@@ -40,6 +40,8 @@ public:
 	required_device<buffered_spriteram16_device> m_spriteram;
 	DECLARE_WRITE16_MEMBER(karnov_control_w);
 	DECLARE_READ16_MEMBER(karnov_control_r);
+	DECLARE_WRITE16_MEMBER(karnov_videoram_w);
+	DECLARE_WRITE16_MEMBER(karnov_playfield_swap_w);
 };
 
 enum {
@@ -54,8 +56,6 @@ enum {
 
 /*----------- defined in video/karnov.c -----------*/
 
-WRITE16_HANDLER( karnov_playfield_swap_w );
-WRITE16_HANDLER( karnov_videoram_w );
 
 void karnov_flipscreen_w(running_machine &machine, int data);
 

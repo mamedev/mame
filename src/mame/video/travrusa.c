@@ -240,11 +240,10 @@ VIDEO_START( travrusa )
 
 ***************************************************************************/
 
-WRITE8_HANDLER( travrusa_videoram_w )
+WRITE8_MEMBER(travrusa_state::travrusa_videoram_w)
 {
-	travrusa_state *state = space->machine().driver_data<travrusa_state>();
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset / 2);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
 
@@ -259,30 +258,28 @@ static void set_scroll( running_machine &machine )
 	state->m_bg_tilemap->set_scrollx(3, 0);
 }
 
-WRITE8_HANDLER( travrusa_scroll_x_low_w )
+WRITE8_MEMBER(travrusa_state::travrusa_scroll_x_low_w)
 {
-	travrusa_state *state = space->machine().driver_data<travrusa_state>();
-	state->m_scrollx[0] = data;
-	set_scroll(space->machine());
+	m_scrollx[0] = data;
+	set_scroll(machine());
 }
 
-WRITE8_HANDLER( travrusa_scroll_x_high_w )
+WRITE8_MEMBER(travrusa_state::travrusa_scroll_x_high_w)
 {
-	travrusa_state *state = space->machine().driver_data<travrusa_state>();
-	state->m_scrollx[1] = data;
-	set_scroll(space->machine());
+	m_scrollx[1] = data;
+	set_scroll(machine());
 }
 
 
-WRITE8_HANDLER( travrusa_flipscreen_w )
+WRITE8_MEMBER(travrusa_state::travrusa_flipscreen_w)
 {
 	/* screen flip is handled both by software and hardware */
-	data ^= ~input_port_read(space->machine(), "DSW2") & 1;
+	data ^= ~input_port_read(machine(), "DSW2") & 1;
 
-	flip_screen_set(space->machine(), data & 1);
+	flip_screen_set(machine(), data & 1);
 
-	coin_counter_w(space->machine(), 0, data & 0x02);
-	coin_counter_w(space->machine(), 1, data & 0x20);
+	coin_counter_w(machine(), 0, data & 0x02);
+	coin_counter_w(machine(), 1, data & 0x20);
 }
 
 

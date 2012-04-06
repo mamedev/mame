@@ -57,7 +57,7 @@ static MACHINE_RESET( starwars )
 		memcpy(state->m_slapstic_base, &state->m_slapstic_source[state->m_slapstic_current_bank * 0x2000], 0x2000);
 
 		/* reset all the banks */
-		starwars_out_w(space, 4, 0);
+		state->starwars_out_w(*space, 4, 0);
 	}
 
 	/* reset the matrix processor */
@@ -159,7 +159,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, starwars_state )
 	AM_RANGE(0x4320, 0x433f) AM_READ_PORT("IN1")
 	AM_RANGE(0x4340, 0x435f) AM_READ_PORT("DSW0")
 	AM_RANGE(0x4360, 0x437f) AM_READ_PORT("DSW1")
-	AM_RANGE(0x4380, 0x439f) AM_READ_LEGACY(starwars_adc_r)			/* a-d control result */
+	AM_RANGE(0x4380, 0x439f) AM_READ(starwars_adc_r)			/* a-d control result */
 	AM_RANGE(0x4400, 0x4400) AM_READWRITE_LEGACY(starwars_main_read_r, starwars_main_wr_w)
 	AM_RANGE(0x4401, 0x4401) AM_READ_LEGACY(starwars_main_ready_flag_r)
 	AM_RANGE(0x4500, 0x45ff) AM_DEVREADWRITE("x2212", x2212_device, read, write)
@@ -167,14 +167,14 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, starwars_state )
 	AM_RANGE(0x4620, 0x463f) AM_WRITE_LEGACY(avgdvg_reset_w)
 	AM_RANGE(0x4640, 0x465f) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x4660, 0x467f) AM_WRITE(irq_ack_w)
-	AM_RANGE(0x4680, 0x469f) AM_READNOP AM_WRITE_LEGACY(starwars_out_w)
-	AM_RANGE(0x46a0, 0x46bf) AM_WRITE_LEGACY(starwars_nstore_w)
-	AM_RANGE(0x46c0, 0x46c2) AM_WRITE_LEGACY(starwars_adc_select_w)
+	AM_RANGE(0x4680, 0x469f) AM_READNOP AM_WRITE(starwars_out_w)
+	AM_RANGE(0x46a0, 0x46bf) AM_WRITE(starwars_nstore_w)
+	AM_RANGE(0x46c0, 0x46c2) AM_WRITE(starwars_adc_select_w)
 	AM_RANGE(0x46e0, 0x46e0) AM_WRITE_LEGACY(starwars_soundrst_w)
-	AM_RANGE(0x4700, 0x4707) AM_WRITE_LEGACY(starwars_math_w)
-	AM_RANGE(0x4700, 0x4700) AM_READ_LEGACY(starwars_div_reh_r)
-	AM_RANGE(0x4701, 0x4701) AM_READ_LEGACY(starwars_div_rel_r)
-	AM_RANGE(0x4703, 0x4703) AM_READ_LEGACY(starwars_prng_r)			/* pseudo random number generator */
+	AM_RANGE(0x4700, 0x4707) AM_WRITE(starwars_math_w)
+	AM_RANGE(0x4700, 0x4700) AM_READ(starwars_div_reh_r)
+	AM_RANGE(0x4701, 0x4701) AM_READ(starwars_div_rel_r)
+	AM_RANGE(0x4703, 0x4703) AM_READ(starwars_prng_r)			/* pseudo random number generator */
 	AM_RANGE(0x4800, 0x4fff) AM_RAM								/* CPU and Math RAM */
 	AM_RANGE(0x5000, 0x5fff) AM_RAM AM_BASE(m_mathram)	/* CPU and Math RAM */
 	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1")						/* banked ROM */

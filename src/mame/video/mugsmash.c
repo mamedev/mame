@@ -80,12 +80,11 @@ static TILE_GET_INFO( get_mugsmash_tile_info1 )
 	SET_TILE_INFO(1, tileno, colour, TILE_FLIPYX(fx));
 }
 
-WRITE16_HANDLER( mugsmash_videoram1_w )
+WRITE16_MEMBER(mugsmash_state::mugsmash_videoram1_w)
 {
-	mugsmash_state *state = space->machine().driver_data<mugsmash_state>();
 
-	state->m_videoram1[offset] = data;
-	state->m_tilemap1->mark_tile_dirty(offset / 2);
+	m_videoram1[offset] = data;
+	m_tilemap1->mark_tile_dirty(offset / 2);
 }
 
 static TILE_GET_INFO( get_mugsmash_tile_info2 )
@@ -109,34 +108,32 @@ static TILE_GET_INFO( get_mugsmash_tile_info2 )
 	SET_TILE_INFO(1, tileno, 16 + colour, TILE_FLIPYX(fx));
 }
 
-WRITE16_HANDLER( mugsmash_videoram2_w )
+WRITE16_MEMBER(mugsmash_state::mugsmash_videoram2_w)
 {
-	mugsmash_state *state = space->machine().driver_data<mugsmash_state>();
 
-	state->m_videoram2[offset] = data;
-	state->m_tilemap2->mark_tile_dirty(offset / 2);
+	m_videoram2[offset] = data;
+	m_tilemap2->mark_tile_dirty(offset / 2);
 }
 
-WRITE16_HANDLER (mugsmash_reg_w)
+WRITE16_MEMBER(mugsmash_state::mugsmash_reg_w)
 {
-	mugsmash_state *state = space->machine().driver_data<mugsmash_state>();
 
-	state->m_regs1[offset] = data;
+	m_regs1[offset] = data;
 //  popmessage ("Regs %04x, %04x, %04x, %04x", mugsmash_regs1[0], mugsmash_regs1[1],mugsmash_regs1[2], mugsmash_regs1[3]);
 
 	switch (offset)
 	{
 	case 0:
-		state->m_tilemap2->set_scrollx(0, state->m_regs1[2] + 7);
+		m_tilemap2->set_scrollx(0, m_regs1[2] + 7);
 		break;
 	case 1:
-		state->m_tilemap2->set_scrolly(0, state->m_regs1[3] + 4);
+		m_tilemap2->set_scrolly(0, m_regs1[3] + 4);
 		break;
 	case 2:
-		state->m_tilemap1->set_scrollx(0, state->m_regs1[0] + 3);
+		m_tilemap1->set_scrollx(0, m_regs1[0] + 3);
 		break;
 	case 3:
-		state->m_tilemap1->set_scrolly(0, state->m_regs1[1] + 4);
+		m_tilemap1->set_scrolly(0, m_regs1[1] + 4);
 		break;
 	}
 }

@@ -79,9 +79,9 @@ static WRITE8_DEVICE_HANDLER( madalien_portB_w )
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, madalien_state )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
 
-	AM_RANGE(0x6000, 0x63ff) AM_RAM_WRITE_LEGACY(madalien_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0x6000, 0x63ff) AM_RAM_WRITE(madalien_videoram_w) AM_BASE(m_videoram)
 	AM_RANGE(0x6400, 0x67ff) AM_RAM
-	AM_RANGE(0x6800, 0x7fff) AM_RAM_WRITE_LEGACY(madalien_charram_w) AM_BASE(m_charram)
+	AM_RANGE(0x6800, 0x7fff) AM_RAM_WRITE(madalien_charram_w) AM_BASE(m_charram)
 
 	AM_RANGE(0x8000, 0x8000) AM_MIRROR(0x0ff0) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0x8001, 0x8001) AM_MIRROR(0x0ff0) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)

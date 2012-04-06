@@ -46,8 +46,8 @@ WRITE8_MEMBER(timelimt_state::sound_reset_w)
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, timelimt_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM		/* rom */
 	AM_RANGE(0x8000, 0x87ff) AM_RAM		/* ram */
-	AM_RANGE(0x8800, 0x8bff) AM_RAM_WRITE_LEGACY(timelimt_videoram_w) AM_BASE(m_videoram)	/* video ram */
-	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE_LEGACY(timelimt_bg_videoram_w) AM_BASE(m_bg_videoram) AM_SIZE(m_bg_videoram_size)/* background ram */
+	AM_RANGE(0x8800, 0x8bff) AM_RAM_WRITE(timelimt_videoram_w) AM_BASE(m_videoram)	/* video ram */
+	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE(timelimt_bg_videoram_w) AM_BASE(m_bg_videoram) AM_SIZE(m_bg_videoram_size)/* background ram */
 	AM_RANGE(0x9800, 0x98ff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)	/* sprite ram */
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("INPUTS")
 	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("SYSTEM")
@@ -56,9 +56,9 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, timelimt_state )
 	AM_RANGE(0xb003, 0xb003) AM_WRITE(sound_reset_w)/* sound reset ? */
 	AM_RANGE(0xb800, 0xb800) AM_WRITE(soundlatch_w) /* sound write */
 	AM_RANGE(0xb800, 0xb800) AM_READNOP		/* NMI ack? */
-	AM_RANGE(0xc800, 0xc800) AM_WRITE_LEGACY(timelimt_scroll_x_lsb_w)
-	AM_RANGE(0xc801, 0xc801) AM_WRITE_LEGACY(timelimt_scroll_x_msb_w)
-	AM_RANGE(0xc802, 0xc802) AM_WRITE_LEGACY(timelimt_scroll_y_w)
+	AM_RANGE(0xc800, 0xc800) AM_WRITE(timelimt_scroll_x_lsb_w)
+	AM_RANGE(0xc801, 0xc801) AM_WRITE(timelimt_scroll_x_msb_w)
+	AM_RANGE(0xc802, 0xc802) AM_WRITE(timelimt_scroll_y_w)
 	AM_RANGE(0xc803, 0xc803) AM_WRITENOP		/* ???? bit 0 used only */
 	AM_RANGE(0xc804, 0xc804) AM_WRITENOP		/* ???? not used */
 ADDRESS_MAP_END

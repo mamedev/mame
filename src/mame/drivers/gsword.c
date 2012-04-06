@@ -338,11 +338,11 @@ static ADDRESS_MAP_START( cpu1_map, AS_PROGRAM , 8, gsword_state )
 	AM_RANGE(0xa380, 0xa3ff) AM_RAM AM_BASE(m_spritetile_ram)
 	AM_RANGE(0xa400, 0xa77f) AM_RAM
 	AM_RANGE(0xa780, 0xa7ff) AM_RAM AM_BASE(m_spritexy_ram) AM_SIZE(m_spritexy_size)
-	AM_RANGE(0xa980, 0xa980) AM_WRITE_LEGACY(gsword_charbank_w)
-	AM_RANGE(0xaa80, 0xaa80) AM_WRITE_LEGACY(gsword_videoctrl_w)	/* flip screen, char palette bank */
-	AM_RANGE(0xab00, 0xab00) AM_WRITE_LEGACY(gsword_scroll_w)
+	AM_RANGE(0xa980, 0xa980) AM_WRITE(gsword_charbank_w)
+	AM_RANGE(0xaa80, 0xaa80) AM_WRITE(gsword_videoctrl_w)	/* flip screen, char palette bank */
+	AM_RANGE(0xab00, 0xab00) AM_WRITE(gsword_scroll_w)
 	AM_RANGE(0xab80, 0xabff) AM_WRITEONLY AM_BASE(m_spriteattrib_ram)
-	AM_RANGE(0xb000, 0xb7ff) AM_RAM_WRITE_LEGACY(gsword_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0xb000, 0xb7ff) AM_RAM_WRITE(gsword_videoram_w) AM_BASE(m_videoram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cpu1_io_map, AS_IO, 8, gsword_state )

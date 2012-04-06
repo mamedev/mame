@@ -64,10 +64,10 @@ INLINE void fuuki16_vram_w(address_space *space, offs_t offset, UINT16 data, UIN
 	state->m_tilemap[_N_]->mark_tile_dirty(offset / 2);
 }
 
-WRITE16_HANDLER( fuuki16_vram_0_w ) { fuuki16_vram_w(space, offset, data, mem_mask, 0); }
-WRITE16_HANDLER( fuuki16_vram_1_w ) { fuuki16_vram_w(space, offset, data, mem_mask, 1); }
-WRITE16_HANDLER( fuuki16_vram_2_w ) { fuuki16_vram_w(space, offset, data, mem_mask, 2); }
-WRITE16_HANDLER( fuuki16_vram_3_w ) { fuuki16_vram_w(space, offset, data, mem_mask, 3); }
+WRITE16_MEMBER(fuuki16_state::fuuki16_vram_0_w){ fuuki16_vram_w(&space, offset, data, mem_mask, 0); }
+WRITE16_MEMBER(fuuki16_state::fuuki16_vram_1_w){ fuuki16_vram_w(&space, offset, data, mem_mask, 1); }
+WRITE16_MEMBER(fuuki16_state::fuuki16_vram_2_w){ fuuki16_vram_w(&space, offset, data, mem_mask, 2); }
+WRITE16_MEMBER(fuuki16_state::fuuki16_vram_3_w){ fuuki16_vram_w(&space, offset, data, mem_mask, 3); }
 
 
 /***************************************************************************

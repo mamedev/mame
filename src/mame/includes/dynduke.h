@@ -23,16 +23,16 @@ public:
 	int m_old_back;
 	int m_old_fore;
 	required_device<buffered_spriteram16_device> m_spriteram;
+	DECLARE_WRITE16_MEMBER(dynduke_paletteram_w);
+	DECLARE_WRITE16_MEMBER(dynduke_background_w);
+	DECLARE_WRITE16_MEMBER(dynduke_foreground_w);
+	DECLARE_WRITE16_MEMBER(dynduke_text_w);
+	DECLARE_WRITE16_MEMBER(dynduke_gfxbank_w);
+	DECLARE_WRITE16_MEMBER(dynduke_control_w);
 };
 
 
 /*----------- defined in video/dynduke.c -----------*/
 
-WRITE16_HANDLER( dynduke_background_w );
-WRITE16_HANDLER( dynduke_foreground_w );
-WRITE16_HANDLER( dynduke_text_w );
-WRITE16_HANDLER( dynduke_gfxbank_w );
-WRITE16_HANDLER( dynduke_control_w );
-WRITE16_HANDLER( dynduke_paletteram_w );
 VIDEO_START( dynduke );
 SCREEN_UPDATE_IND16( dynduke );

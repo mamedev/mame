@@ -39,9 +39,8 @@ INLINE void get_crosshair_xy(running_machine &machine, int player, int *x, int *
  *
  *************************************/
 
-READ16_HANDLER( lethalj_gun_r )
+READ16_MEMBER(lethalj_state::lethalj_gun_r)
 {
-	lethalj_state *state = space->machine().driver_data<lethalj_state>();
 	UINT16 result = 0;
 	int beamx, beamy;
 
@@ -50,21 +49,21 @@ READ16_HANDLER( lethalj_gun_r )
 		case 4:
 		case 5:
 			/* latch the crosshair position */
-			get_crosshair_xy(space->machine(), offset - 4, &beamx, &beamy);
-			state->m_gunx = beamx;
-			state->m_guny = beamy;
-			state->m_blank_palette = 1;
+			get_crosshair_xy(machine(), offset - 4, &beamx, &beamy);
+			m_gunx = beamx;
+			m_guny = beamy;
+			m_blank_palette = 1;
 			break;
 
 		case 6:
-			result = state->m_gunx / 2;
+			result = m_gunx / 2;
 			break;
 
 		case 7:
-			result = state->m_guny + 4;
+			result = m_guny + 4;
 			break;
 	}
-/*  logerror("%08X:lethalj_gun_r(%d) = %04X\n", cpu_get_pc(&space->device()), offset, result); */
+/*  logerror("%08X:lethalj_gun_r(%d) = %04X\n", cpu_get_pc(&space.device()), offset, result); */
 	return result;
 }
 
@@ -102,19 +101,19 @@ static TIMER_CALLBACK( gen_ext1_int )
 
 
 
-static void do_blit(lethalj_state *state)
+void lethalj_state::do_blit()
 {
-	int dsty = (INT16)state->m_blitter_data[1];
-	int srcx = (UINT16)state->m_blitter_data[2];
-	int srcy = (UINT16)(state->m_blitter_data[3] + 1);
-	int width = (UINT16)state->m_blitter_data[5];
-	int dstx = (INT16)state->m_blitter_data[6];
-	int height = (UINT16)state->m_blitter_data[7];
+	int dsty = (INT16)m_blitter_data[1];
+	int srcx = (UINT16)m_blitter_data[2];
+	int srcy = (UINT16)(m_blitter_data[3] + 1);
+	int width = (UINT16)m_blitter_data[5];
+	int dstx = (INT16)m_blitter_data[6];
+	int height = (UINT16)m_blitter_data[7];
 	int y;
 /*
     logerror("blitter data = %04X %04X %04X %04X %04X %04X %04X %04X\n",
-            state->m_blitter_data[0], state->m_blitter_data[1], state->m_blitter_data[2], state->m_blitter_data[3],
-            state->m_blitter_data[4], state->m_blitter_data[5], state->m_blitter_data[6], state->m_blitter_data[7]);
+            m_blitter_data[0], m_blitter_data[1], m_blitter_data[2], m_blitter_data[3],
+            m_blitter_data[4], m_blitter_data[5], m_blitter_data[6], m_blitter_data[7]);
 */
 	/* loop over Y coordinates */
 	for (y = 0; y <= height; y++, srcy++, dsty++)
@@ -122,8 +121,8 @@ static void do_blit(lethalj_state *state)
 		/* clip in Y */
 		if (dsty >= 0 && dsty < BLITTER_DEST_HEIGHT/2)
 		{
-			UINT16 *source = state->m_blitter_base + (srcy % state->m_blitter_rows) * BLITTER_SOURCE_WIDTH;
-			UINT16 *dest = state->m_screenram + (dsty + (state->m_vispage ^ 1) * 256) * BLITTER_DEST_WIDTH;
+			UINT16 *source = m_blitter_base + (srcy % m_blitter_rows) * BLITTER_SOURCE_WIDTH;
+			UINT16 *dest = m_screenram + (dsty + (m_vispage ^ 1) * 256) * BLITTER_DEST_WIDTH;
 			int sx = srcx;
 			int dx = dstx;
 			int x;
@@ -141,26 +140,25 @@ static void do_blit(lethalj_state *state)
 }
 
 
-WRITE16_HANDLER( lethalj_blitter_w )
+WRITE16_MEMBER(lethalj_state::lethalj_blitter_w)
 {
-	lethalj_state *state = space->machine().driver_data<lethalj_state>();
 	/* combine the data */
-	COMBINE_DATA(&state->m_blitter_data[offset]);
+	COMBINE_DATA(&m_blitter_data[offset]);
 
 	/* blit on a write to offset 7, and signal an IRQ */
 	if (offset == 7)
 	{
-		if (state->m_blitter_data[6] == 2 && state->m_blitter_data[7] == 2)
-			state->m_vispage ^= 1;
+		if (m_blitter_data[6] == 2 && m_blitter_data[7] == 2)
+			m_vispage ^= 1;
 		else
-			do_blit(state);
+			do_blit();
 
-		space->machine().scheduler().timer_set(attotime::from_hz(XTAL_32MHz) * ((state->m_blitter_data[5] + 1) * (state->m_blitter_data[7] + 1)), FUNC(gen_ext1_int));
+		machine().scheduler().timer_set(attotime::from_hz(XTAL_32MHz) * ((m_blitter_data[5] + 1) * (m_blitter_data[7] + 1)), FUNC(gen_ext1_int));
 	}
 
 	/* clear the IRQ on offset 0 */
 	else if (offset == 0)
-		cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
+		cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
 }
 
 

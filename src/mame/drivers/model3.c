@@ -1625,23 +1625,25 @@ static WRITE64_HANDLER( model3_sys_w )
 
 static READ64_HANDLER( model3_rtc_r )
 {
+	model3_state *state = space->machine().driver_data<model3_state>();
 	UINT64 r = 0;
 	if(ACCESSING_BITS_56_63) {
-		r |= (UINT64)rtc72421_r(space, (offset*2)+0, (UINT32)(mem_mask >> 32)) << 32;
+		r |= (UINT64)state->rtc72421_r(*space, (offset*2)+0, (UINT32)(mem_mask >> 32)) << 32;
 	}
 	if(ACCESSING_BITS_24_31) {
-		r |= (UINT64)rtc72421_r(space, (offset*2)+1, (UINT32)(mem_mask));
+		r |= (UINT64)state->rtc72421_r(*space, (offset*2)+1, (UINT32)(mem_mask));
 	}
 	return r;
 }
 
 static WRITE64_HANDLER( model3_rtc_w )
 {
+	model3_state *state = space->machine().driver_data<model3_state>();
 	if(ACCESSING_BITS_56_63) {
-		rtc72421_w(space, (offset*2)+0, (UINT32)(data >> 32), (UINT32)(mem_mask >> 32));
+		state->rtc72421_w(*space, (offset*2)+0, (UINT32)(data >> 32), (UINT32)(mem_mask >> 32));
 	}
 	if(ACCESSING_BITS_24_31) {
-		rtc72421_w(space, (offset*2)+1, (UINT32)(data), (UINT32)(mem_mask));
+		state->rtc72421_w(*space, (offset*2)+1, (UINT32)(data), (UINT32)(mem_mask));
 	}
 }
 
@@ -1877,9 +1879,9 @@ static ADDRESS_MAP_START( model3_mem, AS_PROGRAM, 64, model3_state )
 	AM_RANGE(0x00000000, 0x007fffff) AM_RAM	AM_BASE(m_work_ram)	/* work RAM */
 
 	AM_RANGE(0x84000000, 0x8400003f) AM_READ_LEGACY(real3d_status_r )
-	AM_RANGE(0x88000000, 0x88000007) AM_WRITE_LEGACY(real3d_cmd_w )
-	AM_RANGE(0x8e000000, 0x8e0fffff) AM_WRITE_LEGACY(real3d_display_list_w )
-	AM_RANGE(0x98000000, 0x980fffff) AM_WRITE_LEGACY(real3d_polygon_ram_w )
+	AM_RANGE(0x88000000, 0x88000007) AM_WRITE(real3d_cmd_w )
+	AM_RANGE(0x8e000000, 0x8e0fffff) AM_WRITE(real3d_display_list_w )
+	AM_RANGE(0x98000000, 0x980fffff) AM_WRITE(real3d_polygon_ram_w )
 
 	AM_RANGE(0xf0040000, 0xf004003f) AM_MIRROR(0x0e000000) AM_READWRITE_LEGACY(model3_ctrl_r, model3_ctrl_w )
 	AM_RANGE(0xf0080000, 0xf008ffff) AM_MIRROR(0x0e000000) AM_WRITE8_LEGACY(model3_sound_w, U64(0xffffffffffffffff) )
@@ -1889,10 +1891,10 @@ static ADDRESS_MAP_START( model3_mem, AS_PROGRAM, 64, model3_state )
 	AM_RANGE(0xf0180000, 0xf019ffff) AM_MIRROR(0x0e000000) AM_RAM							/* Security Board RAM */
 	AM_RANGE(0xf01a0000, 0xf01a003f) AM_MIRROR(0x0e000000) AM_READ_LEGACY(model3_security_r )	/* Security board */
 
-	AM_RANGE(0xf1000000, 0xf10f7fff) AM_READWRITE_LEGACY(model3_char_r, model3_char_w )	/* character RAM */
-	AM_RANGE(0xf10f8000, 0xf10fffff) AM_READWRITE_LEGACY(model3_tile_r, model3_tile_w )	/* tilemaps */
-	AM_RANGE(0xf1100000, 0xf111ffff) AM_READWRITE_LEGACY(model3_palette_r, model3_palette_w ) AM_BASE(m_paletteram64) /* palette */
-	AM_RANGE(0xf1180000, 0xf11800ff) AM_READWRITE_LEGACY(model3_vid_reg_r, model3_vid_reg_w )
+	AM_RANGE(0xf1000000, 0xf10f7fff) AM_READWRITE(model3_char_r, model3_char_w )	/* character RAM */
+	AM_RANGE(0xf10f8000, 0xf10fffff) AM_READWRITE(model3_tile_r, model3_tile_w )	/* tilemaps */
+	AM_RANGE(0xf1100000, 0xf111ffff) AM_READWRITE(model3_palette_r, model3_palette_w ) AM_BASE(m_paletteram64) /* palette */
+	AM_RANGE(0xf1180000, 0xf11800ff) AM_READWRITE(model3_vid_reg_r, model3_vid_reg_w )
 
 	AM_RANGE(0xff800000, 0xffffffff) AM_ROM AM_REGION("user1", 0)
 ADDRESS_MAP_END

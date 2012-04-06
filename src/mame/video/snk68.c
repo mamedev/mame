@@ -85,22 +85,20 @@ VIDEO_START( searchar )
 
 ***************************************************************************/
 
-READ16_HANDLER( pow_spriteram_r )
+READ16_MEMBER(snk68_state::pow_spriteram_r)
 {
-	snk68_state *state = space->machine().driver_data<snk68_state>();
 
 	// streetsj expects the MSB of every 32-bit word to be FF. Presumably RAM
 	// exists only for 3 bytes out of 4 and the fourth is unmapped.
 	if (!(offset & 1))
-		return state->m_spriteram[offset] | 0xff00;
+		return m_spriteram[offset] | 0xff00;
 	else
-		return state->m_spriteram[offset];
+		return m_spriteram[offset];
 }
 
-WRITE16_HANDLER( pow_spriteram_w )
+WRITE16_MEMBER(snk68_state::pow_spriteram_w)
 {
-	snk68_state *state = space->machine().driver_data<snk68_state>();
-	UINT16 *spriteram16 = state->m_spriteram;
+	UINT16 *spriteram16 = m_spriteram;
 	UINT16 newword = spriteram16[offset];
 
 	if (!(offset & 1))
@@ -110,86 +108,80 @@ WRITE16_HANDLER( pow_spriteram_w )
 
 	if (spriteram16[offset] != newword)
 	{
-		int vpos = space->machine().primary_screen->vpos();
+		int vpos = machine().primary_screen->vpos();
 
 		if (vpos > 0)
-			space->machine().primary_screen->update_partial(vpos - 1);
+			machine().primary_screen->update_partial(vpos - 1);
 
 		spriteram16[offset] = newword;
 	}
 }
 
-READ16_HANDLER( pow_fg_videoram_r )
+READ16_MEMBER(snk68_state::pow_fg_videoram_r)
 {
-	snk68_state *state = space->machine().driver_data<snk68_state>();
 
 	// RAM is only 8-bit
-	return state->m_pow_fg_videoram[offset] | 0xff00;
+	return m_pow_fg_videoram[offset] | 0xff00;
 }
 
-WRITE16_HANDLER( pow_fg_videoram_w )
+WRITE16_MEMBER(snk68_state::pow_fg_videoram_w)
 {
-	snk68_state *state = space->machine().driver_data<snk68_state>();
 
 	data |= 0xff00;
-	COMBINE_DATA(&state->m_pow_fg_videoram[offset]);
-	state->m_fg_tilemap->mark_tile_dirty(offset >> 1);
+	COMBINE_DATA(&m_pow_fg_videoram[offset]);
+	m_fg_tilemap->mark_tile_dirty(offset >> 1);
 }
 
-WRITE16_HANDLER( searchar_fg_videoram_w )
+WRITE16_MEMBER(snk68_state::searchar_fg_videoram_w)
 {
-	snk68_state *state = space->machine().driver_data<snk68_state>();
 
 	// RAM is full 16-bit, though only half of it is used by the hardware
-	COMBINE_DATA(&state->m_pow_fg_videoram[offset]);
-	state->m_fg_tilemap->mark_tile_dirty(offset >> 1);
+	COMBINE_DATA(&m_pow_fg_videoram[offset]);
+	m_fg_tilemap->mark_tile_dirty(offset >> 1);
 }
 
-WRITE16_HANDLER( pow_flipscreen16_w )
+WRITE16_MEMBER(snk68_state::pow_flipscreen16_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		snk68_state *state = space->machine().driver_data<snk68_state>();
-		state->m_flipscreen = data & 0x08;
-		space->machine().tilemap().set_flip_all(state->m_flipscreen ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
+		m_flipscreen = data & 0x08;
+		machine().tilemap().set_flip_all(m_flipscreen ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
 
-		state->m_sprite_flip_axis = data & 0x04;	// for streetsm? though might not be present on this board
+		m_sprite_flip_axis = data & 0x04;	// for streetsm? though might not be present on this board
 
-		if (state->m_fg_tile_offset != ((data & 0x70) << 4))
+		if (m_fg_tile_offset != ((data & 0x70) << 4))
 		{
-			state->m_fg_tile_offset = (data & 0x70) << 4;
-			state->m_fg_tilemap->mark_all_dirty();
+			m_fg_tile_offset = (data & 0x70) << 4;
+			m_fg_tilemap->mark_all_dirty();
 		}
 	}
 }
 
-WRITE16_HANDLER( searchar_flipscreen16_w )
+WRITE16_MEMBER(snk68_state::searchar_flipscreen16_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		snk68_state *state = space->machine().driver_data<snk68_state>();
 
-		state->m_flipscreen = data & 0x08;
-		space->machine().tilemap().set_flip_all(state->m_flipscreen ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
+		m_flipscreen = data & 0x08;
+		machine().tilemap().set_flip_all(m_flipscreen ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
 
-		state->m_sprite_flip_axis = data & 0x04;
+		m_sprite_flip_axis = data & 0x04;
 	}
 }
 
-WRITE16_HANDLER( pow_paletteram16_word_w )
+WRITE16_MEMBER(snk68_state::pow_paletteram16_word_w)
 {
-	snk68_state *state = space->machine().driver_data<snk68_state>();
 	UINT16 newword;
 	int r,g,b;
 
-	COMBINE_DATA(&state->m_paletteram[offset]);
-	newword = state->m_paletteram[offset];
+	COMBINE_DATA(&m_paletteram[offset]);
+	newword = m_paletteram[offset];
 
 	r = ((newword >> 7) & 0x1e) | ((newword >> 14) & 0x01);
 	g = ((newword >> 3) & 0x1e) | ((newword >> 13) & 0x01) ;
 	b = ((newword << 1) & 0x1e) | ((newword >> 12) & 0x01) ;
 
-	palette_set_color_rgb(space->machine(),offset,pal5bit(r),pal5bit(g),pal5bit(b));
+	palette_set_color_rgb(machine(),offset,pal5bit(r),pal5bit(g),pal5bit(b));
 }
 
 

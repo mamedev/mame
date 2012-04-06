@@ -63,15 +63,14 @@ SCREEN_VBLANK( lemmings )
 /******************************************************************************/
 
 // RAM based
-WRITE16_HANDLER( lemmings_pixel_0_w )
+WRITE16_MEMBER(lemmings_state::lemmings_pixel_0_w)
 {
 
-	lemmings_state *state = space->machine().driver_data<lemmings_state>();
 	int sx, sy, src, old;
 
-	old = state->m_pixel_0_data[offset];
-	COMBINE_DATA(&state->m_pixel_0_data[offset]);
-	src = state->m_pixel_0_data[offset];
+	old = m_pixel_0_data[offset];
+	COMBINE_DATA(&m_pixel_0_data[offset]);
+	src = m_pixel_0_data[offset];
 	if (old == src)
 		return;
 
@@ -81,36 +80,34 @@ WRITE16_HANDLER( lemmings_pixel_0_w )
 	if (sx > 2047 || sy > 255)
 		return;
 
-	state->m_bitmap0.pix16(sy, sx + 0) = ((src >> 8) & 0xf) | 0x100;
-	state->m_bitmap0.pix16(sy, sx + 1) = ((src >> 0) & 0xf) | 0x100;
+	m_bitmap0.pix16(sy, sx + 0) = ((src >> 8) & 0xf) | 0x100;
+	m_bitmap0.pix16(sy, sx + 1) = ((src >> 0) & 0xf) | 0x100;
 }
 
 // RAM based tiles for the FG tilemap
-WRITE16_HANDLER( lemmings_pixel_1_w )
+WRITE16_MEMBER(lemmings_state::lemmings_pixel_1_w)
 {
-	lemmings_state *state = space->machine().driver_data<lemmings_state>();
 	int sx, sy, src, tile;
 
-	COMBINE_DATA(&state->m_pixel_1_data[offset]);
-	src = state->m_pixel_1_data[offset];
+	COMBINE_DATA(&m_pixel_1_data[offset]);
+	src = m_pixel_1_data[offset];
 
 	sy = ((offset << 1) / 0x200);
 	sx = ((offset << 1) & 0x1ff);
 
 	/* Copy pixel to buffer for easier decoding later */
 	tile = ((sx / 8) * 32) + (sy / 8);
-	gfx_element_mark_dirty(space->machine().gfx[2], tile);
-	state->m_vram_buffer[(tile * 64) + ((sx & 7)) + ((sy & 7) * 8)] = (src >> 8) & 0xf;
+	gfx_element_mark_dirty(machine().gfx[2], tile);
+	m_vram_buffer[(tile * 64) + ((sx & 7)) + ((sy & 7) * 8)] = (src >> 8) & 0xf;
 
 	sx += 1; /* Update both pixels in the word */
-	state->m_vram_buffer[(tile * 64) + ((sx & 7)) + ((sy & 7) * 8)] = (src >> 0) & 0xf;
+	m_vram_buffer[(tile * 64) + ((sx & 7)) + ((sy & 7) * 8)] = (src >> 0) & 0xf;
 }
 
-WRITE16_HANDLER( lemmings_vram_w )
+WRITE16_MEMBER(lemmings_state::lemmings_vram_w)
 {
-	lemmings_state *state = space->machine().driver_data<lemmings_state>();
-	COMBINE_DATA(&state->m_vram_data[offset]);
-	state->m_vram_tilemap->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_vram_data[offset]);
+	m_vram_tilemap->mark_tile_dirty(offset);
 }
 
 

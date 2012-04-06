@@ -55,230 +55,206 @@ PALETTE_INIT( sprtmtch )
 #define LAYOUT_MJDIALQ2	3	// 2 layers
 #define LAYOUT_JANTOUKI	4	// 2 x (4 couples of layers, interleaved)
 
-WRITE8_HANDLER( dynax_extra_scrollx_w )
+WRITE8_MEMBER(dynax_state::dynax_extra_scrollx_w)
 {
-	dynax_state *state = space->machine().driver_data<dynax_state>();
-	state->m_extra_scroll_x = data;
+	m_extra_scroll_x = data;
 }
 
-WRITE8_HANDLER( dynax_extra_scrolly_w )
+WRITE8_MEMBER(dynax_state::dynax_extra_scrolly_w)
 {
-	dynax_state *state = space->machine().driver_data<dynax_state>();
-	state->m_extra_scroll_y = data;
+	m_extra_scroll_y = data;
 }
 
 
 /* Destination Pen */
-WRITE8_HANDLER( dynax_blit_pen_w )
+WRITE8_MEMBER(dynax_state::dynax_blit_pen_w)
 {
-	dynax_state *state = space->machine().driver_data<dynax_state>();
-	state->m_blit_pen = data;
+	m_blit_pen = data;
 	LOG(("P=%02X ", data));
 }
 
-WRITE8_HANDLER( dynax_blit2_pen_w )
+WRITE8_MEMBER(dynax_state::dynax_blit2_pen_w)
 {
-	dynax_state *state = space->machine().driver_data<dynax_state>();
-	state->m_blit2_pen = data;
+	m_blit2_pen = data;
 	LOG(("P'=%02X ", data));
 }
 
 
 /* Destination Layers */
-WRITE8_HANDLER( dynax_blit_dest_w )
+WRITE8_MEMBER(dynax_state::dynax_blit_dest_w)
 {
-	dynax_state *state = space->machine().driver_data<dynax_state>();
-	state->m_blit_dest = data;
-	if (state->m_layer_layout == LAYOUT_HNORIDUR)
-		state->m_blit_dest = BITSWAP8(state->m_blit_dest ^ 0x0f, 7, 6, 5, 4, 0, 1, 2, 3);
+	m_blit_dest = data;
+	if (m_layer_layout == LAYOUT_HNORIDUR)
+		m_blit_dest = BITSWAP8(m_blit_dest ^ 0x0f, 7, 6, 5, 4, 0, 1, 2, 3);
 
 	LOG(("D=%02X ", data));
 }
 
-WRITE8_HANDLER( dynax_blit2_dest_w )
+WRITE8_MEMBER(dynax_state::dynax_blit2_dest_w)
 {
-	dynax_state *state = space->machine().driver_data<dynax_state>();
-	state->m_blit2_dest = data;
+	m_blit2_dest = data;
 	LOG(("D'=%02X ", data));
 }
 
-WRITE8_HANDLER( tenkai_blit_dest_w )
+WRITE8_MEMBER(dynax_state::tenkai_blit_dest_w)
 {
 	dynax_blit_dest_w(space, 0, BITSWAP8(data, 7, 6, 5, 4, 0, 1, 2, 3));
 }
 
 
 /* Background Color */
-WRITE8_HANDLER( dynax_blit_backpen_w )
+WRITE8_MEMBER(dynax_state::dynax_blit_backpen_w)
 {
-	dynax_state *state = space->machine().driver_data<dynax_state>();
-	state->m_blit_backpen = data;
+	m_blit_backpen = data;
 	LOG(("B=%02X ", data));
 }
 
 
 /* Layers 0&1 Palettes (Low Bits) */
-WRITE8_HANDLER( dynax_blit_palette01_w )
+WRITE8_MEMBER(dynax_state::dynax_blit_palette01_w)
 {
-	dynax_state *state = space->machine().driver_data<dynax_state>();
-	if (state->m_layer_layout == LAYOUT_HNORIDUR)
-		state->m_blit_palettes = (state->m_blit_palettes & 0x00ff) | ((data & 0x0f) << 12) | ((data & 0xf0) << 4);
+	if (m_layer_layout == LAYOUT_HNORIDUR)
+		m_blit_palettes = (m_blit_palettes & 0x00ff) | ((data & 0x0f) << 12) | ((data & 0xf0) << 4);
 	else
-		state->m_blit_palettes = (state->m_blit_palettes & 0xff00) | data;
+		m_blit_palettes = (m_blit_palettes & 0xff00) | data;
 	LOG(("P01=%02X ", data));
 }
 
-WRITE8_HANDLER( tenkai_blit_palette01_w )
+WRITE8_MEMBER(dynax_state::tenkai_blit_palette01_w)
 {
-	dynax_state *state = space->machine().driver_data<dynax_state>();
-	state->m_blit_palettes = (state->m_blit_palettes & 0xff00) | data;
+	m_blit_palettes = (m_blit_palettes & 0xff00) | data;
 	LOG(("P01=%02X ", data));
 }
 
 
 /* Layers 4&5 Palettes (Low Bits) */
-WRITE8_HANDLER( dynax_blit_palette45_w )
+WRITE8_MEMBER(dynax_state::dynax_blit_palette45_w)
 {
-	dynax_state *state = space->machine().driver_data<dynax_state>();
 
-	if (state->m_layer_layout == LAYOUT_HNORIDUR)
-		state->m_blit2_palettes = (state->m_blit2_palettes & 0x00ff) | ((data & 0x0f) << 12) | ((data & 0xf0) << 4);
+	if (m_layer_layout == LAYOUT_HNORIDUR)
+		m_blit2_palettes = (m_blit2_palettes & 0x00ff) | ((data & 0x0f) << 12) | ((data & 0xf0) << 4);
 	else
-		state->m_blit2_palettes = (state->m_blit2_palettes & 0xff00) | data;
+		m_blit2_palettes = (m_blit2_palettes & 0xff00) | data;
 	LOG(("P45=%02X ", data));
 }
 
 
 /* Layer 2&3 Palettes (Low Bits) */
-WRITE8_HANDLER( dynax_blit_palette23_w )
+WRITE8_MEMBER(dynax_state::dynax_blit_palette23_w)
 {
-	dynax_state *state = space->machine().driver_data<dynax_state>();
 
-	if (state->m_layer_layout == LAYOUT_HNORIDUR)
-		state->m_blit_palettes = (state->m_blit_palettes & 0xff00) | ((data & 0x0f) << 4) | ((data & 0xf0) >> 4);
+	if (m_layer_layout == LAYOUT_HNORIDUR)
+		m_blit_palettes = (m_blit_palettes & 0xff00) | ((data & 0x0f) << 4) | ((data & 0xf0) >> 4);
 	else
-		state->m_blit_palettes = (state->m_blit_palettes & 0x00ff) | (data << 8);
+		m_blit_palettes = (m_blit_palettes & 0x00ff) | (data << 8);
 	LOG(("P23=%02X ", data));
 }
 
-WRITE8_HANDLER( tenkai_blit_palette23_w )
+WRITE8_MEMBER(dynax_state::tenkai_blit_palette23_w)
 {
-	dynax_state *state = space->machine().driver_data<dynax_state>();
-	state->m_blit_palettes = (state->m_blit_palettes & 0x00ff) | ((data & 0x0f) << 12) | ((data & 0xf0) << 4);
+	m_blit_palettes = (m_blit_palettes & 0x00ff) | ((data & 0x0f) << 12) | ((data & 0xf0) << 4);
 	LOG(("P23=%02X ", data));
 }
 
 
 /* Layer 6&7 Palettes (Low Bits) */
-WRITE8_HANDLER( dynax_blit_palette67_w )
+WRITE8_MEMBER(dynax_state::dynax_blit_palette67_w)
 {
-	dynax_state *state = space->machine().driver_data<dynax_state>();
 
-	if (state->m_layer_layout == LAYOUT_HNORIDUR)
-		state->m_blit2_palettes = (state->m_blit2_palettes & 0xff00) | ((data & 0x0f) << 4) | ((data & 0xf0) >> 4);
+	if (m_layer_layout == LAYOUT_HNORIDUR)
+		m_blit2_palettes = (m_blit2_palettes & 0xff00) | ((data & 0x0f) << 4) | ((data & 0xf0) >> 4);
 	else
-		state->m_blit2_palettes = (state->m_blit2_palettes & 0x00ff) | (data << 8);
+		m_blit2_palettes = (m_blit2_palettes & 0x00ff) | (data << 8);
 	LOG(("P67=%02X ", data));
 }
 
 
 /* Layers Palettes (High Bits) */
-WRITE8_HANDLER( dynax_blit_palbank_w )
+WRITE8_MEMBER(dynax_state::dynax_blit_palbank_w)
 {
-	dynax_state *state = space->machine().driver_data<dynax_state>();
-	state->m_blit_palbank = data;
+	m_blit_palbank = data;
 	LOG(("PB=%02X ", data));
 }
 
-WRITE8_HANDLER( dynax_blit2_palbank_w )
+WRITE8_MEMBER(dynax_state::dynax_blit2_palbank_w)
 {
-	dynax_state *state = space->machine().driver_data<dynax_state>();
-	state->m_blit2_palbank = data;
+	m_blit2_palbank = data;
 	LOG(("PB'=%02X ", data));
 }
 
 
 /* Which half of the layers to write two (interleaved games only) */
-WRITE8_HANDLER( hanamai_layer_half_w )
+WRITE8_MEMBER(dynax_state::hanamai_layer_half_w)
 {
-	dynax_state *state = space->machine().driver_data<dynax_state>();
-	state->m_hanamai_layer_half = (~data) & 1;
+	m_hanamai_layer_half = (~data) & 1;
 	LOG(("H=%02X ", data));
 }
 
 
 /* Write to both halves of the layers (interleaved games only) */
-WRITE8_HANDLER( hnoridur_layer_half2_w )
+WRITE8_MEMBER(dynax_state::hnoridur_layer_half2_w)
 {
-	dynax_state *state = space->machine().driver_data<dynax_state>();
-	state->m_hnoridur_layer_half2 = (~data) & 1;
+	m_hnoridur_layer_half2 = (~data) & 1;
 	LOG(("H2=%02X ", data));
 }
 
-WRITE8_HANDLER( mjdialq2_blit_dest_w )
+WRITE8_MEMBER(dynax_state::mjdialq2_blit_dest_w)
 {
-	dynax_state *state = space->machine().driver_data<dynax_state>();
 	int mask = (2 >> offset);	/* 1 or 2 */
 
-	state->m_blit_dest &= ~mask;
+	m_blit_dest &= ~mask;
 
 	if (~data & 1)
-		state->m_blit_dest |= mask;
+		m_blit_dest |= mask;
 }
 
 
 /* Layers Enable */
-WRITE8_HANDLER( dynax_layer_enable_w )
+WRITE8_MEMBER(dynax_state::dynax_layer_enable_w)
 {
-	dynax_state *state = space->machine().driver_data<dynax_state>();
-	state->m_layer_enable = data;
+	m_layer_enable = data;
 	LOG(("E=%02X ", data));
 }
 
-WRITE8_HANDLER( jantouki_layer_enable_w )
+WRITE8_MEMBER(dynax_state::jantouki_layer_enable_w)
 {
-	dynax_state *state = space->machine().driver_data<dynax_state>();
 	int mask = 1 << (7 - offset);
-	state->m_layer_enable = (state->m_layer_enable & ~mask) | ((data & 1) ? mask : 0);
-	state->m_layer_enable |= 1;
+	m_layer_enable = (m_layer_enable & ~mask) | ((data & 1) ? mask : 0);
+	m_layer_enable |= 1;
 }
 
-WRITE8_HANDLER( mjdialq2_layer_enable_w )
+WRITE8_MEMBER(dynax_state::mjdialq2_layer_enable_w)
 {
-	dynax_state *state = space->machine().driver_data<dynax_state>();
 	int mask = (2 >> offset);	/* 1 or 2 */
 
-	state->m_layer_enable &= ~mask;
+	m_layer_enable &= ~mask;
 	if (~data & 1)
-		state->m_layer_enable |= mask;
+		m_layer_enable |= mask;
 }
 
 
-WRITE8_HANDLER( dynax_flipscreen_w )
+WRITE8_MEMBER(dynax_state::dynax_flipscreen_w)
 {
-	dynax_state *state = space->machine().driver_data<dynax_state>();
-	state->m_flipscreen = data & 1;
+	m_flipscreen = data & 1;
 	if (data & ~1)
-		logerror("CPU#0 PC %06X: Warning, flip screen <- %02X\n", cpu_get_pc(&space->device()), data);
+		logerror("CPU#0 PC %06X: Warning, flip screen <- %02X\n", cpu_get_pc(&space.device()), data);
 	LOG(("F=%02X ", data));
 }
 
 
 static const char *const gfxregions[] = { "gfx1", "gfx2", "gfx3", "gfx4", "gfx5", "gfx6", "gfx7", "gfx8" };
 
-WRITE8_HANDLER( dynax_blit_romregion_w )
+WRITE8_MEMBER(dynax_state::dynax_blit_romregion_w)
 {
-	dynax_state *state = space->machine().driver_data<dynax_state>();
 	if (data < ARRAY_LENGTH(gfxregions))
-		state->m_blit_romregion = data;
+		m_blit_romregion = data;
 	LOG(("GFX%X ", data + 1));
 }
 
-WRITE8_HANDLER( dynax_blit2_romregion_w )
+WRITE8_MEMBER(dynax_state::dynax_blit2_romregion_w)
 {
-	dynax_state *state = space->machine().driver_data<dynax_state>();
 	if (data + 1 < ARRAY_LENGTH(gfxregions))
-		state->m_blit2_romregion = data + 1;
+		m_blit2_romregion = data + 1;
 	LOG(("GFX%X' ", data + 2));
 }
 
@@ -618,126 +594,119 @@ static void jantouki_blitter2_start( running_machine &machine, int flags )
 
 
 
-static WRITE8_HANDLER( dynax_blit_scroll_w )
+WRITE8_MEMBER(dynax_state::dynax_blit_scroll_w)
 {
-	dynax_state *state = space->machine().driver_data<dynax_state>();
 
-	switch (state->m_blit_src & 0xc00000)
+	switch (m_blit_src & 0xc00000)
 	{
-		case 0x000000:	state->m_blit_scroll_x = data;
+		case 0x000000:	m_blit_scroll_x = data;
 						LOG(("SX=%02X ", data));
 						break;
-		case 0x400000:	state->m_blit_scroll_y = data;
+		case 0x400000:	m_blit_scroll_y = data;
 						LOG(("SY=%02X ", data));
 						break;
 		case 0x800000:
-		case 0xc00000:	state->m_blit_wrap_enable = data;
+		case 0xc00000:	m_blit_wrap_enable = data;
 						LOG(("WE=%02X ", data));
 						break;
 	}
 }
 
 // inverted scroll values
-static WRITE8_HANDLER( tenkai_blit_scroll_w )
+WRITE8_MEMBER(dynax_state::tenkai_blit_scroll_w)
 {
-	dynax_state *state = space->machine().driver_data<dynax_state>();
 
-	switch (state->m_blit_src & 0xc00000)
+	switch (m_blit_src & 0xc00000)
 	{
-		case 0x000000:	state->m_blit_scroll_x = ((data ^ 0xff) + 1) & 0xff;
+		case 0x000000:	m_blit_scroll_x = ((data ^ 0xff) + 1) & 0xff;
 						LOG(("SX=%02X ", data));
 						break;
-		case 0x400000:	state->m_blit_scroll_y = data ^ 0xff;
+		case 0x400000:	m_blit_scroll_y = data ^ 0xff;
 						LOG(("SY=%02X ", data));
 						break;
 		case 0x800000:
-		case 0xc00000:	state->m_blit_wrap_enable = data;
+		case 0xc00000:	m_blit_wrap_enable = data;
 						LOG(("WE=%02X ", data));
 						break;
 	}
 }
 
-static WRITE8_HANDLER( dynax_blit2_scroll_w )
+WRITE8_MEMBER(dynax_state::dynax_blit2_scroll_w)
 {
-	dynax_state *state = space->machine().driver_data<dynax_state>();
 
-	switch (state->m_blit2_src & 0xc00000)
+	switch (m_blit2_src & 0xc00000)
 	{
-		case 0x000000:	state->m_blit2_scroll_x = data;
+		case 0x000000:	m_blit2_scroll_x = data;
 						LOG(("SX'=%02X ", data));
 						break;
-		case 0x400000:	state->m_blit2_scroll_y = data;
+		case 0x400000:	m_blit2_scroll_y = data;
 						LOG(("SY'=%02X ", data));
 						break;
 		case 0x800000:
-		case 0xc00000:	state->m_blit2_wrap_enable = data;
+		case 0xc00000:	m_blit2_wrap_enable = data;
 						LOG(("WE'=%02X ", data));
 						break;
 	}
 }
 
-WRITE8_HANDLER( dynax_blitter_rev2_w )
+WRITE8_MEMBER(dynax_state::dynax_blitter_rev2_w)
 {
-	dynax_state *state = space->machine().driver_data<dynax_state>();
 
 	switch (offset)
 	{
-		case 0: dynax_blitter_start(space->machine(), data); break;
-		case 1: state->m_blit_x = data; break;
-		case 2: state->m_blit_y = data; break;
-		case 3: state->m_blit_src = (state->m_blit_src & 0xffff00) | (data <<  0); break;
-		case 4: state->m_blit_src = (state->m_blit_src & 0xff00ff) | (data <<  8); break;
-		case 5: state->m_blit_src = (state->m_blit_src & 0x00ffff) | (data << 16); break;
+		case 0: dynax_blitter_start(machine(), data); break;
+		case 1: m_blit_x = data; break;
+		case 2: m_blit_y = data; break;
+		case 3: m_blit_src = (m_blit_src & 0xffff00) | (data <<  0); break;
+		case 4: m_blit_src = (m_blit_src & 0xff00ff) | (data <<  8); break;
+		case 5: m_blit_src = (m_blit_src & 0x00ffff) | (data << 16); break;
 		case 6: dynax_blit_scroll_w(space, 0, data); break;
 	}
 }
 
 // different scroll_w
-WRITE8_HANDLER( tenkai_blitter_rev2_w )
+WRITE8_MEMBER(dynax_state::tenkai_blitter_rev2_w)
 {
-	dynax_state *state = space->machine().driver_data<dynax_state>();
 
 	switch (offset)
 	{
-		case 0: dynax_blitter_start(space->machine(), data); break;
-		case 1: state->m_blit_x = data; break;
-		case 2: state->m_blit_y = data; break;
-		case 3: state->m_blit_src = (state->m_blit_src & 0xffff00) | (data <<  0); break;
-		case 4: state->m_blit_src = (state->m_blit_src & 0xff00ff) | (data <<  8); break;
-		case 5: state->m_blit_src = (state->m_blit_src & 0x00ffff) | (data << 16); break;
+		case 0: dynax_blitter_start(machine(), data); break;
+		case 1: m_blit_x = data; break;
+		case 2: m_blit_y = data; break;
+		case 3: m_blit_src = (m_blit_src & 0xffff00) | (data <<  0); break;
+		case 4: m_blit_src = (m_blit_src & 0xff00ff) | (data <<  8); break;
+		case 5: m_blit_src = (m_blit_src & 0x00ffff) | (data << 16); break;
 		case 6: tenkai_blit_scroll_w(space, 0, data); break;
 	}
 }
 
 
-WRITE8_HANDLER( jantouki_blitter_rev2_w )
+WRITE8_MEMBER(dynax_state::jantouki_blitter_rev2_w)
 {
-	dynax_state *state = space->machine().driver_data<dynax_state>();
 
 	switch (offset)
 	{
-		case 0: jantouki_blitter_start(space->machine(), data); break;
-		case 1: state->m_blit_x = data; break;
-		case 2: state->m_blit_y = data; break;
-		case 3: state->m_blit_src = (state->m_blit_src & 0xffff00) | (data <<  0); break;
-		case 4: state->m_blit_src = (state->m_blit_src & 0xff00ff) | (data <<  8); break;
-		case 5: state->m_blit_src = (state->m_blit_src & 0x00ffff) | (data << 16); break;
+		case 0: jantouki_blitter_start(machine(), data); break;
+		case 1: m_blit_x = data; break;
+		case 2: m_blit_y = data; break;
+		case 3: m_blit_src = (m_blit_src & 0xffff00) | (data <<  0); break;
+		case 4: m_blit_src = (m_blit_src & 0xff00ff) | (data <<  8); break;
+		case 5: m_blit_src = (m_blit_src & 0x00ffff) | (data << 16); break;
 		case 6: dynax_blit_scroll_w(space, 0, data); break;
 	}
 }
 
-WRITE8_HANDLER( jantouki_blitter2_rev2_w )
+WRITE8_MEMBER(dynax_state::jantouki_blitter2_rev2_w)
 {
-	dynax_state *state = space->machine().driver_data<dynax_state>();
 
 	switch (offset)
 	{
-		case 0: jantouki_blitter2_start(space->machine(),data); break;
-		case 1: state->m_blit2_x = data; break;
-		case 2: state->m_blit2_y = data; break;
-		case 3: state->m_blit2_src = (state->m_blit2_src & 0xffff00) | (data <<  0); break;
-		case 4: state->m_blit2_src = (state->m_blit2_src & 0xff00ff) | (data <<  8); break;
-		case 5: state->m_blit2_src = (state->m_blit2_src & 0x00ffff) | (data << 16); break;
+		case 0: jantouki_blitter2_start(machine(),data); break;
+		case 1: m_blit2_x = data; break;
+		case 2: m_blit2_y = data; break;
+		case 3: m_blit2_src = (m_blit2_src & 0xffff00) | (data <<  0); break;
+		case 4: m_blit2_src = (m_blit2_src & 0xff00ff) | (data <<  8); break;
+		case 5: m_blit2_src = (m_blit2_src & 0x00ffff) | (data << 16); break;
 		case 6: dynax_blit2_scroll_w(space, 0, data); break;
 	}
 }
@@ -1189,16 +1158,14 @@ static void mjdialq2_copylayer( running_machine &machine, bitmap_ind16 &bitmap, 
 	}
 }
 
-WRITE8_HANDLER( hanamai_priority_w )
+WRITE8_MEMBER(dynax_state::hanamai_priority_w)
 {
-	dynax_state *state = space->machine().driver_data<dynax_state>();
-	state->m_hanamai_priority = data;
+	m_hanamai_priority = data;
 }
 
-WRITE8_HANDLER( tenkai_priority_w )
+WRITE8_MEMBER(dynax_state::tenkai_priority_w)
 {
-	dynax_state *state = space->machine().driver_data<dynax_state>();
-	state->m_hanamai_priority = BITSWAP8(data, 3, 2, 1, 0, 4, 7, 5, 6);
+	m_hanamai_priority = BITSWAP8(data, 3, 2, 1, 0, 4, 7, 5, 6);
 }
 
 static int debug_mask( running_machine &machine )

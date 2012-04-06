@@ -20,6 +20,10 @@ public:
 	DECLARE_WRITE16_MEMBER(tokib_soundcommand16_w);
 	DECLARE_READ16_MEMBER(pip16_r);
 	DECLARE_WRITE8_MEMBER(toki_adpcm_data_w);
+	DECLARE_WRITE16_MEMBER(toki_control_w);
+	DECLARE_WRITE16_MEMBER(toki_foreground_videoram16_w);
+	DECLARE_WRITE16_MEMBER(toki_background1_videoram16_w);
+	DECLARE_WRITE16_MEMBER(toki_background2_videoram16_w);
 };
 
 
@@ -28,7 +32,3 @@ public:
 VIDEO_START( toki );
 SCREEN_UPDATE_IND16( toki );
 SCREEN_UPDATE_IND16( tokib );
-WRITE16_HANDLER( toki_background1_videoram16_w );
-WRITE16_HANDLER( toki_background2_videoram16_w );
-WRITE16_HANDLER( toki_control_w );
-WRITE16_HANDLER( toki_foreground_videoram16_w );

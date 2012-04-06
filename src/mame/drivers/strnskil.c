@@ -84,7 +84,7 @@ static ADDRESS_MAP_START( strnskil_map1, AS_PROGRAM, 8, strnskil_state )
 
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xc800, 0xcfff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE_LEGACY(strnskil_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(strnskil_videoram_w) AM_BASE(m_videoram)
 
 	AM_RANGE(0xd800, 0xd800) AM_READ(strnskil_d800_r)
 	AM_RANGE(0xd801, 0xd801) AM_READ_PORT("DSW1")
@@ -93,7 +93,7 @@ static ADDRESS_MAP_START( strnskil_map1, AS_PROGRAM, 8, strnskil_state )
 	AM_RANGE(0xd804, 0xd804) AM_READ_PORT("P1")
 	AM_RANGE(0xd805, 0xd805) AM_READ_PORT("P2")
 
-	AM_RANGE(0xd808, 0xd808) AM_WRITE_LEGACY(strnskil_scrl_ctrl_w)
+	AM_RANGE(0xd808, 0xd808) AM_WRITE(strnskil_scrl_ctrl_w)
 	AM_RANGE(0xd809, 0xd809) AM_WRITENOP /* coin counter? */
 	AM_RANGE(0xd80a, 0xd80b) AM_WRITEONLY AM_BASE(m_xscroll)
 ADDRESS_MAP_END

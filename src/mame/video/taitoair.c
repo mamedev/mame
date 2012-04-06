@@ -355,94 +355,88 @@ static void fill_poly( bitmap_ind16 &bitmap, const rectangle &cliprect, const st
     TODO: still don't know how this works. It calls three values (0x1fff-0x5fff-0xdfff), for two or three offsets.
     In theory this should fit into framebuffer draw, display, clear and swap in some way.
 */
-WRITE16_HANDLER( dsp_flags_w )
+WRITE16_MEMBER(taitoair_state::dsp_flags_w)
 {
-	taitoair_state *state = space->machine().driver_data<taitoair_state>();
 	rectangle cliprect;
 
 	/* printf("%04x -> %d\n",data,offset); */
 
 	cliprect.min_x = 0;
 	cliprect.min_y = 3*16;
-	cliprect.max_x = space->machine().primary_screen->width() - 1;
-	cliprect.max_y = space->machine().primary_screen->height() - 1;
+	cliprect.max_x = machine().primary_screen->width() - 1;
+	cliprect.max_y = machine().primary_screen->height() - 1;
 
 	{
 		/* clear and copy operation if offset is 0x3001 */
 		if(offset == 1)
 		{
 			/* clear screen fb */
-			state->m_framebuffer[1]->fill(0, cliprect);
+			m_framebuffer[1]->fill(0, cliprect);
 			/* copy buffer fb into screen fb (at this stage we are ready to draw) */
-			copybitmap_trans(*state->m_framebuffer[1], *state->m_framebuffer[0], 0, 0, 0, 0, cliprect, 0);
+			copybitmap_trans(*m_framebuffer[1], *m_framebuffer[0], 0, 0, 0, 0, cliprect, 0);
 			/* now clear buffer fb */
-			state->m_framebuffer[0]->fill(0, cliprect);
+			m_framebuffer[0]->fill(0, cliprect);
 		}
 
 		/* if offset 0x3001 OR 0x3002 we put data in the buffer fb */
 		if(offset)
 		{
-			if (state->m_line_ram[0x3fff])
+			if (m_line_ram[0x3fff])
 			{
 				int adr = 0x3fff;
 //              struct taitoair_poly q;
 
-				while (adr >= 0 && state->m_line_ram[adr] && state->m_line_ram[adr] != 0x4000)
+				while (adr >= 0 && m_line_ram[adr] && m_line_ram[adr] != 0x4000)
 				{
 					int pcount;
-					if (!(state->m_line_ram[adr] & 0x8000) || adr < 10)
+					if (!(m_line_ram[adr] & 0x8000) || adr < 10)
 					{
-						logerror("quad: unknown value %04x at %04x\n", state->m_line_ram[adr], adr);
+						logerror("quad: unknown value %04x at %04x\n", m_line_ram[adr], adr);
 						break;
 					}
-					state->m_q.col = ((state->m_line_ram[adr] & 0x007f) * 0x80) + 0x2040;
+					m_q.col = ((m_line_ram[adr] & 0x007f) * 0x80) + 0x2040;
 					adr--;
 					pcount = 0;
-					while (pcount < TAITOAIR_POLY_MAX_PT && adr >= 1 && !(state->m_line_ram[adr] & 0xc000))
+					while (pcount < TAITOAIR_POLY_MAX_PT && adr >= 1 && !(m_line_ram[adr] & 0xc000))
 					{
-						state->m_q.p[pcount].y = state->m_line_ram[adr] + 3 * 16;
-						state->m_q.p[pcount].x = state->m_line_ram[adr - 1];
+						m_q.p[pcount].y = m_line_ram[adr] + 3 * 16;
+						m_q.p[pcount].x = m_line_ram[adr - 1];
 						pcount++;
 						adr -= 2;
 					}
 					adr--;
-					state->m_q.pcount = pcount;
-					fill_poly(*state->m_framebuffer[0], cliprect, &state->m_q);
+					m_q.pcount = pcount;
+					fill_poly(*m_framebuffer[0], cliprect, &m_q);
 				}
 			}
 		}
 	}
 }
 
-WRITE16_HANDLER( dsp_x_eyecoord_w )
+WRITE16_MEMBER(taitoair_state::dsp_x_eyecoord_w)
 {
-	taitoair_state *state = space->machine().driver_data<taitoair_state>();
-	state->m_eyecoordBuffer[0] = data;
+	m_eyecoordBuffer[0] = data;
 }
 
-WRITE16_HANDLER( dsp_y_eyecoord_w )
+WRITE16_MEMBER(taitoair_state::dsp_y_eyecoord_w)
 {
-	taitoair_state *state = space->machine().driver_data<taitoair_state>();
-	state->m_eyecoordBuffer[1] = data;
+	m_eyecoordBuffer[1] = data;
 }
 
-WRITE16_HANDLER( dsp_z_eyecoord_w )
+WRITE16_MEMBER(taitoair_state::dsp_z_eyecoord_w)
 {
-	taitoair_state *state = space->machine().driver_data<taitoair_state>();
-	state->m_eyecoordBuffer[2] = data;
+	m_eyecoordBuffer[2] = data;
 }
 
-WRITE16_HANDLER( dsp_frustum_left_w )
+WRITE16_MEMBER(taitoair_state::dsp_frustum_left_w)
 {
 	/* Strange.  It comes in as it it were the right side of the screen */
-	taitoair_state *state = space->machine().driver_data<taitoair_state>();
-	state->m_frustumLeft = -data;
+	m_frustumLeft = -data;
 }
 
-WRITE16_HANDLER( dsp_frustum_bottom_w )
+WRITE16_MEMBER(taitoair_state::dsp_frustum_bottom_w)
 {
-	taitoair_state *state = space->machine().driver_data<taitoair_state>();
-	state->m_frustumBottom = data;
+	m_frustumBottom = data;
 }
 
 
@@ -513,22 +507,21 @@ void airInfernoFrustum(const INT16 leftExtent, const INT16 bottomExtent, float* 
 #undef M
 }
 
-WRITE16_HANDLER( dsp_rasterize_w )
+WRITE16_MEMBER(taitoair_state::dsp_rasterize_w)
 {
 }
 
-READ16_HANDLER( dsp_x_return_r )
+READ16_MEMBER(taitoair_state::dsp_x_return_r)
 {
-	taitoair_state *state = space->machine().driver_data<taitoair_state>();
 
 	/* Construct a frustum from the system's most recently set left and bottom extents */
 	float m[16];
-	airInfernoFrustum(state->m_frustumLeft, state->m_frustumBottom, m);
+	airInfernoFrustum(m_frustumLeft, m_frustumBottom, m);
 	int res;
 
 	res = projectEyeCoordToScreen(m,
 								  32*16, /* x max screen size */
-								  state->m_eyecoordBuffer,0);
+								  m_eyecoordBuffer,0);
 
     // Extremely poor man's clipping :-P
     if (res == -10000) return -32*8;
@@ -538,18 +531,17 @@ READ16_HANDLER( dsp_x_return_r )
 	return res;
 }
 
-READ16_HANDLER( dsp_y_return_r )
+READ16_MEMBER(taitoair_state::dsp_y_return_r)
 {
-	taitoair_state *state = space->machine().driver_data<taitoair_state>();
 
 	/* Construct a frustum from the system's most recently set left and bottom extents */
 	float m[16];
-	airInfernoFrustum(state->m_frustumLeft, state->m_frustumBottom, m);
+	airInfernoFrustum(m_frustumLeft, m_frustumBottom, m);
 
 	int res;
 	res = projectEyeCoordToScreen(m,
 								  28*16, /* y max screen size */
-								  state->m_eyecoordBuffer, 1);
+								  m_eyecoordBuffer, 1);
 
     // Extremely poor man's clipping :-P
     if (res == -10000) return 28*7;

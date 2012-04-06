@@ -13,15 +13,15 @@ public:
 	tilemap_t *m_bg_tilemap;
 	UINT8 *m_spriteram;
 	size_t m_spriteram_size;
+	DECLARE_WRITE8_MEMBER(vulgus_fgvideoram_w);
+	DECLARE_WRITE8_MEMBER(vulgus_bgvideoram_w);
+	DECLARE_WRITE8_MEMBER(vulgus_c804_w);
+	DECLARE_WRITE8_MEMBER(vulgus_palette_bank_w);
 };
 
 
 /*----------- defined in video/vulgus.c -----------*/
 
-WRITE8_HANDLER( vulgus_fgvideoram_w );
-WRITE8_HANDLER( vulgus_bgvideoram_w );
-WRITE8_HANDLER( vulgus_c804_w );
-WRITE8_HANDLER( vulgus_palette_bank_w );
 
 VIDEO_START( vulgus );
 PALETTE_INIT( vulgus );

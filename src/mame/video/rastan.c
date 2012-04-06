@@ -11,22 +11,21 @@
 
 /***************************************************************************/
 
-WRITE16_HANDLER( rastan_spritectrl_w )
+WRITE16_MEMBER(rastan_state::rastan_spritectrl_w)
 {
-	rastan_state *state = space->machine().driver_data<rastan_state>();
 
 	/* bits 5-7 are the sprite palette bank */
-	pc090oj_set_sprite_ctrl(state->m_pc090oj, (data & 0xe0) >> 5);
+	pc090oj_set_sprite_ctrl(m_pc090oj, (data & 0xe0) >> 5);
 
 	/* bit 4 unused */
 
 	/* bits 0 and 1 are coin lockout */
-	coin_lockout_w(space->machine(), 1, ~data & 0x01);
-	coin_lockout_w(space->machine(), 0, ~data & 0x02);
+	coin_lockout_w(machine(), 1, ~data & 0x01);
+	coin_lockout_w(machine(), 0, ~data & 0x02);
 
 	/* bits 2 and 3 are the coin counters */
-	coin_counter_w(space->machine(), 1, data & 0x04);
-	coin_counter_w(space->machine(), 0, data & 0x08);
+	coin_counter_w(machine(), 1, data & 0x04);
+	coin_counter_w(machine(), 0, data & 0x08);
 }
 
 /***************************************************************************/

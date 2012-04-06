@@ -35,7 +35,7 @@ SCREEN_UPDATE_IND16( beezer )
 	return 0;
 }
 
-WRITE8_HANDLER( beezer_map_w )
+WRITE8_MEMBER(beezer_state::beezer_map_w)
 {
 	/*
       bit 7 -- 330  ohm resistor  -- BLUE
@@ -65,12 +65,12 @@ WRITE8_HANDLER( beezer_map_w )
 	bit1 = (data >> 7) & 0x01;
 	b = 0x5f * bit0 + 0xa0 * bit1;
 
-	palette_set_color(space->machine(), offset, MAKE_RGB(r, g, b));
+	palette_set_color(machine(), offset, MAKE_RGB(r, g, b));
 }
 
-READ8_HANDLER( beezer_line_r )
+READ8_MEMBER(beezer_state::beezer_line_r)
 {
-	return space->machine().primary_screen->vpos();
-//  Note: was (state->m_scanline & 0xfe) << 1; with scanline % 128
+	return machine().primary_screen->vpos();
+//  Note: was (m_scanline & 0xfe) << 1; with scanline % 128
 }
 

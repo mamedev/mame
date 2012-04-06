@@ -21,30 +21,28 @@
 
 ******************************************************************************/
 
-WRITE16_HANDLER( inufuku_palettereg_w )
+WRITE16_MEMBER(inufuku_state::inufuku_palettereg_w)
 {
-	inufuku_state *state = space->machine().driver_data<inufuku_state>();
 	switch (offset)
 	{
-		case 0x02:	state->m_bg_palettebank = (data & 0xf000) >> 12;
-				state->m_bg_tilemap->mark_all_dirty();
+		case 0x02:	m_bg_palettebank = (data & 0xf000) >> 12;
+				m_bg_tilemap->mark_all_dirty();
 				break;
-		case 0x03:	state->m_tx_palettebank = (data & 0xf000) >> 12;
-				state->m_tx_tilemap->mark_all_dirty();
+		case 0x03:	m_tx_palettebank = (data & 0xf000) >> 12;
+				m_tx_tilemap->mark_all_dirty();
 				break;
 	}
 }
 
-WRITE16_HANDLER( inufuku_scrollreg_w )
+WRITE16_MEMBER(inufuku_state::inufuku_scrollreg_w)
 {
-	inufuku_state *state = space->machine().driver_data<inufuku_state>();
 	switch (offset)
 	{
-		case 0x00:	state->m_bg_scrollx = data + 1; break;
-		case 0x01:	state->m_bg_scrolly = data + 0; break;
-		case 0x02:	state->m_tx_scrollx = data - 3; break;
-		case 0x03:	state->m_tx_scrolly = data + 1; break;
-		case 0x04:	state->m_bg_raster = (data & 0x0200) ? 0 : 1; break;
+		case 0x00:	m_bg_scrollx = data + 1; break;
+		case 0x01:	m_bg_scrolly = data + 0; break;
+		case 0x02:	m_tx_scrollx = data - 3; break;
+		case 0x03:	m_tx_scrolly = data + 1; break;
+		case 0x04:	m_bg_raster = (data & 0x0200) ? 0 : 1; break;
 	}
 }
 
@@ -183,30 +181,26 @@ static TILE_GET_INFO( get_inufuku_tx_tile_info )
 			0);
 }
 
-READ16_HANDLER( inufuku_bg_videoram_r )
+READ16_MEMBER(inufuku_state::inufuku_bg_videoram_r)
 {
-	inufuku_state *state = space->machine().driver_data<inufuku_state>();
-	return state->m_bg_videoram[offset];
+	return m_bg_videoram[offset];
 }
 
-WRITE16_HANDLER( inufuku_bg_videoram_w )
+WRITE16_MEMBER(inufuku_state::inufuku_bg_videoram_w)
 {
-	inufuku_state *state = space->machine().driver_data<inufuku_state>();
-	COMBINE_DATA(&state->m_bg_videoram[offset]);
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_bg_videoram[offset]);
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-READ16_HANDLER( inufuku_tx_videoram_r )
+READ16_MEMBER(inufuku_state::inufuku_tx_videoram_r)
 {
-	inufuku_state *state = space->machine().driver_data<inufuku_state>();
-	return state->m_tx_videoram[offset];
+	return m_tx_videoram[offset];
 }
 
-WRITE16_HANDLER( inufuku_tx_videoram_w )
+WRITE16_MEMBER(inufuku_state::inufuku_tx_videoram_w)
 {
-	inufuku_state *state = space->machine().driver_data<inufuku_state>();
-	COMBINE_DATA(&state->m_tx_videoram[offset]);
-	state->m_tx_tilemap->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_tx_videoram[offset]);
+	m_tx_tilemap->mark_tile_dirty(offset);
 }
 
 

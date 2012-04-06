@@ -188,22 +188,20 @@ VIDEO_START( batrider )
 	state->m_vdp0->gp9001_gfxrom_is_banked = 1;
 }
 
-WRITE16_HANDLER( toaplan2_txvideoram16_w )
+WRITE16_MEMBER(toaplan2_state::toaplan2_txvideoram16_w)
 {
-	toaplan2_state *state = space->machine().driver_data<toaplan2_state>();
 
-	COMBINE_DATA(&state->m_txvideoram16[offset]);
-	if (offset < (state->m_tx_vram_size/4))
-		state->m_tx_tilemap->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_txvideoram16[offset]);
+	if (offset < (m_tx_vram_size/4))
+		m_tx_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_HANDLER( toaplan2_txvideoram16_offs_w )
+WRITE16_MEMBER(toaplan2_state::toaplan2_txvideoram16_offs_w)
 {
 	// FIXME: implement line select and per-line flipping for all games
 	// see SCREEN_UPDATE_IND16( batrider )
 
-	toaplan2_state *state = space->machine().driver_data<toaplan2_state>();
-	UINT16 oldword = state->m_txvideoram16_offs[offset];
+	UINT16 oldword = m_txvideoram16_offs[offset];
 
 	if (oldword != data)
 	{
@@ -211,90 +209,86 @@ WRITE16_HANDLER( toaplan2_txvideoram16_offs_w )
 		{
 			if (data & 0x8000)		/* Flip off */
 			{
-				state->m_tx_flip = 0;
-				state->m_tx_tilemap->set_flip(state->m_tx_flip);
-				state->m_tx_tilemap->set_scrolly(0, 0);
+				m_tx_flip = 0;
+				m_tx_tilemap->set_flip(m_tx_flip);
+				m_tx_tilemap->set_scrolly(0, 0);
 			}
 			else					/* Flip on */
 			{
-				state->m_tx_flip = (TILEMAP_FLIPY | TILEMAP_FLIPX);
-				state->m_tx_tilemap->set_flip(state->m_tx_flip);
-				state->m_tx_tilemap->set_scrolly(0, -16);
+				m_tx_flip = (TILEMAP_FLIPY | TILEMAP_FLIPX);
+				m_tx_tilemap->set_flip(m_tx_flip);
+				m_tx_tilemap->set_scrolly(0, -16);
 			}
 		}
-		COMBINE_DATA(&state->m_txvideoram16_offs[offset]);
+		COMBINE_DATA(&m_txvideoram16_offs[offset]);
 	}
 //  logerror("Writing %04x to text offs RAM offset %04x\n",data,offset);
 }
 
-WRITE16_HANDLER( toaplan2_txscrollram16_w )
+WRITE16_MEMBER(toaplan2_state::toaplan2_txscrollram16_w)
 {
 	/*** Line-Scroll RAM for Text Layer ***/
 
-	toaplan2_state *state = space->machine().driver_data<toaplan2_state>();
 	int data_tx = data;
 
-	state->m_tx_tilemap->set_scrollx(offset, data_tx);
+	m_tx_tilemap->set_scrollx(offset, data_tx);
 
 //  logerror("Writing %04x to text scroll RAM offset %04x\n",data,offset);
-	COMBINE_DATA(&state->m_txscrollram16[offset]);
+	COMBINE_DATA(&m_txscrollram16[offset]);
 }
 
-WRITE16_HANDLER( toaplan2_tx_gfxram16_w )
+WRITE16_MEMBER(toaplan2_state::toaplan2_tx_gfxram16_w)
 {
 	/*** Dynamic GFX decoding for Truxton 2 / FixEight ***/
 
-	toaplan2_state *state = space->machine().driver_data<toaplan2_state>();
-	UINT16 oldword = state->m_tx_gfxram16[offset];
+	UINT16 oldword = m_tx_gfxram16[offset];
 
 	if (oldword != data)
 	{
 		int code = offset/32;
-		COMBINE_DATA(&state->m_tx_gfxram16[offset]);
-		gfx_element_mark_dirty(space->machine().gfx[2], code);
+		COMBINE_DATA(&m_tx_gfxram16[offset]);
+		gfx_element_mark_dirty(machine().gfx[2], code);
 	}
 }
 
-WRITE16_HANDLER( batrider_textdata_dma_w )
+WRITE16_MEMBER(toaplan2_state::batrider_textdata_dma_w)
 {
 	/*** Dynamic Text GFX decoding for Batrider ***/
 	/*** Only done once during start-up ***/
 
-	toaplan2_state *state = space->machine().driver_data<toaplan2_state>();
-	UINT16 *dest = state->m_tx_gfxram16;
+	UINT16 *dest = m_tx_gfxram16;
 
-	memcpy(dest, state->m_txvideoram16, state->m_tx_vram_size);
-	dest += (state->m_tx_vram_size/2);
-	memcpy(dest, state->m_generic_paletteram_16, state->m_paletteram_size);
-	dest += (state->m_paletteram_size/2);
-	memcpy(dest, state->m_txvideoram16_offs, state->m_tx_offs_vram_size);
-	dest += (state->m_tx_offs_vram_size/2);
-	memcpy(dest, state->m_txscrollram16, state->m_tx_scroll_vram_size);
-	dest += (state->m_tx_scroll_vram_size/2);
-	memcpy(dest, state->m_mainram16, state->m_mainram_overlap_size);
+	memcpy(dest, m_txvideoram16, m_tx_vram_size);
+	dest += (m_tx_vram_size/2);
+	memcpy(dest, m_generic_paletteram_16, m_paletteram_size);
+	dest += (m_paletteram_size/2);
+	memcpy(dest, m_txvideoram16_offs, m_tx_offs_vram_size);
+	dest += (m_tx_offs_vram_size/2);
+	memcpy(dest, m_txscrollram16, m_tx_scroll_vram_size);
+	dest += (m_tx_scroll_vram_size/2);
+	memcpy(dest, m_mainram16, m_mainram_overlap_size);
 
 	for (int i = 0; i < 1024; i++)
-		gfx_element_mark_dirty(space->machine().gfx[2], i);
+		gfx_element_mark_dirty(machine().gfx[2], i);
 }
 
-WRITE16_HANDLER( batrider_unknown_dma_w )
+WRITE16_MEMBER(toaplan2_state::batrider_unknown_dma_w)
 {
 	// FIXME: In batrider and bbakraid, the text layer and palette RAM
 	// are probably DMA'd from main RAM by writing here at every vblank,
 	// rather than being directly accessible to the 68K like the other games
 }
 
-WRITE16_HANDLER( batrider_objectbank_w )
+WRITE16_MEMBER(toaplan2_state::batrider_objectbank_w)
 {
-	toaplan2_state *state = space->machine().driver_data<toaplan2_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
 		data &= 0xf;
-		if (state->m_vdp0->gp9001_gfxrom_bank[offset] != data)
+		if (m_vdp0->gp9001_gfxrom_bank[offset] != data)
 		{
-			state->m_vdp0->gp9001_gfxrom_bank[offset] = data;
-			state->m_vdp0->gp9001_gfxrom_bank_dirty = 1;
+			m_vdp0->gp9001_gfxrom_bank[offset] = data;
+			m_vdp0->gp9001_gfxrom_bank_dirty = 1;
 		}
 	}
 }

@@ -26,15 +26,15 @@
 
 static ADDRESS_MAP_START( yard_map, AS_PROGRAM, 8, m58_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0x8000, 0x8fff) AM_RAM_WRITE_LEGACY(yard_videoram_w) AM_BASE(m_videoram)
-	AM_RANGE(0x9000, 0x9fff) AM_WRITE_LEGACY(yard_scroll_panel_w)
+	AM_RANGE(0x8000, 0x8fff) AM_RAM_WRITE(yard_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0x9000, 0x9fff) AM_WRITE(yard_scroll_panel_w)
 	AM_RANGE(0xc820, 0xc87f) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
 	AM_RANGE(0xa000, 0xa000) AM_RAM AM_BASE(m_yard_scroll_x_low)
 	AM_RANGE(0xa200, 0xa200) AM_RAM AM_BASE(m_yard_scroll_x_high)
 	AM_RANGE(0xa400, 0xa400) AM_RAM AM_BASE(m_yard_scroll_y_low)
 	AM_RANGE(0xa800, 0xa800) AM_RAM AM_BASE(m_yard_score_panel_disabled)
 	AM_RANGE(0xd000, 0xd000) AM_WRITE_LEGACY(irem_sound_cmd_w)
-	AM_RANGE(0xd001, 0xd001) AM_WRITE_LEGACY(yard_flipscreen_w)	/* + coin counters */
+	AM_RANGE(0xd001, 0xd001) AM_WRITE(yard_flipscreen_w)	/* + coin counters */
 	AM_RANGE(0xd000, 0xd000) AM_READ_PORT("IN0")
 	AM_RANGE(0xd001, 0xd001) AM_READ_PORT("IN1")
 	AM_RANGE(0xd002, 0xd002) AM_READ_PORT("IN2")

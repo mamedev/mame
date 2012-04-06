@@ -174,10 +174,10 @@ static ADDRESS_MAP_START( pirates_map, AS_PROGRAM, 16, pirates_state )
 	AM_RANGE(0x700000, 0x700001) AM_WRITEONLY AM_BASE(m_scroll)	// scroll reg
 	AM_RANGE(0x800000, 0x803fff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x900000, 0x90017f) AM_RAM  // more of tilemaps ?
-	AM_RANGE(0x900180, 0x90137f) AM_RAM_WRITE_LEGACY(pirates_tx_tileram_w) AM_BASE(m_tx_tileram)
-	AM_RANGE(0x901380, 0x902a7f) AM_RAM_WRITE_LEGACY(pirates_fg_tileram_w) AM_BASE(m_fg_tileram)
+	AM_RANGE(0x900180, 0x90137f) AM_RAM_WRITE(pirates_tx_tileram_w) AM_BASE(m_tx_tileram)
+	AM_RANGE(0x901380, 0x902a7f) AM_RAM_WRITE(pirates_fg_tileram_w) AM_BASE(m_fg_tileram)
 //  AM_RANGE(0x902580, 0x902a7f) AM_RAM  // more of tilemaps ?
-	AM_RANGE(0x902a80, 0x904187) AM_RAM_WRITE_LEGACY(pirates_bg_tileram_w) AM_BASE(m_bg_tileram)
+	AM_RANGE(0x902a80, 0x904187) AM_RAM_WRITE(pirates_bg_tileram_w) AM_BASE(m_bg_tileram)
 //  AM_RANGE(0x903c80, 0x904187) AM_RAM  // more of tilemaps ?
 	AM_RANGE(0xa00000, 0xa00001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 ADDRESS_MAP_END

@@ -38,6 +38,16 @@ public:
 	DECLARE_READ8_MEMBER(razmataz_counter_r);
 	DECLARE_WRITE8_MEMBER(zaxxon_coin_counter_w);
 	DECLARE_WRITE8_MEMBER(zaxxon_coin_enable_w);
+	DECLARE_WRITE8_MEMBER(zaxxon_flipscreen_w);
+	DECLARE_WRITE8_MEMBER(zaxxon_fg_color_w);
+	DECLARE_WRITE8_MEMBER(zaxxon_bg_position_w);
+	DECLARE_WRITE8_MEMBER(zaxxon_bg_color_w);
+	DECLARE_WRITE8_MEMBER(zaxxon_bg_enable_w);
+	DECLARE_WRITE8_MEMBER(congo_fg_bank_w);
+	DECLARE_WRITE8_MEMBER(congo_color_bank_w);
+	DECLARE_WRITE8_MEMBER(zaxxon_videoram_w);
+	DECLARE_WRITE8_MEMBER(congo_colorram_w);
+	DECLARE_WRITE8_MEMBER(congo_sprite_custom_w);
 };
 
 
@@ -56,18 +66,8 @@ MACHINE_CONFIG_EXTERN( congo_samples );
 
 /*----------- defined in video/zaxxon.c -----------*/
 
-WRITE8_HANDLER( zaxxon_flipscreen_w );
-WRITE8_HANDLER( zaxxon_fg_color_w );
-WRITE8_HANDLER( zaxxon_bg_position_w );
-WRITE8_HANDLER( zaxxon_bg_color_w );
-WRITE8_HANDLER( zaxxon_bg_enable_w );
 
-WRITE8_HANDLER( zaxxon_videoram_w );
-WRITE8_HANDLER( congo_colorram_w );
 
-WRITE8_HANDLER( congo_fg_bank_w );
-WRITE8_HANDLER( congo_color_bank_w );
-WRITE8_HANDLER( congo_sprite_custom_w );
 
 PALETTE_INIT( zaxxon );
 

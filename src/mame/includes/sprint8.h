@@ -24,6 +24,7 @@ public:
 	DECLARE_READ8_MEMBER(sprint8_input_r);
 	DECLARE_WRITE8_MEMBER(sprint8_lockout_w);
 	DECLARE_WRITE8_MEMBER(sprint8_int_reset_w);
+	DECLARE_WRITE8_MEMBER(sprint8_video_ram_w);
 };
 
 
@@ -39,7 +40,6 @@ SCREEN_VBLANK( sprint8 );
 VIDEO_START( sprint8 );
 SCREEN_UPDATE_IND16( sprint8 );
 
-WRITE8_HANDLER( sprint8_video_ram_w );
 
 
 /*----------- defined in audio/sprint8.c -----------*/

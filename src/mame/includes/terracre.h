@@ -19,16 +19,16 @@ public:
 	DECLARE_READ8_MEMBER(soundlatch_clear_r);
 	DECLARE_READ16_MEMBER(amazon_protection_r);
 	DECLARE_WRITE16_MEMBER(amazon_protection_w);
+	DECLARE_WRITE16_MEMBER(amazon_background_w);
+	DECLARE_WRITE16_MEMBER(amazon_foreground_w);
+	DECLARE_WRITE16_MEMBER(amazon_flipscreen_w);
+	DECLARE_WRITE16_MEMBER(amazon_scrolly_w);
+	DECLARE_WRITE16_MEMBER(amazon_scrollx_w);
 };
 
 
 /*----------- defined in video/terracre.c -----------*/
 
 PALETTE_INIT( amazon );
-WRITE16_HANDLER( amazon_background_w );
-WRITE16_HANDLER( amazon_foreground_w );
-WRITE16_HANDLER( amazon_scrolly_w );
-WRITE16_HANDLER( amazon_scrollx_w );
-WRITE16_HANDLER( amazon_flipscreen_w );
 VIDEO_START( amazon );
 SCREEN_UPDATE_IND16( amazon );

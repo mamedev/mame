@@ -89,6 +89,13 @@ public:
 	DECLARE_WRITE8_MEMBER(batrider_clear_nmi_w);
 	DECLARE_READ16_MEMBER(bbakraid_eeprom_r);
 	DECLARE_WRITE16_MEMBER(bbakraid_eeprom_w);
+	DECLARE_WRITE16_MEMBER(toaplan2_txvideoram16_w);
+	DECLARE_WRITE16_MEMBER(toaplan2_txvideoram16_offs_w);
+	DECLARE_WRITE16_MEMBER(toaplan2_txscrollram16_w);
+	DECLARE_WRITE16_MEMBER(toaplan2_tx_gfxram16_w);
+	DECLARE_WRITE16_MEMBER(batrider_textdata_dma_w);
+	DECLARE_WRITE16_MEMBER(batrider_unknown_dma_w);
+	DECLARE_WRITE16_MEMBER(batrider_objectbank_w);
 };
 
 /*----------- defined in video/toaplan2.c -----------*/
@@ -109,11 +116,4 @@ SCREEN_UPDATE_IND16( batsugun );
 SCREEN_VBLANK( toaplan2 );
 
 /* non-vdp text layer */
-WRITE16_HANDLER( toaplan2_txvideoram16_w );
-WRITE16_HANDLER( toaplan2_txvideoram16_offs_w );
-WRITE16_HANDLER( toaplan2_txscrollram16_w );
-WRITE16_HANDLER( toaplan2_tx_gfxram16_w );
 
-WRITE16_HANDLER( batrider_textdata_dma_w );
-WRITE16_HANDLER( batrider_unknown_dma_w );
-WRITE16_HANDLER( batrider_objectbank_w );

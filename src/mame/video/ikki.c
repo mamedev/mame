@@ -55,10 +55,9 @@ PALETTE_INIT( ikki )
 	}
 }
 
-WRITE8_HANDLER( ikki_scrn_ctrl_w )
+WRITE8_MEMBER(ikki_state::ikki_scrn_ctrl_w)
 {
-	ikki_state *state = space->machine().driver_data<ikki_state>();
-	state->m_flipscreen = (data >> 2) & 1;
+	m_flipscreen = (data >> 2) & 1;
 }
 
 

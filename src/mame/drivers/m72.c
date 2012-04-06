@@ -871,10 +871,10 @@ static ADDRESS_MAP_START( NAME##_map, AS_PROGRAM, 16 , m72_state )		\
 	AM_RANGE(0x00000, ROMSIZE-1) AM_ROM									\
 	AM_RANGE(WORKRAM, WORKRAM+0x3fff) AM_RAM	/* work RAM */			\
 	AM_RANGE(0xc0000, 0xc03ff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)	\
-	AM_RANGE(0xc8000, 0xc8bff) AM_READWRITE_LEGACY(m72_palette1_r, m72_palette1_w) AM_SHARE("paletteram")			\
-	AM_RANGE(0xcc000, 0xccbff) AM_READWRITE_LEGACY(m72_palette2_r, m72_palette2_w) AM_SHARE("paletteram2")		\
-	AM_RANGE(0xd0000, 0xd3fff) AM_RAM_WRITE_LEGACY(m72_videoram1_w) AM_BASE(m_videoram1)		\
-	AM_RANGE(0xd8000, 0xdbfff) AM_RAM_WRITE_LEGACY(m72_videoram2_w) AM_BASE(m_videoram2)		\
+	AM_RANGE(0xc8000, 0xc8bff) AM_READWRITE(m72_palette1_r, m72_palette1_w) AM_SHARE("paletteram")			\
+	AM_RANGE(0xcc000, 0xccbff) AM_READWRITE(m72_palette2_r, m72_palette2_w) AM_SHARE("paletteram2")		\
+	AM_RANGE(0xd0000, 0xd3fff) AM_RAM_WRITE(m72_videoram1_w) AM_BASE(m_videoram1)		\
+	AM_RANGE(0xd8000, 0xdbfff) AM_RAM_WRITE(m72_videoram2_w) AM_BASE(m_videoram2)		\
 	AM_RANGE(0xe0000, 0xeffff) AM_READWRITE(soundram_r, soundram_w)							\
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM									\
 ADDRESS_MAP_END
@@ -891,10 +891,10 @@ static ADDRESS_MAP_START( xmultipl_map, AS_PROGRAM, 16, m72_state )
 	AM_RANGE(0x9c000, 0x9ffff) AM_RAM	/* work RAM */
 	AM_RANGE(0xb0ffe, 0xb0fff) AM_WRITEONLY	/* leftover from protection?? */
 	AM_RANGE(0xc0000, 0xc03ff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
-	AM_RANGE(0xc8000, 0xc8bff) AM_READWRITE_LEGACY(m72_palette1_r, m72_palette1_w) AM_SHARE("paletteram")
-	AM_RANGE(0xcc000, 0xccbff) AM_READWRITE_LEGACY(m72_palette2_r, m72_palette2_w) AM_SHARE("paletteram2")
-	AM_RANGE(0xd0000, 0xd3fff) AM_RAM_WRITE_LEGACY(m72_videoram1_w) AM_BASE(m_videoram1)
-	AM_RANGE(0xd8000, 0xdbfff) AM_RAM_WRITE_LEGACY(m72_videoram2_w) AM_BASE(m_videoram2)
+	AM_RANGE(0xc8000, 0xc8bff) AM_READWRITE(m72_palette1_r, m72_palette1_w) AM_SHARE("paletteram")
+	AM_RANGE(0xcc000, 0xccbff) AM_READWRITE(m72_palette2_r, m72_palette2_w) AM_SHARE("paletteram2")
+	AM_RANGE(0xd0000, 0xd3fff) AM_RAM_WRITE(m72_videoram1_w) AM_BASE(m_videoram1)
+	AM_RANGE(0xd8000, 0xdbfff) AM_RAM_WRITE(m72_videoram2_w) AM_BASE(m_videoram2)
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -903,22 +903,22 @@ static ADDRESS_MAP_START( dbreed_map, AS_PROGRAM, 16, m72_state )
 	AM_RANGE(0x88000, 0x8bfff) AM_RAM	/* work RAM */
 	AM_RANGE(0xb0ffe, 0xb0fff) AM_WRITEONLY	/* leftover from protection?? */
 	AM_RANGE(0xc0000, 0xc03ff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
-	AM_RANGE(0xc8000, 0xc8bff) AM_READWRITE_LEGACY(m72_palette1_r, m72_palette1_w) AM_SHARE("paletteram")
-	AM_RANGE(0xcc000, 0xccbff) AM_READWRITE_LEGACY(m72_palette2_r, m72_palette2_w) AM_SHARE("paletteram2")
-	AM_RANGE(0xd0000, 0xd3fff) AM_RAM_WRITE_LEGACY(m72_videoram1_w) AM_BASE(m_videoram1)
-	AM_RANGE(0xd8000, 0xdbfff) AM_RAM_WRITE_LEGACY(m72_videoram2_w) AM_BASE(m_videoram2)
+	AM_RANGE(0xc8000, 0xc8bff) AM_READWRITE(m72_palette1_r, m72_palette1_w) AM_SHARE("paletteram")
+	AM_RANGE(0xcc000, 0xccbff) AM_READWRITE(m72_palette2_r, m72_palette2_w) AM_SHARE("paletteram2")
+	AM_RANGE(0xd0000, 0xd3fff) AM_RAM_WRITE(m72_videoram1_w) AM_BASE(m_videoram1)
+	AM_RANGE(0xd8000, 0xdbfff) AM_RAM_WRITE(m72_videoram2_w) AM_BASE(m_videoram2)
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( rtype2_map, AS_PROGRAM, 16, m72_state )
 	AM_RANGE(0x00000, 0x7ffff) AM_ROM
-	AM_RANGE(0xb0000, 0xb0001) AM_WRITE_LEGACY(m72_irq_line_w)
-	AM_RANGE(0xbc000, 0xbc001) AM_WRITE_LEGACY(m72_dmaon_w)
+	AM_RANGE(0xb0000, 0xb0001) AM_WRITE(m72_irq_line_w)
+	AM_RANGE(0xbc000, 0xbc001) AM_WRITE(m72_dmaon_w)
 	AM_RANGE(0xc0000, 0xc03ff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
-	AM_RANGE(0xc8000, 0xc8bff) AM_READWRITE_LEGACY(m72_palette1_r, m72_palette1_w) AM_SHARE("paletteram")
-	AM_RANGE(0xd0000, 0xd3fff) AM_RAM_WRITE_LEGACY(m72_videoram1_w) AM_BASE(m_videoram1)
-	AM_RANGE(0xd4000, 0xd7fff) AM_RAM_WRITE_LEGACY(m72_videoram2_w) AM_BASE(m_videoram2)
-	AM_RANGE(0xd8000, 0xd8bff) AM_READWRITE_LEGACY(m72_palette2_r, m72_palette2_w) AM_SHARE("paletteram2")
+	AM_RANGE(0xc8000, 0xc8bff) AM_READWRITE(m72_palette1_r, m72_palette1_w) AM_SHARE("paletteram")
+	AM_RANGE(0xd0000, 0xd3fff) AM_RAM_WRITE(m72_videoram1_w) AM_BASE(m_videoram1)
+	AM_RANGE(0xd4000, 0xd7fff) AM_RAM_WRITE(m72_videoram2_w) AM_BASE(m_videoram2)
+	AM_RANGE(0xd8000, 0xd8bff) AM_READWRITE(m72_palette2_r, m72_palette2_w) AM_SHARE("paletteram2")
 	AM_RANGE(0xe0000, 0xe3fff) AM_RAM	/* work RAM */
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM
 ADDRESS_MAP_END
@@ -926,16 +926,16 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( majtitle_map, AS_PROGRAM, 16, m72_state )
 	AM_RANGE(0x00000, 0x7ffff) AM_ROM
 	AM_RANGE(0xa0000, 0xa03ff) AM_RAM AM_BASE(m_majtitle_rowscrollram)
-	AM_RANGE(0xa4000, 0xa4bff) AM_READWRITE_LEGACY(m72_palette2_r, m72_palette2_w) AM_SHARE("paletteram2")
-	AM_RANGE(0xac000, 0xaffff) AM_RAM_WRITE_LEGACY(m72_videoram1_w) AM_BASE(m_videoram1)
-	AM_RANGE(0xb0000, 0xbffff) AM_RAM_WRITE_LEGACY(m72_videoram2_w) AM_BASE(m_videoram2)	/* larger than the other games */
+	AM_RANGE(0xa4000, 0xa4bff) AM_READWRITE(m72_palette2_r, m72_palette2_w) AM_SHARE("paletteram2")
+	AM_RANGE(0xac000, 0xaffff) AM_RAM_WRITE(m72_videoram1_w) AM_BASE(m_videoram1)
+	AM_RANGE(0xb0000, 0xbffff) AM_RAM_WRITE(m72_videoram2_w) AM_BASE(m_videoram2)	/* larger than the other games */
 	AM_RANGE(0xc0000, 0xc03ff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
 	AM_RANGE(0xc8000, 0xc83ff) AM_RAM AM_BASE(m_spriteram2)
-	AM_RANGE(0xcc000, 0xccbff) AM_READWRITE_LEGACY(m72_palette1_r, m72_palette1_w) AM_SHARE("paletteram")
+	AM_RANGE(0xcc000, 0xccbff) AM_READWRITE(m72_palette1_r, m72_palette1_w) AM_SHARE("paletteram")
 	AM_RANGE(0xd0000, 0xd3fff) AM_RAM	/* work RAM */
-	AM_RANGE(0xe0000, 0xe0001) AM_WRITE_LEGACY(m72_irq_line_w)
+	AM_RANGE(0xe0000, 0xe0001) AM_WRITE(m72_irq_line_w)
 	AM_RANGE(0xe4000, 0xe4001) AM_WRITEONLY	/* playfield enable? 1 during screen transitions, 0 otherwise */
-	AM_RANGE(0xec000, 0xec001) AM_WRITE_LEGACY(m72_dmaon_w)
+	AM_RANGE(0xec000, 0xec001) AM_WRITE(m72_dmaon_w)
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -944,37 +944,37 @@ static ADDRESS_MAP_START( hharry_map, AS_PROGRAM, 16, m72_state )
 	AM_RANGE(0xa0000, 0xa3fff) AM_RAM	/* work RAM */
 	AM_RANGE(0xb0ffe, 0xb0fff) AM_WRITEONLY	/* leftover from protection?? */
 	AM_RANGE(0xc0000, 0xc03ff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
-	AM_RANGE(0xc8000, 0xc8bff) AM_READWRITE_LEGACY(m72_palette1_r, m72_palette1_w) AM_SHARE("paletteram")
-	AM_RANGE(0xcc000, 0xccbff) AM_READWRITE_LEGACY(m72_palette2_r, m72_palette2_w) AM_SHARE("paletteram2")
-	AM_RANGE(0xd0000, 0xd3fff) AM_RAM_WRITE_LEGACY(m72_videoram1_w) AM_BASE(m_videoram1)
-	AM_RANGE(0xd8000, 0xdbfff) AM_RAM_WRITE_LEGACY(m72_videoram2_w) AM_BASE(m_videoram2)
+	AM_RANGE(0xc8000, 0xc8bff) AM_READWRITE(m72_palette1_r, m72_palette1_w) AM_SHARE("paletteram")
+	AM_RANGE(0xcc000, 0xccbff) AM_READWRITE(m72_palette2_r, m72_palette2_w) AM_SHARE("paletteram2")
+	AM_RANGE(0xd0000, 0xd3fff) AM_RAM_WRITE(m72_videoram1_w) AM_BASE(m_videoram1)
+	AM_RANGE(0xd8000, 0xdbfff) AM_RAM_WRITE(m72_videoram2_w) AM_BASE(m_videoram2)
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hharryu_map, AS_PROGRAM, 16, m72_state )
 	AM_RANGE(0x00000, 0x7ffff) AM_ROM
-	AM_RANGE(0xa0000, 0xa0bff) AM_READWRITE_LEGACY(m72_palette1_r, m72_palette1_w) AM_SHARE("paletteram")
-	AM_RANGE(0xa8000, 0xa8bff) AM_READWRITE_LEGACY(m72_palette2_r, m72_palette2_w) AM_SHARE("paletteram2")
-	AM_RANGE(0xb0000, 0xb0001) AM_WRITE_LEGACY(m72_irq_line_w)
-	AM_RANGE(0xbc000, 0xbc001) AM_WRITE_LEGACY(m72_dmaon_w)
+	AM_RANGE(0xa0000, 0xa0bff) AM_READWRITE(m72_palette1_r, m72_palette1_w) AM_SHARE("paletteram")
+	AM_RANGE(0xa8000, 0xa8bff) AM_READWRITE(m72_palette2_r, m72_palette2_w) AM_SHARE("paletteram2")
+	AM_RANGE(0xb0000, 0xb0001) AM_WRITE(m72_irq_line_w)
+	AM_RANGE(0xbc000, 0xbc001) AM_WRITE(m72_dmaon_w)
 	AM_RANGE(0xb0ffe, 0xb0fff) AM_WRITEONLY	/* leftover from protection?? */
 	AM_RANGE(0xc0000, 0xc03ff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
-	AM_RANGE(0xd0000, 0xd3fff) AM_RAM_WRITE_LEGACY(m72_videoram1_w) AM_BASE(m_videoram1)
-	AM_RANGE(0xd4000, 0xd7fff) AM_RAM_WRITE_LEGACY(m72_videoram2_w) AM_BASE(m_videoram2)
+	AM_RANGE(0xd0000, 0xd3fff) AM_RAM_WRITE(m72_videoram1_w) AM_BASE(m_videoram1)
+	AM_RANGE(0xd4000, 0xd7fff) AM_RAM_WRITE(m72_videoram2_w) AM_BASE(m_videoram2)
 	AM_RANGE(0xe0000, 0xe3fff) AM_RAM	/* work RAM */
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( kengo_map, AS_PROGRAM, 16, m72_state )
 	AM_RANGE(0x00000, 0x7ffff) AM_ROM
-	AM_RANGE(0xa0000, 0xa0bff) AM_READWRITE_LEGACY(m72_palette1_r, m72_palette1_w) AM_SHARE("paletteram")
-	AM_RANGE(0xa8000, 0xa8bff) AM_READWRITE_LEGACY(m72_palette2_r, m72_palette2_w) AM_SHARE("paletteram2")
-	AM_RANGE(0xb0000, 0xb0001) AM_WRITE_LEGACY(m72_irq_line_w)
+	AM_RANGE(0xa0000, 0xa0bff) AM_READWRITE(m72_palette1_r, m72_palette1_w) AM_SHARE("paletteram")
+	AM_RANGE(0xa8000, 0xa8bff) AM_READWRITE(m72_palette2_r, m72_palette2_w) AM_SHARE("paletteram2")
+	AM_RANGE(0xb0000, 0xb0001) AM_WRITE(m72_irq_line_w)
 	AM_RANGE(0xb4000, 0xb4001) AM_WRITENOP	/* ??? */
-	AM_RANGE(0xbc000, 0xbc001) AM_WRITE_LEGACY(m72_dmaon_w)
+	AM_RANGE(0xbc000, 0xbc001) AM_WRITE(m72_dmaon_w)
 	AM_RANGE(0xc0000, 0xc03ff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
-	AM_RANGE(0x80000, 0x83fff) AM_RAM_WRITE_LEGACY(m72_videoram1_w) AM_BASE(m_videoram1)
-	AM_RANGE(0x84000, 0x87fff) AM_RAM_WRITE_LEGACY(m72_videoram2_w) AM_BASE(m_videoram2)
+	AM_RANGE(0x80000, 0x83fff) AM_RAM_WRITE(m72_videoram1_w) AM_BASE(m_videoram1)
+	AM_RANGE(0x84000, 0x87fff) AM_RAM_WRITE(m72_videoram2_w) AM_BASE(m_videoram2)
 	AM_RANGE(0xe0000, 0xe3fff) AM_RAM	/* work RAM */
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM
 ADDRESS_MAP_END
@@ -984,14 +984,14 @@ static ADDRESS_MAP_START( m72_portmap, AS_IO, 16, m72_state )
 	AM_RANGE(0x02, 0x03) AM_READ_PORT("IN1")
 	AM_RANGE(0x04, 0x05) AM_READ_PORT("DSW")
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE_LEGACY("m72", m72_sound_command_w)
-	AM_RANGE(0x02, 0x03) AM_WRITE_LEGACY(m72_port02_w)	/* coin counters, reset sound cpu, other stuff? */
-	AM_RANGE(0x04, 0x05) AM_WRITE_LEGACY(m72_dmaon_w)
-	AM_RANGE(0x06, 0x07) AM_WRITE_LEGACY(m72_irq_line_w)
+	AM_RANGE(0x02, 0x03) AM_WRITE(m72_port02_w)	/* coin counters, reset sound cpu, other stuff? */
+	AM_RANGE(0x04, 0x05) AM_WRITE(m72_dmaon_w)
+	AM_RANGE(0x06, 0x07) AM_WRITE(m72_irq_line_w)
 	//AM_RANGE(0x40, 0x43) AM_WRITENOP /* Interrupt controller, only written to at bootup */
-	AM_RANGE(0x80, 0x81) AM_WRITE_LEGACY(m72_scrolly1_w)
-	AM_RANGE(0x82, 0x83) AM_WRITE_LEGACY(m72_scrollx1_w)
-	AM_RANGE(0x84, 0x85) AM_WRITE_LEGACY(m72_scrolly2_w)
-	AM_RANGE(0x86, 0x87) AM_WRITE_LEGACY(m72_scrollx2_w)
+	AM_RANGE(0x80, 0x81) AM_WRITE(m72_scrolly1_w)
+	AM_RANGE(0x82, 0x83) AM_WRITE(m72_scrollx1_w)
+	AM_RANGE(0x84, 0x85) AM_WRITE(m72_scrolly2_w)
+	AM_RANGE(0x86, 0x87) AM_WRITE(m72_scrollx2_w)
 /*  { 0xc0, 0xc0      trigger sample, filled by init_ function */
 ADDRESS_MAP_END
 
@@ -1000,12 +1000,12 @@ static ADDRESS_MAP_START( rtype2_portmap, AS_IO, 16, m72_state )
 	AM_RANGE(0x02, 0x03) AM_READ_PORT("IN1")
 	AM_RANGE(0x04, 0x05) AM_READ_PORT("DSW")
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE_LEGACY("m72", m72_sound_command_w)
-	AM_RANGE(0x02, 0x03) AM_WRITE_LEGACY(rtype2_port02_w)
+	AM_RANGE(0x02, 0x03) AM_WRITE(rtype2_port02_w)
 	AM_RANGE(0x40, 0x43) AM_WRITENOP /* Interrupt controller, only written to at bootup */
-	AM_RANGE(0x80, 0x81) AM_WRITE_LEGACY(m72_scrolly1_w)
-	AM_RANGE(0x82, 0x83) AM_WRITE_LEGACY(m72_scrollx1_w)
-	AM_RANGE(0x84, 0x85) AM_WRITE_LEGACY(m72_scrolly2_w)
-	AM_RANGE(0x86, 0x87) AM_WRITE_LEGACY(m72_scrollx2_w)
+	AM_RANGE(0x80, 0x81) AM_WRITE(m72_scrolly1_w)
+	AM_RANGE(0x82, 0x83) AM_WRITE(m72_scrollx1_w)
+	AM_RANGE(0x84, 0x85) AM_WRITE(m72_scrolly2_w)
+	AM_RANGE(0x86, 0x87) AM_WRITE(m72_scrollx2_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( poundfor_portmap, AS_IO, 16, m72_state )
@@ -1013,12 +1013,12 @@ static ADDRESS_MAP_START( poundfor_portmap, AS_IO, 16, m72_state )
 	AM_RANGE(0x04, 0x05) AM_READ_PORT("DSW")
 	AM_RANGE(0x08, 0x0f) AM_READ(poundfor_trackball_r)
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE_LEGACY("m72", m72_sound_command_w)
-	AM_RANGE(0x02, 0x03) AM_WRITE_LEGACY(rtype2_port02_w)
+	AM_RANGE(0x02, 0x03) AM_WRITE(rtype2_port02_w)
 	AM_RANGE(0x40, 0x43) AM_WRITENOP /* Interrupt controller, only written to at bootup */
-	AM_RANGE(0x80, 0x81) AM_WRITE_LEGACY(m72_scrolly1_w)
-	AM_RANGE(0x82, 0x83) AM_WRITE_LEGACY(m72_scrollx1_w)
-	AM_RANGE(0x84, 0x85) AM_WRITE_LEGACY(m72_scrolly2_w)
-	AM_RANGE(0x86, 0x87) AM_WRITE_LEGACY(m72_scrollx2_w)
+	AM_RANGE(0x80, 0x81) AM_WRITE(m72_scrolly1_w)
+	AM_RANGE(0x82, 0x83) AM_WRITE(m72_scrollx1_w)
+	AM_RANGE(0x84, 0x85) AM_WRITE(m72_scrolly2_w)
+	AM_RANGE(0x86, 0x87) AM_WRITE(m72_scrollx2_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( majtitle_portmap, AS_IO, 16, m72_state )
@@ -1026,13 +1026,13 @@ static ADDRESS_MAP_START( majtitle_portmap, AS_IO, 16, m72_state )
 	AM_RANGE(0x02, 0x03) AM_READ_PORT("IN1")
 	AM_RANGE(0x04, 0x05) AM_READ_PORT("DSW")
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE_LEGACY("m72", m72_sound_command_w)
-	AM_RANGE(0x02, 0x03) AM_WRITE_LEGACY(rtype2_port02_w)
+	AM_RANGE(0x02, 0x03) AM_WRITE(rtype2_port02_w)
 	AM_RANGE(0x40, 0x43) AM_WRITENOP /* Interrupt controller, only written to at bootup */
-	AM_RANGE(0x80, 0x81) AM_WRITE_LEGACY(m72_scrolly1_w)
-	AM_RANGE(0x82, 0x83) AM_WRITE_LEGACY(m72_scrollx1_w)
-	AM_RANGE(0x84, 0x85) AM_WRITE_LEGACY(m72_scrolly2_w)
-	AM_RANGE(0x86, 0x87) AM_WRITE_LEGACY(m72_scrollx2_w)
-	AM_RANGE(0x8e, 0x8f) AM_WRITE_LEGACY(majtitle_gfx_ctrl_w)
+	AM_RANGE(0x80, 0x81) AM_WRITE(m72_scrolly1_w)
+	AM_RANGE(0x82, 0x83) AM_WRITE(m72_scrollx1_w)
+	AM_RANGE(0x84, 0x85) AM_WRITE(m72_scrolly2_w)
+	AM_RANGE(0x86, 0x87) AM_WRITE(m72_scrollx2_w)
+	AM_RANGE(0x8e, 0x8f) AM_WRITE(majtitle_gfx_ctrl_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hharry_portmap, AS_IO, 16, m72_state )
@@ -1040,14 +1040,14 @@ static ADDRESS_MAP_START( hharry_portmap, AS_IO, 16, m72_state )
 	AM_RANGE(0x02, 0x03) AM_READ_PORT("IN1")
 	AM_RANGE(0x04, 0x05) AM_READ_PORT("DSW")
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE_LEGACY("m72", m72_sound_command_w)
-	AM_RANGE(0x02, 0x03) AM_WRITE_LEGACY(rtype2_port02_w)	/* coin counters, reset sound cpu, other stuff? */
-	AM_RANGE(0x04, 0x05) AM_WRITE_LEGACY(m72_dmaon_w)
-	AM_RANGE(0x06, 0x07) AM_WRITE_LEGACY(m72_irq_line_w)
+	AM_RANGE(0x02, 0x03) AM_WRITE(rtype2_port02_w)	/* coin counters, reset sound cpu, other stuff? */
+	AM_RANGE(0x04, 0x05) AM_WRITE(m72_dmaon_w)
+	AM_RANGE(0x06, 0x07) AM_WRITE(m72_irq_line_w)
 	AM_RANGE(0x40, 0x43) AM_WRITENOP /* Interrupt controller, only written to at bootup */
-	AM_RANGE(0x80, 0x81) AM_WRITE_LEGACY(m72_scrolly1_w)
-	AM_RANGE(0x82, 0x83) AM_WRITE_LEGACY(m72_scrollx1_w)
-	AM_RANGE(0x84, 0x85) AM_WRITE_LEGACY(m72_scrolly2_w)
-	AM_RANGE(0x86, 0x87) AM_WRITE_LEGACY(m72_scrollx2_w)
+	AM_RANGE(0x80, 0x81) AM_WRITE(m72_scrolly1_w)
+	AM_RANGE(0x82, 0x83) AM_WRITE(m72_scrollx1_w)
+	AM_RANGE(0x84, 0x85) AM_WRITE(m72_scrolly2_w)
+	AM_RANGE(0x86, 0x87) AM_WRITE(m72_scrollx2_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( kengo_portmap, AS_IO, 16, m72_state )
@@ -1055,11 +1055,11 @@ static ADDRESS_MAP_START( kengo_portmap, AS_IO, 16, m72_state )
 	AM_RANGE(0x02, 0x03) AM_READ_PORT("IN1")
 	AM_RANGE(0x04, 0x05) AM_READ_PORT("DSW")
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE_LEGACY("m72", m72_sound_command_w)
-	AM_RANGE(0x02, 0x03) AM_WRITE_LEGACY(rtype2_port02_w)
-	AM_RANGE(0x80, 0x81) AM_WRITE_LEGACY(m72_scrolly1_w)
-	AM_RANGE(0x82, 0x83) AM_WRITE_LEGACY(m72_scrollx1_w)
-	AM_RANGE(0x84, 0x85) AM_WRITE_LEGACY(m72_scrolly2_w)
-	AM_RANGE(0x86, 0x87) AM_WRITE_LEGACY(m72_scrollx2_w)
+	AM_RANGE(0x02, 0x03) AM_WRITE(rtype2_port02_w)
+	AM_RANGE(0x80, 0x81) AM_WRITE(m72_scrolly1_w)
+	AM_RANGE(0x82, 0x83) AM_WRITE(m72_scrollx1_w)
+	AM_RANGE(0x84, 0x85) AM_WRITE(m72_scrolly2_w)
+	AM_RANGE(0x86, 0x87) AM_WRITE(m72_scrollx2_w)
 //  AM_RANGE(0x8c, 0x8f) AM_WRITENOP    /* ??? */
 ADDRESS_MAP_END
 

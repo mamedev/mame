@@ -1935,58 +1935,52 @@ static TGP_FUNCTION( function_get_swa )
 	}
 }
 
-READ16_HANDLER( model1_tgp_copro_r )
+READ16_MEMBER(model1_state::model1_tgp_copro_r)
 {
-	model1_state *state = space->machine().driver_data<model1_state>();
 	if(!offset) {
-		state->m_copro_r = fifoout_pop(space);
-		return state->m_copro_r;
+		m_copro_r = fifoout_pop(&space);
+		return m_copro_r;
 	} else
-		return state->m_copro_r >> 16;
+		return m_copro_r >> 16;
 }
 
-WRITE16_HANDLER( model1_tgp_copro_w )
+WRITE16_MEMBER(model1_state::model1_tgp_copro_w)
 {
-	model1_state *state = space->machine().driver_data<model1_state>();
 	if(offset) {
-		state->m_copro_w = (state->m_copro_w & 0x0000ffff) | (data << 16);
-		state->m_pushpc = cpu_get_pc(&space->device());
-		fifoin_push(space, state->m_copro_w);
+		m_copro_w = (m_copro_w & 0x0000ffff) | (data << 16);
+		m_pushpc = cpu_get_pc(&space.device());
+		fifoin_push(&space, m_copro_w);
 	} else
-		state->m_copro_w = (state->m_copro_w & 0xffff0000) | data;
+		m_copro_w = (m_copro_w & 0xffff0000) | data;
 }
 
-READ16_HANDLER( model1_tgp_copro_adr_r )
+READ16_MEMBER(model1_state::model1_tgp_copro_adr_r)
 {
-	model1_state *state = space->machine().driver_data<model1_state>();
-	return state->m_ram_adr;
+	return m_ram_adr;
 }
 
-WRITE16_HANDLER( model1_tgp_copro_adr_w )
+WRITE16_MEMBER(model1_state::model1_tgp_copro_adr_w)
 {
-	model1_state *state = space->machine().driver_data<model1_state>();
-	COMBINE_DATA(&state->m_ram_adr);
+	COMBINE_DATA(&m_ram_adr);
 }
 
-READ16_HANDLER( model1_tgp_copro_ram_r )
+READ16_MEMBER(model1_state::model1_tgp_copro_ram_r)
 {
-	model1_state *state = space->machine().driver_data<model1_state>();
 	if(!offset) {
-		logerror("TGP f0 ram read %04x, %08x (%f) (%x)\n", state->m_ram_adr, state->m_ram_data[state->m_ram_adr], u2f(state->m_ram_data[state->m_ram_adr]), cpu_get_pc(&space->device()));
-		return state->m_ram_data[state->m_ram_adr];
+		logerror("TGP f0 ram read %04x, %08x (%f) (%x)\n", m_ram_adr, m_ram_data[m_ram_adr], u2f(m_ram_data[m_ram_adr]), cpu_get_pc(&space.device()));
+		return m_ram_data[m_ram_adr];
 	} else
-		return state->m_ram_data[state->m_ram_adr++] >> 16;
+		return m_ram_data[m_ram_adr++] >> 16;
 }
 
-WRITE16_HANDLER( model1_tgp_copro_ram_w )
+WRITE16_MEMBER(model1_state::model1_tgp_copro_ram_w)
 {
-	model1_state *state = space->machine().driver_data<model1_state>();
-	COMBINE_DATA(state->m_ram_latch+offset);
+	COMBINE_DATA(m_ram_latch+offset);
 	if(offset) {
-		UINT32 v = state->m_ram_latch[0]|(state->m_ram_latch[1]<<16);
-		logerror("TGP f0 ram write %04x, %08x (%f) (%x)\n", state->m_ram_adr, v, u2f(v), cpu_get_pc(&space->device()));
-		state->m_ram_data[state->m_ram_adr] = v;
-		state->m_ram_adr++;
+		UINT32 v = m_ram_latch[0]|(m_ram_latch[1]<<16);
+		logerror("TGP f0 ram write %04x, %08x (%f) (%x)\n", m_ram_adr, v, u2f(v), cpu_get_pc(&space.device()));
+		m_ram_data[m_ram_adr] = v;
+		m_ram_adr++;
 	}
 }
 
@@ -2143,98 +2137,90 @@ static void copro_fifoout_push(device_t *device, UINT32 data)
 	state->m_copro_fifoout_num++;
 }
 
-static READ32_HANDLER(copro_ram_r)
+READ32_MEMBER(model1_state::copro_ram_r)
 {
-	model1_state *state = space->machine().driver_data<model1_state>();
-	return state->m_ram_data[offset & 0x7fff];
+	return m_ram_data[offset & 0x7fff];
 }
 
-static WRITE32_HANDLER(copro_ram_w)
+WRITE32_MEMBER(model1_state::copro_ram_w)
 {
-	model1_state *state = space->machine().driver_data<model1_state>();
-	state->m_ram_data[offset&0x7fff] = data;
+	m_ram_data[offset&0x7fff] = data;
 }
 
-READ16_HANDLER( model1_tgp_vr_adr_r )
+READ16_MEMBER(model1_state::model1_tgp_vr_adr_r)
 {
-	model1_state *state = space->machine().driver_data<model1_state>();
-	if ( state->m_ram_adr == 0 && state->m_copro_fifoin_num != 0 )
+	if ( m_ram_adr == 0 && m_copro_fifoin_num != 0 )
 	{
 		/* spin the main cpu and let the TGP catch up */
-		device_spin_until_time(&space->device(), attotime::from_usec(100));
+		device_spin_until_time(&space.device(), attotime::from_usec(100));
 	}
 
-	return state->m_ram_adr;
+	return m_ram_adr;
 }
 
-WRITE16_HANDLER( model1_tgp_vr_adr_w )
+WRITE16_MEMBER(model1_state::model1_tgp_vr_adr_w)
 {
-	model1_state *state = space->machine().driver_data<model1_state>();
-	COMBINE_DATA(&state->m_ram_adr);
+	COMBINE_DATA(&m_ram_adr);
 }
 
-READ16_HANDLER( model1_vr_tgp_ram_r )
+READ16_MEMBER(model1_state::model1_vr_tgp_ram_r)
 {
-	model1_state *state = space->machine().driver_data<model1_state>();
 	UINT16	r;
 
 	if (!offset)
 	{
-		r = state->m_ram_data[state->m_ram_adr&0x7fff];
+		r = m_ram_data[m_ram_adr&0x7fff];
 	}
 	else
 	{
-		r = state->m_ram_data[state->m_ram_adr&0x7fff] >> 16;
+		r = m_ram_data[m_ram_adr&0x7fff] >> 16;
 
-		if ( state->m_ram_adr == 0 && r == 0xffff )
+		if ( m_ram_adr == 0 && r == 0xffff )
 		{
 			/* if the TGP is busy, spin some more */
-			device_spin_until_time(&space->device(), attotime::from_usec(100));
+			device_spin_until_time(&space.device(), attotime::from_usec(100));
 		}
 
-		if ( state->m_ram_adr & 0x8000 )
-			state->m_ram_adr++;
+		if ( m_ram_adr & 0x8000 )
+			m_ram_adr++;
 	}
 
 	return r;
 }
 
-WRITE16_HANDLER( model1_vr_tgp_ram_w )
+WRITE16_MEMBER(model1_state::model1_vr_tgp_ram_w)
 {
-	model1_state *state = space->machine().driver_data<model1_state>();
-	COMBINE_DATA(state->m_ram_latch+offset);
+	COMBINE_DATA(m_ram_latch+offset);
 
 	if (offset)
 	{
-		UINT32 v = state->m_ram_latch[0]|(state->m_ram_latch[1]<<16);
-		state->m_ram_data[state->m_ram_adr&0x7fff] = v;
-		if ( state->m_ram_adr & 0x8000 )
-			state->m_ram_adr++;
+		UINT32 v = m_ram_latch[0]|(m_ram_latch[1]<<16);
+		m_ram_data[m_ram_adr&0x7fff] = v;
+		if ( m_ram_adr & 0x8000 )
+			m_ram_adr++;
 	}
 }
 
-READ16_HANDLER( model1_vr_tgp_r )
+READ16_MEMBER(model1_state::model1_vr_tgp_r)
 {
-	model1_state *state = space->machine().driver_data<model1_state>();
 	if (!offset)
 	{
-		state->m_vr_r = copro_fifoout_pop(space);
-		return state->m_vr_r;
+		m_vr_r = copro_fifoout_pop(&space);
+		return m_vr_r;
 	}
 	else
-		return state->m_vr_r >> 16;
+		return m_vr_r >> 16;
 }
 
-WRITE16_HANDLER( model1_vr_tgp_w )
+WRITE16_MEMBER(model1_state::model1_vr_tgp_w)
 {
-	model1_state *state = space->machine().driver_data<model1_state>();
 	if (offset)
 	{
-		state->m_vr_w = (state->m_vr_w & 0x0000ffff) | (data << 16);
-		copro_fifoin_push(space, state->m_vr_w);
+		m_vr_w = (m_vr_w & 0x0000ffff) | (data << 16);
+		copro_fifoin_push(&space, m_vr_w);
 	}
 	else
-		state->m_vr_w = (state->m_vr_w & 0xffff0000) | data;
+		m_vr_w = (m_vr_w & 0xffff0000) | data;
 }
 
 /* TGP config */
@@ -2246,8 +2232,8 @@ const mb86233_cpu_core model1_vr_tgp_config =
 };
 
 /* TGP memory map */
-ADDRESS_MAP_START( model1_vr_tgp_map, AS_PROGRAM, 32, driver_device )
+ADDRESS_MAP_START( model1_vr_tgp_map, AS_PROGRAM, 32, model1_state )
 	AM_RANGE(0x00000000, 0x000007ff) AM_RAM AM_REGION("tgp", 0)
-	AM_RANGE(0x00400000, 0x00407fff) AM_READWRITE_LEGACY(copro_ram_r, copro_ram_w)
+	AM_RANGE(0x00400000, 0x00407fff) AM_READWRITE(copro_ram_r, copro_ram_w)
 	AM_RANGE(0xff800000, 0xff87ffff) AM_ROM AM_REGION("user2", 0)
 ADDRESS_MAP_END

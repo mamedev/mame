@@ -191,17 +191,17 @@ static ADDRESS_MAP_START( f3_map, AS_PROGRAM, 32, taito_f3_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 	AM_RANGE(0x300000, 0x30007f) AM_WRITE(f3_sound_bankswitch_w)
 	AM_RANGE(0x400000, 0x41ffff) AM_MIRROR(0x20000) AM_RAM AM_BASE(m_f3_ram)
-	AM_RANGE(0x440000, 0x447fff) AM_RAM_WRITE_LEGACY(f3_palette_24bit_w) AM_SHARE("paletteram")
+	AM_RANGE(0x440000, 0x447fff) AM_RAM_WRITE(f3_palette_24bit_w) AM_SHARE("paletteram")
 	AM_RANGE(0x4a0000, 0x4a001f) AM_READWRITE(f3_control_r,  f3_control_w)
 	AM_RANGE(0x4c0000, 0x4c0003) AM_WRITE16(f3_unk_w,0xffffffff)
-	AM_RANGE(0x600000, 0x60ffff) AM_READWRITE16_LEGACY(f3_spriteram_r,f3_spriteram_w,0xffffffff) //AM_BASE_SIZE(m_spriteram, m_spriteram_size)
-	AM_RANGE(0x610000, 0x61bfff) AM_READWRITE16_LEGACY(f3_pf_data_r,f3_pf_data_w,0xffffffff)		//AM_BASE(m_f3_pf_data)
-	AM_RANGE(0x61c000, 0x61dfff) AM_READWRITE16_LEGACY(f3_videoram_r,f3_videoram_w,0xffffffff)		//AM_BASE(m_videoram)
-	AM_RANGE(0x61e000, 0x61ffff) AM_READWRITE16_LEGACY(f3_vram_r,f3_vram_w,0xffffffff) 			//AM_BASE(m_f3_vram)
-	AM_RANGE(0x620000, 0x62ffff) AM_READWRITE16_LEGACY(f3_lineram_r,f3_lineram_w,0xffffffff)		//AM_BASE(m_f3_line_ram)
-	AM_RANGE(0x630000, 0x63ffff) AM_READWRITE16_LEGACY(f3_pivot_r,f3_pivot_w,0xffffffff)			//AM_BASE(m_f3_pivot_ram)
-	AM_RANGE(0x660000, 0x66000f) AM_WRITE16_LEGACY(f3_control_0_w,0xffffffff)
-	AM_RANGE(0x660010, 0x66001f) AM_WRITE16_LEGACY(f3_control_1_w,0xffffffff)
+	AM_RANGE(0x600000, 0x60ffff) AM_READWRITE16(f3_spriteram_r,f3_spriteram_w,0xffffffff) //AM_BASE_SIZE(m_spriteram, m_spriteram_size)
+	AM_RANGE(0x610000, 0x61bfff) AM_READWRITE16(f3_pf_data_r,f3_pf_data_w,0xffffffff)		//AM_BASE(m_f3_pf_data)
+	AM_RANGE(0x61c000, 0x61dfff) AM_READWRITE16(f3_videoram_r,f3_videoram_w,0xffffffff)		//AM_BASE(m_videoram)
+	AM_RANGE(0x61e000, 0x61ffff) AM_READWRITE16(f3_vram_r,f3_vram_w,0xffffffff) 			//AM_BASE(m_f3_vram)
+	AM_RANGE(0x620000, 0x62ffff) AM_READWRITE16(f3_lineram_r,f3_lineram_w,0xffffffff)		//AM_BASE(m_f3_line_ram)
+	AM_RANGE(0x630000, 0x63ffff) AM_READWRITE16(f3_pivot_r,f3_pivot_w,0xffffffff)			//AM_BASE(m_f3_pivot_ram)
+	AM_RANGE(0x660000, 0x66000f) AM_WRITE16(f3_control_0_w,0xffffffff)
+	AM_RANGE(0x660010, 0x66001f) AM_WRITE16(f3_control_1_w,0xffffffff)
 	AM_RANGE(0xc00000, 0xc007ff) AM_RAM AM_SHARE("f3_shared")
 	AM_RANGE(0xc80000, 0xc80003) AM_WRITE(f3_sound_reset_0_w)
 	AM_RANGE(0xc80100, 0xc80103) AM_WRITE(f3_sound_reset_1_w)
@@ -3860,12 +3860,12 @@ static DRIVER_INIT( bubsymph )
 
 READ32_MEMBER(taito_f3_state::bubsympb_oki_r)
 {
-	return machine().device<okim6295_device>("oki")->read(*&space,0);
+	return machine().device<okim6295_device>("oki")->read(space,0);
 }
 WRITE32_MEMBER(taito_f3_state::bubsympb_oki_w)
 {
 	//printf("write %08x %08x\n",data,mem_mask);
-	if (ACCESSING_BITS_0_7) machine().device<okim6295_device>("oki")->write(*&space, 0,data&0xff);
+	if (ACCESSING_BITS_0_7) machine().device<okim6295_device>("oki")->write(space, 0,data&0xff);
 	//if (mem_mask==0x000000ff) downcast<okim6295_device *>(device)->write(0,data&0xff);
 	if (ACCESSING_BITS_16_23)
 	{

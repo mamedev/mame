@@ -47,6 +47,9 @@ public:
 	/* devices */
 	device_t *m_maincpu;
 	DECLARE_READ8_MEMBER(exerion_protection_r);
+	DECLARE_WRITE8_MEMBER(exerion_videoreg_w);
+	DECLARE_WRITE8_MEMBER(exerion_video_latch_w);
+	DECLARE_READ8_MEMBER(exerion_video_timing_r);
 };
 
 
@@ -57,6 +60,3 @@ PALETTE_INIT( exerion );
 VIDEO_START( exerion );
 SCREEN_UPDATE_IND16( exerion );
 
-WRITE8_HANDLER( exerion_videoreg_w );
-WRITE8_HANDLER( exerion_video_latch_w );
-READ8_HANDLER( exerion_video_timing_r );

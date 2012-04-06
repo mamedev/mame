@@ -119,8 +119,8 @@ static WRITE8_HANDLER( irq_mask_w )
 
 static ADDRESS_MAP_START( pengo_map, AS_PROGRAM, 8, pengo_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE_LEGACY(pacman_videoram_w) AM_BASE(m_videoram) /* video and color RAM, scratchpad RAM, sprite codes */
-	AM_RANGE(0x8400, 0x87ff) AM_RAM_WRITE_LEGACY(pacman_colorram_w) AM_BASE(m_colorram)
+	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(pacman_videoram_w) AM_BASE(m_videoram) /* video and color RAM, scratchpad RAM, sprite codes */
+	AM_RANGE(0x8400, 0x87ff) AM_RAM_WRITE(pacman_colorram_w) AM_BASE(m_colorram)
 	AM_RANGE(0x8800, 0x8fef) AM_RAM
 	AM_RANGE(0x8ff0, 0x8fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x9000, 0x901f) AM_DEVWRITE_LEGACY("namco", pacman_sound_w)
@@ -129,11 +129,11 @@ static ADDRESS_MAP_START( pengo_map, AS_PROGRAM, 8, pengo_state )
 	AM_RANGE(0x9040, 0x907f) AM_READ_PORT("DSW0")
 	AM_RANGE(0x9040, 0x9040) AM_WRITE_LEGACY(irq_mask_w)
 	AM_RANGE(0x9041, 0x9041) AM_DEVWRITE_LEGACY("namco", pacman_sound_enable_w)
-	AM_RANGE(0x9042, 0x9042) AM_WRITE_LEGACY(pengo_palettebank_w)
-	AM_RANGE(0x9043, 0x9043) AM_WRITE_LEGACY(pacman_flipscreen_w)
+	AM_RANGE(0x9042, 0x9042) AM_WRITE(pengo_palettebank_w)
+	AM_RANGE(0x9043, 0x9043) AM_WRITE(pacman_flipscreen_w)
 	AM_RANGE(0x9044, 0x9045) AM_WRITE_LEGACY(pengo_coin_counter_w)
-	AM_RANGE(0x9046, 0x9046) AM_WRITE_LEGACY(pengo_colortablebank_w)
-	AM_RANGE(0x9047, 0x9047) AM_WRITE_LEGACY(pengo_gfxbank_w)
+	AM_RANGE(0x9046, 0x9046) AM_WRITE(pengo_colortablebank_w)
+	AM_RANGE(0x9047, 0x9047) AM_WRITE(pengo_gfxbank_w)
 	AM_RANGE(0x9070, 0x9070) AM_WRITENOP
 	AM_RANGE(0x9080, 0x90bf) AM_READ_PORT("IN1")
 	AM_RANGE(0x90c0, 0x90ff) AM_READ_PORT("IN0")
@@ -142,21 +142,21 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( jrpacmbl_map, AS_PROGRAM, 8, pengo_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE_LEGACY(jrpacman_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(jrpacman_videoram_w) AM_BASE(m_videoram)
 	AM_RANGE(0x8800, 0x8fef) AM_RAM
 	AM_RANGE(0x8ff0, 0x8fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x9000, 0x901f) AM_DEVWRITE_LEGACY("namco", pacman_sound_w)
 	AM_RANGE(0x9020, 0x902f) AM_WRITEONLY AM_SHARE("spriteram2")
-	AM_RANGE(0x9030, 0x9030) AM_WRITE_LEGACY(jrpacman_scroll_w)
+	AM_RANGE(0x9030, 0x9030) AM_WRITE(jrpacman_scroll_w)
 	AM_RANGE(0x9040, 0x904f) AM_READ_PORT("DSW")
 	AM_RANGE(0x9040, 0x9040) AM_WRITE_LEGACY(irq_mask_w)
 	AM_RANGE(0x9041, 0x9041) AM_DEVWRITE_LEGACY("namco", pacman_sound_enable_w)
-	AM_RANGE(0x9042, 0x9042) AM_WRITE_LEGACY(pengo_palettebank_w)
-	AM_RANGE(0x9043, 0x9043) AM_WRITE_LEGACY(pacman_flipscreen_w)
-	AM_RANGE(0x9044, 0x9044) AM_WRITE_LEGACY(jrpacman_bgpriority_w)
-	AM_RANGE(0x9045, 0x9045) AM_WRITE_LEGACY(jrpacman_spritebank_w)
-	AM_RANGE(0x9046, 0x9046) AM_WRITE_LEGACY(pengo_colortablebank_w)
-	AM_RANGE(0x9047, 0x9047) AM_WRITE_LEGACY(jrpacman_charbank_w)
+	AM_RANGE(0x9042, 0x9042) AM_WRITE(pengo_palettebank_w)
+	AM_RANGE(0x9043, 0x9043) AM_WRITE(pacman_flipscreen_w)
+	AM_RANGE(0x9044, 0x9044) AM_WRITE(jrpacman_bgpriority_w)
+	AM_RANGE(0x9045, 0x9045) AM_WRITE(jrpacman_spritebank_w)
+	AM_RANGE(0x9046, 0x9046) AM_WRITE(pengo_colortablebank_w)
+	AM_RANGE(0x9047, 0x9047) AM_WRITE(jrpacman_charbank_w)
 	AM_RANGE(0x9070, 0x9070) AM_WRITENOP
 	AM_RANGE(0x9080, 0x90bf) AM_READ_PORT("P2")
 	AM_RANGE(0x90c0, 0x90ff) AM_READ_PORT("P1")

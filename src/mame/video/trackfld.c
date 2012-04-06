@@ -89,74 +89,71 @@ PALETTE_INIT( trackfld )
 	}
 }
 
-WRITE8_HANDLER( trackfld_videoram_w )
+WRITE8_MEMBER(trackfld_state::trackfld_videoram_w)
 {
-	trackfld_state *state = space->machine().driver_data<trackfld_state>();
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( trackfld_colorram_w )
+WRITE8_MEMBER(trackfld_state::trackfld_colorram_w)
 {
-	trackfld_state *state = space->machine().driver_data<trackfld_state>();
-	state->m_colorram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_colorram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( trackfld_flipscreen_w )
+WRITE8_MEMBER(trackfld_state::trackfld_flipscreen_w)
 {
-	if (flip_screen_get(space->machine()) != data)
+	if (flip_screen_get(machine()) != data)
 	{
-		flip_screen_set(space->machine(), data);
-		space->machine().tilemap().mark_all_dirty();
+		flip_screen_set(machine(), data);
+		machine().tilemap().mark_all_dirty();
 	}
 }
 
-WRITE8_HANDLER( atlantol_gfxbank_w )
+WRITE8_MEMBER(trackfld_state::atlantol_gfxbank_w)
 {
-	trackfld_state *state = space->machine().driver_data<trackfld_state>();
 	if (data & 1)
 	{
 		/* male / female sprites switch */
-		if ((state->m_old_gfx_bank == 1 && (data & 1) == 1) || (state->m_old_gfx_bank == 0 && (data & 1) == 1))
-			state->m_sprite_bank2 = 0x200;
+		if ((m_old_gfx_bank == 1 && (data & 1) == 1) || (m_old_gfx_bank == 0 && (data & 1) == 1))
+			m_sprite_bank2 = 0x200;
 		else
-			state->m_sprite_bank2 = 0;
+			m_sprite_bank2 = 0;
 
-		state->m_sprite_bank1 = 0;
-		state->m_old_gfx_bank = data & 1;
+		m_sprite_bank1 = 0;
+		m_old_gfx_bank = data & 1;
 	}
 	else
 	{
 		/* male / female sprites switch */
-		if ((state->m_old_gfx_bank == 0 && (data & 1) == 0) || (state->m_old_gfx_bank == 1 && (data & 1) == 0))
-			state->m_sprite_bank2 = 0;
+		if ((m_old_gfx_bank == 0 && (data & 1) == 0) || (m_old_gfx_bank == 1 && (data & 1) == 0))
+			m_sprite_bank2 = 0;
 		else
-			state->m_sprite_bank2 = 0x200;
+			m_sprite_bank2 = 0x200;
 
-		state->m_sprite_bank1 = 0;
-		state->m_old_gfx_bank = data & 1;
+		m_sprite_bank1 = 0;
+		m_old_gfx_bank = data & 1;
 	}
 
 	if ((data & 3) == 3)
 	{
-		if (state->m_sprite_bank2)
-			state->m_sprite_bank1 = 0x500;
+		if (m_sprite_bank2)
+			m_sprite_bank1 = 0x500;
 		else
-			state->m_sprite_bank1 = 0x300;
+			m_sprite_bank1 = 0x300;
 	}
 	else if ((data & 3) == 2)
 	{
-		if (state->m_sprite_bank2)
-			state->m_sprite_bank1 = 0x300;
+		if (m_sprite_bank2)
+			m_sprite_bank1 = 0x300;
 		else
-			state->m_sprite_bank1 = 0x100;
+			m_sprite_bank1 = 0x100;
 	}
 
-	if (state->m_bg_bank != (data & 0x8))
+	if (m_bg_bank != (data & 0x8))
 	{
-		state->m_bg_bank = data & 0x8;
-		state->m_bg_tilemap->mark_all_dirty();
+		m_bg_bank = data & 0x8;
+		m_bg_tilemap->mark_all_dirty();
 	}
 }
 

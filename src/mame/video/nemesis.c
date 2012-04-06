@@ -94,93 +94,89 @@ static TILE_GET_INFO( get_fg_tile_info )
 }
 
 
-WRITE16_HANDLER( nemesis_gfx_flipx_word_w )
+WRITE16_MEMBER(nemesis_state::nemesis_gfx_flipx_word_w)
 {
-	nemesis_state *state = space->machine().driver_data<nemesis_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
-		state->m_flipscreen = data & 0x01;
+		m_flipscreen = data & 0x01;
 
 		if (data & 0x01)
-			state->m_tilemap_flip |= TILEMAP_FLIPX;
+			m_tilemap_flip |= TILEMAP_FLIPX;
 		else
-			state->m_tilemap_flip &= ~TILEMAP_FLIPX;
+			m_tilemap_flip &= ~TILEMAP_FLIPX;
 
-		space->machine().tilemap().set_flip_all(state->m_tilemap_flip);
+		machine().tilemap().set_flip_all(m_tilemap_flip);
 	}
 
 	if (ACCESSING_BITS_8_15)
 	{
 		if (data & 0x0100)
-			device_set_input_line_and_vector(state->m_audiocpu, 0, HOLD_LINE, 0xff);
+			device_set_input_line_and_vector(m_audiocpu, 0, HOLD_LINE, 0xff);
 	}
 }
 
-WRITE16_HANDLER( nemesis_gfx_flipy_word_w )
+WRITE16_MEMBER(nemesis_state::nemesis_gfx_flipy_word_w)
 {
-	nemesis_state *state = space->machine().driver_data<nemesis_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
 		if (data & 0x01)
-			state->m_tilemap_flip |= TILEMAP_FLIPY;
+			m_tilemap_flip |= TILEMAP_FLIPY;
 		else
-			state->m_tilemap_flip &= ~TILEMAP_FLIPY;
+			m_tilemap_flip &= ~TILEMAP_FLIPY;
 
-		space->machine().tilemap().set_flip_all(state->m_tilemap_flip);
+		machine().tilemap().set_flip_all(m_tilemap_flip);
 	}
 }
 
 
-WRITE16_HANDLER( salamand_control_port_word_w )
+WRITE16_MEMBER(nemesis_state::salamand_control_port_word_w)
 {
-	nemesis_state *state = space->machine().driver_data<nemesis_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
-		UINT8 accessing_bits = data ^ state->m_irq_port_last;
+		UINT8 accessing_bits = data ^ m_irq_port_last;
 
-		state->m_irq_on = data & 0x01;
-		state->m_irq2_on = data & 0x02;
-		state->m_flipscreen = data & 0x04;
+		m_irq_on = data & 0x01;
+		m_irq2_on = data & 0x02;
+		m_flipscreen = data & 0x04;
 
 		if (data & 0x04)
-			state->m_tilemap_flip |= TILEMAP_FLIPX;
+			m_tilemap_flip |= TILEMAP_FLIPX;
 		else
-			state->m_tilemap_flip &= ~TILEMAP_FLIPX;
+			m_tilemap_flip &= ~TILEMAP_FLIPX;
 
 		if (data & 0x08)
-			state->m_tilemap_flip |= TILEMAP_FLIPY;
+			m_tilemap_flip |= TILEMAP_FLIPY;
 		else
-			state->m_tilemap_flip &= ~TILEMAP_FLIPY;
+			m_tilemap_flip &= ~TILEMAP_FLIPY;
 
 		if (accessing_bits & 0x0c)
-			space->machine().tilemap().set_flip_all(state->m_tilemap_flip);
+			machine().tilemap().set_flip_all(m_tilemap_flip);
 
-		state->m_irq_port_last = data;
+		m_irq_port_last = data;
 	}
 
 	if (ACCESSING_BITS_8_15)
 	{
-		coin_lockout_w(space->machine(), 0, data & 0x0200);
-		coin_lockout_w(space->machine(), 1, data & 0x0400);
+		coin_lockout_w(machine(), 0, data & 0x0200);
+		coin_lockout_w(machine(), 1, data & 0x0400);
 
 		if (data & 0x0800)
-			device_set_input_line(state->m_audiocpu, 0, HOLD_LINE);
+			device_set_input_line(m_audiocpu, 0, HOLD_LINE);
 
-		state->m_selected_ip = (~data & 0x1000) >> 12;		/* citybomb steering & accel */
+		m_selected_ip = (~data & 0x1000) >> 12;		/* citybomb steering & accel */
 	}
 }
 
 
-WRITE16_HANDLER( nemesis_palette_word_w )
+WRITE16_MEMBER(nemesis_state::nemesis_palette_word_w)
 {
-	nemesis_state *state = space->machine().driver_data<nemesis_state>();
 	int r, g, b, bit1, bit2, bit3, bit4, bit5;
 
-	COMBINE_DATA(state->m_paletteram + offset);
-	data = state->m_paletteram[offset];
+	COMBINE_DATA(m_paletteram + offset);
+	data = m_paletteram[offset];
 
 	/* Mish, 30/11/99 - Schematics show the resistor values are:
         300 Ohms
@@ -213,62 +209,56 @@ WRITE16_HANDLER( nemesis_palette_word_w )
 	bit5 = BIT(data, 14);
 	b = MULTIPLIER;
 
-	palette_set_color(space->machine(), offset, MAKE_RGB(r, g, b));
+	palette_set_color(machine(), offset, MAKE_RGB(r, g, b));
 }
 
-WRITE16_HANDLER( salamander_palette_word_w )
+WRITE16_MEMBER(nemesis_state::salamander_palette_word_w)
 {
-	nemesis_state *state = space->machine().driver_data<nemesis_state>();
 
-	COMBINE_DATA(state->m_paletteram + offset);
+	COMBINE_DATA(m_paletteram + offset);
 	offset &= ~1;
 
-	data = ((state->m_paletteram[offset] << 8) & 0xff00) | (state->m_paletteram[offset + 1] & 0xff);
-	palette_set_color_rgb(space->machine(), offset / 2, pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
+	data = ((m_paletteram[offset] << 8) & 0xff00) | (m_paletteram[offset + 1] & 0xff);
+	palette_set_color_rgb(machine(), offset / 2, pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
 }
 
 
-WRITE16_HANDLER( nemesis_videoram1_word_w )
+WRITE16_MEMBER(nemesis_state::nemesis_videoram1_word_w)
 {
-	nemesis_state *state = space->machine().driver_data<nemesis_state>();
 
-	COMBINE_DATA(state->m_videoram1 + offset);
-	state->m_foreground->mark_tile_dirty(offset);
+	COMBINE_DATA(m_videoram1 + offset);
+	m_foreground->mark_tile_dirty(offset);
 }
 
-WRITE16_HANDLER( nemesis_videoram2_word_w )
+WRITE16_MEMBER(nemesis_state::nemesis_videoram2_word_w)
 {
-	nemesis_state *state = space->machine().driver_data<nemesis_state>();
 
-	COMBINE_DATA(state->m_videoram2 + offset);
-	state->m_background->mark_tile_dirty(offset);
+	COMBINE_DATA(m_videoram2 + offset);
+	m_background->mark_tile_dirty(offset);
 }
 
-WRITE16_HANDLER( nemesis_colorram1_word_w )
+WRITE16_MEMBER(nemesis_state::nemesis_colorram1_word_w)
 {
-	nemesis_state *state = space->machine().driver_data<nemesis_state>();
 
-	COMBINE_DATA(state->m_colorram1 + offset);
-	state->m_foreground->mark_tile_dirty(offset);
+	COMBINE_DATA(m_colorram1 + offset);
+	m_foreground->mark_tile_dirty(offset);
 }
 
-WRITE16_HANDLER( nemesis_colorram2_word_w )
+WRITE16_MEMBER(nemesis_state::nemesis_colorram2_word_w)
 {
-	nemesis_state *state = space->machine().driver_data<nemesis_state>();
 
-	COMBINE_DATA(state->m_colorram2 + offset);
-	state->m_background->mark_tile_dirty(offset);
+	COMBINE_DATA(m_colorram2 + offset);
+	m_background->mark_tile_dirty(offset);
 }
 
 
 /* we have to straighten out the 16-bit word into bytes for gfxdecode() to work */
-WRITE16_HANDLER( nemesis_charram_word_w )
+WRITE16_MEMBER(nemesis_state::nemesis_charram_word_w)
 {
-	nemesis_state *state = space->machine().driver_data<nemesis_state>();
-	UINT16 oldword = state->m_charram[offset];
+	UINT16 oldword = m_charram[offset];
 
-	COMBINE_DATA(state->m_charram + offset);
-	data = state->m_charram[offset];
+	COMBINE_DATA(m_charram + offset);
+	data = m_charram[offset];
 
 	if (oldword != data)
 	{
@@ -277,7 +267,7 @@ WRITE16_HANDLER( nemesis_charram_word_w )
 		{
 			int w = sprite_data[i].width;
 			int h = sprite_data[i].height;
-			gfx_element_mark_dirty(space->machine().gfx[sprite_data[i].char_type], offset * 4 / (w * h));
+			gfx_element_mark_dirty(machine().gfx[sprite_data[i].char_type], offset * 4 / (w * h));
 		}
 	}
 }

@@ -14,12 +14,12 @@ public:
 	DECLARE_WRITE8_MEMBER(xyonix_irqack_w);
 	DECLARE_READ8_MEMBER(xyonix_io_r);
 	DECLARE_WRITE8_MEMBER(xyonix_io_w);
+	DECLARE_WRITE8_MEMBER(xyonix_vidram_w);
 };
 
 
 /*----------- defined in video/xyonix.c -----------*/
 
 PALETTE_INIT( xyonix );
-WRITE8_HANDLER( xyonix_vidram_w );
 VIDEO_START(xyonix);
 SCREEN_UPDATE_IND16(xyonix);

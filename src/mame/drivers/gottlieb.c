@@ -327,9 +327,9 @@ WRITE8_MEMBER(gottlieb_state::general_output_w)
 {
 	/* bits 0-3 control video features, and are different for laserdisc games */
 	if (m_laserdisc == NULL)
-		gottlieb_video_control_w(&space, offset, data);
+		gottlieb_video_control_w(space, offset, data);
 	else
-		gottlieb_laserdisc_video_control_w(&space, offset, data);
+		gottlieb_laserdisc_video_control_w(space, offset, data);
 
 	/* bit 4 controls the coin meter */
 	coin_counter_w(machine(), 0, data & 0x10);
@@ -690,19 +690,19 @@ static INTERRUPT_GEN( gottlieb_interrupt )
 WRITE8_MEMBER(gottlieb_state::gottlieb_sh_w)
 {
 	if (m_r1_sound != NULL)
-		m_r1_sound->write(*&space, offset, data);
+		m_r1_sound->write(space, offset, data);
 	if (m_r2_sound != NULL)
-		m_r2_sound->write(*&space, offset, data);
+		m_r2_sound->write(space, offset, data);
 }
 
 static ADDRESS_MAP_START( reactor_map, AS_PROGRAM, 8, gottlieb_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xffff)
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x20ff) AM_MIRROR(0x0f00) AM_WRITEONLY AM_BASE(m_spriteram)							/* FRSEL */
-	AM_RANGE(0x3000, 0x33ff) AM_MIRROR(0x0c00) AM_RAM_WRITE_LEGACY(gottlieb_videoram_w) AM_BASE(m_videoram)		/* BRSEL */
-	AM_RANGE(0x4000, 0x4fff) AM_RAM_WRITE_LEGACY(gottlieb_charram_w) AM_BASE(m_charram)				/* BOJRSEL1 */
+	AM_RANGE(0x3000, 0x33ff) AM_MIRROR(0x0c00) AM_RAM_WRITE(gottlieb_videoram_w) AM_BASE(m_videoram)		/* BRSEL */
+	AM_RANGE(0x4000, 0x4fff) AM_RAM_WRITE(gottlieb_charram_w) AM_BASE(m_charram)				/* BOJRSEL1 */
 /*  AM_RANGE(0x5000, 0x5fff) AM_WRITE_LEGACY() */																/* BOJRSEL2 */
-	AM_RANGE(0x6000, 0x601f) AM_MIRROR(0x0fe0) AM_WRITE_LEGACY(gottlieb_paletteram_w) AM_SHARE("paletteram")		/* COLSEL */
+	AM_RANGE(0x6000, 0x601f) AM_MIRROR(0x0fe0) AM_WRITE(gottlieb_paletteram_w) AM_SHARE("paletteram")		/* COLSEL */
 	AM_RANGE(0x7000, 0x7000) AM_MIRROR(0x0ff8) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x7001, 0x7001) AM_MIRROR(0x0ff8) AM_WRITE(gottlieb_analog_reset_w)						/* A1J2 interface */
 	AM_RANGE(0x7002, 0x7002) AM_MIRROR(0x0ff8) AM_WRITE(gottlieb_sh_w)									/* trackball H */
@@ -722,9 +722,9 @@ static ADDRESS_MAP_START( gottlieb_map, AS_PROGRAM, 8, gottlieb_state )
 	AM_RANGE(0x1000, 0x1fff) AM_RAM AM_REGION("maincpu", 0x1000)	/* or ROM */
 	AM_RANGE(0x2000, 0x2fff) AM_RAM AM_REGION("maincpu", 0x2000)	/* or ROM */
 	AM_RANGE(0x3000, 0x30ff) AM_MIRROR(0x0700) AM_WRITEONLY AM_BASE(m_spriteram)							/* FRSEL */
-	AM_RANGE(0x3800, 0x3bff) AM_MIRROR(0x0400) AM_RAM_WRITE_LEGACY(gottlieb_videoram_w) AM_BASE(m_videoram)		/* BRSEL */
-	AM_RANGE(0x4000, 0x4fff) AM_RAM_WRITE_LEGACY(gottlieb_charram_w) AM_BASE(m_charram)				/* BOJRSEL1 */
-	AM_RANGE(0x5000, 0x501f) AM_MIRROR(0x07e0) AM_WRITE_LEGACY(gottlieb_paletteram_w) AM_SHARE("paletteram")		/* COLSEL */
+	AM_RANGE(0x3800, 0x3bff) AM_MIRROR(0x0400) AM_RAM_WRITE(gottlieb_videoram_w) AM_BASE(m_videoram)		/* BRSEL */
+	AM_RANGE(0x4000, 0x4fff) AM_RAM_WRITE(gottlieb_charram_w) AM_BASE(m_charram)				/* BOJRSEL1 */
+	AM_RANGE(0x5000, 0x501f) AM_MIRROR(0x07e0) AM_WRITE(gottlieb_paletteram_w) AM_SHARE("paletteram")		/* COLSEL */
 	AM_RANGE(0x5800, 0x5800) AM_MIRROR(0x07f8) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x5801, 0x5801) AM_MIRROR(0x07f8) AM_WRITE(gottlieb_analog_reset_w)						/* A1J2 interface */
 	AM_RANGE(0x5802, 0x5802) AM_MIRROR(0x07f8) AM_WRITE(gottlieb_sh_w)									/* OP20-27 */

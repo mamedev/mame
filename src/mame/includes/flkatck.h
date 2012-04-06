@@ -30,6 +30,8 @@ public:
 	DECLARE_WRITE8_MEMBER(flkatck_ls138_w);
 	DECLARE_READ8_MEMBER(multiply_r);
 	DECLARE_WRITE8_MEMBER(multiply_w);
+	DECLARE_WRITE8_MEMBER(flkatck_k007121_w);
+	DECLARE_WRITE8_MEMBER(flkatck_k007121_regs_w);
 };
 
 
@@ -38,8 +40,6 @@ public:
 
 /*----------- defined in video/flkatck.c -----------*/
 
-WRITE8_HANDLER( flkatck_k007121_w );
-WRITE8_HANDLER( flkatck_k007121_regs_w );
 
 VIDEO_START( flkatck );
 SCREEN_UPDATE_IND16( flkatck );

@@ -52,10 +52,9 @@ static TIMER_CALLBACK( spritebuffer_callback )
 		m92_sprite_interrupt(machine);
 }
 
-WRITE16_HANDLER( m92_spritecontrol_w )
+WRITE16_MEMBER(m92_state::m92_spritecontrol_w)
 {
-	m92_state *state = space->machine().driver_data<m92_state>();
-	COMBINE_DATA(&state->m_spritecontrol[offset]);
+	COMBINE_DATA(&m_spritecontrol[offset]);
 	// offset0: sprite list size (negative)
 	// offset1: ? (always 0)
 	// offset2: sprite control
@@ -67,9 +66,9 @@ WRITE16_HANDLER( m92_spritecontrol_w )
 	if (offset==2 && ACCESSING_BITS_0_7)
 	{
 		if ((data & 0xff) == 8)
-			state->m_sprite_list = (((0x100 - state->m_spritecontrol[0]) & 0xff) * 4);
+			m_sprite_list = (((0x100 - m_spritecontrol[0]) & 0xff) * 4);
 		else
-			state->m_sprite_list = 0x400;
+			m_sprite_list = 0x400;
 
 		/* Bit 0 is also significant */
 	}
@@ -78,20 +77,19 @@ WRITE16_HANDLER( m92_spritecontrol_w )
 	if (offset==4)
 	{
 		/* this implementation is not accurate: still some delayed sprites in gunforc2 (might be another issue?) */
-		state->m_spriteram->copy();
-		state->m_sprite_buffer_busy = 0;
+		m_spriteram->copy();
+		m_sprite_buffer_busy = 0;
 
 		/* Pixel clock is 26.6666MHz (some boards 27MHz??), we have 0x800 bytes, or 0x400 words to copy from
         spriteram to the buffer.  It seems safe to assume 1 word can be copied per clock. */
-		space->machine().scheduler().timer_set(attotime::from_hz(XTAL_26_66666MHz) * 0x400, FUNC(spritebuffer_callback));
+		machine().scheduler().timer_set(attotime::from_hz(XTAL_26_66666MHz) * 0x400, FUNC(spritebuffer_callback));
 	}
-//  logerror("%04x: m92_spritecontrol_w %08x %08x\n",cpu_get_pc(&space->device()),offset,data);
+//  logerror("%04x: m92_spritecontrol_w %08x %08x\n",cpu_get_pc(&space.device()),offset,data);
 }
 
-WRITE16_HANDLER( m92_videocontrol_w )
+WRITE16_MEMBER(m92_state::m92_videocontrol_w)
 {
-	m92_state *state = space->machine().driver_data<m92_state>();
-	COMBINE_DATA(&state->m_videocontrol);
+	COMBINE_DATA(&m_videocontrol);
 	/*
         Many games write:
             0x2000
@@ -121,21 +119,19 @@ WRITE16_HANDLER( m92_videocontrol_w )
     */
 
 	/* Access to upper palette bank */
-    state->m_palette_bank = (state->m_videocontrol >> 1) & 1;
+    m_palette_bank = (m_videocontrol >> 1) & 1;
 
-//  logerror("%04x: m92_videocontrol_w %d = %02x\n",cpu_get_pc(&space->device()),offset,data);
+//  logerror("%04x: m92_videocontrol_w %d = %02x\n",cpu_get_pc(&space.device()),offset,data);
 }
 
-READ16_HANDLER( m92_paletteram_r )
+READ16_MEMBER(m92_state::m92_paletteram_r)
 {
-	m92_state *state = space->machine().driver_data<m92_state>();
-	return state->m_generic_paletteram_16[offset + 0x400 * state->m_palette_bank];
+	return m_generic_paletteram_16[offset + 0x400 * m_palette_bank];
 }
 
-WRITE16_HANDLER( m92_paletteram_w )
+WRITE16_MEMBER(m92_state::m92_paletteram_w)
 {
-	m92_state *state = space->machine().driver_data<m92_state>();
-	state->paletteram16_xBBBBBGGGGGRRRRR_word_w(*space, offset + 0x400 * state->m_palette_bank, data, mem_mask);
+	paletteram16_xBBBBBGGGGGRRRRR_word_w(space, offset + 0x400 * m_palette_bank, data, mem_mask);
 }
 
 /*****************************************************************************/
@@ -162,77 +158,72 @@ static TILE_GET_INFO( get_pf_tile_info )
 
 /*****************************************************************************/
 
-WRITE16_HANDLER( m92_vram_w )
+WRITE16_MEMBER(m92_state::m92_vram_w)
 {
-	m92_state *state = space->machine().driver_data<m92_state>();
 	int laynum;
 
-	COMBINE_DATA(&state->m_vram_data[offset]);
+	COMBINE_DATA(&m_vram_data[offset]);
 
 	for (laynum = 0; laynum < 3; laynum++)
 	{
-		if ((offset & 0x6000) == state->m_pf_layer[laynum].vram_base)
+		if ((offset & 0x6000) == m_pf_layer[laynum].vram_base)
 		{
-			state->m_pf_layer[laynum].tmap->mark_tile_dirty((offset & 0x1fff) / 2);
-			state->m_pf_layer[laynum].wide_tmap->mark_tile_dirty((offset & 0x3fff) / 2);
+			m_pf_layer[laynum].tmap->mark_tile_dirty((offset & 0x1fff) / 2);
+			m_pf_layer[laynum].wide_tmap->mark_tile_dirty((offset & 0x3fff) / 2);
 		}
-		if ((offset & 0x6000) == state->m_pf_layer[laynum].vram_base + 0x2000)
-			state->m_pf_layer[laynum].wide_tmap->mark_tile_dirty((offset & 0x3fff) / 2);
+		if ((offset & 0x6000) == m_pf_layer[laynum].vram_base + 0x2000)
+			m_pf_layer[laynum].wide_tmap->mark_tile_dirty((offset & 0x3fff) / 2);
 	}
 }
 
 /*****************************************************************************/
 
-WRITE16_HANDLER( m92_pf1_control_w )
+WRITE16_MEMBER(m92_state::m92_pf1_control_w)
 {
-	m92_state *state = space->machine().driver_data<m92_state>();
-	COMBINE_DATA(&state->m_pf_layer[0].control[offset]);
+	COMBINE_DATA(&m_pf_layer[0].control[offset]);
 }
 
-WRITE16_HANDLER( m92_pf2_control_w )
+WRITE16_MEMBER(m92_state::m92_pf2_control_w)
 {
-	m92_state *state = space->machine().driver_data<m92_state>();
-	COMBINE_DATA(&state->m_pf_layer[1].control[offset]);
+	COMBINE_DATA(&m_pf_layer[1].control[offset]);
 }
 
-WRITE16_HANDLER( m92_pf3_control_w )
+WRITE16_MEMBER(m92_state::m92_pf3_control_w)
 {
-	m92_state *state = space->machine().driver_data<m92_state>();
-	COMBINE_DATA(&state->m_pf_layer[2].control[offset]);
+	COMBINE_DATA(&m_pf_layer[2].control[offset]);
 }
 
-WRITE16_HANDLER( m92_master_control_w )
+WRITE16_MEMBER(m92_state::m92_master_control_w)
 {
-	m92_state *state = space->machine().driver_data<m92_state>();
-	UINT16 old = state->m_pf_master_control[offset];
+	UINT16 old = m_pf_master_control[offset];
 	pf_layer_info *layer;
 
-	COMBINE_DATA(&state->m_pf_master_control[offset]);
+	COMBINE_DATA(&m_pf_master_control[offset]);
 
 	switch (offset)
 	{
 		case 0: /* Playfield 1 (top layer) */
 		case 1: /* Playfield 2 (middle layer) */
 		case 2: /* Playfield 3 (bottom layer) */
-			layer = &state->m_pf_layer[offset];
+			layer = &m_pf_layer[offset];
 
 			/* update VRAM base (bits 0-1) */
-			layer->vram_base = (state->m_pf_master_control[offset] & 3) * 0x2000;
+			layer->vram_base = (m_pf_master_control[offset] & 3) * 0x2000;
 
 			/* update size (bit 2) */
-			if (state->m_pf_master_control[offset] & 0x04)
+			if (m_pf_master_control[offset] & 0x04)
 			{
 				layer->tmap->enable(FALSE);
-				layer->wide_tmap->enable((~state->m_pf_master_control[offset] >> 4) & 1);
+				layer->wide_tmap->enable((~m_pf_master_control[offset] >> 4) & 1);
 			}
 			else
 			{
-				layer->tmap->enable((~state->m_pf_master_control[offset] >> 4) & 1);
+				layer->tmap->enable((~m_pf_master_control[offset] >> 4) & 1);
 				layer->wide_tmap->enable(FALSE);
 			}
 
 			/* mark everything dirty of the VRAM base or size changes */
-			if ((old ^ state->m_pf_master_control[offset]) & 0x07)
+			if ((old ^ m_pf_master_control[offset]) & 0x07)
 			{
 				layer->tmap->mark_all_dirty();
 				layer->wide_tmap->mark_all_dirty();
@@ -240,7 +231,7 @@ WRITE16_HANDLER( m92_master_control_w )
 			break;
 
 		case 3:
-			state->m_raster_irq_position = state->m_pf_master_control[3] - 128;
+			m_raster_irq_position = m_pf_master_control[3] - 128;
 			break;
 	}
 }

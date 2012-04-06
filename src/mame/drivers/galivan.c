@@ -57,7 +57,7 @@ static ADDRESS_MAP_START( galivan_map, AS_PROGRAM, 8, galivan_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 
 	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xd800, 0xdfff) AM_WRITE_LEGACY(galivan_videoram_w) AM_BASE_SIZE(m_videoram, m_videoram_size)
+	AM_RANGE(0xd800, 0xdfff) AM_WRITE(galivan_videoram_w) AM_BASE_SIZE(m_videoram, m_videoram_size)
 
 	AM_RANGE(0xe000, 0xe0ff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
 	AM_RANGE(0xe100, 0xffff) AM_RAM
@@ -67,7 +67,7 @@ static ADDRESS_MAP_START( ninjemak_map, AS_PROGRAM, 8, galivan_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 
 	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xd800, 0xdfff) AM_WRITE_LEGACY(galivan_videoram_w) AM_BASE_SIZE(m_videoram, m_videoram_size)
+	AM_RANGE(0xd800, 0xdfff) AM_WRITE(galivan_videoram_w) AM_BASE_SIZE(m_videoram, m_videoram_size)
 
 	AM_RANGE(0xe000, 0xe1ff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
 	AM_RANGE(0xe200, 0xffff) AM_RAM
@@ -80,9 +80,9 @@ static ADDRESS_MAP_START( io_map, AS_IO, 8, galivan_state )
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW1")
 	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSW2")
-	AM_RANGE(0x40, 0x40) AM_WRITE_LEGACY(galivan_gfxbank_w)
-	AM_RANGE(0x41, 0x42) AM_WRITE_LEGACY(galivan_scrollx_w)
-	AM_RANGE(0x43, 0x44) AM_WRITE_LEGACY(galivan_scrolly_w)
+	AM_RANGE(0x40, 0x40) AM_WRITE(galivan_gfxbank_w)
+	AM_RANGE(0x41, 0x42) AM_WRITE(galivan_scrollx_w)
+	AM_RANGE(0x43, 0x44) AM_WRITE(galivan_scrolly_w)
 	AM_RANGE(0x45, 0x45) AM_WRITE(galivan_sound_command_w)
 /*  AM_RANGE(0x46, 0x46) AM_WRITENOP */
 /*  AM_RANGE(0x47, 0x47) AM_WRITENOP */
@@ -97,7 +97,7 @@ WRITE8_MEMBER(galivan_state::blit_trigger_w)
 
 static ADDRESS_MAP_START( ninjemak_io_map, AS_IO, 8, galivan_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x80, 0x80) AM_READ_PORT("P1") AM_WRITE_LEGACY(ninjemak_gfxbank_w)
+	AM_RANGE(0x80, 0x80) AM_READ_PORT("P1") AM_WRITE(ninjemak_gfxbank_w)
 	AM_RANGE(0x81, 0x81) AM_READ_PORT("P2")
 	AM_RANGE(0x82, 0x82) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x83, 0x83) AM_READ_PORT("SERVICE")

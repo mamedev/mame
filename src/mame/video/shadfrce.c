@@ -14,12 +14,11 @@ static TILE_GET_INFO( get_shadfrce_fgtile_info )
 	SET_TILE_INFO(0,tileno,colour*4,0);
 }
 
-WRITE16_HANDLER( shadfrce_fgvideoram_w )
+WRITE16_MEMBER(shadfrce_state::shadfrce_fgvideoram_w)
 {
-	shadfrce_state *state = space->machine().driver_data<shadfrce_state>();
 
-	state->m_fgvideoram[offset] = data;
-	state->m_fgtilemap->mark_tile_dirty(offset/2);
+	m_fgvideoram[offset] = data;
+	m_fgtilemap->mark_tile_dirty(offset/2);
 }
 
 static TILE_GET_INFO( get_shadfrce_bg0tile_info )
@@ -37,12 +36,11 @@ static TILE_GET_INFO( get_shadfrce_bg0tile_info )
 	SET_TILE_INFO(2,tileno,colour,TILE_FLIPYX(fyx));
 }
 
-WRITE16_HANDLER( shadfrce_bg0videoram_w )
+WRITE16_MEMBER(shadfrce_state::shadfrce_bg0videoram_w)
 {
-	shadfrce_state *state = space->machine().driver_data<shadfrce_state>();
 
-	state->m_bg0videoram[offset] = data;
-	state->m_bg0tilemap->mark_tile_dirty(offset/2);
+	m_bg0videoram[offset] = data;
+	m_bg0tilemap->mark_tile_dirty(offset/2);
 }
 
 static TILE_GET_INFO( get_shadfrce_bg1tile_info )
@@ -56,12 +54,11 @@ static TILE_GET_INFO( get_shadfrce_bg1tile_info )
 	SET_TILE_INFO(2,tileno,colour+64,0);
 }
 
-WRITE16_HANDLER( shadfrce_bg1videoram_w )
+WRITE16_MEMBER(shadfrce_state::shadfrce_bg1videoram_w)
 {
-	shadfrce_state *state = space->machine().driver_data<shadfrce_state>();
 
-	state->m_bg1videoram[offset] = data;
-	state->m_bg1tilemap->mark_tile_dirty(offset);
+	m_bg1videoram[offset] = data;
+	m_bg1tilemap->mark_tile_dirty(offset);
 }
 
 
@@ -82,32 +79,28 @@ VIDEO_START( shadfrce )
 	state->m_spvideoram_old = auto_alloc_array(machine, UINT16, state->m_spvideoram_size/2);
 }
 
-WRITE16_HANDLER ( shadfrce_bg0scrollx_w )
+WRITE16_MEMBER(shadfrce_state::shadfrce_bg0scrollx_w)
 {
-	shadfrce_state *state = space->machine().driver_data<shadfrce_state>();
 
-	state->m_bg0tilemap->set_scrollx(0, data & 0x1ff );
+	m_bg0tilemap->set_scrollx(0, data & 0x1ff );
 }
 
-WRITE16_HANDLER ( shadfrce_bg0scrolly_w )
+WRITE16_MEMBER(shadfrce_state::shadfrce_bg0scrolly_w)
 {
-	shadfrce_state *state = space->machine().driver_data<shadfrce_state>();
 
-	state->m_bg0tilemap->set_scrolly(0, data  & 0x1ff );
+	m_bg0tilemap->set_scrolly(0, data  & 0x1ff );
 }
 
-WRITE16_HANDLER ( shadfrce_bg1scrollx_w )
+WRITE16_MEMBER(shadfrce_state::shadfrce_bg1scrollx_w)
 {
-	shadfrce_state *state = space->machine().driver_data<shadfrce_state>();
 
-	state->m_bg1tilemap->set_scrollx(0, data  & 0x1ff );
+	m_bg1tilemap->set_scrollx(0, data  & 0x1ff );
 }
 
-WRITE16_HANDLER ( shadfrce_bg1scrolly_w )
+WRITE16_MEMBER(shadfrce_state::shadfrce_bg1scrolly_w)
 {
-	shadfrce_state *state = space->machine().driver_data<shadfrce_state>();
 
-	state->m_bg1tilemap->set_scrolly(0, data & 0x1ff );
+	m_bg1tilemap->set_scrolly(0, data & 0x1ff );
 }
 
 

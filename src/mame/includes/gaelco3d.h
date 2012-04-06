@@ -94,16 +94,16 @@ public:
 	DECLARE_WRITE32_MEMBER(radikalb_lamp_w);
 	DECLARE_WRITE32_MEMBER(unknown_137_w);
 	DECLARE_WRITE32_MEMBER(unknown_13a_w);
+	DECLARE_WRITE32_MEMBER(gaelco3d_render_w);
+	DECLARE_WRITE16_MEMBER(gaelco3d_paletteram_w);
+	DECLARE_WRITE32_MEMBER(gaelco3d_paletteram_020_w);
 };
 
 
 /*----------- defined in video/gaelco3d.c -----------*/
 
 void gaelco3d_render(screen_device &screen);
-WRITE32_HANDLER( gaelco3d_render_w );
 
-WRITE16_HANDLER( gaelco3d_paletteram_w );
-WRITE32_HANDLER( gaelco3d_paletteram_020_w );
 
 VIDEO_START( gaelco3d );
 SCREEN_UPDATE_IND16( gaelco3d );

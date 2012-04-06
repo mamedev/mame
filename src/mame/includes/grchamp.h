@@ -50,6 +50,9 @@ public:
 	DECLARE_WRITE8_MEMBER(main_to_sub_comm_w);
 	DECLARE_READ8_MEMBER(main_to_sub_comm_r);
 	UINT8 get_pc3259_bits(int offs);
+	DECLARE_WRITE8_MEMBER(grchamp_left_w);
+	DECLARE_WRITE8_MEMBER(grchamp_center_w);
+	DECLARE_WRITE8_MEMBER(grchamp_right_w);
 };
 
 /* Discrete Sound Input Nodes */
@@ -72,6 +75,3 @@ DISCRETE_SOUND_EXTERN( grchamp );
 PALETTE_INIT( grchamp );
 VIDEO_START( grchamp );
 SCREEN_UPDATE_RGB32( grchamp );
-WRITE8_HANDLER( grchamp_left_w );
-WRITE8_HANDLER( grchamp_center_w );
-WRITE8_HANDLER( grchamp_right_w );

@@ -947,7 +947,7 @@ static ADDRESS_MAP_START( galaga_map, AS_PROGRAM, 8, galaga_state )
 	AM_RANGE(0x6830, 0x6830) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x7000, 0x70ff) AM_DEVREADWRITE_LEGACY("06xx", namco_06xx_data_r, namco_06xx_data_w)
 	AM_RANGE(0x7100, 0x7100) AM_DEVREADWRITE_LEGACY("06xx", namco_06xx_ctrl_r, namco_06xx_ctrl_w)
-	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE_LEGACY(galaga_videoram_w) AM_BASE(m_videoram) AM_SHARE("gvr")
+	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(galaga_videoram_w) AM_BASE(m_videoram) AM_SHARE("gvr")
 	AM_RANGE(0x8800, 0x8bff) AM_RAM AM_SHARE("share1") AM_BASE(m_galaga_ram1)
 	AM_RANGE(0x9000, 0x93ff) AM_RAM AM_SHARE("share2") AM_BASE(m_galaga_ram2)
 	AM_RANGE(0x9800, 0x9bff) AM_RAM AM_SHARE("share3") AM_BASE(m_galaga_ram3)
@@ -3279,7 +3279,8 @@ static DRIVER_INIT (gatsbee)
 	DRIVER_INIT_CALL(galaga);
 
 	/* Gatsbee has a larger character ROM, we need a handler for banking */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x1000, 0x1000, FUNC(gatsbee_bank_w));
+	galaga_state *state =  machine.driver_data<galaga_state>();
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x1000, 0x1000, write8_delegate(FUNC(galaga_state::gatsbee_bank_w),state));
 }
 
 

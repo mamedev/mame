@@ -156,9 +156,9 @@ static ADDRESS_MAP_START( cpu_map, AS_PROGRAM, 32, silkroad_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 	AM_RANGE(0x40c000, 0x40cfff) AM_RAM AM_BASE(m_sprram) // sprites
 	AM_RANGE(0x600000, 0x603fff) AM_RAM_WRITE(paletteram32_xRRRRRGGGGGBBBBB_dword_w) AM_SHARE("paletteram") // palette
-	AM_RANGE(0x800000, 0x803fff) AM_RAM_WRITE_LEGACY(silkroad_fgram_w) AM_BASE(m_vidram)  // lower Layer
-	AM_RANGE(0x804000, 0x807fff) AM_RAM_WRITE_LEGACY(silkroad_fgram2_w) AM_BASE(m_vidram2)  // mid layer
-	AM_RANGE(0x808000, 0x80bfff) AM_RAM_WRITE_LEGACY(silkroad_fgram3_w) AM_BASE(m_vidram3) // higher layer
+	AM_RANGE(0x800000, 0x803fff) AM_RAM_WRITE(silkroad_fgram_w) AM_BASE(m_vidram)  // lower Layer
+	AM_RANGE(0x804000, 0x807fff) AM_RAM_WRITE(silkroad_fgram2_w) AM_BASE(m_vidram2)  // mid layer
+	AM_RANGE(0x808000, 0x80bfff) AM_RAM_WRITE(silkroad_fgram3_w) AM_BASE(m_vidram3) // higher layer
 	AM_RANGE(0xc00000, 0xc00003) AM_READ_PORT("INPUTS")
 	AM_RANGE(0xc00004, 0xc00007) AM_READ_PORT("DSW")
 	AM_RANGE(0xc00024, 0xc00027) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff0000)

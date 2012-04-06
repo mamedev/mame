@@ -52,12 +52,11 @@ VIDEO_START( shangkid )
 	state->m_background = tilemap_create(machine, get_bg_tile_info,tilemap_scan_rows,8,8,64,32);
 }
 
-WRITE8_HANDLER( shangkid_videoram_w )
+WRITE8_MEMBER(shangkid_state::shangkid_videoram_w)
 {
-	shangkid_state *state = space->machine().driver_data<shangkid_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = m_videoram;
 	videoram[offset] = data;
-	state->m_background->mark_tile_dirty(offset&0x7ff );
+	m_background->mark_tile_dirty(offset&0x7ff );
 }
 
 static void draw_sprite(running_machine &machine, const UINT8 *source, bitmap_ind16 &bitmap, const rectangle &cliprect)

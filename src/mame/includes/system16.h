@@ -136,6 +136,14 @@ public:
 	DECLARE_WRITE8_MEMBER(shdancbl_msm5205_data_w);
 	DECLARE_READ8_MEMBER(shdancbl_soundbank_r);
 	DECLARE_WRITE8_MEMBER(shdancbl_bankctrl_w);
+	DECLARE_WRITE16_MEMBER(sys16_paletteram_w);
+	DECLARE_WRITE16_MEMBER(sys16_tileram_w);
+	DECLARE_WRITE16_MEMBER(sys16_textram_w);
+	DECLARE_WRITE16_MEMBER(s16a_bootleg_bgscrolly_w);
+	DECLARE_WRITE16_MEMBER(s16a_bootleg_bgscrollx_w);
+	DECLARE_WRITE16_MEMBER(s16a_bootleg_fgscrolly_w);
+	DECLARE_WRITE16_MEMBER(s16a_bootleg_fgscrollx_w);
+	DECLARE_WRITE16_MEMBER(s16a_bootleg_tilemapselect_w);
 };
 
 /*----------- defined in video/system16.c -----------*/
@@ -146,15 +154,8 @@ extern VIDEO_START( s16a_bootleg_shinobi );
 extern VIDEO_START( s16a_bootleg_passsht );
 extern SCREEN_UPDATE_IND16( s16a_bootleg );
 extern SCREEN_UPDATE_IND16( s16a_bootleg_passht4b );
-extern WRITE16_HANDLER( s16a_bootleg_tilemapselect_w );
-extern WRITE16_HANDLER( s16a_bootleg_bgscrolly_w );
-extern WRITE16_HANDLER( s16a_bootleg_bgscrollx_w );
-extern WRITE16_HANDLER( s16a_bootleg_fgscrolly_w );
-extern WRITE16_HANDLER( s16a_bootleg_fgscrollx_w );
 
 /* video hardware */
-extern WRITE16_HANDLER( sys16_tileram_w );
-extern WRITE16_HANDLER( sys16_textram_w );
 
 /* "normal" video hardware */
 extern VIDEO_START( system16 );

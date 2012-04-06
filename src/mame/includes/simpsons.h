@@ -30,13 +30,17 @@ public:
 	device_t *m_k053251;
 	DECLARE_WRITE8_MEMBER(z80_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(z80_arm_nmi_w);
+	DECLARE_WRITE8_MEMBER(simpsons_eeprom_w);
+	DECLARE_WRITE8_MEMBER(simpsons_coin_counter_w);
+	DECLARE_READ8_MEMBER(simpsons_sound_interrupt_r);
+	DECLARE_READ8_MEMBER(simpsons_k052109_r);
+	DECLARE_WRITE8_MEMBER(simpsons_k052109_w);
+	DECLARE_READ8_MEMBER(simpsons_k053247_r);
+	DECLARE_WRITE8_MEMBER(simpsons_k053247_w);
 };
 
 /*----------- defined in machine/simpsons.c -----------*/
 
-WRITE8_HANDLER( simpsons_eeprom_w );
-WRITE8_HANDLER( simpsons_coin_counter_w );
-READ8_HANDLER( simpsons_sound_interrupt_r );
 READ8_DEVICE_HANDLER( simpsons_sound_r );
 MACHINE_RESET( simpsons );
 MACHINE_START( simpsons );

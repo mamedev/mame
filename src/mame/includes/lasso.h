@@ -36,16 +36,17 @@ public:
 	DECLARE_WRITE8_MEMBER(pinbo_sound_command_w);
 	DECLARE_READ8_MEMBER(sound_status_r);
 	DECLARE_WRITE8_MEMBER(sound_select_w);
+	DECLARE_WRITE8_MEMBER(lasso_videoram_w);
+	DECLARE_WRITE8_MEMBER(lasso_colorram_w);
+	DECLARE_WRITE8_MEMBER(lasso_flip_screen_w);
+	DECLARE_WRITE8_MEMBER(lasso_video_control_w);
+	DECLARE_WRITE8_MEMBER(wwjgtin_video_control_w);
+	DECLARE_WRITE8_MEMBER(pinbo_video_control_w);
 };
 
 
 /*----------- defined in video/lasso.c -----------*/
 
-WRITE8_HANDLER( lasso_videoram_w );
-WRITE8_HANDLER( lasso_colorram_w );
-WRITE8_HANDLER( lasso_video_control_w );
-WRITE8_HANDLER( wwjgtin_video_control_w );
-WRITE8_HANDLER( pinbo_video_control_w );
 
 PALETTE_INIT( lasso );
 PALETTE_INIT( wwjgtin );

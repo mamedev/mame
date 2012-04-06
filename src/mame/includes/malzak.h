@@ -30,11 +30,11 @@ public:
 	DECLARE_WRITE8_MEMBER(port60_w);
 	DECLARE_WRITE8_MEMBER(portc0_w);
 	DECLARE_READ8_MEMBER(collision_r);
+	DECLARE_WRITE8_MEMBER(malzak_playfield_w);
 };
 
 
 /*----------- defined in video/malzak.c -----------*/
 
-WRITE8_HANDLER( malzak_playfield_w );
 
 SCREEN_UPDATE_IND16( malzak );

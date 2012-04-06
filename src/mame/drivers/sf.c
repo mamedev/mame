@@ -115,8 +115,8 @@ WRITE16_MEMBER(sf_state::protection_w)
 			space.write_word(0xffc00c, 0xc0);
 			space.write_word(0xffc00e, 0);
 
-			sf_fg_scroll_w(&space, 0, d1, 0xffff);
-			sf_bg_scroll_w(&space, 0, d2, 0xffff);
+			sf_fg_scroll_w(space, 0, d1, 0xffff);
+			sf_bg_scroll_w(space, 0, d2, 0xffff);
 			break;
 		}
 	case 4:
@@ -140,7 +140,7 @@ WRITE16_MEMBER(sf_state::protection_w)
 				}
 				space.write_word(0xffc682, d1);
 				space.write_word(0xffc00e, off);
-				sf_bg_scroll_w(&space, 0, d1, 0xffff);
+				sf_bg_scroll_w(space, 0, d1, 0xffff);
 			}
 			break;
 		}
@@ -190,7 +190,7 @@ static WRITE8_DEVICE_HANDLER( msm5205_w )
 
 static ADDRESS_MAP_START( sf_map, AS_PROGRAM, 16, sf_state )
 	AM_RANGE(0x000000, 0x04ffff) AM_ROM
-	AM_RANGE(0x800000, 0x800fff) AM_RAM_WRITE_LEGACY(sf_videoram_w) AM_BASE_SIZE(m_videoram, m_videoram_size)
+	AM_RANGE(0x800000, 0x800fff) AM_RAM_WRITE(sf_videoram_w) AM_BASE_SIZE(m_videoram, m_videoram_size)
 	AM_RANGE(0xb00000, 0xb007ff) AM_RAM_WRITE(paletteram16_xxxxRRRRGGGGBBBB_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0xc00000, 0xc00001) AM_READ_PORT("COINS")
 	AM_RANGE(0xc00002, 0xc00003) AM_READ_PORT("IN0")
@@ -201,9 +201,9 @@ static ADDRESS_MAP_START( sf_map, AS_PROGRAM, 16, sf_state )
 	AM_RANGE(0xc0000c, 0xc0000d) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xc0000e, 0xc0000f) AM_READ(dummy_r)
 	AM_RANGE(0xc00010, 0xc00011) AM_WRITE(sf_coin_w)
-	AM_RANGE(0xc00014, 0xc00015) AM_WRITE_LEGACY(sf_fg_scroll_w)
-	AM_RANGE(0xc00018, 0xc00019) AM_WRITE_LEGACY(sf_bg_scroll_w)
-	AM_RANGE(0xc0001a, 0xc0001b) AM_WRITE_LEGACY(sf_gfxctrl_w)
+	AM_RANGE(0xc00014, 0xc00015) AM_WRITE(sf_fg_scroll_w)
+	AM_RANGE(0xc00018, 0xc00019) AM_WRITE(sf_bg_scroll_w)
+	AM_RANGE(0xc0001a, 0xc0001b) AM_WRITE(sf_gfxctrl_w)
 	AM_RANGE(0xc0001c, 0xc0001d) AM_WRITE(soundcmd_w)
 //  AM_RANGE(0xc0001e, 0xc0001f) AM_WRITE(protection_w)
 	AM_RANGE(0xff8000, 0xffdfff) AM_RAM
@@ -212,7 +212,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sfus_map, AS_PROGRAM, 16, sf_state )
 	AM_RANGE(0x000000, 0x04ffff) AM_ROM
-	AM_RANGE(0x800000, 0x800fff) AM_RAM_WRITE_LEGACY(sf_videoram_w) AM_BASE_SIZE(m_videoram, m_videoram_size)
+	AM_RANGE(0x800000, 0x800fff) AM_RAM_WRITE(sf_videoram_w) AM_BASE_SIZE(m_videoram, m_videoram_size)
 	AM_RANGE(0xb00000, 0xb007ff) AM_RAM_WRITE(paletteram16_xxxxRRRRGGGGBBBB_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0xc00000, 0xc00001) AM_READ_PORT("IN0")
 	AM_RANGE(0xc00002, 0xc00003) AM_READ_PORT("IN1")
@@ -223,9 +223,9 @@ static ADDRESS_MAP_START( sfus_map, AS_PROGRAM, 16, sf_state )
 	AM_RANGE(0xc0000c, 0xc0000d) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xc0000e, 0xc0000f) AM_READ(dummy_r)
 	AM_RANGE(0xc00010, 0xc00011) AM_WRITE(sf_coin_w)
-	AM_RANGE(0xc00014, 0xc00015) AM_WRITE_LEGACY(sf_fg_scroll_w)
-	AM_RANGE(0xc00018, 0xc00019) AM_WRITE_LEGACY(sf_bg_scroll_w)
-	AM_RANGE(0xc0001a, 0xc0001b) AM_WRITE_LEGACY(sf_gfxctrl_w)
+	AM_RANGE(0xc00014, 0xc00015) AM_WRITE(sf_fg_scroll_w)
+	AM_RANGE(0xc00018, 0xc00019) AM_WRITE(sf_bg_scroll_w)
+	AM_RANGE(0xc0001a, 0xc0001b) AM_WRITE(sf_gfxctrl_w)
 	AM_RANGE(0xc0001c, 0xc0001d) AM_WRITE(soundcmd_w)
 //  AM_RANGE(0xc0001e, 0xc0001f) AM_WRITE(protection_w)
 	AM_RANGE(0xff8000, 0xffdfff) AM_RAM
@@ -234,7 +234,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sfjp_map, AS_PROGRAM, 16, sf_state )
 	AM_RANGE(0x000000, 0x04ffff) AM_ROM
-	AM_RANGE(0x800000, 0x800fff) AM_RAM_WRITE_LEGACY(sf_videoram_w) AM_BASE_SIZE(m_videoram, m_videoram_size)
+	AM_RANGE(0x800000, 0x800fff) AM_RAM_WRITE(sf_videoram_w) AM_BASE_SIZE(m_videoram, m_videoram_size)
 	AM_RANGE(0xb00000, 0xb007ff) AM_RAM_WRITE(paletteram16_xxxxRRRRGGGGBBBB_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0xc00000, 0xc00001) AM_READ_PORT("COINS")
 	AM_RANGE(0xc00002, 0xc00003) AM_READ_PORT("P1")
@@ -245,9 +245,9 @@ static ADDRESS_MAP_START( sfjp_map, AS_PROGRAM, 16, sf_state )
 	AM_RANGE(0xc0000c, 0xc0000d) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xc0000e, 0xc0000f) AM_READ(dummy_r)
 	AM_RANGE(0xc00010, 0xc00011) AM_WRITE(sf_coin_w)
-	AM_RANGE(0xc00014, 0xc00015) AM_WRITE_LEGACY(sf_fg_scroll_w)
-	AM_RANGE(0xc00018, 0xc00019) AM_WRITE_LEGACY(sf_bg_scroll_w)
-	AM_RANGE(0xc0001a, 0xc0001b) AM_WRITE_LEGACY(sf_gfxctrl_w)
+	AM_RANGE(0xc00014, 0xc00015) AM_WRITE(sf_fg_scroll_w)
+	AM_RANGE(0xc00018, 0xc00019) AM_WRITE(sf_bg_scroll_w)
+	AM_RANGE(0xc0001a, 0xc0001b) AM_WRITE(sf_gfxctrl_w)
 	AM_RANGE(0xc0001c, 0xc0001d) AM_WRITE(soundcmd_w)
 	AM_RANGE(0xc0001e, 0xc0001f) AM_WRITE(protection_w)
 	AM_RANGE(0xff8000, 0xffdfff) AM_RAM

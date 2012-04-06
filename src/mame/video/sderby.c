@@ -14,12 +14,11 @@ static TILE_GET_INFO( get_sderby_tile_info )
 	SET_TILE_INFO(1,tileno,colour,0);
 }
 
-WRITE16_HANDLER( sderby_videoram_w )
+WRITE16_MEMBER(sderby_state::sderby_videoram_w)
 {
-	sderby_state *state = space->machine().driver_data<sderby_state>();
 
-	COMBINE_DATA(&state->m_videoram[offset]);
-	state->m_tilemap->mark_tile_dirty(offset/2);
+	COMBINE_DATA(&m_videoram[offset]);
+	m_tilemap->mark_tile_dirty(offset/2);
 }
 
 /* MD Layer */
@@ -35,12 +34,11 @@ static TILE_GET_INFO( get_sderby_md_tile_info )
 	SET_TILE_INFO(1,tileno,colour+16,0);
 }
 
-WRITE16_HANDLER( sderby_md_videoram_w )
+WRITE16_MEMBER(sderby_state::sderby_md_videoram_w)
 {
-	sderby_state *state = space->machine().driver_data<sderby_state>();
 
-	COMBINE_DATA(&state->m_md_videoram[offset]);
-	state->m_md_tilemap->mark_tile_dirty(offset/2);
+	COMBINE_DATA(&m_md_videoram[offset]);
+	m_md_tilemap->mark_tile_dirty(offset/2);
 }
 
 /* FG Layer */
@@ -56,12 +54,11 @@ static TILE_GET_INFO( get_sderby_fg_tile_info )
 	SET_TILE_INFO(0,tileno,colour+32,0);
 }
 
-WRITE16_HANDLER( sderby_fg_videoram_w )
+WRITE16_MEMBER(sderby_state::sderby_fg_videoram_w)
 {
-	sderby_state *state = space->machine().driver_data<sderby_state>();
 
-	COMBINE_DATA(&state->m_fg_videoram[offset]);
-	state->m_fg_tilemap->mark_tile_dirty(offset/2);
+	COMBINE_DATA(&m_fg_videoram[offset]);
+	m_fg_tilemap->mark_tile_dirty(offset/2);
 }
 
 
@@ -131,19 +128,18 @@ SCREEN_UPDATE_IND16( pmroulet )
 }
 
 
-WRITE16_HANDLER( sderby_scroll_w )
+WRITE16_MEMBER(sderby_state::sderby_scroll_w)
 {
-	sderby_state *state = space->machine().driver_data<sderby_state>();
 
-	data = COMBINE_DATA(&state->m_scroll[offset]);
+	data = COMBINE_DATA(&m_scroll[offset]);
 
 	switch (offset)
 	{
-		case 0: state->m_fg_tilemap->set_scrollx(0,data+2);break;
-		case 1: state->m_fg_tilemap->set_scrolly(0,data-8);break;
-		case 2: state->m_md_tilemap->set_scrollx(0,data+4);break;
-		case 3: state->m_md_tilemap->set_scrolly(0,data-8);break;
-		case 4: state->m_tilemap->set_scrollx(0,data+6);   break;
-		case 5: state->m_tilemap->set_scrolly(0,data-8);   break;
+		case 0: m_fg_tilemap->set_scrollx(0,data+2);break;
+		case 1: m_fg_tilemap->set_scrolly(0,data-8);break;
+		case 2: m_md_tilemap->set_scrollx(0,data+4);break;
+		case 3: m_md_tilemap->set_scrolly(0,data-8);break;
+		case 4: m_tilemap->set_scrollx(0,data+6);   break;
+		case 5: m_tilemap->set_scrolly(0,data-8);   break;
 	}
 }

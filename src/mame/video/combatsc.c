@@ -331,58 +331,53 @@ VIDEO_START( combatscb )
 
 ***************************************************************************/
 
-READ8_HANDLER( combatsc_video_r )
+READ8_MEMBER(combatsc_state::combatsc_video_r)
 {
-	combatsc_state *state = space->machine().driver_data<combatsc_state>();
-	return state->m_videoram[offset];
+	return m_videoram[offset];
 }
 
-WRITE8_HANDLER( combatsc_video_w )
+WRITE8_MEMBER(combatsc_state::combatsc_video_w)
 {
-	combatsc_state *state = space->machine().driver_data<combatsc_state>();
-	state->m_videoram[offset] = data;
+	m_videoram[offset] = data;
 
 	if (offset < 0x800)
 	{
-		if (state->m_video_circuit)
-			state->m_bg_tilemap[1]->mark_tile_dirty(offset & 0x3ff);
+		if (m_video_circuit)
+			m_bg_tilemap[1]->mark_tile_dirty(offset & 0x3ff);
 		else
-			state->m_bg_tilemap[0]->mark_tile_dirty(offset & 0x3ff);
+			m_bg_tilemap[0]->mark_tile_dirty(offset & 0x3ff);
 	}
-	else if (offset < 0x1000 && state->m_video_circuit == 0)
+	else if (offset < 0x1000 && m_video_circuit == 0)
 	{
-		state->m_textlayer->mark_tile_dirty(offset & 0x3ff);
+		m_textlayer->mark_tile_dirty(offset & 0x3ff);
 	}
 }
 
-WRITE8_HANDLER( combatsc_pf_control_w )
+WRITE8_MEMBER(combatsc_state::combatsc_pf_control_w)
 {
-	combatsc_state *state = space->machine().driver_data<combatsc_state>();
-	device_t *k007121 = state->m_video_circuit ? state->m_k007121_2 : state->m_k007121_1;
+	device_t *k007121 = m_video_circuit ? m_k007121_2 : m_k007121_1;
 	k007121_ctrl_w(k007121, offset, data);
 
 	if (offset == 7)
-		state->m_bg_tilemap[state->m_video_circuit]->set_flip((data & 0x08) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+		m_bg_tilemap[m_video_circuit]->set_flip((data & 0x08) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
 	if (offset == 3)
 	{
 		if (data & 0x08)
-			memcpy(state->m_spriteram[state->m_video_circuit], state->m_page[state->m_video_circuit] + 0x1000, 0x800);
+			memcpy(m_spriteram[m_video_circuit], m_page[m_video_circuit] + 0x1000, 0x800);
 		else
-			memcpy(state->m_spriteram[state->m_video_circuit], state->m_page[state->m_video_circuit] + 0x1800, 0x800);
+			memcpy(m_spriteram[m_video_circuit], m_page[m_video_circuit] + 0x1800, 0x800);
 	}
 }
 
-READ8_HANDLER( combatsc_scrollram_r )
+READ8_MEMBER(combatsc_state::combatsc_scrollram_r)
 {
-	combatsc_state *state = space->machine().driver_data<combatsc_state>();
-	return state->m_scrollram[offset];
+	return m_scrollram[offset];
 }
 
-WRITE8_HANDLER( combatsc_scrollram_w )
+WRITE8_MEMBER(combatsc_state::combatsc_scrollram_w)
 {
-	combatsc_state *state = space->machine().driver_data<combatsc_state>();
-	state->m_scrollram[offset] = data;
+	m_scrollram[offset] = data;
 }
 
 

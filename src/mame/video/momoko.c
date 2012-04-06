@@ -12,66 +12,56 @@
 #include "includes/momoko.h"
 
 
-WRITE8_HANDLER ( momoko_fg_scrollx_w )
+WRITE8_MEMBER(momoko_state::momoko_fg_scrollx_w)
 {
-	momoko_state *state = space->machine().driver_data<momoko_state>();
-	state->m_fg_scrollx = data;
+	m_fg_scrollx = data;
 }
 
-WRITE8_HANDLER ( momoko_fg_scrolly_w )
+WRITE8_MEMBER(momoko_state::momoko_fg_scrolly_w)
 {
-	momoko_state *state = space->machine().driver_data<momoko_state>();
-	state->m_fg_scrolly = data;
+	m_fg_scrolly = data;
 }
 
-WRITE8_HANDLER ( momoko_fg_select_w )
+WRITE8_MEMBER(momoko_state::momoko_fg_select_w)
 {
-	momoko_state *state = space->machine().driver_data<momoko_state>();
-	state->m_fg_select = data & 0x0f;
-	state->m_fg_mask = data & 0x10;
+	m_fg_select = data & 0x0f;
+	m_fg_mask = data & 0x10;
 }
 
-WRITE8_HANDLER ( momoko_text_scrolly_w )
+WRITE8_MEMBER(momoko_state::momoko_text_scrolly_w)
 {
-	momoko_state *state = space->machine().driver_data<momoko_state>();
-	state->m_text_scrolly = data;
+	m_text_scrolly = data;
 }
 
-WRITE8_HANDLER ( momoko_text_mode_w )
+WRITE8_MEMBER(momoko_state::momoko_text_mode_w)
 {
-	momoko_state *state = space->machine().driver_data<momoko_state>();
-	state->m_text_mode = data;
+	m_text_mode = data;
 }
 
-WRITE8_HANDLER ( momoko_bg_scrollx_w )
+WRITE8_MEMBER(momoko_state::momoko_bg_scrollx_w)
 {
-	momoko_state *state = space->machine().driver_data<momoko_state>();
-	state->m_bg_scrollx[offset] = data;
+	m_bg_scrollx[offset] = data;
 }
 
-WRITE8_HANDLER ( momoko_bg_scrolly_w )
+WRITE8_MEMBER(momoko_state::momoko_bg_scrolly_w)
 {
-	momoko_state *state = space->machine().driver_data<momoko_state>();
-	state->m_bg_scrolly[offset] = data;
+	m_bg_scrolly[offset] = data;
 }
 
-WRITE8_HANDLER( momoko_bg_select_w )
+WRITE8_MEMBER(momoko_state::momoko_bg_select_w)
 {
-	momoko_state *state = space->machine().driver_data<momoko_state>();
-	state->m_bg_select = data & 0x0f;
-	state->m_bg_mask = data & 0x10;
+	m_bg_select = data & 0x0f;
+	m_bg_mask = data & 0x10;
 }
 
-WRITE8_HANDLER( momoko_bg_priority_w )
+WRITE8_MEMBER(momoko_state::momoko_bg_priority_w)
 {
-	momoko_state *state = space->machine().driver_data<momoko_state>();
-	state->m_bg_priority = data & 0x01;
+	m_bg_priority = data & 0x01;
 }
 
-WRITE8_HANDLER( momoko_flipscreen_w )
+WRITE8_MEMBER(momoko_state::momoko_flipscreen_w)
 {
-	momoko_state *state = space->machine().driver_data<momoko_state>();
-	state->m_flipscreen = data & 0x01;
+	m_flipscreen = data & 0x01;
 }
 
 /****************************************************************************/

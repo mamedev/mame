@@ -25,6 +25,8 @@ public:
 	device_t *m_dac;
 
 	UINT8          m_irq_mask;
+	DECLARE_WRITE8_MEMBER(cheekyms_port_40_w);
+	DECLARE_WRITE8_MEMBER(cheekyms_port_80_w);
 };
 
 
@@ -33,5 +35,3 @@ public:
 PALETTE_INIT( cheekyms );
 VIDEO_START( cheekyms );
 SCREEN_UPDATE_IND16( cheekyms );
-WRITE8_HANDLER( cheekyms_port_40_w );
-WRITE8_HANDLER( cheekyms_port_80_w );

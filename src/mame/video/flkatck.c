@@ -83,39 +83,37 @@ VIDEO_START( flkatck )
 
 ***************************************************************************/
 
-WRITE8_HANDLER( flkatck_k007121_w )
+WRITE8_MEMBER(flkatck_state::flkatck_k007121_w)
 {
-	flkatck_state *state = space->machine().driver_data<flkatck_state>();
 
-	state->m_k007121_ram[offset] = data;
+	m_k007121_ram[offset] = data;
 	if (offset < 0x1000)	/* tiles */
 	{
 		if (offset & 0x800)	/* score */
-			state->m_k007121_tilemap[1]->mark_tile_dirty(offset & 0x3ff);
+			m_k007121_tilemap[1]->mark_tile_dirty(offset & 0x3ff);
 		else
-			state->m_k007121_tilemap[0]->mark_tile_dirty(offset & 0x3ff);
+			m_k007121_tilemap[0]->mark_tile_dirty(offset & 0x3ff);
 	}
 }
 
-WRITE8_HANDLER( flkatck_k007121_regs_w )
+WRITE8_MEMBER(flkatck_state::flkatck_k007121_regs_w)
 {
-	flkatck_state *state = space->machine().driver_data<flkatck_state>();
 
 	switch (offset)
 	{
 		case 0x04:	/* ROM bank select */
-			if (data != k007121_ctrlram_r(state->m_k007121, 4))
-				space->machine().tilemap().mark_all_dirty();
+			if (data != k007121_ctrlram_r(m_k007121, 4))
+				machine().tilemap().mark_all_dirty();
 			break;
 
 		case 0x07:	/* flip screen + IRQ control */
-			state->m_flipscreen = data & 0x08;
-			space->machine().tilemap().set_flip_all(state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
-			state->m_irq_enabled = data & 0x02;
+			m_flipscreen = data & 0x08;
+			machine().tilemap().set_flip_all(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+			m_irq_enabled = data & 0x02;
 			break;
 	}
 
-	k007121_ctrl_w(state->m_k007121, offset, data);
+	k007121_ctrl_w(m_k007121, offset, data);
 }
 
 

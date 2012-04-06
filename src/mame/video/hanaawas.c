@@ -62,21 +62,19 @@ PALETTE_INIT( hanaawas )
 	}
 }
 
-WRITE8_HANDLER( hanaawas_videoram_w )
+WRITE8_MEMBER(hanaawas_state::hanaawas_videoram_w)
 {
-	hanaawas_state *state = space->machine().driver_data<hanaawas_state>();
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( hanaawas_colorram_w )
+WRITE8_MEMBER(hanaawas_state::hanaawas_colorram_w)
 {
-	hanaawas_state *state = space->machine().driver_data<hanaawas_state>();
-	state->m_colorram[offset] = data;
+	m_colorram[offset] = data;
 
 	/* dirty both current and next offsets */
-	state->m_bg_tilemap->mark_tile_dirty(offset);
-	state->m_bg_tilemap->mark_tile_dirty((offset + (flip_screen_get(space->machine()) ? -1 : 1)) & 0x03ff);
+	m_bg_tilemap->mark_tile_dirty(offset);
+	m_bg_tilemap->mark_tile_dirty((offset + (flip_screen_get(machine()) ? -1 : 1)) & 0x03ff);
 }
 
 WRITE8_DEVICE_HANDLER( hanaawas_portB_w )

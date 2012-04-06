@@ -40,9 +40,9 @@ Pleiads:
 
 static ADDRESS_MAP_START( phoenix_memory_map, AS_PROGRAM, 8, phoenix_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x4fff) AM_READ_BANK("bank1") AM_WRITE_LEGACY(phoenix_videoram_w)	/* 2 pages selected by bit 0 of the video register */
-	AM_RANGE(0x5000, 0x53ff) AM_WRITE_LEGACY(phoenix_videoreg_w)
-	AM_RANGE(0x5800, 0x5bff) AM_WRITE_LEGACY(phoenix_scroll_w)
+	AM_RANGE(0x4000, 0x4fff) AM_READ_BANK("bank1") AM_WRITE(phoenix_videoram_w)	/* 2 pages selected by bit 0 of the video register */
+	AM_RANGE(0x5000, 0x53ff) AM_WRITE(phoenix_videoreg_w)
+	AM_RANGE(0x5800, 0x5bff) AM_WRITE(phoenix_scroll_w)
 	AM_RANGE(0x6000, 0x63ff) AM_DEVWRITE_LEGACY("cust", phoenix_sound_control_a_w)
 	AM_RANGE(0x6800, 0x6bff) AM_DEVWRITE_LEGACY("cust", phoenix_sound_control_b_w)
 	AM_RANGE(0x7000, 0x73ff) AM_READ_PORT("IN0")							/* IN0 or IN1 */
@@ -51,9 +51,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pleiads_memory_map, AS_PROGRAM, 8, phoenix_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x4fff) AM_READ_BANK("bank1") AM_WRITE_LEGACY(phoenix_videoram_w)	/* 2 pages selected by bit 0 of the video register */
-	AM_RANGE(0x5000, 0x53ff) AM_WRITE_LEGACY(pleiads_videoreg_w)
-	AM_RANGE(0x5800, 0x5bff) AM_WRITE_LEGACY(phoenix_scroll_w)
+	AM_RANGE(0x4000, 0x4fff) AM_READ_BANK("bank1") AM_WRITE(phoenix_videoram_w)	/* 2 pages selected by bit 0 of the video register */
+	AM_RANGE(0x5000, 0x53ff) AM_WRITE(pleiads_videoreg_w)
+	AM_RANGE(0x5800, 0x5bff) AM_WRITE(phoenix_scroll_w)
 	AM_RANGE(0x6000, 0x63ff) AM_DEVWRITE_LEGACY("cust", pleiads_sound_control_a_w)
 	AM_RANGE(0x6800, 0x6bff) AM_DEVWRITE_LEGACY("cust", pleiads_sound_control_b_w)
 	AM_RANGE(0x7000, 0x73ff) AM_READ_PORT("IN0")							/* IN0 or IN1 + protection */
@@ -62,12 +62,12 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( survival_memory_map, AS_PROGRAM, 8, phoenix_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x4fff) AM_READ_BANK("bank1") AM_WRITE_LEGACY(phoenix_videoram_w)	/* 2 pages selected by bit 0 of the video register */
-	AM_RANGE(0x5000, 0x53ff) AM_WRITE_LEGACY(phoenix_videoreg_w)
-	AM_RANGE(0x5800, 0x5bff) AM_WRITE_LEGACY(phoenix_scroll_w)
+	AM_RANGE(0x4000, 0x4fff) AM_READ_BANK("bank1") AM_WRITE(phoenix_videoram_w)	/* 2 pages selected by bit 0 of the video register */
+	AM_RANGE(0x5000, 0x53ff) AM_WRITE(phoenix_videoreg_w)
+	AM_RANGE(0x5800, 0x5bff) AM_WRITE(phoenix_scroll_w)
 	AM_RANGE(0x6800, 0x68ff) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)
 	AM_RANGE(0x6900, 0x69ff) AM_DEVREADWRITE_LEGACY("aysnd", ay8910_r, ay8910_data_w)
-	AM_RANGE(0x7000, 0x73ff) AM_READ_LEGACY(survival_input_port_0_r)				/* IN0 or IN1 */
+	AM_RANGE(0x7000, 0x73ff) AM_READ(survival_input_port_0_r)				/* IN0 or IN1 */
 	AM_RANGE(0x7800, 0x7bff) AM_READ_PORT("DSW0")							/* DSW */
 ADDRESS_MAP_END
 

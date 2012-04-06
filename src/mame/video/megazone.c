@@ -96,10 +96,9 @@ PALETTE_INIT( megazone )
 	}
 }
 
-WRITE8_HANDLER( megazone_flipscreen_w )
+WRITE8_MEMBER(megazone_state::megazone_flipscreen_w)
 {
-	megazone_state *state = space->machine().driver_data<megazone_state>();
-	state->m_flipscreen = data & 1;
+	m_flipscreen = data & 1;
 }
 
 VIDEO_START( megazone )

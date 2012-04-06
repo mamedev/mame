@@ -37,162 +37,152 @@ INTERRUPT_GEN( wardner_interrupt )
 }
 
 
-WRITE16_HANDLER( twincobr_dsp_addrsel_w )
+WRITE16_MEMBER(twincobr_state::twincobr_dsp_addrsel_w)
 {
-	twincobr_state *state = space->machine().driver_data<twincobr_state>();
 	/* This sets the main CPU RAM address the DSP should */
 	/*  read/write, via the DSP IO port 0 */
 	/* Top three bits of data need to be shifted left 3 places */
 	/*  to select which memory bank from main CPU address */
-	/*  space to use */
+	/*  &space to use */
 	/* Lower thirteen bits of this data is shifted left one position */
 	/*  to move it to an even address word boundary */
 
-	state->m_main_ram_seg = ((data & 0xe000) << 3);
-	state->m_dsp_addr_w   = ((data & 0x1fff) << 1);
+	m_main_ram_seg = ((data & 0xe000) << 3);
+	m_dsp_addr_w   = ((data & 0x1fff) << 1);
 
-	LOG(("DSP PC:%04x IO write %04x (%08x) at port 0\n",cpu_get_previouspc(&space->device()),data,state->m_main_ram_seg + state->m_dsp_addr_w));
+	LOG(("DSP PC:%04x IO write %04x (%08x) at port 0\n",cpu_get_previouspc(&space.device()),data,m_main_ram_seg + m_dsp_addr_w));
 }
 
-READ16_HANDLER( twincobr_dsp_r )
+READ16_MEMBER(twincobr_state::twincobr_dsp_r)
 {
-	twincobr_state *state = space->machine().driver_data<twincobr_state>();
 	/* DSP can read data from main CPU RAM via DSP IO port 1 */
 
 	address_space *mainspace;
 	UINT16 input_data = 0;
-	switch (state->m_main_ram_seg) {
+	switch (m_main_ram_seg) {
 		case 0x30000:
 		case 0x40000:
-		case 0x50000:	mainspace = space->machine().device("maincpu")->memory().space(AS_PROGRAM);
-						input_data = mainspace->read_word(state->m_main_ram_seg + state->m_dsp_addr_w);
+		case 0x50000:	mainspace = machine().device("maincpu")->memory().space(AS_PROGRAM);
+						input_data = mainspace->read_word(m_main_ram_seg + m_dsp_addr_w);
 						break;
-		default:		logerror("DSP PC:%04x Warning !!! IO reading from %08x (port 1)\n",cpu_get_previouspc(&space->device()),state->m_main_ram_seg + state->m_dsp_addr_w); break;
+		default:		logerror("DSP PC:%04x Warning !!! IO reading from %08x (port 1)\n",cpu_get_previouspc(&space.device()),m_main_ram_seg + m_dsp_addr_w); break;
 	}
-	LOG(("DSP PC:%04x IO read %04x at %08x (port 1)\n",cpu_get_previouspc(&space->device()),input_data,state->m_main_ram_seg + state->m_dsp_addr_w));
+	LOG(("DSP PC:%04x IO read %04x at %08x (port 1)\n",cpu_get_previouspc(&space.device()),input_data,m_main_ram_seg + m_dsp_addr_w));
 	return input_data;
 }
 
-WRITE16_HANDLER( twincobr_dsp_w )
+WRITE16_MEMBER(twincobr_state::twincobr_dsp_w)
 {
-	twincobr_state *state = space->machine().driver_data<twincobr_state>();
 	address_space *mainspace;
 
 	/* Data written to main CPU RAM via DSP IO port 1 */
-	state->m_dsp_execute = 0;
-	switch (state->m_main_ram_seg) {
-		case 0x30000:	if ((state->m_dsp_addr_w < 3) && (data == 0)) state->m_dsp_execute = 1;
+	m_dsp_execute = 0;
+	switch (m_main_ram_seg) {
+		case 0x30000:	if ((m_dsp_addr_w < 3) && (data == 0)) m_dsp_execute = 1;
 		case 0x40000:
-		case 0x50000:	mainspace = space->machine().device("maincpu")->memory().space(AS_PROGRAM);
-						mainspace->write_word(state->m_main_ram_seg + state->m_dsp_addr_w, data);
+		case 0x50000:	mainspace = machine().device("maincpu")->memory().space(AS_PROGRAM);
+						mainspace->write_word(m_main_ram_seg + m_dsp_addr_w, data);
 						break;
-		default:		logerror("DSP PC:%04x Warning !!! IO writing to %08x (port 1)\n",cpu_get_previouspc(&space->device()),state->m_main_ram_seg + state->m_dsp_addr_w); break;
+		default:		logerror("DSP PC:%04x Warning !!! IO writing to %08x (port 1)\n",cpu_get_previouspc(&space.device()),m_main_ram_seg + m_dsp_addr_w); break;
 	}
-	LOG(("DSP PC:%04x IO write %04x at %08x (port 1)\n",cpu_get_previouspc(&space->device()),data,state->m_main_ram_seg + state->m_dsp_addr_w));
+	LOG(("DSP PC:%04x IO write %04x at %08x (port 1)\n",cpu_get_previouspc(&space.device()),data,m_main_ram_seg + m_dsp_addr_w));
 }
 
-WRITE16_HANDLER( wardner_dsp_addrsel_w )
+WRITE16_MEMBER(twincobr_state::wardner_dsp_addrsel_w)
 {
-	twincobr_state *state = space->machine().driver_data<twincobr_state>();
 	/* This sets the main CPU RAM address the DSP should */
 	/*  read/write, via the DSP IO port 0 */
 	/* Lower twelve bits of this data is shifted left one position */
 	/*  to move it to an even address boundary */
 
-	state->m_main_ram_seg =  (data & 0xe000);
-	state->m_dsp_addr_w   = ((data & 0x07ff) << 1);
+	m_main_ram_seg =  (data & 0xe000);
+	m_dsp_addr_w   = ((data & 0x07ff) << 1);
 
-	if (state->m_main_ram_seg == 0x6000) state->m_main_ram_seg = 0x7000;
+	if (m_main_ram_seg == 0x6000) m_main_ram_seg = 0x7000;
 
-	LOG(("DSP PC:%04x IO write %04x (%08x) at port 0\n",cpu_get_previouspc(&space->device()),data,state->m_main_ram_seg + state->m_dsp_addr_w));
+	LOG(("DSP PC:%04x IO write %04x (%08x) at port 0\n",cpu_get_previouspc(&space.device()),data,m_main_ram_seg + m_dsp_addr_w));
 }
 
-READ16_HANDLER( wardner_dsp_r )
+READ16_MEMBER(twincobr_state::wardner_dsp_r)
 {
-	twincobr_state *state = space->machine().driver_data<twincobr_state>();
 	/* DSP can read data from main CPU RAM via DSP IO port 1 */
 
 	address_space *mainspace;
 	UINT16 input_data = 0;
-	switch (state->m_main_ram_seg) {
+	switch (m_main_ram_seg) {
 		case 0x7000:
 		case 0x8000:
-		case 0xa000:	mainspace = space->machine().device("maincpu")->memory().space(AS_PROGRAM);
-						input_data =  mainspace->read_byte(state->m_main_ram_seg + (state->m_dsp_addr_w + 0))
-								   | (mainspace->read_byte(state->m_main_ram_seg + (state->m_dsp_addr_w + 1)) << 8);
+		case 0xa000:	mainspace = machine().device("maincpu")->memory().space(AS_PROGRAM);
+						input_data =  mainspace->read_byte(m_main_ram_seg + (m_dsp_addr_w + 0))
+								   | (mainspace->read_byte(m_main_ram_seg + (m_dsp_addr_w + 1)) << 8);
 						break;
-		default:		logerror("DSP PC:%04x Warning !!! IO reading from %08x (port 1)\n",cpu_get_previouspc(&space->device()),state->m_main_ram_seg + state->m_dsp_addr_w); break;
+		default:		logerror("DSP PC:%04x Warning !!! IO reading from %08x (port 1)\n",cpu_get_previouspc(&space.device()),m_main_ram_seg + m_dsp_addr_w); break;
 	}
-	LOG(("DSP PC:%04x IO read %04x at %08x (port 1)\n",cpu_get_previouspc(&space->device()),input_data,state->m_main_ram_seg + state->m_dsp_addr_w));
+	LOG(("DSP PC:%04x IO read %04x at %08x (port 1)\n",cpu_get_previouspc(&space.device()),input_data,m_main_ram_seg + m_dsp_addr_w));
 	return input_data;
 }
 
-WRITE16_HANDLER( wardner_dsp_w )
+WRITE16_MEMBER(twincobr_state::wardner_dsp_w)
 {
-	twincobr_state *state = space->machine().driver_data<twincobr_state>();
 	address_space *mainspace;
 
 	/* Data written to main CPU RAM via DSP IO port 1 */
-	state->m_dsp_execute = 0;
-	switch (state->m_main_ram_seg) {
-		case 0x7000:	if ((state->m_dsp_addr_w < 3) && (data == 0)) state->m_dsp_execute = 1;
+	m_dsp_execute = 0;
+	switch (m_main_ram_seg) {
+		case 0x7000:	if ((m_dsp_addr_w < 3) && (data == 0)) m_dsp_execute = 1;
 		case 0x8000:
-		case 0xa000:	mainspace = space->machine().device("maincpu")->memory().space(AS_PROGRAM);
-						mainspace->write_byte(state->m_main_ram_seg + (state->m_dsp_addr_w + 0), (data & 0xff));
-						mainspace->write_byte(state->m_main_ram_seg + (state->m_dsp_addr_w + 1), ((data >> 8) & 0xff));
+		case 0xa000:	mainspace = machine().device("maincpu")->memory().space(AS_PROGRAM);
+						mainspace->write_byte(m_main_ram_seg + (m_dsp_addr_w + 0), (data & 0xff));
+						mainspace->write_byte(m_main_ram_seg + (m_dsp_addr_w + 1), ((data >> 8) & 0xff));
 						break;
-		default:		logerror("DSP PC:%04x Warning !!! IO writing to %08x (port 1)\n",cpu_get_previouspc(&space->device()),state->m_main_ram_seg + state->m_dsp_addr_w); break;
+		default:		logerror("DSP PC:%04x Warning !!! IO writing to %08x (port 1)\n",cpu_get_previouspc(&space.device()),m_main_ram_seg + m_dsp_addr_w); break;
 	}
-	LOG(("DSP PC:%04x IO write %04x at %08x (port 1)\n",cpu_get_previouspc(&space->device()),data,state->m_main_ram_seg + state->m_dsp_addr_w));
+	LOG(("DSP PC:%04x IO write %04x at %08x (port 1)\n",cpu_get_previouspc(&space.device()),data,m_main_ram_seg + m_dsp_addr_w));
 }
 
-WRITE16_HANDLER( twincobr_dsp_bio_w )
+WRITE16_MEMBER(twincobr_state::twincobr_dsp_bio_w)
 {
-	twincobr_state *state = space->machine().driver_data<twincobr_state>();
 	/* data 0xffff  means inhibit BIO line to DSP and enable */
 	/*              communication to main processor */
 	/*              Actually only DSP data bit 15 controls this */
 	/* data 0x0000  means set DSP BIO line active and disable */
 	/*              communication to main processor*/
-	LOG(("DSP PC:%04x IO write %04x at port 3\n",cpu_get_previouspc(&space->device()),data));
+	LOG(("DSP PC:%04x IO write %04x at port 3\n",cpu_get_previouspc(&space.device()),data));
 	if (data & 0x8000) {
-		state->m_dsp_BIO = CLEAR_LINE;
+		m_dsp_BIO = CLEAR_LINE;
 	}
 	if (data == 0) {
-		if (state->m_dsp_execute) {
+		if (m_dsp_execute) {
 			LOG(("Turning the main CPU on\n"));
-			cputag_set_input_line(space->machine(), "maincpu", INPUT_LINE_HALT, CLEAR_LINE);
-			state->m_dsp_execute = 0;
+			cputag_set_input_line(machine(), "maincpu", INPUT_LINE_HALT, CLEAR_LINE);
+			m_dsp_execute = 0;
 		}
-		state->m_dsp_BIO = ASSERT_LINE;
+		m_dsp_BIO = ASSERT_LINE;
 	}
 }
 
-READ16_HANDLER( fsharkbt_dsp_r )
+READ16_MEMBER(twincobr_state::fsharkbt_dsp_r)
 {
-	twincobr_state *state = space->machine().driver_data<twincobr_state>();
 	/* IO Port 2 used by Flying Shark bootleg */
 	/* DSP reads data from an extra MCU (8741) at IO port 2 */
 	/* Port is read three times during startup. First and last data */
 	/*   read must equal, but second data read must be different */
-	state->m_fsharkbt_8741 += 1;
-	LOG(("DSP PC:%04x IO read %04x from 8741 MCU (port 2)\n",cpu_get_previouspc(&space->device()),(state->m_fsharkbt_8741 & 0x08)));
-	return (state->m_fsharkbt_8741 & 1);
+	m_fsharkbt_8741 += 1;
+	LOG(("DSP PC:%04x IO read %04x from 8741 MCU (port 2)\n",cpu_get_previouspc(&space.device()),(m_fsharkbt_8741 & 0x08)));
+	return (m_fsharkbt_8741 & 1);
 }
 
-WRITE16_HANDLER( fsharkbt_dsp_w )
+WRITE16_MEMBER(twincobr_state::fsharkbt_dsp_w)
 {
 	/* Flying Shark bootleg DSP writes data to an extra MCU (8741) at IO port 2 */
 #if 0
-	twincobr_state *state = space->machine().driver_data<twincobr_state>();
-	logerror("DSP PC:%04x IO write from DSP RAM:%04x to 8741 MCU (port 2)\n",cpu_get_previouspc(&space->device()),state->m_fsharkbt_8741);
+	logerror("DSP PC:%04x IO write from DSP RAM:%04x to 8741 MCU (port 2)\n",cpu_get_previouspc(&space.device()),m_fsharkbt_8741);
 #endif
 }
 
-READ16_HANDLER ( twincobr_BIO_r )
+READ16_MEMBER(twincobr_state::twincobr_BIO_r)
 {
-	twincobr_state *state = space->machine().driver_data<twincobr_state>();
-	return state->m_dsp_BIO;
+	return m_dsp_BIO;
 }
 
 
@@ -246,32 +236,30 @@ static void toaplan0_control_w(running_machine &machine, int offset, int data)
 	}
 }
 
-WRITE16_HANDLER( twincobr_control_w )
+WRITE16_MEMBER(twincobr_state::twincobr_control_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		toaplan0_control_w(space->machine(), offset, data & 0xff);
+		toaplan0_control_w(machine(), offset, data & 0xff);
 	}
 }
 
-WRITE8_HANDLER( wardner_control_w )
+WRITE8_MEMBER(twincobr_state::wardner_control_w)
 {
-	toaplan0_control_w(space->machine(), offset, data);
+	toaplan0_control_w(machine(), offset, data);
 }
 
 
-READ16_HANDLER( twincobr_sharedram_r )
+READ16_MEMBER(twincobr_state::twincobr_sharedram_r)
 {
-	twincobr_state *state = space->machine().driver_data<twincobr_state>();
-	return state->m_sharedram[offset];
+	return m_sharedram[offset];
 }
 
-WRITE16_HANDLER( twincobr_sharedram_w )
+WRITE16_MEMBER(twincobr_state::twincobr_sharedram_w)
 {
-	twincobr_state *state = space->machine().driver_data<twincobr_state>();
 	if (ACCESSING_BITS_0_7)
 	{
-		state->m_sharedram[offset] = data & 0xff;
+		m_sharedram[offset] = data & 0xff;
 	}
 }
 
@@ -306,22 +294,22 @@ static void toaplan0_coin_dsp_w(address_space *space, int offset, int data)
 }
 
 
-WRITE16_HANDLER( fshark_coin_dsp_w )
+WRITE16_MEMBER(twincobr_state::fshark_coin_dsp_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		toaplan0_coin_dsp_w(space, offset, data & 0xff);
+		toaplan0_coin_dsp_w(&space, offset, data & 0xff);
 	}
 }
 
-WRITE8_HANDLER( twincobr_coin_w )
+WRITE8_MEMBER(twincobr_state::twincobr_coin_w)
 {
-	toaplan0_coin_dsp_w(space, offset, data);
+	toaplan0_coin_dsp_w(&space, offset, data);
 }
 
-WRITE8_HANDLER( wardner_coin_dsp_w )
+WRITE8_MEMBER(twincobr_state::wardner_coin_dsp_w)
 {
-	toaplan0_coin_dsp_w(space, offset, data);
+	toaplan0_coin_dsp_w(&space, offset, data);
 }
 
 

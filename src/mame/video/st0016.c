@@ -30,7 +30,7 @@ static const gfx_layout charlayout =
 	8*8*4
 };
 
-WRITE8_HANDLER(st0016_sprite_bank_w)
+WRITE8_MEMBER(st0016_state::st0016_sprite_bank_w)
 {
 /*
     76543210
@@ -41,7 +41,7 @@ WRITE8_HANDLER(st0016_sprite_bank_w)
 	st0016_spr2_bank=(data>>4)&ST0016_SPR_BANK_MASK;
 }
 
-WRITE8_HANDLER(st0016_palette_bank_w)
+WRITE8_MEMBER(st0016_state::st0016_palette_bank_w)
 {
 /*
     76543210
@@ -51,7 +51,7 @@ WRITE8_HANDLER(st0016_palette_bank_w)
 	st0016_pal_bank=data&ST0016_PAL_BANK_MASK;
 }
 
-WRITE8_HANDLER(st0016_character_bank_w)
+WRITE8_MEMBER(st0016_state::st0016_character_bank_w)
 {
 /*
     fedcba9876543210
@@ -67,55 +67,55 @@ WRITE8_HANDLER(st0016_character_bank_w)
 }
 
 
-READ8_HANDLER (st0016_sprite_ram_r)
+READ8_MEMBER(st0016_state::st0016_sprite_ram_r)
 {
 	return st0016_spriteram[ST0016_SPR_BANK_SIZE*st0016_spr_bank+offset];
 }
 
-WRITE8_HANDLER (st0016_sprite_ram_w)
+WRITE8_MEMBER(st0016_state::st0016_sprite_ram_w)
 {
 
 	st0016_spriteram[ST0016_SPR_BANK_SIZE*st0016_spr_bank+offset]=data;
 }
 
-READ8_HANDLER (st0016_sprite2_ram_r)
+READ8_MEMBER(st0016_state::st0016_sprite2_ram_r)
 {
 	return st0016_spriteram[ST0016_SPR_BANK_SIZE*st0016_spr2_bank+offset];
 }
 
-WRITE8_HANDLER (st0016_sprite2_ram_w)
+WRITE8_MEMBER(st0016_state::st0016_sprite2_ram_w)
 {
 	st0016_spriteram[ST0016_SPR_BANK_SIZE*st0016_spr2_bank+offset]=data;
 }
 
-READ8_HANDLER (st0016_palette_ram_r)
+READ8_MEMBER(st0016_state::st0016_palette_ram_r)
 {
 	return st0016_paletteram[ST0016_PAL_BANK_SIZE*st0016_pal_bank+offset];
 }
 
-WRITE8_HANDLER (st0016_palette_ram_w)
+WRITE8_MEMBER(st0016_state::st0016_palette_ram_w)
 {
 	int color=(ST0016_PAL_BANK_SIZE*st0016_pal_bank+offset)/2;
 	int val;
 	st0016_paletteram[ST0016_PAL_BANK_SIZE*st0016_pal_bank+offset]=data;
 	val=st0016_paletteram[color*2]+(st0016_paletteram[color*2+1]<<8);
 	if(!color)
-		palette_set_color_rgb(space->machine(),UNUSED_PEN,pal5bit(val >> 0),pal5bit(val >> 5),pal5bit(val >> 10)); /* same as color 0 - bg ? */
-	palette_set_color_rgb(space->machine(),color,pal5bit(val >> 0),pal5bit(val >> 5),pal5bit(val >> 10));
+		palette_set_color_rgb(machine(),UNUSED_PEN,pal5bit(val >> 0),pal5bit(val >> 5),pal5bit(val >> 10)); /* same as color 0 - bg ? */
+	palette_set_color_rgb(machine(),color,pal5bit(val >> 0),pal5bit(val >> 5),pal5bit(val >> 10));
 }
 
-READ8_HANDLER(st0016_character_ram_r)
+READ8_MEMBER(st0016_state::st0016_character_ram_r)
 {
 	return st0016_charram[ST0016_CHAR_BANK_SIZE*st0016_char_bank+offset];
 }
 
-WRITE8_HANDLER(st0016_character_ram_w)
+WRITE8_MEMBER(st0016_state::st0016_character_ram_w)
 {
 	st0016_charram[ST0016_CHAR_BANK_SIZE*st0016_char_bank+offset]=data;
-	gfx_element_mark_dirty(space->machine().gfx[st0016_ramgfx], st0016_char_bank);
+	gfx_element_mark_dirty(machine().gfx[st0016_ramgfx], st0016_char_bank);
 }
 
-READ8_HANDLER(st0016_vregs_r)
+READ8_MEMBER(st0016_state::st0016_vregs_r)
 {
 /*
         $0, $1 = max scanline(including vblank)/timer? ($3e7)
@@ -139,13 +139,13 @@ READ8_HANDLER(st0016_vregs_r)
 	{
 		case 0:
 		case 1:
-			return space->machine().rand();
+			return machine().rand();
 	}
 
 	return st0016_vregs[offset];
 }
 
-READ8_HANDLER(st0016_dma_r)
+READ8_MEMBER(st0016_state::st0016_dma_r)
 {
 	/* bits 0 and 1 = 0 -> DMA transfer complete */
 	if(ISMACS)
@@ -155,7 +155,7 @@ READ8_HANDLER(st0016_dma_r)
 }
 
 
-WRITE8_HANDLER(st0016_vregs_w)
+WRITE8_MEMBER(st0016_state::st0016_vregs_w)
 {
 	/*
 
@@ -186,8 +186,8 @@ WRITE8_HANDLER(st0016_vregs_w)
 		UINT32 srcadr=(st0016_vregs[0xa0]|(st0016_vregs[0xa1]<<8)|(st0016_vregs[0xa2]<<16))<<1;
 		UINT32 dstadr=(st0016_vregs[0xa3]|(st0016_vregs[0xa4]<<8)|(st0016_vregs[0xa5]<<16))<<1;
 		UINT32 length=((st0016_vregs[0xa6]|(st0016_vregs[0xa7]<<8)|((st0016_vregs[0xa8]&0x1f)<<16))+1)<<1;
-		UINT32 srclen = (space->machine().region("maincpu")->bytes()-0x10000);
-		UINT8 *mem = space->machine().region("maincpu")->base();
+		UINT32 srclen = (machine().region("maincpu")->bytes()-0x10000);
+		UINT8 *mem = machine().region("maincpu")->base();
 
 		srcadr += macs_cart_slot*0x400000;
 
@@ -205,7 +205,7 @@ WRITE8_HANDLER(st0016_vregs_w)
 			{
 				/* samples ? sound dma ? */
 				// speaglsht:  unknown DMA copy : src - 2B6740, dst - 4400, len - 1E400
-				logerror("unknown DMA copy : src - %X, dst - %X, len - %X, PC - %X\n",srcadr,dstadr,length,cpu_get_previouspc(&space->device()));
+				logerror("unknown DMA copy : src - %X, dst - %X, len - %X, PC - %X\n",srcadr,dstadr,length,cpu_get_previouspc(&space.device()));
 				break;
 			}
 		}

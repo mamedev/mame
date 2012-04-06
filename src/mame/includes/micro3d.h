@@ -72,6 +72,33 @@ public:
 	UINT16				*m_tmp_buffer;
 	int					m_drawing_buffer;
 	int					m_display_buffer;
+	DECLARE_WRITE16_MEMBER(micro3d_ti_uart_w);
+	DECLARE_READ16_MEMBER(micro3d_ti_uart_r);
+	DECLARE_WRITE32_MEMBER(micro3d_scc_w);
+	DECLARE_READ32_MEMBER(micro3d_scc_r);
+	DECLARE_READ16_MEMBER(micro3d_tms_host_r);
+	DECLARE_WRITE16_MEMBER(micro3d_tms_host_w);
+	DECLARE_WRITE32_MEMBER(micro3d_mac1_w);
+	DECLARE_READ32_MEMBER(micro3d_mac2_r);
+	DECLARE_WRITE32_MEMBER(micro3d_mac2_w);
+	DECLARE_READ16_MEMBER(micro3d_encoder_h_r);
+	DECLARE_READ16_MEMBER(micro3d_encoder_l_r);
+	DECLARE_READ16_MEMBER(micro3d_adc_r);
+	DECLARE_WRITE16_MEMBER(micro3d_adc_w);
+	DECLARE_READ16_MEMBER(botssa_140000_r);
+	DECLARE_READ16_MEMBER(botssa_180000_r);
+	DECLARE_WRITE16_MEMBER(micro3d_reset_w);
+	DECLARE_WRITE16_MEMBER(host_drmath_int_w);
+	DECLARE_WRITE32_MEMBER(micro3d_shared_w);
+	DECLARE_READ32_MEMBER(micro3d_shared_r);
+	DECLARE_WRITE32_MEMBER(drmath_int_w);
+	DECLARE_WRITE32_MEMBER(drmath_intr2_ack);
+	DECLARE_WRITE16_MEMBER(micro3d_clut_w);
+	DECLARE_WRITE16_MEMBER(micro3d_creg_w);
+	DECLARE_WRITE16_MEMBER(micro3d_xfer3dk_w);
+	DECLARE_WRITE32_MEMBER(micro3d_fifo_w);
+	DECLARE_WRITE32_MEMBER(micro3d_alt_fifo_w);
+	DECLARE_READ32_MEMBER(micro3d_pipe_r);
 };
 
 typedef struct _micro3d_vtx_
@@ -82,37 +109,16 @@ typedef struct _micro3d_vtx_
 
 /*----------- defined in machine/micro3d.c -----------*/
 
-READ16_HANDLER( micro3d_ti_uart_r );
-WRITE16_HANDLER( micro3d_ti_uart_w );
 
-READ32_HANDLER( micro3d_scc_r );
-WRITE32_HANDLER( micro3d_scc_w );
 
-READ16_HANDLER( micro3d_tms_host_r );
-WRITE16_HANDLER( micro3d_tms_host_w );
 
-READ16_HANDLER( micro3d_adc_r );
-WRITE16_HANDLER( micro3d_adc_w );
 
-WRITE16_HANDLER( host_drmath_int_w );
-WRITE16_HANDLER( micro3d_reset_w );
 
-READ16_HANDLER( micro3d_encoder_l_r );
-READ16_HANDLER( micro3d_encoder_h_r );
 
 CUSTOM_INPUT( botssa_hwchk_r );
-READ16_HANDLER( botssa_140000_r );
-READ16_HANDLER( botssa_180000_r );
 
-READ32_HANDLER( micro3d_shared_r );
-WRITE32_HANDLER( micro3d_shared_w );
 
-WRITE32_HANDLER( drmath_int_w );
-WRITE32_HANDLER( drmath_intr2_ack );
 
-WRITE32_HANDLER( micro3d_mac1_w );
-WRITE32_HANDLER( micro3d_mac2_w );
-READ32_HANDLER( micro3d_mac2_r );
 
 void micro3d_duart_irq_handler(device_t *device, UINT8 vector);
 UINT8 micro3d_duart_input_r(device_t *device);
@@ -145,11 +151,5 @@ VIDEO_RESET( micro3d );
 void micro3d_tms_interrupt(device_t *device, int state);
 void micro3d_scanline_update(screen_device &screen, bitmap_ind16 &bitmap, int scanline, const tms34010_display_params *params);
 
-WRITE16_HANDLER( micro3d_clut_w );
-WRITE16_HANDLER( micro3d_creg_w );
-WRITE16_HANDLER( micro3d_xfer3dk_w );
-READ32_HANDLER( micro3d_pipe_r );
-WRITE32_HANDLER( micro3d_fifo_w );
-WRITE32_HANDLER( micro3d_alt_fifo_w );
 
 INTERRUPT_GEN( micro3d_vblank );

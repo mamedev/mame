@@ -1,18 +1,16 @@
 #include "emu.h"
 #include "includes/higemaru.h"
 
-WRITE8_HANDLER( higemaru_videoram_w )
+WRITE8_MEMBER(higemaru_state::higemaru_videoram_w)
 {
-	higemaru_state *state = space->machine().driver_data<higemaru_state>();
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( higemaru_colorram_w )
+WRITE8_MEMBER(higemaru_state::higemaru_colorram_w)
 {
-	higemaru_state *state = space->machine().driver_data<higemaru_state>();
-	state->m_colorram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_colorram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 /***************************************************************************
@@ -73,21 +71,20 @@ PALETTE_INIT( higemaru )
 	}
 }
 
-WRITE8_HANDLER( higemaru_c800_w )
+WRITE8_MEMBER(higemaru_state::higemaru_c800_w)
 {
-	higemaru_state *state = space->machine().driver_data<higemaru_state>();
 	if (data & 0x7c)
 		logerror("c800 = %02x\n",data);
 
 	/* bits 0 and 1 are coin counters */
-	coin_counter_w(space->machine(), 0,data & 2);
-	coin_counter_w(space->machine(), 1,data & 1);
+	coin_counter_w(machine(), 0,data & 2);
+	coin_counter_w(machine(), 1,data & 1);
 
 	/* bit 7 flips screen */
-	if (flip_screen_get(space->machine()) != (data & 0x80))
+	if (flip_screen_get(machine()) != (data & 0x80))
 	{
-		flip_screen_set(space->machine(), data & 0x80);
-		state->m_bg_tilemap->mark_all_dirty();
+		flip_screen_set(machine(), data & 0x80);
+		m_bg_tilemap->mark_all_dirty();
 	}
 }
 

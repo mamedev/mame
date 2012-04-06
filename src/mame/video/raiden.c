@@ -4,26 +4,23 @@
 
 /******************************************************************************/
 
-WRITE16_HANDLER( raiden_background_w )
+WRITE16_MEMBER(raiden_state::raiden_background_w)
 {
-	raiden_state *state = space->machine().driver_data<raiden_state>();
-	COMBINE_DATA(&state->m_back_data[offset]);
-	state->m_bg_layer->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_back_data[offset]);
+	m_bg_layer->mark_tile_dirty(offset);
 }
 
-WRITE16_HANDLER( raiden_foreground_w )
+WRITE16_MEMBER(raiden_state::raiden_foreground_w)
 {
-	raiden_state *state = space->machine().driver_data<raiden_state>();
-	COMBINE_DATA(&state->m_fore_data[offset]);
-	state->m_fg_layer->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_fore_data[offset]);
+	m_fg_layer->mark_tile_dirty(offset);
 }
 
-WRITE16_HANDLER( raiden_text_w )
+WRITE16_MEMBER(raiden_state::raiden_text_w)
 {
-	raiden_state *state = space->machine().driver_data<raiden_state>();
-	UINT16 *videoram = state->m_videoram;
+	UINT16 *videoram = m_videoram;
 	COMBINE_DATA(&videoram[offset]);
-	state->m_tx_layer->mark_tile_dirty(offset);
+	m_tx_layer->mark_tile_dirty(offset);
 }
 
 static TILE_GET_INFO( get_back_tile_info )
@@ -95,27 +92,25 @@ VIDEO_START( raidena )
 	state->m_tx_layer->set_transparent_pen(15);
 }
 
-WRITE16_HANDLER( raiden_control_w )
+WRITE16_MEMBER(raiden_state::raiden_control_w)
 {
-	raiden_state *state = space->machine().driver_data<raiden_state>();
 	/* All other bits unknown - could be playfield enables */
 
 	/* Flipscreen */
 	if (offset==3 && ACCESSING_BITS_0_7) {
-		state->m_flipscreen=data&0x2;
-		space->machine().tilemap().set_flip_all(state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+		m_flipscreen=data&0x2;
+		machine().tilemap().set_flip_all(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 	}
 }
 
-WRITE16_HANDLER( raidena_control_w )
+WRITE16_MEMBER(raiden_state::raidena_control_w)
 {
-	raiden_state *state = space->machine().driver_data<raiden_state>();
 	/* raidena uses 0x40 instead of 0x02 */
 
 	/* Flipscreen */
 	if (offset==3 && ACCESSING_BITS_0_7) {
-		state->m_flipscreen=data&0x40;
-		space->machine().tilemap().set_flip_all(state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+		m_flipscreen=data&0x40;
+		machine().tilemap().set_flip_all(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 	}
 }
 

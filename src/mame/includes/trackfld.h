@@ -34,15 +34,15 @@ public:
 	DECLARE_WRITE8_MEMBER(questions_bank_w);
 	DECLARE_WRITE8_MEMBER(irq_mask_w);
 	DECLARE_WRITE8_MEMBER(yieartf_nmi_mask_w);
+	DECLARE_WRITE8_MEMBER(trackfld_videoram_w);
+	DECLARE_WRITE8_MEMBER(trackfld_colorram_w);
+	DECLARE_WRITE8_MEMBER(trackfld_flipscreen_w);
+	DECLARE_WRITE8_MEMBER(atlantol_gfxbank_w);
 };
 
 
 /*----------- defined in video/trackfld.c -----------*/
 
-WRITE8_HANDLER( trackfld_videoram_w );
-WRITE8_HANDLER( trackfld_colorram_w );
-WRITE8_HANDLER( trackfld_flipscreen_w );
-WRITE8_HANDLER( atlantol_gfxbank_w );
 
 PALETTE_INIT( trackfld );
 VIDEO_START( trackfld );

@@ -27,14 +27,16 @@ public:
 	device_t *m_k051960;
 	device_t *m_k051316;
 	DECLARE_WRITE8_MEMBER(sound_bank_w);
+	DECLARE_READ8_MEMBER(ajax_ls138_f10_r);
+	DECLARE_WRITE8_MEMBER(ajax_ls138_f10_w);
+	DECLARE_WRITE8_MEMBER(ajax_bankswitch_2_w);
+	DECLARE_WRITE8_MEMBER(ajax_bankswitch_w);
+	DECLARE_WRITE8_MEMBER(ajax_lamps_w);
 };
 
 
 /*----------- defined in machine/ajax.c -----------*/
 
-WRITE8_HANDLER( ajax_bankswitch_2_w );
-READ8_HANDLER( ajax_ls138_f10_r );
-WRITE8_HANDLER( ajax_ls138_f10_w );
 MACHINE_START( ajax );
 MACHINE_RESET( ajax );
 INTERRUPT_GEN( ajax_interrupt );

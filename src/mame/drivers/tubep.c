@@ -133,10 +133,10 @@ WRITE8_MEMBER(tubep_state::tubep_LS259_w)
 				//screen_flip_w(offset,data&1); /* bit 0 = screen flip, active high */
 				break;
 		case 6:
-				tubep_background_romselect_w(&space,offset,data);	/* bit0 = 0->select roms: B1,B3,B5; bit0 = 1->select roms: B2,B4,B6 */
+				tubep_background_romselect_w(space,offset,data);	/* bit0 = 0->select roms: B1,B3,B5; bit0 = 1->select roms: B2,B4,B6 */
 				break;
 		case 7:
-				tubep_colorproms_A4_line_w(&space,offset,data);	/* bit0 = line A4 (color proms address) state */
+				tubep_colorproms_A4_line_w(space,offset,data);	/* bit0 = line A4 (color proms address) state */
 				break;
 		default:
 				break;
@@ -147,7 +147,7 @@ WRITE8_MEMBER(tubep_state::tubep_LS259_w)
 static ADDRESS_MAP_START( tubep_main_map, AS_PROGRAM, 8, tubep_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xa000, 0xa7ff) AM_RAM
-	AM_RANGE(0xc000, 0xc7ff) AM_WRITE_LEGACY(tubep_textram_w) AM_BASE(m_textram)	/* RAM on GFX PCB @B13 */
+	AM_RANGE(0xc000, 0xc7ff) AM_WRITE(tubep_textram_w) AM_BASE(m_textram)	/* RAM on GFX PCB @B13 */
 	AM_RANGE(0xe000, 0xe7ff) AM_WRITEONLY AM_SHARE("share1")
 	AM_RANGE(0xe800, 0xebff) AM_WRITEONLY AM_SHARE("share4")				/* row of 8 x 2147 RAMs on main PCB */
 ADDRESS_MAP_END
@@ -199,8 +199,8 @@ WRITE8_MEMBER(tubep_state::second_cpu_irq_line_clear_w)
 
 static ADDRESS_MAP_START( tubep_second_map, AS_PROGRAM, 8, tubep_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xa000, 0xa000) AM_WRITE_LEGACY(tubep_background_a000_w)
-	AM_RANGE(0xc000, 0xc000) AM_WRITE_LEGACY(tubep_background_c000_w)
+	AM_RANGE(0xa000, 0xa000) AM_WRITE(tubep_background_a000_w)
+	AM_RANGE(0xc000, 0xc000) AM_WRITE(tubep_background_c000_w)
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("share1")								/* 6116 #1 */
 	AM_RANGE(0xe800, 0xebff) AM_WRITEONLY AM_SHARE("share4") AM_BASE(m_backgroundram)	/* row of 8 x 2147 RAMs on main PCB */
 	AM_RANGE(0xf000, 0xf3ff) AM_WRITEONLY AM_SHARE("share3")						/* sprites color lookup table */
@@ -363,7 +363,7 @@ static MACHINE_RESET( tubep )
 static ADDRESS_MAP_START( nsc_map, AS_PROGRAM, 8, tubep_state )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_SHARE("share3") AM_BASE(m_sprite_colorsharedram)
 	AM_RANGE(0x0800, 0x0fff) AM_RAM AM_SHARE("share2")
-	AM_RANGE(0x2000, 0x2009) AM_WRITE_LEGACY(tubep_sprite_control_w)
+	AM_RANGE(0x2000, 0x2009) AM_WRITE(tubep_sprite_control_w)
 	AM_RANGE(0x200a, 0x200b) AM_WRITENOP /* not used by the games - perhaps designed for debugging */
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -403,7 +403,7 @@ WRITE8_MEMBER(tubep_state::rjammer_soundlatch_w)
 static ADDRESS_MAP_START( rjammer_main_map, AS_PROGRAM, 8, tubep_state )
 	AM_RANGE(0x0000, 0x9fff) AM_ROM
 	AM_RANGE(0xa000, 0xa7ff) AM_RAM									/* MB8416 SRAM on daughterboard on main PCB (there are two SRAMs, this is the one on the left) */
-	AM_RANGE(0xc000, 0xc7ff) AM_WRITE_LEGACY(tubep_textram_w) AM_BASE(m_textram)/* RAM on GFX PCB @B13 */
+	AM_RANGE(0xc000, 0xc7ff) AM_WRITE(tubep_textram_w) AM_BASE(m_textram)/* RAM on GFX PCB @B13 */
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("share1")						/* MB8416 SRAM on daughterboard (the one on the right) */
 ADDRESS_MAP_END
 
@@ -434,8 +434,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( rjammer_second_portmap, AS_IO, 8, tubep_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xb0, 0xb0) AM_WRITE_LEGACY(rjammer_background_page_w)
-	AM_RANGE(0xd0, 0xd0) AM_WRITE_LEGACY(rjammer_background_LS377_w)
+	AM_RANGE(0xb0, 0xb0) AM_WRITE(rjammer_background_page_w)
+	AM_RANGE(0xd0, 0xd0) AM_WRITE(rjammer_background_LS377_w)
 ADDRESS_MAP_END
 
 

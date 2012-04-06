@@ -36,15 +36,15 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, tail2nos_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x200000, 0x27ffff) AM_ROMBANK("bank1")	/* extra ROM */
 	AM_RANGE(0x2c0000, 0x2dffff) AM_ROMBANK("bank2")
-	AM_RANGE(0x400000, 0x41ffff) AM_READWRITE_LEGACY(tail2nos_zoomdata_r, tail2nos_zoomdata_w)
+	AM_RANGE(0x400000, 0x41ffff) AM_READWRITE(tail2nos_zoomdata_r, tail2nos_zoomdata_w)
 	AM_RANGE(0x500000, 0x500fff) AM_DEVREADWRITE8_LEGACY("k051316", k051316_r, k051316_w, 0x00ff)
 	AM_RANGE(0x510000, 0x51001f) AM_DEVWRITE8_LEGACY("k051316", k051316_ctrl_w, 0x00ff)
 	AM_RANGE(0xff8000, 0xffbfff) AM_RAM								/* work RAM */
 	AM_RANGE(0xffc000, 0xffc2ff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
 	AM_RANGE(0xffc300, 0xffcfff) AM_RAM
-	AM_RANGE(0xffd000, 0xffdfff) AM_RAM_WRITE_LEGACY(tail2nos_bgvideoram_w) AM_BASE(m_bgvideoram)
+	AM_RANGE(0xffd000, 0xffdfff) AM_RAM_WRITE(tail2nos_bgvideoram_w) AM_BASE(m_bgvideoram)
 	AM_RANGE(0xffe000, 0xffefff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")
-	AM_RANGE(0xfff000, 0xfff001) AM_READ_PORT("INPUTS") AM_WRITE_LEGACY(tail2nos_gfxbank_w)
+	AM_RANGE(0xfff000, 0xfff001) AM_READ_PORT("INPUTS") AM_WRITE(tail2nos_gfxbank_w)
 	AM_RANGE(0xfff004, 0xfff005) AM_READ_PORT("DSW")
 	AM_RANGE(0xfff008, 0xfff009) AM_WRITE(sound_command_w)
 ADDRESS_MAP_END

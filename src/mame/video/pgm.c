@@ -555,11 +555,10 @@ static void draw_sprites( pgm_state *state, running_machine &machine, bitmap_ind
 }
 
 /* TX Layer */
-WRITE16_HANDLER( pgm_tx_videoram_w )
+WRITE16_MEMBER(pgm_state::pgm_tx_videoram_w)
 {
-	pgm_state *state = space->machine().driver_data<pgm_state>();
-	state->m_tx_videoram[offset] = data;
-	state->m_tx_tilemap->mark_tile_dirty(offset / 2);
+	m_tx_videoram[offset] = data;
+	m_tx_tilemap->mark_tile_dirty(offset / 2);
 }
 
 static TILE_GET_INFO( get_pgm_tx_tilemap_tile_info )
@@ -591,11 +590,10 @@ static TILE_GET_INFO( get_pgm_tx_tilemap_tile_info )
 
 /* BG Layer */
 
-WRITE16_HANDLER( pgm_bg_videoram_w )
+WRITE16_MEMBER(pgm_state::pgm_bg_videoram_w)
 {
-	pgm_state *state = space->machine().driver_data<pgm_state>();
-	state->m_bg_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset / 2);
+	m_bg_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
 static TILE_GET_INFO( get_pgm_bg_tilemap_tile_info )

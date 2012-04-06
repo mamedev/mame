@@ -103,18 +103,16 @@ PALETTE_INIT( yard )
  *
  *************************************/
 
-WRITE8_HANDLER( yard_videoram_w )
+WRITE8_MEMBER(m58_state::yard_videoram_w)
 {
-	m58_state *state = space->machine().driver_data<m58_state>();
 
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset / 2);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
 
-WRITE8_HANDLER( yard_scroll_panel_w )
+WRITE8_MEMBER(m58_state::yard_scroll_panel_w)
 {
-	m58_state *state = space->machine().driver_data<m58_state>();
 
 	int sx,sy,i;
 
@@ -133,7 +131,7 @@ WRITE8_HANDLER( yard_scroll_panel_w )
 		col = (data >> i) & 0x11;
 		col = ((col >> 3) | col) & 3;
 
-		state->m_scroll_panel_bitmap->pix16(sy, sx + i) = RADAR_PALETTE_BASE + (sy & 0xfc) + col;
+		m_scroll_panel_bitmap->pix16(sy, sx + i) = RADAR_PALETTE_BASE + (sy & 0xfc) + col;
 	}
 }
 
@@ -199,13 +197,13 @@ VIDEO_START( yard )
  *
  *************************************/
 
-WRITE8_HANDLER( yard_flipscreen_w )
+WRITE8_MEMBER(m58_state::yard_flipscreen_w)
 {
 	/* screen flip is handled both by software and hardware */
-	flip_screen_set(space->machine(), (data & 0x01) ^ (~input_port_read(space->machine(), "DSW2") & 0x01));
+	flip_screen_set(machine(), (data & 0x01) ^ (~input_port_read(machine(), "DSW2") & 0x01));
 
-	coin_counter_w(space->machine(), 0, data & 0x02);
-	coin_counter_w(space->machine(), 1, data & 0x20);
+	coin_counter_w(machine(), 0, data & 0x02);
+	coin_counter_w(machine(), 1, data & 0x20);
 }
 
 

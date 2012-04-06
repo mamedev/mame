@@ -39,22 +39,20 @@ TIMER_DEVICE_CALLBACK( mhavoc_cpu_irq_clock )
 }
 
 
-WRITE8_HANDLER( mhavoc_alpha_irq_ack_w )
+WRITE8_MEMBER(mhavoc_state::mhavoc_alpha_irq_ack_w)
 {
-	mhavoc_state *state = space->machine().driver_data<mhavoc_state>();
 	/* clear the line and reset the clock */
-	cputag_set_input_line(space->machine(), "alpha", 0, CLEAR_LINE);
-	state->m_alpha_irq_clock = 0;
-	state->m_alpha_irq_clock_enable = 1;
+	cputag_set_input_line(machine(), "alpha", 0, CLEAR_LINE);
+	m_alpha_irq_clock = 0;
+	m_alpha_irq_clock_enable = 1;
 }
 
 
-WRITE8_HANDLER( mhavoc_gamma_irq_ack_w )
+WRITE8_MEMBER(mhavoc_state::mhavoc_gamma_irq_ack_w)
 {
-	mhavoc_state *state = space->machine().driver_data<mhavoc_state>();
 	/* clear the line and reset the clock */
-	cputag_set_input_line(space->machine(), "gamma", 0, CLEAR_LINE);
-	state->m_gamma_irq_clock = 0;
+	cputag_set_input_line(machine(), "gamma", 0, CLEAR_LINE);
+	m_gamma_irq_clock = 0;
 }
 
 
@@ -94,8 +92,8 @@ MACHINE_RESET( mhavoc )
 	memory_configure_bank(machine, "bank2", 0, 4, machine.region("alpha")->base() + 0x10000, 0x2000);
 
 	/* reset RAM/ROM banks to 0 */
-	mhavoc_ram_banksel_w(space, 0, 0);
-	mhavoc_rom_banksel_w(space, 0, 0);
+	state->mhavoc_ram_banksel_w(*space, 0, 0);
+	state->mhavoc_rom_banksel_w(*space, 0, 0);
 
 	/* reset alpha comm status */
 	state->m_alpha_data = 0;
@@ -140,21 +138,19 @@ static TIMER_CALLBACK( delayed_gamma_w )
 }
 
 
-WRITE8_HANDLER( mhavoc_gamma_w )
+WRITE8_MEMBER(mhavoc_state::mhavoc_gamma_w)
 {
-	mhavoc_state *state = space->machine().driver_data<mhavoc_state>();
-	logerror("  writing to gamma processor: %02x (%d %d)\n", data, state->m_gamma_rcvd, state->m_alpha_xmtd);
-	space->machine().scheduler().synchronize(FUNC(delayed_gamma_w), data);
+	logerror("  writing to gamma processor: %02x (%d %d)\n", data, m_gamma_rcvd, m_alpha_xmtd);
+	machine().scheduler().synchronize(FUNC(delayed_gamma_w), data);
 }
 
 
-READ8_HANDLER( mhavoc_alpha_r )
+READ8_MEMBER(mhavoc_state::mhavoc_alpha_r)
 {
-	mhavoc_state *state = space->machine().driver_data<mhavoc_state>();
-	logerror("\t\t\t\t\treading from alpha processor: %02x (%d %d)\n", state->m_alpha_data, state->m_gamma_rcvd, state->m_alpha_xmtd);
-	state->m_gamma_rcvd = 1;
-	state->m_alpha_xmtd = 0;
-	return state->m_alpha_data;
+	logerror("\t\t\t\t\treading from alpha processor: %02x (%d %d)\n", m_alpha_data, m_gamma_rcvd, m_alpha_xmtd);
+	m_gamma_rcvd = 1;
+	m_alpha_xmtd = 0;
+	return m_alpha_data;
 }
 
 
@@ -165,23 +161,21 @@ READ8_HANDLER( mhavoc_alpha_r )
  *
  *************************************/
 
-WRITE8_HANDLER( mhavoc_alpha_w )
+WRITE8_MEMBER(mhavoc_state::mhavoc_alpha_w)
 {
-	mhavoc_state *state = space->machine().driver_data<mhavoc_state>();
-	logerror("\t\t\t\t\twriting to alpha processor: %02x %d %d\n", data, state->m_alpha_rcvd, state->m_gamma_xmtd);
-	state->m_alpha_rcvd = 0;
-	state->m_gamma_xmtd = 1;
-	state->m_gamma_data = data;
+	logerror("\t\t\t\t\twriting to alpha processor: %02x %d %d\n", data, m_alpha_rcvd, m_gamma_xmtd);
+	m_alpha_rcvd = 0;
+	m_gamma_xmtd = 1;
+	m_gamma_data = data;
 }
 
 
-READ8_HANDLER( mhavoc_gamma_r )
+READ8_MEMBER(mhavoc_state::mhavoc_gamma_r)
 {
-	mhavoc_state *state = space->machine().driver_data<mhavoc_state>();
-	logerror("  reading from gamma processor: %02x (%d %d)\n", state->m_gamma_data, state->m_alpha_rcvd, state->m_gamma_xmtd);
-	state->m_alpha_rcvd = 1;
-	state->m_gamma_xmtd = 0;
-	return state->m_gamma_data;
+	logerror("  reading from gamma processor: %02x (%d %d)\n", m_gamma_data, m_alpha_rcvd, m_gamma_xmtd);
+	m_alpha_rcvd = 1;
+	m_gamma_xmtd = 0;
+	return m_gamma_data;
 }
 
 
@@ -192,15 +186,15 @@ READ8_HANDLER( mhavoc_gamma_r )
  *
  *************************************/
 
-WRITE8_HANDLER( mhavoc_ram_banksel_w )
+WRITE8_MEMBER(mhavoc_state::mhavoc_ram_banksel_w)
 {
-	memory_set_bank(space->machine(), "bank1", data & 1);
+	memory_set_bank(machine(), "bank1", data & 1);
 }
 
 
-WRITE8_HANDLER( mhavoc_rom_banksel_w )
+WRITE8_MEMBER(mhavoc_state::mhavoc_rom_banksel_w)
 {
-	memory_set_bank(space->machine(), "bank2", data & 3);
+	memory_set_bank(machine(), "bank2", data & 3);
 }
 
 
@@ -258,56 +252,55 @@ CUSTOM_INPUT( alpha_xmtd_r )
  *
  *************************************/
 
-WRITE8_HANDLER( mhavoc_out_0_w )
+WRITE8_MEMBER(mhavoc_state::mhavoc_out_0_w)
 {
-	mhavoc_state *state = space->machine().driver_data<mhavoc_state>();
 	/* Bit 7 = Invert Y -- unemulated */
 	/* Bit 6 = Invert X -- unemulated */
 
 	/* Bit 5 = Player 1 */
-	state->m_player_1 = (data >> 5) & 1;
+	m_player_1 = (data >> 5) & 1;
 
 	/* Bit 3 = Gamma reset */
-	cputag_set_input_line(space->machine(), "gamma", INPUT_LINE_RESET, (data & 0x08) ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(machine(), "gamma", INPUT_LINE_RESET, (data & 0x08) ? CLEAR_LINE : ASSERT_LINE);
 	if (!(data & 0x08))
 	{
 		logerror("\t\t\t\t*** resetting gamma processor. ***\n");
-		state->m_alpha_rcvd = 0;
-		state->m_alpha_xmtd = 0;
-		state->m_gamma_rcvd = 0;
-		state->m_gamma_xmtd = 0;
+		m_alpha_rcvd = 0;
+		m_alpha_xmtd = 0;
+		m_gamma_rcvd = 0;
+		m_gamma_xmtd = 0;
 	}
 
 	/* Bit 0 = Roller light (Blinks on fatal errors) */
-	set_led_status(space->machine(), 0, data & 0x01);
+	set_led_status(machine(), 0, data & 0x01);
 }
 
 
-WRITE8_HANDLER( alphaone_out_0_w )
+WRITE8_MEMBER(mhavoc_state::alphaone_out_0_w)
 {
 	/* Bit 5 = P2 lamp */
-	set_led_status(space->machine(), 0, ~data & 0x20);
+	set_led_status(machine(), 0, ~data & 0x20);
 
 	/* Bit 4 = P1 lamp */
-	set_led_status(space->machine(), 1, ~data & 0x10);
+	set_led_status(machine(), 1, ~data & 0x10);
 
 	/* Bit 1 = right coin counter */
-	coin_counter_w(space->machine(), 1, data & 0x02);
+	coin_counter_w(machine(), 1, data & 0x02);
 
 	/* Bit 0 = left coin counter */
-	coin_counter_w(space->machine(), 0, data & 0x01);
+	coin_counter_w(machine(), 0, data & 0x01);
 
 logerror("alphaone_out_0_w(%02X)\n", data);
 }
 
 
-WRITE8_HANDLER( mhavoc_out_1_w )
+WRITE8_MEMBER(mhavoc_state::mhavoc_out_1_w)
 {
 	/* Bit 1 = left coin counter */
-	coin_counter_w(space->machine(), 0, data & 0x02);
+	coin_counter_w(machine(), 0, data & 0x02);
 
 	/* Bit 0 = right coin counter */
-	coin_counter_w(space->machine(), 1, data & 0x01);
+	coin_counter_w(machine(), 1, data & 0x01);
 }
 
 /*************************************
@@ -316,18 +309,16 @@ WRITE8_HANDLER( mhavoc_out_1_w )
  *
  *************************************/
 
-static WRITE8_HANDLER( mhavocrv_speech_data_w )
+WRITE8_MEMBER(mhavoc_state::mhavocrv_speech_data_w)
 {
-	mhavoc_state *state = space->machine().driver_data<mhavoc_state>();
-	state->m_speech_write_buffer = data;
+	m_speech_write_buffer = data;
 }
 
 
-static WRITE8_HANDLER( mhavocrv_speech_strobe_w )
+WRITE8_MEMBER(mhavoc_state::mhavocrv_speech_strobe_w)
 {
-	mhavoc_state *state = space->machine().driver_data<mhavoc_state>();
-	device_t *tms = space->machine().device("tms");
-	tms5220_data_w(tms, 0, state->m_speech_write_buffer);
+	device_t *tms = machine().device("tms");
+	tms5220_data_w(tms, 0, m_speech_write_buffer);
 }
 
 /*************************************
@@ -340,6 +331,7 @@ DRIVER_INIT( mhavocrv )
 {
 	/* install the speech support that was only optionally stuffed for use */
 	/* in the Return to Vax hack */
-	machine.device("gamma")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x5800, 0x5800, FUNC(mhavocrv_speech_data_w));
-	machine.device("gamma")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x5900, 0x5900, FUNC(mhavocrv_speech_strobe_w));
+	mhavoc_state *state = machine.driver_data<mhavoc_state>();
+	machine.device("gamma")->memory().space(AS_PROGRAM)->install_write_handler(0x5800, 0x5800, write8_delegate(FUNC(mhavoc_state::mhavocrv_speech_data_w),state));
+	machine.device("gamma")->memory().space(AS_PROGRAM)->install_write_handler(0x5900, 0x5900, write8_delegate(FUNC(mhavoc_state::mhavocrv_speech_strobe_w),state));
 }

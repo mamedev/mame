@@ -55,89 +55,83 @@ const gfx_layout bwing_tilelayout =
 };
 
 
-WRITE8_HANDLER( bwing_spriteram_w )
+WRITE8_MEMBER(bwing_state::bwing_spriteram_w)
 {
-	bwing_state *state = space->machine().driver_data<bwing_state>();
-	state->m_spriteram[offset] = data;
+	m_spriteram[offset] = data;
 }
 
-WRITE8_HANDLER( bwing_videoram_w )
+WRITE8_MEMBER(bwing_state::bwing_videoram_w)
 {
-	bwing_state *state = space->machine().driver_data<bwing_state>();
-	state->m_videoram[offset] = data;
-	state->m_charmap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_charmap->mark_tile_dirty(offset);
 }
 
 
-READ8_HANDLER ( bwing_scrollram_r )
+READ8_MEMBER(bwing_state::bwing_scrollram_r)
 {
-	bwing_state *state = space->machine().driver_data<bwing_state>();
 	int offs;
 
-	if (!state->m_srbank)
-		offs = state->m_srxlat[offset];
+	if (!m_srbank)
+		offs = m_srxlat[offset];
 	else
 		offs = offset;
 
-	return ((state->m_srbase[state->m_srbank])[offs]);
+	return ((m_srbase[m_srbank])[offs]);
 }
 
 
-WRITE8_HANDLER( bwing_scrollram_w )
+WRITE8_MEMBER(bwing_state::bwing_scrollram_w)
 {
-	bwing_state *state = space->machine().driver_data<bwing_state>();
 	int offs;
 
-	if (!state->m_srbank)
+	if (!m_srbank)
 	{
-		offs = state->m_srxlat[offset];
+		offs = m_srxlat[offset];
 		if (offs >> 12)
-			state->m_bgmap->mark_tile_dirty(offs & 0xfff);
+			m_bgmap->mark_tile_dirty(offs & 0xfff);
 		else
-			state->m_fgmap->mark_tile_dirty(offs & 0xfff);
+			m_fgmap->mark_tile_dirty(offs & 0xfff);
 	}
 	else
 	{
 		offs = offset;
 		if (offset < 0x1000)
-			gfx_element_mark_dirty(space->machine().gfx[2], offset / 32);
+			gfx_element_mark_dirty(machine().gfx[2], offset / 32);
 		else
-			gfx_element_mark_dirty(space->machine().gfx[3], offset / 32);
+			gfx_element_mark_dirty(machine().gfx[3], offset / 32);
 	}
 
-	(state->m_srbase[state->m_srbank])[offs] = data;
+	(m_srbase[m_srbank])[offs] = data;
 }
 
 
-WRITE8_HANDLER( bwing_scrollreg_w )
+WRITE8_MEMBER(bwing_state::bwing_scrollreg_w)
 {
-	bwing_state *state = space->machine().driver_data<bwing_state>();
-	state->m_sreg[offset] = data;
+	m_sreg[offset] = data;
 
 	switch (offset)
 	{
-		case 6: state->m_palatch = data; break; // one of the palette components is latched through I/O(yike)
+		case 6: m_palatch = data; break; // one of the palette components is latched through I/O(yike)
 
 		case 7:
 			// tile graphics are decoded in RAM on the fly and tile codes are banked + interleaved(ouch)
-			state->m_mapmask = data;
-			state->m_srbank = data >> 6;
+			m_mapmask = data;
+			m_srbank = data >> 6;
 
 			#if BW_DEBUG
-				logerror("(%s)%04x: w=%02x a=%04x f=%d\n", space->device().tag, cpu_get_pc(&space->device()), data, 0x1b00 + offset, space->machine().primary_screen->frame_number());
+				logerror("(%s)%04x: w=%02x a=%04x f=%d\n", device().tag, cpu_get_pc(&space.device()), data, 0x1b00 + offset, machine().primary_screen->frame_number());
 			#endif
 		break;
 	}
 
 	#if BW_DEBUG
-		(space->machine().region(REGION_CPU1)->base())[0x1b10 + offset] = data;
+		(machine().region(REGION_CPU1)->base())[0x1b10 + offset] = data;
 	#endif
 }
 
 
-WRITE8_HANDLER( bwing_paletteram_w )
+WRITE8_MEMBER(bwing_state::bwing_paletteram_w)
 {
-	bwing_state *state = space->machine().driver_data<bwing_state>();
 	static const float rgb[4][3] = {
 		{0.85f, 0.95f, 1.00f},
 		{0.90f, 1.00f, 1.00f},
@@ -146,17 +140,17 @@ WRITE8_HANDLER( bwing_paletteram_w )
 	};
 	int r, g, b, i;
 
-	state->m_paletteram[offset] = data;
+	m_paletteram[offset] = data;
 
 	r = ~data & 7;
 	g = ~(data >> 4) & 7;
-	b = ~state->m_palatch & 7;
+	b = ~m_palatch & 7;
 
 	r = ((r << 5) + (r << 2) + (r >> 1));
 	g = ((g << 5) + (g << 2) + (g >> 1));
 	b = ((b << 5) + (b << 2) + (b >> 1));
 
-	if ((i = input_port_read(space->machine(), "EXTRA")) < 4)
+	if ((i = input_port_read(machine(), "EXTRA")) < 4)
 	{
 		r = (float)r * rgb[i][0];
 		g = (float)g * rgb[i][1];
@@ -166,10 +160,10 @@ WRITE8_HANDLER( bwing_paletteram_w )
 		if (b > 0xff) b = 0xff;
 	}
 
-	palette_set_color(space->machine(), offset, MAKE_RGB(r, g, b));
+	palette_set_color(machine(), offset, MAKE_RGB(r, g, b));
 
 	#if BW_DEBUG
-		state->m_paletteram[offset + 0x40] = state->m_palatch;
+		m_paletteram[offset + 0x40] = m_palatch;
 	#endif
 }
 

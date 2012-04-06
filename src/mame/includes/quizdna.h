@@ -15,6 +15,12 @@ public:
 	size_t m_spriteram_size;
 	DECLARE_WRITE8_MEMBER(quizdna_rombank_w);
 	DECLARE_WRITE8_MEMBER(gekiretu_rombank_w);
+	DECLARE_WRITE8_MEMBER(quizdna_bg_ram_w);
+	DECLARE_WRITE8_MEMBER(quizdna_fg_ram_w);
+	DECLARE_WRITE8_MEMBER(quizdna_bg_yscroll_w);
+	DECLARE_WRITE8_MEMBER(quizdna_bg_xscroll_w);
+	DECLARE_WRITE8_MEMBER(quizdna_screen_ctrl_w);
+	DECLARE_WRITE8_MEMBER(paletteram_xBGR_RRRR_GGGG_BBBB_w);
 };
 
 
@@ -23,10 +29,4 @@ public:
 VIDEO_START( quizdna );
 SCREEN_UPDATE_IND16( quizdna );
 
-WRITE8_HANDLER( quizdna_fg_ram_w );
-WRITE8_HANDLER( quizdna_bg_ram_w );
-WRITE8_HANDLER( quizdna_bg_yscroll_w );
-WRITE8_HANDLER( quizdna_bg_xscroll_w );
-WRITE8_HANDLER( quizdna_screen_ctrl_w );
 
-WRITE8_HANDLER( paletteram_xBGR_RRRR_GGGG_BBBB_w );

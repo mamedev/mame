@@ -208,55 +208,52 @@ VIDEO_START( ninjemak )
 
 ***************************************************************************/
 
-WRITE8_HANDLER( galivan_videoram_w )
+WRITE8_MEMBER(galivan_state::galivan_videoram_w)
 {
-	galivan_state *state = space->machine().driver_data<galivan_state>();
-	state->m_videoram[offset] = data;
-	state->m_tx_tilemap->mark_tile_dirty(offset & 0x3ff);
+	m_videoram[offset] = data;
+	m_tx_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
 /* Written through port 40 */
-WRITE8_HANDLER( galivan_gfxbank_w )
+WRITE8_MEMBER(galivan_state::galivan_gfxbank_w)
 {
-	galivan_state *state = space->machine().driver_data<galivan_state>();
 
 	/* bits 0 and 1 coin counters */
-	coin_counter_w(space->machine(), 0,data & 1);
-	coin_counter_w(space->machine(), 1,data & 2);
+	coin_counter_w(machine(), 0,data & 1);
+	coin_counter_w(machine(), 1,data & 2);
 
 	/* bit 2 flip screen */
-	state->m_flipscreen = data & 0x04;
-	state->m_bg_tilemap->set_flip(state->m_flipscreen ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
-	state->m_tx_tilemap->set_flip(state->m_flipscreen ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
+	m_flipscreen = data & 0x04;
+	m_bg_tilemap->set_flip(m_flipscreen ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
+	m_tx_tilemap->set_flip(m_flipscreen ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
 
 	/* bit 7 selects one of two ROM banks for c000-dfff */
-	memory_set_bank(space->machine(), "bank1", (data & 0x80) >> 7);
+	memory_set_bank(machine(), "bank1", (data & 0x80) >> 7);
 
-	/*  logerror("Address: %04X - port 40 = %02x\n", cpu_get_pc(&space->device()), data); */
+	/*  logerror("Address: %04X - port 40 = %02x\n", cpu_get_pc(&space.device()), data); */
 }
 
-WRITE8_HANDLER( ninjemak_gfxbank_w )
+WRITE8_MEMBER(galivan_state::ninjemak_gfxbank_w)
 {
-	galivan_state *state = space->machine().driver_data<galivan_state>();
 
 	/* bits 0 and 1 coin counters */
-	coin_counter_w(space->machine(), 0,data & 1);
-	coin_counter_w(space->machine(), 1,data & 2);
+	coin_counter_w(machine(), 0,data & 1);
+	coin_counter_w(machine(), 1,data & 2);
 
 	/* bit 2 flip screen */
-	state->m_flipscreen = data & 0x04;
-	state->m_bg_tilemap->set_flip(state->m_flipscreen ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
-	state->m_tx_tilemap->set_flip(state->m_flipscreen ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
+	m_flipscreen = data & 0x04;
+	m_bg_tilemap->set_flip(m_flipscreen ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
+	m_tx_tilemap->set_flip(m_flipscreen ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
 
 	/* bit 3 unknown */
 
 	/* bit 4 background disable flag */
-	state->m_ninjemak_dispdisable = data & 0x10;
+	m_ninjemak_dispdisable = data & 0x10;
 
 	/* bit 5 sprite flag ??? */
 
 	/* bit 6, 7 ROM bank select */
-	memory_set_bank(space->machine(), "bank1", (data & 0xc0) >> 6);
+	memory_set_bank(machine(), "bank1", (data & 0xc0) >> 6);
 
 #if 0
 	{
@@ -275,27 +272,25 @@ WRITE8_HANDLER( ninjemak_gfxbank_w )
 
 
 /* Written through port 41-42 */
-WRITE8_HANDLER( galivan_scrollx_w )
+WRITE8_MEMBER(galivan_state::galivan_scrollx_w)
 {
-	galivan_state *state = space->machine().driver_data<galivan_state>();
 	if (offset == 1)
 	{
 		if (data & 0x80)
-			state->m_write_layers = 1;
-		else if (state->m_write_layers)
+			m_write_layers = 1;
+		else if (m_write_layers)
 		{
-			state->m_layers = data & 0x60;
-			state->m_write_layers = 0;
+			m_layers = data & 0x60;
+			m_write_layers = 0;
 		}
 	}
-	state->m_galivan_scrollx[offset] = data;
+	m_galivan_scrollx[offset] = data;
 }
 
 /* Written through port 43-44 */
-WRITE8_HANDLER( galivan_scrolly_w )
+WRITE8_MEMBER(galivan_state::galivan_scrolly_w)
 {
-	galivan_state *state = space->machine().driver_data<galivan_state>();
-	state->m_galivan_scrolly[offset] = data;
+	m_galivan_scrolly[offset] = data;
 }
 
 

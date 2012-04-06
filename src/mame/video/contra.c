@@ -197,100 +197,92 @@ VIDEO_START( contra )
 
 ***************************************************************************/
 
-WRITE8_HANDLER( contra_fg_vram_w )
+WRITE8_MEMBER(contra_state::contra_fg_vram_w)
 {
-	contra_state *state = space->machine().driver_data<contra_state>();
 
-	state->m_fg_vram[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset);
+	m_fg_vram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( contra_fg_cram_w )
+WRITE8_MEMBER(contra_state::contra_fg_cram_w)
 {
-	contra_state *state = space->machine().driver_data<contra_state>();
 
-	state->m_fg_cram[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset);
+	m_fg_cram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( contra_bg_vram_w )
+WRITE8_MEMBER(contra_state::contra_bg_vram_w)
 {
-	contra_state *state = space->machine().driver_data<contra_state>();
 
-	state->m_bg_vram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_bg_vram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( contra_bg_cram_w )
+WRITE8_MEMBER(contra_state::contra_bg_cram_w)
 {
-	contra_state *state = space->machine().driver_data<contra_state>();
 
-	state->m_bg_cram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_bg_cram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( contra_text_vram_w )
+WRITE8_MEMBER(contra_state::contra_text_vram_w)
 {
-	contra_state *state = space->machine().driver_data<contra_state>();
 
-	state->m_tx_vram[offset] = data;
-	state->m_tx_tilemap->mark_tile_dirty(offset);
+	m_tx_vram[offset] = data;
+	m_tx_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( contra_text_cram_w )
+WRITE8_MEMBER(contra_state::contra_text_cram_w)
 {
-	contra_state *state = space->machine().driver_data<contra_state>();
 
-	state->m_tx_cram[offset] = data;
-	state->m_tx_tilemap->mark_tile_dirty(offset);
+	m_tx_cram[offset] = data;
+	m_tx_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( contra_K007121_ctrl_0_w )
+WRITE8_MEMBER(contra_state::contra_K007121_ctrl_0_w)
 {
-	contra_state *state = space->machine().driver_data<contra_state>();
-	UINT8 ctrl_6 = k007121_ctrlram_r(state->m_k007121_1, 6);
+	UINT8 ctrl_6 = k007121_ctrlram_r(m_k007121_1, 6);
 
 	if (offset == 3)
 	{
 		if ((data & 0x8) == 0)
-			memcpy(state->m_buffered_spriteram, state->m_spriteram + 0x800, 0x800);
+			memcpy(m_buffered_spriteram, m_spriteram + 0x800, 0x800);
 		else
-			memcpy(state->m_buffered_spriteram, state->m_spriteram, 0x800);
+			memcpy(m_buffered_spriteram, m_spriteram, 0x800);
 	}
 
 	if (offset == 6)
 	{
 		if (ctrl_6 != data)
-			state->m_fg_tilemap->mark_all_dirty();
+			m_fg_tilemap->mark_all_dirty();
 	}
 
 	if (offset == 7)
-		state->m_fg_tilemap->set_flip((data & 0x08) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+		m_fg_tilemap->set_flip((data & 0x08) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
-	k007121_ctrl_w(state->m_k007121_1, offset, data);
+	k007121_ctrl_w(m_k007121_1, offset, data);
 }
 
-WRITE8_HANDLER( contra_K007121_ctrl_1_w )
+WRITE8_MEMBER(contra_state::contra_K007121_ctrl_1_w)
 {
-	contra_state *state = space->machine().driver_data<contra_state>();
-	UINT8 ctrl_6 = k007121_ctrlram_r(state->m_k007121_2, 6);
+	UINT8 ctrl_6 = k007121_ctrlram_r(m_k007121_2, 6);
 
 	if (offset == 3)
 	{
 		if ((data & 0x8) == 0)
-			memcpy(state->m_buffered_spriteram_2, state->m_spriteram + 0x2800, 0x800);
+			memcpy(m_buffered_spriteram_2, m_spriteram + 0x2800, 0x800);
 		else
-			memcpy(state->m_buffered_spriteram_2, state->m_spriteram + 0x2000, 0x800);
+			memcpy(m_buffered_spriteram_2, m_spriteram + 0x2000, 0x800);
 	}
 	if (offset == 6)
 	{
 		if (ctrl_6 != data )
-			state->m_bg_tilemap->mark_all_dirty();
+			m_bg_tilemap->mark_all_dirty();
 	}
 	if (offset == 7)
-		state->m_bg_tilemap->set_flip((data & 0x08) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+		m_bg_tilemap->set_flip((data & 0x08) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
-	k007121_ctrl_w(state->m_k007121_2, offset, data);
+	k007121_ctrl_w(m_k007121_2, offset, data);
 }
 
 

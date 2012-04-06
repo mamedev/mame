@@ -187,9 +187,9 @@ VIDEO_START( itech8 )
  *
  *************************************/
 
-WRITE8_HANDLER( itech8_palette_w )
+WRITE8_MEMBER(itech8_state::itech8_palette_w)
 {
-	tlc34076_w(space->machine().device("tlc34076"), offset/2, data);
+	tlc34076_w(machine().device("tlc34076"), offset/2, data);
 }
 
 
@@ -200,12 +200,11 @@ WRITE8_HANDLER( itech8_palette_w )
  *
  *************************************/
 
-WRITE8_HANDLER( itech8_page_w )
+WRITE8_MEMBER(itech8_state::itech8_page_w)
 {
-	itech8_state *state = space->machine().driver_data<itech8_state>();
-	space->machine().primary_screen->update_partial(space->machine().primary_screen->vpos());
-	logerror("%04x:display_page = %02X (%d)\n", cpu_get_pc(&space->device()), data, space->machine().primary_screen->vpos());
-	state->m_page_select = data;
+	machine().primary_screen->update_partial(machine().primary_screen->vpos());
+	logerror("%04x:display_page = %02X (%d)\n", cpu_get_pc(&space.device()), data, machine().primary_screen->vpos());
+	m_page_select = data;
 }
 
 
@@ -439,14 +438,13 @@ static TIMER_CALLBACK( blitter_done )
  *
  *************************************/
 
-READ8_HANDLER( itech8_blitter_r )
+READ8_MEMBER(itech8_state::itech8_blitter_r)
 {
-	itech8_state *state = space->machine().driver_data<itech8_state>();
-	int result = state->m_blitter_data[offset / 2];
+	int result = m_blitter_data[offset / 2];
 	static const char *const portnames[] = { "AN_C", "AN_D", "AN_E", "AN_F" };
 
 	/* debugging */
-	if (FULL_LOGGING) logerror("%04x:blitter_r(%02x)\n", cpu_get_previouspc(&space->device()), offset / 2);
+	if (FULL_LOGGING) logerror("%04x:blitter_r(%02x)\n", cpu_get_previouspc(&space.device()), offset / 2);
 
 	/* low bit seems to be ignored */
 	offset /= 2;
@@ -454,8 +452,8 @@ READ8_HANDLER( itech8_blitter_r )
 	/* a read from offset 3 clears the interrupt and returns the status */
 	if (offset == 3)
 	{
-		itech8_update_interrupts(space->machine(), -1, -1, 0);
-		if (state->m_blit_in_progress)
+		itech8_update_interrupts(machine(), -1, -1, 0);
+		if (m_blit_in_progress)
 			result |= 0x80;
 		else
 			result &= 0x7f;
@@ -463,17 +461,16 @@ READ8_HANDLER( itech8_blitter_r )
 
 	/* a read from offsets 12-15 return input port values */
 	if (offset >= 12 && offset <= 15)
-		result = input_port_read_safe(space->machine(), portnames[offset - 12], 0x00);
+		result = input_port_read_safe(machine(), portnames[offset - 12], 0x00);
 
 	return result;
 }
 
 
-WRITE8_HANDLER( itech8_blitter_w )
+WRITE8_MEMBER(itech8_state::itech8_blitter_w)
 {
-	itech8_state *state = space->machine().driver_data<itech8_state>();
-	UINT8 *blitter_data = state->m_blitter_data;
-	struct tms34061_display &tms_state = state->m_tms_state;
+	UINT8 *blitter_data = m_blitter_data;
+	struct tms34061_display &tms_state = m_tms_state;
 
 	/* low bit seems to be ignored */
 	offset /= 2;
@@ -487,7 +484,7 @@ WRITE8_HANDLER( itech8_blitter_w )
 		{
 			logerror("Blit: XY=%1X%04X SRC=%02X%02X%02X SIZE=%3dx%3d FLAGS=%02x",
 						(tms_state.regs[TMS34061_XYOFFSET] >> 8) & 0x0f, tms_state.regs[TMS34061_XYADDRESS],
-						*state->m_grom_bank, blitter_data[0], blitter_data[1],
+						*m_grom_bank, blitter_data[0], blitter_data[1],
 						blitter_data[4], blitter_data[5],
 						blitter_data[2]);
 			logerror("   %02X %02X %02X [%02X] %02X %02X %02X [%02X]-%02X %02X %02X %02X [%02X %02X %02X %02X]\n",
@@ -502,15 +499,15 @@ WRITE8_HANDLER( itech8_blitter_w )
 		}
 
 		/* perform the blit */
-		perform_blit(space);
-		state->m_blit_in_progress = 1;
+		perform_blit(&space);
+		m_blit_in_progress = 1;
 
 		/* set a timer to go off when we're done */
-		space->machine().scheduler().timer_set(attotime::from_hz(12000000/4) * (BLITTER_WIDTH * BLITTER_HEIGHT + 12), FUNC(blitter_done));
+		machine().scheduler().timer_set(attotime::from_hz(12000000/4) * (BLITTER_WIDTH * BLITTER_HEIGHT + 12), FUNC(blitter_done));
 	}
 
 	/* debugging */
-	if (FULL_LOGGING) logerror("%04x:blitter_w(%02x)=%02x\n", cpu_get_previouspc(&space->device()), offset, data);
+	if (FULL_LOGGING) logerror("%04x:blitter_w(%02x)=%02x\n", cpu_get_previouspc(&space.device()), offset, data);
 }
 
 
@@ -521,7 +518,7 @@ WRITE8_HANDLER( itech8_blitter_w )
  *
  *************************************/
 
-WRITE8_HANDLER( itech8_tms34061_w )
+WRITE8_MEMBER(itech8_state::itech8_tms34061_w)
 {
 	int func = (offset >> 9) & 7;
 	int col = offset & 0xff;
@@ -532,11 +529,11 @@ WRITE8_HANDLER( itech8_tms34061_w )
 		col ^= 2;
 
 	/* Row address (RA0-RA8) is not dependent on the offset */
-	tms34061_w(space, col, 0xff, func, data);
+	tms34061_w(&space, col, 0xff, func, data);
 }
 
 
-READ8_HANDLER( itech8_tms34061_r )
+READ8_MEMBER(itech8_state::itech8_tms34061_r)
 {
 	int func = (offset >> 9) & 7;
 	int col = offset & 0xff;
@@ -547,7 +544,7 @@ READ8_HANDLER( itech8_tms34061_r )
 		col ^= 2;
 
 	/* Row address (RA0-RA8) is not dependent on the offset */
-	return tms34061_r(space, col, 0xff, func);
+	return tms34061_r(&space, col, 0xff, func);
 }
 
 
@@ -558,20 +555,18 @@ READ8_HANDLER( itech8_tms34061_r )
  *
  *************************************/
 
-WRITE8_HANDLER( grmatch_palette_w )
+WRITE8_MEMBER(itech8_state::grmatch_palette_w)
 {
-	itech8_state *state = space->machine().driver_data<itech8_state>();
 	/* set the palette control; examined in the scanline callback */
-	state->m_grmatch_palcontrol = data;
+	m_grmatch_palcontrol = data;
 }
 
 
-WRITE8_HANDLER( grmatch_xscroll_w )
+WRITE8_MEMBER(itech8_state::grmatch_xscroll_w)
 {
-	itech8_state *state = space->machine().driver_data<itech8_state>();
 	/* update the X scroll value */
-	space->machine().primary_screen->update_now();
-	state->m_grmatch_xscroll = data;
+	machine().primary_screen->update_now();
+	m_grmatch_xscroll = data;
 }
 
 

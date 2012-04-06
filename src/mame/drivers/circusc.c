@@ -147,7 +147,7 @@ WRITE8_MEMBER(circusc_state::irq_mask_w)
 }
 
 static ADDRESS_MAP_START( circusc_map, AS_PROGRAM, 8, circusc_state )
-	AM_RANGE(0x0000, 0x0000) AM_MIRROR(0x03f8) AM_WRITE_LEGACY(circusc_flipscreen_w)		/* FLIP */
+	AM_RANGE(0x0000, 0x0000) AM_MIRROR(0x03f8) AM_WRITE(circusc_flipscreen_w)		/* FLIP */
 	AM_RANGE(0x0001, 0x0001) AM_MIRROR(0x03f8) AM_WRITE(irq_mask_w)					/* INTST */
 //  AM_RANGE(0x0002, 0x0002) AM_MIRROR(0x03f8) AM_WRITENOP                          /* MUT - not used /*
 	AM_RANGE(0x0003, 0x0004) AM_MIRROR(0x03f8) AM_WRITE(circusc_coin_counter_w)		/* COIN1, COIN2 */
@@ -163,8 +163,8 @@ static ADDRESS_MAP_START( circusc_map, AS_PROGRAM, 8, circusc_state )
 	AM_RANGE(0x1800, 0x1800) AM_MIRROR(0x03ff) AM_READ_PORT("DSW2")
 	AM_RANGE(0x1c00, 0x1c00) AM_MIRROR(0x03ff) AM_WRITEONLY AM_BASE(m_scroll) /* VGAP */
 	AM_RANGE(0x2000, 0x2fff) AM_RAM
-	AM_RANGE(0x3000, 0x33ff) AM_RAM_WRITE_LEGACY(circusc_colorram_w) AM_BASE(m_colorram) /* colorram */
-	AM_RANGE(0x3400, 0x37ff) AM_RAM_WRITE_LEGACY(circusc_videoram_w) AM_BASE(m_videoram) /* videoram */
+	AM_RANGE(0x3000, 0x33ff) AM_RAM_WRITE(circusc_colorram_w) AM_BASE(m_colorram) /* colorram */
+	AM_RANGE(0x3400, 0x37ff) AM_RAM_WRITE(circusc_videoram_w) AM_BASE(m_videoram) /* videoram */
 	AM_RANGE(0x3800, 0x38ff) AM_RAM AM_BASE(m_spriteram_2) /* spriteram2 */
 	AM_RANGE(0x3900, 0x39ff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size) /* spriteram */
 	AM_RANGE(0x3a00, 0x3fff) AM_RAM

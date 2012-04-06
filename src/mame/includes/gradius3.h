@@ -41,6 +41,8 @@ public:
 	DECLARE_WRITE16_MEMBER(cpuB_irqtrigger_w);
 	DECLARE_WRITE16_MEMBER(sound_command_w);
 	DECLARE_WRITE16_MEMBER(sound_irq_w);
+	DECLARE_READ16_MEMBER(gradius3_gfxrom_r);
+	DECLARE_WRITE16_MEMBER(gradius3_gfxram_w);
 };
 
 /*----------- defined in video/gradius3.c -----------*/
@@ -48,8 +50,6 @@ public:
 extern void gradius3_sprite_callback(running_machine &machine, int *code,int *color,int *priority_mask,int *shadow);
 extern void gradius3_tile_callback(running_machine &machine, int layer,int bank,int *code,int *color,int *flags,int *priority);
 
-READ16_HANDLER( gradius3_gfxrom_r );
-WRITE16_HANDLER( gradius3_gfxram_w );
 
 VIDEO_START( gradius3 );
 SCREEN_UPDATE_IND16( gradius3 );

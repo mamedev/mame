@@ -50,6 +50,36 @@ public:
 	DECLARE_WRITE8_MEMBER(ram_8w_w);
 	DECLARE_WRITE8_MEMBER(sprite_dma_w);
 	DECLARE_WRITE8_MEMBER(time_w);
+	DECLARE_WRITE8_MEMBER(pc10_SDCS_w);
+	DECLARE_WRITE8_MEMBER(pc10_CNTRLMASK_w);
+	DECLARE_WRITE8_MEMBER(pc10_DISPMASK_w);
+	DECLARE_WRITE8_MEMBER(pc10_SOUNDMASK_w);
+	DECLARE_WRITE8_MEMBER(pc10_NMIENABLE_w);
+	DECLARE_WRITE8_MEMBER(pc10_DOGDI_w);
+	DECLARE_WRITE8_MEMBER(pc10_GAMERES_w);
+	DECLARE_WRITE8_MEMBER(pc10_GAMESTOP_w);
+	DECLARE_WRITE8_MEMBER(pc10_PPURES_w);
+	DECLARE_READ8_MEMBER(pc10_detectclr_r);
+	DECLARE_WRITE8_MEMBER(pc10_CARTSEL_w);
+	DECLARE_READ8_MEMBER(pc10_prot_r);
+	DECLARE_WRITE8_MEMBER(pc10_prot_w);
+	DECLARE_WRITE8_MEMBER(pc10_in0_w);
+	DECLARE_READ8_MEMBER(pc10_in0_r);
+	DECLARE_READ8_MEMBER(pc10_in1_r);
+	DECLARE_WRITE8_MEMBER(pc10_nt_w);
+	DECLARE_READ8_MEMBER(pc10_nt_r);
+	DECLARE_WRITE8_MEMBER(pc10_chr_w);
+	DECLARE_READ8_MEMBER(pc10_chr_r);
+	DECLARE_WRITE8_MEMBER(mmc1_rom_switch_w);
+	DECLARE_WRITE8_MEMBER(aboard_vrom_switch_w);
+	DECLARE_WRITE8_MEMBER(bboard_rom_switch_w);
+	DECLARE_WRITE8_MEMBER(cboard_vrom_switch_w);
+	DECLARE_WRITE8_MEMBER(eboard_rom_switch_w);
+	DECLARE_WRITE8_MEMBER(gboard_rom_switch_w);
+	DECLARE_WRITE8_MEMBER(iboard_rom_switch_w);
+	DECLARE_WRITE8_MEMBER(hboard_rom_switch_w);
+	void pc10_set_mirroring(int mirroring);
+	DECLARE_WRITE8_MEMBER(playch10_videoram_w);
 };
 
 
@@ -75,22 +105,6 @@ DRIVER_INIT( pchboard );	/* h-board games */
 DRIVER_INIT( pciboard );	/* i-board games */
 DRIVER_INIT( pckboard );	/* k-board games */
 CUSTOM_INPUT( pc10_int_detect_r );
-READ8_HANDLER( pc10_prot_r );
-READ8_HANDLER( pc10_detectclr_r );
-READ8_HANDLER( pc10_in0_r );
-READ8_HANDLER( pc10_in1_r );
-WRITE8_HANDLER( pc10_SDCS_w );
-WRITE8_HANDLER( pc10_CNTRLMASK_w );
-WRITE8_HANDLER( pc10_DISPMASK_w );
-WRITE8_HANDLER( pc10_SOUNDMASK_w );
-WRITE8_HANDLER( pc10_NMIENABLE_w );
-WRITE8_HANDLER( pc10_DOGDI_w );
-WRITE8_HANDLER( pc10_GAMERES_w );
-WRITE8_HANDLER( pc10_GAMESTOP_w );
-WRITE8_HANDLER( pc10_PPURES_w );
-WRITE8_HANDLER( pc10_prot_w );
-WRITE8_HANDLER( pc10_CARTSEL_w );
-WRITE8_HANDLER( pc10_in0_w );
 
 
 
@@ -99,7 +113,6 @@ WRITE8_HANDLER( pc10_in0_w );
 extern const ppu2c0x_interface playch10_ppu_interface;
 extern const ppu2c0x_interface playch10_ppu_interface_hboard;
 
-WRITE8_HANDLER( playch10_videoram_w );
 PALETTE_INIT( playch10 );
 VIDEO_START( playch10 );
 VIDEO_START( playch10_hboard );

@@ -63,6 +63,7 @@ public:
 	DECLARE_WRITE8_MEMBER(nsub_io_w);
 	DECLARE_READ8_MEMBER(invinco_io_r);
 	DECLARE_WRITE8_MEMBER(invinco_io_w);
+	DECLARE_WRITE8_MEMBER(vicdual_palette_bank_w);
 };
 
 
@@ -73,7 +74,6 @@ int vicdual_is_cabinet_color(running_machine &machine);
 
 /*----------- defined in video/vicdual.c -----------*/
 
-WRITE8_HANDLER( vicdual_palette_bank_w );
 
 SCREEN_UPDATE_RGB32( vicdual_bw );
 SCREEN_UPDATE_RGB32( vicdual_color );

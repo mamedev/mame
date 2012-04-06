@@ -38,17 +38,17 @@ public:
 	DECLARE_WRITE8_MEMBER(hcastle_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(hcastle_soundirq_w);
 	DECLARE_WRITE8_MEMBER(hcastle_coin_w);
+	DECLARE_WRITE8_MEMBER(hcastle_pf1_video_w);
+	DECLARE_WRITE8_MEMBER(hcastle_pf2_video_w);
+	DECLARE_WRITE8_MEMBER(hcastle_gfxbank_w);
+	DECLARE_READ8_MEMBER(hcastle_gfxbank_r);
+	DECLARE_WRITE8_MEMBER(hcastle_pf1_control_w);
+	DECLARE_WRITE8_MEMBER(hcastle_pf2_control_w);
 };
 
 
 /*----------- defined in video/hcastle.c -----------*/
 
-WRITE8_HANDLER( hcastle_pf1_video_w );
-WRITE8_HANDLER( hcastle_pf2_video_w );
-READ8_HANDLER( hcastle_gfxbank_r );
-WRITE8_HANDLER( hcastle_gfxbank_w );
-WRITE8_HANDLER( hcastle_pf1_control_w );
-WRITE8_HANDLER( hcastle_pf2_control_w );
 
 PALETTE_INIT( hcastle );
 SCREEN_UPDATE_IND16( hcastle );

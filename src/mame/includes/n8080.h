@@ -41,13 +41,13 @@ public:
 	DECLARE_WRITE8_MEMBER(n8080_shift_bits_w);
 	DECLARE_WRITE8_MEMBER(n8080_shift_data_w);
 	DECLARE_READ8_MEMBER(n8080_shift_r);
+	DECLARE_WRITE8_MEMBER(n8080_video_control_w);
 };
 
 
 
 /*----------- defined in video/n8080.c -----------*/
 
-WRITE8_HANDLER( n8080_video_control_w );
 
 PALETTE_INIT( n8080 );
 PALETTE_INIT( helifire );

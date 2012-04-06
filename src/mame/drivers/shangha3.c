@@ -121,7 +121,7 @@ static ADDRESS_MAP_START( shangha3_map, AS_PROGRAM, 16, shangha3_state )
 	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(paletteram16_RRRRRGGGGGBBBBBx_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x200000, 0x200001) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x200002, 0x200003) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x200008, 0x200009) AM_WRITE_LEGACY(shangha3_blitter_go_w)
+	AM_RANGE(0x200008, 0x200009) AM_WRITE(shangha3_blitter_go_w)
 	AM_RANGE(0x20000a, 0x20000b) AM_WRITENOP	/* irq ack? */
 	AM_RANGE(0x20000c, 0x20000d) AM_WRITE(shangha3_coinctrl_w)
 	AM_RANGE(0x20001e, 0x20001f) AM_DEVREAD8_LEGACY("aysnd", ay8910_r, 0x00ff)
@@ -130,8 +130,8 @@ static ADDRESS_MAP_START( shangha3_map, AS_PROGRAM, 16, shangha3_state )
 	AM_RANGE(0x20004e, 0x20004f) AM_READWRITE(shangha3_prot_r,shangha3_prot_w)
 	AM_RANGE(0x20006e, 0x20006f) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x300000, 0x30ffff) AM_RAM AM_BASE_SIZE(m_ram, m_ram_size)	/* gfx & work ram */
-	AM_RANGE(0x340000, 0x340001) AM_WRITE_LEGACY(shangha3_flipscreen_w)
-	AM_RANGE(0x360000, 0x360001) AM_WRITE_LEGACY(shangha3_gfxlist_addr_w)
+	AM_RANGE(0x340000, 0x340001) AM_WRITE(shangha3_flipscreen_w)
+	AM_RANGE(0x360000, 0x360001) AM_WRITE(shangha3_gfxlist_addr_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( heberpop_map, AS_PROGRAM, 16, shangha3_state )
@@ -140,13 +140,13 @@ static ADDRESS_MAP_START( heberpop_map, AS_PROGRAM, 16, shangha3_state )
 	AM_RANGE(0x200000, 0x200001) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x200002, 0x200003) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x200004, 0x200005) AM_READ_PORT("DSW")
-	AM_RANGE(0x200008, 0x200009) AM_WRITE_LEGACY(shangha3_blitter_go_w)
+	AM_RANGE(0x200008, 0x200009) AM_WRITE(shangha3_blitter_go_w)
 	AM_RANGE(0x20000a, 0x20000b) AM_WRITENOP	/* irq ack? */
 	AM_RANGE(0x20000c, 0x20000d) AM_WRITE(heberpop_coinctrl_w)
 	AM_RANGE(0x20000e, 0x20000f) AM_WRITE(heberpop_sound_command_w)
 	AM_RANGE(0x300000, 0x30ffff) AM_RAM AM_BASE_SIZE(m_ram, m_ram_size)	/* gfx & work ram */
-	AM_RANGE(0x340000, 0x340001) AM_WRITE_LEGACY(shangha3_flipscreen_w)
-	AM_RANGE(0x360000, 0x360001) AM_WRITE_LEGACY(shangha3_gfxlist_addr_w)
+	AM_RANGE(0x340000, 0x340001) AM_WRITE(shangha3_flipscreen_w)
+	AM_RANGE(0x360000, 0x360001) AM_WRITE(shangha3_gfxlist_addr_w)
 	AM_RANGE(0x800000, 0xb7ffff) AM_READ(heberpop_gfxrom_r)
 ADDRESS_MAP_END
 
@@ -155,14 +155,14 @@ static ADDRESS_MAP_START( blocken_map, AS_PROGRAM, 16, shangha3_state )
 	AM_RANGE(0x100000, 0x100001) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x100002, 0x100003) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x100004, 0x100005) AM_READ_PORT("DSW")
-	AM_RANGE(0x100008, 0x100009) AM_WRITE_LEGACY(shangha3_blitter_go_w)
+	AM_RANGE(0x100008, 0x100009) AM_WRITE(shangha3_blitter_go_w)
 	AM_RANGE(0x10000a, 0x10000b) AM_WRITENOP	/* irq ack? */
 	AM_RANGE(0x10000c, 0x10000d) AM_WRITE(blocken_coinctrl_w)
 	AM_RANGE(0x10000e, 0x10000f) AM_WRITE(heberpop_sound_command_w)
 	AM_RANGE(0x200000, 0x200fff) AM_RAM_WRITE(paletteram16_RRRRRGGGGGBBBBBx_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x300000, 0x30ffff) AM_RAM AM_BASE_SIZE(m_ram, m_ram_size)	/* gfx & work ram */
-	AM_RANGE(0x340000, 0x340001) AM_WRITE_LEGACY(shangha3_flipscreen_w)
-	AM_RANGE(0x360000, 0x360001) AM_WRITE_LEGACY(shangha3_gfxlist_addr_w)
+	AM_RANGE(0x340000, 0x340001) AM_WRITE(shangha3_flipscreen_w)
+	AM_RANGE(0x360000, 0x360001) AM_WRITE(shangha3_gfxlist_addr_w)
 	AM_RANGE(0x800000, 0xb7ffff) AM_READ(heberpop_gfxrom_r)
 ADDRESS_MAP_END
 

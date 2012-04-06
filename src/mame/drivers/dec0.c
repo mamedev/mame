@@ -178,11 +178,11 @@ WRITE16_MEMBER(dec0_state::dec0_control_w)
 	switch (offset << 1)
 	{
 		case 0: /* Playfield & Sprite priority */
-			dec0_priority_w(&space, 0, data, mem_mask);
+			dec0_priority_w(space, 0, data, mem_mask);
 			break;
 
 		case 2: /* DMA flag */
-			dec0_update_sprites_w(&space, 0, 0, mem_mask);
+			dec0_update_sprites_w(space, 0, 0, mem_mask);
 			break;
 
 		case 4: /* 6502 sound cpu */
@@ -233,7 +233,7 @@ WRITE16_MEMBER(dec0_state::automat_control_w)
 			break;
 
 		case 12: /* DMA flag */
-			dec0_update_sprites_w(&space, 0, 0, mem_mask);
+			dec0_update_sprites_w(space, 0, 0, mem_mask);
 			break;
 #if 0
 		case 8: /* Interrupt ack (VBL - IRQ 6) */
@@ -265,7 +265,7 @@ WRITE16_MEMBER(dec0_state::slyspy_control_w)
 			}
 			break;
 		case 2:
-			dec0_priority_w(&space, 0, data, mem_mask);
+			dec0_priority_w(space, 0, data, mem_mask);
 			break;
     }
 }
@@ -302,11 +302,11 @@ static ADDRESS_MAP_START( dec0_map, AS_PROGRAM, 16, dec0_state )
 	AM_RANGE(0x24cc00, 0x24cfff) AM_DEVREADWRITE_LEGACY("tilegen3", deco_bac06_pf_rowscroll_r, deco_bac06_pf_rowscroll_w)
 	AM_RANGE(0x24d000, 0x24d7ff) AM_DEVREADWRITE_LEGACY("tilegen3", deco_bac06_pf_data_r, deco_bac06_pf_data_w)
 
-	AM_RANGE(0x300000, 0x30001f) AM_READ_LEGACY(dec0_rotary_r)
-	AM_RANGE(0x30c000, 0x30c00b) AM_READ_LEGACY(dec0_controls_r)
+	AM_RANGE(0x300000, 0x30001f) AM_READ(dec0_rotary_r)
+	AM_RANGE(0x30c000, 0x30c00b) AM_READ(dec0_controls_r)
 	AM_RANGE(0x30c010, 0x30c01f) AM_WRITE(dec0_control_w)									/* Priority, sound, etc. */
-	AM_RANGE(0x310000, 0x3107ff) AM_RAM_WRITE_LEGACY(dec0_paletteram_rg_w) AM_SHARE("paletteram")
-	AM_RANGE(0x314000, 0x3147ff) AM_RAM_WRITE_LEGACY(dec0_paletteram_b_w) AM_SHARE("paletteram2")
+	AM_RANGE(0x310000, 0x3107ff) AM_RAM_WRITE(dec0_paletteram_rg_w) AM_SHARE("paletteram")
+	AM_RANGE(0x314000, 0x3147ff) AM_RAM_WRITE(dec0_paletteram_b_w) AM_SHARE("paletteram2")
 	AM_RANGE(0xff8000, 0xffbfff) AM_RAM AM_BASE(m_ram)									/* Main ram */
 	AM_RANGE(0xffc000, 0xffc7ff) AM_RAM AM_BASE(m_spriteram)								/* Sprites */
 ADDRESS_MAP_END
@@ -320,11 +320,11 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hippodrm_sub_map, AS_PROGRAM, 8, dec0_state )
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM
-	AM_RANGE(0x180000, 0x1800ff) AM_READWRITE_LEGACY(hippodrm_shared_r, hippodrm_shared_w)
+	AM_RANGE(0x180000, 0x1800ff) AM_READWRITE(hippodrm_shared_r, hippodrm_shared_w)
 	AM_RANGE(0x1a0000, 0x1a0007) AM_DEVWRITE_LEGACY("tilegen3", deco_bac06_pf_control0_8bit_packed_w)
 	AM_RANGE(0x1a0010, 0x1a001f) AM_DEVWRITE_LEGACY("tilegen3", deco_bac06_pf_control1_8bit_swap_w)
 	AM_RANGE(0x1a1000, 0x1a17ff) AM_DEVREADWRITE_LEGACY("tilegen3", deco_bac06_pf_data_8bit_swap_r, deco_bac06_pf_data_8bit_swap_w)
-	AM_RANGE(0x1d0000, 0x1d00ff) AM_READWRITE_LEGACY(hippodrm_prot_r, hippodrm_prot_w)
+	AM_RANGE(0x1d0000, 0x1d00ff) AM_READWRITE(hippodrm_prot_r, hippodrm_prot_w)
 	AM_RANGE(0x1f0000, 0x1f1fff) AM_RAMBANK("bank8") /* Main ram */
 	AM_RANGE(0x1ff400, 0x1ff403) AM_WRITE_LEGACY(h6280_irq_status_w)
 	AM_RANGE(0x1ff402, 0x1ff403) AM_READ_PORT("VBLANK")
@@ -519,8 +519,8 @@ static ADDRESS_MAP_START( midres_map, AS_PROGRAM, 16, dec0_state )
 	AM_RANGE(0x100000, 0x103fff) AM_RAM AM_BASE(m_ram)
 	AM_RANGE(0x120000, 0x1207ff) AM_RAM AM_BASE(m_spriteram)
 	AM_RANGE(0x140000, 0x1407ff) AM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_SHARE("paletteram")
-	AM_RANGE(0x160000, 0x160001) AM_WRITE_LEGACY(dec0_priority_w)
-	AM_RANGE(0x180000, 0x18000f) AM_READ_LEGACY(midres_controls_r)
+	AM_RANGE(0x160000, 0x160001) AM_WRITE(dec0_priority_w)
+	AM_RANGE(0x180000, 0x18000f) AM_READ(midres_controls_r)
 	AM_RANGE(0x180008, 0x18000f) AM_WRITENOP /* ?? watchdog ?? */
 	AM_RANGE(0x1a0000, 0x1a0001) AM_WRITE(midres_sound_w)
 
@@ -633,12 +633,12 @@ static ADDRESS_MAP_START( automat_map, AS_PROGRAM, 16, dec0_state )
 	AM_RANGE(0x24cc00, 0x24cfff) AM_DEVREADWRITE_LEGACY("tilegen3", deco_bac06_pf_rowscroll_r, deco_bac06_pf_rowscroll_w)
 	AM_RANGE(0x24d000, 0x24d7ff) AM_DEVREADWRITE_LEGACY("tilegen3", deco_bac06_pf_data_r, deco_bac06_pf_data_w)
 
-	AM_RANGE(0x300000, 0x30001f) AM_READ_LEGACY(dec0_rotary_r)
-	AM_RANGE(0x30c000, 0x30c00b) AM_READ_LEGACY(dec0_controls_r)
+	AM_RANGE(0x300000, 0x30001f) AM_READ(dec0_rotary_r)
+	AM_RANGE(0x30c000, 0x30c00b) AM_READ(dec0_controls_r)
 	AM_RANGE(0x30c000, 0x30c01f) AM_WRITE(automat_control_w)			/* Priority, sound, etc. */
 	AM_RANGE(0x310000, 0x3107ff) AM_RAM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x314000, 0x3147ff) AM_RAM
-	AM_RANGE(0x400008, 0x400009) AM_WRITE_LEGACY(dec0_priority_w)				// NEW
+	AM_RANGE(0x400008, 0x400009) AM_WRITE(dec0_priority_w)				// NEW
 	AM_RANGE(0xff8000, 0xffbfff) AM_RAM AM_BASE(m_ram)				/* Main ram */
 	AM_RANGE(0xffc000, 0xffc7ff) AM_RAM AM_BASE(m_spriteram)			/* Sprites */
 ADDRESS_MAP_END
@@ -661,7 +661,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mcu_io_map, AS_IO, 8, dec0_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P3) AM_READWRITE_LEGACY(dec0_mcu_port_r, dec0_mcu_port_w)
+	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P3) AM_READWRITE(dec0_mcu_port_r, dec0_mcu_port_w)
 ADDRESS_MAP_END
 
 /******************************************************************************/
@@ -3060,8 +3060,8 @@ static DRIVER_INIT( convert_robocop_gfx4_to_automat )
 static DRIVER_INIT( midresb )
 {
 	dec0_state *state = machine.driver_data<dec0_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x00180000, 0x0018000f, FUNC(dec0_controls_r) );
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x001a0000, 0x001a000f, FUNC(dec0_rotary_r) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x00180000, 0x0018000f, read16_delegate(FUNC(dec0_state::dec0_controls_r),state));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x001a0000, 0x001a000f, read16_delegate(FUNC(dec0_state::dec0_rotary_r),state));
 
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x00180014, 0x00180015, write16_delegate(FUNC(dec0_state::midres_sound_w),state));
 }

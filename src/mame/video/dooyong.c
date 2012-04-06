@@ -46,95 +46,89 @@ INLINE void dooyong_scroll8_w(offs_t offset, UINT8 data, UINT8 *scroll, tilemap_
 /* These handle writes to the tilemap scroll registers in 8-bit machines.
    There is one per tilemap, wrapping the above function that does the work. */
 
-WRITE8_HANDLER( dooyong_bgscroll8_w )
+WRITE8_MEMBER(dooyong_state::dooyong_bgscroll8_w)
 {
-	dooyong_state *state = space->machine().driver_data<dooyong_state>();
-	dooyong_scroll8_w(offset, data, state->m_bgscroll8, state->m_bg_tilemap);
+	dooyong_scroll8_w(offset, data, m_bgscroll8, m_bg_tilemap);
 }
 
-static WRITE8_HANDLER( dooyong_bg2scroll8_w )
+WRITE8_MEMBER(dooyong_state::dooyong_bg2scroll8_w)
 {
-	dooyong_state *state = space->machine().driver_data<dooyong_state>();
-	dooyong_scroll8_w(offset, data, state->m_bg2scroll8, state->m_bg2_tilemap);
+	dooyong_scroll8_w(offset, data, m_bg2scroll8, m_bg2_tilemap);
 }
 
-WRITE8_HANDLER( dooyong_fgscroll8_w )
+WRITE8_MEMBER(dooyong_state::dooyong_fgscroll8_w)
 {
-	dooyong_state *state = space->machine().driver_data<dooyong_state>();
-	dooyong_scroll8_w(offset, data, state->m_fgscroll8, state->m_fg_tilemap);
+	dooyong_scroll8_w(offset, data, m_fgscroll8, m_fg_tilemap);
 }
 
-WRITE8_HANDLER( dooyong_fg2scroll8_w )
+WRITE8_MEMBER(dooyong_state::dooyong_fg2scroll8_w)
 {
-	dooyong_state *state = space->machine().driver_data<dooyong_state>();
-	dooyong_scroll8_w(offset, data, state->m_fg2scroll8, state->m_fg2_tilemap);
+	dooyong_scroll8_w(offset, data, m_fg2scroll8, m_fg2_tilemap);
 }
 
 
 /* These handle writes to the tilemap scroll registers in 16-bit machines.
    This is just an 8-bit peripheral in a 16-bit machine. */
 
-WRITE16_HANDLER( dooyong_bgscroll16_w )
+WRITE16_MEMBER(dooyong_state::dooyong_bgscroll16_w)
 {
 	if (ACCESSING_BITS_0_7) dooyong_bgscroll8_w(space, offset, data & 0x00ff);
 }
 
-WRITE16_HANDLER( dooyong_bg2scroll16_w )
+WRITE16_MEMBER(dooyong_state::dooyong_bg2scroll16_w)
 {
 	if (ACCESSING_BITS_0_7) dooyong_bg2scroll8_w(space, offset, data & 0x00ff);
 }
 
-WRITE16_HANDLER( dooyong_fgscroll16_w )
+WRITE16_MEMBER(dooyong_state::dooyong_fgscroll16_w)
 {
 	if (ACCESSING_BITS_0_7) dooyong_fgscroll8_w(space, offset, data & 0x00ff);
 }
 
-WRITE16_HANDLER( dooyong_fg2scroll16_w )
+WRITE16_MEMBER(dooyong_state::dooyong_fg2scroll16_w)
 {
 	if (ACCESSING_BITS_0_7) dooyong_fg2scroll8_w(space, offset, data & 0x00ff);
 }
 
 
-WRITE8_HANDLER( dooyong_txvideoram8_w )
+WRITE8_MEMBER(dooyong_state::dooyong_txvideoram8_w)
 {
-	dooyong_state *state = space->machine().driver_data<dooyong_state>();
-	if (state->m_txvideoram[offset] != data)
+	if (m_txvideoram[offset] != data)
 	{
-		state->m_txvideoram[offset] = data;
-		if (state->m_tx_tilemap_mode == 0)
-			state->m_tx_tilemap->mark_tile_dirty(offset & 0x07ff);
+		m_txvideoram[offset] = data;
+		if (m_tx_tilemap_mode == 0)
+			m_tx_tilemap->mark_tile_dirty(offset & 0x07ff);
 		else
-			state->m_tx_tilemap->mark_tile_dirty(offset >> 1);
+			m_tx_tilemap->mark_tile_dirty(offset >> 1);
 	}
 }
 
 
 /* Control registers seem to be different on every game */
 
-WRITE8_HANDLER( lastday_ctrl_w )
+WRITE8_MEMBER(dooyong_state::lastday_ctrl_w)
 {
-	dooyong_state *state = space->machine().driver_data<dooyong_state>();
 	/* bits 0 and 1 are coin counters */
-	coin_counter_w(space->machine(), 0, data & 0x01);
-	coin_counter_w(space->machine(), 1, data & 0x02);
+	coin_counter_w(machine(), 0, data & 0x01);
+	coin_counter_w(machine(), 1, data & 0x02);
 
 	/* bit 3 is used but unknown */
 
 	/* bit 4 disables sprites */
-	state->m_sprites_disabled = data & 0x10;
+	m_sprites_disabled = data & 0x10;
 
 	/* bit 6 is flip screen */
-	flip_screen_set(space->machine(), data & 0x40);
+	flip_screen_set(machine(), data & 0x40);
 }
 
-WRITE8_HANDLER( pollux_ctrl_w )
+WRITE8_MEMBER(dooyong_state::pollux_ctrl_w)
 {
 	/* bit 0 is flip screen */
-	flip_screen_set(space->machine(), data & 0x01);
+	flip_screen_set(machine(), data & 0x01);
 
 	/* bits 6 and 7 are coin counters */
-	coin_counter_w(space->machine(), 0, data & 0x80);
-	coin_counter_w(space->machine(), 1, data & 0x40);
+	coin_counter_w(machine(), 0, data & 0x80);
+	coin_counter_w(machine(), 1, data & 0x40);
 
 	/* bit 1 is used but unknown */
 
@@ -142,61 +136,57 @@ WRITE8_HANDLER( pollux_ctrl_w )
 	/* bit 4 is used but unknown */
 }
 
-WRITE8_HANDLER( primella_ctrl_w )
+WRITE8_MEMBER(dooyong_state::primella_ctrl_w)
 {
-	dooyong_state *state = space->machine().driver_data<dooyong_state>();
 	/* bits 0-2 select ROM bank */
-	memory_set_bank(space->machine(), "bank1", data & 0x07);
+	memory_set_bank(machine(), "bank1", data & 0x07);
 
 	/* bit 3 disables tx layer */
-	state->m_tx_pri = data & 0x08;
+	m_tx_pri = data & 0x08;
 
 	/* bit 4 flips screen */
-	flip_screen_set(space->machine(), data & 0x10);
+	flip_screen_set(machine(), data & 0x10);
 
 	/* bit 5 used but unknown */
 
-//  logerror("%04x: bankswitch = %02x\n",cpu_get_pc(&space->device()),data&0xe0);
+//  logerror("%04x: bankswitch = %02x\n",cpu_get_pc(&space.device()),data&0xe0);
 }
 
-WRITE8_HANDLER( paletteram_flytiger_w )
+WRITE8_MEMBER(dooyong_state::paletteram_flytiger_w)
 {
-	dooyong_state *state = space->machine().driver_data<dooyong_state>();
-	if (state->m_flytiger_palette_bank)
+	if (m_flytiger_palette_bank)
 	{
 		UINT16 value;
-		state->m_paletteram_flytiger[offset] = data;
-		value = state->m_paletteram_flytiger[offset & ~1] | (state->m_paletteram_flytiger[offset | 1] << 8);
-		palette_set_color_rgb(space->machine(), offset/2, pal5bit(value >> 10), pal5bit(value >> 5), pal5bit(value >> 0));
+		m_paletteram_flytiger[offset] = data;
+		value = m_paletteram_flytiger[offset & ~1] | (m_paletteram_flytiger[offset | 1] << 8);
+		palette_set_color_rgb(machine(), offset/2, pal5bit(value >> 10), pal5bit(value >> 5), pal5bit(value >> 0));
 	}
 }
 
-WRITE8_HANDLER( flytiger_ctrl_w )
+WRITE8_MEMBER(dooyong_state::flytiger_ctrl_w)
 {
-	dooyong_state *state = space->machine().driver_data<dooyong_state>();
 	/* bit 0 is flip screen */
-	flip_screen_set(space->machine(), data & 0x01);
+	flip_screen_set(machine(), data & 0x01);
 
 	/* bits 1, 2 used but unknown */
 
 	/* bit 3 fg palette banking: trash protection? */
-	state->m_flytiger_palette_bank = data & 0x08;
+	m_flytiger_palette_bank = data & 0x08;
 
 	/* bit 4 changes tilemaps priority */
-	state->m_flytiger_pri = data & 0x10;
+	m_flytiger_pri = data & 0x10;
 }
 
-WRITE16_HANDLER( rshark_ctrl_w )
+WRITE16_MEMBER(dooyong_state::rshark_ctrl_w)
 
 {
-	dooyong_state *state = space->machine().driver_data<dooyong_state>();
 	if (ACCESSING_BITS_0_7)
 	{
 		/* bit 0 flips screen */
-		flip_screen_set(space->machine(), data & 0x0001);
+		flip_screen_set(machine(), data & 0x0001);
 
 		/* bit 4 changes tilemaps priority */
-		state->m_rshark_pri = data & 0x0010;
+		m_rshark_pri = data & 0x0010;
 
 		/* bit 5 used but unknown */
 	}

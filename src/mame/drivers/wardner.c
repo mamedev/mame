@@ -173,7 +173,7 @@ static WRITE8_HANDLER( wardner_ramrom_bank_sw )
 		}
 		else
 		{
-			mainspace->install_legacy_read_handler(0x8000, 0x8fff, FUNC(wardner_sprite_r));
+			mainspace->install_read_handler(0x8000, 0x8fff, read8_delegate(FUNC(wardner_state::wardner_sprite_r),state));
 			mainspace->install_read_bank(0xa000, 0xadff, "bank4");
 			mainspace->install_read_bank(0xae00, 0xafff, "bank2");
 			mainspace->install_read_bank(0xc000, 0xc7ff, "bank3");
@@ -203,7 +203,7 @@ static ADDRESS_MAP_START( main_program_map, AS_PROGRAM, 8, wardner_state )
 
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1") /* Overlapped RAM/Banked ROM - See below */
 
-	AM_RANGE(0x8000, 0x8fff) AM_WRITE_LEGACY(wardner_sprite_w) AM_SHARE("spriteram")
+	AM_RANGE(0x8000, 0x8fff) AM_WRITE(wardner_sprite_w) AM_SHARE("spriteram")
 	AM_RANGE(0x9000, 0x9fff) AM_ROM
 	AM_RANGE(0xa000, 0xadff) AM_WRITE(paletteram_xBBBBBGGGGGRRRRR_le_w) AM_SHARE("paletteram")
 	AM_RANGE(0xae00, 0xafff) AM_RAM AM_BASE(m_rambase_ae00)
@@ -216,21 +216,21 @@ static ADDRESS_MAP_START( main_io_map, AS_IO, 8, wardner_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0x02, 0x02) AM_DEVWRITE("crtc", mc6845_device, register_w)
-	AM_RANGE(0x10, 0x13) AM_WRITE_LEGACY(wardner_txscroll_w)		/* scroll text layer */
-	AM_RANGE(0x14, 0x15) AM_WRITE_LEGACY(wardner_txlayer_w)		/* offset in text video RAM */
-	AM_RANGE(0x20, 0x23) AM_WRITE_LEGACY(wardner_bgscroll_w)		/* scroll bg layer */
-	AM_RANGE(0x24, 0x25) AM_WRITE_LEGACY(wardner_bglayer_w)		/* offset in bg video RAM */
-	AM_RANGE(0x30, 0x33) AM_WRITE_LEGACY(wardner_fgscroll_w)		/* scroll fg layer */
-	AM_RANGE(0x34, 0x35) AM_WRITE_LEGACY(wardner_fglayer_w)		/* offset in fg video RAM */
-	AM_RANGE(0x40, 0x43) AM_WRITE_LEGACY(wardner_exscroll_w)		/* scroll extra layer (not used) */
+	AM_RANGE(0x10, 0x13) AM_WRITE(wardner_txscroll_w)		/* scroll text layer */
+	AM_RANGE(0x14, 0x15) AM_WRITE(wardner_txlayer_w)		/* offset in text video RAM */
+	AM_RANGE(0x20, 0x23) AM_WRITE(wardner_bgscroll_w)		/* scroll bg layer */
+	AM_RANGE(0x24, 0x25) AM_WRITE(wardner_bglayer_w)		/* offset in bg video RAM */
+	AM_RANGE(0x30, 0x33) AM_WRITE(wardner_fgscroll_w)		/* scroll fg layer */
+	AM_RANGE(0x34, 0x35) AM_WRITE(wardner_fglayer_w)		/* offset in fg video RAM */
+	AM_RANGE(0x40, 0x43) AM_WRITE(wardner_exscroll_w)		/* scroll extra layer (not used) */
 	AM_RANGE(0x50, 0x50) AM_READ_PORT("DSWA")
 	AM_RANGE(0x52, 0x52) AM_READ_PORT("DSWB")
 	AM_RANGE(0x54, 0x54) AM_READ_PORT("P1")
 	AM_RANGE(0x56, 0x56) AM_READ_PORT("P2")
 	AM_RANGE(0x58, 0x58) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x5a, 0x5a) AM_WRITE_LEGACY(wardner_coin_dsp_w)		/* Machine system control */
-	AM_RANGE(0x5c, 0x5c) AM_WRITE_LEGACY(wardner_control_w)		/* Machine system control */
-	AM_RANGE(0x60, 0x65) AM_READWRITE_LEGACY(wardner_videoram_r, wardner_videoram_w)		/* data from video layer RAM */
+	AM_RANGE(0x5a, 0x5a) AM_WRITE(wardner_coin_dsp_w)		/* Machine system control */
+	AM_RANGE(0x5c, 0x5c) AM_WRITE(wardner_control_w)		/* Machine system control */
+	AM_RANGE(0x60, 0x65) AM_READWRITE(wardner_videoram_r, wardner_videoram_w)		/* data from video layer RAM */
 	AM_RANGE(0x70, 0x70) AM_WRITE_LEGACY(wardner_ramrom_bank_sw)	/* ROM bank select */
 ADDRESS_MAP_END
 
@@ -260,10 +260,10 @@ ADDRESS_MAP_END
 	/* $000 - 08F  TMS32010 Internal Data RAM in Data Address Space */
 
 static ADDRESS_MAP_START( DSP_io_map, AS_IO, 16, wardner_state )
-	AM_RANGE(0, 0) AM_WRITE_LEGACY(wardner_dsp_addrsel_w)
-	AM_RANGE(1, 1) AM_READWRITE_LEGACY(wardner_dsp_r, wardner_dsp_w)
-	AM_RANGE(3, 3) AM_WRITE_LEGACY(twincobr_dsp_bio_w)
-	AM_RANGE(TMS32010_BIO, TMS32010_BIO) AM_READ_LEGACY(twincobr_BIO_r)
+	AM_RANGE(0, 0) AM_WRITE(wardner_dsp_addrsel_w)
+	AM_RANGE(1, 1) AM_READWRITE(wardner_dsp_r, wardner_dsp_w)
+	AM_RANGE(3, 3) AM_WRITE(twincobr_dsp_bio_w)
+	AM_RANGE(TMS32010_BIO, TMS32010_BIO) AM_READ(twincobr_BIO_r)
 ADDRESS_MAP_END
 
 

@@ -412,73 +412,66 @@ SCREEN_UPDATE_IND16( model3 )
 
 
 
-READ64_HANDLER(model3_char_r)
+READ64_MEMBER(model3_state::model3_char_r)
 {
-	model3_state *state = space->machine().driver_data<model3_state>();
-	return state->m_m3_char_ram[offset];
+	return m_m3_char_ram[offset];
 }
 
-WRITE64_HANDLER(model3_char_w)
+WRITE64_MEMBER(model3_state::model3_char_w)
 {
-	model3_state *state = space->machine().driver_data<model3_state>();
-	COMBINE_DATA(&state->m_m3_char_ram[offset]);
+	COMBINE_DATA(&m_m3_char_ram[offset]);
 }
 
-READ64_HANDLER(model3_tile_r)
+READ64_MEMBER(model3_state::model3_tile_r)
 {
-	model3_state *state = space->machine().driver_data<model3_state>();
-	return state->m_m3_tile_ram[offset];
+	return m_m3_tile_ram[offset];
 }
 
-WRITE64_HANDLER(model3_tile_w)
+WRITE64_MEMBER(model3_state::model3_tile_w)
 {
-	model3_state *state = space->machine().driver_data<model3_state>();
-	COMBINE_DATA(&state->m_m3_tile_ram[offset]);
+	COMBINE_DATA(&m_m3_tile_ram[offset]);
 }
 
-READ64_HANDLER(model3_vid_reg_r)
+READ64_MEMBER(model3_state::model3_vid_reg_r)
 {
-	model3_state *state = space->machine().driver_data<model3_state>();
 	switch(offset)
 	{
-		case 0x00/8:	return state->m_vid_reg0;
+		case 0x00/8:	return m_vid_reg0;
 		case 0x08/8:	return U64(0xffffffffffffffff);		/* ??? */
-		case 0x20/8:	return (UINT64)state->m_layer_enable << 52;
-		case 0x40/8:	return ((UINT64)state->m_layer_modulate1 << 32) | (UINT64)state->m_layer_modulate2;
+		case 0x20/8:	return (UINT64)m_layer_enable << 52;
+		case 0x40/8:	return ((UINT64)m_layer_modulate1 << 32) | (UINT64)m_layer_modulate2;
 		default:		logerror("read reg %02X\n", offset);break;
 	}
 	return 0;
 }
 
-WRITE64_HANDLER(model3_vid_reg_w)
+WRITE64_MEMBER(model3_state::model3_vid_reg_w)
 {
-	model3_state *state = space->machine().driver_data<model3_state>();
 	switch(offset)
 	{
-		case 0x00/8:	logerror("vid_reg0: %08X%08X\n", (UINT32)(data>>32),(UINT32)(data)); state->m_vid_reg0 = data; break;
+		case 0x00/8:	logerror("vid_reg0: %08X%08X\n", (UINT32)(data>>32),(UINT32)(data)); m_vid_reg0 = data; break;
 		case 0x08/8:	break;		/* ??? */
-		case 0x10/8:	model3_set_irq_line(space->machine(), (data >> 56) & 0x0f, CLEAR_LINE); break;		/* VBL IRQ Ack */
+		case 0x10/8:	model3_set_irq_line(machine(), (data >> 56) & 0x0f, CLEAR_LINE); break;		/* VBL IRQ Ack */
 
-		case 0x20/8:	state->m_layer_enable = (data >> 52);	break;
+		case 0x20/8:	m_layer_enable = (data >> 52);	break;
 
-		case 0x40/8:	state->m_layer_modulate1 = (UINT32)(data >> 32);
-						state->m_layer_modulate2 = (UINT32)(data);
+		case 0x40/8:	m_layer_modulate1 = (UINT32)(data >> 32);
+						m_layer_modulate2 = (UINT32)(data);
 						break;
-		case 0x60/8:	COMBINE_DATA(&state->m_layer_scroll[0]); break;
-		case 0x68/8:	COMBINE_DATA(&state->m_layer_scroll[1]); break;
+		case 0x60/8:	COMBINE_DATA(&m_layer_scroll[0]); break;
+		case 0x68/8:	COMBINE_DATA(&m_layer_scroll[1]); break;
 		default:		logerror("model3_vid_reg_w: %02X, %08X%08X\n", offset, (UINT32)(data >> 32), (UINT32)(data)); break;
 	}
 }
 
-WRITE64_HANDLER( model3_palette_w )
+WRITE64_MEMBER(model3_state::model3_palette_w)
 {
-	model3_state *state = space->machine().driver_data<model3_state>();
 	int r1,g1,b1,r2,g2,b2;
 	UINT32 data1,data2;
 
-	COMBINE_DATA(&state->m_paletteram64[offset]);
-	data1 = BYTE_REVERSE32((UINT32)(state->m_paletteram64[offset] >> 32));
-	data2 = BYTE_REVERSE32((UINT32)(state->m_paletteram64[offset] >> 0));
+	COMBINE_DATA(&m_paletteram64[offset]);
+	data1 = BYTE_REVERSE32((UINT32)(m_paletteram64[offset] >> 32));
+	data2 = BYTE_REVERSE32((UINT32)(m_paletteram64[offset] >> 0));
 
 	r1 = ((data1 >> 0) & 0x1f);
 	g1 = ((data1 >> 5) & 0x1f);
@@ -487,14 +480,13 @@ WRITE64_HANDLER( model3_palette_w )
 	g2 = ((data2 >> 5) & 0x1f);
 	b2 = ((data2 >> 10) & 0x1f);
 
-	state->m_pal_lookup[(offset*2)+0] = (data1 & 0x8000) | (r1 << 10) | (g1 << 5) | b1;
-	state->m_pal_lookup[(offset*2)+1] = (data2 & 0x8000) | (r2 << 10) | (g2 << 5) | b2;
+	m_pal_lookup[(offset*2)+0] = (data1 & 0x8000) | (r1 << 10) | (g1 << 5) | b1;
+	m_pal_lookup[(offset*2)+1] = (data2 & 0x8000) | (r2 << 10) | (g2 << 5) | b2;
 }
 
-READ64_HANDLER( model3_palette_r )
+READ64_MEMBER(model3_state::model3_palette_r)
 {
-	model3_state *state = space->machine().driver_data<model3_state>();
-	return state->m_paletteram64[offset];
+	return m_paletteram64[offset];
 }
 
 
@@ -641,25 +633,23 @@ static cached_texture *get_texture(running_machine &machine, int page, int texx,
 /*****************************************************************************/
 /* Real3D Graphics stuff */
 
-WRITE64_HANDLER( real3d_display_list_w )
+WRITE64_MEMBER(model3_state::real3d_display_list_w)
 {
-	model3_state *state = space->machine().driver_data<model3_state>();
 	if(ACCESSING_BITS_32_63) {
-		state->m_display_list_ram[offset*2] = BYTE_REVERSE32((UINT32)(data >> 32));
+		m_display_list_ram[offset*2] = BYTE_REVERSE32((UINT32)(data >> 32));
 	}
 	if(ACCESSING_BITS_0_31) {
-		state->m_display_list_ram[(offset*2)+1] = BYTE_REVERSE32((UINT32)(data));
+		m_display_list_ram[(offset*2)+1] = BYTE_REVERSE32((UINT32)(data));
 	}
 }
 
-WRITE64_HANDLER( real3d_polygon_ram_w )
+WRITE64_MEMBER(model3_state::real3d_polygon_ram_w)
 {
-	model3_state *state = space->machine().driver_data<model3_state>();
 	if(ACCESSING_BITS_32_63) {
-		state->m_polygon_ram[offset*2] = BYTE_REVERSE32((UINT32)(data >> 32));
+		m_polygon_ram[offset*2] = BYTE_REVERSE32((UINT32)(data >> 32));
 	}
 	if(ACCESSING_BITS_0_31) {
-		state->m_polygon_ram[(offset*2)+1] = BYTE_REVERSE32((UINT32)(data));
+		m_polygon_ram[(offset*2)+1] = BYTE_REVERSE32((UINT32)(data));
 	}
 }
 
@@ -870,9 +860,9 @@ void real3d_polygon_ram_dma(address_space *space, UINT32 src, UINT32 dst, int le
 	}
 }
 
-WRITE64_HANDLER( real3d_cmd_w )
+WRITE64_MEMBER(model3_state::real3d_cmd_w)
 {
-	real3d_display_list_end(space->machine());
+	real3d_display_list_end(machine());
 }
 
 

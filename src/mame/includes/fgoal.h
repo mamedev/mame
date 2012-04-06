@@ -37,6 +37,9 @@ public:
 	DECLARE_READ8_MEMBER(fgoal_shifter_reverse_r);
 	DECLARE_WRITE8_MEMBER(fgoal_sound1_w);
 	DECLARE_WRITE8_MEMBER(fgoal_sound2_w);
+	DECLARE_WRITE8_MEMBER(fgoal_color_w);
+	DECLARE_WRITE8_MEMBER(fgoal_ypos_w);
+	DECLARE_WRITE8_MEMBER(fgoal_xpos_w);
 };
 
 
@@ -45,7 +48,4 @@ public:
 VIDEO_START( fgoal );
 SCREEN_UPDATE_IND16( fgoal );
 
-WRITE8_HANDLER( fgoal_color_w );
-WRITE8_HANDLER( fgoal_xpos_w );
-WRITE8_HANDLER( fgoal_ypos_w );
 

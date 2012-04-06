@@ -67,29 +67,28 @@ static TILE_GET_INFO( get_tile_info_glass_screen1 )
     B2B1B0 selects the picture (there are 8 pictures in each half of the ROM)
 */
 
-WRITE16_HANDLER( glass_blitter_w )
+WRITE16_MEMBER(glass_state::glass_blitter_w)
 {
-	glass_state *state = space->machine().driver_data<glass_state>();
-	state->m_blitter_serial_buffer[state->m_current_bit] = data & 0x01;
-	state->m_current_bit++;
+	m_blitter_serial_buffer[m_current_bit] = data & 0x01;
+	m_current_bit++;
 
-	if (state->m_current_bit == 5)
+	if (m_current_bit == 5)
 	{
-		state->m_current_command = (state->m_blitter_serial_buffer[0] << 4) |
-							(state->m_blitter_serial_buffer[1] << 3) |
-							(state->m_blitter_serial_buffer[2] << 2) |
-							(state->m_blitter_serial_buffer[3] << 1) |
-							(state->m_blitter_serial_buffer[4] << 0);
-		state->m_current_bit = 0;
+		m_current_command = (m_blitter_serial_buffer[0] << 4) |
+							(m_blitter_serial_buffer[1] << 3) |
+							(m_blitter_serial_buffer[2] << 2) |
+							(m_blitter_serial_buffer[3] << 1) |
+							(m_blitter_serial_buffer[4] << 0);
+		m_current_bit = 0;
 
 		/* fill the screen bitmap with the current picture */
 		{
 			int i, j;
-			UINT8 *gfx = (UINT8 *)space->machine().region("gfx3")->base();
+			UINT8 *gfx = (UINT8 *)machine().region("gfx3")->base();
 
-			gfx = gfx + (state->m_current_command & 0x07) * 0x10000 + (state->m_current_command & 0x08) * 0x10000 + 0x140;
+			gfx = gfx + (m_current_command & 0x07) * 0x10000 + (m_current_command & 0x08) * 0x10000 + 0x140;
 
-			if ((state->m_current_command & 0x18) != 0)
+			if ((m_current_command & 0x18) != 0)
 			{
 				for (j = 0; j < 200; j++)
 				{
@@ -97,12 +96,12 @@ WRITE16_HANDLER( glass_blitter_w )
 					{
 						int color = *gfx;
 						gfx++;
-						state->m_screen_bitmap->pix16(j, i) = color & 0xff;
+						m_screen_bitmap->pix16(j, i) = color & 0xff;
 					}
 				}
 			}
 			else
-				state->m_screen_bitmap->fill(0);
+				m_screen_bitmap->fill(0);
 		}
 	}
 }
@@ -113,11 +112,10 @@ WRITE16_HANDLER( glass_blitter_w )
 
 ***************************************************************************/
 
-WRITE16_HANDLER( glass_vram_w )
+WRITE16_MEMBER(glass_state::glass_vram_w)
 {
-	glass_state *state = space->machine().driver_data<glass_state>();
-	COMBINE_DATA(&state->m_videoram[offset]);
-	state->m_pant[offset >> 11]->mark_tile_dirty(((offset << 1) & 0x0fff) >> 2);
+	COMBINE_DATA(&m_videoram[offset]);
+	m_pant[offset >> 11]->mark_tile_dirty(((offset << 1) & 0x0fff) >> 2);
 }
 
 

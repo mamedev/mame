@@ -9,12 +9,12 @@ public:
 	UINT16 *m_spriteram;
 	DECLARE_WRITE16_MEMBER(xorworld_irq2_ack_w);
 	DECLARE_WRITE16_MEMBER(xorworld_irq6_ack_w);
+	DECLARE_WRITE16_MEMBER(xorworld_videoram16_w);
 };
 
 
 /*----------- defined in video/xorworld.c -----------*/
 
-WRITE16_HANDLER( xorworld_videoram16_w );
 
 PALETTE_INIT( xorworld );
 VIDEO_START( xorworld );

@@ -32,17 +32,17 @@ public:
 	DECLARE_READ8_MEMBER(exprraid_protection_r);
 	DECLARE_WRITE8_MEMBER(sound_cpu_command_w);
 	DECLARE_READ8_MEMBER(vblank_r);
+	DECLARE_WRITE8_MEMBER(exprraid_videoram_w);
+	DECLARE_WRITE8_MEMBER(exprraid_colorram_w);
+	DECLARE_WRITE8_MEMBER(exprraid_flipscreen_w);
+	DECLARE_WRITE8_MEMBER(exprraid_bgselect_w);
+	DECLARE_WRITE8_MEMBER(exprraid_scrollx_w);
+	DECLARE_WRITE8_MEMBER(exprraid_scrolly_w);
 };
 
 
 /*----------- defined in video/exprraid.c -----------*/
 
-extern WRITE8_HANDLER( exprraid_videoram_w );
-extern WRITE8_HANDLER( exprraid_colorram_w );
-extern WRITE8_HANDLER( exprraid_flipscreen_w );
-extern WRITE8_HANDLER( exprraid_bgselect_w );
-extern WRITE8_HANDLER( exprraid_scrollx_w );
-extern WRITE8_HANDLER( exprraid_scrolly_w );
 
 extern VIDEO_START( exprraid );
 extern SCREEN_UPDATE_IND16( exprraid );

@@ -68,6 +68,8 @@ public:
 	DECLARE_WRITE8_MEMBER(psikyo_clear_nmi_w);
 	DECLARE_WRITE8_MEMBER(sngkace_sound_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(gunbird_sound_bankswitch_w);
+	DECLARE_WRITE32_MEMBER(psikyo_vram_0_w);
+	DECLARE_WRITE32_MEMBER(psikyo_vram_1_w);
 };
 
 
@@ -75,8 +77,6 @@ public:
 
 void psikyo_switch_banks(running_machine &machine, int tmap, int bank);
 
-WRITE32_HANDLER( psikyo_vram_0_w );
-WRITE32_HANDLER( psikyo_vram_1_w );
 
 VIDEO_START( sngkace );
 VIDEO_START( psikyo );

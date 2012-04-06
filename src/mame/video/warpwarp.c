@@ -193,18 +193,16 @@ VIDEO_START( warpwarp )
 
 ***************************************************************************/
 
-WRITE8_HANDLER( geebee_videoram_w )
+WRITE8_MEMBER(warpwarp_state::geebee_videoram_w)
 {
-	warpwarp_state *state = space->machine().driver_data<warpwarp_state>();
-	state->m_geebee_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
+	m_geebee_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_HANDLER( warpwarp_videoram_w )
+WRITE8_MEMBER(warpwarp_state::warpwarp_videoram_w)
 {
-	warpwarp_state *state = space->machine().driver_data<warpwarp_state>();
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
 

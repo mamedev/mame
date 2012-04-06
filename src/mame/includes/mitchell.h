@@ -55,30 +55,30 @@ public:
 	DECLARE_WRITE8_MEMBER(input_w);
 	DECLARE_WRITE8_MEMBER(spangbl_msm5205_data_w);
 	DECLARE_WRITE8_MEMBER(mstworld_sound_w);
+	DECLARE_WRITE8_MEMBER(pang_video_bank_w);
+	DECLARE_WRITE8_MEMBER(mstworld_video_bank_w);
+	DECLARE_WRITE8_MEMBER(mgakuen_videoram_w);
+	DECLARE_READ8_MEMBER(mgakuen_videoram_r);
+	DECLARE_WRITE8_MEMBER(mgakuen_objram_w);
+	DECLARE_READ8_MEMBER(mgakuen_objram_r);
+	DECLARE_WRITE8_MEMBER(pang_videoram_w);
+	DECLARE_READ8_MEMBER(pang_videoram_r);
+	DECLARE_WRITE8_MEMBER(pang_colorram_w);
+	DECLARE_READ8_MEMBER(pang_colorram_r);
+	DECLARE_WRITE8_MEMBER(pang_gfxctrl_w);
+	DECLARE_WRITE8_MEMBER(pangbl_gfxctrl_w);
+	DECLARE_WRITE8_MEMBER(mstworld_gfxctrl_w);
+	DECLARE_WRITE8_MEMBER(pang_paletteram_w);
+	DECLARE_READ8_MEMBER(pang_paletteram_r);
+	DECLARE_WRITE8_MEMBER(mgakuen_paletteram_w);
+	DECLARE_READ8_MEMBER(mgakuen_paletteram_r);
 };
 
 
 /*----------- defined in video/mitchell.c -----------*/
 
-WRITE8_HANDLER( mgakuen_paletteram_w );
-READ8_HANDLER( mgakuen_paletteram_r );
-WRITE8_HANDLER( mgakuen_videoram_w );
-READ8_HANDLER( mgakuen_videoram_r );
-WRITE8_HANDLER( mgakuen_objram_w );
-READ8_HANDLER( mgakuen_objram_r );
 
-WRITE8_HANDLER( pang_video_bank_w );
-WRITE8_HANDLER( pang_videoram_w );
-READ8_HANDLER( pang_videoram_r );
-WRITE8_HANDLER( pang_colorram_w );
-READ8_HANDLER( pang_colorram_r );
-WRITE8_HANDLER( pang_gfxctrl_w );
-WRITE8_HANDLER( pangbl_gfxctrl_w );
-WRITE8_HANDLER( pang_paletteram_w );
-READ8_HANDLER( pang_paletteram_r );
 
-WRITE8_HANDLER( mstworld_gfxctrl_w );
-WRITE8_HANDLER( mstworld_video_bank_w );
 
 VIDEO_START( pang );
 SCREEN_UPDATE_IND16( pang );

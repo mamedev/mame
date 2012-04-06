@@ -62,11 +62,10 @@ static TILE_GET_INFO( get_tile_info_gaelco_screen1 )
 
 ***************************************************************************/
 
-WRITE16_HANDLER( gaelco_vram_w )
+WRITE16_MEMBER(gaelco_state::gaelco_vram_w)
 {
-	gaelco_state *state = space->machine().driver_data<gaelco_state>();
-	COMBINE_DATA(&state->m_videoram[offset]);
-	state->m_tilemap[offset >> 11]->mark_tile_dirty(((offset << 1) & 0x0fff) >> 2);
+	COMBINE_DATA(&m_videoram[offset]);
+	m_tilemap[offset >> 11]->mark_tile_dirty(((offset << 1) & 0x0fff) >> 2);
 }
 
 /***************************************************************************

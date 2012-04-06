@@ -126,9 +126,9 @@ WRITE8_MEMBER(victory_state::lamp_control_w)
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, victory_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc0ff) AM_READ_LEGACY(victory_video_control_r)
-	AM_RANGE(0xc100, 0xc1ff) AM_WRITE_LEGACY(victory_video_control_w)
-	AM_RANGE(0xc200, 0xc3ff) AM_WRITE_LEGACY(victory_paletteram_w)
+	AM_RANGE(0xc000, 0xc0ff) AM_READ(victory_video_control_r)
+	AM_RANGE(0xc100, 0xc1ff) AM_WRITE(victory_video_control_w)
+	AM_RANGE(0xc200, 0xc3ff) AM_WRITE(victory_paletteram_w)
 	AM_RANGE(0xc400, 0xc7ff) AM_RAM AM_BASE(m_videoram)
 	AM_RANGE(0xc800, 0xdfff) AM_RAM AM_BASE(m_charram)
 	AM_RANGE(0xe000, 0xefff) AM_RAM

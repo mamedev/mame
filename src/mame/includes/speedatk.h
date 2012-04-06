@@ -18,14 +18,14 @@ public:
 	DECLARE_WRITE8_MEMBER(key_matrix_w);
 	DECLARE_READ8_MEMBER(key_matrix_status_r);
 	DECLARE_WRITE8_MEMBER(key_matrix_status_w);
+	DECLARE_WRITE8_MEMBER(speedatk_videoram_w);
+	DECLARE_WRITE8_MEMBER(speedatk_colorram_w);
+	DECLARE_WRITE8_MEMBER(speedatk_6845_w);
 };
 
 
 /*----------- defined in video/speedatk.c -----------*/
 
-WRITE8_HANDLER( speedatk_videoram_w );
-WRITE8_HANDLER( speedatk_colorram_w );
-WRITE8_HANDLER( speedatk_6845_w );
 PALETTE_INIT( speedatk );
 VIDEO_START( speedatk );
 SCREEN_UPDATE_IND16( speedatk );

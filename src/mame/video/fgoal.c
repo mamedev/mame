@@ -8,24 +8,21 @@
 #include "includes/fgoal.h"
 
 
-WRITE8_HANDLER( fgoal_color_w )
+WRITE8_MEMBER(fgoal_state::fgoal_color_w)
 {
-	fgoal_state *state = space->machine().driver_data<fgoal_state>();
-	state->m_current_color = data & 3;
+	m_current_color = data & 3;
 }
 
 
-WRITE8_HANDLER( fgoal_ypos_w )
+WRITE8_MEMBER(fgoal_state::fgoal_ypos_w)
 {
-	fgoal_state *state = space->machine().driver_data<fgoal_state>();
-	state->m_ypos = data;
+	m_ypos = data;
 }
 
 
-WRITE8_HANDLER( fgoal_xpos_w )
+WRITE8_MEMBER(fgoal_state::fgoal_xpos_w)
 {
-	fgoal_state *state = space->machine().driver_data<fgoal_state>();
-	state->m_xpos = data;
+	m_xpos = data;
 }
 
 

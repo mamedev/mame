@@ -14,11 +14,11 @@ public:
 	required_device<cpu_device> m_maincpu;
 	DECLARE_WRITE16_MEMBER(OKIM6295_bankswitch_w);
 	DECLARE_WRITE16_MEMBER(targeth_coin_counter_w);
+	DECLARE_WRITE16_MEMBER(targeth_vram_w);
 };
 
 
 /*----------- defined in video/targeth.c -----------*/
 
-WRITE16_HANDLER( targeth_vram_w );
 VIDEO_START( targeth );
 SCREEN_UPDATE_IND16( targeth );

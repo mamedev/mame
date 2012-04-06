@@ -21,12 +21,11 @@
 #include "includes/gatron.h"
 
 
-WRITE8_HANDLER( gat_videoram_w )
+WRITE8_MEMBER(gatron_state::gat_videoram_w)
 {
-	gatron_state *state = space->machine().driver_data<gatron_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = m_videoram;
 	videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )

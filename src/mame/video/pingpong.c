@@ -82,18 +82,16 @@ PALETTE_INIT( pingpong )
 	}
 }
 
-WRITE8_HANDLER( pingpong_videoram_w )
+WRITE8_MEMBER(pingpong_state::pingpong_videoram_w)
 {
-	pingpong_state *state = space->machine().driver_data<pingpong_state>();
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( pingpong_colorram_w )
+WRITE8_MEMBER(pingpong_state::pingpong_colorram_w)
 {
-	pingpong_state *state = space->machine().driver_data<pingpong_state>();
-	state->m_colorram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_colorram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )

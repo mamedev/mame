@@ -3,41 +3,39 @@
 #include "video/taitoic.h"
 #include "includes/taito_b.h"
 
-WRITE16_HANDLER( hitice_pixelram_w )
+WRITE16_MEMBER(taitob_state::hitice_pixelram_w)
 {
-	taitob_state *state = space->machine().driver_data<taitob_state>();
 	int sy = offset >> 9;
 	int sx = offset & 0x1ff;
 
-	COMBINE_DATA(&state->m_pixelram[offset]);
+	COMBINE_DATA(&m_pixelram[offset]);
 
 	if (ACCESSING_BITS_0_7)
 	{
 		/* bit 15 of pixel_scroll[0] is probably flip screen */
-		state->m_pixel_bitmap->pix16(sy, 2 * sx + 0) = state->m_b_fg_color_base * 16 + (data & 0xff);
-		state->m_pixel_bitmap->pix16(sy, 2 * sx + 1) = state->m_b_fg_color_base * 16 + (data & 0xff);
+		m_pixel_bitmap->pix16(sy, 2 * sx + 0) = m_b_fg_color_base * 16 + (data & 0xff);
+		m_pixel_bitmap->pix16(sy, 2 * sx + 1) = m_b_fg_color_base * 16 + (data & 0xff);
 	}
 }
 
-WRITE16_HANDLER( hitice_pixel_scroll_w )
+WRITE16_MEMBER(taitob_state::hitice_pixel_scroll_w)
 {
-	taitob_state *state = space->machine().driver_data<taitob_state>();
-	COMBINE_DATA(&state->m_pixel_scroll[offset]);
+	COMBINE_DATA(&m_pixel_scroll[offset]);
 }
 
 static void hitice_clear_pixel_bitmap( running_machine &machine )
 {
 	int i;
+	taitob_state *state = machine.driver_data<taitob_state>();
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	for (i = 0; i < 0x40000; i++)
-		hitice_pixelram_w(space, i, 0, 0xffff);
+		state->hitice_pixelram_w(*space, i, 0, 0xffff);
 }
 
-WRITE16_HANDLER( realpunc_video_ctrl_w )
+WRITE16_MEMBER(taitob_state::realpunc_video_ctrl_w)
 {
-	taitob_state *state = space->machine().driver_data<taitob_state>();
-	COMBINE_DATA(&state->m_realpunc_video_ctrl);
+	COMBINE_DATA(&m_realpunc_video_ctrl);
 }
 
 static VIDEO_START( taitob_core )
@@ -118,25 +116,23 @@ VIDEO_START( realpunc )
 }
 
 
-READ16_HANDLER( tc0180vcu_framebuffer_word_r )
+READ16_MEMBER(taitob_state::tc0180vcu_framebuffer_word_r)
 {
-	taitob_state *state = space->machine().driver_data<taitob_state>();
 	int sy = offset >> 8;
 	int sx = 2 * (offset & 0xff);
 
-	return (state->m_framebuffer[sy >> 8]->pix16(sy & 0xff, sx + 0) << 8) | state->m_framebuffer[sy >> 8]->pix16(sy & 0xff, sx + 1);
+	return (m_framebuffer[sy >> 8]->pix16(sy & 0xff, sx + 0) << 8) | m_framebuffer[sy >> 8]->pix16(sy & 0xff, sx + 1);
 }
 
-WRITE16_HANDLER( tc0180vcu_framebuffer_word_w )
+WRITE16_MEMBER(taitob_state::tc0180vcu_framebuffer_word_w)
 {
-	taitob_state *state = space->machine().driver_data<taitob_state>();
 	int sy = offset >> 8;
 	int sx = 2 * (offset & 0xff);
 
 	if (ACCESSING_BITS_8_15)
-		state->m_framebuffer[sy >> 8]->pix16(sy & 0xff, sx + 0) = data >> 8;
+		m_framebuffer[sy >> 8]->pix16(sy & 0xff, sx + 0) = data >> 8;
 	if (ACCESSING_BITS_0_7)
-		state->m_framebuffer[sy >> 8]->pix16(sy & 0xff, sx + 1) = data & 0xff;
+		m_framebuffer[sy >> 8]->pix16(sy & 0xff, sx + 1) = data & 0xff;
 }
 
 

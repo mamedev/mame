@@ -58,6 +58,50 @@ public:
 	required_device<buffered_spriteram8_device> m_spriteram;
 	DECLARE_READ8_MEMBER(tigerh_status_r);
 	DECLARE_READ8_MEMBER(gtstarb1_port_0_read);
+	DECLARE_WRITE8_MEMBER(slapfight_port_00_w);
+	DECLARE_WRITE8_MEMBER(slapfight_port_01_w);
+	DECLARE_WRITE8_MEMBER(slapfight_port_06_w);
+	DECLARE_WRITE8_MEMBER(slapfight_port_07_w);
+	DECLARE_WRITE8_MEMBER(slapfight_port_08_w);
+	DECLARE_WRITE8_MEMBER(slapfight_port_09_w);
+	DECLARE_READ8_MEMBER(slapfight_port_00_r);
+	DECLARE_READ8_MEMBER(slapfight_68705_portA_r);
+	DECLARE_WRITE8_MEMBER(slapfight_68705_portA_w);
+	DECLARE_WRITE8_MEMBER(slapfight_68705_ddrA_w);
+	DECLARE_READ8_MEMBER(slapfight_68705_portB_r);
+	DECLARE_WRITE8_MEMBER(slapfight_68705_portB_w);
+	DECLARE_WRITE8_MEMBER(slapfight_68705_ddrB_w);
+	DECLARE_READ8_MEMBER(slapfight_68705_portC_r);
+	DECLARE_WRITE8_MEMBER(slapfight_68705_portC_w);
+	DECLARE_WRITE8_MEMBER(slapfight_68705_ddrC_w);
+	DECLARE_WRITE8_MEMBER(slapfight_mcu_w);
+	DECLARE_READ8_MEMBER(slapfight_mcu_r);
+	DECLARE_READ8_MEMBER(slapfight_mcu_status_r);
+	DECLARE_READ8_MEMBER(getstar_e803_r);
+	DECLARE_WRITE8_MEMBER(getstar_e803_w);
+	DECLARE_WRITE8_MEMBER(getstar_sh_intenable_w);
+	DECLARE_WRITE8_MEMBER(getstar_port_04_w);
+	DECLARE_READ8_MEMBER(tigerh_68705_portA_r);
+	DECLARE_WRITE8_MEMBER(tigerh_68705_portA_w);
+	DECLARE_WRITE8_MEMBER(tigerh_68705_ddrA_w);
+	DECLARE_READ8_MEMBER(tigerh_68705_portB_r);
+	DECLARE_WRITE8_MEMBER(tigerh_68705_portB_w);
+	DECLARE_WRITE8_MEMBER(tigerh_68705_ddrB_w);
+	DECLARE_READ8_MEMBER(tigerh_68705_portC_r);
+	DECLARE_WRITE8_MEMBER(tigerh_68705_portC_w);
+	DECLARE_WRITE8_MEMBER(tigerh_68705_ddrC_w);
+	DECLARE_WRITE8_MEMBER(tigerh_mcu_w);
+	DECLARE_READ8_MEMBER(tigerh_mcu_r);
+	DECLARE_READ8_MEMBER(tigerh_mcu_status_r);
+	DECLARE_READ8_MEMBER(tigerhb_e803_r);
+	DECLARE_WRITE8_MEMBER(tigerhb_e803_w);
+	DECLARE_READ8_MEMBER(perfrman_port_00_r);
+	DECLARE_WRITE8_MEMBER(slapfight_videoram_w);
+	DECLARE_WRITE8_MEMBER(slapfight_colorram_w);
+	DECLARE_WRITE8_MEMBER(slapfight_fixram_w);
+	DECLARE_WRITE8_MEMBER(slapfight_fixcol_w);
+	DECLARE_WRITE8_MEMBER(slapfight_flipscreen_w);
+	DECLARE_WRITE8_MEMBER(slapfight_palette_bank_w);
 };
 
 
@@ -66,63 +110,26 @@ public:
 /* due to code at 0x108d (GUARDIAN) or 0x1152 (GETSTARJ),
    register C is a unaltered copy of register A */
 
-#define GS_SAVE_REGS  state->m_gs_a = cpu_get_reg(&space->device(), Z80_BC) >> 0; \
-                       state->m_gs_d = cpu_get_reg(&space->device(), Z80_DE) >> 8; \
-                       state->m_gs_e = cpu_get_reg(&space->device(), Z80_DE) >> 0;
+#define GS_SAVE_REGS  m_gs_a = cpu_get_reg(&space.device(), Z80_BC) >> 0; \
+                      m_gs_d = cpu_get_reg(&space.device(), Z80_DE) >> 8; \
+                      m_gs_e = cpu_get_reg(&space.device(), Z80_DE) >> 0;
 
-#define GS_RESET_REGS state->m_gs_a = 0; \
-                       state->m_gs_d = 0; \
-                       state->m_gs_e = 0;
+#define GS_RESET_REGS m_gs_a = 0; \
+                      m_gs_d = 0; \
+                      m_gs_e = 0;
 
 
 /*----------- defined in machine/slapfght.c -----------*/
 
 MACHINE_RESET( slapfight );
 
-READ8_HANDLER( slapfight_port_00_r );
-WRITE8_HANDLER( slapfight_port_00_w );
-WRITE8_HANDLER( slapfight_port_01_w );
-WRITE8_HANDLER( slapfight_port_06_w );
-WRITE8_HANDLER( slapfight_port_07_w );
-WRITE8_HANDLER( slapfight_port_08_w );
-WRITE8_HANDLER( slapfight_port_09_w );
-
-READ8_HANDLER ( slapfight_68705_portA_r );
-WRITE8_HANDLER( slapfight_68705_portA_w );
-READ8_HANDLER ( slapfight_68705_portB_r );
-WRITE8_HANDLER( slapfight_68705_portB_w );
-READ8_HANDLER ( slapfight_68705_portC_r );
-WRITE8_HANDLER( slapfight_68705_portC_w );
-WRITE8_HANDLER( slapfight_68705_ddrA_w );
-WRITE8_HANDLER( slapfight_68705_ddrB_w );
-WRITE8_HANDLER( slapfight_68705_ddrC_w );
-WRITE8_HANDLER( slapfight_mcu_w );
-READ8_HANDLER ( slapfight_mcu_r );
-READ8_HANDLER ( slapfight_mcu_status_r );
-
-READ8_HANDLER( getstar_e803_r );
-WRITE8_HANDLER( getstar_e803_w );
-
-READ8_HANDLER( perfrman_port_00_r );
-
-READ8_HANDLER ( tigerh_68705_portA_r );
-WRITE8_HANDLER( tigerh_68705_portA_w );
-READ8_HANDLER ( tigerh_68705_portB_r );
-WRITE8_HANDLER( tigerh_68705_portB_w );
-READ8_HANDLER ( tigerh_68705_portC_r );
-WRITE8_HANDLER( tigerh_68705_portC_w );
-WRITE8_HANDLER( tigerh_68705_ddrA_w );
-WRITE8_HANDLER( tigerh_68705_ddrB_w );
-WRITE8_HANDLER( tigerh_68705_ddrC_w );
-WRITE8_HANDLER( tigerh_mcu_w );
-READ8_HANDLER ( tigerh_mcu_r );
-READ8_HANDLER ( tigerh_mcu_status_r );
-
-READ8_HANDLER( tigerhb_e803_r );
-WRITE8_HANDLER( tigerhb_e803_w );
 
 
-WRITE8_HANDLER( getstar_sh_intenable_w );
+
+
+
+
+
 INTERRUPT_GEN( getstar_interrupt );
 
 
@@ -133,9 +140,3 @@ SCREEN_UPDATE_IND16( perfrman );
 VIDEO_START( slapfight );
 VIDEO_START( perfrman );
 
-WRITE8_HANDLER( slapfight_flipscreen_w );
-WRITE8_HANDLER( slapfight_fixram_w );
-WRITE8_HANDLER( slapfight_fixcol_w );
-WRITE8_HANDLER( slapfight_videoram_w );
-WRITE8_HANDLER( slapfight_colorram_w );
-WRITE8_HANDLER( slapfight_palette_bank_w );

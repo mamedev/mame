@@ -65,29 +65,29 @@ public:
 	DECLARE_WRITE16_MEMBER(twinactn_scroll0_w);
 	DECLARE_WRITE16_MEMBER(twinactn_scroll1_w);
 	DECLARE_WRITE16_MEMBER(twinactn_flipscreen_w);
+	DECLARE_WRITE16_MEMBER(nmk_bgvideoram0_w);
+	DECLARE_WRITE16_MEMBER(nmk_bgvideoram1_w);
+	DECLARE_WRITE16_MEMBER(nmk_bgvideoram2_w);
+	DECLARE_WRITE16_MEMBER(nmk_bgvideoram3_w);
+	DECLARE_WRITE16_MEMBER(nmk_fgvideoram_w);
+	DECLARE_WRITE16_MEMBER(nmk_txvideoram_w);
+	DECLARE_WRITE16_MEMBER(mustang_scroll_w);
+	DECLARE_WRITE16_MEMBER(bioshipbg_scroll_w);
+	DECLARE_WRITE16_MEMBER(nmk_scroll_w);
+	DECLARE_WRITE16_MEMBER(nmk_scroll_2_w);
+	DECLARE_WRITE16_MEMBER(vandyke_scroll_w);
+	DECLARE_WRITE16_MEMBER(vandykeb_scroll_w);
+	DECLARE_WRITE16_MEMBER(manybloc_scroll_w);
+	DECLARE_WRITE16_MEMBER(nmk_flipscreen_w);
+	DECLARE_WRITE16_MEMBER(nmk_tilebank_w);
+	DECLARE_WRITE16_MEMBER(bioship_scroll_w);
+	DECLARE_WRITE16_MEMBER(bioship_bank_w);
 };
 
 
 /*----------- defined in video/nmk16.c -----------*/
 
-WRITE16_HANDLER( nmk_bgvideoram0_w );
-WRITE16_HANDLER( nmk_bgvideoram1_w );
-WRITE16_HANDLER( nmk_bgvideoram2_w );
-WRITE16_HANDLER( nmk_bgvideoram3_w );
 
-WRITE16_HANDLER( nmk_fgvideoram_w );
-WRITE16_HANDLER( nmk_txvideoram_w );
-WRITE16_HANDLER( nmk_scroll_w );
-WRITE16_HANDLER( nmk_scroll_2_w );
-WRITE16_HANDLER( nmk_flipscreen_w );
-WRITE16_HANDLER( nmk_tilebank_w );
-WRITE16_HANDLER( bioship_scroll_w );
-WRITE16_HANDLER( bioship_bank_w );
-WRITE16_HANDLER( mustang_scroll_w );
-WRITE16_HANDLER( bioshipbg_scroll_w );
-WRITE16_HANDLER( vandyke_scroll_w );
-WRITE16_HANDLER( vandykeb_scroll_w );
-WRITE16_HANDLER( manybloc_scroll_w );
 
 VIDEO_START( macross );
 VIDEO_START( gunnail );

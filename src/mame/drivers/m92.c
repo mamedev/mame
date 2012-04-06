@@ -334,12 +334,12 @@ WRITE16_MEMBER(m92_state::m92_sound_reset_w)
 /* appears to be an earlier board */
 static ADDRESS_MAP_START( lethalth_map, AS_PROGRAM, 16, m92_state )
 	AM_RANGE(0x00000, 0x7ffff) AM_ROM
-	AM_RANGE(0x80000, 0x8ffff) AM_RAM_WRITE_LEGACY(m92_vram_w) AM_BASE(m_vram_data)
+	AM_RANGE(0x80000, 0x8ffff) AM_RAM_WRITE(m92_vram_w) AM_BASE(m_vram_data)
 	AM_RANGE(0xe0000, 0xeffff) AM_RAM /* System ram */
 	AM_RANGE(0xf8000, 0xf87ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xf8800, 0xf8fff) AM_READWRITE_LEGACY(m92_paletteram_r, m92_paletteram_w)
-	AM_RANGE(0xf9000, 0xf900f) AM_WRITE_LEGACY(m92_spritecontrol_w) AM_BASE(m_spritecontrol)
-	AM_RANGE(0xf9800, 0xf9801) AM_WRITE_LEGACY(m92_videocontrol_w)
+	AM_RANGE(0xf8800, 0xf8fff) AM_READWRITE(m92_paletteram_r, m92_paletteram_w)
+	AM_RANGE(0xf9000, 0xf900f) AM_WRITE(m92_spritecontrol_w) AM_BASE(m_spritecontrol)
+	AM_RANGE(0xf9800, 0xf9801) AM_WRITE(m92_videocontrol_w)
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM AM_REGION("maincpu", 0x7fff0)
 ADDRESS_MAP_END
 
@@ -347,12 +347,12 @@ static ADDRESS_MAP_START( m92_map, AS_PROGRAM, 16, m92_state )
 	AM_RANGE(0x00000, 0x9ffff) AM_ROM
 	AM_RANGE(0xa0000, 0xbffff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc0000, 0xcffff) AM_ROM AM_REGION("maincpu", 0x00000)	/* Mirror used by In The Hunt as protection */
-	AM_RANGE(0xd0000, 0xdffff) AM_RAM_WRITE_LEGACY(m92_vram_w) AM_BASE(m_vram_data)
+	AM_RANGE(0xd0000, 0xdffff) AM_RAM_WRITE(m92_vram_w) AM_BASE(m_vram_data)
 	AM_RANGE(0xe0000, 0xeffff) AM_RAM /* System ram */
 	AM_RANGE(0xf8000, 0xf87ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xf8800, 0xf8fff) AM_READWRITE_LEGACY(m92_paletteram_r, m92_paletteram_w)
-	AM_RANGE(0xf9000, 0xf900f) AM_WRITE_LEGACY(m92_spritecontrol_w) AM_BASE(m_spritecontrol)
-	AM_RANGE(0xf9800, 0xf9801) AM_WRITE_LEGACY(m92_videocontrol_w)
+	AM_RANGE(0xf8800, 0xf8fff) AM_READWRITE(m92_paletteram_r, m92_paletteram_w)
+	AM_RANGE(0xf9000, 0xf900f) AM_WRITE(m92_spritecontrol_w) AM_BASE(m_spritecontrol)
+	AM_RANGE(0xf9800, 0xf9801) AM_WRITE(m92_videocontrol_w)
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM AM_REGION("maincpu", 0x7fff0)
 ADDRESS_MAP_END
 
@@ -365,10 +365,10 @@ static ADDRESS_MAP_START( m92_portmap, AS_IO, 16, m92_state )
 	AM_RANGE(0x00, 0x01) AM_WRITE(m92_soundlatch_w)
 	AM_RANGE(0x02, 0x03) AM_WRITE(m92_coincounter_w)
 	AM_RANGE(0x40, 0x43) AM_WRITENOP /* Interrupt controller, only written to at bootup */
-	AM_RANGE(0x80, 0x87) AM_WRITE_LEGACY(m92_pf1_control_w)
-	AM_RANGE(0x88, 0x8f) AM_WRITE_LEGACY(m92_pf2_control_w)
-	AM_RANGE(0x90, 0x97) AM_WRITE_LEGACY(m92_pf3_control_w)
-	AM_RANGE(0x98, 0x9f) AM_WRITE_LEGACY(m92_master_control_w)
+	AM_RANGE(0x80, 0x87) AM_WRITE(m92_pf1_control_w)
+	AM_RANGE(0x88, 0x8f) AM_WRITE(m92_pf2_control_w)
+	AM_RANGE(0x90, 0x97) AM_WRITE(m92_pf3_control_w)
+	AM_RANGE(0x98, 0x9f) AM_WRITE(m92_master_control_w)
 	AM_RANGE(0xc0, 0xc1) AM_WRITE(m92_sound_reset_w)
 ADDRESS_MAP_END
 
@@ -387,10 +387,10 @@ static ADDRESS_MAP_START( ppan_portmap, AS_IO, 16, m92_state )
 	AM_RANGE(0x18, 0x19) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x02, 0x03) AM_WRITE(m92_coincounter_w)
 	AM_RANGE(0x40, 0x43) AM_WRITENOP /* Interrupt controller, only written to at bootup */
-	AM_RANGE(0x80, 0x87) AM_WRITE_LEGACY(m92_pf1_control_w)
-	AM_RANGE(0x88, 0x8f) AM_WRITE_LEGACY(m92_pf2_control_w)
-	AM_RANGE(0x90, 0x97) AM_WRITE_LEGACY(m92_pf3_control_w)
-	AM_RANGE(0x98, 0x9f) AM_WRITE_LEGACY(m92_master_control_w)
+	AM_RANGE(0x80, 0x87) AM_WRITE(m92_pf1_control_w)
+	AM_RANGE(0x88, 0x8f) AM_WRITE(m92_pf2_control_w)
+	AM_RANGE(0x90, 0x97) AM_WRITE(m92_pf3_control_w)
+	AM_RANGE(0x98, 0x9f) AM_WRITE(m92_master_control_w)
 ADDRESS_MAP_END
 
 

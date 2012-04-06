@@ -67,42 +67,39 @@ VIDEO_START( srumbler )
 
 ***************************************************************************/
 
-WRITE8_HANDLER( srumbler_foreground_w )
+WRITE8_MEMBER(srumbler_state::srumbler_foreground_w)
 {
-	srumbler_state *state = space->machine().driver_data<srumbler_state>();
-	state->m_foregroundram[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset/2);
+	m_foregroundram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset/2);
 }
 
-WRITE8_HANDLER( srumbler_background_w )
+WRITE8_MEMBER(srumbler_state::srumbler_background_w)
 {
-	srumbler_state *state = space->machine().driver_data<srumbler_state>();
-	state->m_backgroundram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset/2);
+	m_backgroundram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset/2);
 }
 
 
-WRITE8_HANDLER( srumbler_4009_w )
+WRITE8_MEMBER(srumbler_state::srumbler_4009_w)
 {
 	/* bit 0 flips screen */
-	flip_screen_set(space->machine(), data & 1);
+	flip_screen_set(machine(), data & 1);
 
 	/* bits 4-5 used during attract mode, unknown */
 
 	/* bits 6-7 coin counters */
-	coin_counter_w(space->machine(), 0,data & 0x40);
-	coin_counter_w(space->machine(), 1,data & 0x80);
+	coin_counter_w(machine(), 0,data & 0x40);
+	coin_counter_w(machine(), 1,data & 0x80);
 }
 
 
-WRITE8_HANDLER( srumbler_scroll_w )
+WRITE8_MEMBER(srumbler_state::srumbler_scroll_w)
 {
-	srumbler_state *state = space->machine().driver_data<srumbler_state>();
 
-	state->m_scroll[offset] = data;
+	m_scroll[offset] = data;
 
-	state->m_bg_tilemap->set_scrollx(0,state->m_scroll[0] | (state->m_scroll[1] << 8));
-	state->m_bg_tilemap->set_scrolly(0,state->m_scroll[2] | (state->m_scroll[3] << 8));
+	m_bg_tilemap->set_scrollx(0,m_scroll[0] | (m_scroll[1] << 8));
+	m_bg_tilemap->set_scrolly(0,m_scroll[2] | (m_scroll[3] << 8));
 }
 
 

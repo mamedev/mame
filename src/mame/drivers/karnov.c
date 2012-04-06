@@ -429,10 +429,10 @@ static ADDRESS_MAP_START( karnov_map, AS_PROGRAM, 16, karnov_state )
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
 	AM_RANGE(0x060000, 0x063fff) AM_RAM AM_BASE(m_ram)
 	AM_RANGE(0x080000, 0x080fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x0a0000, 0x0a07ff) AM_RAM_WRITE_LEGACY(karnov_videoram_w) AM_BASE(m_videoram)
-	AM_RANGE(0x0a0800, 0x0a0fff) AM_WRITE_LEGACY(karnov_videoram_w) /* Wndrplnt Mirror */
+	AM_RANGE(0x0a0000, 0x0a07ff) AM_RAM_WRITE(karnov_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0x0a0800, 0x0a0fff) AM_WRITE(karnov_videoram_w) /* Wndrplnt Mirror */
 	AM_RANGE(0x0a1000, 0x0a17ff) AM_WRITEONLY AM_BASE(m_pf_data)
-	AM_RANGE(0x0a1800, 0x0a1fff) AM_WRITE_LEGACY(karnov_playfield_swap_w)
+	AM_RANGE(0x0a1800, 0x0a1fff) AM_WRITE(karnov_playfield_swap_w)
 	AM_RANGE(0x0c0000, 0x0c0007) AM_READ(karnov_control_r)
 	AM_RANGE(0x0c0000, 0x0c000f) AM_WRITE(karnov_control_w)
 ADDRESS_MAP_END

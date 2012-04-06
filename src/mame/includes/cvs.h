@@ -79,6 +79,10 @@ public:
 	DECLARE_WRITE8_MEMBER(cvs_s2636_1_or_character_ram_w);
 	DECLARE_READ8_MEMBER(cvs_s2636_2_or_character_ram_r);
 	DECLARE_WRITE8_MEMBER(cvs_s2636_2_or_character_ram_w);
+	DECLARE_WRITE8_MEMBER(cvs_video_fx_w);
+	DECLARE_READ8_MEMBER(cvs_collision_r);
+	DECLARE_READ8_MEMBER(cvs_collision_clear);
+	DECLARE_WRITE8_MEMBER(cvs_scroll_w);
 };
 
 
@@ -89,11 +93,7 @@ MACHINE_RESET( cvs );
 
 /*----------- defined in video/cvs.c -----------*/
 
-WRITE8_HANDLER( cvs_scroll_w );
-WRITE8_HANDLER( cvs_video_fx_w );
 
-READ8_HANDLER( cvs_collision_r );
-READ8_HANDLER( cvs_collision_clear );
 
 void cvs_init_stars( running_machine &machine );
 void cvs_scroll_stars( running_machine &machine );

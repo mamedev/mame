@@ -163,21 +163,20 @@ DRIVER_INIT( beezer )
 	state->m_banklatch = 0;
 }
 
-WRITE8_HANDLER( beezer_bankswitch_w )
+WRITE8_MEMBER(beezer_state::beezer_bankswitch_w)
 {
-	beezer_state *state = space->machine().driver_data<beezer_state>();
-	state->m_banklatch = data&0x3f; // latched 'x,y,z' plus bank bits in ls174 @ 4H
+	m_banklatch = data&0x3f; // latched 'x,y,z' plus bank bits in ls174 @ 4H
 	if ((data & 0x07) == 0)
 	{
-		via6522_device *via_0 = space->machine().device<via6522_device>("via6522_0");
-		space->install_write_handler(0xc600, 0xc7ff, write8_delegate(FUNC(beezer_state::watchdog_reset_w),state));
-		space->install_legacy_write_handler(0xc800, 0xc9ff, FUNC(beezer_map_w));
-		space->install_legacy_read_handler(0xca00, 0xcbff, FUNC(beezer_line_r));
-		space->install_readwrite_handler(0xce00, 0xcfff, read8_delegate(FUNC(via6522_device::read), via_0), write8_delegate(FUNC(via6522_device::write), via_0));
+		via6522_device *via_0 = machine().device<via6522_device>("via6522_0");
+		space.install_write_handler(0xc600, 0xc7ff, write8_delegate(FUNC(beezer_state::watchdog_reset_w),this));
+		space.install_write_handler(0xc800, 0xc9ff, write8_delegate(FUNC(beezer_state::beezer_map_w),this));
+		space.install_read_handler(0xca00, 0xcbff, read8_delegate(FUNC(beezer_state::beezer_line_r),this));
+		space.install_readwrite_handler(0xce00, 0xcfff, read8_delegate(FUNC(via6522_device::read), via_0), write8_delegate(FUNC(via6522_device::write), via_0));
 	}
 	else
 	{
-		UINT8 *rom = space->machine().region("maincpu")->base() + 0x10000;
-		space->install_ram(0xc000, 0xcfff, rom + (data & 0x07) * 0x2000 + ((data & 0x08) ? 0x1000: 0));
+		UINT8 *rom = machine().region("maincpu")->base() + 0x10000;
+		space.install_ram(0xc000, 0xcfff, rom + (data & 0x07) * 0x2000 + ((data & 0x08) ? 0x1000: 0));
 	}
 }

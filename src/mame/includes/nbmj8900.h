@@ -28,6 +28,19 @@ public:
 	UINT8 *m_palette;
 	UINT8 *m_clut;
 	int m_flipscreen_old;
+	DECLARE_READ8_MEMBER(nbmj8900_palette_type1_r);
+	DECLARE_WRITE8_MEMBER(nbmj8900_palette_type1_w);
+	DECLARE_READ8_MEMBER(nbmj8900_palette_type2_r);
+	DECLARE_WRITE8_MEMBER(nbmj8900_palette_type2_w);
+	DECLARE_READ8_MEMBER(nbmj8900_palette_type3_r);
+	DECLARE_WRITE8_MEMBER(nbmj8900_palette_type3_w);
+	DECLARE_WRITE8_MEMBER(nbmj8900_clutsel_w);
+	DECLARE_READ8_MEMBER(nbmj8900_clut_r);
+	DECLARE_WRITE8_MEMBER(nbmj8900_clut_w);
+	DECLARE_WRITE8_MEMBER(nbmj8900_blitter_w);
+	DECLARE_WRITE8_MEMBER(nbmj8900_scrolly_w);
+	DECLARE_WRITE8_MEMBER(nbmj8900_vramsel_w);
+	DECLARE_WRITE8_MEMBER(nbmj8900_romsel_w);
 };
 
 
@@ -36,12 +49,3 @@ public:
 SCREEN_UPDATE_IND16( nbmj8900 );
 VIDEO_START( nbmj8900_2layer );
 
-READ8_HANDLER( nbmj8900_palette_type1_r );
-WRITE8_HANDLER( nbmj8900_palette_type1_w );
-WRITE8_HANDLER( nbmj8900_blitter_w );
-WRITE8_HANDLER( nbmj8900_scrolly_w );
-WRITE8_HANDLER( nbmj8900_vramsel_w );
-WRITE8_HANDLER( nbmj8900_romsel_w );
-WRITE8_HANDLER( nbmj8900_clutsel_w );
-READ8_HANDLER( nbmj8900_clut_r );
-WRITE8_HANDLER( nbmj8900_clut_w );

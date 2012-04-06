@@ -52,18 +52,18 @@ public:
 	DECLARE_READ16_MEMBER(pbobble_input_bypass_r);
 	DECLARE_WRITE16_MEMBER(spacedxo_tc0220ioc_w);
 	DECLARE_WRITE16_MEMBER(realpunc_output_w);
+	DECLARE_WRITE16_MEMBER(hitice_pixelram_w);
+	DECLARE_WRITE16_MEMBER(hitice_pixel_scroll_w);
+	DECLARE_WRITE16_MEMBER(realpunc_video_ctrl_w);
+	DECLARE_READ16_MEMBER(tc0180vcu_framebuffer_word_r);
+	DECLARE_WRITE16_MEMBER(tc0180vcu_framebuffer_word_w);
 };
 
 
 /*----------- defined in video/taito_b.c -----------*/
 
-READ16_HANDLER( tc0180vcu_framebuffer_word_r );
-WRITE16_HANDLER( tc0180vcu_framebuffer_word_w );
 
-WRITE16_HANDLER( hitice_pixelram_w );
-WRITE16_HANDLER( hitice_pixel_scroll_w );
 
-WRITE16_HANDLER( realpunc_video_ctrl_w );
 
 VIDEO_START( taitob_color_order0 );
 VIDEO_START( taitob_color_order1 );

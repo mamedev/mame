@@ -62,30 +62,27 @@ VIDEO_START( news )
 
 ***************************************************************************/
 
-WRITE8_HANDLER( news_fgram_w )
+WRITE8_MEMBER(news_state::news_fgram_w)
 {
-	news_state *state = space->machine().driver_data<news_state>();
 
-	state->m_fgram[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset / 2);
+	m_fgram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE8_HANDLER( news_bgram_w )
+WRITE8_MEMBER(news_state::news_bgram_w)
 {
-	news_state *state = space->machine().driver_data<news_state>();
 
-	state->m_bgram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset / 2);
+	m_bgram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE8_HANDLER( news_bgpic_w )
+WRITE8_MEMBER(news_state::news_bgpic_w)
 {
-	news_state *state = space->machine().driver_data<news_state>();
 
-	if (state->m_bgpic != data)
+	if (m_bgpic != data)
 	{
-		state->m_bgpic = data;
-		state->m_bg_tilemap->mark_all_dirty();
+		m_bgpic = data;
+		m_bg_tilemap->mark_all_dirty();
 	}
 }
 

@@ -39,22 +39,23 @@ public:
 	DECLARE_WRITE8_MEMBER(nmi_disable_w);
 	DECLARE_WRITE8_MEMBER(nmi_enable_w);
 	DECLARE_READ8_MEMBER(snd_flag_r);
+	DECLARE_WRITE8_MEMBER(ladyfrog_spriteram_w);
+	DECLARE_READ8_MEMBER(ladyfrog_spriteram_r);
+	DECLARE_WRITE8_MEMBER(ladyfrog_videoram_w);
+	DECLARE_READ8_MEMBER(ladyfrog_videoram_r);
+	DECLARE_WRITE8_MEMBER(ladyfrog_palette_w);
+	DECLARE_READ8_MEMBER(ladyfrog_palette_r);
+	DECLARE_WRITE8_MEMBER(ladyfrog_gfxctrl_w);
+	DECLARE_WRITE8_MEMBER(ladyfrog_gfxctrl2_w);
+	DECLARE_READ8_MEMBER(ladyfrog_gfxctrl_r);
+	DECLARE_READ8_MEMBER(ladyfrog_scrlram_r);
+	DECLARE_WRITE8_MEMBER(ladyfrog_scrlram_w);
 };
 
 
 /*----------- defined in video/ladyfrog.c -----------*/
 
-WRITE8_HANDLER( ladyfrog_videoram_w );
-WRITE8_HANDLER( ladyfrog_spriteram_w );
-WRITE8_HANDLER( ladyfrog_palette_w );
-WRITE8_HANDLER( ladyfrog_gfxctrl_w );
-WRITE8_HANDLER( ladyfrog_gfxctrl2_w );
-WRITE8_HANDLER( ladyfrog_scrlram_w );
 
-READ8_HANDLER( ladyfrog_spriteram_r );
-READ8_HANDLER( ladyfrog_palette_r );
-READ8_HANDLER( ladyfrog_scrlram_r );
-READ8_HANDLER( ladyfrog_videoram_r );
 
 VIDEO_START( ladyfrog );
 VIDEO_START( toucheme );

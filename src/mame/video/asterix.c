@@ -13,11 +13,10 @@ static void reset_spritebank( running_machine &machine )
 	state->m_spritebanks[3] = (state->m_spritebank <<  3) & 0x7000;
 }
 
-WRITE16_HANDLER( asterix_spritebank_w )
+WRITE16_MEMBER(asterix_state::asterix_spritebank_w)
 {
-	asterix_state *state = space->machine().driver_data<asterix_state>();
-	COMBINE_DATA(&state->m_spritebank);
-	reset_spritebank(space->machine());
+	COMBINE_DATA(&m_spritebank);
+	reset_spritebank(machine());
 }
 
 void asterix_sprite_callback( running_machine &machine, int *code, int *color, int *priority_mask )

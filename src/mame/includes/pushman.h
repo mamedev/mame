@@ -37,13 +37,13 @@ public:
 	DECLARE_WRITE16_MEMBER(bballs_68705_w);
 	DECLARE_READ8_MEMBER(pushman_68000_r);
 	DECLARE_WRITE8_MEMBER(pushman_68000_w);
+	DECLARE_WRITE16_MEMBER(pushman_scroll_w);
+	DECLARE_WRITE16_MEMBER(pushman_videoram_w);
 };
 
 
 /*----------- defined in video/pushman.c -----------*/
 
-WRITE16_HANDLER( pushman_scroll_w );
-WRITE16_HANDLER( pushman_videoram_w );
 
 VIDEO_START( pushman );
 

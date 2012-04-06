@@ -452,20 +452,18 @@ VIDEO_START( galaga )
 ***************************************************************************/
 
 
-WRITE8_HANDLER( galaga_videoram_w )
+WRITE8_MEMBER(galaga_state::galaga_videoram_w)
 {
-	galaga_state *state =  space->machine().driver_data<galaga_state>();
 
-	state->m_videoram[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
+	m_videoram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_HANDLER ( gatsbee_bank_w )
+WRITE8_MEMBER(galaga_state::gatsbee_bank_w)
 {
-	galaga_state *state =  space->machine().driver_data<galaga_state>();
 
-	state->m_galaga_gfxbank = data & 0x1;
-	state->m_fg_tilemap->mark_all_dirty();
+	m_galaga_gfxbank = data & 0x1;
+	m_fg_tilemap->mark_all_dirty();
 }
 
 

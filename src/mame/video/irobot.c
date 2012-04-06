@@ -57,7 +57,7 @@ PALETTE_INIT( irobot )
 }
 
 
-WRITE8_HANDLER( irobot_paletteram_w )
+WRITE8_MEMBER(irobot_state::irobot_paletteram_w)
 {
 	int r,g,b;
 	int bits,intensity;
@@ -71,7 +71,7 @@ WRITE8_HANDLER( irobot_paletteram_w )
 	g = 12 * bits * intensity;
 	bits = (color >> 7) & 0x03;
 	r = 12 * bits * intensity;
-	palette_set_color(space->machine(),(offset >> 1) & 0x3F,MAKE_RGB(r,g,b));
+	palette_set_color(machine(),(offset >> 1) & 0x3F,MAKE_RGB(r,g,b));
 }
 
 

@@ -78,7 +78,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, wiping_state )
 	AM_RANGE(0x9000, 0x93ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x9800, 0x9bff) AM_RAM AM_SHARE("share2")
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(main_irq_mask_w)
-	AM_RANGE(0xa002, 0xa002) AM_WRITE_LEGACY(wiping_flipscreen_w)
+	AM_RANGE(0xa002, 0xa002) AM_WRITE(wiping_flipscreen_w)
 	AM_RANGE(0xa003, 0xa003) AM_WRITE(subcpu_reset_w)
 	AM_RANGE(0xa800, 0xa807) AM_READ(ports_r)
 	AM_RANGE(0xb000, 0xb7ff) AM_RAM

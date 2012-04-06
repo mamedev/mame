@@ -14,14 +14,14 @@ public:
 	tilemap_t *m_fg_tilemap;
 	tilemap_t *m_bg_tilemap;
 	int      m_bgpic;
+	DECLARE_WRITE8_MEMBER(news_fgram_w);
+	DECLARE_WRITE8_MEMBER(news_bgram_w);
+	DECLARE_WRITE8_MEMBER(news_bgpic_w);
 };
 
 
 /*----------- defined in video/news.c -----------*/
 
-WRITE8_HANDLER( news_fgram_w );
-WRITE8_HANDLER( news_bgram_w );
-WRITE8_HANDLER( news_bgpic_w );
 
 VIDEO_START( news );
 SCREEN_UPDATE_IND16( news );

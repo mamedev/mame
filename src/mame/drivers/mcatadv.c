@@ -180,8 +180,8 @@ static ADDRESS_MAP_START( mcatadv_map, AS_PROGRAM, 16, mcatadv_state )
 	AM_RANGE(0x200000, 0x200005) AM_RAM AM_BASE(m_scroll1)
 	AM_RANGE(0x300000, 0x300005) AM_RAM AM_BASE(m_scroll2)
 
-	AM_RANGE(0x400000, 0x401fff) AM_RAM_WRITE_LEGACY(mcatadv_videoram1_w) AM_BASE(m_videoram1) // Tilemap 0
-	AM_RANGE(0x500000, 0x501fff) AM_RAM_WRITE_LEGACY(mcatadv_videoram2_w) AM_BASE(m_videoram2) // Tilemap 1
+	AM_RANGE(0x400000, 0x401fff) AM_RAM_WRITE(mcatadv_videoram1_w) AM_BASE(m_videoram1) // Tilemap 0
+	AM_RANGE(0x500000, 0x501fff) AM_RAM_WRITE(mcatadv_videoram2_w) AM_BASE(m_videoram2) // Tilemap 1
 
 	AM_RANGE(0x600000, 0x601fff) AM_RAM_WRITE(paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x602000, 0x602fff) AM_RAM // Bigger than needs to be?

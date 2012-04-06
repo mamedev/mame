@@ -14,20 +14,18 @@ static TILE_GET_INFO( get_sbugger_tile_info )
 	SET_TILE_INFO(0,tileno,color,0);
 }
 
-WRITE8_HANDLER( sbugger_videoram_w )
+WRITE8_MEMBER(sbugger_state::sbugger_videoram_w)
 {
-	sbugger_state *state = space->machine().driver_data<sbugger_state>();
 
-	state->m_videoram[offset] = data;
-	state->m_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( sbugger_videoram_attr_w )
+WRITE8_MEMBER(sbugger_state::sbugger_videoram_attr_w)
 {
-	sbugger_state *state = space->machine().driver_data<sbugger_state>();
 
-	state->m_videoram_attr[offset] = data;
-	state->m_tilemap->mark_tile_dirty(offset);
+	m_videoram_attr[offset] = data;
+	m_tilemap->mark_tile_dirty(offset);
 }
 
 VIDEO_START(sbugger)

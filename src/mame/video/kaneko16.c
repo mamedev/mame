@@ -46,10 +46,9 @@ struct tempsprite
 };
 
 
-WRITE16_HANDLER( kaneko16_display_enable )
+WRITE16_MEMBER(kaneko16_state::kaneko16_display_enable)
 {
-	kaneko16_state *state = space->machine().driver_data<kaneko16_state>();
-	COMBINE_DATA(&state->m_disp_enable);
+	COMBINE_DATA(&m_disp_enable);
 }
 
 /***************************************************************************
@@ -92,10 +91,10 @@ INLINE void kaneko16_vram_w(address_space *space, offs_t offset, UINT16 data, UI
 	state->m_tmap[_N_]->mark_tile_dirty(offset/2);
 }
 
-WRITE16_HANDLER( kaneko16_vram_0_w ) { kaneko16_vram_w(space, offset, data, mem_mask, 0); }
-WRITE16_HANDLER( kaneko16_vram_1_w ) { kaneko16_vram_w(space, offset, data, mem_mask, 1); }
-WRITE16_HANDLER( kaneko16_vram_2_w ) { kaneko16_vram_w(space, offset, data, mem_mask, 2); }
-WRITE16_HANDLER( kaneko16_vram_3_w ) { kaneko16_vram_w(space, offset, data, mem_mask, 3); }
+WRITE16_MEMBER(kaneko16_state::kaneko16_vram_0_w){ kaneko16_vram_w(&space, offset, data, mem_mask, 0); }
+WRITE16_MEMBER(kaneko16_state::kaneko16_vram_1_w){ kaneko16_vram_w(&space, offset, data, mem_mask, 1); }
+WRITE16_MEMBER(kaneko16_state::kaneko16_vram_2_w){ kaneko16_vram_w(&space, offset, data, mem_mask, 2); }
+WRITE16_MEMBER(kaneko16_state::kaneko16_vram_3_w){ kaneko16_vram_w(&space, offset, data, mem_mask, 3); }
 
 VIDEO_START( kaneko16_sprites )
 {
@@ -717,36 +716,34 @@ FLIP ON:
 900010: 0000 0400 A000 A400-1E00 2200 0000 0400     ; +1f<<6 on y
 */
 
-READ16_HANDLER( kaneko16_sprites_regs_r )
+READ16_MEMBER(kaneko16_state::kaneko16_sprites_regs_r)
 {
-	kaneko16_state *state = space->machine().driver_data<kaneko16_state>();
-	return state->m_sprites_regs[offset];
+	return m_sprites_regs[offset];
 }
 
-WRITE16_HANDLER( kaneko16_sprites_regs_w )
+WRITE16_MEMBER(kaneko16_state::kaneko16_sprites_regs_w)
 {
-	kaneko16_state *state = space->machine().driver_data<kaneko16_state>();
 	UINT16 new_data;
 
-	COMBINE_DATA(&state->m_sprites_regs[offset]);
-	new_data  = state->m_sprites_regs[offset];
+	COMBINE_DATA(&m_sprites_regs[offset]);
+	new_data  = m_sprites_regs[offset];
 
 	switch (offset)
 	{
 		case 0:
 			if (ACCESSING_BITS_0_7)
 			{
-				state->m_sprite_flipx = new_data & 2;
-				state->m_sprite_flipy = new_data & 1;
+				m_sprite_flipx = new_data & 2;
+				m_sprite_flipy = new_data & 1;
 
-				if(state->m_sprite_type == 0 || state->m_sprite_type == 2)
-					state->m_keep_sprites = ~new_data & 4;
+				if(m_sprite_type == 0 || m_sprite_type == 2)
+					m_keep_sprites = ~new_data & 4;
 			}
 
 			break;
 	}
 
-//  logerror("CPU #0 PC %06X : Warning, sprites reg %04X <- %04X\n",cpu_get_pc(&space->device()),offset*2,data);
+//  logerror("CPU #0 PC %06X : Warning, sprites reg %04X <- %04X\n",cpu_get_pc(&space.device()),offset*2,data);
 }
 
 
@@ -802,43 +799,37 @@ There are more!
 
 */
 
-WRITE16_HANDLER( kaneko16_layers_0_regs_w )
+WRITE16_MEMBER(kaneko16_state::kaneko16_layers_0_regs_w)
 {
-	kaneko16_state *state = space->machine().driver_data<kaneko16_state>();
-	COMBINE_DATA(&state->m_layers_0_regs[offset]);
+	COMBINE_DATA(&m_layers_0_regs[offset]);
 }
 
-WRITE16_HANDLER( kaneko16_layers_1_regs_w )
+WRITE16_MEMBER(kaneko16_state::kaneko16_layers_1_regs_w)
 {
-	kaneko16_state *state = space->machine().driver_data<kaneko16_state>();
-	COMBINE_DATA(&state->m_layers_1_regs[offset]);
+	COMBINE_DATA(&m_layers_1_regs[offset]);
 }
 
 
 
 
 /* Select the high color background image (out of 32 in the ROMs) */
-READ16_HANDLER( kaneko16_bg15_select_r )
+READ16_MEMBER(kaneko16_state::kaneko16_bg15_select_r)
 {
-	kaneko16_state *state = space->machine().driver_data<kaneko16_state>();
-	return state->m_bg15_select[0];
+	return m_bg15_select[0];
 }
-WRITE16_HANDLER( kaneko16_bg15_select_w )
+WRITE16_MEMBER(kaneko16_state::kaneko16_bg15_select_w)
 {
-	kaneko16_state *state = space->machine().driver_data<kaneko16_state>();
-	COMBINE_DATA(&state->m_bg15_select[0]);
+	COMBINE_DATA(&m_bg15_select[0]);
 }
 
 /* ? */
-READ16_HANDLER( kaneko16_bg15_reg_r )
+READ16_MEMBER(kaneko16_state::kaneko16_bg15_reg_r)
 {
-	kaneko16_state *state = space->machine().driver_data<kaneko16_state>();
-	return state->m_bg15_reg[0];
+	return m_bg15_reg[0];
 }
-WRITE16_HANDLER( kaneko16_bg15_reg_w )
+WRITE16_MEMBER(kaneko16_state::kaneko16_bg15_reg_w)
 {
-	kaneko16_state *state = space->machine().driver_data<kaneko16_state>();
-	COMBINE_DATA(&state->m_bg15_reg[0]);
+	COMBINE_DATA(&m_bg15_reg[0]);
 }
 
 

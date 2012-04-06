@@ -102,10 +102,10 @@ static ADDRESS_MAP_START( lemmings_map, AS_PROGRAM, 16, lemmings_state )
 	AM_RANGE(0x1a0064, 0x1a0065) AM_WRITE(lemmings_sound_w)
 	AM_RANGE(0x1c0000, 0x1c0001) AM_DEVWRITE("spriteram", buffered_spriteram16_device, write) /* 1 written once a frame */
 	AM_RANGE(0x1e0000, 0x1e0001) AM_DEVWRITE("spriteram2", buffered_spriteram16_device, write) /* 1 written once a frame */
-	AM_RANGE(0x200000, 0x201fff) AM_RAM_WRITE_LEGACY(lemmings_vram_w) AM_BASE(m_vram_data)
+	AM_RANGE(0x200000, 0x201fff) AM_RAM_WRITE(lemmings_vram_w) AM_BASE(m_vram_data)
 	AM_RANGE(0x202000, 0x202fff) AM_RAM
-	AM_RANGE(0x300000, 0x37ffff) AM_RAM_WRITE_LEGACY(lemmings_pixel_0_w) AM_BASE(m_pixel_0_data)
-	AM_RANGE(0x380000, 0x39ffff) AM_RAM_WRITE_LEGACY(lemmings_pixel_1_w) AM_BASE(m_pixel_1_data)
+	AM_RANGE(0x300000, 0x37ffff) AM_RAM_WRITE(lemmings_pixel_0_w) AM_BASE(m_pixel_0_data)
+	AM_RANGE(0x380000, 0x39ffff) AM_RAM_WRITE(lemmings_pixel_1_w) AM_BASE(m_pixel_1_data)
 ADDRESS_MAP_END
 
 /******************************************************************************/

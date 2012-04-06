@@ -29,6 +29,23 @@ public:
 	int m_param_cnt;
 	int m_flipscreen_old;
 	DECLARE_READ8_MEMBER(taiwanmb_unk_r);
+	DECLARE_READ8_MEMBER(nbmj8891_palette_type1_r);
+	DECLARE_WRITE8_MEMBER(nbmj8891_palette_type1_w);
+	DECLARE_READ8_MEMBER(nbmj8891_palette_type2_r);
+	DECLARE_WRITE8_MEMBER(nbmj8891_palette_type2_w);
+	DECLARE_READ8_MEMBER(nbmj8891_palette_type3_r);
+	DECLARE_WRITE8_MEMBER(nbmj8891_palette_type3_w);
+	DECLARE_WRITE8_MEMBER(nbmj8891_clutsel_w);
+	DECLARE_READ8_MEMBER(nbmj8891_clut_r);
+	DECLARE_WRITE8_MEMBER(nbmj8891_clut_w);
+	DECLARE_WRITE8_MEMBER(nbmj8891_blitter_w);
+	DECLARE_WRITE8_MEMBER(nbmj8891_taiwanmb_blitter_w);
+	DECLARE_WRITE8_MEMBER(nbmj8891_taiwanmb_gfxdraw_w);
+	DECLARE_WRITE8_MEMBER(nbmj8891_taiwanmb_gfxflag_w);
+	DECLARE_WRITE8_MEMBER(nbmj8891_taiwanmb_mcu_w);
+	DECLARE_WRITE8_MEMBER(nbmj8891_scrolly_w);
+	DECLARE_WRITE8_MEMBER(nbmj8891_vramsel_w);
+	DECLARE_WRITE8_MEMBER(nbmj8891_romsel_w);
 };
 
 
@@ -38,20 +55,3 @@ SCREEN_UPDATE_IND16( nbmj8891 );
 VIDEO_START( nbmj8891_1layer );
 VIDEO_START( nbmj8891_2layer );
 
-READ8_HANDLER( nbmj8891_palette_type1_r );
-WRITE8_HANDLER( nbmj8891_palette_type1_w );
-READ8_HANDLER( nbmj8891_palette_type2_r );
-WRITE8_HANDLER( nbmj8891_palette_type2_w );
-READ8_HANDLER( nbmj8891_palette_type3_r );
-WRITE8_HANDLER( nbmj8891_palette_type3_w );
-WRITE8_HANDLER( nbmj8891_blitter_w );
-WRITE8_HANDLER( nbmj8891_scrolly_w );
-WRITE8_HANDLER( nbmj8891_vramsel_w );
-WRITE8_HANDLER( nbmj8891_romsel_w );
-WRITE8_HANDLER( nbmj8891_clutsel_w );
-READ8_HANDLER( nbmj8891_clut_r );
-WRITE8_HANDLER( nbmj8891_clut_w );
-WRITE8_HANDLER( nbmj8891_taiwanmb_blitter_w );
-WRITE8_HANDLER( nbmj8891_taiwanmb_gfxflag_w );
-WRITE8_HANDLER( nbmj8891_taiwanmb_gfxdraw_w );
-WRITE8_HANDLER( nbmj8891_taiwanmb_mcu_w );

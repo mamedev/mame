@@ -299,20 +299,20 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, bigevglf_state )
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
 	AM_RANGE(0xd000, 0xd7ff) AM_ROMBANK("bank1")
 	AM_RANGE(0xd800, 0xdbff) AM_RAM AM_SHARE("share1") /* only half of the RAM is accessible, line a10 of IC73 (6116) is GNDed */
-	AM_RANGE(0xe000, 0xe7ff) AM_WRITE_LEGACY(bigevglf_palette_w) AM_BASE(m_paletteram)
+	AM_RANGE(0xe000, 0xe7ff) AM_WRITE(bigevglf_palette_w) AM_BASE(m_paletteram)
 	AM_RANGE(0xe800, 0xefff) AM_WRITEONLY AM_BASE(m_spriteram1) /* sprite 'templates' */
-	AM_RANGE(0xf000, 0xf0ff) AM_READWRITE_LEGACY(bigevglf_vidram_r, bigevglf_vidram_w) /* 41464 (64kB * 8 chips), addressed using ports 1 and 5 */
+	AM_RANGE(0xf000, 0xf0ff) AM_READWRITE(bigevglf_vidram_r, bigevglf_vidram_w) /* 41464 (64kB * 8 chips), addressed using ports 1 and 5 */
 	AM_RANGE(0xf840, 0xf8ff) AM_RAM AM_BASE(m_spriteram2)  /* spriteram (x,y,offset in spriteram1,palette) */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bigevglf_portmap, AS_IO, 8, bigevglf_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITENOP	/* video ram enable ???*/
-	AM_RANGE(0x01, 0x01) AM_WRITE_LEGACY(bigevglf_gfxcontrol_w)  /* plane select */
+	AM_RANGE(0x01, 0x01) AM_WRITE(bigevglf_gfxcontrol_w)  /* plane select */
 	AM_RANGE(0x02, 0x02) AM_WRITE(beg_banking_w)
 	AM_RANGE(0x03, 0x03) AM_WRITE(beg13_a_set_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE(beg13_b_clr_w)
-	AM_RANGE(0x05, 0x05) AM_WRITE_LEGACY(bigevglf_vidram_addr_w)	/* video banking (256 banks) for f000-f0ff area */
+	AM_RANGE(0x05, 0x05) AM_WRITE(bigevglf_vidram_addr_w)	/* video banking (256 banks) for f000-f0ff area */
 	AM_RANGE(0x06, 0x06) AM_READ(beg_status_r)
 ADDRESS_MAP_END
 
@@ -336,7 +336,7 @@ READ8_MEMBER(bigevglf_state::sub_cpu_mcu_coin_port_r)
 
     */
 	m_mcu_coin_bit5 ^= 0x20;
-	return bigevglf_mcu_status_r(&space, 0) | (input_port_read(machine(), "PORT04") & 3) | m_mcu_coin_bit5;	/* bit 0 and bit 1 - coin inputs */
+	return bigevglf_mcu_status_r(space, 0) | (input_port_read(machine(), "PORT04") & 3) | m_mcu_coin_bit5;	/* bit 0 and bit 1 - coin inputs */
 }
 
 static ADDRESS_MAP_START( bigevglf_sub_portmap, AS_IO, 8, bigevglf_state )
@@ -350,8 +350,8 @@ static ADDRESS_MAP_START( bigevglf_sub_portmap, AS_IO, 8, bigevglf_state )
 	AM_RANGE(0x06, 0x06) AM_READ_PORT("DSW2")
 	AM_RANGE(0x07, 0x07) AM_READNOP
 	AM_RANGE(0x08, 0x08) AM_WRITE(beg_port08_w) /* muxed port select + other unknown stuff */
-	AM_RANGE(0x0b, 0x0b) AM_READ_LEGACY(bigevglf_mcu_r)
-	AM_RANGE(0x0c, 0x0c) AM_WRITE_LEGACY(bigevglf_mcu_w)
+	AM_RANGE(0x0b, 0x0b) AM_READ(bigevglf_mcu_r)
+	AM_RANGE(0x0c, 0x0c) AM_WRITE(bigevglf_mcu_w)
 	AM_RANGE(0x0e, 0x0e) AM_WRITENOP /* 0-enable MCU, 1-keep reset line ASSERTED; D0 goes to the input of ls74 and the /Q of this ls74 goes to reset line on 68705 */
 	AM_RANGE(0x10, 0x17) AM_WRITE(beg13_a_clr_w)
 	AM_RANGE(0x18, 0x1f) AM_WRITE(beg13_b_set_w)
@@ -385,12 +385,12 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( m68705_map, AS_PROGRAM, 8, bigevglf_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
-	AM_RANGE(0x0000, 0x0000) AM_READWRITE_LEGACY(bigevglf_68705_port_a_r, bigevglf_68705_port_a_w)
-	AM_RANGE(0x0001, 0x0001) AM_READWRITE_LEGACY(bigevglf_68705_port_b_r, bigevglf_68705_port_b_w)
-	AM_RANGE(0x0002, 0x0002) AM_READWRITE_LEGACY(bigevglf_68705_port_c_r, bigevglf_68705_port_c_w)
-	AM_RANGE(0x0004, 0x0004) AM_WRITE_LEGACY(bigevglf_68705_ddr_a_w)
-	AM_RANGE(0x0005, 0x0005) AM_WRITE_LEGACY(bigevglf_68705_ddr_b_w)
-	AM_RANGE(0x0006, 0x0006) AM_WRITE_LEGACY(bigevglf_68705_ddr_c_w)
+	AM_RANGE(0x0000, 0x0000) AM_READWRITE(bigevglf_68705_port_a_r, bigevglf_68705_port_a_w)
+	AM_RANGE(0x0001, 0x0001) AM_READWRITE(bigevglf_68705_port_b_r, bigevglf_68705_port_b_w)
+	AM_RANGE(0x0002, 0x0002) AM_READWRITE(bigevglf_68705_port_c_r, bigevglf_68705_port_c_w)
+	AM_RANGE(0x0004, 0x0004) AM_WRITE(bigevglf_68705_ddr_a_w)
+	AM_RANGE(0x0005, 0x0005) AM_WRITE(bigevglf_68705_ddr_b_w)
+	AM_RANGE(0x0006, 0x0006) AM_WRITE(bigevglf_68705_ddr_c_w)
 	AM_RANGE(0x0010, 0x007f) AM_RAM
 	AM_RANGE(0x0080, 0x07ff) AM_ROM
 ADDRESS_MAP_END

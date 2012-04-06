@@ -118,7 +118,7 @@ WRITE16_MEMBER(gaelco_state::thoop_encrypted_w)
 
 static ADDRESS_MAP_START( bigkarnk_map, AS_PROGRAM, 16, gaelco_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM															/* ROM */
-	AM_RANGE(0x100000, 0x101fff) AM_RAM_WRITE_LEGACY(gaelco_vram_w) AM_BASE(m_videoram)				/* Video RAM */
+	AM_RANGE(0x100000, 0x101fff) AM_RAM_WRITE(gaelco_vram_w) AM_BASE(m_videoram)				/* Video RAM */
 	AM_RANGE(0x102000, 0x103fff) AM_RAM															/* Screen RAM */
 	AM_RANGE(0x108000, 0x108007) AM_WRITEONLY AM_BASE(m_vregs)							/* Video Registers */
 //  AM_RANGE(0x10800c, 0x10800d) AM_WRITE(watchdog_reset_w)                                                 /* INT 6 ACK/Watchdog timer */
@@ -145,7 +145,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( maniacsq_map, AS_PROGRAM, 16, gaelco_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM															/* ROM */
-	AM_RANGE(0x100000, 0x101fff) AM_RAM_WRITE_LEGACY(gaelco_vram_w) AM_BASE(m_videoram)				/* Video RAM */
+	AM_RANGE(0x100000, 0x101fff) AM_RAM_WRITE(gaelco_vram_w) AM_BASE(m_videoram)				/* Video RAM */
 	AM_RANGE(0x102000, 0x103fff) AM_RAM															/* Screen RAM */
 	AM_RANGE(0x108000, 0x108007) AM_WRITEONLY AM_BASE(m_vregs)							/* Video Registers */
 //  AM_RANGE(0x10800c, 0x10800d) AM_WRITE(watchdog_reset_w)                                                 /* INT 6 ACK/Watchdog timer */

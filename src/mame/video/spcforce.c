@@ -10,9 +10,9 @@
 #include "includes/spcforce.h"
 
 
-WRITE8_HANDLER( spcforce_flip_screen_w )
+WRITE8_MEMBER(spcforce_state::spcforce_flip_screen_w)
 {
-	flip_screen_set(space->machine(), ~data & 0x01);
+	flip_screen_set(machine(), ~data & 0x01);
 }
 
 

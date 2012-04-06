@@ -43,9 +43,9 @@ static ADDRESS_MAP_START( skyfox_map, AS_PROGRAM, 8, skyfox_state )
 	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("INPUTS")			// Input Ports
 	AM_RANGE(0xe001, 0xe001) AM_READ_PORT("DSW0")			//
 	AM_RANGE(0xe002, 0xe002) AM_READ_PORT("DSW1")			//
-	AM_RANGE(0xe008, 0xe00f) AM_WRITE_LEGACY(skyfox_vregs_w)		// Video Regs
+	AM_RANGE(0xe008, 0xe00f) AM_WRITE(skyfox_vregs_w)		// Video Regs
 	AM_RANGE(0xf001, 0xf001) AM_READ_PORT("DSW2")			//
-//  AM_RANGE(0xff00, 0xff07) AM_READ_LEGACY(skyfox_vregs_r)        // fake to read the vregs
+//  AM_RANGE(0xff00, 0xff07) AM_READ(skyfox_vregs_r)        // fake to read the vregs
 ADDRESS_MAP_END
 
 

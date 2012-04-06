@@ -22,11 +22,10 @@ VIDEO_START( freekick )
 }
 
 
-WRITE8_HANDLER( freek_videoram_w )
+WRITE8_MEMBER(freekick_state::freek_videoram_w)
 {
-	freekick_state *state = space->machine().driver_data<freekick_state>();
-	state->m_videoram[offset] = data;
-	state->m_freek_tilemap->mark_tile_dirty(offset & 0x3ff);
+	m_videoram[offset] = data;
+	m_freek_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
 static void gigas_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )

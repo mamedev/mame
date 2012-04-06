@@ -128,7 +128,7 @@ WRITE16_MEMBER(m107_state::m107_sound_reset_w)
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, m107_state )
 	AM_RANGE(0x00000, 0x9ffff) AM_ROM
 	AM_RANGE(0xa0000, 0xbffff) AM_ROMBANK("bank1")
-	AM_RANGE(0xd0000, 0xdffff) AM_RAM_WRITE_LEGACY(m107_vram_w) AM_BASE(m_vram_data)
+	AM_RANGE(0xd0000, 0xdffff) AM_RAM_WRITE(m107_vram_w) AM_BASE(m_vram_data)
 	AM_RANGE(0xe0000, 0xeffff) AM_RAM /* System ram */
 	AM_RANGE(0xf8000, 0xf8fff) AM_RAM AM_BASE(m_spriteram)
 	AM_RANGE(0xf9000, 0xf9fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
@@ -144,9 +144,9 @@ static ADDRESS_MAP_START( main_portmap, AS_IO, 16, m107_state )
 	AM_RANGE(0x00, 0x01) AM_WRITE(m107_soundlatch_w)
 	AM_RANGE(0x02, 0x03) AM_WRITE(m107_coincounter_w)
 	AM_RANGE(0x04, 0x05) AM_WRITENOP /* ??? 0008 */
-	AM_RANGE(0x80, 0x9f) AM_WRITE_LEGACY(m107_control_w)
+	AM_RANGE(0x80, 0x9f) AM_WRITE(m107_control_w)
 	AM_RANGE(0xa0, 0xaf) AM_WRITENOP /* Written with 0's in interrupt */
-	AM_RANGE(0xb0, 0xb1) AM_WRITE_LEGACY(m107_spritebuffer_w)
+	AM_RANGE(0xb0, 0xb1) AM_WRITE(m107_spritebuffer_w)
 	AM_RANGE(0xc0, 0xc3) AM_READNOP /* Only wpksoc: ticket related? */
 	AM_RANGE(0xc0, 0xc1) AM_WRITE(m107_sound_reset_w)
 ADDRESS_MAP_END

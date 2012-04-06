@@ -21,13 +21,13 @@ public:
 	DECLARE_WRITE16_MEMBER(heberpop_coinctrl_w);
 	DECLARE_WRITE16_MEMBER(blocken_coinctrl_w);
 	DECLARE_WRITE16_MEMBER(heberpop_sound_command_w);
+	DECLARE_WRITE16_MEMBER(shangha3_flipscreen_w);
+	DECLARE_WRITE16_MEMBER(shangha3_gfxlist_addr_w);
+	DECLARE_WRITE16_MEMBER(shangha3_blitter_go_w);
 };
 
 
 /*----------- defined in video/shangha3.c -----------*/
 
-WRITE16_HANDLER( shangha3_flipscreen_w );
-WRITE16_HANDLER( shangha3_gfxlist_addr_w );
-WRITE16_HANDLER( shangha3_blitter_go_w );
 VIDEO_START( shangha3 );
 SCREEN_UPDATE_IND16( shangha3 );

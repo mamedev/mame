@@ -41,16 +41,16 @@ public:
 	device_t *m_audio_cpu;	// system 16c does not have sound CPU
 	DECLARE_WRITE16_MEMBER(sound_command_w);
 	DECLARE_WRITE16_MEMBER(deniam_irq_ack_w);
+	DECLARE_WRITE16_MEMBER(deniam_videoram_w);
+	DECLARE_WRITE16_MEMBER(deniam_textram_w);
+	DECLARE_WRITE16_MEMBER(deniam_palette_w);
+	DECLARE_READ16_MEMBER(deniam_coinctrl_r);
+	DECLARE_WRITE16_MEMBER(deniam_coinctrl_w);
 };
 
 
 /*----------- defined in video/deniam.c -----------*/
 
-WRITE16_HANDLER( deniam_videoram_w );
-WRITE16_HANDLER( deniam_textram_w );
-WRITE16_HANDLER( deniam_palette_w );
-READ16_HANDLER( deniam_coinctrl_r );
-WRITE16_HANDLER( deniam_coinctrl_w );
 
 VIDEO_START( deniam );
 SCREEN_UPDATE_IND16( deniam );

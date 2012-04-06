@@ -25,18 +25,18 @@ public:
 	/* misc */
 	int        m_input_ports_hack;
 	DECLARE_WRITE8_MEMBER(yamyam_bankswitch_w);
+	DECLARE_WRITE8_MEMBER(gundealr_bg_videoram_w);
+	DECLARE_WRITE8_MEMBER(gundealr_fg_videoram_w);
+	DECLARE_WRITE8_MEMBER(gundealr_paletteram_w);
+	DECLARE_WRITE8_MEMBER(gundealr_fg_scroll_w);
+	DECLARE_WRITE8_MEMBER(yamyam_fg_scroll_w);
+	DECLARE_WRITE8_MEMBER(gundealr_flipscreen_w);
 };
 
 
 
 /*----------- defined in video/gundealr.c -----------*/
 
-WRITE8_HANDLER( gundealr_paletteram_w );
-WRITE8_HANDLER( gundealr_bg_videoram_w );
-WRITE8_HANDLER( gundealr_fg_videoram_w );
-WRITE8_HANDLER( gundealr_fg_scroll_w );
-WRITE8_HANDLER( yamyam_fg_scroll_w );
-WRITE8_HANDLER( gundealr_flipscreen_w );
 
 SCREEN_UPDATE_IND16( gundealr );
 VIDEO_START( gundealr );

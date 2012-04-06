@@ -423,9 +423,9 @@ static TIMER_CALLBACK( counter_fired_callback )
 }
 
 
-static void reload_count(mcr68_state *state, int counter)
+void mcr68_state::reload_count(int counter)
 {
-	struct counter_state *m6840 = &state->m_m6840_state[counter];
+	struct counter_state *m6840 = &m_m6840_state[counter];
 	attotime period;
 	attotime total_period;
 	int count;
@@ -443,9 +443,9 @@ static void reload_count(mcr68_state *state, int counter)
 
 	/* determine the clock period for this timer */
 	if (m6840->control & 0x02)
-		period = state->m_m6840_internal_counter_period;
+		period = m_m6840_internal_counter_period;
 	else
-		period = state->m_m6840_counter_periods[counter];
+		period = m_m6840_counter_periods[counter];
 
 	/* determine the number of clock periods before we expire */
 	count = m6840->count;
@@ -462,9 +462,9 @@ LOG(("reload_count(%d): period = %f  count = %d\n", counter, period.as_double(),
 }
 
 
-static UINT16 compute_counter(mcr68_state *state, int counter)
+UINT16 mcr68_state::compute_counter(int counter)
 {
-	struct counter_state *m6840 = &state->m_m6840_state[counter];
+	struct counter_state *m6840 = &m_m6840_state[counter];
 	attotime period;
 	int remaining;
 
@@ -474,9 +474,9 @@ static UINT16 compute_counter(mcr68_state *state, int counter)
 
 	/* determine the clock period for this timer */
 	if (m6840->control & 0x02)
-		period = state->m_m6840_internal_counter_period;
+		period = m_m6840_internal_counter_period;
 	else
-		period = state->m_m6840_counter_periods[counter];
+		period = m_m6840_counter_periods[counter];
 	/* see how many are left */
 	remaining = m6840->timer->remaining().as_attoseconds() / period.as_attoseconds();
 
@@ -500,16 +500,15 @@ static UINT16 compute_counter(mcr68_state *state, int counter)
  *
  *************************************/
 
-static WRITE8_HANDLER( mcr68_6840_w_common )
+WRITE8_MEMBER(mcr68_state::mcr68_6840_w_common)
 {
-	mcr68_state *state = space->machine().driver_data<mcr68_state>();
 	int i;
 
 	/* offsets 0 and 1 are control registers */
 	if (offset < 2)
 	{
-		int counter = (offset == 1) ? 1 : (state->m_m6840_state[1].control & 0x01) ? 0 : 2;
-		struct counter_state *m6840 = &state->m_m6840_state[counter];
+		int counter = (offset == 1) ? 1 : (m_m6840_state[1].control & 0x01) ? 0 : 2;
+		struct counter_state *m6840 = &m_m6840_state[counter];
 		UINT8 diffs = data ^ m6840->control;
 
 		m6840->control = data;
@@ -522,8 +521,8 @@ static WRITE8_HANDLER( mcr68_6840_w_common )
 			{
 				for (i = 0; i < 3; i++)
 				{
-					state->m_m6840_state[i].timer->adjust(attotime::never);
-					state->m_m6840_state[i].timer_active = 0;
+					m_m6840_state[i].timer->adjust(attotime::never);
+					m_m6840_state[i].timer_active = 0;
 				}
 			}
 
@@ -531,50 +530,49 @@ static WRITE8_HANDLER( mcr68_6840_w_common )
 			else
 			{
 				for (i = 0; i < 3; i++)
-					reload_count(state, i);
+					reload_count(i);
 			}
 
-			state->m_m6840_status = 0;
-			update_interrupts(space->machine());
+			m_m6840_status = 0;
+			update_interrupts(machine());
 		}
 
 		/* changing the clock source? (needed for Zwackery) */
 		if (diffs & 0x02)
-			reload_count(state, counter);
+			reload_count(counter);
 
-		LOG(("%06X:Counter %d control = %02X\n", cpu_get_previouspc(&space->device()), counter, data));
+		LOG(("%06X:Counter %d control = %02X\n", cpu_get_previouspc(&space.device()), counter, data));
 	}
 
 	/* offsets 2, 4, and 6 are MSB buffer registers */
 	else if ((offset & 1) == 0)
 	{
-		LOG(("%06X:MSB = %02X\n", cpu_get_previouspc(&space->device()), data));
-		state->m_m6840_msb_buffer = data;
+		LOG(("%06X:MSB = %02X\n", cpu_get_previouspc(&space.device()), data));
+		m_m6840_msb_buffer = data;
 	}
 
 	/* offsets 3, 5, and 7 are Write Timer Latch commands */
 	else
 	{
 		int counter = (offset - 2) / 2;
-		struct counter_state *m6840 = &state->m_m6840_state[counter];
-		m6840->latch = (state->m_m6840_msb_buffer << 8) | (data & 0xff);
+		struct counter_state *m6840 = &m_m6840_state[counter];
+		m6840->latch = (m_m6840_msb_buffer << 8) | (data & 0xff);
 
 		/* clear the interrupt */
-		state->m_m6840_status &= ~(1 << counter);
-		update_interrupts(space->machine());
+		m_m6840_status &= ~(1 << counter);
+		update_interrupts(machine());
 
 		/* reload the count if in an appropriate mode */
 		if (!(m6840->control & 0x10))
-			reload_count(state, counter);
+			reload_count(counter);
 
-		LOG(("%06X:Counter %d latch = %04X\n", cpu_get_previouspc(&space->device()), counter, m6840->latch));
+		LOG(("%06X:Counter %d latch = %04X\n", cpu_get_previouspc(&space.device()), counter, m6840->latch));
 	}
 }
 
 
-static READ16_HANDLER( mcr68_6840_r_common )
+READ16_MEMBER(mcr68_state::mcr68_6840_r_common)
 {
-	mcr68_state *state = space->machine().driver_data<mcr68_state>();
 	/* offset 0 is a no-op */
 	if (offset == 0)
 		return 0;
@@ -582,55 +580,55 @@ static READ16_HANDLER( mcr68_6840_r_common )
 	/* offset 1 is the status register */
 	else if (offset == 1)
 	{
-		LOG(("%06X:Status read = %04X\n", cpu_get_previouspc(&space->device()), state->m_m6840_status));
-		state->m_m6840_status_read_since_int |= state->m_m6840_status & 0x07;
-		return state->m_m6840_status;
+		LOG(("%06X:Status read = %04X\n", cpu_get_previouspc(&space.device()), m_m6840_status));
+		m_m6840_status_read_since_int |= m_m6840_status & 0x07;
+		return m_m6840_status;
 	}
 
 	/* offsets 2, 4, and 6 are Read Timer Counter commands */
 	else if ((offset & 1) == 0)
 	{
 		int counter = (offset - 2) / 2;
-		int result = compute_counter(state, counter);
+		int result = compute_counter(counter);
 
 		/* clear the interrupt if the status has been read */
-		if (state->m_m6840_status_read_since_int & (1 << counter))
-			state->m_m6840_status &= ~(1 << counter);
-		update_interrupts(space->machine());
+		if (m_m6840_status_read_since_int & (1 << counter))
+			m_m6840_status &= ~(1 << counter);
+		update_interrupts(machine());
 
-		state->m_m6840_lsb_buffer = result & 0xff;
+		m_m6840_lsb_buffer = result & 0xff;
 
-		LOG(("%06X:Counter %d read = %04X\n", cpu_get_previouspc(&space->device()), counter, result));
+		LOG(("%06X:Counter %d read = %04X\n", cpu_get_previouspc(&space.device()), counter, result));
 		return result >> 8;
 	}
 
 	/* offsets 3, 5, and 7 are LSB buffer registers */
 	else
-		return state->m_m6840_lsb_buffer;
+		return m_m6840_lsb_buffer;
 }
 
 
-WRITE16_HANDLER( mcr68_6840_upper_w )
+WRITE16_MEMBER(mcr68_state::mcr68_6840_upper_w)
 {
 	if (ACCESSING_BITS_8_15)
 		mcr68_6840_w_common(space, offset, (data >> 8) & 0xff);
 }
 
 
-WRITE16_HANDLER( mcr68_6840_lower_w )
+WRITE16_MEMBER(mcr68_state::mcr68_6840_lower_w)
 {
 	if (ACCESSING_BITS_0_7)
 		mcr68_6840_w_common(space, offset, data & 0xff);
 }
 
 
-READ16_HANDLER( mcr68_6840_upper_r )
+READ16_MEMBER(mcr68_state::mcr68_6840_upper_r)
 {
 	return (mcr68_6840_r_common(space,offset,0) << 8) | 0x00ff;
 }
 
 
-READ16_HANDLER( mcr68_6840_lower_r )
+READ16_MEMBER(mcr68_state::mcr68_6840_lower_r)
 {
 	return mcr68_6840_r_common(space,offset,0) | 0xff00;
 }

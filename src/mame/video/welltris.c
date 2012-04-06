@@ -5,25 +5,24 @@
 
 
 #ifdef UNUSED_FUNCTION
-READ16_HANDLER( welltris_spriteram_r )
+READ16_MEMBER(welltris_state::welltris_spriteram_r)
 {
 	return welltris_spriteram[offset];
 }
 #endif
 
-WRITE16_HANDLER( welltris_spriteram_w )
+WRITE16_MEMBER(welltris_state::welltris_spriteram_w)
 {
-	welltris_state *state = space->machine().driver_data<welltris_state>();
 	int offs;
 
-	COMBINE_DATA(&state->m_spriteram[offset]);
+	COMBINE_DATA(&m_spriteram[offset]);
 
 	/* hack... sprite doesn't work otherwise (quiz18kn) */
 	if ((offset == 0x1fe) &&
-		(state->m_spriteram[0x01fc] == 0x0000) &&
-		(state->m_spriteram[0x01fd] == 0x0000) &&
-		(state->m_spriteram[0x01ff] == 0x0000)) {
-		for (offs = 0; offs < 0x1fc; offs++) state->m_spriteram[offs] = 0x0000;
+		(m_spriteram[0x01fc] == 0x0000) &&
+		(m_spriteram[0x01fd] == 0x0000) &&
+		(m_spriteram[0x01ff] == 0x0000)) {
+		for (offs = 0; offs < 0x1fc; offs++) m_spriteram[offs] = 0x0000;
 	}
 }
 
@@ -143,55 +142,52 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 	}
 }
 
-static void setbank(welltris_state *state, int num, int bank)
+void welltris_state::setbank(int num, int bank)
 {
-	if (state->m_gfxbank[num] != bank)
+	if (m_gfxbank[num] != bank)
 	{
-		state->m_gfxbank[num] = bank;
-		state->m_char_tilemap->mark_all_dirty();
+		m_gfxbank[num] = bank;
+		m_char_tilemap->mark_all_dirty();
 	}
 }
 
 
 /* Not really enough evidence here */
 
-WRITE16_HANDLER( welltris_palette_bank_w )
+WRITE16_MEMBER(welltris_state::welltris_palette_bank_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		welltris_state *state = space->machine().driver_data<welltris_state>();
 
-		if (state->m_charpalettebank != (data & 0x03))
+		if (m_charpalettebank != (data & 0x03))
 		{
-			state->m_charpalettebank = (data & 0x03);
-			state->m_char_tilemap->mark_all_dirty();
+			m_charpalettebank = (data & 0x03);
+			m_char_tilemap->mark_all_dirty();
 		}
 
-		flip_screen_set(space->machine(), data & 0x80);
+		flip_screen_set(machine(), data & 0x80);
 
-		state->m_spritepalettebank = (data & 0x20) >> 5;
-		state->m_pixelpalettebank = (data & 0x08) >> 3;
+		m_spritepalettebank = (data & 0x20) >> 5;
+		m_pixelpalettebank = (data & 0x08) >> 3;
 	}
 }
 
-WRITE16_HANDLER( welltris_gfxbank_w )
+WRITE16_MEMBER(welltris_state::welltris_gfxbank_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		welltris_state *state = space->machine().driver_data<welltris_state>();
 
-		setbank(state, 0, (data & 0xf0) >> 4);
-		setbank(state, 1, data & 0x0f);
+		setbank(0, (data & 0xf0) >> 4);
+		setbank(1, data & 0x0f);
 	}
 }
 
-WRITE16_HANDLER( welltris_scrollreg_w )
+WRITE16_MEMBER(welltris_state::welltris_scrollreg_w)
 {
-	welltris_state *state = space->machine().driver_data<welltris_state>();
 
 	switch (offset) {
-		case 0: state->m_scrollx = data - 14; break;
-		case 1: state->m_scrolly = data +  0; break;
+		case 0: m_scrollx = data - 14; break;
+		case 1: m_scrolly = data +  0; break;
 	}
 }
 
@@ -208,12 +204,11 @@ static TILE_GET_INFO( get_welltris_tile_info )
 			0);
 }
 
-WRITE16_HANDLER( welltris_charvideoram_w )
+WRITE16_MEMBER(welltris_state::welltris_charvideoram_w)
 {
-	welltris_state *state = space->machine().driver_data<welltris_state>();
 
-	COMBINE_DATA(&state->m_charvideoram[offset]);
-	state->m_char_tilemap->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_charvideoram[offset]);
+	m_char_tilemap->mark_tile_dirty(offset);
 }
 
 VIDEO_START( welltris )

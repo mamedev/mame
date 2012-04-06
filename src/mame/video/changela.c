@@ -734,7 +734,7 @@ SCREEN_UPDATE_IND16( changela )
 	return 0;
 }
 
-WRITE8_HANDLER( changela_colors_w )
+WRITE8_MEMBER(changela_state::changela_colors_w)
 {
 	/* Each color is combined from 3 bits from open-colelctor outputs of ram.
     Each of the bits is connected to a 220, 470, or 1000 Ohm resistor.
@@ -767,57 +767,52 @@ WRITE8_HANDLER( changela_colors_w )
 	g = color_table[(c >> 3) & 0x07];
 	b = color_table[(c >> 6) & 0x07];
 
-	palette_set_color_rgb(space->machine(),color_index,r,g,b);
+	palette_set_color_rgb(machine(),color_index,r,g,b);
 }
 
 
-WRITE8_HANDLER( changela_mem_device_select_w )
+WRITE8_MEMBER(changela_state::changela_mem_device_select_w)
 {
-	changela_state *state = space->machine().driver_data<changela_state>();
-	state->m_mem_dev_selected = (data & 0x07) * 0x800;
-	state->m_tree_en = (data & 0x30) >> 4;
+	m_mem_dev_selected = (data & 0x07) * 0x800;
+	m_tree_en = (data & 0x30) >> 4;
 
 	/*
     (data & 0x07) possible settings:
     0 - not connected (no device)
-    1 - ADR1 is 2114 RAM at U59 (state space->machine()) (accessible range: 0x0000-0x003f)
+    1 - ADR1 is 2114 RAM at U59 (state machine()) (accessible range: 0x0000-0x003f)
     2 - ADR2 is 2128 RAM at U109 (River RAM)    (accessible range: 0x0000-0x07ff)
     3 - ADR3 is 2128 RAM at U114 (Tree RAM)    (accessible range: 0x0000-0x07ff)
     4 - ADR4 is 2732 ROM at U7    (Tree ROM)    (accessible range: 0x0000-0x07ff)
-    5 - SLOPE is ROM at U44 (state space->machine())     (accessible range: 0x0000-0x07ff)
+    5 - SLOPE is ROM at U44 (state machine())     (accessible range: 0x0000-0x07ff)
     */
 }
 
-WRITE8_HANDLER( changela_mem_device_w )
+WRITE8_MEMBER(changela_state::changela_mem_device_w)
 {
-	changela_state *state = space->machine().driver_data<changela_state>();
-	state->m_memory_devices[state->m_mem_dev_selected + offset] = data;
+	m_memory_devices[m_mem_dev_selected + offset] = data;
 
-	if (state->m_mem_dev_selected == 0x800)
+	if (m_mem_dev_selected == 0x800)
 	{
-		state->m_memory_devices[state->m_mem_dev_selected + 0x40 + offset] = data;
-		state->m_memory_devices[state->m_mem_dev_selected + 0x80 + offset] = data;
+		m_memory_devices[m_mem_dev_selected + 0x40 + offset] = data;
+		m_memory_devices[m_mem_dev_selected + 0x80 + offset] = data;
 	}
 }
 
 
-READ8_HANDLER( changela_mem_device_r )
+READ8_MEMBER(changela_state::changela_mem_device_r)
 {
-	changela_state *state = space->machine().driver_data<changela_state>();
-	return state->m_memory_devices[state->m_mem_dev_selected + offset];
+	return m_memory_devices[m_mem_dev_selected + offset];
 }
 
 
-WRITE8_HANDLER( changela_slope_rom_addr_hi_w )
+WRITE8_MEMBER(changela_state::changela_slope_rom_addr_hi_w)
 {
-	changela_state *state = space->machine().driver_data<changela_state>();
-	state->m_slopeROM_bank = (data & 0x03) << 9;
+	m_slopeROM_bank = (data & 0x03) << 9;
 }
 
-WRITE8_HANDLER( changela_slope_rom_addr_lo_w )
+WRITE8_MEMBER(changela_state::changela_slope_rom_addr_lo_w)
 {
-	changela_state *state = space->machine().driver_data<changela_state>();
-	state->m_horizon = data;
+	m_horizon = data;
 }
 
 

@@ -30,15 +30,15 @@ public:
 	device_t *m_soundcpu;
 	DECLARE_WRITE8_MEMBER(sound_cmd_w);
 	DECLARE_WRITE8_MEMBER(sound_irq_ack_w);
+	DECLARE_WRITE8_MEMBER(kncljoe_videoram_w);
+	DECLARE_WRITE8_MEMBER(kncljoe_control_w);
+	DECLARE_WRITE8_MEMBER(kncljoe_scroll_w);
 };
 
 
 
 /*----------- defined in video/kncljoe.c -----------*/
 
-WRITE8_HANDLER(kncljoe_videoram_w);
-WRITE8_HANDLER(kncljoe_control_w);
-WRITE8_HANDLER(kncljoe_scroll_w);
 
 PALETTE_INIT( kncljoe );
 VIDEO_START( kncljoe );

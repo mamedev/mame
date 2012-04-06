@@ -56,6 +56,10 @@ public:
 	DECLARE_READ16_MEMBER(dsp56k_ram_bank04_read);
 	DECLARE_WRITE16_MEMBER(dsp56k_ram_bank04_write);
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
+	DECLARE_READ32_MEMBER(polygonet_ttl_ram_r);
+	DECLARE_WRITE32_MEMBER(polygonet_ttl_ram_w);
+	DECLARE_READ32_MEMBER(polygonet_roz_ram_r);
+	DECLARE_WRITE32_MEMBER(polygonet_roz_ram_w);
 };
 
 /*----------- defined in video/plygonet.c -----------*/
@@ -63,7 +67,3 @@ public:
 VIDEO_START( polygonet );
 SCREEN_UPDATE_IND16( polygonet );
 
-READ32_HANDLER( polygonet_ttl_ram_r );
-WRITE32_HANDLER( polygonet_ttl_ram_w );
-READ32_HANDLER( polygonet_roz_ram_r );
-WRITE32_HANDLER( polygonet_roz_ram_w );

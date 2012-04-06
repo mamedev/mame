@@ -12,9 +12,8 @@
 
 /***************************************************************************/
 
-WRITE16_HANDLER( rbisland_spritectrl_w )
+WRITE16_MEMBER(rbisland_state::rbisland_spritectrl_w)
 {
-	rbisland_state *state = space->machine().driver_data<rbisland_state>();
 
 	if (offset == 0)
 	{
@@ -22,13 +21,12 @@ WRITE16_HANDLER( rbisland_spritectrl_w )
 		/* bits 5-7 are the sprite palette bank */
 		/* other bits unknown */
 
-		pc090oj_set_sprite_ctrl(state->m_pc090oj, (data & 0xe0) >> 5);
+		pc090oj_set_sprite_ctrl(m_pc090oj, (data & 0xe0) >> 5);
 	}
 }
 
-WRITE16_HANDLER( jumping_spritectrl_w )
+WRITE16_MEMBER(rbisland_state::jumping_spritectrl_w)
 {
-	rbisland_state *state = space->machine().driver_data<rbisland_state>();
 
 	if (offset == 0)
 	{
@@ -36,7 +34,7 @@ WRITE16_HANDLER( jumping_spritectrl_w )
 		/* bits 5-7 are the sprite palette bank */
 		/* other bits unknown */
 
-		state->m_sprite_ctrl = data;
+		m_sprite_ctrl = data;
 	}
 }
 

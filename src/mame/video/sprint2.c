@@ -52,35 +52,30 @@ VIDEO_START( sprint2 )
 }
 
 
-READ8_HANDLER( sprint2_collision1_r )
+READ8_MEMBER(sprint2_state::sprint2_collision1_r)
 {
-	sprint2_state *state = space->machine().driver_data<sprint2_state>();
-	return state->m_collision[0];
+	return m_collision[0];
 }
-READ8_HANDLER( sprint2_collision2_r )
+READ8_MEMBER(sprint2_state::sprint2_collision2_r)
 {
-	sprint2_state *state = space->machine().driver_data<sprint2_state>();
-	return state->m_collision[1];
+	return m_collision[1];
 }
 
 
-WRITE8_HANDLER( sprint2_collision_reset1_w )
+WRITE8_MEMBER(sprint2_state::sprint2_collision_reset1_w)
 {
-	sprint2_state *state = space->machine().driver_data<sprint2_state>();
-	state->m_collision[0] = 0;
+	m_collision[0] = 0;
 }
-WRITE8_HANDLER( sprint2_collision_reset2_w )
+WRITE8_MEMBER(sprint2_state::sprint2_collision_reset2_w)
 {
-	sprint2_state *state = space->machine().driver_data<sprint2_state>();
-	state->m_collision[1] = 0;
+	m_collision[1] = 0;
 }
 
 
-WRITE8_HANDLER( sprint2_video_ram_w )
+WRITE8_MEMBER(sprint2_state::sprint2_video_ram_w)
 {
-	sprint2_state *state = space->machine().driver_data<sprint2_state>();
-	state->m_video_ram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_video_ram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 

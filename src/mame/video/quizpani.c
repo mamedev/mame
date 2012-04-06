@@ -38,35 +38,32 @@ static TILE_GET_INFO( txt_tile_info )
 			0);
 }
 
-WRITE16_HANDLER( quizpani_bg_videoram_w )
+WRITE16_MEMBER(quizpani_state::quizpani_bg_videoram_w)
 {
-	quizpani_state *state = space->machine().driver_data<quizpani_state>();
-	state->m_bg_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_bg_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_HANDLER( quizpani_txt_videoram_w )
+WRITE16_MEMBER(quizpani_state::quizpani_txt_videoram_w)
 {
-	quizpani_state *state = space->machine().driver_data<quizpani_state>();
-	state->m_txt_videoram[offset] = data;
-	state->m_txt_tilemap->mark_tile_dirty(offset);
+	m_txt_videoram[offset] = data;
+	m_txt_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_HANDLER( quizpani_tilesbank_w )
+WRITE16_MEMBER(quizpani_state::quizpani_tilesbank_w)
 {
-	quizpani_state *state = space->machine().driver_data<quizpani_state>();
 	if (ACCESSING_BITS_0_7)
 	{
-		if(state->m_txtbank != (data & 0x30)>>4)
+		if(m_txtbank != (data & 0x30)>>4)
 		{
-			state->m_txtbank = (data & 0x30)>>4;
-			state->m_txt_tilemap->mark_all_dirty();
+			m_txtbank = (data & 0x30)>>4;
+			m_txt_tilemap->mark_all_dirty();
 		}
 
-		if(state->m_bgbank != (data & 3))
+		if(m_bgbank != (data & 3))
 		{
-			state->m_bgbank = data & 3;
-			state->m_bg_tilemap->mark_all_dirty();
+			m_bgbank = data & 3;
+			m_bg_tilemap->mark_all_dirty();
 		}
 	}
 }

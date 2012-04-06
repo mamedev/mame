@@ -54,51 +54,46 @@ VIDEO_START( gotcha )
 }
 
 
-WRITE16_HANDLER( gotcha_fgvideoram_w )
+WRITE16_MEMBER(gotcha_state::gotcha_fgvideoram_w)
 {
-	gotcha_state *state = space->machine().driver_data<gotcha_state>();
-	COMBINE_DATA(&state->m_fgvideoram[offset]);
-	state->m_fg_tilemap->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_fgvideoram[offset]);
+	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_HANDLER( gotcha_bgvideoram_w )
+WRITE16_MEMBER(gotcha_state::gotcha_bgvideoram_w)
 {
-	gotcha_state *state = space->machine().driver_data<gotcha_state>();
-	COMBINE_DATA(&state->m_bgvideoram[offset]);
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_bgvideoram[offset]);
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_HANDLER( gotcha_gfxbank_select_w )
+WRITE16_MEMBER(gotcha_state::gotcha_gfxbank_select_w)
 {
-	gotcha_state *state = space->machine().driver_data<gotcha_state>();
 	if (ACCESSING_BITS_8_15)
-		state->m_banksel = (data & 0x0300) >> 8;
+		m_banksel = (data & 0x0300) >> 8;
 }
 
-WRITE16_HANDLER( gotcha_gfxbank_w )
+WRITE16_MEMBER(gotcha_state::gotcha_gfxbank_w)
 {
-	gotcha_state *state = space->machine().driver_data<gotcha_state>();
 	if (ACCESSING_BITS_8_15)
 	{
-		if (state->m_gfxbank[state->m_banksel] != ((data & 0x0f00) >> 8))
+		if (m_gfxbank[m_banksel] != ((data & 0x0f00) >> 8))
 		{
-			state->m_gfxbank[state->m_banksel] = (data & 0x0f00) >> 8;
-			space->machine().tilemap().mark_all_dirty();
+			m_gfxbank[m_banksel] = (data & 0x0f00) >> 8;
+			machine().tilemap().mark_all_dirty();
 		}
 	}
 }
 
-WRITE16_HANDLER( gotcha_scroll_w )
+WRITE16_MEMBER(gotcha_state::gotcha_scroll_w)
 {
-	gotcha_state *state = space->machine().driver_data<gotcha_state>();
-	COMBINE_DATA(&state->m_scroll[offset]);
+	COMBINE_DATA(&m_scroll[offset]);
 
 	switch (offset)
 	{
-		case 0: state->m_fg_tilemap->set_scrollx(0, state->m_scroll[0]); break;
-		case 1: state->m_fg_tilemap->set_scrolly(0, state->m_scroll[1]); break;
-		case 2: state->m_bg_tilemap->set_scrollx(0, state->m_scroll[2]); break;
-		case 3: state->m_bg_tilemap->set_scrolly(0, state->m_scroll[3]); break;
+		case 0: m_fg_tilemap->set_scrollx(0, m_scroll[0]); break;
+		case 1: m_fg_tilemap->set_scrolly(0, m_scroll[1]); break;
+		case 2: m_bg_tilemap->set_scrollx(0, m_scroll[2]); break;
+		case 3: m_bg_tilemap->set_scrolly(0, m_scroll[3]); break;
 	}
 }
 

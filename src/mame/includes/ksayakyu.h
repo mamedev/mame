@@ -27,13 +27,13 @@ public:
 	DECLARE_WRITE8_MEMBER(latch_w);
 	DECLARE_READ8_MEMBER(sound_status_r);
 	DECLARE_WRITE8_MEMBER(tomaincpu_w);
+	DECLARE_WRITE8_MEMBER(ksayakyu_videoram_w);
+	DECLARE_WRITE8_MEMBER(ksayakyu_videoctrl_w);
 };
 
 
 /*----------- defined in video/ksayakyu.c -----------*/
 
-WRITE8_HANDLER( ksayakyu_videoram_w );
-WRITE8_HANDLER( ksayakyu_videoctrl_w );
 PALETTE_INIT( ksayakyu );
 VIDEO_START( ksayakyu );
 SCREEN_UPDATE_IND16( ksayakyu );

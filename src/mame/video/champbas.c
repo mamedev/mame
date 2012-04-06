@@ -161,34 +161,31 @@ VIDEO_START( exctsccr )
 
 
 
-WRITE8_HANDLER( champbas_bg_videoram_w )
+WRITE8_MEMBER(champbas_state::champbas_bg_videoram_w)
 {
-	champbas_state *state = space->machine().driver_data<champbas_state>();
-	state->m_bg_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
+	m_bg_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_HANDLER( champbas_gfxbank_w )
+WRITE8_MEMBER(champbas_state::champbas_gfxbank_w)
 {
-	champbas_state *state = space->machine().driver_data<champbas_state>();
 	data &= 1;
-	if (state->m_gfx_bank != data)
+	if (m_gfx_bank != data)
 	{
-		state->m_gfx_bank = data;
-		state->m_bg_tilemap->mark_all_dirty();
+		m_gfx_bank = data;
+		m_bg_tilemap->mark_all_dirty();
 	}
 }
 
-WRITE8_HANDLER( champbas_palette_bank_w )
+WRITE8_MEMBER(champbas_state::champbas_palette_bank_w)
 {
-	champbas_state *state = space->machine().driver_data<champbas_state>();
-	state->m_palette_bank = data & 1;
-	state->m_bg_tilemap->set_palette_offset(state->m_palette_bank << 8);
+	m_palette_bank = data & 1;
+	m_bg_tilemap->set_palette_offset(m_palette_bank << 8);
 }
 
-WRITE8_HANDLER( champbas_flipscreen_w )
+WRITE8_MEMBER(champbas_state::champbas_flipscreen_w)
 {
-	flip_screen_set(space->machine(), ~data & 1);
+	flip_screen_set(machine(), ~data & 1);
 }
 
 

@@ -37,6 +37,8 @@ public:
 	DECLARE_WRITE16_MEMBER(dbzcontrol_w);
 	DECLARE_WRITE16_MEMBER(dbz_sound_command_w);
 	DECLARE_WRITE16_MEMBER(dbz_sound_cause_nmi);
+	DECLARE_WRITE16_MEMBER(dbz_bg2_videoram_w);
+	DECLARE_WRITE16_MEMBER(dbz_bg1_videoram_w);
 };
 
 
@@ -45,8 +47,6 @@ public:
 extern void dbz_sprite_callback(running_machine &machine, int *code, int *color, int *priority_mask);
 extern void dbz_tile_callback(running_machine &machine, int layer, int *code, int *color, int *flags);
 
-WRITE16_HANDLER(dbz_bg1_videoram_w);
-WRITE16_HANDLER(dbz_bg2_videoram_w);
 
 VIDEO_START(dbz);
 SCREEN_UPDATE_IND16(dbz);

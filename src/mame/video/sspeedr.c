@@ -8,87 +8,75 @@ Taito Super Speed Race video emulation
 #include "includes/sspeedr.h"
 
 
-WRITE8_HANDLER( sspeedr_driver_horz_w )
+WRITE8_MEMBER(sspeedr_state::sspeedr_driver_horz_w)
 {
-	sspeedr_state *state = space->machine().driver_data<sspeedr_state>();
-	state->m_driver_horz = (state->m_driver_horz & 0x100) | data;
+	m_driver_horz = (m_driver_horz & 0x100) | data;
 }
 
 
-WRITE8_HANDLER( sspeedr_driver_horz_2_w )
+WRITE8_MEMBER(sspeedr_state::sspeedr_driver_horz_2_w)
 {
-	sspeedr_state *state = space->machine().driver_data<sspeedr_state>();
-	state->m_driver_horz = (state->m_driver_horz & 0xff) | ((data & 1) << 8);
+	m_driver_horz = (m_driver_horz & 0xff) | ((data & 1) << 8);
 }
 
 
-WRITE8_HANDLER( sspeedr_driver_vert_w )
+WRITE8_MEMBER(sspeedr_state::sspeedr_driver_vert_w)
 {
-	sspeedr_state *state = space->machine().driver_data<sspeedr_state>();
-	state->m_driver_vert = data;
+	m_driver_vert = data;
 }
 
 
-WRITE8_HANDLER( sspeedr_driver_pic_w )
+WRITE8_MEMBER(sspeedr_state::sspeedr_driver_pic_w)
 {
-	sspeedr_state *state = space->machine().driver_data<sspeedr_state>();
-	state->m_driver_pic = data & 0x1f;
+	m_driver_pic = data & 0x1f;
 }
 
 
-WRITE8_HANDLER( sspeedr_drones_horz_w )
+WRITE8_MEMBER(sspeedr_state::sspeedr_drones_horz_w)
 {
-	sspeedr_state *state = space->machine().driver_data<sspeedr_state>();
-	state->m_drones_horz = (state->m_drones_horz & 0x100) | data;
+	m_drones_horz = (m_drones_horz & 0x100) | data;
 }
 
 
-WRITE8_HANDLER( sspeedr_drones_horz_2_w )
+WRITE8_MEMBER(sspeedr_state::sspeedr_drones_horz_2_w)
 {
-	sspeedr_state *state = space->machine().driver_data<sspeedr_state>();
-	state->m_drones_horz = (state->m_drones_horz & 0xff) | ((data & 1) << 8);
+	m_drones_horz = (m_drones_horz & 0xff) | ((data & 1) << 8);
 }
 
 
-WRITE8_HANDLER( sspeedr_drones_mask_w )
+WRITE8_MEMBER(sspeedr_state::sspeedr_drones_mask_w)
 {
-	sspeedr_state *state = space->machine().driver_data<sspeedr_state>();
-	state->m_drones_mask = data & 0x3f;
+	m_drones_mask = data & 0x3f;
 }
 
 
-WRITE8_HANDLER( sspeedr_drones_vert_w )
+WRITE8_MEMBER(sspeedr_state::sspeedr_drones_vert_w)
 {
-	sspeedr_state *state = space->machine().driver_data<sspeedr_state>();
-	state->m_drones_vert[offset] = data;
+	m_drones_vert[offset] = data;
 }
 
 
-WRITE8_HANDLER( sspeedr_track_horz_w )
+WRITE8_MEMBER(sspeedr_state::sspeedr_track_horz_w)
 {
-	sspeedr_state *state = space->machine().driver_data<sspeedr_state>();
-	state->m_track_horz = (state->m_track_horz & 0x100) | data;
+	m_track_horz = (m_track_horz & 0x100) | data;
 }
 
 
-WRITE8_HANDLER( sspeedr_track_horz_2_w )
+WRITE8_MEMBER(sspeedr_state::sspeedr_track_horz_2_w)
 {
-	sspeedr_state *state = space->machine().driver_data<sspeedr_state>();
-	state->m_track_horz = (state->m_track_horz & 0xff) | ((data & 1) << 8);
+	m_track_horz = (m_track_horz & 0xff) | ((data & 1) << 8);
 }
 
 
-WRITE8_HANDLER( sspeedr_track_vert_w )
+WRITE8_MEMBER(sspeedr_state::sspeedr_track_vert_w)
 {
-	sspeedr_state *state = space->machine().driver_data<sspeedr_state>();
-	state->m_track_vert[offset] = data & 0x7f;
+	m_track_vert[offset] = data & 0x7f;
 }
 
 
-WRITE8_HANDLER( sspeedr_track_ice_w )
+WRITE8_MEMBER(sspeedr_state::sspeedr_track_ice_w)
 {
-	sspeedr_state *state = space->machine().driver_data<sspeedr_state>();
-	state->m_track_ice = data & 0x07;
+	m_track_ice = data & 0x07;
 }
 
 

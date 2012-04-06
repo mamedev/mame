@@ -66,10 +66,10 @@ static WRITE8_DEVICE_HANDLER( oki_bankswitch_w );
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, wwfwfest_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x0c0000, 0x0c1fff) AM_RAM_WRITE_LEGACY(wwfwfest_fg0_videoram_w) AM_BASE(m_fg0_videoram)	/* FG0 Ram - 4 bytes per tile */
+	AM_RANGE(0x0c0000, 0x0c1fff) AM_RAM_WRITE(wwfwfest_fg0_videoram_w) AM_BASE(m_fg0_videoram)	/* FG0 Ram - 4 bytes per tile */
 	AM_RANGE(0x0c2000, 0x0c3fff) AM_RAM AM_SHARE("spriteram")						/* SPR Ram */
-	AM_RANGE(0x080000, 0x080fff) AM_RAM_WRITE_LEGACY(wwfwfest_bg0_videoram_w) AM_BASE(m_bg0_videoram)	/* BG0 Ram - 4 bytes per tile */
-	AM_RANGE(0x082000, 0x082fff) AM_RAM_WRITE_LEGACY(wwfwfest_bg1_videoram_w) AM_BASE(m_bg1_videoram)	/* BG1 Ram - 2 bytes per tile */
+	AM_RANGE(0x080000, 0x080fff) AM_RAM_WRITE(wwfwfest_bg0_videoram_w) AM_BASE(m_bg0_videoram)	/* BG0 Ram - 4 bytes per tile */
+	AM_RANGE(0x082000, 0x082fff) AM_RAM_WRITE(wwfwfest_bg1_videoram_w) AM_BASE(m_bg1_videoram)	/* BG1 Ram - 2 bytes per tile */
 	AM_RANGE(0x100000, 0x100007) AM_WRITE(wwfwfest_scroll_write)
 	AM_RANGE(0x10000a, 0x10000b) AM_WRITE(wwfwfest_flipscreen_w)
 	AM_RANGE(0x140000, 0x140003) AM_WRITE(wwfwfest_irq_ack_w)

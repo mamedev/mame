@@ -24,23 +24,21 @@ PALETTE_INIT( kchamp )
 	}
 }
 
-WRITE8_HANDLER( kchamp_videoram_w )
+WRITE8_MEMBER(kchamp_state::kchamp_videoram_w)
 {
-	kchamp_state *state = space->machine().driver_data<kchamp_state>();
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( kchamp_colorram_w )
+WRITE8_MEMBER(kchamp_state::kchamp_colorram_w)
 {
-	kchamp_state *state = space->machine().driver_data<kchamp_state>();
-	state->m_colorram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_colorram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( kchamp_flipscreen_w )
+WRITE8_MEMBER(kchamp_state::kchamp_flipscreen_w)
 {
-	flip_screen_set(space->machine(), data & 0x01);
+	flip_screen_set(machine(), data & 0x01);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )

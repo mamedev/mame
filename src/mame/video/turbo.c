@@ -202,22 +202,20 @@ VIDEO_START( buckrog )
  *
  *************************************/
 
-WRITE8_HANDLER( turbo_videoram_w )
+WRITE8_MEMBER(turbo_state::turbo_videoram_w)
 {
-	turbo_state *state = space->machine().driver_data<turbo_state>();
-	state->m_videoram[offset] = data;
+	m_videoram[offset] = data;
 	if (offset < 0x400)
 	{
-		space->machine().primary_screen->update_partial(space->machine().primary_screen->vpos());
-		state->m_fg_tilemap->mark_tile_dirty(offset);
+		machine().primary_screen->update_partial(machine().primary_screen->vpos());
+		m_fg_tilemap->mark_tile_dirty(offset);
 	}
 }
 
 
-WRITE8_HANDLER( buckrog_bitmap_w )
+WRITE8_MEMBER(turbo_state::buckrog_bitmap_w)
 {
-	turbo_state *state = space->machine().driver_data<turbo_state>();
-	state->m_buckrog_bitmap_ram[offset] = data & 1;
+	m_buckrog_bitmap_ram[offset] = data & 1;
 }
 
 

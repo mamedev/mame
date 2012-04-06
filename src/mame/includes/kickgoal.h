@@ -42,14 +42,14 @@ public:
 	required_device<eeprom_device> m_eeprom;
 	DECLARE_READ16_MEMBER(kickgoal_eeprom_r);
 	DECLARE_WRITE16_MEMBER(kickgoal_eeprom_w);
+	DECLARE_WRITE16_MEMBER(kickgoal_fgram_w);
+	DECLARE_WRITE16_MEMBER(kickgoal_bgram_w);
+	DECLARE_WRITE16_MEMBER(kickgoal_bg2ram_w);
 };
 
 
 /*----------- defined in video/kickgoal.c -----------*/
 
-WRITE16_HANDLER( kickgoal_fgram_w  );
-WRITE16_HANDLER( kickgoal_bgram_w  );
-WRITE16_HANDLER( kickgoal_bg2ram_w );
 
 VIDEO_START( kickgoal );
 SCREEN_UPDATE_IND16( kickgoal );

@@ -30,16 +30,16 @@ public:
 	int            m_sc2on;
 
 	required_device<buffered_spriteram8_device> m_spriteram;
+	DECLARE_WRITE8_MEMBER(exedexes_videoram_w);
+	DECLARE_WRITE8_MEMBER(exedexes_colorram_w);
+	DECLARE_WRITE8_MEMBER(exedexes_c804_w);
+	DECLARE_WRITE8_MEMBER(exedexes_gfxctrl_w);
 };
 
 
 
 /*----------- defined in video/exedexes.c -----------*/
 
-extern WRITE8_HANDLER( exedexes_videoram_w );
-extern WRITE8_HANDLER( exedexes_colorram_w );
-extern WRITE8_HANDLER( exedexes_c804_w );
-extern WRITE8_HANDLER( exedexes_gfxctrl_w );
 
 extern PALETTE_INIT( exedexes );
 extern VIDEO_START( exedexes );

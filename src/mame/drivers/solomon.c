@@ -47,10 +47,10 @@ WRITE8_MEMBER(solomon_state::nmi_mask_w)
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, solomon_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
-	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE_LEGACY(solomon_colorram_w) AM_BASE(m_colorram)
-	AM_RANGE(0xd400, 0xd7ff) AM_RAM_WRITE_LEGACY(solomon_videoram_w) AM_BASE(m_videoram)
-	AM_RANGE(0xd800, 0xdbff) AM_RAM_WRITE_LEGACY(solomon_colorram2_w) AM_BASE(m_colorram2)
-	AM_RANGE(0xdc00, 0xdfff) AM_RAM_WRITE_LEGACY(solomon_videoram2_w) AM_BASE(m_videoram2)
+	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(solomon_colorram_w) AM_BASE(m_colorram)
+	AM_RANGE(0xd400, 0xd7ff) AM_RAM_WRITE(solomon_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0xd800, 0xdbff) AM_RAM_WRITE(solomon_colorram2_w) AM_BASE(m_colorram2)
+	AM_RANGE(0xdc00, 0xdfff) AM_RAM_WRITE(solomon_videoram2_w) AM_BASE(m_videoram2)
 	AM_RANGE(0xe000, 0xe07f) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
 	AM_RANGE(0xe400, 0xe5ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_le_w) AM_SHARE("paletteram")
 	AM_RANGE(0xe600, 0xe600) AM_READ_PORT("P1")
@@ -61,7 +61,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, solomon_state )
 	AM_RANGE(0xe605, 0xe605) AM_READ_PORT("DSW2")
 	AM_RANGE(0xe606, 0xe606) AM_READNOP	/* watchdog? */
 	AM_RANGE(0xe600, 0xe600) AM_WRITE(nmi_mask_w)
-	AM_RANGE(0xe604, 0xe604) AM_WRITE_LEGACY(solomon_flipscreen_w)
+	AM_RANGE(0xe604, 0xe604) AM_WRITE(solomon_flipscreen_w)
 	AM_RANGE(0xe800, 0xe800) AM_WRITE(solomon_sh_command_w)
 	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END

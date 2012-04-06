@@ -34,14 +34,14 @@ public:
 	DECLARE_WRITE8_MEMBER(brkthru_1803_w);
 	DECLARE_WRITE8_MEMBER(darwin_0803_w);
 	DECLARE_WRITE8_MEMBER(brkthru_soundlatch_w);
+	DECLARE_WRITE8_MEMBER(brkthru_bgram_w);
+	DECLARE_WRITE8_MEMBER(brkthru_fgram_w);
+	DECLARE_WRITE8_MEMBER(brkthru_1800_w);
 };
 
 
 /*----------- defined in video/brkthru.c -----------*/
 
-WRITE8_HANDLER( brkthru_1800_w );
-WRITE8_HANDLER( brkthru_bgram_w );
-WRITE8_HANDLER( brkthru_fgram_w );
 VIDEO_START( brkthru );
 PALETTE_INIT( brkthru );
 SCREEN_UPDATE_IND16( brkthru );

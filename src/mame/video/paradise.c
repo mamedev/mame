@@ -28,14 +28,14 @@ Note:   if MAME_DEBUG is defined, pressing Z with:
 #include "emu.h"
 #include "includes/paradise.h"
 
-WRITE8_HANDLER( paradise_flipscreen_w )
+WRITE8_MEMBER(paradise_state::paradise_flipscreen_w)
 {
-	flip_screen_set(space->machine(), data ? 0 : 1);
+	flip_screen_set(machine(), data ? 0 : 1);
 }
 
-WRITE8_HANDLER( tgtball_flipscreen_w )
+WRITE8_MEMBER(paradise_state::tgtball_flipscreen_w)
 {
-	flip_screen_set(space->machine(), data ? 1 : 0);
+	flip_screen_set(machine(), data ? 1 : 0);
 }
 
 /* Note: Penky updates pixel palette bank register BEFORE actually writing to the paletteram. */
@@ -50,15 +50,14 @@ static void update_pix_palbank(running_machine &machine)
 }
 
 /* 800 bytes for red, followed by 800 bytes for green & 800 bytes for blue */
-WRITE8_HANDLER( paradise_palette_w )
+WRITE8_MEMBER(paradise_state::paradise_palette_w)
 {
-	paradise_state *state = space->machine().driver_data<paradise_state>();
-	state->m_paletteram[offset] = data;
+	m_paletteram[offset] = data;
 	offset %= 0x800;
-	palette_set_color_rgb(space->machine(), offset, state->m_paletteram[offset + 0x800 * 0], state->m_paletteram[offset + 0x800 * 1],
-		state->m_paletteram[offset + 0x800 * 2]);
+	palette_set_color_rgb(machine(), offset, m_paletteram[offset + 0x800 * 0], m_paletteram[offset + 0x800 * 1],
+		m_paletteram[offset + 0x800 * 2]);
 
-	update_pix_palbank(space->machine());
+	update_pix_palbank(machine());
 }
 
 /***************************************************************************
@@ -73,28 +72,26 @@ WRITE8_HANDLER( paradise_palette_w )
 ***************************************************************************/
 
 /* Background */
-WRITE8_HANDLER( paradise_vram_0_w )
+WRITE8_MEMBER(paradise_state::paradise_vram_0_w)
 {
-	paradise_state *state = space->machine().driver_data<paradise_state>();
-	state->m_vram_0[offset] = data;
-	state->m_tilemap_0->mark_tile_dirty(offset % 0x400);
+	m_vram_0[offset] = data;
+	m_tilemap_0->mark_tile_dirty(offset % 0x400);
 }
 
 /* 16 color tiles with paradise_palbank as color code */
-WRITE8_HANDLER( paradise_palbank_w )
+WRITE8_MEMBER(paradise_state::paradise_palbank_w)
 {
-	paradise_state *state = space->machine().driver_data<paradise_state>();
 	int bank1 = (data & 0x0e) | 1;
 	int bank2 = (data & 0xf0);
 
-	state->m_pixbank = bank2;
+	m_pixbank = bank2;
 
-	update_pix_palbank(space->machine());
+	update_pix_palbank(machine());
 
-	if (state->m_palbank != bank1)
+	if (m_palbank != bank1)
 	{
-		state->m_palbank = bank1;
-		state->m_tilemap_0->mark_all_dirty();
+		m_palbank = bank1;
+		m_tilemap_0->mark_all_dirty();
 	}
 }
 
@@ -107,11 +104,10 @@ static TILE_GET_INFO( get_tile_info_0 )
 
 
 /* Midground */
-WRITE8_HANDLER( paradise_vram_1_w )
+WRITE8_MEMBER(paradise_state::paradise_vram_1_w)
 {
-	paradise_state *state = space->machine().driver_data<paradise_state>();
-	state->m_vram_1[offset] = data;
-	state->m_tilemap_1->mark_tile_dirty(offset % 0x400);
+	m_vram_1[offset] = data;
+	m_tilemap_1->mark_tile_dirty(offset % 0x400);
 }
 
 static TILE_GET_INFO( get_tile_info_1 )
@@ -123,11 +119,10 @@ static TILE_GET_INFO( get_tile_info_1 )
 
 
 /* Foreground */
-WRITE8_HANDLER( paradise_vram_2_w )
+WRITE8_MEMBER(paradise_state::paradise_vram_2_w)
 {
-	paradise_state *state = space->machine().driver_data<paradise_state>();
-	state->m_vram_2[offset] = data;
-	state->m_tilemap_2->mark_tile_dirty(offset % 0x400);
+	m_vram_2[offset] = data;
+	m_tilemap_2->mark_tile_dirty(offset % 0x400);
 }
 
 static TILE_GET_INFO( get_tile_info_2 )
@@ -139,18 +134,17 @@ static TILE_GET_INFO( get_tile_info_2 )
 
 /* 256 x 256 bitmap. 4 bits per pixel so every byte encodes 2 pixels */
 
-WRITE8_HANDLER( paradise_pixmap_w )
+WRITE8_MEMBER(paradise_state::paradise_pixmap_w)
 {
-	paradise_state *state = space->machine().driver_data<paradise_state>();
 	int x, y;
 
-	state->m_videoram[offset] = data;
+	m_videoram[offset] = data;
 
 	x = (offset & 0x7f) << 1;
 	y = (offset >> 7);
 
-	state->m_tmpbitmap.pix16(y, x + 0) = 0x80f - (data >> 4);
-	state->m_tmpbitmap.pix16(y, x + 1) = 0x80f - (data & 0x0f);
+	m_tmpbitmap.pix16(y, x + 0) = 0x80f - (data >> 4);
+	m_tmpbitmap.pix16(y, x + 1) = 0x80f - (data & 0x0f);
 }
 
 
@@ -186,10 +180,9 @@ VIDEO_START( paradise )
 ***************************************************************************/
 
 /* Sprites / Layers priority */
-WRITE8_HANDLER( paradise_priority_w )
+WRITE8_MEMBER(paradise_state::paradise_priority_w)
 {
-	paradise_state *state = space->machine().driver_data<paradise_state>();
-	state->m_priority = data;
+	m_priority = data;
 }
 
 static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )

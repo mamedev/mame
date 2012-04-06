@@ -18,14 +18,14 @@ public:
 
 	/* video-related */
 	tilemap_t    *m_bg_tilemap;
+	DECLARE_WRITE8_MEMBER(higemaru_videoram_w);
+	DECLARE_WRITE8_MEMBER(higemaru_colorram_w);
+	DECLARE_WRITE8_MEMBER(higemaru_c800_w);
 };
 
 
 /*----------- defined in video/higemaru.c -----------*/
 
-WRITE8_HANDLER( higemaru_videoram_w );
-WRITE8_HANDLER( higemaru_colorram_w );
-WRITE8_HANDLER( higemaru_c800_w );
 
 PALETTE_INIT( higemaru );
 VIDEO_START( higemaru );

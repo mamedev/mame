@@ -230,21 +230,19 @@ might be for Footchmp. That seems to be the only game
 altering spritebanks of sprites while they're on screen.
 ********************************************************/
 
-WRITE16_HANDLER( taitof2_sprite_extension_w )
+WRITE16_MEMBER(taitof2_state::taitof2_sprite_extension_w)
 {
 	/* areas above 0x1000 cleared in some games, but not used */
-	taitof2_state *state = space->machine().driver_data<taitof2_state>();
 
 	if (offset < 0x800)
 	{
-		COMBINE_DATA(&state->m_sprite_extension[offset]);
+		COMBINE_DATA(&m_sprite_extension[offset]);
 	}
 }
 
 
-WRITE16_HANDLER( taitof2_spritebank_w )
+WRITE16_MEMBER(taitof2_state::taitof2_spritebank_w)
 {
-	taitof2_state *state = space->machine().driver_data<taitof2_state>();
 	int i = 0;
 	int j = 0;
 
@@ -255,8 +253,8 @@ WRITE16_HANDLER( taitof2_spritebank_w )
 	{
 		j = (offset & 1) << 1;   /* either set pair 0&1 or 2&3 */
 		i = data << 11;
-		state->m_spritebank_buffered[j] = i;
-		state->m_spritebank_buffered[j + 1] = (i + 0x400);
+		m_spritebank_buffered[j] = i;
+		m_spritebank_buffered[j + 1] = (i + 0x400);
 
 //logerror("bank %d, set to: %04x\n", j, i);
 //logerror("bank %d, paired so: %04x\n", j + 1, i + 0x400);
@@ -265,25 +263,24 @@ WRITE16_HANDLER( taitof2_spritebank_w )
 	else   /* last 4 are individual banks */
 	{
 		i = data << 10;
-		state->m_spritebank_buffered[offset] = i;
+		m_spritebank_buffered[offset] = i;
 
 //logerror("bank %d, new value: %04x\n", offset, i);
 	}
 
 }
 
-WRITE16_HANDLER( koshien_spritebank_w )
+WRITE16_MEMBER(taitof2_state::koshien_spritebank_w)
 {
-	taitof2_state *state = space->machine().driver_data<taitof2_state>();
-	state->m_spritebank_buffered[0] = 0x0000;   /* never changes */
-	state->m_spritebank_buffered[1] = 0x0400;
+	m_spritebank_buffered[0] = 0x0000;   /* never changes */
+	m_spritebank_buffered[1] = 0x0400;
 
-	state->m_spritebank_buffered[2] =  ((data & 0x00f) + 1) * 0x800;
-	state->m_spritebank_buffered[4] = (((data & 0x0f0) >> 4) + 1) * 0x800;
-	state->m_spritebank_buffered[6] = (((data & 0xf00) >> 8) + 1) * 0x800;
-	state->m_spritebank_buffered[3] = state->m_spritebank_buffered[2] + 0x400;
-	state->m_spritebank_buffered[5] = state->m_spritebank_buffered[4] + 0x400;
-	state->m_spritebank_buffered[7] = state->m_spritebank_buffered[6] + 0x400;
+	m_spritebank_buffered[2] =  ((data & 0x00f) + 1) * 0x800;
+	m_spritebank_buffered[4] = (((data & 0x0f0) >> 4) + 1) * 0x800;
+	m_spritebank_buffered[6] = (((data & 0xf00) >> 8) + 1) * 0x800;
+	m_spritebank_buffered[3] = m_spritebank_buffered[2] + 0x400;
+	m_spritebank_buffered[5] = m_spritebank_buffered[4] + 0x400;
+	m_spritebank_buffered[7] = m_spritebank_buffered[6] + 0x400;
 }
 
 static void taito_f2_tc360_spritemixdraw( running_machine &machine, bitmap_ind16 &dest_bmp, const rectangle &clip, const gfx_element *gfx,

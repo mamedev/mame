@@ -16,6 +16,10 @@ public:
 	DECLARE_WRITE8_MEMBER(xxmissio_bank_sel_w);
 	DECLARE_WRITE8_MEMBER(xxmissio_status_m_w);
 	DECLARE_WRITE8_MEMBER(xxmissio_status_s_w);
+	DECLARE_WRITE8_MEMBER(xxmissio_flipscreen_w);
+	DECLARE_WRITE8_MEMBER(xxmissio_bgram_w);
+	DECLARE_READ8_MEMBER(xxmissio_bgram_r);
+	DECLARE_WRITE8_MEMBER(xxmissio_paletteram_w);
 };
 
 
@@ -26,9 +30,5 @@ SCREEN_UPDATE_IND16( xxmissio );
 
 WRITE8_DEVICE_HANDLER( xxmissio_scroll_x_w );
 WRITE8_DEVICE_HANDLER( xxmissio_scroll_y_w );
-WRITE8_HANDLER( xxmissio_flipscreen_w );
 
-READ8_HANDLER( xxmissio_bgram_r );
-WRITE8_HANDLER( xxmissio_bgram_w );
 
-WRITE8_HANDLER( xxmissio_paletteram_w );

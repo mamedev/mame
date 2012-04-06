@@ -26,15 +26,15 @@ public:
 	UINT8      m_bgon;
 	UINT8      m_sprite3bank;
 	DECLARE_READ8_MEMBER(gunsmoke_protection_r);
+	DECLARE_WRITE8_MEMBER(gunsmoke_videoram_w);
+	DECLARE_WRITE8_MEMBER(gunsmoke_colorram_w);
+	DECLARE_WRITE8_MEMBER(gunsmoke_c804_w);
+	DECLARE_WRITE8_MEMBER(gunsmoke_d806_w);
 };
 
 
 /*----------- defined in video/gunsmoke.c -----------*/
 
-WRITE8_HANDLER( gunsmoke_c804_w );
-WRITE8_HANDLER( gunsmoke_d806_w );
-WRITE8_HANDLER( gunsmoke_videoram_w );
-WRITE8_HANDLER( gunsmoke_colorram_w );
 
 PALETTE_INIT( gunsmoke );
 VIDEO_START( gunsmoke );

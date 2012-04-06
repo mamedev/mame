@@ -1841,7 +1841,7 @@ UINT32* konamigx_type3_psac2_bank;
 static int konamigx_type3_psac2_actual_bank;
 //int konamigx_type3_psac2_actual_last_bank = 0;
 
-WRITE32_HANDLER( konamigx_type3_psac2_bank_w )
+WRITE32_MEMBER(konamigx_state::konamigx_type3_psac2_bank_w)
 {
 	// other bits are used for something...
 
@@ -2582,22 +2582,21 @@ SCREEN_UPDATE_RGB32(konamigx_right)
 }
 
 
-WRITE32_HANDLER( konamigx_palette_w )
+WRITE32_MEMBER(konamigx_state::konamigx_palette_w)
 {
 	int r,g,b;
 
-	konamigx_state *state = space->machine().driver_data<konamigx_state>();
-	COMBINE_DATA(&state->m_generic_paletteram_32[offset]);
+	COMBINE_DATA(&m_generic_paletteram_32[offset]);
 
-	r = (state->m_generic_paletteram_32[offset] >>16) & 0xff;
-	g = (state->m_generic_paletteram_32[offset] >> 8) & 0xff;
-	b = (state->m_generic_paletteram_32[offset] >> 0) & 0xff;
+	r = (m_generic_paletteram_32[offset] >>16) & 0xff;
+	g = (m_generic_paletteram_32[offset] >> 8) & 0xff;
+	b = (m_generic_paletteram_32[offset] >> 0) & 0xff;
 
-	palette_set_color(space->machine(),offset,MAKE_RGB(r,g,b));
+	palette_set_color(machine(),offset,MAKE_RGB(r,g,b));
 }
 
 #ifdef UNUSED_FUNCTION
-WRITE32_HANDLER( konamigx_palette2_w )
+WRITE32_MEMBER(konamigx_state::konamigx_palette2_w)
 {
 	int r,g,b;
 
@@ -2609,7 +2608,7 @@ WRITE32_HANDLER( konamigx_palette2_w )
 
 	offset += (0x8000/4);
 
-	palette_set_color(space->machine(),offset,MAKE_RGB(r,g,b));
+	palette_set_color(machine(),offset,MAKE_RGB(r,g,b));
 }
 #endif
 
@@ -2620,20 +2619,19 @@ INLINE void set_color_555(running_machine &machine, pen_t color, int rshift, int
 
 #ifdef UNUSED_FUNCTION
 // main monitor for type 3
-WRITE32_HANDLER( konamigx_555_palette_w )
+WRITE32_MEMBER(konamigx_state::konamigx_555_palette_w)
 {
 	UINT32 coldat;
-	konamigx_state *state = space->machine().driver_data<konamigx_state>();
-	COMBINE_DATA(&state->m_generic_paletteram_32[offset]);
+	COMBINE_DATA(&m_generic_paletteram_32[offset]);
 
-	coldat = state->m_generic_paletteram_32[offset];
+	coldat = m_generic_paletteram_32[offset];
 
-	set_color_555(space->machine(), offset*2, 0, 5, 10,coldat >> 16);
-	set_color_555(space->machine(), offset*2+1, 0, 5, 10,coldat & 0xffff);
+	set_color_555(machine(), offset*2, 0, 5, 10,coldat >> 16);
+	set_color_555(machine(), offset*2+1, 0, 5, 10,coldat & 0xffff);
 }
 
 // sub monitor for type 3
-WRITE32_HANDLER( konamigx_555_palette2_w )
+WRITE32_MEMBER(konamigx_state::konamigx_555_palette2_w)
 {
 	UINT32 coldat;
 	COMBINE_DATA(&gx_subpaletteram32[offset]);
@@ -2641,13 +2639,13 @@ WRITE32_HANDLER( konamigx_555_palette2_w )
 
 	offset += (0x4000/4);
 
-	set_color_555(space->machine(), offset*2, 0, 5, 10,coldat >> 16);
-	set_color_555(space->machine(), offset*2+1, 0, 5, 10,coldat & 0xffff);
+	set_color_555(machine(), offset*2, 0, 5, 10,coldat >> 16);
+	set_color_555(machine(), offset*2+1, 0, 5, 10,coldat & 0xffff);
 }
 #endif
 
 
-WRITE32_HANDLER( konamigx_tilebank_w )
+WRITE32_MEMBER(konamigx_state::konamigx_tilebank_w)
 {
 	if (ACCESSING_BITS_24_31)
 		gx_tilebanks[offset*4] = (data>>24)&0xff;
@@ -2660,7 +2658,7 @@ WRITE32_HANDLER( konamigx_tilebank_w )
 }
 
 // type 1 RAM-based PSAC tilemap
-WRITE32_HANDLER(konamigx_t1_psacmap_w)
+WRITE32_MEMBER(konamigx_state::konamigx_t1_psacmap_w)
 {
 	COMBINE_DATA(&gx_psacram[offset]);
 	gx_psac_tilemap->mark_tile_dirty(offset/2);
@@ -2668,7 +2666,7 @@ WRITE32_HANDLER(konamigx_t1_psacmap_w)
 }
 
 // type 4 RAM-based PSAC tilemap
-WRITE32_HANDLER( konamigx_t4_psacmap_w )
+WRITE32_MEMBER(konamigx_state::konamigx_t4_psacmap_w)
 {
 	COMBINE_DATA(&gx_psacram[offset]);
 

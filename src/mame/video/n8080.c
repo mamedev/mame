@@ -8,13 +8,12 @@
 #include "includes/n8080.h"
 
 
-WRITE8_HANDLER( n8080_video_control_w )
+WRITE8_MEMBER(n8080_state::n8080_video_control_w)
 {
-	n8080_state *state = space->machine().driver_data<n8080_state>();
 
-	state->m_sheriff_color_mode = (data >> 3) & 3;
-	state->m_sheriff_color_data = (data >> 0) & 7;
-	flip_screen_set_no_update(space->machine(), data & 0x20);
+	m_sheriff_color_mode = (data >> 3) & 3;
+	m_sheriff_color_data = (data >> 0) & 7;
+	flip_screen_set_no_update(machine(), data & 0x20);
 }
 
 

@@ -79,10 +79,9 @@ PALETTE_INIT( wiping )
 
 
 
-WRITE8_HANDLER( wiping_flipscreen_w )
+WRITE8_MEMBER(wiping_state::wiping_flipscreen_w)
 {
-	wiping_state *state = space->machine().driver_data<wiping_state>();
-	state->m_flipscreen = (data & 1);
+	m_flipscreen = (data & 1);
 }
 
 

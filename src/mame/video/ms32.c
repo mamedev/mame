@@ -151,29 +151,28 @@ static void update_color(running_machine &machine, int color)
 	palette_set_color(machine,color,MAKE_RGB(r,g,b));
 }
 
-WRITE32_HANDLER( ms32_brightness_w )
+WRITE32_MEMBER(ms32_state::ms32_brightness_w)
 {
-	ms32_state *state = space->machine().driver_data<ms32_state>();
-	int oldword = state->m_brt[offset];
-	COMBINE_DATA(&state->m_brt[offset]);
+	int oldword = m_brt[offset];
+	COMBINE_DATA(&m_brt[offset]);
 
-	if (state->m_brt[offset] != oldword)
+	if (m_brt[offset] != oldword)
 	{
 		int bank = ((offset & 2) >> 1) * 0x4000;
 		//int i;
 
 		if (bank == 0)
 		{
-			state->m_brt_r = 0x100 - ((state->m_brt[0] & 0xff00) >> 8);
-			state->m_brt_g = 0x100 - ((state->m_brt[0] & 0x00ff) >> 0);
-			state->m_brt_b = 0x100 - ((state->m_brt[1] & 0x00ff) >> 0);
+			m_brt_r = 0x100 - ((m_brt[0] & 0xff00) >> 8);
+			m_brt_g = 0x100 - ((m_brt[0] & 0x00ff) >> 0);
+			m_brt_b = 0x100 - ((m_brt[1] & 0x00ff) >> 0);
 
 		//  for (i = 0;i < 0x3000;i++)  // colors 0x3000-0x3fff are not used
-		//      update_color(space->machine(), i);
+		//      update_color(machine(), i);
 		}
 	}
 
-//popmessage("%04x %04x %04x %04x",state->m_brt[0],state->m_brt[1],state->m_brt[2],state->m_brt[3]);
+//popmessage("%04x %04x %04x %04x",m_brt[0],m_brt[1],m_brt[2],m_brt[3]);
 }
 
 
@@ -181,16 +180,15 @@ WRITE32_HANDLER( ms32_brightness_w )
 
 
 
-WRITE32_HANDLER( ms32_gfxctrl_w )
+WRITE32_MEMBER(ms32_state::ms32_gfxctrl_w)
 {
-	ms32_state *state = space->machine().driver_data<ms32_state>();
 	if (ACCESSING_BITS_0_7)
 	{
 		/* bit 1 = flip screen */
-		state->m_flipscreen = data & 0x02;
-		state->m_tx_tilemap->set_flip(state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
-		state->m_bg_tilemap->set_flip(state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
-		state->m_bg_tilemap_alt->set_flip(state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+		m_flipscreen = data & 0x02;
+		m_tx_tilemap->set_flip(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+		m_bg_tilemap->set_flip(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+		m_bg_tilemap_alt->set_flip(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
 		/* bit 2 used by f1superb, unknown */
 

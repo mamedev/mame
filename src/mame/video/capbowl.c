@@ -52,9 +52,8 @@ VIDEO_START( capbowl )
  *
  *************************************/
 
-WRITE8_HANDLER( capbowl_tms34061_w )
+WRITE8_MEMBER(capbowl_state::capbowl_tms34061_w)
 {
-	capbowl_state *state = space->machine().driver_data<capbowl_state>();
 	int func = (offset >> 8) & 3;
 	int col = offset & 0xff;
 
@@ -64,13 +63,12 @@ WRITE8_HANDLER( capbowl_tms34061_w )
 		col ^= 2;
 
 	/* Row address (RA0-RA8) is not dependent on the offset */
-	tms34061_w(space, col, *state->m_rowaddress, func, data);
+	tms34061_w(&space, col, *m_rowaddress, func, data);
 }
 
 
-READ8_HANDLER( capbowl_tms34061_r )
+READ8_MEMBER(capbowl_state::capbowl_tms34061_r)
 {
-	capbowl_state *state = space->machine().driver_data<capbowl_state>();
 	int func = (offset >> 8) & 3;
 	int col = offset & 0xff;
 
@@ -80,7 +78,7 @@ READ8_HANDLER( capbowl_tms34061_r )
 		col ^= 2;
 
 	/* Row address (RA0-RA8) is not dependent on the offset */
-	return tms34061_r(space, col, *state->m_rowaddress, func);
+	return tms34061_r(&space, col, *m_rowaddress, func);
 }
 
 
@@ -91,35 +89,33 @@ READ8_HANDLER( capbowl_tms34061_r )
  *
  *************************************/
 
-WRITE8_HANDLER( bowlrama_blitter_w )
+WRITE8_MEMBER(capbowl_state::bowlrama_blitter_w)
 {
-	capbowl_state *state = space->machine().driver_data<capbowl_state>();
 
 	switch (offset)
 	{
 		case 0x08:	  /* Write address high byte (only 2 bits used) */
-			state->m_blitter_addr = (state->m_blitter_addr & ~0xff0000) | (data << 16);
+			m_blitter_addr = (m_blitter_addr & ~0xff0000) | (data << 16);
 			break;
 
 		case 0x17:    /* Write address mid byte (8 bits)   */
-			state->m_blitter_addr = (state->m_blitter_addr & ~0x00ff00) | (data << 8);
+			m_blitter_addr = (m_blitter_addr & ~0x00ff00) | (data << 8);
 			break;
 
 		case 0x18:	  /* Write Address low byte (8 bits)   */
-			state->m_blitter_addr = (state->m_blitter_addr & ~0x0000ff) | (data << 0);
+			m_blitter_addr = (m_blitter_addr & ~0x0000ff) | (data << 0);
 			break;
 
 		default:
-			logerror("PC=%04X Write to unsupported blitter address %02X Data=%02X\n", cpu_get_pc(&space->device()), offset, data);
+			logerror("PC=%04X Write to unsupported blitter address %02X Data=%02X\n", cpu_get_pc(&space.device()), offset, data);
 			break;
 	}
 }
 
 
-READ8_HANDLER( bowlrama_blitter_r )
+READ8_MEMBER(capbowl_state::bowlrama_blitter_r)
 {
-	capbowl_state *state = space->machine().driver_data<capbowl_state>();
-	UINT8 data = space->machine().region("gfx1")->base()[state->m_blitter_addr];
+	UINT8 data = machine().region("gfx1")->base()[m_blitter_addr];
 	UINT8 result = 0;
 
 	switch (offset)
@@ -138,11 +134,11 @@ READ8_HANDLER( bowlrama_blitter_r )
 		/* Read data and increment address */
 		case 4:
 			result = data;
-			state->m_blitter_addr = (state->m_blitter_addr + 1) & 0x3ffff;
+			m_blitter_addr = (m_blitter_addr + 1) & 0x3ffff;
 			break;
 
 		default:
-			logerror("PC=%04X Read from unsupported blitter address %02X\n", cpu_get_pc(&space->device()), offset);
+			logerror("PC=%04X Read from unsupported blitter address %02X\n", cpu_get_pc(&space.device()), offset);
 			break;
 	}
 

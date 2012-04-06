@@ -74,91 +74,84 @@ PALETTE_INIT( snk6502 )
 	}
 }
 
-WRITE8_HANDLER( snk6502_videoram_w )
+WRITE8_MEMBER(snk6502_state::snk6502_videoram_w)
 {
-	snk6502_state *state = space->machine().driver_data<snk6502_state>();
 
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( snk6502_videoram2_w )
+WRITE8_MEMBER(snk6502_state::snk6502_videoram2_w)
 {
-	snk6502_state *state = space->machine().driver_data<snk6502_state>();
 
-	state->m_videoram2[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset);
+	m_videoram2[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( snk6502_colorram_w )
+WRITE8_MEMBER(snk6502_state::snk6502_colorram_w)
 {
-	snk6502_state *state = space->machine().driver_data<snk6502_state>();
 
-	state->m_colorram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
-	state->m_fg_tilemap->mark_tile_dirty(offset);
+	m_colorram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
+	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( snk6502_charram_w )
+WRITE8_MEMBER(snk6502_state::snk6502_charram_w)
 {
-	snk6502_state *state = space->machine().driver_data<snk6502_state>();
 
-	if (state->m_charram[offset] != data)
+	if (m_charram[offset] != data)
 	{
-		state->m_charram[offset] = data;
-		gfx_element_mark_dirty(space->machine().gfx[0], (offset/8) % 256);
+		m_charram[offset] = data;
+		gfx_element_mark_dirty(machine().gfx[0], (offset/8) % 256);
 	}
 }
 
 
-WRITE8_HANDLER( snk6502_flipscreen_w )
+WRITE8_MEMBER(snk6502_state::snk6502_flipscreen_w)
 {
-	snk6502_state *state = space->machine().driver_data<snk6502_state>();
 	int bank;
 
 	/* bits 0-2 select background color */
 
-	if (state->m_backcolor != (data & 7))
+	if (m_backcolor != (data & 7))
 	{
 		int i;
 
-		state->m_backcolor = data & 7;
+		m_backcolor = data & 7;
 
 		for (i = 0;i < 32;i += 4)
-			palette_set_color(space->machine(), COLOR(space->machine(), 1, i), state->m_palette[4 * state->m_backcolor + 0x20]);
+			palette_set_color(machine(), COLOR(machine(), 1, i), m_palette[4 * m_backcolor + 0x20]);
 	}
 
 	/* bit 3 selects char bank */
 
 	bank = (~data & 0x08) >> 3;
 
-	if (state->m_charbank != bank)
+	if (m_charbank != bank)
 	{
-		state->m_charbank = bank;
-		space->machine().tilemap().mark_all_dirty();
+		m_charbank = bank;
+		machine().tilemap().mark_all_dirty();
 	}
 
 	/* bit 7 flips screen */
 
-	if (flip_screen_get(space->machine()) != (data & 0x80))
+	if (flip_screen_get(machine()) != (data & 0x80))
 	{
-		flip_screen_set(space->machine(), data & 0x80);
-		space->machine().tilemap().mark_all_dirty();
+		flip_screen_set(machine(), data & 0x80);
+		machine().tilemap().mark_all_dirty();
 	}
 }
 
-WRITE8_HANDLER( snk6502_scrollx_w )
+WRITE8_MEMBER(snk6502_state::snk6502_scrollx_w)
 {
-	snk6502_state *state = space->machine().driver_data<snk6502_state>();
 
-	state->m_bg_tilemap->set_scrollx(0, data);
+	m_bg_tilemap->set_scrollx(0, data);
 }
 
-WRITE8_HANDLER( snk6502_scrolly_w )
+WRITE8_MEMBER(snk6502_state::snk6502_scrolly_w)
 {
-	snk6502_state *state = space->machine().driver_data<snk6502_state>();
 
-	state->m_bg_tilemap->set_scrolly(0, data);
+	m_bg_tilemap->set_scrolly(0, data);
 }
 
 
@@ -266,37 +259,35 @@ PALETTE_INIT( satansat )
 	}
 }
 
-WRITE8_HANDLER( satansat_b002_w )
+WRITE8_MEMBER(snk6502_state::satansat_b002_w)
 {
-	snk6502_state *state = space->machine().driver_data<snk6502_state>();
 	/* bit 0 flips screen */
 
-	if (flip_screen_get(space->machine()) != (data & 0x01))
+	if (flip_screen_get(machine()) != (data & 0x01))
 	{
-		flip_screen_set(space->machine(), data & 0x01);
-		space->machine().tilemap().mark_all_dirty();
+		flip_screen_set(machine(), data & 0x01);
+		machine().tilemap().mark_all_dirty();
 	}
 
 	/* bit 1 enables interrupts */
-	state->m_irq_mask = data & 2;
+	m_irq_mask = data & 2;
 
 	/* other bits unused */
 }
 
-WRITE8_HANDLER( satansat_backcolor_w )
+WRITE8_MEMBER(snk6502_state::satansat_backcolor_w)
 {
-	snk6502_state *state = space->machine().driver_data<snk6502_state>();
 
 	/* bits 0-1 select background color. Other bits unused. */
 
-	if (state->m_backcolor != (data & 0x03))
+	if (m_backcolor != (data & 0x03))
 	{
 		int i;
 
-		state->m_backcolor = data & 0x03;
+		m_backcolor = data & 0x03;
 
 		for (i = 0; i < 16; i += 4)
-			palette_set_color(space->machine(), COLOR(space->machine(), 1, i), state->m_palette[state->m_backcolor + 0x10]);
+			palette_set_color(machine(), COLOR(machine(), 1, i), m_palette[m_backcolor + 0x10]);
 	}
 }
 

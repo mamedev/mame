@@ -97,10 +97,9 @@ INTERRUPT_GEN( victory_vblank_interrupt )
  *
  *************************************/
 
-WRITE8_HANDLER( victory_paletteram_w )
+WRITE8_MEMBER(victory_state::victory_paletteram_w)
 {
-	victory_state *state = space->machine().driver_data<victory_state>();
-	state->m_paletteram[offset & 0x3f] = ((offset & 0x80) << 1) | data;
+	m_paletteram[offset & 0x3f] = ((offset & 0x80) << 1) | data;
 }
 
 
@@ -125,41 +124,40 @@ static void set_palette(running_machine &machine)
  *
  *************************************/
 
-READ8_HANDLER( victory_video_control_r )
+READ8_MEMBER(victory_state::victory_video_control_r)
 {
-	victory_state *state = space->machine().driver_data<victory_state>();
 	int result = 0;
 
 	switch (offset)
 	{
 		case 0x00:	/* 5XFIQ */
-			result = state->m_fgcollx;
-			if (LOG_COLLISION) logerror("%04X:5XFIQ read = %02X\n", cpu_get_previouspc(&space->device()), result);
+			result = m_fgcollx;
+			if (LOG_COLLISION) logerror("%04X:5XFIQ read = %02X\n", cpu_get_previouspc(&space.device()), result);
 			return result;
 
 		case 0x01:	/* 5CLFIQ */
-			result = state->m_fgcolly;
-			if (state->m_fgcoll)
+			result = m_fgcolly;
+			if (m_fgcoll)
 			{
-				state->m_fgcoll = 0;
-				victory_update_irq(space->machine());
+				m_fgcoll = 0;
+				victory_update_irq(machine());
 			}
-			if (LOG_COLLISION) logerror("%04X:5CLFIQ read = %02X\n", cpu_get_previouspc(&space->device()), result);
+			if (LOG_COLLISION) logerror("%04X:5CLFIQ read = %02X\n", cpu_get_previouspc(&space.device()), result);
 			return result;
 
 		case 0x02:	/* 5BACKX */
-			result = state->m_bgcollx & 0xfc;
-			if (LOG_COLLISION) logerror("%04X:5BACKX read = %02X\n", cpu_get_previouspc(&space->device()), result);
+			result = m_bgcollx & 0xfc;
+			if (LOG_COLLISION) logerror("%04X:5BACKX read = %02X\n", cpu_get_previouspc(&space.device()), result);
 			return result;
 
 		case 0x03:	/* 5BACKY */
-			result = state->m_bgcolly;
-			if (state->m_bgcoll)
+			result = m_bgcolly;
+			if (m_bgcoll)
 			{
-				state->m_bgcoll = 0;
-				victory_update_irq(space->machine());
+				m_bgcoll = 0;
+				victory_update_irq(machine());
 			}
-			if (LOG_COLLISION) logerror("%04X:5BACKY read = %02X\n", cpu_get_previouspc(&space->device()), result);
+			if (LOG_COLLISION) logerror("%04X:5BACKY read = %02X\n", cpu_get_previouspc(&space.device()), result);
 			return result;
 
 		case 0x04:	/* 5STAT */
@@ -168,17 +166,17 @@ READ8_HANDLER( victory_video_control_r )
 			// D5 = 5VIRQ
 			// D4 = 5BCIRQ (3B1)
 			// D3 = SL256
-			if (state->m_micro.timer_active && state->m_micro.timer->elapsed() < state->m_micro.endtime)
+			if (m_micro.timer_active && m_micro.timer->elapsed() < m_micro.endtime)
 				result |= 0x80;
-			result |= (~state->m_fgcoll & 1) << 6;
-			result |= (~state->m_vblank_irq & 1) << 5;
-			result |= (~state->m_bgcoll & 1) << 4;
-			result |= (space->machine().primary_screen->vpos() & 0x100) >> 5;
-			if (LOG_COLLISION) logerror("%04X:5STAT read = %02X\n", cpu_get_previouspc(&space->device()), result);
+			result |= (~m_fgcoll & 1) << 6;
+			result |= (~m_vblank_irq & 1) << 5;
+			result |= (~m_bgcoll & 1) << 4;
+			result |= (machine().primary_screen->vpos() & 0x100) >> 5;
+			if (LOG_COLLISION) logerror("%04X:5STAT read = %02X\n", cpu_get_previouspc(&space.device()), result);
 			return result;
 
 		default:
-			logerror("%04X:victory_video_control_r(%02X)\n", cpu_get_previouspc(&space->device()), offset);
+			logerror("%04X:victory_video_control_r(%02X)\n", cpu_get_previouspc(&space.device()), offset);
 			break;
 	}
 	return 0;
@@ -192,29 +190,28 @@ READ8_HANDLER( victory_video_control_r )
  *
  *************************************/
 
-WRITE8_HANDLER( victory_video_control_w )
+WRITE8_MEMBER(victory_state::victory_video_control_w)
 {
-	victory_state *state = space->machine().driver_data<victory_state>();
-	struct micro_t &micro = state->m_micro;
+	struct micro_t &micro = m_micro;
 	switch (offset)
 	{
 		case 0x00:	/* LOAD IL */
-			if (LOG_MICROCODE) logerror("%04X:IL=%02X\n", cpu_get_previouspc(&space->device()), data);
+			if (LOG_MICROCODE) logerror("%04X:IL=%02X\n", cpu_get_previouspc(&space.device()), data);
 			micro.i = (micro.i & 0xff00) | (data & 0x00ff);
 			break;
 
 		case 0x01:	/* LOAD IH */
-			if (LOG_MICROCODE) logerror("%04X:IH=%02X\n", cpu_get_previouspc(&space->device()), data);
+			if (LOG_MICROCODE) logerror("%04X:IH=%02X\n", cpu_get_previouspc(&space.device()), data);
 			micro.i = (micro.i & 0x00ff) | ((data << 8) & 0xff00);
 			if (micro.cmdlo == 5)
 			{
 				if (LOG_MICROCODE) logerror("  Command 5 triggered by write to IH\n");
-				command5(space->machine());
+				command5(machine());
 			}
 			break;
 
 		case 0x02:	/* LOAD CMD */
-			if (LOG_MICROCODE) logerror("%04X:CMD=%02X\n", cpu_get_previouspc(&space->device()), data);
+			if (LOG_MICROCODE) logerror("%04X:CMD=%02X\n", cpu_get_previouspc(&space.device()), data);
 			micro.cmd = data;
 			micro.cmdlo = data & 7;
 			if (micro.cmdlo == 0)
@@ -224,63 +221,63 @@ WRITE8_HANDLER( victory_video_control_w )
 			else if (micro.cmdlo == 6)
 			{
 				if (LOG_MICROCODE) logerror("  Command 6 triggered\n");
-				command6(space->machine());
+				command6(machine());
 			}
 			break;
 
 		case 0x03:	/* LOAD G */
-			if (LOG_MICROCODE) logerror("%04X:G=%02X\n", cpu_get_previouspc(&space->device()), data);
+			if (LOG_MICROCODE) logerror("%04X:G=%02X\n", cpu_get_previouspc(&space.device()), data);
 			micro.g = data;
 			break;
 
 		case 0x04:	/* LOAD X */
-			if (LOG_MICROCODE) logerror("%04X:X=%02X\n", cpu_get_previouspc(&space->device()), data);
+			if (LOG_MICROCODE) logerror("%04X:X=%02X\n", cpu_get_previouspc(&space.device()), data);
 			micro.xp = data;
 			if (micro.cmdlo == 3)
 			{
 				if (LOG_MICROCODE) logerror(" Command 3 triggered by write to X\n");
-				command3(space->machine());
+				command3(machine());
 			}
 			break;
 
 		case 0x05:	/* LOAD Y */
-			if (LOG_MICROCODE) logerror("%04X:Y=%02X\n", cpu_get_previouspc(&space->device()), data);
+			if (LOG_MICROCODE) logerror("%04X:Y=%02X\n", cpu_get_previouspc(&space.device()), data);
 			micro.yp = data;
 			if (micro.cmdlo == 4)
 			{
 				if (LOG_MICROCODE) logerror("  Command 4 triggered by write to Y\n");
-				command4(space->machine());
+				command4(machine());
 			}
 			break;
 
 		case 0x06:	/* LOAD R */
-			if (LOG_MICROCODE) logerror("%04X:R=%02X\n", cpu_get_previouspc(&space->device()), data);
+			if (LOG_MICROCODE) logerror("%04X:R=%02X\n", cpu_get_previouspc(&space.device()), data);
 			micro.r = data;
 			break;
 
 		case 0x07:	/* LOAD B */
-			if (LOG_MICROCODE) logerror("%04X:B=%02X\n", cpu_get_previouspc(&space->device()), data);
+			if (LOG_MICROCODE) logerror("%04X:B=%02X\n", cpu_get_previouspc(&space.device()), data);
 			micro.b = data;
 			if (micro.cmdlo == 2)
 			{
 				if (LOG_MICROCODE) logerror("  Command 2 triggered by write to B\n");
-				command2(space->machine());
+				command2(machine());
 			}
 			else if (micro.cmdlo == 7)
 			{
 				if (LOG_MICROCODE) logerror("  Command 7 triggered by write to B\n");
-				command7(space->machine());
+				command7(machine());
 			}
 			break;
 
 		case 0x08:	/* SCROLLX */
-			if (LOG_MICROCODE) logerror("%04X:SCROLLX write = %02X\n", cpu_get_previouspc(&space->device()), data);
-			state->m_scrollx = data;
+			if (LOG_MICROCODE) logerror("%04X:SCROLLX write = %02X\n", cpu_get_previouspc(&space.device()), data);
+			m_scrollx = data;
 			break;
 
 		case 0x09:	/* SCROLLY */
-			if (LOG_MICROCODE) logerror("%04X:SCROLLY write = %02X\n", cpu_get_previouspc(&space->device()), data);
-			state->m_scrolly = data;
+			if (LOG_MICROCODE) logerror("%04X:SCROLLY write = %02X\n", cpu_get_previouspc(&space.device()), data);
+			m_scrolly = data;
 			break;
 
 		case 0x0a:	/* CONTROL */
@@ -291,18 +288,18 @@ WRITE8_HANDLER( victory_video_control_w )
 			// D3 = SINVERT
 			// D2 = BIR12
 			// D1 = SELOVER
-			if (LOG_MICROCODE) logerror("%04X:CONTROL write = %02X\n", cpu_get_previouspc(&space->device()), data);
-			state->m_video_control = data;
+			if (LOG_MICROCODE) logerror("%04X:CONTROL write = %02X\n", cpu_get_previouspc(&space.device()), data);
+			m_video_control = data;
 			break;
 
 		case 0x0b:	/* CLRVIRQ */
-			if (LOG_MICROCODE) logerror("%04X:CLRVIRQ write = %02X\n", cpu_get_previouspc(&space->device()), data);
-			state->m_vblank_irq = 0;
-			victory_update_irq(space->machine());
+			if (LOG_MICROCODE) logerror("%04X:CLRVIRQ write = %02X\n", cpu_get_previouspc(&space.device()), data);
+			m_vblank_irq = 0;
+			victory_update_irq(machine());
 			break;
 
 		default:
-			if (LOG_MICROCODE) logerror("%04X:victory_video_control_w(%02X) = %02X\n", cpu_get_previouspc(&space->device()), offset, data);
+			if (LOG_MICROCODE) logerror("%04X:victory_video_control_w(%02X) = %02X\n", cpu_get_previouspc(&space.device()), offset, data);
 			break;
 	}
 }

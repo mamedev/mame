@@ -416,33 +416,29 @@ VIDEO_START( commsega )
 
 ***************************************************************************/
 
-WRITE8_HANDLER( rallyx_videoram_w )
+WRITE8_MEMBER(rallyx_state::rallyx_videoram_w)
 {
-	rallyx_state *state = space->machine().driver_data<rallyx_state>();
 
-	state->m_videoram[offset] = data;
+	m_videoram[offset] = data;
 	if (offset & 0x400)
-		state->m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
+		m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
 	else
-		state->m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
+		m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_HANDLER( rallyx_scrollx_w )
+WRITE8_MEMBER(rallyx_state::rallyx_scrollx_w)
 {
-	rallyx_state *state = space->machine().driver_data<rallyx_state>();
-	state->m_bg_tilemap->set_scrollx(0, data);
+	m_bg_tilemap->set_scrollx(0, data);
 }
 
-WRITE8_HANDLER( rallyx_scrolly_w )
+WRITE8_MEMBER(rallyx_state::rallyx_scrolly_w)
 {
-	rallyx_state *state = space->machine().driver_data<rallyx_state>();
-	state->m_bg_tilemap->set_scrolly(0, data);
+	m_bg_tilemap->set_scrolly(0, data);
 }
 
-WRITE8_HANDLER( tactcian_starson_w )
+WRITE8_MEMBER(rallyx_state::tactcian_starson_w)
 {
-	rallyx_state *state = space->machine().driver_data<rallyx_state>();
-	state->m_stars_enable = data & 1;
+	m_stars_enable = data & 1;
 }
 
 

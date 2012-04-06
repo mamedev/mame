@@ -464,7 +464,7 @@ static ADDRESS_MAP_START( le_main, AS_PROGRAM, 8, lethal_state )
 	AM_RANGE(0x4090, 0x4090) AM_READNOP
 	AM_RANGE(0x40a0, 0x40a0) AM_READNOP
 	AM_RANGE(0x40c4, 0x40c4) AM_WRITE(control2_w)
-	AM_RANGE(0x40c8, 0x40d0) AM_WRITE_LEGACY(lethalen_palette_control)	// PCU1-PCU3 on the schematics
+	AM_RANGE(0x40c8, 0x40d0) AM_WRITE(lethalen_palette_control)	// PCU1-PCU3 on the schematics
 	AM_RANGE(0x40d4, 0x40d7) AM_READ(guns_r)
 	AM_RANGE(0x40d8, 0x40d8) AM_READ_PORT("DSW")
 	AM_RANGE(0x40d9, 0x40d9) AM_READ_PORT("INPUTS")

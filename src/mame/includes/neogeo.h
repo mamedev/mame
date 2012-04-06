@@ -124,6 +124,10 @@ public:
 	DECLARE_WRITE16_MEMBER(system_control_w);
 	DECLARE_WRITE16_MEMBER(watchdog_w);
 	DECLARE_READ16_MEMBER(neogeo_unmapped_r);
+	DECLARE_READ16_MEMBER(neogeo_paletteram_r);
+	DECLARE_WRITE16_MEMBER(neogeo_paletteram_w);
+	DECLARE_READ16_MEMBER(neogeo_video_register_r);
+	DECLARE_WRITE16_MEMBER(neogeo_video_register_w);
 };
 
 
@@ -229,13 +233,9 @@ VIDEO_START( neogeo );
 VIDEO_RESET( neogeo );
 SCREEN_UPDATE_RGB32( neogeo );
 
-READ16_HANDLER( neogeo_video_register_r );
-WRITE16_HANDLER( neogeo_video_register_w );
 
 void neogeo_set_palette_bank(running_machine &machine, UINT8 data);
 void neogeo_set_screen_dark(running_machine &machine, UINT8 data);
-READ16_HANDLER( neogeo_paletteram_r );
-WRITE16_HANDLER( neogeo_paletteram_w );
 
 void neogeo_set_fixed_layer_source(running_machine &machine, UINT8 data);
 

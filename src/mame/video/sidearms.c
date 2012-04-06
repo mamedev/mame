@@ -9,93 +9,87 @@
 #include "emu.h"
 #include "includes/sidearms.h"
 
-WRITE8_HANDLER( sidearms_videoram_w )
+WRITE8_MEMBER(sidearms_state::sidearms_videoram_w)
 {
-	sidearms_state *state = space->machine().driver_data<sidearms_state>();
 
-	state->m_videoram[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( sidearms_colorram_w )
+WRITE8_MEMBER(sidearms_state::sidearms_colorram_w)
 {
-	sidearms_state *state = space->machine().driver_data<sidearms_state>();
 
-	state->m_colorram[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset);
+	m_colorram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( sidearms_c804_w )
+WRITE8_MEMBER(sidearms_state::sidearms_c804_w)
 {
-	sidearms_state *state = space->machine().driver_data<sidearms_state>();
 
 	/* bits 0 and 1 are coin counters */
-	coin_counter_w(space->machine(), 0, data & 0x01);
-	coin_counter_w(space->machine(), 1, data & 0x02);
+	coin_counter_w(machine(), 0, data & 0x01);
+	coin_counter_w(machine(), 1, data & 0x02);
 
 	/* bit 2 and 3 lock the coin chutes */
-	if (!state->m_gameid || state->m_gameid==3)
+	if (!m_gameid || m_gameid==3)
 	{
-		coin_lockout_w(space->machine(), 0, !(data & 0x04));
-		coin_lockout_w(space->machine(), 1, !(data & 0x08));
+		coin_lockout_w(machine(), 0, !(data & 0x04));
+		coin_lockout_w(machine(), 1, !(data & 0x08));
 	}
 	else
 	{
-		coin_lockout_w(space->machine(), 0, data & 0x04);
-		coin_lockout_w(space->machine(), 1, data & 0x08);
+		coin_lockout_w(machine(), 0, data & 0x04);
+		coin_lockout_w(machine(), 1, data & 0x08);
 	}
 
 	/* bit 4 resets the sound CPU */
 	if (data & 0x10)
 	{
-		cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_RESET, PULSE_LINE);
+		cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_RESET, PULSE_LINE);
 	}
 
 	/* bit 5 enables starfield */
-	if (state->m_staron != (data & 0x20))
+	if (m_staron != (data & 0x20))
 	{
-		state->m_staron = data & 0x20;
-		state->m_hflop_74a_n = 1;
-		state->m_hcount_191 = state->m_vcount_191 = 0;
+		m_staron = data & 0x20;
+		m_hflop_74a_n = 1;
+		m_hcount_191 = m_vcount_191 = 0;
 	}
 
 	/* bit 6 enables char layer */
-	state->m_charon = data & 0x40;
+	m_charon = data & 0x40;
 
 	/* bit 7 flips screen */
-	if (state->m_flipon != (data & 0x80))
+	if (m_flipon != (data & 0x80))
 	{
-		state->m_flipon = data & 0x80;
-		flip_screen_set(space->machine(), state->m_flipon);
-		space->machine().tilemap().mark_all_dirty();
+		m_flipon = data & 0x80;
+		flip_screen_set(machine(), m_flipon);
+		machine().tilemap().mark_all_dirty();
 	}
 }
 
-WRITE8_HANDLER( sidearms_gfxctrl_w )
+WRITE8_MEMBER(sidearms_state::sidearms_gfxctrl_w)
 {
-	sidearms_state *state = space->machine().driver_data<sidearms_state>();
-	state->m_objon = data & 0x01;
-	state->m_bgon = data & 0x02;
+	m_objon = data & 0x01;
+	m_bgon = data & 0x02;
 }
 
-WRITE8_HANDLER( sidearms_star_scrollx_w )
+WRITE8_MEMBER(sidearms_state::sidearms_star_scrollx_w)
 {
-	sidearms_state *state = space->machine().driver_data<sidearms_state>();
-	UINT32 last_state = state->m_hcount_191;
+	UINT32 last_state = m_hcount_191;
 
-	state->m_hcount_191++;
-	state->m_hcount_191 &= 0x1ff;
+	m_hcount_191++;
+	m_hcount_191 &= 0x1ff;
 
 	// invert 74LS74A(flipflop) output on 74LS191(hscan counter) carry's rising edge
-	if (state->m_hcount_191 & ~last_state & 0x100)
-		state->m_hflop_74a_n ^= 1;
+	if (m_hcount_191 & ~last_state & 0x100)
+		m_hflop_74a_n ^= 1;
 }
 
-WRITE8_HANDLER( sidearms_star_scrolly_w )
+WRITE8_MEMBER(sidearms_state::sidearms_star_scrolly_w)
 {
-	sidearms_state *state = space->machine().driver_data<sidearms_state>();
-	state->m_vcount_191++;
-	state->m_vcount_191 &= 0xff;
+	m_vcount_191++;
+	m_vcount_191 &= 0xff;
 }
 
 

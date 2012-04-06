@@ -34,15 +34,15 @@ public:
 	DECLARE_READ16_MEMBER(button1_r);
 	DECLARE_READ16_MEMBER(button2_r);
 	DECLARE_WRITE8_MEMBER(sound2_bank_w);
+	DECLARE_WRITE16_MEMBER(sf_videoram_w);
+	DECLARE_WRITE16_MEMBER(sf_bg_scroll_w);
+	DECLARE_WRITE16_MEMBER(sf_fg_scroll_w);
+	DECLARE_WRITE16_MEMBER(sf_gfxctrl_w);
 };
 
 
 /*----------- defined in video/sf.c -----------*/
 
-WRITE16_HANDLER( sf_bg_scroll_w );
-WRITE16_HANDLER( sf_fg_scroll_w );
-WRITE16_HANDLER( sf_videoram_w );
-WRITE16_HANDLER( sf_gfxctrl_w );
 
 VIDEO_START( sf );
 SCREEN_UPDATE_IND16( sf );

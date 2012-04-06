@@ -55,19 +55,26 @@ public:
 	DECLARE_WRITE8_MEMBER(tnzsb_sound_command_w);
 	DECLARE_WRITE8_MEMBER(jpopnics_palette_w);
 	DECLARE_WRITE8_MEMBER(jpopnics_subbankswitch_w);
+	DECLARE_READ8_MEMBER(tnzs_port1_r);
+	DECLARE_READ8_MEMBER(tnzs_port2_r);
+	DECLARE_WRITE8_MEMBER(tnzs_port2_w);
+	DECLARE_READ8_MEMBER(arknoid2_sh_f000_r);
+	DECLARE_READ8_MEMBER(tnzs_mcu_r);
+	DECLARE_WRITE8_MEMBER(tnzs_mcu_w);
+	DECLARE_WRITE8_MEMBER(tnzs_bankswitch_w);
+	DECLARE_WRITE8_MEMBER(tnzs_bankswitch1_w);
+	DECLARE_READ8_MEMBER(mcu_tnzs_r);
+	DECLARE_WRITE8_MEMBER(mcu_tnzs_w);
+	DECLARE_READ8_MEMBER(mcu_arknoid2_r);
+	DECLARE_WRITE8_MEMBER(mcu_arknoid2_w);
+	DECLARE_READ8_MEMBER(mcu_extrmatn_r);
+	DECLARE_WRITE8_MEMBER(mcu_extrmatn_w);
+	DECLARE_WRITE8_MEMBER(tnzs_sync_kludge_w);
 };
 
 
 /*----------- defined in machine/tnzs.c -----------*/
 
-READ8_HANDLER( tnzs_port1_r );
-READ8_HANDLER( tnzs_port2_r );
-WRITE8_HANDLER( tnzs_port2_w );
-READ8_HANDLER( arknoid2_sh_f000_r );
-READ8_HANDLER( tnzs_mcu_r );
-WRITE8_HANDLER( tnzs_mcu_w );
-WRITE8_HANDLER( tnzs_bankswitch_w );
-WRITE8_HANDLER( tnzs_bankswitch1_w );
 INTERRUPT_GEN( arknoid2_interrupt );
 
 DRIVER_INIT( plumpop );

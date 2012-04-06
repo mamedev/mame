@@ -16,6 +16,11 @@ public:
 	size_t m_spriteram_size;
 	DECLARE_WRITE8_MEMBER(nmi_enable_w);
 	DECLARE_WRITE8_MEMBER(sound_reset_w);
+	DECLARE_WRITE8_MEMBER(timelimt_videoram_w);
+	DECLARE_WRITE8_MEMBER(timelimt_bg_videoram_w);
+	DECLARE_WRITE8_MEMBER(timelimt_scroll_x_lsb_w);
+	DECLARE_WRITE8_MEMBER(timelimt_scroll_x_msb_w);
+	DECLARE_WRITE8_MEMBER(timelimt_scroll_y_w);
 };
 
 
@@ -25,8 +30,3 @@ VIDEO_START( timelimt );
 PALETTE_INIT( timelimt );
 SCREEN_UPDATE_IND16( timelimt );
 
-WRITE8_HANDLER( timelimt_videoram_w );
-WRITE8_HANDLER( timelimt_bg_videoram_w );
-WRITE8_HANDLER( timelimt_scroll_y_w );
-WRITE8_HANDLER( timelimt_scroll_x_msb_w );
-WRITE8_HANDLER( timelimt_scroll_x_lsb_w );

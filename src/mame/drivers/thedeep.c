@@ -161,8 +161,8 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, thedeep_state )
 	AM_RANGE(0xe100, 0xe100) AM_WRITE(thedeep_e100_w)	// ?
 	AM_RANGE(0xe210, 0xe213) AM_WRITEONLY AM_BASE(m_scroll)	// Scroll
 	AM_RANGE(0xe400, 0xe7ff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)	// Sprites
-	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE_LEGACY(thedeep_vram_1_w) AM_BASE(m_vram_1)	// Text Layer
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE_LEGACY(thedeep_vram_0_w) AM_BASE(m_vram_0)	// Background Layer
+	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(thedeep_vram_1_w) AM_BASE(m_vram_1)	// Text Layer
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(thedeep_vram_0_w) AM_BASE(m_vram_0)	// Background Layer
 	AM_RANGE(0xf800, 0xf83f) AM_RAM AM_BASE(m_scroll2				)	// Column Scroll
 	AM_RANGE(0xf840, 0xffff) AM_RAM
 ADDRESS_MAP_END

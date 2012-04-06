@@ -11,6 +11,10 @@ public:
 	UINT8 *m_spriteram;
 	size_t m_spriteram_size;
 	DECLARE_WRITE8_MEMBER(suprloco_soundport_w);
+	DECLARE_WRITE8_MEMBER(suprloco_videoram_w);
+	DECLARE_WRITE8_MEMBER(suprloco_scrollram_w);
+	DECLARE_WRITE8_MEMBER(suprloco_control_w);
+	DECLARE_READ8_MEMBER(suprloco_control_r);
 };
 
 
@@ -19,7 +23,3 @@ public:
 PALETTE_INIT( suprloco );
 VIDEO_START( suprloco );
 SCREEN_UPDATE_IND16( suprloco );
-WRITE8_HANDLER( suprloco_videoram_w );
-WRITE8_HANDLER( suprloco_scrollram_w );
-WRITE8_HANDLER( suprloco_control_w );
-READ8_HANDLER( suprloco_control_r );

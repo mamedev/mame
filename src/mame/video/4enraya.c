@@ -9,13 +9,12 @@
 #include "emu.h"
 #include "includes/4enraya.h"
 
-WRITE8_HANDLER( fenraya_videoram_w )
+WRITE8_MEMBER(_4enraya_state::fenraya_videoram_w)
 {
-	_4enraya_state *state = space->machine().driver_data<_4enraya_state>();
 
-	state->m_videoram[(offset & 0x3ff) * 2] = data;
-	state->m_videoram[(offset & 0x3ff) * 2 + 1] = (offset & 0xc00) >> 10;
-	state->m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
+	m_videoram[(offset & 0x3ff) * 2] = data;
+	m_videoram[(offset & 0x3ff) * 2 + 1] = (offset & 0xc00) >> 10;
+	m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
 static TILE_GET_INFO( get_tile_info )

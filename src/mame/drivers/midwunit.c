@@ -103,17 +103,17 @@ Notes:
  *************************************/
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, midwunit_state )
-	AM_RANGE(0x00000000, 0x003fffff) AM_READWRITE_LEGACY(midtunit_vram_r, midtunit_vram_w)
+	AM_RANGE(0x00000000, 0x003fffff) AM_READWRITE(midtunit_vram_r, midtunit_vram_w)
 	AM_RANGE(0x01000000, 0x013fffff) AM_RAM
-	AM_RANGE(0x01400000, 0x0145ffff) AM_READWRITE_LEGACY(midwunit_cmos_r, midwunit_cmos_w) AM_SHARE("nvram")
-	AM_RANGE(0x01480000, 0x014fffff) AM_WRITE_LEGACY(midwunit_cmos_enable_w)
-	AM_RANGE(0x01600000, 0x0160001f) AM_READWRITE_LEGACY(midwunit_security_r, midwunit_security_w)
-	AM_RANGE(0x01680000, 0x0168001f) AM_READWRITE_LEGACY(midwunit_sound_r, midwunit_sound_w)
-	AM_RANGE(0x01800000, 0x0187ffff) AM_READWRITE_LEGACY(midwunit_io_r, midwunit_io_w)
-	AM_RANGE(0x01880000, 0x018fffff) AM_RAM_WRITE_LEGACY(midtunit_paletteram_w) AM_SHARE("paletteram")
-	AM_RANGE(0x01a00000, 0x01a000ff) AM_MIRROR(0x00080000) AM_READWRITE_LEGACY(midtunit_dma_r, midtunit_dma_w)
-	AM_RANGE(0x01b00000, 0x01b0001f) AM_READWRITE_LEGACY(midwunit_control_r, midwunit_control_w)
-	AM_RANGE(0x02000000, 0x06ffffff) AM_READ_LEGACY(midwunit_gfxrom_r) AM_BASE(m_decode_memory)
+	AM_RANGE(0x01400000, 0x0145ffff) AM_READWRITE(midwunit_cmos_r, midwunit_cmos_w) AM_SHARE("nvram")
+	AM_RANGE(0x01480000, 0x014fffff) AM_WRITE(midwunit_cmos_enable_w)
+	AM_RANGE(0x01600000, 0x0160001f) AM_READWRITE(midwunit_security_r, midwunit_security_w)
+	AM_RANGE(0x01680000, 0x0168001f) AM_READWRITE(midwunit_sound_r, midwunit_sound_w)
+	AM_RANGE(0x01800000, 0x0187ffff) AM_READWRITE(midwunit_io_r, midwunit_io_w)
+	AM_RANGE(0x01880000, 0x018fffff) AM_RAM_WRITE(midtunit_paletteram_w) AM_SHARE("paletteram")
+	AM_RANGE(0x01a00000, 0x01a000ff) AM_MIRROR(0x00080000) AM_READWRITE(midtunit_dma_r, midtunit_dma_w)
+	AM_RANGE(0x01b00000, 0x01b0001f) AM_READWRITE(midwunit_control_r, midwunit_control_w)
+	AM_RANGE(0x02000000, 0x06ffffff) AM_READ(midwunit_gfxrom_r) AM_BASE(m_decode_memory)
 	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE_LEGACY(tms34010_io_register_r, tms34010_io_register_w)
 	AM_RANGE(0xff800000, 0xffffffff) AM_ROM AM_REGION("user1", 0)
 ADDRESS_MAP_END

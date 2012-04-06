@@ -10,67 +10,60 @@
 #include "includes/commando.h"
 
 
-WRITE8_HANDLER( commando_videoram_w )
+WRITE8_MEMBER(commando_state::commando_videoram_w)
 {
-	commando_state *state = space->machine().driver_data<commando_state>();
 
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( commando_colorram_w )
+WRITE8_MEMBER(commando_state::commando_colorram_w)
 {
-	commando_state *state = space->machine().driver_data<commando_state>();
 
-	state->m_colorram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_colorram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( commando_videoram2_w )
+WRITE8_MEMBER(commando_state::commando_videoram2_w)
 {
-	commando_state *state = space->machine().driver_data<commando_state>();
 
-	state->m_videoram2[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset);
+	m_videoram2[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( commando_colorram2_w )
+WRITE8_MEMBER(commando_state::commando_colorram2_w)
 {
-	commando_state *state = space->machine().driver_data<commando_state>();
 
-	state->m_colorram2[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset);
+	m_colorram2[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( commando_scrollx_w )
+WRITE8_MEMBER(commando_state::commando_scrollx_w)
 {
-	commando_state *state = space->machine().driver_data<commando_state>();
 
-	state->m_scroll_x[offset] = data;
-	state->m_bg_tilemap->set_scrollx(0, state->m_scroll_x[0] | (state->m_scroll_x[1] << 8));
+	m_scroll_x[offset] = data;
+	m_bg_tilemap->set_scrollx(0, m_scroll_x[0] | (m_scroll_x[1] << 8));
 }
 
-WRITE8_HANDLER( commando_scrolly_w )
+WRITE8_MEMBER(commando_state::commando_scrolly_w)
 {
-	commando_state *state = space->machine().driver_data<commando_state>();
 
-	state->m_scroll_y[offset] = data;
-	state->m_bg_tilemap->set_scrolly(0, state->m_scroll_y[0] | (state->m_scroll_y[1] << 8));
+	m_scroll_y[offset] = data;
+	m_bg_tilemap->set_scrolly(0, m_scroll_y[0] | (m_scroll_y[1] << 8));
 }
 
-WRITE8_HANDLER( commando_c804_w )
+WRITE8_MEMBER(commando_state::commando_c804_w)
 {
-	commando_state *state = space->machine().driver_data<commando_state>();
 
 	// bits 0 and 1 are coin counters
-	coin_counter_w(space->machine(), 0, data & 0x01);
-	coin_counter_w(space->machine(), 1, data & 0x02);
+	coin_counter_w(machine(), 0, data & 0x01);
+	coin_counter_w(machine(), 1, data & 0x02);
 
 	// bit 4 resets the sound CPU
-	device_set_input_line(state->m_audiocpu, INPUT_LINE_RESET, (data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(m_audiocpu, INPUT_LINE_RESET, (data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
 
 	// bit 7 flips screen
-	flip_screen_set(space->machine(), data & 0x80);
+	flip_screen_set(machine(), data & 0x80);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )

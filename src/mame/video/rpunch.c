@@ -94,101 +94,95 @@ VIDEO_START( rpunch )
  *
  *************************************/
 
-WRITE16_HANDLER( rpunch_videoram_w )
+WRITE16_MEMBER(rpunch_state::rpunch_videoram_w)
 {
-	rpunch_state *state = space->machine().driver_data<rpunch_state>();
-	UINT16 *videoram = state->m_videoram;
+	UINT16 *videoram = m_videoram;
 	int tmap = offset >> 12;
 	int tile_index = offset & 0xfff;
 	COMBINE_DATA(&videoram[offset]);
-	state->m_background[tmap]->mark_tile_dirty(tile_index);
+	m_background[tmap]->mark_tile_dirty(tile_index);
 }
 
 
-WRITE16_HANDLER( rpunch_videoreg_w )
+WRITE16_MEMBER(rpunch_state::rpunch_videoreg_w)
 {
-	rpunch_state *state = space->machine().driver_data<rpunch_state>();
-	int oldword = state->m_videoflags;
-	COMBINE_DATA(&state->m_videoflags);
+	int oldword = m_videoflags;
+	COMBINE_DATA(&m_videoflags);
 
-	if (state->m_videoflags != oldword)
+	if (m_videoflags != oldword)
 	{
 		/* invalidate tilemaps */
-		if ((oldword ^ state->m_videoflags) & 0x0410)
-			state->m_background[0]->mark_all_dirty();
-		if ((oldword ^ state->m_videoflags) & 0x0820)
-			state->m_background[1]->mark_all_dirty();
+		if ((oldword ^ m_videoflags) & 0x0410)
+			m_background[0]->mark_all_dirty();
+		if ((oldword ^ m_videoflags) & 0x0820)
+			m_background[1]->mark_all_dirty();
 	}
 }
 
 
-WRITE16_HANDLER( rpunch_scrollreg_w )
+WRITE16_MEMBER(rpunch_state::rpunch_scrollreg_w)
 {
-	rpunch_state *state = space->machine().driver_data<rpunch_state>();
 	if (ACCESSING_BITS_0_7 && ACCESSING_BITS_8_15)
 		switch (offset)
 		{
 			case 0:
-				state->m_background[0]->set_scrolly(0, data & 0x1ff);
+				m_background[0]->set_scrolly(0, data & 0x1ff);
 				break;
 
 			case 1:
-				state->m_background[0]->set_scrollx(0, data & 0x1ff);
+				m_background[0]->set_scrollx(0, data & 0x1ff);
 				break;
 
 			case 2:
-				state->m_background[1]->set_scrolly(0, data & 0x1ff);
+				m_background[1]->set_scrolly(0, data & 0x1ff);
 				break;
 
 			case 3:
-				state->m_background[1]->set_scrollx(0, data & 0x1ff);
+				m_background[1]->set_scrollx(0, data & 0x1ff);
 				break;
 		}
 }
 
 
-WRITE16_HANDLER( rpunch_crtc_data_w )
+WRITE16_MEMBER(rpunch_state::rpunch_crtc_data_w)
 {
-	rpunch_state *state = space->machine().driver_data<rpunch_state>();
 	if (ACCESSING_BITS_0_7)
 	{
 		data &= 0xff;
-		switch (state->m_crtc_register)
+		switch (m_crtc_register)
 		{
 			/* only register we know about.... */
 			case 0x0b:
-				state->m_crtc_timer->adjust(space->machine().primary_screen->time_until_vblank_start(), (data == 0xc0) ? 2 : 1);
+				m_crtc_timer->adjust(machine().primary_screen->time_until_vblank_start(), (data == 0xc0) ? 2 : 1);
 				break;
 
 			default:
-				logerror("CRTC register %02X = %02X\n", state->m_crtc_register, data & 0xff);
+				logerror("CRTC register %02X = %02X\n", m_crtc_register, data & 0xff);
 				break;
 		}
 	}
 }
 
 
-WRITE16_HANDLER( rpunch_crtc_register_w )
+WRITE16_MEMBER(rpunch_state::rpunch_crtc_register_w)
 {
-	rpunch_state *state = space->machine().driver_data<rpunch_state>();
 	if (ACCESSING_BITS_0_7)
-		state->m_crtc_register = data & 0xff;
+		m_crtc_register = data & 0xff;
 }
 
 
-WRITE16_HANDLER( rpunch_ins_w )
+WRITE16_MEMBER(rpunch_state::rpunch_ins_w)
 {
-	rpunch_state *state = space->machine().driver_data<rpunch_state>();
 	if (ACCESSING_BITS_0_7)
 	{
 		if (offset == 0)
 		{
-			state->m_gins = data & 0x3f;
+			m_gins = data & 0x3f;
 			logerror("GINS = %02X\n", data & 0x3f);
 		}
 		else
 		{
-			state->m_bins = data & 0x3f;
+			m_bins = data & 0x3f;
 			logerror("BINS = %02X\n", data & 0x3f);
 		}
 	}

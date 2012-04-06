@@ -81,21 +81,20 @@ static void set_pens( running_machine &machine )
 
 
 
-WRITE8_HANDLER( cvs_video_fx_w )
+WRITE8_MEMBER(cvs_state::cvs_video_fx_w)
 {
-	cvs_state *state = space->machine().driver_data<cvs_state>();
 
 	if (data & 0xce)
-		logerror("%4x : CVS: Unimplemented CVS video fx = %2x\n",cpu_get_pc(&space->device()), data & 0xce);
+		logerror("%4x : CVS: Unimplemented CVS video fx = %2x\n",cpu_get_pc(&space.device()), data & 0xce);
 
-	state->m_stars_on = data & 0x01;
+	m_stars_on = data & 0x01;
 
 	if (data & 0x02)   logerror("           SHADE BRIGHTER TO RIGHT\n");
 	if (data & 0x04)   logerror("           SCREEN ROTATE\n");
 	if (data & 0x08)   logerror("           SHADE BRIGHTER TO LEFT\n");
 
-	set_led_status(space->machine(), 1, data & 0x10);	/* lamp 1 */
-	set_led_status(space->machine(), 2, data & 0x20);	/* lamp 2 */
+	set_led_status(machine(), 1, data & 0x10);	/* lamp 1 */
+	set_led_status(machine(), 2, data & 0x20);	/* lamp 2 */
 
 	if (data & 0x40)   logerror("           SHADE BRIGHTER TO BOTTOM\n");
 	if (data & 0x80)   logerror("           SHADE BRIGHTER TO TOP\n");
@@ -103,24 +102,21 @@ WRITE8_HANDLER( cvs_video_fx_w )
 
 
 
-READ8_HANDLER( cvs_collision_r )
+READ8_MEMBER(cvs_state::cvs_collision_r)
 {
-	cvs_state *state = space->machine().driver_data<cvs_state>();
-	return state->m_collision_register;
+	return m_collision_register;
 }
 
-READ8_HANDLER( cvs_collision_clear )
+READ8_MEMBER(cvs_state::cvs_collision_clear)
 {
-	cvs_state *state = space->machine().driver_data<cvs_state>();
-	state->m_collision_register = 0;
+	m_collision_register = 0;
 	return 0;
 }
 
 
-WRITE8_HANDLER( cvs_scroll_w )
+WRITE8_MEMBER(cvs_state::cvs_scroll_w)
 {
-	cvs_state *state = space->machine().driver_data<cvs_state>();
-	state->m_scroll_reg = 255 - data;
+	m_scroll_reg = 255 - data;
 }
 
 

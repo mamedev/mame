@@ -134,19 +134,18 @@ VIDEO_START( hatris )
  *
  *************************************/
 
-WRITE8_HANDLER( fromance_gfxreg_w )
+WRITE8_MEMBER(fromance_state::fromance_gfxreg_w)
 {
-	fromance_state *state = space->machine().driver_data<fromance_state>();
 
-	state->m_gfxreg = data;
-	state->m_flipscreen = (data & 0x01);
-	state->m_selected_videoram = (~data >> 1) & 1;
-	state->m_selected_paletteram = (data >> 6) & 1;
+	m_gfxreg = data;
+	m_flipscreen = (data & 0x01);
+	m_selected_videoram = (~data >> 1) & 1;
+	m_selected_paletteram = (data >> 6) & 1;
 
-	if (state->m_flipscreen != state->m_flipscreen_old)
+	if (m_flipscreen != m_flipscreen_old)
 	{
-		state->m_flipscreen_old = state->m_flipscreen;
-		space->machine().tilemap().set_flip_all(state->m_flipscreen ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
+		m_flipscreen_old = m_flipscreen;
+		machine().tilemap().set_flip_all(m_flipscreen ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
 	}
 }
 
@@ -158,28 +157,26 @@ WRITE8_HANDLER( fromance_gfxreg_w )
  *
  *************************************/
 
-READ8_HANDLER( fromance_paletteram_r )
+READ8_MEMBER(fromance_state::fromance_paletteram_r)
 {
-	fromance_state *state = space->machine().driver_data<fromance_state>();
 
 	/* adjust for banking and read */
-	offset |= state->m_selected_paletteram << 11;
-	return state->m_local_paletteram[offset];
+	offset |= m_selected_paletteram << 11;
+	return m_local_paletteram[offset];
 }
 
 
-WRITE8_HANDLER( fromance_paletteram_w )
+WRITE8_MEMBER(fromance_state::fromance_paletteram_w)
 {
-	fromance_state *state = space->machine().driver_data<fromance_state>();
 	int palword;
 
 	/* adjust for banking and modify */
-	offset |= state->m_selected_paletteram << 11;
-	state->m_local_paletteram[offset] = data;
+	offset |= m_selected_paletteram << 11;
+	m_local_paletteram[offset] = data;
 
 	/* compute R,G,B */
-	palword = (state->m_local_paletteram[offset | 1] << 8) | state->m_local_paletteram[offset & ~1];
-	palette_set_color_rgb(space->machine(), offset / 2, pal5bit(palword >> 10), pal5bit(palword >> 5), pal5bit(palword >> 0));
+	palword = (m_local_paletteram[offset | 1] << 8) | m_local_paletteram[offset & ~1];
+	palette_set_color_rgb(machine(), offset / 2, pal5bit(palword >> 10), pal5bit(palword >> 5), pal5bit(palword >> 0));
 }
 
 
@@ -190,18 +187,16 @@ WRITE8_HANDLER( fromance_paletteram_w )
  *
  *************************************/
 
-READ8_HANDLER( fromance_videoram_r )
+READ8_MEMBER(fromance_state::fromance_videoram_r)
 {
-	fromance_state *state = space->machine().driver_data<fromance_state>();
-	return state->m_local_videoram[state->m_selected_videoram][offset];
+	return m_local_videoram[m_selected_videoram][offset];
 }
 
 
-WRITE8_HANDLER( fromance_videoram_w )
+WRITE8_MEMBER(fromance_state::fromance_videoram_w)
 {
-	fromance_state *state = space->machine().driver_data<fromance_state>();
-	state->m_local_videoram[state->m_selected_videoram][offset] = data;
-	(state->m_selected_videoram ? state->m_fg_tilemap : state->m_bg_tilemap)->mark_tile_dirty(offset & 0x0fff);
+	m_local_videoram[m_selected_videoram][offset] = data;
+	(m_selected_videoram ? m_fg_tilemap : m_bg_tilemap)->mark_tile_dirty(offset & 0x0fff);
 }
 
 
@@ -212,24 +207,23 @@ WRITE8_HANDLER( fromance_videoram_w )
  *
  *************************************/
 
-WRITE8_HANDLER( fromance_scroll_w )
+WRITE8_MEMBER(fromance_state::fromance_scroll_w)
 {
-	fromance_state *state = space->machine().driver_data<fromance_state>();
-	if (state->m_flipscreen)
+	if (m_flipscreen)
 	{
 		switch (offset)
 		{
 			case 0:
-				state->m_scrollx[1] = (data + (((state->m_gfxreg & 0x08) >> 3) * 0x100) - state->m_scrollx_ofs);
+				m_scrollx[1] = (data + (((m_gfxreg & 0x08) >> 3) * 0x100) - m_scrollx_ofs);
 				break;
 			case 1:
-				state->m_scrolly[1] = (data + (((state->m_gfxreg & 0x04) >> 2) * 0x100) - state->m_scrolly_ofs); // - 0x10
+				m_scrolly[1] = (data + (((m_gfxreg & 0x04) >> 2) * 0x100) - m_scrolly_ofs); // - 0x10
 				break;
 			case 2:
-				state->m_scrollx[0] = (data + (((state->m_gfxreg & 0x20) >> 5) * 0x100) - state->m_scrollx_ofs);
+				m_scrollx[0] = (data + (((m_gfxreg & 0x20) >> 5) * 0x100) - m_scrollx_ofs);
 				break;
 			case 3:
-				state->m_scrolly[0] = (data + (((state->m_gfxreg & 0x10) >> 4) * 0x100) - state->m_scrolly_ofs);
+				m_scrolly[0] = (data + (((m_gfxreg & 0x10) >> 4) * 0x100) - m_scrolly_ofs);
 				break;
 		}
 	}
@@ -238,16 +232,16 @@ WRITE8_HANDLER( fromance_scroll_w )
 		switch (offset)
 		{
 			case 0:
-				state->m_scrollx[1] = (data + (((state->m_gfxreg & 0x08) >> 3) * 0x100) - 0x1f7);
+				m_scrollx[1] = (data + (((m_gfxreg & 0x08) >> 3) * 0x100) - 0x1f7);
 				break;
 			case 1:
-				state->m_scrolly[1] = (data + (((state->m_gfxreg & 0x04) >> 2) * 0x100) - 0xf9);
+				m_scrolly[1] = (data + (((m_gfxreg & 0x04) >> 2) * 0x100) - 0xf9);
 				break;
 			case 2:
-				state->m_scrollx[0] = (data + (((state->m_gfxreg & 0x20) >> 5) * 0x100) - 0x1f7);
+				m_scrollx[0] = (data + (((m_gfxreg & 0x20) >> 5) * 0x100) - 0x1f7);
 				break;
 			case 3:
-				state->m_scrolly[0] = (data + (((state->m_gfxreg & 0x10) >> 4) * 0x100) - 0xf9);
+				m_scrolly[0] = (data + (((m_gfxreg & 0x10) >> 4) * 0x100) - 0xf9);
 				break;
 		}
 	}
@@ -270,29 +264,27 @@ static TIMER_CALLBACK( crtc_interrupt_gen )
 }
 
 
-WRITE8_HANDLER( fromance_crtc_data_w )
+WRITE8_MEMBER(fromance_state::fromance_crtc_data_w)
 {
-	fromance_state *state = space->machine().driver_data<fromance_state>();
-	state->m_crtc_data[state->m_crtc_register] = data;
+	m_crtc_data[m_crtc_register] = data;
 
-	switch (state->m_crtc_register)
+	switch (m_crtc_register)
 	{
 		/* only register we know about.... */
 		case 0x0b:
-			state->m_crtc_timer->adjust(space->machine().primary_screen->time_until_vblank_start(), (data > 0x80) ? 2 : 1);
+			m_crtc_timer->adjust(machine().primary_screen->time_until_vblank_start(), (data > 0x80) ? 2 : 1);
 			break;
 
 		default:
-			logerror("CRTC register %02X = %02X\n", state->m_crtc_register, data & 0xff);
+			logerror("CRTC register %02X = %02X\n", m_crtc_register, data & 0xff);
 			break;
 	}
 }
 
 
-WRITE8_HANDLER( fromance_crtc_register_w )
+WRITE8_MEMBER(fromance_state::fromance_crtc_register_w)
 {
-	fromance_state *state = space->machine().driver_data<fromance_state>();
-	state->m_crtc_register = data;
+	m_crtc_register = data;
 }
 
 

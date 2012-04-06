@@ -133,12 +133,12 @@ public:
 	DECLARE_WRITE32_MEMBER(activate_3d_buffer);
 	DECLARE_READ8_MEMBER(hng64_comm_shared_r);
 	DECLARE_WRITE8_MEMBER(hng64_comm_shared_w);
+	DECLARE_WRITE32_MEMBER(hng64_videoram_w);
 };
 
 
 /*----------- defined in video/hng64.c -----------*/
 
-WRITE32_HANDLER( hng64_videoram_w );
 void hng64_command3d(running_machine& machine, const UINT16* packet);
 
 VIDEO_START( hng64 );

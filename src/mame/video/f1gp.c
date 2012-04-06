@@ -95,77 +95,69 @@ VIDEO_START( f1gp2 )
 
 ***************************************************************************/
 
-READ16_HANDLER( f1gp_zoomdata_r )
+READ16_MEMBER(f1gp_state::f1gp_zoomdata_r)
 {
-	f1gp_state *state = space->machine().driver_data<f1gp_state>();
-	return state->m_zoomdata[offset];
+	return m_zoomdata[offset];
 }
 
-WRITE16_HANDLER( f1gp_zoomdata_w )
+WRITE16_MEMBER(f1gp_state::f1gp_zoomdata_w)
 {
-	f1gp_state *state = space->machine().driver_data<f1gp_state>();
-	COMBINE_DATA(&state->m_zoomdata[offset]);
-	gfx_element_mark_dirty(space->machine().gfx[3], offset / 64);
+	COMBINE_DATA(&m_zoomdata[offset]);
+	gfx_element_mark_dirty(machine().gfx[3], offset / 64);
 }
 
-READ16_HANDLER( f1gp_rozvideoram_r )
+READ16_MEMBER(f1gp_state::f1gp_rozvideoram_r)
 {
-	f1gp_state *state = space->machine().driver_data<f1gp_state>();
-	return state->m_rozvideoram[offset];
+	return m_rozvideoram[offset];
 }
 
-WRITE16_HANDLER( f1gp_rozvideoram_w )
+WRITE16_MEMBER(f1gp_state::f1gp_rozvideoram_w)
 {
-	f1gp_state *state = space->machine().driver_data<f1gp_state>();
-	COMBINE_DATA(&state->m_rozvideoram[offset]);
-	state->m_roz_tilemap->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_rozvideoram[offset]);
+	m_roz_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_HANDLER( f1gp_fgvideoram_w )
+WRITE16_MEMBER(f1gp_state::f1gp_fgvideoram_w)
 {
-	f1gp_state *state = space->machine().driver_data<f1gp_state>();
-	COMBINE_DATA(&state->m_fgvideoram[offset]);
-	state->m_fg_tilemap->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_fgvideoram[offset]);
+	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_HANDLER( f1gp_fgscroll_w )
+WRITE16_MEMBER(f1gp_state::f1gp_fgscroll_w)
 {
-	f1gp_state *state = space->machine().driver_data<f1gp_state>();
-	COMBINE_DATA(&state->m_scroll[offset]);
+	COMBINE_DATA(&m_scroll[offset]);
 
-	state->m_fg_tilemap->set_scrollx(0, state->m_scroll[0]);
-	state->m_fg_tilemap->set_scrolly(0, state->m_scroll[1]);
+	m_fg_tilemap->set_scrollx(0, m_scroll[0]);
+	m_fg_tilemap->set_scrolly(0, m_scroll[1]);
 }
 
-WRITE16_HANDLER( f1gp_gfxctrl_w )
+WRITE16_MEMBER(f1gp_state::f1gp_gfxctrl_w)
 {
-	f1gp_state *state = space->machine().driver_data<f1gp_state>();
 	if (ACCESSING_BITS_0_7)
 	{
-		state->m_flipscreen = data & 0x20;
-		state->m_gfxctrl = data & 0xdf;
+		m_flipscreen = data & 0x20;
+		m_gfxctrl = data & 0xdf;
 	}
 }
 
-WRITE16_HANDLER( f1gp2_gfxctrl_w )
+WRITE16_MEMBER(f1gp_state::f1gp2_gfxctrl_w)
 {
-	f1gp_state *state = space->machine().driver_data<f1gp_state>();
 	if (ACCESSING_BITS_0_7)
 	{
-		state->m_flipscreen = data & 0x20;
+		m_flipscreen = data & 0x20;
 
 		/* bit 0/1 = fg/sprite/roz priority */
 		/* bit 2 = blank screen */
 
-		state->m_gfxctrl = data & 0xdf;
+		m_gfxctrl = data & 0xdf;
 	}
 
 	if (ACCESSING_BITS_8_15)
 	{
-		if (state->m_roz_bank != (data >> 8))
+		if (m_roz_bank != (data >> 8))
 		{
-			state->m_roz_bank = (data >> 8);
-			state->m_roz_tilemap->mark_all_dirty();
+			m_roz_bank = (data >> 8);
+			m_roz_tilemap->mark_all_dirty();
 		}
 	}
 }

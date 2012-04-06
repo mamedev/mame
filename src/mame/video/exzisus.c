@@ -16,59 +16,51 @@ Functions to emulate the video hardware of the machine.
   Memory handlers
 ***************************************************************************/
 
-READ8_HANDLER ( exzisus_videoram_0_r )
+READ8_MEMBER(exzisus_state::exzisus_videoram_0_r)
 {
-	exzisus_state *state = space->machine().driver_data<exzisus_state>();
-	return state->m_videoram0[offset];
+	return m_videoram0[offset];
 }
 
 
-READ8_HANDLER ( exzisus_videoram_1_r )
+READ8_MEMBER(exzisus_state::exzisus_videoram_1_r)
 {
-	exzisus_state *state = space->machine().driver_data<exzisus_state>();
-	return state->m_videoram1[offset];
+	return m_videoram1[offset];
 }
 
 
-READ8_HANDLER ( exzisus_objectram_0_r )
+READ8_MEMBER(exzisus_state::exzisus_objectram_0_r)
 {
-	exzisus_state *state = space->machine().driver_data<exzisus_state>();
-	return state->m_objectram0[offset];
+	return m_objectram0[offset];
 }
 
 
-READ8_HANDLER ( exzisus_objectram_1_r )
+READ8_MEMBER(exzisus_state::exzisus_objectram_1_r)
 {
-	exzisus_state *state = space->machine().driver_data<exzisus_state>();
-	return state->m_objectram1[offset];
+	return m_objectram1[offset];
 }
 
 
-WRITE8_HANDLER( exzisus_videoram_0_w )
+WRITE8_MEMBER(exzisus_state::exzisus_videoram_0_w)
 {
-	exzisus_state *state = space->machine().driver_data<exzisus_state>();
-	state->m_videoram0[offset] = data;
+	m_videoram0[offset] = data;
 }
 
 
-WRITE8_HANDLER( exzisus_videoram_1_w )
+WRITE8_MEMBER(exzisus_state::exzisus_videoram_1_w)
 {
-	exzisus_state *state = space->machine().driver_data<exzisus_state>();
-	state->m_videoram1[offset] = data;
+	m_videoram1[offset] = data;
 }
 
 
-WRITE8_HANDLER( exzisus_objectram_0_w )
+WRITE8_MEMBER(exzisus_state::exzisus_objectram_0_w)
 {
-	exzisus_state *state = space->machine().driver_data<exzisus_state>();
-	state->m_objectram0[offset] = data;
+	m_objectram0[offset] = data;
 }
 
 
-WRITE8_HANDLER( exzisus_objectram_1_w )
+WRITE8_MEMBER(exzisus_state::exzisus_objectram_1_w)
 {
-	exzisus_state *state = space->machine().driver_data<exzisus_state>();
-	state->m_objectram1[offset] = data;
+	m_objectram1[offset] = data;
 }
 
 

@@ -13,19 +13,19 @@ public:
 	DECLARE_WRITE8_MEMBER(sound_command_w);
 	DECLARE_WRITE8_MEMBER(irq_clear_w);
 	DECLARE_WRITE8_MEMBER(sound_nmi_mask_w);
+	DECLARE_WRITE8_MEMBER(tagteam_videoram_w);
+	DECLARE_WRITE8_MEMBER(tagteam_colorram_w);
+	DECLARE_READ8_MEMBER(tagteam_mirrorvideoram_r);
+	DECLARE_READ8_MEMBER(tagteam_mirrorcolorram_r);
+	DECLARE_WRITE8_MEMBER(tagteam_mirrorvideoram_w);
+	DECLARE_WRITE8_MEMBER(tagteam_mirrorcolorram_w);
+	DECLARE_WRITE8_MEMBER(tagteam_control_w);
+	DECLARE_WRITE8_MEMBER(tagteam_flipscreen_w);
 };
 
 
 /*----------- defined in video/tagteam.c -----------*/
 
-WRITE8_HANDLER( tagteam_videoram_w );
-WRITE8_HANDLER( tagteam_colorram_w );
-READ8_HANDLER( tagteam_mirrorvideoram_r );
-WRITE8_HANDLER( tagteam_mirrorvideoram_w );
-READ8_HANDLER( tagteam_mirrorcolorram_r );
-WRITE8_HANDLER( tagteam_mirrorcolorram_w );
-WRITE8_HANDLER( tagteam_control_w );
-WRITE8_HANDLER( tagteam_flipscreen_w );
 
 PALETTE_INIT( tagteam );
 VIDEO_START( tagteam );

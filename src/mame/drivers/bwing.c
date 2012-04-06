@@ -149,13 +149,13 @@ static ADDRESS_MAP_START( bwp1_map, AS_PROGRAM, 8, bwing_state )
 	AM_RANGE(0x1b00, 0x1b07) AM_READ(bwp1_io_r)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM_WRITE(bwp12_sharedram1_w) AM_BASE(m_bwp1_sharedram1)
 	AM_RANGE(0x0800, 0x0fff) AM_RAM
-	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE_LEGACY(bwing_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(bwing_videoram_w) AM_BASE(m_videoram)
 	AM_RANGE(0x1400, 0x17ff) AM_RAM
-	AM_RANGE(0x1800, 0x19ff) AM_RAM_WRITE_LEGACY(bwing_spriteram_w) AM_BASE(m_spriteram)
-	AM_RANGE(0x1a00, 0x1aff) AM_RAM_WRITE_LEGACY(bwing_paletteram_w) AM_BASE(m_paletteram)
-	AM_RANGE(0x1b00, 0x1b07) AM_RAM_WRITE_LEGACY(bwing_scrollreg_w)
+	AM_RANGE(0x1800, 0x19ff) AM_RAM_WRITE(bwing_spriteram_w) AM_BASE(m_spriteram)
+	AM_RANGE(0x1a00, 0x1aff) AM_RAM_WRITE(bwing_paletteram_w) AM_BASE(m_paletteram)
+	AM_RANGE(0x1b00, 0x1b07) AM_RAM_WRITE(bwing_scrollreg_w)
 	AM_RANGE(0x1c00, 0x1c07) AM_RAM_WRITE(bwp1_ctrl_w)
-	AM_RANGE(0x2000, 0x3fff) AM_READWRITE_LEGACY(bwing_scrollram_r, bwing_scrollram_w)
+	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(bwing_scrollram_r, bwing_scrollram_w)
 	AM_RANGE(0x4000, 0xffff) AM_ROM // "B-Wings US" writes to 9631-9632(debug?)
 ADDRESS_MAP_END
 

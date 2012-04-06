@@ -16,12 +16,11 @@ static TILE_GET_INFO( get_stlforce_bg_tile_info )
 	SET_TILE_INFO(0,tileno,colour,0);
 }
 
-WRITE16_HANDLER( stlforce_bg_videoram_w )
+WRITE16_MEMBER(stlforce_state::stlforce_bg_videoram_w)
 {
-	stlforce_state *state = space->machine().driver_data<stlforce_state>();
 
-	state->m_bg_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_bg_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 /* middle layer, low */
@@ -40,12 +39,11 @@ static TILE_GET_INFO( get_stlforce_mlow_tile_info )
 	SET_TILE_INFO(0,tileno,colour,0);
 }
 
-WRITE16_HANDLER( stlforce_mlow_videoram_w )
+WRITE16_MEMBER(stlforce_state::stlforce_mlow_videoram_w)
 {
-	stlforce_state *state = space->machine().driver_data<stlforce_state>();
 
-	state->m_mlow_videoram[offset] = data;
-	state->m_mlow_tilemap->mark_tile_dirty(offset);
+	m_mlow_videoram[offset] = data;
+	m_mlow_tilemap->mark_tile_dirty(offset);
 }
 
 /* middle layer, high */
@@ -64,12 +62,11 @@ static TILE_GET_INFO( get_stlforce_mhigh_tile_info )
 	SET_TILE_INFO(0,tileno,colour,0);
 }
 
-WRITE16_HANDLER( stlforce_mhigh_videoram_w )
+WRITE16_MEMBER(stlforce_state::stlforce_mhigh_videoram_w)
 {
-	stlforce_state *state = space->machine().driver_data<stlforce_state>();
 
-	state->m_mhigh_videoram[offset] = data;
-	state->m_mhigh_tilemap->mark_tile_dirty(offset);
+	m_mhigh_videoram[offset] = data;
+	m_mhigh_tilemap->mark_tile_dirty(offset);
 }
 
 /* text layer, appears to be the top layer */
@@ -89,12 +86,11 @@ static TILE_GET_INFO( get_stlforce_tx_tile_info )
 	SET_TILE_INFO(1,tileno,colour,0);
 }
 
-WRITE16_HANDLER( stlforce_tx_videoram_w )
+WRITE16_MEMBER(stlforce_state::stlforce_tx_videoram_w)
 {
-	stlforce_state *state = space->machine().driver_data<stlforce_state>();
 
-	state->m_tx_videoram[offset] = data;
-	state->m_tx_tilemap->mark_tile_dirty(offset);
+	m_tx_videoram[offset] = data;
+	m_tx_tilemap->mark_tile_dirty(offset);
 }
 
 /* sprites - quite a bit still needs doing .. */

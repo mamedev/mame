@@ -281,24 +281,24 @@ static ADDRESS_MAP_START( main_program_map, AS_PROGRAM, 16, twincobr_state )
 	AM_RANGE(0x050000, 0x050dff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x060000, 0x060001) AM_DEVWRITE8("crtc", mc6845_device, address_w, 0x00ff)
 	AM_RANGE(0x060002, 0x060003) AM_DEVWRITE8("crtc", mc6845_device, register_w, 0x00ff)
-	AM_RANGE(0x070000, 0x070003) AM_WRITE_LEGACY(twincobr_txscroll_w)	/* text layer scroll */
-	AM_RANGE(0x070004, 0x070005) AM_WRITE_LEGACY(twincobr_txoffs_w)	/* offset in text video RAM */
-	AM_RANGE(0x072000, 0x072003) AM_WRITE_LEGACY(twincobr_bgscroll_w)	/* bg layer scroll */
-	AM_RANGE(0x072004, 0x072005) AM_WRITE_LEGACY(twincobr_bgoffs_w)	/* offset in bg video RAM */
-	AM_RANGE(0x074000, 0x074003) AM_WRITE_LEGACY(twincobr_fgscroll_w)	/* fg layer scroll */
-	AM_RANGE(0x074004, 0x074005) AM_WRITE_LEGACY(twincobr_fgoffs_w)	/* offset in fg video RAM */
-	AM_RANGE(0x076000, 0x076003) AM_WRITE_LEGACY(twincobr_exscroll_w)	/* Spare layer scroll */
+	AM_RANGE(0x070000, 0x070003) AM_WRITE(twincobr_txscroll_w)	/* text layer scroll */
+	AM_RANGE(0x070004, 0x070005) AM_WRITE(twincobr_txoffs_w)	/* offset in text video RAM */
+	AM_RANGE(0x072000, 0x072003) AM_WRITE(twincobr_bgscroll_w)	/* bg layer scroll */
+	AM_RANGE(0x072004, 0x072005) AM_WRITE(twincobr_bgoffs_w)	/* offset in bg video RAM */
+	AM_RANGE(0x074000, 0x074003) AM_WRITE(twincobr_fgscroll_w)	/* fg layer scroll */
+	AM_RANGE(0x074004, 0x074005) AM_WRITE(twincobr_fgoffs_w)	/* offset in fg video RAM */
+	AM_RANGE(0x076000, 0x076003) AM_WRITE(twincobr_exscroll_w)	/* Spare layer scroll */
 	AM_RANGE(0x078000, 0x078001) AM_READ_PORT("DSWA")
 	AM_RANGE(0x078002, 0x078003) AM_READ_PORT("DSWB")
 	AM_RANGE(0x078004, 0x078005) AM_READ_PORT("P1")
 	AM_RANGE(0x078006, 0x078007) AM_READ_PORT("P2")
 	AM_RANGE(0x078008, 0x078009) AM_READ_PORT("VBLANK")			/* V-Blank & FShark Coin/Start */
-	AM_RANGE(0x07800a, 0x07800b) AM_WRITE_LEGACY(fshark_coin_dsp_w)	/* Flying Shark DSP Comms & coin stuff */
-	AM_RANGE(0x07800c, 0x07800d) AM_WRITE_LEGACY(twincobr_control_w)	/* Twin Cobra DSP Comms & system control */
-	AM_RANGE(0x07a000, 0x07afff) AM_READWRITE_LEGACY(twincobr_sharedram_r, twincobr_sharedram_w)	/* 16-bit on 68000 side, 8-bit on Z80 side */
-	AM_RANGE(0x07e000, 0x07e001) AM_READWRITE_LEGACY(twincobr_txram_r, twincobr_txram_w)	/* data for text video RAM */
-	AM_RANGE(0x07e002, 0x07e003) AM_READWRITE_LEGACY(twincobr_bgram_r, twincobr_bgram_w)	/* data for bg video RAM */
-	AM_RANGE(0x07e004, 0x07e005) AM_READWRITE_LEGACY(twincobr_fgram_r, twincobr_fgram_w)	/* data for fg video RAM */
+	AM_RANGE(0x07800a, 0x07800b) AM_WRITE(fshark_coin_dsp_w)	/* Flying Shark DSP Comms & coin stuff */
+	AM_RANGE(0x07800c, 0x07800d) AM_WRITE(twincobr_control_w)	/* Twin Cobra DSP Comms & system control */
+	AM_RANGE(0x07a000, 0x07afff) AM_READWRITE(twincobr_sharedram_r, twincobr_sharedram_w)	/* 16-bit on 68000 side, 8-bit on Z80 side */
+	AM_RANGE(0x07e000, 0x07e001) AM_READWRITE(twincobr_txram_r, twincobr_txram_w)	/* data for text video RAM */
+	AM_RANGE(0x07e002, 0x07e003) AM_READWRITE(twincobr_bgram_r, twincobr_bgram_w)	/* data for bg video RAM */
+	AM_RANGE(0x07e004, 0x07e005) AM_READWRITE(twincobr_fgram_r, twincobr_fgram_w)	/* data for fg video RAM */
 ADDRESS_MAP_END
 
 
@@ -313,7 +313,7 @@ static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, twincobr_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE_LEGACY("ymsnd", ym3812_r, ym3812_w)
 	AM_RANGE(0x10, 0x10) AM_READ_PORT("SYSTEM")			/* Twin Cobra - Coin/Start */
-	AM_RANGE(0x20, 0x20) AM_WRITE_LEGACY(twincobr_coin_w)		/* Twin Cobra coin count-lockout */
+	AM_RANGE(0x20, 0x20) AM_WRITE(twincobr_coin_w)		/* Twin Cobra coin count-lockout */
 	AM_RANGE(0x40, 0x40) AM_READ_PORT("DSWA")
 	AM_RANGE(0x50, 0x50) AM_READ_PORT("DSWB")
 ADDRESS_MAP_END
@@ -328,11 +328,11 @@ ADDRESS_MAP_END
 	/* $000 - 08F  TMS32010 Internal Data RAM in Data Address Space */
 
 static ADDRESS_MAP_START( DSP_io_map, AS_IO, 16, twincobr_state )
-	AM_RANGE(0, 0) AM_WRITE_LEGACY(twincobr_dsp_addrsel_w)
-	AM_RANGE(1, 1) AM_READWRITE_LEGACY(twincobr_dsp_r, twincobr_dsp_w)
-	AM_RANGE(2, 2) AM_READWRITE_LEGACY(fsharkbt_dsp_r, fsharkbt_dsp_w)
-	AM_RANGE(3, 3) AM_WRITE_LEGACY(twincobr_dsp_bio_w)
-	AM_RANGE(TMS32010_BIO, TMS32010_BIO) AM_READ_LEGACY(twincobr_BIO_r)
+	AM_RANGE(0, 0) AM_WRITE(twincobr_dsp_addrsel_w)
+	AM_RANGE(1, 1) AM_READWRITE(twincobr_dsp_r, twincobr_dsp_w)
+	AM_RANGE(2, 2) AM_READWRITE(fsharkbt_dsp_r, fsharkbt_dsp_w)
+	AM_RANGE(3, 3) AM_WRITE(twincobr_dsp_bio_w)
+	AM_RANGE(TMS32010_BIO, TMS32010_BIO) AM_READ(twincobr_BIO_r)
 ADDRESS_MAP_END
 
 

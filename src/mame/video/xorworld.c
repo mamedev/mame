@@ -48,12 +48,11 @@ PALETTE_INIT( xorworld )
 	}
 }
 
-WRITE16_HANDLER( xorworld_videoram16_w )
+WRITE16_MEMBER(xorworld_state::xorworld_videoram16_w)
 {
-	xorworld_state *state = space->machine().driver_data<xorworld_state>();
-	UINT16 *videoram = state->m_videoram;
+	UINT16 *videoram = m_videoram;
 	COMBINE_DATA(&videoram[offset]);
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 /*

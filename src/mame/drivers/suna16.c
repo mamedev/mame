@@ -91,11 +91,11 @@ WRITE16_MEMBER(suna16_state::bestbest_coin_w)
 static ADDRESS_MAP_START( bssoccer_map, AS_PROGRAM, 16, suna16_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM	// ROM
 	AM_RANGE(0x200000, 0x203fff) AM_RAM	// RAM
-	AM_RANGE(0x400000, 0x4001ff) AM_READWRITE_LEGACY(suna16_paletteram16_r, suna16_paletteram16_w)  // Banked Palette
+	AM_RANGE(0x400000, 0x4001ff) AM_READWRITE(suna16_paletteram16_r, suna16_paletteram16_w)  // Banked Palette
 	AM_RANGE(0x400200, 0x400fff) AM_RAM	//
 	AM_RANGE(0x600000, 0x61ffff) AM_RAM AM_BASE(m_spriteram)	// Sprites
 	AM_RANGE(0xa00000, 0xa00001) AM_READ_PORT("P1") AM_WRITE(suna16_soundlatch_w)	// To Sound CPU
-	AM_RANGE(0xa00002, 0xa00003) AM_READ_PORT("P2") AM_WRITE_LEGACY(suna16_flipscreen_w)	// Flip Screen
+	AM_RANGE(0xa00002, 0xa00003) AM_READ_PORT("P2") AM_WRITE(suna16_flipscreen_w)	// Flip Screen
 	AM_RANGE(0xa00004, 0xa00005) AM_READ_PORT("P3") AM_WRITE(bssoccer_leds_w)	// Leds
 	AM_RANGE(0xa00006, 0xa00007) AM_READ_PORT("P4") AM_WRITENOP	// ? IRQ 1 Ack
 	AM_RANGE(0xa00008, 0xa00009) AM_READ_PORT("DSW1") AM_WRITENOP	// ? IRQ 2 Ack
@@ -110,12 +110,12 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( uballoon_map, AS_PROGRAM, 16, suna16_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM	// ROM
 	AM_RANGE(0x800000, 0x803fff) AM_RAM	// RAM
-	AM_RANGE(0x200000, 0x2001ff) AM_READWRITE_LEGACY(suna16_paletteram16_r, suna16_paletteram16_w)	// Banked Palette
+	AM_RANGE(0x200000, 0x2001ff) AM_READWRITE(suna16_paletteram16_r, suna16_paletteram16_w)	// Banked Palette
 	AM_RANGE(0x200200, 0x200fff) AM_RAM	//
 	AM_RANGE(0x400000, 0x41ffff) AM_MIRROR(0x1e0000) AM_RAM AM_BASE(m_spriteram)	// Sprites
 	AM_RANGE(0x600000, 0x600001) AM_READ_PORT("P1") AM_WRITE(suna16_soundlatch_w)	// To Sound CPU
 	AM_RANGE(0x600002, 0x600003) AM_READ_PORT("P2")
-	AM_RANGE(0x600004, 0x600005) AM_READ_PORT("DSW1") AM_WRITE_LEGACY(suna16_flipscreen_w)	// Flip Screen
+	AM_RANGE(0x600004, 0x600005) AM_READ_PORT("DSW1") AM_WRITE(suna16_flipscreen_w)	// Flip Screen
 	AM_RANGE(0x600006, 0x600007) AM_READ_PORT("DSW2")
 	AM_RANGE(0x600008, 0x600009) AM_WRITE(uballoon_leds_w)	// Leds
 	AM_RANGE(0x60000c, 0x60000d) AM_WRITENOP	// ? IRQ 1 Ack
@@ -131,10 +131,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sunaq_map, AS_PROGRAM, 16, suna16_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM	// ROM
 	AM_RANGE(0x500000, 0x500001) AM_READ_PORT("P1") AM_WRITE(suna16_soundlatch_w)	// To Sound CPU
-	AM_RANGE(0x500002, 0x500003) AM_READ_PORT("P2") AM_WRITE_LEGACY(suna16_flipscreen_w)	// Flip Screen
+	AM_RANGE(0x500002, 0x500003) AM_READ_PORT("P2") AM_WRITE(suna16_flipscreen_w)	// Flip Screen
 	AM_RANGE(0x500004, 0x500005) AM_READ_PORT("DSW1")
 	AM_RANGE(0x500006, 0x500007) AM_READ_PORT("DSW2")				// (unused?)
-	AM_RANGE(0x540000, 0x5401ff) AM_READWRITE_LEGACY(suna16_paletteram16_r, suna16_paletteram16_w)
+	AM_RANGE(0x540000, 0x5401ff) AM_READWRITE(suna16_paletteram16_r, suna16_paletteram16_w)
 	AM_RANGE(0x540200, 0x540fff) AM_RAM   // RAM
 	AM_RANGE(0x580000, 0x583fff) AM_RAM	// RAM
 	AM_RANGE(0x5c0000, 0x5dffff) AM_RAM AM_BASE(m_spriteram)	// Sprites
@@ -171,11 +171,11 @@ static ADDRESS_MAP_START( bestbest_map, AS_PROGRAM, 16, suna16_state )
 	AM_RANGE( 0x000000, 0x03ffff ) AM_ROM AM_MIRROR(0xc0000)		// ROM
 	AM_RANGE( 0x200000, 0x2fffff ) AM_ROM AM_REGION("user1", 0)		// ROM
 	AM_RANGE( 0x500000, 0x500001 ) AM_READ_PORT("P1") AM_WRITE(suna16_soundlatch_w)		// To Sound CPU
-	AM_RANGE( 0x500002, 0x500003 ) AM_READ_PORT("P2") AM_WRITE_LEGACY(bestbest_flipscreen_w)	// P2 + Coins, Flip Screen
+	AM_RANGE( 0x500002, 0x500003 ) AM_READ_PORT("P2") AM_WRITE(bestbest_flipscreen_w)	// P2 + Coins, Flip Screen
 	AM_RANGE( 0x500004, 0x500005 ) AM_READ_PORT("DSW") AM_WRITE(bestbest_coin_w)		// Coin Counter
 	AM_RANGE( 0x500008, 0x500009 ) AM_WRITE(bestbest_prot_w )		// Protection
 	AM_RANGE( 0x500018, 0x500019 ) AM_READ(bestbest_prot_r )		//
-	AM_RANGE( 0x540000, 0x540fff ) AM_READWRITE_LEGACY(suna16_paletteram16_r, suna16_paletteram16_w )	// Banked(?) Palette
+	AM_RANGE( 0x540000, 0x540fff ) AM_READWRITE(suna16_paletteram16_r, suna16_paletteram16_w )	// Banked(?) Palette
 	AM_RANGE( 0x541000, 0x54ffff ) AM_RAM														//
 	AM_RANGE( 0x580000, 0x58ffff ) AM_RAM							// RAM
 	AM_RANGE( 0x5c0000, 0x5dffff ) AM_RAM AM_BASE(m_spriteram)	// Sprites (Chip 1)

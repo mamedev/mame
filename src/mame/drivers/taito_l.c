@@ -676,8 +676,8 @@ READ8_MEMBER(taitol_state::horshoes_trackx_hi_r)
 	AM_RANGE(0xd000, 0xdfff) AM_ROMBANK("bank3") AM_WRITE(bank1_w) \
 	AM_RANGE(0xe000, 0xefff) AM_ROMBANK("bank4") AM_WRITE(bank2_w) \
 	AM_RANGE(0xf000, 0xfdff) AM_ROMBANK("bank5") AM_WRITE(bank3_w) \
-	AM_RANGE(0xfe00, 0xfe03) AM_READWRITE_LEGACY(taitol_bankc_r, taitol_bankc_w)		\
-	AM_RANGE(0xfe04, 0xfe04) AM_READWRITE_LEGACY(taitol_control_r, taitol_control_w)	\
+	AM_RANGE(0xfe00, 0xfe03) AM_READWRITE(taitol_bankc_r, taitol_bankc_w)		\
+	AM_RANGE(0xfe04, 0xfe04) AM_READWRITE(taitol_control_r, taitol_control_w)	\
 	AM_RANGE(0xff00, 0xff02) AM_READWRITE(irq_adr_r, irq_adr_w)			\
 	AM_RANGE(0xff03, 0xff03) AM_READWRITE(irq_enable_r, irq_enable_w)		\
 	AM_RANGE(0xff04, 0xff07) AM_READWRITE(rambankswitch_r, rambankswitch_w)	\
@@ -889,7 +889,7 @@ static ADDRESS_MAP_START( horshoes_map, AS_PROGRAM, 8, taitol_state )
 	AM_RANGE(0xa808, 0xa808) AM_READ(horshoes_trackx_lo_r)
 	AM_RANGE(0xa80c, 0xa80c) AM_READ(horshoes_trackx_hi_r)
 	AM_RANGE(0xb801, 0xb801) AM_READNOP	// Watchdog or interrupt ack
-	AM_RANGE(0xb802, 0xb802) AM_WRITE_LEGACY(horshoes_bankg_w)
+	AM_RANGE(0xb802, 0xb802) AM_WRITE(horshoes_bankg_w)
 	AM_RANGE(0xbc00, 0xbc00) AM_WRITENOP
 ADDRESS_MAP_END
 

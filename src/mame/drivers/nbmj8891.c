@@ -331,83 +331,83 @@ static DRIVER_INIT( taiwanmb )
 
 static ADDRESS_MAP_START( gionbana_map, AS_PROGRAM, 8, nbmj8891_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
-	AM_RANGE(0xf000, 0xf00f) AM_READWRITE_LEGACY(nbmj8891_clut_r,nbmj8891_clut_w)
-	AM_RANGE(0xf400, 0xf5ff) AM_READWRITE_LEGACY(nbmj8891_palette_type1_r,nbmj8891_palette_type1_w)
+	AM_RANGE(0xf000, 0xf00f) AM_READWRITE(nbmj8891_clut_r,nbmj8891_clut_w)
+	AM_RANGE(0xf400, 0xf5ff) AM_READWRITE(nbmj8891_palette_type1_r,nbmj8891_palette_type1_w)
 	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mgion_map, AS_PROGRAM, 8, nbmj8891_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
-	AM_RANGE(0xf000, 0xf1ff) AM_READWRITE_LEGACY(nbmj8891_palette_type1_r,nbmj8891_palette_type1_w)
-	AM_RANGE(0xf400, 0xf40f) AM_READWRITE_LEGACY(nbmj8891_clut_r,nbmj8891_clut_w)
+	AM_RANGE(0xf000, 0xf1ff) AM_READWRITE(nbmj8891_palette_type1_r,nbmj8891_palette_type1_w)
+	AM_RANGE(0xf400, 0xf40f) AM_READWRITE(nbmj8891_clut_r,nbmj8891_clut_w)
 	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( omotesnd_map, AS_PROGRAM, 8, nbmj8891_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
-	AM_RANGE(0xf400, 0xf5ff) AM_READWRITE_LEGACY(nbmj8891_palette_type1_r,nbmj8891_palette_type1_w)
+	AM_RANGE(0xf400, 0xf5ff) AM_READWRITE(nbmj8891_palette_type1_r,nbmj8891_palette_type1_w)
 	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hanamomo_map, AS_PROGRAM, 8, nbmj8891_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
-	AM_RANGE(0xf000, 0xf1ff) AM_READWRITE_LEGACY(nbmj8891_palette_type1_r,nbmj8891_palette_type1_w)
-	AM_RANGE(0xf400, 0xf40f) AM_READWRITE_LEGACY(nbmj8891_clut_r,nbmj8891_clut_w)
+	AM_RANGE(0xf000, 0xf1ff) AM_READWRITE(nbmj8891_palette_type1_r,nbmj8891_palette_type1_w)
+	AM_RANGE(0xf400, 0xf40f) AM_READWRITE(nbmj8891_clut_r,nbmj8891_clut_w)
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( scandalm_map, AS_PROGRAM, 8, nbmj8891_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
-	AM_RANGE(0xf400, 0xf5ff) AM_READWRITE_LEGACY(nbmj8891_palette_type1_r,nbmj8891_palette_type1_w)
+	AM_RANGE(0xf400, 0xf5ff) AM_READWRITE(nbmj8891_palette_type1_r,nbmj8891_palette_type1_w)
 	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( club90s_map, AS_PROGRAM, 8, nbmj8891_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xf80f) AM_READWRITE_LEGACY(nbmj8891_clut_r,nbmj8891_clut_w)
-	AM_RANGE(0xfc00, 0xfdff) AM_READWRITE_LEGACY(nbmj8891_palette_type1_r,nbmj8891_palette_type1_w)
+	AM_RANGE(0xf800, 0xf80f) AM_READWRITE(nbmj8891_clut_r,nbmj8891_clut_w)
+	AM_RANGE(0xfc00, 0xfdff) AM_READWRITE(nbmj8891_palette_type1_r,nbmj8891_palette_type1_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( lovehous_map, AS_PROGRAM, 8, nbmj8891_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
-	AM_RANGE(0xf000, 0xf00f) AM_READWRITE_LEGACY(nbmj8891_clut_r,nbmj8891_clut_w)
-	AM_RANGE(0xf400, 0xf5ff) AM_READWRITE_LEGACY(nbmj8891_palette_type2_r,nbmj8891_palette_type2_w)
+	AM_RANGE(0xf000, 0xf00f) AM_READWRITE(nbmj8891_clut_r,nbmj8891_clut_w)
+	AM_RANGE(0xf400, 0xf5ff) AM_READWRITE(nbmj8891_palette_type2_r,nbmj8891_palette_type2_w)
 	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( maiko_map, AS_PROGRAM, 8, nbmj8891_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
-	AM_RANGE(0xf000, 0xf1ff) AM_READWRITE_LEGACY(nbmj8891_palette_type2_r,nbmj8891_palette_type2_w)
-	AM_RANGE(0xf400, 0xf40f) AM_READWRITE_LEGACY(nbmj8891_clut_r,nbmj8891_clut_w)
+	AM_RANGE(0xf000, 0xf1ff) AM_READWRITE(nbmj8891_palette_type2_r,nbmj8891_palette_type2_w)
+	AM_RANGE(0xf400, 0xf40f) AM_READWRITE(nbmj8891_clut_r,nbmj8891_clut_w)
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hnxmasev_map, AS_PROGRAM, 8, nbmj8891_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
-	AM_RANGE(0xf200, 0xf3ff) AM_READWRITE_LEGACY(nbmj8891_palette_type2_r,nbmj8891_palette_type2_w)
-	AM_RANGE(0xf700, 0xf70f) AM_READWRITE_LEGACY(nbmj8891_clut_r,nbmj8891_clut_w)
+	AM_RANGE(0xf200, 0xf3ff) AM_READWRITE(nbmj8891_palette_type2_r,nbmj8891_palette_type2_w)
+	AM_RANGE(0xf700, 0xf70f) AM_READWRITE(nbmj8891_clut_r,nbmj8891_clut_w)
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hnageman_map, AS_PROGRAM, 8, nbmj8891_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
-	AM_RANGE(0xf000, 0xf00f) AM_READWRITE_LEGACY(nbmj8891_clut_r,nbmj8891_clut_w)
-	AM_RANGE(0xf400, 0xf5ff) AM_READWRITE_LEGACY(nbmj8891_palette_type2_r,nbmj8891_palette_type2_w)
+	AM_RANGE(0xf000, 0xf00f) AM_READWRITE(nbmj8891_clut_r,nbmj8891_clut_w)
+	AM_RANGE(0xf400, 0xf5ff) AM_READWRITE(nbmj8891_palette_type2_r,nbmj8891_palette_type2_w)
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mmaiko_map, AS_PROGRAM, 8, nbmj8891_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
-	AM_RANGE(0xf000, 0xf1ff) AM_READWRITE_LEGACY(nbmj8891_palette_type2_r,nbmj8891_palette_type2_w)
-	AM_RANGE(0xf400, 0xf40f) AM_READWRITE_LEGACY(nbmj8891_clut_r,nbmj8891_clut_w)
+	AM_RANGE(0xf000, 0xf1ff) AM_READWRITE(nbmj8891_palette_type2_r,nbmj8891_palette_type2_w)
+	AM_RANGE(0xf400, 0xf40f) AM_READWRITE(nbmj8891_clut_r,nbmj8891_clut_w)
 	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hanaoji_map, AS_PROGRAM, 8, nbmj8891_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
-	AM_RANGE(0xf200, 0xf3ff) AM_READWRITE_LEGACY(nbmj8891_palette_type2_r,nbmj8891_palette_type2_w)
-	AM_RANGE(0xf700, 0xf70f) AM_READWRITE_LEGACY(nbmj8891_clut_r,nbmj8891_clut_w)
+	AM_RANGE(0xf200, 0xf3ff) AM_READWRITE(nbmj8891_palette_type2_r,nbmj8891_palette_type2_w)
+	AM_RANGE(0xf700, 0xf70f) AM_READWRITE(nbmj8891_clut_r,nbmj8891_clut_w)
 	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
@@ -418,18 +418,18 @@ READ8_MEMBER(nbmj8891_state::taiwanmb_unk_r)
 
 static ADDRESS_MAP_START( taiwanmb_map, AS_PROGRAM, 8, nbmj8891_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xec00, 0xedff) AM_READWRITE_LEGACY(nbmj8891_palette_type3_r,nbmj8891_palette_type3_w)
+	AM_RANGE(0xec00, 0xedff) AM_READWRITE(nbmj8891_palette_type3_r,nbmj8891_palette_type3_w)
 	AM_RANGE(0xf800, 0xfeff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xff00, 0xff1f) AM_NOP									// ?
 	AM_RANGE(0xff20, 0xff20) AM_READ(taiwanmb_unk_r)				// MCU or 1413M3 STATUS? (return != 0x00 then loop)
-	AM_RANGE(0xff20, 0xff20) AM_WRITE_LEGACY(nbmj8891_taiwanmb_mcu_w)		// MCU PARAMETER?
+	AM_RANGE(0xff20, 0xff20) AM_WRITE(nbmj8891_taiwanmb_mcu_w)		// MCU PARAMETER?
 	AM_RANGE(0xff21, 0xff2f) AM_READNOP								// ?
 	AM_RANGE(0xff21, 0xff21) AM_WRITENOP							// blitter parameter set end (write 0x01 only)
-	AM_RANGE(0xff22, 0xff27) AM_WRITE_LEGACY(nbmj8891_taiwanmb_blitter_w)	// blitter parameter
-	AM_RANGE(0xff28, 0xff28) AM_WRITE_LEGACY(nbmj8891_romsel_w)			// gfx rombank select
-	AM_RANGE(0xff29, 0xff29) AM_WRITE_LEGACY(nbmj8891_taiwanmb_gfxflag_w)	// screen flip flag?
+	AM_RANGE(0xff22, 0xff27) AM_WRITE(nbmj8891_taiwanmb_blitter_w)	// blitter parameter
+	AM_RANGE(0xff28, 0xff28) AM_WRITE(nbmj8891_romsel_w)			// gfx rombank select
+	AM_RANGE(0xff29, 0xff29) AM_WRITE(nbmj8891_taiwanmb_gfxflag_w)	// screen flip flag?
 	AM_RANGE(0xff2a, 0xff2a) AM_WRITENOP							// not used?
-	AM_RANGE(0xff2b, 0xff2b) AM_WRITE_LEGACY(nbmj8891_clutsel_w)			// color look up table select
+	AM_RANGE(0xff2b, 0xff2b) AM_WRITE(nbmj8891_clutsel_w)			// color look up table select
 	AM_RANGE(0xff2c, 0xff2c) AM_WRITENOP							// blitter parameter set start (write 0xff only)
 	AM_RANGE(0xff2d, 0xff2d) AM_WRITENOP							// not used?
 	AM_RANGE(0xff2e, 0xff2e) AM_WRITENOP							// not used?
@@ -442,17 +442,17 @@ static ADDRESS_MAP_START( gionbana_io_map, AS_IO, 8, nbmj8891_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x7f) AM_READ_LEGACY(nb1413m3_sndrom_r)
 	AM_RANGE(0x00, 0x00) AM_WRITE_LEGACY(nb1413m3_nmi_clock_w)
-	AM_RANGE(0x20, 0x27) AM_WRITE_LEGACY(nbmj8891_blitter_w)
-	AM_RANGE(0x40, 0x40) AM_WRITE_LEGACY(nbmj8891_clutsel_w)
-	AM_RANGE(0x60, 0x60) AM_WRITE_LEGACY(nbmj8891_romsel_w)
-	AM_RANGE(0x70, 0x70) AM_WRITE_LEGACY(nbmj8891_scrolly_w)
+	AM_RANGE(0x20, 0x27) AM_WRITE(nbmj8891_blitter_w)
+	AM_RANGE(0x40, 0x40) AM_WRITE(nbmj8891_clutsel_w)
+	AM_RANGE(0x60, 0x60) AM_WRITE(nbmj8891_romsel_w)
+	AM_RANGE(0x70, 0x70) AM_WRITE(nbmj8891_scrolly_w)
 	AM_RANGE(0x80, 0x81) AM_DEVWRITE_LEGACY("fmsnd", ym3812_w)
 	AM_RANGE(0x90, 0x90) AM_READ_LEGACY(nb1413m3_inputport0_r)
 	AM_RANGE(0xa0, 0xa0) AM_READWRITE_LEGACY(nb1413m3_inputport1_r,nb1413m3_inputportsel_w)
 	AM_RANGE(0xb0, 0xb0) AM_READWRITE_LEGACY(nb1413m3_inputport2_r,nb1413m3_sndrombank1_w)
 	AM_RANGE(0xc0, 0xc0) AM_READ_LEGACY(nb1413m3_inputport3_r) //AM_WRITENOP
 	AM_RANGE(0xd0, 0xd0) AM_DEVWRITE_LEGACY("dac", DAC_WRITE)
-	AM_RANGE(0xe0, 0xe0) AM_WRITE_LEGACY(nbmj8891_vramsel_w)
+	AM_RANGE(0xe0, 0xe0) AM_WRITE(nbmj8891_vramsel_w)
 	AM_RANGE(0xf0, 0xf0) AM_READWRITE_LEGACY(nb1413m3_dipsw1_r,nb1413m3_outcoin_w)
 	AM_RANGE(0xf1, 0xf1) AM_READ_LEGACY(nb1413m3_dipsw2_r)
 ADDRESS_MAP_END
@@ -461,17 +461,17 @@ static ADDRESS_MAP_START( mgion_io_map, AS_IO, 8, nbmj8891_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x7f) AM_READ_LEGACY(nb1413m3_sndrom_r)
 	AM_RANGE(0x00, 0x00) AM_WRITE_LEGACY(nb1413m3_nmi_clock_w)
-	AM_RANGE(0x30, 0x37) AM_WRITE_LEGACY(nbmj8891_blitter_w)
-	AM_RANGE(0x40, 0x40) AM_WRITE_LEGACY(nbmj8891_clutsel_w)
-	AM_RANGE(0x60, 0x60) AM_WRITE_LEGACY(nbmj8891_romsel_w)
-	AM_RANGE(0x70, 0x70) AM_WRITE_LEGACY(nbmj8891_scrolly_w)
+	AM_RANGE(0x30, 0x37) AM_WRITE(nbmj8891_blitter_w)
+	AM_RANGE(0x40, 0x40) AM_WRITE(nbmj8891_clutsel_w)
+	AM_RANGE(0x60, 0x60) AM_WRITE(nbmj8891_romsel_w)
+	AM_RANGE(0x70, 0x70) AM_WRITE(nbmj8891_scrolly_w)
 	AM_RANGE(0x80, 0x81) AM_DEVWRITE_LEGACY("fmsnd", ym3812_w)
 	AM_RANGE(0x90, 0x90) AM_READ_LEGACY(nb1413m3_inputport0_r)
 	AM_RANGE(0xa0, 0xa0) AM_READWRITE_LEGACY(nb1413m3_inputport1_r,nb1413m3_inputportsel_w)
 	AM_RANGE(0xb0, 0xb0) AM_READWRITE_LEGACY(nb1413m3_inputport2_r,nb1413m3_sndrombank1_w)
 	AM_RANGE(0xc0, 0xc0) AM_READ_LEGACY(nb1413m3_inputport3_r) //AM_WRITENOP
 	AM_RANGE(0xd0, 0xd0) AM_DEVWRITE_LEGACY("dac", DAC_WRITE)
-	AM_RANGE(0xe0, 0xe0) AM_WRITE_LEGACY(nbmj8891_vramsel_w)
+	AM_RANGE(0xe0, 0xe0) AM_WRITE(nbmj8891_vramsel_w)
 	AM_RANGE(0xf0, 0xf0) AM_READWRITE_LEGACY(nb1413m3_dipsw1_r,nb1413m3_outcoin_w)
 	AM_RANGE(0xf1, 0xf1) AM_READ_LEGACY(nb1413m3_dipsw2_r)
 ADDRESS_MAP_END
@@ -479,20 +479,20 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( omotesnd_io_map, AS_IO, 8, nbmj8891_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x7f) AM_READ_LEGACY(nb1413m3_sndrom_r)
-	AM_RANGE(0x00, 0x07) AM_WRITE_LEGACY(nbmj8891_blitter_w)
-	AM_RANGE(0x30, 0x30) AM_WRITE_LEGACY(nbmj8891_vramsel_w)
-	AM_RANGE(0x10, 0x10) AM_WRITE_LEGACY(nbmj8891_romsel_w)
-	AM_RANGE(0x20, 0x20) AM_WRITE_LEGACY(nbmj8891_clutsel_w)
-	AM_RANGE(0x40, 0x4f) AM_WRITE_LEGACY(nbmj8891_clut_w)
+	AM_RANGE(0x00, 0x07) AM_WRITE(nbmj8891_blitter_w)
+	AM_RANGE(0x30, 0x30) AM_WRITE(nbmj8891_vramsel_w)
+	AM_RANGE(0x10, 0x10) AM_WRITE(nbmj8891_romsel_w)
+	AM_RANGE(0x20, 0x20) AM_WRITE(nbmj8891_clutsel_w)
+	AM_RANGE(0x40, 0x4f) AM_WRITE(nbmj8891_clut_w)
 //  AM_RANGE(0x50, 0x50) AM_WRITE_LEGACY(nb1413m3_nmi_clock_w)
-	AM_RANGE(0x70, 0x70) AM_WRITE_LEGACY(nbmj8891_scrolly_w)
+	AM_RANGE(0x70, 0x70) AM_WRITE(nbmj8891_scrolly_w)
 	AM_RANGE(0x81, 0x81) AM_DEVREAD_LEGACY("fmsnd", ay8910_r)
 	AM_RANGE(0x82, 0x83) AM_DEVWRITE_LEGACY("fmsnd", ay8910_data_address_w)
 	AM_RANGE(0x90, 0x90) AM_READ_LEGACY(nb1413m3_inputport0_r) AM_WRITENOP
 	AM_RANGE(0xa0, 0xa0) AM_READWRITE_LEGACY(nb1413m3_inputport1_r,nb1413m3_inputportsel_w)
 	AM_RANGE(0xb0, 0xb0) AM_READWRITE_LEGACY(nb1413m3_inputport2_r,nb1413m3_sndrombank1_w)
 	AM_RANGE(0xc0, 0xc0) AM_READ_LEGACY(nb1413m3_inputport3_r) AM_WRITENOP
-	AM_RANGE(0xd0, 0xdf) AM_READ_LEGACY(nbmj8891_clut_r)
+	AM_RANGE(0xd0, 0xdf) AM_READ(nbmj8891_clut_r)
 	AM_RANGE(0xd0, 0xd0) AM_DEVWRITE_LEGACY("dac", DAC_WRITE)
 	AM_RANGE(0xf0, 0xf0) AM_READWRITE_LEGACY(nb1413m3_dipsw1_r,nb1413m3_outcoin_w)
 	AM_RANGE(0xf1, 0xf1) AM_READ_LEGACY(nb1413m3_dipsw2_r)
@@ -502,10 +502,10 @@ static ADDRESS_MAP_START( hanamomo_io_map, AS_IO, 8, nbmj8891_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x7f) AM_READ_LEGACY(nb1413m3_sndrom_r)
 	AM_RANGE(0x00, 0x00) AM_WRITE_LEGACY(nb1413m3_nmi_clock_w)
-	AM_RANGE(0x30, 0x37) AM_WRITE_LEGACY(nbmj8891_blitter_w)
-	AM_RANGE(0x40, 0x40) AM_WRITE_LEGACY(nbmj8891_clutsel_w)
-	AM_RANGE(0x60, 0x60) AM_WRITE_LEGACY(nbmj8891_romsel_w)
-	AM_RANGE(0x70, 0x70) AM_WRITE_LEGACY(nbmj8891_scrolly_w)
+	AM_RANGE(0x30, 0x37) AM_WRITE(nbmj8891_blitter_w)
+	AM_RANGE(0x40, 0x40) AM_WRITE(nbmj8891_clutsel_w)
+	AM_RANGE(0x60, 0x60) AM_WRITE(nbmj8891_romsel_w)
+	AM_RANGE(0x70, 0x70) AM_WRITE(nbmj8891_scrolly_w)
 	AM_RANGE(0x80, 0x81) AM_DEVWRITE_LEGACY("fmsnd", ym3812_w)
 	AM_RANGE(0x90, 0x90) AM_READ_LEGACY(nb1413m3_inputport0_r)
 	AM_RANGE(0xa0, 0xa0) AM_READWRITE_LEGACY(nb1413m3_inputport1_r,nb1413m3_inputportsel_w)
@@ -521,10 +521,10 @@ static ADDRESS_MAP_START( msjiken_io_map, AS_IO, 8, nbmj8891_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x7f) AM_READ_LEGACY(nb1413m3_sndrom_r)
 	AM_RANGE(0x00, 0x00) AM_WRITE_LEGACY(nb1413m3_nmi_clock_w)
-	AM_RANGE(0x40, 0x40) AM_WRITE_LEGACY(nbmj8891_clutsel_w)
-	AM_RANGE(0x50, 0x57) AM_WRITE_LEGACY(nbmj8891_blitter_w)
-	AM_RANGE(0x60, 0x60) AM_WRITE_LEGACY(nbmj8891_romsel_w)
-	AM_RANGE(0x70, 0x70) AM_WRITE_LEGACY(nbmj8891_scrolly_w)
+	AM_RANGE(0x40, 0x40) AM_WRITE(nbmj8891_clutsel_w)
+	AM_RANGE(0x50, 0x57) AM_WRITE(nbmj8891_blitter_w)
+	AM_RANGE(0x60, 0x60) AM_WRITE(nbmj8891_romsel_w)
+	AM_RANGE(0x70, 0x70) AM_WRITE(nbmj8891_scrolly_w)
 	AM_RANGE(0x80, 0x81) AM_DEVWRITE_LEGACY("fmsnd", ym3812_w)
 	AM_RANGE(0x90, 0x90) AM_READ_LEGACY(nb1413m3_inputport0_r)
 	AM_RANGE(0xa0, 0xa0) AM_READWRITE_LEGACY(nb1413m3_inputport1_r,nb1413m3_inputportsel_w)
@@ -539,11 +539,11 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( scandal_io_map, AS_IO, 8, nbmj8891_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x7f) AM_READ_LEGACY(nb1413m3_sndrom_r)
-	AM_RANGE(0x40, 0x4f) AM_WRITE_LEGACY(nbmj8891_clut_w)
-	AM_RANGE(0x00, 0x07) AM_WRITE_LEGACY(nbmj8891_blitter_w)
-	AM_RANGE(0x10, 0x10) AM_WRITE_LEGACY(nbmj8891_romsel_w)
-	AM_RANGE(0x20, 0x20) AM_WRITE_LEGACY(nbmj8891_clutsel_w)
-	AM_RANGE(0x50, 0x50) AM_WRITE_LEGACY(nbmj8891_scrolly_w)
+	AM_RANGE(0x40, 0x4f) AM_WRITE(nbmj8891_clut_w)
+	AM_RANGE(0x00, 0x07) AM_WRITE(nbmj8891_blitter_w)
+	AM_RANGE(0x10, 0x10) AM_WRITE(nbmj8891_romsel_w)
+	AM_RANGE(0x20, 0x20) AM_WRITE(nbmj8891_clutsel_w)
+	AM_RANGE(0x50, 0x50) AM_WRITE(nbmj8891_scrolly_w)
 	AM_RANGE(0x80, 0x81) AM_DEVWRITE_LEGACY("fmsnd", ym3812_w)
 	AM_RANGE(0x90, 0x90) AM_READ_LEGACY(nb1413m3_inputport0_r)
 	AM_RANGE(0xa0, 0xa0) AM_READWRITE_LEGACY(nb1413m3_inputport1_r,nb1413m3_inputportsel_w)
@@ -558,11 +558,11 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( scandalm_io_map, AS_IO, 8, nbmj8891_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x7f) AM_READ_LEGACY(nb1413m3_sndrom_r)
-	AM_RANGE(0x00, 0x07) AM_WRITE_LEGACY(nbmj8891_blitter_w)
-	AM_RANGE(0x10, 0x10) AM_WRITE_LEGACY(nbmj8891_romsel_w)
-	AM_RANGE(0x20, 0x20) AM_WRITE_LEGACY(nbmj8891_clutsel_w)
-	AM_RANGE(0x40, 0x4f) AM_WRITE_LEGACY(nbmj8891_clut_w)
-	AM_RANGE(0x50, 0x50) AM_WRITE_LEGACY(nbmj8891_scrolly_w)
+	AM_RANGE(0x00, 0x07) AM_WRITE(nbmj8891_blitter_w)
+	AM_RANGE(0x10, 0x10) AM_WRITE(nbmj8891_romsel_w)
+	AM_RANGE(0x20, 0x20) AM_WRITE(nbmj8891_clutsel_w)
+	AM_RANGE(0x40, 0x4f) AM_WRITE(nbmj8891_clut_w)
+	AM_RANGE(0x50, 0x50) AM_WRITE(nbmj8891_scrolly_w)
 	AM_RANGE(0x81, 0x81) AM_DEVREAD_LEGACY("fmsnd", ay8910_r)
 	AM_RANGE(0x82, 0x83) AM_DEVWRITE_LEGACY("fmsnd", ay8910_data_address_w)
 	AM_RANGE(0x90, 0x90) AM_READ_LEGACY(nb1413m3_inputport0_r)
@@ -578,12 +578,12 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( bananadr_io_map, AS_IO, 8, nbmj8891_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x7f) AM_READ_LEGACY(nb1413m3_sndrom_r)
-	AM_RANGE(0x00, 0x07) AM_WRITE_LEGACY(nbmj8891_blitter_w)
-	AM_RANGE(0x10, 0x10) AM_WRITE_LEGACY(nbmj8891_romsel_w)
-	AM_RANGE(0x20, 0x20) AM_WRITE_LEGACY(nbmj8891_clutsel_w)
-	AM_RANGE(0x30, 0x30) AM_WRITE_LEGACY(nbmj8891_vramsel_w)
-	AM_RANGE(0x40, 0x4f) AM_WRITE_LEGACY(nbmj8891_clut_w)
-	AM_RANGE(0x50, 0x50) AM_WRITE_LEGACY(nbmj8891_scrolly_w)
+	AM_RANGE(0x00, 0x07) AM_WRITE(nbmj8891_blitter_w)
+	AM_RANGE(0x10, 0x10) AM_WRITE(nbmj8891_romsel_w)
+	AM_RANGE(0x20, 0x20) AM_WRITE(nbmj8891_clutsel_w)
+	AM_RANGE(0x30, 0x30) AM_WRITE(nbmj8891_vramsel_w)
+	AM_RANGE(0x40, 0x4f) AM_WRITE(nbmj8891_clut_w)
+	AM_RANGE(0x50, 0x50) AM_WRITE(nbmj8891_scrolly_w)
 	AM_RANGE(0x80, 0x81) AM_DEVWRITE_LEGACY("fmsnd", ym3812_w)
 	AM_RANGE(0x90, 0x90) AM_READ_LEGACY(nb1413m3_inputport0_r)
 	AM_RANGE(0xa0, 0xa0) AM_READWRITE_LEGACY(nb1413m3_inputport1_r,nb1413m3_inputportsel_w)
@@ -599,17 +599,17 @@ static ADDRESS_MAP_START( lovehous_io_map, AS_IO, 8, nbmj8891_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x7f) AM_READ_LEGACY(nb1413m3_sndrom_r)
 	AM_RANGE(0x00, 0x00) AM_WRITE_LEGACY(nb1413m3_nmi_clock_w)
-	AM_RANGE(0x40, 0x40) AM_WRITE_LEGACY(nbmj8891_clutsel_w)
-	AM_RANGE(0x50, 0x57) AM_WRITE_LEGACY(nbmj8891_blitter_w)
-	AM_RANGE(0x60, 0x60) AM_WRITE_LEGACY(nbmj8891_romsel_w)
-	AM_RANGE(0x70, 0x70) AM_WRITE_LEGACY(nbmj8891_scrolly_w)
+	AM_RANGE(0x40, 0x40) AM_WRITE(nbmj8891_clutsel_w)
+	AM_RANGE(0x50, 0x57) AM_WRITE(nbmj8891_blitter_w)
+	AM_RANGE(0x60, 0x60) AM_WRITE(nbmj8891_romsel_w)
+	AM_RANGE(0x70, 0x70) AM_WRITE(nbmj8891_scrolly_w)
 	AM_RANGE(0x80, 0x81) AM_DEVWRITE_LEGACY("fmsnd", ym3812_w)
 	AM_RANGE(0x90, 0x90) AM_READ_LEGACY(nb1413m3_inputport0_r) //AM_WRITENOP
 	AM_RANGE(0xa0, 0xa0) AM_READWRITE_LEGACY(nb1413m3_inputport1_r,nb1413m3_inputportsel_w)
 	AM_RANGE(0xb0, 0xb0) AM_READWRITE_LEGACY(nb1413m3_inputport2_r,nb1413m3_sndrombank1_w)
 	AM_RANGE(0xc0, 0xc0) AM_READ_PORT("PORT0-2")
 	AM_RANGE(0xd0, 0xd0) AM_DEVWRITE_LEGACY("dac", DAC_WRITE)
-	AM_RANGE(0xe0, 0xe0) AM_WRITE_LEGACY(nbmj8891_vramsel_w)
+	AM_RANGE(0xe0, 0xe0) AM_WRITE(nbmj8891_vramsel_w)
 	AM_RANGE(0xf0, 0xf0) AM_READWRITE_LEGACY(nb1413m3_dipsw1_r,nb1413m3_outcoin_w)
 	AM_RANGE(0xf1, 0xf1) AM_READ_LEGACY(nb1413m3_dipsw2_r)
 ADDRESS_MAP_END
@@ -618,17 +618,17 @@ static ADDRESS_MAP_START( maiko_io_map, AS_IO, 8, nbmj8891_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x7f) AM_READ_LEGACY(nb1413m3_sndrom_r)
 	AM_RANGE(0x00, 0x00) AM_WRITE_LEGACY(nb1413m3_nmi_clock_w)
-	AM_RANGE(0x40, 0x40) AM_WRITE_LEGACY(nbmj8891_clutsel_w)
-	AM_RANGE(0x50, 0x57) AM_WRITE_LEGACY(nbmj8891_blitter_w)
-	AM_RANGE(0x60, 0x60) AM_WRITE_LEGACY(nbmj8891_romsel_w)
-	AM_RANGE(0x70, 0x70) AM_WRITE_LEGACY(nbmj8891_scrolly_w)
+	AM_RANGE(0x40, 0x40) AM_WRITE(nbmj8891_clutsel_w)
+	AM_RANGE(0x50, 0x57) AM_WRITE(nbmj8891_blitter_w)
+	AM_RANGE(0x60, 0x60) AM_WRITE(nbmj8891_romsel_w)
+	AM_RANGE(0x70, 0x70) AM_WRITE(nbmj8891_scrolly_w)
 	AM_RANGE(0x80, 0x81) AM_DEVWRITE_LEGACY("fmsnd", ym3812_w)
 	AM_RANGE(0x90, 0x90) AM_READ_LEGACY(nb1413m3_inputport0_r)
 	AM_RANGE(0xa0, 0xa0) AM_READWRITE_LEGACY(nb1413m3_inputport1_r,nb1413m3_inputportsel_w)
 	AM_RANGE(0xb0, 0xb0) AM_READWRITE_LEGACY(nb1413m3_inputport2_r,nb1413m3_sndrombank1_w)
 	AM_RANGE(0xc0, 0xc0) AM_READ_PORT("PORT0-2") //AM_WRITENOP
 	AM_RANGE(0xd0, 0xd0) AM_DEVWRITE_LEGACY("dac", DAC_WRITE)
-	AM_RANGE(0xe0, 0xe0) AM_WRITE_LEGACY(nbmj8891_vramsel_w)
+	AM_RANGE(0xe0, 0xe0) AM_WRITE(nbmj8891_vramsel_w)
 	AM_RANGE(0xf0, 0xf0) AM_READWRITE_LEGACY(nb1413m3_dipsw1_r,nb1413m3_outcoin_w)
 	AM_RANGE(0xf1, 0xf1) AM_READ_LEGACY(nb1413m3_dipsw2_r)
 ADDRESS_MAP_END
@@ -644,7 +644,7 @@ static ADDRESS_MAP_START( taiwanmb_io_map, AS_IO, 8, nbmj8891_state )
 //  AM_RANGE(0xc0, 0xc0) AM_WRITENOP                    // ?
 //  AM_RANGE(0xd0, 0xd0) AM_READ_LEGACY(ff_r)  // irq ack? watchdog?
 	AM_RANGE(0xd0, 0xd0) AM_DEVWRITE_LEGACY("dac", DAC_WRITE)
-	AM_RANGE(0xe0, 0xe0) AM_READ_LEGACY(nb1413m3_dipsw3_h_r) AM_WRITE_LEGACY(nbmj8891_taiwanmb_gfxdraw_w)	// blitter draw start
+	AM_RANGE(0xe0, 0xe0) AM_READ_LEGACY(nb1413m3_dipsw3_h_r) AM_WRITE(nbmj8891_taiwanmb_gfxdraw_w)	// blitter draw start
 	AM_RANGE(0xe1, 0xe1) AM_READ_LEGACY(nb1413m3_dipsw3_l_r)
 	AM_RANGE(0xf0, 0xf0) AM_READWRITE_LEGACY(nb1413m3_dipsw2_r,nb1413m3_outcoin_w)
 	AM_RANGE(0xf1, 0xf1) AM_READ_LEGACY(nb1413m3_dipsw1_r)

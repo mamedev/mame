@@ -11,18 +11,16 @@
 #include "includes/bagman.h"
 
 
-WRITE8_HANDLER( bagman_videoram_w )
+WRITE8_MEMBER(bagman_state::bagman_videoram_w)
 {
-	bagman_state *state = space->machine().driver_data<bagman_state>();
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( bagman_colorram_w )
+WRITE8_MEMBER(bagman_state::bagman_colorram_w)
 {
-	bagman_state *state = space->machine().driver_data<bagman_state>();
-	state->m_colorram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_colorram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 /***************************************************************************
@@ -81,13 +79,12 @@ PALETTE_INIT( bagman )
 	}
 }
 
-WRITE8_HANDLER( bagman_flipscreen_w )
+WRITE8_MEMBER(bagman_state::bagman_flipscreen_w)
 {
-	bagman_state *state = space->machine().driver_data<bagman_state>();
-	if ((flip_screen_get(space->machine()) ^ data) & 1)
+	if ((flip_screen_get(machine()) ^ data) & 1)
 	{
-		flip_screen_set(space->machine(), data & 0x01);
-		state->m_bg_tilemap->mark_all_dirty();
+		flip_screen_set(machine(), data & 0x01);
+		m_bg_tilemap->mark_all_dirty();
 	}
 }
 

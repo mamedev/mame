@@ -261,22 +261,20 @@ VIDEO_START( hharry )
 
 ***************************************************************************/
 
-READ16_HANDLER( m72_palette1_r )
+READ16_MEMBER(m72_state::m72_palette1_r)
 {
 	/* A9 isn't connected, so 0x200-0x3ff mirrors 0x000-0x1ff etc. */
 	offset &= ~0x100;
 
-	m72_state *state = space->machine().driver_data<m72_state>();
-	return state->m_generic_paletteram_16[offset] | 0xffe0;	/* only D0-D4 are connected */
+	return m_generic_paletteram_16[offset] | 0xffe0;	/* only D0-D4 are connected */
 }
 
-READ16_HANDLER( m72_palette2_r )
+READ16_MEMBER(m72_state::m72_palette2_r)
 {
 	/* A9 isn't connected, so 0x200-0x3ff mirrors 0x000-0x1ff etc. */
 	offset &= ~0x100;
 
-	m72_state *state = space->machine().driver_data<m72_state>();
-	return state->m_generic_paletteram2_16[offset] | 0xffe0;	/* only D0-D4 are connected */
+	return m_generic_paletteram2_16[offset] | 0xffe0;	/* only D0-D4 are connected */
 }
 
 INLINE void changecolor(running_machine &machine,int color,int r,int g,int b)
@@ -284,131 +282,119 @@ INLINE void changecolor(running_machine &machine,int color,int r,int g,int b)
 	palette_set_color_rgb(machine,color,pal5bit(r),pal5bit(g),pal5bit(b));
 }
 
-WRITE16_HANDLER( m72_palette1_w )
+WRITE16_MEMBER(m72_state::m72_palette1_w)
 {
 	/* A9 isn't connected, so 0x200-0x3ff mirrors 0x000-0x1ff etc. */
 	offset &= ~0x100;
 
-	m72_state *state = space->machine().driver_data<m72_state>();
-	COMBINE_DATA(&state->m_generic_paletteram_16[offset]);
+	COMBINE_DATA(&m_generic_paletteram_16[offset]);
 	offset &= 0x0ff;
-	changecolor(space->machine(),
+	changecolor(machine(),
 			offset,
-			state->m_generic_paletteram_16[offset + 0x000],
-			state->m_generic_paletteram_16[offset + 0x200],
-			state->m_generic_paletteram_16[offset + 0x400]);
+			m_generic_paletteram_16[offset + 0x000],
+			m_generic_paletteram_16[offset + 0x200],
+			m_generic_paletteram_16[offset + 0x400]);
 }
 
-WRITE16_HANDLER( m72_palette2_w )
+WRITE16_MEMBER(m72_state::m72_palette2_w)
 {
 	/* A9 isn't connected, so 0x200-0x3ff mirrors 0x000-0x1ff etc. */
 	offset &= ~0x100;
 
-	m72_state *state = space->machine().driver_data<m72_state>();
-	COMBINE_DATA(&state->m_generic_paletteram2_16[offset]);
+	COMBINE_DATA(&m_generic_paletteram2_16[offset]);
 	offset &= 0x0ff;
-	changecolor(space->machine(),
+	changecolor(machine(),
 			offset + 256,
-			state->m_generic_paletteram2_16[offset + 0x000],
-			state->m_generic_paletteram2_16[offset + 0x200],
-			state->m_generic_paletteram2_16[offset + 0x400]);
+			m_generic_paletteram2_16[offset + 0x000],
+			m_generic_paletteram2_16[offset + 0x200],
+			m_generic_paletteram2_16[offset + 0x400]);
 }
 
-WRITE16_HANDLER( m72_videoram1_w )
+WRITE16_MEMBER(m72_state::m72_videoram1_w)
 {
-	m72_state *state = space->machine().driver_data<m72_state>();
-	COMBINE_DATA(&state->m_videoram1[offset]);
-	state->m_fg_tilemap->mark_tile_dirty(offset/2);
+	COMBINE_DATA(&m_videoram1[offset]);
+	m_fg_tilemap->mark_tile_dirty(offset/2);
 }
 
-WRITE16_HANDLER( m72_videoram2_w )
+WRITE16_MEMBER(m72_state::m72_videoram2_w)
 {
-	m72_state *state = space->machine().driver_data<m72_state>();
-	COMBINE_DATA(&state->m_videoram2[offset]);
-	state->m_bg_tilemap->mark_tile_dirty(offset/2);
+	COMBINE_DATA(&m_videoram2[offset]);
+	m_bg_tilemap->mark_tile_dirty(offset/2);
 }
 
-WRITE16_HANDLER( m72_irq_line_w )
+WRITE16_MEMBER(m72_state::m72_irq_line_w)
 {
-	m72_state *state = space->machine().driver_data<m72_state>();
-	COMBINE_DATA(&state->m_raster_irq_position);
+	COMBINE_DATA(&m_raster_irq_position);
 }
 
-WRITE16_HANDLER( m72_scrollx1_w )
+WRITE16_MEMBER(m72_state::m72_scrollx1_w)
 {
-	m72_state *state = space->machine().driver_data<m72_state>();
-	COMBINE_DATA(&state->m_scrollx1);
+	COMBINE_DATA(&m_scrollx1);
 }
 
-WRITE16_HANDLER( m72_scrollx2_w )
+WRITE16_MEMBER(m72_state::m72_scrollx2_w)
 {
-	m72_state *state = space->machine().driver_data<m72_state>();
-	COMBINE_DATA(&state->m_scrollx2);
+	COMBINE_DATA(&m_scrollx2);
 }
 
-WRITE16_HANDLER( m72_scrolly1_w )
+WRITE16_MEMBER(m72_state::m72_scrolly1_w)
 {
-	m72_state *state = space->machine().driver_data<m72_state>();
-	COMBINE_DATA(&state->m_scrolly1);
+	COMBINE_DATA(&m_scrolly1);
 }
 
-WRITE16_HANDLER( m72_scrolly2_w )
+WRITE16_MEMBER(m72_state::m72_scrolly2_w)
 {
-	m72_state *state = space->machine().driver_data<m72_state>();
-	COMBINE_DATA(&state->m_scrolly2);
+	COMBINE_DATA(&m_scrolly2);
 }
 
-WRITE16_HANDLER( m72_dmaon_w )
+WRITE16_MEMBER(m72_state::m72_dmaon_w)
 {
-	m72_state *state = space->machine().driver_data<m72_state>();
 	if (ACCESSING_BITS_0_7)
-		memcpy(state->m_buffered_spriteram, state->m_spriteram, state->m_spriteram_size);
+		memcpy(m_buffered_spriteram, m_spriteram, m_spriteram_size);
 }
 
 
-WRITE16_HANDLER( m72_port02_w )
+WRITE16_MEMBER(m72_state::m72_port02_w)
 {
-	m72_state *state = space->machine().driver_data<m72_state>();
 	if (ACCESSING_BITS_0_7)
 	{
 		if (data & 0xe0) logerror("write %02x to port 02\n",data);
 
 		/* bits 0/1 are coin counters */
-		coin_counter_w(space->machine(), 0,data & 0x01);
-		coin_counter_w(space->machine(), 1,data & 0x02);
+		coin_counter_w(machine(), 0,data & 0x01);
+		coin_counter_w(machine(), 1,data & 0x02);
 
 		/* bit 2 is flip screen (handled both by software and hardware) */
-		flip_screen_set(space->machine(), ((data & 0x04) >> 2) ^ ((~input_port_read(space->machine(), "DSW") >> 8) & 1));
+		flip_screen_set(machine(), ((data & 0x04) >> 2) ^ ((~input_port_read(machine(), "DSW") >> 8) & 1));
 
 		/* bit 3 is display disable */
-		state->m_video_off = data & 0x08;
+		m_video_off = data & 0x08;
 
 		/* bit 4 resets sound CPU (active low) */
 		if (data & 0x10)
-			cputag_set_input_line(space->machine(), "soundcpu", INPUT_LINE_RESET, CLEAR_LINE);
+			cputag_set_input_line(machine(), "soundcpu", INPUT_LINE_RESET, CLEAR_LINE);
 		else
-			cputag_set_input_line(space->machine(), "soundcpu", INPUT_LINE_RESET, ASSERT_LINE);
+			cputag_set_input_line(machine(), "soundcpu", INPUT_LINE_RESET, ASSERT_LINE);
 
 		/* bit 5 = "bank"? */
 	}
 }
 
-WRITE16_HANDLER( rtype2_port02_w )
+WRITE16_MEMBER(m72_state::rtype2_port02_w)
 {
-	m72_state *state = space->machine().driver_data<m72_state>();
 	if (ACCESSING_BITS_0_7)
 	{
 		if (data & 0xe0) logerror("write %02x to port 02\n",data);
 
 		/* bits 0/1 are coin counters */
-		coin_counter_w(space->machine(), 0,data & 0x01);
-		coin_counter_w(space->machine(), 1,data & 0x02);
+		coin_counter_w(machine(), 0,data & 0x01);
+		coin_counter_w(machine(), 1,data & 0x02);
 
 		/* bit 2 is flip screen (handled both by software and hardware) */
-		flip_screen_set(space->machine(), ((data & 0x04) >> 2) ^ ((~input_port_read(space->machine(), "DSW") >> 8) & 1));
+		flip_screen_set(machine(), ((data & 0x04) >> 2) ^ ((~input_port_read(machine(), "DSW") >> 8) & 1));
 
 		/* bit 3 is display disable */
-		state->m_video_off = data & 0x08;
+		m_video_off = data & 0x08;
 
 		/* other bits unknown */
 	}
@@ -417,13 +403,12 @@ WRITE16_HANDLER( rtype2_port02_w )
 
 
 /* the following is mostly a kludge. This register seems to be used for something else */
-WRITE16_HANDLER( majtitle_gfx_ctrl_w )
+WRITE16_MEMBER(m72_state::majtitle_gfx_ctrl_w)
 {
-	m72_state *state = space->machine().driver_data<m72_state>();
 	if (ACCESSING_BITS_8_15)
 	{
-		if (data & 0xff00) state->m_majtitle_rowscroll = 1;
-		else state->m_majtitle_rowscroll = 0;
+		if (data & 0xff00) m_majtitle_rowscroll = 1;
+		else m_majtitle_rowscroll = 0;
 	}
 }
 

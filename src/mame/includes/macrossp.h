@@ -48,14 +48,14 @@ public:
 	DECLARE_WRITE32_MEMBER(macrossp_palette_fade_w);
 	DECLARE_WRITE32_MEMBER(macrossp_speedup_w);
 	DECLARE_WRITE32_MEMBER(quizmoon_speedup_w);
+	DECLARE_WRITE32_MEMBER(macrossp_scra_videoram_w);
+	DECLARE_WRITE32_MEMBER(macrossp_scrb_videoram_w);
+	DECLARE_WRITE32_MEMBER(macrossp_scrc_videoram_w);
+	DECLARE_WRITE32_MEMBER(macrossp_text_videoram_w);
 };
 
 /*----------- defined in video/macrossp.c -----------*/
 
-WRITE32_HANDLER( macrossp_scra_videoram_w );
-WRITE32_HANDLER( macrossp_scrb_videoram_w );
-WRITE32_HANDLER( macrossp_scrc_videoram_w );
-WRITE32_HANDLER( macrossp_text_videoram_w );
 
 VIDEO_START(macrossp);
 SCREEN_UPDATE_RGB32(macrossp);

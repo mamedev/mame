@@ -48,6 +48,14 @@ public:
 	DECLARE_READ8_MEMBER(rjammer_soundlatch_r);
 	DECLARE_WRITE8_MEMBER(rjammer_voice_input_w);
 	DECLARE_WRITE8_MEMBER(rjammer_voice_intensity_control_w);
+	DECLARE_WRITE8_MEMBER(tubep_textram_w);
+	DECLARE_WRITE8_MEMBER(tubep_background_romselect_w);
+	DECLARE_WRITE8_MEMBER(tubep_colorproms_A4_line_w);
+	DECLARE_WRITE8_MEMBER(tubep_background_a000_w);
+	DECLARE_WRITE8_MEMBER(tubep_background_c000_w);
+	DECLARE_WRITE8_MEMBER(tubep_sprite_control_w);
+	DECLARE_WRITE8_MEMBER(rjammer_background_LS377_w);
+	DECLARE_WRITE8_MEMBER(rjammer_background_page_w);
 };
 
 
@@ -62,14 +70,6 @@ VIDEO_START( tubep );
 VIDEO_RESET( tubep );
 
 
-extern WRITE8_HANDLER( tubep_textram_w );
-extern WRITE8_HANDLER( rjammer_background_LS377_w );
-extern WRITE8_HANDLER( rjammer_background_page_w );
 
-extern WRITE8_HANDLER( tubep_colorproms_A4_line_w );
-extern WRITE8_HANDLER( tubep_background_romselect_w );
-extern WRITE8_HANDLER( tubep_background_a000_w );
-extern WRITE8_HANDLER( tubep_background_c000_w );
 
-extern WRITE8_HANDLER( tubep_sprite_control_w );
 

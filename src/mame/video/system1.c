@@ -167,16 +167,15 @@ VIDEO_START( system2 )
  *
  *************************************/
 
-WRITE8_HANDLER( system1_videomode_w )
+WRITE8_MEMBER(system1_state::system1_videomode_w)
 {
-	system1_state *state = space->machine().driver_data<system1_state>();
 	if (data & 0x6e) logerror("videomode = %02x\n",data);
 
 	/* bit 4 is screen blank */
-	state->m_video_mode = data;
+	m_video_mode = data;
 
 	/* bit 7 is flip screen */
-	flip_screen_set(space->machine(), data & 0x80);
+	flip_screen_set(machine(), data & 0x80);
 }
 
 
@@ -187,25 +186,22 @@ WRITE8_HANDLER( system1_videomode_w )
  *
  *************************************/
 
-READ8_HANDLER( system1_mixer_collision_r )
+READ8_MEMBER(system1_state::system1_mixer_collision_r)
 {
-	system1_state *state = space->machine().driver_data<system1_state>();
-	space->machine().primary_screen->update_now();
-	return state->m_mix_collide[offset & 0x3f] | 0x7e | (state->m_mix_collide_summary << 7);
+	machine().primary_screen->update_now();
+	return m_mix_collide[offset & 0x3f] | 0x7e | (m_mix_collide_summary << 7);
 }
 
-WRITE8_HANDLER( system1_mixer_collision_w )
+WRITE8_MEMBER(system1_state::system1_mixer_collision_w)
 {
-	system1_state *state = space->machine().driver_data<system1_state>();
-	space->machine().primary_screen->update_now();
-	state->m_mix_collide[offset & 0x3f] = 0;
+	machine().primary_screen->update_now();
+	m_mix_collide[offset & 0x3f] = 0;
 }
 
-WRITE8_HANDLER( system1_mixer_collision_reset_w )
+WRITE8_MEMBER(system1_state::system1_mixer_collision_reset_w)
 {
-	system1_state *state = space->machine().driver_data<system1_state>();
-	space->machine().primary_screen->update_now();
-	state->m_mix_collide_summary = 0;
+	machine().primary_screen->update_now();
+	m_mix_collide_summary = 0;
 }
 
 
@@ -216,25 +212,22 @@ WRITE8_HANDLER( system1_mixer_collision_reset_w )
  *
  *************************************/
 
-READ8_HANDLER( system1_sprite_collision_r )
+READ8_MEMBER(system1_state::system1_sprite_collision_r)
 {
-	system1_state *state = space->machine().driver_data<system1_state>();
-	space->machine().primary_screen->update_now();
-	return state->m_sprite_collide[offset & 0x3ff] | 0x7e | (state->m_sprite_collide_summary << 7);
+	machine().primary_screen->update_now();
+	return m_sprite_collide[offset & 0x3ff] | 0x7e | (m_sprite_collide_summary << 7);
 }
 
-WRITE8_HANDLER( system1_sprite_collision_w )
+WRITE8_MEMBER(system1_state::system1_sprite_collision_w)
 {
-	system1_state *state = space->machine().driver_data<system1_state>();
-	space->machine().primary_screen->update_now();
-	state->m_sprite_collide[offset & 0x3ff] = 0;
+	machine().primary_screen->update_now();
+	m_sprite_collide[offset & 0x3ff] = 0;
 }
 
-WRITE8_HANDLER( system1_sprite_collision_reset_w )
+WRITE8_MEMBER(system1_state::system1_sprite_collision_reset_w)
 {
-	system1_state *state = space->machine().driver_data<system1_state>();
-	space->machine().primary_screen->update_now();
-	state->m_sprite_collide_summary = 0;
+	machine().primary_screen->update_now();
+	m_sprite_collide_summary = 0;
 }
 
 
@@ -260,28 +253,26 @@ INLINE void videoram_wait_states(cpu_device *cpu)
 	device_adjust_icount(cpu, -cycles_until_next_fixst);
 }
 
-READ8_HANDLER( system1_videoram_r )
+READ8_MEMBER(system1_state::system1_videoram_r)
 {
-	system1_state *state = space->machine().driver_data<system1_state>();
-	UINT8 *videoram = state->m_videoram;
-	videoram_wait_states(space->machine().firstcpu);
-	offset |= 0x1000 * ((state->m_videoram_bank >> 1) % (state->m_tilemap_pages / 2));
+	UINT8 *videoram = m_videoram;
+	videoram_wait_states(machine().firstcpu);
+	offset |= 0x1000 * ((m_videoram_bank >> 1) % (m_tilemap_pages / 2));
 	return videoram[offset];
 }
 
-WRITE8_HANDLER( system1_videoram_w )
+WRITE8_MEMBER(system1_state::system1_videoram_w)
 {
-	system1_state *state = space->machine().driver_data<system1_state>();
-	UINT8 *videoram = state->m_videoram;
-	videoram_wait_states(space->machine().firstcpu);
-	offset |= 0x1000 * ((state->m_videoram_bank >> 1) % (state->m_tilemap_pages / 2));
+	UINT8 *videoram = m_videoram;
+	videoram_wait_states(machine().firstcpu);
+	offset |= 0x1000 * ((m_videoram_bank >> 1) % (m_tilemap_pages / 2));
 	videoram[offset] = data;
 
-	state->m_tilemap_page[offset / 0x800]->mark_tile_dirty((offset % 0x800) / 2);
+	m_tilemap_page[offset / 0x800]->mark_tile_dirty((offset % 0x800) / 2);
 
 	/* force a partial update if the page is changing */
-	if (state->m_tilemap_pages > 2 && offset >= 0x740 && offset < 0x748 && offset % 2 == 0)
-		space->machine().primary_screen->update_now();
+	if (m_tilemap_pages > 2 && offset >= 0x740 && offset < 0x748 && offset % 2 == 0)
+		machine().primary_screen->update_now();
 }
 
 WRITE8_DEVICE_HANDLER( system1_videoram_bank_w )
@@ -298,9 +289,9 @@ WRITE8_DEVICE_HANDLER( system1_videoram_bank_w )
  *
  *************************************/
 
-WRITE8_HANDLER( system1_paletteram_w )
+WRITE8_MEMBER(system1_state::system1_paletteram_w)
 {
-	const UINT8 *color_prom = space->machine().region("palette")->base();
+	const UINT8 *color_prom = machine().region("palette")->base();
 	int val,r,g,b;
 
 	/*
@@ -324,8 +315,7 @@ WRITE8_HANDLER( system1_paletteram_w )
       accurate to +/- .003K ohms.
     */
 
-	system1_state *state = space->machine().driver_data<system1_state>();
-	state->m_generic_paletteram_8[offset] = data;
+	m_generic_paletteram_8[offset] = data;
 
 	if (color_prom != NULL)
 	{
@@ -359,7 +349,7 @@ WRITE8_HANDLER( system1_paletteram_w )
 		b = pal2bit(data >> 6);
 	}
 
-	palette_set_color(space->machine(),offset,MAKE_RGB(r,g,b));
+	palette_set_color(machine(),offset,MAKE_RGB(r,g,b));
 }
 
 

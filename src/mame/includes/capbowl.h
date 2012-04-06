@@ -31,6 +31,10 @@ public:
 	DECLARE_READ8_MEMBER(track_1_r);
 	DECLARE_WRITE8_MEMBER(track_reset_w);
 	DECLARE_WRITE8_MEMBER(capbowl_sndcmd_w);
+	DECLARE_WRITE8_MEMBER(capbowl_tms34061_w);
+	DECLARE_READ8_MEMBER(capbowl_tms34061_r);
+	DECLARE_WRITE8_MEMBER(bowlrama_blitter_w);
+	DECLARE_READ8_MEMBER(bowlrama_blitter_r);
 };
 
 /*----------- defined in video/capbowl.c -----------*/
@@ -38,8 +42,4 @@ public:
 VIDEO_START( capbowl );
 SCREEN_UPDATE_RGB32( capbowl );
 
-WRITE8_HANDLER( bowlrama_blitter_w );
-READ8_HANDLER( bowlrama_blitter_r );
 
-WRITE8_HANDLER( capbowl_tms34061_w );
-READ8_HANDLER( capbowl_tms34061_r );

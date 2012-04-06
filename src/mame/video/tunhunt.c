@@ -48,12 +48,11 @@
 
 /****************************************************************************************/
 
-WRITE8_HANDLER( tunhunt_videoram_w )
+WRITE8_MEMBER(tunhunt_state::tunhunt_videoram_w)
 {
-	tunhunt_state *state = space->machine().driver_data<tunhunt_state>();
 
-	state->m_videoram[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 static TILE_GET_INFO( get_fg_tile_info )

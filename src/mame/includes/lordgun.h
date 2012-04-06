@@ -37,16 +37,16 @@ public:
 	DECLARE_READ16_MEMBER(lordgun_gun_1_x_r);
 	DECLARE_READ16_MEMBER(lordgun_gun_1_y_r);
 	DECLARE_WRITE16_MEMBER(lordgun_soundlatch_w);
+	DECLARE_WRITE16_MEMBER(lordgun_paletteram_w);
+	DECLARE_WRITE16_MEMBER(lordgun_vram_0_w);
+	DECLARE_WRITE16_MEMBER(lordgun_vram_1_w);
+	DECLARE_WRITE16_MEMBER(lordgun_vram_2_w);
+	DECLARE_WRITE16_MEMBER(lordgun_vram_3_w);
 };
 
 
 /*----------- defined in video/lordgun.c -----------*/
 
-WRITE16_HANDLER( lordgun_paletteram_w );
-WRITE16_HANDLER( lordgun_vram_0_w );
-WRITE16_HANDLER( lordgun_vram_1_w );
-WRITE16_HANDLER( lordgun_vram_2_w );
-WRITE16_HANDLER( lordgun_vram_3_w );
 
 float lordgun_crosshair_mapper(const input_field_config *field, float linear_value);
 void lordgun_update_gun(running_machine &machine, int i);

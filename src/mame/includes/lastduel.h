@@ -37,18 +37,18 @@ public:
 	required_device<buffered_spriteram16_device> m_spriteram;
 	DECLARE_WRITE16_MEMBER(lastduel_sound_w);
 	DECLARE_WRITE8_MEMBER(mg_bankswitch_w);
+	DECLARE_WRITE16_MEMBER(lastduel_flip_w);
+	DECLARE_WRITE16_MEMBER(lastduel_scroll_w);
+	DECLARE_WRITE16_MEMBER(lastduel_scroll1_w);
+	DECLARE_WRITE16_MEMBER(lastduel_scroll2_w);
+	DECLARE_WRITE16_MEMBER(lastduel_vram_w);
+	DECLARE_WRITE16_MEMBER(madgear_scroll1_w);
+	DECLARE_WRITE16_MEMBER(madgear_scroll2_w);
+	DECLARE_WRITE16_MEMBER(lastduel_palette_word_w);
 };
 
 /*----------- defined in video/lastduel.c -----------*/
 
-WRITE16_HANDLER( lastduel_vram_w );
-WRITE16_HANDLER( lastduel_flip_w );
-WRITE16_HANDLER( lastduel_scroll1_w );
-WRITE16_HANDLER( lastduel_scroll2_w );
-WRITE16_HANDLER( madgear_scroll1_w );
-WRITE16_HANDLER( madgear_scroll2_w );
-WRITE16_HANDLER( lastduel_scroll_w );
-WRITE16_HANDLER( lastduel_palette_word_w );
 
 VIDEO_START( lastduel );
 VIDEO_START( madgear );

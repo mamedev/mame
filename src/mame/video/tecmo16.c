@@ -127,91 +127,79 @@ VIDEO_START( riot )
 
 /******************************************************************************/
 
-WRITE16_HANDLER( tecmo16_videoram_w )
+WRITE16_MEMBER(tecmo16_state::tecmo16_videoram_w)
 {
-	tecmo16_state *state = space->machine().driver_data<tecmo16_state>();
-	COMBINE_DATA(&state->m_videoram[offset]);
-	state->m_fg_tilemap->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_videoram[offset]);
+	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_HANDLER( tecmo16_colorram_w )
+WRITE16_MEMBER(tecmo16_state::tecmo16_colorram_w)
 {
-	tecmo16_state *state = space->machine().driver_data<tecmo16_state>();
-	COMBINE_DATA(&state->m_colorram[offset]);
-	state->m_fg_tilemap->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_colorram[offset]);
+	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_HANDLER( tecmo16_videoram2_w )
+WRITE16_MEMBER(tecmo16_state::tecmo16_videoram2_w)
 {
-	tecmo16_state *state = space->machine().driver_data<tecmo16_state>();
-	COMBINE_DATA(&state->m_videoram2[offset]);
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_videoram2[offset]);
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_HANDLER( tecmo16_colorram2_w )
+WRITE16_MEMBER(tecmo16_state::tecmo16_colorram2_w)
 {
-	tecmo16_state *state = space->machine().driver_data<tecmo16_state>();
-	COMBINE_DATA(&state->m_colorram2[offset]);
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_colorram2[offset]);
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE16_HANDLER( tecmo16_charram_w )
+WRITE16_MEMBER(tecmo16_state::tecmo16_charram_w)
 {
-	tecmo16_state *state = space->machine().driver_data<tecmo16_state>();
-	COMBINE_DATA(&state->m_charram[offset]);
-	state->m_tx_tilemap->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_charram[offset]);
+	m_tx_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_HANDLER( tecmo16_flipscreen_w )
+WRITE16_MEMBER(tecmo16_state::tecmo16_flipscreen_w)
 {
-	tecmo16_state *state = space->machine().driver_data<tecmo16_state>();
-	state->m_flipscreen = data & 0x01;
-	flip_screen_set(space->machine(), state->m_flipscreen);
+	m_flipscreen = data & 0x01;
+	flip_screen_set(machine(), m_flipscreen);
 }
 
 /******************************************************************************/
 
-WRITE16_HANDLER( tecmo16_scroll_x_w )
+WRITE16_MEMBER(tecmo16_state::tecmo16_scroll_x_w)
 {
-	tecmo16_state *state = space->machine().driver_data<tecmo16_state>();
-	COMBINE_DATA(&state->m_scroll_x_w);
-	state->m_fg_tilemap->set_scrollx(0,state->m_scroll_x_w);
+	COMBINE_DATA(&m_scroll_x_w);
+	m_fg_tilemap->set_scrollx(0,m_scroll_x_w);
 }
 
-WRITE16_HANDLER( tecmo16_scroll_y_w )
+WRITE16_MEMBER(tecmo16_state::tecmo16_scroll_y_w)
 {
-	tecmo16_state *state = space->machine().driver_data<tecmo16_state>();
-	COMBINE_DATA(&state->m_scroll_y_w);
-	state->m_fg_tilemap->set_scrolly(0,state->m_scroll_y_w);
+	COMBINE_DATA(&m_scroll_y_w);
+	m_fg_tilemap->set_scrolly(0,m_scroll_y_w);
 }
 
-WRITE16_HANDLER( tecmo16_scroll2_x_w )
+WRITE16_MEMBER(tecmo16_state::tecmo16_scroll2_x_w)
 {
-	tecmo16_state *state = space->machine().driver_data<tecmo16_state>();
-	COMBINE_DATA(&state->m_scroll2_x_w);
-	state->m_bg_tilemap->set_scrollx(0,state->m_scroll2_x_w);
+	COMBINE_DATA(&m_scroll2_x_w);
+	m_bg_tilemap->set_scrollx(0,m_scroll2_x_w);
 }
 
-WRITE16_HANDLER( tecmo16_scroll2_y_w )
+WRITE16_MEMBER(tecmo16_state::tecmo16_scroll2_y_w)
 {
-	tecmo16_state *state = space->machine().driver_data<tecmo16_state>();
-	COMBINE_DATA(&state->m_scroll2_y_w);
-	state->m_bg_tilemap->set_scrolly(0,state->m_scroll2_y_w);
+	COMBINE_DATA(&m_scroll2_y_w);
+	m_bg_tilemap->set_scrolly(0,m_scroll2_y_w);
 }
 
-WRITE16_HANDLER( tecmo16_scroll_char_x_w )
+WRITE16_MEMBER(tecmo16_state::tecmo16_scroll_char_x_w)
 {
-	tecmo16_state *state = space->machine().driver_data<tecmo16_state>();
-	COMBINE_DATA(&state->m_scroll_char_x_w);
-	state->m_tx_tilemap->set_scrollx(0,state->m_scroll_char_x_w);
+	COMBINE_DATA(&m_scroll_char_x_w);
+	m_tx_tilemap->set_scrollx(0,m_scroll_char_x_w);
 }
 
-WRITE16_HANDLER( tecmo16_scroll_char_y_w )
+WRITE16_MEMBER(tecmo16_state::tecmo16_scroll_char_y_w)
 {
-	tecmo16_state *state = space->machine().driver_data<tecmo16_state>();
-	COMBINE_DATA(&state->m_scroll_char_y_w);
-	state->m_tx_tilemap->set_scrolly(0,state->m_scroll_char_y_w-16);
+	COMBINE_DATA(&m_scroll_char_y_w);
+	m_tx_tilemap->set_scrolly(0,m_scroll_char_y_w-16);
 }
 
 /******************************************************************************/

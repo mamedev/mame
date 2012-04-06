@@ -48,59 +48,56 @@ PALETTE_INIT( ojankoy )
 	}
 }
 
-WRITE8_HANDLER( ojankohs_palette_w )
+WRITE8_MEMBER(ojankohs_state::ojankohs_palette_w)
 {
-	ojankohs_state *state = space->machine().driver_data<ojankohs_state>();
 	int r, g, b;
 
-	state->m_paletteram[offset] = data;
+	m_paletteram[offset] = data;
 
 	offset &= 0x7fe;
 
-	r = (state->m_paletteram[offset + 0] & 0x7c) >> 2;
-	g = ((state->m_paletteram[offset + 0] & 0x03) << 3) | ((state->m_paletteram[offset + 1] & 0xe0) >> 5);
-	b = (state->m_paletteram[offset + 1] & 0x1f) >> 0;
+	r = (m_paletteram[offset + 0] & 0x7c) >> 2;
+	g = ((m_paletteram[offset + 0] & 0x03) << 3) | ((m_paletteram[offset + 1] & 0xe0) >> 5);
+	b = (m_paletteram[offset + 1] & 0x1f) >> 0;
 
-	palette_set_color_rgb(space->machine(), offset >> 1, pal5bit(r), pal5bit(g), pal5bit(b));
+	palette_set_color_rgb(machine(), offset >> 1, pal5bit(r), pal5bit(g), pal5bit(b));
 }
 
-WRITE8_HANDLER( ccasino_palette_w )
+WRITE8_MEMBER(ojankohs_state::ccasino_palette_w)
 {
-	ojankohs_state *state = space->machine().driver_data<ojankohs_state>();
 	int r, g, b;
 
 	/* get top 8 bits of the I/O port address */
-	offset = (offset << 8) | (cpu_get_reg(&space->device(), Z80_BC) >> 8);
+	offset = (offset << 8) | (cpu_get_reg(&space.device(), Z80_BC) >> 8);
 
-	state->m_paletteram[offset] = data;
+	m_paletteram[offset] = data;
 
 	offset &= 0x7fe;
 
-	r = (state->m_paletteram[offset + 0] & 0x7c) >> 2;
-	g = ((state->m_paletteram[offset + 0] & 0x03) << 3) | ((state->m_paletteram[offset + 1] & 0xe0) >> 5);
-	b = (state->m_paletteram[offset + 1] & 0x1f) >> 0;
+	r = (m_paletteram[offset + 0] & 0x7c) >> 2;
+	g = ((m_paletteram[offset + 0] & 0x03) << 3) | ((m_paletteram[offset + 1] & 0xe0) >> 5);
+	b = (m_paletteram[offset + 1] & 0x1f) >> 0;
 
-	palette_set_color_rgb(space->machine(), offset >> 1, pal5bit(r), pal5bit(g), pal5bit(b));
+	palette_set_color_rgb(machine(), offset >> 1, pal5bit(r), pal5bit(g), pal5bit(b));
 }
 
-WRITE8_HANDLER( ojankoc_palette_w )
+WRITE8_MEMBER(ojankohs_state::ojankoc_palette_w)
 {
-	ojankohs_state *state = space->machine().driver_data<ojankohs_state>();
 	int r, g, b, color;
 
-	if (state->m_paletteram[offset] == data)
+	if (m_paletteram[offset] == data)
 		return;
 
-	state->m_paletteram[offset] = data;
-	state->m_screen_refresh = 1;
+	m_paletteram[offset] = data;
+	m_screen_refresh = 1;
 
-	color = (state->m_paletteram[offset & 0x1e] << 8) | state->m_paletteram[offset | 0x01];
+	color = (m_paletteram[offset & 0x1e] << 8) | m_paletteram[offset | 0x01];
 
 	r = (color >> 10) & 0x1f;
 	g = (color >>  5) & 0x1f;
 	b = (color >>  0) & 0x1f;
 
-	palette_set_color_rgb(space->machine(), offset >> 1, pal5bit(r), pal5bit(g), pal5bit(b));
+	palette_set_color_rgb(machine(), offset >> 1, pal5bit(r), pal5bit(g), pal5bit(b));
 }
 
 
@@ -110,51 +107,47 @@ WRITE8_HANDLER( ojankoc_palette_w )
 
 ******************************************************************************/
 
-WRITE8_HANDLER( ojankohs_videoram_w )
+WRITE8_MEMBER(ojankohs_state::ojankohs_videoram_w)
 {
-	ojankohs_state *state = space->machine().driver_data<ojankohs_state>();
-	state->m_videoram[offset] = data;
-	state->m_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( ojankohs_colorram_w )
+WRITE8_MEMBER(ojankohs_state::ojankohs_colorram_w)
 {
-	ojankohs_state *state = space->machine().driver_data<ojankohs_state>();
-	state->m_colorram[offset] = data;
-	state->m_tilemap->mark_tile_dirty(offset);
+	m_colorram[offset] = data;
+	m_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( ojankohs_gfxreg_w )
+WRITE8_MEMBER(ojankohs_state::ojankohs_gfxreg_w)
 {
-	ojankohs_state *state = space->machine().driver_data<ojankohs_state>();
 
-	if (state->m_gfxreg != data)
+	if (m_gfxreg != data)
 	{
-		state->m_gfxreg = data;
-		state->m_tilemap->mark_all_dirty();
+		m_gfxreg = data;
+		m_tilemap->mark_all_dirty();
 	}
 }
 
-WRITE8_HANDLER( ojankohs_flipscreen_w )
+WRITE8_MEMBER(ojankohs_state::ojankohs_flipscreen_w)
 {
-	ojankohs_state *state = space->machine().driver_data<ojankohs_state>();
 
-	if (state->m_flipscreen != BIT(data, 0))
+	if (m_flipscreen != BIT(data, 0))
 	{
 
-		state->m_flipscreen = BIT(data, 0);
+		m_flipscreen = BIT(data, 0);
 
-		space->machine().tilemap().set_flip_all(state->m_flipscreen ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
+		machine().tilemap().set_flip_all(m_flipscreen ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
 
-		if (state->m_flipscreen)
+		if (m_flipscreen)
 		{
-			state->m_scrollx = -0xe0;
-			state->m_scrolly = -0x20;
+			m_scrollx = -0xe0;
+			m_scrolly = -0x20;
 		}
 		else
 		{
-			state->m_scrollx = 0;
-			state->m_scrolly = 0;
+			m_scrollx = 0;
+			m_scrolly = 0;
 		}
 	}
 }
@@ -209,36 +202,35 @@ void ojankoc_flipscreen( address_space *space, int data )
 		{
 			color1 = state->m_videoram[0x0000 + ((y * 256) + x)];
 			color2 = state->m_videoram[0x3fff - ((y * 256) + x)];
-			ojankoc_videoram_w(space, 0x0000 + ((y * 256) + x), color2);
-			ojankoc_videoram_w(space, 0x3fff - ((y * 256) + x), color1);
+			state->ojankoc_videoram_w(*space, 0x0000 + ((y * 256) + x), color2);
+			state->ojankoc_videoram_w(*space, 0x3fff - ((y * 256) + x), color1);
 
 			color1 = state->m_videoram[0x4000 + ((y * 256) + x)];
 			color2 = state->m_videoram[0x7fff - ((y * 256) + x)];
-			ojankoc_videoram_w(space, 0x4000 + ((y * 256) + x), color2);
-			ojankoc_videoram_w(space, 0x7fff - ((y * 256) + x), color1);
+			state->ojankoc_videoram_w(*space, 0x4000 + ((y * 256) + x), color2);
+			state->ojankoc_videoram_w(*space, 0x7fff - ((y * 256) + x), color1);
 		}
 	}
 
 	state->m_flipscreen_old = state->m_flipscreen;
 }
 
-WRITE8_HANDLER( ojankoc_videoram_w )
+WRITE8_MEMBER(ojankohs_state::ojankoc_videoram_w)
 {
-	ojankohs_state *state = space->machine().driver_data<ojankohs_state>();
 	int i;
 	UINT8 x, y, xx, px, py ;
 	UINT8 color, color1, color2;
 
-	state->m_videoram[offset] = data;
+	m_videoram[offset] = data;
 
-	color1 = state->m_videoram[offset & 0x3fff];
-	color2 = state->m_videoram[offset | 0x4000];
+	color1 = m_videoram[offset & 0x3fff];
+	color2 = m_videoram[offset | 0x4000];
 
 	y = offset >> 6;
 	x = (offset & 0x3f) << 2;
 	xx = 0;
 
-	if (state->m_flipscreen)
+	if (m_flipscreen)
 	{
 		x = 0xfc - x;
 		y = 0xff - y;
@@ -252,7 +244,7 @@ WRITE8_HANDLER( ojankoc_videoram_w )
 		px = x + (i ^ xx);
 		py = y;
 
-		state->m_tmpbitmap.pix16(py, px) = color;
+		m_tmpbitmap.pix16(py, px) = color;
 
 		color1 >>= 1;
 		color2 >>= 1;
@@ -335,7 +327,7 @@ SCREEN_UPDATE_IND16( ojankoc )
 		/* redraw bitmap */
 		for (offs = 0; offs < 0x8000; offs++)
 		{
-			ojankoc_videoram_w(space, offs, state->m_videoram[offs]);
+			state->ojankoc_videoram_w(*space, offs, state->m_videoram[offs]);
 		}
 		state->m_screen_refresh = 0;
 	}

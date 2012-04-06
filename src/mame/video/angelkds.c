@@ -23,22 +23,20 @@ static TILE_GET_INFO( get_tx_tile_info )
 	SET_TILE_INFO(0, tileno, 0, 0);
 }
 
-WRITE8_HANDLER( angelkds_txvideoram_w )
+WRITE8_MEMBER(angelkds_state::angelkds_txvideoram_w)
 {
-	angelkds_state *state = space->machine().driver_data<angelkds_state>();
 
-	state->m_txvideoram[offset] = data;
-	state->m_tx_tilemap->mark_tile_dirty(offset);
+	m_txvideoram[offset] = data;
+	m_tx_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( angelkds_txbank_write )
+WRITE8_MEMBER(angelkds_state::angelkds_txbank_write)
 {
-	angelkds_state *state = space->machine().driver_data<angelkds_state>();
 
-	if (state->m_txbank != data)
+	if (m_txbank != data)
 	{
-		state->m_txbank = data;
-		state->m_tx_tilemap->mark_all_dirty();
+		m_txbank = data;
+		m_tx_tilemap->mark_all_dirty();
 	}
 }
 
@@ -57,30 +55,27 @@ static TILE_GET_INFO( get_bgtop_tile_info )
 	SET_TILE_INFO(1, tileno, 0, 0);
 }
 
-WRITE8_HANDLER( angelkds_bgtopvideoram_w )
+WRITE8_MEMBER(angelkds_state::angelkds_bgtopvideoram_w)
 {
-	angelkds_state *state = space->machine().driver_data<angelkds_state>();
 
-	state->m_bgtopvideoram[offset] = data;
-	state->m_bgtop_tilemap->mark_tile_dirty(offset);
+	m_bgtopvideoram[offset] = data;
+	m_bgtop_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( angelkds_bgtopbank_write )
+WRITE8_MEMBER(angelkds_state::angelkds_bgtopbank_write)
 {
-	angelkds_state *state = space->machine().driver_data<angelkds_state>();
 
-	if (state->m_bgtopbank != data)
+	if (m_bgtopbank != data)
 	{
-		state->m_bgtopbank = data;
-		state->m_bgtop_tilemap->mark_all_dirty();
+		m_bgtopbank = data;
+		m_bgtop_tilemap->mark_all_dirty();
 	}
 }
 
-WRITE8_HANDLER( angelkds_bgtopscroll_write )
+WRITE8_MEMBER(angelkds_state::angelkds_bgtopscroll_write)
 {
-	angelkds_state *state = space->machine().driver_data<angelkds_state>();
 
-	state->m_bgtop_tilemap->set_scrollx(0, data);
+	m_bgtop_tilemap->set_scrollx(0, data);
 }
 
 /*** Bottom Half Background Tilemap
@@ -98,39 +93,35 @@ static TILE_GET_INFO( get_bgbot_tile_info )
 	SET_TILE_INFO(2, tileno, 1, 0);
 }
 
-WRITE8_HANDLER( angelkds_bgbotvideoram_w )
+WRITE8_MEMBER(angelkds_state::angelkds_bgbotvideoram_w)
 {
-	angelkds_state *state = space->machine().driver_data<angelkds_state>();
 
-	state->m_bgbotvideoram[offset] = data;
-	state->m_bgbot_tilemap->mark_tile_dirty(offset);
+	m_bgbotvideoram[offset] = data;
+	m_bgbot_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_HANDLER( angelkds_bgbotbank_write )
+WRITE8_MEMBER(angelkds_state::angelkds_bgbotbank_write)
 {
-	angelkds_state *state = space->machine().driver_data<angelkds_state>();
 
-	if (state->m_bgbotbank != data)
+	if (m_bgbotbank != data)
 	{
-		state->m_bgbotbank = data;
-		state->m_bgbot_tilemap->mark_all_dirty();
+		m_bgbotbank = data;
+		m_bgbot_tilemap->mark_all_dirty();
 	}
 }
 
-WRITE8_HANDLER( angelkds_bgbotscroll_write )
+WRITE8_MEMBER(angelkds_state::angelkds_bgbotscroll_write)
 {
-	angelkds_state *state = space->machine().driver_data<angelkds_state>();
 
-	state->m_bgbot_tilemap->set_scrollx(0, data);
+	m_bgbot_tilemap->set_scrollx(0, data);
 }
 
 
-WRITE8_HANDLER( angelkds_layer_ctrl_write )
+WRITE8_MEMBER(angelkds_state::angelkds_layer_ctrl_write)
 {
-	angelkds_state *state = space->machine().driver_data<angelkds_state>();
 
-	state->m_layer_ctrl = data;
+	m_layer_ctrl = data;
 }
 
 /*** Sprites
@@ -241,15 +232,14 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 
 */
 
-WRITE8_HANDLER( angelkds_paletteram_w )
+WRITE8_MEMBER(angelkds_state::angelkds_paletteram_w)
 {
-	angelkds_state *state = space->machine().driver_data<angelkds_state>();
 	int no;
 
-	state->m_paletteram[offset] = data;
+	m_paletteram[offset] = data;
 
 	no = offset & 0xff;
-	palette_set_color_rgb(space->machine(), no, pal4bit(state->m_paletteram[no]), pal4bit(state->m_paletteram[no]>>4), pal4bit(state->m_paletteram[no + 0x100]));
+	palette_set_color_rgb(machine(), no, pal4bit(m_paletteram[no]), pal4bit(m_paletteram[no]>>4), pal4bit(m_paletteram[no + 0x100]));
 }
 
 /*** Video Start & Update

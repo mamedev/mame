@@ -30,14 +30,14 @@ public:
 	device_t *m_deco_tilegen2;
 	DECLARE_WRITE16_MEMBER(twocrude_control_w);
 	DECLARE_READ16_MEMBER(twocrude_control_r);
+	DECLARE_WRITE16_MEMBER(twocrude_palette_24bit_rg_w);
+	DECLARE_WRITE16_MEMBER(twocrude_palette_24bit_b_w);
 };
 
 
 
 /*----------- defined in video/cbuster.c -----------*/
 
-WRITE16_HANDLER( twocrude_palette_24bit_rg_w );
-WRITE16_HANDLER( twocrude_palette_24bit_b_w );
 
 VIDEO_START( twocrude );
 SCREEN_UPDATE_RGB32( twocrude );

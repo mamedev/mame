@@ -23,33 +23,29 @@ WRITE8_DEVICE_HANDLER( xxmissio_scroll_y_w )
 	state->m_yscroll = data;
 }
 
-WRITE8_HANDLER( xxmissio_flipscreen_w )
+WRITE8_MEMBER(xxmissio_state::xxmissio_flipscreen_w)
 {
-	xxmissio_state *state = space->machine().driver_data<xxmissio_state>();
-	state->m_flipscreen = data & 0x01;
+	m_flipscreen = data & 0x01;
 }
 
-WRITE8_HANDLER( xxmissio_bgram_w )
+WRITE8_MEMBER(xxmissio_state::xxmissio_bgram_w)
 {
-	xxmissio_state *state = space->machine().driver_data<xxmissio_state>();
-	int x = (offset + (state->m_xscroll >> 3)) & 0x1f;
+	int x = (offset + (m_xscroll >> 3)) & 0x1f;
 	offset = (offset & 0x7e0) | x;
 
-	state->m_bgram[offset] = data;
+	m_bgram[offset] = data;
 }
-READ8_HANDLER( xxmissio_bgram_r )
+READ8_MEMBER(xxmissio_state::xxmissio_bgram_r)
 {
-	xxmissio_state *state = space->machine().driver_data<xxmissio_state>();
-	int x = (offset + (state->m_xscroll >> 3)) & 0x1f;
+	int x = (offset + (m_xscroll >> 3)) & 0x1f;
 	offset = (offset & 0x7e0) | x;
 
-	return state->m_bgram[offset];
+	return m_bgram[offset];
 }
 
-WRITE8_HANDLER( xxmissio_paletteram_w )
+WRITE8_MEMBER(xxmissio_state::xxmissio_paletteram_w)
 {
-	xxmissio_state *state = space->machine().driver_data<xxmissio_state>();
-	state->paletteram_BBGGRRII_w(*space,offset,data);
+	paletteram_BBGGRRII_w(space,offset,data);
 }
 
 /****************************************************************************/

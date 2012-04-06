@@ -42,27 +42,27 @@ public:
 	DECLARE_WRITE8_MEMBER(irq_ack_w);
 	DECLARE_READ8_MEMBER(esb_slapstic_r);
 	DECLARE_WRITE8_MEMBER(esb_slapstic_w);
+	DECLARE_WRITE8_MEMBER(starwars_nstore_w);
+	DECLARE_WRITE8_MEMBER(starwars_out_w);
+	DECLARE_READ8_MEMBER(starwars_adc_r);
+	DECLARE_WRITE8_MEMBER(starwars_adc_select_w);
+	DECLARE_READ8_MEMBER(starwars_prng_r);
+	DECLARE_READ8_MEMBER(starwars_div_reh_r);
+	DECLARE_READ8_MEMBER(starwars_div_rel_r);
+	DECLARE_WRITE8_MEMBER(starwars_math_w);
 };
 
 
 /*----------- defined in machine/starwars.c -----------*/
 
-WRITE8_HANDLER( starwars_nstore_w );
 
-WRITE8_HANDLER( starwars_out_w );
 CUSTOM_INPUT( matrix_flag_r );
 
-READ8_HANDLER( starwars_adc_r );
-WRITE8_HANDLER( starwars_adc_select_w );
 
 void starwars_mproc_init(running_machine &machine);
 void starwars_mproc_reset(running_machine &machine);
 
-READ8_HANDLER( starwars_prng_r );
-READ8_HANDLER( starwars_div_reh_r );
-READ8_HANDLER( starwars_div_rel_r );
 
-WRITE8_HANDLER( starwars_math_w );
 
 
 /*----------- defined in audio/starwars.c -----------*/

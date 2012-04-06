@@ -207,7 +207,7 @@ static ADDRESS_MAP_START( rastan_map, AS_PROGRAM, 16, rastan_state )
 	AM_RANGE(0x10c000, 0x10ffff) AM_RAM
 	AM_RANGE(0x200000, 0x200fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x350008, 0x350009) AM_WRITENOP	/* 0 only (often) ? */
-	AM_RANGE(0x380000, 0x380001) AM_WRITE_LEGACY(rastan_spritectrl_w)	/* sprite palette bank, coin counters & lockout */
+	AM_RANGE(0x380000, 0x380001) AM_WRITE(rastan_spritectrl_w)	/* sprite palette bank, coin counters & lockout */
 	AM_RANGE(0x390000, 0x390001) AM_READ_PORT("P1")
 	AM_RANGE(0x390002, 0x390003) AM_READ_PORT("P2")
 	AM_RANGE(0x390004, 0x390005) AM_READ_PORT("SPECIAL")

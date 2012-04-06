@@ -8,11 +8,10 @@ Atari Canyon Bomber video emulation
 #include "includes/canyon.h"
 
 
-WRITE8_HANDLER( canyon_videoram_w )
+WRITE8_MEMBER(canyon_state::canyon_videoram_w)
 {
-	canyon_state *state = space->machine().driver_data<canyon_state>();
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 

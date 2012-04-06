@@ -34,6 +34,7 @@ public:
 	DECLARE_WRITE8_MEMBER(le_bgcolor_w);
 	DECLARE_READ8_MEMBER(guns_r);
 	DECLARE_READ8_MEMBER(gunsaux_r);
+	DECLARE_WRITE8_MEMBER(lethalen_palette_control);
 };
 
 /*----------- defined in video/lethal.c -----------*/
@@ -41,7 +42,6 @@ public:
 extern void lethalen_sprite_callback(running_machine &machine, int *code, int *color, int *priority_mask);
 extern void lethalen_tile_callback(running_machine &machine, int layer, int *code, int *color, int *flags);
 
-WRITE8_HANDLER(lethalen_palette_control);
 
 VIDEO_START(lethalen);
 SCREEN_UPDATE_IND16(lethalen);

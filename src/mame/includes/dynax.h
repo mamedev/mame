@@ -232,6 +232,40 @@ public:
 	DECLARE_WRITE8_MEMBER(gekisha_p4_w);
 	DECLARE_READ8_MEMBER(gekisha_8000_r);
 	DECLARE_WRITE8_MEMBER(gekisha_8000_w);
+	DECLARE_WRITE8_MEMBER(dynax_extra_scrollx_w);
+	DECLARE_WRITE8_MEMBER(dynax_extra_scrolly_w);
+	DECLARE_WRITE8_MEMBER(dynax_blit_pen_w);
+	DECLARE_WRITE8_MEMBER(dynax_blit2_pen_w);
+	DECLARE_WRITE8_MEMBER(dynax_blit_dest_w);
+	DECLARE_WRITE8_MEMBER(dynax_blit2_dest_w);
+	DECLARE_WRITE8_MEMBER(tenkai_blit_dest_w);
+	DECLARE_WRITE8_MEMBER(dynax_blit_backpen_w);
+	DECLARE_WRITE8_MEMBER(dynax_blit_palette01_w);
+	DECLARE_WRITE8_MEMBER(tenkai_blit_palette01_w);
+	DECLARE_WRITE8_MEMBER(dynax_blit_palette45_w);
+	DECLARE_WRITE8_MEMBER(dynax_blit_palette23_w);
+	DECLARE_WRITE8_MEMBER(tenkai_blit_palette23_w);
+	DECLARE_WRITE8_MEMBER(dynax_blit_palette67_w);
+	DECLARE_WRITE8_MEMBER(dynax_blit_palbank_w);
+	DECLARE_WRITE8_MEMBER(dynax_blit2_palbank_w);
+	DECLARE_WRITE8_MEMBER(hanamai_layer_half_w);
+	DECLARE_WRITE8_MEMBER(hnoridur_layer_half2_w);
+	DECLARE_WRITE8_MEMBER(mjdialq2_blit_dest_w);
+	DECLARE_WRITE8_MEMBER(dynax_layer_enable_w);
+	DECLARE_WRITE8_MEMBER(jantouki_layer_enable_w);
+	DECLARE_WRITE8_MEMBER(mjdialq2_layer_enable_w);
+	DECLARE_WRITE8_MEMBER(dynax_flipscreen_w);
+	DECLARE_WRITE8_MEMBER(dynax_blit_romregion_w);
+	DECLARE_WRITE8_MEMBER(dynax_blit2_romregion_w);
+	DECLARE_WRITE8_MEMBER(dynax_blit_scroll_w);
+	DECLARE_WRITE8_MEMBER(tenkai_blit_scroll_w);
+	DECLARE_WRITE8_MEMBER(dynax_blit2_scroll_w);
+	DECLARE_WRITE8_MEMBER(dynax_blitter_rev2_w);
+	DECLARE_WRITE8_MEMBER(tenkai_blitter_rev2_w);
+	DECLARE_WRITE8_MEMBER(jantouki_blitter_rev2_w);
+	DECLARE_WRITE8_MEMBER(jantouki_blitter2_rev2_w);
+	DECLARE_WRITE8_MEMBER(hanamai_priority_w);
+	DECLARE_WRITE8_MEMBER(tenkai_priority_w);
 };
 
 //----------- defined in drivers/dynax.c -----------
@@ -243,43 +277,12 @@ void neruton_update_irq(running_machine &machine);
 
 //----------- defined in video/dynax.c -----------
 
-WRITE8_HANDLER( dynax_blitter_rev2_w );
-WRITE8_HANDLER( jantouki_blitter_rev2_w );
-WRITE8_HANDLER( jantouki_blitter2_rev2_w );
-WRITE8_HANDLER( tenkai_blitter_rev2_w );
 
-WRITE8_HANDLER( dynax_blit_pen_w );
-WRITE8_HANDLER( dynax_blit2_pen_w );
-WRITE8_HANDLER( dynax_blit_backpen_w );
-WRITE8_HANDLER( dynax_blit_dest_w );
-WRITE8_HANDLER( dynax_blit2_dest_w );
-WRITE8_HANDLER( dynax_blit_palbank_w );
-WRITE8_HANDLER( dynax_blit2_palbank_w );
-WRITE8_HANDLER( dynax_blit_palette01_w );
-WRITE8_HANDLER( dynax_blit_palette23_w );
-WRITE8_HANDLER( dynax_blit_palette45_w );
-WRITE8_HANDLER( dynax_blit_palette67_w );
-WRITE8_HANDLER( dynax_layer_enable_w );
-WRITE8_HANDLER( jantouki_layer_enable_w );
-WRITE8_HANDLER( dynax_flipscreen_w );
-WRITE8_HANDLER( dynax_extra_scrollx_w );
-WRITE8_HANDLER( dynax_extra_scrolly_w );
-WRITE8_HANDLER( dynax_blit_romregion_w );
-WRITE8_HANDLER( dynax_blit2_romregion_w );
 
-WRITE8_HANDLER( hanamai_layer_half_w );
-WRITE8_HANDLER( hnoridur_layer_half2_w );
 
-WRITE8_HANDLER( hanamai_priority_w );
-WRITE8_HANDLER( tenkai_priority_w );
 
-WRITE8_HANDLER( mjdialq2_blit_dest_w );
-WRITE8_HANDLER( tenkai_blit_dest_w );
 
-WRITE8_HANDLER( mjdialq2_layer_enable_w );
 
-WRITE8_HANDLER( tenkai_blit_palette01_w );
-WRITE8_HANDLER( tenkai_blit_palette23_w );
 
 VIDEO_START( hanamai );
 VIDEO_START( hnoridur );

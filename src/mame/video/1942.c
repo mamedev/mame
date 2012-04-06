@@ -140,55 +140,50 @@ VIDEO_START( 1942 )
 
 ***************************************************************************/
 
-WRITE8_HANDLER( c1942_fgvideoram_w )
+WRITE8_MEMBER(_1942_state::c1942_fgvideoram_w)
 {
-	_1942_state *state = space->machine().driver_data<_1942_state>();
 
-	state->m_fg_videoram[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
+	m_fg_videoram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_HANDLER( c1942_bgvideoram_w )
+WRITE8_MEMBER(_1942_state::c1942_bgvideoram_w)
 {
-	_1942_state *state = space->machine().driver_data<_1942_state>();
 
-	state->m_bg_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty((offset & 0x0f) | ((offset >> 1) & 0x01f0));
+	m_bg_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty((offset & 0x0f) | ((offset >> 1) & 0x01f0));
 }
 
 
-WRITE8_HANDLER( c1942_palette_bank_w )
+WRITE8_MEMBER(_1942_state::c1942_palette_bank_w)
 {
-	_1942_state *state = space->machine().driver_data<_1942_state>();
 
-	if (state->m_palette_bank != data)
+	if (m_palette_bank != data)
 	{
-		state->m_palette_bank = data;
-		state->m_bg_tilemap->mark_all_dirty();
+		m_palette_bank = data;
+		m_bg_tilemap->mark_all_dirty();
 	}
 }
 
-WRITE8_HANDLER( c1942_scroll_w )
+WRITE8_MEMBER(_1942_state::c1942_scroll_w)
 {
-	_1942_state *state = space->machine().driver_data<_1942_state>();
 
-	state->m_scroll[offset] = data;
-	state->m_bg_tilemap->set_scrollx(0, state->m_scroll[0] | (state->m_scroll[1] << 8));
+	m_scroll[offset] = data;
+	m_bg_tilemap->set_scrollx(0, m_scroll[0] | (m_scroll[1] << 8));
 }
 
 
-WRITE8_HANDLER( c1942_c804_w )
+WRITE8_MEMBER(_1942_state::c1942_c804_w)
 {
-	_1942_state *state = space->machine().driver_data<_1942_state>();
 	/* bit 7: flip screen
        bit 4: cpu B reset
        bit 0: coin counter */
 
-	coin_counter_w(space->machine(), 0,data & 0x01);
+	coin_counter_w(machine(), 0,data & 0x01);
 
-	device_set_input_line(state->m_audiocpu, INPUT_LINE_RESET, (data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(m_audiocpu, INPUT_LINE_RESET, (data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
 
-	flip_screen_set(space->machine(), data & 0x80);
+	flip_screen_set(machine(), data & 0x80);
 }
 
 

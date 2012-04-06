@@ -37,27 +37,27 @@ public:
 	DECLARE_WRITE8_MEMBER(spelunkr_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(spelunk2_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(youjyudn_bankswitch_w);
+	DECLARE_WRITE8_MEMBER(m62_flipscreen_w);
+	DECLARE_WRITE8_MEMBER(m62_hscroll_low_w);
+	DECLARE_WRITE8_MEMBER(m62_hscroll_high_w);
+	DECLARE_WRITE8_MEMBER(m62_vscroll_low_w);
+	DECLARE_WRITE8_MEMBER(m62_vscroll_high_w);
+	DECLARE_WRITE8_MEMBER(m62_tileram_w);
+	DECLARE_WRITE8_MEMBER(m62_textram_w);
+	DECLARE_WRITE8_MEMBER(kungfum_tileram_w);
+	DECLARE_WRITE8_MEMBER(ldrun3_topbottom_mask_w);
+	DECLARE_WRITE8_MEMBER(kidniki_text_vscroll_low_w);
+	DECLARE_WRITE8_MEMBER(kidniki_text_vscroll_high_w);
+	DECLARE_WRITE8_MEMBER(kidniki_background_bank_w);
+	DECLARE_WRITE8_MEMBER(spelunkr_palbank_w);
+	DECLARE_WRITE8_MEMBER(spelunk2_gfxport_w);
+	DECLARE_WRITE8_MEMBER(horizon_scrollram_w);
 };
 
 
 /*----------- defined in video/m62.c -----------*/
 
-WRITE8_HANDLER( m62_tileram_w );
-WRITE8_HANDLER( m62_textram_w );
-WRITE8_HANDLER( m62_flipscreen_w );
-WRITE8_HANDLER( m62_hscroll_low_w );
-WRITE8_HANDLER( m62_hscroll_high_w );
-WRITE8_HANDLER( m62_vscroll_low_w );
-WRITE8_HANDLER( m62_vscroll_high_w );
 
-WRITE8_HANDLER( horizon_scrollram_w );
-WRITE8_HANDLER( kidniki_text_vscroll_low_w );
-WRITE8_HANDLER( kidniki_text_vscroll_high_w );
-WRITE8_HANDLER( kidniki_background_bank_w );
-WRITE8_HANDLER( kungfum_tileram_w );
-WRITE8_HANDLER( ldrun3_topbottom_mask_w );
-WRITE8_HANDLER( spelunkr_palbank_w );
-WRITE8_HANDLER( spelunk2_gfxport_w );
 
 PALETTE_INIT( m62 );
 PALETTE_INIT( lotlot );

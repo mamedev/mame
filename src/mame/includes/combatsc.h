@@ -54,17 +54,17 @@ public:
 	DECLARE_READ8_MEMBER(protection_r);
 	DECLARE_WRITE8_MEMBER(protection_clock_w);
 	DECLARE_WRITE8_MEMBER(combatsc_sh_irqtrigger_w);
+	DECLARE_READ8_MEMBER(combatsc_video_r);
+	DECLARE_WRITE8_MEMBER(combatsc_video_w);
+	DECLARE_WRITE8_MEMBER(combatsc_pf_control_w);
+	DECLARE_READ8_MEMBER(combatsc_scrollram_r);
+	DECLARE_WRITE8_MEMBER(combatsc_scrollram_w);
 };
 
 
 /*----------- defined in video/combatsc.c -----------*/
 
-READ8_HANDLER( combatsc_video_r );
-WRITE8_HANDLER( combatsc_video_w );
 
-WRITE8_HANDLER( combatsc_pf_control_w );
-READ8_HANDLER( combatsc_scrollram_r );
-WRITE8_HANDLER( combatsc_scrollram_w );
 
 PALETTE_INIT( combatsc );
 PALETTE_INIT( combatscb );

@@ -266,14 +266,14 @@ static ADDRESS_MAP_START( lordgun_map, AS_PROGRAM, 16, lordgun_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
 	AM_RANGE(0x210000, 0x21ffff) AM_RAM AM_BASE(m_priority_ram)						// PRIORITY
-	AM_RANGE(0x300000, 0x30ffff) AM_RAM_WRITE_LEGACY(lordgun_vram_0_w) AM_BASE(m_vram[0])	// DISPLAY
-	AM_RANGE(0x310000, 0x313fff) AM_RAM_WRITE_LEGACY(lordgun_vram_1_w) AM_BASE(m_vram[1])	// DISPLAY
-	AM_RANGE(0x314000, 0x314fff) AM_RAM_WRITE_LEGACY(lordgun_vram_2_w) AM_BASE(m_vram[2])	// DISPLAY
+	AM_RANGE(0x300000, 0x30ffff) AM_RAM_WRITE(lordgun_vram_0_w) AM_BASE(m_vram[0])	// DISPLAY
+	AM_RANGE(0x310000, 0x313fff) AM_RAM_WRITE(lordgun_vram_1_w) AM_BASE(m_vram[1])	// DISPLAY
+	AM_RANGE(0x314000, 0x314fff) AM_RAM_WRITE(lordgun_vram_2_w) AM_BASE(m_vram[2])	// DISPLAY
 	AM_RANGE(0x315000, 0x317fff) AM_RAM														//
-	AM_RANGE(0x318000, 0x319fff) AM_RAM_WRITE_LEGACY(lordgun_vram_3_w) AM_BASE(m_vram[3])	// DISPLAY
+	AM_RANGE(0x318000, 0x319fff) AM_RAM_WRITE(lordgun_vram_3_w) AM_BASE(m_vram[3])	// DISPLAY
 	AM_RANGE(0x31c000, 0x31c7ff) AM_RAM AM_BASE(m_scrollram)							// LINE
 	AM_RANGE(0x400000, 0x4007ff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)						// ANIMATOR
-	AM_RANGE(0x500000, 0x500fff) AM_RAM_WRITE_LEGACY(lordgun_paletteram_w) AM_SHARE("paletteram")
+	AM_RANGE(0x500000, 0x500fff) AM_RAM_WRITE(lordgun_paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0x502000, 0x502001) AM_WRITEONLY AM_BASE(m_scroll_x[0])
 	AM_RANGE(0x502200, 0x502201) AM_WRITEONLY AM_BASE(m_scroll_x[1])
 	AM_RANGE(0x502400, 0x502401) AM_WRITEONLY AM_BASE(m_scroll_x[2])
@@ -298,14 +298,14 @@ static ADDRESS_MAP_START( aliencha_map, AS_PROGRAM, 16, lordgun_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
 	AM_RANGE(0x210000, 0x21ffff) AM_RAM AM_BASE(m_priority_ram)						// PRIORITY
-	AM_RANGE(0x300000, 0x30ffff) AM_RAM_WRITE_LEGACY(lordgun_vram_0_w) AM_BASE(m_vram[0])	// BACKGROUND 1
-	AM_RANGE(0x310000, 0x313fff) AM_RAM_WRITE_LEGACY(lordgun_vram_1_w) AM_BASE(m_vram[1])	// BACKGROUND 2
-	AM_RANGE(0x314000, 0x314fff) AM_RAM_WRITE_LEGACY(lordgun_vram_2_w) AM_BASE(m_vram[2])	// BACKGROUND 3
+	AM_RANGE(0x300000, 0x30ffff) AM_RAM_WRITE(lordgun_vram_0_w) AM_BASE(m_vram[0])	// BACKGROUND 1
+	AM_RANGE(0x310000, 0x313fff) AM_RAM_WRITE(lordgun_vram_1_w) AM_BASE(m_vram[1])	// BACKGROUND 2
+	AM_RANGE(0x314000, 0x314fff) AM_RAM_WRITE(lordgun_vram_2_w) AM_BASE(m_vram[2])	// BACKGROUND 3
 	AM_RANGE(0x315000, 0x317fff) AM_RAM														//
-	AM_RANGE(0x318000, 0x319fff) AM_RAM_WRITE_LEGACY(lordgun_vram_3_w) AM_BASE(m_vram[3])	// TEXT
+	AM_RANGE(0x318000, 0x319fff) AM_RAM_WRITE(lordgun_vram_3_w) AM_BASE(m_vram[3])	// TEXT
 	AM_RANGE(0x31c000, 0x31c7ff) AM_RAM AM_BASE(m_scrollram)							// LINE OFFSET
 	AM_RANGE(0x400000, 0x4007ff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)						// ANIMATE
-	AM_RANGE(0x500000, 0x500fff) AM_RAM_WRITE_LEGACY(lordgun_paletteram_w) AM_SHARE("paletteram")
+	AM_RANGE(0x500000, 0x500fff) AM_RAM_WRITE(lordgun_paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0x502000, 0x502001) AM_WRITEONLY AM_BASE(m_scroll_x[0])
 	AM_RANGE(0x502200, 0x502201) AM_WRITEONLY AM_BASE(m_scroll_x[1])
 	AM_RANGE(0x502400, 0x502401) AM_WRITEONLY AM_BASE(m_scroll_x[2])

@@ -86,74 +86,67 @@ VIDEO_START( marineb )
  *
  *************************************/
 
-WRITE8_HANDLER( marineb_videoram_w )
+WRITE8_MEMBER(marineb_state::marineb_videoram_w)
 {
-	marineb_state *state = space->machine().driver_data<marineb_state>();
 
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_HANDLER( marineb_colorram_w )
+WRITE8_MEMBER(marineb_state::marineb_colorram_w)
 {
-	marineb_state *state = space->machine().driver_data<marineb_state>();
 
-	state->m_colorram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_colorram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_HANDLER( marineb_column_scroll_w )
+WRITE8_MEMBER(marineb_state::marineb_column_scroll_w)
 {
-	marineb_state *state = space->machine().driver_data<marineb_state>();
-	state->m_column_scroll = data;
+	m_column_scroll = data;
 }
 
 
-WRITE8_HANDLER( marineb_palette_bank_0_w )
+WRITE8_MEMBER(marineb_state::marineb_palette_bank_0_w)
 {
-	marineb_state *state = space->machine().driver_data<marineb_state>();
-	UINT8 old = state->m_palette_bank;
+	UINT8 old = m_palette_bank;
 
-	state->m_palette_bank = (state->m_palette_bank & 0x02) | (data & 0x01);
+	m_palette_bank = (m_palette_bank & 0x02) | (data & 0x01);
 
-	if (old != state->m_palette_bank)
+	if (old != m_palette_bank)
 	{
-		state->m_bg_tilemap->mark_all_dirty();
+		m_bg_tilemap->mark_all_dirty();
 	}
 }
 
 
-WRITE8_HANDLER( marineb_palette_bank_1_w )
+WRITE8_MEMBER(marineb_state::marineb_palette_bank_1_w)
 {
-	marineb_state *state = space->machine().driver_data<marineb_state>();
-	UINT8 old = state->m_palette_bank;
+	UINT8 old = m_palette_bank;
 
-	state->m_palette_bank = (state->m_palette_bank & 0x01) | ((data & 0x01) << 1);
+	m_palette_bank = (m_palette_bank & 0x01) | ((data & 0x01) << 1);
 
-	if (old != state->m_palette_bank)
+	if (old != m_palette_bank)
 	{
-		state->m_bg_tilemap->mark_all_dirty();
+		m_bg_tilemap->mark_all_dirty();
 	}
 }
 
 
-WRITE8_HANDLER( marineb_flipscreen_x_w )
+WRITE8_MEMBER(marineb_state::marineb_flipscreen_x_w)
 {
-	marineb_state *state = space->machine().driver_data<marineb_state>();
 
-	state->m_flipscreen_x = data ^ state->m_marineb_active_low_flipscreen;
-	state->m_bg_tilemap->set_flip((state->m_flipscreen_x ? TILEMAP_FLIPX : 0) | (state->m_flipscreen_y ? TILEMAP_FLIPY : 0));
+	m_flipscreen_x = data ^ m_marineb_active_low_flipscreen;
+	m_bg_tilemap->set_flip((m_flipscreen_x ? TILEMAP_FLIPX : 0) | (m_flipscreen_y ? TILEMAP_FLIPY : 0));
 }
 
 
-WRITE8_HANDLER( marineb_flipscreen_y_w )
+WRITE8_MEMBER(marineb_state::marineb_flipscreen_y_w)
 {
-	marineb_state *state = space->machine().driver_data<marineb_state>();
 
-	state->m_flipscreen_y = data ^ state->m_marineb_active_low_flipscreen;
-	state->m_bg_tilemap->set_flip((state->m_flipscreen_x ? TILEMAP_FLIPX : 0) | (state->m_flipscreen_y ? TILEMAP_FLIPY : 0));
+	m_flipscreen_y = data ^ m_marineb_active_low_flipscreen;
+	m_bg_tilemap->set_flip((m_flipscreen_x ? TILEMAP_FLIPX : 0) | (m_flipscreen_y ? TILEMAP_FLIPY : 0));
 }
 
 

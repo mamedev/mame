@@ -68,18 +68,18 @@ public:
 	DECLARE_READ8_MEMBER(from_snd_r);
 	DECLARE_READ8_MEMBER(snd_flag_r);
 	DECLARE_WRITE8_MEMBER(to_main_w);
+	DECLARE_WRITE8_MEMBER(fortyl_pixram_sel_w);
+	DECLARE_READ8_MEMBER(fortyl_pixram_r);
+	DECLARE_WRITE8_MEMBER(fortyl_pixram_w);
+	DECLARE_WRITE8_MEMBER(fortyl_bg_videoram_w);
+	DECLARE_READ8_MEMBER(fortyl_bg_videoram_r);
+	DECLARE_WRITE8_MEMBER(fortyl_bg_colorram_w);
+	DECLARE_READ8_MEMBER(fortyl_bg_colorram_r);
 };
 
 
 /*----------- defined in video/40love.c -----------*/
 
-WRITE8_HANDLER( fortyl_bg_videoram_w );
-WRITE8_HANDLER( fortyl_bg_colorram_w );
-READ8_HANDLER ( fortyl_bg_videoram_r );
-READ8_HANDLER ( fortyl_bg_colorram_r );
-WRITE8_HANDLER( fortyl_pixram_sel_w );
-READ8_HANDLER( fortyl_pixram_r );
-WRITE8_HANDLER( fortyl_pixram_w );
 
 VIDEO_START( fortyl );
 SCREEN_UPDATE_IND16( fortyl );

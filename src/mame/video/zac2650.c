@@ -15,37 +15,33 @@
 /* once it's workings are fully understood.                   */
 /**************************************************************/
 
-WRITE8_HANDLER( tinvader_videoram_w )
+WRITE8_MEMBER(zac2650_state::tinvader_videoram_w)
 {
-	zac2650_state *state = space->machine().driver_data<zac2650_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = m_videoram;
 	videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-READ8_HANDLER( zac_s2636_r )
+READ8_MEMBER(zac2650_state::zac_s2636_r)
 {
-	zac2650_state *state = space->machine().driver_data<zac2650_state>();
-	if(offset!=0xCB) return state->m_s2636_0_ram[offset];
-    else return state->m_CollisionSprite;
+	if(offset!=0xCB) return m_s2636_0_ram[offset];
+    else return m_CollisionSprite;
 }
 
-WRITE8_HANDLER( zac_s2636_w )
+WRITE8_MEMBER(zac2650_state::zac_s2636_w)
 {
-	zac2650_state *state = space->machine().driver_data<zac2650_state>();
-	state->m_s2636_0_ram[offset] = data;
-	gfx_element_mark_dirty(space->machine().gfx[1], offset/8);
-	gfx_element_mark_dirty(space->machine().gfx[2], offset/8);
+	m_s2636_0_ram[offset] = data;
+	gfx_element_mark_dirty(machine().gfx[1], offset/8);
+	gfx_element_mark_dirty(machine().gfx[2], offset/8);
 	if (offset == 0xc7)
 	{
-		s2636_soundport_w(space->machine().device("s2636snd"), 0, data);
+		s2636_soundport_w(machine().device("s2636snd"), 0, data);
 	}
 }
 
-READ8_HANDLER( tinvader_port_0_r )
+READ8_MEMBER(zac2650_state::tinvader_port_0_r)
 {
-	zac2650_state *state = space->machine().driver_data<zac2650_state>();
-	return input_port_read(space->machine(), "1E80") - state->m_CollisionBackground;
+	return input_port_read(machine(), "1E80") - m_CollisionBackground;
 }
 
 /*****************************************/

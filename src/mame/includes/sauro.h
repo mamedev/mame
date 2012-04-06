@@ -19,18 +19,18 @@ public:
 	DECLARE_WRITE8_MEMBER(sauro_coin1_w);
 	DECLARE_WRITE8_MEMBER(sauro_coin2_w);
 	DECLARE_WRITE8_MEMBER(flip_screen_w);
+	DECLARE_WRITE8_MEMBER(tecfri_videoram_w);
+	DECLARE_WRITE8_MEMBER(tecfri_colorram_w);
+	DECLARE_WRITE8_MEMBER(tecfri_videoram2_w);
+	DECLARE_WRITE8_MEMBER(tecfri_colorram2_w);
+	DECLARE_WRITE8_MEMBER(tecfri_scroll_bg_w);
+	DECLARE_WRITE8_MEMBER(sauro_palette_bank_w);
+	DECLARE_WRITE8_MEMBER(sauro_scroll_fg_w);
 };
 
 
 /*----------- defined in video/sauro.c -----------*/
 
-WRITE8_HANDLER( tecfri_videoram_w );
-WRITE8_HANDLER( tecfri_colorram_w );
-WRITE8_HANDLER( tecfri_videoram2_w );
-WRITE8_HANDLER( tecfri_colorram2_w );
-WRITE8_HANDLER( tecfri_scroll_bg_w );
-WRITE8_HANDLER( sauro_scroll_fg_w );
-WRITE8_HANDLER( sauro_palette_bank_w );
 
 VIDEO_START( sauro );
 VIDEO_START( trckydoc );

@@ -101,94 +101,85 @@ VIDEO_START( blktiger )
 
 ***************************************************************************/
 
-WRITE8_HANDLER( blktiger_txvideoram_w )
+WRITE8_MEMBER(blktiger_state::blktiger_txvideoram_w)
 {
-	blktiger_state *state = space->machine().driver_data<blktiger_state>();
-	state->m_txvideoram[offset] = data;
-	state->m_tx_tilemap->mark_tile_dirty(offset & 0x3ff);
+	m_txvideoram[offset] = data;
+	m_tx_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-READ8_HANDLER( blktiger_bgvideoram_r )
+READ8_MEMBER(blktiger_state::blktiger_bgvideoram_r)
 {
-	blktiger_state *state = space->machine().driver_data<blktiger_state>();
-	return state->m_scroll_ram[offset + state->m_scroll_bank];
+	return m_scroll_ram[offset + m_scroll_bank];
 }
 
-WRITE8_HANDLER( blktiger_bgvideoram_w )
+WRITE8_MEMBER(blktiger_state::blktiger_bgvideoram_w)
 {
-	blktiger_state *state = space->machine().driver_data<blktiger_state>();
-	offset += state->m_scroll_bank;
+	offset += m_scroll_bank;
 
-	state->m_scroll_ram[offset] = data;
-	state->m_bg_tilemap8x4->mark_tile_dirty(offset / 2);
-	state->m_bg_tilemap4x8->mark_tile_dirty(offset / 2);
+	m_scroll_ram[offset] = data;
+	m_bg_tilemap8x4->mark_tile_dirty(offset / 2);
+	m_bg_tilemap4x8->mark_tile_dirty(offset / 2);
 }
 
-WRITE8_HANDLER( blktiger_bgvideoram_bank_w )
+WRITE8_MEMBER(blktiger_state::blktiger_bgvideoram_bank_w)
 {
-	blktiger_state *state = space->machine().driver_data<blktiger_state>();
-	state->m_scroll_bank = (data % BGRAM_BANKS) * BGRAM_BANK_SIZE;
+	m_scroll_bank = (data % BGRAM_BANKS) * BGRAM_BANK_SIZE;
 }
 
 
-WRITE8_HANDLER( blktiger_scrolly_w )
+WRITE8_MEMBER(blktiger_state::blktiger_scrolly_w)
 {
-	blktiger_state *state = space->machine().driver_data<blktiger_state>();
 	int scrolly;
 
-	state->m_scroll_y[offset] = data;
-	scrolly = state->m_scroll_y[0] | (state->m_scroll_y[1] << 8);
-	state->m_bg_tilemap8x4->set_scrolly(0, scrolly);
-	state->m_bg_tilemap4x8->set_scrolly(0, scrolly);
+	m_scroll_y[offset] = data;
+	scrolly = m_scroll_y[0] | (m_scroll_y[1] << 8);
+	m_bg_tilemap8x4->set_scrolly(0, scrolly);
+	m_bg_tilemap4x8->set_scrolly(0, scrolly);
 }
 
-WRITE8_HANDLER( blktiger_scrollx_w )
+WRITE8_MEMBER(blktiger_state::blktiger_scrollx_w)
 {
-	blktiger_state *state = space->machine().driver_data<blktiger_state>();
 	int scrollx;
 
-	state->m_scroll_x[offset] = data;
-	scrollx = state->m_scroll_x[0] | (state->m_scroll_x[1] << 8);
-	state->m_bg_tilemap8x4->set_scrollx(0, scrollx);
-	state->m_bg_tilemap4x8->set_scrollx(0, scrollx);
+	m_scroll_x[offset] = data;
+	scrollx = m_scroll_x[0] | (m_scroll_x[1] << 8);
+	m_bg_tilemap8x4->set_scrollx(0, scrollx);
+	m_bg_tilemap4x8->set_scrollx(0, scrollx);
 }
 
 
-WRITE8_HANDLER( blktiger_video_control_w )
+WRITE8_MEMBER(blktiger_state::blktiger_video_control_w)
 {
-	blktiger_state *state = space->machine().driver_data<blktiger_state>();
 	/* bits 0 and 1 are coin counters */
-	coin_counter_w(space->machine(), 0,data & 1);
-	coin_counter_w(space->machine(), 1,data & 2);
+	coin_counter_w(machine(), 0,data & 1);
+	coin_counter_w(machine(), 1,data & 2);
 
 	/* bit 5 resets the sound CPU */
-	device_set_input_line(state->m_audiocpu, INPUT_LINE_RESET, (data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(m_audiocpu, INPUT_LINE_RESET, (data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
 
 	/* bit 6 flips screen */
-	flip_screen_set(space->machine(), data & 0x40);
+	flip_screen_set(machine(), data & 0x40);
 
 	/* bit 7 enables characters? Just a guess */
-	state->m_chon = ~data & 0x80;
+	m_chon = ~data & 0x80;
 }
 
-WRITE8_HANDLER( blktiger_video_enable_w )
+WRITE8_MEMBER(blktiger_state::blktiger_video_enable_w)
 {
-	blktiger_state *state = space->machine().driver_data<blktiger_state>();
 
 	/* not sure which is which, but I think that bit 1 and 2 enable background and sprites */
 	/* bit 1 enables bg ? */
-	state->m_bgon = ~data & 0x02;
+	m_bgon = ~data & 0x02;
 
 	/* bit 2 enables sprites ? */
-	state->m_objon = ~data & 0x04;
+	m_objon = ~data & 0x04;
 }
 
-WRITE8_HANDLER( blktiger_screen_layout_w )
+WRITE8_MEMBER(blktiger_state::blktiger_screen_layout_w)
 {
-	blktiger_state *state = space->machine().driver_data<blktiger_state>();
-	state->m_screen_layout = data;
-	state->m_bg_tilemap8x4->enable(state->m_screen_layout);
-	state->m_bg_tilemap4x8->enable(!state->m_screen_layout);
+	m_screen_layout = data;
+	m_bg_tilemap8x4->enable(m_screen_layout);
+	m_bg_tilemap4x8->enable(!m_screen_layout);
 }
 
 

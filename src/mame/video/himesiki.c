@@ -27,24 +27,21 @@ VIDEO_START( himesiki )
 	state->m_bg_tilemap = tilemap_create( machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
 }
 
-WRITE8_HANDLER( himesiki_bg_ram_w )
+WRITE8_MEMBER(himesiki_state::himesiki_bg_ram_w)
 {
-	himesiki_state *state = space->machine().driver_data<himesiki_state>();
-	state->m_bg_ram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset / 2);
+	m_bg_ram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE8_HANDLER( himesiki_scrollx_w )
+WRITE8_MEMBER(himesiki_state::himesiki_scrollx_w)
 {
-	himesiki_state *state = space->machine().driver_data<himesiki_state>();
-	state->m_scrollx[offset] = data;
+	m_scrollx[offset] = data;
 }
 
-WRITE8_HANDLER( himesiki_flip_w )
+WRITE8_MEMBER(himesiki_state::himesiki_flip_w)
 {
-	himesiki_state *state = space->machine().driver_data<himesiki_state>();
-	state->m_flipscreen = data & 0xc0;
-	flip_screen_set(space->machine(), state->m_flipscreen);
+	m_flipscreen = data & 0xc0;
+	flip_screen_set(machine(), m_flipscreen);
 
 	if (data & 0x3f)
 		logerror("p08_w %02x\n",data);

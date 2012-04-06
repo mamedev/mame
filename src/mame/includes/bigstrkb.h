@@ -15,13 +15,13 @@ public:
 	UINT16 *m_vidreg1;
 	UINT16 *m_vidreg2;
 	UINT16 *m_spriteram;
+	DECLARE_WRITE16_MEMBER(bsb_videoram_w);
+	DECLARE_WRITE16_MEMBER(bsb_videoram2_w);
+	DECLARE_WRITE16_MEMBER(bsb_videoram3_w);
 };
 
 
 /*----------- defined in video/bigstrkb.c -----------*/
 
-WRITE16_HANDLER( bsb_videoram_w );
-WRITE16_HANDLER( bsb_videoram2_w );
-WRITE16_HANDLER( bsb_videoram3_w );
 VIDEO_START(bigstrkb);
 SCREEN_UPDATE_IND16(bigstrkb);

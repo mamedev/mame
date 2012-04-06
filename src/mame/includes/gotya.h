@@ -22,6 +22,9 @@ public:
 
 	/* devices */
 	samples_device *m_samples;
+	DECLARE_WRITE8_MEMBER(gotya_videoram_w);
+	DECLARE_WRITE8_MEMBER(gotya_colorram_w);
+	DECLARE_WRITE8_MEMBER(gotya_video_control_w);
 };
 
 
@@ -32,9 +35,6 @@ WRITE8_HANDLER( gotya_soundlatch_w );
 
 /*----------- defined in video/gotya.c -----------*/
 
-WRITE8_HANDLER( gotya_videoram_w );
-WRITE8_HANDLER( gotya_colorram_w );
-WRITE8_HANDLER( gotya_video_control_w );
 
 PALETTE_INIT( gotya );
 VIDEO_START( gotya );

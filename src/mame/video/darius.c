@@ -35,13 +35,12 @@ VIDEO_START( darius )
 
 /***************************************************************************/
 
-WRITE16_HANDLER( darius_fg_layer_w )
+WRITE16_MEMBER(darius_state::darius_fg_layer_w)
 {
-	darius_state *state = space->machine().driver_data<darius_state>();
 
-	COMBINE_DATA(&state->m_fg_ram[offset]);
+	COMBINE_DATA(&m_fg_ram[offset]);
 	if (offset < 0x4000)
-		state->m_fg_tilemap->mark_tile_dirty((offset & 0x1fff));
+		m_fg_tilemap->mark_tile_dirty((offset & 0x1fff));
 }
 
 /***************************************************************************/

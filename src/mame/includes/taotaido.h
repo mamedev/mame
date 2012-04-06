@@ -20,14 +20,14 @@ public:
 	DECLARE_WRITE16_MEMBER(sound_command_w);
 	DECLARE_WRITE8_MEMBER(pending_command_clear_w);
 	DECLARE_WRITE8_MEMBER(taotaido_sh_bankswitch_w);
+	DECLARE_WRITE16_MEMBER(taotaido_sprite_character_bank_select_w);
+	DECLARE_WRITE16_MEMBER(taotaido_tileregs_w);
+	DECLARE_WRITE16_MEMBER(taotaido_bgvideoram_w);
 };
 
 
 /*----------- defined in video/taotaido.c -----------*/
 
-WRITE16_HANDLER( taotaido_sprite_character_bank_select_w );
-WRITE16_HANDLER( taotaido_tileregs_w );
-WRITE16_HANDLER( taotaido_bgvideoram_w );
 VIDEO_START( taotaido );
 SCREEN_UPDATE_IND16( taotaido );
 SCREEN_VBLANK( taotaido );

@@ -19,179 +19,166 @@ static void nbmj8891_gfxdraw(running_machine &machine);
 
 
 ******************************************************************************/
-READ8_HANDLER( nbmj8891_palette_type1_r )
+READ8_MEMBER(nbmj8891_state::nbmj8891_palette_type1_r)
 {
-	nbmj8891_state *state = space->machine().driver_data<nbmj8891_state>();
-	return state->m_palette[offset];
+	return m_palette[offset];
 }
 
-WRITE8_HANDLER( nbmj8891_palette_type1_w )
+WRITE8_MEMBER(nbmj8891_state::nbmj8891_palette_type1_w)
 {
-	nbmj8891_state *state = space->machine().driver_data<nbmj8891_state>();
 	int r, g, b;
 
-	state->m_palette[offset] = data;
+	m_palette[offset] = data;
 
 	if (!(offset & 1)) return;
 
 	offset &= 0x1fe;
 
-	r = ((state->m_palette[offset + 0] & 0x0f) >> 0);
-	g = ((state->m_palette[offset + 1] & 0xf0) >> 4);
-	b = ((state->m_palette[offset + 1] & 0x0f) >> 0);
+	r = ((m_palette[offset + 0] & 0x0f) >> 0);
+	g = ((m_palette[offset + 1] & 0xf0) >> 4);
+	b = ((m_palette[offset + 1] & 0x0f) >> 0);
 
-	palette_set_color_rgb(space->machine(), (offset >> 1), pal4bit(r), pal4bit(g), pal4bit(b));
+	palette_set_color_rgb(machine(), (offset >> 1), pal4bit(r), pal4bit(g), pal4bit(b));
 }
 
-READ8_HANDLER( nbmj8891_palette_type2_r )
+READ8_MEMBER(nbmj8891_state::nbmj8891_palette_type2_r)
 {
-	nbmj8891_state *state = space->machine().driver_data<nbmj8891_state>();
-	return state->m_palette[offset];
+	return m_palette[offset];
 }
 
-WRITE8_HANDLER( nbmj8891_palette_type2_w )
+WRITE8_MEMBER(nbmj8891_state::nbmj8891_palette_type2_w)
 {
-	nbmj8891_state *state = space->machine().driver_data<nbmj8891_state>();
 	int r, g, b;
 
-	state->m_palette[offset] = data;
+	m_palette[offset] = data;
 
 	if (!(offset & 0x100)) return;
 
 	offset &= 0x0ff;
 
-	r = ((state->m_palette[offset + 0x000] & 0x0f) >> 0);
-	g = ((state->m_palette[offset + 0x000] & 0xf0) >> 4);
-	b = ((state->m_palette[offset + 0x100] & 0x0f) >> 0);
+	r = ((m_palette[offset + 0x000] & 0x0f) >> 0);
+	g = ((m_palette[offset + 0x000] & 0xf0) >> 4);
+	b = ((m_palette[offset + 0x100] & 0x0f) >> 0);
 
-	palette_set_color_rgb(space->machine(), (offset & 0x0ff), pal4bit(r), pal4bit(g), pal4bit(b));
+	palette_set_color_rgb(machine(), (offset & 0x0ff), pal4bit(r), pal4bit(g), pal4bit(b));
 }
 
-READ8_HANDLER( nbmj8891_palette_type3_r )
+READ8_MEMBER(nbmj8891_state::nbmj8891_palette_type3_r)
 {
-	nbmj8891_state *state = space->machine().driver_data<nbmj8891_state>();
-	return state->m_palette[offset];
+	return m_palette[offset];
 }
 
-WRITE8_HANDLER( nbmj8891_palette_type3_w )
+WRITE8_MEMBER(nbmj8891_state::nbmj8891_palette_type3_w)
 {
-	nbmj8891_state *state = space->machine().driver_data<nbmj8891_state>();
 	int r, g, b;
 
-	state->m_palette[offset] = data;
+	m_palette[offset] = data;
 
 	if (!(offset & 1)) return;
 
 	offset &= 0x1fe;
 
-	r = ((state->m_palette[offset + 1] & 0x0f) >> 0);
-	g = ((state->m_palette[offset + 0] & 0xf0) >> 4);
-	b = ((state->m_palette[offset + 0] & 0x0f) >> 0);
+	r = ((m_palette[offset + 1] & 0x0f) >> 0);
+	g = ((m_palette[offset + 0] & 0xf0) >> 4);
+	b = ((m_palette[offset + 0] & 0x0f) >> 0);
 
-	palette_set_color_rgb(space->machine(), (offset >> 1), pal4bit(r), pal4bit(g), pal4bit(b));
+	palette_set_color_rgb(machine(), (offset >> 1), pal4bit(r), pal4bit(g), pal4bit(b));
 }
 
-WRITE8_HANDLER( nbmj8891_clutsel_w )
+WRITE8_MEMBER(nbmj8891_state::nbmj8891_clutsel_w)
 {
-	nbmj8891_state *state = space->machine().driver_data<nbmj8891_state>();
-	state->m_clutsel = data;
+	m_clutsel = data;
 }
 
-READ8_HANDLER( nbmj8891_clut_r )
+READ8_MEMBER(nbmj8891_state::nbmj8891_clut_r)
 {
-	nbmj8891_state *state = space->machine().driver_data<nbmj8891_state>();
-	return state->m_clut[offset];
+	return m_clut[offset];
 }
 
-WRITE8_HANDLER( nbmj8891_clut_w )
+WRITE8_MEMBER(nbmj8891_state::nbmj8891_clut_w)
 {
-	nbmj8891_state *state = space->machine().driver_data<nbmj8891_state>();
-	state->m_clut[((state->m_clutsel & 0x7f) * 0x10) + (offset & 0x0f)] = data;
+	m_clut[((m_clutsel & 0x7f) * 0x10) + (offset & 0x0f)] = data;
 }
 
 /******************************************************************************
 
 
 ******************************************************************************/
-WRITE8_HANDLER( nbmj8891_blitter_w )
+WRITE8_MEMBER(nbmj8891_state::nbmj8891_blitter_w)
 {
-	nbmj8891_state *state = space->machine().driver_data<nbmj8891_state>();
 	switch (offset)
 	{
-		case 0x00:	state->m_blitter_src_addr = (state->m_blitter_src_addr & 0xff00) | data; break;
-		case 0x01:	state->m_blitter_src_addr = (state->m_blitter_src_addr & 0x00ff) | (data << 8); break;
-		case 0x02:	state->m_blitter_destx = data; break;
-		case 0x03:	state->m_blitter_desty = data; break;
-		case 0x04:	state->m_blitter_sizex = data; break;
-		case 0x05:	state->m_blitter_sizey = data;
+		case 0x00:	m_blitter_src_addr = (m_blitter_src_addr & 0xff00) | data; break;
+		case 0x01:	m_blitter_src_addr = (m_blitter_src_addr & 0x00ff) | (data << 8); break;
+		case 0x02:	m_blitter_destx = data; break;
+		case 0x03:	m_blitter_desty = data; break;
+		case 0x04:	m_blitter_sizex = data; break;
+		case 0x05:	m_blitter_sizey = data;
 					/* writing here also starts the blit */
-					nbmj8891_gfxdraw(space->machine());
+					nbmj8891_gfxdraw(machine());
 					break;
-		case 0x06:	state->m_blitter_direction_x = (data & 0x01) ? 1 : 0;
-					state->m_blitter_direction_y = (data & 0x02) ? 1 : 0;
-					state->m_flipscreen = (data & 0x04) ? 1 : 0;
-					state->m_dispflag = (data & 0x08) ? 0 : 1;
-					if (state->m_gfxdraw_mode) nbmj8891_vramflip(space->machine(), 1);
-					nbmj8891_vramflip(space->machine(), 0);
+		case 0x06:	m_blitter_direction_x = (data & 0x01) ? 1 : 0;
+					m_blitter_direction_y = (data & 0x02) ? 1 : 0;
+					m_flipscreen = (data & 0x04) ? 1 : 0;
+					m_dispflag = (data & 0x08) ? 0 : 1;
+					if (m_gfxdraw_mode) nbmj8891_vramflip(machine(), 1);
+					nbmj8891_vramflip(machine(), 0);
 					break;
 		case 0x07:	break;
 	}
 }
 
-WRITE8_HANDLER( nbmj8891_taiwanmb_blitter_w )
+WRITE8_MEMBER(nbmj8891_state::nbmj8891_taiwanmb_blitter_w)
 {
-	nbmj8891_state *state = space->machine().driver_data<nbmj8891_state>();
 	switch (offset)
 	{
-		case 0:	state->m_blitter_src_addr = (state->m_blitter_src_addr & 0xff00) | data; break;
-		case 1:	state->m_blitter_src_addr = (state->m_blitter_src_addr & 0x00ff) | (data << 8); break;
-		case 2:	state->m_blitter_destx = data; break;
-		case 3:	state->m_blitter_desty = data; break;
-		case 4:	state->m_blitter_sizex = (data - 1) & 0xff; break;
-		case 5:	state->m_blitter_sizey = (data - 1) & 0xff; break;
+		case 0:	m_blitter_src_addr = (m_blitter_src_addr & 0xff00) | data; break;
+		case 1:	m_blitter_src_addr = (m_blitter_src_addr & 0x00ff) | (data << 8); break;
+		case 2:	m_blitter_destx = data; break;
+		case 3:	m_blitter_desty = data; break;
+		case 4:	m_blitter_sizex = (data - 1) & 0xff; break;
+		case 5:	m_blitter_sizey = (data - 1) & 0xff; break;
 	}
 }
 
-WRITE8_HANDLER( nbmj8891_taiwanmb_gfxdraw_w )
+WRITE8_MEMBER(nbmj8891_state::nbmj8891_taiwanmb_gfxdraw_w)
 {
-//  nbmj8891_gfxdraw(space->machine());
+//  nbmj8891_gfxdraw(machine());
 }
 
-WRITE8_HANDLER( nbmj8891_taiwanmb_gfxflag_w )
+WRITE8_MEMBER(nbmj8891_state::nbmj8891_taiwanmb_gfxflag_w)
 {
-	nbmj8891_state *state = space->machine().driver_data<nbmj8891_state>();
-	state->m_flipscreen = (data & 0x04) ? 1 : 0;
+	m_flipscreen = (data & 0x04) ? 1 : 0;
 
-	nbmj8891_vramflip(space->machine(), 0);
+	nbmj8891_vramflip(machine(), 0);
 }
 
-WRITE8_HANDLER( nbmj8891_taiwanmb_mcu_w )
+WRITE8_MEMBER(nbmj8891_state::nbmj8891_taiwanmb_mcu_w)
 {
-	nbmj8891_state *state = space->machine().driver_data<nbmj8891_state>();
 
-	state->m_param_old[state->m_param_cnt & 0x0f] = data;
+	m_param_old[m_param_cnt & 0x0f] = data;
 
 	if (data == 0x00)
 	{
-		state->m_blitter_direction_x = 0;
-		state->m_blitter_direction_y = 0;
-		state->m_blitter_destx = 0;
-		state->m_blitter_desty = 0;
-		state->m_blitter_sizex = 0;
-		state->m_blitter_sizey = 0;
-		state->m_dispflag = 0;
+		m_blitter_direction_x = 0;
+		m_blitter_direction_y = 0;
+		m_blitter_destx = 0;
+		m_blitter_desty = 0;
+		m_blitter_sizex = 0;
+		m_blitter_sizey = 0;
+		m_dispflag = 0;
 	}
 
 /*
     if (data == 0x02)
     {
-        if (state->m_param_old[(state->m_param_cnt - 1) & 0x0f] == 0x18)
+        if (m_param_old[(m_param_cnt - 1) & 0x0f] == 0x18)
         {
-            state->m_dispflag = 1;
+            m_dispflag = 1;
         }
-        else if (state->m_param_old[(state->m_param_cnt - 1) & 0x0f] == 0x1a)
+        else if (m_param_old[(m_param_cnt - 1) & 0x0f] == 0x1a)
         {
-            state->m_dispflag = 0;
+            m_dispflag = 0;
         }
     }
 */
@@ -203,80 +190,77 @@ WRITE8_HANDLER( nbmj8891_taiwanmb_mcu_w )
 
 	if (data == 0x12)
 	{
-		if (state->m_param_old[(state->m_param_cnt - 1) & 0x0f] == 0x08)
+		if (m_param_old[(m_param_cnt - 1) & 0x0f] == 0x08)
 		{
-			state->m_blitter_direction_x = 1;
-			state->m_blitter_direction_y = 0;
-			state->m_blitter_destx += state->m_blitter_sizex + 1;
-			state->m_blitter_desty += 0;
-			state->m_blitter_sizex ^= 0xff;
-			state->m_blitter_sizey ^= 0x00;
+			m_blitter_direction_x = 1;
+			m_blitter_direction_y = 0;
+			m_blitter_destx += m_blitter_sizex + 1;
+			m_blitter_desty += 0;
+			m_blitter_sizex ^= 0xff;
+			m_blitter_sizey ^= 0x00;
 		}
-		else if (state->m_param_old[(state->m_param_cnt - 1) & 0x0f] == 0x0a)
+		else if (m_param_old[(m_param_cnt - 1) & 0x0f] == 0x0a)
 		{
-			state->m_blitter_direction_x = 0;
-			state->m_blitter_direction_y = 1;
-			state->m_blitter_destx += 0;
-			state->m_blitter_desty += state->m_blitter_sizey + 1;
-			state->m_blitter_sizex ^= 0x00;
-			state->m_blitter_sizey ^= 0xff;
+			m_blitter_direction_x = 0;
+			m_blitter_direction_y = 1;
+			m_blitter_destx += 0;
+			m_blitter_desty += m_blitter_sizey + 1;
+			m_blitter_sizex ^= 0x00;
+			m_blitter_sizey ^= 0xff;
 		}
-		else if (state->m_param_old[(state->m_param_cnt - 1) & 0x0f] == 0x0c)
+		else if (m_param_old[(m_param_cnt - 1) & 0x0f] == 0x0c)
 		{
-			state->m_blitter_direction_x = 1;
-			state->m_blitter_direction_y = 1;
-			state->m_blitter_destx += state->m_blitter_sizex + 1;
-			state->m_blitter_desty += state->m_blitter_sizey + 1;
-			state->m_blitter_sizex ^= 0xff;
-			state->m_blitter_sizey ^= 0xff;
+			m_blitter_direction_x = 1;
+			m_blitter_direction_y = 1;
+			m_blitter_destx += m_blitter_sizex + 1;
+			m_blitter_desty += m_blitter_sizey + 1;
+			m_blitter_sizex ^= 0xff;
+			m_blitter_sizey ^= 0xff;
 		}
-		else if (state->m_param_old[(state->m_param_cnt - 1) & 0x0f] == 0x0e)
+		else if (m_param_old[(m_param_cnt - 1) & 0x0f] == 0x0e)
 		{
-			state->m_blitter_direction_x = 0;
-			state->m_blitter_direction_y = 0;
-			state->m_blitter_destx += 0;
-			state->m_blitter_desty += 0;
-			state->m_blitter_sizex ^= 0x00;
-			state->m_blitter_sizey ^= 0x00;
+			m_blitter_direction_x = 0;
+			m_blitter_direction_y = 0;
+			m_blitter_destx += 0;
+			m_blitter_desty += 0;
+			m_blitter_sizex ^= 0x00;
+			m_blitter_sizey ^= 0x00;
 		}
 
-		nbmj8891_gfxdraw(space->machine());
+		nbmj8891_gfxdraw(machine());
 	}
 
-//  state->m_blitter_direction_x = 0;                // for debug
-//  state->m_blitter_direction_y = 0;                // for debug
-	state->m_dispflag = 1;					// for debug
+//  m_blitter_direction_x = 0;                // for debug
+//  m_blitter_direction_y = 0;                // for debug
+	m_dispflag = 1;					// for debug
 
-	state->m_param_cnt++;
+	m_param_cnt++;
 }
 
-WRITE8_HANDLER( nbmj8891_scrolly_w )
+WRITE8_MEMBER(nbmj8891_state::nbmj8891_scrolly_w)
 {
-	nbmj8891_state *state = space->machine().driver_data<nbmj8891_state>();
-	state->m_scrolly = data;
+	m_scrolly = data;
 }
 
-WRITE8_HANDLER( nbmj8891_vramsel_w )
+WRITE8_MEMBER(nbmj8891_state::nbmj8891_vramsel_w)
 {
-	nbmj8891_state *state = space->machine().driver_data<nbmj8891_state>();
 	/* protection - not sure about this */
 	nb1413m3_sndromrgntag = (data & 0x20) ? "protection" : "voice";
 
-	state->m_vram = data;
+	m_vram = data;
 }
 
-WRITE8_HANDLER( nbmj8891_romsel_w )
+WRITE8_MEMBER(nbmj8891_state::nbmj8891_romsel_w)
 {
-	nbmj8891_state *state = space->machine().driver_data<nbmj8891_state>();
-	int gfxlen = space->machine().region("gfx1")->bytes();
-	state->m_gfxrom = (data & 0x0f);
+	int gfxlen = machine().region("gfx1")->bytes();
+	m_gfxrom = (data & 0x0f);
 
-	if ((0x20000 * state->m_gfxrom) > (gfxlen - 1))
+	if ((0x20000 * m_gfxrom) > (gfxlen - 1))
 	{
 #ifdef MAME_DEBUG
 		popmessage("GFXROM BANK OVER!!");
 #endif
-		state->m_gfxrom &= (gfxlen / 0x20000 - 1);
+		m_gfxrom &= (gfxlen / 0x20000 - 1);
 	}
 }
 

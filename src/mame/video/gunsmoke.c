@@ -58,52 +58,48 @@ PALETTE_INIT( gunsmoke )
 	}
 }
 
-WRITE8_HANDLER( gunsmoke_videoram_w )
+WRITE8_MEMBER(gunsmoke_state::gunsmoke_videoram_w)
 {
-	gunsmoke_state *state = space->machine().driver_data<gunsmoke_state>();
-	state->m_videoram[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( gunsmoke_colorram_w )
+WRITE8_MEMBER(gunsmoke_state::gunsmoke_colorram_w)
 {
-	gunsmoke_state *state = space->machine().driver_data<gunsmoke_state>();
-	state->m_colorram[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset);
+	m_colorram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( gunsmoke_c804_w )
+WRITE8_MEMBER(gunsmoke_state::gunsmoke_c804_w)
 {
-	gunsmoke_state *state = space->machine().driver_data<gunsmoke_state>();
 
 	/* bits 0 and 1 are for coin counters */
-	coin_counter_w(space->machine(), 1, data & 0x01);
-	coin_counter_w(space->machine(), 0, data & 0x02);
+	coin_counter_w(machine(), 1, data & 0x01);
+	coin_counter_w(machine(), 0, data & 0x02);
 
 	/* bits 2 and 3 select the ROM bank */
-	memory_set_bank(space->machine(), "bank1", (data & 0x0c) >> 2);
+	memory_set_bank(machine(), "bank1", (data & 0x0c) >> 2);
 
 	/* bit 5 resets the sound CPU? - we ignore it */
 
 	/* bit 6 flips screen */
-	flip_screen_set(space->machine(), data & 0x40);
+	flip_screen_set(machine(), data & 0x40);
 
 	/* bit 7 enables characters? */
-	state->m_chon = data & 0x80;
+	m_chon = data & 0x80;
 }
 
-WRITE8_HANDLER( gunsmoke_d806_w )
+WRITE8_MEMBER(gunsmoke_state::gunsmoke_d806_w)
 {
-	gunsmoke_state *state = space->machine().driver_data<gunsmoke_state>();
 
 	/* bits 0-2 select the sprite 3 bank */
-	state->m_sprite3bank = data & 0x07;
+	m_sprite3bank = data & 0x07;
 
 	/* bit 4 enables bg 1? */
-	state->m_bgon = data & 0x10;
+	m_bgon = data & 0x10;
 
 	/* bit 5 enables sprites? */
-	state->m_objon = data & 0x20;
+	m_objon = data & 0x20;
 }
 
 static TILE_GET_INFO( get_bg_tile_info )

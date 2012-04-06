@@ -17,13 +17,13 @@ public:
 	UINT8                *m_yard_scroll_y_low;
 	UINT8                *m_yard_score_panel_disabled;
 	bitmap_ind16             *m_scroll_panel_bitmap;
+	DECLARE_WRITE8_MEMBER(yard_videoram_w);
+	DECLARE_WRITE8_MEMBER(yard_scroll_panel_w);
+	DECLARE_WRITE8_MEMBER(yard_flipscreen_w);
 };
 
 /*----------- defined in video/m58.c -----------*/
 
-WRITE8_HANDLER( yard_videoram_w );
-WRITE8_HANDLER( yard_scroll_panel_w );
-WRITE8_HANDLER( yard_flipscreen_w );
 
 PALETTE_INIT( yard );
 VIDEO_START( yard );

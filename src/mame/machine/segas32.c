@@ -49,20 +49,19 @@ void decrypt_ga2_protrom(running_machine &machine)
 	auto_free(machine, temp);
 }
 
-WRITE16_HANDLER( ga2_dpram_w )
+WRITE16_MEMBER(segas32_state::ga2_dpram_w)
 {
 	/* does it ever actually write.. */
 }
 
-READ16_HANDLER( ga2_dpram_r )
+READ16_MEMBER(segas32_state::ga2_dpram_r)
 {
-	segas32_state *state = space->machine().driver_data<segas32_state>();
-	return (state->m_ga2_dpram[offset])|(state->m_ga2_dpram[offset+1]<<8);
+	return (m_ga2_dpram[offset])|(m_ga2_dpram[offset+1]<<8);
 }
 
 
 #if 0 // simulation
-READ16_HANDLER(ga2_sprite_protection_r)
+READ16_MEMBER(segas32_state::ga2_sprite_protection_r)
 {
 	static const UINT16 prot[16] =
 	{
@@ -79,7 +78,7 @@ READ16_HANDLER(ga2_sprite_protection_r)
 	return prot[offset];
 }
 
-READ16_HANDLER(ga2_wakeup_protection_r)
+READ16_MEMBER(segas32_state::ga2_wakeup_protection_r)
 {
 	static const char prot[] =
 		"wake up! GOLDEN AXE The Revenge of Death-Adder! ";
@@ -101,29 +100,28 @@ READ16_HANDLER(ga2_wakeup_protection_r)
 #define CURRENT_LEVEL_STATUS		0xF0BC
 #define LEVEL_ORDER_ARRAY		0x263A
 
-WRITE16_HANDLER(sonic_level_load_protection)
+WRITE16_MEMBER(segas32_state::sonic_level_load_protection)
 {
-	segas32_state *state = space->machine().driver_data<segas32_state>();
 	UINT16 level;
 //Perform write
-	state->m_system32_workram[CLEARED_LEVELS / 2] = (data & mem_mask) | (state->m_system32_workram[CLEARED_LEVELS / 2] & ~mem_mask);
+	m_system32_workram[CLEARED_LEVELS / 2] = (data & mem_mask) | (m_system32_workram[CLEARED_LEVELS / 2] & ~mem_mask);
 
 //Refresh current level
-		if (state->m_system32_workram[CLEARED_LEVELS / 2] == 0)
+		if (m_system32_workram[CLEARED_LEVELS / 2] == 0)
 		{
 			level = 0x0007;
 		}
 		else
 		{
-			const UINT8 *ROM = space->machine().region("maincpu")->base();
-			level =  *((ROM + LEVEL_ORDER_ARRAY) + (state->m_system32_workram[CLEARED_LEVELS / 2] * 2) - 1);
-			level |= *((ROM + LEVEL_ORDER_ARRAY) + (state->m_system32_workram[CLEARED_LEVELS / 2] * 2) - 2) << 8;
+			const UINT8 *ROM = machine().region("maincpu")->base();
+			level =  *((ROM + LEVEL_ORDER_ARRAY) + (m_system32_workram[CLEARED_LEVELS / 2] * 2) - 1);
+			level |= *((ROM + LEVEL_ORDER_ARRAY) + (m_system32_workram[CLEARED_LEVELS / 2] * 2) - 2) << 8;
 		}
-		state->m_system32_workram[CURRENT_LEVEL / 2] = level;
+		m_system32_workram[CURRENT_LEVEL / 2] = level;
 
 //Reset level status
-		state->m_system32_workram[CURRENT_LEVEL_STATUS / 2] = 0x0000;
-		state->m_system32_workram[(CURRENT_LEVEL_STATUS + 2) / 2] = 0x0000;
+		m_system32_workram[CURRENT_LEVEL_STATUS / 2] = 0x0000;
+		m_system32_workram[(CURRENT_LEVEL_STATUS + 2) / 2] = 0x0000;
 }
 
 
@@ -136,9 +134,8 @@ WRITE16_HANDLER(sonic_level_load_protection)
 
 // the protection board on many system32 games has full dma/bus access
 // and can write things into work RAM.  we simulate that here for burning rival.
-READ16_HANDLER(brival_protection_r)
+READ16_MEMBER(segas32_state::brival_protection_r)
 {
-	segas32_state *state = space->machine().driver_data<segas32_state>();
 	if (mem_mask == 0xffff)	// only trap on word-wide reads
 	{
 		switch (offset)
@@ -150,12 +147,11 @@ READ16_HANDLER(brival_protection_r)
 		}
 	}
 
-	return state->m_system32_workram[0xba00/2 + offset];
+	return m_system32_workram[0xba00/2 + offset];
 }
 
-WRITE16_HANDLER(brival_protection_w)
+WRITE16_MEMBER(segas32_state::brival_protection_w)
 {
-	segas32_state *state = space->machine().driver_data<segas32_state>();
 	static const int protAddress[6][2] =
 	{
 		{ 0x109517, 0x00/2 },
@@ -167,7 +163,7 @@ WRITE16_HANDLER(brival_protection_w)
 	};
 	char ret[32];
 	int curProtType;
-	UINT8 *ROM = space->machine().region("maincpu")->base();
+	UINT8 *ROM = machine().region("maincpu")->base();
 
 	switch (offset)
 	{
@@ -199,7 +195,7 @@ WRITE16_HANDLER(brival_protection_w)
 	memcpy(ret, &ROM[protAddress[curProtType][0]], 16);
 	ret[16] = '\0';
 
-	memcpy(&state->m_system32_protram[protAddress[curProtType][1]], ret, 16);
+	memcpy(&m_system32_protram[protAddress[curProtType][1]], ret, 16);
 }
 
 
@@ -226,17 +222,17 @@ void darkedge_fd1149_vblank(device_t *device)
 }
 
 
-WRITE16_HANDLER( darkedge_protection_w )
+WRITE16_MEMBER(segas32_state::darkedge_protection_w)
 {
 	logerror("%06x:darkedge_prot_w(%06X) = %04X & %04X\n",
-		cpu_get_pc(&space->device()), 0xa00000 + 2*offset, data, mem_mask);
+		cpu_get_pc(&space.device()), 0xa00000 + 2*offset, data, mem_mask);
 }
 
 
-READ16_HANDLER( darkedge_protection_r )
+READ16_MEMBER(segas32_state::darkedge_protection_r)
 {
 	logerror("%06x:darkedge_prot_r(%06X) & %04X\n",
-		cpu_get_pc(&space->device()), 0xa00000 + 2*offset, mem_mask);
+		cpu_get_pc(&space.device()), 0xa00000 + 2*offset, mem_mask);
 	return 0xffff;
 }
 
@@ -248,13 +244,13 @@ READ16_HANDLER( darkedge_protection_r )
  ******************************************************************************
  ******************************************************************************/
 
-WRITE16_HANDLER( dbzvrvs_protection_w )
+WRITE16_MEMBER(segas32_state::dbzvrvs_protection_w)
 {
-	space->write_word( 0x2080c8, space->read_word( 0x200044 ) );
+	space.write_word( 0x2080c8, space.read_word( 0x200044 ) );
 }
 
 
-READ16_HANDLER( dbzvrvs_protection_r )
+READ16_MEMBER(segas32_state::dbzvrvs_protection_r)
 {
 	return 0xffff;
 }
@@ -269,14 +265,14 @@ READ16_HANDLER( dbzvrvs_protection_r )
 
 
 // protection ram is 8-bits wide and only occupies every other address
-READ16_HANDLER(arabfgt_protection_r)
+READ16_MEMBER(segas32_state::arabfgt_protection_r)
 {
-	int PC = cpu_get_pc(&space->device());
+	int PC = cpu_get_pc(&space.device());
 	int cmpVal;
 
 	if (PC == 0xfe0325 || PC == 0xfe01e5 || PC == 0xfe035e || PC == 0xfe03cc)
 	{
-		cmpVal = cpu_get_reg(&space->device(), 1);
+		cmpVal = cpu_get_reg(&space.device(), 1);
 
 		// R0 always contains the value the protection is supposed to return (!)
 		return cmpVal;
@@ -289,11 +285,11 @@ READ16_HANDLER(arabfgt_protection_r)
 	return 0;
 }
 
-WRITE16_HANDLER(arabfgt_protection_w)
+WRITE16_MEMBER(segas32_state::arabfgt_protection_w)
 {
 }
 
-READ16_HANDLER(arf_wakeup_protection_r)
+READ16_MEMBER(segas32_state::arf_wakeup_protection_r)
 {
 	static const char prot[] =
 		"wake up! ARF!                                   ";
@@ -305,22 +301,21 @@ READ16_HANDLER(arf_wakeup_protection_r)
   The J.League 1994 (Japan)
  ******************************************************************************
  ******************************************************************************/
-WRITE16_HANDLER( jleague_protection_w )
+WRITE16_MEMBER(segas32_state::jleague_protection_w)
 {
-	segas32_state *state = space->machine().driver_data<segas32_state>();
-	COMBINE_DATA( &state->m_system32_workram[0xf700/2 + offset ] );
+	COMBINE_DATA( &m_system32_workram[0xf700/2 + offset ] );
 
 	switch( offset )
 	{
 		// Map team browser selection to opponent browser selection
 		// using same lookup table that V60 uses for sound sample mapping.
 		case 0:
-			space->write_byte( 0x20f708, space->read_word( 0x7bbc0 + data*2 ) );
+			space.write_byte( 0x20f708, space.read_word( 0x7bbc0 + data*2 ) );
 			break;
 
 		// move on to team browser
 		case 4/2:
-			space->write_byte( 0x200016, data & 0xff );
+			space.write_byte( 0x200016, data & 0xff );
 			break;
 
 		default:
@@ -349,12 +344,11 @@ WRITE16_HANDLER( jleague_protection_w )
     maybe the standalone board was for dev only? nop the 3 bytes at 0x06023A for standalone. (centred intro text)
 */
 
-READ16_HANDLER( arescue_dsp_r )
+READ16_MEMBER(segas32_state::arescue_dsp_r)
 {
-	segas32_state *state = space->machine().driver_data<segas32_state>();
 	if( offset == 4/2 )
 	{
-		switch( state->m_arescue_dsp_io[0] )
+		switch( m_arescue_dsp_io[0] )
 		{
 			case 0:
 			case 1:
@@ -362,26 +356,25 @@ READ16_HANDLER( arescue_dsp_r )
 				break;
 
 			case 3:
-				state->m_arescue_dsp_io[0] = 0x8000;
-				state->m_arescue_dsp_io[2/2] = 0x0001;
+				m_arescue_dsp_io[0] = 0x8000;
+				m_arescue_dsp_io[2/2] = 0x0001;
 				break;
 
 			case 6:
-				state->m_arescue_dsp_io[0] = 4 * state->m_arescue_dsp_io[2/2];
+				m_arescue_dsp_io[0] = 4 * m_arescue_dsp_io[2/2];
 				break;
 
 			default:
-				logerror("Unhandled DSP cmd %04x (%04x).\n", state->m_arescue_dsp_io[0], state->m_arescue_dsp_io[1] );
+				logerror("Unhandled DSP cmd %04x (%04x).\n", m_arescue_dsp_io[0], m_arescue_dsp_io[1] );
 				break;
 		}
 	}
 
-	return state->m_arescue_dsp_io[offset];
+	return m_arescue_dsp_io[offset];
 }
 
-WRITE16_HANDLER( arescue_dsp_w )
+WRITE16_MEMBER(segas32_state::arescue_dsp_w)
 {
-	segas32_state *state = space->machine().driver_data<segas32_state>();
-	COMBINE_DATA(&state->m_arescue_dsp_io[offset]);
+	COMBINE_DATA(&m_arescue_dsp_io[offset]);
 }
 

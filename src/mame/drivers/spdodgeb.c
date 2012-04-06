@@ -247,14 +247,14 @@ READ8_MEMBER(spdodgeb_state::port_0_r)
 static ADDRESS_MAP_START( spdodgeb_map, AS_PROGRAM, 8, spdodgeb_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x10ff) AM_WRITEONLY AM_BASE_SIZE(m_spriteram, m_spriteram_size)
-	AM_RANGE(0x2000, 0x2fff) AM_RAM_WRITE_LEGACY(spdodgeb_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0x2000, 0x2fff) AM_RAM_WRITE(spdodgeb_videoram_w) AM_BASE(m_videoram)
 	AM_RANGE(0x3000, 0x3000) AM_READ(port_0_r) //AM_WRITENOP
 	AM_RANGE(0x3001, 0x3001) AM_READ_PORT("DSW") //AM_WRITENOP
 	AM_RANGE(0x3002, 0x3002) AM_WRITE(sound_command_w)
 //  AM_RANGE(0x3003, 0x3003) AM_WRITENOP
-	AM_RANGE(0x3004, 0x3004) AM_WRITE_LEGACY(spdodgeb_scrollx_lo_w)
+	AM_RANGE(0x3004, 0x3004) AM_WRITE(spdodgeb_scrollx_lo_w)
 //  AM_RANGE(0x3005, 0x3005) AM_WRITENOP         /* mcu63701_output_w */
-	AM_RANGE(0x3006, 0x3006) AM_WRITE_LEGACY(spdodgeb_ctrl_w)	/* scroll hi, flip screen, bank switch, palette select */
+	AM_RANGE(0x3006, 0x3006) AM_WRITE(spdodgeb_ctrl_w)	/* scroll hi, flip screen, bank switch, palette select */
 	AM_RANGE(0x3800, 0x3800) AM_WRITE(mcu63701_w)
 	AM_RANGE(0x3801, 0x3805) AM_READ(mcu63701_r)
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")

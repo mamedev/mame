@@ -80,39 +80,34 @@ VIDEO_START( timelimt )
 
 /***************************************************************************/
 
-WRITE8_HANDLER( timelimt_videoram_w )
+WRITE8_MEMBER(timelimt_state::timelimt_videoram_w)
 {
-	timelimt_state *state = space->machine().driver_data<timelimt_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = m_videoram;
 	videoram[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset);
+	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( timelimt_bg_videoram_w )
+WRITE8_MEMBER(timelimt_state::timelimt_bg_videoram_w)
 {
-	timelimt_state *state = space->machine().driver_data<timelimt_state>();
-	state->m_bg_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_bg_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( timelimt_scroll_x_lsb_w )
+WRITE8_MEMBER(timelimt_state::timelimt_scroll_x_lsb_w)
 {
-	timelimt_state *state = space->machine().driver_data<timelimt_state>();
-	state->m_scrollx &= 0x100;
-	state->m_scrollx |= data & 0xff;
+	m_scrollx &= 0x100;
+	m_scrollx |= data & 0xff;
 }
 
-WRITE8_HANDLER( timelimt_scroll_x_msb_w )
+WRITE8_MEMBER(timelimt_state::timelimt_scroll_x_msb_w)
 {
-	timelimt_state *state = space->machine().driver_data<timelimt_state>();
-	state->m_scrollx &= 0xff;
-	state->m_scrollx |= ( data & 1 ) << 8;
+	m_scrollx &= 0xff;
+	m_scrollx |= ( data & 1 ) << 8;
 }
 
-WRITE8_HANDLER( timelimt_scroll_y_w )
+WRITE8_MEMBER(timelimt_state::timelimt_scroll_y_w)
 {
-	timelimt_state *state = space->machine().driver_data<timelimt_state>();
-	state->m_scrolly = data;
+	m_scrolly = data;
 }
 
 

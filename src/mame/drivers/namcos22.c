@@ -1805,7 +1805,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( master_dsp_data, AS_DATA, 16, namcos22_state )
 	AM_RANGE(0x1000, 0x3fff) AM_RAM
 	AM_RANGE(0x4000, 0x7fff) AM_READ_LEGACY(master_external_ram_r) AM_WRITE_LEGACY(master_external_ram_w)
-	AM_RANGE(0x8000, 0xffff) AM_READ_LEGACY(namcos22_dspram16_r) AM_WRITE_LEGACY(namcos22_dspram16_w)
+	AM_RANGE(0x8000, 0xffff) AM_READ(namcos22_dspram16_r) AM_WRITE(namcos22_dspram16_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( master_dsp_io, AS_IO, 16, namcos22_state )
@@ -1820,7 +1820,7 @@ static ADDRESS_MAP_START( master_dsp_io, AS_IO, 16, namcos22_state )
 	AM_RANGE(0xa,0xa) AM_WRITE_LEGACY(dsp_unk_porta_w)
 	AM_RANGE(0xb,0xb) AM_WRITENOP /* RINT-related? */
 	AM_RANGE(0xc,0xc) AM_WRITE_LEGACY(master_render_device_w)
-	AM_RANGE(0xd,0xd) AM_WRITE_LEGACY(namcos22_dspram16_bank_w)
+	AM_RANGE(0xd,0xd) AM_WRITE(namcos22_dspram16_bank_w)
 	AM_RANGE(0xe,0xe) AM_WRITE_LEGACY(dsp_led_w)
 	AM_RANGE(0xf,0xf) AM_WRITENOP AM_READ_LEGACY(dsp_upload_status_r)
 	AM_RANGE(TMS32025_HOLD,  TMS32025_HOLD)  AM_READ_LEGACY(dsp_HOLD_signal_r)
@@ -2559,19 +2559,19 @@ static ADDRESS_MAP_START( namcos22s_am, AS_PROGRAM, 32, namcos22_state )
 	AM_RANGE(0x700000, 0x70001f) AM_READWRITE_LEGACY(namcos22_system_controller_r, namcos22s_system_controller_w) AM_BASE(m_system_controller)
 	AM_RANGE(0x800000, 0x800003) AM_WRITE_LEGACY(namcos22s_chipselect_w)
 	AM_RANGE(0x810000, 0x81000f) AM_RAM AM_BASE(m_czattr)
-	AM_RANGE(0x810200, 0x8103ff) AM_READWRITE_LEGACY(namcos22s_czram_r, namcos22s_czram_w)
+	AM_RANGE(0x810200, 0x8103ff) AM_READWRITE(namcos22s_czram_r, namcos22s_czram_w)
 	AM_RANGE(0x820000, 0x8202ff) AM_WRITENOP /* leftover of old (non-super) video mixer device */
-	AM_RANGE(0x824000, 0x8243ff) AM_READWRITE_LEGACY(namcos22_gamma_r, namcos22_gamma_w) AM_BASE(m_gamma)
-	AM_RANGE(0x828000, 0x83ffff) AM_READWRITE_LEGACY(namcos22_paletteram_r, namcos22_paletteram_w) AM_SHARE("paletteram")
-	AM_RANGE(0x860000, 0x860007) AM_READWRITE_LEGACY(namcos22s_spotram_r, namcos22s_spotram_w)
-	AM_RANGE(0x880000, 0x89dfff) AM_READWRITE_LEGACY(namcos22_cgram_r, namcos22_cgram_w) AM_BASE(m_cgram)
-	AM_RANGE(0x89e000, 0x89ffff) AM_READWRITE_LEGACY(namcos22_textram_r, namcos22_textram_w) AM_BASE(m_textram)
-	AM_RANGE(0x8a0000, 0x8a000f) AM_READWRITE_LEGACY(namcos22_tilemapattr_r, namcos22_tilemapattr_w) AM_BASE(m_tilemapattr)
+	AM_RANGE(0x824000, 0x8243ff) AM_READWRITE(namcos22_gamma_r, namcos22_gamma_w) AM_BASE(m_gamma)
+	AM_RANGE(0x828000, 0x83ffff) AM_READWRITE(namcos22_paletteram_r, namcos22_paletteram_w) AM_SHARE("paletteram")
+	AM_RANGE(0x860000, 0x860007) AM_READWRITE(namcos22s_spotram_r, namcos22s_spotram_w)
+	AM_RANGE(0x880000, 0x89dfff) AM_READWRITE(namcos22_cgram_r, namcos22_cgram_w) AM_BASE(m_cgram)
+	AM_RANGE(0x89e000, 0x89ffff) AM_READWRITE(namcos22_textram_r, namcos22_textram_w) AM_BASE(m_textram)
+	AM_RANGE(0x8a0000, 0x8a000f) AM_READWRITE(namcos22_tilemapattr_r, namcos22_tilemapattr_w) AM_BASE(m_tilemapattr)
 	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_BASE(m_vics_data)
-	AM_RANGE(0x940000, 0x94007f) AM_READWRITE_LEGACY(namcos22s_vics_control_r, namcos22s_vics_control_w) AM_BASE(m_vics_control)
+	AM_RANGE(0x940000, 0x94007f) AM_READWRITE(namcos22s_vics_control_r, namcos22s_vics_control_w) AM_BASE(m_vics_control)
 	AM_RANGE(0x980000, 0x9affff) AM_RAM AM_BASE(m_spriteram) /* C374 */
 	AM_RANGE(0xa04000, 0xa0bfff) AM_READWRITE_LEGACY(namcos22_mcuram_r, namcos22_mcuram_w) AM_BASE(m_shareram) /* COM RAM */
-	AM_RANGE(0xc00000, 0xc1ffff) AM_READWRITE_LEGACY(namcos22_dspram_r, namcos22_dspram_w) AM_BASE(m_polygonram)
+	AM_RANGE(0xc00000, 0xc1ffff) AM_READWRITE(namcos22_dspram_r, namcos22_dspram_w) AM_BASE(m_polygonram)
 	AM_RANGE(0xe00000, 0xe3ffff) AM_RAM /* workram */
 ADDRESS_MAP_END
 
@@ -3179,7 +3179,7 @@ static ADDRESS_MAP_START( namcos22_am, AS_PROGRAM, 32, namcos22_state )
      * Known chip type: TC55328P-25, N341256P-15
      * Notes: connected bits = 0x00ffffff (24bit)
      */
-	AM_RANGE(0x70000000, 0x7001ffff) AM_READWRITE_LEGACY(namcos22_dspram_r, namcos22_dspram_w) AM_BASE(m_polygonram)
+	AM_RANGE(0x70000000, 0x7001ffff) AM_READWRITE(namcos22_dspram_r, namcos22_dspram_w) AM_BASE(m_polygonram)
 
 	/**
      * LED on PCB(?)
@@ -3198,13 +3198,13 @@ static ADDRESS_MAP_START( namcos22_am, AS_PROGRAM, 32, namcos22_state )
      * Mounted position: VIDEO 7D (C305)
      * Notes: Boot time check: 0x90020100 - 0x9002027f
      */
-	AM_RANGE(0x90020000, 0x90027fff) AM_READWRITE_LEGACY(namcos22_gamma_r, namcos22_gamma_w) AM_BASE(m_gamma)
+	AM_RANGE(0x90020000, 0x90027fff) AM_READWRITE(namcos22_gamma_r, namcos22_gamma_w) AM_BASE(m_gamma)
 
 	/**
      * Mounted position: VIDEO 6B, 7B, 8B (near C305)
      * Note: 0xff00-0xffff are for Tilemap (16 x 16)
      */
-	AM_RANGE(0x90028000, 0x9003ffff) AM_READWRITE_LEGACY(namcos22_paletteram_r, namcos22_paletteram_w) AM_SHARE("paletteram")
+	AM_RANGE(0x90028000, 0x9003ffff) AM_READWRITE(namcos22_paletteram_r, namcos22_paletteram_w) AM_SHARE("paletteram")
 
 	/**
      * unknown (option)
@@ -3215,7 +3215,7 @@ static ADDRESS_MAP_START( namcos22_am, AS_PROGRAM, 32, namcos22_state )
 	/**
      * Tilemap PCG Memory
      */
-	AM_RANGE(0x90080000, 0x9009dfff) AM_READWRITE_LEGACY(namcos22_cgram_r, namcos22_cgram_w) AM_BASE(m_cgram)
+	AM_RANGE(0x90080000, 0x9009dfff) AM_READWRITE(namcos22_cgram_r, namcos22_cgram_w) AM_BASE(m_cgram)
 
 	/**
      * Tilemap Memory (64 x 64)
@@ -3223,13 +3223,13 @@ static ADDRESS_MAP_START( namcos22_am, AS_PROGRAM, 32, namcos22_state )
      * Known chip type: HM511664 (64k x 16bit SRAM)
      * Note: Self test: 90084000 - 9009ffff
      */
-	AM_RANGE(0x9009e000, 0x9009ffff) AM_READWRITE_LEGACY(namcos22_textram_r, namcos22_textram_w) AM_BASE(m_textram)
+	AM_RANGE(0x9009e000, 0x9009ffff) AM_READWRITE(namcos22_textram_r, namcos22_textram_w) AM_BASE(m_textram)
 
 	/**
      * Tilemap Register
      * Mounted position: unknown
      */
-	AM_RANGE(0x900a0000, 0x900a000f) AM_READWRITE_LEGACY(namcos22_tilemapattr_r, namcos22_tilemapattr_w) AM_BASE(m_tilemapattr)
+	AM_RANGE(0x900a0000, 0x900a000f) AM_READWRITE(namcos22_tilemapattr_r, namcos22_tilemapattr_w) AM_BASE(m_tilemapattr)
 ADDRESS_MAP_END
 
 

@@ -14,13 +14,13 @@ public:
 	tilemap_t *m_fg3_tilemap;
 	DECLARE_WRITE32_MEMBER(paletteram32_xRRRRRGGGGGBBBBB_dword_w);
 	DECLARE_WRITE32_MEMBER(silk_coin_counter_w);
+	DECLARE_WRITE32_MEMBER(silkroad_fgram_w);
+	DECLARE_WRITE32_MEMBER(silkroad_fgram2_w);
+	DECLARE_WRITE32_MEMBER(silkroad_fgram3_w);
 };
 
 
 /*----------- defined in video/silkroad.c -----------*/
 
-WRITE32_HANDLER( silkroad_fgram_w );
-WRITE32_HANDLER( silkroad_fgram2_w );
-WRITE32_HANDLER( silkroad_fgram3_w );
 VIDEO_START(silkroad);
 SCREEN_UPDATE_IND16(silkroad);

@@ -396,173 +396,154 @@ VIDEO_START( tdfever )
 
 /**************************************************************************************/
 
-WRITE8_HANDLER( snk_tx_videoram_w )
+WRITE8_MEMBER(snk_state::snk_tx_videoram_w)
 {
-	snk_state *state = space->machine().driver_data<snk_state>();
 
-	state->m_tx_videoram[offset] = data;
-	state->m_tx_tilemap->mark_tile_dirty(offset);
+	m_tx_videoram[offset] = data;
+	m_tx_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( marvins_fg_videoram_w )
+WRITE8_MEMBER(snk_state::marvins_fg_videoram_w)
 {
-	snk_state *state = space->machine().driver_data<snk_state>();
 
-	state->m_fg_videoram[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset);
+	m_fg_videoram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( marvins_bg_videoram_w )
+WRITE8_MEMBER(snk_state::marvins_bg_videoram_w)
 {
-	snk_state *state = space->machine().driver_data<snk_state>();
 
-	state->m_bg_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_bg_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( snk_bg_videoram_w )
+WRITE8_MEMBER(snk_state::snk_bg_videoram_w)
 {
-	snk_state *state = space->machine().driver_data<snk_state>();
 
-	state->m_bg_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset >> 1);
+	m_bg_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset >> 1);
 }
 
 
-WRITE8_HANDLER( snk_fg_scrollx_w )
+WRITE8_MEMBER(snk_state::snk_fg_scrollx_w)
 {
-	snk_state *state = space->machine().driver_data<snk_state>();
 
-	state->m_fg_scrollx = (state->m_fg_scrollx & ~0xff) | data;
+	m_fg_scrollx = (m_fg_scrollx & ~0xff) | data;
 }
 
-WRITE8_HANDLER( snk_fg_scrolly_w )
+WRITE8_MEMBER(snk_state::snk_fg_scrolly_w)
 {
-	snk_state *state = space->machine().driver_data<snk_state>();
 
-	state->m_fg_scrolly = (state->m_fg_scrolly & ~0xff) | data;
+	m_fg_scrolly = (m_fg_scrolly & ~0xff) | data;
 }
 
-WRITE8_HANDLER( snk_bg_scrollx_w )
+WRITE8_MEMBER(snk_state::snk_bg_scrollx_w)
 {
-	snk_state *state = space->machine().driver_data<snk_state>();
 
-	state->m_bg_scrollx = (state->m_bg_scrollx & ~0xff) | data;
+	m_bg_scrollx = (m_bg_scrollx & ~0xff) | data;
 }
 
-WRITE8_HANDLER( snk_bg_scrolly_w )
+WRITE8_MEMBER(snk_state::snk_bg_scrolly_w)
 {
-	snk_state *state = space->machine().driver_data<snk_state>();
 
-	state->m_bg_scrolly = (state->m_bg_scrolly & ~0xff) | data;
+	m_bg_scrolly = (m_bg_scrolly & ~0xff) | data;
 }
 
-WRITE8_HANDLER( snk_sp16_scrollx_w )
+WRITE8_MEMBER(snk_state::snk_sp16_scrollx_w)
 {
-	snk_state *state = space->machine().driver_data<snk_state>();
 
-	state->m_sp16_scrollx = (state->m_sp16_scrollx & ~0xff) | data;
+	m_sp16_scrollx = (m_sp16_scrollx & ~0xff) | data;
 }
 
-WRITE8_HANDLER( snk_sp16_scrolly_w )
+WRITE8_MEMBER(snk_state::snk_sp16_scrolly_w)
 {
-	snk_state *state = space->machine().driver_data<snk_state>();
 
-	state->m_sp16_scrolly = (state->m_sp16_scrolly & ~0xff) | data;
+	m_sp16_scrolly = (m_sp16_scrolly & ~0xff) | data;
 }
 
-WRITE8_HANDLER( snk_sp32_scrollx_w )
+WRITE8_MEMBER(snk_state::snk_sp32_scrollx_w)
 {
-	snk_state *state = space->machine().driver_data<snk_state>();
 
-	state->m_sp32_scrollx = (state->m_sp32_scrollx & ~0xff) | data;
+	m_sp32_scrollx = (m_sp32_scrollx & ~0xff) | data;
 }
 
-WRITE8_HANDLER( snk_sp32_scrolly_w )
+WRITE8_MEMBER(snk_state::snk_sp32_scrolly_w)
 {
-	snk_state *state = space->machine().driver_data<snk_state>();
 
-	state->m_sp32_scrolly = (state->m_sp32_scrolly & ~0xff) | data;
+	m_sp32_scrolly = (m_sp32_scrolly & ~0xff) | data;
 }
 
-WRITE8_HANDLER( snk_sprite_split_point_w )
+WRITE8_MEMBER(snk_state::snk_sprite_split_point_w)
 {
-	snk_state *state = space->machine().driver_data<snk_state>();
 
-	state->m_sprite_split_point = data;
+	m_sprite_split_point = data;
 }
 
 
-WRITE8_HANDLER( marvins_palette_bank_w )
+WRITE8_MEMBER(snk_state::marvins_palette_bank_w)
 {
-	snk_state *state = space->machine().driver_data<snk_state>();
 
-	state->m_bg_tilemap->set_palette_offset(data & 0x70);
-	state->m_fg_tilemap->set_palette_offset((data & 0x07) << 4);
+	m_bg_tilemap->set_palette_offset(data & 0x70);
+	m_fg_tilemap->set_palette_offset((data & 0x07) << 4);
 }
 
-WRITE8_HANDLER( marvins_flipscreen_w )
+WRITE8_MEMBER(snk_state::marvins_flipscreen_w)
 {
-	flip_screen_set(space->machine(), data & 0x80);
+	flip_screen_set(machine(), data & 0x80);
 
 	// other bits unknown
 }
 
-WRITE8_HANDLER( sgladiat_flipscreen_w )
+WRITE8_MEMBER(snk_state::sgladiat_flipscreen_w)
 {
-	snk_state *state = space->machine().driver_data<snk_state>();
 
-	flip_screen_set(space->machine(), data & 0x80);
+	flip_screen_set(machine(), data & 0x80);
 
-	state->m_bg_tilemap->set_palette_offset(((data & 0xf) ^ 8) << 4);
+	m_bg_tilemap->set_palette_offset(((data & 0xf) ^ 8) << 4);
 
 	// other bits unknown
 }
 
-WRITE8_HANDLER( hal21_flipscreen_w )
+WRITE8_MEMBER(snk_state::hal21_flipscreen_w)
 {
-	snk_state *state = space->machine().driver_data<snk_state>();
 
-	flip_screen_set(space->machine(), data & 0x80);
+	flip_screen_set(machine(), data & 0x80);
 
-	state->m_bg_tilemap->set_palette_offset(((data & 0xf) ^ 8) << 4);
-	if (state->m_bg_tile_offset != ((data & 0x20) << 3))
+	m_bg_tilemap->set_palette_offset(((data & 0xf) ^ 8) << 4);
+	if (m_bg_tile_offset != ((data & 0x20) << 3))
 	{
-		state->m_bg_tile_offset = (data & 0x20) << 3;
-		state->m_bg_tilemap->mark_all_dirty();
+		m_bg_tile_offset = (data & 0x20) << 3;
+		m_bg_tilemap->mark_all_dirty();
 	}
 
 	// other bits unknown
 }
 
-WRITE8_HANDLER( marvins_scroll_msb_w )
+WRITE8_MEMBER(snk_state::marvins_scroll_msb_w)
 {
-	snk_state *state = space->machine().driver_data<snk_state>();
 
-	state->m_bg_scrollx =   (state->m_bg_scrollx   & 0xff) | ((data & 0x04) << 6);
-	state->m_fg_scrollx =   (state->m_fg_scrollx   & 0xff) | ((data & 0x02) << 7);
-	state->m_sp16_scrollx = (state->m_sp16_scrollx & 0xff) | ((data & 0x01) << 8);
+	m_bg_scrollx =   (m_bg_scrollx   & 0xff) | ((data & 0x04) << 6);
+	m_fg_scrollx =   (m_fg_scrollx   & 0xff) | ((data & 0x02) << 7);
+	m_sp16_scrollx = (m_sp16_scrollx & 0xff) | ((data & 0x01) << 8);
 }
 
-WRITE8_HANDLER( jcross_scroll_msb_w )
+WRITE8_MEMBER(snk_state::jcross_scroll_msb_w)
 {
-	snk_state *state = space->machine().driver_data<snk_state>();
 
-	state->m_bg_scrolly =   (state->m_bg_scrolly   & 0xff) | ((data & 0x10) << 4);
-	state->m_sp16_scrolly = (state->m_sp16_scrolly & 0xff) | ((data & 0x08) << 5);
-	state->m_bg_scrollx =   (state->m_bg_scrollx   & 0xff) | ((data & 0x02) << 7);
-	state->m_sp16_scrollx = (state->m_sp16_scrollx & 0xff) | ((data & 0x01) << 8);
+	m_bg_scrolly =   (m_bg_scrolly   & 0xff) | ((data & 0x10) << 4);
+	m_sp16_scrolly = (m_sp16_scrolly & 0xff) | ((data & 0x08) << 5);
+	m_bg_scrollx =   (m_bg_scrollx   & 0xff) | ((data & 0x02) << 7);
+	m_sp16_scrollx = (m_sp16_scrollx & 0xff) | ((data & 0x01) << 8);
 }
 
-WRITE8_HANDLER( sgladiat_scroll_msb_w )
+WRITE8_MEMBER(snk_state::sgladiat_scroll_msb_w)
 {
-	snk_state *state = space->machine().driver_data<snk_state>();
 
-	state->m_bg_scrollx =   (state->m_bg_scrollx   & 0xff) | ((data & 0x02) << 7);
-	state->m_sp16_scrollx = (state->m_sp16_scrollx & 0xff) | ((data & 0x01) << 8);
+	m_bg_scrollx =   (m_bg_scrollx   & 0xff) | ((data & 0x02) << 7);
+	m_sp16_scrollx = (m_sp16_scrollx & 0xff) | ((data & 0x01) << 8);
 }
 
-WRITE8_HANDLER( aso_videoattrs_w )
+WRITE8_MEMBER(snk_state::aso_videoattrs_w)
 {
 	/*
         video attributes:
@@ -576,17 +557,16 @@ WRITE8_HANDLER( aso_videoattrs_w )
         -------X    scrollx MSB (sprites)
     */
 
-	snk_state *state = space->machine().driver_data<snk_state>();
 
-	flip_screen_set(space->machine(), data & 0x20);
+	flip_screen_set(machine(), data & 0x20);
 
-	state->m_bg_scrolly =   (state->m_bg_scrolly   & 0xff) | ((data & 0x10) << 4);
-	state->m_sp16_scrolly = (state->m_sp16_scrolly & 0xff) | ((data & 0x08) << 5);
-	state->m_bg_scrollx =   (state->m_bg_scrollx   & 0xff) | ((data & 0x02) << 7);
-	state->m_sp16_scrollx = (state->m_sp16_scrollx & 0xff) | ((data & 0x01) << 8);
+	m_bg_scrolly =   (m_bg_scrolly   & 0xff) | ((data & 0x10) << 4);
+	m_sp16_scrolly = (m_sp16_scrolly & 0xff) | ((data & 0x08) << 5);
+	m_bg_scrollx =   (m_bg_scrollx   & 0xff) | ((data & 0x02) << 7);
+	m_sp16_scrollx = (m_sp16_scrollx & 0xff) | ((data & 0x01) << 8);
 }
 
-WRITE8_HANDLER( tnk3_videoattrs_w )
+WRITE8_MEMBER(snk_state::tnk3_videoattrs_w)
 {
 	/*
         video attributes:
@@ -600,53 +580,49 @@ WRITE8_HANDLER( tnk3_videoattrs_w )
         -------X    scrollx MSB (sprites)
     */
 
-	snk_state *state = space->machine().driver_data<snk_state>();
 
-	flip_screen_set(space->machine(), data & 0x80);
+	flip_screen_set(machine(), data & 0x80);
 
-	if (state->m_tx_tile_offset != ((data & 0x40) << 2))
+	if (m_tx_tile_offset != ((data & 0x40) << 2))
 	{
-		state->m_tx_tile_offset = (data & 0x40) << 2;
-		state->m_tx_tilemap->mark_all_dirty();
+		m_tx_tile_offset = (data & 0x40) << 2;
+		m_tx_tilemap->mark_all_dirty();
 	}
 
-	state->m_bg_scrolly =   (state->m_bg_scrolly   & 0xff) | ((data & 0x10) << 4);
-	state->m_sp16_scrolly = (state->m_sp16_scrolly & 0xff) | ((data & 0x08) << 5);
-	state->m_bg_scrollx =   (state->m_bg_scrollx   & 0xff) | ((data & 0x02) << 7);
-	state->m_sp16_scrollx = (state->m_sp16_scrollx & 0xff) | ((data & 0x01) << 8);
+	m_bg_scrolly =   (m_bg_scrolly   & 0xff) | ((data & 0x10) << 4);
+	m_sp16_scrolly = (m_sp16_scrolly & 0xff) | ((data & 0x08) << 5);
+	m_bg_scrollx =   (m_bg_scrollx   & 0xff) | ((data & 0x02) << 7);
+	m_sp16_scrollx = (m_sp16_scrollx & 0xff) | ((data & 0x01) << 8);
 }
 
-WRITE8_HANDLER( aso_bg_bank_w )
+WRITE8_MEMBER(snk_state::aso_bg_bank_w)
 {
-	snk_state *state = space->machine().driver_data<snk_state>();
 
-	state->m_bg_tilemap->set_palette_offset(((data & 0xf) ^ 8) << 4);
-	if (state->m_bg_tile_offset != ((data & 0x30) << 4))
+	m_bg_tilemap->set_palette_offset(((data & 0xf) ^ 8) << 4);
+	if (m_bg_tile_offset != ((data & 0x30) << 4))
 	{
-		state->m_bg_tile_offset = (data & 0x30) << 4;
-		state->m_bg_tilemap->mark_all_dirty();
+		m_bg_tile_offset = (data & 0x30) << 4;
+		m_bg_tilemap->mark_all_dirty();
 	}
 }
 
-WRITE8_HANDLER( ikari_bg_scroll_msb_w )
+WRITE8_MEMBER(snk_state::ikari_bg_scroll_msb_w)
 {
-	snk_state *state = space->machine().driver_data<snk_state>();
 
-	state->m_bg_scrollx = (state->m_bg_scrollx & 0xff) | ((data & 0x02) << 7);
-	state->m_bg_scrolly = (state->m_bg_scrolly & 0xff) | ((data & 0x01) << 8);
+	m_bg_scrollx = (m_bg_scrollx & 0xff) | ((data & 0x02) << 7);
+	m_bg_scrolly = (m_bg_scrolly & 0xff) | ((data & 0x01) << 8);
 }
 
-WRITE8_HANDLER( ikari_sp_scroll_msb_w )
+WRITE8_MEMBER(snk_state::ikari_sp_scroll_msb_w)
 {
-	snk_state *state = space->machine().driver_data<snk_state>();
 
-	state->m_sp32_scrollx = (state->m_sp32_scrollx & 0xff) | ((data & 0x20) << 3);
-	state->m_sp16_scrollx = (state->m_sp16_scrollx & 0xff) | ((data & 0x10) << 4);
-	state->m_sp32_scrolly = (state->m_sp32_scrolly & 0xff) | ((data & 0x08) << 5);
-	state->m_sp16_scrolly = (state->m_sp16_scrolly & 0xff) | ((data & 0x04) << 6);
+	m_sp32_scrollx = (m_sp32_scrollx & 0xff) | ((data & 0x20) << 3);
+	m_sp16_scrollx = (m_sp16_scrollx & 0xff) | ((data & 0x10) << 4);
+	m_sp32_scrolly = (m_sp32_scrolly & 0xff) | ((data & 0x08) << 5);
+	m_sp16_scrolly = (m_sp16_scrolly & 0xff) | ((data & 0x04) << 6);
 }
 
-WRITE8_HANDLER( ikari_unknown_video_w )
+WRITE8_MEMBER(snk_state::ikari_unknown_video_w)
 {
 	/* meaning of 0xc980 uncertain.
        Normally 0x20, ikaria/ikarijp sets it to 0x31 during test mode.
@@ -654,92 +630,85 @@ WRITE8_HANDLER( ikari_unknown_video_w )
        hard flags test and the test grid.
        Changing palette bank is necessary to fix colors in test mode. */
 
-	snk_state *state = space->machine().driver_data<snk_state>();
 
 if (data != 0x20 &&	// normal
 	data != 0x31 &&	// ikari test
 	data != 0xaa)	// victroad spurious during boot
 	popmessage("attrs %02x contact MAMEDEV", data);
 
-	state->m_tx_tilemap->set_palette_offset((data & 0x01) << 4);
-	if (state->m_tx_tile_offset != ((data & 0x10) << 4))
+	m_tx_tilemap->set_palette_offset((data & 0x01) << 4);
+	if (m_tx_tile_offset != ((data & 0x10) << 4))
 	{
-		state->m_tx_tile_offset = (data & 0x10) << 4;
-		state->m_tx_tilemap->mark_all_dirty();
+		m_tx_tile_offset = (data & 0x10) << 4;
+		m_tx_tilemap->mark_all_dirty();
 	}
 }
 
-WRITE8_HANDLER( gwar_tx_bank_w )
+WRITE8_MEMBER(snk_state::gwar_tx_bank_w)
 {
-	snk_state *state = space->machine().driver_data<snk_state>();
 
-	state->m_tx_tilemap->set_palette_offset((data & 0xf) << 4);
-	if (state->m_tx_tile_offset != ((data & 0x30) << 4))
+	m_tx_tilemap->set_palette_offset((data & 0xf) << 4);
+	if (m_tx_tile_offset != ((data & 0x30) << 4))
 	{
-		state->m_tx_tile_offset = (data & 0x30) << 4;
-		state->m_tx_tilemap->mark_all_dirty();
+		m_tx_tile_offset = (data & 0x30) << 4;
+		m_tx_tilemap->mark_all_dirty();
 	}
 
-	if (state->m_is_psychos)
-		state->m_bg_tilemap->set_palette_offset((data & 0x80));
+	if (m_is_psychos)
+		m_bg_tilemap->set_palette_offset((data & 0x80));
 }
 
-WRITE8_HANDLER( gwar_videoattrs_w )
+WRITE8_MEMBER(snk_state::gwar_videoattrs_w)
 {
-	snk_state *state = space->machine().driver_data<snk_state>();
 
-	flip_screen_set(space->machine(), data & 0x04);
+	flip_screen_set(machine(), data & 0x04);
 
-	state->m_sp32_scrollx = (state->m_sp32_scrollx & 0xff) | ((data & 0x80) << 1);
-	state->m_sp16_scrollx = (state->m_sp16_scrollx & 0xff) | ((data & 0x40) << 2);
-	state->m_sp32_scrolly = (state->m_sp32_scrolly & 0xff) | ((data & 0x20) << 3);
-	state->m_sp16_scrolly = (state->m_sp16_scrolly & 0xff) | ((data & 0x10) << 4);
-	state->m_bg_scrollx =   (state->m_bg_scrollx   & 0xff) | ((data & 0x02) << 7);
-	state->m_bg_scrolly =   (state->m_bg_scrolly   & 0xff) | ((data & 0x01) << 8);
+	m_sp32_scrollx = (m_sp32_scrollx & 0xff) | ((data & 0x80) << 1);
+	m_sp16_scrollx = (m_sp16_scrollx & 0xff) | ((data & 0x40) << 2);
+	m_sp32_scrolly = (m_sp32_scrolly & 0xff) | ((data & 0x20) << 3);
+	m_sp16_scrolly = (m_sp16_scrolly & 0xff) | ((data & 0x10) << 4);
+	m_bg_scrollx =   (m_bg_scrollx   & 0xff) | ((data & 0x02) << 7);
+	m_bg_scrolly =   (m_bg_scrolly   & 0xff) | ((data & 0x01) << 8);
 }
 
-WRITE8_HANDLER( gwara_videoattrs_w )
+WRITE8_MEMBER(snk_state::gwara_videoattrs_w)
 {
-	snk_state *state = space->machine().driver_data<snk_state>();
 
-	flip_screen_set(space->machine(), data & 0x10);
+	flip_screen_set(machine(), data & 0x10);
 
-	state->m_bg_scrollx =   (state->m_bg_scrollx   & 0xff) | ((data & 0x02) << 7);
-	state->m_bg_scrolly =   (state->m_bg_scrolly   & 0xff) | ((data & 0x01) << 8);
+	m_bg_scrollx =   (m_bg_scrollx   & 0xff) | ((data & 0x02) << 7);
+	m_bg_scrolly =   (m_bg_scrolly   & 0xff) | ((data & 0x01) << 8);
 }
 
-WRITE8_HANDLER( gwara_sp_scroll_msb_w )
+WRITE8_MEMBER(snk_state::gwara_sp_scroll_msb_w)
 {
-	snk_state *state = space->machine().driver_data<snk_state>();
 
-	state->m_sp32_scrollx = (state->m_sp32_scrollx & 0xff) | ((data & 0x20) << 3);
-	state->m_sp16_scrollx = (state->m_sp16_scrollx & 0xff) | ((data & 0x10) << 4);
-	state->m_sp32_scrolly = (state->m_sp32_scrolly & 0xff) | ((data & 0x08) << 5);
-	state->m_sp16_scrolly = (state->m_sp16_scrolly & 0xff) | ((data & 0x04) << 6);
+	m_sp32_scrollx = (m_sp32_scrollx & 0xff) | ((data & 0x20) << 3);
+	m_sp16_scrollx = (m_sp16_scrollx & 0xff) | ((data & 0x10) << 4);
+	m_sp32_scrolly = (m_sp32_scrolly & 0xff) | ((data & 0x08) << 5);
+	m_sp16_scrolly = (m_sp16_scrolly & 0xff) | ((data & 0x04) << 6);
 }
 
-WRITE8_HANDLER( tdfever_sp_scroll_msb_w )
+WRITE8_MEMBER(snk_state::tdfever_sp_scroll_msb_w)
 {
-	snk_state *state = space->machine().driver_data<snk_state>();
 
-	state->m_sp32_scrolly = (state->m_sp32_scrolly & 0xff) | ((data & 0x80) << 1);
-	state->m_sp32_scrollx = (state->m_sp32_scrollx & 0xff) | ((data & 0x40) << 2);
+	m_sp32_scrolly = (m_sp32_scrolly & 0xff) | ((data & 0x80) << 1);
+	m_sp32_scrollx = (m_sp32_scrollx & 0xff) | ((data & 0x40) << 2);
 }
 
-WRITE8_HANDLER( tdfever_spriteram_w )
+WRITE8_MEMBER(snk_state::tdfever_spriteram_w)
 {
-	snk_state *state = space->machine().driver_data<snk_state>();
 
 	/*  partial updates avoid flickers in the fsoccer radar. */
-	if (offset < 0x80 && state->m_spriteram[offset] != data)
+	if (offset < 0x80 && m_spriteram[offset] != data)
 	{
-		int vpos = space->machine().primary_screen->vpos();
+		int vpos = machine().primary_screen->vpos();
 
 		if (vpos > 0)
-			space->machine().primary_screen->update_partial(vpos - 1);
+			machine().primary_screen->update_partial(vpos - 1);
 	}
 
-	state->m_spriteram[offset] = data;
+	m_spriteram[offset] = data;
 }
 
 /**************************************************************************************/

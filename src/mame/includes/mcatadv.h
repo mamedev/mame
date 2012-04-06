@@ -30,6 +30,8 @@ public:
 	DECLARE_WRITE16_MEMBER(mcat_coin_w);
 	DECLARE_READ16_MEMBER(mcat_wd_r);
 	DECLARE_WRITE8_MEMBER(mcatadv_sound_bw_w);
+	DECLARE_WRITE16_MEMBER(mcatadv_videoram1_w);
+	DECLARE_WRITE16_MEMBER(mcatadv_videoram2_w);
 };
 
 /*----------- defined in video/mcatadv.c -----------*/
@@ -38,5 +40,3 @@ SCREEN_UPDATE_IND16( mcatadv );
 VIDEO_START( mcatadv );
 SCREEN_VBLANK( mcatadv );
 
-WRITE16_HANDLER( mcatadv_videoram1_w );
-WRITE16_HANDLER( mcatadv_videoram2_w );

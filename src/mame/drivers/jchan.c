@@ -524,11 +524,11 @@ static ADDRESS_MAP_START( jchan_sub, AS_PROGRAM, 16, jchan_state )
 	AM_RANGE(0x400000, 0x403fff) AM_RAM AM_BASE(m_mainsub_shared_ram) AM_SHARE("share1")
 
 	/* VIEW2 Tilemap - [D] grid tested, cleared ($1d84), also cleared at startup ($810-$826) */
-	AM_RANGE(0x500000, 0x500fff) AM_RAM_WRITE_LEGACY(kaneko16_vram_1_w) AM_BASE(m_vram[1])	// Layers 0
-	AM_RANGE(0x501000, 0x501fff) AM_RAM_WRITE_LEGACY(kaneko16_vram_0_w) AM_BASE(m_vram[0])	//
+	AM_RANGE(0x500000, 0x500fff) AM_RAM_WRITE(kaneko16_vram_1_w) AM_BASE(m_vram[1])	// Layers 0
+	AM_RANGE(0x501000, 0x501fff) AM_RAM_WRITE(kaneko16_vram_0_w) AM_BASE(m_vram[0])	//
 	AM_RANGE(0x502000, 0x502fff) AM_RAM AM_BASE(m_vscroll[1])									//
 	AM_RANGE(0x503000, 0x503fff) AM_RAM AM_BASE(m_vscroll[0])									//
-	AM_RANGE(0x600000, 0x60001f) AM_RAM_WRITE_LEGACY(kaneko16_layers_0_regs_w) AM_BASE(m_layers_0_regs)	// Layers 0 Regs
+	AM_RANGE(0x600000, 0x60001f) AM_RAM_WRITE(kaneko16_layers_0_regs_w) AM_BASE(m_layers_0_regs)	// Layers 0 Regs
 
 	/* background prites */
 	AM_RANGE(0x700000, 0x703fff) AM_RAM_WRITE_LEGACY(jchan_suprnova_sprite32_2_w) AM_BASE(m_spriteram_2)

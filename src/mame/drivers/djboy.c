@@ -263,8 +263,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( cpu1_am, AS_PROGRAM, 8, djboy_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank2")
-	AM_RANGE(0xc000, 0xcfff) AM_RAM_WRITE_LEGACY(djboy_videoram_w) AM_BASE(m_videoram)
-	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE_LEGACY(djboy_paletteram_w) AM_BASE(m_paletteram)
+	AM_RANGE(0xc000, 0xcfff) AM_RAM_WRITE(djboy_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(djboy_paletteram_w) AM_BASE(m_paletteram)
 	AM_RANGE(0xd400, 0xd8ff) AM_RAM
 	AM_RANGE(0xe000, 0xffff) AM_RAM AM_SHARE("share1")
 ADDRESS_MAP_END
@@ -274,8 +274,8 @@ static ADDRESS_MAP_START( cpu1_port_am, AS_IO, 8, djboy_state )
 	AM_RANGE(0x00, 0x00) AM_WRITE(cpu1_bankswitch_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(trigger_nmi_on_sound_cpu2)
 	AM_RANGE(0x04, 0x04) AM_READWRITE(beast_data_r, beast_data_w)
-	AM_RANGE(0x06, 0x06) AM_WRITE_LEGACY(djboy_scrolly_w)
-	AM_RANGE(0x08, 0x08) AM_WRITE_LEGACY(djboy_scrollx_w)
+	AM_RANGE(0x06, 0x06) AM_WRITE(djboy_scrolly_w)
+	AM_RANGE(0x08, 0x08) AM_WRITE(djboy_scrollx_w)
 	AM_RANGE(0x0a, 0x0a) AM_WRITE(trigger_nmi_on_cpu0)
 	AM_RANGE(0x0c, 0x0c) AM_READ(beast_status_r)
 	AM_RANGE(0x0e, 0x0e) AM_WRITE(coin_count_w)

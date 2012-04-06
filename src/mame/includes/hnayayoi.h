@@ -23,6 +23,10 @@ public:
 	DECLARE_READ8_MEMBER(keyboard_0_r);
 	DECLARE_READ8_MEMBER(keyboard_1_r);
 	DECLARE_WRITE8_MEMBER(keyboard_w);
+	DECLARE_WRITE8_MEMBER(dynax_blitter_rev1_param_w);
+	DECLARE_WRITE8_MEMBER(dynax_blitter_rev1_start_w);
+	DECLARE_WRITE8_MEMBER(dynax_blitter_rev1_clear_w);
+	DECLARE_WRITE8_MEMBER(hnayayoi_palbank_w);
 };
 
 
@@ -32,7 +36,3 @@ VIDEO_START( hnayayoi );
 VIDEO_START( untoucha );
 SCREEN_UPDATE_IND16( hnayayoi );
 
-WRITE8_HANDLER( dynax_blitter_rev1_param_w );
-WRITE8_HANDLER( dynax_blitter_rev1_start_w );
-WRITE8_HANDLER( dynax_blitter_rev1_clear_w );
-WRITE8_HANDLER( hnayayoi_palbank_w );

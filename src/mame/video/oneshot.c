@@ -13,11 +13,10 @@ static TILE_GET_INFO( get_oneshot_bg_tile_info )
 	SET_TILE_INFO(0, tileno, 0, 0);
 }
 
-WRITE16_HANDLER( oneshot_bg_videoram_w )
+WRITE16_MEMBER(oneshot_state::oneshot_bg_videoram_w)
 {
-	oneshot_state *state = space->machine().driver_data<oneshot_state>();
-	COMBINE_DATA(&state->m_bg_videoram[offset]);
-	state->m_bg_tilemap->mark_tile_dirty(offset / 2);
+	COMBINE_DATA(&m_bg_videoram[offset]);
+	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
 /* mid tilemap */
@@ -29,11 +28,10 @@ static TILE_GET_INFO( get_oneshot_mid_tile_info )
 	SET_TILE_INFO(0, tileno, 2, 0);
 }
 
-WRITE16_HANDLER( oneshot_mid_videoram_w )
+WRITE16_MEMBER(oneshot_state::oneshot_mid_videoram_w)
 {
-	oneshot_state *state = space->machine().driver_data<oneshot_state>();
-	COMBINE_DATA(&state->m_mid_videoram[offset]);
-	state->m_mid_tilemap->mark_tile_dirty(offset / 2);
+	COMBINE_DATA(&m_mid_videoram[offset]);
+	m_mid_tilemap->mark_tile_dirty(offset / 2);
 }
 
 
@@ -46,11 +44,10 @@ static TILE_GET_INFO( get_oneshot_fg_tile_info )
 	SET_TILE_INFO(0, tileno, 3, 0);
 }
 
-WRITE16_HANDLER( oneshot_fg_videoram_w )
+WRITE16_MEMBER(oneshot_state::oneshot_fg_videoram_w)
 {
-	oneshot_state *state = space->machine().driver_data<oneshot_state>();
-	COMBINE_DATA(&state->m_fg_videoram[offset]);
-	state->m_fg_tilemap->mark_tile_dirty(offset / 2);
+	COMBINE_DATA(&m_fg_videoram[offset]);
+	m_fg_tilemap->mark_tile_dirty(offset / 2);
 }
 
 VIDEO_START( oneshot )

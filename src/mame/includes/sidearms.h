@@ -32,16 +32,16 @@ public:
 	DECLARE_WRITE8_MEMBER(sidearms_bankswitch_w);
 	DECLARE_READ8_MEMBER(turtship_ports_r);
 	DECLARE_WRITE8_MEMBER(whizz_bankswitch_w);
+	DECLARE_WRITE8_MEMBER(sidearms_videoram_w);
+	DECLARE_WRITE8_MEMBER(sidearms_colorram_w);
+	DECLARE_WRITE8_MEMBER(sidearms_c804_w);
+	DECLARE_WRITE8_MEMBER(sidearms_gfxctrl_w);
+	DECLARE_WRITE8_MEMBER(sidearms_star_scrollx_w);
+	DECLARE_WRITE8_MEMBER(sidearms_star_scrolly_w);
 };
 
 /*----------- defined in video/sidearms.c -----------*/
 
-WRITE8_HANDLER( sidearms_videoram_w );
-WRITE8_HANDLER( sidearms_colorram_w );
-WRITE8_HANDLER( sidearms_star_scrollx_w );
-WRITE8_HANDLER( sidearms_star_scrolly_w );
-WRITE8_HANDLER( sidearms_c804_w );
-WRITE8_HANDLER( sidearms_gfxctrl_w );
 
 VIDEO_START( sidearms );
 SCREEN_UPDATE_IND16( sidearms );

@@ -18,6 +18,9 @@ public:
 	device_t *m_audiocpu;
 	DECLARE_WRITE16_MEMBER(mugsmash_reg2_w);
 	DECLARE_READ16_MEMBER(mugsmash_input_ports_r);
+	DECLARE_WRITE16_MEMBER(mugsmash_videoram1_w);
+	DECLARE_WRITE16_MEMBER(mugsmash_videoram2_w);
+	DECLARE_WRITE16_MEMBER(mugsmash_reg_w);
 };
 
 
@@ -26,6 +29,3 @@ public:
 VIDEO_START( mugsmash );
 SCREEN_UPDATE_IND16( mugsmash );
 
-WRITE16_HANDLER( mugsmash_reg_w );
-WRITE16_HANDLER( mugsmash_videoram2_w );
-WRITE16_HANDLER( mugsmash_videoram1_w );

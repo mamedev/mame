@@ -322,7 +322,7 @@ static ADDRESS_MAP_START( io_map, AS_IO, 8, cinemat_state )
 	AM_RANGE(0x17, 0x17) AM_READ(coin_input_r)
 
 	AM_RANGE(0x05, 0x05) AM_WRITE(coin_reset_w)
-	AM_RANGE(0x06, 0x06) AM_WRITE_LEGACY(cinemat_vector_control_w)
+	AM_RANGE(0x06, 0x06) AM_WRITE(cinemat_vector_control_w)
 	AM_RANGE(0x00, 0x07) AM_WRITE_LEGACY(cinemat_sound_control_w)
 ADDRESS_MAP_END
 

@@ -41,19 +41,20 @@ public:
 	int m_last_p1_vert;
 	int m_last_p2_horiz;
 	int m_last_p2_vert;
+	DECLARE_WRITE8_MEMBER(bsktball_nmion_w);
+	DECLARE_WRITE8_MEMBER(bsktball_ld1_w);
+	DECLARE_WRITE8_MEMBER(bsktball_ld2_w);
+	DECLARE_READ8_MEMBER(bsktball_in0_r);
+	DECLARE_WRITE8_MEMBER(bsktball_led1_w);
+	DECLARE_WRITE8_MEMBER(bsktball_led2_w);
+	DECLARE_WRITE8_MEMBER(bsktball_videoram_w);
 };
 
 
 
 /*----------- defined in machine/bsktball.c -----------*/
 
-WRITE8_HANDLER( bsktball_nmion_w );
 TIMER_DEVICE_CALLBACK( bsktball_scanline );
-WRITE8_HANDLER( bsktball_ld1_w );
-WRITE8_HANDLER( bsktball_ld2_w );
-READ8_HANDLER( bsktball_in0_r );
-WRITE8_HANDLER( bsktball_led1_w );
-WRITE8_HANDLER( bsktball_led2_w );
 
 
 /*----------- defined in audio/bsktball.c -----------*/
@@ -68,5 +69,4 @@ DISCRETE_SOUND_EXTERN( bsktball );
 
 VIDEO_START( bsktball );
 SCREEN_UPDATE_IND16( bsktball );
-WRITE8_HANDLER( bsktball_videoram_w );
 

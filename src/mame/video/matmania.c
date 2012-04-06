@@ -72,38 +72,37 @@ PALETTE_INIT( matmania )
 
 
 
-WRITE8_HANDLER( matmania_paletteram_w )
+WRITE8_MEMBER(matmania_state::matmania_paletteram_w)
 {
-	matmania_state *state = space->machine().driver_data<matmania_state>();
 	int bit0, bit1, bit2, bit3, val;
 	int r, g, b;
 	int offs2;
 
-	state->m_paletteram[offset] = data;
+	m_paletteram[offset] = data;
 	offs2 = offset & 0x0f;
 
-	val = state->m_paletteram[offs2];
+	val = m_paletteram[offs2];
 	bit0 = BIT(val, 0);
 	bit1 = BIT(val, 1);
 	bit2 = BIT(val, 2);
 	bit3 = BIT(val, 3);
 	r = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-	val = state->m_paletteram[offs2 | 0x10];
+	val = m_paletteram[offs2 | 0x10];
 	bit0 = BIT(val, 0);
 	bit1 = BIT(val, 1);
 	bit2 = BIT(val, 2);
 	bit3 = BIT(val, 3);
 	g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-	val = state->m_paletteram[offs2 | 0x20];
+	val = m_paletteram[offs2 | 0x20];
 	bit0 = BIT(val, 0);
 	bit1 = BIT(val, 1);
 	bit2 = BIT(val, 2);
 	bit3 = BIT(val, 3);
 	b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-	palette_set_color(space->machine(),offs2 + 64,MAKE_RGB(r,g,b));
+	palette_set_color(machine(),offs2 + 64,MAKE_RGB(r,g,b));
 }
 
 

@@ -65,39 +65,35 @@ VIDEO_START( gng )
 
 ***************************************************************************/
 
-WRITE8_HANDLER( gng_fgvideoram_w )
+WRITE8_MEMBER(gng_state::gng_fgvideoram_w)
 {
-	gng_state *state = space->machine().driver_data<gng_state>();
-	state->m_fgvideoram[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
+	m_fgvideoram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_HANDLER( gng_bgvideoram_w )
+WRITE8_MEMBER(gng_state::gng_bgvideoram_w)
 {
-	gng_state *state = space->machine().driver_data<gng_state>();
-	state->m_bgvideoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
-}
-
-
-WRITE8_HANDLER( gng_bgscrollx_w )
-{
-	gng_state *state = space->machine().driver_data<gng_state>();
-	state->m_scrollx[offset] = data;
-	state->m_bg_tilemap->set_scrollx(0, state->m_scrollx[0] + 256 * state->m_scrollx[1]);
-}
-
-WRITE8_HANDLER( gng_bgscrolly_w )
-{
-	gng_state *state = space->machine().driver_data<gng_state>();
-	state->m_scrolly[offset] = data;
-	state->m_bg_tilemap->set_scrolly(0, state->m_scrolly[0] + 256 * state->m_scrolly[1]);
+	m_bgvideoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
 
-WRITE8_HANDLER( gng_flipscreen_w )
+WRITE8_MEMBER(gng_state::gng_bgscrollx_w)
 {
-	flip_screen_set(space->machine(), ~data & 1);
+	m_scrollx[offset] = data;
+	m_bg_tilemap->set_scrollx(0, m_scrollx[0] + 256 * m_scrollx[1]);
+}
+
+WRITE8_MEMBER(gng_state::gng_bgscrolly_w)
+{
+	m_scrolly[offset] = data;
+	m_bg_tilemap->set_scrolly(0, m_scrolly[0] + 256 * m_scrolly[1]);
+}
+
+
+WRITE8_MEMBER(gng_state::gng_flipscreen_w)
+{
+	flip_screen_set(machine(), ~data & 1);
 }
 
 

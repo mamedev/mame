@@ -88,9 +88,9 @@ WRITE8_MEMBER(tbowl_state::tbowl_sound_command_w)
 static ADDRESS_MAP_START( 6206B_map, AS_PROGRAM, 8, tbowl_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
-	AM_RANGE(0xa000, 0xbfff) AM_RAM_WRITE_LEGACY(tbowl_bg2videoram_w) AM_BASE(m_bg2videoram)
-	AM_RANGE(0xc000, 0xdfff) AM_RAM_WRITE_LEGACY(tbowl_bgvideoram_w) AM_BASE(m_bgvideoram)
-	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE_LEGACY(tbowl_txvideoram_w) AM_BASE(m_txvideoram)
+	AM_RANGE(0xa000, 0xbfff) AM_RAM_WRITE(tbowl_bg2videoram_w) AM_BASE(m_bg2videoram)
+	AM_RANGE(0xc000, 0xdfff) AM_RAM_WRITE(tbowl_bgvideoram_w) AM_BASE(m_bgvideoram)
+	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(tbowl_txvideoram_w) AM_BASE(m_txvideoram)
 //  AM_RANGE(0xf000, 0xf000) AM_WRITE_LEGACY(unknown_write) * written during start-up, not again */
 	AM_RANGE(0xf000, 0xf7ff) AM_ROMBANK("bank1")
 	AM_RANGE(0xf800, 0xfbff) AM_READWRITE(shared_r, shared_w) AM_BASE(m_shared_ram) /* check */
@@ -109,14 +109,14 @@ static ADDRESS_MAP_START( 6206B_map, AS_PROGRAM, 8, tbowl_state )
 	AM_RANGE(0xfc0a, 0xfc0a) AM_READ_PORT("DSW3")
 //  AM_RANGE(0xfc0a, 0xfc0a) AM_WRITE_LEGACY(unknown_write) /* hardly used .. */
 	AM_RANGE(0xfc0d, 0xfc0d) AM_WRITE(tbowl_sound_command_w) /* not sure, used quite a bit */
-	AM_RANGE(0xfc10, 0xfc10) AM_WRITE_LEGACY(tbowl_bg2xscroll_lo)
-	AM_RANGE(0xfc11, 0xfc11) AM_WRITE_LEGACY(tbowl_bg2xscroll_hi)
-	AM_RANGE(0xfc12, 0xfc12) AM_WRITE_LEGACY(tbowl_bg2yscroll_lo)
-	AM_RANGE(0xfc13, 0xfc13) AM_WRITE_LEGACY(tbowl_bg2yscroll_hi)
-	AM_RANGE(0xfc14, 0xfc14) AM_WRITE_LEGACY(tbowl_bgxscroll_lo)
-	AM_RANGE(0xfc15, 0xfc15) AM_WRITE_LEGACY(tbowl_bgxscroll_hi)
-	AM_RANGE(0xfc16, 0xfc16) AM_WRITE_LEGACY(tbowl_bgyscroll_lo)
-	AM_RANGE(0xfc17, 0xfc17) AM_WRITE_LEGACY(tbowl_bgyscroll_hi)
+	AM_RANGE(0xfc10, 0xfc10) AM_WRITE(tbowl_bg2xscroll_lo)
+	AM_RANGE(0xfc11, 0xfc11) AM_WRITE(tbowl_bg2xscroll_hi)
+	AM_RANGE(0xfc12, 0xfc12) AM_WRITE(tbowl_bg2yscroll_lo)
+	AM_RANGE(0xfc13, 0xfc13) AM_WRITE(tbowl_bg2yscroll_hi)
+	AM_RANGE(0xfc14, 0xfc14) AM_WRITE(tbowl_bgxscroll_lo)
+	AM_RANGE(0xfc15, 0xfc15) AM_WRITE(tbowl_bgxscroll_hi)
+	AM_RANGE(0xfc16, 0xfc16) AM_WRITE(tbowl_bgyscroll_lo)
+	AM_RANGE(0xfc17, 0xfc17) AM_WRITE(tbowl_bgyscroll_hi)
 ADDRESS_MAP_END
 
 /* Board C */

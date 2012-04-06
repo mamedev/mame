@@ -23,6 +23,8 @@ public:
 	int m_flipscreen;
 	DECLARE_WRITE16_MEMBER(darkseal_control_w);
 	DECLARE_READ16_MEMBER(darkseal_control_r);
+	DECLARE_WRITE16_MEMBER(darkseal_palette_24bit_rg_w);
+	DECLARE_WRITE16_MEMBER(darkseal_palette_24bit_b_w);
 };
 
 
@@ -31,5 +33,3 @@ public:
 VIDEO_START( darkseal );
 SCREEN_UPDATE_IND16( darkseal );
 
-WRITE16_HANDLER( darkseal_palette_24bit_rg_w );
-WRITE16_HANDLER( darkseal_palette_24bit_b_w );

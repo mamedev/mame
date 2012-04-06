@@ -126,12 +126,11 @@ static TILE_GET_INFO( get_tile_info )
  *
  *************************************/
 
-WRITE8_HANDLER( m57_videoram_w )
+WRITE8_MEMBER(m57_state::m57_videoram_w)
 {
-	m57_state *state = space->machine().driver_data<m57_state>();
 
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset / 2);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
 
@@ -158,16 +157,15 @@ VIDEO_START( m57 )
  *
  *************************************/
 
-WRITE8_HANDLER( m57_flipscreen_w )
+WRITE8_MEMBER(m57_state::m57_flipscreen_w)
 {
-	m57_state *state = space->machine().driver_data<m57_state>();
 
 	/* screen flip is handled both by software and hardware */
-	state->m_flipscreen = (data & 0x01) ^ (~input_port_read(space->machine(), "DSW2") & 0x01);
-	state->m_bg_tilemap->set_flip(state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	m_flipscreen = (data & 0x01) ^ (~input_port_read(machine(), "DSW2") & 0x01);
+	m_bg_tilemap->set_flip(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
-	coin_counter_w(space->machine(), 0,data & 0x02);
-	coin_counter_w(space->machine(), 1,data & 0x20);
+	coin_counter_w(machine(), 0,data & 0x02);
+	coin_counter_w(machine(), 1,data & 0x20);
 }
 
 

@@ -252,7 +252,7 @@ static ADDRESS_MAP_START( darius_map, AS_PROGRAM, 16, darius_state )
 	AM_RANGE(0xd80000, 0xd80fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")/* palette */
 	AM_RANGE(0xe00100, 0xe00fff) AM_RAM AM_SHARE("share1") AM_BASE_SIZE(m_spriteram, m_spriteram_size)
 	AM_RANGE(0xe01000, 0xe02fff) AM_RAM AM_SHARE("share2")
-	AM_RANGE(0xe08000, 0xe0ffff) AM_RAM_WRITE_LEGACY(darius_fg_layer_w) AM_SHARE("share3") AM_BASE(m_fg_ram)
+	AM_RANGE(0xe08000, 0xe0ffff) AM_RAM_WRITE(darius_fg_layer_w) AM_SHARE("share3") AM_BASE(m_fg_ram)
 	AM_RANGE(0xe10000, 0xe10fff) AM_RAM												/* ??? */
 ADDRESS_MAP_END
 
@@ -263,7 +263,7 @@ static ADDRESS_MAP_START( darius_cpub_map, AS_PROGRAM, 16, darius_state )
 	AM_RANGE(0xd80000, 0xd80fff) AM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w)
 	AM_RANGE(0xe00100, 0xe00fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xe01000, 0xe02fff) AM_RAM AM_SHARE("share2")
-	AM_RANGE(0xe08000, 0xe0ffff) AM_RAM_WRITE_LEGACY(darius_fg_layer_w) AM_SHARE("share3")
+	AM_RANGE(0xe08000, 0xe0ffff) AM_RAM_WRITE(darius_fg_layer_w) AM_SHARE("share3")
 ADDRESS_MAP_END
 
 

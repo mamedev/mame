@@ -20,6 +20,11 @@ public:
 	tilemap_t *m_bg_tilemap;
 	UINT8 m_survival_input_latches[2];
 	UINT8 m_survival_input_readc;
+	DECLARE_WRITE8_MEMBER(phoenix_videoram_w);
+	DECLARE_WRITE8_MEMBER(phoenix_videoreg_w);
+	DECLARE_WRITE8_MEMBER(pleiads_videoreg_w);
+	DECLARE_WRITE8_MEMBER(phoenix_scroll_w);
+	DECLARE_READ8_MEMBER(survival_input_port_0_r);
 };
 
 
@@ -54,14 +59,9 @@ PALETTE_INIT( pleiads );
 VIDEO_START( phoenix );
 SCREEN_UPDATE_IND16( phoenix );
 
-WRITE8_HANDLER( phoenix_videoram_w );
-WRITE8_HANDLER( phoenix_videoreg_w );
-WRITE8_HANDLER( pleiads_videoreg_w );
-WRITE8_HANDLER( phoenix_scroll_w );
 
 CUSTOM_INPUT( player_input_r );
 CUSTOM_INPUT( pleiads_protection_r );
-READ8_HANDLER( survival_input_port_0_r );
 READ8_DEVICE_HANDLER( survival_protection_r );
 
 READ_LINE_DEVICE_HANDLER( survival_sid_callback );

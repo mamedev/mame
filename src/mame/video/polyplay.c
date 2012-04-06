@@ -29,14 +29,13 @@ PALETTE_INIT( polyplay )
 }
 
 
-WRITE8_HANDLER( polyplay_characterram_w )
+WRITE8_MEMBER(polyplay_state::polyplay_characterram_w)
 {
-	polyplay_state *state = space->machine().driver_data<polyplay_state>();
-	if (state->m_characterram[offset] != data)
+	if (m_characterram[offset] != data)
 	{
-		gfx_element_mark_dirty(space->machine().gfx[1], (offset >> 3) & 0x7f);
+		gfx_element_mark_dirty(machine().gfx[1], (offset >> 3) & 0x7f);
 
-		state->m_characterram[offset] = data;
+		m_characterram[offset] = data;
 	}
 }
 

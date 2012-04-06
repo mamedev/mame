@@ -49,26 +49,23 @@ VIDEO_START( vb )
 	state->m_vb_spprombank=0xff;
 }
 
-WRITE8_HANDLER( vb_videoram_w )
+WRITE8_MEMBER(vball_state::vb_videoram_w)
 {
-	vball_state *state = space->machine().driver_data<vball_state>();
-	state->m_vb_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_vb_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 #ifdef UNUSED_FUNCTION
-READ8_HANDLER( vb_attrib_r )
+READ8_MEMBER(vball_state::vb_attrib_r)
 {
-	vball_state *state = space->machine().driver_data<vball_state>();
-	return state->m_vb_attribram[offset];
+	return m_vb_attribram[offset];
 }
 #endif
 
-WRITE8_HANDLER( vb_attrib_w )
+WRITE8_MEMBER(vball_state::vb_attrib_w)
 {
-	vball_state *state = space->machine().driver_data<vball_state>();
-	state->m_vb_attribram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_vb_attribram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 void vb_bgprombank_w( running_machine &machine, int bank )

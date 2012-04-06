@@ -395,38 +395,33 @@ VIDEO_RESET( tubep )
 }
 
 
-WRITE8_HANDLER( tubep_textram_w )
+WRITE8_MEMBER(tubep_state::tubep_textram_w)
 {
-	tubep_state *state = space->machine().driver_data<tubep_state>();
-	state->m_textram[offset] = data;
+	m_textram[offset] = data;
 }
 
 
-WRITE8_HANDLER( tubep_background_romselect_w )
+WRITE8_MEMBER(tubep_state::tubep_background_romselect_w)
 {
-	tubep_state *state = space->machine().driver_data<tubep_state>();
-	state->m_background_romsel = data & 1;
+	m_background_romsel = data & 1;
 }
 
 
-WRITE8_HANDLER( tubep_colorproms_A4_line_w )
+WRITE8_MEMBER(tubep_state::tubep_colorproms_A4_line_w)
 {
-	tubep_state *state = space->machine().driver_data<tubep_state>();
-	state->m_color_A4 = (data & 1)<<4;
+	m_color_A4 = (data & 1)<<4;
 }
 
 
-WRITE8_HANDLER( tubep_background_a000_w )
+WRITE8_MEMBER(tubep_state::tubep_background_a000_w)
 {
-	tubep_state *state = space->machine().driver_data<tubep_state>();
-	state->m_ls175_b7 = ((data & 0x0f) ^ 0x0f) | 0xf0;
+	m_ls175_b7 = ((data & 0x0f) ^ 0x0f) | 0xf0;
 }
 
 
-WRITE8_HANDLER( tubep_background_c000_w )
+WRITE8_MEMBER(tubep_state::tubep_background_c000_w)
 {
-	tubep_state *state = space->machine().driver_data<tubep_state>();
-	state->m_ls175_e8 = ((data & 0x0f) ^ 0x0f);
+	m_ls175_e8 = ((data & 0x0f) ^ 0x0f);
 }
 
 
@@ -506,70 +501,69 @@ static void draw_sprite(running_machine &machine)
 }
 
 
-WRITE8_HANDLER( tubep_sprite_control_w )
+WRITE8_MEMBER(tubep_state::tubep_sprite_control_w)
 {
-	tubep_state *state = space->machine().driver_data<tubep_state>();
 	if (offset < 10)
 	{
 		/*graph_ctrl[offset] = data;*/
 		switch(offset)
 		{
 		case 0:	/*a*/
-			state->m_romEF_addr = (0x010 | (data & 0x0f))<<7; /*roms @F13, @E13 have A11 lines connected to +5V directly */
-			state->m_HINV = (data & 0x10) ? 0xff: 0x00;
-			state->m_VINV = (data & 0x20) ? 0xff: 0x00;
+			m_romEF_addr = (0x010 | (data & 0x0f))<<7; /*roms @F13, @E13 have A11 lines connected to +5V directly */
+			m_HINV = (data & 0x10) ? 0xff: 0x00;
+			m_VINV = (data & 0x20) ? 0xff: 0x00;
 			break;
 
 		case 1:	/*b: XSize-1 */
-			state->m_XSize = data & 0x7f;
-			state->m_mark_2 = (data&0x80)<<1;
+			m_XSize = data & 0x7f;
+			m_mark_2 = (data&0x80)<<1;
 			break;
 
 		case 2:	/*c: YSize-1 */
-			state->m_YSize = data & 0x7f;
-			state->m_mark_1 = (data&0x80)<<1;
+			m_YSize = data & 0x7f;
+			m_mark_1 = (data&0x80)<<1;
 			break;
 
 		case 3:	/*d*/
-			state->m_ls273_g6 = (data & 0xff);
+			m_ls273_g6 = (data & 0xff);
 			break;
 
 		case 4:	/*e*/
-			state->m_ls273_j6 = (data & 0xff);
+			m_ls273_j6 = (data & 0xff);
 			break;
 
 		case 5:	/*f*/
-			state->m_romHI_addr_mid = (data & 0x0f)<<7;
-			state->m_romHI_addr_msb = (data & 0x30)<<7;
+			m_romHI_addr_mid = (data & 0x0f)<<7;
+			m_romHI_addr_msb = (data & 0x30)<<7;
 			break;
 
 		case 6:	/*g*/
-			state->m_romD_addr = (data & 0x3f)<<7;
+			m_romD_addr = (data & 0x3f)<<7;
 			break;
 
 		case 7:	/*h: adder input LSB*/
-			state->m_E16_add_b = ((data & 0xff) << 0) | (state->m_E16_add_b & 0xff00);
+			m_E16_add_b = ((data & 0xff) << 0) | (m_E16_add_b & 0xff00);
 			break;
 
 		case 8:	/*J: adder input MSB*/
-			state->m_E16_add_b = ((data & 0xff) << 8) | (state->m_E16_add_b & 0x00ff);
+			m_E16_add_b = ((data & 0xff) << 8) | (m_E16_add_b & 0x00ff);
 			break;
 
 		case 9:	/*K*/
 			/*write to: LS174 @J3 to set color bank (hi address lines to 2114 colorram @J1 ) */
-			state->m_colorram_addr_hi = (data & 0x3f) << 4;
+			m_colorram_addr_hi = (data & 0x3f) << 4;
 
 			/*write to: LS74 @D13 to clear the interrupt line /SINT
-            /SINT line will be reasserted in state->m_XSize * state->m_YSize cycles (RH0 signal cycles)
+            /SINT line will be reasserted in m_XSize * m_YSize cycles (RH0 signal cycles)
             */
 			/* 1.clear the /SINT interrupt line */
-			cputag_set_input_line(space->machine(), "mcu", 0, CLEAR_LINE);
+			cputag_set_input_line(machine(), "mcu", 0, CLEAR_LINE);
 
 			/* 2.assert /SINT again after this time */
-			space->machine().scheduler().timer_set( attotime::from_hz(19968000/8) * ((state->m_XSize+1)*(state->m_YSize+1)), FUNC(sprite_timer_callback));
+			machine().scheduler().timer_set( attotime::from_hz(19968000/8) * ((m_XSize+1)*(m_YSize+1)), FUNC(sprite_timer_callback));
 
 			/* 3.clear of /SINT starts sprite drawing circuit */
-			draw_sprite(space->machine());
+			draw_sprite(machine());
 			break;
 		}
 	}
@@ -729,17 +723,15 @@ PALETTE_INIT( rjammer )
 }
 
 
-WRITE8_HANDLER( rjammer_background_LS377_w )
+WRITE8_MEMBER(tubep_state::rjammer_background_LS377_w)
 {
-	tubep_state *state = space->machine().driver_data<tubep_state>();
-	state->m_ls377_data = data & 0xff;
+	m_ls377_data = data & 0xff;
 }
 
 
-WRITE8_HANDLER( rjammer_background_page_w )
+WRITE8_MEMBER(tubep_state::rjammer_background_page_w)
 {
-	tubep_state *state = space->machine().driver_data<tubep_state>();
-	state->m_page = (data & 1) * 0x200;
+	m_page = (data & 1) * 0x200;
 }
 
 

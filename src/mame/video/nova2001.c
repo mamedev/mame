@@ -47,23 +47,22 @@ PALETTE_INIT( nova2001 )
 	}
 }
 
-WRITE8_HANDLER( ninjakun_paletteram_w )
+WRITE8_MEMBER(nova2001_state::ninjakun_paletteram_w)
 {
 	int i;
 
-	nova2001_state *state = space->machine().driver_data<nova2001_state>();
-	state->paletteram_BBGGRRII_w(*space,offset,data);
+	paletteram_BBGGRRII_w(space,offset,data);
 
 	// expand the sprite palette to full length
 	if (offset < 16)
 	{
-		state->paletteram_BBGGRRII_w(*space, 0x200 + offset * 16 + 1, data);
+		paletteram_BBGGRRII_w(space, 0x200 + offset * 16 + 1, data);
 
 		if (offset != 1)
 		{
 			for (i = 0; i < 16; i++)
 			{
-				state->paletteram_BBGGRRII_w(*space, 0x200 + offset + i * 16, data);
+				paletteram_BBGGRRII_w(space, 0x200 + offset + i * 16, data);
 			}
 		}
 	}
@@ -201,66 +200,60 @@ VIDEO_START( raiders5 )
  *
  *************************************/
 
-WRITE8_HANDLER( nova2001_fg_videoram_w )
+WRITE8_MEMBER(nova2001_state::nova2001_fg_videoram_w)
 {
-	nova2001_state *state = space->machine().driver_data<nova2001_state>();
-	state->m_fg_videoram[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
+	m_fg_videoram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_HANDLER( nova2001_bg_videoram_w )
+WRITE8_MEMBER(nova2001_state::nova2001_bg_videoram_w)
 {
-	nova2001_state *state = space->machine().driver_data<nova2001_state>();
-	state->m_bg_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
+	m_bg_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_HANDLER( ninjakun_bg_videoram_w )
+WRITE8_MEMBER(nova2001_state::ninjakun_bg_videoram_w)
 {
-	nova2001_state *state = space->machine().driver_data<nova2001_state>();
-	int x = state->m_bg_tilemap->scrollx(0) >> 3;
-	int y = state->m_bg_tilemap->scrolly(0) >> 3;
+	int x = m_bg_tilemap->scrollx(0) >> 3;
+	int y = m_bg_tilemap->scrolly(0) >> 3;
 
 	// add scroll registers to address
 	offset = ((offset + x + (y << 5)) & 0x3ff) + (offset & 0x400);
 
-	state->m_bg_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
+	m_bg_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-READ8_HANDLER( ninjakun_bg_videoram_r )
+READ8_MEMBER(nova2001_state::ninjakun_bg_videoram_r)
 {
-	nova2001_state *state = space->machine().driver_data<nova2001_state>();
-	int x = state->m_bg_tilemap->scrollx(0) >> 3;
-	int y = state->m_bg_tilemap->scrolly(0) >> 3;
+	int x = m_bg_tilemap->scrollx(0) >> 3;
+	int y = m_bg_tilemap->scrolly(0) >> 3;
 
 	// add scroll registers to address
 	offset = ((offset + x + (y << 5)) & 0x3ff) + (offset & 0x400);
 
-	return state->m_bg_videoram[offset];
+	return m_bg_videoram[offset];
 }
 
-WRITE8_HANDLER( nova2001_scroll_x_w )
+WRITE8_MEMBER(nova2001_state::nova2001_scroll_x_w)
 {
-	nova2001_state *state = space->machine().driver_data<nova2001_state>();
-	state->m_bg_tilemap->set_scrollx(0, data);
+	m_bg_tilemap->set_scrollx(0, data);
 }
 
-WRITE8_HANDLER( nova2001_scroll_y_w )
+WRITE8_MEMBER(nova2001_state::nova2001_scroll_y_w)
 {
-	nova2001_state *state = space->machine().driver_data<nova2001_state>();
-	state->m_bg_tilemap->set_scrolly(0, data);
+	m_bg_tilemap->set_scrolly(0, data);
 }
 
-WRITE8_HANDLER( nova2001_flipscreen_w )
+WRITE8_MEMBER(nova2001_state::nova2001_flipscreen_w)
 {
 	// inverted
-	flip_screen_set(space->machine(), ~data & 1);
+	flip_screen_set(machine(), ~data & 1);
 }
 
-WRITE8_HANDLER( pkunwar_flipscreen_w )
+WRITE8_MEMBER(nova2001_state::pkunwar_flipscreen_w)
 {
-	flip_screen_set(space->machine(), data & 1);
+	flip_screen_set(machine(), data & 1);
 }
 
 

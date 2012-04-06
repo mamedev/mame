@@ -77,35 +77,31 @@ PALETTE_INIT( gberet )
 	}
 }
 
-WRITE8_HANDLER( gberet_videoram_w )
+WRITE8_MEMBER(gberet_state::gberet_videoram_w)
 {
-	gberet_state *state = space->machine().driver_data<gberet_state>();
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( gberet_colorram_w )
+WRITE8_MEMBER(gberet_state::gberet_colorram_w)
 {
-	gberet_state *state = space->machine().driver_data<gberet_state>();
-	state->m_colorram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_colorram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( gberet_scroll_w )
+WRITE8_MEMBER(gberet_state::gberet_scroll_w)
 {
-	gberet_state *state = space->machine().driver_data<gberet_state>();
 	int scroll;
 
-	state->m_scrollram[offset] = data;
+	m_scrollram[offset] = data;
 
-	scroll = state->m_scrollram[offset & 0x1f] | (state->m_scrollram[offset | 0x20] << 8);
-	state->m_bg_tilemap->set_scrollx(offset & 0x1f, scroll);
+	scroll = m_scrollram[offset & 0x1f] | (m_scrollram[offset | 0x20] << 8);
+	m_bg_tilemap->set_scrollx(offset & 0x1f, scroll);
 }
 
-WRITE8_HANDLER( gberet_sprite_bank_w )
+WRITE8_MEMBER(gberet_state::gberet_sprite_bank_w)
 {
-	gberet_state *state = space->machine().driver_data<gberet_state>();
-	state->m_spritebank = data;
+	m_spritebank = data;
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
@@ -180,16 +176,15 @@ SCREEN_UPDATE_IND16( gberet )
 
 /* Green Beret (bootleg) */
 
-WRITE8_HANDLER( gberetb_scroll_w )
+WRITE8_MEMBER(gberet_state::gberetb_scroll_w)
 {
-	gberet_state *state = space->machine().driver_data<gberet_state>();
 	int scroll = data;
 
 	if (offset)
 		scroll |= 0x100;
 
 	for (offset = 6; offset < 29; offset++)
-		state->m_bg_tilemap->set_scrollx(offset, scroll + 64 - 8);
+		m_bg_tilemap->set_scrollx(offset, scroll + 64 - 8);
 }
 
 static void gberetb_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )

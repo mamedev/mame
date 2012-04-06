@@ -95,29 +95,26 @@ static TILE_GET_INFO( get_tile_info_1_16x16 )
 			0);
 }
 
-WRITE16_HANDLER( esd16_vram_0_w )
+WRITE16_MEMBER(esd16_state::esd16_vram_0_w)
 {
-	esd16_state *state = space->machine().driver_data<esd16_state>();
-	COMBINE_DATA(&state->m_vram_0[offset]);
-	state->m_tilemap_0->mark_tile_dirty(offset);
-	state->m_tilemap_0_16x16->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_vram_0[offset]);
+	m_tilemap_0->mark_tile_dirty(offset);
+	m_tilemap_0_16x16->mark_tile_dirty(offset);
 }
 
-WRITE16_HANDLER( esd16_vram_1_w )
+WRITE16_MEMBER(esd16_state::esd16_vram_1_w)
 {
-	esd16_state *state = space->machine().driver_data<esd16_state>();
-	COMBINE_DATA(&state->m_vram_1[offset]);
-	state->m_tilemap_1->mark_tile_dirty(offset);
-	state->m_tilemap_1_16x16->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_vram_1[offset]);
+	m_tilemap_1->mark_tile_dirty(offset);
+	m_tilemap_1_16x16->mark_tile_dirty(offset);
 }
 
-WRITE16_HANDLER( esd16_tilemap0_color_w )
+WRITE16_MEMBER(esd16_state::esd16_tilemap0_color_w)
 {
-	esd16_state *state = space->machine().driver_data<esd16_state>();
-	state->m_tilemap0_color = data & 3;
-	state->m_tilemap_0->mark_all_dirty();
+	m_tilemap0_color = data & 3;
+	m_tilemap_0->mark_all_dirty();
 
-	flip_screen_set(space->machine(), data & 0x80);
+	flip_screen_set(machine(), data & 0x80);
 }
 
 

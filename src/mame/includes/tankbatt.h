@@ -22,12 +22,12 @@ public:
 	DECLARE_WRITE8_MEMBER(tankbatt_irq_ack_w);
 	DECLARE_WRITE8_MEMBER(tankbatt_coin_counter_w);
 	DECLARE_WRITE8_MEMBER(tankbatt_coin_lockout_w);
+	DECLARE_WRITE8_MEMBER(tankbatt_videoram_w);
 };
 
 
 /*----------- defined in video/tankbatt.c -----------*/
 
-WRITE8_HANDLER( tankbatt_videoram_w );
 
 PALETTE_INIT( tankbatt );
 VIDEO_START( tankbatt );

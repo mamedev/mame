@@ -10,24 +10,21 @@
 ***************************************************************************/
 
 
-READ8_HANDLER( retofinv_68705_portA_r )
+READ8_MEMBER(retofinv_state::retofinv_68705_portA_r)
 {
-	retofinv_state *state = space->machine().driver_data<retofinv_state>();
-//logerror("%04x: 68705 port A read %02x\n",cpu_get_pc(&space->device()),state->m_portA_in);
-	return (state->m_portA_out & state->m_ddrA) | (state->m_portA_in & ~state->m_ddrA);
+//logerror("%04x: 68705 port A read %02x\n",cpu_get_pc(&space.device()),m_portA_in);
+	return (m_portA_out & m_ddrA) | (m_portA_in & ~m_ddrA);
 }
 
-WRITE8_HANDLER( retofinv_68705_portA_w )
+WRITE8_MEMBER(retofinv_state::retofinv_68705_portA_w)
 {
-	retofinv_state *state = space->machine().driver_data<retofinv_state>();
-//logerror("%04x: 68705 port A write %02x\n",cpu_get_pc(&space->device()),data);
-	state->m_portA_out = data;
+//logerror("%04x: 68705 port A write %02x\n",cpu_get_pc(&space.device()),data);
+	m_portA_out = data;
 }
 
-WRITE8_HANDLER( retofinv_68705_ddrA_w )
+WRITE8_MEMBER(retofinv_state::retofinv_68705_ddrA_w)
 {
-	retofinv_state *state = space->machine().driver_data<retofinv_state>();
-	state->m_ddrA = data;
+	m_ddrA = data;
 }
 
 
@@ -42,38 +39,35 @@ WRITE8_HANDLER( retofinv_68705_ddrA_w )
  */
 
 
-READ8_HANDLER( retofinv_68705_portB_r )
+READ8_MEMBER(retofinv_state::retofinv_68705_portB_r)
 {
-	retofinv_state *state = space->machine().driver_data<retofinv_state>();
-	return (state->m_portB_out & state->m_ddrB) | (state->m_portB_in & ~state->m_ddrB);
+	return (m_portB_out & m_ddrB) | (m_portB_in & ~m_ddrB);
 }
 
-WRITE8_HANDLER( retofinv_68705_portB_w )
+WRITE8_MEMBER(retofinv_state::retofinv_68705_portB_w)
 {
-	retofinv_state *state = space->machine().driver_data<retofinv_state>();
-//logerror("%04x: 68705 port B write %02x\n",cpu_get_pc(&space->device()),data);
+//logerror("%04x: 68705 port B write %02x\n",cpu_get_pc(&space.device()),data);
 
-	if ((state->m_ddrB & 0x02) && (~data & 0x02) && (state->m_portB_out & 0x02))
+	if ((m_ddrB & 0x02) && (~data & 0x02) && (m_portB_out & 0x02))
 	{
-		state->m_portA_in = state->m_from_main;
-		if (state->m_main_sent) cputag_set_input_line(space->machine(), "68705", 0, CLEAR_LINE);
-		state->m_main_sent = 0;
-//logerror("read command %02x from main cpu\n",state->m_portA_in);
+		m_portA_in = m_from_main;
+		if (m_main_sent) cputag_set_input_line(machine(), "68705", 0, CLEAR_LINE);
+		m_main_sent = 0;
+//logerror("read command %02x from main cpu\n",m_portA_in);
 	}
-	if ((state->m_ddrB & 0x04) && (data & 0x04) && (~state->m_portB_out & 0x04))
+	if ((m_ddrB & 0x04) && (data & 0x04) && (~m_portB_out & 0x04))
 	{
-//logerror("send command %02x to main cpu\n",state->m_portA_out);
-		state->m_from_mcu = state->m_portA_out;
-		state->m_mcu_sent = 1;
+//logerror("send command %02x to main cpu\n",m_portA_out);
+		m_from_mcu = m_portA_out;
+		m_mcu_sent = 1;
 	}
 
-	state->m_portB_out = data;
+	m_portB_out = data;
 }
 
-WRITE8_HANDLER( retofinv_68705_ddrB_w )
+WRITE8_MEMBER(retofinv_state::retofinv_68705_ddrB_w)
 {
-	retofinv_state *state = space->machine().driver_data<retofinv_state>();
-	state->m_ddrB = data;
+	m_ddrB = data;
 }
 
 
@@ -87,57 +81,51 @@ WRITE8_HANDLER( retofinv_68705_ddrB_w )
  */
 
 
-READ8_HANDLER( retofinv_68705_portC_r )
+READ8_MEMBER(retofinv_state::retofinv_68705_portC_r)
 {
-	retofinv_state *state = space->machine().driver_data<retofinv_state>();
-	state->m_portC_in = 0;
-	if (state->m_main_sent) state->m_portC_in |= 0x01;
-	if (!state->m_mcu_sent) state->m_portC_in |= 0x02;
-//logerror("%04x: 68705 port C read %02x\n",cpu_get_pc(&space->device()),state->m_portC_in);
-	return (state->m_portC_out & state->m_ddrC) | (state->m_portC_in & ~state->m_ddrC);
+	m_portC_in = 0;
+	if (m_main_sent) m_portC_in |= 0x01;
+	if (!m_mcu_sent) m_portC_in |= 0x02;
+//logerror("%04x: 68705 port C read %02x\n",cpu_get_pc(&space.device()),m_portC_in);
+	return (m_portC_out & m_ddrC) | (m_portC_in & ~m_ddrC);
 }
 
-WRITE8_HANDLER( retofinv_68705_portC_w )
+WRITE8_MEMBER(retofinv_state::retofinv_68705_portC_w)
 {
-	retofinv_state *state = space->machine().driver_data<retofinv_state>();
-logerror("%04x: 68705 port C write %02x\n",cpu_get_pc(&space->device()),data);
-	state->m_portC_out = data;
+logerror("%04x: 68705 port C write %02x\n",cpu_get_pc(&space.device()),data);
+	m_portC_out = data;
 }
 
-WRITE8_HANDLER( retofinv_68705_ddrC_w )
+WRITE8_MEMBER(retofinv_state::retofinv_68705_ddrC_w)
 {
-	retofinv_state *state = space->machine().driver_data<retofinv_state>();
-	state->m_ddrC = data;
+	m_ddrC = data;
 }
 
 
-WRITE8_HANDLER( retofinv_mcu_w )
+WRITE8_MEMBER(retofinv_state::retofinv_mcu_w)
 {
-	retofinv_state *state = space->machine().driver_data<retofinv_state>();
-logerror("%04x: mcu_w %02x\n",cpu_get_pc(&space->device()),data);
-	state->m_from_main = data;
-	state->m_main_sent = 1;
-	cputag_set_input_line(space->machine(), "68705", 0, ASSERT_LINE);
+logerror("%04x: mcu_w %02x\n",cpu_get_pc(&space.device()),data);
+	m_from_main = data;
+	m_main_sent = 1;
+	cputag_set_input_line(machine(), "68705", 0, ASSERT_LINE);
 }
 
-READ8_HANDLER( retofinv_mcu_r )
+READ8_MEMBER(retofinv_state::retofinv_mcu_r)
 {
-	retofinv_state *state = space->machine().driver_data<retofinv_state>();
-logerror("%04x: mcu_r %02x\n",cpu_get_pc(&space->device()),state->m_from_mcu);
-	state->m_mcu_sent = 0;
-	return state->m_from_mcu;
+logerror("%04x: mcu_r %02x\n",cpu_get_pc(&space.device()),m_from_mcu);
+	m_mcu_sent = 0;
+	return m_from_mcu;
 }
 
-READ8_HANDLER( retofinv_mcu_status_r )
+READ8_MEMBER(retofinv_state::retofinv_mcu_status_r)
 {
-	retofinv_state *state = space->machine().driver_data<retofinv_state>();
 	int res = 0;
 
 	/* bit 4 = when 1, mcu is ready to receive data from main cpu */
 	/* bit 5 = when 1, mcu has sent data to the main cpu */
-//logerror("%04x: mcu_status_r\n",cpu_get_pc(&space->device()));
-	if (!state->m_main_sent) res |= 0x10;
-	if (state->m_mcu_sent) res |= 0x20;
+//logerror("%04x: mcu_status_r\n",cpu_get_pc(&space.device()));
+	if (!m_main_sent) res |= 0x10;
+	if (m_mcu_sent) res |= 0x20;
 
 	return res;
 }

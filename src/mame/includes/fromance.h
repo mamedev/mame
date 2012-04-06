@@ -61,6 +61,14 @@ public:
 	DECLARE_WRITE8_MEMBER(fromance_portselect_w);
 	DECLARE_READ8_MEMBER(fromance_keymatrix_r);
 	DECLARE_WRITE8_MEMBER(fromance_coinctr_w);
+	DECLARE_WRITE8_MEMBER(fromance_gfxreg_w);
+	DECLARE_READ8_MEMBER(fromance_paletteram_r);
+	DECLARE_WRITE8_MEMBER(fromance_paletteram_w);
+	DECLARE_READ8_MEMBER(fromance_videoram_r);
+	DECLARE_WRITE8_MEMBER(fromance_videoram_w);
+	DECLARE_WRITE8_MEMBER(fromance_scroll_w);
+	DECLARE_WRITE8_MEMBER(fromance_crtc_data_w);
+	DECLARE_WRITE8_MEMBER(fromance_crtc_register_w);
 };
 
 
@@ -73,15 +81,7 @@ VIDEO_START( hatris );
 SCREEN_UPDATE_IND16( fromance );
 SCREEN_UPDATE_IND16( pipedrm );
 
-WRITE8_HANDLER( fromance_crtc_data_w );
-WRITE8_HANDLER( fromance_crtc_register_w );
 
-WRITE8_HANDLER( fromance_gfxreg_w );
 
-WRITE8_HANDLER( fromance_scroll_w );
 
-READ8_HANDLER( fromance_paletteram_r );
-WRITE8_HANDLER( fromance_paletteram_w );
 
-READ8_HANDLER( fromance_videoram_r );
-WRITE8_HANDLER( fromance_videoram_w );

@@ -210,9 +210,9 @@ WRITE16_MEMBER(pgm_state::pgm_videoram_w)
 {
 
 	if (offset < 0x4000 / 2)
-		pgm_bg_videoram_w(&space, offset&0x7ff, data, mem_mask);
+		pgm_bg_videoram_w(space, offset&0x7ff, data, mem_mask);
 	else if (offset < 0x7000 / 2)
-		pgm_tx_videoram_w(&space, offset&0xfff, data, mem_mask);
+		pgm_tx_videoram_w(space, offset&0xfff, data, mem_mask);
 	else
 		COMBINE_DATA(&m_videoram[offset]);
 }

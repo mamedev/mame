@@ -24,6 +24,7 @@ public:
 	DECLARE_WRITE8_MEMBER(coincount_w);
 	DECLARE_WRITE8_MEMBER(nvram_w);
 	DECLARE_WRITE8_MEMBER(nvram_enable_w);
+	DECLARE_WRITE8_MEMBER(atetris_videoram_w);
 };
 
 /*----------- defined in video/atetris.c -----------*/
@@ -31,4 +32,3 @@ public:
 VIDEO_START( atetris );
 SCREEN_UPDATE_IND16( atetris );
 
-WRITE8_HANDLER( atetris_videoram_w );

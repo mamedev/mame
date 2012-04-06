@@ -39,18 +39,16 @@ static TILE_GET_INFO( VS920A_get_tile_info )
 	SET_TILE_INFO(state->m_VS920A_cur_chip->gfx_region, tileno, state->m_VS920A_cur_chip->pal_base + pal, 0);
 }
 
-WRITE16_HANDLER( VS920A_0_vram_w )
+WRITE16_MEMBER(gstriker_state::VS920A_0_vram_w)
 {
-	gstriker_state *state = space->machine().driver_data<gstriker_state>();
-	COMBINE_DATA(&state->m_VS920A[0].vram[offset]);
-	state->m_VS920A[0].tmap->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_VS920A[0].vram[offset]);
+	m_VS920A[0].tmap->mark_tile_dirty(offset);
 }
 
-WRITE16_HANDLER( VS920A_1_vram_w )
+WRITE16_MEMBER(gstriker_state::VS920A_1_vram_w)
 {
-	gstriker_state *state = space->machine().driver_data<gstriker_state>();
-	COMBINE_DATA(&state->m_VS920A[1].vram[offset]);
-	state->m_VS920A[1].tmap->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_VS920A[1].vram[offset]);
+	m_VS920A[1].tmap->mark_tile_dirty(offset);
 }
 
 static void VS920A_init(running_machine &machine, int numchips)
@@ -156,9 +154,9 @@ static TILE_GET_INFO( MB60553_get_tile_info )
 	SET_TILE_INFO(state->m_MB60553->gfx_region, tileno + state->m_MB60553_cur_chip->bank[bankno] * 0x200, pal + state->m_MB60553->pal_base, 0);
 }
 
-static void MB60553_reg_written(gstriker_state *state, int numchip, int num_reg)
+void gstriker_state::MB60553_reg_written(int numchip, int num_reg)
 {
-	tMB60553* cur = &state->m_MB60553[numchip];
+	tMB60553* cur = &m_MB60553[numchip];
 
 	switch (num_reg)
 	{
@@ -286,42 +284,38 @@ static tilemap_t* MB60553_get_tilemap(gstriker_state *state, int numchip)
 }
 
 
-WRITE16_HANDLER(MB60553_0_regs_w)
+WRITE16_MEMBER(gstriker_state::MB60553_0_regs_w)
 {
-	gstriker_state *state = space->machine().driver_data<gstriker_state>();
-	UINT16 oldreg = state->m_MB60553[0].regs[offset];
+	UINT16 oldreg = m_MB60553[0].regs[offset];
 
-	COMBINE_DATA(&state->m_MB60553[0].regs[offset]);
+	COMBINE_DATA(&m_MB60553[0].regs[offset]);
 
-	if (state->m_MB60553[0].regs[offset] != oldreg)
-		MB60553_reg_written(state, 0, offset);
+	if (m_MB60553[0].regs[offset] != oldreg)
+		MB60553_reg_written(0, offset);
 }
 
-WRITE16_HANDLER(MB60553_1_regs_w)
+WRITE16_MEMBER(gstriker_state::MB60553_1_regs_w)
 {
-	gstriker_state *state = space->machine().driver_data<gstriker_state>();
-	UINT16 oldreg = state->m_MB60553[1].regs[offset];
+	UINT16 oldreg = m_MB60553[1].regs[offset];
 
-	COMBINE_DATA(&state->m_MB60553[1].regs[offset]);
+	COMBINE_DATA(&m_MB60553[1].regs[offset]);
 
-	if (state->m_MB60553[1].regs[offset] != oldreg)
-		MB60553_reg_written(state, 1, offset);
+	if (m_MB60553[1].regs[offset] != oldreg)
+		MB60553_reg_written(1, offset);
 }
 
-WRITE16_HANDLER(MB60553_0_vram_w)
+WRITE16_MEMBER(gstriker_state::MB60553_0_vram_w)
 {
-	gstriker_state *state = space->machine().driver_data<gstriker_state>();
-	COMBINE_DATA(&state->m_MB60553[0].vram[offset]);
+	COMBINE_DATA(&m_MB60553[0].vram[offset]);
 
-	state->m_MB60553[0].tmap->mark_tile_dirty(offset);
+	m_MB60553[0].tmap->mark_tile_dirty(offset);
 }
 
-WRITE16_HANDLER(MB60553_1_vram_w)
+WRITE16_MEMBER(gstriker_state::MB60553_1_vram_w)
 {
-	gstriker_state *state = space->machine().driver_data<gstriker_state>();
-	COMBINE_DATA(&state->m_MB60553[1].vram[offset]);
+	COMBINE_DATA(&m_MB60553[1].vram[offset]);
 
-	state->m_MB60553[1].tmap->mark_tile_dirty(offset);
+	m_MB60553[1].tmap->mark_tile_dirty(offset);
 }
 
 
@@ -525,7 +519,7 @@ static void CG10103_set_transpen(gstriker_state *state, int numchip, int transpe
 
 
 #ifdef UNUSED_FUNCTION
-WRITE16_HANDLER( gsx_videoram3_w )
+WRITE16_MEMBER(gstriker_state::gsx_videoram3_w)
 {
 	// This memory appears to be empty in gstriker
 	gs_videoram3[offset] = data;

@@ -45,19 +45,19 @@ public:
 	DECLARE_READ8_MEMBER(ccasino_dipsw4_r);
 	DECLARE_WRITE8_MEMBER(ojankoy_coinctr_w);
 	DECLARE_WRITE8_MEMBER(ccasino_coinctr_w);
+	DECLARE_WRITE8_MEMBER(ojankohs_palette_w);
+	DECLARE_WRITE8_MEMBER(ccasino_palette_w);
+	DECLARE_WRITE8_MEMBER(ojankoc_palette_w);
+	DECLARE_WRITE8_MEMBER(ojankohs_videoram_w);
+	DECLARE_WRITE8_MEMBER(ojankohs_colorram_w);
+	DECLARE_WRITE8_MEMBER(ojankohs_gfxreg_w);
+	DECLARE_WRITE8_MEMBER(ojankohs_flipscreen_w);
+	DECLARE_WRITE8_MEMBER(ojankoc_videoram_w);
 };
 
 
 /*----------- defined in video/ojankohs.c -----------*/
 
-WRITE8_HANDLER( ojankohs_palette_w );
-WRITE8_HANDLER( ccasino_palette_w );
-WRITE8_HANDLER( ojankohs_videoram_w );
-WRITE8_HANDLER( ojankohs_colorram_w );
-WRITE8_HANDLER( ojankohs_gfxreg_w );
-WRITE8_HANDLER( ojankohs_flipscreen_w );
-WRITE8_HANDLER( ojankoc_palette_w );
-WRITE8_HANDLER( ojankoc_videoram_w );
 
 PALETTE_INIT( ojankoy );
 

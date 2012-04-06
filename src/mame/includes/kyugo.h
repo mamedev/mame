@@ -37,20 +37,20 @@ public:
 	DECLARE_WRITE8_MEMBER(kyugo_nmi_mask_w);
 	DECLARE_WRITE8_MEMBER(kyugo_sub_cpu_control_w);
 	DECLARE_WRITE8_MEMBER(kyugo_coin_counter_w);
+	DECLARE_WRITE8_MEMBER(kyugo_fgvideoram_w);
+	DECLARE_WRITE8_MEMBER(kyugo_bgvideoram_w);
+	DECLARE_WRITE8_MEMBER(kyugo_bgattribram_w);
+	DECLARE_READ8_MEMBER(kyugo_spriteram_2_r);
+	DECLARE_WRITE8_MEMBER(kyugo_scroll_x_lo_w);
+	DECLARE_WRITE8_MEMBER(kyugo_gfxctrl_w);
+	DECLARE_WRITE8_MEMBER(kyugo_scroll_y_w);
+	DECLARE_WRITE8_MEMBER(kyugo_flipscreen_w);
 };
 
 
 /*----------- defined in video/kyugo.c -----------*/
 
-READ8_HANDLER( kyugo_spriteram_2_r );
 
-WRITE8_HANDLER( kyugo_fgvideoram_w );
-WRITE8_HANDLER( kyugo_bgvideoram_w );
-WRITE8_HANDLER( kyugo_bgattribram_w );
-WRITE8_HANDLER( kyugo_scroll_x_lo_w );
-WRITE8_HANDLER( kyugo_gfxctrl_w );
-WRITE8_HANDLER( kyugo_scroll_y_w );
-WRITE8_HANDLER( kyugo_flipscreen_w );
 
 VIDEO_START( kyugo );
 SCREEN_UPDATE_IND16( kyugo );

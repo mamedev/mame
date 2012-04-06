@@ -147,40 +147,38 @@ VIDEO_START( zaccaria )
 
 ***************************************************************************/
 
-WRITE8_HANDLER( zaccaria_videoram_w )
+WRITE8_MEMBER(zaccaria_state::zaccaria_videoram_w)
 {
-	zaccaria_state *state = space->machine().driver_data<zaccaria_state>();
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_HANDLER( zaccaria_attributes_w )
+WRITE8_MEMBER(zaccaria_state::zaccaria_attributes_w)
 {
-	zaccaria_state *state = space->machine().driver_data<zaccaria_state>();
 	if (offset & 1)
 	{
-		if (state->m_attributesram[offset] != data)
+		if (m_attributesram[offset] != data)
 		{
 			int i;
 
 			for (i = offset / 2;i < 0x400;i += 32)
-				state->m_bg_tilemap->mark_tile_dirty(i);
+				m_bg_tilemap->mark_tile_dirty(i);
 		}
 	}
 	else
-		state->m_bg_tilemap->set_scrolly(offset / 2,data);
+		m_bg_tilemap->set_scrolly(offset / 2,data);
 
-	state->m_attributesram[offset] = data;
+	m_attributesram[offset] = data;
 }
 
-WRITE8_HANDLER( zaccaria_flip_screen_x_w )
+WRITE8_MEMBER(zaccaria_state::zaccaria_flip_screen_x_w)
 {
-	flip_screen_x_set(space->machine(), data & 1);
+	flip_screen_x_set(machine(), data & 1);
 }
 
-WRITE8_HANDLER( zaccaria_flip_screen_y_w )
+WRITE8_MEMBER(zaccaria_state::zaccaria_flip_screen_y_w)
 {
-	flip_screen_y_set(space->machine(), data & 1);
+	flip_screen_y_set(machine(), data & 1);
 }
 
 

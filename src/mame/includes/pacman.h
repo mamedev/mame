@@ -75,6 +75,21 @@ public:
 	DECLARE_WRITE8_MEMBER(mspacman_enable_decode_w);
 	DECLARE_WRITE8_MEMBER(irq_mask_w);
 	DECLARE_READ8_MEMBER(cannonbp_protection_r);
+	DECLARE_WRITE8_MEMBER(pacman_videoram_w);
+	DECLARE_WRITE8_MEMBER(pacman_colorram_w);
+	DECLARE_WRITE8_MEMBER(pacman_flipscreen_w);
+	DECLARE_WRITE8_MEMBER(pengo_palettebank_w);
+	DECLARE_WRITE8_MEMBER(pengo_colortablebank_w);
+	DECLARE_WRITE8_MEMBER(pengo_gfxbank_w);
+	DECLARE_WRITE8_MEMBER(s2650games_videoram_w);
+	DECLARE_WRITE8_MEMBER(s2650games_colorram_w);
+	DECLARE_WRITE8_MEMBER(s2650games_scroll_w);
+	DECLARE_WRITE8_MEMBER(s2650games_tilesbank_w);
+	DECLARE_WRITE8_MEMBER(jrpacman_videoram_w);
+	DECLARE_WRITE8_MEMBER(jrpacman_charbank_w);
+	DECLARE_WRITE8_MEMBER(jrpacman_spritebank_w);
+	DECLARE_WRITE8_MEMBER(jrpacman_scroll_w);
+	DECLARE_WRITE8_MEMBER(jrpacman_bgpriority_w);
 };
 
 
@@ -84,35 +99,20 @@ PALETTE_INIT( pacman );
 VIDEO_START( pacman );
 SCREEN_UPDATE_IND16( pacman );
 
-WRITE8_HANDLER( pacman_videoram_w );
-WRITE8_HANDLER( pacman_colorram_w );
-WRITE8_HANDLER( pacman_flipscreen_w );
 
 
 VIDEO_START( pengo );
 
-WRITE8_HANDLER( pengo_palettebank_w );
-WRITE8_HANDLER( pengo_colortablebank_w );
-WRITE8_HANDLER( pengo_gfxbank_w );
 
 
 VIDEO_START( s2650games );
 SCREEN_UPDATE_IND16( s2650games );
 
 
-WRITE8_HANDLER( s2650games_videoram_w );
-WRITE8_HANDLER( s2650games_colorram_w );
-WRITE8_HANDLER( s2650games_scroll_w );
-WRITE8_HANDLER( s2650games_tilesbank_w );
 
 
 VIDEO_START( jrpacman );
 
-WRITE8_HANDLER( jrpacman_videoram_w );
-WRITE8_HANDLER( jrpacman_charbank_w );
-WRITE8_HANDLER( jrpacman_spritebank_w );
-WRITE8_HANDLER( jrpacman_scroll_w );
-WRITE8_HANDLER( jrpacman_bgpriority_w );
 
 VIDEO_START( birdiy );
 

@@ -42,15 +42,14 @@ VIDEO_START( balsente )
  *
  *************************************/
 
-WRITE8_HANDLER( balsente_videoram_w )
+WRITE8_MEMBER(balsente_state::balsente_videoram_w)
 {
-	balsente_state *state = space->machine().driver_data<balsente_state>();
 
 	/* expand the two pixel values into two bytes */
-	state->m_videoram[offset] = data;
+	m_videoram[offset] = data;
 
-	state->m_expanded_videoram[offset * 2 + 0] = data >> 4;
-	state->m_expanded_videoram[offset * 2 + 1] = data & 15;
+	m_expanded_videoram[offset * 2 + 0] = data >> 4;
+	m_expanded_videoram[offset * 2 + 1] = data & 15;
 }
 
 
@@ -61,19 +60,18 @@ WRITE8_HANDLER( balsente_videoram_w )
  *
  *************************************/
 
-WRITE8_HANDLER( balsente_palette_select_w )
+WRITE8_MEMBER(balsente_state::balsente_palette_select_w)
 {
-	balsente_state *state = space->machine().driver_data<balsente_state>();
 
 	/* only update if changed */
-	if (state->m_palettebank_vis != (data & 3))
+	if (m_palettebank_vis != (data & 3))
 	{
 		/* update the scanline palette */
-		space->machine().primary_screen->update_partial(space->machine().primary_screen->vpos() - 1 + BALSENTE_VBEND);
-		state->m_palettebank_vis = data & 3;
+		machine().primary_screen->update_partial(machine().primary_screen->vpos() - 1 + BALSENTE_VBEND);
+		m_palettebank_vis = data & 3;
 	}
 
-	logerror("balsente_palette_select_w(%d) scanline=%d\n", data & 3, space->machine().primary_screen->vpos());
+	logerror("balsente_palette_select_w(%d) scanline=%d\n", data & 3, machine().primary_screen->vpos());
 }
 
 
@@ -84,18 +82,17 @@ WRITE8_HANDLER( balsente_palette_select_w )
  *
  *************************************/
 
-WRITE8_HANDLER( balsente_paletteram_w )
+WRITE8_MEMBER(balsente_state::balsente_paletteram_w)
 {
 	int r, g, b;
 
-	balsente_state *state = space->machine().driver_data<balsente_state>();
-	state->m_generic_paletteram_8[offset] = data & 0x0f;
+	m_generic_paletteram_8[offset] = data & 0x0f;
 
-	r = state->m_generic_paletteram_8[(offset & ~3) + 0];
-	g = state->m_generic_paletteram_8[(offset & ~3) + 1];
-	b = state->m_generic_paletteram_8[(offset & ~3) + 2];
+	r = m_generic_paletteram_8[(offset & ~3) + 0];
+	g = m_generic_paletteram_8[(offset & ~3) + 1];
+	b = m_generic_paletteram_8[(offset & ~3) + 2];
 
-	palette_set_color_rgb(space->machine(), offset / 4, pal4bit(r), pal4bit(g), pal4bit(b));
+	palette_set_color_rgb(machine(), offset / 4, pal4bit(r), pal4bit(g), pal4bit(b));
 }
 
 
@@ -106,14 +103,13 @@ WRITE8_HANDLER( balsente_paletteram_w )
  *
  *************************************/
 
-WRITE8_HANDLER( shrike_sprite_select_w )
+WRITE8_MEMBER(balsente_state::shrike_sprite_select_w)
 {
-	balsente_state *state = space->machine().driver_data<balsente_state>();
-	if( state->m_sprite_data != state->m_sprite_bank[(data & 0x80 >> 7) ^ 1 ])
+	if( m_sprite_data != m_sprite_bank[(data & 0x80 >> 7) ^ 1 ])
 	{
 		logerror( "shrike_sprite_select_w( 0x%02x )\n", data );
-		space->machine().primary_screen->update_partial(space->machine().primary_screen->vpos() - 1 + BALSENTE_VBEND);
-		state->m_sprite_data = state->m_sprite_bank[(data & 0x80 >> 7) ^ 1];
+		machine().primary_screen->update_partial(machine().primary_screen->vpos() - 1 + BALSENTE_VBEND);
+		m_sprite_data = m_sprite_bank[(data & 0x80 >> 7) ^ 1];
 	}
 
 	shrike_shared_6809_w( space, 1, data );

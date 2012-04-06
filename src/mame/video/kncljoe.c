@@ -117,16 +117,14 @@ VIDEO_START( kncljoe )
 
 ***************************************************************************/
 
-WRITE8_HANDLER( kncljoe_videoram_w )
+WRITE8_MEMBER(kncljoe_state::kncljoe_videoram_w)
 {
-	kncljoe_state *state = space->machine().driver_data<kncljoe_state>();
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset / 2);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE8_HANDLER( kncljoe_control_w )
+WRITE8_MEMBER(kncljoe_state::kncljoe_control_w)
 {
-	kncljoe_state *state = space->machine().driver_data<kncljoe_state>();
 	int i;
 	/*
             0x01    screen flip
@@ -138,38 +136,37 @@ WRITE8_HANDLER( kncljoe_control_w )
             reset when IN0 - Coin 1 goes low (active)
             set after IN0 - Coin 1 goes high AND the credit has been added
    */
-	state->m_flipscreen = data & 0x01;
-	space->machine().tilemap().set_flip_all(state->m_flipscreen ? TILEMAP_FLIPX : TILEMAP_FLIPY);
+	m_flipscreen = data & 0x01;
+	machine().tilemap().set_flip_all(m_flipscreen ? TILEMAP_FLIPX : TILEMAP_FLIPY);
 
-	coin_counter_w(space->machine(), 0, data & 0x02);
-	coin_counter_w(space->machine(), 1, data & 0x20);
+	coin_counter_w(machine(), 0, data & 0x02);
+	coin_counter_w(machine(), 1, data & 0x20);
 
 	i = (data & 0x10) >> 4;
-	if (state->m_tile_bank != i)
+	if (m_tile_bank != i)
 	{
-		state->m_tile_bank = i;
-		state->m_bg_tilemap->mark_all_dirty();
+		m_tile_bank = i;
+		m_bg_tilemap->mark_all_dirty();
 	}
 
 	i = (data & 0x04) >> 2;
-	if (state->m_sprite_bank != i)
+	if (m_sprite_bank != i)
 	{
-		state->m_sprite_bank = i;
-		memset(space->machine().region("maincpu")->base() + 0xf100, 0, 0x180);
+		m_sprite_bank = i;
+		memset(machine().region("maincpu")->base() + 0xf100, 0, 0x180);
 	}
 }
 
-WRITE8_HANDLER( kncljoe_scroll_w )
+WRITE8_MEMBER(kncljoe_state::kncljoe_scroll_w)
 {
-	kncljoe_state *state = space->machine().driver_data<kncljoe_state>();
 	int scrollx;
 
-	state->m_scrollregs[offset] = data;
-	scrollx = state->m_scrollregs[0] | state->m_scrollregs[1] << 8;
-	state->m_bg_tilemap->set_scrollx(0, scrollx);
-	state->m_bg_tilemap->set_scrollx(1, scrollx);
-	state->m_bg_tilemap->set_scrollx(2, scrollx);
-	state->m_bg_tilemap->set_scrollx(3, 0);
+	m_scrollregs[offset] = data;
+	scrollx = m_scrollregs[0] | m_scrollregs[1] << 8;
+	m_bg_tilemap->set_scrollx(0, scrollx);
+	m_bg_tilemap->set_scrollx(1, scrollx);
+	m_bg_tilemap->set_scrollx(2, scrollx);
+	m_bg_tilemap->set_scrollx(3, 0);
 }
 
 

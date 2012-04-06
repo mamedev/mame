@@ -30,6 +30,18 @@ public:
 	tilemap_t *m_bg_tilemap;
 	int m_width;
 	DECLARE_WRITE8_MEMBER(skydiver_nmion_w);
+	DECLARE_WRITE8_MEMBER(skydiver_videoram_w);
+	DECLARE_READ8_MEMBER(skydiver_wram_r);
+	DECLARE_WRITE8_MEMBER(skydiver_wram_w);
+	DECLARE_WRITE8_MEMBER(skydiver_width_w);
+	DECLARE_WRITE8_MEMBER(skydiver_coin_lockout_w);
+	DECLARE_WRITE8_MEMBER(skydiver_start_lamp_1_w);
+	DECLARE_WRITE8_MEMBER(skydiver_start_lamp_2_w);
+	DECLARE_WRITE8_MEMBER(skydiver_lamp_s_w);
+	DECLARE_WRITE8_MEMBER(skydiver_lamp_k_w);
+	DECLARE_WRITE8_MEMBER(skydiver_lamp_y_w);
+	DECLARE_WRITE8_MEMBER(skydiver_lamp_d_w);
+	DECLARE_WRITE8_MEMBER(skydiver_2000_201F_w);
 };
 
 
@@ -41,17 +53,5 @@ DISCRETE_SOUND_EXTERN( skydiver );
 /*----------- defined in video/skydiver.c -----------*/
 
 MACHINE_RESET( skydiver );
-WRITE8_HANDLER( skydiver_videoram_w );
-WRITE8_HANDLER( skydiver_wram_w );	/* the signal is WRAM, presumably Work RAM */
-READ8_HANDLER( skydiver_wram_r );
-WRITE8_HANDLER( skydiver_start_lamp_1_w );
-WRITE8_HANDLER( skydiver_start_lamp_2_w );
-WRITE8_HANDLER( skydiver_lamp_s_w );
-WRITE8_HANDLER( skydiver_lamp_k_w );
-WRITE8_HANDLER( skydiver_lamp_y_w );
-WRITE8_HANDLER( skydiver_lamp_d_w );
-WRITE8_HANDLER( skydiver_2000_201F_w );
-WRITE8_HANDLER( skydiver_width_w );
-WRITE8_HANDLER( skydiver_coin_lockout_w );
 VIDEO_START( skydiver );
 SCREEN_UPDATE_IND16( skydiver );

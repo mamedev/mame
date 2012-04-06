@@ -53,9 +53,8 @@ static void get_pens( running_machine &machine, pen_t *pens )
 }
 
 
-WRITE8_HANDLER( epos_port_1_w )
+WRITE8_MEMBER(epos_state::epos_port_1_w)
 {
-	epos_state *state = space->machine().driver_data<epos_state>();
 	/* D0 - start light #1
        D1 - start light #2
        D2 - coin counter
@@ -63,12 +62,12 @@ WRITE8_HANDLER( epos_port_1_w )
        D4-D7 - unused
      */
 
-	set_led_status(space->machine(), 0, (data >> 0) & 0x01);
-	set_led_status(space->machine(), 1, (data >> 1) & 0x01);
+	set_led_status(machine(), 0, (data >> 0) & 0x01);
+	set_led_status(machine(), 1, (data >> 1) & 0x01);
 
-	coin_counter_w(space->machine(), 0, (data >> 2) & 0x01);
+	coin_counter_w(machine(), 0, (data >> 2) & 0x01);
 
-	state->m_palette = (data >> 3) & 0x01;
+	m_palette = (data >> 3) & 0x01;
 }
 
 

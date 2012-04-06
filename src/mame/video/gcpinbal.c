@@ -76,29 +76,27 @@ VIDEO_START( gcpinbal )
                    TILEMAP READ AND WRITE HANDLERS
 *******************************************************************/
 
-READ16_HANDLER( gcpinbal_tilemaps_word_r )
+READ16_MEMBER(gcpinbal_state::gcpinbal_tilemaps_word_r)
 {
-	gcpinbal_state *state = space->machine().driver_data<gcpinbal_state>();
-	return state->m_tilemapram[offset];
+	return m_tilemapram[offset];
 }
 
-WRITE16_HANDLER( gcpinbal_tilemaps_word_w )
+WRITE16_MEMBER(gcpinbal_state::gcpinbal_tilemaps_word_w)
 {
-	gcpinbal_state *state = space->machine().driver_data<gcpinbal_state>();
-	COMBINE_DATA(&state->m_tilemapram[offset]);
+	COMBINE_DATA(&m_tilemapram[offset]);
 
 	if (offset < 0x800)	/* BG0 */
-		state->m_tilemap[0]->mark_tile_dirty(offset / 2);
+		m_tilemap[0]->mark_tile_dirty(offset / 2);
 	else if ((offset < 0x1000))	/* BG1 */
-		state->m_tilemap[1]->mark_tile_dirty((offset % 0x800) / 2);
+		m_tilemap[1]->mark_tile_dirty((offset % 0x800) / 2);
 	else if ((offset < 0x1800))	/* FG */
-		state->m_tilemap[2]->mark_tile_dirty((offset % 0x800));
+		m_tilemap[2]->mark_tile_dirty((offset % 0x800));
 }
 
 
 #ifdef UNUSED_FUNCTION
 
-READ16_HANDLER( gcpinbal_ctrl_word_r )
+READ16_MEMBER(gcpinbal_state::gcpinbal_ctrl_word_r)
 {
     // ***** NOT HOOKED UP *****
 
@@ -106,7 +104,7 @@ READ16_HANDLER( gcpinbal_ctrl_word_r )
 }
 
 
-WRITE16_HANDLER( gcpinbal_ctrl_word_w )
+WRITE16_MEMBER(gcpinbal_state::gcpinbal_ctrl_word_w)
 {
     // ***** NOT HOOKED UP *****
 

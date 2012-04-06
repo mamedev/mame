@@ -128,39 +128,36 @@ VIDEO_START( vulgus )
 
 ***************************************************************************/
 
-WRITE8_HANDLER( vulgus_fgvideoram_w )
+WRITE8_MEMBER(vulgus_state::vulgus_fgvideoram_w)
 {
-	vulgus_state *state = space->machine().driver_data<vulgus_state>();
-	state->m_fgvideoram[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
+	m_fgvideoram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_HANDLER( vulgus_bgvideoram_w )
+WRITE8_MEMBER(vulgus_state::vulgus_bgvideoram_w)
 {
-	vulgus_state *state = space->machine().driver_data<vulgus_state>();
-	state->m_bgvideoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
+	m_bgvideoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
 
-WRITE8_HANDLER( vulgus_c804_w )
+WRITE8_MEMBER(vulgus_state::vulgus_c804_w)
 {
 	/* bits 0 and 1 are coin counters */
-	coin_counter_w(space->machine(), 0, data & 0x01);
-	coin_counter_w(space->machine(), 1, data & 0x02);
+	coin_counter_w(machine(), 0, data & 0x01);
+	coin_counter_w(machine(), 1, data & 0x02);
 
 	/* bit 7 flips screen */
-	flip_screen_set(space->machine(), data & 0x80);
+	flip_screen_set(machine(), data & 0x80);
 }
 
 
-WRITE8_HANDLER( vulgus_palette_bank_w )
+WRITE8_MEMBER(vulgus_state::vulgus_palette_bank_w)
 {
-	vulgus_state *state = space->machine().driver_data<vulgus_state>();
-	if (state->m_palette_bank != (data & 3))
+	if (m_palette_bank != (data & 3))
 	{
-		state->m_palette_bank = data & 3;
-		state->m_bg_tilemap->mark_all_dirty();
+		m_palette_bank = data & 3;
+		m_bg_tilemap->mark_all_dirty();
 	}
 }
 

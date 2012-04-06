@@ -27,6 +27,11 @@ public:
 	/* devices */
 	device_t *m_audiocpu;
 	DECLARE_WRITE16_MEMBER(gotcha_lamps_w);
+	DECLARE_WRITE16_MEMBER(gotcha_fgvideoram_w);
+	DECLARE_WRITE16_MEMBER(gotcha_bgvideoram_w);
+	DECLARE_WRITE16_MEMBER(gotcha_gfxbank_select_w);
+	DECLARE_WRITE16_MEMBER(gotcha_gfxbank_w);
+	DECLARE_WRITE16_MEMBER(gotcha_scroll_w);
 };
 
 
@@ -36,8 +41,3 @@ public:
 VIDEO_START( gotcha );
 SCREEN_UPDATE_IND16( gotcha );
 
-WRITE16_HANDLER( gotcha_fgvideoram_w );
-WRITE16_HANDLER( gotcha_bgvideoram_w );
-WRITE16_HANDLER( gotcha_gfxbank_select_w );
-WRITE16_HANDLER( gotcha_gfxbank_w );
-WRITE16_HANDLER( gotcha_scroll_w );

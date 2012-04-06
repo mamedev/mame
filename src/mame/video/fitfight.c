@@ -52,12 +52,11 @@ static TILE_GET_INFO( get_fof_bak_tile_info )
 	SET_TILE_INFO(2, code, colr, TILE_FLIPYX(xflip));
 }
 
-WRITE16_HANDLER(  fof_bak_tileram_w )
+WRITE16_MEMBER(fitfight_state::fof_bak_tileram_w)
 {
-	fitfight_state *state = space->machine().driver_data<fitfight_state>();
 
-	COMBINE_DATA(&state->m_fof_bak_tileram[offset]);
-	state->m_fof_bak_tilemap->mark_tile_dirty(offset / 2);
+	COMBINE_DATA(&m_fof_bak_tileram[offset]);
+	m_fof_bak_tilemap->mark_tile_dirty(offset / 2);
 }
 
 
@@ -72,12 +71,11 @@ static TILE_GET_INFO( get_fof_mid_tile_info )
 	SET_TILE_INFO(1, code, colr, TILE_FLIPYX(xflip));
 }
 
-WRITE16_HANDLER( fof_mid_tileram_w )
+WRITE16_MEMBER(fitfight_state::fof_mid_tileram_w)
 {
-	fitfight_state *state = space->machine().driver_data<fitfight_state>();
 
-	COMBINE_DATA(&state->m_fof_mid_tileram[offset]);
-	state->m_fof_mid_tilemap->mark_tile_dirty(offset / 2);
+	COMBINE_DATA(&m_fof_mid_tileram[offset]);
+	m_fof_mid_tilemap->mark_tile_dirty(offset / 2);
 }
 
 static TILE_GET_INFO( get_fof_txt_tile_info )
@@ -91,12 +89,11 @@ static TILE_GET_INFO( get_fof_txt_tile_info )
 	SET_TILE_INFO(0, code, colr, TILE_FLIPYX(xflip));
 }
 
-WRITE16_HANDLER( fof_txt_tileram_w )
+WRITE16_MEMBER(fitfight_state::fof_txt_tileram_w)
 {
-	fitfight_state *state = space->machine().driver_data<fitfight_state>();
 
-	COMBINE_DATA(&state->m_fof_txt_tileram[offset]);
-	state->m_fof_txt_tilemap->mark_tile_dirty(offset / 2);
+	COMBINE_DATA(&m_fof_txt_tileram[offset]);
+	m_fof_txt_tilemap->mark_tile_dirty(offset / 2);
 }
 
 /* video start / update */

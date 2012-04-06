@@ -119,7 +119,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, fcombat_state )
 	AM_RANGE(0xe200, 0xe200) AM_READ_PORT("DSW1")
 	AM_RANGE(0xe300, 0xe300) AM_READ(e300_r)
 	AM_RANGE(0xe400, 0xe400) AM_READ(fcombat_protection_r) // protection?
-	AM_RANGE(0xe800, 0xe800) AM_WRITE_LEGACY(fcombat_videoreg_w)	// at least bit 0 for flip screen and joystick input multiplexor
+	AM_RANGE(0xe800, 0xe800) AM_WRITE(fcombat_videoreg_w)	// at least bit 0 for flip screen and joystick input multiplexor
 	AM_RANGE(0xe900, 0xe900) AM_WRITE(e900_w)
 	AM_RANGE(0xea00, 0xea00) AM_WRITE(ea00_w)
 	AM_RANGE(0xeb00, 0xeb00) AM_WRITE(eb00_w)

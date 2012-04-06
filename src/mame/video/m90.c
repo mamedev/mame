@@ -272,10 +272,9 @@ static void dynablsb_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap
 	}
 }
 
-WRITE16_HANDLER( m90_video_control_w )
+WRITE16_MEMBER(m90_state::m90_video_control_w)
 {
-	m90_state *state = space->machine().driver_data<m90_state>();
-	COMBINE_DATA(&state->m_video_control_data[offset]);
+	COMBINE_DATA(&m_video_control_data[offset]);
 }
 
 static void markdirty(tilemap_t *tmap,int page,offs_t offset)
@@ -286,15 +285,14 @@ static void markdirty(tilemap_t *tmap,int page,offs_t offset)
 		tmap->mark_tile_dirty(offset/2);
 }
 
-WRITE16_HANDLER( m90_video_w )
+WRITE16_MEMBER(m90_state::m90_video_w)
 {
-	m90_state *state = space->machine().driver_data<m90_state>();
-	COMBINE_DATA(&state->m_video_data[offset]);
+	COMBINE_DATA(&m_video_data[offset]);
 
-	markdirty(state->m_pf1_layer,     state->m_video_control_data[5] & 0x3,offset);
-	markdirty(state->m_pf1_wide_layer,state->m_video_control_data[5] & 0x2,offset);
-	markdirty(state->m_pf2_layer,     state->m_video_control_data[6] & 0x3,offset);
-	markdirty(state->m_pf2_wide_layer,state->m_video_control_data[6] & 0x2,offset);
+	markdirty(m_pf1_layer,     m_video_control_data[5] & 0x3,offset);
+	markdirty(m_pf1_wide_layer,m_video_control_data[5] & 0x2,offset);
+	markdirty(m_pf2_layer,     m_video_control_data[6] & 0x3,offset);
+	markdirty(m_pf2_wide_layer,m_video_control_data[6] & 0x2,offset);
 }
 
 SCREEN_UPDATE_IND16( m90 )

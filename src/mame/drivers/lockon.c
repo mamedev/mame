@@ -156,13 +156,13 @@ static WRITE16_HANDLER( emres_w )
 static ADDRESS_MAP_START( main_v30, AS_PROGRAM, 16, lockon_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000, 0x03fff) AM_RAM
-	AM_RANGE(0x04000, 0x04003) AM_READWRITE_LEGACY(lockon_crtc_r, lockon_crtc_w)
+	AM_RANGE(0x04000, 0x04003) AM_READWRITE(lockon_crtc_r, lockon_crtc_w)
 	AM_RANGE(0x06000, 0x06001) AM_READ_PORT("DSW")
 	AM_RANGE(0x08000, 0x081ff) AM_RAM AM_BASE_SIZE(m_hud_ram, m_hudram_size)
-	AM_RANGE(0x09000, 0x09fff) AM_RAM_WRITE_LEGACY(lockon_char_w) AM_BASE(m_char_ram)
+	AM_RANGE(0x09000, 0x09fff) AM_RAM_WRITE(lockon_char_w) AM_BASE(m_char_ram)
 	AM_RANGE(0x0a000, 0x0a001) AM_WRITE_LEGACY(adrst_w)
-	AM_RANGE(0x0b000, 0x0bfff) AM_WRITE_LEGACY(lockon_rotate_w)
-	AM_RANGE(0x0c000, 0x0cfff) AM_WRITE_LEGACY(lockon_fb_clut_w)
+	AM_RANGE(0x0b000, 0x0bfff) AM_WRITE(lockon_rotate_w)
+	AM_RANGE(0x0c000, 0x0cfff) AM_WRITE(lockon_fb_clut_w)
 	AM_RANGE(0x0e000, 0x0e001) AM_WRITE_LEGACY(inten_w)
 	AM_RANGE(0x0f000, 0x0f001) AM_WRITE_LEGACY(emres_w)
 	AM_RANGE(0x10000, 0x1ffff) AM_READNOP AM_WRITE_LEGACY(tst_w)
@@ -180,9 +180,9 @@ static ADDRESS_MAP_START( ground_v30, AS_PROGRAM, 16, lockon_state )
 	AM_RANGE(0x00000, 0x03fff) AM_RAM
 	AM_RANGE(0x04000, 0x04fff) AM_RAM AM_BASE(m_scene_ram)
 	AM_RANGE(0x08000, 0x08fff) AM_RAM AM_BASE_SIZE(m_ground_ram, m_groundram_size)
-	AM_RANGE(0x0C000, 0x0C001) AM_WRITE_LEGACY(lockon_scene_h_scr_w)
-	AM_RANGE(0x0C002, 0x0C003) AM_WRITE_LEGACY(lockon_scene_v_scr_w)
-	AM_RANGE(0x0C004, 0x0C005) AM_WRITE_LEGACY(lockon_ground_ctrl_w)
+	AM_RANGE(0x0C000, 0x0C001) AM_WRITE(lockon_scene_h_scr_w)
+	AM_RANGE(0x0C002, 0x0C003) AM_WRITE(lockon_scene_v_scr_w)
+	AM_RANGE(0x0C004, 0x0C005) AM_WRITE(lockon_ground_ctrl_w)
 	AM_RANGE(0x20000, 0x2ffff) AM_MIRROR(0xc0000) AM_ROM
 	AM_RANGE(0x30000, 0x3ffff) AM_MIRROR(0xc0000) AM_ROM
 ADDRESS_MAP_END
@@ -191,8 +191,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( object_v30, AS_PROGRAM, 16, lockon_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000, 0x03fff) AM_RAM
-	AM_RANGE(0x04000, 0x04001) AM_READWRITE_LEGACY(lockon_obj_4000_r, lockon_obj_4000_w)
-	AM_RANGE(0x08000, 0x08fff) AM_WRITE_LEGACY(lockon_tza112_w)
+	AM_RANGE(0x04000, 0x04001) AM_READWRITE(lockon_obj_4000_r, lockon_obj_4000_w)
+	AM_RANGE(0x08000, 0x08fff) AM_WRITE(lockon_tza112_w)
 	AM_RANGE(0x0c000, 0x0c1ff) AM_RAM AM_BASE_SIZE(m_object_ram, m_objectram_size)
 	AM_RANGE(0x30000, 0x3ffff) AM_MIRROR(0xc0000) AM_ROM
 ADDRESS_MAP_END

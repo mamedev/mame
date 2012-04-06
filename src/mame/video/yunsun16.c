@@ -71,20 +71,18 @@ static TILE_GET_INFO( get_tile_info_1 )
 			(attr & 0x20) ? TILE_FLIPX : 0);
 }
 
-WRITE16_HANDLER( yunsun16_vram_0_w )
+WRITE16_MEMBER(yunsun16_state::yunsun16_vram_0_w)
 {
-	yunsun16_state *state = space->machine().driver_data<yunsun16_state>();
 
-	COMBINE_DATA(&state->m_vram_0[offset]);
-	state->m_tilemap_0->mark_tile_dirty(offset / 2);
+	COMBINE_DATA(&m_vram_0[offset]);
+	m_tilemap_0->mark_tile_dirty(offset / 2);
 }
 
-WRITE16_HANDLER( yunsun16_vram_1_w )
+WRITE16_MEMBER(yunsun16_state::yunsun16_vram_1_w)
 {
-	yunsun16_state *state = space->machine().driver_data<yunsun16_state>();
 
-	COMBINE_DATA(&state->m_vram_1[offset]);
-	state->m_tilemap_1->mark_tile_dirty(offset / 2);
+	COMBINE_DATA(&m_vram_1[offset]);
+	m_tilemap_1->mark_tile_dirty(offset / 2);
 }
 
 

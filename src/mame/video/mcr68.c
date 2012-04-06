@@ -149,25 +149,23 @@ VIDEO_START( zwackery )
  *
  *************************************/
 
-WRITE16_HANDLER( mcr68_paletteram_w )
+WRITE16_MEMBER(mcr68_state::mcr68_paletteram_w)
 {
 	int newword;
 
-	mcr68_state *state = space->machine().driver_data<mcr68_state>();
-	COMBINE_DATA(&state->m_generic_paletteram_16[offset]);
-	newword = state->m_generic_paletteram_16[offset];
-	palette_set_color_rgb(space->machine(), offset, pal3bit(newword >> 6), pal3bit(newword >> 0), pal3bit(newword >> 3));
+	COMBINE_DATA(&m_generic_paletteram_16[offset]);
+	newword = m_generic_paletteram_16[offset];
+	palette_set_color_rgb(machine(), offset, pal3bit(newword >> 6), pal3bit(newword >> 0), pal3bit(newword >> 3));
 }
 
 
-WRITE16_HANDLER( zwackery_paletteram_w )
+WRITE16_MEMBER(mcr68_state::zwackery_paletteram_w)
 {
 	int newword;
 
-	mcr68_state *state = space->machine().driver_data<mcr68_state>();
-	COMBINE_DATA(&state->m_generic_paletteram_16[offset]);
-	newword = state->m_generic_paletteram_16[offset];
-	palette_set_color_rgb(space->machine(), offset, pal5bit(~newword >> 10), pal5bit(~newword >> 0), pal5bit(~newword >> 5));
+	COMBINE_DATA(&m_generic_paletteram_16[offset]);
+	newword = m_generic_paletteram_16[offset];
+	palette_set_color_rgb(machine(), offset, pal5bit(~newword >> 10), pal5bit(~newword >> 0), pal5bit(~newword >> 5));
 }
 
 
@@ -178,32 +176,29 @@ WRITE16_HANDLER( zwackery_paletteram_w )
  *
  *************************************/
 
-WRITE16_HANDLER( mcr68_videoram_w )
+WRITE16_MEMBER(mcr68_state::mcr68_videoram_w)
 {
-	mcr68_state *state = space->machine().driver_data<mcr68_state>();
-	UINT16 *videoram = state->m_videoram;
+	UINT16 *videoram = m_videoram;
 	COMBINE_DATA(&videoram[offset]);
-	state->m_bg_tilemap->mark_tile_dirty(offset / 2);
+	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
 
-WRITE16_HANDLER( zwackery_videoram_w )
+WRITE16_MEMBER(mcr68_state::zwackery_videoram_w)
 {
-	mcr68_state *state = space->machine().driver_data<mcr68_state>();
-	UINT16 *videoram = state->m_videoram;
+	UINT16 *videoram = m_videoram;
 	COMBINE_DATA(&videoram[offset]);
-	state->m_bg_tilemap->mark_tile_dirty(offset);
-	state->m_fg_tilemap->mark_tile_dirty(offset);
+	m_bg_tilemap->mark_tile_dirty(offset);
+	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE16_HANDLER( zwackery_spriteram_w )
+WRITE16_MEMBER(mcr68_state::zwackery_spriteram_w)
 {
-	mcr68_state *state = space->machine().driver_data<mcr68_state>();
 	/* yech -- Zwackery relies on the upper 8 bits of a spriteram read being $ff! */
 	/* to make this happen we always write $ff in the upper 8 bits */
-	COMBINE_DATA(&state->m_spriteram[offset]);
-	state->m_spriteram[offset] |= 0xff00;
+	COMBINE_DATA(&m_spriteram[offset]);
+	m_spriteram[offset] |= 0xff00;
 }
 
 

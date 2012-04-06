@@ -60,13 +60,13 @@ Note:   if MAME_DEBUG is defined, pressing Z or X with:
 #define SHOW_READ_ERROR(_format_,_offset_)\
 {\
 	popmessage(_format_,_offset_);\
-	logerror("CPU #0 PC %06X : Warning, ",cpu_get_pc(&space->device())); \
+	logerror("CPU #0 PC %06X : Warning, ",cpu_get_pc(&space.device())); \
 	logerror(_format_ "\n",_offset_);\
 }
 #define SHOW_WRITE_ERROR(_format_,_offset_,_data_)\
 {\
 	popmessage(_format_,_offset_,_data_);\
-	logerror("CPU #0 PC %06X : Warning, ",cpu_get_pc(&space->device())); \
+	logerror("CPU #0 PC %06X : Warning, ",cpu_get_pc(&space.device())); \
 	logerror(_format_ "\n",_offset_,_data_); \
 }
 
@@ -74,18 +74,18 @@ Note:   if MAME_DEBUG is defined, pressing Z or X with:
 
 #define SHOW_READ_ERROR(_format_,_offset_)\
 {\
-	logerror("CPU #0 PC %06X : Warning, ",cpu_get_pc(&space->device())); \
+	logerror("CPU #0 PC %06X : Warning, ",cpu_get_pc(&space.device())); \
 	logerror(_format_ "\n",_offset_);\
 }
 #define SHOW_WRITE_ERROR(_format_,_offset_,_data_)\
 {\
-	logerror("CPU #0 PC %06X : Warning, ",cpu_get_pc(&space->device())); \
+	logerror("CPU #0 PC %06X : Warning, ",cpu_get_pc(&space.device())); \
 	logerror(_format_ "\n",_offset_,_data_); \
 }
 
 #endif
 
-#define CISCHEAT_VREG_SCROLL(_n_, _dir_)	state->m_scroll##_dir_[_n_] = new_data
+#define CISCHEAT_VREG_SCROLL(_n_, _dir_)	m_scroll##_dir_[_n_] = new_data
 
 
 #define cischeat_tmap_SET_SCROLL(_n_) \
@@ -149,9 +149,9 @@ INLINE void scrollram_w(address_space *space, offs_t offset, UINT16 data, UINT16
 	}
 }
 
-WRITE16_HANDLER( cischeat_scrollram_0_w ) { scrollram_w(space, offset, data, mem_mask, 0); }
-WRITE16_HANDLER( cischeat_scrollram_1_w ) { scrollram_w(space, offset, data, mem_mask, 1); }
-WRITE16_HANDLER( cischeat_scrollram_2_w ) { scrollram_w(space, offset, data, mem_mask, 2); }
+WRITE16_MEMBER(cischeat_state::cischeat_scrollram_0_w){ scrollram_w(&space, offset, data, mem_mask, 0); }
+WRITE16_MEMBER(cischeat_state::cischeat_scrollram_1_w){ scrollram_w(&space, offset, data, mem_mask, 1); }
+WRITE16_MEMBER(cischeat_state::cischeat_scrollram_2_w){ scrollram_w(&space, offset, data, mem_mask, 2); }
 
 static TILEMAP_MAPPER( cischeat_scan_8x8 )
 {
@@ -219,13 +219,13 @@ static void create_tilemaps(running_machine &machine)
 	}
 }
 
-static void cischeat_set_vreg_flag(cischeat_state *state, int which, int data)
+void cischeat_state::cischeat_set_vreg_flag(int which, int data)
 {
-	if (state->m_scroll_flag[which] != data)
+	if (m_scroll_flag[which] != data)
 	{
-		state->m_scroll_flag[which] = data;
-		state->m_tmap[which] = state->m_tilemap[which][(data >> 4) & 1][data & 3];
-		state->m_tmap[which]->mark_all_dirty();
+		m_scroll_flag[which] = data;
+		m_tmap[which] = m_tilemap[which][(data >> 4) & 1][data & 3];
+		m_tmap[which]->mark_all_dirty();
 	}
 }
 
@@ -295,51 +295,49 @@ VIDEO_START( bigrun )
                                 Big Run
 **************************************************************************/
 
-READ16_HANDLER( bigrun_vregs_r )
+READ16_MEMBER(cischeat_state::bigrun_vregs_r)
 {
-	cischeat_state *state = space->machine().driver_data<cischeat_state>();
 	switch (offset)
 	{
-		case 0x0000/2 : return input_port_read(space->machine(), "IN1");	// Coins
-		case 0x0002/2 : return input_port_read(space->machine(), "IN2");	// Buttons
-		case 0x0004/2 : return input_port_read(space->machine(), "IN3");	// Motor Limit Switches
-		case 0x0006/2 : return input_port_read(space->machine(), "IN4");	// DSW 1 & 2
+		case 0x0000/2 : return input_port_read(machine(), "IN1");	// Coins
+		case 0x0002/2 : return input_port_read(machine(), "IN2");	// Buttons
+		case 0x0004/2 : return input_port_read(machine(), "IN3");	// Motor Limit Switches
+		case 0x0006/2 : return input_port_read(machine(), "IN4");	// DSW 1 & 2
 
-		case 0x0008/2 :	return state->soundlatch2_word_r(*space,0,0xffff);	// From sound cpu
+		case 0x0008/2 :	return soundlatch2_word_r(space,0,0xffff);	// From sound cpu
 
 		case 0x0010/2 :
-			switch (state->m_ip_select & 0x3)
+			switch (m_ip_select & 0x3)
 			{
-				case 0 : return input_port_read(space->machine(), "IN6");		// Driving Wheel
+				case 0 : return input_port_read(machine(), "IN6");		// Driving Wheel
 				case 1 : return 0xffff;					// Cockpit: Up / Down Position
 				case 2 : return 0xffff;					// Cockpit: Left / Right Position?
-				case 3 : return input_port_read(space->machine(), "PEDAL");	// Accelerator (Pedal)
+				case 3 : return input_port_read(machine(), "PEDAL");	// Accelerator (Pedal)
 				default: return 0xffff;
 			}
 
 
-		case 0x2200/2 : return input_port_read(space->machine(), "IN5");	// DSW 3 (4 bits)
+		case 0x2200/2 : return input_port_read(machine(), "IN5");	// DSW 3 (4 bits)
 
 		default:	SHOW_READ_ERROR("vreg %04X read!",offset*2);
-					return state->m_vregs[offset];
+					return m_vregs[offset];
 	}
 }
 
-WRITE16_HANDLER( bigrun_vregs_w )
+WRITE16_MEMBER(cischeat_state::bigrun_vregs_w)
 {
-	cischeat_state *state = space->machine().driver_data<cischeat_state>();
-	UINT16 old_data = state->m_vregs[offset];
-	UINT16 new_data = COMBINE_DATA(&state->m_vregs[offset]);
+	UINT16 old_data = m_vregs[offset];
+	UINT16 new_data = COMBINE_DATA(&m_vregs[offset]);
 
 	switch (offset)
 	{
 		case 0x0000/2   :	// leds
 			if (ACCESSING_BITS_0_7)
 			{
-				coin_counter_w(space->machine(), 0,new_data & 0x01);
-				coin_counter_w(space->machine(), 1,new_data & 0x02);
-				set_led_status(space->machine(), 0,new_data & 0x10);	// start button
-				set_led_status(space->machine(), 1,new_data & 0x20);	// ?
+				coin_counter_w(machine(), 0,new_data & 0x01);
+				coin_counter_w(machine(), 1,new_data & 0x02);
+				set_led_status(machine(), 0,new_data & 0x10);	// start button
+				set_led_status(machine(), 1,new_data & 0x20);	// ?
 			}
 			break;
 
@@ -348,40 +346,40 @@ WRITE16_HANDLER( bigrun_vregs_w )
 
 		case 0x0004/2   :	// motor (seat?)
 			if (ACCESSING_BITS_0_7)
-				set_led_status(space->machine(), 2, (new_data != old_data) ? 1 : 0);
+				set_led_status(machine(), 2, (new_data != old_data) ? 1 : 0);
 			break;
 
 		case 0x0006/2   :	// motor (wheel?)
 			break;
 
 		case 0x000a/2   :	// to sound cpu
-			state->soundlatch_word_w(*space,0,new_data,0xffff);
+			soundlatch_word_w(space,0,new_data,0xffff);
 			break;
 
 		case 0x000c/2   :	break;	// ??
 
-		case 0x0010/2   : state->m_ip_select = new_data;	break;
-		case 0x0012/2   : state->m_ip_select = new_data+1;	break; // value above + 1
+		case 0x0010/2   : m_ip_select = new_data;	break;
+		case 0x0012/2   : m_ip_select = new_data+1;	break; // value above + 1
 
 		case 0x2000/2+0 : CISCHEAT_VREG_SCROLL(0,x);		break;
 		case 0x2000/2+1 : CISCHEAT_VREG_SCROLL(0,y);		break;
-		case 0x2000/2+2 : cischeat_set_vreg_flag(state,0,new_data);break;
+		case 0x2000/2+2 : cischeat_set_vreg_flag(0,new_data);break;
 
 		case 0x2008/2+0 : CISCHEAT_VREG_SCROLL(1,x);		break;
 		case 0x2008/2+1 : CISCHEAT_VREG_SCROLL(1,y);		break;
-		case 0x2008/2+2 : cischeat_set_vreg_flag(state,1,new_data);break;
+		case 0x2008/2+2 : cischeat_set_vreg_flag(1,new_data);break;
 
 		case 0x2100/2+0 : CISCHEAT_VREG_SCROLL(2,x);		break;
 		case 0x2100/2+1 : CISCHEAT_VREG_SCROLL(2,y);		break;
-		case 0x2100/2+2 : cischeat_set_vreg_flag(state,2,new_data);break;
+		case 0x2100/2+2 : cischeat_set_vreg_flag(2,new_data);break;
 
 		case 0x2108/2   : break;	// ? written with 0 only
 		case 0x2208/2   : break;	// watchdog reset
 
 		/* Not sure about this one.. */
-		case 0x2308/2   :	cputag_set_input_line(space->machine(), "cpu2", INPUT_LINE_RESET, (new_data & 2) ? ASSERT_LINE : CLEAR_LINE );
-							cputag_set_input_line(space->machine(), "cpu3", INPUT_LINE_RESET, (new_data & 2) ? ASSERT_LINE : CLEAR_LINE );
-							cputag_set_input_line(space->machine(), "soundcpu", INPUT_LINE_RESET, (new_data & 1) ? ASSERT_LINE : CLEAR_LINE );
+		case 0x2308/2   :	cputag_set_input_line(machine(), "cpu2", INPUT_LINE_RESET, (new_data & 2) ? ASSERT_LINE : CLEAR_LINE );
+							cputag_set_input_line(machine(), "cpu3", INPUT_LINE_RESET, (new_data & 2) ? ASSERT_LINE : CLEAR_LINE );
+							cputag_set_input_line(machine(), "soundcpu", INPUT_LINE_RESET, (new_data & 1) ? ASSERT_LINE : CLEAR_LINE );
 							break;
 
 		default: SHOW_WRITE_ERROR("vreg %04X <- %04X",offset*2,data);
@@ -393,48 +391,46 @@ WRITE16_HANDLER( bigrun_vregs_w )
                                 Cisco Heat
 **************************************************************************/
 
-READ16_HANDLER( cischeat_vregs_r )
+READ16_MEMBER(cischeat_state::cischeat_vregs_r)
 {
-	cischeat_state *state = space->machine().driver_data<cischeat_state>();
 	switch (offset)
 	{
-		case 0x0000/2 : return input_port_read(space->machine(), "IN1");	// Coins
-		case 0x0002/2 : return input_port_read(space->machine(), "IN2");	// Buttons
-		case 0x0004/2 : return input_port_read(space->machine(), "IN3");	// Motor Limit Switches
-		case 0x0006/2 : return input_port_read(space->machine(), "IN4");	// DSW 1 & 2
+		case 0x0000/2 : return input_port_read(machine(), "IN1");	// Coins
+		case 0x0002/2 : return input_port_read(machine(), "IN2");	// Buttons
+		case 0x0004/2 : return input_port_read(machine(), "IN3");	// Motor Limit Switches
+		case 0x0006/2 : return input_port_read(machine(), "IN4");	// DSW 1 & 2
 
 		case 0x0010/2 :
-			switch (state->m_ip_select & 0x3)
+			switch (m_ip_select & 0x3)
 			{
-				case 0 : return input_port_read(space->machine(), "IN6");	// Driving Wheel
+				case 0 : return input_port_read(machine(), "IN6");	// Driving Wheel
 				case 1 : return ~0;					// Cockpit: Up / Down Position?
 				case 2 : return ~0;					// Cockpit: Left / Right Position?
 				default: return ~0;
 			}
 
-		case 0x2200/2 : return input_port_read(space->machine(), "IN5");	// DSW 3 (4 bits)
-		case 0x2300/2 : return state->soundlatch2_r(*space,0);	// From sound cpu
+		case 0x2200/2 : return input_port_read(machine(), "IN5");	// DSW 3 (4 bits)
+		case 0x2300/2 : return soundlatch2_r(space,0);	// From sound cpu
 
 		default:	SHOW_READ_ERROR("vreg %04X read!",offset*2);
-					return state->m_vregs[offset];
+					return m_vregs[offset];
 	}
 }
 
-WRITE16_HANDLER( cischeat_vregs_w )
+WRITE16_MEMBER(cischeat_state::cischeat_vregs_w)
 {
-	cischeat_state *state = space->machine().driver_data<cischeat_state>();
-	UINT16 old_data = state->m_vregs[offset];
-	UINT16 new_data = COMBINE_DATA(&state->m_vregs[offset]);
+	UINT16 old_data = m_vregs[offset];
+	UINT16 new_data = COMBINE_DATA(&m_vregs[offset]);
 
 	switch (offset)
 	{
 		case 0x0000/2   :	// leds
 			if (ACCESSING_BITS_0_7)
 			{
-				coin_counter_w(space->machine(), 0,new_data & 0x01);
-				coin_counter_w(space->machine(), 1,new_data & 0x02);
-				set_led_status(space->machine(), 0,new_data & 0x10);	// start button
-				set_led_status(space->machine(), 1,new_data & 0x20);	// ?
+				coin_counter_w(machine(), 0,new_data & 0x01);
+				coin_counter_w(machine(), 1,new_data & 0x02);
+				set_led_status(machine(), 0,new_data & 0x10);	// start button
+				set_led_status(machine(), 1,new_data & 0x20);	// ?
 			}
 			break;
 
@@ -443,39 +439,39 @@ WRITE16_HANDLER( cischeat_vregs_w )
 
 		case 0x0004/2   :	// motor (seat?)
 			if (ACCESSING_BITS_0_7)
-				set_led_status(space->machine(), 2, (new_data != old_data) ? 1 : 0);
+				set_led_status(machine(), 2, (new_data != old_data) ? 1 : 0);
 			break;
 
 		case 0x0006/2   :	// motor (wheel?)
 			break;
 
-		case 0x0010/2   : state->m_ip_select = new_data;	break;
+		case 0x0010/2   : m_ip_select = new_data;	break;
 		case 0x0012/2   : break; // value above + 1
 
 		case 0x2000/2+0 : CISCHEAT_VREG_SCROLL(0,x);		break;
 		case 0x2000/2+1 : CISCHEAT_VREG_SCROLL(0,y);		break;
-		case 0x2000/2+2 : cischeat_set_vreg_flag(state,0,new_data);break;
+		case 0x2000/2+2 : cischeat_set_vreg_flag(0,new_data);break;
 
 		case 0x2008/2+0 : CISCHEAT_VREG_SCROLL(1,x);		break;
 		case 0x2008/2+1 : CISCHEAT_VREG_SCROLL(1,y);		break;
-		case 0x2008/2+2 : cischeat_set_vreg_flag(state,1,new_data);break;
+		case 0x2008/2+2 : cischeat_set_vreg_flag(1,new_data);break;
 
 		case 0x2100/2+0 : CISCHEAT_VREG_SCROLL(2,x);		break;
 		case 0x2100/2+1 : CISCHEAT_VREG_SCROLL(2,y);		break;
-		case 0x2100/2+2 : cischeat_set_vreg_flag(state,2,new_data);break;
+		case 0x2100/2+2 : cischeat_set_vreg_flag(2,new_data);break;
 
 		case 0x2108/2   : break;	// ? written with 0 only
 		case 0x2208/2   : break;	// watchdog reset
 
 		case 0x2300/2   :	/* Sound CPU: reads latch during int 4, and stores command */
-							state->soundlatch_word_w(*space, 0, new_data, 0xffff);
-							cputag_set_input_line(space->machine(), "soundcpu", 4, HOLD_LINE);
+							soundlatch_word_w(space, 0, new_data, 0xffff);
+							cputag_set_input_line(machine(), "soundcpu", 4, HOLD_LINE);
 							break;
 
 		/* Not sure about this one.. */
-		case 0x2308/2   :	cputag_set_input_line(space->machine(), "cpu2", INPUT_LINE_RESET, (new_data & 2) ? ASSERT_LINE : CLEAR_LINE );
-							cputag_set_input_line(space->machine(), "cpu3", INPUT_LINE_RESET, (new_data & 2) ? ASSERT_LINE : CLEAR_LINE );
-							cputag_set_input_line(space->machine(), "soundcpu", INPUT_LINE_RESET, (new_data & 1) ? ASSERT_LINE : CLEAR_LINE );
+		case 0x2308/2   :	cputag_set_input_line(machine(), "cpu2", INPUT_LINE_RESET, (new_data & 2) ? ASSERT_LINE : CLEAR_LINE );
+							cputag_set_input_line(machine(), "cpu3", INPUT_LINE_RESET, (new_data & 2) ? ASSERT_LINE : CLEAR_LINE );
+							cputag_set_input_line(machine(), "soundcpu", INPUT_LINE_RESET, (new_data & 1) ? ASSERT_LINE : CLEAR_LINE );
 							break;
 
 		default: SHOW_WRITE_ERROR("vreg %04X <- %04X",offset*2,data);
@@ -488,41 +484,39 @@ WRITE16_HANDLER( cischeat_vregs_w )
                             F1 GrandPrix Star
 **************************************************************************/
 
-READ16_HANDLER( f1gpstar_vregs_r )
+READ16_MEMBER(cischeat_state::f1gpstar_vregs_r)
 {
-	cischeat_state *state = space->machine().driver_data<cischeat_state>();
 	switch (offset)
 	{
-		case 0x0000/2 :	return input_port_read(space->machine(), "IN1");	// DSW 1 & 2
+		case 0x0000/2 :	return input_port_read(machine(), "IN1");	// DSW 1 & 2
 
 //      case 0x0002/2 : return 0xFFFF;
 
-		case 0x0004/2 :	return input_port_read(space->machine(), "IN2");	// Buttons
+		case 0x0004/2 :	return input_port_read(machine(), "IN2");	// Buttons
 
-		case 0x0006/2 :	return input_port_read(space->machine(), "IN3");	// ? Read at boot only
+		case 0x0006/2 :	return input_port_read(machine(), "IN3");	// ? Read at boot only
 
-		case 0x0008/2 :	return state->soundlatch2_r(*space,0);		// From sound cpu
+		case 0x0008/2 :	return soundlatch2_r(space,0);		// From sound cpu
 
-		case 0x000c/2 :	return input_port_read(space->machine(), "IN4");	// DSW 3
+		case 0x000c/2 :	return input_port_read(machine(), "IN4");	// DSW 3
 
 		case 0x0010/2 :	// Accel + Driving Wheel
-			return (input_port_read(space->machine(), "PEDAL") & 0xff) + ((input_port_read(space->machine(), "IN5") & 0xff)<<8);
+			return (input_port_read(machine(), "PEDAL") & 0xff) + ((input_port_read(machine(), "IN5") & 0xff)<<8);
 
 		default:		SHOW_READ_ERROR("vreg %04X read!",offset*2);
-						return state->m_vregs[offset];
+						return m_vregs[offset];
 	}
 }
 
-READ16_HANDLER( f1gpstr2_vregs_r )
+READ16_MEMBER(cischeat_state::f1gpstr2_vregs_r)
 {
-	cischeat_state *state = space->machine().driver_data<cischeat_state>();
 	if ((offset >= 0x1000/2) && (offset < 0x2000/2))
-		return state->m_vregs[offset];
+		return m_vregs[offset];
 
 	switch (offset)
 	{
 		case 0x0018/2 :
-			return (state->m_f1gpstr2_ioready[0]&1) ? 0xff : 0xf0;
+			return (m_f1gpstr2_ioready[0]&1) ? 0xff : 0xf0;
 
 		default:
 			return f1gpstar_vregs_r(space,offset,mem_mask);
@@ -533,37 +527,35 @@ READ16_HANDLER( f1gpstr2_vregs_r )
                             Wild Pilot
 **************************************************************************/
 
-READ16_HANDLER( wildplt_vregs_r )
+READ16_MEMBER(cischeat_state::wildplt_vregs_r)
 {
-	cischeat_state *state = space->machine().driver_data<cischeat_state>();
 	if ((offset >= 0x1000/2) && (offset < 0x2000/2))
-		return state->m_vregs[offset];
+		return m_vregs[offset];
 
 	switch (offset)
 	{
-		case 0x0000/2 :	return input_port_read(space->machine(), "IN0"); // DSW 1 & 2
+		case 0x0000/2 :	return input_port_read(machine(), "IN0"); // DSW 1 & 2
 
-		case 0x0004/2 :	return input_port_read(space->machine(), "IN1"); // Buttons
+		case 0x0004/2 :	return input_port_read(machine(), "IN1"); // Buttons
 
-		case 0x0008/2 :	return state->soundlatch2_r(*space,0); // From sound cpu
+		case 0x0008/2 :	return soundlatch2_r(space,0); // From sound cpu
 
 		case 0x0010/2 :	// X, Y
-			return input_port_read(space->machine(), "IN2") | (input_port_read(space->machine(), "IN3")<<8);
+			return input_port_read(machine(), "IN2") | (input_port_read(machine(), "IN3")<<8);
 
 		case 0x0018/2 :
-			return (state->m_f1gpstr2_ioready[0]&1) ? 0xff : 0xf0;
+			return (m_f1gpstr2_ioready[0]&1) ? 0xff : 0xf0;
 
 		default: SHOW_READ_ERROR("vreg %04X read!",offset*2);
-			return state->m_vregs[offset];
+			return m_vregs[offset];
 	}
 }
 
 
-WRITE16_HANDLER( f1gpstar_vregs_w )
+WRITE16_MEMBER(cischeat_state::f1gpstar_vregs_w)
 {
-	cischeat_state *state = space->machine().driver_data<cischeat_state>();
-//  UINT16 old_data = state->m_vregs[offset];
-	UINT16 new_data = COMBINE_DATA(&state->m_vregs[offset]);
+//  UINT16 old_data = m_vregs[offset];
+	UINT16 new_data = COMBINE_DATA(&m_vregs[offset]);
 
 	switch (offset)
 	{
@@ -576,52 +568,51 @@ CPU #0 PC 00235C : Warning, vreg 0006 <- 0000
 		case 0x0004/2   :
 			if (ACCESSING_BITS_0_7)
 			{
-				coin_counter_w(space->machine(), 0,new_data & 0x01);
-				coin_counter_w(space->machine(), 1,new_data & 0x02);
-				set_led_status(space->machine(), 0,new_data & 0x04);	// start button
-				set_led_status(space->machine(), 1,new_data & 0x20);	// ?
+				coin_counter_w(machine(), 0,new_data & 0x01);
+				coin_counter_w(machine(), 1,new_data & 0x02);
+				set_led_status(machine(), 0,new_data & 0x04);	// start button
+				set_led_status(machine(), 1,new_data & 0x20);	// ?
 				// wheel | seat motor
-				set_led_status(space->machine(), 2, ((new_data >> 3) | (new_data >> 4)) & 1 );
+				set_led_status(machine(), 2, ((new_data >> 3) | (new_data >> 4)) & 1 );
 			}
 			break;
 		case 0x0014/2   :	break;
 
 		/* Usually written in sequence, but not always */
-		case 0x0008/2   :	state->soundlatch_word_w(*space, 0, new_data, 0xffff);	break;
-		case 0x0018/2   :	cputag_set_input_line(space->machine(), "soundcpu", 4, HOLD_LINE);	break;
+		case 0x0008/2   :	soundlatch_word_w(space, 0, new_data, 0xffff);	break;
+		case 0x0018/2   :	cputag_set_input_line(machine(), "soundcpu", 4, HOLD_LINE);	break;
 
 		case 0x0010/2   :	break;
 
 		case 0x2000/2+0 : CISCHEAT_VREG_SCROLL(0,x);		break;
 		case 0x2000/2+1 : CISCHEAT_VREG_SCROLL(0,y);		break;
-		case 0x2000/2+2 : cischeat_set_vreg_flag(state,0,new_data);break;
+		case 0x2000/2+2 : cischeat_set_vreg_flag(0,new_data);break;
 
 		case 0x2008/2+0 : CISCHEAT_VREG_SCROLL(1,x);		break;
 		case 0x2008/2+1 : CISCHEAT_VREG_SCROLL(1,y);		break;
-		case 0x2008/2+2 : cischeat_set_vreg_flag(state,1,new_data);break;
+		case 0x2008/2+2 : cischeat_set_vreg_flag(1,new_data);break;
 
 		case 0x2100/2+0 : CISCHEAT_VREG_SCROLL(2,x);		break;
 		case 0x2100/2+1 : CISCHEAT_VREG_SCROLL(2,y);		break;
-		case 0x2100/2+2 : cischeat_set_vreg_flag(state,2,new_data);break;
+		case 0x2100/2+2 : cischeat_set_vreg_flag(2,new_data);break;
 
 		case 0x2108/2   : break;	// ? written with 0 only
 		case 0x2208/2   : break;	// watchdog reset
 
 		/* Not sure about this one. Values: $10 then 0, $7 then 0 */
-		case 0x2308/2   :	cputag_set_input_line(space->machine(), "cpu2", INPUT_LINE_RESET, (new_data & 1) ? ASSERT_LINE : CLEAR_LINE );
-							cputag_set_input_line(space->machine(), "cpu3", INPUT_LINE_RESET, (new_data & 2) ? ASSERT_LINE : CLEAR_LINE );
-							cputag_set_input_line(space->machine(), "soundcpu", INPUT_LINE_RESET, (new_data & 4) ? ASSERT_LINE : CLEAR_LINE );
+		case 0x2308/2   :	cputag_set_input_line(machine(), "cpu2", INPUT_LINE_RESET, (new_data & 1) ? ASSERT_LINE : CLEAR_LINE );
+							cputag_set_input_line(machine(), "cpu3", INPUT_LINE_RESET, (new_data & 2) ? ASSERT_LINE : CLEAR_LINE );
+							cputag_set_input_line(machine(), "soundcpu", INPUT_LINE_RESET, (new_data & 4) ? ASSERT_LINE : CLEAR_LINE );
 							break;
 
 		default:		SHOW_WRITE_ERROR("vreg %04X <- %04X",offset*2,data);
 	}
 }
 
-WRITE16_HANDLER( f1gpstr2_vregs_w )
+WRITE16_MEMBER(cischeat_state::f1gpstr2_vregs_w)
 {
-	cischeat_state *state = space->machine().driver_data<cischeat_state>();
-	UINT16 old_data = state->m_vregs[offset];
-	UINT16 new_data = COMBINE_DATA(&state->m_vregs[offset]);
+	UINT16 old_data = m_vregs[offset];
+	UINT16 new_data = COMBINE_DATA(&m_vregs[offset]);
 
 	if ((offset >= 0x1000/2) && (offset < 0x2000/2))
 		return;
@@ -632,9 +623,9 @@ WRITE16_HANDLER( f1gpstr2_vregs_w )
 			if (ACCESSING_BITS_0_7)
 			{
 				if((old_data & 4) && ((new_data & 4) == 0))
-					cputag_set_input_line(space->machine(), "cpu5", 4, HOLD_LINE);
+					cputag_set_input_line(machine(), "cpu5", 4, HOLD_LINE);
 				if((old_data & 2) && ((new_data & 2) == 0))
-					cputag_set_input_line(space->machine(), "cpu5", 2, HOLD_LINE);
+					cputag_set_input_line(machine(), "cpu5", 2, HOLD_LINE);
 			}
 			break;
 
@@ -648,17 +639,16 @@ WRITE16_HANDLER( f1gpstr2_vregs_w )
                                 Scud Hammer
 **************************************************************************/
 
-WRITE16_HANDLER( scudhamm_vregs_w )
+WRITE16_MEMBER(cischeat_state::scudhamm_vregs_w)
 {
-	cischeat_state *state = space->machine().driver_data<cischeat_state>();
-//  int old_data = state->m_vregs[offset];
-	int new_data = COMBINE_DATA(&state->m_vregs[offset]);
+//  int old_data = m_vregs[offset];
+	int new_data = COMBINE_DATA(&m_vregs[offset]);
 
 	switch (offset)
 	{
 		case 0x000/2+0 : CISCHEAT_VREG_SCROLL(0,x);		break;
 		case 0x000/2+1 : CISCHEAT_VREG_SCROLL(0,y);		break;
-		case 0x000/2+2 : cischeat_set_vreg_flag(state,0,new_data);break;
+		case 0x000/2+2 : cischeat_set_vreg_flag(0,new_data);break;
 
 //      UNUSED LAYER
 		case 0x008/2+0 :
@@ -668,9 +658,9 @@ WRITE16_HANDLER( scudhamm_vregs_w )
 
 		case 0x100/2+0 : CISCHEAT_VREG_SCROLL(2,x);		break;
 		case 0x100/2+1 : CISCHEAT_VREG_SCROLL(2,y);		break;
-		case 0x100/2+2 : cischeat_set_vreg_flag(state,2,new_data);break;
+		case 0x100/2+2 : cischeat_set_vreg_flag(2,new_data);break;
 
-		case 0x208/2   : state->watchdog_reset_w(*space,0,0);	break;
+		case 0x208/2   : watchdog_reset_w(space,0,0);	break;
 
 		default: SHOW_WRITE_ERROR("vreg %04X <- %04X",offset*2,data);
 	}

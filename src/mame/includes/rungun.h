@@ -42,6 +42,9 @@ public:
 	DECLARE_READ16_MEMBER(sound_status_msb_r);
 	DECLARE_WRITE8_MEMBER(sound_status_w);
 	DECLARE_WRITE8_MEMBER(z80ctrl_w);
+	DECLARE_READ16_MEMBER(rng_ttl_ram_r);
+	DECLARE_WRITE16_MEMBER(rng_ttl_ram_w);
+	DECLARE_WRITE16_MEMBER(rng_936_videoram_w);
 };
 
 
@@ -51,9 +54,6 @@ public:
 
 extern void rng_sprite_callback(running_machine &machine, int *code, int *color, int *priority_mask);
 
-READ16_HANDLER( rng_ttl_ram_r );
-WRITE16_HANDLER( rng_ttl_ram_w );
-WRITE16_HANDLER( rng_936_videoram_w );
 
 VIDEO_START( rng );
 SCREEN_UPDATE_IND16( rng );

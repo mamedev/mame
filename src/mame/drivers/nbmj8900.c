@@ -110,15 +110,15 @@ static DRIVER_INIT( togenkyo )
 
 static ADDRESS_MAP_START( ohpaipee_map, AS_PROGRAM, 8, nbmj8900_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
-	AM_RANGE(0xf000, 0xf00f) AM_READWRITE_LEGACY(nbmj8900_clut_r, nbmj8900_clut_w)
-	AM_RANGE(0xf400, 0xf5ff) AM_READWRITE_LEGACY(nbmj8900_palette_type1_r, nbmj8900_palette_type1_w)
+	AM_RANGE(0xf000, 0xf00f) AM_READWRITE(nbmj8900_clut_r, nbmj8900_clut_w)
+	AM_RANGE(0xf400, 0xf5ff) AM_READWRITE(nbmj8900_palette_type1_r, nbmj8900_palette_type1_w)
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( togenkyo_map, AS_PROGRAM, 8, nbmj8900_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
-	AM_RANGE(0xf000, 0xf00f) AM_READWRITE_LEGACY(nbmj8900_clut_r, nbmj8900_clut_w)
-	AM_RANGE(0xf400, 0xf5ff) AM_READWRITE_LEGACY(nbmj8900_palette_type1_r, nbmj8900_palette_type1_w)
+	AM_RANGE(0xf000, 0xf00f) AM_READWRITE(nbmj8900_clut_r, nbmj8900_clut_w)
+	AM_RANGE(0xf400, 0xf5ff) AM_READWRITE(nbmj8900_palette_type1_r, nbmj8900_palette_type1_w)
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -126,11 +126,11 @@ static ADDRESS_MAP_START( ohpaipee_io_map, AS_IO, 8, nbmj8900_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x7f) AM_READ_LEGACY(nb1413m3_sndrom_r)
 	AM_RANGE(0x00, 0x00) AM_WRITE_LEGACY(nb1413m3_nmi_clock_w)
-	AM_RANGE(0x20, 0x27) AM_WRITE_LEGACY(nbmj8900_blitter_w)
+	AM_RANGE(0x20, 0x27) AM_WRITE(nbmj8900_blitter_w)
 
-	AM_RANGE(0x40, 0x40) AM_WRITE_LEGACY(nbmj8900_clutsel_w)
-	AM_RANGE(0x60, 0x60) AM_WRITE_LEGACY(nbmj8900_romsel_w)
-	AM_RANGE(0x70, 0x70) AM_WRITE_LEGACY(nbmj8900_scrolly_w)
+	AM_RANGE(0x40, 0x40) AM_WRITE(nbmj8900_clutsel_w)
+	AM_RANGE(0x60, 0x60) AM_WRITE(nbmj8900_romsel_w)
+	AM_RANGE(0x70, 0x70) AM_WRITE(nbmj8900_scrolly_w)
 
 	AM_RANGE(0x80, 0x81) AM_DEVREADWRITE_LEGACY("ymsnd", ym3812_r,ym3812_w)
 
@@ -140,7 +140,7 @@ static ADDRESS_MAP_START( ohpaipee_io_map, AS_IO, 8, nbmj8900_state )
 	AM_RANGE(0xb0, 0xb0) AM_READWRITE_LEGACY(nb1413m3_inputport2_r,nb1413m3_sndrombank1_w)
 	AM_RANGE(0xc0, 0xc0) AM_READ_LEGACY(nb1413m3_inputport3_r)
 	AM_RANGE(0xd0, 0xd0) AM_DEVWRITE_LEGACY("dac", DAC_WRITE)
-	AM_RANGE(0xe0, 0xe0) AM_WRITE_LEGACY(nbmj8900_vramsel_w)
+	AM_RANGE(0xe0, 0xe0) AM_WRITE(nbmj8900_vramsel_w)
 	AM_RANGE(0xf0, 0xf0) AM_READ_LEGACY(nb1413m3_dipsw1_r)
 	AM_RANGE(0xf1, 0xf1) AM_READWRITE_LEGACY(nb1413m3_dipsw2_r, nb1413m3_outcoin_w)
 ADDRESS_MAP_END

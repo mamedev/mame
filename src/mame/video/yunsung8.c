@@ -37,58 +37,55 @@ Note:   if MAME_DEBUG is defined, pressing Z with:
 
 ***************************************************************************/
 
-WRITE8_HANDLER( yunsung8_videobank_w )
+WRITE8_MEMBER(yunsung8_state::yunsung8_videobank_w)
 {
-	yunsung8_state *state = space->machine().driver_data<yunsung8_state>();
-	state->m_videobank = data;
+	m_videobank = data;
 }
 
 
-READ8_HANDLER( yunsung8_videoram_r )
+READ8_MEMBER(yunsung8_state::yunsung8_videoram_r)
 {
-	yunsung8_state *state = space->machine().driver_data<yunsung8_state>();
 	int bank;
 
 	/*  Bit 1 of the bankswitching register contols the c000-c7ff
         area (Palette). Bit 0 controls the c800-dfff area (Tiles) */
 
 	if (offset < 0x0800)
-		bank = state->m_videobank & 2;
+		bank = m_videobank & 2;
 	else
-		bank = state->m_videobank & 1;
+		bank = m_videobank & 1;
 
 	if (bank)
-		return state->m_videoram_0[offset];
+		return m_videoram_0[offset];
 	else
-		return state->m_videoram_1[offset];
+		return m_videoram_1[offset];
 }
 
 
-WRITE8_HANDLER( yunsung8_videoram_w )
+WRITE8_MEMBER(yunsung8_state::yunsung8_videoram_w)
 {
-	yunsung8_state *state = space->machine().driver_data<yunsung8_state>();
 
 	if (offset < 0x0800)		// c000-c7ff    Banked Palette RAM
 	{
-		int bank = state->m_videobank & 2;
+		int bank = m_videobank & 2;
 		UINT8 *RAM;
 		int color;
 
 		if (bank)
-			RAM = state->m_videoram_0;
+			RAM = m_videoram_0;
 		else
-			RAM = state->m_videoram_1;
+			RAM = m_videoram_1;
 
 		RAM[offset] = data;
 		color = RAM[offset & ~1] | (RAM[offset | 1] << 8);
 
 		/* BBBBBGGGGGRRRRRx */
-		palette_set_color_rgb(space->machine(), offset / 2 + (bank ? 0x400 : 0), pal5bit(color >> 0), pal5bit(color >> 5), pal5bit(color >> 10));
+		palette_set_color_rgb(machine(), offset / 2 + (bank ? 0x400 : 0), pal5bit(color >> 0), pal5bit(color >> 5), pal5bit(color >> 10));
 	}
 	else
 	{
 		int tile;
-		int bank = state->m_videobank & 1;
+		int bank = m_videobank & 1;
 
 		if (offset < 0x1000)
 			tile = (offset - 0x0800);		// c800-cfff: Banked Color RAM
@@ -97,21 +94,21 @@ WRITE8_HANDLER( yunsung8_videoram_w )
 
 		if (bank)
 		{
-			state->m_videoram_0[offset] = data;
-			state->m_tilemap_0->mark_tile_dirty(tile);
+			m_videoram_0[offset] = data;
+			m_tilemap_0->mark_tile_dirty(tile);
 		}
 		else
 		{
-			state->m_videoram_1[offset] = data;
-			state->m_tilemap_1->mark_tile_dirty(tile);
+			m_videoram_1[offset] = data;
+			m_tilemap_1->mark_tile_dirty(tile);
 		}
 	}
 }
 
 
-WRITE8_HANDLER( yunsung8_flipscreen_w )
+WRITE8_MEMBER(yunsung8_state::yunsung8_flipscreen_w)
 {
-	space->machine().tilemap().set_flip_all((data & 1) ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
+	machine().tilemap().set_flip_all((data & 1) ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
 }
 
 

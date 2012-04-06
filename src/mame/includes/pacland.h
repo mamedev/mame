@@ -25,16 +25,16 @@ public:
 	DECLARE_WRITE8_MEMBER(pacland_irq_1_ctrl_w);
 	DECLARE_WRITE8_MEMBER(pacland_irq_2_ctrl_w);
 	DECLARE_READ8_MEMBER(readFF);
+	DECLARE_WRITE8_MEMBER(pacland_videoram_w);
+	DECLARE_WRITE8_MEMBER(pacland_videoram2_w);
+	DECLARE_WRITE8_MEMBER(pacland_scroll0_w);
+	DECLARE_WRITE8_MEMBER(pacland_scroll1_w);
+	DECLARE_WRITE8_MEMBER(pacland_bankswitch_w);
 };
 
 
 /*----------- defined in video/pacland.c -----------*/
 
-WRITE8_HANDLER( pacland_videoram_w );
-WRITE8_HANDLER( pacland_videoram2_w );
-WRITE8_HANDLER( pacland_scroll0_w );
-WRITE8_HANDLER( pacland_scroll1_w );
-WRITE8_HANDLER( pacland_bankswitch_w );
 
 PALETTE_INIT( pacland );
 VIDEO_START( pacland );

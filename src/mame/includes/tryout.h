@@ -17,16 +17,16 @@ public:
 	DECLARE_WRITE8_MEMBER(tryout_sound_w);
 	DECLARE_WRITE8_MEMBER(tryout_sound_irq_ack_w);
 	DECLARE_WRITE8_MEMBER(tryout_bankswitch_w);
+	DECLARE_READ8_MEMBER(tryout_vram_r);
+	DECLARE_WRITE8_MEMBER(tryout_videoram_w);
+	DECLARE_WRITE8_MEMBER(tryout_vram_w);
+	DECLARE_WRITE8_MEMBER(tryout_vram_bankswitch_w);
+	DECLARE_WRITE8_MEMBER(tryout_flipscreen_w);
 };
 
 
 /*----------- defined in video/tryout.c -----------*/
 
-READ8_HANDLER( tryout_vram_r );
-WRITE8_HANDLER( tryout_videoram_w );
-WRITE8_HANDLER( tryout_vram_w );
-WRITE8_HANDLER( tryout_vram_bankswitch_w );
-WRITE8_HANDLER( tryout_flipscreen_w );
 
 PALETTE_INIT( tryout );
 VIDEO_START( tryout );

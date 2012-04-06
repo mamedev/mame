@@ -18,10 +18,9 @@
 
   Thanks Zwaxy for the timer info. */
 
-READ8_HANDLER( dday_countdown_timer_r )
+READ8_MEMBER(dday_state::dday_countdown_timer_r)
 {
-	dday_state *state = space->machine().driver_data<dday_state>();
-	return ((state->m_timer_value / 10) << 4) | (state->m_timer_value % 10);
+	return ((m_timer_value / 10) << 4) | (m_timer_value % 10);
 }
 
 static TIMER_CALLBACK( countdown_timer_callback )
@@ -228,85 +227,78 @@ VIDEO_START( dday )
 	start_countdown_timer(machine);
 }
 
-WRITE8_HANDLER( dday_bgvideoram_w )
+WRITE8_MEMBER(dday_state::dday_bgvideoram_w)
 {
-	dday_state *state = space->machine().driver_data<dday_state>();
 
-	state->m_bgvideoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_bgvideoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( dday_fgvideoram_w )
+WRITE8_MEMBER(dday_state::dday_fgvideoram_w)
 {
-	dday_state *state = space->machine().driver_data<dday_state>();
 
-	state->m_fgvideoram[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset);
-	state->m_fg_tilemap->mark_tile_dirty(offset ^ 0x1f);  /* for flipx case */
+	m_fgvideoram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset);
+	m_fg_tilemap->mark_tile_dirty(offset ^ 0x1f);  /* for flipx case */
 }
 
-WRITE8_HANDLER( dday_textvideoram_w )
+WRITE8_MEMBER(dday_state::dday_textvideoram_w)
 {
-	dday_state *state = space->machine().driver_data<dday_state>();
 
-	state->m_textvideoram[offset] = data;
-	state->m_text_tilemap->mark_tile_dirty(offset);
+	m_textvideoram[offset] = data;
+	m_text_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( dday_colorram_w )
+WRITE8_MEMBER(dday_state::dday_colorram_w)
 {
-	dday_state *state = space->machine().driver_data<dday_state>();
 	int i;
 
 	offset &= 0x03e0;
 
-	state->m_colorram[offset & 0x3e0] = data;
+	m_colorram[offset & 0x3e0] = data;
 
 	for (i = 0; i < 0x20; i++)
-		state->m_fg_tilemap->mark_tile_dirty(offset + i);
+		m_fg_tilemap->mark_tile_dirty(offset + i);
 }
 
-READ8_HANDLER( dday_colorram_r )
+READ8_MEMBER(dday_state::dday_colorram_r)
 {
-	dday_state *state = space->machine().driver_data<dday_state>();
-	return state->m_colorram[offset & 0x03e0];
+	return m_colorram[offset & 0x03e0];
 }
 
 
-WRITE8_HANDLER( dday_sl_control_w )
+WRITE8_MEMBER(dday_state::dday_sl_control_w)
 {
-	dday_state *state = space->machine().driver_data<dday_state>();
 
-	if (state->m_sl_image != data)
+	if (m_sl_image != data)
 	{
-		state->m_sl_image = data;
-		state->m_sl_tilemap->mark_all_dirty();
+		m_sl_image = data;
+		m_sl_tilemap->mark_all_dirty();
 	}
 }
 
 
-WRITE8_HANDLER( dday_control_w )
+WRITE8_MEMBER(dday_state::dday_control_w)
 {
-	dday_state *state = space->machine().driver_data<dday_state>();
 
 	//if (data & 0xac)  logerror("Control = %02X\n", data & 0xac);
 
 	/* bit 0 is coin counter 1 */
-	coin_counter_w(space->machine(), 0, data & 0x01);
+	coin_counter_w(machine(), 0, data & 0x01);
 
 	/* bit 1 is coin counter 2 */
-	coin_counter_w(space->machine(), 1, data & 0x02);
+	coin_counter_w(machine(), 1, data & 0x02);
 
 	/* bit 4 is sound enable */
-	if (!(data & 0x10) && (state->m_control & 0x10))
-		state->m_ay1->reset();
+	if (!(data & 0x10) && (m_control & 0x10))
+		m_ay1->reset();
 
-	space->machine().sound().system_enable(data & 0x10);
+	machine().sound().system_enable(data & 0x10);
 
 	/* bit 6 is search light enable */
-	state->m_sl_enable = data & 0x40;
+	m_sl_enable = data & 0x40;
 
-	state->m_control = data;
+	m_control = data;
 }
 
 /***************************************************************************

@@ -21,6 +21,9 @@ public:
 	DECLARE_READ8_MEMBER(cabalbl_snd2_r);
 	DECLARE_READ8_MEMBER(cabalbl_snd1_r);
 	DECLARE_WRITE8_MEMBER(cabalbl_coin_w);
+	DECLARE_WRITE16_MEMBER(cabal_flipscreen_w);
+	DECLARE_WRITE16_MEMBER(cabal_background_videoram16_w);
+	DECLARE_WRITE16_MEMBER(cabal_text_videoram16_w);
 };
 
 
@@ -28,6 +31,3 @@ public:
 
 extern VIDEO_START( cabal );
 extern SCREEN_UPDATE_IND16( cabal );
-WRITE16_HANDLER( cabal_flipscreen_w );
-WRITE16_HANDLER( cabal_background_videoram16_w );
-WRITE16_HANDLER( cabal_text_videoram16_w );

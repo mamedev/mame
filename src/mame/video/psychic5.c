@@ -89,115 +89,108 @@ static void set_background_palette_intensity(running_machine &machine)
   Memory handler
 ***************************************************************************/
 
-READ8_HANDLER( psychic5_vram_page_select_r )
+READ8_MEMBER(psychic5_state::psychic5_vram_page_select_r)
 {
-	psychic5_state *state = space->machine().driver_data<psychic5_state>();
-	return state->m_ps5_vram_page;
+	return m_ps5_vram_page;
 }
 
-WRITE8_HANDLER( psychic5_vram_page_select_w )
+WRITE8_MEMBER(psychic5_state::psychic5_vram_page_select_w)
 {
-	psychic5_state *state = space->machine().driver_data<psychic5_state>();
-	state->m_ps5_vram_page = data & 1;
+	m_ps5_vram_page = data & 1;
 }
 
-WRITE8_HANDLER( psychic5_title_screen_w )
+WRITE8_MEMBER(psychic5_state::psychic5_title_screen_w)
 {
-	psychic5_state *state = space->machine().driver_data<psychic5_state>();
-	state->m_title_screen = data;
+	m_title_screen = data;
 }
 
-READ8_HANDLER( psychic5_paged_ram_r )
+READ8_MEMBER(psychic5_state::psychic5_paged_ram_r)
 {
-	psychic5_state *state = space->machine().driver_data<psychic5_state>();
-	if (state->m_ps5_vram_page == 1)
+	if (m_ps5_vram_page == 1)
 	{
 		switch (offset)
 		{
-			case 0x00: return input_port_read(space->machine(), "SYSTEM");
-			case 0x01: return input_port_read(space->machine(), "P1");
-			case 0x02: return input_port_read(space->machine(), "P2");
-			case 0x03: return input_port_read(space->machine(), "DSW1");
-			case 0x04: return input_port_read(space->machine(), "DSW2");
+			case 0x00: return input_port_read(machine(), "SYSTEM");
+			case 0x01: return input_port_read(machine(), "P1");
+			case 0x02: return input_port_read(machine(), "P2");
+			case 0x03: return input_port_read(machine(), "DSW1");
+			case 0x04: return input_port_read(machine(), "DSW2");
 		}
 	}
 
-	return state->m_ps5_pagedram[state->m_ps5_vram_page][offset];
+	return m_ps5_pagedram[m_ps5_vram_page][offset];
 }
 
-WRITE8_HANDLER( psychic5_paged_ram_w )
+WRITE8_MEMBER(psychic5_state::psychic5_paged_ram_w)
 {
-	psychic5_state *state = space->machine().driver_data<psychic5_state>();
-	state->m_ps5_pagedram[state->m_ps5_vram_page][offset] = data;
+	m_ps5_pagedram[m_ps5_vram_page][offset] = data;
 
-	if (state->m_ps5_vram_page == 0)
+	if (m_ps5_vram_page == 0)
 	{
 		if (offset <= 0xfff)
-			state->m_bg_tilemap->mark_tile_dirty(offset >> 1);
+			m_bg_tilemap->mark_tile_dirty(offset >> 1);
 	}
 	else
 	{
 		if (offset == BG_SCROLLX_LSB || offset == BG_SCROLLX_MSB)
 		{
-			UINT16 bg_scrollx = state->m_ps5_io_ram[BG_SCROLLX_LSB] | (state->m_ps5_io_ram[BG_SCROLLX_MSB] << 8);
-			state->m_bg_tilemap->set_scrollx(0, bg_scrollx);
+			UINT16 bg_scrollx = m_ps5_io_ram[BG_SCROLLX_LSB] | (m_ps5_io_ram[BG_SCROLLX_MSB] << 8);
+			m_bg_tilemap->set_scrollx(0, bg_scrollx);
 		}
 		else if (offset == BG_SCROLLY_LSB || offset == BG_SCROLLY_MSB)
 		{
-			UINT16 bg_scrolly = state->m_ps5_io_ram[BG_SCROLLY_LSB] | (state->m_ps5_io_ram[BG_SCROLLY_MSB] << 8);
-			state->m_bg_tilemap->set_scrolly(0, bg_scrolly);
+			UINT16 bg_scrolly = m_ps5_io_ram[BG_SCROLLY_LSB] | (m_ps5_io_ram[BG_SCROLLY_MSB] << 8);
+			m_bg_tilemap->set_scrolly(0, bg_scrolly);
 		}
 		else if (offset == BG_SCREEN_MODE)
 		{
-			state->m_bg_status = state->m_ps5_io_ram[BG_SCREEN_MODE];
+			m_bg_status = m_ps5_io_ram[BG_SCREEN_MODE];
 		}
 		else if (offset >= 0x400 && offset <= 0x5ff)	/* Sprite color */
-			psychic5_change_palette(space->machine(),((offset >> 1) & 0xff)+0x000,offset-0x400);
+			psychic5_change_palette(machine(),((offset >> 1) & 0xff)+0x000,offset-0x400);
 		else if (offset >= 0x800 && offset <= 0x9ff)	/* BG color */
-			psychic5_change_palette(space->machine(),((offset >> 1) & 0xff)+0x100,offset-0x400);
+			psychic5_change_palette(machine(),((offset >> 1) & 0xff)+0x100,offset-0x400);
 		else if (offset >= 0xa00 && offset <= 0xbff)	/* Text color */
-			psychic5_change_palette(space->machine(),((offset >> 1) & 0xff)+0x200,offset-0x400);
+			psychic5_change_palette(machine(),((offset >> 1) & 0xff)+0x200,offset-0x400);
 		else if (offset >= 0x1000)
-			state->m_fg_tilemap->mark_tile_dirty((offset-0x1000) >> 1);
+			m_fg_tilemap->mark_tile_dirty((offset-0x1000) >> 1);
 	}
 }
 
-WRITE8_HANDLER( bombsa_paged_ram_w )
+WRITE8_MEMBER(psychic5_state::bombsa_paged_ram_w)
 {
-	psychic5_state *state = space->machine().driver_data<psychic5_state>();
-	state->m_ps5_pagedram[state->m_ps5_vram_page][offset] = data;
+	m_ps5_pagedram[m_ps5_vram_page][offset] = data;
 
-	if (state->m_ps5_vram_page == 0)
+	if (m_ps5_vram_page == 0)
 	{
-		state->m_bg_tilemap->mark_tile_dirty(offset >> 1);
+		m_bg_tilemap->mark_tile_dirty(offset >> 1);
 	}
 	else
 	{
 		if (offset == BG_SCROLLX_LSB || offset == BG_SCROLLX_MSB)
 		{
-			UINT16 bg_scrollx = state->m_ps5_io_ram[BG_SCROLLX_LSB] | (state->m_ps5_io_ram[BG_SCROLLX_MSB] << 8);
-			state->m_bg_tilemap->set_scrollx(0, bg_scrollx);
+			UINT16 bg_scrollx = m_ps5_io_ram[BG_SCROLLX_LSB] | (m_ps5_io_ram[BG_SCROLLX_MSB] << 8);
+			m_bg_tilemap->set_scrollx(0, bg_scrollx);
 		}
 		else if (offset == BG_SCROLLY_LSB || offset == BG_SCROLLY_MSB)
 		{
-			UINT16 bg_scrolly = state->m_ps5_io_ram[BG_SCROLLY_LSB] | (state->m_ps5_io_ram[BG_SCROLLY_MSB] << 8);
-			state->m_bg_tilemap->set_scrolly(0, bg_scrolly);
+			UINT16 bg_scrolly = m_ps5_io_ram[BG_SCROLLY_LSB] | (m_ps5_io_ram[BG_SCROLLY_MSB] << 8);
+			m_bg_tilemap->set_scrolly(0, bg_scrolly);
 		}
 		else if (offset == BG_SCREEN_MODE)
 		{
-			state->m_bg_status = state->m_ps5_io_ram[BG_SCREEN_MODE];
+			m_bg_status = m_ps5_io_ram[BG_SCREEN_MODE];
 		}
 		else if (offset >= 0x0800 && offset <= 0x0fff)
-			state->m_fg_tilemap->mark_tile_dirty((offset & 0x7ff) >> 1);
+			m_fg_tilemap->mark_tile_dirty((offset & 0x7ff) >> 1);
 		else if (offset >= 0x1000 && offset <= 0x15ff)
-			psychic5_change_palette(space->machine(), (offset >> 1) & 0x3ff, offset-0x1000);
+			psychic5_change_palette(machine(), (offset >> 1) & 0x3ff, offset-0x1000);
 	}
 }
 
-WRITE8_HANDLER( bombsa_unknown_w )
+WRITE8_MEMBER(psychic5_state::bombsa_unknown_w)
 {
-	psychic5_state *state = space->machine().driver_data<psychic5_state>();
-	state->m_bombsa_unknown = data;
+	m_bombsa_unknown = data;
 }
 
 

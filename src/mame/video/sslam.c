@@ -4,14 +4,13 @@
 #include "includes/sslam.h"
 
 
-WRITE16_HANDLER( sslam_paletteram_w )
+WRITE16_MEMBER(sslam_state::sslam_paletteram_w)
 {
 	int r, g, b, val;
 
-	sslam_state *state = space->machine().driver_data<sslam_state>();
-	COMBINE_DATA(&state->m_generic_paletteram_16[offset]);
+	COMBINE_DATA(&m_generic_paletteram_16[offset]);
 
-	val = state->m_generic_paletteram_16[offset];
+	val = m_generic_paletteram_16[offset];
 	r = (val >> 11) & 0x1e;
 	g = (val >>  7) & 0x1e;
 	b = (val >>  3) & 0x1e;
@@ -20,7 +19,7 @@ WRITE16_HANDLER( sslam_paletteram_w )
 	g |= ((val & 0x04) >> 2);
 	b |= ((val & 0x02) >> 1);
 
-	palette_set_color_rgb(space->machine(), offset, pal5bit(r), pal5bit(g), pal5bit(b));
+	palette_set_color_rgb(machine(), offset, pal5bit(r), pal5bit(g), pal5bit(b));
 }
 
 static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -101,12 +100,11 @@ static TILE_GET_INFO( get_sslam_tx_tile_info )
 	SET_TILE_INFO(3,code+0xc000 ,colr >> 12,0);
 }
 
-WRITE16_HANDLER( sslam_tx_tileram_w )
+WRITE16_MEMBER(sslam_state::sslam_tx_tileram_w)
 {
-	sslam_state *state = space->machine().driver_data<sslam_state>();
 
-	COMBINE_DATA(&state->m_tx_tileram[offset]);
-	state->m_tx_tilemap->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_tx_tileram[offset]);
+	m_tx_tilemap->mark_tile_dirty(offset);
 }
 
 /* Middle Layer */
@@ -120,12 +118,11 @@ static TILE_GET_INFO( get_sslam_md_tile_info )
 	SET_TILE_INFO(2,code+0x2000 ,colr >> 12,0);
 }
 
-WRITE16_HANDLER( sslam_md_tileram_w )
+WRITE16_MEMBER(sslam_state::sslam_md_tileram_w)
 {
-	sslam_state *state = space->machine().driver_data<sslam_state>();
 
-	COMBINE_DATA(&state->m_md_tileram[offset]);
-	state->m_md_tilemap->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_md_tileram[offset]);
+	m_md_tilemap->mark_tile_dirty(offset);
 }
 
 /* Background Layer */
@@ -139,12 +136,11 @@ static TILE_GET_INFO( get_sslam_bg_tile_info )
 	SET_TILE_INFO(1,code ,colr >> 13,0);
 }
 
-WRITE16_HANDLER( sslam_bg_tileram_w )
+WRITE16_MEMBER(sslam_state::sslam_bg_tileram_w)
 {
-	sslam_state *state = space->machine().driver_data<sslam_state>();
 
-	COMBINE_DATA(&state->m_bg_tileram[offset]);
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_bg_tileram[offset]);
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 static TILE_GET_INFO( get_powerbls_bg_tile_info )
@@ -159,12 +155,11 @@ static TILE_GET_INFO( get_powerbls_bg_tile_info )
 	SET_TILE_INFO(1,code,colr,0);
 }
 
-WRITE16_HANDLER( powerbls_bg_tileram_w )
+WRITE16_MEMBER(sslam_state::powerbls_bg_tileram_w)
 {
-	sslam_state *state = space->machine().driver_data<sslam_state>();
 
-	COMBINE_DATA(&state->m_bg_tileram[offset]);
-	state->m_bg_tilemap->mark_tile_dirty(offset>>1);
+	COMBINE_DATA(&m_bg_tileram[offset]);
+	m_bg_tilemap->mark_tile_dirty(offset>>1);
 }
 
 VIDEO_START(sslam)

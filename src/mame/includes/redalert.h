@@ -25,6 +25,7 @@ public:
 	DECLARE_WRITE8_MEMBER(redalert_interrupt_clear_w);
 	DECLARE_READ8_MEMBER(panther_interrupt_clear_r);
 	DECLARE_READ8_MEMBER(panther_unk_r);
+	DECLARE_WRITE8_MEMBER(redalert_bitmap_videoram_w);
 };
 
 
@@ -42,7 +43,6 @@ MACHINE_CONFIG_EXTERN( demoneye_audio );
 
 /*----------- defined in video/redalert.c -----------*/
 
-WRITE8_HANDLER( redalert_bitmap_videoram_w );
 
 MACHINE_CONFIG_EXTERN( ww3_video );
 MACHINE_CONFIG_EXTERN( panther_video );

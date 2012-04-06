@@ -95,6 +95,19 @@ public:
 	DECLARE_WRITE16_MEMBER(tmnt2_1c0800_w);
 	DECLARE_READ8_MEMBER(k054539_ctrl_r);
 	DECLARE_WRITE8_MEMBER(k054539_ctrl_w);
+	DECLARE_WRITE16_MEMBER(tmnt_paletteram_word_w);
+	DECLARE_WRITE16_MEMBER(tmnt_0a0000_w);
+	DECLARE_WRITE16_MEMBER(punkshot_0a0020_w);
+	DECLARE_WRITE16_MEMBER(lgtnfght_0a0018_w);
+	DECLARE_WRITE16_MEMBER(blswhstl_700300_w);
+	DECLARE_READ16_MEMBER(glfgreat_rom_r);
+	DECLARE_WRITE16_MEMBER(glfgreat_122000_w);
+	DECLARE_WRITE16_MEMBER(ssriders_eeprom_w);
+	DECLARE_WRITE16_MEMBER(ssriders_1c0300_w);
+	DECLARE_WRITE16_MEMBER(prmrsocr_122000_w);
+	DECLARE_READ16_MEMBER(prmrsocr_rom_r);
+	DECLARE_WRITE16_MEMBER(tmnt_priority_w);
+	DECLARE_READ16_MEMBER(glfgreat_ball_r);
 };
 
 
@@ -113,19 +126,6 @@ extern void lgtnfght_sprite_callback(running_machine &machine, int *code,int *co
 extern void blswhstl_sprite_callback(running_machine &machine, int *code,int *color,int *priority_mask);
 extern void prmrsocr_sprite_callback(running_machine &machine, int *code,int *color,int *priority_mask);
 
-WRITE16_HANDLER( tmnt_paletteram_word_w );
-WRITE16_HANDLER( tmnt_0a0000_w );
-WRITE16_HANDLER( punkshot_0a0020_w );
-WRITE16_HANDLER( lgtnfght_0a0018_w );
-WRITE16_HANDLER( blswhstl_700300_w );
-READ16_HANDLER( glfgreat_rom_r );
-WRITE16_HANDLER( glfgreat_122000_w );
-WRITE16_HANDLER( ssriders_eeprom_w );
-WRITE16_HANDLER( ssriders_1c0300_w );
-WRITE16_HANDLER( prmrsocr_122000_w );
-WRITE16_HANDLER( tmnt_priority_w );
-READ16_HANDLER( glfgreat_ball_r );
-READ16_HANDLER( prmrsocr_rom_r );
 
 VIDEO_START( cuebrick );
 VIDEO_START( mia );

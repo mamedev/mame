@@ -91,22 +91,21 @@ static void update_background(running_machine &machine)
  These are used to index a color triplet of RGB.  The triplet is read
  from RAM, and output to R0-R4, G0-G4, and B0-B4.
  **************************************************************************/
-WRITE8_HANDLER( vigilant_paletteram_w )
+WRITE8_MEMBER(vigilant_state::vigilant_paletteram_w)
 {
 	int bank,r,g,b;
 
 
-	vigilant_state *state = space->machine().driver_data<vigilant_state>();
-	state->m_generic_paletteram_8[offset] = data;
+	m_generic_paletteram_8[offset] = data;
 
 	bank = offset & 0x400;
 	offset &= 0xff;
 
-	r = (state->m_generic_paletteram_8[bank + offset + 0x000] << 3) & 0xFF;
-	g = (state->m_generic_paletteram_8[bank + offset + 0x100] << 3) & 0xFF;
-	b = (state->m_generic_paletteram_8[bank + offset + 0x200] << 3) & 0xFF;
+	r = (m_generic_paletteram_8[bank + offset + 0x000] << 3) & 0xFF;
+	g = (m_generic_paletteram_8[bank + offset + 0x100] << 3) & 0xFF;
+	b = (m_generic_paletteram_8[bank + offset + 0x200] << 3) & 0xFF;
 
-	palette_set_color(space->machine(), (bank >> 2) + offset,MAKE_RGB(r,g,b));
+	palette_set_color(machine(), (bank >> 2) + offset,MAKE_RGB(r,g,b));
 }
 
 
@@ -117,13 +116,12 @@ WRITE8_HANDLER( vigilant_paletteram_w )
  horiz_scroll_low  = HSPL, an 8-bit register
  horiz_scroll_high = HSPH, a 1-bit register
  **************************************************************************/
-WRITE8_HANDLER( vigilant_horiz_scroll_w )
+WRITE8_MEMBER(vigilant_state::vigilant_horiz_scroll_w)
 {
-	vigilant_state *state = space->machine().driver_data<vigilant_state>();
 	if (offset==0)
-		state->m_horiz_scroll_low = data;
+		m_horiz_scroll_low = data;
 	else
-		state->m_horiz_scroll_high = (data & 0x01) * 256;
+		m_horiz_scroll_high = (data & 0x01) * 256;
 }
 
 /***************************************************************************
@@ -132,13 +130,12 @@ WRITE8_HANDLER( vigilant_horiz_scroll_w )
  rear_horiz_scroll_low  = RHSPL, an 8-bit register
  rear_horiz_scroll_high = RHSPH, an 8-bit register but only 3 bits are saved
 ***************************************************************************/
-WRITE8_HANDLER( vigilant_rear_horiz_scroll_w )
+WRITE8_MEMBER(vigilant_state::vigilant_rear_horiz_scroll_w)
 {
-	vigilant_state *state = space->machine().driver_data<vigilant_state>();
 	if (offset==0)
-		state->m_rear_horiz_scroll_low = data;
+		m_rear_horiz_scroll_low = data;
 	else
-		state->m_rear_horiz_scroll_high = (data & 0x07) * 256;
+		m_rear_horiz_scroll_high = (data & 0x07) * 256;
 }
 
 /***************************************************************************
@@ -156,11 +153,10 @@ WRITE8_HANDLER( vigilant_rear_horiz_scroll_w )
  palette.  However, the top four bits of the palette inputs are labelled:
  "RCC3", "RCC2", "V256E", "RCC0".  Methinks there's a typo.
  **************************************************************************/
-WRITE8_HANDLER( vigilant_rear_color_w )
+WRITE8_MEMBER(vigilant_state::vigilant_rear_color_w)
 {
-	vigilant_state *state = space->machine().driver_data<vigilant_state>();
-	state->m_rear_disable = data & 0x40;
-	state->m_rear_color = (data & 0x0d);
+	m_rear_disable = data & 0x40;
+	m_rear_color = (data & 0x0d);
 }
 
 /***************************************************************************

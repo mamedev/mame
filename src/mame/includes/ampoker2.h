@@ -14,12 +14,12 @@ public:
 	DECLARE_WRITE8_MEMBER(ampoker2_port35_w);
 	DECLARE_WRITE8_MEMBER(ampoker2_port36_w);
 	DECLARE_WRITE8_MEMBER(ampoker2_watchdog_reset_w);
+	DECLARE_WRITE8_MEMBER(ampoker2_videoram_w);
 };
 
 
 /*----------- defined in video/ampoker2.c -----------*/
 
-WRITE8_HANDLER( ampoker2_videoram_w );
 PALETTE_INIT( ampoker2 );
 VIDEO_START( ampoker2 );
 VIDEO_START( sigma2k );

@@ -23,6 +23,10 @@ public:
 	DECLARE_WRITE8_MEMBER(flower_coin_counter_w);
 	DECLARE_WRITE8_MEMBER(flower_coin_lockout_w);
 	DECLARE_WRITE8_MEMBER(sound_command_w);
+	DECLARE_WRITE8_MEMBER(flower_textram_w);
+	DECLARE_WRITE8_MEMBER(flower_bg0ram_w);
+	DECLARE_WRITE8_MEMBER(flower_bg1ram_w);
+	DECLARE_WRITE8_MEMBER(flower_flipscreen_w);
 };
 
 
@@ -36,10 +40,6 @@ DECLARE_LEGACY_SOUND_DEVICE(FLOWER, flower_sound);
 
 /*----------- defined in video/flower.c -----------*/
 
-WRITE8_HANDLER( flower_textram_w );
-WRITE8_HANDLER( flower_bg0ram_w );
-WRITE8_HANDLER( flower_bg1ram_w );
-WRITE8_HANDLER( flower_flipscreen_w );
 
 SCREEN_UPDATE_IND16( flower );
 VIDEO_START( flower );

@@ -29,14 +29,14 @@ public:
 	DECLARE_READ8_MEMBER(blueprnt_sh_dipsw_r);
 	DECLARE_WRITE8_MEMBER(blueprnt_sound_command_w);
 	DECLARE_WRITE8_MEMBER(blueprnt_coin_counter_w);
+	DECLARE_WRITE8_MEMBER(blueprnt_videoram_w);
+	DECLARE_WRITE8_MEMBER(blueprnt_colorram_w);
+	DECLARE_WRITE8_MEMBER(blueprnt_flipscreen_w);
 };
 
 
 /*----------- defined in video/blueprnt.c -----------*/
 
-WRITE8_HANDLER( blueprnt_videoram_w );
-WRITE8_HANDLER( blueprnt_colorram_w );
-WRITE8_HANDLER( blueprnt_flipscreen_w );
 
 PALETTE_INIT( blueprnt );
 VIDEO_START( blueprnt );

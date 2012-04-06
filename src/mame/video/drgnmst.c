@@ -17,11 +17,10 @@ static TILE_GET_INFO( get_drgnmst_fg_tile_info )
 	SET_TILE_INFO(1, tileno, colour, TILE_FLIPYX(flipyx));
 }
 
-WRITE16_HANDLER( drgnmst_fg_videoram_w )
+WRITE16_MEMBER(drgnmst_state::drgnmst_fg_videoram_w)
 {
-	drgnmst_state *state = space->machine().driver_data<drgnmst_state>();
-	COMBINE_DATA(&state->m_fg_videoram[offset]);
-	state->m_fg_tilemap->mark_tile_dirty(offset / 2);
+	COMBINE_DATA(&m_fg_videoram[offset]);
+	m_fg_tilemap->mark_tile_dirty(offset / 2);
 }
 
 static TILE_GET_INFO( get_drgnmst_bg_tile_info )
@@ -35,11 +34,10 @@ static TILE_GET_INFO( get_drgnmst_bg_tile_info )
 	SET_TILE_INFO(3, tileno, colour, TILE_FLIPYX(flipyx));
 }
 
-WRITE16_HANDLER( drgnmst_bg_videoram_w )
+WRITE16_MEMBER(drgnmst_state::drgnmst_bg_videoram_w)
 {
-	drgnmst_state *state = space->machine().driver_data<drgnmst_state>();
-	COMBINE_DATA(&state->m_bg_videoram[offset]);
-	state->m_bg_tilemap->mark_tile_dirty(offset / 2);
+	COMBINE_DATA(&m_bg_videoram[offset]);
+	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
 static TILE_GET_INFO( get_drgnmst_md_tile_info )
@@ -53,11 +51,10 @@ static TILE_GET_INFO( get_drgnmst_md_tile_info )
 	SET_TILE_INFO(2, tileno, colour, TILE_FLIPYX(flipyx));
 }
 
-WRITE16_HANDLER( drgnmst_md_videoram_w )
+WRITE16_MEMBER(drgnmst_state::drgnmst_md_videoram_w)
 {
-	drgnmst_state *state = space->machine().driver_data<drgnmst_state>();
-	COMBINE_DATA(&state->m_md_videoram[offset]);
-	state->m_md_tilemap->mark_tile_dirty(offset / 2);
+	COMBINE_DATA(&m_md_videoram[offset]);
+	m_md_tilemap->mark_tile_dirty(offset / 2);
 }
 
 static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect )

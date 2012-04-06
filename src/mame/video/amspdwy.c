@@ -16,19 +16,17 @@
 #include "includes/amspdwy.h"
 
 
-WRITE8_HANDLER( amspdwy_paletteram_w )
+WRITE8_MEMBER(amspdwy_state::amspdwy_paletteram_w)
 {
-	amspdwy_state *state = space->machine().driver_data<amspdwy_state>();
 	data ^= 0xff;
-	state->paletteram_BBGGGRRR_w(*space, offset, data);
+	paletteram_BBGGGRRR_w(space, offset, data);
 //  paletteram_RRRGGGBB_w(offset, data);
 }
 
-WRITE8_HANDLER( amspdwy_flipscreen_w )
+WRITE8_MEMBER(amspdwy_state::amspdwy_flipscreen_w)
 {
-	amspdwy_state *state = space->machine().driver_data<amspdwy_state>();
-	state->m_flipscreen ^= 1;
-	flip_screen_set(space->machine(), state->m_flipscreen);
+	m_flipscreen ^= 1;
+	flip_screen_set(machine(), m_flipscreen);
 }
 
 /***************************************************************************
@@ -56,18 +54,16 @@ static TILE_GET_INFO( get_tile_info )
 			0);
 }
 
-WRITE8_HANDLER( amspdwy_videoram_w )
+WRITE8_MEMBER(amspdwy_state::amspdwy_videoram_w)
 {
-	amspdwy_state *state = space->machine().driver_data<amspdwy_state>();
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( amspdwy_colorram_w )
+WRITE8_MEMBER(amspdwy_state::amspdwy_colorram_w)
 {
-	amspdwy_state *state = space->machine().driver_data<amspdwy_state>();
-	state->m_colorram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_colorram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 

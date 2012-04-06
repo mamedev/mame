@@ -89,26 +89,24 @@ PALETTE_INIT( hyperspt )
 	}
 }
 
-WRITE8_HANDLER( hyperspt_videoram_w )
+WRITE8_MEMBER(hyperspt_state::hyperspt_videoram_w)
 {
-	hyperspt_state *state = space->machine().driver_data<hyperspt_state>();
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( hyperspt_colorram_w )
+WRITE8_MEMBER(hyperspt_state::hyperspt_colorram_w)
 {
-	hyperspt_state *state = space->machine().driver_data<hyperspt_state>();
-	state->m_colorram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_colorram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( hyperspt_flipscreen_w )
+WRITE8_MEMBER(hyperspt_state::hyperspt_flipscreen_w)
 {
-	if (flip_screen_get(space->machine()) != (data & 0x01))
+	if (flip_screen_get(machine()) != (data & 0x01))
 	{
-		flip_screen_set(space->machine(), data & 0x01);
-		space->machine().tilemap().mark_all_dirty();
+		flip_screen_set(machine(), data & 0x01);
+		machine().tilemap().mark_all_dirty();
 	}
 }
 

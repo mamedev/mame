@@ -74,6 +74,17 @@ public:
 	DECLARE_WRITE8_MEMBER(flip_screen_w);
 	DECLARE_READ8_MEMBER(dec8_mcu_from_main_r);
 	DECLARE_WRITE8_MEMBER(dec8_mcu_to_main_w);
+	DECLARE_WRITE8_MEMBER(dec8_bg_data_w);
+	DECLARE_READ8_MEMBER(dec8_bg_data_r);
+	DECLARE_WRITE8_MEMBER(dec8_videoram_w);
+	DECLARE_WRITE8_MEMBER(srdarwin_videoram_w);
+	DECLARE_WRITE8_MEMBER(dec8_scroll2_w);
+	DECLARE_WRITE8_MEMBER(srdarwin_control_w);
+	DECLARE_WRITE8_MEMBER(lastmisn_control_w);
+	DECLARE_WRITE8_MEMBER(shackled_control_w);
+	DECLARE_WRITE8_MEMBER(lastmisn_scrollx_w);
+	DECLARE_WRITE8_MEMBER(lastmisn_scrolly_w);
+	DECLARE_WRITE8_MEMBER(gondo_scroll_w);
 };
 
 /*----------- defined in video/dec8.c -----------*/
@@ -99,16 +110,5 @@ VIDEO_START( garyoret );
 
 WRITE8_HANDLER( dec8_bac06_0_w );
 WRITE8_HANDLER( dec8_bac06_1_w );
-WRITE8_HANDLER( dec8_bg_data_w );
 WRITE8_HANDLER( dec8_pf1_data_w );
-READ8_HANDLER( dec8_bg_data_r );
 READ8_HANDLER( dec8_pf1_data_r );
-WRITE8_HANDLER( srdarwin_videoram_w );
-WRITE8_HANDLER( dec8_scroll2_w );
-WRITE8_HANDLER( srdarwin_control_w );
-WRITE8_HANDLER( gondo_scroll_w );
-WRITE8_HANDLER( shackled_control_w );
-WRITE8_HANDLER( lastmisn_control_w );
-WRITE8_HANDLER( lastmisn_scrollx_w );
-WRITE8_HANDLER( lastmisn_scrolly_w );
-WRITE8_HANDLER( dec8_videoram_w );

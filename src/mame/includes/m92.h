@@ -45,6 +45,15 @@ public:
 	DECLARE_WRITE16_MEMBER(m92_sound_irq_ack_w);
 	DECLARE_WRITE16_MEMBER(m92_sound_status_w);
 	DECLARE_WRITE16_MEMBER(m92_sound_reset_w);
+	DECLARE_WRITE16_MEMBER(m92_spritecontrol_w);
+	DECLARE_WRITE16_MEMBER(m92_videocontrol_w);
+	DECLARE_READ16_MEMBER(m92_paletteram_r);
+	DECLARE_WRITE16_MEMBER(m92_paletteram_w);
+	DECLARE_WRITE16_MEMBER(m92_vram_w);
+	DECLARE_WRITE16_MEMBER(m92_pf1_control_w);
+	DECLARE_WRITE16_MEMBER(m92_pf2_control_w);
+	DECLARE_WRITE16_MEMBER(m92_pf3_control_w);
+	DECLARE_WRITE16_MEMBER(m92_master_control_w);
 };
 
 
@@ -55,15 +64,6 @@ extern void m92_sprite_interrupt(running_machine &machine);
 
 /*----------- defined in video/m92.c -----------*/
 
-WRITE16_HANDLER( m92_spritecontrol_w );
-WRITE16_HANDLER( m92_videocontrol_w );
-READ16_HANDLER( m92_paletteram_r );
-WRITE16_HANDLER( m92_paletteram_w );
-WRITE16_HANDLER( m92_vram_w );
-WRITE16_HANDLER( m92_pf1_control_w );
-WRITE16_HANDLER( m92_pf2_control_w );
-WRITE16_HANDLER( m92_pf3_control_w );
-WRITE16_HANDLER( m92_master_control_w );
 
 VIDEO_START( m92 );
 SCREEN_UPDATE_IND16( m92 );

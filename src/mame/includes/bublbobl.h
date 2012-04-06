@@ -55,54 +55,54 @@ public:
 	device_t *m_mcu;
 	device_t *m_audiocpu;
 	device_t *m_slave;
+	DECLARE_WRITE8_MEMBER(bublbobl_bankswitch_w);
+	DECLARE_WRITE8_MEMBER(tokio_bankswitch_w);
+	DECLARE_WRITE8_MEMBER(tokio_videoctrl_w);
+	DECLARE_WRITE8_MEMBER(bublbobl_nmitrigger_w);
+	DECLARE_READ8_MEMBER(tokio_mcu_r);
+	DECLARE_READ8_MEMBER(tokiob_mcu_r);
+	DECLARE_WRITE8_MEMBER(bublbobl_sound_command_w);
+	DECLARE_WRITE8_MEMBER(bublbobl_sh_nmi_disable_w);
+	DECLARE_WRITE8_MEMBER(bublbobl_sh_nmi_enable_w);
+	DECLARE_WRITE8_MEMBER(bublbobl_soundcpu_reset_w);
+	DECLARE_READ8_MEMBER(bublbobl_sound_status_r);
+	DECLARE_WRITE8_MEMBER(bublbobl_sound_status_w);
+	DECLARE_READ8_MEMBER(bublbobl_mcu_ddr1_r);
+	DECLARE_WRITE8_MEMBER(bublbobl_mcu_ddr1_w);
+	DECLARE_READ8_MEMBER(bublbobl_mcu_ddr2_r);
+	DECLARE_WRITE8_MEMBER(bublbobl_mcu_ddr2_w);
+	DECLARE_READ8_MEMBER(bublbobl_mcu_ddr3_r);
+	DECLARE_WRITE8_MEMBER(bublbobl_mcu_ddr3_w);
+	DECLARE_READ8_MEMBER(bublbobl_mcu_ddr4_r);
+	DECLARE_WRITE8_MEMBER(bublbobl_mcu_ddr4_w);
+	DECLARE_READ8_MEMBER(bublbobl_mcu_port1_r);
+	DECLARE_WRITE8_MEMBER(bublbobl_mcu_port1_w);
+	DECLARE_READ8_MEMBER(bublbobl_mcu_port2_r);
+	DECLARE_WRITE8_MEMBER(bublbobl_mcu_port2_w);
+	DECLARE_READ8_MEMBER(bublbobl_mcu_port3_r);
+	DECLARE_WRITE8_MEMBER(bublbobl_mcu_port3_w);
+	DECLARE_READ8_MEMBER(bublbobl_mcu_port4_r);
+	DECLARE_WRITE8_MEMBER(bublbobl_mcu_port4_w);
+	DECLARE_READ8_MEMBER(boblbobl_ic43_a_r);
+	DECLARE_WRITE8_MEMBER(boblbobl_ic43_a_w);
+	DECLARE_WRITE8_MEMBER(boblbobl_ic43_b_w);
+	DECLARE_READ8_MEMBER(boblbobl_ic43_b_r);
+	DECLARE_READ8_MEMBER(bublbobl_68705_port_a_r);
+	DECLARE_WRITE8_MEMBER(bublbobl_68705_port_a_w);
+	DECLARE_WRITE8_MEMBER(bublbobl_68705_ddr_a_w);
+	DECLARE_READ8_MEMBER(bublbobl_68705_port_b_r);
+	DECLARE_WRITE8_MEMBER(bublbobl_68705_port_b_w);
+	DECLARE_WRITE8_MEMBER(bublbobl_68705_ddr_b_w);
 };
 
 
 
 /*----------- defined in machine/bublbobl.c -----------*/
 
-WRITE8_HANDLER( bublbobl_bankswitch_w );
-WRITE8_HANDLER( tokio_bankswitch_w );
-WRITE8_HANDLER( tokio_videoctrl_w );
-WRITE8_HANDLER( bublbobl_nmitrigger_w );
-READ8_HANDLER( tokio_mcu_r );
-READ8_HANDLER( tokiob_mcu_r );
-WRITE8_HANDLER( bublbobl_sound_command_w );
-WRITE8_HANDLER( bublbobl_sh_nmi_disable_w );
-WRITE8_HANDLER( bublbobl_sh_nmi_enable_w );
-WRITE8_HANDLER( bublbobl_soundcpu_reset_w );
-WRITE8_HANDLER( bublbobl_sound_status_w );
-READ8_HANDLER( bublbobl_sound_status_r );
-READ8_HANDLER( boblbobl_ic43_a_r );
-WRITE8_HANDLER( boblbobl_ic43_a_w );
-READ8_HANDLER( boblbobl_ic43_b_r );
-WRITE8_HANDLER( boblbobl_ic43_b_w );
 
-READ8_HANDLER( bublbobl_mcu_ddr1_r );
-WRITE8_HANDLER( bublbobl_mcu_ddr1_w );
-READ8_HANDLER( bublbobl_mcu_ddr2_r );
-WRITE8_HANDLER( bublbobl_mcu_ddr2_w );
-READ8_HANDLER( bublbobl_mcu_ddr3_r );
-WRITE8_HANDLER( bublbobl_mcu_ddr3_w );
-READ8_HANDLER( bublbobl_mcu_ddr4_r );
-WRITE8_HANDLER( bublbobl_mcu_ddr4_w );
-READ8_HANDLER( bublbobl_mcu_port1_r );
-WRITE8_HANDLER( bublbobl_mcu_port1_w );
-READ8_HANDLER( bublbobl_mcu_port2_r );
-WRITE8_HANDLER( bublbobl_mcu_port2_w );
-READ8_HANDLER( bublbobl_mcu_port3_r );
-WRITE8_HANDLER( bublbobl_mcu_port3_w );
-READ8_HANDLER( bublbobl_mcu_port4_r );
-WRITE8_HANDLER( bublbobl_mcu_port4_w );
 
 // for 68705 bootleg
 INTERRUPT_GEN( bublbobl_m68705_interrupt );
-READ8_HANDLER( bublbobl_68705_port_a_r );
-WRITE8_HANDLER( bublbobl_68705_port_a_w );
-WRITE8_HANDLER( bublbobl_68705_ddr_a_w );
-READ8_HANDLER( bublbobl_68705_port_b_r );
-WRITE8_HANDLER( bublbobl_68705_port_b_w );
-WRITE8_HANDLER( bublbobl_68705_ddr_b_w );
 
 
 /*----------- defined in video/bublbobl.c -----------*/

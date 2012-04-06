@@ -29,16 +29,16 @@ public:
 	DECLARE_WRITE16_MEMBER(coinctrl_w);
 	DECLARE_WRITE16_MEMBER(calendar_w);
 	DECLARE_READ16_MEMBER(calendar_r);
+	DECLARE_WRITE16_MEMBER(othldrby_videoram_addr_w);
+	DECLARE_READ16_MEMBER(othldrby_videoram_r);
+	DECLARE_WRITE16_MEMBER(othldrby_videoram_w);
+	DECLARE_WRITE16_MEMBER(othldrby_vreg_addr_w);
+	DECLARE_WRITE16_MEMBER(othldrby_vreg_w);
 };
 
 
 /*----------- defined in video/othldrby.c -----------*/
 
-WRITE16_HANDLER( othldrby_videoram_addr_w );
-READ16_HANDLER( othldrby_videoram_r );
-WRITE16_HANDLER( othldrby_videoram_w );
-WRITE16_HANDLER( othldrby_vreg_addr_w );
-WRITE16_HANDLER( othldrby_vreg_w );
 
 VIDEO_START( othldrby );
 SCREEN_VBLANK( othldrby );

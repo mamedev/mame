@@ -60,25 +60,25 @@ public:
 	DECLARE_WRITE16_MEMBER(tetrisp2_systemregs_w);
 	DECLARE_READ16_MEMBER(tetrisp2_nvram_r);
 	DECLARE_WRITE16_MEMBER(tetrisp2_nvram_w);
+	DECLARE_WRITE16_MEMBER(tetrisp2_palette_w);
+	DECLARE_WRITE16_MEMBER(rocknms_sub_palette_w);
+	DECLARE_WRITE8_MEMBER(tetrisp2_priority_w);
+	DECLARE_WRITE8_MEMBER(rockn_priority_w);
+	DECLARE_WRITE16_MEMBER(rocknms_sub_priority_w);
+	DECLARE_READ16_MEMBER(nndmseal_priority_r);
+	DECLARE_READ8_MEMBER(tetrisp2_priority_r);
+	DECLARE_WRITE16_MEMBER(tetrisp2_vram_bg_w);
+	DECLARE_WRITE16_MEMBER(tetrisp2_vram_fg_w);
+	DECLARE_WRITE16_MEMBER(tetrisp2_vram_rot_w);
+	DECLARE_WRITE16_MEMBER(rocknms_sub_vram_bg_w);
+	DECLARE_WRITE16_MEMBER(rocknms_sub_vram_fg_w);
+	DECLARE_WRITE16_MEMBER(rocknms_sub_vram_rot_w);
 };
 
 /*----------- defined in video/tetrisp2.c -----------*/
 
-WRITE16_HANDLER( tetrisp2_palette_w );
-WRITE16_HANDLER( rocknms_sub_palette_w );
-WRITE8_HANDLER( tetrisp2_priority_w );
-WRITE8_HANDLER( rockn_priority_w );
-READ8_HANDLER( tetrisp2_priority_r );
-WRITE16_HANDLER( rocknms_sub_priority_w );
-READ16_HANDLER( nndmseal_priority_r );
 
-WRITE16_HANDLER( tetrisp2_vram_bg_w );
-WRITE16_HANDLER( tetrisp2_vram_fg_w );
-WRITE16_HANDLER( tetrisp2_vram_rot_w );
 
-WRITE16_HANDLER( rocknms_sub_vram_bg_w );
-WRITE16_HANDLER( rocknms_sub_vram_fg_w );
-WRITE16_HANDLER( rocknms_sub_vram_rot_w );
 
 VIDEO_START( tetrisp2 );
 SCREEN_UPDATE_IND16( tetrisp2 );

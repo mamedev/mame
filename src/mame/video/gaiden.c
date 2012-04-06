@@ -167,126 +167,111 @@ VIDEO_START( drgnbowl )
 
 ***************************************************************************/
 
-WRITE16_HANDLER( gaiden_flip_w )
+WRITE16_MEMBER(gaiden_state::gaiden_flip_w)
 {
 	if (ACCESSING_BITS_0_7)
-		flip_screen_set(space->machine(), data & 1);
+		flip_screen_set(machine(), data & 1);
 }
 
-WRITE16_HANDLER( gaiden_txscrollx_w )
+WRITE16_MEMBER(gaiden_state::gaiden_txscrollx_w)
 {
-	gaiden_state *state = space->machine().driver_data<gaiden_state>();
-	COMBINE_DATA(&state->m_tx_scroll_x);
-	state->m_text_layer->set_scrollx(0, state->m_tx_scroll_x);
+	COMBINE_DATA(&m_tx_scroll_x);
+	m_text_layer->set_scrollx(0, m_tx_scroll_x);
 }
 
-WRITE16_HANDLER( gaiden_txscrolly_w )
+WRITE16_MEMBER(gaiden_state::gaiden_txscrolly_w)
 {
-	gaiden_state *state = space->machine().driver_data<gaiden_state>();
-	COMBINE_DATA(&state->m_tx_scroll_y);
-	state->m_text_layer->set_scrolly(0, (state->m_tx_scroll_y - state->m_tx_offset_y) & 0xffff);
+	COMBINE_DATA(&m_tx_scroll_y);
+	m_text_layer->set_scrolly(0, (m_tx_scroll_y - m_tx_offset_y) & 0xffff);
 }
 
-WRITE16_HANDLER( gaiden_fgscrollx_w )
+WRITE16_MEMBER(gaiden_state::gaiden_fgscrollx_w)
 {
-	gaiden_state *state = space->machine().driver_data<gaiden_state>();
-	COMBINE_DATA(&state->m_fg_scroll_x);
-	state->m_foreground->set_scrollx(0, state->m_fg_scroll_x);
+	COMBINE_DATA(&m_fg_scroll_x);
+	m_foreground->set_scrollx(0, m_fg_scroll_x);
 }
 
-WRITE16_HANDLER( gaiden_fgscrolly_w )
+WRITE16_MEMBER(gaiden_state::gaiden_fgscrolly_w)
 {
-	gaiden_state *state = space->machine().driver_data<gaiden_state>();
-	COMBINE_DATA(&state->m_fg_scroll_y);
-	state->m_foreground->set_scrolly(0, (state->m_fg_scroll_y - state->m_fg_offset_y) & 0xffff);
+	COMBINE_DATA(&m_fg_scroll_y);
+	m_foreground->set_scrolly(0, (m_fg_scroll_y - m_fg_offset_y) & 0xffff);
 }
 
-WRITE16_HANDLER( gaiden_bgscrollx_w )
+WRITE16_MEMBER(gaiden_state::gaiden_bgscrollx_w)
 {
-	gaiden_state *state = space->machine().driver_data<gaiden_state>();
-	COMBINE_DATA(&state->m_bg_scroll_x);
-	state->m_background->set_scrollx(0, state->m_bg_scroll_x);
+	COMBINE_DATA(&m_bg_scroll_x);
+	m_background->set_scrollx(0, m_bg_scroll_x);
 }
 
-WRITE16_HANDLER( gaiden_bgscrolly_w )
+WRITE16_MEMBER(gaiden_state::gaiden_bgscrolly_w)
 {
-	gaiden_state *state = space->machine().driver_data<gaiden_state>();
-	COMBINE_DATA(&state->m_bg_scroll_y);
-	state->m_background->set_scrolly(0, (state->m_bg_scroll_y - state->m_bg_offset_y) & 0xffff);
+	COMBINE_DATA(&m_bg_scroll_y);
+	m_background->set_scrolly(0, (m_bg_scroll_y - m_bg_offset_y) & 0xffff);
 }
 
-WRITE16_HANDLER( gaiden_txoffsety_w )
+WRITE16_MEMBER(gaiden_state::gaiden_txoffsety_w)
 {
-	gaiden_state *state = space->machine().driver_data<gaiden_state>();
 
 	if (ACCESSING_BITS_0_7) {
-		state->m_tx_offset_y = data;
-		state->m_text_layer->set_scrolly(0, (state->m_tx_scroll_y - state->m_tx_offset_y) & 0xffff);
+		m_tx_offset_y = data;
+		m_text_layer->set_scrolly(0, (m_tx_scroll_y - m_tx_offset_y) & 0xffff);
 	}
 }
 
-WRITE16_HANDLER( gaiden_fgoffsety_w )
+WRITE16_MEMBER(gaiden_state::gaiden_fgoffsety_w)
 {
-	gaiden_state *state = space->machine().driver_data<gaiden_state>();
 
 	if (ACCESSING_BITS_0_7) {
-		state->m_fg_offset_y = data;
-		state->m_foreground->set_scrolly(0, (state->m_fg_scroll_y - state->m_fg_offset_y) & 0xffff);
+		m_fg_offset_y = data;
+		m_foreground->set_scrolly(0, (m_fg_scroll_y - m_fg_offset_y) & 0xffff);
 	}
 }
 
-WRITE16_HANDLER( gaiden_bgoffsety_w )
+WRITE16_MEMBER(gaiden_state::gaiden_bgoffsety_w)
 {
-	gaiden_state *state = space->machine().driver_data<gaiden_state>();
 
 	if (ACCESSING_BITS_0_7) {
-		state->m_bg_offset_y = data;
-		state->m_background->set_scrolly(0, (state->m_bg_scroll_y - state->m_bg_offset_y) & 0xffff);
+		m_bg_offset_y = data;
+		m_background->set_scrolly(0, (m_bg_scroll_y - m_bg_offset_y) & 0xffff);
 	}
 }
 
-WRITE16_HANDLER( gaiden_sproffsety_w )
+WRITE16_MEMBER(gaiden_state::gaiden_sproffsety_w)
 {
-	gaiden_state *state = space->machine().driver_data<gaiden_state>();
 
 	if (ACCESSING_BITS_0_7) {
-		state->m_spr_offset_y = data;
+		m_spr_offset_y = data;
 		// handled in draw_sprites
 	}
 }
 
 
-WRITE16_HANDLER( gaiden_videoram3_w )
+WRITE16_MEMBER(gaiden_state::gaiden_videoram3_w)
 {
-	gaiden_state *state = space->machine().driver_data<gaiden_state>();
-	COMBINE_DATA(&state->m_videoram3[offset]);
-	state->m_background->mark_tile_dirty(offset & 0x07ff);
+	COMBINE_DATA(&m_videoram3[offset]);
+	m_background->mark_tile_dirty(offset & 0x07ff);
 }
 
-READ16_HANDLER( gaiden_videoram3_r )
+READ16_MEMBER(gaiden_state::gaiden_videoram3_r)
 {
-	gaiden_state *state = space->machine().driver_data<gaiden_state>();
-	return state->m_videoram3[offset];
+	return m_videoram3[offset];
 }
 
-WRITE16_HANDLER( gaiden_videoram2_w )
+WRITE16_MEMBER(gaiden_state::gaiden_videoram2_w)
 {
-	gaiden_state *state = space->machine().driver_data<gaiden_state>();
-	COMBINE_DATA(&state->m_videoram2[offset]);
-	state->m_foreground->mark_tile_dirty(offset & 0x07ff);
+	COMBINE_DATA(&m_videoram2[offset]);
+	m_foreground->mark_tile_dirty(offset & 0x07ff);
 }
 
-READ16_HANDLER( gaiden_videoram2_r )
+READ16_MEMBER(gaiden_state::gaiden_videoram2_r)
 {
-	gaiden_state *state = space->machine().driver_data<gaiden_state>();
-	return state->m_videoram2[offset];
+	return m_videoram2[offset];
 }
 
-WRITE16_HANDLER( gaiden_videoram_w )
+WRITE16_MEMBER(gaiden_state::gaiden_videoram_w)
 {
-	gaiden_state *state = space->machine().driver_data<gaiden_state>();
-	COMBINE_DATA(&state->m_videoram[offset]);
-	state->m_text_layer->mark_tile_dirty(offset & 0x03ff);
+	COMBINE_DATA(&m_videoram[offset]);
+	m_text_layer->mark_tile_dirty(offset & 0x03ff);
 }
 
 

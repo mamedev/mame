@@ -39,15 +39,15 @@ public:
 	DECLARE_WRITE8_MEMBER(champbas_mcu_switch_w);
 	DECLARE_WRITE8_MEMBER(champbas_mcu_halt_w);
 	DECLARE_READ8_MEMBER(champbja_alt_protection_r);
+	DECLARE_WRITE8_MEMBER(champbas_bg_videoram_w);
+	DECLARE_WRITE8_MEMBER(champbas_gfxbank_w);
+	DECLARE_WRITE8_MEMBER(champbas_palette_bank_w);
+	DECLARE_WRITE8_MEMBER(champbas_flipscreen_w);
 };
 
 
 /*----------- defined in video/champbas.c -----------*/
 
-WRITE8_HANDLER( champbas_bg_videoram_w );
-WRITE8_HANDLER( champbas_gfxbank_w );
-WRITE8_HANDLER( champbas_palette_bank_w );
-WRITE8_HANDLER( champbas_flipscreen_w );
 
 PALETTE_INIT( champbas );
 PALETTE_INIT( exctsccr );

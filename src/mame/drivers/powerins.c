@@ -77,16 +77,16 @@ static ADDRESS_MAP_START( powerins_map, AS_PROGRAM, 16, powerins_state )
 	AM_RANGE(0x100002, 0x100003) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x100008, 0x100009) AM_READ_PORT("DSW1")
 	AM_RANGE(0x10000a, 0x10000b) AM_READ_PORT("DSW2")
-	AM_RANGE(0x100014, 0x100015) AM_WRITE_LEGACY(powerins_flipscreen_w)								// Flip Screen
+	AM_RANGE(0x100014, 0x100015) AM_WRITE(powerins_flipscreen_w)								// Flip Screen
 	AM_RANGE(0x100016, 0x100017) AM_WRITENOP													// ? always 1
-	AM_RANGE(0x100018, 0x100019) AM_WRITE_LEGACY(powerins_tilebank_w)									// Tiles Banking (VRAM 0)
+	AM_RANGE(0x100018, 0x100019) AM_WRITE(powerins_tilebank_w)									// Tiles Banking (VRAM 0)
 	AM_RANGE(0x10001e, 0x10001f) AM_WRITE(powerins_soundlatch_w)								// Sound Latch
 	AM_RANGE(0x100030, 0x100031) AM_WRITE(powerins_okibank_w)									// Sound
-	AM_RANGE(0x120000, 0x120fff) AM_RAM_WRITE_LEGACY(powerins_paletteram16_w) AM_SHARE("paletteram")	// Palette
+	AM_RANGE(0x120000, 0x120fff) AM_RAM_WRITE(powerins_paletteram16_w) AM_SHARE("paletteram")	// Palette
 	AM_RANGE(0x130000, 0x130007) AM_RAM AM_BASE(m_vctrl_0)								// VRAM 0 Control
-	AM_RANGE(0x140000, 0x143fff) AM_RAM_WRITE_LEGACY(powerins_vram_0_w) AM_BASE(m_vram_0)		// VRAM 0
-	AM_RANGE(0x170000, 0x170fff) AM_RAM_WRITE_LEGACY(powerins_vram_1_w) AM_BASE(m_vram_1)		// VRAM 1
-	AM_RANGE(0x171000, 0x171fff) AM_WRITE_LEGACY(powerins_vram_1_w)									// Mirror of VRAM 1?
+	AM_RANGE(0x140000, 0x143fff) AM_RAM_WRITE(powerins_vram_0_w) AM_BASE(m_vram_0)		// VRAM 0
+	AM_RANGE(0x170000, 0x170fff) AM_RAM_WRITE(powerins_vram_1_w) AM_BASE(m_vram_1)		// VRAM 1
+	AM_RANGE(0x171000, 0x171fff) AM_WRITE(powerins_vram_1_w)									// Mirror of VRAM 1?
 	AM_RANGE(0x180000, 0x18ffff) AM_RAM AM_BASE(m_spriteram)									// RAM + Sprites
 ADDRESS_MAP_END
 
@@ -97,17 +97,17 @@ static ADDRESS_MAP_START( powerina_map, AS_PROGRAM, 16, powerins_state )
 	AM_RANGE(0x100002, 0x100003) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x100008, 0x100009) AM_READ_PORT("DSW1")
 	AM_RANGE(0x10000a, 0x10000b) AM_READ_PORT("DSW2")
-	AM_RANGE(0x100014, 0x100015) AM_WRITE_LEGACY(powerins_flipscreen_w)								// Flip Screen
+	AM_RANGE(0x100014, 0x100015) AM_WRITE(powerins_flipscreen_w)								// Flip Screen
 	AM_RANGE(0x100016, 0x100017) AM_WRITENOP													// ? always 1
-	AM_RANGE(0x100018, 0x100019) AM_WRITE_LEGACY(powerins_tilebank_w)									// Tiles Banking (VRAM 0)
+	AM_RANGE(0x100018, 0x100019) AM_WRITE(powerins_tilebank_w)									// Tiles Banking (VRAM 0)
 	AM_RANGE(0x10001e, 0x10001f) AM_WRITENOP													// Sound Latch, NOPed since there is no sound cpu
 	AM_RANGE(0x100030, 0x100031) AM_WRITE(powerins_okibank_w)									// Sound
 	AM_RANGE(0x10003e, 0x10003f) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff)		// (used by powerina)
-	AM_RANGE(0x120000, 0x120fff) AM_RAM_WRITE_LEGACY(powerins_paletteram16_w) AM_SHARE("paletteram")	// Palette
+	AM_RANGE(0x120000, 0x120fff) AM_RAM_WRITE(powerins_paletteram16_w) AM_SHARE("paletteram")	// Palette
 	AM_RANGE(0x130000, 0x130007) AM_RAM AM_BASE(m_vctrl_0)								// VRAM 0 Control
-	AM_RANGE(0x140000, 0x143fff) AM_RAM_WRITE_LEGACY(powerins_vram_0_w) AM_BASE(m_vram_0)		// VRAM 0
-	AM_RANGE(0x170000, 0x170fff) AM_RAM_WRITE_LEGACY(powerins_vram_1_w) AM_BASE(m_vram_1)		// VRAM 1
-	AM_RANGE(0x171000, 0x171fff) AM_WRITE_LEGACY(powerins_vram_1_w)									// Mirror of VRAM 1?
+	AM_RANGE(0x140000, 0x143fff) AM_RAM_WRITE(powerins_vram_0_w) AM_BASE(m_vram_0)		// VRAM 0
+	AM_RANGE(0x170000, 0x170fff) AM_RAM_WRITE(powerins_vram_1_w) AM_BASE(m_vram_1)		// VRAM 1
+	AM_RANGE(0x171000, 0x171fff) AM_WRITE(powerins_vram_1_w)									// Mirror of VRAM 1?
 	AM_RANGE(0x180000, 0x18ffff) AM_RAM AM_BASE(m_spriteram)									// RAM + Sprites
 ADDRESS_MAP_END
 

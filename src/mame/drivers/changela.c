@@ -205,16 +205,16 @@ static ADDRESS_MAP_START( changela_map, AS_PROGRAM, 8, changela_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM AM_BASE(m_spriteram) /* OBJ0 RAM */
 	AM_RANGE(0x9000, 0x97ff) AM_RAM AM_BASE(m_videoram)	/* OBJ1 RAM */
-	AM_RANGE(0xa000, 0xa07f) AM_WRITE_LEGACY(changela_colors_w) AM_BASE(m_colorram)	/* Color 93419 RAM 64x9(nine!!!) bits A0-used as the 8-th bit data input (d0-d7->normal, a0->d8) */
+	AM_RANGE(0xa000, 0xa07f) AM_WRITE(changela_colors_w) AM_BASE(m_colorram)	/* Color 93419 RAM 64x9(nine!!!) bits A0-used as the 8-th bit data input (d0-d7->normal, a0->d8) */
 	AM_RANGE(0xb000, 0xbfff) AM_ROM
 
-	AM_RANGE(0xc000, 0xc7ff) AM_READWRITE_LEGACY(changela_mem_device_r, changela_mem_device_w)	/* RAM4 (River Bed RAM); RAM5 (Tree RAM) */
+	AM_RANGE(0xc000, 0xc7ff) AM_READWRITE(changela_mem_device_r, changela_mem_device_w)	/* RAM4 (River Bed RAM); RAM5 (Tree RAM) */
 
 	/* LS138 - U16 */
 	AM_RANGE(0xc800, 0xc800) AM_WRITENOP				/* not connected */
-	AM_RANGE(0xc900, 0xc900) AM_WRITE_LEGACY(changela_mem_device_select_w)	/* selects the memory device to be accessible at 0xc000-0xc7ff */
-	AM_RANGE(0xca00, 0xca00) AM_WRITE_LEGACY(changela_slope_rom_addr_hi_w)
-	AM_RANGE(0xcb00, 0xcb00) AM_WRITE_LEGACY(changela_slope_rom_addr_lo_w)
+	AM_RANGE(0xc900, 0xc900) AM_WRITE(changela_mem_device_select_w)	/* selects the memory device to be accessible at 0xc000-0xc7ff */
+	AM_RANGE(0xca00, 0xca00) AM_WRITE(changela_slope_rom_addr_hi_w)
+	AM_RANGE(0xcb00, 0xcb00) AM_WRITE(changela_slope_rom_addr_lo_w)
 
 	AM_RANGE(0xd000, 0xd001) AM_DEVREADWRITE_LEGACY("ay1", ay8910_r, ay8910_address_data_w)
 	AM_RANGE(0xd010, 0xd011) AM_DEVREADWRITE_LEGACY("ay2", ay8910_r, ay8910_address_data_w)

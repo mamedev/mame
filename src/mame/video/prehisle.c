@@ -10,54 +10,50 @@
 #include "includes/prehisle.h"
 
 
-WRITE16_HANDLER( prehisle_bg_videoram16_w )
+WRITE16_MEMBER(prehisle_state::prehisle_bg_videoram16_w)
 {
-	prehisle_state *state = space->machine().driver_data<prehisle_state>();
 
-	COMBINE_DATA(&state->m_bg_videoram16[offset]);
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_bg_videoram16[offset]);
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_HANDLER( prehisle_fg_videoram16_w )
+WRITE16_MEMBER(prehisle_state::prehisle_fg_videoram16_w)
 {
-	prehisle_state *state = space->machine().driver_data<prehisle_state>();
 
-	COMBINE_DATA(&state->m_videoram[offset]);
-	state->m_fg_tilemap->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_videoram[offset]);
+	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-READ16_HANDLER( prehisle_control16_r )
+READ16_MEMBER(prehisle_state::prehisle_control16_r)
 {
-	prehisle_state *state = space->machine().driver_data<prehisle_state>();
 
 	switch (offset)
 	{
-	case 0x08: return input_port_read(space->machine(), "P2");						// Player 2
-	case 0x10: return input_port_read(space->machine(), "COIN");						// Coins, Tilt, Service
-	case 0x20: return input_port_read(space->machine(), "P1") ^ state->m_invert_controls;		// Player 1
-	case 0x21: return input_port_read(space->machine(), "DSW0");						// DIPs
-	case 0x22: return input_port_read(space->machine(), "DSW1");						// DIPs + VBLANK
+	case 0x08: return input_port_read(machine(), "P2");						// Player 2
+	case 0x10: return input_port_read(machine(), "COIN");						// Coins, Tilt, Service
+	case 0x20: return input_port_read(machine(), "P1") ^ m_invert_controls;		// Player 1
+	case 0x21: return input_port_read(machine(), "DSW0");						// DIPs
+	case 0x22: return input_port_read(machine(), "DSW1");						// DIPs + VBLANK
 	default: return 0;
 	}
 }
 
-WRITE16_HANDLER( prehisle_control16_w )
+WRITE16_MEMBER(prehisle_state::prehisle_control16_w)
 {
-	prehisle_state *state = space->machine().driver_data<prehisle_state>();
 	int scroll = 0;
 
 	COMBINE_DATA(&scroll);
 
 	switch (offset)
 	{
-	case 0x00: state->m_bg_tilemap->set_scrolly(0, scroll); break;
-	case 0x08: state->m_bg_tilemap->set_scrollx(0, scroll); break;
-	case 0x10: state->m_bg2_tilemap->set_scrolly(0, scroll); break;
-	case 0x18: state->m_bg2_tilemap->set_scrollx(0, scroll); break;
-	case 0x23: state->m_invert_controls = data ? 0x00ff : 0x0000; break;
-	case 0x28: coin_counter_w(space->machine(), 0, data & 1); break;
-	case 0x29: coin_counter_w(space->machine(), 1, data & 1); break;
-	case 0x30: flip_screen_set(space->machine(), data & 0x01); break;
+	case 0x00: m_bg_tilemap->set_scrolly(0, scroll); break;
+	case 0x08: m_bg_tilemap->set_scrollx(0, scroll); break;
+	case 0x10: m_bg2_tilemap->set_scrolly(0, scroll); break;
+	case 0x18: m_bg2_tilemap->set_scrollx(0, scroll); break;
+	case 0x23: m_invert_controls = data ? 0x00ff : 0x0000; break;
+	case 0x28: coin_counter_w(machine(), 0, data & 1); break;
+	case 0x29: coin_counter_w(machine(), 1, data & 1); break;
+	case 0x30: flip_screen_set(machine(), data & 0x01); break;
 	}
 }
 

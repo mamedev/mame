@@ -176,7 +176,7 @@ static ADDRESS_MAP_START( mjkjidai_map, AS_PROGRAM, 8, mjkjidai_state )
 	AM_RANGE(0xe000, 0xe01f) AM_RAM AM_BASE(m_spriteram1)			// shared with tilemap ram
 	AM_RANGE(0xe800, 0xe81f) AM_RAM AM_BASE(m_spriteram2)		// shared with tilemap ram
 	AM_RANGE(0xf000, 0xf01f) AM_RAM AM_BASE(m_spriteram3)		// shared with tilemap ram
-	AM_RANGE(0xe000, 0xf7ff) AM_RAM_WRITE_LEGACY(mjkjidai_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0xe000, 0xf7ff) AM_RAM_WRITE(mjkjidai_videoram_w) AM_BASE(m_videoram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mjkjidai_io_map, AS_IO, 8, mjkjidai_state )
@@ -185,7 +185,7 @@ static ADDRESS_MAP_START( mjkjidai_io_map, AS_IO, 8, mjkjidai_state )
 	AM_RANGE(0x01, 0x01) AM_READNOP	// ???
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN2")
 	AM_RANGE(0x01, 0x02) AM_WRITE(keyboard_select_w)
-	AM_RANGE(0x10, 0x10) AM_WRITE_LEGACY(mjkjidai_ctrl_w)	// rom bank, coin counter, flip screen etc
+	AM_RANGE(0x10, 0x10) AM_WRITE(mjkjidai_ctrl_w)	// rom bank, coin counter, flip screen etc
 	AM_RANGE(0x11, 0x11) AM_READ_PORT("IN0")
 	AM_RANGE(0x12, 0x12) AM_READ_PORT("IN1")
 	AM_RANGE(0x20, 0x20) AM_DEVWRITE_LEGACY("sn1", sn76496_w)

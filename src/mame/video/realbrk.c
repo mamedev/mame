@@ -23,27 +23,25 @@
 #include "includes/realbrk.h"
 
 
-WRITE16_HANDLER( realbrk_flipscreen_w )
+WRITE16_MEMBER(realbrk_state::realbrk_flipscreen_w)
 {
-	realbrk_state *state = space->machine().driver_data<realbrk_state>();
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_counter_w(space->machine(), 0,	data & 0x0001);
-		coin_counter_w(space->machine(), 1,	data & 0x0004);
+		coin_counter_w(machine(), 0,	data & 0x0001);
+		coin_counter_w(machine(), 1,	data & 0x0004);
 
-		flip_screen_set(space->machine(),	data & 0x0080);
+		flip_screen_set(machine(),	data & 0x0080);
 	}
 
 	if (ACCESSING_BITS_8_15)
 	{
-		state->m_disable_video	=	data & 0x8000;
+		m_disable_video	=	data & 0x8000;
 	}
 }
 
-WRITE16_HANDLER( dai2kaku_flipscreen_w )
+WRITE16_MEMBER(realbrk_state::dai2kaku_flipscreen_w)
 {
-	realbrk_state *state = space->machine().driver_data<realbrk_state>();
-	state->m_disable_video = 0;
+	m_disable_video = 0;
 }
 
 /***************************************************************************
@@ -94,18 +92,16 @@ static TILE_GET_INFO( get_tile_info_1 )
 			TILE_FLIPYX( attr >> 14 ));
 }
 
-WRITE16_HANDLER( realbrk_vram_0_w )
+WRITE16_MEMBER(realbrk_state::realbrk_vram_0_w)
 {
-	realbrk_state *state = space->machine().driver_data<realbrk_state>();
-	COMBINE_DATA(&state->m_vram_0[offset]);
-	state->m_tilemap_0->mark_tile_dirty(offset/2);
+	COMBINE_DATA(&m_vram_0[offset]);
+	m_tilemap_0->mark_tile_dirty(offset/2);
 }
 
-WRITE16_HANDLER( realbrk_vram_1_w )
+WRITE16_MEMBER(realbrk_state::realbrk_vram_1_w)
 {
-	realbrk_state *state = space->machine().driver_data<realbrk_state>();
-	COMBINE_DATA(&state->m_vram_1[offset]);
-	state->m_tilemap_1->mark_tile_dirty(offset/2);
+	COMBINE_DATA(&m_vram_1[offset]);
+	m_tilemap_1->mark_tile_dirty(offset/2);
 }
 
 /***************************************************************************
@@ -133,11 +129,10 @@ static TILE_GET_INFO( get_tile_info_2 )
 			0);
 }
 
-WRITE16_HANDLER( realbrk_vram_2_w )
+WRITE16_MEMBER(realbrk_state::realbrk_vram_2_w)
 {
-	realbrk_state *state = space->machine().driver_data<realbrk_state>();
-	COMBINE_DATA(&state->m_vram_2[offset]);
-	state->m_tilemap_2->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_vram_2[offset]);
+	m_tilemap_2->mark_tile_dirty(offset);
 }
 
 
@@ -481,15 +476,14 @@ static void dai2kaku_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap
 
 ***************************************************************************/
 
-WRITE16_HANDLER( realbrk_vregs_w )
+WRITE16_MEMBER(realbrk_state::realbrk_vregs_w)
 {
-	realbrk_state *state = space->machine().driver_data<realbrk_state>();
-	UINT16 old_data = state->m_vregs[offset];
-	UINT16 new_data = COMBINE_DATA(&state->m_vregs[offset]);
+	UINT16 old_data = m_vregs[offset];
+	UINT16 new_data = COMBINE_DATA(&m_vregs[offset]);
 	if (new_data != old_data)
 	{
 		if (offset == 0xa/2)
-			state->m_tilemap_0->mark_all_dirty();
+			m_tilemap_0->mark_all_dirty();
 	}
 }
 

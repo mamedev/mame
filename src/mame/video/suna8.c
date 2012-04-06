@@ -107,32 +107,29 @@ READ8_MEMBER( suna8_state::banked_paletteram_r )
 	return m_generic_paletteram_8[offset];
 }
 
-READ8_HANDLER( suna8_banked_spriteram_r )
+READ8_MEMBER(suna8_state::suna8_banked_spriteram_r)
 {
-	suna8_state *state = space->machine().driver_data<suna8_state>();
 
-	offset += state->m_spritebank * 0x2000;
-	return state->m_spriteram[offset];
+	offset += m_spritebank * 0x2000;
+	return m_spriteram[offset];
 }
 
-WRITE8_HANDLER( suna8_spriteram_w )
+WRITE8_MEMBER(suna8_state::suna8_spriteram_w)
 {
-	suna8_state *state = space->machine().driver_data<suna8_state>();
 
-	state->m_spriteram[offset] = data;
+	m_spriteram[offset] = data;
 #if TILEMAPS
-	state->m_bg_tilemap->mark_tile_dirty(offset/2);
+	m_bg_tilemap->mark_tile_dirty(offset/2);
 #endif
 }
 
-WRITE8_HANDLER( suna8_banked_spriteram_w )
+WRITE8_MEMBER(suna8_state::suna8_banked_spriteram_w)
 {
-	suna8_state *state = space->machine().driver_data<suna8_state>();
 
-	offset += state->m_spritebank * 0x2000;
-	state->m_spriteram[offset] = data;
+	offset += m_spritebank * 0x2000;
+	m_spriteram[offset] = data;
 #if TILEMAPS
-	state->m_bg_tilemap->mark_tile_dirty(offset/2);
+	m_bg_tilemap->mark_tile_dirty(offset/2);
 #endif
 }
 

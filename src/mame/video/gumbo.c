@@ -4,11 +4,10 @@
 #include "includes/gumbo.h"
 
 
-WRITE16_HANDLER( gumbo_bg_videoram_w )
+WRITE16_MEMBER(gumbo_state::gumbo_bg_videoram_w)
 {
-	gumbo_state *state = space->machine().driver_data<gumbo_state>();
-	COMBINE_DATA(&state->m_bg_videoram[offset]);
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_bg_videoram[offset]);
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 static TILE_GET_INFO( get_gumbo_bg_tile_info )
@@ -19,11 +18,10 @@ static TILE_GET_INFO( get_gumbo_bg_tile_info )
 }
 
 
-WRITE16_HANDLER( gumbo_fg_videoram_w )
+WRITE16_MEMBER(gumbo_state::gumbo_fg_videoram_w)
 {
-	gumbo_state *state = space->machine().driver_data<gumbo_state>();
-	COMBINE_DATA(&state->m_fg_videoram[offset]);
-	state->m_fg_tilemap->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_fg_videoram[offset]);
+	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 static TILE_GET_INFO( get_gumbo_fg_tile_info )

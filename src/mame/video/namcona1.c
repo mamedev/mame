@@ -136,25 +136,23 @@ static TILE_GET_INFO( roz_get_info )
 
 /*************************************************************************/
 
-WRITE16_HANDLER( namcona1_videoram_w )
+WRITE16_MEMBER(namcona1_state::namcona1_videoram_w)
 {
-	namcona1_state *state = space->machine().driver_data<namcona1_state>();
-	UINT16 *videoram = state->m_videoram;
+	UINT16 *videoram = m_videoram;
 	COMBINE_DATA( &videoram[offset] );
 	if( offset<0x8000/2 )
 	{
-		state->m_bg_tilemap[offset/0x1000]->mark_tile_dirty(offset&0xfff );
+		m_bg_tilemap[offset/0x1000]->mark_tile_dirty(offset&0xfff );
 	}
 	else if( offset<0xa000/2 )
 	{
-		state->m_roz_tilemap ->mark_all_dirty();
+		m_roz_tilemap ->mark_all_dirty();
 	}
 } /* namcona1_videoram_w */
 
-READ16_HANDLER( namcona1_videoram_r )
+READ16_MEMBER(namcona1_state::namcona1_videoram_r)
 {
-	namcona1_state *state = space->machine().driver_data<namcona1_state>();
-	UINT16 *videoram = state->m_videoram;
+	UINT16 *videoram = m_videoram;
 	return videoram[offset];
 } /* namcona1_videoram_r */
 
@@ -179,23 +177,21 @@ UpdatePalette(running_machine &machine, int offset )
 	palette_set_color_rgb( machine, offset, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
 } /* namcona1_paletteram_w */
 
-READ16_HANDLER( namcona1_paletteram_r )
+READ16_MEMBER(namcona1_state::namcona1_paletteram_r)
 {
-	namcona1_state *state = space->machine().driver_data<namcona1_state>();
-	return state->m_generic_paletteram_16[offset];
+	return m_generic_paletteram_16[offset];
 } /* namcona1_paletteram_r */
 
-WRITE16_HANDLER( namcona1_paletteram_w )
+WRITE16_MEMBER(namcona1_state::namcona1_paletteram_w)
 {
-	namcona1_state *state = space->machine().driver_data<namcona1_state>();
-	COMBINE_DATA( &state->m_generic_paletteram_16[offset] );
-	if( state->m_vreg[0x8e/2] )
+	COMBINE_DATA( &m_generic_paletteram_16[offset] );
+	if( m_vreg[0x8e/2] )
 	{ /* graphics enabled; update palette immediately */
-		UpdatePalette(space->machine(), offset );
+		UpdatePalette(machine(), offset );
 	}
 	else
 	{
-		state->m_palette_is_dirty = 1;
+		m_palette_is_dirty = 1;
 	}
 }
 
@@ -236,48 +232,46 @@ static const gfx_layout cg_layout_4bpp =
 	64*8
 }; /* cg_layout_4bpp */
 
-READ16_HANDLER( namcona1_gfxram_r )
+READ16_MEMBER(namcona1_state::namcona1_gfxram_r)
 {
-	namcona1_state *state = space->machine().driver_data<namcona1_state>();
-	UINT16 type = state->m_vreg[0x0c/2];
+	UINT16 type = m_vreg[0x0c/2];
 	if( type == 0x03 )
 	{
 		if( offset<0x4000 )
 		{
-			return state->m_shaperam[offset];
+			return m_shaperam[offset];
 		}
 	}
 	else if( type == 0x02 )
 	{
-		return state->m_cgram[offset];
+		return m_cgram[offset];
 	}
 	return 0x0000;
 } /* namcona1_gfxram_r */
 
-WRITE16_HANDLER( namcona1_gfxram_w )
+WRITE16_MEMBER(namcona1_state::namcona1_gfxram_w)
 {
-	namcona1_state *state = space->machine().driver_data<namcona1_state>();
-	UINT16 type = state->m_vreg[0x0c/2];
+	UINT16 type = m_vreg[0x0c/2];
 	UINT16 old_word;
 
 	if( type == 0x03 )
 	{
 		if( offset<0x4000 )
 		{
-			old_word = state->m_shaperam[offset];
-			COMBINE_DATA( &state->m_shaperam[offset] );
-			if( state->m_shaperam[offset]!=old_word )
-				gfx_element_mark_dirty(space->machine().gfx[2], offset/4);
+			old_word = m_shaperam[offset];
+			COMBINE_DATA( &m_shaperam[offset] );
+			if( m_shaperam[offset]!=old_word )
+				gfx_element_mark_dirty(machine().gfx[2], offset/4);
 		}
 	}
 	else if( type == 0x02 )
 	{
-		old_word = state->m_cgram[offset];
-		COMBINE_DATA( &state->m_cgram[offset] );
-		if( state->m_cgram[offset]!=old_word )
+		old_word = m_cgram[offset];
+		COMBINE_DATA( &m_cgram[offset] );
+		if( m_cgram[offset]!=old_word )
 		{
-			gfx_element_mark_dirty(space->machine().gfx[0], offset/0x20);
-			gfx_element_mark_dirty(space->machine().gfx[1], offset/0x20);
+			gfx_element_mark_dirty(machine().gfx[0], offset/0x20);
+			gfx_element_mark_dirty(machine().gfx[1], offset/0x20);
 		}
 	}
 } /* namcona1_gfxram_w */

@@ -20,10 +20,10 @@ public:
 	/* misc */
 	int      m_counter;
 	DECLARE_WRITE8_MEMBER(dealer_decrypt_rom);
+	DECLARE_WRITE8_MEMBER(epos_port_1_w);
 };
 
 
 /*----------- defined in video/epos.c -----------*/
 
-WRITE8_HANDLER( epos_port_1_w );
 SCREEN_UPDATE_RGB32( epos );

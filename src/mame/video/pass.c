@@ -16,12 +16,11 @@ static TILE_GET_INFO( get_pass_bg_tile_info )
 
 }
 
-WRITE16_HANDLER( pass_bg_videoram_w )
+WRITE16_MEMBER(pass_state::pass_bg_videoram_w)
 {
-	pass_state *state = space->machine().driver_data<pass_state>();
 
-	state->m_bg_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_bg_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 /* foreground 'sprites' tilemap stuff */
@@ -38,11 +37,10 @@ static TILE_GET_INFO( get_pass_fg_tile_info )
 
 }
 
-WRITE16_HANDLER( pass_fg_videoram_w )
+WRITE16_MEMBER(pass_state::pass_fg_videoram_w)
 {
-	pass_state *state = space->machine().driver_data<pass_state>();
-	state->m_fg_videoram[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset);
+	m_fg_videoram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 /* video update / start */

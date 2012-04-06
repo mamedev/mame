@@ -565,7 +565,7 @@ static ADDRESS_MAP_START( zeus_map, AS_PROGRAM, 32, midzeus_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_RAM AM_BASE_LEGACY(&ram_base)
 	AM_RANGE(0x400000, 0x41ffff) AM_RAM
 	AM_RANGE(0x808000, 0x80807f) AM_READWRITE(tms32031_control_r, tms32031_control_w) AM_BASE_LEGACY(&tms32031_control)
-	AM_RANGE(0x880000, 0x8803ff) AM_READWRITE_LEGACY(zeus_r, zeus_w) AM_BASE_LEGACY(&zeusbase)
+	AM_RANGE(0x880000, 0x8803ff) AM_READWRITE(zeus_r, zeus_w) AM_BASE_LEGACY(&zeusbase)
 	AM_RANGE(0x8d0000, 0x8d0004) AM_READWRITE(bitlatches_r, bitlatches_w)
 	AM_RANGE(0x990000, 0x99000f) AM_READWRITE_LEGACY(midway_ioasic_r, midway_ioasic_w)
 	AM_RANGE(0x9e0000, 0x9e0000) AM_WRITENOP		// watchdog?

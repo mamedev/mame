@@ -44,6 +44,19 @@ public:
 	DECLARE_WRITE8_MEMBER(fg_scrollx_w);
 	DECLARE_WRITE8_MEMBER(fg_scrolly_w);
 	DECLARE_WRITE8_MEMBER(fg_scroll_msb_w);
+	DECLARE_READ8_MEMBER(nb1414m4_text_videoram_r);
+	DECLARE_WRITE8_MEMBER(nb1414m4_text_videoram_w);
+	DECLARE_READ8_MEMBER(armedf_text_videoram_r);
+	DECLARE_WRITE8_MEMBER(armedf_text_videoram_w);
+	DECLARE_WRITE16_MEMBER(armedf_fg_videoram_w);
+	DECLARE_WRITE16_MEMBER(armedf_bg_videoram_w);
+	DECLARE_WRITE16_MEMBER(terraf_fg_scrolly_w);
+	DECLARE_WRITE16_MEMBER(terraf_fg_scrollx_w);
+	DECLARE_WRITE16_MEMBER(terraf_fg_scroll_msb_arm_w);
+	DECLARE_WRITE16_MEMBER(armedf_fg_scrollx_w);
+	DECLARE_WRITE16_MEMBER(armedf_fg_scrolly_w);
+	DECLARE_WRITE16_MEMBER(armedf_bg_scrollx_w);
+	DECLARE_WRITE16_MEMBER(armedf_bg_scrolly_w);
 };
 
 class bigfghtr_state : public armedf_state
@@ -70,16 +83,3 @@ SCREEN_UPDATE_IND16( armedf );
 VIDEO_START( armedf );
 VIDEO_START( terraf );
 
-WRITE16_HANDLER( armedf_bg_videoram_w );
-WRITE16_HANDLER( armedf_fg_videoram_w );
-READ8_HANDLER( armedf_text_videoram_r );
-WRITE8_HANDLER( armedf_text_videoram_w );
-READ8_HANDLER( nb1414m4_text_videoram_r );
-WRITE8_HANDLER( nb1414m4_text_videoram_w );
-WRITE16_HANDLER( terraf_fg_scrollx_w );
-WRITE16_HANDLER( terraf_fg_scrolly_w );
-WRITE16_HANDLER( terraf_fg_scroll_msb_arm_w );
-WRITE16_HANDLER( armedf_fg_scrollx_w );
-WRITE16_HANDLER( armedf_fg_scrolly_w );
-WRITE16_HANDLER( armedf_bg_scrollx_w );
-WRITE16_HANDLER( armedf_bg_scrolly_w );

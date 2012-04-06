@@ -225,7 +225,7 @@ WRITE8_MEMBER(trackfld_state::irq_mask_w)
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, trackfld_state )
 	AM_RANGE(0x1000, 0x1000) AM_MIRROR(0x007f) AM_WRITE(watchdog_reset_w)		/* AFE */
-	AM_RANGE(0x1080, 0x1080) AM_MIRROR(0x0078) AM_WRITE_LEGACY(trackfld_flipscreen_w)	/* FLIP */
+	AM_RANGE(0x1080, 0x1080) AM_MIRROR(0x0078) AM_WRITE(trackfld_flipscreen_w)	/* FLIP */
 	AM_RANGE(0x1081, 0x1081) AM_MIRROR(0x0078) AM_WRITE_LEGACY(konami_sh_irqtrigger_w)	/* 26 */ /* cause interrupt on audio CPU */
 	AM_RANGE(0x1082, 0x1082) AM_MIRROR(0x0078) AM_WRITENOP						/* 25 */
 	AM_RANGE(0x1083, 0x1084) AM_MIRROR(0x0078) AM_WRITE(coin_w)					/* 24, 23 */
@@ -246,8 +246,8 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, trackfld_state )
 	AM_RANGE(0x1c40, 0x1c5f) AM_RAM AM_BASE(m_scroll2)
 	AM_RANGE(0x1c60, 0x1fff) AM_RAM
 	AM_RANGE(0x2800, 0x2fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x3000, 0x37ff) AM_RAM_WRITE_LEGACY(trackfld_videoram_w) AM_BASE(m_videoram)
-	AM_RANGE(0x3800, 0x3fff) AM_RAM_WRITE_LEGACY(trackfld_colorram_w) AM_BASE(m_colorram)
+	AM_RANGE(0x3000, 0x37ff) AM_RAM_WRITE(trackfld_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0x3800, 0x3fff) AM_RAM_WRITE(trackfld_colorram_w) AM_BASE(m_colorram)
 	AM_RANGE(0x6000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -264,7 +264,7 @@ static ADDRESS_MAP_START( yieartf_map, AS_PROGRAM, 8, trackfld_state )
 	AM_RANGE(0x0002, 0x0002) AM_DEVWRITE_LEGACY("vlm", yiear_VLM5030_control_w)
 	AM_RANGE(0x0003, 0x0003) AM_DEVWRITE_LEGACY("vlm", vlm5030_data_w)
 	AM_RANGE(0x1000, 0x1000) AM_MIRROR(0x007f) AM_WRITE(watchdog_reset_w)		/* AFE */
-	AM_RANGE(0x1080, 0x1080) AM_MIRROR(0x0078) AM_WRITE_LEGACY(trackfld_flipscreen_w)	/* FLIP */
+	AM_RANGE(0x1080, 0x1080) AM_MIRROR(0x0078) AM_WRITE(trackfld_flipscreen_w)	/* FLIP */
 	AM_RANGE(0x1081, 0x1081) AM_MIRROR(0x0078) AM_WRITE_LEGACY(konami_sh_irqtrigger_w)	/* 26 */ /* cause interrupt on audio CPU */
 	AM_RANGE(0x1082, 0x1082) AM_MIRROR(0x0078) AM_WRITE(yieartf_nmi_mask_w)		/* 25 */
 	AM_RANGE(0x1083, 0x1084) AM_MIRROR(0x0078) AM_WRITE(coin_w)					/* 24, 23 */
@@ -285,8 +285,8 @@ static ADDRESS_MAP_START( yieartf_map, AS_PROGRAM, 8, trackfld_state )
 	AM_RANGE(0x1c40, 0x1c5f) AM_RAM AM_BASE(m_scroll2)
 	AM_RANGE(0x1c60, 0x1fff) AM_RAM
 	AM_RANGE(0x2800, 0x2fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x3000, 0x37ff) AM_RAM_WRITE_LEGACY(trackfld_videoram_w) AM_BASE(m_videoram)
-	AM_RANGE(0x3800, 0x3fff) AM_RAM_WRITE_LEGACY(trackfld_colorram_w) AM_BASE(m_colorram)
+	AM_RANGE(0x3000, 0x37ff) AM_RAM_WRITE(trackfld_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0x3800, 0x3fff) AM_RAM_WRITE(trackfld_colorram_w) AM_BASE(m_colorram)
 	AM_RANGE(0x6000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -294,7 +294,7 @@ static ADDRESS_MAP_START( reaktor_map, AS_PROGRAM, 8, trackfld_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	/* all usual addresses +0x8000 */
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0x9080, 0x9080) AM_WRITE_LEGACY(trackfld_flipscreen_w)
+	AM_RANGE(0x9080, 0x9080) AM_WRITE(trackfld_flipscreen_w)
 	AM_RANGE(0x9081, 0x9081) AM_WRITE_LEGACY(konami_sh_irqtrigger_w)  /* cause interrupt on audio CPU */
 	AM_RANGE(0x9083, 0x9084) AM_WRITE(coin_w)
 	AM_RANGE(0x9087, 0x9087) AM_WRITE(irq_mask_w)
@@ -312,8 +312,8 @@ static ADDRESS_MAP_START( reaktor_map, AS_PROGRAM, 8, trackfld_state )
 	AM_RANGE(0x9c60, 0x9fff) AM_RAM
 	AM_RANGE(0xa800, 0xabff) AM_RAM
 	AM_RANGE(0xac00, 0xafff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xb000, 0xb7ff) AM_RAM_WRITE_LEGACY(trackfld_videoram_w) AM_BASE(m_videoram)
-	AM_RANGE(0xb800, 0xbfff) AM_RAM_WRITE_LEGACY(trackfld_colorram_w) AM_BASE(m_colorram)
+	AM_RANGE(0xb000, 0xb7ff) AM_RAM_WRITE(trackfld_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0xb800, 0xbfff) AM_RAM_WRITE(trackfld_colorram_w) AM_BASE(m_colorram)
 ADDRESS_MAP_END
 
 /* Reaktor reads / writes some I/O ports, no idea what they're connected to, if anything */
@@ -327,7 +327,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mastkin_map, AS_PROGRAM, 8, trackfld_state )
 	AM_RANGE(0x1000, 0x1000) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0x10b0, 0x10b0) AM_WRITE_LEGACY(trackfld_flipscreen_w)
+	AM_RANGE(0x10b0, 0x10b0) AM_WRITE(trackfld_flipscreen_w)
 	AM_RANGE(0x10b1, 0x10b1) AM_READNOP AM_WRITE_LEGACY(konami_sh_irqtrigger_w)
 	AM_RANGE(0x10b3, 0x10b4) AM_WRITE(coin_w) // actually not used
 	AM_RANGE(0x10b7, 0x10b7) AM_READNOP AM_WRITE(irq_mask_w)
@@ -346,15 +346,15 @@ static ADDRESS_MAP_START( mastkin_map, AS_PROGRAM, 8, trackfld_state )
 	AM_RANGE(0x2000, 0x27ff) AM_RAM // initialized at POST
 	AM_RANGE(0x2800, 0x2bff) AM_RAM
 	AM_RANGE(0x2c00, 0x2fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x3000, 0x37ff) AM_RAM_WRITE_LEGACY(trackfld_videoram_w) AM_BASE(m_videoram)
-	AM_RANGE(0x3800, 0x3fff) AM_RAM_WRITE_LEGACY(trackfld_colorram_w) AM_BASE(m_colorram)
+	AM_RANGE(0x3000, 0x37ff) AM_RAM_WRITE(trackfld_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0x3800, 0x3fff) AM_RAM_WRITE(trackfld_colorram_w) AM_BASE(m_colorram)
 	AM_RANGE(0x6000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( wizzquiz_map, AS_PROGRAM, 8, trackfld_state )
 	AM_RANGE(0x0000, 0x007f) AM_RAM
 	AM_RANGE(0x1000, 0x1000) AM_READWRITE(watchdog_reset_r, watchdog_reset_w)
-	AM_RANGE(0x1080, 0x1080) AM_WRITE_LEGACY(trackfld_flipscreen_w)
+	AM_RANGE(0x1080, 0x1080) AM_WRITE(trackfld_flipscreen_w)
 	AM_RANGE(0x1081, 0x1081) AM_WRITE_LEGACY(konami_sh_irqtrigger_w)  /* cause interrupt on audio CPU */
 	AM_RANGE(0x1083, 0x1084) AM_WRITE(coin_w)
 	AM_RANGE(0x1087, 0x1087) AM_WRITE(irq_mask_w)
@@ -372,8 +372,8 @@ static ADDRESS_MAP_START( wizzquiz_map, AS_PROGRAM, 8, trackfld_state )
 	AM_RANGE(0x1c60, 0x1fff) AM_RAM
 	AM_RANGE(0x2800, 0x2bff) AM_RAM
 	AM_RANGE(0x2c00, 0x2fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x3000, 0x37ff) AM_RAM_WRITE_LEGACY(trackfld_videoram_w) AM_BASE(m_videoram)
-	AM_RANGE(0x3800, 0x3fff) AM_RAM_WRITE_LEGACY(trackfld_colorram_w) AM_BASE(m_colorram)
+	AM_RANGE(0x3000, 0x37ff) AM_RAM_WRITE(trackfld_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0x3800, 0x3fff) AM_RAM_WRITE(trackfld_colorram_w) AM_BASE(m_colorram)
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(questions_bank_w)
 	AM_RANGE(0x6000, 0xdfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xe000, 0xffff) AM_ROM
@@ -1437,7 +1437,8 @@ static DRIVER_INIT( atlantol )
 
 	space->set_decrypted_region(0x0000, 0xffff, decrypt);
 
-	space->install_legacy_write_handler(0x0800, 0x0800, FUNC(atlantol_gfxbank_w));
+	trackfld_state *state = machine.driver_data<trackfld_state>();
+	space->install_write_handler(0x0800, 0x0800, write8_delegate(FUNC(trackfld_state::atlantol_gfxbank_w),state));
 	space->nop_write(0x1000, 0x1000);
 
 	/* unmapped areas read as ROM */

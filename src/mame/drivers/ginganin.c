@@ -74,11 +74,11 @@ static ADDRESS_MAP_START( ginganin_map, AS_PROGRAM, 16, ginganin_state )
 /* The ROM area: 10000-13fff is written with: 0000 0000 0000 0001, at startup only. Why? */
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x020000, 0x023fff) AM_RAM
-	AM_RANGE(0x030000, 0x0307ff) AM_RAM_WRITE_LEGACY(ginganin_txtram16_w) AM_BASE(m_txtram)
+	AM_RANGE(0x030000, 0x0307ff) AM_RAM_WRITE(ginganin_txtram16_w) AM_BASE(m_txtram)
 	AM_RANGE(0x040000, 0x0407ff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
 	AM_RANGE(0x050000, 0x0507ff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBxxxx_word_w) AM_SHARE("paletteram")
-	AM_RANGE(0x060000, 0x06000f) AM_RAM_WRITE_LEGACY(ginganin_vregs16_w) AM_BASE(m_vregs)
-	AM_RANGE(0x068000, 0x06bfff) AM_RAM_WRITE_LEGACY(ginganin_fgram16_w) AM_BASE(m_fgram)
+	AM_RANGE(0x060000, 0x06000f) AM_RAM_WRITE(ginganin_vregs16_w) AM_BASE(m_vregs)
+	AM_RANGE(0x068000, 0x06bfff) AM_RAM_WRITE(ginganin_fgram16_w) AM_BASE(m_fgram)
 	AM_RANGE(0x070000, 0x070001) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x070002, 0x070003) AM_READ_PORT("DSW")
 ADDRESS_MAP_END

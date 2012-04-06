@@ -73,12 +73,11 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 
 
-WRITE32_HANDLER( silkroad_fgram_w )
+WRITE32_MEMBER(silkroad_state::silkroad_fgram_w)
 {
-	silkroad_state *state = space->machine().driver_data<silkroad_state>();
 
-	COMBINE_DATA(&state->m_vidram[offset]);
-	state->m_fg_tilemap->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_vidram[offset]);
+	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 static TILE_GET_INFO( get_fg2_tile_info )
@@ -97,12 +96,11 @@ static TILE_GET_INFO( get_fg2_tile_info )
 
 
 
-WRITE32_HANDLER( silkroad_fgram2_w )
+WRITE32_MEMBER(silkroad_state::silkroad_fgram2_w)
 {
-	silkroad_state *state = space->machine().driver_data<silkroad_state>();
 
-	COMBINE_DATA(&state->m_vidram2[offset]);
-	state->m_fg2_tilemap->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_vidram2[offset]);
+	m_fg2_tilemap->mark_tile_dirty(offset);
 }
 
 static TILE_GET_INFO( get_fg3_tile_info )
@@ -121,12 +119,11 @@ static TILE_GET_INFO( get_fg3_tile_info )
 
 
 
-WRITE32_HANDLER( silkroad_fgram3_w )
+WRITE32_MEMBER(silkroad_state::silkroad_fgram3_w)
 {
-	silkroad_state *state = space->machine().driver_data<silkroad_state>();
 
-	COMBINE_DATA(&state->m_vidram3[offset]);
-	state->m_fg3_tilemap->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_vidram3[offset]);
+	m_fg3_tilemap->mark_tile_dirty(offset);
 }
 
 VIDEO_START(silkroad)

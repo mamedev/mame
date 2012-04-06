@@ -114,7 +114,7 @@ static ADDRESS_MAP_START( tank8_cpu_map, AS_PROGRAM, 8, tank8_state )
 	AM_RANGE(0x1c0b, 0x1c0b) AM_READ_PORT("RC")
 	AM_RANGE(0x1c0f, 0x1c0f) AM_READ_PORT("VBLANK")
 
-	AM_RANGE(0x1800, 0x1bff) AM_WRITE_LEGACY(tank8_video_ram_w) AM_BASE(m_video_ram)
+	AM_RANGE(0x1800, 0x1bff) AM_WRITE(tank8_video_ram_w) AM_BASE(m_video_ram)
 	AM_RANGE(0x1c00, 0x1c0f) AM_WRITEONLY AM_BASE(m_pos_h_ram)
 	AM_RANGE(0x1c10, 0x1c1f) AM_WRITEONLY AM_BASE(m_pos_v_ram)
 	AM_RANGE(0x1c20, 0x1c2f) AM_WRITEONLY AM_BASE(m_pos_d_ram)

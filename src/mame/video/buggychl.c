@@ -25,31 +25,27 @@ VIDEO_START( buggychl )
 
 
 
-WRITE8_HANDLER( buggychl_chargen_w )
+WRITE8_MEMBER(buggychl_state::buggychl_chargen_w)
 {
-	buggychl_state *state = space->machine().driver_data<buggychl_state>();
-	if (state->m_charram[offset] != data)
+	if (m_charram[offset] != data)
 	{
-		state->m_charram[offset] = data;
-		gfx_element_mark_dirty(space->machine().gfx[0], (offset / 8) & 0xff);
+		m_charram[offset] = data;
+		gfx_element_mark_dirty(machine().gfx[0], (offset / 8) & 0xff);
 	}
 }
 
-WRITE8_HANDLER( buggychl_sprite_lookup_bank_w )
+WRITE8_MEMBER(buggychl_state::buggychl_sprite_lookup_bank_w)
 {
-	buggychl_state *state = space->machine().driver_data<buggychl_state>();
-	state->m_sl_bank = (data & 0x10) << 8;
+	m_sl_bank = (data & 0x10) << 8;
 }
 
-WRITE8_HANDLER( buggychl_sprite_lookup_w )
+WRITE8_MEMBER(buggychl_state::buggychl_sprite_lookup_w)
 {
-	buggychl_state *state = space->machine().driver_data<buggychl_state>();
-	state->m_sprite_lookup[offset + state->m_sl_bank] = data;
+	m_sprite_lookup[offset + m_sl_bank] = data;
 }
 
-WRITE8_HANDLER( buggychl_ctrl_w )
+WRITE8_MEMBER(buggychl_state::buggychl_ctrl_w)
 {
-	buggychl_state *state = space->machine().driver_data<buggychl_state>();
 /*
     bit7 = lamp
     bit6 = lockout
@@ -60,22 +56,21 @@ WRITE8_HANDLER( buggychl_ctrl_w )
     bit0 = VINV
 */
 
-	flip_screen_y_set(space->machine(), data & 0x01);
-	flip_screen_x_set(space->machine(), data & 0x02);
+	flip_screen_y_set(machine(), data & 0x01);
+	flip_screen_x_set(machine(), data & 0x02);
 
-	state->m_bg_on = data & 0x04;
-	state->m_sky_on = data & 0x08;
+	m_bg_on = data & 0x04;
+	m_sky_on = data & 0x08;
 
-	state->m_sprite_color_base = (data & 0x10) ? 1 * 16 : 3 * 16;
+	m_sprite_color_base = (data & 0x10) ? 1 * 16 : 3 * 16;
 
-	coin_lockout_global_w(space->machine(), (~data & 0x40) >> 6);
-	set_led_status(space->machine(), 0, ~data & 0x80);
+	coin_lockout_global_w(machine(), (~data & 0x40) >> 6);
+	set_led_status(machine(), 0, ~data & 0x80);
 }
 
-WRITE8_HANDLER( buggychl_bg_scrollx_w )
+WRITE8_MEMBER(buggychl_state::buggychl_bg_scrollx_w)
 {
-	buggychl_state *state = space->machine().driver_data<buggychl_state>();
-	state->m_bg_scrollx = -(data - 0x12);
+	m_bg_scrollx = -(data - 0x12);
 }
 
 

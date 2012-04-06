@@ -158,18 +158,16 @@ VIDEO_START( labyrunr )
 
 ***************************************************************************/
 
-WRITE8_HANDLER( labyrunr_vram1_w )
+WRITE8_MEMBER(labyrunr_state::labyrunr_vram1_w)
 {
-	labyrunr_state *state = space->machine().driver_data<labyrunr_state>();
-	state->m_videoram1[offset] = data;
-	state->m_layer0->mark_tile_dirty(offset & 0x3ff);
+	m_videoram1[offset] = data;
+	m_layer0->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_HANDLER( labyrunr_vram2_w )
+WRITE8_MEMBER(labyrunr_state::labyrunr_vram2_w)
 {
-	labyrunr_state *state = space->machine().driver_data<labyrunr_state>();
-	state->m_videoram2[offset] = data;
-	state->m_layer1->mark_tile_dirty(offset & 0x3ff);
+	m_videoram2[offset] = data;
+	m_layer1->mark_tile_dirty(offset & 0x3ff);
 }
 
 

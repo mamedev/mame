@@ -2,16 +2,15 @@
 #include "includes/mexico86.h"
 
 
-WRITE8_HANDLER( mexico86_bankswitch_w )
+WRITE8_MEMBER(mexico86_state::mexico86_bankswitch_w)
 {
-	mexico86_state *state = space->machine().driver_data<mexico86_state>();
 
 	if ((data & 7) > 5)
 		popmessage("Switching to invalid bank!");
 
-	memory_set_bank(space->machine(), "bank1", data & 0x07);
+	memory_set_bank(machine(), "bank1", data & 0x07);
 
-	state->m_charbank = BIT(data, 5);
+	m_charbank = BIT(data, 5);
 }
 
 

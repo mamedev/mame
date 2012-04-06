@@ -12,20 +12,20 @@ public:
 	UINT8 *m_spriteram;
 	DECLARE_WRITE8_MEMBER(ninjakun_cpu1_io_A002_w);
 	DECLARE_WRITE8_MEMBER(ninjakun_cpu2_io_A002_w);
+	DECLARE_WRITE8_MEMBER(ninjakun_paletteram_w);
+	DECLARE_WRITE8_MEMBER(nova2001_fg_videoram_w);
+	DECLARE_WRITE8_MEMBER(nova2001_bg_videoram_w);
+	DECLARE_WRITE8_MEMBER(ninjakun_bg_videoram_w);
+	DECLARE_READ8_MEMBER(ninjakun_bg_videoram_r);
+	DECLARE_WRITE8_MEMBER(nova2001_scroll_x_w);
+	DECLARE_WRITE8_MEMBER(nova2001_scroll_y_w);
+	DECLARE_WRITE8_MEMBER(nova2001_flipscreen_w);
+	DECLARE_WRITE8_MEMBER(pkunwar_flipscreen_w);
 };
 
 
 /*----------- defined in video/nova2001.c -----------*/
 
-extern WRITE8_HANDLER( nova2001_fg_videoram_w );
-extern WRITE8_HANDLER( nova2001_bg_videoram_w );
-extern WRITE8_HANDLER( ninjakun_bg_videoram_w );
-extern READ8_HANDLER( ninjakun_bg_videoram_r );
-extern WRITE8_HANDLER( nova2001_scroll_x_w );
-extern WRITE8_HANDLER( nova2001_scroll_y_w );
-extern WRITE8_HANDLER( nova2001_flipscreen_w );
-extern WRITE8_HANDLER( pkunwar_flipscreen_w );
-extern WRITE8_HANDLER( ninjakun_paletteram_w );
 
 extern PALETTE_INIT( nova2001 );
 extern VIDEO_START( nova2001 );

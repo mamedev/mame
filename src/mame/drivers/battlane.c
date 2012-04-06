@@ -99,15 +99,15 @@ static INTERRUPT_GEN( battlane_cpu1_interrupt )
 
 static ADDRESS_MAP_START( battlane_map, AS_PROGRAM, 8, battlane_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x1000, 0x17ff) AM_RAM_WRITE_LEGACY(battlane_tileram_w) AM_SHARE("share2") AM_BASE(m_tileram)
-	AM_RANGE(0x1800, 0x18ff) AM_RAM_WRITE_LEGACY(battlane_spriteram_w) AM_SHARE("share3") AM_BASE(m_spriteram)
-	AM_RANGE(0x1c00, 0x1c00) AM_READ_PORT("P1") AM_WRITE_LEGACY(battlane_video_ctrl_w)
-	AM_RANGE(0x1c01, 0x1c01) AM_READ_PORT("P2") AM_WRITE_LEGACY(battlane_scrollx_w)
-	AM_RANGE(0x1c02, 0x1c02) AM_READ_PORT("DSW1") AM_WRITE_LEGACY(battlane_scrolly_w)
+	AM_RANGE(0x1000, 0x17ff) AM_RAM_WRITE(battlane_tileram_w) AM_SHARE("share2") AM_BASE(m_tileram)
+	AM_RANGE(0x1800, 0x18ff) AM_RAM_WRITE(battlane_spriteram_w) AM_SHARE("share3") AM_BASE(m_spriteram)
+	AM_RANGE(0x1c00, 0x1c00) AM_READ_PORT("P1") AM_WRITE(battlane_video_ctrl_w)
+	AM_RANGE(0x1c01, 0x1c01) AM_READ_PORT("P2") AM_WRITE(battlane_scrollx_w)
+	AM_RANGE(0x1c02, 0x1c02) AM_READ_PORT("DSW1") AM_WRITE(battlane_scrolly_w)
 	AM_RANGE(0x1c03, 0x1c03) AM_READ_PORT("DSW2") AM_WRITE(battlane_cpu_command_w)
 	AM_RANGE(0x1c04, 0x1c05) AM_DEVREADWRITE_LEGACY("ymsnd", ym3526_r, ym3526_w)
-	AM_RANGE(0x1e00, 0x1e3f) AM_WRITE_LEGACY(battlane_palette_w)
-	AM_RANGE(0x2000, 0x3fff) AM_RAM_WRITE_LEGACY(battlane_bitmap_w) AM_SHARE("share4")
+	AM_RANGE(0x1e00, 0x1e3f) AM_WRITE(battlane_palette_w)
+	AM_RANGE(0x2000, 0x3fff) AM_RAM_WRITE(battlane_bitmap_w) AM_SHARE("share4")
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

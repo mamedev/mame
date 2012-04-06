@@ -53,13 +53,28 @@ public:
 	DECLARE_READ8_MEMBER(audio_command_r);
 	DECLARE_READ8_MEMBER(zoar_dsw1_read);
 	DECLARE_READ8_MEMBER(wtennis_reset_hack_r);
+	DECLARE_READ8_MEMBER(mmonkey_protection_r);
+	DECLARE_WRITE8_MEMBER(mmonkey_protection_w);
+	DECLARE_WRITE8_MEMBER(btime_paletteram_w);
+	DECLARE_WRITE8_MEMBER(lnc_videoram_w);
+	DECLARE_READ8_MEMBER(btime_mirrorvideoram_r);
+	DECLARE_READ8_MEMBER(btime_mirrorcolorram_r);
+	DECLARE_WRITE8_MEMBER(btime_mirrorvideoram_w);
+	DECLARE_WRITE8_MEMBER(lnc_mirrorvideoram_w);
+	DECLARE_WRITE8_MEMBER(btime_mirrorcolorram_w);
+	DECLARE_WRITE8_MEMBER(deco_charram_w);
+	DECLARE_WRITE8_MEMBER(bnj_background_w);
+	DECLARE_WRITE8_MEMBER(bnj_scroll1_w);
+	DECLARE_WRITE8_MEMBER(bnj_scroll2_w);
+	DECLARE_WRITE8_MEMBER(btime_video_control_w);
+	DECLARE_WRITE8_MEMBER(bnj_video_control_w);
+	DECLARE_WRITE8_MEMBER(zoar_video_control_w);
+	DECLARE_WRITE8_MEMBER(disco_video_control_w);
 };
 
 
 /*----------- defined in machine/btime.c -----------*/
 
-READ8_HANDLER( mmonkey_protection_r );
-WRITE8_HANDLER( mmonkey_protection_w );
 
 
 /*----------- defined in video/btime.c -----------*/
@@ -78,19 +93,4 @@ SCREEN_UPDATE_IND16( zoar );
 SCREEN_UPDATE_IND16( disco );
 SCREEN_UPDATE_IND16( eggs );
 
-WRITE8_HANDLER( btime_paletteram_w );
-WRITE8_HANDLER( bnj_background_w );
-WRITE8_HANDLER( bnj_scroll1_w );
-WRITE8_HANDLER( bnj_scroll2_w );
-READ8_HANDLER( btime_mirrorvideoram_r );
-WRITE8_HANDLER( btime_mirrorvideoram_w );
-READ8_HANDLER( btime_mirrorcolorram_r );
-WRITE8_HANDLER( btime_mirrorcolorram_w );
-WRITE8_HANDLER( lnc_videoram_w );
-WRITE8_HANDLER( lnc_mirrorvideoram_w );
-WRITE8_HANDLER( deco_charram_w );
 
-WRITE8_HANDLER( zoar_video_control_w );
-WRITE8_HANDLER( btime_video_control_w );
-WRITE8_HANDLER( bnj_video_control_w );
-WRITE8_HANDLER( disco_video_control_w );

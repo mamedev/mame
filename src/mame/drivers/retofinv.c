@@ -99,14 +99,14 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, retofinv_state )
 	AM_RANGE(0x7fff, 0x7fff) AM_WRITE(coincounter_w)
 	AM_RANGE(0x7b00, 0x7bff) AM_ROM	/* space for diagnostic ROM? The code looks */
 									/* for a string here, and jumps if it's present */
-	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE_LEGACY(retofinv_fg_videoram_w) AM_SHARE("share2") AM_BASE(m_fg_videoram)
+	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(retofinv_fg_videoram_w) AM_SHARE("share2") AM_BASE(m_fg_videoram)
 	AM_RANGE(0x8800, 0x9fff) AM_RAM AM_SHARE("share1") AM_BASE(m_sharedram)
-	AM_RANGE(0xa000, 0xa7ff) AM_RAM_WRITE_LEGACY(retofinv_bg_videoram_w) AM_SHARE("share3") AM_BASE(m_bg_videoram)
-	AM_RANGE(0xb800, 0xb802) AM_WRITE_LEGACY(retofinv_gfx_ctrl_w)
+	AM_RANGE(0xa000, 0xa7ff) AM_RAM_WRITE(retofinv_bg_videoram_w) AM_SHARE("share3") AM_BASE(m_bg_videoram)
+	AM_RANGE(0xb800, 0xb802) AM_WRITE(retofinv_gfx_ctrl_w)
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("P1")
 	AM_RANGE(0xc001, 0xc001) AM_READ_PORT("P2")
 	AM_RANGE(0xc002, 0xc002) AM_READNOP	/* bit 7 must be 0, otherwise game resets */
-	AM_RANGE(0xc003, 0xc003) AM_READ_LEGACY(retofinv_mcu_status_r)
+	AM_RANGE(0xc003, 0xc003) AM_READ(retofinv_mcu_status_r)
 	AM_RANGE(0xc004, 0xc004) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xc005, 0xc005) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc006, 0xc006) AM_READ_PORT("DSW2")
@@ -119,16 +119,16 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, retofinv_state )
 	AM_RANGE(0xc805, 0xc805) AM_WRITE(cpu1_reset_w)
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0xd800, 0xd800) AM_WRITE(soundcommand_w)
-	AM_RANGE(0xe000, 0xe000) AM_READ_LEGACY(retofinv_mcu_r)
-	AM_RANGE(0xe800, 0xe800) AM_WRITE_LEGACY(retofinv_mcu_w)
+	AM_RANGE(0xe000, 0xe000) AM_READ(retofinv_mcu_r)
+	AM_RANGE(0xe800, 0xe800) AM_WRITE(retofinv_mcu_w)
 	AM_RANGE(0xf800, 0xf800) AM_READ(cpu0_mf800_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 8, retofinv_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE_LEGACY(retofinv_fg_videoram_w) AM_SHARE("share2")
+	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(retofinv_fg_videoram_w) AM_SHARE("share2")
 	AM_RANGE(0x8800, 0x9fff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0xa000, 0xa7ff) AM_RAM_WRITE_LEGACY(retofinv_bg_videoram_w) AM_SHARE("share3")
+	AM_RANGE(0xa000, 0xa7ff) AM_RAM_WRITE(retofinv_bg_videoram_w) AM_SHARE("share3")
 	AM_RANGE(0xc804, 0xc804) AM_WRITE(irq1_ack_w)
 ADDRESS_MAP_END
 
@@ -144,12 +144,12 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mcu_map, AS_PROGRAM, 8, retofinv_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
-	AM_RANGE(0x0000, 0x0000) AM_READWRITE_LEGACY(retofinv_68705_portA_r, retofinv_68705_portA_w)
-	AM_RANGE(0x0001, 0x0001) AM_READWRITE_LEGACY(retofinv_68705_portB_r, retofinv_68705_portB_w)
-	AM_RANGE(0x0002, 0x0002) AM_READWRITE_LEGACY(retofinv_68705_portC_r, retofinv_68705_portC_w)
-	AM_RANGE(0x0004, 0x0004) AM_WRITE_LEGACY(retofinv_68705_ddrA_w)
-	AM_RANGE(0x0005, 0x0005) AM_WRITE_LEGACY(retofinv_68705_ddrB_w)
-	AM_RANGE(0x0006, 0x0006) AM_WRITE_LEGACY(retofinv_68705_ddrC_w)
+	AM_RANGE(0x0000, 0x0000) AM_READWRITE(retofinv_68705_portA_r, retofinv_68705_portA_w)
+	AM_RANGE(0x0001, 0x0001) AM_READWRITE(retofinv_68705_portB_r, retofinv_68705_portB_w)
+	AM_RANGE(0x0002, 0x0002) AM_READWRITE(retofinv_68705_portC_r, retofinv_68705_portC_w)
+	AM_RANGE(0x0004, 0x0004) AM_WRITE(retofinv_68705_ddrA_w)
+	AM_RANGE(0x0005, 0x0005) AM_WRITE(retofinv_68705_ddrB_w)
+	AM_RANGE(0x0006, 0x0006) AM_WRITE(retofinv_68705_ddrC_w)
 	AM_RANGE(0x0010, 0x007f) AM_RAM
 	AM_RANGE(0x0080, 0x07ff) AM_ROM
 ADDRESS_MAP_END

@@ -253,16 +253,15 @@ VIDEO_START( segag80r )
  *
  *************************************/
 
-WRITE8_HANDLER( segag80r_videoram_w )
+WRITE8_MEMBER(segag80r_state::segag80r_videoram_w)
 {
-	segag80r_state *state = space->machine().driver_data<segag80r_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = m_videoram;
 	/* accesses to the upper half of VRAM go to paletteram if selected */
-	if ((offset & 0x1000) && (state->m_video_control & 0x02))
+	if ((offset & 0x1000) && (m_video_control & 0x02))
 	{
 		offset &= 0x3f;
-		state->m_generic_paletteram_8[offset] = data;
-		g80_set_palette_entry(space->machine(), offset, data);
+		m_generic_paletteram_8[offset] = data;
+		g80_set_palette_entry(machine(), offset, data);
 		return;
 	}
 
@@ -271,7 +270,7 @@ WRITE8_HANDLER( segag80r_videoram_w )
 
 	/* track which characters are dirty */
 	if (offset & 0x800)
-		gfx_element_mark_dirty(space->machine().gfx[0], (offset & 0x7ff) / 8);
+		gfx_element_mark_dirty(machine().gfx[0], (offset & 0x7ff) / 8);
 }
 
 
@@ -282,12 +281,11 @@ WRITE8_HANDLER( segag80r_videoram_w )
  *
  *************************************/
 
-READ8_HANDLER( segag80r_video_port_r )
+READ8_MEMBER(segag80r_state::segag80r_video_port_r)
 {
-	segag80r_state *state = space->machine().driver_data<segag80r_state>();
 	if (offset == 0)
 	{
-		logerror("%04X:segag80r_video_port_r(%d)\n", cpu_get_pc(&space->device()), offset);
+		logerror("%04X:segag80r_video_port_r(%d)\n", cpu_get_pc(&space.device()), offset);
 		return 0xff;
 	}
 	else
@@ -298,17 +296,16 @@ READ8_HANDLER( segag80r_video_port_r )
             D2 = interrupt enable state
             D3 = n/c
         */
-		return (state->m_vblank_latch << 0) | (state->m_video_flip << 1) | (state->m_video_control & 0x04) | 0xf8;
+		return (m_vblank_latch << 0) | (m_video_flip << 1) | (m_video_control & 0x04) | 0xf8;
 	}
 }
 
 
-WRITE8_HANDLER( segag80r_video_port_w )
+WRITE8_MEMBER(segag80r_state::segag80r_video_port_w)
 {
-	segag80r_state *state = space->machine().driver_data<segag80r_state>();
 	if (offset == 0)
 	{
-		logerror("%04X:segag80r_video_port_w(%d) = %02X\n", cpu_get_pc(&space->device()), offset, data);
+		logerror("%04X:segag80r_video_port_w(%d) = %02X\n", cpu_get_pc(&space.device()), offset, data);
 	}
 	else
 	{
@@ -319,7 +316,7 @@ WRITE8_HANDLER( segag80r_video_port_w )
             D2 = interrupt enable
             D3 = n/c (used as flip by many background boards)
         */
-		state->m_video_control = data;
+		m_video_control = data;
 	}
 }
 
@@ -332,18 +329,16 @@ WRITE8_HANDLER( segag80r_video_port_w )
  *
  *************************************/
 
-READ8_HANDLER( spaceod_back_port_r )
+READ8_MEMBER(segag80r_state::spaceod_back_port_r)
 {
-	segag80r_state *state = space->machine().driver_data<segag80r_state>();
 	/* force an update to get the current detection value */
-	space->machine().primary_screen->update_partial(space->machine().primary_screen->vpos());
-	return 0xfe | state->m_spaceod_bg_detect;
+	machine().primary_screen->update_partial(machine().primary_screen->vpos());
+	return 0xfe | m_spaceod_bg_detect;
 }
 
 
-WRITE8_HANDLER( spaceod_back_port_w )
+WRITE8_MEMBER(segag80r_state::spaceod_back_port_w)
 {
-	segag80r_state *state = space->machine().driver_data<segag80r_state>();
 	switch (offset & 7)
 	{
 		/* port 0: latches D0-D7 into LS377 at U39 (SH4)
@@ -355,54 +350,54 @@ WRITE8_HANDLER( spaceod_back_port_w )
             d7 = background ROM select 1
         */
 		case 0:
-			if ((state->m_spaceod_bg_control ^ data) & 0xc4)
+			if ((m_spaceod_bg_control ^ data) & 0xc4)
 			{
-				state->m_spaceod_bg_htilemap->mark_all_dirty();
-				state->m_spaceod_bg_vtilemap->mark_all_dirty();
+				m_spaceod_bg_htilemap->mark_all_dirty();
+				m_spaceod_bg_vtilemap->mark_all_dirty();
 			}
-			state->m_spaceod_bg_control = data;
+			m_spaceod_bg_control = data;
 			break;
 
 		/* port 1: loads both H and V counters with 0 */
 		case 1:
-			state->m_spaceod_hcounter = 0;
-			state->m_spaceod_vcounter = 0;
+			m_spaceod_hcounter = 0;
+			m_spaceod_vcounter = 0;
 			break;
 
 		/* port 2: clocks either the H or V counters (based on port 0:d1) */
 		/* either up or down (based on port 0:d0) */
 		case 2:
-			if (!(state->m_spaceod_bg_control & 0x02))
+			if (!(m_spaceod_bg_control & 0x02))
 			{
-				if (!(state->m_spaceod_bg_control & 0x01))
-					state->m_spaceod_hcounter++;
+				if (!(m_spaceod_bg_control & 0x01))
+					m_spaceod_hcounter++;
 				else
-					state->m_spaceod_hcounter--;
+					m_spaceod_hcounter--;
 			}
 			else
 			{
-				if (!(state->m_spaceod_bg_control & 0x01))
-					state->m_spaceod_vcounter++;
+				if (!(m_spaceod_bg_control & 0x01))
+					m_spaceod_vcounter++;
 				else
-					state->m_spaceod_vcounter--;
+					m_spaceod_vcounter--;
 			}
 			break;
 
 		/* port 3: clears the background detection flag */
 		case 3:
-			space->machine().primary_screen->update_partial(space->machine().primary_screen->vpos());
-			state->m_spaceod_bg_detect = 0;
+			machine().primary_screen->update_partial(machine().primary_screen->vpos());
+			m_spaceod_bg_detect = 0;
 			break;
 
 		/* port 4: enables (0)/disables (1) the background */
 		case 4:
-			state->m_bg_enable = data & 1;
+			m_bg_enable = data & 1;
 			break;
 
 		/* port 5: specifies fixed background color */
 		/* top two bits are not connected */
 		case 5:
-			state->m_spaceod_fixed_color = data & 0x3f;
+			m_spaceod_fixed_color = data & 0x3f;
 			break;
 
 		/* port 6: latches D0-D7 into LS377 at U37 -> CN1-11/12/13/14/15/16/17/18 */
@@ -422,16 +417,15 @@ WRITE8_HANDLER( spaceod_back_port_w )
  *
  *************************************/
 
-WRITE8_HANDLER( monsterb_videoram_w )
+WRITE8_MEMBER(segag80r_state::monsterb_videoram_w)
 {
-	segag80r_state *state = space->machine().driver_data<segag80r_state>();
 	/* accesses to the the area $f040-$f07f go to background palette if */
 	/* the palette access enable bit is set */
-	if ((offset & 0x1fc0) == 0x1040 && (state->m_video_control & 0x40))
+	if ((offset & 0x1fc0) == 0x1040 && (m_video_control & 0x40))
 	{
 		offs_t paloffs = offset & 0x3f;
-		state->m_generic_paletteram_8[paloffs | 0x40] = data;
-		g80_set_palette_entry(space->machine(), paloffs | 0x40, data);
+		m_generic_paletteram_8[paloffs | 0x40] = data;
+		g80_set_palette_entry(machine(), paloffs | 0x40, data);
 		/* note that since the background board is not integrated with the main board */
 		/* writes here also write through to regular videoram */
 	}
@@ -441,9 +435,8 @@ WRITE8_HANDLER( monsterb_videoram_w )
 }
 
 
-WRITE8_HANDLER( monsterb_back_port_w )
+WRITE8_MEMBER(segag80r_state::monsterb_back_port_w)
 {
-	segag80r_state *state = space->machine().driver_data<segag80r_state>();
 	switch (offset & 7)
 	{
 		/* port 0: not used (looks like latches for C7-C10 = background color) */
@@ -472,11 +465,11 @@ WRITE8_HANDLER( monsterb_back_port_w )
             d7 = BKGEN - background enable
          */
 		case 4:
-			if ((state->m_bg_char_bank ^ data) & 0x0f)
-				state->m_bg_tilemap->mark_all_dirty();
-			state->m_bg_char_bank = data & 0x0f;
-			state->m_bg_scrolly = (data << 4) & 0x700;
-			state->m_bg_enable = data & 0x80;
+			if ((m_bg_char_bank ^ data) & 0x0f)
+				m_bg_tilemap->mark_all_dirty();
+			m_bg_char_bank = data & 0x0f;
+			m_bg_scrolly = (data << 4) & 0x700;
+			m_bg_enable = data & 0x80;
 			break;
 
 		/* port 5: not connected */
@@ -494,16 +487,15 @@ WRITE8_HANDLER( monsterb_back_port_w )
  *
  *************************************/
 
-WRITE8_HANDLER( pignewt_videoram_w )
+WRITE8_MEMBER(segag80r_state::pignewt_videoram_w)
 {
-	segag80r_state *state = space->machine().driver_data<segag80r_state>();
 	/* accesses to the the area $f040-$f07f go to background palette if */
 	/* the palette access enable bit is set */
-	if ((offset & 0x1fc0) == 0x1040 && (state->m_video_control & 0x02))
+	if ((offset & 0x1fc0) == 0x1040 && (m_video_control & 0x02))
 	{
 		offs_t paloffs = offset & 0x3f;
-		state->m_generic_paletteram_8[paloffs | 0x40] = data;
-		g80_set_palette_entry(space->machine(), paloffs | 0x40, data);
+		m_generic_paletteram_8[paloffs | 0x40] = data;
+		g80_set_palette_entry(machine(), paloffs | 0x40, data);
 		return;
 	}
 
@@ -512,41 +504,39 @@ WRITE8_HANDLER( pignewt_videoram_w )
 }
 
 
-WRITE8_HANDLER( pignewt_back_color_w )
+WRITE8_MEMBER(segag80r_state::pignewt_back_color_w)
 {
-	segag80r_state *state = space->machine().driver_data<segag80r_state>();
 	/* it is not really known what this does */
 	if (offset == 0)
-		state->m_pignewt_bg_color_offset = data;
+		m_pignewt_bg_color_offset = data;
 	else
-		logerror("pignewt_back_color_w(%d) = %02X\n", state->m_pignewt_bg_color_offset, data);
+		logerror("pignewt_back_color_w(%d) = %02X\n", m_pignewt_bg_color_offset, data);
 }
 
 
-WRITE8_HANDLER( pignewt_back_port_w )
+WRITE8_MEMBER(segag80r_state::pignewt_back_port_w)
 {
-	segag80r_state *state = space->machine().driver_data<segag80r_state>();
 	switch (offset & 7)
 	{
 		/* port 0: scroll offset low */
 		case 0:
-			state->m_bg_scrollx = (state->m_bg_scrollx & 0x300) | data;
+			m_bg_scrollx = (m_bg_scrollx & 0x300) | data;
 			break;
 
 		/* port 1: scroll offset high */
 		case 1:
-			state->m_bg_scrollx = (state->m_bg_scrollx & 0x0ff) | ((data << 8) & 0x300);
-			state->m_bg_enable = data & 0x80;
+			m_bg_scrollx = (m_bg_scrollx & 0x0ff) | ((data << 8) & 0x300);
+			m_bg_enable = data & 0x80;
 			break;
 
 		/* port 2: scroll offset low */
 		case 2:
-			state->m_bg_scrolly = (state->m_bg_scrolly & 0x300) | data;
+			m_bg_scrolly = (m_bg_scrolly & 0x300) | data;
 			break;
 
 		/* port 3: scroll offset high */
 		case 3:
-			state->m_bg_scrolly = (state->m_bg_scrolly & 0x0ff) | ((data << 8) & 0x300);
+			m_bg_scrolly = (m_bg_scrolly & 0x0ff) | ((data << 8) & 0x300);
 			break;
 
 		/* port 4: background character bank control
@@ -561,9 +551,9 @@ WRITE8_HANDLER( pignewt_back_port_w )
          */
 		case 4:
 			data = (data & 0x09) | ((data >> 2) & 0x02) | ((data << 2) & 0x04);
-			if ((state->m_bg_char_bank ^ data) & 0x0f)
-				state->m_bg_tilemap->mark_all_dirty();
-			state->m_bg_char_bank = data & 0x0f;
+			if ((m_bg_char_bank ^ data) & 0x0f)
+				m_bg_tilemap->mark_all_dirty();
+			m_bg_char_bank = data & 0x0f;
 			break;
 
 		/* port 5: not connected? */
@@ -580,16 +570,15 @@ WRITE8_HANDLER( pignewt_back_port_w )
  *
  *************************************/
 
-WRITE8_HANDLER( sindbadm_videoram_w )
+WRITE8_MEMBER(segag80r_state::sindbadm_videoram_w)
 {
-	segag80r_state *state = space->machine().driver_data<segag80r_state>();
 	/* accesses to the the area $f000-$f03f go to background palette if */
 	/* the palette access enable bit is set */
-	if ((offset & 0x1fc0) == 0x1000 && (state->m_video_control & 0x02))
+	if ((offset & 0x1fc0) == 0x1000 && (m_video_control & 0x02))
 	{
 		offs_t paloffs = offset & 0x3f;
-		state->m_generic_paletteram_8[paloffs | 0x40] = data;
-		g80_set_palette_entry(space->machine(), paloffs | 0x40, data);
+		m_generic_paletteram_8[paloffs | 0x40] = data;
+		g80_set_palette_entry(machine(), paloffs | 0x40, data);
 		return;
 	}
 
@@ -598,14 +587,13 @@ WRITE8_HANDLER( sindbadm_videoram_w )
 }
 
 
-WRITE8_HANDLER( sindbadm_back_port_w )
+WRITE8_MEMBER(segag80r_state::sindbadm_back_port_w)
 {
-	segag80r_state *state = space->machine().driver_data<segag80r_state>();
 	switch (offset & 3)
 	{
 		/* port 0: irq ack */
 		case 0:
-			cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
+			cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
 			break;
 
 		/* port 1: background control
@@ -620,12 +608,12 @@ WRITE8_HANDLER( sindbadm_back_port_w )
             d7 = BG enable
         */
 		case 1:
-			state->m_bg_enable = data & 0x80;
-			state->m_bg_scrollx = (data << 6) & 0x300;
-			state->m_bg_scrolly = (data << 4) & 0x700;
-			if ((state->m_bg_char_bank ^ data) & 0x03)
-				state->m_bg_tilemap->mark_all_dirty();
-			state->m_bg_char_bank = data & 0x03;
+			m_bg_enable = data & 0x80;
+			m_bg_scrollx = (data << 6) & 0x300;
+			m_bg_scrolly = (data << 4) & 0x700;
+			if ((m_bg_char_bank ^ data) & 0x03)
+				m_bg_tilemap->mark_all_dirty();
+			m_bg_char_bank = data & 0x03;
 			break;
 	}
 }

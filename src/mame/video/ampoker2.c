@@ -111,12 +111,11 @@ PALETTE_INIT( ampoker2 )
 	}
 }
 
-WRITE8_HANDLER( ampoker2_videoram_w )
+WRITE8_MEMBER(ampoker2_state::ampoker2_videoram_w)
 {
-	ampoker2_state *state = space->machine().driver_data<ampoker2_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = m_videoram;
 	videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset / 2);
+	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )

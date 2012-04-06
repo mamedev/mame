@@ -137,23 +137,20 @@ VIDEO_START( bnj )
 }
 
 
-WRITE8_HANDLER( btime_paletteram_w )
+WRITE8_MEMBER(btime_state::btime_paletteram_w)
 {
 	/* RGB output is inverted */
-	btime_state *state = space->machine().driver_data<btime_state>();
-	state->paletteram_BBGGGRRR_w(*space, offset, ~data);
+	paletteram_BBGGGRRR_w(space, offset, ~data);
 }
 
-WRITE8_HANDLER( lnc_videoram_w )
+WRITE8_MEMBER(btime_state::lnc_videoram_w)
 {
-	btime_state *state = space->machine().driver_data<btime_state>();
-	state->m_videoram[offset] = data;
-	state->m_colorram[offset] = *state->m_lnc_charbank;
+	m_videoram[offset] = data;
+	m_colorram[offset] = *m_lnc_charbank;
 }
 
-READ8_HANDLER( btime_mirrorvideoram_r )
+READ8_MEMBER(btime_state::btime_mirrorvideoram_r)
 {
-	btime_state *state = space->machine().driver_data<btime_state>();
 	int x, y;
 
 	/* swap x and y coordinates */
@@ -161,12 +158,11 @@ READ8_HANDLER( btime_mirrorvideoram_r )
 	y = offset % 32;
 	offset = 32 * y + x;
 
-	return state->m_videoram[offset];
+	return m_videoram[offset];
 }
 
-READ8_HANDLER( btime_mirrorcolorram_r )
+READ8_MEMBER(btime_state::btime_mirrorcolorram_r)
 {
-	btime_state *state = space->machine().driver_data<btime_state>();
 	int x, y;
 
 	/* swap x and y coordinates */
@@ -174,12 +170,11 @@ READ8_HANDLER( btime_mirrorcolorram_r )
 	y = offset % 32;
 	offset = 32 * y + x;
 
-	return state->m_colorram[offset];
+	return m_colorram[offset];
 }
 
-WRITE8_HANDLER( btime_mirrorvideoram_w )
+WRITE8_MEMBER(btime_state::btime_mirrorvideoram_w)
 {
-	btime_state *state = space->machine().driver_data<btime_state>();
 	int x, y;
 
 	/* swap x and y coordinates */
@@ -187,10 +182,10 @@ WRITE8_HANDLER( btime_mirrorvideoram_w )
 	y = offset % 32;
 	offset = 32 * y + x;
 
-	state->m_videoram[offset] = data;
+	m_videoram[offset] = data;
 }
 
-WRITE8_HANDLER( lnc_mirrorvideoram_w )
+WRITE8_MEMBER(btime_state::lnc_mirrorvideoram_w)
 {
 	int x, y;
 
@@ -202,9 +197,8 @@ WRITE8_HANDLER( lnc_mirrorvideoram_w )
 	lnc_videoram_w(space, offset, data);
 }
 
-WRITE8_HANDLER( btime_mirrorcolorram_w )
+WRITE8_MEMBER(btime_state::btime_mirrorcolorram_w)
 {
-	btime_state *state = space->machine().driver_data<btime_state>();
 	int x, y;
 
 	/* swap x and y coordinates */
@@ -212,55 +206,51 @@ WRITE8_HANDLER( btime_mirrorcolorram_w )
 	y = offset % 32;
 	offset = 32 * y + x;
 
-	state->m_colorram[offset] = data;
+	m_colorram[offset] = data;
 }
 
-WRITE8_HANDLER( deco_charram_w )
+WRITE8_MEMBER(btime_state::deco_charram_w)
 {
-	btime_state *state = space->machine().driver_data<btime_state>();
-	if (state->m_deco_charram[offset] == data)
+	if (m_deco_charram[offset] == data)
 		return;
 
-	state->m_deco_charram[offset] = data;
+	m_deco_charram[offset] = data;
 
 	offset &= 0x1fff;
 
 	/* dirty sprite */
-	gfx_element_mark_dirty(space->machine().gfx[1], offset >> 5);
+	gfx_element_mark_dirty(machine().gfx[1], offset >> 5);
 
 	/* diry char */
-	gfx_element_mark_dirty(space->machine().gfx[0], offset >> 3);
+	gfx_element_mark_dirty(machine().gfx[0], offset >> 3);
 }
 
-WRITE8_HANDLER( bnj_background_w )
+WRITE8_MEMBER(btime_state::bnj_background_w)
 {
-	btime_state *state = space->machine().driver_data<btime_state>();
-	state->m_bnj_backgroundram[offset] = data;
+	m_bnj_backgroundram[offset] = data;
 }
 
-WRITE8_HANDLER( bnj_scroll1_w )
+WRITE8_MEMBER(btime_state::bnj_scroll1_w)
 {
-	btime_state *state = space->machine().driver_data<btime_state>();
-	state->m_bnj_scroll1 = data;
+	m_bnj_scroll1 = data;
 }
 
-WRITE8_HANDLER( bnj_scroll2_w )
+WRITE8_MEMBER(btime_state::bnj_scroll2_w)
 {
-	btime_state *state = space->machine().driver_data<btime_state>();
-	state->m_bnj_scroll2 = data;
+	m_bnj_scroll2 = data;
 }
 
-WRITE8_HANDLER( btime_video_control_w )
+WRITE8_MEMBER(btime_state::btime_video_control_w)
 {
 	// Btime video control
 	//
 	// Bit 0   = Flip screen
 	// Bit 1-7 = Unknown
 
-	flip_screen_set(space->machine(), data & 0x01);
+	flip_screen_set(machine(), data & 0x01);
 }
 
-WRITE8_HANDLER( bnj_video_control_w )
+WRITE8_MEMBER(btime_state::bnj_video_control_w)
 {
 	/* Bnj/Lnc works a little differently than the btime/eggs (apparently). */
 	/* According to the information at: */
@@ -272,32 +262,30 @@ WRITE8_HANDLER( bnj_video_control_w )
 	/* For now we just check 0x40 in DSW1, and ignore the write if we */
 	/* are in upright controls mode. */
 
-	if (input_port_read(space->machine(), "DSW1") & 0x40) /* cocktail mode */
+	if (input_port_read(machine(), "DSW1") & 0x40) /* cocktail mode */
 		btime_video_control_w(space, offset, data);
 }
 
-WRITE8_HANDLER( zoar_video_control_w )
+WRITE8_MEMBER(btime_state::zoar_video_control_w)
 {
-	btime_state *state = space->machine().driver_data<btime_state>();
 	// Zoar video control
 	//
 	// Bit 0-2 = Unknown (always 0). Marked as MCOL on schematics
 	// Bit 3-4 = Palette
 	// Bit 7   = Flip Screen
 
-	state->m_btime_palette = (data & 0x30) >> 3;
+	m_btime_palette = (data & 0x30) >> 3;
 
-	if (input_port_read(space->machine(), "DSW1") & 0x40) /* cocktail mode */
-		flip_screen_set(space->machine(), data & 0x80);
+	if (input_port_read(machine(), "DSW1") & 0x40) /* cocktail mode */
+		flip_screen_set(machine(), data & 0x80);
 }
 
-WRITE8_HANDLER( disco_video_control_w )
+WRITE8_MEMBER(btime_state::disco_video_control_w)
 {
-	btime_state *state = space->machine().driver_data<btime_state>();
-	state->m_btime_palette = (data >> 2) & 0x03;
+	m_btime_palette = (data >> 2) & 0x03;
 
-	if (!(input_port_read(space->machine(), "DSW1") & 0x40)) /* cocktail mode */
-		flip_screen_set(space->machine(), data & 0x01);
+	if (!(input_port_read(machine(), "DSW1") & 0x40)) /* cocktail mode */
+		flip_screen_set(machine(), data & 0x01);
 }
 
 

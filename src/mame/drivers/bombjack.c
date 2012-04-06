@@ -138,19 +138,19 @@ WRITE8_MEMBER(bombjack_state::irq_mask_w)
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, bombjack_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
-	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE_LEGACY(bombjack_videoram_w) AM_BASE(m_videoram)
-	AM_RANGE(0x9400, 0x97ff) AM_RAM_WRITE_LEGACY(bombjack_colorram_w) AM_BASE(m_colorram)
+	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(bombjack_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0x9400, 0x97ff) AM_RAM_WRITE(bombjack_colorram_w) AM_BASE(m_colorram)
 	AM_RANGE(0x9820, 0x987f) AM_WRITEONLY AM_BASE_SIZE(m_spriteram, m_spriteram_size)
 	AM_RANGE(0x9a00, 0x9a00) AM_WRITENOP
 	AM_RANGE(0x9c00, 0x9cff) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_le_w) AM_SHARE("paletteram")
-	AM_RANGE(0x9e00, 0x9e00) AM_WRITE_LEGACY(bombjack_background_w)
+	AM_RANGE(0x9e00, 0x9e00) AM_WRITE(bombjack_background_w)
 	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("P1")
 	AM_RANGE(0xb000, 0xb000) AM_WRITE(irq_mask_w)
 	AM_RANGE(0xb001, 0xb001) AM_READ_PORT("P2")
 	AM_RANGE(0xb002, 0xb002) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xb003, 0xb003) AM_READNOP	/* watchdog reset? */
 	AM_RANGE(0xb004, 0xb004) AM_READ_PORT("DSW1")
-	AM_RANGE(0xb004, 0xb004) AM_WRITE_LEGACY(bombjack_flipscreen_w)
+	AM_RANGE(0xb004, 0xb004) AM_WRITE(bombjack_flipscreen_w)
 	AM_RANGE(0xb005, 0xb005) AM_READ_PORT("DSW2")
 	AM_RANGE(0xb800, 0xb800) AM_WRITE(bombjack_soundlatch_w)
 	AM_RANGE(0xc000, 0xdfff) AM_ROM

@@ -97,10 +97,10 @@ static ADDRESS_MAP_START( mikie_map, AS_PROGRAM, 8, mikie_state )
 	AM_RANGE(0x0000, 0x00ff) AM_RAM
 	AM_RANGE(0x2000, 0x2001) AM_WRITE(mikie_coin_counter_w)
 	AM_RANGE(0x2002, 0x2002) AM_WRITE(mikie_sh_irqtrigger_w)
-	AM_RANGE(0x2006, 0x2006) AM_WRITE_LEGACY(mikie_flipscreen_w)
+	AM_RANGE(0x2006, 0x2006) AM_WRITE(mikie_flipscreen_w)
 	AM_RANGE(0x2007, 0x2007) AM_WRITE(irq_mask_w)
 	AM_RANGE(0x2100, 0x2100) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0x2200, 0x2200) AM_WRITE_LEGACY(mikie_palettebank_w)
+	AM_RANGE(0x2200, 0x2200) AM_WRITE(mikie_palettebank_w)
 	AM_RANGE(0x2300, 0x2300) AM_WRITENOP	// ???
 	AM_RANGE(0x2400, 0x2400) AM_READ_PORT("SYSTEM") AM_WRITE(soundlatch_w)
 	AM_RANGE(0x2401, 0x2401) AM_READ_PORT("P1")
@@ -110,8 +110,8 @@ static ADDRESS_MAP_START( mikie_map, AS_PROGRAM, 8, mikie_state )
 	AM_RANGE(0x2501, 0x2501) AM_READ_PORT("DSW2")
 	AM_RANGE(0x2800, 0x288f) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
 	AM_RANGE(0x2890, 0x37ff) AM_RAM
-	AM_RANGE(0x3800, 0x3bff) AM_RAM_WRITE_LEGACY(mikie_colorram_w) AM_BASE(m_colorram)
-	AM_RANGE(0x3c00, 0x3fff) AM_RAM_WRITE_LEGACY(mikie_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0x3800, 0x3bff) AM_RAM_WRITE(mikie_colorram_w) AM_BASE(m_colorram)
+	AM_RANGE(0x3c00, 0x3fff) AM_RAM_WRITE(mikie_videoram_w) AM_BASE(m_videoram)
 	AM_RANGE(0x4000, 0x5fff) AM_ROM	// Machine checks for extra rom
 	AM_RANGE(0x6000, 0xffff) AM_ROM
 ADDRESS_MAP_END

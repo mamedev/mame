@@ -49,6 +49,7 @@ public:
 	DECLARE_READ8_MEMBER(dac2_r);
 	DECLARE_READ8_MEMBER(dac1_r);
 	DECLARE_READ8_MEMBER(dac0_r);
+	DECLARE_WRITE32_MEMBER(namcofl_spritebank_w);
 };
 
 
@@ -57,4 +58,3 @@ public:
 VIDEO_START( namcofl );
 SCREEN_UPDATE_IND16( namcofl );
 
-WRITE32_HANDLER( namcofl_spritebank_w );

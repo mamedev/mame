@@ -33,6 +33,7 @@ public:
 	DECLARE_READ8_MEMBER(oigas_2_r);
 	DECLARE_READ8_MEMBER(freekick_ff_r);
 	DECLARE_WRITE8_MEMBER(freekick_ff_w);
+	DECLARE_WRITE8_MEMBER(freek_videoram_w);
 };
 
 
@@ -42,4 +43,3 @@ VIDEO_START(freekick);
 SCREEN_UPDATE_IND16(gigas);
 SCREEN_UPDATE_IND16(pbillrd);
 SCREEN_UPDATE_IND16(freekick);
-WRITE8_HANDLER( freek_videoram_w );

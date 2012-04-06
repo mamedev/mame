@@ -230,7 +230,7 @@ static ADDRESS_MAP_START( capbowl_map, AS_PROGRAM, 8, capbowl_state )
 	AM_RANGE(0x4000, 0x4000) AM_WRITEONLY AM_BASE(m_rowaddress)
 	AM_RANGE(0x4800, 0x4800) AM_WRITE(capbowl_rom_select_w)
 	AM_RANGE(0x5000, 0x57ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x5800, 0x5fff) AM_READWRITE_LEGACY(capbowl_tms34061_r, capbowl_tms34061_w)
+	AM_RANGE(0x5800, 0x5fff) AM_READWRITE(capbowl_tms34061_r, capbowl_tms34061_w)
 	AM_RANGE(0x6000, 0x6000) AM_WRITE(capbowl_sndcmd_w)
 	AM_RANGE(0x6800, 0x6800) AM_WRITE(track_reset_w)	/* + watchdog */
 	AM_RANGE(0x7000, 0x7000) AM_READ(track_0_r)			/* + other inputs */
@@ -240,10 +240,10 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( bowlrama_map, AS_PROGRAM, 8, capbowl_state )
-	AM_RANGE(0x0000, 0x001f) AM_READWRITE_LEGACY(bowlrama_blitter_r, bowlrama_blitter_w)
+	AM_RANGE(0x0000, 0x001f) AM_READWRITE(bowlrama_blitter_r, bowlrama_blitter_w)
 	AM_RANGE(0x4000, 0x4000) AM_WRITEONLY AM_BASE(m_rowaddress)
 	AM_RANGE(0x5000, 0x57ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x5800, 0x5fff) AM_READWRITE_LEGACY(capbowl_tms34061_r, capbowl_tms34061_w)
+	AM_RANGE(0x5800, 0x5fff) AM_READWRITE(capbowl_tms34061_r, capbowl_tms34061_w)
 	AM_RANGE(0x6000, 0x6000) AM_WRITE(capbowl_sndcmd_w)
 	AM_RANGE(0x6800, 0x6800) AM_WRITE(track_reset_w)	/* + watchdog */
 	AM_RANGE(0x7000, 0x7000) AM_READ(track_0_r)			/* + other inputs */

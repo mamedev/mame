@@ -13,13 +13,13 @@ public:
 	DECLARE_WRITE8_MEMBER(control_port_2_w);
 	DECLARE_WRITE8_MEMBER(control_port_2a_w);
 	DECLARE_READ8_MEMBER(payout_r);
+	DECLARE_WRITE8_MEMBER(lvcards_videoram_w);
+	DECLARE_WRITE8_MEMBER(lvcards_colorram_w);
 };
 
 
 /*----------- defined in video/lvcards.c -----------*/
 
-WRITE8_HANDLER( lvcards_videoram_w );
-WRITE8_HANDLER( lvcards_colorram_w );
 
 PALETTE_INIT( lvcards );
 PALETTE_INIT( ponttehk );

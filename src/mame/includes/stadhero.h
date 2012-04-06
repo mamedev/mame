@@ -10,6 +10,7 @@ public:
 	UINT16 *m_spriteram;
 	DECLARE_READ16_MEMBER(stadhero_control_r);
 	DECLARE_WRITE16_MEMBER(stadhero_control_w);
+	DECLARE_WRITE16_MEMBER(stadhero_pf1_data_w);
 };
 
 
@@ -18,4 +19,3 @@ public:
 VIDEO_START( stadhero );
 SCREEN_UPDATE_IND16( stadhero );
 
-WRITE16_HANDLER( stadhero_pf1_data_w );

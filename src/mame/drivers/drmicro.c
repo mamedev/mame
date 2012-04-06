@@ -78,7 +78,7 @@ WRITE8_MEMBER(drmicro_state::pcm_set_w)
 static ADDRESS_MAP_START( drmicro_map, AS_PROGRAM, 8, drmicro_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE_LEGACY(drmicro_videoram_w)
+	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(drmicro_videoram_w)
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 

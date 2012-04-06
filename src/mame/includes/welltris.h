@@ -20,17 +20,18 @@ public:
 	DECLARE_WRITE8_MEMBER(welltris_sh_bankswitch_w);
 	DECLARE_WRITE16_MEMBER(sound_command_w);
 	DECLARE_WRITE8_MEMBER(pending_command_clear_w);
+	DECLARE_READ16_MEMBER(welltris_spriteram_r);
+	DECLARE_WRITE16_MEMBER(welltris_spriteram_w);
+	DECLARE_WRITE16_MEMBER(welltris_palette_bank_w);
+	DECLARE_WRITE16_MEMBER(welltris_gfxbank_w);
+	DECLARE_WRITE16_MEMBER(welltris_scrollreg_w);
+	DECLARE_WRITE16_MEMBER(welltris_charvideoram_w);
+	void setbank(int num, int bank);
 };
 
 
 /*----------- defined in video/welltris.c -----------*/
 
-//READ16_HANDLER( welltris_spriteram_r );
-WRITE16_HANDLER( welltris_spriteram_w );
-WRITE16_HANDLER( welltris_palette_bank_w );
-WRITE16_HANDLER( welltris_gfxbank_w );
-WRITE16_HANDLER( welltris_charvideoram_w );
-WRITE16_HANDLER( welltris_scrollreg_w );
 
 VIDEO_START( welltris );
 SCREEN_UPDATE_IND16( welltris );

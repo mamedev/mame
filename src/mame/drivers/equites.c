@@ -706,21 +706,21 @@ WRITE16_MEMBER(equites_state::mcu_halt_clear_w)
 static ADDRESS_MAP_START( equites_map, AS_PROGRAM, 16, equites_state )
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM	// ROM area is written several times (dev system?)
 	AM_RANGE(0x040000, 0x040fff) AM_RAM AM_SHARE("nvram")	// nvram is for gekisou only
-	AM_RANGE(0x080000, 0x080fff) AM_READWRITE_LEGACY(equites_fg_videoram_r, equites_fg_videoram_w)	// 8-bit
-	AM_RANGE(0x0c0000, 0x0c01ff) AM_RAM_WRITE_LEGACY(equites_bg_videoram_w) AM_BASE(m_bg_videoram)
+	AM_RANGE(0x080000, 0x080fff) AM_READWRITE(equites_fg_videoram_r, equites_fg_videoram_w)	// 8-bit
+	AM_RANGE(0x0c0000, 0x0c01ff) AM_RAM_WRITE(equites_bg_videoram_w) AM_BASE(m_bg_videoram)
 	AM_RANGE(0x0c0200, 0x0c0fff) AM_RAM
 	AM_RANGE(0x100000, 0x100001) AM_READ(equites_spriteram_kludge_r)
 	AM_RANGE(0x100000, 0x1001ff) AM_RAM AM_BASE(m_spriteram)
 	AM_RANGE(0x140000, 0x1407ff) AM_READWRITE(mcu_r, mcu_w)	// 8-bit
 	AM_RANGE(0x180000, 0x180001) AM_READ_PORT("IN1") AM_WRITE(soundlatch_word_w) // LSB: sound latch
-	AM_RANGE(0x184000, 0x184001) AM_WRITE_LEGACY(equites_flip0_w)
+	AM_RANGE(0x184000, 0x184001) AM_WRITE(equites_flip0_w)
 	AM_RANGE(0x188000, 0x188001) AM_WRITE(mcu_halt_clear_w) // 8404 control port1
 	AM_RANGE(0x18c000, 0x18c001) AM_WRITENOP // 8404 control port2
-	AM_RANGE(0x1a4000, 0x1a4001) AM_WRITE_LEGACY(equites_flip1_w)
+	AM_RANGE(0x1a4000, 0x1a4001) AM_WRITE(equites_flip1_w)
 	AM_RANGE(0x1a8000, 0x1a8001) AM_WRITE(mcu_halt_assert_w) // 8404 control port3
 	AM_RANGE(0x1ac000, 0x1ac001) AM_WRITENOP // 8404 control port4
-	AM_RANGE(0x1c0000, 0x1c0001) AM_READ_PORT("IN0") AM_WRITE_LEGACY(equites_scrollreg_w) // scroll register[XXYY]
-	AM_RANGE(0x380000, 0x380001) AM_WRITE_LEGACY(equites_bgcolor_w) // bg color register[CC--]
+	AM_RANGE(0x1c0000, 0x1c0001) AM_READ_PORT("IN0") AM_WRITE(equites_scrollreg_w) // scroll register[XXYY]
+	AM_RANGE(0x380000, 0x380001) AM_WRITE(equites_bgcolor_w) // bg color register[CC--]
 	// 580000 unknown (protection?) (gekisou only, installed by DRIVER_INIT)
 	// 5a0000 unknown (protection?) (gekisou only, installed by DRIVER_INIT)
 	AM_RANGE(0x780000, 0x780001) AM_WRITE(watchdog_reset16_w)
@@ -730,20 +730,20 @@ static ADDRESS_MAP_START( splndrbt_map, AS_PROGRAM, 16, equites_state )
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM
 	AM_RANGE(0x040000, 0x040fff) AM_RAM AM_BASE(m_workram) // work RAM
 	AM_RANGE(0x080000, 0x080001) AM_READ_PORT("IN0") // joyport [2211]
-	AM_RANGE(0x0c0000, 0x0c0001) AM_READ_PORT("IN1") AM_WRITE_LEGACY(splndrbt_flip0_w) // [MMLL] MM: bg color register, LL: normal screen
+	AM_RANGE(0x0c0000, 0x0c0001) AM_READ_PORT("IN1") AM_WRITE(splndrbt_flip0_w) // [MMLL] MM: bg color register, LL: normal screen
 	AM_RANGE(0x0c4000, 0x0c4001) AM_WRITE(mcu_halt_clear_w) // 8404 control port1
 	AM_RANGE(0x0c8000, 0x0c8001) AM_WRITENOP // 8404 control port2
-	AM_RANGE(0x0cc000, 0x0cc001) AM_WRITE_LEGACY(splndrbt_selchar0_w) // select active char map
-	AM_RANGE(0x0e0000, 0x0e0001) AM_WRITE_LEGACY(splndrbt_flip1_w) // [MMLL] MM: not used, LL: flip screen
+	AM_RANGE(0x0cc000, 0x0cc001) AM_WRITE(splndrbt_selchar0_w) // select active char map
+	AM_RANGE(0x0e0000, 0x0e0001) AM_WRITE(splndrbt_flip1_w) // [MMLL] MM: not used, LL: flip screen
 	AM_RANGE(0x0e4000, 0x0e4001) AM_WRITE(mcu_halt_assert_w) // 8404 control port3
 	AM_RANGE(0x0e8000, 0x0e8001) AM_WRITENOP // 8404 control port4
-	AM_RANGE(0x0ec000, 0x0ec001) AM_WRITE_LEGACY(splndrbt_selchar1_w) // select active char map
-	AM_RANGE(0x100000, 0x100001) AM_WRITE_LEGACY(splndrbt_bg_scrollx_w)
+	AM_RANGE(0x0ec000, 0x0ec001) AM_WRITE(splndrbt_selchar1_w) // select active char map
+	AM_RANGE(0x100000, 0x100001) AM_WRITE(splndrbt_bg_scrollx_w)
 	AM_RANGE(0x140000, 0x140001) AM_WRITE(soundlatch_word_w) // LSB: sound command
-	AM_RANGE(0x1c0000, 0x1c0001) AM_WRITE_LEGACY(splndrbt_bg_scrolly_w)
+	AM_RANGE(0x1c0000, 0x1c0001) AM_WRITE(splndrbt_bg_scrolly_w)
 	AM_RANGE(0x180000, 0x1807ff) AM_READWRITE(mcu_r, mcu_w)	// 8-bit
-	AM_RANGE(0x200000, 0x200fff) AM_MIRROR(0x1000) AM_READWRITE_LEGACY(equites_fg_videoram_r, equites_fg_videoram_w)	// 8-bit
-	AM_RANGE(0x400000, 0x4007ff) AM_RAM_WRITE_LEGACY(equites_bg_videoram_w) AM_BASE(m_bg_videoram)
+	AM_RANGE(0x200000, 0x200fff) AM_MIRROR(0x1000) AM_READWRITE(equites_fg_videoram_r, equites_fg_videoram_w)	// 8-bit
+	AM_RANGE(0x400000, 0x4007ff) AM_RAM_WRITE(equites_bg_videoram_w) AM_BASE(m_bg_videoram)
 	AM_RANGE(0x400800, 0x400fff) AM_RAM
 	AM_RANGE(0x600000, 0x6000ff) AM_RAM AM_BASE(m_spriteram)	// sprite RAM 0,1
 	AM_RANGE(0x600100, 0x6001ff) AM_RAM AM_BASE(m_spriteram_2)	// sprite RAM 2 (8-bit)

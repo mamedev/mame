@@ -1515,7 +1515,7 @@ static ADDRESS_MAP_START( contcirc_map, AS_PROGRAM, 16, taitoz_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x080000, 0x083fff) AM_RAM
 	AM_RANGE(0x084000, 0x087fff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x090000, 0x090001) AM_WRITE_LEGACY(contcirc_out_w)    /* road palette bank, sub CPU reset, 3d glasses control */
+	AM_RANGE(0x090000, 0x090001) AM_WRITE(contcirc_out_w)    /* road palette bank, sub CPU reset, 3d glasses control */
 	AM_RANGE(0x100000, 0x100007) AM_DEVREADWRITE_LEGACY("tc0110pcr", tc0110pcr_word_r, tc0110pcr_step1_rbswap_word_w)	/* palette */
 	AM_RANGE(0x200000, 0x20ffff) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)	/* tilemaps */
 	AM_RANGE(0x220000, 0x22000f) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
@@ -1631,7 +1631,7 @@ static ADDRESS_MAP_START( sci_map, AS_PROGRAM, 16, taitoz_state )
 	AM_RANGE(0xa00000, 0xa0ffff) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)	/* tilemaps */
 	AM_RANGE(0xa20000, 0xa2000f) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
 	AM_RANGE(0xc00000, 0xc03fff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
-	AM_RANGE(0xc08000, 0xc08001) AM_READWRITE_LEGACY(sci_spriteframe_r, sci_spriteframe_w)
+	AM_RANGE(0xc08000, 0xc08001) AM_READWRITE(sci_spriteframe_r, sci_spriteframe_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sci_cpub_map, AS_PROGRAM, 16, taitoz_state )
@@ -1726,7 +1726,7 @@ static ADDRESS_MAP_START( dblaxle_map, AS_PROGRAM, 16, taitoz_state )
 	AM_RANGE(0xa00000, 0xa0ffff) AM_DEVREADWRITE_LEGACY("tc0480scp", tc0480scp_word_r, tc0480scp_word_w)	  /* tilemaps */
 	AM_RANGE(0xa30000, 0xa3002f) AM_DEVREADWRITE_LEGACY("tc0480scp", tc0480scp_ctrl_word_r, tc0480scp_ctrl_word_w)
 	AM_RANGE(0xc00000, 0xc03fff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size) /* mostly unused ? */
-	AM_RANGE(0xc08000, 0xc08001) AM_READWRITE_LEGACY(sci_spriteframe_r, sci_spriteframe_w)	/* set in int6, seems to stay zero */
+	AM_RANGE(0xc08000, 0xc08001) AM_READWRITE(sci_spriteframe_r, sci_spriteframe_w)	/* set in int6, seems to stay zero */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dblaxle_cpub_map, AS_PROGRAM, 16, taitoz_state )
@@ -1750,7 +1750,7 @@ static ADDRESS_MAP_START( racingb_map, AS_PROGRAM, 16, taitoz_state )
 	AM_RANGE(0x900000, 0x90ffff) AM_DEVREADWRITE_LEGACY("tc0480scp", tc0480scp_word_r, tc0480scp_word_w)	  /* tilemaps */
 	AM_RANGE(0x930000, 0x93002f) AM_DEVREADWRITE_LEGACY("tc0480scp", tc0480scp_ctrl_word_r, tc0480scp_ctrl_word_w)
 	AM_RANGE(0xb00000, 0xb03fff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size) /* mostly unused ? */
-	AM_RANGE(0xb08000, 0xb08001) AM_READWRITE_LEGACY(sci_spriteframe_r, sci_spriteframe_w)	/* alternates 0/0x100 */
+	AM_RANGE(0xb08000, 0xb08001) AM_READWRITE(sci_spriteframe_r, sci_spriteframe_w)	/* alternates 0/0x100 */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( racingb_cpub_map, AS_PROGRAM, 16, taitoz_state )

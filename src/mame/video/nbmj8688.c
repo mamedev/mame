@@ -11,7 +11,6 @@
 #include "includes/nbmj8688.h"
 
 
-static void mjsikaku_vramflip(nbmj8688_state *state);
 static void mbmj8688_gfxdraw(running_machine &machine, int gfxtype);
 
 
@@ -103,10 +102,9 @@ PALETTE_INIT( mbmj8688_16bit )
 
 
 
-WRITE8_HANDLER( nbmj8688_clut_w )
+WRITE8_MEMBER(nbmj8688_state::nbmj8688_clut_w)
 {
-	nbmj8688_state *state = space->machine().driver_data<nbmj8688_state>();
-	state->m_clut[offset] = (data ^ 0xff);
+	m_clut[offset] = (data ^ 0xff);
 }
 
 /******************************************************************************
@@ -114,118 +112,110 @@ WRITE8_HANDLER( nbmj8688_clut_w )
 
 ******************************************************************************/
 
-WRITE8_HANDLER( nbmj8688_blitter_w )
+WRITE8_MEMBER(nbmj8688_state::nbmj8688_blitter_w)
 {
-	nbmj8688_state *state = space->machine().driver_data<nbmj8688_state>();
 	switch (offset)
 	{
-		case 0x00:	state->m_blitter_src_addr = (state->m_blitter_src_addr & 0xff00) | data; break;
-		case 0x01:	state->m_blitter_src_addr = (state->m_blitter_src_addr & 0x00ff) | (data << 8); break;
-		case 0x02:	state->m_blitter_destx = data; break;
-		case 0x03:	state->m_blitter_desty = data; break;
-		case 0x04:	state->m_blitter_sizex = data; break;
-		case 0x05:	state->m_blitter_sizey = data;
+		case 0x00:	m_blitter_src_addr = (m_blitter_src_addr & 0xff00) | data; break;
+		case 0x01:	m_blitter_src_addr = (m_blitter_src_addr & 0x00ff) | (data << 8); break;
+		case 0x02:	m_blitter_destx = data; break;
+		case 0x03:	m_blitter_desty = data; break;
+		case 0x04:	m_blitter_sizex = data; break;
+		case 0x05:	m_blitter_sizey = data;
 					/* writing here also starts the blit */
-					mbmj8688_gfxdraw(space->machine(), state->m_mjsikaku_gfxmode);
+					mbmj8688_gfxdraw(machine(), m_mjsikaku_gfxmode);
 					break;
-		case 0x06:	state->m_blitter_direction_x = (data & 0x01) ? 1 : 0;
-					state->m_blitter_direction_y = (data & 0x02) ? 1 : 0;
-					state->m_mjsikaku_flipscreen = (data & 0x04) ? 0 : 1;
-					state->m_mjsikaku_dispflag = (data & 0x08) ? 0 : 1;
-					mjsikaku_vramflip(state);
+		case 0x06:	m_blitter_direction_x = (data & 0x01) ? 1 : 0;
+					m_blitter_direction_y = (data & 0x02) ? 1 : 0;
+					m_mjsikaku_flipscreen = (data & 0x04) ? 0 : 1;
+					m_mjsikaku_dispflag = (data & 0x08) ? 0 : 1;
+					mjsikaku_vramflip();
 					break;
 		case 0x07:	break;
 	}
 }
 
-WRITE8_HANDLER( mjsikaku_gfxflag2_w )
+WRITE8_MEMBER(nbmj8688_state::mjsikaku_gfxflag2_w)
 {
-	nbmj8688_state *state = space->machine().driver_data<nbmj8688_state>();
-	state->m_mjsikaku_gfxflag2 = data;
+	m_mjsikaku_gfxflag2 = data;
 
 	if (nb1413m3_type == NB1413M3_SEIHAM
 			|| nb1413m3_type == NB1413M3_KORINAI
 			|| nb1413m3_type == NB1413M3_KORINAIM
 			|| nb1413m3_type == NB1413M3_LIVEGAL)
-		state->m_mjsikaku_gfxflag2 ^= 0x20;
+		m_mjsikaku_gfxflag2 ^= 0x20;
 
 	if (nb1413m3_type == NB1413M3_OJOUSANM
 			|| nb1413m3_type == NB1413M3_RYUUHA)
-		state->m_mjsikaku_gfxflag2 |= 0x20;
+		m_mjsikaku_gfxflag2 |= 0x20;
 }
 
-static WRITE8_HANDLER( mjsikaku_gfxflag3_w )
+WRITE8_MEMBER(nbmj8688_state::mjsikaku_gfxflag3_w)
 {
-	nbmj8688_state *state = space->machine().driver_data<nbmj8688_state>();
-	state->m_mjsikaku_gfxflag3 = (data & 0xe0);
+	m_mjsikaku_gfxflag3 = (data & 0xe0);
 }
 
-WRITE8_HANDLER( mjsikaku_scrolly_w )
+WRITE8_MEMBER(nbmj8688_state::mjsikaku_scrolly_w)
 {
-	nbmj8688_state *state = space->machine().driver_data<nbmj8688_state>();
-	state->m_mjsikaku_scrolly = data;
+	m_mjsikaku_scrolly = data;
 }
 
-WRITE8_HANDLER( mjsikaku_romsel_w )
+WRITE8_MEMBER(nbmj8688_state::mjsikaku_romsel_w)
 {
-	nbmj8688_state *state = space->machine().driver_data<nbmj8688_state>();
-	int gfxlen = space->machine().region("gfx1")->bytes();
-	state->m_mjsikaku_gfxrom = (data & 0x0f);
+	int gfxlen = machine().region("gfx1")->bytes();
+	m_mjsikaku_gfxrom = (data & 0x0f);
 
-	if ((state->m_mjsikaku_gfxrom << 17) > (gfxlen - 1))
+	if ((m_mjsikaku_gfxrom << 17) > (gfxlen - 1))
 	{
 #ifdef MAME_DEBUG
 		popmessage("GFXROM BANK OVER!!");
 #endif
-		state->m_mjsikaku_gfxrom &= (gfxlen / 0x20000 - 1);
+		m_mjsikaku_gfxrom &= (gfxlen / 0x20000 - 1);
 	}
 }
 
-WRITE8_HANDLER( secolove_romsel_w )
+WRITE8_MEMBER(nbmj8688_state::secolove_romsel_w)
 {
-	nbmj8688_state *state = space->machine().driver_data<nbmj8688_state>();
-	int gfxlen = space->machine().region("gfx1")->bytes();
-	state->m_mjsikaku_gfxrom = ((data & 0xc0) >> 4) + (data & 0x03);
+	int gfxlen = machine().region("gfx1")->bytes();
+	m_mjsikaku_gfxrom = ((data & 0xc0) >> 4) + (data & 0x03);
 	mjsikaku_gfxflag2_w(space, 0, data);
 
-	if ((state->m_mjsikaku_gfxrom << 17) > (gfxlen - 1))
+	if ((m_mjsikaku_gfxrom << 17) > (gfxlen - 1))
 	{
 #ifdef MAME_DEBUG
 		popmessage("GFXROM BANK OVER!!");
 #endif
-		state->m_mjsikaku_gfxrom &= (gfxlen / 0x20000 - 1);
+		m_mjsikaku_gfxrom &= (gfxlen / 0x20000 - 1);
 	}
 }
 
-WRITE8_HANDLER( crystalg_romsel_w )
+WRITE8_MEMBER(nbmj8688_state::crystalg_romsel_w)
 {
-	nbmj8688_state *state = space->machine().driver_data<nbmj8688_state>();
-	int gfxlen = space->machine().region("gfx1")->bytes();
-	state->m_mjsikaku_gfxrom = (data & 0x03);
+	int gfxlen = machine().region("gfx1")->bytes();
+	m_mjsikaku_gfxrom = (data & 0x03);
 	mjsikaku_gfxflag2_w(space, 0, data);
 
-	if ((state->m_mjsikaku_gfxrom << 17) > (gfxlen - 1))
+	if ((m_mjsikaku_gfxrom << 17) > (gfxlen - 1))
 	{
 #ifdef MAME_DEBUG
 		popmessage("GFXROM BANK OVER!!");
 #endif
-		state->m_mjsikaku_gfxrom &= (gfxlen / 0x20000 - 1);
+		m_mjsikaku_gfxrom &= (gfxlen / 0x20000 - 1);
 	}
 }
 
-WRITE8_HANDLER( seiha_romsel_w )
+WRITE8_MEMBER(nbmj8688_state::seiha_romsel_w)
 {
-	nbmj8688_state *state = space->machine().driver_data<nbmj8688_state>();
-	int gfxlen = space->machine().region("gfx1")->bytes();
-	state->m_mjsikaku_gfxrom = (data & 0x1f);
+	int gfxlen = machine().region("gfx1")->bytes();
+	m_mjsikaku_gfxrom = (data & 0x1f);
 	mjsikaku_gfxflag3_w(space, 0, data);
 
-	if ((state->m_mjsikaku_gfxrom << 17) > (gfxlen - 1))
+	if ((m_mjsikaku_gfxrom << 17) > (gfxlen - 1))
 	{
 #ifdef MAME_DEBUG
 		popmessage("GFXROM BANK OVER!!");
 #endif
-		state->m_mjsikaku_gfxrom &= (gfxlen / 0x20000 - 1);
+		m_mjsikaku_gfxrom &= (gfxlen / 0x20000 - 1);
 	}
 }
 
@@ -233,26 +223,26 @@ WRITE8_HANDLER( seiha_romsel_w )
 
 
 ******************************************************************************/
-void mjsikaku_vramflip(nbmj8688_state *state)
+void nbmj8688_state::mjsikaku_vramflip()
 {
 	int x, y;
 	UINT16 color1, color2;
 
-	if (state->m_mjsikaku_flipscreen == state->m_mjsikaku_flipscreen_old) return;
+	if (m_mjsikaku_flipscreen == m_mjsikaku_flipscreen_old) return;
 
 	for (y = 0; y < (256 / 2); y++)
 	{
 		for (x = 0; x < 512; x++)
 		{
-			color1 = state->m_mjsikaku_videoram[(y * 512) + x];
-			color2 = state->m_mjsikaku_videoram[((y ^ 0xff) * 512) + (x ^ 0x1ff)];
-			state->m_mjsikaku_videoram[(y * 512) + x] = color2;
-			state->m_mjsikaku_videoram[((y ^ 0xff) * 512) + (x ^ 0x1ff)] = color1;
+			color1 = m_mjsikaku_videoram[(y * 512) + x];
+			color2 = m_mjsikaku_videoram[((y ^ 0xff) * 512) + (x ^ 0x1ff)];
+			m_mjsikaku_videoram[(y * 512) + x] = color2;
+			m_mjsikaku_videoram[((y ^ 0xff) * 512) + (x ^ 0x1ff)] = color1;
 		}
 	}
 
-	state->m_mjsikaku_flipscreen_old = state->m_mjsikaku_flipscreen;
-	state->m_mjsikaku_screen_refresh = 1;
+	m_mjsikaku_flipscreen_old = m_mjsikaku_flipscreen;
+	m_mjsikaku_screen_refresh = 1;
 }
 
 
@@ -636,36 +626,36 @@ logerror("HD61830B unsupported instruction %02x %02x\n",state->m_HD61830B_instr[
 	}
 }
 
-WRITE8_HANDLER( nbmj8688_HD61830B_0_instr_w )
+WRITE8_MEMBER(nbmj8688_state::nbmj8688_HD61830B_0_instr_w)
 {
-	nbmj8688_HD61830B_instr_w(space,offset,data,0);
+	nbmj8688_HD61830B_instr_w(&space,offset,data,0);
 }
 
-WRITE8_HANDLER( nbmj8688_HD61830B_1_instr_w )
+WRITE8_MEMBER(nbmj8688_state::nbmj8688_HD61830B_1_instr_w)
 {
-	nbmj8688_HD61830B_instr_w(space,offset,data,1);
+	nbmj8688_HD61830B_instr_w(&space,offset,data,1);
 }
 
-WRITE8_HANDLER( nbmj8688_HD61830B_both_instr_w )
+WRITE8_MEMBER(nbmj8688_state::nbmj8688_HD61830B_both_instr_w)
 {
-	nbmj8688_HD61830B_instr_w(space,offset,data,0);
-	nbmj8688_HD61830B_instr_w(space,offset,data,1);
+	nbmj8688_HD61830B_instr_w(&space,offset,data,0);
+	nbmj8688_HD61830B_instr_w(&space,offset,data,1);
 }
 
-WRITE8_HANDLER( nbmj8688_HD61830B_0_data_w )
+WRITE8_MEMBER(nbmj8688_state::nbmj8688_HD61830B_0_data_w)
 {
-	nbmj8688_HD61830B_data_w(space,offset,data,0);
+	nbmj8688_HD61830B_data_w(&space,offset,data,0);
 }
 
-WRITE8_HANDLER( nbmj8688_HD61830B_1_data_w )
+WRITE8_MEMBER(nbmj8688_state::nbmj8688_HD61830B_1_data_w)
 {
-	nbmj8688_HD61830B_data_w(space,offset,data,1);
+	nbmj8688_HD61830B_data_w(&space,offset,data,1);
 }
 
-WRITE8_HANDLER( nbmj8688_HD61830B_both_data_w )
+WRITE8_MEMBER(nbmj8688_state::nbmj8688_HD61830B_both_data_w)
 {
-	nbmj8688_HD61830B_data_w(space,offset,data,0);
-	nbmj8688_HD61830B_data_w(space,offset,data,1);
+	nbmj8688_HD61830B_data_w(&space,offset,data,0);
+	nbmj8688_HD61830B_data_w(&space,offset,data,1);
 }
 
 

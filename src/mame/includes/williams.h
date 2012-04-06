@@ -40,6 +40,31 @@ public:
 	tilemap_t *m_bg_tilemap;
 	UINT16 m_tilemap_xscroll;
 	UINT8 m_williams2_fg_color;
+	DECLARE_WRITE8_MEMBER(williams_vram_select_w);
+	DECLARE_WRITE8_MEMBER(williams2_bank_select_w);
+	DECLARE_WRITE8_MEMBER(williams_cmos_w);
+	DECLARE_WRITE8_MEMBER(bubbles_cmos_w);
+	DECLARE_WRITE8_MEMBER(williams_watchdog_reset_w);
+	DECLARE_WRITE8_MEMBER(williams2_watchdog_reset_w);
+	DECLARE_WRITE8_MEMBER(williams2_7segment_w);
+	DECLARE_WRITE8_MEMBER(defender_video_control_w);
+	DECLARE_WRITE8_MEMBER(defender_bank_select_w);
+	DECLARE_READ8_MEMBER(mayday_protection_r);
+	DECLARE_WRITE8_MEMBER(sinistar_vram_select_w);
+	DECLARE_WRITE8_MEMBER(blaster_vram_select_w);
+	DECLARE_WRITE8_MEMBER(blaster_bank_select_w);
+	DECLARE_WRITE8_MEMBER(williams2_paletteram_w);
+	DECLARE_WRITE8_MEMBER(williams2_fg_select_w);
+	DECLARE_READ8_MEMBER(williams_video_counter_r);
+	DECLARE_READ8_MEMBER(williams2_video_counter_r);
+	DECLARE_WRITE8_MEMBER(williams2_bg_select_w);
+	DECLARE_WRITE8_MEMBER(williams2_tileram_w);
+	DECLARE_WRITE8_MEMBER(williams2_xscroll_low_w);
+	DECLARE_WRITE8_MEMBER(williams2_xscroll_high_w);
+	DECLARE_WRITE8_MEMBER(blaster_remap_select_w);
+	DECLARE_WRITE8_MEMBER(blaster_video_control_w);
+	DECLARE_WRITE8_MEMBER(williams_blitter_w);
+	DECLARE_WRITE8_MEMBER(williams2_blit_window_enable_w);
 };
 
 
@@ -98,25 +123,12 @@ MACHINE_START( joust2 );
 MACHINE_RESET( joust2 );
 
 /* banking */
-WRITE8_HANDLER( defender_bank_select_w );
-WRITE8_HANDLER( williams_vram_select_w );
-WRITE8_HANDLER( sinistar_vram_select_w );
-WRITE8_HANDLER( blaster_bank_select_w );
-WRITE8_HANDLER( blaster_vram_select_w );
-WRITE8_HANDLER( williams2_bank_select_w );
 
 /* misc */
-WRITE8_HANDLER( williams_cmos_w );
-WRITE8_HANDLER( bubbles_cmos_w );
-WRITE8_HANDLER( williams_watchdog_reset_w );
-WRITE8_HANDLER( williams2_watchdog_reset_w );
-WRITE8_HANDLER( williams2_7segment_w );
 CUSTOM_INPUT( williams_mux_r );
 
 /* Mayday protection */
-READ8_HANDLER( mayday_protection_r );
 
-WRITE8_HANDLER( defender_video_control_w );
 
 /*----------- defined in video/williams.c -----------*/
 
@@ -128,11 +140,6 @@ WRITE8_HANDLER( defender_video_control_w );
 #define WILLIAMS_TILEMAP_TSHOOT		1		/* IC79 is a 74LS157 selector jumpered to be enabled */
 #define WILLIAMS_TILEMAP_JOUST2		2		/* IC79 is a 74LS157 selector jumpered to be disabled */
 
-WRITE8_HANDLER( williams_blitter_w );
-WRITE8_HANDLER( blaster_remap_select_w );
-WRITE8_HANDLER( blaster_video_control_w );
-READ8_HANDLER( williams_video_counter_r );
-READ8_HANDLER( williams2_video_counter_r );
 
 VIDEO_START( williams );
 VIDEO_START( blaster );
@@ -143,10 +150,3 @@ SCREEN_UPDATE_RGB32( blaster );
 SCREEN_UPDATE_RGB32( williams2 );
 
 
-WRITE8_HANDLER( williams2_tileram_w );
-WRITE8_HANDLER( williams2_paletteram_w );
-WRITE8_HANDLER( williams2_fg_select_w );
-WRITE8_HANDLER( williams2_bg_select_w );
-WRITE8_HANDLER( williams2_xscroll_low_w );
-WRITE8_HANDLER( williams2_xscroll_high_w );
-WRITE8_HANDLER( williams2_blit_window_enable_w );

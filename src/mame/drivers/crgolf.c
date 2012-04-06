@@ -259,7 +259,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, crgolf_state )
 	AM_RANGE(0x8007, 0x8007) AM_WRITEONLY AM_BASE(m_screena_enable)
 	AM_RANGE(0x8800, 0x8800) AM_READWRITE(sound_to_main_r, main_to_sound_w)
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(rom_bank_select_w)
-	AM_RANGE(0xa000, 0xffff) AM_READWRITE_LEGACY(crgolf_videoram_r, crgolf_videoram_w)
+	AM_RANGE(0xa000, 0xffff) AM_READWRITE(crgolf_videoram_r, crgolf_videoram_w)
 ADDRESS_MAP_END
 
 

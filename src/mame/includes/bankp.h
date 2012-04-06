@@ -28,17 +28,17 @@ public:
 	int     m_priority;
 
 	UINT8 m_nmi_mask;
+	DECLARE_WRITE8_MEMBER(bankp_scroll_w);
+	DECLARE_WRITE8_MEMBER(bankp_videoram_w);
+	DECLARE_WRITE8_MEMBER(bankp_colorram_w);
+	DECLARE_WRITE8_MEMBER(bankp_videoram2_w);
+	DECLARE_WRITE8_MEMBER(bankp_colorram2_w);
+	DECLARE_WRITE8_MEMBER(bankp_out_w);
 };
 
 
 /*----------- defined in video/bankp.c -----------*/
 
-WRITE8_HANDLER( bankp_videoram_w );
-WRITE8_HANDLER( bankp_colorram_w );
-WRITE8_HANDLER( bankp_videoram2_w );
-WRITE8_HANDLER( bankp_colorram2_w );
-WRITE8_HANDLER( bankp_scroll_w );
-WRITE8_HANDLER( bankp_out_w );
 
 PALETTE_INIT( bankp );
 VIDEO_START( bankp );

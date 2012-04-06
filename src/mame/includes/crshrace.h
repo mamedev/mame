@@ -36,14 +36,14 @@ public:
 	DECLARE_WRITE8_MEMBER(crshrace_sh_bankswitch_w);
 	DECLARE_WRITE16_MEMBER(sound_command_w);
 	DECLARE_WRITE8_MEMBER(pending_command_clear_w);
+	DECLARE_WRITE16_MEMBER(crshrace_videoram1_w);
+	DECLARE_WRITE16_MEMBER(crshrace_videoram2_w);
+	DECLARE_WRITE16_MEMBER(crshrace_roz_bank_w);
+	DECLARE_WRITE16_MEMBER(crshrace_gfxctrl_w);
 };
 
 /*----------- defined in video/crshrace.c -----------*/
 
-WRITE16_HANDLER( crshrace_videoram1_w );
-WRITE16_HANDLER( crshrace_videoram2_w );
-WRITE16_HANDLER( crshrace_roz_bank_w );
-WRITE16_HANDLER( crshrace_gfxctrl_w );
 
 VIDEO_START( crshrace );
 SCREEN_VBLANK( crshrace );

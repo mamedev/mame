@@ -31,15 +31,15 @@ public:
 
 	/* devices */
 	device_t *m_audiocpu;
+	DECLARE_WRITE16_MEMBER(ginganin_fgram16_w);
+	DECLARE_WRITE16_MEMBER(ginganin_txtram16_w);
+	DECLARE_WRITE16_MEMBER(ginganin_vregs16_w);
 };
 
 
 
 /*----------- defined in video/ginganin.c -----------*/
 
-WRITE16_HANDLER( ginganin_fgram16_w );
-WRITE16_HANDLER( ginganin_txtram16_w );
-WRITE16_HANDLER( ginganin_vregs16_w );
 
 VIDEO_START( ginganin );
 SCREEN_UPDATE_IND16( ginganin );

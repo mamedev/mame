@@ -19,11 +19,11 @@
 #include "machine/eeprom.h"
 
 
-class kongambl_state : public driver_device
+class kongambl_state : public konamigx_state
 {
 public:
 	kongambl_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: konamigx_state(mconfig, type, tag) { }
 
 	DECLARE_READ32_MEMBER(eeprom_r);
 	DECLARE_WRITE32_MEMBER(eeprom_w);
@@ -85,7 +85,7 @@ static ADDRESS_MAP_START( kongambl_map, AS_PROGRAM, 32, kongambl_state )
 
 	AM_RANGE(0x440000, 0x443fff) AM_RAM
 
-	AM_RANGE(0x460000, 0x47ffff) AM_RAM_WRITE_LEGACY(konamigx_palette_w) AM_SHARE("paletteram")
+	AM_RANGE(0x460000, 0x47ffff) AM_RAM_WRITE(konamigx_palette_w) AM_SHARE("paletteram")
 
 	AM_RANGE(0x480000, 0x48003f) AM_DEVWRITE_LEGACY("k056832", k056832_long_w)
 

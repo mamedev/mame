@@ -145,49 +145,43 @@ VIDEO_START( appoooh )
 	state->save_item(NAME(state->m_priority));
 }
 
-WRITE8_HANDLER( appoooh_scroll_w )
+WRITE8_MEMBER(appoooh_state::appoooh_scroll_w)
 {
-	appoooh_state *state = space->machine().driver_data<appoooh_state>();
-	state->m_scroll_x = data;
+	m_scroll_x = data;
 }
 
 
-WRITE8_HANDLER( appoooh_fg_videoram_w )
+WRITE8_MEMBER(appoooh_state::appoooh_fg_videoram_w)
 {
-	appoooh_state *state = space->machine().driver_data<appoooh_state>();
-	state->m_fg_videoram[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset);
+	m_fg_videoram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( appoooh_fg_colorram_w )
+WRITE8_MEMBER(appoooh_state::appoooh_fg_colorram_w)
 {
-	appoooh_state *state = space->machine().driver_data<appoooh_state>();
-	state->m_fg_colorram[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset);
+	m_fg_colorram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( appoooh_bg_videoram_w )
+WRITE8_MEMBER(appoooh_state::appoooh_bg_videoram_w)
 {
-	appoooh_state *state = space->machine().driver_data<appoooh_state>();
-	state->m_bg_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_bg_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( appoooh_bg_colorram_w )
+WRITE8_MEMBER(appoooh_state::appoooh_bg_colorram_w)
 {
-	appoooh_state *state = space->machine().driver_data<appoooh_state>();
-	state->m_bg_colorram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_bg_colorram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( appoooh_out_w )
+WRITE8_MEMBER(appoooh_state::appoooh_out_w)
 {
-	appoooh_state *state = space->machine().driver_data<appoooh_state>();
 	/* bit 0 controls NMI */
-	state->m_nmi_mask = data & 1;
+	m_nmi_mask = data & 1;
 
 	/* bit 1 flip screen */
-	flip_screen_set(space->machine(), data & 0x02);
+	flip_screen_set(machine(), data & 0x02);
 
 	/* bits 2-3 unknown */
 
@@ -195,13 +189,13 @@ WRITE8_HANDLER( appoooh_out_w )
 	/* TODO: understand how this works, currently the only thing I do is draw */
 	/* the front layer behind sprites when priority == 0, and invert the sprite */
 	/* order when priority == 1 */
-	state->m_priority = (data & 0x30) >> 4;
+	m_priority = (data & 0x30) >> 4;
 
 	/* bit 6 ROM bank select */
 	{
-		UINT8 *RAM = space->machine().region("maincpu")->base();
+		UINT8 *RAM = machine().region("maincpu")->base();
 
-		memory_set_bankptr(space->machine(), "bank1",&RAM[data&0x40 ? 0x10000 : 0x0a000]);
+		memory_set_bankptr(machine(), "bank1",&RAM[data&0x40 ? 0x10000 : 0x0a000]);
 	}
 
 	/* bit 7 unknown (used) */

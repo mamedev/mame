@@ -18,18 +18,18 @@ public:
 	UINT8 m_sound_nmi_mask;
 	DECLARE_WRITE8_MEMBER(ssozumo_sh_command_w);
 	DECLARE_WRITE8_MEMBER(sound_nmi_mask_w);
+	DECLARE_WRITE8_MEMBER(ssozumo_videoram_w);
+	DECLARE_WRITE8_MEMBER(ssozumo_colorram_w);
+	DECLARE_WRITE8_MEMBER(ssozumo_videoram2_w);
+	DECLARE_WRITE8_MEMBER(ssozumo_colorram2_w);
+	DECLARE_WRITE8_MEMBER(ssozumo_paletteram_w);
+	DECLARE_WRITE8_MEMBER(ssozumo_scroll_w);
+	DECLARE_WRITE8_MEMBER(ssozumo_flipscreen_w);
 };
 
 
 /*----------- defined in video/ssozumo.c -----------*/
 
-WRITE8_HANDLER( ssozumo_videoram_w );
-WRITE8_HANDLER( ssozumo_colorram_w );
-WRITE8_HANDLER( ssozumo_videoram2_w );
-WRITE8_HANDLER( ssozumo_colorram2_w );
-WRITE8_HANDLER( ssozumo_paletteram_w );
-WRITE8_HANDLER( ssozumo_scroll_w );
-WRITE8_HANDLER( ssozumo_flipscreen_w );
 
 PALETTE_INIT( ssozumo );
 VIDEO_START( ssozumo );

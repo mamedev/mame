@@ -26,13 +26,13 @@ public:
 	/* misc */
 	int            m_bank;
 	DECLARE_WRITE8_MEMBER(compgolf_ctrl_w);
+	DECLARE_WRITE8_MEMBER(compgolf_video_w);
+	DECLARE_WRITE8_MEMBER(compgolf_back_w);
 };
 
 
 /*----------- defined in video/compgolf.c -----------*/
 
-WRITE8_HANDLER( compgolf_video_w );
-WRITE8_HANDLER( compgolf_back_w );
 PALETTE_INIT ( compgolf );
 VIDEO_START  ( compgolf );
 SCREEN_UPDATE_IND16( compgolf );

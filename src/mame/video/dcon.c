@@ -10,70 +10,63 @@
 
 /******************************************************************************/
 
-READ16_HANDLER( dcon_control_r )
+READ16_MEMBER(dcon_state::dcon_control_r)
 {
-	dcon_state *state = space->machine().driver_data<dcon_state>();
-	return state->m_enable;
+	return m_enable;
 }
 
-WRITE16_HANDLER( dcon_control_w )
+WRITE16_MEMBER(dcon_state::dcon_control_w)
 {
-	dcon_state *state = space->machine().driver_data<dcon_state>();
 	if (ACCESSING_BITS_0_7)
 	{
-		state->m_enable=data;
-		if ((state->m_enable&4)==4)
-			state->m_foreground_layer->enable(0);
+		m_enable=data;
+		if ((m_enable&4)==4)
+			m_foreground_layer->enable(0);
 		else
-			state->m_foreground_layer->enable(1);
+			m_foreground_layer->enable(1);
 
-		if ((state->m_enable&2)==2)
-			state->m_midground_layer->enable(0);
+		if ((m_enable&2)==2)
+			m_midground_layer->enable(0);
 		else
-			state->m_midground_layer->enable(1);
+			m_midground_layer->enable(1);
 
-		if ((state->m_enable&1)==1)
-			state->m_background_layer->enable(0);
+		if ((m_enable&1)==1)
+			m_background_layer->enable(0);
 		else
-			state->m_background_layer->enable(1);
+			m_background_layer->enable(1);
 	}
 }
 
-WRITE16_HANDLER( dcon_gfxbank_w )
+WRITE16_MEMBER(dcon_state::dcon_gfxbank_w)
 {
-	dcon_state *state = space->machine().driver_data<dcon_state>();
 	if (data&1)
-		state->m_gfx_bank_select=0x1000;
+		m_gfx_bank_select=0x1000;
 	else
-		state->m_gfx_bank_select=0;
+		m_gfx_bank_select=0;
 }
 
-WRITE16_HANDLER( dcon_background_w )
+WRITE16_MEMBER(dcon_state::dcon_background_w)
 {
-	dcon_state *state = space->machine().driver_data<dcon_state>();
-	COMBINE_DATA(&state->m_back_data[offset]);
-	state->m_background_layer->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_back_data[offset]);
+	m_background_layer->mark_tile_dirty(offset);
 }
 
-WRITE16_HANDLER( dcon_foreground_w )
+WRITE16_MEMBER(dcon_state::dcon_foreground_w)
 {
-	dcon_state *state = space->machine().driver_data<dcon_state>();
-	COMBINE_DATA(&state->m_fore_data[offset]);
-	state->m_foreground_layer->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_fore_data[offset]);
+	m_foreground_layer->mark_tile_dirty(offset);
 }
 
-WRITE16_HANDLER( dcon_midground_w )
+WRITE16_MEMBER(dcon_state::dcon_midground_w)
 {
-	dcon_state *state = space->machine().driver_data<dcon_state>();
-	COMBINE_DATA(&state->m_mid_data[offset]);
-	state->m_midground_layer->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_mid_data[offset]);
+	m_midground_layer->mark_tile_dirty(offset);
 }
 
-WRITE16_HANDLER( dcon_text_w )
+WRITE16_MEMBER(dcon_state::dcon_text_w)
 {
-	dcon_state *state = space->machine().driver_data<dcon_state>();
-	COMBINE_DATA(&state->m_textram[offset]);
-	state->m_text_layer->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_textram[offset]);
+	m_text_layer->mark_tile_dirty(offset);
 }
 
 static TILE_GET_INFO( get_back_tile_info )

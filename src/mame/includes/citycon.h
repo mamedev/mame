@@ -27,14 +27,14 @@ public:
 	device_t *m_maincpu;
 	DECLARE_READ8_MEMBER(citycon_in_r);
 	DECLARE_READ8_MEMBER(citycon_irq_ack_r);
+	DECLARE_WRITE8_MEMBER(citycon_videoram_w);
+	DECLARE_WRITE8_MEMBER(citycon_linecolor_w);
+	DECLARE_WRITE8_MEMBER(citycon_background_w);
 };
 
 
 /*----------- defined in video/citycon.c -----------*/
 
-WRITE8_HANDLER( citycon_videoram_w );
-WRITE8_HANDLER( citycon_linecolor_w );
-WRITE8_HANDLER( citycon_background_w );
 
 SCREEN_UPDATE_IND16( citycon );
 VIDEO_START( citycon );

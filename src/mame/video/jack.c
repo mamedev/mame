@@ -10,36 +10,33 @@
 #include "includes/jack.h"
 
 
-WRITE8_HANDLER( jack_videoram_w )
+WRITE8_MEMBER(jack_state::jack_videoram_w)
 {
-	jack_state *state = space->machine().driver_data<jack_state>();
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( jack_colorram_w )
+WRITE8_MEMBER(jack_state::jack_colorram_w)
 {
-	jack_state *state = space->machine().driver_data<jack_state>();
-	state->m_colorram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_colorram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( jack_paletteram_w )
+WRITE8_MEMBER(jack_state::jack_paletteram_w)
 {
 	/* RGB output is inverted */
-	jack_state *state = space->machine().driver_data<jack_state>();
-	state->paletteram_BBGGGRRR_w(*space, offset, ~data);
+	paletteram_BBGGGRRR_w(space, offset, ~data);
 }
 
-READ8_HANDLER( jack_flipscreen_r )
+READ8_MEMBER(jack_state::jack_flipscreen_r)
 {
-	flip_screen_set(space->machine(), offset);
+	flip_screen_set(machine(), offset);
 	return 0;
 }
 
-WRITE8_HANDLER( jack_flipscreen_w )
+WRITE8_MEMBER(jack_state::jack_flipscreen_w)
 {
-	flip_screen_set(space->machine(), offset);
+	flip_screen_set(machine(), offset);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )

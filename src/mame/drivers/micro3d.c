@@ -200,17 +200,17 @@ static ADDRESS_MAP_START( hostmem, AS_PROGRAM, 16, micro3d_state )
 	AM_RANGE(0x000000, 0x143fff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x800000, 0x83ffff) AM_RAM AM_BASE(m_shared_ram)
-	AM_RANGE(0x900000, 0x900001) AM_WRITE_LEGACY(host_drmath_int_w)
+	AM_RANGE(0x900000, 0x900001) AM_WRITE(host_drmath_int_w)
 	AM_RANGE(0x920000, 0x920001) AM_READ_PORT("INPUTS_C_D")
 	AM_RANGE(0x940000, 0x940001) AM_READ_PORT("INPUTS_A_B")
-	AM_RANGE(0x960000, 0x960001) AM_WRITE_LEGACY(micro3d_reset_w)
-	AM_RANGE(0x980000, 0x980001) AM_READWRITE_LEGACY(micro3d_adc_r, micro3d_adc_w)
-	AM_RANGE(0x9a0000, 0x9a0007) AM_READWRITE_LEGACY(micro3d_tms_host_r, micro3d_tms_host_w)
+	AM_RANGE(0x960000, 0x960001) AM_WRITE(micro3d_reset_w)
+	AM_RANGE(0x980000, 0x980001) AM_READWRITE(micro3d_adc_r, micro3d_adc_w)
+	AM_RANGE(0x9a0000, 0x9a0007) AM_READWRITE(micro3d_tms_host_r, micro3d_tms_host_w)
 	AM_RANGE(0x9c0000, 0x9c0001) AM_NOP					/* Lamps */
 	AM_RANGE(0x9e0000, 0x9e002f) AM_DEVREADWRITE8("mc68901", mc68901_device, read, write, 0xff00)
 	AM_RANGE(0xa00000, 0xa0003f) AM_DEVREADWRITE8_LEGACY("duart68681", duart68681_r, duart68681_w, 0xff00)
-	AM_RANGE(0xa20000, 0xa20001) AM_READ_LEGACY(micro3d_encoder_h_r)
-	AM_RANGE(0xa40002, 0xa40003) AM_READ_LEGACY(micro3d_encoder_l_r)
+	AM_RANGE(0xa20000, 0xa20001) AM_READ(micro3d_encoder_h_r)
+	AM_RANGE(0xa40002, 0xa40003) AM_READ(micro3d_encoder_l_r)
 ADDRESS_MAP_END
 
 
@@ -224,11 +224,11 @@ static ADDRESS_MAP_START( vgbmem, AS_PROGRAM, 16, micro3d_state )
 	AM_RANGE(0x00000000, 0x007fffff) AM_RAM AM_BASE(m_micro3d_sprite_vram)
 	AM_RANGE(0x00800000, 0x00bfffff) AM_RAM
 	AM_RANGE(0x00c00000, 0x00c0000f) AM_READ_PORT("VGB_SW")
-	AM_RANGE(0x00e00000, 0x00e0000f) AM_WRITE_LEGACY(micro3d_xfer3dk_w)
-	AM_RANGE(0x02000000, 0x0200ffff) AM_RAM_WRITE_LEGACY(micro3d_clut_w) AM_SHARE("paletteram")
-	AM_RANGE(0x02600000, 0x0260000f) AM_WRITE_LEGACY(micro3d_creg_w)
-	AM_RANGE(0x02c00000, 0x02c0003f) AM_READ_LEGACY(micro3d_ti_uart_r)
-	AM_RANGE(0x02e00000, 0x02e0003f) AM_WRITE_LEGACY(micro3d_ti_uart_w)
+	AM_RANGE(0x00e00000, 0x00e0000f) AM_WRITE(micro3d_xfer3dk_w)
+	AM_RANGE(0x02000000, 0x0200ffff) AM_RAM_WRITE(micro3d_clut_w) AM_SHARE("paletteram")
+	AM_RANGE(0x02600000, 0x0260000f) AM_WRITE(micro3d_creg_w)
+	AM_RANGE(0x02c00000, 0x02c0003f) AM_READ(micro3d_ti_uart_r)
+	AM_RANGE(0x02e00000, 0x02e0003f) AM_WRITE(micro3d_ti_uart_w)
 	AM_RANGE(0x03800000, 0x03dfffff) AM_ROM AM_REGION("tms_gfx", 0)
 	AM_RANGE(0x03e00000, 0x03ffffff) AM_ROM AM_REGION("tms34010", 0)
 	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE_LEGACY(tms34010_io_register_r, tms34010_io_register_w)
@@ -248,17 +248,17 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( drmath_data, AS_DATA, 32, micro3d_state )
 	AM_RANGE(0x00000000, 0x000fffff) AM_ROM AM_REGION("drmath", 0)
-	AM_RANGE(0x00800000, 0x0083ffff) AM_READWRITE_LEGACY(micro3d_shared_r, micro3d_shared_w)
+	AM_RANGE(0x00800000, 0x0083ffff) AM_READWRITE(micro3d_shared_r, micro3d_shared_w)
 	AM_RANGE(0x00400000, 0x004fffff) AM_RAM
 	AM_RANGE(0x00500000, 0x005fffff) AM_RAM
-	AM_RANGE(0x00a00000, 0x00a00003) AM_WRITE_LEGACY(drmath_int_w)
-	AM_RANGE(0x01000000, 0x01000003) AM_WRITE_LEGACY(micro3d_mac1_w)
-	AM_RANGE(0x01000004, 0x01000007) AM_READWRITE_LEGACY(micro3d_mac2_r, micro3d_mac2_w)
+	AM_RANGE(0x00a00000, 0x00a00003) AM_WRITE(drmath_int_w)
+	AM_RANGE(0x01000000, 0x01000003) AM_WRITE(micro3d_mac1_w)
+	AM_RANGE(0x01000004, 0x01000007) AM_READWRITE(micro3d_mac2_r, micro3d_mac2_w)
 	AM_RANGE(0x01200000, 0x01203fff) AM_RAM AM_BASE(m_mac_sram)
-	AM_RANGE(0x01400000, 0x01400003) AM_READWRITE_LEGACY(micro3d_pipe_r, micro3d_fifo_w)
-	AM_RANGE(0x01600000, 0x01600003) AM_WRITE_LEGACY(drmath_intr2_ack)
-	AM_RANGE(0x01800000, 0x01800003) AM_WRITE_LEGACY(micro3d_alt_fifo_w)
-	AM_RANGE(0x03fffff0, 0x03fffff7) AM_READWRITE_LEGACY(micro3d_scc_r, micro3d_scc_w)
+	AM_RANGE(0x01400000, 0x01400003) AM_READWRITE(micro3d_pipe_r, micro3d_fifo_w)
+	AM_RANGE(0x01600000, 0x01600003) AM_WRITE(drmath_intr2_ack)
+	AM_RANGE(0x01800000, 0x01800003) AM_WRITE(micro3d_alt_fifo_w)
+	AM_RANGE(0x03fffff0, 0x03fffff7) AM_READWRITE(micro3d_scc_r, micro3d_scc_w)
 ADDRESS_MAP_END
 
 /*************************************

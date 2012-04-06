@@ -12,15 +12,15 @@ public:
 	int m_CollisionSprite;
 	tilemap_t *m_bg_tilemap;
 	DECLARE_WRITE8_MEMBER(tinvader_sound_w);
+	DECLARE_WRITE8_MEMBER(tinvader_videoram_w);
+	DECLARE_READ8_MEMBER(zac_s2636_r);
+	DECLARE_WRITE8_MEMBER(zac_s2636_w);
+	DECLARE_READ8_MEMBER(tinvader_port_0_r);
 };
 
 
 /*----------- defined in video/zac2650.c -----------*/
 
-WRITE8_HANDLER( tinvader_videoram_w );
-READ8_HANDLER( zac_s2636_r );
-WRITE8_HANDLER( zac_s2636_w );
-READ8_HANDLER( tinvader_port_0_r );
 
 VIDEO_START( tinvader );
 SCREEN_UPDATE_IND16( tinvader );

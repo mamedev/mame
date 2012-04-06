@@ -180,16 +180,16 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, stactics_state )
  /* AM_RANGE(0x6010, 0x6017) AM_MIRROR(0x0f08) AM_WRITE_LEGACY(stactics_sound_w) */
     AM_RANGE(0x6016, 0x6016) AM_MIRROR(0x0f08) AM_WRITEONLY AM_BASE(m_motor_on)  /* Note: This overlaps rocket sound */
     AM_RANGE(0x6020, 0x6027) AM_MIRROR(0x0f08) AM_WRITEONLY AM_BASE(m_lamps)
-    AM_RANGE(0x6030, 0x6030) AM_MIRROR(0x0f0f) AM_WRITE_LEGACY(stactics_speed_latch_w)
-    AM_RANGE(0x6040, 0x6040) AM_MIRROR(0x0f0f) AM_WRITE_LEGACY(stactics_shot_trigger_w)
-    AM_RANGE(0x6050, 0x6050) AM_MIRROR(0x0f0f) AM_WRITE_LEGACY(stactics_shot_flag_clear_w)
+    AM_RANGE(0x6030, 0x6030) AM_MIRROR(0x0f0f) AM_WRITE(stactics_speed_latch_w)
+    AM_RANGE(0x6040, 0x6040) AM_MIRROR(0x0f0f) AM_WRITE(stactics_shot_trigger_w)
+    AM_RANGE(0x6050, 0x6050) AM_MIRROR(0x0f0f) AM_WRITE(stactics_shot_flag_clear_w)
     AM_RANGE(0x6060, 0x606f) AM_MIRROR(0x0f00) AM_WRITEONLY AM_BASE(m_display_buffer)
     AM_RANGE(0x6070, 0x609f) AM_MIRROR(0x0f00) AM_WRITENOP
  /* AM_RANGE(0x60a0, 0x60ef) AM_MIRROR(0x0f00) AM_WRITE_LEGACY(stactics_sound2_w) */
     AM_RANGE(0x60f0, 0x60ff) AM_MIRROR(0x0f00) AM_WRITENOP
     AM_RANGE(0x7000, 0x7000) AM_MIRROR(0x0fff) AM_READ_PORT("IN2")
     AM_RANGE(0x8000, 0x8000) AM_MIRROR(0x0fff) AM_READ_PORT("IN3")
-    AM_RANGE(0x8000, 0x87ff) AM_MIRROR(0x0800) AM_WRITE_LEGACY(stactics_scroll_ram_w)
+    AM_RANGE(0x8000, 0x87ff) AM_MIRROR(0x0800) AM_WRITE(stactics_scroll_ram_w)
     AM_RANGE(0x9000, 0x9000) AM_MIRROR(0x0fff) AM_READ(vert_pos_r)
     AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x0fff) AM_READ(horiz_pos_r)
     AM_RANGE(0xb000, 0xbfff) AM_RAM AM_BASE(m_videoram_b)

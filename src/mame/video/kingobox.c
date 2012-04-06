@@ -131,49 +131,44 @@ PALETTE_INIT( ringking )
 	palette_init_common(machine, color_prom, ringking_get_rgb_data);
 }
 
-WRITE8_HANDLER( kingofb_videoram_w )
+WRITE8_MEMBER(kingofb_state::kingofb_videoram_w)
 {
-	kingofb_state *state = space->machine().driver_data<kingofb_state>();
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( kingofb_colorram_w )
+WRITE8_MEMBER(kingofb_state::kingofb_colorram_w)
 {
-	kingofb_state *state = space->machine().driver_data<kingofb_state>();
-	state->m_colorram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_colorram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( kingofb_videoram2_w )
+WRITE8_MEMBER(kingofb_state::kingofb_videoram2_w)
 {
-	kingofb_state *state = space->machine().driver_data<kingofb_state>();
-	state->m_videoram2[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset);
+	m_videoram2[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( kingofb_colorram2_w )
+WRITE8_MEMBER(kingofb_state::kingofb_colorram2_w)
 {
-	kingofb_state *state = space->machine().driver_data<kingofb_state>();
-	state->m_colorram2[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset);
+	m_colorram2[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( kingofb_f800_w )
+WRITE8_MEMBER(kingofb_state::kingofb_f800_w)
 {
-	kingofb_state *state = space->machine().driver_data<kingofb_state>();
-	state->m_nmi_enable = data & 0x20;
+	m_nmi_enable = data & 0x20;
 
-	if (state->m_palette_bank != ((data & 0x18) >> 3))
+	if (m_palette_bank != ((data & 0x18) >> 3))
 	{
-		state->m_palette_bank = (data & 0x18) >> 3;
-		state->m_bg_tilemap->mark_all_dirty();
+		m_palette_bank = (data & 0x18) >> 3;
+		m_bg_tilemap->mark_all_dirty();
 	}
 
-	if (flip_screen_get(space->machine()) != (data & 0x80))
+	if (flip_screen_get(machine()) != (data & 0x80))
 	{
-		flip_screen_set(space->machine(), data & 0x80);
-		space->machine().tilemap().mark_all_dirty();
+		flip_screen_set(machine(), data & 0x80);
+		machine().tilemap().mark_all_dirty();
 	}
 }
 

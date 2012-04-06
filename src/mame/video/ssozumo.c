@@ -40,82 +40,76 @@ PALETTE_INIT( ssozumo )
 	}
 }
 
-WRITE8_HANDLER( ssozumo_videoram_w )
+WRITE8_MEMBER(ssozumo_state::ssozumo_videoram_w)
 {
-	ssozumo_state *state = space->machine().driver_data<ssozumo_state>();
 
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( ssozumo_colorram_w )
+WRITE8_MEMBER(ssozumo_state::ssozumo_colorram_w)
 {
-	ssozumo_state *state = space->machine().driver_data<ssozumo_state>();
 
-	state->m_colorram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_colorram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( ssozumo_videoram2_w )
+WRITE8_MEMBER(ssozumo_state::ssozumo_videoram2_w)
 {
-	ssozumo_state *state = space->machine().driver_data<ssozumo_state>();
 
-	state->m_videoram2[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset);
+	m_videoram2[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( ssozumo_colorram2_w )
+WRITE8_MEMBER(ssozumo_state::ssozumo_colorram2_w)
 {
-	ssozumo_state *state = space->machine().driver_data<ssozumo_state>();
 
-	state->m_colorram2[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset);
+	m_colorram2[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( ssozumo_paletteram_w )
+WRITE8_MEMBER(ssozumo_state::ssozumo_paletteram_w)
 {
-	ssozumo_state *state = space->machine().driver_data<ssozumo_state>();
 	int	bit0, bit1, bit2, bit3, val;
 	int	r, g, b;
 	int	offs2;
 
-	state->m_paletteram[offset] = data;
+	m_paletteram[offset] = data;
 	offs2 = offset & 0x0f;
 
-	val = state->m_paletteram[offs2];
+	val = m_paletteram[offs2];
 	bit0 = (val >> 0) & 0x01;
 	bit1 = (val >> 1) & 0x01;
 	bit2 = (val >> 2) & 0x01;
 	bit3 = (val >> 3) & 0x01;
 	r = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-	val = state->m_paletteram[offs2 | 0x10];
+	val = m_paletteram[offs2 | 0x10];
 	bit0 = (val >> 0) & 0x01;
 	bit1 = (val >> 1) & 0x01;
 	bit2 = (val >> 2) & 0x01;
 	bit3 = (val >> 3) & 0x01;
 	g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-	val = state->m_paletteram[offs2 | 0x20];
+	val = m_paletteram[offs2 | 0x20];
 	bit0 = (val >> 0) & 0x01;
 	bit1 = (val >> 1) & 0x01;
 	bit2 = (val >> 2) & 0x01;
 	bit3 = (val >> 3) & 0x01;
 	b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-	palette_set_color(space->machine(), offs2 + 64, MAKE_RGB(r, g, b));
+	palette_set_color(machine(), offs2 + 64, MAKE_RGB(r, g, b));
 }
 
-WRITE8_HANDLER( ssozumo_scroll_w )
+WRITE8_MEMBER(ssozumo_state::ssozumo_scroll_w)
 {
-	ssozumo_state *state = space->machine().driver_data<ssozumo_state>();
 
-	state->m_bg_tilemap->set_scrolly(0, data);
+	m_bg_tilemap->set_scrolly(0, data);
 }
 
-WRITE8_HANDLER( ssozumo_flipscreen_w )
+WRITE8_MEMBER(ssozumo_state::ssozumo_flipscreen_w)
 {
-	flip_screen_set(space->machine(), data & 0x80);
+	flip_screen_set(machine(), data & 0x80);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )

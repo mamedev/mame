@@ -24,6 +24,13 @@ public:
 	DECLARE_WRITE8_MEMBER(ra_fake_d800_w);
 	DECLARE_WRITE8_MEMBER(nmi_mask_w);
 	DECLARE_WRITE8_MEMBER(sound_nmi_mask_w);
+	DECLARE_WRITE8_MEMBER(rollrace_charbank_w);
+	DECLARE_WRITE8_MEMBER(rollrace_bkgpen_w);
+	DECLARE_WRITE8_MEMBER(rollrace_spritebank_w);
+	DECLARE_WRITE8_MEMBER(rollrace_backgroundpage_w);
+	DECLARE_WRITE8_MEMBER(rollrace_backgroundcolor_w);
+	DECLARE_WRITE8_MEMBER(rollrace_flipy_w);
+	DECLARE_WRITE8_MEMBER(rollrace_flipx_w);
 };
 
 
@@ -32,11 +39,4 @@ public:
 PALETTE_INIT( rollrace );
 SCREEN_UPDATE_IND16( rollrace );
 
-WRITE8_HANDLER( rollrace_charbank_w );
-WRITE8_HANDLER( rollrace_backgroundpage_w );
-WRITE8_HANDLER( rollrace_backgroundcolor_w );
-WRITE8_HANDLER( rollrace_bkgpen_w );
-WRITE8_HANDLER( rollrace_flipy_w );
-WRITE8_HANDLER( rollrace_spritebank_w );
-WRITE8_HANDLER( rollrace_flipx_w );
 

@@ -104,7 +104,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, mystston_state )
 	AM_RANGE(0x07e0, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x17ff) AM_RAM AM_BASE(m_fg_videoram)
 	AM_RANGE(0x1800, 0x1fff) AM_RAM AM_BASE(m_bg_videoram)
-	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x1f8f) AM_READ_PORT("IN0") AM_WRITE_LEGACY(mystston_video_control_w) AM_BASE(m_video_control)
+	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x1f8f) AM_READ_PORT("IN0") AM_WRITE(mystston_video_control_w) AM_BASE(m_video_control)
 	AM_RANGE(0x2010, 0x2010) AM_MIRROR(0x1f8f) AM_READ_PORT("IN1") AM_WRITE(irq_clear_w)
 	AM_RANGE(0x2020, 0x2020) AM_MIRROR(0x1f8f) AM_READ_PORT("DSW0") AM_WRITEONLY AM_BASE(m_scroll)
 	AM_RANGE(0x2030, 0x2030) AM_MIRROR(0x1f8f) AM_READ_PORT("DSW1") AM_WRITEONLY AM_BASE(m_ay8910_data)

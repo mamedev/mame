@@ -464,15 +464,15 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( DSP_map_data, AS_DATA, 16, taitoair_state )
 	AM_RANGE(0x2003, 0x2003) AM_READNOP //bit 0 DMA status flag or vblank
-	AM_RANGE(0x3000, 0x3002) AM_WRITE_LEGACY(dsp_flags_w)
-	AM_RANGE(0x3404, 0x3404) AM_WRITE_LEGACY(dsp_frustum_left_w)
-	AM_RANGE(0x3405, 0x3405) AM_WRITE_LEGACY(dsp_x_eyecoord_w)
-	AM_RANGE(0x3406, 0x3406) AM_WRITE_LEGACY(dsp_z_eyecoord_w)
-	AM_RANGE(0x3407, 0x3407) AM_READ_LEGACY(dsp_x_return_r)
-	AM_RANGE(0x3408, 0x3408) AM_WRITE_LEGACY(dsp_frustum_bottom_w)
-	AM_RANGE(0x3409, 0x3409) AM_WRITE_LEGACY(dsp_y_eyecoord_w)
-	AM_RANGE(0x340a, 0x340a) AM_WRITE_LEGACY(dsp_rasterize_w)      /* Just a (lame) guess */
-	AM_RANGE(0x340b, 0x340b) AM_READ_LEGACY(dsp_y_return_r)
+	AM_RANGE(0x3000, 0x3002) AM_WRITE(dsp_flags_w)
+	AM_RANGE(0x3404, 0x3404) AM_WRITE(dsp_frustum_left_w)
+	AM_RANGE(0x3405, 0x3405) AM_WRITE(dsp_x_eyecoord_w)
+	AM_RANGE(0x3406, 0x3406) AM_WRITE(dsp_z_eyecoord_w)
+	AM_RANGE(0x3407, 0x3407) AM_READ(dsp_x_return_r)
+	AM_RANGE(0x3408, 0x3408) AM_WRITE(dsp_frustum_bottom_w)
+	AM_RANGE(0x3409, 0x3409) AM_WRITE(dsp_y_eyecoord_w)
+	AM_RANGE(0x340a, 0x340a) AM_WRITE(dsp_rasterize_w)      /* Just a (lame) guess */
+	AM_RANGE(0x340b, 0x340b) AM_READ(dsp_y_return_r)
 //  AM_RANGE(0x3418, 0x341a) AM_WRITE_LEGACY(dsp_sqrt_w)
 //  AM_RANGE(0x341b, 0x341b) AM_WRITE_LEGACY(dsp_sqrt_r)
 //  AM_RANGE(0x341c, 0x341c) AM_READ_LEGACY(dsp_sqrt_flags1_r)

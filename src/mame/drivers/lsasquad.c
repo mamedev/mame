@@ -175,15 +175,15 @@ static ADDRESS_MAP_START( lsasquad_map, AS_PROGRAM, 8, lsasquad_state )
 	AM_RANGE(0xe800, 0xe800) AM_READ_PORT("DSWA")
 	AM_RANGE(0xe801, 0xe801) AM_READ_PORT("DSWB")
 	AM_RANGE(0xe802, 0xe802) AM_READ_PORT("DSWC")
-	AM_RANGE(0xe803, 0xe803) AM_READ_LEGACY(lsasquad_mcu_status_r)	/* COIN + 68705 status */
+	AM_RANGE(0xe803, 0xe803) AM_READ(lsasquad_mcu_status_r)	/* COIN + 68705 status */
 	AM_RANGE(0xe804, 0xe804) AM_READ_PORT("P1")
 	AM_RANGE(0xe805, 0xe805) AM_READ_PORT("P2")
 	AM_RANGE(0xe806, 0xe806) AM_READ_PORT("START")
 	AM_RANGE(0xe807, 0xe807) AM_READ_PORT("SERVICE")
 	AM_RANGE(0xea00, 0xea00) AM_WRITE(lsasquad_bankswitch_w)
-	AM_RANGE(0xec00, 0xec00) AM_READWRITE_LEGACY(lsasquad_sound_result_r,lsasquad_sound_command_w)
-	AM_RANGE(0xec01, 0xec01) AM_READ_LEGACY(lsasquad_sound_status_r)
-	AM_RANGE(0xee00, 0xee00) AM_READWRITE_LEGACY(lsasquad_mcu_r,lsasquad_mcu_w)
+	AM_RANGE(0xec00, 0xec00) AM_READWRITE(lsasquad_sound_result_r,lsasquad_sound_command_w)
+	AM_RANGE(0xec01, 0xec01) AM_READ(lsasquad_sound_status_r)
+	AM_RANGE(0xee00, 0xee00) AM_READWRITE(lsasquad_mcu_r,lsasquad_mcu_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( lsasquad_sound_map, AS_PROGRAM, 8, lsasquad_state )
@@ -191,20 +191,20 @@ static ADDRESS_MAP_START( lsasquad_sound_map, AS_PROGRAM, 8, lsasquad_state )
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2203_r,ym2203_w)
 	AM_RANGE(0xc000, 0xc001) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
-	AM_RANGE(0xd000, 0xd000) AM_READWRITE_LEGACY(lsasquad_sh_sound_command_r, lsasquad_sh_result_w)
-	AM_RANGE(0xd400, 0xd400) AM_WRITE_LEGACY(lsasquad_sh_nmi_disable_w)
-	AM_RANGE(0xd800, 0xd800) AM_WRITE_LEGACY(lsasquad_sh_nmi_enable_w)
-	AM_RANGE(0xd800, 0xd800) AM_READ_LEGACY(lsasquad_sound_status_r)
+	AM_RANGE(0xd000, 0xd000) AM_READWRITE(lsasquad_sh_sound_command_r, lsasquad_sh_result_w)
+	AM_RANGE(0xd400, 0xd400) AM_WRITE(lsasquad_sh_nmi_disable_w)
+	AM_RANGE(0xd800, 0xd800) AM_WRITE(lsasquad_sh_nmi_enable_w)
+	AM_RANGE(0xd800, 0xd800) AM_READ(lsasquad_sound_status_r)
 	AM_RANGE(0xe000, 0xefff) AM_ROM		/* space for diagnostic ROM? */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( lsasquad_m68705_map, AS_PROGRAM, 8, lsasquad_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
-	AM_RANGE(0x0000, 0x0000) AM_READWRITE_LEGACY(lsasquad_68705_port_a_r,lsasquad_68705_port_a_w)
-	AM_RANGE(0x0001, 0x0001) AM_READWRITE_LEGACY(lsasquad_68705_port_b_r,lsasquad_68705_port_b_w)
-	AM_RANGE(0x0002, 0x0002) AM_READ_LEGACY(lsasquad_mcu_status_r)
-	AM_RANGE(0x0004, 0x0004) AM_WRITE_LEGACY(lsasquad_68705_ddr_a_w)
-	AM_RANGE(0x0005, 0x0005) AM_WRITE_LEGACY(lsasquad_68705_ddr_b_w)
+	AM_RANGE(0x0000, 0x0000) AM_READWRITE(lsasquad_68705_port_a_r,lsasquad_68705_port_a_w)
+	AM_RANGE(0x0001, 0x0001) AM_READWRITE(lsasquad_68705_port_b_r,lsasquad_68705_port_b_w)
+	AM_RANGE(0x0002, 0x0002) AM_READ(lsasquad_mcu_status_r)
+	AM_RANGE(0x0004, 0x0004) AM_WRITE(lsasquad_68705_ddr_a_w)
+	AM_RANGE(0x0005, 0x0005) AM_WRITE(lsasquad_68705_ddr_b_w)
 	AM_RANGE(0x0010, 0x007f) AM_RAM
 	AM_RANGE(0x0080, 0x07ff) AM_ROM
 ADDRESS_MAP_END
@@ -226,8 +226,8 @@ static ADDRESS_MAP_START( storming_map, AS_PROGRAM, 8, lsasquad_state )
 	AM_RANGE(0xe806, 0xe806) AM_READ_PORT("START")
 	AM_RANGE(0xe807, 0xe807) AM_READ_PORT("SERVICE")
 	AM_RANGE(0xea00, 0xea00) AM_WRITE(lsasquad_bankswitch_w)
-	AM_RANGE(0xec00, 0xec00) AM_READWRITE_LEGACY(lsasquad_sound_result_r,lsasquad_sound_command_w)
-	AM_RANGE(0xec01, 0xec01) AM_READ_LEGACY(lsasquad_sound_status_r)
+	AM_RANGE(0xec00, 0xec00) AM_READWRITE(lsasquad_sound_result_r,lsasquad_sound_command_w)
+	AM_RANGE(0xec01, 0xec01) AM_READ(lsasquad_sound_status_r)
 ADDRESS_MAP_END
 
 
@@ -382,15 +382,15 @@ static ADDRESS_MAP_START( daikaiju_map, AS_PROGRAM, 8, lsasquad_state )
 	AM_RANGE(0xe400, 0xe7ff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)	/* OBJECT RAM */
 	AM_RANGE(0xe800, 0xe800) AM_READ_PORT("DSWA")
 	AM_RANGE(0xe801, 0xe801) AM_READ_PORT("DSWB")
-	AM_RANGE(0xe803, 0xe803) AM_READ_LEGACY(daikaiju_mcu_status_r)	/* COIN + 68705 status */
+	AM_RANGE(0xe803, 0xe803) AM_READ(daikaiju_mcu_status_r)	/* COIN + 68705 status */
 	AM_RANGE(0xe804, 0xe804) AM_READ_PORT("P1")
 	AM_RANGE(0xe805, 0xe805) AM_READ_PORT("P2")
 	AM_RANGE(0xe806, 0xe806) AM_READ_PORT("START")
 	AM_RANGE(0xe807, 0xe807) AM_READ_PORT("SERVICE")
 	AM_RANGE(0xea00, 0xea00) AM_WRITE(lsasquad_bankswitch_w)
-	AM_RANGE(0xec00, 0xec00) AM_WRITE_LEGACY(lsasquad_sound_command_w)
-	AM_RANGE(0xec01, 0xec01) AM_READ_LEGACY(lsasquad_sound_status_r)
-	AM_RANGE(0xee00, 0xee00) AM_READWRITE_LEGACY(lsasquad_mcu_r, lsasquad_mcu_w)
+	AM_RANGE(0xec00, 0xec00) AM_WRITE(lsasquad_sound_command_w)
+	AM_RANGE(0xec01, 0xec01) AM_READ(lsasquad_sound_status_r)
+	AM_RANGE(0xee00, 0xee00) AM_READWRITE(lsasquad_mcu_r, lsasquad_mcu_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( daikaiju_sound_map, AS_PROGRAM, 8, lsasquad_state )
@@ -398,9 +398,9 @@ static ADDRESS_MAP_START( daikaiju_sound_map, AS_PROGRAM, 8, lsasquad_state )
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2203_r, ym2203_w)
 	AM_RANGE(0xc000, 0xc001) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
-	AM_RANGE(0xd000, 0xd000) AM_READ_LEGACY(daikaiju_sh_sound_command_r)
+	AM_RANGE(0xd000, 0xd000) AM_READ(daikaiju_sh_sound_command_r)
 	AM_RANGE(0xd400, 0xd400) AM_WRITENOP
-	AM_RANGE(0xd800, 0xd800) AM_READ_LEGACY(daikaiju_sound_status_r) AM_WRITENOP
+	AM_RANGE(0xd800, 0xd800) AM_READ(daikaiju_sound_status_r) AM_WRITENOP
 	AM_RANGE(0xdc00, 0xdc00) AM_WRITENOP
 	AM_RANGE(0xe000, 0xefff) AM_ROM	/* space for diagnostic ROM? */
 ADDRESS_MAP_END

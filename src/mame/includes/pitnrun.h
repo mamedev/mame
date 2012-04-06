@@ -28,35 +28,35 @@ public:
 	DECLARE_WRITE8_MEMBER(nmi_enable_w);
 	DECLARE_WRITE8_MEMBER(pitnrun_hflip_w);
 	DECLARE_WRITE8_MEMBER(pitnrun_vflip_w);
+	DECLARE_READ8_MEMBER(pitnrun_mcu_data_r);
+	DECLARE_WRITE8_MEMBER(pitnrun_mcu_data_w);
+	DECLARE_READ8_MEMBER(pitnrun_mcu_status_r);
+	DECLARE_READ8_MEMBER(pitnrun_68705_portA_r);
+	DECLARE_WRITE8_MEMBER(pitnrun_68705_portA_w);
+	DECLARE_READ8_MEMBER(pitnrun_68705_portB_r);
+	DECLARE_WRITE8_MEMBER(pitnrun_68705_portB_w);
+	DECLARE_READ8_MEMBER(pitnrun_68705_portC_r);
+	DECLARE_WRITE8_MEMBER(pitnrun_videoram_w);
+	DECLARE_WRITE8_MEMBER(pitnrun_videoram2_w);
+	DECLARE_WRITE8_MEMBER(pitnrun_char_bank_select);
+	DECLARE_WRITE8_MEMBER(pitnrun_scroll_w);
+	DECLARE_WRITE8_MEMBER(pitnrun_ha_w);
+	DECLARE_WRITE8_MEMBER(pitnrun_h_heed_w);
+	DECLARE_WRITE8_MEMBER(pitnrun_v_heed_w);
+	DECLARE_WRITE8_MEMBER(pitnrun_color_select_w);
 };
 
 
 /*----------- defined in machine/pitnrun.c -----------*/
 
-WRITE8_HANDLER (pitnrun_68705_portA_w);
-WRITE8_HANDLER (pitnrun_68705_portB_w);
 
-READ8_HANDLER (pitnrun_68705_portA_r);
-READ8_HANDLER (pitnrun_68705_portB_r);
-READ8_HANDLER (pitnrun_68705_portC_r);
 
 MACHINE_RESET( pitnrun );
 
-READ8_HANDLER( pitnrun_mcu_data_r );
-READ8_HANDLER( pitnrun_mcu_status_r );
-WRITE8_HANDLER( pitnrun_mcu_data_w );
 
 
 /*----------- defined in video/pitnrun.c -----------*/
 
-WRITE8_HANDLER( pitnrun_videoram_w );
-WRITE8_HANDLER( pitnrun_videoram2_w );
-WRITE8_HANDLER(pitnrun_ha_w);
-WRITE8_HANDLER(pitnrun_h_heed_w);
-WRITE8_HANDLER(pitnrun_v_heed_w);
-WRITE8_HANDLER(pitnrun_color_select_w);
-WRITE8_HANDLER( pitnrun_char_bank_select );
-WRITE8_HANDLER( pitnrun_scroll_w );
 
 PALETTE_INIT(pitnrun);
 VIDEO_START(pitnrun);

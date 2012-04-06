@@ -61,11 +61,10 @@ static void set_pens(tank8_state *state, colortable_t *colortable)
 }
 
 
-WRITE8_HANDLER( tank8_video_ram_w )
+WRITE8_MEMBER(tank8_state::tank8_video_ram_w)
 {
-	tank8_state *state = space->machine().driver_data<tank8_state>();
-	state->m_video_ram[offset] = data;
-	state->m_tilemap->mark_tile_dirty(offset);
+	m_video_ram[offset] = data;
+	m_tilemap->mark_tile_dirty(offset);
 }
 
 

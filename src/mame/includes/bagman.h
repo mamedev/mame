@@ -30,6 +30,12 @@ public:
 	UINT8 m_irq_mask;
 	DECLARE_WRITE8_MEMBER(bagman_coin_counter_w);
 	DECLARE_WRITE8_MEMBER(irq_mask_w);
+	DECLARE_WRITE8_MEMBER(bagman_pal16r6_w);
+	DECLARE_READ8_MEMBER(bagman_pal16r6_r);
+	void update_pal();
+	DECLARE_WRITE8_MEMBER(bagman_videoram_w);
+	DECLARE_WRITE8_MEMBER(bagman_colorram_w);
+	DECLARE_WRITE8_MEMBER(bagman_flipscreen_w);
 };
 
 
@@ -55,16 +61,11 @@ public:
 
 /*----------- defined in machine/bagman.c -----------*/
 
-READ8_HANDLER( bagman_pal16r6_r );
 MACHINE_RESET( bagman );
-WRITE8_HANDLER( bagman_pal16r6_w );
 
 
 /*----------- defined in video/bagman.c -----------*/
 
-WRITE8_HANDLER( bagman_videoram_w );
-WRITE8_HANDLER( bagman_colorram_w );
-WRITE8_HANDLER( bagman_flipscreen_w );
 
 PALETTE_INIT( bagman );
 VIDEO_START( bagman );

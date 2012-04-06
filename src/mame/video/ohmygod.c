@@ -41,32 +41,28 @@ VIDEO_START( ohmygod )
 
 ***************************************************************************/
 
-WRITE16_HANDLER( ohmygod_videoram_w )
+WRITE16_MEMBER(ohmygod_state::ohmygod_videoram_w)
 {
-	ohmygod_state *state = space->machine().driver_data<ohmygod_state>();
-	COMBINE_DATA(&state->m_videoram[offset]);
-	state->m_bg_tilemap->mark_tile_dirty(offset / 2);
+	COMBINE_DATA(&m_videoram[offset]);
+	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE16_HANDLER( ohmygod_spritebank_w )
+WRITE16_MEMBER(ohmygod_state::ohmygod_spritebank_w)
 {
-	ohmygod_state *state = space->machine().driver_data<ohmygod_state>();
 	if (ACCESSING_BITS_8_15)
-		state->m_spritebank = data & 0x8000;
+		m_spritebank = data & 0x8000;
 }
 
-WRITE16_HANDLER( ohmygod_scrollx_w )
+WRITE16_MEMBER(ohmygod_state::ohmygod_scrollx_w)
 {
-	ohmygod_state *state = space->machine().driver_data<ohmygod_state>();
-	COMBINE_DATA(&state->m_scrollx);
-	state->m_bg_tilemap->set_scrollx(0, state->m_scrollx - 0x81ec);
+	COMBINE_DATA(&m_scrollx);
+	m_bg_tilemap->set_scrollx(0, m_scrollx - 0x81ec);
 }
 
-WRITE16_HANDLER( ohmygod_scrolly_w )
+WRITE16_MEMBER(ohmygod_state::ohmygod_scrolly_w)
 {
-	ohmygod_state *state = space->machine().driver_data<ohmygod_state>();
-	COMBINE_DATA(&state->m_scrolly);
-	state->m_bg_tilemap->set_scrolly(0, state->m_scrolly - 0x81ef);
+	COMBINE_DATA(&m_scrolly);
+	m_bg_tilemap->set_scrolly(0, m_scrolly - 0x81ef);
 }
 
 

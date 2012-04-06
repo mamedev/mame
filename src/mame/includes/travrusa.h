@@ -12,14 +12,14 @@ public:
 	/* video-related */
 	tilemap_t*             m_bg_tilemap;
 	int                  m_scrollx[2];
+	DECLARE_WRITE8_MEMBER(travrusa_videoram_w);
+	DECLARE_WRITE8_MEMBER(travrusa_scroll_x_low_w);
+	DECLARE_WRITE8_MEMBER(travrusa_scroll_x_high_w);
+	DECLARE_WRITE8_MEMBER(travrusa_flipscreen_w);
 };
 
 /*----------- defined in video/travrusa.c -----------*/
 
-WRITE8_HANDLER( travrusa_videoram_w );
-WRITE8_HANDLER( travrusa_scroll_x_low_w );
-WRITE8_HANDLER( travrusa_scroll_x_high_w );
-WRITE8_HANDLER( travrusa_flipscreen_w );
 
 PALETTE_INIT( travrusa );
 PALETTE_INIT( shtrider );

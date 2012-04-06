@@ -103,7 +103,7 @@ produces a high clock frequency, slow movements a low freq.
 
 static ADDRESS_MAP_START( wrally_map, AS_PROGRAM, 16, wrally_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM															/* ROM */
-	AM_RANGE(0x100000, 0x103fff) AM_RAM_WRITE_LEGACY(wrally_vram_w) AM_BASE(m_videoram)	/* encrypted Video RAM */
+	AM_RANGE(0x100000, 0x103fff) AM_RAM_WRITE(wrally_vram_w) AM_BASE(m_videoram)	/* encrypted Video RAM */
 	AM_RANGE(0x108000, 0x108007) AM_RAM AM_BASE(m_vregs)									/* Video Registers */
 	AM_RANGE(0x10800c, 0x10800d) AM_WRITENOP												/* CLR INT Video */
 	AM_RANGE(0x200000, 0x203fff) AM_RAM_WRITE(paletteram16_xxxxBBBBRRRRGGGG_word_w) AM_SHARE("paletteram")	/* Palette */
@@ -112,12 +112,12 @@ static ADDRESS_MAP_START( wrally_map, AS_PROGRAM, 16, wrally_state )
 	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x700004, 0x700005) AM_READ_PORT("WHEEL")
 	AM_RANGE(0x700008, 0x700009) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x70000c, 0x70000d) AM_WRITE_LEGACY(OKIM6295_bankswitch_w)								/* OKI6295 bankswitch */
+	AM_RANGE(0x70000c, 0x70000d) AM_WRITE(OKIM6295_bankswitch_w)								/* OKI6295 bankswitch */
 	AM_RANGE(0x70000e, 0x70000f) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)	/* OKI6295 status/data register */
-	AM_RANGE(0x70000a, 0x70001b) AM_WRITE_LEGACY(wrally_coin_lockout_w)								/* Coin lockouts */
-	AM_RANGE(0x70002a, 0x70003b) AM_WRITE_LEGACY(wrally_coin_counter_w)								/* Coin counters */
+	AM_RANGE(0x70000a, 0x70001b) AM_WRITE(wrally_coin_lockout_w)								/* Coin lockouts */
+	AM_RANGE(0x70002a, 0x70003b) AM_WRITE(wrally_coin_counter_w)								/* Coin counters */
 	AM_RANGE(0x70004a, 0x70004b) AM_WRITENOP												/* Sound muting */
-	AM_RANGE(0x70005a, 0x70005b) AM_WRITE_LEGACY(wrally_flipscreen_w)									/* Flip screen */
+	AM_RANGE(0x70005a, 0x70005b) AM_WRITE(wrally_flipscreen_w)									/* Flip screen */
 	AM_RANGE(0x70006a, 0x70007b) AM_WRITENOP												/* ??? */
 	AM_RANGE(0xfec000, 0xfeffff) AM_RAM AM_BASE(m_shareram)										/* Work RAM (shared with DS5002FP) */
 ADDRESS_MAP_END

@@ -319,8 +319,8 @@ static ADDRESS_MAP_START( psikyo_map, AS_PROGRAM, 32, psikyo_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM														// ROM (not all used)
 	AM_RANGE(0x400000, 0x401fff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)		// Sprites, buffered by two frames (list buffered + fb buffered)
 	AM_RANGE(0x600000, 0x601fff) AM_RAM_WRITE(paletteram32_xRRRRRGGGGGBBBBB_dword_w) AM_SHARE("paletteram")	// Palette
-	AM_RANGE(0x800000, 0x801fff) AM_RAM_WRITE_LEGACY(psikyo_vram_0_w) AM_BASE(m_vram_0)		// Layer 0
-	AM_RANGE(0x802000, 0x803fff) AM_RAM_WRITE_LEGACY(psikyo_vram_1_w) AM_BASE(m_vram_1)		// Layer 1
+	AM_RANGE(0x800000, 0x801fff) AM_RAM_WRITE(psikyo_vram_0_w) AM_BASE(m_vram_0)		// Layer 0
+	AM_RANGE(0x802000, 0x803fff) AM_RAM_WRITE(psikyo_vram_1_w) AM_BASE(m_vram_1)		// Layer 1
 	AM_RANGE(0x804000, 0x807fff) AM_RAM AM_BASE(m_vregs)							// RAM + Vregs
 //  AM_RANGE(0xc00000, 0xc0000b) AM_READ_LEGACY(psikyo_input_r)                                    // Depends on board, see DRIVER_INIT
 //  AM_RANGE(0xc00004, 0xc0000b) AM_WRITE(s1945_mcu_w)                                      // MCU on sh404, see DRIVER_INIT
@@ -330,7 +330,7 @@ ADDRESS_MAP_END
 
 READ32_MEMBER(psikyo_state::s1945bl_oki_r)
 {
-	UINT8 dat = machine().device<okim6295_device>("oki")->read(*&space, 0);
+	UINT8 dat = machine().device<okim6295_device>("oki")->read(space, 0);
 	return dat << 24;
 }
 
@@ -339,7 +339,7 @@ WRITE32_MEMBER(psikyo_state::s1945bl_oki_w)
 	if (ACCESSING_BITS_24_31)
 	{
 		okim6295_device *oki = machine().device<okim6295_device>("oki");
-		oki->write(*&space, 0, data >> 24);
+		oki->write(space, 0, data >> 24);
 	}
 
 	if (ACCESSING_BITS_16_23)
@@ -368,8 +368,8 @@ static ADDRESS_MAP_START( psikyo_bootleg_map, AS_PROGRAM, 32, psikyo_state )
 
 	AM_RANGE(0x400000, 0x401fff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)		// Sprites, buffered by two frames (list buffered + fb buffered)
 	AM_RANGE(0x600000, 0x601fff) AM_RAM_WRITE(paletteram32_xRRRRRGGGGGBBBBB_dword_w) AM_SHARE("paletteram")	// Palette
-	AM_RANGE(0x800000, 0x801fff) AM_RAM_WRITE_LEGACY(psikyo_vram_0_w) AM_BASE(m_vram_0)		// Layer 0
-	AM_RANGE(0x802000, 0x803fff) AM_RAM_WRITE_LEGACY(psikyo_vram_1_w) AM_BASE(m_vram_1)		// Layer 1
+	AM_RANGE(0x800000, 0x801fff) AM_RAM_WRITE(psikyo_vram_0_w) AM_BASE(m_vram_0)		// Layer 0
+	AM_RANGE(0x802000, 0x803fff) AM_RAM_WRITE(psikyo_vram_1_w) AM_BASE(m_vram_1)		// Layer 1
 	AM_RANGE(0x804000, 0x807fff) AM_RAM AM_BASE(m_vregs)								// RAM + Vregs
 //  AM_RANGE(0xc00000, 0xc0000b) AM_READ_LEGACY(psikyo_input_r)                                    // Depends on board, see DRIVER_INIT
 //  AM_RANGE(0xc00004, 0xc0000b) AM_WRITE(s1945_mcu_w)                                      // MCU on sh404, see DRIVER_INIT

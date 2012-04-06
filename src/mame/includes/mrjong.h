@@ -17,14 +17,14 @@ public:
 	/* video-related */
 	tilemap_t *m_bg_tilemap;
 	DECLARE_READ8_MEMBER(io_0x03_r);
+	DECLARE_WRITE8_MEMBER(mrjong_videoram_w);
+	DECLARE_WRITE8_MEMBER(mrjong_colorram_w);
+	DECLARE_WRITE8_MEMBER(mrjong_flipscreen_w);
 };
 
 
 /*----------- defined in video/mrjong.c -----------*/
 
-WRITE8_HANDLER( mrjong_videoram_w );
-WRITE8_HANDLER( mrjong_colorram_w );
-WRITE8_HANDLER( mrjong_flipscreen_w );
 
 PALETTE_INIT( mrjong );
 VIDEO_START( mrjong );

@@ -4,14 +4,13 @@
 
 
 
-WRITE8_HANDLER( playch10_videoram_w )
+WRITE8_MEMBER(playch10_state::playch10_videoram_w)
 {
-	playch10_state *state = space->machine().driver_data<playch10_state>();
-	UINT8 *videoram = state->m_videoram;
-	if (state->m_pc10_sdcs)
+	UINT8 *videoram = m_videoram;
+	if (m_pc10_sdcs)
 	{
 		videoram[offset] = data;
-		state->m_bg_tilemap->mark_tile_dirty(offset / 2);
+		m_bg_tilemap->mark_tile_dirty(offset / 2);
 	}
 }
 

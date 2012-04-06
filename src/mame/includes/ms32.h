@@ -63,6 +63,8 @@ public:
 	DECLARE_READ8_MEMBER(latch_r);
 	DECLARE_WRITE8_MEMBER(ms32_snd_bank_w);
 	DECLARE_WRITE8_MEMBER(to_main_w);
+	DECLARE_WRITE32_MEMBER(ms32_brightness_w);
+	DECLARE_WRITE32_MEMBER(ms32_gfxctrl_w);
 };
 
 
@@ -71,9 +73,7 @@ public:
 //extern UINT32 *ms32_fce00000;
 
 
-WRITE32_HANDLER( ms32_brightness_w );
 
-WRITE32_HANDLER( ms32_gfxctrl_w );
 VIDEO_START( ms32 );
 VIDEO_START( f1superb );
 SCREEN_UPDATE_RGB32( ms32 );

@@ -110,13 +110,12 @@ static const int resistances_normal[6] = {3900, 2000, 1000, 1000/2, 1000/4, 0};
 static const int resistances_sh[6] = {3900, 2000, 1000, 1000/2, 1000/4, 470};
 
 #ifdef UNUSED_CODE
-WRITE16_HANDLER( sys16_paletteram_w )
+WRITE16_MEMBER(segas1x_bootleg_state::sys16_paletteram_w)
 {
-	segas1x_bootleg_state *state = space->machine().driver_data<segas1x_bootleg_state>();
 	UINT16 newword;
 
-	COMBINE_DATA(&state->m_generic_paletteram_16[offset]);
-	newword = state->m_generic_paletteram_16[offset];
+	COMBINE_DATA(&m_generic_paletteram_16[offset]);
+	newword = m_generic_paletteram_16[offset];
 
 	/*  sBGR BBBB GGGG RRRR */
 	/*  x000 4321 4321 4321 */
@@ -139,23 +138,23 @@ WRITE16_HANDLER( sys16_paletteram_w )
 		int b4 = (newword >> 11) & 1;
 
 		/* Normal colors */
-		r = combine_6_weights(state->m_weights[0][0], r0, r1, r2, r3, r4, 0);
-		g = combine_6_weights(state->m_weights[0][1], g0, g1, g2, g3, g4, 0);
-		b = combine_6_weights(state->m_weights[0][2], b0, b1, b2, b3, b4, 0);
+		r = combine_6_weights(m_weights[0][0], r0, r1, r2, r3, r4, 0);
+		g = combine_6_weights(m_weights[0][1], g0, g1, g2, g3, g4, 0);
+		b = combine_6_weights(m_weights[0][2], b0, b1, b2, b3, b4, 0);
 
 		/* Shadow colors */
-		rs = combine_6_weights(state->m_weights[1][0], r0, r1, r2, r3, r4, 0);
-		gs = combine_6_weights(state->m_weights[1][1], g0, g1, g2, g3, g4, 0);
-		bs = combine_6_weights(state->m_weights[1][2], b0, b1, b2, b3, b4, 0);
+		rs = combine_6_weights(m_weights[1][0], r0, r1, r2, r3, r4, 0);
+		gs = combine_6_weights(m_weights[1][1], g0, g1, g2, g3, g4, 0);
+		bs = combine_6_weights(m_weights[1][2], b0, b1, b2, b3, b4, 0);
 
 		/* Highlight colors */
-		//rh = combine_6_weights(state->m_weights[1][0], r0, r1, r2, r3, r4, 1);
-		//gh = combine_6_weights(state->m_weights[1][1], g0, g1, g2, g3, g4, 1);
-		//bh = combine_6_weights(state->m_weights[1][2], b0, b1, b2, b3, b4, 1);
+		//rh = combine_6_weights(m_weights[1][0], r0, r1, r2, r3, r4, 1);
+		//gh = combine_6_weights(m_weights[1][1], g0, g1, g2, g3, g4, 1);
+		//bh = combine_6_weights(m_weights[1][2], b0, b1, b2, b3, b4, 1);
 
-		palette_set_color(space->machine(), offset, MAKE_RGB(r, g, b) );
+		palette_set_color(machine(), offset, MAKE_RGB(r, g, b) );
 
-		palette_set_color(space->machine(), offset + space->machine().total_colors()/2, MAKE_RGB(rs,gs,bs));
+		palette_set_color(machine(), offset + machine().total_colors()/2, MAKE_RGB(rs,gs,bs));
 	}
 }
 #endif
@@ -292,39 +291,38 @@ static TILE_GET_INFO( get_fg2_tile_info )
 			0);
 }
 
-WRITE16_HANDLER( sys16_tileram_w )
+WRITE16_MEMBER(segas1x_bootleg_state::sys16_tileram_w)
 {
-	segas1x_bootleg_state *state = space->machine().driver_data<segas1x_bootleg_state>();
-	UINT16 oldword = state->m_tileram[offset];
+	UINT16 oldword = m_tileram[offset];
 
-	COMBINE_DATA(&state->m_tileram[offset]);
+	COMBINE_DATA(&m_tileram[offset]);
 
-	if (oldword != state->m_tileram[offset])
+	if (oldword != m_tileram[offset])
 	{
 		int page = offset / (64 * 32);
 		offset = offset % (64 * 32);
 
-		if (state->m_bg_page[0] == page) state->m_background->mark_tile_dirty(offset + 64 * 32 * 0);
-		if (state->m_bg_page[1] == page) state->m_background->mark_tile_dirty(offset + 64 * 32 * 1);
-		if (state->m_bg_page[2] == page) state->m_background->mark_tile_dirty(offset + 64 * 32 * 2);
-		if (state->m_bg_page[3] == page) state->m_background->mark_tile_dirty(offset + 64 * 32 * 3);
+		if (m_bg_page[0] == page) m_background->mark_tile_dirty(offset + 64 * 32 * 0);
+		if (m_bg_page[1] == page) m_background->mark_tile_dirty(offset + 64 * 32 * 1);
+		if (m_bg_page[2] == page) m_background->mark_tile_dirty(offset + 64 * 32 * 2);
+		if (m_bg_page[3] == page) m_background->mark_tile_dirty(offset + 64 * 32 * 3);
 
-		if (state->m_fg_page[0] == page) state->m_foreground->mark_tile_dirty(offset + 64 * 32 * 0);
-		if (state->m_fg_page[1] == page) state->m_foreground->mark_tile_dirty(offset + 64 * 32 * 1);
-		if (state->m_fg_page[2] == page) state->m_foreground->mark_tile_dirty(offset + 64 * 32 * 2);
-		if (state->m_fg_page[3] == page) state->m_foreground->mark_tile_dirty(offset + 64 * 32 * 3);
+		if (m_fg_page[0] == page) m_foreground->mark_tile_dirty(offset + 64 * 32 * 0);
+		if (m_fg_page[1] == page) m_foreground->mark_tile_dirty(offset + 64 * 32 * 1);
+		if (m_fg_page[2] == page) m_foreground->mark_tile_dirty(offset + 64 * 32 * 2);
+		if (m_fg_page[3] == page) m_foreground->mark_tile_dirty(offset + 64 * 32 * 3);
 
-		if (state->m_system18)
+		if (m_system18)
 		{
-			if (state->m_bg2_page[0] == page) state->m_background2->mark_tile_dirty(offset + 64 * 32 * 0);
-			if (state->m_bg2_page[1] == page) state->m_background2->mark_tile_dirty(offset + 64 * 32 * 1);
-			if (state->m_bg2_page[2] == page) state->m_background2->mark_tile_dirty(offset + 64 * 32 * 2);
-			if (state->m_bg2_page[3] == page) state->m_background2->mark_tile_dirty(offset + 64 * 32 * 3);
+			if (m_bg2_page[0] == page) m_background2->mark_tile_dirty(offset + 64 * 32 * 0);
+			if (m_bg2_page[1] == page) m_background2->mark_tile_dirty(offset + 64 * 32 * 1);
+			if (m_bg2_page[2] == page) m_background2->mark_tile_dirty(offset + 64 * 32 * 2);
+			if (m_bg2_page[3] == page) m_background2->mark_tile_dirty(offset + 64 * 32 * 3);
 
-			if (state->m_fg2_page[0] == page) state->m_foreground2->mark_tile_dirty(offset + 64 * 32 * 0);
-			if (state->m_fg2_page[1] == page) state->m_foreground2->mark_tile_dirty(offset + 64 * 32 * 1);
-			if (state->m_fg2_page[2] == page) state->m_foreground2->mark_tile_dirty(offset + 64 * 32 * 2);
-			if (state->m_fg2_page[3] == page) state->m_foreground2->mark_tile_dirty(offset + 64 * 32 * 3);
+			if (m_fg2_page[0] == page) m_foreground2->mark_tile_dirty(offset + 64 * 32 * 0);
+			if (m_fg2_page[1] == page) m_foreground2->mark_tile_dirty(offset + 64 * 32 * 1);
+			if (m_fg2_page[2] == page) m_foreground2->mark_tile_dirty(offset + 64 * 32 * 2);
+			if (m_fg2_page[3] == page) m_foreground2->mark_tile_dirty(offset + 64 * 32 * 3);
 		}
 	}
 }
@@ -361,12 +359,11 @@ static TILE_GET_INFO( get_text_tile_info )
 		tileinfo.category = 0;
 }
 
-WRITE16_HANDLER( sys16_textram_w )
+WRITE16_MEMBER(segas1x_bootleg_state::sys16_textram_w)
 {
-	segas1x_bootleg_state *state = space->machine().driver_data<segas1x_bootleg_state>();
 
-	COMBINE_DATA(&state->m_textram[offset]);
-	state->m_text_layer->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_textram[offset]);
+	m_text_layer->mark_tile_dirty(offset);
 }
 
 /***************************************************************************/
@@ -543,36 +540,31 @@ static TILE_GET_INFO( get_s16a_bootleg_tile_info1 )
 			0);
 }
 
-WRITE16_HANDLER( s16a_bootleg_bgscrolly_w )
+WRITE16_MEMBER(segas1x_bootleg_state::s16a_bootleg_bgscrolly_w)
 {
-	segas1x_bootleg_state *state = space->machine().driver_data<segas1x_bootleg_state>();
-	state->m_bg_scrolly = data;
+	m_bg_scrolly = data;
 }
 
-WRITE16_HANDLER( s16a_bootleg_bgscrollx_w )
+WRITE16_MEMBER(segas1x_bootleg_state::s16a_bootleg_bgscrollx_w)
 {
-	segas1x_bootleg_state *state = space->machine().driver_data<segas1x_bootleg_state>();
-	state->m_bg_scrollx = data;
+	m_bg_scrollx = data;
 }
 
-WRITE16_HANDLER( s16a_bootleg_fgscrolly_w )
+WRITE16_MEMBER(segas1x_bootleg_state::s16a_bootleg_fgscrolly_w)
 {
-	segas1x_bootleg_state *state = space->machine().driver_data<segas1x_bootleg_state>();
-	state->m_fg_scrolly = data;
+	m_fg_scrolly = data;
 }
 
-WRITE16_HANDLER( s16a_bootleg_fgscrollx_w )
+WRITE16_MEMBER(segas1x_bootleg_state::s16a_bootleg_fgscrollx_w)
 {
-	segas1x_bootleg_state *state = space->machine().driver_data<segas1x_bootleg_state>();
-	state->m_fg_scrollx = data;
+	m_fg_scrollx = data;
 }
 
-WRITE16_HANDLER( s16a_bootleg_tilemapselect_w )
+WRITE16_MEMBER(segas1x_bootleg_state::s16a_bootleg_tilemapselect_w)
 {
-	segas1x_bootleg_state *state = space->machine().driver_data<segas1x_bootleg_state>();
 
-	COMBINE_DATA(&state->m_tilemapselect);
-	//printf("system16 bootleg tilemapselect %04x\n", state->m_tilemapselect);
+	COMBINE_DATA(&m_tilemapselect);
+	//printf("system16 bootleg tilemapselect %04x\n", m_tilemapselect);
 }
 
 

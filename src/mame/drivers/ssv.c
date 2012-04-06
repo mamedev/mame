@@ -408,11 +408,11 @@ READ16_MEMBER(ssv_state::fake_r){   return ssv_scroll[offset];  }
 #define SSV_MAP( _ROM  )																							\
 	AM_RANGE(0x000000, 0x00ffff) AM_RAM AM_BASE(m_mainram)										/*  RAM     */	\
 	AM_RANGE(0x100000, 0x13ffff) AM_RAM AM_BASE(m_spriteram)										/*  Sprites */	\
-	AM_RANGE(0x140000, 0x15ffff) AM_RAM_WRITE_LEGACY(paletteram16_xrgb_swap_word_w) AM_BASE(m_paletteram)	/*  Palette */	\
+	AM_RANGE(0x140000, 0x15ffff) AM_RAM_WRITE(paletteram16_xrgb_swap_word_w) AM_BASE(m_paletteram)	/*  Palette */	\
 	AM_RANGE(0x160000, 0x17ffff) AM_RAM																/*          */	\
-	AM_RANGE(0x1c0000, 0x1c0001) AM_READ_LEGACY(ssv_vblank_r			)									/*  Vblank? */	\
+	AM_RANGE(0x1c0000, 0x1c0001) AM_READ(ssv_vblank_r			)									/*  Vblank? */	\
 /**/AM_RANGE(0x1c0002, 0x1c007f) AM_READONLY									/*  Scroll  */	\
-	AM_RANGE(0x1c0000, 0x1c007f) AM_WRITE_LEGACY(ssv_scroll_w) AM_BASE(m_scroll)             		/*  Scroll  */  \
+	AM_RANGE(0x1c0000, 0x1c007f) AM_WRITE(ssv_scroll_w) AM_BASE(m_scroll)             		/*  Scroll  */  \
 	AM_RANGE(0x210002, 0x210003) AM_READ_PORT("DSW1")																\
 	AM_RANGE(0x210004, 0x210005) AM_READ_PORT("DSW2")																\
 	AM_RANGE(0x210008, 0x210009) AM_READ_PORT("P1")																	\
@@ -579,7 +579,7 @@ WRITE16_MEMBER(ssv_state::gdfs_blitram_w)
 }
 
 static ADDRESS_MAP_START( gdfs_map, AS_PROGRAM, 16, ssv_state )
-	AM_RANGE(0x400000, 0x41ffff) AM_RAM_WRITE_LEGACY(gdfs_tmapram_w) AM_BASE(m_gdfs_tmapram)
+	AM_RANGE(0x400000, 0x41ffff) AM_RAM_WRITE(gdfs_tmapram_w) AM_BASE(m_gdfs_tmapram)
 	AM_RANGE(0x420000, 0x43ffff) AM_RAM
 	AM_RANGE(0x440000, 0x44003f) AM_RAM AM_BASE(m_gdfs_tmapscroll)
 	AM_RANGE(0x500000, 0x500001) AM_DEVWRITE_LEGACY("eeprom", gdfs_eeprom_w)

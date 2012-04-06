@@ -516,15 +516,15 @@ static int transfer_dword( running_machine &machine, UINT32 dest, UINT32 source 
 	}
 	if( dest>=0xf00000 && dest<0xf02000 )
 	{
-		namcona1_paletteram_w(space, (dest-0xf00000)/2, data, 0xffff );
+		state->namcona1_paletteram_w(*space, (dest-0xf00000)/2, data, 0xffff );
 	}
 	else if( dest>=0xf40000 && dest<0xf80000 )
 	{
-		namcona1_gfxram_w(space, (dest-0xf40000)/2, data, 0xffff );
+		state->namcona1_gfxram_w(*space, (dest-0xf40000)/2, data, 0xffff );
 	}
 	else if( dest>=0xff0000 && dest<0xffc000 )
 	{
-		namcona1_videoram_w(space, (dest-0xff0000)/2, data, 0xffff );
+		state->namcona1_videoram_w(*space, (dest-0xff0000)/2, data, 0xffff );
 	}
 	else if( dest>=0xfff000 && dest<0x1000000 )
 	{
@@ -745,9 +745,9 @@ static ADDRESS_MAP_START( namcona1_main_map, AS_PROGRAM, 16, namcona1_state )
 	AM_RANGE(0xe00000, 0xe00fff) AM_READWRITE(namcona1_nvram_r, namcona1_nvram_w)
 	AM_RANGE(0xe40000, 0xe4000f) AM_READWRITE(custom_key_r, custom_key_w)
 	AM_RANGE(0xefff00, 0xefffff) AM_READWRITE(namcona1_vreg_r, namcona1_vreg_w) AM_BASE(m_vreg)
-	AM_RANGE(0xf00000, 0xf01fff) AM_READWRITE_LEGACY(namcona1_paletteram_r, namcona1_paletteram_w) AM_SHARE("paletteram")
-	AM_RANGE(0xf40000, 0xf7ffff) AM_READWRITE_LEGACY(namcona1_gfxram_r, namcona1_gfxram_w)
-	AM_RANGE(0xff0000, 0xffbfff) AM_READWRITE_LEGACY(namcona1_videoram_r,    namcona1_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0xf00000, 0xf01fff) AM_READWRITE(namcona1_paletteram_r, namcona1_paletteram_w) AM_SHARE("paletteram")
+	AM_RANGE(0xf40000, 0xf7ffff) AM_READWRITE(namcona1_gfxram_r, namcona1_gfxram_w)
+	AM_RANGE(0xff0000, 0xffbfff) AM_READWRITE(namcona1_videoram_r,    namcona1_videoram_w) AM_BASE(m_videoram)
 	AM_RANGE(0xffd000, 0xffdfff) AM_RAM /* unknown */
 	AM_RANGE(0xffe000, 0xffefff) AM_RAM	AM_BASE(m_scroll)		/* scroll registers */
 	AM_RANGE(0xfff000, 0xffffff) AM_RAM	AM_BASE(m_spriteram)			/* spriteram */
@@ -767,9 +767,9 @@ static ADDRESS_MAP_START( namcona2_main_map, AS_PROGRAM, 16, namcona1_state )
 	/* xday: additional battery-backed ram at 00E024FA? */
 	AM_RANGE(0xe40000, 0xe4000f) AM_READWRITE(custom_key_r, custom_key_w)
 	AM_RANGE(0xefff00, 0xefffff) AM_READWRITE(namcona1_vreg_r, namcona1_vreg_w) AM_BASE(m_vreg)
-	AM_RANGE(0xf00000, 0xf01fff) AM_READWRITE_LEGACY(namcona1_paletteram_r, namcona1_paletteram_w) AM_SHARE("paletteram")
-	AM_RANGE(0xf40000, 0xf7ffff) AM_READWRITE_LEGACY(namcona1_gfxram_r, namcona1_gfxram_w)
-	AM_RANGE(0xff0000, 0xffbfff) AM_READWRITE_LEGACY(namcona1_videoram_r,    namcona1_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0xf00000, 0xf01fff) AM_READWRITE(namcona1_paletteram_r, namcona1_paletteram_w) AM_SHARE("paletteram")
+	AM_RANGE(0xf40000, 0xf7ffff) AM_READWRITE(namcona1_gfxram_r, namcona1_gfxram_w)
+	AM_RANGE(0xff0000, 0xffbfff) AM_READWRITE(namcona1_videoram_r,    namcona1_videoram_w) AM_BASE(m_videoram)
 	AM_RANGE(0xffd000, 0xffdfff) AM_RAM /* unknown */
 	AM_RANGE(0xffe000, 0xffefff) AM_RAM	AM_BASE(m_scroll)		/* scroll registers */
 	AM_RANGE(0xfff000, 0xffffff) AM_RAM	AM_BASE(m_spriteram)			/* spriteram */

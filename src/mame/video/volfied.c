@@ -24,28 +24,25 @@ VIDEO_START( volfied )
           READ AND WRITE HANDLERS
 *******************************************************/
 
-READ16_HANDLER( volfied_video_ram_r )
+READ16_MEMBER(volfied_state::volfied_video_ram_r)
 {
-	volfied_state *state = space->machine().driver_data<volfied_state>();
-	return state->m_video_ram[offset];
+	return m_video_ram[offset];
 }
 
-WRITE16_HANDLER( volfied_video_ram_w )
+WRITE16_MEMBER(volfied_state::volfied_video_ram_w)
 {
-	volfied_state *state = space->machine().driver_data<volfied_state>();
 
-	mem_mask &= state->m_video_mask;
+	mem_mask &= m_video_mask;
 
-	COMBINE_DATA(&state->m_video_ram[offset]);
+	COMBINE_DATA(&m_video_ram[offset]);
 }
 
-WRITE16_HANDLER( volfied_video_ctrl_w )
+WRITE16_MEMBER(volfied_state::volfied_video_ctrl_w)
 {
-	volfied_state *state = space->machine().driver_data<volfied_state>();
-	COMBINE_DATA(&state->m_video_ctrl);
+	COMBINE_DATA(&m_video_ctrl);
 }
 
-READ16_HANDLER( volfied_video_ctrl_r )
+READ16_MEMBER(volfied_state::volfied_video_ctrl_r)
 {
 	/* Could this be some kind of hardware collision detection? If bit 6 is
        set the game will check for collisions with the large enemy, whereas
@@ -56,16 +53,14 @@ READ16_HANDLER( volfied_video_ctrl_r )
 	return 0x60;
 }
 
-WRITE16_HANDLER( volfied_video_mask_w )
+WRITE16_MEMBER(volfied_state::volfied_video_mask_w)
 {
-	volfied_state *state = space->machine().driver_data<volfied_state>();
-	COMBINE_DATA(&state->m_video_mask);
+	COMBINE_DATA(&m_video_mask);
 }
 
-WRITE16_HANDLER( volfied_sprite_ctrl_w )
+WRITE16_MEMBER(volfied_state::volfied_sprite_ctrl_w)
 {
-	volfied_state *state = space->machine().driver_data<volfied_state>();
-	pc090oj_set_sprite_ctrl(state->m_pc090oj, (data & 0x3c) >> 2);
+	pc090oj_set_sprite_ctrl(m_pc090oj, (data & 0x3c) >> 2);
 }
 
 

@@ -36,6 +36,8 @@ public:
 	DECLARE_READ16_MEMBER(ultennis_hack_r);
 	DECLARE_WRITE16_MEMBER(protection_bit_w);
 	DECLARE_READ16_MEMBER(unk_r);
+	DECLARE_READ16_MEMBER(artmagic_blitter_r);
+	DECLARE_WRITE16_MEMBER(artmagic_blitter_w);
 };
 
 
@@ -46,7 +48,5 @@ VIDEO_START( artmagic );
 void artmagic_to_shiftreg(address_space *space, offs_t address, UINT16 *data);
 void artmagic_from_shiftreg(address_space *space, offs_t address, UINT16 *data);
 
-READ16_HANDLER( artmagic_blitter_r );
-WRITE16_HANDLER( artmagic_blitter_w );
 
 void artmagic_scanline(screen_device &screen, bitmap_rgb32 &bitmap, int scanline, const tms34010_display_params *params);

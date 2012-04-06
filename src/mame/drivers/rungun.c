@@ -197,9 +197,9 @@ static ADDRESS_MAP_START( rungun_map, AS_PROGRAM, 16, rungun_state )
 	AM_RANGE(0x601000, 0x601fff) AM_RAM											// communication? second monitor buffer?
 	AM_RANGE(0x640000, 0x640007) AM_DEVWRITE_LEGACY("k055673", k053246_word_w)						// '246A registers
 	AM_RANGE(0x680000, 0x68001f) AM_DEVWRITE_LEGACY("k053936", k053936_ctrl_w)			// '936 registers
-	AM_RANGE(0x6c0000, 0x6cffff) AM_RAM_WRITE_LEGACY(rng_936_videoram_w) AM_BASE(m_936_videoram)	// PSAC2 ('936) RAM (34v + 35v)
+	AM_RANGE(0x6c0000, 0x6cffff) AM_RAM_WRITE(rng_936_videoram_w) AM_BASE(m_936_videoram)	// PSAC2 ('936) RAM (34v + 35v)
 	AM_RANGE(0x700000, 0x7007ff) AM_DEVREADWRITE_LEGACY("k053936", k053936_linectrl_r, k053936_linectrl_w)			// PSAC "Line RAM"
-	AM_RANGE(0x740000, 0x741fff) AM_READWRITE_LEGACY(rng_ttl_ram_r, rng_ttl_ram_w)		// text plane RAM
+	AM_RANGE(0x740000, 0x741fff) AM_READWRITE(rng_ttl_ram_r, rng_ttl_ram_w)		// text plane RAM
 	AM_RANGE(0x7c0000, 0x7c0001) AM_WRITENOP									// watchdog
 #if RNG_DEBUG
 	AM_RANGE(0x5c0010, 0x5c001f) AM_DEVREAD_LEGACY("k055673", k053247_reg_word_r)

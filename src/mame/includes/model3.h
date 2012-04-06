@@ -103,6 +103,19 @@ public:
 	cached_texture *m_texcache[2][1024/32][2048/32];
 
 	required_device<cpu_device> m_maincpu;
+	DECLARE_READ32_MEMBER(rtc72421_r);
+	DECLARE_WRITE32_MEMBER(rtc72421_w);
+	DECLARE_READ64_MEMBER(model3_char_r);
+	DECLARE_WRITE64_MEMBER(model3_char_w);
+	DECLARE_READ64_MEMBER(model3_tile_r);
+	DECLARE_WRITE64_MEMBER(model3_tile_w);
+	DECLARE_READ64_MEMBER(model3_vid_reg_r);
+	DECLARE_WRITE64_MEMBER(model3_vid_reg_w);
+	DECLARE_WRITE64_MEMBER(model3_palette_w);
+	DECLARE_READ64_MEMBER(model3_palette_r);
+	DECLARE_WRITE64_MEMBER(real3d_display_list_w);
+	DECLARE_WRITE64_MEMBER(real3d_polygon_ram_w);
+	DECLARE_WRITE64_MEMBER(real3d_cmd_w);
 };
 
 
@@ -117,27 +130,14 @@ void model3_machine_init(running_machine &machine, int step);
 int model3_tap_read(running_machine &machine);
 void model3_tap_write(running_machine &machine, int tck, int tms, int tdi, int trst);
 void model3_tap_reset(running_machine &machine);
-READ32_HANDLER(rtc72421_r);
-WRITE32_HANDLER(rtc72421_w);
 
 
 /*----------- defined in video/model3.c -----------*/
 
-READ64_HANDLER(model3_char_r);
-WRITE64_HANDLER(model3_char_w);
-READ64_HANDLER(model3_tile_r);
-WRITE64_HANDLER(model3_tile_w);
-READ64_HANDLER(model3_vid_reg_r);
-WRITE64_HANDLER(model3_vid_reg_w);
-READ64_HANDLER(model3_palette_r);
-WRITE64_HANDLER(model3_palette_w);
 
 VIDEO_START(model3);
 SCREEN_UPDATE_IND16(model3);
 
-WRITE64_HANDLER(real3d_cmd_w);
-WRITE64_HANDLER(real3d_display_list_w);
-WRITE64_HANDLER(real3d_polygon_ram_w);
 void real3d_display_list_end(running_machine &machine);
 void real3d_display_list1_dma(address_space *space, UINT32 src, UINT32 dst, int length, int byteswap);
 void real3d_display_list2_dma(address_space *space, UINT32 src, UINT32 dst, int length, int byteswap);

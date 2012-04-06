@@ -26,18 +26,16 @@
  *
  *************************************/
 
-WRITE16_HANDLER( midyunit_cmos_w )
+WRITE16_MEMBER(midyunit_state::midyunit_cmos_w)
 {
-	midyunit_state *state = space->machine().driver_data<midyunit_state>();
-	logerror("%08x:CMOS Write @ %05X\n", cpu_get_pc(&space->device()), offset);
-	COMBINE_DATA(&state->m_cmos_ram[offset + state->m_cmos_page]);
+	logerror("%08x:CMOS Write @ %05X\n", cpu_get_pc(&space.device()), offset);
+	COMBINE_DATA(&m_cmos_ram[offset + m_cmos_page]);
 }
 
 
-READ16_HANDLER( midyunit_cmos_r )
+READ16_MEMBER(midyunit_state::midyunit_cmos_r)
 {
-	midyunit_state *state = space->machine().driver_data<midyunit_state>();
-	return state->m_cmos_ram[offset + state->m_cmos_page];
+	return m_cmos_ram[offset + m_cmos_page];
 }
 
 
@@ -48,31 +46,30 @@ READ16_HANDLER( midyunit_cmos_r )
  *
  *************************************/
 
-WRITE16_HANDLER( midyunit_cmos_enable_w )
+WRITE16_MEMBER(midyunit_state::midyunit_cmos_enable_w)
 {
-	midyunit_state *state = space->machine().driver_data<midyunit_state>();
-	state->m_cmos_w_enable = (~data >> 9) & 1;
+	m_cmos_w_enable = (~data >> 9) & 1;
 
-	logerror("%08x:Protection write = %04X\n", cpu_get_pc(&space->device()), data);
+	logerror("%08x:Protection write = %04X\n", cpu_get_pc(&space.device()), data);
 
 	/* only go down this path if we have a data structure */
-	if (state->m_prot_data)
+	if (m_prot_data)
 	{
 		/* mask off the data */
 		data &= 0x0f00;
 
 		/* update the FIFO */
-		state->m_prot_sequence[0] = state->m_prot_sequence[1];
-		state->m_prot_sequence[1] = state->m_prot_sequence[2];
-		state->m_prot_sequence[2] = data;
+		m_prot_sequence[0] = m_prot_sequence[1];
+		m_prot_sequence[1] = m_prot_sequence[2];
+		m_prot_sequence[2] = data;
 
 		/* special case: sequence entry 1234 means Strike Force, which is different */
-		if (state->m_prot_data->reset_sequence[0] == 0x1234)
+		if (m_prot_data->reset_sequence[0] == 0x1234)
 		{
 			if (data == 0x500)
 			{
-				state->m_prot_result = space->read_word(TOBYTE(0x10a4390)) << 4;
-				logerror("  desired result = %04X\n", state->m_prot_result);
+				m_prot_result = space.read_word(TOBYTE(0x10a4390)) << 4;
+				logerror("  desired result = %04X\n", m_prot_result);
 			}
 		}
 
@@ -80,31 +77,30 @@ WRITE16_HANDLER( midyunit_cmos_enable_w )
 		else
 		{
 			/* look for a reset */
-			if (state->m_prot_sequence[0] == state->m_prot_data->reset_sequence[0] &&
-				state->m_prot_sequence[1] == state->m_prot_data->reset_sequence[1] &&
-				state->m_prot_sequence[2] == state->m_prot_data->reset_sequence[2])
+			if (m_prot_sequence[0] == m_prot_data->reset_sequence[0] &&
+				m_prot_sequence[1] == m_prot_data->reset_sequence[1] &&
+				m_prot_sequence[2] == m_prot_data->reset_sequence[2])
 			{
 				logerror("Protection reset\n");
-				state->m_prot_index = 0;
+				m_prot_index = 0;
 			}
 
 			/* look for a clock */
-			if ((state->m_prot_sequence[1] & 0x0800) != 0 && (state->m_prot_sequence[2] & 0x0800) == 0)
+			if ((m_prot_sequence[1] & 0x0800) != 0 && (m_prot_sequence[2] & 0x0800) == 0)
 			{
-				state->m_prot_result = state->m_prot_data->data_sequence[state->m_prot_index++];
-				logerror("Protection clock (new data = %04X)\n", state->m_prot_result);
+				m_prot_result = m_prot_data->data_sequence[m_prot_index++];
+				logerror("Protection clock (new data = %04X)\n", m_prot_result);
 			}
 		}
 	}
 }
 
 
-READ16_HANDLER( midyunit_protection_r )
+READ16_MEMBER(midyunit_state::midyunit_protection_r)
 {
-	midyunit_state *state = space->machine().driver_data<midyunit_state>();
 	/* return the most recently clocked value */
-	logerror("%08X:Protection read = %04X\n", cpu_get_pc(&space->device()), state->m_prot_result);
-	return state->m_prot_result;
+	logerror("%08X:Protection read = %04X\n", cpu_get_pc(&space.device()), m_prot_result);
+	return m_prot_result;
 }
 
 
@@ -115,11 +111,11 @@ READ16_HANDLER( midyunit_protection_r )
  *
  *************************************/
 
-READ16_HANDLER( midyunit_input_r )
+READ16_MEMBER(midyunit_state::midyunit_input_r)
 {
 	static const char *const portnames[] = { "IN0", "IN1", "IN2", "DSW", "UNK0", "UNK1" };
 
-	return input_port_read(space->machine(), portnames[offset]);
+	return input_port_read(machine(), portnames[offset]);
 }
 
 
@@ -130,27 +126,25 @@ READ16_HANDLER( midyunit_input_r )
  *
  *************************************/
 
-static READ16_HANDLER( term2_input_r )
+READ16_MEMBER(midyunit_state::term2_input_r)
 {
-	midyunit_state *state = space->machine().driver_data<midyunit_state>();
 	static const char *const portnames[] = { "IN0", "IN1", NULL, "DSW", "UNK0", "UNK1" };
 
 	if (offset != 2)
-		return input_port_read(space->machine(), portnames[offset]);
+		return input_port_read(machine(), portnames[offset]);
 
-	switch (state->m_term2_analog_select)
+	switch (m_term2_analog_select)
 	{
 		default:
-		case 0:  return input_port_read(space->machine(), "STICK0_X");
-		case 1:  return input_port_read(space->machine(), "STICK0_Y");
-		case 2:  return input_port_read(space->machine(), "STICK1_X");
-		case 3:  return input_port_read(space->machine(), "STICK1_Y");
+		case 0:  return input_port_read(machine(), "STICK0_X");
+		case 1:  return input_port_read(machine(), "STICK0_Y");
+		case 2:  return input_port_read(machine(), "STICK1_X");
+		case 3:  return input_port_read(machine(), "STICK1_Y");
 	}
 }
 
-static WRITE16_HANDLER( term2_sound_w )
+WRITE16_MEMBER(midyunit_state::term2_sound_w)
 {
-	midyunit_state *state = space->machine().driver_data<midyunit_state>();
 	/* Flash Lamp Output Data */
 	if  ( ((data & 0x800) != 0x800) && ((data & 0x400) == 0x400 ) )
 	{
@@ -176,10 +170,10 @@ static WRITE16_HANDLER( term2_sound_w )
 	}
 
 	if (offset == 0)
-		state->m_term2_analog_select = (data >> 12) & 3;
+		m_term2_analog_select = (data >> 12) & 3;
 
-	williams_adpcm_reset_w(space->machine(), (~data & 0x100) >> 1);
-	williams_adpcm_data_w(space->machine(), data);
+	williams_adpcm_reset_w(machine(), (~data & 0x100) >> 1);
+	williams_adpcm_data_w(machine(), data);
 }
 
 
@@ -190,48 +184,44 @@ static WRITE16_HANDLER( term2_sound_w )
  *
  *************************************/
 
-static WRITE16_HANDLER( term2_hack_w )
+WRITE16_MEMBER(midyunit_state::term2_hack_w)
 {
-	midyunit_state *state = space->machine().driver_data<midyunit_state>();
-	if (offset == 1 && cpu_get_pc(&space->device()) == 0xffce6520)
+	if (offset == 1 && cpu_get_pc(&space.device()) == 0xffce6520)
 	{
-		state->m_t2_hack_mem[offset] = 0;
+		m_t2_hack_mem[offset] = 0;
 		return;
 	}
-	COMBINE_DATA(&state->m_t2_hack_mem[offset]);
+	COMBINE_DATA(&m_t2_hack_mem[offset]);
 }
 
-static WRITE16_HANDLER( term2la3_hack_w )
+WRITE16_MEMBER(midyunit_state::term2la3_hack_w)
 {
-	midyunit_state *state = space->machine().driver_data<midyunit_state>();
-	if (offset == 0 && cpu_get_pc(&space->device()) == 0xffce5230)
+	if (offset == 0 && cpu_get_pc(&space.device()) == 0xffce5230)
 	{
-		state->m_t2_hack_mem[offset] = 0;
+		m_t2_hack_mem[offset] = 0;
 		return;
 	}
-	COMBINE_DATA(&state->m_t2_hack_mem[offset]);
+	COMBINE_DATA(&m_t2_hack_mem[offset]);
 }
 
-static WRITE16_HANDLER( term2la2_hack_w )
+WRITE16_MEMBER(midyunit_state::term2la2_hack_w)
 {
-	midyunit_state *state = space->machine().driver_data<midyunit_state>();
-	if (offset == 0 && cpu_get_pc(&space->device()) == 0xffce4b80)
+	if (offset == 0 && cpu_get_pc(&space.device()) == 0xffce4b80)
 	{
-		state->m_t2_hack_mem[offset] = 0;
+		m_t2_hack_mem[offset] = 0;
 		return;
 	}
-	COMBINE_DATA(&state->m_t2_hack_mem[offset]);
+	COMBINE_DATA(&m_t2_hack_mem[offset]);
 }
 
-static WRITE16_HANDLER( term2la1_hack_w )
+WRITE16_MEMBER(midyunit_state::term2la1_hack_w)
 {
-	midyunit_state *state = space->machine().driver_data<midyunit_state>();
-	if (offset == 0 && cpu_get_pc(&space->device()) == 0xffce33f0)
+	if (offset == 0 && cpu_get_pc(&space.device()) == 0xffce33f0)
 	{
-		state->m_t2_hack_mem[offset] = 0;
+		m_t2_hack_mem[offset] = 0;
 		return;
 	}
-	COMBINE_DATA(&state->m_t2_hack_mem[offset]);
+	COMBINE_DATA(&m_t2_hack_mem[offset]);
 }
 
 
@@ -242,14 +232,13 @@ static WRITE16_HANDLER( term2la1_hack_w )
  *
  *************************************/
 
-static WRITE8_HANDLER( cvsd_protection_w )
+WRITE8_MEMBER(midyunit_state::cvsd_protection_w)
 {
-	midyunit_state *state = space->machine().driver_data<midyunit_state>();
 	/* because the entire CVSD ROM is banked, we have to make sure that writes */
 	/* go to the proper location (i.e., bank 0); currently bank 0 always lives */
-	/* in the 0x10000-0x17fff space, so we just need to add 0x8000 to get the  */
+	/* in the 0x10000-0x17fff &space, so we just need to add 0x8000 to get the  */
 	/* proper offset */
-	state->m_cvsd_protection_base[offset] = data;
+	m_cvsd_protection_base[offset] = data;
 }
 
 
@@ -310,7 +299,7 @@ static void init_generic(running_machine &machine, int bpp, int sound, int prot_
 	{
 		case SOUND_CVSD_SMALL:
 			williams_cvsd_init(machine);
-			machine.device("cvsdcpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(prot_start, prot_end, FUNC(cvsd_protection_w));
+			machine.device("cvsdcpu")->memory().space(AS_PROGRAM)->install_write_handler(prot_start, prot_end, write8_delegate(FUNC(midyunit_state::cvsd_protection_w),state));
 			state->m_cvsd_protection_base = machine.region("cvsdcpu")->base() + 0x10000 + (prot_start - 0x8000);
 			break;
 
@@ -489,24 +478,25 @@ DRIVER_INIT( mkyawdim )
  *
  *************************************/
 
-static READ16_HANDLER( mkturbo_prot_r )
+READ16_MEMBER(midyunit_state::mkturbo_prot_r)
 {
-	/* the security GAL overlays a counter of some sort at 0xfffff400 in ROM space.
+	/* the security GAL overlays a counter of some sort at 0xfffff400 in ROM &space.
      * A startup protection check expects to read back two different values in succession */
-	return space->machine().rand();
+	return machine().rand();
 }
 
 DRIVER_INIT( mkyturbo )
 {
 	/* protection */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xfffff400, 0xfffff40f, FUNC(mkturbo_prot_r));
+	midyunit_state *state = machine.driver_data<midyunit_state>();
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xfffff400, 0xfffff40f, read16_delegate(FUNC(midyunit_state::mkturbo_prot_r),state));
 
 	DRIVER_INIT_CALL(mkyunit);
 }
 
 /********************** Terminator 2 **********************/
 
-static void term2_init_common(running_machine &machine, write16_space_func hack_w, const char *name)
+static void term2_init_common(running_machine &machine, write16_delegate hack_w)
 {
 	midyunit_state *state = machine.driver_data<midyunit_state>();
 	/* protection */
@@ -520,19 +510,19 @@ static void term2_init_common(running_machine &machine, write16_space_func hack_
 	/* common init */
 	init_generic(machine, 6, SOUND_ADPCM, 0xfa8d, 0xfa9c);
 
-	/* special inputs */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x01c00000, 0x01c0005f, FUNC(term2_input_r));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x01e00000, 0x01e0001f, FUNC(term2_sound_w));
+	/* special inputs */	
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x01c00000, 0x01c0005f, read16_delegate(FUNC(midyunit_state::term2_input_r),state));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x01e00000, 0x01e0001f, write16_delegate(FUNC(midyunit_state::term2_sound_w),state));
 
 	/* HACK: this prevents the freeze on the movies */
 	/* until we figure whats causing it, this is better than nothing */
-	state->m_t2_hack_mem = machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x010aa0e0, 0x010aa0ff, hack_w, name);
+	state->m_t2_hack_mem = machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x010aa0e0, 0x010aa0ff, hack_w);
 }
 
-DRIVER_INIT( term2 ) { term2_init_common(machine, FUNC(term2_hack_w)); }
-DRIVER_INIT( term2la3 ) { term2_init_common(machine, FUNC(term2la3_hack_w)); }
-DRIVER_INIT( term2la2 ) { term2_init_common(machine, FUNC(term2la2_hack_w)); }
-DRIVER_INIT( term2la1 ) { term2_init_common(machine, FUNC(term2la1_hack_w)); }
+DRIVER_INIT( term2 )    { midyunit_state *state = machine.driver_data<midyunit_state>();term2_init_common(machine, write16_delegate(FUNC(midyunit_state::term2_hack_w),state)); }
+DRIVER_INIT( term2la3 ) { midyunit_state *state = machine.driver_data<midyunit_state>();term2_init_common(machine, write16_delegate(FUNC(midyunit_state::term2la3_hack_w),state)); }
+DRIVER_INIT( term2la2 ) { midyunit_state *state = machine.driver_data<midyunit_state>();term2_init_common(machine, write16_delegate(FUNC(midyunit_state::term2la2_hack_w),state)); }
+DRIVER_INIT( term2la1 ) { midyunit_state *state = machine.driver_data<midyunit_state>();term2_init_common(machine, write16_delegate(FUNC(midyunit_state::term2la1_hack_w),state)); }
 
 
 
@@ -597,38 +587,37 @@ MACHINE_RESET( midyunit )
  *
  *************************************/
 
-WRITE16_HANDLER( midyunit_sound_w )
+WRITE16_MEMBER(midyunit_state::midyunit_sound_w)
 {
-	midyunit_state *state = space->machine().driver_data<midyunit_state>();
 	/* check for out-of-bounds accesses */
 	if (offset)
 	{
-		logerror("%08X:Unexpected write to sound (hi) = %04X\n", cpu_get_pc(&space->device()), data);
+		logerror("%08X:Unexpected write to sound (hi) = %04X\n", cpu_get_pc(&space.device()), data);
 		return;
 	}
 
 	/* call through based on the sound type */
 	if (ACCESSING_BITS_0_7 && ACCESSING_BITS_8_15)
-		switch (state->m_chip_type)
+		switch (m_chip_type)
 		{
 			case SOUND_NARC:
-				williams_narc_data_w(space->machine(), data);
+				williams_narc_data_w(machine(), data);
 				break;
 
 			case SOUND_CVSD_SMALL:
 			case SOUND_CVSD:
-				williams_cvsd_reset_w(space->machine(), (~data & 0x100) >> 8);
-				williams_cvsd_data_w(space->machine(), (data & 0xff) | ((data & 0x200) >> 1));
+				williams_cvsd_reset_w(machine(), (~data & 0x100) >> 8);
+				williams_cvsd_data_w(machine(), (data & 0xff) | ((data & 0x200) >> 1));
 				break;
 
 			case SOUND_ADPCM:
-				williams_adpcm_reset_w(space->machine(), (~data & 0x100) >> 8);
-				williams_adpcm_data_w(space->machine(), data);
+				williams_adpcm_reset_w(machine(), (~data & 0x100) >> 8);
+				williams_adpcm_data_w(machine(), data);
 				break;
 
 			case SOUND_YAWDIM:
-				state->soundlatch_w(*space, 0, data);
-				cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+				soundlatch_w(space, 0, data);
+				cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 				break;
 		}
 }

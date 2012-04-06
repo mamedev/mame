@@ -27,18 +27,18 @@ public:
 	DECLARE_WRITE16_MEMBER(shadfrce_irq_ack_w);
 	DECLARE_WRITE16_MEMBER(shadfrce_irq_w);
 	DECLARE_WRITE16_MEMBER(shadfrce_scanline_w);
+	DECLARE_WRITE16_MEMBER(shadfrce_fgvideoram_w);
+	DECLARE_WRITE16_MEMBER(shadfrce_bg0videoram_w);
+	DECLARE_WRITE16_MEMBER(shadfrce_bg1videoram_w);
+	DECLARE_WRITE16_MEMBER(shadfrce_bg0scrollx_w);
+	DECLARE_WRITE16_MEMBER(shadfrce_bg0scrolly_w);
+	DECLARE_WRITE16_MEMBER(shadfrce_bg1scrollx_w);
+	DECLARE_WRITE16_MEMBER(shadfrce_bg1scrolly_w);
 };
 
 
 /*----------- defined in video/shadfrce.c -----------*/
 
-WRITE16_HANDLER ( shadfrce_bg0scrollx_w );
-WRITE16_HANDLER ( shadfrce_bg1scrollx_w );
-WRITE16_HANDLER ( shadfrce_bg0scrolly_w );
-WRITE16_HANDLER ( shadfrce_bg1scrolly_w );
 VIDEO_START( shadfrce );
 SCREEN_VBLANK(shadfrce);
 SCREEN_UPDATE_IND16( shadfrce );
-WRITE16_HANDLER( shadfrce_fgvideoram_w );
-WRITE16_HANDLER( shadfrce_bg0videoram_w );
-WRITE16_HANDLER( shadfrce_bg1videoram_w );

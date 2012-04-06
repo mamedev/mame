@@ -34,15 +34,15 @@ public:
 	device_t *m_maincpu;
 	device_t *m_audiocpu;
 	DECLARE_WRITE16_MEMBER(ddragon3_io_w);
+	DECLARE_WRITE16_MEMBER(ddragon3_scroll_w);
+	DECLARE_READ16_MEMBER(ddragon3_scroll_r);
+	DECLARE_WRITE16_MEMBER(ddragon3_bg_videoram_w);
+	DECLARE_WRITE16_MEMBER(ddragon3_fg_videoram_w);
 };
 
 
 /*----------- defined in video/ddragon3.c -----------*/
 
-extern WRITE16_HANDLER( ddragon3_bg_videoram_w );
-extern WRITE16_HANDLER( ddragon3_fg_videoram_w );
-extern WRITE16_HANDLER( ddragon3_scroll_w );
-extern READ16_HANDLER( ddragon3_scroll_r );
 
 extern VIDEO_START( ddragon3 );
 extern SCREEN_UPDATE_IND16( ddragon3 );

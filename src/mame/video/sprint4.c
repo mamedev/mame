@@ -149,10 +149,9 @@ SCREEN_VBLANK( sprint4 )
 }
 
 
-WRITE8_HANDLER( sprint4_video_ram_w )
+WRITE8_MEMBER(sprint4_state::sprint4_video_ram_w)
 {
-	sprint4_state *state = space->machine().driver_data<sprint4_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = m_videoram;
 	videoram[offset] = data;
-	state->m_playfield->mark_tile_dirty(offset);
+	m_playfield->mark_tile_dirty(offset);
 }

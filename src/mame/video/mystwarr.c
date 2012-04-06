@@ -393,19 +393,17 @@ SCREEN_UPDATE_RGB32(martchmp)
 
 
 
-WRITE16_HANDLER(ddd_053936_enable_w)
+WRITE16_MEMBER(mystwarr_state::ddd_053936_enable_w)
 {
-	mystwarr_state *state = space->machine().driver_data<mystwarr_state>();
 	if (ACCESSING_BITS_8_15)
 	{
-		state->m_roz_enable = data & 0x0100;
-		state->m_roz_rombank = (data & 0xc000)>>14;
+		m_roz_enable = data & 0x0100;
+		m_roz_rombank = (data & 0xc000)>>14;
 	}
 }
 
-WRITE16_HANDLER(ddd_053936_clip_w)
+WRITE16_MEMBER(mystwarr_state::ddd_053936_clip_w)
 {
-	mystwarr_state *state = space->machine().driver_data<mystwarr_state>();
 	int old, clip_x, clip_y, size_x, size_y;
 	int minx, maxx, miny, maxy;
 
@@ -415,14 +413,14 @@ WRITE16_HANDLER(ddd_053936_clip_w)
 	}
 	else
 	{
-		old = state->m_clip;
-		COMBINE_DATA(&state->m_clip);
-		if (state->m_clip != old)
+		old = m_clip;
+		COMBINE_DATA(&m_clip);
+		if (m_clip != old)
 		{
-			clip_x = (state->m_clip & 0x003f) >> 0;
-			clip_y = (state->m_clip & 0x0fc0) >> 6;
-			size_x = (state->m_clip & 0x3000) >> 12;
-			size_y = (state->m_clip & 0xc000) >> 14;
+			clip_x = (m_clip & 0x003f) >> 0;
+			clip_y = (m_clip & 0x0fc0) >> 6;
+			size_x = (m_clip & 0x3000) >> 12;
+			size_y = (m_clip & 0xc000) >> 14;
 
 			switch (size_x)
 			{
@@ -449,10 +447,10 @@ WRITE16_HANDLER(ddd_053936_clip_w)
 }
 
 // reference: 223e5c in gaiapolis (ROMs 34j and 36m)
-READ16_HANDLER(gai_053936_tilerom_0_r)
+READ16_MEMBER(mystwarr_state::gai_053936_tilerom_0_r)
 {
-	UINT8 *ROM1 = (UINT8 *)space->machine().region("gfx4")->base();
-	UINT8 *ROM2 = (UINT8 *)space->machine().region("gfx4")->base();
+	UINT8 *ROM1 = (UINT8 *)machine().region("gfx4")->base();
+	UINT8 *ROM2 = (UINT8 *)machine().region("gfx4")->base();
 
 	ROM1 += 0x20000;
 	ROM2 += 0x20000+0x40000;
@@ -460,10 +458,10 @@ READ16_HANDLER(gai_053936_tilerom_0_r)
 	return ((ROM1[offset]<<8) | ROM2[offset]);
 }
 
-READ16_HANDLER(ddd_053936_tilerom_0_r)
+READ16_MEMBER(mystwarr_state::ddd_053936_tilerom_0_r)
 {
-	UINT8 *ROM1 = (UINT8 *)space->machine().region("gfx4")->base();
-	UINT8 *ROM2 = (UINT8 *)space->machine().region("gfx4")->base();
+	UINT8 *ROM1 = (UINT8 *)machine().region("gfx4")->base();
+	UINT8 *ROM2 = (UINT8 *)machine().region("gfx4")->base();
 
 	ROM2 += 0x40000;
 
@@ -471,30 +469,28 @@ READ16_HANDLER(ddd_053936_tilerom_0_r)
 }
 
 // reference: 223e1a in gaiapolis (ROM 36j)
-READ16_HANDLER(ddd_053936_tilerom_1_r)
+READ16_MEMBER(mystwarr_state::ddd_053936_tilerom_1_r)
 {
-	UINT8 *ROM = (UINT8 *)space->machine().region("gfx4")->base();
+	UINT8 *ROM = (UINT8 *)machine().region("gfx4")->base();
 
 	return ROM[offset/2];
 }
 
 // reference: 223db0 in gaiapolis (ROMs 32n, 29n, 26n)
-READ16_HANDLER(gai_053936_tilerom_2_r)
+READ16_MEMBER(mystwarr_state::gai_053936_tilerom_2_r)
 {
-	mystwarr_state *state = space->machine().driver_data<mystwarr_state>();
-	UINT8 *ROM = (UINT8 *)space->machine().region("gfx3")->base();
+	UINT8 *ROM = (UINT8 *)machine().region("gfx3")->base();
 
-	offset += (state->m_roz_rombank * 0x100000);
+	offset += (m_roz_rombank * 0x100000);
 
 	return ROM[offset/2]<<8;
 }
 
-READ16_HANDLER(ddd_053936_tilerom_2_r)
+READ16_MEMBER(mystwarr_state::ddd_053936_tilerom_2_r)
 {
-	mystwarr_state *state = space->machine().driver_data<mystwarr_state>();
-	UINT8 *ROM = (UINT8 *)space->machine().region("gfx3")->base();
+	UINT8 *ROM = (UINT8 *)machine().region("gfx3")->base();
 
-	offset += (state->m_roz_rombank * 0x100000);
+	offset += (m_roz_rombank * 0x100000);
 
 	return ROM[offset]<<8;
 }

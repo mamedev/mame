@@ -38,15 +38,15 @@ public:
 	DECLARE_WRITE8_MEMBER(circusc_coin_counter_w);
 	DECLARE_WRITE8_MEMBER(circusc_sound_w);
 	DECLARE_WRITE8_MEMBER(irq_mask_w);
+	DECLARE_WRITE8_MEMBER(circusc_videoram_w);
+	DECLARE_WRITE8_MEMBER(circusc_colorram_w);
+	DECLARE_WRITE8_MEMBER(circusc_flipscreen_w);
 };
 
 
 /*----------- defined in video/circusc.c -----------*/
 
-WRITE8_HANDLER( circusc_videoram_w );
-WRITE8_HANDLER( circusc_colorram_w );
 
 VIDEO_START( circusc );
-WRITE8_HANDLER( circusc_flipscreen_w );
 PALETTE_INIT( circusc );
 SCREEN_UPDATE_IND16( circusc );

@@ -90,13 +90,13 @@ public:
 	DECLARE_WRITE16_MEMBER(jpmioawp_w);
 	DECLARE_READ16_MEMBER(ump_r);
 	void jpm_draw_lamps(int data, int lamp_strobe);
+	DECLARE_WRITE16_MEMBER(jpmimpct_bt477_w);
+	DECLARE_READ16_MEMBER(jpmimpct_bt477_r);
 };
 
 
 /*----------- defined in video/jpmimpct.c -----------*/
 
-READ16_HANDLER( jpmimpct_bt477_r );
-WRITE16_HANDLER( jpmimpct_bt477_w );
 
 void jpmimpct_to_shiftreg(address_space *space, UINT32 address, UINT16 *shiftreg);
 void jpmimpct_from_shiftreg(address_space *space, UINT32 address, UINT16 *shiftreg);

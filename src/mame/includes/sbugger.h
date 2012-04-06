@@ -8,6 +8,8 @@ public:
 	UINT8 *m_videoram_attr;
 
 	tilemap_t *m_tilemap;
+	DECLARE_WRITE8_MEMBER(sbugger_videoram_w);
+	DECLARE_WRITE8_MEMBER(sbugger_videoram_attr_w);
 };
 
 
@@ -16,5 +18,3 @@ public:
 PALETTE_INIT(sbugger);
 SCREEN_UPDATE_IND16(sbugger);
 VIDEO_START(sbugger);
-WRITE8_HANDLER( sbugger_videoram_attr_w );
-WRITE8_HANDLER( sbugger_videoram_w );

@@ -48,22 +48,22 @@ public:
 	DECLARE_READ8_MEMBER(prot_io_r);
 	DECLARE_WRITE8_MEMBER(prot_io_w);
 	DECLARE_READ16_MEMBER(bcstory_1a0_read);
+	DECLARE_WRITE16_MEMBER(bcstory_tilebank_w);
+	DECLARE_WRITE16_MEMBER(chokchok_tilebank_w);
+	DECLARE_WRITE16_MEMBER(wlstar_tilebank_w);
+	DECLARE_WRITE16_MEMBER(suprtrio_tilebank_w);
+	DECLARE_WRITE16_MEMBER(tumblepb_pf1_data_w);
+	DECLARE_WRITE16_MEMBER(tumblepb_pf2_data_w);
+	DECLARE_WRITE16_MEMBER(fncywld_pf1_data_w);
+	DECLARE_WRITE16_MEMBER(fncywld_pf2_data_w);
+	DECLARE_WRITE16_MEMBER(tumblepb_control_0_w);
+	DECLARE_WRITE16_MEMBER(pangpang_pf1_data_w);
+	DECLARE_WRITE16_MEMBER(pangpang_pf2_data_w);
 };
 
 /*----------- defined in video/tumbleb.c -----------*/
 
-WRITE16_HANDLER( tumblepb_pf1_data_w );
-WRITE16_HANDLER( tumblepb_pf2_data_w );
-WRITE16_HANDLER( fncywld_pf1_data_w );
-WRITE16_HANDLER( fncywld_pf2_data_w );
-WRITE16_HANDLER( tumblepb_control_0_w );
-WRITE16_HANDLER( pangpang_pf1_data_w );
-WRITE16_HANDLER( pangpang_pf2_data_w );
 
-WRITE16_HANDLER( bcstory_tilebank_w );
-WRITE16_HANDLER( suprtrio_tilebank_w );
-WRITE16_HANDLER( chokchok_tilebank_w );
-WRITE16_HANDLER( wlstar_tilebank_w );
 
 VIDEO_START( tumblepb );
 VIDEO_START( fncywld );

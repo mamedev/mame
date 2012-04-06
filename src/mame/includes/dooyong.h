@@ -44,28 +44,29 @@ public:
 	optional_device<buffered_spriteram16_device> m_spriteram16;
 	DECLARE_WRITE8_MEMBER(lastday_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(flip_screen_w);
+	DECLARE_WRITE8_MEMBER(dooyong_bgscroll8_w);
+	DECLARE_WRITE8_MEMBER(dooyong_bg2scroll8_w);
+	DECLARE_WRITE8_MEMBER(dooyong_fgscroll8_w);
+	DECLARE_WRITE8_MEMBER(dooyong_fg2scroll8_w);
+	DECLARE_WRITE16_MEMBER(dooyong_bgscroll16_w);
+	DECLARE_WRITE16_MEMBER(dooyong_bg2scroll16_w);
+	DECLARE_WRITE16_MEMBER(dooyong_fgscroll16_w);
+	DECLARE_WRITE16_MEMBER(dooyong_fg2scroll16_w);
+	DECLARE_WRITE8_MEMBER(dooyong_txvideoram8_w);
+	DECLARE_WRITE8_MEMBER(lastday_ctrl_w);
+	DECLARE_WRITE8_MEMBER(pollux_ctrl_w);
+	DECLARE_WRITE8_MEMBER(primella_ctrl_w);
+	DECLARE_WRITE8_MEMBER(paletteram_flytiger_w);
+	DECLARE_WRITE8_MEMBER(flytiger_ctrl_w);
+	DECLARE_WRITE16_MEMBER(rshark_ctrl_w);
 };
 
 
 /*----------- defined in video/dooyong.c -----------*/
 
-WRITE8_HANDLER( dooyong_bgscroll8_w );
-WRITE8_HANDLER( dooyong_fgscroll8_w );
-WRITE8_HANDLER( dooyong_fg2scroll8_w );
 
-WRITE16_HANDLER( dooyong_bgscroll16_w );
-WRITE16_HANDLER( dooyong_bg2scroll16_w );
-WRITE16_HANDLER( dooyong_fgscroll16_w );
-WRITE16_HANDLER( dooyong_fg2scroll16_w );
 
-WRITE8_HANDLER( dooyong_txvideoram8_w );
 
-WRITE8_HANDLER( lastday_ctrl_w );
-WRITE8_HANDLER( pollux_ctrl_w );
-WRITE8_HANDLER( primella_ctrl_w );
-WRITE8_HANDLER( paletteram_flytiger_w );
-WRITE8_HANDLER( flytiger_ctrl_w );
-WRITE16_HANDLER( rshark_ctrl_w );
 
 SCREEN_UPDATE_IND16( lastday );
 SCREEN_UPDATE_IND16( gulfstrm );

@@ -19,13 +19,13 @@ public:
 	DECLARE_WRITE8_MEMBER(sbasketb_sh_irqtrigger_w);
 	DECLARE_WRITE8_MEMBER(sbasketb_coin_counter_w);
 	DECLARE_WRITE8_MEMBER(irq_mask_w);
+	DECLARE_WRITE8_MEMBER(sbasketb_videoram_w);
+	DECLARE_WRITE8_MEMBER(sbasketb_colorram_w);
+	DECLARE_WRITE8_MEMBER(sbasketb_flipscreen_w);
 };
 
 /*----------- defined in video/sbasketb.c -----------*/
 
-WRITE8_HANDLER( sbasketb_videoram_w );
-WRITE8_HANDLER( sbasketb_colorram_w );
-WRITE8_HANDLER( sbasketb_flipscreen_w );
 
 PALETTE_INIT( sbasketb );
 VIDEO_START( sbasketb );

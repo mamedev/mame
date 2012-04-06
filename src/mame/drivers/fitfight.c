@@ -156,9 +156,9 @@ static ADDRESS_MAP_START( fitfight_main_map, AS_PROGRAM, 16, fitfight_state )
 	//  histryma: @0x000031be,@0x00001d8e
 
 	AM_RANGE(0xb00000, 0xb03fff) AM_WRITENOP /* unused layer? */
-	AM_RANGE(0xb04000, 0xb07fff) AM_RAM_WRITE_LEGACY(fof_bak_tileram_w) AM_BASE(m_fof_bak_tileram)
-	AM_RANGE(0xb08000, 0xb0bfff) AM_RAM_WRITE_LEGACY(fof_mid_tileram_w) AM_BASE(m_fof_mid_tileram)
-	AM_RANGE(0xb0c000, 0xb0ffff) AM_RAM_WRITE_LEGACY(fof_txt_tileram_w) AM_BASE(m_fof_txt_tileram)
+	AM_RANGE(0xb04000, 0xb07fff) AM_RAM_WRITE(fof_bak_tileram_w) AM_BASE(m_fof_bak_tileram)
+	AM_RANGE(0xb08000, 0xb0bfff) AM_RAM_WRITE(fof_mid_tileram_w) AM_BASE(m_fof_mid_tileram)
+	AM_RANGE(0xb0c000, 0xb0ffff) AM_RAM_WRITE(fof_txt_tileram_w) AM_BASE(m_fof_txt_tileram)
 
 	AM_RANGE(0xb10000, 0xb13fff) AM_WRITENOP //used by histryma @0x0000b25a
 	AM_RANGE(0xb14000, 0xb17fff) AM_WRITENOP //used by histryma @0x0000b25a,b270
@@ -190,9 +190,9 @@ static ADDRESS_MAP_START( bbprot_main_map, AS_PROGRAM, 16, fitfight_state )
 	AM_RANGE(0xa00000, 0xa00001) AM_WRITEONLY AM_BASE(m_fof_a00000)
 
 	AM_RANGE(0xb00000, 0xb03fff) AM_WRITENOP /* unused layer? */
-	AM_RANGE(0xb04000, 0xb07fff) AM_RAM_WRITE_LEGACY(fof_bak_tileram_w) AM_BASE(m_fof_bak_tileram)
-	AM_RANGE(0xb08000, 0xb0bfff) AM_RAM_WRITE_LEGACY(fof_mid_tileram_w) AM_BASE(m_fof_mid_tileram)
-	AM_RANGE(0xb0c000, 0xb0ffff) AM_RAM_WRITE_LEGACY(fof_txt_tileram_w) AM_BASE(m_fof_txt_tileram)
+	AM_RANGE(0xb04000, 0xb07fff) AM_RAM_WRITE(fof_bak_tileram_w) AM_BASE(m_fof_bak_tileram)
+	AM_RANGE(0xb08000, 0xb0bfff) AM_RAM_WRITE(fof_mid_tileram_w) AM_BASE(m_fof_mid_tileram)
+	AM_RANGE(0xb0c000, 0xb0ffff) AM_RAM_WRITE(fof_txt_tileram_w) AM_BASE(m_fof_txt_tileram)
 
 	AM_RANGE(0xc00000, 0xc00fff) AM_READONLY
 	AM_RANGE(0xc00000, 0xc03fff) AM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")

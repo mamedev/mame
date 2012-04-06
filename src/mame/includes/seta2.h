@@ -28,11 +28,11 @@ public:
 
 	UINT8 m_funcube_serial_fifo[4];
 	UINT8 m_funcube_serial_count;
+	DECLARE_WRITE16_MEMBER(seta2_vregs_w);
 };
 
 /*----------- defined in video/seta2.c -----------*/
 
-WRITE16_HANDLER( seta2_vregs_w );
 
 VIDEO_START( seta2 );
 VIDEO_START( seta2_xoffset );

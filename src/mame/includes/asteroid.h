@@ -16,6 +16,13 @@ public:
 	UINT8 *m_ram2;
 	DECLARE_WRITE8_MEMBER(astdelux_coin_counter_w);
 	DECLARE_WRITE8_MEMBER(llander_led_w);
+	DECLARE_READ8_MEMBER(asteroid_IN0_r);
+	DECLARE_READ8_MEMBER(asterock_IN0_r);
+	DECLARE_READ8_MEMBER(asteroid_IN1_r);
+	DECLARE_READ8_MEMBER(asteroid_DSW1_r);
+	DECLARE_WRITE8_MEMBER(asteroid_bank_switch_w);
+	DECLARE_WRITE8_MEMBER(astdelux_bank_switch_w);
+	DECLARE_WRITE8_MEMBER(astdelux_led_w);
 };
 
 
@@ -25,14 +32,7 @@ INTERRUPT_GEN( asteroid_interrupt );
 INTERRUPT_GEN( asterock_interrupt );
 INTERRUPT_GEN( llander_interrupt );
 
-READ8_HANDLER( asteroid_IN0_r );
-READ8_HANDLER( asterock_IN0_r );
-READ8_HANDLER( asteroid_IN1_r );
-READ8_HANDLER( asteroid_DSW1_r );
 
-WRITE8_HANDLER( asteroid_bank_switch_w );
-WRITE8_HANDLER( astdelux_bank_switch_w );
-WRITE8_HANDLER( astdelux_led_w );
 
 MACHINE_RESET( asteroid );
 

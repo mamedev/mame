@@ -10,9 +10,8 @@
 #include "includes/opwolf.h"
 
 
-WRITE16_HANDLER( opwolf_spritectrl_w )
+WRITE16_MEMBER(opwolf_state::opwolf_spritectrl_w)
 {
-	opwolf_state *state = space->machine().driver_data<opwolf_state>();
 
 	if (offset == 0)
 	{
@@ -20,7 +19,7 @@ WRITE16_HANDLER( opwolf_spritectrl_w )
 		/* bits 5-7 are the sprite palette bank */
 		/* other bits unknown */
 
-		pc090oj_set_sprite_ctrl(state->m_pc090oj, (data & 0xe0) >> 5);
+		pc090oj_set_sprite_ctrl(m_pc090oj, (data & 0xe0) >> 5);
 
 		/* If data = 4, the Piston Motor is off, otherwise it's on. */
 		if (data == 4)

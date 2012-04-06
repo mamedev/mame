@@ -47,7 +47,7 @@ READ8_MEMBER(cbasebal_state::bankedram_r)
 	switch (m_rambank)
 	{
 	case 2:
-		return cbasebal_textram_r(&space, offset);	/* VRAM */
+		return cbasebal_textram_r(space, offset);	/* VRAM */
 	case 1:
 		if (offset < 0x800)
 			return m_generic_paletteram_8[offset];
@@ -55,7 +55,7 @@ READ8_MEMBER(cbasebal_state::bankedram_r)
 			return 0;
 		break;
 	default:
-		return cbasebal_scrollram_r(&space, offset);	/* SCROLL */
+		return cbasebal_scrollram_r(space, offset);	/* SCROLL */
 	}
 }
 
@@ -65,14 +65,14 @@ WRITE8_MEMBER(cbasebal_state::bankedram_w)
 	switch (m_rambank)
 	{
 	case 2:
-		cbasebal_textram_w(&space, offset, data);
+		cbasebal_textram_w(space, offset, data);
 		break;
 	case 1:
 		if (offset < 0x800)
 			paletteram_xxxxBBBBRRRRGGGG_le_w(space, offset, data);
 		break;
 	default:
-		cbasebal_scrollram_w(&space, offset, data);
+		cbasebal_scrollram_w(space, offset, data);
 		break;
 	}
 }
@@ -124,12 +124,12 @@ static ADDRESS_MAP_START( cbasebal_portmap, AS_IO, 8, cbasebal_state )
 	AM_RANGE(0x03, 0x03) AM_WRITE_PORT("IO_03")
 	AM_RANGE(0x05, 0x05) AM_DEVWRITE("oki", okim6295_device, write)
 	AM_RANGE(0x06, 0x07) AM_DEVWRITE_LEGACY("ymsnd", ym2413_w)
-	AM_RANGE(0x08, 0x09) AM_WRITE_LEGACY(cbasebal_scrollx_w)
-	AM_RANGE(0x0a, 0x0b) AM_WRITE_LEGACY(cbasebal_scrolly_w)
+	AM_RANGE(0x08, 0x09) AM_WRITE(cbasebal_scrollx_w)
+	AM_RANGE(0x0a, 0x0b) AM_WRITE(cbasebal_scrolly_w)
 	AM_RANGE(0x10, 0x10) AM_READ_PORT("P1")
 	AM_RANGE(0x11, 0x11) AM_READ_PORT("P2")
 	AM_RANGE(0x12, 0x12) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x13, 0x13) AM_WRITE_LEGACY(cbasebal_gfxctrl_w)
+	AM_RANGE(0x13, 0x13) AM_WRITE(cbasebal_gfxctrl_w)
 	AM_RANGE(0x14, 0x14) AM_WRITE(cbasebal_coinctrl_w)
 ADDRESS_MAP_END
 

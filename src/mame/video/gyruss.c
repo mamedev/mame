@@ -91,11 +91,10 @@ PALETTE_INIT( gyruss )
 
 
 
-WRITE8_HANDLER( gyruss_spriteram_w )
+WRITE8_MEMBER(gyruss_state::gyruss_spriteram_w)
 {
-	gyruss_state *state = space->machine().driver_data<gyruss_state>();
-	space->machine().primary_screen->update_now();
-	state->m_spriteram[offset] = data;
+	machine().primary_screen->update_now();
+	m_spriteram[offset] = data;
 }
 
 
@@ -122,10 +121,10 @@ VIDEO_START( gyruss )
 
 
 
-READ8_HANDLER( gyruss_scanline_r )
+READ8_MEMBER(gyruss_state::gyruss_scanline_r)
 {
 	/* reads 1V - 128V */
-	return space->machine().primary_screen->vpos();
+	return machine().primary_screen->vpos();
 }
 
 

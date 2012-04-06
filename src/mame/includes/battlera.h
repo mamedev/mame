@@ -31,6 +31,13 @@ public:
 	DECLARE_WRITE8_MEMBER(control_data_w);
 	DECLARE_READ8_MEMBER(control_data_r);
 	DECLARE_WRITE8_MEMBER(battlera_adpcm_data_w);
+	DECLARE_WRITE8_MEMBER(battlera_palette_w);
+	DECLARE_READ8_MEMBER(HuC6270_debug_r);
+	DECLARE_WRITE8_MEMBER(HuC6270_debug_w);
+	DECLARE_READ8_MEMBER(HuC6270_register_r);
+	DECLARE_WRITE8_MEMBER(HuC6270_register_w);
+	DECLARE_READ8_MEMBER(HuC6270_data_r);
+	DECLARE_WRITE8_MEMBER(HuC6270_data_w);
 };
 
 
@@ -40,11 +47,4 @@ SCREEN_UPDATE_IND16( battlera );
 VIDEO_START( battlera );
 TIMER_DEVICE_CALLBACK( battlera_irq );
 
-READ8_HANDLER( HuC6270_register_r );
-WRITE8_HANDLER( HuC6270_register_w );
-//READ8_HANDLER( HuC6270_data_r );
-WRITE8_HANDLER( HuC6270_data_w );
-WRITE8_HANDLER( battlera_palette_w );
 
-READ8_HANDLER( HuC6270_debug_r );
-WRITE8_HANDLER( HuC6270_debug_w );

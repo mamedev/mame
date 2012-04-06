@@ -110,7 +110,7 @@ static ADDRESS_MAP_START( himesiki_prm0, AS_PROGRAM, 8, himesiki_state )
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
 	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_BASE(m_spriteram)
 	AM_RANGE(0xa800, 0xafff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_le_w) AM_SHARE("paletteram")
-	AM_RANGE(0xb000, 0xbfff) AM_RAM_WRITE_LEGACY(himesiki_bg_ram_w) AM_BASE(m_bg_ram)
+	AM_RANGE(0xb000, 0xbfff) AM_RAM_WRITE(himesiki_bg_ram_w) AM_BASE(m_bg_ram)
 	AM_RANGE(0xc000, 0xffff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
@@ -124,8 +124,8 @@ static ADDRESS_MAP_START( himesiki_iom0, AS_IO, 8, himesiki_state )
 	AM_RANGE(0x05, 0x05) AM_READ_PORT("DSW2")
 	AM_RANGE(0x06, 0x06) AM_WRITE(himesiki_rombank_w)
 	AM_RANGE(0x07, 0x07) AM_WRITENOP // 8255 cw
-	AM_RANGE(0x08, 0x08) AM_WRITE_LEGACY(himesiki_flip_w)
-	AM_RANGE(0x09, 0x0a) AM_WRITE_LEGACY(himesiki_scrollx_w)
+	AM_RANGE(0x08, 0x08) AM_WRITE(himesiki_flip_w)
+	AM_RANGE(0x09, 0x0a) AM_WRITE(himesiki_scrollx_w)
 	AM_RANGE(0x0b, 0x0b) AM_WRITE(himesiki_sound_w)
 ADDRESS_MAP_END
 

@@ -17,6 +17,8 @@ public:
 	int m_highcolorflag;
 	int m_flipscreen;
 	bitmap_rgb32 m_tmpbitmap;
+	DECLARE_WRITE8_MEMBER(hyhoo_blitter_w);
+	DECLARE_WRITE8_MEMBER(hyhoo_romsel_w);
 };
 
 
@@ -25,5 +27,3 @@ public:
 SCREEN_UPDATE_RGB32( hyhoo );
 VIDEO_START( hyhoo );
 
-WRITE8_HANDLER( hyhoo_blitter_w );
-WRITE8_HANDLER( hyhoo_romsel_w );

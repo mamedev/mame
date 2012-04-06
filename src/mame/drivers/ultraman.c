@@ -40,7 +40,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, ultraman_state )
 	AM_RANGE(0x1c0004, 0x1c0005) AM_READ_PORT("P2")
 	AM_RANGE(0x1c0006, 0x1c0007) AM_READ_PORT("DSW1")
 	AM_RANGE(0x1c0008, 0x1c0009) AM_READ_PORT("DSW2")
-	AM_RANGE(0x1c0018, 0x1c0019) AM_WRITE_LEGACY(ultraman_gfxctrl_w)	/* counters + gfx ctrl */
+	AM_RANGE(0x1c0018, 0x1c0019) AM_WRITE(ultraman_gfxctrl_w)	/* counters + gfx ctrl */
 	AM_RANGE(0x1c0020, 0x1c0021) AM_WRITE(sound_cmd_w)
 	AM_RANGE(0x1c0028, 0x1c0029) AM_WRITE(sound_irq_trigger_w)
 	AM_RANGE(0x1c0030, 0x1c0031) AM_WRITE(watchdog_reset16_w)

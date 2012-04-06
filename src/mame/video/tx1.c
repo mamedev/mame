@@ -39,12 +39,12 @@ static TIMER_CALLBACK( interrupt_callback )
 }
 
 
-READ16_HANDLER( tx1_crtc_r )
+READ16_MEMBER(tx1_state::tx1_crtc_r)
 {
 	return 0xffff;
 }
 
-WRITE16_HANDLER( tx1_crtc_w )
+WRITE16_MEMBER(tx1_state::tx1_crtc_w)
 {
 if (PRINT_CRTC_DATA)
 {
@@ -143,10 +143,9 @@ PALETTE_INIT( tx1 )
  *
  *************************************/
 
-WRITE16_HANDLER( tx1_bankcs_w )
+WRITE16_MEMBER(tx1_state::tx1_bankcs_w)
 {
-	tx1_state *state = space->machine().driver_data<tx1_state>();
-	vregs_t &tx1_vregs = state->m_vregs;
+	vregs_t &tx1_vregs = m_vregs;
 
 	// AAB2 = /BASET0
 	// AAB3 = /BASET
@@ -197,31 +196,27 @@ WRITE16_HANDLER( tx1_bankcs_w )
 	}
 }
 
-WRITE16_HANDLER( tx1_slincs_w )
+WRITE16_MEMBER(tx1_state::tx1_slincs_w)
 {
-	tx1_state *state = space->machine().driver_data<tx1_state>();
 	if (offset == 1)
-		state->m_vregs.slin_inc = data;
+		m_vregs.slin_inc = data;
 	else
-		state->m_vregs.slin_inc = state->m_vregs.slin_val = 0;
+		m_vregs.slin_inc = m_vregs.slin_val = 0;
 }
 
-WRITE16_HANDLER( tx1_slock_w )
+WRITE16_MEMBER(tx1_state::tx1_slock_w)
 {
-	tx1_state *state = space->machine().driver_data<tx1_state>();
-	state->m_vregs.slock = data & 1;
+	m_vregs.slock = data & 1;
 }
 
-WRITE16_HANDLER( tx1_scolst_w )
+WRITE16_MEMBER(tx1_state::tx1_scolst_w)
 {
-	tx1_state *state = space->machine().driver_data<tx1_state>();
-	state->m_vregs.scol = data & 0x0707;
+	m_vregs.scol = data & 0x0707;
 }
 
-WRITE16_HANDLER( tx1_flgcs_w )
+WRITE16_MEMBER(tx1_state::tx1_flgcs_w)
 {
-	tx1_state *state = space->machine().driver_data<tx1_state>();
-	state->m_vregs.flags = data & 0xff;
+	m_vregs.flags = data & 0xff;
 }
 
 
@@ -2841,10 +2836,9 @@ static void buggyboy_draw_objs(running_machine &machine, UINT8 *bitmap, int wide
     /WASET  = 24A0-F, 24B0-F
     /FLAGS  = 24E0-F, 24F0-F
 */
-WRITE16_HANDLER( buggyboy_gas_w )
+WRITE16_MEMBER(tx1_state::buggyboy_gas_w)
 {
-	tx1_state *state = space->machine().driver_data<tx1_state>();
-	vregs_t &vregs = state->m_vregs;
+	vregs_t &vregs = m_vregs;
 	offset <<= 1;
 
 	switch (offset & 0xe0)
@@ -2905,7 +2899,7 @@ WRITE16_HANDLER( buggyboy_gas_w )
 		}
 		case 0xe0:
 		{
-			cputag_set_input_line(space->machine(), "math_cpu", INPUT_LINE_TEST, CLEAR_LINE);
+			cputag_set_input_line(machine(), "math_cpu", INPUT_LINE_TEST, CLEAR_LINE);
 			vregs.flags = data;
 			break;
 		}
@@ -2915,16 +2909,14 @@ WRITE16_HANDLER( buggyboy_gas_w )
 	vregs.gas = data;
 }
 
-WRITE16_HANDLER( buggyboy_sky_w )
+WRITE16_MEMBER(tx1_state::buggyboy_sky_w)
 {
-	tx1_state *state = space->machine().driver_data<tx1_state>();
-	state->m_vregs.sky = data;
+	m_vregs.sky = data;
 }
 
-WRITE16_HANDLER( buggyboy_scolst_w )
+WRITE16_MEMBER(tx1_state::buggyboy_scolst_w)
 {
-	tx1_state *state = space->machine().driver_data<tx1_state>();
-	state->m_vregs.scol = data;
+	m_vregs.scol = data;
 }
 
 

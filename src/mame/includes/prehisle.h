@@ -14,15 +14,15 @@ public:
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
 	DECLARE_WRITE16_MEMBER(prehisle_sound16_w);
+	DECLARE_WRITE16_MEMBER(prehisle_bg_videoram16_w);
+	DECLARE_WRITE16_MEMBER(prehisle_fg_videoram16_w);
+	DECLARE_READ16_MEMBER(prehisle_control16_r);
+	DECLARE_WRITE16_MEMBER(prehisle_control16_w);
 };
 
 
 /*----------- defined in video/prehisle.c -----------*/
 
-WRITE16_HANDLER( prehisle_bg_videoram16_w );
-WRITE16_HANDLER( prehisle_fg_videoram16_w );
-WRITE16_HANDLER( prehisle_control16_w );
-READ16_HANDLER( prehisle_control16_r );
 
 VIDEO_START( prehisle );
 SCREEN_UPDATE_IND16( prehisle );

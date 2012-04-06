@@ -18,36 +18,35 @@
 
 ***************************************************************************/
 
-WRITE16_HANDLER( wrally_vram_w )
+WRITE16_MEMBER(wrally_state::wrally_vram_w)
 {
-	wrally_state *state = space->machine().driver_data<wrally_state>();
-	data = gaelco_decrypt(space, offset, data, 0x1f, 0x522a);
-	COMBINE_DATA(&state->m_videoram[offset]);
+	data = gaelco_decrypt(&space, offset, data, 0x1f, 0x522a);
+	COMBINE_DATA(&m_videoram[offset]);
 
-	state->m_pant[(offset & 0x1fff) >> 12]->mark_tile_dirty(((offset << 1) & 0x1fff) >> 2);
+	m_pant[(offset & 0x1fff) >> 12]->mark_tile_dirty(((offset << 1) & 0x1fff) >> 2);
 }
 
-WRITE16_HANDLER( wrally_flipscreen_w )
+WRITE16_MEMBER(wrally_state::wrally_flipscreen_w)
 {
-	flip_screen_set(space->machine(), data & 0x01);
+	flip_screen_set(machine(), data & 0x01);
 }
 
-WRITE16_HANDLER( OKIM6295_bankswitch_w )
+WRITE16_MEMBER(wrally_state::OKIM6295_bankswitch_w)
 {
-	UINT8 *RAM = space->machine().region("oki")->base();
+	UINT8 *RAM = machine().region("oki")->base();
 
 	if (ACCESSING_BITS_0_7){
 		memcpy(&RAM[0x30000], &RAM[0x40000 + (data & 0x0f)*0x10000], 0x10000);
 	}
 }
 
-WRITE16_HANDLER( wrally_coin_counter_w )
+WRITE16_MEMBER(wrally_state::wrally_coin_counter_w)
 {
-	coin_counter_w( space->machine(), (offset >> 3) & 0x01, data & 0x01);
+	coin_counter_w( machine(), (offset >> 3) & 0x01, data & 0x01);
 }
 
-WRITE16_HANDLER( wrally_coin_lockout_w )
+WRITE16_MEMBER(wrally_state::wrally_coin_lockout_w)
 {
-	coin_lockout_w( space->machine(), (offset >> 3) & 0x01, ~data & 0x01);
+	coin_lockout_w( machine(), (offset >> 3) & 0x01, ~data & 0x01);
 }
 

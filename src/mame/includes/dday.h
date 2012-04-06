@@ -30,6 +30,14 @@ public:
 
 	/* devices */
 	device_t *m_ay1;
+	DECLARE_READ8_MEMBER(dday_countdown_timer_r);
+	DECLARE_WRITE8_MEMBER(dday_bgvideoram_w);
+	DECLARE_WRITE8_MEMBER(dday_fgvideoram_w);
+	DECLARE_WRITE8_MEMBER(dday_textvideoram_w);
+	DECLARE_WRITE8_MEMBER(dday_colorram_w);
+	DECLARE_READ8_MEMBER(dday_colorram_r);
+	DECLARE_WRITE8_MEMBER(dday_sl_control_w);
+	DECLARE_WRITE8_MEMBER(dday_control_w);
 };
 
 
@@ -39,11 +47,3 @@ PALETTE_INIT( dday );
 VIDEO_START( dday );
 SCREEN_UPDATE_IND16( dday );
 
-WRITE8_HANDLER( dday_bgvideoram_w );
-WRITE8_HANDLER( dday_fgvideoram_w );
-WRITE8_HANDLER( dday_textvideoram_w );
-WRITE8_HANDLER( dday_colorram_w );
-READ8_HANDLER( dday_colorram_r );
-WRITE8_HANDLER( dday_control_w );
-WRITE8_HANDLER( dday_sl_control_w );
-READ8_HANDLER( dday_countdown_timer_r );

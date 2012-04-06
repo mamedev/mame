@@ -9,16 +9,14 @@
 #include "includes/ladyfrog.h"
 
 
-WRITE8_HANDLER(ladyfrog_spriteram_w)
+WRITE8_MEMBER(ladyfrog_state::ladyfrog_spriteram_w)
 {
-	ladyfrog_state *state = space->machine().driver_data<ladyfrog_state>();
-	state->m_spriteram[offset] = data;
+	m_spriteram[offset] = data;
 }
 
-READ8_HANDLER(ladyfrog_spriteram_r)
+READ8_MEMBER(ladyfrog_state::ladyfrog_spriteram_r)
 {
-	ladyfrog_state *state = space->machine().driver_data<ladyfrog_state>();
-	return state->m_spriteram[offset];
+	return m_spriteram[offset];
 }
 
 static TILE_GET_INFO( get_tile_info )
@@ -33,74 +31,66 @@ static TILE_GET_INFO( get_tile_info )
 			);
 }
 
-WRITE8_HANDLER( ladyfrog_videoram_w )
+WRITE8_MEMBER(ladyfrog_state::ladyfrog_videoram_w)
 {
-	ladyfrog_state *state = space->machine().driver_data<ladyfrog_state>();
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset >> 1);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset >> 1);
 }
 
-READ8_HANDLER( ladyfrog_videoram_r )
+READ8_MEMBER(ladyfrog_state::ladyfrog_videoram_r)
 {
-	ladyfrog_state *state = space->machine().driver_data<ladyfrog_state>();
-	return state->m_videoram[offset];
+	return m_videoram[offset];
 }
 
-WRITE8_HANDLER( ladyfrog_palette_w )
+WRITE8_MEMBER(ladyfrog_state::ladyfrog_palette_w)
 {
-	ladyfrog_state *state = space->machine().driver_data<ladyfrog_state>();
 
 	if (offset & 0x100)
-		state->paletteram_xxxxBBBBGGGGRRRR_split2_w(*space, (offset & 0xff) + (state->m_palette_bank << 8), data);
+		paletteram_xxxxBBBBGGGGRRRR_split2_w(space, (offset & 0xff) + (m_palette_bank << 8), data);
 	else
-		state->paletteram_xxxxBBBBGGGGRRRR_split1_w(*space, (offset & 0xff) + (state->m_palette_bank << 8), data);
+		paletteram_xxxxBBBBGGGGRRRR_split1_w(space, (offset & 0xff) + (m_palette_bank << 8), data);
 }
 
-READ8_HANDLER( ladyfrog_palette_r )
+READ8_MEMBER(ladyfrog_state::ladyfrog_palette_r)
 {
-	ladyfrog_state *state = space->machine().driver_data<ladyfrog_state>();
 
 	if (offset & 0x100)
-		return state->m_generic_paletteram2_8[(offset & 0xff) + (state->m_palette_bank << 8)];
+		return m_generic_paletteram2_8[(offset & 0xff) + (m_palette_bank << 8)];
 	else
-		return state->m_generic_paletteram_8[(offset & 0xff) + (state->m_palette_bank << 8)];
+		return m_generic_paletteram_8[(offset & 0xff) + (m_palette_bank << 8)];
 }
 
-WRITE8_HANDLER( ladyfrog_gfxctrl_w )
+WRITE8_MEMBER(ladyfrog_state::ladyfrog_gfxctrl_w)
 {
-	ladyfrog_state *state = space->machine().driver_data<ladyfrog_state>();
-	state->m_palette_bank = (data & 0x20) >> 5;
+	m_palette_bank = (data & 0x20) >> 5;
 }
 
-WRITE8_HANDLER( ladyfrog_gfxctrl2_w )
+WRITE8_MEMBER(ladyfrog_state::ladyfrog_gfxctrl2_w)
 {
-	ladyfrog_state *state = space->machine().driver_data<ladyfrog_state>();
-	state->m_tilebank = ((data & 0x18) >> 3) ^ 3;
-	state->m_bg_tilemap->mark_all_dirty();
+	m_tilebank = ((data & 0x18) >> 3) ^ 3;
+	m_bg_tilemap->mark_all_dirty();
 }
 
 
 #ifdef UNUSED_FUNCTION
 int gfxctrl;
 
-READ8_HANDLER( ladyfrog_gfxctrl_r )
+READ8_MEMBER(ladyfrog_state::ladyfrog_gfxctrl_r)
 {
 	return gfxctrl;
 }
 #endif
 
-READ8_HANDLER( ladyfrog_scrlram_r )
+READ8_MEMBER(ladyfrog_state::ladyfrog_scrlram_r)
 {
-	ladyfrog_state *state = space->machine().driver_data<ladyfrog_state>();
-	return state->m_scrlram[offset];
+	return m_scrlram[offset];
 }
 
-WRITE8_HANDLER( ladyfrog_scrlram_w )
+WRITE8_MEMBER(ladyfrog_state::ladyfrog_scrlram_w)
 {
-	ladyfrog_state *state = space->machine().driver_data<ladyfrog_state>();
 
-	state->m_scrlram[offset] = data;
-	state->m_bg_tilemap->set_scrolly(offset, data);
+	m_scrlram[offset] = data;
+	m_bg_tilemap->set_scrolly(offset, data);
 }
 
 static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )

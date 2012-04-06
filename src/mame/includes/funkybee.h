@@ -15,16 +15,16 @@ public:
 	int        m_gfx_bank;
 	DECLARE_READ8_MEMBER(funkybee_input_port_0_r);
 	DECLARE_WRITE8_MEMBER(funkybee_coin_counter_w);
+	DECLARE_WRITE8_MEMBER(funkybee_videoram_w);
+	DECLARE_WRITE8_MEMBER(funkybee_colorram_w);
+	DECLARE_WRITE8_MEMBER(funkybee_gfx_bank_w);
+	DECLARE_WRITE8_MEMBER(funkybee_scroll_w);
+	DECLARE_WRITE8_MEMBER(funkybee_flipscreen_w);
 };
 
 
 /*----------- defined in video/funkybee.c -----------*/
 
-WRITE8_HANDLER( funkybee_videoram_w );
-WRITE8_HANDLER( funkybee_colorram_w );
-WRITE8_HANDLER( funkybee_gfx_bank_w );
-WRITE8_HANDLER( funkybee_scroll_w );
-WRITE8_HANDLER( funkybee_flipscreen_w );
 
 PALETTE_INIT( funkybee );
 VIDEO_START( funkybee );

@@ -68,36 +68,31 @@ static TILE_GET_INFO( get_fg_tile_info )
 			TILE_FLIPYX(flipyx));
 }
 
-WRITE8_HANDLER( gomoku_videoram_w )
+WRITE8_MEMBER(gomoku_state::gomoku_videoram_w)
 {
-	gomoku_state *state = space->machine().driver_data<gomoku_state>();
-	state->m_videoram[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( gomoku_colorram_w )
+WRITE8_MEMBER(gomoku_state::gomoku_colorram_w)
 {
-	gomoku_state *state = space->machine().driver_data<gomoku_state>();
-	state->m_colorram[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset);
+	m_colorram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( gomoku_bgram_w )
+WRITE8_MEMBER(gomoku_state::gomoku_bgram_w)
 {
-	gomoku_state *state = space->machine().driver_data<gomoku_state>();
-	state->m_bgram[offset] = data;
+	m_bgram[offset] = data;
 }
 
-WRITE8_HANDLER( gomoku_flipscreen_w )
+WRITE8_MEMBER(gomoku_state::gomoku_flipscreen_w)
 {
-	gomoku_state *state = space->machine().driver_data<gomoku_state>();
-	state->m_flipscreen = (data & 0x02) ? 0 : 1;
+	m_flipscreen = (data & 0x02) ? 0 : 1;
 }
 
-WRITE8_HANDLER( gomoku_bg_dispsw_w )
+WRITE8_MEMBER(gomoku_state::gomoku_bg_dispsw_w)
 {
-	gomoku_state *state = space->machine().driver_data<gomoku_state>();
-	state->m_bg_dispsw = (data & 0x02) ? 0 : 1;
+	m_bg_dispsw = (data & 0x02) ? 0 : 1;
 }
 
 

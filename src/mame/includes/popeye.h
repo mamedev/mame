@@ -22,15 +22,15 @@ public:
 	size_t m_spriteram_size;
 	DECLARE_READ8_MEMBER(protection_r);
 	DECLARE_WRITE8_MEMBER(protection_w);
+	DECLARE_WRITE8_MEMBER(popeye_videoram_w);
+	DECLARE_WRITE8_MEMBER(popeye_colorram_w);
+	DECLARE_WRITE8_MEMBER(popeye_bitmap_w);
+	DECLARE_WRITE8_MEMBER(skyskipr_bitmap_w);
 };
 
 
 /*----------- defined in video/popeye.c -----------*/
 
-WRITE8_HANDLER( popeye_videoram_w );
-WRITE8_HANDLER( popeye_colorram_w );
-WRITE8_HANDLER( popeye_bitmap_w );
-WRITE8_HANDLER( skyskipr_bitmap_w );
 
 PALETTE_INIT( popeye );
 PALETTE_INIT( popeyebl );

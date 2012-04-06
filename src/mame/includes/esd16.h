@@ -41,14 +41,14 @@ public:
 	DECLARE_WRITE16_MEMBER(esd_eeprom_w);
 	DECLARE_WRITE8_MEMBER(esd16_sound_rombank_w);
 	DECLARE_READ8_MEMBER(esd16_sound_command_r);
+	DECLARE_WRITE16_MEMBER(esd16_vram_0_w);
+	DECLARE_WRITE16_MEMBER(esd16_vram_1_w);
+	DECLARE_WRITE16_MEMBER(esd16_tilemap0_color_w);
 };
 
 
 /*----------- defined in video/esd16.c -----------*/
 
-WRITE16_HANDLER( esd16_vram_0_w );
-WRITE16_HANDLER( esd16_vram_1_w );
-WRITE16_HANDLER( esd16_tilemap0_color_w );
 
 VIDEO_START( esd16 );
 SCREEN_UPDATE_IND16( hedpanic );

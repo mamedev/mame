@@ -20,15 +20,15 @@ public:
 	DECLARE_READ8_MEMBER(mcu_p7_read);
 	DECLARE_READ8_MEMBER(mcu_pa_read);
 	DECLARE_WRITE8_MEMBER(mcu_pa_write);
+	DECLARE_READ16_MEMBER(namcond1_shared_ram_r);
+	DECLARE_READ16_MEMBER(namcond1_cuskey_r);
+	DECLARE_WRITE16_MEMBER(namcond1_shared_ram_w);
+	DECLARE_WRITE16_MEMBER(namcond1_cuskey_w);
 };
 
 
 /*----------- defined in machine/namcond1.c -----------*/
 
-READ16_HANDLER( namcond1_shared_ram_r );
-READ16_HANDLER( namcond1_cuskey_r );
-WRITE16_HANDLER( namcond1_shared_ram_w );
-WRITE16_HANDLER( namcond1_cuskey_w );
 
 MACHINE_START( namcond1 );
 MACHINE_RESET( namcond1 );

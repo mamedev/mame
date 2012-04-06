@@ -60,8 +60,8 @@ WRITE8_MEMBER(compgolf_state::compgolf_ctrl_w)
 
 static ADDRESS_MAP_START( compgolf_map, AS_PROGRAM, 8, compgolf_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x1000, 0x17ff) AM_RAM_WRITE_LEGACY(compgolf_video_w) AM_BASE(m_videoram)
-	AM_RANGE(0x1800, 0x1fff) AM_RAM_WRITE_LEGACY(compgolf_back_w) AM_BASE(m_bg_ram)
+	AM_RANGE(0x1000, 0x17ff) AM_RAM_WRITE(compgolf_video_w) AM_BASE(m_videoram)
+	AM_RANGE(0x1800, 0x1fff) AM_RAM_WRITE(compgolf_back_w) AM_BASE(m_bg_ram)
 	AM_RANGE(0x2000, 0x2060) AM_RAM AM_BASE(m_spriteram)
 	AM_RANGE(0x2061, 0x2061) AM_WRITENOP
 	AM_RANGE(0x3000, 0x3000) AM_READ_PORT("P1")

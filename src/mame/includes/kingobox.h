@@ -35,16 +35,16 @@ public:
 	DECLARE_WRITE8_MEMBER(sprite_interrupt_w);
 	DECLARE_WRITE8_MEMBER(scroll_interrupt_w);
 	DECLARE_WRITE8_MEMBER(sound_command_w);
+	DECLARE_WRITE8_MEMBER(kingofb_videoram_w);
+	DECLARE_WRITE8_MEMBER(kingofb_colorram_w);
+	DECLARE_WRITE8_MEMBER(kingofb_videoram2_w);
+	DECLARE_WRITE8_MEMBER(kingofb_colorram2_w);
+	DECLARE_WRITE8_MEMBER(kingofb_f800_w);
 };
 
 
 /*----------- defined in video/kingobox.c -----------*/
 
-WRITE8_HANDLER( kingofb_videoram_w );
-WRITE8_HANDLER( kingofb_colorram_w );
-WRITE8_HANDLER( kingofb_videoram2_w );
-WRITE8_HANDLER( kingofb_colorram2_w );
-WRITE8_HANDLER( kingofb_f800_w );
 
 PALETTE_INIT( kingofb );
 VIDEO_START( kingofb );

@@ -1,47 +1,44 @@
 #include "emu.h"
 #include "includes/shisen.h"
 
-WRITE8_HANDLER( sichuan2_videoram_w )
+WRITE8_MEMBER(shisen_state::sichuan2_videoram_w)
 {
-	shisen_state *state = space->machine().driver_data<shisen_state>();
 
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset / 2);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE8_HANDLER( sichuan2_bankswitch_w )
+WRITE8_MEMBER(shisen_state::sichuan2_bankswitch_w)
 {
-	shisen_state *state = space->machine().driver_data<shisen_state>();
 	int bankaddress;
 	int bank;
-	UINT8 *RAM = space->machine().region("maincpu")->base();
+	UINT8 *RAM = machine().region("maincpu")->base();
 
 	if (data & 0xc0) logerror("bank switch %02x\n",data);
 
 	/* bits 0-2 select ROM bank */
 	bankaddress = 0x10000 + (data & 0x07) * 0x4000;
-	memory_set_bankptr(space->machine(), "bank1", &RAM[bankaddress]);
+	memory_set_bankptr(machine(), "bank1", &RAM[bankaddress]);
 
 	/* bits 3-5 select gfx bank */
 	bank = (data & 0x38) >> 3;
 
-	if (state->m_gfxbank != bank)
+	if (m_gfxbank != bank)
 	{
-		state->m_gfxbank = bank;
-		space->machine().tilemap().mark_all_dirty();
+		m_gfxbank = bank;
+		machine().tilemap().mark_all_dirty();
 	}
 
 	/* bits 6-7 unknown */
 }
 
-WRITE8_HANDLER( sichuan2_paletteram_w )
+WRITE8_MEMBER(shisen_state::sichuan2_paletteram_w)
 {
-	shisen_state *state = space->machine().driver_data<shisen_state>();
-	state->m_paletteram[offset] = data;
+	m_paletteram[offset] = data;
 
 	offset &= 0xff;
 
-	palette_set_color_rgb(space->machine(), offset, pal5bit(state->m_paletteram[offset + 0x000]), pal5bit(state->m_paletteram[offset + 0x100]), pal5bit(state->m_paletteram[offset + 0x200]));
+	palette_set_color_rgb(machine(), offset, pal5bit(m_paletteram[offset + 0x000]), pal5bit(m_paletteram[offset + 0x100]), pal5bit(m_paletteram[offset + 0x200]));
 }
 
 static TILE_GET_INFO( get_bg_tile_info )

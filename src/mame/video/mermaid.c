@@ -63,64 +63,57 @@ PALETTE_INIT( rougien )
 }
 
 
-WRITE8_HANDLER( mermaid_videoram2_w )
+WRITE8_MEMBER(mermaid_state::mermaid_videoram2_w)
 {
-	mermaid_state *state = space->machine().driver_data<mermaid_state>();
-	state->m_videoram2[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_videoram2[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( mermaid_videoram_w )
+WRITE8_MEMBER(mermaid_state::mermaid_videoram_w)
 {
-	mermaid_state *state = space->machine().driver_data<mermaid_state>();
-	state->m_videoram[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( mermaid_colorram_w )
+WRITE8_MEMBER(mermaid_state::mermaid_colorram_w)
 {
-	mermaid_state *state = space->machine().driver_data<mermaid_state>();
-	state->m_colorram[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset);
+	m_colorram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( mermaid_flip_screen_x_w )
+WRITE8_MEMBER(mermaid_state::mermaid_flip_screen_x_w)
 {
-	flip_screen_x_set(space->machine(), data & 0x01);
+	flip_screen_x_set(machine(), data & 0x01);
 }
 
-WRITE8_HANDLER( mermaid_flip_screen_y_w )
+WRITE8_MEMBER(mermaid_state::mermaid_flip_screen_y_w)
 {
-	flip_screen_y_set(space->machine(), data & 0x01);
+	flip_screen_y_set(machine(), data & 0x01);
 }
 
-WRITE8_HANDLER( mermaid_bg_scroll_w )
+WRITE8_MEMBER(mermaid_state::mermaid_bg_scroll_w)
 {
-	mermaid_state *state = space->machine().driver_data<mermaid_state>();
-	state->m_bg_scrollram[offset] = data;
-	state->m_bg_tilemap->set_scrolly(offset, data);
+	m_bg_scrollram[offset] = data;
+	m_bg_tilemap->set_scrolly(offset, data);
 }
 
-WRITE8_HANDLER( mermaid_fg_scroll_w )
+WRITE8_MEMBER(mermaid_state::mermaid_fg_scroll_w)
 {
-	mermaid_state *state = space->machine().driver_data<mermaid_state>();
-	state->m_fg_scrollram[offset] = data;
-	state->m_fg_tilemap->set_scrolly(offset, data);
+	m_fg_scrollram[offset] = data;
+	m_fg_tilemap->set_scrolly(offset, data);
 }
 
-WRITE8_HANDLER( rougien_gfxbankswitch1_w )
+WRITE8_MEMBER(mermaid_state::rougien_gfxbankswitch1_w)
 {
-	mermaid_state *state = space->machine().driver_data<mermaid_state>();
-	state->m_rougien_gfxbank1 = data & 0x01;
+	m_rougien_gfxbank1 = data & 0x01;
 }
 
-WRITE8_HANDLER( rougien_gfxbankswitch2_w )
+WRITE8_MEMBER(mermaid_state::rougien_gfxbankswitch2_w)
 {
-	mermaid_state *state = space->machine().driver_data<mermaid_state>();
-	state->m_rougien_gfxbank2 = data & 0x01;
+	m_rougien_gfxbank2 = data & 0x01;
 }
 
-READ8_HANDLER( mermaid_collision_r )
+READ8_MEMBER(mermaid_state::mermaid_collision_r)
 {
 	/*
         collision register active LOW:
@@ -137,14 +130,13 @@ READ8_HANDLER( mermaid_collision_r )
         Bit 7
     */
 
-	mermaid_state *state = space->machine().driver_data<mermaid_state>();
 	int collision = 0xff;
 
-	if (state->m_coll_bit0) collision ^= 0x01;
-	if (state->m_coll_bit1) collision ^= 0x02;
-	if (state->m_coll_bit2) collision ^= 0x04;
-	if (state->m_coll_bit3) collision ^= 0x08;
-	if (state->m_coll_bit6) collision ^= 0x40;
+	if (m_coll_bit0) collision ^= 0x01;
+	if (m_coll_bit1) collision ^= 0x02;
+	if (m_coll_bit2) collision ^= 0x04;
+	if (m_coll_bit3) collision ^= 0x08;
+	if (m_coll_bit6) collision ^= 0x40;
 
 	return collision;
 }

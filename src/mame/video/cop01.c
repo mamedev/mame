@@ -120,21 +120,19 @@ VIDEO_START( cop01 )
 
 ***************************************************************************/
 
-WRITE8_HANDLER( cop01_background_w )
+WRITE8_MEMBER(cop01_state::cop01_background_w)
 {
-	cop01_state *state = space->machine().driver_data<cop01_state>();
-	state->m_bgvideoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset & 0x7ff);
+	m_bgvideoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset & 0x7ff);
 }
 
-WRITE8_HANDLER( cop01_foreground_w )
+WRITE8_MEMBER(cop01_state::cop01_foreground_w)
 {
-	cop01_state *state = space->machine().driver_data<cop01_state>();
-	state->m_fgvideoram[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset);
+	m_fgvideoram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( cop01_vreg_w )
+WRITE8_MEMBER(cop01_state::cop01_vreg_w)
 {
 	/*  0x40: --xx---- sprite bank, coin counters, flip screen
      *        -----x-- flip screen
@@ -147,14 +145,13 @@ WRITE8_HANDLER( cop01_vreg_w )
      *        -------x msb xscroll
      *  0x43: xxxxxxxx yscroll
      */
-	cop01_state *state = space->machine().driver_data<cop01_state>();
-	state->m_vreg[offset] = data;
+	m_vreg[offset] = data;
 
 	if (offset == 0)
 	{
-		coin_counter_w(space->machine(), 0, data & 1);
-		coin_counter_w(space->machine(), 1, data & 2);
-		flip_screen_set(space->machine(), data & 4);
+		coin_counter_w(machine(), 0, data & 1);
+		coin_counter_w(machine(), 1, data & 2);
+		flip_screen_set(machine(), data & 4);
 	}
 }
 

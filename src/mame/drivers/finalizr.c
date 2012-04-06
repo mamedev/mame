@@ -95,7 +95,7 @@ WRITE8_MEMBER(finalizr_state::i8039_T0_w)
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, finalizr_state )
 	AM_RANGE(0x0001, 0x0001) AM_WRITEONLY AM_BASE(m_scroll)
-	AM_RANGE(0x0003, 0x0003) AM_WRITE_LEGACY(finalizr_videoctrl_w)
+	AM_RANGE(0x0003, 0x0003) AM_WRITE(finalizr_videoctrl_w)
 	AM_RANGE(0x0004, 0x0004) AM_WRITE(finalizr_flipscreen_w)
 //  AM_RANGE(0x0020, 0x003f) AM_WRITEONLY AM_BASE(m_scroll)
 	AM_RANGE(0x0800, 0x0800) AM_READ_PORT("DSW3")

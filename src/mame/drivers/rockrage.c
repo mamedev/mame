@@ -107,7 +107,7 @@ static ADDRESS_MAP_START( rockrage_map, AS_PROGRAM, 8, rockrage_state )
 	AM_RANGE(0x2e40, 0x2e40) AM_READ_PORT("DSW1")
 	AM_RANGE(0x2e80, 0x2e80) AM_WRITE(rockrage_sh_irqtrigger_w)					/* cause interrupt on audio CPU */
 	AM_RANGE(0x2ec0, 0x2ec0) AM_WRITE(watchdog_reset_w)							/* watchdog reset */
-	AM_RANGE(0x2f00, 0x2f00) AM_WRITE_LEGACY(rockrage_vreg_w)							/* ??? */
+	AM_RANGE(0x2f00, 0x2f00) AM_WRITE(rockrage_vreg_w)							/* ??? */
 	AM_RANGE(0x2f40, 0x2f40) AM_WRITE(rockrage_bankswitch_w)					/* bankswitch control */
 	AM_RANGE(0x4000, 0x5fff) AM_RAM												/* RAM */
 	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1")										/* banked ROM */

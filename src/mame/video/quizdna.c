@@ -63,80 +63,74 @@ VIDEO_START( quizdna )
 	state->m_fg_tilemap->set_transparent_pen(0 );
 }
 
-WRITE8_HANDLER( quizdna_bg_ram_w )
+WRITE8_MEMBER(quizdna_state::quizdna_bg_ram_w)
 {
-	quizdna_state *state = space->machine().driver_data<quizdna_state>();
-	UINT8 *RAM = space->machine().region("maincpu")->base();
-	state->m_bg_ram[offset] = data;
+	UINT8 *RAM = machine().region("maincpu")->base();
+	m_bg_ram[offset] = data;
 	RAM[0x12000+offset] = data;
 
-	state->m_bg_tilemap->mark_tile_dirty((offset & 0xfff) / 2 );
+	m_bg_tilemap->mark_tile_dirty((offset & 0xfff) / 2 );
 }
 
-WRITE8_HANDLER( quizdna_fg_ram_w )
+WRITE8_MEMBER(quizdna_state::quizdna_fg_ram_w)
 {
-	quizdna_state *state = space->machine().driver_data<quizdna_state>();
 	int i;
 	int offs = offset & 0xfff;
-	UINT8 *RAM = space->machine().region("maincpu")->base();
+	UINT8 *RAM = machine().region("maincpu")->base();
 
 	RAM[0x10000+offs] = data;
 	RAM[0x11000+offs] = data; /* mirror */
-	state->m_fg_ram[offs] = data;
+	m_fg_ram[offs] = data;
 
 	for (i=0; i<32; i++)
-		state->m_fg_tilemap->mark_tile_dirty(((offs/2) & 0x1f) + i*0x20 );
+		m_fg_tilemap->mark_tile_dirty(((offs/2) & 0x1f) + i*0x20 );
 }
 
-WRITE8_HANDLER( quizdna_bg_yscroll_w )
+WRITE8_MEMBER(quizdna_state::quizdna_bg_yscroll_w)
 {
-	quizdna_state *state = space->machine().driver_data<quizdna_state>();
-	state->m_bg_tilemap->set_scrolldy(255-data, 255-data+1 );
+	m_bg_tilemap->set_scrolldy(255-data, 255-data+1 );
 }
 
-WRITE8_HANDLER( quizdna_bg_xscroll_w )
+WRITE8_MEMBER(quizdna_state::quizdna_bg_xscroll_w)
 {
-	quizdna_state *state = space->machine().driver_data<quizdna_state>();
 	int x;
-	state->m_bg_xscroll[offset] = data;
-	x = ~(state->m_bg_xscroll[0] + state->m_bg_xscroll[1]*0x100) & 0x1ff;
+	m_bg_xscroll[offset] = data;
+	x = ~(m_bg_xscroll[0] + m_bg_xscroll[1]*0x100) & 0x1ff;
 
-	state->m_bg_tilemap->set_scrolldx(x+64, x-64+10 );
+	m_bg_tilemap->set_scrolldx(x+64, x-64+10 );
 }
 
-WRITE8_HANDLER( quizdna_screen_ctrl_w )
+WRITE8_MEMBER(quizdna_state::quizdna_screen_ctrl_w)
 {
-	quizdna_state *state = space->machine().driver_data<quizdna_state>();
 	int tmp = (data & 0x10) >> 4;
-	state->m_video_enable = data & 0x20;
+	m_video_enable = data & 0x20;
 
-	coin_counter_w(space->machine(), 0, data & 1);
+	coin_counter_w(machine(), 0, data & 1);
 
-	if (state->m_flipscreen == tmp)
+	if (m_flipscreen == tmp)
 		return;
 
-	state->m_flipscreen = tmp;
+	m_flipscreen = tmp;
 
-	flip_screen_set(space->machine(), tmp);
-	state->m_fg_tilemap->set_scrolldx(64, -64 +16);
+	flip_screen_set(machine(), tmp);
+	m_fg_tilemap->set_scrolldx(64, -64 +16);
 }
 
-WRITE8_HANDLER( paletteram_xBGR_RRRR_GGGG_BBBB_w )
+WRITE8_MEMBER(quizdna_state::paletteram_xBGR_RRRR_GGGG_BBBB_w)
 {
 	int r,g,b,d0,d1;
 	int offs = offset & ~1;
 
-	quizdna_state *state = space->machine().driver_data<quizdna_state>();
-	state->m_generic_paletteram_8[offset] = data;
+	m_generic_paletteram_8[offset] = data;
 
-	d0 = state->m_generic_paletteram_8[offs];
-	d1 = state->m_generic_paletteram_8[offs+1];
+	d0 = m_generic_paletteram_8[offs];
+	d1 = m_generic_paletteram_8[offs+1];
 
 	r = ((d1 << 1) & 0x1e) | ((d1 >> 4) & 1);
 	g = ((d0 >> 3) & 0x1e) | ((d1 >> 5) & 1);
 	b = ((d0 << 1) & 0x1e) | ((d1 >> 6) & 1);
 
-	palette_set_color_rgb(space->machine(),offs/2,pal5bit(r),pal5bit(g),pal5bit(b));
+	palette_set_color_rgb(machine(),offs/2,pal5bit(r),pal5bit(g),pal5bit(b));
 }
 
 static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)

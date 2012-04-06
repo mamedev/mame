@@ -34,9 +34,9 @@
 #include "includes/clshroad.h"
 
 
-WRITE8_HANDLER( clshroad_flipscreen_w )
+WRITE8_MEMBER(clshroad_state::clshroad_flipscreen_w)
 {
-	flip_screen_set(space->machine(),  data & 1 );
+	flip_screen_set(machine(),  data & 1 );
 }
 
 
@@ -130,14 +130,13 @@ static TILE_GET_INFO( get_tile_info_0b )
 			0);
 }
 
-WRITE8_HANDLER( clshroad_vram_0_w )
+WRITE8_MEMBER(clshroad_state::clshroad_vram_0_w)
 {
-	clshroad_state *state = space->machine().driver_data<clshroad_state>();
 	int tile_index = offset / 2;
 	int tile = (tile_index & 0x1f) + (tile_index & ~0x3f)/2;
-	state->m_vram_0[offset] = data;
-	if (tile_index & 0x20)	state->m_tilemap_0a->mark_tile_dirty(tile);
-	else					state->m_tilemap_0b->mark_tile_dirty(tile);
+	m_vram_0[offset] = data;
+	if (tile_index & 0x20)	m_tilemap_0a->mark_tile_dirty(tile);
+	else					m_tilemap_0b->mark_tile_dirty(tile);
 }
 
 /***************************************************************************
@@ -200,11 +199,10 @@ static TILE_GET_INFO( get_tile_info_1 )
 			0);
 }
 
-WRITE8_HANDLER( clshroad_vram_1_w )
+WRITE8_MEMBER(clshroad_state::clshroad_vram_1_w)
 {
-	clshroad_state *state = space->machine().driver_data<clshroad_state>();
-	state->m_vram_1[offset] = data;
-	state->m_tilemap_1->mark_tile_dirty(offset % 0x400);
+	m_vram_1[offset] = data;
+	m_tilemap_1->mark_tile_dirty(offset % 0x400);
 }
 
 

@@ -39,22 +39,22 @@ public:
 	DECLARE_READ8_MEMBER(vsgongf_a006_r);
 	DECLARE_READ8_MEMBER(vsgongf_a100_r);
 	DECLARE_WRITE8_MEMBER(vsgongf_sound_command_w);
+	DECLARE_WRITE8_MEMBER(tsamurai_scrolly_w);
+	DECLARE_WRITE8_MEMBER(tsamurai_scrollx_w);
+	DECLARE_WRITE8_MEMBER(tsamurai_bgcolor_w);
+	DECLARE_WRITE8_MEMBER(tsamurai_textbank1_w);
+	DECLARE_WRITE8_MEMBER(tsamurai_textbank2_w);
+	DECLARE_WRITE8_MEMBER(tsamurai_bg_videoram_w);
+	DECLARE_WRITE8_MEMBER(tsamurai_fg_videoram_w);
+	DECLARE_WRITE8_MEMBER(tsamurai_fg_colorram_w);
+	DECLARE_WRITE8_MEMBER(vsgongf_color_w);
 };
 
 
 /*----------- defined in video/tsamurai.c -----------*/
 
-WRITE8_HANDLER( vsgongf_color_w );
 
-WRITE8_HANDLER( tsamurai_bgcolor_w );
-WRITE8_HANDLER( tsamurai_textbank1_w );
-WRITE8_HANDLER( tsamurai_textbank2_w );
 
-WRITE8_HANDLER( tsamurai_scrolly_w );
-WRITE8_HANDLER( tsamurai_scrollx_w );
-WRITE8_HANDLER( tsamurai_bg_videoram_w );
-WRITE8_HANDLER( tsamurai_fg_videoram_w );
-WRITE8_HANDLER( tsamurai_fg_colorram_w );
 
 VIDEO_START( tsamurai );
 SCREEN_UPDATE_IND16( tsamurai );

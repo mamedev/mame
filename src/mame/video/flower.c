@@ -192,29 +192,26 @@ SCREEN_UPDATE_IND16( flower )
 	return 0;
 }
 
-WRITE8_HANDLER( flower_textram_w )
+WRITE8_MEMBER(flower_state::flower_textram_w)
 {
-	flower_state *state = space->machine().driver_data<flower_state>();
-	state->m_textram[offset] = data;
-	state->m_text_tilemap->mark_tile_dirty(offset);
-	state->m_text_right_tilemap->mark_all_dirty();
+	m_textram[offset] = data;
+	m_text_tilemap->mark_tile_dirty(offset);
+	m_text_right_tilemap->mark_all_dirty();
 }
 
-WRITE8_HANDLER( flower_bg0ram_w )
+WRITE8_MEMBER(flower_state::flower_bg0ram_w)
 {
-	flower_state *state = space->machine().driver_data<flower_state>();
-	state->m_bg0ram[offset] = data;
-	state->m_bg0_tilemap->mark_tile_dirty(offset & 0x1ff);
+	m_bg0ram[offset] = data;
+	m_bg0_tilemap->mark_tile_dirty(offset & 0x1ff);
 }
 
-WRITE8_HANDLER( flower_bg1ram_w )
+WRITE8_MEMBER(flower_state::flower_bg1ram_w)
 {
-	flower_state *state = space->machine().driver_data<flower_state>();
-	state->m_bg1ram[offset] = data;
-	state->m_bg1_tilemap->mark_tile_dirty(offset & 0x1ff);
+	m_bg1ram[offset] = data;
+	m_bg1_tilemap->mark_tile_dirty(offset & 0x1ff);
 }
 
-WRITE8_HANDLER( flower_flipscreen_w )
+WRITE8_MEMBER(flower_state::flower_flipscreen_w)
 {
-	flip_screen_set(space->machine(), data);
+	flip_screen_set(machine(), data);
 }

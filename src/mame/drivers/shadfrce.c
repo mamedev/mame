@@ -363,17 +363,17 @@ static TIMER_DEVICE_CALLBACK( shadfrce_scanline )
 
 static ADDRESS_MAP_START( shadfrce_map, AS_PROGRAM, 16, shadfrce_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE_LEGACY(shadfrce_bg0videoram_w) AM_BASE(m_bg0videoram) /* video */
+	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(shadfrce_bg0videoram_w) AM_BASE(m_bg0videoram) /* video */
 	AM_RANGE(0x101000, 0x101fff) AM_RAM
-	AM_RANGE(0x102000, 0x1027ff) AM_RAM_WRITE_LEGACY(shadfrce_bg1videoram_w) AM_BASE(m_bg1videoram) /* bg 2 */
+	AM_RANGE(0x102000, 0x1027ff) AM_RAM_WRITE(shadfrce_bg1videoram_w) AM_BASE(m_bg1videoram) /* bg 2 */
 	AM_RANGE(0x102800, 0x103fff) AM_RAM
-	AM_RANGE(0x140000, 0x141fff) AM_RAM_WRITE_LEGACY(shadfrce_fgvideoram_w) AM_BASE(m_fgvideoram)
+	AM_RANGE(0x140000, 0x141fff) AM_RAM_WRITE(shadfrce_fgvideoram_w) AM_BASE(m_fgvideoram)
 	AM_RANGE(0x142000, 0x143fff) AM_RAM AM_BASE(m_spvideoram) AM_SIZE(m_spvideoram_size) /* sprites */
 	AM_RANGE(0x180000, 0x187fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
-	AM_RANGE(0x1c0000, 0x1c0001) AM_WRITE_LEGACY(shadfrce_bg0scrollx_w) /* SCROLL X */
-	AM_RANGE(0x1c0002, 0x1c0003) AM_WRITE_LEGACY(shadfrce_bg0scrolly_w) /* SCROLL Y */
-	AM_RANGE(0x1c0004, 0x1c0005) AM_WRITE_LEGACY(shadfrce_bg1scrollx_w) /* SCROLL X */
-	AM_RANGE(0x1c0006, 0x1c0007) AM_WRITE_LEGACY(shadfrce_bg1scrolly_w) /* SCROLL Y */
+	AM_RANGE(0x1c0000, 0x1c0001) AM_WRITE(shadfrce_bg0scrollx_w) /* SCROLL X */
+	AM_RANGE(0x1c0002, 0x1c0003) AM_WRITE(shadfrce_bg0scrolly_w) /* SCROLL Y */
+	AM_RANGE(0x1c0004, 0x1c0005) AM_WRITE(shadfrce_bg1scrollx_w) /* SCROLL X */
+	AM_RANGE(0x1c0006, 0x1c0007) AM_WRITE(shadfrce_bg1scrolly_w) /* SCROLL Y */
 	AM_RANGE(0x1c0008, 0x1c0009) AM_WRITENOP /* ?? */
 	AM_RANGE(0x1c000a, 0x1c000b) AM_READNOP AM_WRITE(shadfrce_flip_screen)
 	AM_RANGE(0x1c000c, 0x1c000d) AM_WRITENOP /* ?? */

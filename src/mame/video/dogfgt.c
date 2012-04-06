@@ -84,32 +84,29 @@ VIDEO_START( dogfgt )
 
 ***************************************************************************/
 
-WRITE8_HANDLER( dogfgt_plane_select_w )
+WRITE8_MEMBER(dogfgt_state::dogfgt_plane_select_w)
 {
-	dogfgt_state *state = space->machine().driver_data<dogfgt_state>();
 
-	state->m_bm_plane = data;
+	m_bm_plane = data;
 }
 
-READ8_HANDLER( dogfgt_bitmapram_r )
+READ8_MEMBER(dogfgt_state::dogfgt_bitmapram_r)
 {
-	dogfgt_state *state = space->machine().driver_data<dogfgt_state>();
 
-	if (state->m_bm_plane > 2)
+	if (m_bm_plane > 2)
 	{
-		popmessage("bitmapram_r offs %04x plane %d\n", offset, state->m_bm_plane);
+		popmessage("bitmapram_r offs %04x plane %d\n", offset, m_bm_plane);
 		return 0;
 	}
 
-	return state->m_bitmapram[offset + BITMAPRAM_SIZE / 3 * state->m_bm_plane];
+	return m_bitmapram[offset + BITMAPRAM_SIZE / 3 * m_bm_plane];
 }
 
-static WRITE8_HANDLER( internal_bitmapram_w )
+WRITE8_MEMBER(dogfgt_state::internal_bitmapram_w)
 {
-	dogfgt_state *state = space->machine().driver_data<dogfgt_state>();
 	int x, y, subx;
 
-	state->m_bitmapram[offset] = data;
+	m_bitmapram[offset] = data;
 
 	offset &= (BITMAPRAM_SIZE / 3 - 1);
 	x = 8 * (offset / 256);
@@ -120,61 +117,57 @@ static WRITE8_HANDLER( internal_bitmapram_w )
 		int i, color = 0;
 
 		for (i = 0; i < 3; i++)
-			color |= ((state->m_bitmapram[offset + BITMAPRAM_SIZE / 3 * i] >> subx) & 1) << i;
+			color |= ((m_bitmapram[offset + BITMAPRAM_SIZE / 3 * i] >> subx) & 1) << i;
 
-		if (flip_screen_get(space->machine()))
-			state->m_pixbitmap.pix16(y ^ 0xff, (x + subx) ^ 0xff) = PIXMAP_COLOR_BASE + 8 * state->m_pixcolor + color;
+		if (flip_screen_get(machine()))
+			m_pixbitmap.pix16(y ^ 0xff, (x + subx) ^ 0xff) = PIXMAP_COLOR_BASE + 8 * m_pixcolor + color;
 		else
-			state->m_pixbitmap.pix16(y, x + subx) = PIXMAP_COLOR_BASE + 8 * state->m_pixcolor + color;
+			m_pixbitmap.pix16(y, x + subx) = PIXMAP_COLOR_BASE + 8 * m_pixcolor + color;
 	}
 }
 
-WRITE8_HANDLER( dogfgt_bitmapram_w )
+WRITE8_MEMBER(dogfgt_state::dogfgt_bitmapram_w)
 {
-	dogfgt_state *state = space->machine().driver_data<dogfgt_state>();
 
-	if (state->m_bm_plane > 2)
+	if (m_bm_plane > 2)
 	{
-		popmessage("bitmapram_w offs %04x plane %d\n", offset, state->m_bm_plane);
+		popmessage("bitmapram_w offs %04x plane %d\n", offset, m_bm_plane);
 		return;
 	}
 
-	internal_bitmapram_w(space, offset + BITMAPRAM_SIZE / 3 * state->m_bm_plane, data);
+	internal_bitmapram_w(space, offset + BITMAPRAM_SIZE / 3 * m_bm_plane, data);
 }
 
-WRITE8_HANDLER( dogfgt_bgvideoram_w )
+WRITE8_MEMBER(dogfgt_state::dogfgt_bgvideoram_w)
 {
-	dogfgt_state *state = space->machine().driver_data<dogfgt_state>();
 
-	state->m_bgvideoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
+	m_bgvideoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_HANDLER( dogfgt_scroll_w )
+WRITE8_MEMBER(dogfgt_state::dogfgt_scroll_w)
 {
-	dogfgt_state *state = space->machine().driver_data<dogfgt_state>();
 
-	state->m_scroll[offset] = data;
-	state->m_bg_tilemap->set_scrollx(0, state->m_scroll[0] + 256 * state->m_scroll[1] + 256);
-	state->m_bg_tilemap->set_scrolly(0, state->m_scroll[2] + 256 * state->m_scroll[3]);
+	m_scroll[offset] = data;
+	m_bg_tilemap->set_scrollx(0, m_scroll[0] + 256 * m_scroll[1] + 256);
+	m_bg_tilemap->set_scrolly(0, m_scroll[2] + 256 * m_scroll[3]);
 }
 
-WRITE8_HANDLER( dogfgt_1800_w )
+WRITE8_MEMBER(dogfgt_state::dogfgt_1800_w)
 {
-	dogfgt_state *state = space->machine().driver_data<dogfgt_state>();
 
 	/* bits 0 and 1 are probably text color (not verified because PROM is missing) */
-	state->m_pixcolor = ((data & 0x01) << 1) | ((data & 0x02) >> 1);
+	m_pixcolor = ((data & 0x01) << 1) | ((data & 0x02) >> 1);
 
 	/* bits 4 and 5 are coin counters */
-	coin_counter_w(space->machine(), 0, data & 0x10);
-	coin_counter_w(space->machine(), 1, data & 0x20);
+	coin_counter_w(machine(), 0, data & 0x10);
+	coin_counter_w(machine(), 1, data & 0x20);
 
 	/* bit 7 is screen flip */
-	flip_screen_set(space->machine(), data & 0x80);
+	flip_screen_set(machine(), data & 0x80);
 
 	/* other bits unused? */
-	logerror("PC %04x: 1800 = %02x\n", cpu_get_pc(&space->device()), data);
+	logerror("PC %04x: 1800 = %02x\n", cpu_get_pc(&space.device()), data);
 }
 
 
@@ -230,7 +223,7 @@ SCREEN_UPDATE_IND16( dogfgt )
 		state->m_lastpixcolor = state->m_pixcolor;
 
 		for (offs = 0; offs < BITMAPRAM_SIZE; offs++)
-			internal_bitmapram_w(space, offs, state->m_bitmapram[offs]);
+			state->internal_bitmapram_w(*space, offs, state->m_bitmapram[offs]);
 	}
 
 

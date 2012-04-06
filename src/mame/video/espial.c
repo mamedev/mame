@@ -115,48 +115,43 @@ VIDEO_START( netwars )
  *
  *************************************/
 
-WRITE8_HANDLER( espial_videoram_w )
+WRITE8_MEMBER(espial_state::espial_videoram_w)
 {
-	espial_state *state = space->machine().driver_data<espial_state>();
 
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_HANDLER( espial_colorram_w )
+WRITE8_MEMBER(espial_state::espial_colorram_w)
 {
-	espial_state *state = space->machine().driver_data<espial_state>();
 
-	state->m_colorram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_colorram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_HANDLER( espial_attributeram_w )
+WRITE8_MEMBER(espial_state::espial_attributeram_w)
 {
-	espial_state *state = space->machine().driver_data<espial_state>();
 
-	state->m_attributeram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_attributeram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_HANDLER( espial_scrollram_w )
+WRITE8_MEMBER(espial_state::espial_scrollram_w)
 {
-	espial_state *state = space->machine().driver_data<espial_state>();
 
-	state->m_scrollram[offset] = data;
-	state->m_bg_tilemap->set_scrolly(offset, data);
+	m_scrollram[offset] = data;
+	m_bg_tilemap->set_scrolly(offset, data);
 }
 
 
-WRITE8_HANDLER( espial_flipscreen_w )
+WRITE8_MEMBER(espial_state::espial_flipscreen_w)
 {
-	espial_state *state = space->machine().driver_data<espial_state>();
 
-	state->m_flipscreen = data;
-	state->m_bg_tilemap->set_flip(state->m_flipscreen ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
+	m_flipscreen = data;
+	m_bg_tilemap->set_flip(m_flipscreen ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
 }
 
 

@@ -44,18 +44,16 @@ PALETTE_INIT( trucocl )
 		palette_set_color_rgb(machine,i,pal4bit(color_prom[i] >> 0),pal4bit(color_prom[i+32] >> 0),pal4bit(color_prom[i+32] >> 4));
 }
 
-WRITE8_HANDLER( trucocl_videoram_w )
+WRITE8_MEMBER(trucocl_state::trucocl_videoram_w)
 {
-	trucocl_state *state = space->machine().driver_data<trucocl_state>();
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( trucocl_colorram_w )
+WRITE8_MEMBER(trucocl_state::trucocl_colorram_w)
 {
-	trucocl_state *state = space->machine().driver_data<trucocl_state>();
-	state->m_colorram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_colorram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )

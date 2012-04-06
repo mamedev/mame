@@ -135,32 +135,29 @@ PALETTE_INIT( sraider )
 	colortable_entry_set_value(machine.colortable, 0x81, 0x40);
 }
 
-WRITE8_HANDLER( ladybug_videoram_w )
+WRITE8_MEMBER(ladybug_state::ladybug_videoram_w)
 {
-	ladybug_state *state = space->machine().driver_data<ladybug_state>();
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( ladybug_colorram_w )
+WRITE8_MEMBER(ladybug_state::ladybug_colorram_w)
 {
-	ladybug_state *state = space->machine().driver_data<ladybug_state>();
-	state->m_colorram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_colorram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( ladybug_flipscreen_w )
+WRITE8_MEMBER(ladybug_state::ladybug_flipscreen_w)
 {
-	if (flip_screen_get(space->machine()) != (data & 0x01))
+	if (flip_screen_get(machine()) != (data & 0x01))
 	{
-		flip_screen_set(space->machine(), data & 0x01);
-		space->machine().tilemap().mark_all_dirty();
+		flip_screen_set(machine(), data & 0x01);
+		machine().tilemap().mark_all_dirty();
 	}
 }
 
-WRITE8_HANDLER( sraider_io_w )
+WRITE8_MEMBER(ladybug_state::sraider_io_w)
 {
-	ladybug_state *state = space->machine().driver_data<ladybug_state>();
 
 	// bit7 = flip
 	// bit6 = grid red
@@ -169,15 +166,15 @@ WRITE8_HANDLER( sraider_io_w )
 	// bit3 = enable stars
 	// bit210 = stars speed/dir
 
-	if (flip_screen_get(space->machine()) != (data & 0x80))
+	if (flip_screen_get(machine()) != (data & 0x80))
 	{
-		flip_screen_set(space->machine(), data & 0x80);
-		space->machine().tilemap().mark_all_dirty();
+		flip_screen_set(machine(), data & 0x80);
+		machine().tilemap().mark_all_dirty();
 	}
 
-	state->m_grid_color = data & 0x70;
+	m_grid_color = data & 0x70;
 
-	redclash_set_stars_enable(space->machine(), (data & 0x08) >> 3);
+	redclash_set_stars_enable(machine(), (data & 0x08) >> 3);
 
 	/*
      * There must be a subtle clocking difference between
@@ -185,7 +182,7 @@ WRITE8_HANDLER( sraider_io_w )
      * hence the -1 here
      */
 
-	redclash_set_stars_speed(space->machine(), (data & 0x07) - 1);
+	redclash_set_stars_speed(machine(), (data & 0x07) - 1);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )

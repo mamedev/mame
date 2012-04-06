@@ -6,12 +6,11 @@
                  SPRITE READ AND WRITE HANDLERS
 **************************************************************/
 
-WRITE16_HANDLER( asuka_spritectrl_w )
+WRITE16_MEMBER(asuka_state::asuka_spritectrl_w)
 {
-	asuka_state *state = space->machine().driver_data<asuka_state>();
 
 	/* Bits 2-5 are color bank; in asuka games bit 0 is global priority */
-	pc090oj_set_sprite_ctrl(state->m_pc090oj, ((data & 0x3c) >> 2) | ((data & 0x1) << 15));
+	pc090oj_set_sprite_ctrl(m_pc090oj, ((data & 0x3c) >> 2) | ((data & 0x1) << 15));
 }
 
 

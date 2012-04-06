@@ -34,32 +34,28 @@
 #include "video/kan_pand.h"
 #include "includes/airbustr.h"
 
-WRITE8_HANDLER( airbustr_videoram_w )
+WRITE8_MEMBER(airbustr_state::airbustr_videoram_w)
 {
-	airbustr_state *state = space->machine().driver_data<airbustr_state>();
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( airbustr_colorram_w )
+WRITE8_MEMBER(airbustr_state::airbustr_colorram_w)
 {
-	airbustr_state *state = space->machine().driver_data<airbustr_state>();
-	state->m_colorram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_colorram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( airbustr_videoram2_w )
+WRITE8_MEMBER(airbustr_state::airbustr_videoram2_w)
 {
-	airbustr_state *state = space->machine().driver_data<airbustr_state>();
-	state->m_videoram2[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset);
+	m_videoram2[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( airbustr_colorram2_w )
+WRITE8_MEMBER(airbustr_state::airbustr_colorram2_w)
 {
-	airbustr_state *state = space->machine().driver_data<airbustr_state>();
-	state->m_colorram2[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset);
+	m_colorram2[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 /*  Scroll Registers
@@ -74,24 +70,23 @@ WRITE8_HANDLER( airbustr_colorram2_w )
             Bg Y    Bg X    Fg Y    Fg X    <-Scroll High Bits (complemented!)
 */
 
-WRITE8_HANDLER( airbustr_scrollregs_w )
+WRITE8_MEMBER(airbustr_state::airbustr_scrollregs_w)
 {
-	airbustr_state *state = space->machine().driver_data<airbustr_state>();
 	switch (offset)		// offset 0 <-> port 4
 	{
-		case 0x00:	state->m_fg_scrolly = data;	break;	// low 8 bits
-		case 0x02:	state->m_fg_scrollx = data;	break;
-		case 0x04:	state->m_bg_scrolly = data;	break;
-		case 0x06:	state->m_bg_scrollx = data;	break;
-		case 0x08:	state->m_highbits   = ~data;	break;	// complemented high bits
+		case 0x00:	m_fg_scrolly = data;	break;	// low 8 bits
+		case 0x02:	m_fg_scrollx = data;	break;
+		case 0x04:	m_bg_scrolly = data;	break;
+		case 0x06:	m_bg_scrollx = data;	break;
+		case 0x08:	m_highbits   = ~data;	break;	// complemented high bits
 
-		default:	logerror("CPU #2 - port %02X written with %02X - PC = %04X\n", offset, data, cpu_get_pc(&space->device()));
+		default:	logerror("CPU #2 - port %02X written with %02X - PC = %04X\n", offset, data, cpu_get_pc(&space.device()));
 	}
 
-	state->m_bg_tilemap->set_scrolly(0, ((state->m_highbits << 5) & 0x100) + state->m_bg_scrolly);
-	state->m_bg_tilemap->set_scrollx(0, ((state->m_highbits << 6) & 0x100) + state->m_bg_scrollx);
-	state->m_fg_tilemap->set_scrolly(0, ((state->m_highbits << 7) & 0x100) + state->m_fg_scrolly);
-	state->m_fg_tilemap->set_scrollx(0, ((state->m_highbits << 8) & 0x100) + state->m_fg_scrollx);
+	m_bg_tilemap->set_scrolly(0, ((m_highbits << 5) & 0x100) + m_bg_scrolly);
+	m_bg_tilemap->set_scrollx(0, ((m_highbits << 6) & 0x100) + m_bg_scrollx);
+	m_fg_tilemap->set_scrolly(0, ((m_highbits << 7) & 0x100) + m_fg_scrolly);
+	m_fg_tilemap->set_scrollx(0, ((m_highbits << 8) & 0x100) + m_fg_scrollx);
 }
 
 static TILE_GET_INFO( get_fg_tile_info )

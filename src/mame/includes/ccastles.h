@@ -53,6 +53,14 @@ public:
 	DECLARE_WRITE8_MEMBER(nvram_store_w);
 	DECLARE_READ8_MEMBER(nvram_r);
 	DECLARE_WRITE8_MEMBER(nvram_w);
+	DECLARE_WRITE8_MEMBER(ccastles_hscroll_w);
+	DECLARE_WRITE8_MEMBER(ccastles_vscroll_w);
+	DECLARE_WRITE8_MEMBER(ccastles_video_control_w);
+	DECLARE_WRITE8_MEMBER(ccastles_paletteram_w);
+	DECLARE_WRITE8_MEMBER(ccastles_videoram_w);
+	DECLARE_READ8_MEMBER(ccastles_bitmode_r);
+	DECLARE_WRITE8_MEMBER(ccastles_bitmode_w);
+	DECLARE_WRITE8_MEMBER(ccastles_bitmode_addr_w);
 };
 
 
@@ -62,13 +70,5 @@ public:
 VIDEO_START( ccastles );
 SCREEN_UPDATE_IND16( ccastles );
 
-WRITE8_HANDLER( ccastles_hscroll_w );
-WRITE8_HANDLER( ccastles_vscroll_w );
-WRITE8_HANDLER( ccastles_video_control_w );
 
-WRITE8_HANDLER( ccastles_paletteram_w );
-WRITE8_HANDLER( ccastles_videoram_w );
 
-READ8_HANDLER( ccastles_bitmode_r );
-WRITE8_HANDLER( ccastles_bitmode_w );
-WRITE8_HANDLER( ccastles_bitmode_addr_w );

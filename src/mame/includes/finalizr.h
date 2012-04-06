@@ -40,12 +40,12 @@ public:
 	DECLARE_WRITE8_MEMBER(i8039_irqen_w);
 	DECLARE_READ8_MEMBER(i8039_T1_r);
 	DECLARE_WRITE8_MEMBER(i8039_T0_w);
+	DECLARE_WRITE8_MEMBER(finalizr_videoctrl_w);
 };
 
 
 /*----------- defined in video/finalizr.c -----------*/
 
-WRITE8_HANDLER( finalizr_videoctrl_w );
 
 PALETTE_INIT( finalizr );
 VIDEO_START( finalizr );

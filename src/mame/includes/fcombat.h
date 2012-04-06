@@ -58,6 +58,7 @@ public:
 	DECLARE_WRITE8_MEMBER(ed00_w);
 	DECLARE_READ8_MEMBER(e300_r);
 	DECLARE_WRITE8_MEMBER(ee00_w);
+	DECLARE_WRITE8_MEMBER(fcombat_videoreg_w);
 };
 
 
@@ -68,4 +69,3 @@ PALETTE_INIT( fcombat );
 VIDEO_START( fcombat );
 SCREEN_UPDATE_IND16( fcombat );
 
-WRITE8_HANDLER( fcombat_videoreg_w );

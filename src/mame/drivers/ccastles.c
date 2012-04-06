@@ -306,14 +306,14 @@ WRITE8_MEMBER(ccastles_state::nvram_store_w)
 
 READ8_MEMBER(ccastles_state::nvram_r)
 {
-	return (m_nvram_4b->read(*&space, offset) & 0x0f) | (m_nvram_4a->read(*&space, offset) << 4);
+	return (m_nvram_4b->read(space, offset) & 0x0f) | (m_nvram_4a->read(space, offset) << 4);
 }
 
 
 WRITE8_MEMBER(ccastles_state::nvram_w)
 {
-	m_nvram_4b->write(*&space, offset, data);
-	m_nvram_4a->write(*&space, offset, data >> 4);
+	m_nvram_4b->write(space, offset, data);
+	m_nvram_4a->write(space, offset, data >> 4);
 }
 
 
@@ -326,9 +326,9 @@ WRITE8_MEMBER(ccastles_state::nvram_w)
 
 /* complete memory map derived from schematics */
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, ccastles_state )
-	AM_RANGE(0x0000, 0x0001) AM_WRITE_LEGACY(ccastles_bitmode_addr_w)
-	AM_RANGE(0x0002, 0x0002) AM_READWRITE_LEGACY(ccastles_bitmode_r, ccastles_bitmode_w)
-	AM_RANGE(0x0000, 0x7fff) AM_RAM_WRITE_LEGACY(ccastles_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0x0000, 0x0001) AM_WRITE(ccastles_bitmode_addr_w)
+	AM_RANGE(0x0002, 0x0002) AM_READWRITE(ccastles_bitmode_r, ccastles_bitmode_w)
+	AM_RANGE(0x0000, 0x7fff) AM_RAM_WRITE(ccastles_videoram_w) AM_BASE(m_videoram)
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
 	AM_RANGE(0x8e00, 0x8fff) AM_BASE(m_spriteram)
 	AM_RANGE(0x9000, 0x90ff) AM_MIRROR(0x0300) AM_READWRITE(nvram_r, nvram_w)
@@ -337,16 +337,16 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, ccastles_state )
 	AM_RANGE(0x9800, 0x980f) AM_MIRROR(0x01f0) AM_DEVREADWRITE_LEGACY("pokey1", pokey_r, pokey_w)
 	AM_RANGE(0x9a00, 0x9a0f) AM_MIRROR(0x01f0) AM_DEVREADWRITE_LEGACY("pokey2", pokey_r, pokey_w)
 	AM_RANGE(0x9c00, 0x9c7f) AM_WRITE(nvram_recall_w)
-	AM_RANGE(0x9c80, 0x9cff) AM_WRITE_LEGACY(ccastles_hscroll_w)
-	AM_RANGE(0x9d00, 0x9d7f) AM_WRITE_LEGACY(ccastles_vscroll_w)
+	AM_RANGE(0x9c80, 0x9cff) AM_WRITE(ccastles_hscroll_w)
+	AM_RANGE(0x9d00, 0x9d7f) AM_WRITE(ccastles_vscroll_w)
 	AM_RANGE(0x9d80, 0x9dff) AM_WRITE(irq_ack_w)
 	AM_RANGE(0x9e00, 0x9e7f) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x9e80, 0x9e81) AM_MIRROR(0x0078) AM_WRITE(led_w)
 	AM_RANGE(0x9e82, 0x9e83) AM_MIRROR(0x0078) AM_WRITE(nvram_store_w)
 	AM_RANGE(0x9e85, 0x9e86) AM_MIRROR(0x0078) AM_WRITE(ccounter_w)
 	AM_RANGE(0x9e87, 0x9e87) AM_MIRROR(0x0078) AM_WRITE(bankswitch_w)
-	AM_RANGE(0x9f00, 0x9f07) AM_MIRROR(0x0078) AM_WRITE_LEGACY(ccastles_video_control_w)
-	AM_RANGE(0x9f80, 0x9fbf) AM_MIRROR(0x0040) AM_WRITE_LEGACY(ccastles_paletteram_w)
+	AM_RANGE(0x9f00, 0x9f07) AM_MIRROR(0x0078) AM_WRITE(ccastles_video_control_w)
+	AM_RANGE(0x9f80, 0x9fbf) AM_MIRROR(0x0040) AM_WRITE(ccastles_paletteram_w)
 	AM_RANGE(0xa000, 0xdfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END

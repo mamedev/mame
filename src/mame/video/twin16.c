@@ -40,48 +40,44 @@ enum
 };
 
 
-WRITE16_HANDLER( twin16_text_ram_w )
+WRITE16_MEMBER(twin16_state::twin16_text_ram_w)
 {
-	twin16_state *state = space->machine().driver_data<twin16_state>();
-	COMBINE_DATA(&state->m_text_ram[offset]);
-	state->m_text_tilemap->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_text_ram[offset]);
+	m_text_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_HANDLER( twin16_paletteram_word_w )
+WRITE16_MEMBER(twin16_state::twin16_paletteram_word_w)
 {	// identical to tmnt_paletteram_w
-	twin16_state *state = space->machine().driver_data<twin16_state>();
-	COMBINE_DATA(state->m_generic_paletteram_16 + offset);
+	COMBINE_DATA(m_generic_paletteram_16 + offset);
 	offset &= ~1;
 
-	data = ((state->m_generic_paletteram_16[offset] & 0xff) << 8) | (state->m_generic_paletteram_16[offset + 1] & 0xff);
-	palette_set_color_rgb(space->machine(), offset / 2, pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
+	data = ((m_generic_paletteram_16[offset] & 0xff) << 8) | (m_generic_paletteram_16[offset + 1] & 0xff);
+	palette_set_color_rgb(machine(), offset / 2, pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
 }
 
-WRITE16_HANDLER( fround_gfx_bank_w )
+WRITE16_MEMBER(twin16_state::fround_gfx_bank_w)
 {
-	twin16_state *state = space->machine().driver_data<twin16_state>();
-	COMBINE_DATA(&state->m_gfx_bank);
+	COMBINE_DATA(&m_gfx_bank);
 }
 
-WRITE16_HANDLER( twin16_video_register_w )
+WRITE16_MEMBER(twin16_state::twin16_video_register_w)
 {
-	twin16_state *state = space->machine().driver_data<twin16_state>();
 	switch (offset)
 	{
 		case 0:
-			COMBINE_DATA( &state->m_video_register );
+			COMBINE_DATA( &m_video_register );
 
-			flip_screen_x_set(space->machine(), state->m_video_register & TWIN16_SCREEN_FLIPX);
-			flip_screen_y_set(space->machine(), state->m_video_register & TWIN16_SCREEN_FLIPY);
+			flip_screen_x_set(machine(), m_video_register & TWIN16_SCREEN_FLIPX);
+			flip_screen_y_set(machine(), m_video_register & TWIN16_SCREEN_FLIPY);
 
 			break;
 
-		case 1: COMBINE_DATA( &state->m_scrollx[0] ); break;
-		case 2: COMBINE_DATA( &state->m_scrolly[0] ); break;
-		case 3: COMBINE_DATA( &state->m_scrollx[1] ); break;
-		case 4: COMBINE_DATA( &state->m_scrolly[1] ); break;
-		case 5: COMBINE_DATA( &state->m_scrollx[2] ); break;
-		case 6: COMBINE_DATA( &state->m_scrolly[2] ); break;
+		case 1: COMBINE_DATA( &m_scrollx[0] ); break;
+		case 2: COMBINE_DATA( &m_scrolly[0] ); break;
+		case 3: COMBINE_DATA( &m_scrollx[1] ); break;
+		case 4: COMBINE_DATA( &m_scrolly[1] ); break;
+		case 5: COMBINE_DATA( &m_scrollx[2] ); break;
+		case 6: COMBINE_DATA( &m_scrolly[2] ); break;
 
 		default:
 			logerror("unknown video_register write:%d", data );
@@ -135,11 +131,10 @@ WRITE16_HANDLER( twin16_video_register_w )
  *   3  | ------------xxxx | color
  */
 
-READ16_HANDLER( twin16_sprite_status_r )
+READ16_MEMBER(twin16_state::twin16_sprite_status_r)
 {
-	twin16_state *state = space->machine().driver_data<twin16_state>();
 	// bit 0: busy, other bits: dunno
-	return state->m_sprite_busy;
+	return m_sprite_busy;
 }
 
 static TIMER_CALLBACK( twin16_sprite_tick )

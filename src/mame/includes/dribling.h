@@ -30,11 +30,11 @@ public:
 	device_t *m_ppi_1;
 	DECLARE_READ8_MEMBER(ioread);
 	DECLARE_WRITE8_MEMBER(iowrite);
+	DECLARE_WRITE8_MEMBER(dribling_colorram_w);
 };
 
 
 /*----------- defined in video/dribling.c -----------*/
 
 PALETTE_INIT( dribling );
-WRITE8_HANDLER( dribling_colorram_w );
 SCREEN_UPDATE_IND16( dribling );

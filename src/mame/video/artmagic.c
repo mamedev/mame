@@ -299,35 +299,33 @@ static void execute_blit(running_machine &machine)
 }
 
 
-READ16_HANDLER( artmagic_blitter_r )
+READ16_MEMBER(artmagic_state::artmagic_blitter_r)
 {
-	artmagic_state *state = space->machine().driver_data<artmagic_state>();
 	/*
         bit 1 is a busy flag; loops tightly if clear
         bit 2 is tested in a similar fashion
         bit 4 reflects the page
     */
-	UINT16 result = 0xffef | (state->m_blitter_page << 4);
+	UINT16 result = 0xffef | (m_blitter_page << 4);
 #if (!INSTANT_BLIT)
-	if (attotime_compare(space->machine().time(), state->m_blitter_busy_until) < 0)
+	if (attotime_compare(machine().time(), m_blitter_busy_until) < 0)
 		result ^= 6;
 #endif
 	return result;
 }
 
 
-WRITE16_HANDLER( artmagic_blitter_w )
+WRITE16_MEMBER(artmagic_state::artmagic_blitter_w)
 {
-	artmagic_state *state = space->machine().driver_data<artmagic_state>();
-	COMBINE_DATA(&state->m_blitter_data[offset]);
+	COMBINE_DATA(&m_blitter_data[offset]);
 
 	/* offset 3 triggers the blit */
 	if (offset == 3)
-		execute_blit(space->machine());
+		execute_blit(machine());
 
 	/* offset 4 contains the target page */
 	else if (offset == 4)
-		state->m_blitter_page = (data >> 1) & 1;
+		m_blitter_page = (data >> 1) & 1;
 }
 
 

@@ -10,37 +10,35 @@
 #include "includes/arkanoid.h"
 
 
-WRITE8_HANDLER( arkanoid_videoram_w )
+WRITE8_MEMBER(arkanoid_state::arkanoid_videoram_w)
 {
-	arkanoid_state *state = space->machine().driver_data<arkanoid_state>();
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset / 2);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE8_HANDLER( arkanoid_d008_w )
+WRITE8_MEMBER(arkanoid_state::arkanoid_d008_w)
 {
-	arkanoid_state *state = space->machine().driver_data<arkanoid_state>();
 	int bank;
 
 	/* bits 0 and 1 flip X and Y, I don't know which is which */
-	if (flip_screen_x_get(space->machine()) != (data & 0x01))
+	if (flip_screen_x_get(machine()) != (data & 0x01))
 	{
-		flip_screen_x_set(space->machine(), data & 0x01);
-		state->m_bg_tilemap->mark_all_dirty();
+		flip_screen_x_set(machine(), data & 0x01);
+		m_bg_tilemap->mark_all_dirty();
 	}
 
-	if (flip_screen_y_get(space->machine()) != (data & 0x02))
+	if (flip_screen_y_get(machine()) != (data & 0x02))
 	{
-		flip_screen_y_set(space->machine(), data & 0x02);
-		state->m_bg_tilemap->mark_all_dirty();
+		flip_screen_y_set(machine(), data & 0x02);
+		m_bg_tilemap->mark_all_dirty();
 	}
 
 	/* bit 2 selects the input paddle */
-	state->m_paddle_select = data & 0x04;
+	m_paddle_select = data & 0x04;
 
 	/* bit 3 is coin lockout (but not the service coin) */
-	coin_lockout_w(space->machine(), 0, !(data & 0x08));
-	coin_lockout_w(space->machine(), 1, !(data & 0x08));
+	coin_lockout_w(machine(), 0, !(data & 0x08));
+	coin_lockout_w(machine(), 1, !(data & 0x08));
 
 	/* bit 4 is unknown */
 
@@ -48,18 +46,18 @@ WRITE8_HANDLER( arkanoid_d008_w )
 	/* so I don't know which is which. */
 	bank = (data & 0x20) >> 5;
 
-	if (state->m_gfxbank != bank)
+	if (m_gfxbank != bank)
 	{
-		state->m_gfxbank = bank;
-		state->m_bg_tilemap->mark_all_dirty();
+		m_gfxbank = bank;
+		m_bg_tilemap->mark_all_dirty();
 	}
 
 	bank = (data & 0x40) >> 6;
 
-	if (state->m_palettebank != bank)
+	if (m_palettebank != bank)
 	{
-		state->m_palettebank = bank;
-		state->m_bg_tilemap->mark_all_dirty();
+		m_palettebank = bank;
+		m_bg_tilemap->mark_all_dirty();
 	}
 
 	/* BM:  bit 7 is suspected to be MCU reset, the evidence for this is that
@@ -68,31 +66,30 @@ WRITE8_HANDLER( arkanoid_d008_w )
      leaving the tilt screen (as the MCU is now out of sync with main CPU
      which resets itself).  This bit is the likely candidate as it is flipped
      early in bootup just prior to accessing the MCU for the first time. */
-	if (state->m_mcu != NULL)	// Bootlegs don't have the MCU but still set this bit
-		device_set_input_line(state->m_mcu, INPUT_LINE_RESET, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
+	if (m_mcu != NULL)	// Bootlegs don't have the MCU but still set this bit
+		device_set_input_line(m_mcu, INPUT_LINE_RESET, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 /* different hook-up, everything except for bits 0-1 and 7 aren't tested afaik. */
-WRITE8_HANDLER( tetrsark_d008_w )
+WRITE8_MEMBER(arkanoid_state::tetrsark_d008_w)
 {
-	arkanoid_state *state = space->machine().driver_data<arkanoid_state>();
 	int bank;
 
 	/* bits 0 and 1 flip X and Y, I don't know which is which */
-	if (flip_screen_x_get(space->machine()) != (data & 0x01))
+	if (flip_screen_x_get(machine()) != (data & 0x01))
 	{
-		flip_screen_x_set(space->machine(), data & 0x01);
-		state->m_bg_tilemap->mark_all_dirty();
+		flip_screen_x_set(machine(), data & 0x01);
+		m_bg_tilemap->mark_all_dirty();
 	}
 
-	if (flip_screen_y_get(space->machine()) != (data & 0x02))
+	if (flip_screen_y_get(machine()) != (data & 0x02))
 	{
-		flip_screen_y_set(space->machine(), data & 0x02);
-		state->m_bg_tilemap->mark_all_dirty();
+		flip_screen_y_set(machine(), data & 0x02);
+		m_bg_tilemap->mark_all_dirty();
 	}
 
 	/* bit 2 selects the input paddle? */
-	state->m_paddle_select = data & 0x04;
+	m_paddle_select = data & 0x04;
 
 	/* bit 3-4 is unknown? */
 
@@ -100,54 +97,53 @@ WRITE8_HANDLER( tetrsark_d008_w )
 	/* so I don't know which is which.? */
 	bank = (data & 0x20) >> 5;
 
-	if (state->m_gfxbank != bank)
+	if (m_gfxbank != bank)
 	{
-		state->m_gfxbank = bank;
-		state->m_bg_tilemap->mark_all_dirty();
+		m_gfxbank = bank;
+		m_bg_tilemap->mark_all_dirty();
 	}
 
 	bank = (data & 0x40) >> 6;
 
-	if (state->m_palettebank != bank)
+	if (m_palettebank != bank)
 	{
-		state->m_palettebank = bank;
-		state->m_bg_tilemap->mark_all_dirty();
+		m_palettebank = bank;
+		m_bg_tilemap->mark_all_dirty();
 	}
 
 	/* bit 7 is coin lockout (but not the service coin) */
-	coin_lockout_w(space->machine(), 0, !(data & 0x80));
-	coin_lockout_w(space->machine(), 1, !(data & 0x80));
+	coin_lockout_w(machine(), 0, !(data & 0x80));
+	coin_lockout_w(machine(), 1, !(data & 0x80));
 }
 
 
-WRITE8_HANDLER( hexa_d008_w )
+WRITE8_MEMBER(arkanoid_state::hexa_d008_w)
 {
-	arkanoid_state *state = space->machine().driver_data<arkanoid_state>();
 
 	/* bit 0 = flipx (or y?) */
-	if (flip_screen_x_get(space->machine()) != (data & 0x01))
+	if (flip_screen_x_get(machine()) != (data & 0x01))
 	{
-		flip_screen_x_set(space->machine(), data & 0x01);
-		state->m_bg_tilemap->mark_all_dirty();
+		flip_screen_x_set(machine(), data & 0x01);
+		m_bg_tilemap->mark_all_dirty();
 	}
 
 	/* bit 1 = flipy (or x?) */
-	if (flip_screen_y_get(space->machine()) != (data & 0x02))
+	if (flip_screen_y_get(machine()) != (data & 0x02))
 	{
-		flip_screen_y_set(space->machine(), data & 0x02);
-		state->m_bg_tilemap->mark_all_dirty();
+		flip_screen_y_set(machine(), data & 0x02);
+		m_bg_tilemap->mark_all_dirty();
 	}
 
 	/* bit 2 - 3 unknown */
 
 	/* bit 4 could be the ROM bank selector for 8000-bfff (not sure) */
-	memory_set_bank(space->machine(), "bank1", ((data & 0x10) >> 4));
+	memory_set_bank(machine(), "bank1", ((data & 0x10) >> 4));
 
 	/* bit 5 = gfx bank */
-	if (state->m_gfxbank != ((data & 0x20) >> 5))
+	if (m_gfxbank != ((data & 0x20) >> 5))
 	{
-		state->m_gfxbank = (data & 0x20) >> 5;
-		state->m_bg_tilemap->mark_all_dirty();
+		m_gfxbank = (data & 0x20) >> 5;
+		m_bg_tilemap->mark_all_dirty();
 	}
 
 	/* bit 6 - 7 unknown */

@@ -45,17 +45,30 @@ public:
 
 	/* devices */
 	device_t *m_mcu;
+	DECLARE_READ8_MEMBER(arkanoid_Z80_mcu_r);
+	DECLARE_WRITE8_MEMBER(arkanoid_Z80_mcu_w);
+	DECLARE_READ8_MEMBER(arkanoid_68705_port_a_r);
+	DECLARE_WRITE8_MEMBER(arkanoid_68705_port_a_w);
+	DECLARE_WRITE8_MEMBER(arkanoid_68705_ddr_a_w);
+	DECLARE_READ8_MEMBER(arkanoid_68705_port_c_r);
+	DECLARE_WRITE8_MEMBER(arkanoid_68705_port_c_w);
+	DECLARE_WRITE8_MEMBER(arkanoid_68705_ddr_c_w);
+	DECLARE_READ8_MEMBER(arkanoid_bootleg_f000_r);
+	DECLARE_READ8_MEMBER(arkanoid_bootleg_f002_r);
+	DECLARE_WRITE8_MEMBER(arkanoid_bootleg_d018_w);
+	DECLARE_READ8_MEMBER(block2_bootleg_f000_r);
+	DECLARE_READ8_MEMBER(arkanoid_bootleg_d008_r);
+	DECLARE_WRITE8_MEMBER(arkanoid_videoram_w);
+	DECLARE_WRITE8_MEMBER(arkanoid_d008_w);
+	DECLARE_WRITE8_MEMBER(tetrsark_d008_w);
+	DECLARE_WRITE8_MEMBER(hexa_d008_w);
 };
 
 
 
 /*----------- defined in video/arkanoid.c -----------*/
 
-extern WRITE8_HANDLER( arkanoid_videoram_w );
 
-extern WRITE8_HANDLER( arkanoid_d008_w );
-extern WRITE8_HANDLER( tetrsark_d008_w );
-extern WRITE8_HANDLER( hexa_d008_w );
 
 extern VIDEO_START( arkanoid );
 extern SCREEN_UPDATE_IND16( arkanoid );
@@ -64,21 +77,9 @@ extern SCREEN_UPDATE_IND16( hexa );
 
 /*----------- defined in machine/arkanoid.c -----------*/
 
-extern READ8_HANDLER( arkanoid_Z80_mcu_r );
-extern WRITE8_HANDLER( arkanoid_Z80_mcu_w );
 
-extern READ8_HANDLER( arkanoid_68705_port_a_r );
-extern WRITE8_HANDLER( arkanoid_68705_port_a_w );
-extern WRITE8_HANDLER( arkanoid_68705_ddr_a_w );
 
-extern READ8_HANDLER( arkanoid_68705_port_c_r );
-extern WRITE8_HANDLER( arkanoid_68705_port_c_w );
-extern WRITE8_HANDLER( arkanoid_68705_ddr_c_w );
 
 extern CUSTOM_INPUT( arkanoid_68705_input_r );
 extern CUSTOM_INPUT( arkanoid_input_mux );
 
-extern READ8_HANDLER( arkanoid_bootleg_f000_r );
-extern READ8_HANDLER( arkanoid_bootleg_f002_r );
-extern WRITE8_HANDLER( arkanoid_bootleg_d018_w );
-extern READ8_HANDLER( arkanoid_bootleg_d008_r );

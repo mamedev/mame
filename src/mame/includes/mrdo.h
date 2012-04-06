@@ -21,16 +21,16 @@ public:
 	tilemap_t *m_fg_tilemap;
 	int       m_flipscreen;
 	DECLARE_READ8_MEMBER(mrdo_SECRE_r);
+	DECLARE_WRITE8_MEMBER(mrdo_bgvideoram_w);
+	DECLARE_WRITE8_MEMBER(mrdo_fgvideoram_w);
+	DECLARE_WRITE8_MEMBER(mrdo_scrollx_w);
+	DECLARE_WRITE8_MEMBER(mrdo_scrolly_w);
+	DECLARE_WRITE8_MEMBER(mrdo_flipscreen_w);
 };
 
 
 /*----------- defined in video/mrdo.c -----------*/
 
-WRITE8_HANDLER( mrdo_bgvideoram_w );
-WRITE8_HANDLER( mrdo_fgvideoram_w );
-WRITE8_HANDLER( mrdo_scrollx_w );
-WRITE8_HANDLER( mrdo_scrolly_w );
-WRITE8_HANDLER( mrdo_flipscreen_w );
 
 PALETTE_INIT( mrdo );
 VIDEO_START( mrdo );

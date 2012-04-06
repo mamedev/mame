@@ -16,10 +16,9 @@
 
 /******************************************************************************/
 
-WRITE16_HANDLER( vaportra_priority_w )
+WRITE16_MEMBER(vaportra_state::vaportra_priority_w)
 {
-	vaportra_state *state = space->machine().driver_data<vaportra_state>();
-	COMBINE_DATA(&state->m_priority[offset]);
+	COMBINE_DATA(&m_priority[offset]);
 }
 
 /******************************************************************************/
@@ -36,18 +35,16 @@ static void update_24bitcol( running_machine &machine, int offset )
 	palette_set_color(machine, offset, MAKE_RGB(r,g,b));
 }
 
-WRITE16_HANDLER( vaportra_palette_24bit_rg_w )
+WRITE16_MEMBER(vaportra_state::vaportra_palette_24bit_rg_w)
 {
-	vaportra_state *state = space->machine().driver_data<vaportra_state>();
-	COMBINE_DATA(&state->m_generic_paletteram_16[offset]);
-	update_24bitcol(space->machine(), offset);
+	COMBINE_DATA(&m_generic_paletteram_16[offset]);
+	update_24bitcol(machine(), offset);
 }
 
-WRITE16_HANDLER( vaportra_palette_24bit_b_w )
+WRITE16_MEMBER(vaportra_state::vaportra_palette_24bit_b_w)
 {
-	vaportra_state *state = space->machine().driver_data<vaportra_state>();
-	COMBINE_DATA(&state->m_generic_paletteram2_16[offset]);
-	update_24bitcol(space->machine(), offset);
+	COMBINE_DATA(&m_generic_paletteram2_16[offset]);
+	update_24bitcol(machine(), offset);
 }
 
 /******************************************************************************/

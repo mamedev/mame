@@ -2,17 +2,15 @@
 #include "includes/tigeroad.h"
 
 
-WRITE16_HANDLER( tigeroad_videoram_w )
+WRITE16_MEMBER(tigeroad_state::tigeroad_videoram_w)
 {
-	tigeroad_state *state = space->machine().driver_data<tigeroad_state>();
-	UINT16 *videoram = state->m_videoram;
+	UINT16 *videoram = m_videoram;
 	COMBINE_DATA(&videoram[offset]);
-	state->m_fg_tilemap->mark_tile_dirty(offset);
+	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_HANDLER( tigeroad_videoctrl_w )
+WRITE16_MEMBER(tigeroad_state::tigeroad_videoctrl_w)
 {
-	tigeroad_state *state = space->machine().driver_data<tigeroad_state>();
 	int bank;
 
 	if (ACCESSING_BITS_8_15)
@@ -21,37 +19,36 @@ WRITE16_HANDLER( tigeroad_videoctrl_w )
 
 		/* bit 1 flips screen */
 
-		if (flip_screen_get(space->machine()) != (data & 0x02))
+		if (flip_screen_get(machine()) != (data & 0x02))
 		{
-			flip_screen_set(space->machine(), data & 0x02);
-			space->machine().tilemap().mark_all_dirty();
+			flip_screen_set(machine(), data & 0x02);
+			machine().tilemap().mark_all_dirty();
 		}
 
 		/* bit 2 selects bg char bank */
 
 		bank = (data & 0x04) >> 2;
 
-		if (state->m_bgcharbank != bank)
+		if (m_bgcharbank != bank)
 		{
-			state->m_bgcharbank = bank;
-			state->m_bg_tilemap->mark_all_dirty();
+			m_bgcharbank = bank;
+			m_bg_tilemap->mark_all_dirty();
 		}
 
 		/* bits 4-5 are coin lockouts */
 
-		coin_lockout_w(space->machine(), 0, !(data & 0x10));
-		coin_lockout_w(space->machine(), 1, !(data & 0x20));
+		coin_lockout_w(machine(), 0, !(data & 0x10));
+		coin_lockout_w(machine(), 1, !(data & 0x20));
 
 		/* bits 6-7 are coin counters */
 
-		coin_counter_w(space->machine(), 0, data & 0x40);
-		coin_counter_w(space->machine(), 1, data & 0x80);
+		coin_counter_w(machine(), 0, data & 0x40);
+		coin_counter_w(machine(), 1, data & 0x80);
 	}
 }
 
-WRITE16_HANDLER( tigeroad_scroll_w )
+WRITE16_MEMBER(tigeroad_state::tigeroad_scroll_w)
 {
-	tigeroad_state *state = space->machine().driver_data<tigeroad_state>();
 	int scroll = 0;
 
 	COMBINE_DATA(&scroll);
@@ -59,10 +56,10 @@ WRITE16_HANDLER( tigeroad_scroll_w )
 	switch (offset)
 	{
 	case 0:
-		state->m_bg_tilemap->set_scrollx(0, scroll);
+		m_bg_tilemap->set_scrollx(0, scroll);
 		break;
 	case 1:
-		state->m_bg_tilemap->set_scrolly(0, -scroll - 32 * 8);
+		m_bg_tilemap->set_scrolly(0, -scroll - 32 * 8);
 		break;
 	}
 }

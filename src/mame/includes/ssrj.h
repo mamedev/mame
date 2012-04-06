@@ -15,14 +15,14 @@ public:
 	UINT8 *m_scrollram;
 	UINT8 *m_buffer_spriteram;
 	DECLARE_READ8_MEMBER(ssrj_wheel_r);
+	DECLARE_WRITE8_MEMBER(ssrj_vram1_w);
+	DECLARE_WRITE8_MEMBER(ssrj_vram2_w);
+	DECLARE_WRITE8_MEMBER(ssrj_vram4_w);
 };
 
 
 /*----------- defined in video/ssrj.c -----------*/
 
-WRITE8_HANDLER(ssrj_vram1_w);
-WRITE8_HANDLER(ssrj_vram2_w);
-WRITE8_HANDLER(ssrj_vram4_w);
 
 VIDEO_START( ssrj );
 SCREEN_UPDATE_IND16( ssrj );

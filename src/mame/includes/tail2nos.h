@@ -28,6 +28,10 @@ public:
 	device_t *m_audiocpu;
 	device_t *m_k051316;
 	DECLARE_WRITE16_MEMBER(sound_command_w);
+	DECLARE_WRITE16_MEMBER(tail2nos_bgvideoram_w);
+	DECLARE_READ16_MEMBER(tail2nos_zoomdata_r);
+	DECLARE_WRITE16_MEMBER(tail2nos_zoomdata_w);
+	DECLARE_WRITE16_MEMBER(tail2nos_gfxbank_w);
 };
 
 
@@ -35,10 +39,6 @@ public:
 
 extern void tail2nos_zoom_callback(running_machine &machine, int *code,int *color,int *flags);
 
-WRITE16_HANDLER( tail2nos_bgvideoram_w );
-READ16_HANDLER( tail2nos_zoomdata_r );
-WRITE16_HANDLER( tail2nos_zoomdata_w );
-WRITE16_HANDLER( tail2nos_gfxbank_w );
 
 VIDEO_START( tail2nos );
 SCREEN_UPDATE_IND16( tail2nos );

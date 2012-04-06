@@ -93,13 +93,13 @@ static ADDRESS_MAP_START( mnchmobl_map, AS_PROGRAM, 8, munchmo_state )
 	AM_RANGE(0xbaba, 0xbaba) AM_WRITENOP /* ? */
 	AM_RANGE(0xbc00, 0xbc7f) AM_RAM AM_BASE(m_status_vram)
 	AM_RANGE(0xbe00, 0xbe00) AM_WRITE(mnchmobl_soundlatch_w)
-	AM_RANGE(0xbe01, 0xbe01) AM_WRITE_LEGACY(mnchmobl_palette_bank_w)
+	AM_RANGE(0xbe01, 0xbe01) AM_WRITE(mnchmobl_palette_bank_w)
 	AM_RANGE(0xbe02, 0xbe02) AM_READ_PORT("DSW1")
 	AM_RANGE(0xbe03, 0xbe03) AM_READ_PORT("DSW2")
 	AM_RANGE(0xbe11, 0xbe11) AM_WRITENOP /* ? */
 	AM_RANGE(0xbe21, 0xbe21) AM_WRITENOP /* ? */
 	AM_RANGE(0xbe31, 0xbe31) AM_WRITENOP /* ? */
-	AM_RANGE(0xbe41, 0xbe41) AM_WRITE_LEGACY(mnchmobl_flipscreen_w)
+	AM_RANGE(0xbe41, 0xbe41) AM_WRITE(mnchmobl_flipscreen_w)
 	AM_RANGE(0xbe61, 0xbe61) AM_WRITE(mnchmobl_nmi_enable_w) /* ENI 1-10C */
 	AM_RANGE(0xbf00, 0xbf07) AM_WRITEONLY AM_BASE(m_vreg) /* MY0 1-8C */
 	AM_RANGE(0xbf01, 0xbf01) AM_READ_PORT("SYSTEM")

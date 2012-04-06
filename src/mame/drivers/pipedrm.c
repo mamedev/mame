@@ -175,6 +175,7 @@ Added Multiple Coin Feature:
 
 static WRITE8_HANDLER( pipedrm_bankswitch_w )
 {
+	fromance_state *state = space->machine().driver_data<fromance_state>();
 	/*
         Bit layout:
 
@@ -190,7 +191,7 @@ static WRITE8_HANDLER( pipedrm_bankswitch_w )
 	memory_set_bank(space->machine(), "bank1", data & 0x7);
 
 	/* map to the fromance gfx register */
-	fromance_gfxreg_w(space, offset, ((data >> 6) & 0x01) | 	/* flipscreen */
+	state->fromance_gfxreg_w(*space, offset, ((data >> 6) & 0x01) | 	/* flipscreen */
 							  ((~data >> 2) & 0x02));	/* videoram select */
 }
 
@@ -268,17 +269,17 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, fromance_state )
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
 	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xcfff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_le_w) AM_SHARE("paletteram")
-	AM_RANGE(0xd000, 0xffff) AM_READWRITE_LEGACY(fromance_videoram_r, fromance_videoram_w) AM_BASE_SIZE(m_videoram, m_videoram_size)
+	AM_RANGE(0xd000, 0xffff) AM_READWRITE(fromance_videoram_r, fromance_videoram_w) AM_BASE_SIZE(m_videoram, m_videoram_size)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( main_portmap, AS_IO, 8, fromance_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x10) AM_WRITE_LEGACY(fromance_crtc_data_w)
-	AM_RANGE(0x11, 0x11) AM_WRITE_LEGACY(fromance_crtc_register_w)
+	AM_RANGE(0x10, 0x10) AM_WRITE(fromance_crtc_data_w)
+	AM_RANGE(0x11, 0x11) AM_WRITE(fromance_crtc_register_w)
 	AM_RANGE(0x20, 0x20) AM_READ_PORT("P1") AM_WRITE_LEGACY(sound_command_w)
 	AM_RANGE(0x21, 0x21) AM_READ_PORT("P2") AM_WRITE_LEGACY(pipedrm_bankswitch_w)
-	AM_RANGE(0x22, 0x25) AM_WRITE_LEGACY(fromance_scroll_w)
+	AM_RANGE(0x22, 0x25) AM_WRITE(fromance_scroll_w)
 	AM_RANGE(0x22, 0x22) AM_READ_PORT("DSW1")
 	AM_RANGE(0x23, 0x23) AM_READ_PORT("DSW2")
 	AM_RANGE(0x24, 0x24) AM_READ_PORT("SYSTEM")
@@ -886,8 +887,9 @@ static DRIVER_INIT( pipedrm )
 
 static DRIVER_INIT( hatris )
 {
+	fromance_state *state = machine.driver_data<fromance_state>();
 	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0x20, 0x20, FUNC(sound_command_nonmi_w));
-	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0x21, 0x21, FUNC(fromance_gfxreg_w));
+	machine.device("maincpu")->memory().space(AS_IO)->install_write_handler(0x21, 0x21, write8_delegate(FUNC(fromance_state::fromance_gfxreg_w),state));
 }
 
 

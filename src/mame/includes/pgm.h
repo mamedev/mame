@@ -67,6 +67,8 @@ public:
 	DECLARE_WRITE16_MEMBER(z80_ctrl_w);
 	DECLARE_WRITE16_MEMBER(m68k_l1_w);
 	DECLARE_WRITE8_MEMBER(z80_l3_w);
+	DECLARE_WRITE16_MEMBER(pgm_tx_videoram_w);
+	DECLARE_WRITE16_MEMBER(pgm_bg_videoram_w);
 };
 
 
@@ -369,8 +371,6 @@ INPUT_PORTS_EXTERN( olds );
 
 /*----------- defined in video/pgm.c -----------*/
 
-WRITE16_HANDLER( pgm_tx_videoram_w );
-WRITE16_HANDLER( pgm_bg_videoram_w );
 
 VIDEO_START( pgm );
 SCREEN_VBLANK( pgm );

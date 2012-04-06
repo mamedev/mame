@@ -1351,14 +1351,14 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( am_gpu_winrun, AS_PROGRAM, 16, namcos21_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x100000, 0x100001) AM_READWRITE_LEGACY(winrun_gpu_color_r,winrun_gpu_color_w) /* ? */
+	AM_RANGE(0x100000, 0x100001) AM_READWRITE(winrun_gpu_color_r,winrun_gpu_color_w) /* ? */
 	AM_RANGE(0x180000, 0x19ffff) AM_RAM /* work RAM */
 	AM_RANGE(0x1c0000, 0x1fffff) AM_READWRITE_LEGACY(namcos2_68k_gpu_C148_r,namcos2_68k_gpu_C148_w)
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_BASE(m_winrun_gpucomram )
 	AM_RANGE(0x400000, 0x41ffff) AM_READWRITE(paletteram16_r,paletteram16_w) AM_SHARE("paletteram")
 	AM_RANGE(0x600000, 0x6fffff) AM_READ(gpu_data_r)
-	AM_RANGE(0xc00000, 0xcfffff) AM_READWRITE_LEGACY(winrun_gpu_videoram_r,winrun_gpu_videoram_w)
-	AM_RANGE(0xd00000, 0xd0000f) AM_READWRITE_LEGACY(winrun_gpu_register_r,winrun_gpu_register_w)
+	AM_RANGE(0xc00000, 0xcfffff) AM_READWRITE(winrun_gpu_videoram_r,winrun_gpu_videoram_w)
+	AM_RANGE(0xd00000, 0xd0000f) AM_READWRITE(winrun_gpu_register_r,winrun_gpu_register_w)
 //  AM_RANGE(0xe0000c, 0xe0000d) POSIRQ
 ADDRESS_MAP_END
 

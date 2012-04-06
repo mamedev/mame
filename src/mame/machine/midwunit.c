@@ -12,12 +12,6 @@
 #include "includes/midwunit.h"
 #include "midwayic.h"
 
-
-/* prototype */
-static READ16_HANDLER( midwunit_sound_state_r );
-
-
-
 /*************************************
  *
  *  State saving
@@ -42,35 +36,31 @@ static void register_state_saving(running_machine &machine)
  *
  *************************************/
 
-WRITE16_HANDLER( midwunit_cmos_enable_w )
+WRITE16_MEMBER(midwunit_state::midwunit_cmos_enable_w)
 {
-	midwunit_state *state = space->machine().driver_data<midwunit_state>();
-	state->m_cmos_write_enable = 1;
+	m_cmos_write_enable = 1;
 }
 
 
-WRITE16_HANDLER( midwunit_cmos_w )
+WRITE16_MEMBER(midwunit_state::midwunit_cmos_w)
 {
-	midwunit_state *state = space->machine().driver_data<midwunit_state>();
-	if (state->m_cmos_write_enable)
+	if (m_cmos_write_enable)
 	{
-		midwunit_state *state = space->machine().driver_data<midwunit_state>();
-		COMBINE_DATA(state->m_nvram+offset);
-		state->m_cmos_write_enable = 0;
+		COMBINE_DATA(m_nvram+offset);
+		m_cmos_write_enable = 0;
 	}
 	else
 	{
-		logerror("%08X:Unexpected CMOS W @ %05X\n", cpu_get_pc(&space->device()), offset);
+		logerror("%08X:Unexpected CMOS W @ %05X\n", cpu_get_pc(&space.device()), offset);
 		popmessage("Bad CMOS write");
 	}
 }
 
 
 
-READ16_HANDLER( midwunit_cmos_r )
+READ16_MEMBER(midwunit_state::midwunit_cmos_r)
 {
-	midwunit_state *state = space->machine().driver_data<midwunit_state>();
-	return state->m_nvram[offset];
+	return m_nvram[offset];
 }
 
 
@@ -81,23 +71,22 @@ READ16_HANDLER( midwunit_cmos_r )
  *
  *************************************/
 
-WRITE16_HANDLER( midwunit_io_w )
+WRITE16_MEMBER(midwunit_state::midwunit_io_w)
 {
-	midwunit_state *state = space->machine().driver_data<midwunit_state>();
 	int oldword, newword;
 
 	offset %= 8;
-	oldword = state->m_iodata[offset];
+	oldword = m_iodata[offset];
 	newword = oldword;
 	COMBINE_DATA(&newword);
 
 	switch (offset)
 	{
 		case 1:
-			logerror("%08X:Control W @ %05X = %04X\n", cpu_get_pc(&space->device()), offset, data);
+			logerror("%08X:Control W @ %05X = %04X\n", cpu_get_pc(&space.device()), offset, data);
 
 			/* bit 4 reset sound CPU */
-			dcs_reset_w(space->machine(), newword & 0x10);
+			dcs_reset_w(machine(), newword & 0x10);
 
 			/* bit 5 (active low) reset security chip */
 			midway_serial_pic_reset_w(newword & 0x20);
@@ -110,10 +99,10 @@ WRITE16_HANDLER( midwunit_io_w )
 			break;
 
 		default:
-			logerror("%08X:Unknown I/O write to %d = %04X\n", cpu_get_pc(&space->device()), offset, data);
+			logerror("%08X:Unknown I/O write to %d = %04X\n", cpu_get_pc(&space.device()), offset, data);
 			break;
 	}
-	state->m_iodata[offset] = newword;
+	m_iodata[offset] = newword;
 }
 
 
@@ -124,13 +113,12 @@ WRITE16_HANDLER( midwunit_io_w )
  *
  *************************************/
 
-READ16_HANDLER( midwunit_io_r )
+READ16_MEMBER(midwunit_state::midwunit_io_r)
 {
-	midwunit_state *state = space->machine().driver_data<midwunit_state>();
 	static const char *const portnames[] = { "IN0", "IN1", "DSW", "IN2" };
 
 	/* apply I/O shuffling */
-	offset = state->m_ioshuffle[offset % 16];
+	offset = m_ioshuffle[offset % 16];
 
 	switch (offset)
 	{
@@ -138,13 +126,13 @@ READ16_HANDLER( midwunit_io_r )
 		case 1:
 		case 2:
 		case 3:
-			return input_port_read(space->machine(), portnames[offset]);
+			return input_port_read(machine(), portnames[offset]);
 
 		case 4:
 			return (midway_serial_pic_status_r() << 12) | midwunit_sound_state_r(space,0,0xffff);
 
 		default:
-			logerror("%08X:Unknown I/O read from %d\n", cpu_get_pc(&space->device()), offset);
+			logerror("%08X:Unknown I/O read from %d\n", cpu_get_pc(&space.device()), offset);
 			break;
 	}
 	return ~0;
@@ -200,9 +188,8 @@ static void init_wunit_generic(running_machine &machine)
 /********************** Mortal Kombat 3 **********************/
 
 
-static WRITE16_HANDLER( umk3_palette_hack_w )
+WRITE16_MEMBER(midwunit_state::umk3_palette_hack_w)
 {
-	midwunit_state *state = space->machine().driver_data<midwunit_state>();
 	/*
         UMK3 uses a circular buffer to hold pending palette changes; the buffer holds 17 entries
         total, and the buffer is processed/cleared during the video interrupt. Most of the time,
@@ -221,9 +208,9 @@ static WRITE16_HANDLER( umk3_palette_hack_w )
         Although not realistic, this is sufficient to reduce the frequency of incorrect colors
         without significantly impacting the rest of the system.
     */
-	COMBINE_DATA(&state->m_umk3_palette[offset]);
-	device_adjust_icount(&space->device(), -100);
-/*  printf("in=%04X%04X  out=%04X%04X\n", state->m_umk3_palette[3], state->m_umk3_palette[2], state->m_umk3_palette[1], state->m_umk3_palette[0]); */
+	COMBINE_DATA(&m_umk3_palette[offset]);
+	device_adjust_icount(&space.device(), -100);
+/*  printf("in=%04X%04X  out=%04X%04X\n", m_umk3_palette[3], m_umk3_palette[2], m_umk3_palette[1], m_umk3_palette[0]); */
 }
 
 static void init_mk3_common(running_machine &machine)
@@ -254,14 +241,14 @@ DRIVER_INIT( umk3 )
 {
 	midwunit_state *state = machine.driver_data<midwunit_state>();
 	init_mk3_common(machine);
-	state->m_umk3_palette = machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x0106a060, 0x0106a09f, FUNC(umk3_palette_hack_w));
+	state->m_umk3_palette = machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x0106a060, 0x0106a09f, write16_delegate(FUNC(midwunit_state::umk3_palette_hack_w),state));
 }
 
 DRIVER_INIT( umk3r11 )
 {
 	midwunit_state *state = machine.driver_data<midwunit_state>();
 	init_mk3_common(machine);
-	state->m_umk3_palette = machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x0106a060, 0x0106a09f, FUNC(umk3_palette_hack_w));
+	state->m_umk3_palette = machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x0106a060, 0x0106a09f,write16_delegate(FUNC(midwunit_state::umk3_palette_hack_w),state));
 }
 
 
@@ -291,14 +278,13 @@ DRIVER_INIT( nbahangt )
 
 /********************** WWF Wrestlemania **********************/
 
-static WRITE16_HANDLER( wwfmania_io_0_w )
+WRITE16_MEMBER(midwunit_state::wwfmania_io_0_w)
 {
-	midwunit_state *state = space->machine().driver_data<midwunit_state>();
 	int i;
 
 	/* start with the originals */
 	for (i = 0; i < 16; i++)
-		state->m_ioshuffle[i] = i % 8;
+		m_ioshuffle[i] = i % 8;
 
 	/* based on the data written, shuffle */
 	switch (data)
@@ -307,35 +293,35 @@ static WRITE16_HANDLER( wwfmania_io_0_w )
 			break;
 
 		case 1:
-			state->m_ioshuffle[4] = 0;
-			state->m_ioshuffle[8] = 1;
-			state->m_ioshuffle[1] = 2;
-			state->m_ioshuffle[9] = 3;
-			state->m_ioshuffle[2] = 4;
+			m_ioshuffle[4] = 0;
+			m_ioshuffle[8] = 1;
+			m_ioshuffle[1] = 2;
+			m_ioshuffle[9] = 3;
+			m_ioshuffle[2] = 4;
 			break;
 
 		case 2:
-			state->m_ioshuffle[8] = 0;
-			state->m_ioshuffle[2] = 1;
-			state->m_ioshuffle[4] = 2;
-			state->m_ioshuffle[6] = 3;
-			state->m_ioshuffle[1] = 4;
+			m_ioshuffle[8] = 0;
+			m_ioshuffle[2] = 1;
+			m_ioshuffle[4] = 2;
+			m_ioshuffle[6] = 3;
+			m_ioshuffle[1] = 4;
 			break;
 
 		case 3:
-			state->m_ioshuffle[1] = 0;
-			state->m_ioshuffle[8] = 1;
-			state->m_ioshuffle[2] = 2;
-			state->m_ioshuffle[10] = 3;
-			state->m_ioshuffle[5] = 4;
+			m_ioshuffle[1] = 0;
+			m_ioshuffle[8] = 1;
+			m_ioshuffle[2] = 2;
+			m_ioshuffle[10] = 3;
+			m_ioshuffle[5] = 4;
 			break;
 
 		case 4:
-			state->m_ioshuffle[2] = 0;
-			state->m_ioshuffle[4] = 1;
-			state->m_ioshuffle[1] = 2;
-			state->m_ioshuffle[7] = 3;
-			state->m_ioshuffle[8] = 4;
+			m_ioshuffle[2] = 0;
+			m_ioshuffle[4] = 1;
+			m_ioshuffle[1] = 2;
+			m_ioshuffle[7] = 3;
+			m_ioshuffle[8] = 4;
 			break;
 	}
 	logerror("Changed I/O swiching to %d\n", data);
@@ -347,7 +333,8 @@ DRIVER_INIT( wwfmania )
 	init_wunit_generic(machine);
 
 	/* enable I/O shuffling */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x01800000, 0x0180000f, FUNC(wwfmania_io_0_w));
+	midwunit_state *state = machine.driver_data<midwunit_state>();
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x01800000, 0x0180000f, write16_delegate(FUNC(midwunit_state::wwfmania_io_0_w),state));
 
 	/* serial prefixes 430, 528 */
 	midway_serial_pic_init(machine, 528);
@@ -394,16 +381,16 @@ MACHINE_RESET( midwunit )
  *
  *************************************/
 
-READ16_HANDLER( midwunit_security_r )
+READ16_MEMBER(midwunit_state::midwunit_security_r)
 {
-	return midway_serial_pic_r(space);
+	return midway_serial_pic_r(&space);
 }
 
 
-WRITE16_HANDLER( midwunit_security_w )
+WRITE16_MEMBER(midwunit_state::midwunit_security_w)
 {
 	if (offset == 0 && ACCESSING_BITS_0_7)
-		midway_serial_pic_w(space, data);
+		midway_serial_pic_w(&space, data);
 }
 
 
@@ -414,33 +401,33 @@ WRITE16_HANDLER( midwunit_security_w )
  *
  *************************************/
 
-READ16_HANDLER( midwunit_sound_r )
+READ16_MEMBER(midwunit_state::midwunit_sound_r)
 {
-	logerror("%08X:Sound read\n", cpu_get_pc(&space->device()));
+	logerror("%08X:Sound read\n", cpu_get_pc(&space.device()));
 
-	return dcs_data_r(space->machine()) & 0xff;
+	return dcs_data_r(machine()) & 0xff;
 }
 
 
-READ16_HANDLER( midwunit_sound_state_r )
+READ16_MEMBER(midwunit_state::midwunit_sound_state_r)
 {
-	return dcs_control_r(space->machine());
+	return dcs_control_r(machine());
 }
 
 
-WRITE16_HANDLER( midwunit_sound_w )
+WRITE16_MEMBER(midwunit_state::midwunit_sound_w)
 {
 	/* check for out-of-bounds accesses */
 	if (offset)
 	{
-		logerror("%08X:Unexpected write to sound (hi) = %04X\n", cpu_get_pc(&space->device()), data);
+		logerror("%08X:Unexpected write to sound (hi) = %04X\n", cpu_get_pc(&space.device()), data);
 		return;
 	}
 
 	/* call through based on the sound type */
 	if (ACCESSING_BITS_0_7)
 	{
-		logerror("%08X:Sound write = %04X\n", cpu_get_pc(&space->device()), data);
-		dcs_data_w(space->machine(), data & 0xff);
+		logerror("%08X:Sound write = %04X\n", cpu_get_pc(&space.device()), data);
+		dcs_data_w(machine(), data & 0xff);
 	}
 }

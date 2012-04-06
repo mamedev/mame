@@ -53,16 +53,16 @@ public:
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
 	DECLARE_WRITE16_MEMBER(wgp_sound_w);
 	DECLARE_READ16_MEMBER(wgp_sound_r);
+	DECLARE_READ16_MEMBER(wgp_pivram_word_r);
+	DECLARE_WRITE16_MEMBER(wgp_pivram_word_w);
+	DECLARE_READ16_MEMBER(wgp_piv_ctrl_word_r);
+	DECLARE_WRITE16_MEMBER(wgp_piv_ctrl_word_w);
 };
 
 
 /*----------- defined in video/wgp.c -----------*/
 
-READ16_HANDLER ( wgp_pivram_word_r );
-WRITE16_HANDLER( wgp_pivram_word_w );
 
-READ16_HANDLER ( wgp_piv_ctrl_word_r );
-WRITE16_HANDLER( wgp_piv_ctrl_word_w );
 
 VIDEO_START( wgp );
 VIDEO_START( wgp2 );

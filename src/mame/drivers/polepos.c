@@ -325,7 +325,7 @@ WRITE8_MEMBER(polepos_state::polepos_latch_w)
 			break;
 
 		case 0x07:	/* CHACL */
-			polepos_chacl_w(&space,offset,data);
+			polepos_chacl_w(space,offset,data);
 			break;
 	}
 }
@@ -488,10 +488,10 @@ static MACHINE_RESET( polepos )
 static ADDRESS_MAP_START( z80_map, AS_PROGRAM, 8, polepos_state )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0x3000, 0x37ff) AM_MIRROR(0x0800) AM_RAM AM_SHARE("nvram")					/* Battery Backup */
-	AM_RANGE(0x4000, 0x47ff) AM_READWRITE_LEGACY(polepos_sprite_r, polepos_sprite_w)			/* Motion Object */
-	AM_RANGE(0x4800, 0x4bff) AM_READWRITE_LEGACY(polepos_road_r, polepos_road_w)				/* Road Memory */
-	AM_RANGE(0x4c00, 0x4fff) AM_READWRITE_LEGACY(polepos_alpha_r, polepos_alpha_w)				/* Alphanumeric (char ram) */
-	AM_RANGE(0x5000, 0x57ff) AM_READWRITE_LEGACY(polepos_view_r, polepos_view_w)				/* Background Memory */
+	AM_RANGE(0x4000, 0x47ff) AM_READWRITE(polepos_sprite_r, polepos_sprite_w)			/* Motion Object */
+	AM_RANGE(0x4800, 0x4bff) AM_READWRITE(polepos_road_r, polepos_road_w)				/* Road Memory */
+	AM_RANGE(0x4c00, 0x4fff) AM_READWRITE(polepos_alpha_r, polepos_alpha_w)				/* Alphanumeric (char ram) */
+	AM_RANGE(0x5000, 0x57ff) AM_READWRITE(polepos_view_r, polepos_view_w)				/* Background Memory */
 
 	AM_RANGE(0x8000, 0x83bf) AM_MIRROR(0x0c00) AM_RAM									/* Sound Memory */
 	AM_RANGE(0x83c0, 0x83ff) AM_MIRROR(0x0c00) AM_DEVREADWRITE_LEGACY("namco", polepos_sound_r, polepos_sound_w)	/* Sound data */
@@ -515,12 +515,12 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( z8002_map, AS_PROGRAM, 16, polepos_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x6000, 0x6001) AM_MIRROR(0x0ffe) AM_WRITE(polepos_z8002_nvi_enable_w)	/* NVI enable - *NOT* shared by the two CPUs */
-	AM_RANGE(0x8000, 0x8fff) AM_READWRITE_LEGACY(polepos_sprite16_r, polepos_sprite16_w) AM_BASE(m_sprite16_memory)	/* Motion Object */
-	AM_RANGE(0x9000, 0x97ff) AM_READWRITE_LEGACY(polepos_road16_r, polepos_road16_w) AM_BASE(m_road16_memory)		/* Road Memory */
-	AM_RANGE(0x9800, 0x9fff) AM_READWRITE_LEGACY(polepos_alpha16_r, polepos_alpha16_w) AM_BASE(m_alpha16_memory)	/* Alphanumeric (char ram) */
-	AM_RANGE(0xa000, 0xafff) AM_READWRITE_LEGACY(polepos_view16_r, polepos_view16_w) AM_BASE(m_view16_memory)		/* Background memory */
-	AM_RANGE(0xc000, 0xc001) AM_MIRROR(0x38fe) AM_WRITE_LEGACY(polepos_view16_hscroll_w)						/* Background horz scroll position */
-	AM_RANGE(0xc100, 0xc101) AM_MIRROR(0x38fe) AM_WRITE_LEGACY(polepos_road16_vscroll_w)						/* Road vertical position */
+	AM_RANGE(0x8000, 0x8fff) AM_READWRITE(polepos_sprite16_r, polepos_sprite16_w) AM_BASE(m_sprite16_memory)	/* Motion Object */
+	AM_RANGE(0x9000, 0x97ff) AM_READWRITE(polepos_road16_r, polepos_road16_w) AM_BASE(m_road16_memory)		/* Road Memory */
+	AM_RANGE(0x9800, 0x9fff) AM_READWRITE(polepos_alpha16_r, polepos_alpha16_w) AM_BASE(m_alpha16_memory)	/* Alphanumeric (char ram) */
+	AM_RANGE(0xa000, 0xafff) AM_READWRITE(polepos_view16_r, polepos_view16_w) AM_BASE(m_view16_memory)		/* Background memory */
+	AM_RANGE(0xc000, 0xc001) AM_MIRROR(0x38fe) AM_WRITE(polepos_view16_hscroll_w)						/* Background horz scroll position */
+	AM_RANGE(0xc100, 0xc101) AM_MIRROR(0x38fe) AM_WRITE(polepos_road16_vscroll_w)						/* Road vertical position */
 ADDRESS_MAP_END
 
 

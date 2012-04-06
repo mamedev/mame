@@ -112,16 +112,17 @@ public:
 	DECLARE_WRITE16_MEMBER(vram_1_clr_w);
 	DECLARE_WRITE16_MEMBER(vram_2_clr_w);
 	DECLARE_WRITE8_MEMBER(puzzlet_portb_w);
+	DECLARE_WRITE16_MEMBER(metro_k053936_w);
+	DECLARE_WRITE16_MEMBER(metro_vram_0_w);
+	DECLARE_WRITE16_MEMBER(metro_vram_1_w);
+	DECLARE_WRITE16_MEMBER(metro_vram_2_w);
+	DECLARE_WRITE16_MEMBER(metro_window_w);
+	void blt_write( address_space *space, const int tmap, const offs_t offs, const UINT16 data, const UINT16 mask );
 };
 
 
 /*----------- defined in video/metro.c -----------*/
 
-WRITE16_HANDLER( metro_window_w );
-WRITE16_HANDLER( metro_vram_0_w );
-WRITE16_HANDLER( metro_vram_1_w );
-WRITE16_HANDLER( metro_vram_2_w );
-WRITE16_HANDLER( metro_k053936_w );
 
 VIDEO_START( metro_14100 );
 VIDEO_START( metro_14220 );

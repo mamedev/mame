@@ -7,11 +7,10 @@ Atari Orbit video emulation
 #include "emu.h"
 #include "includes/orbit.h"
 
-WRITE8_HANDLER( orbit_playfield_w )
+WRITE8_MEMBER(orbit_state::orbit_playfield_w)
 {
-	orbit_state *state = space->machine().driver_data<orbit_state>();
-	state->m_playfield_ram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_playfield_ram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 

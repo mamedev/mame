@@ -29,15 +29,15 @@ public:
 	UINT8      m_videoram[0x4000];
 	DECLARE_WRITE8_MEMBER(yunsung8_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(yunsung8_adpcm_w);
+	DECLARE_WRITE8_MEMBER(yunsung8_videobank_w);
+	DECLARE_READ8_MEMBER(yunsung8_videoram_r);
+	DECLARE_WRITE8_MEMBER(yunsung8_videoram_w);
+	DECLARE_WRITE8_MEMBER(yunsung8_flipscreen_w);
 };
 
 
 /*----------- defined in video/yunsung8.c -----------*/
 
-WRITE8_HANDLER( yunsung8_videobank_w );
-READ8_HANDLER ( yunsung8_videoram_r );
-WRITE8_HANDLER( yunsung8_videoram_w );
-WRITE8_HANDLER( yunsung8_flipscreen_w );
 
 VIDEO_START( yunsung8 );
 SCREEN_UPDATE_IND16( yunsung8 );

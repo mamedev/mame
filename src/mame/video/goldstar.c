@@ -19,11 +19,10 @@
 ***************************************************************************/
 
 
-WRITE8_HANDLER( cm_girl_scroll_w )
+WRITE8_MEMBER(goldstar_state::cm_girl_scroll_w)
 {
-	goldstar_state *state = space->machine().driver_data<goldstar_state>();
 
-	state->m_cm_girl_scroll = data;
+	m_cm_girl_scroll = data;
 	/*
         xxxx ----  yscroll
         ---- xxxx  xscroll
@@ -33,11 +32,10 @@ WRITE8_HANDLER( cm_girl_scroll_w )
     */
 }
 
-WRITE8_HANDLER( cm_outport0_w )
+WRITE8_MEMBER(goldstar_state::cm_outport0_w)
 {
-	goldstar_state *state = space->machine().driver_data<goldstar_state>();
 
-	state->m_cm_enable_reg = data;
+	m_cm_enable_reg = data;
 	/*
         ---- ---x  (global enable or irq enable?)
         ---- --x-  (fg enable)
@@ -50,20 +48,18 @@ WRITE8_HANDLER( cm_outport0_w )
 	//popmessage("%02x",data);
 }
 
-WRITE8_HANDLER( goldstar_fg_vidram_w )
+WRITE8_MEMBER(goldstar_state::goldstar_fg_vidram_w)
 {
-	goldstar_state *state = space->machine().driver_data<goldstar_state>();
 
-	state->m_fg_vidram[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset);
+	m_fg_vidram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( goldstar_fg_atrram_w )
+WRITE8_MEMBER(goldstar_state::goldstar_fg_atrram_w)
 {
-	goldstar_state *state = space->machine().driver_data<goldstar_state>();
 
-	state->m_fg_atrram[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset);
+	m_fg_atrram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 static TILE_GET_INFO( get_goldstar_fg_tile_info )
@@ -109,12 +105,11 @@ static TILE_GET_INFO( get_cherrym_fg_tile_info )
 
 
 
-WRITE8_HANDLER( goldstar_reel1_ram_w )
+WRITE8_MEMBER(goldstar_state::goldstar_reel1_ram_w)
 {
-	goldstar_state *state = space->machine().driver_data<goldstar_state>();
 
-	state->m_reel1_ram[offset] = data;
-	state->m_reel1_tilemap->mark_tile_dirty(offset);
+	m_reel1_ram[offset] = data;
+	m_reel1_tilemap->mark_tile_dirty(offset);
 }
 
 static TILE_GET_INFO( get_goldstar_reel1_tile_info )
@@ -130,11 +125,10 @@ static TILE_GET_INFO( get_goldstar_reel1_tile_info )
 }
 
 
-WRITE8_HANDLER( goldstar_reel2_ram_w )
+WRITE8_MEMBER(goldstar_state::goldstar_reel2_ram_w)
 {
-	goldstar_state *state = space->machine().driver_data<goldstar_state>();
-	state->m_reel2_ram[offset] = data;
-	state->m_reel2_tilemap->mark_tile_dirty(offset);
+	m_reel2_ram[offset] = data;
+	m_reel2_tilemap->mark_tile_dirty(offset);
 }
 
 static TILE_GET_INFO( get_goldstar_reel2_tile_info )
@@ -149,12 +143,11 @@ static TILE_GET_INFO( get_goldstar_reel2_tile_info )
 			0);
 }
 
-WRITE8_HANDLER( goldstar_reel3_ram_w )
+WRITE8_MEMBER(goldstar_state::goldstar_reel3_ram_w)
 {
-	goldstar_state *state = space->machine().driver_data<goldstar_state>();
 
-	state->m_reel3_ram[offset] = data;
-	state->m_reel3_tilemap->mark_tile_dirty(offset);
+	m_reel3_ram[offset] = data;
+	m_reel3_tilemap->mark_tile_dirty(offset);
 }
 
 static TILE_GET_INFO( get_goldstar_reel3_tile_info )
@@ -169,29 +162,26 @@ static TILE_GET_INFO( get_goldstar_reel3_tile_info )
 			0);
 }
 
-WRITE8_HANDLER( unkch_reel1_attrram_w )
+WRITE8_MEMBER(goldstar_state::unkch_reel1_attrram_w)
 {
-	goldstar_state *state = space->machine().driver_data<goldstar_state>();
 
-	state->m_reel1_attrram[offset] = data;
-	state->m_reel1_tilemap->mark_tile_dirty(offset);
+	m_reel1_attrram[offset] = data;
+	m_reel1_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( unkch_reel2_attrram_w )
+WRITE8_MEMBER(goldstar_state::unkch_reel2_attrram_w)
 {
-	goldstar_state *state = space->machine().driver_data<goldstar_state>();
 
-	state->m_reel2_attrram[offset] = data;
-	state->m_reel2_tilemap->mark_tile_dirty(offset);
+	m_reel2_attrram[offset] = data;
+	m_reel2_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_HANDLER( unkch_reel3_attrram_w )
+WRITE8_MEMBER(goldstar_state::unkch_reel3_attrram_w)
 {
-	goldstar_state *state = space->machine().driver_data<goldstar_state>();
 
-	state->m_reel3_attrram[offset] = data;
-	state->m_reel3_tilemap->mark_tile_dirty(offset);
+	m_reel3_attrram[offset] = data;
+	m_reel3_tilemap->mark_tile_dirty(offset);
 }
 
 
@@ -335,22 +325,20 @@ VIDEO_START( cherrym )
 
 
 
-WRITE8_HANDLER( goldstar_fa00_w )
+WRITE8_MEMBER(goldstar_state::goldstar_fa00_w)
 {
-	goldstar_state *state = space->machine().driver_data<goldstar_state>();
 
 	/* bit 1 toggles continuously - might be irq enable or watchdog reset */
 
 	/* bit 2 selects background gfx color (I think) */
-	state->m_bgcolor = (data & 0x04) >> 2;
-	state->m_reel1_tilemap->mark_all_dirty();
-	state->m_reel2_tilemap->mark_all_dirty();
-	state->m_reel3_tilemap->mark_all_dirty();
+	m_bgcolor = (data & 0x04) >> 2;
+	m_reel1_tilemap->mark_all_dirty();
+	m_reel2_tilemap->mark_all_dirty();
+	m_reel3_tilemap->mark_all_dirty();
 }
 
-WRITE8_HANDLER( cm_background_col_w )
+WRITE8_MEMBER(goldstar_state::cm_background_col_w)
 {
-	goldstar_state *state = space->machine().driver_data<goldstar_state>();
 
 	//printf("cm_background_col_w %02x\n",data);
 
@@ -366,24 +354,24 @@ WRITE8_HANDLER( cm_background_col_w )
 
 
     */
-	state->m_cmaster_girl_num = (data >> 4)&0x7;
-	state->m_cmaster_girl_pal = (data >> 2)&0x3;
+	m_cmaster_girl_num = (data >> 4)&0x7;
+	m_cmaster_girl_pal = (data >> 2)&0x3;
 
 	//bgcolor = (data & 0x03) >> 0;
 
 	// apparently some boards have this colour scheme?
 	// i'm not convinced it isn't just a different prom on them
 	#if 0
-	state->m_bgcolor = 0;
-	state->m_bgcolor |= (data & 0x01) << 1;
-	state->m_bgcolor |= (data & 0x02) >> 1;
+	m_bgcolor = 0;
+	m_bgcolor |= (data & 0x01) << 1;
+	m_bgcolor |= (data & 0x02) >> 1;
 	#else
-	state->m_bgcolor = (data & 0x03) >> 0;
+	m_bgcolor = (data & 0x03) >> 0;
 	#endif
 
-	state->m_reel1_tilemap->mark_all_dirty();
-	state->m_reel2_tilemap->mark_all_dirty();
-	state->m_reel3_tilemap->mark_all_dirty();
+	m_reel1_tilemap->mark_all_dirty();
+	m_reel2_tilemap->mark_all_dirty();
+	m_reel3_tilemap->mark_all_dirty();
 }
 
 

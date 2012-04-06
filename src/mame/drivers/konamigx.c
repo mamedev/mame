@@ -1163,7 +1163,7 @@ static ADDRESS_MAP_START( gx_base_memmap, AS_PROGRAM, 32, konamigx_state )
 	AM_RANGE(0xd20000, 0xd20fff) AM_READWRITE_LEGACY(K053247_long_r, K053247_long_w)
 	AM_RANGE(0xd21000, 0xd23fff) AM_RAM
 	AM_RANGE(0xd40000, 0xd4003f) AM_WRITE_LEGACY(K056832_long_w)
-	AM_RANGE(0xd44000, 0xd4400f) AM_WRITE_LEGACY(konamigx_tilebank_w)
+	AM_RANGE(0xd44000, 0xd4400f) AM_WRITE(konamigx_tilebank_w)
 	AM_RANGE(0xd48000, 0xd48007) AM_WRITE_LEGACY(K053246_long_w)
 	AM_RANGE(0xd4a010, 0xd4a01f) AM_WRITE_LEGACY(K053247_reg_long_w)
 	AM_RANGE(0xd4c000, 0xd4c01f) AM_READWRITE(ccu_r, ccu_w)
@@ -1188,7 +1188,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gx_type1_map, AS_PROGRAM, 32, konamigx_state )
 	AM_RANGE(0xd4a000, 0xd4a01f) AM_READ(gx6bppspr_r)	// sprite ROM readback
-	AM_RANGE(0xd90000, 0xd97fff) AM_RAM_WRITE_LEGACY(konamigx_palette_w) AM_SHARE("paletteram")
+	AM_RANGE(0xd90000, 0xd97fff) AM_RAM_WRITE(konamigx_palette_w) AM_SHARE("paletteram")
 	AM_RANGE(0xdc0000, 0xdc1fff) AM_RAM			// LAN RAM? (Racin' Force has, Open Golf doesn't)
 	AM_RANGE(0xdd0000, 0xdd00ff) AM_READNOP AM_WRITENOP	// LAN board
 	AM_RANGE(0xdda000, 0xddafff) AM_WRITE_PORT("ADC-WRPORT")
@@ -1198,7 +1198,7 @@ static ADDRESS_MAP_START( gx_type1_map, AS_PROGRAM, 32, konamigx_state )
 	AM_RANGE(0xe20000, 0xe2000f) AM_WRITENOP
 	AM_RANGE(0xe40000, 0xe40003) AM_WRITENOP
 	AM_RANGE(0xe80000, 0xe81fff) AM_RAM AM_BASE_LEGACY((UINT32**)&K053936_0_linectrl)	// chips 21L+19L / S
-	AM_RANGE(0xec0000, 0xedffff) AM_RAM_WRITE_LEGACY(konamigx_t1_psacmap_w) AM_BASE_LEGACY(&gx_psacram)  // chips 20J+23J+18J / S
+	AM_RANGE(0xec0000, 0xedffff) AM_RAM_WRITE(konamigx_t1_psacmap_w) AM_BASE_LEGACY(&gx_psacram)  // chips 20J+23J+18J / S
 	AM_RANGE(0xf00000, 0xf3ffff) AM_READ(type1_roz_r1)	// ROM readback
 	AM_RANGE(0xf40000, 0xf7ffff) AM_READ(type1_roz_r2)	// ROM readback
 	AM_RANGE(0xf80000, 0xf80fff) AM_RAM	// chip 21Q / S
@@ -1208,7 +1208,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gx_type2_map, AS_PROGRAM, 32, konamigx_state )
 	AM_RANGE(0xcc0000, 0xcc0003) AM_WRITE(esc_w)
-	AM_RANGE(0xd90000, 0xd97fff) AM_RAM_WRITE_LEGACY(konamigx_palette_w) AM_SHARE("paletteram")
+	AM_RANGE(0xd90000, 0xd97fff) AM_RAM_WRITE(konamigx_palette_w) AM_SHARE("paletteram")
 	AM_IMPORT_FROM(gx_base_memmap)
 ADDRESS_MAP_END
 
@@ -1217,7 +1217,7 @@ static ADDRESS_MAP_START( gx_type3_map, AS_PROGRAM, 32, konamigx_state )
 	//AM_RANGE(0xcc0000, 0xcc0007) AM_WRITE(type4_prot_w)
 	AM_RANGE(0xe00000, 0xe0001f) AM_RAM AM_BASE_LEGACY((UINT32**)&K053936_0_ctrl)
 	//AM_RANGE(0xe20000, 0xe20003) AM_WRITENOP
-	AM_RANGE(0xe40000, 0xe40003) AM_WRITE_LEGACY(konamigx_type3_psac2_bank_w) AM_BASE_LEGACY(&konamigx_type3_psac2_bank)
+	AM_RANGE(0xe40000, 0xe40003) AM_WRITE(konamigx_type3_psac2_bank_w) AM_BASE_LEGACY(&konamigx_type3_psac2_bank)
 	AM_RANGE(0xe60000, 0xe60fff) AM_RAM AM_BASE_LEGACY((UINT32**)&K053936_0_linectrl)
 	AM_RANGE(0xe80000, 0xe83fff) AM_RAM AM_SHARE("paletteram") 	// main monitor palette
 	AM_RANGE(0xea0000, 0xea3fff) AM_RAM AM_BASE_LEGACY(&gx_subpaletteram32)
@@ -1236,7 +1236,7 @@ static ADDRESS_MAP_START( gx_type4_map, AS_PROGRAM, 32, konamigx_state )
 	AM_RANGE(0xe80000, 0xe87fff) AM_RAM AM_SHARE("paletteram") // 11G/13G/15G (main screen palette RAM)
 	AM_RANGE(0xea0000, 0xea7fff) AM_RAM AM_BASE_LEGACY(&gx_subpaletteram32) // 5G/7G/9G (sub screen palette RAM)
 	AM_RANGE(0xec0000, 0xec0003) AM_READ(type3_sync_r)		// type 4 polls this too
-	AM_RANGE(0xf00000, 0xf07fff) AM_RAM_WRITE_LEGACY(konamigx_t4_psacmap_w) AM_BASE_LEGACY(&gx_psacram)	// PSAC2 tilemap
+	AM_RANGE(0xf00000, 0xf07fff) AM_RAM_WRITE(konamigx_t4_psacmap_w) AM_BASE_LEGACY(&gx_psacram)	// PSAC2 tilemap
 //  AM_RANGE(0xf00000, 0xf07fff) AM_RAM
 	AM_IMPORT_FROM(gx_base_memmap)
 ADDRESS_MAP_END
@@ -1262,27 +1262,27 @@ static INTERRUPT_GEN(tms_sync)
 
 READ16_MEMBER(konamigx_state::tms57002_data_word_r)
 {
-	return machine().device<tms57002_device>("dasp")->data_r(*&space, 0);
+	return machine().device<tms57002_device>("dasp")->data_r(space, 0);
 }
 
 WRITE16_MEMBER(konamigx_state::tms57002_data_word_w)
 {
 	if (ACCESSING_BITS_0_7)
-		machine().device<tms57002_device>("dasp")->data_w(*&space, 0, data);
+		machine().device<tms57002_device>("dasp")->data_w(space, 0, data);
 }
 
 READ16_MEMBER(konamigx_state::tms57002_status_word_r)
 {
-	return (machine().device<tms57002_device>("dasp")->dready_r(*&space, 0) ? 4 : 0) |
-		(machine().device<tms57002_device>("dasp")->empty_r(*&space, 0) ? 1 : 0);
+	return (machine().device<tms57002_device>("dasp")->dready_r(space, 0) ? 4 : 0) |
+		(machine().device<tms57002_device>("dasp")->empty_r(space, 0) ? 1 : 0);
 }
 
 WRITE16_MEMBER(konamigx_state::tms57002_control_word_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		machine().device<tms57002_device>("dasp")->pload_w(*&space, 0, data & 4);
-		machine().device<tms57002_device>("dasp")->cload_w(*&space, 0, data & 8);
+		machine().device<tms57002_device>("dasp")->pload_w(space, 0, data & 4);
+		machine().device<tms57002_device>("dasp")->cload_w(space, 0, data & 8);
 		cputag_set_input_line(machine(), "dasp", INPUT_LINE_RESET, !(data & 16) ? ASSERT_LINE : CLEAR_LINE);
 	}
 }

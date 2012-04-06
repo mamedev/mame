@@ -24,12 +24,11 @@ static TILE_GET_INFO( get_mcatadv_tile_info1 )
 	tileinfo.category = pri;
 }
 
-WRITE16_HANDLER( mcatadv_videoram1_w )
+WRITE16_MEMBER(mcatadv_state::mcatadv_videoram1_w)
 {
-	mcatadv_state *state = space->machine().driver_data<mcatadv_state>();
 
-	COMBINE_DATA(&state->m_videoram1[offset]);
-	state->m_tilemap1->mark_tile_dirty(offset / 2);
+	COMBINE_DATA(&m_videoram1[offset]);
+	m_tilemap1->mark_tile_dirty(offset / 2);
 }
 
 static TILE_GET_INFO( get_mcatadv_tile_info2 )
@@ -43,12 +42,11 @@ static TILE_GET_INFO( get_mcatadv_tile_info2 )
 	tileinfo.category = pri;
 }
 
-WRITE16_HANDLER( mcatadv_videoram2_w )
+WRITE16_MEMBER(mcatadv_state::mcatadv_videoram2_w)
 {
-	mcatadv_state *state = space->machine().driver_data<mcatadv_state>();
 
-	COMBINE_DATA(&state->m_videoram2[offset]);
-	state->m_tilemap2->mark_tile_dirty(offset / 2);
+	COMBINE_DATA(&m_videoram2[offset]);
+	m_tilemap2->mark_tile_dirty(offset / 2);
 }
 
 

@@ -65,7 +65,7 @@ WRITE16_MEMBER(targeth_state::targeth_coin_counter_w)
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, targeth_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x100000, 0x103fff) AM_RAM_WRITE_LEGACY(targeth_vram_w) AM_BASE(m_videoram)	/* Video RAM */
+	AM_RANGE(0x100000, 0x103fff) AM_RAM_WRITE(targeth_vram_w) AM_BASE(m_videoram)	/* Video RAM */
 	AM_RANGE(0x108000, 0x108007) AM_WRITEONLY AM_BASE(m_vregs)	/* Video Registers */
 	AM_RANGE(0x108000, 0x108001) AM_READ_PORT("GUNX1")
 	AM_RANGE(0x108002, 0x108003) AM_READ_PORT("GUNY1")

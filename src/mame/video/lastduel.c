@@ -124,83 +124,76 @@ VIDEO_START( madgear )
 
 ***************************************************************************/
 
-WRITE16_HANDLER( lastduel_flip_w )
+WRITE16_MEMBER(lastduel_state::lastduel_flip_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		flip_screen_set(space->machine(), data & 0x01);
+		flip_screen_set(machine(), data & 0x01);
 
-		coin_lockout_w(space->machine(), 0, ~data & 0x10);
-		coin_lockout_w(space->machine(), 1, ~data & 0x20);
-		coin_counter_w(space->machine(), 0, data & 0x40);
-		coin_counter_w(space->machine(), 1, data & 0x80);
+		coin_lockout_w(machine(), 0, ~data & 0x10);
+		coin_lockout_w(machine(), 1, ~data & 0x20);
+		coin_counter_w(machine(), 0, data & 0x40);
+		coin_counter_w(machine(), 1, data & 0x80);
 	}
 }
 
-WRITE16_HANDLER( lastduel_scroll_w )
+WRITE16_MEMBER(lastduel_state::lastduel_scroll_w)
 {
-	lastduel_state *state = space->machine().driver_data<lastduel_state>();
 
-	data = COMBINE_DATA(&state->m_scroll[offset]);
+	data = COMBINE_DATA(&m_scroll[offset]);
 	switch (offset)
 	{
-		case 0: state->m_fg_tilemap->set_scrolly(0, data); break;
-		case 1: state->m_fg_tilemap->set_scrollx(0, data); break;
-		case 2: state->m_bg_tilemap->set_scrolly(0, data); break;
-		case 3: state->m_bg_tilemap->set_scrollx(0, data); break;
-		case 7: state->m_tilemap_priority = data; break;
+		case 0: m_fg_tilemap->set_scrolly(0, data); break;
+		case 1: m_fg_tilemap->set_scrollx(0, data); break;
+		case 2: m_bg_tilemap->set_scrolly(0, data); break;
+		case 3: m_bg_tilemap->set_scrollx(0, data); break;
+		case 7: m_tilemap_priority = data; break;
 		default:
 			logerror("Unmapped video write %d %04x\n", offset, data);
 			break;
 	}
 }
 
-WRITE16_HANDLER( lastduel_scroll1_w )
+WRITE16_MEMBER(lastduel_state::lastduel_scroll1_w)
 {
-	lastduel_state *state = space->machine().driver_data<lastduel_state>();
 
-	COMBINE_DATA(&state->m_scroll1[offset]);
-	state->m_fg_tilemap->mark_tile_dirty(offset / 2);
+	COMBINE_DATA(&m_scroll1[offset]);
+	m_fg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE16_HANDLER( lastduel_scroll2_w )
+WRITE16_MEMBER(lastduel_state::lastduel_scroll2_w)
 {
-	lastduel_state *state = space->machine().driver_data<lastduel_state>();
 
-	COMBINE_DATA(&state->m_scroll2[offset]);
-	state->m_bg_tilemap->mark_tile_dirty(offset / 2);
+	COMBINE_DATA(&m_scroll2[offset]);
+	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE16_HANDLER( lastduel_vram_w )
+WRITE16_MEMBER(lastduel_state::lastduel_vram_w)
 {
-	lastduel_state *state = space->machine().driver_data<lastduel_state>();
 
-	COMBINE_DATA(&state->m_vram[offset]);
-	state->m_tx_tilemap->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_vram[offset]);
+	m_tx_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_HANDLER( madgear_scroll1_w )
+WRITE16_MEMBER(lastduel_state::madgear_scroll1_w)
 {
-	lastduel_state *state = space->machine().driver_data<lastduel_state>();
 
-	COMBINE_DATA(&state->m_scroll1[offset]);
-	state->m_fg_tilemap->mark_tile_dirty(offset & 0x7ff);
+	COMBINE_DATA(&m_scroll1[offset]);
+	m_fg_tilemap->mark_tile_dirty(offset & 0x7ff);
 }
 
-WRITE16_HANDLER( madgear_scroll2_w )
+WRITE16_MEMBER(lastduel_state::madgear_scroll2_w)
 {
-	lastduel_state *state = space->machine().driver_data<lastduel_state>();
 
-	COMBINE_DATA(&state->m_scroll2[offset]);
-	state->m_bg_tilemap->mark_tile_dirty(offset & 0x7ff);
+	COMBINE_DATA(&m_scroll2[offset]);
+	m_bg_tilemap->mark_tile_dirty(offset & 0x7ff);
 }
 
-WRITE16_HANDLER( lastduel_palette_word_w )
+WRITE16_MEMBER(lastduel_state::lastduel_palette_word_w)
 {
-	lastduel_state *state = space->machine().driver_data<lastduel_state>();
 
 	int red, green, blue, bright;
-	data = COMBINE_DATA(&state->m_paletteram[offset]);
+	data = COMBINE_DATA(&m_paletteram[offset]);
 
 	// Brightness parameter interpreted same way as CPS1
 	bright = 0x10 + (data & 0x0f);
@@ -209,7 +202,7 @@ WRITE16_HANDLER( lastduel_palette_word_w )
 	green = ((data >> 8)  & 0x0f) * bright * 0x11 / 0x1f;
 	blue  = ((data >> 4)  & 0x0f) * bright * 0x11 / 0x1f;
 
-	palette_set_color (space->machine(), offset, MAKE_RGB(red, green, blue));
+	palette_set_color (machine(), offset, MAKE_RGB(red, green, blue));
 }
 
 /***************************************************************************

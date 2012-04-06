@@ -18,14 +18,13 @@ WRITE8_DEVICE_HANDLER(homerun_banking_w)
 	memory_set_bank(device->machine(), "bank1", data & 0x07);
 }
 
-WRITE8_HANDLER( homerun_videoram_w )
+WRITE8_MEMBER(homerun_state::homerun_videoram_w)
 {
-	homerun_state *state = space->machine().driver_data<homerun_state>();
-	state->m_videoram[offset] = data;
-	state->m_tilemap->mark_tile_dirty(offset & 0xfff);
+	m_videoram[offset] = data;
+	m_tilemap->mark_tile_dirty(offset & 0xfff);
 }
 
-WRITE8_HANDLER(homerun_color_w)
+WRITE8_MEMBER(homerun_state::homerun_color_w)
 {
 	int r, g, b;
 	int bit0, bit1, bit2;
@@ -41,7 +40,7 @@ WRITE8_HANDLER(homerun_color_w)
 	bit1 = (data >> 6) & 0x01;
 	bit2 = (data >> 7) & 0x01;
 	b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-	palette_set_color(space->machine(), offset, MAKE_RGB(r,g,b));
+	palette_set_color(machine(), offset, MAKE_RGB(r,g,b));
 }
 
 static TILE_GET_INFO( get_homerun_tile_info )

@@ -70,9 +70,8 @@ VIDEO_START( ultraman )
 
 ***************************************************************************/
 
-WRITE16_HANDLER( ultraman_gfxctrl_w )
+WRITE16_MEMBER(ultraman_state::ultraman_gfxctrl_w)
 {
-	ultraman_state *state = space->machine().driver_data<ultraman_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
@@ -85,32 +84,32 @@ WRITE16_HANDLER( ultraman_gfxctrl_w )
             bit 6: coin counter 1
             bit 7: coin counter 2 */
 
-		k051316_wraparound_enable(state->m_k051316_1, data & 0x01);
+		k051316_wraparound_enable(m_k051316_1, data & 0x01);
 
-		if (state->m_bank0 != ((data & 0x02) >> 1))
+		if (m_bank0 != ((data & 0x02) >> 1))
 		{
-			state->m_bank0 = (data & 0x02) >> 1;
-			space->machine().tilemap().mark_all_dirty();	/* should mark only zoom0 */
+			m_bank0 = (data & 0x02) >> 1;
+			machine().tilemap().mark_all_dirty();	/* should mark only zoom0 */
 		}
 
-		k051316_wraparound_enable(state->m_k051316_2, data & 0x04);
+		k051316_wraparound_enable(m_k051316_2, data & 0x04);
 
-		if (state->m_bank1 != ((data & 0x08) >> 3))
+		if (m_bank1 != ((data & 0x08) >> 3))
 		{
-			state->m_bank1 = (data & 0x08) >> 3;
-			space->machine().tilemap().mark_all_dirty();	/* should mark only zoom1 */
+			m_bank1 = (data & 0x08) >> 3;
+			machine().tilemap().mark_all_dirty();	/* should mark only zoom1 */
 		}
 
-		k051316_wraparound_enable(state->m_k051316_3, data & 0x10);
+		k051316_wraparound_enable(m_k051316_3, data & 0x10);
 
-		if (state->m_bank2 != ((data & 0x20) >> 5))
+		if (m_bank2 != ((data & 0x20) >> 5))
 		{
-			state->m_bank2 = (data & 0x20) >> 5;
-			space->machine().tilemap().mark_all_dirty();	/* should mark only zoom2 */
+			m_bank2 = (data & 0x20) >> 5;
+			machine().tilemap().mark_all_dirty();	/* should mark only zoom2 */
 		}
 
-		coin_counter_w(space->machine(), 0, data & 0x40);
-		coin_counter_w(space->machine(), 1, data & 0x80);
+		coin_counter_w(machine(), 0, data & 0x40);
+		coin_counter_w(machine(), 1, data & 0x80);
 	}
 }
 

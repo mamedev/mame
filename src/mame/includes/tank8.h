@@ -42,6 +42,7 @@ public:
 	DECLARE_READ8_MEMBER(tank8_collision_r);
 	DECLARE_WRITE8_MEMBER(tank8_lockout_w);
 	DECLARE_WRITE8_MEMBER(tank8_int_reset_w);
+	DECLARE_WRITE8_MEMBER(tank8_video_ram_w);
 };
 
 
@@ -62,6 +63,5 @@ SCREEN_VBLANK( tank8 );
 VIDEO_START( tank8 );
 SCREEN_UPDATE_IND16( tank8 );
 
-WRITE8_HANDLER( tank8_video_ram_w );
 
 

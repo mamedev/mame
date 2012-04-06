@@ -202,7 +202,7 @@ static void create_tilemaps(running_machine &machine);
 #define SHOW_WRITE_ERROR(_format_,_offset_,_data_)\
 { \
 	popmessage(_format_,_offset_,_data_);\
-	logerror("CPU #0 PC %06X : Warning, ",cpu_get_pc(&space->device())); \
+	logerror("CPU #0 PC %06X : Warning, ",cpu_get_pc(&space.device())); \
 	logerror(_format_,_offset_,_data_);\
 	logerror("\n");\
 }
@@ -211,7 +211,7 @@ static void create_tilemaps(running_machine &machine);
 
 #define SHOW_WRITE_ERROR(_format_,_offset_,_data_)\
 {\
-	logerror("CPU #0 PC %06X : Warning, ",cpu_get_pc(&space->device())); \
+	logerror("CPU #0 PC %06X : Warning, ",cpu_get_pc(&space.device())); \
 	logerror(_format_,_offset_,_data_); \
 	logerror("\n");\
 }
@@ -311,9 +311,9 @@ INLINE void scrollram_w(address_space *space, offs_t offset, UINT16 data, UINT16
 	}
 }
 
-WRITE16_HANDLER( megasys1_scrollram_0_w ) { scrollram_w(space, offset, data, mem_mask, 0); }
-WRITE16_HANDLER( megasys1_scrollram_1_w ) { scrollram_w(space, offset, data, mem_mask, 1); }
-WRITE16_HANDLER( megasys1_scrollram_2_w ) { scrollram_w(space, offset, data, mem_mask, 2); }
+WRITE16_MEMBER(megasys1_state::megasys1_scrollram_0_w){ scrollram_w(&space, offset, data, mem_mask, 0); }
+WRITE16_MEMBER(megasys1_state::megasys1_scrollram_1_w){ scrollram_w(&space, offset, data, mem_mask, 1); }
+WRITE16_MEMBER(megasys1_state::megasys1_scrollram_2_w){ scrollram_w(&space, offset, data, mem_mask, 2); }
 
 
 
@@ -401,54 +401,53 @@ static void create_tilemaps(running_machine &machine)
 	}
 }
 
-static void megasys1_set_vreg_flag(megasys1_state *state, int which, int data)
+void megasys1_state::megasys1_set_vreg_flag(int which, int data)
 {
-	if (state->m_scroll_flag[which] != data)
+	if (m_scroll_flag[which] != data)
 	{
-		state->m_scroll_flag[which] = data;
-		state->m_tmap[which] = state->m_tilemap[which][(data >> 4) & 1][data & 3];
-		state->m_tmap[which]->mark_all_dirty();
+		m_scroll_flag[which] = data;
+		m_tmap[which] = m_tilemap[which][(data >> 4) & 1][data & 3];
+		m_tmap[which]->mark_all_dirty();
 	}
 }
 
 
 
 /* Used by MS1-A/Z, B */
-WRITE16_HANDLER( megasys1_vregs_A_w )
+WRITE16_MEMBER(megasys1_state::megasys1_vregs_A_w)
 {
-	megasys1_state *state = space->machine().driver_data<megasys1_state>();
-	UINT16 new_data = COMBINE_DATA(&state->m_vregs[offset]);
+	UINT16 new_data = COMBINE_DATA(&m_vregs[offset]);
 
 	switch (offset)
 	{
-		case 0x000/2   :	state->m_active_layers = new_data;	break;
+		case 0x000/2   :	m_active_layers = new_data;	break;
 
-		case 0x008/2+0 :	state->m_scrollx[2] = new_data;	break;
-		case 0x008/2+1 :	state->m_scrolly[2] = new_data;	break;
-		case 0x008/2+2 :	megasys1_set_vreg_flag(state, 2, new_data);		break;
+		case 0x008/2+0 :	m_scrollx[2] = new_data;	break;
+		case 0x008/2+1 :	m_scrolly[2] = new_data;	break;
+		case 0x008/2+2 :	megasys1_set_vreg_flag(2, new_data);		break;
 
-		case 0x200/2+0 :	state->m_scrollx[0] = new_data;	break;
-		case 0x200/2+1 :	state->m_scrolly[0] = new_data;	break;
-		case 0x200/2+2 :	megasys1_set_vreg_flag(state, 0, new_data);		break;
+		case 0x200/2+0 :	m_scrollx[0] = new_data;	break;
+		case 0x200/2+1 :	m_scrolly[0] = new_data;	break;
+		case 0x200/2+2 :	megasys1_set_vreg_flag(0, new_data);		break;
 
-		case 0x208/2+0 :	state->m_scrollx[1] = new_data;	break;
-		case 0x208/2+1 :	state->m_scrolly[1] = new_data;	break;
-		case 0x208/2+2 :	megasys1_set_vreg_flag(state, 1, new_data);		break;
+		case 0x208/2+0 :	m_scrollx[1] = new_data;	break;
+		case 0x208/2+1 :	m_scrolly[1] = new_data;	break;
+		case 0x208/2+2 :	megasys1_set_vreg_flag(1, new_data);		break;
 
-		case 0x100/2   :	state->m_sprite_flag = new_data;		break;
+		case 0x100/2   :	m_sprite_flag = new_data;		break;
 
-		case 0x300/2   :	state->m_screen_flag = new_data;
-							if (space->machine().device("soundcpu"))
+		case 0x300/2   :	m_screen_flag = new_data;
+							if (machine().device("soundcpu"))
 							{
 								if (new_data & 0x10)
-									cputag_set_input_line(space->machine(), "soundcpu", INPUT_LINE_RESET, ASSERT_LINE);
+									cputag_set_input_line(machine(), "soundcpu", INPUT_LINE_RESET, ASSERT_LINE);
 								else
-									cputag_set_input_line(space->machine(), "soundcpu", INPUT_LINE_RESET, CLEAR_LINE);
+									cputag_set_input_line(machine(), "soundcpu", INPUT_LINE_RESET, CLEAR_LINE);
 							}
 							break;
 
-		case 0x308/2   :	state->soundlatch_word_w(*space,0,new_data,0xffff);
-							cputag_set_input_line(space->machine(), "soundcpu", 4, HOLD_LINE);
+		case 0x308/2   :	soundlatch_word_w(space,0,new_data,0xffff);
+							cputag_set_input_line(machine(), "soundcpu", 4, HOLD_LINE);
 							break;
 
 		default		 :	SHOW_WRITE_ERROR("vreg %04X <- %04X",offset*2,data);
@@ -460,49 +459,47 @@ WRITE16_HANDLER( megasys1_vregs_A_w )
 
 
 /* Used by MS1-C only */
-READ16_HANDLER( megasys1_vregs_C_r )
+READ16_MEMBER(megasys1_state::megasys1_vregs_C_r)
 {
-	megasys1_state *state = space->machine().driver_data<megasys1_state>();
 	switch (offset)
 	{
-		case 0x8000/2:	return state->soundlatch2_word_r(*space,0,0xffff);
-		default:		return state->m_vregs[offset];
+		case 0x8000/2:	return soundlatch2_word_r(space,0,0xffff);
+		default:		return m_vregs[offset];
 	}
 }
 
-WRITE16_HANDLER( megasys1_vregs_C_w )
+WRITE16_MEMBER(megasys1_state::megasys1_vregs_C_w)
 {
-	megasys1_state *state = space->machine().driver_data<megasys1_state>();
-	UINT16 new_data = COMBINE_DATA(&state->m_vregs[offset]);
+	UINT16 new_data = COMBINE_DATA(&m_vregs[offset]);
 
 	switch (offset)
 	{
-		case 0x2000/2+0 :	state->m_scrollx[0] = new_data;	break;
-		case 0x2000/2+1 :	state->m_scrolly[0] = new_data;	break;
-		case 0x2000/2+2 :	megasys1_set_vreg_flag(state, 0, new_data);		break;
+		case 0x2000/2+0 :	m_scrollx[0] = new_data;	break;
+		case 0x2000/2+1 :	m_scrolly[0] = new_data;	break;
+		case 0x2000/2+2 :	megasys1_set_vreg_flag(0, new_data);		break;
 
-		case 0x2008/2+0 :	state->m_scrollx[1] = new_data;	break;
-		case 0x2008/2+1 :	state->m_scrolly[1] = new_data;	break;
-		case 0x2008/2+2 :	megasys1_set_vreg_flag(state, 1, new_data);		break;
+		case 0x2008/2+0 :	m_scrollx[1] = new_data;	break;
+		case 0x2008/2+1 :	m_scrolly[1] = new_data;	break;
+		case 0x2008/2+2 :	megasys1_set_vreg_flag(1, new_data);		break;
 
-		case 0x2100/2+0 :	state->m_scrollx[2] = new_data;	break;
-		case 0x2100/2+1 :	state->m_scrolly[2] = new_data;	break;
-		case 0x2100/2+2 :	megasys1_set_vreg_flag(state, 2, new_data);		break;
+		case 0x2100/2+0 :	m_scrollx[2] = new_data;	break;
+		case 0x2100/2+1 :	m_scrolly[2] = new_data;	break;
+		case 0x2100/2+2 :	megasys1_set_vreg_flag(2, new_data);		break;
 
-		case 0x2108/2   :	state->m_sprite_bank   = new_data;	break;
-		case 0x2200/2   :	state->m_sprite_flag   = new_data;	break;
-		case 0x2208/2   :	state->m_active_layers = new_data;	break;
+		case 0x2108/2   :	m_sprite_bank   = new_data;	break;
+		case 0x2200/2   :	m_sprite_flag   = new_data;	break;
+		case 0x2208/2   :	m_active_layers = new_data;	break;
 
-		case 0x2308/2   :	state->m_screen_flag = new_data;
+		case 0x2308/2   :	m_screen_flag = new_data;
 							if (new_data & 0x10)
-								cputag_set_input_line(space->machine(), "soundcpu", INPUT_LINE_RESET, ASSERT_LINE);
+								cputag_set_input_line(machine(), "soundcpu", INPUT_LINE_RESET, ASSERT_LINE);
 							else
-								cputag_set_input_line(space->machine(), "soundcpu", INPUT_LINE_RESET, CLEAR_LINE);
+								cputag_set_input_line(machine(), "soundcpu", INPUT_LINE_RESET, CLEAR_LINE);
 							break;
 
 		case 0x8000/2   :	/* Cybattler reads sound latch on irq 2 */
-							state->soundlatch_word_w(*space, 0, new_data, 0xffff);
-							cputag_set_input_line(space->machine(), "soundcpu", 2, HOLD_LINE);
+							soundlatch_word_w(space, 0, new_data, 0xffff);
+							cputag_set_input_line(machine(), "soundcpu", 2, HOLD_LINE);
 							break;
 
 		default:		SHOW_WRITE_ERROR("vreg %04X <- %04X", offset * 2, data);
@@ -512,29 +509,28 @@ WRITE16_HANDLER( megasys1_vregs_C_w )
 
 
 /* Used by MS1-D only */
-WRITE16_HANDLER( megasys1_vregs_D_w )
+WRITE16_MEMBER(megasys1_state::megasys1_vregs_D_w)
 {
-	megasys1_state *state = space->machine().driver_data<megasys1_state>();
-	UINT16 new_data = COMBINE_DATA(&state->m_vregs[offset]);
+	UINT16 new_data = COMBINE_DATA(&m_vregs[offset]);
 
 	switch (offset)
 	{
-		case 0x2000/2+0 :	state->m_scrollx[0] = new_data;	break;
-		case 0x2000/2+1 :	state->m_scrolly[0] = new_data;	break;
-		case 0x2000/2+2 :	megasys1_set_vreg_flag(state, 0, new_data);		break;
+		case 0x2000/2+0 :	m_scrollx[0] = new_data;	break;
+		case 0x2000/2+1 :	m_scrolly[0] = new_data;	break;
+		case 0x2000/2+2 :	megasys1_set_vreg_flag(0, new_data);		break;
 
-		case 0x2008/2+0 :	state->m_scrollx[1] = new_data;	break;
-		case 0x2008/2+1 :	state->m_scrolly[1] = new_data;	break;
-		case 0x2008/2+2 :	megasys1_set_vreg_flag(state, 1, new_data);		break;
+		case 0x2008/2+0 :	m_scrollx[1] = new_data;	break;
+		case 0x2008/2+1 :	m_scrolly[1] = new_data;	break;
+		case 0x2008/2+2 :	megasys1_set_vreg_flag(1, new_data);		break;
 
-//      case 0x2100/2+0 :   state->m_scrollx[2] = new_data; break;
-//      case 0x2100/2+1 :   state->m_scrolly[2] = new_data; break;
-//      case 0x2100/2+2 :   megasys1_set_vreg_flag(state, 2, new_data);        break;
+//      case 0x2100/2+0 :   m_scrollx[2] = new_data; break;
+//      case 0x2100/2+1 :   m_scrolly[2] = new_data; break;
+//      case 0x2100/2+2 :   megasys1_set_vreg_flag(2, new_data);        break;
 
-		case 0x2108/2   :	state->m_sprite_bank	=	new_data;		break;
-		case 0x2200/2   :	state->m_sprite_flag	=	new_data;		break;
-		case 0x2208/2   :	state->m_active_layers	=	new_data;		break;
-		case 0x2308/2   :	state->m_screen_flag	=	new_data;		break;
+		case 0x2108/2   :	m_sprite_bank	=	new_data;		break;
+		case 0x2200/2   :	m_sprite_flag	=	new_data;		break;
+		case 0x2208/2   :	m_active_layers	=	new_data;		break;
+		case 0x2308/2   :	m_screen_flag	=	new_data;		break;
 
 		default:		SHOW_WRITE_ERROR("vreg %04X <- %04X",offset*2,data);
 	}

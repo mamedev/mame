@@ -22,7 +22,7 @@ Bruce Tomlin (hardware info)
 static ADDRESS_MAP_START(vectrex_map, AS_PROGRAM, 8, vectrex_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc800, 0xcbff) AM_RAM AM_MIRROR(0x0400) AM_BASE(m_gce_vectorram) AM_SIZE(m_gce_vectorram_size)
-	AM_RANGE(0xd000, 0xd7ff) AM_READWRITE_LEGACY(vectrex_via_r, vectrex_via_w)
+	AM_RANGE(0xd000, 0xd7ff) AM_READWRITE(vectrex_via_r, vectrex_via_w)
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -92,7 +92,7 @@ static const ay8910_interface vectrex_ay8910_interface =
 	AY8910_DEFAULT_LOADS,
 	DEVCB_INPUT_PORT("BUTTONS"),
 	DEVCB_NULL,
-	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, vectrex_psg_port_w),
+	DEVCB_DRIVER_MEMBER(vectrex_state, vectrex_psg_port_w),
 	DEVCB_NULL
 };
 
@@ -176,9 +176,9 @@ ROM_END
 static ADDRESS_MAP_START(raaspec_map , AS_PROGRAM, 8, vectrex_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xa000, 0xa000) AM_WRITE_LEGACY(raaspec_led_w)
+	AM_RANGE(0xa000, 0xa000) AM_WRITE(raaspec_led_w)
 	AM_RANGE(0xc800, 0xcbff) AM_RAM AM_MIRROR(0x0400) AM_BASE(m_gce_vectorram) AM_SIZE(m_gce_vectorram_size)
-	AM_RANGE(0xd000, 0xd7ff) AM_READWRITE_LEGACY(vectrex_via_r, vectrex_via_w)
+	AM_RANGE(0xd000, 0xd7ff) AM_READWRITE(vectrex_via_r, vectrex_via_w)
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

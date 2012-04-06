@@ -325,20 +325,18 @@ static void swimmer_set_background_pen(running_machine &machine)
 
 
 
-WRITE8_HANDLER( cclimber_colorram_w )
+WRITE8_MEMBER(cclimber_state::cclimber_colorram_w)
 {
-	cclimber_state *state = space->machine().driver_data<cclimber_state>();
 	/* A5 is not connected, there is only 0x200 bytes of RAM */
-	state->m_colorram[offset & ~0x20] = data;
-	state->m_colorram[offset |  0x20] = data;
+	m_colorram[offset & ~0x20] = data;
+	m_colorram[offset |  0x20] = data;
 }
 
 
-WRITE8_HANDLER( cannonb_flip_screen_w )
+WRITE8_MEMBER(cclimber_state::cannonb_flip_screen_w)
 {
-	cclimber_state *state = space->machine().driver_data<cclimber_state>();
-	state->m_flip_screen[0] = data;
-	state->m_flip_screen[1] = data;
+	m_flip_screen[0] = data;
+	m_flip_screen[1] = data;
 }
 
 

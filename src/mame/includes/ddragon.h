@@ -58,13 +58,13 @@ public:
 	device_t *m_sub_cpu;
 	device_t *m_adpcm_1;
 	device_t *m_adpcm_2;
+	DECLARE_WRITE8_MEMBER(ddragon_bgvideoram_w);
+	DECLARE_WRITE8_MEMBER(ddragon_fgvideoram_w);
 };
 
 
 /*----------- defined in video/ddragon.c -----------*/
 
-WRITE8_HANDLER( ddragon_bgvideoram_w );
-WRITE8_HANDLER( ddragon_fgvideoram_w );
 
 VIDEO_START( chinagat );
 VIDEO_START( ddragon );

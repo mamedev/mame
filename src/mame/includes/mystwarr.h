@@ -1,8 +1,8 @@
-class mystwarr_state : public driver_device
+class mystwarr_state : public konamigx_state
 {
 public:
 	mystwarr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+		: konamigx_state(mconfig, type, tag),
 		m_maincpu(*this,"maincpu")
 		{ }
 
@@ -42,6 +42,14 @@ public:
 	DECLARE_READ16_MEMBER(mccontrol_r);
 	DECLARE_WRITE16_MEMBER(mccontrol_w);
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
+		
+	DECLARE_WRITE16_MEMBER(ddd_053936_enable_w);
+	DECLARE_WRITE16_MEMBER(ddd_053936_clip_w);
+	DECLARE_READ16_MEMBER(gai_053936_tilerom_0_r);
+	DECLARE_READ16_MEMBER(ddd_053936_tilerom_0_r);
+	DECLARE_READ16_MEMBER(ddd_053936_tilerom_1_r);
+	DECLARE_READ16_MEMBER(gai_053936_tilerom_2_r);
+	DECLARE_READ16_MEMBER(ddd_053936_tilerom_2_r);
 };
 
 
@@ -58,10 +66,3 @@ SCREEN_UPDATE_RGB32( mystwarr );
 SCREEN_UPDATE_RGB32( metamrph );
 SCREEN_UPDATE_RGB32( martchmp );
 
-WRITE16_HANDLER( ddd_053936_enable_w );
-WRITE16_HANDLER( ddd_053936_clip_w );
-READ16_HANDLER( gai_053936_tilerom_0_r );
-READ16_HANDLER( ddd_053936_tilerom_0_r );
-READ16_HANDLER( ddd_053936_tilerom_1_r );
-READ16_HANDLER( gai_053936_tilerom_2_r );
-READ16_HANDLER( ddd_053936_tilerom_2_r );

@@ -12,6 +12,11 @@ public:
 	int m_gfxrom_select;
 	tilemap_t *m_bg_tilemap[2];
 	DECLARE_WRITE8_MEMBER(coincntr_w);
+	DECLARE_WRITE8_MEMBER(hexion_bankswitch_w);
+	DECLARE_READ8_MEMBER(hexion_bankedram_r);
+	DECLARE_WRITE8_MEMBER(hexion_bankedram_w);
+	DECLARE_WRITE8_MEMBER(hexion_bankctrl_w);
+	DECLARE_WRITE8_MEMBER(hexion_gfxrom_select_w);
 };
 
 
@@ -20,8 +25,3 @@ public:
 VIDEO_START( hexion );
 SCREEN_UPDATE_IND16( hexion );
 
-WRITE8_HANDLER( hexion_bankswitch_w );
-READ8_HANDLER( hexion_bankedram_r );
-WRITE8_HANDLER( hexion_bankedram_w );
-WRITE8_HANDLER( hexion_bankctrl_w );
-WRITE8_HANDLER( hexion_gfxrom_select_w );

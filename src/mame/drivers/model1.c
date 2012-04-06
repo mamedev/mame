@@ -855,7 +855,7 @@ WRITE16_MEMBER(model1_state::snd_latch_to_68k_w)
 
     if (m_dsbz80 != NULL)
     {
-        m_dsbz80->latch_w(*&space, 0, data);
+        m_dsbz80->latch_w(space, 0, data);
     }
 
 	// signal the 68000 that there's data waiting
@@ -874,7 +874,7 @@ static ADDRESS_MAP_START( model1_mem, AS_PROGRAM, 16, model1_state )
 
 	AM_RANGE(0x600000, 0x60ffff) AM_RAM_WRITE(md0_w) AM_BASE(m_display_list0)
 	AM_RANGE(0x610000, 0x61ffff) AM_RAM_WRITE(md1_w) AM_BASE(m_display_list1)
-	AM_RANGE(0x680000, 0x680003) AM_READWRITE_LEGACY(model1_listctl_r, model1_listctl_w)
+	AM_RANGE(0x680000, 0x680003) AM_READWRITE(model1_listctl_r, model1_listctl_w)
 
 	AM_RANGE(0x700000, 0x70ffff) AM_DEVREADWRITE("tile", segas24_tile, tile_r, tile_w)
 	AM_RANGE(0x720000, 0x720001) AM_WRITENOP		// Unknown, always 0
@@ -895,9 +895,9 @@ static ADDRESS_MAP_START( model1_mem, AS_PROGRAM, 16, model1_state )
 	AM_RANGE(0xc40000, 0xc40001) AM_WRITE(snd_latch_to_68k_w)
 	AM_RANGE(0xc40002, 0xc40003) AM_READ(snd_68k_ready_r)
 
-	AM_RANGE(0xd00000, 0xd00001) AM_READWRITE_LEGACY(model1_tgp_copro_adr_r, model1_tgp_copro_adr_w)
-	AM_RANGE(0xd20000, 0xd20003) AM_WRITE_LEGACY(model1_tgp_copro_ram_w )
-	AM_RANGE(0xd80000, 0xd80003) AM_WRITE_LEGACY(model1_tgp_copro_w) AM_MIRROR(0x10)
+	AM_RANGE(0xd00000, 0xd00001) AM_READWRITE(model1_tgp_copro_adr_r, model1_tgp_copro_adr_w)
+	AM_RANGE(0xd20000, 0xd20003) AM_WRITE(model1_tgp_copro_ram_w )
+	AM_RANGE(0xd80000, 0xd80003) AM_WRITE(model1_tgp_copro_w) AM_MIRROR(0x10)
 	AM_RANGE(0xdc0000, 0xdc0003) AM_READ(fifoin_status_r)
 
 	AM_RANGE(0xe00000, 0xe00001) AM_WRITENOP        // Watchdog?  IRQ ack? Always 0x20, usually on irq
@@ -908,8 +908,8 @@ static ADDRESS_MAP_START( model1_mem, AS_PROGRAM, 16, model1_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( model1_io, AS_IO, 16, model1_state )
-	AM_RANGE(0xd20000, 0xd20003) AM_READ_LEGACY(model1_tgp_copro_ram_r)
-	AM_RANGE(0xd80000, 0xd80003) AM_READ_LEGACY(model1_tgp_copro_r)
+	AM_RANGE(0xd20000, 0xd20003) AM_READ(model1_tgp_copro_ram_r)
+	AM_RANGE(0xd80000, 0xd80003) AM_READ(model1_tgp_copro_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( model1_vr_mem, AS_PROGRAM, 16, model1_state )
@@ -922,7 +922,7 @@ static ADDRESS_MAP_START( model1_vr_mem, AS_PROGRAM, 16, model1_state )
 
 	AM_RANGE(0x600000, 0x60ffff) AM_RAM_WRITE(md0_w) AM_BASE(m_display_list0)
 	AM_RANGE(0x610000, 0x61ffff) AM_RAM_WRITE(md1_w) AM_BASE(m_display_list1)
-	AM_RANGE(0x680000, 0x680003) AM_READWRITE_LEGACY(model1_listctl_r, model1_listctl_w)
+	AM_RANGE(0x680000, 0x680003) AM_READWRITE(model1_listctl_r, model1_listctl_w)
 
 	AM_RANGE(0x700000, 0x70ffff) AM_DEVREADWRITE("tile", segas24_tile, tile_r, tile_w)
 	AM_RANGE(0x720000, 0x720001) AM_WRITENOP		// Unknown, always 0
@@ -943,9 +943,9 @@ static ADDRESS_MAP_START( model1_vr_mem, AS_PROGRAM, 16, model1_state )
 	AM_RANGE(0xc40000, 0xc40001) AM_WRITE(snd_latch_to_68k_w)
 	AM_RANGE(0xc40002, 0xc40003) AM_READ(snd_68k_ready_r)
 
-	AM_RANGE(0xd00000, 0xd00001) AM_READWRITE_LEGACY(model1_tgp_vr_adr_r, model1_tgp_vr_adr_w)
-	AM_RANGE(0xd20000, 0xd20003) AM_WRITE_LEGACY(model1_vr_tgp_ram_w )
-	AM_RANGE(0xd80000, 0xd80003) AM_WRITE_LEGACY(model1_vr_tgp_w) AM_MIRROR(0x10)
+	AM_RANGE(0xd00000, 0xd00001) AM_READWRITE(model1_tgp_vr_adr_r, model1_tgp_vr_adr_w)
+	AM_RANGE(0xd20000, 0xd20003) AM_WRITE(model1_vr_tgp_ram_w )
+	AM_RANGE(0xd80000, 0xd80003) AM_WRITE(model1_vr_tgp_w) AM_MIRROR(0x10)
 	AM_RANGE(0xdc0000, 0xdc0003) AM_READ(fifoin_status_r)
 
 	AM_RANGE(0xe00000, 0xe00001) AM_WRITENOP        // Watchdog?  IRQ ack? Always 0x20, usually on irq
@@ -956,8 +956,8 @@ static ADDRESS_MAP_START( model1_vr_mem, AS_PROGRAM, 16, model1_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( model1_vr_io, AS_IO, 16, model1_state )
-	AM_RANGE(0xd20000, 0xd20003) AM_READ_LEGACY(model1_vr_tgp_ram_r)
-	AM_RANGE(0xd80000, 0xd80003) AM_READ_LEGACY(model1_vr_tgp_r)
+	AM_RANGE(0xd20000, 0xd20003) AM_READ(model1_vr_tgp_ram_r)
+	AM_RANGE(0xd80000, 0xd80003) AM_READ(model1_vr_tgp_r)
 ADDRESS_MAP_END
 
 READ16_MEMBER(model1_state::m1_snd_68k_latch_r)

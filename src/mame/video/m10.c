@@ -56,38 +56,35 @@ static void get_tile_info( running_machine &machine, tile_data &tileinfo, tilema
 }
 
 
-WRITE8_HANDLER( m10_colorram_w )
+WRITE8_MEMBER(m10_state::m10_colorram_w)
 {
-	m10_state *state = space->machine().driver_data<m10_state>();
 
-	if (state->m_colorram[offset] != data)
+	if (m_colorram[offset] != data)
 	{
-		state->m_tx_tilemap->mark_tile_dirty(offset);
-		state->m_colorram[offset] = data;
+		m_tx_tilemap->mark_tile_dirty(offset);
+		m_colorram[offset] = data;
 	}
 }
 
 
-WRITE8_HANDLER( m10_chargen_w )
+WRITE8_MEMBER(m10_state::m10_chargen_w)
 {
-	m10_state *state = space->machine().driver_data<m10_state>();
 
-	if (state->m_chargen[offset] != data)
+	if (m_chargen[offset] != data)
 	{
-		state->m_chargen[offset] = data;
-		gfx_element_mark_dirty(state->m_back_gfx, offset >> (3 + 5));
+		m_chargen[offset] = data;
+		gfx_element_mark_dirty(m_back_gfx, offset >> (3 + 5));
 	}
 }
 
 
-WRITE8_HANDLER( m15_chargen_w )
+WRITE8_MEMBER(m10_state::m15_chargen_w)
 {
-	m10_state *state = space->machine().driver_data<m10_state>();
 
-	if (state->m_chargen[offset] != data)
+	if (m_chargen[offset] != data)
 	{
-		state->m_chargen[offset] = data;
-		gfx_element_mark_dirty(space->machine().gfx[0], offset >> 3);
+		m_chargen[offset] = data;
+		gfx_element_mark_dirty(machine().gfx[0], offset >> 3);
 	}
 }
 

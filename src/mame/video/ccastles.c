@@ -49,26 +49,23 @@ VIDEO_START( ccastles )
  *
  *************************************/
 
-WRITE8_HANDLER( ccastles_hscroll_w )
+WRITE8_MEMBER(ccastles_state::ccastles_hscroll_w)
 {
-	ccastles_state *state = space->machine().driver_data<ccastles_state>();
-	space->machine().primary_screen->update_partial(space->machine().primary_screen->vpos());
-	state->m_hscroll = data;
+	machine().primary_screen->update_partial(machine().primary_screen->vpos());
+	m_hscroll = data;
 }
 
 
-WRITE8_HANDLER( ccastles_vscroll_w )
+WRITE8_MEMBER(ccastles_state::ccastles_vscroll_w)
 {
-	ccastles_state *state = space->machine().driver_data<ccastles_state>();
-	state->m_vscroll = data;
+	m_vscroll = data;
 }
 
 
-WRITE8_HANDLER( ccastles_video_control_w )
+WRITE8_MEMBER(ccastles_state::ccastles_video_control_w)
 {
-	ccastles_state *state = space->machine().driver_data<ccastles_state>();
 	/* only D3 matters */
-	state->m_video_control[offset] = (data >> 3) & 1;
+	m_video_control[offset] = (data >> 3) & 1;
 }
 
 
@@ -79,9 +76,8 @@ WRITE8_HANDLER( ccastles_video_control_w )
  *
  *************************************/
 
-WRITE8_HANDLER( ccastles_paletteram_w )
+WRITE8_MEMBER(ccastles_state::ccastles_paletteram_w)
 {
-	ccastles_state *state = space->machine().driver_data<ccastles_state>();
 	int bit0, bit1, bit2;
 	int r, g, b;
 
@@ -94,21 +90,21 @@ WRITE8_HANDLER( ccastles_paletteram_w )
 	bit0 = (~r >> 0) & 0x01;
 	bit1 = (~r >> 1) & 0x01;
 	bit2 = (~r >> 2) & 0x01;
-	r = combine_3_weights(state->m_rweights, bit0, bit1, bit2);
+	r = combine_3_weights(m_rweights, bit0, bit1, bit2);
 
 	/* green component (inverted) */
 	bit0 = (~g >> 0) & 0x01;
 	bit1 = (~g >> 1) & 0x01;
 	bit2 = (~g >> 2) & 0x01;
-	g = combine_3_weights(state->m_gweights, bit0, bit1, bit2);
+	g = combine_3_weights(m_gweights, bit0, bit1, bit2);
 
 	/* blue component (inverted) */
 	bit0 = (~b >> 0) & 0x01;
 	bit1 = (~b >> 1) & 0x01;
 	bit2 = (~b >> 2) & 0x01;
-	b = combine_3_weights(state->m_bweights, bit0, bit1, bit2);
+	b = combine_3_weights(m_bweights, bit0, bit1, bit2);
 
-	palette_set_color(space->machine(), offset & 0x1f, MAKE_RGB(r, g, b));
+	palette_set_color(machine(), offset & 0x1f, MAKE_RGB(r, g, b));
 }
 
 
@@ -198,10 +194,10 @@ INLINE void bitmode_autoinc( running_machine &machine )
  *
  *************************************/
 
-WRITE8_HANDLER( ccastles_videoram_w )
+WRITE8_MEMBER(ccastles_state::ccastles_videoram_w)
 {
 	/* direct writes to VRAM go through the write protect PROM as well */
-	ccastles_write_vram(space->machine(), offset, data, 0, 0);
+	ccastles_write_vram(machine(), offset, data, 0, 0);
 }
 
 
@@ -212,49 +208,46 @@ WRITE8_HANDLER( ccastles_videoram_w )
  *
  *************************************/
 
-READ8_HANDLER( ccastles_bitmode_r )
+READ8_MEMBER(ccastles_state::ccastles_bitmode_r)
 {
-	ccastles_state *state = space->machine().driver_data<ccastles_state>();
 
 	/* in bitmode, the address comes from the autoincrement latches */
-	UINT16 addr = (state->m_bitmode_addr[1] << 7) | (state->m_bitmode_addr[0] >> 1);
+	UINT16 addr = (m_bitmode_addr[1] << 7) | (m_bitmode_addr[0] >> 1);
 
 	/* the appropriate pixel is selected into the upper 4 bits */
-	UINT8 result = state->m_videoram[addr] << ((~state->m_bitmode_addr[0] & 1) * 4);
+	UINT8 result = m_videoram[addr] << ((~m_bitmode_addr[0] & 1) * 4);
 
 	/* autoincrement because /BITMD was selected */
-	bitmode_autoinc(space->machine());
+	bitmode_autoinc(machine());
 
 	/* the low 4 bits of the data lines are not driven so make them all 1's */
 	return result | 0x0f;
 }
 
 
-WRITE8_HANDLER( ccastles_bitmode_w )
+WRITE8_MEMBER(ccastles_state::ccastles_bitmode_w)
 {
-	ccastles_state *state = space->machine().driver_data<ccastles_state>();
 
 	/* in bitmode, the address comes from the autoincrement latches */
-	UINT16 addr = (state->m_bitmode_addr[1] << 7) | (state->m_bitmode_addr[0] >> 1);
+	UINT16 addr = (m_bitmode_addr[1] << 7) | (m_bitmode_addr[0] >> 1);
 
 	/* the upper 4 bits of data are replicated to the lower 4 bits */
 	data = (data & 0xf0) | (data >> 4);
 
 	/* write through the generic VRAM routine, passing the low 2 X bits as PIXB/PIXA */
-	ccastles_write_vram(space->machine(), addr, data, 1, state->m_bitmode_addr[0] & 3);
+	ccastles_write_vram(machine(), addr, data, 1, m_bitmode_addr[0] & 3);
 
 	/* autoincrement because /BITMD was selected */
-	bitmode_autoinc(space->machine());
+	bitmode_autoinc(machine());
 }
 
 
-WRITE8_HANDLER( ccastles_bitmode_addr_w )
+WRITE8_MEMBER(ccastles_state::ccastles_bitmode_addr_w)
 {
-	ccastles_state *state = space->machine().driver_data<ccastles_state>();
 
 	/* write through to video RAM and also to the addressing latches */
-	ccastles_write_vram(space->machine(), offset, data, 0, 0);
-	state->m_bitmode_addr[offset] = data;
+	ccastles_write_vram(machine(), offset, data, 0, 0);
+	m_bitmode_addr[offset] = data;
 }
 
 

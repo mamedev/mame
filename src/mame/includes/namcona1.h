@@ -77,20 +77,20 @@ public:
 	DECLARE_WRITE8_MEMBER(port8_w);
 	DECLARE_READ8_MEMBER(portana_r);
 	void write_version_info();
+	DECLARE_WRITE16_MEMBER(namcona1_videoram_w);
+	DECLARE_READ16_MEMBER(namcona1_videoram_r);
+	DECLARE_READ16_MEMBER(namcona1_paletteram_r);
+	DECLARE_WRITE16_MEMBER(namcona1_paletteram_w);
+	DECLARE_READ16_MEMBER(namcona1_gfxram_r);
+	DECLARE_WRITE16_MEMBER(namcona1_gfxram_w);
 };
 
 
 /*----------- defined in video/namcona1.c -----------*/
 
 
-extern WRITE16_HANDLER( namcona1_videoram_w );
-extern READ16_HANDLER( namcona1_videoram_r );
 
-extern READ16_HANDLER( namcona1_gfxram_r );
-extern WRITE16_HANDLER( namcona1_gfxram_w );
 
-extern READ16_HANDLER( namcona1_paletteram_r );
-extern WRITE16_HANDLER( namcona1_paletteram_w );
 
 extern SCREEN_UPDATE_IND16( namcona1 );
 extern VIDEO_START( namcona1 );

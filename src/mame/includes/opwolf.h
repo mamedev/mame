@@ -58,6 +58,12 @@ public:
 	DECLARE_READ8_MEMBER(z80_input2_r);
 	DECLARE_WRITE8_MEMBER(opwolf_adpcm_d_w);
 	DECLARE_WRITE8_MEMBER(opwolf_adpcm_e_w);
+	DECLARE_WRITE16_MEMBER(opwolf_cchip_status_w);
+	DECLARE_WRITE16_MEMBER(opwolf_cchip_bank_w);
+	DECLARE_WRITE16_MEMBER(opwolf_cchip_data_w);
+	DECLARE_READ16_MEMBER(opwolf_cchip_status_r);
+	DECLARE_READ16_MEMBER(opwolf_cchip_data_r);
+	DECLARE_WRITE16_MEMBER(opwolf_spritectrl_w);
 };
 
 
@@ -65,15 +71,9 @@ public:
 
 void opwolf_cchip_init(running_machine &machine);
 
-READ16_HANDLER( opwolf_cchip_status_r );
-READ16_HANDLER( opwolf_cchip_data_r );
-WRITE16_HANDLER( opwolf_cchip_status_w );
-WRITE16_HANDLER( opwolf_cchip_data_w );
-WRITE16_HANDLER( opwolf_cchip_bank_w );
 
 
 /*----------- defined in video/opwolf.c -----------*/
 
-WRITE16_HANDLER( opwolf_spritectrl_w );
 
 SCREEN_UPDATE_IND16( opwolf );

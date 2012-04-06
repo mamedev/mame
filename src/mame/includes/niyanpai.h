@@ -61,6 +61,20 @@ public:
 	DECLARE_READ16_MEMBER(niyanpai_dipsw_r);
 	DECLARE_READ16_MEMBER(musobana_inputport_0_r);
 	DECLARE_WRITE16_MEMBER(musobana_inputport_w);
+	DECLARE_READ16_MEMBER(niyanpai_palette_r);
+	DECLARE_WRITE16_MEMBER(niyanpai_palette_w);
+	DECLARE_WRITE16_MEMBER(niyanpai_blitter_0_w);
+	DECLARE_WRITE16_MEMBER(niyanpai_blitter_1_w);
+	DECLARE_WRITE16_MEMBER(niyanpai_blitter_2_w);
+	DECLARE_READ16_MEMBER(niyanpai_blitter_0_r);
+	DECLARE_READ16_MEMBER(niyanpai_blitter_1_r);
+	DECLARE_READ16_MEMBER(niyanpai_blitter_2_r);
+	DECLARE_WRITE16_MEMBER(niyanpai_clut_0_w);
+	DECLARE_WRITE16_MEMBER(niyanpai_clut_1_w);
+	DECLARE_WRITE16_MEMBER(niyanpai_clut_2_w);
+	DECLARE_WRITE16_MEMBER(niyanpai_clutsel_0_w);
+	DECLARE_WRITE16_MEMBER(niyanpai_clutsel_1_w);
+	DECLARE_WRITE16_MEMBER(niyanpai_clutsel_2_w);
 };
 
 
@@ -69,18 +83,4 @@ public:
 SCREEN_UPDATE_IND16( niyanpai );
 VIDEO_START( niyanpai );
 
-READ16_HANDLER( niyanpai_palette_r );
-WRITE16_HANDLER( niyanpai_palette_w );
 
-READ16_HANDLER( niyanpai_blitter_0_r );
-READ16_HANDLER( niyanpai_blitter_1_r );
-READ16_HANDLER( niyanpai_blitter_2_r );
-WRITE16_HANDLER( niyanpai_blitter_0_w );
-WRITE16_HANDLER( niyanpai_blitter_1_w );
-WRITE16_HANDLER( niyanpai_blitter_2_w );
-WRITE16_HANDLER( niyanpai_clut_0_w );
-WRITE16_HANDLER( niyanpai_clut_1_w );
-WRITE16_HANDLER( niyanpai_clut_2_w );
-WRITE16_HANDLER( niyanpai_clutsel_0_w );
-WRITE16_HANDLER( niyanpai_clutsel_1_w );
-WRITE16_HANDLER( niyanpai_clutsel_2_w );

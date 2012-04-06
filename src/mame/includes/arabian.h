@@ -32,13 +32,13 @@ public:
 	DECLARE_READ8_MEMBER(mcu_portk_r);
 	DECLARE_WRITE8_MEMBER(mcu_port_o_w);
 	DECLARE_WRITE8_MEMBER(mcu_port_p_w);
+	DECLARE_WRITE8_MEMBER(arabian_blitter_w);
+	DECLARE_WRITE8_MEMBER(arabian_videoram_w);
 };
 
 
 /*----------- defined in video/arabian.c -----------*/
 
-WRITE8_HANDLER( arabian_blitter_w );
-WRITE8_HANDLER( arabian_videoram_w );
 
 PALETTE_INIT( arabian );
 VIDEO_START( arabian );

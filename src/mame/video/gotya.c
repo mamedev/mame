@@ -61,34 +61,31 @@ PALETTE_INIT( gotya )
 	}
 }
 
-WRITE8_HANDLER( gotya_videoram_w )
+WRITE8_MEMBER(gotya_state::gotya_videoram_w)
 {
-	gotya_state *state = space->machine().driver_data<gotya_state>();
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( gotya_colorram_w )
+WRITE8_MEMBER(gotya_state::gotya_colorram_w)
 {
-	gotya_state *state = space->machine().driver_data<gotya_state>();
-	state->m_colorram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_colorram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( gotya_video_control_w )
+WRITE8_MEMBER(gotya_state::gotya_video_control_w)
 {
-	gotya_state *state = space->machine().driver_data<gotya_state>();
 
 	/* bit 0 - scroll bit 8
        bit 1 - flip screen
        bit 2 - sound disable ??? */
 
-	state->m_scroll_bit_8 = data & 0x01;
+	m_scroll_bit_8 = data & 0x01;
 
-	if (flip_screen_get(space->machine()) != (data & 0x02))
+	if (flip_screen_get(machine()) != (data & 0x02))
 	{
-		flip_screen_set(space->machine(), data & 0x02);
-		space->machine().tilemap().mark_all_dirty();
+		flip_screen_set(machine(), data & 0x02);
+		machine().tilemap().mark_all_dirty();
 	}
 }
 

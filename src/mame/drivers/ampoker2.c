@@ -605,7 +605,7 @@ WRITE8_MEMBER(ampoker2_state::ampoker2_watchdog_reset_w)
 static ADDRESS_MAP_START( ampoker2_map, AS_PROGRAM, 8, ampoker2_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE_LEGACY(ampoker2_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(ampoker2_videoram_w) AM_BASE(m_videoram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ampoker2_io_map, AS_IO, 8, ampoker2_state )

@@ -26,6 +26,16 @@ public:
 
 	required_device<z80_device> m_maincpu;
 	required_shared_ptr<UINT8> m_spriteram;
+	DECLARE_WRITE8_MEMBER(mcr_control_port_w);
+	DECLARE_WRITE8_MEMBER(mcr_ipu_laserdisk_w);
+	DECLARE_READ8_MEMBER(mcr_ipu_watchdog_r);
+	DECLARE_WRITE8_MEMBER(mcr_ipu_watchdog_w);
+	DECLARE_WRITE8_MEMBER(mcr_91490_paletteram_w);
+	DECLARE_WRITE8_MEMBER(mcr_90009_videoram_w);
+	DECLARE_WRITE8_MEMBER(mcr_90010_videoram_w);
+	DECLARE_READ8_MEMBER(twotiger_videoram_r);
+	DECLARE_WRITE8_MEMBER(twotiger_videoram_w);
+	DECLARE_WRITE8_MEMBER(mcr_91490_videoram_w);
 };
 
 
@@ -57,11 +67,7 @@ MACHINE_START( nflfoot );
 TIMER_DEVICE_CALLBACK( mcr_interrupt );
 TIMER_DEVICE_CALLBACK( mcr_ipu_interrupt );
 
-WRITE8_HANDLER( mcr_control_port_w );
 
-WRITE8_HANDLER( mcr_ipu_laserdisk_w );
-READ8_HANDLER( mcr_ipu_watchdog_r );
-WRITE8_HANDLER( mcr_ipu_watchdog_w );
 
 
 /*----------- defined in video/mcr.c -----------*/
@@ -71,12 +77,6 @@ extern INT8 mcr12_sprite_xoffs_flip;
 
 VIDEO_START( mcr );
 
-WRITE8_HANDLER( mcr_91490_paletteram_w );
 
-WRITE8_HANDLER( mcr_90009_videoram_w );
-WRITE8_HANDLER( mcr_90010_videoram_w );
-READ8_HANDLER( twotiger_videoram_r );
-WRITE8_HANDLER( twotiger_videoram_w );
-WRITE8_HANDLER( mcr_91490_videoram_w );
 
 SCREEN_UPDATE_IND16( mcr );

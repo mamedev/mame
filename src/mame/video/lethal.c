@@ -76,28 +76,27 @@ VIDEO_START(lethalen)
 	state->m_layer_colorbase[3] = 0xc0;
 }
 
-WRITE8_HANDLER(lethalen_palette_control)
+WRITE8_MEMBER(lethal_state::lethalen_palette_control)
 {
-	lethal_state *state = space->machine().driver_data<lethal_state>();
 
 	switch (offset)
 	{
 		case 0:	// 40c8 - PCU1 from schematics
-			state->m_layer_colorbase[0] = ((data & 0x7) - 1) * 0x40;
-			state->m_layer_colorbase[1] = (((data >> 4) & 0x7) - 1) * 0x40;
-			k056832_mark_plane_dirty(state->m_k056832, 0);
-			k056832_mark_plane_dirty(state->m_k056832, 1);
+			m_layer_colorbase[0] = ((data & 0x7) - 1) * 0x40;
+			m_layer_colorbase[1] = (((data >> 4) & 0x7) - 1) * 0x40;
+			k056832_mark_plane_dirty(m_k056832, 0);
+			k056832_mark_plane_dirty(m_k056832, 1);
 			break;
 
 		case 4: // 40cc - PCU2 from schematics
-			state->m_layer_colorbase[2] = ((data & 0x7) - 1) * 0x40;
-			state->m_layer_colorbase[3] = (((data >> 4) & 0x7) - 1) * 0x40;
-			k056832_mark_plane_dirty(state->m_k056832, 2);
-			k056832_mark_plane_dirty(state->m_k056832, 3);
+			m_layer_colorbase[2] = ((data & 0x7) - 1) * 0x40;
+			m_layer_colorbase[3] = (((data >> 4) & 0x7) - 1) * 0x40;
+			k056832_mark_plane_dirty(m_k056832, 2);
+			k056832_mark_plane_dirty(m_k056832, 3);
 			break;
 
 		case 8:	// 40d0 - PCU3 from schematics
-			state->m_sprite_colorbase = ((data & 0x7) - 1) * 0x40;
+			m_sprite_colorbase = ((data & 0x7) - 1) * 0x40;
 			break;
 	}
 }

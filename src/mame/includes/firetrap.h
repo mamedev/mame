@@ -50,18 +50,18 @@ public:
 	DECLARE_WRITE8_MEMBER(firetrap_sound_bankselect_w);
 	DECLARE_WRITE8_MEMBER(firetrap_adpcm_data_w);
 	DECLARE_WRITE8_MEMBER(flip_screen_w);
+	DECLARE_WRITE8_MEMBER(firetrap_fgvideoram_w);
+	DECLARE_WRITE8_MEMBER(firetrap_bg1videoram_w);
+	DECLARE_WRITE8_MEMBER(firetrap_bg2videoram_w);
+	DECLARE_WRITE8_MEMBER(firetrap_bg1_scrollx_w);
+	DECLARE_WRITE8_MEMBER(firetrap_bg1_scrolly_w);
+	DECLARE_WRITE8_MEMBER(firetrap_bg2_scrollx_w);
+	DECLARE_WRITE8_MEMBER(firetrap_bg2_scrolly_w);
 };
 
 
 /*----------- defined in video/firetrap.c -----------*/
 
-WRITE8_HANDLER( firetrap_fgvideoram_w );
-WRITE8_HANDLER( firetrap_bg1videoram_w );
-WRITE8_HANDLER( firetrap_bg2videoram_w );
-WRITE8_HANDLER( firetrap_bg1_scrollx_w );
-WRITE8_HANDLER( firetrap_bg1_scrolly_w );
-WRITE8_HANDLER( firetrap_bg2_scrollx_w );
-WRITE8_HANDLER( firetrap_bg2_scrolly_w );
 
 PALETTE_INIT( firetrap );
 VIDEO_START( firetrap );

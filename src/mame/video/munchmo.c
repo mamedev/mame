@@ -29,16 +29,14 @@ PALETTE_INIT( mnchmobl )
 	}
 }
 
-WRITE8_HANDLER( mnchmobl_palette_bank_w )
+WRITE8_MEMBER(munchmo_state::mnchmobl_palette_bank_w)
 {
-	munchmo_state *state = space->machine().driver_data<munchmo_state>();
-	state->m_palette_bank = data & 0x3;
+	m_palette_bank = data & 0x3;
 }
 
-WRITE8_HANDLER( mnchmobl_flipscreen_w )
+WRITE8_MEMBER(munchmo_state::mnchmobl_flipscreen_w)
 {
-	munchmo_state *state = space->machine().driver_data<munchmo_state>();
-	state->m_flipscreen = data;
+	m_flipscreen = data;
 }
 
 

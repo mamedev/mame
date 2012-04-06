@@ -99,7 +99,7 @@ static void mrokumei_handleblit( address_space *space, int rom_base )
 			} /* i!=0 */
 
 			if (data)	/* 00 is a nop */
-				mrokumei_videoram_w(space, base_addr + dest_addr, data);
+				state->mrokumei_videoram_w(*space, base_addr + dest_addr, data);
 
 			if (state->m_vreg[1] & 0x80)	/* flip screen */
 			{
@@ -202,7 +202,7 @@ static void reikaids_handleblit( address_space *space, int rom_base )
 						addr ^= 0x007c;
 					}
 
-					reikaids_videoram_w(space, addr, dat);
+					state->reikaids_videoram_w(*space, addr, dat);
 				}
 			}
 
@@ -289,7 +289,7 @@ static void pteacher_handleblit( address_space *space, int rom_base )
 				if ((addr & 0x2080) == 0)
 				{
 					addr = ((addr & 0xc000) >> 2) | ((addr & 0x1f00) >> 1) | (addr & 0x7f);
-					 mrokumei_videoram_w(space, addr, data);
+					state->mrokumei_videoram_w(*space, addr, data);
 				}
 			}
 
@@ -719,114 +719,103 @@ VIDEO_START( mirderby )
 
 ***************************************************************************/
 
-WRITE8_HANDLER( mrokumei_videoram_w )
+WRITE8_MEMBER(homedata_state::mrokumei_videoram_w)
 {
-	homedata_state *state = space->machine().driver_data<homedata_state>();
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap[(offset & 0x2000) >> 13][(offset & 0x1000) >> 12]->mark_tile_dirty((offset & 0xffe) >> 1);
+	m_videoram[offset] = data;
+	m_bg_tilemap[(offset & 0x2000) >> 13][(offset & 0x1000) >> 12]->mark_tile_dirty((offset & 0xffe) >> 1);
 }
 
-WRITE8_HANDLER( reikaids_videoram_w )
+WRITE8_MEMBER(homedata_state::reikaids_videoram_w)
 {
-	homedata_state *state = space->machine().driver_data<homedata_state>();
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap[(offset & 0x2000) >> 13][offset & 3]->mark_tile_dirty((offset & 0xffc) >> 2);
+	m_videoram[offset] = data;
+	m_bg_tilemap[(offset & 0x2000) >> 13][offset & 3]->mark_tile_dirty((offset & 0xffc) >> 2);
 }
 
 
-WRITE8_HANDLER( reikaids_gfx_bank_w )
+WRITE8_MEMBER(homedata_state::reikaids_gfx_bank_w)
 {
-	homedata_state *state = space->machine().driver_data<homedata_state>();
-//logerror( "%04x: [setbank %02x]\n",cpu_get_pc(&space->device()),data);
+//logerror( "%04x: [setbank %02x]\n",cpu_get_pc(&space.device()),data);
 
-	if (state->m_gfx_bank[state->m_reikaids_which] != data)
+	if (m_gfx_bank[m_reikaids_which] != data)
 	{
-		state->m_gfx_bank[state->m_reikaids_which] = data;
-		space->machine().tilemap().mark_all_dirty();
+		m_gfx_bank[m_reikaids_which] = data;
+		machine().tilemap().mark_all_dirty();
 	}
 
-	state->m_reikaids_which ^= 1;
+	m_reikaids_which ^= 1;
 }
 
-WRITE8_HANDLER( pteacher_gfx_bank_w )
+WRITE8_MEMBER(homedata_state::pteacher_gfx_bank_w)
 {
-	homedata_state *state = space->machine().driver_data<homedata_state>();
-//  logerror("%04x: gfxbank:=%02x\n", cpu_get_pc(&space->device()), data);
-	if (state->m_gfx_bank[0] != data)
+//  logerror("%04x: gfxbank:=%02x\n", cpu_get_pc(&space.device()), data);
+	if (m_gfx_bank[0] != data)
 	{
-		state->m_gfx_bank[0] = data;
-		space->machine().tilemap().mark_all_dirty();
+		m_gfx_bank[0] = data;
+		machine().tilemap().mark_all_dirty();
 	}
 }
 
-WRITE8_HANDLER( homedata_blitter_param_w )
+WRITE8_MEMBER(homedata_state::homedata_blitter_param_w)
 {
-	homedata_state *state = space->machine().driver_data<homedata_state>();
-//logerror("%04x: blitter_param_w %02x\n", cpu_get_pc(&space->device()), data);
-	state->m_blitter_param[state->m_blitter_param_count] = data;
-	state->m_blitter_param_count++;
-	state->m_blitter_param_count &= 3;
+//logerror("%04x: blitter_param_w %02x\n", cpu_get_pc(&space.device()), data);
+	m_blitter_param[m_blitter_param_count] = data;
+	m_blitter_param_count++;
+	m_blitter_param_count &= 3;
 }
 
-WRITE8_HANDLER( mrokumei_blitter_bank_w )
+WRITE8_MEMBER(homedata_state::mrokumei_blitter_bank_w)
 {
-	homedata_state *state = space->machine().driver_data<homedata_state>();
 	/* --xxx--- layer 1 gfx bank
        -----x-- blitter ROM bank
        ------xx layer 0 gfx bank
      */
 
-	if ((state->m_blitter_bank ^ data) & 0x3b)
-		space->machine().tilemap().mark_all_dirty();
+	if ((m_blitter_bank ^ data) & 0x3b)
+		machine().tilemap().mark_all_dirty();
 
-	state->m_blitter_bank = data;
+	m_blitter_bank = data;
 }
 
-WRITE8_HANDLER( reikaids_blitter_bank_w )
+WRITE8_MEMBER(homedata_state::reikaids_blitter_bank_w)
 {
-	homedata_state *state = space->machine().driver_data<homedata_state>();
 	/* xxx----- priority control
        ----x--- target page? what's this for?
        ------xx blitter ROM bank
      */
-	state->m_blitter_bank = data;
+	m_blitter_bank = data;
 }
 
-WRITE8_HANDLER( pteacher_blitter_bank_w )
+WRITE8_MEMBER(homedata_state::pteacher_blitter_bank_w)
 {
-	homedata_state *state = space->machine().driver_data<homedata_state>();
 	/* xxx----- blitter ROM bank
        -----x-- pixel clock (normal/slow)
        ------x- layer #1 gfx charset (lemnangl only)
        -------x layer #0 gfx charset (lemnangl only)
      */
 
-	if ((state->m_blitter_bank ^ data) & 0x03)
-		space->machine().tilemap().mark_all_dirty();
+	if ((m_blitter_bank ^ data) & 0x03)
+		machine().tilemap().mark_all_dirty();
 
-	state->m_blitter_bank = data;
+	m_blitter_bank = data;
 }
 
-WRITE8_HANDLER( mrokumei_blitter_start_w )
+WRITE8_MEMBER(homedata_state::mrokumei_blitter_start_w)
 {
-	homedata_state *state = space->machine().driver_data<homedata_state>();
 	if (data & 0x80)
-		mrokumei_handleblit(space, ((state->m_blitter_bank & 0x04) >> 2) * 0x10000);
+		mrokumei_handleblit(&space, ((m_blitter_bank & 0x04) >> 2) * 0x10000);
 
 	/* bit 0 = bank switch; used by hourouki to access the
        optional service mode ROM (not available in current dump) */
 }
 
-WRITE8_HANDLER( reikaids_blitter_start_w )
+WRITE8_MEMBER(homedata_state::reikaids_blitter_start_w)
 {
-	homedata_state *state = space->machine().driver_data<homedata_state>();
-	reikaids_handleblit(space, (state->m_blitter_bank & 3) * 0x10000);
+	reikaids_handleblit(&space, (m_blitter_bank & 3) * 0x10000);
 }
 
-WRITE8_HANDLER( pteacher_blitter_start_w )
+WRITE8_MEMBER(homedata_state::pteacher_blitter_start_w)
 {
-	homedata_state *state = space->machine().driver_data<homedata_state>();
-	pteacher_handleblit(space, (state->m_blitter_bank >> 5) * 0x10000 & (space->machine().region("user1")->bytes() - 1));
+	pteacher_handleblit(&space, (m_blitter_bank >> 5) * 0x10000 & (machine().region("user1")->bytes() - 1));
 }
 
 

@@ -96,11 +96,10 @@ static TILE_GET_INFO( get_aquarium_txt_tile_info )
 	SET_TILE_INFO(2, tileno, colour, 0);
 }
 
-WRITE16_HANDLER( aquarium_txt_videoram_w )
+WRITE16_MEMBER(aquarium_state::aquarium_txt_videoram_w)
 {
-	aquarium_state *state = space->machine().driver_data<aquarium_state>();
-	state->m_txt_videoram[offset] = data;
-	state->m_txt_tilemap->mark_tile_dirty(offset);
+	m_txt_videoram[offset] = data;
+	m_txt_tilemap->mark_tile_dirty(offset);
 }
 
 /* MID Layer */
@@ -118,11 +117,10 @@ static TILE_GET_INFO( get_aquarium_mid_tile_info )
 	tileinfo.category = (state->m_mid_videoram[tile_index * 2 + 1] & 0x20) >> 5;
 }
 
-WRITE16_HANDLER( aquarium_mid_videoram_w )
+WRITE16_MEMBER(aquarium_state::aquarium_mid_videoram_w)
 {
-	aquarium_state *state = space->machine().driver_data<aquarium_state>();
-	state->m_mid_videoram[offset] = data;
-	state->m_mid_tilemap->mark_tile_dirty(offset / 2);
+	m_mid_videoram[offset] = data;
+	m_mid_tilemap->mark_tile_dirty(offset / 2);
 }
 
 /* BAK Layer */
@@ -140,11 +138,10 @@ static TILE_GET_INFO( get_aquarium_bak_tile_info )
 	tileinfo.category = (state->m_bak_videoram[tile_index * 2 + 1] & 0x20) >> 5;
 }
 
-WRITE16_HANDLER( aquarium_bak_videoram_w )
+WRITE16_MEMBER(aquarium_state::aquarium_bak_videoram_w)
 {
-	aquarium_state *state = space->machine().driver_data<aquarium_state>();
-	state->m_bak_videoram[offset] = data;
-	state->m_bak_tilemap->mark_tile_dirty(offset / 2);
+	m_bak_videoram[offset] = data;
+	m_bak_tilemap->mark_tile_dirty(offset / 2);
 }
 
 VIDEO_START(aquarium)

@@ -20,13 +20,13 @@ public:
 	UINT8    m_irq_mask;
 	DECLARE_WRITE8_MEMBER(hyperspt_coin_counter_w);
 	DECLARE_WRITE8_MEMBER(irq_mask_w);
+	DECLARE_WRITE8_MEMBER(hyperspt_videoram_w);
+	DECLARE_WRITE8_MEMBER(hyperspt_colorram_w);
+	DECLARE_WRITE8_MEMBER(hyperspt_flipscreen_w);
 };
 
 /*----------- defined in video/hyperspt.c -----------*/
 
-WRITE8_HANDLER( hyperspt_videoram_w );
-WRITE8_HANDLER( hyperspt_colorram_w );
-WRITE8_HANDLER( hyperspt_flipscreen_w );
 
 PALETTE_INIT( hyperspt );
 VIDEO_START( hyperspt );

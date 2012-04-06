@@ -25,20 +25,20 @@ public:
 	DECLARE_WRITE8_MEMBER(tehkanwc_track_1_reset_w);
 	DECLARE_WRITE8_MEMBER(sound_command_w);
 	DECLARE_WRITE8_MEMBER(sound_answer_w);
+	DECLARE_WRITE8_MEMBER(tehkanwc_videoram_w);
+	DECLARE_WRITE8_MEMBER(tehkanwc_colorram_w);
+	DECLARE_WRITE8_MEMBER(tehkanwc_videoram2_w);
+	DECLARE_WRITE8_MEMBER(tehkanwc_scroll_x_w);
+	DECLARE_WRITE8_MEMBER(tehkanwc_scroll_y_w);
+	DECLARE_WRITE8_MEMBER(tehkanwc_flipscreen_x_w);
+	DECLARE_WRITE8_MEMBER(tehkanwc_flipscreen_y_w);
+	DECLARE_WRITE8_MEMBER(gridiron_led0_w);
+	DECLARE_WRITE8_MEMBER(gridiron_led1_w);
 };
 
 
 /*----------- defined in video/tehkanwc.c -----------*/
 
-extern WRITE8_HANDLER( tehkanwc_videoram_w );
-extern WRITE8_HANDLER( tehkanwc_colorram_w );
-extern WRITE8_HANDLER( tehkanwc_videoram2_w );
-extern WRITE8_HANDLER( tehkanwc_scroll_x_w );
-extern WRITE8_HANDLER( tehkanwc_scroll_y_w );
-extern WRITE8_HANDLER( tehkanwc_flipscreen_x_w );
-extern WRITE8_HANDLER( tehkanwc_flipscreen_y_w );
-extern WRITE8_HANDLER( gridiron_led0_w );
-extern WRITE8_HANDLER( gridiron_led1_w );
 
 extern VIDEO_START( tehkanwc );
 extern SCREEN_UPDATE_IND16( tehkanwc );

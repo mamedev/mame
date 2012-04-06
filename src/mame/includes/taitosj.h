@@ -40,6 +40,26 @@ public:
 	bitmap_ind16 m_sprite_layer_collbitmap2[3];
 	int m_draw_order[32][4];
 	DECLARE_WRITE8_MEMBER(taitosj_soundcommand_w);
+	DECLARE_WRITE8_MEMBER(taitosj_bankswitch_w);
+	DECLARE_READ8_MEMBER(taitosj_fake_data_r);
+	DECLARE_WRITE8_MEMBER(taitosj_fake_data_w);
+	DECLARE_READ8_MEMBER(taitosj_fake_status_r);
+	DECLARE_READ8_MEMBER(taitosj_mcu_data_r);
+	DECLARE_WRITE8_MEMBER(taitosj_mcu_data_w);
+	DECLARE_READ8_MEMBER(taitosj_mcu_status_r);
+	DECLARE_READ8_MEMBER(taitosj_68705_portA_r);
+	DECLARE_WRITE8_MEMBER(taitosj_68705_portA_w);
+	DECLARE_READ8_MEMBER(taitosj_68705_portB_r);
+	DECLARE_WRITE8_MEMBER(taitosj_68705_portB_w);
+	DECLARE_READ8_MEMBER(taitosj_68705_portC_r);
+	DECLARE_READ8_MEMBER(spacecr_prot_r);
+	DECLARE_WRITE8_MEMBER(alpine_protection_w);
+	DECLARE_WRITE8_MEMBER(alpinea_bankswitch_w);
+	DECLARE_READ8_MEMBER(alpine_port_2_r);
+	DECLARE_READ8_MEMBER(taitosj_gfxrom_r);
+	DECLARE_WRITE8_MEMBER(taitosj_characterram_w);
+	DECLARE_WRITE8_MEMBER(junglhbr_characterram_w);
+	DECLARE_WRITE8_MEMBER(taitosj_collision_reg_clear_w);
 };
 
 
@@ -47,31 +67,11 @@ public:
 
 MACHINE_START( taitosj );
 MACHINE_RESET( taitosj );
-WRITE8_HANDLER( taitosj_bankswitch_w );
-READ8_HANDLER( taitosj_fake_data_r );
-READ8_HANDLER( taitosj_fake_status_r );
-WRITE8_HANDLER( taitosj_fake_data_w );
-READ8_HANDLER( taitosj_mcu_data_r );
-READ8_HANDLER( taitosj_mcu_status_r );
-WRITE8_HANDLER( taitosj_mcu_data_w );
-READ8_HANDLER( taitosj_68705_portA_r );
-READ8_HANDLER( taitosj_68705_portB_r );
-READ8_HANDLER( taitosj_68705_portC_r );
-WRITE8_HANDLER( taitosj_68705_portA_w );
-WRITE8_HANDLER( taitosj_68705_portB_w );
 
-READ8_HANDLER( spacecr_prot_r );
-WRITE8_HANDLER( alpine_protection_w );
-WRITE8_HANDLER( alpinea_bankswitch_w );
-READ8_HANDLER( alpine_port_2_r );
 
 
 /*----------- defined in video/taitosj.c -----------*/
 
-READ8_HANDLER( taitosj_gfxrom_r );
-WRITE8_HANDLER( taitosj_characterram_w );
-WRITE8_HANDLER( junglhbr_characterram_w );
-WRITE8_HANDLER( taitosj_collision_reg_clear_w );
 VIDEO_START( taitosj );
 SCREEN_UPDATE_IND16( taitosj );
 SCREEN_UPDATE_IND16( kikstart );

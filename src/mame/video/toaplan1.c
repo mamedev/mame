@@ -295,7 +295,7 @@ static void rallybik_flipscreen(running_machine &machine)
 	toaplan1_state *state = machine.driver_data<toaplan1_state>();
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
-	rallybik_bcu_flipscreen_w(space, 0, state->m_bcu_flipscreen, 0xffff);
+	state->rallybik_bcu_flipscreen_w(*space, 0, state->m_bcu_flipscreen, 0xffff);
 }
 
 static void toaplan1_flipscreen(running_machine &machine)
@@ -303,7 +303,7 @@ static void toaplan1_flipscreen(running_machine &machine)
 	toaplan1_state *state = machine.driver_data<toaplan1_state>();
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
-	toaplan1_bcu_flipscreen_w(space, 0, state->m_bcu_flipscreen, 0xffff);
+	state->toaplan1_bcu_flipscreen_w(*space, 0, state->m_bcu_flipscreen, 0xffff);
 }
 
 static void register_common(running_machine &machine)
@@ -393,201 +393,186 @@ VIDEO_START( toaplan1 )
 
 ***************************************************************************/
 
-READ16_HANDLER( toaplan1_frame_done_r )
+READ16_MEMBER(toaplan1_state::toaplan1_frame_done_r)
 {
-	return space->machine().primary_screen->vblank();
+	return machine().primary_screen->vblank();
 }
 
-WRITE16_HANDLER( toaplan1_tile_offsets_w )
+WRITE16_MEMBER(toaplan1_state::toaplan1_tile_offsets_w)
 {
-	toaplan1_state *state = space->machine().driver_data<toaplan1_state>();
 
 	if ( offset == 0 )
 	{
-		COMBINE_DATA(&state->m_tiles_offsetx);
-		logerror("Tiles_offsetx now = %08x\n", state->m_tiles_offsetx);
+		COMBINE_DATA(&m_tiles_offsetx);
+		logerror("Tiles_offsetx now = %08x\n", m_tiles_offsetx);
 	}
 	else
 	{
-		COMBINE_DATA(&state->m_tiles_offsety);
-		logerror("Tiles_offsety now = %08x\n", state->m_tiles_offsety);
+		COMBINE_DATA(&m_tiles_offsety);
+		logerror("Tiles_offsety now = %08x\n", m_tiles_offsety);
 	}
-	state->m_reset = 1;
-	toaplan1_set_scrolls(space->machine());
+	m_reset = 1;
+	toaplan1_set_scrolls(machine());
 }
 
-WRITE16_HANDLER( rallybik_bcu_flipscreen_w )
+WRITE16_MEMBER(toaplan1_state::rallybik_bcu_flipscreen_w)
 {
-	toaplan1_state *state = space->machine().driver_data<toaplan1_state>();
 
-	if (ACCESSING_BITS_0_7 && (data != state->m_bcu_flipscreen))
+	if (ACCESSING_BITS_0_7 && (data != m_bcu_flipscreen))
 	{
 		logerror("Setting BCU controller flipscreen port to %04x\n",data);
-		state->m_bcu_flipscreen = data & 0x01;		/* 0x0001 = flip, 0x0000 = no flip */
-		space->machine().tilemap().set_flip_all((data ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0));
-		if (state->m_bcu_flipscreen)
+		m_bcu_flipscreen = data & 0x01;		/* 0x0001 = flip, 0x0000 = no flip */
+		machine().tilemap().set_flip_all((data ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0));
+		if (m_bcu_flipscreen)
 		{
-			state->m_scrollx_offs1 = 0x1c0 - 6;
-			state->m_scrollx_offs2 = 0x1c0 - 4;
-			state->m_scrollx_offs3 = 0x1c0 - 2;
-			state->m_scrollx_offs4 = 0x1c0 - 0;
-			state->m_scrolly_offs  = 0x0e8;
+			m_scrollx_offs1 = 0x1c0 - 6;
+			m_scrollx_offs2 = 0x1c0 - 4;
+			m_scrollx_offs3 = 0x1c0 - 2;
+			m_scrollx_offs4 = 0x1c0 - 0;
+			m_scrolly_offs  = 0x0e8;
 		}
 		else
 		{
-			state->m_scrollx_offs1 = 0x00d + 6;
-			state->m_scrollx_offs2 = 0x00d + 4;
-			state->m_scrollx_offs3 = 0x00d + 2;
-			state->m_scrollx_offs4 = 0x00d + 0;
-			state->m_scrolly_offs  = 0x111;
+			m_scrollx_offs1 = 0x00d + 6;
+			m_scrollx_offs2 = 0x00d + 4;
+			m_scrollx_offs3 = 0x00d + 2;
+			m_scrollx_offs4 = 0x00d + 0;
+			m_scrolly_offs  = 0x111;
 		}
-		toaplan1_set_scrolls(space->machine());
+		toaplan1_set_scrolls(machine());
 	}
 }
 
-WRITE16_HANDLER( toaplan1_bcu_flipscreen_w )
+WRITE16_MEMBER(toaplan1_state::toaplan1_bcu_flipscreen_w)
 {
-	toaplan1_state *state = space->machine().driver_data<toaplan1_state>();
 
-	if (ACCESSING_BITS_0_7 && (data != state->m_bcu_flipscreen))
+	if (ACCESSING_BITS_0_7 && (data != m_bcu_flipscreen))
 	{
 		logerror("Setting BCU controller flipscreen port to %04x\n",data);
-		state->m_bcu_flipscreen = data & 0x01;		/* 0x0001 = flip, 0x0000 = no flip */
-		space->machine().tilemap().set_flip_all((data ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0));
-		if (state->m_bcu_flipscreen)
+		m_bcu_flipscreen = data & 0x01;		/* 0x0001 = flip, 0x0000 = no flip */
+		machine().tilemap().set_flip_all((data ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0));
+		if (m_bcu_flipscreen)
 		{
-			const rectangle &visarea = space->machine().primary_screen->visible_area();
+			const rectangle &visarea = machine().primary_screen->visible_area();
 
-			state->m_scrollx_offs1 = 0x151 - 6;
-			state->m_scrollx_offs2 = 0x151 - 4;
-			state->m_scrollx_offs3 = 0x151 - 2;
-			state->m_scrollx_offs4 = 0x151 - 0;
-			state->m_scrolly_offs  = 0x1ef;
-			state->m_scrolly_offs += ((visarea.max_y + 1) - ((visarea.max_y + 1) - visarea.min_y)) * 2;	/* Horizontal games are offset so adjust by +0x20 */
+			m_scrollx_offs1 = 0x151 - 6;
+			m_scrollx_offs2 = 0x151 - 4;
+			m_scrollx_offs3 = 0x151 - 2;
+			m_scrollx_offs4 = 0x151 - 0;
+			m_scrolly_offs  = 0x1ef;
+			m_scrolly_offs += ((visarea.max_y + 1) - ((visarea.max_y + 1) - visarea.min_y)) * 2;	/* Horizontal games are offset so adjust by +0x20 */
 		}
 		else
 		{
-			state->m_scrollx_offs1 = 0x1ef + 6;
-			state->m_scrollx_offs2 = 0x1ef + 4;
-			state->m_scrollx_offs3 = 0x1ef + 2;
-			state->m_scrollx_offs4 = 0x1ef + 0;
-			state->m_scrolly_offs  = 0x101;
+			m_scrollx_offs1 = 0x1ef + 6;
+			m_scrollx_offs2 = 0x1ef + 4;
+			m_scrollx_offs3 = 0x1ef + 2;
+			m_scrollx_offs4 = 0x1ef + 0;
+			m_scrolly_offs  = 0x101;
 		}
-		toaplan1_set_scrolls(space->machine());
+		toaplan1_set_scrolls(machine());
 	}
 }
 
-WRITE16_HANDLER( toaplan1_fcu_flipscreen_w )
+WRITE16_MEMBER(toaplan1_state::toaplan1_fcu_flipscreen_w)
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		toaplan1_state *state = space->machine().driver_data<toaplan1_state>();
 
 		logerror("Setting FCU controller flipscreen port to %04x\n",data);
-		state->m_fcu_flipscreen = data & 0x8000;	/* 0x8000 = flip, 0x0000 = no flip */
+		m_fcu_flipscreen = data & 0x8000;	/* 0x8000 = flip, 0x0000 = no flip */
 	}
 }
 
-READ16_HANDLER( toaplan1_spriteram_offs_r ) /// this aint really needed ?
+READ16_MEMBER(toaplan1_state::toaplan1_spriteram_offs_r)/// this aint really needed ?
 {
-	toaplan1_state *state = space->machine().driver_data<toaplan1_state>();
 
-	return state->m_spriteram_offs;
+	return m_spriteram_offs;
 }
 
-WRITE16_HANDLER( toaplan1_spriteram_offs_w )
+WRITE16_MEMBER(toaplan1_state::toaplan1_spriteram_offs_w)
 {
-	toaplan1_state *state = space->machine().driver_data<toaplan1_state>();
 
-	COMBINE_DATA(&state->m_spriteram_offs);
+	COMBINE_DATA(&m_spriteram_offs);
 }
 
 
 /* tile palette */
-READ16_HANDLER( toaplan1_colorram1_r )
+READ16_MEMBER(toaplan1_state::toaplan1_colorram1_r)
 {
-	toaplan1_state *state = space->machine().driver_data<toaplan1_state>();
 
-	return state->m_colorram1[offset];
+	return m_colorram1[offset];
 }
 
-WRITE16_HANDLER( toaplan1_colorram1_w )
+WRITE16_MEMBER(toaplan1_state::toaplan1_colorram1_w)
 {
-	toaplan1_state *state = space->machine().driver_data<toaplan1_state>();
 
-	COMBINE_DATA(&state->m_colorram1[offset]);
-	state->paletteram16_xBBBBBGGGGGRRRRR_word_w(*space, offset, data, mem_mask);
+	COMBINE_DATA(&m_colorram1[offset]);
+	paletteram16_xBBBBBGGGGGRRRRR_word_w(space, offset, data, mem_mask);
 }
 
 /* sprite palette */
-READ16_HANDLER( toaplan1_colorram2_r )
+READ16_MEMBER(toaplan1_state::toaplan1_colorram2_r)
 {
-	toaplan1_state *state = space->machine().driver_data<toaplan1_state>();
 
-	return state->m_colorram2[offset];
+	return m_colorram2[offset];
 }
 
-WRITE16_HANDLER( toaplan1_colorram2_w )
+WRITE16_MEMBER(toaplan1_state::toaplan1_colorram2_w)
 {
-	toaplan1_state *state = space->machine().driver_data<toaplan1_state>();
 
-	COMBINE_DATA(&state->m_colorram2[offset]);
-	state->paletteram16_xBBBBBGGGGGRRRRR_word_w(*space, offset+(state->m_colorram1_size/2), data, mem_mask);
+	COMBINE_DATA(&m_colorram2[offset]);
+	paletteram16_xBBBBBGGGGGRRRRR_word_w(space, offset+(m_colorram1_size/2), data, mem_mask);
 }
 
-READ16_HANDLER( toaplan1_spriteram16_r )
+READ16_MEMBER(toaplan1_state::toaplan1_spriteram16_r)
 {
-	toaplan1_state *state = space->machine().driver_data<toaplan1_state>();
 
-	return state->m_spriteram[state->m_spriteram_offs & ((TOAPLAN1_SPRITERAM_SIZE/2)-1)];
+	return m_spriteram[m_spriteram_offs & ((TOAPLAN1_SPRITERAM_SIZE/2)-1)];
 }
 
-WRITE16_HANDLER( toaplan1_spriteram16_w )
+WRITE16_MEMBER(toaplan1_state::toaplan1_spriteram16_w)
 {
-	toaplan1_state *state = space->machine().driver_data<toaplan1_state>();
 
-	COMBINE_DATA(&state->m_spriteram[state->m_spriteram_offs & ((TOAPLAN1_SPRITERAM_SIZE/2)-1)]);
+	COMBINE_DATA(&m_spriteram[m_spriteram_offs & ((TOAPLAN1_SPRITERAM_SIZE/2)-1)]);
 
 #ifdef MAME_DEBUG
-	if (state->m_spriteram_offs >= (TOAPLAN1_SPRITERAM_SIZE/2))
+	if (m_spriteram_offs >= (TOAPLAN1_SPRITERAM_SIZE/2))
 	{
-		logerror("Sprite_RAM_word_w, %08x out of range !\n", state->m_spriteram_offs);
+		logerror("Sprite_RAM_word_w, %08x out of range !\n", m_spriteram_offs);
 		return;
 	}
 #endif
 
-	state->m_spriteram_offs++;
+	m_spriteram_offs++;
 }
 
-READ16_HANDLER( toaplan1_spritesizeram16_r )
+READ16_MEMBER(toaplan1_state::toaplan1_spritesizeram16_r)
 {
-	toaplan1_state *state = space->machine().driver_data<toaplan1_state>();
 
-	return state->m_spritesizeram16[state->m_spriteram_offs & ((TOAPLAN1_SPRITESIZERAM_SIZE/2)-1)];
+	return m_spritesizeram16[m_spriteram_offs & ((TOAPLAN1_SPRITESIZERAM_SIZE/2)-1)];
 }
 
-WRITE16_HANDLER( toaplan1_spritesizeram16_w )
+WRITE16_MEMBER(toaplan1_state::toaplan1_spritesizeram16_w)
 {
-	toaplan1_state *state = space->machine().driver_data<toaplan1_state>();
 
-	COMBINE_DATA(&state->m_spritesizeram16[state->m_spriteram_offs & ((TOAPLAN1_SPRITESIZERAM_SIZE/2)-1)]);
+	COMBINE_DATA(&m_spritesizeram16[m_spriteram_offs & ((TOAPLAN1_SPRITESIZERAM_SIZE/2)-1)]);
 
 #ifdef MAME_DEBUG
-	if (state->m_spriteram_offs >= (TOAPLAN1_SPRITESIZERAM_SIZE/2))
+	if (m_spriteram_offs >= (TOAPLAN1_SPRITESIZERAM_SIZE/2))
 	{
-		logerror("Sprite_Size_RAM_word_w, %08x out of range !\n", state->m_spriteram_offs);
+		logerror("Sprite_Size_RAM_word_w, %08x out of range !\n", m_spriteram_offs);
 		return;
 	}
 #endif
 
-	state->m_spriteram_offs++;	/// really ? shouldn't happen on the sizeram
+	m_spriteram_offs++;	/// really ? shouldn't happen on the sizeram
 }
 
 
 
-WRITE16_HANDLER( toaplan1_bcu_control_w )
+WRITE16_MEMBER(toaplan1_state::toaplan1_bcu_control_w)
 {
-	toaplan1_state *state = space->machine().driver_data<toaplan1_state>();
 
 	logerror("BCU tile controller register:%02x now = %04x\n",offset,data);
 
@@ -595,63 +580,60 @@ WRITE16_HANDLER( toaplan1_bcu_control_w )
 	/*** soft resets. These two games don't have a sound reset port,  */
 	/*** unlike the other games */
 
-	if (state->m_unk_reset_port && state->m_reset)
+	if (m_unk_reset_port && m_reset)
 	{
-		state->m_reset = 0;
+		m_reset = 0;
 		toaplan1_reset_sound(space,0,0,0);
 	}
 }
 
-READ16_HANDLER( toaplan1_tileram_offs_r )
+READ16_MEMBER(toaplan1_state::toaplan1_tileram_offs_r)
 {
-	toaplan1_state *state = space->machine().driver_data<toaplan1_state>();
 
-	return state->m_pf_voffs;
+	return m_pf_voffs;
 }
 
-WRITE16_HANDLER( toaplan1_tileram_offs_w )
+WRITE16_MEMBER(toaplan1_state::toaplan1_tileram_offs_w)
 {
-	toaplan1_state *state = space->machine().driver_data<toaplan1_state>();
 
 	if (data >= 0x4000)
 		logerror("Hmmm, unknown video layer being selected (%08x)\n",data);
-	COMBINE_DATA(&state->m_pf_voffs);
+	COMBINE_DATA(&m_pf_voffs);
 }
 
 
-READ16_HANDLER( toaplan1_tileram16_r )
+READ16_MEMBER(toaplan1_state::toaplan1_tileram16_r)
 {
-	toaplan1_state *state = space->machine().driver_data<toaplan1_state>();
 	offs_t vram_offset;
 	UINT16 video_data = 0;
 
-	switch (state->m_pf_voffs & 0xf000)	/* Locate Layer (PlayField) */
+	switch (m_pf_voffs & 0xf000)	/* Locate Layer (PlayField) */
 	{
 		case 0x0000:
-				vram_offset = ((state->m_pf_voffs * 2) + offset) & ((TOAPLAN1_TILEVRAM_SIZE/2)-1);
-				video_data = state->m_pf1_tilevram16[vram_offset];
+				vram_offset = ((m_pf_voffs * 2) + offset) & ((TOAPLAN1_TILEVRAM_SIZE/2)-1);
+				video_data = m_pf1_tilevram16[vram_offset];
 				break;
 		case 0x1000:
-				vram_offset = ((state->m_pf_voffs * 2) + offset) & ((TOAPLAN1_TILEVRAM_SIZE/2)-1);
-				video_data = state->m_pf2_tilevram16[vram_offset];
+				vram_offset = ((m_pf_voffs * 2) + offset) & ((TOAPLAN1_TILEVRAM_SIZE/2)-1);
+				video_data = m_pf2_tilevram16[vram_offset];
 				break;
 		case 0x2000:
-				vram_offset = ((state->m_pf_voffs * 2) + offset) & ((TOAPLAN1_TILEVRAM_SIZE/2)-1);
-				video_data = state->m_pf3_tilevram16[vram_offset];
+				vram_offset = ((m_pf_voffs * 2) + offset) & ((TOAPLAN1_TILEVRAM_SIZE/2)-1);
+				video_data = m_pf3_tilevram16[vram_offset];
 				break;
 		case 0x3000:
-				vram_offset = ((state->m_pf_voffs * 2) + offset) & ((TOAPLAN1_TILEVRAM_SIZE/2)-1);
-				video_data = state->m_pf4_tilevram16[vram_offset];
+				vram_offset = ((m_pf_voffs * 2) + offset) & ((TOAPLAN1_TILEVRAM_SIZE/2)-1);
+				video_data = m_pf4_tilevram16[vram_offset];
 				break;
 		default:
-				logerror("Hmmm, reading %04x from unknown playfield layer address %06x  Offset:%01x !!!\n", video_data, state->m_pf_voffs, offset);
+				logerror("Hmmm, reading %04x from unknown playfield layer address %06x  Offset:%01x !!!\n", video_data, m_pf_voffs, offset);
 				break;
 	}
 
 	return video_data;
 }
 
-READ16_HANDLER( rallybik_tileram16_r )
+READ16_MEMBER(toaplan1_state::rallybik_tileram16_r)
 {
 	UINT16 data = toaplan1_tileram16_r(space, offset, mem_mask);
 
@@ -663,56 +645,54 @@ READ16_HANDLER( rallybik_tileram16_r )
 	return data;
 }
 
-WRITE16_HANDLER( toaplan1_tileram16_w )
+WRITE16_MEMBER(toaplan1_state::toaplan1_tileram16_w)
 {
-	toaplan1_state *state = space->machine().driver_data<toaplan1_state>();
 	offs_t vram_offset;
 
-	switch (state->m_pf_voffs & 0xf000)	/* Locate Layer (PlayField) */
+	switch (m_pf_voffs & 0xf000)	/* Locate Layer (PlayField) */
 	{
 		case 0x0000:
-				vram_offset = ((state->m_pf_voffs * 2) + offset) & ((TOAPLAN1_TILEVRAM_SIZE/2)-1);
-				COMBINE_DATA(&state->m_pf1_tilevram16[vram_offset]);
-				state->m_pf1_tilemap->mark_tile_dirty(vram_offset/2);
+				vram_offset = ((m_pf_voffs * 2) + offset) & ((TOAPLAN1_TILEVRAM_SIZE/2)-1);
+				COMBINE_DATA(&m_pf1_tilevram16[vram_offset]);
+				m_pf1_tilemap->mark_tile_dirty(vram_offset/2);
 				break;
 		case 0x1000:
-				vram_offset = ((state->m_pf_voffs * 2) + offset) & ((TOAPLAN1_TILEVRAM_SIZE/2)-1);
-				COMBINE_DATA(&state->m_pf2_tilevram16[vram_offset]);
-				state->m_pf2_tilemap->mark_tile_dirty(vram_offset/2);
+				vram_offset = ((m_pf_voffs * 2) + offset) & ((TOAPLAN1_TILEVRAM_SIZE/2)-1);
+				COMBINE_DATA(&m_pf2_tilevram16[vram_offset]);
+				m_pf2_tilemap->mark_tile_dirty(vram_offset/2);
 				break;
 		case 0x2000:
-				vram_offset = ((state->m_pf_voffs * 2) + offset) & ((TOAPLAN1_TILEVRAM_SIZE/2)-1);
-				COMBINE_DATA(&state->m_pf3_tilevram16[vram_offset]);
-				state->m_pf3_tilemap->mark_tile_dirty(vram_offset/2);
+				vram_offset = ((m_pf_voffs * 2) + offset) & ((TOAPLAN1_TILEVRAM_SIZE/2)-1);
+				COMBINE_DATA(&m_pf3_tilevram16[vram_offset]);
+				m_pf3_tilemap->mark_tile_dirty(vram_offset/2);
 				break;
 		case 0x3000:
-				vram_offset = ((state->m_pf_voffs * 2) + offset) & ((TOAPLAN1_TILEVRAM_SIZE/2)-1);
-				COMBINE_DATA(&state->m_pf4_tilevram16[vram_offset]);
-				state->m_pf4_tilemap->mark_tile_dirty(vram_offset/2);
+				vram_offset = ((m_pf_voffs * 2) + offset) & ((TOAPLAN1_TILEVRAM_SIZE/2)-1);
+				COMBINE_DATA(&m_pf4_tilevram16[vram_offset]);
+				m_pf4_tilemap->mark_tile_dirty(vram_offset/2);
 				break;
 		default:
-				logerror("Hmmm, writing %04x to unknown playfield layer address %06x  Offset:%01x\n", data, state->m_pf_voffs, offset);
+				logerror("Hmmm, writing %04x to unknown playfield layer address %06x  Offset:%01x\n", data, m_pf_voffs, offset);
 				break;
 	}
 }
 
 
 
-READ16_HANDLER( toaplan1_scroll_regs_r )
+READ16_MEMBER(toaplan1_state::toaplan1_scroll_regs_r)
 {
-	toaplan1_state *state = space->machine().driver_data<toaplan1_state>();
 	UINT16 scroll = 0;
 
 	switch(offset)
 	{
-		case 00: scroll = state->m_pf1_scrollx; break;
-		case 01: scroll = state->m_pf1_scrolly; break;
-		case 02: scroll = state->m_pf2_scrollx; break;
-		case 03: scroll = state->m_pf2_scrolly; break;
-		case 04: scroll = state->m_pf3_scrollx; break;
-		case 05: scroll = state->m_pf3_scrolly; break;
-		case 06: scroll = state->m_pf4_scrollx; break;
-		case 07: scroll = state->m_pf4_scrolly; break;
+		case 00: scroll = m_pf1_scrollx; break;
+		case 01: scroll = m_pf1_scrolly; break;
+		case 02: scroll = m_pf2_scrollx; break;
+		case 03: scroll = m_pf2_scrolly; break;
+		case 04: scroll = m_pf3_scrollx; break;
+		case 05: scroll = m_pf3_scrolly; break;
+		case 06: scroll = m_pf4_scrollx; break;
+		case 07: scroll = m_pf4_scrolly; break;
 		default: logerror("Hmmm, reading unknown video scroll register (%08x) !!!\n",offset);
 				 break;
 	}
@@ -720,35 +700,34 @@ READ16_HANDLER( toaplan1_scroll_regs_r )
 }
 
 
-WRITE16_HANDLER( toaplan1_scroll_regs_w )
+WRITE16_MEMBER(toaplan1_state::toaplan1_scroll_regs_w)
 {
-	toaplan1_state *state = space->machine().driver_data<toaplan1_state>();
 
 	switch(offset)
 	{
-		case 00: COMBINE_DATA(&state->m_pf1_scrollx);		/* 1D3h */
-				 state->m_pf1_tilemap->set_scrollx(0, (state->m_pf1_scrollx >> 7) - (state->m_tiles_offsetx - state->m_scrollx_offs1));
+		case 00: COMBINE_DATA(&m_pf1_scrollx);		/* 1D3h */
+				 m_pf1_tilemap->set_scrollx(0, (m_pf1_scrollx >> 7) - (m_tiles_offsetx - m_scrollx_offs1));
 				 break;
-		case 01: COMBINE_DATA(&state->m_pf1_scrolly);		/* 1EBh */
-				 state->m_pf1_tilemap->set_scrolly(0, (state->m_pf1_scrolly >> 7) - (state->m_tiles_offsety - state->m_scrolly_offs));
+		case 01: COMBINE_DATA(&m_pf1_scrolly);		/* 1EBh */
+				 m_pf1_tilemap->set_scrolly(0, (m_pf1_scrolly >> 7) - (m_tiles_offsety - m_scrolly_offs));
 				 break;
-		case 02: COMBINE_DATA(&state->m_pf2_scrollx);		/* 1D5h */
-				 state->m_pf2_tilemap->set_scrollx(0, (state->m_pf2_scrollx >> 7) - (state->m_tiles_offsetx - state->m_scrollx_offs2));
+		case 02: COMBINE_DATA(&m_pf2_scrollx);		/* 1D5h */
+				 m_pf2_tilemap->set_scrollx(0, (m_pf2_scrollx >> 7) - (m_tiles_offsetx - m_scrollx_offs2));
 				 break;
-		case 03: COMBINE_DATA(&state->m_pf2_scrolly);		/* 1EBh */
-				 state->m_pf2_tilemap->set_scrolly(0, (state->m_pf2_scrolly >> 7) - (state->m_tiles_offsety - state->m_scrolly_offs));
+		case 03: COMBINE_DATA(&m_pf2_scrolly);		/* 1EBh */
+				 m_pf2_tilemap->set_scrolly(0, (m_pf2_scrolly >> 7) - (m_tiles_offsety - m_scrolly_offs));
 				 break;
-		case 04: COMBINE_DATA(&state->m_pf3_scrollx);		/* 1D7h */
-				 state->m_pf3_tilemap->set_scrollx(0, (state->m_pf3_scrollx >> 7) - (state->m_tiles_offsetx - state->m_scrollx_offs3));
+		case 04: COMBINE_DATA(&m_pf3_scrollx);		/* 1D7h */
+				 m_pf3_tilemap->set_scrollx(0, (m_pf3_scrollx >> 7) - (m_tiles_offsetx - m_scrollx_offs3));
 				 break;
-		case 05: COMBINE_DATA(&state->m_pf3_scrolly);		/* 1EBh */
-				 state->m_pf3_tilemap->set_scrolly(0, (state->m_pf3_scrolly >> 7) - (state->m_tiles_offsety - state->m_scrolly_offs));
+		case 05: COMBINE_DATA(&m_pf3_scrolly);		/* 1EBh */
+				 m_pf3_tilemap->set_scrolly(0, (m_pf3_scrolly >> 7) - (m_tiles_offsety - m_scrolly_offs));
 				 break;
-		case 06: COMBINE_DATA(&state->m_pf4_scrollx);		/* 1D9h */
-				 state->m_pf4_tilemap->set_scrollx(0, (state->m_pf4_scrollx >> 7) - (state->m_tiles_offsetx - state->m_scrollx_offs4));
+		case 06: COMBINE_DATA(&m_pf4_scrollx);		/* 1D9h */
+				 m_pf4_tilemap->set_scrollx(0, (m_pf4_scrollx >> 7) - (m_tiles_offsetx - m_scrollx_offs4));
 				 break;
-		case 07: COMBINE_DATA(&state->m_pf4_scrolly);		/* 1EBh */
-				 state->m_pf4_tilemap->set_scrolly(0, (state->m_pf4_scrolly >> 7) - (state->m_tiles_offsety - state->m_scrolly_offs));
+		case 07: COMBINE_DATA(&m_pf4_scrolly);		/* 1EBh */
+				 m_pf4_tilemap->set_scrolly(0, (m_pf4_scrolly >> 7) - (m_tiles_offsety - m_scrolly_offs));
 				 break;
 		default: logerror("Hmmm, writing %08x to unknown video scroll register (%08x) !!!\n",data ,offset);
 				 break;

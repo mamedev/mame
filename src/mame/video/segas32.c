@@ -433,47 +433,47 @@ static void common_paletteram_w(address_space *space, int which, offs_t offset, 
  *
  *************************************/
 
-READ16_HANDLER( system32_paletteram_r )
+READ16_MEMBER(segas32_state::system32_paletteram_r)
 {
-	return common_paletteram_r(space, 0, offset);
+	return common_paletteram_r(&space, 0, offset);
 }
 
 
-WRITE16_HANDLER( system32_paletteram_w )
+WRITE16_MEMBER(segas32_state::system32_paletteram_w)
 {
-	common_paletteram_w(space, 0, offset, data, mem_mask);
+	common_paletteram_w(&space, 0, offset, data, mem_mask);
 }
 
 
-READ32_HANDLER( multi32_paletteram_0_r )
+READ32_MEMBER(segas32_state::multi32_paletteram_0_r)
 {
-	return common_paletteram_r(space, 0, offset*2+0) |
-	      (common_paletteram_r(space, 0, offset*2+1) << 16);
+	return common_paletteram_r(&space, 0, offset*2+0) |
+	      (common_paletteram_r(&space, 0, offset*2+1) << 16);
 }
 
 
-WRITE32_HANDLER( multi32_paletteram_0_w )
+WRITE32_MEMBER(segas32_state::multi32_paletteram_0_w)
 {
 	if (ACCESSING_BITS_0_15)
-		common_paletteram_w(space, 0, offset*2+0, data, mem_mask);
+		common_paletteram_w(&space, 0, offset*2+0, data, mem_mask);
 	if (ACCESSING_BITS_16_31)
-		common_paletteram_w(space, 0, offset*2+1, data >> 16, mem_mask >> 16);
+		common_paletteram_w(&space, 0, offset*2+1, data >> 16, mem_mask >> 16);
 }
 
 
-READ32_HANDLER( multi32_paletteram_1_r )
+READ32_MEMBER(segas32_state::multi32_paletteram_1_r)
 {
-	return common_paletteram_r(space, 1, offset*2+0) |
-	      (common_paletteram_r(space, 1, offset*2+1) << 16);
+	return common_paletteram_r(&space, 1, offset*2+0) |
+	      (common_paletteram_r(&space, 1, offset*2+1) << 16);
 }
 
 
-WRITE32_HANDLER( multi32_paletteram_1_w )
+WRITE32_MEMBER(segas32_state::multi32_paletteram_1_w)
 {
 	if (ACCESSING_BITS_0_15)
-		common_paletteram_w(space, 1, offset*2+0, data, mem_mask);
+		common_paletteram_w(&space, 1, offset*2+0, data, mem_mask);
 	if (ACCESSING_BITS_16_31)
-		common_paletteram_w(space, 1, offset*2+1, data >> 16, mem_mask >> 16);
+		common_paletteram_w(&space, 1, offset*2+1, data >> 16, mem_mask >> 16);
 }
 
 
@@ -484,17 +484,15 @@ WRITE32_HANDLER( multi32_paletteram_1_w )
  *
  *************************************/
 
-READ16_HANDLER( system32_videoram_r )
+READ16_MEMBER(segas32_state::system32_videoram_r)
 {
-	segas32_state *state = space->machine().driver_data<segas32_state>();
-	return state->m_system32_videoram[offset];
+	return m_system32_videoram[offset];
 }
 
 
-WRITE16_HANDLER( system32_videoram_w )
+WRITE16_MEMBER(segas32_state::system32_videoram_w)
 {
-	segas32_state *state = space->machine().driver_data<segas32_state>();
-	COMBINE_DATA(&state->m_system32_videoram[offset]);
+	COMBINE_DATA(&m_system32_videoram[offset]);
 
 	/* if we are not in the control area, just update any affected tilemaps */
 	if (offset < 0x1ff00/2)
@@ -504,22 +502,21 @@ WRITE16_HANDLER( system32_videoram_w )
 		offset %= 0x200;
 
 		/* scan the cache for a matching pages */
-		for (entry = state->m_cache_head; entry != NULL; entry = entry->next)
+		for (entry = m_cache_head; entry != NULL; entry = entry->next)
 			if (entry->page == page)
 				entry->tmap->mark_tile_dirty(offset);
 	}
 }
 
 
-READ32_HANDLER( multi32_videoram_r )
+READ32_MEMBER(segas32_state::multi32_videoram_r)
 {
-	segas32_state *state = space->machine().driver_data<segas32_state>();
-	return state->m_system32_videoram[offset*2+0] |
-	      (state->m_system32_videoram[offset*2+1] << 16);
+	return m_system32_videoram[offset*2+0] |
+	      (m_system32_videoram[offset*2+1] << 16);
 }
 
 
-WRITE32_HANDLER( multi32_videoram_w )
+WRITE32_MEMBER(segas32_state::multi32_videoram_w)
 {
 	if (ACCESSING_BITS_0_15)
 		system32_videoram_w(space, offset*2+0, data, mem_mask);
@@ -535,16 +532,15 @@ WRITE32_HANDLER( multi32_videoram_w )
  *
  *************************************/
 
-READ16_HANDLER( system32_sprite_control_r )
+READ16_MEMBER(segas32_state::system32_sprite_control_r)
 {
-	segas32_state *state = space->machine().driver_data<segas32_state>();
 	switch (offset)
 	{
 		case 0:
 			/*  D1 : Seems to be '1' only during an erase in progress, this
                      occurs very briefly though.
                 D0 : Selected frame buffer (0= A, 1= B) */
-			return 0xfffc | (int)(&state->m_layer_data[MIXER_LAYER_SPRITES].bitmap < &state->m_layer_data[MIXER_LAYER_SPRITES_2].bitmap);
+			return 0xfffc | (int)(&m_layer_data[MIXER_LAYER_SPRITES].bitmap < &m_layer_data[MIXER_LAYER_SPRITES_2].bitmap);
 
 		case 1:
 			/*  D1 : ?
@@ -563,27 +559,27 @@ READ16_HANDLER( system32_sprite_control_r )
 		case 2:
 			/*  D1 : 1= Vertical flip, 0= Normal orientation
                 D0 : 1= Horizontal flip, 0= Normal orientation */
-			return 0xfffc | state->m_sprite_control_latched[2];
+			return 0xfffc | m_sprite_control_latched[2];
 
 		case 3:
 			/*  D1 : 1= Manual mode, 0= Automatic mode
                 D0 : 1= 30 Hz update, 0= 60 Hz update (automatic mode only) */
-			return 0xfffc | state->m_sprite_control_latched[3];
+			return 0xfffc | m_sprite_control_latched[3];
 
 		case 4:
 			/*  D1 : ?
                 D0 : ? */
-			return 0xfffc | state->m_sprite_control_latched[4];
+			return 0xfffc | m_sprite_control_latched[4];
 
 		case 5:
 			/*  D1 : ?
                 D0 : ? */
-			return 0xfffc | state->m_sprite_control_latched[5];
+			return 0xfffc | m_sprite_control_latched[5];
 
 		case 6:
 			/*  D0 : 1= 416 pixels
                      0= 320 pixels */
-			return 0xfffc | (state->m_sprite_control_latched[6] & 1);
+			return 0xfffc | (m_sprite_control_latched[6] & 1);
 
 		case 7:
 			/*  D1 : ?
@@ -594,22 +590,21 @@ READ16_HANDLER( system32_sprite_control_r )
 }
 
 
-WRITE16_HANDLER( system32_sprite_control_w )
+WRITE16_MEMBER(segas32_state::system32_sprite_control_w)
 {
-	segas32_state *state = space->machine().driver_data<segas32_state>();
 	if (ACCESSING_BITS_0_7)
-		state->m_sprite_control[offset & 7] = data;
+		m_sprite_control[offset & 7] = data;
 }
 
 
-READ32_HANDLER( multi32_sprite_control_r )
+READ32_MEMBER(segas32_state::multi32_sprite_control_r)
 {
 	return system32_sprite_control_r(space, offset*2+0, mem_mask) |
 	      (system32_sprite_control_r(space, offset*2+1, mem_mask >> 16) << 16);
 }
 
 
-WRITE32_HANDLER( multi32_sprite_control_w )
+WRITE32_MEMBER(segas32_state::multi32_sprite_control_w)
 {
 	if (ACCESSING_BITS_0_15)
 		system32_sprite_control_w(space, offset*2+0, data, mem_mask);
@@ -625,44 +620,40 @@ WRITE32_HANDLER( multi32_sprite_control_w )
  *
  *************************************/
 
-READ16_HANDLER( system32_spriteram_r )
+READ16_MEMBER(segas32_state::system32_spriteram_r)
 {
-	segas32_state *state = space->machine().driver_data<segas32_state>();
-	return state->m_system32_spriteram[offset];
+	return m_system32_spriteram[offset];
 }
 
 
-WRITE16_HANDLER( system32_spriteram_w )
+WRITE16_MEMBER(segas32_state::system32_spriteram_w)
 {
-	segas32_state *state = space->machine().driver_data<segas32_state>();
-	COMBINE_DATA(&state->m_system32_spriteram[offset]);
-	state->m_spriteram_32bit[offset/2] =
-		((state->m_system32_spriteram[offset |  1] >> 8 ) & 0x000000ff) |
-		((state->m_system32_spriteram[offset |  1] << 8 ) & 0x0000ff00) |
-		((state->m_system32_spriteram[offset & ~1] << 8 ) & 0x00ff0000) |
-		((state->m_system32_spriteram[offset & ~1] << 24) & 0xff000000);
+	COMBINE_DATA(&m_system32_spriteram[offset]);
+	m_spriteram_32bit[offset/2] =
+		((m_system32_spriteram[offset |  1] >> 8 ) & 0x000000ff) |
+		((m_system32_spriteram[offset |  1] << 8 ) & 0x0000ff00) |
+		((m_system32_spriteram[offset & ~1] << 8 ) & 0x00ff0000) |
+		((m_system32_spriteram[offset & ~1] << 24) & 0xff000000);
 }
 
 
-READ32_HANDLER( multi32_spriteram_r )
+READ32_MEMBER(segas32_state::multi32_spriteram_r)
 {
-	segas32_state *state = space->machine().driver_data<segas32_state>();
-	return state->m_system32_spriteram[offset*2+0] |
-	      (state->m_system32_spriteram[offset*2+1] << 16);
+	return m_system32_spriteram[offset*2+0] |
+	      (m_system32_spriteram[offset*2+1] << 16);
 }
 
 
-WRITE32_HANDLER( multi32_spriteram_w )
+WRITE32_MEMBER(segas32_state::multi32_spriteram_w)
 {
-	segas32_state *state = space->machine().driver_data<segas32_state>();
 	data = SWAP_HALVES(data);
 	mem_mask = SWAP_HALVES(mem_mask);
-	COMBINE_DATA((UINT32 *)&state->m_system32_spriteram[offset*2]);
-	state->m_spriteram_32bit[offset/2] =
-		((state->m_system32_spriteram[offset |  1] >> 8 ) & 0x000000ff) |
-		((state->m_system32_spriteram[offset |  1] << 8 ) & 0x0000ff00) |
-		((state->m_system32_spriteram[offset & ~1] << 8 ) & 0x00ff0000) |
-		((state->m_system32_spriteram[offset & ~1] << 24) & 0xff000000);
+	COMBINE_DATA((UINT32 *)&m_system32_spriteram[offset*2]);
+	m_spriteram_32bit[offset/2] =
+		((m_system32_spriteram[offset |  1] >> 8 ) & 0x000000ff) |
+		((m_system32_spriteram[offset |  1] << 8 ) & 0x0000ff00) |
+		((m_system32_spriteram[offset & ~1] << 8 ) & 0x00ff0000) |
+		((m_system32_spriteram[offset & ~1] << 24) & 0xff000000);
 }
 
 
@@ -673,34 +664,30 @@ WRITE32_HANDLER( multi32_spriteram_w )
  *
  *************************************/
 
-READ16_HANDLER( system32_mixer_r )
+READ16_MEMBER(segas32_state::system32_mixer_r)
 {
-	segas32_state *state = space->machine().driver_data<segas32_state>();
-	return state->m_mixer_control[0][offset];
+	return m_mixer_control[0][offset];
 }
 
-WRITE16_HANDLER( system32_mixer_w )
+WRITE16_MEMBER(segas32_state::system32_mixer_w)
 {
-	segas32_state *state = space->machine().driver_data<segas32_state>();
-	COMBINE_DATA(&state->m_mixer_control[0][offset]);
+	COMBINE_DATA(&m_mixer_control[0][offset]);
 }
 
 
-WRITE32_HANDLER( multi32_mixer_0_w )
+WRITE32_MEMBER(segas32_state::multi32_mixer_0_w)
 {
-	segas32_state *state = space->machine().driver_data<segas32_state>();
 	data = SWAP_HALVES(data);
 	mem_mask = SWAP_HALVES(mem_mask);
-	COMBINE_DATA((UINT32 *)&state->m_mixer_control[0][offset*2]);
+	COMBINE_DATA((UINT32 *)&m_mixer_control[0][offset*2]);
 }
 
 
-WRITE32_HANDLER( multi32_mixer_1_w )
+WRITE32_MEMBER(segas32_state::multi32_mixer_1_w)
 {
-	segas32_state *state = space->machine().driver_data<segas32_state>();
 	data = SWAP_HALVES(data);
 	mem_mask = SWAP_HALVES(mem_mask);
-	COMBINE_DATA((UINT32 *)&state->m_mixer_control[1][offset*2]);
+	COMBINE_DATA((UINT32 *)&m_mixer_control[1][offset*2]);
 }
 
 

@@ -131,14 +131,13 @@ VIDEO_START( spyhunt )
  *
  *************************************/
 
-WRITE8_HANDLER( mcr3_paletteram_w )
+WRITE8_MEMBER(mcr3_state::mcr3_paletteram_w)
 {
-	mcr3_state *state = space->machine().driver_data<mcr3_state>();
-	state->m_generic_paletteram_8[offset] = data;
+	m_generic_paletteram_8[offset] = data;
 	offset &= 0x7f;
 
 	/* high bit of red comes from low bit of address */
-	palette_set_color_rgb(space->machine(), offset / 2, pal3bit(((offset & 1) << 2) + (data >> 6)), pal3bit(data >> 0), pal3bit(data >> 3));
+	palette_set_color_rgb(machine(), offset / 2, pal3bit(((offset & 1) << 2) + (data >> 6)), pal3bit(data >> 0), pal3bit(data >> 3));
 }
 
 
@@ -149,51 +148,47 @@ WRITE8_HANDLER( mcr3_paletteram_w )
  *
  *************************************/
 
-WRITE8_HANDLER( mcr3_videoram_w )
+WRITE8_MEMBER(mcr3_state::mcr3_videoram_w)
 {
-	mcr3_state *state = space->machine().driver_data<mcr3_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = m_videoram;
 	videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset / 2);
+	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
 
-WRITE8_HANDLER( spyhunt_videoram_w )
+WRITE8_MEMBER(mcr3_state::spyhunt_videoram_w)
 {
-	mcr3_state *state = space->machine().driver_data<mcr3_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = m_videoram;
 	videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_HANDLER( spyhunt_alpharam_w )
+WRITE8_MEMBER(mcr3_state::spyhunt_alpharam_w)
 {
-	mcr3_state *state = space->machine().driver_data<mcr3_state>();
-	state->m_spyhunt_alpharam[offset] = data;
-	state->m_alpha_tilemap->mark_tile_dirty(offset);
+	m_spyhunt_alpharam[offset] = data;
+	m_alpha_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_HANDLER( spyhunt_scroll_value_w )
+WRITE8_MEMBER(mcr3_state::spyhunt_scroll_value_w)
 {
-	mcr3_state *state = space->machine().driver_data<mcr3_state>();
 	switch (offset)
 	{
 		case 0:
 			/* low 8 bits of horizontal scroll */
-			state->m_spyhunt_scrollx = (state->m_spyhunt_scrollx & ~0xff) | data;
+			m_spyhunt_scrollx = (m_spyhunt_scrollx & ~0xff) | data;
 			break;
 
 		case 1:
 			/* upper 3 bits of horizontal scroll and upper 1 bit of vertical scroll */
-			state->m_spyhunt_scrollx = (state->m_spyhunt_scrollx & 0xff) | ((data & 0x07) << 8);
-			state->m_spyhunt_scrolly = (state->m_spyhunt_scrolly & 0xff) | ((data & 0x80) << 1);
+			m_spyhunt_scrollx = (m_spyhunt_scrollx & 0xff) | ((data & 0x07) << 8);
+			m_spyhunt_scrolly = (m_spyhunt_scrolly & 0xff) | ((data & 0x80) << 1);
 			break;
 
 		case 2:
 			/* low 8 bits of vertical scroll */
-			state->m_spyhunt_scrolly = (state->m_spyhunt_scrolly & ~0xff) | data;
+			m_spyhunt_scrolly = (m_spyhunt_scrolly & ~0xff) | data;
 			break;
 	}
 }

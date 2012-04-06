@@ -14,14 +14,14 @@ public:
 	tilemap_t *m_bg_tilemap;
 	DECLARE_WRITE16_MEMBER(pirates_out_w);
 	DECLARE_READ16_MEMBER(genix_prot_r);
+	DECLARE_WRITE16_MEMBER(pirates_tx_tileram_w);
+	DECLARE_WRITE16_MEMBER(pirates_fg_tileram_w);
+	DECLARE_WRITE16_MEMBER(pirates_bg_tileram_w);
 };
 
 
 /*----------- defined in video/pirates.c -----------*/
 
-WRITE16_HANDLER( pirates_tx_tileram_w );
-WRITE16_HANDLER( pirates_fg_tileram_w );
-WRITE16_HANDLER( pirates_bg_tileram_w );
 
 VIDEO_START( pirates );
 SCREEN_UPDATE_IND16( pirates );

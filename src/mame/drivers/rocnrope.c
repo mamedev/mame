@@ -52,11 +52,11 @@ static ADDRESS_MAP_START( rocnrope_map, AS_PROGRAM, 8, rocnrope_state )
 	AM_RANGE(0x4000, 0x402f) AM_RAM AM_BASE(m_spriteram2)
 	AM_RANGE(0x4400, 0x442f) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
-	AM_RANGE(0x4800, 0x4bff) AM_RAM_WRITE_LEGACY(rocnrope_colorram_w) AM_BASE(m_colorram)
-	AM_RANGE(0x4c00, 0x4fff) AM_RAM_WRITE_LEGACY(rocnrope_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0x4800, 0x4bff) AM_RAM_WRITE(rocnrope_colorram_w) AM_BASE(m_colorram)
+	AM_RANGE(0x4c00, 0x4fff) AM_RAM_WRITE(rocnrope_videoram_w) AM_BASE(m_videoram)
 	AM_RANGE(0x5000, 0x5fff) AM_RAM
 	AM_RANGE(0x8000, 0x8000) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0x8080, 0x8080) AM_WRITE_LEGACY(rocnrope_flipscreen_w)
+	AM_RANGE(0x8080, 0x8080) AM_WRITE(rocnrope_flipscreen_w)
 	AM_RANGE(0x8081, 0x8081) AM_WRITE_LEGACY(timeplt_sh_irqtrigger_w)  /* cause interrupt on audio CPU */
 	AM_RANGE(0x8082, 0x8082) AM_WRITENOP	/* interrupt acknowledge??? */
 	AM_RANGE(0x8083, 0x8083) AM_WRITENOP	/* Coin counter 1 */

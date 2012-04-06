@@ -61,10 +61,9 @@ static void videoram_write( running_machine &machine, UINT16 offset, UINT8 data,
 }
 
 
-WRITE8_HANDLER( kangaroo_videoram_w )
+WRITE8_MEMBER(kangaroo_state::kangaroo_videoram_w)
 {
-	kangaroo_state *state = space->machine().driver_data<kangaroo_state>();
-	videoram_write(space->machine(), offset, data, state->m_video_control[8]);
+	videoram_write(machine(), offset, data, m_video_control[8]);
 }
 
 
@@ -75,19 +74,18 @@ WRITE8_HANDLER( kangaroo_videoram_w )
  *
  *************************************/
 
-WRITE8_HANDLER( kangaroo_video_control_w )
+WRITE8_MEMBER(kangaroo_state::kangaroo_video_control_w)
 {
-	kangaroo_state *state = space->machine().driver_data<kangaroo_state>();
-	state->m_video_control[offset] = data;
+	m_video_control[offset] = data;
 
 	switch (offset)
 	{
 		case 5:	/* blitter start */
-			blitter_execute(space->machine());
+			blitter_execute(machine());
 			break;
 
 		case 8:	/* bank select */
-			memory_set_bank(space->machine(), "bank1", (data & 0x05) ? 0 : 1);
+			memory_set_bank(machine(), "bank1", (data & 0x05) ? 0 : 1);
 			break;
 	}
 }

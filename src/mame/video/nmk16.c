@@ -225,62 +225,55 @@ VIDEO_START( bjtwin )
 
 ***************************************************************************/
 
-WRITE16_HANDLER( nmk_bgvideoram0_w )
+WRITE16_MEMBER(nmk16_state::nmk_bgvideoram0_w)
 {
-	nmk16_state *state = space->machine().driver_data<nmk16_state>();
-	COMBINE_DATA(&state->m_nmk_bgvideoram0[offset]);
-	state->m_bg_tilemap0->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_nmk_bgvideoram0[offset]);
+	m_bg_tilemap0->mark_tile_dirty(offset);
 }
 
-WRITE16_HANDLER( nmk_bgvideoram1_w )
+WRITE16_MEMBER(nmk16_state::nmk_bgvideoram1_w)
 {
-	nmk16_state *state = space->machine().driver_data<nmk16_state>();
-	COMBINE_DATA(&state->m_nmk_bgvideoram1[offset]);
-	state->m_bg_tilemap1->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_nmk_bgvideoram1[offset]);
+	m_bg_tilemap1->mark_tile_dirty(offset);
 }
 
-WRITE16_HANDLER( nmk_bgvideoram2_w )
+WRITE16_MEMBER(nmk16_state::nmk_bgvideoram2_w)
 {
-	nmk16_state *state = space->machine().driver_data<nmk16_state>();
-	COMBINE_DATA(&state->m_nmk_bgvideoram2[offset]);
-	state->m_bg_tilemap2->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_nmk_bgvideoram2[offset]);
+	m_bg_tilemap2->mark_tile_dirty(offset);
 }
 
-WRITE16_HANDLER( nmk_bgvideoram3_w )
+WRITE16_MEMBER(nmk16_state::nmk_bgvideoram3_w)
 {
-	nmk16_state *state = space->machine().driver_data<nmk16_state>();
-	COMBINE_DATA(&state->m_nmk_bgvideoram3[offset]);
-	state->m_bg_tilemap3->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_nmk_bgvideoram3[offset]);
+	m_bg_tilemap3->mark_tile_dirty(offset);
 }
 
-WRITE16_HANDLER( nmk_fgvideoram_w )
+WRITE16_MEMBER(nmk16_state::nmk_fgvideoram_w)
 {
-	nmk16_state *state = space->machine().driver_data<nmk16_state>();
-	COMBINE_DATA(&state->m_nmk_fgvideoram[offset]);
-	state->m_fg_tilemap->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_nmk_fgvideoram[offset]);
+	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_HANDLER( nmk_txvideoram_w )
+WRITE16_MEMBER(nmk16_state::nmk_txvideoram_w)
 {
-	nmk16_state *state = space->machine().driver_data<nmk16_state>();
-	COMBINE_DATA(&state->m_nmk_txvideoram[offset]);
-	state->m_tx_tilemap->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_nmk_txvideoram[offset]);
+	m_tx_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE16_HANDLER( mustang_scroll_w )
+WRITE16_MEMBER(nmk16_state::mustang_scroll_w)
 {
-	nmk16_state *state = space->machine().driver_data<nmk16_state>();
 //  mame_printf_debug("mustang %04x %04x %04x\n",offset,data,mem_mask);
 
 	switch (data & 0xff00)
 	{
 		case 0x0000:
-			state->m_mustang_bg_xscroll = (state->m_mustang_bg_xscroll & 0x00ff) | ((data & 0x00ff)<<8);
+			m_mustang_bg_xscroll = (m_mustang_bg_xscroll & 0x00ff) | ((data & 0x00ff)<<8);
 			break;
 
 		case 0x0100:
-			state->m_mustang_bg_xscroll = (state->m_mustang_bg_xscroll & 0xff00) | (data & 0x00ff);
+			m_mustang_bg_xscroll = (m_mustang_bg_xscroll & 0xff00) | (data & 0x00ff);
 			break;
 
 		case 0x0200:
@@ -293,124 +286,115 @@ WRITE16_HANDLER( mustang_scroll_w )
 			break;
 	}
 
-	state->m_bg_tilemap0->set_scrollx(0,state->m_mustang_bg_xscroll - state->m_videoshift);
+	m_bg_tilemap0->set_scrollx(0,m_mustang_bg_xscroll - m_videoshift);
 }
 
-WRITE16_HANDLER( bioshipbg_scroll_w )
+WRITE16_MEMBER(nmk16_state::bioshipbg_scroll_w)
 {
-	nmk16_state *state = space->machine().driver_data<nmk16_state>();
 
 	if (ACCESSING_BITS_8_15)
 	{
-		state->m_scroll[offset] = (data >> 8) & 0xff;
+		m_scroll[offset] = (data >> 8) & 0xff;
 
 		if (offset & 2)
-			state->m_bg_tilemap0->set_scrolly(0,state->m_scroll[2] * 256 + state->m_scroll[3]);
+			m_bg_tilemap0->set_scrolly(0,m_scroll[2] * 256 + m_scroll[3]);
 		else
-			state->m_bg_tilemap0->set_scrollx(0,state->m_scroll[0] * 256 + state->m_scroll[1] - state->m_videoshift);
+			m_bg_tilemap0->set_scrollx(0,m_scroll[0] * 256 + m_scroll[1] - m_videoshift);
 	}
 }
 
-WRITE16_HANDLER( nmk_scroll_w )
+WRITE16_MEMBER(nmk16_state::nmk_scroll_w)
 {
-	nmk16_state *state = space->machine().driver_data<nmk16_state>();
 	if (ACCESSING_BITS_0_7)
 	{
 
-		state->m_scroll[offset] = data & 0xff;
+		m_scroll[offset] = data & 0xff;
 
 		if (offset & 2)
-			state->m_bg_tilemap0->set_scrolly(0,state->m_scroll[2] * 256 + state->m_scroll[3]);
+			m_bg_tilemap0->set_scrolly(0,m_scroll[2] * 256 + m_scroll[3]);
 		else
-			state->m_bg_tilemap0->set_scrollx(0,state->m_scroll[0] * 256 + state->m_scroll[1] - state->m_videoshift);
+			m_bg_tilemap0->set_scrollx(0,m_scroll[0] * 256 + m_scroll[1] - m_videoshift);
 	}
 }
 
-WRITE16_HANDLER( nmk_scroll_2_w )
+WRITE16_MEMBER(nmk16_state::nmk_scroll_2_w)
 {
-	nmk16_state *state = space->machine().driver_data<nmk16_state>();
 	if (ACCESSING_BITS_0_7)
 	{
 
-		state->m_scroll_2[offset] = data & 0xff;
+		m_scroll_2[offset] = data & 0xff;
 
 		if (offset & 2)
-			state->m_fg_tilemap->set_scrolly(0,state->m_scroll_2[2] * 256 + state->m_scroll_2[3]);
+			m_fg_tilemap->set_scrolly(0,m_scroll_2[2] * 256 + m_scroll_2[3]);
 		else
-			state->m_fg_tilemap->set_scrollx(0,state->m_scroll_2[0] * 256 + state->m_scroll_2[1] - state->m_videoshift);
+			m_fg_tilemap->set_scrollx(0,m_scroll_2[0] * 256 + m_scroll_2[1] - m_videoshift);
 	}
 }
 
-WRITE16_HANDLER( vandyke_scroll_w )
+WRITE16_MEMBER(nmk16_state::vandyke_scroll_w)
 {
-	nmk16_state *state = space->machine().driver_data<nmk16_state>();
 
-	state->m_vscroll[offset] = data;
+	m_vscroll[offset] = data;
 
-	state->m_bg_tilemap0->set_scrollx(0,state->m_vscroll[0] * 256 + (state->m_vscroll[1] >> 8));
-	state->m_bg_tilemap0->set_scrolly(0,state->m_vscroll[2] * 256 + (state->m_vscroll[3] >> 8));
+	m_bg_tilemap0->set_scrollx(0,m_vscroll[0] * 256 + (m_vscroll[1] >> 8));
+	m_bg_tilemap0->set_scrolly(0,m_vscroll[2] * 256 + (m_vscroll[3] >> 8));
 }
 
-WRITE16_HANDLER( vandykeb_scroll_w )
+WRITE16_MEMBER(nmk16_state::vandykeb_scroll_w)
 {
-	nmk16_state *state = space->machine().driver_data<nmk16_state>();
 
 	switch (offset)
 	{
-	case 0: COMBINE_DATA(&state->m_vscroll[3]); break;
-	case 1: COMBINE_DATA(&state->m_vscroll[2]); break;
-	case 5: COMBINE_DATA(&state->m_vscroll[1]); break;
-	case 6: COMBINE_DATA(&state->m_vscroll[0]); break;
+	case 0: COMBINE_DATA(&m_vscroll[3]); break;
+	case 1: COMBINE_DATA(&m_vscroll[2]); break;
+	case 5: COMBINE_DATA(&m_vscroll[1]); break;
+	case 6: COMBINE_DATA(&m_vscroll[0]); break;
 	}
 
-	state->m_bg_tilemap0->set_scrollx(0,state->m_vscroll[0] * 256 + (state->m_vscroll[1] >> 8));
-	state->m_bg_tilemap0->set_scrolly(0,state->m_vscroll[2] * 256 + (state->m_vscroll[3] >> 8));
+	m_bg_tilemap0->set_scrollx(0,m_vscroll[0] * 256 + (m_vscroll[1] >> 8));
+	m_bg_tilemap0->set_scrolly(0,m_vscroll[2] * 256 + (m_vscroll[3] >> 8));
 }
 
-WRITE16_HANDLER( manybloc_scroll_w )
+WRITE16_MEMBER(nmk16_state::manybloc_scroll_w)
 {
-	nmk16_state *state = space->machine().driver_data<nmk16_state>();
-	COMBINE_DATA(&state->m_gunnail_scrollram[offset]);
+	COMBINE_DATA(&m_gunnail_scrollram[offset]);
 
-	state->m_bg_tilemap0->set_scrollx(0,state->m_gunnail_scrollram[0x82/2]-state->m_videoshift);
-	state->m_bg_tilemap0->set_scrolly(0,state->m_gunnail_scrollram[0xc2/2]);
+	m_bg_tilemap0->set_scrollx(0,m_gunnail_scrollram[0x82/2]-m_videoshift);
+	m_bg_tilemap0->set_scrolly(0,m_gunnail_scrollram[0xc2/2]);
 }
 
-WRITE16_HANDLER( nmk_flipscreen_w )
+WRITE16_MEMBER(nmk16_state::nmk_flipscreen_w)
 {
 	if (ACCESSING_BITS_0_7)
-		flip_screen_set(space->machine(), data & 0x01);
+		flip_screen_set(machine(), data & 0x01);
 }
 
-WRITE16_HANDLER( nmk_tilebank_w )
+WRITE16_MEMBER(nmk16_state::nmk_tilebank_w)
 {
-	nmk16_state *state = space->machine().driver_data<nmk16_state>();
 	if (ACCESSING_BITS_0_7)
 	{
-		if (state->m_bgbank != (data & 0xff))
+		if (m_bgbank != (data & 0xff))
 		{
-			state->m_bgbank = data & 0xff;
-			state->m_bg_tilemap0->mark_all_dirty();
+			m_bgbank = data & 0xff;
+			m_bg_tilemap0->mark_all_dirty();
 		}
 	}
 }
 
-WRITE16_HANDLER( bioship_scroll_w )
+WRITE16_MEMBER(nmk16_state::bioship_scroll_w)
 {
-	nmk16_state *state = space->machine().driver_data<nmk16_state>();
 	if (ACCESSING_BITS_8_15)
-		state->m_bioship_scroll[offset]=data>>8;
+		m_bioship_scroll[offset]=data>>8;
 }
 
-WRITE16_HANDLER( bioship_bank_w )
+WRITE16_MEMBER(nmk16_state::bioship_bank_w)
 {
-	nmk16_state *state = space->machine().driver_data<nmk16_state>();
 	if (ACCESSING_BITS_0_7)
 	{
-		if (state->m_bioship_background_bank != data)
+		if (m_bioship_background_bank != data)
 		{
-			state->m_bioship_background_bank = data;
-			state->m_redraw_bitmap=1;
+			m_bioship_background_bank = data;
+			m_redraw_bitmap=1;
 		}
 	}
 }

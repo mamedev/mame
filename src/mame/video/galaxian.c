@@ -497,27 +497,25 @@ static TILE_GET_INFO( bg_get_tile_info )
 }
 
 
-WRITE8_HANDLER( galaxian_videoram_w )
+WRITE8_MEMBER(galaxian_state::galaxian_videoram_w)
 {
-	galaxian_state *state = space->machine().driver_data<galaxian_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = m_videoram;
 	/* update any video up to the current scanline */
-	space->machine().primary_screen->update_now();
+	machine().primary_screen->update_now();
 
 	/* store the data and mark the corresponding tile dirty */
 	videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_HANDLER( galaxian_objram_w )
+WRITE8_MEMBER(galaxian_state::galaxian_objram_w)
 {
-	galaxian_state *state = space->machine().driver_data<galaxian_state>();
 	/* update any video up to the current scanline */
-	space->machine().primary_screen->update_now();
+	machine().primary_screen->update_now();
 
 	/* store the data */
-	state->m_spriteram[offset] = data;
+	m_spriteram[offset] = data;
 
 	/* the first $40 bytes affect the tilemap */
 	if (offset < 0x40)
@@ -526,19 +524,19 @@ WRITE8_HANDLER( galaxian_objram_w )
 		if ((offset & 0x01) == 0)
 		{
 			/* Frogger: top and bottom 4 bits swapped entering the adder */
-			if (state->m_frogger_adjust)
+			if (m_frogger_adjust)
 				data = (data >> 4) | (data << 4);
-			if (!state->m_sfx_tilemap)
-				state->m_bg_tilemap->set_scrolly(offset >> 1, data);
+			if (!m_sfx_tilemap)
+				m_bg_tilemap->set_scrolly(offset >> 1, data);
 			else
-				state->m_bg_tilemap->set_scrollx(offset >> 1, GALAXIAN_XSCALE*data);
+				m_bg_tilemap->set_scrollx(offset >> 1, GALAXIAN_XSCALE*data);
 		}
 
 		/* odd entries control the color base for the row */
 		else
 		{
 			for (offset >>= 1; offset < 0x0400; offset += 32)
-				state->m_bg_tilemap->mark_tile_dirty(offset);
+				m_bg_tilemap->mark_tile_dirty(offset);
 		}
 	}
 }
@@ -659,35 +657,33 @@ static void bullets_draw(running_machine &machine, bitmap_rgb32 &bitmap, const r
  *
  *************************************/
 
-WRITE8_HANDLER( galaxian_flip_screen_x_w )
+WRITE8_MEMBER(galaxian_state::galaxian_flip_screen_x_w)
 {
-	galaxian_state *state = space->machine().driver_data<galaxian_state>();
-	if (state->m_flipscreen_x != (data & 0x01))
+	if (m_flipscreen_x != (data & 0x01))
 	{
-		space->machine().primary_screen->update_now();
+		machine().primary_screen->update_now();
 
 		/* when the direction changes, we count a different number of clocks */
 		/* per frame, so we need to reset the origin of the stars to the current */
 		/* frame before we flip */
-		stars_update_origin(space->machine());
+		stars_update_origin(machine());
 
-		state->m_flipscreen_x = data & 0x01;
-		state->m_bg_tilemap->set_flip((state->m_flipscreen_x ? TILEMAP_FLIPX : 0) | (state->m_flipscreen_y ? TILEMAP_FLIPY : 0));
+		m_flipscreen_x = data & 0x01;
+		m_bg_tilemap->set_flip((m_flipscreen_x ? TILEMAP_FLIPX : 0) | (m_flipscreen_y ? TILEMAP_FLIPY : 0));
 	}
 }
 
-WRITE8_HANDLER( galaxian_flip_screen_y_w )
+WRITE8_MEMBER(galaxian_state::galaxian_flip_screen_y_w)
 {
-	galaxian_state *state = space->machine().driver_data<galaxian_state>();
-	if (state->m_flipscreen_y != (data & 0x01))
+	if (m_flipscreen_y != (data & 0x01))
 	{
-		space->machine().primary_screen->update_now();
-		state->m_flipscreen_y = data & 0x01;
-		state->m_bg_tilemap->set_flip((state->m_flipscreen_x ? TILEMAP_FLIPX : 0) | (state->m_flipscreen_y ? TILEMAP_FLIPY : 0));
+		machine().primary_screen->update_now();
+		m_flipscreen_y = data & 0x01;
+		m_bg_tilemap->set_flip((m_flipscreen_x ? TILEMAP_FLIPX : 0) | (m_flipscreen_y ? TILEMAP_FLIPY : 0));
 	}
 }
 
-WRITE8_HANDLER( galaxian_flip_screen_xy_w )
+WRITE8_MEMBER(galaxian_state::galaxian_flip_screen_xy_w)
 {
 	galaxian_flip_screen_x_w(space, offset, data);
 	galaxian_flip_screen_y_w(space, offset, data);
@@ -701,61 +697,56 @@ WRITE8_HANDLER( galaxian_flip_screen_xy_w )
  *
  *************************************/
 
-WRITE8_HANDLER( galaxian_stars_enable_w )
+WRITE8_MEMBER(galaxian_state::galaxian_stars_enable_w)
 {
-	galaxian_state *state = space->machine().driver_data<galaxian_state>();
-	if ((state->m_stars_enabled ^ data) & 0x01)
-		space->machine().primary_screen->update_now();
+	if ((m_stars_enabled ^ data) & 0x01)
+		machine().primary_screen->update_now();
 
-	if (!state->m_stars_enabled && (data & 0x01))
+	if (!m_stars_enabled && (data & 0x01))
 	{
 		/* on the rising edge of this, the CLR on the shift registers is released */
 		/* this resets the "origin" of this frame to 0 minus the number of clocks */
 		/* we have counted so far */
-		state->m_star_rng_origin = STAR_RNG_PERIOD - (space->machine().primary_screen->vpos() * 512 + space->machine().primary_screen->hpos());
-		state->m_star_rng_origin_frame = space->machine().primary_screen->frame_number();
+		m_star_rng_origin = STAR_RNG_PERIOD - (machine().primary_screen->vpos() * 512 + machine().primary_screen->hpos());
+		m_star_rng_origin_frame = machine().primary_screen->frame_number();
 	}
-	state->m_stars_enabled = data & 0x01;
+	m_stars_enabled = data & 0x01;
 }
 
 
-WRITE8_HANDLER( scramble_background_enable_w )
+WRITE8_MEMBER(galaxian_state::scramble_background_enable_w)
 {
-	galaxian_state *state = space->machine().driver_data<galaxian_state>();
-	if ((state->m_background_enable ^ data) & 0x01)
-		space->machine().primary_screen->update_now();
+	if ((m_background_enable ^ data) & 0x01)
+		machine().primary_screen->update_now();
 
-	state->m_background_enable = data & 0x01;
+	m_background_enable = data & 0x01;
 }
 
 
-WRITE8_HANDLER( scramble_background_red_w )
+WRITE8_MEMBER(galaxian_state::scramble_background_red_w)
 {
-	galaxian_state *state = space->machine().driver_data<galaxian_state>();
-	if ((state->m_background_red ^ data) & 0x01)
-		space->machine().primary_screen->update_now();
+	if ((m_background_red ^ data) & 0x01)
+		machine().primary_screen->update_now();
 
-	state->m_background_red = data & 0x01;
+	m_background_red = data & 0x01;
 }
 
 
-WRITE8_HANDLER( scramble_background_green_w )
+WRITE8_MEMBER(galaxian_state::scramble_background_green_w)
 {
-	galaxian_state *state = space->machine().driver_data<galaxian_state>();
-	if ((state->m_background_green ^ data) & 0x01)
-		space->machine().primary_screen->update_now();
+	if ((m_background_green ^ data) & 0x01)
+		machine().primary_screen->update_now();
 
-	state->m_background_green = data & 0x01;
+	m_background_green = data & 0x01;
 }
 
 
-WRITE8_HANDLER( scramble_background_blue_w )
+WRITE8_MEMBER(galaxian_state::scramble_background_blue_w)
 {
-	galaxian_state *state = space->machine().driver_data<galaxian_state>();
-	if ((state->m_background_blue ^ data) & 0x01)
-		space->machine().primary_screen->update_now();
+	if ((m_background_blue ^ data) & 0x01)
+		machine().primary_screen->update_now();
 
-	state->m_background_blue = data & 0x01;
+	m_background_blue = data & 0x01;
 }
 
 
@@ -766,14 +757,13 @@ WRITE8_HANDLER( scramble_background_blue_w )
  *
  *************************************/
 
-WRITE8_HANDLER( galaxian_gfxbank_w )
+WRITE8_MEMBER(galaxian_state::galaxian_gfxbank_w)
 {
-	galaxian_state *state = space->machine().driver_data<galaxian_state>();
-	if (state->m_gfxbank[offset] != data)
+	if (m_gfxbank[offset] != data)
 	{
-		space->machine().primary_screen->update_now();
-		state->m_gfxbank[offset] = data;
-		state->m_bg_tilemap->mark_all_dirty();
+		machine().primary_screen->update_now();
+		m_gfxbank[offset] = data;
+		m_bg_tilemap->mark_all_dirty();
 	}
 }
 

@@ -151,104 +151,94 @@ VIDEO_START( splndrbt )
  *
  *************************************/
 
-READ16_HANDLER(equites_fg_videoram_r)
+READ16_MEMBER(equites_state::equites_fg_videoram_r)
 {
-	equites_state *state = space->machine().driver_data<equites_state>();
-	return 0xff00 | state->m_fg_videoram[offset];
+	return 0xff00 | m_fg_videoram[offset];
 }
 
-WRITE16_HANDLER(equites_fg_videoram_w)
+WRITE16_MEMBER(equites_state::equites_fg_videoram_w)
 {
-	equites_state *state = space->machine().driver_data<equites_state>();
 	if (ACCESSING_BITS_0_7)
 	{
-		state->m_fg_videoram[offset] = data & 0xff;
+		m_fg_videoram[offset] = data & 0xff;
 
-		state->m_fg_tilemap->mark_tile_dirty(offset >> 1);
+		m_fg_tilemap->mark_tile_dirty(offset >> 1);
 	}
 }
 
-WRITE16_HANDLER(equites_bg_videoram_w)
+WRITE16_MEMBER(equites_state::equites_bg_videoram_w)
 {
-	equites_state *state = space->machine().driver_data<equites_state>();
-	COMBINE_DATA(state->m_bg_videoram + offset);
+	COMBINE_DATA(m_bg_videoram + offset);
 
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_HANDLER(equites_bgcolor_w)
+WRITE16_MEMBER(equites_state::equites_bgcolor_w)
 {
-	equites_state *state = space->machine().driver_data<equites_state>();
 	if (ACCESSING_BITS_8_15)
-		state->m_bgcolor = data >> 8;
+		m_bgcolor = data >> 8;
 }
 
-WRITE16_HANDLER(equites_scrollreg_w)
+WRITE16_MEMBER(equites_state::equites_scrollreg_w)
 {
-	equites_state *state = space->machine().driver_data<equites_state>();
 	if (ACCESSING_BITS_0_7)
-		state->m_bg_tilemap->set_scrolly(0, data & 0xff);
+		m_bg_tilemap->set_scrolly(0, data & 0xff);
 
 	if (ACCESSING_BITS_8_15)
-		state->m_bg_tilemap->set_scrollx(0, data >> 8);
+		m_bg_tilemap->set_scrollx(0, data >> 8);
 }
 
-WRITE16_HANDLER(splndrbt_selchar0_w)
+WRITE16_MEMBER(equites_state::splndrbt_selchar0_w)
 {
-	equites_state *state = space->machine().driver_data<equites_state>();
-	if (state->m_fg_char_bank != 0)
+	if (m_fg_char_bank != 0)
 	{
-		state->m_fg_char_bank = 0;
-		state->m_fg_tilemap->mark_all_dirty();
+		m_fg_char_bank = 0;
+		m_fg_tilemap->mark_all_dirty();
 	}
 }
 
-WRITE16_HANDLER(splndrbt_selchar1_w)
+WRITE16_MEMBER(equites_state::splndrbt_selchar1_w)
 {
-	equites_state *state = space->machine().driver_data<equites_state>();
-	if (state->m_fg_char_bank != 1)
+	if (m_fg_char_bank != 1)
 	{
-		state->m_fg_char_bank = 1;
-		state->m_fg_tilemap->mark_all_dirty();
+		m_fg_char_bank = 1;
+		m_fg_tilemap->mark_all_dirty();
 	}
 }
 
-WRITE16_HANDLER(equites_flip0_w)
+WRITE16_MEMBER(equites_state::equites_flip0_w)
 {
-	flip_screen_set(space->machine(), 0);
+	flip_screen_set(machine(), 0);
 }
 
-WRITE16_HANDLER(equites_flip1_w)
+WRITE16_MEMBER(equites_state::equites_flip1_w)
 {
-	flip_screen_set(space->machine(), 1);
+	flip_screen_set(machine(), 1);
 }
 
-WRITE16_HANDLER(splndrbt_flip0_w)
+WRITE16_MEMBER(equites_state::splndrbt_flip0_w)
 {
-	equites_state *state = space->machine().driver_data<equites_state>();
 	if (ACCESSING_BITS_0_7)
-		flip_screen_set(space->machine(), 0);
+		flip_screen_set(machine(), 0);
 
 	if (ACCESSING_BITS_8_15)
-		state->m_bgcolor = data >> 8;
+		m_bgcolor = data >> 8;
 }
 
-WRITE16_HANDLER(splndrbt_flip1_w)
+WRITE16_MEMBER(equites_state::splndrbt_flip1_w)
 {
 	if (ACCESSING_BITS_0_7)
-		flip_screen_set(space->machine(), 1);
+		flip_screen_set(machine(), 1);
 }
 
-WRITE16_HANDLER(splndrbt_bg_scrollx_w)
+WRITE16_MEMBER(equites_state::splndrbt_bg_scrollx_w)
 {
-	equites_state *state = space->machine().driver_data<equites_state>();
-	COMBINE_DATA(&state->m_splndrbt_bg_scrollx);
+	COMBINE_DATA(&m_splndrbt_bg_scrollx);
 }
 
-WRITE16_HANDLER(splndrbt_bg_scrolly_w)
+WRITE16_MEMBER(equites_state::splndrbt_bg_scrolly_w)
 {
-	equites_state *state = space->machine().driver_data<equites_state>();
-	COMBINE_DATA(&state->m_splndrbt_bg_scrolly);
+	COMBINE_DATA(&m_splndrbt_bg_scrolly);
 }
 
 

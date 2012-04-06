@@ -18,13 +18,13 @@ public:
 	DECLARE_READ8_MEMBER(dsw_port_1_r);
 	DECLARE_WRITE8_MEMBER(output_port_0_w);
 	DECLARE_WRITE8_MEMBER(output_port_1_w);
+	DECLARE_WRITE8_MEMBER(snookr10_videoram_w);
+	DECLARE_WRITE8_MEMBER(snookr10_colorram_w);
 };
 
 
 /*----------- defined in video/snookr10.c -----------*/
 
-WRITE8_HANDLER( snookr10_videoram_w );
-WRITE8_HANDLER( snookr10_colorram_w );
 PALETTE_INIT( snookr10 );
 PALETTE_INIT( apple10 );
 VIDEO_START( snookr10 );

@@ -15,6 +15,20 @@ public:
 	DECLARE_WRITE32_MEMBER(latch32_w);
 	DECLARE_READ8_MEMBER(latch8_r);
 	DECLARE_WRITE8_MEMBER(latch8_w);
+	DECLARE_WRITE8_MEMBER(st0016_sprite_bank_w);
+	DECLARE_WRITE8_MEMBER(st0016_palette_bank_w);
+	DECLARE_WRITE8_MEMBER(st0016_character_bank_w);
+	DECLARE_READ8_MEMBER(st0016_sprite_ram_r);
+	DECLARE_WRITE8_MEMBER(st0016_sprite_ram_w);
+	DECLARE_READ8_MEMBER(st0016_sprite2_ram_r);
+	DECLARE_WRITE8_MEMBER(st0016_sprite2_ram_w);
+	DECLARE_READ8_MEMBER(st0016_palette_ram_r);
+	DECLARE_WRITE8_MEMBER(st0016_palette_ram_w);
+	DECLARE_READ8_MEMBER(st0016_character_ram_r);
+	DECLARE_WRITE8_MEMBER(st0016_character_ram_w);
+	DECLARE_READ8_MEMBER(st0016_vregs_r);
+	DECLARE_READ8_MEMBER(st0016_dma_r);
+	DECLARE_WRITE8_MEMBER(st0016_vregs_w);
 };
 
 #define ISMACS  (st0016_game&0x80)
@@ -48,20 +62,6 @@ extern UINT8 macs_cart_slot;
 extern UINT32 st0016_game;
 extern UINT8 *st0016_charram;
 
-READ8_HANDLER(st0016_dma_r);
-WRITE8_HANDLER	(st0016_sprite_bank_w);
-WRITE8_HANDLER	(st0016_palette_bank_w);
-WRITE8_HANDLER	(st0016_character_bank_w);
-READ8_HANDLER	(st0016_sprite_ram_r);
-WRITE8_HANDLER	(st0016_sprite_ram_w);
-READ8_HANDLER	(st0016_sprite2_ram_r);
-WRITE8_HANDLER	(st0016_sprite2_ram_w);
-READ8_HANDLER	(st0016_palette_ram_r);
-WRITE8_HANDLER	(st0016_palette_ram_w);
-READ8_HANDLER	(st0016_character_ram_r);
-WRITE8_HANDLER	(st0016_character_ram_w);
-READ8_HANDLER	(st0016_vregs_r);
-WRITE8_HANDLER	(st0016_vregs_w);
 
 void st0016_draw_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 VIDEO_START(st0016);

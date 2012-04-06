@@ -9,37 +9,34 @@
 #include "emu.h"
 #include "includes/bombjack.h"
 
-WRITE8_HANDLER( bombjack_videoram_w )
+WRITE8_MEMBER(bombjack_state::bombjack_videoram_w)
 {
-	bombjack_state *state = space->machine().driver_data<bombjack_state>();
-	state->m_videoram[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( bombjack_colorram_w )
+WRITE8_MEMBER(bombjack_state::bombjack_colorram_w)
 {
-	bombjack_state *state = space->machine().driver_data<bombjack_state>();
-	state->m_colorram[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset);
+	m_colorram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( bombjack_background_w )
+WRITE8_MEMBER(bombjack_state::bombjack_background_w)
 {
-	bombjack_state *state = space->machine().driver_data<bombjack_state>();
 
-	if (state->m_background_image != data)
+	if (m_background_image != data)
 	{
-		state->m_background_image = data;
-		state->m_bg_tilemap->mark_all_dirty();
+		m_background_image = data;
+		m_bg_tilemap->mark_all_dirty();
 	}
 }
 
-WRITE8_HANDLER( bombjack_flipscreen_w )
+WRITE8_MEMBER(bombjack_state::bombjack_flipscreen_w)
 {
-	if (flip_screen_get(space->machine()) != (data & 0x01))
+	if (flip_screen_get(machine()) != (data & 0x01))
 	{
-		flip_screen_set(space->machine(), data & 0x01);
-		space->machine().tilemap().mark_all_dirty();
+		flip_screen_set(machine(), data & 0x01);
+		machine().tilemap().mark_all_dirty();
 	}
 }
 

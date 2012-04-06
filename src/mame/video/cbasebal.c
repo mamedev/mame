@@ -62,78 +62,71 @@ VIDEO_START( cbasebal )
 
 ***************************************************************************/
 
-WRITE8_HANDLER( cbasebal_textram_w )
+WRITE8_MEMBER(cbasebal_state::cbasebal_textram_w)
 {
-	cbasebal_state *state = space->machine().driver_data<cbasebal_state>();
 
-	state->m_textram[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset & 0x7ff);
+	m_textram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset & 0x7ff);
 }
 
-READ8_HANDLER( cbasebal_textram_r )
+READ8_MEMBER(cbasebal_state::cbasebal_textram_r)
 {
-	cbasebal_state *state = space->machine().driver_data<cbasebal_state>();
-	return state->m_textram[offset];
+	return m_textram[offset];
 }
 
-WRITE8_HANDLER( cbasebal_scrollram_w )
+WRITE8_MEMBER(cbasebal_state::cbasebal_scrollram_w)
 {
-	cbasebal_state *state = space->machine().driver_data<cbasebal_state>();
 
-	state->m_scrollram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset / 2);
+	m_scrollram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-READ8_HANDLER( cbasebal_scrollram_r )
+READ8_MEMBER(cbasebal_state::cbasebal_scrollram_r)
 {
-	cbasebal_state *state = space->machine().driver_data<cbasebal_state>();
-	return state->m_scrollram[offset];
+	return m_scrollram[offset];
 }
 
-WRITE8_HANDLER( cbasebal_gfxctrl_w )
+WRITE8_MEMBER(cbasebal_state::cbasebal_gfxctrl_w)
 {
-	cbasebal_state *state = space->machine().driver_data<cbasebal_state>();
 
 	/* bit 0 is unknown - toggles continuously */
 
 	/* bit 1 is flip screen */
-	state->m_flipscreen = data & 0x02;
-	space->machine().tilemap().set_flip_all(state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	m_flipscreen = data & 0x02;
+	machine().tilemap().set_flip_all(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
 	/* bit 2 is unknown - unused? */
 
 	/* bit 3 is tile bank */
-	if (state->m_tilebank != ((data & 0x08) >> 3))
+	if (m_tilebank != ((data & 0x08) >> 3))
 	{
-		state->m_tilebank = (data & 0x08) >> 3;
-		state->m_bg_tilemap->mark_all_dirty();
+		m_tilebank = (data & 0x08) >> 3;
+		m_bg_tilemap->mark_all_dirty();
 	}
 
 	/* bit 4 is sprite bank */
-	state->m_spritebank = (data & 0x10) >> 4;
+	m_spritebank = (data & 0x10) >> 4;
 
 	/* bits 5 is text enable */
-	state->m_text_on = ~data & 0x20;
+	m_text_on = ~data & 0x20;
 
 	/* bits 6-7 are bg/sprite enable (don't know which is which) */
-	state->m_bg_on = ~data & 0x40;
-	state->m_obj_on = ~data & 0x80;
+	m_bg_on = ~data & 0x40;
+	m_obj_on = ~data & 0x80;
 
 	/* other bits unknown, but used */
 }
 
-WRITE8_HANDLER( cbasebal_scrollx_w )
+WRITE8_MEMBER(cbasebal_state::cbasebal_scrollx_w)
 {
-	cbasebal_state *state = space->machine().driver_data<cbasebal_state>();
-	state->m_scroll_x[offset] = data;
-	state->m_bg_tilemap->set_scrollx(0, state->m_scroll_x[0] + 256 * state->m_scroll_x[1]);
+	m_scroll_x[offset] = data;
+	m_bg_tilemap->set_scrollx(0, m_scroll_x[0] + 256 * m_scroll_x[1]);
 }
 
-WRITE8_HANDLER( cbasebal_scrolly_w )
+WRITE8_MEMBER(cbasebal_state::cbasebal_scrolly_w)
 {
-	cbasebal_state *state = space->machine().driver_data<cbasebal_state>();
-	state->m_scroll_y[offset] = data;
-	state->m_bg_tilemap->set_scrolly(0, state->m_scroll_y[0] + 256 * state->m_scroll_y[1]);
+	m_scroll_y[offset] = data;
+	m_bg_tilemap->set_scrolly(0, m_scroll_y[0] + 256 * m_scroll_y[1]);
 }
 
 

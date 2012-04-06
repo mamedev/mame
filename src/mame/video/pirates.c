@@ -51,25 +51,22 @@ VIDEO_START(pirates)
 
 
 
-WRITE16_HANDLER( pirates_tx_tileram_w )
+WRITE16_MEMBER(pirates_state::pirates_tx_tileram_w)
 {
-	pirates_state *state = space->machine().driver_data<pirates_state>();
-	COMBINE_DATA(state->m_tx_tileram+offset);
-	state->m_tx_tilemap->mark_tile_dirty(offset/2);
+	COMBINE_DATA(m_tx_tileram+offset);
+	m_tx_tilemap->mark_tile_dirty(offset/2);
 }
 
-WRITE16_HANDLER( pirates_fg_tileram_w )
+WRITE16_MEMBER(pirates_state::pirates_fg_tileram_w)
 {
-	pirates_state *state = space->machine().driver_data<pirates_state>();
-	COMBINE_DATA(state->m_fg_tileram+offset);
-	state->m_fg_tilemap->mark_tile_dirty(offset/2);
+	COMBINE_DATA(m_fg_tileram+offset);
+	m_fg_tilemap->mark_tile_dirty(offset/2);
 }
 
-WRITE16_HANDLER( pirates_bg_tileram_w )
+WRITE16_MEMBER(pirates_state::pirates_bg_tileram_w)
 {
-	pirates_state *state = space->machine().driver_data<pirates_state>();
-	COMBINE_DATA(state->m_bg_tileram+offset);
-	state->m_bg_tilemap->mark_tile_dirty(offset/2);
+	COMBINE_DATA(m_bg_tileram+offset);
+	m_bg_tilemap->mark_tile_dirty(offset/2);
 }
 
 

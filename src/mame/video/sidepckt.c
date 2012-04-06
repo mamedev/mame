@@ -80,24 +80,22 @@ VIDEO_START( sidepckt )
 
 ***************************************************************************/
 
-WRITE8_HANDLER( sidepckt_videoram_w )
+WRITE8_MEMBER(sidepckt_state::sidepckt_videoram_w)
 {
-	sidepckt_state *state = space->machine().driver_data<sidepckt_state>();
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( sidepckt_colorram_w )
+WRITE8_MEMBER(sidepckt_state::sidepckt_colorram_w)
 {
-	sidepckt_state *state = space->machine().driver_data<sidepckt_state>();
-	state->m_colorram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_colorram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( sidepckt_flipscreen_w )
+WRITE8_MEMBER(sidepckt_state::sidepckt_flipscreen_w)
 {
 	int flipscreen = data;
-	space->machine().tilemap().set_flip_all(flipscreen ? TILEMAP_FLIPY : TILEMAP_FLIPX);
+	machine().tilemap().set_flip_all(flipscreen ? TILEMAP_FLIPY : TILEMAP_FLIPX);
 }
 
 

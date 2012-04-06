@@ -64,17 +64,15 @@ VIDEO_START( pushman )
 
 ***************************************************************************/
 
-WRITE16_HANDLER( pushman_scroll_w )
+WRITE16_MEMBER(pushman_state::pushman_scroll_w)
 {
-	pushman_state *state = space->machine().driver_data<pushman_state>();
-	COMBINE_DATA(&state->m_control[offset]);
+	COMBINE_DATA(&m_control[offset]);
 }
 
-WRITE16_HANDLER( pushman_videoram_w )
+WRITE16_MEMBER(pushman_state::pushman_videoram_w)
 {
-	pushman_state *state = space->machine().driver_data<pushman_state>();
-	COMBINE_DATA(&state->m_videoram[offset]);
-	state->m_tx_tilemap->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_videoram[offset]);
+	m_tx_tilemap->mark_tile_dirty(offset);
 }
 
 

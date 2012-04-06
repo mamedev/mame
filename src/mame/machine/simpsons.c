@@ -11,19 +11,18 @@
 
 ***************************************************************************/
 
-WRITE8_HANDLER( simpsons_eeprom_w )
+WRITE8_MEMBER(simpsons_state::simpsons_eeprom_w)
 {
-	simpsons_state *state = space->machine().driver_data<simpsons_state>();
 
 	if (data == 0xff)
 		return;
 
-	input_port_write(space->machine(), "EEPROMOUT", data, 0xff);
+	input_port_write(machine(), "EEPROMOUT", data, 0xff);
 
-	state->m_video_bank = data & 0x03;
-	simpsons_video_banking(space->machine(), state->m_video_bank);
+	m_video_bank = data & 0x03;
+	simpsons_video_banking(machine(), m_video_bank);
 
-	state->m_firq_enabled = data & 0x04;
+	m_firq_enabled = data & 0x04;
 }
 
 /***************************************************************************
@@ -32,25 +31,23 @@ WRITE8_HANDLER( simpsons_eeprom_w )
 
 ***************************************************************************/
 
-WRITE8_HANDLER( simpsons_coin_counter_w )
+WRITE8_MEMBER(simpsons_state::simpsons_coin_counter_w)
 {
-	simpsons_state *state = space->machine().driver_data<simpsons_state>();
 
 	/* bit 0,1 coin counters */
-	coin_counter_w(space->machine(), 0, data & 0x01);
-	coin_counter_w(space->machine(), 1, data & 0x02);
+	coin_counter_w(machine(), 0, data & 0x01);
+	coin_counter_w(machine(), 1, data & 0x02);
 	/* bit 2 selects mono or stereo sound */
 	/* bit 3 = enable char ROM reading through the video RAM */
-	k052109_set_rmrd_line(state->m_k052109, (data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
+	k052109_set_rmrd_line(m_k052109, (data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
 	/* bit 4 = INIT (unknown) */
 	/* bit 5 = enable sprite ROM reading */
-	k053246_set_objcha_line(state->m_k053246, (~data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
+	k053246_set_objcha_line(m_k053246, (~data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-READ8_HANDLER( simpsons_sound_interrupt_r )
+READ8_MEMBER(simpsons_state::simpsons_sound_interrupt_r)
 {
-	simpsons_state *state = space->machine().driver_data<simpsons_state>();
-	device_set_input_line_and_vector(state->m_audiocpu, 0, HOLD_LINE, 0xff );
+	device_set_input_line_and_vector(m_audiocpu, 0, HOLD_LINE, 0xff );
 	return 0x00;
 }
 

@@ -120,23 +120,33 @@ public:
 	UINT8 *m_obj_bmp;
 	UINT8 *m_rod_bmp;
 	bitmap_ind16 *m_bitmap;
+	DECLARE_READ16_MEMBER(tx1_math_r);
+	DECLARE_WRITE16_MEMBER(tx1_math_w);
+	DECLARE_READ16_MEMBER(tx1_spcs_rom_r);
+	DECLARE_READ16_MEMBER(tx1_spcs_ram_r);
+	DECLARE_WRITE16_MEMBER(tx1_spcs_ram_w);
+	DECLARE_READ16_MEMBER(buggyboy_math_r);
+	DECLARE_WRITE16_MEMBER(buggyboy_math_w);
+	DECLARE_READ16_MEMBER(buggyboy_spcs_rom_r);
+	DECLARE_WRITE16_MEMBER(buggyboy_spcs_ram_w);
+	DECLARE_READ16_MEMBER(buggyboy_spcs_ram_r);
+	DECLARE_READ16_MEMBER(tx1_crtc_r);
+	DECLARE_WRITE16_MEMBER(tx1_crtc_w);
+	DECLARE_WRITE16_MEMBER(tx1_bankcs_w);
+	DECLARE_WRITE16_MEMBER(tx1_slincs_w);
+	DECLARE_WRITE16_MEMBER(tx1_slock_w);
+	DECLARE_WRITE16_MEMBER(tx1_scolst_w);
+	DECLARE_WRITE16_MEMBER(tx1_flgcs_w);
+	DECLARE_WRITE16_MEMBER(buggyboy_gas_w);
+	DECLARE_WRITE16_MEMBER(buggyboy_sky_w);
+	DECLARE_WRITE16_MEMBER(buggyboy_scolst_w);
 };
 
 
 /*----------- defined in machine/tx1.c -----------*/
-READ16_HANDLER( tx1_spcs_rom_r );
-READ16_HANDLER( tx1_spcs_ram_r );
-WRITE16_HANDLER( tx1_spcs_ram_w );
-READ16_HANDLER( tx1_math_r );
-WRITE16_HANDLER( tx1_math_w );
 MACHINE_RESET( tx1 );
 
 
-READ16_HANDLER( buggyboy_spcs_rom_r );
-READ16_HANDLER( buggyboy_spcs_ram_r );
-WRITE16_HANDLER( buggyboy_spcs_ram_w );
-READ16_HANDLER( buggyboy_math_r );
-WRITE16_HANDLER( buggyboy_math_w );
 MACHINE_RESET( buggyboy );
 
 /*----------- defined in audio/tx1.c -----------*/
@@ -156,8 +166,6 @@ DECLARE_LEGACY_SOUND_DEVICE(TX1, tx1_sound);
 
 
 /*----------- defined in video/tx1.c -----------*/
-READ16_HANDLER( tx1_crtc_r );
-WRITE16_HANDLER( tx1_crtc_w );
 
 PALETTE_INIT( tx1 );
 VIDEO_START( tx1 );
@@ -165,11 +173,6 @@ SCREEN_UPDATE_IND16( tx1_left );
 SCREEN_UPDATE_IND16( tx1_middle );
 SCREEN_UPDATE_IND16( tx1_right );
 SCREEN_VBLANK( tx1 );
-WRITE16_HANDLER( tx1_slincs_w );
-WRITE16_HANDLER( tx1_slock_w );
-WRITE16_HANDLER( tx1_scolst_w );
-WRITE16_HANDLER( tx1_bankcs_w );
-WRITE16_HANDLER( tx1_flgcs_w );
 
 PALETTE_INIT( buggyboy );
 VIDEO_START( buggyboy );
@@ -180,6 +183,3 @@ SCREEN_VBLANK( buggyboy );
 
 VIDEO_START( buggybjr );
 SCREEN_UPDATE_IND16( buggybjr );
-WRITE16_HANDLER( buggyboy_gas_w );
-WRITE16_HANDLER( buggyboy_sky_w );
-WRITE16_HANDLER( buggyboy_scolst_w );

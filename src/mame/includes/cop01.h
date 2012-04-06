@@ -33,6 +33,9 @@ public:
 	DECLARE_WRITE8_MEMBER(cop01_irq_ack_w);
 	DECLARE_READ8_MEMBER(cop01_sound_irq_ack_w);
 	DECLARE_READ8_MEMBER(kludge);
+	DECLARE_WRITE8_MEMBER(cop01_background_w);
+	DECLARE_WRITE8_MEMBER(cop01_foreground_w);
+	DECLARE_WRITE8_MEMBER(cop01_vreg_w);
 };
 
 
@@ -44,6 +47,3 @@ PALETTE_INIT( cop01 );
 VIDEO_START( cop01 );
 SCREEN_UPDATE_IND16( cop01 );
 
-WRITE8_HANDLER( cop01_background_w );
-WRITE8_HANDLER( cop01_foreground_w );
-WRITE8_HANDLER( cop01_vreg_w );

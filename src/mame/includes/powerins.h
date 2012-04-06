@@ -16,18 +16,18 @@ public:
 	DECLARE_WRITE16_MEMBER(powerins_okibank_w);
 	DECLARE_WRITE16_MEMBER(powerins_soundlatch_w);
 	DECLARE_READ8_MEMBER(powerinb_fake_ym2203_r);
+	DECLARE_WRITE16_MEMBER(powerins_flipscreen_w);
+	DECLARE_WRITE16_MEMBER(powerins_tilebank_w);
+	DECLARE_WRITE16_MEMBER(powerins_paletteram16_w);
+	DECLARE_WRITE16_MEMBER(powerins_vram_0_w);
+	DECLARE_WRITE16_MEMBER(powerins_vram_1_w);
 };
 
 
 /*----------- defined in video/powerins.c -----------*/
 
-WRITE16_HANDLER( powerins_flipscreen_w );
-WRITE16_HANDLER( powerins_tilebank_w );
 
-WRITE16_HANDLER( powerins_paletteram16_w );
 
-WRITE16_HANDLER( powerins_vram_0_w );
-WRITE16_HANDLER( powerins_vram_1_w );
 
 VIDEO_START( powerins );
 SCREEN_UPDATE_IND16( powerins );

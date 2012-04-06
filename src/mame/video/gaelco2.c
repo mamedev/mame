@@ -171,24 +171,23 @@ static TILE_GET_INFO( get_tile_info_gaelco2_screen1_dual )
 
 ***************************************************************************/
 
-WRITE16_HANDLER( gaelco2_vram_w )
+WRITE16_MEMBER(gaelco2_state::gaelco2_vram_w)
 {
-	gaelco2_state *state = space->machine().driver_data<gaelco2_state>();
-	int pant0_start = ((state->m_vregs[0] >> 9) & 0x07)*0x1000;
+	int pant0_start = ((m_vregs[0] >> 9) & 0x07)*0x1000;
 	int pant0_end = pant0_start + 0x1000;
-	int pant1_start = ((state->m_vregs[1] >> 9) & 0x07)*0x1000;
+	int pant1_start = ((m_vregs[1] >> 9) & 0x07)*0x1000;
 	int pant1_end = pant1_start + 0x1000;
 
-	COMBINE_DATA(&state->m_videoram[offset]);
+	COMBINE_DATA(&m_videoram[offset]);
 
 	/* tilemap 0 writes */
 	if ((offset >= pant0_start) && (offset < pant0_end)){
-		state->m_pant[0]->mark_tile_dirty(((offset << 1) & 0x1fff) >> 2);
+		m_pant[0]->mark_tile_dirty(((offset << 1) & 0x1fff) >> 2);
 	}
 
 	/* tilemap 1 writes */
 	if ((offset >= pant1_start) && (offset < pant1_end)){
-		state->m_pant[1]->mark_tile_dirty(((offset << 1) & 0x1fff) >> 2);
+		m_pant[1]->mark_tile_dirty(((offset << 1) & 0x1fff) >> 2);
 	}
 }
 
@@ -222,13 +221,12 @@ static const int pen_color_adjust[16] = {
 };
 
 
-WRITE16_HANDLER( gaelco2_palette_w )
+WRITE16_MEMBER(gaelco2_state::gaelco2_palette_w)
 {
-	gaelco2_state *state = space->machine().driver_data<gaelco2_state>();
 	int i, color, r, g, b, auxr, auxg, auxb;
 
-	COMBINE_DATA(&state->m_generic_paletteram_16[offset]);
-	color = state->m_generic_paletteram_16[offset];
+	COMBINE_DATA(&m_generic_paletteram_16[offset]);
+	color = m_generic_paletteram_16[offset];
 
 	/* extract RGB components */
 	r = (color >> 10) & 0x1f;
@@ -240,7 +238,7 @@ WRITE16_HANDLER( gaelco2_palette_w )
 	b = pal5bit(b);
 
 	/* update game palette */
-	palette_set_color(space->machine(), 4096*0 + offset, MAKE_RGB(r, g, b));
+	palette_set_color(machine(), 4096*0 + offset, MAKE_RGB(r, g, b));
 
 	/* update shadow/highligh palettes */
 	for (i = 1; i < 16; i++){
@@ -252,7 +250,7 @@ WRITE16_HANDLER( gaelco2_palette_w )
 		auxg = ADJUST_COLOR(g + pen_color_adjust[i]);
 		auxb = ADJUST_COLOR(b + pen_color_adjust[i]);
 
-		palette_set_color(space->machine(), 4096*i + offset, MAKE_RGB(auxr, auxg, auxb));
+		palette_set_color(machine(), 4096*i + offset, MAKE_RGB(auxr, auxg, auxb));
 	}
 }
 

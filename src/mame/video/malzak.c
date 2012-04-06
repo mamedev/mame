@@ -81,13 +81,12 @@ SCREEN_UPDATE_IND16( malzak )
 	return 0;
 }
 
-WRITE8_HANDLER( malzak_playfield_w )
+WRITE8_MEMBER(malzak_state::malzak_playfield_w)
 {
-	malzak_state *state = space->machine().driver_data<malzak_state>();
-	int tile = ((state->m_malzak_x / 16) * 16) + (offset / 16);
+	int tile = ((m_malzak_x / 16) * 16) + (offset / 16);
 
-//  state->m_playfield_x[tile] = state->m_malzak_x / 16;
-//  state->m_playfield_y[tile] = state->m_malzak_y;
-	state->m_playfield_code[tile] = (data & 0x1f);
+//  m_playfield_x[tile] = m_malzak_x / 16;
+//  m_playfield_y[tile] = m_malzak_y;
+	m_playfield_code[tile] = (data & 0x1f);
 	logerror("GFX: 0x16%02x write 0x%02x\n", offset, data);
 }

@@ -48,20 +48,19 @@ Note:   if MAME_DEBUG is defined, pressing Z with:
 ***************************************************************************/
 
 
-WRITE16_HANDLER( powerins_flipscreen_w )
+WRITE16_MEMBER(powerins_state::powerins_flipscreen_w)
 {
-	if (ACCESSING_BITS_0_7)	flip_screen_set(space->machine(),  data & 1 );
+	if (ACCESSING_BITS_0_7)	flip_screen_set(machine(),  data & 1 );
 }
 
-WRITE16_HANDLER( powerins_tilebank_w )
+WRITE16_MEMBER(powerins_state::powerins_tilebank_w)
 {
-	powerins_state *state = space->machine().driver_data<powerins_state>();
 	if (ACCESSING_BITS_0_7)
 	{
-		if (data != state->m_tile_bank)
+		if (data != m_tile_bank)
 		{
-			state->m_tile_bank = data;		// Tiles Bank (VRAM 0)
-			state->m_tilemap_0->mark_all_dirty();
+			m_tile_bank = data;		// Tiles Bank (VRAM 0)
+			m_tilemap_0->mark_all_dirty();
 		}
 	}
 }
@@ -75,20 +74,19 @@ WRITE16_HANDLER( powerins_tilebank_w )
 ***************************************************************************/
 
 
-WRITE16_HANDLER( powerins_paletteram16_w )
+WRITE16_MEMBER(powerins_state::powerins_paletteram16_w)
 {
 	/*  byte 0    byte 1    */
 	/*  RRRR GGGG BBBB RGBx */
 	/*  4321 4321 4321 000x */
 
-	powerins_state *state = space->machine().driver_data<powerins_state>();
-	UINT16 newword = COMBINE_DATA(&state->m_generic_paletteram_16[offset]);
+	UINT16 newword = COMBINE_DATA(&m_generic_paletteram_16[offset]);
 
 	int r = ((newword >> 11) & 0x1E ) | ((newword >> 3) & 0x01);
 	int g = ((newword >>  7) & 0x1E ) | ((newword >> 2) & 0x01);
 	int b = ((newword >>  3) & 0x1E ) | ((newword >> 1) & 0x01);
 
-	palette_set_color_rgb( space->machine(),offset, pal5bit(r),pal5bit(g),pal5bit(b) );
+	palette_set_color_rgb( machine(),offset, pal5bit(r),pal5bit(g),pal5bit(b) );
 }
 
 
@@ -131,11 +129,10 @@ static TILE_GET_INFO( get_tile_info_0 )
 			0);
 }
 
-WRITE16_HANDLER( powerins_vram_0_w )
+WRITE16_MEMBER(powerins_state::powerins_vram_0_w)
 {
-	powerins_state *state = space->machine().driver_data<powerins_state>();
-	COMBINE_DATA(&state->m_vram_0[offset]);
-	state->m_tilemap_0->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_vram_0[offset]);
+	m_tilemap_0->mark_tile_dirty(offset);
 }
 
 static TILEMAP_MAPPER( powerins_get_memory_offset_0 )
@@ -173,11 +170,10 @@ static TILE_GET_INFO( get_tile_info_1 )
 			0);
 }
 
-WRITE16_HANDLER( powerins_vram_1_w )
+WRITE16_MEMBER(powerins_state::powerins_vram_1_w)
 {
-	powerins_state *state = space->machine().driver_data<powerins_state>();
-	COMBINE_DATA(&state->m_vram_1[offset]);
-	state->m_tilemap_1->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_vram_1[offset]);
+	m_tilemap_1->mark_tile_dirty(offset);
 }
 
 

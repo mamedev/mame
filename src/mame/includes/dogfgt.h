@@ -38,17 +38,18 @@ public:
 	DECLARE_WRITE8_MEMBER(sub_irqack_w);
 	DECLARE_WRITE8_MEMBER(dogfgt_soundlatch_w);
 	DECLARE_WRITE8_MEMBER(dogfgt_soundcontrol_w);
+	DECLARE_WRITE8_MEMBER(dogfgt_plane_select_w);
+	DECLARE_READ8_MEMBER(dogfgt_bitmapram_r);
+	DECLARE_WRITE8_MEMBER(internal_bitmapram_w);
+	DECLARE_WRITE8_MEMBER(dogfgt_bitmapram_w);
+	DECLARE_WRITE8_MEMBER(dogfgt_bgvideoram_w);
+	DECLARE_WRITE8_MEMBER(dogfgt_scroll_w);
+	DECLARE_WRITE8_MEMBER(dogfgt_1800_w);
 };
 
 
 /*----------- defined in video/dogfgt.c -----------*/
 
-WRITE8_HANDLER( dogfgt_plane_select_w );
-READ8_HANDLER( dogfgt_bitmapram_r );
-WRITE8_HANDLER( dogfgt_bitmapram_w );
-WRITE8_HANDLER( dogfgt_bgvideoram_w );
-WRITE8_HANDLER( dogfgt_scroll_w );
-WRITE8_HANDLER( dogfgt_1800_w );
 
 PALETTE_INIT( dogfgt );
 VIDEO_START( dogfgt );

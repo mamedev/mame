@@ -25,6 +25,17 @@ public:
 	/* devices */
 	device_t *m_audiocpu;
 	DECLARE_WRITE16_MEMBER(crospang_soundlatch_w);
+	DECLARE_WRITE16_MEMBER(bestri_tilebank_w);
+	DECLARE_WRITE16_MEMBER(bestri_bg_scrolly_w);
+	DECLARE_WRITE16_MEMBER(bestri_fg_scrolly_w);
+	DECLARE_WRITE16_MEMBER(bestri_fg_scrollx_w);
+	DECLARE_WRITE16_MEMBER(bestri_bg_scrollx_w);
+	DECLARE_WRITE16_MEMBER(crospang_fg_scrolly_w);
+	DECLARE_WRITE16_MEMBER(crospang_bg_scrolly_w);
+	DECLARE_WRITE16_MEMBER(crospang_fg_scrollx_w);
+	DECLARE_WRITE16_MEMBER(crospang_bg_scrollx_w);
+	DECLARE_WRITE16_MEMBER(crospang_fg_videoram_w);
+	DECLARE_WRITE16_MEMBER(crospang_bg_videoram_w);
 };
 
 
@@ -33,16 +44,5 @@ public:
 VIDEO_START( crospang );
 SCREEN_UPDATE_IND16( crospang );
 
-WRITE16_HANDLER ( crospang_fg_scrolly_w );
-WRITE16_HANDLER ( crospang_bg_scrolly_w );
-WRITE16_HANDLER ( crospang_fg_scrollx_w );
-WRITE16_HANDLER ( crospang_bg_scrollx_w );
 
-WRITE16_HANDLER ( bestri_fg_scrolly_w );
-WRITE16_HANDLER ( bestri_bg_scrolly_w );
-WRITE16_HANDLER ( bestri_fg_scrollx_w );
-WRITE16_HANDLER ( bestri_bg_scrollx_w );
 
-WRITE16_HANDLER ( crospang_fg_videoram_w );
-WRITE16_HANDLER ( crospang_bg_videoram_w );
-WRITE16_HANDLER ( bestri_tilebank_w );

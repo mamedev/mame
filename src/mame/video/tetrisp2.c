@@ -44,20 +44,18 @@ To Do:
 ***************************************************************************/
 
 /* BBBBBGGGGGRRRRRx xxxxxxxxxxxxxxxx */
-WRITE16_HANDLER( tetrisp2_palette_w )
+WRITE16_MEMBER(tetrisp2_state::tetrisp2_palette_w)
 {
-	tetrisp2_state *state = space->machine().driver_data<tetrisp2_state>();
-	data = COMBINE_DATA(&state->m_generic_paletteram_16[offset]);
+	data = COMBINE_DATA(&m_generic_paletteram_16[offset]);
 	if ((offset & 1) == 0)
-		palette_set_color_rgb(space->machine(),offset/2,pal5bit(data >> 1),pal5bit(data >> 6),pal5bit(data >> 11));
+		palette_set_color_rgb(machine(),offset/2,pal5bit(data >> 1),pal5bit(data >> 6),pal5bit(data >> 11));
 }
 
-WRITE16_HANDLER( rocknms_sub_palette_w )
+WRITE16_MEMBER(tetrisp2_state::rocknms_sub_palette_w)
 {
-	tetrisp2_state *state = space->machine().driver_data<tetrisp2_state>();
-	data = COMBINE_DATA(&state->m_generic_paletteram2_16[offset]);
+	data = COMBINE_DATA(&m_generic_paletteram2_16[offset]);
 	if ((offset & 1) == 0)
-		palette_set_color_rgb(space->machine(),(0x8000 + (offset/2)),pal5bit(data >> 1),pal5bit(data >> 6),pal5bit(data >> 11));
+		palette_set_color_rgb(machine(),(0x8000 + (offset/2)),pal5bit(data >> 1),pal5bit(data >> 6),pal5bit(data >> 11));
 }
 
 
@@ -70,45 +68,40 @@ WRITE16_HANDLER( rocknms_sub_palette_w )
 
 ***************************************************************************/
 
-WRITE8_HANDLER( tetrisp2_priority_w )
+WRITE8_MEMBER(tetrisp2_state::tetrisp2_priority_w)
 {
-	tetrisp2_state *state = space->machine().driver_data<tetrisp2_state>();
 	//if (ACCESSING_BITS_8_15)
 	{
 		data |= ((data & 0xff00) >> 8);
-		state->m_priority[offset] = data;
+		m_priority[offset] = data;
 	}
 }
 
 
-WRITE8_HANDLER( rockn_priority_w )
+WRITE8_MEMBER(tetrisp2_state::rockn_priority_w)
 {
-	tetrisp2_state *state = space->machine().driver_data<tetrisp2_state>();
 	//if (ACCESSING_BITS_8_15)
 	{
-		state->m_priority[offset] = data;
+		m_priority[offset] = data;
 	}
 }
 
-WRITE16_HANDLER( rocknms_sub_priority_w )
+WRITE16_MEMBER(tetrisp2_state::rocknms_sub_priority_w)
 {
-	tetrisp2_state *state = space->machine().driver_data<tetrisp2_state>();
 	if (ACCESSING_BITS_8_15)
 	{
-		state->m_rocknms_sub_priority[offset] = data;
+		m_rocknms_sub_priority[offset] = data;
 	}
 }
 
-READ16_HANDLER( nndmseal_priority_r )
+READ16_MEMBER(tetrisp2_state::nndmseal_priority_r)
 {
-	tetrisp2_state *state = space->machine().driver_data<tetrisp2_state>();
-	return state->m_priority[offset] | 0xff00;
+	return m_priority[offset] | 0xff00;
 }
 
-READ8_HANDLER( tetrisp2_priority_r )
+READ8_MEMBER(tetrisp2_state::tetrisp2_priority_r)
 {
-	tetrisp2_state *state = space->machine().driver_data<tetrisp2_state>();
-	return state->m_priority[offset];
+	return m_priority[offset];
 }
 
 /***************************************************************************
@@ -142,11 +135,10 @@ static TILE_GET_INFO( get_tile_info_bg )
 			0);
 }
 
-WRITE16_HANDLER( tetrisp2_vram_bg_w )
+WRITE16_MEMBER(tetrisp2_state::tetrisp2_vram_bg_w)
 {
-	tetrisp2_state *state = space->machine().driver_data<tetrisp2_state>();
-	COMBINE_DATA(&state->m_vram_bg[offset]);
-	state->m_tilemap_bg->mark_tile_dirty(offset/2);
+	COMBINE_DATA(&m_vram_bg[offset]);
+	m_tilemap_bg->mark_tile_dirty(offset/2);
 }
 
 
@@ -166,11 +158,10 @@ static TILE_GET_INFO( get_tile_info_fg )
 			0);
 }
 
-WRITE16_HANDLER( tetrisp2_vram_fg_w )
+WRITE16_MEMBER(tetrisp2_state::tetrisp2_vram_fg_w)
 {
-	tetrisp2_state *state = space->machine().driver_data<tetrisp2_state>();
-	COMBINE_DATA(&state->m_vram_fg[offset]);
-	state->m_tilemap_fg->mark_tile_dirty(offset/2);
+	COMBINE_DATA(&m_vram_fg[offset]);
+	m_tilemap_fg->mark_tile_dirty(offset/2);
 }
 
 
@@ -186,11 +177,10 @@ static TILE_GET_INFO( get_tile_info_rot )
 			0);
 }
 
-WRITE16_HANDLER( tetrisp2_vram_rot_w )
+WRITE16_MEMBER(tetrisp2_state::tetrisp2_vram_rot_w)
 {
-	tetrisp2_state *state = space->machine().driver_data<tetrisp2_state>();
-	COMBINE_DATA(&state->m_vram_rot[offset]);
-	state->m_tilemap_rot->mark_tile_dirty(offset/2);
+	COMBINE_DATA(&m_vram_rot[offset]);
+	m_tilemap_rot->mark_tile_dirty(offset/2);
 }
 
 static TILE_GET_INFO( get_tile_info_rocknms_sub_bg )
@@ -205,11 +195,10 @@ static TILE_GET_INFO( get_tile_info_rocknms_sub_bg )
 			0);
 }
 
-WRITE16_HANDLER( rocknms_sub_vram_bg_w )
+WRITE16_MEMBER(tetrisp2_state::rocknms_sub_vram_bg_w)
 {
-	tetrisp2_state *state = space->machine().driver_data<tetrisp2_state>();
-	COMBINE_DATA(&state->m_rocknms_sub_vram_bg[offset]);
-	state->m_tilemap_sub_bg->mark_tile_dirty(offset/2);
+	COMBINE_DATA(&m_rocknms_sub_vram_bg[offset]);
+	m_tilemap_sub_bg->mark_tile_dirty(offset/2);
 }
 
 
@@ -225,11 +214,10 @@ static TILE_GET_INFO( get_tile_info_rocknms_sub_fg )
 			0);
 }
 
-WRITE16_HANDLER( rocknms_sub_vram_fg_w )
+WRITE16_MEMBER(tetrisp2_state::rocknms_sub_vram_fg_w)
 {
-	tetrisp2_state *state = space->machine().driver_data<tetrisp2_state>();
-	COMBINE_DATA(&state->m_rocknms_sub_vram_fg[offset]);
-	state->m_tilemap_sub_fg->mark_tile_dirty(offset/2);
+	COMBINE_DATA(&m_rocknms_sub_vram_fg[offset]);
+	m_tilemap_sub_fg->mark_tile_dirty(offset/2);
 }
 
 
@@ -245,11 +233,10 @@ static TILE_GET_INFO( get_tile_info_rocknms_sub_rot )
 			0);
 }
 
-WRITE16_HANDLER( rocknms_sub_vram_rot_w )
+WRITE16_MEMBER(tetrisp2_state::rocknms_sub_vram_rot_w)
 {
-	tetrisp2_state *state = space->machine().driver_data<tetrisp2_state>();
-	COMBINE_DATA(&state->m_rocknms_sub_vram_rot[offset]);
-	state->m_tilemap_sub_rot->mark_tile_dirty(offset/2);
+	COMBINE_DATA(&m_rocknms_sub_vram_rot[offset]);
+	m_tilemap_sub_rot->mark_tile_dirty(offset/2);
 }
 
 

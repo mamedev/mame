@@ -23,18 +23,18 @@ public:
 
 	UINT8     m_irq_mask;
 	DECLARE_WRITE8_MEMBER(irq_mask_w);
+	DECLARE_WRITE8_MEMBER(marineb_videoram_w);
+	DECLARE_WRITE8_MEMBER(marineb_colorram_w);
+	DECLARE_WRITE8_MEMBER(marineb_column_scroll_w);
+	DECLARE_WRITE8_MEMBER(marineb_palette_bank_0_w);
+	DECLARE_WRITE8_MEMBER(marineb_palette_bank_1_w);
+	DECLARE_WRITE8_MEMBER(marineb_flipscreen_x_w);
+	DECLARE_WRITE8_MEMBER(marineb_flipscreen_y_w);
 };
 
 
 /*----------- defined in video/marineb.c -----------*/
 
-WRITE8_HANDLER( marineb_videoram_w );
-WRITE8_HANDLER( marineb_colorram_w );
-WRITE8_HANDLER( marineb_column_scroll_w );
-WRITE8_HANDLER( marineb_palette_bank_0_w );
-WRITE8_HANDLER( marineb_palette_bank_1_w );
-WRITE8_HANDLER( marineb_flipscreen_x_w );
-WRITE8_HANDLER( marineb_flipscreen_y_w );
 
 PALETTE_INIT( marineb );
 VIDEO_START( marineb );

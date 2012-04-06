@@ -49,16 +49,16 @@ public:
 	DECLARE_WRITE8_MEMBER(soundcommand2_w);
 	DECLARE_WRITE8_MEMBER(airbustr_paletteram_w);
 	DECLARE_WRITE8_MEMBER(airbustr_coin_counter_w);
+	DECLARE_WRITE8_MEMBER(airbustr_videoram_w);
+	DECLARE_WRITE8_MEMBER(airbustr_colorram_w);
+	DECLARE_WRITE8_MEMBER(airbustr_videoram2_w);
+	DECLARE_WRITE8_MEMBER(airbustr_colorram2_w);
+	DECLARE_WRITE8_MEMBER(airbustr_scrollregs_w);
 };
 
 
 /*----------- defined in video/airbustr.c -----------*/
 
-WRITE8_HANDLER( airbustr_videoram_w );
-WRITE8_HANDLER( airbustr_colorram_w );
-WRITE8_HANDLER( airbustr_videoram2_w );
-WRITE8_HANDLER( airbustr_colorram2_w );
-WRITE8_HANDLER( airbustr_scrollregs_w );
 
 VIDEO_START( airbustr );
 SCREEN_UPDATE_IND16( airbustr );

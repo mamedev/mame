@@ -42,15 +42,15 @@ public:
 	DECLARE_WRITE8_MEMBER(rallyx_bang_w);
 	DECLARE_WRITE8_MEMBER(rallyx_latch_w);
 	DECLARE_WRITE8_MEMBER(locomotn_latch_w);
+	DECLARE_WRITE8_MEMBER(rallyx_videoram_w);
+	DECLARE_WRITE8_MEMBER(rallyx_scrollx_w);
+	DECLARE_WRITE8_MEMBER(rallyx_scrolly_w);
+	DECLARE_WRITE8_MEMBER(tactcian_starson_w);
 };
 
 
 /*----------- defined in video/rallyx.c -----------*/
 
-WRITE8_HANDLER( rallyx_videoram_w );
-WRITE8_HANDLER( rallyx_scrollx_w );
-WRITE8_HANDLER( rallyx_scrolly_w );
-WRITE8_HANDLER( tactcian_starson_w );
 
 PALETTE_INIT( rallyx );
 PALETTE_INIT( jungler );

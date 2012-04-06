@@ -18,6 +18,11 @@ public:
 	DECLARE_WRITE8_MEMBER(superpac_latch_w);
 	DECLARE_WRITE8_MEMBER(phozon_latch_w);
 	DECLARE_WRITE8_MEMBER(mappy_latch_w);
+	DECLARE_WRITE8_MEMBER(superpac_videoram_w);
+	DECLARE_WRITE8_MEMBER(mappy_videoram_w);
+	DECLARE_WRITE8_MEMBER(superpac_flipscreen_w);
+	DECLARE_READ8_MEMBER(superpac_flipscreen_r);
+	DECLARE_WRITE8_MEMBER(mappy_scroll_w);
 };
 
 
@@ -33,8 +38,3 @@ VIDEO_START( superpac );
 VIDEO_START( mappy );
 SCREEN_UPDATE_IND16( superpac );
 SCREEN_UPDATE_IND16( mappy );
-WRITE8_HANDLER( superpac_videoram_w );
-WRITE8_HANDLER( mappy_videoram_w );
-WRITE8_HANDLER( mappy_scroll_w );
-READ8_HANDLER( superpac_flipscreen_r );
-WRITE8_HANDLER( superpac_flipscreen_w );

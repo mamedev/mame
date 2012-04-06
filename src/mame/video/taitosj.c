@@ -197,61 +197,58 @@ VIDEO_START( taitosj )
 
 
 
-READ8_HANDLER( taitosj_gfxrom_r )
+READ8_MEMBER(taitosj_state::taitosj_gfxrom_r)
 {
-	taitosj_state *state = space->machine().driver_data<taitosj_state>();
 	UINT8 ret;
 
-	offs_t offs = state->m_gfxpointer[0] | (state->m_gfxpointer[1] << 8);
+	offs_t offs = m_gfxpointer[0] | (m_gfxpointer[1] << 8);
 
 	if (offs < 0x8000)
-		ret = space->machine().region("gfx1")->base()[offs];
+		ret = machine().region("gfx1")->base()[offs];
 	else
 		ret = 0;
 
 	offs = offs + 1;
 
-	state->m_gfxpointer[0] = offs & 0xff;
-	state->m_gfxpointer[1] = offs >> 8;
+	m_gfxpointer[0] = offs & 0xff;
+	m_gfxpointer[1] = offs >> 8;
 
 	return ret;
 }
 
 
 
-WRITE8_HANDLER( taitosj_characterram_w )
+WRITE8_MEMBER(taitosj_state::taitosj_characterram_w)
 {
-	taitosj_state *state = space->machine().driver_data<taitosj_state>();
-	if (state->m_characterram[offset] != data)
+	if (m_characterram[offset] != data)
 	{
 		if (offset < 0x1800)
 		{
-			gfx_element_mark_dirty(space->machine().gfx[0], (offset / 8) & 0xff);
-			gfx_element_mark_dirty(space->machine().gfx[1], (offset / 32) & 0x3f);
+			gfx_element_mark_dirty(machine().gfx[0], (offset / 8) & 0xff);
+			gfx_element_mark_dirty(machine().gfx[1], (offset / 32) & 0x3f);
 		}
 		else
 		{
-			gfx_element_mark_dirty(space->machine().gfx[2], (offset / 8) & 0xff);
-			gfx_element_mark_dirty(space->machine().gfx[3], (offset / 32) & 0x3f);
+			gfx_element_mark_dirty(machine().gfx[2], (offset / 8) & 0xff);
+			gfx_element_mark_dirty(machine().gfx[3], (offset / 32) & 0x3f);
 		}
 
-		state->m_characterram[offset] = data;
+		m_characterram[offset] = data;
 	}
 }
 
-WRITE8_HANDLER( junglhbr_characterram_w )
+WRITE8_MEMBER(taitosj_state::junglhbr_characterram_w)
 {
 	taitosj_characterram_w(space, offset, data ^ 0xfc);
 }
 
 
-WRITE8_HANDLER( taitosj_collision_reg_clear_w )
+WRITE8_MEMBER(taitosj_state::taitosj_collision_reg_clear_w)
 {
-	taitosj_state *state = space->machine().driver_data<taitosj_state>();
-	state->m_collision_reg[0] = 0;
-	state->m_collision_reg[1] = 0;
-	state->m_collision_reg[2] = 0;
-	state->m_collision_reg[3] = 0;
+	m_collision_reg[0] = 0;
+	m_collision_reg[1] = 0;
+	m_collision_reg[2] = 0;
+	m_collision_reg[3] = 0;
 }
 
 

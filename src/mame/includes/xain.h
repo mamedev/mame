@@ -49,6 +49,14 @@ public:
 	DECLARE_WRITE8_MEMBER(xain_68705_port_c_w);
 	DECLARE_WRITE8_MEMBER(xain_68705_ddr_c_w);
 	DECLARE_READ8_MEMBER(mcu_comm_reset_r);
+	DECLARE_WRITE8_MEMBER(xain_bgram0_w);
+	DECLARE_WRITE8_MEMBER(xain_bgram1_w);
+	DECLARE_WRITE8_MEMBER(xain_charram_w);
+	DECLARE_WRITE8_MEMBER(xain_scrollxP0_w);
+	DECLARE_WRITE8_MEMBER(xain_scrollyP0_w);
+	DECLARE_WRITE8_MEMBER(xain_scrollxP1_w);
+	DECLARE_WRITE8_MEMBER(xain_scrollyP1_w);
+	DECLARE_WRITE8_MEMBER(xain_flipscreen_w);
 };
 
 
@@ -56,11 +64,3 @@ public:
 
 SCREEN_UPDATE_IND16( xain );
 VIDEO_START( xain );
-WRITE8_HANDLER( xain_scrollxP0_w );
-WRITE8_HANDLER( xain_scrollyP0_w );
-WRITE8_HANDLER( xain_scrollxP1_w );
-WRITE8_HANDLER( xain_scrollyP1_w );
-WRITE8_HANDLER( xain_charram_w );
-WRITE8_HANDLER( xain_bgram0_w );
-WRITE8_HANDLER( xain_bgram1_w );
-WRITE8_HANDLER( xain_flipscreen_w );

@@ -120,42 +120,39 @@ VIDEO_START( retofinv )
 
 ***************************************************************************/
 
-WRITE8_HANDLER( retofinv_bg_videoram_w )
+WRITE8_MEMBER(retofinv_state::retofinv_bg_videoram_w)
 {
-	retofinv_state *state = space->machine().driver_data<retofinv_state>();
-	state->m_bg_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
+	m_bg_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_HANDLER( retofinv_fg_videoram_w )
+WRITE8_MEMBER(retofinv_state::retofinv_fg_videoram_w)
 {
-	retofinv_state *state = space->machine().driver_data<retofinv_state>();
-	state->m_fg_videoram[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
+	m_fg_videoram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_HANDLER( retofinv_gfx_ctrl_w )
+WRITE8_MEMBER(retofinv_state::retofinv_gfx_ctrl_w)
 {
-	retofinv_state *state = space->machine().driver_data<retofinv_state>();
 	switch (offset)
 	{
 		case 0:
-			flip_screen_set(space->machine(), data & 1);
+			flip_screen_set(machine(), data & 1);
 			break;
 
 		case 1:
-			if (state->m_fg_bank != (data & 1))
+			if (m_fg_bank != (data & 1))
 			{
-				state->m_fg_bank = data & 1;
-				state->m_fg_tilemap->mark_all_dirty();
+				m_fg_bank = data & 1;
+				m_fg_tilemap->mark_all_dirty();
 			}
 			break;
 
 		case 2:
-			if (state->m_bg_bank != (data & 1))
+			if (m_bg_bank != (data & 1))
 			{
-				state->m_bg_bank = data & 1;
-				state->m_bg_tilemap->mark_all_dirty();
+				m_bg_bank = data & 1;
+				m_bg_tilemap->mark_all_dirty();
 			}
 			break;
 	}

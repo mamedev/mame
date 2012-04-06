@@ -116,8 +116,8 @@ static ADDRESS_MAP_START( hexion_map, AS_PROGRAM, 8, hexion_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")
 	AM_RANGE(0xa000, 0xbfff) AM_RAM
-	AM_RANGE(0xc000, 0xdffe) AM_READWRITE_LEGACY(hexion_bankedram_r, hexion_bankedram_w)
-	AM_RANGE(0xdfff, 0xdfff) AM_WRITE_LEGACY(hexion_bankctrl_w)
+	AM_RANGE(0xc000, 0xdffe) AM_READWRITE(hexion_bankedram_r, hexion_bankedram_w)
+	AM_RANGE(0xdfff, 0xdfff) AM_WRITE(hexion_bankctrl_w)
 	AM_RANGE(0xe800, 0xe87f) AM_DEVREADWRITE_LEGACY("konami", k051649_waveform_r, k051649_waveform_w)
 	AM_RANGE(0xe880, 0xe889) AM_DEVWRITE_LEGACY("konami", k051649_frequency_w)
 	AM_RANGE(0xe88a, 0xe88e) AM_DEVWRITE_LEGACY("konami", k051649_volume_w)
@@ -131,9 +131,9 @@ static ADDRESS_MAP_START( hexion_map, AS_PROGRAM, 8, hexion_state )
 	AM_RANGE(0xf403, 0xf403) AM_READ_PORT("P2")
 	AM_RANGE(0xf440, 0xf440) AM_READ_PORT("DSW3")
 	AM_RANGE(0xf441, 0xf441) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xf480, 0xf480) AM_WRITE_LEGACY(hexion_bankswitch_w)
+	AM_RANGE(0xf480, 0xf480) AM_WRITE(hexion_bankswitch_w)
 	AM_RANGE(0xf4c0, 0xf4c0) AM_WRITE(coincntr_w)
-	AM_RANGE(0xf500, 0xf500) AM_WRITE_LEGACY(hexion_gfxrom_select_w)
+	AM_RANGE(0xf500, 0xf500) AM_WRITE(hexion_gfxrom_select_w)
 	AM_RANGE(0xf540, 0xf540) AM_READ(watchdog_reset_r)
 ADDRESS_MAP_END
 

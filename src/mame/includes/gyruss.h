@@ -30,13 +30,13 @@ public:
 	DECLARE_WRITE8_MEMBER(gyruss_i8039_irq_w);
 	DECLARE_WRITE8_MEMBER(master_nmi_mask_w);
 	DECLARE_WRITE8_MEMBER(slave_irq_mask_w);
+	DECLARE_WRITE8_MEMBER(gyruss_spriteram_w);
+	DECLARE_READ8_MEMBER(gyruss_scanline_r);
 };
 
 
 /*----------- defined in video/gyruss.c -----------*/
 
-WRITE8_HANDLER( gyruss_spriteram_w );
-READ8_HANDLER( gyruss_scanline_r );
 
 PALETTE_INIT( gyruss );
 VIDEO_START( gyruss );

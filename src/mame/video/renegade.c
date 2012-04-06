@@ -8,38 +8,34 @@
 #include "includes/renegade.h"
 
 
-WRITE8_HANDLER( renegade_videoram_w )
+WRITE8_MEMBER(renegade_state::renegade_videoram_w)
 {
-	renegade_state *state = space->machine().driver_data<renegade_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = m_videoram;
 	videoram[offset] = data;
 	offset = offset % (64 * 16);
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( renegade_videoram2_w )
+WRITE8_MEMBER(renegade_state::renegade_videoram2_w)
 {
-	renegade_state *state = space->machine().driver_data<renegade_state>();
-	state->m_videoram2[offset] = data;
+	m_videoram2[offset] = data;
 	offset = offset % (32 * 32);
-	state->m_fg_tilemap->mark_tile_dirty(offset);
+	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( renegade_flipscreen_w )
+WRITE8_MEMBER(renegade_state::renegade_flipscreen_w)
 {
-	flip_screen_set(space->machine(), ~data & 0x01);
+	flip_screen_set(machine(), ~data & 0x01);
 }
 
-WRITE8_HANDLER( renegade_scroll0_w )
+WRITE8_MEMBER(renegade_state::renegade_scroll0_w)
 {
-	renegade_state *state = space->machine().driver_data<renegade_state>();
-	state->m_scrollx = (state->m_scrollx & 0xff00) | data;
+	m_scrollx = (m_scrollx & 0xff00) | data;
 }
 
-WRITE8_HANDLER( renegade_scroll1_w )
+WRITE8_MEMBER(renegade_state::renegade_scroll1_w)
 {
-	renegade_state *state = space->machine().driver_data<renegade_state>();
-	state->m_scrollx = (state->m_scrollx & 0xff) | (data << 8);
+	m_scrollx = (m_scrollx & 0xff) | (data << 8);
 }
 
 static TILE_GET_INFO( get_bg_tilemap_info )

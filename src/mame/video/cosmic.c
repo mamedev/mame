@@ -10,10 +10,9 @@
 #include "includes/cosmic.h"
 
 
-WRITE8_HANDLER( cosmic_color_register_w )
+WRITE8_MEMBER(cosmic_state::cosmic_color_register_w)
 {
-	cosmic_state *state = space->machine().driver_data<cosmic_state>();
-	state->m_color_registers[offset] = data ? 1 : 0;
+	m_color_registers[offset] = data ? 1 : 0;
 }
 
 
@@ -244,10 +243,9 @@ PALETTE_INIT( nomnlnd )
 }
 
 
-WRITE8_HANDLER( cosmic_background_enable_w )
+WRITE8_MEMBER(cosmic_state::cosmic_background_enable_w)
 {
-	cosmic_state *state = space->machine().driver_data<cosmic_state>();
-	state->m_background_enable = data;
+	m_background_enable = data;
 }
 
 

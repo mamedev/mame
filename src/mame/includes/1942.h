@@ -25,17 +25,17 @@ public:
 	/* devices */
 	device_t *m_audiocpu;
 	DECLARE_WRITE8_MEMBER(c1942_bankswitch_w);
+	DECLARE_WRITE8_MEMBER(c1942_fgvideoram_w);
+	DECLARE_WRITE8_MEMBER(c1942_bgvideoram_w);
+	DECLARE_WRITE8_MEMBER(c1942_palette_bank_w);
+	DECLARE_WRITE8_MEMBER(c1942_scroll_w);
+	DECLARE_WRITE8_MEMBER(c1942_c804_w);
 };
 
 
 
 /*----------- defined in video/1942.c -----------*/
 
-extern WRITE8_HANDLER( c1942_fgvideoram_w );
-extern WRITE8_HANDLER( c1942_bgvideoram_w );
-extern WRITE8_HANDLER( c1942_scroll_w );
-extern WRITE8_HANDLER( c1942_c804_w );
-extern WRITE8_HANDLER( c1942_palette_bank_w );
 
 extern PALETTE_INIT( 1942 );
 extern VIDEO_START( 1942 );

@@ -33,6 +33,8 @@ public:
 	DECLARE_WRITE32_MEMBER(invasn_gun_w);
 	DECLARE_READ32_MEMBER(invasn_gun_r);
 	DECLARE_READ8_MEMBER(PIC16C5X_T0_clk_r);
+	DECLARE_READ32_MEMBER(zeus_r);
+	DECLARE_WRITE32_MEMBER(zeus_w);
 };
 
 
@@ -43,8 +45,6 @@ extern UINT32 *zeusbase;
 VIDEO_START( midzeus );
 SCREEN_UPDATE_IND16( midzeus );
 
-READ32_HANDLER( zeus_r );
-WRITE32_HANDLER( zeus_w );
 
 /*----------- defined in video/midzeus2.c -----------*/
 

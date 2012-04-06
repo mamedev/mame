@@ -25,6 +25,17 @@ public:
 	DECLARE_READ16_MEMBER(p2_gun_x);
 	DECLARE_READ16_MEMBER(p2_gun_y);
 	DECLARE_READ16_MEMBER(dallas_kludge_r);
+	DECLARE_WRITE16_MEMBER(gaelco2_coin_w);
+	DECLARE_WRITE16_MEMBER(gaelco2_coin2_w);
+	DECLARE_WRITE16_MEMBER(wrally2_coin_w);
+	DECLARE_WRITE16_MEMBER(touchgo_coin_w);
+	DECLARE_WRITE16_MEMBER(bang_clr_gun_int_w);
+	DECLARE_WRITE16_MEMBER(wrally2_adc_clk);
+	DECLARE_WRITE16_MEMBER(wrally2_adc_cs);
+	DECLARE_READ16_MEMBER(snowboar_protection_r);
+	DECLARE_WRITE16_MEMBER(snowboar_protection_w);
+	DECLARE_WRITE16_MEMBER(gaelco2_vram_w);
+	DECLARE_WRITE16_MEMBER(gaelco2_palette_w);
 };
 
 
@@ -34,25 +45,14 @@ DRIVER_INIT( alighunt );
 DRIVER_INIT( touchgo );
 DRIVER_INIT( snowboar );
 DRIVER_INIT( bang );
-WRITE16_HANDLER( gaelco2_coin_w );
-WRITE16_HANDLER( gaelco2_coin2_w );
-WRITE16_HANDLER( wrally2_coin_w );
-WRITE16_HANDLER( touchgo_coin_w );
-WRITE16_HANDLER( bang_clr_gun_int_w );
 TIMER_DEVICE_CALLBACK( bang_irq );
 CUSTOM_INPUT( wrally2_analog_bit_r );
-WRITE16_HANDLER( wrally2_adc_clk );
-WRITE16_HANDLER( wrally2_adc_cs );
 WRITE16_DEVICE_HANDLER( gaelco2_eeprom_cs_w );
 WRITE16_DEVICE_HANDLER( gaelco2_eeprom_sk_w );
 WRITE16_DEVICE_HANDLER( gaelco2_eeprom_data_w );
-READ16_HANDLER( snowboar_protection_r );
-WRITE16_HANDLER( snowboar_protection_w );
 
 /*----------- defined in video/gaelco2.c -----------*/
 
-WRITE16_HANDLER( gaelco2_vram_w );
-WRITE16_HANDLER( gaelco2_palette_w );
 SCREEN_UPDATE_IND16( gaelco2 );
 VIDEO_START( gaelco2 );
 SCREEN_UPDATE_IND16( gaelco2_left );

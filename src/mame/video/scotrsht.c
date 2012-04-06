@@ -36,47 +36,43 @@ PALETTE_INIT( scotrsht )
 	}
 }
 
-WRITE8_HANDLER( scotrsht_videoram_w )
+WRITE8_MEMBER(scotrsht_state::scotrsht_videoram_w)
 {
-	scotrsht_state *state = space->machine().driver_data<scotrsht_state>();
 
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( scotrsht_colorram_w )
+WRITE8_MEMBER(scotrsht_state::scotrsht_colorram_w)
 {
-	scotrsht_state *state = space->machine().driver_data<scotrsht_state>();
 
-	state->m_colorram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_colorram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( scotrsht_charbank_w )
+WRITE8_MEMBER(scotrsht_state::scotrsht_charbank_w)
 {
-	scotrsht_state *state = space->machine().driver_data<scotrsht_state>();
 
-	if (state->m_charbank != (data & 0x01))
+	if (m_charbank != (data & 0x01))
 	{
-		state->m_charbank = data & 0x01;
-		state->m_bg_tilemap->mark_all_dirty();
+		m_charbank = data & 0x01;
+		m_bg_tilemap->mark_all_dirty();
 	}
 
 	/* other bits unknown */
 }
 
-WRITE8_HANDLER( scotrsht_palettebank_w )
+WRITE8_MEMBER(scotrsht_state::scotrsht_palettebank_w)
 {
-	scotrsht_state *state = space->machine().driver_data<scotrsht_state>();
 
-	if (state->m_palette_bank != ((data & 0x70) >> 4))
+	if (m_palette_bank != ((data & 0x70) >> 4))
 	{
-		state->m_palette_bank = ((data & 0x70) >> 4);
-		state->m_bg_tilemap->mark_all_dirty();
+		m_palette_bank = ((data & 0x70) >> 4);
+		m_bg_tilemap->mark_all_dirty();
 	}
 
-	coin_counter_w(space->machine(), 0, data & 1);
-	coin_counter_w(space->machine(), 1, data & 2);
+	coin_counter_w(machine(), 0, data & 1);
+	coin_counter_w(machine(), 1, data & 2);
 
 	// data & 4 unknown
 }

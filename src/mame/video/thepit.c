@@ -144,81 +144,75 @@ VIDEO_START( thepit )
  *
  *************************************/
 
-WRITE8_HANDLER( thepit_videoram_w )
+WRITE8_MEMBER(thepit_state::thepit_videoram_w)
 {
-	thepit_state *state = space->machine().driver_data<thepit_state>();
-	state->m_videoram[offset] = data;
-	state->m_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_HANDLER( thepit_colorram_w )
+WRITE8_MEMBER(thepit_state::thepit_colorram_w)
 {
-	thepit_state *state = space->machine().driver_data<thepit_state>();
-	state->m_colorram[offset] = data;
-	state->m_tilemap->mark_tile_dirty(offset);
-	state->m_solid_tilemap->mark_tile_dirty(offset);
+	m_colorram[offset] = data;
+	m_tilemap->mark_tile_dirty(offset);
+	m_solid_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_HANDLER( thepit_flip_screen_x_w )
+WRITE8_MEMBER(thepit_state::thepit_flip_screen_x_w)
 {
-	thepit_state *state = space->machine().driver_data<thepit_state>();
 	int flip;
 
-	state->m_flip_screen_x = data & 0x01;
+	m_flip_screen_x = data & 0x01;
 
-	flip = state->m_flip_screen_x ? TILEMAP_FLIPX : 0;
-	if (state->m_flip_screen_y)
+	flip = m_flip_screen_x ? TILEMAP_FLIPX : 0;
+	if (m_flip_screen_y)
 		flip |= TILEMAP_FLIPY ;
 
-	state->m_tilemap->set_flip(flip);
-	state->m_solid_tilemap->set_flip(flip);
+	m_tilemap->set_flip(flip);
+	m_solid_tilemap->set_flip(flip);
 
 }
 
 
-WRITE8_HANDLER( thepit_flip_screen_y_w )
+WRITE8_MEMBER(thepit_state::thepit_flip_screen_y_w)
 {
-	thepit_state *state = space->machine().driver_data<thepit_state>();
 	int flip;
 
-	state->m_flip_screen_y = data & 0x01;
+	m_flip_screen_y = data & 0x01;
 
-	flip = state->m_flip_screen_x ? TILEMAP_FLIPX : 0;
-	if (state->m_flip_screen_y)
+	flip = m_flip_screen_x ? TILEMAP_FLIPX : 0;
+	if (m_flip_screen_y)
 		flip |= TILEMAP_FLIPY ;
 
-	state->m_tilemap->set_flip(flip);
-	state->m_solid_tilemap->set_flip(flip);
+	m_tilemap->set_flip(flip);
+	m_solid_tilemap->set_flip(flip);
 
 }
 
 
-WRITE8_HANDLER( intrepid_graphics_bank_w )
+WRITE8_MEMBER(thepit_state::intrepid_graphics_bank_w)
 {
-	thepit_state *state = space->machine().driver_data<thepit_state>();
-	if (state->m_graphics_bank != (data & 0x01))
+	if (m_graphics_bank != (data & 0x01))
 	{
-		state->m_graphics_bank = data & 0x01;
+		m_graphics_bank = data & 0x01;
 
-		state->m_tilemap->mark_all_dirty();
+		m_tilemap->mark_all_dirty();
 	}
 }
 
 
-READ8_HANDLER( thepit_input_port_0_r )
+READ8_MEMBER(thepit_state::thepit_input_port_0_r)
 {
-	thepit_state *state = space->machine().driver_data<thepit_state>();
 	/* Read either the real or the fake input ports depending on the
        horizontal flip switch. (This is how the real PCB does it) */
-	if (state->m_flip_screen_x)
+	if (m_flip_screen_x)
 	{
-		return input_port_read(space->machine(), "IN2");
+		return input_port_read(machine(), "IN2");
 	}
 	else
 	{
-		return input_port_read(space->machine(), "IN0");
+		return input_port_read(machine(), "IN0");
 	}
 }
 

@@ -38,11 +38,10 @@ void dbz_sprite_callback( running_machine &machine, int *code, int *color, int *
 
 /* Background Tilemaps */
 
-WRITE16_HANDLER( dbz_bg2_videoram_w )
+WRITE16_MEMBER(dbz_state::dbz_bg2_videoram_w)
 {
-	dbz_state *state = space->machine().driver_data<dbz_state>();
-	COMBINE_DATA(&state->m_bg2_videoram[offset]);
-	state->m_bg2_tilemap->mark_tile_dirty(offset / 2);
+	COMBINE_DATA(&m_bg2_videoram[offset]);
+	m_bg2_tilemap->mark_tile_dirty(offset / 2);
 }
 
 static TILE_GET_INFO( get_dbz_bg2_tile_info )
@@ -57,11 +56,10 @@ static TILE_GET_INFO( get_dbz_bg2_tile_info )
 	SET_TILE_INFO(0, tileno, colour + (state->m_layer_colorbase[5] << 1), flag);
 }
 
-WRITE16_HANDLER( dbz_bg1_videoram_w )
+WRITE16_MEMBER(dbz_state::dbz_bg1_videoram_w)
 {
-	dbz_state *state = space->machine().driver_data<dbz_state>();
-	COMBINE_DATA(&state->m_bg1_videoram[offset]);
-	state->m_bg1_tilemap->mark_tile_dirty(offset / 2);
+	COMBINE_DATA(&m_bg1_videoram[offset]);
+	m_bg1_tilemap->mark_tile_dirty(offset / 2);
 }
 
 static TILE_GET_INFO( get_dbz_bg1_tile_info )

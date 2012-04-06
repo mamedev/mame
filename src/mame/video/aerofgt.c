@@ -189,18 +189,16 @@ VIDEO_START( wbbc97 )
 
 ***************************************************************************/
 
-WRITE16_HANDLER( aerofgt_bg1videoram_w )
+WRITE16_MEMBER(aerofgt_state::aerofgt_bg1videoram_w)
 {
-	aerofgt_state *state = space->machine().driver_data<aerofgt_state>();
-	COMBINE_DATA(&state->m_bg1videoram[offset]);
-	state->m_bg1_tilemap->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_bg1videoram[offset]);
+	m_bg1_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_HANDLER( aerofgt_bg2videoram_w )
+WRITE16_MEMBER(aerofgt_state::aerofgt_bg2videoram_w)
 {
-	aerofgt_state *state = space->machine().driver_data<aerofgt_state>();
-	COMBINE_DATA(&state->m_bg2videoram[offset]);
-	state->m_bg2_tilemap->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_bg2videoram[offset]);
+	m_bg2_tilemap->mark_tile_dirty(offset);
 }
 
 
@@ -214,117 +212,104 @@ static void setbank( running_machine &machine, tilemap_t *tmap, int num, int ban
 	}
 }
 
-WRITE16_HANDLER( pspikes_gfxbank_w )
+WRITE16_MEMBER(aerofgt_state::pspikes_gfxbank_w)
 {
-	aerofgt_state *state = space->machine().driver_data<aerofgt_state>();
 	if (ACCESSING_BITS_0_7)
 	{
-		setbank(space->machine(), state->m_bg1_tilemap, 0, (data & 0xf0) >> 4);
-		setbank(space->machine(), state->m_bg1_tilemap, 1, data & 0x0f);
+		setbank(machine(), m_bg1_tilemap, 0, (data & 0xf0) >> 4);
+		setbank(machine(), m_bg1_tilemap, 1, data & 0x0f);
 	}
 }
 
-WRITE16_HANDLER( pspikesb_gfxbank_w )
+WRITE16_MEMBER(aerofgt_state::pspikesb_gfxbank_w)
 {
-	aerofgt_state *state = space->machine().driver_data<aerofgt_state>();
-	COMBINE_DATA(&state->m_rasterram[0x200 / 2]);
+	COMBINE_DATA(&m_rasterram[0x200 / 2]);
 
-	setbank(space->machine(), state->m_bg1_tilemap, 0, (data & 0xf000) >> 12);
-	setbank(space->machine(), state->m_bg1_tilemap, 1, (data & 0x0f00) >> 8);
+	setbank(machine(), m_bg1_tilemap, 0, (data & 0xf000) >> 12);
+	setbank(machine(), m_bg1_tilemap, 1, (data & 0x0f00) >> 8);
 }
 
-WRITE16_HANDLER( spikes91_lookup_w )
+WRITE16_MEMBER(aerofgt_state::spikes91_lookup_w)
 {
-	aerofgt_state *state = space->machine().driver_data<aerofgt_state>();
-	state->m_spikes91_lookup = data & 1;
+	m_spikes91_lookup = data & 1;
 }
 
-WRITE16_HANDLER( karatblz_gfxbank_w )
+WRITE16_MEMBER(aerofgt_state::karatblz_gfxbank_w)
 {
-	aerofgt_state *state = space->machine().driver_data<aerofgt_state>();
 	if (ACCESSING_BITS_8_15)
 	{
-		setbank(space->machine(), state->m_bg1_tilemap, 0, (data & 0x0100) >> 8);
-		setbank(space->machine(), state->m_bg2_tilemap, 1, (data & 0x0800) >> 11);
+		setbank(machine(), m_bg1_tilemap, 0, (data & 0x0100) >> 8);
+		setbank(machine(), m_bg2_tilemap, 1, (data & 0x0800) >> 11);
 	}
 }
 
-WRITE16_HANDLER( spinlbrk_gfxbank_w )
+WRITE16_MEMBER(aerofgt_state::spinlbrk_gfxbank_w)
 {
-	aerofgt_state *state = space->machine().driver_data<aerofgt_state>();
 	if (ACCESSING_BITS_0_7)
 	{
-		setbank(space->machine(), state->m_bg1_tilemap, 0, (data & 0x07));
-		setbank(space->machine(), state->m_bg2_tilemap, 1, (data & 0x38) >> 3);
+		setbank(machine(), m_bg1_tilemap, 0, (data & 0x07));
+		setbank(machine(), m_bg2_tilemap, 1, (data & 0x38) >> 3);
 	}
 }
 
-WRITE16_HANDLER( turbofrc_gfxbank_w )
+WRITE16_MEMBER(aerofgt_state::turbofrc_gfxbank_w)
 {
-	aerofgt_state *state = space->machine().driver_data<aerofgt_state>();
-	tilemap_t *tmap = (offset == 0) ? state->m_bg1_tilemap : state->m_bg2_tilemap;
+	tilemap_t *tmap = (offset == 0) ? m_bg1_tilemap : m_bg2_tilemap;
 
-	data = COMBINE_DATA(&state->m_bank[offset]);
+	data = COMBINE_DATA(&m_bank[offset]);
 
-	setbank(space->machine(), tmap, 4 * offset + 0, (data >> 0) & 0x0f);
-	setbank(space->machine(), tmap, 4 * offset + 1, (data >> 4) & 0x0f);
-	setbank(space->machine(), tmap, 4 * offset + 2, (data >> 8) & 0x0f);
-	setbank(space->machine(), tmap, 4 * offset + 3, (data >> 12) & 0x0f);
+	setbank(machine(), tmap, 4 * offset + 0, (data >> 0) & 0x0f);
+	setbank(machine(), tmap, 4 * offset + 1, (data >> 4) & 0x0f);
+	setbank(machine(), tmap, 4 * offset + 2, (data >> 8) & 0x0f);
+	setbank(machine(), tmap, 4 * offset + 3, (data >> 12) & 0x0f);
 }
 
-WRITE16_HANDLER( aerofgt_gfxbank_w )
+WRITE16_MEMBER(aerofgt_state::aerofgt_gfxbank_w)
 {
-	aerofgt_state *state = space->machine().driver_data<aerofgt_state>();
-	tilemap_t *tmap = (offset < 2) ? state->m_bg1_tilemap : state->m_bg2_tilemap;
+	tilemap_t *tmap = (offset < 2) ? m_bg1_tilemap : m_bg2_tilemap;
 
-	data = COMBINE_DATA(&state->m_bank[offset]);
+	data = COMBINE_DATA(&m_bank[offset]);
 
-	setbank(space->machine(), tmap, 2 * offset + 0, (data >> 8) & 0xff);
-	setbank(space->machine(), tmap, 2 * offset + 1, (data >> 0) & 0xff);
+	setbank(machine(), tmap, 2 * offset + 0, (data >> 8) & 0xff);
+	setbank(machine(), tmap, 2 * offset + 1, (data >> 0) & 0xff);
 }
 
-WRITE16_HANDLER( aerofgt_bg1scrollx_w )
+WRITE16_MEMBER(aerofgt_state::aerofgt_bg1scrollx_w)
 {
-	aerofgt_state *state = space->machine().driver_data<aerofgt_state>();
-	COMBINE_DATA(&state->m_bg1scrollx);
+	COMBINE_DATA(&m_bg1scrollx);
 }
 
-WRITE16_HANDLER( aerofgt_bg1scrolly_w )
+WRITE16_MEMBER(aerofgt_state::aerofgt_bg1scrolly_w)
 {
-	aerofgt_state *state = space->machine().driver_data<aerofgt_state>();
-	COMBINE_DATA(&state->m_bg1scrolly);
+	COMBINE_DATA(&m_bg1scrolly);
 }
 
-WRITE16_HANDLER( aerofgt_bg2scrollx_w )
+WRITE16_MEMBER(aerofgt_state::aerofgt_bg2scrollx_w)
 {
-	aerofgt_state *state = space->machine().driver_data<aerofgt_state>();
-	COMBINE_DATA(&state->m_bg2scrollx);
+	COMBINE_DATA(&m_bg2scrollx);
 }
 
-WRITE16_HANDLER( aerofgt_bg2scrolly_w )
+WRITE16_MEMBER(aerofgt_state::aerofgt_bg2scrolly_w)
 {
-	aerofgt_state *state = space->machine().driver_data<aerofgt_state>();
-	COMBINE_DATA(&state->m_bg2scrolly);
+	COMBINE_DATA(&m_bg2scrolly);
 }
 
-WRITE16_HANDLER( pspikes_palette_bank_w )
+WRITE16_MEMBER(aerofgt_state::pspikes_palette_bank_w)
 {
-	aerofgt_state *state = space->machine().driver_data<aerofgt_state>();
 	if (ACCESSING_BITS_0_7)
 	{
-		state->m_spritepalettebank = data & 0x03;
-		if (state->m_charpalettebank != (data & 0x1c) >> 2)
+		m_spritepalettebank = data & 0x03;
+		if (m_charpalettebank != (data & 0x1c) >> 2)
 		{
-			state->m_charpalettebank = (data & 0x1c) >> 2;
-			state->m_bg1_tilemap->mark_all_dirty();
+			m_charpalettebank = (data & 0x1c) >> 2;
+			m_bg1_tilemap->mark_all_dirty();
 		}
 	}
 }
 
-WRITE16_HANDLER( wbbc97_bitmap_enable_w )
+WRITE16_MEMBER(aerofgt_state::wbbc97_bitmap_enable_w)
 {
-	aerofgt_state *state = space->machine().driver_data<aerofgt_state>();
-	COMBINE_DATA(&state->m_wbbc97_bitmap_enable);
+	COMBINE_DATA(&m_wbbc97_bitmap_enable);
 }
 
 /***************************************************************************

@@ -39,39 +39,35 @@ PALETTE_INIT( funkybee )
 	}
 }
 
-WRITE8_HANDLER( funkybee_videoram_w )
+WRITE8_MEMBER(funkybee_state::funkybee_videoram_w)
 {
-	funkybee_state *state = space->machine().driver_data<funkybee_state>();
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( funkybee_colorram_w )
+WRITE8_MEMBER(funkybee_state::funkybee_colorram_w)
 {
-	funkybee_state *state = space->machine().driver_data<funkybee_state>();
-	state->m_colorram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_colorram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( funkybee_gfx_bank_w )
+WRITE8_MEMBER(funkybee_state::funkybee_gfx_bank_w)
 {
-	funkybee_state *state = space->machine().driver_data<funkybee_state>();
-	if (state->m_gfx_bank != (data & 0x01))
+	if (m_gfx_bank != (data & 0x01))
 	{
-		state->m_gfx_bank = data & 0x01;
-		space->machine().tilemap().mark_all_dirty();
+		m_gfx_bank = data & 0x01;
+		machine().tilemap().mark_all_dirty();
 	}
 }
 
-WRITE8_HANDLER( funkybee_scroll_w )
+WRITE8_MEMBER(funkybee_state::funkybee_scroll_w)
 {
-	funkybee_state *state = space->machine().driver_data<funkybee_state>();
-	state->m_bg_tilemap->set_scrollx(0, flip_screen_get(space->machine()) ? -data : data);
+	m_bg_tilemap->set_scrollx(0, flip_screen_get(machine()) ? -data : data);
 }
 
-WRITE8_HANDLER( funkybee_flipscreen_w )
+WRITE8_MEMBER(funkybee_state::funkybee_flipscreen_w)
 {
-	flip_screen_set(space->machine(), data & 0x01);
+	flip_screen_set(machine(), data & 0x01);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )

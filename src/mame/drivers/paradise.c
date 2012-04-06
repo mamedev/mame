@@ -74,9 +74,9 @@ WRITE8_MEMBER(paradise_state::torus_coin_counter_w)
 #define STANDARD_MAP	\
 	AM_RANGE(0x0000, 0x7fff) AM_ROM	/* ROM */	\
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")	/* ROM (banked) */ \
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE_LEGACY(paradise_vram_2_w) AM_BASE(m_vram_2)	/* Background */ \
-	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE_LEGACY(paradise_vram_1_w) AM_BASE(m_vram_1)	/* Midground */ \
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE_LEGACY(paradise_vram_0_w) AM_BASE(m_vram_0)	/* Foreground */ \
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(paradise_vram_2_w) AM_BASE(m_vram_2)	/* Background */ \
+	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(paradise_vram_1_w) AM_BASE(m_vram_1)	/* Midground */ \
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(paradise_vram_0_w) AM_BASE(m_vram_0)	/* Foreground */ \
 
 
 static ADDRESS_MAP_START( paradise_map, AS_PROGRAM, 8, paradise_state )
@@ -100,10 +100,10 @@ static ADDRESS_MAP_START( torus_map, AS_PROGRAM, 8, paradise_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( paradise_io_map, AS_IO, 8, paradise_state )
-	AM_RANGE(0x0000, 0x17ff) AM_RAM_WRITE_LEGACY(paradise_palette_w) AM_BASE(m_paletteram)	// Palette
-	AM_RANGE(0x1800, 0x1800) AM_WRITE_LEGACY(paradise_priority_w)	// Layers priority
-	AM_RANGE(0x2001, 0x2001) AM_WRITE_LEGACY(paradise_flipscreen_w)	// Flip Screen
-	AM_RANGE(0x2004, 0x2004) AM_WRITE_LEGACY(paradise_palbank_w)	// Layers palette bank
+	AM_RANGE(0x0000, 0x17ff) AM_RAM_WRITE(paradise_palette_w) AM_BASE(m_paletteram)	// Palette
+	AM_RANGE(0x1800, 0x1800) AM_WRITE(paradise_priority_w)	// Layers priority
+	AM_RANGE(0x2001, 0x2001) AM_WRITE(paradise_flipscreen_w)	// Flip Screen
+	AM_RANGE(0x2004, 0x2004) AM_WRITE(paradise_palbank_w)	// Layers palette bank
 	AM_RANGE(0x2006, 0x2006) AM_WRITE(paradise_rombank_w)	// ROM bank
 	AM_RANGE(0x2007, 0x2007) AM_DEVWRITE_LEGACY("oki2", paradise_okibank_w)	// OKI 1 samples bank
 	AM_RANGE(0x2010, 0x2010) AM_DEVREADWRITE("oki1", okim6295_device, read, write)	// OKI 0
@@ -113,14 +113,14 @@ static ADDRESS_MAP_START( paradise_io_map, AS_IO, 8, paradise_state )
 	AM_RANGE(0x2023, 0x2023) AM_READ_PORT("P2")
 	AM_RANGE(0x2024, 0x2024) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x2030, 0x2030) AM_DEVREADWRITE("oki2", okim6295_device, read, write)	// OKI 1
-	AM_RANGE(0x8000, 0xffff) AM_RAM_WRITE_LEGACY(paradise_pixmap_w) AM_BASE(m_videoram)	// Pixmap
+	AM_RANGE(0x8000, 0xffff) AM_RAM_WRITE(paradise_pixmap_w) AM_BASE(m_videoram)	// Pixmap
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( torus_io_map, AS_IO, 8, paradise_state )
-	AM_RANGE(0x0000, 0x17ff) AM_RAM_WRITE_LEGACY(paradise_palette_w) AM_BASE(m_paletteram)	// Palette
-	AM_RANGE(0x1800, 0x1800) AM_WRITE_LEGACY(paradise_priority_w)	// Layers priority
-	AM_RANGE(0x2001, 0x2001) AM_WRITE_LEGACY(paradise_flipscreen_w)	// Flip Screen
-	AM_RANGE(0x2004, 0x2004) AM_WRITE_LEGACY(paradise_palbank_w)	// Layers palette bank
+	AM_RANGE(0x0000, 0x17ff) AM_RAM_WRITE(paradise_palette_w) AM_BASE(m_paletteram)	// Palette
+	AM_RANGE(0x1800, 0x1800) AM_WRITE(paradise_priority_w)	// Layers priority
+	AM_RANGE(0x2001, 0x2001) AM_WRITE(paradise_flipscreen_w)	// Flip Screen
+	AM_RANGE(0x2004, 0x2004) AM_WRITE(paradise_palbank_w)	// Layers palette bank
 	AM_RANGE(0x2006, 0x2006) AM_WRITE(paradise_rombank_w)	// ROM bank
 	AM_RANGE(0x2010, 0x2010) AM_DEVREADWRITE("oki1", okim6295_device, read, write)	// OKI 0
 	AM_RANGE(0x2020, 0x2020) AM_READ_PORT("DSW1")
@@ -128,7 +128,7 @@ static ADDRESS_MAP_START( torus_io_map, AS_IO, 8, paradise_state )
 	AM_RANGE(0x2022, 0x2022) AM_READ_PORT("P1")
 	AM_RANGE(0x2023, 0x2023) AM_READ_PORT("P2")
 	AM_RANGE(0x2024, 0x2024) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x8000, 0xffff) AM_RAM_WRITE_LEGACY(paradise_pixmap_w) AM_BASE(m_videoram)	// Pixmap
+	AM_RANGE(0x8000, 0xffff) AM_RAM_WRITE(paradise_pixmap_w) AM_BASE(m_videoram)	// Pixmap
 ADDRESS_MAP_END
 
 
@@ -1223,7 +1223,7 @@ static DRIVER_INIT (tgtball)
 {
 	paradise_state *state = machine.driver_data<paradise_state>();
 	state->m_sprite_inc = 4;
-	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0x2001, 0x2001, FUNC(tgtball_flipscreen_w) );
+	machine.device("maincpu")->memory().space(AS_IO)->install_write_handler(0x2001, 0x2001, write8_delegate(FUNC(paradise_state::tgtball_flipscreen_w),state));
 
 }
 

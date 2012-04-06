@@ -35,6 +35,13 @@ public:
 	DECLARE_WRITE8_MEMBER(prosoccr_io_bank_w);
 	DECLARE_READ8_MEMBER(prosport_charram_r);
 	DECLARE_WRITE8_MEMBER(prosport_charram_w);
+	DECLARE_WRITE8_MEMBER(deco16_io_w);
+	DECLARE_WRITE8_MEMBER(prosoccr_io_w);
+	DECLARE_WRITE8_MEMBER(prosport_io_w);
+	DECLARE_WRITE8_MEMBER(liberate_videoram_w);
+	DECLARE_WRITE8_MEMBER(liberate_colorram_w);
+	DECLARE_WRITE8_MEMBER(prosport_bg_vram_w);
+	DECLARE_WRITE8_MEMBER(prosport_paletteram_w);
 };
 
 
@@ -50,11 +57,4 @@ VIDEO_START( prosport );
 VIDEO_START( boomrang );
 VIDEO_START( liberate );
 
-WRITE8_HANDLER( deco16_io_w );
-WRITE8_HANDLER( prosoccr_io_w );
-WRITE8_HANDLER( prosport_io_w );
-WRITE8_HANDLER( prosport_paletteram_w );
-WRITE8_HANDLER( prosport_bg_vram_w );
-WRITE8_HANDLER( liberate_videoram_w );
-WRITE8_HANDLER( liberate_colorram_w );
 

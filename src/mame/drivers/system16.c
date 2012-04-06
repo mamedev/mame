@@ -135,11 +135,11 @@ static ADDRESS_MAP_START( shinobib_map, AS_PROGRAM, 16, segas1x_bootleg_state )
 	AM_RANGE(0xc42002, 0xc42003) AM_READ_PORT("DSW2")
 	AM_RANGE(0xC43000, 0xC43001) AM_WRITENOP
 	AM_RANGE(0xC44000, 0xC44001) AM_WRITENOP
-	AM_RANGE(0xc46000, 0xc46001) AM_WRITE_LEGACY(s16a_bootleg_bgscrolly_w)
-	AM_RANGE(0xc46002, 0xc46003) AM_WRITE_LEGACY(s16a_bootleg_bgscrollx_w)
-	AM_RANGE(0xc46004, 0xc46005) AM_WRITE_LEGACY(s16a_bootleg_fgscrolly_w)
-	AM_RANGE(0xc46006, 0xc46007) AM_WRITE_LEGACY(s16a_bootleg_fgscrollx_w)
-	AM_RANGE(0xc46008, 0xc46009) AM_WRITE_LEGACY(s16a_bootleg_tilemapselect_w)
+	AM_RANGE(0xc46000, 0xc46001) AM_WRITE(s16a_bootleg_bgscrolly_w)
+	AM_RANGE(0xc46002, 0xc46003) AM_WRITE(s16a_bootleg_bgscrollx_w)
+	AM_RANGE(0xc46004, 0xc46005) AM_WRITE(s16a_bootleg_fgscrolly_w)
+	AM_RANGE(0xc46006, 0xc46007) AM_WRITE(s16a_bootleg_fgscrollx_w)
+	AM_RANGE(0xc46008, 0xc46009) AM_WRITE(s16a_bootleg_tilemapselect_w)
 	AM_RANGE(0xC60000, 0xC60001) AM_READNOP
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM // work ram
 ADDRESS_MAP_END
@@ -190,11 +190,11 @@ static ADDRESS_MAP_START( passshtb_map, AS_PROGRAM, 16, segas1x_bootleg_state )
 	AM_RANGE(0xc42002, 0xc42003) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc42000, 0xc42001) AM_READ_PORT("DSW2")
 	AM_RANGE(0xc42006, 0xc42007) AM_WRITE(sound_command_w)
-	AM_RANGE(0xc46000, 0xc46001) AM_WRITE_LEGACY(s16a_bootleg_bgscrolly_w)
-	AM_RANGE(0xc46002, 0xc46003) AM_WRITE_LEGACY(s16a_bootleg_bgscrollx_w)
-	AM_RANGE(0xc46004, 0xc46005) AM_WRITE_LEGACY(s16a_bootleg_fgscrolly_w)
-	AM_RANGE(0xc46006, 0xc46007) AM_WRITE_LEGACY(s16a_bootleg_fgscrollx_w)
-	AM_RANGE(0xc46008, 0xc46009) AM_WRITE_LEGACY(s16a_bootleg_tilemapselect_w)
+	AM_RANGE(0xc46000, 0xc46001) AM_WRITE(s16a_bootleg_bgscrolly_w)
+	AM_RANGE(0xc46002, 0xc46003) AM_WRITE(s16a_bootleg_bgscrollx_w)
+	AM_RANGE(0xc46004, 0xc46005) AM_WRITE(s16a_bootleg_fgscrolly_w)
+	AM_RANGE(0xc46006, 0xc46007) AM_WRITE(s16a_bootleg_fgscrollx_w)
+	AM_RANGE(0xc46008, 0xc46009) AM_WRITE(s16a_bootleg_tilemapselect_w)
 
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM // work ram
 ADDRESS_MAP_END
@@ -273,11 +273,11 @@ static ADDRESS_MAP_START( passht4b_map, AS_PROGRAM, 16, segas1x_bootleg_state )
 	AM_RANGE(0xc43004, 0xc43005) AM_READ_PORT("P3")
 	AM_RANGE(0xc43006, 0xc43007) AM_READ_PORT("P4")
 	AM_RANGE(0xc4600a, 0xc4600b) AM_WRITE(sys16_coinctrl_w)	/* coin counter doesn't work */
-	AM_RANGE(0xc46000, 0xc46001) AM_WRITE_LEGACY(s16a_bootleg_bgscrolly_w)
-	AM_RANGE(0xc46002, 0xc46003) AM_WRITE_LEGACY(s16a_bootleg_bgscrollx_w)
-	AM_RANGE(0xc46004, 0xc46005) AM_WRITE_LEGACY(s16a_bootleg_fgscrolly_w)
-	AM_RANGE(0xc46006, 0xc46007) AM_WRITE_LEGACY(s16a_bootleg_fgscrollx_w)
-	AM_RANGE(0xc46008, 0xc46009) AM_WRITE_LEGACY(s16a_bootleg_tilemapselect_w)
+	AM_RANGE(0xc46000, 0xc46001) AM_WRITE(s16a_bootleg_bgscrolly_w)
+	AM_RANGE(0xc46002, 0xc46003) AM_WRITE(s16a_bootleg_bgscrollx_w)
+	AM_RANGE(0xc46004, 0xc46005) AM_WRITE(s16a_bootleg_fgscrolly_w)
+	AM_RANGE(0xc46006, 0xc46007) AM_WRITE(s16a_bootleg_fgscrollx_w)
+	AM_RANGE(0xc46008, 0xc46009) AM_WRITE(s16a_bootleg_tilemapselect_w)
 
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM // work ram
 ADDRESS_MAP_END
@@ -318,11 +318,11 @@ static ADDRESS_MAP_START( wb3bbl_map, AS_PROGRAM, 16, segas1x_bootleg_state )
 	AM_RANGE(0xc42002, 0xc42003) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc42006, 0xc42007) AM_WRITE(sound_command_w)
 	AM_RANGE(0xC44000, 0xC44001) AM_WRITENOP
-	AM_RANGE(0xc46000, 0xc46001) AM_WRITE_LEGACY(s16a_bootleg_bgscrolly_w)
-	AM_RANGE(0xc46002, 0xc46003) AM_WRITE_LEGACY(s16a_bootleg_bgscrollx_w)
-	AM_RANGE(0xc46004, 0xc46005) AM_WRITE_LEGACY(s16a_bootleg_fgscrolly_w)
-	AM_RANGE(0xc46006, 0xc46007) AM_WRITE_LEGACY(s16a_bootleg_fgscrollx_w)
-	AM_RANGE(0xc46008, 0xc46009) AM_WRITE_LEGACY(s16a_bootleg_tilemapselect_w)
+	AM_RANGE(0xc46000, 0xc46001) AM_WRITE(s16a_bootleg_bgscrolly_w)
+	AM_RANGE(0xc46002, 0xc46003) AM_WRITE(s16a_bootleg_bgscrollx_w)
+	AM_RANGE(0xc46004, 0xc46005) AM_WRITE(s16a_bootleg_fgscrolly_w)
+	AM_RANGE(0xc46006, 0xc46007) AM_WRITE(s16a_bootleg_fgscrollx_w)
+	AM_RANGE(0xc46008, 0xc46009) AM_WRITE(s16a_bootleg_tilemapselect_w)
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM // work ram
 ADDRESS_MAP_END
 
@@ -510,8 +510,8 @@ static ADDRESS_MAP_START( bayroute_map, AS_PROGRAM, 16, segas1x_bootleg_state )
 	AM_RANGE(0x100000, 0x100003) AM_WRITENOP // tilebank control?
 	AM_RANGE(0x500000, 0x503fff) AM_RAM // work ram
 	AM_RANGE(0x600000, 0x600fff) AM_RAM AM_BASE_LEGACY(&segaic16_spriteram_0)
-	AM_RANGE(0x700000, 0x70ffff) AM_RAM_WRITE_LEGACY(sys16_tileram_w) AM_BASE(m_tileram)
-	AM_RANGE(0x710000, 0x710fff) AM_RAM_WRITE_LEGACY(sys16_textram_w) AM_BASE(m_textram)
+	AM_RANGE(0x700000, 0x70ffff) AM_RAM_WRITE(sys16_tileram_w) AM_BASE(m_tileram)
+	AM_RANGE(0x710000, 0x710fff) AM_RAM_WRITE(sys16_textram_w) AM_BASE(m_textram)
 	AM_RANGE(0x800000, 0x800fff) AM_RAM_WRITE_LEGACY(segaic16_paletteram_w)  AM_BASE_LEGACY(&segaic16_paletteram)
 	AM_RANGE(0x900000, 0x900001) AM_WRITE(sys16_coinctrl_w)
 	AM_RANGE(0x901002, 0x901003) AM_READ_PORT("P1")
@@ -597,8 +597,8 @@ WRITE16_MEMBER(segas1x_bootleg_state::s16bl_bgscrolly_w)
 
 static ADDRESS_MAP_START( goldnaxeb1_map, AS_PROGRAM, 16, segas1x_bootleg_state )
 	AM_RANGE(0x000000, 0x0bffff) AM_ROM
-	AM_RANGE(0x100000, 0x10ffff) AM_RAM_WRITE_LEGACY(sys16_tileram_w) AM_BASE(m_tileram)
-	AM_RANGE(0x110000, 0x110fff) AM_RAM_WRITE_LEGACY(sys16_textram_w) AM_BASE(m_textram)
+	AM_RANGE(0x100000, 0x10ffff) AM_RAM_WRITE(sys16_tileram_w) AM_BASE(m_tileram)
+	AM_RANGE(0x110000, 0x110fff) AM_RAM_WRITE(sys16_textram_w) AM_BASE(m_textram)
 	AM_RANGE(0x118000, 0x118001) AM_WRITE(s16bl_fgscrolly_w)
 	AM_RANGE(0x118008, 0x118009) AM_WRITE(s16bl_fgscrollx_bank_w) // and tile bank
 	AM_RANGE(0x118010, 0x118011) AM_WRITE(s16bl_bgscrolly_w)
@@ -624,8 +624,8 @@ static ADDRESS_MAP_START( bayrouteb1_map, AS_PROGRAM, 16, segas1x_bootleg_state 
 	AM_RANGE(0x000000, 0x0bffff) AM_ROM
 	AM_RANGE(0x500000, 0x503fff) AM_RAM // work ram
 	AM_RANGE(0x600000, 0x600fff) AM_RAM AM_BASE_LEGACY(&segaic16_spriteram_0)
-	AM_RANGE(0x700000, 0x70ffff) AM_RAM_WRITE_LEGACY(sys16_tileram_w) AM_BASE(m_tileram)
-	AM_RANGE(0x710000, 0x710fff) AM_RAM_WRITE_LEGACY(sys16_textram_w) AM_BASE(m_textram)
+	AM_RANGE(0x700000, 0x70ffff) AM_RAM_WRITE(sys16_tileram_w) AM_BASE(m_tileram)
+	AM_RANGE(0x710000, 0x710fff) AM_RAM_WRITE(sys16_textram_w) AM_BASE(m_textram)
 	AM_RANGE(0x718000, 0x718001) AM_WRITE(s16bl_fgscrolly_w)
 	AM_RANGE(0x718008, 0x718009) AM_WRITE(s16bl_fgscrollx_bank_w) // and tile bank
 	AM_RANGE(0x718010, 0x718011) AM_WRITE(s16bl_bgscrolly_w)
@@ -693,8 +693,8 @@ static ADDRESS_MAP_START( bayrouteb2_map, AS_PROGRAM, 16, segas1x_bootleg_state 
 	AM_RANGE(0x000000, 0x0bffff) AM_ROM
 	AM_RANGE(0x500000, 0x503fff) AM_RAM // work ram
 	AM_RANGE(0x600000, 0x600fff) AM_RAM AM_BASE_LEGACY(&segaic16_spriteram_0)
-	AM_RANGE(0x700000, 0x70ffff) AM_RAM_WRITE_LEGACY(sys16_tileram_w) AM_BASE(m_tileram)
-	AM_RANGE(0x710000, 0x710fff) AM_RAM_WRITE_LEGACY(sys16_textram_w) AM_BASE(m_textram)
+	AM_RANGE(0x700000, 0x70ffff) AM_RAM_WRITE(sys16_tileram_w) AM_BASE(m_tileram)
+	AM_RANGE(0x710000, 0x710fff) AM_RAM_WRITE(sys16_textram_w) AM_BASE(m_textram)
 	AM_RANGE(0x718000, 0x718001) AM_WRITE(s16bl_fgscrolly_w)
 	AM_RANGE(0x718008, 0x718009) AM_WRITE(s16bl_fgscrollx_bank_w) // and tile bank
 	AM_RANGE(0x718010, 0x718011) AM_WRITE(s16bl_bgscrolly_w)
@@ -716,8 +716,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( dduxbl_map, AS_PROGRAM, 16, segas1x_bootleg_state )
 	AM_RANGE(0x000000, 0x0bffff) AM_ROM
 	AM_RANGE(0x3f0000, 0x3fffff) AM_WRITE(sys16_tilebank_w)
-	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE_LEGACY(sys16_tileram_w) AM_BASE(m_tileram)
-	AM_RANGE(0x410000, 0x410fff) AM_RAM_WRITE_LEGACY(sys16_textram_w) AM_BASE(m_textram)
+	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE(sys16_tileram_w) AM_BASE(m_tileram)
+	AM_RANGE(0x410000, 0x410fff) AM_RAM_WRITE(sys16_textram_w) AM_BASE(m_textram)
 	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_BASE_LEGACY(&segaic16_spriteram_0)
 	AM_RANGE(0x840000, 0x840fff) AM_RAM_WRITE_LEGACY(segaic16_paletteram_w)  AM_BASE_LEGACY(&segaic16_paletteram)
 	AM_RANGE(0xc40000, 0xc40001) AM_WRITE(sys16_coinctrl_w)
@@ -808,8 +808,8 @@ WRITE16_MEMBER(segas1x_bootleg_state::goldnaxeb2_bgpage_w)
 
 static ADDRESS_MAP_START( goldnaxeb2_map, AS_PROGRAM, 16, segas1x_bootleg_state )
 	AM_RANGE(0x000000, 0x0bffff) AM_ROM
-	AM_RANGE(0x100000, 0x10ffff) AM_RAM_WRITE_LEGACY(sys16_tileram_w) AM_BASE(m_tileram)
-	AM_RANGE(0x110000, 0x110fff) AM_RAM_WRITE_LEGACY(sys16_textram_w) AM_BASE(m_textram)
+	AM_RANGE(0x100000, 0x10ffff) AM_RAM_WRITE(sys16_tileram_w) AM_BASE(m_tileram)
+	AM_RANGE(0x110000, 0x110fff) AM_RAM_WRITE(sys16_textram_w) AM_BASE(m_textram)
 	AM_RANGE(0x140000, 0x143fff) AM_RAM_WRITE_LEGACY(segaic16_paletteram_w) AM_BASE_LEGACY(&segaic16_paletteram)
 	AM_RANGE(0x200000, 0x200fff) AM_RAM AM_BASE_LEGACY(&segaic16_spriteram_0)
 	AM_RANGE(0xc40000, 0xc40001) AM_READ_PORT("DSW2") AM_WRITENOP
@@ -837,8 +837,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( fpointbl_map, AS_PROGRAM, 16, segas1x_bootleg_state )
 	AM_RANGE(0x000000, 0x0bffff) AM_ROM
 
-	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE_LEGACY(sys16_tileram_w) AM_BASE(m_tileram)
-	AM_RANGE(0x410000, 0x410fff) AM_RAM_WRITE_LEGACY(sys16_textram_w) AM_BASE(m_textram)
+	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE(sys16_tileram_w) AM_BASE(m_tileram)
+	AM_RANGE(0x410000, 0x410fff) AM_RAM_WRITE(sys16_textram_w) AM_BASE(m_textram)
 	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_BASE_LEGACY(&segaic16_spriteram_0)
 
 	AM_RANGE(0x600006, 0x600007) AM_WRITE(sound_command_w)
@@ -879,8 +879,8 @@ static ADDRESS_MAP_START( eswatbl_map, AS_PROGRAM, 16, segas1x_bootleg_state )
 
 	AM_RANGE(0x3e2000, 0x3e2001) AM_WRITE(eswat_tilebank0_w) // external tile bank ( > 0x4000 tiles )
 
-	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE_LEGACY(sys16_tileram_w) AM_BASE(m_tileram)
-	AM_RANGE(0x410000, 0x410fff) AM_RAM_WRITE_LEGACY(sys16_textram_w) AM_BASE(m_textram)
+	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE(sys16_tileram_w) AM_BASE(m_tileram)
+	AM_RANGE(0x410000, 0x410fff) AM_RAM_WRITE(sys16_textram_w) AM_BASE(m_textram)
 	AM_RANGE(0x418000, 0x418001) AM_WRITE(s16bl_bgscrolly_w)
 	AM_RANGE(0x418008, 0x418009) AM_WRITE(s16bl_bgscrollx_w) // and tile bank
 	AM_RANGE(0x418010, 0x418011) AM_WRITE(s16bl_fgscrolly_w)
@@ -905,8 +905,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tetrisbl_map, AS_PROGRAM, 16, segas1x_bootleg_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE_LEGACY(sys16_tileram_w) AM_BASE(m_tileram)
-	AM_RANGE(0x410000, 0x410fff) AM_RAM_WRITE_LEGACY(sys16_textram_w) AM_BASE(m_textram)
+	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE(sys16_tileram_w) AM_BASE(m_tileram)
+	AM_RANGE(0x410000, 0x410fff) AM_RAM_WRITE(sys16_textram_w) AM_BASE(m_textram)
 
 	AM_RANGE(0x418000, 0x418001) AM_WRITE(s16bl_fgscrolly_w)
 	AM_RANGE(0x418008, 0x418009) AM_WRITE(s16bl_fgscrollx_w)
@@ -945,8 +945,8 @@ static ADDRESS_MAP_START( beautyb_map, AS_PROGRAM, 16, segas1x_bootleg_state )
 	AM_RANGE(0x0280D6, 0x0280D7) AM_READ(beautyb_unkx_r)
 	AM_RANGE(0x0280D8, 0x0280D9) AM_READ(beautyb_unkx_r)
 
-	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE_LEGACY(sys16_tileram_w) AM_BASE(m_tileram)
-	AM_RANGE(0x410000, 0x413fff) AM_RAM_WRITE_LEGACY(sys16_textram_w) AM_BASE(m_textram)
+	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE(sys16_tileram_w) AM_BASE(m_tileram)
+	AM_RANGE(0x410000, 0x413fff) AM_RAM_WRITE(sys16_textram_w) AM_BASE(m_textram)
 
 	AM_RANGE(0x418000, 0x418001) AM_WRITE(s16bl_bgscrolly_w)
 	AM_RANGE(0x418008, 0x418009) AM_WRITE(s16bl_bgscrollx_w)
@@ -973,8 +973,8 @@ static ADDRESS_MAP_START( tturfbl_map, AS_PROGRAM, 16, segas1x_bootleg_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x200000, 0x203fff) AM_RAM // work ram
 	AM_RANGE(0x300000, 0x300fff) AM_RAM AM_BASE_LEGACY(&segaic16_spriteram_0)
-	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE_LEGACY(sys16_tileram_w) AM_BASE(m_tileram)
-	AM_RANGE(0x410000, 0x410fff) AM_RAM_WRITE_LEGACY(sys16_textram_w) AM_BASE(m_textram)
+	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE(sys16_tileram_w) AM_BASE(m_tileram)
+	AM_RANGE(0x410000, 0x410fff) AM_RAM_WRITE(sys16_textram_w) AM_BASE(m_textram)
 	AM_RANGE(0x500000, 0x500fff) AM_RAM_WRITE_LEGACY(segaic16_paletteram_w) AM_BASE_LEGACY(&segaic16_paletteram)
 	AM_RANGE(0x600000, 0x600001) AM_WRITE(sys16_coinctrl_w)
 	AM_RANGE(0x600000, 0x600001) AM_READ_PORT("DSW2")
@@ -1114,8 +1114,8 @@ WRITE16_MEMBER(segas1x_bootleg_state::sound_command_irq_w)
 
 static ADDRESS_MAP_START( shdancbl_map, AS_PROGRAM, 16, segas1x_bootleg_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE_LEGACY(sys16_tileram_w) AM_BASE(m_tileram)
-	AM_RANGE(0x410000, 0x410fff) AM_RAM_WRITE_LEGACY(sys16_textram_w) AM_BASE(m_textram)
+	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE(sys16_tileram_w) AM_BASE(m_tileram)
+	AM_RANGE(0x410000, 0x410fff) AM_RAM_WRITE(sys16_textram_w) AM_BASE(m_textram)
 	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_BASE_LEGACY(&segaic16_spriteram_0)
 	AM_RANGE(0x840000, 0x840fff) AM_RAM_WRITE_LEGACY(segaic16_paletteram_w) AM_BASE_LEGACY(&segaic16_paletteram)
 	AM_RANGE(0xc00000, 0xc0ffff) AM_NOP
@@ -1255,8 +1255,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mwalkbl_map, AS_PROGRAM, 16, segas1x_bootleg_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE_LEGACY(sys16_tileram_w) AM_BASE(m_tileram)
-	AM_RANGE(0x410000, 0x410fff) AM_RAM_WRITE_LEGACY(sys16_textram_w) AM_BASE(m_textram)
+	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE(sys16_tileram_w) AM_BASE(m_tileram)
+	AM_RANGE(0x410000, 0x410fff) AM_RAM_WRITE(sys16_textram_w) AM_BASE(m_textram)
 	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_BASE_LEGACY(&segaic16_spriteram_0)
 	AM_RANGE(0x840000, 0x840fff) AM_RAM_WRITE_LEGACY(segaic16_paletteram_w) AM_BASE_LEGACY(&segaic16_paletteram)
 
@@ -1297,8 +1297,8 @@ ADDRESS_MAP_END
 /* bootleg doesn't have real vdp or i/o */
 static ADDRESS_MAP_START( astormbl_map, AS_PROGRAM, 16, segas1x_bootleg_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x100000, 0x10ffff) AM_RAM_WRITE_LEGACY(sys16_tileram_w) AM_BASE(m_tileram)
-	AM_RANGE(0x110000, 0x110fff) AM_RAM_WRITE_LEGACY(sys16_textram_w) AM_BASE(m_textram)
+	AM_RANGE(0x100000, 0x10ffff) AM_RAM_WRITE(sys16_tileram_w) AM_BASE(m_tileram)
+	AM_RANGE(0x110000, 0x110fff) AM_RAM_WRITE(sys16_textram_w) AM_BASE(m_textram)
 	AM_RANGE(0x140000, 0x140fff) AM_RAM_WRITE_LEGACY(segaic16_paletteram_w) AM_BASE_LEGACY(&segaic16_paletteram)
 	AM_RANGE(0x200000, 0x200fff) AM_RAM AM_BASE_LEGACY(&segaic16_spriteram_0)
 	AM_RANGE(0xa00000, 0xa00001) AM_READ_PORT("COINAGE")

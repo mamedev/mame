@@ -35,16 +35,16 @@ public:
 	DECLARE_WRITE32_MEMBER(policetr_bsmt2000_data_w);
 	DECLARE_READ32_MEMBER(bsmt2000_data_r);
 	DECLARE_WRITE32_MEMBER(speedup_w);
+	DECLARE_WRITE32_MEMBER(policetr_video_w);
+	DECLARE_READ32_MEMBER(policetr_video_r);
+	DECLARE_WRITE32_MEMBER(policetr_palette_offset_w);
+	DECLARE_WRITE32_MEMBER(policetr_palette_data_w);
 };
 
 
 /*----------- defined in video/policetr.c -----------*/
 
-WRITE32_HANDLER( policetr_video_w );
-READ32_HANDLER( policetr_video_r );
 
-WRITE32_HANDLER( policetr_palette_offset_w );
-WRITE32_HANDLER( policetr_palette_data_w );
 
 VIDEO_START( policetr );
 SCREEN_UPDATE_IND16( policetr );

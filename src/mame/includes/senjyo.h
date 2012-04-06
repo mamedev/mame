@@ -43,6 +43,12 @@ public:
 	DECLARE_WRITE8_MEMBER(senjyo_paletteram_w);
 	DECLARE_WRITE8_MEMBER(starforb_scrolly2);
 	DECLARE_WRITE8_MEMBER(starforb_scrollx2);
+	DECLARE_WRITE8_MEMBER(senjyo_fgvideoram_w);
+	DECLARE_WRITE8_MEMBER(senjyo_fgcolorram_w);
+	DECLARE_WRITE8_MEMBER(senjyo_bg1videoram_w);
+	DECLARE_WRITE8_MEMBER(senjyo_bg2videoram_w);
+	DECLARE_WRITE8_MEMBER(senjyo_bg3videoram_w);
+	DECLARE_WRITE8_MEMBER(senjyo_bgstripes_w);
 };
 
 
@@ -58,12 +64,6 @@ WRITE8_HANDLER( senjyo_volume_w );
 
 /*----------- defined in video/senjyo.c -----------*/
 
-WRITE8_HANDLER( senjyo_fgvideoram_w );
-WRITE8_HANDLER( senjyo_fgcolorram_w );
-WRITE8_HANDLER( senjyo_bg1videoram_w );
-WRITE8_HANDLER( senjyo_bg2videoram_w );
-WRITE8_HANDLER( senjyo_bg3videoram_w );
-WRITE8_HANDLER( senjyo_bgstripes_w );
 
 VIDEO_START( senjyo );
 SCREEN_UPDATE_IND16( senjyo );

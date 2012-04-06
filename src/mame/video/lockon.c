@@ -21,12 +21,12 @@
  *
  *************************************/
 
-READ16_HANDLER( lockon_crtc_r )
+READ16_MEMBER(lockon_state::lockon_crtc_r)
 {
 	return 0xffff;
 }
 
-WRITE16_HANDLER( lockon_crtc_w )
+WRITE16_MEMBER(lockon_state::lockon_crtc_w)
 {
 #if 0
 	data &= 0xff;
@@ -132,11 +132,10 @@ PALETTE_INIT( lockon )
  *
  *************************************/
 
-WRITE16_HANDLER( lockon_char_w )
+WRITE16_MEMBER(lockon_state::lockon_char_w)
 {
-	lockon_state *state = space->machine().driver_data<lockon_state>();
-	state->m_char_ram[offset] = data;
-	state->m_tilemap->mark_tile_dirty(offset);
+	m_char_ram[offset] = data;
+	m_tilemap->mark_tile_dirty(offset);
 }
 
 static TILE_GET_INFO( get_lockon_tile_info )
@@ -156,16 +155,14 @@ static TILE_GET_INFO( get_lockon_tile_info )
 
 *******************************************************************************************/
 
-WRITE16_HANDLER( lockon_scene_h_scr_w )
+WRITE16_MEMBER(lockon_state::lockon_scene_h_scr_w)
 {
-	lockon_state *state = space->machine().driver_data<lockon_state>();
-	state->m_scroll_h = data & 0x1ff;
+	m_scroll_h = data & 0x1ff;
 }
 
-WRITE16_HANDLER( lockon_scene_v_scr_w )
+WRITE16_MEMBER(lockon_state::lockon_scene_v_scr_w)
 {
-	lockon_state *state = space->machine().driver_data<lockon_state>();
-	state->m_scroll_v = data & 0x81ff;
+	m_scroll_v = data & 0x81ff;
 }
 
 static void scene_draw( running_machine &machine )
@@ -279,10 +276,9 @@ static void scene_draw( running_machine &machine )
 
  *******************************************************************************************/
 
-WRITE16_HANDLER( lockon_ground_ctrl_w )
+WRITE16_MEMBER(lockon_state::lockon_ground_ctrl_w)
 {
-	lockon_state *state = space->machine().driver_data<lockon_state>();
-	state->m_ground_ctrl = data & 0xff;
+	m_ground_ctrl = data & 0xff;
 }
 
 static TIMER_CALLBACK( bufend_callback )
@@ -608,30 +604,27 @@ static void objects_draw( running_machine &machine )
 }
 
 /* The mechanism used by the object CPU to update the object ASICs palette RAM */
-WRITE16_HANDLER( lockon_tza112_w )
+WRITE16_MEMBER(lockon_state::lockon_tza112_w)
 {
-	lockon_state *state = space->machine().driver_data<lockon_state>();
 
-	if (state->m_iden)
+	if (m_iden)
 	{
-		state->m_obj_pal_latch = data & 0xff;
-		state->m_obj_pal_addr = offset & 0xf;
-		objects_draw(space->machine());
+		m_obj_pal_latch = data & 0xff;
+		m_obj_pal_addr = offset & 0xf;
+		objects_draw(machine());
 	}
 }
 
-READ16_HANDLER( lockon_obj_4000_r )
+READ16_MEMBER(lockon_state::lockon_obj_4000_r)
 {
-	lockon_state *state = space->machine().driver_data<lockon_state>();
 
-	device_set_input_line(state->m_object, NEC_INPUT_LINE_POLL, CLEAR_LINE);
+	device_set_input_line(m_object, NEC_INPUT_LINE_POLL, CLEAR_LINE);
 	return 0xffff;
 }
 
-WRITE16_HANDLER( lockon_obj_4000_w )
+WRITE16_MEMBER(lockon_state::lockon_obj_4000_w)
 {
-	lockon_state *state = space->machine().driver_data<lockon_state>();
-	state->m_iden = data & 1;
+	m_iden = data & 1;
 }
 
 
@@ -657,30 +650,29 @@ WRITE16_HANDLER( lockon_obj_4000_w )
 
 *******************************************************************************************/
 
-WRITE16_HANDLER( lockon_fb_clut_w )
+WRITE16_MEMBER(lockon_state::lockon_fb_clut_w)
 {
 	rgb_t color;
 
-	color = palette_get_color(space->machine(), 0x300 + (data & 0xff));
-	palette_set_color(space->machine(), 0x400 + offset, color);
+	color = palette_get_color(machine(), 0x300 + (data & 0xff));
+	palette_set_color(machine(), 0x400 + offset, color);
 }
 
 /* Rotation control register */
-WRITE16_HANDLER( lockon_rotate_w )
+WRITE16_MEMBER(lockon_state::lockon_rotate_w)
 {
-	lockon_state *state = space->machine().driver_data<lockon_state>();
 
 	switch (offset & 7)
 	{
-		case 0: state->m_xsal  = data & 0x1ff;	break;
-		case 1: state->m_x0ll  = data & 0xff;	break;
-		case 2: state->m_dx0ll = data & 0x1ff;	break;
-		case 3: state->m_dxll  = data & 0x1ff;	break;
+		case 0: m_xsal  = data & 0x1ff;	break;
+		case 1: m_x0ll  = data & 0xff;	break;
+		case 2: m_dx0ll = data & 0x1ff;	break;
+		case 3: m_dxll  = data & 0x1ff;	break;
 
-		case 4: state->m_ysal  = data & 0x1ff;	break;
-		case 5: state->m_y0ll  = data & 0xff;	break;
-		case 6: state->m_dy0ll =	data & 0x1ff;	break;
-		case 7: state->m_dyll  = data & 0x3ff;	break;
+		case 4: m_ysal  = data & 0x1ff;	break;
+		case 5: m_y0ll  = data & 0xff;	break;
+		case 6: m_dy0ll =	data & 0x1ff;	break;
+		case 7: m_dyll  = data & 0x3ff;	break;
 	}
 }
 

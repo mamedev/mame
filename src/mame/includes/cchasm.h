@@ -20,12 +20,13 @@ public:
 	UINT16 *m_ram;
 	int m_xcenter;
 	int m_ycenter;
+	DECLARE_WRITE16_MEMBER(cchasm_led_w);
+	DECLARE_WRITE16_MEMBER(cchasm_refresh_control_w);
 };
 
 
 /*----------- defined in machine/cchasm.c -----------*/
 
-WRITE16_HANDLER( cchasm_led_w );
 
 /*----------- defined in audio/cchasm.c -----------*/
 
@@ -45,6 +46,5 @@ SOUND_START( cchasm );
 
 /*----------- defined in video/cchasm.c -----------*/
 
-WRITE16_HANDLER( cchasm_refresh_control_w );
 VIDEO_START( cchasm );
 

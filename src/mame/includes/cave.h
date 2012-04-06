@@ -140,19 +140,19 @@ public:
 	DECLARE_WRITE8_MEMBER(sailormn_okibank0_w);
 	DECLARE_WRITE8_MEMBER(sailormn_okibank1_w);
 	DECLARE_WRITE16_MEMBER(donpachi_videoregs_w);
+	DECLARE_WRITE16_MEMBER(cave_vram_0_w);
+	DECLARE_WRITE16_MEMBER(cave_vram_1_w);
+	DECLARE_WRITE16_MEMBER(cave_vram_2_w);
+	DECLARE_WRITE16_MEMBER(cave_vram_3_w);
+	DECLARE_WRITE16_MEMBER(cave_vram_0_8x8_w);
+	DECLARE_WRITE16_MEMBER(cave_vram_1_8x8_w);
+	DECLARE_WRITE16_MEMBER(cave_vram_2_8x8_w);
+	DECLARE_WRITE16_MEMBER(cave_vram_3_8x8_w);
 };
 
 /*----------- defined in video/cave.c -----------*/
 
-WRITE16_HANDLER( cave_vram_0_w );
-WRITE16_HANDLER( cave_vram_1_w );
-WRITE16_HANDLER( cave_vram_2_w );
-WRITE16_HANDLER( cave_vram_3_w );
 
-WRITE16_HANDLER( cave_vram_0_8x8_w );
-WRITE16_HANDLER( cave_vram_1_8x8_w );
-WRITE16_HANDLER( cave_vram_2_8x8_w );
-WRITE16_HANDLER( cave_vram_3_8x8_w );
 
 PALETTE_INIT( cave );
 PALETTE_INIT( ddonpach );

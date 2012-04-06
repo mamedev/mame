@@ -19,17 +19,15 @@
  *
  *************************************/
 
-WRITE8_HANDLER( tutankhm_flip_screen_x_w )
+WRITE8_MEMBER(tutankhm_state::tutankhm_flip_screen_x_w)
 {
-	tutankhm_state *state = space->machine().driver_data<tutankhm_state>();
-	state->m_flip_x = data & 0x01;
+	m_flip_x = data & 0x01;
 }
 
 
-WRITE8_HANDLER( tutankhm_flip_screen_y_w )
+WRITE8_MEMBER(tutankhm_state::tutankhm_flip_screen_y_w)
 {
-	tutankhm_state *state = space->machine().driver_data<tutankhm_state>();
-	state->m_flip_y = data & 0x01;
+	m_flip_y = data & 0x01;
 }
 
 

@@ -20,15 +20,15 @@ public:
 	required_device<cpu_device> m_slave;
 	DECLARE_WRITE8_MEMBER(sprcros2_m_port7_w);
 	DECLARE_WRITE8_MEMBER(sprcros2_s_port3_w);
+	DECLARE_WRITE8_MEMBER(sprcros2_fgvideoram_w);
+	DECLARE_WRITE8_MEMBER(sprcros2_bgvideoram_w);
+	DECLARE_WRITE8_MEMBER(sprcros2_bgscrollx_w);
+	DECLARE_WRITE8_MEMBER(sprcros2_bgscrolly_w);
 };
 
 
 /*----------- defined in video/sprcros2.c -----------*/
 
-WRITE8_HANDLER( sprcros2_fgvideoram_w );
-WRITE8_HANDLER( sprcros2_bgvideoram_w );
-WRITE8_HANDLER( sprcros2_bgscrollx_w );
-WRITE8_HANDLER( sprcros2_bgscrolly_w );
 
 PALETTE_INIT( sprcros2 );
 VIDEO_START( sprcros2 );

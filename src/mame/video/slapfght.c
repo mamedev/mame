@@ -91,46 +91,40 @@ VIDEO_START( slapfight )
 
 ***************************************************************************/
 
-WRITE8_HANDLER( slapfight_videoram_w )
+WRITE8_MEMBER(slapfght_state::slapfight_videoram_w)
 {
-	slapfght_state *state = space->machine().driver_data<slapfght_state>();
-	state->m_slapfight_videoram[offset]=data;
-	state->m_pf1_tilemap->mark_tile_dirty(offset);
+	m_slapfight_videoram[offset]=data;
+	m_pf1_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( slapfight_colorram_w )
+WRITE8_MEMBER(slapfght_state::slapfight_colorram_w)
 {
-	slapfght_state *state = space->machine().driver_data<slapfght_state>();
-	state->m_slapfight_colorram[offset]=data;
-	state->m_pf1_tilemap->mark_tile_dirty(offset);
+	m_slapfight_colorram[offset]=data;
+	m_pf1_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( slapfight_fixram_w )
+WRITE8_MEMBER(slapfght_state::slapfight_fixram_w)
 {
-	slapfght_state *state = space->machine().driver_data<slapfght_state>();
-	state->m_slapfight_fixvideoram[offset]=data;
-	state->m_fix_tilemap->mark_tile_dirty(offset);
+	m_slapfight_fixvideoram[offset]=data;
+	m_fix_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( slapfight_fixcol_w )
+WRITE8_MEMBER(slapfght_state::slapfight_fixcol_w)
 {
-	slapfght_state *state = space->machine().driver_data<slapfght_state>();
-	state->m_slapfight_fixcolorram[offset]=data;
-	state->m_fix_tilemap->mark_tile_dirty(offset);
+	m_slapfight_fixcolorram[offset]=data;
+	m_fix_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( slapfight_flipscreen_w )
+WRITE8_MEMBER(slapfght_state::slapfight_flipscreen_w)
 {
-	slapfght_state *state = space->machine().driver_data<slapfght_state>();
 	logerror("Writing %02x to flipscreen\n",offset);
-	if (offset==0) state->m_flipscreen=1; /* Port 0x2 is flipscreen */
-	else state->m_flipscreen=0; /* Port 0x3 is normal */
+	if (offset==0) m_flipscreen=1; /* Port 0x2 is flipscreen */
+	else m_flipscreen=0; /* Port 0x3 is normal */
 }
 
-WRITE8_HANDLER( slapfight_palette_bank_w )
+WRITE8_MEMBER(slapfght_state::slapfight_palette_bank_w)
 {
-	slapfght_state *state = space->machine().driver_data<slapfght_state>();
-	state->m_slapfight_palette_bank = offset;
+	m_slapfight_palette_bank = offset;
 }
 
 static void slapfght_log_vram(running_machine &machine)

@@ -215,19 +215,19 @@ public:
 	DECLARE_READ8_MEMBER(strtheat_inputport_1_r);
 	DECLARE_WRITE8_MEMBER(nmi_mask_w);
 	DECLARE_WRITE8_MEMBER(braze_a15_w);
+	DECLARE_WRITE8_MEMBER(dkong_videoram_w);
+	DECLARE_WRITE8_MEMBER(dkongjr_gfxbank_w);
+	DECLARE_WRITE8_MEMBER(dkong3_gfxbank_w);
+	DECLARE_WRITE8_MEMBER(dkong_palettebank_w);
+	DECLARE_WRITE8_MEMBER(radarscp_grid_enable_w);
+	DECLARE_WRITE8_MEMBER(radarscp_grid_color_w);
+	DECLARE_WRITE8_MEMBER(dkong_flipscreen_w);
+	DECLARE_WRITE8_MEMBER(dkong_spritebank_w);
 };
 
 /*----------- defined in video/dkong.c -----------*/
 
-WRITE8_HANDLER( radarscp_grid_enable_w );
-WRITE8_HANDLER( radarscp_grid_color_w );
-WRITE8_HANDLER( dkong_flipscreen_w );
-WRITE8_HANDLER( dkongjr_gfxbank_w );
-WRITE8_HANDLER( dkong3_gfxbank_w );
-WRITE8_HANDLER( dkong_spritebank_w );
-WRITE8_HANDLER( dkong_palettebank_w );
 
-WRITE8_HANDLER( dkong_videoram_w );
 
 PALETTE_INIT( dkong2b );
 PALETTE_INIT( radarscp );

@@ -74,25 +74,22 @@ VIDEO_START( bloodbro )
 
 ***************************************************************************/
 
-WRITE16_HANDLER( bloodbro_bgvideoram_w )
+WRITE16_MEMBER(bloodbro_state::bloodbro_bgvideoram_w)
 {
-	bloodbro_state *state = space->machine().driver_data<bloodbro_state>();
-	COMBINE_DATA(&state->m_bgvideoram[offset]);
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_bgvideoram[offset]);
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_HANDLER( bloodbro_fgvideoram_w )
+WRITE16_MEMBER(bloodbro_state::bloodbro_fgvideoram_w)
 {
-	bloodbro_state *state = space->machine().driver_data<bloodbro_state>();
-	COMBINE_DATA(&state->m_fgvideoram[offset]);
-	state->m_fg_tilemap->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_fgvideoram[offset]);
+	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_HANDLER( bloodbro_txvideoram_w )
+WRITE16_MEMBER(bloodbro_state::bloodbro_txvideoram_w)
 {
-	bloodbro_state *state = space->machine().driver_data<bloodbro_state>();
-	COMBINE_DATA(&state->m_txvideoram[offset]);
-	state->m_tx_tilemap->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_txvideoram[offset]);
+	m_tx_tilemap->mark_tile_dirty(offset);
 }
 
 

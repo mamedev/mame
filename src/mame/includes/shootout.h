@@ -14,13 +14,13 @@ public:
 	DECLARE_WRITE8_MEMBER(sound_cpu_command_w);
 	DECLARE_WRITE8_MEMBER(shootout_flipscreen_w);
 	DECLARE_WRITE8_MEMBER(shootout_coin_counter_w);
+	DECLARE_WRITE8_MEMBER(shootout_videoram_w);
+	DECLARE_WRITE8_MEMBER(shootout_textram_w);
 };
 
 
 /*----------- defined in video/shootout.c -----------*/
 
-WRITE8_HANDLER( shootout_videoram_w );
-WRITE8_HANDLER( shootout_textram_w );
 
 PALETTE_INIT( shootout );
 VIDEO_START( shootout );

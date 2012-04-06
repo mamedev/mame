@@ -120,30 +120,47 @@ public:
 	DECLARE_READ16_MEMBER(gtmr2_IN1_r);
 	DECLARE_WRITE16_MEMBER(shogwarr_oki_bank_w);
 	DECLARE_WRITE16_MEMBER(brapboys_oki_bank_w);
+	DECLARE_READ16_MEMBER(galpanib_calc_r);
+	DECLARE_WRITE16_MEMBER(galpanib_calc_w);
+	DECLARE_WRITE16_MEMBER(bloodwar_calc_w);
+	DECLARE_READ16_MEMBER(bloodwar_calc_r);
+	DECLARE_WRITE16_MEMBER(calc3_mcu_ram_w);
+	DECLARE_WRITE16_MEMBER(calc3_mcu_com0_w);
+	DECLARE_WRITE16_MEMBER(calc3_mcu_com1_w);
+	DECLARE_WRITE16_MEMBER(calc3_mcu_com2_w);
+	DECLARE_WRITE16_MEMBER(calc3_mcu_com3_w);
+	DECLARE_WRITE16_MEMBER(toybox_mcu_com0_w);
+	DECLARE_WRITE16_MEMBER(toybox_mcu_com1_w);
+	DECLARE_WRITE16_MEMBER(toybox_mcu_com2_w);
+	DECLARE_WRITE16_MEMBER(toybox_mcu_com3_w);
+	DECLARE_READ16_MEMBER(toybox_mcu_status_r);
+	void calc3_mcu_com_w(offs_t offset, UINT16 data, UINT16 mem_mask, int _n_);
+	void toybox_mcu_com_w(offs_t offset, UINT16 data, UINT16 mem_mask, int _n_);
+	DECLARE_WRITE16_MEMBER(shogwarr_calc_w);
+	DECLARE_READ16_MEMBER(shogwarr_calc_r);
+	DECLARE_WRITE16_MEMBER(kaneko16_display_enable);
+	DECLARE_WRITE16_MEMBER(kaneko16_vram_0_w);
+	DECLARE_WRITE16_MEMBER(kaneko16_vram_1_w);
+	DECLARE_WRITE16_MEMBER(kaneko16_vram_2_w);
+	DECLARE_WRITE16_MEMBER(kaneko16_vram_3_w);
+	DECLARE_READ16_MEMBER(kaneko16_sprites_regs_r);
+	DECLARE_WRITE16_MEMBER(kaneko16_sprites_regs_w);
+	DECLARE_WRITE16_MEMBER(kaneko16_layers_0_regs_w);
+	DECLARE_WRITE16_MEMBER(kaneko16_layers_1_regs_w);
+	DECLARE_READ16_MEMBER(kaneko16_bg15_select_r);
+	DECLARE_WRITE16_MEMBER(kaneko16_bg15_select_w);
+	DECLARE_READ16_MEMBER(kaneko16_bg15_reg_r);
+	DECLARE_WRITE16_MEMBER(kaneko16_bg15_reg_w);
 };
 
 
 /*----------- defined in machine/kaneko16.c -----------*/
 
-READ16_HANDLER( galpanib_calc_r );
-WRITE16_HANDLER( galpanib_calc_w );
 
-READ16_HANDLER( bloodwar_calc_r );
-WRITE16_HANDLER( bloodwar_calc_w );
 
 void calc3_mcu_init(running_machine &machine);
-WRITE16_HANDLER( calc3_mcu_ram_w );
-WRITE16_HANDLER( calc3_mcu_com0_w );
-WRITE16_HANDLER( calc3_mcu_com1_w );
-WRITE16_HANDLER( calc3_mcu_com2_w );
-WRITE16_HANDLER( calc3_mcu_com3_w );
 
 void toybox_mcu_init(running_machine &machine);
-WRITE16_HANDLER( toybox_mcu_com0_w );
-WRITE16_HANDLER( toybox_mcu_com1_w );
-WRITE16_HANDLER( toybox_mcu_com2_w );
-WRITE16_HANDLER( toybox_mcu_com3_w );
-READ16_HANDLER( toybox_mcu_status_r );
 
 void bloodwar_mcu_run(running_machine &machine);
 void bonkadv_mcu_run(running_machine &machine);
@@ -164,26 +181,13 @@ MACHINE_RESET( kaneko16 );
 
 /*----------- defined in video/kaneko16.c -----------*/
 
-WRITE16_HANDLER( kaneko16_display_enable );
 
-WRITE16_HANDLER( kaneko16_vram_0_w );
-WRITE16_HANDLER( kaneko16_vram_1_w );
-WRITE16_HANDLER( kaneko16_vram_2_w );
-WRITE16_HANDLER( kaneko16_vram_3_w );
 
-WRITE16_HANDLER( kaneko16_layers_0_regs_w );
-WRITE16_HANDLER( kaneko16_layers_1_regs_w );
 
-READ16_HANDLER ( kaneko16_sprites_regs_r );
-WRITE16_HANDLER( kaneko16_sprites_regs_w );
 
 void kaneko16_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-READ16_HANDLER ( kaneko16_bg15_select_r );
-WRITE16_HANDLER( kaneko16_bg15_select_w );
 
-READ16_HANDLER ( kaneko16_bg15_reg_r );
-WRITE16_HANDLER( kaneko16_bg15_reg_w );
 
 PALETTE_INIT( berlwall );
 

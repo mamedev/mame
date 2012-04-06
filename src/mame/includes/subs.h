@@ -30,6 +30,14 @@ public:
 	int m_steering_val2;
 	int m_last_val_1;
 	int m_last_val_2;
+	DECLARE_WRITE8_MEMBER(subs_steer_reset_w);
+	DECLARE_READ8_MEMBER(subs_control_r);
+	DECLARE_READ8_MEMBER(subs_coin_r);
+	DECLARE_READ8_MEMBER(subs_options_r);
+	DECLARE_WRITE8_MEMBER(subs_lamp1_w);
+	DECLARE_WRITE8_MEMBER(subs_lamp2_w);
+	DECLARE_WRITE8_MEMBER(subs_invert1_w);
+	DECLARE_WRITE8_MEMBER(subs_invert2_w);
 };
 
 
@@ -37,12 +45,6 @@ public:
 
 MACHINE_RESET( subs );
 INTERRUPT_GEN( subs_interrupt );
-WRITE8_HANDLER( subs_steer_reset_w );
-READ8_HANDLER( subs_control_r );
-READ8_HANDLER( subs_coin_r );
-READ8_HANDLER( subs_options_r );
-WRITE8_HANDLER( subs_lamp1_w );
-WRITE8_HANDLER( subs_lamp2_w );
 
 
 /*----------- defined in audio/subs.c -----------*/
@@ -61,5 +63,3 @@ DISCRETE_SOUND_EXTERN( subs );
 SCREEN_UPDATE_IND16( subs_left );
 SCREEN_UPDATE_IND16( subs_right );
 
-WRITE8_HANDLER( subs_invert1_w );
-WRITE8_HANDLER( subs_invert2_w );

@@ -10,13 +10,13 @@ public:
 	DECLARE_WRITE8_MEMBER(usgames_rombank_w);
 	DECLARE_WRITE8_MEMBER(lamps1_w);
 	DECLARE_WRITE8_MEMBER(lamps2_w);
+	DECLARE_WRITE8_MEMBER(usgames_videoram_w);
+	DECLARE_WRITE8_MEMBER(usgames_charram_w);
 };
 
 
 /*----------- defined in video/usgames.c -----------*/
 
-WRITE8_HANDLER( usgames_videoram_w );
-WRITE8_HANDLER( usgames_charram_w );
 VIDEO_START( usgames );
 PALETTE_INIT( usgames );
 SCREEN_UPDATE_IND16( usgames );

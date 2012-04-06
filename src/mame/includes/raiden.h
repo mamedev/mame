@@ -19,16 +19,16 @@ public:
 	int m_alternate;
 	required_device<buffered_spriteram16_device> m_spriteram;
 	DECLARE_READ16_MEMBER(sub_cpu_spin_r);
+	DECLARE_WRITE16_MEMBER(raiden_background_w);
+	DECLARE_WRITE16_MEMBER(raiden_foreground_w);
+	DECLARE_WRITE16_MEMBER(raiden_text_w);
+	DECLARE_WRITE16_MEMBER(raiden_control_w);
+	DECLARE_WRITE16_MEMBER(raidena_control_w);
 };
 
 
 /*----------- defined in video/raiden.c -----------*/
 
-WRITE16_HANDLER( raiden_background_w );
-WRITE16_HANDLER( raiden_foreground_w );
-WRITE16_HANDLER( raiden_text_w );
 VIDEO_START( raiden );
 VIDEO_START( raidena );
-WRITE16_HANDLER( raiden_control_w );
-WRITE16_HANDLER( raidena_control_w );
 SCREEN_UPDATE_IND16( raiden );

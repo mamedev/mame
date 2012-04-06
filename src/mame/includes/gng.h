@@ -29,16 +29,16 @@ public:
 	DECLARE_WRITE8_MEMBER(gng_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(gng_coin_counter_w);
 	DECLARE_READ8_MEMBER(diamond_hack_r);
+	DECLARE_WRITE8_MEMBER(gng_fgvideoram_w);
+	DECLARE_WRITE8_MEMBER(gng_bgvideoram_w);
+	DECLARE_WRITE8_MEMBER(gng_bgscrollx_w);
+	DECLARE_WRITE8_MEMBER(gng_bgscrolly_w);
+	DECLARE_WRITE8_MEMBER(gng_flipscreen_w);
 };
 
 
 /*----------- defined in video/gng.c -----------*/
 
-WRITE8_HANDLER( gng_fgvideoram_w );
-WRITE8_HANDLER( gng_bgvideoram_w );
-WRITE8_HANDLER( gng_bgscrollx_w );
-WRITE8_HANDLER( gng_bgscrolly_w );
-WRITE8_HANDLER( gng_flipscreen_w );
 
 VIDEO_START( gng );
 SCREEN_UPDATE_IND16( gng );

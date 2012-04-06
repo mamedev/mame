@@ -38,6 +38,14 @@ public:
 	DECLARE_WRITE8_MEMBER(contra_sh_irqtrigger_w);
 	DECLARE_WRITE8_MEMBER(contra_coin_counter_w);
 	DECLARE_WRITE8_MEMBER(cpu_sound_command_w);
+	DECLARE_WRITE8_MEMBER(contra_fg_vram_w);
+	DECLARE_WRITE8_MEMBER(contra_fg_cram_w);
+	DECLARE_WRITE8_MEMBER(contra_bg_vram_w);
+	DECLARE_WRITE8_MEMBER(contra_bg_cram_w);
+	DECLARE_WRITE8_MEMBER(contra_text_vram_w);
+	DECLARE_WRITE8_MEMBER(contra_text_cram_w);
+	DECLARE_WRITE8_MEMBER(contra_K007121_ctrl_0_w);
+	DECLARE_WRITE8_MEMBER(contra_K007121_ctrl_1_w);
 };
 
 
@@ -45,15 +53,7 @@ public:
 
 PALETTE_INIT( contra );
 
-WRITE8_HANDLER( contra_fg_vram_w );
-WRITE8_HANDLER( contra_fg_cram_w );
-WRITE8_HANDLER( contra_bg_vram_w );
-WRITE8_HANDLER( contra_bg_cram_w );
-WRITE8_HANDLER( contra_text_vram_w );
-WRITE8_HANDLER( contra_text_cram_w );
 
-WRITE8_HANDLER( contra_K007121_ctrl_0_w );
-WRITE8_HANDLER( contra_K007121_ctrl_1_w );
 
 SCREEN_UPDATE_IND16( contra );
 VIDEO_START( contra );

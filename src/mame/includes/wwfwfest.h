@@ -29,6 +29,9 @@ public:
 	DECLARE_READ16_MEMBER(wwfwfest_paletteram16_xxxxBBBBGGGGRRRR_word_r);
 	DECLARE_WRITE16_MEMBER(wwfwfest_paletteram16_xxxxBBBBGGGGRRRR_word_w);
 	DECLARE_WRITE16_MEMBER(wwfwfest_soundwrite);
+	DECLARE_WRITE16_MEMBER(wwfwfest_fg0_videoram_w);
+	DECLARE_WRITE16_MEMBER(wwfwfest_bg0_videoram_w);
+	DECLARE_WRITE16_MEMBER(wwfwfest_bg1_videoram_w);
 };
 
 
@@ -37,6 +40,3 @@ public:
 VIDEO_START( wwfwfest );
 VIDEO_START( wwfwfstb );
 SCREEN_UPDATE_IND16( wwfwfest );
-WRITE16_HANDLER( wwfwfest_fg0_videoram_w );
-WRITE16_HANDLER( wwfwfest_bg0_videoram_w );
-WRITE16_HANDLER( wwfwfest_bg1_videoram_w );

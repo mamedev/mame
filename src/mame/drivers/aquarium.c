@@ -90,14 +90,14 @@ static UINT8 aquarium_snd_bitswap( UINT8 scrambled_data )
 READ8_MEMBER(aquarium_state::aquarium_oki_r)
 {
 	okim6295_device *oki = machine().device<okim6295_device>("oki");
-	return aquarium_snd_bitswap(oki->read(*&space, offset));
+	return aquarium_snd_bitswap(oki->read(space, offset));
 }
 
 WRITE8_MEMBER(aquarium_state::aquarium_oki_w)
 {
 	logerror("%s:Writing %04x to the OKI M6295\n", machine().describe_context(), aquarium_snd_bitswap(data));
 	okim6295_device *oki = machine().device<okim6295_device>("oki");
-	oki->write(*&space, offset, (aquarium_snd_bitswap(data)));
+	oki->write(space, offset, (aquarium_snd_bitswap(data)));
 }
 
 
@@ -105,9 +105,9 @@ WRITE8_MEMBER(aquarium_state::aquarium_oki_w)
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, aquarium_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0xc00000, 0xc00fff) AM_RAM_WRITE_LEGACY(aquarium_mid_videoram_w) AM_BASE(m_mid_videoram)
-	AM_RANGE(0xc01000, 0xc01fff) AM_RAM_WRITE_LEGACY(aquarium_bak_videoram_w) AM_BASE(m_bak_videoram)
-	AM_RANGE(0xc02000, 0xc03fff) AM_RAM_WRITE_LEGACY(aquarium_txt_videoram_w) AM_BASE(m_txt_videoram)
+	AM_RANGE(0xc00000, 0xc00fff) AM_RAM_WRITE(aquarium_mid_videoram_w) AM_BASE(m_mid_videoram)
+	AM_RANGE(0xc01000, 0xc01fff) AM_RAM_WRITE(aquarium_bak_videoram_w) AM_BASE(m_bak_videoram)
+	AM_RANGE(0xc02000, 0xc03fff) AM_RAM_WRITE(aquarium_txt_videoram_w) AM_BASE(m_txt_videoram)
 	AM_RANGE(0xc80000, 0xc81fff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
 	AM_RANGE(0xd00000, 0xd00fff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0xd80014, 0xd8001f) AM_WRITEONLY AM_BASE(m_scroll)

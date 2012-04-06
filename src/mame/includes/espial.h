@@ -33,6 +33,11 @@ public:
 	DECLARE_WRITE8_MEMBER(espial_master_interrupt_mask_w);
 	DECLARE_WRITE8_MEMBER(espial_master_soundlatch_w);
 	DECLARE_WRITE8_MEMBER(espial_sound_nmi_mask_w);
+	DECLARE_WRITE8_MEMBER(espial_videoram_w);
+	DECLARE_WRITE8_MEMBER(espial_colorram_w);
+	DECLARE_WRITE8_MEMBER(espial_attributeram_w);
+	DECLARE_WRITE8_MEMBER(espial_scrollram_w);
+	DECLARE_WRITE8_MEMBER(espial_flipscreen_w);
 };
 
 /*----------- defined in video/espial.c -----------*/
@@ -40,9 +45,4 @@ public:
 PALETTE_INIT( espial );
 VIDEO_START( espial );
 VIDEO_START( netwars );
-WRITE8_HANDLER( espial_videoram_w );
-WRITE8_HANDLER( espial_colorram_w );
-WRITE8_HANDLER( espial_attributeram_w );
-WRITE8_HANDLER( espial_scrollram_w );
-WRITE8_HANDLER( espial_flipscreen_w );
 SCREEN_UPDATE_IND16( espial );

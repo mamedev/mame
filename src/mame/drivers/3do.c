@@ -108,11 +108,11 @@ static ADDRESS_MAP_START( 3do_mem, AS_PROGRAM, 32, _3do_state )
 	AM_RANGE(0x00200000, 0x003FFFFF) AM_RAM	AM_BASE(m_vram)									/* VRAM */
 	AM_RANGE(0x03000000, 0x030FFFFF) AM_ROMBANK("bank2")									/* BIOS */
 	AM_RANGE(0x03100000, 0x0313FFFF) AM_RAM													/* Brooktree? */
-	AM_RANGE(0x03140000, 0x0315FFFF) AM_READWRITE_LEGACY(_3do_nvarea_r, _3do_nvarea_w)				/* NVRAM */
-	AM_RANGE(0x03180000, 0x031BFFFF) AM_READWRITE_LEGACY(_3do_slow2_r, _3do_slow2_w)				/* Slow bus - additional expansion */
-	AM_RANGE(0x03200000, 0x0320FFFF) AM_READWRITE_LEGACY(_3do_svf_r, _3do_svf_w)					/* special vram access1 */
-	AM_RANGE(0x03300000, 0x033FFFFF) AM_READWRITE_LEGACY(_3do_madam_r, _3do_madam_w)				/* address decoder */
-	AM_RANGE(0x03400000, 0x034FFFFF) AM_READWRITE_LEGACY(_3do_clio_r, _3do_clio_w)					/* io controller */
+	AM_RANGE(0x03140000, 0x0315FFFF) AM_READWRITE(_3do_nvarea_r, _3do_nvarea_w)				/* NVRAM */
+	AM_RANGE(0x03180000, 0x031BFFFF) AM_READWRITE(_3do_slow2_r, _3do_slow2_w)				/* Slow bus - additional expansion */
+	AM_RANGE(0x03200000, 0x0320FFFF) AM_READWRITE(_3do_svf_r, _3do_svf_w)					/* special vram access1 */
+	AM_RANGE(0x03300000, 0x033FFFFF) AM_READWRITE(_3do_madam_r, _3do_madam_w)				/* address decoder */
+	AM_RANGE(0x03400000, 0x034FFFFF) AM_READWRITE(_3do_clio_r, _3do_clio_w)					/* io controller */
 ADDRESS_MAP_END
 
 

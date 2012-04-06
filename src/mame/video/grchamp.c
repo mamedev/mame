@@ -52,25 +52,22 @@ PALETTE_INIT( grchamp )
 }
 
 
-WRITE8_HANDLER( grchamp_left_w )
+WRITE8_MEMBER(grchamp_state::grchamp_left_w)
 {
-	grchamp_state *state = space->machine().driver_data<grchamp_state>();
-	state->m_leftram[offset] = data;
-	state->m_left_tilemap->mark_tile_dirty(offset);
+	m_leftram[offset] = data;
+	m_left_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( grchamp_center_w )
+WRITE8_MEMBER(grchamp_state::grchamp_center_w)
 {
-	grchamp_state *state = space->machine().driver_data<grchamp_state>();
-	state->m_centerram[offset] = data;
-	state->m_center_tilemap->mark_tile_dirty(offset);
+	m_centerram[offset] = data;
+	m_center_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( grchamp_right_w )
+WRITE8_MEMBER(grchamp_state::grchamp_right_w)
 {
-	grchamp_state *state = space->machine().driver_data<grchamp_state>();
-	state->m_rightram[offset] = data;
-	state->m_right_tilemap->mark_tile_dirty(offset);
+	m_rightram[offset] = data;
+	m_right_tilemap->mark_tile_dirty(offset);
 }
 
 static TILE_GET_INFO( get_text_tile_info )

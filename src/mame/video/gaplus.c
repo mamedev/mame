@@ -197,24 +197,21 @@ VIDEO_START( gaplus )
 
 ***************************************************************************/
 
-READ8_HANDLER( gaplus_videoram_r )
+READ8_MEMBER(gaplus_state::gaplus_videoram_r)
 {
-	gaplus_state *state = space->machine().driver_data<gaplus_state>();
-	return state->m_videoram[offset];
+	return m_videoram[offset];
 }
 
-WRITE8_HANDLER( gaplus_videoram_w )
+WRITE8_MEMBER(gaplus_state::gaplus_videoram_w)
 {
-	gaplus_state *state = space->machine().driver_data<gaplus_state>();
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_HANDLER( gaplus_starfield_control_w )
+WRITE8_MEMBER(gaplus_state::gaplus_starfield_control_w)
 {
-	gaplus_state *state = space->machine().driver_data<gaplus_state>();
 	offset &= 3;
-	state->m_starfield_control[offset] = data;
+	m_starfield_control[offset] = data;
 }
 
 

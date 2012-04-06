@@ -111,8 +111,8 @@
 static ADDRESS_MAP_START( pass_map, AS_PROGRAM, 16, pass_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x080000, 0x083fff) AM_RAM
-	AM_RANGE(0x200000, 0x200fff) AM_RAM_WRITE_LEGACY(pass_bg_videoram_w) AM_BASE(m_bg_videoram) // Background
-	AM_RANGE(0x210000, 0x213fff) AM_RAM_WRITE_LEGACY(pass_fg_videoram_w) AM_BASE(m_fg_videoram) // Foreground
+	AM_RANGE(0x200000, 0x200fff) AM_RAM_WRITE(pass_bg_videoram_w) AM_BASE(m_bg_videoram) // Background
+	AM_RANGE(0x210000, 0x213fff) AM_RAM_WRITE(pass_fg_videoram_w) AM_BASE(m_fg_videoram) // Foreground
 	AM_RANGE(0x220000, 0x2203ff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x230000, 0x230001) AM_WRITE(soundlatch_word_w)
 	AM_RANGE(0x230100, 0x230101) AM_READ_PORT("DSW")

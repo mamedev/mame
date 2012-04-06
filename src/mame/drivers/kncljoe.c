@@ -45,15 +45,15 @@ WRITE8_MEMBER(kncljoe_state::sound_cmd_w)
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, kncljoe_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xcfff) AM_RAM_WRITE_LEGACY(kncljoe_videoram_w) AM_BASE(m_videoram)
-	AM_RANGE(0xd000, 0xd001) AM_WRITE_LEGACY(kncljoe_scroll_w) AM_BASE(m_scrollregs)
+	AM_RANGE(0xc000, 0xcfff) AM_RAM_WRITE(kncljoe_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0xd000, 0xd001) AM_WRITE(kncljoe_scroll_w) AM_BASE(m_scrollregs)
 	AM_RANGE(0xd800, 0xd800) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xd801, 0xd801) AM_READ_PORT("P1")
 	AM_RANGE(0xd802, 0xd802) AM_READ_PORT("P2")
 	AM_RANGE(0xd803, 0xd803) AM_READ_PORT("DSWA")
 	AM_RANGE(0xd804, 0xd804) AM_READ_PORT("DSWB")
 	AM_RANGE(0xd800, 0xd800) AM_WRITE(sound_cmd_w)
-	AM_RANGE(0xd801, 0xd801) AM_WRITE_LEGACY(kncljoe_control_w)
+	AM_RANGE(0xd801, 0xd801) AM_WRITE(kncljoe_control_w)
 	AM_RANGE(0xd802, 0xd802) AM_DEVWRITE_LEGACY("sn1", sn76496_w)
 	AM_RANGE(0xd803, 0xd803) AM_DEVWRITE_LEGACY("sn2", sn76496_w)
 	AM_RANGE(0xd807, 0xd807) AM_READNOP		/* unknown read */

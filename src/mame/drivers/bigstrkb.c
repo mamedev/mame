@@ -48,9 +48,9 @@ static ADDRESS_MAP_START( bigstrkb_map, AS_PROGRAM, 16, bigstrkb_state )
 
 	AM_RANGE(0x0D0000, 0x0dffff) AM_RAM  // 0xd2000 - 0xd3fff?   0xd8000?
 
-	AM_RANGE(0x0e0000, 0x0e3fff) AM_RAM_WRITE_LEGACY(bsb_videoram2_w) AM_BASE(m_videoram2)
-	AM_RANGE(0x0e8000, 0x0ebfff) AM_RAM_WRITE_LEGACY(bsb_videoram3_w) AM_BASE(m_videoram3)
-	AM_RANGE(0x0ec000, 0x0effff) AM_RAM_WRITE_LEGACY(bsb_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0x0e0000, 0x0e3fff) AM_RAM_WRITE(bsb_videoram2_w) AM_BASE(m_videoram2)
+	AM_RANGE(0x0e8000, 0x0ebfff) AM_RAM_WRITE(bsb_videoram3_w) AM_BASE(m_videoram3)
+	AM_RANGE(0x0ec000, 0x0effff) AM_RAM_WRITE(bsb_videoram_w) AM_BASE(m_videoram)
 
 	AM_RANGE(0x0f0000, 0x0f7fff) AM_RAM
 	AM_RANGE(0x0f8000, 0x0f87ff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_SHARE("paletteram")

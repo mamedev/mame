@@ -34,17 +34,19 @@ public:
 	device_t *m_pc090oj;
 	DECLARE_WRITE16_MEMBER(jumping_sound_w);
 	DECLARE_READ8_MEMBER(jumping_latch_r);
+	DECLARE_WRITE16_MEMBER(rbisland_cchip_ctrl_w);
+	DECLARE_WRITE16_MEMBER(rbisland_cchip_bank_w);
+	DECLARE_WRITE16_MEMBER(rbisland_cchip_ram_w);
+	DECLARE_READ16_MEMBER(rbisland_cchip_ctrl_r);
+	DECLARE_READ16_MEMBER(rbisland_cchip_ram_r);
+	DECLARE_WRITE16_MEMBER(rbisland_spritectrl_w);
+	DECLARE_WRITE16_MEMBER(jumping_spritectrl_w);
 };
 
 
 /*----------- defined in machine/rainbow.c -----------*/
 
 void rbisland_cchip_init(running_machine &machine, int version);
-READ16_HANDLER( rbisland_cchip_ctrl_r );
-READ16_HANDLER( rbisland_cchip_ram_r );
-WRITE16_HANDLER( rbisland_cchip_ctrl_w );
-WRITE16_HANDLER( rbisland_cchip_bank_w );
-WRITE16_HANDLER( rbisland_cchip_ram_w );
 
 
 /*----------- defined in video/rainbow.c -----------*/
@@ -53,5 +55,3 @@ SCREEN_UPDATE_IND16( rainbow );
 VIDEO_START( jumping );
 SCREEN_UPDATE_IND16( jumping );
 
-WRITE16_HANDLER( jumping_spritectrl_w );
-WRITE16_HANDLER( rbisland_spritectrl_w );

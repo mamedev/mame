@@ -29,13 +29,13 @@ public:
 	DECLARE_WRITE16_MEMBER(gaelco_encrypted_w);
 	DECLARE_WRITE16_MEMBER(thoop_vram_encrypted_w);
 	DECLARE_WRITE16_MEMBER(thoop_encrypted_w);
+	DECLARE_WRITE16_MEMBER(gaelco_vram_w);
 };
 
 
 
 /*----------- defined in video/gaelco.c -----------*/
 
-WRITE16_HANDLER( gaelco_vram_w );
 
 VIDEO_START( bigkarnk );
 VIDEO_START( maniacsq );

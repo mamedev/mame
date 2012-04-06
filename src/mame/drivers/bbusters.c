@@ -325,13 +325,13 @@ READ16_MEMBER(bbusters_state::mechatt_gun_r)
 static ADDRESS_MAP_START( bbusters_map, AS_PROGRAM, 16, bbusters_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x08ffff) AM_RAM AM_BASE(m_ram)
-	AM_RANGE(0x090000, 0x090fff) AM_RAM_WRITE_LEGACY(bbusters_video_w) AM_BASE(m_videoram)
+	AM_RANGE(0x090000, 0x090fff) AM_RAM_WRITE(bbusters_video_w) AM_BASE(m_videoram)
 	AM_RANGE(0x0a0000, 0x0a0fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x0a1000, 0x0a7fff) AM_RAM		/* service mode */
 	AM_RANGE(0x0a8000, 0x0a8fff) AM_RAM AM_SHARE("spriteram2")
 	AM_RANGE(0x0a9000, 0x0affff) AM_RAM		/* service mode */
-	AM_RANGE(0x0b0000, 0x0b1fff) AM_RAM_WRITE_LEGACY(bbusters_pf1_w) AM_BASE(m_pf1_data)
-	AM_RANGE(0x0b2000, 0x0b3fff) AM_RAM_WRITE_LEGACY(bbusters_pf2_w) AM_BASE(m_pf2_data)
+	AM_RANGE(0x0b0000, 0x0b1fff) AM_RAM_WRITE(bbusters_pf1_w) AM_BASE(m_pf1_data)
+	AM_RANGE(0x0b2000, 0x0b3fff) AM_RAM_WRITE(bbusters_pf2_w) AM_BASE(m_pf2_data)
 	AM_RANGE(0x0b4000, 0x0b5fff) AM_RAM		/* service mode */
 	AM_RANGE(0x0b8000, 0x0b8003) AM_WRITEONLY AM_BASE(m_pf1_scroll_data)
 	AM_RANGE(0x0b8008, 0x0b800b) AM_WRITEONLY AM_BASE(m_pf2_scroll_data)
@@ -355,12 +355,12 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( mechatt_map, AS_PROGRAM, 16, bbusters_state )
 	AM_RANGE(0x000000, 0x06ffff) AM_ROM
 	AM_RANGE(0x070000, 0x07ffff) AM_RAM AM_BASE(m_ram)
-	AM_RANGE(0x090000, 0x090fff) AM_RAM_WRITE_LEGACY(bbusters_video_w) AM_BASE(m_videoram)
+	AM_RANGE(0x090000, 0x090fff) AM_RAM_WRITE(bbusters_video_w) AM_BASE(m_videoram)
 	AM_RANGE(0x0a0000, 0x0a0fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x0a1000, 0x0a7fff) AM_WRITENOP
-	AM_RANGE(0x0b0000, 0x0b3fff) AM_RAM_WRITE_LEGACY(bbusters_pf1_w) AM_BASE(m_pf1_data)
+	AM_RANGE(0x0b0000, 0x0b3fff) AM_RAM_WRITE(bbusters_pf1_w) AM_BASE(m_pf1_data)
 	AM_RANGE(0x0b8000, 0x0b8003) AM_WRITEONLY AM_BASE(m_pf1_scroll_data)
-	AM_RANGE(0x0c0000, 0x0c3fff) AM_RAM_WRITE_LEGACY(bbusters_pf2_w) AM_BASE(m_pf2_data)
+	AM_RANGE(0x0c0000, 0x0c3fff) AM_RAM_WRITE(bbusters_pf2_w) AM_BASE(m_pf2_data)
 	AM_RANGE(0x0c8000, 0x0c8003) AM_WRITEONLY AM_BASE(m_pf2_scroll_data)
 	AM_RANGE(0x0d0000, 0x0d07ff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBxxxx_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x0e0000, 0x0e0001) AM_READ_PORT("IN0")

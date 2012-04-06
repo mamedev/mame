@@ -339,7 +339,7 @@ static WRITE16_HANDLER(galsnew_vram_0_bank_w)
 		{
 			if(state->m_vram[0][i])
 			{
-				kaneko16_vram_0_w(space, i+1, data << 8, 0xFF00);
+				state->kaneko16_vram_0_w(*space, i+1, data << 8, 0xFF00);
 			}
 		}
 		state->m_vram_0_bank_num = data;
@@ -356,7 +356,7 @@ static WRITE16_HANDLER(galsnew_vram_1_bank_w)
 		{
 			if(state->m_vram[1][i])
 			{
-				kaneko16_vram_1_w(space, i+1, data << 8, 0xFF00);
+				state->kaneko16_vram_1_w(*space, i+1, data << 8, 0xFF00);
 			}
 		}
 		state->m_vram_1_bank_num = data;
@@ -379,18 +379,18 @@ static ADDRESS_MAP_START( galsnew_map, AS_PROGRAM, 16, expro02_state )
 	AM_RANGE(0x500000, 0x51ffff) AM_RAM AM_BASE(m_galsnew_bg_pixram)
 	AM_RANGE(0x520000, 0x53ffff) AM_RAM AM_BASE(m_galsnew_fg_pixram)
 
-	AM_RANGE(0x580000, 0x580fff) AM_RAM_WRITE_LEGACY(kaneko16_vram_1_w) AM_BASE(m_vram[1])	// Layers 0
-	AM_RANGE(0x581000, 0x581fff) AM_RAM_WRITE_LEGACY(kaneko16_vram_0_w) AM_BASE(m_vram[0])	//
+	AM_RANGE(0x580000, 0x580fff) AM_RAM_WRITE(kaneko16_vram_1_w) AM_BASE(m_vram[1])	// Layers 0
+	AM_RANGE(0x581000, 0x581fff) AM_RAM_WRITE(kaneko16_vram_0_w) AM_BASE(m_vram[0])	//
 	AM_RANGE(0x582000, 0x582fff) AM_RAM AM_BASE(m_vscroll[1])									//
 	AM_RANGE(0x583000, 0x583fff) AM_RAM AM_BASE(m_vscroll[0])									//
 
 	AM_RANGE(0x600000, 0x600fff) AM_RAM_WRITE_LEGACY(galsnew_paletteram_w) AM_SHARE("paletteram") // palette?
 
-	AM_RANGE(0x680000, 0x68001f) AM_RAM_WRITE_LEGACY(kaneko16_layers_0_regs_w) AM_BASE(m_layers_0_regs) // sprite regs? tileregs?
+	AM_RANGE(0x680000, 0x68001f) AM_RAM_WRITE(kaneko16_layers_0_regs_w) AM_BASE(m_layers_0_regs) // sprite regs? tileregs?
 
 	AM_RANGE(0x700000, 0x700fff) AM_RAM AM_SHARE("spriteram")	 // sprites? 0x72f words tested
 
-	AM_RANGE(0x780000, 0x78001f) AM_RAM_WRITE_LEGACY(kaneko16_sprites_regs_w) AM_BASE(m_sprites_regs) // sprite regs? tileregs?
+	AM_RANGE(0x780000, 0x78001f) AM_RAM_WRITE(kaneko16_sprites_regs_w) AM_BASE(m_sprites_regs) // sprite regs? tileregs?
 
 	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("DSW1")
 	AM_RANGE(0x800002, 0x800003) AM_READ_PORT("DSW2")
@@ -404,7 +404,7 @@ static ADDRESS_MAP_START( galsnew_map, AS_PROGRAM, 16, expro02_state )
 
 	AM_RANGE(0xd80000, 0xd80001) AM_WRITE_LEGACY(galsnew_vram_1_bank_w)	/* ??? */
 
-	AM_RANGE(0xe00000, 0xe00015) AM_READWRITE_LEGACY(galpanib_calc_r,galpanib_calc_w) /* CALC1 MCU interaction (simulated) */
+	AM_RANGE(0xe00000, 0xe00015) AM_READWRITE(galpanib_calc_r,galpanib_calc_w) /* CALC1 MCU interaction (simulated) */
 
 	AM_RANGE(0xe80000, 0xe80001) AM_WRITE_LEGACY(galsnew_vram_0_bank_w)	/* ??? */
 ADDRESS_MAP_END
@@ -416,14 +416,14 @@ static ADDRESS_MAP_START( fantasia_map, AS_PROGRAM, 16, expro02_state )
 	AM_RANGE(0x000000, 0x4fffff) AM_ROM
 	AM_RANGE(0x500000, 0x51ffff) AM_RAM AM_BASE(m_galsnew_bg_pixram)
 	AM_RANGE(0x520000, 0x53ffff) AM_RAM AM_BASE(m_galsnew_fg_pixram)
-	AM_RANGE(0x580000, 0x580fff) AM_RAM_WRITE_LEGACY(kaneko16_vram_1_w) AM_BASE(m_vram[1])	// Layers 0
-	AM_RANGE(0x581000, 0x581fff) AM_RAM_WRITE_LEGACY(kaneko16_vram_0_w) AM_BASE(m_vram[0])	//
+	AM_RANGE(0x580000, 0x580fff) AM_RAM_WRITE(kaneko16_vram_1_w) AM_BASE(m_vram[1])	// Layers 0
+	AM_RANGE(0x581000, 0x581fff) AM_RAM_WRITE(kaneko16_vram_0_w) AM_BASE(m_vram[0])	//
 	AM_RANGE(0x582000, 0x582fff) AM_RAM AM_BASE(m_vscroll[1])									//
 	AM_RANGE(0x583000, 0x583fff) AM_RAM AM_BASE(m_vscroll[0])									//
 	AM_RANGE(0x600000, 0x600fff) AM_RAM_WRITE_LEGACY(galsnew_paletteram_w) AM_SHARE("paletteram") // palette?
-	AM_RANGE(0x680000, 0x68001f) AM_RAM_WRITE_LEGACY(kaneko16_layers_0_regs_w) AM_BASE(m_layers_0_regs) // sprite regs? tileregs?
+	AM_RANGE(0x680000, 0x68001f) AM_RAM_WRITE(kaneko16_layers_0_regs_w) AM_BASE(m_layers_0_regs) // sprite regs? tileregs?
 	AM_RANGE(0x700000, 0x700fff) AM_RAM AM_SHARE("spriteram")	 // sprites? 0x72f words tested
-	AM_RANGE(0x780000, 0x78001f) AM_RAM_WRITE_LEGACY(kaneko16_sprites_regs_w) AM_BASE(m_sprites_regs) // sprite regs? tileregs?
+	AM_RANGE(0x780000, 0x78001f) AM_RAM_WRITE(kaneko16_sprites_regs_w) AM_BASE(m_sprites_regs) // sprite regs? tileregs?
 	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("DSW1")
 	AM_RANGE(0x800002, 0x800003) AM_READ_PORT("DSW2")
 	AM_RANGE(0x800004, 0x800005) AM_READ_PORT("DSW3")

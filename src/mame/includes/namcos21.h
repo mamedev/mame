@@ -130,6 +130,12 @@ public:
 	DECLARE_WRITE16_MEMBER(winrun_68k_dspcomram_w);
 	DECLARE_READ16_MEMBER(winrun_dspcomram_control_r);
 	DECLARE_WRITE16_MEMBER(winrun_dspcomram_control_w);
+	DECLARE_READ16_MEMBER(winrun_gpu_color_r);
+	DECLARE_WRITE16_MEMBER(winrun_gpu_color_w);
+	DECLARE_READ16_MEMBER(winrun_gpu_register_r);
+	DECLARE_WRITE16_MEMBER(winrun_gpu_register_w);
+	DECLARE_WRITE16_MEMBER(winrun_gpu_videoram_w);
+	DECLARE_READ16_MEMBER(winrun_gpu_videoram_r);
 };
 
 
@@ -138,14 +144,8 @@ public:
 extern void namcos21_ClearPolyFrameBuffer( running_machine &machine );
 extern void namcos21_DrawQuad( running_machine &machine, int sx[4], int sy[4], int zcode[4], int color );
 
-extern READ16_HANDLER(winrun_gpu_color_r);
-extern WRITE16_HANDLER(winrun_gpu_color_w);
 
-extern READ16_HANDLER(winrun_gpu_videoram_r);
-extern WRITE16_HANDLER(winrun_gpu_videoram_w);
 
-extern READ16_HANDLER(winrun_gpu_register_r);
-extern WRITE16_HANDLER(winrun_gpu_register_w);
 
 extern VIDEO_START( namcos21 ) ;
 extern SCREEN_UPDATE_IND16( namcos21 );

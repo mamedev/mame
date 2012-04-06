@@ -53,16 +53,16 @@ public:
 	DECLARE_READ8_MEMBER(hotsmash_from_mcu_r);
 	DECLARE_WRITE8_MEMBER(pbillian_z80_mcu_w);
 	DECLARE_READ8_MEMBER(pbillian_from_mcu_r);
+	DECLARE_WRITE8_MEMBER(superqix_videoram_w);
+	DECLARE_WRITE8_MEMBER(superqix_bitmapram_w);
+	DECLARE_WRITE8_MEMBER(superqix_bitmapram2_w);
+	DECLARE_WRITE8_MEMBER(pbillian_0410_w);
+	DECLARE_WRITE8_MEMBER(superqix_0410_w);
 };
 
 
 /*----------- defined in video/superqix.c -----------*/
 
-WRITE8_HANDLER( superqix_videoram_w );
-WRITE8_HANDLER( superqix_bitmapram_w );
-WRITE8_HANDLER( superqix_bitmapram2_w );
-WRITE8_HANDLER( pbillian_0410_w );
-WRITE8_HANDLER( superqix_0410_w );
 
 VIDEO_START( pbillian );
 SCREEN_UPDATE_IND16( pbillian );

@@ -27,44 +27,43 @@
  *  1 1 0    Command register
  */
 
-WRITE16_HANDLER( jpmimpct_bt477_w )
+WRITE16_MEMBER(jpmimpct_state::jpmimpct_bt477_w)
 {
-	jpmimpct_state *state = space->machine().driver_data<jpmimpct_state>();
 	UINT8 val = data & 0xff;
 
 	switch (offset)
 	{
 		case 0x0:
 		{
-			state->m_bt477.address = val;
-			state->m_bt477.addr_cnt = 0;
+			m_bt477.address = val;
+			m_bt477.addr_cnt = 0;
 			break;
 		}
 		case 0x1:
 		{
-			UINT8 *addr_cnt = &state->m_bt477.addr_cnt;
-			rgb_t *color = &state->m_bt477.color;
+			UINT8 *addr_cnt = &m_bt477.addr_cnt;
+			rgb_t *color = &m_bt477.color;
 
 			color[*addr_cnt] = val;
 
 			if (++*addr_cnt == 3)
 			{
-				palette_set_color(space->machine(), state->m_bt477.address, MAKE_RGB(color[0], color[1], color[2]));
+				palette_set_color(machine(), m_bt477.address, MAKE_RGB(color[0], color[1], color[2]));
 				*addr_cnt = 0;
 
 				/* Address register increments */
-				state->m_bt477.address++;
+				m_bt477.address++;
 			}
 			break;
 		}
 		case 0x2:
 		{
-			state->m_bt477.pixmask = val;
+			m_bt477.pixmask = val;
 			break;
 		}
 		case 0x6:
 		{
-			state->m_bt477.command = val;
+			m_bt477.command = val;
 			break;
 		}
 		default:
@@ -74,7 +73,7 @@ WRITE16_HANDLER( jpmimpct_bt477_w )
 	}
 }
 
-READ16_HANDLER( jpmimpct_bt477_r )
+READ16_MEMBER(jpmimpct_state::jpmimpct_bt477_r)
 {
 	popmessage("Bt477: Unhandled read access (offset:%x)", offset);
 	return 0;

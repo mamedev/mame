@@ -63,6 +63,14 @@ public:
 	DECLARE_WRITE16_MEMBER(grom_bank16_w);
 	DECLARE_WRITE16_MEMBER(display_page16_w);
 	DECLARE_WRITE16_MEMBER(palette16_w);
+	DECLARE_WRITE8_MEMBER(itech8_palette_w);
+	DECLARE_WRITE8_MEMBER(itech8_page_w);
+	DECLARE_READ8_MEMBER(itech8_blitter_r);
+	DECLARE_WRITE8_MEMBER(itech8_blitter_w);
+	DECLARE_WRITE8_MEMBER(itech8_tms34061_w);
+	DECLARE_READ8_MEMBER(itech8_tms34061_r);
+	DECLARE_WRITE8_MEMBER(grmatch_palette_w);
+	DECLARE_WRITE8_MEMBER(grmatch_xscroll_w);
 };
 
 
@@ -88,18 +96,10 @@ SCREEN_UPDATE_RGB32( slikshot );
 
 VIDEO_START( itech8 );
 
-WRITE8_HANDLER( itech8_page_w );
 
-WRITE8_HANDLER( itech8_palette_w );
 
-READ8_HANDLER( itech8_blitter_r );
-WRITE8_HANDLER( itech8_blitter_w );
 
-WRITE8_HANDLER( itech8_tms34061_w );
-READ8_HANDLER( itech8_tms34061_r );
 
-WRITE8_HANDLER( grmatch_palette_w );
-WRITE8_HANDLER( grmatch_xscroll_w );
 TIMER_DEVICE_CALLBACK( grmatch_palette_update );
 
 SCREEN_UPDATE_RGB32( itech8_2layer );

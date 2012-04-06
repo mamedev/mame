@@ -4,61 +4,55 @@
 
 /******************************************************************************/
 
-WRITE16_HANDLER(tatsumi_sprite_control_w)
+WRITE16_MEMBER(tatsumi_state::tatsumi_sprite_control_w)
 {
-	tatsumi_state *state = space->machine().driver_data<tatsumi_state>();
-	COMBINE_DATA(&state->m_sprite_control_ram[offset]);
+	COMBINE_DATA(&m_sprite_control_ram[offset]);
 
 	/* 0xe0 is bank switch, others unknown */
 //  if ((offset==0xe0 && data&0xefff) || offset!=0xe0)
-//      logerror("%08x:  Tatsumi TZB215 sprite control %04x %08x\n", cpu_get_pc(&space->device()), offset, data);
+//      logerror("%08x:  Tatsumi TZB215 sprite control %04x %08x\n", cpu_get_pc(&space.device()), offset, data);
 }
 
 /******************************************************************************/
 
-WRITE16_HANDLER( apache3_road_z_w )
+WRITE16_MEMBER(tatsumi_state::apache3_road_z_w)
 {
-	tatsumi_state *state = space->machine().driver_data<tatsumi_state>();
-	state->m_apache3_road_z = data & 0xff;
+	m_apache3_road_z = data & 0xff;
 }
 
-WRITE8_HANDLER( apache3_road_x_w )
+WRITE8_MEMBER(tatsumi_state::apache3_road_x_w)
 {
-	tatsumi_state *state = space->machine().driver_data<tatsumi_state>();
 	// Note: Double buffered. Yes, this is correct :)
-	state->m_apache3_road_x_ram[data] = offset;
+	m_apache3_road_x_ram[data] = offset;
 }
 
-READ16_HANDLER( roundup5_vram_r )
+READ16_MEMBER(tatsumi_state::roundup5_vram_r)
 {
-	tatsumi_state *state = space->machine().driver_data<tatsumi_state>();
-	offset+=((state->m_control_word&0x0c00)>>10) * 0xc000;
-	return state->m_roundup5_vram[offset];
+	offset+=((m_control_word&0x0c00)>>10) * 0xc000;
+	return m_roundup5_vram[offset];
 }
 
-WRITE16_HANDLER( roundup5_vram_w )
+WRITE16_MEMBER(tatsumi_state::roundup5_vram_w)
 {
-	tatsumi_state *state = space->machine().driver_data<tatsumi_state>();
-	offset+=((state->m_control_word&0x0c00)>>10) * 0xc000;
+	offset+=((m_control_word&0x0c00)>>10) * 0xc000;
 
 //  if (offset>=0x30000)
-//      logerror("effective write to vram %06x %02x (control %04x)\n",offset,data,state->m_control_word);
+//      logerror("effective write to vram %06x %02x (control %04x)\n",offset,data,m_control_word);
 
-	COMBINE_DATA(&state->m_roundup5_vram[offset]);
+	COMBINE_DATA(&m_roundup5_vram[offset]);
 
 	offset=offset%0xc000;
 
-	gfx_element_mark_dirty(space->machine().gfx[1],offset/0x10);
+	gfx_element_mark_dirty(machine().gfx[1],offset/0x10);
 }
 
 
-WRITE16_HANDLER( roundup5_palette_w )
+WRITE16_MEMBER(tatsumi_state::roundup5_palette_w)
 {
 //  static int hack=0;
 	int word;
 
-	tatsumi_state *state = space->machine().driver_data<tatsumi_state>();
-	COMBINE_DATA(&state->m_generic_paletteram_16[offset]);
+	COMBINE_DATA(&m_generic_paletteram_16[offset]);
 
 //  if (offset==0xbfe)
 //      hack++;
@@ -80,17 +74,16 @@ bit 0:  3.9kOhm resistor
 //  logerror("PAL: %04x %02x\n",offset,data);
 
 	offset&=~1;
-	word = ((state->m_generic_paletteram_16[offset] & 0xff)<<8) | (state->m_generic_paletteram_16[offset+1] & 0xff);
-	palette_set_color_rgb(space->machine(),offset/2,pal5bit(word >> 10),pal5bit(word >> 5),pal5bit(word >> 0));
+	word = ((m_generic_paletteram_16[offset] & 0xff)<<8) | (m_generic_paletteram_16[offset+1] & 0xff);
+	palette_set_color_rgb(machine(),offset/2,pal5bit(word >> 10),pal5bit(word >> 5),pal5bit(word >> 0));
 }
 
 
-WRITE16_HANDLER( apache3_palette_w )
+WRITE16_MEMBER(tatsumi_state::apache3_palette_w)
 {
 //  static int hack=0;
 
-	tatsumi_state *state = space->machine().driver_data<tatsumi_state>();
-	COMBINE_DATA(&state->m_generic_paletteram_16[offset]);
+	COMBINE_DATA(&m_generic_paletteram_16[offset]);
 
 //  if (offset==0xbfe)
 //      hack++;
@@ -111,62 +104,56 @@ bit 0:  3.9kOhm resistor
 
 //  logerror("PAL: %04x %02x\n",offset,data);
 
-	data = state->m_generic_paletteram_16[offset];
-	palette_set_color_rgb(space->machine(),offset,pal5bit(data >> 10),pal5bit(data >> 5),pal5bit(data >> 0));
+	data = m_generic_paletteram_16[offset];
+	palette_set_color_rgb(machine(),offset,pal5bit(data >> 10),pal5bit(data >> 5),pal5bit(data >> 0));
 }
 
 
-WRITE16_HANDLER( roundup5_text_w )
+WRITE16_MEMBER(tatsumi_state::roundup5_text_w)
 {
-	tatsumi_state *state = space->machine().driver_data<tatsumi_state>();
-	UINT16 *videoram = state->m_videoram;
+	UINT16 *videoram = m_videoram;
 	COMBINE_DATA(&videoram[offset]);
-	state->m_tx_layer->mark_tile_dirty(offset);
+	m_tx_layer->mark_tile_dirty(offset);
 }
 
-READ16_HANDLER( cyclwarr_videoram0_r )
+READ16_MEMBER(tatsumi_state::cyclwarr_videoram0_r)
 {
-	tatsumi_state *state = space->machine().driver_data<tatsumi_state>();
-	 return state->m_cyclwarr_videoram0[offset];
+	 return m_cyclwarr_videoram0[offset];
 }
 
-READ16_HANDLER( cyclwarr_videoram1_r )
+READ16_MEMBER(tatsumi_state::cyclwarr_videoram1_r)
 {
-	tatsumi_state *state = space->machine().driver_data<tatsumi_state>();
-	 return state->m_cyclwarr_videoram1[offset];
+	 return m_cyclwarr_videoram1[offset];
 }
 
-WRITE16_HANDLER( cyclwarr_videoram0_w )
+WRITE16_MEMBER(tatsumi_state::cyclwarr_videoram0_w)
 {
-	tatsumi_state *state = space->machine().driver_data<tatsumi_state>();
-	COMBINE_DATA(&state->m_cyclwarr_videoram0[offset]);
+	COMBINE_DATA(&m_cyclwarr_videoram0[offset]);
 	if (offset>=0x400)
 	{
-		state->m_layer0->mark_tile_dirty(offset-0x400);
-		state->m_layer1->mark_tile_dirty(offset-0x400);
+		m_layer0->mark_tile_dirty(offset-0x400);
+		m_layer1->mark_tile_dirty(offset-0x400);
 	}
 }
 
-WRITE16_HANDLER( cyclwarr_videoram1_w )
+WRITE16_MEMBER(tatsumi_state::cyclwarr_videoram1_w)
 {
-	tatsumi_state *state = space->machine().driver_data<tatsumi_state>();
-	COMBINE_DATA(&state->m_cyclwarr_videoram1[offset]);
+	COMBINE_DATA(&m_cyclwarr_videoram1[offset]);
 	if (offset>=0x400)
 	{
-		state->m_layer2->mark_tile_dirty(offset-0x400);
-		state->m_layer3->mark_tile_dirty(offset-0x400);
+		m_layer2->mark_tile_dirty(offset-0x400);
+		m_layer3->mark_tile_dirty(offset-0x400);
 	}
 }
 
-WRITE16_HANDLER( roundup5_crt_w )
+WRITE16_MEMBER(tatsumi_state::roundup5_crt_w)
 {
-	tatsumi_state *state = space->machine().driver_data<tatsumi_state>();
 	if (offset==0 && ACCESSING_BITS_0_7)
-		state->m_roundupt_crt_selected_reg=data&0x3f;
+		m_roundupt_crt_selected_reg=data&0x3f;
 	if (offset==1 && ACCESSING_BITS_0_7) {
-		state->m_roundupt_crt_reg[state->m_roundupt_crt_selected_reg]=data;
-//      if (state->m_roundupt_crt_selected_reg!=0xa && state->m_roundupt_crt_selected_reg!=0xb && state->m_roundupt_crt_selected_reg!=29)
-//      logerror("%08x:  Crt write %02x %02x\n",cpu_get_pc(&space->device()),state->m_roundupt_crt_selected_reg,data);
+		m_roundupt_crt_reg[m_roundupt_crt_selected_reg]=data;
+//      if (m_roundupt_crt_selected_reg!=0xa && m_roundupt_crt_selected_reg!=0xb && m_roundupt_crt_selected_reg!=29)
+//      logerror("%08x:  Crt write %02x %02x\n",cpu_get_pc(&space.device()),m_roundupt_crt_selected_reg,data);
 	}
 }
 

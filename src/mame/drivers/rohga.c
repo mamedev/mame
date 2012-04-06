@@ -142,7 +142,7 @@ static ADDRESS_MAP_START( rohga_map, AS_PROGRAM, 16, rohga_state )
 
 	AM_RANGE(0x2c0000, 0x2c0001) AM_READ_PORT("DSW3")
 
-	AM_RANGE(0x300000, 0x300001) AM_WRITE_LEGACY(rohga_buffer_spriteram16_w) /* write 1 for sprite dma */
+	AM_RANGE(0x300000, 0x300001) AM_WRITE(rohga_buffer_spriteram16_w) /* write 1 for sprite dma */
 	AM_RANGE(0x310000, 0x310009) AM_WRITENOP /* Palette control? */
 	AM_RANGE(0x31000a, 0x31000b) AM_DEVWRITE_LEGACY("deco_common", decocomn_palette_dma_w) /* Write 1111 for dma?  (Or any value?) */
 	AM_RANGE(0x320000, 0x320001) AM_WRITENOP /* ? */
@@ -235,7 +235,7 @@ static ADDRESS_MAP_START( schmeisr_map, AS_PROGRAM, 16, rohga_state )
 	AM_RANGE(0x280000, 0x2807ff) AM_MIRROR(0x800) AM_READWRITE_LEGACY(deco16_104_rohga_prot_r,deco16_104_rohga_prot_w) AM_BASE_LEGACY(&deco16_prot_ram) /* Protection device */
 
 	AM_RANGE(0x2c0000, 0x2c0001) AM_READ_PORT("DSW3")
-	AM_RANGE(0x300000, 0x300001) AM_READ_PORT("DSW3")  AM_WRITE_LEGACY(rohga_buffer_spriteram16_w) /* write 1 for sprite dma */
+	AM_RANGE(0x300000, 0x300001) AM_READ_PORT("DSW3")  AM_WRITE(rohga_buffer_spriteram16_w) /* write 1 for sprite dma */
 	AM_RANGE(0x310002, 0x310003) AM_READ_PORT("IN1")
 	AM_RANGE(0x310000, 0x310009) AM_WRITENOP /* Palette control? */
 	AM_RANGE(0x31000a, 0x31000b) AM_DEVWRITE_LEGACY("deco_common", decocomn_palette_dma_w) /* Write 1111 for dma?  (Or any value?) */

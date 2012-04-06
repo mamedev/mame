@@ -168,12 +168,11 @@ static void journey_set_color(running_machine &machine, int index, int data)
 }
 
 
-WRITE8_HANDLER( mcr_91490_paletteram_w )
+WRITE8_MEMBER(mcr_state::mcr_91490_paletteram_w)
 {
-	mcr_state *state = space->machine().driver_data<mcr_state>();
-	state->m_generic_paletteram_8[offset] = data;
+	m_generic_paletteram_8[offset] = data;
 	offset &= 0x7f;
-	mcr_set_color(space->machine(), (offset / 2) & 0x3f, data | ((offset & 1) << 8));
+	mcr_set_color(machine(), (offset / 2) & 0x3f, data | ((offset & 1) << 8));
 }
 
 
@@ -184,19 +183,17 @@ WRITE8_HANDLER( mcr_91490_paletteram_w )
  *
  *************************************/
 
-WRITE8_HANDLER( mcr_90009_videoram_w )
+WRITE8_MEMBER(mcr_state::mcr_90009_videoram_w)
 {
-	mcr_state *state = space->machine().driver_data<mcr_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = m_videoram;
 	videoram[offset] = data;
 	bg_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_HANDLER( mcr_90010_videoram_w )
+WRITE8_MEMBER(mcr_state::mcr_90010_videoram_w)
 {
-	mcr_state *state = space->machine().driver_data<mcr_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = m_videoram;
 	videoram[offset] = data;
 	bg_tilemap->mark_tile_dirty(offset / 2);
 
@@ -204,26 +201,24 @@ WRITE8_HANDLER( mcr_90010_videoram_w )
 	if ((offset & 0x780) == 0x780)
 	{
 		if (mcr_cpu_board != 91475)
-			mcr_set_color(space->machine(), (offset / 2) & 0x3f, data | ((offset & 1) << 8));
+			mcr_set_color(machine(), (offset / 2) & 0x3f, data | ((offset & 1) << 8));
 		else
-			journey_set_color(space->machine(), (offset / 2) & 0x3f, data | ((offset & 1) << 8));
+			journey_set_color(machine(), (offset / 2) & 0x3f, data | ((offset & 1) << 8));
 	}
 }
 
 
-READ8_HANDLER( twotiger_videoram_r )
+READ8_MEMBER(mcr_state::twotiger_videoram_r)
 {
-	mcr_state *state = space->machine().driver_data<mcr_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = m_videoram;
 	/* Two Tigers swizzles the address bits on videoram */
 	int effoffs = ((offset << 1) & 0x7fe) | ((offset >> 10) & 1);
 	return videoram[effoffs];
 }
 
-WRITE8_HANDLER( twotiger_videoram_w )
+WRITE8_MEMBER(mcr_state::twotiger_videoram_w)
 {
-	mcr_state *state = space->machine().driver_data<mcr_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = m_videoram;
 	/* Two Tigers swizzles the address bits on videoram */
 	int effoffs = ((offset << 1) & 0x7fe) | ((offset >> 10) & 1);
 
@@ -232,14 +227,13 @@ WRITE8_HANDLER( twotiger_videoram_w )
 
 	/* palette RAM is mapped into the upper 0x80 bytes here */
 	if ((effoffs & 0x780) == 0x780)
-		mcr_set_color(space->machine(), ((offset & 0x400) >> 5) | ((offset >> 1) & 0x1f), data | ((offset & 1) << 8));
+		mcr_set_color(machine(), ((offset & 0x400) >> 5) | ((offset >> 1) & 0x1f), data | ((offset & 1) << 8));
 }
 
 
-WRITE8_HANDLER( mcr_91490_videoram_w )
+WRITE8_MEMBER(mcr_state::mcr_91490_videoram_w)
 {
-	mcr_state *state = space->machine().driver_data<mcr_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = m_videoram;
 	videoram[offset] = data;
 	bg_tilemap->mark_tile_dirty(offset / 2);
 }

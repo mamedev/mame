@@ -8,39 +8,36 @@ Mr. F. Lea
 #include "emu.h"
 #include "includes/mrflea.h"
 
-WRITE8_HANDLER( mrflea_gfx_bank_w )
+WRITE8_MEMBER(mrflea_state::mrflea_gfx_bank_w)
 {
-	mrflea_state *state = space->machine().driver_data<mrflea_state>();
-	state->m_gfx_bank = data;
+	m_gfx_bank = data;
 
 	if (data & ~0x14)
 		logerror("unknown gfx bank: 0x%02x\n", data);
 }
 
-WRITE8_HANDLER( mrflea_videoram_w )
+WRITE8_MEMBER(mrflea_state::mrflea_videoram_w)
 {
-	mrflea_state *state = space->machine().driver_data<mrflea_state>();
 	int bank = offset / 0x400;
 
 	offset &= 0x3ff;
-	state->m_videoram[offset] = data;
-	state->m_videoram[offset + 0x400] = bank;
+	m_videoram[offset] = data;
+	m_videoram[offset + 0x400] = bank;
 	/* the address range that tile data is written to sets one bit of
       the bank select.  The remaining bits are from a video register. */
 }
 
-WRITE8_HANDLER( mrflea_spriteram_w )
+WRITE8_MEMBER(mrflea_state::mrflea_spriteram_w)
 {
-	mrflea_state *state = space->machine().driver_data<mrflea_state>();
 
 	if (offset & 2)
 	{
 		/* tile_number */
-		state->m_spriteram[offset | 1] = offset & 1;
+		m_spriteram[offset | 1] = offset & 1;
 		offset &= ~1;
 	}
 
-	state->m_spriteram[offset] = data;
+	m_spriteram[offset] = data;
 }
 
 static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )

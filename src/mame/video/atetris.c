@@ -32,13 +32,12 @@ static TILE_GET_INFO( get_tile_info )
  *
  *************************************/
 
-WRITE8_HANDLER( atetris_videoram_w )
+WRITE8_MEMBER(atetris_state::atetris_videoram_w)
 {
-	atetris_state *state = space->machine().driver_data<atetris_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = m_videoram;
 
 	videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset / 2);
+	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
 

@@ -36,23 +36,23 @@ public:
 	int m_explode_sound_playing;
 	int m_launch1_sound_playing;
 	int m_launch2_sound_playing;
+	DECLARE_WRITE8_MEMBER(starcrus_s1_x_w);
+	DECLARE_WRITE8_MEMBER(starcrus_s1_y_w);
+	DECLARE_WRITE8_MEMBER(starcrus_s2_x_w);
+	DECLARE_WRITE8_MEMBER(starcrus_s2_y_w);
+	DECLARE_WRITE8_MEMBER(starcrus_p1_x_w);
+	DECLARE_WRITE8_MEMBER(starcrus_p1_y_w);
+	DECLARE_WRITE8_MEMBER(starcrus_p2_x_w);
+	DECLARE_WRITE8_MEMBER(starcrus_p2_y_w);
+	DECLARE_WRITE8_MEMBER(starcrus_ship_parm_1_w);
+	DECLARE_WRITE8_MEMBER(starcrus_ship_parm_2_w);
+	DECLARE_WRITE8_MEMBER(starcrus_proj_parm_1_w);
+	DECLARE_WRITE8_MEMBER(starcrus_proj_parm_2_w);
+	DECLARE_READ8_MEMBER(starcrus_coll_det_r);
 };
 
 
 /*----------- defined in video/starcrus.c -----------*/
 
-WRITE8_HANDLER( starcrus_s1_x_w );
-WRITE8_HANDLER( starcrus_s1_y_w );
-WRITE8_HANDLER( starcrus_s2_x_w );
-WRITE8_HANDLER( starcrus_s2_y_w );
-WRITE8_HANDLER( starcrus_p1_x_w );
-WRITE8_HANDLER( starcrus_p1_y_w );
-WRITE8_HANDLER( starcrus_p2_x_w );
-WRITE8_HANDLER( starcrus_p2_y_w );
-WRITE8_HANDLER( starcrus_ship_parm_1_w );
-WRITE8_HANDLER( starcrus_ship_parm_2_w );
-WRITE8_HANDLER( starcrus_proj_parm_1_w );
-WRITE8_HANDLER( starcrus_proj_parm_2_w );
-READ8_HANDLER( starcrus_coll_det_r );
 VIDEO_START( starcrus );
 SCREEN_UPDATE_IND16( starcrus );

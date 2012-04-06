@@ -96,74 +96,66 @@ VIDEO_START( tankbust )
 
 ***************************************************************************/
 
-WRITE8_HANDLER( tankbust_background_videoram_w )
+WRITE8_MEMBER(tankbust_state::tankbust_background_videoram_w)
 {
-	tankbust_state *state = space->machine().driver_data<tankbust_state>();
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
-READ8_HANDLER( tankbust_background_videoram_r )
+READ8_MEMBER(tankbust_state::tankbust_background_videoram_r)
 {
-	tankbust_state *state = space->machine().driver_data<tankbust_state>();
-	return state->m_videoram[offset];
+	return m_videoram[offset];
 }
 
-WRITE8_HANDLER( tankbust_background_colorram_w )
+WRITE8_MEMBER(tankbust_state::tankbust_background_colorram_w)
 {
-	tankbust_state *state = space->machine().driver_data<tankbust_state>();
-	state->m_colorram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_colorram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
-READ8_HANDLER( tankbust_background_colorram_r )
+READ8_MEMBER(tankbust_state::tankbust_background_colorram_r)
 {
-	tankbust_state *state = space->machine().driver_data<tankbust_state>();
-	return state->m_colorram[offset];
+	return m_colorram[offset];
 }
 
-WRITE8_HANDLER( tankbust_txtram_w )
+WRITE8_MEMBER(tankbust_state::tankbust_txtram_w)
 {
-	tankbust_state *state = space->machine().driver_data<tankbust_state>();
-	state->m_txtram[offset] = data;
-	state->m_txt_tilemap->mark_tile_dirty(offset);
+	m_txtram[offset] = data;
+	m_txt_tilemap->mark_tile_dirty(offset);
 }
-READ8_HANDLER( tankbust_txtram_r )
+READ8_MEMBER(tankbust_state::tankbust_txtram_r)
 {
-	tankbust_state *state = space->machine().driver_data<tankbust_state>();
-	return state->m_txtram[offset];
+	return m_txtram[offset];
 }
 
 
 
-WRITE8_HANDLER( tankbust_xscroll_w )
+WRITE8_MEMBER(tankbust_state::tankbust_xscroll_w)
 {
-	tankbust_state *state = space->machine().driver_data<tankbust_state>();
-	if( state->m_xscroll[offset] != data )
+	if( m_xscroll[offset] != data )
 	{
 		int x;
 
-		state->m_xscroll[offset] = data;
+		m_xscroll[offset] = data;
 
-		x = state->m_xscroll[0] + 256 * (state->m_xscroll[1]&1);
+		x = m_xscroll[0] + 256 * (m_xscroll[1]&1);
 		if (x>=0x100) x-=0x200;
-		state->m_bg_tilemap->set_scrollx(0, x );
+		m_bg_tilemap->set_scrollx(0, x );
 	}
-//popmessage("x=%02x %02x", state->m_xscroll[0], state->m_xscroll[1]);
+//popmessage("x=%02x %02x", m_xscroll[0], m_xscroll[1]);
 }
 
 
-WRITE8_HANDLER( tankbust_yscroll_w )
+WRITE8_MEMBER(tankbust_state::tankbust_yscroll_w)
 {
-	tankbust_state *state = space->machine().driver_data<tankbust_state>();
-	if( state->m_yscroll[offset] != data )
+	if( m_yscroll[offset] != data )
 	{
 		int y;
 
-		state->m_yscroll[offset] = data;
-		y = state->m_yscroll[0];
+		m_yscroll[offset] = data;
+		y = m_yscroll[0];
 		if (y>=0x80) y-=0x100;
-		state->m_bg_tilemap->set_scrolly(0, y );
+		m_bg_tilemap->set_scrolly(0, y );
 	}
-//popmessage("y=%02x %02x", state->m_yscroll[0], state->m_yscroll[1]);
+//popmessage("y=%02x %02x", m_yscroll[0], m_yscroll[1]);
 }
 
 /***************************************************************************

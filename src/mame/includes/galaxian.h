@@ -79,6 +79,17 @@ public:
 	rgb_t m_bullet_color[8];
 	UINT8 m_gfxbank[5];
 	required_shared_ptr<UINT8> m_spriteram;
+	DECLARE_WRITE8_MEMBER(galaxian_videoram_w);
+	DECLARE_WRITE8_MEMBER(galaxian_objram_w);
+	DECLARE_WRITE8_MEMBER(galaxian_flip_screen_x_w);
+	DECLARE_WRITE8_MEMBER(galaxian_flip_screen_y_w);
+	DECLARE_WRITE8_MEMBER(galaxian_flip_screen_xy_w);
+	DECLARE_WRITE8_MEMBER(galaxian_stars_enable_w);
+	DECLARE_WRITE8_MEMBER(scramble_background_enable_w);
+	DECLARE_WRITE8_MEMBER(scramble_background_red_w);
+	DECLARE_WRITE8_MEMBER(scramble_background_green_w);
+	DECLARE_WRITE8_MEMBER(scramble_background_blue_w);
+	DECLARE_WRITE8_MEMBER(galaxian_gfxbank_w);
 };
 
 
@@ -90,20 +101,9 @@ PALETTE_INIT( moonwar );
 VIDEO_START( galaxian );
 SCREEN_UPDATE_RGB32( galaxian );
 
-WRITE8_HANDLER( galaxian_videoram_w );
-WRITE8_HANDLER( galaxian_objram_w );
 
-WRITE8_HANDLER( galaxian_flip_screen_x_w );
-WRITE8_HANDLER( galaxian_flip_screen_y_w );
-WRITE8_HANDLER( galaxian_flip_screen_xy_w );
 
-WRITE8_HANDLER( galaxian_stars_enable_w );
-WRITE8_HANDLER( scramble_background_enable_w );
-WRITE8_HANDLER( scramble_background_red_w );
-WRITE8_HANDLER( scramble_background_green_w );
-WRITE8_HANDLER( scramble_background_blue_w );
 
-WRITE8_HANDLER( galaxian_gfxbank_w );
 
 TIMER_DEVICE_CALLBACK( galaxian_stars_blink_timer );
 

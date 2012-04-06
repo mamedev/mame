@@ -44,6 +44,15 @@ public:
 	UINT8 m_alpha_table[8192];
 	UINT8 m_sprite_bpp;
 	DECLARE_READ32_MEMBER(ejanhs_speedup_r);
+	DECLARE_READ32_MEMBER(spi_layer_bank_r);
+	DECLARE_WRITE32_MEMBER(spi_layer_bank_w);
+	DECLARE_READ32_MEMBER(spi_layer_enable_r);
+	DECLARE_WRITE32_MEMBER(spi_layer_enable_w);
+	DECLARE_WRITE32_MEMBER(tilemap_dma_start_w);
+	DECLARE_WRITE32_MEMBER(palette_dma_start_w);
+	DECLARE_WRITE32_MEMBER(sprite_dma_start_w);
+	DECLARE_WRITE32_MEMBER(video_dma_length_w);
+	DECLARE_WRITE32_MEMBER(video_dma_address_w);
 };
 
 
@@ -60,14 +69,6 @@ SCREEN_UPDATE_RGB32( spi );
 VIDEO_START( sys386f2 );
 SCREEN_UPDATE_RGB32( sys386f2 );
 
-READ32_HANDLER( spi_layer_bank_r );
-WRITE32_HANDLER( spi_layer_bank_w );
-WRITE32_HANDLER( spi_layer_enable_w );
 
 void rf2_set_layer_banks(running_machine &machine, int banks);
 
-WRITE32_HANDLER( tilemap_dma_start_w );
-WRITE32_HANDLER( palette_dma_start_w );
-WRITE32_HANDLER( video_dma_length_w );
-WRITE32_HANDLER( video_dma_address_w );
-WRITE32_HANDLER( sprite_dma_start_w );

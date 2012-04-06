@@ -26,24 +26,24 @@ public:
 	UINT16 *m_spriteram;
 	size_t m_spriteram_size;
 	DECLARE_WRITE16_MEMBER(tecmo16_sound_command_w);
+	DECLARE_WRITE16_MEMBER(tecmo16_videoram_w);
+	DECLARE_WRITE16_MEMBER(tecmo16_colorram_w);
+	DECLARE_WRITE16_MEMBER(tecmo16_videoram2_w);
+	DECLARE_WRITE16_MEMBER(tecmo16_colorram2_w);
+	DECLARE_WRITE16_MEMBER(tecmo16_charram_w);
+	DECLARE_WRITE16_MEMBER(tecmo16_flipscreen_w);
+	DECLARE_WRITE16_MEMBER(tecmo16_scroll_x_w);
+	DECLARE_WRITE16_MEMBER(tecmo16_scroll_y_w);
+	DECLARE_WRITE16_MEMBER(tecmo16_scroll2_x_w);
+	DECLARE_WRITE16_MEMBER(tecmo16_scroll2_y_w);
+	DECLARE_WRITE16_MEMBER(tecmo16_scroll_char_x_w);
+	DECLARE_WRITE16_MEMBER(tecmo16_scroll_char_y_w);
 };
 
 
 /*----------- defined in video/tecmo16.c -----------*/
 
-WRITE16_HANDLER( tecmo16_videoram_w );
-WRITE16_HANDLER( tecmo16_colorram_w );
-WRITE16_HANDLER( tecmo16_videoram2_w );
-WRITE16_HANDLER( tecmo16_colorram2_w );
-WRITE16_HANDLER( tecmo16_charram_w );
-WRITE16_HANDLER( tecmo16_flipscreen_w );
 
-WRITE16_HANDLER( tecmo16_scroll_x_w );
-WRITE16_HANDLER( tecmo16_scroll_y_w );
-WRITE16_HANDLER( tecmo16_scroll2_x_w );
-WRITE16_HANDLER( tecmo16_scroll2_y_w );
-WRITE16_HANDLER( tecmo16_scroll_char_x_w );
-WRITE16_HANDLER( tecmo16_scroll_char_y_w );
 
 VIDEO_START( fstarfrc );
 VIDEO_START( ginkun );

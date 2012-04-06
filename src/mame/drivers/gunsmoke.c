@@ -107,13 +107,13 @@ static ADDRESS_MAP_START( gunsmoke_map, AS_PROGRAM, 8, gunsmoke_state )
 	AM_RANGE(0xc004, 0xc004) AM_READ_PORT("DSW2")
 	AM_RANGE(0xc4c9, 0xc4cb) AM_READ(gunsmoke_protection_r)
 	AM_RANGE(0xc800, 0xc800) AM_WRITE(soundlatch_w)
-	AM_RANGE(0xc804, 0xc804) AM_WRITE_LEGACY(gunsmoke_c804_w)	// ROM bank switch, screen flip
+	AM_RANGE(0xc804, 0xc804) AM_WRITE(gunsmoke_c804_w)	// ROM bank switch, screen flip
 	AM_RANGE(0xc806, 0xc806) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE_LEGACY(gunsmoke_videoram_w) AM_BASE(m_videoram)
-	AM_RANGE(0xd400, 0xd7ff) AM_RAM_WRITE_LEGACY(gunsmoke_colorram_w) AM_BASE(m_colorram)
+	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(gunsmoke_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0xd400, 0xd7ff) AM_RAM_WRITE(gunsmoke_colorram_w) AM_BASE(m_colorram)
 	AM_RANGE(0xd800, 0xd801) AM_RAM AM_BASE(m_scrollx)
 	AM_RANGE(0xd802, 0xd802) AM_RAM AM_BASE(m_scrolly)
-	AM_RANGE(0xd806, 0xd806) AM_WRITE_LEGACY(gunsmoke_d806_w)	// sprites and bg enable
+	AM_RANGE(0xd806, 0xd806) AM_WRITE(gunsmoke_d806_w)	// sprites and bg enable
 	AM_RANGE(0xe000, 0xefff) AM_RAM
 	AM_RANGE(0xf000, 0xffff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
 ADDRESS_MAP_END

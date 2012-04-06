@@ -19,22 +19,22 @@ public:
 	coprocessor_t m_coprocessor;
 	DECLARE_WRITE8_MEMBER(thief_input_select_w);
 	DECLARE_READ8_MEMBER(thief_io_r);
+	DECLARE_READ8_MEMBER(thief_context_ram_r);
+	DECLARE_WRITE8_MEMBER(thief_context_ram_w);
+	DECLARE_WRITE8_MEMBER(thief_context_bank_w);
+	DECLARE_WRITE8_MEMBER(thief_video_control_w);
+	DECLARE_WRITE8_MEMBER(thief_color_map_w);
+	DECLARE_WRITE8_MEMBER(thief_color_plane_w);
+	DECLARE_READ8_MEMBER(thief_videoram_r);
+	DECLARE_WRITE8_MEMBER(thief_videoram_w);
+	DECLARE_WRITE8_MEMBER(thief_blit_w);
+	DECLARE_READ8_MEMBER(thief_coprocessor_r);
+	DECLARE_WRITE8_MEMBER(thief_coprocessor_w);
 };
 
 
 /*----------- defined in video/thief.c -----------*/
 
-READ8_HANDLER( thief_context_ram_r );
-WRITE8_HANDLER( thief_context_ram_w );
-WRITE8_HANDLER( thief_context_bank_w );
-WRITE8_HANDLER( thief_video_control_w );
-WRITE8_HANDLER( thief_color_map_w );
-WRITE8_HANDLER( thief_color_plane_w );
-READ8_HANDLER( thief_videoram_r );
-WRITE8_HANDLER( thief_videoram_w );
-WRITE8_HANDLER( thief_blit_w );
-READ8_HANDLER( thief_coprocessor_r );
-WRITE8_HANDLER( thief_coprocessor_w );
 
 VIDEO_START( thief );
 SCREEN_UPDATE_IND16( thief );

@@ -129,7 +129,7 @@ static INTERRUPT_GEN( yiear_nmi_interrupt )
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, yiear_state )
 	AM_RANGE(0x0000, 0x0000) AM_DEVREAD_LEGACY("vlm", yiear_speech_r)
-	AM_RANGE(0x4000, 0x4000) AM_WRITE_LEGACY(yiear_control_w)
+	AM_RANGE(0x4000, 0x4000) AM_WRITE(yiear_control_w)
 	AM_RANGE(0x4800, 0x4800) AM_WRITE_LEGACY(konami_SN76496_latch_w)
 	AM_RANGE(0x4900, 0x4900) AM_DEVWRITE_LEGACY("snsnd", konami_SN76496_w)
 	AM_RANGE(0x4a00, 0x4a00) AM_DEVWRITE_LEGACY("vlm", yiear_VLM5030_control_w)
@@ -143,7 +143,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, yiear_state )
 	AM_RANGE(0x4f00, 0x4f00) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x5000, 0x502f) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
 	AM_RANGE(0x5400, 0x542f) AM_RAM AM_BASE(m_spriteram2)
-	AM_RANGE(0x5800, 0x5fff) AM_WRITE_LEGACY(yiear_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0x5800, 0x5fff) AM_WRITE(yiear_videoram_w) AM_BASE(m_videoram)
 	AM_RANGE(0x5000, 0x5fff) AM_RAM
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END

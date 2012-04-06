@@ -248,16 +248,16 @@ public:
 	DECLARE_WRITE8_MEMBER(laserdisc_select_w);
 	DECLARE_WRITE8_MEMBER(laserdisc_command_w);
 	DECLARE_WRITE8_MEMBER(gottlieb_sh_w);
+	DECLARE_WRITE8_MEMBER(gottlieb_paletteram_w);
+	DECLARE_WRITE8_MEMBER(gottlieb_video_control_w);
+	DECLARE_WRITE8_MEMBER(gottlieb_laserdisc_video_control_w);
+	DECLARE_WRITE8_MEMBER(gottlieb_videoram_w);
+	DECLARE_WRITE8_MEMBER(gottlieb_charram_w);
 };
 
 
 /*----------- defined in video/gottlieb.c -----------*/
 
-extern WRITE8_HANDLER( gottlieb_videoram_w );
-extern WRITE8_HANDLER( gottlieb_charram_w );
-extern WRITE8_HANDLER( gottlieb_video_control_w );
-extern WRITE8_HANDLER( gottlieb_laserdisc_video_control_w );
-extern WRITE8_HANDLER( gottlieb_paletteram_w );
 
 VIDEO_START( gottlieb );
 VIDEO_START( screwloo );

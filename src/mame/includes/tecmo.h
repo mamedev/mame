@@ -25,17 +25,17 @@ public:
 	DECLARE_READ8_MEMBER(tecmo_dswa_h_r);
 	DECLARE_READ8_MEMBER(tecmo_dswb_l_r);
 	DECLARE_READ8_MEMBER(tecmo_dswb_h_r);
+	DECLARE_WRITE8_MEMBER(tecmo_txvideoram_w);
+	DECLARE_WRITE8_MEMBER(tecmo_fgvideoram_w);
+	DECLARE_WRITE8_MEMBER(tecmo_bgvideoram_w);
+	DECLARE_WRITE8_MEMBER(tecmo_fgscroll_w);
+	DECLARE_WRITE8_MEMBER(tecmo_bgscroll_w);
+	DECLARE_WRITE8_MEMBER(tecmo_flipscreen_w);
 };
 
 
 /*----------- defined in video/tecmo.c -----------*/
 
-WRITE8_HANDLER( tecmo_txvideoram_w );
-WRITE8_HANDLER( tecmo_fgvideoram_w );
-WRITE8_HANDLER( tecmo_bgvideoram_w );
-WRITE8_HANDLER( tecmo_fgscroll_w );
-WRITE8_HANDLER( tecmo_bgscroll_w );
-WRITE8_HANDLER( tecmo_flipscreen_w );
 
 VIDEO_START( tecmo );
 SCREEN_UPDATE_IND16( tecmo );

@@ -19,16 +19,14 @@ VIDEO_START( taitoz )
 ********************************************************/
 
 
-READ16_HANDLER( sci_spriteframe_r )
+READ16_MEMBER(taitoz_state::sci_spriteframe_r)
 {
-	taitoz_state *state = space->machine().driver_data<taitoz_state>();
-	return (state->m_sci_spriteframe << 8);
+	return (m_sci_spriteframe << 8);
 }
 
-WRITE16_HANDLER( sci_spriteframe_w )
+WRITE16_MEMBER(taitoz_state::sci_spriteframe_w)
 {
-	taitoz_state *state = space->machine().driver_data<taitoz_state>();
-	state->m_sci_spriteframe = (data >> 8) & 0xff;
+	m_sci_spriteframe = (data >> 8) & 0xff;
 }
 
 
@@ -821,14 +819,13 @@ static void spacegun_draw_sprites_16x8(running_machine &machine, bitmap_ind16 &b
                         SCREEN REFRESH
 **************************************************************/
 
-WRITE16_HANDLER( contcirc_out_w )
+WRITE16_MEMBER(taitoz_state::contcirc_out_w)
 {
-	taitoz_state *state = space->machine().driver_data<taitoz_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
 		/* bit 0 = reset sub CPU */
-		device_set_input_line(state->m_audiocpu, INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
+		device_set_input_line(m_audiocpu, INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
 
 		/* bits 1-3 n.c. */
 
@@ -837,7 +834,7 @@ WRITE16_HANDLER( contcirc_out_w )
 		/* bit 5 = SCP */
 
 		/* bits 6 and 7 select the road palette bank */
-		state->m_road_palbank = (data & 0xc0) >> 6;
+		m_road_palbank = (data & 0xc0) >> 6;
 	}
 }
 

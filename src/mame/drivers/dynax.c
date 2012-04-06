@@ -291,7 +291,7 @@ WRITE8_MEMBER(dynax_state::hnoridur_rombank_w)
 WRITE8_MEMBER(dynax_state::hnoridur_palbank_w)
 {
 	m_palbank = data & 0x0f;
-	dynax_blit_palbank_w(&space, 0, data);
+	dynax_blit_palbank_w(space, 0, data);
 }
 
 WRITE8_MEMBER(dynax_state::hnoridur_palette_w)
@@ -348,7 +348,7 @@ WRITE8_MEMBER(dynax_state::yarunara_palette_w)
 		{
 			msm6242_device *rtc = machine().device<msm6242_device>("rtc");
 
-			rtc->write(*&space, offset,data);
+			rtc->write(space, offset,data);
 		}
 		return;
 
@@ -448,12 +448,12 @@ static MACHINE_RESET( adpcm )
 
 WRITE8_MEMBER(dynax_state::yarunara_layer_half_w)
 {
-	hanamai_layer_half_w(&space, 0, data >> 1);
+	hanamai_layer_half_w(space, 0, data >> 1);
 }
 
 WRITE8_MEMBER(dynax_state::yarunara_layer_half2_w)
 {
-	hnoridur_layer_half2_w(&space, 0, data >> 1);
+	hnoridur_layer_half2_w(space, 0, data >> 1);
 }
 
 static ADDRESS_MAP_START( sprtmtch_mem_map, AS_PROGRAM, 8, dynax_state )
@@ -515,9 +515,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hanamai_io_map, AS_IO, 8, dynax_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x00, 0x00 ) AM_WRITE_LEGACY(dynax_extra_scrollx_w)	// screen scroll X
-	AM_RANGE( 0x20, 0x20 ) AM_WRITE_LEGACY(dynax_extra_scrolly_w)	// screen scroll Y
-	AM_RANGE( 0x41, 0x47 ) AM_WRITE_LEGACY(dynax_blitter_rev2_w)		// Blitter
+	AM_RANGE( 0x00, 0x00 ) AM_WRITE(dynax_extra_scrollx_w)	// screen scroll X
+	AM_RANGE( 0x20, 0x20 ) AM_WRITE(dynax_extra_scrolly_w)	// screen scroll Y
+	AM_RANGE( 0x41, 0x47 ) AM_WRITE(dynax_blitter_rev2_w)		// Blitter
 	AM_RANGE( 0x50, 0x50 ) AM_WRITE(dynax_rombank_w)		// BANK ROM Select  hnkochou only
 	AM_RANGE( 0x60, 0x60 ) AM_READ(hanamai_keyboard_0_r)		// P1
 	AM_RANGE( 0x61, 0x61 ) AM_READ(hanamai_keyboard_1_r)		// P2
@@ -527,31 +527,31 @@ static ADDRESS_MAP_START( hanamai_io_map, AS_IO, 8, dynax_state )
 	AM_RANGE( 0x65, 0x65 ) AM_WRITE(dynax_rombank_w)		// BANK ROM Select  hanamai only
 	AM_RANGE( 0x66, 0x66 ) AM_WRITE(dynax_vblank_ack_w)		// VBlank IRQ Ack
 	AM_RANGE( 0x67, 0x67 ) AM_WRITE(adpcm_data_w)			// MSM5205 data
-	AM_RANGE( 0x68, 0x68 ) AM_WRITE_LEGACY(dynax_layer_enable_w)		// Layers Enable
-	AM_RANGE( 0x69, 0x69 ) AM_WRITE_LEGACY(hanamai_priority_w)		// layer priority
-	AM_RANGE( 0x6a, 0x6a ) AM_WRITE_LEGACY(dynax_blit_dest_w)		// Destination Layer
-	AM_RANGE( 0x6b, 0x6b ) AM_WRITE_LEGACY(dynax_blit_pen_w)		// Destination Pen
-	AM_RANGE( 0x6c, 0x6c ) AM_WRITE_LEGACY(dynax_blit_palette01_w)	// Layers Palettes (Low Bits)
-	AM_RANGE( 0x6d, 0x6d ) AM_WRITE_LEGACY(dynax_blit_palette23_w)	//
-	AM_RANGE( 0x6e, 0x6e ) AM_WRITE_LEGACY(dynax_blit_backpen_w)		// Background Color
+	AM_RANGE( 0x68, 0x68 ) AM_WRITE(dynax_layer_enable_w)		// Layers Enable
+	AM_RANGE( 0x69, 0x69 ) AM_WRITE(hanamai_priority_w)		// layer priority
+	AM_RANGE( 0x6a, 0x6a ) AM_WRITE(dynax_blit_dest_w)		// Destination Layer
+	AM_RANGE( 0x6b, 0x6b ) AM_WRITE(dynax_blit_pen_w)		// Destination Pen
+	AM_RANGE( 0x6c, 0x6c ) AM_WRITE(dynax_blit_palette01_w)	// Layers Palettes (Low Bits)
+	AM_RANGE( 0x6d, 0x6d ) AM_WRITE(dynax_blit_palette23_w)	//
+	AM_RANGE( 0x6e, 0x6e ) AM_WRITE(dynax_blit_backpen_w)		// Background Color
 	AM_RANGE( 0x70, 0x70 ) AM_DEVWRITE_LEGACY("msm", adpcm_reset_w)	// MSM5205 reset
-	AM_RANGE( 0x71, 0x71 ) AM_WRITE_LEGACY(dynax_flipscreen_w)		// Flip Screen
+	AM_RANGE( 0x71, 0x71 ) AM_WRITE(dynax_flipscreen_w)		// Flip Screen
 	AM_RANGE( 0x72, 0x72 ) AM_WRITE(dynax_coincounter_0_w)	// Coin Counters
 	AM_RANGE( 0x73, 0x73 ) AM_WRITE(dynax_coincounter_1_w)	//
 	AM_RANGE( 0x74, 0x74 ) AM_WRITE(dynax_blitter_ack_w)		// Blitter IRQ Ack
-	AM_RANGE( 0x76, 0x76 ) AM_WRITE_LEGACY(dynax_blit_palbank_w)		// Layers Palettes (High Bit)
-	AM_RANGE( 0x77, 0x77 ) AM_WRITE_LEGACY(hanamai_layer_half_w)		// half of the interleaved layer to write to
+	AM_RANGE( 0x76, 0x76 ) AM_WRITE(dynax_blit_palbank_w)		// Layers Palettes (High Bit)
+	AM_RANGE( 0x77, 0x77 ) AM_WRITE(hanamai_layer_half_w)		// half of the interleaved layer to write to
 	AM_RANGE( 0x78, 0x79 ) AM_DEVREADWRITE_LEGACY("ymsnd", ym2203_r, ym2203_w)	// 2 x DSW
 	AM_RANGE( 0x7a, 0x7b ) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)	// AY8910
 //  AM_RANGE( 0x7c, 0x7c ) AM_WRITENOP   // CRT Controller
 //  AM_RANGE( 0x7d, 0x7d ) AM_WRITENOP   //
-	AM_RANGE( 0x7e, 0x7e ) AM_WRITE_LEGACY(dynax_blit_romregion_w)	// Blitter ROM bank
+	AM_RANGE( 0x7e, 0x7e ) AM_WRITE(dynax_blit_romregion_w)	// Blitter ROM bank
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( hnoridur_io_map, AS_IO, 8, dynax_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x01, 0x07 ) AM_WRITE_LEGACY(dynax_blitter_rev2_w)		// Blitter
+	AM_RANGE( 0x01, 0x07 ) AM_WRITE(dynax_blitter_rev2_w)		// Blitter
 //  AM_RANGE( 0x10, 0x10 ) AM_WRITENOP   // CRT Controller
 //  AM_RANGE( 0x11, 0x11 ) AM_WRITENOP   // CRT Controller
 	AM_RANGE( 0x20, 0x20 ) AM_WRITE(hanamai_keyboard_w)		// keyboard row select
@@ -567,23 +567,23 @@ static ADDRESS_MAP_START( hnoridur_io_map, AS_IO, 8, dynax_state )
 	AM_RANGE( 0x36, 0x36 ) AM_DEVREAD_LEGACY("aysnd", ay8910_r)		// AY8910, DSW1
 	AM_RANGE( 0x38, 0x38 ) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_w)	// AY8910
 	AM_RANGE( 0x3a, 0x3a ) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)	//
-	AM_RANGE( 0x40, 0x40 ) AM_WRITE_LEGACY(dynax_blit_pen_w)		// Destination Pen
-	AM_RANGE( 0x41, 0x41 ) AM_WRITE_LEGACY(dynax_blit_dest_w)		// Destination Layer
-	AM_RANGE( 0x42, 0x42 ) AM_WRITE_LEGACY(dynax_blit_palette01_w)	// Layers Palettes
-	AM_RANGE( 0x43, 0x43 ) AM_WRITE_LEGACY(dynax_blit_palette23_w)	//
-	AM_RANGE( 0x44, 0x44 ) AM_WRITE_LEGACY(hanamai_priority_w)		// layer priority and enable
-	AM_RANGE( 0x45, 0x45 ) AM_WRITE_LEGACY(dynax_blit_backpen_w)		// Background Color
-	AM_RANGE( 0x46, 0x46 ) AM_WRITE_LEGACY(dynax_blit_romregion_w)	// Blitter ROM bank
+	AM_RANGE( 0x40, 0x40 ) AM_WRITE(dynax_blit_pen_w)		// Destination Pen
+	AM_RANGE( 0x41, 0x41 ) AM_WRITE(dynax_blit_dest_w)		// Destination Layer
+	AM_RANGE( 0x42, 0x42 ) AM_WRITE(dynax_blit_palette01_w)	// Layers Palettes
+	AM_RANGE( 0x43, 0x43 ) AM_WRITE(dynax_blit_palette23_w)	//
+	AM_RANGE( 0x44, 0x44 ) AM_WRITE(hanamai_priority_w)		// layer priority and enable
+	AM_RANGE( 0x45, 0x45 ) AM_WRITE(dynax_blit_backpen_w)		// Background Color
+	AM_RANGE( 0x46, 0x46 ) AM_WRITE(dynax_blit_romregion_w)	// Blitter ROM bank
 	AM_RANGE( 0x47, 0x47 ) AM_WRITE(hnoridur_palbank_w)
-	AM_RANGE( 0x50, 0x50 ) AM_WRITE_LEGACY(dynax_extra_scrollx_w)	// screen scroll X
-	AM_RANGE( 0x51, 0x51 ) AM_WRITE_LEGACY(dynax_extra_scrolly_w)	// screen scroll Y
+	AM_RANGE( 0x50, 0x50 ) AM_WRITE(dynax_extra_scrollx_w)	// screen scroll X
+	AM_RANGE( 0x51, 0x51 ) AM_WRITE(dynax_extra_scrolly_w)	// screen scroll Y
 	AM_RANGE( 0x54, 0x54 ) AM_WRITE(hnoridur_rombank_w)		// BANK ROM Select
 	AM_RANGE( 0x55, 0x55 ) AM_WRITENOP					// ? VBlank IRQ Ack
 	AM_RANGE( 0x56, 0x56 ) AM_WRITE(dynax_vblank_ack_w)		// VBlank IRQ Ack
 	AM_RANGE( 0x57, 0x57 ) AM_READ(ret_ff)				// ?
-	AM_RANGE( 0x60, 0x60 ) AM_WRITE_LEGACY(dynax_flipscreen_w)		// Flip Screen
-	AM_RANGE( 0x61, 0x61 ) AM_WRITE_LEGACY(hanamai_layer_half_w)		// half of the interleaved layer to write to
-	AM_RANGE( 0x62, 0x62 ) AM_WRITE_LEGACY(hnoridur_layer_half2_w)	//
+	AM_RANGE( 0x60, 0x60 ) AM_WRITE(dynax_flipscreen_w)		// Flip Screen
+	AM_RANGE( 0x61, 0x61 ) AM_WRITE(hanamai_layer_half_w)		// half of the interleaved layer to write to
+	AM_RANGE( 0x62, 0x62 ) AM_WRITE(hnoridur_layer_half2_w)	//
 	AM_RANGE( 0x67, 0x67 ) AM_WRITE(dynax_blitter_ack_w)		// Blitter IRQ Ack
 	AM_RANGE( 0x70, 0x70 ) AM_WRITE(dynax_coincounter_0_w)	// Coin Counters
 	AM_RANGE( 0x71, 0x71 ) AM_WRITE(dynax_coincounter_1_w)	//
@@ -633,7 +633,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hjingi_io_map, AS_IO, 8, dynax_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x01, 0x07 ) AM_WRITE_LEGACY(dynax_blitter_rev2_w)		// Blitter
+	AM_RANGE( 0x01, 0x07 ) AM_WRITE(dynax_blitter_rev2_w)		// Blitter
 
 //  AM_RANGE( 0x10, 0x10 ) AM_WRITENOP   // CRT Controller
 //  AM_RANGE( 0x11, 0x11 ) AM_WRITENOP   // CRT Controller
@@ -654,17 +654,17 @@ static ADDRESS_MAP_START( hjingi_io_map, AS_IO, 8, dynax_state )
 	AM_RANGE( 0x38, 0x38 ) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_w)	// AY8910
 	AM_RANGE( 0x3a, 0x3a ) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)	//
 
-	AM_RANGE( 0x40, 0x40 ) AM_WRITE_LEGACY(dynax_blit_pen_w)		// Destination Pen
-	AM_RANGE( 0x41, 0x41 ) AM_WRITE_LEGACY(dynax_blit_dest_w)		// Destination Layer
-	AM_RANGE( 0x42, 0x42 ) AM_WRITE_LEGACY(dynax_blit_palette01_w)	// Layers Palettes
-	AM_RANGE( 0x43, 0x43 ) AM_WRITE_LEGACY(dynax_blit_palette23_w)	//
-	AM_RANGE( 0x44, 0x44 ) AM_WRITE_LEGACY(hanamai_priority_w)		// layer priority and enable
-	AM_RANGE( 0x45, 0x45 ) AM_WRITE_LEGACY(dynax_blit_backpen_w)		// Background Color
-	AM_RANGE( 0x46, 0x46 ) AM_WRITE_LEGACY(dynax_blit_romregion_w)	// Blitter ROM bank
+	AM_RANGE( 0x40, 0x40 ) AM_WRITE(dynax_blit_pen_w)		// Destination Pen
+	AM_RANGE( 0x41, 0x41 ) AM_WRITE(dynax_blit_dest_w)		// Destination Layer
+	AM_RANGE( 0x42, 0x42 ) AM_WRITE(dynax_blit_palette01_w)	// Layers Palettes
+	AM_RANGE( 0x43, 0x43 ) AM_WRITE(dynax_blit_palette23_w)	//
+	AM_RANGE( 0x44, 0x44 ) AM_WRITE(hanamai_priority_w)		// layer priority and enable
+	AM_RANGE( 0x45, 0x45 ) AM_WRITE(dynax_blit_backpen_w)		// Background Color
+	AM_RANGE( 0x46, 0x46 ) AM_WRITE(dynax_blit_romregion_w)	// Blitter ROM bank
 	AM_RANGE( 0x47, 0x47 ) AM_WRITE(hnoridur_palbank_w)
 
-	AM_RANGE( 0x50, 0x50 ) AM_WRITE_LEGACY(dynax_extra_scrollx_w)	// screen scroll X
-	AM_RANGE( 0x51, 0x51 ) AM_WRITE_LEGACY(dynax_extra_scrolly_w)	// screen scroll Y
+	AM_RANGE( 0x50, 0x50 ) AM_WRITE(dynax_extra_scrollx_w)	// screen scroll X
+	AM_RANGE( 0x51, 0x51 ) AM_WRITE(dynax_extra_scrolly_w)	// screen scroll Y
 
 	AM_RANGE( 0x54, 0x54 ) AM_WRITE(hjingi_bank_w)			//
 
@@ -672,9 +672,9 @@ static ADDRESS_MAP_START( hjingi_io_map, AS_IO, 8, dynax_state )
 	AM_RANGE( 0x57, 0x57 ) AM_READ(ret_ff)				// Blitter Busy
 	AM_RANGE( 0x67, 0x67 ) AM_WRITE(dynax_blitter_ack_w)		// Blitter IRQ Ack
 
-	AM_RANGE( 0x60, 0x60 ) AM_WRITE_LEGACY(dynax_flipscreen_w)		// Flip Screen
-	AM_RANGE( 0x61, 0x61 ) AM_WRITE_LEGACY(hanamai_layer_half_w)		// half of the interleaved layer to write to
-	AM_RANGE( 0x62, 0x62 ) AM_WRITE_LEGACY(hnoridur_layer_half2_w)	//
+	AM_RANGE( 0x60, 0x60 ) AM_WRITE(dynax_flipscreen_w)		// Flip Screen
+	AM_RANGE( 0x61, 0x61 ) AM_WRITE(hanamai_layer_half_w)		// half of the interleaved layer to write to
+	AM_RANGE( 0x62, 0x62 ) AM_WRITE(hnoridur_layer_half2_w)	//
 
 	AM_RANGE( 0x70, 0x70 ) AM_WRITE(dynax_coincounter_0_w)	// Coin Counters
 	AM_RANGE( 0x71, 0x71 ) AM_WRITE(dynax_coincounter_1_w)	//
@@ -761,23 +761,23 @@ WRITE8_MEMBER(dynax_state::yarunara_rombank_w)
 
 WRITE8_MEMBER(dynax_state::yarunara_flipscreen_w)
 {
-	dynax_flipscreen_w(&space, 0, BIT(data, 1));
+	dynax_flipscreen_w(space, 0, BIT(data, 1));
 }
 
 WRITE8_MEMBER(dynax_state::yarunara_flipscreen_inv_w)
 {
-	dynax_flipscreen_w(&space, 0, !BIT(data, 1));
+	dynax_flipscreen_w(space, 0, !BIT(data, 1));
 }
 
 WRITE8_MEMBER(dynax_state::yarunara_blit_romregion_w)
 {
 	switch(data)
 	{
-		case 0x00:	dynax_blit_romregion_w(&space, 0, 0);	return;
-		case 0x01:	dynax_blit_romregion_w(&space, 0, 1);	return;
-		case 0x80:	dynax_blit_romregion_w(&space, 0, 2);	return;
-		case 0x81:	dynax_blit_romregion_w(&space, 0, 3);	return;
-		case 0x82:	dynax_blit_romregion_w(&space, 0, 4);	return;	// mjcomv1
+		case 0x00:	dynax_blit_romregion_w(space, 0, 0);	return;
+		case 0x01:	dynax_blit_romregion_w(space, 0, 1);	return;
+		case 0x80:	dynax_blit_romregion_w(space, 0, 2);	return;
+		case 0x81:	dynax_blit_romregion_w(space, 0, 3);	return;
+		case 0x82:	dynax_blit_romregion_w(space, 0, 4);	return;	// mjcomv1
 	}
 	logerror("%04x: unmapped romregion=%02X\n", cpu_get_pc(&space.device()), data);
 }
@@ -786,14 +786,14 @@ static ADDRESS_MAP_START( yarunara_io_map, AS_IO, 8, dynax_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x00, 0x01 ) AM_WRITE(yarunara_input_w)		// Controls
 	AM_RANGE( 0x02, 0x03 ) AM_READ(yarunara_input_r)		//
-	AM_RANGE( 0x11, 0x17 ) AM_WRITE_LEGACY(dynax_blitter_rev2_w)		// Blitter
+	AM_RANGE( 0x11, 0x17 ) AM_WRITE(dynax_blitter_rev2_w)		// Blitter
 	AM_RANGE( 0x20, 0x20 ) AM_DEVWRITE_LEGACY("msm", adpcm_reset_w)	// MSM5205 reset
 	AM_RANGE( 0x22, 0x22 ) AM_WRITE(adpcm_data_w)			// MSM5205 data
 	AM_RANGE( 0x24, 0x25 ) AM_DEVWRITE_LEGACY("ymsnd", ym2413_w)		//
 	AM_RANGE( 0x28, 0x28 ) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_w)	// AY8910
 	AM_RANGE( 0x2a, 0x2a ) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)	//
-	AM_RANGE( 0x48, 0x48 ) AM_WRITE_LEGACY(dynax_extra_scrollx_w)	// screen scroll X
-	AM_RANGE( 0x49, 0x49 ) AM_WRITE_LEGACY(dynax_extra_scrolly_w)	// screen scroll Y
+	AM_RANGE( 0x48, 0x48 ) AM_WRITE(dynax_extra_scrollx_w)	// screen scroll X
+	AM_RANGE( 0x49, 0x49 ) AM_WRITE(dynax_extra_scrolly_w)	// screen scroll Y
 	AM_RANGE( 0x4a, 0x4a ) AM_WRITE(yarunara_rombank_w)		// BANK ROM Select
 	AM_RANGE( 0x4b, 0x4b ) AM_WRITE(dynax_vblank_ack_w)		// VBlank IRQ Ack
 	AM_RANGE( 0x4c, 0x4c ) AM_READ_PORT("DSW0")			// DSW 1
@@ -804,12 +804,12 @@ static ADDRESS_MAP_START( yarunara_io_map, AS_IO, 8, dynax_state )
 	// 53 ?
 	// 54 ?
 	AM_RANGE( 0x57, 0x57 ) AM_WRITE(dynax_blitter_ack_w)		// Blitter IRQ Ack
-	AM_RANGE( 0x68, 0x68 ) AM_WRITE_LEGACY(dynax_blit_pen_w)		// Destination Pen
-	AM_RANGE( 0x69, 0x69 ) AM_WRITE_LEGACY(dynax_blit_dest_w)		// Destination Layer
-	AM_RANGE( 0x6a, 0x6a ) AM_WRITE_LEGACY(dynax_blit_palette01_w)	// Layers Palettes
-	AM_RANGE( 0x6b, 0x6b ) AM_WRITE_LEGACY(dynax_blit_palette23_w)	//
-	AM_RANGE( 0x6c, 0x6c ) AM_WRITE_LEGACY(hanamai_priority_w)		// layer priority and enable
-	AM_RANGE( 0x6d, 0x6d ) AM_WRITE_LEGACY(dynax_blit_backpen_w)		// Background Color
+	AM_RANGE( 0x68, 0x68 ) AM_WRITE(dynax_blit_pen_w)		// Destination Pen
+	AM_RANGE( 0x69, 0x69 ) AM_WRITE(dynax_blit_dest_w)		// Destination Layer
+	AM_RANGE( 0x6a, 0x6a ) AM_WRITE(dynax_blit_palette01_w)	// Layers Palettes
+	AM_RANGE( 0x6b, 0x6b ) AM_WRITE(dynax_blit_palette23_w)	//
+	AM_RANGE( 0x6c, 0x6c ) AM_WRITE(hanamai_priority_w)		// layer priority and enable
+	AM_RANGE( 0x6d, 0x6d ) AM_WRITE(dynax_blit_backpen_w)		// Background Color
 	AM_RANGE( 0x6e, 0x6e ) AM_WRITE(yarunara_blit_romregion_w)	// Blitter ROM bank
 ADDRESS_MAP_END
 
@@ -817,7 +817,7 @@ ADDRESS_MAP_END
 // Almost identical to hnoridur
 static ADDRESS_MAP_START( mcnpshnt_io_map, AS_IO, 8, dynax_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x01, 0x07 ) AM_WRITE_LEGACY(dynax_blitter_rev2_w)		// Blitter
+	AM_RANGE( 0x01, 0x07 ) AM_WRITE(dynax_blitter_rev2_w)		// Blitter
 //  AM_RANGE( 0x10, 0x10 ) AM_WRITENOP   // CRT Controller
 //  AM_RANGE( 0x11, 0x11 ) AM_WRITENOP   // CRT Controller
 	AM_RANGE( 0x20, 0x20 ) AM_WRITE(hanamai_keyboard_w)		// keyboard row select
@@ -831,22 +831,22 @@ static ADDRESS_MAP_START( mcnpshnt_io_map, AS_IO, 8, dynax_state )
 	AM_RANGE( 0x34, 0x35 ) AM_DEVWRITE_LEGACY("ymsnd", ym2413_w)		//
 	AM_RANGE( 0x38, 0x38 ) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_w)	// AY8910
 	AM_RANGE( 0x3a, 0x3a ) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)	//
-	AM_RANGE( 0x40, 0x40 ) AM_WRITE_LEGACY(dynax_blit_pen_w)		// Destination Pen
-	AM_RANGE( 0x41, 0x41 ) AM_WRITE_LEGACY(dynax_blit_dest_w)		// Destination Layer
-	AM_RANGE( 0x42, 0x42 ) AM_WRITE_LEGACY(dynax_blit_palette01_w)	// Layers Palettes
-	AM_RANGE( 0x43, 0x43 ) AM_WRITE_LEGACY(dynax_blit_palette23_w)	//
-	AM_RANGE( 0x44, 0x44 ) AM_WRITE_LEGACY(hanamai_priority_w)		// layer priority and enable
-	AM_RANGE( 0x45, 0x45 ) AM_WRITE_LEGACY(dynax_blit_backpen_w)		// Background Color
+	AM_RANGE( 0x40, 0x40 ) AM_WRITE(dynax_blit_pen_w)		// Destination Pen
+	AM_RANGE( 0x41, 0x41 ) AM_WRITE(dynax_blit_dest_w)		// Destination Layer
+	AM_RANGE( 0x42, 0x42 ) AM_WRITE(dynax_blit_palette01_w)	// Layers Palettes
+	AM_RANGE( 0x43, 0x43 ) AM_WRITE(dynax_blit_palette23_w)	//
+	AM_RANGE( 0x44, 0x44 ) AM_WRITE(hanamai_priority_w)		// layer priority and enable
+	AM_RANGE( 0x45, 0x45 ) AM_WRITE(dynax_blit_backpen_w)		// Background Color
 	AM_RANGE( 0x46, 0x46 ) AM_WRITE(yarunara_blit_romregion_w)	// Blitter ROM bank
 	AM_RANGE( 0x47, 0x47 ) AM_WRITE(hnoridur_palbank_w)
-	AM_RANGE( 0x50, 0x50 ) AM_WRITE_LEGACY(dynax_extra_scrollx_w)	// screen scroll X
-	AM_RANGE( 0x51, 0x51 ) AM_WRITE_LEGACY(dynax_extra_scrolly_w)	// screen scroll Y
+	AM_RANGE( 0x50, 0x50 ) AM_WRITE(dynax_extra_scrollx_w)	// screen scroll X
+	AM_RANGE( 0x51, 0x51 ) AM_WRITE(dynax_extra_scrolly_w)	// screen scroll Y
 	AM_RANGE( 0x54, 0x54 ) AM_WRITE(hnoridur_rombank_w)		// BANK ROM Select
 	AM_RANGE( 0x56, 0x56 ) AM_WRITE(dynax_vblank_ack_w)		// VBlank IRQ Ack
 	AM_RANGE( 0x57, 0x57 ) AM_READ(ret_ff)				// ?
-	AM_RANGE( 0x60, 0x60 ) AM_WRITE_LEGACY(dynax_flipscreen_w)		// Flip Screen
-	AM_RANGE( 0x61, 0x61 ) AM_WRITE_LEGACY(hanamai_layer_half_w)		// half of the interleaved layer to write to
-	AM_RANGE( 0x62, 0x62 ) AM_WRITE_LEGACY(hnoridur_layer_half2_w)	//
+	AM_RANGE( 0x60, 0x60 ) AM_WRITE(dynax_flipscreen_w)		// Flip Screen
+	AM_RANGE( 0x61, 0x61 ) AM_WRITE(hanamai_layer_half_w)		// half of the interleaved layer to write to
+	AM_RANGE( 0x62, 0x62 ) AM_WRITE(hnoridur_layer_half2_w)	//
 	AM_RANGE( 0x67, 0x67 ) AM_WRITE(dynax_blitter_ack_w)		// Blitter IRQ Ack
 	AM_RANGE( 0x70, 0x70 ) AM_WRITE(dynax_coincounter_0_w)	// Coin Counters
 	AM_RANGE( 0x71, 0x71 ) AM_WRITE(dynax_coincounter_1_w)	//
@@ -855,7 +855,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sprtmtch_io_map, AS_IO, 8, dynax_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x01, 0x07 ) AM_WRITE_LEGACY(dynax_blitter_rev2_w)		// Blitter
+	AM_RANGE( 0x01, 0x07 ) AM_WRITE(dynax_blitter_rev2_w)		// Blitter
 	AM_RANGE( 0x10, 0x11 ) AM_DEVREADWRITE_LEGACY("ymsnd", ym2203_r, ym2203_w)	// 2 x DSW
 //  AM_RANGE( 0x12, 0x12 ) AM_WRITENOP   // CRT Controller
 //  AM_RANGE( 0x13, 0x13 ) AM_WRITENOP   // CRT Controller
@@ -863,37 +863,37 @@ static ADDRESS_MAP_START( sprtmtch_io_map, AS_IO, 8, dynax_state )
 	AM_RANGE( 0x21, 0x21 ) AM_READ_PORT("P2")				// P2
 	AM_RANGE( 0x22, 0x22 ) AM_READ_PORT("COINS")			// Coins
 	AM_RANGE( 0x23, 0x23 ) AM_READ(ret_ff)				// ?
-	AM_RANGE( 0x30, 0x30 ) AM_WRITE_LEGACY(dynax_layer_enable_w)		// Layers Enable
+	AM_RANGE( 0x30, 0x30 ) AM_WRITE(dynax_layer_enable_w)		// Layers Enable
 	AM_RANGE( 0x31, 0x31 ) AM_WRITE(dynax_rombank_w)		// BANK ROM Select
-	AM_RANGE( 0x32, 0x32 ) AM_WRITE_LEGACY(dynax_blit_dest_w)		// Destination Layer
-	AM_RANGE( 0x33, 0x33 ) AM_WRITE_LEGACY(dynax_blit_pen_w)		// Destination Pen
-	AM_RANGE( 0x34, 0x34 ) AM_WRITE_LEGACY(dynax_blit_palette01_w)	// Layers Palettes (Low Bits)
-	AM_RANGE( 0x35, 0x35 ) AM_WRITE_LEGACY(dynax_blit_palette23_w)	//
-	AM_RANGE( 0x36, 0x36 ) AM_WRITE_LEGACY(dynax_blit_backpen_w)		// Background Color
+	AM_RANGE( 0x32, 0x32 ) AM_WRITE(dynax_blit_dest_w)		// Destination Layer
+	AM_RANGE( 0x33, 0x33 ) AM_WRITE(dynax_blit_pen_w)		// Destination Pen
+	AM_RANGE( 0x34, 0x34 ) AM_WRITE(dynax_blit_palette01_w)	// Layers Palettes (Low Bits)
+	AM_RANGE( 0x35, 0x35 ) AM_WRITE(dynax_blit_palette23_w)	//
+	AM_RANGE( 0x36, 0x36 ) AM_WRITE(dynax_blit_backpen_w)		// Background Color
 	AM_RANGE( 0x37, 0x37 ) AM_WRITE(dynax_vblank_ack_w)		// VBlank IRQ Ack
 //  AM_RANGE( 0x40, 0x40 ) AM_DEVWRITE_LEGACY("msm", adpcm_reset_w)    // MSM5205 reset
-	AM_RANGE( 0x41, 0x41 ) AM_WRITE_LEGACY(dynax_flipscreen_w)		// Flip Screen
+	AM_RANGE( 0x41, 0x41 ) AM_WRITE(dynax_flipscreen_w)		// Flip Screen
 	AM_RANGE( 0x42, 0x42 ) AM_WRITE(dynax_coincounter_0_w)	// Coin Counters
 	AM_RANGE( 0x43, 0x43 ) AM_WRITE(dynax_coincounter_1_w)	//
 	AM_RANGE( 0x44, 0x44 ) AM_WRITE(dynax_blitter_ack_w)		// Blitter IRQ Ack
-	AM_RANGE( 0x45, 0x45 ) AM_WRITE_LEGACY(dynax_blit_palbank_w)		// Layers Palettes (High Bit)
+	AM_RANGE( 0x45, 0x45 ) AM_WRITE(dynax_blit_palbank_w)		// Layers Palettes (High Bit)
 ADDRESS_MAP_END
 
 
 
 static ADDRESS_MAP_START( mjfriday_io_map, AS_IO, 8, dynax_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x00, 0x00 ) AM_WRITE_LEGACY(dynax_blit_pen_w)		// Destination Pen
-	AM_RANGE( 0x01, 0x01 ) AM_WRITE_LEGACY(dynax_blit_palette01_w)	// Layers Palettes (Low Bits)
+	AM_RANGE( 0x00, 0x00 ) AM_WRITE(dynax_blit_pen_w)		// Destination Pen
+	AM_RANGE( 0x01, 0x01 ) AM_WRITE(dynax_blit_palette01_w)	// Layers Palettes (Low Bits)
 	AM_RANGE( 0x02, 0x02 ) AM_WRITE(dynax_rombank_w)		// BANK ROM Select
-	AM_RANGE( 0x03, 0x03 ) AM_WRITE_LEGACY(dynax_blit_backpen_w)		// Background Color
-	AM_RANGE( 0x10, 0x11 ) AM_WRITE_LEGACY(mjdialq2_blit_dest_w)		// Destination Layer
-	AM_RANGE( 0x12, 0x12 ) AM_WRITE_LEGACY(dynax_blit_palbank_w)		// Layers Palettes (High Bit)
-	AM_RANGE( 0x13, 0x13 ) AM_WRITE_LEGACY(dynax_flipscreen_w)		// Flip Screen
+	AM_RANGE( 0x03, 0x03 ) AM_WRITE(dynax_blit_backpen_w)		// Background Color
+	AM_RANGE( 0x10, 0x11 ) AM_WRITE(mjdialq2_blit_dest_w)		// Destination Layer
+	AM_RANGE( 0x12, 0x12 ) AM_WRITE(dynax_blit_palbank_w)		// Layers Palettes (High Bit)
+	AM_RANGE( 0x13, 0x13 ) AM_WRITE(dynax_flipscreen_w)		// Flip Screen
 	AM_RANGE( 0x14, 0x14 ) AM_WRITE(dynax_coincounter_0_w)	// Coin Counters
 	AM_RANGE( 0x15, 0x15 ) AM_WRITE(dynax_coincounter_1_w)	//
-	AM_RANGE( 0x16, 0x17 ) AM_WRITE_LEGACY(mjdialq2_layer_enable_w)	// Layers Enable
-	AM_RANGE( 0x41, 0x47 ) AM_WRITE_LEGACY(dynax_blitter_rev2_w)		// Blitter
+	AM_RANGE( 0x16, 0x17 ) AM_WRITE(mjdialq2_layer_enable_w)	// Layers Enable
+	AM_RANGE( 0x41, 0x47 ) AM_WRITE(dynax_blitter_rev2_w)		// Blitter
 //  AM_RANGE( 0x50, 0x50 ) AM_WRITENOP   // CRT Controller
 //  AM_RANGE( 0x51, 0x51 ) AM_WRITENOP   // CRT Controller
 	AM_RANGE( 0x60, 0x60 ) AM_WRITE(hanamai_keyboard_w)		// keyboard row select
@@ -922,22 +922,22 @@ static ADDRESS_MAP_START( nanajign_io_map, AS_IO, 8, dynax_state )
 	AM_RANGE( 0x15, 0x15 ) AM_READ_PORT("DSW1")			// DSW2
 	AM_RANGE( 0x16, 0x16 ) AM_READ_PORT("DSW2")			// DSW3
 //  AM_RANGE( 0x20, 0x21 ) AM_WRITENOP   // CRT Controller
-	AM_RANGE( 0x31, 0x37 ) AM_WRITE_LEGACY(dynax_blitter_rev2_w)		// Blitter
+	AM_RANGE( 0x31, 0x37 ) AM_WRITE(dynax_blitter_rev2_w)		// Blitter
 	AM_RANGE( 0x40, 0x40 ) AM_WRITE(dynax_coincounter_0_w)	// Coin Counter
-	AM_RANGE( 0x50, 0x50 ) AM_WRITE_LEGACY(dynax_flipscreen_w)		// Flip Screen
-	AM_RANGE( 0x51, 0x51 ) AM_WRITE_LEGACY(hanamai_layer_half_w)		// half of the interleaved layer to write to
-	AM_RANGE( 0x52, 0x52 ) AM_WRITE_LEGACY(hnoridur_layer_half2_w)	//
+	AM_RANGE( 0x50, 0x50 ) AM_WRITE(dynax_flipscreen_w)		// Flip Screen
+	AM_RANGE( 0x51, 0x51 ) AM_WRITE(hanamai_layer_half_w)		// half of the interleaved layer to write to
+	AM_RANGE( 0x52, 0x52 ) AM_WRITE(hnoridur_layer_half2_w)	//
 	AM_RANGE( 0x57, 0x57 ) AM_WRITE(dynax_blitter_ack_w)		// Blitter IRQ Ack
-	AM_RANGE( 0x60, 0x60 ) AM_WRITE_LEGACY(dynax_extra_scrollx_w)	// screen scroll X
-	AM_RANGE( 0x62, 0x62 ) AM_WRITE_LEGACY(dynax_extra_scrolly_w)	// screen scroll Y
+	AM_RANGE( 0x60, 0x60 ) AM_WRITE(dynax_extra_scrollx_w)	// screen scroll X
+	AM_RANGE( 0x62, 0x62 ) AM_WRITE(dynax_extra_scrolly_w)	// screen scroll Y
 	AM_RANGE( 0x6a, 0x6a ) AM_WRITE(hnoridur_rombank_w)		// BANK ROM Select
 	AM_RANGE( 0x6c, 0x6c ) AM_WRITE(dynax_vblank_ack_w)		// VBlank IRQ Ack
-	AM_RANGE( 0x70, 0x70 ) AM_WRITE_LEGACY(dynax_blit_pen_w)		// Destination Pen
-	AM_RANGE( 0x71, 0x71 ) AM_WRITE_LEGACY(dynax_blit_dest_w)		// Destination Layer
-	AM_RANGE( 0x72, 0x72 ) AM_WRITE_LEGACY(dynax_blit_palette01_w)	// Layers Palettes
-	AM_RANGE( 0x73, 0x73 ) AM_WRITE_LEGACY(dynax_blit_palette23_w)	//
-	AM_RANGE( 0x74, 0x74 ) AM_WRITE_LEGACY(hanamai_priority_w)		// layer priority and enable
-	AM_RANGE( 0x75, 0x75 ) AM_WRITE_LEGACY(dynax_blit_backpen_w)		// Background Color
+	AM_RANGE( 0x70, 0x70 ) AM_WRITE(dynax_blit_pen_w)		// Destination Pen
+	AM_RANGE( 0x71, 0x71 ) AM_WRITE(dynax_blit_dest_w)		// Destination Layer
+	AM_RANGE( 0x72, 0x72 ) AM_WRITE(dynax_blit_palette01_w)	// Layers Palettes
+	AM_RANGE( 0x73, 0x73 ) AM_WRITE(dynax_blit_palette23_w)	//
+	AM_RANGE( 0x74, 0x74 ) AM_WRITE(hanamai_priority_w)		// layer priority and enable
+	AM_RANGE( 0x75, 0x75 ) AM_WRITE(dynax_blit_backpen_w)		// Background Color
 	AM_RANGE( 0x76, 0x76 ) AM_WRITE(yarunara_blit_romregion_w)	// Blitter ROM bank
 	AM_RANGE( 0x77, 0x77 ) AM_WRITE(hnoridur_palbank_w)
 ADDRESS_MAP_END
@@ -979,9 +979,9 @@ static ADDRESS_MAP_START( jantouki_io_map, AS_IO, 8, dynax_state )
 	AM_RANGE( 0x48, 0x48 ) AM_WRITE(jantouki_rombank_w)		// BANK ROM Select
 	AM_RANGE( 0x49, 0x49 ) AM_WRITE(jantouki_soundlatch_w)	// To Sound CPU
 	AM_RANGE( 0x4a, 0x4a ) AM_READ(jantouki_soundlatch_ack_r)	// Soundlatch status
-	AM_RANGE( 0x4b, 0x4b ) AM_WRITE_LEGACY(dynax_blit2_dest_w)		// Destination Layer 2
-	AM_RANGE( 0x4d, 0x4d ) AM_WRITE_LEGACY(dynax_blit_dest_w)		// Destination Layer
-	AM_RANGE( 0x4f, 0x4f ) AM_WRITE_LEGACY(dynax_blit2_romregion_w)	// Blitter 2 ROM bank
+	AM_RANGE( 0x4b, 0x4b ) AM_WRITE(dynax_blit2_dest_w)		// Destination Layer 2
+	AM_RANGE( 0x4d, 0x4d ) AM_WRITE(dynax_blit_dest_w)		// Destination Layer
+	AM_RANGE( 0x4f, 0x4f ) AM_WRITE(dynax_blit2_romregion_w)	// Blitter 2 ROM bank
 	AM_RANGE( 0x50, 0x50 ) AM_WRITE(jantouki_vblank_ack_w)	// VBlank IRQ Ack
 	AM_RANGE( 0x51, 0x51 ) AM_WRITE(hanamai_keyboard_w)		// keyboard row select
 	AM_RANGE( 0x52, 0x52 ) AM_READ(hanamai_keyboard_0_r)		// P1
@@ -989,21 +989,21 @@ static ADDRESS_MAP_START( jantouki_io_map, AS_IO, 8, dynax_state )
 	AM_RANGE( 0x55, 0x55 ) AM_READ_PORT("DSW0")			// DSW1
 	AM_RANGE( 0x56, 0x56 ) AM_READ_PORT("DSW1")			// DSW2
 	AM_RANGE( 0x58, 0x58 ) AM_WRITE(dynax_coincounter_0_w)	// Coin Counter
-	AM_RANGE( 0x5b, 0x5b ) AM_WRITE_LEGACY(dynax_blit2_palbank_w)	// Layers Palettes (High Bit)
-	AM_RANGE( 0x5d, 0x5d ) AM_WRITE_LEGACY(dynax_blit_palbank_w)		//
+	AM_RANGE( 0x5b, 0x5b ) AM_WRITE(dynax_blit2_palbank_w)	// Layers Palettes (High Bit)
+	AM_RANGE( 0x5d, 0x5d ) AM_WRITE(dynax_blit_palbank_w)		//
 	AM_RANGE( 0x5e, 0x5e ) AM_WRITE(jantouki_blitter_ack_w)	// Blitter IRQ Ack
 	AM_RANGE( 0x5f, 0x5f ) AM_WRITE(jantouki_blitter2_ack_w)	// Blitter 2 IRQ Ack
-	AM_RANGE( 0x60, 0x60 ) AM_WRITE_LEGACY(dynax_blit_palette67_w)	// Layers Palettes (Low Bits)
-	AM_RANGE( 0x61, 0x61 ) AM_WRITE_LEGACY(dynax_blit_palette45_w)	//
-	AM_RANGE( 0x62, 0x62 ) AM_WRITE_LEGACY(dynax_blit_palette23_w)	//
-	AM_RANGE( 0x63, 0x63 ) AM_WRITE_LEGACY(dynax_blit_palette01_w)	//
-	AM_RANGE( 0x64, 0x64 ) AM_WRITE_LEGACY(dynax_blit_backpen_w)		// Background Color
-	AM_RANGE( 0x65, 0x65 ) AM_WRITE_LEGACY(dynax_blit2_pen_w)		// Destination Pen 2
-	AM_RANGE( 0x66, 0x66 ) AM_WRITE_LEGACY(dynax_blit_pen_w)		// Destination Pen
+	AM_RANGE( 0x60, 0x60 ) AM_WRITE(dynax_blit_palette67_w)	// Layers Palettes (Low Bits)
+	AM_RANGE( 0x61, 0x61 ) AM_WRITE(dynax_blit_palette45_w)	//
+	AM_RANGE( 0x62, 0x62 ) AM_WRITE(dynax_blit_palette23_w)	//
+	AM_RANGE( 0x63, 0x63 ) AM_WRITE(dynax_blit_palette01_w)	//
+	AM_RANGE( 0x64, 0x64 ) AM_WRITE(dynax_blit_backpen_w)		// Background Color
+	AM_RANGE( 0x65, 0x65 ) AM_WRITE(dynax_blit2_pen_w)		// Destination Pen 2
+	AM_RANGE( 0x66, 0x66 ) AM_WRITE(dynax_blit_pen_w)		// Destination Pen
 	AM_RANGE( 0x67, 0x67 ) AM_READ(jantouki_blitter_busy_r)	//
-	AM_RANGE( 0x69, 0x6f ) AM_WRITE_LEGACY(jantouki_blitter2_rev2_w)	// Blitter 2
-	AM_RANGE( 0x71, 0x77 ) AM_WRITE_LEGACY(jantouki_blitter_rev2_w)	// Blitter
-	AM_RANGE( 0x78, 0x7e ) AM_WRITE_LEGACY(jantouki_layer_enable_w)	// Layers Enable
+	AM_RANGE( 0x69, 0x6f ) AM_WRITE(jantouki_blitter2_rev2_w)	// Blitter 2
+	AM_RANGE( 0x71, 0x77 ) AM_WRITE(jantouki_blitter_rev2_w)	// Blitter
+	AM_RANGE( 0x78, 0x7e ) AM_WRITE(jantouki_layer_enable_w)	// Layers Enable
 ADDRESS_MAP_END
 
 /***************************************************************************
@@ -1078,10 +1078,10 @@ static ADDRESS_MAP_START( mjelctrn_io_map, AS_IO, 8, dynax_state )
 //  AM_RANGE( 0x21, 0x21 ) AM_WRITENOP   // CRT Controller
 	AM_RANGE( 0x40, 0x40 ) AM_WRITE(dynax_coincounter_0_w)	// Coin Counters
 	AM_RANGE( 0x41, 0x41 ) AM_WRITE(dynax_coincounter_1_w)	//
-	AM_RANGE( 0x60, 0x60 ) AM_WRITE_LEGACY(dynax_extra_scrollx_w)	// screen scroll X
-	AM_RANGE( 0x62, 0x62 ) AM_WRITE_LEGACY(dynax_extra_scrolly_w)	// screen scroll Y
-//  AM_RANGE( 0x64, 0x64 ) AM_WRITE_LEGACY(dynax_extra_scrollx_w)      // screen scroll X
-//  AM_RANGE( 0x66, 0x66 ) AM_WRITE_LEGACY(dynax_extra_scrolly_w)      // screen scroll Y
+	AM_RANGE( 0x60, 0x60 ) AM_WRITE(dynax_extra_scrollx_w)	// screen scroll X
+	AM_RANGE( 0x62, 0x62 ) AM_WRITE(dynax_extra_scrolly_w)	// screen scroll Y
+//  AM_RANGE( 0x64, 0x64 ) AM_WRITE(dynax_extra_scrollx_w)      // screen scroll X
+//  AM_RANGE( 0x66, 0x66 ) AM_WRITE(dynax_extra_scrolly_w)      // screen scroll Y
 	AM_RANGE( 0x6a, 0x6a ) AM_WRITE(hnoridur_rombank_w)		// BANK ROM Select
 	AM_RANGE( 0x80, 0x80 ) AM_WRITE(hanamai_keyboard_w)		// keyboard row select
 	AM_RANGE( 0x81, 0x81 ) AM_READ_PORT("COINS")			// Coins
@@ -1089,17 +1089,17 @@ static ADDRESS_MAP_START( mjelctrn_io_map, AS_IO, 8, dynax_state )
 	AM_RANGE( 0x83, 0x83 ) AM_READ(hanamai_keyboard_0_r)		// P1
 	AM_RANGE( 0x84, 0x84 ) AM_READ(mjelctrn_dsw_r)			// DSW x 4
 	AM_RANGE( 0x85, 0x85 ) AM_READ(ret_ff)				// ?
-	AM_RANGE( 0xa1, 0xa7 ) AM_WRITE_LEGACY(dynax_blitter_rev2_w)		// Blitter
-	AM_RANGE( 0xc0, 0xc0 ) AM_WRITE_LEGACY(dynax_flipscreen_w)		// Flip Screen
-	AM_RANGE( 0xc1, 0xc1 ) AM_WRITE_LEGACY(hanamai_layer_half_w)		// half of the interleaved layer to write to
-	AM_RANGE( 0xc2, 0xc2 ) AM_WRITE_LEGACY(hnoridur_layer_half2_w)	//
+	AM_RANGE( 0xa1, 0xa7 ) AM_WRITE(dynax_blitter_rev2_w)		// Blitter
+	AM_RANGE( 0xc0, 0xc0 ) AM_WRITE(dynax_flipscreen_w)		// Flip Screen
+	AM_RANGE( 0xc1, 0xc1 ) AM_WRITE(hanamai_layer_half_w)		// half of the interleaved layer to write to
+	AM_RANGE( 0xc2, 0xc2 ) AM_WRITE(hnoridur_layer_half2_w)	//
 //  c3,c4   seem to be related to wrap around enable
-	AM_RANGE( 0xe0, 0xe0 ) AM_WRITE_LEGACY(dynax_blit_pen_w)		// Destination Pen
-	AM_RANGE( 0xe1, 0xe1 ) AM_WRITE_LEGACY(dynax_blit_dest_w)		// Destination Layer
-	AM_RANGE( 0xe2, 0xe2 ) AM_WRITE_LEGACY(dynax_blit_palette01_w)	// Layers Palettes
-	AM_RANGE( 0xe3, 0xe3 ) AM_WRITE_LEGACY(dynax_blit_palette23_w)	//
-	AM_RANGE( 0xe4, 0xe4 ) AM_WRITE_LEGACY(hanamai_priority_w)		// layer priority and enable
-	AM_RANGE( 0xe5, 0xe5 ) AM_WRITE_LEGACY(dynax_blit_backpen_w)		// Background Color
+	AM_RANGE( 0xe0, 0xe0 ) AM_WRITE(dynax_blit_pen_w)		// Destination Pen
+	AM_RANGE( 0xe1, 0xe1 ) AM_WRITE(dynax_blit_dest_w)		// Destination Layer
+	AM_RANGE( 0xe2, 0xe2 ) AM_WRITE(dynax_blit_palette01_w)	// Layers Palettes
+	AM_RANGE( 0xe3, 0xe3 ) AM_WRITE(dynax_blit_palette23_w)	//
+	AM_RANGE( 0xe4, 0xe4 ) AM_WRITE(hanamai_priority_w)		// layer priority and enable
+	AM_RANGE( 0xe5, 0xe5 ) AM_WRITE(dynax_blit_backpen_w)		// Background Color
 	AM_RANGE( 0xe6, 0xe6 ) AM_WRITE(yarunara_blit_romregion_w)	// Blitter ROM bank
 	AM_RANGE( 0xe7, 0xe7 ) AM_WRITE(hnoridur_palbank_w)
 ADDRESS_MAP_END
@@ -1198,9 +1198,9 @@ WRITE8_MEMBER(dynax_state::htengoku_blit_romregion_w)
 {
 	switch (data)
 	{
-		case 0x80:	dynax_blit_romregion_w(&space, 0, 0);	return;
-		case 0x81:	dynax_blit_romregion_w(&space, 0, 1);	return;
-		case 0x00:	dynax_blit_romregion_w(&space, 0, 2);	return;
+		case 0x80:	dynax_blit_romregion_w(space, 0, 0);	return;
+		case 0x81:	dynax_blit_romregion_w(space, 0, 1);	return;
+		case 0x00:	dynax_blit_romregion_w(space, 0, 2);	return;
 	}
 	logerror("%04x: unmapped romregion=%02X\n", cpu_get_pc(&space.device()), data);
 }
@@ -1212,7 +1212,7 @@ READ8_MEMBER(dynax_state::unk_r)
 
 static ADDRESS_MAP_START( htengoku_io_map, AS_IO, 8, dynax_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x01, 0x07 ) AM_WRITE_LEGACY(dynax_blitter_rev2_w)		// Blitter
+	AM_RANGE( 0x01, 0x07 ) AM_WRITE(dynax_blitter_rev2_w)		// Blitter
 	AM_RANGE( 0x20, 0x20 ) AM_WRITE(htengoku_select_w)		// Controls
 	AM_RANGE( 0x21, 0x21 ) AM_WRITE(htengoku_coin_w)		//
 	AM_RANGE( 0x22, 0x22 ) AM_READ(htengoku_coin_r)			//
@@ -1232,11 +1232,11 @@ static ADDRESS_MAP_START( htengoku_io_map, AS_IO, 8, dynax_state )
 	AM_RANGE( 0xb6, 0xb6 ) AM_WRITE_LEGACY(ddenlovr_layer_enable_w)
 	AM_RANGE( 0xb8, 0xb8 ) AM_READ(unk_r)				// ? must be 78 on startup
 	AM_RANGE( 0xc2, 0xc2 ) AM_WRITE(htengoku_rombank_w)		// BANK ROM Select
-	AM_RANGE( 0xc0, 0xc0 ) AM_WRITE_LEGACY(dynax_extra_scrollx_w)	// screen scroll X
-	AM_RANGE( 0xc1, 0xc1 ) AM_WRITE_LEGACY(dynax_extra_scrolly_w)	// screen scroll Y
+	AM_RANGE( 0xc0, 0xc0 ) AM_WRITE(dynax_extra_scrollx_w)	// screen scroll X
+	AM_RANGE( 0xc1, 0xc1 ) AM_WRITE(dynax_extra_scrolly_w)	// screen scroll Y
 	AM_RANGE( 0xc3, 0xc3 ) AM_WRITE(dynax_vblank_ack_w)		// VBlank IRQ Ack
-	AM_RANGE( 0xc4, 0xc4 ) AM_WRITE_LEGACY(dynax_blit_pen_w)		// Destination Pen
-	AM_RANGE( 0xc5, 0xc5 ) AM_WRITE_LEGACY(dynax_blit_dest_w)		// Destination Layer
+	AM_RANGE( 0xc4, 0xc4 ) AM_WRITE(dynax_blit_pen_w)		// Destination Pen
+	AM_RANGE( 0xc5, 0xc5 ) AM_WRITE(dynax_blit_dest_w)		// Destination Layer
 	AM_RANGE( 0xc6, 0xc6 ) AM_WRITE(htengoku_blit_romregion_w)	// Blitter ROM bank
 	AM_RANGE( 0xe0, 0xe0 ) AM_WRITE(yarunara_flipscreen_w)
 	AM_RANGE( 0xe1, 0xe1 ) AM_WRITE(yarunara_layer_half_w)	// half of the interleaved layer to write to
@@ -1436,7 +1436,7 @@ READ8_MEMBER(dynax_state::tenkai_8000_r)
 	{
 		msm6242_device *rtc = machine().device<msm6242_device>("rtc");
 
-		return rtc->read(*&space, offset);
+		return rtc->read(space, offset);
 	}
 	else if (m_rombank == 0x12)
 		return tenkai_palette_r(space, offset);
@@ -1452,7 +1452,7 @@ WRITE8_MEMBER(dynax_state::tenkai_8000_w)
 	{
 		msm6242_device *rtc = machine().device<msm6242_device>("rtc");
 
-		rtc->write(*&space, offset, data);
+		rtc->write(space, offset, data);
 		return;
 	}
 	else if (m_rombank == 0x12)
@@ -1486,9 +1486,9 @@ WRITE8_MEMBER(dynax_state::tenkai_blit_romregion_w)
 {
 	switch (data)
 	{
-		case 0x00:	dynax_blit_romregion_w(&space, 0, 0);	return;
-		case 0x83:	dynax_blit_romregion_w(&space, 0, 1);	return;
-		case 0x80:	dynax_blit_romregion_w(&space, 0, 2);	return;
+		case 0x00:	dynax_blit_romregion_w(space, 0, 0);	return;
+		case 0x83:	dynax_blit_romregion_w(space, 0, 1);	return;
+		case 0x80:	dynax_blit_romregion_w(space, 0, 2);	return;
 	}
 	logerror("%04x: unmapped romregion=%02X\n", cpu_get_pc(&space.device()), data);
 }
@@ -1502,12 +1502,12 @@ static ADDRESS_MAP_START( tenkai_map, AS_PROGRAM, 8, dynax_state )
 	AM_RANGE( 0x10008, 0x10008 ) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_w)	//
 	AM_RANGE( 0x10010, 0x10010 ) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)	//
 	AM_RANGE( 0x10020, 0x10021 ) AM_DEVWRITE_LEGACY("ymsnd", ym2413_w)		//
-	AM_RANGE( 0x10040, 0x10040 ) AM_WRITE_LEGACY(dynax_blit_pen_w)		// Destination Pen
-	AM_RANGE( 0x10044, 0x10044 ) AM_WRITE_LEGACY(tenkai_blit_dest_w)		// Destination Layer
-	AM_RANGE( 0x10048, 0x10048 ) AM_WRITE_LEGACY(tenkai_blit_palette23_w)	// Layers Palettes
-	AM_RANGE( 0x1004c, 0x1004c ) AM_WRITE_LEGACY(tenkai_blit_palette01_w)	//
-	AM_RANGE( 0x10050, 0x10050 ) AM_WRITE_LEGACY(tenkai_priority_w)		// layer priority and enable
-	AM_RANGE( 0x10054, 0x10054 ) AM_WRITE_LEGACY(dynax_blit_backpen_w)		// Background Color
+	AM_RANGE( 0x10040, 0x10040 ) AM_WRITE(dynax_blit_pen_w)		// Destination Pen
+	AM_RANGE( 0x10044, 0x10044 ) AM_WRITE(tenkai_blit_dest_w)		// Destination Layer
+	AM_RANGE( 0x10048, 0x10048 ) AM_WRITE(tenkai_blit_palette23_w)	// Layers Palettes
+	AM_RANGE( 0x1004c, 0x1004c ) AM_WRITE(tenkai_blit_palette01_w)	//
+	AM_RANGE( 0x10050, 0x10050 ) AM_WRITE(tenkai_priority_w)		// layer priority and enable
+	AM_RANGE( 0x10054, 0x10054 ) AM_WRITE(dynax_blit_backpen_w)		// Background Color
 	AM_RANGE( 0x10058, 0x10058 ) AM_WRITE(tenkai_blit_romregion_w)	// Blitter ROM bank
 	AM_RANGE( 0x10060, 0x10060 ) AM_WRITE(yarunara_flipscreen_inv_w)	// Flip Screen
 	AM_RANGE( 0x10064, 0x10064 ) AM_WRITE(yarunara_layer_half_w)	// half of the interleaved layer to write to
@@ -1518,7 +1518,7 @@ static ADDRESS_MAP_START( tenkai_map, AS_PROGRAM, 8, dynax_state )
 	AM_RANGE( 0x100c0, 0x100c0 ) AM_WRITE(tenkai_ipsel_w)
 	AM_RANGE( 0x100c1, 0x100c1 ) AM_WRITE(tenkai_ip_w)
 	AM_RANGE( 0x100c2, 0x100c3 ) AM_READ(tenkai_ip_r)
-	AM_RANGE( 0x100e1, 0x100e7 ) AM_WRITE_LEGACY(tenkai_blitter_rev2_w)	// Blitter (inverted scroll values)
+	AM_RANGE( 0x100e1, 0x100e7 ) AM_WRITE(tenkai_blitter_rev2_w)	// Blitter (inverted scroll values)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tenkai_io_map, AS_IO, 8, dynax_state )
@@ -1613,24 +1613,24 @@ WRITE8_MEMBER(dynax_state::gekisha_8000_w)
 		{
 			// same offsets as mjfriday
 
-			case 0x8001:	dynax_blit_palette01_w(&space, offset - 0x01, data);		return;
+			case 0x8001:	dynax_blit_palette01_w(space, offset - 0x01, data);		return;
 
 //          case 0x8002:    // ? 1
 
-			case 0x8003:	dynax_blit_backpen_w(&space, offset - 0x03, data);		return;
+			case 0x8003:	dynax_blit_backpen_w(space, offset - 0x03, data);		return;
 
 			case 0x8010:
-			case 0x8011:	mjdialq2_blit_dest_w(&space, offset - 0x10, data);		return;
+			case 0x8011:	mjdialq2_blit_dest_w(space, offset - 0x10, data);		return;
 
-			case 0x8012:	dynax_blit_palbank_w(&space, offset - 0x12, data);		return;
+			case 0x8012:	dynax_blit_palbank_w(space, offset - 0x12, data);		return;
 
-			case 0x8013:	dynax_flipscreen_w(&space, offset - 0x13, data);			return;
+			case 0x8013:	dynax_flipscreen_w(space, offset - 0x13, data);			return;
 
 			case 0x8014:	dynax_coincounter_0_w(space, offset - 0x14, data);		return;
 			case 0x8015:	dynax_coincounter_1_w(space, offset - 0x15, data);		return;
 
 			case 0x8016:
-			case 0x8017:	mjdialq2_layer_enable_w(&space, offset - 0x16, data);	return;
+			case 0x8017:	mjdialq2_layer_enable_w(space, offset - 0x16, data);	return;
 
 			case 0x8020:
 			case 0x8021:	gekisha_hopper_w(space, offset - 0x20, data);	return;
@@ -1641,7 +1641,7 @@ WRITE8_MEMBER(dynax_state::gekisha_8000_w)
 			case 0x8044:
 			case 0x8045:
 			case 0x8046:
-			case 0x8047:	dynax_blitter_rev2_w(&space, offset - 0x41, data);	return;
+			case 0x8047:	dynax_blitter_rev2_w(space, offset - 0x41, data);	return;
 
 			case 0x8050:	// CRT controller
 			case 0x8051:	return;

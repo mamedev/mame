@@ -101,18 +101,18 @@ static MACHINE_START( skykid )
 
 static ADDRESS_MAP_START( skykid_map, AS_PROGRAM, 8, skykid_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROMBANK("bank1")				/* banked ROM */
-	AM_RANGE(0x2000, 0x2fff) AM_READWRITE_LEGACY(skykid_videoram_r,skykid_videoram_w) AM_BASE(m_videoram)/* Video RAM (background) */
-	AM_RANGE(0x4000, 0x47ff) AM_READWRITE_LEGACY(skykid_textram_r,skykid_textram_w) AM_BASE(m_textram)	/* video RAM (text layer) */
+	AM_RANGE(0x2000, 0x2fff) AM_READWRITE(skykid_videoram_r,skykid_videoram_w) AM_BASE(m_videoram)/* Video RAM (background) */
+	AM_RANGE(0x4000, 0x47ff) AM_READWRITE(skykid_textram_r,skykid_textram_w) AM_BASE(m_textram)	/* video RAM (text layer) */
 	AM_RANGE(0x4800, 0x5fff) AM_RAM AM_BASE(m_spriteram)	/* RAM + Sprite RAM */
-	AM_RANGE(0x6000, 0x60ff) AM_WRITE_LEGACY(skykid_scroll_y_w)		/* Y scroll register map */
-	AM_RANGE(0x6200, 0x63ff) AM_WRITE_LEGACY(skykid_scroll_x_w)		/* X scroll register map */
+	AM_RANGE(0x6000, 0x60ff) AM_WRITE(skykid_scroll_y_w)		/* Y scroll register map */
+	AM_RANGE(0x6200, 0x63ff) AM_WRITE(skykid_scroll_x_w)		/* X scroll register map */
 	AM_RANGE(0x6800, 0x6bff) AM_DEVREADWRITE_LEGACY("namco", namcos1_cus30_r, namcos1_cus30_w) /* PSG device, shared RAM */
 	AM_RANGE(0x7000, 0x7fff) AM_WRITE(skykid_irq_1_ctrl_w)		/* IRQ control */
 	AM_RANGE(0x7800, 0x7fff) AM_READ(watchdog_reset_r)			/* watchdog reset */
 	AM_RANGE(0x8000, 0xffff) AM_ROM					/* ROM */
 	AM_RANGE(0x8000, 0x8fff) AM_WRITE(skykid_subreset_w)		/* MCU control */
 	AM_RANGE(0x9000, 0x9fff) AM_WRITE(skykid_bankswitch_w)		/* Bankswitch control */
-	AM_RANGE(0xa000, 0xa001) AM_WRITE_LEGACY(skykid_flipscreen_priority_w)	/* flip screen & priority */
+	AM_RANGE(0xa000, 0xa001) AM_WRITE(skykid_flipscreen_priority_w)	/* flip screen & priority */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mcu_map, AS_PROGRAM, 8, skykid_state )

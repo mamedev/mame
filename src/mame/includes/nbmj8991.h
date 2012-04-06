@@ -25,6 +25,12 @@ public:
 	DECLARE_WRITE8_MEMBER(nbmj8991_soundbank_w);
 	DECLARE_WRITE8_MEMBER(nbmj8991_sound_w);
 	DECLARE_READ8_MEMBER(nbmj8991_sound_r);
+	DECLARE_WRITE8_MEMBER(nbmj8991_palette_type1_w);
+	DECLARE_WRITE8_MEMBER(nbmj8991_palette_type2_w);
+	DECLARE_WRITE8_MEMBER(nbmj8991_palette_type3_w);
+	DECLARE_WRITE8_MEMBER(nbmj8991_blitter_w);
+	DECLARE_READ8_MEMBER(nbmj8991_clut_r);
+	DECLARE_WRITE8_MEMBER(nbmj8991_clut_w);
 };
 
 
@@ -34,9 +40,3 @@ SCREEN_UPDATE_IND16( nbmj8991_type1 );
 SCREEN_UPDATE_IND16( nbmj8991_type2 );
 VIDEO_START( nbmj8991 );
 
-WRITE8_HANDLER( nbmj8991_palette_type1_w );
-WRITE8_HANDLER( nbmj8991_palette_type2_w );
-WRITE8_HANDLER( nbmj8991_palette_type3_w );
-WRITE8_HANDLER( nbmj8991_blitter_w );
-READ8_HANDLER( nbmj8991_clut_r );
-WRITE8_HANDLER( nbmj8991_clut_w );

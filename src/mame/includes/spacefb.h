@@ -40,6 +40,8 @@ public:
 	UINT32 m_star_shift_reg;
 	double m_color_weights_rg[3];
 	double m_color_weights_b[2];
+	DECLARE_WRITE8_MEMBER(spacefb_port_0_w);
+	DECLARE_WRITE8_MEMBER(spacefb_port_2_w);
 };
 
 
@@ -58,5 +60,3 @@ WRITE8_HANDLER( spacefb_port_1_w );
 VIDEO_START( spacefb );
 SCREEN_UPDATE_RGB32( spacefb );
 
-WRITE8_HANDLER( spacefb_port_0_w );
-WRITE8_HANDLER( spacefb_port_2_w );

@@ -33,18 +33,16 @@ PALETTE_INIT( compgolf )
 	}
 }
 
-WRITE8_HANDLER( compgolf_video_w )
+WRITE8_MEMBER(compgolf_state::compgolf_video_w)
 {
-	compgolf_state *state = space->machine().driver_data<compgolf_state>();
-	state->m_videoram[offset] = data;
-	state->m_text_tilemap->mark_tile_dirty(offset / 2);
+	m_videoram[offset] = data;
+	m_text_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE8_HANDLER( compgolf_back_w )
+WRITE8_MEMBER(compgolf_state::compgolf_back_w)
 {
-	compgolf_state *state = space->machine().driver_data<compgolf_state>();
-	state->m_bg_ram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset / 2);
+	m_bg_ram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
 static TILE_GET_INFO( get_text_info )

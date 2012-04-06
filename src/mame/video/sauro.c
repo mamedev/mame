@@ -11,43 +11,38 @@
 
 /* General */
 
-WRITE8_HANDLER( tecfri_videoram_w )
+WRITE8_MEMBER(sauro_state::tecfri_videoram_w)
 {
-	sauro_state *state = space->machine().driver_data<sauro_state>();
 
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( tecfri_colorram_w )
+WRITE8_MEMBER(sauro_state::tecfri_colorram_w)
 {
-	sauro_state *state = space->machine().driver_data<sauro_state>();
 
-	state->m_colorram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_colorram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( tecfri_videoram2_w )
+WRITE8_MEMBER(sauro_state::tecfri_videoram2_w)
 {
-	sauro_state *state = space->machine().driver_data<sauro_state>();
 
-	state->m_videoram2[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset);
+	m_videoram2[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( tecfri_colorram2_w )
+WRITE8_MEMBER(sauro_state::tecfri_colorram2_w)
 {
-	sauro_state *state = space->machine().driver_data<sauro_state>();
 
-	state->m_colorram2[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset);
+	m_colorram2[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( tecfri_scroll_bg_w )
+WRITE8_MEMBER(sauro_state::tecfri_scroll_bg_w)
 {
-	sauro_state *state = space->machine().driver_data<sauro_state>();
 
-	state->m_bg_tilemap->set_scrollx(0, data);
+	m_bg_tilemap->set_scrollx(0, data);
 }
 
 static TILE_GET_INFO( get_tile_info_bg )
@@ -75,21 +70,19 @@ static TILE_GET_INFO( get_tile_info_fg )
 static const int scroll2_map[8] = {2, 1, 4, 3, 6, 5, 0, 7};
 static const int scroll2_map_flip[8] = {0, 7, 2, 1, 4, 3, 6, 5};
 
-WRITE8_HANDLER( sauro_palette_bank_w )
+WRITE8_MEMBER(sauro_state::sauro_palette_bank_w)
 {
-	sauro_state *state = space->machine().driver_data<sauro_state>();
 
-	state->m_palette_bank = (data & 0x03) << 4;
-	space->machine().tilemap().mark_all_dirty();
+	m_palette_bank = (data & 0x03) << 4;
+	machine().tilemap().mark_all_dirty();
 }
 
-WRITE8_HANDLER( sauro_scroll_fg_w )
+WRITE8_MEMBER(sauro_state::sauro_scroll_fg_w)
 {
-	sauro_state *state = space->machine().driver_data<sauro_state>();
-	const int *map = (flip_screen_get(space->machine()) ? scroll2_map_flip : scroll2_map);
+	const int *map = (flip_screen_get(machine()) ? scroll2_map_flip : scroll2_map);
 	int scroll = (data & 0xf8) | map[data & 7];
 
-	state->m_fg_tilemap->set_scrollx(0, scroll);
+	m_fg_tilemap->set_scrollx(0, scroll);
 }
 
 VIDEO_START( sauro )

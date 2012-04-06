@@ -29,6 +29,7 @@ public:
 	device_t *m_k051960;
 	DECLARE_WRITE16_MEMBER(sound_cmd_w);
 	DECLARE_WRITE16_MEMBER(sound_irq_trigger_w);
+	DECLARE_WRITE16_MEMBER(ultraman_gfxctrl_w);
 };
 
 
@@ -40,7 +41,6 @@ extern void ultraman_zoom_callback_0(running_machine &machine, int *code,int *co
 extern void ultraman_zoom_callback_1(running_machine &machine, int *code,int *color,int *flags);
 extern void ultraman_zoom_callback_2(running_machine &machine, int *code,int *color,int *flags);
 
-WRITE16_HANDLER( ultraman_gfxctrl_w );
 
 VIDEO_START( ultraman );
 SCREEN_UPDATE_IND16( ultraman );

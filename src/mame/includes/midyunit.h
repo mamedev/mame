@@ -54,18 +54,34 @@ public:
 	UINT8 m_yawdim_dma;
 	UINT16 m_dma_register[16];
 	dma_state_t m_dma_state;
+	DECLARE_WRITE16_MEMBER(midyunit_cmos_w);
+	DECLARE_READ16_MEMBER(midyunit_cmos_r);
+	DECLARE_WRITE16_MEMBER(midyunit_cmos_enable_w);
+	DECLARE_READ16_MEMBER(midyunit_protection_r);
+	DECLARE_READ16_MEMBER(midyunit_input_r);
+	DECLARE_WRITE16_MEMBER(midyunit_sound_w);
+	DECLARE_READ16_MEMBER(term2_input_r);
+	DECLARE_WRITE16_MEMBER(term2_sound_w);
+	DECLARE_WRITE16_MEMBER(term2_hack_w);
+	DECLARE_WRITE16_MEMBER(term2la3_hack_w);
+	DECLARE_WRITE16_MEMBER(term2la2_hack_w);
+	DECLARE_WRITE16_MEMBER(term2la1_hack_w);
+	DECLARE_WRITE8_MEMBER(cvsd_protection_w);
+	DECLARE_READ16_MEMBER(mkturbo_prot_r);
+	DECLARE_READ16_MEMBER(midyunit_gfxrom_r);
+	DECLARE_WRITE16_MEMBER(midyunit_vram_w);
+	DECLARE_READ16_MEMBER(midyunit_vram_r);
+	DECLARE_WRITE16_MEMBER(midyunit_control_w);
+	DECLARE_WRITE16_MEMBER(midyunit_paletteram_w);
+	DECLARE_READ16_MEMBER(midyunit_dma_r);
+	DECLARE_WRITE16_MEMBER(midyunit_dma_w);
 };
 
 
 /*----------- defined in machine/midyunit.c -----------*/
 
-WRITE16_HANDLER( midyunit_cmos_w );
-READ16_HANDLER( midyunit_cmos_r );
 
-WRITE16_HANDLER( midyunit_cmos_enable_w );
-READ16_HANDLER( midyunit_protection_r );
 
-READ16_HANDLER( midyunit_input_r );
 
 DRIVER_INIT( narc );
 DRIVER_INIT( trog );
@@ -84,7 +100,6 @@ DRIVER_INIT( totcarn );
 
 MACHINE_RESET( midyunit );
 
-WRITE16_HANDLER( midyunit_sound_w );
 
 
 /*----------- defined in video/midyunit.c -----------*/
@@ -94,18 +109,11 @@ VIDEO_START( midyunit_6bit );
 VIDEO_START( mkyawdim );
 VIDEO_START( midzunit );
 
-READ16_HANDLER( midyunit_gfxrom_r );
 
-WRITE16_HANDLER( midyunit_vram_w );
-READ16_HANDLER( midyunit_vram_r );
 
 void midyunit_to_shiftreg(address_space *space, UINT32 address, UINT16 *shiftreg);
 void midyunit_from_shiftreg(address_space *space, UINT32 address, UINT16 *shiftreg);
 
-WRITE16_HANDLER( midyunit_control_w );
-WRITE16_HANDLER( midyunit_paletteram_w );
 
-READ16_HANDLER( midyunit_dma_r );
-WRITE16_HANDLER( midyunit_dma_w );
 
 void midyunit_scanline_update(screen_device &screen, bitmap_ind16 &bitmap, int scanline, const tms34010_display_params *params);

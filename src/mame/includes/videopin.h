@@ -31,6 +31,8 @@ public:
 	tilemap_t* m_bg_tilemap;
 	DECLARE_READ8_MEMBER(videopin_misc_r);
 	DECLARE_WRITE8_MEMBER(videopin_led_w);
+	DECLARE_WRITE8_MEMBER(videopin_ball_w);
+	DECLARE_WRITE8_MEMBER(videopin_video_ram_w);
 };
 
 
@@ -41,8 +43,6 @@ DISCRETE_SOUND_EXTERN( videopin );
 
 /*----------- defined in video/videopin.c -----------*/
 
-WRITE8_HANDLER( videopin_video_ram_w );
-WRITE8_HANDLER( videopin_ball_w );
 
 VIDEO_START( videopin );
 SCREEN_UPDATE_IND16( videopin );

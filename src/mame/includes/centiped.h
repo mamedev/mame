@@ -35,6 +35,13 @@ public:
 	DECLARE_WRITE8_MEMBER(led_w);
 	DECLARE_WRITE8_MEMBER(coin_count_w);
 	DECLARE_WRITE8_MEMBER(bullsdrt_coin_count_w);
+	DECLARE_WRITE8_MEMBER(centiped_videoram_w);
+	DECLARE_WRITE8_MEMBER(centiped_flip_screen_w);
+	DECLARE_WRITE8_MEMBER(bullsdrt_tilesbank_w);
+	DECLARE_WRITE8_MEMBER(bullsdrt_sprites_bank_w);
+	DECLARE_WRITE8_MEMBER(centiped_paletteram_w);
+	DECLARE_WRITE8_MEMBER(milliped_paletteram_w);
+	DECLARE_WRITE8_MEMBER(mazeinv_paletteram_w);
 };
 
 
@@ -52,12 +59,5 @@ SCREEN_UPDATE_IND16( milliped );
 SCREEN_UPDATE_IND16( warlords );
 SCREEN_UPDATE_IND16( bullsdrt );
 
-WRITE8_HANDLER( centiped_paletteram_w );
-WRITE8_HANDLER( milliped_paletteram_w );
 
-WRITE8_HANDLER( centiped_videoram_w );
-WRITE8_HANDLER( centiped_flip_screen_w );
-WRITE8_HANDLER( bullsdrt_tilesbank_w );
-WRITE8_HANDLER( bullsdrt_sprites_bank_w );
 
-WRITE8_HANDLER( mazeinv_paletteram_w );

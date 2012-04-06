@@ -71,13 +71,13 @@ public:
 	DECLARE_READ16_MEMBER(taitoz_msb_sound_r);
 	DECLARE_WRITE8_MEMBER(taitoz_pancontrol);
 	DECLARE_WRITE16_MEMBER(spacegun_pancontrol);
+	DECLARE_READ16_MEMBER(sci_spriteframe_r);
+	DECLARE_WRITE16_MEMBER(sci_spriteframe_w);
+	DECLARE_WRITE16_MEMBER(contcirc_out_w);
 };
 
 /*----------- defined in video/taito_z.c -----------*/
 
-WRITE16_HANDLER( contcirc_out_w );
-READ16_HANDLER ( sci_spriteframe_r );
-WRITE16_HANDLER( sci_spriteframe_w );
 
 VIDEO_START( taitoz );
 

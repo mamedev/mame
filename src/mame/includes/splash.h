@@ -44,12 +44,12 @@ public:
 	DECLARE_WRITE8_MEMBER(msm1_interrupt_w);
 	DECLARE_WRITE8_MEMBER(msm2_interrupt_w);
 	DECLARE_WRITE8_MEMBER(msm2_data_w);
+	DECLARE_WRITE16_MEMBER(splash_vram_w);
 };
 
 
 /*----------- defined in video/splash.c -----------*/
 
-WRITE16_HANDLER( splash_vram_w );
 VIDEO_START( splash );
 SCREEN_UPDATE_IND16( splash );
 SCREEN_UPDATE_IND16( funystrp );

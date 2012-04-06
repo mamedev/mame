@@ -13,11 +13,11 @@ public:
 	DECLARE_WRITE16_MEMBER(OKIM6295_bankswitch_w);
 	DECLARE_WRITE16_MEMBER(thoop2_coin_w);
 	DECLARE_READ16_MEMBER(DS5002FP_R);
+	DECLARE_WRITE16_MEMBER(thoop2_vram_w);
 };
 
 
 /*----------- defined in video/thoop2.c -----------*/
 
-WRITE16_HANDLER( thoop2_vram_w );
 VIDEO_START( thoop2 );
 SCREEN_UPDATE_IND16( thoop2 );

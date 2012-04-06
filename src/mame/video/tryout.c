@@ -57,23 +57,20 @@ static TILE_GET_INFO( get_bg_tile_info )
 	SET_TILE_INFO(2, state->m_vram[tile_index] & 0x7f, 2, 0);
 }
 
-READ8_HANDLER( tryout_vram_r )
+READ8_MEMBER(tryout_state::tryout_vram_r)
 {
-	tryout_state *state = space->machine().driver_data<tryout_state>();
-	return state->m_vram[offset]; // debug only
+	return m_vram[offset]; // debug only
 }
 
-WRITE8_HANDLER( tryout_videoram_w )
+WRITE8_MEMBER(tryout_state::tryout_videoram_w)
 {
-	tryout_state *state = space->machine().driver_data<tryout_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = m_videoram;
 	videoram[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
+	m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_HANDLER( tryout_vram_w )
+WRITE8_MEMBER(tryout_state::tryout_vram_w)
 {
-	tryout_state *state = space->machine().driver_data<tryout_state>();
 	/*  There are eight banks of vram - in bank 0 the first 0x400 bytes
     is reserved for the tilemap.  In banks 2, 4 and 6 the game never
     writes to the first 0x400 bytes - I suspect it's either
@@ -87,14 +84,14 @@ WRITE8_HANDLER( tryout_vram_w )
     gfx data and then set high from that point onwards.
 
     */
-	const UINT8 bank=(state->m_vram_bank>>1)&0x7;
+	const UINT8 bank=(m_vram_bank>>1)&0x7;
 
 
 	if ((bank==0 || bank==2 || bank==4 || bank==6) && (offset&0x7ff)<0x400) {
 		int newoff=offset&0x3ff;
 
-		state->m_vram[newoff]=data;
-		state->m_bg_tilemap->mark_tile_dirty(newoff);
+		m_vram[newoff]=data;
+		m_bg_tilemap->mark_tile_dirty(newoff);
 		return;
 	}
 
@@ -108,47 +105,46 @@ WRITE8_HANDLER( tryout_vram_w )
     */
 
 	offset=(offset&0x7ff) | (bank<<11);
-	state->m_vram[offset]=data;
+	m_vram[offset]=data;
 
 	switch (offset&0x1c00) {
 	case 0x0400:
-		state->m_vram_gfx[(offset&0x3ff) + 0x0000 + ((offset&0x2000)>>1)]=(~data&0xf);
-		state->m_vram_gfx[(offset&0x3ff) + 0x2000 + ((offset&0x2000)>>1)]=(~data&0xf0)>>4;
+		m_vram_gfx[(offset&0x3ff) + 0x0000 + ((offset&0x2000)>>1)]=(~data&0xf);
+		m_vram_gfx[(offset&0x3ff) + 0x2000 + ((offset&0x2000)>>1)]=(~data&0xf0)>>4;
 		break;
 	case 0x0800:
-		state->m_vram_gfx[(offset&0x3ff) + 0x4000 + ((offset&0x2000)>>1)]=(~data&0xf);
-		state->m_vram_gfx[(offset&0x3ff) + 0x4400 + ((offset&0x2000)>>1)]=(~data&0xf0)>>4;
+		m_vram_gfx[(offset&0x3ff) + 0x4000 + ((offset&0x2000)>>1)]=(~data&0xf);
+		m_vram_gfx[(offset&0x3ff) + 0x4400 + ((offset&0x2000)>>1)]=(~data&0xf0)>>4;
 		break;
 	case 0x0c00:
-		state->m_vram_gfx[(offset&0x3ff) + 0x0400 + ((offset&0x2000)>>1)]=(~data&0xf);
-		state->m_vram_gfx[(offset&0x3ff) + 0x2400 + ((offset&0x2000)>>1)]=(~data&0xf0)>>4;
+		m_vram_gfx[(offset&0x3ff) + 0x0400 + ((offset&0x2000)>>1)]=(~data&0xf);
+		m_vram_gfx[(offset&0x3ff) + 0x2400 + ((offset&0x2000)>>1)]=(~data&0xf0)>>4;
 		break;
 	case 0x1400:
-		state->m_vram_gfx[(offset&0x3ff) + 0x0800 + ((offset&0x2000)>>1)]=(~data&0xf);
-		state->m_vram_gfx[(offset&0x3ff) + 0x2800 + ((offset&0x2000)>>1)]=(~data&0xf0)>>4;
+		m_vram_gfx[(offset&0x3ff) + 0x0800 + ((offset&0x2000)>>1)]=(~data&0xf);
+		m_vram_gfx[(offset&0x3ff) + 0x2800 + ((offset&0x2000)>>1)]=(~data&0xf0)>>4;
 		break;
 	case 0x1800:
-		state->m_vram_gfx[(offset&0x3ff) + 0x4800 + ((offset&0x2000)>>1)]=(~data&0xf);
-		state->m_vram_gfx[(offset&0x3ff) + 0x4c00 + ((offset&0x2000)>>1)]=(~data&0xf0)>>4;
+		m_vram_gfx[(offset&0x3ff) + 0x4800 + ((offset&0x2000)>>1)]=(~data&0xf);
+		m_vram_gfx[(offset&0x3ff) + 0x4c00 + ((offset&0x2000)>>1)]=(~data&0xf0)>>4;
 		break;
 	case 0x1c00:
-		state->m_vram_gfx[(offset&0x3ff) + 0x0c00 + ((offset&0x2000)>>1)]=(~data&0xf);
-		state->m_vram_gfx[(offset&0x3ff) + 0x2c00 + ((offset&0x2000)>>1)]=(~data&0xf0)>>4;
+		m_vram_gfx[(offset&0x3ff) + 0x0c00 + ((offset&0x2000)>>1)]=(~data&0xf);
+		m_vram_gfx[(offset&0x3ff) + 0x2c00 + ((offset&0x2000)>>1)]=(~data&0xf0)>>4;
 		break;
 	}
 
-	gfx_element_mark_dirty(space->machine().gfx[2], (offset-0x400/64)&0x7f);
+	gfx_element_mark_dirty(machine().gfx[2], (offset-0x400/64)&0x7f);
 }
 
-WRITE8_HANDLER( tryout_vram_bankswitch_w )
+WRITE8_MEMBER(tryout_state::tryout_vram_bankswitch_w)
 {
-	tryout_state *state = space->machine().driver_data<tryout_state>();
-	state->m_vram_bank = data;
+	m_vram_bank = data;
 }
 
-WRITE8_HANDLER( tryout_flipscreen_w )
+WRITE8_MEMBER(tryout_state::tryout_flipscreen_w)
 {
-	flip_screen_set(space->machine(), data & 1);
+	flip_screen_set(machine(), data & 1);
 }
 
 static TILEMAP_MAPPER( get_fg_memory_offset )

@@ -19,6 +19,9 @@ public:
 	DECLARE_READ8_MEMBER(sidepckt_i8751_r);
 	DECLARE_WRITE8_MEMBER(sidepckt_i8751_w);
 	DECLARE_WRITE8_MEMBER(sidepctj_i8751_w);
+	DECLARE_WRITE8_MEMBER(sidepckt_videoram_w);
+	DECLARE_WRITE8_MEMBER(sidepckt_colorram_w);
+	DECLARE_WRITE8_MEMBER(sidepckt_flipscreen_w);
 };
 
 
@@ -28,6 +31,3 @@ PALETTE_INIT( sidepckt );
 VIDEO_START( sidepckt );
 SCREEN_UPDATE_IND16( sidepckt );
 
-WRITE8_HANDLER( sidepckt_flipscreen_w );
-WRITE8_HANDLER( sidepckt_videoram_w );
-WRITE8_HANDLER( sidepckt_colorram_w );

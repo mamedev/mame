@@ -242,8 +242,8 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, qix_state )
 	AM_RANGE(0x8000, 0x83ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x8400, 0x87ff) AM_RAM
 	AM_RANGE(0x8800, 0x8bff) AM_READNOP   /* 6850 ACIA */
-	AM_RANGE(0x8c00, 0x8c00) AM_MIRROR(0x3fe) AM_READWRITE_LEGACY(qix_video_firq_r, qix_video_firq_w)
-	AM_RANGE(0x8c01, 0x8c01) AM_MIRROR(0x3fe) AM_READWRITE_LEGACY(qix_data_firq_ack_r, qix_data_firq_ack_w)
+	AM_RANGE(0x8c00, 0x8c00) AM_MIRROR(0x3fe) AM_READWRITE(qix_video_firq_r, qix_video_firq_w)
+	AM_RANGE(0x8c01, 0x8c01) AM_MIRROR(0x3fe) AM_READWRITE(qix_data_firq_ack_r, qix_data_firq_ack_w)
 	AM_RANGE(0x9000, 0x93ff) AM_DEVREADWRITE("sndpia0", pia6821_device, read, write)
 	AM_RANGE(0x9400, 0x97ff) AM_DEVREAD("pia0", pia6821_device, read) AM_DEVWRITE_LEGACY("pia0", qix_pia_w)
 	AM_RANGE(0x9800, 0x9bff) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
@@ -256,8 +256,8 @@ static ADDRESS_MAP_START( zoo_main_map, AS_PROGRAM, 8, qix_state )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x0400, 0x07ff) AM_RAM
 	AM_RANGE(0x0800, 0x0bff) AM_READNOP   /* ACIA */
-	AM_RANGE(0x0c00, 0x0c00) AM_MIRROR(0x3fe) AM_READWRITE_LEGACY(qix_video_firq_r, qix_video_firq_w)
-	AM_RANGE(0x0c01, 0x0c01) AM_MIRROR(0x3fe) AM_READWRITE_LEGACY(qix_data_firq_ack_r, qix_data_firq_ack_w)
+	AM_RANGE(0x0c00, 0x0c00) AM_MIRROR(0x3fe) AM_READWRITE(qix_video_firq_r, qix_video_firq_w)
+	AM_RANGE(0x0c01, 0x0c01) AM_MIRROR(0x3fe) AM_READWRITE(qix_data_firq_ack_r, qix_data_firq_ack_w)
 	AM_RANGE(0x1000, 0x13ff) AM_DEVREADWRITE("sndpia0", pia6821_device, read, write)
 	AM_RANGE(0x1400, 0x17ff) AM_DEVREAD("pia0", pia6821_device, read) AM_DEVWRITE_LEGACY("pia0", qix_pia_w)
 	AM_RANGE(0x1800, 0x1bff) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
@@ -275,9 +275,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mcu_map, AS_PROGRAM, 8, qix_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
-	AM_RANGE(0x0000, 0x0000) AM_READWRITE_LEGACY(qix_68705_portA_r, qix_68705_portA_w) AM_BASE(m_68705_port_out)
-	AM_RANGE(0x0001, 0x0001) AM_READWRITE_LEGACY(qix_68705_portB_r, qix_68705_portB_w)
-	AM_RANGE(0x0002, 0x0002) AM_READWRITE_LEGACY(qix_68705_portC_r, qix_68705_portC_w)
+	AM_RANGE(0x0000, 0x0000) AM_READWRITE(qix_68705_portA_r, qix_68705_portA_w) AM_BASE(m_68705_port_out)
+	AM_RANGE(0x0001, 0x0001) AM_READWRITE(qix_68705_portB_r, qix_68705_portB_w)
+	AM_RANGE(0x0002, 0x0002) AM_READWRITE(qix_68705_portC_r, qix_68705_portC_w)
 	AM_RANGE(0x0004, 0x0007) AM_WRITEONLY AM_BASE(m_68705_ddr)
 	AM_RANGE(0x0010, 0x007f) AM_RAM
 	AM_RANGE(0x0080, 0x07ff) AM_ROM

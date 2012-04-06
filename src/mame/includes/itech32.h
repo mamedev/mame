@@ -102,6 +102,27 @@ public:
 	DECLARE_WRITE32_MEMBER(test1_w);
 	DECLARE_READ32_MEMBER(test2_r);
 	DECLARE_WRITE32_MEMBER(test2_w);
+	DECLARE_WRITE16_MEMBER(timekill_colora_w);
+	DECLARE_WRITE16_MEMBER(timekill_colorbc_w);
+	DECLARE_WRITE16_MEMBER(timekill_intensity_w);
+	DECLARE_WRITE16_MEMBER(bloodstm_color1_w);
+	DECLARE_WRITE16_MEMBER(bloodstm_color2_w);
+	DECLARE_WRITE16_MEMBER(bloodstm_plane_w);
+	DECLARE_WRITE32_MEMBER(drivedge_color0_w);
+	DECLARE_WRITE32_MEMBER(itech020_color1_w);
+	DECLARE_WRITE32_MEMBER(itech020_color2_w);
+	DECLARE_WRITE32_MEMBER(itech020_plane_w);
+	DECLARE_WRITE16_MEMBER(timekill_paletteram_w);
+	DECLARE_WRITE16_MEMBER(bloodstm_paletteram_w);
+	DECLARE_WRITE32_MEMBER(drivedge_paletteram_w);
+	DECLARE_WRITE32_MEMBER(itech020_paletteram_w);
+	DECLARE_WRITE16_MEMBER(itech32_video_w);
+	DECLARE_READ16_MEMBER(itech32_video_r);
+	DECLARE_WRITE16_MEMBER(bloodstm_video_w);
+	DECLARE_READ16_MEMBER(bloodstm_video_r);
+	DECLARE_WRITE32_MEMBER(itech020_video_w);
+	DECLARE_WRITE32_MEMBER(drivedge_zbuf_control_w);
+	DECLARE_READ32_MEMBER(itech020_video_r);
 };
 
 
@@ -114,32 +135,11 @@ void itech32_update_interrupts(running_machine &machine, int vint, int xint, int
 
 VIDEO_START( itech32 );
 
-WRITE16_HANDLER( timekill_colora_w );
-WRITE16_HANDLER( timekill_colorbc_w );
-WRITE16_HANDLER( timekill_intensity_w );
 
-WRITE16_HANDLER( bloodstm_color1_w );
-WRITE16_HANDLER( bloodstm_color2_w );
-WRITE16_HANDLER( bloodstm_plane_w );
 
-WRITE32_HANDLER( drivedge_color0_w );
 
-WRITE32_HANDLER( itech020_color1_w );
-WRITE32_HANDLER( itech020_color2_w );
-WRITE32_HANDLER( itech020_plane_w );
 
-WRITE16_HANDLER( timekill_paletteram_w );
-WRITE16_HANDLER( bloodstm_paletteram_w );
-WRITE32_HANDLER( drivedge_paletteram_w );
-WRITE32_HANDLER( itech020_paletteram_w );
 
-WRITE16_HANDLER( itech32_video_w );
-READ16_HANDLER( itech32_video_r );
 
-WRITE16_HANDLER( bloodstm_video_w );
-READ16_HANDLER( bloodstm_video_r );
-WRITE32_HANDLER( itech020_video_w );
-READ32_HANDLER( itech020_video_r );
-WRITE32_HANDLER( drivedge_zbuf_control_w );
 
 SCREEN_UPDATE_IND16( itech32 );

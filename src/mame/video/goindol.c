@@ -63,18 +63,16 @@ VIDEO_START( goindol )
 
 ***************************************************************************/
 
-WRITE8_HANDLER( goindol_fg_videoram_w )
+WRITE8_MEMBER(goindol_state::goindol_fg_videoram_w)
 {
-	goindol_state *state = space->machine().driver_data<goindol_state>();
-	state->m_fg_videoram[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset / 2);
+	m_fg_videoram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE8_HANDLER( goindol_bg_videoram_w )
+WRITE8_MEMBER(goindol_state::goindol_bg_videoram_w)
 {
-	goindol_state *state = space->machine().driver_data<goindol_state>();
-	state->m_bg_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset / 2);
+	m_bg_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
 

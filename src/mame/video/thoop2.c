@@ -67,11 +67,10 @@ static TILE_GET_INFO( get_tile_info_thoop2_screen1 )
 
 ***************************************************************************/
 
-WRITE16_HANDLER( thoop2_vram_w )
+WRITE16_MEMBER(thoop2_state::thoop2_vram_w)
 {
-	thoop2_state *state = space->machine().driver_data<thoop2_state>();
-	COMBINE_DATA(&state->m_videoram[offset]);
-	state->m_pant[offset >> 11]->mark_tile_dirty(((offset << 1) & 0x0fff) >> 2);
+	COMBINE_DATA(&m_videoram[offset]);
+	m_pant[offset >> 11]->mark_tile_dirty(((offset << 1) & 0x0fff) >> 2);
 }
 
 /***************************************************************************

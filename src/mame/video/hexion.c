@@ -63,98 +63,93 @@ VIDEO_START( hexion )
 
 ***************************************************************************/
 
-WRITE8_HANDLER( hexion_bankswitch_w )
+WRITE8_MEMBER(hexion_state::hexion_bankswitch_w)
 {
-	hexion_state *state = space->machine().driver_data<hexion_state>();
-	UINT8 *rom = space->machine().region("maincpu")->base() + 0x10000;
+	UINT8 *rom = machine().region("maincpu")->base() + 0x10000;
 
 	/* bits 0-3 select ROM bank */
-	memory_set_bankptr(space->machine(), "bank1",rom + 0x2000 * (data & 0x0f));
+	memory_set_bankptr(machine(), "bank1",rom + 0x2000 * (data & 0x0f));
 
 	/* does bit 6 trigger the 052591? */
 	if (data & 0x40)
 	{
-		int bank = state->m_unkram[0]&1;
-		memset(state->m_vram[bank],state->m_unkram[1],0x2000);
-		state->m_bg_tilemap[bank]->mark_all_dirty();
+		int bank = m_unkram[0]&1;
+		memset(m_vram[bank],m_unkram[1],0x2000);
+		m_bg_tilemap[bank]->mark_all_dirty();
 	}
 	/* bit 7 = PMC-BK */
-	state->m_pmcbank = (data & 0x80) >> 7;
+	m_pmcbank = (data & 0x80) >> 7;
 
 	/* other bits unknown */
 if (data & 0x30)
 	popmessage("bankswitch %02x",data&0xf0);
 
-//logerror("%04x: bankswitch_w %02x\n",cpu_get_pc(&space->device()),data);
+//logerror("%04x: bankswitch_w %02x\n",cpu_get_pc(&space.device()),data);
 }
 
-READ8_HANDLER( hexion_bankedram_r )
+READ8_MEMBER(hexion_state::hexion_bankedram_r)
 {
-	hexion_state *state = space->machine().driver_data<hexion_state>();
-	if (state->m_gfxrom_select && offset < 0x1000)
+	if (m_gfxrom_select && offset < 0x1000)
 	{
-		return space->machine().region("gfx1")->base()[((state->m_gfxrom_select & 0x7f) << 12) + offset];
+		return machine().region("gfx1")->base()[((m_gfxrom_select & 0x7f) << 12) + offset];
 	}
-	else if (state->m_bankctrl == 0)
+	else if (m_bankctrl == 0)
 	{
-		return state->m_vram[state->m_rambank][offset];
+		return m_vram[m_rambank][offset];
 	}
-	else if (state->m_bankctrl == 2 && offset < 0x800)
+	else if (m_bankctrl == 2 && offset < 0x800)
 	{
-		return state->m_unkram[offset];
+		return m_unkram[offset];
 	}
 	else
 	{
-//logerror("%04x: bankedram_r offset %04x, bankctrl = %02x\n",cpu_get_pc(&space->device()),offset,state->m_bankctrl);
+//logerror("%04x: bankedram_r offset %04x, bankctrl = %02x\n",cpu_get_pc(&space.device()),offset,m_bankctrl);
 		return 0;
 	}
 }
 
-WRITE8_HANDLER( hexion_bankedram_w )
+WRITE8_MEMBER(hexion_state::hexion_bankedram_w)
 {
-	hexion_state *state = space->machine().driver_data<hexion_state>();
-	if (state->m_bankctrl == 3 && offset == 0 && (data & 0xfe) == 0)
+	if (m_bankctrl == 3 && offset == 0 && (data & 0xfe) == 0)
 	{
-//logerror("%04x: bankedram_w offset %04x, data %02x, bankctrl = %02x\n",cpu_get_pc(&space->device()),offset,data,state->m_bankctrl);
-		state->m_rambank = data & 1;
+//logerror("%04x: bankedram_w offset %04x, data %02x, bankctrl = %02x\n",cpu_get_pc(&space.device()),offset,data,m_bankctrl);
+		m_rambank = data & 1;
 	}
-	else if (state->m_bankctrl == 0)
+	else if (m_bankctrl == 0)
 	{
-		if (state->m_pmcbank)
+		if (m_pmcbank)
 		{
-//logerror("%04x: bankedram_w offset %04x, data %02x, bankctrl = %02x\n",cpu_get_pc(&space->device()),offset,data,state->m_bankctrl);
-			state->m_vram[state->m_rambank][offset] = data;
-			state->m_bg_tilemap[state->m_rambank]->mark_tile_dirty(offset/4);
+//logerror("%04x: bankedram_w offset %04x, data %02x, bankctrl = %02x\n",cpu_get_pc(&space.device()),offset,data,m_bankctrl);
+			m_vram[m_rambank][offset] = data;
+			m_bg_tilemap[m_rambank]->mark_tile_dirty(offset/4);
 		}
 		else
-			logerror("%04x pmc internal ram %04x = %02x\n",cpu_get_pc(&space->device()),offset,data);
+			logerror("%04x pmc internal ram %04x = %02x\n",cpu_get_pc(&space.device()),offset,data);
 	}
-	else if (state->m_bankctrl == 2 && offset < 0x800)
+	else if (m_bankctrl == 2 && offset < 0x800)
 	{
-		if (state->m_pmcbank)
+		if (m_pmcbank)
 		{
-//logerror("%04x: unkram_w offset %04x, data %02x, bankctrl = %02x\n",cpu_get_pc(&space->device()),offset,data,state->m_bankctrl);
-			state->m_unkram[offset] = data;
+//logerror("%04x: unkram_w offset %04x, data %02x, bankctrl = %02x\n",cpu_get_pc(&space.device()),offset,data,m_bankctrl);
+			m_unkram[offset] = data;
 		}
 		else
-			logerror("%04x pmc internal ram %04x = %02x\n",cpu_get_pc(&space->device()),offset,data);
+			logerror("%04x pmc internal ram %04x = %02x\n",cpu_get_pc(&space.device()),offset,data);
 	}
 	else
-logerror("%04x: bankedram_w offset %04x, data %02x, bankctrl = %02x\n",cpu_get_pc(&space->device()),offset,data,state->m_bankctrl);
+logerror("%04x: bankedram_w offset %04x, data %02x, bankctrl = %02x\n",cpu_get_pc(&space.device()),offset,data,m_bankctrl);
 }
 
-WRITE8_HANDLER( hexion_bankctrl_w )
+WRITE8_MEMBER(hexion_state::hexion_bankctrl_w)
 {
-	hexion_state *state = space->machine().driver_data<hexion_state>();
-//logerror("%04x: bankctrl_w %02x\n",cpu_get_pc(&space->device()),data);
-	state->m_bankctrl = data;
+//logerror("%04x: bankctrl_w %02x\n",cpu_get_pc(&space.device()),data);
+	m_bankctrl = data;
 }
 
-WRITE8_HANDLER( hexion_gfxrom_select_w )
+WRITE8_MEMBER(hexion_state::hexion_gfxrom_select_w)
 {
-	hexion_state *state = space->machine().driver_data<hexion_state>();
-//logerror("%04x: gfxrom_select_w %02x\n",cpu_get_pc(&space->device()),data);
-	state->m_gfxrom_select = data;
+//logerror("%04x: gfxrom_select_w %02x\n",cpu_get_pc(&space.device()),data);
+	m_gfxrom_select = data;
 }
 
 

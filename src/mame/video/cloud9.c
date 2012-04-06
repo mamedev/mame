@@ -52,12 +52,11 @@ VIDEO_START( cloud9 )
  *
  *************************************/
 
-WRITE8_HANDLER( cloud9_video_control_w )
+WRITE8_MEMBER(cloud9_state::cloud9_video_control_w)
 {
-	cloud9_state *state = space->machine().driver_data<cloud9_state>();
 
 	/* only D7 matters */
-	state->m_video_control[offset] = (data >> 7) & 1;
+	m_video_control[offset] = (data >> 7) & 1;
 }
 
 
@@ -68,9 +67,8 @@ WRITE8_HANDLER( cloud9_video_control_w )
  *
  *************************************/
 
-WRITE8_HANDLER( cloud9_paletteram_w )
+WRITE8_MEMBER(cloud9_state::cloud9_paletteram_w)
 {
-	cloud9_state *state = space->machine().driver_data<cloud9_state>();
 	int bit0, bit1, bit2;
 	int r, g, b;
 
@@ -83,21 +81,21 @@ WRITE8_HANDLER( cloud9_paletteram_w )
 	bit0 = (~r >> 0) & 0x01;
 	bit1 = (~r >> 1) & 0x01;
 	bit2 = (~r >> 2) & 0x01;
-	r = combine_3_weights(state->m_rweights, bit0, bit1, bit2);
+	r = combine_3_weights(m_rweights, bit0, bit1, bit2);
 
 	/* green component (inverted) */
 	bit0 = (~g >> 0) & 0x01;
 	bit1 = (~g >> 1) & 0x01;
 	bit2 = (~g >> 2) & 0x01;
-	g = combine_3_weights(state->m_gweights, bit0, bit1, bit2);
+	g = combine_3_weights(m_gweights, bit0, bit1, bit2);
 
 	/* blue component (inverted) */
 	bit0 = (~b >> 0) & 0x01;
 	bit1 = (~b >> 1) & 0x01;
 	bit2 = (~b >> 2) & 0x01;
-	b = combine_3_weights(state->m_bweights, bit0, bit1, bit2);
+	b = combine_3_weights(m_bweights, bit0, bit1, bit2);
 
-	palette_set_color(space->machine(), offset & 0x3f, MAKE_RGB(r, g, b));
+	palette_set_color(machine(), offset & 0x3f, MAKE_RGB(r, g, b));
 }
 
 
@@ -180,10 +178,10 @@ INLINE void bitmode_autoinc( running_machine &machine )
  *
  *************************************/
 
-WRITE8_HANDLER( cloud9_videoram_w )
+WRITE8_MEMBER(cloud9_state::cloud9_videoram_w)
 {
 	/* direct writes to VRAM go through the write protect PROM as well */
-	cloud9_write_vram(space->machine(), offset, data, 0, 0);
+	cloud9_write_vram(machine(), offset, data, 0, 0);
 }
 
 
@@ -194,49 +192,46 @@ WRITE8_HANDLER( cloud9_videoram_w )
  *
  *************************************/
 
-READ8_HANDLER( cloud9_bitmode_r )
+READ8_MEMBER(cloud9_state::cloud9_bitmode_r)
 {
-	cloud9_state *state = space->machine().driver_data<cloud9_state>();
 
 	/* in bitmode, the address comes from the autoincrement latches */
-	UINT16 addr = (state->m_bitmode_addr[1] << 6) | (state->m_bitmode_addr[0] >> 2);
+	UINT16 addr = (m_bitmode_addr[1] << 6) | (m_bitmode_addr[0] >> 2);
 
 	/* the appropriate pixel is selected into the upper 4 bits */
-	UINT8 result = state->m_videoram[((~state->m_bitmode_addr[0] & 2) << 13) | addr] << ((state->m_bitmode_addr[0] & 1) * 4);
+	UINT8 result = m_videoram[((~m_bitmode_addr[0] & 2) << 13) | addr] << ((m_bitmode_addr[0] & 1) * 4);
 
 	/* autoincrement because /BITMD was selected */
-	bitmode_autoinc(space->machine());
+	bitmode_autoinc(machine());
 
 	/* the upper 4 bits of the data lines are not driven so make them all 1's */
 	return (result >> 4) | 0xf0;
 }
 
 
-WRITE8_HANDLER( cloud9_bitmode_w )
+WRITE8_MEMBER(cloud9_state::cloud9_bitmode_w)
 {
-	cloud9_state *state = space->machine().driver_data<cloud9_state>();
 
 	/* in bitmode, the address comes from the autoincrement latches */
-	UINT16 addr = (state->m_bitmode_addr[1] << 6) | (state->m_bitmode_addr[0] >> 2);
+	UINT16 addr = (m_bitmode_addr[1] << 6) | (m_bitmode_addr[0] >> 2);
 
 	/* the lower 4 bits of data are replicated to the upper 4 bits */
 	data = (data & 0x0f) | (data << 4);
 
 	/* write through the generic VRAM routine, passing the low 2 X bits as PIXB/PIXA */
-	cloud9_write_vram(space->machine(), addr, data, 1, state->m_bitmode_addr[0] & 3);
+	cloud9_write_vram(machine(), addr, data, 1, m_bitmode_addr[0] & 3);
 
 	/* autoincrement because /BITMD was selected */
-	bitmode_autoinc(space->machine());
+	bitmode_autoinc(machine());
 }
 
 
-WRITE8_HANDLER( cloud9_bitmode_addr_w )
+WRITE8_MEMBER(cloud9_state::cloud9_bitmode_addr_w)
 {
-	cloud9_state *state = space->machine().driver_data<cloud9_state>();
 
 	/* write through to video RAM and also to the addressing latches */
-	cloud9_write_vram(space->machine(), offset, data, 0, 0);
-	state->m_bitmode_addr[offset] = data;
+	cloud9_write_vram(machine(), offset, data, 0, 0);
+	m_bitmode_addr[offset] = data;
 }
 
 

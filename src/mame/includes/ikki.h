@@ -30,12 +30,12 @@ public:
 	required_device<cpu_device> m_subcpu;
 	DECLARE_READ8_MEMBER(ikki_e000_r);
 	DECLARE_WRITE8_MEMBER(ikki_coin_counters);
+	DECLARE_WRITE8_MEMBER(ikki_scrn_ctrl_w);
 };
 
 
 /*----------- defined in video/ikki.c -----------*/
 
-WRITE8_HANDLER( ikki_scrn_ctrl_w );
 
 PALETTE_INIT( ikki );
 VIDEO_START( ikki );

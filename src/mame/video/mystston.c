@@ -123,19 +123,18 @@ static void set_palette(running_machine &machine, mystston_state *state)
  *
  *************************************/
 
-WRITE8_HANDLER( mystston_video_control_w )
+WRITE8_MEMBER(mystston_state::mystston_video_control_w)
 {
-	mystston_state *state = space->machine().driver_data<mystston_state>();
 
-	*state->m_video_control = data;
+	*m_video_control = data;
 
 	/* D0-D1 - foreground text color */
 	/* D2 - background page select */
 	/* D3 - unused */
 
 	/* D4-D5 - coin counters in flipped order */
-	coin_counter_w(space->machine(), 0, data & 0x20);
-	coin_counter_w(space->machine(), 1, data & 0x10);
+	coin_counter_w(machine(), 0, data & 0x20);
+	coin_counter_w(machine(), 1, data & 0x10);
 
 	/* D6 - unused */
 	/* D7 - screen flip */

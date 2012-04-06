@@ -121,49 +121,43 @@ VIDEO_START( avengers )
 
 ***************************************************************************/
 
-WRITE8_HANDLER( lwings_fgvideoram_w )
+WRITE8_MEMBER(lwings_state::lwings_fgvideoram_w)
 {
-	lwings_state *state = space->machine().driver_data<lwings_state>();
-	state->m_fgvideoram[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
+	m_fgvideoram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_HANDLER( lwings_bg1videoram_w )
+WRITE8_MEMBER(lwings_state::lwings_bg1videoram_w)
 {
-	lwings_state *state = space->machine().driver_data<lwings_state>();
-	state->m_bg1videoram[offset] = data;
-	state->m_bg1_tilemap->mark_tile_dirty(offset & 0x3ff);
+	m_bg1videoram[offset] = data;
+	m_bg1_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
 
-WRITE8_HANDLER( lwings_bg1_scrollx_w )
+WRITE8_MEMBER(lwings_state::lwings_bg1_scrollx_w)
 {
-	lwings_state *state = space->machine().driver_data<lwings_state>();
-	state->m_scroll_x[offset] = data;
-	state->m_bg1_tilemap->set_scrollx(0, state->m_scroll_x[0] | (state->m_scroll_x[1] << 8));
+	m_scroll_x[offset] = data;
+	m_bg1_tilemap->set_scrollx(0, m_scroll_x[0] | (m_scroll_x[1] << 8));
 }
 
-WRITE8_HANDLER( lwings_bg1_scrolly_w )
+WRITE8_MEMBER(lwings_state::lwings_bg1_scrolly_w)
 {
-	lwings_state *state = space->machine().driver_data<lwings_state>();
-	state->m_scroll_y[offset] = data;
-	state->m_bg1_tilemap->set_scrolly(0, state->m_scroll_y[0] | (state->m_scroll_y[1] << 8));
+	m_scroll_y[offset] = data;
+	m_bg1_tilemap->set_scrolly(0, m_scroll_y[0] | (m_scroll_y[1] << 8));
 }
 
-WRITE8_HANDLER( trojan_bg2_scrollx_w )
+WRITE8_MEMBER(lwings_state::trojan_bg2_scrollx_w)
 {
-	lwings_state *state = space->machine().driver_data<lwings_state>();
-	state->m_bg2_tilemap->set_scrollx(0, data);
+	m_bg2_tilemap->set_scrollx(0, data);
 }
 
-WRITE8_HANDLER( trojan_bg2_image_w )
+WRITE8_MEMBER(lwings_state::trojan_bg2_image_w)
 {
-	lwings_state *state = space->machine().driver_data<lwings_state>();
 
-	if (state->m_bg2_image != data)
+	if (m_bg2_image != data)
 	{
-		state->m_bg2_image = data;
-		state->m_bg2_tilemap->mark_all_dirty();
+		m_bg2_image = data;
+		m_bg2_tilemap->mark_all_dirty();
 	}
 }
 

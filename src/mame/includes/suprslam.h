@@ -35,14 +35,14 @@ public:
 	DECLARE_READ16_MEMBER(pending_command_r);
 	DECLARE_WRITE8_MEMBER(pending_command_clear_w);
 	DECLARE_WRITE8_MEMBER(suprslam_sh_bankswitch_w);
+	DECLARE_WRITE16_MEMBER(suprslam_screen_videoram_w);
+	DECLARE_WRITE16_MEMBER(suprslam_bg_videoram_w);
+	DECLARE_WRITE16_MEMBER(suprslam_bank_w);
 };
 
 
 /*----------- defined in video/suprslam.c -----------*/
 
-WRITE16_HANDLER( suprslam_screen_videoram_w );
-WRITE16_HANDLER( suprslam_bg_videoram_w );
-WRITE16_HANDLER( suprslam_bank_w );
 
 VIDEO_START( suprslam );
 SCREEN_UPDATE_IND16( suprslam );

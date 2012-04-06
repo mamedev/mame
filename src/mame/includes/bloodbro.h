@@ -13,14 +13,14 @@ public:
 	tilemap_t *m_tx_tilemap;
 	UINT16 *m_spriteram;
 	size_t m_spriteram_size;
+	DECLARE_WRITE16_MEMBER(bloodbro_bgvideoram_w);
+	DECLARE_WRITE16_MEMBER(bloodbro_fgvideoram_w);
+	DECLARE_WRITE16_MEMBER(bloodbro_txvideoram_w);
 };
 
 
 /*----------- defined in video/bloodbro.c -----------*/
 
-WRITE16_HANDLER( bloodbro_bgvideoram_w );
-WRITE16_HANDLER( bloodbro_fgvideoram_w );
-WRITE16_HANDLER( bloodbro_txvideoram_w );
 
 SCREEN_UPDATE_IND16( bloodbro );
 SCREEN_UPDATE_IND16( weststry );

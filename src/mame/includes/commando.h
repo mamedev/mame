@@ -28,19 +28,19 @@ public:
 	/* devices */
 	device_t *m_audiocpu;
 	required_device<buffered_spriteram8_device> m_spriteram;
+	DECLARE_WRITE8_MEMBER(commando_videoram_w);
+	DECLARE_WRITE8_MEMBER(commando_colorram_w);
+	DECLARE_WRITE8_MEMBER(commando_videoram2_w);
+	DECLARE_WRITE8_MEMBER(commando_colorram2_w);
+	DECLARE_WRITE8_MEMBER(commando_scrollx_w);
+	DECLARE_WRITE8_MEMBER(commando_scrolly_w);
+	DECLARE_WRITE8_MEMBER(commando_c804_w);
 };
 
 
 
 /*----------- defined in video/commando.c -----------*/
 
-WRITE8_HANDLER( commando_videoram_w );
-WRITE8_HANDLER( commando_colorram_w );
-WRITE8_HANDLER( commando_videoram2_w );
-WRITE8_HANDLER( commando_colorram2_w );
-WRITE8_HANDLER( commando_scrollx_w );
-WRITE8_HANDLER( commando_scrolly_w );
-WRITE8_HANDLER( commando_c804_w );
 
 VIDEO_START( commando );
 SCREEN_UPDATE_IND16( commando );

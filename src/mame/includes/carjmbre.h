@@ -22,16 +22,16 @@ public:
 
 	UINT8	m_nmi_mask;
 	DECLARE_WRITE8_MEMBER(nmi_mask_w);
+	DECLARE_WRITE8_MEMBER(carjmbre_flipscreen_w);
+	DECLARE_WRITE8_MEMBER(carjmbre_bgcolor_w);
+	DECLARE_WRITE8_MEMBER(carjmbre_8806_w);
+	DECLARE_WRITE8_MEMBER(carjmbre_videoram_w);
 };
 
 
 
 /*----------- defined in video/carjmbre.c -----------*/
 
-WRITE8_HANDLER( carjmbre_flipscreen_w );
-WRITE8_HANDLER( carjmbre_bgcolor_w );
-WRITE8_HANDLER( carjmbre_8806_w );
-WRITE8_HANDLER( carjmbre_videoram_w );
 
 PALETTE_INIT( carjmbre );
 VIDEO_START( carjmbre );

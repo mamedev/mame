@@ -11,23 +11,20 @@
 #include "includes/circus.h"
 
 
-WRITE8_HANDLER( circus_videoram_w )
+WRITE8_MEMBER(circus_state::circus_videoram_w)
 {
-	circus_state *state = space->machine().driver_data<circus_state>();
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( circus_clown_x_w )
+WRITE8_MEMBER(circus_state::circus_clown_x_w)
 {
-	circus_state *state = space->machine().driver_data<circus_state>();
-	state->m_clown_x = 240 - data;
+	m_clown_x = 240 - data;
 }
 
-WRITE8_HANDLER( circus_clown_y_w )
+WRITE8_MEMBER(circus_state::circus_clown_y_w)
 {
-	circus_state *state = space->machine().driver_data<circus_state>();
-	state->m_clown_y = 240 - data;
+	m_clown_y = 240 - data;
 }
 
 static TILE_GET_INFO( get_bg_tile_info )

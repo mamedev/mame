@@ -5,29 +5,25 @@
 
 /******************************************************************************/
 
-WRITE32_HANDLER( deco32_pri_w )
+WRITE32_MEMBER(deco32_state::deco32_pri_w)
 {
-	deco32_state *state = space->machine().driver_data<deco32_state>();
-	state->m_pri=data;
+	m_pri=data;
 }
 
-WRITE32_HANDLER( dragngun_sprite_control_w )
+WRITE32_MEMBER(dragngun_state::dragngun_sprite_control_w)
 {
-	dragngun_state *state = space->machine().driver_data<dragngun_state>();
-	state->m_dragngun_sprite_ctrl=data;
+	m_dragngun_sprite_ctrl=data;
 }
 
-WRITE32_HANDLER( dragngun_spriteram_dma_w )
+WRITE32_MEMBER(dragngun_state::dragngun_spriteram_dma_w)
 {
 	/* DMA spriteram to private sprite chip area, and clear cpu ram */
-	deco32_state *state = space->machine().driver_data<deco32_state>();
-	state->m_spriteram->copy();
-	memset(state->m_spriteram->live(),0,0x2000);
+	m_spriteram->copy();
+	memset(m_spriteram->live(),0,0x2000);
 }
 
-WRITE32_HANDLER( deco32_ace_ram_w )
+WRITE32_MEMBER(deco32_state::deco32_ace_ram_w)
 {
-	deco32_state *state = space->machine().driver_data<deco32_state>();
 	/* Some notes pieced together from Tattoo Assassins info:
 
         Bytes 0 to 0x58 - object alpha control?
@@ -59,10 +55,10 @@ WRITE32_HANDLER( deco32_ace_ram_w )
 
         'fadetype' - 1100 for multiplicative fade, 1000 for additive
     */
-	if (offset>=(0x80/4) && (data!=state->m_ace_ram[offset]))
-		state->m_ace_ram_dirty=1;
+	if (offset>=(0x80/4) && (data!=m_ace_ram[offset]))
+		m_ace_ram_dirty=1;
 
-	COMBINE_DATA(&state->m_ace_ram[offset]);
+	COMBINE_DATA(&m_ace_ram[offset]);
 }
 
 static void updateAceRam(running_machine& machine)
@@ -103,48 +99,45 @@ static void updateAceRam(running_machine& machine)
 /* Later games have double buffered paletteram - the real palette ram is
 only updated on a DMA call */
 
-WRITE32_HANDLER( deco32_nonbuffered_palette_w )
+WRITE32_MEMBER(deco32_state::deco32_nonbuffered_palette_w)
 {
 	int r,g,b;
 
-	deco32_state *state = space->machine().driver_data<deco32_state>();
-	COMBINE_DATA(&state->m_generic_paletteram_32[offset]);
+	COMBINE_DATA(&m_generic_paletteram_32[offset]);
 
-	b = (state->m_generic_paletteram_32[offset] >>16) & 0xff;
-	g = (state->m_generic_paletteram_32[offset] >> 8) & 0xff;
-	r = (state->m_generic_paletteram_32[offset] >> 0) & 0xff;
+	b = (m_generic_paletteram_32[offset] >>16) & 0xff;
+	g = (m_generic_paletteram_32[offset] >> 8) & 0xff;
+	r = (m_generic_paletteram_32[offset] >> 0) & 0xff;
 
-	palette_set_color(space->machine(),offset,MAKE_RGB(r,g,b));
+	palette_set_color(machine(),offset,MAKE_RGB(r,g,b));
 }
 
-WRITE32_HANDLER( deco32_buffered_palette_w )
+WRITE32_MEMBER(deco32_state::deco32_buffered_palette_w)
 {
-	deco32_state *state = space->machine().driver_data<deco32_state>();
-	COMBINE_DATA(&state->m_generic_paletteram_32[offset]);
-	state->m_dirty_palette[offset]=1;
+	COMBINE_DATA(&m_generic_paletteram_32[offset]);
+	m_dirty_palette[offset]=1;
 }
 
-WRITE32_HANDLER( deco32_palette_dma_w )
+WRITE32_MEMBER(deco32_state::deco32_palette_dma_w)
 {
-	deco32_state *state = space->machine().driver_data<deco32_state>();
-	const int m=space->machine().total_colors();
+	const int m=machine().total_colors();
 	int r,g,b,i;
 
 	for (i=0; i<m; i++) {
-		if (state->m_dirty_palette[i]) {
-			state->m_dirty_palette[i]=0;
+		if (m_dirty_palette[i]) {
+			m_dirty_palette[i]=0;
 
-			if (state->m_has_ace_ram)
+			if (m_has_ace_ram)
 			{
-				state->m_ace_ram_dirty=1;
+				m_ace_ram_dirty=1;
 			}
 			else
 			{
-				b = (state->m_generic_paletteram_32[i] >>16) & 0xff;
-				g = (state->m_generic_paletteram_32[i] >> 8) & 0xff;
-				r = (state->m_generic_paletteram_32[i] >> 0) & 0xff;
+				b = (m_generic_paletteram_32[i] >>16) & 0xff;
+				g = (m_generic_paletteram_32[i] >> 8) & 0xff;
+				r = (m_generic_paletteram_32[i] >> 0) & 0xff;
 
-				palette_set_color(space->machine(),i,MAKE_RGB(r,g,b));
+				palette_set_color(machine(),i,MAKE_RGB(r,g,b));
 			}
 		}
 	}

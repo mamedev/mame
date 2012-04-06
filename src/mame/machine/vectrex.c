@@ -306,20 +306,19 @@ TIMER_CALLBACK(vectrex_imager_eye)
 }
 
 
-WRITE8_HANDLER(vectrex_psg_port_w)
+WRITE8_MEMBER(vectrex_state::vectrex_psg_port_w)
 {
-	vectrex_state *state = space->machine().driver_data<vectrex_state>();
 	double wavel, ang_acc, tmp;
 	int mcontrol;
 
 	mcontrol = data & 0x40; /* IO6 controls the imager motor */
 
-	if (!mcontrol && mcontrol ^ state->m_old_mcontrol)
+	if (!mcontrol && mcontrol ^ m_old_mcontrol)
 	{
-		state->m_old_mcontrol = mcontrol;
-		tmp = space->machine().time().as_double();
-		wavel = tmp - state->m_sl;
-		state->m_sl = tmp;
+		m_old_mcontrol = mcontrol;
+		tmp = machine().time().as_double();
+		wavel = tmp - m_sl;
+		m_sl = tmp;
 
 		if (wavel < 1)
 		{
@@ -329,22 +328,22 @@ WRITE8_HANDLER(vectrex_psg_port_w)
                of the whole thing and some constants of the motor's torque/speed curve.
                pwl is the negative pulse width and wavel is the whole wavelength. */
 
-			ang_acc = (50.0 - 1.55 * state->m_imager_freq) / MMI;
-			state->m_imager_freq += ang_acc * state->m_pwl + DAMPC * state->m_imager_freq / MMI * wavel;
+			ang_acc = (50.0 - 1.55 * m_imager_freq) / MMI;
+			m_imager_freq += ang_acc * m_pwl + DAMPC * m_imager_freq / MMI * wavel;
 
-			if (state->m_imager_freq > 1)
+			if (m_imager_freq > 1)
 			{
-				state->m_imager_timer->adjust(
-									  attotime::from_double(MIN(1.0 / state->m_imager_freq, state->m_imager_timer->remaining().as_double())),
+				m_imager_timer->adjust(
+									  attotime::from_double(MIN(1.0 / m_imager_freq, m_imager_timer->remaining().as_double())),
 									  2,
-									  attotime::from_double(1.0 / state->m_imager_freq));
+									  attotime::from_double(1.0 / m_imager_freq));
 			}
 		}
 	}
-	if (mcontrol && mcontrol ^ state->m_old_mcontrol)
+	if (mcontrol && mcontrol ^ m_old_mcontrol)
 	{
-		state->m_old_mcontrol = mcontrol;
-		state->m_pwl = space->machine().time().as_double() - state->m_sl;
+		m_old_mcontrol = mcontrol;
+		m_pwl = machine().time().as_double() - m_sl;
 	}
 }
 

@@ -110,25 +110,22 @@ VIDEO_START( suprloco )
 
 ***************************************************************************/
 
-WRITE8_HANDLER( suprloco_videoram_w )
+WRITE8_MEMBER(suprloco_state::suprloco_videoram_w)
 {
-	suprloco_state *state = space->machine().driver_data<suprloco_state>();
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset/2);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset/2);
 }
 
-WRITE8_HANDLER( suprloco_scrollram_w )
+WRITE8_MEMBER(suprloco_state::suprloco_scrollram_w)
 {
-	suprloco_state *state = space->machine().driver_data<suprloco_state>();
-	int adj = flip_screen_get(space->machine()) ? -8 : 8;
+	int adj = flip_screen_get(machine()) ? -8 : 8;
 
-	state->m_scrollram[offset] = data;
-	state->m_bg_tilemap->set_scrollx(offset, data - adj);
+	m_scrollram[offset] = data;
+	m_bg_tilemap->set_scrollx(offset, data - adj);
 }
 
-WRITE8_HANDLER( suprloco_control_w )
+WRITE8_MEMBER(suprloco_state::suprloco_control_w)
 {
-	suprloco_state *state = space->machine().driver_data<suprloco_state>();
 	/* There is probably a palette select in here */
 
 	/* Bit 0   - coin counter A */
@@ -139,24 +136,23 @@ WRITE8_HANDLER( suprloco_control_w )
 	/* Bit 6   - probably unused */
 	/* Bit 7   - flip screen */
 
-	if ((state->m_control & 0x10) != (data & 0x10))
+	if ((m_control & 0x10) != (data & 0x10))
 	{
 		/*logerror("Bit 4 = %d\n", (data >> 4) & 1); */
 	}
 
-	coin_counter_w(space->machine(), 0, data & 0x01);
-	coin_counter_w(space->machine(), 1, data & 0x02);
+	coin_counter_w(machine(), 0, data & 0x01);
+	coin_counter_w(machine(), 1, data & 0x02);
 
-	flip_screen_set(space->machine(), data & 0x80);
+	flip_screen_set(machine(), data & 0x80);
 
-	state->m_control = data;
+	m_control = data;
 }
 
 
-READ8_HANDLER( suprloco_control_r )
+READ8_MEMBER(suprloco_state::suprloco_control_r)
 {
-	suprloco_state *state = space->machine().driver_data<suprloco_state>();
-	return state->m_control;
+	return m_control;
 }
 
 

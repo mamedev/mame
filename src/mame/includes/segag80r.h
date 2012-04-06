@@ -54,6 +54,18 @@ public:
 	DECLARE_READ8_MEMBER(spaceod_mangled_ports_r);
 	DECLARE_READ8_MEMBER(spaceod_port_fc_r);
 	DECLARE_WRITE8_MEMBER(coin_count_w);
+	DECLARE_WRITE8_MEMBER(segag80r_videoram_w);
+	DECLARE_READ8_MEMBER(segag80r_video_port_r);
+	DECLARE_WRITE8_MEMBER(segag80r_video_port_w);
+	DECLARE_READ8_MEMBER(spaceod_back_port_r);
+	DECLARE_WRITE8_MEMBER(spaceod_back_port_w);
+	DECLARE_WRITE8_MEMBER(monsterb_videoram_w);
+	DECLARE_WRITE8_MEMBER(monsterb_back_port_w);
+	DECLARE_WRITE8_MEMBER(pignewt_videoram_w);
+	DECLARE_WRITE8_MEMBER(pignewt_back_color_w);
+	DECLARE_WRITE8_MEMBER(pignewt_back_port_w);
+	DECLARE_WRITE8_MEMBER(sindbadm_videoram_w);
+	DECLARE_WRITE8_MEMBER(sindbadm_back_port_w);
 };
 
 
@@ -80,29 +92,17 @@ WRITE8_HANDLER( spaceod_sound_w );
 
 INTERRUPT_GEN( segag80r_vblank_start );
 
-WRITE8_HANDLER( segag80r_videoram_w );
 
-READ8_HANDLER( segag80r_video_port_r );
-WRITE8_HANDLER( segag80r_video_port_w );
 
 VIDEO_START( segag80r );
 SCREEN_UPDATE_IND16( segag80r );
 
 
-READ8_HANDLER( spaceod_back_port_r );
-WRITE8_HANDLER( spaceod_back_port_w );
 
 
-WRITE8_HANDLER( monsterb_videoram_w );
-WRITE8_HANDLER( monsterb_back_port_w );
 
 
-WRITE8_HANDLER( pignewt_videoram_w );
-WRITE8_HANDLER( pignewt_back_port_w );
-WRITE8_HANDLER( pignewt_back_color_w );
 
 
 INTERRUPT_GEN( sindbadm_vblank_start );
 
-WRITE8_HANDLER( sindbadm_videoram_w );
-WRITE8_HANDLER( sindbadm_back_port_w );

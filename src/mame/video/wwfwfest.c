@@ -16,33 +16,30 @@
  for writes to Video Ram
 *******************************************************************************/
 
-WRITE16_HANDLER( wwfwfest_fg0_videoram_w )
+WRITE16_MEMBER(wwfwfest_state::wwfwfest_fg0_videoram_w)
 {
-	wwfwfest_state *state = space->machine().driver_data<wwfwfest_state>();
 	/* Videoram is 8 bit, upper & lower byte writes end up in the same place */
 	if (ACCESSING_BITS_8_15 && ACCESSING_BITS_0_7) {
-		COMBINE_DATA(&state->m_fg0_videoram[offset]);
+		COMBINE_DATA(&m_fg0_videoram[offset]);
 	} else if (ACCESSING_BITS_8_15) {
-		state->m_fg0_videoram[offset]=(data>>8)&0xff;
+		m_fg0_videoram[offset]=(data>>8)&0xff;
 	} else {
-		state->m_fg0_videoram[offset]=data&0xff;
+		m_fg0_videoram[offset]=data&0xff;
 	}
 
-	state->m_fg0_tilemap->mark_tile_dirty(offset/2);
+	m_fg0_tilemap->mark_tile_dirty(offset/2);
 }
 
-WRITE16_HANDLER( wwfwfest_bg0_videoram_w )
+WRITE16_MEMBER(wwfwfest_state::wwfwfest_bg0_videoram_w)
 {
-	wwfwfest_state *state = space->machine().driver_data<wwfwfest_state>();
-	COMBINE_DATA(&state->m_bg0_videoram[offset]);
-	state->m_bg0_tilemap->mark_tile_dirty(offset/2);
+	COMBINE_DATA(&m_bg0_videoram[offset]);
+	m_bg0_tilemap->mark_tile_dirty(offset/2);
 }
 
-WRITE16_HANDLER( wwfwfest_bg1_videoram_w )
+WRITE16_MEMBER(wwfwfest_state::wwfwfest_bg1_videoram_w)
 {
-	wwfwfest_state *state = space->machine().driver_data<wwfwfest_state>();
-	COMBINE_DATA(&state->m_bg1_videoram[offset]);
-	state->m_bg1_tilemap->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_bg1_videoram[offset]);
+	m_bg1_tilemap->mark_tile_dirty(offset);
 }
 
 /*******************************************************************************

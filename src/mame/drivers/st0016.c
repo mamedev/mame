@@ -28,13 +28,13 @@ UINT32 st0016_rom_bank;
 static ADDRESS_MAP_START( st0016_mem, AS_PROGRAM, 8, st0016_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xcfff) AM_READ_LEGACY(st0016_sprite_ram_r) AM_WRITE_LEGACY(st0016_sprite_ram_w)
-	AM_RANGE(0xd000, 0xdfff) AM_READ_LEGACY(st0016_sprite2_ram_r) AM_WRITE_LEGACY(st0016_sprite2_ram_w)
+	AM_RANGE(0xc000, 0xcfff) AM_READ(st0016_sprite_ram_r) AM_WRITE(st0016_sprite_ram_w)
+	AM_RANGE(0xd000, 0xdfff) AM_READ(st0016_sprite2_ram_r) AM_WRITE(st0016_sprite2_ram_w)
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM
 	AM_RANGE(0xe800, 0xe87f) AM_RAM /* common ram */
 	AM_RANGE(0xe900, 0xe9ff) AM_DEVREADWRITE_LEGACY("stsnd", st0016_snd_r, st0016_snd_w) /* sound regs 8 x $20 bytes, see notes */
-	AM_RANGE(0xea00, 0xebff) AM_READ_LEGACY(st0016_palette_ram_r) AM_WRITE_LEGACY(st0016_palette_ram_w)
-	AM_RANGE(0xec00, 0xec1f) AM_READ_LEGACY(st0016_character_ram_r) AM_WRITE_LEGACY(st0016_character_ram_w)
+	AM_RANGE(0xea00, 0xebff) AM_READ(st0016_palette_ram_r) AM_WRITE(st0016_palette_ram_w)
+	AM_RANGE(0xec00, 0xec1f) AM_READ(st0016_character_ram_r) AM_WRITE(st0016_character_ram_w)
 	AM_RANGE(0xf000, 0xffff) AM_RAM /* work ram */
 ADDRESS_MAP_END
 
@@ -76,19 +76,19 @@ WRITE8_HANDLER(st0016_rom_bank_w)
 
 static ADDRESS_MAP_START( st0016_io, AS_IO, 8, st0016_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0xbf) AM_READ_LEGACY(st0016_vregs_r) AM_WRITE_LEGACY(st0016_vregs_w) /* video/crt regs ? */
+	AM_RANGE(0x00, 0xbf) AM_READ(st0016_vregs_r) AM_WRITE(st0016_vregs_w) /* video/crt regs ? */
 	AM_RANGE(0xc0, 0xc0) AM_READ_PORT("P1") AM_WRITE(mux_select_w)
 	AM_RANGE(0xc1, 0xc1) AM_READ_PORT("P2") AM_WRITENOP
 	AM_RANGE(0xc2, 0xc2) AM_READ(mux_r) AM_WRITENOP
 	AM_RANGE(0xc3, 0xc3) AM_READ_PORT("P2") AM_WRITENOP
 	AM_RANGE(0xe0, 0xe0) AM_WRITENOP /* renju = $40, neratte = 0 */
 	AM_RANGE(0xe1, 0xe1) AM_WRITE_LEGACY(st0016_rom_bank_w)
-	AM_RANGE(0xe2, 0xe2) AM_WRITE_LEGACY(st0016_sprite_bank_w)
-	AM_RANGE(0xe3, 0xe4) AM_WRITE_LEGACY(st0016_character_bank_w)
-	AM_RANGE(0xe5, 0xe5) AM_WRITE_LEGACY(st0016_palette_bank_w)
+	AM_RANGE(0xe2, 0xe2) AM_WRITE(st0016_sprite_bank_w)
+	AM_RANGE(0xe3, 0xe4) AM_WRITE(st0016_character_bank_w)
+	AM_RANGE(0xe5, 0xe5) AM_WRITE(st0016_palette_bank_w)
 	AM_RANGE(0xe6, 0xe6) AM_WRITENOP /* banking ? ram bank ? shared rambank ? */
 	AM_RANGE(0xe7, 0xe7) AM_WRITENOP /* watchdog */
-	AM_RANGE(0xf0, 0xf0) AM_READ_LEGACY(st0016_dma_r)
+	AM_RANGE(0xf0, 0xf0) AM_READ(st0016_dma_r)
 ADDRESS_MAP_END
 
 
@@ -140,7 +140,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( st0016_m2_io, AS_IO, 8, st0016_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0xbf) AM_READ_LEGACY(st0016_vregs_r) AM_WRITE_LEGACY(st0016_vregs_w)
+	AM_RANGE(0x00, 0xbf) AM_READ(st0016_vregs_r) AM_WRITE(st0016_vregs_w)
 	AM_RANGE(0xc0, 0xc3) AM_READ(latch8_r) AM_WRITE(latch8_w)
 	AM_RANGE(0xd0, 0xd0) AM_READ_PORT("P1") AM_WRITE(mux_select_w)
 	AM_RANGE(0xd1, 0xd1) AM_READ_PORT("P2") AM_WRITENOP
@@ -148,12 +148,12 @@ static ADDRESS_MAP_START( st0016_m2_io, AS_IO, 8, st0016_state )
 	AM_RANGE(0xd3, 0xd3) AM_READ_PORT("P2") AM_WRITENOP
 	AM_RANGE(0xe0, 0xe0) AM_WRITENOP
 	AM_RANGE(0xe1, 0xe1) AM_WRITE_LEGACY(st0016_rom_bank_w)
-	AM_RANGE(0xe2, 0xe2) AM_WRITE_LEGACY(st0016_sprite_bank_w)
-	AM_RANGE(0xe3, 0xe4) AM_WRITE_LEGACY(st0016_character_bank_w)
-	AM_RANGE(0xe5, 0xe5) AM_WRITE_LEGACY(st0016_palette_bank_w)
+	AM_RANGE(0xe2, 0xe2) AM_WRITE(st0016_sprite_bank_w)
+	AM_RANGE(0xe3, 0xe4) AM_WRITE(st0016_character_bank_w)
+	AM_RANGE(0xe5, 0xe5) AM_WRITE(st0016_palette_bank_w)
 	AM_RANGE(0xe6, 0xe6) AM_WRITENOP /* banking ? ram bank ? shared rambank ? */
 	AM_RANGE(0xe7, 0xe7) AM_WRITENOP /* watchdog */
-	AM_RANGE(0xf0, 0xf0) AM_READ_LEGACY(st0016_dma_r)
+	AM_RANGE(0xf0, 0xf0) AM_READ(st0016_dma_r)
 ADDRESS_MAP_END
 
 /*************************************

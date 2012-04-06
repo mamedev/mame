@@ -17,13 +17,13 @@ public:
 	UINT8    m_irq_mask;
 	DECLARE_WRITE8_MEMBER(rocnrope_interrupt_vector_w);
 	DECLARE_WRITE8_MEMBER(irq_mask_w);
+	DECLARE_WRITE8_MEMBER(rocnrope_videoram_w);
+	DECLARE_WRITE8_MEMBER(rocnrope_colorram_w);
+	DECLARE_WRITE8_MEMBER(rocnrope_flipscreen_w);
 };
 
 /*----------- defined in video/rocnrope.c -----------*/
 
-WRITE8_HANDLER( rocnrope_videoram_w );
-WRITE8_HANDLER( rocnrope_colorram_w );
-WRITE8_HANDLER( rocnrope_flipscreen_w );
 
 PALETTE_INIT( rocnrope );
 VIDEO_START( rocnrope );

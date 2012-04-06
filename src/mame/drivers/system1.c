@@ -428,7 +428,7 @@ WRITE8_MEMBER(system1_state::videomode_w)
 	coin_counter_w(machine(), 0, data & 1);
 
 	/* remaining signals are video-related */
-	system1_videomode_w(&space, 0, data);
+	system1_videomode_w(space, 0, data);
 }
 
 
@@ -721,25 +721,25 @@ static ADDRESS_MAP_START( system1_map, AS_PROGRAM, 8, system1_state )
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_BASE(m_ram)
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_BASE(m_spriteram)
-	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE_LEGACY(system1_paletteram_w) AM_SHARE("paletteram")
-	AM_RANGE(0xe000, 0xefff) AM_READWRITE_LEGACY(system1_videoram_r, system1_videoram_w)
-	AM_RANGE(0xf000, 0xf3ff) AM_READWRITE_LEGACY(system1_mixer_collision_r, system1_mixer_collision_w)
-	AM_RANGE(0xf400, 0xf7ff) AM_WRITE_LEGACY(system1_mixer_collision_reset_w)
-	AM_RANGE(0xf800, 0xfbff) AM_READWRITE_LEGACY(system1_sprite_collision_r, system1_sprite_collision_w)
-	AM_RANGE(0xfc00, 0xffff) AM_WRITE_LEGACY(system1_sprite_collision_reset_w)
+	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(system1_paletteram_w) AM_SHARE("paletteram")
+	AM_RANGE(0xe000, 0xefff) AM_READWRITE(system1_videoram_r, system1_videoram_w)
+	AM_RANGE(0xf000, 0xf3ff) AM_READWRITE(system1_mixer_collision_r, system1_mixer_collision_w)
+	AM_RANGE(0xf400, 0xf7ff) AM_WRITE(system1_mixer_collision_reset_w)
+	AM_RANGE(0xf800, 0xfbff) AM_READWRITE(system1_sprite_collision_r, system1_sprite_collision_w)
+	AM_RANGE(0xfc00, 0xffff) AM_WRITE(system1_sprite_collision_reset_w)
 ADDRESS_MAP_END
 
 /* same as normal System 1 except address map is shuffled (RAM/collision are swapped) */
 static ADDRESS_MAP_START( nobo_map, AS_PROGRAM, 8, system1_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xc3ff) AM_READWRITE_LEGACY(system1_mixer_collision_r, system1_mixer_collision_w)
-	AM_RANGE(0xc400, 0xc7ff) AM_WRITE_LEGACY(system1_mixer_collision_reset_w)
-	AM_RANGE(0xc800, 0xcbff) AM_READWRITE_LEGACY(system1_sprite_collision_r, system1_sprite_collision_w)
-	AM_RANGE(0xcc00, 0xcfff) AM_WRITE_LEGACY(system1_sprite_collision_reset_w)
+	AM_RANGE(0xc000, 0xc3ff) AM_READWRITE(system1_mixer_collision_r, system1_mixer_collision_w)
+	AM_RANGE(0xc400, 0xc7ff) AM_WRITE(system1_mixer_collision_reset_w)
+	AM_RANGE(0xc800, 0xcbff) AM_READWRITE(system1_sprite_collision_r, system1_sprite_collision_w)
+	AM_RANGE(0xcc00, 0xcfff) AM_WRITE(system1_sprite_collision_reset_w)
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_BASE(m_spriteram)
-	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE_LEGACY(system1_paletteram_w) AM_SHARE("paletteram")
-	AM_RANGE(0xe000, 0xefff) AM_READWRITE_LEGACY(system1_videoram_r, system1_videoram_w)
+	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(system1_paletteram_w) AM_SHARE("paletteram")
+	AM_RANGE(0xe000, 0xefff) AM_READWRITE(system1_videoram_r, system1_videoram_w)
 	AM_RANGE(0xf000, 0xffff) AM_RAM AM_BASE(m_ram)
 ADDRESS_MAP_END
 

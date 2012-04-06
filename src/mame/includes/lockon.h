@@ -73,6 +73,17 @@ public:
 	device_t *m_f2203_1r;
 	device_t *m_f2203_2r;
 	device_t *m_f2203_3r;
+	DECLARE_READ16_MEMBER(lockon_crtc_r);
+	DECLARE_WRITE16_MEMBER(lockon_crtc_w);
+	DECLARE_WRITE16_MEMBER(lockon_char_w);
+	DECLARE_WRITE16_MEMBER(lockon_scene_h_scr_w);
+	DECLARE_WRITE16_MEMBER(lockon_scene_v_scr_w);
+	DECLARE_WRITE16_MEMBER(lockon_ground_ctrl_w);
+	DECLARE_WRITE16_MEMBER(lockon_tza112_w);
+	DECLARE_READ16_MEMBER(lockon_obj_4000_r);
+	DECLARE_WRITE16_MEMBER(lockon_obj_4000_w);
+	DECLARE_WRITE16_MEMBER(lockon_fb_clut_w);
+	DECLARE_WRITE16_MEMBER(lockon_rotate_w);
 };
 
 
@@ -82,15 +93,4 @@ PALETTE_INIT( lockon );
 VIDEO_START( lockon );
 SCREEN_UPDATE_IND16( lockon );
 SCREEN_VBLANK( lockon );
-READ16_HANDLER( lockon_crtc_r );
-WRITE16_HANDLER( lockon_crtc_w );
-WRITE16_HANDLER( lockon_rotate_w );
-WRITE16_HANDLER( lockon_fb_clut_w );
-WRITE16_HANDLER( lockon_scene_h_scr_w );
-WRITE16_HANDLER( lockon_scene_v_scr_w );
-WRITE16_HANDLER( lockon_ground_ctrl_w );
-WRITE16_HANDLER( lockon_char_w );
 
-WRITE16_HANDLER( lockon_tza112_w );
-READ16_HANDLER( lockon_obj_4000_r );
-WRITE16_HANDLER( lockon_obj_4000_w );

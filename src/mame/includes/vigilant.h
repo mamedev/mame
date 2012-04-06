@@ -18,6 +18,10 @@ public:
 	DECLARE_WRITE8_MEMBER(vigilant_bank_select_w);
 	DECLARE_WRITE8_MEMBER(vigilant_out2_w);
 	DECLARE_WRITE8_MEMBER(kikcubic_coin_w);
+	DECLARE_WRITE8_MEMBER(vigilant_paletteram_w);
+	DECLARE_WRITE8_MEMBER(vigilant_horiz_scroll_w);
+	DECLARE_WRITE8_MEMBER(vigilant_rear_horiz_scroll_w);
+	DECLARE_WRITE8_MEMBER(vigilant_rear_color_w);
 };
 
 
@@ -25,9 +29,5 @@ public:
 
 VIDEO_START( vigilant );
 VIDEO_RESET( vigilant );
-WRITE8_HANDLER( vigilant_paletteram_w );
-WRITE8_HANDLER( vigilant_horiz_scroll_w );
-WRITE8_HANDLER( vigilant_rear_horiz_scroll_w );
-WRITE8_HANDLER( vigilant_rear_color_w );
 SCREEN_UPDATE_IND16( vigilant );
 SCREEN_UPDATE_IND16( kikcubic );

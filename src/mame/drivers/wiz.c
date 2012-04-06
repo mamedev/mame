@@ -237,17 +237,17 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, wiz_state )
 	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("DSW0")
 	AM_RANGE(0xf000, 0xf000) AM_RAM AM_BASE(m_sprite_bank)
 	AM_RANGE(0xf001, 0xf001) AM_WRITE(wiz_main_nmi_mask_w)
-	AM_RANGE(0xf002, 0xf003) AM_WRITE_LEGACY(wiz_palettebank_w)
-	AM_RANGE(0xf004, 0xf005) AM_WRITE_LEGACY(wiz_char_bank_select_w)
-	AM_RANGE(0xf006, 0xf006) AM_WRITE_LEGACY(wiz_flipx_w)
-	AM_RANGE(0xf007, 0xf007) AM_WRITE_LEGACY(wiz_flipy_w)
+	AM_RANGE(0xf002, 0xf003) AM_WRITE(wiz_palettebank_w)
+	AM_RANGE(0xf004, 0xf005) AM_WRITE(wiz_char_bank_select_w)
+	AM_RANGE(0xf006, 0xf006) AM_WRITE(wiz_flipx_w)
+	AM_RANGE(0xf007, 0xf007) AM_WRITE(wiz_flipy_w)
 	AM_RANGE(0xf008, 0xf008) AM_READ_PORT("DSW1")
 	AM_RANGE(0xf008, 0xf00f) AM_WRITENOP			/* initialized by Stinger/Scion */
 	AM_RANGE(0xf010, 0xf010) AM_READ_PORT("IN0")
 	AM_RANGE(0xf018, 0xf018) AM_READ_PORT("IN1")
 	AM_RANGE(0xf800, 0xf800) AM_READ(watchdog_reset_r)
 	AM_RANGE(0xf800, 0xf80f) AM_WRITE(sound_command_w)	/* sound registers */
-	AM_RANGE(0xf818, 0xf818) AM_WRITE_LEGACY(wiz_bgcolor_w)
+	AM_RANGE(0xf818, 0xf818) AM_WRITE(wiz_bgcolor_w)
 ADDRESS_MAP_END
 
 WRITE8_MEMBER(wiz_state::wiz_sound_nmi_mask_w)

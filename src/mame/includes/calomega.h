@@ -11,13 +11,13 @@ public:
 	UINT8 *m_videoram;
 	UINT8 *m_colorram;
 	tilemap_t *m_bg_tilemap;
+	DECLARE_WRITE8_MEMBER(calomega_videoram_w);
+	DECLARE_WRITE8_MEMBER(calomega_colorram_w);
 };
 
 
 /*----------- defined in video/calomega.c -----------*/
 
-WRITE8_HANDLER( calomega_videoram_w );
-WRITE8_HANDLER( calomega_colorram_w );
 PALETTE_INIT( calomega );
 VIDEO_START( calomega );
 SCREEN_UPDATE_IND16( calomega );

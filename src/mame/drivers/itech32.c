@@ -903,15 +903,15 @@ static ADDRESS_MAP_START( timekill_map, AS_PROGRAM, 16, itech32_state )
 	AM_RANGE(0x000000, 0x003fff) AM_RAM AM_BASE(m_main_ram) AM_SHARE("nvram")
 	AM_RANGE(0x040000, 0x040001) AM_READ_PORT("P1")
 	AM_RANGE(0x048000, 0x048001) AM_READ_PORT("P2")
-	AM_RANGE(0x050000, 0x050001) AM_READ_PORT("SYSTEM") AM_WRITE_LEGACY(timekill_intensity_w)
+	AM_RANGE(0x050000, 0x050001) AM_READ_PORT("SYSTEM") AM_WRITE(timekill_intensity_w)
 	AM_RANGE(0x058000, 0x058001) AM_READ_PORT("DIPS") AM_WRITE(watchdog_reset16_w)
-	AM_RANGE(0x060000, 0x060001) AM_WRITE_LEGACY(timekill_colora_w)
-	AM_RANGE(0x068000, 0x068001) AM_WRITE_LEGACY(timekill_colorbc_w)
+	AM_RANGE(0x060000, 0x060001) AM_WRITE(timekill_colora_w)
+	AM_RANGE(0x068000, 0x068001) AM_WRITE(timekill_colorbc_w)
 	AM_RANGE(0x070000, 0x070001) AM_WRITENOP	/* noisy */
 	AM_RANGE(0x078000, 0x078001) AM_WRITE(sound_data_w)
-	AM_RANGE(0x080000, 0x08007f) AM_READWRITE_LEGACY(itech32_video_r, itech32_video_w) AM_BASE(m_video)
+	AM_RANGE(0x080000, 0x08007f) AM_READWRITE(itech32_video_r, itech32_video_w) AM_BASE(m_video)
 	AM_RANGE(0x0a0000, 0x0a0001) AM_WRITE(int1_ack_w)
-	AM_RANGE(0x0c0000, 0x0c7fff) AM_RAM_WRITE_LEGACY(timekill_paletteram_w) AM_SHARE("paletteram")
+	AM_RANGE(0x0c0000, 0x0c7fff) AM_RAM_WRITE(timekill_paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0x100000, 0x17ffff) AM_ROM AM_REGION("user1", 0) AM_BASE(m_main_rom)
 ADDRESS_MAP_END
 
@@ -924,13 +924,13 @@ static ADDRESS_MAP_START( bloodstm_map, AS_PROGRAM, 16, itech32_state )
 	AM_RANGE(0x180000, 0x180001) AM_READ_PORT("P3")
 	AM_RANGE(0x200000, 0x200001) AM_READ_PORT("P4") AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0x280000, 0x280001) AM_READ_PORT("DIPS")
-	AM_RANGE(0x300000, 0x300001) AM_WRITE_LEGACY(bloodstm_color1_w)
-	AM_RANGE(0x380000, 0x380001) AM_WRITE_LEGACY(bloodstm_color2_w)
+	AM_RANGE(0x300000, 0x300001) AM_WRITE(bloodstm_color1_w)
+	AM_RANGE(0x380000, 0x380001) AM_WRITE(bloodstm_color2_w)
 	AM_RANGE(0x400000, 0x400001) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0x480000, 0x480001) AM_WRITE(sound_data_w)
-	AM_RANGE(0x500000, 0x5000ff) AM_READWRITE_LEGACY(bloodstm_video_r, bloodstm_video_w) AM_BASE(m_video)
-	AM_RANGE(0x580000, 0x59ffff) AM_RAM_WRITE_LEGACY(bloodstm_paletteram_w) AM_SHARE("paletteram")
-	AM_RANGE(0x700000, 0x700001) AM_WRITE_LEGACY(bloodstm_plane_w)
+	AM_RANGE(0x500000, 0x5000ff) AM_READWRITE(bloodstm_video_r, bloodstm_video_w) AM_BASE(m_video)
+	AM_RANGE(0x580000, 0x59ffff) AM_RAM_WRITE(bloodstm_paletteram_w) AM_SHARE("paletteram")
+	AM_RANGE(0x700000, 0x700001) AM_WRITE(bloodstm_plane_w)
 	AM_RANGE(0x780000, 0x780001) AM_READ_PORT("EXTRA")
 	AM_RANGE(0x800000, 0x87ffff) AM_MIRROR(0x780000) AM_ROM AM_REGION("user1", 0) AM_BASE(m_main_rom)
 ADDRESS_MAP_END
@@ -991,11 +991,11 @@ AM_RANGE(0x000c00, 0x007fff) AM_MIRROR(0x40000) AM_READWRITE(test2_r, test2_w)
 	AM_RANGE(0x08a000, 0x08a003) AM_READ(drivedge_gas_r) AM_WRITENOP
 	AM_RANGE(0x08c000, 0x08c003) AM_READ_PORT("8c000")
 	AM_RANGE(0x08e000, 0x08e003) AM_READ_PORT("8e000") AM_WRITENOP
-	AM_RANGE(0x100000, 0x10000f) AM_WRITE_LEGACY(drivedge_zbuf_control_w) AM_BASE(m_drivedge_zbuf_control)
-	AM_RANGE(0x180000, 0x180003) AM_WRITE_LEGACY(drivedge_color0_w)
-	AM_RANGE(0x1a0000, 0x1bffff) AM_RAM_WRITE_LEGACY(drivedge_paletteram_w) AM_SHARE("paletteram")
+	AM_RANGE(0x100000, 0x10000f) AM_WRITE(drivedge_zbuf_control_w) AM_BASE(m_drivedge_zbuf_control)
+	AM_RANGE(0x180000, 0x180003) AM_WRITE(drivedge_color0_w)
+	AM_RANGE(0x1a0000, 0x1bffff) AM_RAM_WRITE(drivedge_paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0x1c0000, 0x1c0003) AM_WRITENOP
-	AM_RANGE(0x1e0000, 0x1e0113) AM_READWRITE_LEGACY(itech020_video_r, itech020_video_w) AM_BASE(m_video)
+	AM_RANGE(0x1e0000, 0x1e0113) AM_READWRITE(itech020_video_r, itech020_video_w) AM_BASE(m_video)
 	AM_RANGE(0x1e4000, 0x1e4003) AM_WRITE(tms_reset_assert_w)
 	AM_RANGE(0x1ec000, 0x1ec003) AM_WRITE(tms_reset_clear_w)
 	AM_RANGE(0x200000, 0x200003) AM_READ_PORT("200000")
@@ -1025,18 +1025,18 @@ static ADDRESS_MAP_START( itech020_map, AS_PROGRAM, 32, itech32_state )
 	AM_RANGE(0x180000, 0x180003) AM_READ_PORT("P3")
 	AM_RANGE(0x200000, 0x200003) AM_READ_PORT("P4")
 	AM_RANGE(0x280000, 0x280003) AM_READ_PORT("DIPS")
-	AM_RANGE(0x300000, 0x300003) AM_WRITE_LEGACY(itech020_color1_w)
-	AM_RANGE(0x380000, 0x380003) AM_WRITE_LEGACY(itech020_color2_w)
+	AM_RANGE(0x300000, 0x300003) AM_WRITE(itech020_color1_w)
+	AM_RANGE(0x380000, 0x380003) AM_WRITE(itech020_color2_w)
 	AM_RANGE(0x400000, 0x400003) AM_WRITE(watchdog_reset32_w)
 	AM_RANGE(0x480000, 0x480003) AM_WRITE(sound_data32_w)
-	AM_RANGE(0x500000, 0x5000ff) AM_READWRITE_LEGACY(itech020_video_r, itech020_video_w) AM_BASE(m_video)
+	AM_RANGE(0x500000, 0x5000ff) AM_READWRITE(itech020_video_r, itech020_video_w) AM_BASE(m_video)
 	AM_RANGE(0x578000, 0x57ffff) AM_READNOP				/* touched by protection */
-	AM_RANGE(0x580000, 0x59ffff) AM_RAM_WRITE_LEGACY(itech020_paletteram_w) AM_SHARE("paletteram")
+	AM_RANGE(0x580000, 0x59ffff) AM_RAM_WRITE(itech020_paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0x600000, 0x603fff) AM_RAM AM_SHARE("nvram")
 /* ? */	AM_RANGE(0x61ff00, 0x61ffff) AM_WRITENOP			/* Unknown Writes */
 	AM_RANGE(0x680000, 0x680003) AM_READ(itech020_prot_result_r) AM_WRITENOP
 /* ! */	AM_RANGE(0x680800, 0x68083f) AM_READONLY AM_WRITENOP /* Serial DUART Channel A/B & Top LED sign - To Do! */
-	AM_RANGE(0x700000, 0x700003) AM_WRITE_LEGACY(itech020_plane_w)
+	AM_RANGE(0x700000, 0x700003) AM_WRITE(itech020_plane_w)
 	AM_RANGE(0x800000, 0xbfffff) AM_ROM AM_REGION("user1", 0) AM_BASE(m_main_rom)
 ADDRESS_MAP_END
 
@@ -4030,8 +4030,8 @@ static void init_sftm_common(running_machine &machine, int prot_addr)
 
 	state->m_itech020_prot_address = prot_addr;
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x300000, 0x300003, FUNC(itech020_color2_w));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x380000, 0x380003, FUNC(itech020_color1_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x300000, 0x300003, write32_delegate(FUNC(itech32_state::itech020_color2_w),state));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x380000, 0x380003, write32_delegate(FUNC(itech32_state::itech020_color1_w),state));
 }
 
 
@@ -4062,8 +4062,8 @@ static void init_shuffle_bowl_common(running_machine &machine, int prot_addr)
 
 	state->m_itech020_prot_address = prot_addr;
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x300000, 0x300003, FUNC(itech020_color2_w));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x380000, 0x380003, FUNC(itech020_color1_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x300000, 0x300003, write32_delegate(FUNC(itech32_state::itech020_color2_w),state));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x380000, 0x380003, write32_delegate(FUNC(itech32_state::itech020_color1_w),state));
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x180800, 0x180803, read32_delegate(FUNC(itech32_state::trackball32_4bit_p1_r),state));
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x181000, 0x181003, read32_delegate(FUNC(itech32_state::trackball32_4bit_p2_r),state));
 }

@@ -30,32 +30,28 @@ void denjinmk_setgfxbank(running_machine &machine, UINT16 data)
 	state->m_text_layer->mark_all_dirty();
 }
 
-WRITE16_HANDLER( legionna_background_w )
+WRITE16_MEMBER(legionna_state::legionna_background_w)
 {
-	legionna_state *state = space->machine().driver_data<legionna_state>();
-	COMBINE_DATA(&state->m_back_data[offset]);
-	state->m_background_layer->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_back_data[offset]);
+	m_background_layer->mark_tile_dirty(offset);
 }
 
-WRITE16_HANDLER( legionna_midground_w )
+WRITE16_MEMBER(legionna_state::legionna_midground_w)
 {
-	legionna_state *state = space->machine().driver_data<legionna_state>();
-	COMBINE_DATA(&state->m_mid_data[offset]);
-	state->m_midground_layer->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_mid_data[offset]);
+	m_midground_layer->mark_tile_dirty(offset);
 }
 
-WRITE16_HANDLER( legionna_foreground_w )
+WRITE16_MEMBER(legionna_state::legionna_foreground_w)
 {
-	legionna_state *state = space->machine().driver_data<legionna_state>();
-	COMBINE_DATA(&state->m_fore_data[offset]);
-	state->m_foreground_layer->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_fore_data[offset]);
+	m_foreground_layer->mark_tile_dirty(offset);
 }
 
-WRITE16_HANDLER( legionna_text_w )
+WRITE16_MEMBER(legionna_state::legionna_text_w)
 {
-	legionna_state *state = space->machine().driver_data<legionna_state>();
-	COMBINE_DATA(&state->m_textram[offset]);
-	state->m_text_layer->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_textram[offset]);
+	m_text_layer->mark_tile_dirty(offset);
 }
 
 static TILE_GET_INFO( get_back_tile_info )

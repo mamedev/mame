@@ -58,21 +58,21 @@ public:
 	DECLARE_WRITE8_MEMBER(playmark_oki_w);
 	DECLARE_WRITE8_MEMBER(playmark_snd_control_w);
 	DECLARE_READ8_MEMBER(PIC16C5X_T0_clk_r);
+	DECLARE_WRITE16_MEMBER(wbeachvl_txvideoram_w);
+	DECLARE_WRITE16_MEMBER(wbeachvl_fgvideoram_w);
+	DECLARE_WRITE16_MEMBER(wbeachvl_bgvideoram_w);
+	DECLARE_WRITE16_MEMBER(hrdtimes_txvideoram_w);
+	DECLARE_WRITE16_MEMBER(hrdtimes_fgvideoram_w);
+	DECLARE_WRITE16_MEMBER(hrdtimes_bgvideoram_w);
+	DECLARE_WRITE16_MEMBER(bigtwin_paletteram_w);
+	DECLARE_WRITE16_MEMBER(bigtwin_scroll_w);
+	DECLARE_WRITE16_MEMBER(wbeachvl_scroll_w);
+	DECLARE_WRITE16_MEMBER(excelsr_scroll_w);
+	DECLARE_WRITE16_MEMBER(hrdtimes_scroll_w);
 };
 
 /*----------- defined in video/playmark.c -----------*/
 
-WRITE16_HANDLER( wbeachvl_txvideoram_w );
-WRITE16_HANDLER( wbeachvl_fgvideoram_w );
-WRITE16_HANDLER( wbeachvl_bgvideoram_w );
-WRITE16_HANDLER( hrdtimes_txvideoram_w );
-WRITE16_HANDLER( hrdtimes_fgvideoram_w );
-WRITE16_HANDLER( hrdtimes_bgvideoram_w );
-WRITE16_HANDLER( bigtwin_paletteram_w );
-WRITE16_HANDLER( bigtwin_scroll_w );
-WRITE16_HANDLER( wbeachvl_scroll_w );
-WRITE16_HANDLER( excelsr_scroll_w );
-WRITE16_HANDLER( hrdtimes_scroll_w );
 
 VIDEO_START( bigtwin );
 VIDEO_START( bigtwinb );

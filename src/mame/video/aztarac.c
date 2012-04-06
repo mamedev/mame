@@ -9,7 +9,7 @@
 #include "includes/aztarac.h"
 
 #define AVECTOR(m, x, y, color, intensity) \
-vector_add_point (m, state->m_xcenter + ((x) << 16), state->m_ycenter - ((y) << 16), color, intensity)
+vector_add_point (m, m_xcenter + ((x) << 16), m_ycenter - ((y) << 16), color, intensity)
 
 
 
@@ -22,10 +22,9 @@ INLINE void read_vectorram(UINT16 *vectorram, int addr, int *x, int *y, int *c)
     if (*y & 0x200) *y |= 0xfffffc00;
 }
 
-WRITE16_HANDLER( aztarac_ubr_w )
+WRITE16_MEMBER(aztarac_state::aztarac_ubr_w)
 {
-    aztarac_state *state = space->machine().driver_data<aztarac_state>();
-    UINT16 *vectorram = state->m_vectorram;
+    UINT16 *vectorram = m_vectorram;
     int x, y, c, intensity, xoffset, yoffset, color;
     int defaddr, objaddr=0, ndefs;
 
@@ -44,7 +43,7 @@ WRITE16_HANDLER( aztarac_ubr_w )
             if ((c & 0x2000) == 0)
             {
                 defaddr = (c >> 1) & 0x7ff;
-                AVECTOR (space->machine(), xoffset, yoffset, 0, 0);
+                AVECTOR (machine(), xoffset, yoffset, 0, 0);
 
                 read_vectorram(vectorram, defaddr, &x, &ndefs, &c);
                 ndefs++;
@@ -59,9 +58,9 @@ WRITE16_HANDLER( aztarac_ubr_w )
                         defaddr++;
                         read_vectorram(vectorram, defaddr, &x, &y, &c);
                         if ((c & 0xff00) == 0)
-                            AVECTOR (space->machine(), x + xoffset, y + yoffset, 0, 0);
+                            AVECTOR (machine(), x + xoffset, y + yoffset, 0, 0);
                         else
-                            AVECTOR (space->machine(), x + xoffset, y + yoffset, color, intensity);
+                            AVECTOR (machine(), x + xoffset, y + yoffset, color, intensity);
                     }
                 }
                 else
@@ -72,7 +71,7 @@ WRITE16_HANDLER( aztarac_ubr_w )
                         defaddr++;
                         read_vectorram(vectorram, defaddr, &x, &y, &c);
                         color = VECTOR_COLOR222(c & 0x3f);
-                        AVECTOR (space->machine(), x + xoffset, y + yoffset, color, c >> 8);
+                        AVECTOR (machine(), x + xoffset, y + yoffset, color, c >> 8);
                     }
                 }
             }

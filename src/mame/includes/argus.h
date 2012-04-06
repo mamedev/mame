@@ -36,6 +36,27 @@ public:
 	UINT8 *m_spriteram;
 	size_t m_spriteram_size;
 	DECLARE_WRITE8_MEMBER(argus_bankselect_w);
+	DECLARE_WRITE8_MEMBER(valtric_mosaic_w);
+	DECLARE_READ8_MEMBER(argus_txram_r);
+	DECLARE_WRITE8_MEMBER(argus_txram_w);
+	DECLARE_READ8_MEMBER(argus_bg1ram_r);
+	DECLARE_WRITE8_MEMBER(argus_bg1ram_w);
+	DECLARE_WRITE8_MEMBER(argus_bg_status_w);
+	DECLARE_WRITE8_MEMBER(valtric_bg_status_w);
+	DECLARE_WRITE8_MEMBER(butasan_bg0_status_w);
+	DECLARE_WRITE8_MEMBER(butasan_bg1_status_w);
+	DECLARE_WRITE8_MEMBER(argus_flipscreen_w);
+	DECLARE_READ8_MEMBER(argus_paletteram_r);
+	DECLARE_WRITE8_MEMBER(argus_paletteram_w);
+	DECLARE_WRITE8_MEMBER(valtric_paletteram_w);
+	DECLARE_WRITE8_MEMBER(butasan_paletteram_w);
+	DECLARE_READ8_MEMBER(butasan_bg1ram_r);
+	DECLARE_WRITE8_MEMBER(butasan_bg1ram_w);
+	DECLARE_WRITE8_MEMBER(butasan_pageselect_w);
+	DECLARE_READ8_MEMBER(butasan_pagedram_r);
+	DECLARE_WRITE8_MEMBER(butasan_pagedram_w);
+	DECLARE_WRITE8_MEMBER(valtric_unknown_w);
+	DECLARE_WRITE8_MEMBER(butasan_unknown_w);
 };
 
 
@@ -51,27 +72,6 @@ SCREEN_UPDATE_RGB32( argus );
 SCREEN_UPDATE_RGB32( valtric );
 SCREEN_UPDATE_RGB32( butasan );
 
-READ8_HANDLER( argus_txram_r );
-READ8_HANDLER( argus_bg1ram_r );
-READ8_HANDLER( argus_paletteram_r );
 
-WRITE8_HANDLER( argus_txram_w );
-WRITE8_HANDLER( argus_bg1ram_w );
-WRITE8_HANDLER( argus_bg_status_w );
-WRITE8_HANDLER( argus_flipscreen_w );
-WRITE8_HANDLER( argus_paletteram_w );
 
-WRITE8_HANDLER( valtric_bg_status_w );
-WRITE8_HANDLER( valtric_paletteram_w );
-WRITE8_HANDLER( valtric_mosaic_w );
-WRITE8_HANDLER( valtric_unknown_w );
 
-READ8_HANDLER( butasan_pagedram_r );
-READ8_HANDLER( butasan_bg1ram_r );
-WRITE8_HANDLER( butasan_pageselect_w );
-WRITE8_HANDLER( butasan_pagedram_w );
-WRITE8_HANDLER( butasan_bg1ram_w );
-WRITE8_HANDLER( butasan_bg0_status_w );
-WRITE8_HANDLER( butasan_paletteram_w );
-WRITE8_HANDLER( butasan_bg1_status_w );
-WRITE8_HANDLER( butasan_unknown_w );

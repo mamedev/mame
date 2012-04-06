@@ -298,58 +298,51 @@ static void register_savestate( running_machine &machine )
 }
 
 
-WRITE8_HANDLER( m62_flipscreen_w )
+WRITE8_MEMBER(m62_state::m62_flipscreen_w)
 {
-	m62_state *state = space->machine().driver_data<m62_state>();
 	/* screen flip is handled both by software and hardware */
-	data ^= ~input_port_read(space->machine(), "DSW2") & 1;
+	data ^= ~input_port_read(machine(), "DSW2") & 1;
 
-	state->m_flipscreen = data & 0x01;
-	if (state->m_flipscreen)
-		space->machine().tilemap().set_flip_all(TILEMAP_FLIPX | TILEMAP_FLIPY);
+	m_flipscreen = data & 0x01;
+	if (m_flipscreen)
+		machine().tilemap().set_flip_all(TILEMAP_FLIPX | TILEMAP_FLIPY);
 	else
-		space->machine().tilemap().set_flip_all(0);
+		machine().tilemap().set_flip_all(0);
 
-	coin_counter_w(space->machine(), 0, data & 2);
-	coin_counter_w(space->machine(), 1, data & 4);
+	coin_counter_w(machine(), 0, data & 2);
+	coin_counter_w(machine(), 1, data & 4);
 }
 
-WRITE8_HANDLER( m62_hscroll_low_w )
+WRITE8_MEMBER(m62_state::m62_hscroll_low_w)
 {
-	m62_state *state = space->machine().driver_data<m62_state>();
-	state->m_m62_background_hscroll = (state->m_m62_background_hscroll & 0xff00) | data;
+	m_m62_background_hscroll = (m_m62_background_hscroll & 0xff00) | data;
 }
 
-WRITE8_HANDLER( m62_hscroll_high_w )
+WRITE8_MEMBER(m62_state::m62_hscroll_high_w)
 {
-	m62_state *state = space->machine().driver_data<m62_state>();
-	state->m_m62_background_hscroll = (state->m_m62_background_hscroll & 0xff) | (data << 8);
+	m_m62_background_hscroll = (m_m62_background_hscroll & 0xff) | (data << 8);
 }
 
-WRITE8_HANDLER( m62_vscroll_low_w )
+WRITE8_MEMBER(m62_state::m62_vscroll_low_w)
 {
-	m62_state *state = space->machine().driver_data<m62_state>();
-	state->m_m62_background_vscroll = (state->m_m62_background_vscroll & 0xff00) | data;
+	m_m62_background_vscroll = (m_m62_background_vscroll & 0xff00) | data;
 }
 
-WRITE8_HANDLER( m62_vscroll_high_w )
+WRITE8_MEMBER(m62_state::m62_vscroll_high_w)
 {
-	m62_state *state = space->machine().driver_data<m62_state>();
-	state->m_m62_background_vscroll = (state->m_m62_background_vscroll & 0xff) | (data << 8);
+	m_m62_background_vscroll = (m_m62_background_vscroll & 0xff) | (data << 8);
 }
 
-WRITE8_HANDLER( m62_tileram_w )
+WRITE8_MEMBER(m62_state::m62_tileram_w)
 {
-	m62_state *state = space->machine().driver_data<m62_state>();
-	state->m_m62_tileram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset >> 1);
+	m_m62_tileram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset >> 1);
 }
 
-WRITE8_HANDLER( m62_textram_w )
+WRITE8_MEMBER(m62_state::m62_textram_w)
 {
-	m62_state *state = space->machine().driver_data<m62_state>();
-	state->m_m62_textram[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset >> 1);
+	m_m62_textram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset >> 1);
 }
 
 
@@ -438,11 +431,10 @@ static void m62_textlayer( running_machine &machine, tile_get_info_func tile_get
 		state->m_fg_tilemap->set_scroll_cols(cols);
 }
 
-WRITE8_HANDLER( kungfum_tileram_w )
+WRITE8_MEMBER(m62_state::kungfum_tileram_w)
 {
-	m62_state *state = space->machine().driver_data<m62_state>();
-	state->m_m62_tileram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset & 0x7ff);
+	m_m62_tileram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset & 0x7ff);
 }
 
 static TILE_GET_INFO( get_kungfum_bg_tile_info )
@@ -563,10 +555,9 @@ VIDEO_START( ldrun2 )
 }
 
 
-WRITE8_HANDLER( ldrun3_topbottom_mask_w )
+WRITE8_MEMBER(m62_state::ldrun3_topbottom_mask_w)
 {
-	m62_state *state = space->machine().driver_data<m62_state>();
-	state->m_ldrun3_topbottom_mask = data & 1;
+	m_ldrun3_topbottom_mask = data & 1;
 }
 
 SCREEN_UPDATE_IND16( ldrun3 )
@@ -724,25 +715,22 @@ SCREEN_UPDATE_IND16( lotlot )
 }
 
 
-WRITE8_HANDLER( kidniki_text_vscroll_low_w )
+WRITE8_MEMBER(m62_state::kidniki_text_vscroll_low_w)
 {
-	m62_state *state = space->machine().driver_data<m62_state>();
-	state->m_kidniki_text_vscroll = (state->m_kidniki_text_vscroll & 0xff00) | data;
+	m_kidniki_text_vscroll = (m_kidniki_text_vscroll & 0xff00) | data;
 }
 
-WRITE8_HANDLER( kidniki_text_vscroll_high_w )
+WRITE8_MEMBER(m62_state::kidniki_text_vscroll_high_w)
 {
-	m62_state *state = space->machine().driver_data<m62_state>();
-	state->m_kidniki_text_vscroll = (state->m_kidniki_text_vscroll & 0xff) | (data << 8);
+	m_kidniki_text_vscroll = (m_kidniki_text_vscroll & 0xff) | (data << 8);
 }
 
-WRITE8_HANDLER( kidniki_background_bank_w )
+WRITE8_MEMBER(m62_state::kidniki_background_bank_w)
 {
-	m62_state *state = space->machine().driver_data<m62_state>();
-	if (state->m_kidniki_background_bank != (data & 1))
+	if (m_kidniki_background_bank != (data & 1))
 	{
-		state->m_kidniki_background_bank = data & 1;
-		state->m_bg_tilemap->mark_all_dirty();
+		m_kidniki_background_bank = data & 1;
+		m_bg_tilemap->mark_all_dirty();
 	}
 }
 
@@ -796,14 +784,13 @@ SCREEN_UPDATE_IND16( kidniki )
 }
 
 
-WRITE8_HANDLER( spelunkr_palbank_w )
+WRITE8_MEMBER(m62_state::spelunkr_palbank_w)
 {
-	m62_state *state = space->machine().driver_data<m62_state>();
-	if (state->m_spelunkr_palbank != (data & 0x01))
+	if (m_spelunkr_palbank != (data & 0x01))
 	{
-		state->m_spelunkr_palbank = data & 0x01;
-		state->m_bg_tilemap->mark_all_dirty();
-		state->m_fg_tilemap->mark_all_dirty();
+		m_spelunkr_palbank = data & 0x01;
+		m_bg_tilemap->mark_all_dirty();
+		m_fg_tilemap->mark_all_dirty();
 	}
 }
 
@@ -850,16 +837,15 @@ SCREEN_UPDATE_IND16( spelunkr )
 }
 
 
-WRITE8_HANDLER( spelunk2_gfxport_w )
+WRITE8_MEMBER(m62_state::spelunk2_gfxport_w)
 {
-	m62_state *state = space->machine().driver_data<m62_state>();
 	m62_hscroll_high_w(space, 0, (data & 2) >> 1);
 	m62_vscroll_high_w(space, 0, (data & 1));
-	if (state->m_spelunkr_palbank != ((data & 0x0c) >> 2))
+	if (m_spelunkr_palbank != ((data & 0x0c) >> 2))
 	{
-		state->m_spelunkr_palbank = (data & 0x0c) >> 2;
-		state->m_bg_tilemap->mark_all_dirty();
-		state->m_fg_tilemap->mark_all_dirty();
+		m_spelunkr_palbank = (data & 0x0c) >> 2;
+		m_bg_tilemap->mark_all_dirty();
+		m_fg_tilemap->mark_all_dirty();
 	}
 }
 
@@ -944,10 +930,9 @@ SCREEN_UPDATE_IND16( youjyudn )
 }
 
 
-WRITE8_HANDLER( horizon_scrollram_w )
+WRITE8_MEMBER(m62_state::horizon_scrollram_w)
 {
-	m62_state *state = space->machine().driver_data<m62_state>();
-	state->m_scrollram[offset] = data;
+	m_scrollram[offset] = data;
 }
 
 static TILE_GET_INFO( get_horizon_bg_tile_info )

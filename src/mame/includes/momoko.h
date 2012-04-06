@@ -31,20 +31,20 @@ public:
 	UINT8          m_fg_mask;
 	UINT8          m_flipscreen;
 	DECLARE_WRITE8_MEMBER(momoko_bg_read_bank_w);
+	DECLARE_WRITE8_MEMBER(momoko_fg_scrollx_w);
+	DECLARE_WRITE8_MEMBER(momoko_fg_scrolly_w);
+	DECLARE_WRITE8_MEMBER(momoko_fg_select_w);
+	DECLARE_WRITE8_MEMBER(momoko_text_scrolly_w);
+	DECLARE_WRITE8_MEMBER(momoko_text_mode_w);
+	DECLARE_WRITE8_MEMBER(momoko_bg_scrollx_w);
+	DECLARE_WRITE8_MEMBER(momoko_bg_scrolly_w);
+	DECLARE_WRITE8_MEMBER(momoko_bg_select_w);
+	DECLARE_WRITE8_MEMBER(momoko_bg_priority_w);
+	DECLARE_WRITE8_MEMBER(momoko_flipscreen_w);
 };
 
 
 /*----------- defined in video/momoko.c -----------*/
 
-WRITE8_HANDLER( momoko_fg_scrollx_w );
-WRITE8_HANDLER( momoko_fg_scrolly_w );
-WRITE8_HANDLER( momoko_text_scrolly_w );
-WRITE8_HANDLER( momoko_text_mode_w );
-WRITE8_HANDLER( momoko_bg_scrollx_w );
-WRITE8_HANDLER( momoko_bg_scrolly_w );
-WRITE8_HANDLER( momoko_flipscreen_w );
-WRITE8_HANDLER( momoko_fg_select_w);
-WRITE8_HANDLER( momoko_bg_select_w);
-WRITE8_HANDLER( momoko_bg_priority_w);
 
 SCREEN_UPDATE_IND16( momoko );

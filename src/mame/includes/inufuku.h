@@ -33,17 +33,17 @@ public:
 	DECLARE_WRITE16_MEMBER(inufuku_soundcommand_w);
 	DECLARE_WRITE8_MEMBER(pending_command_clear_w);
 	DECLARE_WRITE8_MEMBER(inufuku_soundrombank_w);
+	DECLARE_WRITE16_MEMBER(inufuku_palettereg_w);
+	DECLARE_WRITE16_MEMBER(inufuku_scrollreg_w);
+	DECLARE_READ16_MEMBER(inufuku_bg_videoram_r);
+	DECLARE_WRITE16_MEMBER(inufuku_bg_videoram_w);
+	DECLARE_READ16_MEMBER(inufuku_tx_videoram_r);
+	DECLARE_WRITE16_MEMBER(inufuku_tx_videoram_w);
 };
 
 
 /*----------- defined in video/inufuku.c -----------*/
 
-READ16_HANDLER( inufuku_bg_videoram_r );
-WRITE16_HANDLER( inufuku_bg_videoram_w );
-READ16_HANDLER( inufuku_tx_videoram_r );
-WRITE16_HANDLER( inufuku_tx_videoram_w );
-WRITE16_HANDLER( inufuku_palettereg_w );
-WRITE16_HANDLER( inufuku_scrollreg_w );
 
 SCREEN_UPDATE_IND16( inufuku );
 VIDEO_START( inufuku );

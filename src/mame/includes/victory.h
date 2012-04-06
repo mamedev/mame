@@ -55,6 +55,9 @@ public:
 	UINT8 m_video_control;
 	struct micro_t m_micro;
 	DECLARE_WRITE8_MEMBER(lamp_control_w);
+	DECLARE_WRITE8_MEMBER(victory_paletteram_w);
+	DECLARE_READ8_MEMBER(victory_video_control_r);
+	DECLARE_WRITE8_MEMBER(victory_video_control_w);
 };
 
 
@@ -64,6 +67,3 @@ VIDEO_START( victory );
 SCREEN_UPDATE_IND16( victory );
 INTERRUPT_GEN( victory_vblank_interrupt );
 
-READ8_HANDLER( victory_video_control_r );
-WRITE8_HANDLER( victory_video_control_w );
-WRITE8_HANDLER( victory_paletteram_w );

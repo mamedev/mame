@@ -46,62 +46,54 @@ static TILE_GET_INFO( get_tile_info2 )
 		0);
 }
 
-WRITE8_HANDLER( pitnrun_videoram_w )
+WRITE8_MEMBER(pitnrun_state::pitnrun_videoram_w)
 {
-	pitnrun_state *state = space->machine().driver_data<pitnrun_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = m_videoram;
 	videoram[offset] = data;
-	state->m_fg ->mark_all_dirty();
+	m_fg ->mark_all_dirty();
 }
 
-WRITE8_HANDLER( pitnrun_videoram2_w )
+WRITE8_MEMBER(pitnrun_state::pitnrun_videoram2_w)
 {
-	pitnrun_state *state = space->machine().driver_data<pitnrun_state>();
-	state->m_videoram2[offset] = data;
-	state->m_bg ->mark_all_dirty();
+	m_videoram2[offset] = data;
+	m_bg ->mark_all_dirty();
 }
 
-WRITE8_HANDLER( pitnrun_char_bank_select )
+WRITE8_MEMBER(pitnrun_state::pitnrun_char_bank_select)
 {
-	pitnrun_state *state = space->machine().driver_data<pitnrun_state>();
-	if(state->m_char_bank!=data)
+	if(m_char_bank!=data)
 	{
-		state->m_bg ->mark_all_dirty();
-		state->m_char_bank=data;
+		m_bg ->mark_all_dirty();
+		m_char_bank=data;
 	}
 }
 
 
-WRITE8_HANDLER( pitnrun_scroll_w )
+WRITE8_MEMBER(pitnrun_state::pitnrun_scroll_w)
 {
-	pitnrun_state *state = space->machine().driver_data<pitnrun_state>();
-	state->m_scroll = (state->m_scroll & (0xff<<((offset)?0:8))) |( data<<((offset)?8:0));
-	state->m_bg->set_scrollx(0, state->m_scroll);
+	m_scroll = (m_scroll & (0xff<<((offset)?0:8))) |( data<<((offset)?8:0));
+	m_bg->set_scrollx(0, m_scroll);
 }
 
-WRITE8_HANDLER(pitnrun_ha_w)
+WRITE8_MEMBER(pitnrun_state::pitnrun_ha_w)
 {
-	pitnrun_state *state = space->machine().driver_data<pitnrun_state>();
-	state->m_ha=data;
+	m_ha=data;
 }
 
-WRITE8_HANDLER(pitnrun_h_heed_w)
+WRITE8_MEMBER(pitnrun_state::pitnrun_h_heed_w)
 {
-	pitnrun_state *state = space->machine().driver_data<pitnrun_state>();
-	state->m_h_heed=data;
+	m_h_heed=data;
 }
 
-WRITE8_HANDLER(pitnrun_v_heed_w)
+WRITE8_MEMBER(pitnrun_state::pitnrun_v_heed_w)
 {
-	pitnrun_state *state = space->machine().driver_data<pitnrun_state>();
-	state->m_v_heed=data;
+	m_v_heed=data;
 }
 
-WRITE8_HANDLER(pitnrun_color_select_w)
+WRITE8_MEMBER(pitnrun_state::pitnrun_color_select_w)
 {
-	pitnrun_state *state = space->machine().driver_data<pitnrun_state>();
-	state->m_color_select=data;
-	space->machine().tilemap().mark_all_dirty();
+	m_color_select=data;
+	machine().tilemap().mark_all_dirty();
 }
 
 static void pitnrun_spotlights(running_machine &machine)

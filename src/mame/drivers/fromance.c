@@ -248,17 +248,17 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( nekkyoku_sub_map, AS_PROGRAM, 8, fromance_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xefff) AM_READWRITE_LEGACY(fromance_videoram_r, fromance_videoram_w)
+	AM_RANGE(0xc000, 0xefff) AM_READWRITE(fromance_videoram_r, fromance_videoram_w)
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xffff) AM_READWRITE_LEGACY(fromance_paletteram_r, fromance_paletteram_w)
+	AM_RANGE(0xf800, 0xffff) AM_READWRITE(fromance_paletteram_r, fromance_paletteram_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fromance_sub_map, AS_PROGRAM, 8, fromance_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xc800, 0xcfff) AM_READWRITE_LEGACY(fromance_paletteram_r, fromance_paletteram_w)
-	AM_RANGE(0xd000, 0xffff) AM_READWRITE_LEGACY(fromance_videoram_r, fromance_videoram_w)
+	AM_RANGE(0xc800, 0xcfff) AM_READWRITE(fromance_paletteram_r, fromance_paletteram_w)
+	AM_RANGE(0xd000, 0xffff) AM_READWRITE(fromance_videoram_r, fromance_videoram_w)
 ADDRESS_MAP_END
 
 
@@ -271,12 +271,12 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( nekkyoku_sub_io_map, AS_IO, 8, fromance_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x10) AM_WRITE_LEGACY(fromance_crtc_data_w)
-	AM_RANGE(0x11, 0x11) AM_WRITE_LEGACY(fromance_crtc_register_w)
+	AM_RANGE(0x10, 0x10) AM_WRITE(fromance_crtc_data_w)
+	AM_RANGE(0x11, 0x11) AM_WRITE(fromance_crtc_register_w)
 	AM_RANGE(0x12, 0x12) AM_READNOP				// unknown
 	AM_RANGE(0xe0, 0xe0) AM_WRITE(fromance_rombank_w)
-	AM_RANGE(0xe1, 0xe1) AM_READ(fromance_busycheck_sub_r) AM_WRITE_LEGACY(fromance_gfxreg_w)
-	AM_RANGE(0xe2, 0xe5) AM_WRITE_LEGACY(fromance_scroll_w)
+	AM_RANGE(0xe1, 0xe1) AM_READ(fromance_busycheck_sub_r) AM_WRITE(fromance_gfxreg_w)
+	AM_RANGE(0xe2, 0xe5) AM_WRITE(fromance_scroll_w)
 	AM_RANGE(0xe6, 0xe6) AM_READWRITE(fromance_commanddata_r, fromance_busycheck_sub_w)
 	AM_RANGE(0xe7, 0xe7) AM_DEVWRITE_LEGACY("msm", fromance_adpcm_reset_w)
 	AM_RANGE(0xe8, 0xe8) AM_WRITE(fromance_adpcm_w)
@@ -285,12 +285,12 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( idolmj_sub_io_map, AS_IO, 8, fromance_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x10) AM_WRITE_LEGACY(fromance_crtc_data_w)
-	AM_RANGE(0x11, 0x11) AM_WRITE_LEGACY(fromance_crtc_register_w)
+	AM_RANGE(0x10, 0x10) AM_WRITE(fromance_crtc_data_w)
+	AM_RANGE(0x11, 0x11) AM_WRITE(fromance_crtc_register_w)
 	AM_RANGE(0x12, 0x12) AM_READNOP				// unknown
 	AM_RANGE(0x20, 0x20) AM_WRITE(fromance_rombank_w)
-	AM_RANGE(0x21, 0x21) AM_READ(fromance_busycheck_sub_r) AM_WRITE_LEGACY(fromance_gfxreg_w)
-	AM_RANGE(0x22, 0x25) AM_WRITE_LEGACY(fromance_scroll_w)
+	AM_RANGE(0x21, 0x21) AM_READ(fromance_busycheck_sub_r) AM_WRITE(fromance_gfxreg_w)
+	AM_RANGE(0x22, 0x25) AM_WRITE(fromance_scroll_w)
 	AM_RANGE(0x26, 0x26) AM_READWRITE(fromance_commanddata_r, fromance_busycheck_sub_w)
 	AM_RANGE(0x27, 0x27) AM_DEVWRITE_LEGACY("msm", fromance_adpcm_reset_w)
 	AM_RANGE(0x28, 0x28) AM_WRITE(fromance_adpcm_w)
@@ -299,12 +299,12 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fromance_sub_io_map, AS_IO, 8, fromance_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x10) AM_WRITE_LEGACY(fromance_crtc_data_w)
-	AM_RANGE(0x11, 0x11) AM_WRITE_LEGACY(fromance_crtc_register_w)
+	AM_RANGE(0x10, 0x10) AM_WRITE(fromance_crtc_data_w)
+	AM_RANGE(0x11, 0x11) AM_WRITE(fromance_crtc_register_w)
 	AM_RANGE(0x12, 0x12) AM_READNOP				// unknown
 	AM_RANGE(0x20, 0x20) AM_WRITE(fromance_rombank_w)
-	AM_RANGE(0x21, 0x21) AM_READ(fromance_busycheck_sub_r) AM_WRITE_LEGACY(fromance_gfxreg_w)
-	AM_RANGE(0x22, 0x25) AM_WRITE_LEGACY(fromance_scroll_w)
+	AM_RANGE(0x21, 0x21) AM_READ(fromance_busycheck_sub_r) AM_WRITE(fromance_gfxreg_w)
+	AM_RANGE(0x22, 0x25) AM_WRITE(fromance_scroll_w)
 	AM_RANGE(0x26, 0x26) AM_READWRITE(fromance_commanddata_r, fromance_busycheck_sub_w)
 	AM_RANGE(0x27, 0x27) AM_DEVWRITE_LEGACY("msm", fromance_adpcm_reset_w)
 	AM_RANGE(0x28, 0x28) AM_WRITE(fromance_adpcm_w)

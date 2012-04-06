@@ -16,14 +16,14 @@ public:
 	UINT16 *m_spriteram;
 	DECLARE_READ16_MEMBER(ghunter_trackball_low_r);
 	DECLARE_READ16_MEMBER(ghunter_trackball_high_r);
+	DECLARE_WRITE16_MEMBER(deadang_foreground_w);
+	DECLARE_WRITE16_MEMBER(deadang_text_w);
+	DECLARE_WRITE16_MEMBER(deadang_bank_w);
 };
 
 
 /*----------- defined in video/deadang.c -----------*/
 
-WRITE16_HANDLER( deadang_foreground_w );
-WRITE16_HANDLER( deadang_text_w );
-WRITE16_HANDLER( deadang_bank_w );
 
 VIDEO_START( deadang );
 SCREEN_UPDATE_IND16( deadang );

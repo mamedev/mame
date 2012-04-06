@@ -131,49 +131,42 @@ VIDEO_START( skykid )
 
 ***************************************************************************/
 
-READ8_HANDLER( skykid_videoram_r )
+READ8_MEMBER(skykid_state::skykid_videoram_r)
 {
-	skykid_state *state = space->machine().driver_data<skykid_state>();
-	return state->m_videoram[offset];
+	return m_videoram[offset];
 }
 
-WRITE8_HANDLER( skykid_videoram_w )
+WRITE8_MEMBER(skykid_state::skykid_videoram_w)
 {
-	skykid_state *state = space->machine().driver_data<skykid_state>();
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset & 0x7ff);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset & 0x7ff);
 }
 
-READ8_HANDLER( skykid_textram_r )
+READ8_MEMBER(skykid_state::skykid_textram_r)
 {
-	skykid_state *state = space->machine().driver_data<skykid_state>();
-	return state->m_textram[offset];
+	return m_textram[offset];
 }
 
-WRITE8_HANDLER( skykid_textram_w )
+WRITE8_MEMBER(skykid_state::skykid_textram_w)
 {
-	skykid_state *state = space->machine().driver_data<skykid_state>();
-	state->m_textram[offset] = data;
-	state->m_tx_tilemap->mark_tile_dirty(offset & 0x3ff);
+	m_textram[offset] = data;
+	m_tx_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_HANDLER( skykid_scroll_x_w )
+WRITE8_MEMBER(skykid_state::skykid_scroll_x_w)
 {
-	skykid_state *state = space->machine().driver_data<skykid_state>();
-	state->m_scroll_x = offset;
+	m_scroll_x = offset;
 }
 
-WRITE8_HANDLER( skykid_scroll_y_w )
+WRITE8_MEMBER(skykid_state::skykid_scroll_y_w)
 {
-	skykid_state *state = space->machine().driver_data<skykid_state>();
-	state->m_scroll_y = offset;
+	m_scroll_y = offset;
 }
 
-WRITE8_HANDLER( skykid_flipscreen_priority_w )
+WRITE8_MEMBER(skykid_state::skykid_flipscreen_priority_w)
 {
-	skykid_state *state = space->machine().driver_data<skykid_state>();
-	state->m_priority = data;
-	flip_screen_set(space->machine(), offset & 1);
+	m_priority = data;
+	flip_screen_set(machine(), offset & 1);
 }
 
 

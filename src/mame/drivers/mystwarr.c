@@ -339,7 +339,7 @@ static ADDRESS_MAP_START( viostorm_map, AS_PROGRAM, 16, mystwarr_state )
 	AM_RANGE(0x250000, 0x25000f) AM_RAM		// K053250 reg
 	AM_RANGE(0x254000, 0x25401f) AM_WRITE_LEGACY(K054338_word_w)
 	AM_RANGE(0x258000, 0x2580ff) AM_WRITE_LEGACY(K055555_word_w)
-	AM_RANGE(0x25c000, 0x25c03f) AM_READWRITE_LEGACY(K055550_word_r,K055550_word_w)
+	AM_RANGE(0x25c000, 0x25c03f) AM_READWRITE(K055550_word_r,K055550_word_w)
 	AM_RANGE(0x260000, 0x26001f) AM_DEVREADWRITE8_LEGACY("k053252",k053252_r,k053252_w,0x00ff)
 	AM_RANGE(0x264000, 0x264001) AM_WRITE(sound_irq_w)
 	AM_RANGE(0x26800c, 0x26800d) AM_WRITE(sound_cmd1_w)
@@ -430,7 +430,7 @@ static ADDRESS_MAP_START( martchmp_map, AS_PROGRAM, 16, mystwarr_state )
 	AM_RANGE(0x404000, 0x404007) AM_WRITE_LEGACY(K053246_word_w)				// OBJSET1
 	AM_RANGE(0x40a000, 0x40a01f) AM_WRITE_LEGACY(K054338_word_w)				// CLTC
 	AM_RANGE(0x40c000, 0x40c03f) AM_WRITE_LEGACY(K056832_word_w)				// VACSET
-	AM_RANGE(0x40e000, 0x40e03f) AM_WRITE_LEGACY(K053990_martchmp_word_w)		// protection
+	AM_RANGE(0x40e000, 0x40e03f) AM_WRITE(K053990_martchmp_word_w)		// protection
 	AM_RANGE(0x410000, 0x410001) AM_WRITE(mweeprom_w)
 	AM_RANGE(0x412000, 0x412001) AM_READWRITE(mccontrol_r,mccontrol_w)
 	AM_RANGE(0x414000, 0x414001) AM_READ_PORT("P1_P2")
@@ -475,7 +475,7 @@ static ADDRESS_MAP_START( dadandrn_map, AS_PROGRAM, 16, mystwarr_state )
 	AM_RANGE(0x470000, 0x470fff) AM_RAM AM_BASE_LEGACY(&K053936_0_linectrl)
 	AM_RANGE(0x480000, 0x48003f) AM_WRITE_LEGACY(K056832_word_w)		// VACSET
 	AM_RANGE(0x482000, 0x482007) AM_WRITE_LEGACY(K056832_b_word_w)	// VSCCS
-	AM_RANGE(0x484000, 0x484003) AM_WRITE_LEGACY(ddd_053936_clip_w)
+	AM_RANGE(0x484000, 0x484003) AM_WRITE(ddd_053936_clip_w)
 	AM_RANGE(0x486000, 0x48601f) AM_DEVREADWRITE8_LEGACY("k053252",k053252_r,k053252_w,0x00ff)
 	AM_RANGE(0x488000, 0x4880ff) AM_WRITE_LEGACY(K055555_word_w)
 	AM_RANGE(0x48a00c, 0x48a00d) AM_WRITE(sound_cmd1_msb_w)
@@ -486,13 +486,13 @@ static ADDRESS_MAP_START( dadandrn_map, AS_PROGRAM, 16, mystwarr_state )
 	AM_RANGE(0x48e000, 0x48e001) AM_READ_PORT("IN0_P1")	// bit 3 (0x8) is test switch
 	AM_RANGE(0x48e020, 0x48e021) AM_READ(dddeeprom_r)
 	AM_RANGE(0x600000, 0x60ffff) AM_RAM AM_BASE(m_gx_workram)
-	AM_RANGE(0x680000, 0x68003f) AM_READWRITE_LEGACY(K055550_word_r,K055550_word_w)
+	AM_RANGE(0x680000, 0x68003f) AM_READWRITE(K055550_word_r,K055550_word_w)
 	AM_RANGE(0x6a0000, 0x6a0001) AM_WRITE(mmeeprom_w)
-	AM_RANGE(0x6c0000, 0x6c0001) AM_WRITE_LEGACY(ddd_053936_enable_w)
+	AM_RANGE(0x6c0000, 0x6c0001) AM_WRITE(ddd_053936_enable_w)
 	AM_RANGE(0x6e0000, 0x6e0001) AM_WRITE(sound_irq_w)
-	AM_RANGE(0x800000, 0x87ffff) AM_READ_LEGACY(ddd_053936_tilerom_0_r)	// 256k tilemap readback
-	AM_RANGE(0xa00000, 0xa7ffff) AM_READ_LEGACY(ddd_053936_tilerom_1_r) // 128k tilemap readback
-	AM_RANGE(0xc00000, 0xdfffff) AM_READ_LEGACY(ddd_053936_tilerom_2_r)	// tile character readback
+	AM_RANGE(0x800000, 0x87ffff) AM_READ(ddd_053936_tilerom_0_r)	// 256k tilemap readback
+	AM_RANGE(0xa00000, 0xa7ffff) AM_READ(ddd_053936_tilerom_1_r) // 128k tilemap readback
+	AM_RANGE(0xc00000, 0xdfffff) AM_READ(ddd_053936_tilerom_2_r)	// tile character readback
 	AM_RANGE(0xe00000, 0xe00001) AM_WRITENOP	// watchdog
 #if MW_DEBUG
 	AM_RANGE(0x430000, 0x430007) AM_READ_LEGACY(K053246_reg_word_r)
@@ -522,7 +522,7 @@ static ADDRESS_MAP_START( gaiapols_map, AS_PROGRAM, 16, mystwarr_state )
 	AM_RANGE(0x470000, 0x470fff) AM_RAM AM_BASE_LEGACY(&K053936_0_linectrl)
 	AM_RANGE(0x480000, 0x48003f) AM_WRITE_LEGACY(K056832_word_w)			// VACSET
 	AM_RANGE(0x482000, 0x482007) AM_WRITE_LEGACY(K056832_b_word_w)			// VSCCS
-	AM_RANGE(0x484000, 0x484003) AM_WRITE_LEGACY(ddd_053936_clip_w)
+	AM_RANGE(0x484000, 0x484003) AM_WRITE(ddd_053936_clip_w)
 	AM_RANGE(0x486000, 0x48601f) AM_DEVREADWRITE8_LEGACY("k053252",k053252_r,k053252_w,0x00ff)
 	AM_RANGE(0x488000, 0x4880ff) AM_WRITE_LEGACY(K055555_word_w)
 	AM_RANGE(0x48a00c, 0x48a00d) AM_WRITE(sound_cmd1_msb_w)
@@ -535,11 +535,11 @@ static ADDRESS_MAP_START( gaiapols_map, AS_PROGRAM, 16, mystwarr_state )
 	AM_RANGE(0x600000, 0x60ffff) AM_RAM AM_BASE(m_gx_workram)
 	AM_RANGE(0x660000, 0x6600ff) AM_READWRITE_LEGACY(K054000_lsb_r,K054000_lsb_w)
 	AM_RANGE(0x6a0000, 0x6a0001) AM_WRITE(mmeeprom_w)
-	AM_RANGE(0x6c0000, 0x6c0001) AM_WRITE_LEGACY(ddd_053936_enable_w)
+	AM_RANGE(0x6c0000, 0x6c0001) AM_WRITE(ddd_053936_enable_w)
 	AM_RANGE(0x6e0000, 0x6e0001) AM_WRITE(sound_irq_w)
-	AM_RANGE(0x800000, 0x87ffff) AM_READ_LEGACY(gai_053936_tilerom_0_r)	// 256k tilemap readback
-	AM_RANGE(0xa00000, 0xa7ffff) AM_READ_LEGACY(ddd_053936_tilerom_1_r)	// 128k tilemap readback
-	AM_RANGE(0xc00000, 0xdfffff) AM_READ_LEGACY(gai_053936_tilerom_2_r)	// tile character readback
+	AM_RANGE(0x800000, 0x87ffff) AM_READ(gai_053936_tilerom_0_r)	// 256k tilemap readback
+	AM_RANGE(0xa00000, 0xa7ffff) AM_READ(ddd_053936_tilerom_1_r)	// 128k tilemap readback
+	AM_RANGE(0xc00000, 0xdfffff) AM_READ(gai_053936_tilerom_2_r)	// tile character readback
 	AM_RANGE(0xe00000, 0xe00001) AM_WRITENOP	// watchdog
 #if MW_DEBUG
 	AM_RANGE(0x430000, 0x430007) AM_READ_LEGACY(K053246_reg_word_r)

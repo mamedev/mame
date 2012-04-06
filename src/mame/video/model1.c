@@ -1168,20 +1168,18 @@ static void end_frame(running_machine &machine)
 		state->m_listctl[0] ^= 0x40;
 }
 
-READ16_HANDLER( model1_listctl_r )
+READ16_MEMBER(model1_state::model1_listctl_r)
 {
-	model1_state *state = space->machine().driver_data<model1_state>();
 	if(!offset)
-		return state->m_listctl[0] | 0x30;
+		return m_listctl[0] | 0x30;
 	else
-		return state->m_listctl[1];
+		return m_listctl[1];
 }
 
-WRITE16_HANDLER( model1_listctl_w )
+WRITE16_MEMBER(model1_state::model1_listctl_w)
 {
-	model1_state *state = space->machine().driver_data<model1_state>();
-	COMBINE_DATA(state->m_listctl+offset);
-	LOG_TGP(("VIDEO: control=%08x\n", (state->m_listctl[1]<<16)|state->m_listctl[0]));
+	COMBINE_DATA(m_listctl+offset);
+	LOG_TGP(("VIDEO: control=%08x\n", (m_listctl[1]<<16)|m_listctl[0]));
 }
 
 static void tgp_render(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect)

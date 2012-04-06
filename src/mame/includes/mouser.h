@@ -27,12 +27,12 @@ public:
 	DECLARE_WRITE8_MEMBER(mouser_sound_interrupt_w);
 	DECLARE_READ8_MEMBER(mouser_sound_byte_r);
 	DECLARE_WRITE8_MEMBER(mouser_sound_nmi_clear_w);
+	DECLARE_WRITE8_MEMBER(mouser_flip_screen_x_w);
+	DECLARE_WRITE8_MEMBER(mouser_flip_screen_y_w);
 };
 
 /*----------- defined in video/mouser.c -----------*/
 
-WRITE8_HANDLER( mouser_flip_screen_x_w );
-WRITE8_HANDLER( mouser_flip_screen_y_w );
 
 PALETTE_INIT( mouser );
 SCREEN_UPDATE_IND16( mouser );

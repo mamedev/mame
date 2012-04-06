@@ -35,14 +35,14 @@ public:
 	DECLARE_WRITE8_MEMBER(prot_fd99_w);
 	DECLARE_WRITE8_MEMBER(prot_fc66_w);
 	DECLARE_WRITE8_MEMBER(prot_fcb0_w);
+	DECLARE_WRITE8_MEMBER(goindol_fg_videoram_w);
+	DECLARE_WRITE8_MEMBER(goindol_bg_videoram_w);
 };
 
 
 
 /*----------- defined in video/goindol.c -----------*/
 
-WRITE8_HANDLER( goindol_fg_videoram_w );
-WRITE8_HANDLER( goindol_bg_videoram_w );
 
 VIDEO_START( goindol );
 SCREEN_UPDATE_IND16( goindol );

@@ -338,16 +338,16 @@ static UINT8 rtc_get_reg(running_machine &machine, int reg)
 	}
 }
 
-READ32_HANDLER(rtc72421_r)
+READ32_MEMBER(model3_state::rtc72421_r)
 {
 	int reg = offset;
 	UINT32 data;
-	data = rtc_get_reg(space->machine(), reg) << 24;
+	data = rtc_get_reg(machine(), reg) << 24;
 	data |= 0x30000;	/* these bits are set to pass the battery voltage test */
 	return data;
 }
 
-WRITE32_HANDLER(rtc72421_w)
+WRITE32_MEMBER(model3_state::rtc72421_w)
 {
 }
 

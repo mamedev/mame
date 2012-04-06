@@ -168,33 +168,30 @@ static void set_background_palette(running_machine &machine,int bank)
 	}
 }
 
-WRITE8_HANDLER( popeye_videoram_w )
+WRITE8_MEMBER(popeye_state::popeye_videoram_w)
 {
-	popeye_state *state = space->machine().driver_data<popeye_state>();
-	state->m_videoram[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( popeye_colorram_w )
+WRITE8_MEMBER(popeye_state::popeye_colorram_w)
 {
-	popeye_state *state = space->machine().driver_data<popeye_state>();
-	state->m_colorram[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset);
+	m_colorram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( popeye_bitmap_w )
+WRITE8_MEMBER(popeye_state::popeye_bitmap_w)
 {
-	popeye_state *state = space->machine().driver_data<popeye_state>();
 	int sx,sy,x,y,colour;
 
-	state->m_bitmapram[offset] = data;
+	m_bitmapram[offset] = data;
 
-	if (state->m_bitmap_type == TYPE_SKYSKIPR)
+	if (m_bitmap_type == TYPE_SKYSKIPR)
 	{
 		sx = 8 * (offset % 128);
 		sy = 8 * (offset / 128);
 
-		if (flip_screen_get(space->machine()))
+		if (flip_screen_get(machine()))
 			sy = 512-8 - sy;
 
 		colour = data & 0x0f;
@@ -202,7 +199,7 @@ WRITE8_HANDLER( popeye_bitmap_w )
 		{
 			for (x = 0; x < 8; x++)
 			{
-				state->m_tmpbitmap2->pix16(sy+y, sx+x) = colour;
+				m_tmpbitmap2->pix16(sy+y, sx+x) = colour;
 			}
 		}
 	}
@@ -211,7 +208,7 @@ WRITE8_HANDLER( popeye_bitmap_w )
 		sx = 8 * (offset % 64);
 		sy = 4 * (offset / 64);
 
-		if (flip_screen_get(space->machine()))
+		if (flip_screen_get(machine()))
 			sy = 512-4 - sy;
 
 		colour = data & 0x0f;
@@ -219,13 +216,13 @@ WRITE8_HANDLER( popeye_bitmap_w )
 		{
 			for (x = 0; x < 8; x++)
 			{
-				state->m_tmpbitmap2->pix16(sy+y, sx+x) = colour;
+				m_tmpbitmap2->pix16(sy+y, sx+x) = colour;
 			}
 		}
 	}
 }
 
-WRITE8_HANDLER( skyskipr_bitmap_w )
+WRITE8_MEMBER(popeye_state::skyskipr_bitmap_w)
 {
 	offset = ((offset & 0xfc0) << 1) | (offset & 0x03f);
 	if (data & 0x80)
@@ -288,7 +285,7 @@ static void draw_background(running_machine &machine, bitmap_ind16 &bitmap, cons
 	if (state->m_lastflip != flip_screen_get(machine))
 	{
 		for (offs = 0;offs < popeye_bitmapram_size;offs++)
-			popeye_bitmap_w(space,offs,state->m_bitmapram[offs]);
+			state->popeye_bitmap_w(*space,offs,state->m_bitmapram[offs]);
 
 		state->m_lastflip = flip_screen_get(machine);
 	}

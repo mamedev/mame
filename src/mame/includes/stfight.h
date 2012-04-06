@@ -20,6 +20,17 @@ public:
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_tx_tilemap;
 	int m_sprite_base;
+	DECLARE_READ8_MEMBER(stfight_dsw_r);
+	DECLARE_READ8_MEMBER(stfight_coin_r);
+	DECLARE_WRITE8_MEMBER(stfight_coin_w);
+	DECLARE_WRITE8_MEMBER(stfight_e800_w);
+	DECLARE_WRITE8_MEMBER(stfight_fm_w);
+	DECLARE_READ8_MEMBER(stfight_fm_r);
+	DECLARE_WRITE8_MEMBER(stfight_bank_w);
+	DECLARE_WRITE8_MEMBER(stfight_text_char_w);
+	DECLARE_WRITE8_MEMBER(stfight_text_attr_w);
+	DECLARE_WRITE8_MEMBER(stfight_sprite_bank_w);
+	DECLARE_WRITE8_MEMBER(stfight_vh_latch_w);
 };
 
 
@@ -29,12 +40,6 @@ DRIVER_INIT( empcity );
 DRIVER_INIT( stfight );
 MACHINE_RESET( stfight );
 INTERRUPT_GEN( stfight_vb_interrupt );
-READ8_HANDLER( stfight_dsw_r );
-WRITE8_HANDLER( stfight_fm_w );
-READ8_HANDLER( stfight_coin_r );
-WRITE8_HANDLER( stfight_coin_w );
-WRITE8_HANDLER( stfight_e800_w );
-READ8_HANDLER( stfight_fm_r );
 void stfight_adpcm_int(device_t *device);
 WRITE8_DEVICE_HANDLER( stfight_adpcm_control_w );
 
@@ -42,9 +47,5 @@ WRITE8_DEVICE_HANDLER( stfight_adpcm_control_w );
 /*----------- defined in video/stfight.c -----------*/
 
 PALETTE_INIT( stfight );
-WRITE8_HANDLER( stfight_text_char_w );
-WRITE8_HANDLER( stfight_text_attr_w );
-WRITE8_HANDLER( stfight_vh_latch_w );
-WRITE8_HANDLER( stfight_sprite_bank_w );
 VIDEO_START( stfight );
 SCREEN_UPDATE_IND16( stfight );

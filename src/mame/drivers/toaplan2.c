@@ -1115,12 +1115,12 @@ static ADDRESS_MAP_START( truxton2_68k_mem, AS_PROGRAM, 16, toaplan2_state )
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
 	AM_RANGE(0x200000, 0x20000d) AM_DEVREADWRITE_LEGACY("gp9001vdp0", gp9001_vdp_r, gp9001_vdp_w)
 	AM_RANGE(0x300000, 0x300fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
-	AM_RANGE(0x400000, 0x401fff) AM_RAM_WRITE_LEGACY(toaplan2_txvideoram16_w) AM_BASE_SIZE(m_txvideoram16, m_tx_vram_size)
-	AM_RANGE(0x402000, 0x4021ff) AM_RAM_WRITE_LEGACY(toaplan2_txvideoram16_offs_w) AM_BASE_SIZE(m_txvideoram16_offs, m_tx_offs_vram_size)
+	AM_RANGE(0x400000, 0x401fff) AM_RAM_WRITE(toaplan2_txvideoram16_w) AM_BASE_SIZE(m_txvideoram16, m_tx_vram_size)
+	AM_RANGE(0x402000, 0x4021ff) AM_RAM_WRITE(toaplan2_txvideoram16_offs_w) AM_BASE_SIZE(m_txvideoram16_offs, m_tx_offs_vram_size)
 	AM_RANGE(0x402200, 0x402fff) AM_RAM
-	AM_RANGE(0x403000, 0x4031ff) AM_RAM_WRITE_LEGACY(toaplan2_txscrollram16_w) AM_BASE_SIZE(m_txscrollram16, m_tx_scroll_vram_size)
+	AM_RANGE(0x403000, 0x4031ff) AM_RAM_WRITE(toaplan2_txscrollram16_w) AM_BASE_SIZE(m_txscrollram16, m_tx_scroll_vram_size)
 	AM_RANGE(0x403200, 0x403fff) AM_RAM
-	AM_RANGE(0x500000, 0x50ffff) AM_RAM_WRITE_LEGACY(toaplan2_tx_gfxram16_w) AM_BASE(m_tx_gfxram16)
+	AM_RANGE(0x500000, 0x50ffff) AM_RAM_WRITE(toaplan2_tx_gfxram16_w) AM_BASE(m_tx_gfxram16)
 	AM_RANGE(0x600000, 0x600001) AM_READ(video_count_r)
 	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("DSWA")
 	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("DSWB")
@@ -1183,10 +1183,10 @@ static ADDRESS_MAP_START( fixeight_68k_mem, AS_PROGRAM, 16, toaplan2_state )
 	AM_RANGE(0x280000, 0x28ffff) AM_READWRITE(shared_ram_r, shared_ram_w )
 	AM_RANGE(0x300000, 0x30000d) AM_DEVREADWRITE_LEGACY("gp9001vdp0", gp9001_vdp_r, gp9001_vdp_w)
 	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
-	AM_RANGE(0x500000, 0x501fff) AM_RAM_WRITE_LEGACY(toaplan2_txvideoram16_w) AM_BASE_SIZE(m_txvideoram16, m_tx_vram_size)
-	AM_RANGE(0x502000, 0x5021ff) AM_RAM_WRITE_LEGACY(toaplan2_txvideoram16_offs_w) AM_BASE_SIZE(m_txvideoram16_offs, m_tx_offs_vram_size)
-	AM_RANGE(0x503000, 0x5031ff) AM_RAM_WRITE_LEGACY(toaplan2_txscrollram16_w) AM_BASE_SIZE(m_txscrollram16, m_tx_scroll_vram_size)
-	AM_RANGE(0x600000, 0x60ffff) AM_RAM_WRITE_LEGACY(toaplan2_tx_gfxram16_w) AM_BASE(m_tx_gfxram16)
+	AM_RANGE(0x500000, 0x501fff) AM_RAM_WRITE(toaplan2_txvideoram16_w) AM_BASE_SIZE(m_txvideoram16, m_tx_vram_size)
+	AM_RANGE(0x502000, 0x5021ff) AM_RAM_WRITE(toaplan2_txvideoram16_offs_w) AM_BASE_SIZE(m_txvideoram16_offs, m_tx_offs_vram_size)
+	AM_RANGE(0x503000, 0x5031ff) AM_RAM_WRITE(toaplan2_txscrollram16_w) AM_BASE_SIZE(m_txscrollram16, m_tx_scroll_vram_size)
+	AM_RANGE(0x600000, 0x60ffff) AM_RAM_WRITE(toaplan2_tx_gfxram16_w) AM_BASE(m_tx_gfxram16)
 	AM_RANGE(0x700000, 0x700001) AM_WRITE(fixeight_subcpu_ctrl_w)
 	AM_RANGE(0x800000, 0x800001) AM_READ(video_count_r)
 ADDRESS_MAP_END
@@ -1205,9 +1205,9 @@ static ADDRESS_MAP_START( fixeightbl_68k_mem, AS_PROGRAM, 16, toaplan2_state )
 	AM_RANGE(0x20001c, 0x20001d) AM_READ_PORT("DSWA")
 	AM_RANGE(0x300000, 0x30000d) AM_DEVREADWRITE_LEGACY("gp9001vdp0", gp9001_vdp_r, gp9001_vdp_w)
 	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
-	AM_RANGE(0x500000, 0x501fff) AM_RAM_WRITE_LEGACY(toaplan2_txvideoram16_w) AM_BASE_SIZE(m_txvideoram16, m_tx_vram_size)
-	AM_RANGE(0x502000, 0x5021ff) AM_RAM_WRITE_LEGACY(toaplan2_txvideoram16_offs_w) AM_BASE_SIZE(m_txvideoram16_offs, m_tx_offs_vram_size)
-	AM_RANGE(0x503000, 0x5031ff) AM_RAM_WRITE_LEGACY(toaplan2_txscrollram16_w) AM_BASE_SIZE(m_txscrollram16, m_tx_scroll_vram_size)
+	AM_RANGE(0x500000, 0x501fff) AM_RAM_WRITE(toaplan2_txvideoram16_w) AM_BASE_SIZE(m_txvideoram16, m_tx_vram_size)
+	AM_RANGE(0x502000, 0x5021ff) AM_RAM_WRITE(toaplan2_txvideoram16_offs_w) AM_BASE_SIZE(m_txvideoram16_offs, m_tx_offs_vram_size)
+	AM_RANGE(0x503000, 0x5031ff) AM_RAM_WRITE(toaplan2_txscrollram16_w) AM_BASE_SIZE(m_txscrollram16, m_tx_scroll_vram_size)
 	AM_RANGE(0x700000, 0x700001) AM_READ(video_count_r)
 	AM_RANGE(0x800000, 0x87ffff) AM_ROM AM_REGION("maincpu", 0x80000)
 ADDRESS_MAP_END
@@ -1278,10 +1278,10 @@ static ADDRESS_MAP_START( mahoudai_68k_mem, AS_PROGRAM, 16, toaplan2_state )
 	AM_RANGE(0x300000, 0x30000d) AM_DEVREADWRITE_LEGACY("gp9001vdp0", gp9001_vdp_r, gp9001_vdp_w)
 	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x401000, 0x4017ff) AM_RAM							// Unused palette RAM
-	AM_RANGE(0x500000, 0x501fff) AM_RAM_WRITE_LEGACY(toaplan2_txvideoram16_w) AM_BASE_SIZE(m_txvideoram16, m_tx_vram_size)
-	AM_RANGE(0x502000, 0x5021ff) AM_RAM_WRITE_LEGACY(toaplan2_txvideoram16_offs_w) AM_BASE_SIZE(m_txvideoram16_offs, m_tx_offs_vram_size)
+	AM_RANGE(0x500000, 0x501fff) AM_RAM_WRITE(toaplan2_txvideoram16_w) AM_BASE_SIZE(m_txvideoram16, m_tx_vram_size)
+	AM_RANGE(0x502000, 0x5021ff) AM_RAM_WRITE(toaplan2_txvideoram16_offs_w) AM_BASE_SIZE(m_txvideoram16_offs, m_tx_offs_vram_size)
 	AM_RANGE(0x502200, 0x502fff) AM_RAM
-	AM_RANGE(0x503000, 0x5031ff) AM_RAM_WRITE_LEGACY(toaplan2_txscrollram16_w) AM_BASE_SIZE(m_txscrollram16, m_tx_scroll_vram_size)
+	AM_RANGE(0x503000, 0x5031ff) AM_RAM_WRITE(toaplan2_txscrollram16_w) AM_BASE_SIZE(m_txscrollram16, m_tx_scroll_vram_size)
 	AM_RANGE(0x503200, 0x503fff) AM_RAM
 ADDRESS_MAP_END
 
@@ -1302,10 +1302,10 @@ static ADDRESS_MAP_START( shippumd_68k_mem, AS_PROGRAM, 16, toaplan2_state )
 	AM_RANGE(0x300000, 0x30000d) AM_DEVREADWRITE_LEGACY("gp9001vdp0", gp9001_vdp_r, gp9001_vdp_w)
 	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x401000, 0x4017ff) AM_RAM							// Unused palette RAM
-	AM_RANGE(0x500000, 0x501fff) AM_RAM_WRITE_LEGACY(toaplan2_txvideoram16_w) AM_BASE_SIZE(m_txvideoram16, m_tx_vram_size)
-	AM_RANGE(0x502000, 0x5021ff) AM_RAM_WRITE_LEGACY(toaplan2_txvideoram16_offs_w) AM_BASE_SIZE(m_txvideoram16_offs, m_tx_offs_vram_size)
+	AM_RANGE(0x500000, 0x501fff) AM_RAM_WRITE(toaplan2_txvideoram16_w) AM_BASE_SIZE(m_txvideoram16, m_tx_vram_size)
+	AM_RANGE(0x502000, 0x5021ff) AM_RAM_WRITE(toaplan2_txvideoram16_offs_w) AM_BASE_SIZE(m_txvideoram16_offs, m_tx_offs_vram_size)
 	AM_RANGE(0x502200, 0x502fff) AM_RAM
-	AM_RANGE(0x503000, 0x5031ff) AM_RAM_WRITE_LEGACY(toaplan2_txscrollram16_w) AM_BASE_SIZE(m_txscrollram16, m_tx_scroll_vram_size)
+	AM_RANGE(0x503000, 0x5031ff) AM_RAM_WRITE(toaplan2_txscrollram16_w) AM_BASE_SIZE(m_txscrollram16, m_tx_scroll_vram_size)
 	AM_RANGE(0x503200, 0x503fff) AM_RAM
 ADDRESS_MAP_END
 
@@ -1324,10 +1324,10 @@ static ADDRESS_MAP_START( bgaregga_68k_mem, AS_PROGRAM, 16, toaplan2_state )
 	AM_RANGE(0x21c03c, 0x21c03d) AM_READ(video_count_r)
 	AM_RANGE(0x300000, 0x30000d) AM_DEVREADWRITE_LEGACY("gp9001vdp0", gp9001_vdp_r, gp9001_vdp_w)
 	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
-	AM_RANGE(0x500000, 0x501fff) AM_RAM_WRITE_LEGACY(toaplan2_txvideoram16_w) AM_BASE_SIZE(m_txvideoram16, m_tx_vram_size)
-	AM_RANGE(0x502000, 0x5021ff) AM_RAM_WRITE_LEGACY(toaplan2_txvideoram16_offs_w) AM_BASE_SIZE(m_txvideoram16_offs, m_tx_offs_vram_size)
+	AM_RANGE(0x500000, 0x501fff) AM_RAM_WRITE(toaplan2_txvideoram16_w) AM_BASE_SIZE(m_txvideoram16, m_tx_vram_size)
+	AM_RANGE(0x502000, 0x5021ff) AM_RAM_WRITE(toaplan2_txvideoram16_offs_w) AM_BASE_SIZE(m_txvideoram16_offs, m_tx_offs_vram_size)
 	AM_RANGE(0x502200, 0x502fff) AM_RAM
-	AM_RANGE(0x503000, 0x5031ff) AM_RAM_WRITE_LEGACY(toaplan2_txscrollram16_w) AM_BASE_SIZE(m_txscrollram16, m_tx_scroll_vram_size)
+	AM_RANGE(0x503000, 0x5031ff) AM_RAM_WRITE(toaplan2_txscrollram16_w) AM_BASE_SIZE(m_txscrollram16, m_tx_scroll_vram_size)
 	AM_RANGE(0x503200, 0x503fff) AM_RAM
 	AM_RANGE(0x600000, 0x600001) AM_WRITE(bgaregga_soundlatch_w)
 ADDRESS_MAP_END
@@ -1336,10 +1336,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( batrider_68k_mem, AS_PROGRAM, 16, toaplan2_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 	// actually 200000 - 20ffff is probably all main RAM, and the text and palette RAM are written via DMA
-	AM_RANGE(0x200000, 0x201fff) AM_RAM_WRITE_LEGACY(toaplan2_txvideoram16_w) AM_BASE_SIZE(m_txvideoram16, m_tx_vram_size)
+	AM_RANGE(0x200000, 0x201fff) AM_RAM_WRITE(toaplan2_txvideoram16_w) AM_BASE_SIZE(m_txvideoram16, m_tx_vram_size)
 	AM_RANGE(0x202000, 0x202fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram") AM_SIZE(m_paletteram_size)
-	AM_RANGE(0x203000, 0x2031ff) AM_RAM_WRITE_LEGACY(toaplan2_txvideoram16_offs_w) AM_BASE_SIZE(m_txvideoram16_offs, m_tx_offs_vram_size)
-	AM_RANGE(0x203200, 0x2033ff) AM_RAM_WRITE_LEGACY(toaplan2_txscrollram16_w) AM_BASE_SIZE(m_txscrollram16, m_tx_scroll_vram_size)
+	AM_RANGE(0x203000, 0x2031ff) AM_RAM_WRITE(toaplan2_txvideoram16_offs_w) AM_BASE_SIZE(m_txvideoram16_offs, m_tx_offs_vram_size)
+	AM_RANGE(0x203200, 0x2033ff) AM_RAM_WRITE(toaplan2_txscrollram16_w) AM_BASE_SIZE(m_txscrollram16, m_tx_scroll_vram_size)
 	AM_RANGE(0x203400, 0x207fff) AM_RAM AM_BASE_SIZE(m_mainram16, m_mainram_overlap_size)
 	AM_RANGE(0x208000, 0x20ffff) AM_RAM
 	AM_RANGE(0x300000, 0x37ffff) AM_READ(batrider_z80rom_r)
@@ -1357,19 +1357,19 @@ static ADDRESS_MAP_START( batrider_68k_mem, AS_PROGRAM, 16, toaplan2_state )
 	AM_RANGE(0x500024, 0x500025) AM_WRITE(batrider_unknown_sound_w)
 	AM_RANGE(0x500026, 0x500027) AM_WRITE(batrider_clear_sndirq_w)
 	AM_RANGE(0x500060, 0x500061) AM_WRITE(batrider_z80_busreq_w)
-	AM_RANGE(0x500080, 0x500081) AM_WRITE_LEGACY(batrider_textdata_dma_w)
-	AM_RANGE(0x500082, 0x500083) AM_WRITE_LEGACY(batrider_unknown_dma_w)
-	AM_RANGE(0x5000c0, 0x5000cf) AM_WRITE_LEGACY(batrider_objectbank_w)
+	AM_RANGE(0x500080, 0x500081) AM_WRITE(batrider_textdata_dma_w)
+	AM_RANGE(0x500082, 0x500083) AM_WRITE(batrider_unknown_dma_w)
+	AM_RANGE(0x5000c0, 0x5000cf) AM_WRITE(batrider_objectbank_w)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( bbakraid_68k_mem, AS_PROGRAM, 16, toaplan2_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 	// actually 200000 - 20ffff is probably all main RAM, and the text and palette RAM are written via DMA
-	AM_RANGE(0x200000, 0x201fff) AM_RAM_WRITE_LEGACY(toaplan2_txvideoram16_w) AM_BASE_SIZE(m_txvideoram16, m_tx_vram_size)
+	AM_RANGE(0x200000, 0x201fff) AM_RAM_WRITE(toaplan2_txvideoram16_w) AM_BASE_SIZE(m_txvideoram16, m_tx_vram_size)
 	AM_RANGE(0x202000, 0x202fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram") AM_SIZE(m_paletteram_size)
-	AM_RANGE(0x203000, 0x2031ff) AM_RAM_WRITE_LEGACY(toaplan2_txvideoram16_offs_w) AM_BASE_SIZE(m_txvideoram16_offs, m_tx_offs_vram_size)
-	AM_RANGE(0x203200, 0x2033ff) AM_RAM_WRITE_LEGACY(toaplan2_txscrollram16_w) AM_BASE_SIZE(m_txscrollram16, m_tx_scroll_vram_size)
+	AM_RANGE(0x203000, 0x2031ff) AM_RAM_WRITE(toaplan2_txvideoram16_offs_w) AM_BASE_SIZE(m_txvideoram16_offs, m_tx_offs_vram_size)
+	AM_RANGE(0x203200, 0x2033ff) AM_RAM_WRITE(toaplan2_txscrollram16_w) AM_BASE_SIZE(m_txscrollram16, m_tx_scroll_vram_size)
 	AM_RANGE(0x203400, 0x207fff) AM_RAM AM_BASE_SIZE(m_mainram16, m_mainram_overlap_size)
 	AM_RANGE(0x208000, 0x20ffff) AM_RAM
 	AM_RANGE(0x300000, 0x33ffff) AM_READ(batrider_z80rom_r)
@@ -1387,9 +1387,9 @@ static ADDRESS_MAP_START( bbakraid_68k_mem, AS_PROGRAM, 16, toaplan2_state )
 	AM_RANGE(0x50001a, 0x50001b) AM_WRITE(batrider_unknown_sound_w)
 	AM_RANGE(0x50001c, 0x50001d) AM_WRITE(batrider_clear_sndirq_w)
 	AM_RANGE(0x50001e, 0x50001f) AM_WRITE(bbakraid_eeprom_w)
-	AM_RANGE(0x500080, 0x500081) AM_WRITE_LEGACY(batrider_textdata_dma_w)
-	AM_RANGE(0x500082, 0x500083) AM_WRITE_LEGACY(batrider_unknown_dma_w)
-	AM_RANGE(0x5000c0, 0x5000cf) AM_WRITE_LEGACY(batrider_objectbank_w)
+	AM_RANGE(0x500080, 0x500081) AM_WRITE(batrider_textdata_dma_w)
+	AM_RANGE(0x500082, 0x500083) AM_WRITE(batrider_unknown_dma_w)
+	AM_RANGE(0x5000c0, 0x5000cf) AM_WRITE(batrider_objectbank_w)
 ADDRESS_MAP_END
 
 

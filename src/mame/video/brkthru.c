@@ -86,12 +86,11 @@ static TILE_GET_INFO( get_bg_tile_info )
 	SET_TILE_INFO(region, code & 0x7f, colour,0);
 }
 
-WRITE8_HANDLER( brkthru_bgram_w )
+WRITE8_MEMBER(brkthru_state::brkthru_bgram_w)
 {
-	brkthru_state *state = space->machine().driver_data<brkthru_state>();
 
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset / 2);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
 
@@ -102,12 +101,11 @@ static TILE_GET_INFO( get_fg_tile_info )
 	SET_TILE_INFO(0, code, 0, 0);
 }
 
-WRITE8_HANDLER( brkthru_fgram_w )
+WRITE8_MEMBER(brkthru_state::brkthru_fgram_w)
 {
-	brkthru_state *state = space->machine().driver_data<brkthru_state>();
 
-	state->m_fg_videoram[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset);
+	m_fg_videoram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 VIDEO_START( brkthru )
@@ -122,35 +120,34 @@ VIDEO_START( brkthru )
 }
 
 
-WRITE8_HANDLER( brkthru_1800_w )
+WRITE8_MEMBER(brkthru_state::brkthru_1800_w)
 {
-	brkthru_state *state = space->machine().driver_data<brkthru_state>();
 
 	if (offset == 0)	/* low 8 bits of scroll */
-		state->m_bgscroll = (state->m_bgscroll & 0x100) | data;
+		m_bgscroll = (m_bgscroll & 0x100) | data;
 	else if (offset == 1)
 	{
 		/* bit 0-2 = ROM bank select */
-		memory_set_bank(space->machine(), "bank1", data & 0x07);
+		memory_set_bank(machine(), "bank1", data & 0x07);
 
 		/* bit 3-5 = background tiles color code */
-		if (((data & 0x38) >> 2) != state->m_bgbasecolor)
+		if (((data & 0x38) >> 2) != m_bgbasecolor)
 		{
-			state->m_bgbasecolor = (data & 0x38) >> 2;
-			state->m_bg_tilemap->mark_all_dirty();
+			m_bgbasecolor = (data & 0x38) >> 2;
+			m_bg_tilemap->mark_all_dirty();
 		}
 
 		/* bit 6 = screen flip */
-		if (state->m_flipscreen != (data & 0x40))
+		if (m_flipscreen != (data & 0x40))
 		{
-			state->m_flipscreen = data & 0x40;
-			state->m_bg_tilemap->set_flip(state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
-			state->m_fg_tilemap->set_flip(state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+			m_flipscreen = data & 0x40;
+			m_bg_tilemap->set_flip(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+			m_fg_tilemap->set_flip(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
 		}
 
 		/* bit 7 = high bit of scroll */
-		state->m_bgscroll = (state->m_bgscroll & 0xff) | ((data & 0x80) << 1);
+		m_bgscroll = (m_bgscroll & 0xff) | ((data & 0x80) << 1);
 	}
 }
 

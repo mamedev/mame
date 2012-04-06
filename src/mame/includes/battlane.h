@@ -24,18 +24,18 @@ public:
 	device_t *m_maincpu;
 	device_t *m_subcpu;
 	DECLARE_WRITE8_MEMBER(battlane_cpu_command_w);
+	DECLARE_WRITE8_MEMBER(battlane_palette_w);
+	DECLARE_WRITE8_MEMBER(battlane_scrollx_w);
+	DECLARE_WRITE8_MEMBER(battlane_scrolly_w);
+	DECLARE_WRITE8_MEMBER(battlane_tileram_w);
+	DECLARE_WRITE8_MEMBER(battlane_spriteram_w);
+	DECLARE_WRITE8_MEMBER(battlane_bitmap_w);
+	DECLARE_WRITE8_MEMBER(battlane_video_ctrl_w);
 };
 
 
 /*----------- defined in video/battlane.c -----------*/
 
-WRITE8_HANDLER( battlane_palette_w );
-WRITE8_HANDLER( battlane_scrollx_w );
-WRITE8_HANDLER( battlane_scrolly_w );
-WRITE8_HANDLER( battlane_tileram_w );
-WRITE8_HANDLER( battlane_spriteram_w );
-WRITE8_HANDLER( battlane_bitmap_w );
-WRITE8_HANDLER( battlane_video_ctrl_w );
 
 VIDEO_START( battlane );
 SCREEN_UPDATE_IND16( battlane );

@@ -42,10 +42,10 @@ READ8_MEMBER(mrdo_state::mrdo_SECRE_r)
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, mrdo_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE_LEGACY(mrdo_bgvideoram_w) AM_BASE(m_bgvideoram)
-	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE_LEGACY(mrdo_fgvideoram_w) AM_BASE(m_fgvideoram)
+	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(mrdo_bgvideoram_w) AM_BASE(m_bgvideoram)
+	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(mrdo_fgvideoram_w) AM_BASE(m_fgvideoram)
 	AM_RANGE(0x9000, 0x90ff) AM_WRITEONLY AM_BASE_SIZE(m_spriteram, m_spriteram_size)
-	AM_RANGE(0x9800, 0x9800) AM_WRITE_LEGACY(mrdo_flipscreen_w)	/* screen flip + playfield priority */
+	AM_RANGE(0x9800, 0x9800) AM_WRITE(mrdo_flipscreen_w)	/* screen flip + playfield priority */
 	AM_RANGE(0x9801, 0x9801) AM_DEVWRITE_LEGACY("sn1", sn76496_w)
 	AM_RANGE(0x9802, 0x9802) AM_DEVWRITE_LEGACY("sn2", sn76496_w)
 	AM_RANGE(0x9803, 0x9803) AM_READ(mrdo_SECRE_r)
@@ -54,8 +54,8 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, mrdo_state )
 	AM_RANGE(0xa002, 0xa002) AM_READ_PORT("DSW1")
 	AM_RANGE(0xa003, 0xa003) AM_READ_PORT("DSW2")
 	AM_RANGE(0xe000, 0xefff) AM_RAM
-	AM_RANGE(0xf000, 0xf7ff) AM_WRITE_LEGACY(mrdo_scrollx_w)
-	AM_RANGE(0xf800, 0xffff) AM_WRITE_LEGACY(mrdo_scrolly_w)
+	AM_RANGE(0xf000, 0xf7ff) AM_WRITE(mrdo_scrollx_w)
+	AM_RANGE(0xf800, 0xffff) AM_WRITE(mrdo_scrolly_w)
 ADDRESS_MAP_END
 
 

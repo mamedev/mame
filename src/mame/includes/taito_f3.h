@@ -201,6 +201,21 @@ public:
 	DECLARE_WRITE16_MEMBER(f3_unk_w);
 	DECLARE_READ32_MEMBER(bubsympb_oki_r);
 	DECLARE_WRITE32_MEMBER(bubsympb_oki_w);
+	DECLARE_READ16_MEMBER(f3_pf_data_r);
+	DECLARE_WRITE16_MEMBER(f3_pf_data_w);
+	DECLARE_WRITE16_MEMBER(f3_control_0_w);
+	DECLARE_WRITE16_MEMBER(f3_control_1_w);
+	DECLARE_READ16_MEMBER(f3_spriteram_r);
+	DECLARE_WRITE16_MEMBER(f3_spriteram_w);
+	DECLARE_READ16_MEMBER(f3_videoram_r);
+	DECLARE_WRITE16_MEMBER(f3_videoram_w);
+	DECLARE_READ16_MEMBER(f3_vram_r);
+	DECLARE_WRITE16_MEMBER(f3_vram_w);
+	DECLARE_READ16_MEMBER(f3_pivot_r);
+	DECLARE_WRITE16_MEMBER(f3_pivot_w);
+	DECLARE_READ16_MEMBER(f3_lineram_r);
+	DECLARE_WRITE16_MEMBER(f3_lineram_w);
+	DECLARE_WRITE32_MEMBER(f3_palette_24bit_w);
 };
 
 
@@ -210,19 +225,4 @@ VIDEO_START( f3 );
 SCREEN_UPDATE_RGB32( f3 );
 SCREEN_VBLANK( f3 );
 
-WRITE16_HANDLER( f3_control_0_w );
-WRITE16_HANDLER( f3_control_1_w );
-WRITE32_HANDLER( f3_palette_24bit_w );
-WRITE16_HANDLER( f3_pf_data_w );
-WRITE16_HANDLER( f3_vram_w );
-WRITE16_HANDLER( f3_pivot_w );
-WRITE16_HANDLER( f3_lineram_w );
-WRITE16_HANDLER( f3_videoram_w );
-WRITE16_HANDLER( f3_spriteram_w );
 
-READ16_HANDLER( f3_pf_data_r );
-READ16_HANDLER( f3_vram_r );
-READ16_HANDLER( f3_pivot_r );
-READ16_HANDLER( f3_lineram_r );
-READ16_HANDLER( f3_videoram_r );
-READ16_HANDLER( f3_spriteram_r );

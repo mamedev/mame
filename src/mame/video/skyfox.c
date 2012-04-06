@@ -46,23 +46,21 @@
 ***************************************************************************/
 
 #ifdef UNUSED_FUNCTION
-READ8_HANDLER( skyfox_vregs_r )	// for debug
+READ8_MEMBER(skyfox_state::skyfox_vregs_r)// for debug
 {
-	skyfox_state *state = space->machine().driver_data<skyfox_state>();
-	return state->m_vreg[offset];
+	return m_vreg[offset];
 }
 #endif
 
-WRITE8_HANDLER( skyfox_vregs_w )
+WRITE8_MEMBER(skyfox_state::skyfox_vregs_w)
 {
-	skyfox_state *state = space->machine().driver_data<skyfox_state>();
 
-	state->m_vreg[offset] = data;
+	m_vreg[offset] = data;
 
 	switch (offset)
 	{
-		case 0:	state->m_bg_ctrl = data;	break;
-		case 1:	state->soundlatch_w(*space, 0, data);	break;
+		case 0:	m_bg_ctrl = data;	break;
+		case 1:	soundlatch_w(space, 0, data);	break;
 		case 2:	break;
 		case 3:	break;
 		case 4:	break;

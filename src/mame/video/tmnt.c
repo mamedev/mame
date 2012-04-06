@@ -313,103 +313,98 @@ VIDEO_START( blswhstl )
 
 ***************************************************************************/
 
-WRITE16_HANDLER( tmnt_paletteram_word_w )
+WRITE16_MEMBER(tmnt_state::tmnt_paletteram_word_w)
 {
-	tmnt_state *state = space->machine().driver_data<tmnt_state>();
-	COMBINE_DATA(state->m_generic_paletteram_16 + offset);
+	COMBINE_DATA(m_generic_paletteram_16 + offset);
 	offset &= ~1;
 
-	data = (state->m_generic_paletteram_16[offset] << 8) | state->m_generic_paletteram_16[offset + 1];
-	palette_set_color_rgb(space->machine(), offset / 2, pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
+	data = (m_generic_paletteram_16[offset] << 8) | m_generic_paletteram_16[offset + 1];
+	palette_set_color_rgb(machine(), offset / 2, pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
 }
 
 
 
-WRITE16_HANDLER( tmnt_0a0000_w )
+WRITE16_MEMBER(tmnt_state::tmnt_0a0000_w)
 {
-	tmnt_state *state = space->machine().driver_data<tmnt_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
 		/* bit 0/1 = coin counters */
-		coin_counter_w(space->machine(), 0, data & 0x01);
-		coin_counter_w(space->machine(), 1, data & 0x02);	/* 2 players version */
+		coin_counter_w(machine(), 0, data & 0x01);
+		coin_counter_w(machine(), 1, data & 0x02);	/* 2 players version */
 
 		/* bit 3 high then low triggers irq on sound CPU */
-		if (state->m_last == 0x08 && (data & 0x08) == 0)
-			device_set_input_line_and_vector(state->m_audiocpu, 0, HOLD_LINE, 0xff);
+		if (m_last == 0x08 && (data & 0x08) == 0)
+			device_set_input_line_and_vector(m_audiocpu, 0, HOLD_LINE, 0xff);
 
-		state->m_last = data & 0x08;
+		m_last = data & 0x08;
 
 		/* bit 5 = irq enable */
-		state->m_irq5_mask = data & 0x20;
+		m_irq5_mask = data & 0x20;
 
 		/* bit 7 = enable char ROM reading through the video RAM */
-		k052109_set_rmrd_line(state->m_k052109, (data & 0x80) ? ASSERT_LINE : CLEAR_LINE);
+		k052109_set_rmrd_line(m_k052109, (data & 0x80) ? ASSERT_LINE : CLEAR_LINE);
 
 		/* other bits unused */
 	}
 }
 
-WRITE16_HANDLER( punkshot_0a0020_w )
+WRITE16_MEMBER(tmnt_state::punkshot_0a0020_w)
 {
-	tmnt_state *state = space->machine().driver_data<tmnt_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
 		/* bit 0 = coin counter */
-		coin_counter_w(space->machine(), 0, data & 0x01);
+		coin_counter_w(machine(), 0, data & 0x01);
 
 		/* bit 2 = trigger irq on sound CPU */
-		if (state->m_last == 0x04 && (data & 0x04) == 0)
-			device_set_input_line_and_vector(state->m_audiocpu, 0, HOLD_LINE, 0xff);
+		if (m_last == 0x04 && (data & 0x04) == 0)
+			device_set_input_line_and_vector(m_audiocpu, 0, HOLD_LINE, 0xff);
 
-		state->m_last = data & 0x04;
+		m_last = data & 0x04;
 
 		/* bit 3 = enable char ROM reading through the video RAM */
-		k052109_set_rmrd_line(state->m_k052109, (data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
+		k052109_set_rmrd_line(m_k052109, (data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
-WRITE16_HANDLER( lgtnfght_0a0018_w )
+WRITE16_MEMBER(tmnt_state::lgtnfght_0a0018_w)
 {
-	tmnt_state *state = space->machine().driver_data<tmnt_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
 		/* bit 0,1 = coin counter */
-		coin_counter_w(space->machine(), 0, data & 0x01);
-		coin_counter_w(space->machine(), 1, data & 0x02);
+		coin_counter_w(machine(), 0, data & 0x01);
+		coin_counter_w(machine(), 1, data & 0x02);
 
 		/* bit 2 = trigger irq on sound CPU */
-		if (state->m_last == 0x00 && (data & 0x04) == 0x04)
-			device_set_input_line_and_vector(state->m_audiocpu, 0, HOLD_LINE, 0xff);
+		if (m_last == 0x00 && (data & 0x04) == 0x04)
+			device_set_input_line_and_vector(m_audiocpu, 0, HOLD_LINE, 0xff);
 
-		state->m_last = data & 0x04;
+		m_last = data & 0x04;
 
 		/* bit 3 = enable char ROM reading through the video RAM */
-		k052109_set_rmrd_line(state->m_k052109, (data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
+		k052109_set_rmrd_line(m_k052109, (data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
-WRITE16_HANDLER( blswhstl_700300_w )
+WRITE16_MEMBER(tmnt_state::blswhstl_700300_w)
 {
-	tmnt_state *state = space->machine().driver_data<tmnt_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
 		/* bit 0,1 = coin counter */
-		coin_counter_w(space->machine(), 0,data & 0x01);
-		coin_counter_w(space->machine(), 1,data & 0x02);
+		coin_counter_w(machine(), 0,data & 0x01);
+		coin_counter_w(machine(), 1,data & 0x02);
 
 		/* bit 3 = enable char ROM reading through the video RAM */
-		k052109_set_rmrd_line(state->m_k052109, (data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
+		k052109_set_rmrd_line(m_k052109, (data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
 
 		/* bit 7 = select char ROM bank */
-		if (state->m_blswhstl_rombank != ((data & 0x80) >> 7))
+		if (m_blswhstl_rombank != ((data & 0x80) >> 7))
 		{
-			state->m_blswhstl_rombank = (data & 0x80) >> 7;
-			space->machine().tilemap().mark_all_dirty();
+			m_blswhstl_rombank = (data & 0x80) >> 7;
+			machine().tilemap().mark_all_dirty();
 		}
 
 		/* other bits unknown */
@@ -417,133 +412,126 @@ WRITE16_HANDLER( blswhstl_700300_w )
 }
 
 
-READ16_HANDLER( glfgreat_rom_r )
+READ16_MEMBER(tmnt_state::glfgreat_rom_r)
 {
-	tmnt_state *state = space->machine().driver_data<tmnt_state>();
 
-	if (state->m_glfgreat_roz_rom_mode)
-		return space->machine().region("gfx3")->base()[state->m_glfgreat_roz_char_bank * 0x80000 + offset];
+	if (m_glfgreat_roz_rom_mode)
+		return machine().region("gfx3")->base()[m_glfgreat_roz_char_bank * 0x80000 + offset];
 	else if (offset < 0x40000)
 	{
-		UINT8 *usr = space->machine().region("user1")->base();
-		return usr[offset + 0x80000 + state->m_glfgreat_roz_rom_bank * 0x40000] + 256 * usr[offset + state->m_glfgreat_roz_rom_bank * 0x40000];
+		UINT8 *usr = machine().region("user1")->base();
+		return usr[offset + 0x80000 + m_glfgreat_roz_rom_bank * 0x40000] + 256 * usr[offset + m_glfgreat_roz_rom_bank * 0x40000];
 	}
 	else
-		return space->machine().region("user1")->base()[((offset & 0x3ffff) >> 2) + 0x100000 + state->m_glfgreat_roz_rom_bank * 0x10000];
+		return machine().region("user1")->base()[((offset & 0x3ffff) >> 2) + 0x100000 + m_glfgreat_roz_rom_bank * 0x10000];
 }
 
-WRITE16_HANDLER( glfgreat_122000_w )
+WRITE16_MEMBER(tmnt_state::glfgreat_122000_w)
 {
-	tmnt_state *state = space->machine().driver_data<tmnt_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
 		/* bit 0,1 = coin counter */
-		coin_counter_w(space->machine(), 0, data & 0x01);
-		coin_counter_w(space->machine(), 1, data & 0x02);
+		coin_counter_w(machine(), 0, data & 0x01);
+		coin_counter_w(machine(), 1, data & 0x02);
 
 		/* bit 4 = enable char ROM reading through the video RAM */
-		k052109_set_rmrd_line(state->m_k052109, (data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
+		k052109_set_rmrd_line(m_k052109, (data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
 
 		/* bit 5 = 53596 tile rom bank selection */
-		if (state->m_glfgreat_roz_rom_bank != (data & 0x20) >> 5)
+		if (m_glfgreat_roz_rom_bank != (data & 0x20) >> 5)
 		{
-			state->m_glfgreat_roz_rom_bank = (data & 0x20) >> 5;
-			state->m_roz_tilemap->mark_all_dirty();
+			m_glfgreat_roz_rom_bank = (data & 0x20) >> 5;
+			m_roz_tilemap->mark_all_dirty();
 		}
 
 		/* bit 6,7 = 53596 char bank selection for ROM test */
-		state->m_glfgreat_roz_char_bank = (data & 0xc0) >> 6;
+		m_glfgreat_roz_char_bank = (data & 0xc0) >> 6;
 
 		/* other bits unknown */
 	}
 	if (ACCESSING_BITS_8_15)
 	{
 		/* bit 8 = 53596 char/rom selection for ROM test */
-		state->m_glfgreat_roz_rom_mode = data & 0x100;
+		m_glfgreat_roz_rom_mode = data & 0x100;
 	}
 }
 
 
-WRITE16_HANDLER( ssriders_eeprom_w )
+WRITE16_MEMBER(tmnt_state::ssriders_eeprom_w)
 {
-	tmnt_state *state = space->machine().driver_data<tmnt_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
 		/* bit 0 is data */
 		/* bit 1 is cs (active low) */
 		/* bit 2 is clock (active high) */
-		input_port_write(space->machine(), "EEPROMOUT", data, 0xff);
+		input_port_write(machine(), "EEPROMOUT", data, 0xff);
 
 		/* bits 3-4 control palette dimming */
 		/* 4 = DIMPOL = when set, negate SHAD */
 		/* 3 = DIMMOD = when set, or BRIT with [negated] SHAD */
-		state->m_dim_c = data & 0x18;
+		m_dim_c = data & 0x18;
 
 		/* bit 5 selects sprite ROM for testing in TMNT2 (bits 5-7, actually, according to the schematics) */
-		k053244_bankselect(state->m_k053245, ((data & 0x20) >> 5) << 2);
+		k053244_bankselect(m_k053245, ((data & 0x20) >> 5) << 2);
 	}
 }
 
-WRITE16_HANDLER( ssriders_1c0300_w )
+WRITE16_MEMBER(tmnt_state::ssriders_1c0300_w)
 {
-	tmnt_state *state = space->machine().driver_data<tmnt_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
 		/* bit 0,1 = coin counter */
-		coin_counter_w(space->machine(), 0, data & 0x01);
-		coin_counter_w(space->machine(), 1, data & 0x02);
+		coin_counter_w(machine(), 0, data & 0x01);
+		coin_counter_w(machine(), 1, data & 0x02);
 
 		/* bit 3 = enable char ROM reading through the video RAM */
-		k052109_set_rmrd_line(state->m_k052109, (data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
+		k052109_set_rmrd_line(m_k052109, (data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
 
 		/* bits 4-6 control palette dimming (DIM0-DIM2) */
-		state->m_dim_v = (data & 0x70) >> 4;
+		m_dim_v = (data & 0x70) >> 4;
 	}
 }
 
-WRITE16_HANDLER( prmrsocr_122000_w )
+WRITE16_MEMBER(tmnt_state::prmrsocr_122000_w)
 {
-	tmnt_state *state = space->machine().driver_data<tmnt_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
 		/* bit 0,1 = coin counter */
-		coin_counter_w(space->machine(), 0, data & 0x01);
-		coin_counter_w(space->machine(), 1, data & 0x02);
+		coin_counter_w(machine(), 0, data & 0x01);
+		coin_counter_w(machine(), 1, data & 0x02);
 
 		/* bit 4 = enable char ROM reading through the video RAM */
-		k052109_set_rmrd_line(state->m_k052109, (data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
+		k052109_set_rmrd_line(m_k052109, (data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
 
 		/* bit 6 = sprite ROM bank */
-		state->m_prmrsocr_sprite_bank = (data & 0x40) >> 6;
-		k053244_bankselect(state->m_k053245, state->m_prmrsocr_sprite_bank << 2);
+		m_prmrsocr_sprite_bank = (data & 0x40) >> 6;
+		k053244_bankselect(m_k053245, m_prmrsocr_sprite_bank << 2);
 
 		/* bit 7 = 53596 region selector for ROM test */
-		state->m_glfgreat_roz_char_bank = (data & 0x80) >> 7;
+		m_glfgreat_roz_char_bank = (data & 0x80) >> 7;
 
 		/* other bits unknown (unused?) */
 	}
 }
 
-READ16_HANDLER( prmrsocr_rom_r )
+READ16_MEMBER(tmnt_state::prmrsocr_rom_r)
 {
-	tmnt_state *state = space->machine().driver_data<tmnt_state>();
 
-	if(state->m_glfgreat_roz_char_bank)
-		return space->machine().region("gfx3")->base()[offset];
+	if(m_glfgreat_roz_char_bank)
+		return machine().region("gfx3")->base()[offset];
 	else
 	{
-		UINT8 *usr = space->machine().region("user1")->base();
+		UINT8 *usr = machine().region("user1")->base();
 		return 256 * usr[offset] + usr[offset + 0x020000];
 	}
 }
 
-WRITE16_HANDLER( tmnt_priority_w )
+WRITE16_MEMBER(tmnt_state::tmnt_priority_w)
 {
-	tmnt_state *state = space->machine().driver_data<tmnt_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
@@ -565,7 +553,7 @@ WRITE16_HANDLER( tmnt_priority_w )
               are 0) is taken from the *foreground* palette, not the background
               one as would be more intuitive.
         */
-		state->m_tmnt_priorityflag = (data & 0x0c) >> 2;
+		m_tmnt_priorityflag = (data & 0x0c) >> 2;
 	}
 }
 
@@ -671,18 +659,17 @@ SCREEN_UPDATE_IND16( lgtnfght )
 }
 
 
-READ16_HANDLER( glfgreat_ball_r )
+READ16_MEMBER(tmnt_state::glfgreat_ball_r)
 {
-	tmnt_state *state = space->machine().driver_data<tmnt_state>();
 
 #ifdef MAME_DEBUG
-popmessage("%04x", state->m_glfgreat_pixel);
+popmessage("%04x", m_glfgreat_pixel);
 #endif
 	/* if out of the ROZ layer palette range, it's in the water - return 0 */
-	if (state->m_glfgreat_pixel < 0x400 || state->m_glfgreat_pixel >= 0x500)
+	if (m_glfgreat_pixel < 0x400 || m_glfgreat_pixel >= 0x500)
 		return 0;
 	else
-		return state->m_glfgreat_pixel & 0xff;
+		return m_glfgreat_pixel & 0xff;
 }
 
 SCREEN_UPDATE_IND16( glfgreat )

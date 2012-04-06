@@ -22,11 +22,10 @@
  *
  *************************************/
 
-WRITE8_HANDLER( redalert_bitmap_videoram_w )
+WRITE8_MEMBER(redalert_state::redalert_bitmap_videoram_w)
 {
-	redalert_state *state = space->machine().driver_data<redalert_state>();
-	state->m_bitmap_videoram[offset     ] = data;
-	state->m_bitmap_colorram[offset >> 3] = *state->m_bitmap_color & 0x07;
+	m_bitmap_videoram[offset     ] = data;
+	m_bitmap_colorram[offset >> 3] = *m_bitmap_color & 0x07;
 }
 
 

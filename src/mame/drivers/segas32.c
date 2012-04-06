@@ -1204,11 +1204,11 @@ static ADDRESS_MAP_START( system32_map, AS_PROGRAM, 16, segas32_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_MIRROR(0x0f0000) AM_RAM	AM_BASE(m_system32_workram)
-	AM_RANGE(0x300000, 0x31ffff) AM_MIRROR(0x0e0000) AM_READWRITE_LEGACY(system32_videoram_r, system32_videoram_w) AM_BASE(m_system32_videoram)
-	AM_RANGE(0x400000, 0x41ffff) AM_MIRROR(0x0e0000) AM_READWRITE_LEGACY(system32_spriteram_r, system32_spriteram_w) AM_BASE(m_system32_spriteram)
-	AM_RANGE(0x500000, 0x50000f) AM_MIRROR(0x0ffff0) AM_READWRITE_LEGACY(system32_sprite_control_r, system32_sprite_control_w)
-	AM_RANGE(0x600000, 0x60ffff) AM_MIRROR(0x0e0000) AM_READWRITE_LEGACY(system32_paletteram_r, system32_paletteram_w) AM_BASE(m_system32_paletteram[0])
-	AM_RANGE(0x610000, 0x61007f) AM_MIRROR(0x0eff80) AM_READWRITE_LEGACY(system32_mixer_r, system32_mixer_w)
+	AM_RANGE(0x300000, 0x31ffff) AM_MIRROR(0x0e0000) AM_READWRITE(system32_videoram_r, system32_videoram_w) AM_BASE(m_system32_videoram)
+	AM_RANGE(0x400000, 0x41ffff) AM_MIRROR(0x0e0000) AM_READWRITE(system32_spriteram_r, system32_spriteram_w) AM_BASE(m_system32_spriteram)
+	AM_RANGE(0x500000, 0x50000f) AM_MIRROR(0x0ffff0) AM_READWRITE(system32_sprite_control_r, system32_sprite_control_w)
+	AM_RANGE(0x600000, 0x60ffff) AM_MIRROR(0x0e0000) AM_READWRITE(system32_paletteram_r, system32_paletteram_w) AM_BASE(m_system32_paletteram[0])
+	AM_RANGE(0x610000, 0x61007f) AM_MIRROR(0x0eff80) AM_READWRITE(system32_mixer_r, system32_mixer_w)
 	AM_RANGE(0x700000, 0x701fff) AM_MIRROR(0x0fe000) AM_READWRITE_LEGACY(shared_ram_16_r, shared_ram_16_w)
 	AM_RANGE(0xc00000, 0xc0001f) AM_MIRROR(0x0fff80) AM_READWRITE_LEGACY(io_chip_r, io_chip_w)
 	AM_RANGE(0xc00040, 0xc0007f) AM_MIRROR(0x0fff80) AM_READWRITE_LEGACY(io_expansion_r, io_expansion_w)
@@ -1223,13 +1223,13 @@ static ADDRESS_MAP_START( multi32_map, AS_PROGRAM, 32, segas32_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xffffff)
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 	AM_RANGE(0x200000, 0x21ffff) AM_MIRROR(0x0e0000) AM_RAM
-	AM_RANGE(0x300000, 0x31ffff) AM_MIRROR(0x0e0000) AM_READWRITE_LEGACY(multi32_videoram_r, multi32_videoram_w) AM_BASE(m_system32_videoram)
-	AM_RANGE(0x400000, 0x41ffff) AM_MIRROR(0x0e0000) AM_READWRITE_LEGACY(multi32_spriteram_r, multi32_spriteram_w) AM_BASE(m_system32_spriteram)
-	AM_RANGE(0x500000, 0x50000f) AM_MIRROR(0x0ffff0) AM_READWRITE_LEGACY(multi32_sprite_control_r, multi32_sprite_control_w)
-	AM_RANGE(0x600000, 0x60ffff) AM_MIRROR(0x060000) AM_READWRITE_LEGACY(multi32_paletteram_0_r, multi32_paletteram_0_w) AM_BASE(m_system32_paletteram[0])
-	AM_RANGE(0x610000, 0x61007f) AM_MIRROR(0x06ff80) AM_WRITE_LEGACY(multi32_mixer_0_w)
-	AM_RANGE(0x680000, 0x68ffff) AM_MIRROR(0x060000) AM_READWRITE_LEGACY(multi32_paletteram_1_r, multi32_paletteram_1_w) AM_BASE(m_system32_paletteram[1])
-	AM_RANGE(0x690000, 0x69007f) AM_MIRROR(0x06ff80) AM_WRITE_LEGACY(multi32_mixer_1_w)
+	AM_RANGE(0x300000, 0x31ffff) AM_MIRROR(0x0e0000) AM_READWRITE(multi32_videoram_r, multi32_videoram_w) AM_BASE(m_system32_videoram)
+	AM_RANGE(0x400000, 0x41ffff) AM_MIRROR(0x0e0000) AM_READWRITE(multi32_spriteram_r, multi32_spriteram_w) AM_BASE(m_system32_spriteram)
+	AM_RANGE(0x500000, 0x50000f) AM_MIRROR(0x0ffff0) AM_READWRITE(multi32_sprite_control_r, multi32_sprite_control_w)
+	AM_RANGE(0x600000, 0x60ffff) AM_MIRROR(0x060000) AM_READWRITE(multi32_paletteram_0_r, multi32_paletteram_0_w) AM_BASE(m_system32_paletteram[0])
+	AM_RANGE(0x610000, 0x61007f) AM_MIRROR(0x06ff80) AM_WRITE(multi32_mixer_0_w)
+	AM_RANGE(0x680000, 0x68ffff) AM_MIRROR(0x060000) AM_READWRITE(multi32_paletteram_1_r, multi32_paletteram_1_w) AM_BASE(m_system32_paletteram[1])
+	AM_RANGE(0x690000, 0x69007f) AM_MIRROR(0x06ff80) AM_WRITE(multi32_mixer_1_w)
 	AM_RANGE(0x700000, 0x701fff) AM_MIRROR(0x0fe000) AM_READWRITE_LEGACY(shared_ram_32_r, shared_ram_32_w)
 	AM_RANGE(0xc00000, 0xc0001f) AM_MIRROR(0x07ff80) AM_READWRITE_LEGACY(io_chip_0_r, io_chip_0_w)
 	AM_RANGE(0xc00040, 0xc0007f) AM_MIRROR(0x07ff80) AM_READWRITE_LEGACY(io_expansion_0_r, io_expansion_0_w)
@@ -4050,7 +4050,7 @@ static DRIVER_INIT( arescue )
 {
 	segas32_state *state = machine.driver_data<segas32_state>();
 	segas32_common_init(machine, analog_custom_io_r, analog_custom_io_w);
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xa00000, 0xa00007, FUNC(arescue_dsp_r), FUNC(arescue_dsp_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xa00000, 0xa00007, read16_delegate(FUNC(segas32_state::arescue_dsp_r),state), write16_delegate(FUNC(segas32_state::arescue_dsp_w),state));
 
 	state->m_dual_pcb_comms = auto_alloc_array(machine, UINT16, 0x1000/2);
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x810000, 0x810fff, FUNC(dual_pcb_comms_r), FUNC(dual_pcb_comms_w));
@@ -4068,8 +4068,9 @@ static DRIVER_INIT( arabfgt )
 	segas32_common_init(machine, extra_custom_io_r, NULL);
 
 	/* install protection handlers */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xa00100, 0xa0011f, FUNC(arf_wakeup_protection_r));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xa00000, 0xa00fff, FUNC(arabfgt_protection_r), FUNC(arabfgt_protection_w));
+	segas32_state *state = machine.driver_data<segas32_state>();
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xa00100, 0xa0011f, read16_delegate(FUNC(segas32_state::arf_wakeup_protection_r),state));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xa00000, 0xa00fff, read16_delegate(FUNC(segas32_state::arabfgt_protection_r),state), write16_delegate(FUNC(segas32_state::arabfgt_protection_w),state));
 }
 
 
@@ -4080,8 +4081,8 @@ static DRIVER_INIT( brival )
 
 	/* install protection handlers */
 	state->m_system32_protram = auto_alloc_array(machine, UINT16, 0x1000/2);
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x20ba00, 0x20ba07, FUNC(brival_protection_r));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xa00000, 0xa00fff, FUNC(brival_protection_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x20ba00, 0x20ba07, read16_delegate(FUNC(segas32_state::brival_protection_r),state));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xa00000, 0xa00fff, write16_delegate(FUNC(segas32_state::brival_protection_w),state));
 }
 
 
@@ -4091,7 +4092,7 @@ static DRIVER_INIT( darkedge )
 	segas32_common_init(machine, extra_custom_io_r, NULL);
 
 	/* install protection handlers */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xa00000, 0xa7ffff, FUNC(darkedge_protection_r), FUNC(darkedge_protection_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xa00000, 0xa7ffff, read16_delegate(FUNC(segas32_state::darkedge_protection_r),state), write16_delegate(FUNC(segas32_state::darkedge_protection_w),state));
 	state->m_system32_prot_vblank = darkedge_fd1149_vblank;
 }
 
@@ -4100,7 +4101,8 @@ static DRIVER_INIT( dbzvrvs )
 	segas32_common_init(machine, NULL, NULL);
 
 	/* install protection handlers */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xa00000, 0xa7ffff, FUNC(dbzvrvs_protection_r), FUNC(dbzvrvs_protection_w));
+	segas32_state *state = machine.driver_data<segas32_state>();	
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xa00000, 0xa7ffff, read16_delegate(FUNC(segas32_state::dbzvrvs_protection_r),state), write16_delegate(FUNC(segas32_state::dbzvrvs_protection_w),state));
 }
 
 static WRITE16_HANDLER( f1en_comms_echo_w )
@@ -4138,7 +4140,8 @@ static DRIVER_INIT( ga2 )
 	segas32_common_init(machine, extra_custom_io_r, NULL);
 
 	decrypt_ga2_protrom(machine);
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xa00000, 0xa00fff, FUNC(ga2_dpram_r), FUNC(ga2_dpram_w));
+	segas32_state *state = machine.driver_data<segas32_state>();	
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xa00000, 0xa00fff, read16_delegate(FUNC(segas32_state::ga2_dpram_r),state), write16_delegate(FUNC(segas32_state::ga2_dpram_w),state));
 }
 
 
@@ -4223,7 +4226,8 @@ static DRIVER_INIT( sonic )
 	segas32_common_init(machine, sonic_custom_io_r, sonic_custom_io_w);
 
 	/* install protection handlers */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x20E5C4, 0x20E5C5, FUNC(sonic_level_load_protection));
+	segas32_state *state = machine.driver_data<segas32_state>();	
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x20E5C4, 0x20E5C5, write16_delegate(FUNC(segas32_state::sonic_level_load_protection),state));
 }
 
 
@@ -4248,7 +4252,8 @@ static DRIVER_INIT( svf )
 static DRIVER_INIT( jleague )
 {
 	segas32_common_init(machine, NULL, NULL);
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x20F700, 0x20F705, FUNC(jleague_protection_w));
+	segas32_state *state = machine.driver_data<segas32_state>();
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x20F700, 0x20F705, write16_delegate(FUNC(segas32_state::jleague_protection_w),state));
 }
 
 

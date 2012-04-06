@@ -72,17 +72,19 @@ public:
 	DECLARE_READ16_MEMBER(twrldc94_prot_reg_r);
 	DECLARE_READ16_MEMBER(vbl_toggle_r);
 	DECLARE_WRITE16_MEMBER(vbl_toggle_w);
+	DECLARE_WRITE16_MEMBER(VS920A_0_vram_w);
+	DECLARE_WRITE16_MEMBER(VS920A_1_vram_w);
+	DECLARE_WRITE16_MEMBER(MB60553_0_regs_w);
+	DECLARE_WRITE16_MEMBER(MB60553_1_regs_w);
+	DECLARE_WRITE16_MEMBER(MB60553_0_vram_w);
+	DECLARE_WRITE16_MEMBER(MB60553_1_vram_w);
+	DECLARE_WRITE16_MEMBER(gsx_videoram3_w);
+	void MB60553_reg_written(int numchip, int num_reg);
 };
 
 
 /*----------- defined in video/gstriker.c -----------*/
 
-WRITE16_HANDLER( VS920A_0_vram_w );
-WRITE16_HANDLER( VS920A_1_vram_w );
-WRITE16_HANDLER( MB60553_0_regs_w );
-WRITE16_HANDLER( MB60553_1_regs_w );
-WRITE16_HANDLER( MB60553_0_vram_w );
-WRITE16_HANDLER( MB60553_1_vram_w );
 
 SCREEN_UPDATE_IND16( gstriker );
 VIDEO_START( gstriker );

@@ -191,48 +191,43 @@ VIDEO_START( mrdo )
 
 ***************************************************************************/
 
-WRITE8_HANDLER( mrdo_bgvideoram_w )
+WRITE8_MEMBER(mrdo_state::mrdo_bgvideoram_w)
 {
-	mrdo_state *state = space->machine().driver_data<mrdo_state>();
-	state->m_bgvideoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
+	m_bgvideoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_HANDLER( mrdo_fgvideoram_w )
+WRITE8_MEMBER(mrdo_state::mrdo_fgvideoram_w)
 {
-	mrdo_state *state = space->machine().driver_data<mrdo_state>();
-	state->m_fgvideoram[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
+	m_fgvideoram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
 
-WRITE8_HANDLER( mrdo_scrollx_w )
+WRITE8_MEMBER(mrdo_state::mrdo_scrollx_w)
 {
-	mrdo_state *state = space->machine().driver_data<mrdo_state>();
-	state->m_bg_tilemap->set_scrollx(0, data);
+	m_bg_tilemap->set_scrollx(0, data);
 }
 
-WRITE8_HANDLER( mrdo_scrolly_w )
+WRITE8_MEMBER(mrdo_state::mrdo_scrolly_w)
 {
-	mrdo_state *state = space->machine().driver_data<mrdo_state>();
 
 	/* This is NOT affected by flipscreen (so stop it happening) */
-	if (state->m_flipscreen)
-		state->m_bg_tilemap->set_scrolly(0,((256 - data) & 0xff));
+	if (m_flipscreen)
+		m_bg_tilemap->set_scrolly(0,((256 - data) & 0xff));
 	else
-		state->m_bg_tilemap->set_scrolly(0, data);
+		m_bg_tilemap->set_scrolly(0, data);
 }
 
 
-WRITE8_HANDLER( mrdo_flipscreen_w )
+WRITE8_MEMBER(mrdo_state::mrdo_flipscreen_w)
 {
-	mrdo_state *state = space->machine().driver_data<mrdo_state>();
 
 	/* bits 1-3 control the playfield priority, but they are not used by */
 	/* Mr. Do! so we don't emulate them */
 
-	state->m_flipscreen = data & 0x01;
-	space->machine().tilemap().set_flip_all(state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	m_flipscreen = data & 0x01;
+	machine().tilemap().set_flip_all(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 }
 
 

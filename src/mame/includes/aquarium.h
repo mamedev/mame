@@ -32,14 +32,14 @@ public:
 	DECLARE_WRITE8_MEMBER(aquarium_z80_bank_w);
 	DECLARE_READ8_MEMBER(aquarium_oki_r);
 	DECLARE_WRITE8_MEMBER(aquarium_oki_w);
+	DECLARE_WRITE16_MEMBER(aquarium_txt_videoram_w);
+	DECLARE_WRITE16_MEMBER(aquarium_mid_videoram_w);
+	DECLARE_WRITE16_MEMBER(aquarium_bak_videoram_w);
 };
 
 
 /*----------- defined in video/aquarium.c -----------*/
 
-WRITE16_HANDLER( aquarium_txt_videoram_w );
-WRITE16_HANDLER( aquarium_mid_videoram_w );
-WRITE16_HANDLER( aquarium_bak_videoram_w );
 
 VIDEO_START(aquarium);
 SCREEN_UPDATE_IND16(aquarium);

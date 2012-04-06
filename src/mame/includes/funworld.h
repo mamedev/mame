@@ -9,13 +9,13 @@ public:
 	tilemap_t *m_bg_tilemap;
 	DECLARE_READ8_MEMBER(questions_r);
 	DECLARE_WRITE8_MEMBER(question_bank_w);
+	DECLARE_WRITE8_MEMBER(funworld_videoram_w);
+	DECLARE_WRITE8_MEMBER(funworld_colorram_w);
 };
 
 
 /*----------- defined in video/funworld.c -----------*/
 
-WRITE8_HANDLER( funworld_videoram_w );
-WRITE8_HANDLER( funworld_colorram_w );
 PALETTE_INIT( funworld );
 VIDEO_START( funworld );
 VIDEO_START( magicrd2 );

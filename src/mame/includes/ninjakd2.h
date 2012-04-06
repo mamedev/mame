@@ -34,28 +34,28 @@ public:
 	DECLARE_WRITE8_MEMBER(ninjakd2_pcm_play_w);
 	DECLARE_READ8_MEMBER(omegaf_io_protection_r);
 	DECLARE_WRITE8_MEMBER(omegaf_io_protection_w);
+	DECLARE_WRITE8_MEMBER(ninjakd2_bgvideoram_w);
+	DECLARE_WRITE8_MEMBER(ninjakd2_fgvideoram_w);
+	DECLARE_WRITE8_MEMBER(robokid_bg0_bank_w);
+	DECLARE_WRITE8_MEMBER(robokid_bg1_bank_w);
+	DECLARE_WRITE8_MEMBER(robokid_bg2_bank_w);
+	DECLARE_READ8_MEMBER(robokid_bg0_videoram_r);
+	DECLARE_READ8_MEMBER(robokid_bg1_videoram_r);
+	DECLARE_READ8_MEMBER(robokid_bg2_videoram_r);
+	DECLARE_WRITE8_MEMBER(robokid_bg0_videoram_w);
+	DECLARE_WRITE8_MEMBER(robokid_bg1_videoram_w);
+	DECLARE_WRITE8_MEMBER(robokid_bg2_videoram_w);
+	DECLARE_WRITE8_MEMBER(ninjakd2_bg_ctrl_w);
+	DECLARE_WRITE8_MEMBER(robokid_bg0_ctrl_w);
+	DECLARE_WRITE8_MEMBER(robokid_bg1_ctrl_w);
+	DECLARE_WRITE8_MEMBER(robokid_bg2_ctrl_w);
+	DECLARE_WRITE8_MEMBER(ninjakd2_sprite_overdraw_w);
 };
 
 
 /*----------- defined in video/ninjakd2.c -----------*/
 
-extern WRITE8_HANDLER( ninjakd2_bgvideoram_w );
-extern WRITE8_HANDLER( ninjakd2_fgvideoram_w );
-extern WRITE8_HANDLER( ninjakd2_bg_ctrl_w );
-extern WRITE8_HANDLER( ninjakd2_sprite_overdraw_w );
 
-extern READ8_HANDLER( robokid_bg0_videoram_r );
-extern READ8_HANDLER( robokid_bg1_videoram_r );
-extern READ8_HANDLER( robokid_bg2_videoram_r );
-extern WRITE8_HANDLER( robokid_bg0_videoram_w );
-extern WRITE8_HANDLER( robokid_bg1_videoram_w );
-extern WRITE8_HANDLER( robokid_bg2_videoram_w );
-extern WRITE8_HANDLER( robokid_bg0_ctrl_w );
-extern WRITE8_HANDLER( robokid_bg1_ctrl_w );
-extern WRITE8_HANDLER( robokid_bg2_ctrl_w );
-extern WRITE8_HANDLER( robokid_bg0_bank_w );
-extern WRITE8_HANDLER( robokid_bg1_bank_w );
-extern WRITE8_HANDLER( robokid_bg2_bank_w );
 
 extern VIDEO_START( ninjakd2 );
 extern VIDEO_START( mnight );

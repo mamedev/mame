@@ -39,6 +39,10 @@ public:
 	DECLARE_READ8_MEMBER(vert_pos_r);
 	DECLARE_READ8_MEMBER(horiz_pos_r);
 	DECLARE_WRITE8_MEMBER(stactics_coin_lockout_w);
+	DECLARE_WRITE8_MEMBER(stactics_scroll_ram_w);
+	DECLARE_WRITE8_MEMBER(stactics_speed_latch_w);
+	DECLARE_WRITE8_MEMBER(stactics_shot_trigger_w);
+	DECLARE_WRITE8_MEMBER(stactics_shot_flag_clear_w);
 };
 
 
@@ -46,10 +50,6 @@ public:
 
 MACHINE_CONFIG_EXTERN( stactics_video );
 
-WRITE8_HANDLER( stactics_scroll_ram_w );
-WRITE8_HANDLER( stactics_speed_latch_w );
-WRITE8_HANDLER( stactics_shot_trigger_w );
-WRITE8_HANDLER( stactics_shot_flag_clear_w );
 CUSTOM_INPUT( stactics_get_frame_count_d3 );
 CUSTOM_INPUT( stactics_get_shot_standby );
 CUSTOM_INPUT( stactics_get_not_shot_arrive );

@@ -66,29 +66,29 @@ public:
 	UINT8 m_video_changed;
 	emu_timer *m_scanline_timer;
 	midvunit_renderer *m_poly;
+	DECLARE_WRITE32_MEMBER(midvunit_dma_queue_w);
+	DECLARE_READ32_MEMBER(midvunit_dma_queue_entries_r);
+	DECLARE_READ32_MEMBER(midvunit_dma_trigger_r);
+	DECLARE_WRITE32_MEMBER(midvunit_page_control_w);
+	DECLARE_READ32_MEMBER(midvunit_page_control_r);
+	DECLARE_WRITE32_MEMBER(midvunit_video_control_w);
+	DECLARE_READ32_MEMBER(midvunit_scanline_r);
+	DECLARE_WRITE32_MEMBER(midvunit_videoram_w);
+	DECLARE_READ32_MEMBER(midvunit_videoram_r);
+	DECLARE_WRITE32_MEMBER(midvunit_paletteram_w);
+	DECLARE_WRITE32_MEMBER(midvunit_textureram_w);
+	DECLARE_READ32_MEMBER(midvunit_textureram_r);
 };
 
 
 
 /*----------- defined in video/midvunit.c -----------*/
 
-WRITE32_HANDLER( midvunit_dma_queue_w );
-READ32_HANDLER( midvunit_dma_queue_entries_r );
-READ32_HANDLER( midvunit_dma_trigger_r );
 
-WRITE32_HANDLER( midvunit_page_control_w );
-READ32_HANDLER( midvunit_page_control_r );
 
-WRITE32_HANDLER( midvunit_video_control_w );
-READ32_HANDLER( midvunit_scanline_r );
 
-WRITE32_HANDLER( midvunit_videoram_w );
-READ32_HANDLER( midvunit_videoram_r );
 
-WRITE32_HANDLER( midvunit_paletteram_w );
 
-WRITE32_HANDLER( midvunit_textureram_w );
-READ32_HANDLER( midvunit_textureram_r );
 
 VIDEO_START( midvunit );
 SCREEN_UPDATE_IND16( midvunit );

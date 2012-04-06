@@ -178,15 +178,15 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, tankbust_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x9fff) AM_ROMBANK("bank1")
 	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK("bank2")
-	AM_RANGE(0xc000, 0xc7ff) AM_READWRITE_LEGACY(tankbust_background_videoram_r, tankbust_background_videoram_w) AM_BASE(m_videoram)
-	AM_RANGE(0xc800, 0xcfff) AM_READWRITE_LEGACY(tankbust_background_colorram_r, tankbust_background_colorram_w) AM_BASE(m_colorram)
-	AM_RANGE(0xd000, 0xd7ff) AM_READWRITE_LEGACY(tankbust_txtram_r, tankbust_txtram_w) AM_BASE(m_txtram)
+	AM_RANGE(0xc000, 0xc7ff) AM_READWRITE(tankbust_background_videoram_r, tankbust_background_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0xc800, 0xcfff) AM_READWRITE(tankbust_background_colorram_r, tankbust_background_colorram_w) AM_BASE(m_colorram)
+	AM_RANGE(0xd000, 0xd7ff) AM_READWRITE(tankbust_txtram_r, tankbust_txtram_w) AM_BASE(m_txtram)
 	AM_RANGE(0xd800, 0xd8ff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
 	AM_RANGE(0xe000, 0xe007) AM_READWRITE(debug_output_area_r, tankbust_e0xx_w)
-	AM_RANGE(0xe800, 0xe800) AM_READ_PORT("INPUTS") AM_WRITE_LEGACY(tankbust_yscroll_w)
+	AM_RANGE(0xe800, 0xe800) AM_READ_PORT("INPUTS") AM_WRITE(tankbust_yscroll_w)
 	AM_RANGE(0xe801, 0xe801) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xe802, 0xe802) AM_READ_PORT("DSW")
-	AM_RANGE(0xe801, 0xe802) AM_WRITE_LEGACY(tankbust_xscroll_w)
+	AM_RANGE(0xe801, 0xe802) AM_WRITE(tankbust_xscroll_w)
 	AM_RANGE(0xe803, 0xe803) AM_READWRITE(some_changing_input, tankbust_soundlatch_w)	/*unknown. Game expects this to change so this is not player input */
 	AM_RANGE(0xe804, 0xe804) AM_WRITENOP	/* watchdog ? ; written in long-lasting loops */
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM

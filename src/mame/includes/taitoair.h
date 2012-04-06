@@ -64,6 +64,15 @@ public:
 	DECLARE_READ16_MEMBER(stick_input_r);
 	DECLARE_READ16_MEMBER(stick2_input_r);
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
+	DECLARE_WRITE16_MEMBER(dsp_flags_w);
+	DECLARE_WRITE16_MEMBER(dsp_x_eyecoord_w);
+	DECLARE_WRITE16_MEMBER(dsp_y_eyecoord_w);
+	DECLARE_WRITE16_MEMBER(dsp_z_eyecoord_w);
+	DECLARE_WRITE16_MEMBER(dsp_frustum_left_w);
+	DECLARE_WRITE16_MEMBER(dsp_frustum_bottom_w);
+	DECLARE_WRITE16_MEMBER(dsp_rasterize_w);
+	DECLARE_READ16_MEMBER(dsp_x_return_r);
+	DECLARE_READ16_MEMBER(dsp_y_return_r);
 };
 
 
@@ -72,13 +81,4 @@ public:
 SCREEN_UPDATE_IND16( taitoair );
 VIDEO_START( taitoair );
 
-WRITE16_HANDLER( dsp_flags_w );
-WRITE16_HANDLER( dsp_x_eyecoord_w );
-WRITE16_HANDLER( dsp_y_eyecoord_w );
-WRITE16_HANDLER( dsp_z_eyecoord_w );
-WRITE16_HANDLER( dsp_rasterize_w );
-WRITE16_HANDLER( dsp_frustum_left_w );
-WRITE16_HANDLER( dsp_frustum_bottom_w );
-READ16_HANDLER( dsp_x_return_r );
-READ16_HANDLER( dsp_y_return_r );
 

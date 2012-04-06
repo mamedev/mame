@@ -24,6 +24,13 @@ public:
 	DECLARE_WRITE8_MEMBER(sound_data_w);
 	DECLARE_WRITE8_MEMBER(sound_irq_ack_w);
 	DECLARE_WRITE8_MEMBER(coin_lock_w);
+	DECLARE_WRITE8_MEMBER(suprridr_flipx_w);
+	DECLARE_WRITE8_MEMBER(suprridr_flipy_w);
+	DECLARE_WRITE8_MEMBER(suprridr_fgdisable_w);
+	DECLARE_WRITE8_MEMBER(suprridr_fgscrolly_w);
+	DECLARE_WRITE8_MEMBER(suprridr_bgscrolly_w);
+	DECLARE_WRITE8_MEMBER(suprridr_bgram_w);
+	DECLARE_WRITE8_MEMBER(suprridr_fgram_w);
 };
 
 
@@ -32,14 +39,7 @@ public:
 VIDEO_START( suprridr );
 PALETTE_INIT( suprridr );
 
-WRITE8_HANDLER( suprridr_flipx_w );
-WRITE8_HANDLER( suprridr_flipy_w );
-WRITE8_HANDLER( suprridr_fgdisable_w );
-WRITE8_HANDLER( suprridr_fgscrolly_w );
-WRITE8_HANDLER( suprridr_bgscrolly_w );
 int suprridr_is_screen_flipped(running_machine &machine);
 
-WRITE8_HANDLER( suprridr_fgram_w );
-WRITE8_HANDLER( suprridr_bgram_w );
 
 SCREEN_UPDATE_IND16( suprridr );

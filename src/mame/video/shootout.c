@@ -66,20 +66,18 @@ static TILE_GET_INFO( get_fg_tile_info )
 			0);
 }
 
-WRITE8_HANDLER( shootout_videoram_w )
+WRITE8_MEMBER(shootout_state::shootout_videoram_w)
 {
-	shootout_state *state = space->machine().driver_data<shootout_state>();
 
-	state->m_videoram[offset] = data;
-	state->m_background->mark_tile_dirty(offset&0x3ff );
+	m_videoram[offset] = data;
+	m_background->mark_tile_dirty(offset&0x3ff );
 }
 
-WRITE8_HANDLER( shootout_textram_w )
+WRITE8_MEMBER(shootout_state::shootout_textram_w)
 {
-	shootout_state *state = space->machine().driver_data<shootout_state>();
 
-	state->m_textram[offset] = data;
-	state->m_foreground->mark_tile_dirty(offset&0x3ff );
+	m_textram[offset] = data;
+	m_foreground->mark_tile_dirty(offset&0x3ff );
 }
 
 VIDEO_START( shootout )

@@ -434,8 +434,8 @@ static ADDRESS_MAP_START( dfeveron_map, AS_PROGRAM, 16, cave_state )
 	AM_RANGE(0x300000, 0x300003) AM_DEVREADWRITE8_LEGACY("ymz", ymz280b_r, ymz280b_w, 0x00ff)					// YMZ280
 /**/AM_RANGE(0x400000, 0x407fff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)		// Sprites
 /**/AM_RANGE(0x408000, 0x40ffff) AM_RAM AM_BASE(m_spriteram_2)							// Sprites?
-/**/AM_RANGE(0x500000, 0x507fff) AM_RAM_WRITE_LEGACY(cave_vram_0_w) AM_BASE(m_vram[0])			// Layer 0
-/**/AM_RANGE(0x600000, 0x607fff) AM_RAM_WRITE_LEGACY(cave_vram_1_w) AM_BASE(m_vram[1])			// Layer 1
+/**/AM_RANGE(0x500000, 0x507fff) AM_RAM_WRITE(cave_vram_0_w) AM_BASE(m_vram[0])			// Layer 0
+/**/AM_RANGE(0x600000, 0x607fff) AM_RAM_WRITE(cave_vram_1_w) AM_BASE(m_vram[1])			// Layer 1
 /**/AM_RANGE(0x708000, 0x708fff) AM_RAM AM_BASE_SIZE(m_paletteram, m_paletteram_size)	// Palette
 /**/AM_RANGE(0x710000, 0x710bff) AM_READONLY															// ?
 	AM_RANGE(0x710c00, 0x710fff) AM_RAM																	// ?
@@ -459,9 +459,9 @@ static ADDRESS_MAP_START( ddonpach_map, AS_PROGRAM, 16, cave_state )
 	AM_RANGE(0x300000, 0x300003) AM_DEVREADWRITE8_LEGACY("ymz", ymz280b_r, ymz280b_w, 0x00ff)					// YMZ280
 /**/AM_RANGE(0x400000, 0x407fff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)		// Sprites
 /**/AM_RANGE(0x408000, 0x40ffff) AM_RAM AM_BASE(m_spriteram_2)							// Sprites?
-/**/AM_RANGE(0x500000, 0x507fff) AM_RAM_WRITE_LEGACY(cave_vram_0_w) AM_BASE(m_vram[0])			// Layer 0
-/**/AM_RANGE(0x600000, 0x607fff) AM_RAM_WRITE_LEGACY(cave_vram_1_w) AM_BASE(m_vram[1])			// Layer 1
-/**/AM_RANGE(0x700000, 0x70ffff) AM_RAM_WRITE_LEGACY(cave_vram_2_8x8_w) AM_BASE(m_vram[2])		// Layer 2
+/**/AM_RANGE(0x500000, 0x507fff) AM_RAM_WRITE(cave_vram_0_w) AM_BASE(m_vram[0])			// Layer 0
+/**/AM_RANGE(0x600000, 0x607fff) AM_RAM_WRITE(cave_vram_1_w) AM_BASE(m_vram[1])			// Layer 1
+/**/AM_RANGE(0x700000, 0x70ffff) AM_RAM_WRITE(cave_vram_2_8x8_w) AM_BASE(m_vram[2])		// Layer 2
 	AM_RANGE(0x800000, 0x800007) AM_READ(cave_irq_cause_r)												// IRQ Cause
 	AM_RANGE(0x800000, 0x80007f) AM_WRITEONLY AM_BASE(m_videoregs)						// Video Regs
 /**/AM_RANGE(0x900000, 0x900005) AM_RAM AM_BASE(m_vctrl[0])								// Layer 0 Control
@@ -506,9 +506,9 @@ WRITE16_MEMBER(cave_state::donpachi_videoregs_w)
 static ADDRESS_MAP_START( donpachi_map, AS_PROGRAM, 16, cave_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM																		// ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM																		// RAM
-	AM_RANGE(0x200000, 0x207fff) AM_RAM_WRITE_LEGACY(cave_vram_1_w) AM_BASE(m_vram[1])				// Layer 1
-	AM_RANGE(0x300000, 0x307fff) AM_RAM_WRITE_LEGACY(cave_vram_0_w) AM_BASE(m_vram[0])				// Layer 0
-	AM_RANGE(0x400000, 0x407fff) AM_RAM_WRITE_LEGACY(cave_vram_2_8x8_w) AM_BASE(m_vram[2])			// Layer 2
+	AM_RANGE(0x200000, 0x207fff) AM_RAM_WRITE(cave_vram_1_w) AM_BASE(m_vram[1])				// Layer 1
+	AM_RANGE(0x300000, 0x307fff) AM_RAM_WRITE(cave_vram_0_w) AM_BASE(m_vram[0])				// Layer 0
+	AM_RANGE(0x400000, 0x407fff) AM_RAM_WRITE(cave_vram_2_8x8_w) AM_BASE(m_vram[2])			// Layer 2
 	AM_RANGE(0x500000, 0x507fff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)			// Sprites
 	AM_RANGE(0x508000, 0x50ffff) AM_RAM AM_BASE(m_spriteram_2)								// Sprites?
 /**/AM_RANGE(0x600000, 0x600005) AM_RAM AM_BASE(m_vctrl[1])									// Layer 1 Control
@@ -535,9 +535,9 @@ static ADDRESS_MAP_START( esprade_map, AS_PROGRAM, 16, cave_state )
 	AM_RANGE(0x300000, 0x300003) AM_DEVREADWRITE8_LEGACY("ymz", ymz280b_r, ymz280b_w, 0x00ff)					// YMZ280
 /**/AM_RANGE(0x400000, 0x407fff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)		// Sprites
 /**/AM_RANGE(0x408000, 0x40ffff) AM_RAM AM_BASE(m_spriteram_2)							// Sprites?
-/**/AM_RANGE(0x500000, 0x507fff) AM_RAM_WRITE_LEGACY(cave_vram_0_w) AM_BASE(m_vram[0])			// Layer 0
-/**/AM_RANGE(0x600000, 0x607fff) AM_RAM_WRITE_LEGACY(cave_vram_1_w) AM_BASE(m_vram[1])			// Layer 1
-/**/AM_RANGE(0x700000, 0x707fff) AM_RAM_WRITE_LEGACY(cave_vram_2_w) AM_BASE(m_vram[2])			// Layer 2
+/**/AM_RANGE(0x500000, 0x507fff) AM_RAM_WRITE(cave_vram_0_w) AM_BASE(m_vram[0])			// Layer 0
+/**/AM_RANGE(0x600000, 0x607fff) AM_RAM_WRITE(cave_vram_1_w) AM_BASE(m_vram[1])			// Layer 1
+/**/AM_RANGE(0x700000, 0x707fff) AM_RAM_WRITE(cave_vram_2_w) AM_BASE(m_vram[2])			// Layer 2
 	AM_RANGE(0x800000, 0x800007) AM_READ(cave_irq_cause_r)												// IRQ Cause
 	AM_RANGE(0x800000, 0x80007f) AM_WRITEONLY AM_BASE(m_videoregs)						// Video Regs
 /**/AM_RANGE(0x900000, 0x900005) AM_RAM AM_BASE(m_vctrl[0])								// Layer 0 Control
@@ -560,11 +560,11 @@ static ADDRESS_MAP_START( gaia_map, AS_PROGRAM, 16, cave_state )
 	AM_RANGE(0x300000, 0x300003) AM_DEVREADWRITE8_LEGACY("ymz", ymz280b_r, ymz280b_w, 0x00ff)					// YMZ280
 	AM_RANGE(0x400000, 0x407fff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)		// Sprite bank 1
 	AM_RANGE(0x408000, 0x40ffff) AM_RAM AM_BASE(m_spriteram_2)							// Sprite bank 2
-	AM_RANGE(0x500000, 0x507fff) AM_RAM_WRITE_LEGACY(cave_vram_0_w) AM_BASE(m_vram[0])			// Layer 0
+	AM_RANGE(0x500000, 0x507fff) AM_RAM_WRITE(cave_vram_0_w) AM_BASE(m_vram[0])			// Layer 0
 	AM_RANGE(0x508000, 0x50ffff) AM_RAM																	// More Layer 0, Tested but not used?
-	AM_RANGE(0x600000, 0x607fff) AM_RAM_WRITE_LEGACY(cave_vram_1_w) AM_BASE(m_vram[1])			// Layer 1
+	AM_RANGE(0x600000, 0x607fff) AM_RAM_WRITE(cave_vram_1_w) AM_BASE(m_vram[1])			// Layer 1
 	AM_RANGE(0x608000, 0x60ffff) AM_RAM																	// More Layer 1, Tested but not used?
-	AM_RANGE(0x700000, 0x707fff) AM_RAM_WRITE_LEGACY(cave_vram_2_w) AM_BASE(m_vram[2])			// Layer 2
+	AM_RANGE(0x700000, 0x707fff) AM_RAM_WRITE(cave_vram_2_w) AM_BASE(m_vram[2])			// Layer 2
 	AM_RANGE(0x708000, 0x70ffff) AM_RAM																	// More Layer 2, Tested but not used?
 	AM_RANGE(0x800000, 0x800007) AM_READ(cave_irq_cause_r)												// IRQ Cause
 	AM_RANGE(0x800000, 0x80007f) AM_WRITEONLY AM_BASE(m_videoregs)						// Video Regs
@@ -591,9 +591,9 @@ static ADDRESS_MAP_START( guwange_map, AS_PROGRAM, 16, cave_state )
 	AM_RANGE(0x300000, 0x30007f) AM_WRITEONLY AM_BASE(m_videoregs)						// Video Regs
 /**/AM_RANGE(0x400000, 0x407fff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)		// Sprites
 /**/AM_RANGE(0x408000, 0x40ffff) AM_RAM AM_BASE(m_spriteram_2)							// Sprites?
-/**/AM_RANGE(0x500000, 0x507fff) AM_RAM_WRITE_LEGACY(cave_vram_0_w) AM_BASE(m_vram[0])			// Layer 0
-/**/AM_RANGE(0x600000, 0x607fff) AM_RAM_WRITE_LEGACY(cave_vram_1_w) AM_BASE(m_vram[1])			// Layer 1
-/**/AM_RANGE(0x700000, 0x707fff) AM_RAM_WRITE_LEGACY(cave_vram_2_w) AM_BASE(m_vram[2])			// Layer 2
+/**/AM_RANGE(0x500000, 0x507fff) AM_RAM_WRITE(cave_vram_0_w) AM_BASE(m_vram[0])			// Layer 0
+/**/AM_RANGE(0x600000, 0x607fff) AM_RAM_WRITE(cave_vram_1_w) AM_BASE(m_vram[1])			// Layer 1
+/**/AM_RANGE(0x700000, 0x707fff) AM_RAM_WRITE(cave_vram_2_w) AM_BASE(m_vram[2])			// Layer 2
 	AM_RANGE(0x800000, 0x800003) AM_DEVREADWRITE8_LEGACY("ymz", ymz280b_r, ymz280b_w, 0x00ff)					// YMZ280
 /**/AM_RANGE(0x900000, 0x900005) AM_RAM AM_BASE(m_vctrl[0])								// Layer 0 Control
 /**/AM_RANGE(0xa00000, 0xa00005) AM_RAM AM_BASE(m_vctrl[1])								// Layer 1 Control
@@ -615,9 +615,9 @@ static ADDRESS_MAP_START( hotdogst_map, AS_PROGRAM, 16, cave_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM																	// ROM
 	AM_RANGE(0x300000, 0x30ffff) AM_RAM																	// RAM
 /**/AM_RANGE(0x408000, 0x408fff) AM_RAM AM_BASE_SIZE(m_paletteram, m_paletteram_size)	// Palette
-/**/AM_RANGE(0x880000, 0x887fff) AM_RAM_WRITE_LEGACY(cave_vram_0_w) AM_BASE(m_vram[0])			// Layer 0
-/**/AM_RANGE(0x900000, 0x907fff) AM_RAM_WRITE_LEGACY(cave_vram_1_w) AM_BASE(m_vram[1])			// Layer 1
-/**/AM_RANGE(0x980000, 0x987fff) AM_RAM_WRITE_LEGACY(cave_vram_2_w) AM_BASE(m_vram[2])			// Layer 2
+/**/AM_RANGE(0x880000, 0x887fff) AM_RAM_WRITE(cave_vram_0_w) AM_BASE(m_vram[0])			// Layer 0
+/**/AM_RANGE(0x900000, 0x907fff) AM_RAM_WRITE(cave_vram_1_w) AM_BASE(m_vram[1])			// Layer 1
+/**/AM_RANGE(0x980000, 0x987fff) AM_RAM_WRITE(cave_vram_2_w) AM_BASE(m_vram[2])			// Layer 2
 	AM_RANGE(0xa80000, 0xa80007) AM_READ(cave_irq_cause_r)												// IRQ Cause
 //  AM_RANGE(0xa8006e, 0xa8006f) AM_READ(soundlatch_ack_r)                                              // From Sound CPU
 	AM_RANGE(0xa8006e, 0xa8006f) AM_WRITE(sound_cmd_w)													// To Sound CPU
@@ -705,7 +705,7 @@ static CUSTOM_INPUT( korokoro_hopper_r )
 
 static ADDRESS_MAP_START( korokoro_map, AS_PROGRAM, 16, cave_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM																		// ROM
-	AM_RANGE(0x100000, 0x107fff) AM_WRITE_LEGACY(cave_vram_0_w) AM_BASE(m_vram[0])					// Layer 0
+	AM_RANGE(0x100000, 0x107fff) AM_WRITE(cave_vram_0_w) AM_BASE(m_vram[0])					// Layer 0
 	AM_RANGE(0x140000, 0x140005) AM_WRITEONLY AM_BASE(m_vctrl[0])							// Layer 0 Control
 	AM_RANGE(0x180000, 0x187fff) AM_WRITEONLY AM_BASE_SIZE(m_spriteram, m_spriteram_size)	// Sprites
 	AM_RANGE(0x1c0000, 0x1c0007) AM_READ(cave_irq_cause_r)													// IRQ Cause
@@ -723,7 +723,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( crusherm_map, AS_PROGRAM, 16, cave_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM																		// ROM
-	AM_RANGE(0x100000, 0x107fff) AM_WRITE_LEGACY(cave_vram_0_w) AM_BASE(m_vram[0])					// Layer 0
+	AM_RANGE(0x100000, 0x107fff) AM_WRITE(cave_vram_0_w) AM_BASE(m_vram[0])					// Layer 0
 	AM_RANGE(0x140000, 0x140005) AM_WRITEONLY AM_BASE(m_vctrl[0])							// Layer 0 Control
 	AM_RANGE(0x180000, 0x187fff) AM_WRITEONLY AM_BASE_SIZE(m_spriteram, m_spriteram_size)	// Sprites
 	AM_RANGE(0x200000, 0x207fff) AM_WRITEONLY AM_BASE_SIZE(m_paletteram, m_paletteram_size)	// Palette
@@ -751,8 +751,8 @@ static ADDRESS_MAP_START( mazinger_map, AS_PROGRAM, 16, cave_state )
 	AM_RANGE(0x300068, 0x300069) AM_WRITE(watchdog_reset16_w)											// Watchdog
 	AM_RANGE(0x30006e, 0x30006f) AM_READWRITE(soundlatch_ack_r, sound_cmd_w)							// From Sound CPU
 	AM_RANGE(0x300000, 0x30007f) AM_WRITEONLY AM_BASE(m_videoregs)						// Video Regs
-	AM_RANGE(0x400000, 0x407fff) AM_RAM_WRITE_LEGACY(cave_vram_1_8x8_w) AM_BASE(m_vram[1])		// Layer 1
-/**/AM_RANGE(0x500000, 0x507fff) AM_RAM_WRITE_LEGACY(cave_vram_0_8x8_w) AM_BASE(m_vram[0])		// Layer 0
+	AM_RANGE(0x400000, 0x407fff) AM_RAM_WRITE(cave_vram_1_8x8_w) AM_BASE(m_vram[1])		// Layer 1
+/**/AM_RANGE(0x500000, 0x507fff) AM_RAM_WRITE(cave_vram_0_8x8_w) AM_BASE(m_vram[0])		// Layer 0
 /**/AM_RANGE(0x600000, 0x600005) AM_RAM AM_BASE(m_vctrl[1])								// Layer 1 Control
 /**/AM_RANGE(0x700000, 0x700005) AM_RAM AM_BASE(m_vctrl[0])								// Layer 0 Control
 	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("IN0")													// Inputs
@@ -773,11 +773,11 @@ static ADDRESS_MAP_START( metmqstr_map, AS_PROGRAM, 16, cave_state )
 	AM_RANGE(0x200000, 0x27ffff) AM_ROM																	// ROM
 	AM_RANGE(0x408000, 0x408fff) AM_RAM AM_BASE_SIZE(m_paletteram, m_paletteram_size)	// Palette
 	AM_RANGE(0x600000, 0x600001) AM_READ(watchdog_reset16_r)											// Watchdog?
-	AM_RANGE(0x880000, 0x887fff) AM_RAM_WRITE_LEGACY(cave_vram_2_w) AM_BASE(m_vram[2])			// Layer 2
+	AM_RANGE(0x880000, 0x887fff) AM_RAM_WRITE(cave_vram_2_w) AM_BASE(m_vram[2])			// Layer 2
 	AM_RANGE(0x888000, 0x88ffff) AM_RAM																	//
-	AM_RANGE(0x900000, 0x907fff) AM_RAM_WRITE_LEGACY(cave_vram_1_w) AM_BASE(m_vram[1])			// Layer 1
+	AM_RANGE(0x900000, 0x907fff) AM_RAM_WRITE(cave_vram_1_w) AM_BASE(m_vram[1])			// Layer 1
 	AM_RANGE(0x908000, 0x90ffff) AM_RAM																	//
-	AM_RANGE(0x980000, 0x987fff) AM_RAM_WRITE_LEGACY(cave_vram_0_w) AM_BASE(m_vram[0])			// Layer 0
+	AM_RANGE(0x980000, 0x987fff) AM_RAM_WRITE(cave_vram_0_w) AM_BASE(m_vram[0])			// Layer 0
 	AM_RANGE(0x988000, 0x98ffff) AM_RAM																	//
 	AM_RANGE(0xa80000, 0xa80007) AM_READ(cave_irq_cause_r)												// IRQ Cause
 	AM_RANGE(0xa80068, 0xa80069) AM_WRITE(watchdog_reset16_w)											// Watchdog?
@@ -834,10 +834,10 @@ static ADDRESS_MAP_START( pwrinst2_map, AS_PROGRAM, 16, cave_state )
 	AM_RANGE(0x500002, 0x500003) AM_READ_PORT("IN1")														//
 	AM_RANGE(0x600000, 0x6fffff) AM_ROM AM_REGION("user1", 0)												// extra data ROM space
 	AM_RANGE(0x700000, 0x700001) AM_DEVWRITE_LEGACY("eeprom", cave_eeprom_msb_w)									// EEPROM
-	AM_RANGE(0x800000, 0x807fff) AM_RAM_WRITE_LEGACY(cave_vram_2_w) AM_BASE(m_vram[2])				// Layer 2
-	AM_RANGE(0x880000, 0x887fff) AM_RAM_WRITE_LEGACY(cave_vram_0_w) AM_BASE(m_vram[0])				// Layer 0
-	AM_RANGE(0x900000, 0x907fff) AM_RAM_WRITE_LEGACY(cave_vram_1_w) AM_BASE(m_vram[1])				// Layer 1
-	AM_RANGE(0x980000, 0x987fff) AM_RAM_WRITE_LEGACY(cave_vram_3_8x8_w) AM_BASE(m_vram[3])			// Layer 3
+	AM_RANGE(0x800000, 0x807fff) AM_RAM_WRITE(cave_vram_2_w) AM_BASE(m_vram[2])				// Layer 2
+	AM_RANGE(0x880000, 0x887fff) AM_RAM_WRITE(cave_vram_0_w) AM_BASE(m_vram[0])				// Layer 0
+	AM_RANGE(0x900000, 0x907fff) AM_RAM_WRITE(cave_vram_1_w) AM_BASE(m_vram[1])				// Layer 1
+	AM_RANGE(0x980000, 0x987fff) AM_RAM_WRITE(cave_vram_3_8x8_w) AM_BASE(m_vram[3])			// Layer 3
 	AM_RANGE(0xa00000, 0xa07fff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)			// Sprites
 	AM_RANGE(0xa08000, 0xa0ffff) AM_RAM AM_BASE(m_spriteram_2)								// Sprites?
 	AM_RANGE(0xa10000, 0xa1ffff) AM_RAM																		// Sprites?
@@ -878,9 +878,9 @@ static ADDRESS_MAP_START( sailormn_map, AS_PROGRAM, 16, cave_state )
 	AM_RANGE(0x600000, 0x600001) AM_READ(sailormn_input0_r)												// Inputs + Watchdog!
 	AM_RANGE(0x600002, 0x600003) AM_READ_PORT("IN1")													// Inputs + EEPROM
 	AM_RANGE(0x700000, 0x700001) AM_DEVWRITE_LEGACY("eeprom", sailormn_eeprom_msb_w)							// EEPROM
-	AM_RANGE(0x800000, 0x807fff) AM_RAM_WRITE_LEGACY(cave_vram_0_w) AM_BASE(m_vram[0])			// Layer 0
-	AM_RANGE(0x880000, 0x887fff) AM_RAM_WRITE_LEGACY(cave_vram_1_w) AM_BASE(m_vram[1])			// Layer 1
-	AM_RANGE(0x900000, 0x907fff) AM_RAM_WRITE_LEGACY(cave_vram_2_w) AM_BASE(m_vram[2])			// Layer 2
+	AM_RANGE(0x800000, 0x807fff) AM_RAM_WRITE(cave_vram_0_w) AM_BASE(m_vram[0])			// Layer 0
+	AM_RANGE(0x880000, 0x887fff) AM_RAM_WRITE(cave_vram_1_w) AM_BASE(m_vram[1])			// Layer 1
+	AM_RANGE(0x900000, 0x907fff) AM_RAM_WRITE(cave_vram_2_w) AM_BASE(m_vram[2])			// Layer 2
 	AM_RANGE(0x908000, 0x908001) AM_RAM																	// (agallet)
 /**/AM_RANGE(0xa00000, 0xa00005) AM_RAM AM_BASE(m_vctrl[0])								// Layer 0 Control
 /**/AM_RANGE(0xa80000, 0xa80005) AM_RAM AM_BASE(m_vctrl[1])								// Layer 1 Control
@@ -944,8 +944,8 @@ static ADDRESS_MAP_START( tjumpman_map, AS_PROGRAM, 16, cave_state )
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM AM_SHARE("nvram")												// RAM
 	AM_RANGE(0x200000, 0x207fff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)		// Sprites
 	AM_RANGE(0x208000, 0x20ffff) AM_RAM AM_BASE(m_spriteram_2)							// Sprite bank 2
-	AM_RANGE(0x304000, 0x307fff) AM_WRITE_LEGACY(cave_vram_0_w)												// Layer 0 - 16x16 tiles mapped here
-	AM_RANGE(0x300000, 0x307fff) AM_RAM_WRITE_LEGACY(cave_vram_0_w) AM_BASE(m_vram[0])			// Layer 0
+	AM_RANGE(0x304000, 0x307fff) AM_WRITE(cave_vram_0_w)												// Layer 0 - 16x16 tiles mapped here
+	AM_RANGE(0x300000, 0x307fff) AM_RAM_WRITE(cave_vram_0_w) AM_BASE(m_vram[0])			// Layer 0
 	AM_RANGE(0x400000, 0x400005) AM_WRITEONLY AM_BASE(m_vctrl[0])						// Layer 0 Control
 	AM_RANGE(0x500000, 0x50ffff) AM_RAM AM_BASE_SIZE(m_paletteram, m_paletteram_size)	// Palette
 	AM_RANGE(0x600000, 0x600001) AM_READ_PORT("IN0")													// Inputs + EEPROM + Hopper
@@ -984,7 +984,7 @@ static ADDRESS_MAP_START( pacslot_map, AS_PROGRAM, 16, cave_state )
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM AM_SHARE("nvram")												// RAM
 	AM_RANGE(0x200000, 0x207fff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)		// Sprites
 	AM_RANGE(0x208000, 0x20ffff) AM_RAM AM_BASE(m_spriteram_2)							// Sprite bank 2
-	AM_RANGE(0x300000, 0x307fff) AM_RAM_WRITE_LEGACY(cave_vram_0_w) AM_BASE(m_vram[0])			// Layer 0
+	AM_RANGE(0x300000, 0x307fff) AM_RAM_WRITE(cave_vram_0_w) AM_BASE(m_vram[0])			// Layer 0
 	AM_RANGE(0x400000, 0x400007) AM_READ(cave_irq_cause_r)												// IRQ Cause
 	AM_RANGE(0x400068, 0x400069) AM_WRITE(watchdog_reset16_w)											// Watchdog
 	AM_RANGE(0x400000, 0x40007f) AM_WRITEONLY AM_BASE(m_videoregs)						// Video Regs
@@ -1008,7 +1008,7 @@ static ADDRESS_MAP_START( uopoko_map, AS_PROGRAM, 16, cave_state )
 	AM_RANGE(0x300000, 0x300003) AM_DEVREADWRITE8_LEGACY("ymz", ymz280b_r, ymz280b_w, 0x00ff)					// YMZ280
 /**/AM_RANGE(0x400000, 0x407fff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)		// Sprites
 /**/AM_RANGE(0x408000, 0x40ffff) AM_RAM AM_BASE(m_spriteram_2)							// Sprites?
-/**/AM_RANGE(0x500000, 0x507fff) AM_RAM_WRITE_LEGACY(cave_vram_0_w) AM_BASE(m_vram[0])			// Layer 0
+/**/AM_RANGE(0x500000, 0x507fff) AM_RAM_WRITE(cave_vram_0_w) AM_BASE(m_vram[0])			// Layer 0
 	AM_RANGE(0x600000, 0x600007) AM_READ(cave_irq_cause_r)												// IRQ Cause
 	AM_RANGE(0x600000, 0x60007f) AM_WRITEONLY AM_BASE(m_videoregs)						// Video Regs
 /**/AM_RANGE(0x700000, 0x700005) AM_RAM AM_BASE(m_vctrl[0])								// Layer 0 Control

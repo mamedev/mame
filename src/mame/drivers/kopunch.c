@@ -45,8 +45,8 @@ WRITE8_MEMBER(kopunch_state::kopunch_coin_w)
 static ADDRESS_MAP_START( kopunch_map, AS_PROGRAM, 8, kopunch_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
-	AM_RANGE(0x6000, 0x63ff) AM_RAM_WRITE_LEGACY(kopunch_videoram_w) AM_BASE(m_videoram)
-	AM_RANGE(0x7000, 0x70ff) AM_RAM_WRITE_LEGACY(kopunch_videoram2_w) AM_BASE(m_videoram2)
+	AM_RANGE(0x6000, 0x63ff) AM_RAM_WRITE(kopunch_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0x7000, 0x70ff) AM_RAM_WRITE(kopunch_videoram2_w) AM_BASE(m_videoram2)
 	AM_RANGE(0x7100, 0x7aff) AM_RAM	// ???
 ADDRESS_MAP_END
 
@@ -62,9 +62,9 @@ static ADDRESS_MAP_START( kopunch_io_map, AS_IO, 8, kopunch_state )
 	AM_RANGE(0x39, 0x39) AM_WRITENOP
 	AM_RANGE(0x3a, 0x3a) AM_READ_PORT("DSW")
 	AM_RANGE(0x3b, 0x3b) AM_WRITENOP
-	AM_RANGE(0x3c, 0x3c) AM_WRITE_LEGACY(kopunch_scroll_x_w)
-	AM_RANGE(0x3d, 0x3d) AM_WRITE_LEGACY(kopunch_scroll_y_w)
-	AM_RANGE(0x3e, 0x3e) AM_READ_PORT("P2") AM_WRITE_LEGACY(kopunch_gfxbank_w)
+	AM_RANGE(0x3c, 0x3c) AM_WRITE(kopunch_scroll_x_w)
+	AM_RANGE(0x3d, 0x3d) AM_WRITE(kopunch_scroll_y_w)
+	AM_RANGE(0x3e, 0x3e) AM_READ_PORT("P2") AM_WRITE(kopunch_gfxbank_w)
 	AM_RANGE(0x3f, 0x3f) AM_WRITENOP
 ADDRESS_MAP_END
 

@@ -167,107 +167,94 @@ VIDEO_START( armedf )
 
 ***************************************************************************/
 
-READ8_HANDLER( nb1414m4_text_videoram_r )
+READ8_MEMBER(armedf_state::nb1414m4_text_videoram_r)
 {
-	armedf_state *state = space->machine().driver_data<armedf_state>();
 
-	return state->m_text_videoram[offset];
+	return m_text_videoram[offset];
 }
 
-WRITE8_HANDLER( nb1414m4_text_videoram_w )
+WRITE8_MEMBER(armedf_state::nb1414m4_text_videoram_w)
 {
-	armedf_state *state = space->machine().driver_data<armedf_state>();
 
-	state->m_text_videoram[offset] = data;
-	state->m_tx_tilemap->mark_tile_dirty(offset & 0x7ff);
+	m_text_videoram[offset] = data;
+	m_tx_tilemap->mark_tile_dirty(offset & 0x7ff);
 }
 
-READ8_HANDLER( armedf_text_videoram_r )
+READ8_MEMBER(armedf_state::armedf_text_videoram_r)
 {
-	armedf_state *state = space->machine().driver_data<armedf_state>();
 
-	return state->m_text_videoram[offset];
+	return m_text_videoram[offset];
 }
 
-WRITE8_HANDLER( armedf_text_videoram_w )
+WRITE8_MEMBER(armedf_state::armedf_text_videoram_w)
 {
-	armedf_state *state = space->machine().driver_data<armedf_state>();
-	state->m_text_videoram[offset] = data;
-	state->m_tx_tilemap->mark_tile_dirty(offset & 0x7ff);
+	m_text_videoram[offset] = data;
+	m_tx_tilemap->mark_tile_dirty(offset & 0x7ff);
 }
 
-WRITE16_HANDLER( armedf_fg_videoram_w )
+WRITE16_MEMBER(armedf_state::armedf_fg_videoram_w)
 {
-	armedf_state *state = space->machine().driver_data<armedf_state>();
-	COMBINE_DATA(&state->m_fg_videoram[offset]);
-	state->m_fg_tilemap->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_fg_videoram[offset]);
+	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_HANDLER( armedf_bg_videoram_w )
+WRITE16_MEMBER(armedf_state::armedf_bg_videoram_w)
 {
-	armedf_state *state = space->machine().driver_data<armedf_state>();
-	COMBINE_DATA(&state->m_bg_videoram[offset]);
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_bg_videoram[offset]);
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_HANDLER( terraf_fg_scrolly_w )
+WRITE16_MEMBER(armedf_state::terraf_fg_scrolly_w)
 {
-	armedf_state *state = space->machine().driver_data<armedf_state>();
 	if (ACCESSING_BITS_8_15)
 	{
-		state->m_fg_scrolly = ((data >> 8) & 0xff) | (state->m_fg_scrolly & 0x300);
-		state->m_waiting_msb = 1;
+		m_fg_scrolly = ((data >> 8) & 0xff) | (m_fg_scrolly & 0x300);
+		m_waiting_msb = 1;
 	}
 }
 
-WRITE16_HANDLER( terraf_fg_scrollx_w )
+WRITE16_MEMBER(armedf_state::terraf_fg_scrollx_w)
 {
-	armedf_state *state = space->machine().driver_data<armedf_state>();
 	if (ACCESSING_BITS_8_15)
 	{
-		if (state->m_waiting_msb)
+		if (m_waiting_msb)
 		{
-			state->m_scroll_msb = data >> 8;
-			state->m_fg_scrollx = (state->m_fg_scrollx & 0xff) | (((state->m_scroll_msb >> 4) & 3) << 8);
-			state->m_fg_scrolly = (state->m_fg_scrolly & 0xff) | (((state->m_scroll_msb >> 0) & 3) << 8);
-			//popmessage("%04X %04X %04X",data,state->m_fg_scrollx,state->m_fg_scrolly);
+			m_scroll_msb = data >> 8;
+			m_fg_scrollx = (m_fg_scrollx & 0xff) | (((m_scroll_msb >> 4) & 3) << 8);
+			m_fg_scrolly = (m_fg_scrolly & 0xff) | (((m_scroll_msb >> 0) & 3) << 8);
+			//popmessage("%04X %04X %04X",data,m_fg_scrollx,m_fg_scrolly);
 		}
 		else
-			state->m_fg_scrollx = ((data >> 8) & 0xff) | (state->m_fg_scrollx & 0x300);
+			m_fg_scrollx = ((data >> 8) & 0xff) | (m_fg_scrollx & 0x300);
 	}
 }
 
-WRITE16_HANDLER( terraf_fg_scroll_msb_arm_w )
+WRITE16_MEMBER(armedf_state::terraf_fg_scroll_msb_arm_w)
 {
-	armedf_state *state = space->machine().driver_data<armedf_state>();
 	if (ACCESSING_BITS_8_15)
-		state->m_waiting_msb = 0;
+		m_waiting_msb = 0;
 }
 
-WRITE16_HANDLER( armedf_fg_scrollx_w )
+WRITE16_MEMBER(armedf_state::armedf_fg_scrollx_w)
 {
-	armedf_state *state = space->machine().driver_data<armedf_state>();
-	COMBINE_DATA(&state->m_fg_scrollx);
+	COMBINE_DATA(&m_fg_scrollx);
 }
 
-WRITE16_HANDLER( armedf_fg_scrolly_w )
+WRITE16_MEMBER(armedf_state::armedf_fg_scrolly_w)
 {
-	armedf_state *state = space->machine().driver_data<armedf_state>();
-	COMBINE_DATA(&state->m_fg_scrolly);
+	COMBINE_DATA(&m_fg_scrolly);
 }
 
-WRITE16_HANDLER( armedf_bg_scrollx_w )
+WRITE16_MEMBER(armedf_state::armedf_bg_scrollx_w)
 {
-	armedf_state *state = space->machine().driver_data<armedf_state>();
-	COMBINE_DATA(&state->m_bg_scrollx);
-	state->m_bg_tilemap->set_scrollx(0, state->m_bg_scrollx);
+	COMBINE_DATA(&m_bg_scrollx);
+	m_bg_tilemap->set_scrollx(0, m_bg_scrollx);
 }
 
-WRITE16_HANDLER( armedf_bg_scrolly_w )
+WRITE16_MEMBER(armedf_state::armedf_bg_scrolly_w)
 {
-	armedf_state *state = space->machine().driver_data<armedf_state>();
-	COMBINE_DATA(&state->m_bg_scrolly);
-	state->m_bg_tilemap->set_scrolly(0, state->m_bg_scrolly);
+	COMBINE_DATA(&m_bg_scrolly);
+	m_bg_tilemap->set_scrolly(0, m_bg_scrolly);
 }
 
 

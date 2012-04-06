@@ -177,10 +177,10 @@ WRITE8_MEMBER(tp84_state::sub_irq_mask_w)
 
 static ADDRESS_MAP_START( cpu2_map, AS_PROGRAM, 8, tp84_state )
 //  AM_RANGE(0x0000, 0x0000) AM_RAM /* Watch dog ?*/
-	AM_RANGE(0x2000, 0x2000) AM_READ_LEGACY(tp84_scanline_r) /* beam position */
+	AM_RANGE(0x2000, 0x2000) AM_READ(tp84_scanline_r) /* beam position */
 	AM_RANGE(0x4000, 0x4000) AM_WRITE(sub_irq_mask_w)
 	AM_RANGE(0x6000, 0x679f) AM_RAM
-	AM_RANGE(0x67a0, 0x67ff) AM_RAM_WRITE_LEGACY(tp84_spriteram_w) AM_BASE(m_spriteram)
+	AM_RANGE(0x67a0, 0x67ff) AM_RAM_WRITE(tp84_spriteram_w) AM_BASE(m_spriteram)
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END

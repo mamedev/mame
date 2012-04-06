@@ -651,12 +651,11 @@ static TILE_GET_INFO( get_hng64_tile3_16x16_info )
 }
 
 
-WRITE32_HANDLER( hng64_videoram_w )
+WRITE32_MEMBER(hng64_state::hng64_videoram_w)
 {
-	hng64_state *state = space->machine().driver_data<hng64_state>();
 	int realoff;
-
-	COMBINE_DATA(&state->m_videoram[offset]);
+	hng64_state *state = machine().driver_data<hng64_state>();
+	COMBINE_DATA(&m_videoram[offset]);
 
 	realoff = offset*4;
 

@@ -65,19 +65,19 @@
 static ADDRESS_MAP_START( master_map_program, AS_PROGRAM, 8, leland_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x9fff) AM_ROMBANK("bank1")
-	AM_RANGE(0xa000, 0xdfff) AM_ROMBANK("bank2") AM_WRITE_LEGACY(leland_battery_ram_w) AM_SHARE("battery")
+	AM_RANGE(0xa000, 0xdfff) AM_ROMBANK("bank2") AM_WRITE(leland_battery_ram_w) AM_SHARE("battery")
 	AM_RANGE(0xe000, 0xefff) AM_RAM
-	AM_RANGE(0xf000, 0xf3ff) AM_READWRITE_LEGACY(leland_gated_paletteram_r, leland_gated_paletteram_w) AM_SHARE("paletteram")
-	AM_RANGE(0xf800, 0xf801) AM_WRITE_LEGACY(leland_master_video_addr_w)
+	AM_RANGE(0xf000, 0xf3ff) AM_READWRITE(leland_gated_paletteram_r, leland_gated_paletteram_w) AM_SHARE("paletteram")
+	AM_RANGE(0xf800, 0xf801) AM_WRITE(leland_master_video_addr_w)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( master_map_io, AS_IO, 8, leland_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xf0, 0xf0) AM_WRITE_LEGACY(leland_master_alt_bankswitch_w)
+	AM_RANGE(0xf0, 0xf0) AM_WRITE(leland_master_alt_bankswitch_w)
 	AM_RANGE(0xf2, 0xf2) AM_DEVREADWRITE_LEGACY("custom", leland_80186_response_r, leland_80186_command_lo_w)
 	AM_RANGE(0xf4, 0xf4) AM_DEVWRITE_LEGACY("custom", leland_80186_command_hi_w)
-	AM_RANGE(0xfd, 0xff) AM_READWRITE_LEGACY(leland_master_analog_key_r, leland_master_analog_key_w)
+	AM_RANGE(0xfd, 0xff) AM_READWRITE(leland_master_analog_key_r, leland_master_analog_key_w)
 ADDRESS_MAP_END
 
 
@@ -92,26 +92,26 @@ static ADDRESS_MAP_START( slave_small_map_program, AS_PROGRAM, 8, leland_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0xdfff) AM_ROMBANK("bank3")
 	AM_RANGE(0xe000, 0xefff) AM_RAM
-	AM_RANGE(0xf800, 0xf801) AM_WRITE_LEGACY(leland_slave_video_addr_w)
-	AM_RANGE(0xf802, 0xf802) AM_READ_LEGACY(leland_raster_r)
-	AM_RANGE(0xf803, 0xf803) AM_WRITE_LEGACY(leland_slave_small_banksw_w)
+	AM_RANGE(0xf800, 0xf801) AM_WRITE(leland_slave_video_addr_w)
+	AM_RANGE(0xf802, 0xf802) AM_READ(leland_raster_r)
+	AM_RANGE(0xf803, 0xf803) AM_WRITE(leland_slave_small_banksw_w)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( slave_large_map_program, AS_PROGRAM, 8, leland_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x4000, 0xbfff) AM_ROMBANK("bank3")
-	AM_RANGE(0xc000, 0xc000) AM_WRITE_LEGACY(leland_slave_large_banksw_w)
+	AM_RANGE(0xc000, 0xc000) AM_WRITE(leland_slave_large_banksw_w)
 	AM_RANGE(0xe000, 0xefff) AM_RAM
-	AM_RANGE(0xf800, 0xf801) AM_WRITE_LEGACY(leland_slave_video_addr_w)
-	AM_RANGE(0xf802, 0xf802) AM_READ_LEGACY(leland_raster_r)
+	AM_RANGE(0xf800, 0xf801) AM_WRITE(leland_slave_video_addr_w)
+	AM_RANGE(0xf802, 0xf802) AM_READ(leland_raster_r)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( slave_map_io, AS_IO, 8, leland_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x1f) AM_READWRITE_LEGACY(leland_svram_port_r, leland_svram_port_w)
-	AM_RANGE(0x40, 0x5f) AM_READWRITE_LEGACY(leland_svram_port_r, leland_svram_port_w)
+	AM_RANGE(0x00, 0x1f) AM_READWRITE(leland_svram_port_r, leland_svram_port_w)
+	AM_RANGE(0x40, 0x5f) AM_READWRITE(leland_svram_port_r, leland_svram_port_w)
 ADDRESS_MAP_END
 
 
@@ -1980,12 +1980,13 @@ ROM_END
 
 static void init_master_ports(running_machine &machine, UINT8 mvram_base, UINT8 io_base)
 {
+	leland_state *state = machine.driver_data<leland_state>();
 	/* set up the master CPU VRAM I/O */
-	machine.device("master")->memory().space(AS_IO)->install_legacy_readwrite_handler(mvram_base, mvram_base + 0x1f, FUNC(leland_mvram_port_r), FUNC(leland_mvram_port_w));
+	machine.device("master")->memory().space(AS_IO)->install_readwrite_handler(mvram_base, mvram_base + 0x1f, read8_delegate(FUNC(leland_state::leland_mvram_port_r),state), write8_delegate(FUNC(leland_state::leland_mvram_port_w),state));
 
 	/* set up the master CPU I/O ports */
-	machine.device("master")->memory().space(AS_IO)->install_legacy_read_handler(io_base, io_base + 0x1f, FUNC(leland_master_input_r));
-	machine.device("master")->memory().space(AS_IO)->install_legacy_write_handler(io_base, io_base + 0x0f, FUNC(leland_master_output_w));
+	machine.device("master")->memory().space(AS_IO)->install_read_handler(io_base, io_base + 0x1f, read8_delegate(FUNC(leland_state::leland_master_input_r),state));
+	machine.device("master")->memory().space(AS_IO)->install_write_handler(io_base, io_base + 0x0f, write8_delegate(FUNC(leland_state::leland_master_output_w),state));
 }
 
 
@@ -2001,9 +2002,9 @@ static DRIVER_INIT( cerberus )
 	/* set up the master CPU I/O ports */
 	init_master_ports(machine, 0x40, 0x80);
 
-	/* set up additional input ports */
-	machine.device("master")->memory().space(AS_IO)->install_legacy_read_handler(0x80, 0x80, FUNC(cerberus_dial_1_r));
-	machine.device("master")->memory().space(AS_IO)->install_legacy_read_handler(0x90, 0x90, FUNC(cerberus_dial_2_r));
+	/* set up additional input ports */	
+	machine.device("master")->memory().space(AS_IO)->install_read_handler(0x80, 0x80, read8_delegate(FUNC(leland_state::cerberus_dial_1_r),state));
+	machine.device("master")->memory().space(AS_IO)->install_read_handler(0x90, 0x90, read8_delegate(FUNC(leland_state::cerberus_dial_2_r),state));
 }
 
 
@@ -2052,7 +2053,7 @@ static DRIVER_INIT( alleymas )
 	/* kludge warning: the game uses location E0CA to determine if the joysticks are available */
 	/* it gets cleared by the code, but there is no obvious way for the value to be set to a */
 	/* non-zero value. If the value is zero, the joystick is never read. */
-	state->m_alleymas_kludge_mem = machine.device("master")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xe0ca, 0xe0ca, FUNC(alleymas_joystick_kludge));
+	state->m_alleymas_kludge_mem = machine.device("master")->memory().space(AS_PROGRAM)->install_write_handler(0xe0ca, 0xe0ca, write8_delegate(FUNC(leland_state::alleymas_joystick_kludge),state));
 }
 
 
@@ -2077,9 +2078,9 @@ static DRIVER_INIT( dangerz )
 	init_master_ports(machine, 0x40, 0x80);
 
 	/* set up additional input ports */
-	machine.device("master")->memory().space(AS_IO)->install_legacy_read_handler(0xf4, 0xf4, FUNC(dangerz_input_upper_r));
-	machine.device("master")->memory().space(AS_IO)->install_legacy_read_handler(0xf8, 0xf8, FUNC(dangerz_input_y_r));
-	machine.device("master")->memory().space(AS_IO)->install_legacy_read_handler(0xfc, 0xfc, FUNC(dangerz_input_x_r));
+	machine.device("master")->memory().space(AS_IO)->install_read_handler(0xf4, 0xf4, read8_delegate(FUNC(leland_state::dangerz_input_upper_r),state));
+	machine.device("master")->memory().space(AS_IO)->install_read_handler(0xf8, 0xf8, read8_delegate(FUNC(leland_state::dangerz_input_y_r),state));
+	machine.device("master")->memory().space(AS_IO)->install_read_handler(0xfc, 0xfc, read8_delegate(FUNC(leland_state::dangerz_input_x_r),state));
 }
 
 
@@ -2128,10 +2129,10 @@ static DRIVER_INIT( redlin2p )
 	init_master_ports(machine, 0x00, 0xc0);
 
 	/* set up additional input ports */
-	machine.device("master")->memory().space(AS_IO)->install_legacy_read_handler(0xc0, 0xc0, FUNC(redline_pedal_1_r));
-	machine.device("master")->memory().space(AS_IO)->install_legacy_read_handler(0xd0, 0xd0, FUNC(redline_pedal_2_r));
-	machine.device("master")->memory().space(AS_IO)->install_legacy_read_handler(0xf8, 0xf8, FUNC(redline_wheel_2_r));
-	machine.device("master")->memory().space(AS_IO)->install_legacy_read_handler(0xfb, 0xfb, FUNC(redline_wheel_1_r));
+	machine.device("master")->memory().space(AS_IO)->install_read_handler(0xc0, 0xc0, read8_delegate(FUNC(leland_state::redline_pedal_1_r),state));
+	machine.device("master")->memory().space(AS_IO)->install_read_handler(0xd0, 0xd0, read8_delegate(FUNC(leland_state::redline_pedal_2_r),state));
+	machine.device("master")->memory().space(AS_IO)->install_read_handler(0xf8, 0xf8, read8_delegate(FUNC(leland_state::redline_wheel_2_r),state));
+	machine.device("master")->memory().space(AS_IO)->install_read_handler(0xfb, 0xfb, read8_delegate(FUNC(leland_state::redline_wheel_1_r),state));
 }
 
 
@@ -2162,9 +2163,9 @@ static DRIVER_INIT( viper )
 	init_master_ports(machine, 0x00, 0xc0);
 
 	/* set up additional input ports */
-	machine.device("master")->memory().space(AS_IO)->install_legacy_read_handler(0xa4, 0xa4, FUNC(dangerz_input_upper_r));
-	machine.device("master")->memory().space(AS_IO)->install_legacy_read_handler(0xb8, 0xb8, FUNC(dangerz_input_y_r));
-	machine.device("master")->memory().space(AS_IO)->install_legacy_read_handler(0xbc, 0xbc, FUNC(dangerz_input_x_r));
+	machine.device("master")->memory().space(AS_IO)->install_read_handler(0xa4, 0xa4, read8_delegate(FUNC(leland_state::dangerz_input_upper_r),state));
+	machine.device("master")->memory().space(AS_IO)->install_read_handler(0xb8, 0xb8, read8_delegate(FUNC(leland_state::dangerz_input_y_r),state));
+	machine.device("master")->memory().space(AS_IO)->install_read_handler(0xbc, 0xbc, read8_delegate(FUNC(leland_state::dangerz_input_x_r),state));
 }
 
 
@@ -2259,9 +2260,9 @@ static DRIVER_INIT( offroad )
 	init_master_ports(machine, 0x40, 0x80);	/* yes, this is intentional */
 
 	/* set up additional input ports */
-	machine.device("master")->memory().space(AS_IO)->install_legacy_read_handler(0xf8, 0xf8, FUNC(offroad_wheel_3_r));
-	machine.device("master")->memory().space(AS_IO)->install_legacy_read_handler(0xf9, 0xf9, FUNC(offroad_wheel_1_r));
-	machine.device("master")->memory().space(AS_IO)->install_legacy_read_handler(0xfb, 0xfb, FUNC(offroad_wheel_2_r));
+	machine.device("master")->memory().space(AS_IO)->install_read_handler(0xf8, 0xf8, read8_delegate(FUNC(leland_state::offroad_wheel_3_r),state));
+	machine.device("master")->memory().space(AS_IO)->install_read_handler(0xf9, 0xf9, read8_delegate(FUNC(leland_state::offroad_wheel_1_r),state));
+	machine.device("master")->memory().space(AS_IO)->install_read_handler(0xfb, 0xfb, read8_delegate(FUNC(leland_state::offroad_wheel_2_r),state));
 }
 
 
@@ -2279,9 +2280,9 @@ static DRIVER_INIT( offroadt )
 	init_master_ports(machine, 0x80, 0x40);
 
 	/* set up additional input ports */
-	machine.device("master")->memory().space(AS_IO)->install_legacy_read_handler(0xf8, 0xf8, FUNC(offroad_wheel_3_r));
-	machine.device("master")->memory().space(AS_IO)->install_legacy_read_handler(0xf9, 0xf9, FUNC(offroad_wheel_1_r));
-	machine.device("master")->memory().space(AS_IO)->install_legacy_read_handler(0xfb, 0xfb, FUNC(offroad_wheel_2_r));
+	machine.device("master")->memory().space(AS_IO)->install_read_handler(0xf8, 0xf8, read8_delegate(FUNC(leland_state::offroad_wheel_3_r),state));
+	machine.device("master")->memory().space(AS_IO)->install_read_handler(0xf9, 0xf9, read8_delegate(FUNC(leland_state::offroad_wheel_1_r),state));
+	machine.device("master")->memory().space(AS_IO)->install_read_handler(0xfb, 0xfb, read8_delegate(FUNC(leland_state::offroad_wheel_2_r),state));
 }
 
 

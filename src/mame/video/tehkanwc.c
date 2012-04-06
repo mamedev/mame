@@ -15,58 +15,51 @@ robbiex@rocketmail.com
 #include "includes/tehkanwc.h"
 
 
-WRITE8_HANDLER( tehkanwc_videoram_w )
+WRITE8_MEMBER(tehkanwc_state::tehkanwc_videoram_w)
 {
-	tehkanwc_state *state = space->machine().driver_data<tehkanwc_state>();
-	state->m_videoram[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( tehkanwc_colorram_w )
+WRITE8_MEMBER(tehkanwc_state::tehkanwc_colorram_w)
 {
-	tehkanwc_state *state = space->machine().driver_data<tehkanwc_state>();
-	state->m_colorram[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset);
+	m_colorram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( tehkanwc_videoram2_w )
+WRITE8_MEMBER(tehkanwc_state::tehkanwc_videoram2_w)
 {
-	tehkanwc_state *state = space->machine().driver_data<tehkanwc_state>();
-	state->m_videoram2[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset / 2);
+	m_videoram2[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE8_HANDLER( tehkanwc_scroll_x_w )
+WRITE8_MEMBER(tehkanwc_state::tehkanwc_scroll_x_w)
 {
-	tehkanwc_state *state = space->machine().driver_data<tehkanwc_state>();
-	state->m_scroll_x[offset] = data;
+	m_scroll_x[offset] = data;
 }
 
-WRITE8_HANDLER( tehkanwc_scroll_y_w )
+WRITE8_MEMBER(tehkanwc_state::tehkanwc_scroll_y_w)
 {
-	tehkanwc_state *state = space->machine().driver_data<tehkanwc_state>();
-	state->m_bg_tilemap->set_scrolly(0, data);
+	m_bg_tilemap->set_scrolly(0, data);
 }
 
-WRITE8_HANDLER( tehkanwc_flipscreen_x_w )
+WRITE8_MEMBER(tehkanwc_state::tehkanwc_flipscreen_x_w)
 {
-	flip_screen_x_set(space->machine(), data & 0x40);
+	flip_screen_x_set(machine(), data & 0x40);
 }
 
-WRITE8_HANDLER( tehkanwc_flipscreen_y_w )
+WRITE8_MEMBER(tehkanwc_state::tehkanwc_flipscreen_y_w)
 {
-	flip_screen_y_set(space->machine(), data & 0x40);
+	flip_screen_y_set(machine(), data & 0x40);
 }
 
-WRITE8_HANDLER( gridiron_led0_w )
+WRITE8_MEMBER(tehkanwc_state::gridiron_led0_w)
 {
-	tehkanwc_state *state = space->machine().driver_data<tehkanwc_state>();
-	state->m_led0 = data;
+	m_led0 = data;
 }
-WRITE8_HANDLER( gridiron_led1_w )
+WRITE8_MEMBER(tehkanwc_state::gridiron_led1_w)
 {
-	tehkanwc_state *state = space->machine().driver_data<tehkanwc_state>();
-	state->m_led1 = data;
+	m_led1 = data;
 }
 
 static TILE_GET_INFO( get_bg_tile_info )

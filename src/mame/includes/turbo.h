@@ -88,6 +88,8 @@ public:
 	DECLARE_READ8_MEMBER(buckrog_cpu2_command_r);
 	DECLARE_READ8_MEMBER(buckrog_port_2_r);
 	DECLARE_READ8_MEMBER(buckrog_port_3_r);
+	DECLARE_WRITE8_MEMBER(turbo_videoram_w);
+	DECLARE_WRITE8_MEMBER(buckrog_bitmap_w);
 };
 
 
@@ -122,5 +124,3 @@ PALETTE_INIT( buckrog );
 VIDEO_START( buckrog );
 SCREEN_UPDATE_IND16( buckrog );
 
-WRITE8_HANDLER( turbo_videoram_w );
-WRITE8_HANDLER( buckrog_bitmap_w );

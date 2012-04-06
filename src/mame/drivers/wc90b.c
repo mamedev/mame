@@ -141,9 +141,9 @@ WRITE8_MEMBER(wc90b_state::adpcm_data_w)
 static ADDRESS_MAP_START( wc90b_map1, AS_PROGRAM, 8, wc90b_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_RAM /* Main RAM */
-	AM_RANGE(0xa000, 0xafff) AM_RAM_WRITE_LEGACY(wc90b_fgvideoram_w) AM_BASE(m_fgvideoram)
-	AM_RANGE(0xc000, 0xcfff) AM_RAM_WRITE_LEGACY(wc90b_bgvideoram_w) AM_BASE(m_bgvideoram)
-	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE_LEGACY(wc90b_txvideoram_w) AM_BASE(m_txvideoram)
+	AM_RANGE(0xa000, 0xafff) AM_RAM_WRITE(wc90b_fgvideoram_w) AM_BASE(m_fgvideoram)
+	AM_RANGE(0xc000, 0xcfff) AM_RAM_WRITE(wc90b_bgvideoram_w) AM_BASE(m_bgvideoram)
+	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(wc90b_txvideoram_w) AM_BASE(m_txvideoram)
 	AM_RANGE(0xf000, 0xf7ff) AM_ROMBANK("bank1")
 	AM_RANGE(0xf800, 0xfbff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xfc00, 0xfc00) AM_WRITE(wc90b_bankswitch_w)

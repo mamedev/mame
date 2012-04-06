@@ -42,12 +42,11 @@ PALETTE_INIT( dribling )
  *
  *************************************/
 
-WRITE8_HANDLER( dribling_colorram_w )
+WRITE8_MEMBER(dribling_state::dribling_colorram_w)
 {
-	dribling_state *state = space->machine().driver_data<dribling_state>();
 
 	/* it is very important that we mask off the two bits here */
-	state->m_colorram[offset & 0x1f9f] = data;
+	m_colorram[offset & 0x1f9f] = data;
 }
 
 

@@ -63,69 +63,61 @@ VIDEO_START( tsamurai )
 
 ***************************************************************************/
 
-WRITE8_HANDLER( tsamurai_scrolly_w )
+WRITE8_MEMBER(tsamurai_state::tsamurai_scrolly_w)
 {
-	tsamurai_state *state = space->machine().driver_data<tsamurai_state>();
-	state->m_background->set_scrolly(0, data );
+	m_background->set_scrolly(0, data );
 }
 
-WRITE8_HANDLER( tsamurai_scrollx_w )
+WRITE8_MEMBER(tsamurai_state::tsamurai_scrollx_w)
 {
-	tsamurai_state *state = space->machine().driver_data<tsamurai_state>();
-	state->m_background->set_scrollx(0, data );
+	m_background->set_scrollx(0, data );
 }
 
-WRITE8_HANDLER( tsamurai_bgcolor_w )
+WRITE8_MEMBER(tsamurai_state::tsamurai_bgcolor_w)
 {
-	tsamurai_state *state = space->machine().driver_data<tsamurai_state>();
-	state->m_bgcolor = data;
+	m_bgcolor = data;
 }
 
-WRITE8_HANDLER( tsamurai_textbank1_w )
+WRITE8_MEMBER(tsamurai_state::tsamurai_textbank1_w)
 {
-	tsamurai_state *state = space->machine().driver_data<tsamurai_state>();
-	if( state->m_textbank1!=data )
+	if( m_textbank1!=data )
 	{
-		state->m_textbank1 = data;
-		state->m_foreground ->mark_all_dirty();
+		m_textbank1 = data;
+		m_foreground ->mark_all_dirty();
 	}
 }
 
-WRITE8_HANDLER( tsamurai_textbank2_w )
+WRITE8_MEMBER(tsamurai_state::tsamurai_textbank2_w)
 {
-	tsamurai_state *state = space->machine().driver_data<tsamurai_state>();
-	if( state->m_textbank2!=data )
+	if( m_textbank2!=data )
 	{
-		state->m_textbank2 = data;
-		state->m_foreground ->mark_all_dirty();
+		m_textbank2 = data;
+		m_foreground ->mark_all_dirty();
 	}
 }
 
-WRITE8_HANDLER( tsamurai_bg_videoram_w )
+WRITE8_MEMBER(tsamurai_state::tsamurai_bg_videoram_w)
 {
-	tsamurai_state *state = space->machine().driver_data<tsamurai_state>();
-	state->m_bg_videoram[offset]=data;
+	m_bg_videoram[offset]=data;
 	offset = offset/2;
-	state->m_background->mark_tile_dirty(offset);
+	m_background->mark_tile_dirty(offset);
 }
-WRITE8_HANDLER( tsamurai_fg_videoram_w )
+WRITE8_MEMBER(tsamurai_state::tsamurai_fg_videoram_w)
 {
-	tsamurai_state *state = space->machine().driver_data<tsamurai_state>();
-	state->m_videoram[offset]=data;
-	state->m_foreground->mark_tile_dirty(offset);
+	m_videoram[offset]=data;
+	m_foreground->mark_tile_dirty(offset);
 }
-WRITE8_HANDLER( tsamurai_fg_colorram_w )
+WRITE8_MEMBER(tsamurai_state::tsamurai_fg_colorram_w)
 {
-	tsamurai_state *state = space->machine().driver_data<tsamurai_state>();
-	if( state->m_colorram[offset]!=data )
+	if( m_colorram[offset]!=data )
 	{
-		state->m_colorram[offset]=data;
+		m_colorram[offset]=data;
 		if (offset & 1)
 		{
 			int col = offset/2;
 			int row;
 			for (row = 0;row < 32;row++)
-				state->m_foreground->mark_tile_dirty(32*row+col);
+				m_foreground->mark_tile_dirty(32*row+col);
 		}
 	}
 }
@@ -232,13 +224,12 @@ VS Gong Fight runs on older hardware
 ***************************************************************************/
 
 
-WRITE8_HANDLER( vsgongf_color_w )
+WRITE8_MEMBER(tsamurai_state::vsgongf_color_w)
 {
-	tsamurai_state *state = space->machine().driver_data<tsamurai_state>();
-	if( state->m_vsgongf_color != data )
+	if( m_vsgongf_color != data )
 	{
-		state->m_vsgongf_color = data;
-		state->m_foreground ->mark_all_dirty();
+		m_vsgongf_color = data;
+		m_foreground ->mark_all_dirty();
 	}
 }
 

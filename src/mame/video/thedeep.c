@@ -67,18 +67,16 @@ static TILE_GET_INFO( get_tile_info_1 )
 			0);
 }
 
-WRITE8_HANDLER( thedeep_vram_0_w )
+WRITE8_MEMBER(thedeep_state::thedeep_vram_0_w)
 {
-	thedeep_state *state = space->machine().driver_data<thedeep_state>();
-	state->m_vram_0[offset] = data;
-	state->m_tilemap_0->mark_tile_dirty(offset / 2);
+	m_vram_0[offset] = data;
+	m_tilemap_0->mark_tile_dirty(offset / 2);
 }
 
-WRITE8_HANDLER( thedeep_vram_1_w )
+WRITE8_MEMBER(thedeep_state::thedeep_vram_1_w)
 {
-	thedeep_state *state = space->machine().driver_data<thedeep_state>();
-	state->m_vram_1[offset] = data;
-	state->m_tilemap_1->mark_tile_dirty(offset / 2);
+	m_vram_1[offset] = data;
+	m_tilemap_1->mark_tile_dirty(offset / 2);
 }
 
 

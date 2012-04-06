@@ -21,13 +21,13 @@ driver by David Haywood
 
 static ADDRESS_MAP_START( news_map, AS_PROGRAM, 8, news_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM 	/* 4000-7fff is written to during startup, probably leftover code */
-	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE_LEGACY(news_fgram_w) AM_BASE(m_fgram)
-	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE_LEGACY(news_bgram_w) AM_BASE(m_bgram)
+	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(news_fgram_w) AM_BASE(m_fgram)
+	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(news_bgram_w) AM_BASE(m_bgram)
 	AM_RANGE(0x9000, 0x91ff) AM_RAM_WRITE(paletteram_xxxxRRRRGGGGBBBB_be_w) AM_SHARE("paletteram")
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("DSW")
 	AM_RANGE(0xc001, 0xc001) AM_READ_PORT("INPUTS")
 	AM_RANGE(0xc002, 0xc002) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0xc003, 0xc003) AM_WRITE_LEGACY(news_bgpic_w)
+	AM_RANGE(0xc003, 0xc003) AM_WRITE(news_bgpic_w)
 	AM_RANGE(0xe000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 

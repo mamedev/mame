@@ -196,18 +196,18 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, angelkds_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe3ff) AM_RAM_WRITE_LEGACY(angelkds_bgtopvideoram_w) AM_BASE(m_bgtopvideoram) /* Top Half of Screen */
-	AM_RANGE(0xe400, 0xe7ff) AM_RAM_WRITE_LEGACY(angelkds_bgbotvideoram_w) AM_BASE(m_bgbotvideoram) /* Bottom Half of Screen */
-	AM_RANGE(0xe800, 0xebff) AM_RAM_WRITE_LEGACY(angelkds_txvideoram_w) AM_BASE(m_txvideoram)
+	AM_RANGE(0xe000, 0xe3ff) AM_RAM_WRITE(angelkds_bgtopvideoram_w) AM_BASE(m_bgtopvideoram) /* Top Half of Screen */
+	AM_RANGE(0xe400, 0xe7ff) AM_RAM_WRITE(angelkds_bgbotvideoram_w) AM_BASE(m_bgbotvideoram) /* Bottom Half of Screen */
+	AM_RANGE(0xe800, 0xebff) AM_RAM_WRITE(angelkds_txvideoram_w) AM_BASE(m_txvideoram)
 	AM_RANGE(0xec00, 0xecff) AM_RAM AM_BASE(m_spriteram)
-	AM_RANGE(0xed00, 0xeeff) AM_RAM_WRITE_LEGACY(angelkds_paletteram_w) AM_BASE(m_paletteram)
+	AM_RANGE(0xed00, 0xeeff) AM_RAM_WRITE(angelkds_paletteram_w) AM_BASE(m_paletteram)
 	AM_RANGE(0xef00, 0xefff) AM_RAM
-	AM_RANGE(0xf000, 0xf000) AM_WRITE_LEGACY(angelkds_bgtopbank_write)
-	AM_RANGE(0xf001, 0xf001) AM_WRITE_LEGACY(angelkds_bgtopscroll_write)
-	AM_RANGE(0xf002, 0xf002) AM_WRITE_LEGACY(angelkds_bgbotbank_write)
-	AM_RANGE(0xf003, 0xf003) AM_WRITE_LEGACY(angelkds_bgbotscroll_write)
-	AM_RANGE(0xf004, 0xf004) AM_WRITE_LEGACY(angelkds_txbank_write)
-	AM_RANGE(0xf005, 0xf005) AM_WRITE_LEGACY(angelkds_layer_ctrl_write)
+	AM_RANGE(0xf000, 0xf000) AM_WRITE(angelkds_bgtopbank_write)
+	AM_RANGE(0xf001, 0xf001) AM_WRITE(angelkds_bgtopscroll_write)
+	AM_RANGE(0xf002, 0xf002) AM_WRITE(angelkds_bgbotbank_write)
+	AM_RANGE(0xf003, 0xf003) AM_WRITE(angelkds_bgbotscroll_write)
+	AM_RANGE(0xf004, 0xf004) AM_WRITE(angelkds_txbank_write)
+	AM_RANGE(0xf005, 0xf005) AM_WRITE(angelkds_layer_ctrl_write)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( main_portmap, AS_IO, 8, angelkds_state )

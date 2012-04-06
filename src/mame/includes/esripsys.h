@@ -84,6 +84,7 @@ public:
 	DECLARE_WRITE8_MEMBER(tms5220_w);
 	DECLARE_WRITE8_MEMBER(control_w);
 	DECLARE_WRITE8_MEMBER(volume_dac_w);
+	DECLARE_WRITE8_MEMBER(esripsys_bg_intensity_w);
 };
 
 
@@ -92,7 +93,6 @@ public:
 VIDEO_START( esripsys );
 SCREEN_UPDATE_RGB32( esripsys );
 
-WRITE8_HANDLER( esripsys_bg_intensity_w );
 INTERRUPT_GEN( esripsys_vblank_irq );
 
 int esripsys_draw(running_machine &machine, int l, int r, int fig, int attr, int addr, int col, int x_scale, int bank);

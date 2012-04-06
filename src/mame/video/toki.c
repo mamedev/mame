@@ -26,11 +26,10 @@ remove all the code writing the $a0000 area.)
 
 *************************************************************************/
 
-WRITE16_HANDLER( toki_control_w )
+WRITE16_MEMBER(toki_state::toki_control_w)
 {
-	toki_state *state = space->machine().driver_data<toki_state>();
-	space->machine().primary_screen->update_partial(space->machine().primary_screen->vpos() - 1);
-	COMBINE_DATA(&state->m_scrollram16[offset]);
+	machine().primary_screen->update_partial(machine().primary_screen->vpos() - 1);
+	COMBINE_DATA(&m_scrollram16[offset]);
 }
 
 static TILE_GET_INFO( get_text_tile_info )
@@ -100,26 +99,23 @@ VIDEO_START( toki )
 
 /*************************************/
 
-WRITE16_HANDLER( toki_foreground_videoram16_w )
+WRITE16_MEMBER(toki_state::toki_foreground_videoram16_w)
 {
-	toki_state *state = space->machine().driver_data<toki_state>();
-	UINT16 *videoram = state->m_videoram;
+	UINT16 *videoram = m_videoram;
 	COMBINE_DATA(&videoram[offset]);
-	state->m_text_layer->mark_tile_dirty(offset);
+	m_text_layer->mark_tile_dirty(offset);
 }
 
-WRITE16_HANDLER( toki_background1_videoram16_w )
+WRITE16_MEMBER(toki_state::toki_background1_videoram16_w)
 {
-	toki_state *state = space->machine().driver_data<toki_state>();
-	COMBINE_DATA(&state->m_background1_videoram16[offset]);
-	state->m_background_layer->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_background1_videoram16[offset]);
+	m_background_layer->mark_tile_dirty(offset);
 }
 
-WRITE16_HANDLER( toki_background2_videoram16_w )
+WRITE16_MEMBER(toki_state::toki_background2_videoram16_w)
 {
-	toki_state *state = space->machine().driver_data<toki_state>();
-	COMBINE_DATA(&state->m_background2_videoram16[offset]);
-	state->m_foreground_layer->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_background2_videoram16[offset]);
+	m_foreground_layer->mark_tile_dirty(offset);
 }
 
 /***************************************************************************

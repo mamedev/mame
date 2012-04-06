@@ -83,16 +83,15 @@ VIDEO_START(mainsnk)
 }
 
 
-WRITE8_HANDLER(mainsnk_c600_w)
+WRITE8_MEMBER(mainsnk_state::mainsnk_c600_w)
 {
-	mainsnk_state *state = space->machine().driver_data<mainsnk_state>();
 	int bank;
-	int total_elements = space->machine().gfx[0]->total_elements;
+	int total_elements = machine().gfx[0]->total_elements;
 
-	flip_screen_set(space->machine(), ~data & 0x80);
+	flip_screen_set(machine(), ~data & 0x80);
 
-	state->m_bg_tilemap->set_palette_offset((data & 0x07) << 4);
-	state->m_tx_tilemap->set_palette_offset((data & 0x07) << 4);
+	m_bg_tilemap->set_palette_offset((data & 0x07) << 4);
+	m_tx_tilemap->set_palette_offset((data & 0x07) << 4);
 
 	bank = 0;
 	if (total_elements == 0x400)	// mainsnk
@@ -100,27 +99,25 @@ WRITE8_HANDLER(mainsnk_c600_w)
 	else if (total_elements == 0x800)	// canvas
 		bank = ((data & 0x40) >> 6) | ((data & 0x30) >> 3);
 
-	if (state->m_bg_tile_offset != (bank << 8))
+	if (m_bg_tile_offset != (bank << 8))
 	{
-		state->m_bg_tile_offset = bank << 8;
-		state->m_bg_tilemap->mark_all_dirty();
+		m_bg_tile_offset = bank << 8;
+		m_bg_tilemap->mark_all_dirty();
 	}
 }
 
-WRITE8_HANDLER( mainsnk_fgram_w )
+WRITE8_MEMBER(mainsnk_state::mainsnk_fgram_w)
 {
-	mainsnk_state *state = space->machine().driver_data<mainsnk_state>();
 
-	state->m_fgram[offset] = data;
-	state->m_tx_tilemap->mark_tile_dirty(offset);
+	m_fgram[offset] = data;
+	m_tx_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( mainsnk_bgram_w )
+WRITE8_MEMBER(mainsnk_state::mainsnk_bgram_w)
 {
-	mainsnk_state *state = space->machine().driver_data<mainsnk_state>();
 
-	state->m_bgram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_bgram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 

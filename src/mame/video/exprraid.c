@@ -2,49 +2,44 @@
 #include "includes/exprraid.h"
 
 
-WRITE8_HANDLER( exprraid_videoram_w )
+WRITE8_MEMBER(exprraid_state::exprraid_videoram_w)
 {
-	exprraid_state *state = space->machine().driver_data<exprraid_state>();
-	state->m_videoram[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( exprraid_colorram_w )
+WRITE8_MEMBER(exprraid_state::exprraid_colorram_w)
 {
-	exprraid_state *state = space->machine().driver_data<exprraid_state>();
-	state->m_colorram[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset);
+	m_colorram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( exprraid_flipscreen_w )
+WRITE8_MEMBER(exprraid_state::exprraid_flipscreen_w)
 {
-	if (flip_screen_get(space->machine()) != (data & 0x01))
+	if (flip_screen_get(machine()) != (data & 0x01))
 	{
-		flip_screen_set(space->machine(), data & 0x01);
-		space->machine().tilemap().mark_all_dirty();
+		flip_screen_set(machine(), data & 0x01);
+		machine().tilemap().mark_all_dirty();
 	}
 }
 
-WRITE8_HANDLER( exprraid_bgselect_w )
+WRITE8_MEMBER(exprraid_state::exprraid_bgselect_w)
 {
-	exprraid_state *state = space->machine().driver_data<exprraid_state>();
-	if (state->m_bg_index[offset] != data)
+	if (m_bg_index[offset] != data)
 	{
-		state->m_bg_index[offset] = data;
-		state->m_bg_tilemap->mark_all_dirty();
+		m_bg_index[offset] = data;
+		m_bg_tilemap->mark_all_dirty();
 	}
 }
 
-WRITE8_HANDLER( exprraid_scrollx_w )
+WRITE8_MEMBER(exprraid_state::exprraid_scrollx_w)
 {
-	exprraid_state *state = space->machine().driver_data<exprraid_state>();
-	state->m_bg_tilemap->set_scrollx(offset, data);
+	m_bg_tilemap->set_scrollx(offset, data);
 }
 
-WRITE8_HANDLER( exprraid_scrolly_w )
+WRITE8_MEMBER(exprraid_state::exprraid_scrolly_w)
 {
-	exprraid_state *state = space->machine().driver_data<exprraid_state>();
-	state->m_bg_tilemap->set_scrolly(0, data);
+	m_bg_tilemap->set_scrolly(0, data);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )

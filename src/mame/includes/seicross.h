@@ -19,13 +19,13 @@ public:
 	UINT8 *m_row_scroll;
 
 	UINT8 m_irq_mask;
+	DECLARE_WRITE8_MEMBER(seicross_videoram_w);
+	DECLARE_WRITE8_MEMBER(seicross_colorram_w);
 };
 
 
 /*----------- defined in video/seicross.c -----------*/
 
-WRITE8_HANDLER( seicross_videoram_w );
-WRITE8_HANDLER( seicross_colorram_w );
 
 PALETTE_INIT( seicross );
 VIDEO_START( seicross );

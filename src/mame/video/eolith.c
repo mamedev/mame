@@ -2,10 +2,9 @@
 #include "includes/eolith.h"
 
 
-WRITE32_HANDLER( eolith_vram_w )
+WRITE32_MEMBER(eolith_state::eolith_vram_w)
 {
-	eolith_state *state = space->machine().driver_data<eolith_state>();
-	UINT32 *dest = &state->m_vram[offset+(0x40000/4)*state->m_buffer];
+	UINT32 *dest = &m_vram[offset+(0x40000/4)*m_buffer];
 
 	if (mem_mask == 0xffffffff)
 	{
@@ -26,10 +25,9 @@ WRITE32_HANDLER( eolith_vram_w )
 }
 
 
-READ32_HANDLER( eolith_vram_r )
+READ32_MEMBER(eolith_state::eolith_vram_r)
 {
-	eolith_state *state = space->machine().driver_data<eolith_state>();
-	return state->m_vram[offset+(0x40000/4)*state->m_buffer];
+	return m_vram[offset+(0x40000/4)*m_buffer];
 }
 
 VIDEO_START( eolith )

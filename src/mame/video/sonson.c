@@ -94,32 +94,29 @@ PALETTE_INIT( sonson )
 	}
 }
 
-WRITE8_HANDLER( sonson_videoram_w )
+WRITE8_MEMBER(sonson_state::sonson_videoram_w)
 {
-	sonson_state *state = space->machine().driver_data<sonson_state>();
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( sonson_colorram_w )
+WRITE8_MEMBER(sonson_state::sonson_colorram_w)
 {
-	sonson_state *state = space->machine().driver_data<sonson_state>();
-	state->m_colorram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_colorram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( sonson_scrollx_w )
+WRITE8_MEMBER(sonson_state::sonson_scrollx_w)
 {
-	sonson_state *state = space->machine().driver_data<sonson_state>();
 	int row;
 
 	for (row = 5; row < 32; row++)
-		state->m_bg_tilemap->set_scrollx(row, data);
+		m_bg_tilemap->set_scrollx(row, data);
 }
 
-WRITE8_HANDLER( sonson_flipscreen_w )
+WRITE8_MEMBER(sonson_state::sonson_flipscreen_w)
 {
-	flip_screen_set(space->machine(), ~data & 0x01);
+	flip_screen_set(machine(), ~data & 0x01);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )

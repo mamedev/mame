@@ -141,31 +141,29 @@ VIDEO_START( chkun )
  *
  *************************************/
 
-WRITE8_HANDLER( timeplt_videoram_w )
+WRITE8_MEMBER(timeplt_state::timeplt_videoram_w)
 {
-	timeplt_state *state = space->machine().driver_data<timeplt_state>();
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_HANDLER( timeplt_colorram_w )
+WRITE8_MEMBER(timeplt_state::timeplt_colorram_w)
 {
-	timeplt_state *state = space->machine().driver_data<timeplt_state>();
-	state->m_colorram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_colorram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_HANDLER( timeplt_flipscreen_w )
+WRITE8_MEMBER(timeplt_state::timeplt_flipscreen_w)
 {
-	flip_screen_set(space->machine(), ~data & 1);
+	flip_screen_set(machine(), ~data & 1);
 }
 
 
-READ8_HANDLER( timeplt_scanline_r )
+READ8_MEMBER(timeplt_state::timeplt_scanline_r)
 {
-	return space->machine().primary_screen->vpos();
+	return machine().primary_screen->vpos();
 }
 
 

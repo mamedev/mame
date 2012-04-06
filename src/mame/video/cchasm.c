@@ -103,17 +103,17 @@ static void cchasm_refresh (running_machine &machine)
 }
 
 
-WRITE16_HANDLER( cchasm_refresh_control_w )
+WRITE16_MEMBER(cchasm_state::cchasm_refresh_control_w)
 {
 	if (ACCESSING_BITS_8_15)
 	{
 		switch (data >> 8)
 		{
 		case 0x37:
-			cchasm_refresh(space->machine());
+			cchasm_refresh(machine());
 			break;
 		case 0xf7:
-			cputag_set_input_line (space->machine(), "maincpu", 2, CLEAR_LINE);
+			cputag_set_input_line (machine(), "maincpu", 2, CLEAR_LINE);
 			break;
 		}
 	}

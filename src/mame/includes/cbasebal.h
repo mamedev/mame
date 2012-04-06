@@ -35,17 +35,17 @@ public:
 	DECLARE_READ8_MEMBER(bankedram_r);
 	DECLARE_WRITE8_MEMBER(bankedram_w);
 	DECLARE_WRITE8_MEMBER(cbasebal_coinctrl_w);
+	DECLARE_WRITE8_MEMBER(cbasebal_textram_w);
+	DECLARE_READ8_MEMBER(cbasebal_textram_r);
+	DECLARE_WRITE8_MEMBER(cbasebal_scrollram_w);
+	DECLARE_READ8_MEMBER(cbasebal_scrollram_r);
+	DECLARE_WRITE8_MEMBER(cbasebal_gfxctrl_w);
+	DECLARE_WRITE8_MEMBER(cbasebal_scrollx_w);
+	DECLARE_WRITE8_MEMBER(cbasebal_scrolly_w);
 };
 
 /*----------- defined in video/cbasebal.c -----------*/
 
-WRITE8_HANDLER( cbasebal_textram_w );
-READ8_HANDLER( cbasebal_textram_r );
-WRITE8_HANDLER( cbasebal_scrollram_w );
-READ8_HANDLER( cbasebal_scrollram_r );
-WRITE8_HANDLER( cbasebal_gfxctrl_w );
-WRITE8_HANDLER( cbasebal_scrollx_w );
-WRITE8_HANDLER( cbasebal_scrolly_w );
 
 VIDEO_START( cbasebal );
 SCREEN_UPDATE_IND16( cbasebal );

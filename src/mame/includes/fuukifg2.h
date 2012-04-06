@@ -27,15 +27,15 @@ public:
 	DECLARE_WRITE16_MEMBER(fuuki16_vregs_w);
 	DECLARE_WRITE16_MEMBER(fuuki16_sound_command_w);
 	DECLARE_WRITE8_MEMBER(fuuki16_sound_rombank_w);
+	DECLARE_WRITE16_MEMBER(fuuki16_vram_0_w);
+	DECLARE_WRITE16_MEMBER(fuuki16_vram_1_w);
+	DECLARE_WRITE16_MEMBER(fuuki16_vram_2_w);
+	DECLARE_WRITE16_MEMBER(fuuki16_vram_3_w);
 };
 
 
 /*----------- defined in video/fuukifg2.c -----------*/
 
-WRITE16_HANDLER( fuuki16_vram_0_w );
-WRITE16_HANDLER( fuuki16_vram_1_w );
-WRITE16_HANDLER( fuuki16_vram_2_w );
-WRITE16_HANDLER( fuuki16_vram_3_w );
 
 VIDEO_START( fuuki16 );
 SCREEN_UPDATE_IND16( fuuki16 );

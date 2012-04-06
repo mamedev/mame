@@ -64,6 +64,21 @@ public:
 	DECLARE_READ16_MEMBER(soundram_r);
 	DECLARE_WRITE16_MEMBER(soundram_w);
 	DECLARE_READ16_MEMBER(poundfor_trackball_r);
+	DECLARE_READ16_MEMBER(m72_palette1_r);
+	DECLARE_READ16_MEMBER(m72_palette2_r);
+	DECLARE_WRITE16_MEMBER(m72_palette1_w);
+	DECLARE_WRITE16_MEMBER(m72_palette2_w);
+	DECLARE_WRITE16_MEMBER(m72_videoram1_w);
+	DECLARE_WRITE16_MEMBER(m72_videoram2_w);
+	DECLARE_WRITE16_MEMBER(m72_irq_line_w);
+	DECLARE_WRITE16_MEMBER(m72_scrollx1_w);
+	DECLARE_WRITE16_MEMBER(m72_scrollx2_w);
+	DECLARE_WRITE16_MEMBER(m72_scrolly1_w);
+	DECLARE_WRITE16_MEMBER(m72_scrolly2_w);
+	DECLARE_WRITE16_MEMBER(m72_dmaon_w);
+	DECLARE_WRITE16_MEMBER(m72_port02_w);
+	DECLARE_WRITE16_MEMBER(rtype2_port02_w);
+	DECLARE_WRITE16_MEMBER(majtitle_gfx_ctrl_w);
 };
 
 
@@ -77,21 +92,6 @@ VIDEO_START( poundfor );
 VIDEO_START( xmultipl );
 VIDEO_START( hharryu );
 
-READ16_HANDLER( m72_palette1_r );
-READ16_HANDLER( m72_palette2_r );
-WRITE16_HANDLER( m72_palette1_w );
-WRITE16_HANDLER( m72_palette2_w );
-WRITE16_HANDLER( m72_videoram1_w );
-WRITE16_HANDLER( m72_videoram2_w );
-WRITE16_HANDLER( m72_irq_line_w );
-WRITE16_HANDLER( m72_scrollx1_w );
-WRITE16_HANDLER( m72_scrollx2_w );
-WRITE16_HANDLER( m72_scrolly1_w );
-WRITE16_HANDLER( m72_scrolly2_w );
-WRITE16_HANDLER( m72_dmaon_w );
-WRITE16_HANDLER( m72_port02_w );
-WRITE16_HANDLER( rtype2_port02_w );
-WRITE16_HANDLER( majtitle_gfx_ctrl_w );
 
 SCREEN_UPDATE_IND16( m72 );
 SCREEN_UPDATE_IND16( majtitle );

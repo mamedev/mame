@@ -65,7 +65,7 @@ static ADDRESS_MAP_START( vigilant_map, AS_PROGRAM, 8, vigilant_state )
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")		/* Fallthrough */
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc020, 0xc0df) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
-	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE_LEGACY(vigilant_paletteram_w) AM_SHARE("paletteram")
+	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(vigilant_paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0xd000, 0xdfff) AM_RAM AM_BASE(m_videoram)
 	AM_RANGE(0xe000, 0xefff) AM_RAM
 ADDRESS_MAP_END
@@ -77,16 +77,16 @@ static ADDRESS_MAP_START( vigilant_io_map, AS_IO, 8, vigilant_state )
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN2")
 	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW1")
 	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSW2") AM_WRITE(vigilant_bank_select_w)	/* PBANK */
-	AM_RANGE(0x80, 0x81) AM_WRITE_LEGACY(vigilant_horiz_scroll_w)		/* HSPL, HSPH */
-	AM_RANGE(0x82, 0x83) AM_WRITE_LEGACY(vigilant_rear_horiz_scroll_w) /* RHSPL, RHSPH */
-	AM_RANGE(0x84, 0x84) AM_WRITE_LEGACY(vigilant_rear_color_w)		/* RCOD */
+	AM_RANGE(0x80, 0x81) AM_WRITE(vigilant_horiz_scroll_w)		/* HSPL, HSPH */
+	AM_RANGE(0x82, 0x83) AM_WRITE(vigilant_rear_horiz_scroll_w) /* RHSPL, RHSPH */
+	AM_RANGE(0x84, 0x84) AM_WRITE(vigilant_rear_color_w)		/* RCOD */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( kikcubic_map, AS_PROGRAM, 8, vigilant_state )
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")		/* Fallthrough */
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc0ff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
-	AM_RANGE(0xc800, 0xcaff) AM_RAM_WRITE_LEGACY(vigilant_paletteram_w) AM_SHARE("paletteram")
+	AM_RANGE(0xc800, 0xcaff) AM_RAM_WRITE(vigilant_paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0xd000, 0xdfff) AM_RAM AM_BASE(m_videoram)
 	AM_RANGE(0xe000, 0xffff) AM_RAM
 ADDRESS_MAP_END

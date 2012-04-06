@@ -60,25 +60,24 @@
 #include "emu.h"
 #include "includes/suna16.h"
 
-WRITE16_HANDLER( suna16_flipscreen_w )
+WRITE16_MEMBER(suna16_state::suna16_flipscreen_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		suna16_state *state = space->machine().driver_data<suna16_state>();
-		flip_screen_set(space->machine(),  data & 1 );
-		state->m_color_bank = ( data & 4 ) >> 2;
+		flip_screen_set(machine(),  data & 1 );
+		m_color_bank = ( data & 4 ) >> 2;
 	}
-	if (data & ~(1|4))	logerror("CPU#0 PC %06X - Flip screen unknown bits: %04X\n", cpu_get_pc(&space->device()), data);
+	if (data & ~(1|4))	logerror("CPU#0 PC %06X - Flip screen unknown bits: %04X\n", cpu_get_pc(&space.device()), data);
 }
 
-WRITE16_HANDLER( bestbest_flipscreen_w )
+WRITE16_MEMBER(suna16_state::bestbest_flipscreen_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		flip_screen_set(space->machine(),  data & 0x10 );
-		//state->m_color_bank = ( data & 0x07 );
+		flip_screen_set(machine(),  data & 0x10 );
+		//m_color_bank = ( data & 0x07 );
 	}
-	if (data & ~(0x10))	logerror("CPU#0 PC %06X - Flip screen unknown bits: %04X\n", cpu_get_pc(&space->device()), data);
+	if (data & ~(0x10))	logerror("CPU#0 PC %06X - Flip screen unknown bits: %04X\n", cpu_get_pc(&space.device()), data);
 }
 
 
@@ -97,20 +96,18 @@ VIDEO_START( suna16 )
 	state->m_paletteram = auto_alloc_array(machine, UINT16, machine.total_colors());
 }
 
-READ16_HANDLER( suna16_paletteram16_r )
+READ16_MEMBER(suna16_state::suna16_paletteram16_r)
 {
-	suna16_state *state = space->machine().driver_data<suna16_state>();
 
-	return state->m_paletteram[offset + state->m_color_bank * 256];
+	return m_paletteram[offset + m_color_bank * 256];
 }
 
-WRITE16_HANDLER( suna16_paletteram16_w )
+WRITE16_MEMBER(suna16_state::suna16_paletteram16_w)
 {
-	suna16_state *state = space->machine().driver_data<suna16_state>();
 
-	offset += state->m_color_bank * 256;
-	data = COMBINE_DATA(&state->m_paletteram[offset]);
-	palette_set_color_rgb( space->machine(), offset, pal5bit(data >> 0),pal5bit(data >> 5),pal5bit(data >> 10));
+	offset += m_color_bank * 256;
+	data = COMBINE_DATA(&m_paletteram[offset]);
+	palette_set_color_rgb( machine(), offset, pal5bit(data >> 0),pal5bit(data >> 5),pal5bit(data >> 10));
 }
 
 

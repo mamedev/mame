@@ -65,69 +65,63 @@ VIDEO_START( kyugo )
  *
  *************************************/
 
-WRITE8_HANDLER( kyugo_fgvideoram_w )
+WRITE8_MEMBER(kyugo_state::kyugo_fgvideoram_w)
 {
-	kyugo_state *state = space->machine().driver_data<kyugo_state>();
 
-	state->m_fgvideoram[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset);
+	m_fgvideoram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_HANDLER( kyugo_bgvideoram_w )
+WRITE8_MEMBER(kyugo_state::kyugo_bgvideoram_w)
 {
-	kyugo_state *state = space->machine().driver_data<kyugo_state>();
 
-	state->m_bgvideoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_bgvideoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_HANDLER( kyugo_bgattribram_w )
+WRITE8_MEMBER(kyugo_state::kyugo_bgattribram_w)
 {
-	kyugo_state *state = space->machine().driver_data<kyugo_state>();
 
-	state->m_bgattribram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_bgattribram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
-READ8_HANDLER( kyugo_spriteram_2_r )
+READ8_MEMBER(kyugo_state::kyugo_spriteram_2_r)
 {
-	kyugo_state *state = space->machine().driver_data<kyugo_state>();
 
 	// only the lower nibble is connected
-	return state->m_spriteram_2[offset] | 0xf0;
+	return m_spriteram_2[offset] | 0xf0;
 }
 
 
-WRITE8_HANDLER( kyugo_scroll_x_lo_w )
+WRITE8_MEMBER(kyugo_state::kyugo_scroll_x_lo_w)
 {
-	kyugo_state *state = space->machine().driver_data<kyugo_state>();
-	state->m_scroll_x_lo = data;
+	m_scroll_x_lo = data;
 }
 
 
-WRITE8_HANDLER( kyugo_gfxctrl_w )
+WRITE8_MEMBER(kyugo_state::kyugo_gfxctrl_w)
 {
-	kyugo_state *state = space->machine().driver_data<kyugo_state>();
 
 	/* bit 0 is scroll MSB */
-	state->m_scroll_x_hi = data & 0x01;
+	m_scroll_x_hi = data & 0x01;
 
 	/* bit 5 is front layer color (Son of Phoenix only) */
-	if (state->m_fgcolor != ((data & 0x20) >> 5))
+	if (m_fgcolor != ((data & 0x20) >> 5))
 	{
-		state->m_fgcolor = (data & 0x20) >> 5;
+		m_fgcolor = (data & 0x20) >> 5;
 
-		state->m_fg_tilemap->mark_all_dirty();
+		m_fg_tilemap->mark_all_dirty();
 	}
 
 	/* bit 6 is background palette bank */
-	if (state->m_bgpalbank != ((data & 0x40) >> 6))
+	if (m_bgpalbank != ((data & 0x40) >> 6))
 	{
-		state->m_bgpalbank = (data & 0x40) >> 6;
-		state->m_bg_tilemap->mark_all_dirty();
+		m_bgpalbank = (data & 0x40) >> 6;
+		m_bg_tilemap->mark_all_dirty();
 	}
 
 	if (data & 0x9e)
@@ -135,21 +129,19 @@ WRITE8_HANDLER( kyugo_gfxctrl_w )
 }
 
 
-WRITE8_HANDLER( kyugo_scroll_y_w )
+WRITE8_MEMBER(kyugo_state::kyugo_scroll_y_w)
 {
-	kyugo_state *state = space->machine().driver_data<kyugo_state>();
-	state->m_scroll_y = data;
+	m_scroll_y = data;
 }
 
 
-WRITE8_HANDLER( kyugo_flipscreen_w )
+WRITE8_MEMBER(kyugo_state::kyugo_flipscreen_w)
 {
-	kyugo_state *state = space->machine().driver_data<kyugo_state>();
 
-	if (state->m_flipscreen != (data & 0x01))
+	if (m_flipscreen != (data & 0x01))
 	{
-		state->m_flipscreen = (data & 0x01);
-		space->machine().tilemap().set_flip_all((state->m_flipscreen ? (TILEMAP_FLIPX | TILEMAP_FLIPY): 0));
+		m_flipscreen = (data & 0x01);
+		machine().tilemap().set_flip_all((m_flipscreen ? (TILEMAP_FLIPX | TILEMAP_FLIPY): 0));
 	}
 }
 

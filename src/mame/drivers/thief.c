@@ -152,26 +152,26 @@ READ8_MEMBER(thief_state::thief_io_r)
 static ADDRESS_MAP_START( sharkatt_main_map, AS_PROGRAM, 8, thief_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM		/* 2114 */
-	AM_RANGE(0xc000, 0xdfff) AM_READWRITE_LEGACY(thief_videoram_r, thief_videoram_w)	/* 4116 */
+	AM_RANGE(0xc000, 0xdfff) AM_READWRITE(thief_videoram_r, thief_videoram_w)	/* 4116 */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( thief_main_map, AS_PROGRAM, 8, thief_state )
-	AM_RANGE(0x0000, 0x0000) AM_WRITE_LEGACY(thief_blit_w)
+	AM_RANGE(0x0000, 0x0000) AM_WRITE(thief_blit_w)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM		/* 2114 */
 	AM_RANGE(0xa000, 0xafff) AM_ROM		/* NATO Defense diagnostic ROM */
-	AM_RANGE(0xc000, 0xdfff) AM_READWRITE_LEGACY(thief_videoram_r, thief_videoram_w)	/* 4116 */
-	AM_RANGE(0xe000, 0xe008) AM_READWRITE_LEGACY(thief_coprocessor_r, thief_coprocessor_w)
+	AM_RANGE(0xc000, 0xdfff) AM_READWRITE(thief_videoram_r, thief_videoram_w)	/* 4116 */
+	AM_RANGE(0xe000, 0xe008) AM_READWRITE(thief_coprocessor_r, thief_coprocessor_w)
 	AM_RANGE(0xe010, 0xe02f) AM_ROM
-	AM_RANGE(0xe080, 0xe0bf) AM_READWRITE_LEGACY(thief_context_ram_r, thief_context_ram_w)
-	AM_RANGE(0xe0c0, 0xe0c0) AM_WRITE_LEGACY(thief_context_bank_w)
+	AM_RANGE(0xe080, 0xe0bf) AM_READWRITE(thief_context_ram_r, thief_context_ram_w)
+	AM_RANGE(0xe0c0, 0xe0c0) AM_WRITE(thief_context_bank_w)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( io_map, AS_IO, 8, thief_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITENOP /* watchdog */
-	AM_RANGE(0x10, 0x10) AM_WRITE_LEGACY(thief_video_control_w)
+	AM_RANGE(0x10, 0x10) AM_WRITE(thief_video_control_w)
 	AM_RANGE(0x30, 0x30) AM_WRITE(thief_input_select_w) /* 8255 */
 	AM_RANGE(0x31, 0x31) AM_READ(thief_io_r)	/* 8255 */
 	AM_RANGE(0x33, 0x33) AM_DEVWRITE_LEGACY("samples", tape_control_w)
@@ -179,9 +179,9 @@ static ADDRESS_MAP_START( io_map, AS_IO, 8, thief_state )
 	AM_RANGE(0x41, 0x41) AM_DEVREAD_LEGACY("ay1", ay8910_r)
 	AM_RANGE(0x42, 0x43) AM_DEVWRITE_LEGACY("ay2", ay8910_address_data_w)
 	AM_RANGE(0x43, 0x43) AM_DEVREAD_LEGACY("ay2", ay8910_r)
-	AM_RANGE(0x50, 0x50) AM_WRITE_LEGACY(thief_color_plane_w)
+	AM_RANGE(0x50, 0x50) AM_WRITE(thief_color_plane_w)
 	AM_RANGE(0x60, 0x6f) AM_DEVREADWRITE_LEGACY("tms", tms9927_r, tms9927_w)
-	AM_RANGE(0x70, 0x7f) AM_WRITE_LEGACY(thief_color_map_w)
+	AM_RANGE(0x70, 0x7f) AM_WRITE(thief_color_map_w)
 ADDRESS_MAP_END
 
 

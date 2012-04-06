@@ -61,11 +61,10 @@ Note:   if MAME_DEBUG is defined, pressing Z with:
                             Palette GGGGGRRRRRBBBBBx
 ***************************************************************************/
 
-WRITE16_HANDLER( hyprduel_paletteram_w )
+WRITE16_MEMBER(hyprduel_state::hyprduel_paletteram_w)
 {
-	hyprduel_state *state = space->machine().driver_data<hyprduel_state>();
-	data = COMBINE_DATA(&state->m_paletteram[offset]);
-	palette_set_color_rgb(space->machine(), offset, pal5bit(data >> 6), pal5bit(data >> 11), pal5bit(data >> 1));
+	data = COMBINE_DATA(&m_paletteram[offset]);
+	palette_set_color_rgb(machine(), offset, pal5bit(data >> 6), pal5bit(data >> 11), pal5bit(data >> 1));
 }
 
 
@@ -275,35 +274,31 @@ static TILE_GET_INFO( get_tile_info_2_8bit )
 	get_tile_info_8bit(machine, tileinfo, tile_index, 2, state->m_vram_2);
 }
 
-WRITE16_HANDLER( hyprduel_vram_0_w )
+WRITE16_MEMBER(hyprduel_state::hyprduel_vram_0_w)
 {
-	hyprduel_state *state = space->machine().driver_data<hyprduel_state>();
-	hyprduel_vram_w(space->machine(), offset, data, mem_mask, 0, state->m_vram_0);
+	hyprduel_vram_w(machine(), offset, data, mem_mask, 0, m_vram_0);
 }
 
-WRITE16_HANDLER( hyprduel_vram_1_w )
+WRITE16_MEMBER(hyprduel_state::hyprduel_vram_1_w)
 {
-	hyprduel_state *state = space->machine().driver_data<hyprduel_state>();
-	hyprduel_vram_w(space->machine(), offset, data, mem_mask, 1, state->m_vram_1);
+	hyprduel_vram_w(machine(), offset, data, mem_mask, 1, m_vram_1);
 }
 
-WRITE16_HANDLER( hyprduel_vram_2_w )
+WRITE16_MEMBER(hyprduel_state::hyprduel_vram_2_w)
 {
-	hyprduel_state *state = space->machine().driver_data<hyprduel_state>();
-	hyprduel_vram_w(space->machine(), offset, data, mem_mask, 2, state->m_vram_2);
+	hyprduel_vram_w(machine(), offset, data, mem_mask, 2, m_vram_2);
 }
 
 
 /* Dirty the relevant tilemap when its window changes */
-WRITE16_HANDLER( hyprduel_window_w )
+WRITE16_MEMBER(hyprduel_state::hyprduel_window_w)
 {
-	hyprduel_state *state = space->machine().driver_data<hyprduel_state>();
-	UINT16 olddata = state->m_window[offset];
-	UINT16 newdata = COMBINE_DATA(&state->m_window[offset]);
+	UINT16 olddata = m_window[offset];
+	UINT16 newdata = COMBINE_DATA(&m_window[offset]);
 	if (newdata != olddata)
 	{
 		offset /= 2;
-		state->m_bg_tilemap[offset]->mark_all_dirty();
+		m_bg_tilemap[offset]->mark_all_dirty();
 	}
 }
 
@@ -616,34 +611,32 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
                                 Screen Drawing
 ***************************************************************************/
 
-WRITE16_HANDLER( hyprduel_scrollreg_w )
+WRITE16_MEMBER(hyprduel_state::hyprduel_scrollreg_w)
 {
-	hyprduel_state *state = space->machine().driver_data<hyprduel_state>();
-	UINT16 window = state->m_window[offset];
+	UINT16 window = m_window[offset];
 
-	COMBINE_DATA(&state->m_scroll[offset]);
+	COMBINE_DATA(&m_scroll[offset]);
 
 	if (offset & 0x01)
-		state->m_bg_tilemap[offset / 2]->set_scrollx(0, state->m_scroll[offset] - window - (window & 7));
+		m_bg_tilemap[offset / 2]->set_scrollx(0, m_scroll[offset] - window - (window & 7));
 	else
-		state->m_bg_tilemap[offset / 2]->set_scrolly(0, state->m_scroll[offset] - window - (window & 7));
+		m_bg_tilemap[offset / 2]->set_scrolly(0, m_scroll[offset] - window - (window & 7));
 }
 
-WRITE16_HANDLER( hyprduel_scrollreg_init_w )
+WRITE16_MEMBER(hyprduel_state::hyprduel_scrollreg_init_w)
 {
-	hyprduel_state *state = space->machine().driver_data<hyprduel_state>();
 	int i;
 
 	for (i = 0; i < 3; i++)
 	{
-		UINT16 wx = state->m_window[i * 2 + 1];
-		UINT16 wy = state->m_window[i * 2 + 0];
+		UINT16 wx = m_window[i * 2 + 1];
+		UINT16 wy = m_window[i * 2 + 0];
 
-		state->m_scroll[i * 2 + 1] = data;
-		state->m_scroll[i * 2 + 0] = data;
+		m_scroll[i * 2 + 1] = data;
+		m_scroll[i * 2 + 0] = data;
 
-		state->m_bg_tilemap[i]->set_scrollx(0, data - wx - (wx & 7));
-		state->m_bg_tilemap[i]->set_scrolly(0, data - wy - (wy & 7));
+		m_bg_tilemap[i]->set_scrollx(0, data - wx - (wx & 7));
+		m_bg_tilemap[i]->set_scrolly(0, data - wy - (wy & 7));
 	}
 }
 

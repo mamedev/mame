@@ -6,13 +6,12 @@
 
 /*** SCR A LAYER ***/
 
-WRITE32_HANDLER( macrossp_scra_videoram_w )
+WRITE32_MEMBER(macrossp_state::macrossp_scra_videoram_w)
 {
-	macrossp_state *state = space->machine().driver_data<macrossp_state>();
 
-	COMBINE_DATA(&state->m_scra_videoram[offset]);
+	COMBINE_DATA(&m_scra_videoram[offset]);
 
-	state->m_scra_tilemap->mark_tile_dirty(offset);
+	m_scra_tilemap->mark_tile_dirty(offset);
 }
 
 
@@ -44,13 +43,12 @@ static TILE_GET_INFO( get_macrossp_scra_tile_info )
 
 /*** SCR B LAYER ***/
 
-WRITE32_HANDLER( macrossp_scrb_videoram_w )
+WRITE32_MEMBER(macrossp_state::macrossp_scrb_videoram_w)
 {
-	macrossp_state *state = space->machine().driver_data<macrossp_state>();
 
-	COMBINE_DATA(&state->m_scrb_videoram[offset]);
+	COMBINE_DATA(&m_scrb_videoram[offset]);
 
-	state->m_scrb_tilemap->mark_tile_dirty(offset);
+	m_scrb_tilemap->mark_tile_dirty(offset);
 }
 
 
@@ -82,13 +80,12 @@ static TILE_GET_INFO( get_macrossp_scrb_tile_info )
 
 /*** SCR C LAYER ***/
 
-WRITE32_HANDLER( macrossp_scrc_videoram_w )
+WRITE32_MEMBER(macrossp_state::macrossp_scrc_videoram_w)
 {
-	macrossp_state *state = space->machine().driver_data<macrossp_state>();
 
-	COMBINE_DATA(&state->m_scrc_videoram[offset]);
+	COMBINE_DATA(&m_scrc_videoram[offset]);
 
-	state->m_scrc_tilemap->mark_tile_dirty(offset);
+	m_scrc_tilemap->mark_tile_dirty(offset);
 }
 
 
@@ -120,13 +117,12 @@ static TILE_GET_INFO( get_macrossp_scrc_tile_info )
 
 /*** TEXT LAYER ***/
 
-WRITE32_HANDLER( macrossp_text_videoram_w )
+WRITE32_MEMBER(macrossp_state::macrossp_text_videoram_w)
 {
-	macrossp_state *state = space->machine().driver_data<macrossp_state>();
 
-	COMBINE_DATA(&state->m_text_videoram[offset]);
+	COMBINE_DATA(&m_text_videoram[offset]);
 
-	state->m_text_tilemap->mark_tile_dirty(offset);
+	m_text_tilemap->mark_tile_dirty(offset);
 }
 
 

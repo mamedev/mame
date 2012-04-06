@@ -44,42 +44,40 @@ static void set_pens( running_machine &machine )
 }
 
 
-WRITE8_HANDLER( K005885_0_w )
+WRITE8_MEMBER(ddribble_state::K005885_0_w)
 {
-	ddribble_state *state = space->machine().driver_data<ddribble_state>();
 	switch (offset)
 	{
 		case 0x03:	/* char bank selection for set 1 */
-			if ((data & 0x03) != state->m_charbank[0])
+			if ((data & 0x03) != m_charbank[0])
 			{
-				state->m_charbank[0] = data & 0x03;
-				state->m_fg_tilemap->mark_all_dirty();
+				m_charbank[0] = data & 0x03;
+				m_fg_tilemap->mark_all_dirty();
 			}
 			break;
 		case 0x04:	/* IRQ control, flipscreen */
-			state->m_int_enable_0 = data & 0x02;
+			m_int_enable_0 = data & 0x02;
 			break;
 	}
-	state->m_vregs[0][offset] = data;
+	m_vregs[0][offset] = data;
 }
 
-WRITE8_HANDLER( K005885_1_w )
+WRITE8_MEMBER(ddribble_state::K005885_1_w)
 {
-	ddribble_state *state = space->machine().driver_data<ddribble_state>();
 	switch (offset)
 	{
 		case 0x03:	/* char bank selection for set 2 */
-			if ((data & 0x03) != state->m_charbank[1])
+			if ((data & 0x03) != m_charbank[1])
 			{
-				state->m_charbank[1] = data & 0x03;
-				state->m_bg_tilemap->mark_all_dirty();
+				m_charbank[1] = data & 0x03;
+				m_bg_tilemap->mark_all_dirty();
 			}
 			break;
 		case 0x04:	/* IRQ control, flipscreen */
-			state->m_int_enable_1 = data & 0x02;
+			m_int_enable_1 = data & 0x02;
 			break;
 	}
-	state->m_vregs[1][offset] = data;
+	m_vregs[1][offset] = data;
 }
 
 /***************************************************************************
@@ -140,18 +138,16 @@ VIDEO_START( ddribble )
 
 ***************************************************************************/
 
-WRITE8_HANDLER( ddribble_fg_videoram_w )
+WRITE8_MEMBER(ddribble_state::ddribble_fg_videoram_w)
 {
-	ddribble_state *state = space->machine().driver_data<ddribble_state>();
-	state->m_fg_videoram[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset & 0xbff);
+	m_fg_videoram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset & 0xbff);
 }
 
-WRITE8_HANDLER( ddribble_bg_videoram_w )
+WRITE8_MEMBER(ddribble_state::ddribble_bg_videoram_w)
 {
-	ddribble_state *state = space->machine().driver_data<ddribble_state>();
-	state->m_bg_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset & 0xbff);
+	m_bg_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset & 0xbff);
 }
 
 /***************************************************************************

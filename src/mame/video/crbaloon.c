@@ -47,18 +47,16 @@ PALETTE_INIT( crbaloon )
 }
 
 
-WRITE8_HANDLER( crbaloon_videoram_w )
+WRITE8_MEMBER(crbaloon_state::crbaloon_videoram_w)
 {
-	crbaloon_state *state = space->machine().driver_data<crbaloon_state>();
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( crbaloon_colorram_w )
+WRITE8_MEMBER(crbaloon_state::crbaloon_colorram_w)
 {
-	crbaloon_state *state = space->machine().driver_data<crbaloon_state>();
-	state->m_colorram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_colorram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )

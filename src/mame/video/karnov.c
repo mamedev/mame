@@ -145,18 +145,16 @@ static TILE_GET_INFO( get_fix_tile_info )
 			0);
 }
 
-WRITE16_HANDLER( karnov_videoram_w )
+WRITE16_MEMBER(karnov_state::karnov_videoram_w)
 {
-	karnov_state *state = space->machine().driver_data<karnov_state>();
-	COMBINE_DATA(&state->m_videoram[offset]);
-	state->m_fix_tilemap->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_videoram[offset]);
+	m_fix_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_HANDLER( karnov_playfield_swap_w )
+WRITE16_MEMBER(karnov_state::karnov_playfield_swap_w)
 {
-	karnov_state *state = space->machine().driver_data<karnov_state>();
 	offset = ((offset & 0x1f) << 5) | ((offset & 0x3e0) >> 5);
-	COMBINE_DATA(&state->m_pf_data[offset]);
+	COMBINE_DATA(&m_pf_data[offset]);
 }
 
 /******************************************************************************/

@@ -75,11 +75,10 @@ VIDEO_START( finalizr )
 
 
 
-WRITE8_HANDLER( finalizr_videoctrl_w )
+WRITE8_MEMBER(finalizr_state::finalizr_videoctrl_w)
 {
-	finalizr_state *state = space->machine().driver_data<finalizr_state>();
-	state->m_charbank = data & 3;
-	state->m_spriterambank = data & 8;
+	m_charbank = data & 3;
+	m_spriterambank = data & 8;
 	/* other bits unknown */
 }
 

@@ -30,13 +30,13 @@ public:
 	device_t *m_audiocpu;
 	DECLARE_WRITE16_MEMBER(yunsun16_sound_bank_w);
 	DECLARE_WRITE16_MEMBER(magicbub_sound_command_w);
+	DECLARE_WRITE16_MEMBER(yunsun16_vram_0_w);
+	DECLARE_WRITE16_MEMBER(yunsun16_vram_1_w);
 };
 
 
 /*----------- defined in video/yunsun16.c -----------*/
 
-WRITE16_HANDLER( yunsun16_vram_0_w );
-WRITE16_HANDLER( yunsun16_vram_1_w );
 
 VIDEO_START( yunsun16 );
 SCREEN_UPDATE_IND16( yunsun16 );

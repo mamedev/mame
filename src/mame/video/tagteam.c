@@ -42,23 +42,20 @@ PALETTE_INIT( tagteam )
 }
 
 
-WRITE8_HANDLER( tagteam_videoram_w )
+WRITE8_MEMBER(tagteam_state::tagteam_videoram_w)
 {
-	tagteam_state *state = space->machine().driver_data<tagteam_state>();
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( tagteam_colorram_w )
+WRITE8_MEMBER(tagteam_state::tagteam_colorram_w)
 {
-	tagteam_state *state = space->machine().driver_data<tagteam_state>();
-	state->m_colorram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_colorram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-READ8_HANDLER( tagteam_mirrorvideoram_r )
+READ8_MEMBER(tagteam_state::tagteam_mirrorvideoram_r)
 {
-	tagteam_state *state = space->machine().driver_data<tagteam_state>();
 	int x,y;
 
 	/* swap x and y coordinates */
@@ -66,12 +63,11 @@ READ8_HANDLER( tagteam_mirrorvideoram_r )
 	y = offset % 32;
 	offset = 32 * y + x;
 
-	return state->m_videoram[offset];
+	return m_videoram[offset];
 }
 
-READ8_HANDLER( tagteam_mirrorcolorram_r )
+READ8_MEMBER(tagteam_state::tagteam_mirrorcolorram_r)
 {
-	tagteam_state *state = space->machine().driver_data<tagteam_state>();
 	int x,y;
 
 	/* swap x and y coordinates */
@@ -79,10 +75,10 @@ READ8_HANDLER( tagteam_mirrorcolorram_r )
 	y = offset % 32;
 	offset = 32 * y + x;
 
-	return state->m_colorram[offset];
+	return m_colorram[offset];
 }
 
-WRITE8_HANDLER( tagteam_mirrorvideoram_w )
+WRITE8_MEMBER(tagteam_state::tagteam_mirrorvideoram_w)
 {
 	int x,y;
 
@@ -94,7 +90,7 @@ WRITE8_HANDLER( tagteam_mirrorvideoram_w )
 	tagteam_videoram_w(space,offset,data);
 }
 
-WRITE8_HANDLER( tagteam_mirrorcolorram_w )
+WRITE8_MEMBER(tagteam_state::tagteam_mirrorcolorram_w)
 {
 	int x,y;
 
@@ -106,29 +102,28 @@ WRITE8_HANDLER( tagteam_mirrorcolorram_w )
 	tagteam_colorram_w(space,offset,data);
 }
 
-WRITE8_HANDLER( tagteam_control_w )
+WRITE8_MEMBER(tagteam_state::tagteam_control_w)
 {
-	tagteam_state *state = space->machine().driver_data<tagteam_state>();
 
 	// d0-3: color for blank screen, applies to h/v borders too
 	// (not implemented yet, and tagteam doesn't have a global screen on/off bit)
 
 	// d7: palette bank
-	state->m_palettebank = (data & 0x80) >> 7;
+	m_palettebank = (data & 0x80) >> 7;
 }
 
-WRITE8_HANDLER( tagteam_flipscreen_w )
+WRITE8_MEMBER(tagteam_state::tagteam_flipscreen_w)
 {
 	// d0: flip screen
-	if (flip_screen_get(space->machine()) != (data &0x01))
+	if (flip_screen_get(machine()) != (data &0x01))
 	{
-		flip_screen_set(space->machine(), data & 0x01);
-		space->machine().tilemap().mark_all_dirty();
+		flip_screen_set(machine(), data & 0x01);
+		machine().tilemap().mark_all_dirty();
 	}
 
 	// d6/7: coin counters
-	coin_counter_w(space->machine(), 0, data & 0x80);
-	coin_counter_w(space->machine(), 1, data & 0x40);
+	coin_counter_w(machine(), 0, data & 0x80);
+	coin_counter_w(machine(), 1, data & 0x40);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )

@@ -33,16 +33,16 @@ public:
 	DECLARE_WRITE8_MEMBER(gberetb_flipscreen_w);
 	DECLARE_READ8_MEMBER(gberetb_irq_ack_r);
 	DECLARE_WRITE8_MEMBER(gberetb_nmi_ack_w);
+	DECLARE_WRITE8_MEMBER(gberet_videoram_w);
+	DECLARE_WRITE8_MEMBER(gberet_colorram_w);
+	DECLARE_WRITE8_MEMBER(gberet_scroll_w);
+	DECLARE_WRITE8_MEMBER(gberet_sprite_bank_w);
+	DECLARE_WRITE8_MEMBER(gberetb_scroll_w);
 };
 
 
 /*----------- defined in video/gberet.c -----------*/
 
-WRITE8_HANDLER( gberet_videoram_w );
-WRITE8_HANDLER( gberet_colorram_w );
-WRITE8_HANDLER( gberet_scroll_w );
-WRITE8_HANDLER( gberetb_scroll_w );
-WRITE8_HANDLER( gberet_sprite_bank_w );
 
 PALETTE_INIT( gberet );
 VIDEO_START( gberet );

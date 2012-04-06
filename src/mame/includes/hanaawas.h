@@ -21,13 +21,13 @@ public:
 	int        m_mux;
 	DECLARE_READ8_MEMBER(hanaawas_input_port_0_r);
 	DECLARE_WRITE8_MEMBER(hanaawas_inputs_mux_w);
+	DECLARE_WRITE8_MEMBER(hanaawas_videoram_w);
+	DECLARE_WRITE8_MEMBER(hanaawas_colorram_w);
 };
 
 
 /*----------- defined in video/hanaawas.c -----------*/
 
-WRITE8_HANDLER( hanaawas_videoram_w );
-WRITE8_HANDLER( hanaawas_colorram_w );
 WRITE8_DEVICE_HANDLER( hanaawas_portB_w );
 
 PALETTE_INIT( hanaawas );

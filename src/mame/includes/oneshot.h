@@ -34,13 +34,13 @@ public:
 	DECLARE_READ16_MEMBER(oneshot_gun_y_p1_r);
 	DECLARE_READ16_MEMBER(oneshot_gun_x_p2_r);
 	DECLARE_READ16_MEMBER(oneshot_gun_y_p2_r);
+	DECLARE_WRITE16_MEMBER(oneshot_bg_videoram_w);
+	DECLARE_WRITE16_MEMBER(oneshot_mid_videoram_w);
+	DECLARE_WRITE16_MEMBER(oneshot_fg_videoram_w);
 };
 
 /*----------- defined in video/oneshot.c -----------*/
 
-WRITE16_HANDLER( oneshot_bg_videoram_w );
-WRITE16_HANDLER( oneshot_mid_videoram_w );
-WRITE16_HANDLER( oneshot_fg_videoram_w );
 
 VIDEO_START( oneshot );
 SCREEN_UPDATE_IND16( oneshot );

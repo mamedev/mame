@@ -7,42 +7,37 @@
 #include "emu.h"
 #include "includes/goal92.h"
 
-READ16_HANDLER( goal92_fg_bank_r )
+READ16_MEMBER(goal92_state::goal92_fg_bank_r)
 {
-	goal92_state *state = space->machine().driver_data<goal92_state>();
-	return state->m_fg_bank;
+	return m_fg_bank;
 }
 
-WRITE16_HANDLER( goal92_fg_bank_w )
+WRITE16_MEMBER(goal92_state::goal92_fg_bank_w)
 {
-	goal92_state *state = space->machine().driver_data<goal92_state>();
-	COMBINE_DATA(&state->m_fg_bank);
+	COMBINE_DATA(&m_fg_bank);
 
 	if (ACCESSING_BITS_0_7)
 	{
-		state->m_fg_layer->mark_all_dirty();
+		m_fg_layer->mark_all_dirty();
 	}
 }
 
-WRITE16_HANDLER( goal92_text_w )
+WRITE16_MEMBER(goal92_state::goal92_text_w)
 {
-	goal92_state *state = space->machine().driver_data<goal92_state>();
-	COMBINE_DATA(&state->m_tx_data[offset]);
-	state->m_tx_layer->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_tx_data[offset]);
+	m_tx_layer->mark_tile_dirty(offset);
 }
 
-WRITE16_HANDLER( goal92_background_w )
+WRITE16_MEMBER(goal92_state::goal92_background_w)
 {
-	goal92_state *state = space->machine().driver_data<goal92_state>();
-	COMBINE_DATA(&state->m_bg_data[offset]);
-	state->m_bg_layer->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_bg_data[offset]);
+	m_bg_layer->mark_tile_dirty(offset);
 }
 
-WRITE16_HANDLER( goal92_foreground_w )
+WRITE16_MEMBER(goal92_state::goal92_foreground_w)
 {
-	goal92_state *state = space->machine().driver_data<goal92_state>();
-	COMBINE_DATA(&state->m_fg_data[offset]);
-	state->m_fg_layer->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_fg_data[offset]);
+	m_fg_layer->mark_tile_dirty(offset);
 }
 
 static TILE_GET_INFO( get_text_tile_info )

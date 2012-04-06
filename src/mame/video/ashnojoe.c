@@ -98,109 +98,100 @@ static TILE_GET_INFO( get_joe_tile_info_7 )
 			0);
 }
 
-WRITE16_HANDLER( ashnojoe_tileram_w )
+WRITE16_MEMBER(ashnojoe_state::ashnojoe_tileram_w)
 {
-	ashnojoe_state *state = space->machine().driver_data<ashnojoe_state>();
 
-	state->m_tileram[offset] = data;
-	state->m_joetilemap->mark_tile_dirty(offset);
+	m_tileram[offset] = data;
+	m_joetilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE16_HANDLER( ashnojoe_tileram2_w )
+WRITE16_MEMBER(ashnojoe_state::ashnojoe_tileram2_w)
 {
-	ashnojoe_state *state = space->machine().driver_data<ashnojoe_state>();
 
-	state->m_tileram_2[offset] = data;
-	state->m_joetilemap2->mark_tile_dirty(offset / 2);
+	m_tileram_2[offset] = data;
+	m_joetilemap2->mark_tile_dirty(offset / 2);
 }
 
-WRITE16_HANDLER( ashnojoe_tileram3_w )
+WRITE16_MEMBER(ashnojoe_state::ashnojoe_tileram3_w)
 {
-	ashnojoe_state *state = space->machine().driver_data<ashnojoe_state>();
 
-	state->m_tileram_3[offset] = data;
-	state->m_joetilemap3->mark_tile_dirty(offset);
+	m_tileram_3[offset] = data;
+	m_joetilemap3->mark_tile_dirty(offset);
 }
 
-WRITE16_HANDLER( ashnojoe_tileram4_w )
+WRITE16_MEMBER(ashnojoe_state::ashnojoe_tileram4_w)
 {
-	ashnojoe_state *state = space->machine().driver_data<ashnojoe_state>();
 
-	state->m_tileram_4[offset] = data;
-	state->m_joetilemap4->mark_tile_dirty(offset);
+	m_tileram_4[offset] = data;
+	m_joetilemap4->mark_tile_dirty(offset);
 }
 
-WRITE16_HANDLER( ashnojoe_tileram5_w )
+WRITE16_MEMBER(ashnojoe_state::ashnojoe_tileram5_w)
 {
-	ashnojoe_state *state = space->machine().driver_data<ashnojoe_state>();
 
-	state->m_tileram_5[offset] = data;
-	state->m_joetilemap5->mark_tile_dirty(offset / 2);
+	m_tileram_5[offset] = data;
+	m_joetilemap5->mark_tile_dirty(offset / 2);
 }
 
-WRITE16_HANDLER( ashnojoe_tileram6_w )
+WRITE16_MEMBER(ashnojoe_state::ashnojoe_tileram6_w)
 {
-	ashnojoe_state *state = space->machine().driver_data<ashnojoe_state>();
 
-	state->m_tileram_6[offset] = data;
-	state->m_joetilemap6->mark_tile_dirty(offset / 2);
+	m_tileram_6[offset] = data;
+	m_joetilemap6->mark_tile_dirty(offset / 2);
 }
 
-WRITE16_HANDLER( ashnojoe_tileram7_w )
+WRITE16_MEMBER(ashnojoe_state::ashnojoe_tileram7_w)
 {
-	ashnojoe_state *state = space->machine().driver_data<ashnojoe_state>();
 
-	state->m_tileram_7[offset] = data;
-	state->m_joetilemap7->mark_tile_dirty(offset / 2);
+	m_tileram_7[offset] = data;
+	m_joetilemap7->mark_tile_dirty(offset / 2);
 }
 
-WRITE16_HANDLER( joe_tilemaps_xscroll_w )
+WRITE16_MEMBER(ashnojoe_state::joe_tilemaps_xscroll_w)
 {
-	ashnojoe_state *state = space->machine().driver_data<ashnojoe_state>();
 
 	switch( offset )
 	{
 	case 0:
-		state->m_joetilemap3->set_scrollx(0, data);
+		m_joetilemap3->set_scrollx(0, data);
 		break;
 	case 1:
-		state->m_joetilemap5->set_scrollx(0, data);
+		m_joetilemap5->set_scrollx(0, data);
 		break;
 	case 2:
-		state->m_joetilemap2->set_scrollx(0, data);
+		m_joetilemap2->set_scrollx(0, data);
 		break;
 	case 3:
-		state->m_joetilemap4->set_scrollx(0, data);
+		m_joetilemap4->set_scrollx(0, data);
 		break;
 	case 4:
-		state->m_joetilemap6->set_scrollx(0, data);
-		state->m_joetilemap7->set_scrollx(0, data);
+		m_joetilemap6->set_scrollx(0, data);
+		m_joetilemap7->set_scrollx(0, data);
 		break;
 	}
 }
 
-WRITE16_HANDLER( joe_tilemaps_yscroll_w )
+WRITE16_MEMBER(ashnojoe_state::joe_tilemaps_yscroll_w)
 {
-	ashnojoe_state *state = space->machine().driver_data<ashnojoe_state>();
 
 	switch( offset )
 	{
 	case 0:
-		state->m_joetilemap3->set_scrolly(0, data);
+		m_joetilemap3->set_scrolly(0, data);
 		break;
 	case 1:
-		state->m_joetilemap5->set_scrolly(0, data);
+		m_joetilemap5->set_scrolly(0, data);
 		break;
 	case 2:
-		state->m_joetilemap2->set_scrolly(0, data);
+		m_joetilemap2->set_scrolly(0, data);
 		break;
 	case 3:
-		state->m_joetilemap4->set_scrolly(0, data);
+		m_joetilemap4->set_scrolly(0, data);
 		break;
 	case 4:
-		state->m_joetilemap6->set_scrolly(0, data);
-		state->m_joetilemap7->set_scrolly(0, data);
+		m_joetilemap6->set_scrolly(0, data);
+		m_joetilemap7->set_scrolly(0, data);
 		break;
 	}
 }

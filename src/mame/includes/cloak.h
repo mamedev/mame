@@ -28,18 +28,20 @@ public:
 	DECLARE_WRITE8_MEMBER(cloak_irq_reset_0_w);
 	DECLARE_WRITE8_MEMBER(cloak_irq_reset_1_w);
 	DECLARE_WRITE8_MEMBER(cloak_nvram_enable_w);
+	DECLARE_WRITE8_MEMBER(cloak_paletteram_w);
+	DECLARE_WRITE8_MEMBER(cloak_clearbmp_w);
+	DECLARE_READ8_MEMBER(graph_processor_r);
+	DECLARE_WRITE8_MEMBER(graph_processor_w);
+	DECLARE_WRITE8_MEMBER(cloak_videoram_w);
+	DECLARE_WRITE8_MEMBER(cloak_flipscreen_w);
+	void set_current_bitmap_videoram_pointer();
+	void adjust_xy(int offset);
 };
 
 
 /*----------- defined in video/cloak.c -----------*/
 
-WRITE8_HANDLER( cloak_videoram_w );
-WRITE8_HANDLER( cloak_flipscreen_w );
 
-WRITE8_HANDLER( cloak_paletteram_w );
-READ8_HANDLER( graph_processor_r );
-WRITE8_HANDLER( graph_processor_w );
-WRITE8_HANDLER( cloak_clearbmp_w );
 
 VIDEO_START( cloak );
 SCREEN_UPDATE_IND16( cloak );

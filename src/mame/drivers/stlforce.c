@@ -92,10 +92,10 @@ static WRITE16_DEVICE_HANDLER( oki_bank_w )
 
 static ADDRESS_MAP_START( stlforce_map, AS_PROGRAM, 16, stlforce_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x100000, 0x1007ff) AM_RAM_WRITE_LEGACY(stlforce_bg_videoram_w) AM_BASE(m_bg_videoram)
-	AM_RANGE(0x100800, 0x100fff) AM_RAM_WRITE_LEGACY(stlforce_mlow_videoram_w) AM_BASE(m_mlow_videoram)
-	AM_RANGE(0x101000, 0x1017ff) AM_RAM_WRITE_LEGACY(stlforce_mhigh_videoram_w) AM_BASE(m_mhigh_videoram)
-	AM_RANGE(0x101800, 0x1027ff) AM_RAM_WRITE_LEGACY(stlforce_tx_videoram_w) AM_BASE(m_tx_videoram)
+	AM_RANGE(0x100000, 0x1007ff) AM_RAM_WRITE(stlforce_bg_videoram_w) AM_BASE(m_bg_videoram)
+	AM_RANGE(0x100800, 0x100fff) AM_RAM_WRITE(stlforce_mlow_videoram_w) AM_BASE(m_mlow_videoram)
+	AM_RANGE(0x101000, 0x1017ff) AM_RAM_WRITE(stlforce_mhigh_videoram_w) AM_BASE(m_mhigh_videoram)
+	AM_RANGE(0x101800, 0x1027ff) AM_RAM_WRITE(stlforce_tx_videoram_w) AM_BASE(m_tx_videoram)
 	AM_RANGE(0x102800, 0x102fff) AM_RAM /* unknown / ram */
 	AM_RANGE(0x103000, 0x1033ff) AM_RAM AM_BASE(m_bg_scrollram)
 	AM_RANGE(0x103400, 0x1037ff) AM_RAM AM_BASE(m_mlow_scrollram)

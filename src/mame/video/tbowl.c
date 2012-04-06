@@ -20,11 +20,10 @@ static TILE_GET_INFO( get_tx_tile_info )
 	SET_TILE_INFO(0,tileno,col,0);
 }
 
-WRITE8_HANDLER( tbowl_txvideoram_w )
+WRITE8_MEMBER(tbowl_state::tbowl_txvideoram_w)
 {
-	tbowl_state *state = space->machine().driver_data<tbowl_state>();
-	state->m_txvideoram[offset] = data;
-	state->m_tx_tilemap->mark_tile_dirty(offset & 0x7ff);
+	m_txvideoram[offset] = data;
+	m_tx_tilemap->mark_tile_dirty(offset & 0x7ff);
 }
 
 /* Bottom BG Layer (bg) Tilemap */
@@ -41,35 +40,30 @@ static TILE_GET_INFO( get_bg_tile_info )
 	SET_TILE_INFO(1,tileno,col,0);
 }
 
-WRITE8_HANDLER( tbowl_bg2videoram_w )
+WRITE8_MEMBER(tbowl_state::tbowl_bg2videoram_w)
 {
-	tbowl_state *state = space->machine().driver_data<tbowl_state>();
-	state->m_bg2videoram[offset] = data;
-	state->m_bg2_tilemap->mark_tile_dirty(offset & 0xfff);
+	m_bg2videoram[offset] = data;
+	m_bg2_tilemap->mark_tile_dirty(offset & 0xfff);
 }
 
-WRITE8_HANDLER (tbowl_bgxscroll_lo)
+WRITE8_MEMBER(tbowl_state::tbowl_bgxscroll_lo)
 {
-	tbowl_state *state = space->machine().driver_data<tbowl_state>();
-	state->m_xscroll = (state->m_xscroll & 0xff00) | data;
+	m_xscroll = (m_xscroll & 0xff00) | data;
 }
 
-WRITE8_HANDLER (tbowl_bgxscroll_hi)
+WRITE8_MEMBER(tbowl_state::tbowl_bgxscroll_hi)
 {
-	tbowl_state *state = space->machine().driver_data<tbowl_state>();
-	state->m_xscroll = (state->m_xscroll & 0x00ff) | (data << 8);
+	m_xscroll = (m_xscroll & 0x00ff) | (data << 8);
 }
 
-WRITE8_HANDLER (tbowl_bgyscroll_lo)
+WRITE8_MEMBER(tbowl_state::tbowl_bgyscroll_lo)
 {
-	tbowl_state *state = space->machine().driver_data<tbowl_state>();
-	state->m_yscroll = (state->m_yscroll & 0xff00) | data;
+	m_yscroll = (m_yscroll & 0xff00) | data;
 }
 
-WRITE8_HANDLER (tbowl_bgyscroll_hi)
+WRITE8_MEMBER(tbowl_state::tbowl_bgyscroll_hi)
 {
-	tbowl_state *state = space->machine().driver_data<tbowl_state>();
-	state->m_yscroll = (state->m_yscroll & 0x00ff) | (data << 8);
+	m_yscroll = (m_yscroll & 0x00ff) | (data << 8);
 }
 
 /* Middle BG Layer (bg2) Tilemaps */
@@ -87,35 +81,30 @@ static TILE_GET_INFO( get_bg2_tile_info )
 	SET_TILE_INFO(2,tileno,col,0);
 }
 
-WRITE8_HANDLER( tbowl_bgvideoram_w )
+WRITE8_MEMBER(tbowl_state::tbowl_bgvideoram_w)
 {
-	tbowl_state *state = space->machine().driver_data<tbowl_state>();
-	state->m_bgvideoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset & 0xfff);
+	m_bgvideoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset & 0xfff);
 }
 
-WRITE8_HANDLER (tbowl_bg2xscroll_lo)
+WRITE8_MEMBER(tbowl_state::tbowl_bg2xscroll_lo)
 {
-	tbowl_state *state = space->machine().driver_data<tbowl_state>();
-	state->m_bg2xscroll = (state->m_bg2xscroll & 0xff00) | data;
+	m_bg2xscroll = (m_bg2xscroll & 0xff00) | data;
 }
 
-WRITE8_HANDLER (tbowl_bg2xscroll_hi)
+WRITE8_MEMBER(tbowl_state::tbowl_bg2xscroll_hi)
 {
-	tbowl_state *state = space->machine().driver_data<tbowl_state>();
-	state->m_bg2xscroll = (state->m_bg2xscroll & 0x00ff) | (data << 8);
+	m_bg2xscroll = (m_bg2xscroll & 0x00ff) | (data << 8);
 }
 
-WRITE8_HANDLER (tbowl_bg2yscroll_lo)
+WRITE8_MEMBER(tbowl_state::tbowl_bg2yscroll_lo)
 {
-	tbowl_state *state = space->machine().driver_data<tbowl_state>();
-	state->m_bg2yscroll = (state->m_bg2yscroll & 0xff00) | data;
+	m_bg2yscroll = (m_bg2yscroll & 0xff00) | data;
 }
 
-WRITE8_HANDLER (tbowl_bg2yscroll_hi)
+WRITE8_MEMBER(tbowl_state::tbowl_bg2yscroll_hi)
 {
-	tbowl_state *state = space->machine().driver_data<tbowl_state>();
-	state->m_bg2yscroll = (state->m_bg2yscroll & 0x00ff) | (data << 8);
+	m_bg2yscroll = (m_bg2yscroll & 0x00ff) | (data << 8);
 }
 
 static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect, int xscroll)

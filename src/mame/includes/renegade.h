@@ -55,6 +55,11 @@ public:
 	DECLARE_READ8_MEMBER(renegade_68705_port_c_r);
 	DECLARE_WRITE8_MEMBER(renegade_68705_port_c_w);
 	DECLARE_WRITE8_MEMBER(renegade_68705_ddr_c_w);
+	DECLARE_WRITE8_MEMBER(renegade_videoram_w);
+	DECLARE_WRITE8_MEMBER(renegade_videoram2_w);
+	DECLARE_WRITE8_MEMBER(renegade_flipscreen_w);
+	DECLARE_WRITE8_MEMBER(renegade_scroll0_w);
+	DECLARE_WRITE8_MEMBER(renegade_scroll1_w);
 };
 
 
@@ -62,8 +67,3 @@ public:
 
 SCREEN_UPDATE_IND16( renegade );
 VIDEO_START( renegade );
-WRITE8_HANDLER( renegade_scroll0_w );
-WRITE8_HANDLER( renegade_scroll1_w );
-WRITE8_HANDLER( renegade_videoram_w );
-WRITE8_HANDLER( renegade_videoram2_w );
-WRITE8_HANDLER( renegade_flipscreen_w );

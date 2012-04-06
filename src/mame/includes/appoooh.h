@@ -29,6 +29,12 @@ public:
 
 	UINT8 m_nmi_mask;
 	DECLARE_WRITE8_MEMBER(appoooh_adpcm_w);
+	DECLARE_WRITE8_MEMBER(appoooh_scroll_w);
+	DECLARE_WRITE8_MEMBER(appoooh_fg_videoram_w);
+	DECLARE_WRITE8_MEMBER(appoooh_fg_colorram_w);
+	DECLARE_WRITE8_MEMBER(appoooh_bg_videoram_w);
+	DECLARE_WRITE8_MEMBER(appoooh_bg_colorram_w);
+	DECLARE_WRITE8_MEMBER(appoooh_out_w);
 };
 
 #define CHR1_OFST   0x00  /* palette page of char set #1 */
@@ -37,14 +43,8 @@ public:
 
 /* ----------- defined in video/appoooh.c -----------*/
 
-WRITE8_HANDLER( appoooh_fg_videoram_w );
-WRITE8_HANDLER( appoooh_fg_colorram_w );
-WRITE8_HANDLER( appoooh_bg_videoram_w );
-WRITE8_HANDLER( appoooh_bg_colorram_w );
 PALETTE_INIT( appoooh );
 PALETTE_INIT( robowres );
-WRITE8_HANDLER( appoooh_scroll_w );
-WRITE8_HANDLER( appoooh_out_w );
 VIDEO_START( appoooh );
 SCREEN_UPDATE_IND16( appoooh );
 SCREEN_UPDATE_IND16( robowres );

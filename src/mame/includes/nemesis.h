@@ -56,22 +56,22 @@ public:
 	DECLARE_READ16_MEMBER(selected_ip_word_r);
 	DECLARE_WRITE16_MEMBER(nemesis_soundlatch_word_w);
 	DECLARE_READ8_MEMBER(wd_r);
+	DECLARE_WRITE16_MEMBER(nemesis_gfx_flipx_word_w);
+	DECLARE_WRITE16_MEMBER(nemesis_gfx_flipy_word_w);
+	DECLARE_WRITE16_MEMBER(salamand_control_port_word_w);
+	DECLARE_WRITE16_MEMBER(nemesis_palette_word_w);
+	DECLARE_WRITE16_MEMBER(salamander_palette_word_w);
+	DECLARE_WRITE16_MEMBER(nemesis_videoram1_word_w);
+	DECLARE_WRITE16_MEMBER(nemesis_videoram2_word_w);
+	DECLARE_WRITE16_MEMBER(nemesis_colorram1_word_w);
+	DECLARE_WRITE16_MEMBER(nemesis_colorram2_word_w);
+	DECLARE_WRITE16_MEMBER(nemesis_charram_word_w);
 };
 
 
 /*----------- defined in video/nemesis.c -----------*/
 
-WRITE16_HANDLER( nemesis_gfx_flipx_word_w );
-WRITE16_HANDLER( nemesis_gfx_flipy_word_w );
-WRITE16_HANDLER( salamand_control_port_word_w );
-WRITE16_HANDLER( salamander_palette_word_w );
-WRITE16_HANDLER( nemesis_palette_word_w );
 
-WRITE16_HANDLER( nemesis_videoram1_word_w );
-WRITE16_HANDLER( nemesis_videoram2_word_w );
-WRITE16_HANDLER( nemesis_colorram1_word_w );
-WRITE16_HANDLER( nemesis_colorram2_word_w );
-WRITE16_HANDLER( nemesis_charram_word_w );
 
 VIDEO_START( nemesis );
 SCREEN_UPDATE_IND16( nemesis );

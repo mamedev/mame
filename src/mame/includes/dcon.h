@@ -18,18 +18,18 @@ public:
 	int m_last_gfx_bank;
 	UINT16 *m_spriteram;
 	size_t m_spriteram_size;
+	DECLARE_READ16_MEMBER(dcon_control_r);
+	DECLARE_WRITE16_MEMBER(dcon_control_w);
+	DECLARE_WRITE16_MEMBER(dcon_gfxbank_w);
+	DECLARE_WRITE16_MEMBER(dcon_background_w);
+	DECLARE_WRITE16_MEMBER(dcon_foreground_w);
+	DECLARE_WRITE16_MEMBER(dcon_midground_w);
+	DECLARE_WRITE16_MEMBER(dcon_text_w);
 };
 
 
 /*----------- defined in video/dcon.c -----------*/
 
-WRITE16_HANDLER( dcon_gfxbank_w );
-WRITE16_HANDLER( dcon_background_w );
-WRITE16_HANDLER( dcon_foreground_w );
-WRITE16_HANDLER( dcon_midground_w );
-WRITE16_HANDLER( dcon_text_w );
-WRITE16_HANDLER( dcon_control_w );
-READ16_HANDLER( dcon_control_r );
 
 VIDEO_START( dcon );
 SCREEN_UPDATE_IND16( dcon );

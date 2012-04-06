@@ -47,12 +47,11 @@ VIDEO_START( meadows )
  *
  *************************************/
 
-WRITE8_HANDLER( meadows_videoram_w )
+WRITE8_MEMBER(meadows_state::meadows_videoram_w)
 {
-	meadows_state *state = space->machine().driver_data<meadows_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = m_videoram;
 	videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
@@ -63,11 +62,10 @@ WRITE8_HANDLER( meadows_videoram_w )
  *
  *************************************/
 
-WRITE8_HANDLER( meadows_spriteram_w )
+WRITE8_MEMBER(meadows_state::meadows_spriteram_w)
 {
-	meadows_state *state = space->machine().driver_data<meadows_state>();
-	space->machine().primary_screen->update_now();
-	state->m_spriteram[offset] = data;
+	machine().primary_screen->update_now();
+	m_spriteram[offset] = data;
 }
 
 

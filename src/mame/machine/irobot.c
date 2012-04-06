@@ -34,33 +34,31 @@ static void irmb_run(running_machine &machine);
 
 
 
-READ8_HANDLER( irobot_sharedmem_r )
+READ8_MEMBER(irobot_state::irobot_sharedmem_r)
 {
-	irobot_state *state = space->machine().driver_data<irobot_state>();
-	if (state->m_outx == 3)
-		return state->m_mbRAM[BYTE_XOR_BE(offset)];
+	if (m_outx == 3)
+		return m_mbRAM[BYTE_XOR_BE(offset)];
 
-	if (state->m_outx == 2)
-		return state->m_combase[BYTE_XOR_BE(offset & 0xFFF)];
+	if (m_outx == 2)
+		return m_combase[BYTE_XOR_BE(offset & 0xFFF)];
 
-	if (state->m_outx == 0)
-		return state->m_mbROM[((state->m_mpage & 1) << 13) + BYTE_XOR_BE(offset)];
+	if (m_outx == 0)
+		return m_mbROM[((m_mpage & 1) << 13) + BYTE_XOR_BE(offset)];
 
-	if (state->m_outx == 1)
-		return state->m_mbROM[0x4000 + ((state->m_mpage & 3) << 13) + BYTE_XOR_BE(offset)];
+	if (m_outx == 1)
+		return m_mbROM[0x4000 + ((m_mpage & 3) << 13) + BYTE_XOR_BE(offset)];
 
 	return 0xFF;
 }
 
 /* Comment out the mbRAM =, comRAM2 = or comRAM1 = and it will start working */
-WRITE8_HANDLER( irobot_sharedmem_w )
+WRITE8_MEMBER(irobot_state::irobot_sharedmem_w)
 {
-	irobot_state *state = space->machine().driver_data<irobot_state>();
-	if (state->m_outx == 3)
-		state->m_mbRAM[BYTE_XOR_BE(offset)] = data;
+	if (m_outx == 3)
+		m_mbRAM[BYTE_XOR_BE(offset)] = data;
 
-	if (state->m_outx == 2)
-		state->m_combase[BYTE_XOR_BE(offset & 0xFFF)] = data;
+	if (m_outx == 2)
+		m_combase[BYTE_XOR_BE(offset & 0xFFF)] = data;
 }
 
 TIMER_DEVICE_CALLBACK( irobot_irvg_done_callback )
@@ -70,88 +68,86 @@ TIMER_DEVICE_CALLBACK( irobot_irvg_done_callback )
 	state->m_irvg_running = 0;
 }
 
-WRITE8_HANDLER( irobot_statwr_w )
+WRITE8_MEMBER(irobot_state::irobot_statwr_w)
 {
-	irobot_state *state = space->machine().driver_data<irobot_state>();
 	logerror("write %2x ", data);
-	IR_CPU_STATE(space->machine());
+	IR_CPU_STATE(machine());
 
-	state->m_combase = state->m_comRAM[data >> 7];
-	state->m_combase_mb = state->m_comRAM[(data >> 7) ^ 1];
-	state->m_bufsel = data & 0x02;
-	if (((data & 0x01) == 0x01) && (state->m_vg_clear == 0))
-		irobot_poly_clear(space->machine());
+	m_combase = m_comRAM[data >> 7];
+	m_combase_mb = m_comRAM[(data >> 7) ^ 1];
+	m_bufsel = data & 0x02;
+	if (((data & 0x01) == 0x01) && (m_vg_clear == 0))
+		irobot_poly_clear(machine());
 
-	state->m_vg_clear = data & 0x01;
+	m_vg_clear = data & 0x01;
 
-	if ((data & 0x04) && !(state->m_statwr & 0x04))
+	if ((data & 0x04) && !(m_statwr & 0x04))
 	{
-		irobot_run_video(space->machine());
+		irobot_run_video(machine());
 #if IR_TIMING
-		if (state->m_irvg_running == 0)
+		if (m_irvg_running == 0)
 			logerror("vg start ");
 		else
 			logerror("vg start [busy!] ");
-		IR_CPU_STATE(space->machine());
-		state->m_irvg_timer->adjust(attotime::from_msec(10));
+		IR_CPU_STATE(machine());
+		m_irvg_timer->adjust(attotime::from_msec(10));
 #endif
-		state->m_irvg_running=1;
+		m_irvg_running=1;
 	}
-	if ((data & 0x10) && !(state->m_statwr & 0x10))
-		irmb_run(space->machine());
-	state->m_statwr = data;
+	if ((data & 0x10) && !(m_statwr & 0x10))
+		irmb_run(machine());
+	m_statwr = data;
 }
 
-WRITE8_HANDLER( irobot_out0_w )
+WRITE8_MEMBER(irobot_state::irobot_out0_w)
 {
-	irobot_state *state = space->machine().driver_data<irobot_state>();
-	UINT8 *RAM = space->machine().region("maincpu")->base();
+	UINT8 *RAM = machine().region("maincpu")->base();
 
-	state->m_out0 = data;
+	m_out0 = data;
 	switch (data & 0x60)
 	{
 		case 0:
-			memory_set_bankptr(space->machine(), "bank2", &RAM[0x1C000]);
+			memory_set_bankptr(machine(), "bank2", &RAM[0x1C000]);
 			break;
 		case 0x20:
-			memory_set_bankptr(space->machine(), "bank2", &RAM[0x1C800]);
+			memory_set_bankptr(machine(), "bank2", &RAM[0x1C800]);
 			break;
 		case 0x40:
-			memory_set_bankptr(space->machine(), "bank2", &RAM[0x1D000]);
+			memory_set_bankptr(machine(), "bank2", &RAM[0x1D000]);
 			break;
 	}
-	state->m_outx = (data & 0x18) >> 3;
-	state->m_mpage = (data & 0x06) >> 1;
-	state->m_alphamap = (data & 0x80);
+	m_outx = (data & 0x18) >> 3;
+	m_mpage = (data & 0x06) >> 1;
+	m_alphamap = (data & 0x80);
 }
 
-WRITE8_HANDLER( irobot_rom_banksel_w )
+WRITE8_MEMBER(irobot_state::irobot_rom_banksel_w)
 {
-	UINT8 *RAM = space->machine().region("maincpu")->base();
+	UINT8 *RAM = machine().region("maincpu")->base();
 
 	switch ((data & 0x0E) >> 1)
 	{
 		case 0:
-			memory_set_bankptr(space->machine(), "bank1", &RAM[0x10000]);
+			memory_set_bankptr(machine(), "bank1", &RAM[0x10000]);
 			break;
 		case 1:
-			memory_set_bankptr(space->machine(), "bank1", &RAM[0x12000]);
+			memory_set_bankptr(machine(), "bank1", &RAM[0x12000]);
 			break;
 		case 2:
-			memory_set_bankptr(space->machine(), "bank1", &RAM[0x14000]);
+			memory_set_bankptr(machine(), "bank1", &RAM[0x14000]);
 			break;
 		case 3:
-			memory_set_bankptr(space->machine(), "bank1", &RAM[0x16000]);
+			memory_set_bankptr(machine(), "bank1", &RAM[0x16000]);
 			break;
 		case 4:
-			memory_set_bankptr(space->machine(), "bank1", &RAM[0x18000]);
+			memory_set_bankptr(machine(), "bank1", &RAM[0x18000]);
 			break;
 		case 5:
-			memory_set_bankptr(space->machine(), "bank1", &RAM[0x1A000]);
+			memory_set_bankptr(machine(), "bank1", &RAM[0x1A000]);
 			break;
 	}
-	set_led_status(space->machine(), 0,data & 0x10);
-	set_led_status(space->machine(), 1,data & 0x20);
+	set_led_status(machine(), 0,data & 0x10);
+	set_led_status(machine(), 1,data & 0x20);
 }
 
 static TIMER_CALLBACK( scanline_callback )
@@ -191,52 +187,49 @@ MACHINE_RESET( irobot )
 	/* set an initial timer to go off on scanline 0 */
 	machine.scheduler().timer_set(machine.primary_screen->time_until_pos(0), FUNC(scanline_callback));
 
-	irobot_rom_banksel_w(machine.device("maincpu")->memory().space(AS_PROGRAM),0,0);
-	irobot_out0_w(machine.device("maincpu")->memory().space(AS_PROGRAM),0,0);
+	state->irobot_rom_banksel_w(*machine.device("maincpu")->memory().space(AS_PROGRAM),0,0);
+	state->irobot_out0_w(*machine.device("maincpu")->memory().space(AS_PROGRAM),0,0);
 	state->m_combase = state->m_comRAM[0];
 	state->m_combase_mb = state->m_comRAM[1];
 	state->m_outx = 0;
 }
 
-WRITE8_HANDLER( irobot_control_w )
+WRITE8_MEMBER(irobot_state::irobot_control_w)
 {
-	irobot_state *state = space->machine().driver_data<irobot_state>();
 
-	state->m_control_num = offset & 0x03;
+	m_control_num = offset & 0x03;
 }
 
-READ8_HANDLER( irobot_control_r )
+READ8_MEMBER(irobot_state::irobot_control_r)
 {
-	irobot_state *state = space->machine().driver_data<irobot_state>();
 
-	if (state->m_control_num == 0)
-		return input_port_read(space->machine(), "AN0");
-	else if (state->m_control_num == 1)
-		return input_port_read(space->machine(), "AN1");
+	if (m_control_num == 0)
+		return input_port_read(machine(), "AN0");
+	else if (m_control_num == 1)
+		return input_port_read(machine(), "AN1");
 	return 0;
 
 }
 
 /*  we allow irmb_running and irvg_running to appear running before clearing
     them to simulate the mathbox and vector generator running in real time */
-READ8_HANDLER( irobot_status_r )
+READ8_MEMBER(irobot_state::irobot_status_r)
 {
-	irobot_state *state = space->machine().driver_data<irobot_state>();
 	int d=0;
 
 	logerror("status read. ");
-	IR_CPU_STATE(space->machine());
+	IR_CPU_STATE(machine());
 
-	if (!state->m_irmb_running) d |= 0x20;
-	if (state->m_irvg_running) d |= 0x40;
+	if (!m_irmb_running) d |= 0x20;
+	if (m_irvg_running) d |= 0x40;
 
-	//        d = (state->m_irmb_running * 0x20) | (state->m_irvg_running * 0x40);
-	if (state->m_irvg_vblank) d = d | 0x80;
+	//        d = (m_irmb_running * 0x20) | (m_irvg_running * 0x40);
+	if (m_irvg_vblank) d = d | 0x80;
 #if IR_TIMING
 	/* flags are cleared by callbacks */
 #else
-	state->m_irmb_running=0;
-	state->m_irvg_running=0;
+	m_irmb_running=0;
+	m_irvg_running=0;
 #endif
 	return d;
 }

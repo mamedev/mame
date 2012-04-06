@@ -110,45 +110,42 @@ WRITE8_DEVICE_HANDLER( qix_flip_screen_w )
  *
  *************************************/
 
-static READ8_HANDLER( qix_videoram_r )
+READ8_MEMBER(qix_state::qix_videoram_r)
 {
-	qix_state *state = space->machine().driver_data<qix_state>();
 
 	/* add in the upper bit of the address latch */
-	offset += (state->m_videoram_address[0] & 0x80) << 8;
-	return state->m_videoram[offset];
+	offset += (m_videoram_address[0] & 0x80) << 8;
+	return m_videoram[offset];
 }
 
 
-static WRITE8_HANDLER( qix_videoram_w )
+WRITE8_MEMBER(qix_state::qix_videoram_w)
 {
-	qix_state *state = space->machine().driver_data<qix_state>();
 
 	/* update the screen in case the game is writing "behind" the beam -
        Zookeeper likes to do this */
-	space->machine().primary_screen->update_now();
+	machine().primary_screen->update_now();
 
 	/* add in the upper bit of the address latch */
-	offset += (state->m_videoram_address[0] & 0x80) << 8;
+	offset += (m_videoram_address[0] & 0x80) << 8;
 
 	/* write the data */
-	state->m_videoram[offset] = data;
+	m_videoram[offset] = data;
 }
 
 
-static WRITE8_HANDLER( slither_videoram_w )
+WRITE8_MEMBER(qix_state::slither_videoram_w)
 {
-	qix_state *state = space->machine().driver_data<qix_state>();
 
 	/* update the screen in case the game is writing "behind" the beam -
        Zookeeper likes to do this */
-	space->machine().primary_screen->update_now();
+	machine().primary_screen->update_now();
 
 	/* add in the upper bit of the address latch */
-	offset += (state->m_videoram_address[0] & 0x80) << 8;
+	offset += (m_videoram_address[0] & 0x80) << 8;
 
 	/* blend the data */
-	state->m_videoram[offset] = (state->m_videoram[offset] & ~*state->m_videoram_mask) | (data & *state->m_videoram_mask);
+	m_videoram[offset] = (m_videoram[offset] & ~*m_videoram_mask) | (data & *m_videoram_mask);
 }
 
 
@@ -168,43 +165,40 @@ static WRITE8_HANDLER( slither_videoram_w )
  *
  *************************************/
 
-static READ8_HANDLER( qix_addresslatch_r )
+READ8_MEMBER(qix_state::qix_addresslatch_r)
 {
-	qix_state *state = space->machine().driver_data<qix_state>();
 
 	/* compute the value at the address latch */
-	offset = (state->m_videoram_address[0] << 8) | state->m_videoram_address[1];
-	return state->m_videoram[offset];
+	offset = (m_videoram_address[0] << 8) | m_videoram_address[1];
+	return m_videoram[offset];
 }
 
 
-static WRITE8_HANDLER( qix_addresslatch_w )
+WRITE8_MEMBER(qix_state::qix_addresslatch_w)
 {
-	qix_state *state = space->machine().driver_data<qix_state>();
 
 	/* update the screen in case the game is writing "behind" the beam */
-	space->machine().primary_screen->update_now();
+	machine().primary_screen->update_now();
 
 	/* compute the value at the address latch */
-	offset = (state->m_videoram_address[0] << 8) | state->m_videoram_address[1];
+	offset = (m_videoram_address[0] << 8) | m_videoram_address[1];
 
 	/* write the data */
-	state->m_videoram[offset] = data;
+	m_videoram[offset] = data;
 }
 
 
-static WRITE8_HANDLER( slither_addresslatch_w )
+WRITE8_MEMBER(qix_state::slither_addresslatch_w)
 {
-	qix_state *state = space->machine().driver_data<qix_state>();
 
 	/* update the screen in case the game is writing "behind" the beam */
-	space->machine().primary_screen->update_now();
+	machine().primary_screen->update_now();
 
 	/* compute the value at the address latch */
-	offset = (state->m_videoram_address[0] << 8) | state->m_videoram_address[1];
+	offset = (m_videoram_address[0] << 8) | m_videoram_address[1];
 
 	/* blend the data */
-	state->m_videoram[offset] = (state->m_videoram[offset] & ~*state->m_videoram_mask) | (data & *state->m_videoram_mask);
+	m_videoram[offset] = (m_videoram[offset] & ~*m_videoram_mask) | (data & *m_videoram_mask);
 }
 
 
@@ -216,35 +210,33 @@ static WRITE8_HANDLER( slither_addresslatch_w )
  *************************************/
 
 
-static WRITE8_HANDLER( qix_paletteram_w )
+WRITE8_MEMBER(qix_state::qix_paletteram_w)
 {
-	qix_state *state = space->machine().driver_data<qix_state>();
 
-	UINT8 old_data = state->m_paletteram[offset];
+	UINT8 old_data = m_paletteram[offset];
 
 	/* set the palette RAM value */
-	state->m_paletteram[offset] = data;
+	m_paletteram[offset] = data;
 
 	/* trigger an update if a currently visible pen has changed */
-	if (((offset >> 8) == state->m_palette_bank) &&
+	if (((offset >> 8) == m_palette_bank) &&
 	    (old_data != data))
-		space->machine().primary_screen->update_now();
+		machine().primary_screen->update_now();
 }
 
 
-WRITE8_HANDLER( qix_palettebank_w )
+WRITE8_MEMBER(qix_state::qix_palettebank_w)
 {
-	qix_state *state = space->machine().driver_data<qix_state>();
 
 	/* set the bank value */
-	if (state->m_palette_bank != (data & 3))
+	if (m_palette_bank != (data & 3))
 	{
-		space->machine().primary_screen->update_now();
-		state->m_palette_bank = data & 3;
+		machine().primary_screen->update_now();
+		m_palette_bank = data & 3;
 	}
 
 	/* LEDs are in the upper 6 bits */
-	state->m_leds = ~data & 0xfc;
+	m_leds = ~data & 0xfc;
 }
 
 
@@ -345,14 +337,14 @@ static MC6845_UPDATE_ROW( update_row )
  *************************************/
 
 static ADDRESS_MAP_START( qix_video_map, AS_PROGRAM, 8, qix_state )
-	AM_RANGE(0x0000, 0x7fff) AM_READWRITE_LEGACY(qix_videoram_r, qix_videoram_w)
+	AM_RANGE(0x0000, 0x7fff) AM_READWRITE(qix_videoram_r, qix_videoram_w)
 	AM_RANGE(0x8000, 0x83ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x8400, 0x87ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x8800, 0x8800) AM_MIRROR(0x03ff) AM_WRITE_LEGACY(qix_palettebank_w)
-	AM_RANGE(0x8c00, 0x8c00) AM_MIRROR(0x03fe) AM_READWRITE_LEGACY(qix_data_firq_r, qix_data_firq_w)
-	AM_RANGE(0x8c01, 0x8c01) AM_MIRROR(0x03fe) AM_READWRITE_LEGACY(qix_video_firq_ack_r, qix_video_firq_ack_w)
-	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE_LEGACY(qix_paletteram_w) AM_BASE(m_paletteram)
-	AM_RANGE(0x9400, 0x9400) AM_MIRROR(0x03fc) AM_READWRITE_LEGACY(qix_addresslatch_r, qix_addresslatch_w)
+	AM_RANGE(0x8800, 0x8800) AM_MIRROR(0x03ff) AM_WRITE(qix_palettebank_w)
+	AM_RANGE(0x8c00, 0x8c00) AM_MIRROR(0x03fe) AM_READWRITE(qix_data_firq_r, qix_data_firq_w)
+	AM_RANGE(0x8c01, 0x8c01) AM_MIRROR(0x03fe) AM_READWRITE(qix_video_firq_ack_r, qix_video_firq_ack_w)
+	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(qix_paletteram_w) AM_BASE(m_paletteram)
+	AM_RANGE(0x9400, 0x9400) AM_MIRROR(0x03fc) AM_READWRITE(qix_addresslatch_r, qix_addresslatch_w)
 	AM_RANGE(0x9402, 0x9403) AM_MIRROR(0x03fc) AM_WRITEONLY AM_BASE(m_videoram_address)
 	AM_RANGE(0x9800, 0x9800) AM_MIRROR(0x03ff) AM_READONLY AM_BASE(m_scanline_latch)
 	AM_RANGE(0x9c00, 0x9c00) AM_MIRROR(0x03fe) AM_DEVWRITE("vid_u18", mc6845_device, address_w)
@@ -362,15 +354,15 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( zookeep_video_map, AS_PROGRAM, 8, qix_state )
-	AM_RANGE(0x0000, 0x7fff) AM_READWRITE_LEGACY(qix_videoram_r, qix_videoram_w)
+	AM_RANGE(0x0000, 0x7fff) AM_READWRITE(qix_videoram_r, qix_videoram_w)
 	AM_RANGE(0x8000, 0x83ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x8400, 0x87ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x8800, 0x8800) AM_MIRROR(0x03fe) AM_WRITE_LEGACY(qix_palettebank_w)
-	AM_RANGE(0x8801, 0x8801) AM_MIRROR(0x03fe) AM_WRITE_LEGACY(zookeep_bankswitch_w)
-	AM_RANGE(0x8c00, 0x8c00) AM_MIRROR(0x03fe) AM_READWRITE_LEGACY(qix_data_firq_r, qix_data_firq_w)
-	AM_RANGE(0x8c01, 0x8c01) AM_MIRROR(0x03fe) AM_READWRITE_LEGACY(qix_video_firq_ack_r, qix_video_firq_ack_w)
-	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE_LEGACY(qix_paletteram_w) AM_BASE(m_paletteram)
-	AM_RANGE(0x9400, 0x9400) AM_MIRROR(0x03fc) AM_READWRITE_LEGACY(qix_addresslatch_r, qix_addresslatch_w)
+	AM_RANGE(0x8800, 0x8800) AM_MIRROR(0x03fe) AM_WRITE(qix_palettebank_w)
+	AM_RANGE(0x8801, 0x8801) AM_MIRROR(0x03fe) AM_WRITE(zookeep_bankswitch_w)
+	AM_RANGE(0x8c00, 0x8c00) AM_MIRROR(0x03fe) AM_READWRITE(qix_data_firq_r, qix_data_firq_w)
+	AM_RANGE(0x8c01, 0x8c01) AM_MIRROR(0x03fe) AM_READWRITE(qix_video_firq_ack_r, qix_video_firq_ack_w)
+	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(qix_paletteram_w) AM_BASE(m_paletteram)
+	AM_RANGE(0x9400, 0x9400) AM_MIRROR(0x03fc) AM_READWRITE(qix_addresslatch_r, qix_addresslatch_w)
 	AM_RANGE(0x9402, 0x9403) AM_MIRROR(0x03fc) AM_WRITEONLY AM_BASE(m_videoram_address)
 	AM_RANGE(0x9800, 0x9800) AM_MIRROR(0x03ff) AM_READONLY AM_BASE(m_scanline_latch)
 	AM_RANGE(0x9c00, 0x9c00) AM_MIRROR(0x03fe) AM_DEVWRITE("vid_u18", mc6845_device, address_w)
@@ -381,14 +373,14 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( slither_video_map, AS_PROGRAM, 8, qix_state )
-	AM_RANGE(0x0000, 0x7fff) AM_READWRITE_LEGACY(qix_videoram_r, slither_videoram_w)
+	AM_RANGE(0x0000, 0x7fff) AM_READWRITE(qix_videoram_r, slither_videoram_w)
 	AM_RANGE(0x8000, 0x83ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x8400, 0x87ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x8800, 0x8800) AM_MIRROR(0x03ff) AM_WRITE_LEGACY(qix_palettebank_w)
-	AM_RANGE(0x8c00, 0x8c00) AM_MIRROR(0x03fe) AM_READWRITE_LEGACY(qix_data_firq_r, qix_data_firq_w)
-	AM_RANGE(0x8c01, 0x8c01) AM_MIRROR(0x03fe) AM_READWRITE_LEGACY(qix_video_firq_ack_r, qix_video_firq_ack_w)
-	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE_LEGACY(qix_paletteram_w) AM_BASE(m_paletteram)
-	AM_RANGE(0x9400, 0x9400) AM_MIRROR(0x03fc) AM_READWRITE_LEGACY(qix_addresslatch_r, slither_addresslatch_w)
+	AM_RANGE(0x8800, 0x8800) AM_MIRROR(0x03ff) AM_WRITE(qix_palettebank_w)
+	AM_RANGE(0x8c00, 0x8c00) AM_MIRROR(0x03fe) AM_READWRITE(qix_data_firq_r, qix_data_firq_w)
+	AM_RANGE(0x8c01, 0x8c01) AM_MIRROR(0x03fe) AM_READWRITE(qix_video_firq_ack_r, qix_video_firq_ack_w)
+	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(qix_paletteram_w) AM_BASE(m_paletteram)
+	AM_RANGE(0x9400, 0x9400) AM_MIRROR(0x03fc) AM_READWRITE(qix_addresslatch_r, slither_addresslatch_w)
 	AM_RANGE(0x9401, 0x9401) AM_MIRROR(0x03fc) AM_WRITEONLY AM_BASE(m_videoram_mask)
 	AM_RANGE(0x9402, 0x9403) AM_MIRROR(0x03fc) AM_WRITEONLY AM_BASE(m_videoram_address)
 	AM_RANGE(0x9800, 0x9800) AM_MIRROR(0x03ff) AM_READONLY AM_BASE(m_scanline_latch)

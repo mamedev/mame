@@ -124,60 +124,55 @@ VIDEO_START( deniam )
 
 ***************************************************************************/
 
-WRITE16_HANDLER( deniam_videoram_w )
+WRITE16_MEMBER(deniam_state::deniam_videoram_w)
 {
-	deniam_state *state = space->machine().driver_data<deniam_state>();
 	int page, i;
-	COMBINE_DATA(&state->m_videoram[offset]);
+	COMBINE_DATA(&m_videoram[offset]);
 
 	page = offset >> 11;
 	for (i = 0; i < 4; i++)
 	{
-		if (state->m_bg_page[i] == page)
-			state->m_bg_tilemap->mark_tile_dirty(i * 0x800 + (offset & 0x7ff));
-		if (state->m_fg_page[i] == page)
-			state->m_fg_tilemap->mark_tile_dirty(i * 0x800 + (offset & 0x7ff));
+		if (m_bg_page[i] == page)
+			m_bg_tilemap->mark_tile_dirty(i * 0x800 + (offset & 0x7ff));
+		if (m_fg_page[i] == page)
+			m_fg_tilemap->mark_tile_dirty(i * 0x800 + (offset & 0x7ff));
 	}
 }
 
 
-WRITE16_HANDLER( deniam_textram_w )
+WRITE16_MEMBER(deniam_state::deniam_textram_w)
 {
-	deniam_state *state = space->machine().driver_data<deniam_state>();
-	COMBINE_DATA(&state->m_textram[offset]);
-	state->m_tx_tilemap->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_textram[offset]);
+	m_tx_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE16_HANDLER( deniam_palette_w )
+WRITE16_MEMBER(deniam_state::deniam_palette_w)
 {
-	deniam_state *state = space->machine().driver_data<deniam_state>();
 	int r, g, b;
 
-	data = COMBINE_DATA(&state->m_paletteram[offset]);
+	data = COMBINE_DATA(&m_paletteram[offset]);
 
 	r = ((data << 1) & 0x1e) | ((data >> 12) & 0x01);
 	g = ((data >> 3) & 0x1e) | ((data >> 13) & 0x01);
 	b = ((data >> 7) & 0x1e) | ((data >> 14) & 0x01);
-	palette_set_color_rgb(space->machine(), offset, pal5bit(r), pal5bit(g), pal5bit(b));
+	palette_set_color_rgb(machine(), offset, pal5bit(r), pal5bit(g), pal5bit(b));
 }
 
-READ16_HANDLER( deniam_coinctrl_r )
+READ16_MEMBER(deniam_state::deniam_coinctrl_r)
 {
-	deniam_state *state = space->machine().driver_data<deniam_state>();
-	return state->m_coinctrl;
+	return m_coinctrl;
 }
 
-WRITE16_HANDLER( deniam_coinctrl_w )
+WRITE16_MEMBER(deniam_state::deniam_coinctrl_w)
 {
-	deniam_state *state = space->machine().driver_data<deniam_state>();
-	COMBINE_DATA(&state->m_coinctrl);
+	COMBINE_DATA(&m_coinctrl);
 
 	/* bit 0 is coin counter */
-	coin_counter_w(space->machine(), 0, state->m_coinctrl & 0x01);
+	coin_counter_w(machine(), 0, m_coinctrl & 0x01);
 
 	/* bit 6 is display enable (0 freezes screen) */
-	state->m_display_enable = state->m_coinctrl & 0x20;
+	m_display_enable = m_coinctrl & 0x20;
 
 	/* other bits unknown (unused?) */
 }

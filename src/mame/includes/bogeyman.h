@@ -29,16 +29,16 @@ public:
 	int        m_colbank;
 	DECLARE_WRITE8_MEMBER(bogeyman_8910_latch_w);
 	DECLARE_WRITE8_MEMBER(bogeyman_8910_control_w);
+	DECLARE_WRITE8_MEMBER(bogeyman_videoram_w);
+	DECLARE_WRITE8_MEMBER(bogeyman_colorram_w);
+	DECLARE_WRITE8_MEMBER(bogeyman_videoram2_w);
+	DECLARE_WRITE8_MEMBER(bogeyman_colorram2_w);
+	DECLARE_WRITE8_MEMBER(bogeyman_paletteram_w);
 };
 
 
 /*----------- defined in video/bogeyman.c -----------*/
 
-WRITE8_HANDLER( bogeyman_videoram_w );
-WRITE8_HANDLER( bogeyman_colorram_w );
-WRITE8_HANDLER( bogeyman_videoram2_w );
-WRITE8_HANDLER( bogeyman_colorram2_w );
-WRITE8_HANDLER( bogeyman_paletteram_w );
 
 PALETTE_INIT( bogeyman );
 VIDEO_START( bogeyman );

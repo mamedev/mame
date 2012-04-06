@@ -18,6 +18,7 @@ public:
 	int m_ycenter;
 	DECLARE_READ16_MEMBER(nvram_r);
 	DECLARE_READ16_MEMBER(joystick_r);
+	DECLARE_WRITE16_MEMBER(aztarac_ubr_w);
 };
 
 /*----------- defined in audio/aztarac.c -----------*/
@@ -34,7 +35,6 @@ INTERRUPT_GEN( aztarac_snd_timed_irq );
 
 /*----------- defined in video/aztarac.c -----------*/
 
-WRITE16_HANDLER( aztarac_ubr_w );
 
 VIDEO_START( aztarac );
 

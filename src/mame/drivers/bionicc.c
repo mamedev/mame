@@ -146,15 +146,15 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, bionicc_state )
 	AM_RANGE(0xfe0000, 0xfe07ff) AM_RAM	/* RAM? */
 	AM_RANGE(0xfe0800, 0xfe0cff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xfe0d00, 0xfe3fff) AM_RAM              /* RAM? */
-	AM_RANGE(0xfe4000, 0xfe4001) AM_WRITE_LEGACY(bionicc_gfxctrl_w)	/* + coin counters */
+	AM_RANGE(0xfe4000, 0xfe4001) AM_WRITE(bionicc_gfxctrl_w)	/* + coin counters */
 	AM_RANGE(0xfe4000, 0xfe4001) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xfe4002, 0xfe4003) AM_READ_PORT("DSW")
-	AM_RANGE(0xfe8010, 0xfe8017) AM_WRITE_LEGACY(bionicc_scroll_w)
+	AM_RANGE(0xfe8010, 0xfe8017) AM_WRITE(bionicc_scroll_w)
 	AM_RANGE(0xfe801a, 0xfe801b) AM_WRITE(bionicc_mpu_trigger_w)	/* ??? not sure, but looks like it */
-	AM_RANGE(0xfec000, 0xfecfff) AM_RAM_WRITE_LEGACY(bionicc_txvideoram_w) AM_BASE(m_txvideoram)
-	AM_RANGE(0xff0000, 0xff3fff) AM_RAM_WRITE_LEGACY(bionicc_fgvideoram_w) AM_BASE(m_fgvideoram)
-	AM_RANGE(0xff4000, 0xff7fff) AM_RAM_WRITE_LEGACY(bionicc_bgvideoram_w) AM_BASE(m_bgvideoram)
-	AM_RANGE(0xff8000, 0xff87ff) AM_RAM_WRITE_LEGACY(bionicc_paletteram_w) AM_BASE(m_paletteram)
+	AM_RANGE(0xfec000, 0xfecfff) AM_RAM_WRITE(bionicc_txvideoram_w) AM_BASE(m_txvideoram)
+	AM_RANGE(0xff0000, 0xff3fff) AM_RAM_WRITE(bionicc_fgvideoram_w) AM_BASE(m_fgvideoram)
+	AM_RANGE(0xff4000, 0xff7fff) AM_RAM_WRITE(bionicc_bgvideoram_w) AM_BASE(m_bgvideoram)
+	AM_RANGE(0xff8000, 0xff87ff) AM_RAM_WRITE(bionicc_paletteram_w) AM_BASE(m_paletteram)
 	AM_RANGE(0xffc000, 0xfffff7) AM_RAM	/* working RAM */
 	AM_RANGE(0xfffff8, 0xfffff9) AM_READWRITE(hacked_soundcommand_r, hacked_soundcommand_w)      /* hack */
 	AM_RANGE(0xfffffa, 0xffffff) AM_READWRITE(hacked_controls_r, hacked_controls_w)	/* hack */

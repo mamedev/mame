@@ -9,18 +9,17 @@ todo - convert to tilemap
 #include "includes/funybubl.h"
 
 
-WRITE8_HANDLER ( funybubl_paldatawrite )
+WRITE8_MEMBER(funybubl_state::funybubl_paldatawrite)
 {
-	funybubl_state *state = space->machine().driver_data<funybubl_state>();
 	int colchanged ;
 	UINT32 coldat;
 
-	state->m_paletteram[offset] = data;
+	m_paletteram[offset] = data;
 	colchanged = offset >> 2;
-	coldat = state->m_paletteram[colchanged * 4] | (state->m_paletteram[colchanged * 4 + 1] << 8) |
-			(state->m_paletteram[colchanged * 4 + 2] << 16) | (state->m_paletteram[colchanged * 4 + 3] << 24);
+	coldat = m_paletteram[colchanged * 4] | (m_paletteram[colchanged * 4 + 1] << 8) |
+			(m_paletteram[colchanged * 4 + 2] << 16) | (m_paletteram[colchanged * 4 + 3] << 24);
 
-	palette_set_color_rgb(space->machine(), colchanged, pal6bit(coldat >> 12), pal6bit(coldat >> 0), pal6bit(coldat >> 6));
+	palette_set_color_rgb(machine(), colchanged, pal6bit(coldat >> 12), pal6bit(coldat >> 0), pal6bit(coldat >> 6));
 }
 
 

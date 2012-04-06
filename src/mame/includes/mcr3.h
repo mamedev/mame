@@ -22,16 +22,16 @@ public:
 	INT16 m_spyhunt_scrolly;
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_alpha_tilemap;
+	DECLARE_WRITE8_MEMBER(mcr3_paletteram_w);
+	DECLARE_WRITE8_MEMBER(mcr3_videoram_w);
+	DECLARE_WRITE8_MEMBER(spyhunt_videoram_w);
+	DECLARE_WRITE8_MEMBER(spyhunt_alpharam_w);
+	DECLARE_WRITE8_MEMBER(spyhunt_scroll_value_w);
 };
 
 
 /*----------- defined in video/mcr3.c -----------*/
 
-WRITE8_HANDLER( mcr3_paletteram_w );
-WRITE8_HANDLER( mcr3_videoram_w );
-WRITE8_HANDLER( spyhunt_videoram_w );
-WRITE8_HANDLER( spyhunt_alpharam_w );
-WRITE8_HANDLER( spyhunt_scroll_value_w );
 
 VIDEO_START( mcrmono );
 VIDEO_START( spyhunt );

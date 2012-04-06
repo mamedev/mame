@@ -1034,15 +1034,15 @@ static READ32_HANDLER( soundrom_r )
 
 static ADDRESS_MAP_START( spi_map, AS_PROGRAM, 32, seibuspi_state )
 	AM_RANGE(0x00000000, 0x00000417) AM_RAM
-	AM_RANGE(0x00000418, 0x0000041b) AM_READWRITE_LEGACY(spi_layer_bank_r, spi_layer_bank_w)
+	AM_RANGE(0x00000418, 0x0000041b) AM_READWRITE(spi_layer_bank_r, spi_layer_bank_w)
 	AM_RANGE(0x0000041c, 0x0000041f) AM_READNOP
-	AM_RANGE(0x0000041c, 0x0000041f) AM_WRITE_LEGACY(spi_layer_enable_w)
+	AM_RANGE(0x0000041c, 0x0000041f) AM_WRITE(spi_layer_enable_w)
 	AM_RANGE(0x00000420, 0x0000042b) AM_RAM AM_BASE(m_spi_scrollram)
-	AM_RANGE(0x00000480, 0x00000483) AM_WRITE_LEGACY(tilemap_dma_start_w)
-	AM_RANGE(0x00000484, 0x00000487) AM_WRITE_LEGACY(palette_dma_start_w)
-	AM_RANGE(0x00000490, 0x00000493) AM_WRITE_LEGACY(video_dma_length_w)
-	AM_RANGE(0x00000494, 0x00000497) AM_WRITE_LEGACY(video_dma_address_w)
-	AM_RANGE(0x0000050c, 0x0000050f) AM_WRITE_LEGACY(sprite_dma_start_w)
+	AM_RANGE(0x00000480, 0x00000483) AM_WRITE(tilemap_dma_start_w)
+	AM_RANGE(0x00000484, 0x00000487) AM_WRITE(palette_dma_start_w)
+	AM_RANGE(0x00000490, 0x00000493) AM_WRITE(video_dma_length_w)
+	AM_RANGE(0x00000494, 0x00000497) AM_WRITE(video_dma_address_w)
+	AM_RANGE(0x0000050c, 0x0000050f) AM_WRITE(sprite_dma_start_w)
 	AM_RANGE(0x00000600, 0x00000603) AM_READ_LEGACY(spi_int_r)				/* Clear Interrupt */
 	AM_RANGE(0x00000600, 0x00000603) AM_WRITENOP				/* Unknown */
 	AM_RANGE(0x00000604, 0x00000607) AM_READ_LEGACY(spi_controls1_r)	/* Player controls */
@@ -1132,15 +1132,15 @@ static const ymf271_interface ymf271_config =
 
 static ADDRESS_MAP_START( seibu386_map, AS_PROGRAM, 32, seibuspi_state )
 	AM_RANGE(0x00000000, 0x00000417) AM_RAM
-	AM_RANGE(0x00000418, 0x0000041b) AM_READWRITE_LEGACY(spi_layer_bank_r, spi_layer_bank_w)
+	AM_RANGE(0x00000418, 0x0000041b) AM_READWRITE(spi_layer_bank_r, spi_layer_bank_w)
 	AM_RANGE(0x0000041c, 0x0000041f) AM_READNOP
-	AM_RANGE(0x0000041c, 0x0000041f) AM_WRITE_LEGACY(spi_layer_enable_w)
+	AM_RANGE(0x0000041c, 0x0000041f) AM_WRITE(spi_layer_enable_w)
 	AM_RANGE(0x00000420, 0x0000042b) AM_RAM AM_BASE(m_spi_scrollram)
-	AM_RANGE(0x00000480, 0x00000483) AM_WRITE_LEGACY(tilemap_dma_start_w)
-	AM_RANGE(0x00000484, 0x00000487) AM_WRITE_LEGACY(palette_dma_start_w)
-	AM_RANGE(0x00000490, 0x00000493) AM_WRITE_LEGACY(video_dma_length_w)
-	AM_RANGE(0x00000494, 0x00000497) AM_WRITE_LEGACY(video_dma_address_w)
-	AM_RANGE(0x0000050c, 0x0000050f) AM_WRITE_LEGACY(sprite_dma_start_w)
+	AM_RANGE(0x00000480, 0x00000483) AM_WRITE(tilemap_dma_start_w)
+	AM_RANGE(0x00000484, 0x00000487) AM_WRITE(palette_dma_start_w)
+	AM_RANGE(0x00000490, 0x00000493) AM_WRITE(video_dma_length_w)
+	AM_RANGE(0x00000494, 0x00000497) AM_WRITE(video_dma_address_w)
+	AM_RANGE(0x0000050c, 0x0000050f) AM_WRITE(sprite_dma_start_w)
 	AM_RANGE(0x00000600, 0x00000603) AM_READ_LEGACY(spi_int_r)				/* Unknown */
 	AM_RANGE(0x00000604, 0x00000607) AM_READ_LEGACY(spi_controls1_r)	/* Player controls */
 	AM_RANGE(0x00000608, 0x0000060b) AM_READ_LEGACY(spi_unknown_r)
@@ -1166,11 +1166,11 @@ static ADDRESS_MAP_START( sys386f2_map, AS_PROGRAM, 32, seibuspi_state )
 	AM_RANGE(0x00000400, 0x00000403) AM_READNOP AM_WRITE_LEGACY(input_select_w)
 	AM_RANGE(0x00000404, 0x00000407) AM_DEVWRITE_LEGACY("eeprom", sys386f2_eeprom_w)
 	AM_RANGE(0x00000408, 0x0000040f) AM_DEVWRITE8_LEGACY("ymz", ymz280b_w, 0x000000ff)
-	AM_RANGE(0x00000484, 0x00000487) AM_WRITE_LEGACY(palette_dma_start_w)
-	AM_RANGE(0x00000490, 0x00000493) AM_WRITE_LEGACY(video_dma_length_w)
-	AM_RANGE(0x00000494, 0x00000497) AM_WRITE_LEGACY(video_dma_address_w)
+	AM_RANGE(0x00000484, 0x00000487) AM_WRITE(palette_dma_start_w)
+	AM_RANGE(0x00000490, 0x00000493) AM_WRITE(video_dma_length_w)
+	AM_RANGE(0x00000494, 0x00000497) AM_WRITE(video_dma_address_w)
 	AM_RANGE(0x00000500, 0x0000054f) AM_RAM /* Unknown */
-	AM_RANGE(0x00000560, 0x00000563) AM_WRITE_LEGACY(sprite_dma_start_w)
+	AM_RANGE(0x00000560, 0x00000563) AM_WRITE(sprite_dma_start_w)
 	AM_RANGE(0x00000600, 0x00000607) AM_DEVREAD8_LEGACY("ymz", ymz280b_r, 0x000000ff)
 	AM_RANGE(0x00000608, 0x0000060b) AM_READ_LEGACY(spi_unknown_r)
 	AM_RANGE(0x0000060c, 0x0000060f) AM_READ_LEGACY(spi_controls1_r)	/* Player controls */
@@ -2160,7 +2160,7 @@ static void init_rf2(running_machine &machine)
 	seibuspi_rise10_bg_decrypt(machine.region("gfx2")->base(), machine.region("gfx2")->bytes());
 	seibuspi_rise10_sprite_decrypt(machine.region("gfx3")->base(), 0x600000);
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x560, 0x563, FUNC(sprite_dma_start_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x560, 0x563, write32_delegate(FUNC(seibuspi_state::sprite_dma_start_w),state));
 }
 
 static DRIVER_INIT( rdft2 )
@@ -2185,7 +2185,7 @@ static void init_rfjet(running_machine &machine)
 	seibuspi_rise11_bg_decrypt(machine.region("gfx2")->base(), machine.region("gfx2")->bytes());
 	seibuspi_rise11_sprite_decrypt_rfjet(machine.region("gfx3")->base(), 0x800000);
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x560, 0x563, FUNC(sprite_dma_start_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x560, 0x563, write32_delegate(FUNC(seibuspi_state::sprite_dma_start_w),state));
 }
 
 static DRIVER_INIT( rfjet )

@@ -20,20 +20,19 @@ void alpha68k_V_video_bank_w( running_machine &machine, int bank )
 	state->m_bank_base = bank & 0xf;
 }
 
-WRITE16_HANDLER( alpha68k_paletteram_w )
+WRITE16_MEMBER(alpha68k_state::alpha68k_paletteram_w)
 {
-	alpha68k_state *state = space->machine().driver_data<alpha68k_state>();
 	int newword;
 	int r, g, b;
 
-	COMBINE_DATA(state->m_paletteram + offset);
-	newword = state->m_paletteram[offset];
+	COMBINE_DATA(m_paletteram + offset);
+	newword = m_paletteram[offset];
 
 	r = ((newword >> 7) & 0x1e) | ((newword >> 14) & 0x01);
 	g = ((newword >> 3) & 0x1e) | ((newword >> 13) & 0x01);
 	b = ((newword << 1) & 0x1e) | ((newword >> 12) & 0x01);
 
-	palette_set_color_rgb(space->machine(), offset, pal5bit(r), pal5bit(g), pal5bit(b));
+	palette_set_color_rgb(machine(), offset, pal5bit(r), pal5bit(g), pal5bit(b));
 }
 
 /******************************************************************************/
@@ -49,19 +48,18 @@ static TILE_GET_INFO( get_tile_info )
 	SET_TILE_INFO(0, tile, color, 0);
 }
 
-WRITE16_HANDLER( alpha68k_videoram_w )
+WRITE16_MEMBER(alpha68k_state::alpha68k_videoram_w)
 {
-	alpha68k_state *state = space->machine().driver_data<alpha68k_state>();
 	/* Doh. */
 	if(ACCESSING_BITS_0_7)
 		if(ACCESSING_BITS_8_15)
-			state->m_videoram[offset] = data;
+			m_videoram[offset] = data;
 		else
-			state->m_videoram[offset] = data & 0xff;
+			m_videoram[offset] = data & 0xff;
 	else
-		state->m_videoram[offset] = (data >> 8) & 0xff;
+		m_videoram[offset] = (data >> 8) & 0xff;
 
-	state->m_fix_tilemap->mark_tile_dirty(offset / 2);
+	m_fix_tilemap->mark_tile_dirty(offset / 2);
 }
 
 VIDEO_START( alpha68k )
@@ -169,33 +167,32 @@ SCREEN_UPDATE_IND16( alpha68k_II )
 
 */
 
-WRITE16_HANDLER( alpha68k_II_video_bank_w )
+WRITE16_MEMBER(alpha68k_state::alpha68k_II_video_bank_w)
 {
-	alpha68k_state *state = space->machine().driver_data<alpha68k_state>();
 	switch (offset)
 	{
 		case 0x10: /* Reset */
-			state->m_bank_base = state->m_buffer_28 = state->m_buffer_60 = state->m_buffer_68 = 0;
+			m_bank_base = m_buffer_28 = m_buffer_60 = m_buffer_68 = 0;
 			return;
 		case 0x14:
-			if (state->m_buffer_60) state->m_bank_base=1; else state->m_bank_base=0;
-			state->m_buffer_28 = 1;
+			if (m_buffer_60) m_bank_base=1; else m_bank_base=0;
+			m_buffer_28 = 1;
 			return;
 		case 0x18:
-			if (state->m_buffer_68) {if (state->m_buffer_60) state->m_bank_base = 3; else state->m_bank_base = 2; }
-			if (state->m_buffer_28) {if (state->m_buffer_60) state->m_bank_base = 1; else state->m_bank_base = 0; }
+			if (m_buffer_68) {if (m_buffer_60) m_bank_base = 3; else m_bank_base = 2; }
+			if (m_buffer_28) {if (m_buffer_60) m_bank_base = 1; else m_bank_base = 0; }
 			return;
 		case 0x30:
-			state->m_buffer_28 = state->m_buffer_68 = 0; state->m_bank_base = 1;
-			state->m_buffer_60 = 1;
+			m_buffer_28 = m_buffer_68 = 0; m_bank_base = 1;
+			m_buffer_60 = 1;
 			return;
 		case 0x34:
-			if (state->m_buffer_60) state->m_bank_base = 3; else state->m_bank_base = 2;
-			state->m_buffer_68 = 1;
+			if (m_buffer_60) m_bank_base = 3; else m_bank_base = 2;
+			m_buffer_68 = 1;
 			return;
 		case 0x38:
-			if (state->m_buffer_68) {if (state->m_buffer_60) state->m_bank_base = 7; else state->m_bank_base = 6; }
-			if (state->m_buffer_28) {if (state->m_buffer_60) state->m_bank_base = 5; else state->m_bank_base = 4; }
+			if (m_buffer_68) {if (m_buffer_60) m_bank_base = 7; else m_bank_base = 6; }
+			if (m_buffer_28) {if (m_buffer_60) m_bank_base = 5; else m_bank_base = 4; }
 			return;
 		case 0x08: /* Graphics flags?  Not related to fix chars anyway */
 		case 0x0c:
@@ -209,7 +206,7 @@ WRITE16_HANDLER( alpha68k_II_video_bank_w )
 
 /******************************************************************************/
 
-WRITE16_HANDLER( alpha68k_V_video_control_w )
+WRITE16_MEMBER(alpha68k_state::alpha68k_V_video_control_w)
 {
 	switch (offset)
 	{

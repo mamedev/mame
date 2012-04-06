@@ -27,21 +27,21 @@ public:
 	int irq_count;
 	DECLARE_WRITE8_MEMBER(paradise_rombank_w);
 	DECLARE_WRITE8_MEMBER(torus_coin_counter_w);
+	DECLARE_WRITE8_MEMBER(paradise_flipscreen_w);
+	DECLARE_WRITE8_MEMBER(tgtball_flipscreen_w);
+	DECLARE_WRITE8_MEMBER(paradise_palette_w);
+	DECLARE_WRITE8_MEMBER(paradise_vram_0_w);
+	DECLARE_WRITE8_MEMBER(paradise_palbank_w);
+	DECLARE_WRITE8_MEMBER(paradise_vram_1_w);
+	DECLARE_WRITE8_MEMBER(paradise_vram_2_w);
+	DECLARE_WRITE8_MEMBER(paradise_pixmap_w);
+	DECLARE_WRITE8_MEMBER(paradise_priority_w);
 };
 
 /*----------- defined in video/paradise.c -----------*/
 
-WRITE8_HANDLER( paradise_vram_0_w );
-WRITE8_HANDLER( paradise_vram_1_w );
-WRITE8_HANDLER( paradise_vram_2_w );
 
-WRITE8_HANDLER( paradise_flipscreen_w );
-WRITE8_HANDLER( tgtball_flipscreen_w );
-WRITE8_HANDLER( paradise_palette_w );
-WRITE8_HANDLER( paradise_pixmap_w );
 
-WRITE8_HANDLER( paradise_priority_w );
-WRITE8_HANDLER( paradise_palbank_w );
 
 VIDEO_START( paradise );
 

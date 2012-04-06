@@ -150,14 +150,14 @@ WRITE8_MEMBER(gberet_state::gberet_sound_w)
 
 static ADDRESS_MAP_START( gberet_map, AS_PROGRAM, 8, gberet_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE_LEGACY(gberet_colorram_w) AM_BASE(m_colorram)
-	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE_LEGACY(gberet_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(gberet_colorram_w) AM_BASE(m_colorram)
+	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(gberet_videoram_w) AM_BASE(m_videoram)
 	AM_RANGE(0xd000, 0xd0ff) AM_RAM AM_BASE(m_spriteram2)
 	AM_RANGE(0xd100, 0xd1ff) AM_RAM AM_BASE(m_spriteram)
 	AM_RANGE(0xd200, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe03f) AM_RAM_WRITE_LEGACY(gberet_scroll_w) AM_BASE(m_scrollram)
+	AM_RANGE(0xe000, 0xe03f) AM_RAM_WRITE(gberet_scroll_w) AM_BASE(m_scrollram)
 	AM_RANGE(0xe040, 0xe042) AM_WRITENOP // ???
-	AM_RANGE(0xe043, 0xe043) AM_WRITE_LEGACY(gberet_sprite_bank_w)
+	AM_RANGE(0xe043, 0xe043) AM_WRITE(gberet_sprite_bank_w)
 	AM_RANGE(0xe044, 0xe044) AM_WRITE(gberet_flipscreen_w)
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(gberet_coin_counter_w)
 	AM_RANGE(0xf200, 0xf200) AM_READ_PORT("DSW2") AM_WRITEONLY AM_BASE(m_soundlatch)
@@ -170,14 +170,14 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mrgoemon_map, AS_PROGRAM, 8, gberet_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE_LEGACY(gberet_colorram_w) AM_BASE(m_colorram)
-	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE_LEGACY(gberet_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(gberet_colorram_w) AM_BASE(m_colorram)
+	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(gberet_videoram_w) AM_BASE(m_videoram)
 	AM_RANGE(0xd000, 0xd0ff) AM_RAM AM_BASE(m_spriteram2)
 	AM_RANGE(0xd100, 0xd1ff) AM_RAM AM_BASE(m_spriteram)
 	AM_RANGE(0xd200, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe03f) AM_RAM_WRITE_LEGACY(gberet_scroll_w) AM_BASE(m_scrollram)
+	AM_RANGE(0xe000, 0xe03f) AM_RAM_WRITE(gberet_scroll_w) AM_BASE(m_scrollram)
 	AM_RANGE(0xe040, 0xe042) AM_WRITENOP // ???
-	AM_RANGE(0xe043, 0xe043) AM_WRITE_LEGACY(gberet_sprite_bank_w)
+	AM_RANGE(0xe043, 0xe043) AM_WRITE(gberet_sprite_bank_w)
 	AM_RANGE(0xe044, 0xe044) AM_WRITE(gberet_flipscreen_w)
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(mrgoemon_coin_counter_w)
 	AM_RANGE(0xf200, 0xf200) AM_READ_PORT("DSW2") AM_WRITEONLY AM_BASE(m_soundlatch)
@@ -208,8 +208,8 @@ WRITE8_MEMBER(gberet_state::gberetb_nmi_ack_w)
 
 static ADDRESS_MAP_START( gberetb_map, AS_PROGRAM, 8, gberet_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE_LEGACY(gberet_colorram_w) AM_BASE(m_colorram)
-	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE_LEGACY(gberet_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(gberet_colorram_w) AM_BASE(m_colorram)
+	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(gberet_videoram_w) AM_BASE(m_videoram)
 	AM_RANGE(0xd000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe03f) AM_RAM
 	AM_RANGE(0xe040, 0xe043) AM_WRITENOP // ???
@@ -224,7 +224,7 @@ static ADDRESS_MAP_START( gberetb_map, AS_PROGRAM, 8, gberet_state )
 	AM_RANGE(0xf602, 0xf602) AM_READ_PORT("P1")
 	AM_RANGE(0xf603, 0xf603) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xf800, 0xf800) AM_READWRITE(gberetb_irq_ack_r, gberetb_nmi_ack_w)
-	AM_RANGE(0xf900, 0xf901) AM_WRITE_LEGACY(gberetb_scroll_w)
+	AM_RANGE(0xf900, 0xf901) AM_WRITE(gberetb_scroll_w)
 ADDRESS_MAP_END
 
 

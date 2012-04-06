@@ -770,7 +770,7 @@ WRITE32_MEMBER(gaelco3d_state::unknown_13a_w)
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, gaelco3d_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
-	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE_LEGACY(gaelco3d_paletteram_w) AM_SHARE("paletteram")
+	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE(gaelco3d_paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0x51000c, 0x51000d) AM_READ_PORT("IN0")
 	AM_RANGE(0x51001c, 0x51001d) AM_READ_PORT("IN1")
 	AM_RANGE(0x51002c, 0x51002d) AM_READ_PORT("IN2")
@@ -800,7 +800,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( main020_map, AS_PROGRAM, 32, gaelco3d_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
-	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE_LEGACY(gaelco3d_paletteram_020_w) AM_SHARE("paletteram")
+	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE(gaelco3d_paletteram_020_w) AM_SHARE("paletteram")
 	AM_RANGE(0x51000c, 0x51000f) AM_READ_PORT("IN0")
 	AM_RANGE(0x51001c, 0x51001f) AM_READ_PORT("IN1")
 	AM_RANGE(0x51002c, 0x51002f) AM_READ_PORT("IN2")
@@ -831,7 +831,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( tms_map, AS_PROGRAM, 32, gaelco3d_state )
 	AM_RANGE(0x000000, 0x007fff) AM_READWRITE(tms_m68k_ram_r, tms_m68k_ram_w)
 	AM_RANGE(0x400000, 0x5fffff) AM_ROM AM_REGION("user2", 0)
-	AM_RANGE(0xc00000, 0xc00007) AM_WRITE_LEGACY(gaelco3d_render_w)
+	AM_RANGE(0xc00000, 0xc00007) AM_WRITE(gaelco3d_render_w)
 ADDRESS_MAP_END
 
 

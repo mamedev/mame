@@ -32,15 +32,15 @@ public:
 	DECLARE_WRITE8_MEMBER(mikie_sh_irqtrigger_w);
 	DECLARE_WRITE8_MEMBER(mikie_coin_counter_w);
 	DECLARE_WRITE8_MEMBER(irq_mask_w);
+	DECLARE_WRITE8_MEMBER(mikie_videoram_w);
+	DECLARE_WRITE8_MEMBER(mikie_colorram_w);
+	DECLARE_WRITE8_MEMBER(mikie_palettebank_w);
+	DECLARE_WRITE8_MEMBER(mikie_flipscreen_w);
 };
 
 
 /*----------- defined in video/mikie.c -----------*/
 
-WRITE8_HANDLER( mikie_videoram_w );
-WRITE8_HANDLER( mikie_colorram_w );
-WRITE8_HANDLER( mikie_palettebank_w );
-WRITE8_HANDLER( mikie_flipscreen_w );
 
 PALETTE_INIT( mikie );
 VIDEO_START( mikie );

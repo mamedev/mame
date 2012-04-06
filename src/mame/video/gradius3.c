@@ -99,22 +99,21 @@ VIDEO_START( gradius3 )
 
 ***************************************************************************/
 
-READ16_HANDLER( gradius3_gfxrom_r )
+READ16_MEMBER(gradius3_state::gradius3_gfxrom_r)
 {
-	UINT8 *gfxdata = space->machine().region("gfx2")->base();
+	UINT8 *gfxdata = machine().region("gfx2")->base();
 
 	return (gfxdata[2 * offset + 1] << 8) | gfxdata[2 * offset];
 }
 
-WRITE16_HANDLER( gradius3_gfxram_w )
+WRITE16_MEMBER(gradius3_state::gradius3_gfxram_w)
 {
-	gradius3_state *state = space->machine().driver_data<gradius3_state>();
-	int oldword = state->m_gfxram[offset];
+	int oldword = m_gfxram[offset];
 
-	COMBINE_DATA(&state->m_gfxram[offset]);
+	COMBINE_DATA(&m_gfxram[offset]);
 
-	if (oldword != state->m_gfxram[offset])
-		gfx_element_mark_dirty(space->machine().gfx[0], offset / 16);
+	if (oldword != m_gfxram[offset])
+		gfx_element_mark_dirty(machine().gfx[0], offset / 16);
 }
 
 /***************************************************************************

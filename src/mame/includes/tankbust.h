@@ -24,6 +24,14 @@ public:
 	DECLARE_READ8_MEMBER(debug_output_area_r);
 	DECLARE_READ8_MEMBER(read_from_unmapped_memory);
 	DECLARE_READ8_MEMBER(some_changing_input);
+	DECLARE_WRITE8_MEMBER(tankbust_background_videoram_w);
+	DECLARE_READ8_MEMBER(tankbust_background_videoram_r);
+	DECLARE_WRITE8_MEMBER(tankbust_background_colorram_w);
+	DECLARE_READ8_MEMBER(tankbust_background_colorram_r);
+	DECLARE_WRITE8_MEMBER(tankbust_txtram_w);
+	DECLARE_READ8_MEMBER(tankbust_txtram_r);
+	DECLARE_WRITE8_MEMBER(tankbust_xscroll_w);
+	DECLARE_WRITE8_MEMBER(tankbust_yscroll_w);
 };
 
 
@@ -32,14 +40,6 @@ public:
 VIDEO_START( tankbust );
 SCREEN_UPDATE_IND16( tankbust );
 
-WRITE8_HANDLER( tankbust_background_videoram_w );
-READ8_HANDLER( tankbust_background_videoram_r );
-WRITE8_HANDLER( tankbust_background_colorram_w );
-READ8_HANDLER( tankbust_background_colorram_r );
-WRITE8_HANDLER( tankbust_txtram_w );
-READ8_HANDLER( tankbust_txtram_r );
 
-WRITE8_HANDLER( tankbust_xscroll_w );
-WRITE8_HANDLER( tankbust_yscroll_w );
 
 

@@ -88,17 +88,17 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_subcpu;
+	DECLARE_WRITE16_MEMBER(seta_vregs_w);
+	DECLARE_WRITE16_MEMBER(seta_vram_0_w);
+	DECLARE_WRITE16_MEMBER(seta_vram_2_w);
+	DECLARE_WRITE16_MEMBER(twineagl_tilebank_w);
 };
 
 /*----------- defined in video/seta.c -----------*/
 
 void seta_coin_lockout_w(running_machine &machine, int data);
 
-WRITE16_HANDLER( twineagl_tilebank_w );
 
-WRITE16_HANDLER( seta_vram_0_w );
-WRITE16_HANDLER( seta_vram_2_w );
-WRITE16_HANDLER( seta_vregs_w );
 
 PALETTE_INIT( blandia );
 PALETTE_INIT( gundhara );

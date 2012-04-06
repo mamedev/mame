@@ -45,6 +45,9 @@ public:
 	DECLARE_WRITE8_MEMBER(led_0_w);
 	DECLARE_WRITE8_MEMBER(led_1_w);
 	DECLARE_WRITE8_MEMBER(gridlee_coin_counter_w);
+	DECLARE_WRITE8_MEMBER(gridlee_cocktail_flip_w);
+	DECLARE_WRITE8_MEMBER(gridlee_videoram_w);
+	DECLARE_WRITE8_MEMBER(gridlee_palette_select_w);
 };
 
 
@@ -63,6 +66,3 @@ PALETTE_INIT( gridlee );
 VIDEO_START( gridlee );
 SCREEN_UPDATE_IND16( gridlee );
 
-WRITE8_HANDLER( gridlee_cocktail_flip_w );
-WRITE8_HANDLER( gridlee_videoram_w );
-WRITE8_HANDLER( gridlee_palette_select_w );

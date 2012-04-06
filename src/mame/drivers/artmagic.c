@@ -506,7 +506,7 @@ static const tms34010_config tms_config =
 static ADDRESS_MAP_START( tms_map, AS_PROGRAM, 16, artmagic_state )
 	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_BASE(m_vram0)
 	AM_RANGE(0x00400000, 0x005fffff) AM_RAM AM_BASE(m_vram1)
-	AM_RANGE(0x00800000, 0x0080007f) AM_READWRITE_LEGACY(artmagic_blitter_r, artmagic_blitter_w)
+	AM_RANGE(0x00800000, 0x0080007f) AM_READWRITE(artmagic_blitter_r, artmagic_blitter_w)
 	AM_RANGE(0x00c00000, 0x00c000ff) AM_DEVREADWRITE8_LEGACY("tlc34076", tlc34076_r, tlc34076_w, 0x00ff)
 	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE_LEGACY(tms34010_io_register_r, tms34010_io_register_w)
 	AM_RANGE(0xffe00000, 0xffffffff) AM_RAM
@@ -516,7 +516,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( stonebal_tms_map, AS_PROGRAM, 16, artmagic_state )
 	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_BASE(m_vram0)
 	AM_RANGE(0x00400000, 0x005fffff) AM_RAM AM_BASE(m_vram1)
-	AM_RANGE(0x00800000, 0x0080007f) AM_READWRITE_LEGACY(artmagic_blitter_r, artmagic_blitter_w)
+	AM_RANGE(0x00800000, 0x0080007f) AM_READWRITE(artmagic_blitter_r, artmagic_blitter_w)
 	AM_RANGE(0x00c00000, 0x00c000ff) AM_DEVREADWRITE8_LEGACY("tlc34076", tlc34076_r, tlc34076_w, 0x00ff)
 	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE_LEGACY(tms34010_io_register_r, tms34010_io_register_w)
 	AM_RANGE(0xffc00000, 0xffffffff) AM_RAM

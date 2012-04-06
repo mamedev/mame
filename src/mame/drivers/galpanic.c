@@ -241,7 +241,7 @@ static ADDRESS_MAP_START( galpanic_map, AS_PROGRAM, 16, galpanic_state )
 	AM_RANGE(0xb00000, 0xb00001) AM_WRITENOP	/* ??? */
 	AM_RANGE(0xc00000, 0xc00001) AM_WRITENOP	/* ??? */
 	AM_RANGE(0xd00000, 0xd00001) AM_WRITENOP	/* ??? */
-	AM_RANGE(0xe00000, 0xe00015) AM_READWRITE_LEGACY(galpanib_calc_r,galpanib_calc_w) /* CALC1 MCU interaction (simulated) */
+	AM_RANGE(0xe00000, 0xe00015) AM_READWRITE(galpanib_calc_r,galpanib_calc_w) /* CALC1 MCU interaction (simulated) */
 ADDRESS_MAP_END
 
 static READ16_HANDLER( comad_timer_r )

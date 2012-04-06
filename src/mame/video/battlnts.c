@@ -31,10 +31,9 @@ void battlnts_sprite_callback(running_machine &machine, int *code,int *color)
 	*color = 0;
 }
 
-WRITE8_HANDLER( battlnts_spritebank_w )
+WRITE8_MEMBER(battlnts_state::battlnts_spritebank_w)
 {
-	battlnts_state *state = space->machine().driver_data<battlnts_state>();
-	state->m_spritebank = 1024 * (data & 1);
+	m_spritebank = 1024 * (data & 1);
 }
 
 /***************************************************************************

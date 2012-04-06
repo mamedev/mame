@@ -7,22 +7,20 @@
 #include "emu.h"
 #include "includes/nitedrvr.h"
 
-WRITE8_HANDLER( nitedrvr_videoram_w )
+WRITE8_MEMBER(nitedrvr_state::nitedrvr_videoram_w)
 {
-	nitedrvr_state *state = space->machine().driver_data<nitedrvr_state>();
 
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( nitedrvr_hvc_w )
+WRITE8_MEMBER(nitedrvr_state::nitedrvr_hvc_w)
 {
-	nitedrvr_state *state = space->machine().driver_data<nitedrvr_state>();
 
-	state->m_hvc[offset & 0x3f] = data;
+	m_hvc[offset & 0x3f] = data;
 
 	if ((offset & 0x30) == 0x30)
-		state->watchdog_reset_w(*space, 0, 0);
+		watchdog_reset_w(space, 0, 0);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )

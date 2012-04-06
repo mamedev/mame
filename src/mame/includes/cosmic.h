@@ -49,13 +49,13 @@ public:
 	DECLARE_READ8_MEMBER(magspot_coinage_dip_r);
 	DECLARE_READ8_MEMBER(nomnlnd_port_0_1_r);
 	DECLARE_WRITE8_MEMBER(flip_screen_w);
+	DECLARE_WRITE8_MEMBER(cosmic_color_register_w);
+	DECLARE_WRITE8_MEMBER(cosmic_background_enable_w);
 };
 
 
 /*----------- defined in video/cosmic.c -----------*/
 
-WRITE8_HANDLER( cosmic_color_register_w );
-WRITE8_HANDLER( cosmic_background_enable_w );
 
 PALETTE_INIT( panic );
 PALETTE_INIT( cosmica );

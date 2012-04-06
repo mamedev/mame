@@ -35,6 +35,7 @@ public:
 	DECLARE_WRITE16_MEMBER(paletteram16_xbgr_word_be_sprites_w);
 	DECLARE_WRITE16_MEMBER(paletteram16_xbgr_word_be_tilelow_w);
 	DECLARE_WRITE16_MEMBER(paletteram16_xbgr_word_be_tilehigh_w);
+	DECLARE_WRITE16_MEMBER(sshangha_video_w);
 };
 
 
@@ -43,4 +44,3 @@ public:
 VIDEO_START( sshangha );
 SCREEN_UPDATE_RGB32( sshangha );
 
-WRITE16_HANDLER( sshangha_video_w );

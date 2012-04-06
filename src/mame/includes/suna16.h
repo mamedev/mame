@@ -22,16 +22,16 @@ public:
 	DECLARE_WRITE8_MEMBER(bssoccer_pcm_1_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(bssoccer_pcm_2_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(uballoon_pcm_1_bankswitch_w);
+	DECLARE_WRITE16_MEMBER(suna16_flipscreen_w);
+	DECLARE_WRITE16_MEMBER(bestbest_flipscreen_w);
+	DECLARE_READ16_MEMBER(suna16_paletteram16_r);
+	DECLARE_WRITE16_MEMBER(suna16_paletteram16_w);
 };
 
 
 /*----------- defined in video/suna16.c -----------*/
 
-WRITE16_HANDLER( suna16_flipscreen_w );
-WRITE16_HANDLER( bestbest_flipscreen_w );
 
-READ16_HANDLER ( suna16_paletteram16_r );
-WRITE16_HANDLER( suna16_paletteram16_w );
 
 VIDEO_START( suna16 );
 SCREEN_UPDATE_IND16( suna16 );

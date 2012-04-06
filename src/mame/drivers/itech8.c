@@ -708,7 +708,7 @@ WRITE8_MEMBER(itech8_state::blitter_w)
 		memory_set_bankptr(machine(), "bank1", &machine().region("maincpu")->base()[0x4000 + 0xc000 * ((data >> 5) & 1)]);
 
 	/* the rest is handled by the video hardware */
-	itech8_blitter_w(&space, offset, data);
+	itech8_blitter_w(space, offset, data);
 }
 
 
@@ -832,14 +832,14 @@ WRITE16_MEMBER(itech8_state::grom_bank16_w)
 WRITE16_MEMBER(itech8_state::display_page16_w)
 {
 	if (ACCESSING_BITS_8_15)
-		itech8_page_w(&space, 0, ~data >> 8);
+		itech8_page_w(space, 0, ~data >> 8);
 }
 
 
 WRITE16_MEMBER(itech8_state::palette16_w)
 {
 	if (ACCESSING_BITS_8_15)
-		itech8_palette_w(&space, offset / 8, data >> 8);
+		itech8_palette_w(space, offset / 8, data >> 8);
 }
 
 
@@ -852,15 +852,15 @@ WRITE16_MEMBER(itech8_state::palette16_w)
 
 /*------ common layout with TMS34061 at 0000 ------*/
 static ADDRESS_MAP_START( tmslo_map, AS_PROGRAM, 8, itech8_state )
-	AM_RANGE(0x0000, 0x0fff) AM_READWRITE_LEGACY(itech8_tms34061_r, itech8_tms34061_w)
+	AM_RANGE(0x0000, 0x0fff) AM_READWRITE(itech8_tms34061_r, itech8_tms34061_w)
 	AM_RANGE(0x1100, 0x1100) AM_WRITENOP
 	AM_RANGE(0x1120, 0x1120) AM_WRITE(sound_data_w)
 	AM_RANGE(0x1140, 0x1140) AM_READ_PORT("40") AM_WRITEONLY AM_BASE(m_grom_bank)
-	AM_RANGE(0x1160, 0x1160) AM_READ_PORT("60") AM_WRITE_LEGACY(itech8_page_w)
+	AM_RANGE(0x1160, 0x1160) AM_READ_PORT("60") AM_WRITE(itech8_page_w)
 	AM_RANGE(0x1180, 0x1180) AM_READ_PORT("80") AM_WRITE_LEGACY(tms34061_latch_w)
 	AM_RANGE(0x11a0, 0x11a0) AM_WRITE(itech8_nmi_ack_w)
-	AM_RANGE(0x11c0, 0x11df) AM_READ_LEGACY(itech8_blitter_r) AM_WRITE(blitter_w)
-	AM_RANGE(0x11e0, 0x11ff) AM_WRITE_LEGACY(itech8_palette_w)
+	AM_RANGE(0x11c0, 0x11df) AM_READ(itech8_blitter_r) AM_WRITE(blitter_w)
+	AM_RANGE(0x11e0, 0x11ff) AM_WRITE(itech8_palette_w)
 	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x4000, 0xffff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
@@ -868,15 +868,15 @@ ADDRESS_MAP_END
 
 /*------ common layout with TMS34061 at 1000 ------*/
 static ADDRESS_MAP_START( tmshi_map, AS_PROGRAM, 8, itech8_state )
-	AM_RANGE(0x1000, 0x1fff) AM_READWRITE_LEGACY(itech8_tms34061_r, itech8_tms34061_w)
+	AM_RANGE(0x1000, 0x1fff) AM_READWRITE(itech8_tms34061_r, itech8_tms34061_w)
 	AM_RANGE(0x0100, 0x0100) AM_WRITENOP
 	AM_RANGE(0x0120, 0x0120) AM_WRITE(sound_data_w)
 	AM_RANGE(0x0140, 0x0140) AM_READ_PORT("40") AM_WRITEONLY AM_BASE(m_grom_bank)
-	AM_RANGE(0x0160, 0x0160) AM_READ_PORT("60") AM_WRITE_LEGACY(itech8_page_w)
+	AM_RANGE(0x0160, 0x0160) AM_READ_PORT("60") AM_WRITE(itech8_page_w)
 	AM_RANGE(0x0180, 0x0180) AM_READ_PORT("80") AM_WRITE_LEGACY(tms34061_latch_w)
 	AM_RANGE(0x01a0, 0x01a0) AM_WRITE(itech8_nmi_ack_w)
-	AM_RANGE(0x01c0, 0x01df) AM_READ_LEGACY(itech8_blitter_r) AM_WRITE(blitter_w)
-	AM_RANGE(0x01e0, 0x01ff) AM_WRITE_LEGACY(itech8_palette_w)
+	AM_RANGE(0x01c0, 0x01df) AM_READ(itech8_blitter_r) AM_WRITE(blitter_w)
+	AM_RANGE(0x01e0, 0x01ff) AM_WRITE(itech8_palette_w)
 	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x4000, 0xffff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
@@ -885,14 +885,14 @@ ADDRESS_MAP_END
 /*------ Golden Tee Golf II 1992 layout ------*/
 static ADDRESS_MAP_START( gtg2_map, AS_PROGRAM, 8, itech8_state )
 	AM_RANGE(0x0100, 0x0100) AM_READ_PORT("40") AM_WRITE(itech8_nmi_ack_w)
-	AM_RANGE(0x0120, 0x0120) AM_READ_PORT("60") AM_WRITE_LEGACY(itech8_page_w)
-	AM_RANGE(0x0140, 0x015f) AM_WRITE_LEGACY(itech8_palette_w)
+	AM_RANGE(0x0120, 0x0120) AM_READ_PORT("60") AM_WRITE(itech8_page_w)
+	AM_RANGE(0x0140, 0x015f) AM_WRITE(itech8_palette_w)
 	AM_RANGE(0x0140, 0x0140) AM_READ_PORT("80")
 	AM_RANGE(0x0160, 0x0160) AM_WRITEONLY AM_BASE(m_grom_bank)
-	AM_RANGE(0x0180, 0x019f) AM_READ_LEGACY(itech8_blitter_r) AM_WRITE(blitter_w)
+	AM_RANGE(0x0180, 0x019f) AM_READ(itech8_blitter_r) AM_WRITE(blitter_w)
 	AM_RANGE(0x01c0, 0x01c0) AM_WRITE(gtg2_sound_data_w)
 	AM_RANGE(0x01e0, 0x01e0) AM_WRITE_LEGACY(tms34061_latch_w)
-	AM_RANGE(0x1000, 0x1fff) AM_READWRITE_LEGACY(itech8_tms34061_r, itech8_tms34061_w)
+	AM_RANGE(0x1000, 0x1fff) AM_READWRITE(itech8_tms34061_r, itech8_tms34061_w)
 	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x4000, 0xffff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
@@ -908,9 +908,9 @@ static ADDRESS_MAP_START( ninclown_map, AS_PROGRAM, 16, itech8_state )
 	AM_RANGE(0x100180, 0x100181) AM_READ_PORT("60") AM_WRITE(display_page16_w)
 	AM_RANGE(0x100240, 0x100241) AM_WRITE8_LEGACY(tms34061_latch_w, 0xff00)
 	AM_RANGE(0x100280, 0x100281) AM_READ_PORT("80") AM_WRITENOP
-	AM_RANGE(0x100300, 0x10031f) AM_READWRITE8_LEGACY(itech8_blitter_r, itech8_blitter_w, 0xffff)
+	AM_RANGE(0x100300, 0x10031f) AM_READWRITE8(itech8_blitter_r, itech8_blitter_w, 0xffff)
 	AM_RANGE(0x100380, 0x1003ff) AM_WRITE(palette16_w)
-	AM_RANGE(0x110000, 0x110fff) AM_READWRITE8_LEGACY(itech8_tms34061_r, itech8_tms34061_w, 0xffff)
+	AM_RANGE(0x110000, 0x110fff) AM_READWRITE8(itech8_tms34061_r, itech8_tms34061_w, 0xffff)
 ADDRESS_MAP_END
 
 
@@ -2630,8 +2630,9 @@ ROM_END
 
 static DRIVER_INIT( grmatch )
 {
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x0160, 0x0160, FUNC(grmatch_palette_w));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x0180, 0x0180, FUNC(grmatch_xscroll_w));
+	itech8_state *state = machine.driver_data<itech8_state>();
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x0160, 0x0160, write8_delegate(FUNC(itech8_state::grmatch_palette_w),state));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x0180, 0x0180, write8_delegate(FUNC(itech8_state::grmatch_xscroll_w),state));
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->unmap_write(0x01e0, 0x01ff);
 }
 
@@ -2692,7 +2693,7 @@ static DRIVER_INIT( rimrockn )
 
 	/* different banking mechanism (disable the old one) */
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x01a0, 0x01a0, write8_delegate(FUNC(itech8_state::rimrockn_bank_w),state));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x01c0, 0x01df, FUNC(itech8_blitter_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x01c0, 0x01df, write8_delegate(FUNC(itech8_state::itech8_blitter_w),state));
 }
 
 

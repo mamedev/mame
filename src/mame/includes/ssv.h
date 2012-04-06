@@ -84,14 +84,14 @@ public:
 	DECLARE_WRITE16_MEMBER(eaglshot_trackball_w);
 	DECLARE_READ16_MEMBER(eaglshot_gfxram_r);
 	DECLARE_WRITE16_MEMBER(eaglshot_gfxram_w);
+	DECLARE_WRITE16_MEMBER(gdfs_tmapram_w);
+	DECLARE_READ16_MEMBER(ssv_vblank_r);
+	DECLARE_WRITE16_MEMBER(ssv_scroll_w);
+	DECLARE_WRITE16_MEMBER(paletteram16_xrgb_swap_word_w);
 };
 
 /*----------- defined in video/ssv.c -----------*/
 
-READ16_HANDLER( ssv_vblank_r );
-WRITE16_HANDLER( ssv_scroll_w );
-WRITE16_HANDLER( paletteram16_xrgb_swap_word_w );
-WRITE16_HANDLER( gdfs_tmapram_w );
 void ssv_enable_video(running_machine &machine, int enable);
 
 VIDEO_START( ssv );

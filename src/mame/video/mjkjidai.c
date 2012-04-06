@@ -40,42 +40,40 @@ VIDEO_START( mjkjidai )
 
 ***************************************************************************/
 
-WRITE8_HANDLER( mjkjidai_videoram_w )
+WRITE8_MEMBER(mjkjidai_state::mjkjidai_videoram_w)
 {
-	mjkjidai_state *state = space->machine().driver_data<mjkjidai_state>();
 
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset & 0x7ff);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset & 0x7ff);
 }
 
-WRITE8_HANDLER( mjkjidai_ctrl_w )
+WRITE8_MEMBER(mjkjidai_state::mjkjidai_ctrl_w)
 {
-	mjkjidai_state *state = space->machine().driver_data<mjkjidai_state>();
-	UINT8 *rom = space->machine().region("maincpu")->base();
+	UINT8 *rom = machine().region("maincpu")->base();
 
-//  logerror("%04x: port c0 = %02x\n",cpu_get_pc(&space->device()),data);
+//  logerror("%04x: port c0 = %02x\n",cpu_get_pc(&space.device()),data);
 
 	/* bit 0 = NMI enable */
-	state->m_nmi_mask = data & 1;
+	m_nmi_mask = data & 1;
 
 	/* bit 1 = flip screen */
-	flip_screen_set(space->machine(), data & 0x02);
+	flip_screen_set(machine(), data & 0x02);
 
 	/* bit 2 =display enable */
-	state->m_display_enable = data & 0x04;
+	m_display_enable = data & 0x04;
 
 	/* bit 5 = coin counter */
-	coin_counter_w(space->machine(), 0,data & 0x20);
+	coin_counter_w(machine(), 0,data & 0x20);
 
 	/* bits 6-7 select ROM bank */
 	if (data & 0xc0)
 	{
-		memory_set_bankptr(space->machine(), "bank1",rom + 0x10000-0x4000 + ((data & 0xc0) << 8));
+		memory_set_bankptr(machine(), "bank1",rom + 0x10000-0x4000 + ((data & 0xc0) << 8));
 	}
 	else
 	{
 		/* there is code flowing from 7fff to this bank so they have to be contiguous in memory */
-		memory_set_bankptr(space->machine(), "bank1",rom + 0x08000);
+		memory_set_bankptr(machine(), "bank1",rom + 0x08000);
 	}
 }
 

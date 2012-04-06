@@ -8,7 +8,7 @@
 #include "includes/runaway.h"
 
 
-WRITE8_HANDLER( runaway_paletteram_w )
+WRITE8_MEMBER(runaway_state::runaway_paletteram_w)
 {
 	int R =
 		0x21 * ((~data >> 2) & 1) +
@@ -25,29 +25,27 @@ WRITE8_HANDLER( runaway_paletteram_w )
 		0x47 * ((~data >> 0) & 1) +
 		0x97 * ((~data >> 1) & 1);
 
-	palette_set_color(space->machine(), offset, MAKE_RGB(R, G, B));
+	palette_set_color(machine(), offset, MAKE_RGB(R, G, B));
 }
 
 
 
-WRITE8_HANDLER( runaway_video_ram_w )
+WRITE8_MEMBER(runaway_state::runaway_video_ram_w)
 {
-	runaway_state *state = space->machine().driver_data<runaway_state>();
-	state->m_video_ram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_video_ram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
 
-WRITE8_HANDLER( runaway_tile_bank_w )
+WRITE8_MEMBER(runaway_state::runaway_tile_bank_w)
 {
-	runaway_state *state = space->machine().driver_data<runaway_state>();
-	if ((data & 1) != state->m_tile_bank)
+	if ((data & 1) != m_tile_bank)
 	{
-		state->m_bg_tilemap->mark_all_dirty();
+		m_bg_tilemap->mark_all_dirty();
 	}
 
-	state->m_tile_bank = data & 1;
+	m_tile_bank = data & 1;
 }
 
 

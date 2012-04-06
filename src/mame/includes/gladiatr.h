@@ -25,18 +25,18 @@ public:
 	int m_fg_tile_bank;
 	int m_bg_tile_bank;
 	UINT8 *m_spriteram;
+	DECLARE_WRITE8_MEMBER(gladiatr_videoram_w);
+	DECLARE_WRITE8_MEMBER(gladiatr_colorram_w);
+	DECLARE_WRITE8_MEMBER(gladiatr_textram_w);
+	DECLARE_WRITE8_MEMBER(gladiatr_paletteram_w);
+	DECLARE_WRITE8_MEMBER(gladiatr_spritebuffer_w);
+	DECLARE_WRITE8_MEMBER(gladiatr_spritebank_w);
+	DECLARE_WRITE8_MEMBER(ppking_video_registers_w);
+	DECLARE_WRITE8_MEMBER(gladiatr_video_registers_w);
 };
 
 /*----------- defined in video/gladiatr.c -----------*/
 
-WRITE8_HANDLER( gladiatr_videoram_w );
-WRITE8_HANDLER( gladiatr_colorram_w );
-WRITE8_HANDLER( gladiatr_textram_w );
-WRITE8_HANDLER( gladiatr_paletteram_w );
-WRITE8_HANDLER( ppking_video_registers_w );
-WRITE8_HANDLER( gladiatr_video_registers_w );
-WRITE8_HANDLER( gladiatr_spritebuffer_w );
-WRITE8_HANDLER( gladiatr_spritebank_w );
 VIDEO_START( ppking );
 SCREEN_UPDATE_IND16( ppking );
 VIDEO_START( gladiatr );

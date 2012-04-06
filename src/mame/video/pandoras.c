@@ -119,35 +119,31 @@ VIDEO_START( pandoras )
 
 ***************************************************************************/
 
-WRITE8_HANDLER( pandoras_vram_w )
+WRITE8_MEMBER(pandoras_state::pandoras_vram_w)
 {
-	pandoras_state *state = space->machine().driver_data<pandoras_state>();
 
-	state->m_layer0->mark_tile_dirty(offset);
-	state->m_videoram[offset] = data;
+	m_layer0->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
 }
 
-WRITE8_HANDLER( pandoras_cram_w )
+WRITE8_MEMBER(pandoras_state::pandoras_cram_w)
 {
-	pandoras_state *state = space->machine().driver_data<pandoras_state>();
 
-	state->m_layer0->mark_tile_dirty(offset);
-	state->m_colorram[offset] = data;
+	m_layer0->mark_tile_dirty(offset);
+	m_colorram[offset] = data;
 }
 
-WRITE8_HANDLER( pandoras_scrolly_w )
+WRITE8_MEMBER(pandoras_state::pandoras_scrolly_w)
 {
-	pandoras_state *state = space->machine().driver_data<pandoras_state>();
 
-	state->m_layer0->set_scrolly(0, data);
+	m_layer0->set_scrolly(0, data);
 }
 
-WRITE8_HANDLER( pandoras_flipscreen_w )
+WRITE8_MEMBER(pandoras_state::pandoras_flipscreen_w)
 {
-	pandoras_state *state = space->machine().driver_data<pandoras_state>();
 
-	state->m_flipscreen = data;
-	space->machine().tilemap().set_flip_all(state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	m_flipscreen = data;
+	machine().tilemap().set_flip_all(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 }
 
 /***************************************************************************

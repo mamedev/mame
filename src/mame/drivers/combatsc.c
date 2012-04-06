@@ -374,8 +374,8 @@ static READ8_DEVICE_HANDLER ( combatsc_ym2203_r )
  *************************************/
 
 static ADDRESS_MAP_START( combatsc_map, AS_PROGRAM, 8, combatsc_state )
-	AM_RANGE(0x0000, 0x0007) AM_WRITE_LEGACY(combatsc_pf_control_w)
-	AM_RANGE(0x0020, 0x005f) AM_READWRITE_LEGACY(combatsc_scrollram_r, combatsc_scrollram_w)
+	AM_RANGE(0x0000, 0x0007) AM_WRITE(combatsc_pf_control_w)
+	AM_RANGE(0x0020, 0x005f) AM_READWRITE(combatsc_scrollram_r, combatsc_scrollram_w)
 //  AM_RANGE(0x0060, 0x00ff) AM_WRITEONLY                 /* RAM */
 
 	AM_RANGE(0x0200, 0x0201) AM_READWRITE(protection_r, protection_w)
@@ -395,7 +395,7 @@ static ADDRESS_MAP_START( combatsc_map, AS_PROGRAM, 8, combatsc_state )
 
 	AM_RANGE(0x0600, 0x06ff) AM_RAM AM_BASE(m_paletteram)		/* palette */
 	AM_RANGE(0x0800, 0x1fff) AM_RAM								/* RAM */
-	AM_RANGE(0x2000, 0x3fff) AM_READWRITE_LEGACY(combatsc_video_r, combatsc_video_w)
+	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(combatsc_video_r, combatsc_video_w)
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")						/* banked ROM area */
 	AM_RANGE(0x8000, 0xffff) AM_ROM								/* ROM */
 ADDRESS_MAP_END
@@ -405,7 +405,7 @@ static ADDRESS_MAP_START( combatscb_map, AS_PROGRAM, 8, combatsc_state )
 	AM_RANGE(0x0500, 0x0500) AM_WRITE(combatscb_bankselect_w)
 	AM_RANGE(0x0600, 0x06ff) AM_RAM AM_BASE(m_paletteram)		/* palette */
 	AM_RANGE(0x0800, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x3fff) AM_READWRITE_LEGACY(combatsc_video_r, combatsc_video_w)
+	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(combatsc_video_r, combatsc_video_w)
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")						/* banked ROM/RAM area */
 	AM_RANGE(0x8000, 0xffff) AM_ROM								/* ROM */
 ADDRESS_MAP_END

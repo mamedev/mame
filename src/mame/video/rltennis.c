@@ -110,49 +110,48 @@ enum
 
 #define SRC_SHIFT			8
 
-WRITE16_HANDLER(rlt_blitter_w)
+WRITE16_MEMBER(rltennis_state::rlt_blitter_w)
 {
-	rltennis_state *state = space->machine().driver_data<rltennis_state>();
 
-	int old_data=state->m_blitter[offset];
-	COMBINE_DATA(&state->m_blitter[offset]);
-	int new_data=state->m_blitter[offset];
+	int old_data=m_blitter[offset];
+	COMBINE_DATA(&m_blitter[offset]);
+	int new_data=m_blitter[offset];
 
 	if(offset==BLT_FLAGS && ((new_data^old_data) & BLTFLAG_DISPLAY_UD) )  /* visible page flip and clear */
 	{
 		if(new_data & BLTFLAG_DISPLAY_UD)
 		{
-			copybitmap(*state->m_tmp_bitmap[BITMAP_FG_DISPLAY], *state->m_tmp_bitmap[BITMAP_FG_1], 0, 0, 0, 0, state->m_tmp_bitmap[BITMAP_FG_DISPLAY]->cliprect());
-			state->m_tmp_bitmap[BITMAP_FG_1]->fill(0);
+			copybitmap(*m_tmp_bitmap[BITMAP_FG_DISPLAY], *m_tmp_bitmap[BITMAP_FG_1], 0, 0, 0, 0, m_tmp_bitmap[BITMAP_FG_DISPLAY]->cliprect());
+			m_tmp_bitmap[BITMAP_FG_1]->fill(0);
 		}
 		else
 		{
-			copybitmap(*state->m_tmp_bitmap[BITMAP_FG_DISPLAY], *state->m_tmp_bitmap[BITMAP_FG_2], 0, 0, 0, 0, state->m_tmp_bitmap[BITMAP_FG_DISPLAY]->cliprect());
-			state->m_tmp_bitmap[BITMAP_FG_2]->fill(0);
+			copybitmap(*m_tmp_bitmap[BITMAP_FG_DISPLAY], *m_tmp_bitmap[BITMAP_FG_2], 0, 0, 0, 0, m_tmp_bitmap[BITMAP_FG_DISPLAY]->cliprect());
+			m_tmp_bitmap[BITMAP_FG_2]->fill(0);
 		}
 	}
 
 	if(offset == BLT_START && (((new_data ^ old_data ) & new_data) & BLTSTRT_TRIGGER))  /* blit strobe 0->1 */
 	{
-		device_set_input_line(state->m_maincpu, 1, HOLD_LINE);
+		device_set_input_line(m_maincpu, 1, HOLD_LINE);
 
-		int src_x0=(state->m_blitter[BLT_X_START]>>SRC_SHIFT)+((state->m_blitter[BLT_FLAGS] & BLTFLAG_SRC_LR)?256:0);
-		int src_y0=(state->m_blitter[BLT_Y_START]>>SRC_SHIFT)+((state->m_blitter[BLT_FLAGS]>>3)&0xff00)+(((state->m_blitter[BLT_START]) & BLTSTRT_ROM_MSB)?(1<<0xd):0);
+		int src_x0=(m_blitter[BLT_X_START]>>SRC_SHIFT)+((m_blitter[BLT_FLAGS] & BLTFLAG_SRC_LR)?256:0);
+		int src_y0=(m_blitter[BLT_Y_START]>>SRC_SHIFT)+((m_blitter[BLT_FLAGS]>>3)&0xff00)+(((m_blitter[BLT_START]) & BLTSTRT_ROM_MSB)?(1<<0xd):0);
 
-		int dst_x0=(state->m_blitter[BLT_X_START]&0xff);
-		int dst_y0=(state->m_blitter[BLT_Y_START]&0xff);
+		int dst_x0=(m_blitter[BLT_X_START]&0xff);
+		int dst_y0=(m_blitter[BLT_Y_START]&0xff);
 
-		int dst_x1=(state->m_blitter[BLT_X_END]&0xff);
-		int dst_y1=(state->m_blitter[BLT_Y_END]&0xff);
+		int dst_x1=(m_blitter[BLT_X_END]&0xff);
+		int dst_y1=(m_blitter[BLT_Y_END]&0xff);
 
-		int src_x1=((state->m_blitter[BLT_X_END]>>SRC_SHIFT)&0xff)+((state->m_blitter[BLT_FLAGS] & BLTFLAG_SRC_LR)?256:0);
-		int src_y1=((state->m_blitter[BLT_Y_END]>>SRC_SHIFT)&0xff)+((state->m_blitter[BLT_FLAGS]>>3)&0xff00)+(((state->m_blitter[BLT_START]) & BLTSTRT_ROM_MSB)?(1<<0xd):0);
+		int src_x1=((m_blitter[BLT_X_END]>>SRC_SHIFT)&0xff)+((m_blitter[BLT_FLAGS] & BLTFLAG_SRC_LR)?256:0);
+		int src_y1=((m_blitter[BLT_Y_END]>>SRC_SHIFT)&0xff)+((m_blitter[BLT_FLAGS]>>3)&0xff00)+(((m_blitter[BLT_START]) & BLTSTRT_ROM_MSB)?(1<<0xd):0);
 
-		int x_dst_step=(state->m_blitter[BLT_FLAGS] & BLTFLAG_DST_X_DIR)?1:-1;
-		int y_dst_step=(state->m_blitter[BLT_FLAGS] & BLTFLAG_DST_Y_DIR)?1:-1;
+		int x_dst_step=(m_blitter[BLT_FLAGS] & BLTFLAG_DST_X_DIR)?1:-1;
+		int y_dst_step=(m_blitter[BLT_FLAGS] & BLTFLAG_DST_Y_DIR)?1:-1;
 
-		int x_src_step=(state->m_blitter[BLT_FLAGS] & BLTFLAG_SRC_X_DIR)?1:-1;
-		int y_src_step=(state->m_blitter[BLT_FLAGS] & BLTFLAG_SRC_Y_DIR)?1:-1;
+		int x_src_step=(m_blitter[BLT_FLAGS] & BLTFLAG_SRC_X_DIR)?1:-1;
+		int y_src_step=(m_blitter[BLT_FLAGS] & BLTFLAG_SRC_Y_DIR)?1:-1;
 
 		int x,y;
 
@@ -176,11 +175,11 @@ WRITE16_HANDLER(rlt_blitter_w)
 			if(blit_h1<blit_h) blit_h1=blit_h;
 		}
 
-		int layer=(state->m_blitter[BLT_START] & BLTSTRT_LAYER )?BITMAP_BG:BITMAP_FG_1;
+		int layer=(m_blitter[BLT_START] & BLTSTRT_LAYER )?BITMAP_BG:BITMAP_FG_1;
 
 		if(layer==BITMAP_FG_1)
 		{
-			if(state->m_blitter[BLT_FLAGS] & BLTFLAG_DST_UD )
+			if(m_blitter[BLT_FLAGS] & BLTFLAG_DST_UD )
 			{
 				layer=BITMAP_FG_2;
 			}
@@ -209,12 +208,12 @@ WRITE16_HANDLER(rlt_blitter_w)
 
 				int address=yy*512+xx;
 
-				int pix = state->m_gfx[ address & 0x0ffffff ];
-				int screen_x=(x&0xff)+((state->m_blitter[BLT_FLAGS] & BLTFLAG_DST_LR )?256:0);
+				int pix = m_gfx[ address & 0x0ffffff ];
+				int screen_x=(x&0xff)+((m_blitter[BLT_FLAGS] & BLTFLAG_DST_LR )?256:0);
 
 				if((pix || force_blit)&& screen_x >0 && y >0 && screen_x < 512 && y < 256 )
 				{
-					state->m_tmp_bitmap[layer]->pix16(y  , screen_x ) = pix;
+					m_tmp_bitmap[layer]->pix16(y  , screen_x ) = pix;
 				}
 			}
 		}

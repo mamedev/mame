@@ -34,18 +34,16 @@ PALETTE_INIT( jailbrek )
 	}
 }
 
-WRITE8_HANDLER( jailbrek_videoram_w )
+WRITE8_MEMBER(jailbrek_state::jailbrek_videoram_w)
 {
-	jailbrek_state *state = space->machine().driver_data<jailbrek_state>();
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( jailbrek_colorram_w )
+WRITE8_MEMBER(jailbrek_state::jailbrek_colorram_w)
 {
-	jailbrek_state *state = space->machine().driver_data<jailbrek_state>();
-	state->m_colorram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_colorram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )

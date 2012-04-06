@@ -8,7 +8,7 @@
 #include "video/vector.h"
 #include "includes/cchasm.h"
 
-WRITE16_HANDLER( cchasm_led_w )
+WRITE16_MEMBER(cchasm_state::cchasm_led_w)
 {
 	/*logerror("LED write %x to %x\n", data, offset);*/
 }

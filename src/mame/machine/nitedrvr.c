@@ -56,17 +56,15 @@ static int nitedrvr_steering( running_machine &machine )
 nitedrvr_steering_reset
 ***************************************************************************/
 
-READ8_HANDLER( nitedrvr_steering_reset_r )
+READ8_MEMBER(nitedrvr_state::nitedrvr_steering_reset_r)
 {
-	nitedrvr_state *state = space->machine().driver_data<nitedrvr_state>();
-	state->m_steering_val = 0;
+	m_steering_val = 0;
 	return 0;
 }
 
-WRITE8_HANDLER( nitedrvr_steering_reset_w )
+WRITE8_MEMBER(nitedrvr_state::nitedrvr_steering_reset_w)
 {
-	nitedrvr_state *state = space->machine().driver_data<nitedrvr_state>();
-	state->m_steering_val = 0;
+	m_steering_val = 0;
 }
 
 
@@ -98,33 +96,32 @@ Night Driver looks for the following:
 Fill in the steering and gear bits in a special way.
 ***************************************************************************/
 
-READ8_HANDLER( nitedrvr_in0_r )
+READ8_MEMBER(nitedrvr_state::nitedrvr_in0_r)
 {
-	nitedrvr_state *state = space->machine().driver_data<nitedrvr_state>();
-	int gear = input_port_read(space->machine(), "GEARS");
+	int gear = input_port_read(machine(), "GEARS");
 
-	if (gear & 0x10)				state->m_gear = 1;
-	else if (gear & 0x20)			state->m_gear = 2;
-	else if (gear & 0x40)			state->m_gear = 3;
-	else if (gear & 0x80)			state->m_gear = 4;
+	if (gear & 0x10)				m_gear = 1;
+	else if (gear & 0x20)			m_gear = 2;
+	else if (gear & 0x40)			m_gear = 3;
+	else if (gear & 0x80)			m_gear = 4;
 
 	switch (offset & 0x03)
 	{
 		case 0x00:						/* No remapping necessary */
-			return input_port_read(space->machine(), "DSW0");
+			return input_port_read(machine(), "DSW0");
 		case 0x01:						/* No remapping necessary */
-			return input_port_read(space->machine(), "DSW1");
+			return input_port_read(machine(), "DSW1");
 		case 0x02:						/* Remap our gear shift */
-			if (state->m_gear == 1)
+			if (m_gear == 1)
 				return 0xe0;
-			else if (state->m_gear == 2)
+			else if (m_gear == 2)
 				return 0xd0;
-			else if (state->m_gear == 3)
+			else if (m_gear == 3)
 				return 0xb0;
 			else
 				return 0x70;
 		case 0x03:						/* Remap our steering */
-			return (input_port_read(space->machine(), "DSW2") | nitedrvr_steering(space->machine()));
+			return (input_port_read(machine(), "DSW2") | nitedrvr_steering(machine()));
 		default:
 			return 0xff;
 	}
@@ -162,16 +159,15 @@ Night Driver looks for the following:
 Fill in the track difficulty switch and special signal in a special way.
 ***************************************************************************/
 
-READ8_HANDLER( nitedrvr_in1_r )
+READ8_MEMBER(nitedrvr_state::nitedrvr_in1_r)
 {
-	nitedrvr_state *state = space->machine().driver_data<nitedrvr_state>();
-	int port = input_port_read(space->machine(), "IN0");
+	int port = input_port_read(machine(), "IN0");
 
-	state->m_ac_line = (state->m_ac_line + 1) % 3;
+	m_ac_line = (m_ac_line + 1) % 3;
 
-	if (port & 0x10)				state->m_track = 0;
-	else if (port & 0x20)			state->m_track = 1;
-	else if (port & 0x40)			state->m_track = 2;
+	if (port & 0x10)				m_track = 0;
+	else if (port & 0x20)			m_track = 1;
+	else if (port & 0x40)			m_track = 2;
 
 	switch (offset & 0x07)
 	{
@@ -184,12 +180,12 @@ READ8_HANDLER( nitedrvr_in1_r )
 		case 0x03:
 			return ((port & 0x08) << 4);
 		case 0x04:
-			if (state->m_track == 1) return 0x80; else return 0x00;
+			if (m_track == 1) return 0x80; else return 0x00;
 		case 0x05:
-			if (state->m_track == 0) return 0x80; else return 0x00;
+			if (m_track == 0) return 0x80; else return 0x00;
 		case 0x06:
 			/* TODO: fix alternating signal? */
-			if (state->m_ac_line==0) return 0x80; else return 0x00;
+			if (m_ac_line==0) return 0x80; else return 0x00;
 		case 0x07:
 			return 0x00;
 		default:
@@ -210,13 +206,12 @@ D4 = SKID1
 D5 = SKID2
 ***************************************************************************/
 
-WRITE8_HANDLER( nitedrvr_out0_w )
+WRITE8_MEMBER(nitedrvr_state::nitedrvr_out0_w)
 {
-	nitedrvr_state *state = space->machine().driver_data<nitedrvr_state>();
 
-	discrete_sound_w(state->m_discrete, NITEDRVR_MOTOR_DATA, data & 0x0f);	// Motor freq data
-	discrete_sound_w(state->m_discrete, NITEDRVR_SKID1_EN, data & 0x10);	// Skid1 enable
-	discrete_sound_w(state->m_discrete, NITEDRVR_SKID2_EN, data & 0x20);	// Skid2 enable
+	discrete_sound_w(m_discrete, NITEDRVR_MOTOR_DATA, data & 0x0f);	// Motor freq data
+	discrete_sound_w(m_discrete, NITEDRVR_SKID1_EN, data & 0x10);	// Skid1 enable
+	discrete_sound_w(m_discrete, NITEDRVR_SKID2_EN, data & 0x20);	// Skid2 enable
 }
 
 /***************************************************************************
@@ -230,27 +225,26 @@ D4 = LED START
 D5 = Spare (Not used)
 ***************************************************************************/
 
-WRITE8_HANDLER( nitedrvr_out1_w )
+WRITE8_MEMBER(nitedrvr_state::nitedrvr_out1_w)
 {
-	nitedrvr_state *state = space->machine().driver_data<nitedrvr_state>();
 
-	set_led_status(space->machine(), 0, data & 0x10);
+	set_led_status(machine(), 0, data & 0x10);
 
-	state->m_crash_en = data & 0x01;
+	m_crash_en = data & 0x01;
 
-	discrete_sound_w(state->m_discrete, NITEDRVR_CRASH_EN, state->m_crash_en);	// Crash enable
-	discrete_sound_w(state->m_discrete, NITEDRVR_ATTRACT_EN, data & 0x02);		// Attract enable (sound disable)
+	discrete_sound_w(m_discrete, NITEDRVR_CRASH_EN, m_crash_en);	// Crash enable
+	discrete_sound_w(m_discrete, NITEDRVR_ATTRACT_EN, data & 0x02);		// Attract enable (sound disable)
 
-	if (!state->m_crash_en)
+	if (!m_crash_en)
 	{
 		/* Crash reset, set counter high and enable output */
-		state->m_crash_data_en = 1;
-		state->m_crash_data = 0x0f;
+		m_crash_data_en = 1;
+		m_crash_data = 0x0f;
 		/* Invert video */
-		palette_set_color(space->machine(), 1, MAKE_RGB(0x00,0x00,0x00)); /* BLACK */
-		palette_set_color(space->machine(), 0, MAKE_RGB(0xff,0xff,0xff)); /* WHITE */
+		palette_set_color(machine(), 1, MAKE_RGB(0x00,0x00,0x00)); /* BLACK */
+		palette_set_color(machine(), 0, MAKE_RGB(0xff,0xff,0xff)); /* WHITE */
 	}
-	discrete_sound_w(state->m_discrete, NITEDRVR_BANG_DATA, state->m_crash_data_en ? state->m_crash_data : 0);	// Crash Volume
+	discrete_sound_w(m_discrete, NITEDRVR_BANG_DATA, m_crash_data_en ? m_crash_data : 0);	// Crash Volume
 }
 
 

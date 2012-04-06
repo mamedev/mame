@@ -520,7 +520,7 @@ static ADDRESS_MAP_START( hardhead_map, AS_PROGRAM, 8, suna8_state )
 	AM_RANGE(0xdc80, 0xdc80) AM_NOP								// <- R (after bank select)
 	AM_RANGE(0xdd00, 0xdd00) AM_NOP								// <- R (after ip select)
 	AM_RANGE(0xdd80, 0xddff) AM_READWRITE(hardhead_protection_r, hardhead_protection_w	)	// Protection
-	AM_RANGE(0xe000, 0xffff) AM_RAM_WRITE_LEGACY(suna8_spriteram_w) AM_BASE(m_spriteram)	// Sprites
+	AM_RANGE(0xe000, 0xffff) AM_RAM_WRITE(suna8_spriteram_w) AM_BASE(m_spriteram)	// Sprites
 ADDRESS_MAP_END
 
 
@@ -589,7 +589,7 @@ static ADDRESS_MAP_START( rranger_map, AS_PROGRAM, 8, suna8_state )
 	AM_RANGE(0xc2c0, 0xc2c0) AM_READ_PORT("DSW2")				// DSW 2
 	AM_RANGE(0xc600, 0xc7ff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_be_w) AM_SHARE("paletteram")	// Palette
 	AM_RANGE(0xc800, 0xdfff) AM_RAM								// RAM
-	AM_RANGE(0xe000, 0xffff) AM_RAM_WRITE_LEGACY(suna8_spriteram_w) AM_BASE(m_spriteram)	// Sprites
+	AM_RANGE(0xe000, 0xffff) AM_RAM_WRITE(suna8_spriteram_w) AM_BASE(m_spriteram)	// Sprites
 ADDRESS_MAP_END
 
 
@@ -671,7 +671,7 @@ static ADDRESS_MAP_START( brickzn_map, AS_PROGRAM, 8, suna8_state )
 	AM_RANGE(0xc140, 0xc140) AM_READ(brickzn_c140_r)				// ???
 	AM_RANGE(0xc600, 0xc7ff) AM_READWRITE(banked_paletteram_r, brickzn_banked_paletteram_w)	// Palette (Banked)
 	AM_RANGE(0xc800, 0xdfff) AM_RAM									// RAM
-	AM_RANGE(0xe000, 0xffff) AM_READWRITE_LEGACY(suna8_banked_spriteram_r, suna8_banked_spriteram_w)	// Sprites (Banked)
+	AM_RANGE(0xe000, 0xffff) AM_READWRITE(suna8_banked_spriteram_r, suna8_banked_spriteram_w)	// Sprites (Banked)
 ADDRESS_MAP_END
 
 
@@ -791,7 +791,7 @@ static ADDRESS_MAP_START( hardhea2_map, AS_PROGRAM, 8, suna8_state )
 
 	AM_RANGE(0xc600, 0xc7ff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_be_w) AM_SHARE("paletteram"	)	// Palette (Banked??)
 	AM_RANGE(0xc800, 0xdfff) AM_RAMBANK("bank2")							// RAM (Banked?)
-	AM_RANGE(0xe000, 0xffff) AM_READWRITE_LEGACY(suna8_banked_spriteram_r, suna8_banked_spriteram_w)	// Sprites (Banked)
+	AM_RANGE(0xe000, 0xffff) AM_READWRITE(suna8_banked_spriteram_r, suna8_banked_spriteram_w)	// Sprites (Banked)
 ADDRESS_MAP_END
 
 
@@ -827,7 +827,7 @@ static ADDRESS_MAP_START( starfigh_map, AS_PROGRAM, 8, suna8_state )
 	AM_RANGE(0xc500, 0xc500) AM_WRITE(soundlatch_w					)	// To Sound CPU
 	AM_RANGE(0xc600, 0xc7ff) AM_READWRITE(banked_paletteram_r, paletteram_RRRRGGGGBBBBxxxx_be_w) AM_SHARE("paletteram"	)	// Palette (Banked??)
 	AM_RANGE(0xc800, 0xdfff) AM_RAM									// RAM
-	AM_RANGE(0xe000, 0xffff) AM_READWRITE_LEGACY(suna8_banked_spriteram_r, suna8_banked_spriteram_w)	// Sprites (Banked)
+	AM_RANGE(0xe000, 0xffff) AM_READWRITE(suna8_banked_spriteram_r, suna8_banked_spriteram_w)	// Sprites (Banked)
 ADDRESS_MAP_END
 
 
@@ -960,7 +960,7 @@ static ADDRESS_MAP_START( sparkman_map, AS_PROGRAM, 8, suna8_state )
 	AM_RANGE(0xc500, 0xc500) AM_WRITE(soundlatch_w				)	// To Sound CPU
 	AM_RANGE(0xc600, 0xc7ff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_be_w) AM_SHARE("paletteram"	)	// Palette (Banked??)
 	AM_RANGE(0xc800, 0xdfff) AM_RAM_WRITE(suna8_wram_w) AM_BASE(m_wram)								// RAM
-	AM_RANGE(0xe000, 0xffff) AM_READWRITE_LEGACY(suna8_banked_spriteram_r, suna8_banked_spriteram_w)	// Sprites (Banked)
+	AM_RANGE(0xe000, 0xffff) AM_READWRITE(suna8_banked_spriteram_r, suna8_banked_spriteram_w)	// Sprites (Banked)
 ADDRESS_MAP_END
 
 

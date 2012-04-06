@@ -28,16 +28,16 @@ public:
 	DECLARE_WRITE8_MEMBER(wiz_coin_counter_w);
 	DECLARE_WRITE8_MEMBER(wiz_main_nmi_mask_w);
 	DECLARE_WRITE8_MEMBER(wiz_sound_nmi_mask_w);
+	DECLARE_WRITE8_MEMBER(wiz_palettebank_w);
+	DECLARE_WRITE8_MEMBER(wiz_bgcolor_w);
+	DECLARE_WRITE8_MEMBER(wiz_char_bank_select_w);
+	DECLARE_WRITE8_MEMBER(wiz_flipx_w);
+	DECLARE_WRITE8_MEMBER(wiz_flipy_w);
 };
 
 
 /*----------- defined in video/wiz.c -----------*/
 
-WRITE8_HANDLER( wiz_char_bank_select_w );
-WRITE8_HANDLER( wiz_palettebank_w );
-WRITE8_HANDLER( wiz_bgcolor_w );
-WRITE8_HANDLER( wiz_flipx_w );
-WRITE8_HANDLER( wiz_flipy_w );
 
 VIDEO_START( wiz );
 PALETTE_INIT( wiz );

@@ -128,25 +128,23 @@ VIDEO_START( pooyan )
  *
  *************************************/
 
-WRITE8_HANDLER( pooyan_videoram_w )
+WRITE8_MEMBER(pooyan_state::pooyan_videoram_w)
 {
-	pooyan_state *state = space->machine().driver_data<pooyan_state>();
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_HANDLER( pooyan_colorram_w )
+WRITE8_MEMBER(pooyan_state::pooyan_colorram_w)
 {
-	pooyan_state *state = space->machine().driver_data<pooyan_state>();
-	state->m_colorram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_colorram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_HANDLER( pooyan_flipscreen_w )
+WRITE8_MEMBER(pooyan_state::pooyan_flipscreen_w)
 {
-	flip_screen_set(space->machine(), ~data & 0x01);
+	flip_screen_set(machine(), ~data & 0x01);
 }
 
 

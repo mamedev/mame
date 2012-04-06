@@ -68,7 +68,7 @@ static ADDRESS_MAP_START( battlnts_map, AS_PROGRAM, 8, battlnts_state )
 	AM_RANGE(0x2e03, 0x2e03) AM_READ_PORT("DSW3")				/* coinsw, testsw, startsw */
 	AM_RANGE(0x2e04, 0x2e04) AM_READ_PORT("DSW2")
 	AM_RANGE(0x2e08, 0x2e08) AM_WRITE(battlnts_bankswitch_w)	/* bankswitch control */
-	AM_RANGE(0x2e0c, 0x2e0c) AM_WRITE_LEGACY(battlnts_spritebank_w)	/* sprite bank select */
+	AM_RANGE(0x2e0c, 0x2e0c) AM_WRITE(battlnts_spritebank_w)	/* sprite bank select */
 	AM_RANGE(0x2e10, 0x2e10) AM_WRITE(watchdog_reset_w)			/* watchdog reset */
 	AM_RANGE(0x2e14, 0x2e14) AM_WRITE(soundlatch_w)				/* sound code # */
 	AM_RANGE(0x2e18, 0x2e18) AM_WRITE(battlnts_sh_irqtrigger_w)	/* cause interrupt on audio CPU */

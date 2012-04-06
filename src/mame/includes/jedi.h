@@ -52,6 +52,8 @@ public:
 	DECLARE_WRITE8_MEMBER(jedi_coin_counter_w);
 	DECLARE_WRITE8_MEMBER(nvram_data_w);
 	DECLARE_WRITE8_MEMBER(nvram_enable_w);
+	DECLARE_WRITE8_MEMBER(jedi_vscroll_w);
+	DECLARE_WRITE8_MEMBER(jedi_hscroll_w);
 };
 
 
@@ -69,5 +71,3 @@ CUSTOM_INPUT( jedi_audio_comm_stat_r );
 
 MACHINE_CONFIG_EXTERN( jedi_video );
 
-WRITE8_HANDLER( jedi_vscroll_w );
-WRITE8_HANDLER( jedi_hscroll_w );

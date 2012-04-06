@@ -107,11 +107,11 @@ WRITE8_MEMBER(pokechmp_state::pokechmp_paletteram_w)
 
 static ADDRESS_MAP_START( pokechmp_map, AS_PROGRAM, 8, pokechmp_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x0800, 0x0fff) AM_RAM_WRITE_LEGACY(pokechmp_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0x0800, 0x0fff) AM_RAM_WRITE(pokechmp_videoram_w) AM_BASE(m_videoram)
 	AM_RANGE(0x1000, 0x11ff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
 
 	AM_RANGE(0x1800, 0x1800) AM_READ_PORT("P1")
-	AM_RANGE(0x1801, 0x1801) AM_WRITE_LEGACY(pokechmp_flipscreen_w)
+	AM_RANGE(0x1801, 0x1801) AM_WRITE(pokechmp_flipscreen_w)
 	/* 1800 - 0x181f are unused BAC-06 registers, see video/dec0.c */
 	AM_RANGE(0x1802, 0x181f) AM_WRITENOP
 

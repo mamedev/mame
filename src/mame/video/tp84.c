@@ -103,19 +103,18 @@ PALETTE_INIT( tp84 )
 }
 
 
-WRITE8_HANDLER( tp84_spriteram_w )
+WRITE8_MEMBER(tp84_state::tp84_spriteram_w)
 {
-	tp84_state *state = space->machine().driver_data<tp84_state>();
 	/* the game multiplexes the sprites, so update now */
-	space->machine().primary_screen->update_now();
-	state->m_spriteram[offset] = data;
+	machine().primary_screen->update_now();
+	m_spriteram[offset] = data;
 }
 
 
-READ8_HANDLER( tp84_scanline_r )
+READ8_MEMBER(tp84_state::tp84_scanline_r)
 {
 	/* reads 1V - 128V */
-	return space->machine().primary_screen->vpos();
+	return machine().primary_screen->vpos();
 }
 
 

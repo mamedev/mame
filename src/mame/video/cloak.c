@@ -38,10 +38,9 @@
 
 ***************************************************************************/
 
-WRITE8_HANDLER( cloak_paletteram_w )
+WRITE8_MEMBER(cloak_state::cloak_paletteram_w)
 {
-	cloak_state *state = space->machine().driver_data<cloak_state>();
-	state->m_palette_ram[offset & 0x3f] = ((offset & 0x40) << 2) | data;
+	m_palette_ram[offset & 0x3f] = ((offset & 0x40) << 2) | data;
 }
 
 
@@ -87,75 +86,71 @@ static void set_pens(running_machine &machine)
 }
 
 
-static void set_current_bitmap_videoram_pointer(cloak_state *state)
+void cloak_state::set_current_bitmap_videoram_pointer()
 {
-	state->m_current_bitmap_videoram_accessed  = state->m_bitmap_videoram_selected ? state->m_bitmap_videoram1 : state->m_bitmap_videoram2;
-	state->m_current_bitmap_videoram_displayed = state->m_bitmap_videoram_selected ? state->m_bitmap_videoram2 : state->m_bitmap_videoram1;
+	m_current_bitmap_videoram_accessed  = m_bitmap_videoram_selected ? m_bitmap_videoram1 : m_bitmap_videoram2;
+	m_current_bitmap_videoram_displayed = m_bitmap_videoram_selected ? m_bitmap_videoram2 : m_bitmap_videoram1;
 }
 
-WRITE8_HANDLER( cloak_clearbmp_w )
+WRITE8_MEMBER(cloak_state::cloak_clearbmp_w)
 {
-	cloak_state *state = space->machine().driver_data<cloak_state>();
 
-	space->machine().primary_screen->update_now();
-	state->m_bitmap_videoram_selected = data & 0x01;
-	set_current_bitmap_videoram_pointer(state);
+	machine().primary_screen->update_now();
+	m_bitmap_videoram_selected = data & 0x01;
+	set_current_bitmap_videoram_pointer();
 
 	if (data & 0x02)	/* clear */
-		memset(state->m_current_bitmap_videoram_accessed, 0, 256*256);
+		memset(m_current_bitmap_videoram_accessed, 0, 256*256);
 }
 
-static void adjust_xy(cloak_state *state, int offset)
+void cloak_state::adjust_xy(int offset)
 {
 	switch (offset)
 	{
-		case 0x00:  state->m_bitmap_videoram_address_x--; state->m_bitmap_videoram_address_y++; break;
-		case 0x01:								 state->m_bitmap_videoram_address_y--; break;
-		case 0x02:  state->m_bitmap_videoram_address_x--;							  break;
-		case 0x04:  state->m_bitmap_videoram_address_x++; state->m_bitmap_videoram_address_y++; break;
-		case 0x05:								 state->m_bitmap_videoram_address_y++; break;
-		case 0x06:  state->m_bitmap_videoram_address_x++;							  break;
+		case 0x00:  m_bitmap_videoram_address_x--; m_bitmap_videoram_address_y++; break;
+		case 0x01:						 m_bitmap_videoram_address_y--; break;
+		case 0x02:  m_bitmap_videoram_address_x--;							  break;
+		case 0x04:  m_bitmap_videoram_address_x++; m_bitmap_videoram_address_y++; break;
+		case 0x05:						 m_bitmap_videoram_address_y++; break;
+		case 0x06:  m_bitmap_videoram_address_x++;							  break;
 	}
 }
 
-READ8_HANDLER( graph_processor_r )
+READ8_MEMBER(cloak_state::graph_processor_r)
 {
-	cloak_state *state = space->machine().driver_data<cloak_state>();
-	UINT8 ret = state->m_current_bitmap_videoram_displayed[(state->m_bitmap_videoram_address_y << 8) | state->m_bitmap_videoram_address_x];
+	UINT8 ret = m_current_bitmap_videoram_displayed[(m_bitmap_videoram_address_y << 8) | m_bitmap_videoram_address_x];
 
-	adjust_xy(state, offset);
+	adjust_xy(offset);
 
 	return ret;
 }
 
-WRITE8_HANDLER( graph_processor_w )
+WRITE8_MEMBER(cloak_state::graph_processor_w)
 {
-	cloak_state *state = space->machine().driver_data<cloak_state>();
 
 	switch (offset)
 	{
-		case 0x03: state->m_bitmap_videoram_address_x = data; break;
-		case 0x07: state->m_bitmap_videoram_address_y = data; break;
+		case 0x03: m_bitmap_videoram_address_x = data; break;
+		case 0x07: m_bitmap_videoram_address_y = data; break;
 		default:
-			state->m_current_bitmap_videoram_accessed[(state->m_bitmap_videoram_address_y << 8) | state->m_bitmap_videoram_address_x] = data & 0x0f;
+			m_current_bitmap_videoram_accessed[(m_bitmap_videoram_address_y << 8) | m_bitmap_videoram_address_x] = data & 0x0f;
 
-			adjust_xy(state, offset);
+			adjust_xy(offset);
 			break;
 	}
 }
 
-WRITE8_HANDLER( cloak_videoram_w )
+WRITE8_MEMBER(cloak_state::cloak_videoram_w)
 {
-	cloak_state *state = space->machine().driver_data<cloak_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = m_videoram;
 
 	videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( cloak_flipscreen_w )
+WRITE8_MEMBER(cloak_state::cloak_flipscreen_w)
 {
-	flip_screen_set(space->machine(), data & 0x80);
+	flip_screen_set(machine(), data & 0x80);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
@@ -177,7 +172,7 @@ VIDEO_START( cloak )
 	state->m_bitmap_videoram2 = auto_alloc_array(machine, UINT8, 256*256);
 	state->m_palette_ram = auto_alloc_array(machine, UINT16, NUM_PENS);
 
-	set_current_bitmap_videoram_pointer(state);
+	state->set_current_bitmap_videoram_pointer();
 
 	state->save_item(NAME(state->m_bitmap_videoram_address_x));
 	state->save_item(NAME(state->m_bitmap_videoram_address_y));
@@ -185,7 +180,7 @@ VIDEO_START( cloak )
 	state->save_pointer(NAME(state->m_bitmap_videoram1), 256*256);
 	state->save_pointer(NAME(state->m_bitmap_videoram2), 256*256);
 	state->save_pointer(NAME(state->m_palette_ram), NUM_PENS);
-	machine.save().register_postload(save_prepost_delegate(FUNC(set_current_bitmap_videoram_pointer), state));
+	machine.save().register_postload(save_prepost_delegate(FUNC(cloak_state::set_current_bitmap_videoram_pointer), state));
 }
 
 static void draw_bitmap(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)

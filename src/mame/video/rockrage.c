@@ -76,18 +76,17 @@ void rockrage_sprite_callback( running_machine &machine, int *code, int *color )
 }
 
 
-WRITE8_HANDLER( rockrage_vreg_w )
+WRITE8_MEMBER(rockrage_state::rockrage_vreg_w)
 {
 	/* bits 4-7: unused */
 	/* bit 3: bit 4 of bank # (layer 0) */
 	/* bit 2: bit 1 of bank # (layer 0) */
 	/* bits 0-1: sprite bank select */
-	rockrage_state *state = space->machine().driver_data<rockrage_state>();
 
-	if ((data & 0x0c) != (state->m_vreg & 0x0c))
-		space->machine().tilemap().mark_all_dirty();
+	if ((data & 0x0c) != (m_vreg & 0x0c))
+		machine().tilemap().mark_all_dirty();
 
-	state->m_vreg = data;
+	m_vreg = data;
 }
 
 /***************************************************************************

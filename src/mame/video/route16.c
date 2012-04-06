@@ -17,21 +17,19 @@
  *
  *************************************/
 
-WRITE8_HANDLER( route16_out0_w )
+WRITE8_MEMBER(route16_state::route16_out0_w)
 {
-	route16_state *state = space->machine().driver_data<route16_state>();
-	state->m_palette_1 = data & 0x1f;
+	m_palette_1 = data & 0x1f;
 
-	coin_counter_w(space->machine(), 0, (data >> 5) & 0x01);
+	coin_counter_w(machine(), 0, (data >> 5) & 0x01);
 }
 
 
-WRITE8_HANDLER( route16_out1_w )
+WRITE8_MEMBER(route16_state::route16_out1_w)
 {
-	route16_state *state = space->machine().driver_data<route16_state>();
-	state->m_palette_2 = data & 0x1f;
+	m_palette_2 = data & 0x1f;
 
-	state->m_flipscreen = (data >> 5) & 0x01;
+	m_flipscreen = (data >> 5) & 0x01;
 }
 
 

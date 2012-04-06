@@ -25,13 +25,13 @@ public:
 	int        m_xpc;
 	int        m_gc_up;
 	int        m_gc_down;
+	DECLARE_WRITE8_MEMBER(homerun_videoram_w);
+	DECLARE_WRITE8_MEMBER(homerun_color_w);
 };
 
 
 /*----------- defined in video/homerun.c -----------*/
 
-WRITE8_HANDLER( homerun_videoram_w );
-WRITE8_HANDLER( homerun_color_w );
 WRITE8_DEVICE_HANDLER( homerun_banking_w );
 
 VIDEO_START(homerun);

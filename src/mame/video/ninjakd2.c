@@ -221,83 +221,72 @@ VIDEO_START( omegaf )
  *
  *************************************/
 
-WRITE8_HANDLER( ninjakd2_bgvideoram_w )
+WRITE8_MEMBER(ninjakd2_state::ninjakd2_bgvideoram_w)
 {
-	ninjakd2_state *state = space->machine().driver_data<ninjakd2_state>();
-	state->m_bg_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset >> 1);
+	m_bg_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset >> 1);
 }
 
-WRITE8_HANDLER( ninjakd2_fgvideoram_w )
+WRITE8_MEMBER(ninjakd2_state::ninjakd2_fgvideoram_w)
 {
-	ninjakd2_state *state = space->machine().driver_data<ninjakd2_state>();
-	state->m_fg_videoram[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset >> 1);
+	m_fg_videoram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset >> 1);
 }
 
 
 
-WRITE8_HANDLER( robokid_bg0_bank_w )
+WRITE8_MEMBER(ninjakd2_state::robokid_bg0_bank_w)
 {
-	ninjakd2_state *state = space->machine().driver_data<ninjakd2_state>();
-	state->m_robokid_bg0_bank = data & state->m_bank_mask;
+	m_robokid_bg0_bank = data & m_bank_mask;
 }
 
-WRITE8_HANDLER( robokid_bg1_bank_w )
+WRITE8_MEMBER(ninjakd2_state::robokid_bg1_bank_w)
 {
-	ninjakd2_state *state = space->machine().driver_data<ninjakd2_state>();
-	state->m_robokid_bg1_bank = data & state->m_bank_mask;
+	m_robokid_bg1_bank = data & m_bank_mask;
 }
 
-WRITE8_HANDLER( robokid_bg2_bank_w )
+WRITE8_MEMBER(ninjakd2_state::robokid_bg2_bank_w)
 {
-	ninjakd2_state *state = space->machine().driver_data<ninjakd2_state>();
-	state->m_robokid_bg2_bank = data & state->m_bank_mask;
+	m_robokid_bg2_bank = data & m_bank_mask;
 }
 
-READ8_HANDLER( robokid_bg0_videoram_r )
+READ8_MEMBER(ninjakd2_state::robokid_bg0_videoram_r)
 {
-	ninjakd2_state *state = space->machine().driver_data<ninjakd2_state>();
-	return state->m_robokid_bg0_videoram[(state->m_robokid_bg0_bank << 10) | offset];
+	return m_robokid_bg0_videoram[(m_robokid_bg0_bank << 10) | offset];
 }
 
-READ8_HANDLER( robokid_bg1_videoram_r )
+READ8_MEMBER(ninjakd2_state::robokid_bg1_videoram_r)
 {
-	ninjakd2_state *state = space->machine().driver_data<ninjakd2_state>();
-	return state->m_robokid_bg1_videoram[(state->m_robokid_bg1_bank << 10) | offset];
+	return m_robokid_bg1_videoram[(m_robokid_bg1_bank << 10) | offset];
 }
 
-READ8_HANDLER( robokid_bg2_videoram_r )
+READ8_MEMBER(ninjakd2_state::robokid_bg2_videoram_r)
 {
-	ninjakd2_state *state = space->machine().driver_data<ninjakd2_state>();
-	return state->m_robokid_bg2_videoram[(state->m_robokid_bg2_bank << 10) | offset];
+	return m_robokid_bg2_videoram[(m_robokid_bg2_bank << 10) | offset];
 }
 
-WRITE8_HANDLER( robokid_bg0_videoram_w )
+WRITE8_MEMBER(ninjakd2_state::robokid_bg0_videoram_w)
 {
-	ninjakd2_state *state = space->machine().driver_data<ninjakd2_state>();
-	int const address = (state->m_robokid_bg0_bank << 10 ) | offset;
+	int const address = (m_robokid_bg0_bank << 10 ) | offset;
 
-	state->m_robokid_bg0_videoram[address] = data;
-	state->m_bg0_tilemap->mark_tile_dirty(address >> 1);
+	m_robokid_bg0_videoram[address] = data;
+	m_bg0_tilemap->mark_tile_dirty(address >> 1);
 }
 
-WRITE8_HANDLER( robokid_bg1_videoram_w )
+WRITE8_MEMBER(ninjakd2_state::robokid_bg1_videoram_w)
 {
-	ninjakd2_state *state = space->machine().driver_data<ninjakd2_state>();
-	int const address = (state->m_robokid_bg1_bank << 10 ) | offset;
+	int const address = (m_robokid_bg1_bank << 10 ) | offset;
 
-	state->m_robokid_bg1_videoram[address] = data;
-	state->m_bg1_tilemap->mark_tile_dirty(address >> 1);
+	m_robokid_bg1_videoram[address] = data;
+	m_bg1_tilemap->mark_tile_dirty(address >> 1);
 }
 
-WRITE8_HANDLER( robokid_bg2_videoram_w )
+WRITE8_MEMBER(ninjakd2_state::robokid_bg2_videoram_w)
 {
-	ninjakd2_state *state = space->machine().driver_data<ninjakd2_state>();
-	int const address = (state->m_robokid_bg2_bank << 10 ) | offset;
+	int const address = (m_robokid_bg2_bank << 10 ) | offset;
 
-	state->m_robokid_bg2_videoram[address] = data;
-	state->m_bg2_tilemap->mark_tile_dirty(address >> 1);
+	m_robokid_bg2_videoram[address] = data;
+	m_bg2_tilemap->mark_tile_dirty(address >> 1);
 }
 
 
@@ -320,36 +309,31 @@ static void bg_ctrl(int offset, int data, tilemap_t* tilemap)
 	tilemap->set_scrolly(0, scrolly);
 }
 
-WRITE8_HANDLER( ninjakd2_bg_ctrl_w )
+WRITE8_MEMBER(ninjakd2_state::ninjakd2_bg_ctrl_w)
 {
-	ninjakd2_state *state = space->machine().driver_data<ninjakd2_state>();
-	bg_ctrl(offset, data, state->m_bg_tilemap);
+	bg_ctrl(offset, data, m_bg_tilemap);
 }
 
-WRITE8_HANDLER( robokid_bg0_ctrl_w )
+WRITE8_MEMBER(ninjakd2_state::robokid_bg0_ctrl_w)
 {
-	ninjakd2_state *state = space->machine().driver_data<ninjakd2_state>();
-	bg_ctrl(offset, data, state->m_bg0_tilemap);
+	bg_ctrl(offset, data, m_bg0_tilemap);
 }
 
-WRITE8_HANDLER( robokid_bg1_ctrl_w )
+WRITE8_MEMBER(ninjakd2_state::robokid_bg1_ctrl_w)
 {
-	ninjakd2_state *state = space->machine().driver_data<ninjakd2_state>();
-	bg_ctrl(offset, data, state->m_bg1_tilemap);
+	bg_ctrl(offset, data, m_bg1_tilemap);
 }
 
-WRITE8_HANDLER( robokid_bg2_ctrl_w )
+WRITE8_MEMBER(ninjakd2_state::robokid_bg2_ctrl_w)
 {
-	ninjakd2_state *state = space->machine().driver_data<ninjakd2_state>();
-	bg_ctrl(offset, data, state->m_bg2_tilemap);
+	bg_ctrl(offset, data, m_bg2_tilemap);
 }
 
 
 
-WRITE8_HANDLER( ninjakd2_sprite_overdraw_w )
+WRITE8_MEMBER(ninjakd2_state::ninjakd2_sprite_overdraw_w)
 {
-	ninjakd2_state *state = space->machine().driver_data<ninjakd2_state>();
-	state->m_next_sprite_overdraw_enabled = data & 1;
+	m_next_sprite_overdraw_enabled = data & 1;
 }
 
 

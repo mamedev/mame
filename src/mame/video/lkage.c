@@ -41,24 +41,23 @@
 #include "includes/lkage.h"
 
 
-WRITE8_HANDLER( lkage_videoram_w )
+WRITE8_MEMBER(lkage_state::lkage_videoram_w)
 {
-	lkage_state *state = space->machine().driver_data<lkage_state>();
 
-	state->m_videoram[offset] = data;
+	m_videoram[offset] = data;
 
 	switch (offset / 0x400)
 	{
 	case 0:
-		state->m_tx_tilemap->mark_tile_dirty(offset & 0x3ff);
+		m_tx_tilemap->mark_tile_dirty(offset & 0x3ff);
 		break;
 
 	case 1:
-		state->m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
+		m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
 		break;
 
 	case 2:
-		state->m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
+		m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
 		break;
 
 	default:

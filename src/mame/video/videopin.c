@@ -87,17 +87,15 @@ SCREEN_UPDATE_IND16( videopin )
 }
 
 
-WRITE8_HANDLER( videopin_ball_w )
+WRITE8_MEMBER(videopin_state::videopin_ball_w)
 {
-	videopin_state *state = space->machine().driver_data<videopin_state>();
-	state->m_ball_x = data & 15;
-	state->m_ball_y = data >> 4;
+	m_ball_x = data & 15;
+	m_ball_y = data >> 4;
 }
 
 
-WRITE8_HANDLER( videopin_video_ram_w )
+WRITE8_MEMBER(videopin_state::videopin_video_ram_w)
 {
-	videopin_state *state = space->machine().driver_data<videopin_state>();
-	state->m_video_ram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_video_ram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }

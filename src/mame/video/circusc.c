@@ -134,23 +134,21 @@ VIDEO_START( circusc )
 
 ***************************************************************************/
 
-WRITE8_HANDLER( circusc_videoram_w )
+WRITE8_MEMBER(circusc_state::circusc_videoram_w)
 {
-	circusc_state *state = space->machine().driver_data<circusc_state>();
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( circusc_colorram_w )
+WRITE8_MEMBER(circusc_state::circusc_colorram_w)
 {
-	circusc_state *state = space->machine().driver_data<circusc_state>();
-	state->m_colorram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_colorram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( circusc_flipscreen_w )
+WRITE8_MEMBER(circusc_state::circusc_flipscreen_w)
 {
-	flip_screen_set(space->machine(), data & 1);
+	flip_screen_set(machine(), data & 1);
 }
 
 

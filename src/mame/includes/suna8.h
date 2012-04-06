@@ -74,6 +74,9 @@ public:
 
 	DECLARE_READ8_MEMBER(banked_paletteram_r);
 	DECLARE_WRITE8_MEMBER( brickzn_banked_paletteram_w );
+	DECLARE_READ8_MEMBER(suna8_banked_spriteram_r);
+	DECLARE_WRITE8_MEMBER(suna8_spriteram_w);
+	DECLARE_WRITE8_MEMBER(suna8_banked_spriteram_w);
 };
 
 
@@ -87,10 +90,7 @@ SAMPLES_START( suna8_sh_start );
 
 /*----------- defined in video/suna8.c -----------*/
 
-WRITE8_HANDLER( suna8_spriteram_w );			// for debug
-WRITE8_HANDLER( suna8_banked_spriteram_w );	// for debug
 
-READ8_HANDLER( suna8_banked_spriteram_r );
 
 VIDEO_START( suna8_textdim0 );
 VIDEO_START( suna8_textdim8 );

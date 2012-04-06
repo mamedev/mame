@@ -510,7 +510,7 @@ WRITE16_MEMBER(taitob_state::realpunc_output_w)
 	AM_RANGE(ADDR+0x11980, ADDR+0x137ff) AM_RAM					\
 	AM_RANGE(ADDR+0x13800, ADDR+0x13fff) AM_DEVREADWRITE_LEGACY("tc0180vcu", tc0180vcu_scroll_r, tc0180vcu_scroll_w)	\
 	AM_RANGE(ADDR+0x18000, ADDR+0x1801f) AM_DEVREADWRITE_LEGACY("tc0180vcu", tc0180vcu_ctrl_r, tc0180vcu_ctrl_w)		\
-	AM_RANGE(ADDR+0x40000, ADDR+0x7ffff) AM_READWRITE_LEGACY(tc0180vcu_framebuffer_word_r, tc0180vcu_framebuffer_word_w)
+	AM_RANGE(ADDR+0x40000, ADDR+0x7ffff) AM_READWRITE(tc0180vcu_framebuffer_word_r, tc0180vcu_framebuffer_word_w)
 
 
 static ADDRESS_MAP_START( rastsag2_map, AS_PROGRAM, 16, taitob_state )
@@ -566,9 +566,9 @@ static ADDRESS_MAP_START( hitice_map, AS_PROGRAM, 16, taitob_state )
 	AM_RANGE(0x700002, 0x700003) AM_DEVREADWRITE8_LEGACY("tc0140syt", tc0140syt_comm_r, tc0140syt_comm_w, 0xff00)
 	AM_RANGE(0x800000, 0x803fff) AM_RAM	/* Main RAM */
 	AM_RANGE(0xa00000, 0xa01fff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBxxxx_word_w) AM_SHARE("paletteram")
-	AM_RANGE(0xb00000, 0xb7ffff) AM_RAM_WRITE_LEGACY(hitice_pixelram_w) AM_BASE(m_pixelram)
+	AM_RANGE(0xb00000, 0xb7ffff) AM_RAM_WRITE(hitice_pixelram_w) AM_BASE(m_pixelram)
 //  { 0xbffff0, 0xbffff1, ???
-	AM_RANGE(0xbffff2, 0xbffff5) AM_WRITE_LEGACY(hitice_pixel_scroll_w)
+	AM_RANGE(0xbffff2, 0xbffff5) AM_WRITE(hitice_pixel_scroll_w)
 //  { 0xbffffa, 0xbffffb, ???
 ADDRESS_MAP_END
 
@@ -723,7 +723,7 @@ static ADDRESS_MAP_START( realpunc_map, AS_PROGRAM, 16, taitob_state )
 	AM_RANGE(0x110000, 0x12ffff) AM_RAM
 	AM_RANGE(0x130000, 0x13ffff) AM_RAM // Check me
 	AM_RANGE(0x180000, 0x18000f) AM_DEVREADWRITE_LEGACY("tc0510nio", tc0510nio_halfword_wordswap_r, tc0510nio_halfword_wordswap_w)
-	AM_RANGE(0x184000, 0x184001) AM_WRITE_LEGACY(realpunc_video_ctrl_w)
+	AM_RANGE(0x184000, 0x184001) AM_WRITE(realpunc_video_ctrl_w)
 	AM_RANGE(0x188000, 0x188001) AM_READNOP AM_DEVWRITE8_LEGACY("tc0140syt", tc0140syt_port_w, 0xff00)
 	AM_RANGE(0x188002, 0x188003) AM_READNOP AM_DEVWRITE8_LEGACY("tc0140syt", tc0140syt_comm_w, 0xff00)
 	AM_RANGE(0x18c000, 0x18c001) AM_WRITE(realpunc_output_w)

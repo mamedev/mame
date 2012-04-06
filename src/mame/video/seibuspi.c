@@ -2,26 +2,24 @@
 #include "includes/seibuspi.h"
 
 
-READ32_HANDLER( spi_layer_bank_r )
+READ32_MEMBER(seibuspi_state::spi_layer_bank_r)
 {
-	seibuspi_state *state = space->machine().driver_data<seibuspi_state>();
-	return state->m_layer_bank;
+	return m_layer_bank;
 }
 
-WRITE32_HANDLER( spi_layer_bank_w )
+WRITE32_MEMBER(seibuspi_state::spi_layer_bank_w)
 {
-	seibuspi_state *state = space->machine().driver_data<seibuspi_state>();
-	COMBINE_DATA( &state->m_layer_bank );
+	COMBINE_DATA( &m_layer_bank );
 
-	if (state->m_layer_bank & 0x80000000) {
-		state->m_fore_layer_offset = 0x1000 / 4;
-		state->m_mid_layer_offset = 0x2000 / 4;
-		state->m_text_layer_offset = 0x3000 / 4;
+	if (m_layer_bank & 0x80000000) {
+		m_fore_layer_offset = 0x1000 / 4;
+		m_mid_layer_offset = 0x2000 / 4;
+		m_text_layer_offset = 0x3000 / 4;
 	}
 	else {
-		state->m_fore_layer_offset = 0x800 / 4;
-		state->m_mid_layer_offset = 0x1000 / 4;
-		state->m_text_layer_offset = 0x1800 / 4;
+		m_fore_layer_offset = 0x800 / 4;
+		m_mid_layer_offset = 0x1000 / 4;
+		m_text_layer_offset = 0x1800 / 4;
 	}
 }
 
@@ -48,84 +46,81 @@ void rf2_set_layer_banks(running_machine &machine, int banks)
 }
 
 #ifdef UNUSED_FUNCTION
-READ32_HANDLER( spi_layer_enable_r )
+READ32_MEMBER(seibuspi_state::spi_layer_enable_r)
 {
-	seibuspi_state *state = space->machine().driver_data<seibuspi_state>();
-	return state->m_layer_enable;
+	return m_layer_enable;
 }
 #endif
 
-WRITE32_HANDLER( spi_layer_enable_w )
+WRITE32_MEMBER(seibuspi_state::spi_layer_enable_w)
 {
-	seibuspi_state *state = space->machine().driver_data<seibuspi_state>();
-	COMBINE_DATA( &state->m_layer_enable );
-	state->m_back_layer->enable((state->m_layer_enable & 0x1) ^ 0x1);
-	state->m_mid_layer->enable(((state->m_layer_enable >> 1) & 0x1) ^ 0x1);
-	state->m_fore_layer->enable(((state->m_layer_enable >> 2) & 0x1) ^ 0x1);
+	COMBINE_DATA( &m_layer_enable );
+	m_back_layer->enable((m_layer_enable & 0x1) ^ 0x1);
+	m_mid_layer->enable(((m_layer_enable >> 1) & 0x1) ^ 0x1);
+	m_fore_layer->enable(((m_layer_enable >> 2) & 0x1) ^ 0x1);
 }
 
-WRITE32_HANDLER( tilemap_dma_start_w )
+WRITE32_MEMBER(seibuspi_state::tilemap_dma_start_w)
 {
-	seibuspi_state *state = space->machine().driver_data<seibuspi_state>();
-	if (state->m_video_dma_address != 0)
+	if (m_video_dma_address != 0)
 	{
 		int i;
-		int index = (state->m_video_dma_address / 4) - 0x200;
+		int index = (m_video_dma_address / 4) - 0x200;
 
-		if (state->m_layer_bank & 0x80000000)
+		if (m_layer_bank & 0x80000000)
 		{
 			/* back layer */
 			for (i=0; i < 0x800/4; i++) {
-				UINT32 tile = state->m_spimainram[index];
-				if (state->m_tilemap_ram[i] != tile) {
-					state->m_tilemap_ram[i] = tile;
-					state->m_back_layer->mark_tile_dirty((i * 2) );
-					state->m_back_layer->mark_tile_dirty((i * 2) + 1 );
+				UINT32 tile = m_spimainram[index];
+				if (m_tilemap_ram[i] != tile) {
+					m_tilemap_ram[i] = tile;
+					m_back_layer->mark_tile_dirty((i * 2) );
+					m_back_layer->mark_tile_dirty((i * 2) + 1 );
 				}
 				index++;
 			}
 
 			/* back layer row scroll */
-			memcpy(&state->m_tilemap_ram[0x800/4], &state->m_spimainram[index], 0x800/4);
+			memcpy(&m_tilemap_ram[0x800/4], &m_spimainram[index], 0x800/4);
 			index += 0x800/4;
 
 			/* fore layer */
 			for (i=0; i < 0x800/4; i++) {
-				UINT32 tile = state->m_spimainram[index];
-				if (state->m_tilemap_ram[i+state->m_fore_layer_offset] != tile) {
-					state->m_tilemap_ram[i+state->m_fore_layer_offset] = tile;
-					state->m_fore_layer->mark_tile_dirty((i * 2) );
-					state->m_fore_layer->mark_tile_dirty((i * 2) + 1 );
+				UINT32 tile = m_spimainram[index];
+				if (m_tilemap_ram[i+m_fore_layer_offset] != tile) {
+					m_tilemap_ram[i+m_fore_layer_offset] = tile;
+					m_fore_layer->mark_tile_dirty((i * 2) );
+					m_fore_layer->mark_tile_dirty((i * 2) + 1 );
 				}
 				index++;
 			}
 
 			/* fore layer row scroll */
-			memcpy(&state->m_tilemap_ram[0x1800/4], &state->m_spimainram[index], 0x800/4);
+			memcpy(&m_tilemap_ram[0x1800/4], &m_spimainram[index], 0x800/4);
 			index += 0x800/4;
 
 			/* mid layer */
 			for (i=0; i < 0x800/4; i++) {
-				UINT32 tile = state->m_spimainram[index];
-				if (state->m_tilemap_ram[i+state->m_mid_layer_offset] != tile) {
-					state->m_tilemap_ram[i+state->m_mid_layer_offset] = tile;
-					state->m_mid_layer->mark_tile_dirty((i * 2) );
-					state->m_mid_layer->mark_tile_dirty((i * 2) + 1 );
+				UINT32 tile = m_spimainram[index];
+				if (m_tilemap_ram[i+m_mid_layer_offset] != tile) {
+					m_tilemap_ram[i+m_mid_layer_offset] = tile;
+					m_mid_layer->mark_tile_dirty((i * 2) );
+					m_mid_layer->mark_tile_dirty((i * 2) + 1 );
 				}
 				index++;
 			}
 
 			/* mid layer row scroll */
-			memcpy(&state->m_tilemap_ram[0x1800/4], &state->m_spimainram[index], 0x800/4);
+			memcpy(&m_tilemap_ram[0x1800/4], &m_spimainram[index], 0x800/4);
 			index += 0x800/4;
 
 			/* text layer */
 			for (i=0; i < 0x1000/4; i++) {
-				UINT32 tile = state->m_spimainram[index];
-				if (state->m_tilemap_ram[i+state->m_text_layer_offset] != tile) {
-					state->m_tilemap_ram[i+state->m_text_layer_offset] = tile;
-					state->m_text_layer->mark_tile_dirty((i * 2) );
-					state->m_text_layer->mark_tile_dirty((i * 2) + 1 );
+				UINT32 tile = m_spimainram[index];
+				if (m_tilemap_ram[i+m_text_layer_offset] != tile) {
+					m_tilemap_ram[i+m_text_layer_offset] = tile;
+					m_text_layer->mark_tile_dirty((i * 2) );
+					m_text_layer->mark_tile_dirty((i * 2) + 1 );
 				}
 				index++;
 			}
@@ -134,44 +129,44 @@ WRITE32_HANDLER( tilemap_dma_start_w )
 		{
 			/* back layer */
 			for (i=0; i < 0x800/4; i++) {
-				UINT32 tile = state->m_spimainram[index];
-				if (state->m_tilemap_ram[i] != tile) {
-					state->m_tilemap_ram[i] = tile;
-					state->m_back_layer->mark_tile_dirty((i * 2) );
-					state->m_back_layer->mark_tile_dirty((i * 2) + 1 );
+				UINT32 tile = m_spimainram[index];
+				if (m_tilemap_ram[i] != tile) {
+					m_tilemap_ram[i] = tile;
+					m_back_layer->mark_tile_dirty((i * 2) );
+					m_back_layer->mark_tile_dirty((i * 2) + 1 );
 				}
 				index++;
 			}
 
 			/* fore layer */
 			for (i=0; i < 0x800/4; i++) {
-				UINT32 tile = state->m_spimainram[index];
-				if (state->m_tilemap_ram[i+state->m_fore_layer_offset] != tile) {
-					state->m_tilemap_ram[i+state->m_fore_layer_offset] = tile;
-					state->m_fore_layer->mark_tile_dirty((i * 2) );
-					state->m_fore_layer->mark_tile_dirty((i * 2) + 1 );
+				UINT32 tile = m_spimainram[index];
+				if (m_tilemap_ram[i+m_fore_layer_offset] != tile) {
+					m_tilemap_ram[i+m_fore_layer_offset] = tile;
+					m_fore_layer->mark_tile_dirty((i * 2) );
+					m_fore_layer->mark_tile_dirty((i * 2) + 1 );
 				}
 				index++;
 			}
 
 			/* mid layer */
 			for (i=0; i < 0x800/4; i++) {
-				UINT32 tile = state->m_spimainram[index];
-				if (state->m_tilemap_ram[i+state->m_mid_layer_offset] != tile) {
-					state->m_tilemap_ram[i+state->m_mid_layer_offset] = tile;
-					state->m_mid_layer->mark_tile_dirty((i * 2) );
-					state->m_mid_layer->mark_tile_dirty((i * 2) + 1 );
+				UINT32 tile = m_spimainram[index];
+				if (m_tilemap_ram[i+m_mid_layer_offset] != tile) {
+					m_tilemap_ram[i+m_mid_layer_offset] = tile;
+					m_mid_layer->mark_tile_dirty((i * 2) );
+					m_mid_layer->mark_tile_dirty((i * 2) + 1 );
 				}
 				index++;
 			}
 
 			/* text layer */
 			for (i=0; i < 0x1000/4; i++) {
-				UINT32 tile = state->m_spimainram[index];
-				if (state->m_tilemap_ram[i+state->m_text_layer_offset] != tile) {
-					state->m_tilemap_ram[i+state->m_text_layer_offset] = tile;
-					state->m_text_layer->mark_tile_dirty((i * 2) );
-					state->m_text_layer->mark_tile_dirty((i * 2) + 1 );
+				UINT32 tile = m_spimainram[index];
+				if (m_tilemap_ram[i+m_text_layer_offset] != tile) {
+					m_tilemap_ram[i+m_text_layer_offset] = tile;
+					m_text_layer->mark_tile_dirty((i * 2) );
+					m_text_layer->mark_tile_dirty((i * 2) + 1 );
 				}
 				index++;
 			}
@@ -179,43 +174,39 @@ WRITE32_HANDLER( tilemap_dma_start_w )
 	}
 }
 
-WRITE32_HANDLER( palette_dma_start_w )
+WRITE32_MEMBER(seibuspi_state::palette_dma_start_w)
 {
-	seibuspi_state *state = space->machine().driver_data<seibuspi_state>();
-	if (state->m_video_dma_address != 0)
+	if (m_video_dma_address != 0)
 	{
 		int i;
-		for (i=0; i < ((state->m_video_dma_length+1) * 2) / 4; i++)
+		for (i=0; i < ((m_video_dma_length+1) * 2) / 4; i++)
 		{
-			UINT32 color = state->m_spimainram[(state->m_video_dma_address / 4) + i - 0x200];
-			if (state->m_palette_ram[i] != color) {
-				state->m_palette_ram[i] = color;
-				palette_set_color_rgb( space->machine(), (i * 2), pal5bit(state->m_palette_ram[i] >> 0), pal5bit(state->m_palette_ram[i] >> 5), pal5bit(state->m_palette_ram[i] >> 10) );
-				palette_set_color_rgb( space->machine(), (i * 2) + 1, pal5bit(state->m_palette_ram[i] >> 16), pal5bit(state->m_palette_ram[i] >> 21), pal5bit(state->m_palette_ram[i] >> 26) );
+			UINT32 color = m_spimainram[(m_video_dma_address / 4) + i - 0x200];
+			if (m_palette_ram[i] != color) {
+				m_palette_ram[i] = color;
+				palette_set_color_rgb( machine(), (i * 2), pal5bit(m_palette_ram[i] >> 0), pal5bit(m_palette_ram[i] >> 5), pal5bit(m_palette_ram[i] >> 10) );
+				palette_set_color_rgb( machine(), (i * 2) + 1, pal5bit(m_palette_ram[i] >> 16), pal5bit(m_palette_ram[i] >> 21), pal5bit(m_palette_ram[i] >> 26) );
 			}
 		}
 	}
 }
 
-WRITE32_HANDLER( sprite_dma_start_w )
+WRITE32_MEMBER(seibuspi_state::sprite_dma_start_w)
 {
-	seibuspi_state *state = space->machine().driver_data<seibuspi_state>();
-	if (state->m_video_dma_address != 0)
+	if (m_video_dma_address != 0)
 	{
-		memcpy( state->m_sprite_ram, &state->m_spimainram[(state->m_video_dma_address / 4) - 0x200], state->m_sprite_dma_length);
+		memcpy( m_sprite_ram, &m_spimainram[(m_video_dma_address / 4) - 0x200], m_sprite_dma_length);
 	}
 }
 
-WRITE32_HANDLER( video_dma_length_w )
+WRITE32_MEMBER(seibuspi_state::video_dma_length_w)
 {
-	seibuspi_state *state = space->machine().driver_data<seibuspi_state>();
-	COMBINE_DATA( &state->m_video_dma_length );
+	COMBINE_DATA( &m_video_dma_length );
 }
 
-WRITE32_HANDLER( video_dma_address_w )
+WRITE32_MEMBER(seibuspi_state::video_dma_address_w)
 {
-	seibuspi_state *state = space->machine().driver_data<seibuspi_state>();
-	COMBINE_DATA( &state->m_video_dma_address );
+	COMBINE_DATA( &m_video_dma_address );
 }
 
 static void drawgfx_blend(bitmap_rgb32 &bitmap, const rectangle &cliprect, const gfx_element *gfx, UINT32 code, UINT32 color, int flipx, int flipy, int sx, int sy)

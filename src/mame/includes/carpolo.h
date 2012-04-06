@@ -45,6 +45,20 @@ public:
 	bitmap_ind16 *m_sprite_goal_collision_bitmap1;
 	bitmap_ind16 *m_sprite_goal_collision_bitmap2;
 	bitmap_ind16 *m_sprite_border_collision_bitmap;
+	DECLARE_READ8_MEMBER(carpolo_ball_screen_collision_cause_r);
+	DECLARE_READ8_MEMBER(carpolo_car_ball_collision_x_r);
+	DECLARE_READ8_MEMBER(carpolo_car_ball_collision_y_r);
+	DECLARE_READ8_MEMBER(carpolo_car_car_collision_cause_r);
+	DECLARE_READ8_MEMBER(carpolo_car_goal_collision_cause_r);
+	DECLARE_READ8_MEMBER(carpolo_car_ball_collision_cause_r);
+	DECLARE_READ8_MEMBER(carpolo_car_border_collision_cause_r);
+	DECLARE_READ8_MEMBER(carpolo_interrupt_cause_r);
+	DECLARE_WRITE8_MEMBER(carpolo_ball_screen_interrupt_clear_w);
+	DECLARE_WRITE8_MEMBER(carpolo_car_car_interrupt_clear_w);
+	DECLARE_WRITE8_MEMBER(carpolo_car_goal_interrupt_clear_w);
+	DECLARE_WRITE8_MEMBER(carpolo_car_ball_interrupt_clear_w);
+	DECLARE_WRITE8_MEMBER(carpolo_car_border_interrupt_clear_w);
+	DECLARE_WRITE8_MEMBER(carpolo_timer_interrupt_clear_w);
 };
 
 
@@ -63,24 +77,10 @@ WRITE_LINE_DEVICE_HANDLER( carpolo_7474_2u_2_q_cb );
 MACHINE_START( carpolo );
 MACHINE_RESET( carpolo );
 
-READ8_HANDLER( carpolo_interrupt_cause_r );
 
-READ8_HANDLER( carpolo_ball_screen_collision_cause_r );
-READ8_HANDLER( carpolo_car_ball_collision_x_r );
-READ8_HANDLER( carpolo_car_ball_collision_y_r );
-READ8_HANDLER( carpolo_car_car_collision_cause_r );
-READ8_HANDLER( carpolo_car_goal_collision_cause_r );
-READ8_HANDLER( carpolo_car_ball_collision_cause_r );
-READ8_HANDLER( carpolo_car_border_collision_cause_r );
 
 INTERRUPT_GEN( carpolo_timer_interrupt );
 
-WRITE8_HANDLER( carpolo_ball_screen_interrupt_clear_w );
-WRITE8_HANDLER( carpolo_car_car_interrupt_clear_w );
-WRITE8_HANDLER( carpolo_car_goal_interrupt_clear_w );
-WRITE8_HANDLER( carpolo_car_ball_interrupt_clear_w );
-WRITE8_HANDLER( carpolo_car_border_interrupt_clear_w );
-WRITE8_HANDLER( carpolo_timer_interrupt_clear_w );
 
 void carpolo_generate_car_car_interrupt(running_machine &machine, int car1, int car2);
 void carpolo_generate_ball_screen_interrupt(running_machine &machine, UINT8 cause);

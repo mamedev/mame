@@ -70,11 +70,10 @@ static TILE_GET_INFO( get_bsb_tile_info )
 	SET_TILE_INFO(0,tileno,col>>12,0);
 }
 
-WRITE16_HANDLER( bsb_videoram_w )
+WRITE16_MEMBER(bigstrkb_state::bsb_videoram_w)
 {
-	bigstrkb_state *state = space->machine().driver_data<bigstrkb_state>();
-	state->m_videoram[offset] = data;
-	state->m_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_tilemap->mark_tile_dirty(offset);
 }
 
 static TILE_GET_INFO( get_bsb_tile2_info )
@@ -88,11 +87,10 @@ static TILE_GET_INFO( get_bsb_tile2_info )
 	SET_TILE_INFO(1,tileno,col>>12,0);
 }
 
-WRITE16_HANDLER( bsb_videoram2_w )
+WRITE16_MEMBER(bigstrkb_state::bsb_videoram2_w)
 {
-	bigstrkb_state *state = space->machine().driver_data<bigstrkb_state>();
-	state->m_videoram2[offset] = data;
-	state->m_tilemap2->mark_tile_dirty(offset);
+	m_videoram2[offset] = data;
+	m_tilemap2->mark_tile_dirty(offset);
 }
 
 
@@ -107,11 +105,10 @@ static TILE_GET_INFO( get_bsb_tile3_info )
 	SET_TILE_INFO(1,tileno+0x2000,(col>>12)+(0x100/16),0);
 }
 
-WRITE16_HANDLER( bsb_videoram3_w )
+WRITE16_MEMBER(bigstrkb_state::bsb_videoram3_w)
 {
-	bigstrkb_state *state = space->machine().driver_data<bigstrkb_state>();
-	state->m_videoram3[offset] = data;
-	state->m_tilemap3->mark_tile_dirty(offset);
+	m_videoram3[offset] = data;
+	m_tilemap3->mark_tile_dirty(offset);
 }
 
 /* Video Start / Update */

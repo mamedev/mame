@@ -88,47 +88,43 @@ VIDEO_START( taitol )
 
 ***************************************************************************/
 
-WRITE8_HANDLER( horshoes_bankg_w )
+WRITE8_MEMBER(taitol_state::horshoes_bankg_w)
 {
-	taitol_state *state = space->machine().driver_data<taitol_state>();
 
-	if (state->m_horshoes_gfxbank != data)
+	if (m_horshoes_gfxbank != data)
 	{
-		state->m_horshoes_gfxbank = data;
+		m_horshoes_gfxbank = data;
 
-		state->m_bg18_tilemap->mark_all_dirty();
-		state->m_bg19_tilemap->mark_all_dirty();
+		m_bg18_tilemap->mark_all_dirty();
+		m_bg19_tilemap->mark_all_dirty();
 	}
 }
 
-WRITE8_HANDLER( taitol_bankc_w )
+WRITE8_MEMBER(taitol_state::taitol_bankc_w)
 {
-	taitol_state *state = space->machine().driver_data<taitol_state>();
 
-	if (state->m_bankc[offset] != data)
+	if (m_bankc[offset] != data)
 	{
-		state->m_bankc[offset] = data;
-//      logerror("Bankc %d, %02x (%04x)\n", offset, data, cpu_get_pc(&space->device()));
+		m_bankc[offset] = data;
+//      logerror("Bankc %d, %02x (%04x)\n", offset, data, cpu_get_pc(&space.device()));
 
-		state->m_bg18_tilemap->mark_all_dirty();
-		state->m_bg19_tilemap->mark_all_dirty();
+		m_bg18_tilemap->mark_all_dirty();
+		m_bg19_tilemap->mark_all_dirty();
 	}
 }
 
-READ8_HANDLER( taitol_bankc_r )
+READ8_MEMBER(taitol_state::taitol_bankc_r)
 {
-	taitol_state *state = space->machine().driver_data<taitol_state>();
-	return state->m_bankc[offset];
+	return m_bankc[offset];
 }
 
 
-WRITE8_HANDLER( taitol_control_w )
+WRITE8_MEMBER(taitol_state::taitol_control_w)
 {
-	taitol_state *state = space->machine().driver_data<taitol_state>();
 
-//  logerror("Control Write %02x (%04x)\n", data, cpu_get_pc(&space->device()));
+//  logerror("Control Write %02x (%04x)\n", data, cpu_get_pc(&space.device()));
 
-	state->m_cur_ctrl = data;
+	m_cur_ctrl = data;
 //popmessage("%02x",data);
 
 	/* bit 0 unknown */
@@ -138,18 +134,17 @@ WRITE8_HANDLER( taitol_control_w )
 	/* bit 3 controls sprite/tile priority - handled in vh_screenrefresh() */
 
 	/* bit 4 flip screen */
-	state->m_flipscreen = data & 0x10;
-	space->machine().tilemap().set_flip_all(state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	m_flipscreen = data & 0x10;
+	machine().tilemap().set_flip_all(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
 	/* bit 5 display enable - handled in vh_screenrefresh() */
 }
 
-READ8_HANDLER( taitol_control_r )
+READ8_MEMBER(taitol_state::taitol_control_r)
 {
-	taitol_state *state = space->machine().driver_data<taitol_state>();
 
-//  logerror("Control Read %02x (%04x)\n", cur_ctrl, cpu_get_pc(&space->device()));
-	return state->m_cur_ctrl;
+//  logerror("Control Read %02x (%04x)\n", cur_ctrl, cpu_get_pc(&space.device()));
+	return m_cur_ctrl;
 }
 
 void taitol_chardef14_m( running_machine &machine, int offset )

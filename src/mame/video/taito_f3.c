@@ -736,185 +736,170 @@ VIDEO_START( f3 )
 
 /******************************************************************************/
 
-READ16_HANDLER( f3_pf_data_r )
+READ16_MEMBER(taito_f3_state::f3_pf_data_r)
 {
-	taito_f3_state *state = space->machine().driver_data<taito_f3_state>();
-	return state->m_f3_pf_data[offset];
+	return m_f3_pf_data[offset];
 }
 
-WRITE16_HANDLER( f3_pf_data_w )
+WRITE16_MEMBER(taito_f3_state::f3_pf_data_w)
 {
-	taito_f3_state *state = space->machine().driver_data<taito_f3_state>();
-	COMBINE_DATA(&state->m_f3_pf_data[offset]);
+	COMBINE_DATA(&m_f3_pf_data[offset]);
 
-	if (state->m_f3_game_config->extend) {
-		if		(offset<0x1000) state->m_pf1_tilemap->mark_tile_dirty((offset & 0xfff) >> 1);
-		else if (offset<0x2000) state->m_pf2_tilemap->mark_tile_dirty((offset & 0xfff) >> 1);
-		else if (offset<0x3000) state->m_pf3_tilemap->mark_tile_dirty((offset & 0xfff) >> 1);
-		else if (offset<0x4000) state->m_pf4_tilemap->mark_tile_dirty((offset & 0xfff) >> 1);
+	if (m_f3_game_config->extend) {
+		if		(offset<0x1000) m_pf1_tilemap->mark_tile_dirty((offset & 0xfff) >> 1);
+		else if (offset<0x2000) m_pf2_tilemap->mark_tile_dirty((offset & 0xfff) >> 1);
+		else if (offset<0x3000) m_pf3_tilemap->mark_tile_dirty((offset & 0xfff) >> 1);
+		else if (offset<0x4000) m_pf4_tilemap->mark_tile_dirty((offset & 0xfff) >> 1);
 	} else {
-		if		(offset<0x0800) state->m_pf1_tilemap->mark_tile_dirty((offset & 0x7ff) >> 1);
-		else if (offset<0x1000) state->m_pf2_tilemap->mark_tile_dirty((offset & 0x7ff) >> 1);
-		else if (offset<0x1800) state->m_pf3_tilemap->mark_tile_dirty((offset & 0x7ff) >> 1);
-		else if (offset<0x2000) state->m_pf4_tilemap->mark_tile_dirty((offset & 0x7ff) >> 1);
-		else if (offset<0x2800) state->m_pf5_tilemap->mark_tile_dirty((offset & 0x7ff) >> 1);
-		else if (offset<0x3000) state->m_pf6_tilemap->mark_tile_dirty((offset & 0x7ff) >> 1);
-		else if (offset<0x3800) state->m_pf7_tilemap->mark_tile_dirty((offset & 0x7ff) >> 1);
-		else if (offset<0x4000) state->m_pf8_tilemap->mark_tile_dirty((offset & 0x7ff) >> 1);
+		if		(offset<0x0800) m_pf1_tilemap->mark_tile_dirty((offset & 0x7ff) >> 1);
+		else if (offset<0x1000) m_pf2_tilemap->mark_tile_dirty((offset & 0x7ff) >> 1);
+		else if (offset<0x1800) m_pf3_tilemap->mark_tile_dirty((offset & 0x7ff) >> 1);
+		else if (offset<0x2000) m_pf4_tilemap->mark_tile_dirty((offset & 0x7ff) >> 1);
+		else if (offset<0x2800) m_pf5_tilemap->mark_tile_dirty((offset & 0x7ff) >> 1);
+		else if (offset<0x3000) m_pf6_tilemap->mark_tile_dirty((offset & 0x7ff) >> 1);
+		else if (offset<0x3800) m_pf7_tilemap->mark_tile_dirty((offset & 0x7ff) >> 1);
+		else if (offset<0x4000) m_pf8_tilemap->mark_tile_dirty((offset & 0x7ff) >> 1);
 	}
 }
 
-WRITE16_HANDLER( f3_control_0_w )
+WRITE16_MEMBER(taito_f3_state::f3_control_0_w)
 {
-	taito_f3_state *state = space->machine().driver_data<taito_f3_state>();
-	COMBINE_DATA(&state->m_f3_control_0[offset]);
+	COMBINE_DATA(&m_f3_control_0[offset]);
 }
 
-WRITE16_HANDLER( f3_control_1_w )
+WRITE16_MEMBER(taito_f3_state::f3_control_1_w)
 {
-	taito_f3_state *state = space->machine().driver_data<taito_f3_state>();
-	COMBINE_DATA(&state->m_f3_control_1[offset]);
+	COMBINE_DATA(&m_f3_control_1[offset]);
 }
 
-READ16_HANDLER( f3_spriteram_r )
+READ16_MEMBER(taito_f3_state::f3_spriteram_r)
 {
-	taito_f3_state *state = space->machine().driver_data<taito_f3_state>();
-	return state->m_spriteram[offset];
+	return m_spriteram[offset];
 }
 
-WRITE16_HANDLER( f3_spriteram_w )
+WRITE16_MEMBER(taito_f3_state::f3_spriteram_w)
 {
-	taito_f3_state *state = space->machine().driver_data<taito_f3_state>();
-	COMBINE_DATA(&state->m_spriteram[offset]);
+	COMBINE_DATA(&m_spriteram[offset]);
 }
 
-READ16_HANDLER( f3_videoram_r )
+READ16_MEMBER(taito_f3_state::f3_videoram_r)
 {
-	taito_f3_state *state = space->machine().driver_data<taito_f3_state>();
-	return state->m_videoram[offset];
+	return m_videoram[offset];
 }
 
-WRITE16_HANDLER( f3_videoram_w )
+WRITE16_MEMBER(taito_f3_state::f3_videoram_w)
 {
-	taito_f3_state *state = space->machine().driver_data<taito_f3_state>();
 	int tile,col_off;
-	COMBINE_DATA(&state->m_videoram[offset]);
+	COMBINE_DATA(&m_videoram[offset]);
 
-	state->m_vram_layer->mark_tile_dirty(offset);
-	//state->m_vram_layer->mark_tile_dirty(offset+1);
+	m_vram_layer->mark_tile_dirty(offset);
+	//m_vram_layer->mark_tile_dirty(offset+1);
 
 	if (offset>0x7ff) offset-=0x800;
 
 	tile=offset;
 	col_off=((tile&0x3f)*32)+((tile&0xfc0)>>6);
 
-	state->m_pixel_layer->mark_tile_dirty(col_off);
-	//state->m_pixel_layer->mark_tile_dirty(col_off+32);
+	m_pixel_layer->mark_tile_dirty(col_off);
+	//m_pixel_layer->mark_tile_dirty(col_off+32);
 }
 
 
-READ16_HANDLER( f3_vram_r )
+READ16_MEMBER(taito_f3_state::f3_vram_r)
 {
-	taito_f3_state *state = space->machine().driver_data<taito_f3_state>();
 
-	return state->m_f3_vram[offset];
+	return m_f3_vram[offset];
 }
 
-WRITE16_HANDLER( f3_vram_w )
+WRITE16_MEMBER(taito_f3_state::f3_vram_w)
 {
-	taito_f3_state *state = space->machine().driver_data<taito_f3_state>();
-	COMBINE_DATA(&state->m_f3_vram[offset]);
-	gfx_element_mark_dirty(space->machine().gfx[0], offset/16);
+	COMBINE_DATA(&m_f3_vram[offset]);
+	gfx_element_mark_dirty(machine().gfx[0], offset/16);
 }
 
-READ16_HANDLER( f3_pivot_r )
+READ16_MEMBER(taito_f3_state::f3_pivot_r)
 {
-	taito_f3_state *state = space->machine().driver_data<taito_f3_state>();
-	return state->m_f3_pivot_ram[offset];
+	return m_f3_pivot_ram[offset];
 }
 
-WRITE16_HANDLER( f3_pivot_w )
+WRITE16_MEMBER(taito_f3_state::f3_pivot_w)
 {
-	taito_f3_state *state = space->machine().driver_data<taito_f3_state>();
-	COMBINE_DATA(&state->m_f3_pivot_ram[offset]);
-	gfx_element_mark_dirty(space->machine().gfx[3], offset/16);
+	COMBINE_DATA(&m_f3_pivot_ram[offset]);
+	gfx_element_mark_dirty(machine().gfx[3], offset/16);
 }
 
-READ16_HANDLER( f3_lineram_r )
+READ16_MEMBER(taito_f3_state::f3_lineram_r)
 {
-	taito_f3_state *state = space->machine().driver_data<taito_f3_state>();
-	return state->m_f3_line_ram[offset];
+	return m_f3_line_ram[offset];
 }
 
-WRITE16_HANDLER( f3_lineram_w )
+WRITE16_MEMBER(taito_f3_state::f3_lineram_w)
 {
-	taito_f3_state *state = space->machine().driver_data<taito_f3_state>();
 	/* DariusGX has an interesting bug at the start of Round D - the clearing of lineram
     (0xa000->0x0xa7ff) overflows into priority RAM (0xb000) and creates garbage priority
     values.  I'm not sure what the real machine would do with these values, and this
     emulation certainly doesn't like it, so I've chosen to catch the bug here, and prevent
     the trashing of priority ram.  If anyone has information on what the real machine does,
     please let me know! */
-	if (state->m_f3_game==DARIUSG) {
-		if (state->m_f3_skip_this_frame)
+	if (m_f3_game==DARIUSG) {
+		if (m_f3_skip_this_frame)
 			return;
 		if (offset==0xb000/2 && data==0x003f) {
-			state->m_f3_skip_this_frame=1;
+			m_f3_skip_this_frame=1;
 			return;
 		}
 	}
 
-	COMBINE_DATA(&state->m_f3_line_ram[offset]);
+	COMBINE_DATA(&m_f3_line_ram[offset]);
 }
 
-WRITE32_HANDLER( f3_palette_24bit_w )
+WRITE32_MEMBER(taito_f3_state::f3_palette_24bit_w)
 {
-	taito_f3_state *state = space->machine().driver_data<taito_f3_state>();
 	int r,g,b;
 
-	COMBINE_DATA(&state->m_generic_paletteram_32[offset]);
+	COMBINE_DATA(&m_generic_paletteram_32[offset]);
 
 	/* 12 bit palette games - there has to be a palette select bit somewhere */
-	if (state->m_f3_game==SPCINVDX || state->m_f3_game==RIDINGF || state->m_f3_game==ARABIANM || state->m_f3_game==RINGRAGE) {
-		b = 15 * ((state->m_generic_paletteram_32[offset] >> 4) & 0xf);
-		g = 15 * ((state->m_generic_paletteram_32[offset] >> 8) & 0xf);
-		r = 15 * ((state->m_generic_paletteram_32[offset] >> 12) & 0xf);
+	if (m_f3_game==SPCINVDX || m_f3_game==RIDINGF || m_f3_game==ARABIANM || m_f3_game==RINGRAGE) {
+		b = 15 * ((m_generic_paletteram_32[offset] >> 4) & 0xf);
+		g = 15 * ((m_generic_paletteram_32[offset] >> 8) & 0xf);
+		r = 15 * ((m_generic_paletteram_32[offset] >> 12) & 0xf);
 	}
 
 	/* This is weird - why are only the sprites and VRAM palettes 21 bit? */
-	else if (state->m_f3_game==CLEOPATR) {
+	else if (m_f3_game==CLEOPATR) {
 		if (offset<0x100 || offset>0x1000) {
-			r = ((state->m_generic_paletteram_32[offset] >>16) & 0x7f)<<1;
-			g = ((state->m_generic_paletteram_32[offset] >> 8) & 0x7f)<<1;
-			b = ((state->m_generic_paletteram_32[offset] >> 0) & 0x7f)<<1;
+			r = ((m_generic_paletteram_32[offset] >>16) & 0x7f)<<1;
+			g = ((m_generic_paletteram_32[offset] >> 8) & 0x7f)<<1;
+			b = ((m_generic_paletteram_32[offset] >> 0) & 0x7f)<<1;
 		} else {
-			r = (state->m_generic_paletteram_32[offset] >>16) & 0xff;
-			g = (state->m_generic_paletteram_32[offset] >> 8) & 0xff;
-			b = (state->m_generic_paletteram_32[offset] >> 0) & 0xff;
+			r = (m_generic_paletteram_32[offset] >>16) & 0xff;
+			g = (m_generic_paletteram_32[offset] >> 8) & 0xff;
+			b = (m_generic_paletteram_32[offset] >> 0) & 0xff;
 		}
 	}
 
 	/* Another weird couple - perhaps this is alpha blending related? */
-	else if (state->m_f3_game==TWINQIX || state->m_f3_game==RECALH) {
+	else if (m_f3_game==TWINQIX || m_f3_game==RECALH) {
 		if (offset>0x1c00) {
-			r = ((state->m_generic_paletteram_32[offset] >>16) & 0x7f)<<1;
-			g = ((state->m_generic_paletteram_32[offset] >> 8) & 0x7f)<<1;
-			b = ((state->m_generic_paletteram_32[offset] >> 0) & 0x7f)<<1;
+			r = ((m_generic_paletteram_32[offset] >>16) & 0x7f)<<1;
+			g = ((m_generic_paletteram_32[offset] >> 8) & 0x7f)<<1;
+			b = ((m_generic_paletteram_32[offset] >> 0) & 0x7f)<<1;
 		} else {
-			r = (state->m_generic_paletteram_32[offset] >>16) & 0xff;
-			g = (state->m_generic_paletteram_32[offset] >> 8) & 0xff;
-			b = (state->m_generic_paletteram_32[offset] >> 0) & 0xff;
+			r = (m_generic_paletteram_32[offset] >>16) & 0xff;
+			g = (m_generic_paletteram_32[offset] >> 8) & 0xff;
+			b = (m_generic_paletteram_32[offset] >> 0) & 0xff;
 		}
 	}
 
 	/* All other games - standard 24 bit palette */
 	else {
-		r = (state->m_generic_paletteram_32[offset] >>16) & 0xff;
-		g = (state->m_generic_paletteram_32[offset] >> 8) & 0xff;
-		b = (state->m_generic_paletteram_32[offset] >> 0) & 0xff;
+		r = (m_generic_paletteram_32[offset] >>16) & 0xff;
+		g = (m_generic_paletteram_32[offset] >> 8) & 0xff;
+		b = (m_generic_paletteram_32[offset] >> 0) & 0xff;
 	}
 
-	palette_set_color(space->machine(),offset,MAKE_RGB(r,g,b));
+	palette_set_color(machine(),offset,MAKE_RGB(r,g,b));
 }
 
 /******************************************************************************/

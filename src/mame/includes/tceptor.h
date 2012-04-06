@@ -37,6 +37,11 @@ public:
 	DECLARE_READ8_MEMBER(input0_r);
 	DECLARE_READ8_MEMBER(input1_r);
 	DECLARE_READ8_MEMBER(readFF);
+	DECLARE_WRITE8_MEMBER(tceptor_tile_ram_w);
+	DECLARE_WRITE8_MEMBER(tceptor_tile_attr_w);
+	DECLARE_WRITE8_MEMBER(tceptor_bg_ram_w);
+	DECLARE_WRITE8_MEMBER(tceptor_bg_scroll_w);
+	void tile_mark_dirty(int offset);
 };
 
 
@@ -49,8 +54,4 @@ SCREEN_UPDATE_IND16( tceptor_3d_left );
 SCREEN_UPDATE_IND16( tceptor_3d_right );
 SCREEN_VBLANK( tceptor );
 
-WRITE8_HANDLER( tceptor_tile_ram_w );
-WRITE8_HANDLER( tceptor_tile_attr_w );
-WRITE8_HANDLER( tceptor_bg_ram_w );
-WRITE8_HANDLER( tceptor_bg_scroll_w );
 

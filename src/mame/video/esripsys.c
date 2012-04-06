@@ -185,10 +185,9 @@ SCREEN_UPDATE_RGB32( esripsys )
 	return 0;
 }
 
-WRITE8_HANDLER( esripsys_bg_intensity_w )
+WRITE8_MEMBER(esripsys_state::esripsys_bg_intensity_w)
 {
-	esripsys_state *state = space->machine().driver_data<esripsys_state>();
-	state->m_bg_intensity = data & 0xf;
+	m_bg_intensity = data & 0xf;
 }
 
 /* Draw graphics to a line buffer */

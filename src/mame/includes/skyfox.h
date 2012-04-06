@@ -24,11 +24,12 @@ public:
 
 	/* devices */
 	device_t *m_maincpu;
+	DECLARE_READ8_MEMBER(skyfox_vregs_r);
+	DECLARE_WRITE8_MEMBER(skyfox_vregs_w);
 };
 
 /*----------- defined in video/skyfox.c -----------*/
 
-WRITE8_HANDLER( skyfox_vregs_w );
 
 PALETTE_INIT( skyfox );
 

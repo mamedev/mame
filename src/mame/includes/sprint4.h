@@ -23,6 +23,7 @@ public:
 	DECLARE_WRITE8_MEMBER(sprint4_da_latch_w);
 	DECLARE_WRITE8_MEMBER(sprint4_lamp_w);
 	DECLARE_WRITE8_MEMBER(sprint4_lockout_w);
+	DECLARE_WRITE8_MEMBER(sprint4_video_ram_w);
 };
 
 
@@ -34,4 +35,3 @@ SCREEN_VBLANK( sprint4 );
 VIDEO_START( sprint4 );
 SCREEN_UPDATE_IND16( sprint4 );
 
-WRITE8_HANDLER( sprint4_video_ram_w );

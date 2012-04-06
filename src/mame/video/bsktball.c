@@ -8,12 +8,11 @@
 #include "includes/bsktball.h"
 
 
-WRITE8_HANDLER( bsktball_videoram_w )
+WRITE8_MEMBER(bsktball_state::bsktball_videoram_w)
 {
-	bsktball_state *state = space->machine().driver_data<bsktball_state>();
 
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )

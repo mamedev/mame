@@ -39,13 +39,13 @@ public:
 	DECLARE_WRITE8_MEMBER(i8039_irqen_and_status_w);
 	DECLARE_WRITE8_MEMBER(megazone_coin_counter_w);
 	DECLARE_WRITE8_MEMBER(irq_mask_w);
+	DECLARE_WRITE8_MEMBER(megazone_flipscreen_w);
 };
 
 
 
 /*----------- defined in video/megazone.c -----------*/
 
-WRITE8_HANDLER( megazone_flipscreen_w );
 
 PALETTE_INIT( megazone );
 VIDEO_START( megazone );

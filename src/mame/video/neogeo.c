@@ -179,21 +179,19 @@ void neogeo_set_screen_dark( running_machine &machine, UINT8 data )
 }
 
 
-READ16_HANDLER( neogeo_paletteram_r )
+READ16_MEMBER(neogeo_state::neogeo_paletteram_r)
 {
-	neogeo_state *state = space->machine().driver_data<neogeo_state>();
-	return state->m_palettes[state->m_palette_bank][offset];
+	return m_palettes[m_palette_bank][offset];
 }
 
 
-WRITE16_HANDLER( neogeo_paletteram_w )
+WRITE16_MEMBER(neogeo_state::neogeo_paletteram_w)
 {
-	neogeo_state *state = space->machine().driver_data<neogeo_state>();
-	UINT16 *addr = &state->m_palettes[state->m_palette_bank][offset];
+	UINT16 *addr = &m_palettes[m_palette_bank][offset];
 
 	COMBINE_DATA(addr);
 
-	state->m_pens[offset] = get_pen(space->machine(), *addr);
+	m_pens[offset] = get_pen(machine(), *addr);
 }
 
 
@@ -793,23 +791,22 @@ static void set_video_control( running_machine &machine, UINT16 data )
 }
 
 
-READ16_HANDLER( neogeo_video_register_r )
+READ16_MEMBER(neogeo_state::neogeo_video_register_r)
 {
-	neogeo_state *state = space->machine().driver_data<neogeo_state>();
 	UINT16 ret;
 
 	/* accessing the LSB only is not mapped */
 	if (mem_mask == 0x00ff)
-		ret = state->neogeo_unmapped_r(*space, 0, 0xffff) & 0x00ff;
+		ret = neogeo_unmapped_r(space, 0, 0xffff) & 0x00ff;
 	else
 	{
 		switch (offset)
 		{
 		default:
 		case 0x00:
-		case 0x01: ret = get_videoram_data(space->machine()); break;
-		case 0x02: ret = get_videoram_modulo(space->machine()); break;
-		case 0x03: ret = get_video_control(space->machine()); break;
+		case 0x01: ret = get_videoram_data(machine()); break;
+		case 0x02: ret = get_videoram_modulo(machine()); break;
+		case 0x03: ret = get_video_control(machine()); break;
 		}
 	}
 
@@ -817,7 +814,7 @@ READ16_HANDLER( neogeo_video_register_r )
 }
 
 
-WRITE16_HANDLER( neogeo_video_register_w )
+WRITE16_MEMBER(neogeo_state::neogeo_video_register_w)
 {
 	/* accessing the LSB only is not mapped */
 	if (mem_mask != 0x00ff)
@@ -828,13 +825,13 @@ WRITE16_HANDLER( neogeo_video_register_w )
 
 		switch (offset)
 		{
-		case 0x00: set_videoram_offset(space->machine(), data); break;
-		case 0x01: set_videoram_data(space->machine(), data); break;
-		case 0x02: set_videoram_modulo(space->machine(), data); break;
-		case 0x03: set_video_control(space->machine(), data); break;
-		case 0x04: neogeo_set_display_counter_msb(space, data); break;
-		case 0x05: neogeo_set_display_counter_lsb(space, data); break;
-		case 0x06: neogeo_acknowledge_interrupt(space->machine(), data); break;
+		case 0x00: set_videoram_offset(machine(), data); break;
+		case 0x01: set_videoram_data(machine(), data); break;
+		case 0x02: set_videoram_modulo(machine(), data); break;
+		case 0x03: set_video_control(machine(), data); break;
+		case 0x04: neogeo_set_display_counter_msb(&space, data); break;
+		case 0x05: neogeo_set_display_counter_lsb(&space, data); break;
+		case 0x06: neogeo_acknowledge_interrupt(machine(), data); break;
 		case 0x07: break; /* unknown, see get_video_control */
 		}
 	}

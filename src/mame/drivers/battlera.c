@@ -65,19 +65,19 @@ READ8_MEMBER(battlera_state::control_data_r)
 
 static ADDRESS_MAP_START( battlera_map, AS_PROGRAM, 8, battlera_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x100000, 0x10ffff) AM_READWRITE_LEGACY(HuC6270_debug_r, HuC6270_debug_w) /* Cheat to edit vram data */
+	AM_RANGE(0x100000, 0x10ffff) AM_READWRITE(HuC6270_debug_r, HuC6270_debug_w) /* Cheat to edit vram data */
 	AM_RANGE(0x1e0800, 0x1e0801) AM_WRITE(battlera_sound_w)
-	AM_RANGE(0x1e1000, 0x1e13ff) AM_WRITE_LEGACY(battlera_palette_w) AM_SHARE("paletteram")
+	AM_RANGE(0x1e1000, 0x1e13ff) AM_WRITE(battlera_palette_w) AM_SHARE("paletteram")
 	AM_RANGE(0x1f0000, 0x1f1fff) AM_RAMBANK("bank8") /* Main ram */
-	AM_RANGE(0x1fe000, 0x1fe001) AM_READWRITE_LEGACY(HuC6270_register_r, HuC6270_register_w)
-	AM_RANGE(0x1fe002, 0x1fe003) AM_WRITE_LEGACY(HuC6270_data_w)
+	AM_RANGE(0x1fe000, 0x1fe001) AM_READWRITE(HuC6270_register_r, HuC6270_register_w)
+	AM_RANGE(0x1fe002, 0x1fe003) AM_WRITE(HuC6270_data_w)
 	AM_RANGE(0x1ff000, 0x1ff001) AM_READWRITE(control_data_r, control_data_w)
 	AM_RANGE(0x1ff400, 0x1ff403) AM_WRITE_LEGACY(h6280_irq_status_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( battlera_portmap, AS_IO, 8, battlera_state )
-	AM_RANGE(0x00, 0x01) AM_WRITE_LEGACY(HuC6270_register_w)
-	AM_RANGE(0x02, 0x03) AM_WRITE_LEGACY(HuC6270_data_w)
+	AM_RANGE(0x00, 0x01) AM_WRITE(HuC6270_register_w)
+	AM_RANGE(0x02, 0x03) AM_WRITE(HuC6270_data_w)
 ADDRESS_MAP_END
 
 /******************************************************************************/

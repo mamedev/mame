@@ -15,13 +15,13 @@ public:
 
 	UINT8      m_yiear_nmi_enable;
 	UINT8      m_yiear_irq_enable;
+	DECLARE_WRITE8_MEMBER(yiear_videoram_w);
+	DECLARE_WRITE8_MEMBER(yiear_control_w);
 };
 
 
 /*----------- defined in video/yiear.c -----------*/
 
-WRITE8_HANDLER( yiear_videoram_w );
-WRITE8_HANDLER( yiear_control_w );
 
 PALETTE_INIT( yiear );
 VIDEO_START( yiear );

@@ -78,12 +78,12 @@ public:
 	DECLARE_READ8_MEMBER(readport3);
 	DECLARE_WRITE8_MEMBER(adpcm_nmi_disable);
 	DECLARE_WRITE8_MEMBER(adpcm_nmi_enable);
+	DECLARE_WRITE16_MEMBER(darius_fg_layer_w);
 };
 
 
 /*----------- defined in video/darius.c -----------*/
 
-WRITE16_HANDLER( darius_fg_layer_w );
 
 VIDEO_START( darius );
 SCREEN_UPDATE_IND16( darius_left );

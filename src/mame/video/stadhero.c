@@ -33,11 +33,10 @@ SCREEN_UPDATE_IND16( stadhero )
 
 /******************************************************************************/
 
-WRITE16_HANDLER( stadhero_pf1_data_w )
+WRITE16_MEMBER(stadhero_state::stadhero_pf1_data_w)
 {
-	stadhero_state *state = space->machine().driver_data<stadhero_state>();
-	COMBINE_DATA(&state->m_pf1_data[offset]);
-	state->m_pf1_tilemap->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_pf1_data[offset]);
+	m_pf1_tilemap->mark_tile_dirty(offset);
 }
 
 

@@ -264,9 +264,9 @@ WRITE_LINE_DEVICE_HANDLER( qix_vsync_changed )
  *
  *************************************/
 
-WRITE8_HANDLER( zookeep_bankswitch_w )
+WRITE8_MEMBER(qix_state::zookeep_bankswitch_w)
 {
-	memory_set_bank(space->machine(), "bank1", (data >> 2) & 1);
+	memory_set_bank(machine(), "bank1", (data >> 2) & 1);
 	/* not necessary, but technically correct */
 	qix_palettebank_w(space, offset, data);
 }
@@ -279,28 +279,28 @@ WRITE8_HANDLER( zookeep_bankswitch_w )
  *
  *************************************/
 
-WRITE8_HANDLER( qix_data_firq_w )
+WRITE8_MEMBER(qix_state::qix_data_firq_w)
 {
-	cputag_set_input_line(space->machine(), "maincpu", M6809_FIRQ_LINE, ASSERT_LINE);
+	cputag_set_input_line(machine(), "maincpu", M6809_FIRQ_LINE, ASSERT_LINE);
 }
 
 
-WRITE8_HANDLER( qix_data_firq_ack_w )
+WRITE8_MEMBER(qix_state::qix_data_firq_ack_w)
 {
-	cputag_set_input_line(space->machine(), "maincpu", M6809_FIRQ_LINE, CLEAR_LINE);
+	cputag_set_input_line(machine(), "maincpu", M6809_FIRQ_LINE, CLEAR_LINE);
 }
 
 
-READ8_HANDLER( qix_data_firq_r )
+READ8_MEMBER(qix_state::qix_data_firq_r)
 {
-	cputag_set_input_line(space->machine(), "maincpu", M6809_FIRQ_LINE, ASSERT_LINE);
+	cputag_set_input_line(machine(), "maincpu", M6809_FIRQ_LINE, ASSERT_LINE);
 	return 0xff;
 }
 
 
-READ8_HANDLER( qix_data_firq_ack_r )
+READ8_MEMBER(qix_state::qix_data_firq_ack_r)
 {
-	cputag_set_input_line(space->machine(), "maincpu", M6809_FIRQ_LINE, CLEAR_LINE);
+	cputag_set_input_line(machine(), "maincpu", M6809_FIRQ_LINE, CLEAR_LINE);
 	return 0xff;
 }
 
@@ -312,28 +312,28 @@ READ8_HANDLER( qix_data_firq_ack_r )
  *
  *************************************/
 
-WRITE8_HANDLER( qix_video_firq_w )
+WRITE8_MEMBER(qix_state::qix_video_firq_w)
 {
-	cputag_set_input_line(space->machine(), "videocpu", M6809_FIRQ_LINE, ASSERT_LINE);
+	cputag_set_input_line(machine(), "videocpu", M6809_FIRQ_LINE, ASSERT_LINE);
 }
 
 
-WRITE8_HANDLER( qix_video_firq_ack_w )
+WRITE8_MEMBER(qix_state::qix_video_firq_ack_w)
 {
-	cputag_set_input_line(space->machine(), "videocpu", M6809_FIRQ_LINE, CLEAR_LINE);
+	cputag_set_input_line(machine(), "videocpu", M6809_FIRQ_LINE, CLEAR_LINE);
 }
 
 
-READ8_HANDLER( qix_video_firq_r )
+READ8_MEMBER(qix_state::qix_video_firq_r)
 {
-	cputag_set_input_line(space->machine(), "videocpu", M6809_FIRQ_LINE, ASSERT_LINE);
+	cputag_set_input_line(machine(), "videocpu", M6809_FIRQ_LINE, ASSERT_LINE);
 	return 0xff;
 }
 
 
-READ8_HANDLER( qix_video_firq_ack_r )
+READ8_MEMBER(qix_state::qix_video_firq_ack_r)
 {
-	cputag_set_input_line(space->machine(), "videocpu", M6809_FIRQ_LINE, CLEAR_LINE);
+	cputag_set_input_line(machine(), "videocpu", M6809_FIRQ_LINE, CLEAR_LINE);
 	return 0xff;
 }
 
@@ -394,36 +394,33 @@ static WRITE8_DEVICE_HANDLER( qixmcu_coinctrl_w )
  *
  *************************************/
 
-READ8_HANDLER( qix_68705_portA_r )
+READ8_MEMBER(qix_state::qix_68705_portA_r)
 {
-	qix_state *state = space->machine().driver_data<qix_state>();
 
-	UINT8 ddr = state->m_68705_ddr[0];
-	UINT8 out = state->m_68705_port_out[0];
-	UINT8 in = state->m_68705_port_in[0];
+	UINT8 ddr = m_68705_ddr[0];
+	UINT8 out = m_68705_port_out[0];
+	UINT8 in = m_68705_port_in[0];
 	logerror("68705:portA_r = %02X (%02X)\n", (out & ddr) | (in & ~ddr), in);
 	return (out & ddr) | (in & ~ddr);
 }
 
 
-READ8_HANDLER( qix_68705_portB_r )
+READ8_MEMBER(qix_state::qix_68705_portB_r)
 {
-	qix_state *state = space->machine().driver_data<qix_state>();
 
-	UINT8 ddr = state->m_68705_ddr[1];
-	UINT8 out = state->m_68705_port_out[1];
-	UINT8 in = (input_port_read(space->machine(), "COIN") & 0x0f) | ((input_port_read(space->machine(), "COIN") & 0x80) >> 3);
+	UINT8 ddr = m_68705_ddr[1];
+	UINT8 out = m_68705_port_out[1];
+	UINT8 in = (input_port_read(machine(), "COIN") & 0x0f) | ((input_port_read(machine(), "COIN") & 0x80) >> 3);
 	return (out & ddr) | (in & ~ddr);
 }
 
 
-READ8_HANDLER( qix_68705_portC_r )
+READ8_MEMBER(qix_state::qix_68705_portC_r)
 {
-	qix_state *state = space->machine().driver_data<qix_state>();
 
-	UINT8 ddr = state->m_68705_ddr[2];
-	UINT8 out = state->m_68705_port_out[2];
-	UINT8 in = (state->m_coinctrl & 0x08) | ((input_port_read(space->machine(), "COIN") & 0x70) >> 4);
+	UINT8 ddr = m_68705_ddr[2];
+	UINT8 out = m_68705_port_out[2];
+	UINT8 in = (m_coinctrl & 0x08) | ((input_port_read(machine(), "COIN") & 0x70) >> 4);
 	return (out & ddr) | (in & ~ddr);
 }
 
@@ -435,30 +432,27 @@ READ8_HANDLER( qix_68705_portC_r )
  *
  *************************************/
 
-WRITE8_HANDLER( qix_68705_portA_w )
+WRITE8_MEMBER(qix_state::qix_68705_portA_w)
 {
-	qix_state *state = space->machine().driver_data<qix_state>();
 
 	logerror("68705:portA_w = %02X\n", data);
-	state->m_68705_port_out[0] = data;
+	m_68705_port_out[0] = data;
 }
 
 
-WRITE8_HANDLER( qix_68705_portB_w )
+WRITE8_MEMBER(qix_state::qix_68705_portB_w)
 {
-	qix_state *state = space->machine().driver_data<qix_state>();
 
-	state->m_68705_port_out[1] = data;
-	coin_lockout_w(space->machine(), 0, (~data >> 6) & 1);
-	coin_counter_w(space->machine(), 0, (data >> 7) & 1);
+	m_68705_port_out[1] = data;
+	coin_lockout_w(machine(), 0, (~data >> 6) & 1);
+	coin_counter_w(machine(), 0, (data >> 7) & 1);
 }
 
 
-WRITE8_HANDLER( qix_68705_portC_w )
+WRITE8_MEMBER(qix_state::qix_68705_portC_w)
 {
-	qix_state *state = space->machine().driver_data<qix_state>();
 
-	state->m_68705_port_out[2] = data;
+	m_68705_port_out[2] = data;
 }
 
 

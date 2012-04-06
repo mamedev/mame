@@ -13,90 +13,79 @@
 #include "includes/crospang.h"
 #include "video/decospr.h"
 
-WRITE16_HANDLER( bestri_tilebank_w)
+WRITE16_MEMBER(crospang_state::bestri_tilebank_w)
 {
-	crospang_state *state = space->machine().driver_data<crospang_state>();
 
-	state->m_bestri_tilebank = (data>>10) & 0xf;
+	m_bestri_tilebank = (data>>10) & 0xf;
 	//printf("bestri %04x\n", data);
 
-	state->m_fg_layer->mark_all_dirty();
-	state->m_bg_layer->mark_all_dirty();
+	m_fg_layer->mark_all_dirty();
+	m_bg_layer->mark_all_dirty();
 }
 
 
-WRITE16_HANDLER ( bestri_bg_scrolly_w )
+WRITE16_MEMBER(crospang_state::bestri_bg_scrolly_w)
 {
-	crospang_state *state = space->machine().driver_data<crospang_state>();
 
 	/* Very Strange */
 	int scroll =  (data & 0x3ff) ^ 0x0155;
-	state->m_bg_layer->set_scrolly(0, -scroll + 7);
+	m_bg_layer->set_scrolly(0, -scroll + 7);
 }
 
-WRITE16_HANDLER ( bestri_fg_scrolly_w )
+WRITE16_MEMBER(crospang_state::bestri_fg_scrolly_w)
 {
-	crospang_state *state = space->machine().driver_data<crospang_state>();
 
 	/* Very Strange */
 	int scroll = (data & 0x3ff) ^ 0x00ab;
-	state->m_fg_layer->set_scrolly(0, -scroll + 7);
+	m_fg_layer->set_scrolly(0, -scroll + 7);
 }
 
-WRITE16_HANDLER ( bestri_fg_scrollx_w )
+WRITE16_MEMBER(crospang_state::bestri_fg_scrollx_w)
 {
-	crospang_state *state = space->machine().driver_data<crospang_state>();
 
 	// printf("fg_layer x %04x\n",data);
-	state->m_fg_layer->set_scrollx(0, data + 32);
+	m_fg_layer->set_scrollx(0, data + 32);
 }
 
-WRITE16_HANDLER ( bestri_bg_scrollx_w )
+WRITE16_MEMBER(crospang_state::bestri_bg_scrollx_w)
 {
-	crospang_state *state = space->machine().driver_data<crospang_state>();
 
 	// printf("bg_layer x %04x\n",data);
-	state->m_bg_layer->set_scrollx(0, data - 60);
+	m_bg_layer->set_scrollx(0, data - 60);
 }
 
 
-WRITE16_HANDLER ( crospang_fg_scrolly_w )
+WRITE16_MEMBER(crospang_state::crospang_fg_scrolly_w)
 {
-	crospang_state *state = space->machine().driver_data<crospang_state>();
-	state->m_fg_layer->set_scrolly(0, data + 8);
+	m_fg_layer->set_scrolly(0, data + 8);
 }
 
-WRITE16_HANDLER ( crospang_bg_scrolly_w )
+WRITE16_MEMBER(crospang_state::crospang_bg_scrolly_w)
 {
-	crospang_state *state = space->machine().driver_data<crospang_state>();
-	state->m_bg_layer->set_scrolly(0, data + 8);
+	m_bg_layer->set_scrolly(0, data + 8);
 }
 
-WRITE16_HANDLER ( crospang_fg_scrollx_w )
+WRITE16_MEMBER(crospang_state::crospang_fg_scrollx_w)
 {
-	crospang_state *state = space->machine().driver_data<crospang_state>();
-	state->m_fg_layer->set_scrollx(0, data);
+	m_fg_layer->set_scrollx(0, data);
 }
 
-WRITE16_HANDLER ( crospang_bg_scrollx_w )
+WRITE16_MEMBER(crospang_state::crospang_bg_scrollx_w)
 {
-	crospang_state *state = space->machine().driver_data<crospang_state>();
-	state->m_bg_layer->set_scrollx(0, data + 4);
+	m_bg_layer->set_scrollx(0, data + 4);
 }
 
 
-WRITE16_HANDLER ( crospang_fg_videoram_w )
+WRITE16_MEMBER(crospang_state::crospang_fg_videoram_w)
 {
-	crospang_state *state = space->machine().driver_data<crospang_state>();
-	COMBINE_DATA(&state->m_fg_videoram[offset]);
-	state->m_fg_layer->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_fg_videoram[offset]);
+	m_fg_layer->mark_tile_dirty(offset);
 }
 
-WRITE16_HANDLER ( crospang_bg_videoram_w )
+WRITE16_MEMBER(crospang_state::crospang_bg_videoram_w)
 {
-	crospang_state *state = space->machine().driver_data<crospang_state>();
-	COMBINE_DATA(&state->m_bg_videoram[offset]);
-	state->m_bg_layer->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_bg_videoram[offset]);
+	m_bg_layer->mark_tile_dirty(offset);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )

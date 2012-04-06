@@ -106,12 +106,12 @@ static ADDRESS_MAP_START( gotcha_map, AS_PROGRAM, 16, gotcha_state )
 	AM_RANGE(0x180000, 0x180001) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x180002, 0x180003) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x180004, 0x180005) AM_READ_PORT("DSW")
-	AM_RANGE(0x300000, 0x300001) AM_WRITE_LEGACY(gotcha_gfxbank_select_w)
-	AM_RANGE(0x300002, 0x300009) AM_WRITE_LEGACY(gotcha_scroll_w)
+	AM_RANGE(0x300000, 0x300001) AM_WRITE(gotcha_gfxbank_select_w)
+	AM_RANGE(0x300002, 0x300009) AM_WRITE(gotcha_scroll_w)
 //  { 0x30000c, 0x30000d,
-	AM_RANGE(0x30000e, 0x30000f) AM_WRITE_LEGACY(gotcha_gfxbank_w)
-	AM_RANGE(0x320000, 0x320fff) AM_WRITE_LEGACY(gotcha_fgvideoram_w) AM_BASE(m_fgvideoram)
-	AM_RANGE(0x322000, 0x322fff) AM_WRITE_LEGACY(gotcha_bgvideoram_w) AM_BASE(m_bgvideoram)
+	AM_RANGE(0x30000e, 0x30000f) AM_WRITE(gotcha_gfxbank_w)
+	AM_RANGE(0x320000, 0x320fff) AM_WRITE(gotcha_fgvideoram_w) AM_BASE(m_fgvideoram)
+	AM_RANGE(0x322000, 0x322fff) AM_WRITE(gotcha_bgvideoram_w) AM_BASE(m_bgvideoram)
 ADDRESS_MAP_END
 
 

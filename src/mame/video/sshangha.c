@@ -11,11 +11,10 @@
 
 /******************************************************************************/
 
-WRITE16_HANDLER (sshangha_video_w)
+WRITE16_MEMBER(sshangha_state::sshangha_video_w)
 {
-	sshangha_state *state = space->machine().driver_data<sshangha_state>();
 	/* 0x4: Special video mode, other bits unknown */
-	state->m_video_control=data;
+	m_video_control=data;
 //  popmessage("%04x",data);
 }
 

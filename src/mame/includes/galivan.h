@@ -39,19 +39,19 @@ public:
 	DECLARE_WRITE8_MEMBER(youmab_81_w);
 	DECLARE_WRITE8_MEMBER(youmab_84_w);
 	DECLARE_WRITE8_MEMBER(youmab_86_w);
+	DECLARE_WRITE8_MEMBER(galivan_videoram_w);
+	DECLARE_WRITE8_MEMBER(galivan_gfxbank_w);
+	DECLARE_WRITE8_MEMBER(ninjemak_gfxbank_w);
+	DECLARE_WRITE8_MEMBER(galivan_scrollx_w);
+	DECLARE_WRITE8_MEMBER(galivan_scrolly_w);
 };
 
 
 
 /*----------- defined in video/galivan.c -----------*/
 
-WRITE8_HANDLER( galivan_scrollx_w );
-WRITE8_HANDLER( galivan_scrolly_w );
-WRITE8_HANDLER( galivan_videoram_w );
-WRITE8_HANDLER( galivan_gfxbank_w );
 WRITE8_HANDLER( ninjemak_scrollx_w );
 WRITE8_HANDLER( ninjemak_scrolly_w );
-WRITE8_HANDLER( ninjemak_gfxbank_w );
 
 PALETTE_INIT( galivan );
 

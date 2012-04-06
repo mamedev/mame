@@ -49,6 +49,22 @@ public:
 	DECLARE_READ16_MEMBER(wildfang_protection_r);
 	DECLARE_WRITE16_MEMBER(raiga_protection_w);
 	DECLARE_READ16_MEMBER(raiga_protection_r);
+	DECLARE_WRITE16_MEMBER(gaiden_flip_w);
+	DECLARE_WRITE16_MEMBER(gaiden_txscrollx_w);
+	DECLARE_WRITE16_MEMBER(gaiden_txscrolly_w);
+	DECLARE_WRITE16_MEMBER(gaiden_fgscrollx_w);
+	DECLARE_WRITE16_MEMBER(gaiden_fgscrolly_w);
+	DECLARE_WRITE16_MEMBER(gaiden_bgscrollx_w);
+	DECLARE_WRITE16_MEMBER(gaiden_bgscrolly_w);
+	DECLARE_WRITE16_MEMBER(gaiden_txoffsety_w);
+	DECLARE_WRITE16_MEMBER(gaiden_fgoffsety_w);
+	DECLARE_WRITE16_MEMBER(gaiden_bgoffsety_w);
+	DECLARE_WRITE16_MEMBER(gaiden_sproffsety_w);
+	DECLARE_WRITE16_MEMBER(gaiden_videoram3_w);
+	DECLARE_READ16_MEMBER(gaiden_videoram3_r);
+	DECLARE_WRITE16_MEMBER(gaiden_videoram2_w);
+	DECLARE_READ16_MEMBER(gaiden_videoram2_r);
+	DECLARE_WRITE16_MEMBER(gaiden_videoram_w);
 };
 
 
@@ -63,20 +79,4 @@ SCREEN_UPDATE_RGB32( gaiden );
 SCREEN_UPDATE_RGB32( raiga );
 SCREEN_UPDATE_IND16( drgnbowl );
 
-WRITE16_HANDLER( gaiden_videoram_w );
-WRITE16_HANDLER( gaiden_videoram2_w );
-READ16_HANDLER( gaiden_videoram2_r );
-WRITE16_HANDLER( gaiden_videoram3_w );
-READ16_HANDLER( gaiden_videoram3_r );
 
-WRITE16_HANDLER( gaiden_flip_w );
-WRITE16_HANDLER( gaiden_txscrollx_w );
-WRITE16_HANDLER( gaiden_txscrolly_w );
-WRITE16_HANDLER( gaiden_fgscrollx_w );
-WRITE16_HANDLER( gaiden_fgscrolly_w );
-WRITE16_HANDLER( gaiden_bgscrollx_w );
-WRITE16_HANDLER( gaiden_bgscrolly_w );
-WRITE16_HANDLER( gaiden_txoffsety_w );
-WRITE16_HANDLER( gaiden_fgoffsety_w );
-WRITE16_HANDLER( gaiden_bgoffsety_w );
-WRITE16_HANDLER( gaiden_sproffsety_w );

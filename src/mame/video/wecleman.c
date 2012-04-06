@@ -424,11 +424,10 @@ static TILE_GET_INFO( wecleman_get_txt_tile_info )
 	SET_TILE_INFO(PAGE_GFX, code&0xfff, (code>>5&0x78)+(code>>12), 0);
 }
 
-WRITE16_HANDLER( wecleman_txtram_w )
+WRITE16_MEMBER(wecleman_state::wecleman_txtram_w)
 {
-	wecleman_state *state = space->machine().driver_data<wecleman_state>();
-	UINT16 old_data = state->m_txtram[offset];
-	UINT16 new_data = COMBINE_DATA(&state->m_txtram[offset]);
+	UINT16 old_data = m_txtram[offset];
+	UINT16 new_data = COMBINE_DATA(&m_txtram[offset]);
 
 	if ( old_data != new_data )
 	{
@@ -437,27 +436,27 @@ WRITE16_HANDLER( wecleman_txtram_w )
 			/* pages selector for the background */
 			if (offset == 0xEFE/2)
 			{
-				state->m_bgpage[0] = (new_data >> 0x4) & 3;
-				state->m_bgpage[1] = (new_data >> 0x0) & 3;
-				state->m_bgpage[2] = (new_data >> 0xc) & 3;
-				state->m_bgpage[3] = (new_data >> 0x8) & 3;
-				state->m_bg_tilemap->mark_all_dirty();
+				m_bgpage[0] = (new_data >> 0x4) & 3;
+				m_bgpage[1] = (new_data >> 0x0) & 3;
+				m_bgpage[2] = (new_data >> 0xc) & 3;
+				m_bgpage[3] = (new_data >> 0x8) & 3;
+				m_bg_tilemap->mark_all_dirty();
 			}
 
 			/* pages selector for the foreground */
 			if (offset == 0xEFC/2)
 			{
-				state->m_fgpage[0] = (new_data >> 0x4) & 3;
-				state->m_fgpage[1] = (new_data >> 0x0) & 3;
-				state->m_fgpage[2] = (new_data >> 0xc) & 3;
-				state->m_fgpage[3] = (new_data >> 0x8) & 3;
-				state->m_fg_tilemap->mark_all_dirty();
+				m_fgpage[0] = (new_data >> 0x4) & 3;
+				m_fgpage[1] = (new_data >> 0x0) & 3;
+				m_fgpage[2] = (new_data >> 0xc) & 3;
+				m_fgpage[3] = (new_data >> 0x8) & 3;
+				m_fg_tilemap->mark_all_dirty();
 			}
 
 			/* Parallactic horizontal scroll registers follow */
 		}
 		else
-			state->m_txt_tilemap->mark_tile_dirty(offset);
+			m_txt_tilemap->mark_tile_dirty(offset);
 	}
 }
 
@@ -493,10 +492,9 @@ static TILE_GET_INFO( wecleman_get_fg_tile_info )
 ------------------------------------------------------------------------*/
 
 /* Pages that compose both the background and the foreground */
-WRITE16_HANDLER( wecleman_pageram_w )
+WRITE16_MEMBER(wecleman_state::wecleman_pageram_w)
 {
-	wecleman_state *state = space->machine().driver_data<wecleman_state>();
-	COMBINE_DATA(&state->m_pageram[offset]);
+	COMBINE_DATA(&m_pageram[offset]);
 
 	{
 		int page,col,row;
@@ -506,16 +504,16 @@ WRITE16_HANDLER( wecleman_pageram_w )
 		row  = ( offset / PAGE_NX ) % PAGE_NY;
 
 		/* background */
-		if (state->m_bgpage[0] == page) state->m_bg_tilemap->mark_tile_dirty((col+PAGE_NX*0) + (row+PAGE_NY*0)*PAGE_NX*2 );
-		if (state->m_bgpage[1] == page) state->m_bg_tilemap->mark_tile_dirty((col+PAGE_NX*1) + (row+PAGE_NY*0)*PAGE_NX*2 );
-		if (state->m_bgpage[2] == page) state->m_bg_tilemap->mark_tile_dirty((col+PAGE_NX*0) + (row+PAGE_NY*1)*PAGE_NX*2 );
-		if (state->m_bgpage[3] == page) state->m_bg_tilemap->mark_tile_dirty((col+PAGE_NX*1) + (row+PAGE_NY*1)*PAGE_NX*2 );
+		if (m_bgpage[0] == page) m_bg_tilemap->mark_tile_dirty((col+PAGE_NX*0) + (row+PAGE_NY*0)*PAGE_NX*2 );
+		if (m_bgpage[1] == page) m_bg_tilemap->mark_tile_dirty((col+PAGE_NX*1) + (row+PAGE_NY*0)*PAGE_NX*2 );
+		if (m_bgpage[2] == page) m_bg_tilemap->mark_tile_dirty((col+PAGE_NX*0) + (row+PAGE_NY*1)*PAGE_NX*2 );
+		if (m_bgpage[3] == page) m_bg_tilemap->mark_tile_dirty((col+PAGE_NX*1) + (row+PAGE_NY*1)*PAGE_NX*2 );
 
 		/* foreground */
-		if (state->m_fgpage[0] == page) state->m_fg_tilemap->mark_tile_dirty((col+PAGE_NX*0) + (row+PAGE_NY*0)*PAGE_NX*2 );
-		if (state->m_fgpage[1] == page) state->m_fg_tilemap->mark_tile_dirty((col+PAGE_NX*1) + (row+PAGE_NY*0)*PAGE_NX*2 );
-		if (state->m_fgpage[2] == page) state->m_fg_tilemap->mark_tile_dirty((col+PAGE_NX*0) + (row+PAGE_NY*1)*PAGE_NX*2 );
-		if (state->m_fgpage[3] == page) state->m_fg_tilemap->mark_tile_dirty((col+PAGE_NX*1) + (row+PAGE_NY*1)*PAGE_NX*2 );
+		if (m_fgpage[0] == page) m_fg_tilemap->mark_tile_dirty((col+PAGE_NX*0) + (row+PAGE_NY*0)*PAGE_NX*2 );
+		if (m_fgpage[1] == page) m_fg_tilemap->mark_tile_dirty((col+PAGE_NX*1) + (row+PAGE_NY*0)*PAGE_NX*2 );
+		if (m_fgpage[2] == page) m_fg_tilemap->mark_tile_dirty((col+PAGE_NX*0) + (row+PAGE_NY*1)*PAGE_NX*2 );
+		if (m_fgpage[3] == page) m_fg_tilemap->mark_tile_dirty((col+PAGE_NX*1) + (row+PAGE_NY*1)*PAGE_NX*2 );
 	}
 }
 
@@ -834,51 +832,48 @@ static void hotchase_draw_road(running_machine &machine, bitmap_ind16 &bitmap, c
 ***************************************************************************/
 
 // new video and palette code
-WRITE16_HANDLER( wecleman_videostatus_w )
+WRITE16_MEMBER(wecleman_state::wecleman_videostatus_w)
 {
-	wecleman_state *state = space->machine().driver_data<wecleman_state>();
-	COMBINE_DATA(state->m_videostatus);
+	COMBINE_DATA(m_videostatus);
 
 	// bit0-6: background transition, 0=off, 1=on
 	// bit7: palette being changed, 0=no, 1=yes
 	if (ACCESSING_BITS_0_7)
 	{
-		if ((data & 0x7f) == 0 && !state->m_cloud_ds)
-			state->m_cloud_ds = BLEND_INC;
+		if ((data & 0x7f) == 0 && !m_cloud_ds)
+			m_cloud_ds = BLEND_INC;
 		else
-		if ((data & 0x7f) == 1 && !state->m_cloud_visible)
+		if ((data & 0x7f) == 1 && !m_cloud_visible)
 		{
 			data ^= 1;
-			state->m_cloud_ds = BLEND_DEC;
-			state->m_cloud_visible = 1;
+			m_cloud_ds = BLEND_DEC;
+			m_cloud_visible = 1;
 		}
 	}
 }
 
-WRITE16_HANDLER( hotchase_paletteram16_SBGRBBBBGGGGRRRR_word_w )
+WRITE16_MEMBER(wecleman_state::hotchase_paletteram16_SBGRBBBBGGGGRRRR_word_w)
 {
 	int newword, r, g, b;
 
-	wecleman_state *state = space->machine().driver_data<wecleman_state>();
-	newword = COMBINE_DATA(&state->m_generic_paletteram_16[offset]);
+	newword = COMBINE_DATA(&m_generic_paletteram_16[offset]);
 
 	r = ((newword << 1) & 0x1E ) | ((newword >> 12) & 0x01);
 	g = ((newword >> 3) & 0x1E ) | ((newword >> 13) & 0x01);
 	b = ((newword >> 7) & 0x1E ) | ((newword >> 14) & 0x01);
 
-	palette_set_color_rgb(space->machine(), offset, pal5bit(r), pal5bit(g), pal5bit(b));
+	palette_set_color_rgb(machine(), offset, pal5bit(r), pal5bit(g), pal5bit(b));
 	r>>=1; g>>=1; b>>=1;
-	palette_set_color_rgb(space->machine(), offset+0x800, pal5bit(r)/2, pal5bit(g)/2, pal5bit(b)/2);
+	palette_set_color_rgb(machine(), offset+0x800, pal5bit(r)/2, pal5bit(g)/2, pal5bit(b)/2);
 }
 
-WRITE16_HANDLER( wecleman_paletteram16_SSSSBBBBGGGGRRRR_word_w )
+WRITE16_MEMBER(wecleman_state::wecleman_paletteram16_SSSSBBBBGGGGRRRR_word_w)
 {
-	wecleman_state *state = space->machine().driver_data<wecleman_state>();
-	int newword = COMBINE_DATA(&state->m_generic_paletteram_16[offset]);
+	int newword = COMBINE_DATA(&m_generic_paletteram_16[offset]);
 
 	// the highest nibble has some unknown functions
 //  if (newword & 0xf000) logerror("MSN set on color %03x: %1x\n", offset, newword>>12);
-	palette_set_color_rgb(space->machine(), offset, pal4bit(newword >> 0), pal4bit(newword >> 4), pal4bit(newword >> 8));
+	palette_set_color_rgb(machine(), offset, pal4bit(newword >> 0), pal4bit(newword >> 4), pal4bit(newword >> 8));
 }
 
 

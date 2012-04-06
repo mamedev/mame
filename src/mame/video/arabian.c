@@ -267,26 +267,25 @@ static void blit_area( running_machine &machine, UINT8 plane, UINT16 src, UINT8 
  *
  *************************************/
 
-WRITE8_HANDLER( arabian_blitter_w )
+WRITE8_MEMBER(arabian_state::arabian_blitter_w)
 {
-	arabian_state *state = space->machine().driver_data<arabian_state>();
 
 	/* write the data */
-	state->m_blitter[offset] = data;
+	m_blitter[offset] = data;
 
 	/* watch for a write to offset 6 -- that triggers the blit */
 	if (offset == 6)
 	{
 		/* extract the data */
-		int plane = state->m_blitter[0];
-		int src   = state->m_blitter[1] | (state->m_blitter[2] << 8);
-		int x     = state->m_blitter[4] << 2;
-		int y     = state->m_blitter[3];
-		int sx    = state->m_blitter[6];
-		int sy    = state->m_blitter[5];
+		int plane = m_blitter[0];
+		int src   = m_blitter[1] | (m_blitter[2] << 8);
+		int x     = m_blitter[4] << 2;
+		int y     = m_blitter[3];
+		int sx    = m_blitter[6];
+		int sy    = m_blitter[5];
 
 		/* blit it */
-		blit_area(space->machine(), plane, src, x, y, sx, sy);
+		blit_area(machine(), plane, src, x, y, sx, sy);
 	}
 }
 
@@ -298,9 +297,8 @@ WRITE8_HANDLER( arabian_blitter_w )
  *
  *************************************/
 
-WRITE8_HANDLER( arabian_videoram_w )
+WRITE8_MEMBER(arabian_state::arabian_videoram_w)
 {
-	arabian_state *state = space->machine().driver_data<arabian_state>();
 	UINT8 *base;
 	UINT8 x, y;
 
@@ -309,7 +307,7 @@ WRITE8_HANDLER( arabian_videoram_w )
 	y = offset & 0xff;
 
 	/* get a pointer to the pixels */
-	base = &state->m_main_bitmap[y * BITMAP_WIDTH + x];
+	base = &m_main_bitmap[y * BITMAP_WIDTH + x];
 
 	/* the data is written as 4 2-bit values, as follows:
 
@@ -324,7 +322,7 @@ WRITE8_HANDLER( arabian_videoram_w )
     */
 
 	/* enable writes to AZ/AR */
-	if (state->m_blitter[0] & 0x08)
+	if (m_blitter[0] & 0x08)
 	{
 		base[0] = (base[0] & ~0x03) | ((data & 0x10) >> 3) | ((data & 0x01) >> 0);
 		base[1] = (base[1] & ~0x03) | ((data & 0x20) >> 4) | ((data & 0x02) >> 1);
@@ -333,7 +331,7 @@ WRITE8_HANDLER( arabian_videoram_w )
 	}
 
 	/* enable writes to AG/AB */
-	if (state->m_blitter[0] & 0x04)
+	if (m_blitter[0] & 0x04)
 	{
 		base[0] = (base[0] & ~0x0c) | ((data & 0x10) >> 1) | ((data & 0x01) << 2);
 		base[1] = (base[1] & ~0x0c) | ((data & 0x20) >> 2) | ((data & 0x02) << 1);
@@ -342,7 +340,7 @@ WRITE8_HANDLER( arabian_videoram_w )
 	}
 
 	/* enable writes to BZ/BR */
-	if (state->m_blitter[0] & 0x02)
+	if (m_blitter[0] & 0x02)
 	{
 		base[0] = (base[0] & ~0x30) | ((data & 0x10) << 1) | ((data & 0x01) << 4);
 		base[1] = (base[1] & ~0x30) | ((data & 0x20) << 0) | ((data & 0x02) << 3);
@@ -351,7 +349,7 @@ WRITE8_HANDLER( arabian_videoram_w )
 	}
 
 	/* enable writes to BG/BB */
-	if (state->m_blitter[0] & 0x01)
+	if (m_blitter[0] & 0x01)
 	{
 		base[0] = (base[0] & ~0xc0) | ((data & 0x10) << 3) | ((data & 0x01) << 6);
 		base[1] = (base[1] & ~0xc0) | ((data & 0x20) << 2) | ((data & 0x02) << 5);

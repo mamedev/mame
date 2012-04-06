@@ -4,31 +4,28 @@
 
 /******************************************************************************/
 
-WRITE16_HANDLER( deadang_foreground_w )
+WRITE16_MEMBER(deadang_state::deadang_foreground_w)
 {
-	deadang_state *state = space->machine().driver_data<deadang_state>();
-	COMBINE_DATA(&state->m_video_data[offset]);
-	state->m_pf1_layer->mark_tile_dirty(offset );
+	COMBINE_DATA(&m_video_data[offset]);
+	m_pf1_layer->mark_tile_dirty(offset );
 }
 
-WRITE16_HANDLER( deadang_text_w )
+WRITE16_MEMBER(deadang_state::deadang_text_w)
 {
-	deadang_state *state = space->machine().driver_data<deadang_state>();
-	UINT16 *videoram = state->m_videoram;
+	UINT16 *videoram = m_videoram;
 	COMBINE_DATA(&videoram[offset]);
-	state->m_text_layer->mark_tile_dirty(offset );
+	m_text_layer->mark_tile_dirty(offset );
 }
 
-WRITE16_HANDLER( deadang_bank_w )
+WRITE16_MEMBER(deadang_state::deadang_bank_w)
 {
-	deadang_state *state = space->machine().driver_data<deadang_state>();
 	if (ACCESSING_BITS_0_7)
 	{
-		state->m_deadangle_tilebank = data&1;
-		if (state->m_deadangle_tilebank!=state->m_deadangle_oldtilebank)
+		m_deadangle_tilebank = data&1;
+		if (m_deadangle_tilebank!=m_deadangle_oldtilebank)
 		{
-			state->m_deadangle_oldtilebank = state->m_deadangle_tilebank;
-			state->m_pf1_layer->mark_all_dirty();
+			m_deadangle_oldtilebank = m_deadangle_tilebank;
+			m_pf1_layer->mark_all_dirty();
 		}
 	}
 }

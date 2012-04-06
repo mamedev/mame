@@ -33,8 +33,8 @@ static ADDRESS_MAP_START( io_map, AS_IO, 8, cheekyms_state )
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("DSW")
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x20, 0x3f) AM_WRITEONLY AM_BASE(m_spriteram)
-	AM_RANGE(0x40, 0x40) AM_WRITE_LEGACY(cheekyms_port_40_w)
-	AM_RANGE(0x80, 0x80) AM_WRITE_LEGACY(cheekyms_port_80_w) AM_BASE(m_port_80)
+	AM_RANGE(0x40, 0x40) AM_WRITE(cheekyms_port_40_w)
+	AM_RANGE(0x80, 0x80) AM_WRITE(cheekyms_port_80_w) AM_BASE(m_port_80)
 ADDRESS_MAP_END
 
 

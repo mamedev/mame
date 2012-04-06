@@ -107,31 +107,28 @@ void micro3d_scanline_update(screen_device &screen, bitmap_ind16 &bitmap, int sc
 	}
 }
 
-WRITE16_HANDLER( micro3d_clut_w )
+WRITE16_MEMBER(micro3d_state::micro3d_clut_w)
 {
 	UINT16 word;
 
-	micro3d_state *state = space->machine().driver_data<micro3d_state>();
-	COMBINE_DATA(&state->m_generic_paletteram_16[offset]);
-	word = state->m_generic_paletteram_16[offset];
-	palette_set_color_rgb(space->machine(), offset, pal5bit(word >> 6), pal5bit(word >> 1), pal5bit(word >> 11));
+	COMBINE_DATA(&m_generic_paletteram_16[offset]);
+	word = m_generic_paletteram_16[offset];
+	palette_set_color_rgb(machine(), offset, pal5bit(word >> 6), pal5bit(word >> 1), pal5bit(word >> 11));
 }
 
-WRITE16_HANDLER( micro3d_creg_w )
+WRITE16_MEMBER(micro3d_state::micro3d_creg_w)
 {
-	micro3d_state *state = space->machine().driver_data<micro3d_state>();
 
 	if (~data & 0x80)
-		cputag_set_input_line(space->machine(), "vgb", 0, CLEAR_LINE);
+		cputag_set_input_line(machine(), "vgb", 0, CLEAR_LINE);
 
-	state->m_creg = data;
+	m_creg = data;
 }
 
-WRITE16_HANDLER( micro3d_xfer3dk_w )
+WRITE16_MEMBER(micro3d_state::micro3d_xfer3dk_w)
 {
-	micro3d_state *state = space->machine().driver_data<micro3d_state>();
 
-	state->m_xfer3dk = data;
+	m_xfer3dk = data;
 }
 
 void micro3d_tms_interrupt(device_t *device, int state)
@@ -647,49 +644,48 @@ bc000000-1fc DPRAM address for read access
 
 ******************************************************************************/
 
-WRITE32_HANDLER( micro3d_fifo_w )
+WRITE32_MEMBER(micro3d_state::micro3d_fifo_w)
 {
-	micro3d_state *state = space->machine().driver_data<micro3d_state>();
 	UINT32 opcode = data >> 24;
 
-	switch (state->m_draw_state)
+	switch (m_draw_state)
 	{
 		case STATE_DRAW_CMD:
 		{
-			state->m_draw_cmd = data;
+			m_draw_cmd = data;
 
 			switch (opcode)
 			{
 				case 0xb4:
 				{
-					state->m_x_mid = data & 0x3ff;
-					state->m_y_mid = (data >> 10) & 0x3ff;
+					m_x_mid = data & 0x3ff;
+					m_y_mid = (data >> 10) & 0x3ff;
 					break;
 				}
 				case 0xc8:
 				{
-					state->m_dpram_bank ^= 1;
+					m_dpram_bank ^= 1;
 					break;
 				}
 				case 0xbc:
 				{
-					UINT32 dpram_r_addr = (((data & 0x01ff) << 1) | state->m_dpram_bank);
-					state->m_pipe_data = state->m_draw_dpram[dpram_r_addr];
-					cputag_set_input_line(space->machine(), "drmath", AM29000_INTR1, ASSERT_LINE);
+					UINT32 dpram_r_addr = (((data & 0x01ff) << 1) | m_dpram_bank);
+					m_pipe_data = m_draw_dpram[dpram_r_addr];
+					cputag_set_input_line(machine(), "drmath", AM29000_INTR1, ASSERT_LINE);
 					break;
 				}
 				case 0x80:
 				{
 					int addr;
-					state->m_fifo_idx = 0;
-					state->m_draw_state = STATE_DRAW_VTX_DATA;
+					m_fifo_idx = 0;
+					m_draw_state = STATE_DRAW_VTX_DATA;
 
 					/* Invalidate the draw RAM
                      * TODO: Not sure this is the right place for it -
                      * causes monitor mode draw tests to fail
                      */
 					for (addr = 0; addr < 512; ++addr)
-						state->m_draw_dpram[addr << 1] = 0x3ff000;
+						m_draw_dpram[addr << 1] = 0x3ff000;
 
 					break;
 				}
@@ -701,66 +697,65 @@ WRITE32_HANDLER( micro3d_fifo_w )
 				case 0xd8:
 				{
 					/* TODO: We shouldn't need this extra buffer - is there some sort of sync missing? */
-					memcpy(state->m_frame_buffers[state->m_drawing_buffer], state->m_tmp_buffer, 512*1024*2);
-					state->m_drawing_buffer ^= 1;
-					cputag_set_input_line(space->machine(), "vgb", 0, ASSERT_LINE);
+					memcpy(m_frame_buffers[m_drawing_buffer], m_tmp_buffer, 512*1024*2);
+					m_drawing_buffer ^= 1;
+					cputag_set_input_line(machine(), "vgb", 0, ASSERT_LINE);
 					break;
 				}
 				default:
-					state->m_draw_state = STATE_DRAW_CMD_DATA;
+					m_draw_state = STATE_DRAW_CMD_DATA;
 			}
 			break;
 		}
 		case STATE_DRAW_CMD_DATA:
 		{
-			switch (state->m_draw_cmd >> 24)
+			switch (m_draw_cmd >> 24)
 			{
-				case 0x90: state->m_z_min = VTX_SEX(data); break;
-				case 0x94: state->m_z_max = VTX_SEX(data); break;
-				case 0x98: state->m_y_max = VTX_SEX(data); break;
-				case 0x9c: state->m_x_min = VTX_SEX(data); break;
-				case 0xa0: state->m_x_max = VTX_SEX(data); break;
-				case 0xa4: state->m_y_min = VTX_SEX(data); break;
+				case 0x90: m_z_min = VTX_SEX(data); break;
+				case 0x94: m_z_max = VTX_SEX(data); break;
+				case 0x98: m_y_max = VTX_SEX(data); break;
+				case 0x9c: m_x_min = VTX_SEX(data); break;
+				case 0xa0: m_x_max = VTX_SEX(data); break;
+				case 0xa4: m_y_min = VTX_SEX(data); break;
 				case 0xb8:
 				{
-					state->m_draw_dpram[((state->m_draw_cmd & 0x1ff) << 1) | state->m_dpram_bank] = data & 0x00ffffff;
+					m_draw_dpram[((m_draw_cmd & 0x1ff) << 1) | m_dpram_bank] = data & 0x00ffffff;
 					break;
 				}
 				default:
-					popmessage("Unknown 3D command: %x %x\n", state->m_draw_cmd, data);
+					popmessage("Unknown 3D command: %x %x\n", m_draw_cmd, data);
 			}
-			state->m_draw_state = STATE_DRAW_CMD;
+			m_draw_state = STATE_DRAW_CMD;
 			break;
 		}
 		case STATE_DRAW_VTX_DATA:
 		{
 			if ((opcode == 0x85) || (opcode == 0x8a))
 			{
+				micro3d_state *state = machine().driver_data<micro3d_state>();
 				draw_triangles(state, data);
-				state->m_draw_state = STATE_DRAW_CMD;
+				m_draw_state = STATE_DRAW_CMD;
 			}
 			else
 			{
-				state->m_vtx_fifo[state->m_fifo_idx++] = VTX_SEX(data);
+				m_vtx_fifo[m_fifo_idx++] = VTX_SEX(data);
 			}
 			break;
 		}
 	}
 }
 
-WRITE32_HANDLER( micro3d_alt_fifo_w )
+WRITE32_MEMBER(micro3d_state::micro3d_alt_fifo_w)
 {
-	micro3d_state *state = space->machine().driver_data<micro3d_state>();
 
-	state->m_vtx_fifo[state->m_fifo_idx++] = VTX_SEX(data);
+	m_vtx_fifo[m_fifo_idx++] = VTX_SEX(data);
 }
 
-READ32_HANDLER( micro3d_pipe_r )
+READ32_MEMBER(micro3d_state::micro3d_pipe_r)
 {
-	micro3d_state *state = space->machine().driver_data<micro3d_state>();
 
-	cputag_set_input_line(space->machine(), "drmath", AM29000_INTR1, CLEAR_LINE);
-	return state->m_pipe_data;
+	cputag_set_input_line(machine(), "drmath", AM29000_INTR1, CLEAR_LINE);
+	return m_pipe_data;
 }
 
 INTERRUPT_GEN( micro3d_vblank )

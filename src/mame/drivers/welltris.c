@@ -357,15 +357,15 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, welltris_state )
 	AM_RANGE(0x100000, 0x17ffff) AM_ROM
 	AM_RANGE(0x800000, 0x81ffff) AM_RAM AM_BASE(m_pixelram)	/* Graph_1 & 2*/
 	AM_RANGE(0xff8000, 0xffbfff) AM_RAM								/* work */
-	AM_RANGE(0xffc000, 0xffc3ff) AM_RAM_WRITE_LEGACY(welltris_spriteram_w) AM_BASE(m_spriteram)			/* Sprite */
-	AM_RANGE(0xffd000, 0xffdfff) AM_RAM_WRITE_LEGACY(welltris_charvideoram_w) AM_BASE(m_charvideoram)		/* Char */
+	AM_RANGE(0xffc000, 0xffc3ff) AM_RAM_WRITE(welltris_spriteram_w) AM_BASE(m_spriteram)			/* Sprite */
+	AM_RANGE(0xffd000, 0xffdfff) AM_RAM_WRITE(welltris_charvideoram_w) AM_BASE(m_charvideoram)		/* Char */
 	AM_RANGE(0xffe000, 0xffefff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")	/* Palette */
 	AM_RANGE(0xfff000, 0xfff001) AM_READ_PORT("P1")					/* Bottom Controls */
-	AM_RANGE(0xfff000, 0xfff001) AM_WRITE_LEGACY(welltris_palette_bank_w)
+	AM_RANGE(0xfff000, 0xfff001) AM_WRITE(welltris_palette_bank_w)
 	AM_RANGE(0xfff002, 0xfff003) AM_READ_PORT("P2")					/* Top Controls */
-	AM_RANGE(0xfff002, 0xfff003) AM_WRITE_LEGACY(welltris_gfxbank_w)
+	AM_RANGE(0xfff002, 0xfff003) AM_WRITE(welltris_gfxbank_w)
 	AM_RANGE(0xfff004, 0xfff005) AM_READ_PORT("P3")					/* Left Side Ctrls */
-	AM_RANGE(0xfff004, 0xfff007) AM_WRITE_LEGACY(welltris_scrollreg_w)
+	AM_RANGE(0xfff004, 0xfff007) AM_WRITE(welltris_scrollreg_w)
 	AM_RANGE(0xfff006, 0xfff007) AM_READ_PORT("P4")					/* Right Side Ctrls */
 	AM_RANGE(0xfff008, 0xfff009) AM_READ_PORT("SYSTEM")				/* Bit 5 Tested at start of irq 1 */
 	AM_RANGE(0xfff008, 0xfff009) AM_WRITE(sound_command_w)

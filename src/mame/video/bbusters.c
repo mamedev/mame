@@ -51,28 +51,25 @@ static TILE_GET_INFO( get_pf2_tile_info )
 	SET_TILE_INFO(4,tile&0xfff,tile>>12,0);
 }
 
-WRITE16_HANDLER( bbusters_video_w )
+WRITE16_MEMBER(bbusters_state::bbusters_video_w)
 {
-	bbusters_state *state = space->machine().driver_data<bbusters_state>();
 
-	COMBINE_DATA(&state->m_videoram[offset]);
-	state->m_fix_tilemap->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_videoram[offset]);
+	m_fix_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_HANDLER( bbusters_pf1_w )
+WRITE16_MEMBER(bbusters_state::bbusters_pf1_w)
 {
-	bbusters_state *state = space->machine().driver_data<bbusters_state>();
 
-	COMBINE_DATA(&state->m_pf1_data[offset]);
-	state->m_pf1_tilemap->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_pf1_data[offset]);
+	m_pf1_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_HANDLER( bbusters_pf2_w )
+WRITE16_MEMBER(bbusters_state::bbusters_pf2_w)
 {
-	bbusters_state *state = space->machine().driver_data<bbusters_state>();
 
-	COMBINE_DATA(&state->m_pf2_data[offset]);
-	state->m_pf2_tilemap->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_pf2_data[offset]);
+	m_pf2_tilemap->mark_tile_dirty(offset);
 }
 
 /******************************************************************************/

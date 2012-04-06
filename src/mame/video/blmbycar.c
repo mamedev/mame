@@ -42,12 +42,11 @@ Note:   if MAME_DEBUG is defined, pressing Z with:
 
 /* xxxxBBBBGGGGRRRR */
 
-WRITE16_HANDLER( blmbycar_palette_w )
+WRITE16_MEMBER(blmbycar_state::blmbycar_palette_w)
 {
-	blmbycar_state *state = space->machine().driver_data<blmbycar_state>();
 
-	data = COMBINE_DATA(&state->m_paletteram[offset]);
-	palette_set_color_rgb( space->machine(), offset, pal4bit(data >> 4), pal4bit(data >> 0), pal4bit(data >> 8));
+	data = COMBINE_DATA(&m_paletteram[offset]);
+	palette_set_color_rgb( machine(), offset, pal4bit(data >> 4), pal4bit(data >> 0), pal4bit(data >> 8));
 }
 
 
@@ -100,18 +99,16 @@ static TILE_GET_INFO( get_tile_info_1 )
 }
 
 
-WRITE16_HANDLER( blmbycar_vram_0_w )
+WRITE16_MEMBER(blmbycar_state::blmbycar_vram_0_w)
 {
-	blmbycar_state *state = space->machine().driver_data<blmbycar_state>();
-	COMBINE_DATA(&state->m_vram_0[offset]);
-	state->m_tilemap_0->mark_tile_dirty(offset / 2);
+	COMBINE_DATA(&m_vram_0[offset]);
+	m_tilemap_0->mark_tile_dirty(offset / 2);
 }
 
-WRITE16_HANDLER( blmbycar_vram_1_w )
+WRITE16_MEMBER(blmbycar_state::blmbycar_vram_1_w)
 {
-	blmbycar_state *state = space->machine().driver_data<blmbycar_state>();
-	COMBINE_DATA(&state->m_vram_1[offset]);
-	state->m_tilemap_1->mark_tile_dirty(offset / 2);
+	COMBINE_DATA(&m_vram_1[offset]);
+	m_tilemap_1->mark_tile_dirty(offset / 2);
 }
 
 

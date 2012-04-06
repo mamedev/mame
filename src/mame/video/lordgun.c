@@ -46,12 +46,11 @@ Note:   if MAME_DEBUG is defined, pressing Z with:
 ***************************************************************************/
 
 // xxxxBBBBGGGGRRRR, but repeat ecah color for each priority code (since we stuff it in the high bits of the pen)
-WRITE16_HANDLER( lordgun_paletteram_w )
+WRITE16_MEMBER(lordgun_state::lordgun_paletteram_w)
 {
-	lordgun_state *state = space->machine().driver_data<lordgun_state>();
-	COMBINE_DATA(&state->m_generic_paletteram_16[offset]);
+	COMBINE_DATA(&m_generic_paletteram_16[offset]);
 	for (int pri = 0; pri < 8; pri++)
-		palette_set_color_rgb(space->machine(), offset+0x800*pri, pal4bit(data >> 0), pal4bit(data >> 4), pal4bit(data >> 8));
+		palette_set_color_rgb(machine(), offset+0x800*pri, pal4bit(data >> 0), pal4bit(data >> 4), pal4bit(data >> 8));
 }
 
 
@@ -83,10 +82,10 @@ INLINE void lordgun_vram_w(address_space *space, offs_t offset, UINT16 data, UIN
 	state->m_tilemap[_N_]->mark_tile_dirty(offset/2);
 }
 
-WRITE16_HANDLER( lordgun_vram_0_w ) { lordgun_vram_w(space, offset, data, mem_mask, 0); }
-WRITE16_HANDLER( lordgun_vram_1_w ) { lordgun_vram_w(space, offset, data, mem_mask, 1); }
-WRITE16_HANDLER( lordgun_vram_2_w ) { lordgun_vram_w(space, offset, data, mem_mask, 2); }
-WRITE16_HANDLER( lordgun_vram_3_w ) { lordgun_vram_w(space, offset, data, mem_mask, 3); }
+WRITE16_MEMBER(lordgun_state::lordgun_vram_0_w){ lordgun_vram_w(&space, offset, data, mem_mask, 0); }
+WRITE16_MEMBER(lordgun_state::lordgun_vram_1_w){ lordgun_vram_w(&space, offset, data, mem_mask, 1); }
+WRITE16_MEMBER(lordgun_state::lordgun_vram_2_w){ lordgun_vram_w(&space, offset, data, mem_mask, 2); }
+WRITE16_MEMBER(lordgun_state::lordgun_vram_3_w){ lordgun_vram_w(&space, offset, data, mem_mask, 3); }
 
 /***************************************************************************
 

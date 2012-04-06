@@ -100,17 +100,16 @@ up blit_src for the second call.
 
 ***************************************************************************/
 
-WRITE8_HANDLER( dynax_blitter_rev1_param_w )
+WRITE8_MEMBER(hnayayoi_state::dynax_blitter_rev1_param_w)
 {
-	hnayayoi_state *state = space->machine().driver_data<hnayayoi_state>();
 	switch (offset)
 	{
-		case 0: state->m_blit_dest = (state->m_blit_dest & 0xff00) | (data << 0); break;
-		case 1: state->m_blit_dest = (state->m_blit_dest & 0x00ff) | (data << 8); break;
-		case 2: state->m_blit_layer = data; break;
-		case 3: state->m_blit_src = (state->m_blit_src & 0xffff00) | (data << 0); break;
-		case 4: state->m_blit_src = (state->m_blit_src & 0xff00ff) | (data << 8); break;
-		case 5: state->m_blit_src = (state->m_blit_src & 0x00ffff) | (data <<16); break;
+		case 0: m_blit_dest = (m_blit_dest & 0xff00) | (data << 0); break;
+		case 1: m_blit_dest = (m_blit_dest & 0x00ff) | (data << 8); break;
+		case 2: m_blit_layer = data; break;
+		case 3: m_blit_src = (m_blit_src & 0xffff00) | (data << 0); break;
+		case 4: m_blit_src = (m_blit_src & 0xff00ff) | (data << 8); break;
+		case 5: m_blit_src = (m_blit_src & 0x00ffff) | (data <<16); break;
 	}
 }
 
@@ -129,23 +128,22 @@ static void copy_pixel( running_machine &machine, int x, int y, int pen )
 	}
 }
 
-WRITE8_HANDLER( dynax_blitter_rev1_start_w )
+WRITE8_MEMBER(hnayayoi_state::dynax_blitter_rev1_start_w)
 {
-	hnayayoi_state *state = space->machine().driver_data<hnayayoi_state>();
-	UINT8 *rom = space->machine().region("gfx1")->base();
-	int romlen = space->machine().region("gfx1")->bytes();
-	int sx = state->m_blit_dest & 0xff;
-	int sy = state->m_blit_dest >> 8;
+	UINT8 *rom = machine().region("gfx1")->base();
+	int romlen = machine().region("gfx1")->bytes();
+	int sx = m_blit_dest & 0xff;
+	int sy = m_blit_dest >> 8;
 	int x, y;
 
 	x = sx;
 	y = sy;
-	while (state->m_blit_src < romlen)
+	while (m_blit_src < romlen)
 	{
-		int cmd = rom[state->m_blit_src] & 0x0f;
-		int pen = rom[state->m_blit_src] >> 4;
+		int cmd = rom[m_blit_src] & 0x0f;
+		int pen = rom[m_blit_src] >> 4;
 
-		state->m_blit_src++;
+		m_blit_src++;
 
 		switch (cmd)
 		{
@@ -155,31 +153,31 @@ WRITE8_HANDLER( dynax_blitter_rev1_start_w )
 				break;
 
 			case 0xe:
-				if (state->m_blit_src >= romlen)
+				if (m_blit_src >= romlen)
 				{
-					popmessage("GFXROM OVER %06x", state->m_blit_src);
+					popmessage("GFXROM OVER %06x", m_blit_src);
 					return;
 				}
 				x = sx;
-				state->m_blit_layer = rom[state->m_blit_src++];
+				m_blit_layer = rom[m_blit_src++];
 				break;
 
 			case 0xd:
-				if (state->m_blit_src >= romlen)
+				if (m_blit_src >= romlen)
 				{
-					popmessage("GFXROM OVER %06x", state->m_blit_src);
+					popmessage("GFXROM OVER %06x", m_blit_src);
 					return;
 				}
-				x = sx + rom[state->m_blit_src++];
+				x = sx + rom[m_blit_src++];
 				/* fall through into next case */
 
 			case 0xc:
-				if (state->m_blit_src >= romlen)
+				if (m_blit_src >= romlen)
 				{
-					popmessage("GFXROM OVER %06x", state->m_blit_src);
+					popmessage("GFXROM OVER %06x", m_blit_src);
 					return;
 				}
-				cmd = rom[state->m_blit_src++];
+				cmd = rom[m_blit_src++];
 				/* fall through into next case */
 
 			case 0xb:
@@ -194,7 +192,7 @@ WRITE8_HANDLER( dynax_blitter_rev1_start_w )
 			case 0x2:
 			case 0x1:
 				while (cmd--)
-					copy_pixel(space->machine(), x++, y, pen);
+					copy_pixel(machine(), x++, y, pen);
 				break;
 
 			case 0x0:
@@ -202,28 +200,26 @@ WRITE8_HANDLER( dynax_blitter_rev1_start_w )
 		}
 	}
 
-	popmessage("GFXROM OVER %06x", state->m_blit_src);
+	popmessage("GFXROM OVER %06x", m_blit_src);
 }
 
-WRITE8_HANDLER( dynax_blitter_rev1_clear_w )
+WRITE8_MEMBER(hnayayoi_state::dynax_blitter_rev1_clear_w)
 {
-	hnayayoi_state *state = space->machine().driver_data<hnayayoi_state>();
 	int pen = data >> 4;
 	int i;
 
 	for (i = 0; i < 8; i++)
 	{
-		if ((~state->m_blit_layer & (1 << i)) && (state->m_pixmap[i]))
-			memset(state->m_pixmap[i] + state->m_blit_dest, pen, 0x10000 - state->m_blit_dest);
+		if ((~m_blit_layer & (1 << i)) && (m_pixmap[i]))
+			memset(m_pixmap[i] + m_blit_dest, pen, 0x10000 - m_blit_dest);
 	}
 }
 
 
-WRITE8_HANDLER( hnayayoi_palbank_w )
+WRITE8_MEMBER(hnayayoi_state::hnayayoi_palbank_w)
 {
-	hnayayoi_state *state = space->machine().driver_data<hnayayoi_state>();
 	offset *= 8;
-	state->m_palbank = (state->m_palbank & (0xff00 >> offset)) | (data << offset);
+	m_palbank = (m_palbank & (0xff00 >> offset)) | (data << offset);
 }
 
 

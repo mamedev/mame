@@ -89,6 +89,11 @@ public:
 	DECLARE_READ32_MEMBER(panicstr_speedup_r);
 	DECLARE_READ32_MEMBER(sengekis_speedup_r);
 	DECLARE_READ32_MEMBER(sengekij_speedup_r);
+	DECLARE_WRITE32_MEMBER(skns_pal_regs_w);
+	DECLARE_WRITE32_MEMBER(skns_palette_ram_w);
+	DECLARE_WRITE32_MEMBER(skns_tilemapA_w);
+	DECLARE_WRITE32_MEMBER(skns_tilemapB_w);
+	DECLARE_WRITE32_MEMBER(skns_v3_regs_w);
 };
 
 
@@ -101,11 +106,6 @@ void skns_draw_sprites(
 	UINT8* gfx_source, size_t gfx_length,
 	UINT32* sprite_regs );
 
-WRITE32_HANDLER ( skns_tilemapA_w );
-WRITE32_HANDLER ( skns_tilemapB_w );
-WRITE32_HANDLER ( skns_v3_regs_w );
-WRITE32_HANDLER ( skns_pal_regs_w );
-WRITE32_HANDLER ( skns_palette_ram_w );
 VIDEO_START(skns);
 VIDEO_RESET(skns);
 SCREEN_VBLANK(skns);

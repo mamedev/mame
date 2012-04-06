@@ -69,59 +69,53 @@ VIDEO_START( gundealr )
 
 ***************************************************************************/
 
-WRITE8_HANDLER( gundealr_bg_videoram_w )
+WRITE8_MEMBER(gundealr_state::gundealr_bg_videoram_w)
 {
-	gundealr_state *state = space->machine().driver_data<gundealr_state>();
-	state->m_bg_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset / 2);
+	m_bg_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE8_HANDLER( gundealr_fg_videoram_w )
+WRITE8_MEMBER(gundealr_state::gundealr_fg_videoram_w)
 {
-	gundealr_state *state = space->machine().driver_data<gundealr_state>();
-	state->m_fg_videoram[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset / 2);
+	m_fg_videoram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE8_HANDLER( gundealr_paletteram_w )
+WRITE8_MEMBER(gundealr_state::gundealr_paletteram_w)
 {
-	gundealr_state *state = space->machine().driver_data<gundealr_state>();
 	int r,g,b,val;
 
-	state->m_paletteram[offset] = data;
+	m_paletteram[offset] = data;
 
-	val = state->m_paletteram[offset & ~1];
+	val = m_paletteram[offset & ~1];
 	r = (val >> 4) & 0x0f;
 	g = (val >> 0) & 0x0f;
 
-	val = state->m_paletteram[offset | 1];
+	val = m_paletteram[offset | 1];
 	b = (val >> 4) & 0x0f;
 	/* TODO: the bottom 4 bits are used as well, but I'm not sure about the meaning */
 
-	palette_set_color_rgb(space->machine(), offset / 2, pal4bit(r), pal4bit(g), pal4bit(b));
+	palette_set_color_rgb(machine(), offset / 2, pal4bit(r), pal4bit(g), pal4bit(b));
 }
 
-WRITE8_HANDLER( gundealr_fg_scroll_w )
+WRITE8_MEMBER(gundealr_state::gundealr_fg_scroll_w)
 {
-	gundealr_state *state = space->machine().driver_data<gundealr_state>();
-	state->m_scroll[offset] = data;
-	state->m_fg_tilemap->set_scrollx(0, state->m_scroll[1] | ((state->m_scroll[0] & 0x03) << 8));
-	state->m_fg_tilemap->set_scrolly(0, state->m_scroll[3] | ((state->m_scroll[2] & 0x03) << 8));
+	m_scroll[offset] = data;
+	m_fg_tilemap->set_scrollx(0, m_scroll[1] | ((m_scroll[0] & 0x03) << 8));
+	m_fg_tilemap->set_scrolly(0, m_scroll[3] | ((m_scroll[2] & 0x03) << 8));
 }
 
-WRITE8_HANDLER( yamyam_fg_scroll_w )
+WRITE8_MEMBER(gundealr_state::yamyam_fg_scroll_w)
 {
-	gundealr_state *state = space->machine().driver_data<gundealr_state>();
-	state->m_scroll[offset] = data;
-	state->m_fg_tilemap->set_scrollx(0, state->m_scroll[0] | ((state->m_scroll[1] & 0x03) << 8));
-	state->m_fg_tilemap->set_scrolly(0, state->m_scroll[2] | ((state->m_scroll[3] & 0x03) << 8));
+	m_scroll[offset] = data;
+	m_fg_tilemap->set_scrollx(0, m_scroll[0] | ((m_scroll[1] & 0x03) << 8));
+	m_fg_tilemap->set_scrolly(0, m_scroll[2] | ((m_scroll[3] & 0x03) << 8));
 }
 
-WRITE8_HANDLER( gundealr_flipscreen_w )
+WRITE8_MEMBER(gundealr_state::gundealr_flipscreen_w)
 {
-	gundealr_state *state = space->machine().driver_data<gundealr_state>();
-	state->m_flipscreen = data;
-	space->machine().tilemap().set_flip_all(state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	m_flipscreen = data;
+	machine().tilemap().set_flip_all(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 }
 
 

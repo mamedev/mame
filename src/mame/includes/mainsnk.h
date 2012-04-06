@@ -15,14 +15,14 @@ public:
 	DECLARE_WRITE8_MEMBER(sound_command_w);
 	DECLARE_READ8_MEMBER(sound_command_r);
 	DECLARE_READ8_MEMBER(sound_ack_r);
+	DECLARE_WRITE8_MEMBER(mainsnk_c600_w);
+	DECLARE_WRITE8_MEMBER(mainsnk_fgram_w);
+	DECLARE_WRITE8_MEMBER(mainsnk_bgram_w);
 };
 
 
 /*----------- defined in video/mainsnk.c -----------*/
 
 PALETTE_INIT(mainsnk);
-WRITE8_HANDLER(mainsnk_c600_w);
-WRITE8_HANDLER(mainsnk_fgram_w);
-WRITE8_HANDLER(mainsnk_bgram_w);
 VIDEO_START(mainsnk);
 SCREEN_UPDATE_IND16(mainsnk);

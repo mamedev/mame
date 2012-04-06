@@ -25,6 +25,8 @@ public:
 	DECLARE_WRITE8_MEMBER(pc3092_w);
 	DECLARE_READ8_MEMBER(pc3259_r);
 	DECLARE_WRITE8_MEMBER(port_sound_w);
+	DECLARE_WRITE8_MEMBER(crbaloon_videoram_w);
+	DECLARE_WRITE8_MEMBER(crbaloon_colorram_w);
 };
 
 
@@ -46,8 +48,6 @@ PALETTE_INIT( crbaloon );
 VIDEO_START( crbaloon );
 SCREEN_UPDATE_IND16( crbaloon );
 
-WRITE8_HANDLER( crbaloon_videoram_w );
-WRITE8_HANDLER( crbaloon_colorram_w );
 
 UINT16 crbaloon_get_collision_address(running_machine &machine);
 void crbaloon_set_clear_collision_address(running_machine &machine, int _crbaloon_collision_address_clear);

@@ -107,8 +107,8 @@ WRITE8_MEMBER(kchamp_state::sound_msm_w)
 static ADDRESS_MAP_START( kchampvs_map, AS_PROGRAM, 8, kchamp_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
-	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE_LEGACY(kchamp_videoram_w) AM_BASE(m_videoram)
-	AM_RANGE(0xd400, 0xd7ff) AM_RAM_WRITE_LEGACY(kchamp_colorram_w) AM_BASE(m_colorram)
+	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(kchamp_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0xd400, 0xd7ff) AM_RAM_WRITE(kchamp_colorram_w) AM_BASE(m_colorram)
 	AM_RANGE(0xd800, 0xd8ff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
 	AM_RANGE(0xd900, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xffff) AM_ROM
@@ -116,7 +116,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( kchampvs_io_map, AS_IO, 8, kchamp_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1") AM_WRITE_LEGACY(kchamp_flipscreen_w)
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1") AM_WRITE(kchamp_flipscreen_w)
 	AM_RANGE(0x01, 0x01) AM_WRITE(control_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(sound_reset_w)
 	AM_RANGE(0x40, 0x40) AM_READ_PORT("P2") AM_WRITE(sound_command_w)
@@ -160,15 +160,15 @@ WRITE8_MEMBER(kchamp_state::kc_sound_control_w)
 static ADDRESS_MAP_START( kchamp_map, AS_PROGRAM, 8, kchamp_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe3ff) AM_RAM_WRITE_LEGACY(kchamp_videoram_w) AM_BASE(m_videoram)
-	AM_RANGE(0xe400, 0xe7ff) AM_RAM_WRITE_LEGACY(kchamp_colorram_w) AM_BASE(m_colorram)
+	AM_RANGE(0xe000, 0xe3ff) AM_RAM_WRITE(kchamp_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0xe400, 0xe7ff) AM_RAM_WRITE(kchamp_colorram_w) AM_BASE(m_colorram)
 	AM_RANGE(0xea00, 0xeaff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
 	AM_RANGE(0xeb00, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( kchamp_io_map, AS_IO, 8, kchamp_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x80, 0x80) AM_READ_PORT("DSW") AM_WRITE_LEGACY(kchamp_flipscreen_w)
+	AM_RANGE(0x80, 0x80) AM_READ_PORT("DSW") AM_WRITE(kchamp_flipscreen_w)
 	AM_RANGE(0x81, 0x81) AM_WRITE(control_w)
 	AM_RANGE(0x90, 0x90) AM_READ_PORT("P1")
 	AM_RANGE(0x98, 0x98) AM_READ_PORT("P2")

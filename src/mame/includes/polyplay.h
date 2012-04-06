@@ -26,6 +26,7 @@ public:
 	DECLARE_WRITE8_MEMBER(polyplay_sound_channel);
 	DECLARE_WRITE8_MEMBER(polyplay_start_timer2);
 	DECLARE_READ8_MEMBER(polyplay_random_read);
+	DECLARE_WRITE8_MEMBER(polyplay_characterram_w);
 };
 
 
@@ -43,4 +44,3 @@ SAMPLES_START( polyplay_sh_start );
 PALETTE_INIT( polyplay );
 VIDEO_START( polyplay );
 SCREEN_UPDATE_IND16( polyplay );
-WRITE8_HANDLER( polyplay_characterram_w );

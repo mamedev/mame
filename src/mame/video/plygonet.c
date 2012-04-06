@@ -36,42 +36,38 @@ static TILE_GET_INFO( roz_get_tile_info )
 	SET_TILE_INFO(0, code, attr, 0);
 }
 
-READ32_HANDLER( polygonet_ttl_ram_r )
+READ32_MEMBER(polygonet_state::polygonet_ttl_ram_r)
 {
-	polygonet_state *state = space->machine().driver_data<polygonet_state>();
-	UINT32 *vram = (UINT32 *)state->m_ttl_vram;
+	UINT32 *vram = (UINT32 *)m_ttl_vram;
 
 	return vram[offset];
 }
 
-WRITE32_HANDLER( polygonet_ttl_ram_w )
+WRITE32_MEMBER(polygonet_state::polygonet_ttl_ram_w)
 {
-	polygonet_state *state = space->machine().driver_data<polygonet_state>();
-	UINT32 *vram = (UINT32 *)state->m_ttl_vram;
+	UINT32 *vram = (UINT32 *)m_ttl_vram;
 
 	COMBINE_DATA(&vram[offset]);
 
-	state->m_ttl_tilemap->mark_tile_dirty(offset*2);
-	state->m_ttl_tilemap->mark_tile_dirty(offset*2+1);
+	m_ttl_tilemap->mark_tile_dirty(offset*2);
+	m_ttl_tilemap->mark_tile_dirty(offset*2+1);
 }
 
-READ32_HANDLER( polygonet_roz_ram_r )
+READ32_MEMBER(polygonet_state::polygonet_roz_ram_r)
 {
-	polygonet_state *state = space->machine().driver_data<polygonet_state>();
-	UINT32 *vram = (UINT32 *)state->m_roz_vram;
+	UINT32 *vram = (UINT32 *)m_roz_vram;
 
 	return vram[offset];
 }
 
-WRITE32_HANDLER( polygonet_roz_ram_w )
+WRITE32_MEMBER(polygonet_state::polygonet_roz_ram_w)
 {
-	polygonet_state *state = space->machine().driver_data<polygonet_state>();
-	UINT32 *vram = (UINT32 *)state->m_roz_vram;
+	UINT32 *vram = (UINT32 *)m_roz_vram;
 
 	COMBINE_DATA(&vram[offset]);
 
-	state->m_roz_tilemap->mark_tile_dirty(offset*2);
-	state->m_roz_tilemap->mark_tile_dirty(offset*2+1);
+	m_roz_tilemap->mark_tile_dirty(offset*2);
+	m_roz_tilemap->mark_tile_dirty(offset*2+1);
 }
 
 static TILEMAP_MAPPER( plygonet_scan )

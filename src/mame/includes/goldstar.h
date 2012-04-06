@@ -68,26 +68,26 @@ public:
 	DECLARE_READ8_MEMBER(fixedval74_r);
 	DECLARE_READ8_MEMBER(fixedvale4_r);
 	DECLARE_READ8_MEMBER(fixedvalc7_r);
+	DECLARE_WRITE8_MEMBER(cm_girl_scroll_w);
+	DECLARE_WRITE8_MEMBER(cm_outport0_w);
+	DECLARE_WRITE8_MEMBER(goldstar_fg_vidram_w);
+	DECLARE_WRITE8_MEMBER(goldstar_fg_atrram_w);
+	DECLARE_WRITE8_MEMBER(goldstar_reel1_ram_w);
+	DECLARE_WRITE8_MEMBER(goldstar_reel2_ram_w);
+	DECLARE_WRITE8_MEMBER(goldstar_reel3_ram_w);
+	DECLARE_WRITE8_MEMBER(unkch_reel1_attrram_w);
+	DECLARE_WRITE8_MEMBER(unkch_reel2_attrram_w);
+	DECLARE_WRITE8_MEMBER(unkch_reel3_attrram_w);
+	DECLARE_WRITE8_MEMBER(goldstar_fa00_w);
+	DECLARE_WRITE8_MEMBER(cm_background_col_w);
 };
 
 
 /*----------- defined in video/goldstar.c -----------*/
 
-WRITE8_HANDLER( goldstar_reel1_ram_w );
-WRITE8_HANDLER( goldstar_reel2_ram_w );
-WRITE8_HANDLER( goldstar_reel3_ram_w );
 
-WRITE8_HANDLER( unkch_reel1_attrram_w );
-WRITE8_HANDLER( unkch_reel2_attrram_w );
-WRITE8_HANDLER( unkch_reel3_attrram_w );
 
-WRITE8_HANDLER( goldstar_fg_vidram_w );
-WRITE8_HANDLER( goldstar_fg_atrram_w );
-WRITE8_HANDLER( cm_girl_scroll_w );
 
-WRITE8_HANDLER( goldstar_fa00_w );
-WRITE8_HANDLER( cm_background_col_w );
-WRITE8_HANDLER( cm_outport0_w );
 VIDEO_START( goldstar );
 VIDEO_START( bingowng );
 VIDEO_START( cherrym );

@@ -41,23 +41,21 @@ PALETTE_INIT( strnskil )
 }
 
 
-WRITE8_HANDLER( strnskil_videoram_w )
+WRITE8_MEMBER(strnskil_state::strnskil_videoram_w)
 {
-	strnskil_state *state = space->machine().driver_data<strnskil_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = m_videoram;
 	videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset / 2);
+	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE8_HANDLER( strnskil_scrl_ctrl_w )
+WRITE8_MEMBER(strnskil_state::strnskil_scrl_ctrl_w)
 {
-	strnskil_state *state = space->machine().driver_data<strnskil_state>();
-	state->m_scrl_ctrl = data >> 5;
+	m_scrl_ctrl = data >> 5;
 
-	if (flip_screen_get(space->machine()) != (data & 0x08))
+	if (flip_screen_get(machine()) != (data & 0x08))
 	{
-		flip_screen_set(space->machine(), data & 0x08);
-		space->machine().tilemap().mark_all_dirty();
+		flip_screen_set(machine(), data & 0x08);
+		machine().tilemap().mark_all_dirty();
 	}
 }
 

@@ -42,13 +42,13 @@ public:
 	optional_device<buffered_spriteram16_device> m_spriteram2;
 	DECLARE_READ16_MEMBER(rohga_irq_ack_r);
 	DECLARE_WRITE16_MEMBER(wizdfire_irq_ack_w);
+	DECLARE_WRITE16_MEMBER(rohga_buffer_spriteram16_w);
 };
 
 
 
 /*----------- defined in video/rohga.c -----------*/
 
-WRITE16_HANDLER( rohga_buffer_spriteram16_w );
 
 VIDEO_START( rohga );
 VIDEO_START( schmeisr );

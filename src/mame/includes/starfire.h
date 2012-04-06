@@ -34,6 +34,10 @@ public:
 	DECLARE_READ8_MEMBER(starfire_scratch_r);
 	DECLARE_READ8_MEMBER(starfire_input_r);
 	DECLARE_READ8_MEMBER(fireone_input_r);
+	DECLARE_WRITE8_MEMBER(starfire_colorram_w);
+	DECLARE_READ8_MEMBER(starfire_colorram_r);
+	DECLARE_WRITE8_MEMBER(starfire_videoram_w);
+	DECLARE_READ8_MEMBER(starfire_videoram_r);
 };
 
 /*----------- defined in video/starfire.c -----------*/
@@ -41,8 +45,4 @@ public:
 SCREEN_UPDATE_RGB32( starfire );
 VIDEO_START( starfire );
 
-WRITE8_HANDLER( starfire_videoram_w );
-READ8_HANDLER( starfire_videoram_r );
-WRITE8_HANDLER( starfire_colorram_w );
-READ8_HANDLER( starfire_colorram_r );
 

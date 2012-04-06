@@ -112,23 +112,22 @@ VIDEO_START( fcombat )
  *
  *************************************/
 
-WRITE8_HANDLER( fcombat_videoreg_w )
+WRITE8_MEMBER(fcombat_state::fcombat_videoreg_w)
 {
-	fcombat_state *state = space->machine().driver_data<fcombat_state>();
 
 	/* bit 0 = flip screen and joystick input multiplexor */
-	state->m_cocktail_flip = data & 1;
+	m_cocktail_flip = data & 1;
 
 	/* bits 1-2 char lookup table bank */
-	state->m_char_palette = (data & 0x06) >> 1;
+	m_char_palette = (data & 0x06) >> 1;
 
 	/* bits 3 char bank */
-	state->m_char_bank = (data & 0x08) >> 3;
+	m_char_bank = (data & 0x08) >> 3;
 
 	/* bits 4-5 unused */
 
 	/* bits 6-7 sprite lookup table bank */
-	state->m_sprite_palette = 0;//(data & 0xc0) >> 6;
+	m_sprite_palette = 0;//(data & 0xc0) >> 6;
 	//popmessage("%08x",data);
 }
 

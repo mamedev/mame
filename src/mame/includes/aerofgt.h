@@ -46,27 +46,27 @@ public:
 	DECLARE_WRITE8_MEMBER(pending_command_clear_w);
 	DECLARE_WRITE8_MEMBER(aerofgt_sh_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(aerfboot_okim6295_banking_w);
+	DECLARE_WRITE16_MEMBER(aerofgt_bg1videoram_w);
+	DECLARE_WRITE16_MEMBER(aerofgt_bg2videoram_w);
+	DECLARE_WRITE16_MEMBER(pspikes_gfxbank_w);
+	DECLARE_WRITE16_MEMBER(pspikesb_gfxbank_w);
+	DECLARE_WRITE16_MEMBER(spikes91_lookup_w);
+	DECLARE_WRITE16_MEMBER(karatblz_gfxbank_w);
+	DECLARE_WRITE16_MEMBER(spinlbrk_gfxbank_w);
+	DECLARE_WRITE16_MEMBER(turbofrc_gfxbank_w);
+	DECLARE_WRITE16_MEMBER(aerofgt_gfxbank_w);
+	DECLARE_WRITE16_MEMBER(aerofgt_bg1scrollx_w);
+	DECLARE_WRITE16_MEMBER(aerofgt_bg1scrolly_w);
+	DECLARE_WRITE16_MEMBER(aerofgt_bg2scrollx_w);
+	DECLARE_WRITE16_MEMBER(aerofgt_bg2scrolly_w);
+	DECLARE_WRITE16_MEMBER(pspikes_palette_bank_w);
+	DECLARE_WRITE16_MEMBER(wbbc97_bitmap_enable_w);
 };
 
 
 /*----------- defined in video/aerofgt.c -----------*/
 
 
-WRITE16_HANDLER( aerofgt_bg1videoram_w );
-WRITE16_HANDLER( aerofgt_bg2videoram_w );
-WRITE16_HANDLER( pspikes_gfxbank_w );
-WRITE16_HANDLER( pspikesb_gfxbank_w );
-WRITE16_HANDLER( spikes91_lookup_w );
-WRITE16_HANDLER( karatblz_gfxbank_w );
-WRITE16_HANDLER( spinlbrk_gfxbank_w );
-WRITE16_HANDLER( turbofrc_gfxbank_w );
-WRITE16_HANDLER( aerofgt_gfxbank_w );
-WRITE16_HANDLER( aerofgt_bg1scrollx_w );
-WRITE16_HANDLER( aerofgt_bg1scrolly_w );
-WRITE16_HANDLER( aerofgt_bg2scrollx_w );
-WRITE16_HANDLER( aerofgt_bg2scrolly_w );
-WRITE16_HANDLER( pspikes_palette_bank_w );
-WRITE16_HANDLER( wbbc97_bitmap_enable_w );
 
 VIDEO_START( pspikes );
 VIDEO_START( karatblz );

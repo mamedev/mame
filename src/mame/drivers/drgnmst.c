@@ -78,8 +78,8 @@ READ8_MEMBER(drgnmst_state::drgnmst_snd_command_r)
 
 	switch (m_oki_control & 0x1f)
 	{
-		case 0x12:	data = (m_oki_2->read(*&space, 0) & 0x0f); break;
-		case 0x16:	data = (m_oki_1->read(*&space, 0) & 0x0f); break;
+		case 0x12:	data = (m_oki_2->read(space, 0) & 0x0f); break;
+		case 0x16:	data = (m_oki_1->read(space, 0) & 0x0f); break;
 		case 0x0b:
 		case 0x0f:	data = m_snd_command; break;
 		default:	break;
@@ -164,12 +164,12 @@ WRITE8_MEMBER(drgnmst_state::drgnmst_snd_control_w)
 		case 0x11:
 //                  logerror("Writing %02x to OKI1", m_oki_command);
 //                  logerror(", PortC=%02x, Code=%02x, Bank0=%01x, Bank1=%01x\n", m_oki_control, m_snd_command, m_oki0_bank, m_oki1_bank);
-					m_oki_2->write(*&space, 0, m_oki_command);
+					m_oki_2->write(space, 0, m_oki_command);
 					break;
 		case 0x15:
 //                  logerror("Writing %02x to OKI0", m_oki_command);
 //                  logerror(", PortC=%02x, Code=%02x, Bank0=%01x, Bank1=%01x\n", m_oki_control, m_snd_command, m_oki0_bank, m_oki1_bank);
-					m_oki_1->write(*&space, 0, m_oki_command);
+					m_oki_1->write(space, 0, m_oki_command);
 					break;
 		default:	break;
 	}
@@ -200,9 +200,9 @@ static ADDRESS_MAP_START( drgnmst_main_map, AS_PROGRAM, 16, drgnmst_state )
 	AM_RANGE(0x800188, 0x800189) AM_WRITE(drgnmst_snd_flag_w)
 	AM_RANGE(0x8001e0, 0x8001e1) AM_WRITENOP
 	AM_RANGE(0x900000, 0x903fff) AM_RAM_WRITE(paletteram16_xxxxRRRRGGGGBBBB_word_w) AM_SHARE("paletteram")
-	AM_RANGE(0x904000, 0x907fff) AM_RAM_WRITE_LEGACY(drgnmst_md_videoram_w) AM_BASE(m_md_videoram)
-	AM_RANGE(0x908000, 0x90bfff) AM_RAM_WRITE_LEGACY(drgnmst_bg_videoram_w) AM_BASE(m_bg_videoram)
-	AM_RANGE(0x90c000, 0x90ffff) AM_RAM_WRITE_LEGACY(drgnmst_fg_videoram_w) AM_BASE(m_fg_videoram)
+	AM_RANGE(0x904000, 0x907fff) AM_RAM_WRITE(drgnmst_md_videoram_w) AM_BASE(m_md_videoram)
+	AM_RANGE(0x908000, 0x90bfff) AM_RAM_WRITE(drgnmst_bg_videoram_w) AM_BASE(m_bg_videoram)
+	AM_RANGE(0x90c000, 0x90ffff) AM_RAM_WRITE(drgnmst_fg_videoram_w) AM_BASE(m_fg_videoram)
 	AM_RANGE(0x920000, 0x923fff) AM_RAM AM_BASE(m_rowscrollram) // rowscroll ram
 	AM_RANGE(0x930000, 0x9307ff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)	// Sprites
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM

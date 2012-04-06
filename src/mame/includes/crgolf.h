@@ -41,11 +41,11 @@ public:
 	DECLARE_READ8_MEMBER(main_to_sound_r);
 	DECLARE_WRITE8_MEMBER(sound_to_main_w);
 	DECLARE_READ8_MEMBER(sound_to_main_r);
+	DECLARE_WRITE8_MEMBER(crgolf_videoram_w);
+	DECLARE_READ8_MEMBER(crgolf_videoram_r);
 };
 
 /*----------- defined in video/crgolf.c -----------*/
 
-WRITE8_HANDLER( crgolf_videoram_w );
-READ8_HANDLER( crgolf_videoram_r );
 
 MACHINE_CONFIG_EXTERN( crgolf_video );

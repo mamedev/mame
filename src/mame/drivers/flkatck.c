@@ -93,12 +93,12 @@ WRITE8_MEMBER(flkatck_state::multiply_w)
 
 
 static ADDRESS_MAP_START( flkatck_map, AS_PROGRAM, 8, flkatck_state )
-	AM_RANGE(0x0000, 0x0007) AM_RAM_WRITE_LEGACY(flkatck_k007121_regs_w)									/* 007121 registers */
+	AM_RANGE(0x0000, 0x0007) AM_RAM_WRITE(flkatck_k007121_regs_w)									/* 007121 registers */
 	AM_RANGE(0x0008, 0x03ff) AM_RAM																	/* RAM */
 	AM_RANGE(0x0400, 0x041f) AM_READWRITE(flkatck_ls138_r, flkatck_ls138_w)							/* inputs, DIPS, bankswitch, counters, sound command */
 	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_le_w) AM_SHARE("paletteram")	/* palette */
 	AM_RANGE(0x1000, 0x1fff) AM_RAM																	/* RAM */
-	AM_RANGE(0x2000, 0x3fff) AM_RAM_WRITE_LEGACY(flkatck_k007121_w) AM_BASE(m_k007121_ram)					/* Video RAM (007121) */
+	AM_RANGE(0x2000, 0x3fff) AM_RAM_WRITE(flkatck_k007121_w) AM_BASE(m_k007121_ram)					/* Video RAM (007121) */
 	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK("bank1")															/* banked ROM */
 	AM_RANGE(0x6000, 0xffff) AM_ROM																	/* ROM */
 ADDRESS_MAP_END

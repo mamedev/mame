@@ -64,26 +64,24 @@ static TILE_GET_INFO( get_pf_tile_info )
 
 /*****************************************************************************/
 
-WRITE16_HANDLER( m107_vram_w )
+WRITE16_MEMBER(m107_state::m107_vram_w)
 {
-	m107_state *state = space->machine().driver_data<m107_state>();
 	int laynum;
 
-	COMBINE_DATA(&state->m_vram_data[offset]);
+	COMBINE_DATA(&m_vram_data[offset]);
 	for (laynum = 0; laynum < 4; laynum++)
-		if ((offset & 0x6000) == state->m_pf_layer[laynum].vram_base)
-			state->m_pf_layer[laynum].tmap->mark_tile_dirty((offset & 0x1fff) / 2);
+		if ((offset & 0x6000) == m_pf_layer[laynum].vram_base)
+			m_pf_layer[laynum].tmap->mark_tile_dirty((offset & 0x1fff) / 2);
 }
 
 /*****************************************************************************/
 
-WRITE16_HANDLER( m107_control_w )
+WRITE16_MEMBER(m107_state::m107_control_w)
 {
-	m107_state *state = space->machine().driver_data<m107_state>();
-	UINT16 old = state->m_control[offset];
+	UINT16 old = m_control[offset];
 	pf_layer_info *layer;
 
-	COMBINE_DATA(&state->m_control[offset]);
+	COMBINE_DATA(&m_control[offset]);
 
 	switch (offset*2)
 	{
@@ -91,20 +89,20 @@ WRITE16_HANDLER( m107_control_w )
 		case 0x12: /* Playfield 2 */
 		case 0x14: /* Playfield 3 */
 		case 0x16: /* Playfield 4 (bottom layer) */
-			layer = &state->m_pf_layer[offset - 0x08];
+			layer = &m_pf_layer[offset - 0x08];
 
 			/* update VRAM base (bits 8-11) */
-			layer->vram_base = ((state->m_control[offset] >> 8) & 15) * 0x800;
+			layer->vram_base = ((m_control[offset] >> 8) & 15) * 0x800;
 
 			/* update enable (bit 7) */
-			layer->tmap->enable((~state->m_control[offset] >> 7) & 1);
+			layer->tmap->enable((~m_control[offset] >> 7) & 1);
 
 			/* mark everything dirty of the VRAM base changes */
-			if ((old ^ state->m_control[offset]) & 0x0f00)
+			if ((old ^ m_control[offset]) & 0x0f00)
 				layer->tmap->mark_all_dirty();
 
-			if(state->m_control[offset] & 0xf07c)
-				printf("%04x %02x\n",state->m_control[offset],offset*2);
+			if(m_control[offset] & 0xf07c)
+				printf("%04x %02x\n",m_control[offset],offset*2);
 
 			break;
 
@@ -114,7 +112,7 @@ WRITE16_HANDLER( m107_control_w )
 			break;
 
 		case 0x1e:
-			state->m_raster_irq_position = state->m_control[offset] - 128;
+			m_raster_irq_position = m_control[offset] - 128;
 			break;
 	}
 }
@@ -369,17 +367,16 @@ static void m107_screenrefresh(running_machine &machine, bitmap_ind16 &bitmap, c
 
 /*****************************************************************************/
 
-WRITE16_HANDLER( m107_spritebuffer_w )
+WRITE16_MEMBER(m107_state::m107_spritebuffer_w)
 {
-	m107_state *state = space->machine().driver_data<m107_state>();
 	if (ACCESSING_BITS_0_7) {
 		/*
         TODO: this register looks a lot more complex than how the game uses it. All of them seems to test various bit combinations during POST.
         */
-//      logerror("%04x: buffered spriteram\n",cpu_get_pc(&space->device()));
-		state->m_sprite_display	= (!(data & 0x1000));
+//      logerror("%04x: buffered spriteram\n",cpu_get_pc(&space.device()));
+		m_sprite_display	= (!(data & 0x1000));
 
-		memcpy(state->m_buffered_spriteram, state->m_spriteram, 0x1000);
+		memcpy(m_buffered_spriteram, m_spriteram, 0x1000);
 	}
 }
 

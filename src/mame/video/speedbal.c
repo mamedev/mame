@@ -57,11 +57,10 @@ VIDEO_START( speedbal )
  *                                   *
  *************************************/
 
-WRITE8_HANDLER( speedbal_foreground_videoram_w )
+WRITE8_MEMBER(speedbal_state::speedbal_foreground_videoram_w)
 {
-	speedbal_state *state = space->machine().driver_data<speedbal_state>();
-	state->m_foreground_videoram[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset>>1);
+	m_foreground_videoram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset>>1);
 }
 
 /*************************************
@@ -70,11 +69,10 @@ WRITE8_HANDLER( speedbal_foreground_videoram_w )
  *                                   *
  *************************************/
 
-WRITE8_HANDLER( speedbal_background_videoram_w )
+WRITE8_MEMBER(speedbal_state::speedbal_background_videoram_w)
 {
-	speedbal_state *state = space->machine().driver_data<speedbal_state>();
-	state->m_background_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset>>1);
+	m_background_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset>>1);
 }
 
 

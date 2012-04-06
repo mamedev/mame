@@ -359,10 +359,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( slave_map, AS_PROGRAM, 8, airbustr_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank2")
-	AM_RANGE(0xc000, 0xc3ff) AM_RAM_WRITE_LEGACY(airbustr_videoram2_w) AM_BASE(m_videoram2)
-	AM_RANGE(0xc400, 0xc7ff) AM_RAM_WRITE_LEGACY(airbustr_colorram2_w) AM_BASE(m_colorram2)
-	AM_RANGE(0xc800, 0xcbff) AM_RAM_WRITE_LEGACY(airbustr_videoram_w) AM_BASE(m_videoram)
-	AM_RANGE(0xcc00, 0xcfff) AM_RAM_WRITE_LEGACY(airbustr_colorram_w) AM_BASE(m_colorram)
+	AM_RANGE(0xc000, 0xc3ff) AM_RAM_WRITE(airbustr_videoram2_w) AM_BASE(m_videoram2)
+	AM_RANGE(0xc400, 0xc7ff) AM_RAM_WRITE(airbustr_colorram2_w) AM_BASE(m_colorram2)
+	AM_RANGE(0xc800, 0xcbff) AM_RAM_WRITE(airbustr_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0xcc00, 0xcfff) AM_RAM_WRITE(airbustr_colorram_w) AM_BASE(m_colorram)
 	AM_RANGE(0xd000, 0xd5ff) AM_RAM_WRITE(airbustr_paletteram_w) AM_BASE(m_paletteram)
 	AM_RANGE(0xd600, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xefff) AM_RAM
@@ -373,7 +373,7 @@ static ADDRESS_MAP_START( slave_io_map, AS_IO, 8, airbustr_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(slave_bankswitch_w)
 	AM_RANGE(0x02, 0x02) AM_READWRITE(soundcommand2_r, soundcommand_w)
-	AM_RANGE(0x04, 0x0c) AM_WRITE_LEGACY(airbustr_scrollregs_w)
+	AM_RANGE(0x04, 0x0c) AM_WRITE(airbustr_scrollregs_w)
 	AM_RANGE(0x0e, 0x0e) AM_READ(soundcommand_status_r)
 	AM_RANGE(0x20, 0x20) AM_READ_PORT("P1")
 	AM_RANGE(0x22, 0x22) AM_READ_PORT("P2")

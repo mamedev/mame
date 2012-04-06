@@ -114,35 +114,31 @@ VIDEO_START( bionicc )
 
 ***************************************************************************/
 
-WRITE16_HANDLER( bionicc_bgvideoram_w )
+WRITE16_MEMBER(bionicc_state::bionicc_bgvideoram_w)
 {
-	bionicc_state *state = space->machine().driver_data<bionicc_state>();
 
-	COMBINE_DATA(&state->m_bgvideoram[offset]);
-	state->m_bg_tilemap->mark_tile_dirty(offset / 2);
+	COMBINE_DATA(&m_bgvideoram[offset]);
+	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE16_HANDLER( bionicc_fgvideoram_w )
+WRITE16_MEMBER(bionicc_state::bionicc_fgvideoram_w)
 {
-	bionicc_state *state = space->machine().driver_data<bionicc_state>();
 
-	COMBINE_DATA(&state->m_fgvideoram[offset]);
-	state->m_fg_tilemap->mark_tile_dirty(offset / 2);
+	COMBINE_DATA(&m_fgvideoram[offset]);
+	m_fg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE16_HANDLER( bionicc_txvideoram_w )
+WRITE16_MEMBER(bionicc_state::bionicc_txvideoram_w)
 {
-	bionicc_state *state = space->machine().driver_data<bionicc_state>();
 
-	COMBINE_DATA(&state->m_txvideoram[offset]);
-	state->m_tx_tilemap->mark_tile_dirty(offset & 0x3ff);
+	COMBINE_DATA(&m_txvideoram[offset]);
+	m_tx_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE16_HANDLER( bionicc_paletteram_w )
+WRITE16_MEMBER(bionicc_state::bionicc_paletteram_w)
 {
-	bionicc_state *state = space->machine().driver_data<bionicc_state>();
 	int r, g, b, bright;
-	data = COMBINE_DATA(&state->m_paletteram[offset]);
+	data = COMBINE_DATA(&m_paletteram[offset]);
 
 	bright = (data & 0x0f);
 
@@ -157,45 +153,43 @@ WRITE16_HANDLER( bionicc_paletteram_w )
 		b = b * (0x07 + bright) / 0x0e;
 	}
 
-	palette_set_color (space->machine(), offset, MAKE_RGB(r, g, b));
+	palette_set_color (machine(), offset, MAKE_RGB(r, g, b));
 }
 
-WRITE16_HANDLER( bionicc_scroll_w )
+WRITE16_MEMBER(bionicc_state::bionicc_scroll_w)
 {
-	bionicc_state *state = space->machine().driver_data<bionicc_state>();
 
-	data = COMBINE_DATA(&state->m_scroll[offset]);
+	data = COMBINE_DATA(&m_scroll[offset]);
 
 	switch (offset)
 	{
 		case 0:
-			state->m_fg_tilemap->set_scrollx(0, data);
+			m_fg_tilemap->set_scrollx(0, data);
 			break;
 		case 1:
-			state->m_fg_tilemap->set_scrolly(0, data);
+			m_fg_tilemap->set_scrolly(0, data);
 			break;
 		case 2:
-			state->m_bg_tilemap->set_scrollx(0, data);
+			m_bg_tilemap->set_scrollx(0, data);
 			break;
 		case 3:
-			state->m_bg_tilemap->set_scrolly(0, data);
+			m_bg_tilemap->set_scrolly(0, data);
 			break;
 	}
 }
 
-WRITE16_HANDLER( bionicc_gfxctrl_w )
+WRITE16_MEMBER(bionicc_state::bionicc_gfxctrl_w)
 {
-	bionicc_state *state = space->machine().driver_data<bionicc_state>();
 
 	if (ACCESSING_BITS_8_15)
 	{
-		flip_screen_set(space->machine(), data & 0x0100);
+		flip_screen_set(machine(), data & 0x0100);
 
-		state->m_bg_tilemap->enable(data & 0x2000);	/* guess */
-		state->m_fg_tilemap->enable(data & 0x1000);	/* guess */
+		m_bg_tilemap->enable(data & 0x2000);	/* guess */
+		m_fg_tilemap->enable(data & 0x1000);	/* guess */
 
-		coin_counter_w(space->machine(), 0, data & 0x8000);
-		coin_counter_w(space->machine(), 1, data & 0x4000);
+		coin_counter_w(machine(), 0, data & 0x8000);
+		coin_counter_w(machine(), 1, data & 0x4000);
 	}
 }
 

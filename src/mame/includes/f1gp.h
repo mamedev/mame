@@ -47,18 +47,18 @@ public:
 	DECLARE_READ16_MEMBER(command_pending_r);
 	DECLARE_WRITE8_MEMBER(pending_command_clear_w);
 	DECLARE_WRITE16_MEMBER(f1gpb_misc_w);
+	DECLARE_READ16_MEMBER(f1gp_zoomdata_r);
+	DECLARE_WRITE16_MEMBER(f1gp_zoomdata_w);
+	DECLARE_READ16_MEMBER(f1gp_rozvideoram_r);
+	DECLARE_WRITE16_MEMBER(f1gp_rozvideoram_w);
+	DECLARE_WRITE16_MEMBER(f1gp_fgvideoram_w);
+	DECLARE_WRITE16_MEMBER(f1gp_fgscroll_w);
+	DECLARE_WRITE16_MEMBER(f1gp_gfxctrl_w);
+	DECLARE_WRITE16_MEMBER(f1gp2_gfxctrl_w);
 };
 
 /*----------- defined in video/f1gp.c -----------*/
 
-READ16_HANDLER( f1gp_zoomdata_r );
-WRITE16_HANDLER( f1gp_zoomdata_w );
-READ16_HANDLER( f1gp_rozvideoram_r );
-WRITE16_HANDLER( f1gp_rozvideoram_w );
-WRITE16_HANDLER( f1gp_fgvideoram_w );
-WRITE16_HANDLER( f1gp_fgscroll_w );
-WRITE16_HANDLER( f1gp_gfxctrl_w );
-WRITE16_HANDLER( f1gp2_gfxctrl_w );
 
 VIDEO_START( f1gp );
 VIDEO_START( f1gpb );

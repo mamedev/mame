@@ -247,63 +247,56 @@ VIDEO_START( hrdtimes )
 
 ***************************************************************************/
 
-WRITE16_HANDLER( wbeachvl_txvideoram_w )
+WRITE16_MEMBER(playmark_state::wbeachvl_txvideoram_w)
 {
-	playmark_state *state = space->machine().driver_data<playmark_state>();
 
-	COMBINE_DATA(&state->m_videoram1[offset]);
-	state->m_tx_tilemap->mark_tile_dirty(offset / 2);
+	COMBINE_DATA(&m_videoram1[offset]);
+	m_tx_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE16_HANDLER( wbeachvl_fgvideoram_w )
+WRITE16_MEMBER(playmark_state::wbeachvl_fgvideoram_w)
 {
-	playmark_state *state = space->machine().driver_data<playmark_state>();
 
-	COMBINE_DATA(&state->m_videoram2[offset]);
-	state->m_fg_tilemap->mark_tile_dirty(offset / 2);
+	COMBINE_DATA(&m_videoram2[offset]);
+	m_fg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE16_HANDLER( wbeachvl_bgvideoram_w )
+WRITE16_MEMBER(playmark_state::wbeachvl_bgvideoram_w)
 {
-	playmark_state *state = space->machine().driver_data<playmark_state>();
 
-	COMBINE_DATA(&state->m_videoram3[offset]);
-	state->m_bg_tilemap->mark_tile_dirty(offset / 2);
+	COMBINE_DATA(&m_videoram3[offset]);
+	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE16_HANDLER( hrdtimes_txvideoram_w )
+WRITE16_MEMBER(playmark_state::hrdtimes_txvideoram_w)
 {
-	playmark_state *state = space->machine().driver_data<playmark_state>();
 
-	COMBINE_DATA(&state->m_videoram1[offset]);
-	state->m_tx_tilemap->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_videoram1[offset]);
+	m_tx_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_HANDLER( hrdtimes_fgvideoram_w )
+WRITE16_MEMBER(playmark_state::hrdtimes_fgvideoram_w)
 {
-	playmark_state *state = space->machine().driver_data<playmark_state>();
 
-	COMBINE_DATA(&state->m_videoram2[offset]);
-	state->m_fg_tilemap->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_videoram2[offset]);
+	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_HANDLER( hrdtimes_bgvideoram_w )
+WRITE16_MEMBER(playmark_state::hrdtimes_bgvideoram_w)
 {
-	playmark_state *state = space->machine().driver_data<playmark_state>();
 
-	COMBINE_DATA(&state->m_videoram3[offset]);
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_videoram3[offset]);
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE16_HANDLER( bigtwin_paletteram_w )
+WRITE16_MEMBER(playmark_state::bigtwin_paletteram_w)
 {
 	int r, g, b, val;
 
-	playmark_state *state = space->machine().driver_data<playmark_state>();
-	COMBINE_DATA(&state->m_generic_paletteram_16[offset]);
+	COMBINE_DATA(&m_generic_paletteram_16[offset]);
 
-	val = state->m_generic_paletteram_16[offset];
+	val = m_generic_paletteram_16[offset];
 	r = (val >> 11) & 0x1e;
 	g = (val >>  7) & 0x1e;
 	b = (val >>  3) & 0x1e;
@@ -312,82 +305,78 @@ WRITE16_HANDLER( bigtwin_paletteram_w )
 	g |= ((val & 0x04) >> 2);
 	b |= ((val & 0x02) >> 1);
 
-	palette_set_color_rgb(space->machine(), offset, pal5bit(r), pal5bit(g), pal5bit(b));
+	palette_set_color_rgb(machine(), offset, pal5bit(r), pal5bit(g), pal5bit(b));
 }
 
-WRITE16_HANDLER( bigtwin_scroll_w )
+WRITE16_MEMBER(playmark_state::bigtwin_scroll_w)
 {
-	playmark_state *state = space->machine().driver_data<playmark_state>();
 
-	data = COMBINE_DATA(&state->m_scroll[offset]);
+	data = COMBINE_DATA(&m_scroll[offset]);
 
 	switch (offset)
 	{
-		case 0: 	state->m_tx_tilemap->set_scrollx(0, data + 2); break;
-		case 1: 	state->m_tx_tilemap->set_scrolly(0, data);   break;
-		case 2: 	state->m_bgscrollx = -(data + 4);                    break;
-		case 3: 	state->m_bgscrolly = (-data) & 0x1ff;
-				state->m_bg_enable = data & 0x0200;
-				state->m_bg_full_size = data & 0x0400;
+		case 0: 	m_tx_tilemap->set_scrollx(0, data + 2); break;
+		case 1: 	m_tx_tilemap->set_scrolly(0, data);   break;
+		case 2: 	m_bgscrollx = -(data + 4);                    break;
+		case 3: 	m_bgscrolly = (-data) & 0x1ff;
+				m_bg_enable = data & 0x0200;
+				m_bg_full_size = data & 0x0400;
 				break;
-		case 4: 	state->m_fg_tilemap->set_scrollx(0, data + 6); break;
-		case 5: 	state->m_fg_tilemap->set_scrolly(0, data);   break;
+		case 4: 	m_fg_tilemap->set_scrollx(0, data + 6); break;
+		case 5: 	m_fg_tilemap->set_scrolly(0, data);   break;
 	}
 }
 
-WRITE16_HANDLER( wbeachvl_scroll_w )
+WRITE16_MEMBER(playmark_state::wbeachvl_scroll_w)
 {
-	playmark_state *state = space->machine().driver_data<playmark_state>();
 
-	data = COMBINE_DATA(&state->m_scroll[offset]);
+	data = COMBINE_DATA(&m_scroll[offset]);
 
 	switch (offset)
 	{
-		case 0: 	state->m_tx_tilemap->set_scrollx(0, data + 2); break;
-		case 1: 	state->m_tx_tilemap->set_scrolly(0, data);   break;
-		case 2: 	state->m_fgscrollx = data + 4;break;
-		case 3: 	state->m_fg_tilemap->set_scrolly(0, data & 0x3ff);
-				state->m_fg_rowscroll_enable = data & 0x0800;
+		case 0: 	m_tx_tilemap->set_scrollx(0, data + 2); break;
+		case 1: 	m_tx_tilemap->set_scrolly(0, data);   break;
+		case 2: 	m_fgscrollx = data + 4;break;
+		case 3: 	m_fg_tilemap->set_scrolly(0, data & 0x3ff);
+				m_fg_rowscroll_enable = data & 0x0800;
 				break;
-		case 4: 	state->m_bg_tilemap->set_scrollx(0, data + 6); break;
-		case 5: 	state->m_bg_tilemap->set_scrolly(0, data);   break;
+		case 4: 	m_bg_tilemap->set_scrollx(0, data + 6); break;
+		case 5: 	m_bg_tilemap->set_scrolly(0, data);   break;
 	}
 }
 
-WRITE16_HANDLER( excelsr_scroll_w )
+WRITE16_MEMBER(playmark_state::excelsr_scroll_w)
 {
-	playmark_state *state = space->machine().driver_data<playmark_state>();
 
-	data = COMBINE_DATA(&state->m_scroll[offset]);
+	data = COMBINE_DATA(&m_scroll[offset]);
 
 	switch (offset)
 	{
-		case 0:	state->m_tx_tilemap->set_scrollx(0, data + 2); break;
-		case 1: 	state->m_tx_tilemap->set_scrolly(0, data);   break;
-		case 2: 	state->m_bgscrollx = -data;	break;
-		case 3: 	state->m_bgscrolly = (-data + 2)& 0x1ff;
-				state->m_bg_enable = data & 0x0200;
-				state->m_bg_full_size = data & 0x0400;
+		case 0:	m_tx_tilemap->set_scrollx(0, data + 2); break;
+		case 1: 	m_tx_tilemap->set_scrolly(0, data);   break;
+		case 2: 	m_bgscrollx = -data;	break;
+		case 3: 	m_bgscrolly = (-data + 2)& 0x1ff;
+				m_bg_enable = data & 0x0200;
+				m_bg_full_size = data & 0x0400;
 				break;
-		case 4:	state->m_fg_tilemap->set_scrollx(0, data + 6); break;
-		case 5:	state->m_fg_tilemap->set_scrolly(0, data);   break;
+		case 4:	m_fg_tilemap->set_scrollx(0, data + 6); break;
+		case 5:	m_fg_tilemap->set_scrolly(0, data);   break;
 	}
 }
 
-WRITE16_HANDLER( hrdtimes_scroll_w )
+WRITE16_MEMBER(playmark_state::hrdtimes_scroll_w)
 {
-	playmark_state *state = space->machine().driver_data<playmark_state>();
 
-	data = COMBINE_DATA(&state->m_scroll[offset]);
+	data = COMBINE_DATA(&m_scroll[offset]);
 
 	switch (offset)
 	{
-		case 0: state->m_tx_tilemap->set_scrollx(0, data); break;
-		case 1: state->m_tx_tilemap->set_scrolly(0, data); break;
-		case 2: state->m_fg_tilemap->set_scrollx(0, data); break;
-		case 3: state->m_fg_tilemap->set_scrolly(0, data); break;
-		case 4: state->m_bg_tilemap->set_scrollx(0, data); break;
-		case 5: state->m_bg_tilemap->set_scrolly(0, data); break;
+		case 0: m_tx_tilemap->set_scrollx(0, data); break;
+		case 1: m_tx_tilemap->set_scrolly(0, data); break;
+		case 2: m_fg_tilemap->set_scrollx(0, data); break;
+		case 3: m_fg_tilemap->set_scrolly(0, data); break;
+		case 4: m_bg_tilemap->set_scrollx(0, data); break;
+		case 5: m_bg_tilemap->set_scrolly(0, data); break;
 	}
 }
 

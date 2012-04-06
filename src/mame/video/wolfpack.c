@@ -45,65 +45,53 @@ PALETTE_INIT( wolfpack )
 }
 
 
-WRITE8_HANDLER( wolfpack_ship_size_w )
+WRITE8_MEMBER(wolfpack_state::wolfpack_ship_size_w)
 {
-	wolfpack_state *state = space->machine().driver_data<wolfpack_state>();
-	state->m_ship_size = data;
+	m_ship_size = data;
 }
-WRITE8_HANDLER( wolfpack_video_invert_w )
+WRITE8_MEMBER(wolfpack_state::wolfpack_video_invert_w)
 {
-	wolfpack_state *state = space->machine().driver_data<wolfpack_state>();
-	state->m_video_invert = data & 1;
+	m_video_invert = data & 1;
 }
-WRITE8_HANDLER( wolfpack_ship_reflect_w )
+WRITE8_MEMBER(wolfpack_state::wolfpack_ship_reflect_w)
 {
-	wolfpack_state *state = space->machine().driver_data<wolfpack_state>();
-	state->m_ship_reflect = data & 1;
+	m_ship_reflect = data & 1;
 }
-WRITE8_HANDLER( wolfpack_pt_pos_select_w )
+WRITE8_MEMBER(wolfpack_state::wolfpack_pt_pos_select_w)
 {
-	wolfpack_state *state = space->machine().driver_data<wolfpack_state>();
-	state->m_pt_pos_select = data & 1;
+	m_pt_pos_select = data & 1;
 }
-WRITE8_HANDLER( wolfpack_pt_horz_w )
+WRITE8_MEMBER(wolfpack_state::wolfpack_pt_horz_w)
 {
-	wolfpack_state *state = space->machine().driver_data<wolfpack_state>();
-	state->m_pt_horz = data;
+	m_pt_horz = data;
 }
-WRITE8_HANDLER( wolfpack_pt_pic_w )
+WRITE8_MEMBER(wolfpack_state::wolfpack_pt_pic_w)
 {
-	wolfpack_state *state = space->machine().driver_data<wolfpack_state>();
-	state->m_pt_pic = data & 0x3f;
+	m_pt_pic = data & 0x3f;
 }
-WRITE8_HANDLER( wolfpack_ship_h_w )
+WRITE8_MEMBER(wolfpack_state::wolfpack_ship_h_w)
 {
-	wolfpack_state *state = space->machine().driver_data<wolfpack_state>();
-	state->m_ship_h = data;
+	m_ship_h = data;
 }
-WRITE8_HANDLER( wolfpack_torpedo_pic_w )
+WRITE8_MEMBER(wolfpack_state::wolfpack_torpedo_pic_w)
 {
-	wolfpack_state *state = space->machine().driver_data<wolfpack_state>();
-	state->m_torpedo_pic = data;
+	m_torpedo_pic = data;
 }
-WRITE8_HANDLER( wolfpack_ship_h_precess_w )
+WRITE8_MEMBER(wolfpack_state::wolfpack_ship_h_precess_w)
 {
-	wolfpack_state *state = space->machine().driver_data<wolfpack_state>();
-	state->m_ship_h_precess = data & 0x3f;
+	m_ship_h_precess = data & 0x3f;
 }
-WRITE8_HANDLER( wolfpack_ship_pic_w )
+WRITE8_MEMBER(wolfpack_state::wolfpack_ship_pic_w)
 {
-	wolfpack_state *state = space->machine().driver_data<wolfpack_state>();
-	state->m_ship_pic = data & 0x0f;
+	m_ship_pic = data & 0x0f;
 }
-WRITE8_HANDLER( wolfpack_torpedo_h_w )
+WRITE8_MEMBER(wolfpack_state::wolfpack_torpedo_h_w)
 {
-	wolfpack_state *state = space->machine().driver_data<wolfpack_state>();
-	state->m_torpedo_h = data;
+	m_torpedo_h = data;
 }
-WRITE8_HANDLER( wolfpack_torpedo_v_w )
+WRITE8_MEMBER(wolfpack_state::wolfpack_torpedo_v_w)
 {
-	wolfpack_state *state = space->machine().driver_data<wolfpack_state>();
-	state->m_torpedo_v = data;
+	m_torpedo_v = data;
 }
 
 

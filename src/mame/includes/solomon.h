@@ -18,16 +18,16 @@ public:
 	DECLARE_WRITE8_MEMBER(solomon_sh_command_w);
 	DECLARE_READ8_MEMBER(solomon_0xe603_r);
 	DECLARE_WRITE8_MEMBER(nmi_mask_w);
+	DECLARE_WRITE8_MEMBER(solomon_videoram_w);
+	DECLARE_WRITE8_MEMBER(solomon_colorram_w);
+	DECLARE_WRITE8_MEMBER(solomon_videoram2_w);
+	DECLARE_WRITE8_MEMBER(solomon_colorram2_w);
+	DECLARE_WRITE8_MEMBER(solomon_flipscreen_w);
 };
 
 
 /*----------- defined in video/solomon.c -----------*/
 
-WRITE8_HANDLER( solomon_videoram_w );
-WRITE8_HANDLER( solomon_colorram_w );
-WRITE8_HANDLER( solomon_videoram2_w );
-WRITE8_HANDLER( solomon_colorram2_w );
-WRITE8_HANDLER( solomon_flipscreen_w );
 
 VIDEO_START( solomon );
 SCREEN_UPDATE_IND16( solomon );

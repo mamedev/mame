@@ -92,7 +92,7 @@ READ16_MEMBER(gcpinbal_state::ioc_r)
 
 		case 0x50:
 		case 0x51:
-			return m_oki->read(*&space, 0) << 8;
+			return m_oki->read(space, 0) << 8;
 
 	}
 
@@ -144,7 +144,7 @@ WRITE16_MEMBER(gcpinbal_state::ioc_w)
 		// OKIM6295
 		case 0x50:
 		case 0x51:
-			m_oki->write(*&space, 0, data >> 8);
+			m_oki->write(space, 0, data >> 8);
 			break;
 
 		// MSM6585 ADPCM - mini emulation
@@ -231,7 +231,7 @@ static void gcp_adpcm_int( device_t *device )
 
 static ADDRESS_MAP_START( gcpinbal_map, AS_PROGRAM, 16, gcpinbal_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
-	AM_RANGE(0xc00000, 0xc03fff) AM_READWRITE_LEGACY(gcpinbal_tilemaps_word_r, gcpinbal_tilemaps_word_w) AM_BASE(m_tilemapram)
+	AM_RANGE(0xc00000, 0xc03fff) AM_READWRITE(gcpinbal_tilemaps_word_r, gcpinbal_tilemaps_word_w) AM_BASE(m_tilemapram)
 	AM_RANGE(0xc80000, 0xc80fff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)	/* sprite ram */
 	AM_RANGE(0xd00000, 0xd00fff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0xd80000, 0xd800ff) AM_READWRITE(ioc_r, ioc_w) AM_BASE(m_ioc_ram)

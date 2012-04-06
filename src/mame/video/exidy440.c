@@ -74,20 +74,18 @@ static VIDEO_START( topsecex )
  *
  *************************************/
 
-READ8_HANDLER( exidy440_videoram_r )
+READ8_MEMBER(exidy440_state::exidy440_videoram_r)
 {
-	exidy440_state *state = space->machine().driver_data<exidy440_state>();
-	UINT8 *base = &state->m_local_videoram[(*state->m_scanline * 256 + offset) * 2];
+	UINT8 *base = &m_local_videoram[(*m_scanline * 256 + offset) * 2];
 
 	/* combine the two pixel values into one byte */
 	return (base[0] << 4) | base[1];
 }
 
 
-WRITE8_HANDLER( exidy440_videoram_w )
+WRITE8_MEMBER(exidy440_state::exidy440_videoram_w)
 {
-	exidy440_state *state = space->machine().driver_data<exidy440_state>();
-	UINT8 *base = &state->m_local_videoram[(*state->m_scanline * 256 + offset) * 2];
+	UINT8 *base = &m_local_videoram[(*m_scanline * 256 + offset) * 2];
 
 	/* expand the two pixel values into two bytes */
 	base[0] = (data >> 4) & 15;
@@ -102,30 +100,28 @@ WRITE8_HANDLER( exidy440_videoram_w )
  *
  *************************************/
 
-READ8_HANDLER( exidy440_paletteram_r )
+READ8_MEMBER(exidy440_state::exidy440_paletteram_r)
 {
-	exidy440_state *state = space->machine().driver_data<exidy440_state>();
-	return state->m_local_paletteram[state->m_palettebank_io * 512 + offset];
+	return m_local_paletteram[m_palettebank_io * 512 + offset];
 }
 
 
-WRITE8_HANDLER( exidy440_paletteram_w )
+WRITE8_MEMBER(exidy440_state::exidy440_paletteram_w)
 {
-	exidy440_state *state = space->machine().driver_data<exidy440_state>();
 	/* update palette ram in the I/O bank */
-	state->m_local_paletteram[state->m_palettebank_io * 512 + offset] = data;
+	m_local_paletteram[m_palettebank_io * 512 + offset] = data;
 
 	/* if we're modifying the active palette, change the color immediately */
-	if (state->m_palettebank_io == state->m_palettebank_vis)
+	if (m_palettebank_io == m_palettebank_vis)
 	{
 		int word;
 
 		/* combine two bytes into a word */
-		offset = state->m_palettebank_vis * 512 + (offset & 0x1fe);
-		word = (state->m_local_paletteram[offset] << 8) + state->m_local_paletteram[offset + 1];
+		offset = m_palettebank_vis * 512 + (offset & 0x1fe);
+		word = (m_local_paletteram[offset] << 8) + m_local_paletteram[offset + 1];
 
 		/* extract the 5-5-5 RGB colors */
-		palette_set_color_rgb(space->machine(), offset / 2, pal5bit(word >> 10), pal5bit(word >> 5), pal5bit(word >> 0));
+		palette_set_color_rgb(machine(), offset / 2, pal5bit(word >> 10), pal5bit(word >> 5), pal5bit(word >> 0));
 	}
 }
 
@@ -137,20 +133,19 @@ WRITE8_HANDLER( exidy440_paletteram_w )
  *
  *************************************/
 
-READ8_HANDLER( exidy440_horizontal_pos_r )
+READ8_MEMBER(exidy440_state::exidy440_horizontal_pos_r)
 {
-	exidy440_state *state = space->machine().driver_data<exidy440_state>();
 	/* clear the FIRQ on a read here */
-	state->m_firq_beam = 0;
-	exidy440_update_firq(space->machine());
+	m_firq_beam = 0;
+	exidy440_update_firq(machine());
 
 	/* according to the schems, this value is only latched on an FIRQ
      * caused by collision or beam */
-	return state->m_latched_x;
+	return m_latched_x;
 }
 
 
-READ8_HANDLER( exidy440_vertical_pos_r )
+READ8_MEMBER(exidy440_state::exidy440_vertical_pos_r)
 {
 	int result;
 
@@ -158,7 +153,7 @@ READ8_HANDLER( exidy440_vertical_pos_r )
      * caused by collision or beam, ORed together with CHRCLK,
      * which probably goes off once per scanline; for now, we just
      * always return the current scanline */
-	result = space->machine().primary_screen->vpos();
+	result = machine().primary_screen->vpos();
 	return (result < 255) ? result : 255;
 }
 
@@ -170,11 +165,10 @@ READ8_HANDLER( exidy440_vertical_pos_r )
  *
  *************************************/
 
-WRITE8_HANDLER( exidy440_spriteram_w )
+WRITE8_MEMBER(exidy440_state::exidy440_spriteram_w)
 {
-	exidy440_state *state = space->machine().driver_data<exidy440_state>();
-	space->machine().primary_screen->update_partial(space->machine().primary_screen->vpos());
-	state->m_spriteram[offset] = data;
+	machine().primary_screen->update_partial(machine().primary_screen->vpos());
+	m_spriteram[offset] = data;
 }
 
 
@@ -185,44 +179,42 @@ WRITE8_HANDLER( exidy440_spriteram_w )
  *
  *************************************/
 
-WRITE8_HANDLER( exidy440_control_w )
+WRITE8_MEMBER(exidy440_state::exidy440_control_w)
 {
-	exidy440_state *state = space->machine().driver_data<exidy440_state>();
-	int oldvis = state->m_palettebank_vis;
+	int oldvis = m_palettebank_vis;
 
 	/* extract the various bits */
-	exidy440_bank_select(space->machine(), data >> 4);
-	state->m_firq_enable = (data >> 3) & 1;
-	state->m_firq_select = (data >> 2) & 1;
-	state->m_palettebank_io = (data >> 1) & 1;
-	state->m_palettebank_vis = data & 1;
+	exidy440_bank_select(machine(), data >> 4);
+	m_firq_enable = (data >> 3) & 1;
+	m_firq_select = (data >> 2) & 1;
+	m_palettebank_io = (data >> 1) & 1;
+	m_palettebank_vis = data & 1;
 
 	/* update the FIRQ in case we enabled something */
-	exidy440_update_firq(space->machine());
+	exidy440_update_firq(machine());
 
 	/* if we're swapping palettes, change all the colors */
-	if (oldvis != state->m_palettebank_vis)
+	if (oldvis != m_palettebank_vis)
 	{
 		int i;
 
 		/* pick colors from the visible bank */
-		offset = state->m_palettebank_vis * 512;
+		offset = m_palettebank_vis * 512;
 		for (i = 0; i < 256; i++, offset += 2)
 		{
 			/* extract a word and the 5-5-5 RGB components */
-			int word = (state->m_local_paletteram[offset] << 8) + state->m_local_paletteram[offset + 1];
-			palette_set_color_rgb(space->machine(), i, pal5bit(word >> 10), pal5bit(word >> 5), pal5bit(word >> 0));
+			int word = (m_local_paletteram[offset] << 8) + m_local_paletteram[offset + 1];
+			palette_set_color_rgb(machine(), i, pal5bit(word >> 10), pal5bit(word >> 5), pal5bit(word >> 0));
 		}
 	}
 }
 
 
-WRITE8_HANDLER( exidy440_interrupt_clear_w )
+WRITE8_MEMBER(exidy440_state::exidy440_interrupt_clear_w)
 {
-	exidy440_state *state = space->machine().driver_data<exidy440_state>();
 	/* clear the VBLANK FIRQ on a write here */
-	state->m_firq_vblank = 0;
-	exidy440_update_firq(space->machine());
+	m_firq_vblank = 0;
+	exidy440_update_firq(machine());
 }
 
 

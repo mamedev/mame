@@ -25,14 +25,14 @@ public:
 	DECLARE_WRITE16_MEMBER(blockout_sound_command_w);
 	DECLARE_WRITE16_MEMBER(blockout_irq6_ack_w);
 	DECLARE_WRITE16_MEMBER(blockout_irq5_ack_w);
+	DECLARE_WRITE16_MEMBER(blockout_paletteram_w);
+	DECLARE_WRITE16_MEMBER(blockout_frontcolor_w);
+	DECLARE_WRITE16_MEMBER(blockout_videoram_w);
 };
 
 
 /*----------- defined in video/blockout.c -----------*/
 
-WRITE16_HANDLER( blockout_videoram_w );
-WRITE16_HANDLER( blockout_paletteram_w );
-WRITE16_HANDLER( blockout_frontcolor_w );
 
 VIDEO_START( blockout );
 SCREEN_UPDATE_IND16( blockout );

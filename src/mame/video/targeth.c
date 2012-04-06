@@ -58,11 +58,10 @@ static TILE_GET_INFO( get_tile_info_targeth_screen1 )
 
 ***************************************************************************/
 
-WRITE16_HANDLER( targeth_vram_w )
+WRITE16_MEMBER(targeth_state::targeth_vram_w)
 {
-	targeth_state *state = space->machine().driver_data<targeth_state>();
-	state->m_videoram[offset] = data;
-	state->m_pant[(offset & 0x1fff) >> 12]->mark_tile_dirty(((offset << 1) & 0x1fff) >> 2);
+	m_videoram[offset] = data;
+	m_pant[(offset & 0x1fff) >> 12]->mark_tile_dirty(((offset << 1) & 0x1fff) >> 2);
 }
 
 

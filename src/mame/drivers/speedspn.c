@@ -108,8 +108,8 @@ static WRITE8_DEVICE_HANDLER( oki_banking_w )
 static ADDRESS_MAP_START( speedspn_map, AS_PROGRAM, 8, speedspn_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(paletteram_xxxxRRRRGGGGBBBB_le_w) AM_SHARE("paletteram")	/* RAM COLOUR */
-	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE_LEGACY(speedspn_attram_w) AM_BASE(m_attram)
-	AM_RANGE(0x9000, 0x9fff) AM_READWRITE_LEGACY(speedspn_vidram_r,speedspn_vidram_w)	/* RAM FIX / RAM OBJECTS (selected by bit 0 of port 17) */
+	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(speedspn_attram_w) AM_BASE(m_attram)
+	AM_RANGE(0x9000, 0x9fff) AM_READWRITE(speedspn_vidram_r,speedspn_vidram_w)	/* RAM FIX / RAM OBJECTS (selected by bit 0 of port 17) */
 	AM_RANGE(0xa000, 0xa7ff) AM_RAM
 	AM_RANGE(0xa800, 0xafff) AM_RAM
 	AM_RANGE(0xb000, 0xbfff) AM_RAM 											/* RAM PROGRAM */
@@ -118,14 +118,14 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( speedspn_io_map, AS_IO, 8, speedspn_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x07, 0x07) AM_WRITE_LEGACY(speedspn_global_display_w)
+	AM_RANGE(0x07, 0x07) AM_WRITE(speedspn_global_display_w)
 	AM_RANGE(0x10, 0x10) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x11, 0x11) AM_READ_PORT("P1")
 	AM_RANGE(0x12, 0x12) AM_READ_PORT("P2") AM_WRITE(speedspn_banked_rom_change)
 	AM_RANGE(0x13, 0x13) AM_READ_PORT("DSW1") AM_WRITE(speedspn_sound_w)
 	AM_RANGE(0x14, 0x14) AM_READ_PORT("DSW2")
 	AM_RANGE(0x16, 0x16) AM_READ(speedspn_irq_ack_r) // @@@ could be watchdog, value is discarded
-	AM_RANGE(0x17, 0x17) AM_WRITE_LEGACY(speedspn_banked_vidram_change)
+	AM_RANGE(0x17, 0x17) AM_WRITE(speedspn_banked_vidram_change)
 ADDRESS_MAP_END
 
 /* sound cpu */

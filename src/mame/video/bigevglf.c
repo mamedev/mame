@@ -9,49 +9,44 @@
 #include "includes/bigevglf.h"
 
 
-WRITE8_HANDLER(bigevglf_palette_w)
+WRITE8_MEMBER(bigevglf_state::bigevglf_palette_w)
 {
-	bigevglf_state *state = space->machine().driver_data<bigevglf_state>();
 	int color;
 
-	state->m_paletteram[offset] = data;
-	color = state->m_paletteram[offset & 0x3ff] | (state->m_paletteram[0x400 + (offset & 0x3ff)] << 8);
-	palette_set_color_rgb(space->machine(), offset & 0x3ff, pal4bit(color >> 4), pal4bit(color >> 0), pal4bit(color >> 8));
+	m_paletteram[offset] = data;
+	color = m_paletteram[offset & 0x3ff] | (m_paletteram[0x400 + (offset & 0x3ff)] << 8);
+	palette_set_color_rgb(machine(), offset & 0x3ff, pal4bit(color >> 4), pal4bit(color >> 0), pal4bit(color >> 8));
 }
 
-WRITE8_HANDLER( bigevglf_gfxcontrol_w )
+WRITE8_MEMBER(bigevglf_state::bigevglf_gfxcontrol_w)
 {
-	bigevglf_state *state = space->machine().driver_data<bigevglf_state>();
 
 /* bits used: 0,1,2,3
  0 and 2 select plane,
  1 and 3 select visible plane,
 */
-	state->m_plane_selected  = ((data & 4) >> 1) | (data & 1);
-	state->m_plane_visible = ((data & 8) >> 2) | ((data & 2) >> 1);
+	m_plane_selected  = ((data & 4) >> 1) | (data & 1);
+	m_plane_visible = ((data & 8) >> 2) | ((data & 2) >> 1);
 }
 
-WRITE8_HANDLER( bigevglf_vidram_addr_w )
+WRITE8_MEMBER(bigevglf_state::bigevglf_vidram_addr_w)
 {
-	bigevglf_state *state = space->machine().driver_data<bigevglf_state>();
-	state->m_vidram_bank = (data & 0xff) * 0x100;
+	m_vidram_bank = (data & 0xff) * 0x100;
 }
 
-WRITE8_HANDLER( bigevglf_vidram_w )
+WRITE8_MEMBER(bigevglf_state::bigevglf_vidram_w)
 {
-	bigevglf_state *state = space->machine().driver_data<bigevglf_state>();
 	UINT32 x, y, o;
-	o = state->m_vidram_bank + offset;
-	state->m_vidram[o + 0x10000 * state->m_plane_selected] = data;
+	o = m_vidram_bank + offset;
+	m_vidram[o + 0x10000 * m_plane_selected] = data;
 	y = o >>8;
 	x = (o & 255);
-	state->m_tmp_bitmap[state->m_plane_selected].pix16(y, x) = data;
+	m_tmp_bitmap[m_plane_selected].pix16(y, x) = data;
 }
 
-READ8_HANDLER( bigevglf_vidram_r )
+READ8_MEMBER(bigevglf_state::bigevglf_vidram_r)
 {
-	bigevglf_state *state = space->machine().driver_data<bigevglf_state>();
-	return state->m_vidram[0x10000 * state->m_plane_selected + state->m_vidram_bank + offset];
+	return m_vidram[0x10000 * m_plane_selected + m_vidram_bank + offset];
 }
 
 VIDEO_START( bigevglf )

@@ -62,20 +62,18 @@ VIDEO_START( mosaic )
 
 ***************************************************************************/
 
-WRITE8_HANDLER( mosaic_fgvideoram_w )
+WRITE8_MEMBER(mosaic_state::mosaic_fgvideoram_w)
 {
-	mosaic_state *state = space->machine().driver_data<mosaic_state>();
 
-	state->m_fgvideoram[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset / 2);
+	m_fgvideoram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE8_HANDLER( mosaic_bgvideoram_w )
+WRITE8_MEMBER(mosaic_state::mosaic_bgvideoram_w)
 {
-	mosaic_state *state = space->machine().driver_data<mosaic_state>();
 
-	state->m_bgvideoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset / 2);
+	m_bgvideoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
 

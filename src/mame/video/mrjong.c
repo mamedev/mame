@@ -68,26 +68,24 @@ PALETTE_INIT( mrjong )
 
 ***************************************************************************/
 
-WRITE8_HANDLER( mrjong_videoram_w )
+WRITE8_MEMBER(mrjong_state::mrjong_videoram_w)
 {
-	mrjong_state *state = space->machine().driver_data<mrjong_state>();
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( mrjong_colorram_w )
+WRITE8_MEMBER(mrjong_state::mrjong_colorram_w)
 {
-	mrjong_state *state = space->machine().driver_data<mrjong_state>();
-	state->m_colorram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_colorram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( mrjong_flipscreen_w )
+WRITE8_MEMBER(mrjong_state::mrjong_flipscreen_w)
 {
-	if (flip_screen_get(space->machine()) != BIT(data, 2))
+	if (flip_screen_get(machine()) != BIT(data, 2))
 	{
-		flip_screen_set(space->machine(), BIT(data, 2));
-		space->machine().tilemap().mark_all_dirty();
+		flip_screen_set(machine(), BIT(data, 2));
+		machine().tilemap().mark_all_dirty();
 	}
 }
 

@@ -165,8 +165,8 @@ WRITE8_MEMBER(suprridr_state::coin_lock_w)
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, suprridr_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x8800, 0x8bff) AM_RAM_WRITE_LEGACY(suprridr_bgram_w) AM_BASE(m_bgram)
-	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE_LEGACY(suprridr_fgram_w) AM_BASE(m_fgram)
+	AM_RANGE(0x8800, 0x8bff) AM_RAM_WRITE(suprridr_bgram_w) AM_BASE(m_bgram)
+	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE(suprridr_fgram_w) AM_BASE(m_fgram)
 	AM_RANGE(0x9800, 0x983f) AM_RAM
 	AM_RANGE(0x9840, 0x987f) AM_RAM AM_BASE(m_spriteram)
 	AM_RANGE(0x9880, 0x9bff) AM_RAM
@@ -174,12 +174,12 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, suprridr_state )
 	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("DSW") AM_WRITE(nmi_enable_w)
 	AM_RANGE(0xb002, 0xb003) AM_WRITE(coin_lock_w)
-	AM_RANGE(0xb006, 0xb006) AM_WRITE_LEGACY(suprridr_flipx_w)
-	AM_RANGE(0xb007, 0xb007) AM_WRITE_LEGACY(suprridr_flipy_w)
+	AM_RANGE(0xb006, 0xb006) AM_WRITE(suprridr_flipx_w)
+	AM_RANGE(0xb007, 0xb007) AM_WRITE(suprridr_flipy_w)
 	AM_RANGE(0xb800, 0xb800) AM_WRITE(sound_data_w)
-	AM_RANGE(0xc801, 0xc801) AM_WRITE_LEGACY(suprridr_fgdisable_w)
-	AM_RANGE(0xc802, 0xc802) AM_WRITE_LEGACY(suprridr_fgscrolly_w)
-	AM_RANGE(0xc804, 0xc804) AM_WRITE_LEGACY(suprridr_bgscrolly_w)
+	AM_RANGE(0xc801, 0xc801) AM_WRITE(suprridr_fgdisable_w)
+	AM_RANGE(0xc802, 0xc802) AM_WRITE(suprridr_fgscrolly_w)
+	AM_RANGE(0xc804, 0xc804) AM_WRITE(suprridr_bgscrolly_w)
 	AM_RANGE(0xc000, 0xefff) AM_ROM
 ADDRESS_MAP_END
 

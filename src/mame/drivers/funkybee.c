@@ -91,12 +91,12 @@ WRITE8_MEMBER(funkybee_state::funkybee_coin_counter_w)
 static ADDRESS_MAP_START( funkybee_map, AS_PROGRAM, 8, funkybee_state )
 	AM_RANGE(0x0000, 0x4fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0xa000, 0xbfff) AM_RAM_WRITE_LEGACY(funkybee_videoram_w) AM_BASE(m_videoram)
-	AM_RANGE(0xc000, 0xdfff) AM_RAM_WRITE_LEGACY(funkybee_colorram_w) AM_BASE(m_colorram)
-	AM_RANGE(0xe000, 0xe000) AM_WRITE_LEGACY(funkybee_scroll_w)
-	AM_RANGE(0xe800, 0xe800) AM_WRITE_LEGACY(funkybee_flipscreen_w)
+	AM_RANGE(0xa000, 0xbfff) AM_RAM_WRITE(funkybee_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0xc000, 0xdfff) AM_RAM_WRITE(funkybee_colorram_w) AM_BASE(m_colorram)
+	AM_RANGE(0xe000, 0xe000) AM_WRITE(funkybee_scroll_w)
+	AM_RANGE(0xe800, 0xe800) AM_WRITE(funkybee_flipscreen_w)
 	AM_RANGE(0xe802, 0xe803) AM_WRITE(funkybee_coin_counter_w)
-	AM_RANGE(0xe805, 0xe805) AM_WRITE_LEGACY(funkybee_gfx_bank_w)
+	AM_RANGE(0xe805, 0xe805) AM_WRITE(funkybee_gfx_bank_w)
 	AM_RANGE(0xf000, 0xf000) AM_READNOP	/* IRQ Ack */
 	AM_RANGE(0xf800, 0xf800) AM_READWRITE(funkybee_input_port_0_r, watchdog_reset_w)
 	AM_RANGE(0xf801, 0xf801) AM_READ_PORT("IN1")

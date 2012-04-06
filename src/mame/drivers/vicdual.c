@@ -732,7 +732,7 @@ WRITE8_MEMBER(vicdual_state::headon2_io_w)
 {
 	if (offset & 0x01)  assert_coin_status(machine());
 	if (offset & 0x02)  headon_audio_w(&space, 0, data);
-	if (offset & 0x04)  vicdual_palette_bank_w(&space, 0, data);
+	if (offset & 0x04)  vicdual_palette_bank_w(space, 0, data);
     if (offset & 0x08) { /* schematics show this as going into a shifer circuit, but never written to */ }
     if (offset & 0x10) { /* schematics show this as going to an edge connector, but never written to */ }
 	if (offset & 0x18)  logerror("********* Write to port %x\n", offset);
@@ -745,7 +745,7 @@ WRITE8_MEMBER(vicdual_state::digger_io_w)
 	if (offset & 0x02) { /* digger_audio_1_w(0, data) */ }
 	if (offset & 0x04)
 	{
-		vicdual_palette_bank_w(&space, 0, data & 0x03);
+		vicdual_palette_bank_w(space, 0, data & 0x03);
 		/* digger_audio_2_w(0, data & 0xfc); */
 	}
 
@@ -947,7 +947,7 @@ WRITE8_MEMBER(vicdual_state::invho2_io_w)
 	if (offset & 0x01)  invho2_audio_w(&space, 0, data);
 	if (offset & 0x02)  invinco_audio_w(&space, 0, data);
 	if (offset & 0x08)  assert_coin_status(machine());
-	if (offset & 0x40)  vicdual_palette_bank_w(&space, 0, data);
+	if (offset & 0x40)  vicdual_palette_bank_w(space, 0, data);
 }
 
 
@@ -956,7 +956,7 @@ WRITE8_MEMBER(vicdual_state::invds_io_w)
 	if (offset & 0x01)  invinco_audio_w(&space, 0, data);
 	if (offset & 0x02) { /* deepscan_audio_w(0, data) */ }
 	if (offset & 0x08)  assert_coin_status(machine());
-	if (offset & 0x40)  vicdual_palette_bank_w(&space, 0, data);
+	if (offset & 0x40)  vicdual_palette_bank_w(space, 0, data);
 }
 
 
@@ -965,14 +965,14 @@ WRITE8_MEMBER(vicdual_state::sspacaho_io_w)
 	if (offset & 0x01)  invho2_audio_w(&space, 0, data);
 	if (offset & 0x02) { /* s&spaceatt_audio_w(&space, 0, data) */ }
 	if (offset & 0x08)  assert_coin_status(machine());
-	if (offset & 0x40)  vicdual_palette_bank_w(&space, 0, data);
+	if (offset & 0x40)  vicdual_palette_bank_w(space, 0, data);
 }
 
 
 WRITE8_MEMBER(vicdual_state::tranqgun_io_w)
 {
 	if (offset & 0x01) { /* tranqgun_audio_w(&space, 0, data) */ }
-	if (offset & 0x02)  vicdual_palette_bank_w(&space, 0, data);
+	if (offset & 0x02)  vicdual_palette_bank_w(space, 0, data);
 	if (offset & 0x08)  assert_coin_status(machine());
 }
 
@@ -982,7 +982,7 @@ WRITE8_MEMBER(vicdual_state::spacetrk_io_w)
 	if (offset & 0x01) { /* &spacetrk_audio_w(&space, 0, data) */ }
 	if (offset & 0x02) { /* &spacetrk_audio_w(&space, 0, data) */ }
 	if (offset & 0x08)  assert_coin_status(machine());
-	if (offset & 0x40)  vicdual_palette_bank_w(&space, 0, data);
+	if (offset & 0x40)  vicdual_palette_bank_w(space, 0, data);
 }
 
 
@@ -991,14 +991,14 @@ WRITE8_MEMBER(vicdual_state::carnival_io_w)
 	if (offset & 0x01)  carnival_audio_1_w(&space, 0, data);
 	if (offset & 0x02)  carnival_audio_2_w(&space, 0, data);
 	if (offset & 0x08)  assert_coin_status(machine());
-	if (offset & 0x40)  vicdual_palette_bank_w(&space, 0, data);
+	if (offset & 0x40)  vicdual_palette_bank_w(space, 0, data);
 }
 
 
 WRITE8_MEMBER(vicdual_state::brdrline_io_w)
 {
 	if (offset & 0x01) { /* brdrline_audio_w(&space, 0, data) */ }
-	if (offset & 0x02)  vicdual_palette_bank_w(&space, 0, data);
+	if (offset & 0x02)  vicdual_palette_bank_w(space, 0, data);
 	if (offset & 0x08)  assert_coin_status(machine());
 }
 
@@ -1008,7 +1008,7 @@ WRITE8_MEMBER(vicdual_state::pulsar_io_w)
 	if (offset & 0x01)  pulsar_audio_1_w(&space, 0, data);
 	if (offset & 0x02)  pulsar_audio_2_w(&space, 0, data);
 	if (offset & 0x08)  assert_coin_status(machine());
-	if (offset & 0x40)  vicdual_palette_bank_w(&space, 0, data);
+	if (offset & 0x40)  vicdual_palette_bank_w(space, 0, data);
 }
 
 
@@ -1018,7 +1018,7 @@ WRITE8_MEMBER(vicdual_state::heiankyo_io_w)
 
 	if (offset & 0x02)
 	{
-		vicdual_palette_bank_w(&space, 0, data >> 6);
+		vicdual_palette_bank_w(space, 0, data >> 6);
 		/* heiankyo_audio_2_w(0, data & 0x3f); */
 	}
 
@@ -1031,7 +1031,7 @@ WRITE8_MEMBER(vicdual_state::alphaho_io_w)
 	if (offset & 0x01) { /* headon_audio_w(0, data) */ }
 	if (offset & 0x02) { /* alphaf_audio_w(0, data) */ }
 	if (offset & 0x08)  assert_coin_status(machine());
-	if (offset & 0x40)  vicdual_palette_bank_w(&space, 0, data);
+	if (offset & 0x40)  vicdual_palette_bank_w(space, 0, data);
 }
 
 
@@ -2066,7 +2066,7 @@ WRITE8_MEMBER(vicdual_state::samurai_io_w)
 {
 	if (offset & 0x02) { /* samurai_audio_w(0, data) */ }
 	if (offset & 0x08)  assert_coin_status(machine());
-	if (offset & 0x40)  vicdual_palette_bank_w(&space, 0, data);
+	if (offset & 0x40)  vicdual_palette_bank_w(space, 0, data);
 }
 
 
@@ -2180,7 +2180,7 @@ WRITE8_MEMBER(vicdual_state::nsub_io_w)
 {
 	if (offset & 0x01)  assert_coin_status(machine());
 	if (offset & 0x02) { /* nsub_audio_w(0, data) */ }
-	if (offset & 0x04)  vicdual_palette_bank_w(&space, 0, data);
+	if (offset & 0x04)  vicdual_palette_bank_w(space, 0, data);
 }
 
 
@@ -2276,7 +2276,7 @@ WRITE8_MEMBER(vicdual_state::invinco_io_w)
 {
 	if (offset & 0x01)  assert_coin_status(machine());
 	if (offset & 0x02)  invinco_audio_w(&space, 0, data);
-	if (offset & 0x04)  vicdual_palette_bank_w(&space, 0, data);
+	if (offset & 0x04)  vicdual_palette_bank_w(space, 0, data);
 }
 
 

@@ -59,30 +59,27 @@ static TILE_GET_INFO( field_get_tile_info )
  *
  *************************************/
 
-WRITE8_HANDLER( atarifb_alpha1_videoram_w )
+WRITE8_MEMBER(atarifb_state::atarifb_alpha1_videoram_w)
 {
-	atarifb_state *state = space->machine().driver_data<atarifb_state>();
 
-	state->m_alphap1_videoram[offset] = data;
-	state->m_alpha1_tilemap->mark_tile_dirty(offset);
+	m_alphap1_videoram[offset] = data;
+	m_alpha1_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_HANDLER( atarifb_alpha2_videoram_w )
+WRITE8_MEMBER(atarifb_state::atarifb_alpha2_videoram_w)
 {
-	atarifb_state *state = space->machine().driver_data<atarifb_state>();
 
-	state->m_alphap2_videoram[offset] = data;
-	state->m_alpha2_tilemap->mark_tile_dirty(offset);
+	m_alphap2_videoram[offset] = data;
+	m_alpha2_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_HANDLER( atarifb_field_videoram_w )
+WRITE8_MEMBER(atarifb_state::atarifb_field_videoram_w)
 {
-	atarifb_state *state = space->machine().driver_data<atarifb_state>();
 
-	state->m_field_videoram[offset] = data;
-	state->m_field_tilemap->mark_tile_dirty(offset);
+	m_field_videoram[offset] = data;
+	m_field_tilemap->mark_tile_dirty(offset);
 }
 
 

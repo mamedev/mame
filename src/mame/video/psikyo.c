@@ -94,47 +94,45 @@ static TILE_GET_INFO( get_tile_info_1 )
 }
 
 
-WRITE32_HANDLER( psikyo_vram_0_w )
+WRITE32_MEMBER(psikyo_state::psikyo_vram_0_w)
 {
-	psikyo_state *state = space->machine().driver_data<psikyo_state>();
 
-	COMBINE_DATA(&state->m_vram_0[offset]);
+	COMBINE_DATA(&m_vram_0[offset]);
 	if (ACCESSING_BITS_16_31)
 	{
-		state->m_tilemap_0_size0->mark_tile_dirty(offset * 2);
-		state->m_tilemap_0_size1->mark_tile_dirty(offset * 2);
-		state->m_tilemap_0_size2->mark_tile_dirty(offset * 2);
-		state->m_tilemap_0_size3->mark_tile_dirty(offset * 2);
+		m_tilemap_0_size0->mark_tile_dirty(offset * 2);
+		m_tilemap_0_size1->mark_tile_dirty(offset * 2);
+		m_tilemap_0_size2->mark_tile_dirty(offset * 2);
+		m_tilemap_0_size3->mark_tile_dirty(offset * 2);
 	}
 
 	if (ACCESSING_BITS_0_15)
 	{
-		state->m_tilemap_0_size0->mark_tile_dirty(offset * 2 + 1);
-		state->m_tilemap_0_size1->mark_tile_dirty(offset * 2 + 1);
-		state->m_tilemap_0_size2->mark_tile_dirty(offset * 2 + 1);
-		state->m_tilemap_0_size3->mark_tile_dirty(offset * 2 + 1);
+		m_tilemap_0_size0->mark_tile_dirty(offset * 2 + 1);
+		m_tilemap_0_size1->mark_tile_dirty(offset * 2 + 1);
+		m_tilemap_0_size2->mark_tile_dirty(offset * 2 + 1);
+		m_tilemap_0_size3->mark_tile_dirty(offset * 2 + 1);
 	}
 }
 
-WRITE32_HANDLER( psikyo_vram_1_w )
+WRITE32_MEMBER(psikyo_state::psikyo_vram_1_w)
 {
-	psikyo_state *state = space->machine().driver_data<psikyo_state>();
 
-	COMBINE_DATA(&state->m_vram_1[offset]);
+	COMBINE_DATA(&m_vram_1[offset]);
 	if (ACCESSING_BITS_16_31)
 	{
-		state->m_tilemap_1_size0->mark_tile_dirty(offset * 2);
-		state->m_tilemap_1_size1->mark_tile_dirty(offset * 2);
-		state->m_tilemap_1_size2->mark_tile_dirty(offset * 2);
-		state->m_tilemap_1_size3->mark_tile_dirty(offset * 2);
+		m_tilemap_1_size0->mark_tile_dirty(offset * 2);
+		m_tilemap_1_size1->mark_tile_dirty(offset * 2);
+		m_tilemap_1_size2->mark_tile_dirty(offset * 2);
+		m_tilemap_1_size3->mark_tile_dirty(offset * 2);
 	}
 
 	if (ACCESSING_BITS_0_15)
 	{
-		state->m_tilemap_1_size0->mark_tile_dirty(offset * 2 + 1);
-		state->m_tilemap_1_size1->mark_tile_dirty(offset * 2 + 1);
-		state->m_tilemap_1_size2->mark_tile_dirty(offset * 2 + 1);
-		state->m_tilemap_1_size3->mark_tile_dirty(offset * 2 + 1);
+		m_tilemap_1_size0->mark_tile_dirty(offset * 2 + 1);
+		m_tilemap_1_size1->mark_tile_dirty(offset * 2 + 1);
+		m_tilemap_1_size2->mark_tile_dirty(offset * 2 + 1);
+		m_tilemap_1_size3->mark_tile_dirty(offset * 2 + 1);
 	}
 }
 

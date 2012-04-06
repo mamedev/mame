@@ -54,25 +54,28 @@ public:
 
 	/* devices */
 	device_t *m_maincpu;
+	DECLARE_WRITE8_MEMBER(atarifb_out1_w);
+	DECLARE_WRITE8_MEMBER(atarifb4_out1_w);
+	DECLARE_WRITE8_MEMBER(abaseb_out1_w);
+	DECLARE_WRITE8_MEMBER(soccer_out1_w);
+	DECLARE_WRITE8_MEMBER(atarifb_out2_w);
+	DECLARE_WRITE8_MEMBER(soccer_out2_w);
+	DECLARE_WRITE8_MEMBER(atarifb_out3_w);
+	DECLARE_READ8_MEMBER(atarifb_in0_r);
+	DECLARE_READ8_MEMBER(atarifb_in2_r);
+	DECLARE_READ8_MEMBER(atarifb4_in0_r);
+	DECLARE_READ8_MEMBER(atarifb4_in2_r);
+	DECLARE_WRITE8_MEMBER(atarifb_alpha1_videoram_w);
+	DECLARE_WRITE8_MEMBER(atarifb_alpha2_videoram_w);
+	DECLARE_WRITE8_MEMBER(atarifb_field_videoram_w);
 };
 
 
 /*----------- defined in machine/atarifb.c -----------*/
 
-WRITE8_HANDLER( atarifb_out1_w );
-WRITE8_HANDLER( atarifb4_out1_w );
-WRITE8_HANDLER( abaseb_out1_w );
-WRITE8_HANDLER( soccer_out1_w );
 
-WRITE8_HANDLER( atarifb_out2_w );
-WRITE8_HANDLER( soccer_out2_w );
 
-WRITE8_HANDLER( atarifb_out3_w );
 
-READ8_HANDLER( atarifb_in0_r );
-READ8_HANDLER( atarifb_in2_r );
-READ8_HANDLER( atarifb4_in0_r );
-READ8_HANDLER( atarifb4_in2_r );
 
 
 /*----------- defined in audio/atarifb.c -----------*/
@@ -88,6 +91,3 @@ SCREEN_UPDATE_IND16( atarifb );
 SCREEN_UPDATE_IND16( abaseb );
 SCREEN_UPDATE_IND16( soccer );
 
-WRITE8_HANDLER( atarifb_alpha1_videoram_w );
-WRITE8_HANDLER( atarifb_alpha2_videoram_w );
-WRITE8_HANDLER( atarifb_field_videoram_w );

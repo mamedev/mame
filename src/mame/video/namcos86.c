@@ -159,41 +159,36 @@ VIDEO_START( namcos86 )
 
 ***************************************************************************/
 
-READ8_HANDLER( rthunder_videoram1_r )
+READ8_MEMBER(namcos86_state::rthunder_videoram1_r)
 {
-	namcos86_state *state = space->machine().driver_data<namcos86_state>();
-	return state->m_rthunder_videoram1[offset];
+	return m_rthunder_videoram1[offset];
 }
 
-WRITE8_HANDLER( rthunder_videoram1_w )
+WRITE8_MEMBER(namcos86_state::rthunder_videoram1_w)
 {
-	namcos86_state *state = space->machine().driver_data<namcos86_state>();
-	state->m_rthunder_videoram1[offset] = data;
-	state->m_bg_tilemap[offset/0x1000]->mark_tile_dirty((offset & 0xfff)/2);
+	m_rthunder_videoram1[offset] = data;
+	m_bg_tilemap[offset/0x1000]->mark_tile_dirty((offset & 0xfff)/2);
 }
 
-READ8_HANDLER( rthunder_videoram2_r )
+READ8_MEMBER(namcos86_state::rthunder_videoram2_r)
 {
-	namcos86_state *state = space->machine().driver_data<namcos86_state>();
-	return state->m_rthunder_videoram2[offset];
+	return m_rthunder_videoram2[offset];
 }
 
-WRITE8_HANDLER( rthunder_videoram2_w )
+WRITE8_MEMBER(namcos86_state::rthunder_videoram2_w)
 {
-	namcos86_state *state = space->machine().driver_data<namcos86_state>();
-	state->m_rthunder_videoram2[offset] = data;
-	state->m_bg_tilemap[2+offset/0x1000]->mark_tile_dirty((offset & 0xfff)/2);
+	m_rthunder_videoram2[offset] = data;
+	m_bg_tilemap[2+offset/0x1000]->mark_tile_dirty((offset & 0xfff)/2);
 }
 
-WRITE8_HANDLER( rthunder_tilebank_select_w )
+WRITE8_MEMBER(namcos86_state::rthunder_tilebank_select_w)
 {
-	namcos86_state *state = space->machine().driver_data<namcos86_state>();
 	int bit = BIT(offset,10);
-	if (state->m_tilebank != bit)
+	if (m_tilebank != bit)
 	{
-		state->m_tilebank = bit;
-		state->m_bg_tilemap[0]->mark_all_dirty();
-		state->m_bg_tilemap[1]->mark_all_dirty();
+		m_tilebank = bit;
+		m_bg_tilemap[0]->mark_all_dirty();
+		m_bg_tilemap[1]->mark_all_dirty();
 	}
 }
 
@@ -214,45 +209,42 @@ static void scroll_w(address_space *space, int offset, int data, int layer)
 	}
 }
 
-WRITE8_HANDLER( rthunder_scroll0_w )
+WRITE8_MEMBER(namcos86_state::rthunder_scroll0_w)
 {
-	scroll_w(space,offset,data,0);
+	scroll_w(&space,offset,data,0);
 }
-WRITE8_HANDLER( rthunder_scroll1_w )
+WRITE8_MEMBER(namcos86_state::rthunder_scroll1_w)
 {
-	scroll_w(space,offset,data,1);
+	scroll_w(&space,offset,data,1);
 }
-WRITE8_HANDLER( rthunder_scroll2_w )
+WRITE8_MEMBER(namcos86_state::rthunder_scroll2_w)
 {
-	scroll_w(space,offset,data,2);
+	scroll_w(&space,offset,data,2);
 }
-WRITE8_HANDLER( rthunder_scroll3_w )
+WRITE8_MEMBER(namcos86_state::rthunder_scroll3_w)
 {
-	scroll_w(space,offset,data,3);
-}
-
-WRITE8_HANDLER( rthunder_backcolor_w )
-{
-	namcos86_state *state = space->machine().driver_data<namcos86_state>();
-	state->m_backcolor = data;
+	scroll_w(&space,offset,data,3);
 }
 
-
-
-READ8_HANDLER( rthunder_spriteram_r )
+WRITE8_MEMBER(namcos86_state::rthunder_backcolor_w)
 {
-	namcos86_state *state = space->machine().driver_data<namcos86_state>();
-	return state->m_rthunder_spriteram[offset];
+	m_backcolor = data;
 }
 
-WRITE8_HANDLER( rthunder_spriteram_w )
+
+
+READ8_MEMBER(namcos86_state::rthunder_spriteram_r)
 {
-	namcos86_state *state = space->machine().driver_data<namcos86_state>();
-	state->m_rthunder_spriteram[offset] = data;
+	return m_rthunder_spriteram[offset];
+}
+
+WRITE8_MEMBER(namcos86_state::rthunder_spriteram_w)
+{
+	m_rthunder_spriteram[offset] = data;
 
 	/* a write to this offset tells the sprite chip to buffer the sprite list */
 	if (offset == 0x1ff2)
-		state->m_copy_sprites = 1;
+		m_copy_sprites = 1;
 }
 
 

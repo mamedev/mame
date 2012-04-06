@@ -360,7 +360,7 @@ static ADDRESS_MAP_START( panic_map, AS_PROGRAM, 8, cosmic_state )
 	AM_RANGE(0x6802, 0x6802) AM_READ_PORT("DSW")
 	AM_RANGE(0x6803, 0x6803) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x7000, 0x700b) AM_WRITE(panic_sound_output_w)
-	AM_RANGE(0x700c, 0x700e) AM_WRITE_LEGACY(cosmic_color_register_w)
+	AM_RANGE(0x700c, 0x700e) AM_WRITE(cosmic_color_register_w)
 	AM_RANGE(0x700f, 0x700f) AM_WRITE(flip_screen_w)
 	AM_RANGE(0x7800, 0x7801) AM_WRITE(panic_sound_output2_w)
 ADDRESS_MAP_END
@@ -375,7 +375,7 @@ static ADDRESS_MAP_START( cosmica_map, AS_PROGRAM, 8, cosmic_state )
 	AM_RANGE(0x6802, 0x6802) AM_READ_PORT("DSW")
 	AM_RANGE(0x6803, 0x6803) AM_READ(cosmica_pixel_clock_r)
 	AM_RANGE(0x7000, 0x700b) AM_WRITE(cosmica_sound_output_w)
-	AM_RANGE(0x700c, 0x700d) AM_WRITE_LEGACY(cosmic_color_register_w)
+	AM_RANGE(0x700c, 0x700d) AM_WRITE(cosmic_color_register_w)
 	AM_RANGE(0x700f, 0x700f) AM_WRITE(flip_screen_w)
 ADDRESS_MAP_END
 
@@ -389,7 +389,7 @@ static ADDRESS_MAP_START( cosmicg_io_map, AS_IO, 8, cosmic_state )
 	AM_RANGE(0x00, 0x00) AM_READ(cosmicg_port_0_r)
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
 	AM_RANGE(0x00, 0x15) AM_WRITE(cosmicg_output_w)
-	AM_RANGE(0x16, 0x17) AM_WRITE_LEGACY(cosmic_color_register_w)
+	AM_RANGE(0x16, 0x17) AM_WRITE(cosmic_color_register_w)
 ADDRESS_MAP_END
 
 
@@ -398,7 +398,7 @@ static ADDRESS_MAP_START( magspot_map, AS_PROGRAM, 8, cosmic_state )
 	AM_RANGE(0x3800, 0x3807) AM_READ(magspot_coinage_dip_r)
 	AM_RANGE(0x4000, 0x401f) AM_WRITEONLY AM_BASE_SIZE(m_spriteram, m_spriteram_size)
 	AM_RANGE(0x4800, 0x4800) AM_DEVWRITE_LEGACY("dac", dac_w)
-	AM_RANGE(0x480c, 0x480d) AM_WRITE_LEGACY(cosmic_color_register_w)
+	AM_RANGE(0x480c, 0x480d) AM_WRITE(cosmic_color_register_w)
 	AM_RANGE(0x480f, 0x480f) AM_WRITE(flip_screen_w)
 	AM_RANGE(0x5000, 0x5000) AM_READ_PORT("IN0")
 	AM_RANGE(0x5001, 0x5001) AM_READ_PORT("IN1")
@@ -1543,7 +1543,8 @@ static DRIVER_INIT( cosmica )
 
 static DRIVER_INIT( devzone )
 {
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x4807, 0x4807, FUNC(cosmic_background_enable_w));
+	cosmic_state *state = machine.driver_data<cosmic_state>();
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x4807, 0x4807,write8_delegate(FUNC(cosmic_state::cosmic_background_enable_w),state));
 }
 
 
@@ -1553,7 +1554,7 @@ static DRIVER_INIT( nomnlnd )
 	device_t *dac = machine.device("dac");
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x5000, 0x5001, read8_delegate(FUNC(cosmic_state::nomnlnd_port_0_1_r),state));
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0x4800, 0x4800);
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x4807, 0x4807, FUNC(cosmic_background_enable_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x4807, 0x4807, write8_delegate(FUNC(cosmic_state::cosmic_background_enable_w),state));
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(*dac, 0x480a, 0x480a, FUNC(dac_w));
 }
 

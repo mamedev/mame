@@ -749,11 +749,10 @@ VIDEO_START( ad2083 )
 }
 
 
-WRITE8_HANDLER( racknrol_tiles_bank_w )
+WRITE8_MEMBER(galaxold_state::racknrol_tiles_bank_w)
 {
-	galaxold_state *state = space->machine().driver_data<galaxold_state>();
-	state->m_racknrol_tiles_bank[offset] = data;
-	state->m_bg_tilemap->mark_all_dirty();
+	m_racknrol_tiles_bank[offset] = data;
+	m_bg_tilemap->mark_all_dirty();
 }
 
 static TILE_GET_INFO( racknrol_get_tile_info )
@@ -839,24 +838,21 @@ VIDEO_START( dambustr )
 }
 
 
-WRITE8_HANDLER( galaxold_videoram_w )
+WRITE8_MEMBER(galaxold_state::galaxold_videoram_w)
 {
-	galaxold_state *state = space->machine().driver_data<galaxold_state>();
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-READ8_HANDLER( galaxold_videoram_r )
+READ8_MEMBER(galaxold_state::galaxold_videoram_r)
 {
-	galaxold_state *state = space->machine().driver_data<galaxold_state>();
-	return state->m_videoram[offset];
+	return m_videoram[offset];
 }
 
 
-WRITE8_HANDLER( galaxold_attributesram_w )
+WRITE8_MEMBER(galaxold_state::galaxold_attributesram_w)
 {
-	galaxold_state *state = space->machine().driver_data<galaxold_state>();
-	if (state->m_attributesram[offset] != data)
+	if (m_attributesram[offset] != data)
 	{
 		if (offset & 0x01)
 		{
@@ -864,165 +860,151 @@ WRITE8_HANDLER( galaxold_attributesram_w )
 			int i;
 
 			for (i = offset >> 1; i < 0x0400; i += 32)
-				state->m_bg_tilemap->mark_tile_dirty(i);
+				m_bg_tilemap->mark_tile_dirty(i);
 		}
 		else
 		{
-			if (state->m_modify_ypos)
+			if (m_modify_ypos)
 			{
-				(*state->m_modify_ypos)(&data);
+				(*m_modify_ypos)(&data);
 			}
 
-			state->m_bg_tilemap->set_scrolly(offset >> 1, data);
+			m_bg_tilemap->set_scrolly(offset >> 1, data);
 		}
 
-		state->m_attributesram[offset] = data;
+		m_attributesram[offset] = data;
 	}
 }
 
 
-WRITE8_HANDLER( galaxold_flip_screen_x_w )
+WRITE8_MEMBER(galaxold_state::galaxold_flip_screen_x_w)
 {
-	galaxold_state *state = space->machine().driver_data<galaxold_state>();
-	if (state->m_flipscreen_x != (data & 0x01))
+	if (m_flipscreen_x != (data & 0x01))
 	{
-		state->m_flipscreen_x = data & 0x01;
+		m_flipscreen_x = data & 0x01;
 
-		state->m_bg_tilemap->set_flip((state->m_flipscreen_x ? TILEMAP_FLIPX : 0) | (state->m_flipscreen_y ? TILEMAP_FLIPY : 0));
+		m_bg_tilemap->set_flip((m_flipscreen_x ? TILEMAP_FLIPX : 0) | (m_flipscreen_y ? TILEMAP_FLIPY : 0));
 	}
 }
 
-WRITE8_HANDLER( galaxold_flip_screen_y_w )
+WRITE8_MEMBER(galaxold_state::galaxold_flip_screen_y_w)
 {
-	galaxold_state *state = space->machine().driver_data<galaxold_state>();
-	if (state->m_flipscreen_y != (data & 0x01))
+	if (m_flipscreen_y != (data & 0x01))
 	{
-		state->m_flipscreen_y = data & 0x01;
+		m_flipscreen_y = data & 0x01;
 
-		state->m_bg_tilemap->set_flip((state->m_flipscreen_x ? TILEMAP_FLIPX : 0) | (state->m_flipscreen_y ? TILEMAP_FLIPY : 0));
+		m_bg_tilemap->set_flip((m_flipscreen_x ? TILEMAP_FLIPX : 0) | (m_flipscreen_y ? TILEMAP_FLIPY : 0));
 	}
 }
 
 
 #ifdef UNUSED_FUNCTION
-WRITE8_HANDLER( gteikob2_flip_screen_x_w )
+WRITE8_MEMBER(galaxold_state::gteikob2_flip_screen_x_w)
 {
 	galaxold_flip_screen_x_w(space, offset, ~data);
 }
 
-WRITE8_HANDLER( gteikob2_flip_screen_y_w )
+WRITE8_MEMBER(galaxold_state::gteikob2_flip_screen_y_w)
 {
 	galaxold_flip_screen_y_w(space, offset, ~data);
 }
 #endif
 
 
-WRITE8_HANDLER( hotshock_flip_screen_w )
+WRITE8_MEMBER(galaxold_state::hotshock_flip_screen_w)
 {
 	galaxold_flip_screen_x_w(space, offset, data);
 	galaxold_flip_screen_y_w(space, offset, data);
 }
 
 
-WRITE8_HANDLER( scrambold_background_enable_w )
+WRITE8_MEMBER(galaxold_state::scrambold_background_enable_w)
 {
-	galaxold_state *state = space->machine().driver_data<galaxold_state>();
-	state->m_background_enable = data & 0x01;
+	m_background_enable = data & 0x01;
 }
 
-WRITE8_HANDLER( scrambold_background_red_w )
+WRITE8_MEMBER(galaxold_state::scrambold_background_red_w)
 {
-	galaxold_state *state = space->machine().driver_data<galaxold_state>();
-	state->m_background_red = data & 0x01;
+	m_background_red = data & 0x01;
 }
 
-WRITE8_HANDLER( scrambold_background_green_w )
+WRITE8_MEMBER(galaxold_state::scrambold_background_green_w)
 {
-	galaxold_state *state = space->machine().driver_data<galaxold_state>();
-	state->m_background_green = data & 0x01;
+	m_background_green = data & 0x01;
 }
 
-WRITE8_HANDLER( scrambold_background_blue_w )
+WRITE8_MEMBER(galaxold_state::scrambold_background_blue_w)
 {
-	galaxold_state *state = space->machine().driver_data<galaxold_state>();
-	state->m_background_blue = data & 0x01;
+	m_background_blue = data & 0x01;
 }
 
 
-WRITE8_HANDLER( galaxold_stars_enable_w )
+WRITE8_MEMBER(galaxold_state::galaxold_stars_enable_w)
 {
-	galaxold_state *state = space->machine().driver_data<galaxold_state>();
-	state->m_stars_on = data & 0x01;
+	m_stars_on = data & 0x01;
 
-	if (!state->m_stars_on)
+	if (!m_stars_on)
 	{
-		state->m_stars_scrollpos = 0;
+		m_stars_scrollpos = 0;
 	}
 }
 
 
-WRITE8_HANDLER( darkplnt_bullet_color_w )
+WRITE8_MEMBER(galaxold_state::darkplnt_bullet_color_w)
 {
-	galaxold_state *state = space->machine().driver_data<galaxold_state>();
-	state->m_darkplnt_bullet_color = data & 0x01;
+	m_darkplnt_bullet_color = data & 0x01;
 }
 
 
 
-WRITE8_HANDLER( galaxold_gfxbank_w )
+WRITE8_MEMBER(galaxold_state::galaxold_gfxbank_w)
 {
-	galaxold_state *state = space->machine().driver_data<galaxold_state>();
-	if (state->m_gfxbank[offset] != data)
+	if (m_gfxbank[offset] != data)
 	{
-		state->m_gfxbank[offset] = data;
+		m_gfxbank[offset] = data;
 
-		state->m_bg_tilemap->mark_all_dirty();
+		m_bg_tilemap->mark_all_dirty();
 	}
 }
 
-WRITE8_HANDLER( rockclim_videoram_w )
+WRITE8_MEMBER(galaxold_state::rockclim_videoram_w)
 {
-	galaxold_state *state = space->machine().driver_data<galaxold_state>();
-	state->m_rockclim_videoram[offset] = data;
-	state->m_rockclim_tilemap->mark_tile_dirty(offset);
+	m_rockclim_videoram[offset] = data;
+	m_rockclim_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( rockclim_scroll_w )
+WRITE8_MEMBER(galaxold_state::rockclim_scroll_w)
 {
-	galaxold_state *state = space->machine().driver_data<galaxold_state>();
 	switch(offset&3)
 	{
-		case 0: state->m_rockclim_h=(state->m_rockclim_h&0xff00)|data;state->m_rockclim_tilemap ->set_scrollx(0, state->m_rockclim_h );break;
-		case 1:	state->m_rockclim_h=(state->m_rockclim_h&0xff)|(data<<8);state->m_rockclim_tilemap ->set_scrollx(0, state->m_rockclim_h );break;
-		case 2:	state->m_rockclim_v=(state->m_rockclim_v&0xff00)|data;state->m_rockclim_tilemap ->set_scrolly(0, state->m_rockclim_v );break;
-		case 3:	state->m_rockclim_v=(state->m_rockclim_v&0xff)|(data<<8);state->m_rockclim_tilemap ->set_scrolly(0, state->m_rockclim_v );break;
+		case 0: m_rockclim_h=(m_rockclim_h&0xff00)|data;m_rockclim_tilemap ->set_scrollx(0, m_rockclim_h );break;
+		case 1:	m_rockclim_h=(m_rockclim_h&0xff)|(data<<8);m_rockclim_tilemap ->set_scrollx(0, m_rockclim_h );break;
+		case 2:	m_rockclim_v=(m_rockclim_v&0xff00)|data;m_rockclim_tilemap ->set_scrolly(0, m_rockclim_v );break;
+		case 3:	m_rockclim_v=(m_rockclim_v&0xff)|(data<<8);m_rockclim_tilemap ->set_scrolly(0, m_rockclim_v );break;
 	}
 
 }
 
 
-READ8_HANDLER( rockclim_videoram_r )
+READ8_MEMBER(galaxold_state::rockclim_videoram_r)
 {
-	galaxold_state *state = space->machine().driver_data<galaxold_state>();
-	return state->m_rockclim_videoram[offset];
+	return m_rockclim_videoram[offset];
 }
 
 
-WRITE8_HANDLER( dambustr_bg_split_line_w )
+WRITE8_MEMBER(galaxold_state::dambustr_bg_split_line_w)
 {
-	galaxold_state *state = space->machine().driver_data<galaxold_state>();
-	state->m_dambustr_bg_split_line = data;
+	m_dambustr_bg_split_line = data;
 }
 
 
-WRITE8_HANDLER( dambustr_bg_color_w )
+WRITE8_MEMBER(galaxold_state::dambustr_bg_color_w)
 {
-	galaxold_state *state = space->machine().driver_data<galaxold_state>();
-	state->m_dambustr_bg_color_1 = (BIT(data,2)<<2) | (BIT(data,1)<<1) | BIT(data,0);
-	state->m_dambustr_bg_color_2 = (BIT(data,6)<<2) | (BIT(data,5)<<1) | BIT(data,4);
-	state->m_dambustr_bg_priority = BIT(data,3);
-	state->m_dambustr_char_bank = BIT(data,7);
-	state->m_bg_tilemap->mark_all_dirty();
+	m_dambustr_bg_color_1 = (BIT(data,2)<<2) | (BIT(data,1)<<1) | BIT(data,0);
+	m_dambustr_bg_color_2 = (BIT(data,6)<<2) | (BIT(data,5)<<1) | BIT(data,4);
+	m_dambustr_bg_priority = BIT(data,3);
+	m_dambustr_char_bank = BIT(data,7);
+	m_bg_tilemap->mark_all_dirty();
 }
 
 

@@ -7,16 +7,14 @@
 #include "video/kan_pand.h"
 #include "includes/djboy.h"
 
-WRITE8_HANDLER( djboy_scrollx_w )
+WRITE8_MEMBER(djboy_state::djboy_scrollx_w)
 {
-	djboy_state *state = space->machine().driver_data<djboy_state>();
-	state->m_scrollx = data;
+	m_scrollx = data;
 }
 
-WRITE8_HANDLER( djboy_scrolly_w )
+WRITE8_MEMBER(djboy_state::djboy_scrolly_w)
 {
-	djboy_state *state = space->machine().driver_data<djboy_state>();
-	state->m_scrolly = data;
+	m_scrolly = data;
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
@@ -32,12 +30,11 @@ static TILE_GET_INFO( get_bg_tile_info )
 	SET_TILE_INFO(1, code, color, 0);	/* no flip */
 }
 
-WRITE8_HANDLER( djboy_videoram_w )
+WRITE8_MEMBER(djboy_state::djboy_videoram_w)
 {
-	djboy_state *state = space->machine().driver_data<djboy_state>();
 
-	state->m_videoram[offset] = data;
-	state->m_background->mark_tile_dirty(offset & 0x7ff);
+	m_videoram[offset] = data;
+	m_background->mark_tile_dirty(offset & 0x7ff);
 }
 
 VIDEO_START( djboy )
@@ -46,16 +43,15 @@ VIDEO_START( djboy )
 	state->m_background = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 16, 16, 64, 32);
 }
 
-WRITE8_HANDLER( djboy_paletteram_w )
+WRITE8_MEMBER(djboy_state::djboy_paletteram_w)
 {
-	djboy_state *state = space->machine().driver_data<djboy_state>();
 	int val;
 
-	state->m_paletteram[offset] = data;
+	m_paletteram[offset] = data;
 	offset &= ~1;
-	val = (state->m_paletteram[offset] << 8) | state->m_paletteram[offset + 1];
+	val = (m_paletteram[offset] << 8) | m_paletteram[offset + 1];
 
-	palette_set_color_rgb(space->machine(), offset / 2, pal4bit(val >> 8), pal4bit(val >> 4), pal4bit(val >> 0));
+	palette_set_color_rgb(machine(), offset / 2, pal4bit(val >> 8), pal4bit(val >> 4), pal4bit(val >> 0));
 }
 
 SCREEN_UPDATE_IND16( djboy )

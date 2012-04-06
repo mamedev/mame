@@ -65,36 +65,31 @@ PALETTE_INIT( wiz )
 	}
 }
 
-WRITE8_HANDLER( wiz_palettebank_w )
+WRITE8_MEMBER(wiz_state::wiz_palettebank_w)
 {
-	wiz_state *state = space->machine().driver_data<wiz_state>();
-	state->m_palbank[offset] = data & 1;
-	state->m_palette_bank = state->m_palbank[0] + 2 * state->m_palbank[1];
+	m_palbank[offset] = data & 1;
+	m_palette_bank = m_palbank[0] + 2 * m_palbank[1];
 }
 
-WRITE8_HANDLER( wiz_bgcolor_w )
+WRITE8_MEMBER(wiz_state::wiz_bgcolor_w)
 {
-	wiz_state *state = space->machine().driver_data<wiz_state>();
-	state->m_bgpen = data;
+	m_bgpen = data;
 }
 
-WRITE8_HANDLER( wiz_char_bank_select_w )
+WRITE8_MEMBER(wiz_state::wiz_char_bank_select_w)
 {
-	wiz_state *state = space->machine().driver_data<wiz_state>();
-	state->m_char_bank[offset] = data & 1;
+	m_char_bank[offset] = data & 1;
 }
 
-WRITE8_HANDLER( wiz_flipx_w )
+WRITE8_MEMBER(wiz_state::wiz_flipx_w)
 {
-	wiz_state *state = space->machine().driver_data<wiz_state>();
-	state->m_flipx = data;
+	m_flipx = data;
 }
 
 
-WRITE8_HANDLER( wiz_flipy_w )
+WRITE8_MEMBER(wiz_state::wiz_flipy_w)
 {
-	wiz_state *state = space->machine().driver_data<wiz_state>();
-	state->m_flipy = data;
+	m_flipy = data;
 }
 
 static void draw_background(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int bank, int colortype)

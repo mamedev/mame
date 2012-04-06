@@ -24,11 +24,11 @@ public:
 	device_t *m_k007420;
 	DECLARE_WRITE8_MEMBER(battlnts_sh_irqtrigger_w);
 	DECLARE_WRITE8_MEMBER(battlnts_bankswitch_w);
+	DECLARE_WRITE8_MEMBER(battlnts_spritebank_w);
 };
 
 /*----------- defined in video/battlnts.c -----------*/
 
-WRITE8_HANDLER( battlnts_spritebank_w );
 
 SCREEN_UPDATE_IND16( battlnts );
 

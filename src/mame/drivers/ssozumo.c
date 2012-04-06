@@ -24,18 +24,18 @@ WRITE8_MEMBER(ssozumo_state::ssozumo_sh_command_w)
 static ADDRESS_MAP_START( ssozumo_map, AS_PROGRAM, 8, ssozumo_state )
 	AM_RANGE(0x0000, 0x077f) AM_RAM
 	AM_RANGE(0x0780, 0x07ff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
-	AM_RANGE(0x2000, 0x23ff) AM_RAM_WRITE_LEGACY(ssozumo_videoram2_w) AM_BASE(m_videoram2)
-	AM_RANGE(0x2400, 0x27ff) AM_RAM_WRITE_LEGACY(ssozumo_colorram2_w) AM_BASE(m_colorram2)
-	AM_RANGE(0x3000, 0x31ff) AM_RAM_WRITE_LEGACY(ssozumo_videoram_w) AM_BASE(m_videoram)
-	AM_RANGE(0x3200, 0x33ff) AM_RAM_WRITE_LEGACY(ssozumo_colorram_w) AM_BASE(m_colorram)
+	AM_RANGE(0x2000, 0x23ff) AM_RAM_WRITE(ssozumo_videoram2_w) AM_BASE(m_videoram2)
+	AM_RANGE(0x2400, 0x27ff) AM_RAM_WRITE(ssozumo_colorram2_w) AM_BASE(m_colorram2)
+	AM_RANGE(0x3000, 0x31ff) AM_RAM_WRITE(ssozumo_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0x3200, 0x33ff) AM_RAM_WRITE(ssozumo_colorram_w) AM_BASE(m_colorram)
 	AM_RANGE(0x3400, 0x35ff) AM_RAM
 	AM_RANGE(0x3600, 0x37ff) AM_RAM
-	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("P1") AM_WRITE_LEGACY(ssozumo_flipscreen_w)
+	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("P1") AM_WRITE(ssozumo_flipscreen_w)
 	AM_RANGE(0x4010, 0x4010) AM_READ_PORT("P2") AM_WRITE(ssozumo_sh_command_w)
-	AM_RANGE(0x4020, 0x4020) AM_READ_PORT("DSW2") AM_WRITE_LEGACY(ssozumo_scroll_w)
+	AM_RANGE(0x4020, 0x4020) AM_READ_PORT("DSW2") AM_WRITE(ssozumo_scroll_w)
 	AM_RANGE(0x4030, 0x4030) AM_READ_PORT("DSW1")
 //  AM_RANGE(0x4030, 0x4030) AM_WRITEONLY
-	AM_RANGE(0x4050, 0x407f) AM_RAM_WRITE_LEGACY(ssozumo_paletteram_w) AM_BASE(m_paletteram)
+	AM_RANGE(0x4050, 0x407f) AM_RAM_WRITE(ssozumo_paletteram_w) AM_BASE(m_paletteram)
 	AM_RANGE(0x6000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

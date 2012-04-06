@@ -357,38 +357,35 @@ VIDEO_START( mappy )
 
 ***************************************************************************/
 
-WRITE8_HANDLER( superpac_videoram_w )
+WRITE8_MEMBER(mappy_state::superpac_videoram_w)
 {
-	mappy_state *state = space->machine().driver_data<mappy_state>();
 
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_HANDLER( mappy_videoram_w )
+WRITE8_MEMBER(mappy_state::mappy_videoram_w)
 {
-	mappy_state *state = space->machine().driver_data<mappy_state>();
 
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset & 0x7ff);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset & 0x7ff);
 }
 
-WRITE8_HANDLER( superpac_flipscreen_w )
+WRITE8_MEMBER(mappy_state::superpac_flipscreen_w)
 {
-	flip_screen_set(space->machine(), data & 1);
+	flip_screen_set(machine(), data & 1);
 }
 
-READ8_HANDLER( superpac_flipscreen_r )
+READ8_MEMBER(mappy_state::superpac_flipscreen_r)
 {
-	flip_screen_set(space->machine(), 1);
+	flip_screen_set(machine(), 1);
 	return 0xff;
 }
 
-WRITE8_HANDLER( mappy_scroll_w )
+WRITE8_MEMBER(mappy_state::mappy_scroll_w)
 {
-	mappy_state *state = space->machine().driver_data<mappy_state>();
 
-	state->m_scroll = offset >> 3;
+	m_scroll = offset >> 3;
 }
 
 

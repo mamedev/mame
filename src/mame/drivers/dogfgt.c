@@ -60,19 +60,19 @@ WRITE8_MEMBER(dogfgt_state::dogfgt_soundcontrol_w)
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, dogfgt_state )
 	AM_RANGE(0x0000, 0x07ff) AM_READWRITE(sharedram_r, sharedram_w) AM_BASE(m_sharedram)
 	AM_RANGE(0x0f80, 0x0fdf) AM_WRITEONLY AM_BASE_SIZE(m_spriteram, m_spriteram_size)
-	AM_RANGE(0x1000, 0x17ff) AM_WRITE_LEGACY(dogfgt_bgvideoram_w) AM_BASE(m_bgvideoram)
+	AM_RANGE(0x1000, 0x17ff) AM_WRITE(dogfgt_bgvideoram_w) AM_BASE(m_bgvideoram)
 	AM_RANGE(0x1800, 0x1800) AM_READ_PORT("P1")
-	AM_RANGE(0x1800, 0x1800) AM_WRITE_LEGACY(dogfgt_1800_w)	/* text color, flip screen & coin counters */
+	AM_RANGE(0x1800, 0x1800) AM_WRITE(dogfgt_1800_w)	/* text color, flip screen & coin counters */
 	AM_RANGE(0x1810, 0x1810) AM_READ_PORT("P2")
 	AM_RANGE(0x1810, 0x1810) AM_WRITE(subirqtrigger_w)
 	AM_RANGE(0x1820, 0x1820) AM_READ_PORT("DSW1")
-	AM_RANGE(0x1820, 0x1823) AM_WRITE_LEGACY(dogfgt_scroll_w)
-	AM_RANGE(0x1824, 0x1824) AM_WRITE_LEGACY(dogfgt_plane_select_w)
+	AM_RANGE(0x1820, 0x1823) AM_WRITE(dogfgt_scroll_w)
+	AM_RANGE(0x1824, 0x1824) AM_WRITE(dogfgt_plane_select_w)
 	AM_RANGE(0x1830, 0x1830) AM_READ_PORT("DSW2")
 	AM_RANGE(0x1830, 0x1830) AM_WRITE(dogfgt_soundlatch_w)
 	AM_RANGE(0x1840, 0x1840) AM_WRITE(dogfgt_soundcontrol_w)
 	AM_RANGE(0x1870, 0x187f) AM_WRITE(paletteram_BBGGGRRR_w) AM_SHARE("paletteram")
-	AM_RANGE(0x2000, 0x3fff) AM_READWRITE_LEGACY(dogfgt_bitmapram_r, dogfgt_bitmapram_w)
+	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(dogfgt_bitmapram_r, dogfgt_bitmapram_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

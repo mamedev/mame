@@ -45,15 +45,15 @@ public:
 	DECLARE_READ8_MEMBER(snd_z80_r);
 	DECLARE_WRITE8_MEMBER(snd_z80_w);
 	DECLARE_WRITE8_MEMBER(snd_ymf278b_w);
+	DECLARE_WRITE32_MEMBER(fuuki32_vram_0_w);
+	DECLARE_WRITE32_MEMBER(fuuki32_vram_1_w);
+	DECLARE_WRITE32_MEMBER(fuuki32_vram_2_w);
+	DECLARE_WRITE32_MEMBER(fuuki32_vram_3_w);
 };
 
 
 /*----------- defined in video/fuuki32.c -----------*/
 
-WRITE32_HANDLER( fuuki32_vram_0_w );
-WRITE32_HANDLER( fuuki32_vram_1_w );
-WRITE32_HANDLER( fuuki32_vram_2_w );
-WRITE32_HANDLER( fuuki32_vram_3_w );
 
 VIDEO_START( fuuki32 );
 SCREEN_UPDATE_IND16( fuuki32 );

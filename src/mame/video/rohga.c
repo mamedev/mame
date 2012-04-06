@@ -9,12 +9,11 @@
 #include "video/deco16ic.h"
 #include "video/decospr.h"
 
-WRITE16_HANDLER( rohga_buffer_spriteram16_w )
+WRITE16_MEMBER(rohga_state::rohga_buffer_spriteram16_w)
 {
 	// Spriteram seems to be triple buffered (no sprite lag on real pcb, but there
 	// is on driver with only double buffering)
-	rohga_state *state = space->machine().driver_data<rohga_state>();
-	state->m_spriteram->copy();
+	m_spriteram->copy();
 }
 
 VIDEO_START( rohga )

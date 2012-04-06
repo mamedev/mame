@@ -47,6 +47,7 @@ public:
 	device_t *m_mcu;
 	DECLARE_WRITE8_MEMBER(matmania_sh_command_w);
 	DECLARE_WRITE8_MEMBER(maniach_sh_command_w);
+	DECLARE_WRITE8_MEMBER(matmania_paletteram_w);
 };
 
 /*----------- defined in machine/maniach.c -----------*/
@@ -67,7 +68,6 @@ READ8_HANDLER( maniach_mcu_status_r );
 
 /*----------- defined in video/matmania.c -----------*/
 
-WRITE8_HANDLER( matmania_paletteram_w );
 PALETTE_INIT( matmania );
 SCREEN_UPDATE_IND16( maniach );
 VIDEO_START( matmania );

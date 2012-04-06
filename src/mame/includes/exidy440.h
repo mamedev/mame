@@ -41,6 +41,15 @@ public:
 	DECLARE_READ8_MEMBER(claypign_protection_r);
 	DECLARE_READ8_MEMBER(topsecex_input_port_5_r);
 	DECLARE_WRITE8_MEMBER(topsecex_yscroll_w);
+	DECLARE_READ8_MEMBER(exidy440_videoram_r);
+	DECLARE_WRITE8_MEMBER(exidy440_videoram_w);
+	DECLARE_READ8_MEMBER(exidy440_paletteram_r);
+	DECLARE_WRITE8_MEMBER(exidy440_paletteram_w);
+	DECLARE_READ8_MEMBER(exidy440_horizontal_pos_r);
+	DECLARE_READ8_MEMBER(exidy440_vertical_pos_r);
+	DECLARE_WRITE8_MEMBER(exidy440_spriteram_w);
+	DECLARE_WRITE8_MEMBER(exidy440_control_w);
+	DECLARE_WRITE8_MEMBER(exidy440_interrupt_clear_w);
 };
 
 
@@ -53,15 +62,6 @@ void exidy440_bank_select(running_machine &machine, UINT8 bank);
 
 INTERRUPT_GEN( exidy440_vblank_interrupt );
 
-READ8_HANDLER( exidy440_videoram_r );
-WRITE8_HANDLER( exidy440_videoram_w );
-READ8_HANDLER( exidy440_paletteram_r );
-WRITE8_HANDLER( exidy440_paletteram_w );
-WRITE8_HANDLER( exidy440_spriteram_w );
-WRITE8_HANDLER( exidy440_control_w );
-READ8_HANDLER( exidy440_vertical_pos_r );
-READ8_HANDLER( exidy440_horizontal_pos_r );
-WRITE8_HANDLER( exidy440_interrupt_clear_w );
 
 MACHINE_CONFIG_EXTERN( exidy440_video );
 MACHINE_CONFIG_EXTERN( topsecex_video );

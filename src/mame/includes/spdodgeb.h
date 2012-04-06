@@ -38,6 +38,9 @@ public:
 	DECLARE_READ8_MEMBER(mcu63701_r);
 	DECLARE_WRITE8_MEMBER(mcu63701_w);
 	DECLARE_READ8_MEMBER(port_0_r);
+	DECLARE_WRITE8_MEMBER(spdodgeb_scrollx_lo_w);
+	DECLARE_WRITE8_MEMBER(spdodgeb_ctrl_w);
+	DECLARE_WRITE8_MEMBER(spdodgeb_videoram_w);
 };
 
 
@@ -47,6 +50,3 @@ PALETTE_INIT( spdodgeb );
 VIDEO_START( spdodgeb );
 SCREEN_UPDATE_IND16( spdodgeb );
 TIMER_DEVICE_CALLBACK( spdodgeb_interrupt );
-WRITE8_HANDLER( spdodgeb_scrollx_lo_w );
-WRITE8_HANDLER( spdodgeb_ctrl_w );
-WRITE8_HANDLER( spdodgeb_videoram_w );

@@ -41,12 +41,11 @@ static TILE_GET_INFO( get_xyonix_tile_info )
 	SET_TILE_INFO(0,tileno,attr >> 4,0);
 }
 
-WRITE8_HANDLER( xyonix_vidram_w )
+WRITE8_MEMBER(xyonix_state::xyonix_vidram_w)
 {
-	xyonix_state *state = space->machine().driver_data<xyonix_state>();
 
-	state->m_vidram[offset] = data;
-	state->m_tilemap->mark_tile_dirty((offset-1)&0x0fff);
+	m_vidram[offset] = data;
+	m_tilemap->mark_tile_dirty((offset-1)&0x0fff);
 }
 
 VIDEO_START(xyonix)

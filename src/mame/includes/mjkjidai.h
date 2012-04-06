@@ -19,6 +19,8 @@ public:
 	UINT8 m_nmi_mask;
 	DECLARE_READ8_MEMBER(keyboard_r);
 	DECLARE_WRITE8_MEMBER(keyboard_select_w);
+	DECLARE_WRITE8_MEMBER(mjkjidai_videoram_w);
+	DECLARE_WRITE8_MEMBER(mjkjidai_ctrl_w);
 };
 
 
@@ -26,7 +28,5 @@ public:
 
 VIDEO_START( mjkjidai );
 SCREEN_UPDATE_IND16( mjkjidai );
-WRITE8_HANDLER( mjkjidai_videoram_w );
-WRITE8_HANDLER( mjkjidai_ctrl_w );
 
 

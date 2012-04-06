@@ -14,40 +14,39 @@ Data East machine functions - Bryan McPhail, mish@tendril.co.uk
 
 /******************************************************************************/
 
-READ16_HANDLER( dec0_controls_r )
+READ16_MEMBER(dec0_state::dec0_controls_r)
 {
-	dec0_state *state = space->machine().driver_data<dec0_state>();
 	switch (offset<<1)
 	{
 		case 0: /* Player 1 & 2 joystick & buttons */
-			return input_port_read(space->machine(), "INPUTS");
+			return input_port_read(machine(), "INPUTS");
 
 		case 2: /* Credits, start buttons */
-			return input_port_read(space->machine(), "SYSTEM");
+			return input_port_read(machine(), "SYSTEM");
 
 		case 4: /* Byte 4: Dipswitch bank 2, Byte 5: Dipswitch Bank 1 */
-			return input_port_read(space->machine(), "DSW");
+			return input_port_read(machine(), "DSW");
 
 		case 8: /* Intel 8751 mc, Bad Dudes & Heavy Barrel only */
-			//logerror("CPU #0 PC %06x: warning - read i8751 %06x - %04x\n", cpu_get_pc(&space->device()), 0x30c000+offset, state->m_i8751_return);
-			return state->m_i8751_return;
+			//logerror("CPU #0 PC %06x: warning - read i8751 %06x - %04x\n", cpu_get_pc(&space.device()), 0x30c000+offset, m_i8751_return);
+			return m_i8751_return;
 	}
 
-	logerror("CPU #0 PC %06x: warning - read unmapped memory address %06x\n", cpu_get_pc(&space->device()), 0x30c000+offset);
+	logerror("CPU #0 PC %06x: warning - read unmapped memory address %06x\n", cpu_get_pc(&space.device()), 0x30c000+offset);
 	return ~0;
 }
 
 /******************************************************************************/
 
-READ16_HANDLER( dec0_rotary_r )
+READ16_MEMBER(dec0_state::dec0_rotary_r)
 {
 	switch (offset<<1)
 	{
 		case 0: /* Player 1 rotary */
-			return ~(1 << input_port_read(space->machine(), "AN0"));
+			return ~(1 << input_port_read(machine(), "AN0"));
 
 		case 8: /* Player 2 rotary */
-			return ~(1 << input_port_read(space->machine(), "AN1"));
+			return ~(1 << input_port_read(machine(), "AN1"));
 
 		default:
 			logerror("Unknown rotary read at 300000 %02x\n", offset);
@@ -58,30 +57,30 @@ READ16_HANDLER( dec0_rotary_r )
 
 /******************************************************************************/
 
-READ16_HANDLER( midres_controls_r )
+READ16_MEMBER(dec0_state::midres_controls_r)
 {
 	switch (offset<<1)
 	{
 		case 0: /* Player 1 Joystick + start, Player 2 Joystick + start */
-			return input_port_read(space->machine(), "INPUTS");
+			return input_port_read(machine(), "INPUTS");
 
 		case 2: /* Dipswitches */
-			return input_port_read(space->machine(), "DSW");
+			return input_port_read(machine(), "DSW");
 
 		case 4: /* Player 1 rotary */
-			return ~(1 << input_port_read(space->machine(), "AN0"));
+			return ~(1 << input_port_read(machine(), "AN0"));
 
 		case 6: /* Player 2 rotary */
-			return ~(1 << input_port_read(space->machine(), "AN1"));
+			return ~(1 << input_port_read(machine(), "AN1"));
 
 		case 8: /* Credits, start buttons */
-			return input_port_read(space->machine(), "SYSTEM");
+			return input_port_read(machine(), "SYSTEM");
 
 		case 12:
 			return 0;	/* ?? watchdog ?? */
 	}
 
-	logerror("PC %06x unknown control read at %02x\n", cpu_get_pc(&space->device()), 0x180000+offset);
+	logerror("PC %06x unknown control read at %02x\n", cpu_get_pc(&space.device()), 0x180000+offset);
 	return ~0;
 }
 
@@ -90,48 +89,42 @@ READ16_HANDLER( midres_controls_r )
 /******************************************************************************/
 
 
-READ8_HANDLER( hippodrm_prot_r )
+READ8_MEMBER(dec0_state::hippodrm_prot_r)
 {
-	dec0_state *state = space->machine().driver_data<dec0_state>();
 //logerror("6280 PC %06x - Read %06x\n",cpu_getpc(),offset+0x1d0000);
-	if (state->m_hippodrm_lsb==0x45) return 0x4e;
-	if (state->m_hippodrm_lsb==0x92) return 0x15;
+	if (m_hippodrm_lsb==0x45) return 0x4e;
+	if (m_hippodrm_lsb==0x92) return 0x15;
 	return 0;
 }
 
-WRITE8_HANDLER( hippodrm_prot_w )
+WRITE8_MEMBER(dec0_state::hippodrm_prot_w)
 {
-	dec0_state *state = space->machine().driver_data<dec0_state>();
 	switch (offset) {
-		case 4:	state->m_hippodrm_msb=data; break;
-		case 5:	state->m_hippodrm_lsb=data; break;
+		case 4:	m_hippodrm_msb=data; break;
+		case 5:	m_hippodrm_lsb=data; break;
 	}
 //logerror("6280 PC %06x - Wrote %06x to %04x\n",cpu_getpc(),data,offset+0x1d0000);
 }
 
-READ8_HANDLER( hippodrm_shared_r )
+READ8_MEMBER(dec0_state::hippodrm_shared_r)
 {
-	dec0_state *state = space->machine().driver_data<dec0_state>();
-	return state->m_share[offset];
+	return m_share[offset];
 }
 
-WRITE8_HANDLER( hippodrm_shared_w )
+WRITE8_MEMBER(dec0_state::hippodrm_shared_w)
 {
-	dec0_state *state = space->machine().driver_data<dec0_state>();
-	state->m_share[offset]=data;
+	m_share[offset]=data;
 }
 
-static READ16_HANDLER( hippodrm_68000_share_r )
+READ16_MEMBER(dec0_state::hippodrm_68000_share_r)
 {
-	dec0_state *state = space->machine().driver_data<dec0_state>();
-	if (offset==0) device_yield(&space->device()); /* A wee helper */
-	return state->m_share[offset]&0xff;
+	if (offset==0) device_yield(&space.device()); /* A wee helper */
+	return m_share[offset]&0xff;
 }
 
-static WRITE16_HANDLER( hippodrm_68000_share_w )
+WRITE16_MEMBER(dec0_state::hippodrm_68000_share_w)
 {
-	dec0_state *state = space->machine().driver_data<dec0_state>();
-	state->m_share[offset]=data&0xff;
+	m_share[offset]=data&0xff;
 }
 
 /******************************************************************************/
@@ -171,42 +164,40 @@ static WRITE16_HANDLER( hippodrm_68000_share_w )
 */
 
 
-READ8_HANDLER(dec0_mcu_port_r )
+READ8_MEMBER(dec0_state::dec0_mcu_port_r)
 {
-	dec0_state *state = space->machine().driver_data<dec0_state>();
-	int latchEnable=state->m_i8751_ports[2]>>4;
+	int latchEnable=m_i8751_ports[2]>>4;
 
 	// P0 connected to 4 latches
 	if (offset==0)
 	{
 		if ((latchEnable&1)==0)
-			return state->m_i8751_command>>8;
+			return m_i8751_command>>8;
 		else if ((latchEnable&2)==0)
-			return state->m_i8751_command&0xff;
+			return m_i8751_command&0xff;
 		else if ((latchEnable&4)==0)
-			return state->m_i8751_return>>8;
+			return m_i8751_return>>8;
 		else if ((latchEnable&8)==0)
-			return state->m_i8751_return&0xff;
+			return m_i8751_return&0xff;
 	}
 
 	return 0xff;
 }
 
-WRITE8_HANDLER(dec0_mcu_port_w )
+WRITE8_MEMBER(dec0_state::dec0_mcu_port_w)
 {
-	dec0_state *state = space->machine().driver_data<dec0_state>();
-	state->m_i8751_ports[offset]=data;
+	m_i8751_ports[offset]=data;
 
 	if (offset==2)
 	{
 		if ((data&0x4)==0)
-			cputag_set_input_line(space->machine(), "maincpu", 5, HOLD_LINE);
+			cputag_set_input_line(machine(), "maincpu", 5, HOLD_LINE);
 		if ((data&0x8)==0)
-			cputag_set_input_line(space->machine(), "mcu", MCS51_INT1_LINE, CLEAR_LINE);
+			cputag_set_input_line(machine(), "mcu", MCS51_INT1_LINE, CLEAR_LINE);
 		if ((data&0x40)==0)
-			state->m_i8751_return=(state->m_i8751_return&0xff00)|(state->m_i8751_ports[0]);
+			m_i8751_return=(m_i8751_return&0xff00)|(m_i8751_ports[0]);
 		if ((data&0x80)==0)
-			state->m_i8751_return=(state->m_i8751_return&0xff)|(state->m_i8751_ports[0]<<8);
+			m_i8751_return=(m_i8751_return&0xff)|(m_i8751_ports[0]<<8);
 	}
 }
 
@@ -331,31 +322,28 @@ void dec0_i8751_reset(running_machine &machine)
 
 /******************************************************************************/
 
-static WRITE16_HANDLER( sprite_mirror_w )
+WRITE16_MEMBER(dec0_state::sprite_mirror_w)
 {
-	dec0_state *state = space->machine().driver_data<dec0_state>();
-	COMBINE_DATA(&state->m_spriteram[offset]);
+	COMBINE_DATA(&m_spriteram[offset]);
 }
 
 /******************************************************************************/
 
-static READ16_HANDLER( robocop_68000_share_r )
+READ16_MEMBER(dec0_state::robocop_68000_share_r)
 {
-	dec0_state *state = space->machine().driver_data<dec0_state>();
-//logerror("%08x: Share read %04x\n",cpu_get_pc(&space->device()),offset);
+//logerror("%08x: Share read %04x\n",cpu_get_pc(&space.device()),offset);
 
-	return state->m_robocop_shared_ram[offset];
+	return m_robocop_shared_ram[offset];
 }
 
-static WRITE16_HANDLER( robocop_68000_share_w )
+WRITE16_MEMBER(dec0_state::robocop_68000_share_w)
 {
-	dec0_state *state = space->machine().driver_data<dec0_state>();
-//  logerror("%08x: Share write %04x %04x\n",cpu_get_pc(&space->device()),offset,data);
+//  logerror("%08x: Share write %04x %04x\n",cpu_get_pc(&space.device()),offset,data);
 
-	state->m_robocop_shared_ram[offset]=data&0xff;
+	m_robocop_shared_ram[offset]=data&0xff;
 
 	if (offset == 0x7ff) /* A control address - not standard ram */
-		cputag_set_input_line(space->machine(), "sub", 0, HOLD_LINE);
+		cputag_set_input_line(machine(), "sub", 0, HOLD_LINE);
 }
 
 /******************************************************************************/
@@ -373,9 +361,9 @@ static void h6280_decrypt(running_machine &machine, const char *cputag)
 DRIVER_INIT( hippodrm )
 {
 	UINT8 *RAM = machine.region("sub")->base();
-
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x180000, 0x180fff, FUNC(hippodrm_68000_share_r), FUNC(hippodrm_68000_share_w));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xffc800, 0xffcfff, FUNC(sprite_mirror_w));
+	dec0_state *state = machine.driver_data<dec0_state>();
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x180000, 0x180fff, read16_delegate(FUNC(dec0_state::hippodrm_68000_share_r),state), write16_delegate(FUNC(dec0_state::hippodrm_68000_share_w),state));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xffc800, 0xffcfff, write16_delegate(FUNC(dec0_state::sprite_mirror_w),state));
 
 	h6280_decrypt(machine, "sub");
 
@@ -399,7 +387,8 @@ DRIVER_INIT( slyspy )
 
 DRIVER_INIT( robocop )
 {
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x180000, 0x180fff, FUNC(robocop_68000_share_r), FUNC(robocop_68000_share_w));
+	dec0_state *state = machine.driver_data<dec0_state>();
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x180000, 0x180fff, read16_delegate(FUNC(dec0_state::robocop_68000_share_r),state), write16_delegate(FUNC(dec0_state::robocop_68000_share_w),state));
 }
 
 DRIVER_INIT( baddudes )

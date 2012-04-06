@@ -90,7 +90,7 @@ static ADDRESS_MAP_START( spcforce_map, AS_PROGRAM, 8, spcforce_state )
 	AM_RANGE(0x7000, 0x7000) AM_READ_PORT("DSW") AM_WRITE(soundlatch_w)
 	AM_RANGE(0x7001, 0x7001) AM_READ_PORT("P1") AM_WRITE(spcforce_soundtrigger_w)
 	AM_RANGE(0x7002, 0x7002) AM_READ_PORT("P2")
-	AM_RANGE(0x700b, 0x700b) AM_WRITE_LEGACY(spcforce_flip_screen_w)
+	AM_RANGE(0x700b, 0x700b) AM_WRITE(spcforce_flip_screen_w)
 	AM_RANGE(0x700e, 0x700e) AM_WRITE(irq_mask_w)
 	AM_RANGE(0x700f, 0x700f) AM_WRITENOP
 	AM_RANGE(0x8000, 0x83ff) AM_RAM AM_BASE(m_videoram)

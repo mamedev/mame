@@ -19,53 +19,49 @@ static void nbmj9195_gfxdraw(running_machine &machine, int vram);
 
 
 ******************************************************************************/
-READ8_HANDLER( nbmj9195_palette_r )
+READ8_MEMBER(nbmj9195_state::nbmj9195_palette_r)
 {
-	nbmj9195_state *state = space->machine().driver_data<nbmj9195_state>();
-	return state->m_palette[offset];
+	return m_palette[offset];
 }
 
-WRITE8_HANDLER( nbmj9195_palette_w )
+WRITE8_MEMBER(nbmj9195_state::nbmj9195_palette_w)
 {
-	nbmj9195_state *state = space->machine().driver_data<nbmj9195_state>();
 	int r, g, b;
 
-	state->m_palette[offset] = data;
+	m_palette[offset] = data;
 
 	if (offset & 1)
 	{
 		offset &= 0x1fe;
 
-		r = ((state->m_palette[offset + 0] & 0x0f) >> 0);
-		g = ((state->m_palette[offset + 0] & 0xf0) >> 4);
-		b = ((state->m_palette[offset + 1] & 0x0f) >> 0);
+		r = ((m_palette[offset + 0] & 0x0f) >> 0);
+		g = ((m_palette[offset + 0] & 0xf0) >> 4);
+		b = ((m_palette[offset + 1] & 0x0f) >> 0);
 
-		palette_set_color_rgb(space->machine(), (offset >> 1), pal4bit(r), pal4bit(g), pal4bit(b));
+		palette_set_color_rgb(machine(), (offset >> 1), pal4bit(r), pal4bit(g), pal4bit(b));
 	}
 }
 
-READ8_HANDLER( nbmj9195_nb22090_palette_r )
+READ8_MEMBER(nbmj9195_state::nbmj9195_nb22090_palette_r)
 {
-	nbmj9195_state *state = space->machine().driver_data<nbmj9195_state>();
-	return state->m_nb22090_palette[offset];
+	return m_nb22090_palette[offset];
 }
 
-WRITE8_HANDLER( nbmj9195_nb22090_palette_w )
+WRITE8_MEMBER(nbmj9195_state::nbmj9195_nb22090_palette_w)
 {
-	nbmj9195_state *state = space->machine().driver_data<nbmj9195_state>();
 	int r, g, b;
 	int offs_h, offs_l;
 
-	state->m_nb22090_palette[offset] = data;
+	m_nb22090_palette[offset] = data;
 
 	offs_h = (offset / 0x0300);
 	offs_l = (offset & 0x00ff);
 
-	r = state->m_nb22090_palette[(0x000 + (offs_h * 0x300) + offs_l)];
-	g = state->m_nb22090_palette[(0x100 + (offs_h * 0x300) + offs_l)];
-	b = state->m_nb22090_palette[(0x200 + (offs_h * 0x300) + offs_l)];
+	r = m_nb22090_palette[(0x000 + (offs_h * 0x300) + offs_l)];
+	g = m_nb22090_palette[(0x100 + (offs_h * 0x300) + offs_l)];
+	b = m_nb22090_palette[(0x200 + (offs_h * 0x300) + offs_l)];
 
-	palette_set_color(space->machine(), ((offs_h * 0x100) + offs_l), MAKE_RGB(r, g, b));
+	palette_set_color(machine(), ((offs_h * 0x100) + offs_l), MAKE_RGB(r, g, b));
 }
 
 /******************************************************************************
@@ -375,14 +371,14 @@ static void nbmj9195_gfxdraw(running_machine &machine, int vram)
 
 
 ******************************************************************************/
-WRITE8_HANDLER( nbmj9195_blitter_0_w )	{ nbmj9195_blitter_w(space, offset, data, 0); }
-WRITE8_HANDLER( nbmj9195_blitter_1_w )	{ nbmj9195_blitter_w(space, offset, data, 1); }
+WRITE8_MEMBER(nbmj9195_state::nbmj9195_blitter_0_w){ nbmj9195_blitter_w(&space, offset, data, 0); }
+WRITE8_MEMBER(nbmj9195_state::nbmj9195_blitter_1_w){ nbmj9195_blitter_w(&space, offset, data, 1); }
 
-READ8_HANDLER( nbmj9195_blitter_0_r )	{ return nbmj9195_blitter_r(space, offset, 0); }
-READ8_HANDLER( nbmj9195_blitter_1_r )	{ return nbmj9195_blitter_r(space, offset, 1); }
+READ8_MEMBER(nbmj9195_state::nbmj9195_blitter_0_r){ return nbmj9195_blitter_r(&space, offset, 0); }
+READ8_MEMBER(nbmj9195_state::nbmj9195_blitter_1_r){ return nbmj9195_blitter_r(&space, offset, 1); }
 
-WRITE8_HANDLER( nbmj9195_clut_0_w )		{ nbmj9195_clut_w(space, offset, data, 0); }
-WRITE8_HANDLER( nbmj9195_clut_1_w )		{ nbmj9195_clut_w(space, offset, data, 1); }
+WRITE8_MEMBER(nbmj9195_state::nbmj9195_clut_0_w){ nbmj9195_clut_w(&space, offset, data, 0); }
+WRITE8_MEMBER(nbmj9195_state::nbmj9195_clut_1_w){ nbmj9195_clut_w(&space, offset, data, 1); }
 
 /******************************************************************************
 

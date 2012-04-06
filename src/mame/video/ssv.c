@@ -216,12 +216,11 @@ static TILE_GET_INFO( get_tile_info_0 )
 	SET_TILE_INFO(3, tile, 0, TILE_FLIPXY( tile >> 14 ));
 }
 
-WRITE16_HANDLER( gdfs_tmapram_w )
+WRITE16_MEMBER(ssv_state::gdfs_tmapram_w)
 {
-	ssv_state *state = space->machine().driver_data<ssv_state>();
 
-	COMBINE_DATA(&state->m_gdfs_tmapram[offset]);
-	state->m_gdfs_tmap->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_gdfs_tmapram[offset]);
+	m_gdfs_tmap->mark_tile_dirty(offset);
 }
 
 VIDEO_START( gdfs )
@@ -380,42 +379,40 @@ VIDEO_START( gdfs )
 
 ***************************************************************************/
 
-READ16_HANDLER( ssv_vblank_r )
+READ16_MEMBER(ssv_state::ssv_vblank_r)
 {
-	if (space->machine().primary_screen->vblank())
+	if (machine().primary_screen->vblank())
 		return 0x2000 | 0x1000;
 	else
 		return 0x0000;
 }
 
-WRITE16_HANDLER( ssv_scroll_w )
+WRITE16_MEMBER(ssv_state::ssv_scroll_w)
 {
-	ssv_state *state = space->machine().driver_data<ssv_state>();
 
-	COMBINE_DATA(state->m_scroll + offset);
+	COMBINE_DATA(m_scroll + offset);
 
 /*  offsets 60-7f: CRT Controller   */
 
 }
 
-WRITE16_HANDLER( paletteram16_xrgb_swap_word_w )
+WRITE16_MEMBER(ssv_state::paletteram16_xrgb_swap_word_w)
 {
-	ssv_state *state = space->machine().driver_data<ssv_state>();
 	int r, g, b;
 	UINT16 data0, data1;
 
-	COMBINE_DATA(state->m_paletteram + offset);
+	COMBINE_DATA(m_paletteram + offset);
 
 	offset &= ~1;
 
-	data0 = state->m_paletteram[offset + 1];
-	data1 = state->m_paletteram[offset];
+	data0 = m_paletteram[offset + 1];
+	data1 = m_paletteram[offset];
 
 	r = data0 & 0xff;
 	g = data1 >> 8;
 	b = data1 & 0xff;
 
-	palette_set_color(space->machine(), offset>>1, MAKE_RGB(r, g, b));
+	palette_set_color(machine(), offset>>1, MAKE_RGB(r, g, b));
 }
 
 /***************************************************************************

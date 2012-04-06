@@ -61,23 +61,23 @@ public:
 	DECLARE_WRITE8_MEMBER(bankswitch_w);
 	DECLARE_READ8_MEMBER(mirderby_prot_r);
 	DECLARE_WRITE8_MEMBER(mirderby_prot_w);
+	DECLARE_WRITE8_MEMBER(mrokumei_videoram_w);
+	DECLARE_WRITE8_MEMBER(reikaids_videoram_w);
+	DECLARE_WRITE8_MEMBER(reikaids_gfx_bank_w);
+	DECLARE_WRITE8_MEMBER(pteacher_gfx_bank_w);
+	DECLARE_WRITE8_MEMBER(homedata_blitter_param_w);
+	DECLARE_WRITE8_MEMBER(mrokumei_blitter_bank_w);
+	DECLARE_WRITE8_MEMBER(reikaids_blitter_bank_w);
+	DECLARE_WRITE8_MEMBER(pteacher_blitter_bank_w);
+	DECLARE_WRITE8_MEMBER(mrokumei_blitter_start_w);
+	DECLARE_WRITE8_MEMBER(reikaids_blitter_start_w);
+	DECLARE_WRITE8_MEMBER(pteacher_blitter_start_w);
 };
 
 
 
 /*----------- defined in video/homedata.c -----------*/
 
-WRITE8_HANDLER( mrokumei_videoram_w );
-WRITE8_HANDLER( reikaids_videoram_w );
-WRITE8_HANDLER( reikaids_gfx_bank_w );
-WRITE8_HANDLER( pteacher_gfx_bank_w );
-WRITE8_HANDLER( homedata_blitter_param_w );
-WRITE8_HANDLER( mrokumei_blitter_bank_w );
-WRITE8_HANDLER( reikaids_blitter_bank_w );
-WRITE8_HANDLER( pteacher_blitter_bank_w );
-WRITE8_HANDLER( mrokumei_blitter_start_w );
-WRITE8_HANDLER( reikaids_blitter_start_w );
-WRITE8_HANDLER( pteacher_blitter_start_w );
 
 PALETTE_INIT( mrokumei );
 PALETTE_INIT( reikaids );

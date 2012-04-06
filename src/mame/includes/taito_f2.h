@@ -94,6 +94,9 @@ public:
 	DECLARE_WRITE16_MEMBER(driveout_sound_command_w);
 	DECLARE_WRITE16_MEMBER(cchip2_word_w);
 	DECLARE_READ16_MEMBER(cchip2_word_r);
+	DECLARE_WRITE16_MEMBER(taitof2_sprite_extension_w);
+	DECLARE_WRITE16_MEMBER(taitof2_spritebank_w);
+	DECLARE_WRITE16_MEMBER(koshien_spritebank_w);
 };
 
 /*----------- defined in video/taito_f2.c -----------*/
@@ -137,6 +140,3 @@ SCREEN_UPDATE_IND16( taitof2_deadconx );
 SCREEN_UPDATE_IND16( taitof2_metalb );
 SCREEN_UPDATE_IND16( taitof2_yesnoj );
 
-WRITE16_HANDLER( taitof2_spritebank_w );
-WRITE16_HANDLER( koshien_spritebank_w );
-WRITE16_HANDLER( taitof2_sprite_extension_w );

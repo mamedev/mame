@@ -25,6 +25,12 @@ public:
 	DECLARE_READ16_MEMBER(backup_ram_r);
 	DECLARE_READ16_MEMBER(backup_ram_dx_r);
 	DECLARE_WRITE16_MEMBER(backup_ram_w);
+	DECLARE_WRITE16_MEMBER(realbrk_flipscreen_w);
+	DECLARE_WRITE16_MEMBER(dai2kaku_flipscreen_w);
+	DECLARE_WRITE16_MEMBER(realbrk_vram_0_w);
+	DECLARE_WRITE16_MEMBER(realbrk_vram_1_w);
+	DECLARE_WRITE16_MEMBER(realbrk_vram_2_w);
+	DECLARE_WRITE16_MEMBER(realbrk_vregs_w);
 };
 
 
@@ -37,12 +43,6 @@ VIDEO_START(realbrk);
 SCREEN_UPDATE_IND16(realbrk);
 SCREEN_UPDATE_IND16(dai2kaku);
 
-WRITE16_HANDLER( realbrk_vram_0_w );
-WRITE16_HANDLER( realbrk_vram_1_w );
-WRITE16_HANDLER( realbrk_vram_2_w );
-WRITE16_HANDLER( realbrk_vregs_w );
-WRITE16_HANDLER( realbrk_flipscreen_w );
-WRITE16_HANDLER( dai2kaku_flipscreen_w );
 
 
 #endif

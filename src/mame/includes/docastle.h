@@ -26,25 +26,25 @@ public:
 	/* devices */
 	cpu_device *m_maincpu;
 	cpu_device *m_slave;
+	DECLARE_READ8_MEMBER(docastle_shared0_r);
+	DECLARE_READ8_MEMBER(docastle_shared1_r);
+	DECLARE_WRITE8_MEMBER(docastle_shared0_w);
+	DECLARE_WRITE8_MEMBER(docastle_shared1_w);
+	DECLARE_WRITE8_MEMBER(docastle_nmitrigger_w);
+	DECLARE_WRITE8_MEMBER(docastle_videoram_w);
+	DECLARE_WRITE8_MEMBER(docastle_colorram_w);
+	DECLARE_READ8_MEMBER(docastle_flipscreen_off_r);
+	DECLARE_READ8_MEMBER(docastle_flipscreen_on_r);
+	DECLARE_WRITE8_MEMBER(docastle_flipscreen_off_w);
+	DECLARE_WRITE8_MEMBER(docastle_flipscreen_on_w);
 };
 
 
 /*----------- defined in machine/docastle.c -----------*/
 
-READ8_HANDLER( docastle_shared0_r );
-READ8_HANDLER( docastle_shared1_r );
-WRITE8_HANDLER( docastle_shared0_w );
-WRITE8_HANDLER( docastle_shared1_w );
-WRITE8_HANDLER( docastle_nmitrigger_w );
 
 /*----------- defined in video/docastle.c -----------*/
 
-WRITE8_HANDLER( docastle_videoram_w );
-WRITE8_HANDLER( docastle_colorram_w );
-READ8_HANDLER( docastle_flipscreen_off_r );
-READ8_HANDLER( docastle_flipscreen_on_r );
-WRITE8_HANDLER( docastle_flipscreen_off_w );
-WRITE8_HANDLER( docastle_flipscreen_on_w );
 
 PALETTE_INIT( docastle );
 VIDEO_START( docastle );

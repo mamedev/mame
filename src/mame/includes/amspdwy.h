@@ -31,15 +31,15 @@ public:
 	DECLARE_READ8_MEMBER(amspdwy_wheel_1_r);
 	DECLARE_WRITE8_MEMBER(amspdwy_sound_w);
 	DECLARE_READ8_MEMBER(amspdwy_port_r);
+	DECLARE_WRITE8_MEMBER(amspdwy_paletteram_w);
+	DECLARE_WRITE8_MEMBER(amspdwy_flipscreen_w);
+	DECLARE_WRITE8_MEMBER(amspdwy_videoram_w);
+	DECLARE_WRITE8_MEMBER(amspdwy_colorram_w);
 };
 
 
 /*----------- defined in video/amspdwy.c -----------*/
 
-WRITE8_HANDLER( amspdwy_videoram_w );
-WRITE8_HANDLER( amspdwy_colorram_w );
-WRITE8_HANDLER( amspdwy_paletteram_w );
-WRITE8_HANDLER( amspdwy_flipscreen_w );
 
 VIDEO_START( amspdwy );
 SCREEN_UPDATE_IND16( amspdwy );

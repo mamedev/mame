@@ -29,16 +29,16 @@ public:
 	device_t *m_maincpu;
 	device_t *m_soundcpu;
 	DECLARE_WRITE8_MEMBER(ironhors_sh_irqtrigger_w);
+	DECLARE_WRITE8_MEMBER(ironhors_videoram_w);
+	DECLARE_WRITE8_MEMBER(ironhors_colorram_w);
+	DECLARE_WRITE8_MEMBER(ironhors_charbank_w);
+	DECLARE_WRITE8_MEMBER(ironhors_palettebank_w);
+	DECLARE_WRITE8_MEMBER(ironhors_flipscreen_w);
 };
 
 
 /*----------- defined in video/ironhors.c -----------*/
 
-WRITE8_HANDLER( ironhors_videoram_w );
-WRITE8_HANDLER( ironhors_colorram_w );
-WRITE8_HANDLER( ironhors_palettebank_w );
-WRITE8_HANDLER( ironhors_charbank_w );
-WRITE8_HANDLER( ironhors_flipscreen_w );
 
 PALETTE_INIT( ironhors );
 VIDEO_START( ironhors );

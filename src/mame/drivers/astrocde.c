@@ -433,7 +433,7 @@ WRITE8_MEMBER(astrocde_state::profpac_banksw_w)
 
 	/* bank 0 reads video RAM in the 4000-7FFF range */
 	if (bank == 0)
-		prog_space->install_legacy_read_handler(0x4000, 0x7fff, FUNC(profpac_videoram_r));
+		prog_space->install_read_handler(0x4000, 0x7fff, read8_delegate(FUNC(astrocde_state::profpac_videoram_r),this));
 
 	/* if we have a 640k EPROM board, map that on top of the 4000-7FFF range if specified */
 	if ((data & 0x80) && machine().region("user2")->base() != NULL)
@@ -584,7 +584,7 @@ WRITE8_MEMBER(astrocde_state::tenpindx_lights_w)
 
 static ADDRESS_MAP_START( seawolf2_map, AS_PROGRAM, 8, astrocde_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x0000, 0x3fff) AM_WRITE_LEGACY(astrocade_funcgen_w)
+	AM_RANGE(0x0000, 0x3fff) AM_WRITE(astrocade_funcgen_w)
 	AM_RANGE(0x4000, 0x7fff) AM_RAM AM_BASE(m_videoram)
 	AM_RANGE(0xc000, 0xc3ff) AM_RAM
 ADDRESS_MAP_END
@@ -592,14 +592,14 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ebases_map, AS_PROGRAM, 8, astrocde_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x0000, 0x3fff) AM_WRITE_LEGACY(astrocade_funcgen_w)
+	AM_RANGE(0x0000, 0x3fff) AM_WRITE(astrocade_funcgen_w)
 	AM_RANGE(0x4000, 0x7fff) AM_RAM AM_BASE(m_videoram)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( spacezap_map, AS_PROGRAM, 8, astrocde_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x0000, 0x3fff) AM_WRITE_LEGACY(astrocade_funcgen_w)
+	AM_RANGE(0x0000, 0x3fff) AM_WRITE(astrocade_funcgen_w)
 	AM_RANGE(0x4000, 0x7fff) AM_RAM AM_BASE(m_videoram)
 	AM_RANGE(0xd000, 0xd03f) AM_READWRITE(protected_ram_r, protected_ram_w) AM_BASE(m_protected_ram)
 	AM_RANGE(0xd040, 0xd7ff) AM_RAM
@@ -608,7 +608,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( wow_map, AS_PROGRAM, 8, astrocde_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x0000, 0x3fff) AM_WRITE_LEGACY(astrocade_funcgen_w)
+	AM_RANGE(0x0000, 0x3fff) AM_WRITE(astrocade_funcgen_w)
 	AM_RANGE(0x4000, 0x7fff) AM_RAM AM_BASE(m_videoram)
 	AM_RANGE(0x8000, 0xcfff) AM_ROM
 	AM_RANGE(0xd000, 0xd03f) AM_READWRITE(protected_ram_r, protected_ram_w) AM_BASE(m_protected_ram)
@@ -618,7 +618,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( robby_map, AS_PROGRAM, 8, astrocde_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x0000, 0x3fff) AM_WRITE_LEGACY(astrocade_funcgen_w)
+	AM_RANGE(0x0000, 0x3fff) AM_WRITE(astrocade_funcgen_w)
 	AM_RANGE(0x4000, 0x7fff) AM_RAM AM_BASE(m_videoram)
 	AM_RANGE(0x8000, 0xdfff) AM_ROM
 	AM_RANGE(0xe000, 0xe1ff) AM_READWRITE(protected_ram_r, protected_ram_w) AM_BASE(m_protected_ram)
@@ -629,8 +629,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( profpac_map, AS_PROGRAM, 8, astrocde_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x0000, 0x3fff) AM_WRITE_LEGACY(astrocade_funcgen_w)
-	AM_RANGE(0x4000, 0x7fff) AM_READWRITE_LEGACY(profpac_videoram_r, profpac_videoram_w)
+	AM_RANGE(0x0000, 0x3fff) AM_WRITE(astrocade_funcgen_w)
+	AM_RANGE(0x4000, 0x7fff) AM_READWRITE(profpac_videoram_r, profpac_videoram_w)
 	AM_RANGE(0x4000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xdfff) AM_ROM
 	AM_RANGE(0xe000, 0xe1ff) AM_READWRITE(protected_ram_r, protected_ram_w) AM_BASE(m_protected_ram)
@@ -641,8 +641,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( demndrgn_map, AS_PROGRAM, 8, astrocde_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x0000, 0x3fff) AM_WRITE_LEGACY(astrocade_funcgen_w)
-	AM_RANGE(0x4000, 0x7fff) AM_READWRITE_LEGACY(profpac_videoram_r, profpac_videoram_w)
+	AM_RANGE(0x0000, 0x3fff) AM_WRITE(astrocade_funcgen_w)
+	AM_RANGE(0x4000, 0x7fff) AM_READWRITE(profpac_videoram_r, profpac_videoram_w)
 	AM_RANGE(0x4000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xdfff) AM_ROM
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("nvram")
@@ -665,43 +665,43 @@ ADDRESS_MAP_END
  *************************************/
 
 static ADDRESS_MAP_START( port_map, AS_IO, 8, astrocde_state )
-	AM_RANGE(0x0000, 0x0019) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READWRITE_LEGACY(astrocade_data_chip_register_r, astrocade_data_chip_register_w)
+	AM_RANGE(0x0000, 0x0019) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READWRITE(astrocade_data_chip_register_r, astrocade_data_chip_register_w)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( port_map_mono_pattern, AS_IO, 8, astrocde_state )
-	AM_RANGE(0x0000, 0x0019) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READWRITE_LEGACY(astrocade_data_chip_register_r, astrocade_data_chip_register_w)
-	AM_RANGE(0x0078, 0x007e) AM_MIRROR(0xff00) AM_WRITE_LEGACY(astrocade_pattern_board_w)
+	AM_RANGE(0x0000, 0x0019) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READWRITE(astrocade_data_chip_register_r, astrocade_data_chip_register_w)
+	AM_RANGE(0x0078, 0x007e) AM_MIRROR(0xff00) AM_WRITE(astrocade_pattern_board_w)
 	AM_RANGE(0xa55b, 0xa55b) AM_WRITE(protected_ram_enable_w)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( port_map_stereo_pattern, AS_IO, 8, astrocde_state )
-	AM_RANGE(0x0000, 0x0019) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READWRITE_LEGACY(astrocade_data_chip_register_r, astrocade_data_chip_register_w)
+	AM_RANGE(0x0000, 0x0019) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READWRITE(astrocade_data_chip_register_r, astrocade_data_chip_register_w)
 	AM_RANGE(0x0050, 0x0058) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_DEVWRITE_LEGACY("astrocade2", astrocade_sound_w)
-	AM_RANGE(0x0078, 0x007e) AM_MIRROR(0xff00) AM_WRITE_LEGACY(astrocade_pattern_board_w)
+	AM_RANGE(0x0078, 0x007e) AM_MIRROR(0xff00) AM_WRITE(astrocade_pattern_board_w)
 	AM_RANGE(0xa55b, 0xa55b) AM_WRITE(protected_ram_enable_w)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( port_map_16col_pattern, AS_IO, 8, astrocde_state )
-	AM_RANGE(0x0000, 0x0019) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READWRITE_LEGACY(astrocade_data_chip_register_r, astrocade_data_chip_register_w)
+	AM_RANGE(0x0000, 0x0019) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READWRITE(astrocade_data_chip_register_r, astrocade_data_chip_register_w)
 	AM_RANGE(0x0050, 0x0058) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_DEVWRITE_LEGACY("astrocade2", astrocade_sound_w)
-	AM_RANGE(0x0078, 0x007e) AM_MIRROR(0xff00) AM_WRITE_LEGACY(astrocade_pattern_board_w)
-	AM_RANGE(0x00bf, 0x00bf) AM_MIRROR(0xff00) AM_WRITE_LEGACY(profpac_page_select_w)
-	AM_RANGE(0x00c3, 0x00c3) AM_MIRROR(0xff00) AM_READ_LEGACY(profpac_intercept_r)
-	AM_RANGE(0x00c0, 0x00c5) AM_MIRROR(0xff00) AM_WRITE_LEGACY(profpac_screenram_ctrl_w)
+	AM_RANGE(0x0078, 0x007e) AM_MIRROR(0xff00) AM_WRITE(astrocade_pattern_board_w)
+	AM_RANGE(0x00bf, 0x00bf) AM_MIRROR(0xff00) AM_WRITE(profpac_page_select_w)
+	AM_RANGE(0x00c3, 0x00c3) AM_MIRROR(0xff00) AM_READ(profpac_intercept_r)
+	AM_RANGE(0x00c0, 0x00c5) AM_MIRROR(0xff00) AM_WRITE(profpac_screenram_ctrl_w)
 	AM_RANGE(0x00f3, 0x00f3) AM_MIRROR(0xff00) AM_WRITE(profpac_banksw_w)
 	AM_RANGE(0xa55b, 0xa55b) AM_WRITE(protected_ram_enable_w)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( port_map_16col_pattern_nosound, AS_IO, 8, astrocde_state )
-	AM_RANGE(0x0000, 0x0019) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READWRITE_LEGACY(astrocade_data_chip_register_r, astrocade_data_chip_register_w)
-	AM_RANGE(0x0078, 0x007e) AM_MIRROR(0xff00) AM_WRITE_LEGACY(astrocade_pattern_board_w)
-	AM_RANGE(0x00bf, 0x00bf) AM_MIRROR(0xff00) AM_WRITE_LEGACY(profpac_page_select_w)
-	AM_RANGE(0x00c3, 0x00c3) AM_MIRROR(0xff00) AM_READ_LEGACY(profpac_intercept_r)
-	AM_RANGE(0x00c0, 0x00c5) AM_MIRROR(0xff00) AM_WRITE_LEGACY(profpac_screenram_ctrl_w)
+	AM_RANGE(0x0000, 0x0019) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READWRITE(astrocade_data_chip_register_r, astrocade_data_chip_register_w)
+	AM_RANGE(0x0078, 0x007e) AM_MIRROR(0xff00) AM_WRITE(astrocade_pattern_board_w)
+	AM_RANGE(0x00bf, 0x00bf) AM_MIRROR(0xff00) AM_WRITE(profpac_page_select_w)
+	AM_RANGE(0x00c3, 0x00c3) AM_MIRROR(0xff00) AM_READ(profpac_intercept_r)
+	AM_RANGE(0x00c0, 0x00c5) AM_MIRROR(0xff00) AM_WRITE(profpac_screenram_ctrl_w)
 	AM_RANGE(0x00f3, 0x00f3) AM_MIRROR(0xff00) AM_WRITE(profpac_banksw_w)
 	AM_RANGE(0xa55b, 0xa55b) AM_WRITE(protected_ram_enable_w)
 ADDRESS_MAP_END

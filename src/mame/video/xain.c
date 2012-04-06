@@ -106,63 +106,56 @@ VIDEO_START( xain )
 
 ***************************************************************************/
 
-WRITE8_HANDLER( xain_bgram0_w )
+WRITE8_MEMBER(xain_state::xain_bgram0_w)
 {
-	xain_state *state = space->machine().driver_data<xain_state>();
-	state->m_bgram0[offset] = data;
-	state->m_bgram0_tilemap->mark_tile_dirty(offset & 0x3ff);
+	m_bgram0[offset] = data;
+	m_bgram0_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_HANDLER( xain_bgram1_w )
+WRITE8_MEMBER(xain_state::xain_bgram1_w)
 {
-	xain_state *state = space->machine().driver_data<xain_state>();
-	state->m_bgram1[offset] = data;
-	state->m_bgram1_tilemap->mark_tile_dirty(offset & 0x3ff);
+	m_bgram1[offset] = data;
+	m_bgram1_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_HANDLER( xain_charram_w )
+WRITE8_MEMBER(xain_state::xain_charram_w)
 {
-	xain_state *state = space->machine().driver_data<xain_state>();
-	state->m_charram[offset] = data;
-	state->m_char_tilemap->mark_tile_dirty(offset & 0x3ff);
+	m_charram[offset] = data;
+	m_char_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_HANDLER( xain_scrollxP0_w )
+WRITE8_MEMBER(xain_state::xain_scrollxP0_w)
 {
-	xain_state *state = space->machine().driver_data<xain_state>();
 
-	state->m_scrollxP0[offset] = data;
-	state->m_bgram0_tilemap->set_scrollx(0, state->m_scrollxP0[0]|(state->m_scrollxP0[1]<<8));
+	m_scrollxP0[offset] = data;
+	m_bgram0_tilemap->set_scrollx(0, m_scrollxP0[0]|(m_scrollxP0[1]<<8));
 }
 
-WRITE8_HANDLER( xain_scrollyP0_w )
+WRITE8_MEMBER(xain_state::xain_scrollyP0_w)
 {
-	xain_state *state = space->machine().driver_data<xain_state>();
 
-	state->m_scrollyP0[offset] = data;
-	state->m_bgram0_tilemap->set_scrolly(0, state->m_scrollyP0[0]|(state->m_scrollyP0[1]<<8));
+	m_scrollyP0[offset] = data;
+	m_bgram0_tilemap->set_scrolly(0, m_scrollyP0[0]|(m_scrollyP0[1]<<8));
 }
 
-WRITE8_HANDLER( xain_scrollxP1_w )
+WRITE8_MEMBER(xain_state::xain_scrollxP1_w)
 {
-	xain_state *state = space->machine().driver_data<xain_state>();
 
-	state->m_scrollxP1[offset] = data;
-	state->m_bgram1_tilemap->set_scrollx(0, state->m_scrollxP1[0]|(state->m_scrollxP1[1]<<8));
+	m_scrollxP1[offset] = data;
+	m_bgram1_tilemap->set_scrollx(0, m_scrollxP1[0]|(m_scrollxP1[1]<<8));
 }
 
-WRITE8_HANDLER( xain_scrollyP1_w )
+WRITE8_MEMBER(xain_state::xain_scrollyP1_w)
 {
-	xain_state *state = space->machine().driver_data<xain_state>();
 
-	state->m_scrollyP1[offset] = data;
-	state->m_bgram1_tilemap->set_scrolly(0, state->m_scrollyP1[0]|(state->m_scrollyP1[1]<<8));
+	m_scrollyP1[offset] = data;
+	m_bgram1_tilemap->set_scrolly(0, m_scrollyP1[0]|(m_scrollyP1[1]<<8));
 }
 
 
-WRITE8_HANDLER( xain_flipscreen_w )
+WRITE8_MEMBER(xain_state::xain_flipscreen_w)
 {
-	flip_screen_set(space->machine(), data & 1);
+	flip_screen_set(machine(), data & 1);
 }
 
 

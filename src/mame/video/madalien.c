@@ -112,11 +112,10 @@ static TILE_GET_INFO( get_tile_info_FG )
 	SET_TILE_INFO(0, state->m_videoram[tile_index], 0, 0);
 }
 
-WRITE8_HANDLER( madalien_videoram_w )
+WRITE8_MEMBER(madalien_state::madalien_videoram_w)
 {
-	madalien_state *state = space->machine().driver_data<madalien_state>();
-	state->m_videoram[offset] = data;
-	state->m_tilemap_fg->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_tilemap_fg->mark_tile_dirty(offset);
 }
 
 
@@ -243,11 +242,10 @@ static void draw_foreground(running_machine &machine, bitmap_ind16 &bitmap, cons
 }
 
 
-WRITE8_HANDLER( madalien_charram_w )
+WRITE8_MEMBER(madalien_state::madalien_charram_w)
 {
-	madalien_state *state = space->machine().driver_data<madalien_state>();
-	state->m_charram[offset] = data;
-	gfx_element_mark_dirty(space->machine().gfx[0], (offset/8) & 0xff);
+	m_charram[offset] = data;
+	gfx_element_mark_dirty(machine().gfx[0], (offset/8) & 0xff);
 }
 
 

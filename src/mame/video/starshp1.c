@@ -85,13 +85,12 @@ VIDEO_START( starshp1 )
 }
 
 
-READ8_HANDLER( starshp1_rng_r )
+READ8_MEMBER(starshp1_state::starshp1_rng_r)
 {
-	starshp1_state *state = space->machine().driver_data<starshp1_state>();
-	int width = space->machine().primary_screen->width();
-	int height = space->machine().primary_screen->height();
-	int x = space->machine().primary_screen->hpos();
-	int y = space->machine().primary_screen->vpos();
+	int width = machine().primary_screen->width();
+	int height = machine().primary_screen->height();
+	int x = machine().primary_screen->hpos();
+	int y = machine().primary_screen->vpos();
 
 	/* the LFSR is only running in the non-blank region
        of the screen, so this is not quite right */
@@ -100,30 +99,28 @@ READ8_HANDLER( starshp1_rng_r )
 	if (y > height - 1)
 		y = height - 1;
 
-	return state->m_LSFR[x + (UINT16) (512 * y)];
+	return m_LSFR[x + (UINT16) (512 * y)];
 }
 
 
-WRITE8_HANDLER( starshp1_ssadd_w )
+WRITE8_MEMBER(starshp1_state::starshp1_ssadd_w)
 {
-	starshp1_state *state = space->machine().driver_data<starshp1_state>();
 	/*
      * The range of sprite position values doesn't suffice to
-     * move the zoomed spaceship sprite over the top and left
+     * move the zoomed &spaceship sprite over the top and left
      * edges of the screen. These additional values are used
      * to compensate for this. Technically, they cut off the
-     * first columns and rows of the spaceship sprite, but in
+     * first columns and rows of the &spaceship sprite, but in
      * practice they work like offsets in zoomed pixels.
      */
 
-	state->m_ship_voffset = ((offset & 0xf0) >> 4);
-	state->m_ship_hoffset = ((offset & 0x0f) << 2) | (data & 3);
+	m_ship_voffset = ((offset & 0xf0) >> 4);
+	m_ship_hoffset = ((offset & 0x0f) << 2) | (data & 3);
 }
 
 
-WRITE8_HANDLER( starshp1_sspic_w )
+WRITE8_MEMBER(starshp1_state::starshp1_sspic_w)
 {
-	starshp1_state *state = space->machine().driver_data<starshp1_state>();
 	/*
      * Some mysterious game code at address $2CCE is causing
      * erratic images in the target explosion sequence. The
@@ -131,18 +128,17 @@ WRITE8_HANDLER( starshp1_sspic_w )
      */
 
 	if (data != 0x87)
-		state->m_ship_picture = data;
+		m_ship_picture = data;
 }
 
 
-WRITE8_HANDLER( starshp1_playfield_w )
+WRITE8_MEMBER(starshp1_state::starshp1_playfield_w)
 {
-	starshp1_state *state = space->machine().driver_data<starshp1_state>();
-	if (state->m_mux != 0)
+	if (m_mux != 0)
 	{
 		offset ^= 0x1f;
-		state->m_playfield_ram[offset] = data;
-		state->m_bg_tilemap->mark_tile_dirty(offset);
+		m_playfield_ram[offset] = data;
+		m_bg_tilemap->mark_tile_dirty(offset);
 	}
 }
 

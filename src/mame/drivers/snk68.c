@@ -121,15 +121,15 @@ static ADDRESS_MAP_START( pow_map, AS_PROGRAM, 16, snk68_state )
 	AM_RANGE(0x080000, 0x080001) AM_READ(control_1_r)
 	AM_RANGE(0x080000, 0x080001) AM_WRITE(sound_w)
 	AM_RANGE(0x0c0000, 0x0c0001) AM_READ(control_2_r)
-	AM_RANGE(0x0c0000, 0x0c0001) AM_WRITE_LEGACY(pow_flipscreen16_w)	// + char bank
+	AM_RANGE(0x0c0000, 0x0c0001) AM_WRITE(pow_flipscreen16_w)	// + char bank
 	AM_RANGE(0x0e0000, 0x0e0001) AM_READNOP /* Watchdog or IRQ ack */
 	AM_RANGE(0x0e8000, 0x0e8001) AM_READNOP /* Watchdog or IRQ ack */
 	AM_RANGE(0x0f0000, 0x0f0001) AM_READ_PORT("DSW1")
 	AM_RANGE(0x0f0008, 0x0f0009) AM_READ_PORT("DSW2")
 //  AM_RANGE(0x0f0008, 0x0f0009) AM_WRITENOP    /* ?? */
-	AM_RANGE(0x100000, 0x100fff) AM_READWRITE_LEGACY(pow_fg_videoram_r, pow_fg_videoram_w) AM_MIRROR(0x1000) AM_BASE(m_pow_fg_videoram)	// 8-bit
-	AM_RANGE(0x200000, 0x207fff) AM_READWRITE_LEGACY(pow_spriteram_r, pow_spriteram_w) AM_BASE(m_spriteram)	// only partially populated
-	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE_LEGACY(pow_paletteram16_word_w) AM_BASE(m_paletteram)
+	AM_RANGE(0x100000, 0x100fff) AM_READWRITE(pow_fg_videoram_r, pow_fg_videoram_w) AM_MIRROR(0x1000) AM_BASE(m_pow_fg_videoram)	// 8-bit
+	AM_RANGE(0x200000, 0x207fff) AM_READWRITE(pow_spriteram_r, pow_spriteram_w) AM_BASE(m_spriteram)	// only partially populated
+	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(pow_paletteram16_word_w) AM_BASE(m_paletteram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( searchar_map, AS_PROGRAM, 16, snk68_state )
@@ -138,7 +138,7 @@ static ADDRESS_MAP_START( searchar_map, AS_PROGRAM, 16, snk68_state )
 	AM_RANGE(0x080000, 0x080005) AM_READ(protcontrols_r) /* Player 1 & 2 */
 	AM_RANGE(0x080000, 0x080001) AM_WRITE(sound_w)
 	AM_RANGE(0x080006, 0x080007) AM_WRITE(protection_w) /* top byte unknown, bottom is protection in ikari3 and streetsm */
-	AM_RANGE(0x0c0000, 0x0c0001) AM_WRITE_LEGACY(searchar_flipscreen16_w)
+	AM_RANGE(0x0c0000, 0x0c0001) AM_WRITE(searchar_flipscreen16_w)
 	AM_RANGE(0x0c0000, 0x0c0001) AM_READ(rotary_1_r) /* Player 1 rotary */
 	AM_RANGE(0x0c8000, 0x0c8001) AM_READ(rotary_2_r) /* Player 2 rotary */
 	AM_RANGE(0x0d0000, 0x0d0001) AM_READ(rotary_lsb_r) /* Extra rotary bits */
@@ -148,10 +148,10 @@ static ADDRESS_MAP_START( searchar_map, AS_PROGRAM, 16, snk68_state )
 	AM_RANGE(0x0f0000, 0x0f0001) AM_READ_PORT("DSW1")
 	AM_RANGE(0x0f0008, 0x0f0009) AM_READ_PORT("DSW2")
 	AM_RANGE(0x0f8000, 0x0f8001) AM_READ(sound_status_r)
-	AM_RANGE(0x100000, 0x107fff) AM_READWRITE_LEGACY(pow_spriteram_r, pow_spriteram_w) AM_BASE(m_spriteram)	// only partially populated
-	AM_RANGE(0x200000, 0x200fff) AM_RAM_WRITE_LEGACY(searchar_fg_videoram_w) AM_MIRROR(0x1000) AM_BASE(m_pow_fg_videoram) /* Mirror is used by Ikari 3 */
+	AM_RANGE(0x100000, 0x107fff) AM_READWRITE(pow_spriteram_r, pow_spriteram_w) AM_BASE(m_spriteram)	// only partially populated
+	AM_RANGE(0x200000, 0x200fff) AM_RAM_WRITE(searchar_fg_videoram_w) AM_MIRROR(0x1000) AM_BASE(m_pow_fg_videoram) /* Mirror is used by Ikari 3 */
 	AM_RANGE(0x300000, 0x33ffff) AM_ROMBANK("bank1") /* Extra code bank */
-	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE_LEGACY(pow_paletteram16_word_w) AM_BASE(m_paletteram)
+	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(pow_paletteram16_word_w) AM_BASE(m_paletteram)
 ADDRESS_MAP_END
 
 /******************************************************************************/

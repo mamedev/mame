@@ -42,6 +42,18 @@ public:
 	DECLARE_READ16_MEMBER(unk880000_r);
 	DECLARE_WRITE8_MEMBER(tecmosys_z80_bank_w);
 	DECLARE_WRITE8_MEMBER(tecmosys_oki_bank_w);
+	DECLARE_READ16_MEMBER(tecmosys_prot_status_r);
+	DECLARE_WRITE16_MEMBER(tecmosys_prot_status_w);
+	DECLARE_READ16_MEMBER(tecmosys_prot_data_r);
+	DECLARE_WRITE16_MEMBER(tecmosys_prot_data_w);
+	DECLARE_WRITE16_MEMBER(bg0_tilemap_w);
+	DECLARE_WRITE16_MEMBER(bg1_tilemap_w);
+	DECLARE_WRITE16_MEMBER(bg2_tilemap_w);
+	DECLARE_WRITE16_MEMBER(fg_tilemap_w);
+	DECLARE_WRITE16_MEMBER(tilemap_paletteram16_xGGGGGRRRRRBBBBB_word_w);
+	DECLARE_WRITE16_MEMBER(bg0_tilemap_lineram_w);
+	DECLARE_WRITE16_MEMBER(bg1_tilemap_lineram_w);
+	DECLARE_WRITE16_MEMBER(bg2_tilemap_lineram_w);
 };
 
 
@@ -49,22 +61,10 @@ public:
 
 void tecmosys_prot_init(running_machine &machine, int which);
 
-READ16_HANDLER(tecmosys_prot_status_r);
-WRITE16_HANDLER(tecmosys_prot_status_w);
-READ16_HANDLER(tecmosys_prot_data_r);
-WRITE16_HANDLER(tecmosys_prot_data_w);
 
 
 /*----------- defined in video/tecmosys.c -----------*/
 
-WRITE16_HANDLER( bg0_tilemap_w );
-WRITE16_HANDLER( bg1_tilemap_w );
-WRITE16_HANDLER( bg2_tilemap_w );
-WRITE16_HANDLER( fg_tilemap_w );
-WRITE16_HANDLER( tilemap_paletteram16_xGGGGGRRRRRBBBBB_word_w );
-WRITE16_HANDLER( bg0_tilemap_lineram_w );
-WRITE16_HANDLER( bg1_tilemap_lineram_w );
-WRITE16_HANDLER( bg2_tilemap_lineram_w );
 
 SCREEN_UPDATE_RGB32(tecmosys);
 VIDEO_START(tecmosys);

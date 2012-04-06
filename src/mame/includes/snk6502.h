@@ -31,6 +31,15 @@ public:
 	rgb_t m_palette[64];
 
 	UINT8 m_irq_mask;
+	DECLARE_WRITE8_MEMBER(snk6502_videoram_w);
+	DECLARE_WRITE8_MEMBER(snk6502_videoram2_w);
+	DECLARE_WRITE8_MEMBER(snk6502_colorram_w);
+	DECLARE_WRITE8_MEMBER(snk6502_charram_w);
+	DECLARE_WRITE8_MEMBER(snk6502_flipscreen_w);
+	DECLARE_WRITE8_MEMBER(snk6502_scrollx_w);
+	DECLARE_WRITE8_MEMBER(snk6502_scrolly_w);
+	DECLARE_WRITE8_MEMBER(satansat_b002_w);
+	DECLARE_WRITE8_MEMBER(satansat_backcolor_w);
 };
 
 
@@ -65,21 +74,12 @@ DISCRETE_SOUND_EXTERN( fantasy );
 
 /*----------- defined in video/snk6502.c -----------*/
 
-WRITE8_HANDLER( snk6502_videoram_w );
-WRITE8_HANDLER( snk6502_videoram2_w );
-WRITE8_HANDLER( snk6502_colorram_w );
-WRITE8_HANDLER( snk6502_charram_w );
-WRITE8_HANDLER( snk6502_flipscreen_w );
-WRITE8_HANDLER( snk6502_scrollx_w );
-WRITE8_HANDLER( snk6502_scrolly_w );
 
 PALETTE_INIT( snk6502 );
 VIDEO_START( snk6502 );
 SCREEN_UPDATE_IND16( snk6502 );
 VIDEO_START( pballoon );
 
-WRITE8_HANDLER( satansat_b002_w );
-WRITE8_HANDLER( satansat_backcolor_w );
 
 PALETTE_INIT( satansat );
 VIDEO_START( satansat );

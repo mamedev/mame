@@ -32,18 +32,22 @@ public:
 	UINT8    m_flip_x;
 	UINT8    m_flip_y;
 	DECLARE_WRITE8_MEMBER(coinlock_w);
+	DECLARE_READ8_MEMBER(chaknpop_mcu_port_a_r);
+	DECLARE_READ8_MEMBER(chaknpop_mcu_port_b_r);
+	DECLARE_READ8_MEMBER(chaknpop_mcu_port_c_r);
+	DECLARE_WRITE8_MEMBER(chaknpop_mcu_port_a_w);
+	DECLARE_WRITE8_MEMBER(chaknpop_mcu_port_b_w);
+	DECLARE_WRITE8_MEMBER(chaknpop_mcu_port_c_w);
+	DECLARE_READ8_MEMBER(chaknpop_gfxmode_r);
+	DECLARE_WRITE8_MEMBER(chaknpop_gfxmode_w);
+	DECLARE_WRITE8_MEMBER(chaknpop_txram_w);
+	DECLARE_WRITE8_MEMBER(chaknpop_attrram_w);
 };
 
 
 
 /*----------- defined in machine/chaknpop.c -----------*/
 
-READ8_HANDLER( chaknpop_mcu_port_a_r );
-READ8_HANDLER( chaknpop_mcu_port_b_r );
-READ8_HANDLER( chaknpop_mcu_port_c_r );
-WRITE8_HANDLER( chaknpop_mcu_port_a_w );
-WRITE8_HANDLER( chaknpop_mcu_port_b_w );
-WRITE8_HANDLER( chaknpop_mcu_port_c_w );
 
 
 /*----------- defined in video/chaknpop.c -----------*/
@@ -52,7 +56,3 @@ PALETTE_INIT( chaknpop );
 VIDEO_START( chaknpop );
 SCREEN_UPDATE_IND16( chaknpop );
 
-READ8_HANDLER( chaknpop_gfxmode_r );
-WRITE8_HANDLER( chaknpop_gfxmode_w );
-WRITE8_HANDLER( chaknpop_txram_w );
-WRITE8_HANDLER( chaknpop_attrram_w );

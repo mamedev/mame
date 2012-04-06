@@ -5,36 +5,32 @@
 
 /******************************************************************************/
 
-WRITE16_HANDLER( dynduke_paletteram_w )
+WRITE16_MEMBER(dynduke_state::dynduke_paletteram_w)
 {
-	dynduke_state *state = space->machine().driver_data<dynduke_state>();
 	int color;
 
-	COMBINE_DATA(&state->m_generic_paletteram_16[offset]);
-	color=state->m_generic_paletteram_16[offset];
-	palette_set_color_rgb(space->machine(),offset,pal4bit(color >> 0),pal4bit(color >> 4),pal4bit(color >> 8));
+	COMBINE_DATA(&m_generic_paletteram_16[offset]);
+	color=m_generic_paletteram_16[offset];
+	palette_set_color_rgb(machine(),offset,pal4bit(color >> 0),pal4bit(color >> 4),pal4bit(color >> 8));
 }
 
-WRITE16_HANDLER( dynduke_background_w )
+WRITE16_MEMBER(dynduke_state::dynduke_background_w)
 {
-	dynduke_state *state = space->machine().driver_data<dynduke_state>();
-	COMBINE_DATA(&state->m_back_data[offset]);
-	state->m_bg_layer->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_back_data[offset]);
+	m_bg_layer->mark_tile_dirty(offset);
 }
 
-WRITE16_HANDLER( dynduke_foreground_w )
+WRITE16_MEMBER(dynduke_state::dynduke_foreground_w)
 {
-	dynduke_state *state = space->machine().driver_data<dynduke_state>();
-	COMBINE_DATA(&state->m_fore_data[offset]);
-	state->m_fg_layer->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_fore_data[offset]);
+	m_fg_layer->mark_tile_dirty(offset);
 }
 
-WRITE16_HANDLER( dynduke_text_w )
+WRITE16_MEMBER(dynduke_state::dynduke_text_w)
 {
-	dynduke_state *state = space->machine().driver_data<dynduke_state>();
-	UINT16 *videoram = state->m_videoram;
+	UINT16 *videoram = m_videoram;
 	COMBINE_DATA(&videoram[offset]);
-	state->m_tx_layer->mark_tile_dirty(offset);
+	m_tx_layer->mark_tile_dirty(offset);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
@@ -94,29 +90,27 @@ VIDEO_START( dynduke )
 	state->m_tx_layer->set_transparent_pen(15);
 }
 
-WRITE16_HANDLER( dynduke_gfxbank_w )
+WRITE16_MEMBER(dynduke_state::dynduke_gfxbank_w)
 {
-	dynduke_state *state = space->machine().driver_data<dynduke_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
-		if (data&0x01) state->m_back_bankbase=0x1000; else state->m_back_bankbase=0;
-		if (data&0x10) state->m_fore_bankbase=0x1000; else state->m_fore_bankbase=0;
+		if (data&0x01) m_back_bankbase=0x1000; else m_back_bankbase=0;
+		if (data&0x10) m_fore_bankbase=0x1000; else m_fore_bankbase=0;
 
-		if (state->m_back_bankbase!=state->m_old_back)
-			state->m_bg_layer->mark_all_dirty();
-		if (state->m_fore_bankbase!=state->m_old_fore)
-			state->m_fg_layer->mark_all_dirty();
+		if (m_back_bankbase!=m_old_back)
+			m_bg_layer->mark_all_dirty();
+		if (m_fore_bankbase!=m_old_fore)
+			m_fg_layer->mark_all_dirty();
 
-		state->m_old_back=state->m_back_bankbase;
-		state->m_old_fore=state->m_fore_bankbase;
+		m_old_back=m_back_bankbase;
+		m_old_fore=m_fore_bankbase;
 	}
 }
 
 
-WRITE16_HANDLER( dynduke_control_w )
+WRITE16_MEMBER(dynduke_state::dynduke_control_w)
 {
-	dynduke_state *state = space->machine().driver_data<dynduke_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
@@ -129,12 +123,12 @@ WRITE16_HANDLER( dynduke_control_w )
 		// bit 0x02 is used on the map screen (fore disable?)
 		// bit 0x01 set when inserting coin.. bg disable?
 
-		if (data&0x1) state->m_back_enable = 0; else state->m_back_enable = 1;
-		if (data&0x2) state->m_fore_enable=0; else state->m_fore_enable=1;
-		if (data&0x4) state->m_txt_enable = 0; else state->m_txt_enable = 1;
-		if (data&0x8) state->m_sprite_enable=0; else state->m_sprite_enable=1;
+		if (data&0x1) m_back_enable = 0; else m_back_enable = 1;
+		if (data&0x2) m_fore_enable=0; else m_fore_enable=1;
+		if (data&0x4) m_txt_enable = 0; else m_txt_enable = 1;
+		if (data&0x8) m_sprite_enable=0; else m_sprite_enable=1;
 
-		flip_screen_set(space->machine(), data & 0x40);
+		flip_screen_set(machine(), data & 0x40);
 	}
 }
 

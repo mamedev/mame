@@ -36,23 +36,23 @@ public:
 	DECLARE_READ8_MEMBER(angelkds_main_sound_r);
 	DECLARE_WRITE8_MEMBER(angelkds_sub_sound_w);
 	DECLARE_READ8_MEMBER(angelkds_sub_sound_r);
+	DECLARE_WRITE8_MEMBER(angelkds_txvideoram_w);
+	DECLARE_WRITE8_MEMBER(angelkds_txbank_write);
+	DECLARE_WRITE8_MEMBER(angelkds_bgtopvideoram_w);
+	DECLARE_WRITE8_MEMBER(angelkds_bgtopbank_write);
+	DECLARE_WRITE8_MEMBER(angelkds_bgtopscroll_write);
+	DECLARE_WRITE8_MEMBER(angelkds_bgbotvideoram_w);
+	DECLARE_WRITE8_MEMBER(angelkds_bgbotbank_write);
+	DECLARE_WRITE8_MEMBER(angelkds_bgbotscroll_write);
+	DECLARE_WRITE8_MEMBER(angelkds_layer_ctrl_write);
+	DECLARE_WRITE8_MEMBER(angelkds_paletteram_w);
 };
 
 
 /*----------- defined in video/angelkds.c -----------*/
 
-WRITE8_HANDLER( angelkds_bgtopvideoram_w );
-WRITE8_HANDLER( angelkds_bgbotvideoram_w );
-WRITE8_HANDLER( angelkds_txvideoram_w );
 
-WRITE8_HANDLER( angelkds_bgtopbank_write );
-WRITE8_HANDLER( angelkds_bgtopscroll_write );
-WRITE8_HANDLER( angelkds_bgbotbank_write );
-WRITE8_HANDLER( angelkds_bgbotscroll_write );
-WRITE8_HANDLER( angelkds_txbank_write );
 
-WRITE8_HANDLER( angelkds_paletteram_w );
-WRITE8_HANDLER( angelkds_layer_ctrl_write );
 
 VIDEO_START( angelkds );
 SCREEN_UPDATE_IND16( angelkds );

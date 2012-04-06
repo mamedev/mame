@@ -268,13 +268,13 @@ INLINE int blt_read( const UINT8 *ROM, const int offs )
 	return ROM[offs];
 }
 
-INLINE void blt_write( address_space *space, const int tmap, const offs_t offs, const UINT16 data, const UINT16 mask )
+void hyprduel_state::blt_write( address_space *space, const int tmap, const offs_t offs, const UINT16 data, const UINT16 mask )
 {
 	switch( tmap )
 	{
-		case 1:	hyprduel_vram_0_w(space,offs,data,mask);	break;
-		case 2:	hyprduel_vram_1_w(space, offs, data, mask);	break;
-		case 3:	hyprduel_vram_2_w(space, offs, data, mask);	break;
+		case 1:	hyprduel_vram_0_w(*space, offs,data,mask);	break;
+		case 2:	hyprduel_vram_1_w(*space, offs, data, mask);	break;
+		case 3:	hyprduel_vram_2_w(*space, offs, data, mask);	break;
 	}
 //  logerror("%s : Blitter %X] %04X <- %04X & %04X\n", space->machine().describe_context(), tmap, offs, data, mask);
 }
@@ -415,18 +415,18 @@ WRITE16_MEMBER(hyprduel_state::hyprduel_blitter_w)
 
 static ADDRESS_MAP_START( hyprduel_map, AS_PROGRAM, 16, hyprduel_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x400000, 0x41ffff) AM_RAM_WRITE_LEGACY(hyprduel_vram_0_w) AM_BASE(m_vram_0)		/* Layer 0 */
-	AM_RANGE(0x420000, 0x43ffff) AM_RAM_WRITE_LEGACY(hyprduel_vram_1_w) AM_BASE(m_vram_1)		/* Layer 1 */
-	AM_RANGE(0x440000, 0x45ffff) AM_RAM_WRITE_LEGACY(hyprduel_vram_2_w) AM_BASE(m_vram_2)		/* Layer 2 */
+	AM_RANGE(0x400000, 0x41ffff) AM_RAM_WRITE(hyprduel_vram_0_w) AM_BASE(m_vram_0)		/* Layer 0 */
+	AM_RANGE(0x420000, 0x43ffff) AM_RAM_WRITE(hyprduel_vram_1_w) AM_BASE(m_vram_1)		/* Layer 1 */
+	AM_RANGE(0x440000, 0x45ffff) AM_RAM_WRITE(hyprduel_vram_2_w) AM_BASE(m_vram_2)		/* Layer 2 */
 	AM_RANGE(0x460000, 0x46ffff) AM_READ(hyprduel_bankedrom_r)		/* Banked ROM */
-	AM_RANGE(0x470000, 0x473fff) AM_RAM_WRITE_LEGACY(hyprduel_paletteram_w) AM_BASE(m_paletteram)	/* Palette */
+	AM_RANGE(0x470000, 0x473fff) AM_RAM_WRITE(hyprduel_paletteram_w) AM_BASE(m_paletteram)	/* Palette */
 	AM_RANGE(0x474000, 0x474fff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)			/* Sprites */
 	AM_RANGE(0x475000, 0x477fff) AM_RAM			/* only used memory test */
 	AM_RANGE(0x478000, 0x4787ff) AM_RAM AM_BASE_SIZE(m_tiletable, m_tiletable_size)	/* Tiles Set */
 	AM_RANGE(0x478840, 0x47884d) AM_WRITE(hyprduel_blitter_w) AM_BASE(m_blitter_regs)	/* Tiles Blitter */
-	AM_RANGE(0x478860, 0x47886b) AM_WRITE_LEGACY(hyprduel_window_w) AM_BASE(m_window)			/* Tilemap Window */
-	AM_RANGE(0x478870, 0x47887b) AM_RAM_WRITE_LEGACY(hyprduel_scrollreg_w) AM_BASE(m_scroll)		/* Scroll Regs */
-	AM_RANGE(0x47887c, 0x47887d) AM_WRITE_LEGACY(hyprduel_scrollreg_init_w)
+	AM_RANGE(0x478860, 0x47886b) AM_WRITE(hyprduel_window_w) AM_BASE(m_window)			/* Tilemap Window */
+	AM_RANGE(0x478870, 0x47887b) AM_RAM_WRITE(hyprduel_scrollreg_w) AM_BASE(m_scroll)		/* Scroll Regs */
+	AM_RANGE(0x47887c, 0x47887d) AM_WRITE(hyprduel_scrollreg_init_w)
 	AM_RANGE(0x478880, 0x478881) AM_WRITENOP
 	AM_RANGE(0x478890, 0x478891) AM_WRITENOP
 	AM_RANGE(0x4788a0, 0x4788a1) AM_WRITENOP
@@ -462,18 +462,18 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( magerror_map, AS_PROGRAM, 16, hyprduel_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x400000, 0x400001) AM_WRITE(hyprduel_subcpu_control_w)
-	AM_RANGE(0x800000, 0x81ffff) AM_RAM_WRITE_LEGACY(hyprduel_vram_0_w) AM_BASE(m_vram_0)		/* Layer 0 */
-	AM_RANGE(0x820000, 0x83ffff) AM_RAM_WRITE_LEGACY(hyprduel_vram_1_w) AM_BASE(m_vram_1)		/* Layer 1 */
-	AM_RANGE(0x840000, 0x85ffff) AM_RAM_WRITE_LEGACY(hyprduel_vram_2_w) AM_BASE(m_vram_2)		/* Layer 2 */
+	AM_RANGE(0x800000, 0x81ffff) AM_RAM_WRITE(hyprduel_vram_0_w) AM_BASE(m_vram_0)		/* Layer 0 */
+	AM_RANGE(0x820000, 0x83ffff) AM_RAM_WRITE(hyprduel_vram_1_w) AM_BASE(m_vram_1)		/* Layer 1 */
+	AM_RANGE(0x840000, 0x85ffff) AM_RAM_WRITE(hyprduel_vram_2_w) AM_BASE(m_vram_2)		/* Layer 2 */
 	AM_RANGE(0x860000, 0x86ffff) AM_READ(hyprduel_bankedrom_r)		/* Banked ROM */
-	AM_RANGE(0x870000, 0x873fff) AM_RAM_WRITE_LEGACY(hyprduel_paletteram_w) AM_BASE(m_paletteram)	/* Palette */
+	AM_RANGE(0x870000, 0x873fff) AM_RAM_WRITE(hyprduel_paletteram_w) AM_BASE(m_paletteram)	/* Palette */
 	AM_RANGE(0x874000, 0x874fff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)		/* Sprites */
 	AM_RANGE(0x875000, 0x877fff) AM_RAM			/* only used memory test */
 	AM_RANGE(0x878000, 0x8787ff) AM_RAM AM_BASE_SIZE(m_tiletable, m_tiletable_size)	/* Tiles Set */
 	AM_RANGE(0x878840, 0x87884d) AM_WRITE(hyprduel_blitter_w) AM_BASE(m_blitter_regs)	/* Tiles Blitter */
-	AM_RANGE(0x878860, 0x87886b) AM_WRITE_LEGACY(hyprduel_window_w) AM_BASE(m_window)			/* Tilemap Window */
-	AM_RANGE(0x878870, 0x87887b) AM_RAM_WRITE_LEGACY(hyprduel_scrollreg_w) AM_BASE(m_scroll)		/* Scroll Regs */
-	AM_RANGE(0x87887c, 0x87887d) AM_WRITE_LEGACY(hyprduel_scrollreg_init_w)
+	AM_RANGE(0x878860, 0x87886b) AM_WRITE(hyprduel_window_w) AM_BASE(m_window)			/* Tilemap Window */
+	AM_RANGE(0x878870, 0x87887b) AM_RAM_WRITE(hyprduel_scrollreg_w) AM_BASE(m_scroll)		/* Scroll Regs */
+	AM_RANGE(0x87887c, 0x87887d) AM_WRITE(hyprduel_scrollreg_init_w)
 	AM_RANGE(0x878880, 0x878881) AM_WRITENOP
 	AM_RANGE(0x878890, 0x878891) AM_WRITENOP
 	AM_RANGE(0x8788a0, 0x8788a1) AM_WRITENOP

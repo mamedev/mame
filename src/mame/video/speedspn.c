@@ -20,42 +20,37 @@ VIDEO_START(speedspn)
 	state->m_tilemap = tilemap_create(machine, get_speedspn_tile_info,tilemap_scan_cols, 8, 8,64,32);
 }
 
-WRITE8_HANDLER( speedspn_vidram_w )
+WRITE8_MEMBER(speedspn_state::speedspn_vidram_w)
 {
-	speedspn_state *state = space->machine().driver_data<speedspn_state>();
-	state->m_vidram[offset + state->m_bank_vidram] = data;
+	m_vidram[offset + m_bank_vidram] = data;
 
-	if (state->m_bank_vidram == 0)
-		state->m_tilemap->mark_tile_dirty(offset/2);
+	if (m_bank_vidram == 0)
+		m_tilemap->mark_tile_dirty(offset/2);
 }
 
-WRITE8_HANDLER( speedspn_attram_w )
+WRITE8_MEMBER(speedspn_state::speedspn_attram_w)
 {
-	speedspn_state *state = space->machine().driver_data<speedspn_state>();
-	state->m_attram[offset] = data;
+	m_attram[offset] = data;
 
-	state->m_tilemap->mark_tile_dirty(offset^0x400);
+	m_tilemap->mark_tile_dirty(offset^0x400);
 }
 
-READ8_HANDLER( speedspn_vidram_r )
+READ8_MEMBER(speedspn_state::speedspn_vidram_r)
 {
-	speedspn_state *state = space->machine().driver_data<speedspn_state>();
-	return state->m_vidram[offset + state->m_bank_vidram];
+	return m_vidram[offset + m_bank_vidram];
 }
 
-WRITE8_HANDLER(speedspn_banked_vidram_change)
+WRITE8_MEMBER(speedspn_state::speedspn_banked_vidram_change)
 {
-	speedspn_state *state = space->machine().driver_data<speedspn_state>();
 //  logerror("VidRam Bank: %04x\n", data);
-	state->m_bank_vidram = data & 1;
-	state->m_bank_vidram *= 0x1000;
+	m_bank_vidram = data & 1;
+	m_bank_vidram *= 0x1000;
 }
 
-WRITE8_HANDLER(speedspn_global_display_w)
+WRITE8_MEMBER(speedspn_state::speedspn_global_display_w)
 {
-	speedspn_state *state = space->machine().driver_data<speedspn_state>();
 //  logerror("Global display: %u\n", data);
-	state->m_display_disable = data & 1;
+	m_display_disable = data & 1;
 }
 
 

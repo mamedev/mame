@@ -79,53 +79,48 @@ VIDEO_START( othldrby )
 
 ***************************************************************************/
 
-WRITE16_HANDLER( othldrby_videoram_addr_w )
+WRITE16_MEMBER(othldrby_state::othldrby_videoram_addr_w)
 {
-	othldrby_state *state = space->machine().driver_data<othldrby_state>();
-	state->m_vram_addr = data;
+	m_vram_addr = data;
 }
 
-READ16_HANDLER( othldrby_videoram_r )
+READ16_MEMBER(othldrby_state::othldrby_videoram_r)
 {
-	othldrby_state *state = space->machine().driver_data<othldrby_state>();
 
-	if (state->m_vram_addr < VIDEORAM_SIZE)
-		return state->m_vram[state->m_vram_addr++];
+	if (m_vram_addr < VIDEORAM_SIZE)
+		return m_vram[m_vram_addr++];
 	else
 	{
-		popmessage("GFXRAM OUT OF BOUNDS %04x", state->m_vram_addr);
+		popmessage("GFXRAM OUT OF BOUNDS %04x", m_vram_addr);
 		return 0;
 	}
 }
 
-WRITE16_HANDLER( othldrby_videoram_w )
+WRITE16_MEMBER(othldrby_state::othldrby_videoram_w)
 {
-	othldrby_state *state = space->machine().driver_data<othldrby_state>();
 
-	if (state->m_vram_addr < VIDEORAM_SIZE)
+	if (m_vram_addr < VIDEORAM_SIZE)
 	{
-		if (state->m_vram_addr < SPRITERAM_START)
-			state->m_bg_tilemap[state->m_vram_addr / 0x800]->mark_tile_dirty((state->m_vram_addr & 0x7ff) / 2);
-		state->m_vram[state->m_vram_addr++] = data;
+		if (m_vram_addr < SPRITERAM_START)
+			m_bg_tilemap[m_vram_addr / 0x800]->mark_tile_dirty((m_vram_addr & 0x7ff) / 2);
+		m_vram[m_vram_addr++] = data;
 	}
 	else
-		popmessage("GFXRAM OUT OF BOUNDS %04x", state->m_vram_addr);
+		popmessage("GFXRAM OUT OF BOUNDS %04x", m_vram_addr);
 }
 
-WRITE16_HANDLER( othldrby_vreg_addr_w )
+WRITE16_MEMBER(othldrby_state::othldrby_vreg_addr_w)
 {
-	othldrby_state *state = space->machine().driver_data<othldrby_state>();
-	state->m_vreg_addr = data & 0x7f;	/* bit 7 is set when screen is flipped */
+	m_vreg_addr = data & 0x7f;	/* bit 7 is set when screen is flipped */
 }
 
-WRITE16_HANDLER( othldrby_vreg_w )
+WRITE16_MEMBER(othldrby_state::othldrby_vreg_w)
 {
-	othldrby_state *state = space->machine().driver_data<othldrby_state>();
 
-	if (state->m_vreg_addr < OTHLDRBY_VREG_SIZE)
-		state->m_vreg[state->m_vreg_addr++] = data;
+	if (m_vreg_addr < OTHLDRBY_VREG_SIZE)
+		m_vreg[m_vreg_addr++] = data;
 	else
-		popmessage("%06x: VREG OUT OF BOUNDS %04x", cpu_get_pc(&space->device()), state->m_vreg_addr);
+		popmessage("%06x: VREG OUT OF BOUNDS %04x", cpu_get_pc(&space.device()), m_vreg_addr);
 }
 
 

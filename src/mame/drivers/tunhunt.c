@@ -139,7 +139,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, tunhunt_state )
 	AM_RANGE(0x1800, 0x1800) AM_WRITEONLY	/* SHEL0H */
 	AM_RANGE(0x1a00, 0x1a00) AM_WRITEONLY	/* SHEL1H */
 	AM_RANGE(0x1c00, 0x1c00) AM_WRITEONLY	/* MOBJV */
-	AM_RANGE(0x1e00, 0x1eff) AM_WRITE_LEGACY(tunhunt_videoram_w) AM_BASE(m_videoram)	/* ALPHA */
+	AM_RANGE(0x1e00, 0x1eff) AM_WRITE(tunhunt_videoram_w) AM_BASE(m_videoram)	/* ALPHA */
 	AM_RANGE(0x2000, 0x2000) AM_WRITENOP	/* watchdog */
 	AM_RANGE(0x2000, 0x2007) AM_READ(tunhunt_button_r)
 	AM_RANGE(0x2400, 0x2400) AM_WRITENOP	/* INT ACK */

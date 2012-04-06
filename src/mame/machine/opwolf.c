@@ -388,52 +388,49 @@ static void updateDifficulty( running_machine &machine, int mode )
  *
  *************************************/
 
-WRITE16_HANDLER( opwolf_cchip_status_w )
+WRITE16_MEMBER(opwolf_state::opwolf_cchip_status_w)
 {
 	// This is written once after the C-Chip init is complete (and passes)
 	// We use it to setup some initial state (it's not clear if the real
 	// c-chip sets this here, or if it's as a side-effect of the other
 	// init sequence data).
-	opwolf_state *state = space->machine().driver_data<opwolf_state>();
 
-	state->m_cchip_ram[0x3d] = 1;
-	state->m_cchip_ram[0x7a] = 1;
-	updateDifficulty(space->machine(), 0);
+	m_cchip_ram[0x3d] = 1;
+	m_cchip_ram[0x7a] = 1;
+	updateDifficulty(machine(), 0);
 }
 
-WRITE16_HANDLER( opwolf_cchip_bank_w )
+WRITE16_MEMBER(opwolf_state::opwolf_cchip_bank_w)
 {
-	opwolf_state *state = space->machine().driver_data<opwolf_state>();
-	state->m_current_bank = data & 7;
+	m_current_bank = data & 7;
 }
 
-WRITE16_HANDLER( opwolf_cchip_data_w )
+WRITE16_MEMBER(opwolf_state::opwolf_cchip_data_w)
 {
-	opwolf_state *state = space->machine().driver_data<opwolf_state>();
 
-	state->m_cchip_ram[(state->m_current_bank * 0x400) + offset] = data & 0xff;
+	m_cchip_ram[(m_current_bank * 0x400) + offset] = data & 0xff;
 
 //  if (offset != 0x64 && offset != 0x65 && offset != 0x66 && offset != 0x67 && offset != 0x68 && offset != 0x69)
-//      logerror("%08x:  opwolf c write %04x %04x\n", cpu_get_pc(&space->device()), offset, data);
+//      logerror("%08x:  opwolf c write %04x %04x\n", cpu_get_pc(&space.device()), offset, data);
 
-	if (state->m_current_bank == 0)
+	if (m_current_bank == 0)
 	{
 		// Dip switch A is written here by the 68k - precalculate the coinage values
 		// Shouldn't we directly read the values from the ROM area ?
 		if (offset == 0x14)
 		{
 #if OPWOLF_READ_COINAGE_FROM_ROM
-			UINT16* rom = (UINT16*)space->machine().region("maincpu")->base();
+			UINT16* rom = (UINT16*)machine().region("maincpu")->base();
 			UINT32 coin_table[2] = {0, 0};
 			UINT8 coin_offset[2];
 			int slot;
 
-			if ((state->m_opwolf_region == OPWOLF_REGION_JAPAN) || (state->m_opwolf_region == OPWOLF_REGION_US))
+			if ((m_opwolf_region == OPWOLF_REGION_JAPAN) || (m_opwolf_region == OPWOLF_REGION_US))
 			{
 				coin_table[0] = 0x03ffce;
 				coin_table[1] = 0x03ffce;
 			}
-			if ((state->m_opwolf_region == OPWOLF_REGION_WORLD) || (state->m_opwolf_region == OPWOLF_REGION_OTHER))
+			if ((m_opwolf_region == OPWOLF_REGION_WORLD) || (m_opwolf_region == OPWOLF_REGION_OTHER))
 			{
 				coin_table[0] = 0x03ffde;
 				coin_table[1] = 0x03ffee;
@@ -445,26 +442,26 @@ WRITE16_HANDLER( opwolf_cchip_data_w )
 			{
 				if (coin_table[slot])
 				{
-					state->m_cchip_coins_for_credit[slot] = rom[(coin_table[slot] + coin_offset[slot] + 0) / 2] & 0xff;
-					state->m_cchip_credits_for_coin[slot] = rom[(coin_table[slot] + coin_offset[slot] + 2) / 2] & 0xff;
+					m_cchip_coins_for_credit[slot] = rom[(coin_table[slot] + coin_offset[slot] + 0) / 2] & 0xff;
+					m_cchip_credits_for_coin[slot] = rom[(coin_table[slot] + coin_offset[slot] + 2) / 2] & 0xff;
 				}
 			}
 #else
-			if ((state->m_opwolf_region == OPWOLF_REGION_JAPAN) || (state->m_opwolf_region == OPWOLF_REGION_US))
+			if ((m_opwolf_region == OPWOLF_REGION_JAPAN) || (m_opwolf_region == OPWOLF_REGION_US))
 			{
 				switch (data&0x30)	/* table at 0x03ffce.w - 4 * 2 words (coins for credits first) - inverted order */
 				{
-					case 0x00: state->m_cchip_coins_for_credit[0] = 2; cchip_credits_for_coin[0] = 3; break;
-					case 0x10: state->m_cchip_coins_for_credit[0] = 2; cchip_credits_for_coin[0] = 1; break;
-					case 0x20: state->m_cchip_coins_for_credit[0] = 1; cchip_credits_for_coin[0] = 2; break;
-					case 0x30: state->m_cchip_coins_for_credit[0] = 1; cchip_credits_for_coin[0] = 1; break;
+					case 0x00: m_cchip_coins_for_credit[0] = 2; cchip_credits_for_coin[0] = 3; break;
+					case 0x10: m_cchip_coins_for_credit[0] = 2; cchip_credits_for_coin[0] = 1; break;
+					case 0x20: m_cchip_coins_for_credit[0] = 1; cchip_credits_for_coin[0] = 2; break;
+					case 0x30: m_cchip_coins_for_credit[0] = 1; cchip_credits_for_coin[0] = 1; break;
 				}
 				switch (data&0xc0)	/* table at 0x03ffce.w - 4 * 2 words (coins for credits first) - inverted order */
 				{
-					case 0x00: state->m_cchip_coins_for_credit[1] = 2; cchip_credits_for_coin[1] = 3; break;
-					case 0x40: state->m_cchip_coins_for_credit[1] = 2; cchip_credits_for_coin[1] = 1; break;
-					case 0x80: state->m_cchip_coins_for_credit[1] = 1; cchip_credits_for_coin[1] = 2; break;
-					case 0xc0: state->m_cchip_coins_for_credit[1] = 1; cchip_credits_for_coin[1] = 1; break;
+					case 0x00: m_cchip_coins_for_credit[1] = 2; cchip_credits_for_coin[1] = 3; break;
+					case 0x40: m_cchip_coins_for_credit[1] = 2; cchip_credits_for_coin[1] = 1; break;
+					case 0x80: m_cchip_coins_for_credit[1] = 1; cchip_credits_for_coin[1] = 2; break;
+					case 0xc0: m_cchip_coins_for_credit[1] = 1; cchip_credits_for_coin[1] = 1; break;
 				}
 			}
 
@@ -472,17 +469,17 @@ WRITE16_HANDLER( opwolf_cchip_data_w )
 			{
 				switch (data&0x30)	/* table at 0x03ffde.w - 4 * 2 words (coins for credits first) - inverted order */
 				{
-					case 0x00: state->m_cchip_coins_for_credit[0] = 4; cchip_credits_for_coin[0] = 1; break;
-					case 0x10: state->m_cchip_coins_for_credit[0] = 3; cchip_credits_for_coin[0] = 1; break;
-					case 0x20: state->m_cchip_coins_for_credit[0] = 2; cchip_credits_for_coin[0] = 1; break;
-					case 0x30: state->m_cchip_coins_for_credit[0] = 1; cchip_credits_for_coin[0] = 1; break;
+					case 0x00: m_cchip_coins_for_credit[0] = 4; cchip_credits_for_coin[0] = 1; break;
+					case 0x10: m_cchip_coins_for_credit[0] = 3; cchip_credits_for_coin[0] = 1; break;
+					case 0x20: m_cchip_coins_for_credit[0] = 2; cchip_credits_for_coin[0] = 1; break;
+					case 0x30: m_cchip_coins_for_credit[0] = 1; cchip_credits_for_coin[0] = 1; break;
 				}
 				switch (data & 0xc0)	/* table at 0x03ffee.w - 4 * 2 words (coins for credits first) - inverted order */
 				{
-					case 0x00: state->m_cchip_coins_for_credit[1] = 1; cchip_credits_for_coin[1] = 6; break;
-					case 0x40: state->m_cchip_coins_for_credit[1] = 1; cchip_credits_for_coin[1] = 4; break;
-					case 0x80: state->m_cchip_coins_for_credit[1] = 1; cchip_credits_for_coin[1] = 3; break;
-					case 0xc0: state->m_cchip_coins_for_credit[1] = 1; cchip_credits_for_coin[1] = 2; break;
+					case 0x00: m_cchip_coins_for_credit[1] = 1; cchip_credits_for_coin[1] = 6; break;
+					case 0x40: m_cchip_coins_for_credit[1] = 1; cchip_credits_for_coin[1] = 4; break;
+					case 0x80: m_cchip_coins_for_credit[1] = 1; cchip_credits_for_coin[1] = 3; break;
+					case 0xc0: m_cchip_coins_for_credit[1] = 1; cchip_credits_for_coin[1] = 2; break;
 				}
 			}
 #endif
@@ -491,7 +488,7 @@ WRITE16_HANDLER( opwolf_cchip_data_w )
 		// Dip switch B
 		if (offset == 0x15)
 		{
-			updateDifficulty(space->machine(), 0);
+			updateDifficulty(machine(), 0);
 		}
 	}
 }
@@ -503,7 +500,7 @@ WRITE16_HANDLER( opwolf_cchip_data_w )
  *
  *************************************/
 
-READ16_HANDLER( opwolf_cchip_status_r )
+READ16_MEMBER(opwolf_state::opwolf_cchip_status_r)
 {
 	/*
         Bit 0x4 = Error signal
@@ -512,14 +509,13 @@ READ16_HANDLER( opwolf_cchip_status_r )
 	return 0x1; /* Return 0x5 for C-Chip error */
 }
 
-READ16_HANDLER( opwolf_cchip_data_r )
+READ16_MEMBER(opwolf_state::opwolf_cchip_data_r)
 {
-	opwolf_state *state = space->machine().driver_data<opwolf_state>();
 
-//  if (offset!=0x7f && offset!=0x1c && offset!=0x1d && offset!=0x1e && offset!=0x1f && offset!=0x20 && cpu_get_pc(&space->device())!=0xc18 && cpu_get_pc(&space->device())!=0xc2e && cpu_get_pc(&space->device())!=0xc9e && offset!=0x50 && offset!=0x51 && offset!=0x52 && offset!=0x53 && offset!=0x5 && offset!=0x13 && offset!=0x79 && offset!=0x12 && offset!=0x34)
-//      logerror("%08x:  opwolf c read %04x (bank %04x)\n", cpu_get_pc(&space->device()), offset, state->m_current_bank);
+//  if (offset!=0x7f && offset!=0x1c && offset!=0x1d && offset!=0x1e && offset!=0x1f && offset!=0x20 && cpu_get_pc(&space.device())!=0xc18 && cpu_get_pc(&space.device())!=0xc2e && cpu_get_pc(&space.device())!=0xc9e && offset!=0x50 && offset!=0x51 && offset!=0x52 && offset!=0x53 && offset!=0x5 && offset!=0x13 && offset!=0x79 && offset!=0x12 && offset!=0x34)
+//      logerror("%08x:  opwolf c read %04x (bank %04x)\n", cpu_get_pc(&space.device()), offset, m_current_bank);
 
-	return state->m_cchip_ram[(state->m_current_bank * 0x400) + offset];
+	return m_cchip_ram[(m_current_bank * 0x400) + offset];
 }
 
 /*************************************

@@ -27,15 +27,15 @@ public:
 	DECLARE_WRITE8_MEMBER(timeplt_nmi_enable_w);
 	DECLARE_WRITE8_MEMBER(timeplt_coin_counter_w);
 	DECLARE_READ8_MEMBER(psurge_protection_r);
+	DECLARE_WRITE8_MEMBER(timeplt_videoram_w);
+	DECLARE_WRITE8_MEMBER(timeplt_colorram_w);
+	DECLARE_WRITE8_MEMBER(timeplt_flipscreen_w);
+	DECLARE_READ8_MEMBER(timeplt_scanline_r);
 };
 
 
 /*----------- defined in video/timeplt.c -----------*/
 
-READ8_HANDLER( timeplt_scanline_r );
-WRITE8_HANDLER( timeplt_videoram_w );
-WRITE8_HANDLER( timeplt_colorram_w );
-WRITE8_HANDLER( timeplt_flipscreen_w );
 
 PALETTE_INIT( timeplt );
 VIDEO_START( timeplt );

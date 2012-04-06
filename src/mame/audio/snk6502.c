@@ -1038,8 +1038,8 @@ WRITE8_HANDLER( fantasy_sound_w )
 		/* select tune in ROM based on sound command byte */
 		tone_channels[2].base = 0x1000 + ((data & 0x70) << 4);
 		tone_channels[2].mask = 0xff;
-
-		snk6502_flipscreen_w(space, 0, data);
+		snk6502_state *state = space->machine().driver_data<snk6502_state>();
+		state->snk6502_flipscreen_w(*space, 0, data);
 		break;
 	}
 }

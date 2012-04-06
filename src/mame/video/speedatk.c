@@ -52,18 +52,16 @@ PALETTE_INIT( speedatk )
 	}
 }
 
-WRITE8_HANDLER( speedatk_videoram_w )
+WRITE8_MEMBER(speedatk_state::speedatk_videoram_w)
 {
-	speedatk_state *state = space->machine().driver_data<speedatk_state>();
 
-	state->m_videoram[offset] = data;
+	m_videoram[offset] = data;
 }
 
-WRITE8_HANDLER( speedatk_colorram_w )
+WRITE8_MEMBER(speedatk_state::speedatk_colorram_w)
 {
-	speedatk_state *state = space->machine().driver_data<speedatk_state>();
 
-	state->m_colorram[offset] = data;
+	m_colorram[offset] = data;
 }
 
 VIDEO_START( speedatk )
@@ -71,19 +69,18 @@ VIDEO_START( speedatk )
 
 }
 
-WRITE8_HANDLER( speedatk_6845_w )
+WRITE8_MEMBER(speedatk_state::speedatk_6845_w)
 {
-	speedatk_state *state = space->machine().driver_data<speedatk_state>();
 
 	if(offset == 0)
 	{
-		state->m_crtc_index = data;
-		space->machine().device<mc6845_device>("crtc")->address_w(*space,0,data);
+		m_crtc_index = data;
+		machine().device<mc6845_device>("crtc")->address_w(space,0,data);
 	}
 	else
 	{
-		state->m_crtc_vreg[state->m_crtc_index] = data;
-		space->machine().device<mc6845_device>("crtc")->register_w(*space,0,data);
+		m_crtc_vreg[m_crtc_index] = data;
+		machine().device<mc6845_device>("crtc")->register_w(space,0,data);
 	}
 }
 

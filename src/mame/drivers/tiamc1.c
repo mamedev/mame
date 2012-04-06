@@ -120,8 +120,9 @@
 
 static MACHINE_RESET( tiamc1 )
 {
+	tiamc1_state *state = machine.driver_data<tiamc1_state>();
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	tiamc1_bankswitch_w(space, 0, 0);
+	state->tiamc1_bankswitch_w(*space, 0, 0);
 }
 
 WRITE8_MEMBER(tiamc1_state::tiamc1_control_w)
@@ -132,21 +133,21 @@ WRITE8_MEMBER(tiamc1_state::tiamc1_control_w)
 
 
 static ADDRESS_MAP_START( tiamc1_map, AS_PROGRAM, 8, tiamc1_state )
-	AM_RANGE(0xb000, 0xb7ff) AM_WRITE_LEGACY(tiamc1_videoram_w)
+	AM_RANGE(0xb000, 0xb7ff) AM_WRITE(tiamc1_videoram_w)
 	AM_RANGE(0x0000, 0xdfff) AM_ROM
 	AM_RANGE(0xe000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tiamc1_io_map, AS_IO, 8, tiamc1_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x40, 0x4f) AM_WRITE_LEGACY(tiamc1_sprite_y_w) /* sprites Y */
-	AM_RANGE(0x50, 0x5f) AM_WRITE_LEGACY(tiamc1_sprite_x_w) /* sprites X */
-	AM_RANGE(0x60, 0x6f) AM_WRITE_LEGACY(tiamc1_sprite_n_w) /* sprites # */
-	AM_RANGE(0x70, 0x7f) AM_WRITE_LEGACY(tiamc1_sprite_a_w) /* sprites attributes */
-	AM_RANGE(0xa0, 0xaf) AM_WRITE_LEGACY(tiamc1_palette_w)  /* color ram */
-	AM_RANGE(0xbc, 0xbc) AM_WRITE_LEGACY(tiamc1_bg_hshift_w)/* background H scroll */
-	AM_RANGE(0xbd, 0xbd) AM_WRITE_LEGACY(tiamc1_bg_vshift_w)/* background V scroll */
-	AM_RANGE(0xbe, 0xbe) AM_WRITE_LEGACY(tiamc1_bankswitch_w) /* VRAM selector */
+	AM_RANGE(0x40, 0x4f) AM_WRITE(tiamc1_sprite_y_w) /* sprites Y */
+	AM_RANGE(0x50, 0x5f) AM_WRITE(tiamc1_sprite_x_w) /* sprites X */
+	AM_RANGE(0x60, 0x6f) AM_WRITE(tiamc1_sprite_n_w) /* sprites # */
+	AM_RANGE(0x70, 0x7f) AM_WRITE(tiamc1_sprite_a_w) /* sprites attributes */
+	AM_RANGE(0xa0, 0xaf) AM_WRITE(tiamc1_palette_w)  /* color ram */
+	AM_RANGE(0xbc, 0xbc) AM_WRITE(tiamc1_bg_hshift_w)/* background H scroll */
+	AM_RANGE(0xbd, 0xbd) AM_WRITE(tiamc1_bg_vshift_w)/* background V scroll */
+	AM_RANGE(0xbe, 0xbe) AM_WRITE(tiamc1_bankswitch_w) /* VRAM selector */
 	AM_RANGE(0xbf, 0xbf) AM_WRITENOP                 /* charset control */
 	AM_RANGE(0xc0, 0xc3) AM_DEVWRITE_LEGACY("2x8253", tiamc1_timer0_w)   /* timer 0 */
 	AM_RANGE(0xd0, 0xd0) AM_READ_PORT("IN0")

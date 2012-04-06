@@ -11,6 +11,8 @@ public:
 	UINT8 *m_spriteram;
 	size_t m_spriteram_size;
 	DECLARE_WRITE8_MEMBER(speedbal_coincounter_w);
+	DECLARE_WRITE8_MEMBER(speedbal_foreground_videoram_w);
+	DECLARE_WRITE8_MEMBER(speedbal_background_videoram_w);
 };
 
 
@@ -18,5 +20,3 @@ public:
 
 VIDEO_START( speedbal );
 SCREEN_UPDATE_IND16( speedbal );
-WRITE8_HANDLER( speedbal_foreground_videoram_w );
-WRITE8_HANDLER( speedbal_background_videoram_w );

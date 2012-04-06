@@ -29,15 +29,15 @@ public:
 	DECLARE_WRITE8_MEMBER(bombjack_soundlatch_w);
 	DECLARE_READ8_MEMBER(bombjack_soundlatch_r);
 	DECLARE_WRITE8_MEMBER(irq_mask_w);
+	DECLARE_WRITE8_MEMBER(bombjack_videoram_w);
+	DECLARE_WRITE8_MEMBER(bombjack_colorram_w);
+	DECLARE_WRITE8_MEMBER(bombjack_background_w);
+	DECLARE_WRITE8_MEMBER(bombjack_flipscreen_w);
 };
 
 
 /*----------- defined in video/bombjack.c -----------*/
 
-WRITE8_HANDLER( bombjack_videoram_w );
-WRITE8_HANDLER( bombjack_colorram_w );
-WRITE8_HANDLER( bombjack_background_w );
-WRITE8_HANDLER( bombjack_flipscreen_w );
 
 VIDEO_START( bombjack );
 SCREEN_UPDATE_IND16( bombjack );

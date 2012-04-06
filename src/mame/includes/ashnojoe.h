@@ -43,20 +43,20 @@ public:
 	DECLARE_WRITE8_MEMBER(adpcm_w);
 	DECLARE_READ8_MEMBER(sound_latch_r);
 	DECLARE_READ8_MEMBER(sound_latch_status_r);
+	DECLARE_WRITE16_MEMBER(ashnojoe_tileram_w);
+	DECLARE_WRITE16_MEMBER(ashnojoe_tileram2_w);
+	DECLARE_WRITE16_MEMBER(ashnojoe_tileram3_w);
+	DECLARE_WRITE16_MEMBER(ashnojoe_tileram4_w);
+	DECLARE_WRITE16_MEMBER(ashnojoe_tileram5_w);
+	DECLARE_WRITE16_MEMBER(ashnojoe_tileram6_w);
+	DECLARE_WRITE16_MEMBER(ashnojoe_tileram7_w);
+	DECLARE_WRITE16_MEMBER(joe_tilemaps_xscroll_w);
+	DECLARE_WRITE16_MEMBER(joe_tilemaps_yscroll_w);
 };
 
 
 /*----------- defined in video/ashnojoe.c -----------*/
 
-WRITE16_HANDLER( ashnojoe_tileram_w );
-WRITE16_HANDLER( ashnojoe_tileram2_w );
-WRITE16_HANDLER( ashnojoe_tileram3_w );
-WRITE16_HANDLER( ashnojoe_tileram4_w );
-WRITE16_HANDLER( ashnojoe_tileram5_w );
-WRITE16_HANDLER( ashnojoe_tileram6_w );
-WRITE16_HANDLER( ashnojoe_tileram7_w );
-WRITE16_HANDLER( joe_tilemaps_xscroll_w );
-WRITE16_HANDLER( joe_tilemaps_yscroll_w );
 
 VIDEO_START( ashnojoe );
 SCREEN_UPDATE_IND16( ashnojoe );

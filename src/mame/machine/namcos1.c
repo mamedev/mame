@@ -552,12 +552,12 @@ static WRITE8_HANDLER( key_type3_w )
 *                                                                              *
 *******************************************************************************/
 
-WRITE8_HANDLER( namcos1_sound_bankswitch_w )
+WRITE8_MEMBER(namcos1_state::namcos1_sound_bankswitch_w)
 {
-	UINT8 *rom = space->machine().region("audiocpu")->base() + 0xc000;
+	UINT8 *rom = machine().region("audiocpu")->base() + 0xc000;
 
 	int bank = (data & 0x70) >> 4;
-	memory_set_bankptr(space->machine(), "bank17",rom + 0x4000 * bank);
+	memory_set_bankptr(machine(), "bank17",rom + 0x4000 * bank);
 }
 
 
@@ -569,37 +569,35 @@ WRITE8_HANDLER( namcos1_sound_bankswitch_w )
 *******************************************************************************/
 
 
-WRITE8_HANDLER( namcos1_cpu_control_w )
+WRITE8_MEMBER(namcos1_state::namcos1_cpu_control_w)
 {
-	namcos1_state *state = space->machine().driver_data<namcos1_state>();
-//  logerror("reset control pc=%04x %02x\n",cpu_get_pc(&space->device()),data);
-	if ((data & 1) ^ state->m_reset)
+//  logerror("reset control pc=%04x %02x\n",cpu_get_pc(&space.device()),data);
+	if ((data & 1) ^ m_reset)
 	{
-		state->m_mcu_patch_data = 0;
-		state->m_reset = data & 1;
+		m_mcu_patch_data = 0;
+		m_reset = data & 1;
 	}
 
-	cputag_set_input_line(space->machine(), "sub", INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
-	cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
-	cputag_set_input_line(space->machine(), "mcu", INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(machine(), "sub", INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(machine(), "mcu", INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
 
-WRITE8_HANDLER( namcos1_watchdog_w )
+WRITE8_MEMBER(namcos1_state::namcos1_watchdog_w)
 {
-	namcos1_state *state = space->machine().driver_data<namcos1_state>();
-	if (&space->device() == space->machine().device("maincpu"))
-		state->m_wdog |= 1;
-	else if (&space->device() == space->machine().device("sub"))
-		state->m_wdog |= 2;
-	else if (&space->device() == space->machine().device("audiocpu"))
-		state->m_wdog |= 4;
+	if (&space.device() == machine().device("maincpu"))
+		m_wdog |= 1;
+	else if (&space.device() == machine().device("sub"))
+		m_wdog |= 2;
+	else if (&space.device() == machine().device("audiocpu"))
+		m_wdog |= 4;
 
-	if (state->m_wdog == 7 || !state->m_reset)
+	if (m_wdog == 7 || !m_reset)
 	{
-		state->m_wdog = 0;
-		state->watchdog_reset_w(*space,0,0);
+		m_wdog = 0;
+		watchdog_reset_w(space,0,0);
 	}
 }
 
@@ -741,21 +739,21 @@ static void namcos1_bankswitch(running_machine &machine, int cpu, offs_t offset,
 	}
 }
 
-WRITE8_HANDLER( namcos1_bankswitch_w )
+WRITE8_MEMBER(namcos1_state::namcos1_bankswitch_w)
 {
-//  logerror("cpu %s: namcos1_bankswitch_w offset %04x data %02x\n", space->device().tag(), offset, data);
+//  logerror("cpu %s: namcos1_bankswitch_w offset %04x data %02x\n", device().tag(), offset, data);
 
-	namcos1_bankswitch(space->machine(), (&space->device() == space->machine().device("maincpu")) ? 0 : 1, offset, data);
+	namcos1_bankswitch(machine(), (&space.device() == machine().device("maincpu")) ? 0 : 1, offset, data);
 }
 
 /* Sub cpu set start bank port */
-WRITE8_HANDLER( namcos1_subcpu_bank_w )
+WRITE8_MEMBER(namcos1_state::namcos1_subcpu_bank_w)
 {
 //  logerror("namcos1_subcpu_bank_w offset %04x data %02x\n",offset,data);
 
 	/* Prepare code for CPU 1 */
-	namcos1_bankswitch( space->machine(), 1, 0x0e00, 0x03 );
-	namcos1_bankswitch( space->machine(), 1, 0x0e01, data );
+	namcos1_bankswitch( machine(), 1, 0x0e00, 0x03 );
+	namcos1_bankswitch( machine(), 1, 0x0e01, data );
 }
 
 /*******************************************************************************
@@ -903,7 +901,7 @@ MACHINE_RESET( namcos1 )
 *******************************************************************************/
 
 /* mcu banked rom area select */
-WRITE8_HANDLER( namcos1_mcu_bankswitch_w )
+WRITE8_MEMBER(namcos1_state::namcos1_mcu_bankswitch_w)
 {
 	int addr;
 
@@ -922,7 +920,7 @@ WRITE8_HANDLER( namcos1_mcu_bankswitch_w )
 	/* bit 0-1 : address line A15-A16 */
 	addr += (data & 3) * 0x8000;
 
-	memory_set_bankptr(space->machine(), "bank20", space->machine().region("mcu")->base() + addr);
+	memory_set_bankptr(machine(), "bank20", machine().region("mcu")->base() + addr);
 }
 
 
@@ -939,13 +937,12 @@ WRITE8_HANDLER( namcos1_mcu_bankswitch_w )
 /* I found set $A6 only initialize in MCU                       */
 /* This patch kill write this data by MCU case $A6 to xx(clear) */
 
-WRITE8_HANDLER( namcos1_mcu_patch_w )
+WRITE8_MEMBER(namcos1_state::namcos1_mcu_patch_w)
 {
-	namcos1_state *state = space->machine().driver_data<namcos1_state>();
-	//logerror("mcu C000 write pc=%04x data=%02x\n",cpu_get_pc(&space->device()),data);
-	if (state->m_mcu_patch_data == 0xa6) return;
-	state->m_mcu_patch_data = data;
-	state->m_triram[0] = data;
+	//logerror("mcu C000 write pc=%04x data=%02x\n",cpu_get_pc(&space.device()),data);
+	if (m_mcu_patch_data == 0xa6) return;
+	m_mcu_patch_data = data;
+	m_triram[0] = data;
 }
 
 

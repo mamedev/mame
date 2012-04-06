@@ -84,30 +84,53 @@ public:
 
 	// an empty tile, so that we can safely disable tiles
 	UINT8        m_empty_tile[8*8];
+	DECLARE_WRITE16_MEMBER(toaplan1_intenable_w);
+	DECLARE_WRITE16_MEMBER(demonwld_dsp_addrsel_w);
+	DECLARE_READ16_MEMBER(demonwld_dsp_r);
+	DECLARE_WRITE16_MEMBER(demonwld_dsp_w);
+	DECLARE_WRITE16_MEMBER(demonwld_dsp_bio_w);
+	DECLARE_READ16_MEMBER(demonwld_BIO_r);
+	DECLARE_WRITE16_MEMBER(demonwld_dsp_ctrl_w);
+	DECLARE_READ16_MEMBER(samesame_port_6_word_r);
+	DECLARE_READ16_MEMBER(vimana_system_port_r);
+	DECLARE_READ16_MEMBER(vimana_mcu_r);
+	DECLARE_WRITE16_MEMBER(vimana_mcu_w);
+	DECLARE_READ16_MEMBER(toaplan1_shared_r);
+	DECLARE_WRITE16_MEMBER(toaplan1_shared_w);
+	DECLARE_WRITE16_MEMBER(toaplan1_reset_sound);
+	DECLARE_WRITE8_MEMBER(rallybik_coin_w);
+	DECLARE_WRITE8_MEMBER(toaplan1_coin_w);
+	DECLARE_WRITE16_MEMBER(samesame_coin_w);
+	DECLARE_READ16_MEMBER(toaplan1_frame_done_r);
+	DECLARE_WRITE16_MEMBER(toaplan1_tile_offsets_w);
+	DECLARE_WRITE16_MEMBER(rallybik_bcu_flipscreen_w);
+	DECLARE_WRITE16_MEMBER(toaplan1_bcu_flipscreen_w);
+	DECLARE_WRITE16_MEMBER(toaplan1_fcu_flipscreen_w);
+	DECLARE_READ16_MEMBER(toaplan1_spriteram_offs_r);
+	DECLARE_WRITE16_MEMBER(toaplan1_spriteram_offs_w);
+	DECLARE_READ16_MEMBER(toaplan1_colorram1_r);
+	DECLARE_WRITE16_MEMBER(toaplan1_colorram1_w);
+	DECLARE_READ16_MEMBER(toaplan1_colorram2_r);
+	DECLARE_WRITE16_MEMBER(toaplan1_colorram2_w);
+	DECLARE_READ16_MEMBER(toaplan1_spriteram16_r);
+	DECLARE_WRITE16_MEMBER(toaplan1_spriteram16_w);
+	DECLARE_READ16_MEMBER(toaplan1_spritesizeram16_r);
+	DECLARE_WRITE16_MEMBER(toaplan1_spritesizeram16_w);
+	DECLARE_WRITE16_MEMBER(toaplan1_bcu_control_w);
+	DECLARE_READ16_MEMBER(toaplan1_tileram_offs_r);
+	DECLARE_WRITE16_MEMBER(toaplan1_tileram_offs_w);
+	DECLARE_READ16_MEMBER(toaplan1_tileram16_r);
+	DECLARE_READ16_MEMBER(rallybik_tileram16_r);
+	DECLARE_WRITE16_MEMBER(toaplan1_tileram16_w);
+	DECLARE_READ16_MEMBER(toaplan1_scroll_regs_r);
+	DECLARE_WRITE16_MEMBER(toaplan1_scroll_regs_w);
 };
 
 
 /*----------- defined in machine/toaplan1.c -----------*/
 
 INTERRUPT_GEN( toaplan1_interrupt );
-WRITE16_HANDLER( toaplan1_intenable_w );
-READ16_HANDLER ( toaplan1_shared_r );
-WRITE16_HANDLER( toaplan1_shared_w );
-WRITE16_HANDLER( toaplan1_reset_sound );
-WRITE16_HANDLER( demonwld_dsp_addrsel_w );
-READ16_HANDLER ( demonwld_dsp_r );
-WRITE16_HANDLER( demonwld_dsp_w );
-WRITE16_HANDLER( demonwld_dsp_bio_w );
-WRITE16_HANDLER( demonwld_dsp_ctrl_w );
-READ16_HANDLER ( demonwld_BIO_r );
-READ16_HANDLER ( samesame_port_6_word_r );
-READ16_HANDLER ( vimana_system_port_r );
-READ16_HANDLER ( vimana_mcu_r );
-WRITE16_HANDLER( vimana_mcu_w );
 
-WRITE8_HANDLER( rallybik_coin_w );
-WRITE8_HANDLER( toaplan1_coin_w );
-WRITE16_HANDLER( samesame_coin_w );
 
 MACHINE_RESET( toaplan1 );
 MACHINE_RESET( demonwld );
@@ -121,31 +144,8 @@ void vimana_driver_savestate(running_machine &machine);
 
 /*----------- defined in video/toaplan1.c -----------*/
 
-READ16_HANDLER ( toaplan1_frame_done_r );
-WRITE16_HANDLER( toaplan1_bcu_control_w );
-WRITE16_HANDLER( rallybik_bcu_flipscreen_w );
-WRITE16_HANDLER( toaplan1_bcu_flipscreen_w );
-WRITE16_HANDLER( toaplan1_fcu_flipscreen_w );
 
-READ16_HANDLER ( rallybik_tileram16_r );
-READ16_HANDLER ( toaplan1_tileram16_r );
-WRITE16_HANDLER( toaplan1_tileram16_w );
-READ16_HANDLER ( toaplan1_spriteram16_r );
-WRITE16_HANDLER( toaplan1_spriteram16_w );
-READ16_HANDLER ( toaplan1_spritesizeram16_r );
-WRITE16_HANDLER( toaplan1_spritesizeram16_w );
-READ16_HANDLER ( toaplan1_colorram1_r );
-WRITE16_HANDLER( toaplan1_colorram1_w );
-READ16_HANDLER ( toaplan1_colorram2_r );
-WRITE16_HANDLER( toaplan1_colorram2_w );
 
-READ16_HANDLER ( toaplan1_scroll_regs_r );
-WRITE16_HANDLER( toaplan1_scroll_regs_w );
-WRITE16_HANDLER( toaplan1_tile_offsets_w );
-READ16_HANDLER ( toaplan1_tileram_offs_r );
-WRITE16_HANDLER( toaplan1_tileram_offs_w );
-READ16_HANDLER ( toaplan1_spriteram_offs_r );
-WRITE16_HANDLER( toaplan1_spriteram_offs_w );
 
 SCREEN_VBLANK( rallybik );
 SCREEN_VBLANK( toaplan1 );

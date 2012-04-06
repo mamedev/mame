@@ -15,19 +15,17 @@
  *
  *************************************/
 
-WRITE8_HANDLER( spacefb_port_0_w )
+WRITE8_MEMBER(spacefb_state::spacefb_port_0_w)
 {
-	spacefb_state *state = space->machine().driver_data<spacefb_state>();
-	space->machine().primary_screen->update_now();
-	state->m_port_0 = data;
+	machine().primary_screen->update_now();
+	m_port_0 = data;
 }
 
 
-WRITE8_HANDLER( spacefb_port_2_w )
+WRITE8_MEMBER(spacefb_state::spacefb_port_2_w)
 {
-	spacefb_state *state = space->machine().driver_data<spacefb_state>();
-	space->machine().primary_screen->update_now();
-	state->m_port_2 = data;
+	machine().primary_screen->update_now();
+	m_port_2 = data;
 }
 
 

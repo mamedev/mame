@@ -33,17 +33,17 @@ public:
 	DECLARE_WRITE8_MEMBER(pbaction_sh_command_w);
 	DECLARE_WRITE8_MEMBER(nmi_mask_w);
 	DECLARE_READ8_MEMBER(pbactio3_prot_kludge_r);
+	DECLARE_WRITE8_MEMBER(pbaction_videoram_w);
+	DECLARE_WRITE8_MEMBER(pbaction_colorram_w);
+	DECLARE_WRITE8_MEMBER(pbaction_videoram2_w);
+	DECLARE_WRITE8_MEMBER(pbaction_colorram2_w);
+	DECLARE_WRITE8_MEMBER(pbaction_scroll_w);
+	DECLARE_WRITE8_MEMBER(pbaction_flipscreen_w);
 };
 
 
 /*----------- defined in video/pbaction.c -----------*/
 
-extern WRITE8_HANDLER( pbaction_videoram_w );
-extern WRITE8_HANDLER( pbaction_colorram_w );
-extern WRITE8_HANDLER( pbaction_videoram2_w );
-extern WRITE8_HANDLER( pbaction_colorram2_w );
-extern WRITE8_HANDLER( pbaction_flipscreen_w );
-extern WRITE8_HANDLER( pbaction_scroll_w );
 
 extern VIDEO_START( pbaction );
 extern SCREEN_UPDATE_IND16( pbaction );

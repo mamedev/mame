@@ -21,6 +21,10 @@ public:
 	UINT16 *m_spriteram;
 
 	int m_sprxoffs;
+	DECLARE_WRITE16_MEMBER(stlforce_bg_videoram_w);
+	DECLARE_WRITE16_MEMBER(stlforce_mlow_videoram_w);
+	DECLARE_WRITE16_MEMBER(stlforce_mhigh_videoram_w);
+	DECLARE_WRITE16_MEMBER(stlforce_tx_videoram_w);
 };
 
 
@@ -28,7 +32,3 @@ public:
 
 VIDEO_START( stlforce );
 SCREEN_UPDATE_IND16( stlforce );
-WRITE16_HANDLER( stlforce_tx_videoram_w );
-WRITE16_HANDLER( stlforce_mhigh_videoram_w );
-WRITE16_HANDLER( stlforce_mlow_videoram_w );
-WRITE16_HANDLER( stlforce_bg_videoram_w );

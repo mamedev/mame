@@ -111,11 +111,11 @@ WRITE8_MEMBER(wc90_state::wc90_sound_command_w)
 static ADDRESS_MAP_START( wc90_map_1, AS_PROGRAM, 8, wc90_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_RAM		/* Main RAM */
-	AM_RANGE(0xa000, 0xafff) AM_RAM_WRITE_LEGACY(wc90_fgvideoram_w) AM_BASE(m_fgvideoram)	/* fg video ram */
+	AM_RANGE(0xa000, 0xafff) AM_RAM_WRITE(wc90_fgvideoram_w) AM_BASE(m_fgvideoram)	/* fg video ram */
 	AM_RANGE(0xb000, 0xbfff) AM_RAM
-	AM_RANGE(0xc000, 0xcfff) AM_RAM_WRITE_LEGACY(wc90_bgvideoram_w) AM_BASE(m_bgvideoram)
+	AM_RANGE(0xc000, 0xcfff) AM_RAM_WRITE(wc90_bgvideoram_w) AM_BASE(m_bgvideoram)
 	AM_RANGE(0xd000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE_LEGACY(wc90_txvideoram_w) AM_BASE(m_txvideoram)	/* tx video ram */
+	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(wc90_txvideoram_w) AM_BASE(m_txvideoram)	/* tx video ram */
 	AM_RANGE(0xf000, 0xf7ff) AM_ROMBANK("bank1")
 	AM_RANGE(0xf800, 0xfbff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xfc00, 0xfc00) AM_READ_PORT("P1")

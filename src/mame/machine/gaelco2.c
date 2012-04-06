@@ -136,36 +136,36 @@ DRIVER_INIT( snowboar )
 
 ***************************************************************************/
 
-WRITE16_HANDLER( gaelco2_coin_w )
+WRITE16_MEMBER(gaelco2_state::gaelco2_coin_w)
 {
 	/* Coin Lockouts */
-	coin_lockout_w(space->machine(), 0, ~data & 0x01);
-	coin_lockout_w(space->machine(), 1, ~data & 0x02);
+	coin_lockout_w(machine(), 0, ~data & 0x01);
+	coin_lockout_w(machine(), 1, ~data & 0x02);
 
 	/* Coin Counters */
-	coin_counter_w(space->machine(), 0, data & 0x04);
-	coin_counter_w(space->machine(), 1, data & 0x08);
+	coin_counter_w(machine(), 0, data & 0x04);
+	coin_counter_w(machine(), 1, data & 0x08);
 }
 
-WRITE16_HANDLER( gaelco2_coin2_w )
+WRITE16_MEMBER(gaelco2_state::gaelco2_coin2_w)
 {
 	/* coin counters */
-	coin_counter_w(space->machine(), offset & 0x01,  data & 0x01);
+	coin_counter_w(machine(), offset & 0x01,  data & 0x01);
 }
 
-WRITE16_HANDLER( wrally2_coin_w )
+WRITE16_MEMBER(gaelco2_state::wrally2_coin_w)
 {
 	/* coin counters */
-	coin_counter_w(space->machine(), (offset >> 3) & 0x01,  data & 0x01);
+	coin_counter_w(machine(), (offset >> 3) & 0x01,  data & 0x01);
 }
 
-WRITE16_HANDLER( touchgo_coin_w )
+WRITE16_MEMBER(gaelco2_state::touchgo_coin_w)
 {
 	if ((offset >> 2) == 0){
-		coin_counter_w(space->machine(), 0, data & 0x01);
-		coin_counter_w(space->machine(), 1, data & 0x02);
-		coin_counter_w(space->machine(), 2, data & 0x04);
-		coin_counter_w(space->machine(), 3, data & 0x08);
+		coin_counter_w(machine(), 0, data & 0x01);
+		coin_counter_w(machine(), 1, data & 0x02);
+		coin_counter_w(machine(), 2, data & 0x04);
+		coin_counter_w(machine(), 3, data & 0x08);
 	}
 }
 
@@ -182,10 +182,9 @@ DRIVER_INIT( bang )
 	state->m_clr_gun_int = 0;
 }
 
-WRITE16_HANDLER( bang_clr_gun_int_w )
+WRITE16_MEMBER(gaelco2_state::bang_clr_gun_int_w)
 {
-	gaelco2_state *state = space->machine().driver_data<gaelco2_state>();
-	state->m_clr_gun_int = 1;
+	m_clr_gun_int = 1;
 }
 
 TIMER_DEVICE_CALLBACK( bang_irq )
@@ -227,37 +226,35 @@ CUSTOM_INPUT( wrally2_analog_bit_r )
 }
 
 
-WRITE16_HANDLER( wrally2_adc_clk )
+WRITE16_MEMBER(gaelco2_state::wrally2_adc_clk)
 {
-	gaelco2_state *state = space->machine().driver_data<gaelco2_state>();
 	/* a zero/one combo is written here to clock the next analog port bit */
 	if (ACCESSING_BITS_0_7)
 	{
 		if (!(data & 0xff))
 		{
-			state->m_analog_ports[0] <<= 1;
-			state->m_analog_ports[1] <<= 1;
+			m_analog_ports[0] <<= 1;
+			m_analog_ports[1] <<= 1;
 		}
 	}
 	else
-		logerror("%06X:analog_port_clock_w(%02X) = %08X & %08X\n", cpu_get_pc(&space->device()), offset, data, mem_mask);
+		logerror("%06X:analog_port_clock_w(%02X) = %08X & %08X\n", cpu_get_pc(&space.device()), offset, data, mem_mask);
 }
 
 
-WRITE16_HANDLER( wrally2_adc_cs )
+WRITE16_MEMBER(gaelco2_state::wrally2_adc_cs)
 {
-	gaelco2_state *state = space->machine().driver_data<gaelco2_state>();
 	/* a zero is written here to read the analog ports, and a one is written when finished */
 	if (ACCESSING_BITS_0_7)
 	{
 		if (!(data & 0xff))
 		{
-			state->m_analog_ports[0] = input_port_read_safe(space->machine(), "ANALOG0", 0);
-			state->m_analog_ports[1] = input_port_read_safe(space->machine(), "ANALOG1", 0);
+			m_analog_ports[0] = input_port_read_safe(machine(), "ANALOG0", 0);
+			m_analog_ports[1] = input_port_read_safe(machine(), "ANALOG1", 0);
 		}
 	}
 	else
-		logerror("%06X:analog_port_latch_w(%02X) = %08X & %08X\n", cpu_get_pc(&space->device()), offset, data, mem_mask);
+		logerror("%06X:analog_port_latch_w(%02X) = %08X & %08X\n", cpu_get_pc(&space.device()), offset, data, mem_mask);
 }
 
 /***************************************************************************
@@ -303,16 +300,15 @@ WRITE16_DEVICE_HANDLER( gaelco2_eeprom_data_w )
     The protection handles sound, controls, gameplay and some sprites
 */
 
-READ16_HANDLER( snowboar_protection_r )
+READ16_MEMBER(gaelco2_state::snowboar_protection_r)
 {
-	logerror("%06x: protection read from %04x\n", cpu_get_pc(&space->device()), offset*2);
+	logerror("%06x: protection read from %04x\n", cpu_get_pc(&space.device()), offset*2);
 	return 0x0000;
 }
 
-WRITE16_HANDLER( snowboar_protection_w )
+WRITE16_MEMBER(gaelco2_state::snowboar_protection_w)
 {
-	gaelco2_state *state = space->machine().driver_data<gaelco2_state>();
-	COMBINE_DATA(&state->m_snowboar_protection[offset]);
-	logerror("%06x: protection write %04x to %04x\n", cpu_get_pc(&space->device()), data, offset*2);
+	COMBINE_DATA(&m_snowboar_protection[offset]);
+	logerror("%06x: protection write %04x to %04x\n", cpu_get_pc(&space.device()), data, offset*2);
 
 }

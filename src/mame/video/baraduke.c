@@ -138,30 +138,26 @@ VIDEO_START( baraduke )
 
 ***************************************************************************/
 
-READ8_HANDLER( baraduke_videoram_r )
+READ8_MEMBER(baraduke_state::baraduke_videoram_r)
 {
-	baraduke_state *state = space->machine().driver_data<baraduke_state>();
-	return state->m_videoram[offset];
+	return m_videoram[offset];
 }
 
-WRITE8_HANDLER( baraduke_videoram_w )
+WRITE8_MEMBER(baraduke_state::baraduke_videoram_w)
 {
-	baraduke_state *state = space->machine().driver_data<baraduke_state>();
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap[offset/0x1000]->mark_tile_dirty((offset&0xfff)/2);
+	m_videoram[offset] = data;
+	m_bg_tilemap[offset/0x1000]->mark_tile_dirty((offset&0xfff)/2);
 }
 
-READ8_HANDLER( baraduke_textram_r )
+READ8_MEMBER(baraduke_state::baraduke_textram_r)
 {
-	baraduke_state *state = space->machine().driver_data<baraduke_state>();
-	return state->m_textram[offset];
+	return m_textram[offset];
 }
 
-WRITE8_HANDLER( baraduke_textram_w )
+WRITE8_MEMBER(baraduke_state::baraduke_textram_w)
 {
-	baraduke_state *state = space->machine().driver_data<baraduke_state>();
-	state->m_textram[offset] = data;
-	state->m_tx_tilemap->mark_tile_dirty(offset & 0x3ff);
+	m_textram[offset] = data;
+	m_tx_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
 
@@ -182,31 +178,29 @@ static void scroll_w(address_space *space, int layer, int offset, int data)
 	}
 }
 
-WRITE8_HANDLER( baraduke_scroll0_w )
+WRITE8_MEMBER(baraduke_state::baraduke_scroll0_w)
 {
-	scroll_w(space, 0, offset, data);
+	scroll_w(&space, 0, offset, data);
 }
-WRITE8_HANDLER( baraduke_scroll1_w )
+WRITE8_MEMBER(baraduke_state::baraduke_scroll1_w)
 {
-	scroll_w(space, 1, offset, data);
-}
-
-
-
-READ8_HANDLER( baraduke_spriteram_r )
-{
-	baraduke_state *state = space->machine().driver_data<baraduke_state>();
-	return state->m_spriteram[offset];
+	scroll_w(&space, 1, offset, data);
 }
 
-WRITE8_HANDLER( baraduke_spriteram_w )
+
+
+READ8_MEMBER(baraduke_state::baraduke_spriteram_r)
 {
-	baraduke_state *state = space->machine().driver_data<baraduke_state>();
-	state->m_spriteram[offset] = data;
+	return m_spriteram[offset];
+}
+
+WRITE8_MEMBER(baraduke_state::baraduke_spriteram_w)
+{
+	m_spriteram[offset] = data;
 
 	/* a write to this offset tells the sprite chip to buffer the sprite list */
 	if (offset == 0x1ff2)
-		state->m_copy_sprites = 1;
+		m_copy_sprites = 1;
 }
 
 

@@ -57,6 +57,14 @@ public:
 	DECLARE_WRITE16_MEMBER(hyprduel_cpusync_trigger2_w);
 	DECLARE_READ16_MEMBER(hyprduel_bankedrom_r);
 	DECLARE_WRITE16_MEMBER(hyprduel_blitter_w);
+	DECLARE_WRITE16_MEMBER(hyprduel_paletteram_w);
+	DECLARE_WRITE16_MEMBER(hyprduel_vram_0_w);
+	DECLARE_WRITE16_MEMBER(hyprduel_vram_1_w);
+	DECLARE_WRITE16_MEMBER(hyprduel_vram_2_w);
+	DECLARE_WRITE16_MEMBER(hyprduel_window_w);
+	DECLARE_WRITE16_MEMBER(hyprduel_scrollreg_w);
+	DECLARE_WRITE16_MEMBER(hyprduel_scrollreg_init_w);
+	void blt_write( address_space *space, const int tmap, const offs_t offs, const UINT16 data, const UINT16 mask );
 };
 
 
@@ -64,13 +72,6 @@ public:
 /*----------- defined in video/hyprduel.c -----------*/
 
 
-WRITE16_HANDLER( hyprduel_paletteram_w );
-WRITE16_HANDLER( hyprduel_window_w );
-WRITE16_HANDLER( hyprduel_vram_0_w );
-WRITE16_HANDLER( hyprduel_vram_1_w );
-WRITE16_HANDLER( hyprduel_vram_2_w );
-WRITE16_HANDLER( hyprduel_scrollreg_w );
-WRITE16_HANDLER( hyprduel_scrollreg_init_w );
 
 VIDEO_START( hyprduel_14220 );
 VIDEO_START( magerror_14220 );

@@ -19,15 +19,15 @@ public:
 	int m_charpalbank;
 	int m_flipscreen;
 	tilemap_t *m_bg_tilemap;
+	DECLARE_WRITE8_MEMBER(gsword_videoram_w);
+	DECLARE_WRITE8_MEMBER(gsword_charbank_w);
+	DECLARE_WRITE8_MEMBER(gsword_videoctrl_w);
+	DECLARE_WRITE8_MEMBER(gsword_scroll_w);
 };
 
 
 /*----------- defined in video/gsword.c -----------*/
 
-WRITE8_HANDLER( gsword_charbank_w );
-WRITE8_HANDLER( gsword_videoctrl_w );
-WRITE8_HANDLER( gsword_videoram_w );
-WRITE8_HANDLER( gsword_scroll_w );
 
 PALETTE_INIT( josvolly );
 PALETTE_INIT( gsword );

@@ -91,43 +91,38 @@ VIDEO_START( vastar )
 
 ***************************************************************************/
 
-WRITE8_HANDLER( vastar_fgvideoram_w )
+WRITE8_MEMBER(vastar_state::vastar_fgvideoram_w)
 {
-	vastar_state *state = space->machine().driver_data<vastar_state>();
 
-	state->m_fgvideoram[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
+	m_fgvideoram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_HANDLER( vastar_bg1videoram_w )
+WRITE8_MEMBER(vastar_state::vastar_bg1videoram_w)
 {
-	vastar_state *state = space->machine().driver_data<vastar_state>();
 
-	state->m_bg1videoram[offset] = data;
-	state->m_bg1_tilemap->mark_tile_dirty(offset & 0x3ff);
+	m_bg1videoram[offset] = data;
+	m_bg1_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_HANDLER( vastar_bg2videoram_w )
+WRITE8_MEMBER(vastar_state::vastar_bg2videoram_w)
 {
-	vastar_state *state = space->machine().driver_data<vastar_state>();
 
-	state->m_bg2videoram[offset] = data;
-	state->m_bg2_tilemap->mark_tile_dirty(offset & 0x3ff);
+	m_bg2videoram[offset] = data;
+	m_bg2_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
 
-READ8_HANDLER( vastar_bg1videoram_r )
+READ8_MEMBER(vastar_state::vastar_bg1videoram_r)
 {
-	vastar_state *state = space->machine().driver_data<vastar_state>();
 
-	return state->m_bg1videoram[offset];
+	return m_bg1videoram[offset];
 }
 
-READ8_HANDLER( vastar_bg2videoram_r )
+READ8_MEMBER(vastar_state::vastar_bg2videoram_r)
 {
-	vastar_state *state = space->machine().driver_data<vastar_state>();
 
-	return state->m_bg2videoram[offset];
+	return m_bg2videoram[offset];
 }
 
 

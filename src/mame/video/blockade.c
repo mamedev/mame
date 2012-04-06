@@ -1,16 +1,15 @@
 #include "emu.h"
 #include "includes/blockade.h"
 
-WRITE8_HANDLER( blockade_videoram_w )
+WRITE8_MEMBER(blockade_state::blockade_videoram_w)
 {
-	blockade_state *state = space->machine().driver_data<blockade_state>();
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 
-	if (input_port_read(space->machine(), "IN3") & 0x80)
+	if (input_port_read(machine(), "IN3") & 0x80)
 	{
-		logerror("blockade_videoram_w: scanline %d\n", space->machine().primary_screen->vpos());
-		device_spin_until_interrupt(&space->device());
+		logerror("blockade_videoram_w: scanline %d\n", machine().primary_screen->vpos());
+		device_spin_until_interrupt(&space.device());
 	}
 }
 

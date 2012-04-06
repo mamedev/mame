@@ -105,12 +105,11 @@ static TILE_GET_INFO( get_tile_info2 )
 }
 
 
-WRITE8_HANDLER( sprint8_video_ram_w )
+WRITE8_MEMBER(sprint8_state::sprint8_video_ram_w)
 {
-	sprint8_state *state = space->machine().driver_data<sprint8_state>();
-	state->m_video_ram[offset] = data;
-	state->m_tilemap1->mark_tile_dirty(offset);
-	state->m_tilemap2->mark_tile_dirty(offset);
+	m_video_ram[offset] = data;
+	m_tilemap1->mark_tile_dirty(offset);
+	m_tilemap2->mark_tile_dirty(offset);
 }
 
 

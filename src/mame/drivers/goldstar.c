@@ -140,11 +140,11 @@ static ADDRESS_MAP_START( goldstar_map, AS_PROGRAM, 8, goldstar_state )
 	AM_RANGE(0x0000, 0xb7ff) AM_ROM
 	AM_RANGE(0xb800, 0xbfff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xc000, 0xc7ff) AM_ROM
-	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE_LEGACY(goldstar_fg_vidram_w ) AM_BASE(m_fg_vidram)
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE_LEGACY(goldstar_fg_atrram_w ) AM_BASE(m_fg_atrram)
-	AM_RANGE(0xd800, 0xd9ff) AM_RAM_WRITE_LEGACY(goldstar_reel1_ram_w ) AM_BASE(m_reel1_ram)
-	AM_RANGE(0xe000, 0xe1ff) AM_RAM_WRITE_LEGACY(goldstar_reel2_ram_w ) AM_BASE(m_reel2_ram)
-	AM_RANGE(0xe800, 0xe9ff) AM_RAM_WRITE_LEGACY(goldstar_reel3_ram_w ) AM_BASE(m_reel3_ram)
+	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(goldstar_fg_vidram_w ) AM_BASE(m_fg_vidram)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(goldstar_fg_atrram_w ) AM_BASE(m_fg_atrram)
+	AM_RANGE(0xd800, 0xd9ff) AM_RAM_WRITE(goldstar_reel1_ram_w ) AM_BASE(m_reel1_ram)
+	AM_RANGE(0xe000, 0xe1ff) AM_RAM_WRITE(goldstar_reel2_ram_w ) AM_BASE(m_reel2_ram)
+	AM_RANGE(0xe800, 0xe9ff) AM_RAM_WRITE(goldstar_reel3_ram_w ) AM_BASE(m_reel3_ram)
 	AM_RANGE(0xf040, 0xf07f) AM_RAM AM_BASE(m_reel1_scroll)
 	AM_RANGE(0xf080, 0xf0bf) AM_RAM AM_BASE(m_reel2_scroll)
 	AM_RANGE(0xf0c0, 0xf0ff) AM_RAM AM_BASE(m_reel3_scroll)
@@ -161,7 +161,7 @@ static ADDRESS_MAP_START( goldstar_map, AS_PROGRAM, 8, goldstar_state )
 	AM_RANGE(0xf820, 0xf820) AM_READ_PORT("DSW2")
 	AM_RANGE(0xf830, 0xf830) AM_DEVREADWRITE_LEGACY("aysnd", ay8910_r, ay8910_data_w)
 	AM_RANGE(0xf840, 0xf840) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)
-	AM_RANGE(0xfa00, 0xfa00) AM_WRITE_LEGACY(goldstar_fa00_w)
+	AM_RANGE(0xfa00, 0xfa00) AM_WRITE(goldstar_fa00_w)
 	AM_RANGE(0xfb00, 0xfb00) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	AM_RANGE(0xfd00, 0xfdff) AM_RAM_WRITE(paletteram_BBGGGRRR_w) AM_SHARE("paletteram")
 	AM_RANGE(0xfe00, 0xfe00) AM_READWRITE(protection_r,protection_w)
@@ -183,18 +183,18 @@ static ADDRESS_MAP_START( ncb3_map, AS_PROGRAM, 8, goldstar_state )
 	AM_RANGE(0x0000, 0xb7ff) AM_ROM
 	AM_RANGE(0xb800, 0xbfff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xc000, 0xc7ff) AM_ROM
-	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE_LEGACY(goldstar_fg_vidram_w) AM_BASE(m_fg_vidram)
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE_LEGACY(goldstar_fg_atrram_w) AM_BASE(m_fg_atrram)
-	AM_RANGE(0xd800, 0xd9ff) AM_RAM_WRITE_LEGACY(goldstar_reel1_ram_w) AM_BASE(m_reel1_ram)
-	AM_RANGE(0xe000, 0xe1ff) AM_RAM_WRITE_LEGACY(goldstar_reel2_ram_w) AM_BASE(m_reel2_ram)
-	AM_RANGE(0xe800, 0xe9ff) AM_RAM_WRITE_LEGACY(goldstar_reel3_ram_w) AM_BASE(m_reel3_ram)
+	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(goldstar_fg_vidram_w) AM_BASE(m_fg_vidram)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(goldstar_fg_atrram_w) AM_BASE(m_fg_atrram)
+	AM_RANGE(0xd800, 0xd9ff) AM_RAM_WRITE(goldstar_reel1_ram_w) AM_BASE(m_reel1_ram)
+	AM_RANGE(0xe000, 0xe1ff) AM_RAM_WRITE(goldstar_reel2_ram_w) AM_BASE(m_reel2_ram)
+	AM_RANGE(0xe800, 0xe9ff) AM_RAM_WRITE(goldstar_reel3_ram_w) AM_BASE(m_reel3_ram)
 	AM_RANGE(0xf040, 0xf07f) AM_RAM AM_BASE(m_reel1_scroll)
 	AM_RANGE(0xf080, 0xf0bf) AM_RAM AM_BASE(m_reel2_scroll)
 	AM_RANGE(0xf100, 0xf17f) AM_RAM AM_BASE(m_reel3_scroll) // moved compared to goldstar
 
 	AM_RANGE(0xf800, 0xf803) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w)	/* Input Ports */
 	AM_RANGE(0xf810, 0xf813) AM_DEVREADWRITE_LEGACY("ppi8255_1", ppi8255_r, ppi8255_w)	/* Input Ports */
-	AM_RANGE(0xf822, 0xf822) AM_WRITE_LEGACY(goldstar_fa00_w) // hack (connected to ppi output port?, needed for colour banking)
+	AM_RANGE(0xf822, 0xf822) AM_WRITE(goldstar_fa00_w) // hack (connected to ppi output port?, needed for colour banking)
 	AM_RANGE(0xf820, 0xf823) AM_DEVREADWRITE_LEGACY("ppi8255_2", ppi8255_r, ppi8255_w)	/* Input/Output Ports */
 
 	AM_RANGE(0xf830, 0xf830) AM_DEVREADWRITE_LEGACY("aysnd", ay8910_r, ay8910_data_w)
@@ -257,12 +257,12 @@ static ADDRESS_MAP_START( cm_map, AS_PROGRAM, 8, goldstar_state )
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_SHARE("nvram")
 
 
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE_LEGACY(goldstar_fg_vidram_w) AM_BASE(m_fg_vidram)
-	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE_LEGACY(goldstar_fg_atrram_w) AM_BASE(m_fg_atrram)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(goldstar_fg_vidram_w) AM_BASE(m_fg_vidram)
+	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(goldstar_fg_atrram_w) AM_BASE(m_fg_atrram)
 
-	AM_RANGE(0xf000, 0xf1ff) AM_RAM_WRITE_LEGACY(goldstar_reel1_ram_w ) AM_BASE(m_reel1_ram)
-	AM_RANGE(0xf200, 0xf3ff) AM_RAM_WRITE_LEGACY(goldstar_reel2_ram_w ) AM_BASE(m_reel2_ram)
-	AM_RANGE(0xf400, 0xf5ff) AM_RAM_WRITE_LEGACY(goldstar_reel3_ram_w ) AM_BASE(m_reel3_ram)
+	AM_RANGE(0xf000, 0xf1ff) AM_RAM_WRITE(goldstar_reel1_ram_w ) AM_BASE(m_reel1_ram)
+	AM_RANGE(0xf200, 0xf3ff) AM_RAM_WRITE(goldstar_reel2_ram_w ) AM_BASE(m_reel2_ram)
+	AM_RANGE(0xf400, 0xf5ff) AM_RAM_WRITE(goldstar_reel3_ram_w ) AM_BASE(m_reel3_ram)
 	AM_RANGE(0xf600, 0xf7ff) AM_RAM
 
 	AM_RANGE(0xf800, 0xf87f) AM_RAM AM_BASE(m_reel1_scroll)
@@ -279,12 +279,12 @@ static ADDRESS_MAP_START( nfm_map, AS_PROGRAM, 8, goldstar_state )
 	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_SHARE("nvram")
 
 
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE_LEGACY(goldstar_fg_vidram_w) AM_BASE(m_fg_vidram)
-	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE_LEGACY(goldstar_fg_atrram_w) AM_BASE(m_fg_atrram)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(goldstar_fg_vidram_w) AM_BASE(m_fg_vidram)
+	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(goldstar_fg_atrram_w) AM_BASE(m_fg_atrram)
 
-	AM_RANGE(0xf000, 0xf1ff) AM_RAM_WRITE_LEGACY(goldstar_reel1_ram_w ) AM_BASE(m_reel1_ram)
-	AM_RANGE(0xf200, 0xf3ff) AM_RAM_WRITE_LEGACY(goldstar_reel2_ram_w ) AM_BASE(m_reel2_ram)
-	AM_RANGE(0xf400, 0xf5ff) AM_RAM_WRITE_LEGACY(goldstar_reel3_ram_w ) AM_BASE(m_reel3_ram)
+	AM_RANGE(0xf000, 0xf1ff) AM_RAM_WRITE(goldstar_reel1_ram_w ) AM_BASE(m_reel1_ram)
+	AM_RANGE(0xf200, 0xf3ff) AM_RAM_WRITE(goldstar_reel2_ram_w ) AM_BASE(m_reel2_ram)
+	AM_RANGE(0xf400, 0xf5ff) AM_RAM_WRITE(goldstar_reel3_ram_w ) AM_BASE(m_reel3_ram)
 	AM_RANGE(0xf600, 0xf7ff) AM_RAM
 
 	AM_RANGE(0xf800, 0xf87f) AM_RAM AM_BASE(m_reel1_scroll)
@@ -303,11 +303,11 @@ static ADDRESS_MAP_START( cm_portmap, AS_IO, 8, goldstar_state )
 	AM_RANGE(0x02, 0x03) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_address_w)
 	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w)	/* Inputs */
 	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE_LEGACY("ppi8255_1", ppi8255_r, ppi8255_w)	/* DIP switches */
-	AM_RANGE(0x10, 0x10) AM_WRITE_LEGACY(cm_outport0_w)	/* output port */
+	AM_RANGE(0x10, 0x10) AM_WRITE(cm_outport0_w)	/* output port */
 	AM_RANGE(0x11, 0x11) AM_WRITENOP
 	AM_RANGE(0x12, 0x12) AM_WRITE(cm_outport1_w)	/* output port */
-	AM_RANGE(0x13, 0x13) AM_WRITE_LEGACY(cm_background_col_w)
-	AM_RANGE(0x14, 0x14) AM_WRITE_LEGACY(cm_girl_scroll_w)
+	AM_RANGE(0x13, 0x13) AM_WRITE(cm_background_col_w)
+	AM_RANGE(0x14, 0x14) AM_WRITE(cm_girl_scroll_w)
 ADDRESS_MAP_END
 
 
@@ -326,10 +326,10 @@ static ADDRESS_MAP_START( amcoe1_portmap, AS_IO, 8, goldstar_state )
 	AM_RANGE(0x02, 0x03) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_address_w)
 	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w)	/* Input Ports */
 	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE_LEGACY("ppi8255_1", ppi8255_r, ppi8255_w)	/* DIP switches */
-	AM_RANGE(0x10, 0x10) AM_WRITE_LEGACY(cm_outport0_w)	/* output port */
+	AM_RANGE(0x10, 0x10) AM_WRITE(cm_outport0_w)	/* output port */
 	AM_RANGE(0x11, 0x11) AM_WRITENOP
 	AM_RANGE(0x12, 0x12) AM_WRITE(cm_outport1_w)	/* output port */
-	AM_RANGE(0x13, 0x13) AM_WRITE_LEGACY(cm_background_col_w)
+	AM_RANGE(0x13, 0x13) AM_WRITE(cm_background_col_w)
 	AM_RANGE(0x20, 0x20) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 ADDRESS_MAP_END
 
@@ -339,10 +339,10 @@ static ADDRESS_MAP_START( amcoe2_portmap, AS_IO, 8, goldstar_state )
 	AM_RANGE(0x02, 0x03) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_address_w)
 	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w)	/* Input Ports */
 	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE_LEGACY("ppi8255_1", ppi8255_r, ppi8255_w)	/* DIP switches */
-	AM_RANGE(0x10, 0x10) AM_WRITE_LEGACY(cm_outport0_w)	/* output port */
+	AM_RANGE(0x10, 0x10) AM_WRITE(cm_outport0_w)	/* output port */
 	AM_RANGE(0x11, 0x11) AM_WRITENOP
 	AM_RANGE(0x12, 0x12) AM_WRITE(cm_outport1_w)	/* output port */
-	AM_RANGE(0x13, 0x13) AM_WRITE_LEGACY(cm_background_col_w)
+	AM_RANGE(0x13, 0x13) AM_WRITE(cm_background_col_w)
 ADDRESS_MAP_END
 
 
@@ -362,11 +362,11 @@ WRITE8_MEMBER(goldstar_state::lucky8_outport_w)
 static ADDRESS_MAP_START( lucky8_map, AS_PROGRAM, 8, goldstar_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE_LEGACY(goldstar_fg_vidram_w) AM_BASE(m_fg_vidram)
-	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE_LEGACY(goldstar_fg_atrram_w) AM_BASE(m_fg_atrram)
-	AM_RANGE(0x9800, 0x99ff) AM_RAM_WRITE_LEGACY(goldstar_reel1_ram_w) AM_BASE(m_reel1_ram)
-	AM_RANGE(0xa000, 0xa1ff) AM_RAM_WRITE_LEGACY(goldstar_reel2_ram_w) AM_BASE(m_reel2_ram)
-	AM_RANGE(0xa800, 0xa9ff) AM_RAM_WRITE_LEGACY(goldstar_reel3_ram_w) AM_BASE(m_reel3_ram)
+	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(goldstar_fg_vidram_w) AM_BASE(m_fg_vidram)
+	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE(goldstar_fg_atrram_w) AM_BASE(m_fg_atrram)
+	AM_RANGE(0x9800, 0x99ff) AM_RAM_WRITE(goldstar_reel1_ram_w) AM_BASE(m_reel1_ram)
+	AM_RANGE(0xa000, 0xa1ff) AM_RAM_WRITE(goldstar_reel2_ram_w) AM_BASE(m_reel2_ram)
+	AM_RANGE(0xa800, 0xa9ff) AM_RAM_WRITE(goldstar_reel3_ram_w) AM_BASE(m_reel3_ram)
 	AM_RANGE(0xb040, 0xb07f) AM_RAM AM_BASE(m_reel1_scroll)
 	AM_RANGE(0xb080, 0xb0bf) AM_RAM AM_BASE(m_reel2_scroll)
 	AM_RANGE(0xb100, 0xb17f) AM_RAM AM_BASE(m_reel3_scroll)
@@ -406,11 +406,11 @@ static ADDRESS_MAP_START(magodds_map, AS_PROGRAM, 8, goldstar_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	// where does the extra rom data map?? it seems like it should come straight after the existing rom, but it can't if this is a plain z80?
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("share1") AM_SHARE("nvram")
-	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE_LEGACY(goldstar_fg_vidram_w) AM_BASE(m_fg_vidram)
-	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE_LEGACY(goldstar_fg_atrram_w) AM_BASE(m_fg_atrram)
-	AM_RANGE(0x9800, 0x99ff) AM_RAM_WRITE_LEGACY(goldstar_reel1_ram_w) AM_BASE(m_reel1_ram)
-	AM_RANGE(0xa000, 0xa1ff) AM_RAM_WRITE_LEGACY(goldstar_reel2_ram_w) AM_BASE(m_reel2_ram)
-	AM_RANGE(0xa900, 0xaaff) AM_RAM_WRITE_LEGACY(goldstar_reel3_ram_w) AM_BASE(m_reel3_ram) // +0x100 compared to lucky8
+	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(goldstar_fg_vidram_w) AM_BASE(m_fg_vidram)
+	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE(goldstar_fg_atrram_w) AM_BASE(m_fg_atrram)
+	AM_RANGE(0x9800, 0x99ff) AM_RAM_WRITE(goldstar_reel1_ram_w) AM_BASE(m_reel1_ram)
+	AM_RANGE(0xa000, 0xa1ff) AM_RAM_WRITE(goldstar_reel2_ram_w) AM_BASE(m_reel2_ram)
+	AM_RANGE(0xa900, 0xaaff) AM_RAM_WRITE(goldstar_reel3_ram_w) AM_BASE(m_reel3_ram) // +0x100 compared to lucky8
 	AM_RANGE(0xb040, 0xb07f) AM_RAM AM_BASE(m_reel1_scroll)
 	AM_RANGE(0xb080, 0xb0bf) AM_RAM AM_BASE(m_reel2_scroll)
 	AM_RANGE(0xb100, 0xb17f) AM_RAM AM_BASE(m_reel3_scroll)
@@ -429,11 +429,11 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( kkotnoli_map, AS_PROGRAM, 8, goldstar_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM	/* definitely no NVRAM */
-	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE_LEGACY(goldstar_fg_vidram_w) AM_BASE(m_fg_vidram)
-	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE_LEGACY(goldstar_fg_atrram_w) AM_BASE(m_fg_atrram)
-	AM_RANGE(0x9800, 0x99ff) AM_RAM_WRITE_LEGACY(goldstar_reel1_ram_w) AM_BASE(m_reel1_ram)
-	AM_RANGE(0xa000, 0xa1ff) AM_RAM_WRITE_LEGACY(goldstar_reel2_ram_w) AM_BASE(m_reel2_ram)
-	AM_RANGE(0xa800, 0xa9ff) AM_RAM_WRITE_LEGACY(goldstar_reel3_ram_w) AM_BASE(m_reel3_ram)
+	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(goldstar_fg_vidram_w) AM_BASE(m_fg_vidram)
+	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE(goldstar_fg_atrram_w) AM_BASE(m_fg_atrram)
+	AM_RANGE(0x9800, 0x99ff) AM_RAM_WRITE(goldstar_reel1_ram_w) AM_BASE(m_reel1_ram)
+	AM_RANGE(0xa000, 0xa1ff) AM_RAM_WRITE(goldstar_reel2_ram_w) AM_BASE(m_reel2_ram)
+	AM_RANGE(0xa800, 0xa9ff) AM_RAM_WRITE(goldstar_reel3_ram_w) AM_BASE(m_reel3_ram)
 	AM_RANGE(0xb040, 0xb07f) AM_RAM AM_BASE(m_reel1_scroll)
 	AM_RANGE(0xb080, 0xb0bf) AM_RAM AM_BASE(m_reel2_scroll)
 	AM_RANGE(0xb100, 0xb17f) AM_RAM AM_BASE(m_reel3_scroll)
@@ -468,11 +468,11 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( ladylinr_map, AS_PROGRAM, 8, goldstar_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE_LEGACY(goldstar_fg_vidram_w) AM_BASE(m_fg_vidram)
-	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE_LEGACY(goldstar_fg_atrram_w) AM_BASE(m_fg_atrram)
-	AM_RANGE(0x9800, 0x99ff) AM_RAM_WRITE_LEGACY(goldstar_reel1_ram_w) AM_BASE(m_reel1_ram)
-	AM_RANGE(0xa000, 0xa1ff) AM_RAM_WRITE_LEGACY(goldstar_reel2_ram_w) AM_BASE(m_reel2_ram)
-	AM_RANGE(0xa800, 0xa9ff) AM_RAM_WRITE_LEGACY(goldstar_reel3_ram_w) AM_BASE(m_reel3_ram)
+	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(goldstar_fg_vidram_w) AM_BASE(m_fg_vidram)
+	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE(goldstar_fg_atrram_w) AM_BASE(m_fg_atrram)
+	AM_RANGE(0x9800, 0x99ff) AM_RAM_WRITE(goldstar_reel1_ram_w) AM_BASE(m_reel1_ram)
+	AM_RANGE(0xa000, 0xa1ff) AM_RAM_WRITE(goldstar_reel2_ram_w) AM_BASE(m_reel2_ram)
+	AM_RANGE(0xa800, 0xa9ff) AM_RAM_WRITE(goldstar_reel3_ram_w) AM_BASE(m_reel3_ram)
 	AM_RANGE(0xb040, 0xb07f) AM_RAM AM_BASE(m_reel1_scroll)
 	AM_RANGE(0xb080, 0xb0bf) AM_RAM AM_BASE(m_reel2_scroll)
 	AM_RANGE(0xb100, 0xb17f) AM_RAM AM_BASE(m_reel3_scroll)
@@ -489,11 +489,11 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( wcat3_map, AS_PROGRAM, 8, goldstar_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE_LEGACY(goldstar_fg_vidram_w) AM_BASE(m_fg_vidram)
-	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE_LEGACY(goldstar_fg_atrram_w) AM_BASE(m_fg_atrram)
-	AM_RANGE(0x9800, 0x99ff) AM_RAM_WRITE_LEGACY(goldstar_reel1_ram_w) AM_BASE(m_reel1_ram)
-	AM_RANGE(0xa000, 0xa1ff) AM_RAM_WRITE_LEGACY(goldstar_reel2_ram_w) AM_BASE(m_reel2_ram)
-	AM_RANGE(0xa800, 0xa9ff) AM_RAM_WRITE_LEGACY(goldstar_reel3_ram_w) AM_BASE(m_reel3_ram)
+	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(goldstar_fg_vidram_w) AM_BASE(m_fg_vidram)
+	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE(goldstar_fg_atrram_w) AM_BASE(m_fg_atrram)
+	AM_RANGE(0x9800, 0x99ff) AM_RAM_WRITE(goldstar_reel1_ram_w) AM_BASE(m_reel1_ram)
+	AM_RANGE(0xa000, 0xa1ff) AM_RAM_WRITE(goldstar_reel2_ram_w) AM_BASE(m_reel2_ram)
+	AM_RANGE(0xa800, 0xa9ff) AM_RAM_WRITE(goldstar_reel3_ram_w) AM_BASE(m_reel3_ram)
 	AM_RANGE(0xb040, 0xb07f) AM_RAM AM_BASE(m_reel1_scroll)
 	AM_RANGE(0xb080, 0xb0bf) AM_RAM AM_BASE(m_reel2_scroll)
 	AM_RANGE(0xb100, 0xb17f) AM_RAM AM_BASE(m_reel3_scroll)
@@ -532,16 +532,16 @@ static ADDRESS_MAP_START( unkch_map, AS_PROGRAM, 8, goldstar_state )
 	AM_RANGE(0xd900, 0xd93f) AM_RAM AM_BASE(m_reel3_scroll)
 	AM_RANGE(0xdfc0, 0xdfff) AM_RAM
 
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE_LEGACY(goldstar_fg_vidram_w) AM_BASE(m_fg_vidram)
-	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE_LEGACY(goldstar_fg_atrram_w) AM_BASE(m_fg_atrram)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(goldstar_fg_vidram_w) AM_BASE(m_fg_vidram)
+	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(goldstar_fg_atrram_w) AM_BASE(m_fg_atrram)
 
-	AM_RANGE(0xf000, 0xf1ff) AM_RAM_WRITE_LEGACY(goldstar_reel1_ram_w ) AM_BASE(m_reel1_ram)
-	AM_RANGE(0xf200, 0xf3ff) AM_RAM_WRITE_LEGACY(goldstar_reel2_ram_w ) AM_BASE(m_reel2_ram)
-	AM_RANGE(0xf400, 0xf5ff) AM_RAM_WRITE_LEGACY(goldstar_reel3_ram_w ) AM_BASE(m_reel3_ram)
+	AM_RANGE(0xf000, 0xf1ff) AM_RAM_WRITE(goldstar_reel1_ram_w ) AM_BASE(m_reel1_ram)
+	AM_RANGE(0xf200, 0xf3ff) AM_RAM_WRITE(goldstar_reel2_ram_w ) AM_BASE(m_reel2_ram)
+	AM_RANGE(0xf400, 0xf5ff) AM_RAM_WRITE(goldstar_reel3_ram_w ) AM_BASE(m_reel3_ram)
 	AM_RANGE(0xf600, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xf9ff) AM_RAM_WRITE_LEGACY(unkch_reel1_attrram_w ) AM_BASE(m_reel1_attrram)
-	AM_RANGE(0xfa00, 0xfbff) AM_RAM_WRITE_LEGACY(unkch_reel2_attrram_w ) AM_BASE(m_reel2_attrram)
-	AM_RANGE(0xfc00, 0xfdff) AM_RAM_WRITE_LEGACY(unkch_reel3_attrram_w ) AM_BASE(m_reel3_attrram)
+	AM_RANGE(0xf800, 0xf9ff) AM_RAM_WRITE(unkch_reel1_attrram_w ) AM_BASE(m_reel1_attrram)
+	AM_RANGE(0xfa00, 0xfbff) AM_RAM_WRITE(unkch_reel2_attrram_w ) AM_BASE(m_reel2_attrram)
+	AM_RANGE(0xfc00, 0xfdff) AM_RAM_WRITE(unkch_reel3_attrram_w ) AM_BASE(m_reel3_attrram)
 	AM_RANGE(0xfe00, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -584,8 +584,8 @@ static ADDRESS_MAP_START( unkch_portmap, AS_IO, 8, goldstar_state )
 //  AM_RANGE(0x10, 0x10) AM_WRITE (cm_outport0_w)   /* output port */
 //  AM_RANGE(0x11, 0x11) AM_WRITENOP
 //  AM_RANGE(0x12, 0x12) AM_WRITE (cm_outport1_w)   /* output port */
-//  AM_RANGE(0x13, 0x13) AM_WRITE_LEGACY(cm_background_col_w)
-//  AM_RANGE(0x14, 0x14) AM_WRITE_LEGACY(cm_girl_scroll_w)
+//  AM_RANGE(0x13, 0x13) AM_WRITE(cm_background_col_w)
+//  AM_RANGE(0x14, 0x14) AM_WRITE(cm_girl_scroll_w)
 
 	AM_RANGE(0x08, 0x08) AM_READ_PORT("IN0")
 	AM_RANGE(0x09, 0x09) AM_READ_PORT("IN1")

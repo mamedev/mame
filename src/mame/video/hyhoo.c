@@ -14,46 +14,44 @@
 static void hyhoo_gfxdraw(running_machine &machine);
 
 
-WRITE8_HANDLER( hyhoo_blitter_w )
+WRITE8_MEMBER(hyhoo_state::hyhoo_blitter_w)
 {
-	hyhoo_state *state = space->machine().driver_data<hyhoo_state>();
 	switch (offset)
 	{
-		case 0x00:	state->m_blitter_src_addr = (state->m_blitter_src_addr & 0xff00) | data;
-					nb1413m3_gfxradr_l_w(space, 0, data); break;
-		case 0x01:	state->m_blitter_src_addr = (state->m_blitter_src_addr & 0x00ff) | (data << 8);
-					nb1413m3_gfxradr_h_w(space, 0, data); break;
-		case 0x02:	state->m_blitter_destx = data; break;
-		case 0x03:	state->m_blitter_desty = data; break;
-		case 0x04:	state->m_blitter_sizex = data; break;
-		case 0x05:	state->m_blitter_sizey = data;
+		case 0x00:	m_blitter_src_addr = (m_blitter_src_addr & 0xff00) | data;
+					nb1413m3_gfxradr_l_w(&space, 0, data); break;
+		case 0x01:	m_blitter_src_addr = (m_blitter_src_addr & 0x00ff) | (data << 8);
+					nb1413m3_gfxradr_h_w(&space, 0, data); break;
+		case 0x02:	m_blitter_destx = data; break;
+		case 0x03:	m_blitter_desty = data; break;
+		case 0x04:	m_blitter_sizex = data; break;
+		case 0x05:	m_blitter_sizey = data;
 					/* writing here also starts the blit */
-					hyhoo_gfxdraw(space->machine());
+					hyhoo_gfxdraw(machine());
 					break;
-		case 0x06:	state->m_blitter_direction_x = (data >> 0) & 0x01;
-					state->m_blitter_direction_y = (data >> 1) & 0x01;
-					state->m_flipscreen = (~data >> 2) & 0x01;
-					state->m_dispflag = (~data >> 3) & 0x01;
+		case 0x06:	m_blitter_direction_x = (data >> 0) & 0x01;
+					m_blitter_direction_y = (data >> 1) & 0x01;
+					m_flipscreen = (~data >> 2) & 0x01;
+					m_dispflag = (~data >> 3) & 0x01;
 					break;
 		case 0x07:	break;
 	}
 }
 
 
-WRITE8_HANDLER( hyhoo_romsel_w )
+WRITE8_MEMBER(hyhoo_state::hyhoo_romsel_w)
 {
-	hyhoo_state *state = space->machine().driver_data<hyhoo_state>();
-	int gfxlen = space->machine().region("gfx1")->bytes();
-	state->m_gfxrom = (((data & 0xc0) >> 4) + (data & 0x03));
-	state->m_highcolorflag = data;
-	nb1413m3_gfxrombank_w(space, 0, data);
+	int gfxlen = machine().region("gfx1")->bytes();
+	m_gfxrom = (((data & 0xc0) >> 4) + (data & 0x03));
+	m_highcolorflag = data;
+	nb1413m3_gfxrombank_w(&space, 0, data);
 
-	if ((0x20000 * state->m_gfxrom) > (gfxlen - 1))
+	if ((0x20000 * m_gfxrom) > (gfxlen - 1))
 	{
 #ifdef MAME_DEBUG
 		popmessage("GFXROM BANK OVER!!");
 #endif
-		state->m_gfxrom &= (gfxlen / 0x20000 - 1);
+		m_gfxrom &= (gfxlen / 0x20000 - 1);
 	}
 }
 

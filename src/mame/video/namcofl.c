@@ -104,10 +104,9 @@ SCREEN_UPDATE_IND16( namcofl )
 //        groups of sprites.  I am unsure how to differentiate those groups
 //        at this time however.
 
-WRITE32_HANDLER(namcofl_spritebank_w)
+WRITE32_MEMBER(namcofl_state::namcofl_spritebank_w)
 {
-	namcofl_state *state = space->machine().driver_data<namcofl_state>();
-	COMBINE_DATA(&state->m_sprbank);
+	COMBINE_DATA(&m_sprbank);
 }
 
 static int FLobjcode2tile( running_machine &machine, int code )

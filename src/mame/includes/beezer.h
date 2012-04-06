@@ -11,6 +11,9 @@ public:
 	int m_banklatch;
 
 	device_t *m_maincpu;
+	DECLARE_WRITE8_MEMBER(beezer_bankswitch_w);
+	DECLARE_WRITE8_MEMBER(beezer_map_w);
+	DECLARE_READ8_MEMBER(beezer_line_r);
 };
 
 
@@ -20,7 +23,6 @@ extern const via6522_interface b_via_0_interface;
 extern const via6522_interface b_via_1_interface;
 
 DRIVER_INIT( beezer );
-WRITE8_HANDLER( beezer_bankswitch_w );
 
 /*----------- defined in audio/beezer.c -----------*/
 
@@ -36,5 +38,3 @@ READ8_DEVICE_HANDLER( beezer_noise_r );
 
 TIMER_DEVICE_CALLBACK( beezer_interrupt );
 SCREEN_UPDATE_IND16( beezer );
-WRITE8_HANDLER( beezer_map_w );
-READ8_HANDLER( beezer_line_r );

@@ -28,13 +28,13 @@ public:
 	UINT8        m_irq_enable;
 	UINT8        m_nmi_enable;
 	DECLARE_WRITE8_MEMBER(ctrl_w);
+	DECLARE_WRITE8_MEMBER(jailbrek_videoram_w);
+	DECLARE_WRITE8_MEMBER(jailbrek_colorram_w);
 };
 
 
 /*----------- defined in video/jailbrek.c -----------*/
 
-WRITE8_HANDLER( jailbrek_videoram_w );
-WRITE8_HANDLER( jailbrek_colorram_w );
 
 PALETTE_INIT( jailbrek );
 VIDEO_START( jailbrek );

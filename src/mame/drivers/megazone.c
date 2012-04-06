@@ -83,7 +83,7 @@ WRITE8_MEMBER(megazone_state::irq_mask_w)
 
 static ADDRESS_MAP_START( megazone_map, AS_PROGRAM, 8, megazone_state )
 	AM_RANGE(0x0000, 0x0001) AM_WRITE(megazone_coin_counter_w) /* coin counter 2, coin counter 1 */
-	AM_RANGE(0x0005, 0x0005) AM_WRITE_LEGACY(megazone_flipscreen_w)
+	AM_RANGE(0x0005, 0x0005) AM_WRITE(megazone_flipscreen_w)
 	AM_RANGE(0x0007, 0x0007) AM_WRITE(irq_mask_w)
 	AM_RANGE(0x0800, 0x0800) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x1000, 0x1000) AM_WRITEONLY AM_BASE(m_scrolly)

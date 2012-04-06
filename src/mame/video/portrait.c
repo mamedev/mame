@@ -9,18 +9,16 @@
 #include "includes/portrait.h"
 
 
-WRITE8_HANDLER( portrait_bgvideo_write )
+WRITE8_MEMBER(portrait_state::portrait_bgvideo_write)
 {
-	portrait_state *state = space->machine().driver_data<portrait_state>();
-	state->m_background->mark_tile_dirty(offset/2);
-	state->m_bgvideoram[offset] = data;
+	m_background->mark_tile_dirty(offset/2);
+	m_bgvideoram[offset] = data;
 }
 
-WRITE8_HANDLER( portrait_fgvideo_write )
+WRITE8_MEMBER(portrait_state::portrait_fgvideo_write)
 {
-	portrait_state *state = space->machine().driver_data<portrait_state>();
-	state->m_foreground->mark_tile_dirty(offset/2);
-	state->m_fgvideoram[offset] = data;
+	m_foreground->mark_tile_dirty(offset/2);
+	m_fgvideoram[offset] = data;
 }
 
 INLINE void get_tile_info( running_machine &machine, tile_data &tileinfo, int tile_index, const UINT8 *source )

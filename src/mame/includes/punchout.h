@@ -30,16 +30,16 @@ public:
 	DECLARE_READ8_MEMBER(spunchout_exp_r);
 	DECLARE_WRITE8_MEMBER(spunchout_exp_w);
 	DECLARE_WRITE8_MEMBER(nmi_mask_w);
+	DECLARE_WRITE8_MEMBER(punchout_bg_top_videoram_w);
+	DECLARE_WRITE8_MEMBER(punchout_bg_bot_videoram_w);
+	DECLARE_WRITE8_MEMBER(armwrest_fg_videoram_w);
+	DECLARE_WRITE8_MEMBER(punchout_spr1_videoram_w);
+	DECLARE_WRITE8_MEMBER(punchout_spr2_videoram_w);
 };
 
 
 /*----------- defined in video/punchout.c -----------*/
 
-WRITE8_HANDLER( punchout_bg_top_videoram_w );
-WRITE8_HANDLER( punchout_bg_bot_videoram_w );
-WRITE8_HANDLER( armwrest_fg_videoram_w );
-WRITE8_HANDLER( punchout_spr1_videoram_w );
-WRITE8_HANDLER( punchout_spr2_videoram_w );
 
 VIDEO_START( punchout );
 VIDEO_START( armwrest );

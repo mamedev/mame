@@ -3,12 +3,11 @@
 
 /* tilemap 1 */
 
-WRITE8_HANDLER(ssrj_vram1_w)
+WRITE8_MEMBER(ssrj_state::ssrj_vram1_w)
 {
-	ssrj_state *state = space->machine().driver_data<ssrj_state>();
 
-	state->m_vram1[offset] = data;
-	state->m_tilemap1->mark_tile_dirty(offset>>1);
+	m_vram1[offset] = data;
+	m_tilemap1->mark_tile_dirty(offset>>1);
 }
 
 static TILE_GET_INFO( get_tile_info1 )
@@ -25,12 +24,11 @@ static TILE_GET_INFO( get_tile_info1 )
 
 /* tilemap 2 */
 
-WRITE8_HANDLER(ssrj_vram2_w)
+WRITE8_MEMBER(ssrj_state::ssrj_vram2_w)
 {
-	ssrj_state *state = space->machine().driver_data<ssrj_state>();
 
-	state->m_vram2[offset] = data;
-	state->m_tilemap2->mark_tile_dirty(offset>>1);
+	m_vram2[offset] = data;
+	m_tilemap2->mark_tile_dirty(offset>>1);
 }
 
 static TILE_GET_INFO( get_tile_info2 )
@@ -47,12 +45,11 @@ static TILE_GET_INFO( get_tile_info2 )
 
 /* tilemap 4 */
 
-WRITE8_HANDLER(ssrj_vram4_w)
+WRITE8_MEMBER(ssrj_state::ssrj_vram4_w)
 {
-	ssrj_state *state = space->machine().driver_data<ssrj_state>();
 
-	state->m_vram4[offset] = data;
-	state->m_tilemap4->mark_tile_dirty(offset>>1);
+	m_vram4[offset] = data;
+	m_tilemap4->mark_tile_dirty(offset>>1);
 }
 
 static TILE_GET_INFO( get_tile_info4 )

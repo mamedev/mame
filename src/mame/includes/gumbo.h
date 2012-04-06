@@ -18,13 +18,13 @@ public:
 	/* video-related */
 	tilemap_t    *m_bg_tilemap;
 	tilemap_t    *m_fg_tilemap;
+	DECLARE_WRITE16_MEMBER(gumbo_bg_videoram_w);
+	DECLARE_WRITE16_MEMBER(gumbo_fg_videoram_w);
 };
 
 
 /*----------- defined in video/gumbo.c -----------*/
 
-WRITE16_HANDLER( gumbo_bg_videoram_w );
-WRITE16_HANDLER( gumbo_fg_videoram_w );
 
 VIDEO_START( gumbo );
 SCREEN_UPDATE_IND16( gumbo );

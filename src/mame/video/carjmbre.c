@@ -42,45 +42,42 @@ PALETTE_INIT( carjmbre )
 
 
 
-WRITE8_HANDLER( carjmbre_flipscreen_w )
+WRITE8_MEMBER(carjmbre_state::carjmbre_flipscreen_w)
 {
-	carjmbre_state *state = space->machine().driver_data<carjmbre_state>();
 
-	state->m_flipscreen = (data & 1) ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0;
-	space->machine().tilemap().set_flip_all(state->m_flipscreen);
+	m_flipscreen = (data & 1) ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0;
+	machine().tilemap().set_flip_all(m_flipscreen);
 }
 
-WRITE8_HANDLER( carjmbre_bgcolor_w )
+WRITE8_MEMBER(carjmbre_state::carjmbre_bgcolor_w)
 {
-	carjmbre_state *state = space->machine().driver_data<carjmbre_state>();
 	data = ~data & 0x3f;
 
-	if (data != state->m_bgcolor)
+	if (data != m_bgcolor)
 	{
 		int i;
 
-		state->m_bgcolor = data;
+		m_bgcolor = data;
 		if (data & 3)
 			for (i = 0; i < 64; i += 4)
-				palette_set_color(space->machine(), i, palette_get_color(space->machine(), data));
+				palette_set_color(machine(), i, palette_get_color(machine(), data));
 		else
 			// restore to initial state (black)
 			for (i = 0; i < 64; i += 4)
-				palette_set_color(space->machine(), i, RGB_BLACK);
+				palette_set_color(machine(), i, RGB_BLACK);
 	}
 }
 
-WRITE8_HANDLER( carjmbre_8806_w )
+WRITE8_MEMBER(carjmbre_state::carjmbre_8806_w)
 {
 	// unknown, gets updated at same time as carjmbre_bgcolor_w
 }
 
-WRITE8_HANDLER( carjmbre_videoram_w )
+WRITE8_MEMBER(carjmbre_state::carjmbre_videoram_w)
 {
-	carjmbre_state *state = space->machine().driver_data<carjmbre_state>();
 
-	state->m_videoram[offset] = data;
-	state->m_cj_tilemap->mark_tile_dirty(offset & 0x3ff);
+	m_videoram[offset] = data;
+	m_cj_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
 

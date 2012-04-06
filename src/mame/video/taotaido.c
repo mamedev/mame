@@ -13,13 +13,12 @@ zooming might be wrong (only used on title logo?)
 
 
 /* sprite tile codes 0x4000 - 0x7fff get remapped according to the content of these registers */
-WRITE16_HANDLER( taotaido_sprite_character_bank_select_w )
+WRITE16_MEMBER(taotaido_state::taotaido_sprite_character_bank_select_w)
 {
-	taotaido_state *state = space->machine().driver_data<taotaido_state>();
 	if(ACCESSING_BITS_8_15)
-		state->m_sprite_character_bank_select[offset*2] = data >> 8;
+		m_sprite_character_bank_select[offset*2] = data >> 8;
 	if(ACCESSING_BITS_0_7)
-		state->m_sprite_character_bank_select[offset*2+1] = data &0xff;
+		m_sprite_character_bank_select[offset*2+1] = data &0xff;
 }
 
 /* sprites are like the other video system / psikyo games, we can merge this with aerofgt and plenty of other
@@ -129,9 +128,8 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 
 /* the tilemap */
 
-WRITE16_HANDLER( taotaido_tileregs_w )
+WRITE16_MEMBER(taotaido_state::taotaido_tileregs_w)
 {
-	taotaido_state *state = space->machine().driver_data<taotaido_state>();
 	switch (offset)
 	{
 		case 0: // would normally be x scroll?
@@ -147,19 +145,18 @@ WRITE16_HANDLER( taotaido_tileregs_w )
 		case 6:
 		case 7:
 			if(ACCESSING_BITS_8_15)
-				state->m_video_bank_select[(offset-4)*2] = data >> 8;
+				m_video_bank_select[(offset-4)*2] = data >> 8;
 			if(ACCESSING_BITS_0_7)
-				state->m_video_bank_select[(offset-4)*2+1] = data &0xff;
-				state->m_bg_tilemap->mark_all_dirty();
+				m_video_bank_select[(offset-4)*2+1] = data &0xff;
+				m_bg_tilemap->mark_all_dirty();
 			break;
 	}
 }
 
-WRITE16_HANDLER( taotaido_bgvideoram_w )
+WRITE16_MEMBER(taotaido_state::taotaido_bgvideoram_w)
 {
-	taotaido_state *state = space->machine().driver_data<taotaido_state>();
-	COMBINE_DATA(&state->m_bgram[offset]);
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_bgram[offset]);
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 static TILE_GET_INFO( taotaido_bg_tile_info )

@@ -79,45 +79,42 @@ VIDEO_START( aeroboto )
 
 ***************************************************************************/
 
-READ8_HANDLER( aeroboto_in0_r )
+READ8_MEMBER(aeroboto_state::aeroboto_in0_r)
 {
-	return input_port_read(space->machine(), flip_screen_get(space->machine()) ? "P2" : "P1");
+	return input_port_read(machine(), flip_screen_get(machine()) ? "P2" : "P1");
 }
 
-WRITE8_HANDLER( aeroboto_3000_w )
+WRITE8_MEMBER(aeroboto_state::aeroboto_3000_w)
 {
-	aeroboto_state *state = space->machine().driver_data<aeroboto_state>();
 
 	/* bit 0 selects both flip screen and player1/player2 controls */
-	flip_screen_set(space->machine(), data & 0x01);
+	flip_screen_set(machine(), data & 0x01);
 
 	/* bit 1 = char bank select */
-	if (state->m_charbank != ((data & 0x02) >> 1))
+	if (m_charbank != ((data & 0x02) >> 1))
 	{
-		state->m_bg_tilemap->mark_all_dirty();
-		state->m_charbank = (data & 0x02) >> 1;
+		m_bg_tilemap->mark_all_dirty();
+		m_charbank = (data & 0x02) >> 1;
 	}
 
 	/* bit 2 = disable star field? */
-	state->m_starsoff = data & 0x4;
+	m_starsoff = data & 0x4;
 }
 
-WRITE8_HANDLER( aeroboto_videoram_w )
+WRITE8_MEMBER(aeroboto_state::aeroboto_videoram_w)
 {
-	aeroboto_state *state = space->machine().driver_data<aeroboto_state>();
 
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( aeroboto_tilecolor_w )
+WRITE8_MEMBER(aeroboto_state::aeroboto_tilecolor_w)
 {
-	aeroboto_state *state = space->machine().driver_data<aeroboto_state>();
 
-	if (state->m_tilecolor[offset] != data)
+	if (m_tilecolor[offset] != data)
 	{
-		state->m_tilecolor[offset] = data;
-		state->m_bg_tilemap->mark_all_dirty();
+		m_tilecolor[offset] = data;
+		m_bg_tilemap->mark_all_dirty();
 	}
 }
 

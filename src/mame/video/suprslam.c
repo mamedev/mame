@@ -97,12 +97,11 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 
 /* FG 'SCREEN' LAYER */
 
-WRITE16_HANDLER( suprslam_screen_videoram_w )
+WRITE16_MEMBER(suprslam_state::suprslam_screen_videoram_w)
 {
-	suprslam_state *state = space->machine().driver_data<suprslam_state>();
 
-	state->m_screen_videoram[offset] = data;
-	state->m_screen_tilemap->mark_tile_dirty(offset);
+	m_screen_videoram[offset] = data;
+	m_screen_tilemap->mark_tile_dirty(offset);
 }
 
 
@@ -120,12 +119,11 @@ static TILE_GET_INFO( get_suprslam_tile_info )
 
 
 /* BG LAYER */
-WRITE16_HANDLER( suprslam_bg_videoram_w )
+WRITE16_MEMBER(suprslam_state::suprslam_bg_videoram_w)
 {
-	suprslam_state *state = space->machine().driver_data<suprslam_state>();
 
-	state->m_bg_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_bg_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
@@ -167,18 +165,17 @@ SCREEN_UPDATE_IND16( suprslam )
 	return 0;
 }
 
-WRITE16_HANDLER (suprslam_bank_w)
+WRITE16_MEMBER(suprslam_state::suprslam_bank_w)
 {
-	suprslam_state *state = space->machine().driver_data<suprslam_state>();
 	UINT16 old_screen_bank, old_bg_bank;
-	old_screen_bank = state->m_screen_bank;
-	old_bg_bank = state->m_bg_bank;
+	old_screen_bank = m_screen_bank;
+	old_bg_bank = m_bg_bank;
 
-	state->m_screen_bank = data & 0xf000;
-	state->m_bg_bank = (data & 0x0f00) << 4;
+	m_screen_bank = data & 0xf000;
+	m_bg_bank = (data & 0x0f00) << 4;
 
-	if (state->m_screen_bank != old_screen_bank)
-		state->m_screen_tilemap->mark_all_dirty();
-	if (state->m_bg_bank != old_bg_bank)
-		state->m_bg_tilemap->mark_all_dirty();
+	if (m_screen_bank != old_screen_bank)
+		m_screen_tilemap->mark_all_dirty();
+	if (m_bg_bank != old_bg_bank)
+		m_bg_tilemap->mark_all_dirty();
 }

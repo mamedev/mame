@@ -26,15 +26,15 @@ public:
 	int m_adpcm_bank_shift;
 	int m_sndbank;
 	DECLARE_WRITE16_MEMBER(ohmygod_ctrl_w);
+	DECLARE_WRITE16_MEMBER(ohmygod_videoram_w);
+	DECLARE_WRITE16_MEMBER(ohmygod_spritebank_w);
+	DECLARE_WRITE16_MEMBER(ohmygod_scrollx_w);
+	DECLARE_WRITE16_MEMBER(ohmygod_scrolly_w);
 };
 
 
 /*----------- defined in video/ohmygod.c -----------*/
 
-WRITE16_HANDLER( ohmygod_videoram_w );
-WRITE16_HANDLER( ohmygod_spritebank_w );
-WRITE16_HANDLER( ohmygod_scrollx_w );
-WRITE16_HANDLER( ohmygod_scrolly_w );
 
 VIDEO_START( ohmygod );
 SCREEN_UPDATE_IND16( ohmygod );

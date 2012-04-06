@@ -221,19 +221,18 @@ VIDEO_START( phoenix )
 
 ***************************************************************************/
 
-WRITE8_HANDLER( phoenix_videoram_w )
+WRITE8_MEMBER(phoenix_state::phoenix_videoram_w)
 {
-	phoenix_state *state = space->machine().driver_data<phoenix_state>();
-	UINT8 *rom = space->machine().region("maincpu")->base();
+	UINT8 *rom = machine().region("maincpu")->base();
 
-	state->m_videoram_pg[state->m_videoram_pg_index][offset] = data;
+	m_videoram_pg[m_videoram_pg_index][offset] = data;
 
 	if ((offset & 0x7ff) < 0x340)
 	{
 		if (offset & 0x800)
-			state->m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
+			m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
 		else
-			state->m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
+			m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
 	}
 
 	/* as part of the protecion, Survival executes code from $43a4 */
@@ -241,43 +240,41 @@ WRITE8_HANDLER( phoenix_videoram_w )
 }
 
 
-WRITE8_HANDLER( phoenix_videoreg_w )
+WRITE8_MEMBER(phoenix_state::phoenix_videoreg_w)
 {
-	phoenix_state *state = space->machine().driver_data<phoenix_state>();
-	if (state->m_videoram_pg_index != (data & 1))
+	if (m_videoram_pg_index != (data & 1))
 	{
 		/* set memory bank */
-		state->m_videoram_pg_index = data & 1;
-		memory_set_bank(space->machine(), "bank1", state->m_videoram_pg_index);
+		m_videoram_pg_index = data & 1;
+		memory_set_bank(machine(), "bank1", m_videoram_pg_index);
 
-		state->m_cocktail_mode = state->m_videoram_pg_index && (input_port_read(space->machine(), "CAB") & 0x01);
+		m_cocktail_mode = m_videoram_pg_index && (input_port_read(machine(), "CAB") & 0x01);
 
-		space->machine().tilemap().set_flip_all(state->m_cocktail_mode ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
-		space->machine().tilemap().mark_all_dirty();
+		machine().tilemap().set_flip_all(m_cocktail_mode ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
+		machine().tilemap().mark_all_dirty();
 	}
 
 	/* Phoenix has only one palette select effecting both layers */
-	if (state->m_palette_bank != ((data >> 1) & 1))
+	if (m_palette_bank != ((data >> 1) & 1))
 	{
-		state->m_palette_bank = (data >> 1) & 1;
+		m_palette_bank = (data >> 1) & 1;
 
-		space->machine().tilemap().mark_all_dirty();
+		machine().tilemap().mark_all_dirty();
 	}
 }
 
-WRITE8_HANDLER( pleiads_videoreg_w )
+WRITE8_MEMBER(phoenix_state::pleiads_videoreg_w)
 {
-	phoenix_state *state = space->machine().driver_data<phoenix_state>();
-	if (state->m_videoram_pg_index != (data & 1))
+	if (m_videoram_pg_index != (data & 1))
 	{
 		/* set memory bank */
-		state->m_videoram_pg_index = data & 1;
-		memory_set_bank(space->machine(), "bank1", state->m_videoram_pg_index);
+		m_videoram_pg_index = data & 1;
+		memory_set_bank(machine(), "bank1", m_videoram_pg_index);
 
-		state->m_cocktail_mode = state->m_videoram_pg_index && (input_port_read(space->machine(), "CAB") & 0x01);
+		m_cocktail_mode = m_videoram_pg_index && (input_port_read(machine(), "CAB") & 0x01);
 
-		space->machine().tilemap().set_flip_all(state->m_cocktail_mode ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
-		space->machine().tilemap().mark_all_dirty();
+		machine().tilemap().set_flip_all(m_cocktail_mode ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
+		machine().tilemap().mark_all_dirty();
 	}
 
 
@@ -285,26 +282,25 @@ WRITE8_HANDLER( pleiads_videoreg_w )
        Four palette changes by level.  The palette selection is
        wrong, but the same paletter is used for both layers. */
 
-	if (state->m_palette_bank != ((data >> 1) & 3))
+	if (m_palette_bank != ((data >> 1) & 3))
 	{
-		state->m_palette_bank = ((data >> 1) & 3);
+		m_palette_bank = ((data >> 1) & 3);
 
-		space->machine().tilemap().mark_all_dirty();
+		machine().tilemap().mark_all_dirty();
 
 		logerror("Palette: %02X\n", (data & 0x06) >> 1);
 	}
 
-	state->m_pleiads_protection_question = data & 0xfc;
+	m_pleiads_protection_question = data & 0xfc;
 
 	/* send two bits to sound control C (not sure if they are there) */
-	pleiads_sound_control_c_w(space->machine().device("cust"), offset, data);
+	pleiads_sound_control_c_w(machine().device("cust"), offset, data);
 }
 
 
-WRITE8_HANDLER( phoenix_scroll_w )
+WRITE8_MEMBER(phoenix_state::phoenix_scroll_w)
 {
-	phoenix_state *state = space->machine().driver_data<phoenix_state>();
-	state->m_bg_tilemap->set_scrollx(0,data);
+	m_bg_tilemap->set_scrollx(0,data);
 }
 
 
@@ -366,23 +362,22 @@ CUSTOM_INPUT( pleiads_protection_r )
 */
 
 #define REMAP_JS(js) ((ret & 0xf) | ( (js & 0xf)  << 4))
-READ8_HANDLER( survival_input_port_0_r )
+READ8_MEMBER(phoenix_state::survival_input_port_0_r)
 {
-	phoenix_state *state = space->machine().driver_data<phoenix_state>();
-	UINT8 ret = ~input_port_read(space->machine(), "IN0");
+	UINT8 ret = ~input_port_read(machine(), "IN0");
 
-	if( state->m_survival_input_readc++ == 2 )
+	if( m_survival_input_readc++ == 2 )
 	{
-		state->m_survival_input_readc = 0;
-		state->m_survival_protection_value = 0;
+		m_survival_input_readc = 0;
+		m_survival_protection_value = 0;
 		return ~ret;
 	}
 
 	// Any value that remaps the joystick input to 0,2,4 must clear bit 0
 	// on the AY8910 port B. All other remaps must set bit 0.
 
-	state->m_survival_protection_value = 0xff;
-	state->m_survival_sid_value = 0;
+	m_survival_protection_value = 0xff;
+	m_survival_sid_value = 0;
 
 	switch( ( ret >> 4) & 0xf )
 	{
@@ -393,42 +388,42 @@ READ8_HANDLER( survival_input_port_0_r )
 			ret = REMAP_JS( 8 );
 			break;
 		case 2: // js_e = 0 + 0
-			state->m_survival_sid_value = 0x80;
-			state->m_survival_protection_value = 0xfe;
+			m_survival_sid_value = 0x80;
+			m_survival_protection_value = 0xfe;
 			ret = REMAP_JS( 2 );
 			break;
 		case 3: // js_ne = 0 + 1;
-			state->m_survival_sid_value = 0x80;
+			m_survival_sid_value = 0x80;
 			ret = REMAP_JS( 0xa );
 			break;
 		case 4: // js_w = 4 + 0
-			state->m_survival_sid_value = 0x80;
-			state->m_survival_protection_value = 0xfe;
+			m_survival_sid_value = 0x80;
+			m_survival_protection_value = 0xfe;
 			ret = REMAP_JS( 4 );
 			break;
 		case 5: // js_nw = 2 + 1
-			state->m_survival_sid_value = 0x80;
+			m_survival_sid_value = 0x80;
 			ret = REMAP_JS( 0xc );
 			break;
 		case 8: // js_s = 5 + 1
 			ret = REMAP_JS( 1 );
 			break;
 		case 0xa: // js_se = 6 + 1
-			state->m_survival_sid_value = 0x80;
+			m_survival_sid_value = 0x80;
 			ret = REMAP_JS( 3 );
 			break;
 		case 0xc: // js_sw = 4 + 1
-			state->m_survival_sid_value = 0x80;
+			m_survival_sid_value = 0x80;
 			ret = REMAP_JS( 5 );
 			break;
 		default:
 			break;
 	}
 
-	state->m_survival_input_latches[0] = state->m_survival_input_latches[1];
-	state->m_survival_input_latches[1] = ~ret;
+	m_survival_input_latches[0] = m_survival_input_latches[1];
+	m_survival_input_latches[1] = ~ret;
 
-	return state->m_survival_input_latches[0];
+	return m_survival_input_latches[0];
 }
 
 READ8_DEVICE_HANDLER( survival_protection_r )

@@ -100,42 +100,39 @@ TIMER_DEVICE_CALLBACK( spdodgeb_interrupt )
 	}
 }
 
-WRITE8_HANDLER( spdodgeb_scrollx_lo_w )
+WRITE8_MEMBER(spdodgeb_state::spdodgeb_scrollx_lo_w)
 {
-	spdodgeb_state *state = space->machine().driver_data<spdodgeb_state>();
-	state->m_lastscroll = (state->m_lastscroll & 0x100) | data;
+	m_lastscroll = (m_lastscroll & 0x100) | data;
 }
 
-WRITE8_HANDLER( spdodgeb_ctrl_w )
+WRITE8_MEMBER(spdodgeb_state::spdodgeb_ctrl_w)
 {
-	spdodgeb_state *state = space->machine().driver_data<spdodgeb_state>();
-	UINT8 *rom = space->machine().region("maincpu")->base();
+	UINT8 *rom = machine().region("maincpu")->base();
 
 	/* bit 0 = flip screen */
-	flip_screen_set(space->machine(), data & 0x01);
+	flip_screen_set(machine(), data & 0x01);
 
 	/* bit 1 = ROM bank switch */
-	memory_set_bankptr(space->machine(), "bank1",rom + 0x10000 + 0x4000 * ((~data & 0x02) >> 1));
+	memory_set_bankptr(machine(), "bank1",rom + 0x10000 + 0x4000 * ((~data & 0x02) >> 1));
 
 	/* bit 2 = scroll high bit */
-	state->m_lastscroll = (state->m_lastscroll & 0x0ff) | ((data & 0x04) << 6);
+	m_lastscroll = (m_lastscroll & 0x0ff) | ((data & 0x04) << 6);
 
 	/* bit 3 = to mcu?? */
 
 	/* bits 4-7 = palette bank select */
-	if (state->m_tile_palbank != ((data & 0x30) >> 4))
+	if (m_tile_palbank != ((data & 0x30) >> 4))
 	{
-		state->m_tile_palbank = ((data & 0x30) >> 4);
-		state->m_bg_tilemap->mark_all_dirty();
+		m_tile_palbank = ((data & 0x30) >> 4);
+		m_bg_tilemap->mark_all_dirty();
 	}
-	state->m_sprite_palbank = (data & 0xc0) >> 6;
+	m_sprite_palbank = (data & 0xc0) >> 6;
 }
 
-WRITE8_HANDLER( spdodgeb_videoram_w )
+WRITE8_MEMBER(spdodgeb_state::spdodgeb_videoram_w)
 {
-	spdodgeb_state *state = space->machine().driver_data<spdodgeb_state>();
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset & 0x7ff);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset & 0x7ff);
 }
 
 

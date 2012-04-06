@@ -44,14 +44,14 @@ PALETTE_INIT( mouser )
 	}
 }
 
-WRITE8_HANDLER( mouser_flip_screen_x_w )
+WRITE8_MEMBER(mouser_state::mouser_flip_screen_x_w)
 {
-	flip_screen_x_set(space->machine(), ~data & 1);
+	flip_screen_x_set(machine(), ~data & 1);
 }
 
-WRITE8_HANDLER( mouser_flip_screen_y_w )
+WRITE8_MEMBER(mouser_state::mouser_flip_screen_y_w)
 {
-	flip_screen_y_set(space->machine(), ~data & 1);
+	flip_screen_y_set(machine(), ~data & 1);
 }
 
 SCREEN_UPDATE_IND16( mouser )

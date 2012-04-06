@@ -32,6 +32,7 @@ public:
 	UINT8 *m_video_control;
 	DECLARE_WRITE8_MEMBER(irq_clear_w);
 	DECLARE_WRITE8_MEMBER(mystston_ay8910_select_w);
+	DECLARE_WRITE8_MEMBER(mystston_video_control_w);
 };
 
 
@@ -43,4 +44,3 @@ void mystston_on_scanline_interrupt(running_machine &machine);
 /*----------- defined in video/mystston.c -----------*/
 
 MACHINE_CONFIG_EXTERN( mystston_video );
-WRITE8_HANDLER( mystston_video_control_w );

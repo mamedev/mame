@@ -126,47 +126,41 @@ VIDEO_START( senjyo )
 
 ***************************************************************************/
 
-WRITE8_HANDLER( senjyo_fgvideoram_w )
+WRITE8_MEMBER(senjyo_state::senjyo_fgvideoram_w)
 {
-	senjyo_state *state = space->machine().driver_data<senjyo_state>();
 
-	state->m_fgvideoram[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset);
+	m_fgvideoram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset);
 }
-WRITE8_HANDLER( senjyo_fgcolorram_w )
+WRITE8_MEMBER(senjyo_state::senjyo_fgcolorram_w)
 {
-	senjyo_state *state = space->machine().driver_data<senjyo_state>();
 
-	state->m_fgcolorram[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset);
+	m_fgcolorram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset);
 }
-WRITE8_HANDLER( senjyo_bg1videoram_w )
+WRITE8_MEMBER(senjyo_state::senjyo_bg1videoram_w)
 {
-	senjyo_state *state = space->machine().driver_data<senjyo_state>();
 
-	state->m_bg1videoram[offset] = data;
-	state->m_bg1_tilemap->mark_tile_dirty(offset);
+	m_bg1videoram[offset] = data;
+	m_bg1_tilemap->mark_tile_dirty(offset);
 }
-WRITE8_HANDLER( senjyo_bg2videoram_w )
+WRITE8_MEMBER(senjyo_state::senjyo_bg2videoram_w)
 {
-	senjyo_state *state = space->machine().driver_data<senjyo_state>();
 
-	state->m_bg2videoram[offset] = data;
-	state->m_bg2_tilemap->mark_tile_dirty(offset);
+	m_bg2videoram[offset] = data;
+	m_bg2_tilemap->mark_tile_dirty(offset);
 }
-WRITE8_HANDLER( senjyo_bg3videoram_w )
+WRITE8_MEMBER(senjyo_state::senjyo_bg3videoram_w)
 {
-	senjyo_state *state = space->machine().driver_data<senjyo_state>();
 
-	state->m_bg3videoram[offset] = data;
-	state->m_bg3_tilemap->mark_tile_dirty(offset);
+	m_bg3videoram[offset] = data;
+	m_bg3_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( senjyo_bgstripes_w )
+WRITE8_MEMBER(senjyo_state::senjyo_bgstripes_w)
 {
-	senjyo_state *state = space->machine().driver_data<senjyo_state>();
 
-	*state->m_bgstripesram = data;
+	*m_bgstripesram = data;
 }
 
 /***************************************************************************

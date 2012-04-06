@@ -352,15 +352,15 @@ static TILE_GET_INFO( get_tile_info_1 )	{ get_tile_info(machine, tileinfo, tile_
 static TILE_GET_INFO( get_tile_info_2 )	{ get_tile_info(machine, tileinfo, tile_index, 2); }
 static TILE_GET_INFO( get_tile_info_3 )	{ get_tile_info(machine, tileinfo, tile_index, 3); }
 
-WRITE16_HANDLER( cave_vram_0_w ) { vram_w(space, offset, data, mem_mask, 0); }
-WRITE16_HANDLER( cave_vram_1_w ) { vram_w(space, offset, data, mem_mask, 1); }
-WRITE16_HANDLER( cave_vram_2_w ) { vram_w(space, offset, data, mem_mask, 2); }
-WRITE16_HANDLER( cave_vram_3_w ) { vram_w(space, offset, data, mem_mask, 3); }
+WRITE16_MEMBER(cave_state::cave_vram_0_w){ vram_w(&space, offset, data, mem_mask, 0); }
+WRITE16_MEMBER(cave_state::cave_vram_1_w){ vram_w(&space, offset, data, mem_mask, 1); }
+WRITE16_MEMBER(cave_state::cave_vram_2_w){ vram_w(&space, offset, data, mem_mask, 2); }
+WRITE16_MEMBER(cave_state::cave_vram_3_w){ vram_w(&space, offset, data, mem_mask, 3); }
 
-WRITE16_HANDLER( cave_vram_0_8x8_w ) { vram_8x8_w(space, offset, data, mem_mask, 0); }
-WRITE16_HANDLER( cave_vram_1_8x8_w ) { vram_8x8_w(space, offset, data, mem_mask, 1); }
-WRITE16_HANDLER( cave_vram_2_8x8_w ) { vram_8x8_w(space, offset, data, mem_mask, 2); }
-WRITE16_HANDLER( cave_vram_3_8x8_w ) { vram_8x8_w(space, offset, data, mem_mask, 3); }
+WRITE16_MEMBER(cave_state::cave_vram_0_8x8_w){ vram_8x8_w(&space, offset, data, mem_mask, 0); }
+WRITE16_MEMBER(cave_state::cave_vram_1_8x8_w){ vram_8x8_w(&space, offset, data, mem_mask, 1); }
+WRITE16_MEMBER(cave_state::cave_vram_2_8x8_w){ vram_8x8_w(&space, offset, data, mem_mask, 2); }
+WRITE16_MEMBER(cave_state::cave_vram_3_8x8_w){ vram_8x8_w(&space, offset, data, mem_mask, 3); }
 
 
 /***************************************************************************

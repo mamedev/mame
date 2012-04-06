@@ -33,14 +33,14 @@ public:
 	DECLARE_WRITE16_MEMBER(lemmings_palette_24bit_w);
 	DECLARE_WRITE16_MEMBER(lemmings_sound_w);
 	DECLARE_WRITE8_MEMBER(lemmings_sound_ack_w);
+	DECLARE_WRITE16_MEMBER(lemmings_pixel_0_w);
+	DECLARE_WRITE16_MEMBER(lemmings_pixel_1_w);
+	DECLARE_WRITE16_MEMBER(lemmings_vram_w);
 };
 
 
 /*----------- defined in video/lemmings.c -----------*/
 
-WRITE16_HANDLER( lemmings_pixel_0_w );
-WRITE16_HANDLER( lemmings_pixel_1_w );
-WRITE16_HANDLER( lemmings_vram_w );
 
 VIDEO_START( lemmings );
 SCREEN_VBLANK( lemmings );

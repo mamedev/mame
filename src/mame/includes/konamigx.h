@@ -30,6 +30,18 @@ public:
 	DECLARE_WRITE16_MEMBER(tms57002_data_word_w);
 	DECLARE_READ16_MEMBER(tms57002_status_word_r);
 	DECLARE_WRITE16_MEMBER(tms57002_control_word_w);
+	DECLARE_READ16_MEMBER(K055550_word_r);
+	DECLARE_WRITE16_MEMBER(K055550_word_w);
+	DECLARE_WRITE16_MEMBER(K053990_martchmp_word_w);
+	DECLARE_WRITE32_MEMBER(fantjour_dma_w);
+	DECLARE_WRITE32_MEMBER(konamigx_type3_psac2_bank_w);
+	DECLARE_WRITE32_MEMBER(konamigx_palette_w);
+	DECLARE_WRITE32_MEMBER(konamigx_palette2_w);
+	DECLARE_WRITE32_MEMBER(konamigx_555_palette_w);
+	DECLARE_WRITE32_MEMBER(konamigx_555_palette2_w);
+	DECLARE_WRITE32_MEMBER(konamigx_tilebank_w);
+	DECLARE_WRITE32_MEMBER(konamigx_t1_psacmap_w);
+	DECLARE_WRITE32_MEMBER(konamigx_t4_psacmap_w);
 };
 
 
@@ -124,27 +136,16 @@ SCREEN_UPDATE_RGB32(konamigx);
 SCREEN_UPDATE_RGB32(konamigx_left);
 SCREEN_UPDATE_RGB32(konamigx_right);
 
-WRITE32_HANDLER( konamigx_palette_w );
 #ifdef UNUSED_FUNCTION
-WRITE32_HANDLER( konamigx_palette2_w );
-WRITE32_HANDLER( konamigx_555_palette_w );
-WRITE32_HANDLER( konamigx_555_palette2_w );
 #endif
-WRITE32_HANDLER( konamigx_tilebank_w );
-WRITE32_HANDLER( konamigx_t1_psacmap_w );
-WRITE32_HANDLER( konamigx_t4_psacmap_w );
 
 extern int konamigx_current_frame;
-WRITE32_HANDLER( konamigx_type3_psac2_bank_w );
 extern UINT32* konamigx_type3_psac2_bank;
 
 
 /*----------- defined in machine/konamigx.c -----------*/
 
 // K055550/K053990/ESC protection devices handlers
-READ16_HANDLER ( K055550_word_r );
-WRITE16_HANDLER( K055550_word_w );
-WRITE16_HANDLER( K053990_martchmp_word_w );
 void konamigx_esc_alert(UINT32 *srcbase, int srcoffs, int count, int mode);
 
 void fantjour_dma_install(running_machine &machine);

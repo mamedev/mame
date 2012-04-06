@@ -149,10 +149,9 @@ SCREEN_VBLANK( ultratnk )
 }
 
 
-WRITE8_HANDLER( ultratnk_video_ram_w )
+WRITE8_MEMBER(ultratnk_state::ultratnk_video_ram_w)
 {
-	ultratnk_state *state = space->machine().driver_data<ultratnk_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = m_videoram;
 	videoram[offset] = data;
-	state->m_playfield->mark_tile_dirty(offset);
+	m_playfield->mark_tile_dirty(offset);
 }

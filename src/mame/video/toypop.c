@@ -126,50 +126,45 @@ VIDEO_START( toypop )
 
 ***************************************************************************/
 
-WRITE8_HANDLER( toypop_videoram_w )
+WRITE8_MEMBER(toypop_state::toypop_videoram_w)
 {
-	toypop_state *state = space->machine().driver_data<toypop_state>();
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_HANDLER( toypop_palettebank_w )
+WRITE8_MEMBER(toypop_state::toypop_palettebank_w)
 {
-	toypop_state *state = space->machine().driver_data<toypop_state>();
-	if (state->m_palettebank != (offset & 1))
+	if (m_palettebank != (offset & 1))
 	{
-		state->m_palettebank = offset & 1;
-		space->machine().tilemap().mark_all_dirty();
+		m_palettebank = offset & 1;
+		machine().tilemap().mark_all_dirty();
 	}
 }
 
-WRITE16_HANDLER( toypop_flipscreen_w )
+WRITE16_MEMBER(toypop_state::toypop_flipscreen_w)
 {
-	toypop_state *state = space->machine().driver_data<toypop_state>();
-	state->m_bitmapflip = offset & 1;
+	m_bitmapflip = offset & 1;
 }
 
-READ16_HANDLER( toypop_merged_background_r )
+READ16_MEMBER(toypop_state::toypop_merged_background_r)
 {
-	toypop_state *state = space->machine().driver_data<toypop_state>();
 	int data1, data2;
 
 	// 0x0a0b0c0d is read as 0xabcd
-	data1 = state->m_bg_image[2*offset];
-	data2 = state->m_bg_image[2*offset + 1];
+	data1 = m_bg_image[2*offset];
+	data2 = m_bg_image[2*offset + 1];
 	return ((data1 & 0xf00) << 4) | ((data1 & 0xf) << 8) | ((data2 & 0xf00) >> 4) | (data2 & 0xf);
 }
 
-WRITE16_HANDLER( toypop_merged_background_w )
+WRITE16_MEMBER(toypop_state::toypop_merged_background_w)
 {
-	toypop_state *state = space->machine().driver_data<toypop_state>();
 
 	// 0xabcd is written as 0x0a0b0c0d in the background image
 	if (ACCESSING_BITS_8_15)
-		state->m_bg_image[2*offset] = ((data & 0xf00) >> 8) | ((data & 0xf000) >> 4);
+		m_bg_image[2*offset] = ((data & 0xf00) >> 8) | ((data & 0xf000) >> 4);
 
 	if (ACCESSING_BITS_0_7)
-		state->m_bg_image[2*offset+1] = (data & 0xf) | ((data & 0xf0) << 4);
+		m_bg_image[2*offset+1] = (data & 0xf) | ((data & 0xf0) << 4);
 }
 
 static void draw_background(running_machine &machine, bitmap_ind16 &bitmap)

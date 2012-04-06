@@ -257,8 +257,9 @@ static WRITE8_HANDLER( i8039_irqen_and_status_w )
 
 static WRITE8_HANDLER( flip_screen_w )
 {
-	tutankhm_flip_screen_x_w(space, 0, data);
-	tutankhm_flip_screen_y_w(space, 0, data);
+	junofrst_state *state = space->machine().driver_data<junofrst_state>();
+	state->tutankhm_flip_screen_x_w(*space, 0, data);
+	state->tutankhm_flip_screen_y_w(*space, 0, data);
 }
 
 

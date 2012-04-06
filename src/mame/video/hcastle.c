@@ -146,66 +146,60 @@ VIDEO_START( hcastle )
 
 ***************************************************************************/
 
-WRITE8_HANDLER( hcastle_pf1_video_w )
+WRITE8_MEMBER(hcastle_state::hcastle_pf1_video_w)
 {
-	hcastle_state *state = space->machine().driver_data<hcastle_state>();
-	state->m_pf1_videoram[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset & 0xbff);
+	m_pf1_videoram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset & 0xbff);
 }
 
-WRITE8_HANDLER( hcastle_pf2_video_w )
+WRITE8_MEMBER(hcastle_state::hcastle_pf2_video_w)
 {
-	hcastle_state *state = space->machine().driver_data<hcastle_state>();
-	state->m_pf2_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset & 0xbff);
+	m_pf2_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset & 0xbff);
 }
 
-WRITE8_HANDLER( hcastle_gfxbank_w )
+WRITE8_MEMBER(hcastle_state::hcastle_gfxbank_w)
 {
-	hcastle_state *state = space->machine().driver_data<hcastle_state>();
-	state->m_gfx_bank = data;
+	m_gfx_bank = data;
 }
 
-READ8_HANDLER( hcastle_gfxbank_r )
+READ8_MEMBER(hcastle_state::hcastle_gfxbank_r)
 {
-	hcastle_state *state = space->machine().driver_data<hcastle_state>();
-	return state->m_gfx_bank;
+	return m_gfx_bank;
 }
 
-WRITE8_HANDLER( hcastle_pf1_control_w )
+WRITE8_MEMBER(hcastle_state::hcastle_pf1_control_w)
 {
-	hcastle_state *state = space->machine().driver_data<hcastle_state>();
 
 	if (offset == 3)
 	{
 		if ((data & 0x8) == 0)
-			state->m_spriteram->copy(0x800, 0x800);
+			m_spriteram->copy(0x800, 0x800);
 		else
-			state->m_spriteram->copy(0x000, 0x800);
+			m_spriteram->copy(0x000, 0x800);
 	}
 	else if (offset == 7)
 	{
-		state->m_fg_tilemap->set_flip((data & 0x08) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+		m_fg_tilemap->set_flip((data & 0x08) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 	}
-	k007121_ctrl_w(state->m_k007121_1, offset, data);
+	k007121_ctrl_w(m_k007121_1, offset, data);
 }
 
-WRITE8_HANDLER( hcastle_pf2_control_w )
+WRITE8_MEMBER(hcastle_state::hcastle_pf2_control_w)
 {
-	hcastle_state *state = space->machine().driver_data<hcastle_state>();
 
 	if (offset == 3)
 	{
 		if ((data & 0x8) == 0)
-			state->m_spriteram2->copy(0x800, 0x800);
+			m_spriteram2->copy(0x800, 0x800);
 		else
-			state->m_spriteram2->copy(0x000, 0x800);
+			m_spriteram2->copy(0x000, 0x800);
 	}
 	else if (offset == 7)
 	{
-		state->m_bg_tilemap->set_flip((data & 0x08) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+		m_bg_tilemap->set_flip((data & 0x08) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 	}
-	k007121_ctrl_w(state->m_k007121_2, offset, data);
+	k007121_ctrl_w(m_k007121_2, offset, data);
 }
 
 /*****************************************************************************/

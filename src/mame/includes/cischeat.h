@@ -47,26 +47,27 @@ public:
 	DECLARE_READ16_MEMBER(scudhamm_motor_status_r);
 	DECLARE_READ16_MEMBER(scudhamm_motor_pos_r);
 	DECLARE_READ16_MEMBER(scudhamm_analog_r);
+	DECLARE_WRITE16_MEMBER(cischeat_scrollram_0_w);
+	DECLARE_WRITE16_MEMBER(cischeat_scrollram_1_w);
+	DECLARE_WRITE16_MEMBER(cischeat_scrollram_2_w);
+	DECLARE_READ16_MEMBER(bigrun_vregs_r);
+	DECLARE_WRITE16_MEMBER(bigrun_vregs_w);
+	DECLARE_READ16_MEMBER(cischeat_vregs_r);
+	DECLARE_WRITE16_MEMBER(cischeat_vregs_w);
+	DECLARE_READ16_MEMBER(f1gpstar_vregs_r);
+	DECLARE_READ16_MEMBER(f1gpstr2_vregs_r);
+	DECLARE_READ16_MEMBER(wildplt_vregs_r);
+	DECLARE_WRITE16_MEMBER(f1gpstar_vregs_w);
+	DECLARE_WRITE16_MEMBER(f1gpstr2_vregs_w);
+	DECLARE_WRITE16_MEMBER(scudhamm_vregs_w);
+	void cischeat_set_vreg_flag(int which, int data);
 };
 
 
 /*----------- defined in video/cischeat.c -----------*/
 
-WRITE16_HANDLER( cischeat_scrollram_0_w );
-WRITE16_HANDLER( cischeat_scrollram_1_w );
-WRITE16_HANDLER( cischeat_scrollram_2_w );
 
-READ16_HANDLER( bigrun_vregs_r );
-READ16_HANDLER( cischeat_vregs_r );
-READ16_HANDLER( f1gpstar_vregs_r );
-READ16_HANDLER( f1gpstr2_vregs_r );
-READ16_HANDLER( wildplt_vregs_r );
 
-WRITE16_HANDLER( bigrun_vregs_w );
-WRITE16_HANDLER( cischeat_vregs_w );
-WRITE16_HANDLER( f1gpstar_vregs_w );
-WRITE16_HANDLER( f1gpstr2_vregs_w );
-WRITE16_HANDLER( scudhamm_vregs_w );
 
 VIDEO_START( bigrun );
 VIDEO_START( cischeat );

@@ -12,12 +12,12 @@ public:
 	bitmap_ind16 m_tmpbitmap;
 	DECLARE_WRITE8_MEMBER(tunhunt_control_w);
 	DECLARE_READ8_MEMBER(tunhunt_button_r);
+	DECLARE_WRITE8_MEMBER(tunhunt_videoram_w);
 };
 
 
 /*----------- defined in video/tunhunt.c -----------*/
 
-WRITE8_HANDLER( tunhunt_videoram_w );
 
 PALETTE_INIT( tunhunt );
 VIDEO_START( tunhunt );

@@ -39,34 +39,30 @@ static TILE_GET_INFO( taitojc_tile_info )
 	SET_TILE_INFO(state->m_gfx_index, tile, color, 0);
 }
 
-READ32_HANDLER(taitojc_tile_r)
+READ32_MEMBER(taitojc_state::taitojc_tile_r)
 {
-	taitojc_state *state = space->machine().driver_data<taitojc_state>();
 
-	return state->m_tile_ram[offset];
+	return m_tile_ram[offset];
 }
 
-READ32_HANDLER(taitojc_char_r)
+READ32_MEMBER(taitojc_state::taitojc_char_r)
 {
-	taitojc_state *state = space->machine().driver_data<taitojc_state>();
 
-	return state->m_char_ram[offset];
+	return m_char_ram[offset];
 }
 
-WRITE32_HANDLER(taitojc_tile_w)
+WRITE32_MEMBER(taitojc_state::taitojc_tile_w)
 {
-	taitojc_state *state = space->machine().driver_data<taitojc_state>();
 
-	COMBINE_DATA(state->m_tile_ram + offset);
-	state->m_tilemap->mark_tile_dirty(offset);
+	COMBINE_DATA(m_tile_ram + offset);
+	m_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE32_HANDLER(taitojc_char_w)
+WRITE32_MEMBER(taitojc_state::taitojc_char_w)
 {
-	taitojc_state *state = space->machine().driver_data<taitojc_state>();
 
-	COMBINE_DATA(state->m_char_ram + offset);
-	gfx_element_mark_dirty(space->machine().gfx[state->m_gfx_index], offset/32);
+	COMBINE_DATA(m_char_ram + offset);
+	gfx_element_mark_dirty(machine().gfx[m_gfx_index], offset/32);
 }
 
 // Object data format:

@@ -27,6 +27,7 @@ public:
 	DECLARE_WRITE8_MEMBER(ultratnk_led_1_w);
 	DECLARE_WRITE8_MEMBER(ultratnk_led_2_w);
 	DECLARE_WRITE8_MEMBER(ultratnk_lockout_w);
+	DECLARE_WRITE8_MEMBER(ultratnk_video_ram_w);
 };
 
 
@@ -37,4 +38,3 @@ VIDEO_START( ultratnk );
 SCREEN_UPDATE_IND16( ultratnk );
 SCREEN_VBLANK( ultratnk );
 
-WRITE8_HANDLER( ultratnk_video_ram_w );

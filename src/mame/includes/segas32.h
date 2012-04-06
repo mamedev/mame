@@ -57,35 +57,59 @@ public:
 	UINT32 *m_spriteram_32bit;
 	void (*m_system32_prot_vblank)(device_t *device);
 	int m_print_count;
+	DECLARE_WRITE16_MEMBER(ga2_dpram_w);
+	DECLARE_READ16_MEMBER(ga2_dpram_r);
+	DECLARE_READ16_MEMBER(ga2_sprite_protection_r);
+	DECLARE_READ16_MEMBER(ga2_wakeup_protection_r);
+	DECLARE_WRITE16_MEMBER(sonic_level_load_protection);
+	DECLARE_READ16_MEMBER(brival_protection_r);
+	DECLARE_WRITE16_MEMBER(brival_protection_w);
+	DECLARE_WRITE16_MEMBER(darkedge_protection_w);
+	DECLARE_READ16_MEMBER(darkedge_protection_r);
+	DECLARE_WRITE16_MEMBER(dbzvrvs_protection_w);
+	DECLARE_READ16_MEMBER(dbzvrvs_protection_r);
+	DECLARE_READ16_MEMBER(arabfgt_protection_r);
+	DECLARE_WRITE16_MEMBER(arabfgt_protection_w);
+	DECLARE_READ16_MEMBER(arf_wakeup_protection_r);
+	DECLARE_WRITE16_MEMBER(jleague_protection_w);
+	DECLARE_READ16_MEMBER(arescue_dsp_r);
+	DECLARE_WRITE16_MEMBER(arescue_dsp_w);
+	DECLARE_READ16_MEMBER(system32_paletteram_r);
+	DECLARE_WRITE16_MEMBER(system32_paletteram_w);
+	DECLARE_READ32_MEMBER(multi32_paletteram_0_r);
+	DECLARE_WRITE32_MEMBER(multi32_paletteram_0_w);
+	DECLARE_READ32_MEMBER(multi32_paletteram_1_r);
+	DECLARE_WRITE32_MEMBER(multi32_paletteram_1_w);
+	DECLARE_READ16_MEMBER(system32_videoram_r);
+	DECLARE_WRITE16_MEMBER(system32_videoram_w);
+	DECLARE_READ32_MEMBER(multi32_videoram_r);
+	DECLARE_WRITE32_MEMBER(multi32_videoram_w);
+	DECLARE_READ16_MEMBER(system32_sprite_control_r);
+	DECLARE_WRITE16_MEMBER(system32_sprite_control_w);
+	DECLARE_READ32_MEMBER(multi32_sprite_control_r);
+	DECLARE_WRITE32_MEMBER(multi32_sprite_control_w);
+	DECLARE_READ16_MEMBER(system32_spriteram_r);
+	DECLARE_WRITE16_MEMBER(system32_spriteram_w);
+	DECLARE_READ32_MEMBER(multi32_spriteram_r);
+	DECLARE_WRITE32_MEMBER(multi32_spriteram_w);
+	DECLARE_READ16_MEMBER(system32_mixer_r);
+	DECLARE_WRITE16_MEMBER(system32_mixer_w);
+	DECLARE_WRITE32_MEMBER(multi32_mixer_0_w);
+	DECLARE_WRITE32_MEMBER(multi32_mixer_1_w);
 };
 
 
 /*----------- defined in machine/segas32.c -----------*/
 
-READ16_HANDLER( arabfgt_protection_r );
-READ16_HANDLER( arf_wakeup_protection_r );
-WRITE16_HANDLER( arabfgt_protection_w );
 
-READ16_HANDLER( brival_protection_r );
-WRITE16_HANDLER( brival_protection_w );
 
-READ16_HANDLER( darkedge_protection_r );
-WRITE16_HANDLER( darkedge_protection_w );
 void darkedge_fd1149_vblank(device_t *device);
-WRITE16_HANDLER( jleague_protection_w );
 
-READ16_HANDLER( dbzvrvs_protection_r );
-WRITE16_HANDLER( dbzvrvs_protection_w );
 
 extern const UINT8 ga2_v25_opcode_table[];
 void decrypt_ga2_protrom(running_machine &machine);
-READ16_HANDLER( ga2_dpram_r );
-WRITE16_HANDLER( ga2_dpram_w );
 
-WRITE16_HANDLER(sonic_level_load_protection);
 
-READ16_HANDLER( arescue_dsp_r );
-WRITE16_HANDLER( arescue_dsp_w );
 
 
 /*----------- defined in video/segas32.c -----------*/
@@ -97,29 +121,7 @@ SCREEN_UPDATE_RGB32(multi32_left);
 SCREEN_UPDATE_RGB32(multi32_right);
 void system32_set_vblank(running_machine &machine, int state);
 
-READ16_HANDLER( system32_videoram_r );
-WRITE16_HANDLER( system32_videoram_w );
-READ32_HANDLER( multi32_videoram_r );
-WRITE32_HANDLER( multi32_videoram_w );
 
-READ16_HANDLER( system32_spriteram_r );
-WRITE16_HANDLER( system32_spriteram_w );
-READ32_HANDLER( multi32_spriteram_r );
-WRITE32_HANDLER( multi32_spriteram_w );
 
-READ16_HANDLER( system32_paletteram_r );
-WRITE16_HANDLER( system32_paletteram_w );
-READ32_HANDLER( multi32_paletteram_0_r );
-WRITE32_HANDLER( multi32_paletteram_0_w );
-READ32_HANDLER( multi32_paletteram_1_r );
-WRITE32_HANDLER( multi32_paletteram_1_w );
 
-READ16_HANDLER( system32_sprite_control_r );
-WRITE16_HANDLER( system32_sprite_control_w );
-READ32_HANDLER( multi32_sprite_control_r );
-WRITE32_HANDLER( multi32_sprite_control_w );
 
-WRITE16_HANDLER( system32_mixer_w );
-READ16_HANDLER( system32_mixer_r );
-WRITE32_HANDLER( multi32_mixer_0_w );
-WRITE32_HANDLER( multi32_mixer_1_w );

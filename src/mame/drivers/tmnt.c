@@ -527,7 +527,7 @@ WRITE16_MEMBER(tmnt_state::prmrsocr_eeprom_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		prmrsocr_122000_w(&space, offset, data, mem_mask);
+		prmrsocr_122000_w(space, offset, data, mem_mask);
 	}
 
 	if (ACCESSING_BITS_8_15)
@@ -558,8 +558,8 @@ static ADDRESS_MAP_START( cuebrick_main_map, AS_PROGRAM, 16, tmnt_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x040000, 0x043fff) AM_RAM	/* main RAM */
 	AM_RANGE(0x060000, 0x063fff) AM_RAM	/* main RAM */
-	AM_RANGE(0x080000, 0x080fff) AM_RAM_WRITE_LEGACY(tmnt_paletteram_word_w) AM_SHARE("paletteram")
-	AM_RANGE(0x0a0000, 0x0a0001) AM_READ_PORT("COINS") AM_WRITE_LEGACY(tmnt_0a0000_w)
+	AM_RANGE(0x080000, 0x080fff) AM_RAM_WRITE(tmnt_paletteram_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x0a0000, 0x0a0001) AM_READ_PORT("COINS") AM_WRITE(tmnt_0a0000_w)
 	AM_RANGE(0x0a0002, 0x0a0003) AM_READ_PORT("P1")
 	AM_RANGE(0x0a0004, 0x0a0005) AM_READ_PORT("P2")
 	AM_RANGE(0x0a0008, 0x0a0009) AM_WRITE(tmnt_sound_command_w)
@@ -579,8 +579,8 @@ static ADDRESS_MAP_START( mia_main_map, AS_PROGRAM, 16, tmnt_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x040000, 0x043fff) AM_RAM	/* main RAM */
 	AM_RANGE(0x060000, 0x063fff) AM_RAM	/* main RAM */
-	AM_RANGE(0x080000, 0x080fff) AM_RAM_WRITE_LEGACY(tmnt_paletteram_word_w) AM_SHARE("paletteram")
-	AM_RANGE(0x0a0000, 0x0a0001) AM_READ_PORT("COINS") AM_WRITE_LEGACY(tmnt_0a0000_w)
+	AM_RANGE(0x080000, 0x080fff) AM_RAM_WRITE(tmnt_paletteram_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x0a0000, 0x0a0001) AM_READ_PORT("COINS") AM_WRITE(tmnt_0a0000_w)
 	AM_RANGE(0x0a0002, 0x0a0003) AM_READ_PORT("P1")
 	AM_RANGE(0x0a0004, 0x0a0005) AM_READ_PORT("P2")
 	AM_RANGE(0x0a0008, 0x0a0009) AM_WRITE(tmnt_sound_command_w)
@@ -588,7 +588,7 @@ static ADDRESS_MAP_START( mia_main_map, AS_PROGRAM, 16, tmnt_state )
 	AM_RANGE(0x0a0012, 0x0a0013) AM_READ_PORT("DSW2")
 	AM_RANGE(0x0a0018, 0x0a0019) AM_READ_PORT("DSW3")
 #if 0
-	AM_RANGE(0x0c0000, 0x0c0001) AM_WRITE_LEGACY(tmnt_priority_w)
+	AM_RANGE(0x0c0000, 0x0c0001) AM_WRITE(tmnt_priority_w)
 #endif
 	AM_RANGE(0x100000, 0x107fff) AM_READWRITE(k052109_word_noA12_r, k052109_word_noA12_w)
 //  AM_RANGE(0x10e800, 0x10e801) AM_WRITENOP ???
@@ -600,8 +600,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( tmnt_main_map, AS_PROGRAM, 16, tmnt_state )
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
 	AM_RANGE(0x060000, 0x063fff) AM_RAM	/* main RAM */
-	AM_RANGE(0x080000, 0x080fff) AM_RAM_WRITE_LEGACY(tmnt_paletteram_word_w) AM_SHARE("paletteram")
-	AM_RANGE(0x0a0000, 0x0a0001) AM_READ_PORT("COINS") AM_WRITE_LEGACY(tmnt_0a0000_w)
+	AM_RANGE(0x080000, 0x080fff) AM_RAM_WRITE(tmnt_paletteram_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x0a0000, 0x0a0001) AM_READ_PORT("COINS") AM_WRITE(tmnt_0a0000_w)
 	AM_RANGE(0x0a0002, 0x0a0003) AM_READ_PORT("P1")
 	AM_RANGE(0x0a0004, 0x0a0005) AM_READ_PORT("P2")
 	AM_RANGE(0x0a0006, 0x0a0007) AM_READ_PORT("P3")
@@ -610,7 +610,7 @@ static ADDRESS_MAP_START( tmnt_main_map, AS_PROGRAM, 16, tmnt_state )
 	AM_RANGE(0x0a0012, 0x0a0013) AM_READ_PORT("DSW2")
 	AM_RANGE(0x0a0014, 0x0a0015) AM_READ_PORT("P4")
 	AM_RANGE(0x0a0018, 0x0a0019) AM_READ_PORT("DSW3")
-	AM_RANGE(0x0c0000, 0x0c0001) AM_WRITE_LEGACY(tmnt_priority_w)
+	AM_RANGE(0x0c0000, 0x0c0001) AM_WRITE(tmnt_priority_w)
 	AM_RANGE(0x100000, 0x107fff) AM_READWRITE(k052109_word_noA12_r, k052109_word_noA12_w)
 //  AM_RANGE(0x10e800, 0x10e801) AM_WRITENOP ???
 	AM_RANGE(0x140000, 0x140007) AM_DEVREADWRITE_LEGACY("k051960", k051937_word_r, k051937_word_w)
@@ -626,7 +626,7 @@ static ADDRESS_MAP_START( punkshot_main_map, AS_PROGRAM, 16, tmnt_state )
 	AM_RANGE(0x0a0002, 0x0a0003) AM_READ_PORT("COINS/DSW3")
 	AM_RANGE(0x0a0004, 0x0a0005) AM_READ_PORT("P3/P4")
 	AM_RANGE(0x0a0006, 0x0a0007) AM_READ_PORT("P1/P2")
-	AM_RANGE(0x0a0020, 0x0a0021) AM_WRITE_LEGACY(punkshot_0a0020_w)
+	AM_RANGE(0x0a0020, 0x0a0021) AM_WRITE(punkshot_0a0020_w)
 	AM_RANGE(0x0a0040, 0x0a0043) AM_DEVREAD8_LEGACY("k053260", punkshot_sound_r, 0x00ff)	/* K053260 */
 	AM_RANGE(0x0a0040, 0x0a0041) AM_DEVWRITE8_LEGACY("k053260", k053260_w, 0x00ff)
 	AM_RANGE(0x0a0060, 0x0a007f) AM_DEVWRITE_LEGACY("k053251", k053251_lsb_w)
@@ -648,7 +648,7 @@ static ADDRESS_MAP_START( lgtnfght_main_map, AS_PROGRAM, 16, tmnt_state )
 	AM_RANGE(0x0a0006, 0x0a0007) AM_READ_PORT("DSW1")
 	AM_RANGE(0x0a0008, 0x0a0009) AM_READ_PORT("DSW2")
 	AM_RANGE(0x0a0010, 0x0a0011) AM_READ_PORT("DSW3")
-	AM_RANGE(0x0a0018, 0x0a0019) AM_WRITE_LEGACY(lgtnfght_0a0018_w)
+	AM_RANGE(0x0a0018, 0x0a0019) AM_WRITE(lgtnfght_0a0018_w)
 	AM_RANGE(0x0a0020, 0x0a0023) AM_DEVREAD8_LEGACY("k053260", punkshot_sound_r, 0x00ff)	/* K053260 */
 	AM_RANGE(0x0a0020, 0x0a0021) AM_DEVWRITE8_LEGACY("k053260", k053260_w, 0x00ff)
 	AM_RANGE(0x0a0028, 0x0a0029) AM_WRITE(watchdog_reset16_w)
@@ -679,7 +679,7 @@ static ADDRESS_MAP_START( blswhstl_main_map, AS_PROGRAM, 16, tmnt_state )
 	AM_RANGE(0x700004, 0x700005) AM_READ(blswhstl_coin_r)
 	AM_RANGE(0x700006, 0x700007) AM_READ_PORT("EEPROM")
 	AM_RANGE(0x700200, 0x700201) AM_WRITE(blswhstl_eeprom_w)
-	AM_RANGE(0x700300, 0x700301) AM_WRITE_LEGACY(blswhstl_700300_w)
+	AM_RANGE(0x700300, 0x700301) AM_WRITE(blswhstl_700300_w)
 	AM_RANGE(0x700400, 0x700401) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0x780600, 0x780603) AM_DEVREAD8_LEGACY("k053260", punkshot_sound_r, 0x00ff)	/* K053260 */
 	AM_RANGE(0x780600, 0x780601) AM_DEVWRITE8_LEGACY("k053260", k053260_w, 0x00ff)
@@ -724,12 +724,12 @@ static ADDRESS_MAP_START( glfgreat_main_map, AS_PROGRAM, 16, tmnt_state )
 	AM_RANGE(0x120002, 0x120003) AM_READ_PORT("P3/P4")
 	AM_RANGE(0x120004, 0x120005) AM_READ_PORT("COINS/DSW3")
 	AM_RANGE(0x120006, 0x120007) AM_READ_PORT("DSW1/DSW2")
-	AM_RANGE(0x121000, 0x121001) AM_READ_LEGACY(glfgreat_ball_r)	/* returns the color of the center pixel of the roz layer */
-	AM_RANGE(0x122000, 0x122001) AM_WRITE_LEGACY(glfgreat_122000_w)
+	AM_RANGE(0x121000, 0x121001) AM_READ(glfgreat_ball_r)	/* returns the color of the center pixel of the roz layer */
+	AM_RANGE(0x122000, 0x122001) AM_WRITE(glfgreat_122000_w)
 	AM_RANGE(0x124000, 0x124001) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0x125000, 0x125003) AM_DEVREADWRITE8_LEGACY("k053260", punkshot_sound_r, glfgreat_sound_w, 0xff00)	/* K053260 */
 	AM_RANGE(0x200000, 0x207fff) AM_READWRITE(k052109_word_noA12_r, k052109_word_noA12_w)
-	AM_RANGE(0x300000, 0x3fffff) AM_READ_LEGACY(glfgreat_rom_r)
+	AM_RANGE(0x300000, 0x3fffff) AM_READ(glfgreat_rom_r)
 ADDRESS_MAP_END
 
 
@@ -752,7 +752,7 @@ static ADDRESS_MAP_START( prmrsocr_main_map, AS_PROGRAM, 16, tmnt_state )
 	AM_RANGE(0x123000, 0x123001) AM_WRITE(prmrsocr_sound_irq_w)
 	AM_RANGE(0x200000, 0x207fff) AM_READWRITE(k052109_word_noA12_r, k052109_word_noA12_w)
 	AM_RANGE(0x280000, 0x280001) AM_WRITE(watchdog_reset16_w)
-	AM_RANGE(0x300000, 0x33ffff) AM_READ_LEGACY(prmrsocr_rom_r)
+	AM_RANGE(0x300000, 0x33ffff) AM_READ(prmrsocr_rom_r)
 ADDRESS_MAP_END
 
 
@@ -1007,8 +1007,8 @@ static ADDRESS_MAP_START( tmnt2_main_map, AS_PROGRAM, 16, tmnt_state )
 	AM_RANGE(0x1c0006, 0x1c0007) AM_READ_PORT("P4")
 	AM_RANGE(0x1c0100, 0x1c0101) AM_READ_PORT("COINS")
 	AM_RANGE(0x1c0102, 0x1c0103) AM_READ(ssriders_eeprom_r)
-	AM_RANGE(0x1c0200, 0x1c0201) AM_WRITE_LEGACY(ssriders_eeprom_w)	/* EEPROM and gfx control */
-	AM_RANGE(0x1c0300, 0x1c0301) AM_WRITE_LEGACY(ssriders_1c0300_w)
+	AM_RANGE(0x1c0200, 0x1c0201) AM_WRITE(ssriders_eeprom_w)	/* EEPROM and gfx control */
+	AM_RANGE(0x1c0300, 0x1c0301) AM_WRITE(ssriders_1c0300_w)
 	AM_RANGE(0x1c0400, 0x1c0401) AM_READWRITE(watchdog_reset16_r, watchdog_reset16_w)
 	AM_RANGE(0x1c0500, 0x1c057f) AM_RAM	/* TMNT2 only (1J) unknown, mostly MCU blit offsets */
 //  AM_RANGE(0x1c0800, 0x1c0801) AM_READ(ssriders_protection_r) /* protection device */
@@ -1033,8 +1033,8 @@ static ADDRESS_MAP_START( ssriders_main_map, AS_PROGRAM, 16, tmnt_state )
 	AM_RANGE(0x1c0006, 0x1c0007) AM_READ_PORT("P4")
 	AM_RANGE(0x1c0100, 0x1c0101) AM_READ_PORT("COINS")
 	AM_RANGE(0x1c0102, 0x1c0103) AM_READ(ssriders_eeprom_r)
-	AM_RANGE(0x1c0200, 0x1c0201) AM_WRITE_LEGACY(ssriders_eeprom_w)	/* EEPROM and gfx control */
-	AM_RANGE(0x1c0300, 0x1c0301) AM_WRITE_LEGACY(ssriders_1c0300_w)
+	AM_RANGE(0x1c0200, 0x1c0201) AM_WRITE(ssriders_eeprom_w)	/* EEPROM and gfx control */
+	AM_RANGE(0x1c0300, 0x1c0301) AM_WRITE(ssriders_1c0300_w)
 	AM_RANGE(0x1c0400, 0x1c0401) AM_READWRITE(watchdog_reset16_r, watchdog_reset16_w)
 	AM_RANGE(0x1c0500, 0x1c057f) AM_RAM	/* TMNT2 only (1J) unknown */
 	AM_RANGE(0x1c0800, 0x1c0801) AM_READ(ssriders_protection_r)
@@ -1055,7 +1055,7 @@ static ADDRESS_MAP_START( sunsetbl_main_map, AS_PROGRAM, 16, tmnt_state )
 	AM_RANGE(0x14e700, 0x14e71f) AM_DEVWRITE_LEGACY("k053251", k053251_lsb_w)
 	AM_RANGE(0x180000, 0x183fff) AM_READWRITE(k053245_scattered_word_r, k053245_scattered_word_w) AM_BASE(m_spriteram)
 	AM_RANGE(0x184000, 0x18ffff) AM_RAM
-	AM_RANGE(0x1c0300, 0x1c0301) AM_WRITE_LEGACY(ssriders_1c0300_w)
+	AM_RANGE(0x1c0300, 0x1c0301) AM_WRITE(ssriders_1c0300_w)
 	AM_RANGE(0x1c0400, 0x1c0401) AM_WRITENOP
 	AM_RANGE(0x5a0000, 0x5a001f) AM_READWRITE(k053244_word_noA1_r, k053244_word_noA1_w)
 	AM_RANGE(0x600000, 0x603fff) AM_DEVREADWRITE_LEGACY("k052109", k052109_word_r, k052109_word_w)
@@ -1066,7 +1066,7 @@ static ADDRESS_MAP_START( sunsetbl_main_map, AS_PROGRAM, 16, tmnt_state )
 	AM_RANGE(0xc00002, 0xc00003) AM_READ_PORT("P2")
 	AM_RANGE(0xc00004, 0xc00005) AM_READ_PORT("P3")
 	AM_RANGE(0xc00006, 0xc00007) AM_READ_PORT("P4")
-	AM_RANGE(0xc00200, 0xc00201) AM_WRITE_LEGACY(ssriders_eeprom_w)	/* EEPROM and gfx control */
+	AM_RANGE(0xc00200, 0xc00201) AM_WRITE(ssriders_eeprom_w)	/* EEPROM and gfx control */
 	AM_RANGE(0xc00404, 0xc00405) AM_READ_PORT("COINS")
 	AM_RANGE(0xc00406, 0xc00407) AM_READ(sunsetbl_eeprom_r)
 	AM_RANGE(0xc00600, 0xc00601) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
@@ -1160,12 +1160,12 @@ ADDRESS_MAP_END
 
 READ8_MEMBER(tmnt_state::k054539_ctrl_r)
 {
-	return machine().device<k054539_device>("k054539")->read(*&space, 0x200 + offset, 0xff);
+	return machine().device<k054539_device>("k054539")->read(space, 0x200 + offset, 0xff);
 }
 
 WRITE8_MEMBER(tmnt_state::k054539_ctrl_w)
 {
-	machine().device<k054539_device>("k054539")->write(*&space, 0x200 + offset, data, 0xff);
+	machine().device<k054539_device>("k054539")->write(space, 0x200 + offset, data, 0xff);
 }
 
 static ADDRESS_MAP_START( prmrsocr_audio_map, AS_PROGRAM, 8, tmnt_state )

@@ -28,16 +28,16 @@ public:
 	DECLARE_WRITE8_MEMBER(toypop_m68000_assert_w);
 	DECLARE_WRITE16_MEMBER(toypop_m68000_interrupt_enable_w);
 	DECLARE_WRITE16_MEMBER(toypop_m68000_interrupt_disable_w);
+	DECLARE_WRITE8_MEMBER(toypop_videoram_w);
+	DECLARE_WRITE8_MEMBER(toypop_palettebank_w);
+	DECLARE_WRITE16_MEMBER(toypop_flipscreen_w);
+	DECLARE_READ16_MEMBER(toypop_merged_background_r);
+	DECLARE_WRITE16_MEMBER(toypop_merged_background_w);
 };
 
 
 /*----------- defined in video/toypop.c -----------*/
 
-WRITE8_HANDLER( toypop_videoram_w );
-READ16_HANDLER( toypop_merged_background_r );
-WRITE16_HANDLER( toypop_merged_background_w );
-WRITE8_HANDLER( toypop_palettebank_w );
-WRITE16_HANDLER( toypop_flipscreen_w );
 VIDEO_START( toypop );
 SCREEN_UPDATE_IND16( toypop );
 PALETTE_INIT( toypop );

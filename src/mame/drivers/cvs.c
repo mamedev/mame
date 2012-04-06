@@ -487,9 +487,9 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( cvs_main_cpu_io_map, AS_IO, 8, cvs_state )
-	AM_RANGE(0x00, 0xff) AM_READ(cvs_input_r) AM_WRITE_LEGACY(cvs_scroll_w)
-	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_READWRITE_LEGACY(cvs_collision_clear, cvs_video_fx_w)
-	AM_RANGE(S2650_CTRL_PORT, S2650_CTRL_PORT) AM_READ_LEGACY(cvs_collision_r) AM_WRITE(audio_command_w)
+	AM_RANGE(0x00, 0xff) AM_READ(cvs_input_r) AM_WRITE(cvs_scroll_w)
+	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_READWRITE(cvs_collision_clear, cvs_video_fx_w)
+	AM_RANGE(S2650_CTRL_PORT, S2650_CTRL_PORT) AM_READ(cvs_collision_r) AM_WRITE(audio_command_w)
 	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ_PORT("SENSE")
 	AM_RANGE(S2650_FO_PORT, S2650_FO_PORT) AM_RAM AM_BASE(m_fo_state)
 ADDRESS_MAP_END

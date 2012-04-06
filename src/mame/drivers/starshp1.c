@@ -171,14 +171,14 @@ static ADDRESS_MAP_START( starshp1_map, AS_PROGRAM, 8, starshp1_state )
 	AM_RANGE(0x2c00, 0x3fff) AM_ROM
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("VBLANK")
-	AM_RANGE(0xc300, 0xc3ff) AM_WRITE_LEGACY(starshp1_sspic_w) /* spaceship picture */
+	AM_RANGE(0xc300, 0xc3ff) AM_WRITE(starshp1_sspic_w) /* spaceship picture */
 	AM_RANGE(0xc400, 0xc400) AM_READ_PORT("COINAGE")
-	AM_RANGE(0xc400, 0xc4ff) AM_WRITE_LEGACY(starshp1_ssadd_w) /* spaceship address */
-	AM_RANGE(0xc800, 0xc9ff) AM_RAM_WRITE_LEGACY(starshp1_playfield_w) AM_BASE(m_playfield_ram)
+	AM_RANGE(0xc400, 0xc4ff) AM_WRITE(starshp1_ssadd_w) /* spaceship address */
+	AM_RANGE(0xc800, 0xc9ff) AM_RAM_WRITE(starshp1_playfield_w) AM_BASE(m_playfield_ram)
 	AM_RANGE(0xcc00, 0xcc0f) AM_WRITEONLY AM_BASE(m_hpos_ram)
 	AM_RANGE(0xd000, 0xd00f) AM_WRITEONLY AM_BASE(m_vpos_ram)
 	AM_RANGE(0xd400, 0xd40f) AM_WRITEONLY AM_BASE(m_obj_ram)
-	AM_RANGE(0xd800, 0xd800) AM_READ_LEGACY(starshp1_rng_r)
+	AM_RANGE(0xd800, 0xd800) AM_READ(starshp1_rng_r)
 	AM_RANGE(0xd800, 0xd80f) AM_WRITE(starshp1_collision_reset_w)
 	AM_RANGE(0xdc00, 0xdc0f) AM_WRITE(starshp1_misc_w)
 	AM_RANGE(0xdd00, 0xdd0f) AM_WRITE(starshp1_analog_in_w)

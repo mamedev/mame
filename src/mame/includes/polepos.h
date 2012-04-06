@@ -39,6 +39,25 @@ public:
 	DECLARE_READ8_MEMBER(polepos_ready_r);
 	DECLARE_WRITE8_MEMBER(polepos_latch_w);
 	DECLARE_WRITE16_MEMBER(polepos_z8002_nvi_enable_w);
+	DECLARE_READ16_MEMBER(polepos_sprite16_r);
+	DECLARE_WRITE16_MEMBER(polepos_sprite16_w);
+	DECLARE_READ8_MEMBER(polepos_sprite_r);
+	DECLARE_WRITE8_MEMBER(polepos_sprite_w);
+	DECLARE_READ16_MEMBER(polepos_road16_r);
+	DECLARE_WRITE16_MEMBER(polepos_road16_w);
+	DECLARE_READ8_MEMBER(polepos_road_r);
+	DECLARE_WRITE8_MEMBER(polepos_road_w);
+	DECLARE_WRITE16_MEMBER(polepos_road16_vscroll_w);
+	DECLARE_READ16_MEMBER(polepos_view16_r);
+	DECLARE_WRITE16_MEMBER(polepos_view16_w);
+	DECLARE_READ8_MEMBER(polepos_view_r);
+	DECLARE_WRITE8_MEMBER(polepos_view_w);
+	DECLARE_WRITE16_MEMBER(polepos_view16_hscroll_w);
+	DECLARE_WRITE8_MEMBER(polepos_chacl_w);
+	DECLARE_READ16_MEMBER(polepos_alpha16_r);
+	DECLARE_WRITE16_MEMBER(polepos_alpha16_w);
+	DECLARE_READ8_MEMBER(polepos_alpha_r);
+	DECLARE_WRITE8_MEMBER(polepos_alpha_w);
 };
 
 
@@ -58,23 +77,4 @@ VIDEO_START( polepos );
 PALETTE_INIT( polepos );
 SCREEN_UPDATE_IND16( polepos );
 
-WRITE16_HANDLER( polepos_view16_w );
-WRITE16_HANDLER( polepos_road16_w );
-WRITE16_HANDLER( polepos_alpha16_w );
-WRITE16_HANDLER( polepos_sprite16_w );
-WRITE8_HANDLER( polepos_view_w );
-WRITE8_HANDLER( polepos_road_w );
-WRITE8_HANDLER( polepos_alpha_w );
-WRITE8_HANDLER( polepos_sprite_w );
-WRITE8_HANDLER( polepos_chacl_w );
 
-READ16_HANDLER( polepos_view16_r );
-READ16_HANDLER( polepos_road16_r );
-READ16_HANDLER( polepos_alpha16_r );
-READ16_HANDLER( polepos_sprite16_r );
-READ8_HANDLER( polepos_view_r );
-READ8_HANDLER( polepos_road_r );
-READ8_HANDLER( polepos_alpha_r );
-READ8_HANDLER( polepos_sprite_r );
-WRITE16_HANDLER( polepos_view16_hscroll_w );
-WRITE16_HANDLER( polepos_road16_vscroll_w );

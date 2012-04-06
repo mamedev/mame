@@ -130,8 +130,8 @@ static WRITE8_DEVICE_HANDLER( jailbrek_speech_w )
 }
 
 static ADDRESS_MAP_START( jailbrek_map, AS_PROGRAM, 8, jailbrek_state )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM_WRITE_LEGACY(jailbrek_colorram_w) AM_BASE(m_colorram)
-	AM_RANGE(0x0800, 0x0fff) AM_RAM_WRITE_LEGACY(jailbrek_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0x0000, 0x07ff) AM_RAM_WRITE(jailbrek_colorram_w) AM_BASE(m_colorram)
+	AM_RANGE(0x0800, 0x0fff) AM_RAM_WRITE(jailbrek_videoram_w) AM_BASE(m_videoram)
 	AM_RANGE(0x1000, 0x10bf) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
 	AM_RANGE(0x10c0, 0x14ff) AM_RAM /* ??? */
 	AM_RANGE(0x1500, 0x1fff) AM_RAM /* work ram */

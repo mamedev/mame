@@ -20,14 +20,14 @@ public:
 	/* devices */
 	cpu_device *m_maincpu;
 	DECLARE_WRITE8_MEMBER(irq_enable_w);
+	DECLARE_WRITE8_MEMBER(pooyan_videoram_w);
+	DECLARE_WRITE8_MEMBER(pooyan_colorram_w);
+	DECLARE_WRITE8_MEMBER(pooyan_flipscreen_w);
 };
 
 
 /*----------- defined in video/pooyan.c -----------*/
 
-WRITE8_HANDLER( pooyan_videoram_w );
-WRITE8_HANDLER( pooyan_colorram_w );
-WRITE8_HANDLER( pooyan_flipscreen_w );
 
 PALETTE_INIT( pooyan );
 VIDEO_START( pooyan );

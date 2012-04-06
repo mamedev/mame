@@ -25,13 +25,13 @@ public:
 	DECLARE_READ8_MEMBER(protection_r);
 	DECLARE_WRITE8_MEMBER(gfire2_protection_w);
 	DECLARE_READ8_MEMBER(gfire2_protection_r);
+	DECLARE_WRITE8_MEMBER(mosaic_fgvideoram_w);
+	DECLARE_WRITE8_MEMBER(mosaic_bgvideoram_w);
 };
 
 
 /*----------- defined in video/mosaic.c -----------*/
 
-WRITE8_HANDLER( mosaic_fgvideoram_w );
-WRITE8_HANDLER( mosaic_bgvideoram_w );
 
 VIDEO_START( mosaic );
 SCREEN_UPDATE_IND16( mosaic );

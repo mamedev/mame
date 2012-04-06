@@ -15,20 +15,18 @@
  for writes to Video Ram
 *******************************************************************************/
 
-WRITE16_HANDLER( wwfsstar_fg0_videoram_w )
+WRITE16_MEMBER(wwfsstar_state::wwfsstar_fg0_videoram_w)
 {
-	wwfsstar_state *state = space->machine().driver_data<wwfsstar_state>();
 
-	COMBINE_DATA(&state->m_fg0_videoram[offset]);
-	state->m_fg0_tilemap->mark_tile_dirty(offset/2);
+	COMBINE_DATA(&m_fg0_videoram[offset]);
+	m_fg0_tilemap->mark_tile_dirty(offset/2);
 }
 
-WRITE16_HANDLER( wwfsstar_bg0_videoram_w )
+WRITE16_MEMBER(wwfsstar_state::wwfsstar_bg0_videoram_w)
 {
-	wwfsstar_state *state = space->machine().driver_data<wwfsstar_state>();
 
-	COMBINE_DATA(&state->m_bg0_videoram[offset]);
-	state->m_bg0_tilemap->mark_tile_dirty(offset/2);
+	COMBINE_DATA(&m_bg0_videoram[offset]);
+	m_bg0_tilemap->mark_tile_dirty(offset/2);
 }
 
 /*******************************************************************************

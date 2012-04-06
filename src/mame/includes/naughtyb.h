@@ -21,13 +21,13 @@ public:
 	DECLARE_WRITE8_MEMBER(popflame_protection_w);
 	DECLARE_READ8_MEMBER(trvmstr_questions_r);
 	DECLARE_WRITE8_MEMBER(trvmstr_questions_w);
+	DECLARE_WRITE8_MEMBER(naughtyb_videoreg_w);
+	DECLARE_WRITE8_MEMBER(popflame_videoreg_w);
 };
 
 
 /*----------- defined in video/naughtyb.c -----------*/
 
-WRITE8_HANDLER( naughtyb_videoreg_w );
-WRITE8_HANDLER( popflame_videoreg_w );
 
 VIDEO_START( naughtyb );
 PALETTE_INIT( naughtyb );

@@ -57,7 +57,7 @@ static ADDRESS_MAP_START( main_io_map, AS_IO, 8, n8080_state )
 	AM_RANGE(0x03, 0x03) AM_WRITE(n8080_shift_data_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE_LEGACY(n8080_sound_1_w)
 	AM_RANGE(0x05, 0x05) AM_WRITE_LEGACY(n8080_sound_2_w)
-	AM_RANGE(0x06, 0x06) AM_WRITE_LEGACY(n8080_video_control_w)
+	AM_RANGE(0x06, 0x06) AM_WRITE(n8080_video_control_w)
 ADDRESS_MAP_END
 
 

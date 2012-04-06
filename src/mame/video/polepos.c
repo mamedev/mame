@@ -208,28 +208,24 @@ VIDEO_START( polepos )
 
 ***************************************************************************/
 
-READ16_HANDLER( polepos_sprite16_r )
+READ16_MEMBER(polepos_state::polepos_sprite16_r)
 {
-	polepos_state *state = space->machine().driver_data<polepos_state>();
-	return state->m_sprite16_memory[offset];
+	return m_sprite16_memory[offset];
 }
 
-WRITE16_HANDLER( polepos_sprite16_w )
+WRITE16_MEMBER(polepos_state::polepos_sprite16_w)
 {
-	polepos_state *state = space->machine().driver_data<polepos_state>();
-	COMBINE_DATA(&state->m_sprite16_memory[offset]);
+	COMBINE_DATA(&m_sprite16_memory[offset]);
 }
 
-READ8_HANDLER( polepos_sprite_r )
+READ8_MEMBER(polepos_state::polepos_sprite_r)
 {
-	polepos_state *state = space->machine().driver_data<polepos_state>();
-	return state->m_sprite16_memory[offset] & 0xff;
+	return m_sprite16_memory[offset] & 0xff;
 }
 
-WRITE8_HANDLER( polepos_sprite_w )
+WRITE8_MEMBER(polepos_state::polepos_sprite_w)
 {
-	polepos_state *state = space->machine().driver_data<polepos_state>();
-	state->m_sprite16_memory[offset] = (state->m_sprite16_memory[offset] & 0xff00) | data;
+	m_sprite16_memory[offset] = (m_sprite16_memory[offset] & 0xff00) | data;
 }
 
 
@@ -239,34 +235,29 @@ WRITE8_HANDLER( polepos_sprite_w )
 
 ***************************************************************************/
 
-READ16_HANDLER( polepos_road16_r )
+READ16_MEMBER(polepos_state::polepos_road16_r)
 {
-	polepos_state *state = space->machine().driver_data<polepos_state>();
-	return state->m_road16_memory[offset];
+	return m_road16_memory[offset];
 }
 
-WRITE16_HANDLER( polepos_road16_w )
+WRITE16_MEMBER(polepos_state::polepos_road16_w)
 {
-	polepos_state *state = space->machine().driver_data<polepos_state>();
-	COMBINE_DATA(&state->m_road16_memory[offset]);
+	COMBINE_DATA(&m_road16_memory[offset]);
 }
 
-READ8_HANDLER( polepos_road_r )
+READ8_MEMBER(polepos_state::polepos_road_r)
 {
-	polepos_state *state = space->machine().driver_data<polepos_state>();
-	return state->m_road16_memory[offset] & 0xff;
+	return m_road16_memory[offset] & 0xff;
 }
 
-WRITE8_HANDLER( polepos_road_w )
+WRITE8_MEMBER(polepos_state::polepos_road_w)
 {
-	polepos_state *state = space->machine().driver_data<polepos_state>();
-	state->m_road16_memory[offset] = (state->m_road16_memory[offset] & 0xff00) | data;
+	m_road16_memory[offset] = (m_road16_memory[offset] & 0xff00) | data;
 }
 
-WRITE16_HANDLER( polepos_road16_vscroll_w )
+WRITE16_MEMBER(polepos_state::polepos_road16_vscroll_w)
 {
-	polepos_state *state = space->machine().driver_data<polepos_state>();
-	COMBINE_DATA(&state->m_road16_vscroll);
+	COMBINE_DATA(&m_road16_vscroll);
 }
 
 
@@ -276,49 +267,43 @@ WRITE16_HANDLER( polepos_road16_vscroll_w )
 
 ***************************************************************************/
 
-READ16_HANDLER( polepos_view16_r )
+READ16_MEMBER(polepos_state::polepos_view16_r)
 {
-	polepos_state *state = space->machine().driver_data<polepos_state>();
-	return state->m_view16_memory[offset];
+	return m_view16_memory[offset];
 }
 
-WRITE16_HANDLER( polepos_view16_w )
+WRITE16_MEMBER(polepos_state::polepos_view16_w)
 {
-	polepos_state *state = space->machine().driver_data<polepos_state>();
-	COMBINE_DATA(&state->m_view16_memory[offset]);
+	COMBINE_DATA(&m_view16_memory[offset]);
 	if (offset < 0x400)
-		state->m_bg_tilemap->mark_tile_dirty(offset);
+		m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-READ8_HANDLER( polepos_view_r )
+READ8_MEMBER(polepos_state::polepos_view_r)
 {
-	polepos_state *state = space->machine().driver_data<polepos_state>();
-	return state->m_view16_memory[offset] & 0xff;
+	return m_view16_memory[offset] & 0xff;
 }
 
-WRITE8_HANDLER( polepos_view_w )
+WRITE8_MEMBER(polepos_state::polepos_view_w)
 {
-	polepos_state *state = space->machine().driver_data<polepos_state>();
-	state->m_view16_memory[offset] = (state->m_view16_memory[offset] & 0xff00) | data;
+	m_view16_memory[offset] = (m_view16_memory[offset] & 0xff00) | data;
 	if (offset < 0x400)
-		state->m_bg_tilemap->mark_tile_dirty(offset);
+		m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_HANDLER( polepos_view16_hscroll_w )
+WRITE16_MEMBER(polepos_state::polepos_view16_hscroll_w)
 {
-	polepos_state *state = space->machine().driver_data<polepos_state>();
 
-	COMBINE_DATA(&state->m_scroll);
-	state->m_bg_tilemap->set_scrollx(0,state->m_scroll);
+	COMBINE_DATA(&m_scroll);
+	m_bg_tilemap->set_scrollx(0,m_scroll);
 }
 
-WRITE8_HANDLER( polepos_chacl_w )
+WRITE8_MEMBER(polepos_state::polepos_chacl_w)
 {
-	polepos_state *state = space->machine().driver_data<polepos_state>();
-	if (state->m_chacl != (data & 1))
+	if (m_chacl != (data & 1))
 	{
-		state->m_chacl = data & 1;
-		state->m_tx_tilemap->mark_all_dirty();
+		m_chacl = data & 1;
+		m_tx_tilemap->mark_all_dirty();
 	}
 }
 
@@ -329,30 +314,26 @@ WRITE8_HANDLER( polepos_chacl_w )
 
 ***************************************************************************/
 
-READ16_HANDLER( polepos_alpha16_r )
+READ16_MEMBER(polepos_state::polepos_alpha16_r)
 {
-	polepos_state *state = space->machine().driver_data<polepos_state>();
-	return state->m_alpha16_memory[offset];
+	return m_alpha16_memory[offset];
 }
 
-WRITE16_HANDLER( polepos_alpha16_w )
+WRITE16_MEMBER(polepos_state::polepos_alpha16_w)
 {
-	polepos_state *state = space->machine().driver_data<polepos_state>();
-	COMBINE_DATA(&state->m_alpha16_memory[offset]);
-	state->m_tx_tilemap->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_alpha16_memory[offset]);
+	m_tx_tilemap->mark_tile_dirty(offset);
 }
 
-READ8_HANDLER( polepos_alpha_r )
+READ8_MEMBER(polepos_state::polepos_alpha_r)
 {
-	polepos_state *state = space->machine().driver_data<polepos_state>();
-	return state->m_alpha16_memory[offset] & 0xff;
+	return m_alpha16_memory[offset] & 0xff;
 }
 
-WRITE8_HANDLER( polepos_alpha_w )
+WRITE8_MEMBER(polepos_state::polepos_alpha_w)
 {
-	polepos_state *state = space->machine().driver_data<polepos_state>();
-	state->m_alpha16_memory[offset] = (state->m_alpha16_memory[offset] & 0xff00) | data;
-	state->m_tx_tilemap->mark_tile_dirty(offset);
+	m_alpha16_memory[offset] = (m_alpha16_memory[offset] & 0xff00) | data;
+	m_tx_tilemap->mark_tile_dirty(offset);
 }
 
 

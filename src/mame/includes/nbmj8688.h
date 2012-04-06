@@ -28,6 +28,22 @@ public:
 	int m_mjsikaku_flipscreen_old;
 	DECLARE_READ8_MEMBER(ff_r);
 	DECLARE_WRITE8_MEMBER(barline_output_w);
+	DECLARE_WRITE8_MEMBER(nbmj8688_clut_w);
+	DECLARE_WRITE8_MEMBER(nbmj8688_blitter_w);
+	DECLARE_WRITE8_MEMBER(mjsikaku_gfxflag2_w);
+	DECLARE_WRITE8_MEMBER(mjsikaku_gfxflag3_w);
+	DECLARE_WRITE8_MEMBER(mjsikaku_scrolly_w);
+	DECLARE_WRITE8_MEMBER(mjsikaku_romsel_w);
+	DECLARE_WRITE8_MEMBER(secolove_romsel_w);
+	DECLARE_WRITE8_MEMBER(crystalg_romsel_w);
+	DECLARE_WRITE8_MEMBER(seiha_romsel_w);
+	DECLARE_WRITE8_MEMBER(nbmj8688_HD61830B_0_instr_w);
+	DECLARE_WRITE8_MEMBER(nbmj8688_HD61830B_1_instr_w);
+	DECLARE_WRITE8_MEMBER(nbmj8688_HD61830B_both_instr_w);
+	DECLARE_WRITE8_MEMBER(nbmj8688_HD61830B_0_data_w);
+	DECLARE_WRITE8_MEMBER(nbmj8688_HD61830B_1_data_w);
+	DECLARE_WRITE8_MEMBER(nbmj8688_HD61830B_both_data_w);
+	void mjsikaku_vramflip();
 };
 
 
@@ -46,18 +62,4 @@ VIDEO_START( mbmj8688_hybrid_16bit );
 VIDEO_START( mbmj8688_pure_16bit );
 VIDEO_START( mbmj8688_pure_16bit_LCD );
 
-WRITE8_HANDLER( nbmj8688_clut_w );
-WRITE8_HANDLER( nbmj8688_blitter_w );
-WRITE8_HANDLER( mjsikaku_gfxflag2_w );
-WRITE8_HANDLER( mjsikaku_scrolly_w );
-WRITE8_HANDLER( mjsikaku_romsel_w );
-WRITE8_HANDLER( secolove_romsel_w );
-WRITE8_HANDLER( seiha_romsel_w );
-WRITE8_HANDLER( crystalg_romsel_w );
 
-WRITE8_HANDLER( nbmj8688_HD61830B_0_instr_w );
-WRITE8_HANDLER( nbmj8688_HD61830B_0_data_w );
-WRITE8_HANDLER( nbmj8688_HD61830B_1_instr_w );
-WRITE8_HANDLER( nbmj8688_HD61830B_1_data_w );
-WRITE8_HANDLER( nbmj8688_HD61830B_both_instr_w );
-WRITE8_HANDLER( nbmj8688_HD61830B_both_data_w );

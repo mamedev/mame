@@ -38,20 +38,18 @@ static void setcolor( running_machine &machine, int color, int rgb )
 	palette_set_color(machine, color, MAKE_RGB(r,g,b));
 }
 
-WRITE16_HANDLER( blockout_paletteram_w )
+WRITE16_MEMBER(blockout_state::blockout_paletteram_w)
 {
-	blockout_state *state = space->machine().driver_data<blockout_state>();
 
-	COMBINE_DATA(&state->m_paletteram[offset]);
-	setcolor(space->machine(), offset, state->m_paletteram[offset]);
+	COMBINE_DATA(&m_paletteram[offset]);
+	setcolor(machine(), offset, m_paletteram[offset]);
 }
 
-WRITE16_HANDLER( blockout_frontcolor_w )
+WRITE16_MEMBER(blockout_state::blockout_frontcolor_w)
 {
-	blockout_state *state = space->machine().driver_data<blockout_state>();
 
-	COMBINE_DATA(&state->m_color);
-	setcolor(space->machine(), 512, state->m_color);
+	COMBINE_DATA(&m_color);
+	setcolor(machine(), 512, m_color);
 }
 
 
@@ -100,12 +98,11 @@ static void update_pixels( running_machine &machine, int x, int y )
 
 
 
-WRITE16_HANDLER( blockout_videoram_w )
+WRITE16_MEMBER(blockout_state::blockout_videoram_w)
 {
-	blockout_state *state = space->machine().driver_data<blockout_state>();
 
-	COMBINE_DATA(&state->m_videoram[offset]);
-	update_pixels(space->machine(), (offset % 256) * 2, (offset / 256) % 256);
+	COMBINE_DATA(&m_videoram[offset]);
+	update_pixels(machine(), (offset % 256) * 2, (offset / 256) % 256);
 }
 
 

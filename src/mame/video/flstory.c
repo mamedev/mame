@@ -93,82 +93,75 @@ VIDEO_START( victnine )
 	state->m_generic_paletteram2_8.allocate(0x200);
 }
 
-WRITE8_HANDLER( flstory_videoram_w )
+WRITE8_MEMBER(flstory_state::flstory_videoram_w)
 {
-	flstory_state *state = space->machine().driver_data<flstory_state>();
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset / 2);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE8_HANDLER( flstory_palette_w )
+WRITE8_MEMBER(flstory_state::flstory_palette_w)
 {
-	flstory_state *state = space->machine().driver_data<flstory_state>();
 	if (offset & 0x100)
-		state->paletteram_xxxxBBBBGGGGRRRR_split2_w(*space, (offset & 0xff) + (state->m_palette_bank << 8),data);
+		paletteram_xxxxBBBBGGGGRRRR_split2_w(space, (offset & 0xff) + (m_palette_bank << 8),data);
 	else
-		state->paletteram_xxxxBBBBGGGGRRRR_split1_w(*space, (offset & 0xff) + (state->m_palette_bank << 8),data);
+		paletteram_xxxxBBBBGGGGRRRR_split1_w(space, (offset & 0xff) + (m_palette_bank << 8),data);
 }
 
-READ8_HANDLER( flstory_palette_r )
+READ8_MEMBER(flstory_state::flstory_palette_r)
 {
-	flstory_state *state = space->machine().driver_data<flstory_state>();
 	if (offset & 0x100)
-		return state->m_generic_paletteram2_8[ (offset & 0xff) + (state->m_palette_bank << 8) ];
+		return m_generic_paletteram2_8[ (offset & 0xff) + (m_palette_bank << 8) ];
 	else
-		return state->m_generic_paletteram_8  [ (offset & 0xff) + (state->m_palette_bank << 8) ];
+		return m_generic_paletteram_8  [ (offset & 0xff) + (m_palette_bank << 8) ];
 }
 
-WRITE8_HANDLER( flstory_gfxctrl_w )
+WRITE8_MEMBER(flstory_state::flstory_gfxctrl_w)
 {
-	flstory_state *state = space->machine().driver_data<flstory_state>();
-	if (state->m_gfxctrl == data)
+	if (m_gfxctrl == data)
 		return;
-	state->m_gfxctrl = data;
+	m_gfxctrl = data;
 
-	state->m_flipscreen = (~data & 0x01);
-	if (state->m_char_bank != ((data & 0x10) >> 4))
+	m_flipscreen = (~data & 0x01);
+	if (m_char_bank != ((data & 0x10) >> 4))
 	{
-		state->m_char_bank = (data & 0x10) >> 4;
-		state->m_bg_tilemap->mark_all_dirty();
+		m_char_bank = (data & 0x10) >> 4;
+		m_bg_tilemap->mark_all_dirty();
 	}
-	state->m_palette_bank = (data & 0x20) >> 5;
+	m_palette_bank = (data & 0x20) >> 5;
 
-	flip_screen_set(space->machine(), state->m_flipscreen);
+	flip_screen_set(machine(), m_flipscreen);
 
-//popmessage("%04x: gfxctrl = %02x\n", cpu_get_pc(&space->device()), data);
+//popmessage("%04x: gfxctrl = %02x\n", cpu_get_pc(&space.device()), data);
 
 }
 
-READ8_HANDLER( victnine_gfxctrl_r )
+READ8_MEMBER(flstory_state::victnine_gfxctrl_r)
 {
-	flstory_state *state = space->machine().driver_data<flstory_state>();
-	return state->m_gfxctrl;
+	return m_gfxctrl;
 }
 
-WRITE8_HANDLER( victnine_gfxctrl_w )
+WRITE8_MEMBER(flstory_state::victnine_gfxctrl_w)
 {
-	flstory_state *state = space->machine().driver_data<flstory_state>();
-	if (state->m_gfxctrl == data)
+	if (m_gfxctrl == data)
 		return;
-	state->m_gfxctrl = data;
+	m_gfxctrl = data;
 
-	state->m_palette_bank = (data & 0x20) >> 5;
+	m_palette_bank = (data & 0x20) >> 5;
 
 	if (data & 0x04)
 	{
-		state->m_flipscreen = (data & 0x01);
-		flip_screen_set(space->machine(), state->m_flipscreen);
+		m_flipscreen = (data & 0x01);
+		flip_screen_set(machine(), m_flipscreen);
 	}
 
-//popmessage("%04x: gfxctrl = %02x\n", cpu_get_pc(&space->device()), data);
+//popmessage("%04x: gfxctrl = %02x\n", cpu_get_pc(&space.device()), data);
 
 }
 
-WRITE8_HANDLER( flstory_scrlram_w )
+WRITE8_MEMBER(flstory_state::flstory_scrlram_w)
 {
-	flstory_state *state = space->machine().driver_data<flstory_state>();
-	state->m_scrlram[offset] = data;
-	state->m_bg_tilemap->set_scrolly(offset, data);
+	m_scrlram[offset] = data;
+	m_bg_tilemap->set_scrolly(offset, data);
 }
 
 

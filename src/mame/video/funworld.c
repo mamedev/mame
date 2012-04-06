@@ -142,18 +142,16 @@ PALETTE_INIT(funworld)
 }
 
 
-WRITE8_HANDLER( funworld_videoram_w )
+WRITE8_MEMBER(funworld_state::funworld_videoram_w)
 {
-	funworld_state *state = space->machine().driver_data<funworld_state>();
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( funworld_colorram_w )
+WRITE8_MEMBER(funworld_state::funworld_colorram_w)
 {
-	funworld_state *state = space->machine().driver_data<funworld_state>();
-	state->m_colorram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_colorram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 

@@ -173,26 +173,26 @@ public:
 	CLIO m_clio;
 	SVF m_svf;
 	UINT8 m_video_bits[512];
+	DECLARE_READ32_MEMBER(_3do_nvarea_r);
+	DECLARE_WRITE32_MEMBER(_3do_nvarea_w);
+	DECLARE_READ32_MEMBER(_3do_slow2_r);
+	DECLARE_WRITE32_MEMBER(_3do_slow2_w);
+	DECLARE_READ32_MEMBER(_3do_svf_r);
+	DECLARE_WRITE32_MEMBER(_3do_svf_w);
+	DECLARE_READ32_MEMBER(_3do_madam_r);
+	DECLARE_WRITE32_MEMBER(_3do_madam_w);
+	DECLARE_READ32_MEMBER(_3do_clio_r);
+	DECLARE_WRITE32_MEMBER(_3do_clio_w);
 };
 
 /*----------- defined in machine/3do.c -----------*/
 
-READ32_HANDLER( _3do_nvarea_r );
-WRITE32_HANDLER( _3do_nvarea_w );
 
-READ32_HANDLER( _3do_slow2_r );
-WRITE32_HANDLER( _3do_slow2_w );
 void _3do_slow2_init( running_machine &machine );
 
-READ32_HANDLER( _3do_svf_r );
-WRITE32_HANDLER( _3do_svf_w );
 
-READ32_HANDLER( _3do_madam_r );
-WRITE32_HANDLER( _3do_madam_w );
 void _3do_madam_init( running_machine &machine );
 
-READ32_HANDLER( _3do_clio_r );
-WRITE32_HANDLER( _3do_clio_w );
 void _3do_clio_init( running_machine &machine, screen_device *screen );
 
 

@@ -46,21 +46,18 @@ void simpsons_sprite_callback( running_machine &machine, int *code, int *color, 
 
 ***************************************************************************/
 
-static READ8_HANDLER( simpsons_k052109_r )
+READ8_MEMBER(simpsons_state::simpsons_k052109_r)
 {
-	simpsons_state *state = space->machine().driver_data<simpsons_state>();
-	return k052109_r(state->m_k052109, offset + 0x2000);
+	return k052109_r(m_k052109, offset + 0x2000);
 }
 
-static WRITE8_HANDLER( simpsons_k052109_w )
+WRITE8_MEMBER(simpsons_state::simpsons_k052109_w)
 {
-	simpsons_state *state = space->machine().driver_data<simpsons_state>();
-	k052109_w(state->m_k052109, offset + 0x2000, data);
+	k052109_w(m_k052109, offset + 0x2000, data);
 }
 
-static READ8_HANDLER( simpsons_k053247_r )
+READ8_MEMBER(simpsons_state::simpsons_k053247_r)
 {
-	simpsons_state *state = space->machine().driver_data<simpsons_state>();
 	int offs;
 
 	if (offset < 0x1000)
@@ -68,22 +65,21 @@ static READ8_HANDLER( simpsons_k053247_r )
 		offs = offset >> 1;
 
 		if (offset & 1)
-			return(state->m_spriteram[offs] & 0xff);
+			return(m_spriteram[offs] & 0xff);
 		else
-			return(state->m_spriteram[offs] >> 8);
+			return(m_spriteram[offs] >> 8);
 	}
 	else
-		return state->m_xtraram[offset - 0x1000];
+		return m_xtraram[offset - 0x1000];
 }
 
-static WRITE8_HANDLER( simpsons_k053247_w )
+WRITE8_MEMBER(simpsons_state::simpsons_k053247_w)
 {
-	simpsons_state *state = space->machine().driver_data<simpsons_state>();
 	int offs;
 
 	if (offset < 0x1000)
 	{
-		UINT16 *spriteram = state->m_spriteram;
+		UINT16 *spriteram = m_spriteram;
 		offs = offset >> 1;
 
 		if (offset & 1)
@@ -91,7 +87,7 @@ static WRITE8_HANDLER( simpsons_k053247_w )
 		else
 			spriteram[offs] = (spriteram[offs] & 0x00ff) | (data << 8);
 	}
-	else state->m_xtraram[offset - 0x1000] = data;
+	else m_xtraram[offset - 0x1000] = data;
 }
 
 void simpsons_video_banking( running_machine &machine, int bank )
@@ -109,9 +105,9 @@ void simpsons_video_banking( running_machine &machine, int bank )
 		space->install_legacy_readwrite_handler(*state->m_k052109, 0x0000, 0x0fff, FUNC(k052109_r), FUNC(k052109_w));
 
 	if (bank & 2)
-		space->install_legacy_readwrite_handler(0x2000, 0x3fff, FUNC(simpsons_k053247_r), FUNC(simpsons_k053247_w));
+		space->install_readwrite_handler(0x2000, 0x3fff, read8_delegate(FUNC(simpsons_state::simpsons_k053247_r),state), write8_delegate(FUNC(simpsons_state::simpsons_k053247_w),state));
 	else
-		space->install_legacy_readwrite_handler(0x2000, 0x3fff, FUNC(simpsons_k052109_r), FUNC(simpsons_k052109_w));
+		space->install_readwrite_handler(0x2000, 0x3fff, read8_delegate(FUNC(simpsons_state::simpsons_k052109_r),state), write8_delegate(FUNC(simpsons_state::simpsons_k052109_w),state));
 }
 
 

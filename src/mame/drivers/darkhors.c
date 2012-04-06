@@ -63,11 +63,11 @@ To do:
 #include "cpu/z80/z80.h"
 
 
-class darkhors_state : public driver_device
+class darkhors_state : public st0016_state
 {
 public:
 	darkhors_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+		: st0016_state(mconfig, type, tag),
 		m_maincpu(*this, "maincpu")
 		{ }
 
@@ -731,13 +731,13 @@ static ADDRESS_MAP_START( st0016_mem, AS_PROGRAM, 8, darkhors_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xe900, 0xe9ff) AM_DEVREADWRITE_LEGACY("stsnd", st0016_snd_r, st0016_snd_w)
-	AM_RANGE(0xec00, 0xec1f) AM_READ_LEGACY(st0016_character_ram_r) AM_WRITE_LEGACY(st0016_character_ram_w)
+	AM_RANGE(0xec00, 0xec1f) AM_READ(st0016_character_ram_r) AM_WRITE(st0016_character_ram_w)
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( st0016_io, AS_IO, 8, darkhors_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0xbf) AM_READ_LEGACY(st0016_vregs_r) AM_WRITE_LEGACY(st0016_vregs_w)
+	AM_RANGE(0x00, 0xbf) AM_READ(st0016_vregs_r) AM_WRITE(st0016_vregs_w)
 	//AM_RANGE(0xc0, 0xc0) AM_READ_LEGACY(cmd1_r)
 	//AM_RANGE(0xc1, 0xc1) AM_READ_LEGACY(cmd2_r)
 	//AM_RANGE(0xc2, 0xc2) AM_READ_LEGACY(cmd_stat8_r)

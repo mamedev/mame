@@ -58,12 +58,11 @@ PALETTE_INIT( tankbatt )
 	}
 }
 
-WRITE8_HANDLER( tankbatt_videoram_w )
+WRITE8_MEMBER(tankbatt_state::tankbatt_videoram_w)
 {
-	tankbatt_state *state = space->machine().driver_data<tankbatt_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = m_videoram;
 	videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )

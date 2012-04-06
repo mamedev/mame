@@ -72,12 +72,11 @@ static TILE_GET_INFO( get_tile_info_splash_tilemap1 )
 
 ***************************************************************************/
 
-WRITE16_HANDLER( splash_vram_w )
+WRITE16_MEMBER(splash_state::splash_vram_w)
 {
-	splash_state *state = space->machine().driver_data<splash_state>();
 
-	COMBINE_DATA(&state->m_videoram[offset]);
-	state->m_bg_tilemap[offset >> 11]->mark_tile_dirty(((offset << 1) & 0x0fff) >> 1);
+	COMBINE_DATA(&m_videoram[offset]);
+	m_bg_tilemap[offset >> 11]->mark_tile_dirty(((offset << 1) & 0x0fff) >> 1);
 }
 
 static void draw_bitmap(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)

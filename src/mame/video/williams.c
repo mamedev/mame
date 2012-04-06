@@ -312,7 +312,7 @@ static void create_palette_lookup(running_machine &machine)
 }
 
 
-WRITE8_HANDLER( williams2_paletteram_w )
+WRITE8_MEMBER(williams_state::williams2_paletteram_w)
 {
 	static const UINT8 ztable[16] =
 	{
@@ -322,26 +322,24 @@ WRITE8_HANDLER( williams2_paletteram_w )
 	UINT8 entry_lo, entry_hi, i, r, g, b;
 
 	/* set the new value */
-	williams_state *state = space->machine().driver_data<williams_state>();
-	state->m_generic_paletteram_8[offset] = data;
+	m_generic_paletteram_8[offset] = data;
 
 	/* pull the associated low/high bytes */
-	entry_lo = state->m_generic_paletteram_8[offset & ~1];
-	entry_hi = state->m_generic_paletteram_8[offset |  1];
+	entry_lo = m_generic_paletteram_8[offset & ~1];
+	entry_hi = m_generic_paletteram_8[offset |  1];
 
 	/* update the palette entry */
 	i = ztable[(entry_hi >> 4) & 15];
 	b = ((entry_hi >> 0) & 15) * i;
 	g = ((entry_lo >> 4) & 15) * i;
 	r = ((entry_lo >> 0) & 15) * i;
-	palette_set_color(space->machine(), offset / 2, MAKE_RGB(r, g, b));
+	palette_set_color(machine(), offset / 2, MAKE_RGB(r, g, b));
 }
 
 
-WRITE8_HANDLER( williams2_fg_select_w )
+WRITE8_MEMBER(williams_state::williams2_fg_select_w)
 {
-	williams_state *state = space->machine().driver_data<williams_state>();
-	state->m_williams2_fg_color = data & 0x3f;
+	m_williams2_fg_color = data & 0x3f;
 }
 
 
@@ -352,15 +350,15 @@ WRITE8_HANDLER( williams2_fg_select_w )
  *
  *************************************/
 
-READ8_HANDLER( williams_video_counter_r )
+READ8_MEMBER(williams_state::williams_video_counter_r)
 {
-	return space->machine().primary_screen->vpos() & 0xfc;
+	return machine().primary_screen->vpos() & 0xfc;
 }
 
 
-READ8_HANDLER( williams2_video_counter_r )
+READ8_MEMBER(williams_state::williams2_video_counter_r)
 {
-	return space->machine().primary_screen->vpos();
+	return machine().primary_screen->vpos();
 }
 
 
@@ -406,12 +404,11 @@ static TILE_GET_INFO( get_tile_info )
 }
 
 
-WRITE8_HANDLER( williams2_bg_select_w )
+WRITE8_MEMBER(williams_state::williams2_bg_select_w)
 {
-	williams_state *state = space->machine().driver_data<williams_state>();
 	/* based on the tilemap config, only certain bits are used */
 	/* the rest are determined by other factors */
-	switch (state->m_williams2_tilemap_config)
+	switch (m_williams2_tilemap_config)
 	{
 		case WILLIAMS_TILEMAP_MYSTICM:
 			/* IC79 is a 74LS85 comparator that controls the low bit */
@@ -428,31 +425,28 @@ WRITE8_HANDLER( williams2_bg_select_w )
 			data &= 0x3f;
 			break;
 	}
-	state->m_bg_tilemap->set_palette_offset(data * 16);
+	m_bg_tilemap->set_palette_offset(data * 16);
 }
 
 
-WRITE8_HANDLER( williams2_tileram_w )
+WRITE8_MEMBER(williams_state::williams2_tileram_w)
 {
-	williams_state *state = space->machine().driver_data<williams_state>();
-	state->m_williams2_tileram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_williams2_tileram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_HANDLER( williams2_xscroll_low_w )
+WRITE8_MEMBER(williams_state::williams2_xscroll_low_w)
 {
-	williams_state *state = space->machine().driver_data<williams_state>();
-	state->m_tilemap_xscroll = (state->m_tilemap_xscroll & ~0x00f) | ((data & 0x80) >> 4) | (data & 0x07);
-	state->m_bg_tilemap->set_scrollx(0, (state->m_tilemap_xscroll & 7) + ((state->m_tilemap_xscroll >> 3) * 6));
+	m_tilemap_xscroll = (m_tilemap_xscroll & ~0x00f) | ((data & 0x80) >> 4) | (data & 0x07);
+	m_bg_tilemap->set_scrollx(0, (m_tilemap_xscroll & 7) + ((m_tilemap_xscroll >> 3) * 6));
 }
 
 
-WRITE8_HANDLER( williams2_xscroll_high_w )
+WRITE8_MEMBER(williams_state::williams2_xscroll_high_w)
 {
-	williams_state *state = space->machine().driver_data<williams_state>();
-	state->m_tilemap_xscroll = (state->m_tilemap_xscroll & 0x00f) | (data << 4);
-	state->m_bg_tilemap->set_scrollx(0, (state->m_tilemap_xscroll & 7) + ((state->m_tilemap_xscroll >> 3) * 6));
+	m_tilemap_xscroll = (m_tilemap_xscroll & 0x00f) | (data << 4);
+	m_bg_tilemap->set_scrollx(0, (m_tilemap_xscroll & 7) + ((m_tilemap_xscroll >> 3) * 6));
 }
 
 
@@ -463,18 +457,16 @@ WRITE8_HANDLER( williams2_xscroll_high_w )
  *
  *************************************/
 
-WRITE8_HANDLER( blaster_remap_select_w )
+WRITE8_MEMBER(williams_state::blaster_remap_select_w)
 {
-	williams_state *state = space->machine().driver_data<williams_state>();
-	state->m_blitter_remap_index = data;
-	state->m_blitter_remap = state->m_blitter_remap_lookup + data * 256;
+	m_blitter_remap_index = data;
+	m_blitter_remap = m_blitter_remap_lookup + data * 256;
 }
 
 
-WRITE8_HANDLER( blaster_video_control_w )
+WRITE8_MEMBER(williams_state::blaster_video_control_w)
 {
-	williams_state *state = space->machine().driver_data<williams_state>();
-	state->m_blaster_video_control = data;
+	m_blaster_video_control = data;
 }
 
 
@@ -510,26 +502,25 @@ static void blitter_init(running_machine &machine, int blitter_config, const UIN
 }
 
 
-WRITE8_HANDLER( williams_blitter_w )
+WRITE8_MEMBER(williams_state::williams_blitter_w)
 {
-	williams_state *state = space->machine().driver_data<williams_state>();
 	int sstart, dstart, w, h, accesses;
 	int estimated_clocks_at_4MHz;
 
 	/* store the data */
-	state->m_blitterram[offset] = data;
+	m_blitterram[offset] = data;
 
 	/* only writes to location 0 trigger the blit */
 	if (offset != 0)
 		return;
 
 	/* compute the starting locations */
-	sstart = (state->m_blitterram[2] << 8) + state->m_blitterram[3];
-	dstart = (state->m_blitterram[4] << 8) + state->m_blitterram[5];
+	sstart = (m_blitterram[2] << 8) + m_blitterram[3];
+	dstart = (m_blitterram[4] << 8) + m_blitterram[5];
 
 	/* compute the width and height */
-	w = state->m_blitterram[6] ^ state->m_blitter_xor;
-	h = state->m_blitterram[7] ^ state->m_blitter_xor;
+	w = m_blitterram[6] ^ m_blitter_xor;
+	h = m_blitterram[7] ^ m_blitter_xor;
 
 	/* adjust the width and height */
 	if (w == 0) w = 1;
@@ -538,28 +529,27 @@ WRITE8_HANDLER( williams_blitter_w )
 	if (h == 255) h = 256;
 
 	/* do the actual blit */
-	accesses = blitter_core(space, sstart, dstart, w, h, data);
+	accesses = blitter_core(&space, sstart, dstart, w, h, data);
 
 	/* based on the number of memory accesses needed to do the blit, compute how long the blit will take */
 	/* this is just a guess */
 	estimated_clocks_at_4MHz = 20 + ((data & 4) ? 4 : 2) * accesses;
-	device_adjust_icount(&space->device(), -((estimated_clocks_at_4MHz + 3) / 4));
+	device_adjust_icount(&space.device(), -((estimated_clocks_at_4MHz + 3) / 4));
 
 	/* Log blits */
 	logerror("%04X:Blit @ %3d : %02X%02X -> %02X%02X, %3dx%3d, mask=%02X, flags=%02X, icount=%d, win=%d\n",
-			cpu_get_pc(&space->device()), space->machine().primary_screen->vpos(),
-			state->m_blitterram[2], state->m_blitterram[3],
-			state->m_blitterram[4], state->m_blitterram[5],
-			state->m_blitterram[6], state->m_blitterram[7],
-			state->m_blitterram[1], state->m_blitterram[0],
-			((estimated_clocks_at_4MHz + 3) / 4), state->m_blitter_window_enable);
+			cpu_get_pc(&space.device()), machine().primary_screen->vpos(),
+			m_blitterram[2], m_blitterram[3],
+			m_blitterram[4], m_blitterram[5],
+			m_blitterram[6], m_blitterram[7],
+			m_blitterram[1], m_blitterram[0],
+			((estimated_clocks_at_4MHz + 3) / 4), m_blitter_window_enable);
 }
 
 
-WRITE8_HANDLER( williams2_blit_window_enable_w )
+WRITE8_MEMBER(williams_state::williams2_blit_window_enable_w)
 {
-	williams_state *state = space->machine().driver_data<williams_state>();
-	state->m_blitter_window_enable = data & 0x01;
+	m_blitter_window_enable = data & 0x01;
 }
 
 

@@ -19,153 +19,140 @@ static void nbmj8900_gfxdraw(running_machine &machine);
 
 
 ******************************************************************************/
-READ8_HANDLER( nbmj8900_palette_type1_r )
+READ8_MEMBER(nbmj8900_state::nbmj8900_palette_type1_r)
 {
-	nbmj8900_state *state = space->machine().driver_data<nbmj8900_state>();
-	return state->m_palette[offset];
+	return m_palette[offset];
 }
 
-WRITE8_HANDLER( nbmj8900_palette_type1_w )
+WRITE8_MEMBER(nbmj8900_state::nbmj8900_palette_type1_w)
 {
-	nbmj8900_state *state = space->machine().driver_data<nbmj8900_state>();
 	int r, g, b;
 
-	state->m_palette[offset] = data;
+	m_palette[offset] = data;
 
 	if (!(offset & 1)) return;
 
 	offset &= 0x1fe;
 
-	r = ((state->m_palette[offset + 0] & 0x0f) >> 0);
-	g = ((state->m_palette[offset + 1] & 0xf0) >> 4);
-	b = ((state->m_palette[offset + 1] & 0x0f) >> 0);
+	r = ((m_palette[offset + 0] & 0x0f) >> 0);
+	g = ((m_palette[offset + 1] & 0xf0) >> 4);
+	b = ((m_palette[offset + 1] & 0x0f) >> 0);
 
-	palette_set_color_rgb(space->machine(), (offset >> 1), pal4bit(r), pal4bit(g), pal4bit(b));
+	palette_set_color_rgb(machine(), (offset >> 1), pal4bit(r), pal4bit(g), pal4bit(b));
 }
 
 #ifdef UNUSED_FUNCTION
-READ8_HANDLER( nbmj8900_palette_type2_r )
+READ8_MEMBER(nbmj8900_state::nbmj8900_palette_type2_r)
 {
-	nbmj8900_state *state = space->machine().driver_data<nbmj8900_state>();
-	return state->m_palette[offset];
+	return m_palette[offset];
 }
 
-WRITE8_HANDLER( nbmj8900_palette_type2_w )
+WRITE8_MEMBER(nbmj8900_state::nbmj8900_palette_type2_w)
 {
-	nbmj8900_state *state = space->machine().driver_data<nbmj8900_state>();
 	int r, g, b;
 
-	state->m_palette[offset] = data;
+	m_palette[offset] = data;
 
 	if (!(offset & 0x100)) return;
 
 	offset &= 0x0ff;
 
-	r = ((state->m_palette[offset + 0x000] & 0x0f) >> 0);
-	g = ((state->m_palette[offset + 0x000] & 0xf0) >> 4);
-	b = ((state->m_palette[offset + 0x100] & 0x0f) >> 0);
+	r = ((m_palette[offset + 0x000] & 0x0f) >> 0);
+	g = ((m_palette[offset + 0x000] & 0xf0) >> 4);
+	b = ((m_palette[offset + 0x100] & 0x0f) >> 0);
 
-	palette_set_color_rgb(space->machine(), (offset & 0x0ff), pal4bit(r), pal4bit(g), pal4bit(b));
+	palette_set_color_rgb(machine(), (offset & 0x0ff), pal4bit(r), pal4bit(g), pal4bit(b));
 }
 
-READ8_HANDLER( nbmj8900_palette_type3_r )
+READ8_MEMBER(nbmj8900_state::nbmj8900_palette_type3_r)
 {
-	nbmj8900_state *state = space->machine().driver_data<nbmj8900_state>();
-	return state->m_palette[offset];
+	return m_palette[offset];
 }
 
-WRITE8_HANDLER( nbmj8900_palette_type3_w )
+WRITE8_MEMBER(nbmj8900_state::nbmj8900_palette_type3_w)
 {
-	nbmj8900_state *state = space->machine().driver_data<nbmj8900_state>();
 	int r, g, b;
 
-	state->m_palette[offset] = data;
+	m_palette[offset] = data;
 
 	if (!(offset & 1)) return;
 
 	offset &= 0x1fe;
 
-	r = ((state->m_palette[offset + 1] & 0x0f) >> 0);
-	g = ((state->m_palette[offset + 0] & 0xf0) >> 4);
-	b = ((state->m_palette[offset + 0] & 0x0f) >> 0);
+	r = ((m_palette[offset + 1] & 0x0f) >> 0);
+	g = ((m_palette[offset + 0] & 0xf0) >> 4);
+	b = ((m_palette[offset + 0] & 0x0f) >> 0);
 
-	palette_set_color_rgb(space->machine(), (offset >> 1), pal4bit(r), pal4bit(g), pal4bit(b));
+	palette_set_color_rgb(machine(), (offset >> 1), pal4bit(r), pal4bit(g), pal4bit(b));
 }
 #endif
 
-WRITE8_HANDLER( nbmj8900_clutsel_w )
+WRITE8_MEMBER(nbmj8900_state::nbmj8900_clutsel_w)
 {
-	nbmj8900_state *state = space->machine().driver_data<nbmj8900_state>();
-	state->m_clutsel = data;
+	m_clutsel = data;
 }
 
-READ8_HANDLER( nbmj8900_clut_r )
+READ8_MEMBER(nbmj8900_state::nbmj8900_clut_r)
 {
-	nbmj8900_state *state = space->machine().driver_data<nbmj8900_state>();
-	return state->m_clut[offset];
+	return m_clut[offset];
 }
 
-WRITE8_HANDLER( nbmj8900_clut_w )
+WRITE8_MEMBER(nbmj8900_state::nbmj8900_clut_w)
 {
-	nbmj8900_state *state = space->machine().driver_data<nbmj8900_state>();
-	state->m_clut[((state->m_clutsel & 0x7f) * 0x10) + (offset & 0x0f)] = data;
+	m_clut[((m_clutsel & 0x7f) * 0x10) + (offset & 0x0f)] = data;
 }
 
 /******************************************************************************
 
 
 ******************************************************************************/
-WRITE8_HANDLER( nbmj8900_blitter_w )
+WRITE8_MEMBER(nbmj8900_state::nbmj8900_blitter_w)
 {
-	nbmj8900_state *state = space->machine().driver_data<nbmj8900_state>();
 	switch (offset)
 	{
-		case 0x00:	state->m_blitter_src_addr = (state->m_blitter_src_addr & 0xff00) | data; break;
-		case 0x01:	state->m_blitter_src_addr = (state->m_blitter_src_addr & 0x00ff) | (data << 8); break;
-		case 0x02:	state->m_blitter_destx = data; break;
-		case 0x03:	state->m_blitter_desty = data; break;
-		case 0x04:	state->m_blitter_sizex = data; break;
-		case 0x05:	state->m_blitter_sizey = data;
+		case 0x00:	m_blitter_src_addr = (m_blitter_src_addr & 0xff00) | data; break;
+		case 0x01:	m_blitter_src_addr = (m_blitter_src_addr & 0x00ff) | (data << 8); break;
+		case 0x02:	m_blitter_destx = data; break;
+		case 0x03:	m_blitter_desty = data; break;
+		case 0x04:	m_blitter_sizex = data; break;
+		case 0x05:	m_blitter_sizey = data;
 					/* writing here also starts the blit */
-					nbmj8900_gfxdraw(space->machine());
+					nbmj8900_gfxdraw(machine());
 					break;
-		case 0x06:	state->m_blitter_direction_x = (data & 0x01) ? 1 : 0;
-					state->m_blitter_direction_y = (data & 0x02) ? 1 : 0;
-					state->m_flipscreen = (data & 0x04) ? 1 : 0;
-					state->m_dispflag = (data & 0x08) ? 0 : 1;
-					if (state->m_gfxdraw_mode) nbmj8900_vramflip(space->machine(), 1);
-					nbmj8900_vramflip(space->machine(), 0);
+		case 0x06:	m_blitter_direction_x = (data & 0x01) ? 1 : 0;
+					m_blitter_direction_y = (data & 0x02) ? 1 : 0;
+					m_flipscreen = (data & 0x04) ? 1 : 0;
+					m_dispflag = (data & 0x08) ? 0 : 1;
+					if (m_gfxdraw_mode) nbmj8900_vramflip(machine(), 1);
+					nbmj8900_vramflip(machine(), 0);
 					break;
 		case 0x07:	break;
 	}
 }
 
-WRITE8_HANDLER( nbmj8900_scrolly_w )
+WRITE8_MEMBER(nbmj8900_state::nbmj8900_scrolly_w)
 {
-	nbmj8900_state *state = space->machine().driver_data<nbmj8900_state>();
-	state->m_scrolly = data;
+	m_scrolly = data;
 }
 
-WRITE8_HANDLER( nbmj8900_vramsel_w )
+WRITE8_MEMBER(nbmj8900_state::nbmj8900_vramsel_w)
 {
-	nbmj8900_state *state = space->machine().driver_data<nbmj8900_state>();
 	/* protection - not sure about this */
 	nb1413m3_sndromrgntag = (data & 0x20) ? "protdata" : "voice";
 
-	state->m_vram = data;
+	m_vram = data;
 }
 
-WRITE8_HANDLER( nbmj8900_romsel_w )
+WRITE8_MEMBER(nbmj8900_state::nbmj8900_romsel_w)
 {
-	nbmj8900_state *state = space->machine().driver_data<nbmj8900_state>();
-	state->m_gfxrom = (data & 0x0f);
+	m_gfxrom = (data & 0x0f);
 
-	if ((0x20000 * state->m_gfxrom) > (space->machine().region("gfx")->bytes() - 1))
+	if ((0x20000 * m_gfxrom) > (machine().region("gfx")->bytes() - 1))
 	{
 #ifdef MAME_DEBUG
 		popmessage("GFXROM BANK OVER!!");
 #endif
-		state->m_gfxrom &= (space->machine().region("gfx")->bytes() / 0x20000 - 1);
+		m_gfxrom &= (machine().region("gfx")->bytes() / 0x20000 - 1);
 	}
 }
 

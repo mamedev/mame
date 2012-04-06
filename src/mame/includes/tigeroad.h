@@ -15,13 +15,13 @@ public:
 	required_device<buffered_spriteram16_device> m_spriteram;
 	DECLARE_WRITE16_MEMBER(f1dream_control_w);
 	DECLARE_WRITE16_MEMBER(tigeroad_soundcmd_w);
+	DECLARE_WRITE16_MEMBER(tigeroad_videoram_w);
+	DECLARE_WRITE16_MEMBER(tigeroad_videoctrl_w);
+	DECLARE_WRITE16_MEMBER(tigeroad_scroll_w);
 };
 
 
 /*----------- defined in video/tigeroad.c -----------*/
 
-WRITE16_HANDLER( tigeroad_videoram_w );
-WRITE16_HANDLER( tigeroad_videoctrl_w );
-WRITE16_HANDLER( tigeroad_scroll_w );
 VIDEO_START( tigeroad );
 SCREEN_UPDATE_IND16( tigeroad );

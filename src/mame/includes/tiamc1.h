@@ -19,6 +19,15 @@ public:
 	tilemap_t *m_bg_tilemap2;
 	rgb_t *m_palette;
 	DECLARE_WRITE8_MEMBER(tiamc1_control_w);
+	DECLARE_WRITE8_MEMBER(tiamc1_videoram_w);
+	DECLARE_WRITE8_MEMBER(tiamc1_bankswitch_w);
+	DECLARE_WRITE8_MEMBER(tiamc1_sprite_x_w);
+	DECLARE_WRITE8_MEMBER(tiamc1_sprite_y_w);
+	DECLARE_WRITE8_MEMBER(tiamc1_sprite_a_w);
+	DECLARE_WRITE8_MEMBER(tiamc1_sprite_n_w);
+	DECLARE_WRITE8_MEMBER(tiamc1_bg_vshift_w);
+	DECLARE_WRITE8_MEMBER(tiamc1_bg_hshift_w);
+	DECLARE_WRITE8_MEMBER(tiamc1_palette_w);
 };
 
 
@@ -37,12 +46,3 @@ PALETTE_INIT( tiamc1 );
 VIDEO_START( tiamc1 );
 SCREEN_UPDATE_IND16( tiamc1 );
 
-WRITE8_HANDLER( tiamc1_palette_w );
-WRITE8_HANDLER( tiamc1_videoram_w );
-WRITE8_HANDLER( tiamc1_bankswitch_w );
-WRITE8_HANDLER( tiamc1_sprite_x_w );
-WRITE8_HANDLER( tiamc1_sprite_y_w );
-WRITE8_HANDLER( tiamc1_sprite_a_w );
-WRITE8_HANDLER( tiamc1_sprite_n_w );
-WRITE8_HANDLER( tiamc1_bg_vshift_w );
-WRITE8_HANDLER( tiamc1_bg_hshift_w );

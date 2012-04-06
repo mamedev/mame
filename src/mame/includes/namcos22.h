@@ -106,41 +106,41 @@ public:
 	UINT8 *m_dirtypal;
 	bitmap_ind16 *m_mix_bitmap;
 	tilemap_t *m_bgtilemap;
+	DECLARE_READ32_MEMBER(namcos22_gamma_r);
+	DECLARE_WRITE32_MEMBER(namcos22_gamma_w);
+	DECLARE_WRITE32_MEMBER(namcos22s_czram_w);
+	DECLARE_READ32_MEMBER(namcos22s_czram_r);
+	DECLARE_READ32_MEMBER(namcos22s_vics_control_r);
+	DECLARE_WRITE32_MEMBER(namcos22s_vics_control_w);
+	DECLARE_READ32_MEMBER(namcos22_textram_r);
+	DECLARE_WRITE32_MEMBER(namcos22_textram_w);
+	DECLARE_READ32_MEMBER(namcos22_tilemapattr_r);
+	DECLARE_WRITE32_MEMBER(namcos22_tilemapattr_w);
+	DECLARE_READ32_MEMBER(namcos22s_spotram_r);
+	DECLARE_WRITE32_MEMBER(namcos22s_spotram_w);
+	DECLARE_READ32_MEMBER(namcos22_dspram_r);
+	DECLARE_WRITE32_MEMBER(namcos22_dspram_w);
+	DECLARE_READ32_MEMBER(namcos22_cgram_r);
+	DECLARE_WRITE32_MEMBER(namcos22_cgram_w);
+	DECLARE_READ32_MEMBER(namcos22_paletteram_r);
+	DECLARE_WRITE32_MEMBER(namcos22_paletteram_w);
+	DECLARE_WRITE16_MEMBER(namcos22_dspram16_bank_w);
+	DECLARE_READ16_MEMBER(namcos22_dspram16_r);
+	DECLARE_WRITE16_MEMBER(namcos22_dspram16_w);
 };
 
 
 /*----------- defined in video/namcos22.c -----------*/
 
-WRITE16_HANDLER( namcos22_dspram16_bank_w );
-READ16_HANDLER( namcos22_dspram16_r );
-WRITE16_HANDLER( namcos22_dspram16_w );
 
-READ32_HANDLER( namcos22_cgram_r );
-WRITE32_HANDLER( namcos22_cgram_w );
 
-READ32_HANDLER( namcos22s_czram_r );
-WRITE32_HANDLER( namcos22s_czram_w );
 
-READ32_HANDLER( namcos22s_spotram_r );
-WRITE32_HANDLER( namcos22s_spotram_w );
 
-READ32_HANDLER( namcos22_paletteram_r );
-WRITE32_HANDLER( namcos22_paletteram_w );
 
-READ32_HANDLER( namcos22_textram_r );
-WRITE32_HANDLER( namcos22_textram_w );
 
-READ32_HANDLER( namcos22s_vics_control_r );
-WRITE32_HANDLER( namcos22s_vics_control_w );
 
-READ32_HANDLER( namcos22_gamma_r );
-WRITE32_HANDLER( namcos22_gamma_w );
 
-READ32_HANDLER( namcos22_tilemapattr_r );
-WRITE32_HANDLER( namcos22_tilemapattr_w );
 
-READ32_HANDLER( namcos22_dspram_r );
-WRITE32_HANDLER( namcos22_dspram_w );
 
 
 VIDEO_START( namcos22 );

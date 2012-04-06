@@ -76,6 +76,12 @@ public:
 	DECLARE_WRITE8_MEMBER(changela_collision_reset_0);
 	DECLARE_WRITE8_MEMBER(changela_collision_reset_1);
 	DECLARE_WRITE8_MEMBER(changela_coin_counter_w);
+	DECLARE_WRITE8_MEMBER(changela_colors_w);
+	DECLARE_WRITE8_MEMBER(changela_mem_device_select_w);
+	DECLARE_WRITE8_MEMBER(changela_mem_device_w);
+	DECLARE_READ8_MEMBER(changela_mem_device_r);
+	DECLARE_WRITE8_MEMBER(changela_slope_rom_addr_hi_w);
+	DECLARE_WRITE8_MEMBER(changela_slope_rom_addr_lo_w);
 };
 
 /*----------- defined in video/changela.c -----------*/
@@ -83,9 +89,3 @@ public:
 VIDEO_START( changela );
 SCREEN_UPDATE_IND16( changela );
 
-WRITE8_HANDLER( changela_colors_w );
-WRITE8_HANDLER( changela_mem_device_select_w );
-WRITE8_HANDLER( changela_mem_device_w );
-READ8_HANDLER( changela_mem_device_r );
-WRITE8_HANDLER( changela_slope_rom_addr_hi_w );
-WRITE8_HANDLER( changela_slope_rom_addr_lo_w );

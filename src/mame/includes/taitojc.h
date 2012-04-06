@@ -98,15 +98,15 @@ public:
 	DECLARE_READ16_MEMBER(taitojc_dsp_idle_skip_r);
 	DECLARE_READ16_MEMBER(dendego2_dsp_idle_skip_r);
 	DECLARE_WRITE16_MEMBER(dsp_idle_skip_w);
+	DECLARE_READ32_MEMBER(taitojc_tile_r);
+	DECLARE_READ32_MEMBER(taitojc_char_r);
+	DECLARE_WRITE32_MEMBER(taitojc_tile_w);
+	DECLARE_WRITE32_MEMBER(taitojc_char_w);
 };
 
 
 /*----------- defined in video/taitojc.c -----------*/
 
-READ32_HANDLER(taitojc_tile_r);
-WRITE32_HANDLER(taitojc_tile_w);
-READ32_HANDLER(taitojc_char_r);
-WRITE32_HANDLER(taitojc_char_w);
 void taitojc_clear_frame(running_machine &machine);
 void taitojc_render_polygons(running_machine &machine, UINT16 *polygon_fifo, int length);
 

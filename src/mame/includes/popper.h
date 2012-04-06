@@ -35,18 +35,18 @@ public:
 	DECLARE_READ8_MEMBER(popper_input_ports_r);
 	DECLARE_READ8_MEMBER(popper_soundcpu_nmi_r);
 	DECLARE_WRITE8_MEMBER(nmi_mask_w);
+	DECLARE_WRITE8_MEMBER(popper_ol_videoram_w);
+	DECLARE_WRITE8_MEMBER(popper_videoram_w);
+	DECLARE_WRITE8_MEMBER(popper_ol_attribram_w);
+	DECLARE_WRITE8_MEMBER(popper_attribram_w);
+	DECLARE_WRITE8_MEMBER(popper_flipscreen_w);
+	DECLARE_WRITE8_MEMBER(popper_e002_w);
+	DECLARE_WRITE8_MEMBER(popper_gfx_bank_w);
 };
 
 
 /*----------- defined in video/popper.c -----------*/
 
-WRITE8_HANDLER( popper_videoram_w );
-WRITE8_HANDLER( popper_attribram_w );
-WRITE8_HANDLER( popper_ol_videoram_w );
-WRITE8_HANDLER( popper_ol_attribram_w );
-WRITE8_HANDLER( popper_flipscreen_w );
-WRITE8_HANDLER( popper_e002_w );
-WRITE8_HANDLER( popper_gfx_bank_w );
 
 PALETTE_INIT( popper );
 VIDEO_START( popper );

@@ -332,12 +332,12 @@ WRITE16_MEMBER(tumbleb_state::tumblepb_oki_w)
 	okim6295_device *oki = machine().device<okim6295_device>("oki");
 	if (mem_mask == 0xffff)
 	{
-		oki->write(*&space, 0, data & 0xff);
+		oki->write(space, 0, data & 0xff);
 		//printf("tumbleb_oki_w %04x %04x\n", data, mem_mask);
 	}
 	else
 	{
-		oki->write(*&space, 0, (data >> 8) & 0xff);
+		oki->write(space, 0, (data >> 8) & 0xff);
 		//printf("tumbleb_oki_w %04x %04x\n", data, mem_mask);
 	}
     /* STUFF IN OTHER BYTE TOO..*/
@@ -660,9 +660,9 @@ static ADDRESS_MAP_START( tumblepopb_main_map, AS_PROGRAM, 16, tumbleb_state )
 	AM_RANGE(0x180000, 0x18000f) AM_READ(tumblepopb_controls_r)
 	AM_RANGE(0x18000c, 0x18000d) AM_WRITENOP
 	AM_RANGE(0x1a0000, 0x1a07ff) AM_RAM
-	AM_RANGE(0x300000, 0x30000f) AM_WRITE_LEGACY(tumblepb_control_0_w)
-	AM_RANGE(0x320000, 0x320fff) AM_WRITE_LEGACY(tumblepb_pf1_data_w) AM_BASE(m_pf1_data)
-	AM_RANGE(0x322000, 0x322fff) AM_WRITE_LEGACY(tumblepb_pf2_data_w) AM_BASE(m_pf2_data)
+	AM_RANGE(0x300000, 0x30000f) AM_WRITE(tumblepb_control_0_w)
+	AM_RANGE(0x320000, 0x320fff) AM_WRITE(tumblepb_pf1_data_w) AM_BASE(m_pf1_data)
+	AM_RANGE(0x322000, 0x322fff) AM_WRITE(tumblepb_pf2_data_w) AM_BASE(m_pf2_data)
 	AM_RANGE(0x340000, 0x3401ff) AM_WRITENOP /* Unused row scroll */
 	AM_RANGE(0x340400, 0x34047f) AM_WRITENOP /* Unused col scroll */
 	AM_RANGE(0x342000, 0x3421ff) AM_WRITENOP
@@ -682,9 +682,9 @@ static ADDRESS_MAP_START( fncywld_main_map, AS_PROGRAM, 16, tumbleb_state )
 	AM_RANGE(0x180000, 0x18000f) AM_READ(tumblepopb_controls_r)
 	AM_RANGE(0x18000c, 0x18000d) AM_WRITENOP
 	AM_RANGE(0x1a0000, 0x1a07ff) AM_RAM
-	AM_RANGE(0x300000, 0x30000f) AM_WRITE_LEGACY(tumblepb_control_0_w)
-	AM_RANGE(0x320000, 0x321fff) AM_RAM_WRITE_LEGACY(fncywld_pf1_data_w) AM_BASE(m_pf1_data)
-	AM_RANGE(0x322000, 0x323fff) AM_RAM_WRITE_LEGACY(fncywld_pf2_data_w) AM_BASE(m_pf2_data)
+	AM_RANGE(0x300000, 0x30000f) AM_WRITE(tumblepb_control_0_w)
+	AM_RANGE(0x320000, 0x321fff) AM_RAM_WRITE(fncywld_pf1_data_w) AM_BASE(m_pf1_data)
+	AM_RANGE(0x322000, 0x323fff) AM_RAM_WRITE(fncywld_pf2_data_w) AM_BASE(m_pf2_data)
 	AM_RANGE(0x340000, 0x3401ff) AM_WRITENOP /* Unused row scroll */
 	AM_RANGE(0x340400, 0x34047f) AM_WRITENOP /* Unused col scroll */
 	AM_RANGE(0x342000, 0x3421ff) AM_WRITENOP
@@ -702,16 +702,16 @@ static ADDRESS_MAP_START( htchctch_main_map, AS_PROGRAM, 16, tumbleb_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x10000f) AM_READ(semibase_unknown_r)
 	AM_RANGE(0x100000, 0x100001) AM_WRITE(semicom_soundcmd_w)
-	AM_RANGE(0x100002, 0x100003) AM_WRITE_LEGACY(bcstory_tilebank_w)
+	AM_RANGE(0x100002, 0x100003) AM_WRITE(bcstory_tilebank_w)
 	AM_RANGE(0x120000, 0x123fff) AM_RAM AM_BASE(m_mainram)
 	AM_RANGE(0x140000, 0x1407ff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x160000, 0x160fff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size) /* Bootleg sprite buffer */
 	AM_RANGE(0x180000, 0x18000f) AM_READ(tumblepopb_controls_r)
 	AM_RANGE(0x18000c, 0x18000d) AM_WRITENOP
 	AM_RANGE(0x1a0000, 0x1a0fff) AM_RAM
-	AM_RANGE(0x300000, 0x30000f) AM_WRITE_LEGACY(tumblepb_control_0_w)
-	AM_RANGE(0x320000, 0x321fff) AM_WRITE_LEGACY(tumblepb_pf1_data_w) AM_BASE(m_pf1_data)
-	AM_RANGE(0x322000, 0x322fff) AM_WRITE_LEGACY(tumblepb_pf2_data_w) AM_BASE(m_pf2_data)
+	AM_RANGE(0x300000, 0x30000f) AM_WRITE(tumblepb_control_0_w)
+	AM_RANGE(0x320000, 0x321fff) AM_WRITE(tumblepb_pf1_data_w) AM_BASE(m_pf1_data)
+	AM_RANGE(0x322000, 0x322fff) AM_WRITE(tumblepb_pf2_data_w) AM_BASE(m_pf2_data)
 	AM_RANGE(0x323000, 0x331fff) AM_NOP // metal saver writes there when clearing the above tilemaps, flaw in the program routine
 	AM_RANGE(0x341000, 0x342fff) AM_RAM				// Extra ram?
 ADDRESS_MAP_END
@@ -728,8 +728,8 @@ static ADDRESS_MAP_START( jumppop_main_map, AS_PROGRAM, 16, tumbleb_state )
 	AM_RANGE(0x180006, 0x180007) AM_READ_PORT("DSW")
 	AM_RANGE(0x18000c, 0x18000d) AM_WRITE(jumppop_sound_w)
 	AM_RANGE(0x1a0000, 0x1a7fff) AM_RAM
-	AM_RANGE(0x300000, 0x303fff) AM_RAM_WRITE_LEGACY(tumblepb_pf2_data_w) AM_BASE(m_pf2_data)
-	AM_RANGE(0x320000, 0x323fff) AM_RAM_WRITE_LEGACY(tumblepb_pf1_data_w) AM_BASE(m_pf1_data)
+	AM_RANGE(0x300000, 0x303fff) AM_RAM_WRITE(tumblepb_pf2_data_w) AM_BASE(m_pf2_data)
+	AM_RANGE(0x320000, 0x323fff) AM_RAM_WRITE(tumblepb_pf1_data_w) AM_BASE(m_pf1_data)
 	AM_RANGE(0x380000, 0x38000f) AM_WRITEONLY AM_BASE(m_control)
 ADDRESS_MAP_END
 
@@ -743,10 +743,10 @@ static ADDRESS_MAP_START( suprtrio_main_map, AS_PROGRAM, 16, tumbleb_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x700000, 0x700fff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
 	AM_RANGE(0xa00000, 0xa0000f) AM_RAM AM_BASE(m_control)
-	AM_RANGE(0xa20000, 0xa20fff) AM_RAM_WRITE_LEGACY(tumblepb_pf1_data_w) AM_BASE(m_pf1_data)
-	AM_RANGE(0xa22000, 0xa22fff) AM_RAM_WRITE_LEGACY(tumblepb_pf2_data_w) AM_BASE(m_pf2_data)
+	AM_RANGE(0xa20000, 0xa20fff) AM_RAM_WRITE(tumblepb_pf1_data_w) AM_BASE(m_pf1_data)
+	AM_RANGE(0xa22000, 0xa22fff) AM_RAM_WRITE(tumblepb_pf2_data_w) AM_BASE(m_pf2_data)
 	AM_RANGE(0xcf0000, 0xcf05ff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
-	AM_RANGE(0xe00000, 0xe00001) AM_READ_PORT("PLAYERS") AM_WRITE_LEGACY(suprtrio_tilebank_w)
+	AM_RANGE(0xe00000, 0xe00001) AM_READ_PORT("PLAYERS") AM_WRITE(suprtrio_tilebank_w)
 	AM_RANGE(0xe40000, 0xe40001) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xe80002, 0xe80003) AM_READ_PORT("DSW")
 	AM_RANGE(0xec0000, 0xec0001) AM_WRITE(semicom_soundcmd_w)
@@ -761,9 +761,9 @@ static ADDRESS_MAP_START( pangpang_main_map, AS_PROGRAM, 16, tumbleb_state )
 	AM_RANGE(0x160800, 0x160807) AM_WRITEONLY // writes past the end of spriteram
 	AM_RANGE(0x180000, 0x18000f) AM_READ(tumblepopb_controls_r)
 	AM_RANGE(0x1a0000, 0x1a07ff) AM_RAM
-	AM_RANGE(0x300000, 0x30000f) AM_WRITE_LEGACY(tumblepb_control_0_w)
-	AM_RANGE(0x320000, 0x321fff) AM_RAM_WRITE_LEGACY(pangpang_pf1_data_w) AM_BASE(m_pf1_data)
-	AM_RANGE(0x340000, 0x341fff) AM_RAM_WRITE_LEGACY(pangpang_pf2_data_w) AM_BASE(m_pf2_data)
+	AM_RANGE(0x300000, 0x30000f) AM_WRITE(tumblepb_control_0_w)
+	AM_RANGE(0x320000, 0x321fff) AM_RAM_WRITE(pangpang_pf1_data_w) AM_BASE(m_pf1_data)
+	AM_RANGE(0x340000, 0x341fff) AM_RAM_WRITE(pangpang_pf2_data_w) AM_BASE(m_pf2_data)
 ADDRESS_MAP_END
 
 
@@ -845,9 +845,9 @@ static ADDRESS_MAP_START( jumpkids_main_map, AS_PROGRAM, 16, tumbleb_state )
 	AM_RANGE(0x180000, 0x18000f) AM_READ(tumblepopb_controls_r)
 	AM_RANGE(0x18000c, 0x18000d) AM_WRITENOP
 	AM_RANGE(0x1a0000, 0x1a07ff) AM_RAM
-	AM_RANGE(0x300000, 0x30000f) AM_WRITE_LEGACY(tumblepb_control_0_w)
-	AM_RANGE(0x320000, 0x320fff) AM_WRITE_LEGACY(tumblepb_pf1_data_w) AM_BASE(m_pf1_data)
-	AM_RANGE(0x322000, 0x322fff) AM_WRITE_LEGACY(tumblepb_pf2_data_w) AM_BASE(m_pf2_data)
+	AM_RANGE(0x300000, 0x30000f) AM_WRITE(tumblepb_control_0_w)
+	AM_RANGE(0x320000, 0x320fff) AM_WRITE(tumblepb_pf1_data_w) AM_BASE(m_pf1_data)
+	AM_RANGE(0x322000, 0x322fff) AM_WRITE(tumblepb_pf2_data_w) AM_BASE(m_pf2_data)
 	AM_RANGE(0x340000, 0x3401ff) AM_WRITENOP /* Unused row scroll */
 	AM_RANGE(0x340400, 0x34047f) AM_WRITENOP /* Unused col scroll */
 	AM_RANGE(0x342000, 0x3421ff) AM_WRITENOP
@@ -3758,7 +3758,7 @@ static DRIVER_INIT( chokchok )
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x140000, 0x140fff, write16_delegate(FUNC(tumbleb_state::paletteram16_xxxxBBBBGGGGRRRR_word_w), state));
 
 	/* slightly different banking */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x100002, 0x100003, FUNC(chokchok_tilebank_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x100002, 0x100003, write16_delegate(FUNC(tumbleb_state::chokchok_tilebank_w),state));
 }
 
 static DRIVER_INIT( wlstar )
@@ -3767,7 +3767,7 @@ static DRIVER_INIT( wlstar )
 	tumblepb_gfx1_rearrange(machine);
 
 	/* slightly different banking */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x100002, 0x100003, FUNC(wlstar_tilebank_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x100002, 0x100003, write16_delegate(FUNC(tumbleb_state::wlstar_tilebank_w),state));
 
 	state->m_protbase = 0x0000;
 }

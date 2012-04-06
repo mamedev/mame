@@ -29,16 +29,16 @@ public:
 	int     m_bg2_on;
 	DECLARE_READ8_MEMBER(c1943_protection_r);
 	DECLARE_READ8_MEMBER(_1943b_c007_r);
+	DECLARE_WRITE8_MEMBER(c1943_videoram_w);
+	DECLARE_WRITE8_MEMBER(c1943_colorram_w);
+	DECLARE_WRITE8_MEMBER(c1943_c804_w);
+	DECLARE_WRITE8_MEMBER(c1943_d806_w);
 };
 
 
 
 /*----------- defined in video/1943.c -----------*/
 
-extern WRITE8_HANDLER( c1943_c804_w );
-extern WRITE8_HANDLER( c1943_d806_w );
-extern WRITE8_HANDLER( c1943_videoram_w );
-extern WRITE8_HANDLER( c1943_colorram_w );
 
 extern PALETTE_INIT( 1943 );
 extern VIDEO_START( 1943 );

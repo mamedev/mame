@@ -398,9 +398,10 @@ READ8_HANDLER( ssio_input_port_r )
 
 WRITE8_HANDLER( ssio_output_port_w )
 {
+	mcr_state *state = space->machine().driver_data<mcr_state>();
 	int which = offset >> 2;
 	if (which == 0)
-		mcr_control_port_w(space, offset, data);
+		state->mcr_control_port_w(*space, offset, data);
 	if (ssio_custom_output[which])
 		(*ssio_custom_output[which])(space, offset, data & ssio_custom_output_mask[which]);
 }

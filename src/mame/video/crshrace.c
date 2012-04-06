@@ -50,45 +50,41 @@ VIDEO_START( crshrace )
 
 ***************************************************************************/
 
-WRITE16_HANDLER( crshrace_videoram1_w )
+WRITE16_MEMBER(crshrace_state::crshrace_videoram1_w)
 {
-	crshrace_state *state = space->machine().driver_data<crshrace_state>();
 
-	COMBINE_DATA(&state->m_videoram1[offset]);
-	state->m_tilemap1->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_videoram1[offset]);
+	m_tilemap1->mark_tile_dirty(offset);
 }
 
-WRITE16_HANDLER( crshrace_videoram2_w )
+WRITE16_MEMBER(crshrace_state::crshrace_videoram2_w)
 {
-	crshrace_state *state = space->machine().driver_data<crshrace_state>();
 
-	COMBINE_DATA(&state->m_videoram2[offset]);
-	state->m_tilemap2->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_videoram2[offset]);
+	m_tilemap2->mark_tile_dirty(offset);
 }
 
-WRITE16_HANDLER( crshrace_roz_bank_w )
+WRITE16_MEMBER(crshrace_state::crshrace_roz_bank_w)
 {
-	crshrace_state *state = space->machine().driver_data<crshrace_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
-		if (state->m_roz_bank != (data & 0xff))
+		if (m_roz_bank != (data & 0xff))
 		{
-			state->m_roz_bank = data & 0xff;
-			state->m_tilemap1->mark_all_dirty();
+			m_roz_bank = data & 0xff;
+			m_tilemap1->mark_all_dirty();
 		}
 	}
 }
 
 
-WRITE16_HANDLER( crshrace_gfxctrl_w )
+WRITE16_MEMBER(crshrace_state::crshrace_gfxctrl_w)
 {
-	crshrace_state *state = space->machine().driver_data<crshrace_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
-		state->m_gfxctrl = data & 0xdf;
-		state->m_flipscreen = data & 0x20;
+		m_gfxctrl = data & 0xdf;
+		m_flipscreen = data & 0x20;
 	}
 }
 

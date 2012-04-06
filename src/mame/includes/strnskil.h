@@ -21,13 +21,13 @@ public:
 	DECLARE_READ8_MEMBER(pettanp_protection_r);
 	DECLARE_READ8_MEMBER(banbam_protection_r);
 	DECLARE_WRITE8_MEMBER(protection_w);
+	DECLARE_WRITE8_MEMBER(strnskil_videoram_w);
+	DECLARE_WRITE8_MEMBER(strnskil_scrl_ctrl_w);
 };
 
 
 /*----------- defined in video/strnskil.c -----------*/
 
-WRITE8_HANDLER( strnskil_videoram_w );
-WRITE8_HANDLER( strnskil_scrl_ctrl_w );
 
 PALETTE_INIT( strnskil );
 VIDEO_START( strnskil );

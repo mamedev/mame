@@ -23,6 +23,8 @@ public:
 	DECLARE_READ8_MEMBER(mcu_sim_r);
 	DECLARE_WRITE8_MEMBER(mcu_sim_w);
 	DECLARE_WRITE8_MEMBER(kangaroo_coin_counter_w);
+	DECLARE_WRITE8_MEMBER(kangaroo_videoram_w);
+	DECLARE_WRITE8_MEMBER(kangaroo_video_control_w);
 };
 
 
@@ -33,5 +35,3 @@ public:
 VIDEO_START( kangaroo );
 SCREEN_UPDATE_RGB32( kangaroo );
 
-WRITE8_HANDLER( kangaroo_videoram_w );
-WRITE8_HANDLER( kangaroo_video_control_w );

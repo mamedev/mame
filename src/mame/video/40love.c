@@ -150,32 +150,30 @@ static void fortyl_set_scroll_x( running_machine &machine, int offset )
 	state->m_bg_tilemap->set_scrollx(offset / 2, x);
 }
 
-WRITE8_HANDLER( fortyl_pixram_sel_w )
+WRITE8_MEMBER(fortyl_state::fortyl_pixram_sel_w)
 {
-	fortyl_state *state = space->machine().driver_data<fortyl_state>();
 	int offs;
 	int f = data & 0x01;
 
-	state->m_pixram_sel = (data & 0x04) >> 2;
+	m_pixram_sel = (data & 0x04) >> 2;
 
-	if (state->m_flipscreen != f)
+	if (m_flipscreen != f)
 	{
-		state->m_flipscreen = f;
-		flip_screen_set(space->machine(), state->m_flipscreen);
-		state->m_pix_redraw = 1;
+		m_flipscreen = f;
+		flip_screen_set(machine(), m_flipscreen);
+		m_pix_redraw = 1;
 
 		for (offs = 0; offs < 32; offs++)
-			fortyl_set_scroll_x(space->machine(), offs * 2);
+			fortyl_set_scroll_x(machine(), offs * 2);
 	}
 }
 
-READ8_HANDLER( fortyl_pixram_r )
+READ8_MEMBER(fortyl_state::fortyl_pixram_r)
 {
-	fortyl_state *state = space->machine().driver_data<fortyl_state>();
-	if (state->m_pixram_sel)
-		return state->m_pixram2[offset];
+	if (m_pixram_sel)
+		return m_pixram2[offset];
 	else
-		return state->m_pixram1[offset];
+		return m_pixram1[offset];
 }
 
 static void fortyl_plot_pix( running_machine &machine, int offset )
@@ -207,50 +205,45 @@ static void fortyl_plot_pix( running_machine &machine, int offset )
 	}
 }
 
-WRITE8_HANDLER( fortyl_pixram_w )
+WRITE8_MEMBER(fortyl_state::fortyl_pixram_w)
 {
-	fortyl_state *state = space->machine().driver_data<fortyl_state>();
-	if (state->m_pixram_sel)
-		state->m_pixram2[offset] = data;
+	if (m_pixram_sel)
+		m_pixram2[offset] = data;
 	else
-		state->m_pixram1[offset] = data;
+		m_pixram1[offset] = data;
 
-	fortyl_plot_pix(space->machine(), offset & 0x1fff);
+	fortyl_plot_pix(machine(), offset & 0x1fff);
 }
 
 
-WRITE8_HANDLER( fortyl_bg_videoram_w )
+WRITE8_MEMBER(fortyl_state::fortyl_bg_videoram_w)
 {
-	fortyl_state *state = space->machine().driver_data<fortyl_state>();
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-READ8_HANDLER( fortyl_bg_videoram_r )
+READ8_MEMBER(fortyl_state::fortyl_bg_videoram_r)
 {
-	fortyl_state *state = space->machine().driver_data<fortyl_state>();
-	return state->m_videoram[offset];
+	return m_videoram[offset];
 }
 
-WRITE8_HANDLER( fortyl_bg_colorram_w )
+WRITE8_MEMBER(fortyl_state::fortyl_bg_colorram_w)
 {
-	fortyl_state *state = space->machine().driver_data<fortyl_state>();
-	if (state->m_colorram[offset] != data)
+	if (m_colorram[offset] != data)
 	{
 		int i;
 
-		state->m_colorram[offset] = data;
+		m_colorram[offset] = data;
 		for (i = (offset / 2) * 64; i < (offset / 2) * 64 + 64; i++)
-			state->m_bg_tilemap->mark_tile_dirty(i);
+			m_bg_tilemap->mark_tile_dirty(i);
 
-		fortyl_set_scroll_x(space->machine(), offset);
+		fortyl_set_scroll_x(machine(), offset);
 	}
 }
 
-READ8_HANDLER( fortyl_bg_colorram_r )
+READ8_MEMBER(fortyl_state::fortyl_bg_colorram_r)
 {
-	fortyl_state *state = space->machine().driver_data<fortyl_state>();
-	return state->m_colorram[offset];
+	return m_colorram[offset];
 }
 
 /***************************************************************************

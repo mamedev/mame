@@ -16,15 +16,15 @@ public:
 	int m_palette_bank;
 	DECLARE_WRITE8_MEMBER(ctrl_w);
 	DECLARE_WRITE8_MEMBER(scotrsht_soundlatch_w);
+	DECLARE_WRITE8_MEMBER(scotrsht_videoram_w);
+	DECLARE_WRITE8_MEMBER(scotrsht_colorram_w);
+	DECLARE_WRITE8_MEMBER(scotrsht_charbank_w);
+	DECLARE_WRITE8_MEMBER(scotrsht_palettebank_w);
 };
 
 
 /*----------- defined in video/scotrsht.c -----------*/
 
-WRITE8_HANDLER( scotrsht_videoram_w );
-WRITE8_HANDLER( scotrsht_colorram_w );
-WRITE8_HANDLER( scotrsht_charbank_w );
-WRITE8_HANDLER( scotrsht_palettebank_w );
 
 PALETTE_INIT( scotrsht );
 VIDEO_START( scotrsht );

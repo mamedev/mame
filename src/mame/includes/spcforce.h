@@ -18,10 +18,10 @@ public:
 	DECLARE_READ8_MEMBER(spcforce_t0_r);
 	DECLARE_WRITE8_MEMBER(spcforce_soundtrigger_w);
 	DECLARE_WRITE8_MEMBER(irq_mask_w);
+	DECLARE_WRITE8_MEMBER(spcforce_flip_screen_w);
 };
 
 
 /*----------- defined in video/spcforce.c -----------*/
 
-WRITE8_HANDLER( spcforce_flip_screen_w );
 SCREEN_UPDATE_IND16( spcforce );

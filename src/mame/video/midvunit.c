@@ -346,32 +346,30 @@ void midvunit_renderer::process_dma_queue()
  *
  *************************************/
 
-WRITE32_HANDLER( midvunit_dma_queue_w )
+WRITE32_MEMBER(midvunit_state::midvunit_dma_queue_w)
 {
-	midvunit_state *state = space->machine().driver_data<midvunit_state>();
-	if (LOG_DMA && space->machine().input().code_pressed(KEYCODE_L))
-		logerror("%06X:queue(%X) = %08X\n", cpu_get_pc(&space->device()), state->m_dma_data_index, data);
-	if (state->m_dma_data_index < 16)
-		state->m_dma_data[state->m_dma_data_index++] = data;
+	if (LOG_DMA && machine().input().code_pressed(KEYCODE_L))
+		logerror("%06X:queue(%X) = %08X\n", cpu_get_pc(&space.device()), m_dma_data_index, data);
+	if (m_dma_data_index < 16)
+		m_dma_data[m_dma_data_index++] = data;
 }
 
 
-READ32_HANDLER( midvunit_dma_queue_entries_r )
+READ32_MEMBER(midvunit_state::midvunit_dma_queue_entries_r)
 {
 	/* always return 0 entries */
 	return 0;
 }
 
 
-READ32_HANDLER( midvunit_dma_trigger_r )
+READ32_MEMBER(midvunit_state::midvunit_dma_trigger_r)
 {
-	midvunit_state *state = space->machine().driver_data<midvunit_state>();
 	if (offset)
 	{
-		if (LOG_DMA && space->machine().input().code_pressed(KEYCODE_L))
-			logerror("%06X:trigger\n", cpu_get_pc(&space->device()));
-		state->m_poly->process_dma_queue();
-		state->m_dma_data_index = 0;
+		if (LOG_DMA && machine().input().code_pressed(KEYCODE_L))
+			logerror("%06X:trigger\n", cpu_get_pc(&space.device()));
+		m_poly->process_dma_queue();
+		m_dma_data_index = 0;
 	}
 	return 0;
 }
@@ -384,25 +382,23 @@ READ32_HANDLER( midvunit_dma_trigger_r )
  *
  *************************************/
 
-WRITE32_HANDLER( midvunit_page_control_w )
+WRITE32_MEMBER(midvunit_state::midvunit_page_control_w)
 {
-	midvunit_state *state = space->machine().driver_data<midvunit_state>();
 	/* watch for the display page to change */
-	if ((state->m_page_control ^ data) & 1)
+	if ((m_page_control ^ data) & 1)
 	{
-		state->m_video_changed = TRUE;
-		if (LOG_DMA && space->machine().input().code_pressed(KEYCODE_L))
+		m_video_changed = TRUE;
+		if (LOG_DMA && machine().input().code_pressed(KEYCODE_L))
 			logerror("##########################################################\n");
-		space->machine().primary_screen->update_partial(space->machine().primary_screen->vpos() - 1);
+		machine().primary_screen->update_partial(machine().primary_screen->vpos() - 1);
 	}
-	state->m_page_control = data;
+	m_page_control = data;
 }
 
 
-READ32_HANDLER( midvunit_page_control_r )
+READ32_MEMBER(midvunit_state::midvunit_page_control_r)
 {
-	midvunit_state *state = space->machine().driver_data<midvunit_state>();
-	return state->m_page_control;
+	return m_page_control;
 }
 
 
@@ -413,36 +409,35 @@ READ32_HANDLER( midvunit_page_control_r )
  *
  *************************************/
 
-WRITE32_HANDLER( midvunit_video_control_w )
+WRITE32_MEMBER(midvunit_state::midvunit_video_control_w)
 {
-	midvunit_state *state = space->machine().driver_data<midvunit_state>();
-	UINT16 old = state->m_video_regs[offset];
+	UINT16 old = m_video_regs[offset];
 
 	/* update the data */
-	COMBINE_DATA(&state->m_video_regs[offset]);
+	COMBINE_DATA(&m_video_regs[offset]);
 
 	/* update the scanline timer */
 	if (offset == 0)
-		state->m_scanline_timer->adjust(space->machine().primary_screen->time_until_pos((data & 0x1ff) + 1, 0), data & 0x1ff);
+		m_scanline_timer->adjust(machine().primary_screen->time_until_pos((data & 0x1ff) + 1, 0), data & 0x1ff);
 
 	/* if something changed, update our parameters */
-	if (old != state->m_video_regs[offset] && state->m_video_regs[6] != 0 && state->m_video_regs[11] != 0)
+	if (old != m_video_regs[offset] && m_video_regs[6] != 0 && m_video_regs[11] != 0)
 	{
 		rectangle visarea;
 
 		/* derive visible area from blanking */
 		visarea.min_x = 0;
-		visarea.max_x = (state->m_video_regs[6] + state->m_video_regs[2] - state->m_video_regs[5]) % state->m_video_regs[6];
+		visarea.max_x = (m_video_regs[6] + m_video_regs[2] - m_video_regs[5]) % m_video_regs[6];
 		visarea.min_y = 0;
-		visarea.max_y = (state->m_video_regs[11] + state->m_video_regs[7] - state->m_video_regs[10]) % state->m_video_regs[11];
-		space->machine().primary_screen->configure(state->m_video_regs[6], state->m_video_regs[11], visarea, HZ_TO_ATTOSECONDS(MIDVUNIT_VIDEO_CLOCK / 2) * state->m_video_regs[6] * state->m_video_regs[11]);
+		visarea.max_y = (m_video_regs[11] + m_video_regs[7] - m_video_regs[10]) % m_video_regs[11];
+		machine().primary_screen->configure(m_video_regs[6], m_video_regs[11], visarea, HZ_TO_ATTOSECONDS(MIDVUNIT_VIDEO_CLOCK / 2) * m_video_regs[6] * m_video_regs[11]);
 	}
 }
 
 
-READ32_HANDLER( midvunit_scanline_r )
+READ32_MEMBER(midvunit_state::midvunit_scanline_r)
 {
-	return space->machine().primary_screen->vpos();
+	return machine().primary_screen->vpos();
 }
 
 
@@ -453,25 +448,23 @@ READ32_HANDLER( midvunit_scanline_r )
  *
  *************************************/
 
-WRITE32_HANDLER( midvunit_videoram_w )
+WRITE32_MEMBER(midvunit_state::midvunit_videoram_w)
 {
-	midvunit_state *state = space->machine().driver_data<midvunit_state>();
-	state->m_poly->wait("Video RAM write");
-	if (!state->m_video_changed)
+	m_poly->wait("Video RAM write");
+	if (!m_video_changed)
 	{
-		int visbase = (state->m_page_control & 1) ? 0x40000 : 0x00000;
+		int visbase = (m_page_control & 1) ? 0x40000 : 0x00000;
 		if ((offset & 0x40000) == visbase)
-			state->m_video_changed = TRUE;
+			m_video_changed = TRUE;
 	}
-	COMBINE_DATA(&state->m_videoram[offset]);
+	COMBINE_DATA(&m_videoram[offset]);
 }
 
 
-READ32_HANDLER( midvunit_videoram_r )
+READ32_MEMBER(midvunit_state::midvunit_videoram_r)
 {
-	midvunit_state *state = space->machine().driver_data<midvunit_state>();
-	state->m_poly->wait("Video RAM read");
-	return state->m_videoram[offset];
+	m_poly->wait("Video RAM read");
+	return m_videoram[offset];
 }
 
 
@@ -482,14 +475,13 @@ READ32_HANDLER( midvunit_videoram_r )
  *
  *************************************/
 
-WRITE32_HANDLER( midvunit_paletteram_w )
+WRITE32_MEMBER(midvunit_state::midvunit_paletteram_w)
 {
 	int newword;
 
-	midvunit_state *state = space->machine().driver_data<midvunit_state>();
-	COMBINE_DATA(&state->m_generic_paletteram_32[offset]);
-	newword = state->m_generic_paletteram_32[offset];
-	palette_set_color_rgb(space->machine(), offset, pal5bit(newword >> 10), pal5bit(newword >> 5), pal5bit(newword >> 0));
+	COMBINE_DATA(&m_generic_paletteram_32[offset]);
+	newword = m_generic_paletteram_32[offset];
+	palette_set_color_rgb(machine(), offset, pal5bit(newword >> 10), pal5bit(newword >> 5), pal5bit(newword >> 0));
 }
 
 
@@ -500,20 +492,18 @@ WRITE32_HANDLER( midvunit_paletteram_w )
  *
  *************************************/
 
-WRITE32_HANDLER( midvunit_textureram_w )
+WRITE32_MEMBER(midvunit_state::midvunit_textureram_w)
 {
-	midvunit_state *state = space->machine().driver_data<midvunit_state>();
-	UINT8 *base = (UINT8 *)state->m_textureram;
-	state->m_poly->wait("Texture RAM write");
+	UINT8 *base = (UINT8 *)m_textureram;
+	m_poly->wait("Texture RAM write");
 	base[offset * 2] = data;
 	base[offset * 2 + 1] = data >> 8;
 }
 
 
-READ32_HANDLER( midvunit_textureram_r )
+READ32_MEMBER(midvunit_state::midvunit_textureram_r)
 {
-	midvunit_state *state = space->machine().driver_data<midvunit_state>();
-	UINT8 *base = (UINT8 *)state->m_textureram;
+	UINT8 *base = (UINT8 *)m_textureram;
 	return (base[offset * 2 + 1] << 8) | base[offset * 2];
 }
 

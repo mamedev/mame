@@ -172,9 +172,8 @@ VIDEO_START( m52 )
  *
  *************************************/
 
-WRITE8_HANDLER( m52_scroll_w )
+WRITE8_MEMBER(m52_state::m52_scroll_w)
 {
-	m52_state *state = space->machine().driver_data<m52_state>();
 /*
     According to the schematics there is only one video register that holds the X scroll value
     with a NAND gate on the V64 and V128 lines to control when it's read, and when
@@ -182,10 +181,10 @@ WRITE8_HANDLER( m52_scroll_w )
 
     So we set the first 3 quarters to 255 and the last to the scroll value
 */
-	state->m_bg_tilemap->set_scrollx(0, 255);
-	state->m_bg_tilemap->set_scrollx(1, 255);
-	state->m_bg_tilemap->set_scrollx(2, 255);
-	state->m_bg_tilemap->set_scrollx(3, -data);
+	m_bg_tilemap->set_scrollx(0, 255);
+	m_bg_tilemap->set_scrollx(1, 255);
+	m_bg_tilemap->set_scrollx(2, 255);
+	m_bg_tilemap->set_scrollx(3, -data);
 }
 
 
@@ -196,21 +195,19 @@ WRITE8_HANDLER( m52_scroll_w )
  *
  *************************************/
 
-WRITE8_HANDLER( m52_videoram_w )
+WRITE8_MEMBER(m52_state::m52_videoram_w)
 {
-	m52_state *state = space->machine().driver_data<m52_state>();
 
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_HANDLER( m52_colorram_w )
+WRITE8_MEMBER(m52_state::m52_colorram_w)
 {
-	m52_state *state = space->machine().driver_data<m52_state>();
 
-	state->m_colorram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_colorram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
@@ -224,15 +221,14 @@ WRITE8_HANDLER( m52_colorram_w )
 /* This looks like some kind of protection implemented by a custom chip on the
    scroll board. It mangles the value written to the port m52_bg1xpos_w, as
    follows: result = popcount(value & 0x7f) ^ (value >> 7) */
-READ8_HANDLER( m52_protection_r )
+READ8_MEMBER(m52_state::m52_protection_r)
 {
-	m52_state *state = space->machine().driver_data<m52_state>();
 	int popcount = 0;
 	int temp;
 
-	for (temp = state->m_bg1xpos & 0x7f; temp != 0; temp >>= 1)
+	for (temp = m_bg1xpos & 0x7f; temp != 0; temp >>= 1)
 		popcount += temp & 1;
-	return popcount ^ (state->m_bg1xpos >> 7);
+	return popcount ^ (m_bg1xpos >> 7);
 }
 
 
@@ -243,34 +239,29 @@ READ8_HANDLER( m52_protection_r )
  *
  *************************************/
 
-WRITE8_HANDLER( m52_bg1ypos_w )
+WRITE8_MEMBER(m52_state::m52_bg1ypos_w)
 {
-	m52_state *state = space->machine().driver_data<m52_state>();
-	state->m_bg1ypos = data;
+	m_bg1ypos = data;
 }
 
-WRITE8_HANDLER( m52_bg1xpos_w )
+WRITE8_MEMBER(m52_state::m52_bg1xpos_w)
 {
-	m52_state *state = space->machine().driver_data<m52_state>();
-	state->m_bg1xpos = data;
+	m_bg1xpos = data;
 }
 
-WRITE8_HANDLER( m52_bg2xpos_w )
+WRITE8_MEMBER(m52_state::m52_bg2xpos_w)
 {
-	m52_state *state = space->machine().driver_data<m52_state>();
-	state->m_bg2xpos = data;
+	m_bg2xpos = data;
 }
 
-WRITE8_HANDLER( m52_bg2ypos_w )
+WRITE8_MEMBER(m52_state::m52_bg2ypos_w)
 {
-	m52_state *state = space->machine().driver_data<m52_state>();
-	state->m_bg2ypos = data;
+	m_bg2ypos = data;
 }
 
-WRITE8_HANDLER( m52_bgcontrol_w )
+WRITE8_MEMBER(m52_state::m52_bgcontrol_w)
 {
-	m52_state *state = space->machine().driver_data<m52_state>();
-	state->m_bgcontrol = data;
+	m_bgcontrol = data;
 }
 
 
@@ -281,18 +272,18 @@ WRITE8_HANDLER( m52_bgcontrol_w )
  *
  *************************************/
 
-WRITE8_HANDLER( m52_flipscreen_w )
+WRITE8_MEMBER(m52_state::m52_flipscreen_w)
 {
 	/* screen flip is handled both by software and hardware */
-	flip_screen_set(space->machine(), (data & 0x01) ^ (~input_port_read(space->machine(), "DSW2") & 0x01));
+	flip_screen_set(machine(), (data & 0x01) ^ (~input_port_read(machine(), "DSW2") & 0x01));
 
-	coin_counter_w(space->machine(), 0, data & 0x02);
-	coin_counter_w(space->machine(), 1, data & 0x20);
+	coin_counter_w(machine(), 0, data & 0x02);
+	coin_counter_w(machine(), 1, data & 0x20);
 }
 
-WRITE8_HANDLER( alpha1v_flipscreen_w )
+WRITE8_MEMBER(m52_state::alpha1v_flipscreen_w)
 {
-	flip_screen_set(space->machine(), data & 0x01);
+	flip_screen_set(machine(), data & 0x01);
 }
 
 

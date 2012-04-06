@@ -17,14 +17,14 @@
 // K055550/K053990 protection chips, perform simple memset() and other game logic operations
 static UINT16 prot_data[0x20];
 
-static WRITE32_HANDLER(fantjour_dma_w);
 
-READ16_HANDLER( K055550_word_r )
+
+READ16_MEMBER(konamigx_state::K055550_word_r)
 {
 	return(prot_data[offset]);
 }
 
-WRITE16_HANDLER( K055550_word_w )
+WRITE16_MEMBER(konamigx_state::K055550_word_w)
 {
 	UINT32 adr, bsize, count, i, lim;
 	int src, tgt, srcend, tgtend, skip, cx1, sx1, wx1, cy1, sy1, wy1, cz1, sz1, wz1, c2, s2, w2;
@@ -45,7 +45,7 @@ WRITE16_HANDLER( K055550_word_w )
 
 				lim = adr+bsize*count;
 				for(i=adr; i<lim; i+=2)
-					space->write_word(i, prot_data[0x1a/2]);
+					space.write_word(i, prot_data[0x1a/2]);
 			break;
 
 			// WARNING: The following cases are speculation based with questionable accuracy!(AAT)
@@ -76,41 +76,41 @@ WRITE16_HANDLER( K055550_word_w )
 				// let's hope GCC will inline the mem24bew calls
 				for (src=adr; src<srcend; src+=bsize)
 				{
-					cx1 = (short)space->read_word(src);
-					sx1 = (short)space->read_word(src + 2);
-					wx1 = (short)space->read_word(src + 4);
+					cx1 = (short)space.read_word(src);
+					sx1 = (short)space.read_word(src + 2);
+					wx1 = (short)space.read_word(src + 4);
 
-					cy1 = (short)space->read_word(src + 6);
-					sy1 = (short)space->read_word(src + 8);
-					wy1 = (short)space->read_word(src +10);
+					cy1 = (short)space.read_word(src + 6);
+					sy1 = (short)space.read_word(src + 8);
+					wy1 = (short)space.read_word(src +10);
 
-					cz1 = (short)space->read_word(src +12);
-					sz1 = (short)space->read_word(src +14);
-					wz1 = (short)space->read_word(src +16);
+					cz1 = (short)space.read_word(src +12);
+					sz1 = (short)space.read_word(src +14);
+					wz1 = (short)space.read_word(src +16);
 
 					count = i = src + skip;
 					tgt = src + bsize;
 
-					for (; count<tgt; count++) space->write_byte(count, 0);
+					for (; count<tgt; count++) space.write_byte(count, 0);
 
 					for (; tgt<tgtend; i++, tgt+=bsize)
 					{
-						c2 = (short)space->read_word(tgt);
-						s2 = (short)space->read_word(tgt + 2);
-						w2 = (short)space->read_word(tgt + 4);
+						c2 = (short)space.read_word(tgt);
+						s2 = (short)space.read_word(tgt + 2);
+						w2 = (short)space.read_word(tgt + 4);
 						if (abs((cx1+sx1)-(c2+s2))>=wx1+w2) continue; // X rejection
 
-						c2 = (short)space->read_word(tgt + 6);
-						s2 = (short)space->read_word(tgt + 8);
-						w2 = (short)space->read_word(tgt +10);
+						c2 = (short)space.read_word(tgt + 6);
+						s2 = (short)space.read_word(tgt + 8);
+						w2 = (short)space.read_word(tgt +10);
 						if (abs((cy1+sy1)-(c2+s2))>=wy1+w2) continue; // Y rejection
 
-						c2 = (short)space->read_word(tgt +12);
-						s2 = (short)space->read_word(tgt +14);
-						w2 = (short)space->read_word(tgt +16);
+						c2 = (short)space.read_word(tgt +12);
+						s2 = (short)space.read_word(tgt +14);
+						w2 = (short)space.read_word(tgt +16);
 						if (abs((cz1+sz1)-(c2+s2))>=wz1+w2) continue; // Z rejection
 
-						space->write_byte(i, 0x80); // collision confirmed
+						space.write_byte(i, 0x80); // collision confirmed
 					}
 				}
 			break;
@@ -137,19 +137,19 @@ WRITE16_HANDLER( K055550_word_w )
 				else
 					if (dy < 0) i = 0x80;
 				else
-					i = space->machine().rand() & 0xff; // vector direction indeterminate
+					i = machine().rand() & 0xff; // vector direction indeterminate
 
 				prot_data[0x10] = i;
 			break;
 
 			default:
-//              logerror("%06x: unknown K055550 command %02x\n", cpu_get_pc(&space->device()), data);
+//              logerror("%06x: unknown K055550 command %02x\n", cpu_get_pc(&space.device()), data);
 			break;
 		}
 	}
 }
 
-WRITE16_HANDLER( K053990_martchmp_word_w )
+WRITE16_MEMBER(konamigx_state::K053990_martchmp_word_w)
 {
 	int src_addr, src_count, src_skip;
 	int dst_addr, /*dst_count,*/ dst_skip;
@@ -184,13 +184,13 @@ WRITE16_HANDLER( K053990_martchmp_word_w )
 				if (element_size == 1)
 				for (i=src_count; i; i--)
 				{
-					space->write_byte(dst_addr, space->read_byte(src_addr));
+					space.write_byte(dst_addr, space.read_byte(src_addr));
 					src_addr += src_skip;
 					dst_addr += dst_skip;
 				}
 				else for (i=src_count; i; i--)
 				{
-					space->write_word(dst_addr, space->read_word(src_addr));
+					space.write_word(dst_addr, space.read_word(src_addr));
 					src_addr += src_skip;
 					dst_addr += dst_skip;
 				}
@@ -215,15 +215,15 @@ WRITE16_HANDLER( K053990_martchmp_word_w )
 
 				for (i=mod_count; i; i--)
 				{
-					mod_val  = space->read_word(mod_addr);
+					mod_val  = space.read_word(mod_addr);
 					mod_addr += mod_skip;
 
-					mod_data = space->read_word(src_addr);
+					mod_data = space.read_word(src_addr);
 					src_addr += src_skip;
 
 					mod_data += mod_val;
 
-					space->write_word(dst_addr, mod_data);
+					space.write_word(dst_addr, mod_data);
 					dst_addr += dst_skip;
 				}
 			break;
@@ -441,12 +441,13 @@ static UINT32 fantjour_dma[8];
 
 void fantjour_dma_install(running_machine &machine)
 {
+	konamigx_state *state = machine.driver_data<konamigx_state>();
 	state_save_register_global_array(machine, fantjour_dma);
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xdb0000, 0xdb001f, FUNC(fantjour_dma_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xdb0000, 0xdb001f, write32_delegate(FUNC(konamigx_state::fantjour_dma_w),state));
 	memset(fantjour_dma, 0, sizeof(fantjour_dma));
 }
 
-static WRITE32_HANDLER(fantjour_dma_w)
+WRITE32_MEMBER(konamigx_state::fantjour_dma_w)
 {
 	COMBINE_DATA(fantjour_dma + offset);
 	if(!offset && ACCESSING_BITS_24_31) {
@@ -468,14 +469,14 @@ static WRITE32_HANDLER(fantjour_dma_w)
 		if(mode == 0x93)
 			for(i1=0; i1 <= sz2; i1++)
 				for(i2=0; i2 < db; i2+=4) {
-					space->write_dword(da, space->read_dword(sa) ^ x);
+					space.write_dword(da, space.read_dword(sa) ^ x);
 					da += 4;
 					sa += 4;
 				}
 		else if(mode == 0x8f)
 			for(i1=0; i1 <= sz2; i1++)
 				for(i2=0; i2 < db; i2+=4) {
-					space->write_dword(da, x);
+					space.write_dword(da, x);
 					da += 4;
 				}
 	}

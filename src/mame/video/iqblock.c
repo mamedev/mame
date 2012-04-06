@@ -56,30 +56,26 @@ VIDEO_START( iqblock )
 
 ***************************************************************************/
 
-WRITE8_HANDLER( iqblock_fgvideoram_w )
+WRITE8_MEMBER(iqblock_state::iqblock_fgvideoram_w)
 {
-	iqblock_state *state = space->machine().driver_data<iqblock_state>();
-	state->m_fgvideoram[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset);
+	m_fgvideoram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( iqblock_bgvideoram_w )
+WRITE8_MEMBER(iqblock_state::iqblock_bgvideoram_w)
 {
-	iqblock_state *state = space->machine().driver_data<iqblock_state>();
-	state->m_bgvideoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset & 0x7ff);
+	m_bgvideoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset & 0x7ff);
 }
 
-READ8_HANDLER( iqblock_bgvideoram_r )
+READ8_MEMBER(iqblock_state::iqblock_bgvideoram_r)
 {
-	iqblock_state *state = space->machine().driver_data<iqblock_state>();
-	return state->m_bgvideoram[offset];
+	return m_bgvideoram[offset];
 }
 
-WRITE8_HANDLER( iqblock_fgscroll_w )
+WRITE8_MEMBER(iqblock_state::iqblock_fgscroll_w)
 {
-	iqblock_state *state = space->machine().driver_data<iqblock_state>();
-	state->m_fg_tilemap->set_scrolly(offset,data);
+	m_fg_tilemap->set_scrolly(offset,data);
 }
 
 

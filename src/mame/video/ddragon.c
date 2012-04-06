@@ -129,18 +129,16 @@ VIDEO_START( chinagat )
 
 ***************************************************************************/
 
-WRITE8_HANDLER( ddragon_bgvideoram_w )
+WRITE8_MEMBER(ddragon_state::ddragon_bgvideoram_w)
 {
-	ddragon_state *state = space->machine().driver_data<ddragon_state>();
-	state->m_bgvideoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset / 2);
+	m_bgvideoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE8_HANDLER( ddragon_fgvideoram_w )
+WRITE8_MEMBER(ddragon_state::ddragon_fgvideoram_w)
 {
-	ddragon_state *state = space->machine().driver_data<ddragon_state>();
-	state->m_fgvideoram[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset / 2);
+	m_fgvideoram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset / 2);
 }
 
 

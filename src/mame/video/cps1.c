@@ -1572,10 +1572,9 @@ INLINE UINT16 *cps1_base( running_machine &machine, int offset, int boundary )
 
 
 
-WRITE16_HANDLER( cps1_cps_a_w )
+WRITE16_MEMBER(cps_state::cps1_cps_a_w)
 {
-	cps_state *state = space->machine().driver_data<cps_state>();
-	data = COMBINE_DATA(&state->m_cps_a_regs[offset]);
+	data = COMBINE_DATA(&m_cps_a_regs[offset]);
 
 	/*
     The main CPU writes the palette to gfxram, and the CPS-B custom copies it
@@ -1586,10 +1585,10 @@ WRITE16_HANDLER( cps1_cps_a_w )
     fixes glitches in the ghouls intro, but it might happen at next vblank.
     */
 	if (offset == CPS1_PALETTE_BASE)
-		cps1_build_palette(space->machine(), cps1_base(space->machine(), CPS1_PALETTE_BASE, state->m_palette_align));
+		cps1_build_palette(machine(), cps1_base(machine(), CPS1_PALETTE_BASE, m_palette_align));
 
 	// pzloop2 write to register 24 on startup. This is probably just a bug.
-	if (offset == 0x24 / 2 && state->m_cps_version == 2)
+	if (offset == 0x24 / 2 && m_cps_version == 2)
 		return;
 
 #ifdef MAME_DEBUG
@@ -1599,42 +1598,41 @@ WRITE16_HANDLER( cps1_cps_a_w )
 }
 
 
-READ16_HANDLER( cps1_cps_b_r )
+READ16_MEMBER(cps_state::cps1_cps_b_r)
 {
-	cps_state *state = space->machine().driver_data<cps_state>();
 
 	/* Some games interrogate a couple of registers on bootup. */
 	/* These are CPS1 board B self test checks. They wander from game to */
 	/* game. */
-	if (offset == state->m_game_config->cpsb_addr / 2)
-		return state->m_game_config->cpsb_value;
+	if (offset == m_game_config->cpsb_addr / 2)
+		return m_game_config->cpsb_value;
 
 	/* some games use as a protection check the ability to do 16-bit multiplications */
 	/* with a 32-bit result, by writing the factors to two ports and reading the */
 	/* result from two other ports. */
-	if (offset == state->m_game_config->mult_result_lo / 2)
-		return (state->m_cps_b_regs[state->m_game_config->mult_factor1 / 2] *
-				state->m_cps_b_regs[state->m_game_config->mult_factor2 / 2]) & 0xffff;
+	if (offset == m_game_config->mult_result_lo / 2)
+		return (m_cps_b_regs[m_game_config->mult_factor1 / 2] *
+				m_cps_b_regs[m_game_config->mult_factor2 / 2]) & 0xffff;
 
-	if (offset == state->m_game_config->mult_result_hi / 2)
-		return (state->m_cps_b_regs[state->m_game_config->mult_factor1 / 2] *
-				state->m_cps_b_regs[state->m_game_config->mult_factor2 / 2]) >> 16;
+	if (offset == m_game_config->mult_result_hi / 2)
+		return (m_cps_b_regs[m_game_config->mult_factor1 / 2] *
+				m_cps_b_regs[m_game_config->mult_factor2 / 2]) >> 16;
 
-	if (offset == state->m_game_config->in2_addr / 2)	/* Extra input ports (on C-board) */
-		return input_port_read(space->machine(), "IN2");
+	if (offset == m_game_config->in2_addr / 2)	/* Extra input ports (on C-board) */
+		return input_port_read(machine(), "IN2");
 
-	if (offset == state->m_game_config->in3_addr / 2)	/* Player 4 controls (on C-board) ("Captain Commando") */
-		return input_port_read(space->machine(), "IN3");
+	if (offset == m_game_config->in3_addr / 2)	/* Player 4 controls (on C-board) ("Captain Commando") */
+		return input_port_read(machine(), "IN3");
 
-	if (state->m_cps_version == 2)
+	if (m_cps_version == 2)
 	{
 		if (offset == 0x10/2)
 		{
 			// UNKNOWN--only mmatrix appears to read this, and I'm not sure if the result is actuallyused
-			return state->m_cps_b_regs[0x10 / 2];
+			return m_cps_b_regs[0x10 / 2];
 		}
 		if (offset == 0x12/2)
-			return state->m_cps_b_regs[0x12 / 2];
+			return m_cps_b_regs[0x12 / 2];
 	}
 #ifdef MAME_DEBUG
 	popmessage("CPS-B read port %02x contact MAMEDEV", offset * 2);
@@ -1643,12 +1641,11 @@ READ16_HANDLER( cps1_cps_b_r )
 }
 
 
-WRITE16_HANDLER( cps1_cps_b_w )
+WRITE16_MEMBER(cps_state::cps1_cps_b_w)
 {
-	cps_state *state = space->machine().driver_data<cps_state>();
-	data = COMBINE_DATA(&state->m_cps_b_regs[offset]);
+	data = COMBINE_DATA(&m_cps_b_regs[offset]);
 
-	if (state->m_cps_version == 2)
+	if (m_cps_version == 2)
 	{
 		/* To mark scanlines for raster effects */
 		if (offset == 0x0e/2)
@@ -1658,52 +1655,52 @@ WRITE16_HANDLER( cps1_cps_b_w )
 		}
 		if (offset == 0x10/2)
 		{
-			state->m_scanline1 = (data & 0x1ff);
+			m_scanline1 = (data & 0x1ff);
 			return;
 		}
 		if (offset == 0x12/2)
 		{
-			state->m_scanline2 = (data & 0x1ff);
+			m_scanline2 = (data & 0x1ff);
 			return;
 		}
 	}
 
 
 	// additional outputs on C-board
-	if (offset == state->m_game_config->out2_addr / 2)
+	if (offset == m_game_config->out2_addr / 2)
 	{
 		if (ACCESSING_BITS_0_7)
 		{
-			if (state->m_game_config->cpsb_value == 0x0402)	// Mercs (CN2 connector)
+			if (m_game_config->cpsb_value == 0x0402)	// Mercs (CN2 connector)
 			{
-				coin_lockout_w(space->machine(), 2, ~data & 0x01);
-				set_led_status(space->machine(), 0, data & 0x02);
-				set_led_status(space->machine(), 1, data & 0x04);
-				set_led_status(space->machine(), 2, data & 0x08);
+				coin_lockout_w(machine(), 2, ~data & 0x01);
+				set_led_status(machine(), 0, data & 0x02);
+				set_led_status(machine(), 1, data & 0x04);
+				set_led_status(machine(), 2, data & 0x08);
 			}
 			else	// kod, captcomm, knights
 			{
-				coin_lockout_w(space->machine(), 2, ~data & 0x02);
-				coin_lockout_w(space->machine(), 3, ~data & 0x08);
+				coin_lockout_w(machine(), 2, ~data & 0x02);
+				coin_lockout_w(machine(), 3, ~data & 0x08);
 			}
 		}
 	}
 
 #ifdef MAME_DEBUG
-	if (offset != state->m_game_config->cpsb_addr / 2 &&	// only varth writes here
-			offset != state->m_game_config->mult_factor1 / 2 &&
-			offset != state->m_game_config->mult_factor2 / 2 &&
-			offset != state->m_game_config->layer_control / 2 &&
-			offset != state->m_game_config->unknown1 / 2 &&
-			offset != state->m_game_config->unknown2 / 2 &&
-			offset != state->m_game_config->unknown3 / 2 &&
-			offset != state->m_game_config->priority[0] / 2 &&
-			offset != state->m_game_config->priority[1] / 2 &&
-			offset != state->m_game_config->priority[2] / 2 &&
-			offset != state->m_game_config->priority[3] / 2 &&
-			offset != state->m_game_config->palette_control / 2 &&
-			offset != state->m_game_config->out2_addr / 2 &&
-			!state->m_game_config->bootleg_kludge)
+	if (offset != m_game_config->cpsb_addr / 2 &&	// only varth writes here
+			offset != m_game_config->mult_factor1 / 2 &&
+			offset != m_game_config->mult_factor2 / 2 &&
+			offset != m_game_config->layer_control / 2 &&
+			offset != m_game_config->unknown1 / 2 &&
+			offset != m_game_config->unknown2 / 2 &&
+			offset != m_game_config->unknown3 / 2 &&
+			offset != m_game_config->priority[0] / 2 &&
+			offset != m_game_config->priority[1] / 2 &&
+			offset != m_game_config->priority[2] / 2 &&
+			offset != m_game_config->priority[3] / 2 &&
+			offset != m_game_config->palette_control / 2 &&
+			offset != m_game_config->out2_addr / 2 &&
+			!m_game_config->bootleg_kludge)
 		popmessage("CPS-B write %04x to port %02x contact MAMEDEV", data, offset * 2);
 #endif
 }
@@ -1910,20 +1907,19 @@ void cps1_get_video_base( running_machine &machine )
 }
 
 
-WRITE16_HANDLER( cps1_gfxram_w )
+WRITE16_MEMBER(cps_state::cps1_gfxram_w)
 {
-	cps_state *state = space->machine().driver_data<cps_state>();
 	int page = (offset >> 7) & 0x3c0;
-	COMBINE_DATA(&state->m_gfxram[offset]);
+	COMBINE_DATA(&m_gfxram[offset]);
 
-	if (page == (state->m_cps_a_regs[CPS1_SCROLL1_BASE] & 0x3c0))
-		state->m_bg_tilemap[0]->mark_tile_dirty(offset / 2 & 0x0fff);
+	if (page == (m_cps_a_regs[CPS1_SCROLL1_BASE] & 0x3c0))
+		m_bg_tilemap[0]->mark_tile_dirty(offset / 2 & 0x0fff);
 
-	if (page == (state->m_cps_a_regs[CPS1_SCROLL2_BASE] & 0x3c0))
-		state->m_bg_tilemap[1]->mark_tile_dirty(offset / 2 & 0x0fff);
+	if (page == (m_cps_a_regs[CPS1_SCROLL2_BASE] & 0x3c0))
+		m_bg_tilemap[1]->mark_tile_dirty(offset / 2 & 0x0fff);
 
-	if (page == (state->m_cps_a_regs[CPS1_SCROLL3_BASE] & 0x3c0))
-		state->m_bg_tilemap[2]->mark_tile_dirty(offset / 2 & 0x0fff);
+	if (page == (m_cps_a_regs[CPS1_SCROLL3_BASE] & 0x3c0))
+		m_bg_tilemap[2]->mark_tile_dirty(offset / 2 & 0x0fff);
 }
 
 
@@ -2469,48 +2465,43 @@ static void cps1_render_sprites( running_machine &machine, bitmap_ind16 &bitmap,
 
 
 
-WRITE16_HANDLER( cps2_objram_bank_w )
+WRITE16_MEMBER(cps_state::cps2_objram_bank_w)
 {
-	cps_state *state = space->machine().driver_data<cps_state>();
 
 	if (ACCESSING_BITS_0_7)
-		state->m_objram_bank = data & 1;
+		m_objram_bank = data & 1;
 }
 
-READ16_HANDLER( cps2_objram1_r )
+READ16_MEMBER(cps_state::cps2_objram1_r)
 {
-	cps_state *state = space->machine().driver_data<cps_state>();
-	if (state->m_objram_bank & 1)
-		return state->m_objram2[offset];
+	if (m_objram_bank & 1)
+		return m_objram2[offset];
 	else
-		return state->m_objram1[offset];
+		return m_objram1[offset];
 }
 
-READ16_HANDLER( cps2_objram2_r )
+READ16_MEMBER(cps_state::cps2_objram2_r)
 {
-	cps_state *state = space->machine().driver_data<cps_state>();
-	if (state->m_objram_bank & 1)
-		return state->m_objram1[offset];
+	if (m_objram_bank & 1)
+		return m_objram1[offset];
 	else
-		return state->m_objram2[offset];
+		return m_objram2[offset];
 }
 
-WRITE16_HANDLER( cps2_objram1_w )
+WRITE16_MEMBER(cps_state::cps2_objram1_w)
 {
-	cps_state *state = space->machine().driver_data<cps_state>();
-	if (state->m_objram_bank & 1)
-		COMBINE_DATA(&state->m_objram2[offset]);
+	if (m_objram_bank & 1)
+		COMBINE_DATA(&m_objram2[offset]);
 	else
-		COMBINE_DATA(&state->m_objram1[offset]);
+		COMBINE_DATA(&m_objram1[offset]);
 }
 
-WRITE16_HANDLER( cps2_objram2_w )
+WRITE16_MEMBER(cps_state::cps2_objram2_w)
 {
-	cps_state *state = space->machine().driver_data<cps_state>();
-	if (state->m_objram_bank & 1)
-		COMBINE_DATA(&state->m_objram1[offset]);
+	if (m_objram_bank & 1)
+		COMBINE_DATA(&m_objram1[offset]);
 	else
-		COMBINE_DATA(&state->m_objram2[offset]);
+		COMBINE_DATA(&m_objram2[offset]);
 }
 
 static UINT16 *cps2_objbase( running_machine &machine )

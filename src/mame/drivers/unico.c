@@ -71,10 +71,10 @@ static ADDRESS_MAP_START( burglarx_map, AS_PROGRAM, 16, unico_state )
 	AM_RANGE(0x80018c, 0x80018d) AM_DEVREADWRITE8_LEGACY("ymsnd", ym3812_status_port_r, ym3812_control_port_w, 0xff00		)	//
 	AM_RANGE(0x80018e, 0x80018f) AM_DEVWRITE_LEGACY("oki", burglarx_sound_bank_w)					//
 	AM_RANGE(0x8001e0, 0x8001e1) AM_WRITENOP												// IRQ Ack
-	AM_RANGE(0x904000, 0x90ffff) AM_RAM_WRITE_LEGACY(unico_vram_w) AM_BASE(m_vram)		// Layers 1, 2, 0
+	AM_RANGE(0x904000, 0x90ffff) AM_RAM_WRITE(unico_vram_w) AM_BASE(m_vram)		// Layers 1, 2, 0
 	AM_RANGE(0x920000, 0x923fff) AM_RAM														// ? 0
 	AM_RANGE(0x930000, 0x9307ff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)	// Sprites
-	AM_RANGE(0x940000, 0x947fff) AM_RAM_WRITE_LEGACY(unico_palette_w) AM_SHARE("paletteram")	// Palette
+	AM_RANGE(0x940000, 0x947fff) AM_RAM_WRITE(unico_palette_w) AM_SHARE("paletteram")	// Palette
 ADDRESS_MAP_END
 
 
@@ -159,10 +159,10 @@ static ADDRESS_MAP_START( zeropnt_map, AS_PROGRAM, 16, unico_state )
 	AM_RANGE(0x80018c, 0x80018d) AM_DEVREADWRITE8_LEGACY("ymsnd", ym3812_status_port_r, ym3812_control_port_w, 0xff00		)	//
 	AM_RANGE(0x80018e, 0x80018f) AM_WRITE(zeropnt_sound_bank_w				)	//
 	AM_RANGE(0x8001e0, 0x8001e1) AM_WRITEONLY	// ? IRQ Ack
-	AM_RANGE(0x904000, 0x90ffff) AM_RAM_WRITE_LEGACY(unico_vram_w) AM_BASE(m_vram)	// Layers 1, 2, 0
+	AM_RANGE(0x904000, 0x90ffff) AM_RAM_WRITE(unico_vram_w) AM_BASE(m_vram)	// Layers 1, 2, 0
 	AM_RANGE(0x920000, 0x923fff) AM_RAM	// ? 0
 	AM_RANGE(0x930000, 0x9307ff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)	// Sprites
-	AM_RANGE(0x940000, 0x947fff) AM_RAM_WRITE_LEGACY(unico_palette_w) AM_SHARE("paletteram")	// Palette
+	AM_RANGE(0x940000, 0x947fff) AM_RAM_WRITE(unico_palette_w) AM_SHARE("paletteram")	// Palette
 ADDRESS_MAP_END
 
 
@@ -233,10 +233,10 @@ static ADDRESS_MAP_START( zeropnt2_map, AS_PROGRAM, 32, unico_state )
 	AM_RANGE(0x80015c, 0x80015f) AM_READ_PORT("BUTTONS")
 	AM_RANGE(0x8001e0, 0x8001e3) AM_WRITENOP									// ? IRQ Ack
 	AM_RANGE(0x8001f0, 0x8001f3) AM_DEVWRITE_LEGACY("eeprom", zeropnt2_eeprom_w)					// EEPROM
-	AM_RANGE(0x904000, 0x90ffff) AM_RAM_WRITE_LEGACY(unico_vram32_w) AM_BASE(m_vram32)	// Layers 1, 2, 0
+	AM_RANGE(0x904000, 0x90ffff) AM_RAM_WRITE(unico_vram32_w) AM_BASE(m_vram32)	// Layers 1, 2, 0
 	AM_RANGE(0x920000, 0x923fff) AM_RAM											// ? 0
 	AM_RANGE(0x930000, 0x9307ff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)	// Sprites
-	AM_RANGE(0x940000, 0x947fff) AM_RAM_WRITE_LEGACY(unico_palette32_w) AM_SHARE("paletteram")	// Palette
+	AM_RANGE(0x940000, 0x947fff) AM_RAM_WRITE(unico_palette32_w) AM_SHARE("paletteram")	// Palette
 	AM_RANGE(0xfe0000, 0xffffff) AM_RAM											// RAM
 ADDRESS_MAP_END
 

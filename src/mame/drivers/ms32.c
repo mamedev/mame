@@ -365,8 +365,8 @@ static ADDRESS_MAP_START( ms32_map, AS_PROGRAM, 32, ms32_state )
 	AM_RANGE(0xfce00038, 0xfce0003b) AM_WRITE(reset_sub_w)
 	AM_RANGE(0xfce00050, 0xfce0005f) AM_WRITENOP	// watchdog? I haven't investigated
 //  AM_RANGE(0xfce00000, 0xfce0007f) AM_WRITEONLY AM_BASE_LEGACY(&ms32_fce00000) /* registers not ram? */
-	AM_RANGE(0xfce00000, 0xfce00003) AM_WRITE_LEGACY(ms32_gfxctrl_w)	/* flip screen + other unknown bits */
-	AM_RANGE(0xfce00280, 0xfce0028f) AM_WRITE_LEGACY(ms32_brightness_w)	// global brightness control
+	AM_RANGE(0xfce00000, 0xfce00003) AM_WRITE(ms32_gfxctrl_w)	/* flip screen + other unknown bits */
+	AM_RANGE(0xfce00280, 0xfce0028f) AM_WRITE(ms32_brightness_w)	// global brightness control
 /**/AM_RANGE(0xfce00600, 0xfce0065f) AM_RAM AM_BASE(m_roz_ctrl)		/* roz control registers */
 /**/AM_RANGE(0xfce00a00, 0xfce00a17) AM_RAM AM_BASE(m_tx_scroll)	/* tx layer scroll */
 /**/AM_RANGE(0xfce00a20, 0xfce00a37) AM_RAM AM_BASE(m_bg_scroll)	/* bg layer scroll */

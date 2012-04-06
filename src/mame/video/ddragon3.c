@@ -7,55 +7,51 @@
 #include "emu.h"
 #include "includes/ddragon3.h"
 
-WRITE16_HANDLER( ddragon3_scroll_w )
+WRITE16_MEMBER(ddragon3_state::ddragon3_scroll_w)
 {
-	ddragon3_state *state = space->machine().driver_data<ddragon3_state>();
 
 	switch (offset)
 	{
-		case 0: COMBINE_DATA(&state->m_fg_scrollx);	break;	// Scroll X, BG1
-		case 1: COMBINE_DATA(&state->m_fg_scrolly);	break;	// Scroll Y, BG1
-		case 2: COMBINE_DATA(&state->m_bg_scrollx);	break;	// Scroll X, BG0
-		case 3: COMBINE_DATA(&state->m_bg_scrolly);	break;	// Scroll Y, BG0
+		case 0: COMBINE_DATA(&m_fg_scrollx);	break;	// Scroll X, BG1
+		case 1: COMBINE_DATA(&m_fg_scrolly);	break;	// Scroll Y, BG1
+		case 2: COMBINE_DATA(&m_bg_scrollx);	break;	// Scroll X, BG0
+		case 3: COMBINE_DATA(&m_bg_scrolly);	break;	// Scroll Y, BG0
 		case 4:										break;	// Unknown write
-		case 5: flip_screen_set(space->machine(), data & 0x01);		break;	// Flip Screen
+		case 5: flip_screen_set(machine(), data & 0x01);		break;	// Flip Screen
 		case 6:
-			COMBINE_DATA(&state->m_bg_tilebase);			// BG Tile Base
-			state->m_bg_tilebase &= 0x1ff;
-			state->m_bg_tilemap->mark_all_dirty();
+			COMBINE_DATA(&m_bg_tilebase);			// BG Tile Base
+			m_bg_tilebase &= 0x1ff;
+			m_bg_tilemap->mark_all_dirty();
 			break;
 	}
 }
 
-READ16_HANDLER( ddragon3_scroll_r )
+READ16_MEMBER(ddragon3_state::ddragon3_scroll_r)
 {
-	ddragon3_state *state = space->machine().driver_data<ddragon3_state>();
 
 	switch (offset)
 	{
-		case 0: return state->m_fg_scrollx;
-		case 1: return state->m_fg_scrolly;
-		case 2: return state->m_bg_scrollx;
-		case 3: return state->m_bg_scrolly;
-		case 5: return flip_screen_get(space->machine());
-		case 6: return state->m_bg_tilebase;
+		case 0: return m_fg_scrollx;
+		case 1: return m_fg_scrolly;
+		case 2: return m_bg_scrollx;
+		case 3: return m_bg_scrolly;
+		case 5: return flip_screen_get(machine());
+		case 6: return m_bg_tilebase;
 	}
 
 	return 0;
 }
 
-WRITE16_HANDLER( ddragon3_bg_videoram_w )
+WRITE16_MEMBER(ddragon3_state::ddragon3_bg_videoram_w)
 {
-	ddragon3_state *state = space->machine().driver_data<ddragon3_state>();
-	COMBINE_DATA(&state->m_bg_videoram[offset]);
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_bg_videoram[offset]);
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_HANDLER( ddragon3_fg_videoram_w )
+WRITE16_MEMBER(ddragon3_state::ddragon3_fg_videoram_w)
 {
-	ddragon3_state *state = space->machine().driver_data<ddragon3_state>();
-	COMBINE_DATA(&state->m_fg_videoram[offset]);
-	state->m_fg_tilemap->mark_tile_dirty(offset / 2);
+	COMBINE_DATA(&m_fg_videoram[offset]);
+	m_fg_tilemap->mark_tile_dirty(offset / 2);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )

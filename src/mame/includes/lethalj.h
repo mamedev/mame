@@ -21,15 +21,16 @@ public:
 	DECLARE_WRITE16_MEMBER(ripribit_control_w);
 	DECLARE_WRITE16_MEMBER(cfarm_control_w);
 	DECLARE_WRITE16_MEMBER(cclownz_control_w);
+	DECLARE_READ16_MEMBER(lethalj_gun_r);
+	DECLARE_WRITE16_MEMBER(lethalj_blitter_w);
+	void do_blit();
 };
 
 
 /*----------- defined in video/lethalj.c -----------*/
 
-READ16_HANDLER( lethalj_gun_r );
 
 VIDEO_START( lethalj );
 
-WRITE16_HANDLER( lethalj_blitter_w );
 
 void lethalj_scanline_update(screen_device &screen, bitmap_ind16 &bitmap, int scanline, const tms34010_display_params *params);

@@ -89,17 +89,16 @@ static PALETTE_INIT( stactics )
  *
  *************************************/
 
-WRITE8_HANDLER( stactics_scroll_ram_w )
+WRITE8_MEMBER(stactics_state::stactics_scroll_ram_w)
 {
-	stactics_state *state = space->machine().driver_data<stactics_state>();
 
 	if (data & 0x01)
 	{
 		switch (offset >> 8)
 		{
-			case 4: state->m_y_scroll_d = offset & 0xff; break;
-			case 5: state->m_y_scroll_e = offset & 0xff; break;
-			case 6: state->m_y_scroll_f = offset & 0xff; break;
+			case 4: m_y_scroll_d = offset & 0xff; break;
+			case 5: m_y_scroll_e = offset & 0xff; break;
+			case 6: m_y_scroll_f = offset & 0xff; break;
 		}
 	}
 }
@@ -127,9 +126,8 @@ CUSTOM_INPUT( stactics_get_frame_count_d3 )
  *
  *************************************/
 
-WRITE8_HANDLER( stactics_speed_latch_w )
+WRITE8_MEMBER(stactics_state::stactics_speed_latch_w)
 {
-	stactics_state *state = space->machine().driver_data<stactics_state>();
 
 	/* This writes to a shift register which is clocked by   */
 	/* a 555 oscillator.  This value determines the speed of */
@@ -150,23 +148,21 @@ WRITE8_HANDLER( stactics_speed_latch_w )
 			num_rising_edges++;
 	}
 
-	state->m_beam_states_per_frame = num_rising_edges*19/8;
+	m_beam_states_per_frame = num_rising_edges*19/8;
 }
 
 
-WRITE8_HANDLER( stactics_shot_trigger_w )
+WRITE8_MEMBER(stactics_state::stactics_shot_trigger_w)
 {
-	stactics_state *state = space->machine().driver_data<stactics_state>();
 
-	state->m_shot_standby = 0;
+	m_shot_standby = 0;
 }
 
 
-WRITE8_HANDLER( stactics_shot_flag_clear_w )
+WRITE8_MEMBER(stactics_state::stactics_shot_flag_clear_w)
 {
-	stactics_state *state = space->machine().driver_data<stactics_state>();
 
-	state->m_shot_arrive = 0;
+	m_shot_arrive = 0;
 }
 
 

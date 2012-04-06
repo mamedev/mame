@@ -24,6 +24,10 @@ public:
 	UINT16 m_mid_gfx_bank;
 	required_shared_ptr<UINT16> m_spriteram;
 	DECLARE_WRITE16_MEMBER(denjin_paletteram16_xBBBBBGGGGGRRRRR_word_w);
+	DECLARE_WRITE16_MEMBER(legionna_background_w);
+	DECLARE_WRITE16_MEMBER(legionna_midground_w);
+	DECLARE_WRITE16_MEMBER(legionna_foreground_w);
+	DECLARE_WRITE16_MEMBER(legionna_text_w);
 };
 
 
@@ -31,10 +35,6 @@ public:
 
 void heatbrl_setgfxbank(running_machine &machine, UINT16 data);
 void denjinmk_setgfxbank(running_machine &machine, UINT16 data);
-WRITE16_HANDLER( legionna_background_w );
-WRITE16_HANDLER( legionna_foreground_w );
-WRITE16_HANDLER( legionna_midground_w );
-WRITE16_HANDLER( legionna_text_w );
 
 VIDEO_START( legionna );
 VIDEO_START( cupsoc );

@@ -286,37 +286,37 @@ static INTERRUPT_GEN( gaplus_vblank_sub2_irq )
 
 
 static ADDRESS_MAP_START( cpu1_map, AS_PROGRAM, 8, gaplus_state )
-	AM_RANGE(0x0000, 0x07ff) AM_READWRITE_LEGACY(gaplus_videoram_r, gaplus_videoram_w) AM_BASE(m_videoram)		/* tilemap RAM (shared with CPU #2) */
+	AM_RANGE(0x0000, 0x07ff) AM_READWRITE(gaplus_videoram_r, gaplus_videoram_w) AM_BASE(m_videoram)		/* tilemap RAM (shared with CPU #2) */
 	AM_RANGE(0x0800, 0x1fff) AM_READWRITE(gaplus_spriteram_r, gaplus_spriteram_w) AM_BASE(m_spriteram)	/* shared RAM with CPU #2 (includes sprite RAM) */
 	AM_RANGE(0x6000, 0x63ff) AM_DEVREADWRITE_LEGACY("namco", namco_snd_sharedram_r, namco_snd_sharedram_w)										/* shared RAM with CPU #3 */
 	AM_RANGE(0x6800, 0x680f) AM_DEVREADWRITE_LEGACY("56xx", namcoio_r, namcoio_w)													/* custom I/O chips interface */
 	AM_RANGE(0x6810, 0x681f) AM_DEVREADWRITE_LEGACY("58xx", namcoio_r, namcoio_w)													/* custom I/O chips interface */
-	AM_RANGE(0x6820, 0x682f) AM_READWRITE_LEGACY(gaplus_customio_3_r, gaplus_customio_3_w) AM_BASE(m_customio_3)	/* custom I/O chip #3 interface */
+	AM_RANGE(0x6820, 0x682f) AM_READWRITE(gaplus_customio_3_r, gaplus_customio_3_w) AM_BASE(m_customio_3)	/* custom I/O chip #3 interface */
 	AM_RANGE(0x7000, 0x7fff) AM_WRITE(gaplus_irq_1_ctrl_w)														/* main CPU irq control */
 	AM_RANGE(0x7800, 0x7fff) AM_READ(watchdog_reset_r)															/* watchdog */
 	AM_RANGE(0x8000, 0x8fff) AM_WRITE(gaplus_sreset_w)															/* reset CPU #2 & #3, enable sound */
 	AM_RANGE(0x9000, 0x9fff) AM_WRITE(gaplus_freset_w)															/* reset I/O chips */
-	AM_RANGE(0xa000, 0xa7ff) AM_WRITE_LEGACY(gaplus_starfield_control_w)				/* starfield control */
+	AM_RANGE(0xa000, 0xa7ff) AM_WRITE(gaplus_starfield_control_w)				/* starfield control */
 	AM_RANGE(0xa000, 0xffff) AM_ROM																				/* ROM */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gaplusa_cpu1_map, AS_PROGRAM, 8, gaplus_state )
-	AM_RANGE(0x0000, 0x07ff) AM_READWRITE_LEGACY(gaplus_videoram_r, gaplus_videoram_w) AM_BASE(m_videoram)		/* tilemap RAM (shared with CPU #2) */
+	AM_RANGE(0x0000, 0x07ff) AM_READWRITE(gaplus_videoram_r, gaplus_videoram_w) AM_BASE(m_videoram)		/* tilemap RAM (shared with CPU #2) */
 	AM_RANGE(0x0800, 0x1fff) AM_READWRITE(gaplus_spriteram_r, gaplus_spriteram_w) AM_BASE(m_spriteram)	/* shared RAM with CPU #2 (includes sprite RAM) */
 	AM_RANGE(0x6000, 0x63ff) AM_DEVREADWRITE_LEGACY("namco", namco_snd_sharedram_r, namco_snd_sharedram_w)													/* shared RAM with CPU #3 */
 	AM_RANGE(0x6800, 0x680f) AM_DEVREADWRITE_LEGACY("58xx", namcoio_r, namcoio_w)													/* custom I/O chips interface */
 	AM_RANGE(0x6810, 0x681f) AM_DEVREADWRITE_LEGACY("56xx", namcoio_r, namcoio_w)													/* custom I/O chips interface */
-	AM_RANGE(0x6820, 0x682f) AM_READWRITE_LEGACY(gaplus_customio_3_r, gaplus_customio_3_w) AM_BASE(m_customio_3)	/* custom I/O chip #3 interface */
+	AM_RANGE(0x6820, 0x682f) AM_READWRITE(gaplus_customio_3_r, gaplus_customio_3_w) AM_BASE(m_customio_3)	/* custom I/O chip #3 interface */
 	AM_RANGE(0x7000, 0x7fff) AM_WRITE(gaplus_irq_1_ctrl_w)														/* main CPU irq control */
 	AM_RANGE(0x7800, 0x7fff) AM_READ(watchdog_reset_r)															/* watchdog */
 	AM_RANGE(0x8000, 0x8fff) AM_WRITE(gaplus_sreset_w)															/* reset CPU #2 & #3, enable sound */
 	AM_RANGE(0x9000, 0x9fff) AM_WRITE(gaplus_freset_w)															/* reset I/O chips */
-	AM_RANGE(0xa000, 0xa7ff) AM_WRITE_LEGACY(gaplus_starfield_control_w)				/* starfield control */
+	AM_RANGE(0xa000, 0xa7ff) AM_WRITE(gaplus_starfield_control_w)				/* starfield control */
 	AM_RANGE(0xa000, 0xffff) AM_ROM																				/* ROM */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cpu2_map, AS_PROGRAM, 8, gaplus_state )
-	AM_RANGE(0x0000, 0x07ff) AM_READWRITE_LEGACY(gaplus_videoram_r, gaplus_videoram_w)		/* tilemap RAM (shared with CPU #1) */
+	AM_RANGE(0x0000, 0x07ff) AM_READWRITE(gaplus_videoram_r, gaplus_videoram_w)		/* tilemap RAM (shared with CPU #1) */
 	AM_RANGE(0x0800, 0x1fff) AM_READWRITE(gaplus_spriteram_r, gaplus_spriteram_w)	/* shared RAM with CPU #1 */
 //  AM_RANGE(0x500f, 0x500f) AM_WRITENOP                                            /* ??? written 256 times on startup */
 	AM_RANGE(0x6000, 0x6fff) AM_WRITE(gaplus_irq_2_ctrl_w)							/* IRQ 2 control */

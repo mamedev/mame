@@ -687,39 +687,39 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sailorws_map, AS_PROGRAM, 8, nbmj9195_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
-	AM_RANGE(0xf000, 0xf1ff) AM_READWRITE_LEGACY(nbmj9195_palette_r,nbmj9195_palette_w)
+	AM_RANGE(0xf000, 0xf1ff) AM_READWRITE(nbmj9195_palette_r,nbmj9195_palette_w)
 	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mjuraden_map, AS_PROGRAM, 8, nbmj9195_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
-	AM_RANGE(0xf200, 0xf3ff) AM_READWRITE_LEGACY(nbmj9195_palette_r,nbmj9195_palette_w)
+	AM_RANGE(0xf200, 0xf3ff) AM_READWRITE(nbmj9195_palette_r,nbmj9195_palette_w)
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( koinomp_map, AS_PROGRAM, 8, nbmj9195_state )
 	AM_RANGE(0x0000, 0xdfff) AM_ROM
-	AM_RANGE(0xe000, 0xe1ff) AM_READWRITE_LEGACY(nbmj9195_palette_r,nbmj9195_palette_w)
+	AM_RANGE(0xe000, 0xe1ff) AM_READWRITE(nbmj9195_palette_r,nbmj9195_palette_w)
 	AM_RANGE(0xe800, 0xefff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ngpgal_map, AS_PROGRAM, 8, nbmj9195_state )
 	AM_RANGE(0x0000, 0xcfff) AM_ROM
-	AM_RANGE(0xd000, 0xd1ff) AM_READWRITE_LEGACY(nbmj9195_palette_r,nbmj9195_palette_w)
+	AM_RANGE(0xd000, 0xd1ff) AM_READWRITE(nbmj9195_palette_r,nbmj9195_palette_w)
 	AM_RANGE(0xd800, 0xdfff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mscoutm_map, AS_PROGRAM, 8, nbmj9195_state )
 	AM_RANGE(0x0000, 0xdfff) AM_ROM
 	AM_RANGE(0xe000, 0xe5ff) AM_RAM
-	AM_RANGE(0xe600, 0xebff) AM_READWRITE_LEGACY(nbmj9195_nb22090_palette_r,nbmj9195_nb22090_palette_w)
+	AM_RANGE(0xe600, 0xebff) AM_READWRITE(nbmj9195_nb22090_palette_r,nbmj9195_nb22090_palette_w)
 	AM_RANGE(0xec00, 0xf1ff) AM_RAM
 	AM_RANGE(0xf200, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mjegolf_map, AS_PROGRAM, 8, nbmj9195_state )
 	AM_RANGE(0x0000, 0xdfff) AM_ROM
-	AM_RANGE(0xe000, 0xe5ff) AM_READWRITE_LEGACY(nbmj9195_nb22090_palette_r,nbmj9195_nb22090_palette_w)
+	AM_RANGE(0xe000, 0xe5ff) AM_READWRITE(nbmj9195_nb22090_palette_r,nbmj9195_nb22090_palette_w)
 	AM_RANGE(0xe600, 0xebff) AM_RAM
 	AM_RANGE(0xec00, 0xf1ff) AM_RAM
 	AM_RANGE(0xf200, 0xffff) AM_RAM
@@ -729,9 +729,9 @@ static ADDRESS_MAP_START( mjuraden_io_map, AS_IO, 8, nbmj9195_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_IMPORT_FROM( tmpz84c011_regs )
 
-	AM_RANGE(0x80, 0x81) AM_READ_LEGACY(nbmj9195_blitter_0_r)
-	AM_RANGE(0x80, 0x8f) AM_WRITE_LEGACY(nbmj9195_blitter_0_w)
-	AM_RANGE(0x90, 0x9f) AM_WRITE_LEGACY(nbmj9195_clut_0_w)
+	AM_RANGE(0x80, 0x81) AM_READ(nbmj9195_blitter_0_r)
+	AM_RANGE(0x80, 0x8f) AM_WRITE(nbmj9195_blitter_0_w)
+	AM_RANGE(0x90, 0x9f) AM_WRITE(nbmj9195_clut_0_w)
 
 	AM_RANGE(0xb0, 0xb0) AM_WRITE(nbmj9195_sound_w)
 	AM_RANGE(0xb2, 0xb2) AM_WRITENOP
@@ -744,13 +744,13 @@ static ADDRESS_MAP_START( koinomp_io_map, AS_IO, 8, nbmj9195_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_IMPORT_FROM( tmpz84c011_regs )
 
-	AM_RANGE(0x80, 0x81) AM_READ_LEGACY(nbmj9195_blitter_0_r)
-	AM_RANGE(0x80, 0x8f) AM_WRITE_LEGACY(nbmj9195_blitter_0_w)
-	AM_RANGE(0x90, 0x9f) AM_WRITE_LEGACY(nbmj9195_clut_0_w)
+	AM_RANGE(0x80, 0x81) AM_READ(nbmj9195_blitter_0_r)
+	AM_RANGE(0x80, 0x8f) AM_WRITE(nbmj9195_blitter_0_w)
+	AM_RANGE(0x90, 0x9f) AM_WRITE(nbmj9195_clut_0_w)
 
-	AM_RANGE(0xa0, 0xa1) AM_READ_LEGACY(nbmj9195_blitter_1_r)
-	AM_RANGE(0xa0, 0xaf) AM_WRITE_LEGACY(nbmj9195_blitter_1_w)
-	AM_RANGE(0xb0, 0xbf) AM_WRITE_LEGACY(nbmj9195_clut_1_w)
+	AM_RANGE(0xa0, 0xa1) AM_READ(nbmj9195_blitter_1_r)
+	AM_RANGE(0xa0, 0xaf) AM_WRITE(nbmj9195_blitter_1_w)
+	AM_RANGE(0xb0, 0xbf) AM_WRITE(nbmj9195_clut_1_w)
 
 	AM_RANGE(0xc0, 0xc0) AM_WRITE(nbmj9195_sound_w)
 	AM_RANGE(0xc2, 0xc2) AM_WRITENOP
@@ -764,27 +764,27 @@ static ADDRESS_MAP_START( patimono_io_map, AS_IO, 8, nbmj9195_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_IMPORT_FROM( tmpz84c011_regs )
 
-	AM_RANGE(0x80, 0x81) AM_READ_LEGACY(nbmj9195_blitter_1_r)
-	AM_RANGE(0x80, 0x8f) AM_WRITE_LEGACY(nbmj9195_blitter_1_w)
+	AM_RANGE(0x80, 0x81) AM_READ(nbmj9195_blitter_1_r)
+	AM_RANGE(0x80, 0x8f) AM_WRITE(nbmj9195_blitter_1_w)
 
-	AM_RANGE(0x90, 0x9f) AM_WRITE_LEGACY(nbmj9195_clut_0_w)
+	AM_RANGE(0x90, 0x9f) AM_WRITE(nbmj9195_clut_0_w)
 	AM_RANGE(0xa0, 0xa0) AM_WRITE(nbmj9195_sound_w)
 	AM_RANGE(0xa4, 0xa4) AM_WRITENOP
 	AM_RANGE(0xa8, 0xa8) AM_WRITENOP
 	AM_RANGE(0xb0, 0xb8) AM_WRITE(nbmj9195_inputportsel_w)
 
-	AM_RANGE(0xc0, 0xc1) AM_READ_LEGACY(nbmj9195_blitter_0_r)
-	AM_RANGE(0xc0, 0xcf) AM_WRITE_LEGACY(nbmj9195_blitter_0_w)
-	AM_RANGE(0xd0, 0xdf) AM_WRITE_LEGACY(nbmj9195_clut_1_w)
+	AM_RANGE(0xc0, 0xc1) AM_READ(nbmj9195_blitter_0_r)
+	AM_RANGE(0xc0, 0xcf) AM_WRITE(nbmj9195_blitter_0_w)
+	AM_RANGE(0xd0, 0xdf) AM_WRITE(nbmj9195_clut_1_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mmehyou_io_map, AS_IO, 8, nbmj9195_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_IMPORT_FROM( tmpz84c011_regs )
 
-	AM_RANGE(0x80, 0x81) AM_READ_LEGACY(nbmj9195_blitter_0_r)
-	AM_RANGE(0x80, 0x8f) AM_WRITE_LEGACY(nbmj9195_blitter_0_w)
-	AM_RANGE(0x90, 0x9f) AM_WRITE_LEGACY(nbmj9195_clut_0_w)
+	AM_RANGE(0x80, 0x81) AM_READ(nbmj9195_blitter_0_r)
+	AM_RANGE(0x80, 0x8f) AM_WRITE(nbmj9195_blitter_0_w)
+	AM_RANGE(0x90, 0x9f) AM_WRITE(nbmj9195_clut_0_w)
 
 	AM_RANGE(0xa0, 0xa0) AM_WRITE(nbmj9195_sound_w)
 	AM_RANGE(0xa4, 0xa4) AM_WRITENOP
@@ -796,13 +796,13 @@ static ADDRESS_MAP_START( gal10ren_io_map, AS_IO, 8, nbmj9195_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_IMPORT_FROM( tmpz84c011_regs )
 
-	AM_RANGE(0x60, 0x61) AM_READ_LEGACY(nbmj9195_blitter_0_r)
-	AM_RANGE(0x60, 0x6f) AM_WRITE_LEGACY(nbmj9195_blitter_0_w)
-	AM_RANGE(0x70, 0x7f) AM_WRITE_LEGACY(nbmj9195_clut_0_w)
+	AM_RANGE(0x60, 0x61) AM_READ(nbmj9195_blitter_0_r)
+	AM_RANGE(0x60, 0x6f) AM_WRITE(nbmj9195_blitter_0_w)
+	AM_RANGE(0x70, 0x7f) AM_WRITE(nbmj9195_clut_0_w)
 
-	AM_RANGE(0xa0, 0xa1) AM_READ_LEGACY(nbmj9195_blitter_1_r)
-	AM_RANGE(0xa0, 0xaf) AM_WRITE_LEGACY(nbmj9195_blitter_1_w)
-	AM_RANGE(0xb0, 0xbf) AM_WRITE_LEGACY(nbmj9195_clut_1_w)
+	AM_RANGE(0xa0, 0xa1) AM_READ(nbmj9195_blitter_1_r)
+	AM_RANGE(0xa0, 0xaf) AM_WRITE(nbmj9195_blitter_1_w)
+	AM_RANGE(0xb0, 0xbf) AM_WRITE(nbmj9195_clut_1_w)
 
 	AM_RANGE(0xc0, 0xc0) AM_WRITE(nbmj9195_sound_w)
 	AM_RANGE(0xc8, 0xc8) AM_WRITENOP
@@ -819,13 +819,13 @@ static ADDRESS_MAP_START( renaiclb_io_map, AS_IO, 8, nbmj9195_state )
 	AM_RANGE(0x28, 0x28) AM_WRITENOP
 	AM_RANGE(0x2c, 0x2c) AM_WRITE(nbmj9195_inputportsel_w)
 
-	AM_RANGE(0x60, 0x61) AM_READ_LEGACY(nbmj9195_blitter_0_r)
-	AM_RANGE(0x60, 0x6f) AM_WRITE_LEGACY(nbmj9195_blitter_1_w)
-	AM_RANGE(0x70, 0x7f) AM_WRITE_LEGACY(nbmj9195_clut_1_w)
+	AM_RANGE(0x60, 0x61) AM_READ(nbmj9195_blitter_0_r)
+	AM_RANGE(0x60, 0x6f) AM_WRITE(nbmj9195_blitter_1_w)
+	AM_RANGE(0x70, 0x7f) AM_WRITE(nbmj9195_clut_1_w)
 
-	AM_RANGE(0xe0, 0xe1) AM_READ_LEGACY(nbmj9195_blitter_1_r)
-	AM_RANGE(0xe0, 0xef) AM_WRITE_LEGACY(nbmj9195_blitter_0_w)
-	AM_RANGE(0xf0, 0xff) AM_WRITE_LEGACY(nbmj9195_clut_0_w)
+	AM_RANGE(0xe0, 0xe1) AM_READ(nbmj9195_blitter_1_r)
+	AM_RANGE(0xe0, 0xef) AM_WRITE(nbmj9195_blitter_0_w)
+	AM_RANGE(0xf0, 0xff) AM_WRITE(nbmj9195_clut_0_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mjlaman_io_map, AS_IO, 8, nbmj9195_state )
@@ -837,13 +837,13 @@ static ADDRESS_MAP_START( mjlaman_io_map, AS_IO, 8, nbmj9195_state )
 	AM_RANGE(0x24, 0x24) AM_WRITENOP
 	AM_RANGE(0x26, 0x26) AM_WRITE(nbmj9195_inputportsel_w)
 
-	AM_RANGE(0x80, 0x81) AM_READ_LEGACY(nbmj9195_blitter_0_r)
-	AM_RANGE(0x80, 0x8f) AM_WRITE_LEGACY(nbmj9195_blitter_0_w)
-	AM_RANGE(0x90, 0x9f) AM_WRITE_LEGACY(nbmj9195_clut_0_w)
+	AM_RANGE(0x80, 0x81) AM_READ(nbmj9195_blitter_0_r)
+	AM_RANGE(0x80, 0x8f) AM_WRITE(nbmj9195_blitter_0_w)
+	AM_RANGE(0x90, 0x9f) AM_WRITE(nbmj9195_clut_0_w)
 
-	AM_RANGE(0xe0, 0xe1) AM_READ_LEGACY(nbmj9195_blitter_1_r)
-	AM_RANGE(0xe0, 0xef) AM_WRITE_LEGACY(nbmj9195_blitter_1_w)
-	AM_RANGE(0xf0, 0xff) AM_WRITE_LEGACY(nbmj9195_clut_1_w)
+	AM_RANGE(0xe0, 0xe1) AM_READ(nbmj9195_blitter_1_r)
+	AM_RANGE(0xe0, 0xef) AM_WRITE(nbmj9195_blitter_1_w)
+	AM_RANGE(0xf0, 0xff) AM_WRITE(nbmj9195_clut_1_w)
 ADDRESS_MAP_END
 
 
@@ -851,13 +851,13 @@ static ADDRESS_MAP_START( mkeibaou_io_map, AS_IO, 8, nbmj9195_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_IMPORT_FROM( tmpz84c011_regs )
 
-	AM_RANGE(0x80, 0x81) AM_READ_LEGACY(nbmj9195_blitter_0_r)
-	AM_RANGE(0x80, 0x8f) AM_WRITE_LEGACY(nbmj9195_blitter_0_w)
-	AM_RANGE(0x90, 0x9f) AM_WRITE_LEGACY(nbmj9195_clut_0_w)
+	AM_RANGE(0x80, 0x81) AM_READ(nbmj9195_blitter_0_r)
+	AM_RANGE(0x80, 0x8f) AM_WRITE(nbmj9195_blitter_0_w)
+	AM_RANGE(0x90, 0x9f) AM_WRITE(nbmj9195_clut_0_w)
 
-	AM_RANGE(0xa0, 0xa1) AM_READ_LEGACY(nbmj9195_blitter_1_r)
-	AM_RANGE(0xa0, 0xaf) AM_WRITE_LEGACY(nbmj9195_blitter_1_w)
-	AM_RANGE(0xb0, 0xbf) AM_WRITE_LEGACY(nbmj9195_clut_1_w)
+	AM_RANGE(0xa0, 0xa1) AM_READ(nbmj9195_blitter_1_r)
+	AM_RANGE(0xa0, 0xaf) AM_WRITE(nbmj9195_blitter_1_w)
+	AM_RANGE(0xb0, 0xbf) AM_WRITE(nbmj9195_clut_1_w)
 
 	AM_RANGE(0xd8, 0xd8) AM_WRITE(nbmj9195_sound_w)
 	AM_RANGE(0xda, 0xda) AM_WRITENOP
@@ -870,13 +870,13 @@ static ADDRESS_MAP_START( pachiten_io_map, AS_IO, 8, nbmj9195_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_IMPORT_FROM( tmpz84c011_regs )
 
-	AM_RANGE(0x60, 0x61) AM_READ_LEGACY(nbmj9195_blitter_0_r)
-	AM_RANGE(0x60, 0x6f) AM_WRITE_LEGACY(nbmj9195_blitter_0_w)
-	AM_RANGE(0x70, 0x7f) AM_WRITE_LEGACY(nbmj9195_clut_0_w)
+	AM_RANGE(0x60, 0x61) AM_READ(nbmj9195_blitter_0_r)
+	AM_RANGE(0x60, 0x6f) AM_WRITE(nbmj9195_blitter_0_w)
+	AM_RANGE(0x70, 0x7f) AM_WRITE(nbmj9195_clut_0_w)
 
-	AM_RANGE(0xa0, 0xa1) AM_READ_LEGACY(nbmj9195_blitter_1_r)
-	AM_RANGE(0xa0, 0xaf) AM_WRITE_LEGACY(nbmj9195_blitter_1_w)
-	AM_RANGE(0xb0, 0xbf) AM_WRITE_LEGACY(nbmj9195_clut_1_w)
+	AM_RANGE(0xa0, 0xa1) AM_READ(nbmj9195_blitter_1_r)
+	AM_RANGE(0xa0, 0xaf) AM_WRITE(nbmj9195_blitter_1_w)
+	AM_RANGE(0xb0, 0xbf) AM_WRITE(nbmj9195_clut_1_w)
 
 	AM_RANGE(0xe0, 0xe0) AM_WRITE(nbmj9195_sound_w)
 	AM_RANGE(0xe2, 0xe2) AM_WRITENOP
@@ -888,13 +888,13 @@ static ADDRESS_MAP_START( sailorws_io_map, AS_IO, 8, nbmj9195_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_IMPORT_FROM( tmpz84c011_regs )
 
-	AM_RANGE(0x60, 0x61) AM_READ_LEGACY(nbmj9195_blitter_0_r)
-	AM_RANGE(0x60, 0x6f) AM_WRITE_LEGACY(nbmj9195_blitter_0_w)
-	AM_RANGE(0x70, 0x7f) AM_WRITE_LEGACY(nbmj9195_clut_0_w)
+	AM_RANGE(0x60, 0x61) AM_READ(nbmj9195_blitter_0_r)
+	AM_RANGE(0x60, 0x6f) AM_WRITE(nbmj9195_blitter_0_w)
+	AM_RANGE(0x70, 0x7f) AM_WRITE(nbmj9195_clut_0_w)
 
-	AM_RANGE(0x80, 0x81) AM_READ_LEGACY(nbmj9195_blitter_1_r)
-	AM_RANGE(0x80, 0x8f) AM_WRITE_LEGACY(nbmj9195_blitter_1_w)
-	AM_RANGE(0x90, 0x9f) AM_WRITE_LEGACY(nbmj9195_clut_1_w)
+	AM_RANGE(0x80, 0x81) AM_READ(nbmj9195_blitter_1_r)
+	AM_RANGE(0x80, 0x8f) AM_WRITE(nbmj9195_blitter_1_w)
+	AM_RANGE(0x90, 0x9f) AM_WRITE(nbmj9195_clut_1_w)
 
 	AM_RANGE(0xf0, 0xf0) AM_WRITE(nbmj9195_sound_w)
 	AM_RANGE(0xf2, 0xf2) AM_WRITENOP
@@ -906,13 +906,13 @@ static ADDRESS_MAP_START( sailorwr_io_map, AS_IO, 8, nbmj9195_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_IMPORT_FROM( tmpz84c011_regs )
 
-	AM_RANGE(0x60, 0x61) AM_READ_LEGACY(nbmj9195_blitter_0_r)
-	AM_RANGE(0x60, 0x6f) AM_WRITE_LEGACY(nbmj9195_blitter_0_w)
-	AM_RANGE(0x70, 0x7f) AM_WRITE_LEGACY(nbmj9195_clut_0_w)
+	AM_RANGE(0x60, 0x61) AM_READ(nbmj9195_blitter_0_r)
+	AM_RANGE(0x60, 0x6f) AM_WRITE(nbmj9195_blitter_0_w)
+	AM_RANGE(0x70, 0x7f) AM_WRITE(nbmj9195_clut_0_w)
 
-	AM_RANGE(0x80, 0x81) AM_READ_LEGACY(nbmj9195_blitter_1_r)
-	AM_RANGE(0x80, 0x8f) AM_WRITE_LEGACY(nbmj9195_blitter_1_w)
-	AM_RANGE(0x90, 0x9f) AM_WRITE_LEGACY(nbmj9195_clut_1_w)
+	AM_RANGE(0x80, 0x81) AM_READ(nbmj9195_blitter_1_r)
+	AM_RANGE(0x80, 0x8f) AM_WRITE(nbmj9195_blitter_1_w)
+	AM_RANGE(0x90, 0x9f) AM_WRITE(nbmj9195_clut_1_w)
 
 	AM_RANGE(0xf8, 0xf8) AM_WRITE(nbmj9195_sound_w)
 	AM_RANGE(0xfa, 0xfa) AM_WRITENOP
@@ -925,13 +925,13 @@ static ADDRESS_MAP_START( psailor1_io_map, AS_IO, 8, nbmj9195_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_IMPORT_FROM( tmpz84c011_regs )
 
-	AM_RANGE(0x60, 0x61) AM_READ_LEGACY(nbmj9195_blitter_0_r)
-	AM_RANGE(0x60, 0x6f) AM_WRITE_LEGACY(nbmj9195_blitter_0_w)
-	AM_RANGE(0x70, 0x7f) AM_WRITE_LEGACY(nbmj9195_clut_0_w)
+	AM_RANGE(0x60, 0x61) AM_READ(nbmj9195_blitter_0_r)
+	AM_RANGE(0x60, 0x6f) AM_WRITE(nbmj9195_blitter_0_w)
+	AM_RANGE(0x70, 0x7f) AM_WRITE(nbmj9195_clut_0_w)
 
-	AM_RANGE(0xc0, 0xc1) AM_READ_LEGACY(nbmj9195_blitter_1_r)
-	AM_RANGE(0xc0, 0xcf) AM_WRITE_LEGACY(nbmj9195_blitter_1_w)
-	AM_RANGE(0xd0, 0xdf) AM_WRITE_LEGACY(nbmj9195_clut_1_w)
+	AM_RANGE(0xc0, 0xc1) AM_READ(nbmj9195_blitter_1_r)
+	AM_RANGE(0xc0, 0xcf) AM_WRITE(nbmj9195_blitter_1_w)
+	AM_RANGE(0xd0, 0xdf) AM_WRITE(nbmj9195_clut_1_w)
 
 	AM_RANGE(0xf0, 0xf0) AM_WRITE(nbmj9195_sound_w)
 	AM_RANGE(0xf2, 0xf2) AM_WRITENOP
@@ -943,13 +943,13 @@ static ADDRESS_MAP_START( psailor2_io_map, AS_IO, 8, nbmj9195_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_IMPORT_FROM( tmpz84c011_regs )
 
-	AM_RANGE(0x60, 0x61) AM_READ_LEGACY(nbmj9195_blitter_0_r)
-	AM_RANGE(0x60, 0x6f) AM_WRITE_LEGACY(nbmj9195_blitter_0_w)
-	AM_RANGE(0x70, 0x7f) AM_WRITE_LEGACY(nbmj9195_clut_0_w)
+	AM_RANGE(0x60, 0x61) AM_READ(nbmj9195_blitter_0_r)
+	AM_RANGE(0x60, 0x6f) AM_WRITE(nbmj9195_blitter_0_w)
+	AM_RANGE(0x70, 0x7f) AM_WRITE(nbmj9195_clut_0_w)
 
-	AM_RANGE(0xa0, 0xa1) AM_READ_LEGACY(nbmj9195_blitter_1_r)
-	AM_RANGE(0xa0, 0xaf) AM_WRITE_LEGACY(nbmj9195_blitter_1_w)
-	AM_RANGE(0xb0, 0xbf) AM_WRITE_LEGACY(nbmj9195_clut_1_w)
+	AM_RANGE(0xa0, 0xa1) AM_READ(nbmj9195_blitter_1_r)
+	AM_RANGE(0xa0, 0xaf) AM_WRITE(nbmj9195_blitter_1_w)
+	AM_RANGE(0xb0, 0xbf) AM_WRITE(nbmj9195_clut_1_w)
 
 	AM_RANGE(0xe0, 0xe0) AM_WRITE(nbmj9195_sound_w)
 	AM_RANGE(0xe2, 0xe2) AM_WRITENOP
@@ -961,13 +961,13 @@ static ADDRESS_MAP_START( otatidai_io_map, AS_IO, 8, nbmj9195_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_IMPORT_FROM( tmpz84c011_regs )
 
-	AM_RANGE(0x60, 0x61) AM_READ_LEGACY(nbmj9195_blitter_0_r)
-	AM_RANGE(0x60, 0x6f) AM_WRITE_LEGACY(nbmj9195_blitter_0_w)
-	AM_RANGE(0x70, 0x7f) AM_WRITE_LEGACY(nbmj9195_clut_0_w)
+	AM_RANGE(0x60, 0x61) AM_READ(nbmj9195_blitter_0_r)
+	AM_RANGE(0x60, 0x6f) AM_WRITE(nbmj9195_blitter_0_w)
+	AM_RANGE(0x70, 0x7f) AM_WRITE(nbmj9195_clut_0_w)
 
-	AM_RANGE(0x80, 0x81) AM_READ_LEGACY(nbmj9195_blitter_1_r)
-	AM_RANGE(0x80, 0x8f) AM_WRITE_LEGACY(nbmj9195_blitter_1_w)
-	AM_RANGE(0x90, 0x9f) AM_WRITE_LEGACY(nbmj9195_clut_1_w)
+	AM_RANGE(0x80, 0x81) AM_READ(nbmj9195_blitter_1_r)
+	AM_RANGE(0x80, 0x8f) AM_WRITE(nbmj9195_blitter_1_w)
+	AM_RANGE(0x90, 0x9f) AM_WRITE(nbmj9195_clut_1_w)
 
 	AM_RANGE(0xa0, 0xa0) AM_WRITE(nbmj9195_sound_w)
 	AM_RANGE(0xa8, 0xa8) AM_WRITENOP
@@ -979,31 +979,31 @@ static ADDRESS_MAP_START( yosimoto_io_map, AS_IO, 8, nbmj9195_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_IMPORT_FROM( tmpz84c011_regs )
 
-	AM_RANGE(0x60, 0x61) AM_READ_LEGACY(nbmj9195_blitter_0_r)
-	AM_RANGE(0x60, 0x6f) AM_WRITE_LEGACY(nbmj9195_blitter_0_w)
-	AM_RANGE(0x70, 0x7f) AM_WRITE_LEGACY(nbmj9195_clut_0_w)
+	AM_RANGE(0x60, 0x61) AM_READ(nbmj9195_blitter_0_r)
+	AM_RANGE(0x60, 0x6f) AM_WRITE(nbmj9195_blitter_0_w)
+	AM_RANGE(0x70, 0x7f) AM_WRITE(nbmj9195_clut_0_w)
 
 	AM_RANGE(0x90, 0x90) AM_WRITE(nbmj9195_sound_w)
 	AM_RANGE(0x94, 0x94) AM_WRITENOP
 	AM_RANGE(0x98, 0x98) AM_WRITENOP
 	AM_RANGE(0x9c, 0x9c) AM_WRITE(nbmj9195_inputportsel_w)
 
-	AM_RANGE(0xc0, 0xc1) AM_READ_LEGACY(nbmj9195_blitter_1_r)
-	AM_RANGE(0xc0, 0xcf) AM_WRITE_LEGACY(nbmj9195_blitter_1_w)
-	AM_RANGE(0xd0, 0xdf) AM_WRITE_LEGACY(nbmj9195_clut_1_w)
+	AM_RANGE(0xc0, 0xc1) AM_READ(nbmj9195_blitter_1_r)
+	AM_RANGE(0xc0, 0xcf) AM_WRITE(nbmj9195_blitter_1_w)
+	AM_RANGE(0xd0, 0xdf) AM_WRITE(nbmj9195_clut_1_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( jituroku_io_map, AS_IO, 8, nbmj9195_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_IMPORT_FROM( tmpz84c011_regs )
 
-	AM_RANGE(0x60, 0x61) AM_READ_LEGACY(nbmj9195_blitter_0_r)
-	AM_RANGE(0x60, 0x6f) AM_WRITE_LEGACY(nbmj9195_blitter_0_w)
-	AM_RANGE(0x70, 0x7f) AM_WRITE_LEGACY(nbmj9195_clut_0_w)
+	AM_RANGE(0x60, 0x61) AM_READ(nbmj9195_blitter_0_r)
+	AM_RANGE(0x60, 0x6f) AM_WRITE(nbmj9195_blitter_0_w)
+	AM_RANGE(0x70, 0x7f) AM_WRITE(nbmj9195_clut_0_w)
 
-	AM_RANGE(0xc0, 0xc1) AM_READ_LEGACY(nbmj9195_blitter_1_r)
-	AM_RANGE(0xc0, 0xcf) AM_WRITE_LEGACY(nbmj9195_blitter_1_w)
-	AM_RANGE(0xd0, 0xdf) AM_WRITE_LEGACY(nbmj9195_clut_1_w)
+	AM_RANGE(0xc0, 0xc1) AM_READ(nbmj9195_blitter_1_r)
+	AM_RANGE(0xc0, 0xcf) AM_WRITE(nbmj9195_blitter_1_w)
+	AM_RANGE(0xd0, 0xdf) AM_WRITE(nbmj9195_clut_1_w)
 
 	AM_RANGE(0xe0, 0xe0) AM_WRITE(nbmj9195_sound_w)
 	AM_RANGE(0xe8, 0xe8) AM_WRITENOP
@@ -1020,18 +1020,18 @@ static ADDRESS_MAP_START( ngpgal_io_map, AS_IO, 8, nbmj9195_state )
 	AM_RANGE(0xa8, 0xa8) AM_WRITENOP
 	AM_RANGE(0xb0, 0xb0) AM_WRITE(nbmj9195_inputportsel_w)
 
-	AM_RANGE(0xc0, 0xc1) AM_READ_LEGACY(nbmj9195_blitter_0_r)
-	AM_RANGE(0xc0, 0xcf) AM_WRITE_LEGACY(nbmj9195_blitter_0_w)
-	AM_RANGE(0xd0, 0xdf) AM_WRITE_LEGACY(nbmj9195_clut_0_w)
+	AM_RANGE(0xc0, 0xc1) AM_READ(nbmj9195_blitter_0_r)
+	AM_RANGE(0xc0, 0xcf) AM_WRITE(nbmj9195_blitter_0_w)
+	AM_RANGE(0xd0, 0xdf) AM_WRITE(nbmj9195_clut_0_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mjgottsu_io_map, AS_IO, 8, nbmj9195_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_IMPORT_FROM( tmpz84c011_regs )
 
-	AM_RANGE(0x80, 0x81) AM_READ_LEGACY(nbmj9195_blitter_0_r)
-	AM_RANGE(0x80, 0x8f) AM_WRITE_LEGACY(nbmj9195_blitter_0_w)
-	AM_RANGE(0x90, 0x9f) AM_WRITE_LEGACY(nbmj9195_clut_0_w)
+	AM_RANGE(0x80, 0x81) AM_READ(nbmj9195_blitter_0_r)
+	AM_RANGE(0x80, 0x8f) AM_WRITE(nbmj9195_blitter_0_w)
+	AM_RANGE(0x90, 0x9f) AM_WRITE(nbmj9195_clut_0_w)
 
 	AM_RANGE(0xa0, 0xa0) AM_WRITE(nbmj9195_sound_w)
 	AM_RANGE(0xa4, 0xa4) AM_WRITENOP
@@ -1048,18 +1048,18 @@ static ADDRESS_MAP_START( cmehyou_io_map, AS_IO, 8, nbmj9195_state )
 	AM_RANGE(0xb0, 0xb0) AM_WRITE(nbmj9195_inputportsel_w)
 	AM_RANGE(0xb4, 0xb4) AM_WRITENOP
 
-	AM_RANGE(0xc0, 0xc1) AM_READ_LEGACY(nbmj9195_blitter_0_r)
-	AM_RANGE(0xc0, 0xcf) AM_WRITE_LEGACY(nbmj9195_blitter_0_w)
-	AM_RANGE(0xd0, 0xdf) AM_WRITE_LEGACY(nbmj9195_clut_0_w)
+	AM_RANGE(0xc0, 0xc1) AM_READ(nbmj9195_blitter_0_r)
+	AM_RANGE(0xc0, 0xcf) AM_WRITE(nbmj9195_blitter_0_w)
+	AM_RANGE(0xd0, 0xdf) AM_WRITE(nbmj9195_clut_0_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mjkoiura_io_map, AS_IO, 8, nbmj9195_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_IMPORT_FROM( tmpz84c011_regs )
 
-	AM_RANGE(0x80, 0x81) AM_READ_LEGACY(nbmj9195_blitter_0_r)
-	AM_RANGE(0x80, 0x8f) AM_WRITE_LEGACY(nbmj9195_blitter_0_w)
-	AM_RANGE(0x90, 0x9f) AM_WRITE_LEGACY(nbmj9195_clut_0_w)
+	AM_RANGE(0x80, 0x81) AM_READ(nbmj9195_blitter_0_r)
+	AM_RANGE(0x80, 0x8f) AM_WRITE(nbmj9195_blitter_0_w)
+	AM_RANGE(0x90, 0x9f) AM_WRITE(nbmj9195_clut_0_w)
 
 	AM_RANGE(0xa0, 0xa0) AM_WRITE(nbmj9195_sound_w)
 	AM_RANGE(0xa4, 0xa4) AM_WRITENOP
@@ -1076,9 +1076,9 @@ static ADDRESS_MAP_START( mkoiuraa_io_map, AS_IO, 8, nbmj9195_state )
 	AM_RANGE(0xa8, 0xa8) AM_WRITENOP
 	AM_RANGE(0xb0, 0xb0) AM_WRITE(nbmj9195_inputportsel_w)
 
-	AM_RANGE(0xc0, 0xc1) AM_READ_LEGACY(nbmj9195_blitter_0_r)
-	AM_RANGE(0xc0, 0xcf) AM_WRITE_LEGACY(nbmj9195_blitter_0_w)
-	AM_RANGE(0xd0, 0xdf) AM_WRITE_LEGACY(nbmj9195_clut_0_w)
+	AM_RANGE(0xc0, 0xc1) AM_READ(nbmj9195_blitter_0_r)
+	AM_RANGE(0xc0, 0xcf) AM_WRITE(nbmj9195_blitter_0_w)
+	AM_RANGE(0xd0, 0xdf) AM_WRITE(nbmj9195_clut_0_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mscoutm_io_map, AS_IO, 8, nbmj9195_state )
@@ -1091,14 +1091,14 @@ static ADDRESS_MAP_START( mscoutm_io_map, AS_IO, 8, nbmj9195_state )
 
 	AM_RANGE(0xa0, 0xa6) AM_WRITENOP			// nb22090 param ?
 
-	AM_RANGE(0xc0, 0xc1) AM_READ_LEGACY(nbmj9195_blitter_0_r)
-	AM_RANGE(0xc0, 0xcf) AM_WRITE_LEGACY(nbmj9195_blitter_0_w)
+	AM_RANGE(0xc0, 0xc1) AM_READ(nbmj9195_blitter_0_r)
+	AM_RANGE(0xc0, 0xcf) AM_WRITE(nbmj9195_blitter_0_w)
 
-	AM_RANGE(0xd0, 0xdf) AM_WRITE_LEGACY(nbmj9195_clut_0_w)
-	AM_RANGE(0xe0, 0xe1) AM_READ_LEGACY(nbmj9195_blitter_1_r)
-	AM_RANGE(0xe0, 0xef) AM_WRITE_LEGACY(nbmj9195_blitter_1_w)
+	AM_RANGE(0xd0, 0xdf) AM_WRITE(nbmj9195_clut_0_w)
+	AM_RANGE(0xe0, 0xe1) AM_READ(nbmj9195_blitter_1_r)
+	AM_RANGE(0xe0, 0xef) AM_WRITE(nbmj9195_blitter_1_w)
 
-	AM_RANGE(0xf0, 0xff) AM_WRITE_LEGACY(nbmj9195_clut_1_w)
+	AM_RANGE(0xf0, 0xff) AM_WRITE(nbmj9195_clut_1_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( imekura_io_map, AS_IO, 8, nbmj9195_state )
@@ -1111,14 +1111,14 @@ static ADDRESS_MAP_START( imekura_io_map, AS_IO, 8, nbmj9195_state )
 
 	AM_RANGE(0xb0, 0xb6) AM_WRITENOP			// nb22090 param ?
 
-	AM_RANGE(0xc0, 0xc1) AM_READ_LEGACY(nbmj9195_blitter_0_r)
-	AM_RANGE(0xc0, 0xcf) AM_WRITE_LEGACY(nbmj9195_blitter_0_w)
+	AM_RANGE(0xc0, 0xc1) AM_READ(nbmj9195_blitter_0_r)
+	AM_RANGE(0xc0, 0xcf) AM_WRITE(nbmj9195_blitter_0_w)
 
-	AM_RANGE(0xd0, 0xdf) AM_WRITE_LEGACY(nbmj9195_clut_0_w)
+	AM_RANGE(0xd0, 0xdf) AM_WRITE(nbmj9195_clut_0_w)
 
-	AM_RANGE(0xe0, 0xe1) AM_READ_LEGACY(nbmj9195_blitter_1_r)
-	AM_RANGE(0xe0, 0xef) AM_WRITE_LEGACY(nbmj9195_blitter_1_w)
-	AM_RANGE(0xf0, 0xff) AM_WRITE_LEGACY(nbmj9195_clut_1_w)
+	AM_RANGE(0xe0, 0xe1) AM_READ(nbmj9195_blitter_1_r)
+	AM_RANGE(0xe0, 0xef) AM_WRITE(nbmj9195_blitter_1_w)
+	AM_RANGE(0xf0, 0xff) AM_WRITE(nbmj9195_clut_1_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mjegolf_io_map, AS_IO, 8, nbmj9195_state )
@@ -1127,14 +1127,14 @@ static ADDRESS_MAP_START( mjegolf_io_map, AS_IO, 8, nbmj9195_state )
 
 	AM_RANGE(0x80, 0x86) AM_WRITENOP			// nb22090 param ?
 
-	AM_RANGE(0xa0, 0xa1) AM_READ_LEGACY(nbmj9195_blitter_0_r)
-	AM_RANGE(0xa0, 0xaf) AM_WRITE_LEGACY(nbmj9195_blitter_0_w)
-	AM_RANGE(0xb0, 0xbf) AM_WRITE_LEGACY(nbmj9195_clut_0_w)
+	AM_RANGE(0xa0, 0xa1) AM_READ(nbmj9195_blitter_0_r)
+	AM_RANGE(0xa0, 0xaf) AM_WRITE(nbmj9195_blitter_0_w)
+	AM_RANGE(0xb0, 0xbf) AM_WRITE(nbmj9195_clut_0_w)
 
-	AM_RANGE(0xc0, 0xc1) AM_READ_LEGACY(nbmj9195_blitter_1_r)
-	AM_RANGE(0xc0, 0xcf) AM_WRITE_LEGACY(nbmj9195_blitter_1_w)
+	AM_RANGE(0xc0, 0xc1) AM_READ(nbmj9195_blitter_1_r)
+	AM_RANGE(0xc0, 0xcf) AM_WRITE(nbmj9195_blitter_1_w)
 
-	AM_RANGE(0xd0, 0xdf) AM_WRITE_LEGACY(nbmj9195_clut_1_w)
+	AM_RANGE(0xd0, 0xdf) AM_WRITE(nbmj9195_clut_1_w)
 
 	AM_RANGE(0xe0, 0xe0) AM_READ(mscoutm_dipsw_1_r)
 	AM_RANGE(0xe2, 0xe2) AM_READ(mscoutm_dipsw_0_r)

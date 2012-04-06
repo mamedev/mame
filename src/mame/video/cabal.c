@@ -56,31 +56,28 @@ VIDEO_START( cabal )
 
 /**************************************************************************/
 
-WRITE16_HANDLER( cabal_flipscreen_w )
+WRITE16_MEMBER(cabal_state::cabal_flipscreen_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		cabal_state *state = space->machine().driver_data<cabal_state>();
 		int flip = (data & 0x20) ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0;
-		state->m_background_layer->set_flip(flip);
-		state->m_text_layer->set_flip(flip);
+		m_background_layer->set_flip(flip);
+		m_text_layer->set_flip(flip);
 
-		flip_screen_set(space->machine(), data & 0x20);
+		flip_screen_set(machine(), data & 0x20);
 	}
 }
 
-WRITE16_HANDLER( cabal_background_videoram16_w )
+WRITE16_MEMBER(cabal_state::cabal_background_videoram16_w)
 {
-	cabal_state *state = space->machine().driver_data<cabal_state>();
-	COMBINE_DATA(&state->m_videoram[offset]);
-	state->m_background_layer->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_videoram[offset]);
+	m_background_layer->mark_tile_dirty(offset);
 }
 
-WRITE16_HANDLER( cabal_text_videoram16_w )
+WRITE16_MEMBER(cabal_state::cabal_text_videoram16_w)
 {
-	cabal_state *state = space->machine().driver_data<cabal_state>();
-	COMBINE_DATA(&state->m_colorram[offset]);
-	state->m_text_layer->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_colorram[offset]);
+	m_text_layer->mark_tile_dirty(offset);
 }
 
 

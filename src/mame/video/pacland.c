@@ -227,47 +227,42 @@ VIDEO_START( pacland )
 
 ***************************************************************************/
 
-WRITE8_HANDLER( pacland_videoram_w )
+WRITE8_MEMBER(pacland_state::pacland_videoram_w)
 {
-	pacland_state *state = space->machine().driver_data<pacland_state>();
-	state->m_videoram[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset / 2);
+	m_videoram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE8_HANDLER( pacland_videoram2_w )
+WRITE8_MEMBER(pacland_state::pacland_videoram2_w)
 {
-	pacland_state *state = space->machine().driver_data<pacland_state>();
-	state->m_videoram2[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset / 2);
+	m_videoram2[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE8_HANDLER( pacland_scroll0_w )
+WRITE8_MEMBER(pacland_state::pacland_scroll0_w)
 {
-	pacland_state *state = space->machine().driver_data<pacland_state>();
-	state->m_scroll0 = data + 256 * offset;
+	m_scroll0 = data + 256 * offset;
 }
 
-WRITE8_HANDLER( pacland_scroll1_w )
+WRITE8_MEMBER(pacland_state::pacland_scroll1_w)
 {
-	pacland_state *state = space->machine().driver_data<pacland_state>();
-	state->m_scroll1 = data + 256 * offset;
+	m_scroll1 = data + 256 * offset;
 }
 
-WRITE8_HANDLER( pacland_bankswitch_w )
+WRITE8_MEMBER(pacland_state::pacland_bankswitch_w)
 {
-	pacland_state *state = space->machine().driver_data<pacland_state>();
 	int bankaddress;
-	UINT8 *RAM = space->machine().region("maincpu")->base();
+	UINT8 *RAM = machine().region("maincpu")->base();
 
 	bankaddress = 0x10000 + ((data & 0x07) << 13);
-	memory_set_bankptr(space->machine(), "bank1",&RAM[bankaddress]);
+	memory_set_bankptr(machine(), "bank1",&RAM[bankaddress]);
 
 //  pbc = data & 0x20;
 
-	if (state->m_palette_bank != ((data & 0x18) >> 3))
+	if (m_palette_bank != ((data & 0x18) >> 3))
 	{
-		state->m_palette_bank = (data & 0x18) >> 3;
-		switch_palette(space->machine());
+		m_palette_bank = (data & 0x18) >> 3;
+		switch_palette(machine());
 	}
 }
 

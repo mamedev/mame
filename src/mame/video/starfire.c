@@ -37,9 +37,8 @@ VIDEO_START( starfire )
  *
  *************************************/
 
-WRITE8_HANDLER( starfire_colorram_w )
+WRITE8_MEMBER(starfire_state::starfire_colorram_w)
 {
-	starfire_state *state = space->machine().driver_data<starfire_state>();
 
     /* handle writes to the pseudo-color RAM */
 	if ((offset & 0xe0) == 0)
@@ -47,19 +46,19 @@ WRITE8_HANDLER( starfire_colorram_w )
 		int palette_index = (offset & 0x1f) | ((offset & 0x200) >> 4);
 
 		/* set RAM regardless */
-		int cl = (state->m_starfire_vidctrl1 & 0x80) ? state->m_starfire_color : (data & 0x1f);
+		int cl = (m_starfire_vidctrl1 & 0x80) ? m_starfire_color : (data & 0x1f);
 		int cr = (data >> 5) | ((offset & 0x100) >> 5);
-        cr |= (state->m_starfire_vidctrl1 & 0x80) ? (state->m_starfire_color & 0x10) : (data & 0x10);
+        cr |= (m_starfire_vidctrl1 & 0x80) ? (m_starfire_color & 0x10) : (data & 0x10);
 
-		state->m_starfire_colorram[offset & ~0x100] = cl;
-        state->m_starfire_colorram[offset |  0x100] = cr;
+		m_starfire_colorram[offset & ~0x100] = cl;
+        m_starfire_colorram[offset |  0x100] = cr;
 
-		state->m_starfire_color = cl;
+		m_starfire_color = cl;
 
 		/* don't modify the palette unless the TRANS bit is set */
-		if (state->m_starfire_vidctrl1 & 0x40)
+		if (m_starfire_vidctrl1 & 0x40)
 		{
-			state->m_starfire_colors[palette_index] = ((cl & 0x3) << 7) | ((cr & 0xf) << 3) | ((cl & 0x1c) >> 2);
+			m_starfire_colors[palette_index] = ((cl & 0x3) << 7) | ((cr & 0xf) << 3) | ((cl & 0x1c) >> 2);
 		}
 	}
 
@@ -67,32 +66,31 @@ WRITE8_HANDLER( starfire_colorram_w )
 	else
 	{
 		/* set RAM based on CDRM */
-		state->m_starfire_colorram[offset] = (state->m_starfire_vidctrl1 & 0x80) ? state->m_starfire_color : (data & 0x1f);
-		state->m_starfire_color = (state->m_starfire_vidctrl1 & 0x80) ? state->m_starfire_color : (data & 0x1f);
+		m_starfire_colorram[offset] = (m_starfire_vidctrl1 & 0x80) ? m_starfire_color : (data & 0x1f);
+		m_starfire_color = (m_starfire_vidctrl1 & 0x80) ? m_starfire_color : (data & 0x1f);
 	}
 }
 
-READ8_HANDLER( starfire_colorram_r )
+READ8_MEMBER(starfire_state::starfire_colorram_r)
 {
-	starfire_state *state = space->machine().driver_data<starfire_state>();
 
 	/* handle writes to the pseudo-color RAM, which also happen on reads */
 	if ((offset & 0xe0) == 0)
 	{
 		int palette_index = (offset & 0x1f) | ((offset & 0x200) >> 4);
-        int cl = state->m_starfire_colorram[offset & ~0x100];
-        int cr = state->m_starfire_colorram[offset |  0x100];
+        int cl = m_starfire_colorram[offset & ~0x100];
+        int cr = m_starfire_colorram[offset |  0x100];
 
 		/* don't modify the palette unless the TRANS bit is set */
-		if (state->m_starfire_vidctrl1 & 0x40)
+		if (m_starfire_vidctrl1 & 0x40)
 		{
-			state->m_starfire_colors[palette_index] = ((cl & 0x3) << 7) | ((cr & 0xf) << 3) | ((cl & 0x1c) >> 2);
+			m_starfire_colors[palette_index] = ((cl & 0x3) << 7) | ((cr & 0xf) << 3) | ((cl & 0x1c) >> 2);
 		}
 
 		return cl | ((cr & 0x7) << 5);
 	}
 
-	return state->m_starfire_colorram[offset];
+	return m_starfire_colorram[offset];
 }
 
 /*************************************
@@ -101,27 +99,26 @@ READ8_HANDLER( starfire_colorram_r )
  *
  *************************************/
 
-WRITE8_HANDLER( starfire_videoram_w )
+WRITE8_MEMBER(starfire_state::starfire_videoram_w)
 {
 	int sh, lr, dm, ds, mask, d0, dalu;
 	int offset1 = offset & 0x1fff;
 	int offset2 = (offset + 0x100) & 0x1fff;
-	starfire_state *state = space->machine().driver_data<starfire_state>();
 
 	/* PROT */
-	if (!(offset & 0xe0) && !(state->m_starfire_vidctrl1 & 0x20))
+	if (!(offset & 0xe0) && !(m_starfire_vidctrl1 & 0x20))
 		return;
 
 	/* selector 6A */
 	if (offset & 0x2000)
 	{
-		sh = (state->m_starfire_vidctrl >> 1) & 0x07;
-		lr = state->m_starfire_vidctrl & 0x01;
+		sh = (m_starfire_vidctrl >> 1) & 0x07;
+		lr = m_starfire_vidctrl & 0x01;
 	}
 	else
 	{
-		sh = (state->m_starfire_vidctrl >> 5) & 0x07;
-		lr = (state->m_starfire_vidctrl >> 4) & 0x01;
+		sh = (m_starfire_vidctrl >> 5) & 0x07;
+		lr = (m_starfire_vidctrl >> 4) & 0x01;
 	}
 
 	/* mirror bits 5B/5C/5D/5E */
@@ -137,18 +134,18 @@ WRITE8_HANDLER( starfire_videoram_w )
 	/* ROLL */
 	if ((offset & 0x1f00) == 0x1f00)
 	{
-		if (state->m_starfire_vidctrl1 & 0x10)
+		if (m_starfire_vidctrl1 & 0x10)
 			mask &= 0x00ff;
 		else
 			mask &= 0xff00;
 	}
 
 	/* ALU 8B/8D */
-	d0 = (state->m_starfire_videoram[offset1] << 8) | state->m_starfire_videoram[offset2];
+	d0 = (m_starfire_videoram[offset1] << 8) | m_starfire_videoram[offset2];
 	dalu = d0 & ~mask;
 	d0 &= mask;
 	ds &= mask;
-	switch (~state->m_starfire_vidctrl1 & 15)
+	switch (~m_starfire_vidctrl1 & 15)
 	{
 		case 0:		dalu |= ds ^ mask;				break;
 		case 1:		dalu |= (ds | d0) ^ mask;		break;
@@ -169,31 +166,30 @@ WRITE8_HANDLER( starfire_videoram_w )
 	}
 
 	/* final output */
-	state->m_starfire_videoram[offset1] = dalu >> 8;
-	state->m_starfire_videoram[offset2] = dalu;
+	m_starfire_videoram[offset1] = dalu >> 8;
+	m_starfire_videoram[offset2] = dalu;
 
 	/* color output */
-	if (!(offset & 0x2000) && !(state->m_starfire_vidctrl1 & 0x80))
+	if (!(offset & 0x2000) && !(m_starfire_vidctrl1 & 0x80))
 	{
 		if (mask & 0xff00)
-			state->m_starfire_colorram[offset1] = state->m_starfire_color;
+			m_starfire_colorram[offset1] = m_starfire_color;
 		if (mask & 0x00ff)
-			state->m_starfire_colorram[offset2] = state->m_starfire_color;
+			m_starfire_colorram[offset2] = m_starfire_color;
 	}
 }
 
-READ8_HANDLER( starfire_videoram_r )
+READ8_MEMBER(starfire_state::starfire_videoram_r)
 {
 	int sh, mask, d0;
 	int offset1 = offset & 0x1fff;
 	int offset2 = (offset + 0x100) & 0x1fff;
-    starfire_state *state = space->machine().driver_data<starfire_state>();
 
 	/* selector 6A */
 	if (offset & 0x2000)
-		sh = (state->m_starfire_vidctrl >> 1) & 0x07;
+		sh = (m_starfire_vidctrl >> 1) & 0x07;
 	else
-		sh = (state->m_starfire_vidctrl >> 5) & 0x07;
+		sh = (m_starfire_vidctrl >> 5) & 0x07;
 
 	/* shifters 6D/6E */
 	mask = 0xff00 >> sh;
@@ -201,14 +197,14 @@ READ8_HANDLER( starfire_videoram_r )
 	/* ROLL */
 	if ((offset & 0x1f00) == 0x1f00)
 	{
-		if (state->m_starfire_vidctrl1 & 0x10)
+		if (m_starfire_vidctrl1 & 0x10)
 			mask &= 0x00ff;
 		else
 			mask &= 0xff00;
 	}
 
 	/* munge the results */
-	d0 = (state->m_starfire_videoram[offset1] & (mask >> 8)) | (state->m_starfire_videoram[offset2] & mask);
+	d0 = (m_starfire_videoram[offset1] & (mask >> 8)) | (m_starfire_videoram[offset2] & mask);
 	d0 = (d0 << sh) | (d0 >> (8 - sh));
 	return d0 & 0xff;
 }

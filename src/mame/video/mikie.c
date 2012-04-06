@@ -87,39 +87,36 @@ PALETTE_INIT( mikie )
 	}
 }
 
-WRITE8_HANDLER( mikie_videoram_w )
+WRITE8_MEMBER(mikie_state::mikie_videoram_w)
 {
-	mikie_state *state = space->machine().driver_data<mikie_state>();
 
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( mikie_colorram_w )
+WRITE8_MEMBER(mikie_state::mikie_colorram_w)
 {
-	mikie_state *state = space->machine().driver_data<mikie_state>();
 
-	state->m_colorram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_colorram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( mikie_palettebank_w )
+WRITE8_MEMBER(mikie_state::mikie_palettebank_w)
 {
-	mikie_state *state = space->machine().driver_data<mikie_state>();
 
-	if (state->m_palettebank != (data & 0x07))
+	if (m_palettebank != (data & 0x07))
 	{
-		state->m_palettebank = data & 0x07;
-		space->machine().tilemap().mark_all_dirty();
+		m_palettebank = data & 0x07;
+		machine().tilemap().mark_all_dirty();
 	}
 }
 
-WRITE8_HANDLER( mikie_flipscreen_w )
+WRITE8_MEMBER(mikie_state::mikie_flipscreen_w)
 {
-	if (flip_screen_get(space->machine()) != (data & 0x01))
+	if (flip_screen_get(machine()) != (data & 0x01))
 	{
-		flip_screen_set(space->machine(), data & 0x01);
-		space->machine().tilemap().mark_all_dirty();
+		flip_screen_set(machine(), data & 0x01);
+		machine().tilemap().mark_all_dirty();
 	}
 }
 

@@ -91,40 +91,35 @@ PALETTE_INIT( suprridr )
  *
  *************************************/
 
-WRITE8_HANDLER( suprridr_flipx_w )
+WRITE8_MEMBER(suprridr_state::suprridr_flipx_w)
 {
-	suprridr_state *state = space->machine().driver_data<suprridr_state>();
-	state->m_flipx = data & 1;
-	space->machine().tilemap().set_flip_all((state->m_flipx ? TILEMAP_FLIPX : 0) | (state->m_flipy ? TILEMAP_FLIPY : 0));
+	m_flipx = data & 1;
+	machine().tilemap().set_flip_all((m_flipx ? TILEMAP_FLIPX : 0) | (m_flipy ? TILEMAP_FLIPY : 0));
 }
 
 
-WRITE8_HANDLER( suprridr_flipy_w )
+WRITE8_MEMBER(suprridr_state::suprridr_flipy_w)
 {
-	suprridr_state *state = space->machine().driver_data<suprridr_state>();
-	state->m_flipy = data & 1;
-	space->machine().tilemap().set_flip_all((state->m_flipx ? TILEMAP_FLIPX : 0) | (state->m_flipy ? TILEMAP_FLIPY : 0));
+	m_flipy = data & 1;
+	machine().tilemap().set_flip_all((m_flipx ? TILEMAP_FLIPX : 0) | (m_flipy ? TILEMAP_FLIPY : 0));
 }
 
 
-WRITE8_HANDLER( suprridr_fgdisable_w )
+WRITE8_MEMBER(suprridr_state::suprridr_fgdisable_w)
 {
-	suprridr_state *state = space->machine().driver_data<suprridr_state>();
-	state->m_fg_tilemap->enable(~data & 1);
+	m_fg_tilemap->enable(~data & 1);
 }
 
 
-WRITE8_HANDLER( suprridr_fgscrolly_w )
+WRITE8_MEMBER(suprridr_state::suprridr_fgscrolly_w)
 {
-	suprridr_state *state = space->machine().driver_data<suprridr_state>();
-	state->m_fg_tilemap->set_scrolly(0, data);
+	m_fg_tilemap->set_scrolly(0, data);
 }
 
 
-WRITE8_HANDLER( suprridr_bgscrolly_w )
+WRITE8_MEMBER(suprridr_state::suprridr_bgscrolly_w)
 {
-	suprridr_state *state = space->machine().driver_data<suprridr_state>();
-	state->m_bg_tilemap->set_scrolly(0, data);
+	m_bg_tilemap->set_scrolly(0, data);
 }
 
 
@@ -142,20 +137,18 @@ int suprridr_is_screen_flipped(running_machine &machine)
  *
  *************************************/
 
-WRITE8_HANDLER( suprridr_bgram_w )
+WRITE8_MEMBER(suprridr_state::suprridr_bgram_w)
 {
-	suprridr_state *state = space->machine().driver_data<suprridr_state>();
-	state->m_bgram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
-	state->m_bg_tilemap_noscroll->mark_tile_dirty(offset);
+	m_bgram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
+	m_bg_tilemap_noscroll->mark_tile_dirty(offset);
 }
 
 
-WRITE8_HANDLER( suprridr_fgram_w )
+WRITE8_MEMBER(suprridr_state::suprridr_fgram_w)
 {
-	suprridr_state *state = space->machine().driver_data<suprridr_state>();
-	state->m_fgram[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset);
+	m_fgram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 

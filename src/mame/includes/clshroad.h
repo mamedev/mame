@@ -13,14 +13,14 @@ public:
 	UINT8 *m_spriteram;
 	size_t m_spriteram_size;
 	DECLARE_READ8_MEMBER(clshroad_input_r);
+	DECLARE_WRITE8_MEMBER(clshroad_flipscreen_w);
+	DECLARE_WRITE8_MEMBER(clshroad_vram_0_w);
+	DECLARE_WRITE8_MEMBER(clshroad_vram_1_w);
 };
 
 
 /*----------- defined in video/clshroad.c -----------*/
 
-WRITE8_HANDLER( clshroad_vram_0_w );
-WRITE8_HANDLER( clshroad_vram_1_w );
-WRITE8_HANDLER( clshroad_flipscreen_w );
 
 PALETTE_INIT( firebatl );
 PALETTE_INIT( clshroad );

@@ -8,43 +8,39 @@
 #include "includes/battlex.h"
 
 
-WRITE8_HANDLER( battlex_palette_w )
+WRITE8_MEMBER(battlex_state::battlex_palette_w)
 {
-	palette_set_color_rgb(space->machine(), offset, pal1bit(data >> 0), pal1bit(data >> 2), pal1bit(data >> 1));
+	palette_set_color_rgb(machine(), offset, pal1bit(data >> 0), pal1bit(data >> 2), pal1bit(data >> 1));
 }
 
-WRITE8_HANDLER( battlex_scroll_x_lsb_w )
+WRITE8_MEMBER(battlex_state::battlex_scroll_x_lsb_w)
 {
-	battlex_state *state = space->machine().driver_data<battlex_state>();
-	state->m_scroll_lsb = data;
+	m_scroll_lsb = data;
 }
 
-WRITE8_HANDLER( battlex_scroll_x_msb_w )
+WRITE8_MEMBER(battlex_state::battlex_scroll_x_msb_w)
 {
-	battlex_state *state = space->machine().driver_data<battlex_state>();
-	state->m_scroll_msb = data;
+	m_scroll_msb = data;
 }
 
-WRITE8_HANDLER( battlex_scroll_starfield_w )
+WRITE8_MEMBER(battlex_state::battlex_scroll_starfield_w)
 {
 }
 
-WRITE8_HANDLER( battlex_videoram_w )
+WRITE8_MEMBER(battlex_state::battlex_videoram_w)
 {
-	battlex_state *state = space->machine().driver_data<battlex_state>();
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset / 2);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE8_HANDLER( battlex_flipscreen_w )
+WRITE8_MEMBER(battlex_state::battlex_flipscreen_w)
 {
-	battlex_state *state = space->machine().driver_data<battlex_state>();
-	state->m_starfield_enabled = data & 0x10;
+	m_starfield_enabled = data & 0x10;
 
-	if (flip_screen_get(space->machine()) != (data >> 7))
+	if (flip_screen_get(machine()) != (data >> 7))
 	{
-		flip_screen_set(space->machine(), data & 0x80);
-		space->machine().tilemap().mark_all_dirty();
+		flip_screen_set(machine(), data & 0x80);
+		machine().tilemap().mark_all_dirty();
 	}
 }
 

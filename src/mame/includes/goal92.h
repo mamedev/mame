@@ -34,6 +34,11 @@ public:
 	DECLARE_WRITE16_MEMBER(goal92_sound_command_w);
 	DECLARE_READ16_MEMBER(goal92_inputs_r);
 	DECLARE_WRITE8_MEMBER(adpcm_data_w);
+	DECLARE_READ16_MEMBER(goal92_fg_bank_r);
+	DECLARE_WRITE16_MEMBER(goal92_fg_bank_w);
+	DECLARE_WRITE16_MEMBER(goal92_text_w);
+	DECLARE_WRITE16_MEMBER(goal92_background_w);
+	DECLARE_WRITE16_MEMBER(goal92_foreground_w);
 };
 
 
@@ -42,11 +47,6 @@ public:
 
 /*----------- defined in video/goal92.c -----------*/
 
-WRITE16_HANDLER( goal92_background_w );
-WRITE16_HANDLER( goal92_foreground_w );
-WRITE16_HANDLER( goal92_text_w );
-WRITE16_HANDLER( goal92_fg_bank_w );
-READ16_HANDLER( goal92_fg_bank_r );
 
 VIDEO_START( goal92 );
 SCREEN_UPDATE_IND16( goal92 );

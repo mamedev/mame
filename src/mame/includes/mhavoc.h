@@ -37,6 +37,19 @@ public:
 	UINT8 m_speech_write_buffer;
 	DECLARE_READ8_MEMBER(dual_pokey_r);
 	DECLARE_WRITE8_MEMBER(dual_pokey_w);
+	DECLARE_WRITE8_MEMBER(mhavoc_alpha_irq_ack_w);
+	DECLARE_WRITE8_MEMBER(mhavoc_gamma_irq_ack_w);
+	DECLARE_WRITE8_MEMBER(mhavoc_gamma_w);
+	DECLARE_READ8_MEMBER(mhavoc_alpha_r);
+	DECLARE_WRITE8_MEMBER(mhavoc_alpha_w);
+	DECLARE_READ8_MEMBER(mhavoc_gamma_r);
+	DECLARE_WRITE8_MEMBER(mhavoc_ram_banksel_w);
+	DECLARE_WRITE8_MEMBER(mhavoc_rom_banksel_w);
+	DECLARE_WRITE8_MEMBER(mhavoc_out_0_w);
+	DECLARE_WRITE8_MEMBER(alphaone_out_0_w);
+	DECLARE_WRITE8_MEMBER(mhavoc_out_1_w);
+	DECLARE_WRITE8_MEMBER(mhavocrv_speech_data_w);
+	DECLARE_WRITE8_MEMBER(mhavocrv_speech_strobe_w);
 };
 
 
@@ -44,21 +57,13 @@ public:
 
 TIMER_DEVICE_CALLBACK( mhavoc_cpu_irq_clock );
 
-WRITE8_HANDLER( mhavoc_alpha_irq_ack_w );
-WRITE8_HANDLER( mhavoc_gamma_irq_ack_w );
 
 MACHINE_START( mhavoc );
 MACHINE_RESET( mhavoc );
 DRIVER_INIT( mhavocrv );
 
-WRITE8_HANDLER( mhavoc_gamma_w );
-READ8_HANDLER( mhavoc_alpha_r );
 
-WRITE8_HANDLER( mhavoc_alpha_w );
-READ8_HANDLER( mhavoc_gamma_r );
 
-WRITE8_HANDLER( mhavoc_ram_banksel_w );
-WRITE8_HANDLER( mhavoc_rom_banksel_w );
 
 CUSTOM_INPUT( tms5220_r );
 CUSTOM_INPUT( gamma_rcvd_r );
@@ -67,8 +72,5 @@ CUSTOM_INPUT( alpha_rcvd_r );
 CUSTOM_INPUT( alpha_xmtd_r );
 CUSTOM_INPUT( mhavoc_bit67_r );
 
-WRITE8_HANDLER( mhavoc_out_0_w );
-WRITE8_HANDLER( alphaone_out_0_w );
-WRITE8_HANDLER( mhavoc_out_1_w );
 
 

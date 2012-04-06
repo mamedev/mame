@@ -122,21 +122,19 @@ custom chip capable of four rather than three tilemaps.)
 
 *******************************************************************/
 
-READ16_HANDLER( wgp_pivram_word_r )
+READ16_MEMBER(wgp_state::wgp_pivram_word_r)
 {
-	wgp_state *state = space->machine().driver_data<wgp_state>();
-	return state->m_pivram[offset];
+	return m_pivram[offset];
 }
 
-WRITE16_HANDLER( wgp_pivram_word_w )
+WRITE16_MEMBER(wgp_state::wgp_pivram_word_w)
 {
-	wgp_state *state = space->machine().driver_data<wgp_state>();
 
-	COMBINE_DATA(&state->m_pivram[offset]);
+	COMBINE_DATA(&m_pivram[offset]);
 
 	if (offset < 0x3000)
 	{
-		state->m_piv_tilemap[(offset / 0x1000)]->mark_tile_dirty((offset % 0x1000));
+		m_piv_tilemap[(offset / 0x1000)]->mark_tile_dirty((offset % 0x1000));
 	}
 	else if ((offset >= 0x3400) && (offset < 0x4000))
 	{
@@ -144,54 +142,52 @@ WRITE16_HANDLER( wgp_pivram_word_w )
 	}
 	else if ((offset >= 0x8000) && (offset < 0xb000))
 	{
-		state->m_piv_tilemap[((offset - 0x8000)/ 0x1000)]->mark_tile_dirty((offset % 0x1000));
+		m_piv_tilemap[((offset - 0x8000)/ 0x1000)]->mark_tile_dirty((offset % 0x1000));
 	}
 }
 
-READ16_HANDLER( wgp_piv_ctrl_word_r )
+READ16_MEMBER(wgp_state::wgp_piv_ctrl_word_r)
 {
-	wgp_state *state = space->machine().driver_data<wgp_state>();
-	return state->m_piv_ctrlram[offset];
+	return m_piv_ctrlram[offset];
 }
 
-WRITE16_HANDLER( wgp_piv_ctrl_word_w )
+WRITE16_MEMBER(wgp_state::wgp_piv_ctrl_word_w)
 {
-	wgp_state *state = space->machine().driver_data<wgp_state>();
 	UINT16 a, b;
 
-	COMBINE_DATA(&state->m_piv_ctrlram[offset]);
-	data = state->m_piv_ctrlram[offset];
+	COMBINE_DATA(&m_piv_ctrlram[offset]);
+	data = m_piv_ctrlram[offset];
 
 	switch (offset)
 	{
 		case 0x00:
 			a = -data;
 			b = (a & 0xffe0) >> 1;	/* kill bit 4 */
-			state->m_piv_scrollx[0] = (a & 0xf) | b;
+			m_piv_scrollx[0] = (a & 0xf) | b;
 			break;
 
 		case 0x01:
 			a = -data;
 			b = (a & 0xffe0) >> 1;
-			state->m_piv_scrollx[1] = (a & 0xf) | b;
+			m_piv_scrollx[1] = (a & 0xf) | b;
 			break;
 
 		case 0x02:
 			a = -data;
 			b = (a & 0xffe0) >> 1;
-			state->m_piv_scrollx[2] = (a & 0xf) | b;
+			m_piv_scrollx[2] = (a & 0xf) | b;
 			break;
 
 		case 0x03:
-			state->m_piv_scrolly[0] = data;
+			m_piv_scrolly[0] = data;
 			break;
 
 		case 0x04:
-			state->m_piv_scrolly[1] = data;
+			m_piv_scrolly[1] = data;
 			break;
 
 		case 0x05:
-			state->m_piv_scrolly[2] = data;
+			m_piv_scrolly[2] = data;
 			break;
 
 		case 0x06:
@@ -201,24 +197,24 @@ WRITE16_HANDLER( wgp_piv_ctrl_word_w )
                      seen on Wgp stages 4,5,7 in which piv 2 used
                      for cloud or scenery wandering up screen */
 
-			state->m_piv_ctrl_reg = data;
+			m_piv_ctrl_reg = data;
 			break;
 
 		case 0x08:
 			/* piv 0 y zoom (0x7f = normal, not seen others) */
-			state->m_piv_zoom[0] = data;
+			m_piv_zoom[0] = data;
 			break;
 
 		case 0x09:
 			/* piv 1 y zoom (0x7f = normal, values 0 &
                   0xff7f-ffbc in Wgp2) */
-			state->m_piv_zoom[1] = data;
+			m_piv_zoom[1] = data;
 			break;
 
 		case 0x0a:
 			/* piv 2 y zoom (0x7f = normal, values 0 &
                   0xff7f-ffbc in Wgp2, 0-0x98 in Wgp round 4/5) */
-			state->m_piv_zoom[2] = data;
+			m_piv_zoom[2] = data;
 			break;
 	}
 }

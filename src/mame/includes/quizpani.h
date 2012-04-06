@@ -11,14 +11,14 @@ public:
 	tilemap_t *m_txt_tilemap;
 	int m_bgbank;
 	int m_txtbank;
+	DECLARE_WRITE16_MEMBER(quizpani_bg_videoram_w);
+	DECLARE_WRITE16_MEMBER(quizpani_txt_videoram_w);
+	DECLARE_WRITE16_MEMBER(quizpani_tilesbank_w);
 };
 
 
 /*----------- defined in video/quizpani.c -----------*/
 
-WRITE16_HANDLER( quizpani_bg_videoram_w );
-WRITE16_HANDLER( quizpani_txt_videoram_w );
-WRITE16_HANDLER( quizpani_tilesbank_w );
 
 VIDEO_START( quizpani );
 SCREEN_UPDATE_IND16( quizpani );

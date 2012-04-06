@@ -63,6 +63,51 @@ public:
 	UINT8 m_gfxbank;
 	UINT16 m_last_scanline;
 	emu_timer *m_scanline_timer;
+	DECLARE_READ8_MEMBER(cerberus_dial_1_r);
+	DECLARE_READ8_MEMBER(cerberus_dial_2_r);
+	DECLARE_WRITE8_MEMBER(alleymas_joystick_kludge);
+	DECLARE_READ8_MEMBER(dangerz_input_y_r);
+	DECLARE_READ8_MEMBER(dangerz_input_x_r);
+	DECLARE_READ8_MEMBER(dangerz_input_upper_r);
+	DECLARE_READ8_MEMBER(redline_pedal_1_r);
+	DECLARE_READ8_MEMBER(redline_pedal_2_r);
+	DECLARE_READ8_MEMBER(redline_wheel_1_r);
+	DECLARE_READ8_MEMBER(redline_wheel_2_r);
+	DECLARE_READ8_MEMBER(offroad_wheel_1_r);
+	DECLARE_READ8_MEMBER(offroad_wheel_2_r);
+	DECLARE_READ8_MEMBER(offroad_wheel_3_r);
+	DECLARE_READ8_MEMBER(ataxx_trackball_r);
+	DECLARE_READ8_MEMBER(indyheat_wheel_r);
+	DECLARE_READ8_MEMBER(indyheat_analog_r);
+	DECLARE_WRITE8_MEMBER(indyheat_analog_w);
+	DECLARE_WRITE8_MEMBER(leland_master_alt_bankswitch_w);
+	DECLARE_WRITE8_MEMBER(leland_battery_ram_w);
+	DECLARE_WRITE8_MEMBER(ataxx_battery_ram_w);
+	DECLARE_READ8_MEMBER(leland_master_analog_key_r);
+	DECLARE_WRITE8_MEMBER(leland_master_analog_key_w);
+	DECLARE_READ8_MEMBER(leland_master_input_r);
+	DECLARE_WRITE8_MEMBER(leland_master_output_w);
+	DECLARE_READ8_MEMBER(ataxx_master_input_r);
+	DECLARE_WRITE8_MEMBER(ataxx_master_output_w);
+	DECLARE_WRITE8_MEMBER(leland_gated_paletteram_w);
+	DECLARE_READ8_MEMBER(leland_gated_paletteram_r);
+	DECLARE_WRITE8_MEMBER(ataxx_paletteram_and_misc_w);
+	DECLARE_READ8_MEMBER(ataxx_paletteram_and_misc_r);
+	DECLARE_WRITE8_MEMBER(leland_slave_small_banksw_w);
+	DECLARE_WRITE8_MEMBER(leland_slave_large_banksw_w);
+	DECLARE_WRITE8_MEMBER(ataxx_slave_banksw_w);
+	DECLARE_READ8_MEMBER(leland_raster_r);
+	DECLARE_WRITE8_MEMBER(leland_scroll_w);
+	DECLARE_WRITE8_MEMBER(leland_master_video_addr_w);
+	DECLARE_WRITE8_MEMBER(leland_mvram_port_w);
+	DECLARE_READ8_MEMBER(leland_mvram_port_r);
+	DECLARE_WRITE8_MEMBER(leland_slave_video_addr_w);
+	DECLARE_WRITE8_MEMBER(leland_svram_port_w);
+	DECLARE_READ8_MEMBER(leland_svram_port_r);
+	DECLARE_WRITE8_MEMBER(ataxx_mvram_port_w);
+	DECLARE_WRITE8_MEMBER(ataxx_svram_port_w);
+	DECLARE_READ8_MEMBER(ataxx_mvram_port_r);
+	DECLARE_READ8_MEMBER(ataxx_svram_port_r);
 };
 
 
@@ -74,29 +119,12 @@ public:
 #define SERIAL_TYPE_ENCRYPT		3
 #define SERIAL_TYPE_ENCRYPT_XOR	4
 
-READ8_HANDLER( cerberus_dial_1_r );
-READ8_HANDLER( cerberus_dial_2_r );
 
-WRITE8_HANDLER( alleymas_joystick_kludge );
 
-READ8_HANDLER( dangerz_input_y_r );
-READ8_HANDLER( dangerz_input_x_r );
-READ8_HANDLER( dangerz_input_upper_r );
 
-READ8_HANDLER( redline_pedal_1_r );
-READ8_HANDLER( redline_pedal_2_r );
-READ8_HANDLER( redline_wheel_1_r );
-READ8_HANDLER( redline_wheel_2_r );
 
-READ8_HANDLER( offroad_wheel_1_r );
-READ8_HANDLER( offroad_wheel_2_r );
-READ8_HANDLER( offroad_wheel_3_r );
 
-READ8_HANDLER( ataxx_trackball_r );
 
-READ8_HANDLER( indyheat_wheel_r );
-READ8_HANDLER( indyheat_analog_r );
-WRITE8_HANDLER( indyheat_analog_w );
 
 MACHINE_START( leland );
 MACHINE_RESET( leland );
@@ -105,7 +133,6 @@ MACHINE_RESET( ataxx );
 
 INTERRUPT_GEN( leland_master_interrupt );
 
-WRITE8_HANDLER( leland_master_alt_bankswitch_w );
 void cerberus_bankswitch(running_machine &machine);
 void mayhem_bankswitch(running_machine &machine);
 void dangerz_bankswitch(running_machine &machine);
@@ -121,30 +148,14 @@ void ataxx_init_eeprom(running_machine &machine, const UINT16 *data);
 READ8_DEVICE_HANDLER( ataxx_eeprom_r );
 WRITE8_DEVICE_HANDLER( ataxx_eeprom_w );
 
-WRITE8_HANDLER( leland_battery_ram_w );
-WRITE8_HANDLER( ataxx_battery_ram_w );
 
-READ8_HANDLER( leland_master_analog_key_r );
-WRITE8_HANDLER( leland_master_analog_key_w );
 
-READ8_HANDLER( leland_master_input_r );
-WRITE8_HANDLER( leland_master_output_w );
-READ8_HANDLER( ataxx_master_input_r );
-WRITE8_HANDLER( ataxx_master_output_w );
 
-WRITE8_HANDLER( leland_gated_paletteram_w );
-READ8_HANDLER( leland_gated_paletteram_r );
-WRITE8_HANDLER( ataxx_paletteram_and_misc_w );
-READ8_HANDLER( ataxx_paletteram_and_misc_r );
 
 READ8_DEVICE_HANDLER( leland_sound_port_r );
 WRITE8_DEVICE_HANDLER( leland_sound_port_w );
 
-WRITE8_HANDLER( leland_slave_small_banksw_w );
-WRITE8_HANDLER( leland_slave_large_banksw_w );
-WRITE8_HANDLER( ataxx_slave_banksw_w );
 
-READ8_HANDLER( leland_raster_r );
 
 void leland_rotate_memory(running_machine &machine, const char *cpuname);
 
@@ -172,21 +183,10 @@ ADDRESS_MAP_EXTERN(ataxx_80186_map_io, 16);
 
 /*----------- defined in video/leland.c -----------*/
 
-WRITE8_HANDLER( leland_scroll_w );
 WRITE8_DEVICE_HANDLER( leland_gfx_port_w );
 
-WRITE8_HANDLER( leland_master_video_addr_w );
-WRITE8_HANDLER( leland_mvram_port_w );
-READ8_HANDLER( leland_mvram_port_r );
 
-WRITE8_HANDLER( leland_slave_video_addr_w );
-WRITE8_HANDLER( leland_svram_port_w );
-READ8_HANDLER( leland_svram_port_r );
 
-WRITE8_HANDLER( ataxx_mvram_port_w );
-WRITE8_HANDLER( ataxx_svram_port_w );
-READ8_HANDLER( ataxx_mvram_port_r );
-READ8_HANDLER( ataxx_svram_port_r );
 
 MACHINE_CONFIG_EXTERN( leland_video );
 MACHINE_CONFIG_EXTERN( ataxx_video );

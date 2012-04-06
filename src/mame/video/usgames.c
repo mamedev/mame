@@ -50,18 +50,16 @@ VIDEO_START(usgames)
 }
 
 
-WRITE8_HANDLER( usgames_videoram_w )
+WRITE8_MEMBER(usgames_state::usgames_videoram_w)
 {
-	usgames_state *state = space->machine().driver_data<usgames_state>();
-	state->m_videoram[offset] = data;
-	state->m_tilemap->mark_tile_dirty(offset/2);
+	m_videoram[offset] = data;
+	m_tilemap->mark_tile_dirty(offset/2);
 }
 
-WRITE8_HANDLER( usgames_charram_w )
+WRITE8_MEMBER(usgames_state::usgames_charram_w)
 {
-	usgames_state *state = space->machine().driver_data<usgames_state>();
-	state->m_charram[offset] = data;
-	gfx_element_mark_dirty(space->machine().gfx[0], offset/8);
+	m_charram[offset] = data;
+	gfx_element_mark_dirty(machine().gfx[0], offset/8);
 }
 
 

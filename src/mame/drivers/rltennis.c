@@ -89,7 +89,7 @@ static ADDRESS_MAP_START( rltennis_main, AS_PROGRAM, 16, rltennis_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
-	AM_RANGE(0x700000, 0x70000f) AM_WRITE_LEGACY(rlt_blitter_w)
+	AM_RANGE(0x700000, 0x70000f) AM_WRITE(rlt_blitter_w)
 	AM_RANGE(0x720000, 0x720001) AM_DEVWRITE8("ramdac",ramdac_device,index_w,0x00ff)
 	AM_RANGE(0x720002, 0x720003) AM_DEVREADWRITE8("ramdac",ramdac_device,pal_r,pal_w,0x00ff)
 	AM_RANGE(0x720006, 0x720007) AM_DEVWRITE8("ramdac",ramdac_device,index_r_w,0x00ff)

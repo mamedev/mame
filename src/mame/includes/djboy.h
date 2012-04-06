@@ -59,15 +59,15 @@ public:
 	DECLARE_WRITE8_MEMBER(beast_p2_w);
 	DECLARE_READ8_MEMBER(beast_p3_r);
 	DECLARE_WRITE8_MEMBER(beast_p3_w);
+	DECLARE_WRITE8_MEMBER(djboy_scrollx_w);
+	DECLARE_WRITE8_MEMBER(djboy_scrolly_w);
+	DECLARE_WRITE8_MEMBER(djboy_videoram_w);
+	DECLARE_WRITE8_MEMBER(djboy_paletteram_w);
 };
 
 
 /*----------- defined in video/djboy.c -----------*/
 
-WRITE8_HANDLER( djboy_scrollx_w );
-WRITE8_HANDLER( djboy_scrolly_w );
-WRITE8_HANDLER( djboy_videoram_w );
-WRITE8_HANDLER( djboy_paletteram_w );
 
 VIDEO_START( djboy );
 SCREEN_UPDATE_IND16( djboy );

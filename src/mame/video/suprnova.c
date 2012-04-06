@@ -88,48 +88,47 @@ static void suprnova_draw_roz(bitmap_ind16 &bitmap, bitmap_ind8& bitmapflags, co
 }
 
 
-WRITE32_HANDLER ( skns_pal_regs_w )
+WRITE32_MEMBER(skns_state::skns_pal_regs_w)
 {
-	skns_state *state = space->machine().driver_data<skns_state>();
-	COMBINE_DATA(&state->m_pal_regs[offset]);
-	state->m_palette_updated =1;
+	COMBINE_DATA(&m_pal_regs[offset]);
+	m_palette_updated =1;
 
 	switch ( offset )
 	{
 	/* RWRA regs are for SPRITES */
 
 	case (0x00/4): // RWRA0
-		if( state->m_use_spc_bright != (data&1) ) {
-			state->m_use_spc_bright = data&1;
-			state->m_spc_changed = 1;
+		if( m_use_spc_bright != (data&1) ) {
+			m_use_spc_bright = data&1;
+			m_spc_changed = 1;
 		}
-		state->m_alt_enable_sprites = (data>>8)&1;
+		m_alt_enable_sprites = (data>>8)&1;
 
 
 		break;
 	case (0x04/4): // RWRA1
-		if( state->m_bright_spc_g != (data&0xff) ) {
-			state->m_bright_spc_g = data&0xff;
-			state->m_spc_changed = 1;
+		if( m_bright_spc_g != (data&0xff) ) {
+			m_bright_spc_g = data&0xff;
+			m_spc_changed = 1;
 		}
-		state->m_bright_spc_g_trans = (data>>8) &0xff;
+		m_bright_spc_g_trans = (data>>8) &0xff;
 
 
 		break;
 	case (0x08/4): // RWRA2
-		if( state->m_bright_spc_r != (data&0xff) ) {
-			state->m_bright_spc_r = data&0xff;
-			state->m_spc_changed = 1;
+		if( m_bright_spc_r != (data&0xff) ) {
+			m_bright_spc_r = data&0xff;
+			m_spc_changed = 1;
 		}
-		state->m_bright_spc_r_trans = (data>>8) &0xff;
+		m_bright_spc_r_trans = (data>>8) &0xff;
 
 		break;
 	case (0x0C/4): // RWRA3
-		if( state->m_bright_spc_b != (data&0xff) ) {
-			state->m_bright_spc_b = data&0xff;
-			state->m_spc_changed = 1;
+		if( m_bright_spc_b != (data&0xff) ) {
+			m_bright_spc_b = data&0xff;
+			m_spc_changed = 1;
 		}
-		state->m_bright_spc_b_trans = (data>>8)&0xff;
+		m_bright_spc_b_trans = (data>>8)&0xff;
 
 
 		break;
@@ -137,70 +136,69 @@ WRITE32_HANDLER ( skns_pal_regs_w )
 	/* RWRB regs are for BACKGROUND */
 
 	case (0x10/4): // RWRB0
-		if( state->m_use_v3_bright != (data&1) ) {
-			state->m_use_v3_bright = data&1;
-			state->m_v3_changed = 1;
+		if( m_use_v3_bright != (data&1) ) {
+			m_use_v3_bright = data&1;
+			m_v3_changed = 1;
 		}
 
-		state->m_alt_enable_background = (data>>8)&1;
+		m_alt_enable_background = (data>>8)&1;
 
 		break;
 	case (0x14/4): // RWRB1
-		if( state->m_bright_v3_g != (data&0xff) ) {
-			state->m_bright_v3_g = data&0xff;
-			state->m_v3_changed = 1;
+		if( m_bright_v3_g != (data&0xff) ) {
+			m_bright_v3_g = data&0xff;
+			m_v3_changed = 1;
 		}
 
-		state->m_bright_v3_g_trans = (data>>8)&0xff;
+		m_bright_v3_g_trans = (data>>8)&0xff;
 
 		break;
 	case (0x18/4): // RWRB2
-		if( state->m_bright_v3_r != (data&0xff) ) {
-			state->m_bright_v3_r = data&0xff;
-			state->m_v3_changed = 1;
+		if( m_bright_v3_r != (data&0xff) ) {
+			m_bright_v3_r = data&0xff;
+			m_v3_changed = 1;
 		}
 
-		state->m_bright_v3_r_trans = (data>>8)&0xff;
+		m_bright_v3_r_trans = (data>>8)&0xff;
 
 		break;
 	case (0x1C/4): // RWRB3
-		if( state->m_bright_v3_b != (data&0xff) ) {
-			state->m_bright_v3_b = data&0xff;
-			state->m_v3_changed = 1;
+		if( m_bright_v3_b != (data&0xff) ) {
+			m_bright_v3_b = data&0xff;
+			m_v3_changed = 1;
 		}
 
-		state->m_bright_v3_b_trans = (data>>8)&0xff;
+		m_bright_v3_b_trans = (data>>8)&0xff;
 
 		break;
 	}
 }
 
 
-WRITE32_HANDLER ( skns_palette_ram_w )
+WRITE32_MEMBER(skns_state::skns_palette_ram_w)
 {
-	skns_state *state = space->machine().driver_data<skns_state>();
 	int r,g,b;
 	int brightness_r, brightness_g, brightness_b/*, alpha*/;
 	int use_bright;
 
-	COMBINE_DATA(&state->m_palette_ram[offset]);
+	COMBINE_DATA(&m_palette_ram[offset]);
 
-	b = ((state->m_palette_ram[offset] >> 0  ) & 0x1f);
-	g = ((state->m_palette_ram[offset] >> 5  ) & 0x1f);
-	r = ((state->m_palette_ram[offset] >> 10  ) & 0x1f);
+	b = ((m_palette_ram[offset] >> 0  ) & 0x1f);
+	g = ((m_palette_ram[offset] >> 5  ) & 0x1f);
+	r = ((m_palette_ram[offset] >> 10  ) & 0x1f);
 
-	//alpha = ((state->m_palette_ram[offset] >> 15  ) & 0x1);
+	//alpha = ((m_palette_ram[offset] >> 15  ) & 0x1);
 
 	if(offset<(0x40*256)) { // 1st half is for Sprites
-		use_bright = state->m_use_spc_bright;
-		brightness_b = state->m_bright_spc_b;
-		brightness_g = state->m_bright_spc_g;
-		brightness_r = state->m_bright_spc_r;
+		use_bright = m_use_spc_bright;
+		brightness_b = m_bright_spc_b;
+		brightness_g = m_bright_spc_g;
+		brightness_r = m_bright_spc_r;
 	} else { // V3 bg's
-		use_bright = state->m_use_v3_bright;
-		brightness_b = state->m_bright_v3_b;
-		brightness_g = state->m_bright_v3_g;
-		brightness_r = state->m_bright_v3_r;
+		use_bright = m_use_v3_bright;
+		brightness_b = m_bright_v3_b;
+		brightness_g = m_bright_v3_g;
+		brightness_r = m_bright_v3_r;
 	}
 
 	if(use_bright) {
@@ -216,7 +214,7 @@ WRITE32_HANDLER ( skns_palette_ram_w )
 		r <<= 3;
 	}
 
-	palette_set_color(space->machine(),offset,MAKE_RGB(r,g,b));
+	palette_set_color(machine(),offset,MAKE_RGB(r,g,b));
 }
 
 
@@ -296,11 +294,10 @@ static TILE_GET_INFO( get_tilemap_A_tile_info )
 	//if (pri) popmessage("pri A!! %02x\n", pri);
 }
 
-WRITE32_HANDLER ( skns_tilemapA_w )
+WRITE32_MEMBER(skns_state::skns_tilemapA_w)
 {
-	skns_state *state = space->machine().driver_data<skns_state>();
-	COMBINE_DATA(&state->m_tilemapA_ram[offset]);
-	state->m_tilemap_A->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_tilemapA_ram[offset]);
+	m_tilemap_A->mark_tile_dirty(offset);
 }
 
 static TILE_GET_INFO( get_tilemap_B_tile_info )
@@ -325,29 +322,27 @@ static TILE_GET_INFO( get_tilemap_B_tile_info )
 	//if (pri) popmessage("pri B!! %02x\n", pri); // 02 on cyvern
 }
 
-WRITE32_HANDLER ( skns_tilemapB_w )
+WRITE32_MEMBER(skns_state::skns_tilemapB_w)
 {
-	skns_state *state = space->machine().driver_data<skns_state>();
-	COMBINE_DATA(&state->m_tilemapB_ram[offset]);
-	state->m_tilemap_B->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_tilemapB_ram[offset]);
+	m_tilemap_B->mark_tile_dirty(offset);
 }
 
-WRITE32_HANDLER ( skns_v3_regs_w )
+WRITE32_MEMBER(skns_state::skns_v3_regs_w)
 {
-	skns_state *state = space->machine().driver_data<skns_state>();
-	COMBINE_DATA(&state->m_v3_regs[offset]);
+	COMBINE_DATA(&m_v3_regs[offset]);
 
 	/* if the depth changes we need to dirty the tilemap */
 	if (offset == 0x0c/4)
 	{
-		int old_depthA = state->m_depthA;
-		int old_depthB = state->m_depthB;
+		int old_depthA = m_depthA;
+		int old_depthB = m_depthB;
 
-		state->m_depthA = (state->m_v3_regs[0x0c/4] & 0x0001) << 1;
-		state->m_depthB = (state->m_v3_regs[0x0c/4] & 0x0100) >> 7;
+		m_depthA = (m_v3_regs[0x0c/4] & 0x0001) << 1;
+		m_depthB = (m_v3_regs[0x0c/4] & 0x0100) >> 7;
 
-		if (old_depthA != state->m_depthA)	state->m_tilemap_A->mark_all_dirty();
-		if (old_depthB != state->m_depthB)	state->m_tilemap_B->mark_all_dirty();
+		if (old_depthA != m_depthA)	m_tilemap_A->mark_all_dirty();
+		if (old_depthB != m_depthB)	m_tilemap_B->mark_all_dirty();
 
 	}
 }

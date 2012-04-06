@@ -38,13 +38,13 @@ public:
 	DECLARE_WRITE8_MEMBER(thedeep_to_main_w);
 	DECLARE_WRITE8_MEMBER(thedeep_p3_w);
 	DECLARE_READ8_MEMBER(thedeep_p0_r);
+	DECLARE_WRITE8_MEMBER(thedeep_vram_0_w);
+	DECLARE_WRITE8_MEMBER(thedeep_vram_1_w);
 };
 
 
 /*----------- defined in video/thedeep.c -----------*/
 
-WRITE8_HANDLER( thedeep_vram_0_w );
-WRITE8_HANDLER( thedeep_vram_1_w );
 
 PALETTE_INIT( thedeep );
 VIDEO_START( thedeep );

@@ -61,6 +61,10 @@ public:
 	attotime m_vector_start_time;
 	UINT8 m_cb2;
 	void (*vector_add_point_function) (running_machine &, int, int, rgb_t, int);
+	DECLARE_WRITE8_MEMBER(vectrex_psg_port_w);
+	DECLARE_READ8_MEMBER(vectrex_via_r);
+	DECLARE_WRITE8_MEMBER(vectrex_via_w);
+	DECLARE_WRITE8_MEMBER(raaspec_led_w);
 };
 
 
@@ -74,7 +78,6 @@ void vectrex_configuration(running_machine &machine);
 READ8_DEVICE_HANDLER (vectrex_via_pa_r);
 READ8_DEVICE_HANDLER(vectrex_via_pb_r );
 void vectrex_via_irq (device_t *device, int level);
-WRITE8_HANDLER ( vectrex_psg_port_w );
 
 DRIVER_INIT( vectrex );
 
@@ -92,10 +95,7 @@ SCREEN_UPDATE_RGB32( vectrex );
 
 VIDEO_START( raaspec );
 
-WRITE8_HANDLER  ( raaspec_led_w );
 
-READ8_HANDLER ( vectrex_via_r );
-WRITE8_HANDLER ( vectrex_via_w );
 
 void vectrex_add_point_stereo (running_machine &machine, int x, int y, rgb_t color, int intensity);
 void vectrex_add_point (running_machine &machine, int x, int y, rgb_t color, int intensity);

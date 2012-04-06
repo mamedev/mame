@@ -33,16 +33,16 @@ public:
 	DECLARE_WRITE8_MEMBER(jack_sh_command_w);
 	DECLARE_WRITE8_MEMBER(joinem_misc_w);
 	DECLARE_READ8_MEMBER(striv_question_r);
+	DECLARE_WRITE8_MEMBER(jack_videoram_w);
+	DECLARE_WRITE8_MEMBER(jack_colorram_w);
+	DECLARE_WRITE8_MEMBER(jack_paletteram_w);
+	DECLARE_READ8_MEMBER(jack_flipscreen_r);
+	DECLARE_WRITE8_MEMBER(jack_flipscreen_w);
 };
 
 
 /*----------- defined in video/jack.c -----------*/
 
-WRITE8_HANDLER( jack_videoram_w );
-WRITE8_HANDLER( jack_colorram_w );
-WRITE8_HANDLER( jack_paletteram_w );
-READ8_HANDLER( jack_flipscreen_r );
-WRITE8_HANDLER( jack_flipscreen_w );
 
 VIDEO_START( jack );
 SCREEN_UPDATE_IND16( jack );

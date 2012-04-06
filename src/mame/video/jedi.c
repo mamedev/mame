@@ -108,19 +108,17 @@ static void do_pen_lookup(jedi_state *state, bitmap_rgb32 &bitmap, const rectang
  *
  *************************************/
 
-WRITE8_HANDLER( jedi_vscroll_w )
+WRITE8_MEMBER(jedi_state::jedi_vscroll_w)
 {
-	jedi_state *state = space->machine().driver_data<jedi_state>();
 
-	state->m_vscroll = data | (offset << 8);
+	m_vscroll = data | (offset << 8);
 }
 
 
-WRITE8_HANDLER( jedi_hscroll_w )
+WRITE8_MEMBER(jedi_state::jedi_hscroll_w)
 {
-	jedi_state *state = space->machine().driver_data<jedi_state>();
 
-	state->m_hscroll = data | (offset << 8);
+	m_hscroll = data | (offset << 8);
 }
 
 

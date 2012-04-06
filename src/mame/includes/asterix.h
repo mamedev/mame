@@ -37,6 +37,7 @@ public:
 	DECLARE_WRITE8_MEMBER(sound_arm_nmi_w);
 	DECLARE_WRITE16_MEMBER(sound_irq_w);
 	DECLARE_WRITE16_MEMBER(protection_w);
+	DECLARE_WRITE16_MEMBER(asterix_spritebank_w);
 };
 
 
@@ -44,7 +45,6 @@ public:
 /*----------- defined in video/asterix.c -----------*/
 
 SCREEN_UPDATE_IND16( asterix );
-WRITE16_HANDLER( asterix_spritebank_w );
 
 extern void asterix_tile_callback(running_machine &machine, int layer, int *code, int *color, int *flags);
 extern void asterix_sprite_callback(running_machine &machine, int *code, int *color, int *priority_mask);

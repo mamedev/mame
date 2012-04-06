@@ -136,13 +136,13 @@ static ADDRESS_MAP_START( mario_map, AS_PROGRAM, 8, mario_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x6fff) AM_RAM
 	AM_RANGE(0x7000, 0x73ff) AM_RAM	AM_BASE_SIZE(m_spriteram, m_spriteram_size) /* physical sprite ram */
-	AM_RANGE(0x7400, 0x77ff) AM_RAM_WRITE_LEGACY(mario_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0x7400, 0x77ff) AM_RAM_WRITE(mario_videoram_w) AM_BASE(m_videoram)
 	AM_RANGE(0x7c00, 0x7c00) AM_READ_PORT("IN0") AM_DEVWRITE_LEGACY("discrete", mario_sh1_w) /* Mario run sample */
 	AM_RANGE(0x7c80, 0x7c80) AM_READ_PORT("IN1") AM_DEVWRITE_LEGACY("discrete", mario_sh2_w) /* Luigi run sample */
-	AM_RANGE(0x7d00, 0x7d00) AM_WRITE_LEGACY(mario_scroll_w)
-	AM_RANGE(0x7e80, 0x7e80) AM_WRITE_LEGACY(mario_gfxbank_w)
-	AM_RANGE(0x7e82, 0x7e82) AM_WRITE_LEGACY(mario_flip_w)
-	AM_RANGE(0x7e83, 0x7e83) AM_WRITE_LEGACY(mario_palettebank_w)
+	AM_RANGE(0x7d00, 0x7d00) AM_WRITE(mario_scroll_w)
+	AM_RANGE(0x7e80, 0x7e80) AM_WRITE(mario_gfxbank_w)
+	AM_RANGE(0x7e82, 0x7e82) AM_WRITE(mario_flip_w)
+	AM_RANGE(0x7e83, 0x7e83) AM_WRITE(mario_palettebank_w)
 	AM_RANGE(0x7e84, 0x7e84) AM_WRITE(nmi_mask_w)
 	AM_RANGE(0x7e85, 0x7e85) AM_DEVWRITE_LEGACY("z80dma", mario_z80dma_rdy_w)	/* ==> DMA Chip */
 	AM_RANGE(0x7f00, 0x7f07) AM_WRITE_LEGACY(mario_sh3_w) /* Sound port */
@@ -155,14 +155,14 @@ static ADDRESS_MAP_START( masao_map, AS_PROGRAM, 8, mario_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x6fff) AM_RAM
 	AM_RANGE(0x7000, 0x73ff) AM_RAM	AM_BASE_SIZE(m_spriteram, m_spriteram_size) /* physical sprite ram */
-	AM_RANGE(0x7400, 0x77ff) AM_RAM_WRITE_LEGACY(mario_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0x7400, 0x77ff) AM_RAM_WRITE(mario_videoram_w) AM_BASE(m_videoram)
 	AM_RANGE(0x7c00, 0x7c00) AM_READ_PORT("IN0")
 	AM_RANGE(0x7c80, 0x7c80) AM_READ_PORT("IN1")
-	AM_RANGE(0x7d00, 0x7d00) AM_WRITE_LEGACY(mario_scroll_w)
+	AM_RANGE(0x7d00, 0x7d00) AM_WRITE(mario_scroll_w)
 	AM_RANGE(0x7e00, 0x7e00) AM_WRITE(soundlatch_w)
-	AM_RANGE(0x7e80, 0x7e80) AM_WRITE_LEGACY(mario_gfxbank_w)
-	AM_RANGE(0x7e82, 0x7e82) AM_WRITE_LEGACY(mario_flip_w)
-	AM_RANGE(0x7e83, 0x7e83) AM_WRITE_LEGACY(mario_palettebank_w)
+	AM_RANGE(0x7e80, 0x7e80) AM_WRITE(mario_gfxbank_w)
+	AM_RANGE(0x7e82, 0x7e82) AM_WRITE(mario_flip_w)
+	AM_RANGE(0x7e83, 0x7e83) AM_WRITE(mario_palettebank_w)
 	AM_RANGE(0x7e84, 0x7e84) AM_WRITE(nmi_mask_w)
 	AM_RANGE(0x7e85, 0x7e85) AM_DEVWRITE_LEGACY("z80dma", mario_z80dma_rdy_w)	/* ==> DMA Chip */
 	AM_RANGE(0x7f00, 0x7f00) AM_WRITE_LEGACY(masao_sh_irqtrigger_w)

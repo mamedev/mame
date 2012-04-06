@@ -39,11 +39,11 @@ public:
 	DECLARE_READ16_MEMBER(rlt_io_r);
 	DECLARE_WRITE16_MEMBER(rlt_snd1_w);
 	DECLARE_WRITE16_MEMBER(rlt_snd2_w);
+	DECLARE_WRITE16_MEMBER(rlt_blitter_w);
 };
 
 
 
-WRITE16_HANDLER( rlt_blitter_w );
 VIDEO_START( rltennis );
 SCREEN_UPDATE_IND16( rltennis );
 

@@ -47,15 +47,15 @@ public:
 	DECLARE_WRITE8_MEMBER(sraider_sound_high_w);
 	DECLARE_READ8_MEMBER(sraider_8005_r);
 	DECLARE_WRITE8_MEMBER(sraider_misc_w);
+	DECLARE_WRITE8_MEMBER(ladybug_videoram_w);
+	DECLARE_WRITE8_MEMBER(ladybug_colorram_w);
+	DECLARE_WRITE8_MEMBER(ladybug_flipscreen_w);
+	DECLARE_WRITE8_MEMBER(sraider_io_w);
 };
 
 
 /*----------- defined in video/ladybug.c -----------*/
 
-WRITE8_HANDLER( ladybug_videoram_w );
-WRITE8_HANDLER( ladybug_colorram_w );
-WRITE8_HANDLER( ladybug_flipscreen_w );
-WRITE8_HANDLER( sraider_io_w );
 
 PALETTE_INIT( ladybug );
 VIDEO_START( ladybug );

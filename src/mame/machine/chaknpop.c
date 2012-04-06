@@ -65,83 +65,81 @@ static void mcu_update_seed( running_machine &machine, UINT8 data )
   Memory handlers
 ***************************************************************************/
 
-READ8_HANDLER( chaknpop_mcu_port_a_r )
+READ8_MEMBER(chaknpop_state::chaknpop_mcu_port_a_r)
 {
-	chaknpop_state *state = space->machine().driver_data<chaknpop_state>();
-	//logerror("%04x: MCU port_a read\n", cpu_get_pc(&space->device()));
-	return state->m_mcu_result;
+	//logerror("%04x: MCU port_a read\n", cpu_get_pc(&space.device()));
+	return m_mcu_result;
 }
 
 
-READ8_HANDLER( chaknpop_mcu_port_b_r )
+READ8_MEMBER(chaknpop_state::chaknpop_mcu_port_b_r)
 {
-	//logerror("%04x: MCU port_b read\n", cpu_get_pc(&space->device()));
+	//logerror("%04x: MCU port_b read\n", cpu_get_pc(&space.device()));
 
 	return 0xff;
 }
 
-READ8_HANDLER( chaknpop_mcu_port_c_r )
+READ8_MEMBER(chaknpop_state::chaknpop_mcu_port_c_r)
 {
-	//logerror("%04x: MCU port_c read\n", cpu_get_pc(&space->device()));
+	//logerror("%04x: MCU port_c read\n", cpu_get_pc(&space.device()));
 	return 0x00;
 }
 
-WRITE8_HANDLER( chaknpop_mcu_port_a_w )
+WRITE8_MEMBER(chaknpop_state::chaknpop_mcu_port_a_w)
 {
-	chaknpop_state *state = space->machine().driver_data<chaknpop_state>();
 	UINT8 mcu_command;
 
-	mcu_command = data + state->m_mcu_seed;
-	state->m_mcu_result = 0;
+	mcu_command = data + m_mcu_seed;
+	m_mcu_result = 0;
 
 	if (mcu_command < 0x08)
 	{
-		mcu_update_seed(space->machine(), data);
+		mcu_update_seed(machine(), data);
 
-		state->m_mcu_result = mcu_data[state->m_mcu_select * 8 + mcu_command];
-		state->m_mcu_result -= state->m_mcu_seed;
+		m_mcu_result = mcu_data[m_mcu_select * 8 + mcu_command];
+		m_mcu_result -= m_mcu_seed;
 
-		mcu_update_seed(space->machine(), state->m_mcu_result);
+		mcu_update_seed(machine(), m_mcu_result);
 
-		logerror("%04x: MCU command 0x%02x, result 0x%02x\n", cpu_get_pc(&space->device()), mcu_command, state->m_mcu_result);
+		logerror("%04x: MCU command 0x%02x, result 0x%02x\n", cpu_get_pc(&space.device()), mcu_command, m_mcu_result);
 	}
 	else if (mcu_command >= 0x28 && mcu_command <= 0x2a)
 	{
-		mcu_update_seed(space->machine(), data);
+		mcu_update_seed(machine(), data);
 
-		state->m_mcu_result = state->m_mcu_ram[0x380 + mcu_command];
-		state->m_mcu_result -= state->m_mcu_seed;
+		m_mcu_result = m_mcu_ram[0x380 + mcu_command];
+		m_mcu_result -= m_mcu_seed;
 
-		mcu_update_seed(space->machine(), state->m_mcu_result);
+		mcu_update_seed(machine(), m_mcu_result);
 
-		logerror("%04x: MCU command 0x%02x, result 0x%02x\n", cpu_get_pc(&space->device()), mcu_command, state->m_mcu_result);
+		logerror("%04x: MCU command 0x%02x, result 0x%02x\n", cpu_get_pc(&space.device()), mcu_command, m_mcu_result);
 	}
 	else if (mcu_command < 0x80)
 	{
-		mcu_update_seed(space->machine(), data);
+		mcu_update_seed(machine(), data);
 
 		if (mcu_command >= 0x40 && mcu_command < 0x60)
 		{
-			state->m_mcu_select = mcu_command - 0x40;
+			m_mcu_select = mcu_command - 0x40;
 
-			logerror("%04x: MCU select 0x%02x\n", cpu_get_pc(&space->device()), state->m_mcu_select);
+			logerror("%04x: MCU select 0x%02x\n", cpu_get_pc(&space.device()), m_mcu_select);
 		}
 	}
 	else if (mcu_command == 0x9c|| mcu_command == 0xde)
 	{
-		mcu_update_seed(space->machine(), data);
+		mcu_update_seed(machine(), data);
 
-		logerror("%04x: MCU command 0x%02x\n", cpu_get_pc(&space->device()), mcu_command);
+		logerror("%04x: MCU command 0x%02x\n", cpu_get_pc(&space.device()), mcu_command);
 	}
 }
 
-WRITE8_HANDLER( chaknpop_mcu_port_b_w )
+WRITE8_MEMBER(chaknpop_state::chaknpop_mcu_port_b_w)
 {
-	//logerror("%04x: MCU port_b write 0x%02x\n", cpu_get_pc(&space->device()), data);
+	//logerror("%04x: MCU port_b write 0x%02x\n", cpu_get_pc(&space.device()), data);
 }
 
-WRITE8_HANDLER( chaknpop_mcu_port_c_w )
+WRITE8_MEMBER(chaknpop_state::chaknpop_mcu_port_c_w)
 {
-	//logerror("%04x: MCU port_c write 0x%02x\n", cpu_get_pc(&space->device()), data);
+	//logerror("%04x: MCU port_c write 0x%02x\n", cpu_get_pc(&space.device()), data);
 }
 

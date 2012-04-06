@@ -38,13 +38,13 @@ public:
 	DECLARE_WRITE16_MEMBER(m107_sound_status_w);
 	DECLARE_WRITE16_MEMBER(m107_sound_reset_w);
 	DECLARE_WRITE16_MEMBER(wpksoc_output_w);
+	DECLARE_WRITE16_MEMBER(m107_vram_w);
+	DECLARE_WRITE16_MEMBER(m107_control_w);
+	DECLARE_WRITE16_MEMBER(m107_spritebuffer_w);
 };
 
 
 /*----------- defined in video/m107.c -----------*/
 
-WRITE16_HANDLER( m107_spritebuffer_w );
 SCREEN_UPDATE_IND16( m107 );
 VIDEO_START( m107 );
-WRITE16_HANDLER( m107_control_w );
-WRITE16_HANDLER( m107_vram_w );

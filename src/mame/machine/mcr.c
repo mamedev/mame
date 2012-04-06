@@ -232,7 +232,7 @@ TIMER_DEVICE_CALLBACK( mcr_ipu_interrupt )
  *
  *************************************/
 
-WRITE8_HANDLER( mcr_control_port_w )
+WRITE8_MEMBER(mcr_state::mcr_control_port_w)
 {
 	/*
         Bit layout is as follows:
@@ -246,9 +246,9 @@ WRITE8_HANDLER( mcr_control_port_w )
             D0 = coin meter 1
     */
 
-	coin_counter_w(space->machine(), 0, (data >> 0) & 1);
-	coin_counter_w(space->machine(), 1, (data >> 1) & 1);
-	coin_counter_w(space->machine(), 2, (data >> 2) & 1);
+	coin_counter_w(machine(), 0, (data >> 0) & 1);
+	coin_counter_w(machine(), 1, (data >> 1) & 1);
+	coin_counter_w(machine(), 2, (data >> 2) & 1);
 	mcr_cocktail_flip = (data >> 6) & 1;
 }
 
@@ -271,14 +271,14 @@ static WRITE8_DEVICE_HANDLER( ipu_break_changed )
 }
 
 
-WRITE8_HANDLER( mcr_ipu_laserdisk_w )
+WRITE8_MEMBER(mcr_state::mcr_ipu_laserdisk_w)
 {
 	/* bit 3 enables (1) LD video regardless of PIX SW */
 	/* bit 2 enables (1) LD right channel audio */
 	/* bit 1 enables (1) LD left channel audio */
 	/* bit 0 enables (1) LD video if PIX SW == 1 */
 	if (data != 0)
-		logerror("%04X:mcr_ipu_laserdisk_w(%d) = %02X\n", cpu_get_pc(&space->device()), offset, data);
+		logerror("%04X:mcr_ipu_laserdisk_w(%d) = %02X\n", cpu_get_pc(&space.device()), offset, data);
 }
 
 
@@ -293,7 +293,7 @@ static TIMER_CALLBACK( ipu_watchdog_reset )
 }
 
 
-READ8_HANDLER( mcr_ipu_watchdog_r )
+READ8_MEMBER(mcr_state::mcr_ipu_watchdog_r)
 {
 	/* watchdog counter is clocked by 7.3728MHz crystal / 16 */
 	/* watchdog is tripped when 14-bit counter overflows => / 32768 = 14.0625Hz*/
@@ -302,7 +302,7 @@ READ8_HANDLER( mcr_ipu_watchdog_r )
 }
 
 
-WRITE8_HANDLER( mcr_ipu_watchdog_w )
+WRITE8_MEMBER(mcr_state::mcr_ipu_watchdog_w)
 {
 	mcr_ipu_watchdog_r(space,0);
 }

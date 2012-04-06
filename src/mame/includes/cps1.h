@@ -157,6 +157,15 @@ public:
 	DECLARE_WRITE16_MEMBER(cps1_coinctrl_w);
 	DECLARE_READ16_MEMBER(qsound_sharedram1_r);
 	DECLARE_WRITE16_MEMBER(qsound_sharedram1_w);
+	DECLARE_WRITE16_MEMBER(cps1_cps_a_w);
+	DECLARE_READ16_MEMBER(cps1_cps_b_r);
+	DECLARE_WRITE16_MEMBER(cps1_cps_b_w);
+	DECLARE_WRITE16_MEMBER(cps1_gfxram_w);
+	DECLARE_WRITE16_MEMBER(cps2_objram_bank_w);
+	DECLARE_READ16_MEMBER(cps2_objram1_r);
+	DECLARE_READ16_MEMBER(cps2_objram2_r);
+	DECLARE_WRITE16_MEMBER(cps2_objram1_w);
+	DECLARE_WRITE16_MEMBER(cps2_objram2_w);
 };
 
 /*----------- defined in drivers/cps1.c -----------*/
@@ -170,19 +179,10 @@ GFXDECODE_EXTERN( cps1 );
 
 /*----------- defined in video/cps1.c -----------*/
 
-WRITE16_HANDLER( cps1_cps_a_w );
-WRITE16_HANDLER( cps1_cps_b_w );
-READ16_HANDLER( cps1_cps_b_r );
-WRITE16_HANDLER( cps1_gfxram_w );
 
 DRIVER_INIT( cps1 );
 DRIVER_INIT( cps2_video );
 
-WRITE16_HANDLER( cps2_objram_bank_w );
-READ16_HANDLER( cps2_objram1_r );
-READ16_HANDLER( cps2_objram2_r );
-WRITE16_HANDLER( cps2_objram1_w );
-WRITE16_HANDLER( cps2_objram2_w );
 
 VIDEO_START( cps1 );
 VIDEO_START( cps2 );

@@ -70,45 +70,39 @@ VIDEO_START( msisaac )
 
 ***************************************************************************/
 
-WRITE8_HANDLER( msisaac_fg_scrolly_w )
+WRITE8_MEMBER(msisaac_state::msisaac_fg_scrolly_w)
 {
-	msisaac_state *state = space->machine().driver_data<msisaac_state>();
-	state->m_fg_tilemap->set_scrolly(0, data);
+	m_fg_tilemap->set_scrolly(0, data);
 }
 
-WRITE8_HANDLER( msisaac_fg_scrollx_w )
+WRITE8_MEMBER(msisaac_state::msisaac_fg_scrollx_w)
 {
-	msisaac_state *state = space->machine().driver_data<msisaac_state>();
-	state->m_fg_tilemap->set_scrollx(0, 9 + data);
+	m_fg_tilemap->set_scrollx(0, 9 + data);
 }
 
-WRITE8_HANDLER( msisaac_bg2_scrolly_w )
+WRITE8_MEMBER(msisaac_state::msisaac_bg2_scrolly_w)
 {
-	msisaac_state *state = space->machine().driver_data<msisaac_state>();
-	state->m_bg2_tilemap->set_scrolly(0, data);
+	m_bg2_tilemap->set_scrolly(0, data);
 }
 
-WRITE8_HANDLER( msisaac_bg2_scrollx_w )
+WRITE8_MEMBER(msisaac_state::msisaac_bg2_scrollx_w)
 {
-	msisaac_state *state = space->machine().driver_data<msisaac_state>();
-	state->m_bg2_tilemap->set_scrollx(0, 9 + 2 + data);
+	m_bg2_tilemap->set_scrollx(0, 9 + 2 + data);
 }
 
-WRITE8_HANDLER( msisaac_bg_scrolly_w )
+WRITE8_MEMBER(msisaac_state::msisaac_bg_scrolly_w)
 {
-	msisaac_state *state = space->machine().driver_data<msisaac_state>();
-	state->m_bg_tilemap->set_scrolly(0, data);
+	m_bg_tilemap->set_scrolly(0, data);
 }
 
-WRITE8_HANDLER( msisaac_bg_scrollx_w )
+WRITE8_MEMBER(msisaac_state::msisaac_bg_scrollx_w)
 {
-	msisaac_state *state = space->machine().driver_data<msisaac_state>();
-	state->m_bg_tilemap->set_scrollx(0, 9 + 4 + data);
+	m_bg_tilemap->set_scrollx(0, 9 + 4 + data);
 }
 
 
 #ifdef UNUSED_FUNCTION
-WRITE8_HANDLER( msisaac_textbank1_w )
+WRITE8_MEMBER(msisaac_state::msisaac_textbank1_w)
 {
 	if (textbank1!=data)
 	{
@@ -118,13 +112,12 @@ WRITE8_HANDLER( msisaac_textbank1_w )
 }
 #endif
 
-WRITE8_HANDLER( msisaac_bg2_textbank_w )
+WRITE8_MEMBER(msisaac_state::msisaac_bg2_textbank_w)
 {
-	msisaac_state *state = space->machine().driver_data<msisaac_state>();
-	if (state->m_bg2_textbank != data )
+	if (m_bg2_textbank != data )
 	{
-		state->m_bg2_textbank = data;
-		state->m_bg2_tilemap->mark_all_dirty();
+		m_bg2_textbank = data;
+		m_bg2_tilemap->mark_all_dirty();
 
 		//check if we are correct on this one
 		if ((data != 8) && (data != 0))
@@ -134,25 +127,22 @@ WRITE8_HANDLER( msisaac_bg2_textbank_w )
 	}
 }
 
-WRITE8_HANDLER( msisaac_bg_videoram_w )
+WRITE8_MEMBER(msisaac_state::msisaac_bg_videoram_w)
 {
-	msisaac_state *state = space->machine().driver_data<msisaac_state>();
-	state->m_videoram2[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_videoram2[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( msisaac_bg2_videoram_w )
+WRITE8_MEMBER(msisaac_state::msisaac_bg2_videoram_w)
 {
-	msisaac_state *state = space->machine().driver_data<msisaac_state>();
-	state->m_videoram3[offset] = data;
-	state->m_bg2_tilemap->mark_tile_dirty(offset);
+	m_videoram3[offset] = data;
+	m_bg2_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( msisaac_fg_videoram_w )
+WRITE8_MEMBER(msisaac_state::msisaac_fg_videoram_w)
 {
-	msisaac_state *state = space->machine().driver_data<msisaac_state>();
-	state->m_videoram[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 

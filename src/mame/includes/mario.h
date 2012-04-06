@@ -61,15 +61,15 @@ public:
 
 	UINT8   m_nmi_mask;
 	DECLARE_WRITE8_MEMBER(nmi_mask_w);
+	DECLARE_WRITE8_MEMBER(mario_videoram_w);
+	DECLARE_WRITE8_MEMBER(mario_gfxbank_w);
+	DECLARE_WRITE8_MEMBER(mario_palettebank_w);
+	DECLARE_WRITE8_MEMBER(mario_scroll_w);
+	DECLARE_WRITE8_MEMBER(mario_flip_w);
 };
 
 /*----------- defined in video/mario.c -----------*/
 
-WRITE8_HANDLER( mario_videoram_w );
-WRITE8_HANDLER( mario_gfxbank_w );
-WRITE8_HANDLER( mario_palettebank_w );
-WRITE8_HANDLER( mario_scroll_w );
-WRITE8_HANDLER( mario_flip_w );
 
 PALETTE_INIT( mario );
 VIDEO_START( mario );

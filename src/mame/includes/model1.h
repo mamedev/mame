@@ -106,6 +106,22 @@ public:
 	DECLARE_READ16_MEMBER(m1_snd_v60_ready_r);
 	DECLARE_WRITE16_MEMBER(m1_snd_68k_latch1_w);
 	DECLARE_WRITE16_MEMBER(m1_snd_68k_latch2_w);
+	DECLARE_READ16_MEMBER(model1_tgp_copro_r);
+	DECLARE_WRITE16_MEMBER(model1_tgp_copro_w);
+	DECLARE_READ16_MEMBER(model1_tgp_copro_adr_r);
+	DECLARE_WRITE16_MEMBER(model1_tgp_copro_adr_w);
+	DECLARE_READ16_MEMBER(model1_tgp_copro_ram_r);
+	DECLARE_WRITE16_MEMBER(model1_tgp_copro_ram_w);
+	DECLARE_READ16_MEMBER(model1_tgp_vr_adr_r);
+	DECLARE_WRITE16_MEMBER(model1_tgp_vr_adr_w);
+	DECLARE_READ16_MEMBER(model1_vr_tgp_ram_r);
+	DECLARE_WRITE16_MEMBER(model1_vr_tgp_ram_w);
+	DECLARE_READ16_MEMBER(model1_vr_tgp_r);
+	DECLARE_WRITE16_MEMBER(model1_vr_tgp_w);
+	DECLARE_READ32_MEMBER(copro_ram_r);
+	DECLARE_WRITE32_MEMBER(copro_ram_w);
+	DECLARE_READ16_MEMBER(model1_listctl_r);
+	DECLARE_WRITE16_MEMBER(model1_listctl_w);
 };
 
 
@@ -113,19 +129,7 @@ public:
 
 extern const mb86233_cpu_core model1_vr_tgp_config;
 
-READ16_HANDLER( model1_tgp_copro_r );
-WRITE16_HANDLER( model1_tgp_copro_w );
-READ16_HANDLER( model1_tgp_copro_adr_r );
-WRITE16_HANDLER( model1_tgp_copro_adr_w );
-READ16_HANDLER( model1_tgp_copro_ram_r );
-WRITE16_HANDLER( model1_tgp_copro_ram_w );
 
-READ16_HANDLER( model1_vr_tgp_r );
-WRITE16_HANDLER( model1_vr_tgp_w );
-READ16_HANDLER( model1_tgp_vr_adr_r );
-WRITE16_HANDLER( model1_tgp_vr_adr_w );
-READ16_HANDLER( model1_vr_tgp_ram_r );
-WRITE16_HANDLER( model1_vr_tgp_ram_w );
 
 ADDRESS_MAP_EXTERN( model1_vr_tgp_map, 32 );
 
@@ -141,5 +145,3 @@ VIDEO_START(model1);
 SCREEN_UPDATE_RGB32(model1);
 SCREEN_VBLANK(model1);
 
-READ16_HANDLER( model1_listctl_r );
-WRITE16_HANDLER( model1_listctl_w );

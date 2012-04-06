@@ -80,15 +80,15 @@ WRITE8_MEMBER(marineb_state::irq_mask_w)
 static ADDRESS_MAP_START( marineb_map, AS_PROGRAM, 8, marineb_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x8800, 0x8bff) AM_RAM_WRITE_LEGACY(marineb_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0x8800, 0x8bff) AM_RAM_WRITE(marineb_videoram_w) AM_BASE(m_videoram)
 	AM_RANGE(0x8c00, 0x8c3f) AM_RAM AM_BASE(m_spriteram)  /* Hoccer only */
-	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE_LEGACY(marineb_colorram_w) AM_BASE(m_colorram)
-	AM_RANGE(0x9800, 0x9800) AM_WRITE_LEGACY(marineb_column_scroll_w)
-	AM_RANGE(0x9a00, 0x9a00) AM_WRITE_LEGACY(marineb_palette_bank_0_w)
-	AM_RANGE(0x9c00, 0x9c00) AM_WRITE_LEGACY(marineb_palette_bank_1_w)
+	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(marineb_colorram_w) AM_BASE(m_colorram)
+	AM_RANGE(0x9800, 0x9800) AM_WRITE(marineb_column_scroll_w)
+	AM_RANGE(0x9a00, 0x9a00) AM_WRITE(marineb_palette_bank_0_w)
+	AM_RANGE(0x9c00, 0x9c00) AM_WRITE(marineb_palette_bank_1_w)
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("P2") AM_WRITE(irq_mask_w)
-	AM_RANGE(0xa001, 0xa001) AM_WRITE_LEGACY(marineb_flipscreen_y_w)
-	AM_RANGE(0xa002, 0xa002) AM_WRITE_LEGACY(marineb_flipscreen_x_w)
+	AM_RANGE(0xa001, 0xa001) AM_WRITE(marineb_flipscreen_y_w)
+	AM_RANGE(0xa002, 0xa002) AM_WRITE(marineb_flipscreen_x_w)
 	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("P1")
 	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("DSW")
 	AM_RANGE(0xb800, 0xb800) AM_READ_PORT("SYSTEM") AM_WRITENOP		/* also watchdog */

@@ -9,48 +9,43 @@
 #include "emu.h"
 #include "includes/pbaction.h"
 
-WRITE8_HANDLER( pbaction_videoram_w )
+WRITE8_MEMBER(pbaction_state::pbaction_videoram_w)
 {
-	pbaction_state *state = space->machine().driver_data<pbaction_state>();
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( pbaction_colorram_w )
+WRITE8_MEMBER(pbaction_state::pbaction_colorram_w)
 {
-	pbaction_state *state = space->machine().driver_data<pbaction_state>();
-	state->m_colorram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_colorram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( pbaction_videoram2_w )
+WRITE8_MEMBER(pbaction_state::pbaction_videoram2_w)
 {
-	pbaction_state *state = space->machine().driver_data<pbaction_state>();
-	state->m_videoram2[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset);
+	m_videoram2[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( pbaction_colorram2_w )
+WRITE8_MEMBER(pbaction_state::pbaction_colorram2_w)
 {
-	pbaction_state *state = space->machine().driver_data<pbaction_state>();
-	state->m_colorram2[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset);
+	m_colorram2[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( pbaction_scroll_w )
+WRITE8_MEMBER(pbaction_state::pbaction_scroll_w)
 {
-	pbaction_state *state = space->machine().driver_data<pbaction_state>();
-	state->m_scroll = data - 3;
-	if (flip_screen_get(space->machine()))
-		state->m_scroll = -state->m_scroll;
+	m_scroll = data - 3;
+	if (flip_screen_get(machine()))
+		m_scroll = -m_scroll;
 
-	state->m_bg_tilemap->set_scrollx(0, state->m_scroll);
-	state->m_fg_tilemap->set_scrollx(0, state->m_scroll);
+	m_bg_tilemap->set_scrollx(0, m_scroll);
+	m_fg_tilemap->set_scrollx(0, m_scroll);
 }
 
-WRITE8_HANDLER( pbaction_flipscreen_w )
+WRITE8_MEMBER(pbaction_state::pbaction_flipscreen_w)
 {
-	flip_screen_set(space->machine(), data & 0x01);
+	flip_screen_set(machine(), data & 0x01);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )

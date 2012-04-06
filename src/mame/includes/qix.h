@@ -41,6 +41,29 @@ public:
 	UINT8  m_leds;
 	UINT8 *m_scanline_latch;
 	pen_t m_pens[NUM_PENS];
+	DECLARE_WRITE8_MEMBER(zookeep_bankswitch_w);
+	DECLARE_WRITE8_MEMBER(qix_data_firq_w);
+	DECLARE_WRITE8_MEMBER(qix_data_firq_ack_w);
+	DECLARE_READ8_MEMBER(qix_data_firq_r);
+	DECLARE_READ8_MEMBER(qix_data_firq_ack_r);
+	DECLARE_WRITE8_MEMBER(qix_video_firq_w);
+	DECLARE_WRITE8_MEMBER(qix_video_firq_ack_w);
+	DECLARE_READ8_MEMBER(qix_video_firq_r);
+	DECLARE_READ8_MEMBER(qix_video_firq_ack_r);
+	DECLARE_READ8_MEMBER(qix_68705_portA_r);
+	DECLARE_READ8_MEMBER(qix_68705_portB_r);
+	DECLARE_READ8_MEMBER(qix_68705_portC_r);
+	DECLARE_WRITE8_MEMBER(qix_68705_portA_w);
+	DECLARE_WRITE8_MEMBER(qix_68705_portB_w);
+	DECLARE_WRITE8_MEMBER(qix_68705_portC_w);
+	DECLARE_READ8_MEMBER(qix_videoram_r);
+	DECLARE_WRITE8_MEMBER(qix_videoram_w);
+	DECLARE_WRITE8_MEMBER(slither_videoram_w);
+	DECLARE_READ8_MEMBER(qix_addresslatch_r);
+	DECLARE_WRITE8_MEMBER(qix_addresslatch_w);
+	DECLARE_WRITE8_MEMBER(slither_addresslatch_w);
+	DECLARE_WRITE8_MEMBER(qix_paletteram_w);
+	DECLARE_WRITE8_MEMBER(qix_palettebank_w);
 };
 
 
@@ -57,24 +80,9 @@ extern const pia6821_interface slither_pia_2_intf;
 MACHINE_START( qixmcu );
 MACHINE_RESET( qix );
 
-WRITE8_HANDLER( zookeep_bankswitch_w );
 
-READ8_HANDLER( qix_data_firq_r );
-READ8_HANDLER( qix_data_firq_ack_r );
-WRITE8_HANDLER( qix_data_firq_w );
-WRITE8_HANDLER( qix_data_firq_ack_w );
 
-READ8_HANDLER( qix_video_firq_r );
-READ8_HANDLER( qix_video_firq_ack_r );
-WRITE8_HANDLER( qix_video_firq_w );
-WRITE8_HANDLER( qix_video_firq_ack_w );
 
-READ8_HANDLER( qix_68705_portA_r );
-READ8_HANDLER( qix_68705_portB_r );
-READ8_HANDLER( qix_68705_portC_r );
-WRITE8_HANDLER( qix_68705_portA_w );
-WRITE8_HANDLER( qix_68705_portB_w );
-WRITE8_HANDLER( qix_68705_portC_w );
 
 WRITE8_DEVICE_HANDLER( qix_pia_w );
 
@@ -88,7 +96,6 @@ MACHINE_CONFIG_EXTERN( zookeep_video );
 MACHINE_CONFIG_EXTERN( slither_video );
 
 WRITE8_DEVICE_HANDLER( qix_flip_screen_w );
-WRITE8_HANDLER( qix_palettebank_w );
 
 
 /*----------- defined in audio/qix.c -----------*/

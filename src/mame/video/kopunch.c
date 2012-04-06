@@ -32,42 +32,37 @@ PALETTE_INIT( kopunch )
 	}
 }
 
-WRITE8_HANDLER( kopunch_videoram_w )
+WRITE8_MEMBER(kopunch_state::kopunch_videoram_w)
 {
-	kopunch_state *state = space->machine().driver_data<kopunch_state>();
-	state->m_videoram[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( kopunch_videoram2_w )
+WRITE8_MEMBER(kopunch_state::kopunch_videoram2_w)
 {
-	kopunch_state *state = space->machine().driver_data<kopunch_state>();
-	state->m_videoram2[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_videoram2[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( kopunch_scroll_x_w )
+WRITE8_MEMBER(kopunch_state::kopunch_scroll_x_w)
 {
-	kopunch_state *state = space->machine().driver_data<kopunch_state>();
-	state->m_bg_tilemap->set_scrollx(0, data);
+	m_bg_tilemap->set_scrollx(0, data);
 }
 
-WRITE8_HANDLER( kopunch_scroll_y_w )
+WRITE8_MEMBER(kopunch_state::kopunch_scroll_y_w)
 {
-	kopunch_state *state = space->machine().driver_data<kopunch_state>();
-	state->m_bg_tilemap->set_scrolly(0, data);
+	m_bg_tilemap->set_scrolly(0, data);
 }
 
-WRITE8_HANDLER( kopunch_gfxbank_w )
+WRITE8_MEMBER(kopunch_state::kopunch_gfxbank_w)
 {
-	kopunch_state *state = space->machine().driver_data<kopunch_state>();
-	if (state->m_gfxbank != (data & 0x07))
+	if (m_gfxbank != (data & 0x07))
 	{
-		state->m_gfxbank = data & 0x07;
-		state->m_bg_tilemap->mark_all_dirty();
+		m_gfxbank = data & 0x07;
+		m_bg_tilemap->mark_all_dirty();
 	}
 
-	state->m_bg_tilemap->set_flip((data & 0x08) ? TILEMAP_FLIPY : 0);
+	m_bg_tilemap->set_flip((data & 0x08) ? TILEMAP_FLIPY : 0);
 }
 
 static TILE_GET_INFO( get_fg_tile_info )

@@ -40,25 +40,25 @@ public:
 	int m_qfront;
 	int m_qstate;
 	DECLARE_WRITE8_MEMBER(mexico86_sub_output_w);
+	DECLARE_WRITE8_MEMBER(mexico86_f008_w);
+	DECLARE_READ8_MEMBER(mexico86_68705_port_a_r);
+	DECLARE_WRITE8_MEMBER(mexico86_68705_port_a_w);
+	DECLARE_WRITE8_MEMBER(mexico86_68705_ddr_a_w);
+	DECLARE_READ8_MEMBER(mexico86_68705_port_b_r);
+	DECLARE_WRITE8_MEMBER(mexico86_68705_port_b_w);
+	DECLARE_WRITE8_MEMBER(mexico86_68705_ddr_b_w);
+	DECLARE_WRITE8_MEMBER(mexico86_bankswitch_w);
 };
 
 
 /*----------- defined in machine/mexico86.c -----------*/
 
-WRITE8_HANDLER( mexico86_f008_w );
 INTERRUPT_GEN( kikikai_interrupt );
 INTERRUPT_GEN( mexico86_m68705_interrupt );
-READ8_HANDLER( mexico86_68705_port_a_r );
-WRITE8_HANDLER( mexico86_68705_port_a_w );
-WRITE8_HANDLER( mexico86_68705_ddr_a_w );
-READ8_HANDLER( mexico86_68705_port_b_r );
-WRITE8_HANDLER( mexico86_68705_port_b_w );
-WRITE8_HANDLER( mexico86_68705_ddr_b_w );
 
 
 /*----------- defined in video/mexico86.c -----------*/
 
-WRITE8_HANDLER( mexico86_bankswitch_w );
 
 SCREEN_UPDATE_IND16( mexico86 );
 SCREEN_UPDATE_IND16( kikikai );

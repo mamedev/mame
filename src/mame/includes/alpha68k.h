@@ -63,6 +63,10 @@ public:
 	DECLARE_READ16_MEMBER(sound_cpu_r);
 	DECLARE_WRITE8_MEMBER(sound_bank_w);
 	DECLARE_WRITE8_MEMBER(porta_w);
+	DECLARE_WRITE16_MEMBER(alpha68k_paletteram_w);
+	DECLARE_WRITE16_MEMBER(alpha68k_videoram_w);
+	DECLARE_WRITE16_MEMBER(alpha68k_II_video_bank_w);
+	DECLARE_WRITE16_MEMBER(alpha68k_V_video_control_w);
 };
 
 /* game_id - used to deal with a few game specific situations */
@@ -91,7 +95,3 @@ SCREEN_UPDATE_IND16( alpha68k_V_sb );
 void alpha68k_V_video_bank_w(running_machine &machine, int bank);
 void alpha68k_flipscreen_w(running_machine &machine, int flip);
 
-WRITE16_HANDLER( alpha68k_paletteram_w );
-WRITE16_HANDLER( alpha68k_videoram_w );
-WRITE16_HANDLER( alpha68k_II_video_bank_w );
-WRITE16_HANDLER( alpha68k_V_video_control_w );
