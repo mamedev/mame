@@ -47,6 +47,8 @@ public:
 		: scramble_state(mconfig, type, tag) { }
 
 	UINT8 *m_soundram;
+	DECLARE_READ8_MEMBER(scobra_soundram_r);
+	DECLARE_WRITE8_MEMBER(scobra_soundram_w);
 };
 
 
@@ -206,21 +208,21 @@ static ADDRESS_MAP_START( mimonkey_map, AS_PROGRAM, 8, scobra_state )
 ADDRESS_MAP_END
 
 
-static READ8_HANDLER(scobra_soundram_r)
+READ8_MEMBER(scobra_state::scobra_soundram_r)
 {
-	scobra_state *state = space->machine().driver_data<scobra_state>();
-	return state->m_soundram[offset & 0x03ff];
+
+	return m_soundram[offset & 0x03ff];
 }
 
-static WRITE8_HANDLER(scobra_soundram_w)
+WRITE8_MEMBER(scobra_state::scobra_soundram_w)
 {
-	scobra_state *state = space->machine().driver_data<scobra_state>();
-	state->m_soundram[offset & 0x03ff] = data;
+
+	m_soundram[offset & 0x03ff] = data;
 }
 
 static ADDRESS_MAP_START( scobra_sound_map, AS_PROGRAM, 8, scobra_state )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
-	AM_RANGE(0x8000, 0x8fff) AM_READWRITE_LEGACY(scobra_soundram_r, scobra_soundram_w)
+	AM_RANGE(0x8000, 0x8fff) AM_READWRITE(scobra_soundram_r, scobra_soundram_w)
 	AM_RANGE(0x8000, 0x83ff) AM_WRITENOP AM_BASE(m_soundram)  /* only here to initialize pointer */
 	AM_RANGE(0x9000, 0x9fff) AM_WRITE_LEGACY(scramble_filter_w)
 ADDRESS_MAP_END
@@ -229,7 +231,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( hustlerb_sound_map, AS_PROGRAM, 8, scobra_state )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0x6000, 0x6fff) AM_WRITE_LEGACY(frogger_filter_w)
-	AM_RANGE(0x8000, 0x8fff) AM_RAM_READ_LEGACY(scobra_soundram_r) AM_BASE(m_soundram)  /* only here to initialize pointer */
+	AM_RANGE(0x8000, 0x8fff) AM_RAM_READ(scobra_soundram_r) AM_BASE(m_soundram)  /* only here to initialize pointer */
 ADDRESS_MAP_END
 
 

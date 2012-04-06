@@ -68,6 +68,9 @@ public:
 	DECLARE_READ32_MEMBER(backfire_spriteram2_r);
 	DECLARE_WRITE32_MEMBER(backfire_spriteram2_w);
 	DECLARE_READ32_MEMBER(backfire_speedup_r);
+	DECLARE_READ32_MEMBER(backfire_unknown_wheel_r);
+	DECLARE_READ32_MEMBER(backfire_wheel1_r);
+	DECLARE_READ32_MEMBER(backfire_wheel2_r);
 };
 
 //UINT32 *backfire_180010, *backfire_188010;
@@ -225,19 +228,19 @@ WRITE32_MEMBER(backfire_state::backfire_pf4_rowscroll_w){ data &= 0x0000ffff; me
 
 
 #ifdef UNUSED_FUNCTION
-READ32_HANDLER( backfire_unknown_wheel_r )
+READ32_MEMBER(backfire_state::backfire_unknown_wheel_r)
 {
-	return input_port_read(space->machine(), "PADDLE0");
+	return input_port_read(machine(), "PADDLE0");
 }
 
-READ32_HANDLER( backfire_wheel1_r )
+READ32_MEMBER(backfire_state::backfire_wheel1_r)
 {
-	return space->machine().rand();
+	return machine().rand();
 }
 
-READ32_HANDLER( backfire_wheel2_r )
+READ32_MEMBER(backfire_state::backfire_wheel2_r)
 {
-	return space->machine().rand();
+	return machine().rand();
 }
 #endif
 
@@ -299,9 +302,9 @@ static ADDRESS_MAP_START( backfire_map, AS_PROGRAM, 32, backfire_state )
 //  AM_RANGE(0x1b0000, 0x1b0003) AM_WRITENOP // always 1b0000
 
 	/* when set to pentometer in test mode */
-//  AM_RANGE(0x1e4000, 0x1e4003) AM_READ_LEGACY(backfire_unknown_wheel_r)
-//  AM_RANGE(0x1e8000, 0x1e8003) AM_READ_LEGACY(backfire_wheel1_r)
-//  AM_RANGE(0x1e8004, 0x1e8007) AM_READ_LEGACY(backfire_wheel2_r)
+//  AM_RANGE(0x1e4000, 0x1e4003) AM_READ(backfire_unknown_wheel_r)
+//  AM_RANGE(0x1e8000, 0x1e8003) AM_READ(backfire_wheel1_r)
+//  AM_RANGE(0x1e8004, 0x1e8007) AM_READ(backfire_wheel2_r)
 
 	AM_RANGE(0x1c0000, 0x1c0007) AM_DEVREADWRITE8_LEGACY("ymz", ymz280b_r, ymz280b_w, 0x000000ff)
 ADDRESS_MAP_END

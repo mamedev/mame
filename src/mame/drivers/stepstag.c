@@ -33,28 +33,32 @@ public:
 	stepstag_state(const machine_config &mconfig, device_type type, const char *tag)
 		: tetrisp2_state(mconfig, type, tag) { }
 
+	DECLARE_READ16_MEMBER(stepstag_ip_1_word_r);
+	DECLARE_READ16_MEMBER(unknown_read_0xc00000);
+	DECLARE_READ16_MEMBER(unknown_read_0xd00000);
+	DECLARE_READ16_MEMBER(unknown_read_0xffff00);
 };
 
-static READ16_HANDLER( stepstag_ip_1_word_r )
+READ16_MEMBER(stepstag_state::stepstag_ip_1_word_r)
 {
-	return	( input_port_read(space->machine(), "SYSTEM") &  0xfcff ) |
-			(           space->machine().rand() & ~0xfcff ) |
-			(      1 << (8 + (space->machine().rand()&1)) );
+	return	( input_port_read(machine(), "SYSTEM") &  0xfcff ) |
+			(           machine().rand() & ~0xfcff ) |
+			(      1 << (8 + (machine().rand()&1)) );
 }
 
-static READ16_HANDLER( unknown_read_0xc00000 )
+READ16_MEMBER(stepstag_state::unknown_read_0xc00000)
 {
-	return space->machine().rand();
+	return machine().rand();
 }
 
-static READ16_HANDLER( unknown_read_0xd00000 )
+READ16_MEMBER(stepstag_state::unknown_read_0xd00000)
 {
-	return space->machine().rand();
+	return machine().rand();
 }
 
-static READ16_HANDLER( unknown_read_0xffff00 )
+READ16_MEMBER(stepstag_state::unknown_read_0xffff00)
 {
-	return space->machine().rand();
+	return machine().rand();
 }
 
 static ADDRESS_MAP_START( stepstag_map, AS_PROGRAM, 16, stepstag_state )
@@ -71,7 +75,7 @@ static ADDRESS_MAP_START( stepstag_map, AS_PROGRAM, 16, stepstag_state )
 	AM_RANGE(0x600000, 0x60ffff) AM_RAM_WRITE(tetrisp2_vram_rot_w) AM_BASE(m_vram_rot)	// Rotation
 	AM_RANGE(0x900000, 0x903fff) AM_READWRITE(tetrisp2_nvram_r, tetrisp2_nvram_w) AM_BASE(m_nvram) AM_SHARE("nvram")	// NVRAM
 	AM_RANGE(0x904000, 0x907fff) AM_READWRITE(tetrisp2_nvram_r, tetrisp2_nvram_w)				// NVRAM (mirror)
-//  AM_RANGE(0xa00000, 0xa7ffff) AM_READ_LEGACY(unknown_read_0xc00000 ) // presumably comms with slave CPU
+//  AM_RANGE(0xa00000, 0xa7ffff) AM_READ(unknown_read_0xc00000 ) // presumably comms with slave CPU
 	AM_RANGE(0xb00000, 0xb00001) AM_WRITENOP								// Coin Counter plus other things
 	AM_RANGE(0xb20000, 0xb20001) AM_WRITENOP													// protection related?
 	AM_RANGE(0xb40000, 0xb4000b) AM_WRITEONLY AM_BASE(m_scroll_fg)						// Foreground Scrolling
@@ -81,7 +85,7 @@ static ADDRESS_MAP_START( stepstag_map, AS_PROGRAM, 16, stepstag_state )
 	AM_RANGE(0xba0000, 0xba001f) AM_WRITE(tetrisp2_systemregs_w)								// system param
 	AM_RANGE(0xba001e, 0xba001f) AM_WRITENOP													// Lev 2 irq ack
 	AM_RANGE(0xbe0002, 0xbe0003) AM_READ_PORT("PLAYERS")										// Inputs
-	AM_RANGE(0xbe0004, 0xbe0005) AM_READ_LEGACY(stepstag_ip_1_word_r)									// Inputs & protection
+	AM_RANGE(0xbe0004, 0xbe0005) AM_READ(stepstag_ip_1_word_r)									// Inputs & protection
 	AM_RANGE(0xbe0008, 0xbe0009) AM_READ_PORT("DSW")											// Inputs
 	AM_RANGE(0xbe000a, 0xbe000b) AM_READNOP //watchdog
 ADDRESS_MAP_END
@@ -110,10 +114,10 @@ static ADDRESS_MAP_START( stepstag_sub_map, AS_PROGRAM, 16, stepstag_state )
 	AM_RANGE(0x980000, 0x980001) AM_WRITENOP //??
 	AM_RANGE(0xa00000, 0xa7ffff) AM_RAM
 	AM_RANGE(0xa80000, 0xa80001) AM_WRITENOP //??
-	AM_RANGE(0xc00000, 0xc00001) AM_READ_LEGACY(unknown_read_0xc00000) AM_WRITENOP //??
-	AM_RANGE(0xd00000, 0xd00001) AM_READ_LEGACY(unknown_read_0xd00000)
+	AM_RANGE(0xc00000, 0xc00001) AM_READ(unknown_read_0xc00000) AM_WRITENOP //??
+	AM_RANGE(0xd00000, 0xd00001) AM_READ(unknown_read_0xd00000)
 	AM_RANGE(0xf00000, 0xf00001) AM_WRITENOP //??
-	AM_RANGE(0xffff00, 0xffff01) AM_READ_LEGACY(unknown_read_0xffff00)
+	AM_RANGE(0xffff00, 0xffff01) AM_READ(unknown_read_0xffff00)
 ADDRESS_MAP_END
 
 /* TODO: inputs are copied from Tetris Plus 2, they needs to be changed accordingly */

@@ -63,6 +63,7 @@ public:
 		: amiga_state(mconfig, type, tag) { }
 
 	UINT8 coin_counter[2];
+	DECLARE_WRITE16_MEMBER(arcadia_multibios_change_game);
 };
 
 
@@ -73,12 +74,12 @@ public:
  *
  *************************************/
 
-static WRITE16_HANDLER( arcadia_multibios_change_game )
+WRITE16_MEMBER(arcadia_amiga_state::arcadia_multibios_change_game)
 {
 	if (data == 0)
-		space->install_read_bank(0x800000, 0x97ffff, "bank2");
+		space.install_read_bank(0x800000, 0x97ffff, "bank2");
 	else
-		space->nop_read(0x800000, 0x97ffff);
+		space.nop_read(0x800000, 0x97ffff);
 }
 
 
@@ -203,7 +204,7 @@ static ADDRESS_MAP_START( amiga_map, AS_PROGRAM, 16, arcadia_amiga_state )
 	AM_RANGE(0x800000, 0x97ffff) AM_ROMBANK("bank2") AM_REGION("user3", 0)
 	AM_RANGE(0x980000, 0x9fbfff) AM_ROM AM_REGION("user2", 0)
 	AM_RANGE(0x9fc000, 0x9ffffd) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x9ffffe, 0x9fffff) AM_WRITE_LEGACY(arcadia_multibios_change_game)
+	AM_RANGE(0x9ffffe, 0x9fffff) AM_WRITE(arcadia_multibios_change_game)
 	AM_RANGE(0xf00000, 0xf7ffff) AM_ROM AM_REGION("user2", 0)
 ADDRESS_MAP_END
 

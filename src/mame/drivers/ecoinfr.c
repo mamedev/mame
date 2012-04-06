@@ -55,6 +55,31 @@ public:
 	UINT8 port16_value;
 	UINT8 port17_value;
 
+	DECLARE_WRITE8_MEMBER(ec_port00_out_w);
+	DECLARE_WRITE8_MEMBER(ec_port01_out_w);
+	DECLARE_WRITE8_MEMBER(ec_port02_out_w);
+	DECLARE_WRITE8_MEMBER(ec_port03_out_w);
+	DECLARE_WRITE8_MEMBER(ec_port04_out_w);
+	DECLARE_WRITE8_MEMBER(ec_port05_out_w);
+	DECLARE_WRITE8_MEMBER(ec_port06_out_w);
+	DECLARE_WRITE8_MEMBER(ec_port07_out_w);
+	DECLARE_WRITE8_MEMBER(ec_port08_out_w);
+	DECLARE_WRITE8_MEMBER(ec_port09_out_w);
+	DECLARE_WRITE8_MEMBER(ec_port0a_out_w);
+	DECLARE_WRITE8_MEMBER(ec_port0b_out_w);
+	DECLARE_WRITE8_MEMBER(ec_port0c_out_w);
+	DECLARE_WRITE8_MEMBER(ec_port0d_out_w);
+	DECLARE_WRITE8_MEMBER(ec_port0e_out_w);
+	DECLARE_WRITE8_MEMBER(ec_port0f_out_w);
+	DECLARE_WRITE8_MEMBER(ec_port10_out_w);
+	DECLARE_WRITE8_MEMBER(ec_port11_out_w);
+	DECLARE_WRITE8_MEMBER(ec_port12_out_w);
+	DECLARE_WRITE8_MEMBER(ec_port13_out_w);
+	DECLARE_WRITE8_MEMBER(ec_port14_out_w);
+	DECLARE_WRITE8_MEMBER(ec_port15_out_w);
+	DECLARE_WRITE8_MEMBER(ec_port16_out_w);
+	DECLARE_WRITE8_MEMBER(ec_port17_out_w);
+	DECLARE_WRITE8_MEMBER(ec_port18_out_w);
 };
 
 
@@ -89,47 +114,47 @@ TIMER_DEVICE_CALLBACK( ecoinfr_irq_timer )
 }
 
 
-WRITE8_HANDLER( ec_port00_out_w )
+WRITE8_MEMBER(ecoinfr_state::ec_port00_out_w)
 {
 	// Reel 1 Control
 }
 
-WRITE8_HANDLER( ec_port01_out_w )
+WRITE8_MEMBER(ecoinfr_state::ec_port01_out_w)
 {
 	// Reel 2 Control
 }
 
-WRITE8_HANDLER( ec_port02_out_w )
+WRITE8_MEMBER(ecoinfr_state::ec_port02_out_w)
 {
 	// Reel 3 Control
 }
 
-WRITE8_HANDLER( ec_port03_out_w )
+WRITE8_MEMBER(ecoinfr_state::ec_port03_out_w)
 {
 
 }
 
-WRITE8_HANDLER( ec_port04_out_w )
+WRITE8_MEMBER(ecoinfr_state::ec_port04_out_w)
 {
 
 }
 
-WRITE8_HANDLER( ec_port05_out_w )
+WRITE8_MEMBER(ecoinfr_state::ec_port05_out_w)
 {
 
 }
 
-WRITE8_HANDLER( ec_port06_out_w )
+WRITE8_MEMBER(ecoinfr_state::ec_port06_out_w)
 {
 
 }
 
-WRITE8_HANDLER( ec_port07_out_w )
+WRITE8_MEMBER(ecoinfr_state::ec_port07_out_w)
 {
 
 }
 
-WRITE8_HANDLER( ec_port08_out_w )
+WRITE8_MEMBER(ecoinfr_state::ec_port08_out_w)
 {
 
 }
@@ -137,188 +162,188 @@ WRITE8_HANDLER( ec_port08_out_w )
 // we could do the same thing here with input ports configured to outputs, however
 // I've done it with handlers for now as it allows greater flexibility while the driver
 // is developed
-WRITE8_HANDLER( ec_port09_out_w )
-{
-	ecoinfr_state *state = space->machine().driver_data<ecoinfr_state>();
-	int old_port09_value = state->port09_value;
-	state->port09_value = data;
-
-	if ((state->port09_value&0x01) != (old_port09_value&0x01)) printf("port09 0x01 changed %02x\n", state->port09_value&0x01);
-	if ((state->port09_value&0x02) != (old_port09_value&0x02)) printf("port09 0x02 changed %02x\n", state->port09_value&0x02);
-	if ((state->port09_value&0x04) != (old_port09_value&0x04)) printf("port09 0x04 changed %02x (REEL3 ENABLE)\n", state->port09_value&0x04);
-	if ((state->port09_value&0x08) != (old_port09_value&0x08)) printf("port09 0x08 changed %02x (REEL2 ENABLE)\n", state->port09_value&0x08);
-	if ((state->port09_value&0x10) != (old_port09_value&0x10)) printf("port09 0x10 changed %02x (REEL1 ENABLE)\n", state->port09_value&0x10);
-	if ((state->port09_value&0x20) != (old_port09_value&0x20)) printf("port09 0x20 changed %02x\n", state->port09_value&0x20);
-	if ((state->port09_value&0x40) != (old_port09_value&0x40)) printf("port09 0x40 changed %02x\n", state->port09_value&0x40);
-	if ((state->port09_value&0x80) != (old_port09_value&0x80)) printf("port09 0x80 changed %02x\n", state->port09_value&0x80);
-}
-
-WRITE8_HANDLER( ec_port0a_out_w )
+WRITE8_MEMBER(ecoinfr_state::ec_port09_out_w)
 {
 
+	int old_port09_value = port09_value;
+	port09_value = data;
+
+	if ((port09_value&0x01) != (old_port09_value&0x01)) printf("port09 0x01 changed %02x\n", port09_value&0x01);
+	if ((port09_value&0x02) != (old_port09_value&0x02)) printf("port09 0x02 changed %02x\n", port09_value&0x02);
+	if ((port09_value&0x04) != (old_port09_value&0x04)) printf("port09 0x04 changed %02x (REEL3 ENABLE)\n", port09_value&0x04);
+	if ((port09_value&0x08) != (old_port09_value&0x08)) printf("port09 0x08 changed %02x (REEL2 ENABLE)\n", port09_value&0x08);
+	if ((port09_value&0x10) != (old_port09_value&0x10)) printf("port09 0x10 changed %02x (REEL1 ENABLE)\n", port09_value&0x10);
+	if ((port09_value&0x20) != (old_port09_value&0x20)) printf("port09 0x20 changed %02x\n", port09_value&0x20);
+	if ((port09_value&0x40) != (old_port09_value&0x40)) printf("port09 0x40 changed %02x\n", port09_value&0x40);
+	if ((port09_value&0x80) != (old_port09_value&0x80)) printf("port09 0x80 changed %02x\n", port09_value&0x80);
 }
 
-
-WRITE8_HANDLER( ec_port0b_out_w )
+WRITE8_MEMBER(ecoinfr_state::ec_port0a_out_w)
 {
 
 }
 
-WRITE8_HANDLER( ec_port0c_out_w )
+
+WRITE8_MEMBER(ecoinfr_state::ec_port0b_out_w)
 {
 
 }
 
-WRITE8_HANDLER( ec_port0d_out_w )
+WRITE8_MEMBER(ecoinfr_state::ec_port0c_out_w)
 {
 
 }
 
-WRITE8_HANDLER( ec_port0e_out_w )
+WRITE8_MEMBER(ecoinfr_state::ec_port0d_out_w)
 {
 
 }
 
-WRITE8_HANDLER( ec_port0f_out_w )
+WRITE8_MEMBER(ecoinfr_state::ec_port0e_out_w)
 {
 
 }
 
-WRITE8_HANDLER( ec_port10_out_w )
+WRITE8_MEMBER(ecoinfr_state::ec_port0f_out_w)
 {
-	ecoinfr_state *state = space->machine().driver_data<ecoinfr_state>();
-	int old_port10_value = state->port10_value;
-	state->port10_value = data;
 
-	if ((state->port10_value&0x01) != (old_port10_value&0x01)) printf("port10 0x01 changed %02x\n", state->port10_value&0x01);
-	if ((state->port10_value&0x02) != (old_port10_value&0x02)) printf("port10 0x02 changed %02x\n", state->port10_value&0x02);
-	if ((state->port10_value&0x04) != (old_port10_value&0x04)) printf("port10 0x04 changed %02x\n", state->port10_value&0x04);
-	if ((state->port10_value&0x08) != (old_port10_value&0x08)) printf("port10 0x08 changed %02x\n", state->port10_value&0x08);
-	if ((state->port10_value&0x10) != (old_port10_value&0x10)) printf("port10 0x10 changed %02x\n", state->port10_value&0x10);
-	if ((state->port10_value&0x20) != (old_port10_value&0x20)) printf("port10 0x20 changed %02x\n", state->port10_value&0x20);
-	if ((state->port10_value&0x40) != (old_port10_value&0x40)) printf("port10 0x40 changed %02x\n", state->port10_value&0x40);
-	if ((state->port10_value&0x80) != (old_port10_value&0x80)) printf("port10 0x80 changed %02x\n", state->port10_value&0x80);
 }
 
-WRITE8_HANDLER( ec_port11_out_w )
+WRITE8_MEMBER(ecoinfr_state::ec_port10_out_w)
 {
-	ecoinfr_state *state = space->machine().driver_data<ecoinfr_state>();
-	int old_port11_value = state->port11_value;
-	state->port11_value = data;
 
-	if ((state->port11_value&0x01) != (old_port11_value&0x01)) printf("port11 0x01 changed %02x\n", state->port11_value&0x01);
-	if ((state->port11_value&0x02) != (old_port11_value&0x02)) printf("port11 0x02 changed %02x\n", state->port11_value&0x02);
-	if ((state->port11_value&0x04) != (old_port11_value&0x04)) printf("port11 0x04 changed %02x\n", state->port11_value&0x04);
-	if ((state->port11_value&0x08) != (old_port11_value&0x08)) printf("port11 0x08 changed %02x\n", state->port11_value&0x08);
-	if ((state->port11_value&0x10) != (old_port11_value&0x10)) printf("port11 0x10 changed %02x\n", state->port11_value&0x10);
-	if ((state->port11_value&0x20) != (old_port11_value&0x20)) printf("port11 0x20 changed %02x\n", state->port11_value&0x20);
-	if ((state->port11_value&0x40) != (old_port11_value&0x40)) printf("port11 0x40 changed %02x\n", state->port11_value&0x40);
-	if ((state->port11_value&0x80) != (old_port11_value&0x80)) printf("port11 0x80 changed %02x\n", state->port11_value&0x80);
+	int old_port10_value = port10_value;
+	port10_value = data;
+
+	if ((port10_value&0x01) != (old_port10_value&0x01)) printf("port10 0x01 changed %02x\n", port10_value&0x01);
+	if ((port10_value&0x02) != (old_port10_value&0x02)) printf("port10 0x02 changed %02x\n", port10_value&0x02);
+	if ((port10_value&0x04) != (old_port10_value&0x04)) printf("port10 0x04 changed %02x\n", port10_value&0x04);
+	if ((port10_value&0x08) != (old_port10_value&0x08)) printf("port10 0x08 changed %02x\n", port10_value&0x08);
+	if ((port10_value&0x10) != (old_port10_value&0x10)) printf("port10 0x10 changed %02x\n", port10_value&0x10);
+	if ((port10_value&0x20) != (old_port10_value&0x20)) printf("port10 0x20 changed %02x\n", port10_value&0x20);
+	if ((port10_value&0x40) != (old_port10_value&0x40)) printf("port10 0x40 changed %02x\n", port10_value&0x40);
+	if ((port10_value&0x80) != (old_port10_value&0x80)) printf("port10 0x80 changed %02x\n", port10_value&0x80);
 }
 
-WRITE8_HANDLER( ec_port12_out_w )
+WRITE8_MEMBER(ecoinfr_state::ec_port11_out_w)
 {
-	ecoinfr_state *state = space->machine().driver_data<ecoinfr_state>();
-	int old_port12_value = state->port12_value;
-	state->port12_value = data;
 
-	if ((state->port12_value&0x01) != (old_port12_value&0x01)) printf("port12 0x01 changed %02x\n", state->port12_value&0x01);
-	if ((state->port12_value&0x02) != (old_port12_value&0x02)) printf("port12 0x02 changed %02x\n", state->port12_value&0x02);
-	if ((state->port12_value&0x04) != (old_port12_value&0x04)) printf("port12 0x04 changed %02x\n", state->port12_value&0x04);
-	if ((state->port12_value&0x08) != (old_port12_value&0x08)) printf("port12 0x08 changed %02x\n", state->port12_value&0x08);
-	if ((state->port12_value&0x10) != (old_port12_value&0x10)) printf("port12 0x10 changed %02x\n", state->port12_value&0x10);
-	if ((state->port12_value&0x20) != (old_port12_value&0x20)) printf("port12 0x20 changed %02x\n", state->port12_value&0x20);
-	if ((state->port12_value&0x40) != (old_port12_value&0x40)) printf("port12 0x40 changed %02x\n", state->port12_value&0x40);
-	if ((state->port12_value&0x80) != (old_port12_value&0x80)) printf("port12 0x80 changed %02x\n", state->port12_value&0x80);
+	int old_port11_value = port11_value;
+	port11_value = data;
+
+	if ((port11_value&0x01) != (old_port11_value&0x01)) printf("port11 0x01 changed %02x\n", port11_value&0x01);
+	if ((port11_value&0x02) != (old_port11_value&0x02)) printf("port11 0x02 changed %02x\n", port11_value&0x02);
+	if ((port11_value&0x04) != (old_port11_value&0x04)) printf("port11 0x04 changed %02x\n", port11_value&0x04);
+	if ((port11_value&0x08) != (old_port11_value&0x08)) printf("port11 0x08 changed %02x\n", port11_value&0x08);
+	if ((port11_value&0x10) != (old_port11_value&0x10)) printf("port11 0x10 changed %02x\n", port11_value&0x10);
+	if ((port11_value&0x20) != (old_port11_value&0x20)) printf("port11 0x20 changed %02x\n", port11_value&0x20);
+	if ((port11_value&0x40) != (old_port11_value&0x40)) printf("port11 0x40 changed %02x\n", port11_value&0x40);
+	if ((port11_value&0x80) != (old_port11_value&0x80)) printf("port11 0x80 changed %02x\n", port11_value&0x80);
 }
 
-WRITE8_HANDLER( ec_port13_out_w )
+WRITE8_MEMBER(ecoinfr_state::ec_port12_out_w)
 {
-	ecoinfr_state *state = space->machine().driver_data<ecoinfr_state>();
-	int old_port13_value = state->port13_value;
-	state->port13_value = data;
 
-	if ((state->port13_value&0x01) != (old_port13_value&0x01)) printf("port13 0x01 changed %02x\n", state->port13_value&0x01);
-	if ((state->port13_value&0x02) != (old_port13_value&0x02)) printf("port13 0x02 changed %02x\n", state->port13_value&0x02);
-	if ((state->port13_value&0x04) != (old_port13_value&0x04)) printf("port13 0x04 changed %02x\n", state->port13_value&0x04);
-	if ((state->port13_value&0x08) != (old_port13_value&0x08)) printf("port13 0x08 changed %02x\n", state->port13_value&0x08);
-	if ((state->port13_value&0x10) != (old_port13_value&0x10)) printf("port13 0x10 changed %02x\n", state->port13_value&0x10);
-	if ((state->port13_value&0x20) != (old_port13_value&0x20)) printf("port13 0x20 changed %02x\n", state->port13_value&0x20);
-	if ((state->port13_value&0x40) != (old_port13_value&0x40)) printf("port13 0x40 changed %02x\n", state->port13_value&0x40);
-	if ((state->port13_value&0x80) != (old_port13_value&0x80)) printf("port13 0x80 changed %02x\n", state->port13_value&0x80);
+	int old_port12_value = port12_value;
+	port12_value = data;
+
+	if ((port12_value&0x01) != (old_port12_value&0x01)) printf("port12 0x01 changed %02x\n", port12_value&0x01);
+	if ((port12_value&0x02) != (old_port12_value&0x02)) printf("port12 0x02 changed %02x\n", port12_value&0x02);
+	if ((port12_value&0x04) != (old_port12_value&0x04)) printf("port12 0x04 changed %02x\n", port12_value&0x04);
+	if ((port12_value&0x08) != (old_port12_value&0x08)) printf("port12 0x08 changed %02x\n", port12_value&0x08);
+	if ((port12_value&0x10) != (old_port12_value&0x10)) printf("port12 0x10 changed %02x\n", port12_value&0x10);
+	if ((port12_value&0x20) != (old_port12_value&0x20)) printf("port12 0x20 changed %02x\n", port12_value&0x20);
+	if ((port12_value&0x40) != (old_port12_value&0x40)) printf("port12 0x40 changed %02x\n", port12_value&0x40);
+	if ((port12_value&0x80) != (old_port12_value&0x80)) printf("port12 0x80 changed %02x\n", port12_value&0x80);
 }
 
-WRITE8_HANDLER( ec_port14_out_w )
+WRITE8_MEMBER(ecoinfr_state::ec_port13_out_w)
 {
-	ecoinfr_state *state = space->machine().driver_data<ecoinfr_state>();
-	int old_port14_value = state->port14_value;
-	state->port14_value = data;
 
-	if ((state->port14_value&0x01) != (old_port14_value&0x01)) printf("port14 0x01 changed %02x\n", state->port14_value&0x01);
-	if ((state->port14_value&0x02) != (old_port14_value&0x02)) printf("port14 0x02 changed %02x\n", state->port14_value&0x02);
-	if ((state->port14_value&0x04) != (old_port14_value&0x04)) printf("port14 0x04 changed %02x\n", state->port14_value&0x04);
-	if ((state->port14_value&0x08) != (old_port14_value&0x08)) printf("port14 0x08 changed %02x\n", state->port14_value&0x08);
-	if ((state->port14_value&0x10) != (old_port14_value&0x10)) printf("port14 0x10 changed %02x\n", state->port14_value&0x10);
-	if ((state->port14_value&0x20) != (old_port14_value&0x20)) printf("port14 0x20 changed %02x\n", state->port14_value&0x20);
-	if ((state->port14_value&0x40) != (old_port14_value&0x40)) printf("port14 0x40 changed %02x\n", state->port14_value&0x40);
-	if ((state->port14_value&0x80) != (old_port14_value&0x80)) printf("port14 0x80 changed %02x\n", state->port14_value&0x80);
+	int old_port13_value = port13_value;
+	port13_value = data;
+
+	if ((port13_value&0x01) != (old_port13_value&0x01)) printf("port13 0x01 changed %02x\n", port13_value&0x01);
+	if ((port13_value&0x02) != (old_port13_value&0x02)) printf("port13 0x02 changed %02x\n", port13_value&0x02);
+	if ((port13_value&0x04) != (old_port13_value&0x04)) printf("port13 0x04 changed %02x\n", port13_value&0x04);
+	if ((port13_value&0x08) != (old_port13_value&0x08)) printf("port13 0x08 changed %02x\n", port13_value&0x08);
+	if ((port13_value&0x10) != (old_port13_value&0x10)) printf("port13 0x10 changed %02x\n", port13_value&0x10);
+	if ((port13_value&0x20) != (old_port13_value&0x20)) printf("port13 0x20 changed %02x\n", port13_value&0x20);
+	if ((port13_value&0x40) != (old_port13_value&0x40)) printf("port13 0x40 changed %02x\n", port13_value&0x40);
+	if ((port13_value&0x80) != (old_port13_value&0x80)) printf("port13 0x80 changed %02x\n", port13_value&0x80);
 }
 
-WRITE8_HANDLER( ec_port15_out_w )
+WRITE8_MEMBER(ecoinfr_state::ec_port14_out_w)
 {
-	ecoinfr_state *state = space->machine().driver_data<ecoinfr_state>();
-	int old_port15_value = state->port15_value;
-	state->port15_value = data;
 
-	if ((state->port15_value&0x01) != (old_port15_value&0x01)) printf("port15 0x01 changed %02x\n", state->port15_value&0x01);
-	if ((state->port15_value&0x02) != (old_port15_value&0x02)) printf("port15 0x02 changed %02x\n", state->port15_value&0x02);
-	if ((state->port15_value&0x04) != (old_port15_value&0x04)) printf("port15 0x04 changed %02x\n", state->port15_value&0x04);
-	if ((state->port15_value&0x08) != (old_port15_value&0x08)) printf("port15 0x08 changed %02x\n", state->port15_value&0x08);
-	if ((state->port15_value&0x10) != (old_port15_value&0x10)) printf("port15 0x10 changed %02x\n", state->port15_value&0x10);
-	if ((state->port15_value&0x20) != (old_port15_value&0x20)) printf("port15 0x20 changed %02x\n", state->port15_value&0x20);
-	if ((state->port15_value&0x40) != (old_port15_value&0x40)) printf("port15 0x40 changed %02x\n", state->port15_value&0x40);
-	if ((state->port15_value&0x80) != (old_port15_value&0x80)) printf("port15 0x80 changed %02x\n", state->port15_value&0x80);
+	int old_port14_value = port14_value;
+	port14_value = data;
+
+	if ((port14_value&0x01) != (old_port14_value&0x01)) printf("port14 0x01 changed %02x\n", port14_value&0x01);
+	if ((port14_value&0x02) != (old_port14_value&0x02)) printf("port14 0x02 changed %02x\n", port14_value&0x02);
+	if ((port14_value&0x04) != (old_port14_value&0x04)) printf("port14 0x04 changed %02x\n", port14_value&0x04);
+	if ((port14_value&0x08) != (old_port14_value&0x08)) printf("port14 0x08 changed %02x\n", port14_value&0x08);
+	if ((port14_value&0x10) != (old_port14_value&0x10)) printf("port14 0x10 changed %02x\n", port14_value&0x10);
+	if ((port14_value&0x20) != (old_port14_value&0x20)) printf("port14 0x20 changed %02x\n", port14_value&0x20);
+	if ((port14_value&0x40) != (old_port14_value&0x40)) printf("port14 0x40 changed %02x\n", port14_value&0x40);
+	if ((port14_value&0x80) != (old_port14_value&0x80)) printf("port14 0x80 changed %02x\n", port14_value&0x80);
+}
+
+WRITE8_MEMBER(ecoinfr_state::ec_port15_out_w)
+{
+
+	int old_port15_value = port15_value;
+	port15_value = data;
+
+	if ((port15_value&0x01) != (old_port15_value&0x01)) printf("port15 0x01 changed %02x\n", port15_value&0x01);
+	if ((port15_value&0x02) != (old_port15_value&0x02)) printf("port15 0x02 changed %02x\n", port15_value&0x02);
+	if ((port15_value&0x04) != (old_port15_value&0x04)) printf("port15 0x04 changed %02x\n", port15_value&0x04);
+	if ((port15_value&0x08) != (old_port15_value&0x08)) printf("port15 0x08 changed %02x\n", port15_value&0x08);
+	if ((port15_value&0x10) != (old_port15_value&0x10)) printf("port15 0x10 changed %02x\n", port15_value&0x10);
+	if ((port15_value&0x20) != (old_port15_value&0x20)) printf("port15 0x20 changed %02x\n", port15_value&0x20);
+	if ((port15_value&0x40) != (old_port15_value&0x40)) printf("port15 0x40 changed %02x\n", port15_value&0x40);
+	if ((port15_value&0x80) != (old_port15_value&0x80)) printf("port15 0x80 changed %02x\n", port15_value&0x80);
 
 	// some 3rd party stuff has VDF
 	//  printf("ec_port15_out_w data %02x - VDF reset %02x clock %02x\n", data, data & 0x80, data & 0x40);
 }
 
-WRITE8_HANDLER( ec_port16_out_w )
+WRITE8_MEMBER(ecoinfr_state::ec_port16_out_w)
 {
-	ecoinfr_state *state = space->machine().driver_data<ecoinfr_state>();
-	int old_port16_value = state->port16_value;
-	state->port16_value = data;
 
-	if ((state->port16_value&0x01) != (old_port16_value&0x01)) printf("port16 0x01 changed %02x\n", state->port16_value&0x01);
-	if ((state->port16_value&0x02) != (old_port16_value&0x02)) printf("port16 0x02 changed %02x\n", state->port16_value&0x02);
-	if ((state->port16_value&0x04) != (old_port16_value&0x04)) printf("port16 0x04 changed %02x\n", state->port16_value&0x04);
-	if ((state->port16_value&0x08) != (old_port16_value&0x08)) printf("port16 0x08 changed %02x\n", state->port16_value&0x08);
-	if ((state->port16_value&0x10) != (old_port16_value&0x10)) printf("port16 0x10 changed %02x\n", state->port16_value&0x10);
-	if ((state->port16_value&0x20) != (old_port16_value&0x20)) printf("port16 0x20 changed %02x\n", state->port16_value&0x20);
-	if ((state->port16_value&0x40) != (old_port16_value&0x40)) printf("port16 0x40 changed %02x\n", state->port16_value&0x40);
-	if ((state->port16_value&0x80) != (old_port16_value&0x80)) printf("port16 0x80 changed %02x\n", state->port16_value&0x80);
+	int old_port16_value = port16_value;
+	port16_value = data;
+
+	if ((port16_value&0x01) != (old_port16_value&0x01)) printf("port16 0x01 changed %02x\n", port16_value&0x01);
+	if ((port16_value&0x02) != (old_port16_value&0x02)) printf("port16 0x02 changed %02x\n", port16_value&0x02);
+	if ((port16_value&0x04) != (old_port16_value&0x04)) printf("port16 0x04 changed %02x\n", port16_value&0x04);
+	if ((port16_value&0x08) != (old_port16_value&0x08)) printf("port16 0x08 changed %02x\n", port16_value&0x08);
+	if ((port16_value&0x10) != (old_port16_value&0x10)) printf("port16 0x10 changed %02x\n", port16_value&0x10);
+	if ((port16_value&0x20) != (old_port16_value&0x20)) printf("port16 0x20 changed %02x\n", port16_value&0x20);
+	if ((port16_value&0x40) != (old_port16_value&0x40)) printf("port16 0x40 changed %02x\n", port16_value&0x40);
+	if ((port16_value&0x80) != (old_port16_value&0x80)) printf("port16 0x80 changed %02x\n", port16_value&0x80);
 }
 
-WRITE8_HANDLER( ec_port17_out_w )
+WRITE8_MEMBER(ecoinfr_state::ec_port17_out_w)
 {
-	ecoinfr_state *state = space->machine().driver_data<ecoinfr_state>();
-	int old_port17_value = state->port17_value;
-	state->port17_value = data;
 
-	if ((state->port17_value&0x01) != (old_port17_value&0x01)) printf("port17 0x01 changed %02x\n", state->port17_value&0x01);
-	if ((state->port17_value&0x02) != (old_port17_value&0x02)) printf("port17 0x02 changed %02x\n", state->port17_value&0x02);
-	if ((state->port17_value&0x04) != (old_port17_value&0x04)) printf("port17 0x04 changed %02x\n", state->port17_value&0x04);
-	if ((state->port17_value&0x08) != (old_port17_value&0x08)) printf("port17 0x08 changed %02x\n", state->port17_value&0x08);
-	if ((state->port17_value&0x10) != (old_port17_value&0x10)) printf("port17 0x10 changed %02x\n", state->port17_value&0x10);
-	if ((state->port17_value&0x20) != (old_port17_value&0x20)) printf("port17 0x20 changed %02x\n", state->port17_value&0x20);
-	if ((state->port17_value&0x40) != (old_port17_value&0x40)) printf("port17 0x40 changed %02x\n", state->port17_value&0x40);
-	if ((state->port17_value&0x80) != (old_port17_value&0x80)) printf("port17 0x80 changed %02x\n", state->port17_value&0x80);
+	int old_port17_value = port17_value;
+	port17_value = data;
+
+	if ((port17_value&0x01) != (old_port17_value&0x01)) printf("port17 0x01 changed %02x\n", port17_value&0x01);
+	if ((port17_value&0x02) != (old_port17_value&0x02)) printf("port17 0x02 changed %02x\n", port17_value&0x02);
+	if ((port17_value&0x04) != (old_port17_value&0x04)) printf("port17 0x04 changed %02x\n", port17_value&0x04);
+	if ((port17_value&0x08) != (old_port17_value&0x08)) printf("port17 0x08 changed %02x\n", port17_value&0x08);
+	if ((port17_value&0x10) != (old_port17_value&0x10)) printf("port17 0x10 changed %02x\n", port17_value&0x10);
+	if ((port17_value&0x20) != (old_port17_value&0x20)) printf("port17 0x20 changed %02x\n", port17_value&0x20);
+	if ((port17_value&0x40) != (old_port17_value&0x40)) printf("port17 0x40 changed %02x\n", port17_value&0x40);
+	if ((port17_value&0x80) != (old_port17_value&0x80)) printf("port17 0x80 changed %02x\n", port17_value&0x80);
 
 	// some 3rd party stuff has VDF
 	//  printf("ec_port17_out_w data %02x - VDF data %02x\n", data, data & 0x40);
 }
 
-WRITE8_HANDLER( ec_port18_out_w )
+WRITE8_MEMBER(ecoinfr_state::ec_port18_out_w)
 {
 	// Kick Me (Watchdog)
 }
@@ -337,31 +362,31 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( portmap, AS_IO, 8, ecoinfr_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE_LEGACY(ec_port00_out_w) AM_READ_PORT("IN0") // Reel 1 Write
-	AM_RANGE(0x01, 0x01) AM_WRITE_LEGACY(ec_port01_out_w) AM_READ_PORT("IN1") // Reel 2 Write + Reels Opto Read
-	AM_RANGE(0x02, 0x02) AM_WRITE_LEGACY(ec_port02_out_w) AM_READ_PORT("IN2") // Reel 3 Write
-	AM_RANGE(0x03, 0x03) AM_WRITE_LEGACY(ec_port03_out_w) AM_READ_PORT("IN3")
-	AM_RANGE(0x04, 0x04) AM_WRITE_LEGACY(ec_port04_out_w) AM_READ_PORT("IN4")
-	AM_RANGE(0x05, 0x05) AM_WRITE_LEGACY(ec_port05_out_w) AM_READ_PORT("IN5")
-	AM_RANGE(0x06, 0x06) AM_WRITE_LEGACY(ec_port06_out_w) AM_READ_PORT("IN6")
-	AM_RANGE(0x07, 0x07) AM_WRITE_LEGACY(ec_port07_out_w) AM_READ_PORT("IN7")
-	AM_RANGE(0x08, 0x08) AM_WRITE_LEGACY(ec_port08_out_w)
-	AM_RANGE(0x09, 0x09) AM_WRITE_LEGACY(ec_port09_out_w) // 09 Reel Enables
-	AM_RANGE(0x0a, 0x0a) AM_WRITE_LEGACY(ec_port0a_out_w) // 10 (Sound 1)
-	AM_RANGE(0x0b, 0x0b) AM_WRITE_LEGACY(ec_port0b_out_w) // 11 (Sound 2)
-	AM_RANGE(0x0c, 0x0c) AM_WRITE_LEGACY(ec_port0c_out_w)
-	AM_RANGE(0x0d, 0x0d) AM_WRITE_LEGACY(ec_port0d_out_w)
-	AM_RANGE(0x0e, 0x0e) AM_WRITE_LEGACY(ec_port0e_out_w)
-	AM_RANGE(0x0f, 0x0f) AM_WRITE_LEGACY(ec_port0f_out_w)
-	AM_RANGE(0x10, 0x10) AM_WRITE_LEGACY(ec_port10_out_w) // 16 (Meter)
-	AM_RANGE(0x11, 0x11) AM_WRITE_LEGACY(ec_port11_out_w) // SEC
-	AM_RANGE(0x12, 0x12) AM_WRITE_LEGACY(ec_port12_out_w) // SEC
-	AM_RANGE(0x13, 0x13) AM_WRITE_LEGACY(ec_port13_out_w)
-	AM_RANGE(0x14, 0x14) AM_WRITE_LEGACY(ec_port14_out_w)
-	AM_RANGE(0x15, 0x15) AM_WRITE_LEGACY(ec_port15_out_w) // SEC + VDF (3rd party)
-	AM_RANGE(0x16, 0x16) AM_WRITE_LEGACY(ec_port16_out_w)
-	AM_RANGE(0x17, 0x17) AM_WRITE_LEGACY(ec_port17_out_w) // Hopper + VDF (3rd party)
-	AM_RANGE(0x18, 0x18) AM_WRITE_LEGACY(ec_port18_out_w) // 24 (Watchdog)
+	AM_RANGE(0x00, 0x00) AM_WRITE(ec_port00_out_w) AM_READ_PORT("IN0") // Reel 1 Write
+	AM_RANGE(0x01, 0x01) AM_WRITE(ec_port01_out_w) AM_READ_PORT("IN1") // Reel 2 Write + Reels Opto Read
+	AM_RANGE(0x02, 0x02) AM_WRITE(ec_port02_out_w) AM_READ_PORT("IN2") // Reel 3 Write
+	AM_RANGE(0x03, 0x03) AM_WRITE(ec_port03_out_w) AM_READ_PORT("IN3")
+	AM_RANGE(0x04, 0x04) AM_WRITE(ec_port04_out_w) AM_READ_PORT("IN4")
+	AM_RANGE(0x05, 0x05) AM_WRITE(ec_port05_out_w) AM_READ_PORT("IN5")
+	AM_RANGE(0x06, 0x06) AM_WRITE(ec_port06_out_w) AM_READ_PORT("IN6")
+	AM_RANGE(0x07, 0x07) AM_WRITE(ec_port07_out_w) AM_READ_PORT("IN7")
+	AM_RANGE(0x08, 0x08) AM_WRITE(ec_port08_out_w)
+	AM_RANGE(0x09, 0x09) AM_WRITE(ec_port09_out_w) // 09 Reel Enables
+	AM_RANGE(0x0a, 0x0a) AM_WRITE(ec_port0a_out_w) // 10 (Sound 1)
+	AM_RANGE(0x0b, 0x0b) AM_WRITE(ec_port0b_out_w) // 11 (Sound 2)
+	AM_RANGE(0x0c, 0x0c) AM_WRITE(ec_port0c_out_w)
+	AM_RANGE(0x0d, 0x0d) AM_WRITE(ec_port0d_out_w)
+	AM_RANGE(0x0e, 0x0e) AM_WRITE(ec_port0e_out_w)
+	AM_RANGE(0x0f, 0x0f) AM_WRITE(ec_port0f_out_w)
+	AM_RANGE(0x10, 0x10) AM_WRITE(ec_port10_out_w) // 16 (Meter)
+	AM_RANGE(0x11, 0x11) AM_WRITE(ec_port11_out_w) // SEC
+	AM_RANGE(0x12, 0x12) AM_WRITE(ec_port12_out_w) // SEC
+	AM_RANGE(0x13, 0x13) AM_WRITE(ec_port13_out_w)
+	AM_RANGE(0x14, 0x14) AM_WRITE(ec_port14_out_w)
+	AM_RANGE(0x15, 0x15) AM_WRITE(ec_port15_out_w) // SEC + VDF (3rd party)
+	AM_RANGE(0x16, 0x16) AM_WRITE(ec_port16_out_w)
+	AM_RANGE(0x17, 0x17) AM_WRITE(ec_port17_out_w) // Hopper + VDF (3rd party)
+	AM_RANGE(0x18, 0x18) AM_WRITE(ec_port18_out_w) // 24 (Watchdog)
 ADDRESS_MAP_END
 
 static CUSTOM_INPUT( ecoinfr_reel1_opto_r )

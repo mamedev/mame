@@ -30,6 +30,8 @@ public:
 
 	UINT8 *  m_bgvram;
 	UINT8 *  m_bg_paletteram;
+	DECLARE_WRITE8_MEMBER(bg_paletteram_RRRRGGGGBBBBxxxx_be_w);
+	DECLARE_WRITE8_MEMBER(missb2_bg_bank_w);
 };
 
 
@@ -136,22 +138,22 @@ INLINE void bg_changecolor_RRRRGGGGBBBBxxxx( running_machine &machine, pen_t col
 	palette_set_color_rgb(machine, color + 256, pal4bit(data >> 12), pal4bit(data >> 8), pal4bit(data >> 4));
 }
 
-static WRITE8_HANDLER( bg_paletteram_RRRRGGGGBBBBxxxx_be_w )
+WRITE8_MEMBER(missb2_state::bg_paletteram_RRRRGGGGBBBBxxxx_be_w)
 {
-	missb2_state *state = space->machine().driver_data<missb2_state>();
-	state->m_bg_paletteram[offset] = data;
-	bg_changecolor_RRRRGGGGBBBBxxxx(space->machine(), offset / 2, state->m_bg_paletteram[offset | 1] | (state->m_bg_paletteram[offset & ~1] << 8));
+
+	m_bg_paletteram[offset] = data;
+	bg_changecolor_RRRRGGGGBBBBxxxx(machine(), offset / 2, m_bg_paletteram[offset | 1] | (m_bg_paletteram[offset & ~1] << 8));
 }
 
-static WRITE8_HANDLER( missb2_bg_bank_w )
+WRITE8_MEMBER(missb2_state::missb2_bg_bank_w)
 {
 	int bank;
 
 	// I don't know how this is really connected, bit 1 is always high afaik...
 	bank = ((data & 2) ? 1 : 0) | ((data & 1) ? 4 : 0);
 
-	memory_set_bank(space->machine(), "bank2", bank);
-	memory_set_bank(space->machine(), "bank3", bank);
+	memory_set_bank(machine(), "bank2", bank);
+	memory_set_bank(machine(), "bank3", bank);
 }
 
 /* Memory Maps */
@@ -184,9 +186,9 @@ static ADDRESS_MAP_START( slave_map, AS_PROGRAM, 8, missb2_state )
 	AM_RANGE(0x9000, 0x9fff) AM_ROMBANK("bank2")	// ROM data for the background palette ram
 	AM_RANGE(0xa000, 0xafff) AM_ROMBANK("bank3")	// ROM data for the background palette ram
 	AM_RANGE(0xb000, 0xb1ff) AM_ROM			// banked ???
-	AM_RANGE(0xc000, 0xc1ff) AM_RAM_WRITE_LEGACY(bg_paletteram_RRRRGGGGBBBBxxxx_be_w) AM_BASE(m_bg_paletteram)
+	AM_RANGE(0xc000, 0xc1ff) AM_RAM_WRITE(bg_paletteram_RRRRGGGGBBBBxxxx_be_w) AM_BASE(m_bg_paletteram)
 	AM_RANGE(0xc800, 0xcfff) AM_RAM			// main ???
-	AM_RANGE(0xd000, 0xd000) AM_WRITE_LEGACY(missb2_bg_bank_w)
+	AM_RANGE(0xd000, 0xd000) AM_WRITE(missb2_bg_bank_w)
 	AM_RANGE(0xd002, 0xd002) AM_WRITENOP
 	AM_RANGE(0xd003, 0xd003) AM_RAM AM_BASE(m_bgvram)
 	AM_RANGE(0xe000, 0xf7ff) AM_RAM AM_SHARE("share1")

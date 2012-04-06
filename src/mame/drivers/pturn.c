@@ -109,6 +109,8 @@ public:
 	DECLARE_WRITE8_MEMBER(bgbank_w);
 	DECLARE_WRITE8_MEMBER(flip_w);
 	DECLARE_READ8_MEMBER(pturn_custom_r);
+	DECLARE_READ8_MEMBER(pturn_protection_r);
+	DECLARE_READ8_MEMBER(pturn_protection2_r);
 };
 
 
@@ -203,12 +205,12 @@ static SCREEN_UPDATE_IND16(pturn)
 }
 
 #ifdef UNUSED_FUNCTION
-READ8_HANDLER (pturn_protection_r)
+READ8_MEMBER(pturn_state::pturn_protection_r)
 {
     return 0x66;
 }
 
-READ8_HANDLER (pturn_protection2_r)
+READ8_MEMBER(pturn_state::pturn_protection2_r)
 {
     return 0xfe;
 }

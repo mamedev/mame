@@ -46,31 +46,34 @@ public:
 
 	UINT8 m_hop_io;
 	UINT8 m_bell_io;
+	DECLARE_WRITE8_MEMBER(output_0_w);
+	DECLARE_READ8_MEMBER(input_1_r);
+	DECLARE_WRITE8_MEMBER(output_1_w);
 };
 
 
-static WRITE8_HANDLER( output_0_w )
+WRITE8_MEMBER(cchance_state::output_0_w)
 {
 
 	//---- --x- divider?
-	coin_lockout_w(space->machine(), 0, ~data & 1);
+	coin_lockout_w(machine(), 0, ~data & 1);
 
-//  coin_counter_w(space->machine(), 0, ~data & 1);
+//  coin_counter_w(machine(), 0, ~data & 1);
 }
 
 
-static READ8_HANDLER( input_1_r )
+READ8_MEMBER(cchance_state::input_1_r)
 {
-	cchance_state *state = space->machine().driver_data<cchance_state>();
-	return (state->m_hop_io) | (state->m_bell_io) | (input_port_read(space->machine(), "SP") & 0xff);
+
+	return (m_hop_io) | (m_bell_io) | (input_port_read(machine(), "SP") & 0xff);
 }
 
-static WRITE8_HANDLER( output_1_w )
+WRITE8_MEMBER(cchance_state::output_1_w)
 {
-	cchance_state *state = space->machine().driver_data<cchance_state>();
 
-	state->m_hop_io = (data & 0x40)>>4;
-	state->m_bell_io = (data & 0x80)>>4;
+
+	m_hop_io = (data & 0x40)>>4;
+	m_bell_io = (data & 0x80)>>4;
 }
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, cchance_state )
@@ -86,8 +89,8 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, cchance_state )
 	AM_RANGE(0xe800, 0xe800) AM_DEVWRITE_LEGACY("spritegen", spritebgflag_w8)	/* enable / disable background transparency */
 
 	AM_RANGE(0xf000, 0xf000) AM_READNOP AM_WRITENOP //???
-	AM_RANGE(0xf001, 0xf001) AM_READ_LEGACY(input_1_r) AM_WRITE_LEGACY(output_0_w)
-	AM_RANGE(0xf002, 0xf002) AM_READ_PORT("IN0") AM_WRITE_LEGACY(output_1_w)
+	AM_RANGE(0xf001, 0xf001) AM_READ(input_1_r) AM_WRITE(output_0_w)
+	AM_RANGE(0xf002, 0xf002) AM_READ_PORT("IN0") AM_WRITE(output_1_w)
 	AM_RANGE(0xf800, 0xf801) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
 	AM_RANGE(0xf801, 0xf801) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
 ADDRESS_MAP_END

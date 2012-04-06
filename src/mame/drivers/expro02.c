@@ -161,6 +161,10 @@ public:
 
 	UINT16 m_vram_0_bank_num;
 	UINT16 m_vram_1_bank_num;
+	DECLARE_WRITE16_MEMBER(galsnew_6295_bankswitch_w);
+	DECLARE_WRITE16_MEMBER(galsnew_paletteram_w);
+	DECLARE_WRITE16_MEMBER(galsnew_vram_0_bank_w);
+	DECLARE_WRITE16_MEMBER(galsnew_vram_1_bank_w);
 };
 
 
@@ -306,11 +310,11 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static WRITE16_HANDLER( galsnew_6295_bankswitch_w )
+WRITE16_MEMBER(expro02_state::galsnew_6295_bankswitch_w)
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		UINT8 *rom = space->machine().region("oki")->base();
+		UINT8 *rom = machine().region("oki")->base();
 		memcpy(&rom[0x30000],&rom[0x40000 + ((data >> 8) & 0x0f) * 0x10000],0x10000);
 	}
 }
@@ -321,45 +325,45 @@ static WRITE16_HANDLER( galsnew_6295_bankswitch_w )
  *
  *************************************/
 
-static WRITE16_HANDLER( galsnew_paletteram_w )
+WRITE16_MEMBER(expro02_state::galsnew_paletteram_w)
 {
-	expro02_state *state = space->machine().driver_data<expro02_state>();
-	data = COMBINE_DATA(&state->m_generic_paletteram_16[offset]);
-	palette_set_color_rgb(space->machine(),offset,pal5bit(data >> 6),pal5bit(data >> 11),pal5bit(data >> 1));
+
+	data = COMBINE_DATA(&m_generic_paletteram_16[offset]);
+	palette_set_color_rgb(machine(),offset,pal5bit(data >> 6),pal5bit(data >> 11),pal5bit(data >> 1));
 }
 
 
-static WRITE16_HANDLER(galsnew_vram_0_bank_w)
+WRITE16_MEMBER(expro02_state::galsnew_vram_0_bank_w)
 {
-	expro02_state *state = space->machine().driver_data<expro02_state>();
+
 	int i;
-	if(state->m_vram_0_bank_num != data)
+	if(m_vram_0_bank_num != data)
 	{
 		for(i = 0; i < 0x1000 / 2; i += 2)
 		{
-			if(state->m_vram[0][i])
+			if(m_vram[0][i])
 			{
-				state->kaneko16_vram_0_w(*space, i+1, data << 8, 0xFF00);
+				kaneko16_vram_0_w(*&space, i+1, data << 8, 0xFF00);
 			}
 		}
-		state->m_vram_0_bank_num = data;
+		m_vram_0_bank_num = data;
 	}
 }
 
-static WRITE16_HANDLER(galsnew_vram_1_bank_w)
+WRITE16_MEMBER(expro02_state::galsnew_vram_1_bank_w)
 {
-	expro02_state *state = space->machine().driver_data<expro02_state>();
+
 	int i;
-	if(state->m_vram_1_bank_num != data)
+	if(m_vram_1_bank_num != data)
 	{
 		for(i = 0; i < 0x1000 / 2; i += 2)
 		{
-			if(state->m_vram[1][i])
+			if(m_vram[1][i])
 			{
-				state->kaneko16_vram_1_w(*space, i+1, data << 8, 0xFF00);
+				kaneko16_vram_1_w(*&space, i+1, data << 8, 0xFF00);
 			}
 		}
-		state->m_vram_1_bank_num = data;
+		m_vram_1_bank_num = data;
 	}
 }
 
@@ -384,7 +388,7 @@ static ADDRESS_MAP_START( galsnew_map, AS_PROGRAM, 16, expro02_state )
 	AM_RANGE(0x582000, 0x582fff) AM_RAM AM_BASE(m_vscroll[1])									//
 	AM_RANGE(0x583000, 0x583fff) AM_RAM AM_BASE(m_vscroll[0])									//
 
-	AM_RANGE(0x600000, 0x600fff) AM_RAM_WRITE_LEGACY(galsnew_paletteram_w) AM_SHARE("paletteram") // palette?
+	AM_RANGE(0x600000, 0x600fff) AM_RAM_WRITE(galsnew_paletteram_w) AM_SHARE("paletteram") // palette?
 
 	AM_RANGE(0x680000, 0x68001f) AM_RAM_WRITE(kaneko16_layers_0_regs_w) AM_BASE(m_layers_0_regs) // sprite regs? tileregs?
 
@@ -396,17 +400,17 @@ static ADDRESS_MAP_START( galsnew_map, AS_PROGRAM, 16, expro02_state )
 	AM_RANGE(0x800002, 0x800003) AM_READ_PORT("DSW2")
 	AM_RANGE(0x800004, 0x800005) AM_READ_PORT("DSW3")
 
-	AM_RANGE(0x900000, 0x900001) AM_WRITE_LEGACY(galsnew_6295_bankswitch_w)
+	AM_RANGE(0x900000, 0x900001) AM_WRITE(galsnew_6295_bankswitch_w)
 
 	AM_RANGE(0xa00000, 0xa00001) AM_WRITENOP	/* ??? */
 
 	AM_RANGE(0xc80000, 0xc8ffff) AM_RAM
 
-	AM_RANGE(0xd80000, 0xd80001) AM_WRITE_LEGACY(galsnew_vram_1_bank_w)	/* ??? */
+	AM_RANGE(0xd80000, 0xd80001) AM_WRITE(galsnew_vram_1_bank_w)	/* ??? */
 
 	AM_RANGE(0xe00000, 0xe00015) AM_READWRITE(galpanib_calc_r,galpanib_calc_w) /* CALC1 MCU interaction (simulated) */
 
-	AM_RANGE(0xe80000, 0xe80001) AM_WRITE_LEGACY(galsnew_vram_0_bank_w)	/* ??? */
+	AM_RANGE(0xe80000, 0xe80001) AM_WRITE(galsnew_vram_0_bank_w)	/* ??? */
 ADDRESS_MAP_END
 
 
@@ -420,7 +424,7 @@ static ADDRESS_MAP_START( fantasia_map, AS_PROGRAM, 16, expro02_state )
 	AM_RANGE(0x581000, 0x581fff) AM_RAM_WRITE(kaneko16_vram_0_w) AM_BASE(m_vram[0])	//
 	AM_RANGE(0x582000, 0x582fff) AM_RAM AM_BASE(m_vscroll[1])									//
 	AM_RANGE(0x583000, 0x583fff) AM_RAM AM_BASE(m_vscroll[0])									//
-	AM_RANGE(0x600000, 0x600fff) AM_RAM_WRITE_LEGACY(galsnew_paletteram_w) AM_SHARE("paletteram") // palette?
+	AM_RANGE(0x600000, 0x600fff) AM_RAM_WRITE(galsnew_paletteram_w) AM_SHARE("paletteram") // palette?
 	AM_RANGE(0x680000, 0x68001f) AM_RAM_WRITE(kaneko16_layers_0_regs_w) AM_BASE(m_layers_0_regs) // sprite regs? tileregs?
 	AM_RANGE(0x700000, 0x700fff) AM_RAM AM_SHARE("spriteram")	 // sprites? 0x72f words tested
 	AM_RANGE(0x780000, 0x78001f) AM_RAM_WRITE(kaneko16_sprites_regs_w) AM_BASE(m_sprites_regs) // sprite regs? tileregs?
@@ -428,12 +432,12 @@ static ADDRESS_MAP_START( fantasia_map, AS_PROGRAM, 16, expro02_state )
 	AM_RANGE(0x800002, 0x800003) AM_READ_PORT("DSW2")
 	AM_RANGE(0x800004, 0x800005) AM_READ_PORT("DSW3")
 	AM_RANGE(0x800006, 0x800007) AM_NOP // ? used ?
-	AM_RANGE(0x900000, 0x900001) AM_WRITE_LEGACY(galsnew_6295_bankswitch_w)
+	AM_RANGE(0x900000, 0x900001) AM_WRITE(galsnew_6295_bankswitch_w)
 	AM_RANGE(0xa00000, 0xa00001) AM_WRITENOP	/* ??? */
 	AM_RANGE(0xc80000, 0xc8ffff) AM_RAM
-	AM_RANGE(0xd80000, 0xd80001) AM_WRITE_LEGACY(galsnew_vram_1_bank_w)	/* ??? */
+	AM_RANGE(0xd80000, 0xd80001) AM_WRITE(galsnew_vram_1_bank_w)	/* ??? */
 	//AM_RANGE(0xe00000, 0xe00015) AM_READWRITE_LEGACY(galpanib_calc_r,galpanib_calc_w) /* CALC1 MCU interaction (simulated) */
-	AM_RANGE(0xe80000, 0xe80001) AM_WRITE_LEGACY(galsnew_vram_0_bank_w)	/* ??? */
+	AM_RANGE(0xe80000, 0xe80001) AM_WRITE(galsnew_vram_0_bank_w)	/* ??? */
 	AM_RANGE(0xf00000, 0xf00001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0xff00)
 ADDRESS_MAP_END
 

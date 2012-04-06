@@ -54,24 +54,29 @@ public:
 
 	/* devices */
 	device_t *m_maincpu;
+	DECLARE_READ16_MEMBER(drill_io_r);
+	DECLARE_WRITE16_MEMBER(drill_io_w);
+	DECLARE_WRITE16_MEMBER(sensors_w);
+	DECLARE_READ16_MEMBER(drill_irq_r);
+	DECLARE_WRITE16_MEMBER(drill_irq_w);
 };
 
 
-static READ16_HANDLER( drill_io_r )
+READ16_MEMBER(_2mindril_state::drill_io_r)
 {
-	_2mindril_state *state = space->machine().driver_data<_2mindril_state>();
+
 
 //  if (offset * 2 == 0x4)
-	/*popmessage("PC=%08x %04x %04x %04x %04x %04x %04x %04x %04x", cpu_get_pc(&space->device()), state->m_iodata[0/2], state->m_iodata[2/2], state->m_iodata[4/2], state->m_iodata[6/2],
-                                        state->m_iodata[8/2], state->m_iodata[0xa/2], state->m_iodata[0xc/2], state->m_iodata[0xe/2]);*/
+	/*popmessage("PC=%08x %04x %04x %04x %04x %04x %04x %04x %04x", cpu_get_pc(&space.device()), m_iodata[0/2], m_iodata[2/2], m_iodata[4/2], m_iodata[6/2],
+                                        m_iodata[8/2], m_iodata[0xa/2], m_iodata[0xc/2], m_iodata[0xe/2]);*/
 
 	switch(offset)
 	{
-		case 0x0/2: return input_port_read(space->machine(), "DSW");
+		case 0x0/2: return input_port_read(machine(), "DSW");
 		case 0x2/2:
 		{
-			int arm_pwr = input_port_read(space->machine(), "IN0");//throw
-			//popmessage("PC=%08x %02x",cpu_get_pc(&space->device()),arm_pwr);
+			int arm_pwr = input_port_read(machine(), "IN0");//throw
+			//popmessage("PC=%08x %02x",cpu_get_pc(&space.device()),arm_pwr);
 
 			if(arm_pwr > 0xe0) return ~0x1800;
 			if(arm_pwr > 0xc0) return ~0x1400;
@@ -79,31 +84,31 @@ static READ16_HANDLER( drill_io_r )
 			if(arm_pwr > 0x40) return ~0x1000;
 			else return ~0x0000;
 		}
-		case 0x4/2: return (state->m_defender_sensor) | (state->m_shutter_sensor);
-		case 0xe/2: return input_port_read(space->machine(), "IN2");//coins
-//      default:  printf("PC=%08x [%04x] -> %04x R\n", cpu_get_pc(&space->device()), offset * 2, state->m_iodata[offset]);
+		case 0x4/2: return (m_defender_sensor) | (m_shutter_sensor);
+		case 0xe/2: return input_port_read(machine(), "IN2");//coins
+//      default:  printf("PC=%08x [%04x] -> %04x R\n", cpu_get_pc(&space.device()), offset * 2, m_iodata[offset]);
 	}
 
 	return 0xffff;
 }
 
-static WRITE16_HANDLER( drill_io_w )
+WRITE16_MEMBER(_2mindril_state::drill_io_w)
 {
-	_2mindril_state *state = space->machine().driver_data<_2mindril_state>();
-	COMBINE_DATA(&state->m_iodata[offset]);
+
+	COMBINE_DATA(&m_iodata[offset]);
 
 	switch(offset)
 	{
 		case 0x8/2:
-			coin_counter_w(space->machine(), 0, state->m_iodata[offset] & 0x0400);
-			coin_counter_w(space->machine(), 1, state->m_iodata[offset] & 0x0800);
-			coin_lockout_w(space->machine(), 0, ~state->m_iodata[offset] & 0x0100);
-			coin_lockout_w(space->machine(), 1, ~state->m_iodata[offset] & 0x0200);
+			coin_counter_w(machine(), 0, m_iodata[offset] & 0x0400);
+			coin_counter_w(machine(), 1, m_iodata[offset] & 0x0800);
+			coin_lockout_w(machine(), 0, ~m_iodata[offset] & 0x0100);
+			coin_lockout_w(machine(), 1, ~m_iodata[offset] & 0x0200);
 			break;
 	}
 
 //  if(data != 0 && offset != 8)
-//  printf("PC=%08x [%04x] <- %04x W\n", cpu_get_pc(&space->device()), offset * 2, data);
+//  printf("PC=%08x [%04x] <- %04x W\n", cpu_get_pc(&space.device()), offset * 2, data);
 }
 
 /*
@@ -134,60 +139,60 @@ static TIMER_CALLBACK( defender_req )
 }
 #endif
 
-static WRITE16_HANDLER( sensors_w )
+WRITE16_MEMBER(_2mindril_state::sensors_w)
 {
-	_2mindril_state *state = space->machine().driver_data<_2mindril_state>();
+
 
 	/*---- xxxx ---- ---- select "lamps" (guess)*/
 	/*---- ---- ---- -x-- lamp*/
 	if (data & 1)
 	{
-		//space->machine().scheduler().timer_set(attotime::from_seconds(2), FUNC(shutter_req ), 0x100);
-		state->m_shutter_sensor = 0x100;
+		//machine().scheduler().timer_set(attotime::from_seconds(2), FUNC(shutter_req ), 0x100);
+		m_shutter_sensor = 0x100;
 	}
 	else if (data & 2)
 	{
-		//space->machine().scheduler().timer_set( attotime::from_seconds(2), FUNC(shutter_req ), 0x200);
-		state->m_shutter_sensor = 0x200;
+		//machine().scheduler().timer_set( attotime::from_seconds(2), FUNC(shutter_req ), 0x200);
+		m_shutter_sensor = 0x200;
 	}
 
 	if (data & 0x1000 || data & 0x4000)
 	{
-		//space->machine().scheduler().timer_set( attotime::from_seconds(2), FUNC(defender_req ), 0x800);
-		state->m_defender_sensor = 0x800;
+		//machine().scheduler().timer_set( attotime::from_seconds(2), FUNC(defender_req ), 0x800);
+		m_defender_sensor = 0x800;
 	}
 	else if (data & 0x2000 || data & 0x8000)
 	{
-		//space->machine().scheduler().timer_set( attotime::from_seconds(2), FUNC(defender_req ), 0x400);
-		state->m_defender_sensor = 0x400;
+		//machine().scheduler().timer_set( attotime::from_seconds(2), FUNC(defender_req ), 0x400);
+		m_defender_sensor = 0x400;
 	}
 }
 
-static READ16_HANDLER( drill_irq_r )
+READ16_MEMBER(_2mindril_state::drill_irq_r)
 {
-	_2mindril_state *state = space->machine().driver_data<_2mindril_state>();
-	return state->irq_reg;
+
+	return irq_reg;
 }
 
-static WRITE16_HANDLER( drill_irq_w )
+WRITE16_MEMBER(_2mindril_state::drill_irq_w)
 {
-	_2mindril_state *state = space->machine().driver_data<_2mindril_state>();
+
 	/*
     (note: could rather be irq mask)
     ---- ---- ---x ---- irq lv 5 ack, 0->1 latch
     ---- ---- ---- x--- irq lv 4 ack, 0->1 latch
     ---- ---- -??- -??? connected to the other levels?
     */
-	if(((state->irq_reg & 8) == 0) && data & 8)
-		cputag_set_input_line(space->machine(), "maincpu", 4, CLEAR_LINE);
+	if(((irq_reg & 8) == 0) && data & 8)
+		cputag_set_input_line(machine(), "maincpu", 4, CLEAR_LINE);
 
-	if(((state->irq_reg & 0x10) == 0) && data & 0x10)
-		cputag_set_input_line(space->machine(), "maincpu", 5, CLEAR_LINE);
+	if(((irq_reg & 0x10) == 0) && data & 0x10)
+		cputag_set_input_line(machine(), "maincpu", 5, CLEAR_LINE);
 
 	if(data & 0xffe7)
 		printf("%04x\n",data);
 
-	COMBINE_DATA(&state->irq_reg);
+	COMBINE_DATA(&irq_reg);
 }
 
 static ADDRESS_MAP_START( drill_map, AS_PROGRAM, 16, _2mindril_state )
@@ -205,10 +210,10 @@ static ADDRESS_MAP_START( drill_map, AS_PROGRAM, 16, _2mindril_state )
 	AM_RANGE(0x500000, 0x501fff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x502022, 0x502023) AM_WRITENOP //countinously switches between 0 and 2
 	AM_RANGE(0x600000, 0x600007) AM_DEVREADWRITE8_LEGACY("ymsnd", ym2610_r, ym2610_w, 0x00ff)
-	AM_RANGE(0x60000c, 0x60000d) AM_READWRITE_LEGACY(drill_irq_r,drill_irq_w)
+	AM_RANGE(0x60000c, 0x60000d) AM_READWRITE(drill_irq_r,drill_irq_w)
 	AM_RANGE(0x60000e, 0x60000f) AM_RAM // unknown purpose, zeroed at start-up and nothing else
-	AM_RANGE(0x700000, 0x70000f) AM_READWRITE_LEGACY(drill_io_r,drill_io_w) AM_BASE(m_iodata) // i/o
-	AM_RANGE(0x800000, 0x800001) AM_WRITE_LEGACY(sensors_w)
+	AM_RANGE(0x700000, 0x70000f) AM_READWRITE(drill_io_r,drill_io_w) AM_BASE(m_iodata) // i/o
+	AM_RANGE(0x800000, 0x800001) AM_WRITE(sensors_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( drill )

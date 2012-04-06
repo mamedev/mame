@@ -43,6 +43,9 @@ public:
 	DECLARE_WRITE16_MEMBER(mcu_table2_w);
 	DECLARE_READ16_MEMBER(nzerotea_sound_comms_r);
 	DECLARE_WRITE16_MEMBER(nzerotea_sound_comms_w);
+	DECLARE_WRITE16_MEMBER(mcu_prog_w);
+	DECLARE_WRITE16_MEMBER(mcu_prog_w2);
+	DECLARE_WRITE16_MEMBER(mcu_prog_offs_w);
 };
 
 
@@ -265,12 +268,12 @@ WRITE16_DEVICE_HANDLER( rdx_v33_eeprom_w )
 static UINT16 mcu_prog[0x800];
 static int mcu_prog_offs = 0;
 
-WRITE16_HANDLER( mcu_prog_w )
+WRITE16_MEMBER(r2dx_v33_state::mcu_prog_w)
 {
 	mcu_prog[mcu_prog_offs*2] = data;
 }
 
-WRITE16_HANDLER( mcu_prog_w2 )
+WRITE16_MEMBER(r2dx_v33_state::mcu_prog_w2)
 {
 	mcu_prog[mcu_prog_offs*2+1] = data;
 
@@ -279,7 +282,7 @@ WRITE16_HANDLER( mcu_prog_w2 )
     {
 		char tmp[64];
         FILE *fp;
-	    sprintf(tmp,"cop3_%s.data", space->machine().system().name);
+	    sprintf(tmp,"cop3_%s.data", machine().system().name);
 
 		fp=fopen(tmp, "w+b");
         if (fp)
@@ -291,7 +294,7 @@ WRITE16_HANDLER( mcu_prog_w2 )
 #endif
 }
 
-WRITE16_HANDLER( mcu_prog_offs_w )
+WRITE16_MEMBER(r2dx_v33_state::mcu_prog_offs_w)
 {
 	mcu_prog_offs = data;
 }
@@ -375,11 +378,11 @@ static ADDRESS_MAP_START( rdx_v33_map, AS_PROGRAM, 16, r2dx_v33_state )
 	AM_RANGE(0x00650, 0x0068f) AM_RAM //???
 
 	AM_RANGE(0x0068e, 0x0068f) AM_WRITENOP // synch for the MCU?
-	AM_RANGE(0x006b0, 0x006b1) AM_WRITE_LEGACY(mcu_prog_w)
-	AM_RANGE(0x006b2, 0x006b3) AM_WRITE_LEGACY(mcu_prog_w2)
+	AM_RANGE(0x006b0, 0x006b1) AM_WRITE(mcu_prog_w)
+	AM_RANGE(0x006b2, 0x006b3) AM_WRITE(mcu_prog_w2)
 //  AM_RANGE(0x006b4, 0x006b5) AM_WRITENOP
 //  AM_RANGE(0x006b6, 0x006b7) AM_WRITENOP
-	AM_RANGE(0x006bc, 0x006bd) AM_WRITE_LEGACY(mcu_prog_offs_w)
+	AM_RANGE(0x006bc, 0x006bd) AM_WRITE(mcu_prog_offs_w)
 	AM_RANGE(0x006be, 0x006bf) AM_WRITENOP // MCU program related
 	AM_RANGE(0x006d8, 0x006d9) AM_WRITE(mcu_xval_w)
 	AM_RANGE(0x006da, 0x006db) AM_WRITE(mcu_yval_w)
@@ -451,11 +454,11 @@ static ADDRESS_MAP_START( nzerotea_map, AS_PROGRAM, 16, r2dx_v33_state )
 	AM_RANGE(0x00600, 0x0064f) AM_RAM AM_BASE_LEGACY(&seibu_crtc_regs)
 
 	AM_RANGE(0x0068e, 0x0068f) AM_WRITENOP // synch for the MCU?
-	AM_RANGE(0x006b0, 0x006b1) AM_WRITE_LEGACY(mcu_prog_w)
-	AM_RANGE(0x006b2, 0x006b3) AM_WRITE_LEGACY(mcu_prog_w2)
+	AM_RANGE(0x006b0, 0x006b1) AM_WRITE(mcu_prog_w)
+	AM_RANGE(0x006b2, 0x006b3) AM_WRITE(mcu_prog_w2)
 //  AM_RANGE(0x006b4, 0x006b5) AM_WRITENOP
 //  AM_RANGE(0x006b6, 0x006b7) AM_WRITENOP
-	AM_RANGE(0x006bc, 0x006bd) AM_WRITE_LEGACY(mcu_prog_offs_w)
+	AM_RANGE(0x006bc, 0x006bd) AM_WRITE(mcu_prog_offs_w)
 //  AM_RANGE(0x006d8, 0x006d9) AM_WRITE_LEGACY(bbbbll_w) // scroll?
 //  AM_RANGE(0x006dc, 0x006dd) AM_READ_LEGACY(nzerotea_unknown_r)
 //  AM_RANGE(0x006de, 0x006df) AM_WRITE_LEGACY(mcu_unkaa_w) // mcu command related?

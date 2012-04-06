@@ -105,6 +105,14 @@ public:
 	device_t *m_filter_0_0;
 	device_t *m_filter_0_1;
 	device_t *m_filter_0_2;
+	DECLARE_WRITE8_MEMBER(junofrst_blitter_w);
+	DECLARE_WRITE8_MEMBER(junofrst_bankselect_w);
+	DECLARE_WRITE8_MEMBER(junofrst_sh_irqtrigger_w);
+	DECLARE_WRITE8_MEMBER(junofrst_i8039_irq_w);
+	DECLARE_WRITE8_MEMBER(i8039_irqen_and_status_w);
+	DECLARE_WRITE8_MEMBER(flip_screen_w);
+	DECLARE_WRITE8_MEMBER(junofrst_coin_counter_w);
+	DECLARE_WRITE8_MEMBER(junofrst_irq_enable_w);
 };
 
 
@@ -126,21 +134,21 @@ public:
           We have to mask it off otherwise the "Juno First" logo on the title screen is wrong.
 */
 
-static WRITE8_HANDLER( junofrst_blitter_w )
+WRITE8_MEMBER(junofrst_state::junofrst_blitter_w)
 {
-	junofrst_state *state = space->machine().driver_data<junofrst_state>();
-	state->m_blitterdata[offset] = data;
+
+	m_blitterdata[offset] = data;
 
 	/* blitter is triggered by $8073 */
 	if (offset == 3)
 	{
 		int i;
-		UINT8 *gfx_rom = space->machine().region("gfx1")->base();
+		UINT8 *gfx_rom = machine().region("gfx1")->base();
 
-		offs_t src = ((state->m_blitterdata[2] << 8) | state->m_blitterdata[3]) & 0xfffc;
-		offs_t dest = (state->m_blitterdata[0] << 8) | state->m_blitterdata[1];
+		offs_t src = ((m_blitterdata[2] << 8) | m_blitterdata[3]) & 0xfffc;
+		offs_t dest = (m_blitterdata[0] << 8) | m_blitterdata[1];
 
-		int copy = state->m_blitterdata[3] & 0x01;
+		int copy = m_blitterdata[3] & 0x01;
 
 		/* 16x16 graphics */
 		for (i = 0; i < 16; i++)
@@ -166,9 +174,9 @@ static WRITE8_HANDLER( junofrst_blitter_w )
 						data = 0;
 
 					if (dest & 1)
-						state->m_videoram[dest >> 1] = (state->m_videoram[dest >> 1] & 0x0f) | (data << 4);
+						m_videoram[dest >> 1] = (m_videoram[dest >> 1] & 0x0f) | (data << 4);
 					else
-						state->m_videoram[dest >> 1] = (state->m_videoram[dest >> 1] & 0xf0) | data;
+						m_videoram[dest >> 1] = (m_videoram[dest >> 1] & 0xf0) | data;
 				}
 
 				dest += 1;
@@ -180,9 +188,9 @@ static WRITE8_HANDLER( junofrst_blitter_w )
 }
 
 
-static WRITE8_HANDLER( junofrst_bankselect_w )
+WRITE8_MEMBER(junofrst_state::junofrst_bankselect_w)
 {
-	memory_set_bank(space->machine(), "bank1", data & 0x0f);
+	memory_set_bank(machine(), "bank1", data & 0x0f);
 }
 
 
@@ -224,57 +232,57 @@ static WRITE8_DEVICE_HANDLER( junofrst_portB_w )
 }
 
 
-static WRITE8_HANDLER( junofrst_sh_irqtrigger_w )
+WRITE8_MEMBER(junofrst_state::junofrst_sh_irqtrigger_w)
 {
-	junofrst_state *state = space->machine().driver_data<junofrst_state>();
 
-	if (state->m_last_irq == 0 && data == 1)
+
+	if (m_last_irq == 0 && data == 1)
 	{
 		/* setting bit 0 low then high triggers IRQ on the sound CPU */
-		device_set_input_line_and_vector(state->m_soundcpu, 0, HOLD_LINE, 0xff);
+		device_set_input_line_and_vector(m_soundcpu, 0, HOLD_LINE, 0xff);
 	}
 
-	state->m_last_irq = data;
+	m_last_irq = data;
 }
 
 
-static WRITE8_HANDLER( junofrst_i8039_irq_w )
+WRITE8_MEMBER(junofrst_state::junofrst_i8039_irq_w)
 {
-	junofrst_state *state = space->machine().driver_data<junofrst_state>();
-	device_set_input_line(state->m_i8039, 0, ASSERT_LINE);
+
+	device_set_input_line(m_i8039, 0, ASSERT_LINE);
 }
 
 
-static WRITE8_HANDLER( i8039_irqen_and_status_w )
+WRITE8_MEMBER(junofrst_state::i8039_irqen_and_status_w)
 {
-	junofrst_state *state = space->machine().driver_data<junofrst_state>();
+
 
 	if ((data & 0x80) == 0)
-		device_set_input_line(state->m_i8039, 0, CLEAR_LINE);
-	state->m_i8039_status = (data & 0x70) >> 4;
+		device_set_input_line(m_i8039, 0, CLEAR_LINE);
+	m_i8039_status = (data & 0x70) >> 4;
 }
 
 
-static WRITE8_HANDLER( flip_screen_w )
+WRITE8_MEMBER(junofrst_state::flip_screen_w)
 {
-	junofrst_state *state = space->machine().driver_data<junofrst_state>();
-	state->tutankhm_flip_screen_x_w(*space, 0, data);
-	state->tutankhm_flip_screen_y_w(*space, 0, data);
+
+	tutankhm_flip_screen_x_w(*&space, 0, data);
+	tutankhm_flip_screen_y_w(*&space, 0, data);
 }
 
 
-static WRITE8_HANDLER( junofrst_coin_counter_w )
+WRITE8_MEMBER(junofrst_state::junofrst_coin_counter_w)
 {
-	coin_counter_w(space->machine(), offset, data);
+	coin_counter_w(machine(), offset, data);
 }
 
-static WRITE8_HANDLER( junofrst_irq_enable_w )
+WRITE8_MEMBER(junofrst_state::junofrst_irq_enable_w)
 {
-	junofrst_state *state = space->machine().driver_data<junofrst_state>();
 
-	state->m_irq_enable = data & 1;
-	if (!state->m_irq_enable)
-		device_set_input_line(state->m_maincpu, 0, CLEAR_LINE);
+
+	m_irq_enable = data & 1;
+	if (!m_irq_enable)
+		device_set_input_line(m_maincpu, 0, CLEAR_LINE);
 }
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, junofrst_state )
@@ -286,14 +294,14 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, junofrst_state )
 	AM_RANGE(0x8024, 0x8024) AM_READ_PORT("P1")
 	AM_RANGE(0x8028, 0x8028) AM_READ_PORT("P2")
 	AM_RANGE(0x802c, 0x802c) AM_READ_PORT("DSW1")
-	AM_RANGE(0x8030, 0x8030) AM_WRITE_LEGACY(junofrst_irq_enable_w)
-	AM_RANGE(0x8031, 0x8032) AM_WRITE_LEGACY(junofrst_coin_counter_w)
+	AM_RANGE(0x8030, 0x8030) AM_WRITE(junofrst_irq_enable_w)
+	AM_RANGE(0x8031, 0x8032) AM_WRITE(junofrst_coin_counter_w)
 	AM_RANGE(0x8033, 0x8033) AM_WRITEONLY AM_BASE(m_scroll)  /* not used in Juno */
-	AM_RANGE(0x8034, 0x8035) AM_WRITE_LEGACY(flip_screen_w)
-	AM_RANGE(0x8040, 0x8040) AM_WRITE_LEGACY(junofrst_sh_irqtrigger_w)
+	AM_RANGE(0x8034, 0x8035) AM_WRITE(flip_screen_w)
+	AM_RANGE(0x8040, 0x8040) AM_WRITE(junofrst_sh_irqtrigger_w)
 	AM_RANGE(0x8050, 0x8050) AM_WRITE(soundlatch_w)
-	AM_RANGE(0x8060, 0x8060) AM_WRITE_LEGACY(junofrst_bankselect_w)
-	AM_RANGE(0x8070, 0x8073) AM_WRITE_LEGACY(junofrst_blitter_w)
+	AM_RANGE(0x8060, 0x8060) AM_WRITE(junofrst_bankselect_w)
+	AM_RANGE(0x8070, 0x8073) AM_WRITE(junofrst_blitter_w)
 	AM_RANGE(0x8100, 0x8fff) AM_RAM
 	AM_RANGE(0x9000, 0x9fff) AM_ROMBANK("bank1")
 	AM_RANGE(0xa000, 0xffff) AM_ROM
@@ -308,7 +316,7 @@ static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8, junofrst_state )
 	AM_RANGE(0x4001, 0x4001) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
 	AM_RANGE(0x4002, 0x4002) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_w)
 	AM_RANGE(0x5000, 0x5000) AM_WRITE(soundlatch2_w)
-	AM_RANGE(0x6000, 0x6000) AM_WRITE_LEGACY(junofrst_i8039_irq_w)
+	AM_RANGE(0x6000, 0x6000) AM_WRITE(junofrst_i8039_irq_w)
 ADDRESS_MAP_END
 
 
@@ -320,7 +328,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( mcu_io_map, AS_IO, 8, junofrst_state )
 	AM_RANGE(0x00, 0xff) AM_READ(soundlatch2_r)
 	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_DEVWRITE_LEGACY("dac", dac_w)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE_LEGACY(i8039_irqen_and_status_w)
+	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(i8039_irqen_and_status_w)
 ADDRESS_MAP_END
 
 

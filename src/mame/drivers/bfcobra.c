@@ -284,6 +284,8 @@ public:
 	DECLARE_WRITE8_MEMBER(meter_w);
 	DECLARE_READ8_MEMBER(latch_r);
 	DECLARE_WRITE8_MEMBER(latch_w);
+	DECLARE_WRITE8_MEMBER(fd_op_w);
+	DECLARE_WRITE8_MEMBER(fd_ctrl_w);
 };
 
 
@@ -1298,11 +1300,11 @@ UINT8 results_phase(void)
 	return 0;
 }
 
-WRITE8_HANDLER( fd_op_w )
+WRITE8_MEMBER(bfcobra_state::fd_op_w)
 {
 }
 
-WRITE8_HANDLER( fd_ctrl_w )
+WRITE8_MEMBER(bfcobra_state::fd_ctrl_w)
 {
 }
 #endif

@@ -61,6 +61,8 @@ public:
 	DECLARE_WRITE8_MEMBER(superwng_flip_screen_w);
 	DECLARE_WRITE8_MEMBER(superwng_cointcnt1_w);
 	DECLARE_WRITE8_MEMBER(superwng_cointcnt2_w);
+	DECLARE_WRITE8_MEMBER(superwng_flip_screen_x_w);
+	DECLARE_WRITE8_MEMBER(superwng_flip_screen_y_w);
 };
 
 static TILE_GET_INFO( get_bg_tile_info )
@@ -94,14 +96,14 @@ static TILE_GET_INFO( get_fg_tile_info )
 	SET_TILE_INFO( 0, code, attr & 0xf, flipx|flipy);
 }
 
-WRITE8_HANDLER( superwng_flip_screen_x_w )
+WRITE8_MEMBER(superwng_state::superwng_flip_screen_x_w)
 {
-	flip_screen_x_set(space->machine(), ~data & 1);
+	flip_screen_x_set(machine(), ~data & 1);
 }
 
-WRITE8_HANDLER( superwng_flip_screen_y_w )
+WRITE8_MEMBER(superwng_state::superwng_flip_screen_y_w)
 {
-	flip_screen_y_set(space->machine(), ~data & 1);
+	flip_screen_y_set(machine(), ~data & 1);
 }
 
 static VIDEO_START( superwng )

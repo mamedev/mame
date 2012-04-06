@@ -73,6 +73,8 @@ class pengo_state : public pacman_state
 public:
 	pengo_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pacman_state(mconfig, type, tag) { }
+	DECLARE_WRITE8_MEMBER(pengo_coin_counter_w);
+	DECLARE_WRITE8_MEMBER(irq_mask_w);
 };
 
 
@@ -105,16 +107,16 @@ public:
  *
  *************************************/
 
-static WRITE8_HANDLER( pengo_coin_counter_w )
+WRITE8_MEMBER(pengo_state::pengo_coin_counter_w)
 {
-	coin_counter_w(space->machine(), offset, data & 1);
+	coin_counter_w(machine(), offset, data & 1);
 }
 
-static WRITE8_HANDLER( irq_mask_w )
+WRITE8_MEMBER(pengo_state::irq_mask_w)
 {
-	pengo_state *state = space->machine().driver_data<pengo_state>();
 
-	state->m_irq_mask = data & 1;
+
+	m_irq_mask = data & 1;
 }
 
 static ADDRESS_MAP_START( pengo_map, AS_PROGRAM, 8, pengo_state )
@@ -127,11 +129,11 @@ static ADDRESS_MAP_START( pengo_map, AS_PROGRAM, 8, pengo_state )
 	AM_RANGE(0x9020, 0x902f) AM_WRITEONLY AM_SHARE("spriteram2")
 	AM_RANGE(0x9000, 0x903f) AM_READ_PORT("DSW1")
 	AM_RANGE(0x9040, 0x907f) AM_READ_PORT("DSW0")
-	AM_RANGE(0x9040, 0x9040) AM_WRITE_LEGACY(irq_mask_w)
+	AM_RANGE(0x9040, 0x9040) AM_WRITE(irq_mask_w)
 	AM_RANGE(0x9041, 0x9041) AM_DEVWRITE_LEGACY("namco", pacman_sound_enable_w)
 	AM_RANGE(0x9042, 0x9042) AM_WRITE(pengo_palettebank_w)
 	AM_RANGE(0x9043, 0x9043) AM_WRITE(pacman_flipscreen_w)
-	AM_RANGE(0x9044, 0x9045) AM_WRITE_LEGACY(pengo_coin_counter_w)
+	AM_RANGE(0x9044, 0x9045) AM_WRITE(pengo_coin_counter_w)
 	AM_RANGE(0x9046, 0x9046) AM_WRITE(pengo_colortablebank_w)
 	AM_RANGE(0x9047, 0x9047) AM_WRITE(pengo_gfxbank_w)
 	AM_RANGE(0x9070, 0x9070) AM_WRITENOP
@@ -149,7 +151,7 @@ static ADDRESS_MAP_START( jrpacmbl_map, AS_PROGRAM, 8, pengo_state )
 	AM_RANGE(0x9020, 0x902f) AM_WRITEONLY AM_SHARE("spriteram2")
 	AM_RANGE(0x9030, 0x9030) AM_WRITE(jrpacman_scroll_w)
 	AM_RANGE(0x9040, 0x904f) AM_READ_PORT("DSW")
-	AM_RANGE(0x9040, 0x9040) AM_WRITE_LEGACY(irq_mask_w)
+	AM_RANGE(0x9040, 0x9040) AM_WRITE(irq_mask_w)
 	AM_RANGE(0x9041, 0x9041) AM_DEVWRITE_LEGACY("namco", pacman_sound_enable_w)
 	AM_RANGE(0x9042, 0x9042) AM_WRITE(pengo_palettebank_w)
 	AM_RANGE(0x9043, 0x9043) AM_WRITE(pacman_flipscreen_w)
