@@ -123,6 +123,7 @@ typedef device_t * (*machine_config_constructor)(machine_config &config, device_
 
 // the running machine
 #include "machine.h"
+#include "driver.h"
 #include "mame.h"
 
 // video-related
