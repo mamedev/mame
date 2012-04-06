@@ -74,7 +74,7 @@ class chd_codec
 {
 protected:
 	// can't create these directly
-	chd_codec(chd_file &file, bool lossy);
+	chd_codec(chd_file &file, UINT32 hunkbytes, bool lossy);
 
 public:
 	// allow public deletion
@@ -82,6 +82,7 @@ public:
 
 	// accessors
 	chd_file &chd() const { return m_chd; }
+	UINT32 hunkbytes() const { return m_hunkbytes; }
 	bool lossy() const { return m_lossy; }
 
 	// implementation
@@ -90,6 +91,7 @@ public:
 private:
 	// internal state
 	chd_file &			m_chd;
+	UINT32				m_hunkbytes;
 	bool				m_lossy;
 };
 
@@ -101,7 +103,7 @@ class chd_compressor : public chd_codec
 {
 protected:
 	// can't create these directly
-	chd_compressor(chd_file &file, bool lossy);
+	chd_compressor(chd_file &file, UINT32 hunkbytes, bool lossy);
 
 public:
 	// implementation
@@ -116,7 +118,7 @@ class chd_decompressor : public chd_codec
 {
 protected:
 	// can't create these directly
-	chd_decompressor(chd_file &file, bool lossy);
+	chd_decompressor(chd_file &file, UINT32 hunkbytes, bool lossy);
 
 public:
 	// implementation
@@ -145,18 +147,18 @@ private:
 		chd_codec_type		m_type;
 		bool				m_lossy;
 		const char *		m_name;
-		chd_compressor *	(*m_construct_compressor)(chd_file &, bool);
-		chd_decompressor *	(*m_construct_decompressor)(chd_file &, bool);
+		chd_compressor *	(*m_construct_compressor)(chd_file &, UINT32, bool);
+		chd_decompressor *	(*m_construct_decompressor)(chd_file &, UINT32, bool);
 	};
 
 	// internal helper functions
 	static const codec_entry *find_in_list(chd_codec_type type);
 
 	template<class _CompressorClass>
-	static chd_compressor *construct_compressor(chd_file &chd, bool lossy) { return new _CompressorClass(chd, lossy); }
+	static chd_compressor *construct_compressor(chd_file &chd, UINT32 hunkbytes, bool lossy) { return new _CompressorClass(chd, hunkbytes, lossy); }
 
 	template<class _DecompressorClass>
-	static chd_decompressor *construct_decompressor(chd_file &chd, bool lossy) { return new _DecompressorClass(chd, lossy); }
+	static chd_decompressor *construct_decompressor(chd_file &chd, UINT32 hunkbytes, bool lossy) { return new _DecompressorClass(chd, hunkbytes, lossy); }
 
 	// the static list
 	static const codec_entry s_codec_list[];
@@ -194,13 +196,21 @@ private:
 //**************************************************************************
 
 // currently-defined codecs
-const chd_codec_type CHD_CODEC_NONE 	= 0;
-const chd_codec_type CHD_CODEC_ZLIB 	= CHD_MAKE_TAG('z','l','i','b');
-const chd_codec_type CHD_CODEC_LZMA 	= CHD_MAKE_TAG('l','z','m','a');
-const chd_codec_type CHD_CODEC_HUFFMAN	= CHD_MAKE_TAG('h','u','f','f');
-const chd_codec_type CHD_CODEC_FLAC		= CHD_MAKE_TAG('f','l','a','c');
-const chd_codec_type CHD_CODEC_CD_FLAC	= CHD_MAKE_TAG('c','d','f','l');
-const chd_codec_type CHD_CODEC_AVHUFF	= CHD_MAKE_TAG('a','v','h','u');
+const chd_codec_type CHD_CODEC_NONE 		= 0;
+
+// general codecs
+const chd_codec_type CHD_CODEC_ZLIB 		= CHD_MAKE_TAG('z','l','i','b');
+const chd_codec_type CHD_CODEC_LZMA 		= CHD_MAKE_TAG('l','z','m','a');
+const chd_codec_type CHD_CODEC_HUFFMAN		= CHD_MAKE_TAG('h','u','f','f');
+const chd_codec_type CHD_CODEC_FLAC			= CHD_MAKE_TAG('f','l','a','c');
+
+// general codecs with CD frontend
+const chd_codec_type CHD_CODEC_CD_ZLIB		= CHD_MAKE_TAG('c','d','z','l');
+const chd_codec_type CHD_CODEC_CD_LZMA		= CHD_MAKE_TAG('c','d','l','z');
+const chd_codec_type CHD_CODEC_CD_FLAC		= CHD_MAKE_TAG('c','d','f','l');
+
+// A/V codecs
+const chd_codec_type CHD_CODEC_AVHUFF		= CHD_MAKE_TAG('a','v','h','u');
 
 // A/V codec configuration parameters
 enum

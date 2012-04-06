@@ -161,6 +161,11 @@ const char *cdrom_get_subtype_string(UINT32 subtype);
 chd_error cdrom_parse_metadata(chd_file *chd, cdrom_toc *toc);
 chd_error cdrom_write_metadata(chd_file *chd, const cdrom_toc *toc);
 
+// ECC utilities
+bool ecc_verify(const UINT8 *sector);
+void ecc_generate(UINT8 *sector);
+void ecc_clear(UINT8 *sector);
+
 
 
 /***************************************************************************
