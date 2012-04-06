@@ -251,6 +251,7 @@ int main(int argc, char *argv[])
 
 	// start with a header
 	printf("#include \"emu.h\"\n\n");
+	printf("#include \"drivenum.h\"\n\n");
 
 	// output the list of externs first
 	for (int index = 0; index < drivcount; index++)

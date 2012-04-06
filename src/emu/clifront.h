@@ -43,6 +43,7 @@
 #define __CLIFRONT_H__
 
 #include "emuopts.h"
+#include "drivenum.h"
 
 
 //**************************************************************************

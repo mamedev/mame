@@ -42,6 +42,7 @@
 #ifndef __AUDIT_H__
 #define __AUDIT_H__
 
+#include "drivenum.h"
 #include "hash.h"
 
 

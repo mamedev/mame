@@ -11,6 +11,7 @@
 #include "expat.h"
 #include "emuopts.h"
 #include "hash.h"
+#include "drivenum.h"
 
 
 /***************************************************************************

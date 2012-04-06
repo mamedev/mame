@@ -39,6 +39,7 @@
 
 #include "emu.h"
 #include "emuopts.h"
+#include "drivenum.h"
 #include "ui.h"
 #include "zippath.h"
 #include "uiimage.h"

@@ -61,6 +61,10 @@ enum screen_type_enum
 };
 
 
+// screen_update callback flags
+const UINT32 UPDATE_HAS_NOT_CHANGED = 0x0001;	// the video has not changed
+
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS

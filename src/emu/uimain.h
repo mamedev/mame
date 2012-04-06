@@ -15,6 +15,7 @@
 #define __UIMAIN_H__
 
 #include "crsshair.h"
+#include "drivenum.h"
 
 class ui_menu_main : public ui_menu {
 public:

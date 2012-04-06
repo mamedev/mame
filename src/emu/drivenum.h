@@ -1,6 +1,6 @@
 /***************************************************************************
 
-    driver.h
+    drivenum.h
 
     Driver enumeration helpers.
 
@@ -39,77 +39,15 @@
 
 #pragma once
 
-#ifndef __EMU_H__
-#error Dont include this file directly; include emu.h instead.
-#endif
-
-#ifndef __DRIVER_H__
-#define __DRIVER_H__
+#ifndef __DRIVENUM_H__
+#define __DRIVENUM_H__
 
 
-/***************************************************************************
-    CONSTANTS
-***************************************************************************/
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
 
-/* maxima */
-#define MAX_DRIVER_NAME_CHARS	8
-
-
-
-/* ----- flags for game drivers ----- */
-
-#define ORIENTATION_MASK        		0x00000007
-#define GAME_NOT_WORKING				0x00000008
-#define GAME_UNEMULATED_PROTECTION		0x00000010	/* game's protection not fully emulated */
-#define GAME_WRONG_COLORS				0x00000020	/* colors are totally wrong */
-#define GAME_IMPERFECT_COLORS			0x00000040	/* colors are not 100% accurate, but close */
-#define GAME_IMPERFECT_GRAPHICS			0x00000080	/* graphics are wrong/incomplete */
-#define GAME_NO_COCKTAIL				0x00000100	/* screen flip support is missing */
-#define GAME_NO_SOUND					0x00000200	/* sound is missing */
-#define GAME_IMPERFECT_SOUND			0x00000400	/* sound is known to be wrong */
-#define GAME_SUPPORTS_SAVE				0x00000800	/* game supports save states */
-#define GAME_IS_BIOS_ROOT				0x00001000	/* this driver entry is a BIOS root */
-#define GAME_NO_STANDALONE				0x00002000	/* this driver cannot stand alone */
-#define GAME_REQUIRES_ARTWORK			0x00004000	/* the driver requires external artwork for key elements of the game */
-#define GAME_UNOFFICIAL     			0x00008000	/* unofficial hardware change */
-#define GAME_NO_SOUND_HW				0x00010000	/* sound hardware not available */
-#define GAME_MECHANICAL					0x00020000	/* contains mechanical parts (pinball, redemption games,...) */
-#define GAME_IS_SKELETON				0x00000208	/* mask for skelly games */
-#define GAME_IS_SKELETON_MECHANICAL		0x00024208	/* mask for skelly mechanical games */
-#define GAME_TYPE_ARCADE				0x00040000	/* arcade machine (coin operated machines) */
-#define GAME_TYPE_CONSOLE				0x00080000	/* console system */
-#define GAME_TYPE_COMPUTER				0x00100000	/* any kind of computer including home computers, minis, calcs,... */
-#define GAME_TYPE_OTHER					0x00200000	/* any other emulated system that doesn't fit above (ex. clock, satelite receiver,...) */
-
-/* ----- flags to return from video_update ----- */
-#define UPDATE_HAS_NOT_CHANGED			0x0001	/* the video has not changed */
-
-
-
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
-
-typedef void   (*driver_init_func)(running_machine &machine);
-
-
-struct game_driver
-{
-	const char *		source_file;				/* set this to __FILE__ */
-	const char *		parent;						/* if this is a clone, the name of the parent */
-	const char *		name;						/* short (8-character) name of the game */
-	const char *		description;				/* full name of the game */
-	const char *		year;						/* year the game was released */
-	const char *		manufacturer;				/* manufacturer of the game */
-	machine_config_constructor machine_config;		/* machine driver tokens */
-	ioport_constructor	ipt;					/* pointer to array of input port tokens */
-	void				(*driver_init)(running_machine &machine); /* DRIVER_INIT callback */
-	const rom_entry *	rom;						/* pointer to list of ROMs for the game */
-	const char *		compatible_with;
-	UINT32				flags;						/* orientation and other flags; see defines below */
-	const char *		default_layout;				/* default internally defined layout */
-};
-
+// ======================> driver_list
 
 // driver_list is a purely static class that wraps the global driver list
 class driver_list
@@ -152,6 +90,8 @@ protected:
 	static const game_driver * const	s_drivers_sorted[];
 };
 
+
+// ======================> driver_enumerator
 
 // driver_enumerator enables efficient iteration through the driver list
 class driver_enumerator : public driver_list
@@ -237,105 +177,5 @@ private:
 	machine_config **	m_config;
 	mutable simple_list<config_entry> m_config_cache;
 };
-
-
-
-/***************************************************************************
-    MACROS FOR BUILDING GAME DRIVERS
-***************************************************************************/
-
-
-#define DRIVER_INIT_NAME(name)		driver_init_##name
-#define DRIVER_INIT(name)			void DRIVER_INIT_NAME(name)(running_machine &machine)
-#define DRIVER_INIT_CALL(name)		DRIVER_INIT_NAME(name)(machine)
-
-#define driver_init_0				NULL
-
-
-#define GAME_NAME(name) driver_##name
-#define GAME_EXTERN(name) extern const game_driver GAME_NAME(name)
-
-#define GAME(YEAR,NAME,PARENT,MACHINE,INPUT,INIT,MONITOR,COMPANY,FULLNAME,FLAGS)	\
-	GAMEL(YEAR,NAME,PARENT,MACHINE,INPUT,INIT,MONITOR,COMPANY,FULLNAME,FLAGS,((const char *)0))
-
-#define GAMEL(YEAR,NAME,PARENT,MACHINE,INPUT,INIT,MONITOR,COMPANY,FULLNAME,FLAGS,LAYOUT)	\
-extern const game_driver GAME_NAME(NAME) =	\
-{											\
-	__FILE__,								\
-	#PARENT,								\
-	#NAME,									\
-	FULLNAME,								\
-	#YEAR,									\
-	COMPANY,								\
-	MACHINE_CONFIG_NAME(MACHINE),			\
-	INPUT_PORTS_NAME(INPUT),				\
-	DRIVER_INIT_NAME(INIT),					\
-	ROM_NAME(NAME),							\
-	NULL,									\
-	(MONITOR)|(FLAGS)|GAME_TYPE_ARCADE,		\
-	&LAYOUT[0]								\
-};
-
-#define CONS(YEAR,NAME,PARENT,COMPAT,MACHINE,INPUT,INIT,COMPANY,FULLNAME,FLAGS)	\
-extern const game_driver GAME_NAME(NAME) =	\
-{											\
-	__FILE__,								\
-	#PARENT,								\
-	#NAME,									\
-	FULLNAME,								\
-	#YEAR,									\
-	COMPANY,								\
-	MACHINE_CONFIG_NAME(MACHINE),			\
-	INPUT_PORTS_NAME(INPUT),				\
-	DRIVER_INIT_NAME(INIT),					\
-	ROM_NAME(NAME),							\
-	#COMPAT,								\
-	ROT0|(FLAGS)|GAME_TYPE_CONSOLE,			\
-	NULL									\
-};
-
-#define COMP(YEAR,NAME,PARENT,COMPAT,MACHINE,INPUT,INIT,COMPANY,FULLNAME,FLAGS)	\
-extern const game_driver GAME_NAME(NAME) =	\
-{											\
-	__FILE__,								\
-	#PARENT,								\
-	#NAME,									\
-	FULLNAME,								\
-	#YEAR,									\
-	COMPANY,								\
-	MACHINE_CONFIG_NAME(MACHINE),			\
-	INPUT_PORTS_NAME(INPUT),				\
-	DRIVER_INIT_NAME(INIT),					\
-	ROM_NAME(NAME),							\
-	#COMPAT,								\
-	ROT0|(FLAGS)|GAME_TYPE_COMPUTER,		\
-	NULL									\
-};
-
-#define SYST(YEAR,NAME,PARENT,COMPAT,MACHINE,INPUT,INIT,COMPANY,FULLNAME,FLAGS)	\
-extern const game_driver GAME_NAME(NAME) =	\
-{											\
-	__FILE__,								\
-	#PARENT,								\
-	#NAME,									\
-	FULLNAME,								\
-	#YEAR,									\
-	COMPANY,								\
-	MACHINE_CONFIG_NAME(MACHINE),			\
-	INPUT_PORTS_NAME(INPUT),				\
-	DRIVER_INIT_NAME(INIT),					\
-	ROM_NAME(NAME),							\
-	#COMPAT,								\
-	ROT0|(FLAGS)|GAME_TYPE_OTHER,		\
-	NULL									\
-};
-
-/***************************************************************************
-    GLOBAL VARIABLES
-***************************************************************************/
-
-GAME_EXTERN(___empty);
-
-
 
 #endif

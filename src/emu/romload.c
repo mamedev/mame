@@ -11,6 +11,7 @@
 
 #include "emu.h"
 #include "emuopts.h"
+#include "drivenum.h"
 #include "png.h"
 #include "harddisk.h"
 #include "config.h"

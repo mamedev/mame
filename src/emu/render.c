@@ -72,6 +72,7 @@
 #include "rendlay.h"
 #include "rendutil.h"
 #include "config.h"
+#include "drivenum.h"
 #include "xmlfile.h"
 
 
