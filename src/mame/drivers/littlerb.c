@@ -231,7 +231,7 @@ static void littlerb_recalc_address(running_machine &machine)
 READ16_MEMBER(littlerb_state::littlerb_vdp_r)
 {
 	logerror("%06x littlerb_vdp_r offs %04x mask %04x (address %08x)\n", cpu_get_pc(&space.device()), offset, mem_mask, m_write_address);
-	UINT16 res;
+	UINT16 res = 0;
 
 	switch (offset & 3)
 	{
