@@ -8,7 +8,6 @@
 
 TODO:
 - preserve tape and hook it up, the game is not playable without it
-- discrete sound (should be simple to those that know how)
 - is timing accurate?
 - correct dump for gfx roms
 
@@ -16,6 +15,7 @@ TODO:
 
 #include "emu.h"
 #include "cpu/s2650/s2650.h"
+#include "sound/dac.h"
 
 #include "quizshow.lh"
 
@@ -157,8 +157,8 @@ WRITE8_MEMBER(quizshow_state::quizshow_tape_control_w)
 
 WRITE8_MEMBER(quizshow_state::quizshow_audio_w)
 {
-	// d1: audio beep on/off
-	// TODO
+	// d1: audio out
+	dac_signed_w(machine().device("dac"), 0, (data & 2) ? 0x7f : 0);
 
 	// d0, d2-d7: N/C
 }
@@ -388,7 +388,10 @@ static MACHINE_CONFIG_START( quizshow, quizshow_state )
 	MCFG_MACHINE_RESET(quizshow)
 
 	/* sound hardware (discrete) */
-	// ..
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
 
@@ -443,4 +446,4 @@ static DRIVER_INIT( quizshow )
 }
 
 
-GAMEL( 1976, quizshow, 0, quizshow, quizshow, quizshow, ROT0, "Atari (Kee Games)", "Quiz Show", GAME_NO_SOUND | GAME_NOT_WORKING, layout_quizshow )
+GAMEL( 1976, quizshow, 0, quizshow, quizshow, quizshow, ROT0, "Atari (Kee Games)", "Quiz Show", GAME_NOT_WORKING, layout_quizshow )
