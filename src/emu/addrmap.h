@@ -520,8 +520,6 @@ void _class :: _name(address_map &map, const device_t &device) \
 #define AM_READ16_LEGACY(_handler, _unitmask) \
 	curentry->set_handler(_handler, #_handler, _unitmask); \
 
-#define AM_READ32_LEGACY(_handler, _unitmask) \
-	curentry->set_handler(_handler, #_handler, _unitmask); \
 
 
 // legacy space writes
@@ -531,11 +529,7 @@ void _class :: _name(address_map &map, const device_t &device) \
 #define AM_WRITE8_LEGACY(_handler, _unitmask) \
 	curentry->set_handler(_handler, #_handler, _unitmask); \
 
-#define AM_WRITE16_LEGACY(_handler, _unitmask) \
-	curentry->set_handler(_handler, #_handler, _unitmask); \
 
-#define AM_WRITE32_LEGACY(_handler, _unitmask) \
-	curentry->set_handler(_handler, #_handler, _unitmask); \
 
 
 // legacy space reads/writes
@@ -559,11 +553,7 @@ void _class :: _name(address_map &map, const device_t &device) \
 #define AM_DEVREAD8_LEGACY(_tag, _handler, _unitmask) \
 	curentry->set_handler(device, _tag, _handler, #_handler, _unitmask); \
 
-#define AM_DEVREAD16_LEGACY(_tag, _handler, _unitmask) \
-	curentry->set_handler(device, _tag, _handler, #_handler, _unitmask); \
 
-#define AM_DEVREAD32_LEGACY(_tag, _handler, _unitmask) \
-	curentry->set_handler(device, _tag, _handler, #_handler, _unitmask); \
 
 
 // legacy device writes
@@ -576,8 +566,6 @@ void _class :: _name(address_map &map, const device_t &device) \
 #define AM_DEVWRITE16_LEGACY(_tag, _handler, _unitmask) \
 	curentry->set_handler(device, _tag, _handler, #_handler, _unitmask); \
 
-#define AM_DEVWRITE32_LEGACY(_tag, _handler, _unitmask) \
-	curentry->set_handler(device, _tag, _handler, #_handler, _unitmask); \
 
 
 // legacy device reads/writes
@@ -774,7 +762,6 @@ void _class :: _name(address_map &map, const device_t &device) \
 
 #define AM_RAM_READ_LEGACY(_read)			AM_READ_LEGACY(_read) AM_WRITEONLY
 #define AM_RAM_WRITE_LEGACY(_write)			AM_READONLY AM_WRITE_LEGACY(_write)
-#define AM_RAM_DEVREAD_LEGACY(_tag, _read) AM_DEVREAD_LEGACY(_tag, _read) AM_WRITEONLY
 #define AM_RAM_DEVWRITE_LEGACY(_tag, _write) AM_READONLY AM_DEVWRITE_LEGACY(_tag, _write)
 	
 #define AM_BASE_SIZE(_base, _size)			AM_BASE(_base) AM_SIZE(_size)
