@@ -690,6 +690,6 @@ static DRIVER_INIT(ssingles)
 	state->save_item(NAME(state->m_colorram));
 }
 
-GAME( 1983, ssingles, 0, ssingles, ssingles, ssingles, ROT90, "Ent. Ent. Ltd", "Swinging Singles", GAME_SUPPORTS_SAVE | GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND )
+GAME( 1983, ssingles, 0, ssingles, ssingles, ssingles, ROT90, "Entertainment Enterprises, Ltd.", "Swinging Singles", GAME_SUPPORTS_SAVE | GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND )
 GAME( 1983, atamanot, 0, atamanot, ssingles, ssingles, ROT90, "Yachiyo Denki / Uni Enterprize", "Computer Quiz Atama no Taisou (Japan)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION )
 

@@ -718,5 +718,5 @@ static DRIVER_INIT(mv4in1)
 
 
 GAME( 1982, ltcasino, 0, ltcasino, ltcasino, 0, ROT0, "Digital Controls Inc.", "Little Casino (older)", GAME_WRONG_COLORS | GAME_IMPERFECT_GRAPHICS  )
-GAME( 1983, mv4in1,  ltcasino,  ltcasino, mv4in1, mv4in1, ROT0, "Entertainment Enterprises", "Mini Vegas 4in1", GAME_WRONG_COLORS | GAME_IMPERFECT_GRAPHICS )
+GAME( 1983, mv4in1,  ltcasino,  ltcasino, mv4in1, mv4in1, ROT0, "Entertainment Enterprises, Ltd.", "Mini Vegas 4in1", GAME_WRONG_COLORS | GAME_IMPERFECT_GRAPHICS )
 GAME( 1984, ltcasinn, 0, ltcasino, ltcasinn, 0, ROT0, "Digital Controls Inc.", "Little Casino (newer)", GAME_NOT_WORKING )
