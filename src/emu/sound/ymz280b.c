@@ -1017,7 +1017,7 @@ READ8_DEVICE_HANDLER( ymz280b_r )
 	{
 		/* read from external memory */
 		UINT8 result;
-		if (chip->ext_ram_read.isnull())
+		if (!chip->ext_ram_read.isnull())
 			result = chip->ext_ram_read(chip->rom_readback_addr);
 		else
 			result = ymz280b_read_memory(chip->region_base, chip->region_size, chip->rom_readback_addr);

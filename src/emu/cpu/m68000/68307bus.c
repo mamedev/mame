@@ -13,10 +13,21 @@ READ16_HANDLER( m68307_internal_mbus_r )
 	if (mbus)
 	{
 		int pc = cpu_get_pc(&space->device());
-		logerror("%08x m68307_internal_mbus_r %08x, (%04x)\n", pc, offset*2,mem_mask);
+
+
+		switch (offset<<1)
+		{
+			case m68307BUS_MBSR:
+				logerror("%08x m68307_internal_mbus_r %08x, (%04x) (MBSR - Status Register)\n", pc, offset*2,mem_mask);
+				return space->machine().rand();
+
+			default:
+				logerror("%08x m68307_internal_mbus_r %08x, (%04x)\n", pc, offset*2,mem_mask);
+				return 0x0000;
+		}
 	}
 	
-	return 0x0000;
+	return 0xffff;
 }
 
 WRITE16_HANDLER( m68307_internal_mbus_w )

@@ -1371,7 +1371,7 @@ ROM_START( sc4cburn )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "96000038.lo", 0x00001, 0x080000, CRC(e311ce43) SHA1(c9395c886d76a8aabe35a874f10489cdc02bbd35) )
 	ROM_LOAD16_BYTE( "96000039.hi", 0x00000, 0x080000, CRC(0f3815a9) SHA1(7b30e5f246a953c864a074981718f9540ba22daf) )
-	sc_cburn_others
+	sc_hotpr_others
 ROM_END
 
 
@@ -1379,7 +1379,7 @@ ROM_START( sc4cburna )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "96000040.odd", 0x00001, 0x080000, CRC(da99424b) SHA1(3c74bf35f64a3bc7d301f53a4307c8c4c73059c9) )
 	ROM_LOAD16_BYTE( "96000041.evn", 0x00000, 0x080000, CRC(49c6d054) SHA1(88985743f6e56f5c9557a75bb8e0861659d5be28) )
-	sc_cburn_others
+	sc_hotpr_others
 ROM_END
 
 
@@ -2145,7 +2145,7 @@ ROM_START( sc4cashg )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95408508.lo", 0x00001, 0x080000, CRC(6d96beb0) SHA1(da274c53fce937e01a095693003ecb67379a7980) )
 	ROM_LOAD16_BYTE( "95408509.hi", 0x00000, 0x080000, CRC(084450b4) SHA1(553b2a10e36b0c1f26b0c05c4d2b218f4c5b24b1) )
-	sc_cashm_others
+	sc_cashm_german_others
 ROM_END
 
 
@@ -4746,20 +4746,6 @@ ROM_START( sc4feverh )
 	sc_fever_others
 ROM_END
 
-ROM_START( sc4feveri )
-	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "95406360.lo", 0x00001, 0x080000, CRC(b0ab3f6b) SHA1(48bb1faba0917d16558221f4c0d1cd6a3fa72767) )
-	ROM_LOAD16_BYTE( "95406361.hi", 0x00000, 0x080000, CRC(88874cc3) SHA1(8afe9b666eac553380f9bb80459491a7b4811793) )
-	sc_fever_others
-ROM_END
-
-ROM_START( sc4feverj )
-	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "95406782.lo", 0x00001, 0x080000, CRC(7346b7d3) SHA1(24ff011729419b454430d7c4f92c4618338d7ec0) )
-	ROM_LOAD16_BYTE( "95406783.hi", 0x00000, 0x080000, CRC(fe3d7b7c) SHA1(7618444990a85d227850009393e130d128fe035f) )
-	sc_fever_others
-ROM_END
-
 ROM_START( sc4feverk )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95407012.lo", 0x00001, 0x080000, CRC(d6c56e82) SHA1(9e3fa0cfc7c9541b9637110677fa0b2f0911e450) )
@@ -4767,11 +4753,27 @@ ROM_START( sc4feverk )
 	sc_fever_others
 ROM_END
 
+
+ROM_START( sc4feveri )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "95406360.lo", 0x00001, 0x080000, CRC(b0ab3f6b) SHA1(48bb1faba0917d16558221f4c0d1cd6a3fa72767) )
+	ROM_LOAD16_BYTE( "95406361.hi", 0x00000, 0x080000, CRC(88874cc3) SHA1(8afe9b666eac553380f9bb80459491a7b4811793) )
+	sc_fever7157_others
+ROM_END
+
+ROM_START( sc4feverj )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "95406782.lo", 0x00001, 0x080000, CRC(7346b7d3) SHA1(24ff011729419b454430d7c4f92c4618338d7ec0) )
+	ROM_LOAD16_BYTE( "95406783.hi", 0x00000, 0x080000, CRC(fe3d7b7c) SHA1(7618444990a85d227850009393e130d128fe035f) )
+	sc_fever7157_others
+ROM_END
+
+
 ROM_START( sc4feverl )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95408920.lo", 0x00001, 0x080000, CRC(e29cf521) SHA1(c0b2211030caf5ff37bb6ffb813a0dfd7b72963d) )
 	ROM_LOAD16_BYTE( "95408921.hi", 0x00000, 0x080000, CRC(db3025ee) SHA1(e21f56adee4eda6a77618e82f6b029955e939741) )
-	sc_fever_others
+	sc_fever7157_others
 ROM_END
 
 
@@ -22725,8 +22727,6 @@ GAME( 200?, sc4gslamd	,sc4gslam,	sc4, sc4, sc4, ROT0, "BFM","Grandslam Club (BFM
 GAME( 200?, sc4gslame	,sc4gslam,	sc4, sc4, sc4, ROT0, "BFM","Grandslam Club (BFM) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc4gslamf	,sc4gslam,	sc4, sc4, sc4, ROT0, "BFM","Grandslam Club (BFM) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL )
 
-// PR1227 4PLAY ART13         95004313 4PLAY PR1227
-GAME( 200?, sc4ivply	,0,			sc4, sc4, sc4, ROT0, "BFM","4 Play (Bellfruit) (Scorpion 4)", GAME_IS_SKELETON_MECHANICAL )
 
 // PR2540 ABRACADABRA         ABRA SOUNDS         ABRACADABRA
 GAME( 200?, sc4abra		,0,			sc4, sc4, sc4, ROT0, "Qps","Abracadabra (Qps) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
@@ -22736,36 +22736,17 @@ GAME( 200?, sc4abrac	,sc4abra,	sc4, sc4, sc4, ROT0, "Qps","Abracadabra (Qps) (Sc
 GAME( 200?, sc4abrad	,sc4abra,	sc4, sc4, sc4, ROT0, "Qps","Abracadabra (Qps) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc4abrae	,sc4abra,	sc4, sc4, sc4, ROT0, "Qps","Abracadabra (Qps) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
 
-// PR2070 ACES HIGH         ACEHI SOUNDS            ACES HIGH
-GAME( 200?, sc4acesh	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Aces High (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4acesha	,sc4acesh,	sc4, sc4, sc4, ROT0, "Mazooma","Aces High (Mazooma) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4aceshb	,sc4acesh,	sc4, sc4, sc4, ROT0, "Mazooma","Aces High (Mazooma) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4aceshc	,sc4acesh,	sc4, sc4, sc4, ROT0, "Mazooma","Aces High (Mazooma) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
 
-// PR2118 ADRENALIN         COTL SOUNDS         ADRENALIN
-GAME( 200?, sc4adren	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Adrenalin (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4adrena	,sc4adren,	sc4, sc4, sc4, ROT0, "Mazooma","Adrenalin (Mazooma) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4adrenb	,sc4adren,	sc4, sc4, sc4, ROT0, "Mazooma","Adrenalin (Mazooma) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4adrenc	,sc4adren,	sc4, sc4, sc4, ROT0, "Mazooma","Adrenalin (Mazooma) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
 
 // PR7068 ALADDIN'S CAVE         CAVE SOUNDS
 GAME( 200?, sc4alad		,0,			sc4, sc4, sc4, ROT0, "Mazooma","Aladdin's Cave (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc4alada	,sc4alad,	sc4, sc4, sc4, ROT0, "Mazooma","Aladdin's Cave (Mazooma) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
 
-// PR2154 CLUB AROUND BOAR         CLB AROUND BOARD  CLUB  AROU SOUNDS
-GAME( 200?, sc4a40cl	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Around The Board In 40 Days Club (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4a40cla	,sc4a40cl,	sc4, sc4, sc4, ROT0, "Mazooma","Around The Board In 40 Days Club (Mazooma) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4a40clb	,sc4a40cl,	sc4, sc4, sc4, ROT0, "Mazooma","Around The Board In 40 Days Club (Mazooma) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4a40clc	,sc4a40cl,	sc4, sc4, sc4, ROT0, "Mazooma","Around The Board In 40 Days Club (Mazooma) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
-
- // PR1225 AZTEC CASINO
-GAME( 200?, sc4aztec	,0,			sc4, sc4, sc4, ROT0, "BFM","Aztec (Casino) (Bellfruit) (Scorpion 4)", GAME_IS_SKELETON_MECHANICAL )
- // PR1215 AZTEC EURO
-GAME( 200?, sc4azteca	,sc4aztec,	sc4, sc4, sc4, ROT0, "BFM","Aztec (Euro) (Bellfruit) (Scorpion 4)", GAME_IS_SKELETON_MECHANICAL )
 
 // PR2538 BACK OF THE NET V011         BACKOFTHENETSND         BACK OF THE NET
 GAME( 200?, sc4botn		,0,			sc4, sc4, sc4, ROT0, "Qps","Back Of The Net (Qps) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc4botna	,sc4botn,	sc4, sc4, sc4, ROT0, "Qps","Back Of The Net (Qps) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+
 
 // PR2034 BANK ROLL         ROL SOUNDS          BANK ROLL
 GAME( 200?, sc4broll	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Bank Roll (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
@@ -22774,48 +22755,10 @@ GAME( 200?, sc4brollb	,sc4broll,	sc4, sc4, sc4, ROT0, "Mazooma","Bank Roll (Mazo
 GAME( 200?, sc4brollc	,sc4broll,	sc4, sc4, sc4, ROT0, "Mazooma","Bank Roll (Mazooma) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
 
 
-// PR???? BANKETYBANK V1.0         BANKETYBANKSND           BANKETY BANK
-GAME( 200?, sc4bankb	,0,			sc4, sc4, sc4, ROT0, "Qps","Bankety Bank (Qps) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4bankba	,sc4bankb,	sc4, sc4, sc4, ROT0, "Qps","Bankety Bank (Qps) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-
-// PR2094 BEDAZZLED         BEDZ SOUNDS         BEDAZZLED
-GAME( 200?, sc4bed		,0,			sc4, sc4, sc4, ROT0, "Mazooma","Bedazzled (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4beda		,sc4bed,	sc4, sc4, sc4, ROT0, "Mazooma","Bedazzled (Mazooma) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4bedb		,sc4bed,	sc4, sc4, sc4, ROT0, "Mazooma","Bedazzled (Mazooma) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4bedc		,sc4bed,	sc4, sc4, sc4, ROT0, "Mazooma","Bedazzled (Mazooma) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4bedd		,sc4bed,	sc4, sc4, sc4, ROT0, "Mazooma","Bedazzled (Mazooma) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4bede		,sc4bed,	sc4, sc4, sc4, ROT0, "Mazooma","Bedazzled (Mazooma) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
-
-
-// PR2102 CLUB BEDAZZLED         CBED SOUNDS         CLUB BEDAZZLED
-GAME( 200?, sc4bedcl	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Bedazzled Club (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-// PR2102 CLUB BEDAZZLED         CLUB BEDAZZLED  CLUB  CBED SOUNDS         CLUB BEDAZZLED
-GAME( 200?, sc4bedcla	,sc4bedcl,	sc4, sc4, sc4, ROT0, "Mazooma","Bedazzled Club (Mazooma) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4bedclb	,sc4bedcl,	sc4, sc4, sc4, ROT0, "Mazooma","Bedazzled Club (Mazooma) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4bedclc	,sc4bedcl,	sc4, sc4, sc4, ROT0, "Mazooma","Bedazzled Club (Mazooma) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4bedcld	,sc4bedcl,	sc4, sc4, sc4, ROT0, "Mazooma","Bedazzled Club (Mazooma) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
-
-// PR2083 BIG BLASTER         BBST SOUNDS         BIG BLASTER
-GAME( 200?, sc4bblas	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Big Blaster (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4bblasa	,sc4bblas,	sc4, sc4, sc4, ROT0, "Mazooma","Big Blaster (Mazooma) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4bblasb	,sc4bblas,	sc4, sc4, sc4, ROT0, "Mazooma","Big Blaster (Mazooma) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4bblasc	,sc4bblas,	sc4, sc4, sc4, ROT0, "Mazooma","Big Blaster (Mazooma) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4bblasd	,sc4bblas,	sc4, sc4, sc4, ROT0, "Mazooma","Big Blaster (Mazooma) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4bblase	,sc4bblas,	sc4, sc4, sc4, ROT0, "Mazooma","Big Blaster (Mazooma) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4bblasf	,sc4bblas,	sc4, sc4, sc4, ROT0, "Mazooma","Big Blaster (Mazooma) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL )
-
 // PR2501 BIG DEAL         BIGDEALSND             BIG DEAL
 GAME( 200?, sc4bigdl	,0,			sc4, sc4, sc4, ROT0, "Qps","Big Deal (Qps) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc4bigdla	,sc4bigdl,	sc4, sc4, sc4, ROT0, "Qps","Big Deal (Qps) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
 
-
-// PR21xx BINGO BELLE         SSPT SOUNDS         BINGO BELLE
-GAME( 200?, sc4bingb	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Bingo Belle (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4bingba	,sc4bingb,	sc4, sc4, sc4, ROT0, "Mazooma","Bingo Belle (Mazooma) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-
-// PR???? BANKETYBANK 011         BANKETYBANKSND           BANKETY BANK
-GAME( 200?, sc4bb		,0,			sc4, sc4, sc4, ROT0, "Qps","Blankety Bank (Qps) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4bba		,sc4bb,		sc4, sc4, sc4, ROT0, "Qps","Blankety Bank (Qps) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
 
 // PRXXXX CLUB BANKETY BANK VER1.0         CLUBBANKSND         CLUB BANKETYBANK
 GAME( 200?, sc4bbclb	,0,			sc4, sc4, sc4, ROT0, "Qps","Blankety Bank Club (V1.0) (Qps) (Scorpion 4)", GAME_IS_SKELETON_MECHANICAL )
@@ -22843,9 +22786,6 @@ GAME( 200?, sc4bluec	,sc4blue,	sc4, sc4, sc4, ROT0, "Mazooma","Blue Rinse (Mazoo
 GAME( 200?, sc4blued	,sc4blue,	sc4, sc4, sc4, ROT0, "Mazooma","Blue Rinse (Mazooma) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc4bluee	,sc4blue,	sc4, sc4, sc4, ROT0, "Mazooma","Blue Rinse (Mazooma) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
 
-// PR2298 CLUB BOBBY DAZZLER         CLUB BOB DAZZLER  CLUB  CLUBBOBD SOUNDS
-GAME( 200?, sc4bobcl	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Bobby Dazzler Club (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4bobcla	,sc4bobcl,	sc4, sc4, sc4, ROT0, "Mazooma","Bobby Dazzler Club (Mazooma) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
 
 // PR7036GOLDEN X         GOLDEN X  ARCADE  BARX SOUNDS         GOLDEN X
 GAME( 200?, sc4bonbx	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Bonus Bar X (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
@@ -22863,9 +22803,6 @@ GAME( 200?, sc4bonbxj	,sc4bonbx,	sc4, sc4, sc4, ROT0, "Mazooma","Bonus Bar X (Ma
 GAME( 200?, sc4bonbxk	,sc4bonbx,	sc4, sc4, sc4, ROT0, "Mazooma","Bonus Bar X (Mazooma) (Scorpion 4) (set 12)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc4bonbxl	,sc4bonbx,	sc4, sc4, sc4, ROT0, "Mazooma","Bonus Bar X (Mazooma) (Scorpion 4) (set 13)", GAME_IS_SKELETON_MECHANICAL )
 
-// PR2033 BREAK THE SPELL         SPELL SOUNDS         BREAK THE SPELL
-GAME( 200?, sc4brksp	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Break The Spell (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4brkspa	,sc4brksp,	sc4, sc4, sc4, ROT0, "Mazooma","Break The Spell (Mazooma) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
 
 // PR2023.GERMAN BRIX...........PR2023,German BRIX,......PR2023 SOUNDS V1  (non-standard header)
 GAME( 200?, sc4brix		,0,			sc4, sc4, sc4, ROT0, "Nova","Brix (German) (Nova) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
@@ -22878,17 +22815,6 @@ GAME( 200?, sc4bugsa	,sc4bugs,	sc4, sc4, sc4, ROT0, "BFM","Bugs Money (Bellfruit
 GAME( 200?, sc4bugsb	,sc4bugs,	sc4, sc4, sc4, ROT0, "BFM","Bugs Money (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc4bugsc	,sc4bugs,	sc4, sc4, sc4, ROT0, "BFM","Bugs Money (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
 
-// PR1753 CLUB BULLSEYE         BULLSEYE  CLUB  PR1751 BULLSEYE SOUNDS11         BULLSYE
-GAME( 200?, sc4bulcl	,0,			sc4, sc4, sc4, ROT0, "BFM","Bullseye Club (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4bulcla	,sc4bulcl,	sc4, sc4, sc4, ROT0, "BFM","Bullseye Club (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4bulclb	,sc4bulcl,	sc4, sc4, sc4, ROT0, "BFM","Bullseye Club (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4bulclc	,sc4bulcl,	sc4, sc4, sc4, ROT0, "BFM","Bullseye Club (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4bulcld	,sc4bulcl,	sc4, sc4, sc4, ROT0, "BFM","Bullseye Club (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4bulcle	,sc4bulcl,	sc4, sc4, sc4, ROT0, "BFM","Bullseye Club (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4bulclf	,sc4bulcl,	sc4, sc4, sc4, ROT0, "BFM","Bullseye Club (Bellfruit) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4bulclg	,sc4bulcl,	sc4, sc4, sc4, ROT0, "BFM","Bullseye Club (Bellfruit) (Scorpion 4) (set 8)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4bulclh	,sc4bulcl,	sc4, sc4, sc4, ROT0, "BFM","Bullseye Club (Bellfruit) (Scorpion 4) (set 9)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4bulcli	,sc4bulcl,	sc4, sc4, sc4, ROT0, "BFM","Bullseye Club (Bellfruit) (Scorpion 4) (set 10)", GAME_IS_SKELETON_MECHANICAL )
 
 // PR7017CASINO CAN CAN CASH          PR7017,Casino CAN CAN CASH,         LINE SOUNDS         CAN CAN CASH
 GAME( 200?, sc4canca	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Can Can Cash Casino (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
@@ -22906,9 +22832,6 @@ GAME( 200?, sc4captnd	,sc4captn,	sc4, sc4, sc4, ROT0, "Qps","Captain Cash (Qps) 
 GAME( 200?, sc4captne	,sc4captn,	sc4, sc4, sc4, ROT0, "Qps","Captain Cash (Qps) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc4captnf	,sc4captn,	sc4, sc4, sc4, ROT0, "Qps","Captain Cash (Qps) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL )
 
-// PR1113 CARRY ON WINNING         PR1113 CARRY ON WINNING SOUNDS11
-GAME( 200?, sc4carry	,0,			sc4, sc4, sc4, ROT0, "BFM","Carry On Winning (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4carrya	,sc4carry,	sc4, sc4, sc4, ROT0, "BFM","Carry On Winning (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
 
 // PR2534 CASH AND MOUSE V041         CASHANDMOUSESND          CASH AND MOUSE
 GAME( 200?, sc4cmous	,0,			sc4, sc4, sc4, ROT0, "Qps","Cash & Mouse (V041) (Qps) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
@@ -22917,10 +22840,22 @@ GAME( 200?, sc4cmousb	,sc4cmous,	sc4, sc4, sc4, ROT0, "Qps","Cash & Mouse (V041)
 GAME( 200?, sc4cmousa	,sc4cmous,	sc4, sc4, sc4, ROT0, "Qps","Cash & Mouse (V011) (Qps) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc4cmousc	,sc4cmous,	sc4, sc4, sc4, ROT0, "Qps","Cash & Mouse (V011) (Qps) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
 
+
+// PR6911 HOT PROPERTY         PR6911 HOT PROPERTY SOUNDS11           HOT PROPERTY
+GAME( 200?, sc4hotpr	,0,			sc4, sc4, sc4, ROT0, "BFM","Hot Property (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4hotpra	,sc4hotpr,	sc4, sc4, sc4, ROT0, "BFM","Hot Property (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4hotprb	,sc4hotpr,	sc4, sc4, sc4, ROT0, "BFM","Hot Property (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4hotprc	,sc4hotpr,	sc4, sc4, sc4, ROT0, "BFM","Hot Property (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4hotprd	,sc4hotpr,	sc4, sc4, sc4, ROT0, "BFM","Hot Property (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4hotpre	,sc4hotpr,	sc4, sc4, sc4, ROT0, "BFM","Hot Property (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
+
+// is this some kind of reworked version of Hot Property? 
+
 // PR6911 HOT PROPERTY         PR6911 HOT PROPERTY SOUNDS11        $$  CASH 'N' BURN
-GAME( 200?, sc4cburn	,0,			sc4, sc4, sc4, ROT0, "Qps","Cash 'n' Burn (Qps) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cburn	,sc4hotpr,	sc4, sc4, sc4, ROT0, "Qps","Cash 'n' Burn (Qps) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
 // PR6911 HOT PROPERTY V4.0         PR6911 HOT PROPERTY SOUNDS11        $   CASH 'N' BURN
-GAME( 200?, sc4cburna	,sc4cburn,	sc4, sc4, sc4, ROT0, "Qps","Cash 'n' Burn (Qps) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cburna	,sc4hotpr,	sc4, sc4, sc4, ROT0, "Qps","Cash 'n' Burn (Qps) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+
 
 // PR6815 CASH N FRUIT         PR6815 CASH N FRUIT SOUNDS11
 GAME( 200?, sc4cnfr		,0,			sc4, sc4, sc4, ROT0, "BFM","Cash 'n' Fruit (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
@@ -22968,20 +22903,6 @@ GAME( 200?, sc4cadq		,sc4cad,	sc4, sc4, sc4, ROT0, "Qps","Cash Adder (V043) (Qps
 GAME( 200?, sc4cadcl	,0,			sc4, sc4, sc4, ROT0, "Qps","Cash Adder Club (411) (Qps) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc4cadcla	,sc4cadcl,	sc4, sc4, sc4, ROT0, "Qps","Cash Adder Club (411) (Qps) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
 
-// PR1349 CLUB CASH BAZAAR         PR1349 CLUB CASH BAZAAR SOUNDS11
-GAME( 200?, sc4cbaz		,0,			sc4, sc4, sc4, ROT0, "BFM","Cash Bazaar Club (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cbaza	,sc4cbaz,	sc4, sc4, sc4, ROT0, "BFM","Cash Bazaar Club (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cbazb	,sc4cbaz,	sc4, sc4, sc4, ROT0, "BFM","Cash Bazaar Club (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cbazc	,sc4cbaz,	sc4, sc4, sc4, ROT0, "BFM","Cash Bazaar Club (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cbazd	,sc4cbaz,	sc4, sc4, sc4, ROT0, "BFM","Cash Bazaar Club (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cbaze	,sc4cbaz,	sc4, sc4, sc4, ROT0, "BFM","Cash Bazaar Club (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cbazf	,sc4cbaz,	sc4, sc4, sc4, ROT0, "BFM","Cash Bazaar Club (Bellfruit) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cbazg	,sc4cbaz,	sc4, sc4, sc4, ROT0, "BFM","Cash Bazaar Club (Bellfruit) (Scorpion 4) (set 8)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cbazh	,sc4cbaz,	sc4, sc4, sc4, ROT0, "BFM","Cash Bazaar Club (Bellfruit) (Scorpion 4) (set 9)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cbazi	,sc4cbaz,	sc4, sc4, sc4, ROT0, "BFM","Cash Bazaar Club (Bellfruit) (Scorpion 4) (set 10)", GAME_IS_SKELETON_MECHANICAL )
-// PR1349 CLUB CASH BAZAAR         CLUB CASH BAZAAR  CLUB  PR1349 CLUB CASH BAZAAR SOUNDS11
-GAME( 200?, sc4cbazj	,sc4cbaz,	sc4, sc4, sc4, ROT0, "BFM","Cash Bazaar Club (Bellfruit) (Scorpion 4) (set 11)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cbazk	,sc4cbaz,	sc4, sc4, sc4, ROT0, "BFM","Cash Bazaar Club (Bellfruit) (Scorpion 4) (set 12)", GAME_IS_SKELETON_MECHANICAL )
 
 // PR7038 CASH CONNEXION         MTOM SOUNDS
 GAME( 200?, sc4cconx	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Cash Connexion (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
@@ -22995,19 +22916,7 @@ GAME( 200?, sc4ccrus	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Cash Crusaders (Mazoo
 GAME( 200?, sc4ccrusa	,sc4ccrus,	sc4, sc4, sc4, ROT0, "Mazooma","Cash Crusaders (Mazooma) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc4ccrusb	,sc4ccrus,	sc4, sc4, sc4, ROT0, "Mazooma","Cash Crusaders (Mazooma) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
 
-// PR2020 CASH ERUPTION         ERUP SOUNDS          CASH  ERUPTION
-GAME( 200?, sc4cerup	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Cash Eruption (Mazooma) (Scorpion 4)", GAME_IS_SKELETON_MECHANICAL )
 
-// PR2076 CASH EXPLOSION         CEXP SOUNDS         CASH EXPLSION
-GAME( 200?, sc4cexpl	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Cash Explosion (PR2076) (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cexpla	,sc4cexpl,	sc4, sc4, sc4, ROT0, "Mazooma","Cash Explosion (PR2076) (Mazooma) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cexplb	,sc4cexpl,	sc4, sc4, sc4, ROT0, "Mazooma","Cash Explosion (PR2076) (Mazooma) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cexplc	,sc4cexpl,	sc4, sc4, sc4, ROT0, "Mazooma","Cash Explosion (PR2076) (Mazooma) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cexplf	,sc4cexpl,	sc4, sc4, sc4, ROT0, "Mazooma","Cash Explosion (PR2076) (Mazooma) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cexplg	,sc4cexpl,	sc4, sc4, sc4, ROT0, "Mazooma","Cash Explosion (PR2076) (Mazooma) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
-//  PR2120 CASH EXPLOSION         CEXP SOUNDS         CASH EXPLSION
-GAME( 200?, sc4cexpld	,sc4cexpl,	sc4, sc4, sc4, ROT0, "Mazooma","Cash Explosion (PR2120) (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cexple	,sc4cexpl,	sc4, sc4, sc4, ROT0, "Mazooma","Cash Explosion (PR2120) (Mazooma) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
 
 // PR7108 CASH IN HAND         PR7108 CASH IN HAND SOUNDS11           CASH IN HAND
 GAME( 200?, sc4chand	,0,			sc4, sc4, sc4, ROT0, "BFM","Cash In Hand (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
@@ -23027,15 +22936,6 @@ GAME( 200?, sc4cinvg	,sc4cinv,	sc4, sc4, sc4, ROT0, "BFM","Cash Invaders (Bellfr
 GAME( 200?, sc4cinvh	,sc4cinv,	sc4, sc4, sc4, ROT0, "BFM","Cash Invaders (Bellfruit) (Scorpion 4) (set 9)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc4cinvi	,sc4cinv,	sc4, sc4, sc4, ROT0, "BFM","Cash Invaders (Bellfruit) (Scorpion 4) (set 10)", GAME_IS_SKELETON_MECHANICAL )
 
-// PR2118 CASH ON THE LASH         COTL SOUNDS         CASH ON THE LASH
-GAME( 200?, sc4clash	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Cash On The Lash (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4clasha	,sc4clash,	sc4, sc4, sc4, ROT0, "Mazooma","Cash On The Lash (Mazooma) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4clashb	,sc4clash,	sc4, sc4, sc4, ROT0, "Mazooma","Cash On The Lash (Mazooma) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4clashc	,sc4clash,	sc4, sc4, sc4, ROT0, "Mazooma","Cash On The Lash (Mazooma) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4clashd	,sc4clash,	sc4, sc4, sc4, ROT0, "Mazooma","Cash On The Lash (Mazooma) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4clashe	,sc4clash,	sc4, sc4, sc4, ROT0, "Mazooma","Cash On The Lash (Mazooma) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4clashf	,sc4clash,	sc4, sc4, sc4, ROT0, "Mazooma","Cash On The Lash (Mazooma) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4clashg	,sc4clash,	sc4, sc4, sc4, ROT0, "Mazooma","Cash On The Lash (Mazooma) (Scorpion 4) (set 8)", GAME_IS_SKELETON_MECHANICAL )
 
 
 // PR2061 CASHRAKER         RAKERSND             CASHRAKER
@@ -23061,9 +22961,6 @@ GAME( 200?, sc4crcld	,sc4crcl,	sc4, sc4, sc4, ROT0, "Qps","Cash Raker Club (V1.3
 GAME( 200?, sc4crcle	,sc4crcl,	sc4, sc4, sc4, ROT0, "Qps","Cash Raker Club (411) (Qps) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc4crclf	,sc4crcl,	sc4, sc4, sc4, ROT0, "Qps","Cash Raker Club (411) (Qps) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
 
-// PR2038E Dutch12 Cashanova  (not a standard string)
-GAME( 200?, sc4cashn	,0,			sc4, sc4, sc4, ROT0, "Mazooma / Eurocoin","Cashanova (Dutch) (Mazooma / Eurocoin) (Scorpion 4)", GAME_IS_SKELETON_MECHANICAL )
-
 // PR2022 GERMAN CASHANOVA (not a standard string)
 GAME( 200?, sc4cashg	,0,			sc4, sc4, sc4, ROT0, "Mazooma / Nova","Cashanova (German) (Mazooma / Nova) (Scorpion 4)", GAME_IS_SKELETON_MECHANICAL )
 
@@ -23076,19 +22973,6 @@ GAME( 200?, sc4cashmd	,sc4cashm,	sc4, sc4, sc4, ROT0, "Mazooma","Cashanova (Mazo
 GAME( 200?, sc4cashme	,sc4cashm,	sc4, sc4, sc4, ROT0, "Mazooma","Cashanova (Mazooma) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
 
 
-// PR1426 CASINO CRAZY FRUITS GOLD         PR1426 CRAZY F GOLD SOUNDS11      CRAZY FRUIT GOLD  S.SITE  (set was marked as Casino Crazy Keys)
-GAME( 200?, sc4cckey	,0,		sc4, sc4, sc4, ROT0, "BFM","Casino Crazy Fruits Gold (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cckeya	,sc4cckey,	sc4, sc4, sc4, ROT0, "BFM","Casino Crazy Fruits Gold (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cckeyb	,sc4cckey,	sc4, sc4, sc4, ROT0, "BFM","Casino Crazy Fruits Gold (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cckeyc	,sc4cckey,	sc4, sc4, sc4, ROT0, "BFM","Casino Crazy Fruits Gold (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cckeyd	,sc4cckey,	sc4, sc4, sc4, ROT0, "BFM","Casino Crazy Fruits Gold (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cckeye	,sc4cckey,	sc4, sc4, sc4, ROT0, "BFM","Casino Crazy Fruits Gold (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cckeyf	,sc4cckey,	sc4, sc4, sc4, ROT0, "BFM","Casino Crazy Fruits Gold (Bellfruit) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cckeyg	,sc4cckey,	sc4, sc4, sc4, ROT0, "BFM","Casino Crazy Fruits Gold (Bellfruit) (Scorpion 4) (set 8)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cckeyh	,sc4cckey,	sc4, sc4, sc4, ROT0, "BFM","Casino Crazy Fruits Gold (Bellfruit) (Scorpion 4) (set 9)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cckeyi	,sc4cckey,	sc4, sc4, sc4, ROT0, "BFM","Casino Crazy Fruits Gold (Bellfruit) (Scorpion 4) (set 10)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cckeyj	,sc4cckey,	sc4, sc4, sc4, ROT0, "BFM","Casino Crazy Fruits Gold (Bellfruit) (Scorpion 4) (set 11)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cckeyk	,sc4cckey,	sc4, sc4, sc4, ROT0, "BFM","Casino Crazy Fruits Gold (Bellfruit) (Scorpion 4) (set 12)", GAME_IS_SKELETON_MECHANICAL )
 
 // PR2360 CASINO KING X         BARKX SOUNDS         8  KING X
 GAME( 200?, sc4ckx		,0,			sc4, sc4, sc4, ROT0, "Mazooma","Casino King X (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
@@ -23101,15 +22985,6 @@ GAME( 200?, sc4ckxe		,sc4ckx,	sc4, sc4, sc4, ROT0, "Mazooma","Casino King X (Maz
 GAME( 200?, sc4ckxf		,sc4ckx,	sc4, sc4, sc4, ROT0, "Mazooma","Casino King X (Mazooma) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc4ckxg		,sc4ckx,	sc4, sc4, sc4, ROT0, "Mazooma","Casino King X (Mazooma) (Scorpion 4) (set 8)", GAME_IS_SKELETON_MECHANICAL )
 
-// PR2062 CASINO ROYALE         CROY SOUNDS           CASINO ROYALE
-GAME( 200?, sc4casry	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Casino Royale (PR2062) (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4casryc	,sc4casry,	sc4, sc4, sc4, ROT0, "Mazooma","Casino Royale (PR2062) (Mazooma) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-// PR2075 CASINO ROYALE         DUCRV46     CROY  CROY SOUNDS           CASINO ROYALE  (Jumping Bean copyright?)
-GAME( 200?, sc4casryd	,sc4casry,	sc4, sc4, sc4, ROT0, "Mazooma","Casino Royale (PR2075) (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4casrye	,sc4casry,	sc4, sc4, sc4, ROT0, "Mazooma","Casino Royale (PR2075) (Mazooma) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-// PR2073, CZECH CASINO ROYALE.......................CROY SOUNDS... (not standard header)
-GAME( 200?, sc4casrya	,sc4casry,	sc4, sc4, sc4, ROT0, "Mazooma","Casino Royale (PR2073) (Czech) (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4casryb	,sc4casry,	sc4, sc4, sc4, ROT0, "Mazooma","Casino Royale (PR2073) (Czech) (Mazooma) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
 
 // PR7060CASINO CHICKEN DALES         TTTWO SOUNDS         CHICKEN DALES
 GAME( 200?, sc4chick	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Chickendales (Mazooma) (Scorpion 4)", GAME_IS_SKELETON_MECHANICAL )
@@ -23166,32 +23041,13 @@ GAME( 200?, sc4cclash	,sc4cclas,	sc4, sc4, sc4, ROT0, "BFM","Club Class (65% Fer
 GAME( 200?, sc4cclasp	,sc4cclas,	sc4, sc4, sc4, ROT0, "BFM","Club Class (65% Ferry) (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
 
 
-// PR2383 CLUBCLOUSEAU         CLUBCLOUSEAU  CLUB  CCLOU SOUNDS         CLUB CLOSEAU
-GAME( 200?, sc4clclo	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Club Clouseau (Mazooma) (Scorpion 4)", GAME_IS_SKELETON_MECHANICAL )
 
-// PR2237 CLUB CLUEDO         CLUB CLUEDO CLUB  CCLU SOUNDS         CLUB CLUEDO
-GAME( 200?, sc4clucl	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Cluedo Club (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4clucla	,sc4clucl,	sc4, sc4, sc4, ROT0, "Mazooma","Cluedo Club (Mazooma) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
 
 // PR1208 COLOSSUS         95004235 COLOSSUS PR7155             COLOSSUS
 GAME( 200?, sc4colos	,0,			sc4, sc4, sc4, ROT0, "BFM","Colossus (Bellfruit) (Scorpion 4)", GAME_IS_SKELETON_MECHANICAL )
 
 
-// PR1621 CLUB COOL JEWELS         PR1621 COOL SOUNDS11         CLUB COOL JEWELS  CLUB
-GAME( 200?, sc4cjcl		,0,			sc4, sc4, sc4, ROT0, "BFM","Cool Jewels Club (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cjcla	,sc4cjcl,	sc4, sc4, sc4, ROT0, "BFM","Cool Jewels Club (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cjclb	,sc4cjcl,	sc4, sc4, sc4, ROT0, "BFM","Cool Jewels Club (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cjclc	,sc4cjcl,	sc4, sc4, sc4, ROT0, "BFM","Cool Jewels Club (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cjcld	,sc4cjcl,	sc4, sc4, sc4, ROT0, "BFM","Cool Jewels Club (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cjcle	,sc4cjcl,	sc4, sc4, sc4, ROT0, "BFM","Cool Jewels Club (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cjclf	,sc4cjcl,	sc4, sc4, sc4, ROT0, "BFM","Cool Jewels Club (Bellfruit) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL )
 
-// PR1036 CLUB COP THE LOT         PR1036 CLOT SOUNDS11           COP THE LOT
-GAME( 200?, sc4ctlcl	,0,			sc4, sc4, sc4, ROT0, "BFM","Cop The Lot Club (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4ctlcla	,sc4ctlcl,	sc4, sc4, sc4, ROT0, "BFM","Cop The Lot Club (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-// PR1036 CLUB COP THE LOT         COP THE LOT CLUB  PR1036 CLOT SOUNDS11           COP THE LOT
-GAME( 200?, sc4ctlclb	,sc4ctlcl,	sc4, sc4, sc4, ROT0, "BFM","Cop The Lot Club (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4ctlclc	,sc4ctlcl,	sc4, sc4, sc4, ROT0, "BFM","Cop The Lot Club (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
 
 // PR6837 CLASSIC CLUB COPS AND ROBBERS         PR6837 COPS SOUNDS11         COPS AND ROBBERS
 GAME( 200?, sc4crcc		,0,			sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Club Classic (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
@@ -23200,61 +23056,8 @@ GAME( 200?, sc4crcca	,sc4crcc,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Club
 GAME( 200?, sc4crccb	,sc4crcc,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Club Classic (65%) (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc4crccc	,sc4crcc,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Club Classic (65%) (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
 
-// PR3241 CLUB COPS AND ROBBERS PLATINUM SCORP4         COPS & ROBRS PLT  CLUB  PR3241 C N R PLATINUM SOUNDS11      COPS AND ROBBERS
-GAME( 200?, sc4crcp		,0,			sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Club Platinum (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4crcpa	,sc4crcp,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Club Platinum (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4crcpc	,sc4crcp,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Club Platinum (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4crcpd	,sc4crcp,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Club Platinum (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4crcpe	,sc4crcp,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Club Platinum (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4crcpf	,sc4crcp,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Club Platinum (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4crcpg	,sc4crcp,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Club Platinum (Bellfruit) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4crcph	,sc4crcp,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Club Platinum (Bellfruit) (Scorpion 4) (set 8)", GAME_IS_SKELETON_MECHANICAL )
-
-// PR1348 CLUB COPS AND ROBBERS GOLD         PR1348 CCRG SOUNDS11         COPS AND ROBBERS
-GAME( 200?, sc4crgc		,0,			sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4crgca	,sc4crgc,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4crgcb	,sc4crgc,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4crgcc	,sc4crgc,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4crgcd	,sc4crgc,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4crgce	,sc4crgc,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4crgcf	,sc4crgc,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4crgcg	,sc4crgc,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 8)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4crgch	,sc4crgc,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 9)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4crgci	,sc4crgc,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 10)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4crgcj	,sc4crgc,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 11)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4crgck	,sc4crgc,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 12)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4crgcl	,sc4crgc,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 13)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4crgcm	,sc4crgc,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 14)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4crgco	,sc4crgc,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 15)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4crgcq	,sc4crgc,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 16)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4crgct	,sc4crgc,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 17)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4crgcw	,sc4crgc,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 18)", GAME_IS_SKELETON_MECHANICAL )
-// PR1348 CLUB COPS AND ROBBERS GOLD         COPS & ROBRS GLD  CLUB  PR1348 CCRG SOUNDS11         COPS AND ROBBERS
-GAME( 200?, sc4crgcn	,sc4crgc,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 19)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4crgcp	,sc4crgc,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 20)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4crgcr	,sc4crgc,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 21)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4crgcu	,sc4crgc,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 22)", GAME_IS_SKELETON_MECHANICAL )
-// PR1348 !500 CLUB COPS AND ROBBERS GOLD         COPS & ROBRS GLD  CLUB  PR1348 CCRG SOUNDS11         COPS AND ROBBERS
-GAME( 200?, sc4crgcs	,sc4crgc,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 23)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4crgcv	,sc4crgc,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 24)", GAME_IS_SKELETON_MECHANICAL )
 
 
-// PR2383 CLUBCORONATIONSTREET         CLUBCORONATIONST  CLUB  CCORO SOUNDS         CLUB CORO ST
-GAME( 200?, sc4corcl	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Coronation Street Club (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4corcla	,sc4corcl,	sc4, sc4, sc4, ROT0, "Mazooma","Coronation Street Club (Mazooma) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-
-//  PR2058 COUNT YER CASH         PR2058 COUNT YER CASH SOUNDS11
-GAME( 200?, sc4cyc		,0,			sc4, sc4, sc4, ROT0, "Mazooma","Count Yer Cash (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cyca		,sc4cyc,	sc4, sc4, sc4, ROT0, "Mazooma","Count Yer Cash (Mazooma) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cycb		,sc4cyc,	sc4, sc4, sc4, ROT0, "Mazooma","Count Yer Cash (Mazooma) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cycc		,sc4cyc,	sc4, sc4, sc4, ROT0, "Mazooma","Count Yer Cash (Mazooma) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cycd		,sc4cyc,	sc4, sc4, sc4, ROT0, "Mazooma","Count Yer Cash (Mazooma) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
-
-// PR2092 CLUB COUNT YER CASH         COUNT YER CASH  CLUB  CLCC SOUNDS
-GAME( 200?, sc4cyccl	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Count Yer Cash Club (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cyccla	,sc4cyccl,	sc4, sc4, sc4, ROT0, "Mazooma","Count Yer Cash Club (Mazooma) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cycclb	,sc4cyccl,	sc4, sc4, sc4, ROT0, "Mazooma","Count Yer Cash Club (Mazooma) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cycclc	,sc4cyccl,	sc4, sc4, sc4, ROT0, "Mazooma","Count Yer Cash Club (Mazooma) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
 
 // PR6906 CRAZY CASINO SP98         PR6906 CRCS SOUNDS11
 GAME( 200?, sc4crzcs	,0,			sc4, sc4, sc4, ROT0, "BFM","Crazy Casino SP98 (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
@@ -23302,30 +23105,13 @@ GAME( 200?, sc4cfqpsj	,sc4cfqps,	sc4, sc4, sc4, ROT0, "Qps","Crazy Fruits SP98 (
 // PR6923 CASINO CRAZY FRUITS         PR6923 CRAZY FRUITS SOUNDS11
 GAME( 200?, sc4cfcas	,0,			sc4, sc4, sc4, ROT0, "BFM","Crazy Fruits Casino (Bellfruit) (Scorpion 4)", GAME_IS_SKELETON_MECHANICAL )
 
-// PR1396 CLASSIC CRAZY FRUITS         PR1396 CLSIC CRAZY FRUITS SND11
-GAME( 200?, sc4cfcla	,0,			sc4, sc4, sc4, ROT0, "BFM","Crazy Fruits Classic (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cfclab	,sc4cfcla,	sc4, sc4, sc4, ROT0, "BFM","Crazy Fruits Classic (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cfclac	,sc4cfcla,	sc4, sc4, sc4, ROT0, "BFM","Crazy Fruits Classic (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cfclad	,sc4cfcla,	sc4, sc4, sc4, ROT0, "BFM","Crazy Fruits Classic (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cfclae	,sc4cfcla,	sc4, sc4, sc4, ROT0, "BFM","Crazy Fruits Classic (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cfclaf	,sc4cfcla,	sc4, sc4, sc4, ROT0, "BFM","Crazy Fruits Classic (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
 
 // PR6931 CLUB CRAZY FRUITS         PR6931 CRZY SOUNDS11
 GAME( 200?, sc4cfclb	,0,			sc4, sc4, sc4, ROT0, "BFM","Crazy Fruits Club (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc4cfclba	,sc4cfclb,	sc4, sc4, sc4, ROT0, "BFM","Crazy Fruits Club (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc4cfclbb	,sc4cfclb,	sc4, sc4, sc4, ROT0, "BFM","Crazy Fruits Club (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
 
-//  PR1107 CRAZY FRUITS DOWNUNDER         PR1107 DOWN UNDER SOUNDS11
-GAME( 200?, sc4cfdu		,0,			sc4, sc4, sc4, ROT0, "BFM","Crazy Fruits Down Under (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cfdua	,sc4cfdu,	sc4, sc4, sc4, ROT0, "BFM","Crazy Fruits Down Under (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cfdub	,sc4cfdu,	sc4, sc4, sc4, ROT0, "BFM","Crazy Fruits Down Under (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cfduc	,sc4cfdu,	sc4, sc4, sc4, ROT0, "BFM","Crazy Fruits Down Under (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
 
-// PR1620 CLUB CRAZY FRUITS GOLD         PR1620 CRAZY SOUNDS11         CRAZY FRUITS  CLUB
-GAME( 200?, sc4cfgcl	,0,			sc4, sc4, sc4, ROT0, "BFM","Crazy Fruits Gold Club (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cfgcla	,sc4cfgcl,	sc4, sc4, sc4, ROT0, "BFM","Crazy Fruits Gold Club (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cfgclb	,sc4cfgcl,	sc4, sc4, sc4, ROT0, "BFM","Crazy Fruits Gold Club (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cfgclc	,sc4cfgcl,	sc4, sc4, sc4, ROT0, "BFM","Crazy Fruits Gold Club (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
 
 // PR7141 CRAZY GANG         PR7141 CRAZY GANG SOUNDS11            CRAZY GANG
 GAME( 200?, sc4crzgn	,0,			sc4, sc4, sc4, ROT0, "BFM","Crazy Gang (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
@@ -23410,8 +23196,6 @@ GAME( 200?, sc4cccshe	,sc4cccsh,	sc4, sc4, sc4, ROT0, "Mazooma","Criss Cross Cas
 
 
 
-// PR1221 CRISSCROSSCRAZY  ART13         95004282 CRISSCROSS PR1161
-GAME( 200?, sc4ccc		,0,			sc4, sc4, sc4, ROT0, "BFM","Criss Cross Crazy (Bellfruit) (Scorpion 4)", GAME_IS_SKELETON_MECHANICAL )
 
 
 
@@ -23439,14 +23223,8 @@ GAME( 200?, sc4deepia	,sc4deepi,	sc4, sc4, sc4, ROT0, "Mazooma","Deep Impact (Ma
 GAME( 200?, sc4deepib	,sc4deepi,	sc4, sc4, sc4, ROT0, "Mazooma","Deep Impact (Mazooma) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc4deepid	,sc4deepi,	sc4, sc4, sc4, ROT0, "Mazooma","Deep Impact (Mazooma) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
 
-// PR1006  DEMOLITION DERBY         PR1006 DEMDERBY SOUNDS11
-GAME( 200?, sc4derby	,0,			sc4, sc4, sc4, ROT0, "BFM","Demolition Derby (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4derbya	,sc4derby,	sc4, sc4, sc4, ROT0, "BFM","Demolition Derby (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4derbyb	,sc4derby,	sc4, sc4, sc4, ROT0, "BFM","Demolition Derby (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4derbyc	,sc4derby,	sc4, sc4, sc4, ROT0, "BFM","Demolition Derby (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4derbyd	,sc4derby,	sc4, sc4, sc4, ROT0, "BFM","Demolition Derby (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4derbye	,sc4derby,	sc4, sc4, sc4, ROT0, "BFM","Demolition Derby (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
 
+// gives an 'init comms' countdown
 // PR1439 DIAMONDS & RUBIES         PR1436 TRIPLE CASINO SOUNDS11
 GAME( 200?, sc4druby	,0,			sc4, sc4, sc4, ROT0, "BFM","Diamonds & Rubys (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc4drubya	,sc4druby,	sc4, sc4, sc4, ROT0, "BFM","Diamonds & Rubys (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
@@ -23461,8 +23239,6 @@ GAME( 200?, sc4discob	,sc4disco,	sc4, sc4, sc4, ROT0, "Mazooma","Disco Inferno (
 GAME( 200?, sc4discoc	,sc4disco,	sc4, sc4, sc4, ROT0, "Mazooma","Disco Inferno (Mazooma) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc4discod	,sc4disco,	sc4, sc4, sc4, ROT0, "Mazooma","Disco Inferno (Mazooma) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
 
-// PR2558 DOUBLE DIAMOND 011         DOUBLEDIAMONDSND          DOUBLE DIAMOND
-GAME( 200?, sc4dbldm	,0,			sc4, sc4, sc4, ROT0, "Qps","Double Diamond (Qps) (Scorpion 4)", GAME_IS_SKELETON_MECHANICAL )
 
 // PR7060 DOUBLE FRENZY         DFRZYSND
 GAME( 200?, sc4dblfr	,0,			sc4, sc4, sc4, ROT0, "Qps","Double Frenzy (PR7060) (Qps) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
@@ -23484,18 +23260,7 @@ GAME( 200?, sc4darwc	,sc4darw,	sc4, sc4, sc4, ROT0, "Qps","Dough & Arrow (Qps) (
 GAME( 200?, sc4duckq	,0,			sc4, sc4, sc4, ROT0, "Qps","Ducks Of Hazzard (Qps) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc4duckqa	,sc4duckq,	sc4, sc4, sc4, ROT0, "Qps","Ducks Of Hazzard (Qps) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
 
-// PR1104 DYNAMITE         PR1104 DYNAMITE SOUNDS11
-GAME( 200?, sc4dyna		,0,			sc4, sc4, sc4, ROT0, "BFM","Dynamite (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dynaa	,sc4dyna,	sc4, sc4, sc4, ROT0, "BFM","Dynamite (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
 
-// PR1017 EASY STREAK         PR1017 EASY STREAK SOUNDS11           EASY STREAK
-GAME( 200?, sc4easy		,0,			sc4, sc4, sc4, ROT0, "BFM","Easy Streak (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4easya	,sc4easy,	sc4, sc4, sc4, ROT0, "BFM","Easy Streak (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4easyb	,sc4easy,	sc4, sc4, sc4, ROT0, "BFM","Easy Streak (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4easyc	,sc4easy,	sc4, sc4, sc4, ROT0, "BFM","Easy Streak (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4easyd	,sc4easy,	sc4, sc4, sc4, ROT0, "BFM","Easy Streak (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4easye	,sc4easy,	sc4, sc4, sc4, ROT0, "BFM","Easy Streak (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4easyf	,sc4easy,	sc4, sc4, sc4, ROT0, "BFM","Easy Streak (Bellfruit) (Scorpion 4) (set 11)", GAME_IS_SKELETON_MECHANICAL )
 // PR1326 CASINO EASY STREAK         PR1326 EASY STREAK SOUNDS11
 GAME( 200?, sc4eascs	,sc4easy,	sc4, sc4, sc4, ROT0, "BFM","Easy Streak Casino (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc4eascsa	,sc4easy,	sc4, sc4, sc4, ROT0, "BFM","Easy Streak Casino (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
@@ -23905,13 +23670,6 @@ GAME( 200?, sc4holywa	,sc4holyw,	sc4, sc4, sc4, ROT0, "BFM","Hollywood (Bellfrui
 GAME( 200?, sc4holywb	,sc4holyw,	sc4, sc4, sc4, ROT0, "BFM","Hollywood (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc4holywc	,sc4holyw,	sc4, sc4, sc4, ROT0, "BFM","Hollywood (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
 
-// PR6911 HOT PROPERTY         PR6911 HOT PROPERTY SOUNDS11           HOT PROPERTY
-GAME( 200?, sc4hotpr	,0,			sc4, sc4, sc4, ROT0, "BFM","Hot Property (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4hotpra	,sc4hotpr,	sc4, sc4, sc4, ROT0, "BFM","Hot Property (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4hotprb	,sc4hotpr,	sc4, sc4, sc4, ROT0, "BFM","Hot Property (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4hotprc	,sc4hotpr,	sc4, sc4, sc4, ROT0, "BFM","Hot Property (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4hotprd	,sc4hotpr,	sc4, sc4, sc4, ROT0, "BFM","Hot Property (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4hotpre	,sc4hotpr,	sc4, sc4, sc4, ROT0, "BFM","Hot Property (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
 
 //  PR1759 CLUB HOT SIX         HOT SIX CLUB  PR1759 HOSX SOUNDS11
 GAME( 200?, sc4h6cl		,0,			sc4, sc4, sc4, ROT0, "BFM","Hot Six Club (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
@@ -26890,6 +26648,302 @@ GAME( 200?, sc4gggq		,sc4ggg,	sc4, sc4, sc4, ROT0, "Mazooma","Grand Golden Game 
 GAME( 200?, sc4gggr		,sc4ggg,	sc4, sc4, sc4, ROT0, "Mazooma","Grand Golden Game (Mazooma) (Scorpion 4) (set 19)", GAME_IS_SKELETON_MECHANICAL )// ^^
 GAME( 200?, sc4gggs		,sc4ggg,	sc4, sc4, sc4, ROT0, "Mazooma","Grand Golden Game (Mazooma) (Scorpion 4) (set 20)", GAME_IS_SKELETON_MECHANICAL )// ^^
 
+/**************************************************/
+/************ many give error 41 ******************/
+/**************************************************/
+
+// PR1227 4PLAY ART13         95004313 4PLAY PR1227
+GAME( 200?, sc4ivply	,0,			sc4, sc4, sc4, ROT0, "BFM","4 Play (Bellfruit) (Scorpion 4)", GAME_IS_SKELETON_MECHANICAL ) // not english
+
+// PR2070 ACES HIGH         ACEHI SOUNDS            ACES HIGH
+GAME( 200?, sc4acesh	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Aces High (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4acesha	,sc4acesh,	sc4, sc4, sc4, ROT0, "Mazooma","Aces High (Mazooma) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4aceshb	,sc4acesh,	sc4, sc4, sc4, ROT0, "Mazooma","Aces High (Mazooma) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4aceshc	,sc4acesh,	sc4, sc4, sc4, ROT0, "Mazooma","Aces High (Mazooma) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+
+// PR2118 ADRENALIN         COTL SOUNDS         ADRENALIN
+GAME( 200?, sc4adren	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Adrenalin (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4adrena	,sc4adren,	sc4, sc4, sc4, ROT0, "Mazooma","Adrenalin (Mazooma) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4adrenb	,sc4adren,	sc4, sc4, sc4, ROT0, "Mazooma","Adrenalin (Mazooma) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4adrenc	,sc4adren,	sc4, sc4, sc4, ROT0, "Mazooma","Adrenalin (Mazooma) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+
+// PR2154 CLUB AROUND BOAR         CLB AROUND BOARD  CLUB  AROU SOUNDS
+GAME( 200?, sc4a40cl	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Around The Board In 40 Days Club (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4a40cla	,sc4a40cl,	sc4, sc4, sc4, ROT0, "Mazooma","Around The Board In 40 Days Club (Mazooma) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4a40clb	,sc4a40cl,	sc4, sc4, sc4, ROT0, "Mazooma","Around The Board In 40 Days Club (Mazooma) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4a40clc	,sc4a40cl,	sc4, sc4, sc4, ROT0, "Mazooma","Around The Board In 40 Days Club (Mazooma) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+
+ // PR1225 AZTEC CASINO
+GAME( 200?, sc4aztec	,0,			sc4, sc4, sc4, ROT0, "BFM","Aztec (Casino) (Bellfruit) (Scorpion 4)", GAME_IS_SKELETON_MECHANICAL )
+ // PR1215 AZTEC EURO
+GAME( 200?, sc4azteca	,sc4aztec,	sc4, sc4, sc4, ROT0, "BFM","Aztec (Euro) (Bellfruit) (Scorpion 4)", GAME_IS_SKELETON_MECHANICAL ) // not english
+
+// PR???? BANKETYBANK V1.0         BANKETYBANKSND           BANKETY BANK
+GAME( 200?, sc4bankb	,0,			sc4, sc4, sc4, ROT0, "Qps","Bankety Bank (Qps) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4bankba	,sc4bankb,	sc4, sc4, sc4, ROT0, "Qps","Bankety Bank (Qps) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+
+// PR2094 BEDAZZLED         BEDZ SOUNDS         BEDAZZLED
+GAME( 200?, sc4bed		,0,			sc4, sc4, sc4, ROT0, "Mazooma","Bedazzled (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4beda		,sc4bed,	sc4, sc4, sc4, ROT0, "Mazooma","Bedazzled (Mazooma) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4bedb		,sc4bed,	sc4, sc4, sc4, ROT0, "Mazooma","Bedazzled (Mazooma) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4bedc		,sc4bed,	sc4, sc4, sc4, ROT0, "Mazooma","Bedazzled (Mazooma) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4bedd		,sc4bed,	sc4, sc4, sc4, ROT0, "Mazooma","Bedazzled (Mazooma) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4bede		,sc4bed,	sc4, sc4, sc4, ROT0, "Mazooma","Bedazzled (Mazooma) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
+
+// PR2102 CLUB BEDAZZLED         CBED SOUNDS         CLUB BEDAZZLED
+GAME( 200?, sc4bedcl	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Bedazzled Club (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+// PR2102 CLUB BEDAZZLED         CLUB BEDAZZLED  CLUB  CBED SOUNDS         CLUB BEDAZZLED
+GAME( 200?, sc4bedcla	,sc4bedcl,	sc4, sc4, sc4, ROT0, "Mazooma","Bedazzled Club (Mazooma) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4bedclb	,sc4bedcl,	sc4, sc4, sc4, ROT0, "Mazooma","Bedazzled Club (Mazooma) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4bedclc	,sc4bedcl,	sc4, sc4, sc4, ROT0, "Mazooma","Bedazzled Club (Mazooma) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4bedcld	,sc4bedcl,	sc4, sc4, sc4, ROT0, "Mazooma","Bedazzled Club (Mazooma) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
+
+// PR2083 BIG BLASTER         BBST SOUNDS         BIG BLASTER
+GAME( 200?, sc4bblas	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Big Blaster (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4bblasa	,sc4bblas,	sc4, sc4, sc4, ROT0, "Mazooma","Big Blaster (Mazooma) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4bblasb	,sc4bblas,	sc4, sc4, sc4, ROT0, "Mazooma","Big Blaster (Mazooma) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4bblasc	,sc4bblas,	sc4, sc4, sc4, ROT0, "Mazooma","Big Blaster (Mazooma) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4bblasd	,sc4bblas,	sc4, sc4, sc4, ROT0, "Mazooma","Big Blaster (Mazooma) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4bblase	,sc4bblas,	sc4, sc4, sc4, ROT0, "Mazooma","Big Blaster (Mazooma) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4bblasf	,sc4bblas,	sc4, sc4, sc4, ROT0, "Mazooma","Big Blaster (Mazooma) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL )
+
+
+// PR21xx BINGO BELLE         SSPT SOUNDS         BINGO BELLE
+GAME( 200?, sc4bingb	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Bingo Belle (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4bingba	,sc4bingb,	sc4, sc4, sc4, ROT0, "Mazooma","Bingo Belle (Mazooma) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+
+
+// PR???? BANKETYBANK 011         BANKETYBANKSND           BANKETY BANK
+GAME( 200?, sc4bb		,0,			sc4, sc4, sc4, ROT0, "Qps","Blankety Bank (Qps) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4bba		,sc4bb,		sc4, sc4, sc4, ROT0, "Qps","Blankety Bank (Qps) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+
+// PR2298 CLUB BOBBY DAZZLER         CLUB BOB DAZZLER  CLUB  CLUBBOBD SOUNDS
+GAME( 200?, sc4bobcl	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Bobby Dazzler Club (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4bobcla	,sc4bobcl,	sc4, sc4, sc4, ROT0, "Mazooma","Bobby Dazzler Club (Mazooma) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+
+// PR2033 BREAK THE SPELL         SPELL SOUNDS         BREAK THE SPELL
+GAME( 200?, sc4brksp	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Break The Spell (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4brkspa	,sc4brksp,	sc4, sc4, sc4, ROT0, "Mazooma","Break The Spell (Mazooma) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+
+// PR1753 CLUB BULLSEYE         BULLSEYE  CLUB  PR1751 BULLSEYE SOUNDS11         BULLSYE
+GAME( 200?, sc4bulcl	,0,			sc4, sc4, sc4, ROT0, "BFM","Bullseye Club (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4bulcla	,sc4bulcl,	sc4, sc4, sc4, ROT0, "BFM","Bullseye Club (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4bulclb	,sc4bulcl,	sc4, sc4, sc4, ROT0, "BFM","Bullseye Club (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4bulclc	,sc4bulcl,	sc4, sc4, sc4, ROT0, "BFM","Bullseye Club (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4bulcld	,sc4bulcl,	sc4, sc4, sc4, ROT0, "BFM","Bullseye Club (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4bulcle	,sc4bulcl,	sc4, sc4, sc4, ROT0, "BFM","Bullseye Club (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4bulclf	,sc4bulcl,	sc4, sc4, sc4, ROT0, "BFM","Bullseye Club (Bellfruit) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4bulclg	,sc4bulcl,	sc4, sc4, sc4, ROT0, "BFM","Bullseye Club (Bellfruit) (Scorpion 4) (set 8)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4bulclh	,sc4bulcl,	sc4, sc4, sc4, ROT0, "BFM","Bullseye Club (Bellfruit) (Scorpion 4) (set 9)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4bulcli	,sc4bulcl,	sc4, sc4, sc4, ROT0, "BFM","Bullseye Club (Bellfruit) (Scorpion 4) (set 10)", GAME_IS_SKELETON_MECHANICAL )
+
+
+// PR1113 CARRY ON WINNING         PR1113 CARRY ON WINNING SOUNDS11
+GAME( 200?, sc4carry	,0,			sc4, sc4, sc4, ROT0, "BFM","Carry On Winning (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4carrya	,sc4carry,	sc4, sc4, sc4, ROT0, "BFM","Carry On Winning (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+
+
+// PR1349 CLUB CASH BAZAAR         PR1349 CLUB CASH BAZAAR SOUNDS11
+GAME( 200?, sc4cbaz		,0,			sc4, sc4, sc4, ROT0, "BFM","Cash Bazaar Club (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cbaza	,sc4cbaz,	sc4, sc4, sc4, ROT0, "BFM","Cash Bazaar Club (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cbazb	,sc4cbaz,	sc4, sc4, sc4, ROT0, "BFM","Cash Bazaar Club (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cbazc	,sc4cbaz,	sc4, sc4, sc4, ROT0, "BFM","Cash Bazaar Club (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cbazd	,sc4cbaz,	sc4, sc4, sc4, ROT0, "BFM","Cash Bazaar Club (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cbaze	,sc4cbaz,	sc4, sc4, sc4, ROT0, "BFM","Cash Bazaar Club (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cbazf	,sc4cbaz,	sc4, sc4, sc4, ROT0, "BFM","Cash Bazaar Club (Bellfruit) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cbazg	,sc4cbaz,	sc4, sc4, sc4, ROT0, "BFM","Cash Bazaar Club (Bellfruit) (Scorpion 4) (set 8)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cbazh	,sc4cbaz,	sc4, sc4, sc4, ROT0, "BFM","Cash Bazaar Club (Bellfruit) (Scorpion 4) (set 9)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cbazi	,sc4cbaz,	sc4, sc4, sc4, ROT0, "BFM","Cash Bazaar Club (Bellfruit) (Scorpion 4) (set 10)", GAME_IS_SKELETON_MECHANICAL )
+// PR1349 CLUB CASH BAZAAR         CLUB CASH BAZAAR  CLUB  PR1349 CLUB CASH BAZAAR SOUNDS11
+GAME( 200?, sc4cbazj	,sc4cbaz,	sc4, sc4, sc4, ROT0, "BFM","Cash Bazaar Club (Bellfruit) (Scorpion 4) (set 11)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cbazk	,sc4cbaz,	sc4, sc4, sc4, ROT0, "BFM","Cash Bazaar Club (Bellfruit) (Scorpion 4) (set 12)", GAME_IS_SKELETON_MECHANICAL )
+
+
+// PR2020 CASH ERUPTION         ERUP SOUNDS          CASH  ERUPTION
+GAME( 200?, sc4cerup	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Cash Eruption (Mazooma) (Scorpion 4)", GAME_IS_SKELETON_MECHANICAL )
+
+
+// PR2076 CASH EXPLOSION         CEXP SOUNDS         CASH EXPLSION
+GAME( 200?, sc4cexpl	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Cash Explosion (PR2076) (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cexpla	,sc4cexpl,	sc4, sc4, sc4, ROT0, "Mazooma","Cash Explosion (PR2076) (Mazooma) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cexplb	,sc4cexpl,	sc4, sc4, sc4, ROT0, "Mazooma","Cash Explosion (PR2076) (Mazooma) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cexplc	,sc4cexpl,	sc4, sc4, sc4, ROT0, "Mazooma","Cash Explosion (PR2076) (Mazooma) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cexplf	,sc4cexpl,	sc4, sc4, sc4, ROT0, "Mazooma","Cash Explosion (PR2076) (Mazooma) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cexplg	,sc4cexpl,	sc4, sc4, sc4, ROT0, "Mazooma","Cash Explosion (PR2076) (Mazooma) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
+//  PR2120 CASH EXPLOSION         CEXP SOUNDS         CASH EXPLSION
+GAME( 200?, sc4cexpld	,sc4cexpl,	sc4, sc4, sc4, ROT0, "Mazooma","Cash Explosion (PR2120) (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cexple	,sc4cexpl,	sc4, sc4, sc4, ROT0, "Mazooma","Cash Explosion (PR2120) (Mazooma) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+
+
+// PR2118 CASH ON THE LASH         COTL SOUNDS         CASH ON THE LASH
+GAME( 200?, sc4clash	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Cash On The Lash (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4clasha	,sc4clash,	sc4, sc4, sc4, ROT0, "Mazooma","Cash On The Lash (Mazooma) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4clashb	,sc4clash,	sc4, sc4, sc4, ROT0, "Mazooma","Cash On The Lash (Mazooma) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4clashc	,sc4clash,	sc4, sc4, sc4, ROT0, "Mazooma","Cash On The Lash (Mazooma) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4clashd	,sc4clash,	sc4, sc4, sc4, ROT0, "Mazooma","Cash On The Lash (Mazooma) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4clashe	,sc4clash,	sc4, sc4, sc4, ROT0, "Mazooma","Cash On The Lash (Mazooma) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4clashf	,sc4clash,	sc4, sc4, sc4, ROT0, "Mazooma","Cash On The Lash (Mazooma) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4clashg	,sc4clash,	sc4, sc4, sc4, ROT0, "Mazooma","Cash On The Lash (Mazooma) (Scorpion 4) (set 8)", GAME_IS_SKELETON_MECHANICAL )
+
+// PR2038E Dutch12 Cashanova  (not a standard string)
+GAME( 200?, sc4cashn	,0,			sc4, sc4, sc4, ROT0, "Mazooma / Eurocoin","Cashanova (Dutch) (Mazooma / Eurocoin) (Scorpion 4)", GAME_IS_SKELETON_MECHANICAL )
+
+
+// PR1426 CASINO CRAZY FRUITS GOLD         PR1426 CRAZY F GOLD SOUNDS11      CRAZY FRUIT GOLD  S.SITE  (set was marked as Casino Crazy Keys)
+GAME( 200?, sc4cckey	,0,		    sc4, sc4, sc4, ROT0, "BFM","Casino Crazy Fruits Gold (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cckeya	,sc4cckey,	sc4, sc4, sc4, ROT0, "BFM","Casino Crazy Fruits Gold (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cckeyb	,sc4cckey,	sc4, sc4, sc4, ROT0, "BFM","Casino Crazy Fruits Gold (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cckeyc	,sc4cckey,	sc4, sc4, sc4, ROT0, "BFM","Casino Crazy Fruits Gold (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cckeyd	,sc4cckey,	sc4, sc4, sc4, ROT0, "BFM","Casino Crazy Fruits Gold (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cckeye	,sc4cckey,	sc4, sc4, sc4, ROT0, "BFM","Casino Crazy Fruits Gold (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cckeyf	,sc4cckey,	sc4, sc4, sc4, ROT0, "BFM","Casino Crazy Fruits Gold (Bellfruit) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cckeyg	,sc4cckey,	sc4, sc4, sc4, ROT0, "BFM","Casino Crazy Fruits Gold (Bellfruit) (Scorpion 4) (set 8)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cckeyh	,sc4cckey,	sc4, sc4, sc4, ROT0, "BFM","Casino Crazy Fruits Gold (Bellfruit) (Scorpion 4) (set 9)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cckeyi	,sc4cckey,	sc4, sc4, sc4, ROT0, "BFM","Casino Crazy Fruits Gold (Bellfruit) (Scorpion 4) (set 10)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cckeyj	,sc4cckey,	sc4, sc4, sc4, ROT0, "BFM","Casino Crazy Fruits Gold (Bellfruit) (Scorpion 4) (set 11)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cckeyk	,sc4cckey,	sc4, sc4, sc4, ROT0, "BFM","Casino Crazy Fruits Gold (Bellfruit) (Scorpion 4) (set 12)", GAME_IS_SKELETON_MECHANICAL )
+
+// PR2062 CASINO ROYALE         CROY SOUNDS           CASINO ROYALE
+GAME( 200?, sc4casry	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Casino Royale (PR2062) (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4casryc	,sc4casry,	sc4, sc4, sc4, ROT0, "Mazooma","Casino Royale (PR2062) (Mazooma) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+// PR2075 CASINO ROYALE         DUCRV46     CROY  CROY SOUNDS           CASINO ROYALE  (Jumping Bean copyright?)
+GAME( 200?, sc4casryd	,sc4casry,	sc4, sc4, sc4, ROT0, "Mazooma","Casino Royale (PR2075) (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4casrye	,sc4casry,	sc4, sc4, sc4, ROT0, "Mazooma","Casino Royale (PR2075) (Mazooma) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+// PR2073, CZECH CASINO ROYALE.......................CROY SOUNDS... (not standard header)
+GAME( 200?, sc4casrya	,sc4casry,	sc4, sc4, sc4, ROT0, "Mazooma","Casino Royale (PR2073) (Czech) (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4casryb	,sc4casry,	sc4, sc4, sc4, ROT0, "Mazooma","Casino Royale (PR2073) (Czech) (Mazooma) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+
+// PR2383 CLUBCLOUSEAU         CLUBCLOUSEAU  CLUB  CCLOU SOUNDS         CLUB CLOSEAU
+GAME( 200?, sc4clclo	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Club Clouseau (Mazooma) (Scorpion 4)", GAME_IS_SKELETON_MECHANICAL )
+
+
+// PR2237 CLUB CLUEDO         CLUB CLUEDO CLUB  CCLU SOUNDS         CLUB CLUEDO
+GAME( 200?, sc4clucl	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Cluedo Club (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4clucla	,sc4clucl,	sc4, sc4, sc4, ROT0, "Mazooma","Cluedo Club (Mazooma) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+
+
+// PR1621 CLUB COOL JEWELS         PR1621 COOL SOUNDS11         CLUB COOL JEWELS  CLUB
+GAME( 200?, sc4cjcl		,0,			sc4, sc4, sc4, ROT0, "BFM","Cool Jewels Club (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cjcla	,sc4cjcl,	sc4, sc4, sc4, ROT0, "BFM","Cool Jewels Club (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cjclb	,sc4cjcl,	sc4, sc4, sc4, ROT0, "BFM","Cool Jewels Club (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cjclc	,sc4cjcl,	sc4, sc4, sc4, ROT0, "BFM","Cool Jewels Club (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cjcld	,sc4cjcl,	sc4, sc4, sc4, ROT0, "BFM","Cool Jewels Club (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cjcle	,sc4cjcl,	sc4, sc4, sc4, ROT0, "BFM","Cool Jewels Club (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cjclf	,sc4cjcl,	sc4, sc4, sc4, ROT0, "BFM","Cool Jewels Club (Bellfruit) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL )
+
+// PR1036 CLUB COP THE LOT         PR1036 CLOT SOUNDS11           COP THE LOT
+GAME( 200?, sc4ctlcl	,0,			sc4, sc4, sc4, ROT0, "BFM","Cop The Lot Club (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4ctlcla	,sc4ctlcl,	sc4, sc4, sc4, ROT0, "BFM","Cop The Lot Club (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+// PR1036 CLUB COP THE LOT         COP THE LOT CLUB  PR1036 CLOT SOUNDS11           COP THE LOT
+GAME( 200?, sc4ctlclb	,sc4ctlcl,	sc4, sc4, sc4, ROT0, "BFM","Cop The Lot Club (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4ctlclc	,sc4ctlcl,	sc4, sc4, sc4, ROT0, "BFM","Cop The Lot Club (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+
+
+
+// PR3241 CLUB COPS AND ROBBERS PLATINUM SCORP4         COPS & ROBRS PLT  CLUB  PR3241 C N R PLATINUM SOUNDS11      COPS AND ROBBERS
+GAME( 200?, sc4crcp		,0,			sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Club Platinum (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4crcpa	,sc4crcp,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Club Platinum (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4crcpc	,sc4crcp,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Club Platinum (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4crcpd	,sc4crcp,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Club Platinum (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4crcpe	,sc4crcp,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Club Platinum (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4crcpf	,sc4crcp,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Club Platinum (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4crcpg	,sc4crcp,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Club Platinum (Bellfruit) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4crcph	,sc4crcp,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Club Platinum (Bellfruit) (Scorpion 4) (set 8)", GAME_IS_SKELETON_MECHANICAL )
+
+// PR1348 CLUB COPS AND ROBBERS GOLD         PR1348 CCRG SOUNDS11         COPS AND ROBBERS
+GAME( 200?, sc4crgc		,0,			sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4crgca	,sc4crgc,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4crgcb	,sc4crgc,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4crgcc	,sc4crgc,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4crgcd	,sc4crgc,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4crgce	,sc4crgc,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4crgcf	,sc4crgc,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4crgcg	,sc4crgc,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 8)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4crgch	,sc4crgc,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 9)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4crgci	,sc4crgc,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 10)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4crgcj	,sc4crgc,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 11)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4crgck	,sc4crgc,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 12)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4crgcl	,sc4crgc,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 13)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4crgcm	,sc4crgc,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 14)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4crgco	,sc4crgc,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 15)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4crgcq	,sc4crgc,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 16)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4crgct	,sc4crgc,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 17)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4crgcw	,sc4crgc,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 18)", GAME_IS_SKELETON_MECHANICAL )
+// PR1348 CLUB COPS AND ROBBERS GOLD         COPS & ROBRS GLD  CLUB  PR1348 CCRG SOUNDS11         COPS AND ROBBERS
+GAME( 200?, sc4crgcn	,sc4crgc,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 19)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4crgcp	,sc4crgc,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 20)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4crgcr	,sc4crgc,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 21)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4crgcu	,sc4crgc,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 22)", GAME_IS_SKELETON_MECHANICAL )
+// PR1348 !500 CLUB COPS AND ROBBERS GOLD         COPS & ROBRS GLD  CLUB  PR1348 CCRG SOUNDS11         COPS AND ROBBERS
+GAME( 200?, sc4crgcs	,sc4crgc,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 23)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4crgcv	,sc4crgc,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 24)", GAME_IS_SKELETON_MECHANICAL )
+
+// PR2383 CLUBCORONATIONSTREET         CLUBCORONATIONST  CLUB  CCORO SOUNDS         CLUB CORO ST
+GAME( 200?, sc4corcl	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Coronation Street Club (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4corcla	,sc4corcl,	sc4, sc4, sc4, ROT0, "Mazooma","Coronation Street Club (Mazooma) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+
+//  PR2058 COUNT YER CASH         PR2058 COUNT YER CASH SOUNDS11
+GAME( 200?, sc4cyc		,0,			sc4, sc4, sc4, ROT0, "Mazooma","Count Yer Cash (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cyca		,sc4cyc,	sc4, sc4, sc4, ROT0, "Mazooma","Count Yer Cash (Mazooma) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cycb		,sc4cyc,	sc4, sc4, sc4, ROT0, "Mazooma","Count Yer Cash (Mazooma) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cycc		,sc4cyc,	sc4, sc4, sc4, ROT0, "Mazooma","Count Yer Cash (Mazooma) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cycd		,sc4cyc,	sc4, sc4, sc4, ROT0, "Mazooma","Count Yer Cash (Mazooma) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
+
+// PR2092 CLUB COUNT YER CASH         COUNT YER CASH  CLUB  CLCC SOUNDS
+GAME( 200?, sc4cyccl	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Count Yer Cash Club (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cyccla	,sc4cyccl,	sc4, sc4, sc4, ROT0, "Mazooma","Count Yer Cash Club (Mazooma) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cycclb	,sc4cyccl,	sc4, sc4, sc4, ROT0, "Mazooma","Count Yer Cash Club (Mazooma) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cycclc	,sc4cyccl,	sc4, sc4, sc4, ROT0, "Mazooma","Count Yer Cash Club (Mazooma) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+
+// PR1396 CLASSIC CRAZY FRUITS         PR1396 CLSIC CRAZY FRUITS SND11
+GAME( 200?, sc4cfcla	,0,			sc4, sc4, sc4, ROT0, "BFM","Crazy Fruits Classic (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cfclab	,sc4cfcla,	sc4, sc4, sc4, ROT0, "BFM","Crazy Fruits Classic (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cfclac	,sc4cfcla,	sc4, sc4, sc4, ROT0, "BFM","Crazy Fruits Classic (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cfclad	,sc4cfcla,	sc4, sc4, sc4, ROT0, "BFM","Crazy Fruits Classic (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cfclae	,sc4cfcla,	sc4, sc4, sc4, ROT0, "BFM","Crazy Fruits Classic (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cfclaf	,sc4cfcla,	sc4, sc4, sc4, ROT0, "BFM","Crazy Fruits Classic (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
+
+
+//  PR1107 CRAZY FRUITS DOWNUNDER         PR1107 DOWN UNDER SOUNDS11
+GAME( 200?, sc4cfdu		,0,			sc4, sc4, sc4, ROT0, "BFM","Crazy Fruits Down Under (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cfdua	,sc4cfdu,	sc4, sc4, sc4, ROT0, "BFM","Crazy Fruits Down Under (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cfdub	,sc4cfdu,	sc4, sc4, sc4, ROT0, "BFM","Crazy Fruits Down Under (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cfduc	,sc4cfdu,	sc4, sc4, sc4, ROT0, "BFM","Crazy Fruits Down Under (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+
+// PR1620 CLUB CRAZY FRUITS GOLD         PR1620 CRAZY SOUNDS11         CRAZY FRUITS  CLUB
+GAME( 200?, sc4cfgcl	,0,			sc4, sc4, sc4, ROT0, "BFM","Crazy Fruits Gold Club (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cfgcla	,sc4cfgcl,	sc4, sc4, sc4, ROT0, "BFM","Crazy Fruits Gold Club (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cfgclb	,sc4cfgcl,	sc4, sc4, sc4, ROT0, "BFM","Crazy Fruits Gold Club (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cfgclc	,sc4cfgcl,	sc4, sc4, sc4, ROT0, "BFM","Crazy Fruits Gold Club (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+
+// PR1221 CRISSCROSSCRAZY  ART13         95004282 CRISSCROSS PR1161
+GAME( 200?, sc4ccc		,0,			sc4, sc4, sc4, ROT0, "BFM","Criss Cross Crazy (Bellfruit) (Scorpion 4)", GAME_IS_SKELETON_MECHANICAL ) // not english
+
+// PR1006  DEMOLITION DERBY         PR1006 DEMDERBY SOUNDS11
+GAME( 200?, sc4derby	,0,			sc4, sc4, sc4, ROT0, "BFM","Demolition Derby (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4derbya	,sc4derby,	sc4, sc4, sc4, ROT0, "BFM","Demolition Derby (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4derbyb	,sc4derby,	sc4, sc4, sc4, ROT0, "BFM","Demolition Derby (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4derbyc	,sc4derby,	sc4, sc4, sc4, ROT0, "BFM","Demolition Derby (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4derbyd	,sc4derby,	sc4, sc4, sc4, ROT0, "BFM","Demolition Derby (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4derbye	,sc4derby,	sc4, sc4, sc4, ROT0, "BFM","Demolition Derby (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
+
+// PR2558 DOUBLE DIAMOND 011         DOUBLEDIAMONDSND          DOUBLE DIAMOND
+GAME( 200?, sc4dbldm	,0,			sc4, sc4, sc4, ROT0, "Qps","Double Diamond (Qps) (Scorpion 4)", GAME_IS_SKELETON_MECHANICAL )
+
+// PR1104 DYNAMITE         PR1104 DYNAMITE SOUNDS11
+GAME( 200?, sc4dyna		,0,			sc4, sc4, sc4, ROT0, "BFM","Dynamite (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4dynaa	,sc4dyna,	sc4, sc4, sc4, ROT0, "BFM","Dynamite (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+
+// PR1017 EASY STREAK         PR1017 EASY STREAK SOUNDS11           EASY STREAK
+GAME( 200?, sc4easy		,0,			sc4, sc4, sc4, ROT0, "BFM","Easy Streak (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4easya	,sc4easy,	sc4, sc4, sc4, ROT0, "BFM","Easy Streak (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4easyb	,sc4easy,	sc4, sc4, sc4, ROT0, "BFM","Easy Streak (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4easyc	,sc4easy,	sc4, sc4, sc4, ROT0, "BFM","Easy Streak (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4easyd	,sc4easy,	sc4, sc4, sc4, ROT0, "BFM","Easy Streak (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4easye	,sc4easy,	sc4, sc4, sc4, ROT0, "BFM","Easy Streak (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4easyf	,sc4easy,	sc4, sc4, sc4, ROT0, "BFM","Easy Streak (Bellfruit) (Scorpion 4) (set 11)", GAME_IS_SKELETON_MECHANICAL )
+
+
 
 /* Scorpion 4 + Adder 4 */
 
@@ -26898,3 +26952,6 @@ GAME( 200?, ad4film		,0,			sc4_adder4, sc4, sc4, ROT0, "BFM","Film Premiere (Vid
 GAME( 200?, ad4filma	,ad4film,	sc4_adder4, sc4, sc4, ROT0, "BFM","Film Premiere (Video?) (Bellfruit) (Adder 4) (set 2)", GAME_IS_SKELETON_MECHANICAL ) // ^^
 GAME( 200?, ad4ctl		,0,			sc4_adder4, sc4, sc4, ROT0, "BFM","Cop The Lot Club (Video) (Bellfruit) (Adder 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, ad4ctla		,ad4ctl,	sc4_adder4, sc4, sc4, ROT0, "BFM","Cop The Lot Club (Video) (Bellfruit) (Adder 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+
+
+

@@ -11,12 +11,16 @@ READ16_HANDLER( m68307_internal_sim_r )
 	assert(sim != NULL);
 
 	int pc = cpu_get_pc(&space->device());
-	logerror("%08x m68307_internal_sim_r %08x, (%04x)\n", pc, offset*2,mem_mask);
 
 	if (sim)
 	{
 		switch (offset<<1)
 		{
+			case m68307SIM_PADAT: return sim->read_padat(space, mem_mask);
+			case m68307SIM_PBDAT: return sim->read_pbdat(space, mem_mask);
+		
+			case m68307SIM_LICR2: return  (sim->m_licr2);
+
 			case m68307SIM_BR0:	return (sim->m_br[0]);
 			case m68307SIM_OR0:	return (sim->m_or[0]);
 			case m68307SIM_BR1:	return (sim->m_br[1]);
@@ -25,17 +29,17 @@ READ16_HANDLER( m68307_internal_sim_r )
 			case m68307SIM_OR2:	return (sim->m_or[2]);
 			case m68307SIM_BR3:	return (sim->m_br[3]);
 			case m68307SIM_OR3:	return (sim->m_or[3]);
+
+			default:
+				logerror("%08x m68307_internal_sim_r %08x, (%04x)\n", pc, offset*2,mem_mask);
+				return 0xff;
+
 		}
 	}
 
 
 	return 0x0000;
 }
-
-	m68307_porta_read_callback m_m68307_porta_r;
-	m68307_porta_write_callback m_m68307_porta_w;
-	m68307_portb_read_callback m_m68307_portb_r;
-	m68307_portb_write_callback m_m68307_portb_w;
 
 WRITE16_HANDLER( m68307_internal_sim_w )
 {
@@ -145,6 +149,33 @@ void m68307_sim::write_paddr(UINT16 data, UINT16 mem_mask)
 	COMBINE_DATA(&m_paddr);
 }
 
+
+UINT16 m68307_sim::read_padat(address_space *space, UINT16 mem_mask)
+{
+	int pc = cpu_get_pc(&space->device());
+	m68ki_cpu_core *m68k = m68k_get_safe_token(&space->device());
+
+	if (m68k->m_m68307_porta_r)
+	{
+		// for general purpose bits, if configured as 'output' then anything output gets latched
+		// and anything configured as input is read from the port
+		UINT8 outputbits = m_paddr;
+		UINT8 inputbits = ~m_paddr;
+		UINT8 indat = m68k->m_m68307_porta_r(space, 0) & inputbits;
+		UINT8 outdat = m_padat & outputbits;
+
+		// dedicated bits behave in a different way..  todo
+		UINT8 general_purpose_bits = ~m_pacnt;
+		return ((indat | outdat) & general_purpose_bits);
+	}
+	else
+	{
+		logerror("%08x m68307_internal_sim_r (%04x) (Port A (8-bit) Data Register - PADAT)\n", pc, mem_mask);
+	}
+	return 0xffff;
+}
+
+
 void m68307_sim::write_padat(address_space *space, UINT16 data, UINT16 mem_mask)
 {
 	int pc = cpu_get_pc(&space->device());
@@ -170,6 +201,32 @@ void m68307_sim::write_pbddr(UINT16 data, UINT16 mem_mask)
 {
 	COMBINE_DATA(&m_pbddr);
 }
+
+UINT16 m68307_sim::read_pbdat(address_space *space, UINT16 mem_mask)
+{
+	int pc = cpu_get_pc(&space->device());
+	m68ki_cpu_core *m68k = m68k_get_safe_token(&space->device());
+
+	if (m68k->m_m68307_portb_r)
+	{
+		// for general purpose bits, if configured as 'output' then anything output gets latched
+		// and anything configured as input is read from the port
+		UINT16 outputbits = m_pbddr;
+		UINT16 inputbits = ~m_pbddr;
+		UINT16 indat = m68k->m_m68307_portb_r(space, 0, mem_mask) & inputbits;
+		UINT16 outdat = m_pbdat & outputbits;
+
+		// dedicated bits behave in a different way..  todo
+		UINT16 general_purpose_bits = ~m_pbcnt;
+		return ((indat | outdat) & general_purpose_bits);
+	}
+	else
+	{
+		logerror("%08x m68307_internal_sim_r (%04x) (Port B (16-bit) Data Register - PBDAT)\n", pc, mem_mask);
+	}
+	return 0xffff;
+}
+
 
 void m68307_sim::write_pbdat(address_space *space, UINT16 data, UINT16 mem_mask)
 {
@@ -206,17 +263,24 @@ void m68307_sim::write_licr1(UINT16 data, UINT16 mem_mask)
 void m68307_sim::write_licr2(UINT16 data, UINT16 mem_mask)
 {
 	COMBINE_DATA(&m_licr2);
-	data = m_licr2;
-	logerror("m_licr2 value %04x : Details :\n", data);
-	logerror("int8ipl %01x\n", (data>>0)&7);
-	logerror("pir8    %01x\n", (data>>3)&1);
-	logerror("int7ipl %01x\n", (data>>4)&7);
-	logerror("pir7    %01x\n", (data>>7)&1);
-	logerror("int6ipl %01x\n", (data>>8)&7);
-	logerror("pir6    %01x\n", (data>>11)&1);
-	logerror("int5ipl %01x\n", (data>>12)&7);
-	logerror("pir5    %01x\n", (data>>15)&1);
+	UINT16 newdata = m_licr2;
+	logerror("m_licr2 value %04x : Details :\n", newdata);
+	logerror("int8ipl %01x\n", (newdata>>0)&7);
+	logerror("pir8    %01x\n", (newdata>>3)&1);
+	logerror("int7ipl %01x\n", (newdata>>4)&7);
+	logerror("pir7    %01x\n", (newdata>>7)&1);
+	logerror("int6ipl %01x\n", (newdata>>8)&7);
+	logerror("pir6    %01x\n", (newdata>>11)&1);
+	logerror("int5ipl %01x\n", (newdata>>12)&7);
+	logerror("pir5    %01x\n", (newdata>>15)&1);
 	logerror("\n");
+
+	if (data & 0x0008) m_licr2 = m_licr2 & ~0x0008;
+	if (data & 0x0080) m_licr2 = m_licr2 & ~0x0080;
+	if (data & 0x0800) m_licr2 = m_licr2 & ~0x0800;
+	if (data & 0x8000) m_licr2 = m_licr2 & ~0x8000;
+
+
 }
 
 

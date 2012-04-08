@@ -1930,10 +1930,58 @@ CPU_GET_INFO( m68301 )
 	}
 }
 
+
+
+
 void m68307_set_interrupt(device_t *device, int level, int vector)
 {
 	device_set_input_line_and_vector(device, level, HOLD_LINE, vector);
 }
+
+void m68307_timer0_interrupt(legacy_cpu_device *cpudev)
+{
+	m68ki_cpu_core* m68k = m68k_get_safe_token(cpudev);
+	int prioritylevel = (m68k->m68307SIM->m_picr & 0x7000)>>12;
+	int vector        = (m68k->m68307SIM->m_pivr & 0x00f0) | 0xa;
+	m68307_set_interrupt(cpudev, prioritylevel, vector);
+}
+
+void m68307_timer1_interrupt(legacy_cpu_device *cpudev)
+{
+	m68ki_cpu_core* m68k = m68k_get_safe_token(cpudev);
+	int prioritylevel = (m68k->m68307SIM->m_picr & 0x0700)>>8;
+	int vector        = (m68k->m68307SIM->m_pivr & 0x00f0) | 0xb;
+	m68307_set_interrupt(cpudev, prioritylevel, vector);
+}
+
+void m68307_serial_interrupt(legacy_cpu_device *cpudev)
+{
+ 	m68ki_cpu_core* m68k = m68k_get_safe_token(cpudev);
+	int prioritylevel = (m68k->m68307SIM->m_picr & 0x0070)>>4;
+	int vector        = (m68k->m68307SERIAL->m_uivr);
+	m68307_set_interrupt(cpudev, prioritylevel, vector);
+}
+
+void m68307_mbus_interrupt(legacy_cpu_device *cpudev)
+{
+ 	m68ki_cpu_core* m68k = m68k_get_safe_token(cpudev);
+	int prioritylevel = (m68k->m68307SIM->m_picr & 0x0007)>>0;
+	int vector        = (m68k->m68307SIM->m_pivr & 0x00f0) | 0xd;
+	m68307_set_interrupt(cpudev, prioritylevel, vector);
+}
+
+void m68307_licr2_interrupt(legacy_cpu_device *cpudev)
+{
+ 	m68ki_cpu_core* m68k = m68k_get_safe_token(cpudev);
+	int prioritylevel = (m68k->m68307SIM->m_licr2 & 0x0007)>>0;
+	int vector        = (m68k->m68307SIM->m_pivr & 0x00f0) | 0x9;
+	m68k->m68307SIM->m_licr2 |= 0x8;
+
+
+	m68307_set_interrupt(cpudev, prioritylevel, vector);
+}
+
+
 
 static CPU_INIT( m68307 )
 {

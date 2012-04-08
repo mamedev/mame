@@ -97,40 +97,32 @@ WRITE16_HANDLER( m68307_internal_timer_w )
 
 		}
 	}
-
-//	printf("%d\n", (UINT32)m68k->device->total_cycles());
-
 }
 
 static TIMER_CALLBACK( m68307_timer0_callback )
 {
-//	printf("timer0\n");
-
 
 	legacy_cpu_device *dev = (legacy_cpu_device *)ptr;
 	m68ki_cpu_core* m68k = m68k_get_safe_token(dev);
-
-
-
-	int prioritylevel = (m68k->m68307SIM->m_picr & 0x7000)>>12;
-	int vector        = (m68k->m68307SIM->m_pivr & 0x00f0) | 0xa;
-
-
-
 	m68307_single_timer* tptr = &m68k->m68307TIMER->singletimer[0];
 	tptr->regs[m68307TIMER_TMR] |= 0x2;
-	m68307_set_interrupt(dev, prioritylevel, vector);
+	
+	m68307_timer0_interrupt(dev);
 
-
-	tptr->mametimer->adjust(m68k->device->cycles_to_attotime(100000));
+	tptr->mametimer->adjust(m68k->device->cycles_to_attotime(20000));
 }
 
 static TIMER_CALLBACK( m68307_timer1_callback )
 {
-//	int prioritylevel = (m68k->m68307SIM->m_picr & 0x0700)>>8;
-//	int vector        = (m68k->m68307SIM->m_pivr & 0x00f0) | 0xb;
+	legacy_cpu_device *dev = (legacy_cpu_device *)ptr;
+	m68ki_cpu_core* m68k = m68k_get_safe_token(dev);
+	m68307_single_timer* tptr = &m68k->m68307TIMER->singletimer[1];
+	tptr->regs[m68307TIMER_TMR] |= 0x2;
+	
+	m68307_timer1_interrupt(dev);
 
-	printf("timer1\n");
+	tptr->mametimer->adjust(m68k->device->cycles_to_attotime(20000));
+
 }
 
 static TIMER_CALLBACK( m68307_wd_timer_callback )
@@ -140,12 +132,6 @@ static TIMER_CALLBACK( m68307_wd_timer_callback )
 
 void m68307_timer::init(legacy_cpu_device *device)
 {
-
-	//m68ki_cpu_core *m68k;
-	
-	//m68k = m68k_get_safe_token(device);
-
-
 	m68307_single_timer* tptr;
 			
 	tptr = &singletimer[0];
@@ -163,21 +149,16 @@ void m68307_timer::init(legacy_cpu_device *device)
 
 UINT16 m68307_timer::read_tcn(UINT16 mem_mask, int which)
 {
-//	return 0;
-	return 0x411d;
-//	return 0x3a98;
+	// we should return the current timer value by
+	// calculating what it should be based on the time
+	// since it was last set
+	return 0x3a98;
 }
 
 void m68307_timer::write_ter(UINT16 data, UINT16 mem_mask, int which)
 {
-//	m68ki_cpu_core* m68k = m68k_get_safe_token(parent);
 	m68307_single_timer* tptr = &singletimer[which];
-
-//	UINT16 ter = tptr->regs[m68307TIMER_TMR;
 	if (data & 0x2) tptr->regs[m68307TIMER_TMR] &= ~0x2;
-
-//	COMBINE_DATA(&tptr->regs[m68307TIMER_TMR]);
-
 }
 
 void m68307_timer::write_tmr(UINT16 data, UINT16 mem_mask, int which)

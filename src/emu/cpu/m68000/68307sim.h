@@ -51,10 +51,12 @@ class m68307_sim
 
 	void write_pacnt(UINT16 data, UINT16 mem_mask);
 	void write_paddr(UINT16 data, UINT16 mem_mask);
+	UINT16 read_padat(address_space *space, UINT16 mem_mask);
 	void write_padat(address_space *space, UINT16 data, UINT16 mem_mask);
 
 	void write_pbcnt(UINT16 data, UINT16 mem_mask);
 	void write_pbddr(UINT16 data, UINT16 mem_mask);
+	UINT16 read_pbdat(address_space *space, UINT16 mem_mask);
 	void write_pbdat(address_space *space, UINT16 data, UINT16 mem_mask);
 
 

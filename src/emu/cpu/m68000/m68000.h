@@ -143,6 +143,13 @@ UINT16 m68k_get_fc(device_t *device);
 void m68307_set_port_callbacks(device_t *device, m68307_porta_read_callback porta_r, m68307_porta_write_callback m_m68307_porta_w, m68307_portb_read_callback portb_r, m68307_portb_write_callback m_m68307_portb_w);
 UINT16 m68307_get_cs(device_t *device, offs_t address);
 void m68307_set_interrupt(device_t *device, int level, int vector);
+void m68307_timer0_interrupt(legacy_cpu_device *cpudev);
+void m68307_timer1_interrupt(legacy_cpu_device *cpudev);
+void m68307_serial_interrupt(legacy_cpu_device *cpudev);
+void m68307_mbus_interrupt(legacy_cpu_device *cpudev);
+void m68307_licr2_interrupt(legacy_cpu_device *cpudev);
+
+
 
 typedef int (*instruction_hook_t)(device_t *device, offs_t curpc);
 void m68k_set_instruction_hook(device_t *device, instruction_hook_t ihook);
