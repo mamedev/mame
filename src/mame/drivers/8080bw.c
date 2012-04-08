@@ -512,7 +512,7 @@ static INPUT_PORTS_START( astropal )
 
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_DERIVED( astropal, invaders )
+static MACHINE_CONFIG_DERIVED_CLASS( astropal, invaders, _8080bw_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
