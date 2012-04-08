@@ -325,6 +325,7 @@ DRIVER_INIT( ddp2 );
 /* simulations (or missing) */
 
 DRIVER_INIT( dw2001 );
+DRIVER_INIT( dwpc );
 
 INPUT_PORTS_EXTERN( ddp2 );
 INPUT_PORTS_EXTERN( kov2 );

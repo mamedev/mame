@@ -2496,18 +2496,18 @@ ROM_START( kov2p205 )
 ROM_END
 
 /*
-
+ 
 Do Donpachi II
 Cave, 2001
-
+ 
 This is a PGM cart containing not a lot....
 5x SOP44 mask ROMs (4x 64M, 1x 32M)
-2x EPROMs (1x 4M, 1x 16M)
+2x EPROMs (1x 1M, 1x 16M) 
 2x PALs (labelled FN U14 and FN U15)
 1x custom IGS027A (QFP120)
 3x RAMs WINBOND W24257AJ-8N
 Some logic IC's, resistors, caps etc.
-
+ 
 */
 
 
@@ -2639,6 +2639,36 @@ ROM_START( dw2001 )
 	ROM_REGION( 0x1000000, "ics", 0 ) /* Samples - (8 bit mono 11025Hz) - */
 	PGM_AUDIO_BIOS
 	ROM_LOAD( "2001.u7",      0x200000, 0x200000, CRC(4ea62f21) SHA1(318f8a1ff5d4ff029a1c4133fe7acc2fc185d112) )
+ROM_END
+
+
+
+
+ROM_START( dwpc )
+	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code */
+	PGM_68K_BIOS
+	ROM_LOAD16_WORD_SWAP( "dwpc_v101jp.u22", 0x100000, 0x80000, CRC(b93027c0) SHA1(602e5f651ccb63e6465ebd7762d8d2dcf7d54077) )
+
+	ROM_REGION( 0x4000, "prot", ROMREGION_ERASEFF ) /* ARM protection ASIC - internal rom */
+	ROM_LOAD( "dwpc_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
+
+	ROM_REGION32_LE( 0x4000000, "user1", ROMREGION_ERASEFF )
+	ROM_LOAD( "dwpc_v100jp.u12", 0x000000, 0x80000, CRC(0d112126) SHA1(2b569b8ef974d1d9906cc052eee63b869c8d4fa4) ) // external ARM data rom (encrypted)
+
+	ROM_REGION( 0x600000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	PGM_VIDEO_BIOS
+	ROM_LOAD( "dwpc_v100jp.u11",    0x180000, 0x400000, CRC(3aa5a787) SHA1(ef7bb83f7141b24621c86237244fd9f280923ed1) )
+
+	ROM_REGION( 0x400000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_LOAD( "dwpc_v100jp.u2",    0x000000, 0x200000, CRC(e7115763) SHA1(f1bf06e9434a3b962166849f51b9dc3a74d7f2a4) )
+	ROM_LOAD( "dwpc_v100jp.u3",    0x200000, 0x200000, CRC(49c184a4) SHA1(320504adf596c38db56247e9cef02e7c7a363ccb) )
+
+	ROM_REGION( 0x0200000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_LOAD( "dwpc_v100jp.u9",    0x000000, 0x200000, CRC(412b9913) SHA1(52fc42a966575e02991aa92382b855744f44854a) )
+
+	ROM_REGION( 0x1000000, "ics", 0 ) /* Samples - (8 bit mono 11025Hz) - */
+	PGM_AUDIO_BIOS
+	ROM_LOAD( "dwpc_v100jp.u7",      0x200000, 0x200000, CRC(5cf9bada) SHA1(c5868a31e09e6909c724411a402d8964c29584fc) )
 ROM_END
 
 /*
@@ -3666,7 +3696,7 @@ GAME( 2001, ddp2100,      ddp2,      pgm_arm_type2,    ddp2,     ddp2,       ROT
 // ARM version strings don't match 100% with labels... for 68k ROMs I'm using the build time / date stamp from near the start of the rom, there are some slightly different time stamps later
 GAME( 2002, dmnfrnt,      pgm,       pgm_arm_type3,     pgm,    dmnfrnt,    ROT0,   "IGS", "Demon Front (68k label V105, ROM M105XX 08/05/02) (ARM label V105, ROM 08/05/02 S105XX)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // 68k time: 10:24:11 ARM time: 10:33:23
 GAME( 2002, dmnfrnta,     dmnfrnt,   pgm_arm_type3,     pgm,    dmnfrnt,    ROT0,   "IGS", "Demon Front (68k label V102, ROM M102XX 06/19/02) (ARM label V102, ROM 05/24/02 S101XX)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // 68k time: 13:44:08 ARM time: 13:04:31
-GAME( 2002, dmnfrntpcb,   dmnfrnt,   pgm_arm_type3,     pgm,    dmnfrnt,    ROT0,   "IGS", "Demon Front (68k label V107KR, ROM M107KR 11/03/03) (ARM label V107KR, ROM 10/16/03 S106KR) (JAMMA PCB)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) // works but reports version mismatch (wants internal rom version and region to match external?)
+GAME( 2002, dmnfrntpcb,   dmnfrnt,   pgm_arm_type3,     pgm,    dmnfrnt,    ROT0,   "IGS", "Demon Front (68k label V107KR, ROM M107KR 11/03/03) (ARM label V106KR, ROM 10/16/03 S106KR) (JAMMA PCB)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) // works but reports version mismatch (wants internal rom version and region to match external?)
 
 
 
@@ -3725,7 +3755,10 @@ GAME( 1998, drgw3100,     drgw3,     pgm_022_025_dw,     dw3,      drgw3,      R
 
 GAME( 1998, dwex,         pgm,       pgm_022_025_dw,     dw3,      drgw3,      ROT0,   "IGS", "Dragon World 3 EX (ver. 100)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 
-GAME( 2001, dw2001,       pgm,       pgm_arm_type2,     dw2001,   dw2001,    ROT0,   "IGS", "Dragon World 2001", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) // V0000 02/21/01 16:05:16
+GAME( 2001, dw2001,       pgm,       pgm_arm_type2,     dw2001,   dw2001,    ROT0,   "IGS", "Dragon World 2001", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) // 02/21/01 16:05:16
+
+GAME( 2001, dwpc,         pgm,       pgm_arm_type2,     dw2001,   dwpc,      ROT0,   "IGS", "Dragon World Pretty Chance (V101, Japan)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) // 09/26/01 10:23:26
+
 
 GAME( 1999, puzlstar,     pgm,       pgm_arm_type1_sim,    pstar,    pstar,      ROT0,   "IGS", "Puzzle Star (ver. 100MG)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
 

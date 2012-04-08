@@ -1,5 +1,5 @@
 /***********************************************************************
- PGM IGA027A (55857E* type) ARM protection simulations & emulation
+ PGM IGS027A (55857E* type) ARM protection simulations & emulation
    *guess, the part number might not be directly tied to behavior, see note below
 
  these are simulations of the 'kov' type ARM device

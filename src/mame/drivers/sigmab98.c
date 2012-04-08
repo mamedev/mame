@@ -1197,6 +1197,7 @@ WRITE8_MEMBER(sigmab98_state::itazuram_palette_w)
 		logerror("%s: itazuram_palette_w offset = %03x with unknown bank = %02x\n", machine().describe_context(), offset, m_rombank);
 	}
 }
+
 READ8_MEMBER(sigmab98_state::itazuram_palette_r)
 {
 	return m_generic_paletteram_8[offset];

@@ -1,5 +1,5 @@
 /***********************************************************************
- PGM IGA027A (55857F* type) ARM protection emulation
+ PGM IGS027A (55857F* type) ARM protection emulation
   *guess, the part number might not be directly tied to behavior, see note below
 
  these are emulation of the 'kov2' type ARM device
@@ -16,6 +16,7 @@
  ROMs are not yet dumped
 
  Dragon World 2001 (dw2001)
+ Dragon World Pretty Chance (dwpc)
 
  ----
 
@@ -327,6 +328,41 @@ DRIVER_INIT( dw2001 )
 	mem16[0x11eaf8 / 2] = 0x4e71;
 
 	mem16[0x11eb04 / 2] = 0x4e71;
+
+	/* patch ARM area with fake code */
+	UINT16 *temp16 = (UINT16 *)machine.region("prot")->base();
+	temp16[(0x0000)/2] = 0xd088;
+	temp16[(0x0002)/2] = 0xe59f;
+	temp16[(0x0004)/2] = 0x0680;
+	temp16[(0x0006)/2] = 0xe3a0;
+	temp16[(0x0008)/2] = 0x0001;
+	temp16[(0x000a)/2] = 0xe280;
+	temp16[(0x000c)/2] = 0xff10;
+	temp16[(0x000e)/2] = 0xe12f;
+
+	temp16[(0x0090)/2] = 0x0400;
+	temp16[(0x0092)/2] = 0x1000;
+}
+
+DRIVER_INIT( dwpc )
+{
+	//pgm_arm_type2_state *state = machine.driver_data<pgm_arm_type2_state>();
+	UINT16 *mem16 = (UINT16 *)machine.region("maincpu")->base();
+
+	pgm_basic_init(machine);
+	kov2_latch_init(machine);
+	pgm_mm_decrypt(machine); // encryption is the same as martial masters
+
+	mem16[0x11EDDA / 2] = 0x4e71;
+	mem16[0x11EDDC / 2] = 0x4e71;
+
+	mem16[0x11EDE8 / 2] = 0x4e71;
+
+	mem16[0x11EFC4 / 2] = 0x4e71; 
+	mem16[0x11EFC6 / 2] = 0x4e71;
+
+	mem16[0x11EFD2 / 2] = 0x4e71;
+
 
 	/* patch ARM area with fake code */
 	UINT16 *temp16 = (UINT16 *)machine.region("prot")->base();
