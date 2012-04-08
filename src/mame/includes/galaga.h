@@ -34,7 +34,7 @@ public:
 	UINT8 m_sub2_nmi_mask;
 	DECLARE_READ8_MEMBER(bosco_dsw_r);
 	DECLARE_WRITE8_MEMBER(galaga_flip_screen_w);
-	DECLARE_WRITE8_MEMBER(bosco_latch_w);	
+	DECLARE_WRITE8_MEMBER(bosco_latch_w);
 	DECLARE_WRITE8_MEMBER(galaga_videoram_w);
 	DECLARE_WRITE8_MEMBER(gatsbee_bank_w);
 };

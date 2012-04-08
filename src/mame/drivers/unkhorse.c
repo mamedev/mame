@@ -2,7 +2,7 @@
 
   unknown Japanese horse gambling game
   probably early 80s, manufacturer unknown
-  
+
   from a broken PCB, labeled EFI TG-007
   8085A CPU + 8155 (for I/O and sound)
   8KB RAM mainly for bitmap video, and 512x4 RAM for color map
@@ -51,7 +51,7 @@ PALETTE_INIT( horse )
 static SCREEN_UPDATE_IND16( horse )
 {
 	horse_state *state = screen.machine().driver_data<horse_state>();
-	
+
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		for (int x = 0; x < 32; x++)
@@ -79,7 +79,7 @@ static ADDRESS_MAP_START( horse_map, AS_PROGRAM, 8, horse_state )
 	AM_RANGE(0x4000, 0x40ff) AM_DEVREADWRITE("i8155", i8155_device, memory_r, memory_w)
 	AM_RANGE(0x6000, 0x7fff) AM_RAM AM_BASE(m_video_ram)
 	AM_RANGE(0x8000, 0x879f) AM_RAM AM_BASE(m_color_ram) AM_MIRROR(0x0860)
-	
+
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( horse_io_map, AS_IO, 8, horse_state )
@@ -106,7 +106,7 @@ static WRITE8_DEVICE_HANDLER(horse_output_w)
 {
 	horse_state *state = device->machine().driver_data<horse_state>();
 	state->m_output = data;
-	
+
 	// d4: payout related
 	// d6-d7: input mux
 	// other bits: ?

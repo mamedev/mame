@@ -71,10 +71,10 @@ public:
 	int           m_read_latch;
 	UINT8		  m_mcu_input_snippet;
 	UINT8		  m_mcu_jsr_snippet;
-	
+
 	DECLARE_READ16_MEMBER(latch_r);
 	DECLARE_WRITE16_MEMBER(sharedram_w);
-	DECLARE_READ16_MEMBER(sharedram_r);	
+	DECLARE_READ16_MEMBER(sharedram_r);
 };
 
 /*----------- defined in video/armedf.c -----------*/

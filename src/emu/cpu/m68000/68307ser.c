@@ -27,7 +27,7 @@ READ16_HANDLER( m68307_internal_serial_r )
 			case m68307SER_UISR_UIMR:
 				logerror("%08x m68307_internal_serial_r %08x, (%04x) (UISR - Interrupt Status Register)\n", pc, offset*2,mem_mask);
 				return space->machine().rand() & 0x87;
-			
+
 			default:
 				logerror("%08x m68307_internal_serial_r %08x, (%04x)\n", pc, offset*2,mem_mask);
 				break;
@@ -52,7 +52,7 @@ WRITE16_HANDLER( m68307_internal_serial_w )
 			case m68307SER_USR_UCSR:
 				logerror("%08x m68307_internal_serial_r %08x, (%04x) (UCSR - Clock Select Register)\n", pc, offset*2,mem_mask);
 				break;
-		
+
 			case m68307SER_URB_UTB:
 				logerror("%08x m68307_internal_serial_w %08x, %04x (%04x) (UTB - Transmit Buffer)\n", pc, offset*2,data,mem_mask);
 				break;

@@ -763,7 +763,7 @@ void _class :: _name(address_map &map, const device_t &device) \
 #define AM_RAM_READ_LEGACY(_read)			AM_READ_LEGACY(_read) AM_WRITEONLY
 #define AM_RAM_WRITE_LEGACY(_write)			AM_READONLY AM_WRITE_LEGACY(_write)
 #define AM_RAM_DEVWRITE_LEGACY(_tag, _write) AM_READONLY AM_DEVWRITE_LEGACY(_tag, _write)
-	
+
 #define AM_BASE_SIZE(_base, _size)			AM_BASE(_base) AM_SIZE(_size)
 
 

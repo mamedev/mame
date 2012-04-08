@@ -778,14 +778,14 @@ static ADDRESS_MAP_START( dkong_map, AS_PROGRAM, 8, dkong_state )
     AM_RANGE(0x7c80, 0x7c80) AM_READ_PORT("IN1") AM_WRITE(radarscp_grid_color_w)/* IN1 */
 
     AM_RANGE(0x7d00, 0x7d00) AM_READ(dkong_in2_r)                               /* IN2 */
-    AM_RANGE(0x7d00, 0x7d07) AM_DEVWRITE_LEGACY("ls259.6h", latch8_bit0_w)     		/* Sound signals */
+    AM_RANGE(0x7d00, 0x7d07) AM_DEVWRITE_LEGACY("ls259.6h", latch8_bit0_w)  		/* Sound signals */
 
     AM_RANGE(0x7d80, 0x7d80) AM_READ_PORT("DSW0") AM_WRITE_LEGACY(dkong_audio_irq_w)   /* DSW0 */
     AM_RANGE(0x7d81, 0x7d81) AM_WRITE(radarscp_grid_enable_w)
     AM_RANGE(0x7d82, 0x7d82) AM_WRITE(dkong_flipscreen_w)
     AM_RANGE(0x7d83, 0x7d83) AM_WRITE(dkong_spritebank_w)                       /* 2 PSL Signal */
     AM_RANGE(0x7d84, 0x7d84) AM_WRITE(nmi_mask_w)
-    AM_RANGE(0x7d85, 0x7d85) AM_DEVWRITE_LEGACY("dma8257", p8257_drq_w)        		/* P8257 ==> /DRQ0 /DRQ1 */
+    AM_RANGE(0x7d85, 0x7d85) AM_DEVWRITE_LEGACY("dma8257", p8257_drq_w)     		/* P8257 ==> /DRQ0 /DRQ1 */
     AM_RANGE(0x7d86, 0x7d87) AM_WRITE(dkong_palettebank_w)
 ADDRESS_MAP_END
 
@@ -3149,7 +3149,7 @@ static DRIVER_INIT( strtheat )
     drakton_decrypt_rom(machine, 0x88, 0x1c000, bs[3]);
 
     /* custom handlers supporting Joystick or Steering Wheel */
-	dkong_state *state = machine.driver_data<dkong_state>();	
+	dkong_state *state = machine.driver_data<dkong_state>();
     machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x7c00, 0x7c00, read8_delegate(FUNC(dkong_state::strtheat_inputport_0_r),state));
     machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x7c80, 0x7c80, read8_delegate(FUNC(dkong_state::strtheat_inputport_1_r),state));
 }

@@ -83,7 +83,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, hyperspt_state )
 	AM_RANGE(0xc000, 0xdfff) AM_DEVWRITE_LEGACY("vlm", hyperspt_sound_w)	  /* speech and output control */
 	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE_LEGACY("dac", dac_w)
 	AM_RANGE(0xe001, 0xe001) AM_WRITE_LEGACY(konami_SN76496_latch_w)  /* Loads the snd command into the snd latch */
-	AM_RANGE(0xe002, 0xe002) AM_DEVWRITE_LEGACY("snsnd", konami_SN76496_w) 	 /* This address triggers the SN chip to read the data port. */
+	AM_RANGE(0xe002, 0xe002) AM_DEVWRITE_LEGACY("snsnd", konami_SN76496_w)	 /* This address triggers the SN chip to read the data port. */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( soundb_map, AS_PROGRAM, 8, hyperspt_state )
@@ -95,7 +95,7 @@ static ADDRESS_MAP_START( soundb_map, AS_PROGRAM, 8, hyperspt_state )
 	AM_RANGE(0xc000, 0xdfff) AM_DEVWRITE_LEGACY("hyprolyb_adpcm", hyprolyb_adpcm_w)	  /* speech and output control */
 	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE_LEGACY("dac", dac_w)
 	AM_RANGE(0xe001, 0xe001) AM_WRITE_LEGACY(konami_SN76496_latch_w)  /* Loads the snd command into the snd latch */
-	AM_RANGE(0xe002, 0xe002) AM_DEVWRITE_LEGACY("snsnd", konami_SN76496_w) 	 /* This address triggers the SN chip to read the data port. */
+	AM_RANGE(0xe002, 0xe002) AM_DEVWRITE_LEGACY("snsnd", konami_SN76496_w)	 /* This address triggers the SN chip to read the data port. */
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( hyperspt )

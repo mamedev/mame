@@ -819,7 +819,7 @@ static ADDRESS_MAP_START( cps2_map, AS_PROGRAM, 16, cps_state )
 	AM_RANGE(0x662020, 0x662021) AM_RAM																			/* Network adapter related, accessed in SSF2TB */
 	AM_RANGE(0x660000, 0x663fff) AM_RAM																			/* When bit 14 of 0x804030 equals 0 this space is available. Many games store highscores and other info here if available. */
 	AM_RANGE(0x664000, 0x664001) AM_RAM																			/* Unknown - Only used if 0x660000-0x663fff available (could be RAM enable?) */
-	AM_RANGE(0x700000, 0x701fff) AM_WRITE(cps2_objram1_w) AM_BASE(m_objram1)  							/* Object RAM, no game seems to use it directly */
+	AM_RANGE(0x700000, 0x701fff) AM_WRITE(cps2_objram1_w) AM_BASE(m_objram1)							/* Object RAM, no game seems to use it directly */
 	AM_RANGE(0x708000, 0x709fff) AM_READWRITE(cps2_objram2_r, cps2_objram2_w) AM_BASE(m_objram2)			/* Object RAM */
 	AM_RANGE(0x70a000, 0x70bfff) AM_READWRITE(cps2_objram2_r, cps2_objram2_w) AM_BASE(m_objram2)			/* mirror */
 	AM_RANGE(0x70c000, 0x70dfff) AM_READWRITE(cps2_objram2_r, cps2_objram2_w) AM_BASE(m_objram2)			/* mirror */
@@ -829,7 +829,7 @@ static ADDRESS_MAP_START( cps2_map, AS_PROGRAM, 16, cps_state )
 	AM_RANGE(0x804000, 0x804001) AM_READ_PORT("IN0")                											/* IN0 */
 	AM_RANGE(0x804010, 0x804011) AM_READ_PORT("IN1")                											/* IN1 */
 	AM_RANGE(0x804020, 0x804021) AM_READ_PORT("IN2")                											/* IN2 + EEPROM */
-	AM_RANGE(0x804030, 0x804031) AM_READ_LEGACY(cps2_qsound_volume_r)      											/* Master volume. Also when bit 14=0 addon memory is present, when bit 15=0 network adapter present. */
+	AM_RANGE(0x804030, 0x804031) AM_READ_LEGACY(cps2_qsound_volume_r)   											/* Master volume. Also when bit 14=0 addon memory is present, when bit 15=0 network adapter present. */
 	AM_RANGE(0x804040, 0x804041) AM_WRITE_LEGACY(cps2_eeprom_port_w)													/* EEPROM */
 	AM_RANGE(0x8040a0, 0x8040a1) AM_WRITENOP                													/* Unknown (reset once on startup) */
 	AM_RANGE(0x8040b0, 0x8040b3) AM_READ_LEGACY(kludge_r)																/* unknown (xmcotaj hangs if this is 0) */
@@ -850,7 +850,7 @@ static ADDRESS_MAP_START( dead_cps2_map, AS_PROGRAM, 16, cps_state )
 	AM_RANGE(0x662020, 0x662021) AM_RAM																			/* Network adapter related, accessed in SSF2TB */
 	AM_RANGE(0x660000, 0x663fff) AM_RAM																			/* When bit 14 of 0x804030 equals 0 this space is available. Many games store highscores and other info here if available. */
 	AM_RANGE(0x664000, 0x664001) AM_RAM																			/* Unknown - Only used if 0x660000-0x663fff available (could be RAM enable?) */
-	AM_RANGE(0x700000, 0x701fff) AM_WRITE(cps2_objram1_w) AM_BASE(m_objram1)  							/* Object RAM, no game seems to use it directly */
+	AM_RANGE(0x700000, 0x701fff) AM_WRITE(cps2_objram1_w) AM_BASE(m_objram1)							/* Object RAM, no game seems to use it directly */
 	AM_RANGE(0x708000, 0x709fff) AM_READWRITE(cps2_objram2_r, cps2_objram2_w) AM_BASE(m_objram2)			/* Object RAM */
 	AM_RANGE(0x70a000, 0x70bfff) AM_READWRITE(cps2_objram2_r, cps2_objram2_w) AM_BASE(m_objram2)			/* mirror */
 	AM_RANGE(0x70c000, 0x70dfff) AM_READWRITE(cps2_objram2_r, cps2_objram2_w) AM_BASE(m_objram2)			/* mirror */
@@ -860,7 +860,7 @@ static ADDRESS_MAP_START( dead_cps2_map, AS_PROGRAM, 16, cps_state )
 	AM_RANGE(0x804000, 0x804001) AM_READ_PORT("IN0")                											/* IN0 */
 	AM_RANGE(0x804010, 0x804011) AM_READ_PORT("IN1")                											/* IN1 */
 	AM_RANGE(0x804020, 0x804021) AM_READ_PORT("IN2")                											/* IN2 + EEPROM */
-	AM_RANGE(0x804030, 0x804031) AM_READ_LEGACY(cps2_qsound_volume_r)      											/* Master volume. Also when bit 14=0 addon memory is present, when bit 15=0 network adapter present. */
+	AM_RANGE(0x804030, 0x804031) AM_READ_LEGACY(cps2_qsound_volume_r)   											/* Master volume. Also when bit 14=0 addon memory is present, when bit 15=0 network adapter present. */
 	AM_RANGE(0x804040, 0x804041) AM_WRITE_LEGACY(cps2_eeprom_port_w)													/* EEPROM */
 	AM_RANGE(0x8040a0, 0x8040a1) AM_WRITENOP                													/* Unknown (reset once on startup) */
 	AM_RANGE(0x8040b0, 0x8040b3) AM_READ_LEGACY(kludge_r)																/* unknown (xmcotaj hangs if this is 0) */

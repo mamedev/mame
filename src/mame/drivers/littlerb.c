@@ -77,7 +77,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		  m_maincpu(*this, "maincpu"),
 		  m_dacl(*this, "dacl"),
-   	      m_dacr(*this, "dacr")
+	      m_dacr(*this, "dacr")
 		{ }
 
 	UINT16 m_vdp_address_low;
@@ -514,7 +514,7 @@ static TIMER_DEVICE_CALLBACK( littlerb_scanline )
 		state->m_sound_pointer_r&=0x3ff;
 	}
 
-//	logerror("IRQ\n");
+//  logerror("IRQ\n");
 	if(scanline == 256)
 	{
 		device_set_input_line(state->m_maincpu, 4, HOLD_LINE);

@@ -16,7 +16,7 @@ READ32_HANDLER( m68340_internal_timer_r )
 		int pc = cpu_get_pc(&space->device());
 		logerror("%08x m68340_internal_timer_r %08x, (%08x)\n", pc, offset*4,mem_mask);
 	}
-		
+
 	return 0x00000000;
 }
 

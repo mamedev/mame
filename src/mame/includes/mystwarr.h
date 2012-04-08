@@ -42,7 +42,7 @@ public:
 	DECLARE_READ16_MEMBER(mccontrol_r);
 	DECLARE_WRITE16_MEMBER(mccontrol_w);
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
-		
+
 	DECLARE_WRITE16_MEMBER(ddd_053936_enable_w);
 	DECLARE_WRITE16_MEMBER(ddd_053936_clip_w);
 	DECLARE_READ16_MEMBER(gai_053936_tilerom_0_r);

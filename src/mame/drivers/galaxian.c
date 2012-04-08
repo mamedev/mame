@@ -765,7 +765,7 @@ static WRITE8_HANDLER( explorer_sound_control_w )
 static READ8_DEVICE_HANDLER( explorer_sound_latch_r )
 {
 	galaxian_state *state = device->machine().driver_data<galaxian_state>();
-	cputag_set_input_line(device->machine(), "audiocpu", 0, CLEAR_LINE);	
+	cputag_set_input_line(device->machine(), "audiocpu", 0, CLEAR_LINE);
 	return state->soundlatch_r(*device->machine().device("audiocpu")->memory().space(AS_PROGRAM), 0);
 }
 
@@ -848,7 +848,7 @@ static void monsterz_set_latch(running_machine &machine)
 	galaxian_state *state = machine.driver_data<galaxian_state>();
 	UINT8 *rom = machine.region("audiocpu")->base();
 	state->m_protection_result = rom[0x2000 | (state->m_protection_state & 0x1fff)]; // probably needs a BITSWAP8
-	
+
 	// and an irq on the main z80 afterwards
 	cputag_set_input_line(machine, "maincpu", 0, HOLD_LINE );
 }
@@ -2491,7 +2491,7 @@ static MACHINE_CONFIG_DERIVED( monsterz, sfx )
 	MCFG_CPU_PROGRAM_MAP(monsterz_map)
 
 	MCFG_PPI8255_RECONFIG( "ppi8255_1", monsterz_ppi8255_1_intf )
-	
+
 	/* there are likely other differences too, but those can wait until after protection is sorted out */
 
 MACHINE_CONFIG_END

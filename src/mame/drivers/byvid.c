@@ -25,7 +25,7 @@ public:
 	required_device<cpu_device> m_videocpu;
 	required_device<cpu_device> m_pia;
 
-//	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+//  UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 protected:
 
 	// driver_device overrides
@@ -48,7 +48,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( by133_video_map, AS_PROGRAM, 8, by133_state )
-//	AM_RANGE(0x0000, 0x1fff) communication with main CPU
+//  AM_RANGE(0x0000, 0x1fff) communication with main CPU
 	AM_RANGE(0x2000, 0x2003) AM_DEVREADWRITE("pia", pia6821_device, read, write)
 	AM_RANGE(0x4000, 0x4000) AM_DEVREADWRITE( "tms9928a", tms9928a_device, vram_read, vram_write )
 	AM_RANGE(0x4001, 0x4001) AM_DEVREADWRITE( "tms9928a", tms9928a_device, register_read, register_write )

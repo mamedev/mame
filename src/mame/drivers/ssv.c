@@ -412,7 +412,7 @@ READ16_MEMBER(ssv_state::fake_r){   return ssv_scroll[offset];  }
 	AM_RANGE(0x160000, 0x17ffff) AM_RAM																/*          */	\
 	AM_RANGE(0x1c0000, 0x1c0001) AM_READ(ssv_vblank_r			)									/*  Vblank? */	\
 /**/AM_RANGE(0x1c0002, 0x1c007f) AM_READONLY									/*  Scroll  */	\
-	AM_RANGE(0x1c0000, 0x1c007f) AM_WRITE(ssv_scroll_w) AM_BASE(m_scroll)             		/*  Scroll  */  \
+	AM_RANGE(0x1c0000, 0x1c007f) AM_WRITE(ssv_scroll_w) AM_BASE(m_scroll)           		/*  Scroll  */  \
 	AM_RANGE(0x210002, 0x210003) AM_READ_PORT("DSW1")																\
 	AM_RANGE(0x210004, 0x210005) AM_READ_PORT("DSW2")																\
 	AM_RANGE(0x210008, 0x210009) AM_READ_PORT("P1")																	\

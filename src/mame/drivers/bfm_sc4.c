@@ -8,8 +8,8 @@
 
     -----------------
 
-	This file contains the set lists only, for the actual hardware
-	emulation see bfm_sc4h.c
+    This file contains the set lists only, for the actual hardware
+    emulation see bfm_sc4h.c
 
 */
 
@@ -22849,7 +22849,7 @@ GAME( 200?, sc4hotprc	,sc4hotpr,	sc4, sc4, sc4, ROT0, "BFM","Hot Property (Bellf
 GAME( 200?, sc4hotprd	,sc4hotpr,	sc4, sc4, sc4, ROT0, "BFM","Hot Property (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc4hotpre	,sc4hotpr,	sc4, sc4, sc4, ROT0, "BFM","Hot Property (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
 
-// is this some kind of reworked version of Hot Property? 
+// is this some kind of reworked version of Hot Property?
 
 // PR6911 HOT PROPERTY         PR6911 HOT PROPERTY SOUNDS11        $$  CASH 'N' BURN
 GAME( 200?, sc4cburn	,sc4hotpr,	sc4, sc4, sc4, ROT0, "Qps","Cash 'n' Burn (Qps) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )

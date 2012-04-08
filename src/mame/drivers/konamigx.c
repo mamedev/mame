@@ -1219,7 +1219,7 @@ static ADDRESS_MAP_START( gx_type3_map, AS_PROGRAM, 32, konamigx_state )
 	//AM_RANGE(0xe20000, 0xe20003) AM_WRITENOP
 	AM_RANGE(0xe40000, 0xe40003) AM_WRITE(konamigx_type3_psac2_bank_w) AM_BASE_LEGACY(&konamigx_type3_psac2_bank)
 	AM_RANGE(0xe60000, 0xe60fff) AM_RAM AM_BASE_LEGACY((UINT32**)&K053936_0_linectrl)
-	AM_RANGE(0xe80000, 0xe83fff) AM_RAM AM_SHARE("paletteram") 	// main monitor palette
+	AM_RANGE(0xe80000, 0xe83fff) AM_RAM AM_SHARE("paletteram")	// main monitor palette
 	AM_RANGE(0xea0000, 0xea3fff) AM_RAM AM_BASE_LEGACY(&gx_subpaletteram32)
 	AM_RANGE(0xec0000, 0xec0003) AM_READ(type3_sync_r)
 	//AM_RANGE(0xf00000, 0xf07fff) AM_RAM

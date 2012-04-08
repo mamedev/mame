@@ -229,7 +229,7 @@ MACHINE_CONFIG_START( pgm_arm_type1_cave, pgm_arm_type1_state )
 	MCFG_CPU_PROGRAM_MAP(cavepgm_mem)
 
 	MCFG_MACHINE_START( pgm_arm_type1 )
-	
+
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_REFRESH_RATE(59.17) // verified on pcb
 MACHINE_CONFIG_END

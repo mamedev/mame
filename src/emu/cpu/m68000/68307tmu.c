@@ -22,13 +22,13 @@ READ16_HANDLER( m68307_internal_timer_r )
 				return timer->read_tcn(mem_mask, which);
 				break;
 
-			
+
 			default:
 				logerror("%08x m68307_internal_timer_r %08x, (%04x)\n", pc, offset*2,mem_mask);
 				break;
 		}
 	}
-		
+
 	return 0x0000;
 }
 
@@ -106,7 +106,7 @@ static TIMER_CALLBACK( m68307_timer0_callback )
 	m68ki_cpu_core* m68k = m68k_get_safe_token(dev);
 	m68307_single_timer* tptr = &m68k->m68307TIMER->singletimer[0];
 	tptr->regs[m68307TIMER_TMR] |= 0x2;
-	
+
 	m68307_timer0_interrupt(dev);
 
 	tptr->mametimer->adjust(m68k->device->cycles_to_attotime(20000));
@@ -118,7 +118,7 @@ static TIMER_CALLBACK( m68307_timer1_callback )
 	m68ki_cpu_core* m68k = m68k_get_safe_token(dev);
 	m68307_single_timer* tptr = &m68k->m68307TIMER->singletimer[1];
 	tptr->regs[m68307TIMER_TMR] |= 0x2;
-	
+
 	m68307_timer1_interrupt(dev);
 
 	tptr->mametimer->adjust(m68k->device->cycles_to_attotime(20000));
@@ -133,7 +133,7 @@ static TIMER_CALLBACK( m68307_wd_timer_callback )
 void m68307_timer::init(legacy_cpu_device *device)
 {
 	m68307_single_timer* tptr;
-			
+
 	tptr = &singletimer[0];
 	tptr->mametimer = device->machine().scheduler().timer_alloc(FUNC(m68307_timer0_callback), device);
 

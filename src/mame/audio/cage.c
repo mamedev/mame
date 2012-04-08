@@ -551,7 +551,7 @@ static READ32_HANDLER( cage_io_status_r )
 UINT16 cage_main_r(address_space *space)
 {
 	cage_t *state = &cage;
-	driver_device *drvstate = space->machine().driver_data<driver_device>();	
+	driver_device *drvstate = space->machine().driver_data<driver_device>();
 	if (LOG_COMM)
 		logerror("%s:main read data = %04X\n", space->machine().describe_context(), drvstate->soundlatch_word_r(*space, 0, 0));
 	state->cage_to_cpu_ready = 0;

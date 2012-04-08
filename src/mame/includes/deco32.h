@@ -105,7 +105,7 @@ public:
 	DECLARE_READ32_MEMBER(dragngun_lightgun_r);
 	DECLARE_WRITE32_MEMBER(dragngun_lightgun_w);
 	DECLARE_WRITE32_MEMBER(dragngun_sprite_control_w);
-	DECLARE_WRITE32_MEMBER(dragngun_spriteram_dma_w);	
+	DECLARE_WRITE32_MEMBER(dragngun_spriteram_dma_w);
 };
 
 

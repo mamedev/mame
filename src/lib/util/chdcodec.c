@@ -55,8 +55,8 @@ extern "C" SRes LzmaDec_Allocate_MAME(CLzmaDec *p, const CLzmaProps *propNew, IS
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-static const UINT8 s_cd_sync_header[12] = { 0x00,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0x00 }; 
-	
+static const UINT8 s_cd_sync_header[12] = { 0x00,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0x00 };
+
 
 
 //**************************************************************************
@@ -342,10 +342,10 @@ public:
 		UINT32 complen_bytes = (srclen < 65536) ? 2 : 3;
 		UINT32 ecc_bytes = (frames + 7) / 8;
 		UINT32 header_bytes = ecc_bytes + complen_bytes;
-		
+
 		// clear out destination header
 		memset(dest, 0, header_bytes);
-	
+
 		// copy audio data followed by subcode data
 		for (UINT32 framenum = 0; framenum < frames; framenum++)
 		{
@@ -361,12 +361,12 @@ public:
 				ecc_clear(sector);
 			}
 		}
-		
+
 		// encode the base portion
 		UINT32 complen = m_base_compressor.compress(&m_buffer[0], frames * CD_MAX_SECTOR_DATA, &dest[header_bytes]);
 		if (complen >= srclen)
 			throw CHDERR_COMPRESSION_ERROR;
-		
+
 		// write compressed length
 		dest[ecc_bytes + 0] = complen >> ((complen_bytes - 1) * 8);
 		dest[ecc_bytes + 1] = complen >> ((complen_bytes - 2) * 8);
@@ -411,12 +411,12 @@ public:
 		UINT32 complen_bytes = (destlen < 65536) ? 2 : 3;
 		UINT32 ecc_bytes = (frames + 7) / 8;
 		UINT32 header_bytes = ecc_bytes + complen_bytes;
-		
+
 		// extract compressed length of base
 		UINT32 complen_base = (src[ecc_bytes + 0] << 8) | src[ecc_bytes + 1];
 		if (complen_bytes > 2)
 			complen_base = (complen_base << 8) | src[ecc_bytes + 2];
-		
+
 		// reset and decode
 		m_base_decompressor.decompress(&src[header_bytes], complen_base, &m_buffer[0], frames * CD_MAX_SECTOR_DATA);
 		m_subcode_decompressor.decompress(&src[header_bytes + complen_base], complen - complen_base - header_bytes, &m_buffer[frames * CD_MAX_SECTOR_DATA], frames * CD_MAX_SUBCODE_DATA);

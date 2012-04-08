@@ -2002,7 +2002,7 @@ static DRIVER_INIT( cerberus )
 	/* set up the master CPU I/O ports */
 	init_master_ports(machine, 0x40, 0x80);
 
-	/* set up additional input ports */	
+	/* set up additional input ports */
 	machine.device("master")->memory().space(AS_IO)->install_read_handler(0x80, 0x80, read8_delegate(FUNC(leland_state::cerberus_dial_1_r),state));
 	machine.device("master")->memory().space(AS_IO)->install_read_handler(0x90, 0x90, read8_delegate(FUNC(leland_state::cerberus_dial_2_r),state));
 }

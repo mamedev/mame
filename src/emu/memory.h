@@ -780,7 +780,7 @@ public:
 
 	// dump the internal memory tables to the given file
 	void dump(FILE *file);
-	
+
 	// pointers to a bank pointer (internal usage only)
 	UINT8 **bank_pointer_addr(UINT8 index, bool decrypted = false) { return decrypted ? &m_bankd_ptr[index] : &m_bank_ptr[index]; }
 
@@ -795,14 +795,14 @@ private:
 	UINT8 *						m_bank_ptr[256];		// array of bank pointers
 	UINT8 *						m_bankd_ptr[256];		// array of decrypted bank pointers
 
-	simple_list<address_space> 	m_spacelist;			// list of address spaces
-	simple_list<memory_block> 	m_blocklist;			// head of the list of memory blocks
+	simple_list<address_space>	m_spacelist;			// list of address spaces
+	simple_list<memory_block>	m_blocklist;			// head of the list of memory blocks
 
-	simple_list<memory_bank> 	m_banklist;				// data gathered for each bank
+	simple_list<memory_bank>	m_banklist;				// data gathered for each bank
 	tagmap_t<memory_bank *>		m_bankmap;				// map for fast bank lookups
 	UINT8						m_banknext;				// next bank to allocate
 
-	tagged_list<memory_share> 	m_sharelist;			// map for share lookups
+	tagged_list<memory_share>	m_sharelist;			// map for share lookups
 };
 
 

@@ -537,7 +537,7 @@ void info_xml_creator::output_rom(device_t &device)
 				hash_collection hashes(ROM_GETHASHDATA(rom));
 				if (!hashes.flag(hash_collection::FLAG_NO_DUMP))
 					merge_name = get_merge_name(hashes);
-				if (&device != &m_drivlist.config().root_device()) 
+				if (&device != &m_drivlist.config().root_device())
 					merge_name = NULL;
 				// scan for a BIOS name
 				bios_name[0] = 0;

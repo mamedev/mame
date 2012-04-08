@@ -21,7 +21,7 @@
     -------------------------------
 
     This file contains the hardware emulation, for the supported sets
-	see bfm_sc4.c
+    see bfm_sc4.c
 
 */
 
@@ -77,7 +77,7 @@ static READ16_HANDLER( sc4_mem_r )
 	int pc = cpu_get_pc(&space->device());
 	int cs = m68307_get_cs(state->m_maincpu, offset * 2);
 	int base = 0, end = 0, base2 = 0, end2 = 0;
-//	if (!(space->debugger_access())) printf("cs is %d\n", cs);
+//  if (!(space->debugger_access())) printf("cs is %d\n", cs);
 
 	switch ( cs )
 	{
@@ -112,10 +112,10 @@ static READ16_HANDLER( sc4_mem_r )
 
 					case 0x0050:
 						return 0x0000;
-				
+
 					case 0x0060:
 						return 0x0000;
-				
+
 					case 0x0240:
 						return 0xffff;
 
@@ -127,7 +127,7 @@ static READ16_HANDLER( sc4_mem_r )
 
 					case 0x1010:
 						return 0x0000;
-	
+
 					case 0x1020:
 						return 0x0000;
 
@@ -153,7 +153,7 @@ static READ16_HANDLER( sc4_mem_r )
 		case 3:
 			base = 0xc00000/2;
 			end = base + 0x20 / 2;
-	
+
 			if ((offset>=base) && (offset<end))
 			{
 				offset-=base;
@@ -194,7 +194,7 @@ static WRITE16_HANDLER( sc4_mem_w )
 				logerror("%08x maincpu write access offset %08x data %04x mem_mask %04x cs %d (ROM WRITE?!)\n", pc, offset*2, data, mem_mask, cs);
 			else
 				logerror("%08x maincpu write access offset %08x data %04x mem_mask %04x cs %d\n", pc, offset*2, data, mem_mask, cs);
-			
+
 			break;
 
 		case 2:
@@ -222,7 +222,7 @@ static WRITE16_HANDLER( sc4_mem_w )
 						ymz280b_w(state->m_ymz,1, data & 0xff);
 						break;
 
-				
+
 					default:
 						logerror("%08x maincpu write access offset %08x data %04x mem_mask %04x cs %d (LAMPS etc.)\n", pc, offset*2, data, mem_mask, cs);
 				}
@@ -236,7 +236,7 @@ static WRITE16_HANDLER( sc4_mem_w )
 		case 3:
 			base = 0xc00000/2;
 			end = base + 0x20 / 2;
-	
+
 			if ((offset>=base) && (offset<end))
 			{
 				offset-=base;
@@ -259,7 +259,7 @@ static WRITE16_HANDLER( sc4_mem_w )
 }
 
 static ADDRESS_MAP_START( sc4_map, AS_PROGRAM, 16, sc4_adder4_state )
-	AM_RANGE(0x0000000, 0xffffff) AM_READWRITE_LEGACY(sc4_mem_r, sc4_mem_w) 
+	AM_RANGE(0x0000000, 0xffffff) AM_READWRITE_LEGACY(sc4_mem_r, sc4_mem_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sc4_adder4_map, AS_PROGRAM, 32, sc4_adder4_state )
@@ -294,7 +294,7 @@ void bfm_sc4_write_serial_vfd(running_machine &machine, bool cs, bool clock, boo
 			bfm_sc4_reset_serial_vfd(machine);
 			state->vfd_old_clock = clock;
 			state->vfd_enabled = true;
-		}	
+		}
 		else
 		{
 			// if the clock line changes
@@ -341,7 +341,7 @@ static WRITE16_HANDLER( bfm_sc4_68307_portb_w )
 	// we have game specific DMD roms in a couple of cases, is it possible ALL the later games are meant to have
 	// their own DMD roms rather than it being something generic? (if so we're missing a lot of DMD roms..)
 	bfm_sc4_write_serial_vfd(space->machine(), (data & 0x4000)?1:0, (data & 0x1000)?1:0, !(data & 0x2000)?1:0);
-//	bfm_sc4_write_serial_vfd(space->machine(), (data & 0x1000)?1:0, (data & 0x4000)?0:1, !(data & 0x2000)?1:0);
+//  bfm_sc4_write_serial_vfd(space->machine(), (data & 0x1000)?1:0, (data & 0x4000)?0:1, !(data & 0x2000)?1:0);
 
 }
 
@@ -410,7 +410,7 @@ UINT8 bfm_sc4_duart_input_r(device_t *device)
 void bfm_sc4_duart_output_w(device_t *device, UINT8 data)
 {
 	logerror("bfm_sc4_duart_output_w\n");
-//	cputag_set_input_line(device->machine(), "audiocpu", INPUT_LINE_RESET, data & 0x20 ? CLEAR_LINE : ASSERT_LINE);
+//  cputag_set_input_line(device->machine(), "audiocpu", INPUT_LINE_RESET, data & 0x20 ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -436,18 +436,18 @@ static INTERRUPT_GEN( sc4_fake_int_check )
 		which_int = device->machine().rand() % 5;
 
 		/*
-		if ( device->machine().input().code_pressed_once(KEYCODE_Q) ) which_int = 1;
-		if ( device->machine().input().code_pressed_once(KEYCODE_W) ) which_int = 2;
-		if ( device->machine().input().code_pressed_once(KEYCODE_E) ) which_int = 3;
-		if ( device->machine().input().code_pressed_once(KEYCODE_R) ) which_int = 4;
-		if ( device->machine().input().code_pressed_once(KEYCODE_T) ) which_int = 5;
-		*/
+        if ( device->machine().input().code_pressed_once(KEYCODE_Q) ) which_int = 1;
+        if ( device->machine().input().code_pressed_once(KEYCODE_W) ) which_int = 2;
+        if ( device->machine().input().code_pressed_once(KEYCODE_E) ) which_int = 3;
+        if ( device->machine().input().code_pressed_once(KEYCODE_R) ) which_int = 4;
+        if ( device->machine().input().code_pressed_once(KEYCODE_T) ) which_int = 5;
+        */
 
 		//if (which_int==1) m68307_timer0_interrupt((legacy_cpu_device*)device->machine().device("maincpu"));
 		//if (which_int==2) m68307_timer1_interrupt((legacy_cpu_device*)device->machine().device("maincpu"));
 		if (which_int==3) m68307_serial_interrupt((legacy_cpu_device*)device->machine().device("maincpu"));
 		//if (which_int==4) m68307_mbus_interrupt((legacy_cpu_device*)device->machine().device("maincpu"));
-	//	if (which_int==5) m68307_licr2_interrupt((legacy_cpu_device*)device->machine().device("maincpu"));
+	//  if (which_int==5) m68307_licr2_interrupt((legacy_cpu_device*)device->machine().device("maincpu"));
 	}
 }
 

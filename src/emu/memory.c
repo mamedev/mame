@@ -1578,7 +1578,7 @@ memory_manager::memory_manager(running_machine &machine)
 //**************************************************************************
 
 //-------------------------------------------------
-//  configure_bank - configure the addresses for a 
+//  configure_bank - configure the addresses for a
 //  bank
 //-------------------------------------------------
 
@@ -1604,7 +1604,7 @@ void memory_manager::configure_bank(device_t &device, const char *tag, int start
 
 
 //-------------------------------------------------
-//  configure_bank_decrypted - configure the 
+//  configure_bank_decrypted - configure the
 //  decrypted addresses for a bank
 //-------------------------------------------------
 
@@ -1630,7 +1630,7 @@ void memory_manager::configure_bank_decrypted(device_t &device, const char *tag,
 
 
 //-------------------------------------------------
-//  set_bank - select one pre-configured entry to 
+//  set_bank - select one pre-configured entry to
 //  be the new bank base
 //-------------------------------------------------
 
@@ -1697,7 +1697,7 @@ void memory_manager::set_bankptr(device_t &device, const char *tag, void *base)
 
 
 //-------------------------------------------------
-//  shared - get a pointer to a shared memory 
+//  shared - get a pointer to a shared memory
 //  region by tag
 //-------------------------------------------------
 

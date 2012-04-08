@@ -80,7 +80,7 @@ WRITE8_MEMBER(chaknpop_state::chaknpop_gfxmode_w)
 		int all_dirty = 0;
 
 		m_gfxmode = data;
-		memory_set_bank(machine(), "bank1", (m_gfxmode & GFX_VRAM_BANK) ? 1 : 0); 	/* Select 2 banks of 16k */
+		memory_set_bank(machine(), "bank1", (m_gfxmode & GFX_VRAM_BANK) ? 1 : 0);	/* Select 2 banks of 16k */
 
 		if (m_flip_x != (m_gfxmode & GFX_FLIP_X))
 		{

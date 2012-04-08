@@ -358,7 +358,7 @@ DRIVER_INIT( dwpc )
 
 	mem16[0x11EDE8 / 2] = 0x4e71;
 
-	mem16[0x11EFC4 / 2] = 0x4e71; 
+	mem16[0x11EFC4 / 2] = 0x4e71;
 	mem16[0x11EFC6 / 2] = 0x4e71;
 
 	mem16[0x11EFD2 / 2] = 0x4e71;

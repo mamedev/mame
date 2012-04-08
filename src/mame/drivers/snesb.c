@@ -299,7 +299,7 @@ static WRITE8_DEVICE_HANDLER( spc_ram_100_w )
 
 static ADDRESS_MAP_START( spc_mem, AS_PROGRAM, 8, snesb_state )
 	AM_RANGE(0x0000, 0x00ef) AM_DEVREADWRITE_LEGACY("spc700", spc_ram_r, spc_ram_w)	/* lower 32k ram */
-	AM_RANGE(0x00f0, 0x00ff) AM_DEVREADWRITE_LEGACY("spc700", spc_io_r, spc_io_w)  	/* spc io */
+	AM_RANGE(0x00f0, 0x00ff) AM_DEVREADWRITE_LEGACY("spc700", spc_io_r, spc_io_w)	/* spc io */
 	AM_RANGE(0x0100, 0xffff) AM_DEVWRITE_LEGACY("spc700", spc_ram_100_w)
 	AM_RANGE(0x0100, 0xffbf) AM_DEVREAD_LEGACY("spc700", spc_ram_100_r)
 	AM_RANGE(0xffc0, 0xffff) AM_DEVREAD_LEGACY("spc700", spc_ipl_r)

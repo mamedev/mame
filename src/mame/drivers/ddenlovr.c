@@ -3530,7 +3530,7 @@ static WRITE8_HANDLER( mjflove_coincounter_w )
 	}
 }
 
-static ADDRESS_MAP_START( mjflove_portmap, AS_IO, 8, dynax_state ) 	// 16 bit I/O
+static ADDRESS_MAP_START( mjflove_portmap, AS_IO, 8, dynax_state )	// 16 bit I/O
 	AM_RANGE(0x0010, 0x0010) AM_READ_LEGACY(hanakanz_rand_r) AM_MIRROR(0xff00)
 	AM_RANGE(0x001c, 0x001c) AM_READ_PORT("DSW2") AM_MIRROR(0xff00)
 	AM_RANGE(0x001e, 0x001e) AM_WRITE_LEGACY(hanakanz_keyb_w) AM_MIRROR(0xff00)

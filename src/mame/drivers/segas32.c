@@ -4101,7 +4101,7 @@ static DRIVER_INIT( dbzvrvs )
 	segas32_common_init(machine, NULL, NULL);
 
 	/* install protection handlers */
-	segas32_state *state = machine.driver_data<segas32_state>();	
+	segas32_state *state = machine.driver_data<segas32_state>();
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xa00000, 0xa7ffff, read16_delegate(FUNC(segas32_state::dbzvrvs_protection_r),state), write16_delegate(FUNC(segas32_state::dbzvrvs_protection_w),state));
 }
 
@@ -4140,7 +4140,7 @@ static DRIVER_INIT( ga2 )
 	segas32_common_init(machine, extra_custom_io_r, NULL);
 
 	decrypt_ga2_protrom(machine);
-	segas32_state *state = machine.driver_data<segas32_state>();	
+	segas32_state *state = machine.driver_data<segas32_state>();
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xa00000, 0xa00fff, read16_delegate(FUNC(segas32_state::ga2_dpram_r),state), write16_delegate(FUNC(segas32_state::ga2_dpram_w),state));
 }
 
@@ -4226,7 +4226,7 @@ static DRIVER_INIT( sonic )
 	segas32_common_init(machine, sonic_custom_io_r, sonic_custom_io_w);
 
 	/* install protection handlers */
-	segas32_state *state = machine.driver_data<segas32_state>();	
+	segas32_state *state = machine.driver_data<segas32_state>();
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x20E5C4, 0x20E5C5, write16_delegate(FUNC(segas32_state::sonic_level_load_protection),state));
 }
 

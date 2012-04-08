@@ -604,7 +604,7 @@ static ADDRESS_MAP_START( qsound_main_map, AS_PROGRAM, 16, cps_state )
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START( qsound_sub_map, AS_PROGRAM, 8, cps_state ) 	// used by cps2.c too
+ADDRESS_MAP_START( qsound_sub_map, AS_PROGRAM, 8, cps_state )	// used by cps2.c too
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")	/* banked (contains music data) */
 	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_BASE(m_qsound_sharedram1)

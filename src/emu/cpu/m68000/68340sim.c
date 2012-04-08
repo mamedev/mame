@@ -9,7 +9,7 @@ READ32_HANDLER( m68340_internal_sim_r )
 	m68ki_cpu_core *m68k = m68k_get_safe_token(&space->device());
 	m68340_sim* sim = m68k->m68340SIM;
 	assert(sim != NULL);
-	
+
 	if (sim)
 	{
 		int pc = cpu_get_pc(&space->device());

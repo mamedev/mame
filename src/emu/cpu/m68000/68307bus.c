@@ -26,7 +26,7 @@ READ16_HANDLER( m68307_internal_mbus_r )
 				return 0x0000;
 		}
 	}
-	
+
 	return 0xffff;
 }
 

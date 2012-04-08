@@ -114,7 +114,7 @@ public:
 	DECLARE_WRITE8_MEMBER( soundlatch2_clear_w );
 	DECLARE_WRITE8_MEMBER( soundlatch3_clear_w );
 	DECLARE_WRITE8_MEMBER( soundlatch4_clear_w );
-	
+
 	// general palette helpers
 	void set_color_332(pen_t color, int rshift, int gshift, int bshift, UINT32 data);
 	void set_color_444(pen_t color, int rshift, int gshift, int bshift, UINT32 data);

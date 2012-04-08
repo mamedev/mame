@@ -1461,7 +1461,7 @@ static DRIVER_INIT( taitojc )
 static DRIVER_INIT( dendego2 )
 {
 	taitojc_state *state = machine.driver_data<taitojc_state>();
-	
+
 	DRIVER_INIT_CALL( taitojc );
 
 	machine.device("dsp")->memory().space(AS_DATA)->install_readwrite_handler(0x7ff0, 0x7ff0, read16_delegate(FUNC(taitojc_state::dendego2_dsp_idle_skip_r),state), write16_delegate(FUNC(taitojc_state::dsp_idle_skip_w),state));

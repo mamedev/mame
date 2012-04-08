@@ -1326,43 +1326,43 @@ int m68307_calc_cs(m68ki_cpu_core *m68k, offs_t address)
 
 UINT16 m68k_memory_interface::simple_read_immediate_16_m68307(offs_t address)
 {
-//	m_cpustate->m68307_currentcs = m68307_calc_cs(m_cpustate, address);
+//  m_cpustate->m68307_currentcs = m68307_calc_cs(m_cpustate, address);
 	return m_direct->read_decrypted_word(address);
 }
 
 UINT8 m68k_memory_interface::read_byte_m68307(offs_t address)
 {
-//	m_cpustate->m68307_currentcs = m68307_calc_cs(m_cpustate, address);
+//  m_cpustate->m68307_currentcs = m68307_calc_cs(m_cpustate, address);
 	return m_space->read_byte(address);
 }
 
 UINT16 m68k_memory_interface::read_word_m68307(offs_t address)
 {
-//	m_cpustate->m68307_currentcs = m68307_calc_cs(m_cpustate, address);
+//  m_cpustate->m68307_currentcs = m68307_calc_cs(m_cpustate, address);
 	return m_space->read_word(address);
 }
 
 UINT32 m68k_memory_interface::read_dword_m68307(offs_t address)
 {
-//	m_cpustate->m68307_currentcs = m68307_calc_cs(m_cpustate, address);
+//  m_cpustate->m68307_currentcs = m68307_calc_cs(m_cpustate, address);
 	return m_space->read_dword(address);
 }
 
 void m68k_memory_interface::write_byte_m68307(offs_t address, UINT8 data)
 {
-//	m_cpustate->m68307_currentcs = m68307_calc_cs(m_cpustate, address);
+//  m_cpustate->m68307_currentcs = m68307_calc_cs(m_cpustate, address);
 	m_space->write_byte(address, data);
 }
 
 void m68k_memory_interface::write_word_m68307(offs_t address, UINT16 data)
 {
-//	m_cpustate->m68307_currentcs = m68307_calc_cs(m_cpustate, address);
+//  m_cpustate->m68307_currentcs = m68307_calc_cs(m_cpustate, address);
 	m_space->write_word(address, data);
 }
 
 void m68k_memory_interface::write_dword_m68307(offs_t address, UINT32 data)
 {
-//	m_cpustate->m68307_currentcs = m68307_calc_cs(m_cpustate, address);
+//  m_cpustate->m68307_currentcs = m68307_calc_cs(m_cpustate, address);
 	m_space->write_dword(address, data);
 }
 
@@ -1956,7 +1956,7 @@ void m68307_timer1_interrupt(legacy_cpu_device *cpudev)
 
 void m68307_serial_interrupt(legacy_cpu_device *cpudev)
 {
- 	m68ki_cpu_core* m68k = m68k_get_safe_token(cpudev);
+	m68ki_cpu_core* m68k = m68k_get_safe_token(cpudev);
 	int prioritylevel = (m68k->m68307SIM->m_picr & 0x0070)>>4;
 	int vector        = (m68k->m68307SERIAL->m_uivr);
 	m68307_set_interrupt(cpudev, prioritylevel, vector);
@@ -1964,7 +1964,7 @@ void m68307_serial_interrupt(legacy_cpu_device *cpudev)
 
 void m68307_mbus_interrupt(legacy_cpu_device *cpudev)
 {
- 	m68ki_cpu_core* m68k = m68k_get_safe_token(cpudev);
+	m68ki_cpu_core* m68k = m68k_get_safe_token(cpudev);
 	int prioritylevel = (m68k->m68307SIM->m_picr & 0x0007)>>0;
 	int vector        = (m68k->m68307SIM->m_pivr & 0x00f0) | 0xd;
 	m68307_set_interrupt(cpudev, prioritylevel, vector);
@@ -1972,7 +1972,7 @@ void m68307_mbus_interrupt(legacy_cpu_device *cpudev)
 
 void m68307_licr2_interrupt(legacy_cpu_device *cpudev)
 {
- 	m68ki_cpu_core* m68k = m68k_get_safe_token(cpudev);
+	m68ki_cpu_core* m68k = m68k_get_safe_token(cpudev);
 	int prioritylevel = (m68k->m68307SIM->m_licr2 & 0x0007)>>0;
 	int vector        = (m68k->m68307SIM->m_pivr & 0x00f0) | 0x9;
 	m68k->m68307SIM->m_licr2 |= 0x8;
@@ -2050,10 +2050,10 @@ static WRITE16_HANDLER( m68307_internal_base_w )
 			base = (m68k->m68307_base & 0x0fff) << 12;
 			//mask = (m68k->m68307_base & 0xe000) >> 13;
 			//if ( m68k->m68307_base & 0x1000 ) mask |= 7;
-         	m68k->internal->unmap_readwrite(base+0x000, base+0x04f);
-         	m68k->internal->unmap_readwrite(base+0x100, base+0x11f);
-         	m68k->internal->unmap_readwrite(base+0x120, base+0x13f);
-         	m68k->internal->unmap_readwrite(base+0x140, base+0x149);
+        	m68k->internal->unmap_readwrite(base+0x000, base+0x04f);
+        	m68k->internal->unmap_readwrite(base+0x100, base+0x11f);
+        	m68k->internal->unmap_readwrite(base+0x120, base+0x13f);
+        	m68k->internal->unmap_readwrite(base+0x140, base+0x149);
 
 			/* store new base address */
 			COMBINE_DATA(&m68k->m68307_base);
@@ -2061,7 +2061,7 @@ static WRITE16_HANDLER( m68307_internal_base_w )
 			/* install new internal handler */
 			base = (m68k->m68307_base & 0x0fff) << 12;
 			//mask = (m68k->m68307_base & 0xe000) >> 13;
-			//if ( m68k->m68307_base & 0x1000 ) mask |= 7;     
+			//if ( m68k->m68307_base & 0x1000 ) mask |= 7;
 			m68k->internal->install_legacy_readwrite_handler(base + 0x000, base + 0x04f, FUNC(m68307_internal_sim_r),    FUNC(m68307_internal_sim_w));
 			m68k->internal->install_legacy_readwrite_handler(base + 0x100, base + 0x11f, FUNC(m68307_internal_serial_r), FUNC(m68307_internal_serial_w));
 			m68k->internal->install_legacy_readwrite_handler(base + 0x120, base + 0x13f, FUNC(m68307_internal_timer_r),  FUNC(m68307_internal_timer_w));

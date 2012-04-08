@@ -18,7 +18,7 @@ READ16_HANDLER( m68307_internal_sim_r )
 		{
 			case m68307SIM_PADAT: return sim->read_padat(space, mem_mask);
 			case m68307SIM_PBDAT: return sim->read_pbdat(space, mem_mask);
-		
+
 			case m68307SIM_LICR2: return  (sim->m_licr2);
 
 			case m68307SIM_BR0:	return (sim->m_br[0]);
@@ -97,7 +97,7 @@ WRITE16_HANDLER( m68307_internal_sim_w )
 				logerror("%08x m68307_internal_sim_w %08x, %04x (%04x) (Peripheral Interrupt Control Register - PICR)\n", pc, offset*2,data,mem_mask);
 				sim->write_picr(data,mem_mask);
 				break;
-			
+
 			case m68307SIM_PIVR:
 				logerror("%08x m68307_internal_sim_w %08x, %04x (%04x) (Peripheral Interrupt Vector Register - PIVR)\n", pc, offset*2,data,mem_mask);
 				sim->write_pivr(data,mem_mask);

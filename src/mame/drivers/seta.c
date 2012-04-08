@@ -2463,7 +2463,7 @@ static WRITE16_HANDLER( msgundam_vregs_w )
 	{
 		case 1:	offset = 2;	break;
 		case 2:	offset = 1;	break;
-	}	
+	}
 	state->seta_vregs_w(*space,offset,data,mem_mask);
 }
 

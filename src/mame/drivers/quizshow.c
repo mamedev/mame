@@ -37,7 +37,7 @@ class quizshow_state : public driver_device
 public:
 	quizshow_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
-	
+
 	tilemap_t *m_tilemap;
 	UINT8* m_fo_state;
 	UINT8* m_main_ram;
@@ -77,7 +77,7 @@ PALETTE_INIT( quizshow )
 		1, 0, 0, 0,
 		1, 0, 1, 0
 	};
-	
+
 	for (int i = 0; i < 16 ; i++)
 		colortable_entry_set_value(machine.colortable, i, lut_pal[i]);
 }
@@ -221,8 +221,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( quizshow_io_map, AS_IO, 8, quizshow_state )
 	ADDRESS_MAP_UNMAP_HIGH
-//	AM_RANGE(S2650_CTRL_PORT, S2650_CTRL_PORT) AM_NOP // unused
-//	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_NOP // unused
+//  AM_RANGE(S2650_CTRL_PORT, S2650_CTRL_PORT) AM_NOP // unused
+//  AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_NOP // unused
 	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ(quizshow_tape_signal_r)
 	AM_RANGE(S2650_FO_PORT, S2650_FO_PORT) AM_RAM AM_BASE(m_fo_state)
 ADDRESS_MAP_END
@@ -440,7 +440,7 @@ static DRIVER_INIT( quizshow )
 				dest[tile << 4 | line] = gfxdata[tile << 3 | (line - 4)];
 		}
 	}
-	
+
 	// HACK out a gfxrom glitch, remove it when a good dump is out
 	dest[0x208] = dest[0x209] = 0;
 }

@@ -359,7 +359,7 @@ static ADDRESS_MAP_START( cadash_map, AS_PROGRAM, 16, asuka_state )
 	AM_RANGE(0xc20000, 0xc2000f) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( eto_map, AS_PROGRAM, 16 	/* N.B. tc100scn mirror overlaps spriteram */, asuka_state )
+static ADDRESS_MAP_START( eto_map, AS_PROGRAM, 16	/* N.B. tc100scn mirror overlaps spriteram */, asuka_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x10000f) AM_DEVREADWRITE_LEGACY("tc0110pcr", tc0110pcr_word_r, tc0110pcr_step1_word_w)
 	AM_RANGE(0x200000, 0x203fff) AM_RAM

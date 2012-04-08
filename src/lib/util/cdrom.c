@@ -72,7 +72,7 @@ void CLIB_DECL logerror(const char *text,...);
 const int SYNC_OFFSET = 0x000;		// offset within sector
 const int SYNC_NUM_BYTES = 12;		// 12 bytes
 
-const int MODE_OFFSET = 0x00f;		// offset within sector 
+const int MODE_OFFSET = 0x00f;		// offset within sector
 
 const int ECC_P_OFFSET = 0x81c;		// offset within sector
 const int ECC_P_NUM_BYTES = 86;		// 2 lots of 86
@@ -897,7 +897,7 @@ chd_error cdrom_write_metadata(chd_file *chd, const cdrom_toc *toc)
 
 //-------------------------------------------------
 //  ECC lookup tables
-//	pre-calculated tables for ECC data calcs
+//  pre-calculated tables for ECC data calcs
 //-------------------------------------------------
 
 static const UINT8 ecclow[256] =
@@ -942,10 +942,10 @@ static const UINT8 ecchigh[256] =
 
 
 //-------------------------------------------------
-//  poffsets - each row represents the addresses 
+//  poffsets - each row represents the addresses
 //  used to calculate a byte of the ECC P data
-//	86 (*2) ECC P bytes, 24 values represented by
-//	each
+//  86 (*2) ECC P bytes, 24 values represented by
+//  each
 //-------------------------------------------------
 
 static const UINT16 poffsets[ECC_P_NUM_BYTES][ECC_P_COMP] =
@@ -1040,10 +1040,10 @@ static const UINT16 poffsets[ECC_P_NUM_BYTES][ECC_P_COMP] =
 
 
 //-------------------------------------------------
-//  qoffsets - each row represents the addresses 
+//  qoffsets - each row represents the addresses
 //  used to calculate a byte of the ECC Q data
-//	52 (*2) ECC Q bytes, 43 values represented by
-//	each
+//  52 (*2) ECC Q bytes, 43 values represented by
+//  each
 //-------------------------------------------------
 
 static const UINT16 qoffsets[ECC_Q_NUM_BYTES][ECC_Q_COMP] =
@@ -1105,7 +1105,7 @@ static const UINT16 qoffsets[ECC_Q_NUM_BYTES][ECC_Q_COMP] =
 
 //-------------------------------------------------
 //  ecc_source_byte - return data from the sector
-//  at the given offset, masking anything 
+//  at the given offset, masking anything
 //  particular to a mode
 //-------------------------------------------------
 
@@ -1117,7 +1117,7 @@ inline UINT8 ecc_source_byte(const UINT8 *sector, UINT32 offset)
 
 
 //-------------------------------------------------
-//  ecc_compute_bytes - calculate an ECC value 
+//  ecc_compute_bytes - calculate an ECC value
 //  (P or Q)
 //-------------------------------------------------
 
@@ -1150,7 +1150,7 @@ bool ecc_verify(const UINT8 *sector)
 		if (sector[ECC_P_OFFSET + byte] != val1 || sector[ECC_P_OFFSET + ECC_P_NUM_BYTES + byte] != val2)
 			return false;
 	}
-	
+
 	// then verify Q bytes
     for (int byte = 0; byte < ECC_Q_NUM_BYTES; byte++)
 	{
@@ -1164,7 +1164,7 @@ bool ecc_verify(const UINT8 *sector)
 
 
 //-------------------------------------------------
-//  ecc_generate - generate the P and Q ECC codes 
+//  ecc_generate - generate the P and Q ECC codes
 //  for a sector, overwriting any existing codes
 //-------------------------------------------------
 
@@ -1173,7 +1173,7 @@ void ecc_generate(UINT8 *sector)
 	// first verify P bytes
 	for (int byte = 0; byte < ECC_P_NUM_BYTES; byte++)
 	    ecc_compute_bytes(sector, poffsets[byte], ECC_P_COMP, sector[ECC_P_OFFSET + byte], sector[ECC_P_OFFSET + ECC_P_NUM_BYTES + byte]);
-	
+
 	// then verify Q bytes
     for (int byte = 0; byte < ECC_Q_NUM_BYTES; byte++)
 	    ecc_compute_bytes(sector, qoffsets[byte], ECC_Q_COMP, sector[ECC_Q_OFFSET + byte], sector[ECC_Q_OFFSET + ECC_Q_NUM_BYTES + byte]);
@@ -1182,7 +1182,7 @@ void ecc_generate(UINT8 *sector)
 
 //-------------------------------------------------
 //  ecc_clear - erase the ECC P and Q cods to 0
-//	within a sector
+//  within a sector
 //-------------------------------------------------
 
 void ecc_clear(UINT8 *sector)

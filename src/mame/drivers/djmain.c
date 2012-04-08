@@ -196,7 +196,7 @@ WRITE32_MEMBER(djmain_state::v_ctrl_w)
 		mem_mask >>= 16;
 		COMBINE_DATA(&m_v_ctrl);
 
-		if (m_pending_vb_int && !(!(m_v_ctrl & 0x8000))) // #define DISABLE_VB_INT	(!(state->m_v_ctrl & 0x8000))
+		if (m_pending_vb_int && !(!(m_v_ctrl & 0x8000))) // #define DISABLE_VB_INT  (!(state->m_v_ctrl & 0x8000))
 		{
 			m_pending_vb_int = 0;
 			cputag_set_input_line(machine(), "maincpu", M68K_IRQ_4, HOLD_LINE);

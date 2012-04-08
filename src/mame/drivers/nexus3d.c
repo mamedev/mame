@@ -39,10 +39,10 @@ public:
 	UINT8* m_flash_region;
 
 	DECLARE_READ32_MEMBER(nexus3d_unk_r);
-//	DECLARE_READ32_MEMBER(nexus3d_unk2_r);
-//	DECLARE_READ32_MEMBER(nexus3d_unk3_r);
-//	DECLARE_WRITE32_MEMBER(nexus3d_unk2_w);
-//	DECLARE_WRITE32_MEMBER(nexus3d_unk3_w);
+//  DECLARE_READ32_MEMBER(nexus3d_unk2_r);
+//  DECLARE_READ32_MEMBER(nexus3d_unk3_r);
+//  DECLARE_WRITE32_MEMBER(nexus3d_unk2_w);
+//  DECLARE_WRITE32_MEMBER(nexus3d_unk3_w);
 };
 
 

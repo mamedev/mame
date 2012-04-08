@@ -2496,18 +2496,18 @@ ROM_START( kov2p205 )
 ROM_END
 
 /*
- 
+
 Do Donpachi II
 Cave, 2001
- 
+
 This is a PGM cart containing not a lot....
 5x SOP44 mask ROMs (4x 64M, 1x 32M)
-2x EPROMs (1x 1M, 1x 16M) 
+2x EPROMs (1x 1M, 1x 16M)
 2x PALs (labelled FN U14 and FN U15)
 1x custom IGS027A (QFP120)
 3x RAMs WINBOND W24257AJ-8N
 Some logic IC's, resistors, caps etc.
- 
+
 */
 
 

@@ -289,7 +289,7 @@ public:
 	DECLARE_READ32_MEMBER (nand_data_r);
 	DECLARE_WRITE32_MEMBER(watchdog_w);
 	DECLARE_WRITE32_MEMBER(nand_block_w);
-	DECLARE_READ32_MEMBER (nand_block_r);	
+	DECLARE_READ32_MEMBER (nand_block_r);
 
 	UINT8 *nand_base;
 	void nand_copy( UINT32 *dst, UINT32 address, int len );
@@ -348,9 +348,9 @@ READ32_MEMBER(namcos10_state::range_r)
 		d16 = data32;
 
 	/* This is not entirely correct, but not entirely incorrect either...
-	   It's also specific to mrdriller2, it seems.
-	*/
-	   
+       It's also specific to mrdriller2, it seems.
+    */
+
 	UINT16 dd16 = d16 ^ key;
 
 	key =

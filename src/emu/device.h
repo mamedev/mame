@@ -292,7 +292,7 @@ protected:
 	class finder_base
 	{
 		friend class device_t;
-		
+
 	public:
 		// construction/destruction
 		finder_base(device_t &base, const char *tag);
@@ -344,7 +344,7 @@ protected:
 		// internal state
 		_DeviceClass *m_target;
 	};
-	
+
 	// optional device finder
 	template<class _DeviceClass>
 	class optional_device : public device_finder<_DeviceClass, false>
@@ -360,7 +360,7 @@ protected:
 	public:
 		required_device(device_t &base, const char *tag) : device_finder<_DeviceClass, true>(base, tag) { }
 	};
-	
+
 	// shared pointer finder template
 	template<typename _PointerType, bool _Required>
 	class shared_ptr_finder : public finder_base
@@ -373,7 +373,7 @@ protected:
 			  m_bytes(0),
 			  m_allocated(false),
 			  m_width((width != 0) ? width : sizeof(_PointerType) * 8) { }
-		
+
 		virtual ~shared_ptr_finder() { if (m_allocated) global_free(m_target); }
 
 		// operators to make use transparent
@@ -393,7 +393,7 @@ protected:
 			if (target == 0 && _Required)
 				throw emu_fatalerror("Unable to find required shared pointer '%s'", this->m_tag);
 		}
-		
+
 		// dynamic allocation of a shared pointer
 		void allocate(UINT32 entries)
 		{
@@ -414,7 +414,7 @@ protected:
 		bool m_allocated;
 		UINT8 m_width;
 	};
-	
+
 	// optional device finder
 	template<class _PointerType>
 	class optional_shared_ptr : public shared_ptr_finder<_PointerType, false>

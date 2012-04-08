@@ -1946,7 +1946,7 @@ WRITE16_MEMBER(igs017_state::lhzb2a_input_select_w)
 static ADDRESS_MAP_START( lhzb2a, AS_PROGRAM, 16, igs017_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x500000, 0x503fff) AM_RAM
-//	AM_RANGE(0x910000, 0x910003) protection
+//  AM_RANGE(0x910000, 0x910003) protection
 	AM_RANGE(0xb02000, 0xb02fff) AM_READWRITE( spriteram_lsb_r, spriteram_lsb_w ) AM_BASE( m_spriteram )
 	AM_RANGE(0xb03000, 0xb037ff) AM_RAM_WRITE( lhzb2a_paletteram_w ) AM_SHARE("paletteram")
 	AM_RANGE(0xb04024, 0xb04025) AM_WRITE( video_disable_lsb_w )
@@ -1956,7 +1956,7 @@ static ADDRESS_MAP_START( lhzb2a, AS_PROGRAM, 16, igs017_state )
 	AM_RANGE(0xb0c000, 0xb0ffff) AM_READWRITE( bg_lsb_r, bg_lsb_w ) AM_BASE( m_bg_videoram )
 	AM_RANGE(0xb10000, 0xb10001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff )
 	AM_RANGE(0xb12000, 0xb12001) AM_WRITE( lhzb2a_input_select_w )
-//  Inputs dynamically mapped at xx8000, protection at xx4000 (xx = f0 initially). xx written to xxc000 
+//  Inputs dynamically mapped at xx8000, protection at xx4000 (xx = f0 initially). xx written to xxc000
 ADDRESS_MAP_END
 
 
@@ -1990,8 +1990,8 @@ WRITE16_MEMBER(igs017_state::slqz2_magic_w)
 				okim6295_device *oki = machine().device<okim6295_device>("oki");
 				oki->set_bank_base((data & 0x01) ? 0x40000 : 0);
 
-//				m_hopper			=			data & 0x20;	// hopper motor
-//				coin_counter_w(machine(), 1,	data & 0x40);	// coin out counter
+//              m_hopper            =           data & 0x20;    // hopper motor
+//              coin_counter_w(machine(), 1,    data & 0x40);   // coin out counter
 				coin_counter_w(machine(), 0,	data & 0x80);	// coin in  counter
 
 				if ( data & 0x7e )
@@ -3196,7 +3196,7 @@ static MACHINE_CONFIG_START( lhzb2a, igs017_state )
 
 	MCFG_MACHINE_RESET(lhzb2a)
 
-//	MCFG_PPI8255_ADD( "ppi8255", sdmg2_ppi8255_intf )
+//  MCFG_PPI8255_ADD( "ppi8255", sdmg2_ppi8255_intf )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

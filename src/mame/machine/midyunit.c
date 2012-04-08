@@ -510,7 +510,7 @@ static void term2_init_common(running_machine &machine, write16_delegate hack_w)
 	/* common init */
 	init_generic(machine, 6, SOUND_ADPCM, 0xfa8d, 0xfa9c);
 
-	/* special inputs */	
+	/* special inputs */
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x01c00000, 0x01c0005f, read16_delegate(FUNC(midyunit_state::term2_input_r),state));
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x01e00000, 0x01e0001f, write16_delegate(FUNC(midyunit_state::term2_sound_w),state));
 

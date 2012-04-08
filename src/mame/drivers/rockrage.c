@@ -115,7 +115,7 @@ static ADDRESS_MAP_START( rockrage_map, AS_PROGRAM, 8, rockrage_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( rockrage_sound_map, AS_PROGRAM, 8, rockrage_state )
-	AM_RANGE(0x2000, 0x2000) AM_DEVWRITE_LEGACY("vlm", vlm5030_data_w) 				/* VLM5030 */
+	AM_RANGE(0x2000, 0x2000) AM_DEVWRITE_LEGACY("vlm", vlm5030_data_w)				/* VLM5030 */
 	AM_RANGE(0x3000, 0x3000) AM_DEVREAD_LEGACY("vlm", rockrage_VLM5030_busy_r)			/* VLM5030 */
 	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE_LEGACY("vlm", rockrage_speech_w)				/* VLM5030 */
 	AM_RANGE(0x5000, 0x5000) AM_READ(soundlatch_r)								/* soundlatch_r */

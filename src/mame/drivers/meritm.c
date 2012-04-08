@@ -1878,7 +1878,7 @@ static DRIVER_INIT(megat3te)
 		{ 0x99, 0x53, 0xfc, 0x29, 0x3a, 0x95, 0x8b, 0x58, 0xca, 0xca, 0x00, 0xc2, 0x30, 0x62, 0x0b, 0x96 };
 
 	ds1204_init(machine, megat3_ds1204_key, megat3_ds1204_nvram);
-	
+
 	meritm_state *state = machine.driver_data<meritm_state>();
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xfff8, 0xffff, read8_delegate(FUNC(meritm_state::meritm_ds1644_r), state), write8_delegate(FUNC(meritm_state::meritm_ds1644_w), state));
 
