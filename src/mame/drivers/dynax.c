@@ -1205,11 +1205,6 @@ WRITE8_MEMBER(dynax_state::htengoku_blit_romregion_w)
 	logerror("%04x: unmapped romregion=%02X\n", cpu_get_pc(&space.device()), data);
 }
 
-READ8_MEMBER(dynax_state::unk_r)
-{
-	return 0x78;
-}
-
 static ADDRESS_MAP_START( htengoku_io_map, AS_IO, 8, dynax_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x01, 0x07 ) AM_WRITE(dynax_blitter_rev2_w)		// Blitter
@@ -1222,14 +1217,14 @@ static ADDRESS_MAP_START( htengoku_io_map, AS_IO, 8, dynax_state )
 	AM_RANGE( 0x44, 0x44 ) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_w)	//
 	AM_RANGE( 0x46, 0x47 ) AM_DEVWRITE_LEGACY("ymsnd", ym2413_w)		//
 	AM_RANGE( 0x80, 0x8f ) AM_DEVREADWRITE("rtc", msm6242_device, read, write)
-	AM_RANGE( 0xa0, 0xa3 ) AM_WRITE_LEGACY(ddenlovr_palette_base_w)	// ddenlovr mixer chip
-	AM_RANGE( 0xa4, 0xa7 ) AM_WRITE_LEGACY(ddenlovr_palette_mask_w)
-	AM_RANGE( 0xa8, 0xab ) AM_WRITE_LEGACY(ddenlovr_transparency_pen_w)
-	AM_RANGE( 0xac, 0xaf ) AM_WRITE_LEGACY(ddenlovr_transparency_mask_w)
+	AM_RANGE( 0xa0, 0xa3 ) AM_WRITE(ddenlovr_palette_base_w)	// ddenlovr mixer chip
+	AM_RANGE( 0xa4, 0xa7 ) AM_WRITE(ddenlovr_palette_mask_w)
+	AM_RANGE( 0xa8, 0xab ) AM_WRITE(ddenlovr_transparency_pen_w)
+	AM_RANGE( 0xac, 0xaf ) AM_WRITE(ddenlovr_transparency_mask_w)
 	// b0-b3 ?
-	AM_RANGE( 0xb4, 0xb4 ) AM_WRITE_LEGACY(ddenlovr_bgcolor_w)
-	AM_RANGE( 0xb5, 0xb5 ) AM_WRITE_LEGACY(ddenlovr_priority_w)
-	AM_RANGE( 0xb6, 0xb6 ) AM_WRITE_LEGACY(ddenlovr_layer_enable_w)
+	AM_RANGE( 0xb4, 0xb4 ) AM_WRITE(ddenlovr_bgcolor_w)
+	AM_RANGE( 0xb5, 0xb5 ) AM_WRITE(ddenlovr_priority_w)
+	AM_RANGE( 0xb6, 0xb6 ) AM_WRITE(ddenlovr_layer_enable_w)
 	AM_RANGE( 0xb8, 0xb8 ) AM_READ(unk_r)				// ? must be 78 on startup
 	AM_RANGE( 0xc2, 0xc2 ) AM_WRITE(htengoku_rombank_w)		// BANK ROM Select
 	AM_RANGE( 0xc0, 0xc0 ) AM_WRITE(dynax_extra_scrollx_w)	// screen scroll X

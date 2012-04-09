@@ -207,7 +207,6 @@ public:
 	DECLARE_READ8_MEMBER(htengoku_coin_r);
 	DECLARE_WRITE8_MEMBER(htengoku_rombank_w);
 	DECLARE_WRITE8_MEMBER(htengoku_blit_romregion_w);
-	DECLARE_READ8_MEMBER(unk_r);
 	DECLARE_WRITE8_MEMBER(tenkai_ipsel_w);
 	DECLARE_WRITE8_MEMBER(tenkai_ip_w);
 	DECLARE_READ8_MEMBER(tenkai_ip_r);
@@ -266,6 +265,147 @@ public:
 	DECLARE_WRITE8_MEMBER(jantouki_blitter2_rev2_w);
 	DECLARE_WRITE8_MEMBER(hanamai_priority_w);
 	DECLARE_WRITE8_MEMBER(tenkai_priority_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(ddenlovr_special_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(ddenlovj_blitter_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(nettoqc_special_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(mjflove_blitter_r);
+	DECLARE_WRITE8_MEMBER(ddenlovr_bgcolor_w);
+	DECLARE_WRITE8_MEMBER(ddenlovr_bgcolor2_w);
+	DECLARE_WRITE16_MEMBER(ddenlovr16_bgcolor_w);
+	DECLARE_WRITE8_MEMBER(ddenlovr_priority_w);
+	DECLARE_WRITE8_MEMBER(ddenlovr_priority2_w);
+	DECLARE_WRITE16_MEMBER(ddenlovr16_priority_w);
+	DECLARE_WRITE8_MEMBER(ddenlovr_layer_enable_w);
+	DECLARE_WRITE8_MEMBER(ddenlovr_layer_enable2_w);
+	DECLARE_WRITE16_MEMBER(ddenlovr16_layer_enable_w);
+	DECLARE_WRITE8_MEMBER(hanakanz_blitter_reg_w);
+	DECLARE_WRITE8_MEMBER(hanakanz_blitter_data_w);
+	DECLARE_WRITE8_MEMBER(rongrong_blitter_w);
+	DECLARE_WRITE16_MEMBER(ddenlovr_blitter_w);
+	DECLARE_WRITE16_MEMBER(ddenlovr_blitter_irq_ack_w);
+	DECLARE_READ8_MEMBER(rongrong_gfxrom_r);
+	DECLARE_READ16_MEMBER(ddenlovr_gfxrom_r);
+	DECLARE_WRITE16_MEMBER(ddenlovr_coincounter_0_w);
+	DECLARE_WRITE16_MEMBER(ddenlovr_coincounter_1_w);
+	DECLARE_WRITE8_MEMBER(rongrong_palette_w);
+	DECLARE_WRITE16_MEMBER(ddenlovr_palette_w);
+	DECLARE_WRITE8_MEMBER(ddenlovr_palette_base_w);
+	DECLARE_WRITE8_MEMBER(ddenlovr_palette_base2_w);
+	DECLARE_WRITE8_MEMBER(ddenlovr_palette_mask_w);
+	DECLARE_WRITE8_MEMBER(ddenlovr_palette_mask2_w);
+	DECLARE_WRITE8_MEMBER(ddenlovr_transparency_pen_w);
+	DECLARE_WRITE8_MEMBER(ddenlovr_transparency_pen2_w);
+	DECLARE_WRITE8_MEMBER(ddenlovr_transparency_mask_w);
+	DECLARE_WRITE8_MEMBER(ddenlovr_transparency_mask2_w);
+	DECLARE_WRITE16_MEMBER(ddenlovr16_palette_base_w);
+	DECLARE_WRITE16_MEMBER(ddenlovr16_palette_mask_w);
+	DECLARE_WRITE16_MEMBER(ddenlovr16_transparency_pen_w);
+	DECLARE_WRITE16_MEMBER(ddenlovr16_transparency_mask_w);
+	DECLARE_READ8_MEMBER(unk_r);
+	DECLARE_READ16_MEMBER(unk16_r);
+	DECLARE_WRITE16_MEMBER(ddenlovr_select_16_w);
+	DECLARE_WRITE8_MEMBER(ddenlovr_select2_w);
+	DECLARE_WRITE16_MEMBER(ddenlovr_select2_16_w);
+	DECLARE_READ8_MEMBER(rongrong_input2_r);
+	DECLARE_READ16_MEMBER(quiz365_input2_r);
+	DECLARE_WRITE8_MEMBER(rongrong_blitter_busy_w);
+	DECLARE_READ8_MEMBER(rongrong_blitter_busy_r);
+	DECLARE_WRITE16_MEMBER(quiz365_coincounter_w);
+	DECLARE_READ16_MEMBER(quiz365_protection_r);
+	DECLARE_WRITE16_MEMBER(quiz365_protection_w);
+	DECLARE_READ16_MEMBER(ddenlovj_dsw_r);
+	DECLARE_WRITE16_MEMBER(ddenlovj_coincounter_w);
+	DECLARE_READ16_MEMBER(ddenlovrk_protection1_r);
+	DECLARE_READ16_MEMBER(ddenlovrk_protection2_r);
+	DECLARE_WRITE16_MEMBER(ddenlovrk_protection2_w);
+	DECLARE_READ16_MEMBER(nettoqc_input_r);
+	DECLARE_READ16_MEMBER(nettoqc_protection_r);
+	DECLARE_WRITE16_MEMBER(nettoqc_coincounter_w);
+	DECLARE_READ8_MEMBER(rongrong_input_r);
+	DECLARE_WRITE8_MEMBER(rongrong_select_w);
+	DECLARE_READ8_MEMBER(magic_r);
+	DECLARE_WRITE8_MEMBER(mmpanic_rombank_w);
+	DECLARE_WRITE8_MEMBER(mmpanic_soundlatch_w);
+	DECLARE_WRITE8_MEMBER(mmpanic_blitter_w);
+	DECLARE_WRITE8_MEMBER(mmpanic_blitter2_w);
+	DECLARE_WRITE8_MEMBER(mmpanic_leds_w);
+	DECLARE_WRITE8_MEMBER(mmpanic_leds2_w);
+	DECLARE_WRITE8_MEMBER(mmpanic_lockout_w);
+	DECLARE_READ8_MEMBER(mmpanic_link_r);
+	DECLARE_READ8_MEMBER(funkyfig_busy_r);
+	DECLARE_WRITE8_MEMBER(funkyfig_blitter_w);
+	DECLARE_WRITE8_MEMBER(funkyfig_rombank_w);
+	DECLARE_READ8_MEMBER(funkyfig_dsw_r);
+	DECLARE_READ8_MEMBER(funkyfig_coin_r);
+	DECLARE_READ8_MEMBER(funkyfig_key_r);
+	DECLARE_WRITE8_MEMBER(funkyfig_lockout_w);
+	DECLARE_WRITE8_MEMBER(hanakanz_rombank_w);
+	DECLARE_WRITE8_MEMBER(hanakanz_keyb_w);
+	DECLARE_WRITE8_MEMBER(hanakanz_dsw_w);
+	DECLARE_READ8_MEMBER(hanakanz_keyb_r);
+	DECLARE_READ8_MEMBER(hanakanz_dsw_r);
+	DECLARE_READ8_MEMBER(hanakanz_busy_r);
+	DECLARE_READ8_MEMBER(hanakanz_gfxrom_r);
+	DECLARE_WRITE8_MEMBER(hanakanz_coincounter_w);
+	DECLARE_WRITE8_MEMBER(hanakanz_palette_w);
+	DECLARE_READ8_MEMBER(hanakanz_rand_r);
+	DECLARE_WRITE8_MEMBER(mjreach1_protection_w);
+	DECLARE_READ8_MEMBER(mjreach1_protection_r);
+	DECLARE_READ8_MEMBER(mjchuuka_keyb_r);
+	DECLARE_WRITE8_MEMBER(mjchuuka_blitter_w);
+	DECLARE_READ8_MEMBER(mjchuuka_gfxrom_0_r);
+	DECLARE_READ8_MEMBER(mjchuuka_gfxrom_1_r);
+	DECLARE_WRITE8_MEMBER(mjchuuka_palette_w);
+	DECLARE_WRITE8_MEMBER(mjchuuka_coincounter_w);
+	DECLARE_WRITE8_MEMBER(mjmyster_rambank_w);
+	DECLARE_WRITE8_MEMBER(mjmyster_select2_w);
+	DECLARE_READ8_MEMBER(mjmyster_coins_r);
+	DECLARE_READ8_MEMBER(mjmyster_keyb_r);
+	DECLARE_READ8_MEMBER(mjmyster_dsw_r);
+	DECLARE_WRITE8_MEMBER(mjmyster_coincounter_w);
+	DECLARE_WRITE8_MEMBER(mjmyster_blitter_w);
+	DECLARE_WRITE8_MEMBER(hginga_rombank_w);
+	DECLARE_READ8_MEMBER(hginga_protection_r);
+	DECLARE_WRITE8_MEMBER(hginga_input_w);
+	DECLARE_READ8_MEMBER(hginga_coins_r);
+	DECLARE_WRITE8_MEMBER(hginga_80_w);
+	DECLARE_WRITE8_MEMBER(hginga_coins_w);
+	DECLARE_READ8_MEMBER(hginga_input_r);
+	DECLARE_WRITE8_MEMBER(hginga_blitter_w);
+	DECLARE_WRITE8_MEMBER(hgokou_dsw_sel_w);
+	DECLARE_READ8_MEMBER(hgokou_input_r);
+	DECLARE_WRITE8_MEMBER(hgokou_input_w);
+	DECLARE_READ8_MEMBER(hgokou_protection_r);
+	DECLARE_READ8_MEMBER(hgokbang_input_r);
+	DECLARE_WRITE8_MEMBER(hparadis_select_w);
+	DECLARE_READ8_MEMBER(hparadis_input_r);
+	DECLARE_READ8_MEMBER(hparadis_dsw_r);
+	DECLARE_WRITE8_MEMBER(hparadis_coin_w);
+	DECLARE_READ8_MEMBER(mjmywrld_coins_r);
+	DECLARE_READ16_MEMBER(akamaru_protection1_r);
+	DECLARE_WRITE16_MEMBER(akamaru_protection1_w);
+	DECLARE_READ16_MEMBER(akamaru_protection2_r);
+	DECLARE_READ16_MEMBER(akamaru_dsw_r);
+	DECLARE_READ16_MEMBER(akamaru_blitter_r);
+	DECLARE_READ16_MEMBER(akamaru_e0010d_r);
+	DECLARE_WRITE8_MEMBER(mjflove_rombank_w);
+	DECLARE_READ8_MEMBER(mjflove_protection_r);
+	DECLARE_READ8_MEMBER(mjflove_keyb_r);
+	DECLARE_WRITE8_MEMBER(mjflove_blitter_w);
+	DECLARE_WRITE8_MEMBER(mjflove_coincounter_w);
+	DECLARE_WRITE8_MEMBER(jongtei_dsw_keyb_w);
+	DECLARE_READ8_MEMBER(jongtei_busy_r);
+	DECLARE_READ8_MEMBER(sryudens_keyb_r);
+	DECLARE_WRITE8_MEMBER(sryudens_coincounter_w);
+	DECLARE_WRITE8_MEMBER(sryudens_rambank_w);
+	DECLARE_READ8_MEMBER(daimyojn_keyb1_r);
+	DECLARE_READ8_MEMBER(daimyojn_keyb2_r);
+	DECLARE_WRITE8_MEMBER(daimyojn_protection_w);
+	DECLARE_READ8_MEMBER(daimyojn_protection_r);
+	DECLARE_READ8_MEMBER(momotaro_protection_r);
+	DECLARE_WRITE8_MEMBER(daimyojn_palette_sel_w);
+	DECLARE_WRITE8_MEMBER(daimyojn_blitter_data_palette_w);
+	DECLARE_READ8_MEMBER(daimyojn_year_hack_r);
 };
 
 //----------- defined in drivers/dynax.c -----------
@@ -276,14 +416,6 @@ void mjelctrn_update_irq(running_machine &machine);
 void neruton_update_irq(running_machine &machine);
 
 //----------- defined in video/dynax.c -----------
-
-
-
-
-
-
-
-
 VIDEO_START( hanamai );
 VIDEO_START( hnoridur );
 VIDEO_START( mcnpshnt );
@@ -306,14 +438,6 @@ PALETTE_INIT( sprtmtch );
 
 
 //----------- defined in drivers/ddenlovr.c -----------
-
-WRITE8_HANDLER( ddenlovr_bgcolor_w );
-WRITE8_HANDLER( ddenlovr_priority_w );
-WRITE8_HANDLER( ddenlovr_layer_enable_w );
-WRITE8_HANDLER( ddenlovr_palette_base_w );
-WRITE8_HANDLER( ddenlovr_palette_mask_w );
-WRITE8_HANDLER( ddenlovr_transparency_pen_w );
-WRITE8_HANDLER( ddenlovr_transparency_mask_w );
 
 VIDEO_START(ddenlovr);
 SCREEN_UPDATE_IND16(ddenlovr);
