@@ -363,10 +363,9 @@ CCOMFLAGS += -DNO_SDL_GLEXT
 # Remove libSDLmain, as its symbols conflict with SDLMain_tmpl.m
 LIBS += `sdl-config --libs | sed 's/-lSDLmain//'` -lpthread
 DEFS += -DMACOSX_USE_LIBSDL
-endif
+endif   # MACOSX_USE_LIBSDL
 
 endif   # Mac OS X
-else
 
 DEFS += -DSDLMAME_UNIX
 DEBUGOBJS = $(SDLOBJ)/debugwin.o $(SDLOBJ)/dview.o $(SDLOBJ)/debug-sup.o $(SDLOBJ)/debug-intf.o
