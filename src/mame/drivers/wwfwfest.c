@@ -174,16 +174,16 @@ WRITE16_MEMBER(wwfwfest_state::wwfwfest_soundwrite)
 *******************************************************************************/
 
 /* DIPs are spread across the other input ports */
-static CUSTOM_INPUT( dsw_3f_r )
+CUSTOM_INPUT_MEMBER(wwfwfest_state::dsw_3f_r)
 {
 	const char *tag = (const char *)param;
-	return input_port_read(field.machine(), tag) & 0x3f;
+	return input_port_read(machine(), tag) & 0x3f;
 }
 
-static CUSTOM_INPUT( dsw_c0_r )
+CUSTOM_INPUT_MEMBER(wwfwfest_state::dsw_c0_r)
 {
 	const char *tag = (const char *)param;
-	return (input_port_read(field.machine(), tag) & 0xc0) >> 6;
+	return (input_port_read(machine(), tag) & 0xc0) >> 6;
 }
 
 
@@ -201,7 +201,7 @@ static INPUT_PORTS_START( wwfwfest )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x3000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(dsw_c0_r, "DSW2")
+	PORT_BIT( 0x3000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, wwfwfest_state,dsw_c0_r, "DSW2")
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -214,7 +214,7 @@ static INPUT_PORTS_START( wwfwfest )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x3f00, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(dsw_3f_r, "DSW2")
+	PORT_BIT( 0x3f00, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, wwfwfest_state,dsw_3f_r, "DSW2")
 
 	PORT_START("P3")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(3)
@@ -225,7 +225,7 @@ static INPUT_PORTS_START( wwfwfest )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3)
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START3 )
-	PORT_BIT( 0x3f00, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(dsw_3f_r, "DSW1")
+	PORT_BIT( 0x3f00, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, wwfwfest_state,dsw_3f_r, "DSW1")
 
 	PORT_START("P4")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(4)
@@ -236,7 +236,7 @@ static INPUT_PORTS_START( wwfwfest )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(4)
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START4 )
-	PORT_BIT( 0x0300, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(dsw_c0_r, "DSW1")
+	PORT_BIT( 0x0300, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, wwfwfest_state,dsw_c0_r, "DSW1")
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_VBLANK )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )

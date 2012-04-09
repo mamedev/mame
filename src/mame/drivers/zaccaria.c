@@ -338,10 +338,9 @@ static ADDRESS_MAP_START( sound_map_2, AS_PROGRAM, 8, zaccaria_state )
 ADDRESS_MAP_END
 
 
-static CUSTOM_INPUT( acs_r )
+CUSTOM_INPUT_MEMBER(zaccaria_state::acs_r)
 {
-	zaccaria_state *state = field.machine().driver_data<zaccaria_state>();
-	return (state->m_acs & 0x08) ? 1 : 0;
+	return (m_acs & 0x08) ? 1 : 0;
 }
 
 static INPUT_PORTS_START( monymony )
@@ -449,7 +448,7 @@ static INPUT_PORTS_START( monymony )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(acs_r, NULL)	/* "ACS" - from pin 13 of a PIA on the sound board */
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, zaccaria_state,acs_r, NULL)	/* "ACS" - from pin 13 of a PIA on the sound board */
 	/* other bits come from a protection device */
 INPUT_PORTS_END
 

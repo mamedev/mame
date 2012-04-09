@@ -646,16 +646,15 @@ WRITE16_MEMBER(toaplan2_state::toaplan2_hd647180_cpu_w)
 }
 
 
-static CUSTOM_INPUT( c2map_r )
+CUSTOM_INPUT_MEMBER(toaplan2_state::c2map_r)
 {
-	toaplan2_state *state = field.machine().driver_data<toaplan2_state>();
 
 	// For Teki Paki hardware
 	// bit 4 high signifies secondary CPU is ready
 	// bit 5 is tested low before V-Blank bit ???
-	state->m_mcu_data = 0xff;
+	m_mcu_data = 0xff;
 
-	return (state->m_mcu_data == 0xff) ? 0x01 : 0x00;
+	return (m_mcu_data == 0xff) ? 0x01 : 0x00;
 }
 
 
@@ -1673,7 +1672,7 @@ static INPUT_PORTS_START( tekipaki )
 //  PORT_DIPSETTING(        0x000d, DEF_STR( Japan ) )
 //  PORT_DIPSETTING(        0x000e, DEF_STR( Japan ) )
 	PORT_DIPSETTING(		0x000f, "Japan (Distributed by Tecmo)" )
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(c2map_r, NULL)
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, toaplan2_state,c2map_r, NULL)
 INPUT_PORTS_END
 
 
@@ -2019,7 +2018,7 @@ static INPUT_PORTS_START( whoopee )
 	PORT_INCLUDE( pipibibs )
 
 	PORT_MODIFY("JMPR")
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(c2map_r, NULL)	// bit 0x10 sound ready
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, toaplan2_state,c2map_r, NULL)	// bit 0x10 sound ready
 INPUT_PORTS_END
 
 

@@ -148,6 +148,8 @@ public:
 	DECLARE_WRITE16_MEMBER(cave_vram_1_8x8_w);
 	DECLARE_WRITE16_MEMBER(cave_vram_2_8x8_w);
 	DECLARE_WRITE16_MEMBER(cave_vram_3_8x8_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(korokoro_hopper_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(tjumpman_hopper_r);
 };
 
 /*----------- defined in video/cave.c -----------*/

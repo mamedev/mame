@@ -42,6 +42,7 @@ public:
 	DECLARE_WRITE16_MEMBER(madmax_blitter_vidparam_w);
 	DECLARE_WRITE16_MEMBER(madmax_blitter_unknown_w);
 	DECLARE_READ16_MEMBER(madmax_blitter_vidparam_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(sound_latch_state_r);
 };
 
 

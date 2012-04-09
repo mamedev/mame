@@ -72,6 +72,11 @@ public:
 	DECLARE_WRITE8_MEMBER(montecar_drone_reset_w);
 	DECLARE_WRITE8_MEMBER(steer_reset_w);
 	DECLARE_WRITE8_MEMBER(crash_reset_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(steer_dir_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(steer_flag_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(skid_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(crash_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(gear_r);
 };
 
 

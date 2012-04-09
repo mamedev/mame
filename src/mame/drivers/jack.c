@@ -78,12 +78,11 @@ WRITE8_MEMBER(jack_state::joinem_misc_w)
 	m_joinem_snd_bit = data & 1;
 }
 
-static CUSTOM_INPUT( sound_check_r )
+CUSTOM_INPUT_MEMBER(jack_state::sound_check_r)
 {
-	jack_state *state = field.machine().driver_data<jack_state>();
 	UINT8 ret = 0;
 
-	if ((input_port_read(field.machine(), "IN2") & 0x80) && !state->m_joinem_snd_bit)
+	if ((input_port_read(machine(), "IN2") & 0x80) && !m_joinem_snd_bit)
 		ret = 1;
 
 	return ret;
@@ -574,7 +573,7 @@ static INPUT_PORTS_START( joinem )
 	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x00, "SW2:!3" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x00, "SW2:!4" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x00, "SW2:!5" )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(sound_check_r, NULL) // sound check
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, jack_state,sound_check_r, NULL) // sound check
 	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x00, "SW2:!7" )
 	PORT_DIPNAME( 0x80, 0x00, "Infinite Lives" )		PORT_DIPLOCATION("SW2:!8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )

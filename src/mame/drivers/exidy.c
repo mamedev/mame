@@ -155,22 +155,21 @@ Fax                  1982  6502   FXL, FLA
  *
  *************************************/
 
-static CUSTOM_INPUT( teetert_input_r )
+CUSTOM_INPUT_MEMBER(exidy_state::teetert_input_r)
 {
-	exidy_state *state = field.machine().driver_data<exidy_state>();
-	UINT8 dial = input_port_read(field.machine(), "DIAL");
+	UINT8 dial = input_port_read(machine(), "DIAL");
 	int result = 0;
 
-	result = (dial != state->m_last_dial) << 4;
+	result = (dial != m_last_dial) << 4;
 	if (result != 0)
 	{
-		if (((dial - state->m_last_dial) & 0xff) < 0x80)
+		if (((dial - m_last_dial) & 0xff) < 0x80)
 		{
 			result |= 1;
-			state->m_last_dial++;
+			m_last_dial++;
 		}
 		else
-			state->m_last_dial--;
+			m_last_dial--;
 	}
 
 	return result;
@@ -603,7 +602,7 @@ static INPUT_PORTS_START( teetert )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x44, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(teetert_input_r, NULL)
+	PORT_BIT( 0x44, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, exidy_state,teetert_input_r, NULL)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )

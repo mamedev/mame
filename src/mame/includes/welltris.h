@@ -27,6 +27,7 @@ public:
 	DECLARE_WRITE16_MEMBER(welltris_scrollreg_w);
 	DECLARE_WRITE16_MEMBER(welltris_charvideoram_w);
 	void setbank(int num, int bank);
+	DECLARE_CUSTOM_INPUT_MEMBER(pending_sound_r);
 };
 
 

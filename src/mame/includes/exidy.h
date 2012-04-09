@@ -45,6 +45,7 @@ public:
 	bitmap_ind16 m_motion_object_2_clip;
 	DECLARE_WRITE8_MEMBER(fax_bank_select_w);
 	DECLARE_READ8_MEMBER(exidy_interrupt_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(teetert_input_r);
 };
 
 

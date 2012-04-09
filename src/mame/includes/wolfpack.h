@@ -47,6 +47,7 @@ public:
 	DECLARE_WRITE8_MEMBER(wolfpack_ship_pic_w);
 	DECLARE_WRITE8_MEMBER(wolfpack_torpedo_h_w);
 	DECLARE_WRITE8_MEMBER(wolfpack_torpedo_v_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(wolfpack_dial_r);
 };
 
 

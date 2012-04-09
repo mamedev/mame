@@ -20,6 +20,7 @@ public:
 	DECLARE_WRITE8_MEMBER(bzone_coin_counter_w);
 	DECLARE_READ8_MEMBER(analog_data_r);
 	DECLARE_WRITE8_MEMBER(analog_select_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(clock_r);
 };
 
 

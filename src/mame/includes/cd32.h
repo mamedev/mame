@@ -25,6 +25,7 @@ public:
 	int m_cd32_shifter[2];
 	void (*m_input_hack)(running_machine &machine);
 	int m_oldstate[2];
+	DECLARE_CUSTOM_INPUT_MEMBER(cubo_input);
 };
 
 /*----------- defined in machine/cd32.c -----------*/

@@ -340,12 +340,11 @@ WRITE16_MEMBER(polepos_state::polepos_z8002_nvi_enable_w)
 }
 
 
-static CUSTOM_INPUT( high_port_r ) { return input_port_read(field.machine(), (const char *)param) >> 4; }
-static CUSTOM_INPUT( low_port_r ) { return input_port_read(field.machine(), (const char *)param) & 0x0f; }
-static CUSTOM_INPUT( auto_start_r )
+CUSTOM_INPUT_MEMBER(polepos_state::high_port_r){ return input_port_read(field.machine(), (const char *)param) >> 4; }
+CUSTOM_INPUT_MEMBER(polepos_state::low_port_r){ return input_port_read(field.machine(), (const char *)param) & 0x0f; }
+CUSTOM_INPUT_MEMBER(polepos_state::auto_start_r)
 {
-	polepos_state *state = field.machine().driver_data<polepos_state>();
-	return state->m_auto_start_mask;
+	return m_auto_start_mask;
 }
 
 static WRITE8_DEVICE_HANDLER( out_0 )
@@ -533,7 +532,7 @@ static INPUT_PORTS_START( polepos )
 	PORT_START("IN0L")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Gear Change") PORT_CODE(KEYCODE_SPACE) POLEPOS_TOGGLE /* Gear */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(auto_start_r, NULL)	// start 1, program controlled
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, polepos_state,auto_start_r, NULL)	// start 1, program controlled
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN0H")
@@ -567,7 +566,7 @@ static INPUT_PORTS_START( polepos )
 	PORT_DIPSETTING(	0x00, "4" )
 
 	PORT_START("DSWA_HI")
-	PORT_BIT( 0x0f, 0x00, IPT_SPECIAL ) PORT_CUSTOM(high_port_r, "DSWA")
+	PORT_BIT( 0x0f, 0x00, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, polepos_state,high_port_r, "DSWA")
 
 	PORT_START("DSWB")
 	PORT_DIPNAME( 0x07, 0x07, "Extended Rank" )
@@ -596,7 +595,7 @@ static INPUT_PORTS_START( polepos )
 	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
 
 	PORT_START("DSWB_HI")
-	PORT_BIT( 0x0f, 0x00, IPT_SPECIAL ) PORT_CUSTOM(high_port_r, "DSWB")
+	PORT_BIT( 0x0f, 0x00, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, polepos_state,high_port_r, "DSWB")
 
 	PORT_START("BRAKE")
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_MINMAX(0,0x90) PORT_SENSITIVITY(100) PORT_KEYDELTA(16)
@@ -675,10 +674,10 @@ static INPUT_PORTS_START( topracern )
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 
 	PORT_START("IN0L")
-	PORT_BIT( 0x0f, 0x00, IPT_SPECIAL ) PORT_CUSTOM(low_port_r, "IN0")
+	PORT_BIT( 0x0f, 0x00, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, polepos_state,low_port_r, "IN0")
 
 	PORT_START("IN0H")
-	PORT_BIT( 0x0f, 0x00, IPT_SPECIAL ) PORT_CUSTOM(high_port_r, "IN0")
+	PORT_BIT( 0x0f, 0x00, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, polepos_state,high_port_r, "IN0")
 
 	PORT_START("DSWA")
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) )
@@ -705,7 +704,7 @@ static INPUT_PORTS_START( topracern )
 	PORT_DIPSETTING(	0x00, "4" )
 
 	PORT_START("DSWA_HI")
-	PORT_BIT( 0x0f, 0x00, IPT_SPECIAL ) PORT_CUSTOM(high_port_r, "DSWA")
+	PORT_BIT( 0x0f, 0x00, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, polepos_state,high_port_r, "DSWA")
 
 	/* FIXME: these dips don't work and may not even exist on this bootleg */
 	PORT_START("DSWB")
@@ -735,7 +734,7 @@ static INPUT_PORTS_START( topracern )
 	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
 
 	PORT_START("DSWB_HI")
-	PORT_BIT( 0x0f, 0x00, IPT_SPECIAL ) PORT_CUSTOM(high_port_r, "DSWB")
+	PORT_BIT( 0x0f, 0x00, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, polepos_state,high_port_r, "DSWB")
 
 	PORT_START("BRAKE")
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_MINMAX(0,0x90) PORT_SENSITIVITY(100) PORT_KEYDELTA(16)

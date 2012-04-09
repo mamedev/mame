@@ -936,23 +936,22 @@ static READ32_HANDLER( spi_controls2_r )
 	return 0xffffffff;
 }
 
-static CUSTOM_INPUT( ejsakura_keyboard_r )
+CUSTOM_INPUT_MEMBER(seibuspi_state::ejsakura_keyboard_r)
 {
-	seibuspi_state *state = field.machine().driver_data<seibuspi_state>();
-	switch(state->m_ejsakura_input_port)
+	switch(m_ejsakura_input_port)
 	{
 		case 0x01:
-			return input_port_read(field.machine(), "INPUT01");
+			return input_port_read(machine(), "INPUT01");
 		case 0x02:
-			return input_port_read(field.machine(), "INPUT02");
+			return input_port_read(machine(), "INPUT02");
 		case 0x04:
-			return input_port_read(field.machine(), "INPUT04");
+			return input_port_read(machine(), "INPUT04");
 		case 0x08:
-			return input_port_read(field.machine(), "INPUT08");
+			return input_port_read(machine(), "INPUT08");
 		case 0x10:
-			return input_port_read(field.machine(), "INPUT10");
+			return input_port_read(machine(), "INPUT10");
 		default:
-			return input_port_read(field.machine(), "SYSTEM");
+			return input_port_read(machine(), "SYSTEM");
 	}
 	return 0xffffffff;
 }
@@ -1295,10 +1294,10 @@ INPUT_PORTS_END
    Start - 000111 port 0
 */
 
-static CUSTOM_INPUT( ejanhs_encode )
+CUSTOM_INPUT_MEMBER(seibuspi_state::ejanhs_encode)
 {
 	static const UINT8 encoding[] = { 0x02, 0x10, 0x03, 0x18, 0x04, 0x20, 0x05, 0x28, 0x06, 0x30, 0x07 };
-	input_port_value state = input_port_read(field.machine(), (const char *)param);
+	input_port_value state = input_port_read(machine(), (const char *)param);
 	int bit;
 
 	for (bit = 0; bit < ARRAY_LENGTH(encoding); bit++)
@@ -1309,8 +1308,8 @@ static CUSTOM_INPUT( ejanhs_encode )
 
 static INPUT_PORTS_START( spi_ejanhs )
 	PORT_START("INPUTS")
-	PORT_BIT( 0x0000003f, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(ejanhs_encode, "IN0BITS")
-	PORT_BIT( 0x00003f00, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(ejanhs_encode, "IN1BITS")
+	PORT_BIT( 0x0000003f, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, seibuspi_state,ejanhs_encode, "IN0BITS")
+	PORT_BIT( 0x00003f00, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, seibuspi_state,ejanhs_encode, "IN1BITS")
 	PORT_BIT( 0xffff0000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("SYSTEM")
@@ -1358,7 +1357,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( spi_ejsakura )
 	PORT_START("INPUTS")
-	PORT_BIT( 0xffffffff, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_CUSTOM(ejsakura_keyboard_r, NULL)
+	PORT_BIT( 0xffffffff, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, seibuspi_state,ejsakura_keyboard_r, NULL)
 
 	PORT_START("INPUT01")
 	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_UNKNOWN )

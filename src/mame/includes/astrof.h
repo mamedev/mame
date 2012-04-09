@@ -48,6 +48,9 @@ public:
 	DECLARE_READ8_MEMBER(abattle_coin_prot_r);
 	DECLARE_READ8_MEMBER(afire_coin_prot_r);
 	DECLARE_READ8_MEMBER(tomahawk_protection_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(astrof_p1_controls_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(astrof_p2_controls_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(tomahawk_controls_r);
 };
 
 /*----------- defined in audio/astrof.c -----------*/

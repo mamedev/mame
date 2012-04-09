@@ -65,6 +65,7 @@ public:
 	DECLARE_WRITE8_MEMBER(to_main_w);
 	DECLARE_WRITE32_MEMBER(ms32_brightness_w);
 	DECLARE_WRITE32_MEMBER(ms32_gfxctrl_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(mahjong_ctrl_r);
 };
 
 

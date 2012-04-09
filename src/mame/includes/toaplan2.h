@@ -96,6 +96,7 @@ public:
 	DECLARE_WRITE16_MEMBER(batrider_textdata_dma_w);
 	DECLARE_WRITE16_MEMBER(batrider_unknown_dma_w);
 	DECLARE_WRITE16_MEMBER(batrider_objectbank_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(c2map_r);
 };
 
 /*----------- defined in video/toaplan2.c -----------*/

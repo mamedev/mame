@@ -159,9 +159,9 @@ Pin #11(+) | | R               |
  *
  *************************************/
 
-static CUSTOM_INPUT( cclownz_paddle )
+CUSTOM_INPUT_MEMBER(lethalj_state::cclownz_paddle)
 {
-	int value = input_port_read(field.machine(), "PADDLE");
+	int value = input_port_read(machine(), "PADDLE");
 	return ((value << 4) & 0xf00) | (value & 0x00f);
 }
 
@@ -541,7 +541,7 @@ static INPUT_PORTS_START( cclownz )
 	PORT_DIPSETTING(      0x0000, "3000" )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x0f0f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(cclownz_paddle, NULL)
+	PORT_BIT( 0x0f0f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, lethalj_state,cclownz_paddle, NULL)
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("ticket", ticket_dispenser_line_r)
 	PORT_BIT( 0x0060, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START1 )

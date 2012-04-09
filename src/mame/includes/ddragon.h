@@ -60,6 +60,7 @@ public:
 	device_t *m_adpcm_2;
 	DECLARE_WRITE8_MEMBER(ddragon_bgvideoram_w);
 	DECLARE_WRITE8_MEMBER(ddragon_fgvideoram_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(sub_cpu_busy);
 };
 
 

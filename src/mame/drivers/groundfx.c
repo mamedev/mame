@@ -124,16 +124,14 @@ static const eeprom_interface groundfx_eeprom_interface =
             GAME INPUTS
 **********************************************************/
 
-static CUSTOM_INPUT( frame_counter_r )
+CUSTOM_INPUT_MEMBER(groundfx_state::frame_counter_r)
 {
-	groundfx_state *state = field.machine().driver_data<groundfx_state>();
-	return state->m_frame_counter;
+	return m_frame_counter;
 }
 
-static CUSTOM_INPUT( coin_word_r )
+CUSTOM_INPUT_MEMBER(groundfx_state::coin_word_r)
 {
-	groundfx_state *state = field.machine().driver_data<groundfx_state>();
-	return state->m_coin_word;
+	return m_coin_word;
 }
 
 WRITE32_MEMBER(groundfx_state::groundfx_input_w)
@@ -240,7 +238,7 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( groundfx )
 	PORT_START("BUTTONS")
-	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(frame_counter_r, NULL)
+	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, groundfx_state,frame_counter_r, NULL)
 	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -272,7 +270,7 @@ static INPUT_PORTS_START( groundfx )
 	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(coin_word_r, NULL)
+	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, groundfx_state,coin_word_r, NULL)
 
 	PORT_START("AN0")	/* IN 2, steering wheel */
 	PORT_BIT( 0xff, 0x7f, IPT_AD_STICK_X ) PORT_SENSITIVITY(25) PORT_KEYDELTA(15) PORT_REVERSE PORT_PLAYER(1)

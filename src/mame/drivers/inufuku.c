@@ -111,10 +111,9 @@ WRITE8_MEMBER(inufuku_state::inufuku_soundrombank_w)
 
 ******************************************************************************/
 
-static CUSTOM_INPUT( soundflag_r )
+CUSTOM_INPUT_MEMBER(inufuku_state::soundflag_r)
 {
-	inufuku_state *state = field.machine().driver_data<inufuku_state>();
-	UINT16 soundflag = state->m_pending_command ? 0 : 1;
+	UINT16 soundflag = m_pending_command ? 0 : 1;
 
 	return soundflag;
 }
@@ -232,7 +231,7 @@ static INPUT_PORTS_START( inufuku )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(soundflag_r, NULL)	// pending sound command
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, inufuku_state,soundflag_r, NULL)	// pending sound command
 
 	PORT_START( "EEPROMOUT" )
 	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_device, write_bit)

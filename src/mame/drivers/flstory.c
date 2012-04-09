@@ -117,12 +117,11 @@ static ADDRESS_MAP_START( onna34ro_map, AS_PROGRAM, 8, flstory_state )
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_BASE(m_workram) /* work RAM */
 ADDRESS_MAP_END
 
-static CUSTOM_INPUT( victnine_mcu_status_bit01_r )
+CUSTOM_INPUT_MEMBER(flstory_state::victnine_mcu_status_bit01_r)
 {
-	flstory_state *state = field.machine().driver_data<flstory_state>();
-	address_space *space = state->m_maincpu->memory().space(AS_PROGRAM);
+	address_space *space = m_maincpu->memory().space(AS_PROGRAM);
 
-	return (state->victnine_mcu_status_r(*space, 0) & 3);
+	return (victnine_mcu_status_r(*space, 0) & 3);
 }
 
 static ADDRESS_MAP_START( victnine_map, AS_PROGRAM, 8, flstory_state )
@@ -785,7 +784,7 @@ static INPUT_PORTS_START( victnine )
 	/* bits 0,1 are MCU related:
         - bit 0: mcu is ready to receive data from main cpu
         - bit 1: mcu has sent data to the main cpu       */
-	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(victnine_mcu_status_bit01_r, NULL)
+	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, flstory_state,victnine_mcu_status_bit01_r, NULL)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 )
@@ -928,7 +927,7 @@ static INPUT_PORTS_START( rumba )
 	/* bits 0,1 are MCU related:
         - bit 0: mcu is ready to receive data from main cpu
         - bit 1: mcu has sent data to the main cpu       */
-	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(victnine_mcu_status_bit01_r, NULL)
+	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, flstory_state,victnine_mcu_status_bit01_r, NULL)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )

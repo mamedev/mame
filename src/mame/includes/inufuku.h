@@ -39,6 +39,7 @@ public:
 	DECLARE_WRITE16_MEMBER(inufuku_bg_videoram_w);
 	DECLARE_READ16_MEMBER(inufuku_tx_videoram_r);
 	DECLARE_WRITE16_MEMBER(inufuku_tx_videoram_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(soundflag_r);
 };
 
 

@@ -53,6 +53,8 @@ public:
 	DECLARE_WRITE32_MEMBER(sprite_dma_start_w);
 	DECLARE_WRITE32_MEMBER(video_dma_length_w);
 	DECLARE_WRITE32_MEMBER(video_dma_address_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(ejsakura_keyboard_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(ejanhs_encode);
 };
 
 

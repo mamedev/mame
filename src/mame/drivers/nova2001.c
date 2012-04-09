@@ -132,10 +132,9 @@ e000 - e7ff        R/W      Work RAM
  *************************************/
 
 
-static CUSTOM_INPUT( ninjakun_io_A002_ctrl_r )
+CUSTOM_INPUT_MEMBER(nova2001_state::ninjakun_io_A002_ctrl_r)
 {
-	nova2001_state *state = field.machine().driver_data<nova2001_state>();
-	return state->m_ninjakun_io_a002_ctrl;
+	return m_ninjakun_io_a002_ctrl;
 }
 
 WRITE8_MEMBER(nova2001_state::ninjakun_cpu1_io_A002_w)
@@ -383,7 +382,7 @@ static INPUT_PORTS_START( ninjakun )
 
 	PORT_START("IN2")	/* 0xa002 */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_VBLANK )
-	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(ninjakun_io_A002_ctrl_r, NULL)
+	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, nova2001_state,ninjakun_io_A002_ctrl_r, NULL)
 
 	PORT_START("DSW1") // printed "SW 2"
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) )  PORT_DIPLOCATION("SW2:1")

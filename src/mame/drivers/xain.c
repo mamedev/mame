@@ -271,10 +271,9 @@ WRITE8_MEMBER(xain_state::xain_68705_w)
 		cputag_set_input_line(machine(), "mcu", 0, ASSERT_LINE);
 }
 
-static CUSTOM_INPUT( xain_vblank_r )
+CUSTOM_INPUT_MEMBER(xain_state::xain_vblank_r)
 {
-	xain_state *state = field.machine().driver_data<xain_state>();
-	return state->m_vblank;
+	return m_vblank;
 }
 
 
@@ -354,16 +353,15 @@ WRITE8_MEMBER(xain_state::xain_68705_ddr_c_w)
 	m_ddr_c = data;
 }
 
-static CUSTOM_INPUT( mcu_status_r )
+CUSTOM_INPUT_MEMBER(xain_state::mcu_status_r)
 {
-	xain_state *state = field.machine().driver_data<xain_state>();
 	UINT8 res = 0;
 
-	if (field.machine().device("mcu") != NULL)
+	if (machine().device("mcu") != NULL)
 	{
-		if (state->m_mcu_ready == 1)
+		if (m_mcu_ready == 1)
 			res |= 0x01;
-		if (state->m_mcu_accept == 1)
+		if (m_mcu_accept == 1)
 			res |= 0x02;
 	}
 	else
@@ -516,8 +514,8 @@ static INPUT_PORTS_START( xsleena )
 	PORT_START("VBLANK")
 	PORT_BIT( 0x03, IP_ACTIVE_LOW,  IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_COIN3 )
-	PORT_BIT( 0x18, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_CUSTOM(mcu_status_r, NULL)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(xain_vblank_r, NULL)	/* VBLANK */
+	PORT_BIT( 0x18, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, xain_state,mcu_status_r, NULL)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, xain_state,xain_vblank_r, NULL)	/* VBLANK */
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW,  IPT_UNUSED )
 INPUT_PORTS_END
 

@@ -41,6 +41,7 @@ public:
 	DECLARE_WRITE16_MEMBER(sound_irq_w);
 	DECLARE_WRITE16_MEMBER(xmen_18fa00_w);
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(xmen_frame_r);
 };
 
 /*----------- defined in video/xmen.c -----------*/

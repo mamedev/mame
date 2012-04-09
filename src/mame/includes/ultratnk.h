@@ -28,6 +28,8 @@ public:
 	DECLARE_WRITE8_MEMBER(ultratnk_led_2_w);
 	DECLARE_WRITE8_MEMBER(ultratnk_lockout_w);
 	DECLARE_WRITE8_MEMBER(ultratnk_video_ram_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(get_collision);
+	DECLARE_CUSTOM_INPUT_MEMBER(get_joystick);
 };
 
 

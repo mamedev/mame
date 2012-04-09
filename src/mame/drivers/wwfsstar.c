@@ -271,11 +271,10 @@ static TIMER_DEVICE_CALLBACK( wwfsstar_scanline )
 	}
 }
 
-static CUSTOM_INPUT( wwfsstar_vblank_r )
+CUSTOM_INPUT_MEMBER(wwfsstar_state::wwfsstar_vblank_r)
 {
-	wwfsstar_state *state = field.machine().driver_data<wwfsstar_state>();
 
-	return state->m_vblank;
+	return m_vblank;
 }
 
 /*******************************************************************************
@@ -308,7 +307,7 @@ static INPUT_PORTS_START( wwfsstar )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START2 ) PORT_NAME("Button B (1P VS 2P - Buy-in)")
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(wwfsstar_vblank_r, NULL)	/* VBlank */
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, wwfsstar_state,wwfsstar_vblank_r, NULL)	/* VBlank */
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_SERVICE1 )

@@ -129,6 +129,13 @@ public:
 	DECLARE_WRITE8_MEMBER(gwara_sp_scroll_msb_w);
 	DECLARE_WRITE8_MEMBER(tdfever_sp_scroll_msb_w);
 	DECLARE_WRITE8_MEMBER(tdfever_spriteram_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(marvins_sound_busy);
+	DECLARE_CUSTOM_INPUT_MEMBER(snk_sound_busy);
+	DECLARE_CUSTOM_INPUT_MEMBER(gwar_rotary);
+	DECLARE_CUSTOM_INPUT_MEMBER(gwarb_rotary);
+	DECLARE_CUSTOM_INPUT_MEMBER(countryc_trackball_x);
+	DECLARE_CUSTOM_INPUT_MEMBER(countryc_trackball_y);
+	DECLARE_CUSTOM_INPUT_MEMBER(snk_bonus_r);
 };
 
 

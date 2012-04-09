@@ -355,10 +355,9 @@ static void irq_handler( device_t *device, int irq )
  *
  *************************************/
 
-static CUSTOM_INPUT( sub_cpu_busy )
+CUSTOM_INPUT_MEMBER(ddragon_state::sub_cpu_busy)
 {
-	ddragon_state *state = field.machine().driver_data<ddragon_state>();
-	return state->m_dd_sub_cpu_busy;
+	return m_dd_sub_cpu_busy;
 }
 
 
@@ -707,7 +706,7 @@ static INPUT_PORTS_START( ddragon )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_VBLANK )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(sub_cpu_busy, NULL)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, ddragon_state,sub_cpu_busy, NULL)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )

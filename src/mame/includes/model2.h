@@ -69,6 +69,9 @@ public:
 	bitmap_rgb32 m_sys24_bitmap;
 
 	required_device<cpu_device> m_maincpu;
+	DECLARE_CUSTOM_INPUT_MEMBER(_1c00000_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(_1c0001c_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(rchase2_devices_r);
 };
 
 

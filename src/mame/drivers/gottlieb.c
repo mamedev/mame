@@ -290,13 +290,12 @@ static MACHINE_RESET( gottlieb )
  *
  *************************************/
 
-static CUSTOM_INPUT( analog_delta_r )
+CUSTOM_INPUT_MEMBER(gottlieb_state::analog_delta_r)
 {
-	gottlieb_state *state = field.machine().driver_data<gottlieb_state>();
 	const char *string = (const char *)param;
 	int which = string[0] - '0';
 
-	return input_port_read(field.machine(), &string[1]) - state->m_track[which];
+	return input_port_read(machine(), &string[1]) - m_track[which];
 }
 
 
@@ -308,11 +307,10 @@ WRITE8_MEMBER(gottlieb_state::gottlieb_analog_reset_w)
 }
 
 
-static CUSTOM_INPUT( stooges_joystick_r )
+CUSTOM_INPUT_MEMBER(gottlieb_state::stooges_joystick_r)
 {
-	gottlieb_state *state = field.machine().driver_data<gottlieb_state>();
 	static const char *const joyport[] = { "P2JOY", "P3JOY", "P1JOY", NULL };
-	return (joyport[state->m_joystick_select & 3] != NULL) ? input_port_read(field.machine(), joyport[state->m_joystick_select & 3]) : 0xff;
+	return (joyport[m_joystick_select & 3] != NULL) ? input_port_read(machine(), joyport[m_joystick_select & 3]) : 0xff;
 }
 
 
@@ -778,10 +776,10 @@ static INPUT_PORTS_START( reactor )
 	PORT_BIT ( 0xfc, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("IN2")	/* trackball H */
-	PORT_BIT( 0xff, 0, IPT_SPECIAL ) PORT_CUSTOM(analog_delta_r, "0TRACKX")
+	PORT_BIT( 0xff, 0, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, gottlieb_state,analog_delta_r, "0TRACKX")
 
 	PORT_START("IN3")	/* trackball V */
-	PORT_BIT( 0xff, 0, IPT_SPECIAL ) PORT_CUSTOM(analog_delta_r, "1TRACKY")
+	PORT_BIT( 0xff, 0, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, gottlieb_state,analog_delta_r, "1TRACKY")
 
 	PORT_START("IN4")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
@@ -989,10 +987,10 @@ static INPUT_PORTS_START( argusg )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("IN2")	/* trackball H */
-	PORT_BIT( 0xff, 0, IPT_SPECIAL ) PORT_CUSTOM(analog_delta_r, "0TRACKX")
+	PORT_BIT( 0xff, 0, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, gottlieb_state,analog_delta_r, "0TRACKX")
 
 	PORT_START("IN3")	/* trackball V */
-	PORT_BIT( 0xff, 0, IPT_SPECIAL ) PORT_CUSTOM(analog_delta_r, "1TRACKY")
+	PORT_BIT( 0xff, 0, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, gottlieb_state,analog_delta_r, "1TRACKY")
 
 /* NOTE: Buttons are shared for both players; are mirrored to each side of the controller */
 	PORT_START("IN4")
@@ -1046,7 +1044,7 @@ static INPUT_PORTS_START( mplanets )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN3")	/* trackball V (dial) */
-	PORT_BIT( 0xff, 0, IPT_SPECIAL ) PORT_CUSTOM(analog_delta_r, "1TRACKY")
+	PORT_BIT( 0xff, 0, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, gottlieb_state,analog_delta_r, "1TRACKY")
 
 	PORT_START("IN4")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY
@@ -1525,7 +1523,7 @@ static INPUT_PORTS_START( 3stooges )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN4")	/* joystick inputs */
-	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(stooges_joystick_r, NULL)
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, gottlieb_state,stooges_joystick_r, NULL)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(3)
@@ -1637,7 +1635,7 @@ static INPUT_PORTS_START( wizwarz )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN3")	/* trackball V is a dial input */
-	PORT_BIT( 0xff, 0, IPT_SPECIAL ) PORT_CUSTOM(analog_delta_r, "1TRACKY")
+	PORT_BIT( 0xff, 0, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, gottlieb_state,analog_delta_r, "1TRACKY")
 
 	PORT_START("IN4")	/* ? */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY

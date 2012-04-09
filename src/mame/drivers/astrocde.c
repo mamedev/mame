@@ -253,11 +253,10 @@ WRITE8_MEMBER(astrocde_state::seawolf2_sound_2_w)// Port 41
  *
  *************************************/
 
-static CUSTOM_INPUT( ebases_trackball_r )
+CUSTOM_INPUT_MEMBER(astrocde_state::ebases_trackball_r)
 {
-	astrocde_state *state = field.machine().driver_data<astrocde_state>();
 	static const char *const names[] = { "TRACKX2", "TRACKY2", "TRACKX1", "TRACKY1" };
-	return input_port_read(field.machine(), names[state->m_input_select]);
+	return input_port_read(machine(), names[m_input_select]);
 }
 
 
@@ -480,11 +479,10 @@ READ8_MEMBER(astrocde_state::demndrgn_io_r)
 }
 
 
-static CUSTOM_INPUT( demndragn_joystick_r )
+CUSTOM_INPUT_MEMBER(astrocde_state::demndragn_joystick_r)
 {
-	astrocde_state *state = field.machine().driver_data<astrocde_state>();
 	static const char *const names[] = { "MOVEX", "MOVEY" };
-	return input_port_read(field.machine(), names[state->m_input_select]);
+	return input_port_read(machine(), names[m_input_select]);
 }
 
 
@@ -818,7 +816,7 @@ static INPUT_PORTS_START( ebases )
 	PORT_DIPUNUSED_DIPLOC( 0x80, 0x00, "S1:8" )
 
 	PORT_START("P4HANDLE")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(ebases_trackball_r, NULL)
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, astrocde_state,ebases_trackball_r, NULL)
 
 	PORT_START("TRACKX1")
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_RESET
@@ -1144,7 +1142,7 @@ static INPUT_PORTS_START( demndrgn )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("P2HANDLE")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_CUSTOM(demndragn_joystick_r, NULL)
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, astrocde_state,demndragn_joystick_r, NULL)
 
 	PORT_START("P3HANDLE")
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )

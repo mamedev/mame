@@ -36,6 +36,7 @@ public:
 	DECLARE_WRITE8_MEMBER(cop01_background_w);
 	DECLARE_WRITE8_MEMBER(cop01_foreground_w);
 	DECLARE_WRITE8_MEMBER(cop01_vreg_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(mightguy_area_r);
 };
 
 

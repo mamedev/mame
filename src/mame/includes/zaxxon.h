@@ -48,6 +48,8 @@ public:
 	DECLARE_WRITE8_MEMBER(zaxxon_videoram_w);
 	DECLARE_WRITE8_MEMBER(congo_colorram_w);
 	DECLARE_WRITE8_MEMBER(congo_sprite_custom_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(razmataz_dial_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(zaxxon_coin_r);
 };
 
 

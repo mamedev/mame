@@ -24,6 +24,7 @@ public:
 	DECLARE_READ16_MEMBER(lethalj_gun_r);
 	DECLARE_WRITE16_MEMBER(lethalj_blitter_w);
 	void do_blit();
+	DECLARE_CUSTOM_INPUT_MEMBER(cclownz_paddle);
 };
 
 

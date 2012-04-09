@@ -35,6 +35,7 @@ public:
 	DECLARE_WRITE8_MEMBER(armwrest_fg_videoram_w);
 	DECLARE_WRITE8_MEMBER(punchout_spr1_videoram_w);
 	DECLARE_WRITE8_MEMBER(punchout_spr2_videoram_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(punchout_vlm5030_busy_r);
 };
 
 

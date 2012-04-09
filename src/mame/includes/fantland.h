@@ -40,6 +40,7 @@ public:
 	DECLARE_WRITE8_MEMBER(borntofi_nmi_enable_w);
 	DECLARE_READ8_MEMBER(borntofi_inputs_r);
 	DECLARE_WRITE8_MEMBER(borntofi_msm5205_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(wheelrun_wheel_r);
 };
 
 

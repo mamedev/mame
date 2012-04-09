@@ -127,6 +127,7 @@ public:
 	DECLARE_WRITE16_MEMBER(namcos22_dspram16_bank_w);
 	DECLARE_READ16_MEMBER(namcos22_dspram16_r);
 	DECLARE_WRITE16_MEMBER(namcos22_dspram16_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(alpine_motor_read);
 };
 
 

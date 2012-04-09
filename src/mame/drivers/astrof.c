@@ -120,41 +120,40 @@ static INPUT_CHANGED( service_coin_inserted )
 }
 
 
-static CUSTOM_INPUT( astrof_p1_controls_r )
+CUSTOM_INPUT_MEMBER(astrof_state::astrof_p1_controls_r)
 {
-	return input_port_read(field.machine(), "P1");
+	return input_port_read(machine(), "P1");
 }
 
 
-static CUSTOM_INPUT( astrof_p2_controls_r )
+CUSTOM_INPUT_MEMBER(astrof_state::astrof_p2_controls_r)
 {
 	UINT32 ret;
 
 	/* on an upright cabinet, a single set of controls
        is connected to both sets of pins on the edge
        connector */
-	if (input_port_read(field.machine(), "CAB"))
-		ret = input_port_read(field.machine(), "P2");
+	if (input_port_read(machine(), "CAB"))
+		ret = input_port_read(machine(), "P2");
 	else
-		ret = input_port_read(field.machine(), "P1");
+		ret = input_port_read(machine(), "P1");
 
 	return ret;
 }
 
 
-static CUSTOM_INPUT( tomahawk_controls_r )
+CUSTOM_INPUT_MEMBER(astrof_state::tomahawk_controls_r)
 {
 	UINT32 ret;
-	astrof_state *state = field.machine().driver_data<astrof_state>();
 
 	/* on a cocktail cabinet, two sets of controls are
        multiplexed on a single set of inputs
          (not verified on pcb) */
 
-	if (state->m_flipscreen)
-		ret = input_port_read(field.machine(), "P2");
+	if (m_flipscreen)
+		ret = input_port_read(machine(), "P2");
 	else
-		ret = input_port_read(field.machine(), "P1");
+		ret = input_port_read(machine(), "P1");
 
 	return ret;
 }
@@ -659,8 +658,8 @@ static INPUT_PORTS_START( astrof )
 	PORT_START("IN")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x1c, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(astrof_p1_controls_r, NULL)
-	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(astrof_p2_controls_r, NULL)
+	PORT_BIT( 0x1c, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, astrof_state,astrof_p1_controls_r, NULL)
+	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, astrof_state,astrof_p2_controls_r, NULL)
 
 	PORT_START("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY
@@ -714,8 +713,8 @@ static INPUT_PORTS_START( abattle )
 	PORT_START("IN")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
-	PORT_BIT( 0x1c, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(astrof_p1_controls_r, NULL)
-	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(astrof_p2_controls_r, NULL)
+	PORT_BIT( 0x1c, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, astrof_state,astrof_p1_controls_r, NULL)
+	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, astrof_state,astrof_p2_controls_r, NULL)
 
 	PORT_START("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY
@@ -769,8 +768,8 @@ static INPUT_PORTS_START( spfghmk2 )
 	PORT_START("IN")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x1c, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(astrof_p1_controls_r, NULL)
-	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(astrof_p2_controls_r, NULL)
+	PORT_BIT( 0x1c, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, astrof_state,astrof_p1_controls_r, NULL)
+	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, astrof_state,astrof_p2_controls_r, NULL)
 
 	PORT_START("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY
@@ -820,8 +819,8 @@ static INPUT_PORTS_START( spfghmk22 )
 	PORT_START("IN")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x1c, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(astrof_p1_controls_r, NULL)
-	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(astrof_p2_controls_r, NULL)
+	PORT_BIT( 0x1c, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, astrof_state,astrof_p1_controls_r, NULL)
+	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, astrof_state,astrof_p2_controls_r, NULL)
 
 	PORT_START("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY
@@ -874,7 +873,7 @@ static INPUT_PORTS_START( tomahawk )
 	PORT_INCLUDE( astrof_common )
 
 	PORT_START("IN")
-	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(tomahawk_controls_r, NULL)
+	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, astrof_state,tomahawk_controls_r, NULL)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )

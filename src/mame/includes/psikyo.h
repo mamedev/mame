@@ -71,6 +71,8 @@ public:
 	DECLARE_WRITE8_MEMBER(gunbird_sound_bankswitch_w);
 	DECLARE_WRITE32_MEMBER(psikyo_vram_0_w);
 	DECLARE_WRITE32_MEMBER(psikyo_vram_1_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(z80_nmi_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(mcu_status_r);
 };
 
 

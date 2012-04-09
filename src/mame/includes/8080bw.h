@@ -32,6 +32,7 @@ public:
 	UINT8       m_screen_red;
 
 	device_t *m_speaker;
+	DECLARE_CUSTOM_INPUT_MEMBER(sflush_80_r);
 };
 
 

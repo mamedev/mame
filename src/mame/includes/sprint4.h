@@ -24,6 +24,9 @@ public:
 	DECLARE_WRITE8_MEMBER(sprint4_lamp_w);
 	DECLARE_WRITE8_MEMBER(sprint4_lockout_w);
 	DECLARE_WRITE8_MEMBER(sprint4_video_ram_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(get_lever);
+	DECLARE_CUSTOM_INPUT_MEMBER(get_wheel);
+	DECLARE_CUSTOM_INPUT_MEMBER(get_collision);
 };
 
 

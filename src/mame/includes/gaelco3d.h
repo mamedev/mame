@@ -97,6 +97,7 @@ public:
 	DECLARE_WRITE32_MEMBER(gaelco3d_render_w);
 	DECLARE_WRITE16_MEMBER(gaelco3d_paletteram_w);
 	DECLARE_WRITE32_MEMBER(gaelco3d_paletteram_020_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(analog_bit_r);
 };
 
 

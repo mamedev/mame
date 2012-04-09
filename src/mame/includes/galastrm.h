@@ -41,6 +41,8 @@ public:
 	DECLARE_WRITE32_MEMBER(galastrm_input_w);
 	DECLARE_READ32_MEMBER(galastrm_adstick_ctrl_r);
 	DECLARE_WRITE32_MEMBER(galastrm_adstick_ctrl_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(frame_counter_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(coin_word_r);
 };
 
 

@@ -40,6 +40,7 @@ public:
 	DECLARE_WRITE8_MEMBER(fgoal_color_w);
 	DECLARE_WRITE8_MEMBER(fgoal_ypos_w);
 	DECLARE_WRITE8_MEMBER(fgoal_xpos_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(fgoal_80_r);
 };
 
 

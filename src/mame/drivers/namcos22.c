@@ -4762,10 +4762,9 @@ ROM_END
 
 /*******************************************************************/
 
-static CUSTOM_INPUT( alpine_motor_read )
+CUSTOM_INPUT_MEMBER(namcos22_state::alpine_motor_read)
 {
-	namcos22_state *state = field.machine().driver_data<namcos22_state>();
-	return state->m_motor_status >> (FPTR)param & 1;
+	return m_motor_status >> (FPTR)param & 1;
 }
 
 static INPUT_PORTS_START( alpiner )
@@ -4803,7 +4802,7 @@ static INPUT_PORTS_START( alpiner )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START ) // Decision / View Change
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_16WAY // L Selection
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_16WAY // R Selection
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH,IPT_SPECIAL ) PORT_CUSTOM(alpine_motor_read, (void *)0) // steps are free
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH,IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, namcos22_state,alpine_motor_read, (void *)0) // steps are free
 
 	PORT_START("SWING")
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_NAME("Steps Swing")
@@ -4812,7 +4811,7 @@ static INPUT_PORTS_START( alpiner )
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_NAME("Steps Edge")
 
 	PORT_START("MCUP5B")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH,IPT_SPECIAL ) PORT_CUSTOM(alpine_motor_read, (void *)1) // steps are locked
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH,IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, namcos22_state,alpine_motor_read, (void *)1) // steps are locked
 	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END /* Alpine Racer */
 

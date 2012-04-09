@@ -251,10 +251,9 @@ static const eeprom_interface undrfire_eeprom_interface =
             GAME INPUTS
 **********************************************************/
 
-static CUSTOM_INPUT(frame_counter_r)
+CUSTOM_INPUT_MEMBER(undrfire_state::frame_counter_r)
 {
-	undrfire_state *state = field.machine().driver_data<undrfire_state>();
-	return state->m_frame_counter;
+	return m_frame_counter;
 }
 
 READ32_MEMBER(undrfire_state::undrfire_input_r)
@@ -527,7 +526,7 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( undrfire )
 	PORT_START("INPUTS")
-	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(frame_counter_r, NULL)	/* Frame counter */
+	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, undrfire_state,frame_counter_r, NULL)	/* Frame counter */
 	PORT_BIT( 0x00000002, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x00000004, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x00000008, IP_ACTIVE_LOW,  IPT_UNKNOWN )
@@ -595,7 +594,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( cbombers )
 	PORT_START("INPUTS")
-	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(frame_counter_r, NULL)	/* Frame counter */
+	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, undrfire_state,frame_counter_r, NULL)	/* Frame counter */
 	PORT_BIT( 0x00000002, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x00000004, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x00000008, IP_ACTIVE_LOW,  IPT_UNKNOWN )

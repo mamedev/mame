@@ -252,10 +252,9 @@ WRITE16_MEMBER(tetrisp2_state::rocknms_main2sub_w)
 		m_rocknms_main2sub = (data ^ 0xffff);
 }
 
-static CUSTOM_INPUT( rocknms_main2sub_status_r )
+CUSTOM_INPUT_MEMBER(tetrisp2_state::rocknms_main2sub_status_r)
 {
-	tetrisp2_state *state = field.machine().driver_data<tetrisp2_state>();
-	return  state->m_rocknms_sub2main & 0x0003;
+	return  m_rocknms_sub2main & 0x0003;
 }
 
 WRITE16_MEMBER(tetrisp2_state::rocknms_sub2main_w)
@@ -858,7 +857,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( rocknms )
 	PORT_START("PLAYERS")	// IN0 - $be0002.w
-	PORT_BIT( 0x0003, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(rocknms_main2sub_status_r, NULL)	// MAIN -> SUB Communication
+	PORT_BIT( 0x0003, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, tetrisp2_state,rocknms_main2sub_status_r, NULL)	// MAIN -> SUB Communication
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)

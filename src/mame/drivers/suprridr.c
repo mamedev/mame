@@ -224,15 +224,15 @@ ADDRESS_MAP_END
 #define SUPRRIDR_P1_CONTROL_PORT_TAG	("CONTP1")
 #define SUPRRIDR_P2_CONTROL_PORT_TAG	("CONTP2")
 
-static CUSTOM_INPUT( suprridr_control_r )
+CUSTOM_INPUT_MEMBER(suprridr_state::suprridr_control_r)
 {
 	UINT32 ret;
 
 	/* screen flip multiplexes controls */
-	if (suprridr_is_screen_flipped(field.machine()))
-		ret = input_port_read(field.machine(), SUPRRIDR_P2_CONTROL_PORT_TAG);
+	if (suprridr_is_screen_flipped(machine()))
+		ret = input_port_read(machine(), SUPRRIDR_P2_CONTROL_PORT_TAG);
 	else
-		ret = input_port_read(field.machine(), SUPRRIDR_P1_CONTROL_PORT_TAG);
+		ret = input_port_read(machine(), SUPRRIDR_P1_CONTROL_PORT_TAG);
 
 	return ret;
 }
@@ -240,7 +240,7 @@ static CUSTOM_INPUT( suprridr_control_r )
 
 static INPUT_PORTS_START( suprridr )
 	PORT_START("INPUTS")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(suprridr_control_r, NULL)
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, suprridr_state,suprridr_control_r, NULL)
 
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )

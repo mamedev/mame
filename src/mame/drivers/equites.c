@@ -652,10 +652,9 @@ READ16_MEMBER(equites_state::hvoltage_debug_r)
 #endif
 
 
-static CUSTOM_INPUT( gekisou_unknown_status )
+CUSTOM_INPUT_MEMBER(equites_state::gekisou_unknown_status)
 {
-	equites_state *state = field.machine().driver_data<equites_state>();
-	return state->m_unknown_bit;
+	return m_unknown_bit;
 }
 
 WRITE16_MEMBER(equites_state::gekisou_unknown_0_w)
@@ -850,7 +849,7 @@ static INPUT_PORTS_START( gekisou )
 	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(gekisou_unknown_status, NULL)
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, equites_state,gekisou_unknown_status, NULL)
 
 	/* this is actually a variable resistor */
 	PORT_START(FRQ_ADJUSTER_TAG)

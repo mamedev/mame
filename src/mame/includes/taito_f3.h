@@ -216,6 +216,8 @@ public:
 	DECLARE_READ16_MEMBER(f3_lineram_r);
 	DECLARE_WRITE16_MEMBER(f3_lineram_w);
 	DECLARE_WRITE32_MEMBER(f3_palette_24bit_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(f3_analog_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(f3_coin_r);
 };
 
 

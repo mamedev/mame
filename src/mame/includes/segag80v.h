@@ -34,6 +34,7 @@ public:
 	DECLARE_READ8_MEMBER(multiply_r);
 	DECLARE_WRITE8_MEMBER(coin_count_w);
 	DECLARE_WRITE8_MEMBER(unknown_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(elim4_joint_coin_r);
 };
 
 

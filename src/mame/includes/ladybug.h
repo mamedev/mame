@@ -51,6 +51,8 @@ public:
 	DECLARE_WRITE8_MEMBER(ladybug_colorram_w);
 	DECLARE_WRITE8_MEMBER(ladybug_flipscreen_w);
 	DECLARE_WRITE8_MEMBER(sraider_io_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(ladybug_p1_control_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(ladybug_p2_control_r);
 };
 
 

@@ -90,6 +90,11 @@ public:
 	DECLARE_WRITE8_MEMBER(scramble_background_green_w);
 	DECLARE_WRITE8_MEMBER(scramble_background_blue_w);
 	DECLARE_WRITE8_MEMBER(galaxian_gfxbank_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(scramble_protection_alt_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(gmgalax_port_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(azurian_port_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(kingball_muxbit_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(kingball_noise_r);
 };
 
 

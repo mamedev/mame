@@ -97,6 +97,7 @@ public:
 	DECLARE_READ8_MEMBER(victnine_gfxctrl_r);
 	DECLARE_WRITE8_MEMBER(victnine_gfxctrl_w);
 	DECLARE_WRITE8_MEMBER(flstory_scrlram_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(victnine_mcu_status_bit01_r);
 };
 
 

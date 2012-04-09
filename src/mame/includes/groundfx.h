@@ -30,6 +30,8 @@ public:
 	DECLARE_WRITE32_MEMBER(rotate_control_w);
 	DECLARE_WRITE32_MEMBER(motor_control_w);
 	DECLARE_READ32_MEMBER(irq_speedup_r_groundfx);
+	DECLARE_CUSTOM_INPUT_MEMBER(frame_counter_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(coin_word_r);
 };
 
 

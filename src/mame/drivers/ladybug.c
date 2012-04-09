@@ -203,20 +203,20 @@ static INPUT_CHANGED( coin2_inserted )
 #define LADYBUG_P1_CONTROL_PORT_TAG	("CONTP1")
 #define LADYBUG_P2_CONTROL_PORT_TAG	("CONTP2")
 
-static CUSTOM_INPUT( ladybug_p1_control_r )
+CUSTOM_INPUT_MEMBER(ladybug_state::ladybug_p1_control_r)
 {
-	return input_port_read(field.machine(), LADYBUG_P1_CONTROL_PORT_TAG);
+	return input_port_read(machine(), LADYBUG_P1_CONTROL_PORT_TAG);
 }
 
-static CUSTOM_INPUT( ladybug_p2_control_r )
+CUSTOM_INPUT_MEMBER(ladybug_state::ladybug_p2_control_r)
 {
 	UINT32 ret;
 
 	/* upright cabinet only uses a single set of controls */
-	if (input_port_read(field.machine(), "DSW0") & 0x20)
-		ret = input_port_read(field.machine(), LADYBUG_P2_CONTROL_PORT_TAG);
+	if (input_port_read(machine(), "DSW0") & 0x20)
+		ret = input_port_read(machine(), LADYBUG_P2_CONTROL_PORT_TAG);
 	else
-		ret = input_port_read(field.machine(), LADYBUG_P1_CONTROL_PORT_TAG);
+		ret = input_port_read(machine(), LADYBUG_P1_CONTROL_PORT_TAG);
 
 	return ret;
 }
@@ -224,13 +224,13 @@ static CUSTOM_INPUT( ladybug_p2_control_r )
 
 static INPUT_PORTS_START( ladybug )
 	PORT_START("IN0")
-	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(ladybug_p1_control_r, NULL)
+	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, ladybug_state,ladybug_p1_control_r, NULL)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_TILT )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(ladybug_p2_control_r, NULL)
+	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, ladybug_state,ladybug_p2_control_r, NULL)
 	/* This should be connected to the 4V clock. I don't think the game uses it. */
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	/* Note that there are TWO VBlank inputs, one is active low, the other active */

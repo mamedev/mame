@@ -46,6 +46,8 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(stactics_get_frame_count_d3);
 	DECLARE_CUSTOM_INPUT_MEMBER(stactics_get_shot_standby);
 	DECLARE_CUSTOM_INPUT_MEMBER(stactics_get_not_shot_arrive);
+	DECLARE_CUSTOM_INPUT_MEMBER(get_motor_not_ready);
+	DECLARE_CUSTOM_INPUT_MEMBER(get_rng);
 };
 
 

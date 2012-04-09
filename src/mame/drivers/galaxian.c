@@ -726,15 +726,14 @@ static READ8_DEVICE_HANDLER( scramble_protection_r )
 }
 
 
-static CUSTOM_INPUT( scramble_protection_alt_r )
+CUSTOM_INPUT_MEMBER(galaxian_state::scramble_protection_alt_r)
 {
-	galaxian_state *state = field.machine().driver_data<galaxian_state>();
 	/*
         There are two additional bits that are derived from bit 7 of
         the protection result. This is just a guess but works well enough
         to boot scrambls.
     */
-	return (state->m_protection_result >> 7) & 1;
+	return (m_protection_result >> 7) & 1;
 }
 
 
@@ -1102,13 +1101,12 @@ static INPUT_CHANGED( gmgalax_game_changed )
 }
 
 
-static CUSTOM_INPUT( gmgalax_port_r )
+CUSTOM_INPUT_MEMBER(galaxian_state::gmgalax_port_r)
 {
-	galaxian_state *state = field.machine().driver_data<galaxian_state>();
 	const char *portname = (const char *)param;
-	if (state->m_gmgalax_selected_game != 0)
+	if (m_gmgalax_selected_game != 0)
 		portname += strlen(portname) + 1;
-	return input_port_read(field.machine(), portname);
+	return input_port_read(machine(), portname);
 }
 
 
@@ -1158,9 +1156,9 @@ static WRITE8_HANDLER( zigzag_ay8910_w )
  *
  *************************************/
 
-static CUSTOM_INPUT( azurian_port_r )
+CUSTOM_INPUT_MEMBER(galaxian_state::azurian_port_r)
 {
-	return (input_port_read(field.machine(), "FAKE") >> (FPTR)param) & 1;
+	return (input_port_read(machine(), "FAKE") >> (FPTR)param) & 1;
 }
 
 
@@ -1171,20 +1169,19 @@ static CUSTOM_INPUT( azurian_port_r )
  *
  *************************************/
 
-static CUSTOM_INPUT( kingball_muxbit_r )
+CUSTOM_INPUT_MEMBER(galaxian_state::kingball_muxbit_r)
 {
-	galaxian_state *state = field.machine().driver_data<galaxian_state>();
 	/* multiplex the service mode switch with a speech DIP switch */
-	return (input_port_read(field.machine(), "FAKE") >> state->m_kingball_speech_dip) & 1;
+	return (input_port_read(machine(), "FAKE") >> m_kingball_speech_dip) & 1;
 }
 
 
-static CUSTOM_INPUT( kingball_noise_r )
+CUSTOM_INPUT_MEMBER(galaxian_state::kingball_noise_r)
 {
 	/* bit 5 is the NOISE line from the sound circuit.  The code just verifies
        that it's working, doesn't actually use return value, so we can just use
        rand() */
-	return field.machine().rand() & 1;
+	return machine().rand() & 1;
 }
 
 

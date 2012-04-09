@@ -130,11 +130,10 @@ Stephh's notes (based on the games Z80 code and some tests) :
  *************************************/
 
 /* Players inputs are muxed at 0xa000 */
-static CUSTOM_INPUT( exerion_controls_r )
+CUSTOM_INPUT_MEMBER(exerion_state::exerion_controls_r)
 {
 	static const char *const inname[2] = { "P1", "P2" };
-	exerion_state *state = field.machine().driver_data<exerion_state>();
-	return input_port_read(field.machine(), inname[state->m_cocktail_flip]) & 0x3f;
+	return input_port_read(machine(), inname[m_cocktail_flip]) & 0x3f;
 }
 
 
@@ -234,7 +233,7 @@ ADDRESS_MAP_END
 /* verified from Z80 code */
 static INPUT_PORTS_START( exerion )
 	PORT_START("IN0")
-	PORT_BIT( 0x3f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(exerion_controls_r, (void *)0)
+	PORT_BIT( 0x3f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, exerion_state,exerion_controls_r, (void *)0)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
 

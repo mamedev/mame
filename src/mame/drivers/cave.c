@@ -696,10 +696,9 @@ static WRITE16_DEVICE_HANDLER( korokoro_eeprom_msb_w )
 	}
 }
 
-static CUSTOM_INPUT( korokoro_hopper_r )
+CUSTOM_INPUT_MEMBER(cave_state::korokoro_hopper_r)
 {
-	cave_state *state = field.machine().driver_data<cave_state>();
-	return state->m_hopper ? 1 : 0;
+	return m_hopper ? 1 : 0;
 }
 
 
@@ -933,10 +932,9 @@ WRITE16_MEMBER(cave_state::tjumpman_leds_w)
 //  popmessage("led %04X", data);
 }
 
-static CUSTOM_INPUT( tjumpman_hopper_r )
+CUSTOM_INPUT_MEMBER(cave_state::tjumpman_hopper_r)
 {
-	cave_state *state = field.machine().driver_data<cave_state>();
-	return (state->m_hopper && !(field.machine().primary_screen->frame_number() % 10)) ? 0 : 1;
+	return (m_hopper && !(machine().primary_screen->frame_number() % 10)) ? 0 : 1;
 }
 
 static ADDRESS_MAP_START( tjumpman_map, AS_PROGRAM, 16, cave_state )
@@ -1477,7 +1475,7 @@ static INPUT_PORTS_START( korokoro )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_SERVICE2 )	// service medal out?
 	PORT_SERVICE( 0x2000, IP_ACTIVE_LOW )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_SERVICE1 )	// service coin
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_SPECIAL )	PORT_CUSTOM(korokoro_hopper_r, NULL) // motor / hopper status ???
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_SPECIAL )	PORT_CUSTOM_MEMBER(DEVICE_SELF, cave_state,korokoro_hopper_r, NULL) // motor / hopper status ???
 
 	PORT_START("IN1")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1508,7 +1506,7 @@ static INPUT_PORTS_START( tjumpman )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_OTHER ) PORT_NAME( DEF_STR( Yes ) ) PORT_CODE(KEYCODE_Y)	// suru ("do")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_GAMBLE_PAYOUT )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_NAME( "1 Bet" )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_SPECIAL ) PORT_CUSTOM(tjumpman_hopper_r, NULL)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, cave_state,tjumpman_hopper_r, NULL)
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1533,7 +1531,7 @@ static INPUT_PORTS_START( pacslot )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_OTHER ) PORT_NAME( "Pac-Man" ) PORT_CODE(KEYCODE_Y)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_GAMBLE_PAYOUT )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_NAME( "Bet" )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_SPECIAL ) PORT_CUSTOM(tjumpman_hopper_r, NULL)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, cave_state,tjumpman_hopper_r, NULL)
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )

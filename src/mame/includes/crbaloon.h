@@ -27,6 +27,7 @@ public:
 	DECLARE_WRITE8_MEMBER(port_sound_w);
 	DECLARE_WRITE8_MEMBER(crbaloon_videoram_w);
 	DECLARE_WRITE8_MEMBER(crbaloon_colorram_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(pc3092_r);
 };
 
 

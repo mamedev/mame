@@ -55,14 +55,13 @@ static INTERRUPT_GEN( battlex_interrupt )
 	device_set_input_line(device, 0, ASSERT_LINE);
 }
 
-static CUSTOM_INPUT( battlex_in0_b4_r )
+CUSTOM_INPUT_MEMBER(battlex_state::battlex_in0_b4_r)
 {
-	battlex_state *state = field.machine().driver_data<battlex_state>();
-	UINT32 ret = state->m_in0_b4;
-	if (state->m_in0_b4)
+	UINT32 ret = m_in0_b4;
+	if (m_in0_b4)
 	{
-		cputag_set_input_line(field.machine(), "maincpu", 0, CLEAR_LINE);
-		state->m_in0_b4 = 0;
+		cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
+		m_in0_b4 = 0;
 	}
 
 	return ret;
@@ -119,7 +118,7 @@ static INPUT_PORTS_START( battlex )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(battlex_in0_b4_r, NULL)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, battlex_state,battlex_in0_b4_r, NULL)
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )

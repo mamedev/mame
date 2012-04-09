@@ -253,6 +253,8 @@ public:
 	DECLARE_WRITE8_MEMBER(gottlieb_laserdisc_video_control_w);
 	DECLARE_WRITE8_MEMBER(gottlieb_videoram_w);
 	DECLARE_WRITE8_MEMBER(gottlieb_charram_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(analog_delta_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(stooges_joystick_r);
 };
 
 

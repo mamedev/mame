@@ -70,22 +70,19 @@ READ16_MEMBER(fromanc2_state::fromanc2_keymatrix_r)
 	return ret;
 }
 
-static CUSTOM_INPUT( subcpu_int_r )
+CUSTOM_INPUT_MEMBER(fromanc2_state::subcpu_int_r)
 {
-	fromanc2_state *state = field.machine().driver_data<fromanc2_state>();
-	return state->m_subcpu_int_flag & 0x01;
+	return m_subcpu_int_flag & 0x01;
 }
 
-static CUSTOM_INPUT( sndcpu_nmi_r )
+CUSTOM_INPUT_MEMBER(fromanc2_state::sndcpu_nmi_r)
 {
-	fromanc2_state *state = field.machine().driver_data<fromanc2_state>();
-	return state->m_sndcpu_nmi_flag & 0x01;
+	return m_sndcpu_nmi_flag & 0x01;
 }
 
-static CUSTOM_INPUT( subcpu_nmi_r )
+CUSTOM_INPUT_MEMBER(fromanc2_state::subcpu_nmi_r)
 {
-	fromanc2_state *state = field.machine().driver_data<fromanc2_state>();
-	return state->m_subcpu_nmi_flag & 0x01;
+	return m_subcpu_nmi_flag & 0x01;
 }
 
 WRITE16_MEMBER(fromanc2_state::fromanc2_eeprom_w)
@@ -314,9 +311,9 @@ static INPUT_PORTS_START( fromanc2 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN3 )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_COIN4 )
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(subcpu_int_r, NULL)		// SUBCPU INT FLAG
-	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(sndcpu_nmi_r, NULL)		// SNDCPU NMI FLAG
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(subcpu_nmi_r, NULL)		// SUBCPU NMI FLAG
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, fromanc2_state,subcpu_int_r, NULL)		// SUBCPU INT FLAG
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, fromanc2_state,sndcpu_nmi_r, NULL)		// SNDCPU NMI FLAG
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, fromanc2_state,subcpu_nmi_r, NULL)		// SUBCPU NMI FLAG
 	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME( "Service Mode (1P)" ) PORT_CODE(KEYCODE_F2)	// TEST (1P)
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME( "Service Mode (2P)" ) PORT_CODE(KEYCODE_F2)	// TEST (2P)
@@ -425,7 +422,7 @@ static INPUT_PORTS_START( fromanc4 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_COIN3 )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_COIN4 )
-	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(sndcpu_nmi_r, NULL)		// SNDCPU NMI FLAG
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, fromanc2_state,sndcpu_nmi_r, NULL)		// SNDCPU NMI FLAG
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNUSED )

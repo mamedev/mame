@@ -439,19 +439,17 @@ WRITE8_MEMBER(system1_state::videomode_w)
  *
  *************************************/
 
-static CUSTOM_INPUT( dakkochn_mux_data_r )
+CUSTOM_INPUT_MEMBER(system1_state::dakkochn_mux_data_r)
 {
-	system1_state *state = field.machine().driver_data<system1_state>();
 	static const char *const ports[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5", "KEY6" };
-	return input_port_read(field.machine(), ports[state->m_dakkochn_mux_data]);
+	return input_port_read(machine(), ports[m_dakkochn_mux_data]);
 }
 
 
-static CUSTOM_INPUT( dakkochn_mux_status_r )
+CUSTOM_INPUT_MEMBER(system1_state::dakkochn_mux_status_r)
 {
-	system1_state *state = field.machine().driver_data<system1_state>();
 	/* reads from here indicate which mux port is selected */
-	return 1 << (state->m_dakkochn_mux_data);
+	return 1 << (m_dakkochn_mux_data);
 }
 
 
@@ -1955,10 +1953,10 @@ static INPUT_PORTS_START( dakkochn )
 	PORT_INCLUDE( choplift )
 
 	PORT_MODIFY("P1")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(dakkochn_mux_data_r, NULL)
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, system1_state,dakkochn_mux_data_r, NULL)
 
 	PORT_MODIFY("P2")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(dakkochn_mux_status_r, NULL)
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, system1_state,dakkochn_mux_status_r, NULL)
 
 	PORT_MODIFY("SYSTEM")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED ) 	/* start 1 & 2 not connected. */

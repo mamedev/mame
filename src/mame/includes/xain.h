@@ -57,6 +57,8 @@ public:
 	DECLARE_WRITE8_MEMBER(xain_scrollxP1_w);
 	DECLARE_WRITE8_MEMBER(xain_scrollyP1_w);
 	DECLARE_WRITE8_MEMBER(xain_flipscreen_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(xain_vblank_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(mcu_status_r);
 };
 
 

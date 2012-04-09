@@ -53,13 +53,12 @@ Verify Color PROM resistor values (Last 8 colors)
  *
  *************************************/
 
-static CUSTOM_INPUT( get_motor_not_ready )
+CUSTOM_INPUT_MEMBER(stactics_state::get_motor_not_ready)
 {
-	stactics_state *state = field.machine().driver_data<stactics_state>();
 
 	/* if the motor is self-centering, but not centered yet */
-    return ((*state->m_motor_on & 0x01) == 0) &&
-    	   ((state->m_horiz_pos != 0) || (state->m_vert_pos != 0));
+    return ((*m_motor_on & 0x01) == 0) &&
+    	   ((m_horiz_pos != 0) || (m_vert_pos != 0));
 }
 
 
@@ -125,10 +124,10 @@ static void move_motor(running_machine &machine, stactics_state *state)
  *
  *************************************/
 
-static CUSTOM_INPUT( get_rng )
+CUSTOM_INPUT_MEMBER(stactics_state::get_rng)
 {
 	/* this is a 555 timer, but cannot read one of the resistor values */
-	return field.machine().rand() & 0x07;
+	return machine().rand() & 0x07;
 }
 
 
@@ -216,7 +215,7 @@ static INPUT_PORTS_START( stactics )
     PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 )
     PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
     PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )
-    PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(get_motor_not_ready, NULL)
+    PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, stactics_state,get_motor_not_ready, NULL)
 
     PORT_START("IN1")	/* IN1 */
     PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_B ) )
@@ -245,7 +244,7 @@ static INPUT_PORTS_START( stactics )
     PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
     PORT_START("IN2")	/* IN2 */
-    PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(get_rng, NULL)
+    PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, stactics_state,get_rng, NULL)
     PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, stactics_state,stactics_get_frame_count_d3, NULL)
     PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
     PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )

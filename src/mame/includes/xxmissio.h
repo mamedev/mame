@@ -20,6 +20,7 @@ public:
 	DECLARE_WRITE8_MEMBER(xxmissio_bgram_w);
 	DECLARE_READ8_MEMBER(xxmissio_bgram_r);
 	DECLARE_WRITE8_MEMBER(xxmissio_paletteram_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(xxmissio_status_r);
 };
 
 

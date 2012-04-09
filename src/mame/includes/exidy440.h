@@ -50,6 +50,9 @@ public:
 	DECLARE_WRITE8_MEMBER(exidy440_spriteram_w);
 	DECLARE_WRITE8_MEMBER(exidy440_control_w);
 	DECLARE_WRITE8_MEMBER(exidy440_interrupt_clear_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(firq_beam_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(firq_vblank_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(hitnmiss_button1_r);
 };
 
 

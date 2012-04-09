@@ -40,6 +40,7 @@ public:
 	DECLARE_WRITE16_MEMBER(crshrace_videoram2_w);
 	DECLARE_WRITE16_MEMBER(crshrace_roz_bank_w);
 	DECLARE_WRITE16_MEMBER(crshrace_gfxctrl_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(country_sndpending_r);
 };
 
 /*----------- defined in video/crshrace.c -----------*/

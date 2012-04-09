@@ -319,16 +319,15 @@ static void sasuke_start_counter(running_machine &machine)
  *
  *************************************/
 
-static CUSTOM_INPUT( snk6502_music0_r )
+CUSTOM_INPUT_MEMBER(snk6502_state::snk6502_music0_r)
 {
-	return (snk6502_music0_playing(field.machine()) ? 0x01 : 0x00);
+	return (snk6502_music0_playing(machine()) ? 0x01 : 0x00);
 }
 
-static CUSTOM_INPUT( sasuke_count_r )
+CUSTOM_INPUT_MEMBER(snk6502_state::sasuke_count_r)
 {
-	snk6502_state *state = field.machine().driver_data<snk6502_state>();
 
-	return (state->m_sasuke_counter >> 4);
+	return (m_sasuke_counter >> 4);
 }
 
 
@@ -518,12 +517,12 @@ static INPUT_PORTS_START( satansat )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x7c, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(snk6502_music0_r, NULL)     /* music0 playing */
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk6502_state,snk6502_music0_r, NULL)     /* music0 playing */
 
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1) PORT_CHANGED(coin_inserted, 0)
 	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNKNOWN )                                         /* NC */
-	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(sasuke_count_r, NULL)       /* connected to a binary counter */
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk6502_state,sasuke_count_r, NULL)       /* connected to a binary counter */
 
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW1:!1")
@@ -583,7 +582,7 @@ static INPUT_PORTS_START( vanguard )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL  /* fire left */
 
 	PORT_MODIFY("IN2")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(snk6502_music0_r, NULL)     /* music0 playing */
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk6502_state,snk6502_music0_r, NULL)     /* music0 playing */
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( fantasy )

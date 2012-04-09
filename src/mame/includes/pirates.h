@@ -17,6 +17,7 @@ public:
 	DECLARE_WRITE16_MEMBER(pirates_tx_tileram_w);
 	DECLARE_WRITE16_MEMBER(pirates_fg_tileram_w);
 	DECLARE_WRITE16_MEMBER(pirates_bg_tileram_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(prot_r);
 };
 
 

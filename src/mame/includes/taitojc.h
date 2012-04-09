@@ -102,6 +102,7 @@ public:
 	DECLARE_READ32_MEMBER(taitojc_char_r);
 	DECLARE_WRITE32_MEMBER(taitojc_tile_w);
 	DECLARE_WRITE32_MEMBER(taitojc_char_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(mascon_state_r);
 };
 
 

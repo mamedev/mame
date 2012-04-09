@@ -128,6 +128,11 @@ public:
 	DECLARE_WRITE16_MEMBER(neogeo_paletteram_w);
 	DECLARE_READ16_MEMBER(neogeo_video_register_r);
 	DECLARE_WRITE16_MEMBER(neogeo_video_register_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(multiplexed_controller_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(mahjong_controller_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(get_calendar_status);
+	DECLARE_CUSTOM_INPUT_MEMBER(get_memcard_status);
+	DECLARE_CUSTOM_INPUT_MEMBER(get_audio_result);
 };
 
 

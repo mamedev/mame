@@ -79,6 +79,7 @@ public:
 	DECLARE_WRITE16_MEMBER(splndrbt_flip1_w);
 	DECLARE_WRITE16_MEMBER(splndrbt_bg_scrollx_w);
 	DECLARE_WRITE16_MEMBER(splndrbt_bg_scrolly_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(gekisou_unknown_status);
 };
 
 

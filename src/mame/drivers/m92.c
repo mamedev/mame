@@ -287,10 +287,9 @@ WRITE16_MEMBER(m92_state::m92_bankswitch_w)
 	}
 }
 
-static CUSTOM_INPUT( m92_sprite_busy_r )
+CUSTOM_INPUT_MEMBER(m92_state::m92_sprite_busy_r)
 {
-	m92_state *state = field.machine().driver_data<m92_state>();
-	return state->m_sprite_buffer_busy;
+	return m_sprite_buffer_busy;
 }
 
 /*****************************************************************************/
@@ -420,7 +419,7 @@ static INPUT_PORTS_START( m92_2player )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_SERVICE )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(m92_sprite_busy_r, NULL)
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, m92_state,m92_sprite_busy_r, NULL)
 	/* DIP switch bank 3 */
 	PORT_DIPUNKNOWN_DIPLOC( 0x0100, 0x0100, "SW3:1" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x0200, 0x0200, "SW3:2" )

@@ -21,6 +21,7 @@ public:
 	DECLARE_WRITE8_MEMBER(nova2001_scroll_y_w);
 	DECLARE_WRITE8_MEMBER(nova2001_flipscreen_w);
 	DECLARE_WRITE8_MEMBER(pkunwar_flipscreen_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(ninjakun_io_A002_ctrl_r);
 };
 
 

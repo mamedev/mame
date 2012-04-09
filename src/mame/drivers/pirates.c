@@ -126,20 +126,20 @@ WRITE16_MEMBER(pirates_state::pirates_out_w)
 //  logerror("%06x: out_w %04x\n",cpu_get_pc(&space.device()),data);
 }
 
-static CUSTOM_INPUT( prot_r )
+CUSTOM_INPUT_MEMBER(pirates_state::prot_r)
 {
 //  static int prot = 0xa3;
 //  offs_t pc;
 	int bit;
 
-//  logerror("%s: IN1_r\n",field.machine().describe_context());
+//  logerror("%s: IN1_r\n",machine().describe_context());
 
 #if 0
 	/* Pirates protection workaround. It more complicated than this... see code at
        602e and 62a6 */
 	/* For Genix, see 6576 for setting values and 67c2,d3b4 and dbc2 for tests. */
 
-	pc = cpu_get_pc(field.machine().device("main"));
+	pc = cpu_get_pc(machine().device("main"));
 	if (pc == 0x6134)
 	{
 		bit = prot & 1;
@@ -212,7 +212,7 @@ static INPUT_PORTS_START( pirates )
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH,IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)	// EEPROM data
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_UNKNOWN )		// seems checked in "test mode"
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_UNKNOWN )		// seems checked in "test mode"
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH,IPT_SPECIAL ) PORT_CUSTOM(prot_r, NULL)		// protection
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH,IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, pirates_state,prot_r, NULL)		// protection
 	/* What do these bits do ? */
 	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_UNKNOWN )

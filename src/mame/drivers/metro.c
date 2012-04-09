@@ -381,10 +381,9 @@ READ16_MEMBER(metro_state::metro_soundstatus_r)
 	return (m_busy_sndcpu ? 0x00 : 0x01);
 }
 
-static CUSTOM_INPUT( custom_soundstatus_r )
+CUSTOM_INPUT_MEMBER(metro_state::custom_soundstatus_r)
 {
-	metro_state *state = field.machine().driver_data<metro_state>();
-	return (state->m_busy_sndcpu ? 0x01 : 0x00);
+	return (m_busy_sndcpu ? 0x01 : 0x00);
 }
 
 WRITE16_MEMBER(metro_state::metro_soundstatus_w)
@@ -1951,7 +1950,7 @@ ADDRESS_MAP_END
 	PORT_BIT(  0x0010, IP_ACTIVE_LOW,  IPT_START1   ) \
 	PORT_BIT(  0x0020, IP_ACTIVE_LOW,  IPT_START2   ) \
 	PORT_BIT(  0x0040, IP_ACTIVE_HIGH, IPT_UNKNOWN  ) \
-	PORT_BIT(  0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL  ) PORT_CUSTOM(custom_soundstatus_r, NULL)	/* From Sound CPU */
+	PORT_BIT(  0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL  ) PORT_CUSTOM_MEMBER(DEVICE_SELF, metro_state,custom_soundstatus_r, NULL)	/* From Sound CPU */
 
 
 #define COINAGE_SERVICE_LOC(DIPBANK) \

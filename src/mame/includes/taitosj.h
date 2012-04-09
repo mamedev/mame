@@ -60,6 +60,8 @@ public:
 	DECLARE_WRITE8_MEMBER(taitosj_characterram_w);
 	DECLARE_WRITE8_MEMBER(junglhbr_characterram_w);
 	DECLARE_WRITE8_MEMBER(taitosj_collision_reg_clear_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(input_port_4_f0_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(kikstart_gear_r);
 };
 
 

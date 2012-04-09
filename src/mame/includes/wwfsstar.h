@@ -18,6 +18,7 @@ public:
 	DECLARE_WRITE16_MEMBER(wwfsstar_irqack_w);
 	DECLARE_WRITE16_MEMBER(wwfsstar_fg0_videoram_w);
 	DECLARE_WRITE16_MEMBER(wwfsstar_bg0_videoram_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(wwfsstar_vblank_r);
 };
 
 

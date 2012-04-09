@@ -67,18 +67,17 @@ WRITE8_MEMBER(crbaloon_state::pc3092_w)
 }
 
 
-static CUSTOM_INPUT( pc3092_r )
+CUSTOM_INPUT_MEMBER(crbaloon_state::pc3092_r)
 {
-	crbaloon_state *state = field.machine().driver_data<crbaloon_state>();
 	UINT32 ret;
 
 	/* enable coin & start input? Wild guess!!! */
-	if (state->m_pc3092_data[1] & 0x02)
-		ret = input_port_read(field.machine(), "PC3092");
+	if (m_pc3092_data[1] & 0x02)
+		ret = input_port_read(machine(), "PC3092");
 	else
 		ret = 0x00;
 
-	if (LOG_PC3092) logerror("%s:  read  PC3092 = 0x%02x\n", field.machine().describe_context(), ret);
+	if (LOG_PC3092) logerror("%s:  read  PC3092 = 0x%02x\n", machine().describe_context(), ret);
 
 	return ret;
 }
@@ -296,7 +295,7 @@ static INPUT_PORTS_START( crbaloon )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Name Reset")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_TILT )
-	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(pc3092_r, NULL)
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, crbaloon_state,pc3092_r, NULL)
 
 	PORT_START("PC3092")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )

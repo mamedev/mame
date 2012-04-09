@@ -27,6 +27,7 @@ public:
 	DECLARE_WRITE8_MEMBER(battlex_scroll_starfield_w);
 	DECLARE_WRITE8_MEMBER(battlex_videoram_w);
 	DECLARE_WRITE8_MEMBER(battlex_flipscreen_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(battlex_in0_b4_r);
 };
 
 

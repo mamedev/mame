@@ -18,6 +18,7 @@ public:
 	DECLARE_WRITE8_MEMBER(mainsnk_c600_w);
 	DECLARE_WRITE8_MEMBER(mainsnk_fgram_w);
 	DECLARE_WRITE8_MEMBER(mainsnk_bgram_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(mainsnk_sound_r);
 };
 
 

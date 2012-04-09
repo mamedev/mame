@@ -26,6 +26,7 @@ public:
 	DECLARE_READ32_MEMBER(gunbustr_gun_r);
 	DECLARE_WRITE32_MEMBER(gunbustr_gun_w);
 	DECLARE_READ32_MEMBER(main_cycle_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(coin_word_r);
 };
 
 

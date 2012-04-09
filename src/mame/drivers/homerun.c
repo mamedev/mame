@@ -62,9 +62,9 @@ static ADDRESS_MAP_START( homerun_memmap, AS_PROGRAM, 8, homerun_state )
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 ADDRESS_MAP_END
 
-static CUSTOM_INPUT( homerun_40_r )
+CUSTOM_INPUT_MEMBER(homerun_state::homerun_40_r)
 {
-	UINT8 ret = (field.machine().primary_screen->vpos() > 116) ? 1 : 0;
+	UINT8 ret = (machine().primary_screen->vpos() > 116) ? 1 : 0;
 
 	return ret;
 }
@@ -97,7 +97,7 @@ static const ym2203_interface ym2203_config =
 static INPUT_PORTS_START( homerun )
 	PORT_START("IN0")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(homerun_40_r, NULL)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, homerun_state,homerun_40_r, NULL)
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(	0x80, DEF_STR( On ) )
@@ -127,7 +127,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( dynashot )
 	PORT_START("IN0")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(homerun_40_r, NULL)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, homerun_state,homerun_40_r, NULL)
 	PORT_BIT( 0xb7, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN1")

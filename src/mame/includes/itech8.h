@@ -71,6 +71,8 @@ public:
 	DECLARE_READ8_MEMBER(itech8_tms34061_r);
 	DECLARE_WRITE8_MEMBER(grmatch_palette_w);
 	DECLARE_WRITE8_MEMBER(grmatch_xscroll_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(special_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(gtg_mux);
 };
 
 

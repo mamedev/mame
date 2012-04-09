@@ -176,27 +176,26 @@ Super Strong Warriors
 
 /********** READ INPUTS **********/
 
-static CUSTOM_INPUT( mahjong_ctrl_r )
+CUSTOM_INPUT_MEMBER(ms32_state::mahjong_ctrl_r)
 {
-	ms32_state *state = field.machine().driver_data<ms32_state>();
 	UINT32 mj_input;
 
-	switch (state->m_mahjong_input_select[0])
+	switch (m_mahjong_input_select[0])
 	{
 		case 0x01:
-			mj_input = input_port_read(field.machine(), "MJ0");
+			mj_input = input_port_read(machine(), "MJ0");
 			break;
 		case 0x02:
-			mj_input = input_port_read(field.machine(), "MJ1");
+			mj_input = input_port_read(machine(), "MJ1");
 			break;
 		case 0x04:
-			mj_input = input_port_read(field.machine(), "MJ2");
+			mj_input = input_port_read(machine(), "MJ2");
 			break;
 		case 0x08:
-			mj_input = input_port_read(field.machine(), "MJ3");
+			mj_input = input_port_read(machine(), "MJ3");
 			break;
 		case 0x10:
-			mj_input = input_port_read(field.machine(), "MJ4");
+			mj_input = input_port_read(machine(), "MJ4");
 			break;
 		default:
 			mj_input = 0;
@@ -624,7 +623,7 @@ static INPUT_PORTS_START( ms32_mahjong )
 	PORT_INCLUDE( ms32 )
 
 	PORT_MODIFY("INPUTS")
-	PORT_BIT( 0x000000ff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(mahjong_ctrl_r, NULL)	// here we read mahjong keys
+	PORT_BIT( 0x000000ff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, ms32_state,mahjong_ctrl_r, NULL)	// here we read mahjong keys
 	PORT_BIT( 0x0000ff00, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_COIN2 )

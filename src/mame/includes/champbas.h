@@ -43,6 +43,7 @@ public:
 	DECLARE_WRITE8_MEMBER(champbas_gfxbank_w);
 	DECLARE_WRITE8_MEMBER(champbas_palette_bank_w);
 	DECLARE_WRITE8_MEMBER(champbas_flipscreen_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(champbas_watchdog_bit2);
 };
 
 

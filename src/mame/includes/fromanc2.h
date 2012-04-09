@@ -78,6 +78,9 @@ public:
 	DECLARE_WRITE16_MEMBER(fromanc4_gfxreg_0_w);
 	DECLARE_WRITE16_MEMBER(fromanc4_gfxreg_1_w);
 	DECLARE_WRITE16_MEMBER(fromanc4_gfxreg_2_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(subcpu_int_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(sndcpu_nmi_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(subcpu_nmi_r);
 };
 
 

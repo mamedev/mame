@@ -64,24 +64,23 @@ WRITE8_MEMBER(starshp1_state::starshp1_collision_reset_w)
 }
 
 
-static CUSTOM_INPUT( starshp1_analog_r )
+CUSTOM_INPUT_MEMBER(starshp1_state::starshp1_analog_r)
 {
-	starshp1_state *state = field.machine().driver_data<starshp1_state>();
 	int val = 0;
 
-	switch (state->m_analog_in_select)
+	switch (m_analog_in_select)
 	{
 	case 0:
-		val = input_port_read(field.machine(), "STICKY");
+		val = input_port_read(machine(), "STICKY");
 		break;
 	case 1:
-		val = input_port_read(field.machine(), "STICKX");
+		val = input_port_read(machine(), "STICKX");
 		break;
 	case 2:
 		val = 0x20; /* DAC feedback, not used */
 		break;
 	case 3:
-		val = input_port_read(field.machine(), "PLAYTIME");
+		val = input_port_read(machine(), "PLAYTIME");
 		break;
 	}
 
@@ -89,10 +88,9 @@ static CUSTOM_INPUT( starshp1_analog_r )
 }
 
 
-static CUSTOM_INPUT( collision_latch_r )
+CUSTOM_INPUT_MEMBER(starshp1_state::collision_latch_r)
 {
-	starshp1_state *state = field.machine().driver_data<starshp1_state>();
-	return state->m_collision_latch & 0x0f;
+	return m_collision_latch & 0x0f;
 }
 
 
@@ -202,12 +200,12 @@ static INPUT_PORTS_START( starshp1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 
 	PORT_START("VBLANK")
-	PORT_BIT( 0x3f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(starshp1_analog_r, NULL)	/* analog in */
+	PORT_BIT( 0x3f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, starshp1_state,starshp1_analog_r, NULL)	/* analog in */
 	PORT_SERVICE( 0x40, IP_ACTIVE_LOW )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
 
 	PORT_START("COINAGE")
-	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(collision_latch_r, NULL)	/* collision latch */
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, starshp1_state,collision_latch_r, NULL)	/* collision latch */
 	PORT_DIPNAME( 0x70, 0x20, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(	0x10, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(	0x20, DEF_STR( 1C_1C ) )

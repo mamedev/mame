@@ -94,6 +94,7 @@ public:
 	DECLARE_WRITE32_MEMBER(skns_tilemapA_w);
 	DECLARE_WRITE32_MEMBER(skns_tilemapB_w);
 	DECLARE_WRITE32_MEMBER(skns_v3_regs_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(paddle_r);
 };
 
 

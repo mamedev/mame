@@ -1163,10 +1163,10 @@ INPUT_PORTS_END
 
 /* Mascon must always be in a defined state, Densha de Go 2 in particular returns black screen if the Mascon input is undefined
    We convert the 6 lever "shifter" into a fake analog port for now. */
-static CUSTOM_INPUT( mascon_state_r )
+CUSTOM_INPUT_MEMBER(taitojc_state::mascon_state_r)
 {
 	static const UINT8 mascon_table[6] = { 0x01, 0x10, 0x02, 0x20, 0x04, 0x40 };
-	UINT8 res = input_port_read(field.machine(), "MASCON");
+	UINT8 res = input_port_read(machine(), "MASCON");
 	int i;
 
 	//popmessage("%02x",res);
@@ -1205,7 +1205,7 @@ static INPUT_PORTS_START( dendego )
 	PORT_START("BUTTONS")
 	/* TODO: fix this */
 	PORT_BIT( 0x88, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x77, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(mascon_state_r,NULL)
+	PORT_BIT( 0x77, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, taitojc_state,mascon_state_r,NULL)
 //  PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Mascon 5")      // Mascon 5
 //  PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Mascon 3")      // Mascon 3
 //  PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Mascon 1")      // Mascon 1

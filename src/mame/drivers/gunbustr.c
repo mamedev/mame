@@ -78,10 +78,9 @@ WRITE32_MEMBER(gunbustr_state::gunbustr_palette_w)
 	palette_set_color_rgb(machine(),offset*2+1,pal5bit(a >> 10),pal5bit(a >> 5),pal5bit(a >> 0));
 }
 
-static CUSTOM_INPUT( coin_word_r )
+CUSTOM_INPUT_MEMBER(gunbustr_state::coin_word_r)
 {
-	gunbustr_state *state = field.machine().driver_data<gunbustr_state>();
-	return state->m_coin_word;
+	return m_coin_word;
 }
 
 WRITE32_MEMBER(gunbustr_state::gunbustr_input_w)
@@ -263,7 +262,7 @@ static INPUT_PORTS_START( gunbustr )
 	PORT_BIT( 0x00002000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00008000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(coin_word_r, NULL)
+	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, gunbustr_state,coin_word_r, NULL)
 
 	/* Light gun inputs */
 

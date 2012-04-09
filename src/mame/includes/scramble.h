@@ -12,6 +12,7 @@ public:
 	UINT8 m_security_2B_counter;
 	UINT8 m_xb;
 	DECLARE_CUSTOM_INPUT_MEMBER(darkplnt_custom_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(ckongs_coinage_r);
 };
 
 

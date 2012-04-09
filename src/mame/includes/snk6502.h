@@ -40,6 +40,8 @@ public:
 	DECLARE_WRITE8_MEMBER(snk6502_scrolly_w);
 	DECLARE_WRITE8_MEMBER(satansat_b002_w);
 	DECLARE_WRITE8_MEMBER(satansat_backcolor_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(snk6502_music0_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(sasuke_count_r);
 };
 
 

@@ -73,6 +73,7 @@ public:
 	DECLARE_WRITE16_MEMBER(rocknms_sub_vram_bg_w);
 	DECLARE_WRITE16_MEMBER(rocknms_sub_vram_fg_w);
 	DECLARE_WRITE16_MEMBER(rocknms_sub_vram_rot_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(rocknms_main2sub_status_r);
 };
 
 /*----------- defined in video/tetrisp2.c -----------*/

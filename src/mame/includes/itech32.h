@@ -123,6 +123,7 @@ public:
 	DECLARE_WRITE32_MEMBER(itech020_video_w);
 	DECLARE_WRITE32_MEMBER(drivedge_zbuf_control_w);
 	DECLARE_READ32_MEMBER(itech020_video_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(special_port_r);
 };
 
 

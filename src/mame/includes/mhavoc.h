@@ -56,6 +56,7 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(gamma_xmtd_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(alpha_rcvd_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(alpha_xmtd_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(clock_r);
 };
 
 

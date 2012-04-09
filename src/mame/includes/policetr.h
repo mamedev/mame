@@ -39,6 +39,7 @@ public:
 	DECLARE_READ32_MEMBER(policetr_video_r);
 	DECLARE_WRITE32_MEMBER(policetr_palette_offset_w);
 	DECLARE_WRITE32_MEMBER(policetr_palette_data_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(bsmt_status_r);
 };
 
 

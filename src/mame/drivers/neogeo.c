@@ -377,9 +377,8 @@ static void select_controller( running_machine &machine, UINT8 data )
 }
 
 
-static CUSTOM_INPUT( multiplexed_controller_r )
+CUSTOM_INPUT_MEMBER(neogeo_state::multiplexed_controller_r)
 {
-	neogeo_state *state = field.machine().driver_data<neogeo_state>();
 	int port = (FPTR)param;
 
 	static const char *const cntrl[2][2] =
@@ -387,13 +386,12 @@ static CUSTOM_INPUT( multiplexed_controller_r )
 			{ "IN0-0", "IN0-1" }, { "IN1-0", "IN1-1" }
 		};
 
-	return input_port_read_safe(field.machine(), cntrl[port][state->m_controller_select & 0x01], 0x00);
+	return input_port_read_safe(machine(), cntrl[port][m_controller_select & 0x01], 0x00);
 }
 
 #if 1 // this needs to be added dynamically somehow
-static CUSTOM_INPUT( mahjong_controller_r )
+CUSTOM_INPUT_MEMBER(neogeo_state::mahjong_controller_r)
 {
-	neogeo_state *state = field.machine().driver_data<neogeo_state>();
 	UINT32 ret;
 
 /*
@@ -403,14 +401,14 @@ cpu #0 (PC=00C18D54): unmapped memory word write to 00380000 = 0024 & 00FF
 cpu #0 (PC=00C18D6C): unmapped memory word write to 00380000 = 0009 & 00FF
 cpu #0 (PC=00C18C40): unmapped memory word write to 00380000 = 0000 & 00FF
 */
-	switch (state->m_controller_select)
+	switch (m_controller_select)
 	{
 	default:
 	case 0x00: ret = 0x0000; break; /* nothing? */
-	case 0x09: ret = input_port_read(field.machine(), "MAHJONG1"); break;
-	case 0x12: ret = input_port_read(field.machine(), "MAHJONG2"); break;
-	case 0x1b: ret = input_port_read(field.machine(), "MAHJONG3"); break; /* player 1 normal inputs? */
-	case 0x24: ret = input_port_read(field.machine(), "MAHJONG4"); break;
+	case 0x09: ret = input_port_read(machine(), "MAHJONG1"); break;
+	case 0x12: ret = input_port_read(machine(), "MAHJONG2"); break;
+	case 0x1b: ret = input_port_read(machine(), "MAHJONG3"); break; /* player 1 normal inputs? */
+	case 0x24: ret = input_port_read(machine(), "MAHJONG4"); break;
 	}
 
 	return ret;
@@ -472,10 +470,9 @@ READ16_MEMBER(neogeo_state::neogeo_unmapped_r)
  *
  *************************************/
 
-static CUSTOM_INPUT( get_calendar_status )
+CUSTOM_INPUT_MEMBER(neogeo_state::get_calendar_status)
 {
-	neogeo_state *state = field.machine().driver_data<neogeo_state>();
-	return (upd4990a_databit_r(state->m_upd4990a, 0) << 1) | upd4990a_testbit_r(state->m_upd4990a, 0);
+	return (upd4990a_databit_r(m_upd4990a, 0) << 1) | upd4990a_testbit_r(m_upd4990a, 0);
 }
 
 
@@ -511,11 +508,11 @@ WRITE16_MEMBER(neogeo_state::save_ram_w)
 #define MEMCARD_SIZE	0x0800
 
 
-static CUSTOM_INPUT( get_memcard_status )
+CUSTOM_INPUT_MEMBER(neogeo_state::get_memcard_status)
 {
 	/* D0 and D1 are memcard presence indicators, D2 indicates memcard
        write protect status (we are always write enabled) */
-	return (memcard_present(field.machine()) == -1) ? 0x07 : 0x00;
+	return (memcard_present(machine()) == -1) ? 0x07 : 0x00;
 }
 
 
@@ -608,12 +605,11 @@ WRITE8_MEMBER(neogeo_state::audio_result_w)
 }
 
 
-static CUSTOM_INPUT( get_audio_result )
+CUSTOM_INPUT_MEMBER(neogeo_state::get_audio_result)
 {
-	neogeo_state *state = field.machine().driver_data<neogeo_state>();
-	UINT32 ret = state->m_audio_result;
+	UINT32 ret = m_audio_result;
 
-//  if (LOG_CPU_COMM) logerror("MAIN CPU PC %06x: audio_result_r %02x\n", cpu_get_pc(field.machine().device("maincpu")), ret);
+//  if (LOG_CPU_COMM) logerror("MAIN CPU PC %06x: audio_result_r %02x\n", cpu_get_pc(machine().device("maincpu")), ret);
 
 	return ret;
 }
@@ -1227,7 +1223,7 @@ static const ym2610_interface ym2610_config =
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Next Game") PORT_CODE(KEYCODE_7)		\
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_START2 )   												\
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Previous Game") PORT_CODE(KEYCODE_8)	\
-	PORT_BIT( 0x7000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(get_memcard_status, NULL)			\
+	PORT_BIT( 0x7000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, neogeo_state,get_memcard_status, NULL)			\
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN ) /* In AES 'mode' nitd, kof2000, sengoku3, matrim and mslug5 check if this is ACTIVE_HIGH */
 
 
@@ -1239,8 +1235,8 @@ static const ym2610_interface ym2610_config =
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN ) /* having this ACTIVE_HIGH causes you to start with 2 credits using USA bios roms; if ACTIVE_HIGH + IN4 bit 6 ACTIVE_HIGH = AES 'mode' */	\
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN ) /* having this ACTIVE_HIGH causes you to start with 2 credits using USA bios roms; if ACTIVE_HIGH + IN4 bit 6 ACTIVE_HIGH = AES 'mode' */	\
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_SPECIAL ) /* what is this? When ACTIVE_HIGH + IN4 bit 6 ACTIVE_LOW MVS-4 slot is detected */	\
-	PORT_BIT( 0x00c0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(get_calendar_status, NULL)			\
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(get_audio_result, NULL)
+	PORT_BIT( 0x00c0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, neogeo_state,get_calendar_status, NULL)			\
+	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, neogeo_state,get_audio_result, NULL)
 
 
 #define STANDARD_IN4																			\

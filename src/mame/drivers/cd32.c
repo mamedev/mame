@@ -229,10 +229,9 @@ static UINT16 handle_joystick_potgor(running_machine &machine, UINT16 potgor)
 	return potgor;
 }
 
-static CUSTOM_INPUT(cubo_input)
+CUSTOM_INPUT_MEMBER(cd32_state::cubo_input)
 {
-	cd32_state *state = field.machine().driver_data<cd32_state>();
-	return handle_joystick_potgor(field.machine(), state->m_potgo_value) >> 10;
+	return handle_joystick_potgor(machine(), m_potgo_value) >> 10;
 }
 
 static INPUT_PORTS_START( cd32 )
@@ -251,7 +250,7 @@ static INPUT_PORTS_START( cd32 )
 	PORT_BIT( 0xfcfc, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("POTGO")
-	PORT_BIT( 0x4400, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(cubo_input, 0)
+	PORT_BIT( 0x4400, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, cd32_state,cubo_input, 0)
 	PORT_BIT( 0xbbff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("P1JOY")

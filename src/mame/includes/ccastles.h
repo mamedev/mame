@@ -61,6 +61,7 @@ public:
 	DECLARE_READ8_MEMBER(ccastles_bitmode_r);
 	DECLARE_WRITE8_MEMBER(ccastles_bitmode_w);
 	DECLARE_WRITE8_MEMBER(ccastles_bitmode_addr_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(get_vblank);
 };
 
 

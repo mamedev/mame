@@ -458,31 +458,29 @@ static READ32_HANDLER( videoctl_r )
 	return (space->machine().primary_screen->frame_number() & 1) << 2;
 }
 
-static CUSTOM_INPUT( _1c00000_r )
+CUSTOM_INPUT_MEMBER(model2_state::_1c00000_r)
 {
-	model2_state *state = field.machine().driver_data<model2_state>();
-	UINT32 ret = input_port_read(field.machine(), "IN0");
+	UINT32 ret = input_port_read(machine(), "IN0");
 
-	if(state->m_ctrlmode == 0)
+	if(m_ctrlmode == 0)
 	{
 		return ret;
 	}
 	else
 	{
 		ret &= ~0x0030;
-		return ret | 0x00d0 | (field.machine().device<eeprom_device>("eeprom")->read_bit() << 5);
+		return ret | 0x00d0 | (machine().device<eeprom_device>("eeprom")->read_bit() << 5);
 	}
 }
 
-static CUSTOM_INPUT( _1c0001c_r )
+CUSTOM_INPUT_MEMBER(model2_state::_1c0001c_r)
 {
-	model2_state *state = field.machine().driver_data<model2_state>();
 	UINT32 iptval = 0x00ff;
-	if(state->m_analog_channel < 4)
+	if(m_analog_channel < 4)
 	{
 		static const char *const ports[] = { "ANA0", "ANA1", "ANA2", "ANA3" };
-		iptval = input_port_read_safe(field.machine(), ports[state->m_analog_channel], 0);
-		++state->m_analog_channel;
+		iptval = input_port_read_safe(machine(), ports[m_analog_channel], 0);
+		++m_analog_channel;
 	}
 	return iptval;
 }
@@ -558,7 +556,7 @@ static CUSTOM_INPUT( _1c0001c_r )
 */
 
 
-static CUSTOM_INPUT( rchase2_devices_r )
+CUSTOM_INPUT_MEMBER(model2_state::rchase2_devices_r)
 {
 	return 0xffff;
 }
@@ -1533,7 +1531,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( model2 )
 	PORT_START("1c00000")
 	PORT_BIT( 0x0000ffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(_1c00000_r, NULL)
+	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, model2_state,_1c00000_r, NULL)
 
 	PORT_START("1c00004")
 	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(custom_port_read, "IN1")
@@ -1550,7 +1548,7 @@ static INPUT_PORTS_START( model2 )
 	PORT_START("1c0001c")
 	PORT_BIT( 0x0000001a, IP_ACTIVE_HIGH, IPT_SPECIAL )	// these must be high
 	PORT_BIT( 0x0000ffe5, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(_1c0001c_r, NULL)
+	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, model2_state,_1c0001c_r, NULL)
 
 	PORT_START("IN0")
 	PORT_BIT(0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -1670,7 +1668,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( srallyc )
 	PORT_START("1c00000")
 	PORT_BIT( 0x0000ffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(_1c00000_r, NULL)
+	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, model2_state,_1c00000_r, NULL)
 
 	PORT_START("1c00004")
 	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(custom_port_read, "IN1")
@@ -1687,7 +1685,7 @@ static INPUT_PORTS_START( srallyc )
 	PORT_START("1c0001c")
 	PORT_BIT( 0x0000001a, IP_ACTIVE_HIGH, IPT_SPECIAL )	// these must be high
 	PORT_BIT( 0x0000ffe5, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(_1c0001c_r, NULL)
+	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, model2_state,_1c0001c_r, NULL)
 
 	PORT_START("IN0")
 	PORT_BIT(0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -1721,7 +1719,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( bel )
 	PORT_START("1c00000")
 	PORT_BIT( 0x0000ffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(_1c00000_r, NULL)
+	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, model2_state,_1c00000_r, NULL)
 
 	PORT_START("1c00004")
 	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(custom_port_read, "IN1")
@@ -1738,7 +1736,7 @@ static INPUT_PORTS_START( bel )
 	PORT_START("1c0001c")
 	PORT_BIT( 0x0000001a, IP_ACTIVE_HIGH, IPT_SPECIAL )	// these must be high
 	PORT_BIT( 0x0000ffe5, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(_1c0001c_r, NULL)
+	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, model2_state,_1c0001c_r, NULL)
 
 	PORT_START("IN0")
 	PORT_BIT(0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -1769,7 +1767,7 @@ static INPUT_PORTS_START( rchase2 )
 	PORT_BIT( 0xfffc, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_MODIFY("IN2")
-	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(rchase2_devices_r, NULL)
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, model2_state,rchase2_devices_r, NULL)
 
 	/* FIXME: don't know yet if min max values are really correct, we'll see ... */
 	PORT_START("ANA0")

@@ -212,9 +212,9 @@ static INPUT_PORTS_START( pastelg )
 INPUT_PORTS_END
 
 // stops the game hanging..
-static CUSTOM_INPUT( nb1413m3_hackbusyflag_r )
+CUSTOM_INPUT_MEMBER(pastelg_state::nb1413m3_hackbusyflag_r)
 {
-	return field.machine().rand() & 3;
+	return machine().rand() & 3;
 }
 
 static INPUT_PORTS_START( threeds )
@@ -369,7 +369,7 @@ static INPUT_PORTS_START( threeds )
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(nb1413m3_hackbusyflag_r, NULL)	// DRAW BUSY
+	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, pastelg_state,nb1413m3_hackbusyflag_r, NULL)	// DRAW BUSY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE3 )		// MEMORY RESET
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )		// ANALYZER
 	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )					// TEST

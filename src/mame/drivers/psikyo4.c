@@ -195,22 +195,21 @@ static INTERRUPT_GEN(psikyosh_interrupt)
 	device_set_input_line(device, 4, HOLD_LINE);
 }
 
-static CUSTOM_INPUT( system_port_r )
+CUSTOM_INPUT_MEMBER(psikyo4_state::system_port_r)
 {
-	return input_port_read(field.machine(), "SYSTEM");
+	return input_port_read(machine(), "SYSTEM");
 }
 
-static CUSTOM_INPUT( mahjong_ctrl_r ) /* used by hotgmck/hgkairak */
+CUSTOM_INPUT_MEMBER(psikyo4_state::mahjong_ctrl_r)/* used by hotgmck/hgkairak */
 {
-	psikyo4_state *state = field.machine().driver_data<psikyo4_state>();
 	int player = (FPTR)param;
-	int sel = (state->m_io_select[0] & 0x0000ff00) >> 8;
+	int sel = (m_io_select[0] & 0x0000ff00) >> 8;
 	int ret = 0xff;
 
-	if (sel & 1) ret &= input_port_read(field.machine(), player ? "KEY4" : "KEY0" );
-	if (sel & 2) ret &= input_port_read(field.machine(), player ? "KEY5" : "KEY1" );
-	if (sel & 4) ret &= input_port_read(field.machine(), player ? "KEY6" : "KEY2" );
-	if (sel & 8) ret &= input_port_read(field.machine(), player ? "KEY7" : "KEY3" );
+	if (sel & 1) ret &= input_port_read(machine(), player ? "KEY4" : "KEY0" );
+	if (sel & 2) ret &= input_port_read(machine(), player ? "KEY5" : "KEY1" );
+	if (sel & 4) ret &= input_port_read(machine(), player ? "KEY6" : "KEY2" );
+	if (sel & 8) ret &= input_port_read(machine(), player ? "KEY7" : "KEY3" );
 
 	return ret;
 }
@@ -379,14 +378,14 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( hotgmck )
 	PORT_START("P1_P2")
-	PORT_BIT( 0x000000ff, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_CUSTOM(system_port_r, NULL)
+	PORT_BIT( 0x000000ff, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_CUSTOM_MEMBER(DEVICE_SELF, psikyo4_state,system_port_r, NULL)
 	PORT_BIT( 0x00ffff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0xff000000, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_CUSTOM(mahjong_ctrl_r, (void *)0)
+	PORT_BIT( 0xff000000, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_CUSTOM_MEMBER(DEVICE_SELF, psikyo4_state,mahjong_ctrl_r, (void *)0)
 
 	PORT_START("P3_P4")
-	PORT_BIT( 0x000000ff, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_CUSTOM(system_port_r, NULL)
+	PORT_BIT( 0x000000ff, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_CUSTOM_MEMBER(DEVICE_SELF, psikyo4_state,system_port_r, NULL)
 	PORT_BIT( 0x00ffff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0xff000000, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_CUSTOM(mahjong_ctrl_r, (void *)1)
+	PORT_BIT( 0xff000000, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_CUSTOM_MEMBER(DEVICE_SELF, psikyo4_state,mahjong_ctrl_r, (void *)1)
 
 	PORT_START("JP4")/* jumper pads 'JP4' on the PCB */
 	/* EEPROM is read here */

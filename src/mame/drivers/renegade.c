@@ -593,20 +593,19 @@ READ8_MEMBER(renegade_state::mcu_r)
 	}
 }
 
-static CUSTOM_INPUT( mcu_status_r )
+CUSTOM_INPUT_MEMBER(renegade_state::mcu_status_r)
 {
-	renegade_state *state = field.machine().driver_data<renegade_state>();
 	UINT8 res = 0;
 
-	if (state->m_mcu_sim == TRUE)
+	if (m_mcu_sim == TRUE)
 	{
 		res = 1;
 	}
 	else
 	{
-		if (!state->m_main_sent)
+		if (!m_main_sent)
 			res |= 0x01;
-		if (!state->m_mcu_sent)
+		if (!m_mcu_sent)
 			res |= 0x02;
 	}
 
@@ -717,7 +716,7 @@ static INPUT_PORTS_START( renegade )
 
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)	/* attack right */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)	/* attack right */
-	PORT_BIT( 0x30, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_CUSTOM(mcu_status_r, NULL)
+	PORT_BIT( 0x30, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, renegade_state,mcu_status_r, NULL)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_VBLANK )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )
 

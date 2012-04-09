@@ -19,11 +19,10 @@ WRITE8_MEMBER(xxmissio_state::xxmissio_bank_sel_w)
 	memory_set_bank(machine(), "bank1", data & 7);
 }
 
-static CUSTOM_INPUT( xxmissio_status_r )
+CUSTOM_INPUT_MEMBER(xxmissio_state::xxmissio_status_r)
 {
-	xxmissio_state *state = field.machine().driver_data<xxmissio_state>();
 	int bit_mask = (FPTR)param;
-	return (state->m_status & bit_mask) ? 1 : 0;
+	return (m_status & bit_mask) ? 1 : 0;
 }
 
 WRITE8_MEMBER(xxmissio_state::xxmissio_status_m_w)
@@ -199,14 +198,14 @@ static INPUT_PORTS_START( xxmissio )
 	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW2:8" ) /* Shown as "Unused" in the manual */
 
 	PORT_START("STATUS")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(xxmissio_status_r, (void *)0x01)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, xxmissio_state,xxmissio_status_r, (void *)0x01)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_VBLANK )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(xxmissio_status_r, (void *)0x04)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(xxmissio_status_r, (void *)0x08)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(xxmissio_status_r, (void *)0x10)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(xxmissio_status_r, (void *)0x20)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(xxmissio_status_r, (void *)0x40)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(xxmissio_status_r, (void *)0x80)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, xxmissio_state,xxmissio_status_r, (void *)0x04)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, xxmissio_state,xxmissio_status_r, (void *)0x08)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, xxmissio_state,xxmissio_status_r, (void *)0x10)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, xxmissio_state,xxmissio_status_r, (void *)0x20)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, xxmissio_state,xxmissio_status_r, (void *)0x40)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, xxmissio_state,xxmissio_status_r, (void *)0x80)
 INPUT_PORTS_END
 
 /****************************************************************************/

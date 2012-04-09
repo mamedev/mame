@@ -30,10 +30,10 @@ static MACHINE_RESET( wolfpack )
 }
 
 
-static CUSTOM_INPUT( wolfpack_dial_r )
+CUSTOM_INPUT_MEMBER(wolfpack_state::wolfpack_dial_r)
 {
 	int bit = (FPTR)param;
-	return ((input_port_read(field.machine(), "DIAL") + bit) / 2) & 0x01;
+	return ((input_port_read(machine(), "DIAL") + bit) / 2) & 0x01;
 }
 
 
@@ -149,8 +149,8 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( wolfpack )
 	PORT_START("INPUTS")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(wolfpack_dial_r, (void *)0)	/* dial connects here */
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(wolfpack_dial_r, (void *)1)	/* dial connects here */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, wolfpack_state,wolfpack_dial_r, (void *)0)	/* dial connects here */
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, wolfpack_state,wolfpack_dial_r, (void *)1)	/* dial connects here */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_SERVICE( 0x10, IP_ACTIVE_HIGH )

@@ -314,19 +314,18 @@ READ16_MEMBER(niyanpai_state::musobana_inputport_0_r)
 	return (portdata);
 }
 
-static CUSTOM_INPUT( musobana_outcoin_flag_r )
+CUSTOM_INPUT_MEMBER(niyanpai_state::musobana_outcoin_flag_r)
 {
-	niyanpai_state *state = field.machine().driver_data<niyanpai_state>();
-	address_space *space = field.machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	// tmp68301_parallel_interface[0x05]
 	//  bit 0   coin counter
 	//  bit 2   motor on
 	//  bit 3   coin lock
 
-	if (tmp68301_parallel_interface_r(space, 0x0005, 0x00ff) & 0x0004) state->m_musobana_outcoin_flag ^= 1;
-	else state->m_musobana_outcoin_flag = 1;
+	if (tmp68301_parallel_interface_r(space, 0x0005, 0x00ff) & 0x0004) m_musobana_outcoin_flag ^= 1;
+	else m_musobana_outcoin_flag = 1;
 
-	return state->m_musobana_outcoin_flag & 0x01;
+	return m_musobana_outcoin_flag & 0x01;
 }
 
 WRITE16_MEMBER(niyanpai_state::musobana_inputport_w)
@@ -690,7 +689,7 @@ static INPUT_PORTS_START( musobana )	// I don't have manual for this game.
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_START3 )			// CREDIT CLEAR
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_SERVICE3 )			// MEMORY RESET
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_SERVICE2 )			// ANALYZER
-	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(musobana_outcoin_flag_r, NULL)	// OUT COIN
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, niyanpai_state,musobana_outcoin_flag_r, NULL)	// OUT COIN
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_SERVICE( 0x8000, IP_ACTIVE_LOW )					// TEST
 
@@ -756,7 +755,7 @@ static INPUT_PORTS_START( 4psimasy )	// I don't have manual for this game.
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_START3 )			// CREDIT CLEAR
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_SERVICE3 )			// MEMORY RESET
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_SERVICE2 )			// ANALYZER
-	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(musobana_outcoin_flag_r, NULL)	// OUT COIN
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, niyanpai_state,musobana_outcoin_flag_r, NULL)	// OUT COIN
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_SERVICE( 0x8000, IP_ACTIVE_LOW )					// TEST
 
@@ -822,7 +821,7 @@ static INPUT_PORTS_START( mhhonban )	// I don't have manual for this game.
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_START3 )			// CREDIT CLEAR
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_SERVICE3 )			// MEMORY RESET
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_SERVICE2 )			// ANALYZER
-	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(musobana_outcoin_flag_r, NULL)	// OUT COIN
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, niyanpai_state,musobana_outcoin_flag_r, NULL)	// OUT COIN
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_SERVICE( 0x8000, IP_ACTIVE_LOW )					// TEST
 

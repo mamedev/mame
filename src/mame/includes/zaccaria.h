@@ -27,6 +27,7 @@ public:
 	DECLARE_WRITE8_MEMBER(zaccaria_attributes_w);
 	DECLARE_WRITE8_MEMBER(zaccaria_flip_screen_x_w);
 	DECLARE_WRITE8_MEMBER(zaccaria_flip_screen_y_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(acs_r);
 };
 
 

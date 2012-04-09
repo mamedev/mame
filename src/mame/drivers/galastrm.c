@@ -87,16 +87,14 @@ WRITE32_MEMBER(galastrm_state::galastrm_tc0610_1_w)
 }
 
 
-static CUSTOM_INPUT( frame_counter_r )
+CUSTOM_INPUT_MEMBER(galastrm_state::frame_counter_r)
 {
-	galastrm_state *state = field.machine().driver_data<galastrm_state>();
-	return state->m_frame_counter;
+	return m_frame_counter;
 }
 
-static CUSTOM_INPUT( coin_word_r )
+CUSTOM_INPUT_MEMBER(galastrm_state::coin_word_r)
 {
-	galastrm_state *state = field.machine().driver_data<galastrm_state>();
-	return state->m_coin_word;
+	return m_coin_word;
 }
 
 WRITE32_MEMBER(galastrm_state::galastrm_input_w)
@@ -202,7 +200,7 @@ static INPUT_PORTS_START( galastrm )
 	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)
 	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x00000200, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(frame_counter_r, NULL)
+	PORT_BIT( 0x00000200, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galastrm_state,frame_counter_r, NULL)
 	PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000800, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00001000, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -228,7 +226,7 @@ static INPUT_PORTS_START( galastrm )
 	PORT_BIT( 0x00002000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00008000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(coin_word_r, NULL)
+	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galastrm_state,coin_word_r, NULL)
 
 	PORT_START("STICKX")
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(60) PORT_KEYDELTA(15) PORT_PLAYER(1)

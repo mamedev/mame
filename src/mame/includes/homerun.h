@@ -27,6 +27,7 @@ public:
 	int        m_gc_down;
 	DECLARE_WRITE8_MEMBER(homerun_videoram_w);
 	DECLARE_WRITE8_MEMBER(homerun_color_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(homerun_40_r);
 };
 
 

@@ -124,6 +124,9 @@ public:
 	DECLARE_WRITE8_MEMBER(dambustr_bg_split_line_w);
 	DECLARE_WRITE8_MEMBER(dambustr_bg_color_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(_4in1_fake_port_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(vpool_lives_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(ckongg_coinage_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(dkongjrm_coinage_r);
 };
 
 

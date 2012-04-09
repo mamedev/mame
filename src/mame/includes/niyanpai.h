@@ -75,6 +75,7 @@ public:
 	DECLARE_WRITE16_MEMBER(niyanpai_clutsel_0_w);
 	DECLARE_WRITE16_MEMBER(niyanpai_clutsel_1_w);
 	DECLARE_WRITE16_MEMBER(niyanpai_clutsel_2_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(musobana_outcoin_flag_r);
 };
 
 

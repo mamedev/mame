@@ -178,9 +178,9 @@ WRITE32_MEMBER(policetr_state::policetr_bsmt2000_data_w)
 }
 
 
-static CUSTOM_INPUT( bsmt_status_r )
+CUSTOM_INPUT_MEMBER(policetr_state::bsmt_status_r)
 {
-	return field.machine().device<bsmt2000_device>("bsmt")->read_status();
+	return machine().device<bsmt2000_device>("bsmt")->read_status();
 }
 
 
@@ -321,7 +321,7 @@ static INPUT_PORTS_START( policetr )
 	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_SERVICE( 0x00200000, IP_ACTIVE_LOW )		/* Not actually a dipswitch */
 	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00800000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(bsmt_status_r, NULL)
+	PORT_BIT( 0x00800000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, policetr_state,bsmt_status_r, NULL)
 	PORT_BIT( 0x01000000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x02000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04000000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)

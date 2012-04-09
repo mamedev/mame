@@ -420,12 +420,12 @@ WRITE32_MEMBER(midzeus_state::tms32031_control_w)
  *
  *************************************/
 
-static CUSTOM_INPUT( custom_49way_r )
+CUSTOM_INPUT_MEMBER(midzeus_state::custom_49way_r)
 {
 	static const UINT8 translate49[7] = { 0x8, 0xc, 0xe, 0xf, 0x3, 0x1, 0x0 };
 	const char *namex = (const char *)param;
 	const char *namey = namex + strlen(namex) + 1;
-	return (translate49[input_port_read(field.machine(), namey) >> 4] << 4) | translate49[input_port_read(field.machine(), namex) >> 4];
+	return (translate49[input_port_read(machine(), namey) >> 4] << 4) | translate49[input_port_read(machine(), namex) >> 4];
 }
 
 
@@ -436,9 +436,9 @@ WRITE32_MEMBER(midzeus_state::keypad_select_w)
 }
 
 
-static CUSTOM_INPUT( keypad_r )
+CUSTOM_INPUT_MEMBER(midzeus_state::keypad_r)
 {
-	UINT32 bits = input_port_read(field.machine(), (const char *)param);
+	UINT32 bits = input_port_read(machine(), (const char *)param);
 	UINT8 select = keypad_select;
 	while ((select & 1) != 0)
 	{
@@ -931,7 +931,7 @@ static INPUT_PORTS_START( crusnexo )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN2")
-	PORT_BIT( 0x0007, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_CUSTOM( keypad_r, "KEYPAD" )
+	PORT_BIT( 0x0007, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, midzeus_state, keypad_r, "KEYPAD" )
 	PORT_BIT( 0xfff8, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("KEYPAD")
@@ -1067,7 +1067,7 @@ static INPUT_PORTS_START( thegrid )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN2")
-	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(custom_49way_r, "49WAYX\0" "49WAYY")
+	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, midzeus_state,custom_49way_r, "49WAYX\0" "49WAYY")
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("49WAYX")
