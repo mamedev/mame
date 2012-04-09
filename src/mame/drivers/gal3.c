@@ -162,6 +162,9 @@ public:
 
 static VIDEO_START(gal3)
 {
+	gal3_state *state = machine.driver_data<gal3_state>();
+	state->m_generic_paletteram_16.allocate(0x10000);
+ 
 	namco_obj_init(machine,
 		0,		/* gfx bank */
 		0xf,	/* reverse palette mapping */
@@ -389,7 +392,7 @@ static ADDRESS_MAP_START( cpu_slv_map, AS_PROGRAM, 32, gal3_state )
 /// AM_RANGE(0xf1480000, 0xf14807ff) AM_READWRITE_LEGACY(namcos21_depthcue_r,namcos21_depthcue_w)
 	AM_RANGE(0xf1700000, 0xf170ffff) AM_READWRITE_LEGACY(namco_obj32_r,namco_obj32_w)
 	AM_RANGE(0xf1720000, 0xf1720007) AM_READWRITE_LEGACY(namco_spritepos32_r,namco_spritepos32_w)
-	AM_RANGE(0xf1740000, 0xf175ffff) AM_READWRITE(paletteram32_r,paletteram32_w) AM_SHARE("paletteram")
+	AM_RANGE(0xf1740000, 0xf175ffff) AM_READWRITE(paletteram32_r,paletteram32_w)
 	AM_RANGE(0xf1760000, 0xf1760003) AM_READWRITE(namcos21_video_enable_r,namcos21_video_enable_w)
 
 	AM_RANGE(0xf2200000, 0xf220ffff) AM_RAM
