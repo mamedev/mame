@@ -95,6 +95,7 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(azurian_port_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(kingball_muxbit_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(kingball_noise_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(moonwar_dial_r);
 };
 
 

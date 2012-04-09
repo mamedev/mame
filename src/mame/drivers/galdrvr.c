@@ -2481,27 +2481,26 @@ static INPUT_PORTS_START( scobras )
 INPUT_PORTS_END
 
 
-static CUSTOM_INPUT( moonwar_dial_r )
+CUSTOM_INPUT_MEMBER(galaxian_state::moonwar_dial_r)
 {
-	galaxian_state *state = field.machine().driver_data<galaxian_state>();
 	static const char *const dialname[2] = { "P1_DIAL", "P2_DIAL" };
-	int p = (~state->m_moonwar_port_select >> 4) & 1;
+	int p = (~m_moonwar_port_select >> 4) & 1;
 
 	// see http://www.cityofberwyn.com/schematics/stern/MoonWar_opto.tiff for schematic
 	// I.e. a 74ls161 counts from 0 to 15 which is the absolute number of bars passed on the quadrature
 
-	signed char dialread = input_port_read(field.machine(), dialname[p]);
+	signed char dialread = input_port_read(machine(), dialname[p]);
 
 	UINT8 ret;
 
-	if (dialread < 0) state->m_direction[p] = 0x00;
-	else if (dialread > 0) state->m_direction[p] = 0x10;
+	if (dialread < 0) m_direction[p] = 0x00;
+	else if (dialread > 0) m_direction[p] = 0x10;
 
-	state->m_counter_74ls161[p] += abs(dialread);
-	state->m_counter_74ls161[p] &= 0xf;
+	m_counter_74ls161[p] += abs(dialread);
+	m_counter_74ls161[p] &= 0xf;
 
-	ret = state->m_counter_74ls161[p] | state->m_direction[p];
-	//fprintf(stderr, "dialread1: %02x, counter_74ls161: %02x, spinner ret is %02x\n", dialread, state->m_counter_74ls161[p], ret);
+	ret = m_counter_74ls161[p] | m_direction[p];
+	//fprintf(stderr, "dialread1: %02x, counter_74ls161: %02x, spinner ret is %02x\n", dialread, m_counter_74ls161[p], ret);
 
 	return ret;
 }
@@ -2509,7 +2508,7 @@ static CUSTOM_INPUT( moonwar_dial_r )
 /* verified from Z80 code */
 static INPUT_PORTS_START( moonwar )
 	PORT_START("IN0")
-	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(moonwar_dial_r, (void *)0)
+	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxian_state, moonwar_dial_r, (void *)0)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_COCKTAIL // cocktail: p2 shield
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )

@@ -12,15 +12,17 @@
 #include "emu.h"
 #include "cpu/e132xs/e132xs.h"
 #include "machine/eeprom.h"
+
 #include "sound/okim6295.h"
+#include "includes/eolith.h"
 #include "includes/eolithsp.h"
 
 
-class eolith16_state : public driver_device
+class eolith16_state : public eolith_state
 {
 public:
 	eolith16_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: eolith_state(mconfig, type, tag) { }
 
 	UINT16 *m_vram;
 	int m_vbuffer;
@@ -89,7 +91,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( eolith16 )
 	PORT_START("SPECIAL")
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(eolith_speedup_getvblank, NULL)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, eolith16_state, eolith_speedup_getvblank, NULL)
 	PORT_BIT( 0xff6f, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("SYSTEM")

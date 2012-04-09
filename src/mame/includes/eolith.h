@@ -17,6 +17,8 @@ public:
 	DECLARE_READ32_MEMBER(hidctch3_pen2_r);
 	DECLARE_WRITE32_MEMBER(eolith_vram_w);
 	DECLARE_READ32_MEMBER(eolith_vram_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(eolith_speedup_getvblank);
+	DECLARE_CUSTOM_INPUT_MEMBER(stealsee_speedup_getvblank);
 };
 
 

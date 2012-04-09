@@ -2590,23 +2590,23 @@ CUSTOM_INPUT_MEMBER(mw8080bw_state::invaders_in0_control_r)
 }
 
 
-CUSTOM_INPUT( invaders_in1_control_r )
+CUSTOM_INPUT_MEMBER(mw8080bw_state::invaders_in1_control_r)
 {
-	return input_port_read(field.machine(), INVADERS_P1_CONTROL_PORT_TAG);
+	return input_port_read(machine(), INVADERS_P1_CONTROL_PORT_TAG);
 }
 
 
-CUSTOM_INPUT( invaders_in2_control_r )
+CUSTOM_INPUT_MEMBER(mw8080bw_state::invaders_in2_control_r)
 {
 	UINT32 ret;
 
 	/* upright PCB : P1 controls
        cocktail PCB: P2 controls */
 
-	if (invaders_is_cabinet_cocktail(field.machine()))
-		ret = input_port_read(field.machine(), INVADERS_P2_CONTROL_PORT_TAG);
+	if (invaders_is_cabinet_cocktail(machine()))
+		ret = input_port_read(machine(), INVADERS_P2_CONTROL_PORT_TAG);
 	else
-		ret = input_port_read(field.machine(), INVADERS_P1_CONTROL_PORT_TAG);
+		ret = input_port_read(machine(), INVADERS_P1_CONTROL_PORT_TAG);
 
 	return ret;
 }
@@ -2648,7 +2648,7 @@ static INPUT_PORTS_START( invaders )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_UNUSED )
-	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(invaders_in1_control_r, NULL)
+	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, mw8080bw_state,invaders_in1_control_r, NULL)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN2")
@@ -2661,7 +2661,7 @@ static INPUT_PORTS_START( invaders )
 	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW:2")
 	PORT_DIPSETTING(    0x08, "1000" )
 	PORT_DIPSETTING(    0x00, "1500" )
-	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(invaders_in2_control_r, NULL)
+	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, mw8080bw_state,invaders_in2_control_r, NULL)
 	PORT_DIPNAME( 0x80, 0x00, "Display Coinage" ) PORT_DIPLOCATION("SW:1")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )

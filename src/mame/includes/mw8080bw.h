@@ -103,8 +103,10 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(invaders_coin_input_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(invaders_sw6_sw7_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(invaders_sw5_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(invaders_in0_control_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(blueshrk_coin_input_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(invaders_in0_control_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(invaders_in1_control_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(invaders_in2_control_r);
 };
 
 
@@ -151,9 +153,6 @@ MACHINE_CONFIG_EXTERN( invaders );
 extern const char layout_invaders[];
 
 UINT8 tornbase_get_cabinet_type(running_machine &machine);
-
-CUSTOM_INPUT( invaders_in1_control_r );
-CUSTOM_INPUT( invaders_in2_control_r );
 
 int invaders_is_cabinet_cocktail(running_machine &machine);
 
