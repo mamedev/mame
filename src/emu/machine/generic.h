@@ -148,11 +148,4 @@ INTERRUPT_GEN( irq7_line_hold );
 INTERRUPT_GEN( irq7_line_pulse );
 INTERRUPT_GEN( irq7_line_assert );
 
-
-
-/* ----- generic input port helpers ----- */
-
-/* custom handler */
-CUSTOM_INPUT( custom_port_read );
-
 #endif	/* __MACHINE_GENERIC_H__ */

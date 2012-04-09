@@ -426,6 +426,8 @@ public:
 	UINT16 m_aga_sprdatb[8][4];
 	int m_aga_sprite_fetched_words;
 	int m_aga_sprite_dma_used_words[8];
+	
+	DECLARE_CUSTOM_INPUT_MEMBER( amiga_joystick_convert );
 };
 
 
@@ -438,8 +440,6 @@ void amiga_chip_ram_w8(amiga_state *state, offs_t offset, UINT8 data);
 void amiga_machine_config(running_machine &machine, const amiga_machine_interface *intf);
 
 MACHINE_RESET( amiga );
-
-CUSTOM_INPUT( amiga_joystick_convert );
 
 READ16_HANDLER( amiga_cia_r );
 WRITE16_HANDLER( amiga_cia_w );

@@ -417,9 +417,9 @@ static TIMER_CALLBACK( amiga_irq_proc )
  *
  *************************************/
 
-CUSTOM_INPUT( amiga_joystick_convert )
+CUSTOM_INPUT_MEMBER( amiga_state::amiga_joystick_convert )
 {
-	UINT8 bits = input_port_read(field.machine(), (const char *)param);
+	UINT8 bits = input_port_read(machine(), (const char *)param);
 	int up = (bits >> 0) & 1;
 	int down = (bits >> 1) & 1;
 	int left = (bits >> 2) & 1;

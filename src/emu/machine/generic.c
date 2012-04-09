@@ -706,8 +706,8 @@ READ32_MEMBER( driver_device::watchdog_reset32_r ) { watchdog_reset(machine()); 
     repeated both in the upper and lower half
 -------------------------------------------------*/
 
-CUSTOM_INPUT( custom_port_read )
+CUSTOM_INPUT_MEMBER( driver_device::custom_port_read )
 {
 	const char *tag = (const char *)param;
-	return input_port_read(field.machine(), tag);
+	return input_port_read(machine(), tag);
 }

@@ -186,6 +186,10 @@ public:
 	// 8-8-8 RGB palette write handlers
 	DECLARE_WRITE16_MEMBER( paletteram16_xrgb_word_be_w );
 	DECLARE_WRITE16_MEMBER( paletteram16_xbgr_word_be_w );
+	
+	// generic input port helpers
+	// custom handler
+	DECLARE_CUSTOM_INPUT_MEMBER( custom_port_read );
 
 protected:
 	// helpers called at startup
