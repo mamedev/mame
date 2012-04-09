@@ -218,11 +218,10 @@ TIMER_DEVICE_CALLBACK( bang_irq )
 ***************************************************************************/
 
 
-CUSTOM_INPUT( wrally2_analog_bit_r )
+CUSTOM_INPUT_MEMBER(gaelco2_state::wrally2_analog_bit_r)
 {
-	gaelco2_state *state = field.machine().driver_data<gaelco2_state>();
 	int which = (FPTR)param;
-	return (state->m_analog_ports[which] >> 7) & 0x01;
+	return (m_analog_ports[which] >> 7) & 0x01;
 }
 
 

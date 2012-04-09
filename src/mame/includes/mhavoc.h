@@ -50,6 +50,12 @@ public:
 	DECLARE_WRITE8_MEMBER(mhavoc_out_1_w);
 	DECLARE_WRITE8_MEMBER(mhavocrv_speech_data_w);
 	DECLARE_WRITE8_MEMBER(mhavocrv_speech_strobe_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(tms5220_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(mhavoc_bit67_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(gamma_rcvd_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(gamma_xmtd_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(alpha_rcvd_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(alpha_xmtd_r);
 };
 
 
@@ -61,16 +67,5 @@ TIMER_DEVICE_CALLBACK( mhavoc_cpu_irq_clock );
 MACHINE_START( mhavoc );
 MACHINE_RESET( mhavoc );
 DRIVER_INIT( mhavocrv );
-
-
-
-
-CUSTOM_INPUT( tms5220_r );
-CUSTOM_INPUT( gamma_rcvd_r );
-CUSTOM_INPUT( gamma_xmtd_r );
-CUSTOM_INPUT( alpha_rcvd_r );
-CUSTOM_INPUT( alpha_xmtd_r );
-CUSTOM_INPUT( mhavoc_bit67_r );
-
 
 

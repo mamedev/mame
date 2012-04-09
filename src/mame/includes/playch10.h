@@ -80,6 +80,7 @@ public:
 	DECLARE_WRITE8_MEMBER(hboard_rom_switch_w);
 	void pc10_set_mirroring(int mirroring);
 	DECLARE_WRITE8_MEMBER(playch10_videoram_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(pc10_int_detect_r);
 };
 
 
@@ -104,7 +105,6 @@ DRIVER_INIT( pcgboard_type2 ); /* g-board games with 4 screen mirror */
 DRIVER_INIT( pchboard );	/* h-board games */
 DRIVER_INIT( pciboard );	/* i-board games */
 DRIVER_INIT( pckboard );	/* k-board games */
-CUSTOM_INPUT( pc10_int_detect_r );
 
 
 

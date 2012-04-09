@@ -101,10 +101,9 @@ static READ8_HANDLER( audio_latch_r )
 }
 
 
-CUSTOM_INPUT( jedi_audio_comm_stat_r )
+CUSTOM_INPUT_MEMBER(jedi_state::jedi_audio_comm_stat_r)
 {
-	jedi_state *state = field.machine().driver_data<jedi_state>();
-	return *state->m_audio_comm_stat >> 6;
+	return *m_audio_comm_stat >> 6;
 }
 
 

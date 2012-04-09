@@ -99,6 +99,7 @@ public:
 	DECLARE_WRITE32_MEMBER(micro3d_fifo_w);
 	DECLARE_WRITE32_MEMBER(micro3d_alt_fifo_w);
 	DECLARE_READ32_MEMBER(micro3d_pipe_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(botssa_hwchk_r);
 };
 
 typedef struct _micro3d_vtx_
@@ -111,11 +112,6 @@ typedef struct _micro3d_vtx_
 
 
 
-
-
-
-
-CUSTOM_INPUT( botssa_hwchk_r );
 
 
 

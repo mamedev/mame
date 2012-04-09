@@ -11,6 +11,7 @@ public:
 	UINT8 m_cavelon_bank;
 	UINT8 m_security_2B_counter;
 	UINT8 m_xb;
+	DECLARE_CUSTOM_INPUT_MEMBER(darkplnt_custom_r);
 };
 
 
@@ -53,8 +54,6 @@ READ8_HANDLER( triplep_pap_r );
 
 READ8_HANDLER( hunchbks_mirror_r );
 WRITE8_HANDLER( hunchbks_mirror_w );
-
-CUSTOM_INPUT( darkplnt_custom_r );
 
 
 /*----------- defined in audio/scramble.c -----------*/

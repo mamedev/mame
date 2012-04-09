@@ -368,7 +368,7 @@ static INPUT_PORTS_START( darkplnt )
 	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x02, "5" )
-	PORT_BIT( 0xfc, 0x00, IPT_SPECIAL ) PORT_CUSTOM(darkplnt_custom_r, "DIAL")	/* scrambled dial */
+	PORT_BIT( 0xfc, 0x00, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF,scobra_state, darkplnt_custom_r, "DIAL")	/* scrambled dial */
 
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )

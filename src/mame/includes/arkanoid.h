@@ -62,6 +62,8 @@ public:
 	DECLARE_WRITE8_MEMBER(arkanoid_d008_w);
 	DECLARE_WRITE8_MEMBER(tetrsark_d008_w);
 	DECLARE_WRITE8_MEMBER(hexa_d008_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(arkanoid_68705_input_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(arkanoid_input_mux);
 };
 
 
@@ -73,13 +75,4 @@ public:
 extern VIDEO_START( arkanoid );
 extern SCREEN_UPDATE_IND16( arkanoid );
 extern SCREEN_UPDATE_IND16( hexa );
-
-
-/*----------- defined in machine/arkanoid.c -----------*/
-
-
-
-
-extern CUSTOM_INPUT( arkanoid_68705_input_r );
-extern CUSTOM_INPUT( arkanoid_input_mux );
 

@@ -254,13 +254,12 @@ WRITE8_MEMBER(galaxold_state::_4in1_bank_w)
 	memory_set_bank(machine(), "bank1", m__4in1_bank);
 }
 
-CUSTOM_INPUT( _4in1_fake_port_r )
+CUSTOM_INPUT_MEMBER(galaxold_state::_4in1_fake_port_r)
 {
-	galaxold_state *state = field.machine().driver_data<galaxold_state>();
 	static const char *const portnames[] = { "FAKE1", "FAKE2", "FAKE3", "FAKE4" };
 	int bit_mask = (FPTR)param;
 
-	return (input_port_read(field.machine(), portnames[state->m__4in1_bank]) & bit_mask) ? 0x01 : 0x00;
+	return (input_port_read(machine(), portnames[m__4in1_bank]) & bit_mask) ? 0x01 : 0x00;
 }
 
 #ifdef UNUSED_FUNCTION

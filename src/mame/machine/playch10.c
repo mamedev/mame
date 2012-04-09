@@ -86,10 +86,9 @@ MACHINE_START( playch10_hboard )
  *
  *************************************/
 
-CUSTOM_INPUT( pc10_int_detect_r )
+CUSTOM_INPUT_MEMBER(playch10_state::pc10_int_detect_r)
 {
-	playch10_state *state = field.machine().driver_data<playch10_state>();
-	return ~state->m_pc10_int_detect & 1;
+	return ~m_pc10_int_detect & 1;
 }
 
 WRITE8_MEMBER(playch10_state::pc10_SDCS_w)

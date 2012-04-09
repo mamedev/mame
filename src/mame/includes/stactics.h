@@ -43,6 +43,9 @@ public:
 	DECLARE_WRITE8_MEMBER(stactics_speed_latch_w);
 	DECLARE_WRITE8_MEMBER(stactics_shot_trigger_w);
 	DECLARE_WRITE8_MEMBER(stactics_shot_flag_clear_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(stactics_get_frame_count_d3);
+	DECLARE_CUSTOM_INPUT_MEMBER(stactics_get_shot_standby);
+	DECLARE_CUSTOM_INPUT_MEMBER(stactics_get_not_shot_arrive);
 };
 
 
@@ -50,7 +53,5 @@ public:
 
 MACHINE_CONFIG_EXTERN( stactics_video );
 
-CUSTOM_INPUT( stactics_get_frame_count_d3 );
-CUSTOM_INPUT( stactics_get_shot_standby );
-CUSTOM_INPUT( stactics_get_not_shot_arrive );
+
 

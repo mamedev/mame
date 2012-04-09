@@ -54,6 +54,7 @@ public:
 	DECLARE_WRITE8_MEMBER(nvram_enable_w);
 	DECLARE_WRITE8_MEMBER(jedi_vscroll_w);
 	DECLARE_WRITE8_MEMBER(jedi_hscroll_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(jedi_audio_comm_stat_r);
 };
 
 
@@ -64,7 +65,6 @@ MACHINE_CONFIG_EXTERN( jedi_audio );
 WRITE8_HANDLER( jedi_audio_reset_w );
 WRITE8_HANDLER( jedi_audio_latch_w );
 READ8_HANDLER( jedi_audio_ack_latch_r );
-CUSTOM_INPUT( jedi_audio_comm_stat_r );
 
 
 /*----------- defined in video/jedi.c -----------*/

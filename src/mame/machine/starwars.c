@@ -107,11 +107,10 @@ WRITE8_MEMBER(starwars_state::starwars_out_w)
  *
  *************************************/
 
-CUSTOM_INPUT( matrix_flag_r )
+CUSTOM_INPUT_MEMBER(starwars_state::matrix_flag_r)
 {
-	starwars_state *state = field.machine().driver_data<starwars_state>();
 	/* set the matrix processor flag */
-	return state->m_math_run ? 1 : 0;
+	return m_math_run ? 1 : 0;
 }
 
 

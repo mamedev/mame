@@ -304,20 +304,18 @@ WRITE8_MEMBER(phoenix_state::phoenix_scroll_w)
 }
 
 
-CUSTOM_INPUT( player_input_r )
+CUSTOM_INPUT_MEMBER(phoenix_state::player_input_r)
 {
-	phoenix_state *state = field.machine().driver_data<phoenix_state>();
-	if (state->m_cocktail_mode)
-		return (input_port_read(field.machine(), "CTRL") & 0xf0) >> 4;
+	if (m_cocktail_mode)
+		return (input_port_read(machine(), "CTRL") & 0xf0) >> 4;
 	else
-		return (input_port_read(field.machine(), "CTRL") & 0x0f) >> 0;
+		return (input_port_read(machine(), "CTRL") & 0x0f) >> 0;
 }
 
-CUSTOM_INPUT( pleiads_protection_r )
+CUSTOM_INPUT_MEMBER(phoenix_state::pleiads_protection_r)
 {
-	phoenix_state *state = field.machine().driver_data<phoenix_state>();
 	/* handle Pleiads protection */
-	switch (state->m_pleiads_protection_question)
+	switch (m_pleiads_protection_question)
 	{
 	case 0x00:
 	case 0x20:
@@ -328,7 +326,7 @@ CUSTOM_INPUT( pleiads_protection_r )
 		/* Bit 3 is 1 */
 		return 1;
 	default:
-		logerror("%s:Unknown protection question %02X\n", field.machine().describe_context(), state->m_pleiads_protection_question);
+		logerror("%s:Unknown protection question %02X\n", machine().describe_context(), m_pleiads_protection_question);
 		return 0;
 	}
 }

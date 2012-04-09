@@ -50,13 +50,11 @@ public:
 	DECLARE_READ8_MEMBER(starwars_div_reh_r);
 	DECLARE_READ8_MEMBER(starwars_div_rel_r);
 	DECLARE_WRITE8_MEMBER(starwars_math_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(matrix_flag_r);
 };
 
 
 /*----------- defined in machine/starwars.c -----------*/
-
-
-CUSTOM_INPUT( matrix_flag_r );
 
 
 void starwars_mproc_init(running_machine &machine);

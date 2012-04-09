@@ -65,6 +65,7 @@ public:
 	DECLARE_WRITE8_MEMBER(blaster_video_control_w);
 	DECLARE_WRITE8_MEMBER(williams_blitter_w);
 	DECLARE_WRITE8_MEMBER(williams2_blit_window_enable_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(williams_mux_r);
 };
 
 
@@ -123,9 +124,6 @@ MACHINE_START( joust2 );
 MACHINE_RESET( joust2 );
 
 /* banking */
-
-/* misc */
-CUSTOM_INPUT( williams_mux_r );
 
 /* Mayday protection */
 

@@ -537,11 +537,10 @@ WRITE16_MEMBER(micro3d_state::micro3d_adc_w)
 	machine().scheduler().timer_set(attotime::from_usec(40), FUNC(adc_done_callback), data & ~4);
 }
 
-CUSTOM_INPUT( botssa_hwchk_r )
+CUSTOM_INPUT_MEMBER(micro3d_state::botssa_hwchk_r)
 {
-	micro3d_state *state = field.machine().driver_data<micro3d_state>();
 
-	return state->m_botssa_latch;
+	return m_botssa_latch;
 }
 
 READ16_MEMBER(micro3d_state::botssa_140000_r)

@@ -36,6 +36,7 @@ public:
 	DECLARE_WRITE16_MEMBER(snowboar_protection_w);
 	DECLARE_WRITE16_MEMBER(gaelco2_vram_w);
 	DECLARE_WRITE16_MEMBER(gaelco2_palette_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(wrally2_analog_bit_r);
 };
 
 
@@ -46,7 +47,6 @@ DRIVER_INIT( touchgo );
 DRIVER_INIT( snowboar );
 DRIVER_INIT( bang );
 TIMER_DEVICE_CALLBACK( bang_irq );
-CUSTOM_INPUT( wrally2_analog_bit_r );
 WRITE16_DEVICE_HANDLER( gaelco2_eeprom_cs_w );
 WRITE16_DEVICE_HANDLER( gaelco2_eeprom_sk_w );
 WRITE16_DEVICE_HANDLER( gaelco2_eeprom_data_w );

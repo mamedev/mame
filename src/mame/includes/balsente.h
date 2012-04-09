@@ -158,6 +158,7 @@ public:
 	DECLARE_WRITE8_MEMBER(balsente_palette_select_w);
 	DECLARE_WRITE8_MEMBER(balsente_paletteram_w);
 	DECLARE_WRITE8_MEMBER(shrike_sprite_select_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(nstocker_bits_r);
 };
 
 
@@ -183,8 +184,6 @@ TIMER_DEVICE_CALLBACK( balsente_counter_callback );
 TIMER_DEVICE_CALLBACK( balsente_clock_counter_0_ff );
 
 
-
-CUSTOM_INPUT( nstocker_bits_r );
 
 
 

@@ -97,28 +97,26 @@ WRITE8_MEMBER(arkanoid_state::arkanoid_68705_ddr_c_w)
 	m_ddr_c = data;
 }
 
-CUSTOM_INPUT( arkanoid_68705_input_r )
+CUSTOM_INPUT_MEMBER(arkanoid_state::arkanoid_68705_input_r)
 {
-	arkanoid_state *state = field.machine().driver_data<arkanoid_state>();
 	int res = 0;
 
 	/* bit 0x40 of comes from the sticky bit */
-	if (!state->m_z80write)
+	if (!m_z80write)
 		res |= 0x01;
 
 	/* bit 0x80 comes from a write latch */
-	if (!state->m_m68705write)
+	if (!m_m68705write)
 		res |= 0x02;
 
 	return res;
 }
 
-CUSTOM_INPUT( arkanoid_input_mux )
+CUSTOM_INPUT_MEMBER(arkanoid_state::arkanoid_input_mux)
 {
-	arkanoid_state *state = field.machine().driver_data<arkanoid_state>();
 	const char *tag1 = (const char *)param;
 	const char *tag2 = tag1 + strlen(tag1) + 1;
-	return input_port_read(field.machine(), (state->m_paddle_select == 0) ? tag1 : tag2);
+	return input_port_read(machine(), (m_paddle_select == 0) ? tag1 : tag2);
 }
 
 /*

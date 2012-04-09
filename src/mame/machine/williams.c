@@ -616,15 +616,14 @@ WRITE8_DEVICE_HANDLER( williams_port_select_w )
 	state->m_port_select = data;
 }
 
-CUSTOM_INPUT( williams_mux_r )
+CUSTOM_INPUT_MEMBER(williams_state::williams_mux_r)
 {
-	williams_state *state = field.machine().driver_data<williams_state>();
 	const char *tag = (const char *)param;
 
-	if (state->m_port_select != 0)
+	if (m_port_select != 0)
 		tag += strlen(tag) + 1;
 
-	return input_port_read(field.machine(), tag);
+	return input_port_read(machine(), tag);
 }
 
 /*

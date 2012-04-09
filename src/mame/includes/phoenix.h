@@ -25,6 +25,8 @@ public:
 	DECLARE_WRITE8_MEMBER(pleiads_videoreg_w);
 	DECLARE_WRITE8_MEMBER(phoenix_scroll_w);
 	DECLARE_READ8_MEMBER(survival_input_port_0_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(player_input_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(pleiads_protection_r);
 };
 
 
@@ -60,8 +62,6 @@ VIDEO_START( phoenix );
 SCREEN_UPDATE_IND16( phoenix );
 
 
-CUSTOM_INPUT( player_input_r );
-CUSTOM_INPUT( pleiads_protection_r );
 READ8_DEVICE_HANDLER( survival_protection_r );
 
 READ_LINE_DEVICE_HANDLER( survival_sid_callback );
