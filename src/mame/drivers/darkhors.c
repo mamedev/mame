@@ -70,6 +70,11 @@ public:
 		: st0016_state(mconfig, type, tag),
 		m_maincpu(*this, "maincpu")
 		{ }
+	
+	virtual void machine_start()
+	{
+		m_generic_paletteram_16.allocate(0x10000);
+	}
 
 	tilemap_t *m_tmap;
 	tilemap_t *m_tmap2;
@@ -334,7 +339,7 @@ static ADDRESS_MAP_START( darkhors_map, AS_PROGRAM, 32, darkhors_state )
 	AM_RANGE(0x870000, 0x873fff) AM_RAM_WRITE(darkhors_tmapram2_w) AM_BASE(m_tmapram2)
 	AM_RANGE(0x874000, 0x87dfff) AM_RAM
 	AM_RANGE(0x87e000, 0x87ffff) AM_RAM AM_BASE(m_spriteram)
-	AM_RANGE(0x880000, 0x89ffff) AM_WRITE(paletteram32_xBBBBBGGGGGRRRRR_dword_w) AM_SHARE("paletteram")
+	AM_RANGE(0x880000, 0x89ffff) AM_WRITE(paletteram32_xBBBBBGGGGGRRRRR_dword_w)
 	AM_RANGE(0x8a0000, 0x8bffff) AM_WRITEONLY	// this should still be palette ram!
 	AM_RANGE(0x8c0120, 0x8c012f) AM_WRITEONLY AM_BASE(m_tmapscroll)
 	AM_RANGE(0x8c0130, 0x8c013f) AM_WRITEONLY AM_BASE(m_tmapscroll2)
@@ -365,7 +370,7 @@ static ADDRESS_MAP_START( jclub2_map, AS_PROGRAM, 32, darkhors_state )
 
 	AM_RANGE(0x800000, 0x87ffff) AM_RAM AM_BASE(m_spriteram)
 
-	AM_RANGE(0x880000, 0x89ffff) AM_WRITE(paletteram32_xBBBBBGGGGGRRRRR_dword_w) AM_SHARE("paletteram")
+	AM_RANGE(0x880000, 0x89ffff) AM_WRITE(paletteram32_xBBBBBGGGGGRRRRR_dword_w)
 	AM_RANGE(0x8a0000, 0x8bffff) AM_WRITEONLY	// this should still be palette ram!
 
 	AM_RANGE(0x8C0000, 0x8C01ff) AM_RAM
@@ -953,8 +958,8 @@ ROM_END
 static DRIVER_INIT( darkhors )
 {
 	UINT32 *rom    = (UINT32 *) machine.region("maincpu")->base();
-	UINT8  *eeprom = (UINT8 *)  machine.region("eeprom")->base();
-	int i;
+//	UINT8  *eeprom = (UINT8 *)  machine.region("eeprom")->base();
+//	int i;
 
 #if 1
 	// eeprom error patch
@@ -965,9 +970,9 @@ static DRIVER_INIT( darkhors )
 	rom[0x04600/4]	=	0x4e714eb9;
 #endif
 
-	if (eeprom != NULL)
-		for (i = 0; i < (1<<7); i++)
-			eeprom[i] = eeprom[i*2];
+//	if (eeprom != NULL)
+//		for (i = 0; i < (1<<7); i++)
+//			eeprom[i] = eeprom[i*2];
 }
 
 GAME( 199?, jclub2,   0,      jclub2,  darkhors, 0,        ROT0, "Seta", "Jockey Club II (newer hardware)", GAME_NOT_WORKING | GAME_NO_SOUND )
