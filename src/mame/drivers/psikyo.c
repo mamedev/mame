@@ -307,6 +307,11 @@ READ32_MEMBER(psikyo_state::s1945_input_r)
 
 ***************************************************************************/
 
+READ32_MEMBER(psikyo_state::paletteram32_dword_r)
+{
+	return (m_generic_paletteram_16[offset * 2] << 16) | m_generic_paletteram_16[offset * 2 + 1];
+}
+
 WRITE32_MEMBER(psikyo_state::paletteram32_xRRRRRGGGGGBBBBB_dword_w)
 {
 	if (ACCESSING_BITS_16_31)
@@ -318,7 +323,7 @@ WRITE32_MEMBER(psikyo_state::paletteram32_xRRRRRGGGGGBBBBB_dword_w)
 static ADDRESS_MAP_START( psikyo_map, AS_PROGRAM, 32, psikyo_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM														// ROM (not all used)
 	AM_RANGE(0x400000, 0x401fff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)		// Sprites, buffered by two frames (list buffered + fb buffered)
-	AM_RANGE(0x600000, 0x601fff) AM_RAM_WRITE(paletteram32_xRRRRRGGGGGBBBBB_dword_w) AM_SHARE("paletteram")	// Palette
+	AM_RANGE(0x600000, 0x601fff) AM_READWRITE(paletteram32_dword_r, paletteram32_xRRRRRGGGGGBBBBB_dword_w)	// Palette
 	AM_RANGE(0x800000, 0x801fff) AM_RAM_WRITE(psikyo_vram_0_w) AM_BASE(m_vram_0)		// Layer 0
 	AM_RANGE(0x802000, 0x803fff) AM_RAM_WRITE(psikyo_vram_1_w) AM_BASE(m_vram_1)		// Layer 1
 	AM_RANGE(0x804000, 0x807fff) AM_RAM AM_BASE(m_vregs)							// RAM + Vregs
@@ -367,7 +372,7 @@ static ADDRESS_MAP_START( psikyo_bootleg_map, AS_PROGRAM, 32, psikyo_state )
 	AM_RANGE(0x200000, 0x200fff) AM_RAM AM_BASE(m_bootleg_spritebuffer)				// RAM (it copies the spritelist here, the HW probably doesn't have automatic buffering like the originals?
 
 	AM_RANGE(0x400000, 0x401fff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)		// Sprites, buffered by two frames (list buffered + fb buffered)
-	AM_RANGE(0x600000, 0x601fff) AM_RAM_WRITE(paletteram32_xRRRRRGGGGGBBBBB_dword_w) AM_SHARE("paletteram")	// Palette
+	AM_RANGE(0x600000, 0x601fff) AM_RAM_WRITE(paletteram32_xRRRRRGGGGGBBBBB_dword_w)	// Palette
 	AM_RANGE(0x800000, 0x801fff) AM_RAM_WRITE(psikyo_vram_0_w) AM_BASE(m_vram_0)		// Layer 0
 	AM_RANGE(0x802000, 0x803fff) AM_RAM_WRITE(psikyo_vram_1_w) AM_BASE(m_vram_1)		// Layer 1
 	AM_RANGE(0x804000, 0x807fff) AM_RAM AM_BASE(m_vregs)								// RAM + Vregs
@@ -1026,6 +1031,8 @@ GFXDECODE_END
 static MACHINE_START( psikyo )
 {
 	psikyo_state *state = machine.driver_data<psikyo_state>();
+	
+	state->m_generic_paletteram_16.allocate(0x1000);
 
 	state->m_audiocpu = machine.device("audiocpu");
 

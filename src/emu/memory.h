@@ -722,7 +722,7 @@ public:
 
 	// getters
 	memory_share *next() const { return m_next; }
-	void *ptr() const { return m_ptr; }
+	void *ptr() const { if (this == NULL) return NULL; return m_ptr; }
 	size_t bytes() const { return m_bytes; }
 	UINT8 width() const { return m_width; }
 
