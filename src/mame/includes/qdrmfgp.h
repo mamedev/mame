@@ -8,7 +8,7 @@ public:
 		{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_shared_ptr<UINT8>	m_nvram;
+	required_shared_ptr<UINT16>	m_nvram;
 	UINT8 *m_sndram;
 	UINT16 *m_workram;
 	UINT16 m_control;
