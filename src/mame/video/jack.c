@@ -25,18 +25,18 @@ WRITE8_MEMBER(jack_state::jack_colorram_w)
 WRITE8_MEMBER(jack_state::jack_paletteram_w)
 {
 	/* RGB output is inverted */
-	paletteram_BBGGGRRR_w(space, offset, ~data);
+	paletteram_BBGGGRRR_byte_w(space, offset, ~data);
 }
 
 READ8_MEMBER(jack_state::jack_flipscreen_r)
 {
-	flip_screen_set(machine(), offset);
+	flip_screen_set(offset);
 	return 0;
 }
 
 WRITE8_MEMBER(jack_state::jack_flipscreen_w)
 {
-	flip_screen_set(machine(), offset);
+	flip_screen_set(offset);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
@@ -79,7 +79,7 @@ static void jack_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, c
 		flipx = (spriteram[offs + 3] & 0x80);
 		flipy = (spriteram[offs + 3] & 0x40);
 
-		if (flip_screen_get(machine))
+		if (state->flip_screen())
 		{
 			sx = 248 - sx;
 			sy = 248 - sy;
@@ -164,7 +164,7 @@ static void joinem_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap,
 		flipx = (spriteram[offs + 3] & 0x80);
 		flipy = (spriteram[offs + 3] & 0x40);
 
-		if (flip_screen_get(machine))
+		if (state->flip_screen())
 		{
 			sx = 248 - sx;
 			sy = 248 - sy;

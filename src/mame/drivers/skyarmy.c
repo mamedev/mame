@@ -50,12 +50,12 @@ public:
 
 WRITE8_MEMBER(skyarmy_state::skyarmy_flip_screen_x_w)
 {
-	flip_screen_x_set(machine(), data & 0x01);
+	flip_screen_x_set(data & 0x01);
 }
 
 WRITE8_MEMBER(skyarmy_state::skyarmy_flip_screen_y_w)
 {
-	flip_screen_y_set(machine(), data & 0x01);
+	flip_screen_y_set(data & 0x01);
 }
 
 static TILE_GET_INFO( get_skyarmy_tile_info )

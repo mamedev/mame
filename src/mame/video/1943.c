@@ -145,7 +145,7 @@ WRITE8_MEMBER(_1943_state::c1943_c804_w)
 	/* bit 5 resets the sound CPU - we ignore it */
 
 	/* bit 6 flips screen */
-	flip_screen_set(machine(), data & 0x40);
+	flip_screen_set(data & 0x40);
 
 	/* bit 7 enables characters */
 	m_char_on = data & 0x80;
@@ -230,7 +230,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		int sx = state->m_spriteram[offs + 3] - ((attr & 0x10) << 4);
 		int sy = state->m_spriteram[offs + 2];
 
-		if (flip_screen_get(machine))
+		if (state->flip_screen())
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;
@@ -240,12 +240,12 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		if (priority)
 		{
 			if (color != 0x0a && color != 0x0b)
-				drawgfx_transpen(bitmap, cliprect, machine.gfx[3], code, color, flip_screen_get(machine), flip_screen_get(machine), sx, sy, 0);
+				drawgfx_transpen(bitmap, cliprect, machine.gfx[3], code, color, state->flip_screen(), state->flip_screen(), sx, sy, 0);
 		}
 		else
 		{
 			if (color == 0x0a || color == 0x0b)
-				drawgfx_transpen(bitmap, cliprect, machine.gfx[3], code, color, flip_screen_get(machine), flip_screen_get(machine), sx, sy, 0);
+				drawgfx_transpen(bitmap, cliprect, machine.gfx[3], code, color, state->flip_screen(), state->flip_screen(), sx, sy, 0);
 		}
 	}
 }

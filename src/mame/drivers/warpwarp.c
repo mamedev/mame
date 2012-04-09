@@ -158,7 +158,7 @@ READ8_MEMBER(warpwarp_state::geebee_in_r)
 	res = input_port_read_safe(machine(), portnames[offset], 0);
 	if (offset == 3)
 	{
-		res = input_port_read(machine(), (flip_screen_get(machine()) & 1) ? "IN2" : "IN1");	// read player 2 input in cocktail mode
+		res = input_port_read(machine(), (flip_screen() & 1) ? "IN2" : "IN1");	// read player 2 input in cocktail mode
 		if (m_handle_joystick)
 		{
 			/* map digital two-way joystick to two fixed VOLIN values */
@@ -220,7 +220,7 @@ WRITE8_MEMBER(warpwarp_state::geebee_out7_w)
 				cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
 			break;
 		case 7:
-			flip_screen_set(machine(), data & 1);
+			flip_screen_set(data & 1);
 			break;
 	}
 }
@@ -246,7 +246,7 @@ static READ8_DEVICE_HANDLER( warpwarp_vol_r )
 	warpwarp_state *state = device->machine().driver_data<warpwarp_state>();
 	int res;
 
-	res = input_port_read(device->machine(), (flip_screen_get(device->machine()) & 1) ? "VOLIN2" : "VOLIN1");
+	res = input_port_read(device->machine(), (state->flip_screen() & 1) ? "VOLIN2" : "VOLIN1");
 	if (state->m_handle_joystick)
 	{
 		if (res & 1) return 0x0f;
@@ -305,7 +305,7 @@ WRITE8_MEMBER(warpwarp_state::warpwarp_out3_w)
 				cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
 			break;
 		case 7:
-			flip_screen_set(machine(), data & 1);
+			flip_screen_set(data & 1);
 			break;
 	}
 }

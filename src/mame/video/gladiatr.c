@@ -217,7 +217,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 		int color = src[1] & 0x1f;
 		int x,y;
 
-		if (flip_screen_get(machine))
+		if (state->flip_screen())
 		{
 			xflip = !xflip;
 			yflip = !yflip;
@@ -287,9 +287,9 @@ SCREEN_UPDATE_IND16( gladiatr )
 		int scroll;
 
 		scroll = state->m_bg_scrollx + ((state->m_video_attributes & 0x04) << 6);
-		state->m_bg_tilemap->set_scrollx(0, scroll ^ (flip_screen_get(screen.machine()) ? 0x0f : 0));
+		state->m_bg_tilemap->set_scrollx(0, scroll ^ (state->flip_screen() ? 0x0f : 0));
 		scroll = state->m_fg_scrollx + ((state->m_video_attributes & 0x08) << 5);
-		state->m_fg_tilemap->set_scrollx(0, scroll ^ (flip_screen_get(screen.machine()) ? 0x0f : 0));
+		state->m_fg_tilemap->set_scrollx(0, scroll ^ (state->flip_screen() ? 0x0f : 0));
 
 		// always 0 anyway
 		state->m_bg_tilemap->set_scrolly(0, state->m_bg_scrolly);

@@ -128,7 +128,7 @@ WRITE16_MEMBER(lastduel_state::lastduel_flip_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		flip_screen_set(machine(), data & 0x01);
+		flip_screen_set(data & 0x01);
 
 		coin_lockout_w(machine(), 0, ~data & 0x10);
 		coin_lockout_w(machine(), 1, ~data & 0x20);
@@ -245,7 +245,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		flipy = attr & state->m_sprite_flipy_mask;	/* 0x40 for lastduel, 0x80 for madgear */
 		color = attr & 0x0f;
 
-		if (flip_screen_get(machine))
+		if (state->flip_screen())
 		{
 			sx = 496 - sx;
 			sy = 240 - sy;

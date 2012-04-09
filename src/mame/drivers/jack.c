@@ -74,7 +74,7 @@ WRITE8_MEMBER(jack_state::jack_sh_command_w)
 
 WRITE8_MEMBER(jack_state::joinem_misc_w)
 {
-	flip_screen_set(machine(), data & 0x80);
+	flip_screen_set(data & 0x80);
 	m_joinem_snd_bit = data & 1;
 }
 

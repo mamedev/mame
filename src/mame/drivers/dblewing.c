@@ -101,7 +101,7 @@ static SCREEN_UPDATE_IND16(dblewing)
 	dblewing_state *state = screen.machine().driver_data<dblewing_state>();
 	UINT16 flip = deco16ic_pf_control_r(state->m_deco_tilegen1, 0, 0xffff);
 
-	flip_screen_set(screen.machine(), BIT(flip, 7));
+	state->flip_screen_set(BIT(flip, 7));
 	deco16ic_pf_update(state->m_deco_tilegen1, state->m_pf1_rowscroll, state->m_pf2_rowscroll);
 
 	bitmap.fill(0, cliprect); /* not Confirmed */
@@ -329,7 +329,7 @@ static ADDRESS_MAP_START( dblewing_map, AS_PROGRAM, 16, dblewing_state )
 	AM_RANGE(0x288000, 0x288001) AM_RAM
 	AM_RANGE(0x28c000, 0x28c00f) AM_RAM_DEVWRITE_LEGACY("tilegen1", deco16ic_pf_control_w)
 	AM_RANGE(0x300000, 0x3007ff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
-	AM_RANGE(0x320000, 0x3207ff) AM_RAM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x320000, 0x3207ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0xff0000, 0xff3fff) AM_MIRROR(0xc000) AM_RAM
 ADDRESS_MAP_END
 

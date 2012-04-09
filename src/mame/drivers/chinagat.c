@@ -175,7 +175,7 @@ static WRITE8_HANDLER( chinagat_video_ctrl_w )
 	state->m_scrolly_hi = ((data & 0x02) >> 1);
 	state->m_scrollx_hi = data & 0x01;
 
-	flip_screen_set(space->machine(), ~data & 0x04);
+	state->flip_screen_set(~data & 0x04);
 }
 
 static WRITE8_HANDLER( chinagat_bankswitch_w )
@@ -309,8 +309,8 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, ddragon_state )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(ddragon_fgvideoram_w) AM_BASE(m_fgvideoram)
 	AM_RANGE(0x2800, 0x2fff) AM_RAM_WRITE(ddragon_bgvideoram_w) AM_BASE(m_bgvideoram)
-	AM_RANGE(0x3000, 0x317f) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split1_w) AM_SHARE("paletteram")
-	AM_RANGE(0x3400, 0x357f) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split2_w) AM_SHARE("paletteram2")
+	AM_RANGE(0x3000, 0x317f) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_byte_split_lo_w) AM_SHARE("paletteram")
+	AM_RANGE(0x3400, 0x357f) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_byte_split_hi_w) AM_SHARE("paletteram2")
 	AM_RANGE(0x3800, 0x397f) AM_WRITE_BANK("bank3") AM_BASE_SIZE(m_spriteram, m_spriteram_size)
 	AM_RANGE(0x3e00, 0x3e04) AM_WRITE_LEGACY(chinagat_interrupt_w)
 	AM_RANGE(0x3e06, 0x3e06) AM_WRITEONLY AM_BASE(m_scrolly_lo)

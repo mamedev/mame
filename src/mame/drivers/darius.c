@@ -249,7 +249,7 @@ static ADDRESS_MAP_START( darius_map, AS_PROGRAM, 16, darius_state )
 	AM_RANGE(0xd20000, 0xd20003) AM_DEVWRITE_LEGACY("pc080sn", pc080sn_yscroll_word_w)
 	AM_RANGE(0xd40000, 0xd40003) AM_DEVWRITE_LEGACY("pc080sn", pc080sn_xscroll_word_w)
 	AM_RANGE(0xd50000, 0xd50003) AM_DEVWRITE_LEGACY("pc080sn", pc080sn_ctrl_word_w)
-	AM_RANGE(0xd80000, 0xd80fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")/* palette */
+	AM_RANGE(0xd80000, 0xd80fff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")/* palette */
 	AM_RANGE(0xe00100, 0xe00fff) AM_RAM AM_SHARE("share1") AM_BASE_SIZE(m_spriteram, m_spriteram_size)
 	AM_RANGE(0xe01000, 0xe02fff) AM_RAM AM_SHARE("share2")
 	AM_RANGE(0xe08000, 0xe0ffff) AM_RAM_WRITE(darius_fg_layer_w) AM_SHARE("share3") AM_BASE(m_fg_ram)
@@ -260,7 +260,7 @@ static ADDRESS_MAP_START( darius_cpub_map, AS_PROGRAM, 16, darius_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x040000, 0x04ffff) AM_RAM				/* local RAM */
 	AM_RANGE(0xc00000, 0xc0007f) AM_WRITE(darius_ioc_w)	/* only writes $c00050 (?) */
-	AM_RANGE(0xd80000, 0xd80fff) AM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w)
+	AM_RANGE(0xd80000, 0xd80fff) AM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w)
 	AM_RANGE(0xe00100, 0xe00fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xe01000, 0xe02fff) AM_RAM AM_SHARE("share2")
 	AM_RANGE(0xe08000, 0xe0ffff) AM_RAM_WRITE(darius_fg_layer_w) AM_SHARE("share3")

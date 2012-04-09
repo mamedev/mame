@@ -325,7 +325,7 @@ static void draw_sprites(running_machine &machine, bitmap_rgb32 &bitmap, const r
 		if (attr & 0x01) sx -= 256;
 		if (attr & 0x04) sy -= 256;
 
-		if (flip_screen_get(machine))
+		if (state->flip_screen())
 		{
 			sx = 224 - sx;
 			sy = 224 - sy;
@@ -350,7 +350,7 @@ static void draw_sprites(running_machine &machine, bitmap_rgb32 &bitmap, const r
 		}
 		else
 		{
-			if (flip_screen_get(machine))
+			if (state->flip_screen())
 				DRAW_SPRITE(code, sx + 16, sy + 16)
 			else
 				DRAW_SPRITE(code, sx, sy)
@@ -408,7 +408,7 @@ static void draw_background(running_machine &machine, bitmap_rgb32 &bitmap, cons
 		case 11: case 13: clip.max_x = state->m_sx1; break;
 		}
 
-		if (flip_screen_get(machine))
+		if (state->flip_screen())
 			clip.set(255 - clip.max_x, 255 - clip.min_x, 255 - clip.max_y, 255 - clip.min_y);
 	}
 

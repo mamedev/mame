@@ -122,9 +122,9 @@ WRITE8_MEMBER(ironhors_state::ironhors_palettebank_w)
 
 WRITE8_MEMBER(ironhors_state::ironhors_flipscreen_w)
 {
-	if (flip_screen_get(machine()) != (~data & 0x08))
+	if (flip_screen() != (~data & 0x08))
 	{
-		flip_screen_set(machine(), ~data & 0x08);
+		flip_screen_set(~data & 0x08);
 		machine().tilemap().mark_all_dirty();
 	}
 
@@ -170,9 +170,9 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		int flipy = sr[offs + 4] & 0x40;
 		int code = (sr[offs] << 2) + ((sr[offs + 1] & 0x03) << 10) + ((sr[offs + 1] & 0x0c) >> 2);
 		int color = ((sr[offs + 1] & 0xf0) >> 4) + 16 * state->m_palettebank;
-	//  int mod = flip_screen_get(machine) ? -8 : 8;
+	//  int mod = state->flip_screen() ? -8 : 8;
 
-		if (flip_screen_get(machine))
+		if (state->flip_screen())
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;
@@ -192,7 +192,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 
 			case 0x04:	/* 16x8 */
 				{
-					if (flip_screen_get(machine)) sy += 8; // this fixes the train wheels' position
+					if (state->flip_screen()) sy += 8; // this fixes the train wheels' position
 
 					drawgfx_transpen(bitmap,cliprect,machine.gfx[2],
 							code & ~1,
@@ -283,9 +283,9 @@ static void farwest_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap
 		int code = (sr[offs] << 2) + ((sr2[offs] & 0x03) << 10) + ((sr2[offs] & 0x0c) >> 2);
 		int color = ((sr2[offs] & 0xf0) >> 4) + 16 * state->m_palettebank;
 
-	//  int mod = flip_screen_get() ? -8 : 8;
+	//  int mod = flip_screen() ? -8 : 8;
 
-//      if (flip_screen_get())
+//      if (flip_screen())
 		{
 		//  sx = 240 - sx;
 			sy = 240 - sy;
@@ -305,7 +305,7 @@ static void farwest_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap
 
 			case 0x04:	/* 16x8 */
 				{
-					if (flip_screen_get(machine)) sy += 8; // this fixes the train wheels' position
+					if (state->flip_screen()) sy += 8; // this fixes the train wheels' position
 
 					drawgfx_transpen(bitmap,cliprect,machine.gfx[2],
 							code & ~1,

@@ -88,7 +88,7 @@ WRITE8_MEMBER(mainsnk_state::mainsnk_c600_w)
 	int bank;
 	int total_elements = machine().gfx[0]->total_elements;
 
-	flip_screen_set(machine(), ~data & 0x80);
+	flip_screen_set(~data & 0x80);
 
 	m_bg_tilemap->set_palette_offset((data & 0x07) << 4);
 	m_tx_tilemap->set_palette_offset((data & 0x07) << 4);
@@ -146,7 +146,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 		sx = 288-16 - sx;
 		sy += 8;
 
-		if (flip_screen_get(machine))
+		if (state->flip_screen())
 		{
 			sx = 288-16 - sx;
 			sy = 224-16 - sy;

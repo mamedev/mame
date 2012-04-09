@@ -447,10 +447,11 @@ static void plot_star( running_machine &machine, bitmap_ind16 &bitmap, const rec
 	if (!cliprect.contains(x, y))
 		return;
 
-	if (flip_screen_x_get(machine))
+	rallyx_state *state = machine.driver_data<rallyx_state>();
+	if (state->flip_screen_x())
 		x = 255 - x;
 
-	if (flip_screen_y_get(machine))
+	if (state->flip_screen_y())
 		y = 255 - y;
 
 	if (colortable_entry_get_value(machine.colortable, bitmap.pix16(y, x) % 0x144) == 0)
@@ -487,7 +488,7 @@ static void rallyx_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap,
 		int color = spriteram_2[offs + 1] & 0x3f;
 		int flipx = spriteram[offs] & 1;
 		int flipy = spriteram[offs] & 2;
-		if (flip_screen_get(machine))
+		if (state->flip_screen())
 			sx -= 2 * displacement;
 
 		pdrawgfx_transmask(bitmap,cliprect,machine.gfx[1],
@@ -535,7 +536,7 @@ static void rallyx_draw_bullets( running_machine &machine, bitmap_ind16 &bitmap,
 
 		x = state->m_radarx[offs] + ((~state->m_radarattr[offs & 0x0f] & 0x01) << 8);
 		y = 253 - state->m_radary[offs];
-		if (flip_screen_get(machine))
+		if (state->flip_screen())
 			x -= 3;
 
 		if (transpen)
@@ -630,7 +631,7 @@ SCREEN_UPDATE_IND16( rallyx )
 	rectangle fg_clip = cliprect;
 	rectangle bg_clip = cliprect;
 
-	if (flip_screen_get(screen.machine()))
+	if (state->flip_screen())
 	{
 		bg_clip.min_x = 8 * 8;
 		fg_clip.max_x = 8 * 8 - 1;
@@ -664,7 +665,7 @@ SCREEN_UPDATE_IND16( jungler )
 	rectangle fg_clip = cliprect;
 	rectangle bg_clip = cliprect;
 
-	if (flip_screen_get(screen.machine()))
+	if (state->flip_screen())
 	{
 		bg_clip.min_x = 8 * 8;
 		fg_clip.max_x = 8 * 8 - 1;
@@ -702,7 +703,7 @@ SCREEN_UPDATE_IND16( locomotn )
 	rectangle fg_clip = cliprect;
 	rectangle bg_clip = cliprect;
 
-	if (flip_screen_get(screen.machine()))
+	if (state->flip_screen())
 	{
 		/* handle reduced visible area in some games */
 		if (screen.visible_area().max_x == 32 * 8 - 1)

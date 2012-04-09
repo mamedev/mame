@@ -153,7 +153,7 @@ WRITE8_MEMBER(tecmo_state::tecmo_bgscroll_w)
 
 WRITE8_MEMBER(tecmo_state::tecmo_flipscreen_w)
 {
-	flip_screen_set(machine(), data & 1);
+	flip_screen_set(data & 1);
 }
 
 
@@ -205,7 +205,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 			flipx = bank & 1;
 			flipy = bank & 2;
 
-			if (flip_screen_get(machine))
+			if (state->flip_screen())
 			{
 				xpos = 256 - (8 * size) - xpos;
 				ypos = 256 - (8 * size) - ypos;

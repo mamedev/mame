@@ -230,7 +230,7 @@ WRITE8_MEMBER(stfight_state::stfight_vh_latch_w)
 			/* 0x40 = sprites */
 			m_bg_tilemap->enable(data & 0x20);
 			m_fg_tilemap->enable(data & 0x10);
-			flip_screen_set(machine(), data & 0x01);
+			flip_screen_set(data & 0x01);
 			break;
 	}
 }
@@ -268,7 +268,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 				    sx -= 0x100;
 			}
 
-			if (flip_screen_get(machine))
+			if (state->flip_screen())
 			{
 				sx = 240 - sx;
 				sy = 240 - sy;
@@ -280,7 +280,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 			pdrawgfx_transpen(bitmap,cliprect,machine.gfx[4],
 				     code,
 					 color,
-					 flipx,flip_screen_get(machine),
+					 flipx,state->flip_screen(),
 					 sx,sy,
 				     machine.priority_bitmap,
 					 pri ? 0x02 : 0,0x0f);

@@ -171,7 +171,7 @@ static SCREEN_UPDATE_IND16( calorie )
 		ypos = 0xff - state->m_sprites[x + 2];
 		xpos = state->m_sprites[x + 3];
 
-		if (flip_screen_get(screen.machine()))
+		if (state->flip_screen())
 		{
 			if (state->m_sprites[x + 1] & 0x10)
 				ypos = 0xff - ypos + 32;
@@ -219,7 +219,7 @@ WRITE8_MEMBER(calorie_state::bg_bank_w)
 
 WRITE8_MEMBER(calorie_state::calorie_flipscreen_w)
 {
-	flip_screen_set(machine(), data & 1);
+	flip_screen_set(data & 1);
 }
 
 READ8_MEMBER(calorie_state::calorie_soundlatch_r)
@@ -246,7 +246,7 @@ static ADDRESS_MAP_START( calorie_map, AS_PROGRAM, 8, calorie_state )
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(fg_ram_w) AM_BASE(m_fg_ram)
 	AM_RANGE(0xd800, 0xdbff) AM_RAM AM_BASE(m_sprites)
-	AM_RANGE(0xdc00, 0xdcff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_le_w) AM_SHARE("paletteram")
+	AM_RANGE(0xdc00, 0xdcff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_byte_le_w) AM_SHARE("paletteram")
 	AM_RANGE(0xde00, 0xde00) AM_WRITE(bg_bank_w)
 	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("P1")
 	AM_RANGE(0xf001, 0xf001) AM_READ_PORT("P2")

@@ -21,15 +21,15 @@ WRITE8_MEMBER(arkanoid_state::arkanoid_d008_w)
 	int bank;
 
 	/* bits 0 and 1 flip X and Y, I don't know which is which */
-	if (flip_screen_x_get(machine()) != (data & 0x01))
+	if (flip_screen_x() != (data & 0x01))
 	{
-		flip_screen_x_set(machine(), data & 0x01);
+		flip_screen_x_set(data & 0x01);
 		m_bg_tilemap->mark_all_dirty();
 	}
 
-	if (flip_screen_y_get(machine()) != (data & 0x02))
+	if (flip_screen_y() != (data & 0x02))
 	{
-		flip_screen_y_set(machine(), data & 0x02);
+		flip_screen_y_set(data & 0x02);
 		m_bg_tilemap->mark_all_dirty();
 	}
 
@@ -76,15 +76,15 @@ WRITE8_MEMBER(arkanoid_state::tetrsark_d008_w)
 	int bank;
 
 	/* bits 0 and 1 flip X and Y, I don't know which is which */
-	if (flip_screen_x_get(machine()) != (data & 0x01))
+	if (flip_screen_x() != (data & 0x01))
 	{
-		flip_screen_x_set(machine(), data & 0x01);
+		flip_screen_x_set(data & 0x01);
 		m_bg_tilemap->mark_all_dirty();
 	}
 
-	if (flip_screen_y_get(machine()) != (data & 0x02))
+	if (flip_screen_y() != (data & 0x02))
 	{
-		flip_screen_y_set(machine(), data & 0x02);
+		flip_screen_y_set(data & 0x02);
 		m_bg_tilemap->mark_all_dirty();
 	}
 
@@ -121,16 +121,16 @@ WRITE8_MEMBER(arkanoid_state::hexa_d008_w)
 {
 
 	/* bit 0 = flipx (or y?) */
-	if (flip_screen_x_get(machine()) != (data & 0x01))
+	if (flip_screen_x() != (data & 0x01))
 	{
-		flip_screen_x_set(machine(), data & 0x01);
+		flip_screen_x_set(data & 0x01);
 		m_bg_tilemap->mark_all_dirty();
 	}
 
 	/* bit 1 = flipy (or x?) */
-	if (flip_screen_y_get(machine()) != (data & 0x02))
+	if (flip_screen_y() != (data & 0x02))
 	{
-		flip_screen_y_set(machine(), data & 0x02);
+		flip_screen_y_set(data & 0x02);
 		m_bg_tilemap->mark_all_dirty();
 	}
 
@@ -177,9 +177,9 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 
 		sx = state->m_spriteram[offs];
 		sy = 248 - state->m_spriteram[offs + 1];
-		if (flip_screen_x_get(machine))
+		if (state->flip_screen_x())
 			sx = 248 - sx;
-		if (flip_screen_y_get(machine))
+		if (state->flip_screen_y())
 			sy = 248 - sy;
 
 		code = state->m_spriteram[offs + 3] + ((state->m_spriteram[offs + 2] & 0x03) << 8) + 1024 * state->m_gfxbank;
@@ -187,12 +187,12 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		drawgfx_transpen(bitmap,cliprect,machine.gfx[0],
 				2 * code,
 				((state->m_spriteram[offs + 2] & 0xf8) >> 3) + 32 * state->m_palettebank,
-				flip_screen_x_get(machine),flip_screen_y_get(machine),
-				sx,sy + (flip_screen_y_get(machine) ? 8 : -8),0);
+				state->flip_screen_x(),state->flip_screen_y(),
+				sx,sy + (state->flip_screen_y() ? 8 : -8),0);
 		drawgfx_transpen(bitmap,cliprect,machine.gfx[0],
 				2 * code + 1,
 				((state->m_spriteram[offs + 2] & 0xf8) >> 3) + 32 * state->m_palettebank,
-				flip_screen_x_get(machine),flip_screen_y_get(machine),
+				state->flip_screen_x(),state->flip_screen_y(),
 				sx,sy,0);
 	}
 }

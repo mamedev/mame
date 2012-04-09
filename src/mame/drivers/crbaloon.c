@@ -53,7 +53,7 @@ static void pc3092_reset(void)
 static void pc3092_update(running_machine &machine)
 {
 	crbaloon_state *state = machine.driver_data<crbaloon_state>();
-	flip_screen_set(machine, (state->m_pc3092_data[1] & 0x01) ? TRUE : FALSE);
+	state->flip_screen_set((state->m_pc3092_data[1] & 0x01) ? TRUE : FALSE);
 }
 
 

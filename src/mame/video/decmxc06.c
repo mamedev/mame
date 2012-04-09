@@ -86,7 +86,7 @@ void deco_mxc06_device::draw_sprites( running_machine &machine, bitmap_ind16 &bi
 		sy = 240 - sy;
 
 
-		if (flip_screen_get(machine))
+		if (machine.driver_data()->flip_screen())
 		{
 			sy = 240 - sy;
 			sx = 240 - sx;

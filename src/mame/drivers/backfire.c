@@ -106,7 +106,7 @@ static SCREEN_UPDATE_IND16( backfire_left )
 	backfire_state *state = screen.machine().driver_data<backfire_state>();
 
 	//FIXME: flip_screen_x should not be written!
-	flip_screen_set_no_update(screen.machine(), 1);
+	state->flip_screen_set_no_update(1);
 
 	/* screen 1 uses pf1 as the forground and pf3 as the background */
 	/* screen 2 uses pf2 as the foreground and pf4 as the background */
@@ -139,7 +139,7 @@ static SCREEN_UPDATE_IND16( backfire_right )
 	backfire_state *state = screen.machine().driver_data<backfire_state>();
 
 	//FIXME: flip_screen_x should not be written!
-	flip_screen_set_no_update(screen.machine(), 1);
+	state->flip_screen_set_no_update(1);
 
 	/* screen 1 uses pf1 as the forground and pf3 as the background */
 	/* screen 2 uses pf2 as the foreground and pf4 as the background */

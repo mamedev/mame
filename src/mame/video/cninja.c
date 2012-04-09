@@ -98,7 +98,7 @@ static void cninjabl_draw_sprites( running_machine &machine, bitmap_ind16 &bitma
 			inc = 1;
 		}
 
-		if (flip_screen_get(machine))
+		if (state->flip_screen())
 		{
 			y = 240 - y;
 			x = 240 - x;
@@ -130,7 +130,7 @@ SCREEN_UPDATE_IND16( cninja )
 	cninja_state *state = screen.machine().driver_data<cninja_state>();
 	UINT16 flip = deco16ic_pf_control_r(state->m_deco_tilegen1, 0, 0xffff);
 
-	flip_screen_set(screen.machine(), BIT(flip, 7));
+	state->flip_screen_set(BIT(flip, 7));
 	deco16ic_pf_update(state->m_deco_tilegen1, state->m_pf1_rowscroll, state->m_pf2_rowscroll);
 	deco16ic_pf_update(state->m_deco_tilegen2, state->m_pf3_rowscroll, state->m_pf4_rowscroll);
 
@@ -155,7 +155,7 @@ SCREEN_UPDATE_IND16( cninjabl )
 	deco16ic_set_enable(state->m_deco_tilegen2, 0, 1 );
 	deco16ic_set_enable(state->m_deco_tilegen2, 1, 1 );
 
-	flip_screen_set(screen.machine(), BIT(flip, 7));
+	state->flip_screen_set(BIT(flip, 7));
 	deco16ic_pf_update(state->m_deco_tilegen1, state->m_pf1_rowscroll, state->m_pf2_rowscroll);
 	deco16ic_pf_update(state->m_deco_tilegen2, state->m_pf3_rowscroll, state->m_pf4_rowscroll);
 
@@ -176,7 +176,7 @@ SCREEN_UPDATE_IND16( edrandy )
 	cninja_state *state = screen.machine().driver_data<cninja_state>();
 	UINT16 flip = deco16ic_pf_control_r(state->m_deco_tilegen1, 0, 0xffff);
 
-	flip_screen_set(screen.machine(), BIT(flip, 7));
+	state->flip_screen_set(BIT(flip, 7));
 	deco16ic_pf_update(state->m_deco_tilegen1, state->m_pf1_rowscroll, state->m_pf2_rowscroll);
 	deco16ic_pf_update(state->m_deco_tilegen2, state->m_pf3_rowscroll, state->m_pf4_rowscroll);
 
@@ -211,7 +211,7 @@ SCREEN_UPDATE_IND16( robocop2 )
 	}
 
 	/* Update playfields */
-	flip_screen_set(screen.machine(), BIT(flip, 7));
+	state->flip_screen_set(BIT(flip, 7));
 	deco16ic_pf_update(state->m_deco_tilegen1, state->m_pf1_rowscroll, state->m_pf2_rowscroll);
 	deco16ic_pf_update(state->m_deco_tilegen2, state->m_pf3_rowscroll, state->m_pf4_rowscroll);
 
@@ -254,7 +254,7 @@ SCREEN_UPDATE_RGB32( mutantf )
 	UINT16 priority = decocomn_priority_r(state->m_decocomn, 0, 0xffff);
 
 
-	flip_screen_set(screen.machine(), BIT(flip, 7));
+	state->flip_screen_set(BIT(flip, 7));
 	deco16ic_pf_update(state->m_deco_tilegen1, state->m_pf1_rowscroll, state->m_pf2_rowscroll);
 	deco16ic_pf_update(state->m_deco_tilegen2, state->m_pf3_rowscroll, state->m_pf4_rowscroll);
 

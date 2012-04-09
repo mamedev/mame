@@ -187,7 +187,7 @@ WRITE8_MEMBER(vball_state::cpu_sound_command_w)
 */
 WRITE8_MEMBER(vball_state::vb_scrollx_hi_w)
 {
-	flip_screen_set(machine(), ~data&1);
+	flip_screen_set(~data&1);
 	m_vb_scrollx_hi = (data & 0x02) << 7;
 	vb_bgprombank_w(machine(), (data >> 2) & 0x07);
 	vb_spprombank_w(machine(), (data >> 5) & 0x07);

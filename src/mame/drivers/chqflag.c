@@ -50,7 +50,7 @@ WRITE8_MEMBER(chqflag_state::chqflag_bankswitch_w)
 	if (data & 0x20)
 	{
 		space.install_read_bank(0x1800, 0x1fff, "bank5");
-		space.install_write_handler(0x1800, 0x1fff, write8_delegate(FUNC(driver_device::paletteram_xBBBBBGGGGGRRRRR_be_w),this));
+		space.install_write_handler(0x1800, 0x1fff, write8_delegate(FUNC(driver_device::paletteram_xBBBBBGGGGGRRRRR_byte_be_w),this));
 		memory_set_bankptr(machine(), "bank5", m_generic_paletteram_8);
 
 		if (m_k051316_readroms)

@@ -91,7 +91,7 @@ READ8_MEMBER(jackal_state::topgunbl_rotary_r)
 WRITE8_MEMBER(jackal_state::jackal_flipscreen_w)
 {
 	m_irq_enable = data & 0x02;
-	flip_screen_set(machine(), data & 0x08);
+	flip_screen_set(data & 0x08);
 }
 
 READ8_MEMBER(jackal_state::jackal_zram_r)

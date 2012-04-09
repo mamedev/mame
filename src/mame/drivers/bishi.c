@@ -156,7 +156,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, bishi_state )
 	AM_RANGE(0x870000, 0x8700ff) AM_DEVWRITE_LEGACY("k055555", k055555_word_w)	// PCU2
 	AM_RANGE(0x880000, 0x880003) AM_DEVREADWRITE8_LEGACY("ymz", ymz280b_r, ymz280b_w, 0xff00)
 	AM_RANGE(0xa00000, 0xa01fff) AM_DEVREADWRITE_LEGACY("k056832", k056832_ram_word_r, k056832_ram_word_w)	// Graphic planes
-	AM_RANGE(0xb00000, 0xb03fff) AM_RAM_WRITE(paletteram16_xbgr_word_be_w) AM_SHARE("paletteram")
+	AM_RANGE(0xb00000, 0xb03fff) AM_RAM_WRITE(paletteram_xbgr_word_be_w) AM_SHARE("paletteram")
 	AM_RANGE(0xb04000, 0xb047ff) AM_READ(bishi_mirror_r)	// bug in the ram/rom test?
 	AM_RANGE(0xc00000, 0xc01fff) AM_READ(bishi_K056832_rom_r)
 ADDRESS_MAP_END

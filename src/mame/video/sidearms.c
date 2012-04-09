@@ -63,7 +63,7 @@ WRITE8_MEMBER(sidearms_state::sidearms_c804_w)
 	if (m_flipon != (data & 0x80))
 	{
 		m_flipon = data & 0x80;
-		flip_screen_set(machine(), m_flipon);
+		flip_screen_set(m_flipon);
 		machine().tilemap().mark_all_dirty();
 	}
 }

@@ -308,7 +308,7 @@ static WRITE8_DEVICE_HANDLER( led2_w )
 static WRITE8_DEVICE_HANDLER( misc_w )
 {
 	merit_state *state = device->machine().driver_data<merit_state>();
-	flip_screen_set(device->machine(), ~data & 0x10);
+	state->flip_screen_set(~data & 0x10);
 	state->m_extra_video_bank_bit = (data & 2) << 8;
 	state->m_lscnblk = (data >> 3) & 1;
 
@@ -318,7 +318,7 @@ static WRITE8_DEVICE_HANDLER( misc_w )
 static WRITE8_DEVICE_HANDLER( misc_couple_w )
 {
 	merit_state *state = device->machine().driver_data<merit_state>();
-	flip_screen_set(device->machine(), ~data & 0x10);
+	state->flip_screen_set(~data & 0x10);
 	state->m_extra_video_bank_bit = (data & 2) << 8;
 	state->m_lscnblk = (data >> 3) & 1;
 

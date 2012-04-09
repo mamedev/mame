@@ -172,7 +172,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		x += state->m_sprites_scrolldx;
 		y += state->m_sprites_scrolldy;
 
-		if (flip_screen_get(machine))	// not used?
+		if (state->flip_screen())	// not used?
 		{
 			flipx = !flipx;		x = max_x - x - 16;
 			flipy = !flipy;		y = max_y - y - 16;

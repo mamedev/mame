@@ -372,7 +372,7 @@ static ADDRESS_MAP_START( berlwall, AS_PROGRAM, 16, kaneko16_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM		// ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM		// Work RAM
 	AM_RANGE(0x30e000, 0x30ffff) AM_RAM AM_SHARE("spriteram")		// Sprites
-	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_SHARE("paletteram")	// Palette
+	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(paletteram_xGGGGGRRRRRBBBBB_word_w) AM_SHARE("paletteram")	// Palette
 //  AM_RANGE(0x480000, 0x480001) AM_RAM     // ?
 	AM_RANGE(0x500000, 0x500001) AM_READWRITE(kaneko16_bg15_reg_r, kaneko16_bg15_reg_w) AM_BASE(m_bg15_reg)	// High Color Background
 	AM_RANGE(0x580000, 0x580001) AM_READWRITE(kaneko16_bg15_select_r, kaneko16_bg15_select_w) AM_BASE(m_bg15_select)
@@ -429,7 +429,7 @@ static ADDRESS_MAP_START( bakubrkr, AS_PROGRAM, 16, kaneko16_state )
 	AM_RANGE(0x582000, 0x582fff) AM_RAM AM_BASE(m_vscroll[3])									//
 	AM_RANGE(0x583000, 0x583fff) AM_RAM AM_BASE(m_vscroll[2])									//
 	AM_RANGE(0x600000, 0x601fff) AM_RAM AM_SHARE("spriteram")					// Sprites
-	AM_RANGE(0x700000, 0x700fff) AM_RAM_WRITE(paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_SHARE("paletteram")	// Palette
+	AM_RANGE(0x700000, 0x700fff) AM_RAM_WRITE(paletteram_xGGGGGRRRRRBBBBB_word_w) AM_SHARE("paletteram")	// Palette
 	AM_RANGE(0x800000, 0x80001f) AM_RAM_WRITE(kaneko16_layers_0_regs_w) AM_BASE(m_layers_0_regs)	// Layers 0 Regs
 	AM_RANGE(0x900000, 0x90001f) AM_RAM_WRITE(kaneko16_sprites_regs_w) AM_BASE(m_sprites_regs	)	// Sprites Regs
 	AM_RANGE(0xa80000, 0xa80001) AM_READ(watchdog_reset16_r)	// Watchdog
@@ -449,7 +449,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( blazeon, AS_PROGRAM, 16, kaneko16_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM		// ROM
 	AM_RANGE(0x300000, 0x30ffff) AM_RAM		// Work RAM
-	AM_RANGE(0x500000, 0x500fff) AM_RAM_WRITE(paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_SHARE("paletteram")	// Palette
+	AM_RANGE(0x500000, 0x500fff) AM_RAM_WRITE(paletteram_xGGGGGRRRRRBBBBB_word_w) AM_SHARE("paletteram")	// Palette
 	AM_RANGE(0x600000, 0x600fff) AM_RAM_WRITE(kaneko16_vram_1_w) AM_BASE(m_vram[1])	// Layers 0
 	AM_RANGE(0x601000, 0x601fff) AM_RAM_WRITE(kaneko16_vram_0_w) AM_BASE(m_vram[0])	//
 	AM_RANGE(0x602000, 0x602fff) AM_RAM AM_BASE(m_vscroll[1])									//
@@ -513,7 +513,7 @@ static ADDRESS_MAP_START( bloodwar, AS_PROGRAM, 16, kaneko16_state )
 	AM_RANGE(0x2b0000, 0x2b0001) AM_WRITE(toybox_mcu_com1_w)
 	AM_RANGE(0x2c0000, 0x2c0001) AM_WRITE(toybox_mcu_com2_w)
 	AM_RANGE(0x2d0000, 0x2d0001) AM_WRITE(toybox_mcu_com3_w)
-	AM_RANGE(0x300000, 0x30ffff) AM_RAM_WRITE(paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_SHARE("paletteram")	// Palette
+	AM_RANGE(0x300000, 0x30ffff) AM_RAM_WRITE(paletteram_xGGGGGRRRRRBBBBB_word_w) AM_SHARE("paletteram")	// Palette
 	AM_RANGE(0x400000, 0x401fff) AM_RAM AM_SHARE("spriteram")					// Sprites
 	AM_RANGE(0x500000, 0x500fff) AM_RAM_WRITE(kaneko16_vram_1_w) AM_BASE(m_vram[1])	// Layers 0
 	AM_RANGE(0x501000, 0x501fff) AM_RAM_WRITE(kaneko16_vram_0_w) AM_BASE(m_vram[0])	//
@@ -575,7 +575,7 @@ static ADDRESS_MAP_START( bonkadv, AS_PROGRAM, 16, kaneko16_state )
 	AM_RANGE(0x2b0000, 0x2b0001) AM_WRITE(toybox_mcu_com1_w)
 	AM_RANGE(0x2c0000, 0x2c0001) AM_WRITE(toybox_mcu_com2_w)
 	AM_RANGE(0x2d0000, 0x2d0001) AM_WRITE(toybox_mcu_com3_w)
-	AM_RANGE(0x300000, 0x30ffff) AM_RAM_WRITE(paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_SHARE("paletteram")	// Palette
+	AM_RANGE(0x300000, 0x30ffff) AM_RAM_WRITE(paletteram_xGGGGGRRRRRBBBBB_word_w) AM_SHARE("paletteram")	// Palette
 	AM_RANGE(0x400000, 0x401fff) AM_RAM AM_SHARE("spriteram")					// Sprites
 	AM_RANGE(0x500000, 0x500fff) AM_RAM_WRITE(kaneko16_vram_1_w) AM_BASE(m_vram[1])	// Layers 0
 	AM_RANGE(0x501000, 0x501fff) AM_RAM_WRITE(kaneko16_vram_0_w) AM_BASE(m_vram[0])	//
@@ -655,7 +655,7 @@ static ADDRESS_MAP_START( gtmr_map, AS_PROGRAM, 16, kaneko16_state )
 	AM_RANGE(0x2c0000, 0x2c0001) AM_WRITE(toybox_mcu_com2_w)
 	AM_RANGE(0x2d0000, 0x2d0001) AM_WRITE(toybox_mcu_com3_w)
 
-	AM_RANGE(0x300000, 0x30ffff) AM_RAM_WRITE(paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_SHARE("paletteram")	// Palette
+	AM_RANGE(0x300000, 0x30ffff) AM_RAM_WRITE(paletteram_xGGGGGRRRRRBBBBB_word_w) AM_SHARE("paletteram")	// Palette
 	AM_RANGE(0x310000, 0x327fff) AM_RAM																		//
 	AM_RANGE(0x400000, 0x401fff) AM_RAM AM_SHARE("spriteram")						// Sprites
 
@@ -731,7 +731,7 @@ static ADDRESS_MAP_START( gtmr2_map, AS_PROGRAM, 16, kaneko16_state )
 	AM_RANGE(0x2c0000, 0x2c0001) AM_WRITE(toybox_mcu_com2_w)
 	AM_RANGE(0x2d0000, 0x2d0001) AM_WRITE(toybox_mcu_com3_w)
 
-	AM_RANGE(0x300000, 0x30ffff) AM_RAM_WRITE(paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_SHARE("paletteram")	// Palette
+	AM_RANGE(0x300000, 0x30ffff) AM_RAM_WRITE(paletteram_xGGGGGRRRRRBBBBB_word_w) AM_SHARE("paletteram")	// Palette
 	AM_RANGE(0x310000, 0x327fff) AM_RAM //
 	AM_RANGE(0x400000, 0x401fff) AM_RAM AM_SHARE("spriteram") // Sprites
 
@@ -778,7 +778,7 @@ static ADDRESS_MAP_START( mgcrystl, AS_PROGRAM, 16, kaneko16_state )
 	AM_RANGE(0x400000, 0x40001f) AM_DEVREADWRITE_LEGACY("ay1", kaneko16_YM2149_r, kaneko16_YM2149_w)	// Sound
 	AM_RANGE(0x400200, 0x40021f) AM_DEVREADWRITE_LEGACY("ay2", kaneko16_YM2149_r, kaneko16_YM2149_w)
 	AM_RANGE(0x400400, 0x400401) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x500000, 0x500fff) AM_RAM_WRITE(paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_SHARE("paletteram")	// Palette
+	AM_RANGE(0x500000, 0x500fff) AM_RAM_WRITE(paletteram_xGGGGGRRRRRBBBBB_word_w) AM_SHARE("paletteram")	// Palette
 	AM_RANGE(0x600000, 0x600fff) AM_RAM_WRITE(kaneko16_vram_1_w) AM_BASE(m_vram[1])	// Layers 0
 	AM_RANGE(0x601000, 0x601fff) AM_RAM_WRITE(kaneko16_vram_0_w) AM_BASE(m_vram[0])	//
 	AM_RANGE(0x602000, 0x602fff) AM_RAM AM_BASE(m_vscroll[1])									//
@@ -846,7 +846,7 @@ static ADDRESS_MAP_START( shogwarr, AS_PROGRAM, 16, kaneko16_state )
 	AM_RANGE(0x2b0000, 0x2b0001) AM_WRITE(calc3_mcu_com2_w)
 	//AM_RANGE(0x2c0000, 0x2c0001) AM_WRITE_LEGACY(calc3_run) // guess, might be irqack
 	AM_RANGE(0x2d0000, 0x2d0001) AM_WRITE(calc3_mcu_com3_w)
-	AM_RANGE(0x380000, 0x380fff) AM_RAM_WRITE(paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_SHARE("paletteram")	// Palette
+	AM_RANGE(0x380000, 0x380fff) AM_RAM_WRITE(paletteram_xGGGGGRRRRRBBBBB_word_w) AM_SHARE("paletteram")	// Palette
 	AM_RANGE(0x400000, 0x400001) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff)	// Samples
 	AM_RANGE(0x480000, 0x480001) AM_DEVREADWRITE8("oki2", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x580000, 0x581fff) AM_RAM AM_SHARE("spriteram")					// Sprites

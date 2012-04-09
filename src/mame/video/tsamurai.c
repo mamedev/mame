@@ -168,7 +168,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 		/* So I'm using this specific check. -kal 11 jul 2002 */
 //      if(sprite_type == 1) sy=sy+2;
 
-		if( flip_screen_get(machine) )
+		if( state->flip_screen() )
 		{
 			drawgfx_transpen( bitmap,cliprect,gfx,
 				sprite_number&0x7f,

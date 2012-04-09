@@ -92,7 +92,7 @@ WRITE8_MEMBER(vastar_state::vastar_sharedram_w)
 
 WRITE8_MEMBER(vastar_state::flip_screen_w)
 {
-	flip_screen_set(machine(), data);
+	flip_screen_set(data);
 }
 
 WRITE8_MEMBER(vastar_state::nmi_mask_w)

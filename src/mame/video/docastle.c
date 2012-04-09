@@ -76,27 +76,27 @@ WRITE8_MEMBER(docastle_state::docastle_colorram_w)
 
 READ8_MEMBER(docastle_state::docastle_flipscreen_off_r)
 {
-	flip_screen_set(machine(), 0);
+	flip_screen_set(0);
 	m_do_tilemap->mark_all_dirty();
 	return 0;
 }
 
 READ8_MEMBER(docastle_state::docastle_flipscreen_on_r)
 {
-	flip_screen_set(machine(), 1);
+	flip_screen_set(1);
 	m_do_tilemap->mark_all_dirty();
 	return 1;
 }
 
 WRITE8_MEMBER(docastle_state::docastle_flipscreen_off_w)
 {
-	flip_screen_set(machine(), 0);
+	flip_screen_set(0);
 	m_do_tilemap->mark_all_dirty();
 }
 
 WRITE8_MEMBER(docastle_state::docastle_flipscreen_on_w)
 {
-	flip_screen_set(machine(), 1);
+	flip_screen_set(1);
 	m_do_tilemap->mark_all_dirty();
 }
 
@@ -190,7 +190,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 			flipy = state->m_spriteram[offs + 2] & 0x80;
 		}
 
-		if (flip_screen_get(machine))
+		if (state->flip_screen())
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;

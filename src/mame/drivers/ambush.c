@@ -53,7 +53,7 @@ WRITE8_MEMBER(ambush_state::ambush_coin_counter_w)
 
 WRITE8_MEMBER(ambush_state::flip_screen_w)
 {
-	flip_screen_set(machine(), data);
+	flip_screen_set(data);
 }
 
 

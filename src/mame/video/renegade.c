@@ -25,7 +25,7 @@ WRITE8_MEMBER(renegade_state::renegade_videoram2_w)
 
 WRITE8_MEMBER(renegade_state::renegade_flipscreen_w)
 {
-	flip_screen_set(machine(), ~data & 0x01);
+	flip_screen_set(~data & 0x01);
 }
 
 WRITE8_MEMBER(renegade_state::renegade_scroll0_w)
@@ -97,7 +97,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 			if (sx > 248)
 				sx -= 256;
 
-			if (flip_screen_get(machine))
+			if (state->flip_screen())
 			{
 				sx = 240 - sx;
 				sy = 240 - sy;
@@ -110,17 +110,17 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 				drawgfx_transpen(bitmap, cliprect, machine.gfx[sprite_bank],
 					sprite_number + 1,
 					color,
-					xflip, flip_screen_get(machine),
-					sx, sy + (flip_screen_get(machine) ? -16 : 16), 0);
+					xflip, state->flip_screen(),
+					sx, sy + (state->flip_screen() ? -16 : 16), 0);
 			}
 			else
 			{
-				sy += (flip_screen_get(machine) ? -16 : 16);
+				sy += (state->flip_screen() ? -16 : 16);
 			}
 			drawgfx_transpen(bitmap, cliprect, machine.gfx[sprite_bank],
 				sprite_number,
 				color,
-				xflip, flip_screen_get(machine),
+				xflip, state->flip_screen(),
 				sx, sy, 0);
 		}
 		source += 4;

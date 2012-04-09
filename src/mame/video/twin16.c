@@ -67,8 +67,8 @@ WRITE16_MEMBER(twin16_state::twin16_video_register_w)
 		case 0:
 			COMBINE_DATA( &m_video_register );
 
-			flip_screen_x_set(machine(), m_video_register & TWIN16_SCREEN_FLIPX);
-			flip_screen_y_set(machine(), m_video_register & TWIN16_SCREEN_FLIPY);
+			flip_screen_x_set(m_video_register & TWIN16_SCREEN_FLIPX);
+			flip_screen_y_set(m_video_register & TWIN16_SCREEN_FLIPY);
 
 			break;
 

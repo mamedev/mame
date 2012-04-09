@@ -349,7 +349,7 @@ static WRITE8_DEVICE_HANDLER( chanbara_ay_out_1_w )
 
 	state->m_scrollhi = data & 0x01;
 
-	flip_screen_set(device->machine(), data & 0x02);
+	state->flip_screen_set(data & 0x02);
 
 	memory_set_bank(device->machine(), "bank1", (data & 0x04) >> 2);
 

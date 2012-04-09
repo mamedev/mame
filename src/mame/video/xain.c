@@ -155,7 +155,7 @@ WRITE8_MEMBER(xain_state::xain_scrollyP1_w)
 
 WRITE8_MEMBER(xain_state::xain_flipscreen_w)
 {
-	flip_screen_set(machine(), data & 1);
+	flip_screen_set(data & 1);
 }
 
 
@@ -184,7 +184,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 		if (sy <= -7) sy += 256;
 		flipx = attr & 0x40;
 		flipy = 0;
-		if (flip_screen_get(machine))
+		if (state->flip_screen())
 		{
 			sx = 238 - sx;
 			sy = 240 - sy;

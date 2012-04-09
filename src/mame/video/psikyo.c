@@ -332,7 +332,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		zoomx = 32 - zoomx;
 		zoomy = 32 - zoomy;
 
-		if (flip_screen_get(machine))
+		if (state->flip_screen())
 		{
 			x = width  - x - (nx * zoomx) / 2;
 			y = height - y - (ny * zoomy) / 2;
@@ -453,7 +453,7 @@ static void draw_sprites_bootleg( running_machine &machine, bitmap_ind16 &bitmap
 		zoomy = 32 - zoomy;
 
 
-		if (flip_screen_get(machine))
+		if (state->flip_screen())
 		{
 			x = width  - x - (nx * zoomx) / 2;
 			y = height - y - (ny * zoomy) / 2;
@@ -533,7 +533,7 @@ SCREEN_UPDATE_IND16( psikyo )
 
 	tilemap_t *tmptilemap0, *tmptilemap1;
 
-	flip_screen_set(screen.machine(), ~input_port_read(screen.machine(), "DSW") & 0x00010000);		// hardwired to a DSW bit
+	state->flip_screen_set(~input_port_read(screen.machine(), "DSW") & 0x00010000);		// hardwired to a DSW bit
 
 	/* Layers enable (not quite right) */
 
@@ -707,7 +707,7 @@ SCREEN_UPDATE_IND16( psikyo_bootleg )
 
 	tilemap_t *tmptilemap0, *tmptilemap1;
 
-	flip_screen_set(screen.machine(), ~input_port_read(screen.machine(), "DSW") & 0x00010000);		// hardwired to a DSW bit
+	state->flip_screen_set(~input_port_read(screen.machine(), "DSW") & 0x00010000);		// hardwired to a DSW bit
 
 	/* Layers enable (not quite right) */
 

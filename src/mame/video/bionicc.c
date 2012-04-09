@@ -183,7 +183,7 @@ WRITE16_MEMBER(bionicc_state::bionicc_gfxctrl_w)
 
 	if (ACCESSING_BITS_8_15)
 	{
-		flip_screen_set(machine(), data & 0x0100);
+		flip_screen_set(data & 0x0100);
 
 		m_bg_tilemap->enable(data & 0x2000);	/* guess */
 		m_fg_tilemap->enable(data & 0x1000);	/* guess */
@@ -223,7 +223,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 			if (sy > 512 - 16)
 				sy -= 512;
 
-			if (flip_screen_get(machine))
+			if (state->flip_screen())
 			{
 				sx = 240 - sx;
 				sy = 240 - sy;

@@ -313,9 +313,9 @@ READ32_MEMBER(psikyo_state::paletteram32_dword_r)
 WRITE32_MEMBER(psikyo_state::paletteram32_xRRRRRGGGGGBBBBB_dword_w)
 {
 	if (ACCESSING_BITS_16_31)
-		paletteram16_xRRRRRGGGGGBBBBB_word_w(space, offset * 2, data >> 16, mem_mask >> 16);
+		paletteram_xRRRRRGGGGGBBBBB_word_w(space, offset * 2, data >> 16, mem_mask >> 16);
 	if (ACCESSING_BITS_0_15)
-		paletteram16_xRRRRRGGGGGBBBBB_word_w(space, offset * 2 + 1, data, mem_mask);
+		paletteram_xRRRRRGGGGGBBBBB_word_w(space, offset * 2 + 1, data, mem_mask);
 }
 
 static ADDRESS_MAP_START( psikyo_map, AS_PROGRAM, 32, psikyo_state )

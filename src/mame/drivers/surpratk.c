@@ -47,9 +47,9 @@ WRITE8_MEMBER(surpratk_state::bankedram_w)
 	if (m_videobank & 0x02)
 	{
 		if (m_videobank & 0x04)
-			paletteram_xBBBBBGGGGGRRRRR_be_w(space,offset + 0x0800,data);
+			paletteram_xBBBBBGGGGGRRRRR_byte_be_w(space,offset + 0x0800,data);
 		else
-			paletteram_xBBBBBGGGGGRRRRR_be_w(space,offset,data);
+			paletteram_xBBBBBGGGGGRRRRR_byte_be_w(space,offset,data);
 	}
 	else if (m_videobank & 0x01)
 		k053245_w(m_k053244, offset, data);

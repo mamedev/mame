@@ -432,7 +432,7 @@ WRITE32_MEMBER(dreamwld_state::dreamwld_6295_1_bank_w)
 		logerror("OKI1: unk bank write %x mem_mask %8x\n", data, mem_mask);
 }
 
-// why doesn't using paletteram16_xRRRRRGGGGGBBBBB_word_w with a 16-bit handler work? colours are
+// why doesn't using paletteram_xRRRRRGGGGGBBBBB_word_w with a 16-bit handler work? colours are
 // severely corrupt on dream world's semicom screen + many sprites, seems palette values get duplicated.
 WRITE32_MEMBER(dreamwld_state::dreamwld_palette_w)
 {

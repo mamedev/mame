@@ -88,7 +88,7 @@ static ADDRESS_MAP_START( srumbler_map, AS_PROGRAM, 8, srumbler_state )
 	AM_RANGE(0x6000, 0x6fff) AM_ROMBANK("6000")	/* Banked ROM */
 	AM_RANGE(0x6000, 0x6fff) AM_WRITENOP	/* Video RAM 2 ??? (not used) */
 	AM_RANGE(0x7000, 0x7fff) AM_ROMBANK("7000")	/* Banked ROM */
-	AM_RANGE(0x7000, 0x73ff) AM_WRITE(paletteram_RRRRGGGGBBBBxxxx_be_w) AM_SHARE("paletteram")
+	AM_RANGE(0x7000, 0x73ff) AM_WRITE(paletteram_RRRRGGGGBBBBxxxx_byte_be_w) AM_SHARE("paletteram")
 	AM_RANGE(0x8000, 0x8fff) AM_ROMBANK("8000")	/* Banked ROM */
 	AM_RANGE(0x9000, 0x9fff) AM_ROMBANK("9000")	/* Banked ROM */
 	AM_RANGE(0xa000, 0xafff) AM_ROMBANK("a000")	/* Banked ROM */

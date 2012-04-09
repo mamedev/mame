@@ -1236,7 +1236,7 @@ WRITE8_MEMBER(leland_state::ataxx_master_output_w)
 WRITE8_MEMBER(leland_state::leland_gated_paletteram_w)
 {
 	if (m_wcol_enable)
-		paletteram_BBGGGRRR_w(space, offset, data);
+		paletteram_BBGGGRRR_byte_w(space, offset, data);
 }
 
 
@@ -1251,7 +1251,7 @@ READ8_MEMBER(leland_state::leland_gated_paletteram_r)
 WRITE8_MEMBER(leland_state::ataxx_paletteram_and_misc_w)
 {
 	if (m_wcol_enable)
-		paletteram_xxxxRRRRGGGGBBBB_le_w(space, offset, data);
+		paletteram_xxxxRRRRGGGGBBBB_byte_le_w(space, offset, data);
 	else if (offset == 0x7f8 || offset == 0x7f9)
 		leland_master_video_addr_w(space, offset - 0x7f8, data);
 	else if (offset == 0x7fc)

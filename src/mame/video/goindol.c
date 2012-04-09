@@ -93,7 +93,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		sx = sprite_ram[offs];
 		sy = 240 - sprite_ram[offs + 1];
 
-		if (flip_screen_get(machine))
+		if (state->flip_screen())
 		{
 			sx = 248 - sx;
 			sy = 248 - sy;
@@ -109,14 +109,14 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 						machine.gfx[gfxbank],
 						tile,
 						palette,
-						flip_screen_get(machine),flip_screen_get(machine),
+						state->flip_screen(),state->flip_screen(),
 						sx,sy, 0);
 			drawgfx_transpen(bitmap,cliprect,
 						machine.gfx[gfxbank],
 						tile+1,
 						palette,
-						flip_screen_get(machine),flip_screen_get(machine),
-						sx,sy + (flip_screen_get(machine) ? -8 : 8), 0);
+						state->flip_screen(),state->flip_screen(),
+						sx,sy + (state->flip_screen() ? -8 : 8), 0);
 		}
 	}
 }

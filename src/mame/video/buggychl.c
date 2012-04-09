@@ -56,8 +56,8 @@ WRITE8_MEMBER(buggychl_state::buggychl_ctrl_w)
     bit0 = VINV
 */
 
-	flip_screen_y_set(machine(), data & 0x01);
-	flip_screen_x_set(machine(), data & 0x02);
+	flip_screen_y_set(data & 0x01);
+	flip_screen_x_set(data & 0x02);
 
 	m_bg_on = data & 0x04;
 	m_sky_on = data & 0x08;
@@ -92,7 +92,7 @@ static void draw_bg( running_machine &machine, bitmap_ind16 &bitmap, const recta
 
 	/* prevent wraparound */
 	rectangle clip = cliprect;
-	if (flip_screen_x_get(machine)) clip.min_x += 8*8;
+	if (state->flip_screen_x()) clip.min_x += 8*8;
 	else clip.max_x -= 8*8;
 
 	for (offs = 0; offs < 0x400; offs++)
@@ -102,15 +102,15 @@ static void draw_bg( running_machine &machine, bitmap_ind16 &bitmap, const recta
 		int sx = offs % 32;
 		int sy = offs / 32;
 
-		if (flip_screen_x_get(machine))
+		if (state->flip_screen_x())
 			sx = 31 - sx;
-		if (flip_screen_y_get(machine))
+		if (state->flip_screen_y())
 			sy = 31 - sy;
 
 		drawgfx_opaque(state->m_tmp_bitmap1, state->m_tmp_bitmap1.cliprect(), machine.gfx[0],
 				code,
 				2,
-				flip_screen_x_get(machine),flip_screen_y_get(machine),
+				state->flip_screen_x(),state->flip_screen_y(),
 				8*sx,8*sy);
 	}
 
@@ -137,8 +137,8 @@ static void draw_fg( running_machine &machine, bitmap_ind16 &bitmap, const recta
 	{
 		int sx = offs % 32;
 		int sy = offs / 32;
-		int flipx = flip_screen_x_get(machine);
-		int flipy = flip_screen_y_get(machine);
+		int flipx = state->flip_screen_x();
+		int flipy = state->flip_screen_y();
 
 		int code = state->m_videoram[offs];
 
@@ -184,7 +184,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 
 		for (y = 0; y < 64; y++)
 		{
-			int dy = flip_screen_y_get(machine) ? (255 - sy - y) : (sy + y);
+			int dy = state->flip_screen_y() ? (255 - sy - y) : (sy + y);
 
 			if ((dy & ~0xff) == 0)
 			{
@@ -212,7 +212,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 						int col = pendata[x];
 						if (col)
 						{
-							int dx = flip_screen_x_get(machine) ? (255 - sx - px) : (sx + px);
+							int dx = state->flip_screen_x() ? (255 - sx - px) : (sx + px);
 							if ((dx & ~0xff) == 0)
 								bitmap.pix16(dy, dx) = state->m_sprite_color_base + col;
 						}

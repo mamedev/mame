@@ -36,7 +36,7 @@ WRITE8_MEMBER(drmicro_state::nmi_enable_w)
 
 	m_nmi_enable = data & 1;
 	m_flipscreen = (data & 2) ? 1 : 0;
-	flip_screen_set(machine(), data & 2);
+	flip_screen_set(data & 2);
 
 	// bit2,3 unknown
 }

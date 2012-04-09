@@ -160,7 +160,7 @@ WRITE8_MEMBER(fortyl_state::fortyl_pixram_sel_w)
 	if (m_flipscreen != f)
 	{
 		m_flipscreen = f;
-		flip_screen_set(machine(), m_flipscreen);
+		flip_screen_set(m_flipscreen);
 		m_pix_redraw = 1;
 
 		for (offs = 0; offs < 32; offs++)

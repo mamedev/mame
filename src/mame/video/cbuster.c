@@ -53,7 +53,7 @@ SCREEN_UPDATE_RGB32( twocrude )
 	cbuster_state *state = screen.machine().driver_data<cbuster_state>();
 	UINT16 flip = deco16ic_pf_control_r(state->m_deco_tilegen1, 0, 0xffff);
 
-	flip_screen_set(screen.machine(), !BIT(flip, 7));
+	state->flip_screen_set(!BIT(flip, 7));
 
 	screen.machine().device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, state->m_spriteram16_buffer, 0x400);
 

@@ -24,7 +24,8 @@ XTAL        :   18.432 MHz
 
 static MACHINE_RESET( clshroad )
 {
-	flip_screen_set(machine, 0);
+	clshroad_state *state = machine.driver_data<clshroad_state>();
+	state->flip_screen_set(0);
 }
 
 

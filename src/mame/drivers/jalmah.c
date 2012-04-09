@@ -974,7 +974,7 @@ WRITE16_MEMBER(jalmah_state::jalmah_okibank_w)
 WRITE16_MEMBER(jalmah_state::jalmah_flip_screen_w)
 {
 	/*---- ----x flip screen*/
-	flip_screen_set(machine(), data & 1);
+	flip_screen_set(data & 1);
 
 //  popmessage("%04x",data);
 }
@@ -993,7 +993,7 @@ static ADDRESS_MAP_START( jalmah, AS_PROGRAM, 16, jalmah_state )
 /**/AM_RANGE(0x080020, 0x08003f) AM_RAM_WRITE(jalmah_scroll_w)
 	AM_RANGE(0x080040, 0x080041) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 	//       0x084000, 0x084001  ?
-	AM_RANGE(0x088000, 0x0887ff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_SHARE("paletteram") /* Palette RAM */
+	AM_RANGE(0x088000, 0x0887ff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBRGBx_word_w) AM_SHARE("paletteram") /* Palette RAM */
 	AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE(sc0_vram_w) AM_BASE(m_sc0_vram)
 	AM_RANGE(0x094000, 0x097fff) AM_RAM_WRITE(sc1_vram_w) AM_BASE(m_sc1_vram)
 	AM_RANGE(0x098000, 0x09bfff) AM_RAM_WRITE(sc2_vram_w) AM_BASE(m_sc2_vram)
@@ -1017,7 +1017,7 @@ static ADDRESS_MAP_START( urashima, AS_PROGRAM, 16, jalmah_state )
 /**/AM_RANGE(0x08001c, 0x08001d) AM_RAM_WRITE(urashima_bank_w)
 	AM_RANGE(0x080040, 0x080041) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 	//       0x084000, 0x084001  ?
-	AM_RANGE(0x088000, 0x0887ff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_SHARE("paletteram") /* Palette RAM */
+	AM_RANGE(0x088000, 0x0887ff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBRGBx_word_w) AM_SHARE("paletteram") /* Palette RAM */
 	AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE(urashima_sc0_vram_w) AM_BASE(m_sc0_vram)
 	AM_RANGE(0x094000, 0x097fff) AM_RAM_WRITE(urashima_sc0_vram_w)
 	AM_RANGE(0x098000, 0x09bfff) AM_RAM_WRITE(urashima_sc0_vram_w)

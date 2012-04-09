@@ -114,7 +114,7 @@ WRITE16_MEMBER(esd16_state::esd16_tilemap0_color_w)
 	m_tilemap0_color = data & 3;
 	m_tilemap_0->mark_all_dirty();
 
-	flip_screen_set(machine(), data & 0x80);
+	flip_screen_set(data & 0x80);
 }
 
 

@@ -125,7 +125,7 @@ static ADDRESS_MAP_START( bloodbro_map, AS_PROGRAM, 16, bloodbro_state )
 	AM_RANGE(0x08d400, 0x08d7ff) AM_RAM
 	AM_RANGE(0x08d800, 0x08dfff) AM_RAM_WRITE(bloodbro_txvideoram_w) AM_BASE(m_txvideoram)
 	AM_RANGE(0x08e000, 0x08e7ff) AM_RAM
-	AM_RANGE(0x08e800, 0x08f7ff) AM_RAM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x08e800, 0x08f7ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x08f800, 0x08ffff) AM_RAM
 	AM_RANGE(0x0a0000, 0x0a000d) AM_READWRITE_LEGACY(seibu_main_word_r, seibu_main_word_w)
 	AM_RANGE(0x0c0000, 0x0c007f) AM_RAM AM_BASE(m_scroll)
@@ -151,7 +151,7 @@ static ADDRESS_MAP_START( weststry_map, AS_PROGRAM, 16, bloodbro_state )
 	AM_RANGE(0x0c1002, 0x0c1003) AM_READ_PORT("IN0")
 	AM_RANGE(0x0c1004, 0x0c1005) AM_READ_PORT("IN1")
 	AM_RANGE(0x0c1000, 0x0c17ff) AM_RAM
-	AM_RANGE(0x128000, 0x1287ff) AM_RAM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x128000, 0x1287ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x120000, 0x128fff) AM_RAM
 ADDRESS_MAP_END
 

@@ -100,20 +100,20 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 
 		sx = state->m_spriteram[offs];
 		sy = 248 - state->m_spriteram[offs + 1];
-		if (flip_screen_x_get(machine)) sx = 248 - sx;
-		if (flip_screen_y_get(machine)) sy = 248 - sy;
+		if (state->flip_screen_x()) sx = 248 - sx;
+		if (state->flip_screen_y()) sy = 248 - sy;
 
 		code = state->m_spriteram[offs + 3] + ((state->m_spriteram[offs + 2] & 0x03) << 8)  ;
 
 		drawgfx_transpen(bitmap,cliprect,machine.gfx[0],
 				2 * code,
 				((state->m_spriteram[offs + 2] & 0xf8) >> 3)  ,
-				flip_screen_x_get(machine),flip_screen_y_get(machine),
-				sx,sy + (flip_screen_y_get(machine) ? 8 : -8),0);
+				state->flip_screen_x(),state->flip_screen_y(),
+				sx,sy + (state->flip_screen_y() ? 8 : -8),0);
 		drawgfx_transpen(bitmap,cliprect,machine.gfx[0],
 				2 * code + 1,
 				((state->m_spriteram[offs + 2] & 0xf8) >> 3)  ,
-				flip_screen_x_get(machine),flip_screen_y_get(machine),
+				state->flip_screen_x(),state->flip_screen_y(),
 				sx,sy,0);
 	}
 }
@@ -182,7 +182,7 @@ static ADDRESS_MAP_START( memmap, AS_PROGRAM, 8, dominob_state )
 	AM_RANGE(0xe840, 0xefff) AM_RAM
 	AM_RANGE(0xf000, 0xf07f) AM_RAM AM_BASE(m_bgram)
 	AM_RANGE(0xf080, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xfbff) AM_RAM_WRITE(paletteram_xxxxRRRRGGGGBBBB_le_w) AM_SHARE("paletteram")
+	AM_RANGE(0xf800, 0xfbff) AM_RAM_WRITE(paletteram_xxxxRRRRGGGGBBBB_byte_le_w) AM_SHARE("paletteram")
 	AM_RANGE(0xfc00, 0xffff) AM_RAM
 ADDRESS_MAP_END
 

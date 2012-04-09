@@ -51,16 +51,16 @@ WRITE8_MEMBER(gottlieb_state::gottlieb_video_control_w)
 	m_background_priority = data & 0x01;
 
 	/* bit 1 controls horizonal flip screen */
-	if (flip_screen_x_get(machine()) != (data & 0x02))
+	if (flip_screen_x() != (data & 0x02))
 	{
-		flip_screen_x_set(machine(), data & 0x02);
+		flip_screen_x_set(data & 0x02);
 		machine().tilemap().mark_all_dirty();
 	}
 
 	/* bit 2 controls horizonal flip screen */
-	if (flip_screen_y_get(machine()) != (data & 0x04))
+	if (flip_screen_y() != (data & 0x04))
 	{
-		flip_screen_y_set(machine(), data & 0x04);
+		flip_screen_y_set(data & 0x04);
 		machine().tilemap().mark_all_dirty();
 	}
 
@@ -225,13 +225,13 @@ static void draw_sprites(running_machine &machine, bitmap_rgb32 &bitmap, const r
 		int sy = (spriteram[offs]) - 13;
 		int code = (255 ^ spriteram[offs + 2]) + 256 * state->m_spritebank;
 
-		if (flip_screen_x_get(machine)) sx = 233 - sx;
-		if (flip_screen_y_get(machine)) sy = 244 - sy;
+		if (state->flip_screen_x()) sx = 233 - sx;
+		if (state->flip_screen_y()) sy = 244 - sy;
 
 		drawgfx_transpen(bitmap, clip,
 			machine.gfx[2],
 			code, 0,
-			flip_screen_x_get(machine), flip_screen_y_get(machine),
+			state->flip_screen_x(), state->flip_screen_y(),
 			sx,sy, 0);
 	}
 }

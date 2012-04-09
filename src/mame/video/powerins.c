@@ -50,7 +50,7 @@ Note:   if MAME_DEBUG is defined, pressing Z with:
 
 WRITE16_MEMBER(powerins_state::powerins_flipscreen_w)
 {
-	if (ACCESSING_BITS_0_7)	flip_screen_set(machine(),  data & 1 );
+	if (ACCESSING_BITS_0_7)	flip_screen_set(data & 1 );
 }
 
 WRITE16_MEMBER(powerins_state::powerins_tilebank_w)
@@ -293,7 +293,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 
 		/* Handle flip_screen. Apply a global offset of 32 pixels along x too */
 
-		if (flip_screen_get(machine))
+		if (state->flip_screen())
 		{
 			sx = screen_w - sx - dimx*16 - 32;	flipx = !flipx;
 			sy = screen_h - sy - dimy*16;		flipy = !flipy;

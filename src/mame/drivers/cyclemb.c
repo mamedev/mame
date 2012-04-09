@@ -130,7 +130,7 @@ static SCREEN_UPDATE_IND16( cyclemb )
 	cyclemb_state *state = screen.machine().driver_data<cyclemb_state>();
 	int x,y,count;
 	const gfx_element *gfx = screen.machine().gfx[0];
-	UINT8 flip_screen = flip_screen_get(screen.machine());
+	UINT8 flip_screen = state->flip_screen();
 
 	count = 0;
 
@@ -248,7 +248,7 @@ WRITE8_MEMBER(cyclemb_state::sound_cmd_w)//actually ciom
 
 WRITE8_MEMBER(cyclemb_state::cyclemb_flip_w)
 {
-	flip_screen_set(machine(), data & 1);
+	flip_screen_set(data & 1);
 
 	// a bunch of other things are setted here
 }

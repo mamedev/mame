@@ -78,7 +78,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 		code |= ((source[2] & 0x01) << 6);
 		code |= ((source[2] & 0x08) << 4);
 
-		if(flip_screen_get(machine))
+		if(state->flip_screen())
 		{
 			flipx = !flipx;
 			flipy = !flipy;
@@ -176,7 +176,7 @@ SCREEN_UPDATE_IND16( flower )
 
 	draw_sprites(screen.machine(),bitmap,cliprect);
 
-	if(flip_screen_get(screen.machine()))
+	if(state->flip_screen())
 	{
 		myclip.min_x = cliprect.min_x;
 		myclip.max_x = cliprect.min_x + 15;
@@ -213,5 +213,5 @@ WRITE8_MEMBER(flower_state::flower_bg1ram_w)
 
 WRITE8_MEMBER(flower_state::flower_flipscreen_w)
 {
-	flip_screen_set(machine(), data);
+	flip_screen_set(data);
 }

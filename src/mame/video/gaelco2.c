@@ -193,7 +193,7 @@ WRITE16_MEMBER(gaelco2_state::gaelco2_vram_w)
 
 /***************************************************************************
 
-    Palette (paletteram16_xRRRRRGGGGGBBBBB_word_w)
+    Palette (paletteram_xRRRRRGGGGGBBBBB_word_w)
 
     The game's palette uses colors 0-4095, but we need 15 aditional palettes
     to handle shadows and highlights properly. After a color write to the

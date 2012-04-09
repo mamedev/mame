@@ -131,7 +131,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		sx = (state->m_spriteram[offs + 3] - 128) + 256 * (attr & 0x01);
 		sy = 255 - state->m_spriteram[offs];
 
-		if (flip_screen_get(machine))
+		if (state->flip_screen())
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;
@@ -151,7 +151,7 @@ static SCREEN_UPDATE_IND16(dacholer)
 {
 	dacholer_state *state = screen.machine().driver_data<dacholer_state>();
 
-	if (flip_screen_get(screen.machine()))
+	if (state->flip_screen())
 	{
 		state->m_bg_tilemap->set_scrollx(0, 256 - state->m_scroll_x);
 		state->m_bg_tilemap->set_scrolly(0, 256 - state->m_scroll_y);
@@ -188,7 +188,7 @@ WRITE8_MEMBER(dacholer_state::bg_bank_w)
 		m_bg_tilemap->mark_all_dirty();
 	}
 
-	flip_screen_set(machine(), data & 0xc); // probably one bit for flipx and one for flipy
+	flip_screen_set(data & 0xc); // probably one bit for flipx and one for flipy
 
 }
 

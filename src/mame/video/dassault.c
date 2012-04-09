@@ -86,7 +86,7 @@ SCREEN_UPDATE_RGB32( dassault )
 	bitmap_ind16* sprite_bitmap2 = &screen.machine().device<decospr_device>("spritegen2")->get_sprite_temp_bitmap();
 
 	/* Update tilemaps */
-	flip_screen_set(screen.machine(), BIT(flip, 7));
+	state->flip_screen_set(BIT(flip, 7));
 	deco16ic_pf_update(state->m_deco_tilegen1, 0, state->m_pf2_rowscroll);
 	deco16ic_pf_update(state->m_deco_tilegen2, 0, state->m_pf4_rowscroll);
 

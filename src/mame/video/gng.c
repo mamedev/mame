@@ -93,7 +93,7 @@ WRITE8_MEMBER(gng_state::gng_bgscrolly_w)
 
 WRITE8_MEMBER(gng_state::gng_flipscreen_w)
 {
-	flip_screen_set(machine(), ~data & 1);
+	flip_screen_set(~data & 1);
 }
 
 
@@ -120,7 +120,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		int flipx = attributes & 0x04;
 		int flipy = attributes & 0x08;
 
-		if (flip_screen_get(machine))
+		if (state->flip_screen())
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;

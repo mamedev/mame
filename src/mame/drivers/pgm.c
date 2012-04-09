@@ -323,7 +323,7 @@ ADDRESS_MAP_START( pgm_base_mem, AS_PROGRAM, 16, pgm_state )
 	AM_RANGE(0x800000, 0x81ffff) AM_RAM AM_MIRROR(0x0e0000) AM_BASE_LEGACY(&pgm_mainram) AM_SHARE("sram") /* Main Ram */
 
 	AM_RANGE(0x900000, 0x907fff) AM_MIRROR(0x0f8000) AM_READWRITE(pgm_videoram_r, pgm_videoram_w) AM_BASE(m_videoram) /* IGS023 VIDEO CHIP */
-	AM_RANGE(0xa00000, 0xa011ff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0xa00000, 0xa011ff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0xb00000, 0xb0ffff) AM_RAM AM_BASE(m_videoregs) /* Video Regs inc. Zoom Table */
 
 	AM_RANGE(0xc00002, 0xc00003) AM_READ(soundlatch_word_r) AM_WRITE(m68k_l1_w)

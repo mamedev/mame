@@ -303,7 +303,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 		sprite &= ~sizex;
 		sprite &= ~(sizey << 1);
 
-		if (flip_screen_get(machine))
+		if (state->flip_screen())
 		{
 			flipx ^= 1;
 			flipy ^= 1;
@@ -374,8 +374,8 @@ SCREEN_UPDATE_IND16( pacland )
 	int row;
 
 	for (row = 5; row < 29; row++)
-		state->m_fg_tilemap->set_scrollx(row, flip_screen_get(screen.machine()) ? state->m_scroll0-7 : state->m_scroll0);
-	state->m_bg_tilemap->set_scrollx(0, flip_screen_get(screen.machine()) ? state->m_scroll1-4 : state->m_scroll1-3);
+		state->m_fg_tilemap->set_scrollx(row, state->flip_screen() ? state->m_scroll0-7 : state->m_scroll0);
+	state->m_bg_tilemap->set_scrollx(0, state->flip_screen() ? state->m_scroll1-4 : state->m_scroll1-3);
 
 	/* draw high priority sprite pixels, setting priority bitmap to non-zero
        wherever there is a high-priority pixel; note that we draw to the bitmap

@@ -102,9 +102,9 @@ WRITE8_MEMBER(flstory_state::flstory_videoram_w)
 WRITE8_MEMBER(flstory_state::flstory_palette_w)
 {
 	if (offset & 0x100)
-		paletteram_xxxxBBBBGGGGRRRR_split2_w(space, (offset & 0xff) + (m_palette_bank << 8),data);
+		paletteram_xxxxBBBBGGGGRRRR_byte_split_hi_w(space, (offset & 0xff) + (m_palette_bank << 8),data);
 	else
-		paletteram_xxxxBBBBGGGGRRRR_split1_w(space, (offset & 0xff) + (m_palette_bank << 8),data);
+		paletteram_xxxxBBBBGGGGRRRR_byte_split_lo_w(space, (offset & 0xff) + (m_palette_bank << 8),data);
 }
 
 READ8_MEMBER(flstory_state::flstory_palette_r)
@@ -129,7 +129,7 @@ WRITE8_MEMBER(flstory_state::flstory_gfxctrl_w)
 	}
 	m_palette_bank = (data & 0x20) >> 5;
 
-	flip_screen_set(machine(), m_flipscreen);
+	flip_screen_set(m_flipscreen);
 
 //popmessage("%04x: gfxctrl = %02x\n", cpu_get_pc(&space.device()), data);
 
@@ -151,7 +151,7 @@ WRITE8_MEMBER(flstory_state::victnine_gfxctrl_w)
 	if (data & 0x04)
 	{
 		m_flipscreen = (data & 0x01);
-		flip_screen_set(machine(), m_flipscreen);
+		flip_screen_set(m_flipscreen);
 	}
 
 //popmessage("%04x: gfxctrl = %02x\n", cpu_get_pc(&space.device()), data);

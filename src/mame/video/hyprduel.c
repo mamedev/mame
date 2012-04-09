@@ -557,7 +557,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 
 			UINT32 gfxstart = (8 * 8 * 4 / 8) * (((attr & 0x000f) << 16) + code);
 
-			if (flip_screen_get(machine))
+			if (state->flip_screen())
 			{
 				flipx = !flipx;		x = max_x - x - width;
 				flipy = !flipy;		y = max_y - y - height;
@@ -729,7 +729,7 @@ SCREEN_UPDATE_IND16( hyprduel )
         ---- ---- ---- ---0     Flip  Screen    */
 	if (screenctrl & 2)
 		return 0;
-	flip_screen_set(screen.machine(), screenctrl & 1);
+	state->flip_screen_set(screenctrl & 1);
 
 #if 0
 if (screen.machine().input().code_pressed(KEYCODE_Z))

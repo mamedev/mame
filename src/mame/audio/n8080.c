@@ -313,7 +313,7 @@ static void delayed_sound_2( running_machine &machine, int data )
 	if (~data & 0x20) state->m_curr_sound_pins |= 1 << 0xc;
 
 	if (state->m_n8080_hardware == 1)
-		flip_screen_set_no_update(machine, data & 0x20);
+		state->flip_screen_set_no_update(data & 0x20);
 	if (state->m_n8080_hardware == 3)
 		state->m_helifire_flash = data & 0x20;
 

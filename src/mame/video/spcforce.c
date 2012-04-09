@@ -12,7 +12,7 @@
 
 WRITE8_MEMBER(spcforce_state::spcforce_flip_screen_w)
 {
-	flip_screen_set(machine(), ~data & 0x01);
+	flip_screen_set(~data & 0x01);
 }
 
 
@@ -20,7 +20,7 @@ SCREEN_UPDATE_IND16( spcforce )
 {
 	spcforce_state *state = screen.machine().driver_data<spcforce_state>();
 	int offs;
-	int flip = flip_screen_get(screen.machine());
+	int flip = state->flip_screen();
 
 	/* draw the characters as sprites because they could be overlapping */
 	bitmap.fill(0, cliprect);

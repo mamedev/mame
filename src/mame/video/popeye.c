@@ -191,7 +191,7 @@ WRITE8_MEMBER(popeye_state::popeye_bitmap_w)
 		sx = 8 * (offset % 128);
 		sy = 8 * (offset / 128);
 
-		if (flip_screen_get(machine()))
+		if (flip_screen())
 			sy = 512-8 - sy;
 
 		colour = data & 0x0f;
@@ -208,7 +208,7 @@ WRITE8_MEMBER(popeye_state::popeye_bitmap_w)
 		sx = 8 * (offset % 64);
 		sy = 4 * (offset / 64);
 
-		if (flip_screen_get(machine()))
+		if (flip_screen())
 			sy = 512-4 - sy;
 
 		colour = data & 0x0f;
@@ -282,12 +282,12 @@ static void draw_background(running_machine &machine, bitmap_ind16 &bitmap, cons
 	int offs;
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
-	if (state->m_lastflip != flip_screen_get(machine))
+	if (state->m_lastflip != state->flip_screen())
 	{
 		for (offs = 0;offs < popeye_bitmapram_size;offs++)
 			state->popeye_bitmap_w(*space,offs,state->m_bitmapram[offs]);
 
-		state->m_lastflip = flip_screen_get(machine);
+		state->m_lastflip = state->flip_screen();
 	}
 
 	set_background_palette(machine, (*state->m_palettebank & 0x08) >> 3);
@@ -303,7 +303,7 @@ static void draw_background(running_machine &machine, bitmap_ind16 &bitmap, cons
 		if (state->m_bitmap_type == TYPE_SKYSKIPR)
 			scrollx = 2*scrollx - 512;
 
-		if (flip_screen_get(machine))
+		if (state->flip_screen())
 		{
 			if (state->m_bitmap_type == TYPE_POPEYE)
 				scrollx = -scrollx;
@@ -351,7 +351,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 		sx = 2*(spriteram[offs])-8;
 		sy = 2*(256-spriteram[offs + 1]);
 
-		if (flip_screen_get(machine))
+		if (state->flip_screen())
 		{
 			flipx = !flipx;
 			flipy = !flipy;

@@ -68,9 +68,9 @@ WRITE8_MEMBER(yiear_state::yiear_videoram_w)
 WRITE8_MEMBER(yiear_state::yiear_control_w)
 {
 	/* bit 0 flips screen */
-	if (flip_screen_get(machine()) != (data & 0x01))
+	if (flip_screen() != (data & 0x01))
 	{
-		flip_screen_set(machine(), data & 0x01);
+		flip_screen_set(data & 0x01);
 		machine().tilemap().mark_all_dirty();
 	}
 
@@ -120,7 +120,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		int sy = 240 - spriteram[offs + 1];
 		int sx = spriteram_2[offs];
 
-		if (flip_screen_get(machine))
+		if (state->flip_screen())
 		{
 			sy = 240 - sy;
 			flipy = !flipy;

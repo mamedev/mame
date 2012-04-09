@@ -57,7 +57,7 @@ WRITE8_MEMBER(mjkjidai_state::mjkjidai_ctrl_w)
 	m_nmi_mask = data & 1;
 
 	/* bit 1 = flip screen */
-	flip_screen_set(machine(), data & 0x02);
+	flip_screen_set(data & 0x02);
 
 	/* bit 2 =display enable */
 	m_display_enable = data & 0x04;
@@ -106,7 +106,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 
 		sx += (spriteram_2[offs] & 0x20) >> 5;	// not sure about this
 
-		if (flip_screen_get(machine))
+		if (state->flip_screen())
 		{
 			sx = 496 - sx;
 			sy = 240 - sy;

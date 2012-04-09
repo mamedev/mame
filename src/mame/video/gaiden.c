@@ -170,7 +170,7 @@ VIDEO_START( drgnbowl )
 WRITE16_MEMBER(gaiden_state::gaiden_flip_w)
 {
 	if (ACCESSING_BITS_0_7)
-		flip_screen_set(machine(), data & 1);
+		flip_screen_set(data & 1);
 }
 
 WRITE16_MEMBER(gaiden_state::gaiden_txscrollx_w)
@@ -396,7 +396,7 @@ static void gaiden_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap_
 			if (ypos >= 256)
 				ypos -= 512;
 
-			if (flip_screen_get(machine))
+			if (state->flip_screen())
 			{
 				flipx = !flipx;
 				flipy = !flipy;
@@ -518,7 +518,7 @@ static void raiga_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap_b
 			if (ypos >= 256)
 				ypos -= 512;
 
-			if (flip_screen_get(machine))
+			if (state->flip_screen())
 			{
 				flipx = !flipx;
 				flipy = !flipy;

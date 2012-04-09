@@ -119,7 +119,7 @@ WRITE8_MEMBER(mole_state::mole_tilebank_w)
 
 WRITE8_MEMBER(mole_state::mole_flipscreen_w)
 {
-	flip_screen_set(machine(), data & 0x01);
+	flip_screen_set(data & 0x01);
 }
 
 static SCREEN_UPDATE_IND16( mole )

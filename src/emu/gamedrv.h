@@ -85,16 +85,6 @@ const UINT32 GAME_IS_SKELETON_MECHANICAL	= GAME_IS_SKELETON | GAME_MECHANICAL | 
 // static driver initialization callback
 typedef void (*driver_init_func)(running_machine &machine);
 
-/*
-// wrapper template to allow members
-template<class _DriverClass, void (_DriverClass::*_Function)()>
-void driver_init_wrapper(running_machine &machine)
-{
-    _DriverClass *object = machine.driver_data<_DriverClass>();
-    (object->*_Function)();
-}
-*/
-
 // static POD structure describing each game driver entry
 struct game_driver
 {

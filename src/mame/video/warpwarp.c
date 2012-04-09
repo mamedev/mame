@@ -226,7 +226,7 @@ static void draw_ball(running_machine &machine, bitmap_ind16 &bitmap, const rect
 	{
 		int x,y,i,j;
 
-		if (flip_screen_get(machine) & 1) {
+		if (state->flip_screen() & 1) {
 			x = 376 - state->m_ball_h;
 			y = 280 - state->m_ball_v;
 		}

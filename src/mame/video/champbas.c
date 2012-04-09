@@ -185,7 +185,7 @@ WRITE8_MEMBER(champbas_state::champbas_palette_bank_w)
 
 WRITE8_MEMBER(champbas_state::champbas_flipscreen_w)
 {
-	flip_screen_set(machine(), ~data & 1);
+	flip_screen_set(~data & 1);
 }
 
 

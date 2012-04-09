@@ -276,7 +276,7 @@ WRITE8_MEMBER(travrusa_state::travrusa_flipscreen_w)
 	/* screen flip is handled both by software and hardware */
 	data ^= ~input_port_read(machine(), "DSW2") & 1;
 
-	flip_screen_set(machine(), data & 1);
+	flip_screen_set(data & 1);
 
 	coin_counter_w(machine(), 0, data & 0x02);
 	coin_counter_w(machine(), 1, data & 0x20);
@@ -297,7 +297,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 	const rectangle spritevisiblearea(1*8, 31*8-1, 0*8, 24*8-1);
 	const rectangle spritevisibleareaflip(1*8, 31*8-1, 8*8, 32*8-1);
 	rectangle clip = cliprect;
-	if (flip_screen_get(machine))
+	if (state->flip_screen())
 		clip &= spritevisibleareaflip;
 	else
 		clip &= spritevisiblearea;
@@ -312,7 +312,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 		int flipx = attr & 0x40;
 		int flipy = attr & 0x80;
 
-		if (flip_screen_get(machine))
+		if (state->flip_screen())
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;

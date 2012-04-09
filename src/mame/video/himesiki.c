@@ -41,7 +41,7 @@ WRITE8_MEMBER(himesiki_state::himesiki_scrollx_w)
 WRITE8_MEMBER(himesiki_state::himesiki_flip_w)
 {
 	m_flipscreen = data & 0xc0;
-	flip_screen_set(machine(), m_flipscreen);
+	flip_screen_set(m_flipscreen);
 
 	if (data & 0x3f)
 		logerror("p08_w %02x\n",data);

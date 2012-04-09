@@ -395,7 +395,7 @@ static WRITE8_DEVICE_HANDLER( popeye_portB_w )
 {
 	popeye_state *state = device->machine().driver_data<popeye_state>();
 	/* bit 0 flips screen */
-	flip_screen_set(device->machine(), data & 1);
+	state->flip_screen_set(data & 1);
 
 	/* bits 1-3 select DSW1 bit to read */
 	state->m_dswbit = (data & 0x0e) >> 1;

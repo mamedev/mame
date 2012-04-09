@@ -83,12 +83,12 @@ WRITE8_MEMBER(mermaid_state::mermaid_colorram_w)
 
 WRITE8_MEMBER(mermaid_state::mermaid_flip_screen_x_w)
 {
-	flip_screen_x_set(machine(), data & 0x01);
+	flip_screen_x_set(data & 0x01);
 }
 
 WRITE8_MEMBER(mermaid_state::mermaid_flip_screen_y_w)
 {
-	flip_screen_y_set(machine(), data & 0x01);
+	flip_screen_y_set(data & 0x01);
 }
 
 WRITE8_MEMBER(mermaid_state::mermaid_bg_scroll_w)
@@ -205,19 +205,19 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		code |= state->m_rougien_gfxbank1 * 0x2800;
 		code |= state->m_rougien_gfxbank2 * 0x2400;
 
-		if (flip_screen_x_get(machine))
+		if (state->flip_screen_x())
 		{
 			flipx = !flipx;
 			sx = 240 - sx;
 		}
 
-		if (flip_screen_y_get(machine))
+		if (state->flip_screen_y())
 		{
 			flipy = !flipy;
 			sy = 240 - sy;
 		}
 
-		drawgfx_transpen(bitmap, (flip_screen_x_get(machine) ? flip_spritevisiblearea : spritevisiblearea),
+		drawgfx_transpen(bitmap, (state->flip_screen_x() ? flip_spritevisiblearea : spritevisiblearea),
 			machine.gfx[1], code, color, flipx, flipy, sx, sy, 0);
 	}
 }
@@ -291,13 +291,13 @@ SCREEN_VBLANK( mermaid )
 			code |= state->m_rougien_gfxbank1 * 0x2800;
 			code |= state->m_rougien_gfxbank2 * 0x2400;
 
-			if (flip_screen_x_get(screen.machine()))
+			if (state->flip_screen_x())
 			{
 				flipx = !flipx;
 				sx = 240 - sx;
 			}
 
-			if (flip_screen_y_get(screen.machine()))
+			if (state->flip_screen_y())
 			{
 				flipy = !flipy;
 				sy = 240 - sy;
@@ -354,13 +354,13 @@ SCREEN_VBLANK( mermaid )
 					code2 |= state->m_rougien_gfxbank1 * 0x2800;
 					code2 |= state->m_rougien_gfxbank2 * 0x2400;
 
-					if (flip_screen_x_get(screen.machine()))
+					if (state->flip_screen_x())
 					{
 						flipx2 = !flipx2;
 						sx2 = 240 - sx2;
 					}
 
-					if (flip_screen_y_get(screen.machine()))
+					if (state->flip_screen_y())
 					{
 						flipy2 = !flipy2;
 						sy2 = 240 - sy2;
@@ -394,13 +394,13 @@ SCREEN_VBLANK( mermaid )
 			code |= state->m_rougien_gfxbank1 * 0x2800;
 			code |= state->m_rougien_gfxbank2 * 0x2400;
 
-			if (flip_screen_x_get(screen.machine()))
+			if (state->flip_screen_x())
 			{
 				flipx = !flipx;
 				sx = 240 - sx;
 			}
 
-			if (flip_screen_y_get(screen.machine()))
+			if (state->flip_screen_y())
 			{
 				flipy = !flipy;
 				sy = 240 - sy;
@@ -435,13 +435,13 @@ SCREEN_VBLANK( mermaid )
 					code2 |= state->m_rougien_gfxbank1 * 0x2800;
 					code2 |= state->m_rougien_gfxbank2 * 0x2400;
 
-					if (flip_screen_x_get(screen.machine()))
+					if (state->flip_screen_x())
 					{
 						flipx2 = !flipx2;
 						sx2 = 240 - sx2;
 					}
 
-					if (flip_screen_y_get(screen.machine()))
+					if (state->flip_screen_y())
 					{
 						flipy2 = !flipy2;
 						sy2 = 240 - sy2;
@@ -475,13 +475,13 @@ SCREEN_VBLANK( mermaid )
 			code |= state->m_rougien_gfxbank1 * 0x2800;
 			code |= state->m_rougien_gfxbank2 * 0x2400;
 
-			if (flip_screen_x_get(screen.machine()))
+			if (state->flip_screen_x())
 			{
 				flipx = !flipx;
 				sx = 240 - sx;
 			}
 
-			if (flip_screen_y_get(screen.machine()))
+			if (state->flip_screen_y())
 			{
 				flipy = !flipy;
 				sy = 240 - sy;
@@ -516,13 +516,13 @@ SCREEN_VBLANK( mermaid )
 					code2 |= state->m_rougien_gfxbank1 * 0x2800;
 					code2 |= state->m_rougien_gfxbank2 * 0x2400;
 
-					if (flip_screen_x_get(screen.machine()))
+					if (state->flip_screen_x())
 					{
 						flipx2 = !flipx2;
 						sx2 = 240 - sx2;
 					}
 
-					if (flip_screen_y_get(screen.machine()))
+					if (state->flip_screen_y())
 					{
 						flipy2 = !flipy2;
 						sy2 = 240 - sy2;

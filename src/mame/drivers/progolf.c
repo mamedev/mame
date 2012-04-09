@@ -190,7 +190,7 @@ WRITE8_MEMBER(progolf_state::progolf_scrollx_hi_w)
 
 WRITE8_MEMBER(progolf_state::progolf_flip_screen_w)
 {
-	flip_screen_set(machine(), data & 1);
+	flip_screen_set(data & 1);
 	if(data & 0xfe)
 		printf("$9600 with data = %02x used\n",data);
 }

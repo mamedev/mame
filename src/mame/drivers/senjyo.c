@@ -99,7 +99,7 @@ static INTERRUPT_GEN( senjyo_interrupt )
 
 WRITE8_MEMBER(senjyo_state::flip_screen_w)
 {
-	flip_screen_set(machine(), data);
+	flip_screen_set(data);
 }
 
 static WRITE8_DEVICE_HANDLER( sound_cmd_w )

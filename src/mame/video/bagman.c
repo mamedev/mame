@@ -81,9 +81,9 @@ PALETTE_INIT( bagman )
 
 WRITE8_MEMBER(bagman_state::bagman_flipscreen_w)
 {
-	if ((flip_screen_get(machine()) ^ data) & 1)
+	if ((flip_screen() ^ data) & 1)
 	{
-		flip_screen_set(machine(), data & 0x01);
+		flip_screen_set(data & 0x01);
 		m_bg_tilemap->mark_all_dirty();
 	}
 }
@@ -122,12 +122,12 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 		sy = 255 - spriteram[offs + 2] - 16;
 		flipx = spriteram[offs] & 0x40;
 		flipy = spriteram[offs] & 0x80;
-		if (flip_screen_x_get(machine))
+		if (state->flip_screen_x())
 		{
 			sx = bitmap.width() - sx - 15;
 			flipx = !flipx;
 		}
-		if (flip_screen_y_get(machine))
+		if (state->flip_screen_y())
 		{
 			sy = bitmap.height() - sy - 15;
 			flipy = !flipy;

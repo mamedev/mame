@@ -119,6 +119,7 @@ static void draw_background( running_machine &machine, bitmap_ind16 &bitmap, con
 
 static void draw_sprites_region( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, const UINT8 *sram, int length, int bank )
 {
+	jackal_state *state = machine.driver_data<jackal_state>();
 	int offs;
 
 	for (offs = 0; offs < length; offs += 5)
@@ -137,7 +138,7 @@ static void draw_sprites_region( running_machine &machine, bitmap_ind16 &bitmap,
 		if (sy > 0xf0)
 			sy = sy - 256;
 
-		if (flip_screen_get(machine))
+		if (state->flip_screen())
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;
@@ -150,7 +151,7 @@ static void draw_sprites_region( running_machine &machine, bitmap_ind16 &bitmap,
 			int spritenum = sn1 * 4 + ((sn2 & (8 + 4)) >> 2) + ((sn2 & (2 + 1)) << 10);
 			int mod = -8;
 
-			if (flip_screen_get(machine))
+			if (state->flip_screen())
 			{
 				sx += 8;
 				sy -= 8;
@@ -159,7 +160,7 @@ static void draw_sprites_region( running_machine &machine, bitmap_ind16 &bitmap,
 
 			if ((attr & 0x0C) == 0x0C)
 			{
-				if (flip_screen_get(machine)) sy += 16;
+				if (state->flip_screen()) sy += 16;
 				DRAW_SPRITE(bank + 1, spritenum, sx, sy)
 			}
 
@@ -182,7 +183,7 @@ static void draw_sprites_region( running_machine &machine, bitmap_ind16 &bitmap,
 
 			if (attr & 0x10)
 			{
-				if (flip_screen_get(machine))
+				if (state->flip_screen())
 				{
 					sx -= 16;
 					sy -= 16;

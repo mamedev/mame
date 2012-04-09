@@ -196,7 +196,7 @@ static void draw_sprites( running_machine& machine, bitmap_ind16 &bitmap,const r
 				which = src[i + 3] + ((src[i + 2] & 0x0f) << 8);
 			}
 
-			if (flip_screen_get(machine))
+			if (state->flip_screen())
 			{
 				sx = 240 - sx;
 				sy = 256 - sy;

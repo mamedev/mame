@@ -274,7 +274,7 @@ WRITE8_MEMBER(airbustr_state::slave_bankswitch_w)
 
 	memory_set_bank(machine(), "bank2", data & 0x07);
 
-	flip_screen_set(machine(), data & 0x10);
+	flip_screen_set(data & 0x10);
 
 	// used at the end of levels, after defeating the boss, to leave trails
 	pandora_set_clear_bitmap(m_pandora, data & 0x20);

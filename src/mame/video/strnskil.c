@@ -52,9 +52,9 @@ WRITE8_MEMBER(strnskil_state::strnskil_scrl_ctrl_w)
 {
 	m_scrl_ctrl = data >> 5;
 
-	if (flip_screen_get(machine()) != (data & 0x08))
+	if (flip_screen() != (data & 0x08))
 	{
-		flip_screen_set(machine(), data & 0x08);
+		flip_screen_set(data & 0x08);
 		machine().tilemap().mark_all_dirty();
 	}
 }
@@ -89,14 +89,14 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 	{
 		int code = spriteram[offs + 1];
 		int color = spriteram[offs + 2] & 0x3f;
-		int flipx = flip_screen_x_get(machine);
-		int flipy = flip_screen_y_get(machine);
+		int flipx = state->flip_screen_x();
+		int flipy = state->flip_screen_y();
 
 		int sx = spriteram[offs + 3];
 		int sy = spriteram[offs];
 		int px, py;
 
-		if (flip_screen_get(machine))
+		if (state->flip_screen())
 		{
 			px = 240 - sx + 0; /* +2 or +0 ? */
 			py = sy;

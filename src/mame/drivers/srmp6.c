@@ -505,7 +505,7 @@ WRITE16_MEMBER(srmp6_state::paletteram_w)
 	INT8 r, g, b;
 	int brg = m_brightness - 0x60;
 
-	paletteram16_xBBBBBGGGGGRRRRR_word_w(space, offset, data, mem_mask);
+	paletteram_xBBBBBGGGGGRRRRR_word_w(space, offset, data, mem_mask);
 
 	if(brg)
 	{

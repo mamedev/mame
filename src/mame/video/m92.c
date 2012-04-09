@@ -131,7 +131,7 @@ READ16_MEMBER(m92_state::m92_paletteram_r)
 
 WRITE16_MEMBER(m92_state::m92_paletteram_w)
 {
-	paletteram16_xBBBBBGGGGGRRRRR_word_w(space, offset + 0x400 * m_palette_bank, data, mem_mask);
+	paletteram_xBBBBBGGGGGRRRRR_word_w(space, offset + 0x400 * m_palette_bank, data, mem_mask);
 }
 
 /*****************************************************************************/
@@ -349,7 +349,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 
 				for (row = 0; row < numrows; row++)
 				{
-					if (flip_screen_get(machine))
+					if (state->flip_screen())
 					{
 						pdrawgfx_transpen(bitmap,cliprect,machine.gfx[1],
 								code + s_ptr, color, !flipx, !flipy,
@@ -424,7 +424,7 @@ static void ppan_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, co
 
 				for (row = 0; row < numrows; row++)
 				{
-					if (flip_screen_get(machine))
+					if (state->flip_screen())
 					{
 						pdrawgfx_transpen(bitmap,cliprect,machine.gfx[1],
 								code + s_ptr, color, !flipx, !flipy,
@@ -544,10 +544,11 @@ SCREEN_UPDATE_IND16( m92 )
 	draw_sprites(screen.machine(), bitmap, cliprect);
 
 	/* Flipscreen appears hardwired to the dipswitch - strange */
+	m92_state *state = screen.machine().driver_data<m92_state>();
 	if (input_port_read(screen.machine(), "DSW") & 0x100)
-		flip_screen_set(screen.machine(), 0);
+		state->flip_screen_set(0);
 	else
-		flip_screen_set(screen.machine(), 1);
+		state->flip_screen_set(1);
 	return 0;
 }
 
@@ -561,9 +562,10 @@ SCREEN_UPDATE_IND16( ppan )
 	ppan_draw_sprites(screen.machine(), bitmap, cliprect);
 
 	/* Flipscreen appears hardwired to the dipswitch - strange */
+	m92_state *state = screen.machine().driver_data<m92_state>();
 	if (input_port_read(screen.machine(), "DSW") & 0x100)
-		flip_screen_set(screen.machine(), 0);
+		state->flip_screen_set(0);
 	else
-		flip_screen_set(screen.machine(), 1);
+		state->flip_screen_set(1);
 	return 0;
 }

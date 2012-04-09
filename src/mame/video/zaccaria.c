@@ -173,12 +173,12 @@ WRITE8_MEMBER(zaccaria_state::zaccaria_attributes_w)
 
 WRITE8_MEMBER(zaccaria_state::zaccaria_flip_screen_x_w)
 {
-	flip_screen_x_set(machine(), data & 1);
+	flip_screen_x_set(data & 1);
 }
 
 WRITE8_MEMBER(zaccaria_state::zaccaria_flip_screen_y_w)
 {
-	flip_screen_y_set(machine(), data & 1);
+	flip_screen_y_set(data & 1);
 }
 
 
@@ -206,6 +206,7 @@ offsets 1 and 2 are swapped if accessed from spriteram2
 */
 static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect,UINT8 *spriteram,int color,int section)
 {
+	zaccaria_state *state = machine.driver_data<zaccaria_state>();
 	int offs,o1 = 1,o2 = 2;
 
 	if (section)
@@ -223,12 +224,12 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 
 		if (sx == 1) continue;
 
-		if (flip_screen_x_get(machine))
+		if (state->flip_screen_x())
 		{
 			sx = 240 - sx;
 			flipx = !flipx;
 		}
-		if (flip_screen_y_get(machine))
+		if (state->flip_screen_y())
 		{
 			sy = 240 - sy;
 			flipy = !flipy;

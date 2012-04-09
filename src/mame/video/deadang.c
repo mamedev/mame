@@ -113,7 +113,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 		color = (spriteram16[offs+1]>>12)&0xf;
 		sprite = spriteram16[offs+1]&0xfff;
 
-		if (flip_screen_get(machine)) {
+		if (state->flip_screen()) {
 			x=240-x;
 			y=240-y;
 			if (fx) fx=0; else fx=1;
@@ -151,7 +151,7 @@ SCREEN_UPDATE_IND16( deadang )
 	state->m_pf3_layer->enable(!(state->m_scroll_ram[0x34]&1));
 	state->m_pf1_layer->enable(!(state->m_scroll_ram[0x34]&2));
 	state->m_pf2_layer->enable(!(state->m_scroll_ram[0x34]&4));
-	flip_screen_set(screen.machine(),  state->m_scroll_ram[0x34]&0x40 );
+	state->flip_screen_set(state->m_scroll_ram[0x34]&0x40 );
 
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 	screen.machine().priority_bitmap.fill(0, cliprect);

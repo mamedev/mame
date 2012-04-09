@@ -125,9 +125,9 @@ WRITE8_MEMBER(shaolins_state::shaolins_nmi_w)
 
 	m_nmi_enable = data;
 
-	if (flip_screen_get(machine()) != (data & 0x01))
+	if (flip_screen() != (data & 0x01))
 	{
-		flip_screen_set(machine(), data & 0x01);
+		flip_screen_set(data & 0x01);
 		machine().tilemap().mark_all_dirty();
 	}
 }
@@ -170,7 +170,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 			int sx = 240 - spriteram[offs + 6];
 			int sy = 248 - spriteram[offs + 4];
 
-			if (flip_screen_get(machine))
+			if (state->flip_screen())
 			{
 				sx = 240 - sx;
 				sy = 248 - sy;

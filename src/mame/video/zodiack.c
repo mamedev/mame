@@ -39,9 +39,9 @@ WRITE8_MEMBER( zodiack_state::attributes_w )
 
 WRITE8_MEMBER( zodiack_state::flipscreen_w )
 {
-	if (flip_screen_get(machine()) != (~data & 0x01))
+	if (flip_screen() != (~data & 0x01))
 	{
-		flip_screen_set(machine(), ~data & 0x01);
+		flip_screen_set(~data & 0x01);
 		machine().tilemap().mark_all_dirty();
 	}
 }
@@ -127,7 +127,7 @@ void zodiack_state::video_start()
 	m_fg_tilemap->set_scroll_cols(32);
 
 	/* FIXME: flip_screen_x should not be written. */
-	flip_screen_set_no_update(machine(), 0);
+	flip_screen_set_no_update(0);
 }
 
 void zodiack_state::draw_bullets( bitmap_ind16 &bitmap, const rectangle &cliprect )
@@ -139,7 +139,7 @@ void zodiack_state::draw_bullets( bitmap_ind16 &bitmap, const rectangle &cliprec
 		x = m_bulletsram[offs + 3] + 7;
 		y = 255 - m_bulletsram[offs + 1];
 
-		if (flip_screen_get(machine()) && m_percuss_hardware)
+		if (flip_screen() && m_percuss_hardware)
 		{
 			y = 255 - y;
 		}
@@ -166,7 +166,7 @@ void zodiack_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 		flipy = m_spriteram[offs + 1] & 0x80;
 		spritecode = m_spriteram[offs + 1] & 0x3f;
 
-		if (flip_screen_get(machine()) && m_percuss_hardware)
+		if (flip_screen() && m_percuss_hardware)
 		{
 			sy = 240 - sy;
 			flipy = !flipy;

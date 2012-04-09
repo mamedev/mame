@@ -118,7 +118,7 @@ static void gpworld_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,
 	const int SPR_SKIP_HI   = 5;
 	const int SPR_GFXOFS_LO = 6;
 	const int SPR_GFXOFS_HI = 7;
-	int flip = flip_screen_get(machine);
+	int flip = state->flip_screen();
 
 	int i;
 

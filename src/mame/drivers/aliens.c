@@ -38,7 +38,7 @@ READ8_MEMBER(aliens_state::bankedram_r)
 WRITE8_MEMBER(aliens_state::bankedram_w)
 {
 	if (m_palette_selected)
-		paletteram_xBBBBBGGGGGRRRRR_be_w(space, offset, data);
+		paletteram_xBBBBBGGGGGRRRRR_byte_be_w(space, offset, data);
 	else
 		m_ram[offset] = data;
 }

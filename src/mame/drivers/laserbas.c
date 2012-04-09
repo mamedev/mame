@@ -154,7 +154,7 @@ static ADDRESS_MAP_START( laserbas_io, AS_IO, 8, laserbas_state )
 //  AM_RANGE(0x23, 0x23) AM_WRITE_LEGACY(test_w) bit 2 presumably is a mux for 0x20?
 	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE_LEGACY("pit0", pit8253_r, pit8253_w)
 	AM_RANGE(0x44, 0x47) AM_DEVREADWRITE_LEGACY("pit1", pit8253_r, pit8253_w)
-	AM_RANGE(0x80, 0x9f) AM_RAM_WRITE(paletteram_RRRGGGBB_w) AM_SHARE("paletteram")
+	AM_RANGE(0x80, 0x9f) AM_RAM_WRITE(paletteram_RRRGGGBB_byte_w) AM_SHARE("paletteram")
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( laserbas )

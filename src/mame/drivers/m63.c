@@ -262,9 +262,9 @@ WRITE8_MEMBER(m63_state::m63_palbank_w)
 
 WRITE8_MEMBER(m63_state::m63_flipscreen_w)
 {
-	if (flip_screen_get(machine()) != (~data & 0x01))
+	if (flip_screen() != (~data & 0x01))
 	{
-		flip_screen_set(machine(), ~data & 0x01);
+		flip_screen_set(~data & 0x01);
 		machine().tilemap().mark_all_dirty();
 	}
 }
@@ -272,8 +272,8 @@ WRITE8_MEMBER(m63_state::m63_flipscreen_w)
 WRITE8_MEMBER(m63_state::fghtbskt_flipscreen_w)
 {
 
-	flip_screen_set(machine(), data);
-	m_fg_flag = flip_screen_get(machine()) ? TILE_FLIPX : 0;
+	flip_screen_set(data);
+	m_fg_flag = flip_screen() ? TILE_FLIPX : 0;
 }
 
 
@@ -322,7 +322,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		int sx = state->m_spriteram[offs + 3];
 		int sy = state->m_sy_offset - state->m_spriteram[offs];
 
-		if (flip_screen_get(machine))
+		if (state->flip_screen())
 		{
 			sx = 240 - sx;
 			sy = state->m_sy_offset - sy;

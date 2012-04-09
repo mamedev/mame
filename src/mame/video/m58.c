@@ -200,7 +200,7 @@ VIDEO_START( yard )
 WRITE8_MEMBER(m58_state::yard_flipscreen_w)
 {
 	/* screen flip is handled both by software and hardware */
-	flip_screen_set(machine(), (data & 0x01) ^ (~input_port_read(machine(), "DSW2") & 0x01));
+	flip_screen_set((data & 0x01) ^ (~input_port_read(machine(), "DSW2") & 0x01));
 
 	coin_counter_w(machine(), 0, data & 0x02);
 	coin_counter_w(machine(), 1, data & 0x20);
@@ -245,7 +245,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 			code2 = code1 + 0x40;
 		}
 
-		if (flip_screen_get(machine))
+		if (state->flip_screen())
 		{
 			sx = 240 - sx;
 			sy2 = 192 - sy1;
@@ -279,16 +279,16 @@ static void draw_panel( running_machine &machine, bitmap_ind16 &bitmap, const re
 	{
 		const rectangle clippanel(26*8, 32*8-1,	1*8, 31*8-1);
 		const rectangle clippanelflip(0*8, 6*8-1, 1*8, 31*8-1);
-		rectangle clip = flip_screen_get(machine) ? clippanelflip : clippanel;
+		rectangle clip = state->flip_screen() ? clippanelflip : clippanel;
 		const rectangle &visarea = machine.primary_screen->visible_area();
-		int sx = flip_screen_get(machine) ? cliprect.min_x - 8 : cliprect.max_x + 1 - SCROLL_PANEL_WIDTH;
-		int yoffs = flip_screen_get(machine) ? -40 : -16;
+		int sx = state->flip_screen() ? cliprect.min_x - 8 : cliprect.max_x + 1 - SCROLL_PANEL_WIDTH;
+		int yoffs = state->flip_screen() ? -40 : -16;
 
 		clip.min_y += visarea.min_y + yoffs;
 		clip.max_y += visarea.max_y + yoffs;
 		clip &= cliprect;
 
-		copybitmap(bitmap, *state->m_scroll_panel_bitmap, flip_screen_get(machine), flip_screen_get(machine),
+		copybitmap(bitmap, *state->m_scroll_panel_bitmap, state->flip_screen(), state->flip_screen(),
 				   sx, visarea.min_y + yoffs, clip);
 	}
 }

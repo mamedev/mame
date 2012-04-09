@@ -161,7 +161,7 @@ WRITE16_MEMBER(tecmo16_state::tecmo16_charram_w)
 WRITE16_MEMBER(tecmo16_state::tecmo16_flipscreen_w)
 {
 	m_flipscreen = data & 0x01;
-	flip_screen_set(machine(), m_flipscreen);
+	flip_screen_set(m_flipscreen);
 }
 
 /******************************************************************************/

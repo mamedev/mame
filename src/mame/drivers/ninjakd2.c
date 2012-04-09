@@ -217,7 +217,7 @@ WRITE8_MEMBER(ninjakd2_state::ninjakd2_soundreset_w)
 	cputag_set_input_line(machine(), "soundcpu", INPUT_LINE_RESET, (data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
 
 	// bit 7 flips screen
-	flip_screen_set(machine(), data & 0x80);
+	flip_screen_set(data & 0x80);
 
 	// other bits unused
 }
@@ -402,7 +402,7 @@ static ADDRESS_MAP_START( ninjakd2_main_cpu, AS_PROGRAM, 8, ninjakd2_state )
 	AM_RANGE(0xc202, 0xc202) AM_WRITE(ninjakd2_bankselect_w)
 	AM_RANGE(0xc203, 0xc203) AM_WRITE(ninjakd2_sprite_overdraw_w)
 	AM_RANGE(0xc208, 0xc20c) AM_WRITE(ninjakd2_bg_ctrl_w)	// scroll + enable
-	AM_RANGE(0xc800, 0xcdff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_be_w) AM_SHARE("paletteram")
+	AM_RANGE(0xc800, 0xcdff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_byte_be_w) AM_SHARE("paletteram")
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(ninjakd2_fgvideoram_w) AM_BASE(m_fg_videoram)
 	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(ninjakd2_bgvideoram_w) AM_BASE(m_bg_videoram)
 	AM_RANGE(0xe000, 0xf9ff) AM_RAM
@@ -417,7 +417,7 @@ static ADDRESS_MAP_START( mnight_main_cpu, AS_PROGRAM, 8, ninjakd2_state )
 	AM_RANGE(0xda00, 0xdfff) AM_RAM AM_BASE(m_spriteram)
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(ninjakd2_bgvideoram_w) AM_BASE(m_bg_videoram)
 	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(ninjakd2_fgvideoram_w) AM_BASE(m_fg_videoram)
-	AM_RANGE(0xf000, 0xf5ff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_be_w) AM_SHARE("paletteram")
+	AM_RANGE(0xf000, 0xf5ff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_byte_be_w) AM_SHARE("paletteram")
 	AM_RANGE(0xf800, 0xf800) AM_READ_PORT("KEYCOIN")
 	AM_RANGE(0xf801, 0xf801) AM_READ_PORT("PAD1")
 	AM_RANGE(0xf802, 0xf802) AM_READ_PORT("PAD2")
@@ -434,7 +434,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( robokid_main_cpu, AS_PROGRAM, 8, ninjakd2_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_be_w) AM_SHARE("paletteram")
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_byte_be_w) AM_SHARE("paletteram")
 	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(ninjakd2_fgvideoram_w) AM_BASE(m_fg_videoram)
 	AM_RANGE(0xd000, 0xd3ff) AM_READWRITE(robokid_bg2_videoram_r, robokid_bg2_videoram_w)	// banked
 	AM_RANGE(0xd400, 0xd7ff) AM_READWRITE(robokid_bg1_videoram_r, robokid_bg1_videoram_w)	// banked
@@ -480,7 +480,7 @@ static ADDRESS_MAP_START( omegaf_main_cpu, AS_PROGRAM, 8, ninjakd2_state )
 	AM_RANGE(0xc800, 0xcbff) AM_READWRITE(robokid_bg1_videoram_r, robokid_bg1_videoram_w)	// banked
 	AM_RANGE(0xcc00, 0xcfff) AM_READWRITE(robokid_bg2_videoram_r, robokid_bg2_videoram_w)	// banked
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(ninjakd2_fgvideoram_w) AM_BASE(m_fg_videoram)
-	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_be_w) AM_SHARE("paletteram")
+	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_byte_be_w) AM_SHARE("paletteram")
 	AM_RANGE(0xe000, 0xf9ff) AM_RAM
 	AM_RANGE(0xfa00, 0xffff) AM_RAM AM_BASE(m_spriteram)
 ADDRESS_MAP_END

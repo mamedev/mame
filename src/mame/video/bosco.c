@@ -204,7 +204,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 		int flipy = spriteram[offs] & 2;
 		int color = spriteram_2[offs + 1] & 0x3f;
 
-		if (flip_screen_get(machine))
+		if (state->flip_screen())
 		{
 			sx += 128-2;
 			sy += 8;
@@ -230,7 +230,7 @@ static void draw_bullets(running_machine &machine, bitmap_ind16 &bitmap, const r
 		int x = state->m_bosco_radarx[offs] + ((~state->m_bosco_radarattr[offs] & 0x01) << 8);
 		int y = 253 - state->m_bosco_radary[offs];
 
-		if (flip_screen_get(machine))
+		if (state->flip_screen())
 		{
 			x += 96-2;
 			y += 8;
@@ -289,7 +289,7 @@ SCREEN_UPDATE_IND16( bosco )
        the screen, and clip it to only the position where it is supposed to be shown */
 	rectangle fg_clip = cliprect;
 	rectangle bg_clip = cliprect;
-	if (flip_screen_get(screen.machine()))
+	if (state->flip_screen())
 	{
 		bg_clip.min_x = 20*8;
 		fg_clip.max_x = 20*8-1;
@@ -301,7 +301,7 @@ SCREEN_UPDATE_IND16( bosco )
 	}
 
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
-	draw_stars(screen.machine(),bitmap,cliprect,flip_screen_get(screen.machine()));
+	draw_stars(screen.machine(),bitmap,cliprect,state->flip_screen());
 
 	state->m_bg_tilemap->draw(bitmap, bg_clip, 0,0);
 	state->m_fg_tilemap->draw(bitmap, fg_clip, 0,0);

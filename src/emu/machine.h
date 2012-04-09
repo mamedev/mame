@@ -189,7 +189,6 @@ typedef struct _input_port_private input_port_private;
 typedef struct _ui_input_private ui_input_private;
 typedef struct _debugcpu_private debugcpu_private;
 typedef struct _generic_machine_private generic_machine_private;
-typedef struct _generic_video_private generic_video_private;
 typedef struct _generic_audio_private generic_audio_private;
 
 
@@ -413,7 +412,6 @@ public:
 	ui_input_private *		ui_input_data;		// internal data from uiinput.c
 	debugcpu_private *		debugcpu_data;		// internal data from debugcpu.c
 	generic_machine_private *generic_machine_data; // internal data from machine/generic.c
-	generic_video_private *	generic_video_data;	// internal data from video/generic.c
 	generic_audio_private *	generic_audio_data;	// internal data from audio/generic.c
 
 private:

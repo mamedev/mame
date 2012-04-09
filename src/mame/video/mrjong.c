@@ -82,9 +82,9 @@ WRITE8_MEMBER(mrjong_state::mrjong_colorram_w)
 
 WRITE8_MEMBER(mrjong_state::mrjong_flipscreen_w)
 {
-	if (flip_screen_get(machine()) != BIT(data, 2))
+	if (flip_screen() != BIT(data, 2))
 	{
-		flip_screen_set(machine(), BIT(data, 2));
+		flip_screen_set(BIT(data, 2));
 		machine().tilemap().mark_all_dirty();
 	}
 }
@@ -127,7 +127,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 
 		sx = 224 - state->m_videoram[offs + 2];
 		sy = state->m_videoram[offs + 0];
-		if (flip_screen_get(machine))
+		if (state->flip_screen())
 		{
 			sx = 208 - sx;
 			sy = 240 - sy;

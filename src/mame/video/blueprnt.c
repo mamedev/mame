@@ -63,7 +63,7 @@ WRITE8_MEMBER(blueprnt_state::blueprnt_colorram_w)
 WRITE8_MEMBER(blueprnt_state::blueprnt_flipscreen_w)
 {
 
-	flip_screen_set(machine(), ~data & 0x02);
+	flip_screen_set(~data & 0x02);
 
 	if (m_gfx_bank != ((data & 0x04) >> 2))
 	{
@@ -108,7 +108,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		int flipx = state->m_spriteram[offs + 2] & 0x40;
 		int flipy = state->m_spriteram[offs + 2 - 4] & 0x80;	// -4? Awkward, isn't it?
 
-		if (flip_screen_get(machine))
+		if (state->flip_screen())
 		{
 			sx = 248 - sx;
 			sy = 240 - sy;
@@ -126,7 +126,7 @@ SCREEN_UPDATE_IND16( blueprnt )
 	blueprnt_state *state = screen.machine().driver_data<blueprnt_state>();
 	int i;
 
-	if (flip_screen_get(screen.machine()))
+	if (state->flip_screen())
 		for (i = 0; i < 32; i++)
 			state->m_bg_tilemap->set_scrolly(i, state->m_scrollram[32 - i]);
 	else

@@ -183,12 +183,13 @@ static WRITE8_DEVICE_HANDLER( mux_w )
 
 static WRITE8_DEVICE_HANDLER( yumefuda_output_w )
 {
+	albazg_state *state = device->machine().driver_data<albazg_state>();
 	coin_counter_w(device->machine(), 0, ~data & 4);
 	coin_counter_w(device->machine(), 1, ~data & 2);
 	coin_lockout_global_w(device->machine(), data & 1);
 	//data & 0x10 hopper-c (active LOW)
 	//data & 0x08 divider (active HIGH)
-	flip_screen_set(device->machine(), ~data & 0x20);
+	state->flip_screen_set(~data & 0x20);
 }
 
 static const ay8910_interface ay8910_config =
@@ -233,8 +234,8 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, albazg_state )
 	AM_RANGE(0xa7fc, 0xa7fc) AM_WRITE(prot_lock_w)
 	AM_RANGE(0xa7ff, 0xa7ff) AM_WRITE_PORT("EEPROMOUT")
 	AM_RANGE(0xaf80, 0xafff) AM_READWRITE(custom_ram_r, custom_ram_w) AM_BASE(m_cus_ram)
-	AM_RANGE(0xb000, 0xb07f) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_split1_w) AM_SHARE("paletteram")
-	AM_RANGE(0xb080, 0xb0ff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_split2_w) AM_SHARE("paletteram2")
+	AM_RANGE(0xb000, 0xb07f) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_byte_split_lo_w) AM_SHARE("paletteram")
+	AM_RANGE(0xb080, 0xb0ff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_byte_split_hi_w) AM_SHARE("paletteram2")
 	AM_RANGE(0xc000, 0xc3ff) AM_RAM_WRITE(yumefuda_vram_w) AM_BASE(m_videoram)
 	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(yumefuda_cram_w) AM_BASE(m_colorram)
 	AM_RANGE(0xe000, 0xffff) AM_RAM

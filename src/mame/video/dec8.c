@@ -237,7 +237,7 @@ static void srdarwin_draw_sprites( running_machine& machine, bitmap_ind16 &bitma
 		fx = buffered_spriteram[offs + 1] & 0x04;
 		multi = buffered_spriteram[offs + 1] & 0x10;
 
-		if (flip_screen_get(machine))
+		if (state->flip_screen())
 		{
 			sy = 240 - sy;
 			sx = 240 - sx;
@@ -249,13 +249,13 @@ static void srdarwin_draw_sprites( running_machine& machine, bitmap_ind16 &bitma
 		drawgfx_transpen(bitmap,cliprect,machine.gfx[1],
         			code,
 				color,
-				fx,flip_screen_get(machine),
+				fx,state->flip_screen(),
 				sx,sy,0);
         if (multi)
     		drawgfx_transpen(bitmap,cliprect,machine.gfx[1],
 				code+1,
 				color,
-				fx,flip_screen_get(machine),
+				fx,state->flip_screen(),
 				sx,sy2,0);
 	}
 }
@@ -266,7 +266,7 @@ SCREEN_UPDATE_IND16( cobracom )
 {
 	dec8_state *state = screen.machine().driver_data<dec8_state>();
 
-	flip_screen_set(screen.machine(), state->m_bg_control[0] >> 7);
+	state->flip_screen_set(state->m_bg_control[0] >> 7);
 
 	screen.machine().device<deco_bac06_device>("tilegen1")->deco_bac06_pf_draw(screen.machine(),bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00);
 	screen.machine().device<deco_mxc06_device>("spritegen")->draw_sprites(screen.machine(), bitmap, cliprect, state->m_buffered_spriteram16, 0x04, 0x00, 0x03);
@@ -346,7 +346,7 @@ VIDEO_START( ghostb )
 SCREEN_UPDATE_IND16( oscar )
 {
 	dec8_state *state = screen.machine().driver_data<dec8_state>();
-	flip_screen_set(screen.machine(), state->m_bg_control[1] >> 7);
+	state->flip_screen_set(state->m_bg_control[1] >> 7);
 
 	// we mimic the priority scheme in dec0.c, this was originally a bit different, so this could be wrong
 	screen.machine().device<deco_bac06_device>("tilegen1")->deco_bac06_pf_draw(screen.machine(),bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00);

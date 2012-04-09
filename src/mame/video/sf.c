@@ -104,7 +104,7 @@ WRITE16_MEMBER(sf_state::sf_gfxctrl_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		m_sf_active = data & 0xff;
-		flip_screen_set(machine(), data & 0x04);
+		flip_screen_set(data & 0x04);
 		m_tx_tilemap->enable(data & 0x08);
 		m_bg_tilemap->enable(data & 0x20);
 		m_fg_tilemap->enable(data & 0x40);
@@ -144,7 +144,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap,const r
 		{
 			int c1, c2, c3, c4, t;
 
-			if (flip_screen_get(machine))
+			if (state->flip_screen())
 			{
 				sx = 480 - sx;
 				sy = 224 - sy;
@@ -195,7 +195,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap,const r
 		}
 		else
 		{
-			if (flip_screen_get(machine))
+			if (state->flip_screen())
 			{
 				sx = 496 - sx;
 				sy = 240 - sy;

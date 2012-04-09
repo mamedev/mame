@@ -65,7 +65,7 @@ WRITE8_MEMBER(laserbat_state::laserbat_input_mux_w)
 
 	m_input_mux = (data & 0x30) >> 4;
 
-	flip_screen_set_no_update(machine(), data & 0x08);
+	flip_screen_set_no_update(data & 0x08);
 
 	coin_counter_w(machine(), 0,data & 1);
 

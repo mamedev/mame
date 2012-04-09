@@ -104,7 +104,7 @@ static void draw_sprite_and_check_collision(running_machine &machine, bitmap_ind
 	UINT8 *gfx = machine.region("gfx2")->base() + (code << 7);
 
 
-	if (flip_screen_get(machine))
+	if (state->flip_screen())
 		sy += 32;
 
 	/* assume no collision */

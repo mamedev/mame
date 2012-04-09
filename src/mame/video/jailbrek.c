@@ -79,7 +79,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		int sx = spriteram[i + 2] - ((attr & 0x80) << 1);
 		int sy = spriteram[i + 3];
 
-		if (flip_screen_get(machine))
+		if (state->flip_screen())
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;

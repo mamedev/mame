@@ -71,7 +71,7 @@ static void draw_chars( running_machine &machine, bitmap_ind16 &bitmap, const re
 
 		code = state->m_videoram[offs] | ((col & 0x60) << 3);
 
-		if (flip_screen_get(machine))
+		if (state->flip_screen())
 		{
 			sx = 31 - sx;
 			sy = 31 - sy;
@@ -81,7 +81,7 @@ static void draw_chars( running_machine &machine, bitmap_ind16 &bitmap, const re
 		drawgfx_transpen(bitmap,cliprect,machine.gfx[0],
 			code,
 			(col & 0x0f) | ((*state->m_colorbank & 0x03) << 4),
-			flip_screen_get(machine), flip_screen_get(machine),
+			state->flip_screen(), state->flip_screen(),
 			8 * sx, (8 * sy + scroll) & 0xff, transpen);
 	}
 }
@@ -119,7 +119,7 @@ SCREEN_UPDATE_IND16( ambush )
 			/* 16x16 sprites */
 			gfx = 1;
 
-			if (!flip_screen_get(screen.machine()))
+			if (!state->flip_screen())
 				sy = 240 - sy;
 			else
 				sx = 240 - sx;
@@ -130,7 +130,7 @@ SCREEN_UPDATE_IND16( ambush )
 			gfx = 0;
 			code <<= 2;
 
-			if (!flip_screen_get(screen.machine()))
+			if (!state->flip_screen())
 				sy = 248 - sy;
 			else
 				sx = 248 - sx;
@@ -140,7 +140,7 @@ SCREEN_UPDATE_IND16( ambush )
 		flipx = state->m_spriteram[offs + 1] & 0x40;
 		flipy = state->m_spriteram[offs + 1] & 0x80;
 
-		if (flip_screen_get(screen.machine()))
+		if (state->flip_screen())
 		{
 			flipx = !flipx;
 			flipy = !flipy;

@@ -80,7 +80,7 @@ WRITE8_MEMBER(ettrivia_state::ettrivia_control_w)
 
 	coin_counter_w(machine(), 0, data & 0x80);
 
-	flip_screen_set(machine(), data & 1);
+	flip_screen_set(data & 1);
 }
 
 READ8_MEMBER(ettrivia_state::ettrivia_question_r)

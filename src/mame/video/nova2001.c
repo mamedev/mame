@@ -51,18 +51,18 @@ WRITE8_MEMBER(nova2001_state::ninjakun_paletteram_w)
 {
 	int i;
 
-	paletteram_BBGGRRII_w(space,offset,data);
+	paletteram_BBGGRRII_byte_w(space,offset,data);
 
 	// expand the sprite palette to full length
 	if (offset < 16)
 	{
-		paletteram_BBGGRRII_w(space, 0x200 + offset * 16 + 1, data);
+		paletteram_BBGGRRII_byte_w(space, 0x200 + offset * 16 + 1, data);
 
 		if (offset != 1)
 		{
 			for (i = 0; i < 16; i++)
 			{
-				paletteram_BBGGRRII_w(space, 0x200 + offset + i * 16, data);
+				paletteram_BBGGRRII_byte_w(space, 0x200 + offset + i * 16, data);
 			}
 		}
 	}
@@ -248,12 +248,12 @@ WRITE8_MEMBER(nova2001_state::nova2001_scroll_y_w)
 WRITE8_MEMBER(nova2001_state::nova2001_flipscreen_w)
 {
 	// inverted
-	flip_screen_set(machine(), ~data & 1);
+	flip_screen_set(~data & 1);
 }
 
 WRITE8_MEMBER(nova2001_state::pkunwar_flipscreen_w)
 {
-	flip_screen_set(machine(), data & 1);
+	flip_screen_set(data & 1);
 }
 
 
@@ -286,7 +286,7 @@ static void nova2001_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap
 			continue;
 		}
 
-		if (flip_screen_get(machine))
+		if (state->flip_screen())
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;
@@ -324,7 +324,7 @@ static void pkunwar_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,
 			continue;
 		}
 
-		if (flip_screen_get(machine))
+		if (state->flip_screen())
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;

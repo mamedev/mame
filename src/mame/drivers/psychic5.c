@@ -319,7 +319,7 @@ static MACHINE_RESET( psychic5 )
 {
 	psychic5_state *state = machine.driver_data<psychic5_state>();
 	state->m_bank_latch = 0xff;
-	flip_screen_set(machine, 0);
+	state->flip_screen_set(0);
 }
 
 /***************************************************************************
@@ -386,7 +386,7 @@ WRITE8_MEMBER(psychic5_state::psychic5_coin_counter_w)
 	// bit 7 toggles flip screen
 	if (data & 0x80)
 	{
-		flip_screen_set(machine(), !flip_screen_get(machine()));
+		flip_screen_set(!flip_screen());
 	}
 }
 
@@ -395,7 +395,7 @@ WRITE8_MEMBER(psychic5_state::bombsa_flipscreen_w)
 	// bit 7 toggles flip screen
 	if (data & 0x80)
 	{
-		flip_screen_set(machine(), !flip_screen_get(machine()));
+		flip_screen_set(!flip_screen());
 	}
 }
 

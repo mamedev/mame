@@ -116,7 +116,7 @@ WRITE8_MEMBER(cmmb_state::cmmb_charram_w)
 WRITE8_MEMBER(cmmb_state::cmmb_paletteram_w)
 {
     /* RGB output is inverted */
-    paletteram_RRRGGGBB_w(space,offset,~data);
+    paletteram_RRRGGGBB_byte_w(space,offset,~data);
 }
 
 READ8_MEMBER(cmmb_state::cmmb_input_r)

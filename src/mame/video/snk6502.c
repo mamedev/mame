@@ -135,9 +135,9 @@ WRITE8_MEMBER(snk6502_state::snk6502_flipscreen_w)
 
 	/* bit 7 flips screen */
 
-	if (flip_screen_get(machine()) != (data & 0x80))
+	if (flip_screen() != (data & 0x80))
 	{
-		flip_screen_set(machine(), data & 0x80);
+		flip_screen_set(data & 0x80);
 		machine().tilemap().mark_all_dirty();
 	}
 }
@@ -263,9 +263,9 @@ WRITE8_MEMBER(snk6502_state::satansat_b002_w)
 {
 	/* bit 0 flips screen */
 
-	if (flip_screen_get(machine()) != (data & 0x01))
+	if (flip_screen() != (data & 0x01))
 	{
-		flip_screen_set(machine(), data & 0x01);
+		flip_screen_set(data & 0x01);
 		machine().tilemap().mark_all_dirty();
 	}
 

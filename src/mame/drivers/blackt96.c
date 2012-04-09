@@ -187,7 +187,7 @@ static ADDRESS_MAP_START( blackt96_map, AS_PROGRAM, 16, blackt96_state )
 
 	AM_RANGE(0x100000, 0x100fff) AM_RAM AM_BASE(m_tilemapram) // text tilemap
 	AM_RANGE(0x200000, 0x207fff) AM_RAM AM_BASE(m_tilemapram2)// sprite list + sprite tilemaps
-	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(paletteram16_xxxxRRRRGGGGBBBB_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(paletteram_xxxxRRRRGGGGBBBB_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0xc00000, 0xc03fff) AM_RAM // main ram
 
 ADDRESS_MAP_END

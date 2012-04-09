@@ -190,12 +190,12 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 		flipy = (spriteram[offs+1]&0x80)>>7;
 		flipx = (spriteram[offs+1]&0x40)>>6;
 
-		if (flip_screen_x_get(machine))
+		if (state->flip_screen_x())
 		{
 			sx = 256 - sx;
 			flipx = !flipx;
 		}
-		if (flip_screen_y_get(machine))
+		if (state->flip_screen_y())
 		{
 			sy = 240 - sy;
 			flipy = !flipy;
@@ -245,10 +245,10 @@ SCREEN_UPDATE_IND16( pitnrun )
 		dx=128-state->m_h_heed+((state->m_ha&8)<<5)+3;
 		dy=128-state->m_v_heed+((state->m_ha&0x10)<<4);
 
-		if (flip_screen_x_get(screen.machine()))
+		if (state->flip_screen_x())
 			dx=128-dx+16;
 
-		if (flip_screen_y_get(screen.machine()))
+		if (state->flip_screen_y())
 			dy=128-dy;
 
 		myclip.set(dx, dx+127, dy, dy+127);
@@ -260,7 +260,7 @@ SCREEN_UPDATE_IND16( pitnrun )
 	draw_sprites(screen.machine(),bitmap,myclip);
 
 	if(state->m_ha&4)
-		copybitmap_trans(bitmap,*state->m_tmp_bitmap[state->m_ha&3],flip_screen_x_get(screen.machine()),flip_screen_y_get(screen.machine()),dx,dy,myclip, 1);
+		copybitmap_trans(bitmap,*state->m_tmp_bitmap[state->m_ha&3],state->flip_screen_x(),state->flip_screen_y(),dx,dy,myclip, 1);
 	state->m_fg->draw(bitmap, cliprect, 0,0);
 	return 0;
 }

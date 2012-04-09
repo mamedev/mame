@@ -268,7 +268,7 @@ static void draw_bitmap( running_machine &machine, bitmap_ind16 &bitmap, const r
 		{
 			if (data & 0x80)
 			{
-				if (flip_screen_get(machine))
+				if (state->flip_screen())
 					bitmap.pix16(255-y, 255-x) = pen;
 				else
 					bitmap.pix16(y, x) = pen;
@@ -317,6 +317,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 
 static void cosmica_draw_starfield( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
+	cosmic_state *state = screen.machine().driver_data<cosmic_state>();
 	UINT8 y = 0;
 	UINT8 map = 0;
 	UINT8 *PROM = screen.machine().region("user2")->base();
@@ -333,7 +334,7 @@ static void cosmica_draw_starfield( screen_device &screen, bitmap_ind16 &bitmap,
 			UINT8 x1;
 			int hc, hb_;
 
-			if (flip_screen_get(screen.machine()))
+			if (state->flip_screen())
 				x1 = x - screen.frame_number();
 			else
 				x1 = x + screen.frame_number();
@@ -366,6 +367,7 @@ static void cosmica_draw_starfield( screen_device &screen, bitmap_ind16 &bitmap,
 
 static void devzone_draw_grid( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
+	cosmic_state *state = machine.driver_data<cosmic_state>();
 	UINT8 y;
 	UINT8 *horz_PROM = machine.region("user2")->base();
 	UINT8 *vert_PROM = machine.region("user3")->base();
@@ -404,7 +406,7 @@ static void devzone_draw_grid( running_machine &machine, bitmap_ind16 &bitmap, c
 				if (!(vert_data & horz_data & 0x80))	/* NAND gate */
 				{
 					/* blue */
-					if (flip_screen_get(machine))
+					if (state->flip_screen())
 						bitmap.pix16(255-y, 255-x) = 4;
 					else
 						bitmap.pix16(y, x) = 4;
@@ -424,6 +426,7 @@ static void devzone_draw_grid( running_machine &machine, bitmap_ind16 &bitmap, c
 
 static void nomnlnd_draw_background( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
+	cosmic_state *state = screen.machine().driver_data<cosmic_state>();
 	UINT8 y = 0;
 	UINT8 water = screen.frame_number();
 	UINT8 *PROM = screen.machine().region("user2")->base();
@@ -489,7 +492,7 @@ static void nomnlnd_draw_background( screen_device &screen, bitmap_ind16 &bitmap
 				if ((!hd_) & hc_ & (!hb_))
 				{
 					offs_t offs = ((x >> 3) & 0x03) | ((y & 0x1f) << 2) |
-					              (flip_screen_get(screen.machine()) ? 0x80 : 0);
+					              (state->flip_screen() ? 0x80 : 0);
 
 					UINT8 plane1 = PROM[offs         ] << (x & 0x07);
 					UINT8 plane2 = PROM[offs | 0x0400] << (x & 0x07);
@@ -523,7 +526,7 @@ static void nomnlnd_draw_background( screen_device &screen, bitmap_ind16 &bitmap
 
 			if (color != 0)
 			{
-				if (flip_screen_get(screen.machine()))
+				if (state->flip_screen())
 					bitmap.pix16(255-y, 255-x) = color;
 				else
 					bitmap.pix16(y, x) = color;

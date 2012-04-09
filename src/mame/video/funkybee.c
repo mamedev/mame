@@ -62,12 +62,12 @@ WRITE8_MEMBER(funkybee_state::funkybee_gfx_bank_w)
 
 WRITE8_MEMBER(funkybee_state::funkybee_scroll_w)
 {
-	m_bg_tilemap->set_scrollx(0, flip_screen_get(machine()) ? -data : data);
+	m_bg_tilemap->set_scrollx(0, flip_screen() ? -data : data);
 }
 
 WRITE8_MEMBER(funkybee_state::funkybee_flipscreen_w)
 {
-	flip_screen_set(machine(), data & 0x01);
+	flip_screen_set(data & 0x01);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
@@ -107,7 +107,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		int sx = state->m_videoram[offs2 + 0x10];
 		int sy = 224 - state->m_colorram[offs2];
 
-		if (flip_screen_get(machine))
+		if (state->flip_screen())
 		{
 			sy += 32;
 			flipx = !flipx;
@@ -127,7 +127,7 @@ static void draw_columns( running_machine &machine, bitmap_ind16 &bitmap, const 
 
 	for (offs = 0x1f; offs >= 0; offs--)
 	{
-		int const flip = flip_screen_get(machine);
+		int const flip = state->flip_screen();
 		int code = state->m_videoram[0x1c00 + offs];
 		int color = state->m_colorram[0x1f10] & 0x03;
 		int sx = flip ? state->m_videoram[0x1f1f] : state->m_videoram[0x1f10];

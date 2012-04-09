@@ -74,15 +74,16 @@ WRITE8_MEMBER(hanaawas_state::hanaawas_colorram_w)
 
 	/* dirty both current and next offsets */
 	m_bg_tilemap->mark_tile_dirty(offset);
-	m_bg_tilemap->mark_tile_dirty((offset + (flip_screen_get(machine()) ? -1 : 1)) & 0x03ff);
+	m_bg_tilemap->mark_tile_dirty((offset + (flip_screen() ? -1 : 1)) & 0x03ff);
 }
 
 WRITE8_DEVICE_HANDLER( hanaawas_portB_w )
 {
 	/* bit 7 is flip screen */
-	if (flip_screen_get(device->machine()) != (~data & 0x80))
+	hanaawas_state *state = device->machine().driver_data<hanaawas_state>();
+	if (state->flip_screen() != (~data & 0x80))
 	{
-		flip_screen_set(device->machine(), ~data & 0x80);
+		state->flip_screen_set(~data & 0x80);
 		device->machine().tilemap().mark_all_dirty();
 	}
 }
@@ -91,7 +92,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 {
 	hanaawas_state *state = machine.driver_data<hanaawas_state>();
 	/* the color is determined by the current color byte, but the bank is via the previous one!!! */
-	int offset = (tile_index + (flip_screen_get(machine) ? 1 : -1)) & 0x3ff;
+	int offset = (tile_index + (state->flip_screen() ? 1 : -1)) & 0x3ff;
 	int attr = state->m_colorram[offset];
 	int gfxbank = (attr & 0x40) >> 6;
 	int code = state->m_videoram[tile_index] + ((attr & 0x20) << 3);

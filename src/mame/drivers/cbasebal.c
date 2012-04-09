@@ -69,7 +69,7 @@ WRITE8_MEMBER(cbasebal_state::bankedram_w)
 		break;
 	case 1:
 		if (offset < 0x800)
-			paletteram_xxxxBBBBRRRRGGGG_le_w(space, offset, data);
+			paletteram_xxxxBBBBRRRRGGGG_byte_le_w(space, offset, data);
 		break;
 	default:
 		cbasebal_scrollram_w(space, offset, data);

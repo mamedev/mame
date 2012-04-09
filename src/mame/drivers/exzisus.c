@@ -59,7 +59,7 @@ WRITE8_MEMBER(exzisus_state::exzisus_cpua_bankswitch_w)
 		}
 	}
 
-	flip_screen_set(machine(), data & 0x40);
+	flip_screen_set(data & 0x40);
 }
 
 WRITE8_MEMBER(exzisus_state::exzisus_cpub_bankswitch_w)
@@ -75,7 +75,7 @@ WRITE8_MEMBER(exzisus_state::exzisus_cpub_bankswitch_w)
 		}
 	}
 
-	flip_screen_set(machine(), data & 0x40);
+	flip_screen_set(data & 0x40);
 }
 
 WRITE8_MEMBER(exzisus_state::exzisus_coincounter_w)

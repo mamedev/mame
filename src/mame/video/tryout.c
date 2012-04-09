@@ -144,7 +144,7 @@ WRITE8_MEMBER(tryout_state::tryout_vram_bankswitch_w)
 
 WRITE8_MEMBER(tryout_state::tryout_flipscreen_w)
 {
-	flip_screen_set(machine(), data & 1);
+	flip_screen_set(data & 1);
 }
 
 static TILEMAP_MAPPER( get_fg_memory_offset )
@@ -198,7 +198,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 		fy = 0;
 		inc = 16;
 
-		if (flip_screen_get(machine))
+		if (state->flip_screen())
 		{
 			x = 240 - x;
 			fx = !fx;
@@ -234,7 +234,7 @@ SCREEN_UPDATE_IND16( tryout )
 	tryout_state *state = screen.machine().driver_data<tryout_state>();
 	int scrollx = 0;
 
-	if (!flip_screen_get(screen.machine()))
+	if (!state->flip_screen())
 		state->m_fg_tilemap->set_scrollx(0, 16); /* Assumed hard-wired */
 	else
 		state->m_fg_tilemap->set_scrollx(0, -8); /* Assumed hard-wired */

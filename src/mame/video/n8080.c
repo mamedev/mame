@@ -13,7 +13,7 @@ WRITE8_MEMBER(n8080_state::n8080_video_control_w)
 
 	m_sheriff_color_mode = (data >> 3) & 3;
 	m_sheriff_color_data = (data >> 0) & 7;
-	flip_screen_set_no_update(machine(), data & 0x20);
+	flip_screen_set_no_update(data & 0x20);
 }
 
 
@@ -75,7 +75,7 @@ static void helifire_next_line( running_machine &machine )
 	}
 	else
 	{
-		if (flip_screen_get(machine))
+		if (state->flip_screen())
 			state->m_helifire_mv %= 255;
 		else
 			state->m_helifire_mv %= 257;
@@ -94,7 +94,7 @@ VIDEO_START( spacefev )
 
 	state->m_cannon_timer = machine.scheduler().timer_alloc(FUNC(spacefev_stop_red_cannon));
 
-	flip_screen_set_no_update(machine, 0);
+	state->flip_screen_set_no_update(0);
 
 	state->save_item(NAME(state->m_spacefev_red_screen));
 	state->save_item(NAME(state->m_spacefev_red_cannon));
@@ -105,7 +105,7 @@ VIDEO_START( sheriff )
 {
 	n8080_state *state = machine.driver_data<n8080_state>();
 
-	flip_screen_set_no_update(machine, 0);
+	state->flip_screen_set_no_update(0);
 
 	state->save_item(NAME(state->m_sheriff_color_mode));
 	state->save_item(NAME(state->m_sheriff_color_data));
@@ -134,14 +134,14 @@ VIDEO_START( helifire )
 		state->m_helifire_LSFR[i] = data;
 	}
 
-	flip_screen_set_no_update(machine, 0);
+	state->flip_screen_set_no_update(0);
 }
 
 
 SCREEN_UPDATE_IND16( spacefev )
 {
 	n8080_state *state = screen.machine().driver_data<n8080_state>();
-	UINT8 mask = flip_screen_get(screen.machine()) ? 0xff : 0x00;
+	UINT8 mask = state->flip_screen() ? 0xff : 0x00;
 
 	int x;
 	int y;
@@ -211,7 +211,7 @@ SCREEN_UPDATE_IND16( spacefev )
 SCREEN_UPDATE_IND16( sheriff )
 {
 	n8080_state *state = screen.machine().driver_data<n8080_state>();
-	UINT8 mask = flip_screen_get(screen.machine()) ? 0xff : 0x00;
+	UINT8 mask = state->flip_screen() ? 0xff : 0x00;
 
 	const UINT8* pPROM = screen.machine().region("proms")->base();
 
@@ -323,7 +323,7 @@ SCREEN_UPDATE_IND16( helifire )
 
 			for (n = 0; n < 8; n++)
 			{
-				if (flip_screen_get(screen.machine()))
+				if (state->flip_screen())
 				{
 					if ((state->m_videoram[offset ^ 0x1fff] << n) & 0x80)
 					{

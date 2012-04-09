@@ -68,9 +68,8 @@ static VIDEO_START( wcvol95 )
 static SCREEN_UPDATE_RGB32( wcvol95 )
 {
 	//FIXME: flip_screen_x should not be written!
-	flip_screen_set_no_update(screen.machine(), 1);
-
 	deco156_state *state = screen.machine().driver_data<deco156_state>();
+	state->flip_screen_set_no_update(1);
 
 	screen.machine().priority_bitmap.fill(0);
 	bitmap.fill(0);

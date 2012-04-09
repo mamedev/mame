@@ -502,7 +502,7 @@ WRITE8_MEMBER(suna8_state::hardhead_bankswitch_w)
 */
 WRITE8_MEMBER(suna8_state::hardhead_flipscreen_w)
 {
-	flip_screen_set(machine(),     data & 0x04);
+	flip_screen_set(data & 0x04);
 	coin_lockout_w ( machine(), 0,	data & 0x08);
 	coin_lockout_w ( machine(), 1,	data & 0x10);
 }
@@ -511,7 +511,7 @@ static ADDRESS_MAP_START( hardhead_map, AS_PROGRAM, 8, suna8_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM								// ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")						// Banked ROM
 	AM_RANGE(0xc000, 0xd7ff) AM_RAM								// RAM
-	AM_RANGE(0xd800, 0xd9ff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_be_w) AM_SHARE("paletteram")	// Palette
+	AM_RANGE(0xd800, 0xd9ff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_byte_be_w) AM_SHARE("paletteram")	// Palette
 	AM_RANGE(0xda00, 0xda00) AM_RAM_READ(hardhead_ip_r) AM_BASE(m_hardhead_ip)	// Input Port Select
 	AM_RANGE(0xda80, 0xda80) AM_READ(soundlatch2_r) AM_WRITE(hardhead_bankswitch_w	)	// ROM Banking
 	AM_RANGE(0xdb00, 0xdb00) AM_WRITE(soundlatch_w			)	// To Sound CPU
@@ -549,7 +549,7 @@ WRITE8_MEMBER(suna8_state::rranger_bankswitch_w)
 
 	memory_set_bank(machine(), "bank1", bank);
 
-	flip_screen_set(machine(),     data & 0x20);
+	flip_screen_set(data & 0x20);
 	coin_lockout_w ( machine(), 0,	data & 0x40);
 	coin_lockout_w ( machine(), 1,	data & 0x80);
 }
@@ -587,7 +587,7 @@ static ADDRESS_MAP_START( rranger_map, AS_PROGRAM, 8, suna8_state )
 	AM_RANGE(0xc280, 0xc280) AM_WRITENOP	// ? NMI Ack
 	AM_RANGE(0xc280, 0xc280) AM_READ_PORT("DSW1")				// DSW 1
 	AM_RANGE(0xc2c0, 0xc2c0) AM_READ_PORT("DSW2")				// DSW 2
-	AM_RANGE(0xc600, 0xc7ff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_be_w) AM_SHARE("paletteram")	// Palette
+	AM_RANGE(0xc600, 0xc7ff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_byte_be_w) AM_SHARE("paletteram")	// Palette
 	AM_RANGE(0xc800, 0xdfff) AM_RAM								// RAM
 	AM_RANGE(0xe000, 0xffff) AM_RAM_WRITE(suna8_spriteram_w) AM_BASE(m_spriteram)	// Sprites
 ADDRESS_MAP_END
@@ -632,7 +632,7 @@ WRITE8_MEMBER(suna8_state::brickzn_spritebank_w)
 
 	m_spritebank = (data >> 1) & 1;
 	if (data & ~0x03)	logerror("CPU #0 - PC %04X: unknown spritebank bits: %02X\n",cpu_get_pc(&space.device()),data);
-	flip_screen_set(machine(),  data & 0x01 );
+	flip_screen_set(data & 0x01 );
 }
 
 WRITE8_MEMBER(suna8_state::brickzn_unknown_w)
@@ -693,7 +693,7 @@ WRITE8_MEMBER(suna8_state::hardhea2_nmi_w)
 */
 WRITE8_MEMBER(suna8_state::hardhea2_flipscreen_w)
 {
-	flip_screen_set(machine(), data & 0x01);
+	flip_screen_set(data & 0x01);
 	if (data & ~0x01)	logerror("CPU #0 - PC %04X: unknown flipscreen bits: %02X\n",cpu_get_pc(&space.device()),data);
 }
 
@@ -789,7 +789,7 @@ static ADDRESS_MAP_START( hardhea2_map, AS_PROGRAM, 8, suna8_state )
 	AM_RANGE(0xc533, 0xc533) AM_WRITE(hardhea2_rambank_0_w )
 	// Protection ***
 
-	AM_RANGE(0xc600, 0xc7ff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_be_w) AM_SHARE("paletteram"	)	// Palette (Banked??)
+	AM_RANGE(0xc600, 0xc7ff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_byte_be_w) AM_SHARE("paletteram"	)	// Palette (Banked??)
 	AM_RANGE(0xc800, 0xdfff) AM_RAMBANK("bank2")							// RAM (Banked?)
 	AM_RANGE(0xe000, 0xffff) AM_READWRITE(suna8_banked_spriteram_r, suna8_banked_spriteram_w)	// Sprites (Banked)
 ADDRESS_MAP_END
@@ -825,7 +825,7 @@ static ADDRESS_MAP_START( starfigh_map, AS_PROGRAM, 8, suna8_state )
 	AM_RANGE(0xc300, 0xc300) AM_WRITE(hardhea2_flipscreen_w			)	// Flip Screen
 	AM_RANGE(0xc400, 0xc400) AM_WRITE(hardhea2_leds_w				)	// Leds + Coin Counter
 	AM_RANGE(0xc500, 0xc500) AM_WRITE(soundlatch_w					)	// To Sound CPU
-	AM_RANGE(0xc600, 0xc7ff) AM_READWRITE(banked_paletteram_r, paletteram_RRRRGGGGBBBBxxxx_be_w) AM_SHARE("paletteram"	)	// Palette (Banked??)
+	AM_RANGE(0xc600, 0xc7ff) AM_READWRITE(banked_paletteram_r, paletteram_RRRRGGGGBBBBxxxx_byte_be_w) AM_SHARE("paletteram"	)	// Palette (Banked??)
 	AM_RANGE(0xc800, 0xdfff) AM_RAM									// RAM
 	AM_RANGE(0xe000, 0xffff) AM_READWRITE(suna8_banked_spriteram_r, suna8_banked_spriteram_w)	// Sprites (Banked)
 ADDRESS_MAP_END
@@ -884,7 +884,7 @@ WRITE8_MEMBER(suna8_state::suna8_wram_w)
 */
 WRITE8_MEMBER(suna8_state::sparkman_flipscreen_w)
 {
-	flip_screen_set(machine(), data & 0x01);
+	flip_screen_set(data & 0x01);
 	//if (data & ~0x01)     logerror("CPU #0 - PC %04X: unknown flipscreen bits: %02X\n",cpu_get_pc(&space.device()),data);
 }
 
@@ -958,7 +958,7 @@ static ADDRESS_MAP_START( sparkman_map, AS_PROGRAM, 8, suna8_state )
 	AM_RANGE(0xc400, 0xc400) AM_WRITE(sparkman_leds_w			)	// Leds
 	AM_RANGE(0xc480, 0xc480) AM_WRITE(sparkman_coin_counter_w   )   // Coin Counter
 	AM_RANGE(0xc500, 0xc500) AM_WRITE(soundlatch_w				)	// To Sound CPU
-	AM_RANGE(0xc600, 0xc7ff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_be_w) AM_SHARE("paletteram"	)	// Palette (Banked??)
+	AM_RANGE(0xc600, 0xc7ff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_byte_be_w) AM_SHARE("paletteram"	)	// Palette (Banked??)
 	AM_RANGE(0xc800, 0xdfff) AM_RAM_WRITE(suna8_wram_w) AM_BASE(m_wram)								// RAM
 	AM_RANGE(0xe000, 0xffff) AM_READWRITE(suna8_banked_spriteram_r, suna8_banked_spriteram_w)	// Sprites (Banked)
 ADDRESS_MAP_END

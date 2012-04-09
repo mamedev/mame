@@ -187,8 +187,8 @@ WRITE8_MEMBER(zaxxon_state::zaxxon_flipscreen_w)
 {
 
 	/* low bit controls flip; background and sprite flip are handled at render time */
-	flip_screen_set_no_update(machine(), ~data & 1);
-	m_fg_tilemap->set_flip(flip_screen_get(machine()) ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
+	flip_screen_set_no_update(~data & 1);
+	m_fg_tilemap->set_flip(flip_screen() ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
 }
 
 
@@ -323,13 +323,13 @@ static void draw_background(running_machine &machine, bitmap_ind16 &bitmap, cons
 		int colorbase = state->m_bg_color + (state->m_congo_color_bank << 8);
 		int xmask = pixmap.width() - 1;
 		int ymask = pixmap.height() - 1;
-		int flipmask = flip_screen_get(machine) ? 0xff : 0x00;
-		int flipoffs = flip_screen_get(machine) ? 0x38 : 0x40;
+		int flipmask = state->flip_screen() ? 0xff : 0x00;
+		int flipoffs = state->flip_screen() ? 0x38 : 0x40;
 		int x, y;
 
 		/* the starting X value is offset by 1 pixel (normal) or 7 pixels */
 		/* (flipped) due to a delay in the loading */
-		if (!flip_screen_get(machine))
+		if (!state->flip_screen())
 			flipoffs -= 1;
 		else
 			flipoffs += 7;
@@ -435,7 +435,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 	zaxxon_state *state = machine.driver_data<zaxxon_state>();
 	UINT8 *spriteram = state->m_spriteram;
 	const gfx_element *gfx = machine.gfx[2];
-	int flip = flip_screen_get(machine);
+	int flip = state->flip_screen();
 	int flipmask = flip ? 0xff : 0x00;
 	int offs;
 

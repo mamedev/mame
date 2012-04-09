@@ -30,12 +30,12 @@ Note:   if MAME_DEBUG is defined, pressing Z with:
 
 WRITE8_MEMBER(paradise_state::paradise_flipscreen_w)
 {
-	flip_screen_set(machine(), data ? 0 : 1);
+	flip_screen_set(data ? 0 : 1);
 }
 
 WRITE8_MEMBER(paradise_state::tgtball_flipscreen_w)
 {
-	flip_screen_set(machine(), data ? 1 : 0);
+	flip_screen_set(data ? 1 : 0);
 }
 
 /* Note: Penky updates pixel palette bank register BEFORE actually writing to the paletteram. */
@@ -200,7 +200,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		int flipx = 0;	// ?
 		int flipy = 0;
 
-		if (flip_screen_get(machine))
+		if (state->flip_screen())
 		{
 			x = 0xf0 - x;	flipx = !flipx;
 			y = 0xf0 - y;	flipy = !flipy;
@@ -263,7 +263,7 @@ if (screen.machine().input().code_pressed(KEYCODE_Z))
 
 	if (layers_ctrl & 1)	state->m_tilemap_0->draw(bitmap, cliprect, 0, 0);
 	if (layers_ctrl & 2)	state->m_tilemap_1->draw(bitmap, cliprect, 0, 0);
-	if (layers_ctrl & 4)	copybitmap_trans(bitmap, state->m_tmpbitmap, flip_screen_get(screen.machine()), flip_screen_get(screen.machine()), 0, 0, cliprect, 0x80f);
+	if (layers_ctrl & 4)	copybitmap_trans(bitmap, state->m_tmpbitmap, state->flip_screen(), state->flip_screen(), 0, 0, cliprect, 0x80f);
 
 	if (state->m_priority & 2)
 	{

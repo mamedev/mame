@@ -64,7 +64,7 @@ WRITE16_MEMBER(suna16_state::suna16_flipscreen_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		flip_screen_set(machine(),  data & 1 );
+		flip_screen_set(data & 1 );
 		m_color_bank = ( data & 4 ) >> 2;
 	}
 	if (data & ~(1|4))	logerror("CPU#0 PC %06X - Flip screen unknown bits: %04X\n", cpu_get_pc(&space.device()), data);
@@ -74,7 +74,7 @@ WRITE16_MEMBER(suna16_state::bestbest_flipscreen_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		flip_screen_set(machine(),  data & 0x10 );
+		flip_screen_set(data & 0x10 );
 		//m_color_bank = ( data & 0x07 );
 	}
 	if (data & ~(0x10))	logerror("CPU#0 PC %06X - Flip screen unknown bits: %04X\n", cpu_get_pc(&space.device()), data);
@@ -185,7 +185,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 
 				if (flipx)	tile_flipx = !tile_flipx;
 
-				if (flip_screen_get(machine))
+				if (state->flip_screen())
 				{
 					sx = max_x - sx;
 					sy = max_y - sy;

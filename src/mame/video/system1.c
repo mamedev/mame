@@ -175,7 +175,7 @@ WRITE8_MEMBER(system1_state::system1_videomode_w)
 	m_video_mode = data;
 
 	/* bit 7 is flip screen */
-	flip_screen_set(machine(), data & 0x80);
+	flip_screen_set(data & 0x80);
 }
 
 
@@ -366,7 +366,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 	UINT32 gfxbanks = machine.region("sprites")->bytes() / 0x8000;
 	const UINT8 *gfxbase = machine.region("sprites")->base();
 	UINT8 *spriteram = state->m_spriteram;
-	int flipscreen = flip_screen_get(machine);
+	int flipscreen = state->flip_screen();
 	int spritenum;
 
 	/* up to 32 sprites total */
@@ -578,7 +578,7 @@ SCREEN_UPDATE_IND16( system1 )
 	yscroll = videoram[0xfbd];
 
 	/* adjust for flipping */
-	if (flip_screen_get(screen.machine()))
+	if (state->flip_screen())
 	{
 		xscroll = 640 - (xscroll & 0x1ff);
 		yscroll = 764 - (yscroll & 0x1ff);
@@ -614,7 +614,7 @@ SCREEN_UPDATE_IND16( system2 )
 	bitmap_ind16 &fgpixmap = state->m_tilemap_page[0]->pixmap();
 
 	/* get scroll offsets */
-	if (!flip_screen_get(screen.machine()))
+	if (!state->flip_screen())
 	{
 		xscroll = ((videoram[0x7c0] | (videoram[0x7c1] << 8)) & 0x1ff) - 512 + 10;
 		yscroll = videoram[0x7ba];
@@ -657,7 +657,7 @@ SCREEN_UPDATE_IND16( system2_rowscroll )
 	bitmap_ind16 &fgpixmap = state->m_tilemap_page[0]->pixmap();
 
 	/* get scroll offsets */
-	if (!flip_screen_get(screen.machine()))
+	if (!state->flip_screen())
 	{
 		for (y = 0; y < 32; y++)
 			rowscroll[y] = ((videoram[0x7c0 + y * 2] | (videoram[0x7c1 + y * 2] << 8)) & 0x1ff) - 512 + 10;

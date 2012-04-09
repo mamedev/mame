@@ -10,7 +10,7 @@ SCREEN_UPDATE_IND16( pktgaldx )
 	pktgaldx_state *state = screen.machine().driver_data<pktgaldx_state>();
 	UINT16 flip = deco16ic_pf_control_r(state->m_deco_tilegen1, 0, 0xffff);
 
-	flip_screen_set(screen.machine(), BIT(flip, 7));
+	state->flip_screen_set(BIT(flip, 7));
 	deco16ic_pf_update(state->m_deco_tilegen1, state->m_pf1_rowscroll, state->m_pf2_rowscroll);
 
 	bitmap.fill(0, cliprect); /* not Confirmed */

@@ -97,7 +97,7 @@ WRITE8_MEMBER(tsamurai_state::sound_command3_w)
 
 WRITE8_MEMBER(tsamurai_state::flip_screen_w)
 {
-	flip_screen_set(machine(), data);
+	flip_screen_set(data);
 }
 
 WRITE8_MEMBER(tsamurai_state::tsamurai_coin_counter_w)

@@ -221,7 +221,7 @@ SCREEN_UPDATE_IND16( ashnojoe )
 
 	//state->m_tilemap_reg[0] & 0x10 // ?? on coin insertion
 
-	flip_screen_set(screen.machine(), state->m_tilemap_reg[0] & 1);
+	state->flip_screen_set(state->m_tilemap_reg[0] & 1);
 
 	if(state->m_tilemap_reg[0] & 0x02)
 		state->m_joetilemap7->draw(bitmap, cliprect, 0, 0);

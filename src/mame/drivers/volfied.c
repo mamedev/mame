@@ -67,7 +67,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, volfied_state )
 	AM_RANGE(0x100000, 0x103fff) AM_RAM		/* main    */
 	AM_RANGE(0x200000, 0x203fff) AM_DEVREADWRITE_LEGACY("pc090oj", pc090oj_word_r, pc090oj_word_w)
 	AM_RANGE(0x400000, 0x47ffff) AM_READWRITE(volfied_video_ram_r, volfied_video_ram_w)
-	AM_RANGE(0x500000, 0x503fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x500000, 0x503fff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x600000, 0x600001) AM_WRITE(volfied_video_mask_w)
 	AM_RANGE(0x700000, 0x700001) AM_WRITE(volfied_sprite_ctrl_w)
 	AM_RANGE(0xd00000, 0xd00001) AM_READWRITE(volfied_video_ctrl_r, volfied_video_ctrl_w)

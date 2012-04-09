@@ -275,7 +275,7 @@ WRITE8_MEMBER(m52_state::m52_bgcontrol_w)
 WRITE8_MEMBER(m52_state::m52_flipscreen_w)
 {
 	/* screen flip is handled both by software and hardware */
-	flip_screen_set(machine(), (data & 0x01) ^ (~input_port_read(machine(), "DSW2") & 0x01));
+	flip_screen_set((data & 0x01) ^ (~input_port_read(machine(), "DSW2") & 0x01));
 
 	coin_counter_w(machine(), 0, data & 0x02);
 	coin_counter_w(machine(), 1, data & 0x20);
@@ -283,7 +283,7 @@ WRITE8_MEMBER(m52_state::m52_flipscreen_w)
 
 WRITE8_MEMBER(m52_state::alpha1v_flipscreen_w)
 {
-	flip_screen_set(machine(), data & 0x01);
+	flip_screen_set(data & 0x01);
 }
 
 
@@ -299,7 +299,8 @@ static void draw_background(running_machine &machine, bitmap_ind16 &bitmap, cons
 	rectangle rect;
 	const rectangle &visarea = machine.primary_screen->visible_area();
 
-	if (flip_screen_get(machine))
+	m52_state *state = machine.driver_data<m52_state>();
+	if (state->flip_screen())
 	{
 		xpos = 255 - xpos;
 		ypos = 255 - ypos - BGHEIGHT;
@@ -313,23 +314,23 @@ static void draw_background(running_machine &machine, bitmap_ind16 &bitmap, cons
 	drawgfx_transpen(bitmap, cliprect,
 		machine.gfx[image],
 		0, 0,
-		flip_screen_get(machine),
-		flip_screen_get(machine),
+		state->flip_screen(),
+		state->flip_screen(),
 		xpos,
 		ypos, 0);
 
 	drawgfx_transpen(bitmap, cliprect,
 		machine.gfx[image],
 		0, 0,
-		flip_screen_get(machine),
-		flip_screen_get(machine),
+		state->flip_screen(),
+		state->flip_screen(),
 		xpos - 256,
 		ypos, 0);
 
 	rect.min_x = visarea.min_x;
 	rect.max_x = visarea.max_x;
 
-	if (flip_screen_get(machine))
+	if (state->flip_screen())
 	{
 		rect.min_y = ypos - BGHEIGHT;
 		rect.max_y = ypos - 1;
@@ -370,7 +371,7 @@ SCREEN_UPDATE_IND16( m52 )
 			draw_background(screen.machine(), bitmap, cliprect, state->m_bg1xpos, state->m_bg1ypos, 4); /* cityscape */
 	}
 
-	state->m_bg_tilemap->set_flip(flip_screen_get(screen.machine()) ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
+	state->m_bg_tilemap->set_flip(state->flip_screen() ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
 
 	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
@@ -394,7 +395,7 @@ SCREEN_UPDATE_IND16( m52 )
 			clip.min_y = 128, clip.max_y = 255;
 
 		/* adjust for flipping */
-		if (flip_screen_get(screen.machine()))
+		if (state->flip_screen())
 		{
 			int temp = clip.min_y;
 			clip.min_y = 255 - clip.max_y;

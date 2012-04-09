@@ -13,9 +13,9 @@ WRITE8_MEMBER(pokechmp_state::pokechmp_videoram_w)
 
 WRITE8_MEMBER(pokechmp_state::pokechmp_flipscreen_w)
 {
-	if (flip_screen_get(machine()) != (data & 0x80))
+	if (flip_screen() != (data & 0x80))
 	{
-		flip_screen_set(machine(), data & 0x80);
+		flip_screen_set(data & 0x80);
 		machine().tilemap().mark_all_dirty();
 	}
 }
@@ -55,7 +55,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 
 			flipx = spriteram[offs+1] & 0x04;
 			flipy = spriteram[offs+1] & 0x02;
-			if (flip_screen_get(machine)) {
+			if (state->flip_screen()) {
 				sx=240-sx;
 				sy=240-sy;
 				if (flipx) flipx=0; else flipx=1;

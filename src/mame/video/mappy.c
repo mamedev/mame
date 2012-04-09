@@ -373,12 +373,12 @@ WRITE8_MEMBER(mappy_state::mappy_videoram_w)
 
 WRITE8_MEMBER(mappy_state::superpac_flipscreen_w)
 {
-	flip_screen_set(machine(), data & 1);
+	flip_screen_set(data & 1);
 }
 
 READ8_MEMBER(mappy_state::superpac_flipscreen_r)
 {
-	flip_screen_set(machine(), 1);
+	flip_screen_set(1);
 	return 0xff;
 }
 
@@ -398,6 +398,7 @@ WRITE8_MEMBER(mappy_state::mappy_scroll_w)
 
 static void mappy_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8 *spriteram_base)
 {
+	mappy_state *state = machine.driver_data<mappy_state>();
 	UINT8 *spriteram = spriteram_base + 0x780;
 	UINT8 *spriteram_2 = spriteram + 0x800;
 	UINT8 *spriteram_3 = spriteram_2 + 0x800;
@@ -430,7 +431,7 @@ static void mappy_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, c
 			sy -= 16 * sizey;
 			sy = (sy & 0xff) - 32;	// fix wraparound
 
-			if (flip_screen_get(machine))
+			if (state->flip_screen())
 			{
 				flipx ^= 1;
 				flipy ^= 1;
@@ -478,6 +479,7 @@ spriteram_3
 
 static void phozon_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8 *spriteram_base)
 {
+	mappy_state *state = machine.driver_data<mappy_state>();
 	UINT8 *spriteram = spriteram_base + 0x780;
 	UINT8 *spriteram_2 = spriteram + 0x800;
 	UINT8 *spriteram_3 = spriteram_2 + 0x800;
@@ -509,7 +511,7 @@ static void phozon_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, 
 			sy -= 8 * sizey;
 			sy = (sy & 0xff) - 32;	// fix wraparound
 
-			if (flip_screen_get(machine))
+			if (state->flip_screen())
 			{
 				flipx ^= 1;
 				flipy ^= 1;
@@ -568,7 +570,7 @@ SCREEN_UPDATE_IND16( phozon )
 	mappy_state *state = screen.machine().driver_data<mappy_state>();
 
 	/* flip screen control is embedded in RAM */
-	flip_screen_set(screen.machine(), state->m_spriteram[0x1f7f-0x800] & 1);
+	state->flip_screen_set(state->m_spriteram[0x1f7f-0x800] & 1);
 
 	state->m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE | TILEMAP_DRAW_ALL_CATEGORIES,0);
 

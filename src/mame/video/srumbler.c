@@ -83,7 +83,7 @@ WRITE8_MEMBER(srumbler_state::srumbler_background_w)
 WRITE8_MEMBER(srumbler_state::srumbler_4009_w)
 {
 	/* bit 0 flips screen */
-	flip_screen_set(machine(), data & 1);
+	flip_screen_set(data & 1);
 
 	/* bits 4-5 used during attract mode, unknown */
 
@@ -142,7 +142,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 		sx = buffered_spriteram[offs + 3] + 0x100 * ( attr & 0x01);
 		flipy = attr & 0x02;
 
-		if (flip_screen_get(machine))
+		if (state->flip_screen())
 		{
 			sx = 496 - sx;
 			sy = 240 - sy;
@@ -152,7 +152,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 		drawgfx_transpen(bitmap,cliprect,machine.gfx[2],
 				code,
 				colour,
-				flip_screen_get(machine),flipy,
+				state->flip_screen(),flipy,
 				sx, sy,15);
 	}
 }

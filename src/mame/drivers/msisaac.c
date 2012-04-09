@@ -55,7 +55,7 @@ WRITE8_MEMBER(msisaac_state::nmi_enable_w)
 #if 0
 WRITE8_MEMBER(msisaac_state::flip_screen_w)
 {
-	flip_screen_set(machine(), data);
+	flip_screen_set(data);
 }
 
 WRITE8_MEMBER(msisaac_state::msisaac_coin_counter_w)
@@ -174,7 +174,7 @@ WRITE8_MEMBER(msisaac_state::msisaac_mcu_w)
 static ADDRESS_MAP_START( msisaac_map, AS_PROGRAM, 8, msisaac_state )
 	AM_RANGE(0x0000, 0xdfff) AM_ROM
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM
-	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(paletteram_xxxxRRRRGGGGBBBB_le_w) AM_SHARE("paletteram")
+	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(paletteram_xxxxRRRRGGGGBBBB_byte_le_w) AM_SHARE("paletteram")
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(msisaac_bg2_textbank_w)
 	AM_RANGE(0xf001, 0xf001) AM_WRITENOP					//???
 	AM_RANGE(0xf002, 0xf002) AM_WRITENOP					//???

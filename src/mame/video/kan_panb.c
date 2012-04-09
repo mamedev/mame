@@ -33,7 +33,7 @@ SCREEN_UPDATE_IND16( honeydol )
 		x = dx;
 		y = dy;
 
-		if (flip_screen_get(screen.machine()))
+		if (state->flip_screen())
 		{
 			sx = 240 - x;
 			sy = 240 - y;
@@ -64,7 +64,7 @@ SCREEN_UPDATE_IND16( honeydol )
 		x = dx;
 		y = dy;
 
-		if (flip_screen_get(screen.machine()))
+		if (state->flip_screen())
 		{
 			sx = 240 - x;
 			sy = 240 - y;
@@ -120,7 +120,7 @@ SCREEN_UPDATE_IND16( twinadv )
 		x = dx;
 		y = dy;
 
-		if (flip_screen_get(screen.machine()))
+		if (state->flip_screen())
 		{
 			sx = 240 - x;
 			sy = 240 - y;
@@ -169,7 +169,7 @@ SCREEN_UPDATE_IND16( wintbob )
 
 		if (wrapr == 8) xpos -= 256;
 
-		if (flip_screen_get(screen.machine()))
+		if (state->flip_screen())
 		{
 			xpos = 240 - xpos;
 			ypos = 240 - ypos;
@@ -249,7 +249,7 @@ SCREEN_UPDATE_IND16( snowbro3 )
 		if (x > 511) x &= 0x1ff;
 		if (y > 511) y &= 0x1ff;
 
-		if (flip_screen_get(screen.machine()))
+		if (state->flip_screen())
 		{
 			sx = 240 - x;
 			sy = 240 - y;

@@ -71,7 +71,7 @@ void deco_karnovsprites_device::draw_sprites( running_machine &machine, bitmap_i
 		y = (y + 16) % 0x200;
 		x = 256 - x;
 		y = 256 - y;
-		if (flip_screen_get(machine))
+		if (machine.driver_data()->flip_screen())
 		{
 			y = 240 - y;
 			x = 240 - x;

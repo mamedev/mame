@@ -224,7 +224,7 @@ static SCREEN_UPDATE_IND16( fcrash )
 	int videocontrol = state->m_cps_a_regs[0x22 / 2];
 
 
-	flip_screen_set(screen.machine(), videocontrol & 0x8000);
+	state->flip_screen_set(videocontrol & 0x8000);
 
 	layercontrol = state->m_cps_b_regs[0x20 / 2];
 
@@ -304,7 +304,7 @@ static SCREEN_UPDATE_IND16( kodb )
 	int layercontrol, l0, l1, l2, l3;
 	int videocontrol = state->m_cps_a_regs[0x22 / 2];
 
-	flip_screen_set(screen.machine(), videocontrol & 0x8000);
+	state->flip_screen_set(videocontrol & 0x8000);
 
 	layercontrol = state->m_cps_b_regs[0x20 / 2];
 

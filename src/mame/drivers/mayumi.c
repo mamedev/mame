@@ -99,7 +99,7 @@ WRITE8_MEMBER(mayumi_state::bank_sel_w)
 
 	m_int_enable = data & 1;
 
-	flip_screen_set(machine(), data & 2);
+	flip_screen_set(data & 2);
 }
 
 WRITE8_MEMBER(mayumi_state::input_sel_w)

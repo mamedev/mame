@@ -109,7 +109,7 @@ WRITE16_MEMBER(wwfwfest_state::wwfwfest_irq_ack_w)
 
 WRITE16_MEMBER(wwfwfest_state::wwfwfest_flipscreen_w)
 {
-	flip_screen_set(machine(), data&1);
+	flip_screen_set(data&1);
 }
 
 /*- Palette Reads/Writes -*/
@@ -123,7 +123,7 @@ READ16_MEMBER(wwfwfest_state::wwfwfest_paletteram16_xxxxBBBBGGGGRRRR_word_r)
 WRITE16_MEMBER(wwfwfest_state::wwfwfest_paletteram16_xxxxBBBBGGGGRRRR_word_w)
 {
 	offset = (offset & 0x000f) | (offset & 0x7fc0) >> 2;
-	paletteram16_xxxxBBBBGGGGRRRR_word_w (space, offset, data, mem_mask);
+	paletteram_xxxxBBBBGGGGRRRR_word_w (space, offset, data, mem_mask);
 }
 
 /*- Priority Control -*/

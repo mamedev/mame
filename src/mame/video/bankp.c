@@ -126,7 +126,7 @@ WRITE8_MEMBER(bankp_state::bankp_out_w)
 	m_nmi_mask = (data & 0x10) >> 4;
 
 	/* bit 5 controls screen flip */
-	flip_screen_set(machine(), data & 0x20);
+	flip_screen_set(data & 0x20);
 
 	/* bits 6-7 unknown */
 }
@@ -171,7 +171,7 @@ SCREEN_UPDATE_IND16( bankp )
 {
 	bankp_state *state = screen.machine().driver_data<bankp_state>();
 
-	if (flip_screen_get(screen.machine()))
+	if (state->flip_screen())
 	{
 		state->m_fg_tilemap->set_scrollx(0, -state->m_scroll_x);
 		state->m_bg_tilemap->set_scrollx(0, 0);

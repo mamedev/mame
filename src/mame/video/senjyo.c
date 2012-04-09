@@ -179,7 +179,7 @@ static void draw_bgbitmap(running_machine &machine, bitmap_ind16 &bitmap,const r
 		bitmap.fill(0, cliprect);
 	else
 	{
-		int flip = flip_screen_get(machine);
+		int flip = state->flip_screen();
 
 		pen = 0;
 		count = 0;
@@ -220,7 +220,7 @@ static void draw_radar(running_machine &machine,bitmap_ind16 &bitmap,const recta
 				sx = (8 * (offs % 8) + x) + 256-64;
 				sy = ((offs & 0x1ff) / 8) + 96;
 
-				if (flip_screen_get(machine))
+				if (state->flip_screen())
 				{
 					sx = 255 - sx;
 					sy = 255 - sy;
@@ -255,7 +255,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 			flipx = spriteram[offs+1] & 0x40;
 			flipy = spriteram[offs+1] & 0x80;
 
-			if (flip_screen_get(machine))
+			if (state->flip_screen())
 			{
 				flipx = !flipx;
 				flipy = !flipy;
@@ -293,7 +293,7 @@ SCREEN_UPDATE_IND16( senjyo )
 	palette_set_color(screen.machine(),513,MAKE_RGB(0xff,0xff,0x00));	/* yellow for player */
 
 	{
-		int flip = flip_screen_get(screen.machine());
+		int flip = state->flip_screen();
 		int scrollx,scrolly;
 
 		for (i = 0;i < 32;i++)

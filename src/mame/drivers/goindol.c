@@ -34,7 +34,7 @@ WRITE8_MEMBER(goindol_state::goindol_bankswitch_w)
 		machine().tilemap().mark_all_dirty();
 	}
 
-	flip_screen_set(machine(), data & 0x20);
+	flip_screen_set(data & 0x20);
 }
 
 

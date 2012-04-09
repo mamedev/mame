@@ -189,7 +189,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 			number = (source[2] & 0x00ff) | (source[3] & 0x00ff) << 8;
 			colourbank = (source[4] & 0x000f);
 
-			if (flip_screen_get(machine)) {
+			if (state->flip_screen()) {
 				if (flipy) flipy=0; else flipy=1;
 				if (flipx) flipx=0; else flipx=1;
 				ypos=240-ypos-state->m_sprite_xoff;
@@ -197,7 +197,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 			}
 
 			for (count=0;count<chain;count++) {
-				if (flip_screen_get(machine)) {
+				if (state->flip_screen()) {
 					if (!flipy) {
 						drawgfx_transpen(bitmap,cliprect,gfx,number+count,colourbank,flipx,flipy,xpos,ypos+(16*(chain-1))-(16*count),0);
 					} else {

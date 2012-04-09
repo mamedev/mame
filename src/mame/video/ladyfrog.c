@@ -46,9 +46,9 @@ WRITE8_MEMBER(ladyfrog_state::ladyfrog_palette_w)
 {
 
 	if (offset & 0x100)
-		paletteram_xxxxBBBBGGGGRRRR_split2_w(space, (offset & 0xff) + (m_palette_bank << 8), data);
+		paletteram_xxxxBBBBGGGGRRRR_byte_split_hi_w(space, (offset & 0xff) + (m_palette_bank << 8), data);
 	else
-		paletteram_xxxxBBBBGGGGRRRR_split1_w(space, (offset & 0xff) + (m_palette_bank << 8), data);
+		paletteram_xxxxBBBBGGGGRRRR_byte_split_lo_w(space, (offset & 0xff) + (m_palette_bank << 8), data);
 }
 
 READ8_MEMBER(ladyfrog_state::ladyfrog_palette_r)

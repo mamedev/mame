@@ -49,7 +49,7 @@ SCREEN_UPDATE_IND16( hbarrel )
 {
 	dec0_state *state = screen.machine().driver_data<dec0_state>();
 
-	flip_screen_set(screen.machine(), screen.machine().device<deco_bac06_device>("tilegen1")->get_flip_state());
+	state->flip_screen_set(screen.machine().device<deco_bac06_device>("tilegen1")->get_flip_state());
 
 	screen.machine().device<deco_bac06_device>("tilegen3")->deco_bac06_pf_draw(screen.machine(),bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00);
 	screen.machine().device<deco_mxc06_device>("spritegen")->draw_sprites(screen.machine(), bitmap, cliprect, state->m_buffered_spriteram, 0x08, 0x08, 0x0f);
@@ -67,7 +67,7 @@ SCREEN_UPDATE_IND16( hbarrel )
 SCREEN_UPDATE_IND16( baddudes )
 {
 	dec0_state *state = screen.machine().driver_data<dec0_state>();
-	flip_screen_set(screen.machine(), screen.machine().device<deco_bac06_device>("tilegen1")->get_flip_state());
+	state->flip_screen_set(screen.machine().device<deco_bac06_device>("tilegen1")->get_flip_state());
 
 	/* WARNING: inverted wrt Midnight Resistance */
 	if ((state->m_pri & 0x01) == 0)
@@ -108,7 +108,7 @@ SCREEN_UPDATE_IND16( robocop )
 	dec0_state *state = screen.machine().driver_data<dec0_state>();
 	int trans;
 
-	flip_screen_set(screen.machine(), screen.machine().device<deco_bac06_device>("tilegen1")->get_flip_state());
+	state->flip_screen_set(screen.machine().device<deco_bac06_device>("tilegen1")->get_flip_state());
 
 	if (state->m_pri & 0x04)
 		trans = 0x08;
@@ -153,7 +153,7 @@ SCREEN_UPDATE_IND16( birdtry )
 {
 	dec0_state *state = screen.machine().driver_data<dec0_state>();
 
-	flip_screen_set(screen.machine(), screen.machine().device<deco_bac06_device>("tilegen1")->get_flip_state());
+	state->flip_screen_set(screen.machine().device<deco_bac06_device>("tilegen1")->get_flip_state());
 
 	/* This game doesn't have the extra playfield chip on the game board, but
     the palette does show through. */
@@ -169,7 +169,7 @@ SCREEN_UPDATE_IND16( birdtry )
 SCREEN_UPDATE_IND16( hippodrm )
 {
 	dec0_state *state = screen.machine().driver_data<dec0_state>();
-	flip_screen_set(screen.machine(), screen.machine().device<deco_bac06_device>("tilegen1")->get_flip_state());
+	state->flip_screen_set(screen.machine().device<deco_bac06_device>("tilegen1")->get_flip_state());
 
 	if (state->m_pri & 0x01)
 	{
@@ -192,7 +192,7 @@ SCREEN_UPDATE_IND16( hippodrm )
 SCREEN_UPDATE_IND16( slyspy )
 {
 	dec0_state *state = screen.machine().driver_data<dec0_state>();
-	flip_screen_set(screen.machine(), screen.machine().device<deco_bac06_device>("tilegen1")->get_flip_state());
+	state->flip_screen_set(screen.machine().device<deco_bac06_device>("tilegen1")->get_flip_state());
 
 	screen.machine().device<deco_bac06_device>("tilegen3")->deco_bac06_pf_draw(screen.machine(),bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00);
 	screen.machine().device<deco_bac06_device>("tilegen2")->deco_bac06_pf_draw(screen.machine(),bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);
@@ -214,7 +214,7 @@ SCREEN_UPDATE_IND16( midres )
 	dec0_state *state = screen.machine().driver_data<dec0_state>();
 	int trans;
 
-	flip_screen_set(screen.machine(), screen.machine().device<deco_bac06_device>("tilegen1")->get_flip_state());
+	state->flip_screen_set(screen.machine().device<deco_bac06_device>("tilegen1")->get_flip_state());
 
 	if (state->m_pri & 0x04)
 		trans = 0x00;

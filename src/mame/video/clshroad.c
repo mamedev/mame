@@ -36,7 +36,7 @@
 
 WRITE8_MEMBER(clshroad_state::clshroad_flipscreen_w)
 {
-	flip_screen_set(machine(),  data & 1 );
+	flip_screen_set(data & 1 );
 }
 
 
@@ -301,7 +301,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 		int flipy	=	0;
 
 		x -= 0x4a/2;
-		if (flip_screen_get(machine))
+		if (state->flip_screen())
 		{
 			y = 240 - y;
 			flipx = !flipx;

@@ -54,7 +54,7 @@ WRITE8_MEMBER(shootout_state::sound_cpu_command_w)
 
 WRITE8_MEMBER(shootout_state::shootout_flipscreen_w)
 {
-	flip_screen_set(machine(), data & 0x01);
+	flip_screen_set(data & 0x01);
 }
 
 WRITE8_MEMBER(shootout_state::shootout_coin_counter_w)

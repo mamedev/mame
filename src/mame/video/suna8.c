@@ -313,7 +313,7 @@ static void draw_normal_sprites(running_machine &machine, bitmap_ind16 &bitmap,c
 				if (flipx)	tile_flipx = !tile_flipx;
 				if (flipy)	tile_flipy = !tile_flipy;
 
-				if (flip_screen_get(machine))
+				if (state->flip_screen())
 				{
 					sx = max_x - sx;	tile_flipx = !tile_flipx;
 					sy = max_y - sy;	tile_flipy = !tile_flipy;
@@ -381,7 +381,7 @@ static void draw_text_sprites(running_machine &machine, bitmap_ind16 &bitmap,con
 				int sx		=	 x + tx * 8;
 				int sy		=	(y + real_ty * 8) & 0xff;
 
-				if (flip_screen_get(machine))
+				if (state->flip_screen())
 				{
 					sx = max_x - sx;	flipx = !flipx;
 					sy = max_y - sy;	flipy = !flipy;

@@ -249,7 +249,7 @@ static ADDRESS_MAP_START( sandscrp, AS_PROGRAM, 16, sandscrp_state )
 	AM_RANGE(0x402000, 0x402fff) AM_RAM AM_BASE(m_vscroll[1])									//
 	AM_RANGE(0x403000, 0x403fff) AM_RAM AM_BASE(m_vscroll[0])									//
 	AM_RANGE(0x500000, 0x501fff) AM_DEVREADWRITE_LEGACY("pandora", pandora_spriteram_LSB_r, pandora_spriteram_LSB_w ) // sprites
-	AM_RANGE(0x600000, 0x600fff) AM_RAM_WRITE(paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_SHARE("paletteram")	// Palette
+	AM_RANGE(0x600000, 0x600fff) AM_RAM_WRITE(paletteram_xGGGGGRRRRRBBBBB_word_w) AM_SHARE("paletteram")	// Palette
 	AM_RANGE(0xa00000, 0xa00001) AM_WRITE(sandscrp_coin_counter_w)	// Coin Counters (Lockout unused)
 	AM_RANGE(0xb00000, 0xb00001) AM_READ_PORT("P1")
 	AM_RANGE(0xb00002, 0xb00003) AM_READ_PORT("P2")

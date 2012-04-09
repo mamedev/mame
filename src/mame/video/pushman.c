@@ -105,7 +105,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		flipx = spriteram[offs + 1] & 2;
 		flipy = spriteram[offs + 1] & 1;	/* flip y untested */
 
-		if (flip_screen_get(machine))
+		if (state->flip_screen())
 		{
 			x = 240 - x;
 			y = 240 - y;

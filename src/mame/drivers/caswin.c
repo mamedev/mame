@@ -115,7 +115,7 @@ WRITE8_MEMBER(caswin_state::vvillage_scroll_w)
 /*---- ---x flip screen */
 WRITE8_MEMBER(caswin_state::vvillage_vregs_w)
 {
-	flip_screen_set(machine(), data & 1);
+	flip_screen_set(data & 1);
 }
 
 /**********************

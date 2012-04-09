@@ -179,13 +179,13 @@ static SCREEN_UPDATE_IND16(pturn)
 		flipy=spriteram[offs+1]&0x80;
 
 
-		if (flip_screen_x_get(screen.machine()))
+		if (state->flip_screen_x())
 		{
 			sx = 224 - sx;
 			flipx ^= 0x40;
 		}
 
-		if (flip_screen_y_get(screen.machine()))
+		if (state->flip_screen_y())
 		{
 			flipy ^= 0x80;
 			sy = 224 - sy;
@@ -277,7 +277,7 @@ WRITE8_MEMBER(pturn_state::bgbank_w)
 
 WRITE8_MEMBER(pturn_state::flip_w)
 {
-	flip_screen_set(machine(), data);
+	flip_screen_set(data);
 }
 
 

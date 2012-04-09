@@ -17,7 +17,7 @@ WRITE16_MEMBER(ddragon3_state::ddragon3_scroll_w)
 		case 2: COMBINE_DATA(&m_bg_scrollx);	break;	// Scroll X, BG0
 		case 3: COMBINE_DATA(&m_bg_scrolly);	break;	// Scroll Y, BG0
 		case 4:										break;	// Unknown write
-		case 5: flip_screen_set(machine(), data & 0x01);		break;	// Flip Screen
+		case 5: flip_screen_set(data & 0x01);		break;	// Flip Screen
 		case 6:
 			COMBINE_DATA(&m_bg_tilebase);			// BG Tile Base
 			m_bg_tilebase &= 0x1ff;
@@ -35,7 +35,7 @@ READ16_MEMBER(ddragon3_state::ddragon3_scroll_r)
 		case 1: return m_fg_scrolly;
 		case 2: return m_bg_scrollx;
 		case 3: return m_bg_scrolly;
-		case 5: return flip_screen_get(machine());
+		case 5: return flip_screen();
 		case 6: return m_bg_tilebase;
 	}
 
@@ -138,7 +138,7 @@ static void draw_sprites( running_machine& machine, bitmap_ind16 &bitmap, const 
 			if (attr & 0x02) sy = 239 + (0x100 - sy); else sy = 240 - sy;
 			if (sx > 0x17f) sx = 0 - (0x200 - sx);
 
-			if (flip_screen_get(machine))
+			if (state->flip_screen())
 			{
 				sx = 304 - sx;
 				sy = 224 - sy;
@@ -150,7 +150,7 @@ static void draw_sprites( running_machine& machine, bitmap_ind16 &bitmap, const 
 			{
 				drawgfx_transpen(bitmap, cliprect,
 					machine.gfx[1], code + i, color, flipx, flipy,
-					sx, sy + (flip_screen_get(machine) ? (i * 16) : (-i * 16)), 0);
+					sx, sy + (state->flip_screen() ? (i * 16) : (-i * 16)), 0);
 			}
 		}
 

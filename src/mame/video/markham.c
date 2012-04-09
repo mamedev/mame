@@ -47,9 +47,9 @@ WRITE8_MEMBER(markham_state::markham_videoram_w)
 
 WRITE8_MEMBER(markham_state::markham_flipscreen_w)
 {
-	if (flip_screen_get(machine()) != (data & 0x01))
+	if (flip_screen() != (data & 0x01))
 	{
-		flip_screen_set(machine(), data & 0x01);
+		flip_screen_set(data & 0x01);
 		machine().tilemap().mark_all_dirty();
 	}
 }
@@ -83,15 +83,15 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		int chr = spriteram[offs + 1];
 		int col = spriteram[offs + 2];
 
-		int fx = flip_screen_get(machine);
-		int fy = flip_screen_get(machine);
+		int fx = state->flip_screen();
+		int fy = state->flip_screen();
 
 		int x = spriteram[offs + 3];
 		int y = spriteram[offs + 0];
 		int px, py;
 		col &= 0x3f ;
 
-		if (flip_screen_get(machine) == 0)
+		if (state->flip_screen() == 0)
 		{
 			px = x - 2;
 			py = 240 - y;

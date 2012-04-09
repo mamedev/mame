@@ -98,12 +98,12 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 WRITE8_MEMBER(superwng_state::superwng_flip_screen_x_w)
 {
-	flip_screen_x_set(machine(), ~data & 1);
+	flip_screen_x_set(~data & 1);
 }
 
 WRITE8_MEMBER(superwng_state::superwng_flip_screen_y_w)
 {
-	flip_screen_y_set(machine(), ~data & 1);
+	flip_screen_y_set(~data & 1);
 }
 
 static VIDEO_START( superwng )
@@ -118,7 +118,7 @@ static VIDEO_START( superwng )
 static SCREEN_UPDATE_IND16( superwng )
 {
 	superwng_state *state = screen.machine().driver_data<superwng_state>();
-	int flip=flip_screen_get(screen.machine());
+	int flip=state->flip_screen();
 
 	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	rectangle tmp=cliprect;
@@ -273,7 +273,7 @@ WRITE8_MEMBER(superwng_state::superwng_tilebank_w)
 
 WRITE8_MEMBER(superwng_state::superwng_flip_screen_w)
 {
-	flip_screen_set(machine(), ~data & 0x01);
+	flip_screen_set(~data & 0x01);
 	m_bg_tilemap->mark_all_dirty();
 	m_fg_tilemap->mark_all_dirty();
 }

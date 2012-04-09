@@ -1534,7 +1534,7 @@ static WRITE16_HANDLER( seibu_common_video_regs_w )
 
 	switch(offset)
 	{
-		case (0x01a/2): { flip_screen_set(space->machine(), seibu_vregs[offset] & 0x01); break; }
+		case (0x01a/2): { state->flip_screen_set(seibu_vregs[offset] & 0x01); break; }
 		case (0x01c/2): { state->m_layer_disable =  seibu_vregs[offset]; break; }
 		case (0x020/2): { state->m_scrollram16[0] = seibu_vregs[offset]; break; }
 		case (0x022/2): { state->m_scrollram16[1] = seibu_vregs[offset]; break; }

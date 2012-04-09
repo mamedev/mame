@@ -56,7 +56,7 @@ SCREEN_UPDATE_IND16( vaportra )
 	UINT16 flip = deco16ic_pf_control_r(state->m_deco_tilegen1, 0, 0xffff);
 	int pri = state->m_priority[0] & 0x03;
 
-	flip_screen_set(screen.machine(), !BIT(flip, 7));
+	state->flip_screen_set(!BIT(flip, 7));
 	deco16ic_pf_update(state->m_deco_tilegen1, 0, 0);
 	deco16ic_pf_update(state->m_deco_tilegen2, 0, 0);
 

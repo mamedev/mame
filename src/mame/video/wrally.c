@@ -125,7 +125,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 
 		if (high_priority != priority) continue;
 
-		if (flip_screen_get(machine)) {
+		if (state->flip_screen()) {
 			sy = sy + 248;
 		}
 
@@ -180,7 +180,7 @@ SCREEN_UPDATE_IND16( wrally )
 {
 	wrally_state *state = screen.machine().driver_data<wrally_state>();
 	/* set scroll registers */
-	if (!flip_screen_get(screen.machine())) {
+	if (!state->flip_screen()) {
 		state->m_pant[0]->set_scrolly(0, state->m_vregs[0]);
 		state->m_pant[0]->set_scrollx(0, state->m_vregs[1]+4);
 		state->m_pant[1]->set_scrolly(0, state->m_vregs[2]);

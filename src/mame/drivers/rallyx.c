@@ -243,7 +243,7 @@ WRITE8_MEMBER(rallyx_state::rallyx_latch_w)
 			break;
 
 		case 0x03:	/* FLIP */
-			flip_screen_set_no_update(machine(), bit);
+			flip_screen_set_no_update(bit);
 			machine().tilemap().set_flip_all(bit * (TILEMAP_FLIPX | TILEMAP_FLIPY));
 			break;
 
@@ -285,7 +285,7 @@ WRITE8_MEMBER(rallyx_state::locomotn_latch_w)
 			break;
 
 		case 0x03:	/* FLIP */
-			flip_screen_set_no_update(machine(), bit);
+			flip_screen_set_no_update(bit);
 			machine().tilemap().set_flip_all(bit * (TILEMAP_FLIPX | TILEMAP_FLIPY));
 			break;
 

@@ -66,7 +66,7 @@ WRITE8_MEMBER(bogeyman_state::bogeyman_colorram2_w)
 WRITE8_MEMBER(bogeyman_state::bogeyman_paletteram_w)
 {
 	/* RGB output is inverted */
-	paletteram_BBGGGRRR_w(space, offset, ~data);
+	paletteram_BBGGGRRR_byte_w(space, offset, ~data);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
@@ -121,7 +121,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 
 			if (multi) sy -= 16;
 
-			if (flip_screen_get(machine))
+			if (state->flip_screen())
 			{
 				sx = 240 - sx;
 				sy = 240 - sy;
@@ -141,7 +141,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 					machine.gfx[2],
 					code + 1, color,
 					flipx, flipy,
-					sx, sy + (flip_screen_get(machine) ? -16 : 16), 0);
+					sx, sy + (state->flip_screen() ? -16 : 16), 0);
 			}
 		}
 	}

@@ -131,8 +131,8 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( main_portmap, AS_IO, 8, iqblock_state )
-	AM_RANGE(0x2000, 0x23ff) AM_WRITE(paletteram_xBBBBBGGGGGRRRRR_split1_w)
-	AM_RANGE(0x2800, 0x2bff) AM_WRITE(paletteram_xBBBBBGGGGGRRRRR_split2_w)
+	AM_RANGE(0x2000, 0x23ff) AM_WRITE(paletteram_xBBBBBGGGGGRRRRR_byte_split_lo_w)
+	AM_RANGE(0x2800, 0x2bff) AM_WRITE(paletteram_xBBBBBGGGGGRRRRR_byte_split_hi_w)
 	AM_RANGE(0x6000, 0x603f) AM_WRITE(iqblock_fgscroll_w)
 	AM_RANGE(0x6800, 0x69ff) AM_WRITE(iqblock_fgvideoram_w)	/* initialized up to 6fff... bug or larger tilemap? */
 	AM_RANGE(0x7000, 0x7fff) AM_WRITE(iqblock_bgvideoram_w)

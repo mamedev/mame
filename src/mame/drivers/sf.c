@@ -191,7 +191,7 @@ static WRITE8_DEVICE_HANDLER( msm5205_w )
 static ADDRESS_MAP_START( sf_map, AS_PROGRAM, 16, sf_state )
 	AM_RANGE(0x000000, 0x04ffff) AM_ROM
 	AM_RANGE(0x800000, 0x800fff) AM_RAM_WRITE(sf_videoram_w) AM_BASE_SIZE(m_videoram, m_videoram_size)
-	AM_RANGE(0xb00000, 0xb007ff) AM_RAM_WRITE(paletteram16_xxxxRRRRGGGGBBBB_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0xb00000, 0xb007ff) AM_RAM_WRITE(paletteram_xxxxRRRRGGGGBBBB_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0xc00000, 0xc00001) AM_READ_PORT("COINS")
 	AM_RANGE(0xc00002, 0xc00003) AM_READ_PORT("IN0")
 	AM_RANGE(0xc00004, 0xc00005) AM_READ(button1_r)
@@ -213,7 +213,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sfus_map, AS_PROGRAM, 16, sf_state )
 	AM_RANGE(0x000000, 0x04ffff) AM_ROM
 	AM_RANGE(0x800000, 0x800fff) AM_RAM_WRITE(sf_videoram_w) AM_BASE_SIZE(m_videoram, m_videoram_size)
-	AM_RANGE(0xb00000, 0xb007ff) AM_RAM_WRITE(paletteram16_xxxxRRRRGGGGBBBB_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0xb00000, 0xb007ff) AM_RAM_WRITE(paletteram_xxxxRRRRGGGGBBBB_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0xc00000, 0xc00001) AM_READ_PORT("IN0")
 	AM_RANGE(0xc00002, 0xc00003) AM_READ_PORT("IN1")
 	AM_RANGE(0xc00004, 0xc00005) AM_READ(dummy_r)
@@ -235,7 +235,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sfjp_map, AS_PROGRAM, 16, sf_state )
 	AM_RANGE(0x000000, 0x04ffff) AM_ROM
 	AM_RANGE(0x800000, 0x800fff) AM_RAM_WRITE(sf_videoram_w) AM_BASE_SIZE(m_videoram, m_videoram_size)
-	AM_RANGE(0xb00000, 0xb007ff) AM_RAM_WRITE(paletteram16_xxxxRRRRGGGGBBBB_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0xb00000, 0xb007ff) AM_RAM_WRITE(paletteram_xxxxRRRRGGGGBBBB_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0xc00000, 0xc00001) AM_READ_PORT("COINS")
 	AM_RANGE(0xc00002, 0xc00003) AM_READ_PORT("P1")
 	AM_RANGE(0xc00004, 0xc00005) AM_READ_PORT("P2")

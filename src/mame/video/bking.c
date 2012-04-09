@@ -124,9 +124,9 @@ WRITE8_MEMBER(bking_state::bking_cont1_w)
 
 	coin_lockout_global_w(machine(), ~data & 0x01);
 
-	flip_screen_set_no_update(machine(), data & 0x04);
+	flip_screen_set_no_update(data & 0x04);
 
-	machine().tilemap().set_flip_all(flip_screen_get(machine()) ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
+	machine().tilemap().set_flip_all(flip_screen() ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
 
 	m_controller = data & 0x02;
 
@@ -304,8 +304,8 @@ SCREEN_VBLANK( bking )
 			latch = 0x0400;
 		}
 
-		state->m_bg_tilemap->set_scrollx(0, flip_screen_get(screen.machine()) ? -xld : xld);
-		state->m_bg_tilemap->set_scrolly(0, flip_screen_get(screen.machine()) ? -yld : yld);
+		state->m_bg_tilemap->set_scrollx(0, state->flip_screen() ? -xld : xld);
+		state->m_bg_tilemap->set_scrolly(0, state->flip_screen() ? -yld : yld);
 
 		state->m_bg_tilemap->draw(state->m_tmp_bitmap1, rect, 0, 0);
 
@@ -331,8 +331,8 @@ SCREEN_VBLANK( bking )
 						int col = (xld + x) / 8 + 1;
 						int row = (yld + y) / 8 + 0;
 
-						latch |= (flip_screen_get(screen.machine()) ? 31 - col : col) << 0;
-						latch |= (flip_screen_get(screen.machine()) ? 31 - row : row) << 5;
+						latch |= (state->flip_screen() ? 31 - col : col) << 0;
+						latch |= (state->flip_screen() ? 31 - row : row) << 5;
 
 						state->m_pc3259_output[0] = (latch >> 0x0) & 0xf;
 						state->m_pc3259_output[1] = (latch >> 0x4) & 0xf;

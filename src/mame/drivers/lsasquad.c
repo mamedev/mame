@@ -160,7 +160,7 @@ WRITE8_MEMBER(lsasquad_state::lsasquad_bankswitch_w)
 	/* bit 3 is zeroed on startup, maybe reset sound CPU */
 
 	/* bit 4 flips screen */
-	flip_screen_set(machine(), data & 0x10);
+	flip_screen_set(data & 0x10);
 
 	/* other bits unknown */
 }

@@ -121,7 +121,7 @@ static ADDRESS_MAP_START( sengokmj_map, AS_PROGRAM, 16, sengokmj_state )
 	AM_RANGE(0x0c800, 0x0cfff) AM_RAM_WRITE_LEGACY(seibucrtc_sc1vram_w) AM_BASE_LEGACY(&seibucrtc_sc1vram)
 	AM_RANGE(0x0d000, 0x0d7ff) AM_RAM_WRITE_LEGACY(seibucrtc_sc2vram_w) AM_BASE_LEGACY(&seibucrtc_sc2vram)
 	AM_RANGE(0x0d800, 0x0e7ff) AM_RAM_WRITE_LEGACY(seibucrtc_sc3vram_w) AM_BASE_LEGACY(&seibucrtc_sc3vram)
-	AM_RANGE(0x0e800, 0x0f7ff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x0e800, 0x0f7ff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x0f800, 0x0ffff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xc0000, 0xfffff) AM_ROM
 ADDRESS_MAP_END

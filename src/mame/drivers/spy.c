@@ -63,7 +63,7 @@ WRITE8_MEMBER(spy_state::spy_bankedram1_w)
 
 	if (m_rambank & 1)
 	{
-		paletteram_xBBBBBGGGGGRRRRR_be_w(space,offset,data);
+		paletteram_xBBBBBGGGGGRRRRR_byte_be_w(space,offset,data);
 	}
 	else if (m_rambank & 2)
 	{

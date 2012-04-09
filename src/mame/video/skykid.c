@@ -83,9 +83,9 @@ static TILE_GET_INFO( tx_get_tile_info )
        characters when screen is flipped, we have to flip them back. */
 	SET_TILE_INFO(
 			0,
-			code | (flip_screen_get(machine) ? 0x100 : 0),
+			code | (state->flip_screen() ? 0x100 : 0),
 			attr & 0x3f,
-			flip_screen_get(machine) ? (TILE_FLIPY | TILE_FLIPX) : 0);
+			state->flip_screen() ? (TILE_FLIPY | TILE_FLIPX) : 0);
 }
 
 
@@ -166,7 +166,7 @@ WRITE8_MEMBER(skykid_state::skykid_scroll_y_w)
 WRITE8_MEMBER(skykid_state::skykid_flipscreen_priority_w)
 {
 	m_priority = data;
-	flip_screen_set(machine(), offset & 1);
+	flip_screen_set(offset & 1);
 }
 
 
@@ -206,7 +206,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 		sprite &= ~sizex;
 		sprite &= ~(sizey << 1);
 
-		if (flip_screen_get(machine))
+		if (state->flip_screen())
 		{
 			flipx ^= 1;
 			flipy ^= 1;
@@ -234,7 +234,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 SCREEN_UPDATE_IND16( skykid )
 {
 	skykid_state *state = screen.machine().driver_data<skykid_state>();
-	if (flip_screen_get(screen.machine()))
+	if (state->flip_screen())
 	{
 		state->m_bg_tilemap->set_scrollx(0, 189 - (state->m_scroll_x ^ 1));
 		state->m_bg_tilemap->set_scrolly(0, 7 - state->m_scroll_y);

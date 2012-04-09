@@ -690,7 +690,7 @@ WRITE8_MEMBER(mappy_state::mappy_latch_w)
 			break;
 
 		case 0x04:	/* FLIP */
-			flip_screen_set(machine(), bit);
+			flip_screen_set(bit);
 			break;
 
 		case 0x06:	/* SOUND ON */

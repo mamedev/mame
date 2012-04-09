@@ -187,9 +187,9 @@ WRITE8_MEMBER(pacland_state::pacland_subreset_w)
 WRITE8_MEMBER(pacland_state::pacland_flipscreen_w)
 {
 	int bit = !BIT(offset,11);
-	/* can't use flip_screen_set(machine(), ) because the visible area is asymmetrical */
-	flip_screen_set_no_update(machine(), bit);
-	machine().tilemap().set_flip_all(flip_screen_get(machine()) ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
+	/* can't use flip_screen_set() because the visible area is asymmetrical */
+	flip_screen_set_no_update(bit);
+	machine().tilemap().set_flip_all(flip_screen() ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
 }
 
 

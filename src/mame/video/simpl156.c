@@ -40,7 +40,7 @@ SCREEN_UPDATE_IND16( simpl156 )
 	deco16ic_tilemap_1_draw(state->m_deco_tilegen1, bitmap, cliprect, 0, 4);
 
 	//FIXME: flip_screen_x should not be written!
-	flip_screen_set_no_update(screen.machine(), 1);
+	state->flip_screen_set_no_update(1);
 
 	screen.machine().device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, state->m_spriteram, 0x1400/4); // 0x1400/4 seems right for charlien (doesn't initialize any more RAM, so will draw a garbage 0 with more)
 	return 0;

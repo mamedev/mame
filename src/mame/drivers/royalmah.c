@@ -409,7 +409,7 @@ WRITE8_MEMBER(royalmah_state::mjapinky_bank_w)
 
 WRITE8_MEMBER(royalmah_state::mjapinky_palbank_w)
 {
-	flip_screen_set(machine(), ~data & 4);
+	flip_screen_set(~data & 4);
 	m_palette_base = (data >> 3) & 0x01;
 	coin_counter_w(machine(), 0,data & 2);	// in
 	coin_counter_w(machine(), 1,data & 1);	// out
@@ -845,7 +845,7 @@ READ8_MEMBER(royalmah_state::janptr96_unknown_r)
 
 WRITE8_MEMBER(royalmah_state::janptr96_coin_counter_w)
 {
-	flip_screen_set(machine(), ~data & 4);
+	flip_screen_set(~data & 4);
 	coin_counter_w(machine(), 0,data & 2);	// in
 	coin_counter_w(machine(), 1,data & 1);	// out
 }
@@ -872,7 +872,7 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(royalmah_state::mjifb_coin_counter_w)
 {
-	flip_screen_set(machine(),  data & 4);
+	flip_screen_set(data & 4);
 	coin_counter_w(machine(), 0,data & 2);	// in
 	coin_counter_w(machine(), 1,data & 1);	// out
 }
@@ -1216,7 +1216,7 @@ WRITE8_MEMBER(royalmah_state::mjvegasa_rom_io_w)
 
 WRITE8_MEMBER(royalmah_state::mjvegasa_coin_counter_w)
 {
-	flip_screen_set(machine(),  data & 4);
+	flip_screen_set(data & 4);
 	coin_counter_w(machine(), 0,data & 2);	// in
 	coin_counter_w(machine(), 1,data & 1);	// out
 }

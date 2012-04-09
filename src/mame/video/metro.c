@@ -752,7 +752,7 @@ SCREEN_UPDATE_IND16( metro )
 	if (screenctrl & 2)
 		return 0;
 
-	//flip_screen_set(screen.machine(), screenctrl & 1);
+	//state->flip_screen_set(screenctrl & 1);
 	state->m_flip_screen = screenctrl & 1;
 
 	/* If the game supports 16x16 tiles, make sure that the

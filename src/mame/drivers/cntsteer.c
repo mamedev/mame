@@ -395,7 +395,7 @@ WRITE8_MEMBER(cntsteer_state::zerotrgt_vregs_w)
 				m_bg_tilemap->mark_all_dirty();
 				break;
 		case 3:	m_rotation_sign = (data & 1);
-				flip_screen_set(machine(), !(data & 4));
+				flip_screen_set(!(data & 4));
 				m_scrolly_hi = (data & 0x30) << 4;
 				m_scrollx_hi = (data & 0xc0) << 2;
 				break;

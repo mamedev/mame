@@ -194,7 +194,7 @@ static void toki_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,con
 			flipy   = 0;
 			tile    = (sprite_word[1] & 0xfff) + ((sprite_word[2] & 0x8000) >> 3);
 
-			if (flip_screen_get(machine)) {
+			if (state->flip_screen()) {
 				x=240-x;
 				y=240-y;
 				if (flipx) flipx=0; else flipx=1;
@@ -276,7 +276,7 @@ SCREEN_UPDATE_IND16( toki )
 	state->m_foreground_layer->set_scrollx(0, foreground_x_scroll );
 	state->m_foreground_layer->set_scrolly(0, foreground_y_scroll );
 
-	flip_screen_set(screen.machine(), (state->m_scrollram16[0x28]&0x8000)==0);
+	state->flip_screen_set((state->m_scrollram16[0x28]&0x8000)==0);
 
 	if (state->m_scrollram16[0x28]&0x100) {
 		state->m_background_layer->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE,0);

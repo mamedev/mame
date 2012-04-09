@@ -296,6 +296,24 @@ inline UINT8 pal7bit(UINT8 bits)
 }
 
 
+//-------------------------------------------------
+//  palexpand - expand a palette value to 8 bits
+//-------------------------------------------------
+
+template<int _NumBits>
+inline UINT8 palexpand(UINT8 data)
+{
+	if (_NumBits == 1) return pal1bit(data);
+	if (_NumBits == 2) return pal2bit(data);
+	if (_NumBits == 3) return pal3bit(data);
+	if (_NumBits == 4) return pal4bit(data);
+	if (_NumBits == 5) return pal5bit(data);
+	if (_NumBits == 6) return pal6bit(data);
+	if (_NumBits == 7) return pal7bit(data);
+	return data;
+}
+
+
 /*-------------------------------------------------
     pal332 - create a 3-3-2 color by extracting
     bits from a UINT32

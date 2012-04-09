@@ -376,7 +376,7 @@ static void draw_sprites(running_machine& machine, bitmap_ind16 &bitmap)
 			// Ninja Kid II doesn't use the 'big' feature so it might not be available on the board
 			int const big = (sprptr[2] & 0x04) >> 2;
 
-			if (flip_screen_get(machine))
+			if (state->flip_screen())
 			{
 				sx = 240 - 16*big - sx;
 				sy = 240 - 16*big - sy;

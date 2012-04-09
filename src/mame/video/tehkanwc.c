@@ -45,12 +45,12 @@ WRITE8_MEMBER(tehkanwc_state::tehkanwc_scroll_y_w)
 
 WRITE8_MEMBER(tehkanwc_state::tehkanwc_flipscreen_x_w)
 {
-	flip_screen_x_set(machine(), data & 0x40);
+	flip_screen_x_set(data & 0x40);
 }
 
 WRITE8_MEMBER(tehkanwc_state::tehkanwc_flipscreen_y_w)
 {
-	flip_screen_y_set(machine(), data & 0x40);
+	flip_screen_y_set(data & 0x40);
 }
 
 WRITE8_MEMBER(tehkanwc_state::gridiron_led0_w)
@@ -140,13 +140,13 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 		int sx = spriteram[offs + 2] + ((attr & 0x20) << 3) - 128;
 		int sy = spriteram[offs + 3];
 
-		if (flip_screen_x_get(machine))
+		if (state->flip_screen_x())
 		{
 			sx = 240 - sx;
 			flipx = !flipx;
 		}
 
-		if (flip_screen_y_get(machine))
+		if (state->flip_screen_y())
 		{
 			sy = 240 - sy;
 			flipy = !flipy;

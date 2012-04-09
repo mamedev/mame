@@ -165,9 +165,9 @@ WRITE8_MEMBER(kingofb_state::kingofb_f800_w)
 		m_bg_tilemap->mark_all_dirty();
 	}
 
-	if (flip_screen_get(machine()) != (data & 0x80))
+	if (flip_screen() != (data & 0x80))
 	{
-		flip_screen_set(machine(), data & 0x80);
+		flip_screen_set(data & 0x80);
 		machine().tilemap().mark_all_dirty();
 	}
 }
@@ -226,7 +226,7 @@ static void kingofb_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,
 		sx = spriteram[roffs + 1];
 		sy = spriteram[roffs];
 
-		if (flip_screen_get(machine))
+		if (state->flip_screen())
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;
@@ -288,7 +288,7 @@ static void ringking_draw_sprites( running_machine &machine, bitmap_ind16 &bitma
 		int sx = spriteram[offs + 2];
 		int sy = spriteram[offs];
 
-		if (flip_screen_get(machine))
+		if (state->flip_screen())
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;

@@ -188,9 +188,9 @@ static TILE_GET_INFO( get_fg_tile_info )
 	UINT8 color = ((attr & 0x03) << 4) | ((attr & 0x3c) >> 2);
 	SET_TILE_INFO(
 			0,
-			state->m_xevious_fg_videoram[tile_index] | (flip_screen_get(machine) ? 0x100 : 0),
+			state->m_xevious_fg_videoram[tile_index] | (state->flip_screen() ? 0x100 : 0),
 			color,
-			TILE_FLIPYX((attr & 0xc0) >> 6) ^ (flip_screen_get(machine) ? TILE_FLIPX : 0));
+			TILE_FLIPYX((attr & 0xc0) >> 6) ^ (state->flip_screen() ? TILE_FLIPX : 0));
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
@@ -297,7 +297,7 @@ WRITE8_HANDLER( xevious_vh_latch_w )
 		state->m_fg_tilemap->set_scrolly(0,scroll);
 		break;
 	case 7:
-		flip_screen_set(space->machine(), scroll & 1);
+		state->flip_screen_set(scroll & 1);
 		break;
    default:
 		   logerror("CRTC WRITE REG: %x  Data: %03x\n",reg, scroll);
@@ -448,7 +448,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 			sx = spriteram_2[offs + 1] - 40 + 0x100*(spriteram_3[offs + 1] & 1);
 			sy = 28*8-spriteram_2[offs]-1;
 
-			if (flip_screen_get(machine))
+			if (state->flip_screen())
 			{
 				flipx = !flipx;
 				flipy = !flipy;

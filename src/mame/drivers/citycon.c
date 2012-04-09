@@ -16,7 +16,7 @@ Dip locations added from dip listing at crazykong.com
 
 READ8_MEMBER(citycon_state::citycon_in_r)
 {
-	return input_port_read(machine(), flip_screen_get(machine()) ? "P2" : "P1");
+	return input_port_read(machine(), flip_screen() ? "P2" : "P1");
 }
 
 READ8_MEMBER(citycon_state::citycon_irq_ack_r)
@@ -37,7 +37,7 @@ static ADDRESS_MAP_START( citycon_map, AS_PROGRAM, 8, citycon_state )
 	AM_RANGE(0x3002, 0x3002) AM_READ_PORT("DSW2") AM_WRITE(soundlatch2_w)
 	AM_RANGE(0x3004, 0x3005) AM_READNOP AM_WRITEONLY AM_BASE(m_scroll)
 	AM_RANGE(0x3007, 0x3007) AM_READ(citycon_irq_ack_r)
-	AM_RANGE(0x3800, 0x3cff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_be_w) AM_SHARE("paletteram")
+	AM_RANGE(0x3800, 0x3cff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_byte_be_w) AM_SHARE("paletteram")
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

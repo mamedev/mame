@@ -158,7 +158,7 @@ WRITE8_MEMBER(blktiger_state::blktiger_video_control_w)
 	device_set_input_line(m_audiocpu, INPUT_LINE_RESET, (data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
 
 	/* bit 6 flips screen */
-	flip_screen_set(machine(), data & 0x40);
+	flip_screen_set(data & 0x40);
 
 	/* bit 7 enables characters? Just a guess */
 	m_chon = ~data & 0x80;
@@ -206,7 +206,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		int color = attr & 0x07;
 		int flipx = attr & 0x08;
 
-		if (flip_screen_get(machine))
+		if (state->flip_screen())
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;
@@ -216,7 +216,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		drawgfx_transpen(bitmap,cliprect,machine.gfx[2],
 				code,
 				color,
-				flipx,flip_screen_get(machine),
+				flipx,state->flip_screen(),
 				sx,sy,15);
 	}
 }

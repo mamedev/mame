@@ -511,7 +511,8 @@ static WRITE8_DEVICE_HANDLER( out_coin1 )
 
 static WRITE8_DEVICE_HANDLER( flip )
 {
-	flip_screen_set(device->machine(), data & 1);
+	toypop_state *state = device->machine().driver_data<toypop_state>();
+	state->flip_screen_set(data & 1);
 }
 
 /* chip #0: player inputs, buttons, coins */

@@ -92,7 +92,7 @@ static ADDRESS_MAP_START( mosaic_map, AS_PROGRAM, 8, mosaic_state )
 	AM_RANGE(0x20000, 0x21fff) AM_RAM
 	AM_RANGE(0x22000, 0x22fff) AM_RAM_WRITE(mosaic_bgvideoram_w) AM_BASE(m_bgvideoram)
 	AM_RANGE(0x23000, 0x23fff) AM_RAM_WRITE(mosaic_fgvideoram_w) AM_BASE(m_fgvideoram)
-	AM_RANGE(0x24000, 0x241ff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_le_w) AM_SHARE("paletteram")
+	AM_RANGE(0x24000, 0x241ff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_byte_le_w) AM_SHARE("paletteram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gfire2_map, AS_PROGRAM, 8, mosaic_state )
@@ -100,7 +100,7 @@ static ADDRESS_MAP_START( gfire2_map, AS_PROGRAM, 8, mosaic_state )
 	AM_RANGE(0x10000, 0x17fff) AM_RAM
 	AM_RANGE(0x22000, 0x22fff) AM_RAM_WRITE(mosaic_bgvideoram_w) AM_BASE(m_bgvideoram)
 	AM_RANGE(0x23000, 0x23fff) AM_RAM_WRITE(mosaic_fgvideoram_w) AM_BASE(m_fgvideoram)
-	AM_RANGE(0x24000, 0x241ff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_le_w) AM_SHARE("paletteram")
+	AM_RANGE(0x24000, 0x241ff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_byte_le_w) AM_SHARE("paletteram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mosaic_io_map, AS_IO, 8, mosaic_state )

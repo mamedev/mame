@@ -19,9 +19,9 @@ WRITE16_MEMBER(tigeroad_state::tigeroad_videoctrl_w)
 
 		/* bit 1 flips screen */
 
-		if (flip_screen_get(machine()) != (data & 0x02))
+		if (flip_screen() != (data & 0x02))
 		{
-			flip_screen_set(machine(), data & 0x02);
+			flip_screen_set(data & 0x02);
 			machine().tilemap().mark_all_dirty();
 		}
 
@@ -89,7 +89,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 			if (sx > 0x100) sx -= 0x200;
 			if (sy > 0x100) sy -= 0x200;
 
-			if (flip_screen_get(machine))
+			if (state->flip_screen())
 			{
 				sx = 240 - sx;
 				sy = 240 - sy;

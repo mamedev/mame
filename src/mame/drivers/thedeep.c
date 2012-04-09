@@ -70,11 +70,11 @@ WRITE8_MEMBER(thedeep_state::thedeep_protection_w)
 	switch (m_protection_command)
 	{
 		case 0x11:
-			flip_screen_set(machine(), 1);
+			flip_screen_set(1);
 		break;
 
 		case 0x20:
-			flip_screen_set(machine(), 0);
+			flip_screen_set(0);
 		break;
 
 		case 0x30:
@@ -207,7 +207,7 @@ static void thedeep_maincpu_bankswitch(running_machine &machine,UINT8 bank_trig)
 
 WRITE8_MEMBER(thedeep_state::thedeep_p1_w)
 {
-	flip_screen_set(machine(), (data & 1) ^ 1);
+	flip_screen_set((data & 1) ^ 1);
 	thedeep_maincpu_bankswitch(machine(),(data & 6) >> 1);
 	logerror("P1 %02x\n",data);
 }

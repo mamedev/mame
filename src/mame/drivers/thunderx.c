@@ -48,7 +48,7 @@ WRITE8_MEMBER(thunderx_state::scontra_bankedram_w)
 {
 
 	if (m_palette_selected)
-		paletteram_xBBBBBGGGGGRRRRR_be_w(space, offset, data);
+		paletteram_xBBBBBGGGGGRRRRR_byte_be_w(space, offset, data);
 	else
 		m_ram[offset] = data;
 }
@@ -91,7 +91,7 @@ WRITE8_MEMBER(thunderx_state::thunderx_bankedram_w)
 			logerror("%04x pmc internal ram %04x = %02x\n",cpu_get_pc(&space.device()),offset,data);
 	}
 	else
-		paletteram_xBBBBBGGGGGRRRRR_be_w(space, offset, data);
+		paletteram_xBBBBBGGGGGRRRRR_byte_be_w(space, offset, data);
 }
 
 /*

@@ -508,7 +508,7 @@ WRITE16_MEMBER(toaplan1_state::toaplan1_colorram1_w)
 {
 
 	COMBINE_DATA(&m_colorram1[offset]);
-	paletteram16_xBBBBBGGGGGRRRRR_word_w(space, offset, data, mem_mask);
+	paletteram_xBBBBBGGGGGRRRRR_word_w(space, offset, data, mem_mask);
 }
 
 /* sprite palette */
@@ -522,7 +522,7 @@ WRITE16_MEMBER(toaplan1_state::toaplan1_colorram2_w)
 {
 
 	COMBINE_DATA(&m_colorram2[offset]);
-	paletteram16_xBBBBBGGGGGRRRRR_word_w(space, offset+(m_colorram1_size/2), data, mem_mask);
+	paletteram_xBBBBBGGGGGRRRRR_word_w(space, offset+(m_colorram1_size/2), data, mem_mask);
 }
 
 READ16_MEMBER(toaplan1_state::toaplan1_spriteram16_r)

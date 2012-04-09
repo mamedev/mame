@@ -274,7 +274,7 @@ static ADDRESS_MAP_START( mystwarr_map, AS_PROGRAM, 16, mystwarr_state )
 	AM_RANGE(0x600000, 0x601fff) AM_READWRITE_LEGACY(K056832_ram_word_r,K056832_ram_word_w)
 	AM_RANGE(0x602000, 0x603fff) AM_READWRITE_LEGACY(K056832_ram_word_r,K056832_ram_word_w)	// tilemap RAM mirror read(essential)
 	AM_RANGE(0x680000, 0x683fff) AM_READ_LEGACY(K056832_mw_rom_word_r)
-	AM_RANGE(0x700000, 0x701fff) AM_RAM_WRITE(paletteram16_xrgb_word_be_w) AM_SHARE("paletteram")
+	AM_RANGE(0x700000, 0x701fff) AM_RAM_WRITE(paletteram_xrgb_word_be_w) AM_SHARE("paletteram")
 #if MW_DEBUG
 	AM_RANGE(0x480000, 0x4800ff) AM_READ_LEGACY(K055555_word_r)
 	AM_RANGE(0x482010, 0x48201f) AM_READ_LEGACY(K053247_reg_word_r)
@@ -315,7 +315,7 @@ static ADDRESS_MAP_START( metamrph_map, AS_PROGRAM, 16, mystwarr_state )
 	AM_RANGE(0x302000, 0x303fff) AM_READWRITE_LEGACY(K056832_ram_word_r,K056832_ram_word_w)	// tilemap RAM mirror read/write (essential)
 	AM_RANGE(0x310000, 0x311fff) AM_READ_LEGACY(K056832_mw_rom_word_r)
 	AM_RANGE(0x320000, 0x321fff) AM_DEVREAD("k053250_1", k053250_t, rom_r)
-	AM_RANGE(0x330000, 0x331fff) AM_RAM_WRITE(paletteram16_xrgb_word_be_w) AM_SHARE("paletteram")
+	AM_RANGE(0x330000, 0x331fff) AM_RAM_WRITE(paletteram_xrgb_word_be_w) AM_SHARE("paletteram")
 #if MW_DEBUG
 	AM_RANGE(0x240000, 0x240007) AM_READ_LEGACY(K053246_reg_word_r)
 	AM_RANGE(0x244010, 0x24401f) AM_READ_LEGACY(K053247_reg_word_r)
@@ -358,7 +358,7 @@ static ADDRESS_MAP_START( viostorm_map, AS_PROGRAM, 16, mystwarr_state )
 	AM_RANGE(0x302000, 0x303fff) AM_READWRITE_LEGACY(K056832_ram_word_r,K056832_ram_word_w) // tilemap RAM mirror read(essential)
 	AM_RANGE(0x304000, 0x3041ff) AM_RAM
 	AM_RANGE(0x310000, 0x311fff) AM_READ_LEGACY(K056832_mw_rom_word_r)
-	AM_RANGE(0x330000, 0x331fff) AM_RAM_WRITE(paletteram16_xrgb_word_be_w) AM_SHARE("paletteram")
+	AM_RANGE(0x330000, 0x331fff) AM_RAM_WRITE(paletteram_xrgb_word_be_w) AM_SHARE("paletteram")
 #if MW_DEBUG
 	AM_RANGE(0x240000, 0x240007) AM_READ_LEGACY(K053246_reg_word_r)
 	AM_RANGE(0x244010, 0x24401f) AM_READ_LEGACY(K053247_reg_word_r)
@@ -445,7 +445,7 @@ static ADDRESS_MAP_START( martchmp_map, AS_PROGRAM, 16, mystwarr_state )
 	AM_RANGE(0x41c000, 0x41c01f) AM_DEVREADWRITE8_LEGACY("k053252",k053252_r,k053252_w,0x00ff)				// CCU
 	AM_RANGE(0x41e000, 0x41e007) AM_WRITE_LEGACY(K056832_b_word_w)				// VSCCS
 	AM_RANGE(0x480000, 0x483fff) AM_READWRITE(K053247_martchmp_word_r,K053247_martchmp_word_w) AM_BASE(m_spriteram)	// sprite RAM
-	AM_RANGE(0x600000, 0x601fff) AM_RAM_WRITE(paletteram16_xrgb_word_be_w) AM_SHARE("paletteram")						// palette RAM
+	AM_RANGE(0x600000, 0x601fff) AM_RAM_WRITE(paletteram_xrgb_word_be_w) AM_SHARE("paletteram")						// palette RAM
 	AM_RANGE(0x680000, 0x681fff) AM_READWRITE_LEGACY(K056832_ram_word_r,K056832_ram_word_w)	// tilemap RAM
 	AM_RANGE(0x682000, 0x683fff) AM_READWRITE_LEGACY(K056832_ram_word_r,K056832_ram_word_w)	// tilemap RAM mirror read/write (essential)
 	AM_RANGE(0x700000, 0x703fff) AM_READ_LEGACY(K056832_mw_rom_word_r)			// tile ROM readback
@@ -466,7 +466,7 @@ static ADDRESS_MAP_START( dadandrn_map, AS_PROGRAM, 16, mystwarr_state )
 	AM_RANGE(0x400000, 0x40ffff) AM_READWRITE(K053247_scattered_word_r,K053247_scattered_word_w) AM_BASE(m_spriteram)
 	AM_RANGE(0x410000, 0x411fff) AM_READWRITE_LEGACY(K056832_ram_word_r,K056832_ram_word_w)	// tilemap RAM
 	AM_RANGE(0x412000, 0x413fff) AM_READWRITE_LEGACY(K056832_ram_word_r,K056832_ram_word_w)	// tilemap RAM mirror read/write (essential)
-	AM_RANGE(0x420000, 0x421fff) AM_RAM_WRITE(paletteram16_xrgb_word_be_w) AM_SHARE("paletteram")
+	AM_RANGE(0x420000, 0x421fff) AM_RAM_WRITE(paletteram_xrgb_word_be_w) AM_SHARE("paletteram")
 	AM_RANGE(0x430000, 0x430007) AM_WRITE_LEGACY(K053246_word_w)
 	AM_RANGE(0x440000, 0x443fff) AM_READ_LEGACY(K056832_mw_rom_word_r)
 	AM_RANGE(0x450000, 0x45000f) AM_READ_LEGACY(K055673_rom_word_r)
@@ -513,7 +513,7 @@ static ADDRESS_MAP_START( gaiapols_map, AS_PROGRAM, 16, mystwarr_state )
 	AM_RANGE(0x400000, 0x40ffff) AM_READWRITE(K053247_scattered_word_r,K053247_scattered_word_w) AM_BASE(m_spriteram)
 	AM_RANGE(0x410000, 0x411fff) AM_READWRITE_LEGACY(K056832_ram_word_r,K056832_ram_word_w)		// tilemap RAM
 	AM_RANGE(0x412000, 0x413fff) AM_READWRITE_LEGACY(K056832_ram_word_r,K056832_ram_word_w)		// tilemap RAM mirror read / write (essential)
-	AM_RANGE(0x420000, 0x421fff) AM_RAM_WRITE(paletteram16_xrgb_word_be_w) AM_SHARE("paletteram")
+	AM_RANGE(0x420000, 0x421fff) AM_RAM_WRITE(paletteram_xrgb_word_be_w) AM_SHARE("paletteram")
 	AM_RANGE(0x430000, 0x430007) AM_WRITE_LEGACY(K053246_word_w)
 	AM_RANGE(0x440000, 0x441fff) AM_READ_LEGACY(K056832_mw_rom_word_r)
 	AM_RANGE(0x450000, 0x45000f) AM_READ_LEGACY(K055673_rom_word_r)

@@ -162,7 +162,7 @@ static void pandora_draw( device_t *device, bitmap_ind16 &bitmap, const rectangl
 			y = dy;
 		}
 
-		if (flip_screen_get(device->machine()))
+		if (device->machine().driver_data()->flip_screen())
 		{
 			sx = 240 - x;
 			sy = 240 - y;

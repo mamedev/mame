@@ -150,7 +150,7 @@ WRITE8_MEMBER(cloak_state::cloak_videoram_w)
 
 WRITE8_MEMBER(cloak_state::cloak_flipscreen_w)
 {
-	flip_screen_set(machine(), data & 0x80);
+	flip_screen_set(data & 0x80);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
@@ -212,7 +212,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 		int sx = spriteram[offs + 192];
 		int sy = 240 - spriteram[offs];
 
-		if (flip_screen_get(machine))
+		if (state->flip_screen())
 		{
 			sx -= 9;
 			sy = 240 - sy;

@@ -334,7 +334,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 		sx += sprite_xoffs;
 		sy -= sprite_yoffs;
 
-		if (flip_screen_get(machine))
+		if (state->flip_screen())
 		{
 			sx = -sx - sizex;
 			sy = -sy - sizey;
@@ -377,9 +377,9 @@ SCREEN_UPDATE_IND16( namcos1 )
 	rectangle new_clip = cliprect;
 
 	/* flip screen is embedded in the sprite control registers */
-	/* can't use flip_screen_set(screen.machine(), ) because the visible area is asymmetrical */
-	flip_screen_set_no_update(screen.machine(), state->m_spriteram[0x0ff6] & 1);
-	screen.machine().tilemap().set_flip_all(flip_screen_get(screen.machine()) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	/* can't use state->flip_screen_set() because the visible area is asymmetrical */
+	state->flip_screen_set_no_update(state->m_spriteram[0x0ff6] & 1);
+	screen.machine().tilemap().set_flip_all(state->flip_screen() ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
 
 	/* background color */
@@ -411,7 +411,7 @@ SCREEN_UPDATE_IND16( namcos1 )
 		scrollx = ( state->m_playfield_control[j+1] + (state->m_playfield_control[j+0]<<8) ) - disp_x[i];
 		scrolly = ( state->m_playfield_control[j+3] + (state->m_playfield_control[j+2]<<8) ) + 8;
 
-		if (flip_screen_get(screen.machine()))
+		if (state->flip_screen())
 		{
 			scrollx = -scrollx;
 			scrolly = -scrolly;

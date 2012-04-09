@@ -140,7 +140,7 @@ WRITE8_MEMBER(gberet_state::gberet_flipscreen_w)
 	m_interrupt_mask = data & 7;
 
 	/* bit 3 = flip screen */
-	flip_screen_set(machine(), data & 8);
+	flip_screen_set(data & 8);
 }
 
 WRITE8_MEMBER(gberet_state::gberet_sound_w)
@@ -192,7 +192,7 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(gberet_state::gberetb_flipscreen_w)
 {
-	flip_screen_set(machine(), data & 8);
+	flip_screen_set(data & 8);
 }
 
 READ8_MEMBER(gberet_state::gberetb_irq_ack_r)

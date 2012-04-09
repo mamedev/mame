@@ -58,7 +58,9 @@ driver_device::driver_device(const machine_config &mconfig, device_type type, co
 	  m_generic_paletteram_16(*this, "paletteram"),
 	  m_generic_paletteram2_16(*this, "paletteram2"),
 	  m_generic_paletteram_32(*this, "paletteram"),
-	  m_generic_paletteram2_32(*this, "paletteram2")
+	  m_generic_paletteram2_32(*this, "paletteram2"),
+	  m_flip_screen_x(0),
+	  m_flip_screen_y(0)
 {
 	memset(m_callbacks, 0, sizeof(m_callbacks));
 }
@@ -265,6 +267,10 @@ void driver_device::device_start()
 	machine_start();
 	sound_start();
 	video_start();
+	
+	// save generic states
+	save_item(NAME(m_flip_screen_x));
+	save_item(NAME(m_flip_screen_y));
 }
 
 
@@ -282,3 +288,231 @@ void driver_device::device_reset_after_children()
 	sound_reset();
 	video_reset();
 }
+
+
+
+//**************************************************************************
+//  GENERIC FLIP SCREEN HANDLING
+//**************************************************************************
+
+//-------------------------------------------------
+//  updateflip - handle global flipping
+//-------------------------------------------------
+
+void driver_device::updateflip()
+{
+	// push the flip state to all tilemaps
+	machine().tilemap().set_flip_all((TILEMAP_FLIPX & m_flip_screen_x) | (TILEMAP_FLIPY & m_flip_screen_y));
+
+	// flip the visible area within the screen width/height
+	int width = machine().primary_screen->width();
+	int height = machine().primary_screen->height();
+	rectangle visarea = machine().primary_screen->visible_area();
+	if (m_flip_screen_x)
+	{
+		int temp = width - visarea.min_x - 1;
+		visarea.min_x = width - visarea.max_x - 1;
+		visarea.max_x = temp;
+	}
+	if (m_flip_screen_y)
+	{
+		int temp = height - visarea.min_y - 1;
+		visarea.min_y = height - visarea.max_y - 1;
+		visarea.max_y = temp;
+	}
+
+	// reconfigure the screen with the new visible area
+	attoseconds_t period = machine().primary_screen->frame_period().attoseconds;
+	machine().primary_screen->configure(width, height, visarea, period);
+}
+
+
+//-------------------------------------------------
+//  flip_screen_set - set global flip
+//-------------------------------------------------
+
+void driver_device::flip_screen_set(UINT32 on)
+{
+	// normalize to all 1
+	if (on)
+		on = ~0;
+
+	// if something's changed, handle it
+	if (m_flip_screen_x != on || m_flip_screen_y != on)
+	{
+		if (!on)
+			updateflip(); // flip visarea back
+		m_flip_screen_x = m_flip_screen_y = on;
+		updateflip();
+	}
+}
+
+
+//-------------------------------------------------
+//  flip_screen_set_no_update - set global flip
+//  do not call update_flip.
+//-------------------------------------------------
+
+void driver_device::flip_screen_set_no_update(UINT32 on)
+{
+	// flip_screen_y is not updated on purpose
+    // this function is for drivers which
+    // where writing to flip_screen_x to
+    // bypass update_flip
+	if (on)
+		on = ~0;
+	m_flip_screen_x = on;
+}
+
+
+//-------------------------------------------------
+//  flip_screen_x_set - set global horizontal flip
+//-------------------------------------------------
+
+void driver_device::flip_screen_x_set(UINT32 on)
+{
+	// normalize to all 1
+	if (on)
+		on = ~0;
+	
+	// if something's changed, handle it
+	if (m_flip_screen_x != on)
+	{
+		m_flip_screen_x = on;
+		updateflip();
+	}
+}
+
+
+//-------------------------------------------------
+//  flip_screen_y_set - set global vertical flip
+//-------------------------------------------------
+
+void driver_device::flip_screen_y_set(UINT32 on)
+{
+	// normalize to all 1
+	if (on)
+		on = ~0;
+	
+	// if something's changed, handle it
+	if (m_flip_screen_y != on)
+	{
+		m_flip_screen_y = on;
+		updateflip();
+	}
+}
+
+
+
+//**************************************************************************
+//  8-BIT PALETTE WRITE HANDLERS
+//**************************************************************************
+
+// 3-3-2 RGB palette write handlers
+WRITE8_MEMBER( driver_device::paletteram_BBGGGRRR_byte_w ) { palette_8bit_byte_w<3,3,2, 0,3,6>(space, offset, data, mem_mask); }
+WRITE8_MEMBER( driver_device::paletteram_RRRGGGBB_byte_w ) { palette_8bit_byte_w<3,3,2, 5,2,0>(space, offset, data, mem_mask); }
+WRITE8_MEMBER( driver_device::paletteram_BBGGRRII_byte_w )
+{
+	m_generic_paletteram_8[offset] = data;
+	int i = (data >> 0) & 3;
+	palette_set_color_rgb(machine(), offset, pal4bit(((data >> 0) & 0x0c) | i),
+	                                   pal4bit(((data >> 2) & 0x0c) | i),
+	                                   pal4bit(((data >> 4) & 0x0c) | i));
+}
+
+
+
+//**************************************************************************
+//  16-BIT PALETTE WRITE HANDLERS
+//**************************************************************************
+
+// 4-4-4 RGB palette write handlers
+WRITE8_MEMBER( driver_device::paletteram_xxxxBBBBGGGGRRRR_byte_le_w ) { palette_16bit_byte_le_w<4,4,4, 0,4,8>(space, offset, data, mem_mask); }
+WRITE8_MEMBER( driver_device::paletteram_xxxxBBBBGGGGRRRR_byte_be_w ) { palette_16bit_byte_be_w<4,4,4, 0,4,8>(space, offset, data, mem_mask); }
+WRITE8_MEMBER( driver_device::paletteram_xxxxBBBBGGGGRRRR_byte_split_lo_w ) { palette_16bit_byte_split_lo_w<4,4,4, 0,4,8>(space, offset, data, mem_mask); }
+WRITE8_MEMBER( driver_device::paletteram_xxxxBBBBGGGGRRRR_byte_split_hi_w ) { palette_16bit_byte_split_hi_w<4,4,4, 0,4,8>(space, offset, data, mem_mask); }
+WRITE16_MEMBER( driver_device::paletteram_xxxxBBBBGGGGRRRR_word_w ) { palette_16bit_word_w<4,4,4, 0,4,8>(space, offset, data, mem_mask); }
+
+WRITE8_MEMBER( driver_device::paletteram_xxxxBBBBRRRRGGGG_byte_le_w ) { palette_16bit_byte_le_w<4,4,4, 4,0,8>(space, offset, data, mem_mask); }
+WRITE8_MEMBER( driver_device::paletteram_xxxxBBBBRRRRGGGG_byte_be_w ) { palette_16bit_byte_be_w<4,4,4, 4,0,8>(space, offset, data, mem_mask); }
+WRITE8_MEMBER( driver_device::paletteram_xxxxBBBBRRRRGGGG_byte_split_lo_w ) { palette_16bit_byte_split_lo_w<4,4,4, 4,0,8>(space, offset, data, mem_mask); }
+WRITE8_MEMBER( driver_device::paletteram_xxxxBBBBRRRRGGGG_byte_split_hi_w ) { palette_16bit_byte_split_hi_w<4,4,4, 4,0,8>(space, offset, data, mem_mask); }
+WRITE16_MEMBER( driver_device::paletteram_xxxxBBBBRRRRGGGG_word_w ) { palette_16bit_word_w<4,4,4, 4,0,8>(space, offset, data, mem_mask); }
+
+WRITE8_MEMBER( driver_device::paletteram_xxxxRRRRBBBBGGGG_byte_split_lo_w ) { palette_16bit_byte_split_lo_w<4,4,4, 8,0,4>(space, offset, data, mem_mask); }
+WRITE8_MEMBER( driver_device::paletteram_xxxxRRRRBBBBGGGG_byte_split_hi_w ) { palette_16bit_byte_split_hi_w<4,4,4, 8,0,4>(space, offset, data, mem_mask); }
+
+WRITE8_MEMBER( driver_device::paletteram_xxxxRRRRGGGGBBBB_byte_le_w ) { palette_16bit_byte_le_w<4,4,4, 8,4,0>(space, offset, data, mem_mask); }
+WRITE8_MEMBER( driver_device::paletteram_xxxxRRRRGGGGBBBB_byte_be_w ) { palette_16bit_byte_be_w<4,4,4, 8,4,0>(space, offset, data, mem_mask); }
+WRITE8_MEMBER( driver_device::paletteram_xxxxRRRRGGGGBBBB_byte_split_lo_w ) { palette_16bit_byte_split_lo_w<4,4,4, 8,4,0>(space, offset, data, mem_mask); }
+WRITE8_MEMBER( driver_device::paletteram_xxxxRRRRGGGGBBBB_byte_split_hi_w ) { palette_16bit_byte_split_hi_w<4,4,4, 8,4,0>(space, offset, data, mem_mask); }
+WRITE16_MEMBER( driver_device::paletteram_xxxxRRRRGGGGBBBB_word_w ) { palette_16bit_word_w<4,4,4, 8,4,0>(space, offset, data, mem_mask); }
+
+WRITE8_MEMBER( driver_device::paletteram_RRRRGGGGBBBBxxxx_byte_be_w ) { palette_16bit_byte_be_w<4,4,4, 12,8,4>(space, offset, data, mem_mask); }
+WRITE8_MEMBER( driver_device::paletteram_RRRRGGGGBBBBxxxx_byte_split_lo_w ) { palette_16bit_byte_split_lo_w<4,4,4, 12,8,4>(space, offset, data, mem_mask); }
+WRITE8_MEMBER( driver_device::paletteram_RRRRGGGGBBBBxxxx_byte_split_hi_w ) { palette_16bit_byte_split_hi_w<4,4,4, 12,8,4>(space, offset, data, mem_mask); }
+WRITE16_MEMBER( driver_device::paletteram_RRRRGGGGBBBBxxxx_word_w ) { palette_16bit_word_w<4,4,4, 12,8,4>(space, offset, data, mem_mask); }
+
+// 4-4-4-4 IRGB palette write handlers
+template<int _IShift, int _RShift, int _GShift, int _BShift>
+inline void set_color_irgb(running_machine &machine, pen_t color, UINT16 data)
+{
+	static const UINT8 ztable[16] = { 0x0, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf, 0x10, 0x11 };
+	UINT8 i = ztable[(data >> _IShift) & 15];
+	UINT8 r = ((data >> _RShift) & 15) * i;
+	UINT8 g = ((data >> _GShift) & 15) * i;
+	UINT8 b = ((data >> _BShift) & 15) * i;
+	palette_set_color_rgb(machine, color, r, g, b);
+}
+
+WRITE16_MEMBER( driver_device::paletteram_IIIIRRRRGGGGBBBB_word_w )
+{
+	COMBINE_DATA(&m_generic_paletteram_16[offset]);
+	set_color_irgb<12,8,4,0>(machine(), offset, m_generic_paletteram_16[offset]);
+}
+
+WRITE16_MEMBER( driver_device::paletteram_RRRRGGGGBBBBIIII_word_w )
+{
+	COMBINE_DATA(&m_generic_paletteram_16[offset]);
+	set_color_irgb<0,12,8,4>(machine(), offset, m_generic_paletteram_16[offset]);
+}
+
+// 5-5-5 RGB palette write handlers
+WRITE8_MEMBER( driver_device::paletteram_xBBBBBGGGGGRRRRR_byte_le_w ) { palette_16bit_byte_le_w<5,5,5, 0,5,10>(space, offset, data, mem_mask); }
+WRITE8_MEMBER( driver_device::paletteram_xBBBBBGGGGGRRRRR_byte_be_w ) { palette_16bit_byte_be_w<5,5,5, 0,5,10>(space, offset, data, mem_mask); }
+WRITE8_MEMBER( driver_device::paletteram_xBBBBBGGGGGRRRRR_byte_split_lo_w ) { palette_16bit_byte_split_lo_w<5,5,5, 0,5,10>(space, offset, data, mem_mask); }
+WRITE8_MEMBER( driver_device::paletteram_xBBBBBGGGGGRRRRR_byte_split_hi_w ) { palette_16bit_byte_split_hi_w<5,5,5, 0,5,10>(space, offset, data, mem_mask); }
+WRITE16_MEMBER( driver_device::paletteram_xBBBBBGGGGGRRRRR_word_w ) { palette_16bit_word_w<5,5,5, 0,5,10>(space, offset, data, mem_mask); }
+
+WRITE8_MEMBER( driver_device::paletteram_xBBBBBRRRRRGGGGG_byte_split_lo_w ) { palette_16bit_byte_split_lo_w<5,5,5, 5,0,10>(space, offset, data, mem_mask); }
+WRITE8_MEMBER( driver_device::paletteram_xBBBBBRRRRRGGGGG_byte_split_hi_w ) { palette_16bit_byte_split_hi_w<5,5,5, 5,0,10>(space, offset, data, mem_mask); }
+
+WRITE8_MEMBER( driver_device::paletteram_xRRRRRGGGGGBBBBB_byte_le_w ) { palette_16bit_byte_le_w<5,5,5, 10,5,0>(space, offset, data, mem_mask); }
+WRITE8_MEMBER( driver_device::paletteram_xRRRRRGGGGGBBBBB_byte_be_w ) { palette_16bit_byte_be_w<5,5,5, 10,5,0>(space, offset, data, mem_mask); }
+WRITE8_MEMBER( driver_device::paletteram_xRRRRRGGGGGBBBBB_byte_split_lo_w ) { palette_16bit_byte_split_lo_w<5,5,5, 10,5,0>(space, offset, data, mem_mask); }
+WRITE8_MEMBER( driver_device::paletteram_xRRRRRGGGGGBBBBB_byte_split_hi_w ) { palette_16bit_byte_split_hi_w<5,5,5, 10,5,0>(space, offset, data, mem_mask); }
+WRITE16_MEMBER( driver_device::paletteram_xRRRRRGGGGGBBBBB_word_w ) { palette_16bit_word_w<5,5,5, 10,5,0>(space, offset, data, mem_mask); }
+WRITE32_MEMBER( driver_device::paletteram_xRRRRRGGGGGBBBBB_dword_be_w ) { palette_16bit_dword_be_w<5,5,5, 10,5,0>(space, offset, data, mem_mask); }
+WRITE32_MEMBER( driver_device::paletteram_xRRRRRGGGGGBBBBB_dword_le_w ) { palette_16bit_dword_le_w<5,5,5, 10,5,0>(space, offset, data, mem_mask); }
+
+WRITE16_MEMBER( driver_device::paletteram_xGGGGGRRRRRBBBBB_word_w ) { palette_16bit_word_w<5,5,5, 5,10,0>(space, offset, data, mem_mask); }
+WRITE16_MEMBER( driver_device::paletteram_xGGGGGBBBBBRRRRR_word_w ) { palette_16bit_word_w<5,5,5, 0,10,5>(space, offset, data, mem_mask); }
+WRITE16_MEMBER( driver_device::paletteram_RRRRRGGGGGBBBBBx_word_w ) { palette_16bit_word_w<5,5,5, 11,6,1>(space, offset, data, mem_mask); }
+WRITE16_MEMBER( driver_device::paletteram_GGGGGRRRRRBBBBBx_word_w ) { palette_16bit_word_w<5,5,5, 6,11,1>(space, offset, data, mem_mask); }
+WRITE16_MEMBER( driver_device::paletteram_RRRRGGGGBBBBRGBx_word_w )
+{
+	COMBINE_DATA(&m_generic_paletteram_16[offset]);
+	data = m_generic_paletteram_16[offset];
+	palette_set_color_rgb(machine(), offset, pal5bit(((data >> 11) & 0x1e) | ((data >> 3) & 0x01)),
+	                                    	pal5bit(((data >>  7) & 0x1e) | ((data >> 2) & 0x01)),
+	                                    	pal5bit(((data >>  3) & 0x1e) | ((data >> 1) & 0x01)));
+}
+
+
+//**************************************************************************
+//  32-BIT PALETTE WRITE HANDLERS
+//**************************************************************************
+
+// 8-8-8 RGB palette write handlers
+WRITE16_MEMBER( driver_device::paletteram_xrgb_word_be_w ) { palette_32bit_word_be_w<8,8,8, 16,8,0>(space, offset, data, mem_mask); }
+WRITE16_MEMBER( driver_device::paletteram_xbgr_word_be_w ) { palette_32bit_word_be_w<8,8,8, 0,8,16>(space, offset, data, mem_mask); }

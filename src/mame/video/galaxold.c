@@ -1159,9 +1159,10 @@ static void darkplnt_draw_bullets(running_machine &machine, bitmap_ind16 &bitmap
 
 static void dambustr_draw_bullets(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int offs, int x, int y)
 {
+	galaxold_state *state = machine.driver_data<galaxold_state>();
 	int i, color;
 
-	if (flip_screen_x_get(machine))  x++;
+	if (state->flip_screen_x())  x++;
 
 	x = x - 6;
 
@@ -1339,7 +1340,7 @@ static void dambustr_draw_background(running_machine &machine, bitmap_ind16 &bit
 	int col1 = base + state->m_dambustr_bg_color_1;
 	int col2 = base + state->m_dambustr_bg_color_2;
 
-	if (flip_screen_x_get(machine))
+	if (state->flip_screen_x())
 	{
 		bitmap.plot_box(  0, 0, 256-state->m_dambustr_bg_split_line, 256, col2);
 		bitmap.plot_box(256-state->m_dambustr_bg_split_line, 0, state->m_dambustr_bg_split_line, 256, col1);
@@ -1356,7 +1357,7 @@ static void dambustr_draw_upper_background(running_machine &machine, bitmap_ind1
 {
 	galaxold_state *state = machine.driver_data<galaxold_state>();
 
-	if (flip_screen_x_get(machine))
+	if (state->flip_screen_x())
 	{
 		rectangle clip(254 - state->m_dambustr_bg_split_line, state->m_dambustr_bg_split_line, 0, 255);
 		copybitmap(bitmap, *state->m_dambustr_tmpbitmap, 0, 0, 0, 0, clip);

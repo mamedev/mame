@@ -45,7 +45,7 @@ WRITE8_MEMBER(finalizr_state::finalizr_flipscreen_w)
 	m_nmi_enable = data & 0x01;
 	m_irq_enable = data & 0x02;
 
-	flip_screen_set(machine(), ~data & 0x08);
+	flip_screen_set(~data & 0x08);
 }
 
 WRITE8_MEMBER(finalizr_state::finalizr_i8039_irq_w)

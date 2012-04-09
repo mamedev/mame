@@ -538,7 +538,7 @@ static ADDRESS_MAP_START( tmaster_map, AS_PROGRAM, 16, tmaster_state )
 
 	AM_RANGE( 0x580000, 0x580001 ) AM_WRITENOP // often
 
-	AM_RANGE( 0x600000, 0x601fff ) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w ) AM_SHARE("paletteram")
+	AM_RANGE( 0x600000, 0x601fff ) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w ) AM_SHARE("paletteram")
 
 	AM_RANGE( 0x800000, 0x800001 ) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff )
 

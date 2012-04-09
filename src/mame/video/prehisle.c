@@ -53,7 +53,7 @@ WRITE16_MEMBER(prehisle_state::prehisle_control16_w)
 	case 0x23: m_invert_controls = data ? 0x00ff : 0x0000; break;
 	case 0x28: coin_counter_w(machine(), 0, data & 1); break;
 	case 0x29: coin_counter_w(machine(), 1, data & 1); break;
-	case 0x30: flip_screen_set(machine(), data & 0x01); break;
+	case 0x30: flip_screen_set(data & 0x01); break;
 	}
 }
 
@@ -145,7 +145,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 		if (sx&0x100) sx=-0x100+(sx&0xff);
 		if (sy&0x100) sy=-0x100+(sy&0xff);
 
-		if (flip_screen_get(machine))
+		if (state->flip_screen())
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;

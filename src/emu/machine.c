@@ -62,7 +62,6 @@
                 - calls render_init() [render.c] to initialize the rendering system
                 - calls ui_init() [ui.c] to initialize the user interface
                 - calls generic_machine_init() [machine/generic.c] to initialize generic machine structures
-                - calls generic_video_init() [video/generic.c] to initialize generic video structures
                 - calls generic_sound_init() [audio/generic.c] to initialize generic sound structures
                 - calls timer_init() [timer.c] to reset the timer system
                 - calls osd_init() [osdepend.h] to do platform-specific initialization
@@ -149,7 +148,6 @@ running_machine::running_machine(const machine_config &_config, osd_interface &o
 	  ui_input_data(NULL),
 	  debugcpu_data(NULL),
 	  generic_machine_data(NULL),
-	  generic_video_data(NULL),
 	  generic_audio_data(NULL),
 
 	  m_config(_config),
@@ -252,7 +250,6 @@ void running_machine::start()
 	m_render = auto_alloc(*this, render_manager(*this));
 	generic_machine_init(*this);
 	generic_sound_init(*this);
-	generic_video_init(*this);
 
 	// allocate a soft_reset timer
 	m_soft_reset_timer = m_scheduler.timer_alloc(timer_expired_delegate(FUNC(running_machine::soft_reset), this));

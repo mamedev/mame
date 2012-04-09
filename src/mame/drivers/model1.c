@@ -798,7 +798,7 @@ WRITE16_MEMBER(model1_state::md0_w)
 WRITE16_MEMBER(model1_state::p_w)
 {
 	UINT16 old = m_generic_paletteram_16[offset];
-	paletteram16_xBBBBBGGGGGRRRRR_word_w(space, offset, data, mem_mask);
+	paletteram_xBBBBBGGGGGRRRRR_word_w(space, offset, data, mem_mask);
 	if(0 && m_generic_paletteram_16[offset] != old)
 		logerror("XVIDEO: p_w %x, %04x @ %04x (%x)\n", offset, data, mem_mask, cpu_get_pc(&space.device()));
 }

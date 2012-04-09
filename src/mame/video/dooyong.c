@@ -118,13 +118,13 @@ WRITE8_MEMBER(dooyong_state::lastday_ctrl_w)
 	m_sprites_disabled = data & 0x10;
 
 	/* bit 6 is flip screen */
-	flip_screen_set(machine(), data & 0x40);
+	flip_screen_set(data & 0x40);
 }
 
 WRITE8_MEMBER(dooyong_state::pollux_ctrl_w)
 {
 	/* bit 0 is flip screen */
-	flip_screen_set(machine(), data & 0x01);
+	flip_screen_set(data & 0x01);
 
 	/* bits 6 and 7 are coin counters */
 	coin_counter_w(machine(), 0, data & 0x80);
@@ -145,7 +145,7 @@ WRITE8_MEMBER(dooyong_state::primella_ctrl_w)
 	m_tx_pri = data & 0x08;
 
 	/* bit 4 flips screen */
-	flip_screen_set(machine(), data & 0x10);
+	flip_screen_set(data & 0x10);
 
 	/* bit 5 used but unknown */
 
@@ -166,7 +166,7 @@ WRITE8_MEMBER(dooyong_state::paletteram_flytiger_w)
 WRITE8_MEMBER(dooyong_state::flytiger_ctrl_w)
 {
 	/* bit 0 is flip screen */
-	flip_screen_set(machine(), data & 0x01);
+	flip_screen_set(data & 0x01);
 
 	/* bits 1, 2 used but unknown */
 
@@ -183,7 +183,7 @@ WRITE16_MEMBER(dooyong_state::rshark_ctrl_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		/* bit 0 flips screen */
-		flip_screen_set(machine(), data & 0x0001);
+		flip_screen_set(data & 0x0001);
 
 		/* bit 4 changes tilemaps priority */
 		m_rshark_pri = data & 0x0010;
@@ -410,7 +410,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 			}
 		}
 
-		if (flip_screen_get(machine))
+		if (state->flip_screen())
 		{
 			sx = 498 - sx;
 			sy = 240 - (16 * height) - sy;
@@ -475,7 +475,7 @@ static void rshark_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, 
 			width = buffered_spriteram16[offs+1] & 0x000f;
 			height = (buffered_spriteram16[offs+1] & 0x00f0) >> 4;
 
-			if (flip_screen_get(machine))
+			if (state->flip_screen())
 			{
 				sx = 498 - (16 * width) - sx;
 				sy = 240 - (16 * height) - sy;

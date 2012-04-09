@@ -82,7 +82,7 @@ WRITE16_MEMBER(esd16_state::esd16_sound_command_w)
 static ADDRESS_MAP_START( multchmp_map, AS_PROGRAM, 16, esd16_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM																		// ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM																		// RAM
-	AM_RANGE(0x200000, 0x2005ff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")	// Palette
+	AM_RANGE(0x200000, 0x2005ff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")	// Palette
 /**/AM_RANGE(0x300000, 0x3007ff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)				// Sprites
 	AM_RANGE(0x300800, 0x300807) AM_WRITE(esd16_spriteram_w)												// Sprites (Mirrored)
 /**/AM_RANGE(0x400000, 0x403fff) AM_RAM_WRITE(esd16_vram_0_w) AM_BASE(m_vram_0)						// Layers
@@ -133,7 +133,7 @@ WRITE16_MEMBER(esd16_state::esd_eeprom_w)
 static ADDRESS_MAP_START( hedpanic_map, AS_PROGRAM, 16, esd16_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM																		// ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM																		// RAM
-	AM_RANGE(0x800000, 0x800fff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")	// Palette
+	AM_RANGE(0x800000, 0x800fff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")	// Palette
 	AM_RANGE(0x900000, 0x9007ff) AM_WRITEONLY AM_BASE_SIZE(m_spriteram, m_spriteram_size)		// Sprites
 	AM_RANGE(0x900800, 0x900807) AM_WRITE(esd16_spriteram_w)												// Sprites (Mirrored)
 	AM_RANGE(0xa00000, 0xa03fff) AM_WRITE(esd16_vram_0_w) AM_BASE(m_vram_0)							// Layers
@@ -164,7 +164,7 @@ static ADDRESS_MAP_START( mchampdx_map, AS_PROGRAM, 16, esd16_state )
 	AM_RANGE(0x300000, 0x303fff) AM_WRITE(esd16_vram_0_w) AM_BASE(m_vram_0)							// Layers
 	AM_RANGE(0x320000, 0x323fff) AM_WRITE(esd16_vram_1_w) AM_BASE(m_vram_1)							//
 	AM_RANGE(0x324000, 0x327fff) AM_WRITE(esd16_vram_1_w) AM_BASE(m_vram_1)							// mirror?
-	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")	// Palette
+	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")	// Palette
 	AM_RANGE(0x500000, 0x500001) AM_WRITENOP	// IRQ Ack
 	AM_RANGE(0x500002, 0x500003) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x500004, 0x500005) AM_READ_PORT("SYSTEM")
@@ -188,7 +188,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tangtang_map, AS_PROGRAM, 16, esd16_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM																		// ROM
-	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")	// RAM
+	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")	// RAM
 	AM_RANGE(0x200000, 0x2007ff) AM_WRITEONLY AM_BASE_SIZE(m_spriteram, m_spriteram_size)		// Sprites
 	AM_RANGE(0x200800, 0x200807) AM_WRITE(esd16_spriteram_w)												// Sprites (Mirrored)
 	AM_RANGE(0x300000, 0x303fff) AM_WRITE(esd16_vram_0_w) AM_BASE(m_vram_0)							// Layers

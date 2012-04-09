@@ -151,7 +151,7 @@ static ADDRESS_MAP_START( pktgaldb_map, AS_PROGRAM, 16, pktgaldx_state )
 
 	AM_RANGE(0x300000, 0x30000f) AM_RAM // ??
 
-	AM_RANGE(0x330000, 0x330bff) AM_RAM_WRITE(paletteram16_xbgr_word_be_w) AM_SHARE("paletteram") // extra colours?
+	AM_RANGE(0x330000, 0x330bff) AM_RAM_WRITE(paletteram_xbgr_word_be_w) AM_SHARE("paletteram") // extra colours?
 ADDRESS_MAP_END
 
 

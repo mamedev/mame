@@ -158,7 +158,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 
 			number &= ~(chain - 1);
 
-			if (flip_screen_get(machine))
+			if (state->flip_screen())
 			{
 				flipy = !flipy;
 				flipx = !flipx;
@@ -168,7 +168,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 
 			for (count=0;count<chain;count++)
 			{
-				if (flip_screen_get(machine))
+				if (state->flip_screen())
 				{
 					if (!flipy)
 					{

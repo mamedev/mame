@@ -165,7 +165,7 @@ static WRITE8_DEVICE_HANDLER( adpcm_w )
 
 WRITE8_MEMBER(rmhaihai_state::ctrl_w)
 {
-	flip_screen_set(machine(), data & 0x01);
+	flip_screen_set(data & 0x01);
 
 	// (data & 0x02) is switched on and off in service mode
 

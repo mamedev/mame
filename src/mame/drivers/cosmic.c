@@ -347,7 +347,7 @@ READ8_MEMBER(cosmic_state::nomnlnd_port_0_1_r)
 
 WRITE8_MEMBER(cosmic_state::flip_screen_w)
 {
-	flip_screen_set(machine(), data & 0x80);
+	flip_screen_set(data & 0x80);
 }
 
 

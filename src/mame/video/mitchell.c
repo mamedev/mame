@@ -252,9 +252,9 @@ WRITE8_MEMBER(mitchell_state::pang_paletteram_w)
 {
 
 	if (m_paletteram_bank)
-		paletteram_xxxxRRRRGGGGBBBB_le_w(space, offset + 0x800, data);
+		paletteram_xxxxRRRRGGGGBBBB_byte_le_w(space, offset + 0x800, data);
 	else
-		paletteram_xxxxRRRRGGGGBBBB_le_w(space, offset, data);
+		paletteram_xxxxRRRRGGGGBBBB_byte_le_w(space, offset, data);
 }
 
 READ8_MEMBER(mitchell_state::pang_paletteram_r)
@@ -268,7 +268,7 @@ READ8_MEMBER(mitchell_state::pang_paletteram_r)
 
 WRITE8_MEMBER(mitchell_state::mgakuen_paletteram_w)
 {
-	paletteram_xxxxRRRRGGGGBBBB_le_w(space, offset, data);
+	paletteram_xxxxRRRRGGGGBBBB_byte_le_w(space, offset, data);
 }
 
 READ8_MEMBER(mitchell_state::mgakuen_paletteram_r)

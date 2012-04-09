@@ -266,7 +266,7 @@ static WRITE8_DEVICE_HANDLER( rom_bank_select_w )
 	memory_set_bankptr(device->machine(), "bank2", region_base + (data&0x3f ) * 0x4000);
 
 	state->m_msm_nmi_mask = data & 0x40;
-	flip_screen_set(device->machine(), data & 0x80);
+	state->flip_screen_set(data & 0x80);
 }
 
 WRITE8_MEMBER(suprgolf_state::rom2_bank_select_w)

@@ -113,7 +113,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, tumblep_state )
 #endif
 	AM_RANGE(0x100000, 0x100001) AM_WRITE(tumblep_sound_w)
 	AM_RANGE(0x120000, 0x123fff) AM_RAM
-	AM_RANGE(0x140000, 0x1407ff) AM_RAM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x140000, 0x1407ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x180000, 0x18000f) AM_READ(tumblepop_controls_r)
 	AM_RANGE(0x18000c, 0x18000d) AM_WRITENOP
 	AM_RANGE(0x1a0000, 0x1a07ff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)

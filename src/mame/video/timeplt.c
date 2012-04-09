@@ -157,7 +157,7 @@ WRITE8_MEMBER(timeplt_state::timeplt_colorram_w)
 
 WRITE8_MEMBER(timeplt_state::timeplt_flipscreen_w)
 {
-	flip_screen_set(machine(), ~data & 1);
+	flip_screen_set(~data & 1);
 }
 
 

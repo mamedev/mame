@@ -153,7 +153,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		sizex = (state->m_buf_spriteram[offs + 2] & 0x000f) + 1;
 		sizey = (state->m_buf_spriteram[offs + 3] & 0x000f) + 1;
 
-		if (flip_screen_get(machine))
+		if (state->flip_screen())
 		{
 			flipx = !flipx;
 			flipy = !flipy;
@@ -180,11 +180,11 @@ SCREEN_UPDATE_IND16( othldrby )
 	othldrby_state *state = screen.machine().driver_data<othldrby_state>();
 	int layer;
 
-	flip_screen_set(screen.machine(), state->m_vreg[0x0f] & 0x80);
+	state->flip_screen_set(state->m_vreg[0x0f] & 0x80);
 
 	for (layer = 0; layer < 3; layer++)
 	{
-		if (flip_screen_get(screen.machine()))
+		if (state->flip_screen())
 		{
 			state->m_bg_tilemap[layer]->set_scrollx(0, state->m_vreg[2 * layer] + 59);
 			state->m_bg_tilemap[layer]->set_scrolly(0, state->m_vreg[2 * layer + 1] + 248);

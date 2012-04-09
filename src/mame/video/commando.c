@@ -63,7 +63,7 @@ WRITE8_MEMBER(commando_state::commando_c804_w)
 	device_set_input_line(m_audiocpu, INPUT_LINE_RESET, (data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
 
 	// bit 7 flips screen
-	flip_screen_set(machine(), data & 0x80);
+	flip_screen_set(data & 0x80);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
@@ -116,7 +116,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		int sx = buffered_spriteram[offs + 3] - ((attr & 0x01) << 8);
 		int sy = buffered_spriteram[offs + 2];
 
-		if (flip_screen_get(machine))
+		if (state->flip_screen())
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;

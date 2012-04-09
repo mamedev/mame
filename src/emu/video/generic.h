@@ -35,28 +35,6 @@ extern const gfx_layout gfx_16x16x4_planar;
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-/* ----- initialization ----- */
-
-/* set up all the common systems */
-void generic_video_init(running_machine &machine);
-
-
-
-/* ----- global attributes ----- */
-
-/* set global attributes */
-void flip_screen_set(running_machine &machine, int on);
-void flip_screen_set_no_update(running_machine &machine, int on);	/* will not call update_flip */
-void flip_screen_x_set(running_machine &machine, int on);
-void flip_screen_y_set(running_machine &machine, int on);
-int flip_screen_get(running_machine &machine);
-int flip_screen_x_get(running_machine &machine);
-int flip_screen_y_get(running_machine &machine);
-
-//#define flip_screen flip_screen_get(machine)
-
-
-
 /* ----- generic palette init routines ----- */
 
 PALETTE_INIT( all_black );

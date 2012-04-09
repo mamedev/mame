@@ -1224,7 +1224,7 @@ static MACHINE_RESET( equites )
 {
 	equites_state *state = machine.driver_data<equites_state>();
 
-	flip_screen_set(machine, 0);
+	state->flip_screen_set(0);
 
 	state->m_fg_char_bank = 0;
 	state->m_bgcolor = 0;

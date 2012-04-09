@@ -109,8 +109,8 @@ static ADDRESS_MAP_START( d9final_map, AS_PROGRAM, 8, d9final_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xc800, 0xcbff) AM_RAM_WRITE(paletteram_xxxxBBBBRRRRGGGG_split1_w) AM_SHARE("paletteram")
-	AM_RANGE(0xcc00, 0xcfff) AM_RAM_WRITE(paletteram_xxxxBBBBRRRRGGGG_split2_w) AM_SHARE("paletteram2")
+	AM_RANGE(0xc800, 0xcbff) AM_RAM_WRITE(paletteram_xxxxBBBBRRRRGGGG_byte_split_lo_w) AM_SHARE("paletteram")
+	AM_RANGE(0xcc00, 0xcfff) AM_RAM_WRITE(paletteram_xxxxBBBBRRRRGGGG_byte_split_hi_w) AM_SHARE("paletteram2")
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(sc0_lovram) AM_BASE(m_lo_vram)
 	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(sc0_hivram) AM_BASE(m_hi_vram)
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(sc0_cram) AM_BASE(m_cram)

@@ -148,7 +148,7 @@ WRITE8_MEMBER(vulgus_state::vulgus_c804_w)
 	coin_counter_w(machine(), 1, data & 0x02);
 
 	/* bit 7 flips screen */
-	flip_screen_set(machine(), data & 0x80);
+	flip_screen_set(data & 0x80);
 }
 
 
@@ -185,7 +185,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 		sx = spriteram[offs + 3];
 		sy = spriteram[offs + 2];
 		dir = 1;
-		if (flip_screen_get(machine))
+		if (state->flip_screen())
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;
@@ -200,14 +200,14 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 			drawgfx_transpen(bitmap,cliprect,machine.gfx[2],
 					code + i,
 					col,
-					flip_screen_get(machine),flip_screen_get(machine),
+					state->flip_screen(),state->flip_screen(),
 					sx, sy + 16 * i * dir,15);
 
 			/* draw again with wraparound */
 			drawgfx_transpen(bitmap,cliprect,machine.gfx[2],
 					code + i,
 					col,
-					flip_screen_get(machine),flip_screen_get(machine),
+					state->flip_screen(),state->flip_screen(),
 					sx, sy + 16 * i * dir -  dir * 256,15);
 			i--;
 		} while (i >= 0);

@@ -93,7 +93,7 @@ static void plot_pixel_sbw(bitmap_ind16 *tmpbitmap, int x, int y, int col, int f
 
 WRITE8_MEMBER(sbowling_state::sbw_videoram_w)
 {
-	int flip = flip_screen_get(machine());
+	int flip = flip_screen();
 	int x,y,i,v1,v2;
 
 	m_videoram[offset] = data;
@@ -183,7 +183,7 @@ WRITE8_MEMBER(sbowling_state::system_w)
     */
 
 
-	flip_screen_set(machine(), data&1);
+	flip_screen_set(data&1);
 
 	if ((m_sbw_system^data)&1)
 	{

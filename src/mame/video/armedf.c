@@ -353,7 +353,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		int sx = buffered_spriteram[offs + 3];
 		int sy = state->m_sprite_offy + 240 - (buffered_spriteram[offs + 0] & 0x1ff);
 
-		if (flip_screen_get(machine))
+		if (state->flip_screen())
 		{
 			sx = 320 - sx + 176;	/* don't ask where 176 comes from, just tried it out */
 			sy = 240 - sy + 1;	/* don't ask where 1 comes from, just tried it out */

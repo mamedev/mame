@@ -708,7 +708,7 @@ static WRITE8_DEVICE_HANDLER( ym2149_portb_w )
     bit 0 contains the screen orientation.
 */
 	state->m_ym2149_portb = data;
-	flip_screen_set(device->machine(), data & 0x01);
+	state->flip_screen_set(data & 0x01);
 }
 
 READ8_MEMBER(lucky74_state::usart_8251_r)

@@ -78,7 +78,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 			color += 16 * (spritepalettebank[(tile>>1)&0xff] & 0x0f);
 		}
 
-		if (flip_screen_get(machine))
+		if (state->flip_screen())
 		{
 				sx=240-sx;
 				sy=240-sy;
@@ -170,7 +170,7 @@ WRITE16_MEMBER(terracre_state::amazon_flipscreen_w)
 	{
 		coin_counter_w( machine(), 0, data&0x01 );
 		coin_counter_w( machine(), 1, (data&0x02)>>1 );
-		flip_screen_set(machine(), data&0x04);
+		flip_screen_set(data&0x04);
 	}
 }
 

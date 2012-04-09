@@ -22,7 +22,7 @@ WRITE8_MEMBER(ksayakyu_state::ksayakyu_videoctrl_w)
 	m_video_ctrl = data;
 
 	m_flipscreen = data & 4;
-	flip_screen_set(machine(), m_flipscreen);
+	flip_screen_set(m_flipscreen);
 	m_tilemap->set_scrolly(0, (data & 0xe0) << 3);
 	if(m_flipscreen)
 		m_tilemap->set_flip((data & 2) ? TILEMAP_FLIPY : TILEMAP_FLIPX | TILEMAP_FLIPY);

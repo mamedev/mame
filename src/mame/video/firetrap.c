@@ -211,7 +211,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		color = ((state->m_spriteram[offs + 1] & 0x08) >> 2) | (state->m_spriteram[offs + 1] & 0x01);
 		flipx = state->m_spriteram[offs + 1] & 0x04;
 		flipy = state->m_spriteram[offs + 1] & 0x02;
-		if (flip_screen_get(machine))
+		if (state->flip_screen())
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;
@@ -221,7 +221,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 
 		if (state->m_spriteram[offs + 1] & 0x10)	/* double width */
 		{
-			if (flip_screen_get(machine)) sy -= 16;
+			if (state->flip_screen()) sy -= 16;
 
 			drawgfx_transpen(bitmap,cliprect,machine.gfx[3],
 					code & ~1,
