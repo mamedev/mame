@@ -266,8 +266,8 @@ WRITE8_MEMBER(junofrst_state::i8039_irqen_and_status_w)
 WRITE8_MEMBER(junofrst_state::flip_screen_w)
 {
 
-	tutankhm_flip_screen_x_w(*&space, 0, data);
-	tutankhm_flip_screen_y_w(*&space, 0, data);
+	tutankhm_flip_screen_x_w(space, 0, data);
+	tutankhm_flip_screen_y_w(space, 0, data);
 }
 
 

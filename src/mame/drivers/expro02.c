@@ -343,7 +343,7 @@ WRITE16_MEMBER(expro02_state::galsnew_vram_0_bank_w)
 		{
 			if(m_vram[0][i])
 			{
-				kaneko16_vram_0_w(*&space, i+1, data << 8, 0xFF00);
+				kaneko16_vram_0_w(space, i+1, data << 8, 0xFF00);
 			}
 		}
 		m_vram_0_bank_num = data;
@@ -360,7 +360,7 @@ WRITE16_MEMBER(expro02_state::galsnew_vram_1_bank_w)
 		{
 			if(m_vram[1][i])
 			{
-				kaneko16_vram_1_w(*&space, i+1, data << 8, 0xFF00);
+				kaneko16_vram_1_w(space, i+1, data << 8, 0xFF00);
 			}
 		}
 		m_vram_1_bank_num = data;
