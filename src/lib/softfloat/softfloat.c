@@ -524,7 +524,9 @@ static void
 | Floating-Point Arithmetic.
 *----------------------------------------------------------------------------*/
 
-static floatx80
+// roundAndPackFloatx80 is now also used in fyl2x.c
+
+/* static */ floatx80
  roundAndPackFloatx80(
      int8 roundingPrecision, flag zSign, int32 zExp, bits64 zSig0, bits64 zSig1
  )
