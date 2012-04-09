@@ -86,6 +86,8 @@ public:
 	DECLARE_WRITE8_MEMBER(self_reset_w);
 	DECLARE_WRITE8_MEMBER(led_w);
 	DECLARE_WRITE8_MEMBER(firefox_coin_counter_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(mainflag_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(soundflag_r);
 };
 
 
@@ -282,16 +284,14 @@ WRITE8_MEMBER(firefox_state::firefox_objram_bank_w)
  *
  *************************************/
 
-static CUSTOM_INPUT( mainflag_r )
+CUSTOM_INPUT_MEMBER(firefox_state::mainflag_r)
 {
-	firefox_state *state = field.machine().driver_data<firefox_state>();
-	return state->m_main_to_sound_flag;
+	return m_main_to_sound_flag;
 }
 
-static CUSTOM_INPUT( soundflag_r )
+CUSTOM_INPUT_MEMBER(firefox_state::soundflag_r)
 {
-	firefox_state *state = field.machine().driver_data<firefox_state>();
-	return state->m_sound_to_main_flag;
+	return m_sound_to_main_flag;
 }
 
 READ8_MEMBER(firefox_state::sound_to_main_r)
@@ -573,8 +573,8 @@ static INPUT_PORTS_START( firefox )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("rdin1")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(mainflag_r, NULL)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(soundflag_r, NULL)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, firefox_state,mainflag_r, NULL)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, firefox_state,soundflag_r, NULL)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_VBLANK )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )

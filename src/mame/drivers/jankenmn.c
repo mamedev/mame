@@ -151,6 +151,7 @@ public:
 	jankenmn_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
 
+	DECLARE_CUSTOM_INPUT_MEMBER(jankenmn_hopper_status_r);
 };
 
 
@@ -214,10 +215,10 @@ static WRITE8_DEVICE_HANDLER( jankenmn_lamps3_w )
 	// d0, d6, d7: N/C?
 }
 
-static CUSTOM_INPUT( jankenmn_hopper_status_r )
+CUSTOM_INPUT_MEMBER(jankenmn_state::jankenmn_hopper_status_r)
 {
 	// temp workaround, needs hopper
-	return field.machine().rand();
+	return machine().rand();
 }
 
 
@@ -251,7 +252,7 @@ static INPUT_PORTS_START( jankenmn )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_CODE(KEYCODE_C) PORT_NAME("Paa (Paper)")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN3 ) // 100 yen coin
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(jankenmn_hopper_status_r, NULL)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, jankenmn_state,jankenmn_hopper_status_r, NULL)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN2 ) // 10 yen coin
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 ) // 10 yen coin
 

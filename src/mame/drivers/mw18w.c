@@ -30,6 +30,7 @@ public:
 	DECLARE_WRITE8_MEMBER(mw18w_lamps_w);
 	DECLARE_WRITE8_MEMBER(mw18w_led_display_w);
 	DECLARE_WRITE8_MEMBER(mw18w_irq0_clear_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(mw18w_sensors_r);
 };
 
 
@@ -66,7 +67,7 @@ WRITE8_MEMBER(mw18w_state::mw18w_irq0_clear_w)
 	cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
 }
 
-static CUSTOM_INPUT( mw18w_sensors_r )
+CUSTOM_INPUT_MEMBER(mw18w_state::mw18w_sensors_r)
 {
 	// d7: off road
 	// d6: in dock area
@@ -114,7 +115,7 @@ static INPUT_PORTS_START( mw18w )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )	// left/right sw.
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(mw18w_sensors_r, NULL)
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, mw18w_state,mw18w_sensors_r, NULL)
 
 	PORT_START("IN1")
 	PORT_BIT( 0x1f, 0x00, IPT_PEDAL ) PORT_REMAP_TABLE(mw18w_controller_table + 0x20) PORT_SENSITIVITY(100) PORT_KEYDELTA(1)	// accelerate

@@ -292,6 +292,9 @@ public:
 	DECLARE_WRITE8_MEMBER(wdclr_w);
 	DECLARE_WRITE8_MEMBER(tempest_led_w);
 	DECLARE_WRITE8_MEMBER(tempest_coin_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(tempest_knob_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(tempest_buttons_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(clock_r);
 };
 
 
@@ -329,25 +332,23 @@ WRITE8_MEMBER(tempest_state::wdclr_w)
  *
  *************************************/
 
-static CUSTOM_INPUT( tempest_knob_r )
+CUSTOM_INPUT_MEMBER(tempest_state::tempest_knob_r)
 {
-	tempest_state *state = field.machine().driver_data<tempest_state>();
-	return input_port_read(field.machine(), (state->m_player_select == 0) ?
+	return input_port_read(machine(), (m_player_select == 0) ?
 										TEMPEST_KNOB_P1_TAG : TEMPEST_KNOB_P2_TAG);
 }
 
-static CUSTOM_INPUT( tempest_buttons_r )
+CUSTOM_INPUT_MEMBER(tempest_state::tempest_buttons_r)
 {
-	tempest_state *state = field.machine().driver_data<tempest_state>();
-	return input_port_read(field.machine(), (state->m_player_select == 0) ?
+	return input_port_read(machine(), (m_player_select == 0) ?
 										TEMPEST_BUTTONS_P1_TAG : TEMPEST_BUTTONS_P2_TAG);
 }
 
 
-static CUSTOM_INPUT( clock_r )
+CUSTOM_INPUT_MEMBER(tempest_state::clock_r)
 {
 	/* Emulate the 3kHz source on bit 7 (divide 1.5MHz by 512) */
-	return (field.machine().device<cpu_device>("maincpu")->total_cycles() & 0x100) ? 1 : 0;
+	return (machine().device<cpu_device>("maincpu")->total_cycles() & 0x100) ? 1 : 0;
 }
 
 
@@ -440,10 +441,10 @@ static INPUT_PORTS_START( tempest )
 	/* per default (busy vector processor). */
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(avgdvg_done_r, NULL)
 	/* bit 7 is tied to a 3kHz (?) clock */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(clock_r, NULL)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, tempest_state,clock_r, NULL)
 
 	PORT_START("IN1/DSW0")
-	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(tempest_knob_r, NULL)
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, tempest_state,tempest_knob_r, NULL)
 	/* The next one is reponsible for cocktail mode.
      * According to the documentation, this is not a switch, although
      * it may have been planned to put it on the Math Box PCB, D/E2 )
@@ -464,7 +465,7 @@ static INPUT_PORTS_START( tempest )
 	PORT_DIPNAME(  0x04, 0x04, "Rating" ) PORT_DIPLOCATION("DE2:2")
 	PORT_DIPSETTING(     0x04, "1, 3, 5, 7, 9" )
 	PORT_DIPSETTING(     0x00, "tied to high score" )
-	PORT_BIT(0x18, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(tempest_buttons_r, NULL)
+	PORT_BIT(0x18, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, tempest_state,tempest_buttons_r, NULL)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )

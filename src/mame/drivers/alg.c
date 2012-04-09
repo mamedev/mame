@@ -42,6 +42,9 @@ public:
 	emu_timer *m_serial_timer;
 	UINT8 m_serial_timer_active;
 	UINT16 m_input_select;
+	DECLARE_CUSTOM_INPUT_MEMBER(lightgun_pos_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(lightgun_trigger_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(lightgun_holster_r);
 };
 
 static TIMER_CALLBACK( response_timer );
@@ -184,32 +187,29 @@ static void alg_potgo_w(running_machine &machine, UINT16 data)
 }
 
 
-static CUSTOM_INPUT( lightgun_pos_r )
+CUSTOM_INPUT_MEMBER(alg_state::lightgun_pos_r)
 {
-	alg_state *state = field.machine().driver_data<alg_state>();
 	int x = 0, y = 0;
 
 	/* get the position based on the input select */
-	get_lightgun_pos(*field.machine().primary_screen, state->m_input_select, &x, &y);
+	get_lightgun_pos(*machine().primary_screen, m_input_select, &x, &y);
 	return (y << 8) | (x >> 2);
 }
 
 
-static CUSTOM_INPUT( lightgun_trigger_r )
+CUSTOM_INPUT_MEMBER(alg_state::lightgun_trigger_r)
 {
-	alg_state *state = field.machine().driver_data<alg_state>();
 
 	/* read the trigger control based on the input select */
-	return (input_port_read(field.machine(), "TRIGGERS") >> state->m_input_select) & 1;
+	return (input_port_read(machine(), "TRIGGERS") >> m_input_select) & 1;
 }
 
 
-static CUSTOM_INPUT( lightgun_holster_r )
+CUSTOM_INPUT_MEMBER(alg_state::lightgun_holster_r)
 {
-	alg_state *state = field.machine().driver_data<alg_state>();
 
 	/* read the holster control based on the input select */
-	return (input_port_read(field.machine(), "TRIGGERS") >> (2 + state->m_input_select)) & 1;
+	return (input_port_read(machine(), "TRIGGERS") >> (2 + m_input_select)) & 1;
 }
 
 
@@ -341,7 +341,7 @@ static INPUT_PORTS_START( alg )
 	PORT_BIT( 0xaaff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("HVPOS")		/* read by Amiga core */
-	PORT_BIT( 0x1ffff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(lightgun_pos_r, NULL)
+	PORT_BIT( 0x1ffff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, alg_state,lightgun_pos_r, NULL)
 
 	PORT_START("FIRE")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
@@ -372,13 +372,13 @@ static INPUT_PORTS_START( alg_2p )
 
 	PORT_MODIFY("POTGO")
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(lightgun_trigger_r, NULL)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, alg_state,lightgun_trigger_r, NULL)
 
 	PORT_MODIFY("FIRE")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_MODIFY("P2JOY")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(lightgun_holster_r, NULL)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, alg_state,lightgun_holster_r, NULL)
 
 	PORT_START("GUN2X")		/* referenced by lightgun_pos_r */
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(2)

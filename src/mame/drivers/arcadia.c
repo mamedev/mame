@@ -64,6 +64,7 @@ public:
 
 	UINT8 coin_counter[2];
 	DECLARE_WRITE16_MEMBER(arcadia_multibios_change_game);
+	DECLARE_CUSTOM_INPUT_MEMBER(coin_counter_r);
 };
 
 
@@ -156,10 +157,9 @@ static WRITE8_DEVICE_HANDLER( arcadia_cia_0_portb_w )
  *
  *************************************/
 
-static CUSTOM_INPUT( coin_counter_r )
+CUSTOM_INPUT_MEMBER(arcadia_amiga_state::coin_counter_r)
 {
 	int coin = (FPTR)param;
-	UINT8 *coin_counter = field.machine().driver_data<arcadia_amiga_state>()->coin_counter;
 
 	/* return coin counter values */
 	return coin_counter[coin] & 3;
@@ -229,8 +229,8 @@ static INPUT_PORTS_START( arcadia )
 	PORT_SERVICE_NO_TOGGLE( 0x02, IP_ACTIVE_LOW )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x30, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(coin_counter_r, 0)
-	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(coin_counter_r, 1)
+	PORT_BIT( 0x30, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, arcadia_amiga_state,coin_counter_r, 0)
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, arcadia_amiga_state,coin_counter_r, 1)
 
 	PORT_START("JOY0DAT")
 	PORT_BIT( 0x0303, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(amiga_joystick_convert, "P1JOY")

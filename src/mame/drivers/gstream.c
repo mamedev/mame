@@ -170,34 +170,36 @@ public:
 	DECLARE_WRITE32_MEMBER(gstream_oki_banking_w);
 	DECLARE_WRITE32_MEMBER(gstream_oki_4040_w);
 	DECLARE_READ32_MEMBER(gstream_speedup_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(gstream_mirror_service_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(gstream_mirror_r);
 };
 
 
 
-static CUSTOM_INPUT( gstream_mirror_service_r )
+CUSTOM_INPUT_MEMBER(gstream_state::gstream_mirror_service_r)
 {
 	int result;
 
 	/* PORT_SERVICE_NO_TOGGLE */
-	result = (input_port_read(field.machine(), "IN0") & 0x8000) >> 15;
+	result = (input_port_read(machine(), "IN0") & 0x8000) >> 15;
 
 	return ~result;
 }
 
-static CUSTOM_INPUT( gstream_mirror_r )
+CUSTOM_INPUT_MEMBER(gstream_state::gstream_mirror_r)
 {
 	int result;
 
 	/* IPT_COIN1 */
-	result  = ((input_port_read(field.machine(), "IN0") & 0x200) >>  9) << 0;
+	result  = ((input_port_read(machine(), "IN0") & 0x200) >>  9) << 0;
 	/* IPT_COIN2 */
-	result |= ((input_port_read(field.machine(), "IN1") & 0x200) >>  9) << 1;
+	result |= ((input_port_read(machine(), "IN1") & 0x200) >>  9) << 1;
 	/* IPT_START1 */
-	result |= ((input_port_read(field.machine(), "IN0") & 0x400) >> 10) << 2;
+	result |= ((input_port_read(machine(), "IN0") & 0x400) >> 10) << 2;
 	/* IPT_START2 */
-	result |= ((input_port_read(field.machine(), "IN1") & 0x400) >> 10) << 3;
+	result |= ((input_port_read(machine(), "IN1") & 0x400) >> 10) << 3;
 	/* PORT_SERVICE_NO_TOGGLE */
-	result |= ((input_port_read(field.machine(), "IN0") & 0x8000) >> 15) << 6;
+	result |= ((input_port_read(machine(), "IN0") & 0x8000) >> 15) << 6;
 
 	return ~result;
 }
@@ -394,10 +396,10 @@ static INPUT_PORTS_START( gstream )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_SERVICE2 )
 	PORT_BIT( 0x7000, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_SPECIAL )	PORT_CUSTOM(gstream_mirror_service_r, NULL)
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_SPECIAL )	PORT_CUSTOM_MEMBER(DEVICE_SELF, gstream_state,gstream_mirror_service_r, NULL)
 
 	PORT_START("IN2")
-	PORT_BIT( 0x004f, IP_ACTIVE_LOW, IPT_SPECIAL )	PORT_CUSTOM(gstream_mirror_r, NULL)
+	PORT_BIT( 0x004f, IP_ACTIVE_LOW, IPT_SPECIAL )	PORT_CUSTOM_MEMBER(DEVICE_SELF, gstream_state,gstream_mirror_r, NULL)
 	PORT_BIT( 0xffb0, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 

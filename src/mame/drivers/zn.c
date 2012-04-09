@@ -55,6 +55,7 @@ public:
 	int m_cbaj_to_z80;
 	int m_cbaj_to_r3k;
 	int m_latch_to_z80;
+	DECLARE_CUSTOM_INPUT_MEMBER(jdredd_gun_mux_read);
 };
 
 INLINE void ATTR_PRINTF(3,4) verboselog( running_machine &machine, int n_level, const char *s_fmt, ... )
@@ -2042,11 +2043,10 @@ static WRITE32_DEVICE_HANDLER( jdredd_ide_w )
 	}
 }
 
-static CUSTOM_INPUT( jdredd_gun_mux_read )
+CUSTOM_INPUT_MEMBER(zn_state::jdredd_gun_mux_read)
 {
-	zn_state *state = field.machine().driver_data<zn_state>();
 
-	return state->m_jdredd_gun_mux;
+	return m_jdredd_gun_mux;
 }
 
 void jdredd_vblank(zn_state *state, screen_device &screen, bool vblank_state)
@@ -2746,7 +2746,7 @@ static INPUT_PORTS_START( jdredd )
 	PORT_BIT( 0x6f, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_MODIFY("SERVICE")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(jdredd_gun_mux_read, NULL)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, zn_state,jdredd_gun_mux_read, NULL)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 

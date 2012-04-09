@@ -99,6 +99,7 @@ public:
 	DECLARE_READ8_MEMBER(famibox_IN1_r);
 	DECLARE_READ8_MEMBER(famibox_system_r);
 	DECLARE_WRITE8_MEMBER(famibox_system_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(famibox_coin_r);
 };
 
 /******************************************************
@@ -424,10 +425,9 @@ static INPUT_CHANGED( coin_inserted )
 	}
 }
 
-static CUSTOM_INPUT( famibox_coin_r )
+CUSTOM_INPUT_MEMBER(famibox_state::famibox_coin_r)
 {
-	famibox_state *state = field.machine().driver_data<famibox_state>();
-	return state->m_coins > 0;
+	return m_coins > 0;
 }
 
 static INPUT_PORTS_START( famibox )
@@ -484,7 +484,7 @@ static INPUT_PORTS_START( famibox )
 	PORT_DIPSETTING(    0x08, "Key position 4" )
 	PORT_DIPSETTING(    0x10, "Key position 5" )
 	PORT_DIPSETTING(    0x20, "Key position 6" )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(famibox_coin_r, NULL)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, famibox_state,famibox_coin_r, NULL)
 
 	PORT_START("COIN")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED(coin_inserted, 0)

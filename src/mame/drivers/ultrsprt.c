@@ -31,6 +31,7 @@ public:
 	DECLARE_WRITE32_MEMBER(int_ack_w);
 	DECLARE_READ16_MEMBER(K056800_68k_r);
 	DECLARE_WRITE16_MEMBER(K056800_68k_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(analog_ctrl_r);
 };
 
 
@@ -86,10 +87,10 @@ WRITE32_MEMBER(ultrsprt_state::eeprom_w)
 		input_port_write(machine(), "EEPROMOUT", data, 0xffffffff);
 }
 
-static CUSTOM_INPUT( analog_ctrl_r )
+CUSTOM_INPUT_MEMBER(ultrsprt_state::analog_ctrl_r)
 {
 	const char *tag = (const char *)param;
-	return input_port_read(field.machine(), tag) & 0xfff;
+	return input_port_read(machine(), tag) & 0xfff;
 }
 
 WRITE32_MEMBER(ultrsprt_state::int_ack_w)
@@ -164,15 +165,15 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( ultrsprt )
 	PORT_START("P1")
-	PORT_BIT( 0x00000fff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(analog_ctrl_r, "STICKY1")
-	PORT_BIT( 0x0fff0000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(analog_ctrl_r, "STICKX1")
+	PORT_BIT( 0x00000fff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, ultrsprt_state,analog_ctrl_r, "STICKY1")
+	PORT_BIT( 0x0fff0000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, ultrsprt_state,analog_ctrl_r, "STICKX1")
 	PORT_BIT( 0x40000000, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x20000000, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x10000000, IP_ACTIVE_HIGH, IPT_START1 )
 
 	PORT_START("P2")
-	PORT_BIT( 0x00000fff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(analog_ctrl_r, "STICKY2")
-	PORT_BIT( 0x0fff0000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(analog_ctrl_r, "STICKX2")
+	PORT_BIT( 0x00000fff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, ultrsprt_state,analog_ctrl_r, "STICKY2")
+	PORT_BIT( 0x0fff0000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, ultrsprt_state,analog_ctrl_r, "STICKX2")
 	PORT_BIT( 0x40000000, IP_ACTIVE_HIGH, IPT_SERVICE1 )
 	PORT_BIT( 0x20000000, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x10000000, IP_ACTIVE_HIGH, IPT_START2 )

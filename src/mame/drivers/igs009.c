@@ -60,6 +60,7 @@ public:
 	DECLARE_WRITE8_MEMBER(jingbell_magic_w);
 	DECLARE_READ8_MEMBER(jingbell_magic_r);
 	void show_out();
+	DECLARE_CUSTOM_INPUT_MEMBER(hopper_r);
 };
 
 
@@ -343,10 +344,9 @@ static SCREEN_UPDATE_IND16(jingbell)
 ***************************************************************************/
 
 
-static CUSTOM_INPUT( hopper_r )
+CUSTOM_INPUT_MEMBER(igs009_state::hopper_r)
 {
-	igs009_state *state = field.machine().driver_data<igs009_state>();
-	return state->m_hopper && !(field.machine().primary_screen->frame_number()%10);
+	return m_hopper && !(machine().primary_screen->frame_number()%10);
 }
 
 
@@ -549,7 +549,7 @@ static INPUT_PORTS_START( jingbell )
 	PORT_START("SERVICE")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Memory Clear")	// stats, memory
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM( hopper_r, (void *)0 )	// hopper sensor
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF,igs009_state,hopper_r, (void *)0 )	// hopper sensor
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_NAME("Pay Out")
 	PORT_SERVICE_NO_TOGGLE( 0x20, IP_ACTIVE_LOW )	// test (press during boot)

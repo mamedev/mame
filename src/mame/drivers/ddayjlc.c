@@ -94,6 +94,7 @@ public:
 	DECLARE_WRITE8_MEMBER(sound_w);
 	DECLARE_WRITE8_MEMBER(i8257_CH0_w);
 	DECLARE_WRITE8_MEMBER(i8257_LMSR_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(prot_r);
 };
 
 
@@ -140,10 +141,9 @@ static const UINT8 prot_data[0x10] =
 	0x03, 0x01, 0x00, 0x03
 };
 
-static CUSTOM_INPUT( prot_r )
+CUSTOM_INPUT_MEMBER(ddayjlc_state::prot_r)
 {
-	ddayjlc_state *state = field.machine().driver_data<ddayjlc_state>();
-	return prot_data[state->m_prot_addr];
+	return prot_data[m_prot_addr];
 }
 
 WRITE8_MEMBER(ddayjlc_state::prot_w)
@@ -293,7 +293,7 @@ static INPUT_PORTS_START( ddayjlc )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SERVICE1 )
-	PORT_BIT( 0x60, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(prot_r, NULL)
+	PORT_BIT( 0x60, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, ddayjlc_state,prot_r, NULL)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("DSW1")

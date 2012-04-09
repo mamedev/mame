@@ -77,6 +77,7 @@ public:
 	DECLARE_READ8_MEMBER(palette_r);
 	DECLARE_WRITE8_MEMBER(palette_w);
 	DECLARE_WRITE8_MEMBER(casino5_bank_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(rndbit_r);
 };
 
 
@@ -345,9 +346,9 @@ WRITE8_MEMBER(merit_state::casino5_bank_w)
 	}
 }
 
-static CUSTOM_INPUT(rndbit_r)
+CUSTOM_INPUT_MEMBER(merit_state::rndbit_r)
 {
-	return field.machine().rand();
+	return machine().rand();
 }
 
 static ADDRESS_MAP_START( pitboss_map, AS_PROGRAM, 8, merit_state )
@@ -1024,7 +1025,7 @@ static INPUT_PORTS_START( bigappg )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(rndbit_r, NULL)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, merit_state,rndbit_r, NULL)
 
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x01, 0x01, "Draw Poker enabled" )

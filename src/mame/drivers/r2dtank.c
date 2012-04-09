@@ -65,6 +65,7 @@ public:
 	DECLARE_WRITE8_MEMBER(audio_command_w);
 	DECLARE_READ8_MEMBER(audio_answer_r);
 	DECLARE_WRITE8_MEMBER(audio_answer_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(get_ttl74123_output);
 };
 
 
@@ -230,10 +231,9 @@ static WRITE8_DEVICE_HANDLER( ttl74123_output_changed )
 }
 
 
-static CUSTOM_INPUT( get_ttl74123_output )
+CUSTOM_INPUT_MEMBER(r2dtank_state::get_ttl74123_output)
 {
-	r2dtank_state *state = field.machine().driver_data<r2dtank_state>();
-	return state->m_ttl74123_output;
+	return m_ttl74123_output;
 }
 
 
@@ -453,7 +453,7 @@ static INPUT_PORTS_START( r2dtank )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(get_ttl74123_output, NULL)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, r2dtank_state,get_ttl74123_output, NULL)
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL

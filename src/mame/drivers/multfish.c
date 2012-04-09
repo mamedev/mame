@@ -211,6 +211,7 @@ public:
 	DECLARE_WRITE8_MEMBER(multfish_counters_w);
 	DECLARE_WRITE8_MEMBER(multfish_f3_w);
 	DECLARE_WRITE8_MEMBER(multfish_dispenable_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(multfish_hopper_r);
 };
 
 static TILE_GET_INFO( get_multfish_tile_info )
@@ -386,14 +387,13 @@ READ8_MEMBER(multfish_state::ray_r)
 	return machine().primary_screen->vpos();
 }
 
-static CUSTOM_INPUT( multfish_hopper_r )
+CUSTOM_INPUT_MEMBER(multfish_state::multfish_hopper_r)
 {
-	multfish_state *state = field.machine().driver_data<multfish_state>();
 
-	if ( state->m_hopper_motor != 0 )
+	if ( m_hopper_motor != 0 )
 	{
-			state->m_hopper++;
-			return state->m_hopper>>4;
+			m_hopper++;
+			return m_hopper>>4;
 	}
 	else
 	{
@@ -704,7 +704,7 @@ static INPUT_PORTS_START( multfish )
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED ) // unused?
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM ( multfish_hopper_r, NULL )// Hopper SW (22 B)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, multfish_state,multfish_hopper_r, NULL )// Hopper SW (22 B)
 	PORT_DIPNAME(     0x02, 0x02, "BK Door (17 A)"  )
 	PORT_DIPSETTING(  0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(  0x00, DEF_STR( On ) )
@@ -797,7 +797,7 @@ static INPUT_PORTS_START( rollfr )
 	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM ( multfish_hopper_r, NULL )// Hopper SW (22 B)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, multfish_state,multfish_hopper_r, NULL )// Hopper SW (22 B)
 	PORT_DIPNAME(     0x02, 0x02, "BK Door (17 A)"  )
 	PORT_DIPSETTING(  0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(  0x00, DEF_STR( On ) )

@@ -78,6 +78,8 @@ public:
 	DECLARE_WRITE8_MEMBER(den2_w);
 	DECLARE_WRITE8_MEMBER(ssi263_register_w);
 	DECLARE_READ8_MEMBER(ssi263_register_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(laserdisc_enter_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(laserdisc_ready_r);
 };
 
 
@@ -618,19 +620,17 @@ ADDRESS_MAP_END
 
 /* Input Ports */
 
-static CUSTOM_INPUT( laserdisc_enter_r )
+CUSTOM_INPUT_MEMBER(thayers_state::laserdisc_enter_r)
 {
-	thayers_state *state = field.machine().driver_data<thayers_state>();
-	if (state->m_pr7820 != NULL) return state->m_pr7820_enter;
-	if (state->m_ldv1000 != NULL) return (state->m_ldv1000->status_strobe_r() == ASSERT_LINE) ? 0 : 1;
+	if (m_pr7820 != NULL) return m_pr7820_enter;
+	if (m_ldv1000 != NULL) return (m_ldv1000->status_strobe_r() == ASSERT_LINE) ? 0 : 1;
 	return 0;
 }
 
-static CUSTOM_INPUT( laserdisc_ready_r )
+CUSTOM_INPUT_MEMBER(thayers_state::laserdisc_ready_r)
 {
-	thayers_state *state = field.machine().driver_data<thayers_state>();
-	if (state->m_pr7820 != NULL) return (state->m_pr7820->ready_r() == ASSERT_LINE) ? 0 : 1;
-	if (state->m_ldv1000 != NULL) return (state->m_ldv1000->command_strobe_r() == ASSERT_LINE) ? 0 : 1;
+	if (m_pr7820 != NULL) return (m_pr7820->ready_r() == ASSERT_LINE) ? 0 : 1;
+	if (m_ldv1000 != NULL) return (m_ldv1000->command_strobe_r() == ASSERT_LINE) ? 0 : 1;
 	return 0;
 }
 
@@ -671,8 +671,8 @@ static INPUT_PORTS_START( thayers )
 	PORT_START("COIN")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(laserdisc_enter_r, NULL)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(laserdisc_ready_r, NULL)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, thayers_state,laserdisc_enter_r, NULL)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, thayers_state,laserdisc_ready_r, NULL)
 
 	PORT_START("R0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME( "2" ) PORT_CODE( KEYCODE_F2 )

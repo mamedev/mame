@@ -18,6 +18,7 @@ public:
 	DECLARE_WRITE8_MEMBER(lamp_w);
 	DECLARE_WRITE8_MEMBER(lamp7_w);
 	DECLARE_WRITE8_MEMBER(sol_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(wolfman_replay_hs_r);
 };
 
 
@@ -166,16 +167,16 @@ WRITE8_MEMBER(peyper_state::sol_w)
 }
 
 
-static CUSTOM_INPUT( wolfman_replay_hs_r )
+CUSTOM_INPUT_MEMBER(peyper_state::wolfman_replay_hs_r)
 {
 	int bit_mask = (FPTR)param;
 
 	switch (bit_mask)
 	{
 		case 0x03:
-			return ((input_port_read(field.machine(), "REPLAY") & bit_mask) >> 0);
+			return ((input_port_read(machine(), "REPLAY") & bit_mask) >> 0);
 		case 0x40:
-			return ((input_port_read(field.machine(), "REPLAY") & bit_mask) >> 6);
+			return ((input_port_read(machine(), "REPLAY") & bit_mask) >> 6);
 		default:
 			logerror("wolfman_replay_hs_r : invalid %02X bit_mask\n",bit_mask);
 			return 0;
@@ -450,14 +451,14 @@ static INPUT_PORTS_START( wolfman )
 	PORT_DIPSETTING(    0x20, "01" )
 //  PORT_DIPNAME( 0x18, 0x00, DEF_STR( Coinage ) )          // Partidas/Moneda - code at 0x0a69 - tables at 0x0b30 (4 * 3) - credits BCD stored at 0x6151
 //  PORT_DIPNAME( 0x04, 0x00, "Balls" )                     // Bolas/Partida - code at 0x0a5c - stored at 0x60bd
-	PORT_BIT( 0x03, 0x00, IPT_SPECIAL) PORT_CUSTOM(wolfman_replay_hs_r, (void *)0x03)
+	PORT_BIT( 0x03, 0x00, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, peyper_state,wolfman_replay_hs_r, (void *)0x03)
 
 	/* DSW1 : port 0x24 - DSW1-1 is bit 7 ... DSW1-8 is bit 0 */
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x80, 0x00, "Adjust Replay" )             // Premios por Puntuacion - code at 0x0aa3 - stored at 0x60c4 and 0x60cc (0x00 NO / 0x05 YES)
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Yes ) )
-	PORT_BIT( 0x40, 0x00, IPT_SPECIAL) PORT_CUSTOM(wolfman_replay_hs_r, (void *)0x40)
+	PORT_BIT( 0x40, 0x00, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, peyper_state,wolfman_replay_hs_r, (void *)0x40)
 	PORT_DIPNAME( 0x20, 0x00, "Clear RAM on Reset" )        // Borrador RAM - code at 0x0ace - range 0x6141..0x616f - 0x616d = 0x5a and 0x616e = 0xa5
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Yes ) )

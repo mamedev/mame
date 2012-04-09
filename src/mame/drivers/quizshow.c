@@ -54,6 +54,7 @@ public:
 	DECLARE_READ8_MEMBER(quizshow_timing_r);
 	DECLARE_READ8_MEMBER(quizshow_tape_signal_r);
 	DECLARE_WRITE8_MEMBER(quizshow_main_ram_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(quizshow_tape_headpos_r);
 };
 
 
@@ -234,10 +235,9 @@ ADDRESS_MAP_END
 
 ***************************************************************************/
 
-static CUSTOM_INPUT(quizshow_tape_headpos_r)
+CUSTOM_INPUT_MEMBER(quizshow_state::quizshow_tape_headpos_r)
 {
-	quizshow_state *state = field.machine().driver_data<quizshow_state>();
-	return 1 << state->m_tape_head_pos;
+	return 1 << m_tape_head_pos;
 }
 
 static INPUT_CHANGED(quizshow_category_select)
@@ -252,7 +252,7 @@ static INPUT_CHANGED(quizshow_category_select)
 
 static INPUT_PORTS_START( quizshow )
 	PORT_START("IN0") // ADR strobe 0
-	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(quizshow_tape_headpos_r, NULL)
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, quizshow_state,quizshow_tape_headpos_r, NULL)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN1 )

@@ -31,6 +31,8 @@ public:
 	/* devices */
 	device_t *m_main_cpu;
 	DECLARE_WRITE8_MEMBER(dorachan_ctrl_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(dorachan_protection_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(dorachan_v128_r);
 };
 
 
@@ -40,19 +42,18 @@ public:
  *
  *************************************/
 
-static CUSTOM_INPUT( dorachan_protection_r )
+CUSTOM_INPUT_MEMBER(dorachan_state::dorachan_protection_r)
 {
-	dorachan_state *state = field.machine().driver_data<dorachan_state>();
 	UINT8 ret = 0;
 
-	switch (cpu_get_previouspc(state->m_main_cpu))
+	switch (cpu_get_previouspc(m_main_cpu))
 	{
 	case 0x70ce: ret = 0xf2; break;
 	case 0x72a2: ret = 0xd5; break;
 	case 0x72b5: ret = 0xcb; break;
 
 	default:
-		mame_printf_debug("unhandled $2400 read @ %x\n", cpu_get_previouspc(state->m_main_cpu));
+		mame_printf_debug("unhandled $2400 read @ %x\n", cpu_get_previouspc(m_main_cpu));
 		break;
 	}
 
@@ -127,12 +128,11 @@ WRITE8_MEMBER(dorachan_state::dorachan_ctrl_w)
 }
 
 
-static CUSTOM_INPUT( dorachan_v128_r )
+CUSTOM_INPUT_MEMBER(dorachan_state::dorachan_v128_r)
 {
-	dorachan_state *state = field.machine().driver_data<dorachan_state>();
 
 	/* to avoid resetting (when player 2 starts) bit 0 need to be inverted when screen is flipped */
-	return ((field.machine().primary_screen->vpos() >> 7) & 0x01) ^ state->m_flip_screen;
+	return ((machine().primary_screen->vpos() >> 7) & 0x01) ^ m_flip_screen;
 }
 
 
@@ -180,7 +180,7 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( dorachan )
 	PORT_START("PROT")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(dorachan_protection_r, NULL)
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, dorachan_state,dorachan_protection_r, NULL)
 
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -209,7 +209,7 @@ static INPUT_PORTS_START( dorachan )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
 
 	PORT_START("V128")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(dorachan_v128_r, NULL)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, dorachan_state,dorachan_v128_r, NULL)
 	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 

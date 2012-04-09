@@ -80,6 +80,9 @@ public:
 	DECLARE_WRITE8_MEMBER(ec_port16_out_w);
 	DECLARE_WRITE8_MEMBER(ec_port17_out_w);
 	DECLARE_WRITE8_MEMBER(ec_port18_out_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(ecoinfr_reel1_opto_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(ecoinfr_reel2_opto_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(ecoinfr_reel3_opto_r);
 };
 
 
@@ -389,17 +392,17 @@ static ADDRESS_MAP_START( portmap, AS_IO, 8, ecoinfr_state )
 	AM_RANGE(0x18, 0x18) AM_WRITE(ec_port18_out_w) // 24 (Watchdog)
 ADDRESS_MAP_END
 
-static CUSTOM_INPUT( ecoinfr_reel1_opto_r )
+CUSTOM_INPUT_MEMBER(ecoinfr_state::ecoinfr_reel1_opto_r)
 {
 	return 0;
 }
 
-static CUSTOM_INPUT( ecoinfr_reel2_opto_r )
+CUSTOM_INPUT_MEMBER(ecoinfr_state::ecoinfr_reel2_opto_r)
 {
 	return 0;
 }
 
-static CUSTOM_INPUT( ecoinfr_reel3_opto_r )
+CUSTOM_INPUT_MEMBER(ecoinfr_state::ecoinfr_reel3_opto_r)
 {
 	return 0;
 }
@@ -432,12 +435,12 @@ static INPUT_PORTS_START( ecoinfr_barx )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(ecoinfr_reel1_opto_r, NULL)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, ecoinfr_state,ecoinfr_reel1_opto_r, NULL)
 	PORT_DIPNAME( 0x02, 0x02, "IN1:02" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(ecoinfr_reel3_opto_r, NULL)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(ecoinfr_reel2_opto_r, NULL)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, ecoinfr_state,ecoinfr_reel3_opto_r, NULL)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, ecoinfr_state,ecoinfr_reel2_opto_r, NULL)
 	PORT_DIPNAME( 0x10, 0x10, "IN1:10" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( On ) )

@@ -116,6 +116,7 @@ public:
 	DECLARE_READ16_MEMBER(dtfamily_speedup_r);
 	DECLARE_READ16_MEMBER(toyland_speedup_r);
 	DECLARE_READ16_MEMBER(boonggab_speedup_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(boonggab_photo_sensors_r);
 };
 
 static READ16_DEVICE_HANDLER( eeprom_r )
@@ -641,10 +642,10 @@ static SCREEN_UPDATE_IND16( aoh )
 	return 0;
 }
 
-static CUSTOM_INPUT( boonggab_photo_sensors_r )
+CUSTOM_INPUT_MEMBER(vamphalf_state::boonggab_photo_sensors_r)
 {
 	static const UINT16 photo_sensors_table[8] = { 0x07, 0x06, 0x05, 0x04, 0x03, 0x02, 0x01, 0x00 };
-	UINT8 res = input_port_read(field.machine(), "PHOTO_SENSORS");
+	UINT8 res = input_port_read(machine(), "PHOTO_SENSORS");
 
 	switch(res)
 	{
@@ -790,7 +791,7 @@ static INPUT_PORTS_START( boonggab )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_SPECIAL ) // sensor 1
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_SPECIAL ) // sensor 2
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_SPECIAL ) // sensor 3
-	PORT_BIT( 0x3800, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(boonggab_photo_sensors_r, NULL) // photo sensors 1, 2 and 3
+	PORT_BIT( 0x3800, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vamphalf_state,boonggab_photo_sensors_r, NULL) // photo sensors 1, 2 and 3
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
 

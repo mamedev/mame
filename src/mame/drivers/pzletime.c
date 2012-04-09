@@ -44,6 +44,7 @@ public:
 	DECLARE_WRITE16_MEMBER(txt_videoram_w);
 	DECLARE_WRITE16_MEMBER(ticket_w);
 	DECLARE_WRITE16_MEMBER(video_regs_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(ticket_status_r);
 };
 
 
@@ -201,10 +202,9 @@ static WRITE16_DEVICE_HANDLER( oki_bank_w )
 	downcast<okim6295_device *>(device)->set_bank_base(0x40000 * (data & 0x3));
 }
 
-static CUSTOM_INPUT( ticket_status_r )
+CUSTOM_INPUT_MEMBER(pzletime_state::ticket_status_r)
 {
-	pzletime_state *state = field.machine().driver_data<pzletime_state>();
-	return (state->m_ticket && !(field.machine().primary_screen->frame_number() % 128));
+	return (m_ticket && !(machine().primary_screen->frame_number() % 128));
 }
 
 static ADDRESS_MAP_START( pzletime_map, AS_PROGRAM, 16, pzletime_state )
@@ -233,7 +233,7 @@ static INPUT_PORTS_START( pzletime )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit) /* eeprom */
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(ticket_status_r, NULL) /* ticket dispenser */
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, pzletime_state,ticket_status_r, NULL) /* ticket dispenser */
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("INPUT")

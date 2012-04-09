@@ -81,6 +81,7 @@ public:
 	DECLARE_WRITE8_MEMBER(snd_ack_w);
 	DECLARE_WRITE8_MEMBER(snd_irq_w);
 	DECLARE_WRITE8_MEMBER(music_irq_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(snd_ack_r);
 };
 
 static TILE_GET_INFO( get_bg_tile_info )
@@ -266,10 +267,9 @@ WRITE8_MEMBER(dacholer_state::snd_ack_w)
 	m_snd_ack = data;
 }
 
-static CUSTOM_INPUT( snd_ack_r )
+CUSTOM_INPUT_MEMBER(dacholer_state::snd_ack_r)
 {
-	dacholer_state *state = field.machine().driver_data<dacholer_state>();
-	return state->m_snd_ack;		//guess ...
+	return m_snd_ack;		//guess ...
 }
 
 WRITE8_MEMBER(dacholer_state::snd_irq_w)
@@ -345,7 +345,7 @@ static INPUT_PORTS_START( dacholer )
 	PORT_DIPSETTING(    0x04, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(snd_ack_r, NULL)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, dacholer_state,snd_ack_r, NULL)
 
 	PORT_START("DSWB")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )            /* table at 0x0a9c */

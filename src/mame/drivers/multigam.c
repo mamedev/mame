@@ -112,6 +112,7 @@ public:
 	int m_vrom4k;
 	UINT8 m_supergm3_prg_bank;
 	UINT8 m_supergm3_chr_bank;
+	DECLARE_CUSTOM_INPUT_MEMBER(multigam_inputs_r);
 };
 
 
@@ -261,12 +262,11 @@ static READ8_HANDLER( multigam_IN1_r )
 	return ((state->m_in_1 >> state->m_in_1_shift++) & 0x01) | 0x40;
 }
 
-static CUSTOM_INPUT( multigam_inputs_r )
+CUSTOM_INPUT_MEMBER(multigam_state::multigam_inputs_r)
 {
-	multigam_state *state = field.machine().driver_data<multigam_state>();
 	/* bit 0: serial input (dsw)
        bit 1: coin */
-	return (state->m_in_dsw >> state->m_in_dsw_shift++) & 0x01;
+	return (m_in_dsw >> m_in_dsw_shift++) & 0x01;
 }
 
 
@@ -978,7 +978,7 @@ static INPUT_PORTS_START( multigam_common )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
 
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(multigam_inputs_r, NULL)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, multigam_state,multigam_inputs_r, NULL)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN1 )
 INPUT_PORTS_END
 
