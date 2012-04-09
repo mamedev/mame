@@ -377,8 +377,9 @@ protected:
 		virtual ~shared_ptr_finder() { if (m_allocated) global_free(m_target); }
 
 		// operators to make use transparent
-		operator _PointerType *() { return m_target; }
 		operator _PointerType *() const { return m_target; }
+		_PointerType operator[](int index) const { return m_target[index]; }
+		_PointerType &operator[](int index) { return m_target[index]; }
 		_PointerType *operator->() { return m_target; }
 
 		// getter for explicit fetching
