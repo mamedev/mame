@@ -1321,6 +1321,13 @@ static void fpgen_rm_reg(m68ki_cpu_core *m68k, UINT16 w2)
 			m68k->remaining_cycles -= 109;
 			break;
 		}
+		case 0x06:		// FLOGNP1
+		{
+			REG_FP(m68k)[dst] = floatx80_flognp1 (source);
+			SET_CONDITION_CODES(m68k, REG_FP(m68k)[dst]);
+			m68k->remaining_cycles -= 594; // for MC68881
+			break;
+		}
 		case 0x0e:      // FSIN
 		{
 			REG_FP(m68k)[dst] = source;
@@ -1335,6 +1342,27 @@ static void fpgen_rm_reg(m68ki_cpu_core *m68k, UINT16 w2)
 			floatx80_ftan(REG_FP(m68k)[dst]);
 			SET_CONDITION_CODES(m68k, REG_FP(m68k)[dst]);
 			m68k->remaining_cycles -= 75;
+			break;
+		}
+		case 0x14:		// FLOGN
+		{
+			REG_FP(m68k)[dst] = floatx80_flogn (source);
+			SET_CONDITION_CODES(m68k, REG_FP(m68k)[dst]);
+			m68k->remaining_cycles -= 548; // for MC68881
+			break;
+		}
+		case 0x15:		// FLOG10
+		{
+			REG_FP(m68k)[dst] = floatx80_flog10 (source);
+			SET_CONDITION_CODES(m68k, REG_FP(m68k)[dst]);
+			m68k->remaining_cycles -= 604; // for MC68881
+			break;
+		}
+		case 0x16:		// FLOG2
+		{
+			REG_FP(m68k)[dst] = floatx80_flog2 (source);
+			SET_CONDITION_CODES(m68k, REG_FP(m68k)[dst]);
+			m68k->remaining_cycles -= 604; // for MC68881
 			break;
 		}
 		case 0x18:		// FABS

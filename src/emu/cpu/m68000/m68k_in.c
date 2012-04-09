@@ -2660,7 +2660,8 @@ M68KMAKE_OP(bfexts, 32, ., .)
 		}
 		width = ((width-1) & 31) + 1;
 
-		data = (offset+width) < 16 ? (m68ki_read_16((mc68kcpu), ea) << 16) : m68ki_read_32((mc68kcpu), ea);
+		data = (offset+width) < 8 ? (m68ki_read_8((mc68kcpu), ea) << 24) :
+				(offset+width) < 16 ? (m68ki_read_16((mc68kcpu), ea) << 16) : m68ki_read_32((mc68kcpu), ea);
 
 		data = MASK_OUT_ABOVE_32(data<<offset);
 
@@ -2745,7 +2746,8 @@ M68KMAKE_OP(bfextu, 32, ., .)
 		}
 		width = ((width-1) & 31) + 1;
 
-		data = (offset+width) < 16 ? (m68ki_read_16((mc68kcpu), ea) << 16) : m68ki_read_32((mc68kcpu), ea);
+		data = (offset+width) < 8 ? (m68ki_read_8((mc68kcpu), ea) << 24) :
+				(offset+width) < 16 ? (m68ki_read_16((mc68kcpu), ea) << 16) : m68ki_read_32((mc68kcpu), ea);
 		data = MASK_OUT_ABOVE_32(data<<offset);
 
 		if((offset+width) > 32)
@@ -2942,11 +2944,16 @@ M68KMAKE_OP(bfins, 32, ., .)
 		(mc68kcpu)->not_z_flag = insert_base;
 		insert_long = insert_base >> offset;
 
-		data_long = (offset+width) < 16 ? (m68ki_read_16((mc68kcpu), ea) << 16) : m68ki_read_32((mc68kcpu), ea);
+		data_long = (offset+width) < 8 ? (m68ki_read_8((mc68kcpu), ea) << 24) :
+				(offset+width) < 16 ? (m68ki_read_16((mc68kcpu), ea) << 16) : m68ki_read_32((mc68kcpu), ea);
 		(mc68kcpu)->v_flag = VFLAG_CLEAR;
 		(mc68kcpu)->c_flag = CFLAG_CLEAR;
 
-		if((width + offset) < 16)
+		if((width + offset) < 8)
+		{
+			m68ki_write_8((mc68kcpu), ea, ((data_long & ~mask_long) | insert_long) >> 24);
+		}
+		else if((width + offset) < 16)
 		{
 			m68ki_write_16((mc68kcpu), ea, ((data_long & ~mask_long) | insert_long) >> 16);
 		}
