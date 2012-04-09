@@ -140,7 +140,7 @@ static WRITE8_HANDLER( chinagat_interrupt_w )
 	switch (offset)
 	{
 		case 0: /* 3e00 - SND irq */
-			state->soundlatch_w(*space, 0, data);
+			state->soundlatch_byte_w(*space, 0, data);
 			device_set_input_line(state->m_snd_cpu, state->m_sound_irq, (state->m_sound_irq == INPUT_LINE_NMI) ? PULSE_LINE : HOLD_LINE );
 			break;
 
@@ -341,7 +341,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, ddragon_state )
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x8800, 0x8801) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0x9800, 0x9800) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0xA000, 0xA000) AM_READ(soundlatch_r)
+	AM_RANGE(0xA000, 0xA000) AM_READ(soundlatch_byte_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ym2203c_sound_map, AS_PROGRAM, 8, ddragon_state )
@@ -359,7 +359,7 @@ static ADDRESS_MAP_START( ym2203c_sound_map, AS_PROGRAM, 8, ddragon_state )
 
 //  AM_RANGE(0x8800, 0x8801) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
 //  AM_RANGE(0x9800, 0x9800) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0xA000, 0xA000) AM_READ(soundlatch_r)
+	AM_RANGE(0xA000, 0xA000) AM_READ(soundlatch_byte_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( saiyugoub1_sound_map, AS_PROGRAM, 8, ddragon_state )
@@ -367,7 +367,7 @@ static ADDRESS_MAP_START( saiyugoub1_sound_map, AS_PROGRAM, 8, ddragon_state )
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x8800, 0x8801) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0x9800, 0x9800) AM_WRITE_LEGACY(saiyugoub1_mcu_command_w)
-	AM_RANGE(0xA000, 0xA000) AM_READ(soundlatch_r)
+	AM_RANGE(0xA000, 0xA000) AM_READ(soundlatch_byte_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( i8748_map, AS_PROGRAM, 8, ddragon_state )

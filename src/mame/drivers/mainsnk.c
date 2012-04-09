@@ -116,13 +116,13 @@ WRITE8_MEMBER(mainsnk_state::sound_command_w)
 {
 
 	m_sound_cpu_busy = 1;
-	soundlatch_w(space, 0, data);
+	soundlatch_byte_w(space, 0, data);
 	cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 READ8_MEMBER(mainsnk_state::sound_command_r)
 {
-	return soundlatch_r(space, 0);
+	return soundlatch_byte_r(space, 0);
 }
 
 READ8_MEMBER(mainsnk_state::sound_ack_r)

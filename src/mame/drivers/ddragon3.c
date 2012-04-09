@@ -171,8 +171,8 @@ WRITE16_MEMBER(ddragon3_state::ddragon3_io_w)
 			m_vreg = m_io_reg[0];
 			break;
 
-		case 1: /* soundlatch_w */
-			soundlatch_w(space, 1, m_io_reg[1] & 0xff);
+		case 1: /* soundlatch_byte_w */
+			soundlatch_byte_w(space, 1, m_io_reg[1] & 0xff);
 			device_set_input_line(m_audiocpu, INPUT_LINE_NMI, PULSE_LINE );
 		break;
 
@@ -257,7 +257,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, ddragon3_state )
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xc800, 0xc801) AM_DEVREADWRITE_LEGACY("ym2151", ym2151_r, ym2151_w)
 	AM_RANGE(0xd800, 0xd800) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_r)
+	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0xe800, 0xe800) AM_DEVWRITE_LEGACY("oki", oki_bankswitch_w)
 ADDRESS_MAP_END
 
@@ -266,7 +266,7 @@ static ADDRESS_MAP_START( ctribe_sound_map, AS_PROGRAM, 8, ddragon3_state )
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x8800, 0x8801) AM_DEVREADWRITE_LEGACY("ym2151", ym2151_status_port_r, ym2151_w)
 	AM_RANGE(0x9800, 0x9800) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
+	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_byte_r)
 ADDRESS_MAP_END
 
 /*************************************

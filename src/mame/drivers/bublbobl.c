@@ -308,7 +308,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, bublbobl_state )
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
 	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE_LEGACY("ym1", ym2203_r, ym2203_w)
 	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE_LEGACY("ym2", ym3526_r, ym3526_w)
-	AM_RANGE(0xb000, 0xb000) AM_READ(soundlatch_r) AM_WRITE(bublbobl_sound_status_w)
+	AM_RANGE(0xb000, 0xb000) AM_READ(soundlatch_byte_r) AM_WRITE(bublbobl_sound_status_w)
 	AM_RANGE(0xb001, 0xb001) AM_WRITE(bublbobl_sh_nmi_enable_w) AM_READNOP
 	AM_RANGE(0xb002, 0xb002) AM_WRITE(bublbobl_sh_nmi_disable_w)
 	AM_RANGE(0xe000, 0xffff) AM_ROM	// space for diagnostic ROM?
@@ -392,7 +392,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( tokio_sound_map, AS_PROGRAM, 8, bublbobl_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
-	AM_RANGE(0x9000, 0x9000) AM_READ(soundlatch_r) AM_WRITE(bublbobl_sound_status_w)
+	AM_RANGE(0x9000, 0x9000) AM_READ(soundlatch_byte_r) AM_WRITE(bublbobl_sound_status_w)
 	AM_RANGE(0x9800, 0x9800) AM_READNOP	// ???
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(bublbobl_sh_nmi_disable_w)
 	AM_RANGE(0xa800, 0xa800) AM_WRITE(bublbobl_sh_nmi_enable_w)

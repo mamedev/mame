@@ -102,7 +102,7 @@ WRITE16_MEMBER(bionicc_state::hacked_soundcommand_w)
 {
 
 	COMBINE_DATA(&m_soundcommand);
-	soundlatch_w(space, 0, m_soundcommand & 0xff);
+	soundlatch_byte_w(space, 0, m_soundcommand & 0xff);
 }
 
 READ16_MEMBER(bionicc_state::hacked_soundcommand_r)
@@ -164,7 +164,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, bionicc_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
-	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
+	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 ADDRESS_MAP_END
 

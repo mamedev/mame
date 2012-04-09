@@ -22,17 +22,17 @@
 #define ACTIVELOW_PORT_BIT(P,A,D)   ((P & (~(1 << A))) | ((D ^ 1) << A))
 #define ACTIVEHIGH_PORT_BIT(P,A,D)   ((P & (~(1 << A))) | (D << A))
 
-#define I8035_T_R(M,N) ((state->soundlatch2_r(M,0) >> (N)) & 1)
-#define I8035_T_W_AH(M,N,D) do { state->m_portT = ACTIVEHIGH_PORT_BIT(state->m_portT,N,D); state->soundlatch2_w(M, 0, state->m_portT); } while (0)
+#define I8035_T_R(M,N) ((state->soundlatch2_byte_r(M,0) >> (N)) & 1)
+#define I8035_T_W_AH(M,N,D) do { state->m_portT = ACTIVEHIGH_PORT_BIT(state->m_portT,N,D); state->soundlatch2_byte_w(M, 0, state->m_portT); } while (0)
 
-#define I8035_P1_R(M) (state->soundlatch3_r(M,0))
-#define I8035_P2_R(M) (state->soundlatch4_r(M,0))
-#define I8035_P1_W(M,D) state->soundlatch3_w(M,0,D)
+#define I8035_P1_R(M) (state->soundlatch3_byte_r(M,0))
+#define I8035_P2_R(M) (state->soundlatch4_byte_r(M,0))
+#define I8035_P1_W(M,D) state->soundlatch3_byte_w(M,0,D)
 
 #if (USE_8039)
-#define I8035_P2_W(M,D) do { state->soundlatch4_w(M,0,D); } while (0)
+#define I8035_P2_W(M,D) do { state->soundlatch4_byte_w(M,0,D); } while (0)
 #else
-#define I8035_P2_W(M,D) do { set_ea(M, ((D) & 0x20) ? 0 : 1);  state->soundlatch4_w(M,0,D); } while (0)
+#define I8035_P2_W(M,D) do { set_ea(M, ((D) & 0x20) ? 0 : 1);  state->soundlatch4_byte_w(M,0,D); } while (0)
 #endif
 
 #define I8035_P1_W_AH(M,B,D) I8035_P1_W(M,ACTIVEHIGH_PORT_BIT(I8035_P1_R(M),B,(D)))
@@ -444,10 +444,10 @@ static SOUND_RESET( mario )
 #endif
 
     /* FIXME: convert to latch8 */
-	state->soundlatch_clear_w(*space, 0, 0);
-	state->soundlatch2_clear_w(*space, 0, 0);
-	state->soundlatch3_clear_w(*space, 0, 0);
-	state->soundlatch4_clear_w(*space, 0, 0);
+	state->soundlatch_clear_byte_w(*space, 0, 0);
+	state->soundlatch2_clear_byte_w(*space, 0, 0);
+	state->soundlatch3_clear_byte_w(*space, 0, 0);
+	state->soundlatch4_clear_byte_w(*space, 0, 0);
 	I8035_P1_W(*space, 0x00); /* Input port */
 	I8035_P2_W(*space, 0xff); /* Port is in high impedance state after reset */
 
@@ -492,7 +492,7 @@ static READ8_HANDLER( mario_sh_tune_r )
 	UINT8 p2 = I8035_P2_R(*space);
 
 	if ((p2 >> 7) & 1)
-		return state->soundlatch_r(*space, offset);
+		return state->soundlatch_byte_r(*space, offset);
 	else
 		return (SND[(0x1000 + (p2 & 0x0f) * 256 + offset) & mask]);
 }
@@ -536,7 +536,7 @@ WRITE8_HANDLER( masao_sh_irqtrigger_w )
 WRITE8_HANDLER( mario_sh_tuneselect_w )
 {
 	mario_state	*state = space->machine().driver_data<mario_state>();
-	state->soundlatch_w(*space, offset, data);
+	state->soundlatch_byte_w(*space, offset, data);
 }
 
 /* Sound 0 and 1 are pulsed !*/
@@ -626,7 +626,7 @@ static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_r),
+	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_byte_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL

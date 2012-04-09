@@ -109,7 +109,7 @@ WRITE16_MEMBER(shangha3_state::heberpop_sound_command_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		soundlatch_w(space, 0, data & 0xff);
+		soundlatch_byte_w(space, 0, data & 0xff);
 		cputag_set_input_line_and_vector(machine(), "audiocpu", 0, HOLD_LINE, 0xff);	/* RST 38h */
 	}
 }
@@ -176,7 +176,7 @@ static ADDRESS_MAP_START( heberpop_sound_io_map, AS_IO, 8, shangha3_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE_LEGACY("ymsnd", ym3438_r, ym3438_w)
 	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0xc0, 0xc0) AM_READ(soundlatch_r)
+	AM_RANGE(0xc0, 0xc0) AM_READ(soundlatch_byte_r)
 ADDRESS_MAP_END
 
 

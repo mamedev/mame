@@ -373,7 +373,7 @@ static WRITE16_DEVICE_HANDLER( sslam_snd_w )
 
 WRITE16_MEMBER(sslam_state::powerbls_sound_w)
 {
-	soundlatch_w(space, 0, data & 0xff);
+	soundlatch_byte_w(space, 0, data & 0xff);
 	cputag_set_input_line(machine(), "audiocpu", MCS51_INT1_LINE, HOLD_LINE);
 }
 
@@ -432,7 +432,7 @@ READ8_MEMBER(sslam_state::playmark_snd_command_r)
 	UINT8 data = 0;
 
 	if ((m_oki_control & 0x38) == 0x30) {
-		data = soundlatch_r(space,0);
+		data = soundlatch_byte_r(space,0);
 	}
 	else if ((m_oki_control & 0x38) == 0x28) {
 		data = (machine().device<okim6295_device>("oki")->read(space,0) & 0x0f);

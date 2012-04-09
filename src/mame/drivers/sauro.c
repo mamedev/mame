@@ -131,13 +131,13 @@ Stephh's notes (based on the games Z80 code and some tests) :
 WRITE8_MEMBER(sauro_state::sauro_sound_command_w)
 {
 	data |= 0x80;
-	soundlatch_w(space, offset, data);
+	soundlatch_byte_w(space, offset, data);
 }
 
 READ8_MEMBER(sauro_state::sauro_sound_command_r)
 {
-	int ret	= soundlatch_r(space, offset);
-	soundlatch_clear_w(space, offset, 0);
+	int ret	= soundlatch_byte_r(space, offset);
+	soundlatch_clear_byte_w(space, offset, 0);
 	return ret;
 }
 

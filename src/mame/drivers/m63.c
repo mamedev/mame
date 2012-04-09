@@ -426,7 +426,7 @@ READ8_MEMBER(m63_state::snddata_r)
 {
 	switch (m_p2 & 0xf0)
 	{
-		case 0x60:	return soundlatch_r(space, 0); ;
+		case 0x60:	return soundlatch_byte_r(space, 0); ;
 		case 0x70:	return machine().region("user1")->base()[((m_p1 & 0x1f) << 8) | offset];
 	}
 	return 0xff;
@@ -459,7 +459,7 @@ static ADDRESS_MAP_START( m63_map, AS_PROGRAM, 8, m63_state )
 	AM_RANGE(0xf002, 0xf002) AM_WRITE(m63_flipscreen_w)
 	AM_RANGE(0xf003, 0xf003) AM_WRITE(m63_palbank_w)
 	AM_RANGE(0xf006, 0xf007) AM_WRITE(coin_w)
-	AM_RANGE(0xf800, 0xf800) AM_READ_PORT("P1") AM_WRITE(soundlatch_w)
+	AM_RANGE(0xf800, 0xf800) AM_READ_PORT("P1") AM_WRITE(soundlatch_byte_w)
 	AM_RANGE(0xf801, 0xf801) AM_READ_PORT("P2") AM_WRITENOP	/* continues game when in stop mode (cleared by NMI handler) */
 	AM_RANGE(0xf802, 0xf802) AM_READ_PORT("DSW1")
 	AM_RANGE(0xf803, 0xf803) AM_WRITE(snd_irq_w)
@@ -482,7 +482,7 @@ static ADDRESS_MAP_START( fghtbskt_map, AS_PROGRAM, 8, m63_state )
 	AM_RANGE(0xf003, 0xf003) AM_READ_PORT("DSW")
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(snd_irq_w)
 	AM_RANGE(0xf001, 0xf001) AM_WRITENOP
-	AM_RANGE(0xf002, 0xf002) AM_WRITE(soundlatch_w)
+	AM_RANGE(0xf002, 0xf002) AM_WRITE(soundlatch_byte_w)
 	AM_RANGE(0xf800, 0xf800) AM_WRITENOP
 	AM_RANGE(0xf801, 0xf801) AM_WRITE(nmi_mask_w)
 	AM_RANGE(0xf802, 0xf802) AM_WRITE(fghtbskt_flipscreen_w)

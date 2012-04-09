@@ -361,7 +361,7 @@ WRITE16_MEMBER(karnov_state::karnov_control_w)
 			return;
 
 		case 2: /* SONREQ (Sound CPU byte) */
-			soundlatch_w(space, 0, data & 0xff);
+			soundlatch_byte_w(space, 0, data & 0xff);
 			device_set_input_line(m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 			break;
 
@@ -440,7 +440,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( karnov_sound_map, AS_PROGRAM, 8, karnov_state )
 	AM_RANGE(0x0000, 0x05ff) AM_RAM
-	AM_RANGE(0x0800, 0x0800) AM_READ(soundlatch_r)
+	AM_RANGE(0x0800, 0x0800) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0x1000, 0x1001) AM_DEVWRITE_LEGACY("ym1", ym2203_w)
 	AM_RANGE(0x1800, 0x1801) AM_DEVWRITE_LEGACY("ym2", ym3526_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM

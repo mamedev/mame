@@ -16,7 +16,7 @@ Driver by Takahiro Nogi (nogi@kt.rim.or.jp) 1999/10/04
 
 WRITE8_MEMBER(ssozumo_state::ssozumo_sh_command_w)
 {
-	soundlatch_w(space, 0, data);
+	soundlatch_byte_w(space, 0, data);
 	cputag_set_input_line(machine(), "audiocpu", M6502_IRQ_LINE, HOLD_LINE);
 }
 
@@ -53,7 +53,7 @@ static ADDRESS_MAP_START( ssozumo_sound_map, AS_PROGRAM, 8, ssozumo_state )
 	AM_RANGE(0x2002, 0x2003) AM_DEVWRITE_LEGACY("ay2", ay8910_data_address_w)
 	AM_RANGE(0x2004, 0x2004) AM_DEVWRITE_LEGACY("dac", dac_signed_w)
 	AM_RANGE(0x2005, 0x2005) AM_WRITE(sound_nmi_mask_w)
-	AM_RANGE(0x2007, 0x2007) AM_READ(soundlatch_r)
+	AM_RANGE(0x2007, 0x2007) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

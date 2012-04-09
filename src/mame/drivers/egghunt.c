@@ -199,7 +199,7 @@ WRITE8_MEMBER(egghunt_state::egghunt_vidram_bank_w)
 
 WRITE8_MEMBER(egghunt_state::egghunt_soundlatch_w)
 {
-	soundlatch_w(space, 0, data);
+	soundlatch_byte_w(space, 0, data);
 	device_set_input_line(m_audiocpu, 0, HOLD_LINE);
 }
 
@@ -239,7 +239,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, egghunt_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_r)
+	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0xe001, 0xe001) AM_DEVREADWRITE_LEGACY("oki", egghunt_okibanking_r, egghunt_okibanking_w)
 	AM_RANGE(0xe004, 0xe004) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	AM_RANGE(0xf000, 0xffff) AM_RAM

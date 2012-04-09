@@ -307,7 +307,7 @@ WRITE16_MEMBER(kaneko16_state::kaneko16_soundlatch_w)
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		soundlatch_w(space, 0, (data & 0xff00) >> 8 );
+		soundlatch_byte_w(space, 0, (data & 0xff00) >> 8 );
 		cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
@@ -887,7 +887,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( blazeon_soundport, AS_IO, 8, kaneko16_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x02, 0x03) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
-	AM_RANGE(0x06, 0x06) AM_READ(soundlatch_r)
+	AM_RANGE(0x06, 0x06) AM_READ(soundlatch_byte_r)
 ADDRESS_MAP_END
 
 

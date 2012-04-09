@@ -313,7 +313,7 @@ WRITE16_MEMBER(sliver_state::io_data_w)
 
 WRITE16_MEMBER(sliver_state::sound_w)
 {
-	soundlatch_w(space, 0, data & 0xff);
+	soundlatch_byte_w(space, 0, data & 0xff);
 	cputag_set_input_line(machine(), "audiocpu", MCS51_INT0_LINE, HOLD_LINE);
 }
 
@@ -360,7 +360,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( soundmem_io, AS_IO, 8, sliver_state )
 	AM_RANGE(0x0100, 0x0100) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0x0101, 0x0101) AM_READ(soundlatch_r)
+	AM_RANGE(0x0101, 0x0101) AM_READ(soundlatch_byte_r)
 	/* ports */
 	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_WRITE(oki_setbank )
 ADDRESS_MAP_END

@@ -122,7 +122,7 @@ static ADDRESS_MAP_START( portrait_map, AS_PROGRAM, 8, portrait_state )
 	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(portrait_fgvideo_write) AM_BASE(m_fgvideoram)
 	AM_RANGE(0x9000, 0x91ff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
 	AM_RANGE(0x9200, 0x97ff) AM_RAM
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(soundlatch_w)
+	AM_RANGE(0xa000, 0xa000) AM_WRITE(soundlatch_byte_w)
 	AM_RANGE(0xa010, 0xa010) AM_WRITENOP // ?
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("DSW1")
 	AM_RANGE(0xa004, 0xa004) AM_READ_PORT("DSW2")

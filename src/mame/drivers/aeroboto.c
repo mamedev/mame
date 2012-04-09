@@ -83,8 +83,8 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, aeroboto_state )
 	AM_RANGE(0x2900, 0x2fff) AM_WRITENOP					// cleared along with sprite RAM
 	AM_RANGE(0x2973, 0x2973) AM_READ(aeroboto_2973_r)			// protection read
 	AM_RANGE(0x3000, 0x3000) AM_READWRITE(aeroboto_in0_r, aeroboto_3000_w)
-	AM_RANGE(0x3001, 0x3001) AM_READ_PORT("DSW1") AM_WRITE(soundlatch_w)
-	AM_RANGE(0x3002, 0x3002) AM_READ_PORT("DSW2") AM_WRITE(soundlatch2_w)
+	AM_RANGE(0x3001, 0x3001) AM_READ_PORT("DSW1") AM_WRITE(soundlatch_byte_w)
+	AM_RANGE(0x3002, 0x3002) AM_READ_PORT("DSW2") AM_WRITE(soundlatch2_byte_w)
 	AM_RANGE(0x3003, 0x3003) AM_WRITEONLY AM_BASE(m_vscroll)
 	AM_RANGE(0x3004, 0x3004) AM_READ(aeroboto_201_r) AM_WRITEONLY AM_BASE(m_starx)
 	AM_RANGE(0x3005, 0x3005) AM_WRITEONLY AM_BASE(m_stary)	// usable but probably wrong
@@ -217,8 +217,8 @@ static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_r),
-	DEVCB_DRIVER_MEMBER(driver_device, soundlatch2_r),
+	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_byte_r),
+	DEVCB_DRIVER_MEMBER(driver_device, soundlatch2_byte_r),
 	DEVCB_NULL,
 	DEVCB_NULL
 };

@@ -297,7 +297,7 @@ CUSTOM_INPUT_MEMBER(m92_state::m92_sprite_busy_r)
 WRITE16_MEMBER(m92_state::m92_soundlatch_w)
 {
 	cputag_set_input_line(machine(), "soundcpu", NEC_INPUT_LINE_INTP1, ASSERT_LINE);
-	soundlatch_w(space, 0, data & 0xff);
+	soundlatch_byte_w(space, 0, data & 0xff);
 }
 
 READ16_MEMBER(m92_state::m92_sound_status_r)
@@ -309,7 +309,7 @@ READ16_MEMBER(m92_state::m92_sound_status_r)
 READ16_MEMBER(m92_state::m92_soundlatch_r)
 {
 	cputag_set_input_line(machine(), "soundcpu", NEC_INPUT_LINE_INTP1, CLEAR_LINE);
-	return soundlatch_r(space, offset) | 0xff00;
+	return soundlatch_byte_r(space, offset) | 0xff00;
 }
 
 WRITE16_MEMBER(m92_state::m92_sound_irq_ack_w)

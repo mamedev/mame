@@ -224,8 +224,8 @@ WRITE8_MEMBER(calorie_state::calorie_flipscreen_w)
 
 READ8_MEMBER(calorie_state::calorie_soundlatch_r)
 {
-	UINT8 latch = soundlatch_r(space, 0);
-	soundlatch_clear_w(space, 0, 0);
+	UINT8 latch = soundlatch_byte_r(space, 0);
+	soundlatch_clear_byte_w(space, 0, 0);
 	return latch;
 }
 
@@ -253,7 +253,7 @@ static ADDRESS_MAP_START( calorie_map, AS_PROGRAM, 8, calorie_state )
 	AM_RANGE(0xf002, 0xf002) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xf004, 0xf004) AM_READ_PORT("DSW1") AM_WRITE(calorie_flipscreen_w)
 	AM_RANGE(0xf005, 0xf005) AM_READ_PORT("DSW2")
-	AM_RANGE(0xf800, 0xf800) AM_WRITE(soundlatch_w)
+	AM_RANGE(0xf800, 0xf800) AM_WRITE(soundlatch_byte_w)
 ADDRESS_MAP_END
 
 

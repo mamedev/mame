@@ -238,7 +238,7 @@ static TIMER_CALLBACK( delayed_sound_data_w )
 	segas1x_state *state = machine.driver_data<segas1x_state>();
 	address_space *space = state->m_maincpu->memory().space(AS_PROGRAM);
 
-	state->soundlatch_w(*space, 0, param);
+	state->soundlatch_byte_w(*space, 0, param);
 	device_set_input_line(state->m_soundcpu, INPUT_LINE_NMI, ASSERT_LINE);
 }
 
@@ -254,7 +254,7 @@ static READ8_HANDLER( sound_data_r )
 {
 	segas1x_state *state = space->machine().driver_data<segas1x_state>();
 	device_set_input_line(state->m_soundcpu, INPUT_LINE_NMI, CLEAR_LINE);
-	return state->soundlatch_r(*space, offset);
+	return state->soundlatch_byte_r(*space, offset);
 }
 
 

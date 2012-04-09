@@ -44,7 +44,7 @@ WRITE16_MEMBER(sf_state::soundcmd_w)
 
 	if (ACCESSING_BITS_0_7)
 	{
-		soundlatch_w(space, offset, data & 0xff);
+		soundlatch_byte_w(space, offset, data & 0xff);
 		device_set_input_line(m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
@@ -257,7 +257,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, sf_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xc800, 0xc800) AM_READ(soundlatch_r)
+	AM_RANGE(0xc800, 0xc800) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0xe000, 0xe001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r,ym2151_w)
 ADDRESS_MAP_END
 
@@ -272,7 +272,7 @@ static ADDRESS_MAP_START( sound2_io_map, AS_IO, 8, sf_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVWRITE_LEGACY("msm1", msm5205_w)
 	AM_RANGE(0x01, 0x01) AM_DEVWRITE_LEGACY("msm2", msm5205_w)
-	AM_RANGE(0x01, 0x01) AM_READ(soundlatch_r)
+	AM_RANGE(0x01, 0x01) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0x02, 0x02) AM_WRITE(sound2_bank_w)
 ADDRESS_MAP_END
 

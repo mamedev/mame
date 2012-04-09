@@ -55,7 +55,7 @@ WRITE16_MEMBER(mugsmash_state::mugsmash_reg2_w)
 	switch (offset)
 	{
 	case 1:
-		soundlatch_w(space, 1, data & 0xff);
+		soundlatch_byte_w(space, 1, data & 0xff);
 		device_set_input_line(m_audiocpu, INPUT_LINE_NMI, PULSE_LINE );
 		break;
 
@@ -196,7 +196,7 @@ static ADDRESS_MAP_START( mugsmash_sound_map, AS_PROGRAM, 8, mugsmash_state )
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x8800, 0x8801) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r,ym2151_w)
 	AM_RANGE(0x9800, 0x9800) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
+	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_byte_r)
 ADDRESS_MAP_END
 
 

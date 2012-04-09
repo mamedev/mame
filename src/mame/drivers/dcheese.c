@@ -143,7 +143,7 @@ WRITE16_MEMBER(dcheese_state::sound_command_w)
 		/* write the latch and set the IRQ */
 		m_soundlatch_full = 1;
 		device_set_input_line(m_audiocpu, 0, ASSERT_LINE);
-		soundlatch_w(space, 0, data & 0xff);
+		soundlatch_byte_w(space, 0, data & 0xff);
 	}
 }
 
@@ -161,7 +161,7 @@ READ8_MEMBER(dcheese_state::sound_command_r)
 	/* read the latch and clear the IRQ */
 	m_soundlatch_full = 0;
 	device_set_input_line(m_audiocpu, 0, CLEAR_LINE);
-	return soundlatch_r(space, 0);
+	return soundlatch_byte_r(space, 0);
 }
 
 

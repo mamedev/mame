@@ -198,7 +198,7 @@ static ADDRESS_MAP_START( hotshock_map, AS_PROGRAM, 8, scramble_state )
 	AM_RANGE(0x6006, 0x6006) AM_WRITE(galaxold_gfxbank_w)
 	AM_RANGE(0x6801, 0x6801) AM_WRITE(galaxold_nmi_enable_w)
 	AM_RANGE(0x7000, 0x7000) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0x8000, 0x8000) AM_READ_PORT("IN0") AM_WRITE(soundlatch_w)
+	AM_RANGE(0x8000, 0x8000) AM_READ_PORT("IN0") AM_WRITE(soundlatch_byte_w)
 	AM_RANGE(0x8001, 0x8001) AM_READ_PORT("IN1")
 	AM_RANGE(0x8002, 0x8002) AM_READ_PORT("IN2")
 	AM_RANGE(0x8003, 0x8003) AM_READ_PORT("IN3")
@@ -264,7 +264,7 @@ static ADDRESS_MAP_START( ad2083_map, AS_PROGRAM, 8, scramble_state )
 	AM_RANGE(0x6805, 0x6805) AM_WRITE(galaxold_coin_counter_1_w)
 	AM_RANGE(0x6806, 0x6806) AM_WRITE(scrambold_background_red_w)
 	AM_RANGE(0x6807, 0x6807) AM_WRITE(scrambold_background_green_w)
-	AM_RANGE(0x8000, 0x8000) AM_WRITE(soundlatch_w)
+	AM_RANGE(0x8000, 0x8000) AM_WRITE(soundlatch_byte_w)
 	AM_RANGE(0x9000, 0x9000) AM_WRITE_LEGACY(hotshock_sh_irqtrigger_w)
 	AM_RANGE(0x7000, 0x7000) AM_READ(watchdog_reset_r)
 	AM_RANGE(0x8000, 0x8000) AM_READ_PORT("IN0")
@@ -1152,7 +1152,7 @@ static const ay8910_interface scramble_ay8910_interface_2 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_r),
+	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_byte_r),
 	DEVCB_HANDLER(scramble_portB_r),
 	DEVCB_NULL,
 	DEVCB_NULL

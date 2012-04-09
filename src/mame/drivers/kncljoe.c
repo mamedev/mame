@@ -37,7 +37,7 @@ WRITE8_MEMBER(kncljoe_state::sound_cmd_w)
 {
 
 	if ((data & 0x80) == 0)
-		soundlatch_w(space, 0, data & 0x7f);
+		soundlatch_byte_w(space, 0, data & 0x7f);
 	else
 		device_set_input_line(m_soundcpu, 0, ASSERT_LINE);
 }
@@ -235,7 +235,7 @@ static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_r),
+	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_byte_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_HANDLER(unused_w)

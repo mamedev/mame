@@ -161,7 +161,7 @@ static INTERRUPT_GEN(polygonet_interrupt)
 /* sound CPU communications */
 READ32_MEMBER(polygonet_state::sound_r)
 {
-	int latch = soundlatch3_r(space, 0);
+	int latch = soundlatch3_byte_r(space, 0);
 
 	if ((latch == 0xd) || (latch == 0xe)) latch = 0xf;	/* hack: until 54539 NMI disable found */
 
@@ -172,11 +172,11 @@ WRITE32_MEMBER(polygonet_state::sound_w)
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		soundlatch_w(space, 0, (data>>8)&0xff);
+		soundlatch_byte_w(space, 0, (data>>8)&0xff);
 	}
 	else
 	{
-		soundlatch2_w(space, 0, data&0xff);
+		soundlatch2_byte_w(space, 0, data&0xff);
 	}
 }
 
@@ -570,9 +570,9 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, polygonet_state )
 	AM_RANGE(0xe230, 0xe3ff) AM_RAM
 	AM_RANGE(0xe400, 0xe62f) AM_DEVREADWRITE("konami2", k054539_device, read, write)
 	AM_RANGE(0xe630, 0xe7ff) AM_RAM
-	AM_RANGE(0xf000, 0xf000) AM_WRITE(soundlatch3_w)
-	AM_RANGE(0xf002, 0xf002) AM_READ(soundlatch_r)
-	AM_RANGE(0xf003, 0xf003) AM_READ(soundlatch2_r)
+	AM_RANGE(0xf000, 0xf000) AM_WRITE(soundlatch3_byte_w)
+	AM_RANGE(0xf002, 0xf002) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xf003, 0xf003) AM_READ(soundlatch2_byte_r)
 	AM_RANGE(0xf800, 0xf800) AM_WRITE(sound_bankswitch_w)
 	AM_RANGE(0xfff1, 0xfff3) AM_WRITENOP
 ADDRESS_MAP_END

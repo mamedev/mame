@@ -863,7 +863,7 @@ WRITE16_MEMBER(toaplan2_state::bgaregga_soundlatch_w)
 	if (ACCESSING_BITS_0_7)
 	{
 
-		soundlatch_w(space, offset, data & 0xff);
+		soundlatch_byte_w(space, offset, data & 0xff);
 		device_set_input_line(m_sub_cpu, 0, HOLD_LINE);
 	}
 }
@@ -921,7 +921,7 @@ WRITE16_MEMBER(toaplan2_state::batrider_soundlatch_w)
 	if (ACCESSING_BITS_0_7)
 	{
 
-		soundlatch_w(space, offset, data & 0xff);
+		soundlatch_byte_w(space, offset, data & 0xff);
 		device_set_input_line(m_sub_cpu, INPUT_LINE_NMI, ASSERT_LINE);
 	}
 }
@@ -932,7 +932,7 @@ WRITE16_MEMBER(toaplan2_state::batrider_soundlatch2_w)
 	if (ACCESSING_BITS_0_7)
 	{
 
-		soundlatch2_w(space, offset, data & 0xff);
+		soundlatch2_byte_w(space, offset, data & 0xff);
 		device_set_input_line(m_sub_cpu, INPUT_LINE_NMI, ASSERT_LINE);
 	}
 }
@@ -1418,7 +1418,7 @@ static ADDRESS_MAP_START( bgaregga_sound_z80_mem, AS_PROGRAM, 8, toaplan2_state 
 	AM_RANGE(0xe006, 0xe008) AM_WRITE(raizing_oki_bankswitch_w)
 	AM_RANGE(0xe00a, 0xe00a) AM_WRITE(raizing_z80_bankswitch_w)
 	AM_RANGE(0xe00c, 0xe00c) AM_WRITE(bgaregga_E00C_w)
-	AM_RANGE(0xe01c, 0xe01c) AM_READ(soundlatch_r)
+	AM_RANGE(0xe01c, 0xe01c) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0xe01d, 0xe01d) AM_READ(bgaregga_E01D_r)
 ADDRESS_MAP_END
 
@@ -1432,12 +1432,12 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( batrider_sound_z80_port, AS_IO, 8, toaplan2_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x40, 0x40) AM_WRITE(soundlatch3_w)
-	AM_RANGE(0x42, 0x42) AM_WRITE(soundlatch4_w)
+	AM_RANGE(0x40, 0x40) AM_WRITE(soundlatch3_byte_w)
+	AM_RANGE(0x42, 0x42) AM_WRITE(soundlatch4_byte_w)
 	AM_RANGE(0x44, 0x44) AM_WRITE(batrider_sndirq_w)
 	AM_RANGE(0x46, 0x46) AM_WRITE(batrider_clear_nmi_w)
-	AM_RANGE(0x48, 0x48) AM_READ(soundlatch_r)
-	AM_RANGE(0x4a, 0x4a) AM_READ(soundlatch2_r)
+	AM_RANGE(0x48, 0x48) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x4a, 0x4a) AM_READ(soundlatch2_byte_r)
 	AM_RANGE(0x80, 0x81) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0x82, 0x82) AM_DEVREADWRITE("oki1", okim6295_device, read, write)
 	AM_RANGE(0x84, 0x84) AM_DEVREADWRITE("oki2", okim6295_device, read, write)
@@ -1454,12 +1454,12 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bbakraid_sound_z80_port, AS_IO, 8, toaplan2_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x40, 0x40) AM_WRITE(soundlatch3_w)
-	AM_RANGE(0x42, 0x42) AM_WRITE(soundlatch4_w)
+	AM_RANGE(0x40, 0x40) AM_WRITE(soundlatch3_byte_w)
+	AM_RANGE(0x42, 0x42) AM_WRITE(soundlatch4_byte_w)
 	AM_RANGE(0x44, 0x44) AM_WRITE(batrider_sndirq_w)
 	AM_RANGE(0x46, 0x46) AM_WRITE(batrider_clear_nmi_w)
-	AM_RANGE(0x48, 0x48) AM_READ(soundlatch_r)
-	AM_RANGE(0x4a, 0x4a) AM_READ(soundlatch2_r)
+	AM_RANGE(0x48, 0x48) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x4a, 0x4a) AM_READ(soundlatch2_byte_r)
 	AM_RANGE(0x80, 0x81) AM_DEVREADWRITE_LEGACY("ymz", ymz280b_r, ymz280b_w)
 ADDRESS_MAP_END
 

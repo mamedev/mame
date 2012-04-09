@@ -142,7 +142,7 @@ WRITE8_MEMBER(poo_state::unk_w)
 /* soundlatch write */
 WRITE8_MEMBER(poo_state::sound_cmd_w)
 {
-	soundlatch_w(space, 0, (data & 0xff));
+	soundlatch_byte_w(space, 0, (data & 0xff));
 	cputag_set_input_line(machine(), "subcpu", 0, HOLD_LINE);
 }
 
@@ -322,7 +322,7 @@ static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_r),
+	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_byte_r),
 	DEVCB_DRIVER_MEMBER(poo_state, timer_r),
 	DEVCB_NULL,
 	DEVCB_NULL

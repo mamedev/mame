@@ -62,7 +62,7 @@ WRITE16_MEMBER(aquarium_state::aquarium_sound_w)
 {
 //  popmessage("sound write %04x",data);
 
-	soundlatch_w(space, 1, data & 0xff);
+	soundlatch_byte_w(space, 1, data & 0xff);
 	device_set_input_line(m_audiocpu, INPUT_LINE_NMI, PULSE_LINE );
 }
 
@@ -131,7 +131,7 @@ static ADDRESS_MAP_START( snd_portmap, AS_IO, 8, aquarium_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0x02, 0x02) AM_READWRITE(aquarium_oki_r, aquarium_oki_w)
-	AM_RANGE(0x04, 0x04) AM_READ(soundlatch_r)
+	AM_RANGE(0x04, 0x04) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0x06, 0x06) AM_WRITE(aquarium_snd_ack_w)
 	AM_RANGE(0x08, 0x08) AM_WRITE(aquarium_z80_bank_w)
 ADDRESS_MAP_END

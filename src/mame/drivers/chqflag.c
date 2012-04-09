@@ -131,7 +131,7 @@ READ8_MEMBER(chqflag_state::analog_read_r)
 
 WRITE8_MEMBER(chqflag_state::chqflag_sh_irqtrigger_w)
 {
-	soundlatch2_w(space, 0, data);
+	soundlatch2_byte_w(space, 0, data);
 	device_set_input_line(m_audiocpu, 0, HOLD_LINE);
 }
 
@@ -145,7 +145,7 @@ static ADDRESS_MAP_START( chqflag_map, AS_PROGRAM, 8, chqflag_state )
 	AM_RANGE(0x2000, 0x2007) AM_DEVREADWRITE_LEGACY("k051960", k051937_r, k051937_w)					/* Sprite control registers */
 	AM_RANGE(0x2400, 0x27ff) AM_DEVREADWRITE_LEGACY("k051960", k051960_r, k051960_w)					/* Sprite RAM */
 	AM_RANGE(0x2800, 0x2fff) AM_READ_BANK("bank3") AM_DEVWRITE_LEGACY("k051316_2", k051316_w)		/* 051316 zoom/rotation (chip 2) */
-	AM_RANGE(0x3000, 0x3000) AM_WRITE(soundlatch_w)								/* sound code # */
+	AM_RANGE(0x3000, 0x3000) AM_WRITE(soundlatch_byte_w)								/* sound code # */
 	AM_RANGE(0x3001, 0x3001) AM_WRITE(chqflag_sh_irqtrigger_w)					/* cause interrupt on audio CPU */
 	AM_RANGE(0x3002, 0x3002) AM_WRITE(chqflag_bankswitch_w)						/* bankswitch control */
 	AM_RANGE(0x3003, 0x3003) AM_WRITE(chqflag_vreg_w)							/* enable K051316 ROM reading */
@@ -187,8 +187,8 @@ static ADDRESS_MAP_START( chqflag_sound_map, AS_PROGRAM, 8, chqflag_state )
 	AM_RANGE(0xa01c, 0xa01c) AM_DEVWRITE_LEGACY("k007232_2", k007232_extvolume_w)	/* extra volume, goes to the 007232 w/ A11 */
 	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE_LEGACY("k007232_2", k007232_r, k007232_w)	/* 007232 (chip 2) */
 	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)	/* YM2151 */
-	AM_RANGE(0xd000, 0xd000) AM_READ(soundlatch_r)			/* soundlatch_r */
-	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch2_r)         /* engine sound volume */
+	AM_RANGE(0xd000, 0xd000) AM_READ(soundlatch_byte_r)			/* soundlatch_byte_r */
+	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch2_byte_r)         /* engine sound volume */
 	AM_RANGE(0xf000, 0xf000) AM_WRITENOP					/* ??? */
 ADDRESS_MAP_END
 

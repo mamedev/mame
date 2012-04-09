@@ -119,7 +119,7 @@ WRITE32_MEMBER(limenko_state::fg_videoram_w)
 
 WRITE32_MEMBER(limenko_state::spotty_soundlatch_w)
 {
-	soundlatch_w(space, 0, (data >> 16) & 0xff);
+	soundlatch_byte_w(space, 0, (data >> 16) & 0xff);
 }
 
 CUSTOM_INPUT_MEMBER(limenko_state::spriteram_bit_r)
@@ -222,7 +222,7 @@ READ8_MEMBER(limenko_state::spotty_sound_r)
 	// check m_spotty_sound_cmd bits...
 
 	if(m_spotty_sound_cmd == 0xf7)
-		return soundlatch_r(space,0);
+		return soundlatch_byte_r(space,0);
 	else
 		return machine().device<okim6295_device>("oki")->read(space,0);
 }

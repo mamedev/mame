@@ -67,7 +67,7 @@ WRITE16_MEMBER(esd16_state::esd16_sound_command_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		soundlatch_w(space, 0, data & 0xff);
+		soundlatch_byte_w(space, 0, data & 0xff);
 		device_set_input_line(m_audio_cpu, 0, ASSERT_LINE);		// Generate an IRQ
 		device_spin_until_time(&space.device(), attotime::from_usec(50));	// Allow the other CPU to reply
 	}
@@ -240,7 +240,7 @@ READ8_MEMBER(esd16_state::esd16_sound_command_r)
 
 	/* Clear IRQ only after reading the command, or some get lost */
 	device_set_input_line(m_audio_cpu, 0, CLEAR_LINE);
-	return soundlatch_r(space, 0);
+	return soundlatch_byte_r(space, 0);
 }
 
 static ADDRESS_MAP_START( multchmp_sound_io_map, AS_IO, 8, esd16_state )

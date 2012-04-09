@@ -171,7 +171,7 @@ WRITE8_MEMBER(vball_state::vb_bankswitch_w)
 /* The sound system comes all but verbatim from Double Dragon */
 WRITE8_MEMBER(vball_state::cpu_sound_command_w)
 {
-	soundlatch_w(space, offset, data);
+	soundlatch_byte_w(space, offset, data);
 	cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -229,7 +229,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, vball_state )
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x8800, 0x8801) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0x9800, 0x9803) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0xA000, 0xA000) AM_READ(soundlatch_r)
+	AM_RANGE(0xA000, 0xA000) AM_READ(soundlatch_byte_r)
 ADDRESS_MAP_END
 
 

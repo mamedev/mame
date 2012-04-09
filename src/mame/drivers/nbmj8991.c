@@ -48,20 +48,20 @@ Notes:
 
 WRITE8_MEMBER(nbmj8991_state::nbmj8991_soundbank_w)
 {
-	if (!(data & 0x80)) soundlatch_clear_w(space, 0, 0);
+	if (!(data & 0x80)) soundlatch_clear_byte_w(space, 0, 0);
 	memory_set_bank(machine(), "bank1", data & 0x03);
 }
 
 WRITE8_MEMBER(nbmj8991_state::nbmj8991_sound_w)
 {
-	soundlatch_w(space, 0, data);
+	soundlatch_byte_w(space, 0, data);
 }
 
 READ8_MEMBER(nbmj8991_state::nbmj8991_sound_r)
 {
 	int data;
 
-	data = soundlatch_r(space,0);
+	data = soundlatch_byte_r(space,0);
 	return data;
 }
 

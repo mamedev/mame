@@ -69,7 +69,7 @@ static READ8_DEVICE_HANDLER( amspdwy_sound_r )
 
 WRITE8_MEMBER(amspdwy_state::amspdwy_sound_w)
 {
-	soundlatch_w(space, 0, data);
+	soundlatch_byte_w(space, 0, data);
 	device_set_input_line(m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -114,7 +114,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( amspdwy_sound_map, AS_PROGRAM, 8, amspdwy_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM									// ROM
 //  AM_RANGE(0x8000, 0x8000) AM_WRITENOP                            // ? Written with 0 at the start
-	AM_RANGE(0x9000, 0x9000) AM_READ(soundlatch_r)					// From Main CPU
+	AM_RANGE(0x9000, 0x9000) AM_READ(soundlatch_byte_r)					// From Main CPU
 	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)			//
 	AM_RANGE(0xc000, 0xdfff) AM_RAM									// Work RAM
 	AM_RANGE(0xffff, 0xffff) AM_READNOP								// ??? IY = FFFF at the start ?

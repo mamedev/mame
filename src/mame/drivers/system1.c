@@ -499,7 +499,7 @@ READ8_MEMBER(system1_state::sound_data_r)
 		UINT8 initial_value = ppi8255_get_port_c(ppi);
 		ppi8255_set_port_c(ppi, initial_value & ~0x40);
 		ppi8255_set_port_c(ppi, initial_value |  0x40);
-		return soundlatch_r(space, offset);
+		return soundlatch_byte_r(space, offset);
 	}
 
 	/* if we have a Z80 PIO, get the data from the port and toggle the strobe */
@@ -518,7 +518,7 @@ READ8_MEMBER(system1_state::sound_data_r)
 WRITE8_MEMBER(system1_state::soundport_w)
 {
 	/* boost interleave when communicating with the sound CPU */
-	soundlatch_w(space, 0, data);
+	soundlatch_byte_w(space, 0, data);
 	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
 }
 

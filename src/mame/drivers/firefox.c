@@ -297,13 +297,13 @@ CUSTOM_INPUT_MEMBER(firefox_state::soundflag_r)
 READ8_MEMBER(firefox_state::sound_to_main_r)
 {
 	m_sound_to_main_flag = 0;
-	return soundlatch2_r(space, 0);
+	return soundlatch2_byte_r(space, 0);
 }
 
 WRITE8_MEMBER(firefox_state::main_to_sound_w)
 {
 	m_main_to_sound_flag = 1;
-	soundlatch_w(space, 0, data);
+	soundlatch_byte_w(space, 0, data);
 	cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -317,13 +317,13 @@ WRITE8_MEMBER(firefox_state::sound_reset_w)
 READ8_MEMBER(firefox_state::main_to_sound_r)
 {
 	m_main_to_sound_flag = 0;
-	return soundlatch_r(space, 0);
+	return soundlatch_byte_r(space, 0);
 }
 
 WRITE8_MEMBER(firefox_state::sound_to_main_w)
 {
 	m_sound_to_main_flag = 1;
-	soundlatch2_w(space, 0, data);
+	soundlatch2_byte_w(space, 0, data);
 }
 
 

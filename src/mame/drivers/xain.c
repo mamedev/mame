@@ -223,7 +223,7 @@ WRITE8_MEMBER(xain_state::xainCPUB_bankswitch_w)
 
 WRITE8_MEMBER(xain_state::xain_sound_command_w)
 {
-	soundlatch_w(space,offset,data);
+	soundlatch_byte_w(space,offset,data);
 	cputag_set_input_line(machine(), "audiocpu", M6809_IRQ_LINE, HOLD_LINE);
 }
 
@@ -437,7 +437,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, xain_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x1000, 0x1000) AM_READ(soundlatch_r)
+	AM_RANGE(0x1000, 0x1000) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0x2800, 0x2801) AM_DEVWRITE_LEGACY("ym1", ym2203_w)
 	AM_RANGE(0x3000, 0x3001) AM_DEVWRITE_LEGACY("ym2", ym2203_w)
 	AM_RANGE(0x4000, 0xffff) AM_ROM

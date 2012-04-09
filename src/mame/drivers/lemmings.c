@@ -79,7 +79,7 @@ WRITE16_MEMBER(lemmings_state::lemmings_palette_24bit_w)
 
 WRITE16_MEMBER(lemmings_state::lemmings_sound_w)
 {
-	soundlatch_w(space, 0, data & 0xff);
+	soundlatch_byte_w(space, 0, data & 0xff);
 	device_set_input_line(m_audiocpu, 1, HOLD_LINE);
 }
 
@@ -114,7 +114,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, lemmings_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x0800, 0x0801) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r,ym2151_w)
 	AM_RANGE(0x1000, 0x1000) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0x1800, 0x1800) AM_READ(soundlatch_r) AM_WRITE(lemmings_sound_ack_w)
+	AM_RANGE(0x1800, 0x1800) AM_READ(soundlatch_byte_r) AM_WRITE(lemmings_sound_ack_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

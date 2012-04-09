@@ -102,7 +102,7 @@ WRITE8_MEMBER(flower_state::flower_coin_lockout_w)
 
 WRITE8_MEMBER(flower_state::sound_command_w)
 {
-	soundlatch_w(space, 0, data);
+	soundlatch_byte_w(space, 0, data);
 
 	if (*m_sn_nmi_enable & 1)
 		cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
@@ -135,7 +135,7 @@ static ADDRESS_MAP_START( flower_sound_cpu, AS_PROGRAM, 8, flower_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x4000) AM_WRITE(flower_soundcpu_irq_ack)
 	AM_RANGE(0x4001, 0x4001) AM_WRITEONLY AM_BASE(m_sn_nmi_enable)
-	AM_RANGE(0x6000, 0x6000) AM_READ(soundlatch_r)
+	AM_RANGE(0x6000, 0x6000) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0x8000, 0x803f) AM_DEVWRITE_LEGACY("flower", flower_sound1_w)
 	AM_RANGE(0xa000, 0xa03f) AM_DEVWRITE_LEGACY("flower", flower_sound2_w)
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM

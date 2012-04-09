@@ -93,7 +93,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, ginganin_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x0800, 0x0807) AM_DEVREADWRITE("6840ptm", ptm6840_device, read, write)
-	AM_RANGE(0x1800, 0x1800) AM_READ(soundlatch_r)
+	AM_RANGE(0x1800, 0x1800) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0x2000, 0x2001) AM_DEVWRITE_LEGACY("ymsnd", y8950_w)
 	AM_RANGE(0x2800, 0x2801) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
 	AM_RANGE(0x4000, 0xffff) AM_ROM

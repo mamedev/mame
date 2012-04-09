@@ -227,7 +227,7 @@ WRITE8_MEMBER(cyclemb_state::cyclemb_bankswitch_w)
 #if 0
 WRITE8_MEMBER(cyclemb_state::sound_cmd_w)
 {
-	soundlatch_w(space, 0, data & 0xff);
+	soundlatch_byte_w(space, 0, data & 0xff);
 	cputag_set_input_line(machine(), "audiocpu", 0, HOLD_LINE);
 }
 #endif
@@ -241,7 +241,7 @@ READ8_MEMBER(cyclemb_state::mcu_status_r)
 
 WRITE8_MEMBER(cyclemb_state::sound_cmd_w)//actually ciom
 {
-	soundlatch_w(space, 0, data & 0xff);
+	soundlatch_byte_w(space, 0, data & 0xff);
 	cputag_set_input_line(machine(), "audiocpu", 0, HOLD_LINE);
 }
 #endif
@@ -280,7 +280,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( cyclemb_sound_io, AS_IO, 8, cyclemb_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE_LEGACY("aysnd", ay8910_r, ay8910_address_data_w)
-	AM_RANGE(0x40, 0x40) AM_READ(soundlatch_r) AM_WRITE(soundlatch2_w)
+	AM_RANGE(0x40, 0x40) AM_READ(soundlatch_byte_r) AM_WRITE(soundlatch2_byte_w)
 ADDRESS_MAP_END
 
 static MACHINE_RESET( cyclemb )

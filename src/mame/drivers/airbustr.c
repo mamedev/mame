@@ -295,25 +295,25 @@ READ8_MEMBER(airbustr_state::soundcommand_status_r)
 READ8_MEMBER(airbustr_state::soundcommand_r)
 {
 	m_soundlatch_status = 0;	// soundlatch has been read
-	return soundlatch_r(space, 0);
+	return soundlatch_byte_r(space, 0);
 }
 
 READ8_MEMBER(airbustr_state::soundcommand2_r)
 {
 	m_soundlatch2_status = 0;	// soundlatch2 has been read
-	return soundlatch2_r(space, 0);
+	return soundlatch2_byte_r(space, 0);
 }
 
 WRITE8_MEMBER(airbustr_state::soundcommand_w)
 {
-	soundlatch_w(space, 0, data);
+	soundlatch_byte_w(space, 0, data);
 	m_soundlatch_status = 1;	// soundlatch has been written
 	device_set_input_line(m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);	// cause a nmi to sub cpu
 }
 
 WRITE8_MEMBER(airbustr_state::soundcommand2_w)
 {
-	soundlatch2_w(space, 0, data);
+	soundlatch2_byte_w(space, 0, data);
 	m_soundlatch2_status = 1;	// soundlatch2 has been written
 }
 

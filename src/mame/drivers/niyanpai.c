@@ -62,17 +62,17 @@ static void niyanpai_soundbank_w(running_machine &machine, int data)
 
 READ8_MEMBER(niyanpai_state::niyanpai_sound_r)
 {
-	return soundlatch_r(space, 0);
+	return soundlatch_byte_r(space, 0);
 }
 
 WRITE16_MEMBER(niyanpai_state::niyanpai_sound_w)
 {
-	soundlatch_w(space, 0, ((data >> 8) & 0xff));
+	soundlatch_byte_w(space, 0, ((data >> 8) & 0xff));
 }
 
 WRITE8_MEMBER(niyanpai_state::niyanpai_soundclr_w)
 {
-	soundlatch_clear_w(space, 0, 0);
+	soundlatch_clear_byte_w(space, 0, 0);
 }
 
 

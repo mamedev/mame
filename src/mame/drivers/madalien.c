@@ -55,14 +55,14 @@ WRITE8_MEMBER(madalien_state::madalien_output_w)
 WRITE8_MEMBER(madalien_state::madalien_sound_command_w)
 {
 	cputag_set_input_line(machine(), "audiocpu", 0, ASSERT_LINE);
-	soundlatch_w(space, offset, data);
+	soundlatch_byte_w(space, offset, data);
 }
 
 
 READ8_MEMBER(madalien_state::madalien_sound_command_r)
 {
 	cputag_set_input_line(machine(), "audiocpu", 0, CLEAR_LINE);
-	return soundlatch_r(space, offset);
+	return soundlatch_byte_r(space, offset);
 }
 
 
@@ -87,7 +87,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, madalien_state )
 	AM_RANGE(0x8001, 0x8001) AM_MIRROR(0x0ff0) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
 	AM_RANGE(0x8004, 0x8004) AM_MIRROR(0x0ff0) AM_WRITEONLY AM_BASE(m_video_control)
 	AM_RANGE(0x8005, 0x8005) AM_MIRROR(0x0ff0) AM_WRITE(madalien_output_w)
-	AM_RANGE(0x8006, 0x8006) AM_MIRROR(0x0ff0) AM_READ(soundlatch2_r) AM_WRITE(madalien_sound_command_w)
+	AM_RANGE(0x8006, 0x8006) AM_MIRROR(0x0ff0) AM_READ(soundlatch2_byte_r) AM_WRITE(madalien_sound_command_w)
 	AM_RANGE(0x8008, 0x8008) AM_MIRROR(0x07f0) AM_RAM_READ(shift_r) AM_BASE(m_shift_hi)
 	AM_RANGE(0x8009, 0x8009) AM_MIRROR(0x07f0) AM_RAM_READ(shift_rev_r) AM_BASE(m_shift_lo)
 	AM_RANGE(0x800b, 0x800b) AM_MIRROR(0x07f0) AM_WRITEONLY AM_BASE(m_video_flags)
@@ -109,7 +109,7 @@ static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8, madalien_state )
 	AM_RANGE(0x6000, 0x6003) AM_MIRROR(0x1ffc) AM_RAM /* unknown device in an epoxy block, might be tilt detection */
 	AM_RANGE(0x8000, 0x8000) AM_MIRROR(0x1ffc) AM_READ(madalien_sound_command_r)
 	AM_RANGE(0x8000, 0x8001) AM_MIRROR(0x1ffc) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
-	AM_RANGE(0x8002, 0x8002) AM_MIRROR(0x1ffc) AM_WRITE(soundlatch2_w)
+	AM_RANGE(0x8002, 0x8002) AM_MIRROR(0x1ffc) AM_WRITE(soundlatch2_byte_w)
 	AM_RANGE(0xf800, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

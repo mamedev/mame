@@ -51,18 +51,21 @@
 
 driver_device::driver_device(const machine_config &mconfig, device_type type, const char *tag)
 	: device_t(mconfig, type, "Driver Device", tag, NULL, 0),
-	  m_system(NULL),
-	  m_palette_init(NULL),
 	  m_generic_paletteram_8(*this, "paletteram"),
 	  m_generic_paletteram2_8(*this, "paletteram2"),
 	  m_generic_paletteram_16(*this, "paletteram"),
 	  m_generic_paletteram2_16(*this, "paletteram2"),
 	  m_generic_paletteram_32(*this, "paletteram"),
 	  m_generic_paletteram2_32(*this, "paletteram2"),
+	  m_system(NULL),
+	  m_palette_init(NULL),
+	  m_latch_clear_value(0),
 	  m_flip_screen_x(0),
 	  m_flip_screen_y(0)
 {
-	memset(m_callbacks, 0, sizeof(m_callbacks));
+	memset(m_legacy_callbacks, 0, sizeof(m_legacy_callbacks));
+	memset(m_latched_value, 0, sizeof(m_latched_value));
+	memset(m_latch_read, 0, sizeof(m_latch_read));
 }
 
 
@@ -101,12 +104,16 @@ void driver_device::static_set_game(device_t &device, const game_driver &game)
 
 
 //-------------------------------------------------
-//  static_set_machine_start - set the legacy
-//  machine start callback in the device
-//  configuration
+//  static_set_callback - set the a callback in
+//  the device configuration
 //-------------------------------------------------
 
 void driver_device::static_set_callback(device_t &device, callback_type type, legacy_callback_func callback)
+{
+	downcast<driver_device &>(device).m_legacy_callbacks[type] = callback;
+}
+
+void driver_device::static_set_callback(device_t &device, callback_type type, driver_callback_delegate callback)
 {
 	downcast<driver_device &>(device).m_callbacks[type] = callback;
 }
@@ -141,8 +148,8 @@ void driver_device::driver_start()
 
 void driver_device::machine_start()
 {
-	if (m_callbacks[CB_MACHINE_START] != NULL)
-		(*m_callbacks[CB_MACHINE_START])(machine());
+	if (!m_callbacks[CB_MACHINE_START].isnull())
+		m_callbacks[CB_MACHINE_START]();
 }
 
 
@@ -153,8 +160,8 @@ void driver_device::machine_start()
 
 void driver_device::sound_start()
 {
-	if (m_callbacks[CB_SOUND_START] != NULL)
-		(*m_callbacks[CB_SOUND_START])(machine());
+	if (!m_callbacks[CB_SOUND_START].isnull())
+		m_callbacks[CB_SOUND_START]();
 }
 
 
@@ -165,8 +172,8 @@ void driver_device::sound_start()
 
 void driver_device::video_start()
 {
-	if (m_callbacks[CB_VIDEO_START] != NULL)
-		(*m_callbacks[CB_VIDEO_START])(machine());
+	if (!m_callbacks[CB_VIDEO_START].isnull())
+		m_callbacks[CB_VIDEO_START]();
 }
 
 
@@ -187,8 +194,8 @@ void driver_device::driver_reset()
 
 void driver_device::machine_reset()
 {
-	if (m_callbacks[CB_MACHINE_RESET] != NULL)
-		(*m_callbacks[CB_MACHINE_RESET])(machine());
+	if (!m_callbacks[CB_MACHINE_RESET].isnull())
+		m_callbacks[CB_MACHINE_RESET]();
 }
 
 
@@ -199,8 +206,8 @@ void driver_device::machine_reset()
 
 void driver_device::sound_reset()
 {
-	if (m_callbacks[CB_SOUND_RESET] != NULL)
-		(*m_callbacks[CB_SOUND_RESET])(machine());
+	if (!m_callbacks[CB_SOUND_RESET].isnull())
+		m_callbacks[CB_SOUND_RESET]();
 }
 
 
@@ -211,8 +218,8 @@ void driver_device::sound_reset()
 
 void driver_device::video_reset()
 {
-	if (m_callbacks[CB_VIDEO_RESET] != NULL)
-		(*m_callbacks[CB_VIDEO_RESET])(machine());
+	if (!m_callbacks[CB_VIDEO_RESET].isnull())
+		m_callbacks[CB_VIDEO_RESET]();
 }
 
 
@@ -245,6 +252,11 @@ ioport_constructor driver_device::device_input_ports() const
 
 void driver_device::device_start()
 {
+	// bind our legacy callbacks
+	for (int index = 0; index < ARRAY_LENGTH(m_legacy_callbacks); index++)
+		if (m_legacy_callbacks[index] != NULL)
+			m_callbacks[index] = driver_callback_delegate(m_legacy_callbacks[index], "legacy_callback", &machine());
+
 	// reschedule ourselves to be last
 	device_iterator iter(*this);
 	for (device_t *test = iter.first(); test != NULL; test = iter.next())
@@ -288,6 +300,72 @@ void driver_device::device_reset_after_children()
 	sound_reset();
 	video_reset();
 }
+
+
+
+//**************************************************************************
+//  GENERIC SOUND COMMAND LATCHING
+//**************************************************************************
+
+//-------------------------------------------------
+//  soundlatch_sync_callback - time-delayed 
+//  callback to set a latch value
+//-------------------------------------------------
+
+void driver_device::soundlatch_sync_callback(void *ptr, INT32 param)
+{
+	UINT16 value = param >> 8;
+	int which = param & 0xff;
+
+	// if the latch hasn't been read and the value is changed, log a warning
+	if (!m_latch_read[which] && m_latched_value[which] != value)
+		logerror("Warning: sound latch %d written before being read. Previous: %02x, new: %02x\n", which, m_latched_value[which], value);
+
+	// store the new value and mark it not read
+	m_latched_value[which] = value;
+	m_latch_read[which] = 0;
+}
+
+
+//-------------------------------------------------
+//  soundlatch_byte_w - global write handlers for
+//  writing to sound latches
+//-------------------------------------------------
+
+WRITE8_MEMBER( driver_device::soundlatch_byte_w )		{ machine().scheduler().synchronize(timer_expired_delegate(FUNC(driver_device::soundlatch_sync_callback), this), 0 | (data << 8)); }
+WRITE16_MEMBER( driver_device::soundlatch_word_w )  { machine().scheduler().synchronize(timer_expired_delegate(FUNC(driver_device::soundlatch_sync_callback), this), 0 | (data << 8)); }
+WRITE8_MEMBER( driver_device::soundlatch2_byte_w )		{ machine().scheduler().synchronize(timer_expired_delegate(FUNC(driver_device::soundlatch_sync_callback), this), 1 | (data << 8)); }
+WRITE16_MEMBER( driver_device::soundlatch2_word_w ) { machine().scheduler().synchronize(timer_expired_delegate(FUNC(driver_device::soundlatch_sync_callback), this), 1 | (data << 8)); }
+WRITE8_MEMBER( driver_device::soundlatch3_byte_w )		{ machine().scheduler().synchronize(timer_expired_delegate(FUNC(driver_device::soundlatch_sync_callback), this), 2 | (data << 8)); }
+WRITE16_MEMBER( driver_device::soundlatch3_word_w ) { machine().scheduler().synchronize(timer_expired_delegate(FUNC(driver_device::soundlatch_sync_callback), this), 2 | (data << 8)); }
+WRITE8_MEMBER( driver_device::soundlatch4_byte_w )	{ machine().scheduler().synchronize(timer_expired_delegate(FUNC(driver_device::soundlatch_sync_callback), this), 3 | (data << 8)); }
+WRITE16_MEMBER( driver_device::soundlatch4_word_w ) { machine().scheduler().synchronize(timer_expired_delegate(FUNC(driver_device::soundlatch_sync_callback), this), 3 | (data << 8)); }
+
+
+//-------------------------------------------------
+//  soundlatch_byte_r - global read handlers for
+//  reading from sound latches
+//-------------------------------------------------
+
+READ8_MEMBER( driver_device::soundlatch_byte_r ) 		{ return m_latched_value[0]; }
+READ16_MEMBER( driver_device::soundlatch_word_r )   { return m_latched_value[0]; }
+READ8_MEMBER( driver_device::soundlatch2_byte_r )		{ return m_latched_value[1]; }
+READ16_MEMBER( driver_device::soundlatch2_word_r )  { return m_latched_value[1]; }
+READ8_MEMBER( driver_device::soundlatch3_byte_r )		{ return m_latched_value[2]; }
+READ16_MEMBER( driver_device::soundlatch3_word_r )  { return m_latched_value[2]; }
+READ8_MEMBER( driver_device::soundlatch4_byte_r )		{ return m_latched_value[3]; }
+READ16_MEMBER( driver_device::soundlatch4_word_r )  { return m_latched_value[3]; }
+
+
+//-------------------------------------------------
+//  soundlatch_clear_byte_w - global write handlers
+//  for clearing sound latches
+//-------------------------------------------------
+
+WRITE8_MEMBER( driver_device::soundlatch_clear_byte_w )  { m_latched_value[0] = m_latch_clear_value; }
+WRITE8_MEMBER( driver_device::soundlatch2_clear_byte_w ) { m_latched_value[1] = m_latch_clear_value; }
+WRITE8_MEMBER( driver_device::soundlatch3_clear_byte_w ) { m_latched_value[2] = m_latch_clear_value; }
+WRITE8_MEMBER( driver_device::soundlatch4_clear_byte_w ) { m_latched_value[3] = m_latch_clear_value; }
 
 
 

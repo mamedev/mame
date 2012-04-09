@@ -37,12 +37,12 @@ Takahiro Nogi (nogi@kt.rim.or.jp) 1999/12/17 -
 
 WRITE8_MEMBER(galivan_state::galivan_sound_command_w)
 {
-	soundlatch_w(space,0,((data & 0x7f) << 1) | 1);
+	soundlatch_byte_w(space,0,((data & 0x7f) << 1) | 1);
 }
 
 READ8_MEMBER(galivan_state::soundlatch_clear_r)
 {
-	soundlatch_clear_w(space, 0, 0);
+	soundlatch_clear_byte_w(space, 0, 0);
 	return 0;
 }
 
@@ -118,7 +118,7 @@ static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, galivan_state )
 	AM_RANGE(0x02, 0x02) AM_DEVWRITE_LEGACY("dac1", dac_w)
 	AM_RANGE(0x03, 0x03) AM_DEVWRITE_LEGACY("dac2", dac_w)
 	AM_RANGE(0x04, 0x04) AM_READ(soundlatch_clear_r)
-	AM_RANGE(0x06, 0x06) AM_READ(soundlatch_r)
+	AM_RANGE(0x06, 0x06) AM_READ(soundlatch_byte_r)
 ADDRESS_MAP_END
 
 

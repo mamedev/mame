@@ -198,7 +198,7 @@ static const ay8910_interface timeplt_ay8910_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_r),
+	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_byte_r),
 	DEVCB_DEVICE_HANDLER("timeplt_audio", timeplt_portB_r),
 	DEVCB_NULL,
 	DEVCB_NULL

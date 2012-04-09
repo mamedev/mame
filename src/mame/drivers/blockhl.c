@@ -92,7 +92,7 @@ WRITE8_MEMBER(blockhl_state::k052109_051960_w)
 
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, blockhl_state )
-	AM_RANGE(0x1f84, 0x1f84) AM_WRITE(soundlatch_w)
+	AM_RANGE(0x1f84, 0x1f84) AM_WRITE(soundlatch_byte_w)
 	AM_RANGE(0x1f88, 0x1f88) AM_WRITE(blockhl_sh_irqtrigger_w)
 	AM_RANGE(0x1f8c, 0x1f8c) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x1f94, 0x1f94) AM_READ_PORT("DSW3")
@@ -110,7 +110,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8, blockhl_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
+	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0xe00c, 0xe00d) AM_WRITENOP		/* leftover from missing 007232? */
 ADDRESS_MAP_END

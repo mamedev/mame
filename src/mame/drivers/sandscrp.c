@@ -222,7 +222,7 @@ READ16_MEMBER(sandscrp_state::sandscrp_soundlatch_word_r)
 {
 
 	m_latch2_full = 0;
-	return soundlatch2_r(space,0);
+	return soundlatch2_byte_r(space,0);
 }
 
 WRITE16_MEMBER(sandscrp_state::sandscrp_soundlatch_word_w)
@@ -231,7 +231,7 @@ WRITE16_MEMBER(sandscrp_state::sandscrp_soundlatch_word_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		m_latch1_full = 1;
-		soundlatch_w(space, 0, data & 0xff);
+		soundlatch_byte_w(space, 0, data & 0xff);
 		cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 		device_spin_until_time(&space.device(), attotime::from_usec(100));	// Allow the other cpu to reply
 	}
@@ -291,14 +291,14 @@ READ8_MEMBER(sandscrp_state::sandscrp_soundlatch_r)
 {
 
 	m_latch1_full = 0;
-	return soundlatch_r(space,0);
+	return soundlatch_byte_r(space,0);
 }
 
 WRITE8_MEMBER(sandscrp_state::sandscrp_soundlatch_w)
 {
 
 	m_latch2_full = 1;
-	soundlatch2_w(space,0,data);
+	soundlatch2_byte_w(space,0,data);
 }
 
 static ADDRESS_MAP_START( sandscrp_soundmem, AS_PROGRAM, 8, sandscrp_state )

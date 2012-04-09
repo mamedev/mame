@@ -345,7 +345,7 @@ static ADDRESS_MAP_START( jungler_map, AS_PROGRAM, 8, rallyx_state )
 	AM_RANGE(0xa180, 0xa180) AM_READ_PORT("DSW2")
 	AM_RANGE(0xa000, 0xa00f) AM_MIRROR(0x00f0) AM_WRITEONLY AM_BASE(m_radarattr)	// jungler writes to a03x
 	AM_RANGE(0xa080, 0xa080) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0xa100, 0xa100) AM_WRITE(soundlatch_w)
+	AM_RANGE(0xa100, 0xa100) AM_WRITE(soundlatch_byte_w)
 	AM_RANGE(0xa130, 0xa130) AM_WRITE(rallyx_scrollx_w)	/* only jungler and tactcian */
 	AM_RANGE(0xa140, 0xa140) AM_WRITE(rallyx_scrolly_w)	/* only jungler and tactcian */
 	AM_RANGE(0xa180, 0xa187) AM_WRITE(locomotn_latch_w)

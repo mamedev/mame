@@ -149,7 +149,7 @@ WRITE8_MEMBER(ajax_state::ajax_ls138_f10_w)
 			device_set_input_line(m_audiocpu, 0, HOLD_LINE);
 			break;
 		case 0x02:	/* Sound command number */
-			soundlatch_w(space, offset, data);
+			soundlatch_byte_w(space, offset, data);
 			break;
 		case 0x03:	/* Bankswitch + coin counters + priority*/
 			ajax_bankswitch_w(space, 0, data);

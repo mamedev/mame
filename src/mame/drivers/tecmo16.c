@@ -36,7 +36,7 @@ WRITE16_MEMBER(tecmo16_state::tecmo16_sound_command_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		soundlatch_w(space, 0x00, data & 0xff);
+		soundlatch_byte_w(space, 0x00, data & 0xff);
 		cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
@@ -96,7 +96,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, tecmo16_state )
 	AM_RANGE(0xf000, 0xfbff) AM_RAM	/* Sound RAM */
 	AM_RANGE(0xfc00, 0xfc00) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	AM_RANGE(0xfc04, 0xfc05) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
-	AM_RANGE(0xfc08, 0xfc08) AM_READ(soundlatch_r)
+	AM_RANGE(0xfc08, 0xfc08) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0xfc0c, 0xfc0c) AM_NOP
 	AM_RANGE(0xfffe, 0xffff) AM_RAM
 ADDRESS_MAP_END

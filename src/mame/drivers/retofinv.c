@@ -65,7 +65,7 @@ READ8_MEMBER(retofinv_state::cpu0_mf800_r)
 
 WRITE8_MEMBER(retofinv_state::soundcommand_w)
 {
-      soundlatch_w(space, 0, data);
+      soundlatch_byte_w(space, 0, data);
       cputag_set_input_line(machine(), "audiocpu", 0, HOLD_LINE);
 }
 
@@ -135,7 +135,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, retofinv_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x27ff) AM_RAM
-	AM_RANGE(0x4000, 0x4000) AM_READ(soundlatch_r)
+	AM_RANGE(0x4000, 0x4000) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0x6000, 0x6000) AM_WRITE(cpu2_m6000_w)
 	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE_LEGACY("sn1", sn76496_w)
 	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE_LEGACY("sn2", sn76496_w)

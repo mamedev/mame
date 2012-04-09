@@ -67,7 +67,7 @@ WRITE8_MEMBER(funybubl_state::funybubl_cpurombank_w)
 
 WRITE8_MEMBER(funybubl_state::funybubl_soundcommand_w)
 {
-	soundlatch_w(space, 0, data);
+	soundlatch_byte_w(space, 0, data);
 	device_set_input_line(m_audiocpu, 0, HOLD_LINE);
 }
 
@@ -104,7 +104,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, funybubl_state )
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x9000, 0x9000) AM_DEVWRITE_LEGACY("oki", funybubl_oki_bank_sw)
 	AM_RANGE(0x9800, 0x9800) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
+	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_byte_r)
 ADDRESS_MAP_END
 
 

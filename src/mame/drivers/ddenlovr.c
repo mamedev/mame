@@ -2090,7 +2090,7 @@ WRITE8_MEMBER(dynax_state::mmpanic_rombank_w)
 WRITE8_MEMBER(dynax_state::mmpanic_soundlatch_w)
 {
 
-	soundlatch_w(*&space, 0, data);
+	soundlatch_byte_w(*&space, 0, data);
 	device_set_input_line(m_soundcpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -2200,7 +2200,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mmpanic_sound_portmap, AS_IO, 8, dynax_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(soundlatch_r)
+	AM_RANGE(0x00, 0x00) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0x02, 0x02) AM_READNOP		// read just before port 00
 	AM_RANGE(0x04, 0x04) AM_NOP					// read only once at the start
 	AM_RANGE(0x06, 0x06) AM_WRITENOP	// almost always 1, sometimes 0
@@ -2338,7 +2338,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( funkyfig_sound_portmap, AS_IO, 8, dynax_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x02, 0x02) AM_READ(soundlatch_r)
+	AM_RANGE(0x02, 0x02) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0x04, 0x04) AM_READNOP	// read only once at the start
 ADDRESS_MAP_END
 

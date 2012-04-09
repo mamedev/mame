@@ -126,7 +126,7 @@ static INTERRUPT_GEN( zodiack_sound_nmi_gen )
 
 WRITE8_MEMBER( zodiack_state::master_soundlatch_w )
 {
-	soundlatch_w(space, offset, data);
+	soundlatch_byte_w(space, offset, data);
 	device_set_input_line(m_audiocpu, 0, HOLD_LINE);
 }
 
@@ -146,7 +146,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, zodiack_state )
 	AM_RANGE(0x6082, 0x6082) AM_READ_PORT("DSW1")
 	AM_RANGE(0x6083, 0x6083) AM_READ_PORT("IN0")
 	AM_RANGE(0x6084, 0x6084) AM_READ_PORT("IN1")
-	AM_RANGE(0x6090, 0x6090) AM_READWRITE(soundlatch_r, master_soundlatch_w)
+	AM_RANGE(0x6090, 0x6090) AM_READWRITE(soundlatch_byte_r, master_soundlatch_w)
 	AM_RANGE(0x7000, 0x7000) AM_READNOP AM_WRITE(watchdog_reset_w)  /* NOP??? */
 	AM_RANGE(0x7100, 0x7100) AM_WRITE(nmi_mask_w)
 	AM_RANGE(0x7200, 0x7200) AM_WRITE(flipscreen_w)
@@ -163,7 +163,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, zodiack_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
 	AM_RANGE(0x4000, 0x4000) AM_WRITE(sound_nmi_enable_w)
-	AM_RANGE(0x6000, 0x6000) AM_READWRITE(soundlatch_r, soundlatch_w)
+	AM_RANGE(0x6000, 0x6000) AM_READWRITE(soundlatch_byte_r, soundlatch_byte_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( io_map, AS_IO, 8, zodiack_state  )

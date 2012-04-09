@@ -162,7 +162,7 @@ const ppi8255_interface scramble_ppi_1_intf =
 	DEVCB_NULL,												/* Port A read */
 	DEVCB_NULL,												/* Port B read */
 	DEVCB_NULL,												/* Port C read */
-	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_w),	/* Port A write */
+	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_byte_w),	/* Port A write */
 	DEVCB_HANDLER(scramble_sh_irqtrigger_w),				/* Port B write */
 	DEVCB_NULL												/* Port C write */
 };
@@ -173,7 +173,7 @@ const ppi8255_interface stratgyx_ppi_1_intf =
 	DEVCB_NULL,												/* Port A read */
 	DEVCB_NULL,												/* Port B read */
 	DEVCB_INPUT_PORT("IN3"),								/* Port C read */
-	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_w),	/* Port A write */
+	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_byte_w),	/* Port A write */
 	DEVCB_HANDLER(scramble_sh_irqtrigger_w),				/* Port B write */
 	DEVCB_NULL												/* Port C write */
 };
@@ -184,7 +184,7 @@ const ppi8255_interface scramble_protection_ppi_1_intf =
 	DEVCB_NULL,												/* Port A read */
 	DEVCB_NULL,												/* Port B read */
 	DEVCB_HANDLER(scramble_protection_r),					/* Port C read */
-	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_w),	/* Port A write */
+	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_byte_w),	/* Port A write */
 	DEVCB_HANDLER(scramble_sh_irqtrigger_w),				/* Port B write */
 	DEVCB_HANDLER(scramble_protection_w)					/* Port C write */
 };
@@ -195,7 +195,7 @@ const ppi8255_interface mrkougar_ppi_1_intf =
 	DEVCB_NULL,												/* Port A read */
 	DEVCB_NULL,												/* Port B read */
 	DEVCB_NULL,												/* Port C read */
-	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_w),	/* Port A write */
+	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_byte_w),	/* Port A write */
 	DEVCB_HANDLER(mrkougar_sh_irqtrigger_w),				/* Port B write */
 	DEVCB_NULL												/* Port C write */
 };

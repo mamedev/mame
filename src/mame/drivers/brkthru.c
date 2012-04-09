@@ -92,7 +92,7 @@ WRITE8_MEMBER(brkthru_state::darwin_0803_w)
 
 WRITE8_MEMBER(brkthru_state::brkthru_soundlatch_w)
 {
-	soundlatch_w(space, offset, data);
+	soundlatch_byte_w(space, offset, data);
 	device_set_input_line(m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -151,7 +151,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, brkthru_state )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x2001) AM_DEVWRITE_LEGACY("ym2", ym3526_w)
-	AM_RANGE(0x4000, 0x4000) AM_READ(soundlatch_r)
+	AM_RANGE(0x4000, 0x4000) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0x6000, 0x6001) AM_DEVREADWRITE_LEGACY("ym1", ym2203_r, ym2203_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END

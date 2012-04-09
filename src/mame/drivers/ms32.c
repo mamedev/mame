@@ -219,7 +219,7 @@ READ32_MEMBER(ms32_state::ms32_read_inputs3)
 
 WRITE32_MEMBER(ms32_state::ms32_sound_w)
 {
-	soundlatch_w(space, 0, data & 0xff);
+	soundlatch_byte_w(space, 0, data & 0xff);
 	cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, ASSERT_LINE);
 
 	// give the Z80 time to respond
@@ -1347,7 +1347,7 @@ static TIMER_DEVICE_CALLBACK(ms32_interrupt)
 READ8_MEMBER(ms32_state::latch_r)
 {
 	cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, CLEAR_LINE);
-	return soundlatch_r(space,0)^0xff;
+	return soundlatch_byte_r(space,0)^0xff;
 }
 
 WRITE8_MEMBER(ms32_state::ms32_snd_bank_w)

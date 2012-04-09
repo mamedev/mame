@@ -757,7 +757,7 @@ READ8_MEMBER(royalmah_state::jansou_6405_r)
 
 WRITE8_MEMBER(royalmah_state::jansou_sound_w)
 {
-	soundlatch_w(space, 0, data);
+	soundlatch_byte_w(space, 0, data);
 	cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -788,7 +788,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( jansou_sub_iomap, AS_IO, 8, royalmah_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(soundlatch_r) AM_DEVWRITE_LEGACY("dac", dac_w )
+	AM_RANGE(0x00, 0x00) AM_READ(soundlatch_byte_r) AM_DEVWRITE_LEGACY("dac", dac_w )
 ADDRESS_MAP_END
 
 

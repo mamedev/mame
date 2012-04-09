@@ -19,7 +19,7 @@ TODO:
 
 WRITE8_MEMBER(suprloco_state::suprloco_soundport_w)
 {
-	soundlatch_w(space, 0, data);
+	soundlatch_byte_w(space, 0, data);
 	cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 	/* spin for a while to let the Z80 read the command (fixes hanging sound in Regulus) */
 	device_spin_until_time(&space.device(), attotime::from_usec(50));
@@ -47,7 +47,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, suprloco_state )
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xa000, 0xa003) AM_DEVWRITE_LEGACY("sn1", sn76496_w)
 	AM_RANGE(0xc000, 0xc003) AM_DEVWRITE_LEGACY("sn2", sn76496_w)
-	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_r)
+	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_byte_r)
 ADDRESS_MAP_END
 
 

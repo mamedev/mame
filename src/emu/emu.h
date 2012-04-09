@@ -140,7 +140,6 @@ typedef device_t * (*machine_config_constructor)(machine_config &config, device_
 // generic helpers
 #include "devcb.h"
 #include "drivers/xtal.h"
-#include "audio/generic.h"
 #include "machine/generic.h"
 #include "video/generic.h"
 

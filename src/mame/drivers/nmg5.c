@@ -282,7 +282,7 @@ WRITE16_MEMBER(nmg5_state::nmg5_soundlatch_w)
 
 	if (ACCESSING_BITS_0_7)
 	{
-		soundlatch_w(space, 0, data & 0xff);
+		soundlatch_byte_w(space, 0, data & 0xff);
 		device_set_input_line(m_soundcpu, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
@@ -386,7 +386,7 @@ static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, nmg5_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVWRITE_LEGACY("oki", oki_banking_w)
 	AM_RANGE(0x10, 0x11) AM_DEVREADWRITE_LEGACY("ymsnd", ym3812_r, ym3812_w)
-	AM_RANGE(0x18, 0x18) AM_READ(soundlatch_r)
+	AM_RANGE(0x18, 0x18) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0x1c, 0x1c) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 ADDRESS_MAP_END
 

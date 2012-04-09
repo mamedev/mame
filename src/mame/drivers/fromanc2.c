@@ -40,8 +40,8 @@ static INTERRUPT_GEN( fromanc2_interrupt )
 WRITE16_MEMBER(fromanc2_state::fromanc2_sndcmd_w)
 {
 
-	soundlatch_w(space, offset, (data >> 8) & 0xff);	// 1P (LEFT)
-	soundlatch2_w(space, offset, data & 0xff);			// 2P (RIGHT)
+	soundlatch_byte_w(space, offset, (data >> 8) & 0xff);	// 1P (LEFT)
+	soundlatch2_byte_w(space, offset, data & 0xff);			// 2P (RIGHT)
 
 	device_set_input_line(m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 	m_sndcpu_nmi_flag = 0;
@@ -292,8 +292,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fromanc2_sound_io_map, AS_IO, 8, fromanc2_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(soundlatch_r) AM_WRITENOP			// snd cmd (1P) / ?
-	AM_RANGE(0x04, 0x04) AM_READ(soundlatch2_r)							// snd cmd (2P)
+	AM_RANGE(0x00, 0x00) AM_READ(soundlatch_byte_r) AM_WRITENOP			// snd cmd (1P) / ?
+	AM_RANGE(0x04, 0x04) AM_READ(soundlatch2_byte_r)							// snd cmd (2P)
 	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE_LEGACY("ymsnd", ym2610_r, ym2610_w)
 	AM_RANGE(0x0c, 0x0c) AM_READ(fromanc2_sndcpu_nmi_clr)
 ADDRESS_MAP_END

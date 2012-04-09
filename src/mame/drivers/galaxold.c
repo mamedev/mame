@@ -798,7 +798,7 @@ static ADDRESS_MAP_START( harem_cpu2_io, AS_IO, 8, galaxold_state )
 	AM_RANGE(0x20, 0x20) AM_DEVWRITE_LEGACY("ay2", ay8910_data_w)
 	AM_RANGE(0x40, 0x40) AM_DEVWRITE_LEGACY("ay3", ay8910_address_w)
 	AM_RANGE(0x80, 0x80) AM_DEVWRITE_LEGACY("ay3", ay8910_data_w)
-	AM_RANGE(0x80, 0x80) AM_READ(soundlatch_r)
+	AM_RANGE(0x80, 0x80) AM_READ(soundlatch_byte_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hunchbkg, AS_PROGRAM, 8, galaxold_state )

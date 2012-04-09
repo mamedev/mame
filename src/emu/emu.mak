@@ -134,7 +134,6 @@ EMUSOUNDOBJS = \
 	$(EMUOBJ)/sound/wavwrite.o \
 
 EMUAUDIOOBJS = \
-	$(EMUAUDIO)/generic.o \
 
 EMUDRIVEROBJS = \
 	$(EMUDRIVERS)/empty.o \

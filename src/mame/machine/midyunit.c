@@ -616,7 +616,7 @@ WRITE16_MEMBER(midyunit_state::midyunit_sound_w)
 				break;
 
 			case SOUND_YAWDIM:
-				soundlatch_w(space, 0, data);
+				soundlatch_byte_w(space, 0, data);
 				cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 				break;
 		}

@@ -100,7 +100,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( megazone_sound_map, AS_PROGRAM, 8, megazone_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(megazone_i8039_irq_w)	/* START line. Interrupts 8039 */
-	AM_RANGE(0x4000, 0x4000) AM_WRITE(soundlatch_w)			/* CODE  line. Command Interrupts 8039 */
+	AM_RANGE(0x4000, 0x4000) AM_WRITE(soundlatch_byte_w)			/* CODE  line. Command Interrupts 8039 */
 	AM_RANGE(0x6000, 0x6000) AM_READ_PORT("IN0")			/* IO Coin */
 	AM_RANGE(0x6001, 0x6001) AM_READ_PORT("IN1")			/* P1 IO */
 	AM_RANGE(0x6002, 0x6002) AM_READ_PORT("IN2")			/* P2 IO */
@@ -124,7 +124,7 @@ static ADDRESS_MAP_START( megazone_i8039_map, AS_PROGRAM, 8, megazone_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( megazone_i8039_io_map, AS_IO, 8, megazone_state )
-	AM_RANGE(0x00, 0xff) AM_READ(soundlatch_r)
+	AM_RANGE(0x00, 0xff) AM_READ(soundlatch_byte_r)
 	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_DEVWRITE_LEGACY("dac", dac_w)
 	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(i8039_irqen_and_status_w)
 ADDRESS_MAP_END

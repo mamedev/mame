@@ -140,7 +140,7 @@ WRITE8_MEMBER(tehkanwc_state::tehkanwc_track_1_reset_w)
 
 WRITE8_MEMBER(tehkanwc_state::sound_command_w)
 {
-	soundlatch_w(space, offset, data);
+	soundlatch_byte_w(space, offset, data);
 	cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -151,7 +151,7 @@ static TIMER_CALLBACK( reset_callback )
 
 WRITE8_MEMBER(tehkanwc_state::sound_answer_w)
 {
-	soundlatch2_w(space, 0, data);
+	soundlatch2_byte_w(space, 0, data);
 
 	/* in Gridiron, the sound CPU goes in a tight loop after the self test, */
 	/* probably waiting to be reset by a watchdog */
@@ -232,7 +232,7 @@ static ADDRESS_MAP_START( main_mem, AS_PROGRAM, 8, tehkanwc_state )
 	AM_RANGE(0xf810, 0xf811) AM_READWRITE(tehkanwc_track_1_r, tehkanwc_track_1_reset_w)	/* track 1 x/y */
 	AM_RANGE(0xf812, 0xf812) AM_WRITE(gridiron_led1_w)
 	AM_RANGE(0xf813, 0xf813) AM_READ_PORT("P2BUT")
-	AM_RANGE(0xf820, 0xf820) AM_READ(soundlatch2_r) AM_WRITE(sound_command_w)	/* answer from the sound CPU */
+	AM_RANGE(0xf820, 0xf820) AM_READ(soundlatch2_byte_r) AM_WRITE(sound_command_w)	/* answer from the sound CPU */
 	AM_RANGE(0xf840, 0xf840) AM_READ_PORT("DSW1") AM_WRITE(sub_cpu_halt_w)
 	AM_RANGE(0xf850, 0xf850) AM_READ_PORT("DSW2") AM_WRITENOP			/* ?? writes 0x00 or 0xff */
 	AM_RANGE(0xf860, 0xf860) AM_READ(watchdog_reset_r) AM_WRITE(tehkanwc_flipscreen_x_w)
@@ -260,7 +260,7 @@ static ADDRESS_MAP_START( sound_mem, AS_PROGRAM, 8, tehkanwc_state )
 	AM_RANGE(0x8001, 0x8001) AM_DEVWRITE_LEGACY("msm", msm_reset_w)/* MSM51xx reset */
 	AM_RANGE(0x8002, 0x8002) AM_WRITENOP	/* ?? written in the IRQ handler */
 	AM_RANGE(0x8003, 0x8003) AM_WRITENOP	/* ?? written in the NMI handler */
-	AM_RANGE(0xc000, 0xc000) AM_READ(soundlatch_r) AM_WRITE(sound_answer_w)
+	AM_RANGE(0xc000, 0xc000) AM_READ(soundlatch_byte_r) AM_WRITE(sound_answer_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_port, AS_IO, 8, tehkanwc_state )

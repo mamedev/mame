@@ -90,7 +90,7 @@ WRITE8_MEMBER(bladestl_state::bladestl_bankswitch_w)
 WRITE8_MEMBER(bladestl_state::bladestl_sh_irqtrigger_w)
 {
 
-	soundlatch_w(space, offset, data);
+	soundlatch_byte_w(space, offset, data);
 	device_set_input_line(m_audiocpu, M6809_IRQ_LINE, HOLD_LINE);
 	//logerror("(sound) write %02x\n", data);
 }
@@ -146,7 +146,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, bladestl_state )
 	AM_RANGE(0x3000, 0x3000) AM_DEVWRITE_LEGACY("upd", bladestl_speech_ctrl_w)	/* UPD7759 */
 	AM_RANGE(0x4000, 0x4000) AM_DEVREAD_LEGACY("upd", bladestl_speech_busy_r)	/* UPD7759 */
 	AM_RANGE(0x5000, 0x5000) AM_WRITENOP								/* ??? */
-	AM_RANGE(0x6000, 0x6000) AM_READ(soundlatch_r)						/* soundlatch_r */
+	AM_RANGE(0x6000, 0x6000) AM_READ(soundlatch_byte_r)						/* soundlatch_byte_r */
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

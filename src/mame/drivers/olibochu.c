@@ -241,7 +241,7 @@ WRITE8_MEMBER(olibochu_state::sound_command_w)
 	for (c = 15; c >= 0; c--)
 		if (m_cmd & (1 << c)) break;
 
-	if (c >= 0) soundlatch_w(space, 0, 15 - c);
+	if (c >= 0) soundlatch_byte_w(space, 0, 15 - c);
 }
 
 
@@ -267,7 +267,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( olibochu_sound_map, AS_PROGRAM, 8, olibochu_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x6000, 0x63ff) AM_RAM
-	AM_RANGE(0x7000, 0x7000) AM_READ(soundlatch_r)	/* likely ay8910 input port, not direct */
+	AM_RANGE(0x7000, 0x7000) AM_READ(soundlatch_byte_r)	/* likely ay8910 input port, not direct */
 	AM_RANGE(0x7000, 0x7001) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
 	AM_RANGE(0x7004, 0x7004) AM_WRITENOP //sound filter?
 	AM_RANGE(0x7006, 0x7006) AM_WRITENOP //irq ack?

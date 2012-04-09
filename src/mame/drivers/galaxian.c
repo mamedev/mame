@@ -639,7 +639,7 @@ static const ppi8255_interface konami_ppi8255_1_intf =
 	DEVCB_NULL,												/* Port A read */
 	DEVCB_NULL,												/* Port B read */
 	DEVCB_INPUT_PORT("IN3"),								/* Port C read */
-	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_w),		/* Port A write */
+	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_byte_w),		/* Port A write */
 	DEVCB_HANDLER(konami_sound_control_w),					/* Port B write */
 	DEVCB_HANDLER(konami_portc_1_w)							/* Port C write */
 };
@@ -742,7 +742,7 @@ static const ppi8255_interface scramble_ppi8255_1_intf =
 	DEVCB_NULL,												/* Port A read */
 	DEVCB_NULL,												/* Port B read */
 	DEVCB_HANDLER(scramble_protection_r),					/* Port C read */
-	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_w),		/* Port A write */
+	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_byte_w),		/* Port A write */
 	DEVCB_HANDLER(konami_sound_control_w),					/* Port B write */
 	DEVCB_HANDLER(scramble_protection_w)					/* Port C write */
 };
@@ -765,7 +765,7 @@ static READ8_DEVICE_HANDLER( explorer_sound_latch_r )
 {
 	galaxian_state *state = device->machine().driver_data<galaxian_state>();
 	cputag_set_input_line(device->machine(), "audiocpu", 0, CLEAR_LINE);
-	return state->soundlatch_r(*device->machine().device("audiocpu")->memory().space(AS_PROGRAM), 0);
+	return state->soundlatch_byte_r(*device->machine().device("audiocpu")->memory().space(AS_PROGRAM), 0);
 }
 
 
@@ -808,7 +808,7 @@ static WRITE8_DEVICE_HANDLER( sfx_sample_control_w )
 
 static const ppi8255_interface sfx_ppi8255_2_intf =
 {
-	DEVCB_DRIVER_MEMBER(driver_device, soundlatch2_r),		/* Port A read */
+	DEVCB_DRIVER_MEMBER(driver_device, soundlatch2_byte_r),		/* Port A read */
 	DEVCB_NULL,												/* Port B read */
 	DEVCB_NULL,												/* Port C read */
 	DEVCB_NULL,												/* Port A write */
@@ -1068,7 +1068,7 @@ static const ppi8255_interface scorpion_ppi8255_1_intf =
 	DEVCB_NULL,												/* Port A read */
 	DEVCB_NULL,												/* Port B read */
 	DEVCB_HANDLER(scorpion_protection_r),					/* Port C read */
-	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_w),		/* Port A write */
+	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_byte_w),		/* Port A write */
 	DEVCB_HANDLER(konami_sound_control_w),					/* Port B write */
 	DEVCB_HANDLER(scorpion_protection_w)					/* Port C write */
 };
@@ -1203,7 +1203,7 @@ static WRITE8_HANDLER( kingball_sound2_w )
 {
 	galaxian_state *state = space->machine().driver_data<galaxian_state>();
 	state->m_kingball_sound = (state->m_kingball_sound & ~0x02) | (data << 1);
-	state->soundlatch_w(*space, 0, state->m_kingball_sound | 0xf0);
+	state->soundlatch_byte_w(*space, 0, state->m_kingball_sound | 0xf0);
 }
 
 
@@ -1284,7 +1284,7 @@ static READ8_HANDLER( jumpbug_protection_r )
 static WRITE8_HANDLER( checkman_sound_command_w )
 {
 	galaxian_state *state = space->machine().driver_data<galaxian_state>();
-	state->soundlatch_w(*space, 0, data);
+	state->soundlatch_byte_w(*space, 0, data);
 	cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -1842,7 +1842,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( checkman_sound_portmap, AS_IO, 8, galaxian_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x03, 0x03) AM_READ(soundlatch_r)
+	AM_RANGE(0x03, 0x03) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0x04, 0x05) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
 	AM_RANGE(0x06, 0x06) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
 ADDRESS_MAP_END
@@ -1869,7 +1869,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( kingball_sound_portmap, AS_IO, 8, galaxian_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff) AM_READ(soundlatch_r) AM_DEVWRITE_LEGACY("dac", kingball_dac_w)
+	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff) AM_READ(soundlatch_byte_r) AM_DEVWRITE_LEGACY("dac", kingball_dac_w)
 ADDRESS_MAP_END
 
 
@@ -1974,7 +1974,7 @@ static const ay8910_interface frogger_ay8910_interface =
 {
 	AY8910_DISCRETE_OUTPUT,
 	{RES_K(5.1), RES_K(5.1), RES_K(5.1)},
-	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_r),
+	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_byte_r),
 	DEVCB_HANDLER(frogger_sound_timer_r),
 	DEVCB_NULL,
 	DEVCB_NULL
@@ -1984,7 +1984,7 @@ static const ay8910_interface konami_ay8910_interface_1 =
 {
 	AY8910_DISCRETE_OUTPUT,
 	{RES_K(5.1), RES_K(5.1), RES_K(5.1)},
-	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_r),
+	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_byte_r),
 	DEVCB_HANDLER(konami_sound_timer_r),
 	DEVCB_NULL,
 	DEVCB_NULL
@@ -2026,7 +2026,7 @@ static const ay8910_interface sfx_ay8910_interface =
 	AY8910_DEFAULT_LOADS,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(driver_device, soundlatch2_w),
+	DEVCB_DRIVER_MEMBER(driver_device, soundlatch2_byte_w),
 	DEVCB_HANDLER(sfx_sample_control_w)
 };
 
@@ -2044,7 +2044,7 @@ static const ay8910_interface checkmaj_ay8910_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_r),
+	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_byte_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL
@@ -3390,7 +3390,7 @@ static DRIVER_INIT( explorer )
 	space->install_read_port(0x8001, 0x8001, 0, 0xffc, "IN1");
 	space->install_read_port(0x8002, 0x8002, 0, 0xffc, "IN2");
 	space->install_read_port(0x8003, 0x8003, 0, 0xffc, "IN3");
-	space->install_write_handler(0x8000, 0x8000, 0, 0xfff, write8_delegate(FUNC(galaxian_state::soundlatch_w),state));
+	space->install_write_handler(0x8000, 0x8000, 0, 0xfff, write8_delegate(FUNC(galaxian_state::soundlatch_byte_w),state));
 	space->install_legacy_write_handler(0x9000, 0x9000, 0, 0xfff, FUNC(explorer_sound_control_w));
 }
 
@@ -3460,7 +3460,7 @@ static DRIVER_INIT( froggrmc )
 	/* video extensions */
 	common_init(machine, NULL, frogger_draw_background, frogger_extend_tile_info, frogger_extend_sprite_info);
 
-	space->install_write_handler(0xa800, 0xa800, 0, 0x7ff, write8_delegate(FUNC(galaxian_state::soundlatch_w),state));
+	space->install_write_handler(0xa800, 0xa800, 0, 0x7ff, write8_delegate(FUNC(galaxian_state::soundlatch_byte_w),state));
 	space->install_legacy_write_handler(0xb001, 0xb001, 0, 0x7f8, FUNC(froggrmc_sound_control_w));
 
 	/* actually needs 2k of RAM */

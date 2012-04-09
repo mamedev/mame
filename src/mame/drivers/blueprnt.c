@@ -70,7 +70,7 @@ READ8_MEMBER(blueprnt_state::blueprnt_sh_dipsw_r)
 
 WRITE8_MEMBER(blueprnt_state::blueprnt_sound_command_w)
 {
-	soundlatch_w(space, offset, data);
+	soundlatch_byte_w(space, offset, data);
 	device_set_input_line(m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -254,7 +254,7 @@ static const ay8910_interface ay8910_interface_1 =
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
 	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_r),
+	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_byte_r),
 	DEVCB_HANDLER(dipsw_w),
 	DEVCB_NULL
 };

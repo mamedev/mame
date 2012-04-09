@@ -46,7 +46,7 @@ static WRITE16_HANDLER( fcrash_soundlatch_w )
 
 	if (ACCESSING_BITS_0_7)
 	{
-		state->soundlatch_w(*space, 0, data & 0xff);
+		state->soundlatch_byte_w(*space, 0, data & 0xff);
 		device_set_input_line(state->m_audiocpu, 0, HOLD_LINE);
 	}
 }
@@ -399,7 +399,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, cps_state )
 	AM_RANGE(0xd800, 0xd801) AM_DEVREADWRITE_LEGACY("ym1", ym2203_r, ym2203_w)
 	AM_RANGE(0xdc00, 0xdc01) AM_DEVREADWRITE_LEGACY("ym2", ym2203_r, ym2203_w)
 	AM_RANGE(0xe000, 0xe000) AM_WRITE_LEGACY(fcrash_snd_bankswitch_w)
-	AM_RANGE(0xe400, 0xe400) AM_READ(soundlatch_r)
+	AM_RANGE(0xe400, 0xe400) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0xe800, 0xe800) AM_WRITE_LEGACY(fcrash_msm5205_0_data_w)
 	AM_RANGE(0xec00, 0xec00) AM_WRITE_LEGACY(fcrash_msm5205_1_data_w)
 ADDRESS_MAP_END

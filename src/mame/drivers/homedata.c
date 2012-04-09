@@ -289,7 +289,7 @@ WRITE8_MEMBER(homedata_state::mrokumei_keyboard_select_w)
 READ8_MEMBER(homedata_state::mrokumei_sound_io_r)
 {
 	if (m_sndbank & 4)
-		return(soundlatch_r(space, 0));
+		return(soundlatch_byte_r(space, 0));
 	else
 		return machine().region("audiocpu")->base()[0x10000 + offset + (m_sndbank & 1) * 0x10000];
 }
@@ -317,7 +317,7 @@ WRITE8_MEMBER(homedata_state::mrokumei_sound_io_w)
 
 WRITE8_MEMBER(homedata_state::mrokumei_sound_cmd_w)
 {
-	soundlatch_w(space, offset, data);
+	soundlatch_byte_w(space, offset, data);
 	device_set_input_line(m_audiocpu, 0, HOLD_LINE);
 }
 

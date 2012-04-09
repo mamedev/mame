@@ -205,7 +205,7 @@ WRITE16_MEMBER(nmk16_state::ssmissin_sound_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		soundlatch_w(space, 0, data & 0xff);
+		soundlatch_byte_w(space, 0, data & 0xff);
 		cputag_set_input_line(machine(), "audiocpu", 0, HOLD_LINE);
 	}
 }
@@ -270,7 +270,7 @@ WRITE16_MEMBER(nmk16_state::macross2_sound_reset_w)
 WRITE16_MEMBER(nmk16_state::macross2_sound_command_w)
 {
 	if (ACCESSING_BITS_0_7)
-		soundlatch_w(space,0,data & 0xff);
+		soundlatch_byte_w(space,0,data & 0xff);
 }
 
 WRITE8_MEMBER(nmk16_state::macross2_sound_bank_w)
@@ -302,7 +302,7 @@ WRITE16_MEMBER(nmk16_state::afega_soundlatch_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		soundlatch_w(space, 0, data&0xff);
+		soundlatch_byte_w(space, 0, data&0xff);
 		cputag_set_input_line(machine(), "audiocpu", 0, HOLD_LINE);
 	}
 }
@@ -386,7 +386,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( tharrier_sound_map, AS_PROGRAM, 8, nmk16_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xf000, 0xf000) AM_READWRITE(soundlatch_r,soundlatch2_w)
+	AM_RANGE(0xf000, 0xf000) AM_READWRITE(soundlatch_byte_r,soundlatch2_byte_w)
 	AM_RANGE(0xf400, 0xf400) AM_DEVREADWRITE("oki1", okim6295_device, read, write)
 	AM_RANGE(0xf500, 0xf500) AM_DEVREADWRITE("oki2", okim6295_device, read, write)
 	AM_RANGE(0xf600, 0xf600) AM_WRITE(tharrier_oki6295_bankswitch_0_w)
@@ -938,7 +938,7 @@ static ADDRESS_MAP_START( ssmissin_sound_map, AS_PROGRAM, 8, nmk16_state )
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(ssmissin_soundbank_w)
 	AM_RANGE(0x9800, 0x9800) AM_DEVREADWRITE("oki1", okim6295_device, read, write)
-	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
+	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_byte_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( strahl_map, AS_PROGRAM, 16, nmk16_state )
@@ -1079,7 +1079,7 @@ static ADDRESS_MAP_START( raphero_sound_mem_map, AS_PROGRAM, 8, nmk16_state )
 	AM_RANGE(0xc810, 0xc817) AM_DEVWRITE_LEGACY("nmk112", nmk112_okibank_w)
 //  AM_RANGE(0xc810, 0xc817) AM_WRITE(okibank_w)
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(raphero_sound_rombank_w)
-	AM_RANGE(0xd800, 0xd800) AM_READWRITE(soundlatch_r, soundlatch2_w)	// main cpu
+	AM_RANGE(0xd800, 0xd800) AM_READWRITE(soundlatch_byte_r, soundlatch2_byte_w)	// main cpu
 	AM_RANGE(0xe000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -1089,7 +1089,7 @@ static ADDRESS_MAP_START( macross2_sound_map, AS_PROGRAM, 8, nmk16_state )
 	AM_RANGE(0xa000, 0xa000) AM_READNOP	/* IRQ ack? watchdog? */
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 	AM_RANGE(0xe001, 0xe001) AM_WRITE(macross2_sound_bank_w)
-	AM_RANGE(0xf000, 0xf000) AM_READWRITE(soundlatch_r,soundlatch2_w)	/* from 68000 */
+	AM_RANGE(0xf000, 0xf000) AM_READWRITE(soundlatch_byte_r,soundlatch2_byte_w)	/* from 68000 */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( macross2_sound_io_map, AS_IO, 8, nmk16_state )
@@ -4684,7 +4684,7 @@ static ADDRESS_MAP_START( afega_sound_cpu, AS_PROGRAM, 8, nmk16_state )
 	AM_RANGE(0x0004, 0x0004) AM_WRITENOP // bug in sound prg?
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM									// RAM
-	AM_RANGE(0xf800, 0xf800) AM_READ(soundlatch_r)					// From Main CPU
+	AM_RANGE(0xf800, 0xf800) AM_READ(soundlatch_byte_r)					// From Main CPU
 	AM_RANGE(0xf808, 0xf809) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)	// YM2151
 	AM_RANGE(0xf80a, 0xf80a) AM_DEVREADWRITE("oki1", okim6295_device, read, write)		// M6295
 ADDRESS_MAP_END
@@ -4692,7 +4692,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( firehawk_sound_cpu, AS_PROGRAM, 8, nmk16_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
-	AM_RANGE(0xfff0, 0xfff0) AM_READ(soundlatch_r)
+	AM_RANGE(0xfff0, 0xfff0) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0xfff2, 0xfff2) AM_DEVWRITE_LEGACY("oki2", spec2k_oki1_banking_w )
 	AM_RANGE(0xfff8, 0xfff8) AM_DEVREADWRITE("oki2", okim6295_device, read, write)
 	AM_RANGE(0xfffa, 0xfffa) AM_DEVREADWRITE("oki1", okim6295_device, read, write)
@@ -4715,7 +4715,7 @@ static ADDRESS_MAP_START( twinactn_sound_cpu, AS_PROGRAM, 8, nmk16_state )
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x9000, 0x9000) AM_DEVWRITE_LEGACY("oki1", twinactn_oki_bank_w)
 	AM_RANGE(0x9800, 0x9800) AM_DEVREADWRITE("oki1", okim6295_device, read, write)
-	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)		// From Main CPU
+	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_byte_r)		// From Main CPU
 ADDRESS_MAP_END
 
 /***************************************************************************

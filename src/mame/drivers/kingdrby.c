@@ -281,7 +281,7 @@ static WRITE8_DEVICE_HANDLER( sound_cmd_w )
 	cputag_set_input_line(device->machine(), "soundcpu", INPUT_LINE_NMI, PULSE_LINE);
 	state->m_sound_cmd = data;
 	/* soundlatch is unneeded since we are already using perfect interleave. */
-	// soundlatch_w(space,0, data);
+	// soundlatch_byte_w(space,0, data);
 }
 
 

@@ -142,7 +142,7 @@ WRITE16_MEMBER(gijoe_state::sound_cmd_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		data &= 0xff;
-		soundlatch_w(space, 0, data);
+		soundlatch_byte_w(space, 0, data);
 	}
 }
 
@@ -153,7 +153,7 @@ WRITE16_MEMBER(gijoe_state::sound_irq_w)
 
 READ16_MEMBER(gijoe_state::sound_status_r)
 {
-	return soundlatch2_r(space, 0);
+	return soundlatch2_byte_r(space, 0);
 }
 
 static void sound_nmi( device_t *device )
@@ -197,8 +197,8 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, gijoe_state )
 	AM_RANGE(0x0000, 0xebff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xfa2f) AM_DEVREADWRITE("k054539", k054539_device, read, write)
-	AM_RANGE(0xfc00, 0xfc00) AM_WRITE(soundlatch2_w)
-	AM_RANGE(0xfc02, 0xfc02) AM_READ(soundlatch_r)
+	AM_RANGE(0xfc00, 0xfc00) AM_WRITE(soundlatch2_byte_w)
+	AM_RANGE(0xfc02, 0xfc02) AM_READ(soundlatch_byte_r)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( gijoe )

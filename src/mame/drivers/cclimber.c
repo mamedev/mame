@@ -216,7 +216,7 @@ Dip location verified from manual for: cclimber, guzzler, swimmer
 
 WRITE8_MEMBER(cclimber_state::swimmer_sh_soundlatch_w)
 {
-	soundlatch_w(space,offset,data);
+	soundlatch_byte_w(space,offset,data);
 	cputag_set_input_line_and_vector(machine(), "audiocpu", 0, HOLD_LINE, 0xff);
 }
 
@@ -399,7 +399,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( swimmer_audio_map, AS_PROGRAM, 8, cclimber_state )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
-	AM_RANGE(0x3000, 0x3000) AM_READ(soundlatch_r)
+	AM_RANGE(0x3000, 0x3000) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0x4000, 0x4001) AM_RAM				/* ??? */
 ADDRESS_MAP_END
 

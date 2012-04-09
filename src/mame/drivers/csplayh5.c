@@ -109,7 +109,7 @@ WRITE16_MEMBER(csplayh5_state::csplayh5_mux_w)
 
 WRITE16_MEMBER(csplayh5_state::csplayh5_sound_w)
 {
-	soundlatch_w(space, 0, ((data >> 8) & 0xff));
+	soundlatch_byte_w(space, 0, ((data >> 8) & 0xff));
 }
 
 
@@ -174,12 +174,12 @@ static void csplayh5_soundbank_w(running_machine &machine, int data)
 
 READ8_MEMBER(csplayh5_state::csplayh5_sound_r)
 {
-	return soundlatch_r(space, 0);
+	return soundlatch_byte_r(space, 0);
 }
 
 WRITE8_MEMBER(csplayh5_state::csplayh5_soundclr_w)
 {
-	soundlatch_clear_w(space, 0, 0);
+	soundlatch_clear_byte_w(space, 0, 0);
 }
 
 READ8_MEMBER(csplayh5_state::tmpz84c011_pio_r)

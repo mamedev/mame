@@ -78,7 +78,7 @@ WRITE16_MEMBER(fuuki16_state::fuuki16_sound_command_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		soundlatch_w(space,0,data & 0xff);
+		soundlatch_byte_w(space,0,data & 0xff);
 		device_set_input_line(m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 //      device_spin_until_time(&space.device(), attotime::from_usec(50));   // Allow the other CPU to reply
 		machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(50)); // Fixes glitching in rasters
@@ -140,7 +140,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( fuuki16_sound_io_map, AS_IO, 8, fuuki16_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(fuuki16_sound_rombank_w)	// ROM Bank
-	AM_RANGE(0x11, 0x11) AM_READ(soundlatch_r) AM_WRITENOP	// From Main CPU / ? To Main CPU ?
+	AM_RANGE(0x11, 0x11) AM_READ(soundlatch_byte_r) AM_WRITENOP	// From Main CPU / ? To Main CPU ?
 	AM_RANGE(0x20, 0x20) AM_DEVWRITE_LEGACY("oki", fuuki16_oki_banking_w)	// Oki Banking
 	AM_RANGE(0x30, 0x30) AM_WRITENOP	// ? In the NMI routine
 	AM_RANGE(0x40, 0x41) AM_DEVWRITE_LEGACY("ym1", ym2203_w)

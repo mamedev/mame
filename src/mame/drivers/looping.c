@@ -358,7 +358,7 @@ static WRITE_LINE_DEVICE_HANDLER( looping_spcint )
 
 WRITE8_MEMBER(looping_state::looping_soundlatch_w)
 {
-	soundlatch_w(space, offset, data);
+	soundlatch_byte_w(space, offset, data);
 	cputag_set_input_line_and_vector(machine(), "audiocpu", 0, ASSERT_LINE, 4);
 }
 
@@ -605,7 +605,7 @@ static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_r),
+	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_byte_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL

@@ -151,7 +151,7 @@ static ADDRESS_MAP_START( wink_io, AS_IO, 8, wink_state )
 //  AM_RANGE(0x23, 0x23) AM_WRITENOP                //?
 //  AM_RANGE(0x24, 0x24) AM_WRITENOP                //cab Knocker like in q-bert!
 	AM_RANGE(0x25, 0x27) AM_WRITE(wink_coin_counter_w)
-	AM_RANGE(0x40, 0x40) AM_WRITE(soundlatch_w)
+	AM_RANGE(0x40, 0x40) AM_WRITE(soundlatch_byte_w)
 	AM_RANGE(0x60, 0x60) AM_WRITE(sound_irq_w)
 	AM_RANGE(0x80, 0x80) AM_READ(analog_port_r)
 	AM_RANGE(0xa0, 0xa0) AM_READ(player_inputs_r)
@@ -168,7 +168,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( wink_sound_map, AS_PROGRAM, 8, wink_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
-	AM_RANGE(0x8000, 0x8000) AM_READ(soundlatch_r)
+	AM_RANGE(0x8000, 0x8000) AM_READ(soundlatch_byte_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( wink_sound_io, AS_IO, 8, wink_state )

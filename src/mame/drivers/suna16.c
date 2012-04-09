@@ -42,7 +42,7 @@ WRITE16_MEMBER(suna16_state::suna16_soundlatch_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		soundlatch_w(space, 0, data & 0xff );
+		soundlatch_byte_w(space, 0, data & 0xff );
 	}
 	if (data & ~0xff)	logerror("CPU#0 PC %06X - Sound latch unknown bits: %04X\n", cpu_get_pc(&space.device()), data);
 }
@@ -202,9 +202,9 @@ static ADDRESS_MAP_START( bssoccer_sound_map, AS_PROGRAM, 8, suna16_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM	// ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM	// RAM
 	AM_RANGE(0xf800, 0xf801) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)	// YM2151
-	AM_RANGE(0xfc00, 0xfc00) AM_READ(soundlatch_r)	// From Main CPU
-	AM_RANGE(0xfd00, 0xfd00) AM_WRITE(soundlatch2_w)	// To PCM Z80 #1
-	AM_RANGE(0xfe00, 0xfe00) AM_WRITE(soundlatch3_w)	// To PCM Z80 #2
+	AM_RANGE(0xfc00, 0xfc00) AM_READ(soundlatch_byte_r)	// From Main CPU
+	AM_RANGE(0xfd00, 0xfd00) AM_WRITE(soundlatch2_byte_w)	// To PCM Z80 #1
+	AM_RANGE(0xfe00, 0xfe00) AM_WRITE(soundlatch3_byte_w)	// To PCM Z80 #2
 ADDRESS_MAP_END
 
 /***************************************************************************
@@ -215,7 +215,7 @@ static ADDRESS_MAP_START( uballoon_sound_map, AS_PROGRAM, 8, suna16_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM	// ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM	// RAM
 	AM_RANGE(0xf800, 0xf801) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)	// YM2151
-	AM_RANGE(0xfc00, 0xfc00) AM_READWRITE(soundlatch_r, soundlatch2_w)	// To PCM Z80
+	AM_RANGE(0xfc00, 0xfc00) AM_READWRITE(soundlatch_byte_r, soundlatch2_byte_w)	// To PCM Z80
 ADDRESS_MAP_END
 
 /***************************************************************************
@@ -226,7 +226,7 @@ static ADDRESS_MAP_START( sunaq_sound_map, AS_PROGRAM, 8, suna16_state )
 	AM_RANGE(0x0000, 0xe82f) AM_ROM	// ROM
 	AM_RANGE(0xe830, 0xf7ff) AM_RAM	// RAM (writes to efxx, could be a program bug tho)
 	AM_RANGE(0xf800, 0xf801) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)	// YM2151
-	AM_RANGE(0xfc00, 0xfc00) AM_READWRITE(soundlatch_r, soundlatch2_w)	// To PCM Z80
+	AM_RANGE(0xfc00, 0xfc00) AM_READWRITE(soundlatch_byte_r, soundlatch2_byte_w)	// To PCM Z80
 ADDRESS_MAP_END
 
 /***************************************************************************
@@ -238,8 +238,8 @@ static ADDRESS_MAP_START( bestbest_sound_map, AS_PROGRAM, 8, suna16_state )
 	AM_RANGE( 0xc000, 0xc001 ) AM_DEVWRITE_LEGACY("ymsnd", ym3526_w	)	//
 	AM_RANGE( 0xc002, 0xc003 ) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w	)	// AY8910
 	AM_RANGE( 0xe000, 0xe7ff ) AM_RAM									// RAM
-	AM_RANGE( 0xf000, 0xf000 ) AM_WRITE(soundlatch2_w				)	// To PCM Z80
-	AM_RANGE( 0xf800, 0xf800 ) AM_READ ( soundlatch_r				)	// From Main CPU
+	AM_RANGE( 0xf000, 0xf000 ) AM_WRITE(soundlatch2_byte_w				)	// To PCM Z80
+	AM_RANGE( 0xf800, 0xf800 ) AM_READ ( soundlatch_byte_r				)	// From Main CPU
 ADDRESS_MAP_END
 
 /***************************************************************************
@@ -299,7 +299,7 @@ static WRITE8_DEVICE_HANDLER( bssoccer_DAC_w )
 
 static ADDRESS_MAP_START( bssoccer_pcm_1_io_map, AS_IO, 8, suna16_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(soundlatch2_r)	// From The Sound Z80
+	AM_RANGE(0x00, 0x00) AM_READ(soundlatch2_byte_r)	// From The Sound Z80
 	AM_RANGE(0x00, 0x00) AM_DEVWRITE_LEGACY("dac1", bssoccer_DAC_w)	// 2 x DAC
 	AM_RANGE(0x01, 0x01) AM_DEVWRITE_LEGACY("dac2", bssoccer_DAC_w)	// 2 x DAC
 	AM_RANGE(0x03, 0x03) AM_WRITE(bssoccer_pcm_1_bankswitch_w)	// Rom Bank
@@ -307,7 +307,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bssoccer_pcm_2_io_map, AS_IO, 8, suna16_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(soundlatch3_r)	// From The Sound Z80
+	AM_RANGE(0x00, 0x00) AM_READ(soundlatch3_byte_r)	// From The Sound Z80
 	AM_RANGE(0x00, 0x00) AM_DEVWRITE_LEGACY("dac3", bssoccer_DAC_w)	// 2 x DAC
 	AM_RANGE(0x01, 0x01) AM_DEVWRITE_LEGACY("dac4", bssoccer_DAC_w)	// 2 x DAC
 	AM_RANGE(0x03, 0x03) AM_WRITE(bssoccer_pcm_2_bankswitch_w)	// Rom Bank
@@ -337,7 +337,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( uballoon_pcm_1_io_map, AS_IO, 8, suna16_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(soundlatch2_r)	// From The Sound Z80
+	AM_RANGE(0x00, 0x00) AM_READ(soundlatch2_byte_r)	// From The Sound Z80
 	AM_RANGE(0x00, 0x00) AM_DEVWRITE_LEGACY("dac1", bssoccer_DAC_w)	// 2 x DAC
 	AM_RANGE(0x01, 0x01) AM_DEVWRITE_LEGACY("dac2", bssoccer_DAC_w)	// 2 x DAC
 	AM_RANGE(0x03, 0x03) AM_WRITE(uballoon_pcm_1_bankswitch_w)	// Rom Bank
@@ -361,7 +361,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bestbest_pcm_1_iomap, AS_IO, 8, suna16_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ (soundlatch2_r 	)	// From The Sound Z80
+	AM_RANGE(0x00, 0x00) AM_READ (soundlatch2_byte_r 	)	// From The Sound Z80
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0x02) AM_DEVWRITE_LEGACY("dac1", bssoccer_DAC_w)	// 2 x DAC
 	AM_RANGE(0x01, 0x01) AM_MIRROR(0x02) AM_DEVWRITE_LEGACY("dac2", bssoccer_DAC_w)	// 2 x DAC
 ADDRESS_MAP_END

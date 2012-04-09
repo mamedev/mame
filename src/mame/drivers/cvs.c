@@ -391,7 +391,7 @@ READ8_MEMBER(cvs_state::cvs_speech_command_r)
 
 	/* FIXME: this was by observation on board ???
      *          -bit 7 is TMS status (active LO) */
-	return ((tms5110_ctl_r(m_tms, 0) ^ 1) << 7) | (soundlatch_r(space, 0) & 0x7f);
+	return ((tms5110_ctl_r(m_tms, 0) ^ 1) << 7) | (soundlatch_byte_r(space, 0) & 0x7f);
 }
 
 
@@ -459,7 +459,7 @@ WRITE8_MEMBER(cvs_state::audio_command_w)
 
 	LOG(("data %02x\n", data));
 	/* cause interrupt on audio CPU if bit 7 set */
-	soundlatch_w(space, 0, data);
+	soundlatch_byte_w(space, 0, data);
 	cvs_slave_cpu_interrupt(m_audiocpu, data & 0x80 ? 1 : 0);
 }
 
@@ -506,7 +506,7 @@ static ADDRESS_MAP_START( cvs_dac_cpu_map, AS_PROGRAM, 8, cvs_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x1000, 0x107f) AM_RAM
-	AM_RANGE(0x1800, 0x1800) AM_READ(soundlatch_r)
+	AM_RANGE(0x1800, 0x1800) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0x1840, 0x1840) AM_DEVWRITE_LEGACY("dac1", dac_w)
 	AM_RANGE(0x1880, 0x1883) AM_DEVWRITE_LEGACY("dac2", cvs_4_bit_dac_data_w) AM_BASE(m_cvs_4_bit_dac_data)
 	AM_RANGE(0x1884, 0x1887) AM_DEVWRITE_LEGACY("dac3", cvs_unknown_w)	AM_BASE(m_dac3_state)	/* ???? not connected to anything */

@@ -79,7 +79,7 @@ static ADDRESS_MAP_START( sbasketb_map, AS_PROGRAM, 8, sbasketb_state )
 	AM_RANGE(0x3c81, 0x3c81) AM_WRITE(irq_mask_w)
 	AM_RANGE(0x3c83, 0x3c84) AM_WRITE(sbasketb_coin_counter_w)
 	AM_RANGE(0x3c85, 0x3c85) AM_WRITEONLY AM_BASE(m_spriteram_select)
-	AM_RANGE(0x3d00, 0x3d00) AM_WRITE(soundlatch_w)
+	AM_RANGE(0x3d00, 0x3d00) AM_WRITE(soundlatch_byte_w)
 	AM_RANGE(0x3d80, 0x3d80) AM_WRITE(sbasketb_sh_irqtrigger_w)
 	AM_RANGE(0x3e00, 0x3e00) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x3e01, 0x3e01) AM_READ_PORT("P1")
@@ -94,7 +94,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sbasketb_sound_map, AS_PROGRAM, 8, sbasketb_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
-	AM_RANGE(0x6000, 0x6000) AM_READ(soundlatch_r)
+	AM_RANGE(0x6000, 0x6000) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0x8000, 0x8000) AM_READ_LEGACY(hyperspt_sh_timer_r)
 	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE_LEGACY("vlm", vlm5030_data_w) /* speech data */
 	AM_RANGE(0xc000, 0xdfff) AM_DEVWRITE_LEGACY("vlm", hyperspt_sound_w)     /* speech and output controll */

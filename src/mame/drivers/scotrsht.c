@@ -56,7 +56,7 @@ static INTERRUPT_GEN( scotrsht_interrupt )
 
 WRITE8_MEMBER(scotrsht_state::scotrsht_soundlatch_w)
 {
-	soundlatch_w(space, 0, data);
+	soundlatch_byte_w(space, 0, data);
 	cputag_set_input_line(machine(), "audiocpu", 0, HOLD_LINE);
 }
 
@@ -87,7 +87,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( scotrsht_sound_map, AS_PROGRAM, 8, scotrsht_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
-	AM_RANGE(0x8000, 0x8000) AM_READ(soundlatch_r)
+	AM_RANGE(0x8000, 0x8000) AM_READ(soundlatch_byte_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( scotrsht_sound_port, AS_IO, 8, scotrsht_state )

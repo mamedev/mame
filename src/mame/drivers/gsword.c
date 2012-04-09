@@ -327,7 +327,7 @@ static WRITE8_DEVICE_HANDLER( gsword_adpcm_data_w )
 static WRITE8_HANDLER( adpcm_soundcommand_w )
 {
 	gsword_state *state = space->machine().driver_data<gsword_state>();
-	state->soundlatch_w(*space, 0, data);
+	state->soundlatch_byte_w(*space, 0, data);
 	cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -382,7 +382,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( cpu3_map, AS_PROGRAM, 8, gsword_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE_LEGACY("msm", gsword_adpcm_data_w)
-	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
+	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_byte_r)
 ADDRESS_MAP_END
 
 

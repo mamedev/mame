@@ -433,7 +433,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( z80_sound_map, AS_PROGRAM, 8, megasys1_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_r)
+	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0xf000, 0xf000) AM_WRITENOP /* ?? */
 ADDRESS_MAP_END
 
@@ -3811,7 +3811,7 @@ static DRIVER_INIT( edfbl )
 	//device_t *oki1 = machine.device("oki1");
 	megasys1_state *state = machine.driver_data<megasys1_state>();
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xe0000, 0xe000f, read16_delegate(FUNC(megasys1_state::edfbl_input_r),state));
-	//machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(*oki1, 0xe000e, 0xe000f, FUNC(soundlatch_w));
+	//machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(*oki1, 0xe000e, 0xe000f, FUNC(soundlatch_byte_w));
 }
 
 static DRIVER_INIT( hayaosi1 )

@@ -54,7 +54,7 @@ public:
 
 WRITE16_MEMBER(go2000_state::sound_cmd_w)
 {
-	soundlatch_w(space, offset, data & 0xff);
+	soundlatch_byte_w(space, offset, data & 0xff);
 	device_set_input_line(m_soundcpu, 0, HOLD_LINE);
 }
 
@@ -84,7 +84,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( go2000_sound_io, AS_IO, 8, go2000_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(soundlatch_r)
+	AM_RANGE(0x00, 0x00) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0x00, 0x00) AM_DEVWRITE_LEGACY("dac1", dac_w)
 	AM_RANGE(0x03, 0x03) AM_WRITE(go2000_pcm_1_bankswitch_w)
 ADDRESS_MAP_END

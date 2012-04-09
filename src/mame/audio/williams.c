@@ -544,7 +544,7 @@ static READ8_HANDLER( narc_command_r )
 	driver_device *drvstate = space->machine().driver_data<driver_device>();
 	device_set_input_line(state->sound_cpu, M6809_IRQ_LINE, CLEAR_LINE);
 	state->sound_int_state = 0;
-	return drvstate->soundlatch_r(*space, 0);
+	return drvstate->soundlatch_byte_r(*space, 0);
 }
 
 
@@ -552,7 +552,7 @@ static WRITE8_HANDLER( narc_command2_w )
 {
 	williams_audio_state *state = &audio;
 	driver_device *drvstate = space->machine().driver_data<driver_device>();
-	drvstate->soundlatch2_w(*space, 0, data & 0xff);
+	drvstate->soundlatch2_byte_w(*space, 0, data & 0xff);
 	device_set_input_line(state->soundalt_cpu, M6809_FIRQ_LINE, ASSERT_LINE);
 }
 
@@ -562,7 +562,7 @@ static READ8_HANDLER( narc_command2_r )
 	williams_audio_state *state = &audio;
 	driver_device *drvstate = space->machine().driver_data<driver_device>();
 	device_set_input_line(state->soundalt_cpu, M6809_FIRQ_LINE, CLEAR_LINE);
-	return drvstate->soundlatch2_r(*space, 0);
+	return drvstate->soundlatch2_byte_r(*space, 0);
 }
 
 
@@ -619,7 +619,7 @@ void williams_narc_data_w(running_machine &machine, int data)
 	device_t *sound_cpu = state->sound_cpu;
 	address_space *space = sound_cpu->memory().space(AS_PROGRAM);
 	driver_device *drvstate = space->machine().driver_data<driver_device>();
-	drvstate->soundlatch_w(*space, 0, data & 0xff);
+	drvstate->soundlatch_byte_w(*space, 0, data & 0xff);
 	device_set_input_line(sound_cpu, INPUT_LINE_NMI, (data & 0x100) ? CLEAR_LINE : ASSERT_LINE);
 	if (!(data & 0x200))
 	{
@@ -697,7 +697,7 @@ static READ8_HANDLER( adpcm_command_r )
        self-tests to pass */
 	space->machine().scheduler().timer_set(attotime::from_usec(10), FUNC(clear_irq_state));
 	driver_device *drvstate = space->machine().driver_data<driver_device>();
-	return drvstate->soundlatch_r(*space, 0);
+	return drvstate->soundlatch_byte_r(*space, 0);
 }
 
 
@@ -720,7 +720,7 @@ void williams_adpcm_data_w(running_machine &machine, int data)
 	device_t *sound_cpu = state->sound_cpu;
 	address_space *space = sound_cpu->memory().space(AS_PROGRAM);
 	driver_device *drvstate = space->machine().driver_data<driver_device>();
-	drvstate->soundlatch_w(*space, 0, data & 0xff);
+	drvstate->soundlatch_byte_w(*space, 0, data & 0xff);
 	if (!(data & 0x200))
 	{
 		device_set_input_line(sound_cpu, M6809_IRQ_LINE, ASSERT_LINE);

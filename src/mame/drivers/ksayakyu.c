@@ -87,7 +87,7 @@ WRITE8_MEMBER(ksayakyu_state::bank_select_w)
 WRITE8_MEMBER(ksayakyu_state::latch_w)
 {
 	m_sound_status &= ~0x80;
-	soundlatch_w(space, 0, data | 0x80);
+	soundlatch_byte_w(space, 0, data | 0x80);
 }
 
 READ8_MEMBER(ksayakyu_state::sound_status_r)
@@ -98,7 +98,7 @@ READ8_MEMBER(ksayakyu_state::sound_status_r)
 WRITE8_MEMBER(ksayakyu_state::tomaincpu_w)
 {
 	m_sound_status |= 0x80;
-	soundlatch_w(space, 0, data);
+	soundlatch_byte_w(space, 0, data);
 }
 
 static ADDRESS_MAP_START( maincpu_map, AS_PROGRAM, 8, ksayakyu_state )
@@ -188,7 +188,7 @@ static const ay8910_interface ay8910_interface_1 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_r),
+	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_byte_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_HANDLER(dummy1_w)

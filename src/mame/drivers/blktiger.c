@@ -80,7 +80,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( blktiger_io_map, AS_IO, 8, blktiger_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0")	AM_WRITE(soundlatch_w)
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0")	AM_WRITE(soundlatch_byte_w)
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")	AM_WRITE(blktiger_bankswitch_w)
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN2")
 	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW0")	AM_WRITE(blktiger_coinlockout_w)
@@ -97,7 +97,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( blktigerbl_io_map, AS_IO, 8, blktiger_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0")	AM_WRITE(soundlatch_w)
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0")	AM_WRITE(soundlatch_byte_w)
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")	AM_WRITE(blktiger_bankswitch_w)
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN2")
 	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW0")	AM_WRITE(blktiger_coinlockout_w)
@@ -115,7 +115,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( blktiger_sound_map, AS_PROGRAM, 8, blktiger_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xc800, 0xc800) AM_READ(soundlatch_r)
+	AM_RANGE(0xc800, 0xc800) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0xe000, 0xe001) AM_DEVREADWRITE_LEGACY("ym1", ym2203_r, ym2203_w)
 	AM_RANGE(0xe002, 0xe003) AM_DEVREADWRITE_LEGACY("ym2", ym2203_r, ym2203_w)
 ADDRESS_MAP_END

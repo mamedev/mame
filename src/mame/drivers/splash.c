@@ -53,7 +53,7 @@ WRITE16_MEMBER(splash_state::splash_sh_irqtrigger_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		soundlatch_w(space, 0, data & 0xff);
+		soundlatch_byte_w(space, 0, data & 0xff);
 		cputag_set_input_line(machine(), "audiocpu", 0, HOLD_LINE);
 	}
 }
@@ -62,7 +62,7 @@ WRITE16_MEMBER(splash_state::roldf_sh_irqtrigger_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		soundlatch_w(space, 0, data & 0xff);
+		soundlatch_byte_w(space, 0, data & 0xff);
 		cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 	}
 
@@ -123,7 +123,7 @@ static ADDRESS_MAP_START( splash_sound_map, AS_PROGRAM, 8, splash_state )
 	AM_RANGE(0x0000, 0xd7ff) AM_ROM										/* ROM */
 	AM_RANGE(0xd800, 0xd800) AM_WRITE(splash_adpcm_data_w)				/* ADPCM data for the MSM5205 chip */
 //  AM_RANGE(0xe000, 0xe000) AM_WRITENOP                                /* ??? */
-	AM_RANGE(0xe800, 0xe800) AM_READ(soundlatch_r)						/* Sound latch */
+	AM_RANGE(0xe800, 0xe800) AM_READ(soundlatch_byte_r)						/* Sound latch */
 	AM_RANGE(0xf000, 0xf001) AM_DEVREADWRITE_LEGACY("ymsnd", ym3812_r,ym3812_w)	/* YM3812 */
 	AM_RANGE(0xf800, 0xffff) AM_RAM										/* RAM */
 ADDRESS_MAP_END
@@ -204,7 +204,7 @@ static ADDRESS_MAP_START( roldfrog_sound_io_map, AS_IO, 8, splash_state )
 	AM_RANGE(0x40, 0x40) AM_NOP
 	AM_RANGE(0x31, 0x31) AM_WRITE(sound_bank_w)
 	AM_RANGE(0x37, 0x37) AM_WRITE(roldfrog_vblank_ack_w )
-	AM_RANGE(0x70, 0x70) AM_READ(soundlatch_r)
+	AM_RANGE(0x70, 0x70) AM_READ(soundlatch_byte_r)
 
 	AM_RANGE(0x0, 0xff) AM_READ(roldfrog_unk_r)
 ADDRESS_MAP_END
@@ -222,7 +222,7 @@ WRITE16_MEMBER(splash_state::spr_write)
 
 WRITE16_MEMBER(splash_state::funystrp_sh_irqtrigger_w)
 {
-	soundlatch_w(space, 0, data>>8);
+	soundlatch_byte_w(space, 0, data>>8);
 	cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -285,7 +285,7 @@ static ADDRESS_MAP_START( funystrp_sound_io_map, AS_IO, 8, splash_state )
 	AM_RANGE(0x00, 0x00) AM_WRITE(msm1_data_w)
 	AM_RANGE(0x01, 0x01) AM_WRITE(msm2_data_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(sound_bank_w)
-	AM_RANGE(0x03, 0x03) AM_READ(soundlatch_r)
+	AM_RANGE(0x03, 0x03) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0x04, 0x04) AM_READ(int_source_r)
 	AM_RANGE(0x06, 0x06) AM_WRITE(msm1_interrupt_w)
 	AM_RANGE(0x07, 0x07) AM_WRITE(msm2_interrupt_w)

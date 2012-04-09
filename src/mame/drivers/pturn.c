@@ -236,7 +236,7 @@ WRITE8_MEMBER(pturn_state::nmi_sub_enable_w)
 
 WRITE8_MEMBER(pturn_state::sound_w)
 {
-	soundlatch_w(space,0,data);
+	soundlatch_byte_w(space,0,data);
 }
 
 
@@ -344,7 +344,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 8, pturn_state )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
-	AM_RANGE(0x3000, 0x3000) AM_READ(soundlatch_r) AM_WRITE(nmi_sub_enable_w)
+	AM_RANGE(0x3000, 0x3000) AM_READ(soundlatch_byte_r) AM_WRITE(nmi_sub_enable_w)
 	AM_RANGE(0x4000, 0x4000) AM_RAM
 	AM_RANGE(0x5000, 0x5001) AM_DEVWRITE_LEGACY("ay1", ay8910_address_data_w)
 	AM_RANGE(0x6000, 0x6001) AM_DEVWRITE_LEGACY("ay2", ay8910_address_data_w)
@@ -478,7 +478,7 @@ static MACHINE_RESET( pturn )
 {
 	pturn_state *state = machine.driver_data<pturn_state>();
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	state->soundlatch_clear_w(*space,0,0);
+	state->soundlatch_clear_byte_w(*space,0,0);
 }
 
 static MACHINE_CONFIG_START( pturn, pturn_state )

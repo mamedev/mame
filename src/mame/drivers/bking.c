@@ -42,7 +42,7 @@ WRITE8_MEMBER(bking_state::bking_soundlatch_w)
 		if (data & (1 << i))
 			code |= 0x80 >> i;
 
-	soundlatch_w(space, offset, code);
+	soundlatch_byte_w(space, offset, code);
 	if (m_sound_nmi_enable)
 		device_set_input_line(m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 }
@@ -133,7 +133,7 @@ static ADDRESS_MAP_START( bking_audio_map, AS_PROGRAM, 8, bking_state )
 	AM_RANGE(0x4401, 0x4401) AM_DEVREAD_LEGACY("ay1", ay8910_r)
 	AM_RANGE(0x4402, 0x4403) AM_DEVWRITE_LEGACY("ay2", ay8910_address_data_w)
 	AM_RANGE(0x4403, 0x4403) AM_DEVREAD_LEGACY("ay2", ay8910_r)
-	AM_RANGE(0x4800, 0x4800) AM_READ(soundlatch_r)
+	AM_RANGE(0x4800, 0x4800) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0x4802, 0x4802) AM_READWRITE(bking_sndnmi_disable_r, bking_sndnmi_enable_w)
 	AM_RANGE(0xe000, 0xefff) AM_ROM   /* Space for diagnostic ROM */
 ADDRESS_MAP_END

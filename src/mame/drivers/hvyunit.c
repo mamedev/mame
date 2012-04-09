@@ -252,7 +252,7 @@ READ8_MEMBER(hvyunit_state::mermaid_status_r)
 WRITE8_MEMBER(hvyunit_state::trigger_nmi_on_sound_cpu2)
 {
 
-	soundlatch_w(space, 0, data);
+	soundlatch_byte_w(space, 0, data);
 	device_set_input_line(m_sound_cpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -464,7 +464,7 @@ static ADDRESS_MAP_START( sound_io, AS_IO, 8, hvyunit_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(sound_bankswitch_w)
 	AM_RANGE(0x02, 0x03) AM_DEVREADWRITE_LEGACY("ymsnd", ym2203_r, ym2203_w)
-	AM_RANGE(0x04, 0x04) AM_READ(soundlatch_r)
+	AM_RANGE(0x04, 0x04) AM_READ(soundlatch_byte_r)
 ADDRESS_MAP_END
 
 

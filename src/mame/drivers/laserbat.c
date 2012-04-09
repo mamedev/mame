@@ -189,7 +189,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( catnmous_io_map, AS_IO, 8, laserbat_state )
-	AM_RANGE(0x00, 0x00) AM_WRITE(soundlatch_w) // soundlatch ?
+	AM_RANGE(0x00, 0x00) AM_WRITE(soundlatch_byte_w) // soundlatch ?
 	AM_RANGE(0x01, 0x01) AM_WRITE(video_extra_w)
 	AM_RANGE(0x02, 0x02) AM_READ(laserbat_input_r)
 	AM_RANGE(0x02, 0x02) AM_WRITENOP // unknown
@@ -650,7 +650,7 @@ static const ay8910_interface ay8910_config =
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
 	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_r),
+	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_byte_r),
 	DEVCB_NULL,//ay8910_port0a_w,
 	DEVCB_NULL
 };

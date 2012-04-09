@@ -167,7 +167,7 @@ static WRITE8_DEVICE_HANDLER( audio_trigger_w )
 
 static const via6522_interface via_2_interface =
 {
-	DEVCB_NULL, DEVCB_DRIVER_MEMBER(driver_device, soundlatch_r),				  /*inputs : A/B         */
+	DEVCB_NULL, DEVCB_DRIVER_MEMBER(driver_device, soundlatch_byte_r),				  /*inputs : A/B         */
 	DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,							  /*inputs : CA/B1,CA/B2 */
 	DEVCB_HANDLER(audio_cmd_w), DEVCB_NULL,						  /*outputs: A/B         */
 	DEVCB_NULL, DEVCB_NULL, DEVCB_HANDLER(audio_trigger_w), DEVCB_HANDLER(audio_reset_w), /*outputs: CA/B1,CA/B2 */
@@ -196,7 +196,7 @@ static WRITE8_DEVICE_HANDLER( r6532_soundlatch_w )
 {
 	gameplan_state *gameplan = device->machine().driver_data<gameplan_state>();
 	address_space *space = device->machine().device("maincpu")->memory().space(AS_PROGRAM);
-	gameplan->soundlatch_w(*space, 0, data);
+	gameplan->soundlatch_byte_w(*space, 0, data);
 }
 
 

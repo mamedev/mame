@@ -92,8 +92,8 @@ WRITE16_MEMBER(m107_state::m107_bankswitch_w)
 WRITE16_MEMBER(m107_state::m107_soundlatch_w)
 {
 	cputag_set_input_line(machine(), "soundcpu", NEC_INPUT_LINE_INTP1, ASSERT_LINE);
-	soundlatch_w(space, 0, data & 0xff);
-//      logerror("soundlatch_w %02x\n",data);
+	soundlatch_byte_w(space, 0, data & 0xff);
+//      logerror("soundlatch_byte_w %02x\n",data);
 }
 
 READ16_MEMBER(m107_state::m107_sound_status_r)
@@ -104,7 +104,7 @@ READ16_MEMBER(m107_state::m107_sound_status_r)
 READ16_MEMBER(m107_state::m107_soundlatch_r)
 {
 	cputag_set_input_line(machine(), "soundcpu", NEC_INPUT_LINE_INTP1, CLEAR_LINE);
-	return soundlatch_r(space, offset) | 0xff00;
+	return soundlatch_byte_r(space, offset) | 0xff00;
 }
 
 WRITE16_MEMBER(m107_state::m107_sound_irq_ack_w)

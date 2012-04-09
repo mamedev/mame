@@ -361,12 +361,12 @@ WRITE16_MEMBER(armedf_state::bootleg_io_w)
 WRITE16_MEMBER(armedf_state::sound_command_w)
 {
 	if (ACCESSING_BITS_0_7)
-		soundlatch_w(space, 0, ((data & 0x7f) << 1) | 1);
+		soundlatch_byte_w(space, 0, ((data & 0x7f) << 1) | 1);
 }
 
 READ8_MEMBER(armedf_state::soundlatch_clear_r)
 {
-	soundlatch_clear_w(space, 0, 0);
+	soundlatch_clear_byte_w(space, 0, 0);
 	return 0;
 }
 
@@ -758,7 +758,7 @@ static ADDRESS_MAP_START( sound_portmap, AS_IO, 8, armedf_state )
 	AM_RANGE(0x2, 0x2) AM_DEVWRITE_LEGACY("dac1", dac_signed_w)
 	AM_RANGE(0x3, 0x3) AM_DEVWRITE_LEGACY("dac2", dac_signed_w)
 	AM_RANGE(0x4, 0x4) AM_READ(soundlatch_clear_r)
-	AM_RANGE(0x6, 0x6) AM_READ(soundlatch_r)
+	AM_RANGE(0x6, 0x6) AM_READ(soundlatch_byte_r)
 ADDRESS_MAP_END
 
 

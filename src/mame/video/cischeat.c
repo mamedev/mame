@@ -410,7 +410,7 @@ READ16_MEMBER(cischeat_state::cischeat_vregs_r)
 			}
 
 		case 0x2200/2 : return input_port_read(machine(), "IN5");	// DSW 3 (4 bits)
-		case 0x2300/2 : return soundlatch2_r(space,0);	// From sound cpu
+		case 0x2300/2 : return soundlatch2_byte_r(space,0);	// From sound cpu
 
 		default:	SHOW_READ_ERROR("vreg %04X read!",offset*2);
 					return m_vregs[offset];
@@ -496,7 +496,7 @@ READ16_MEMBER(cischeat_state::f1gpstar_vregs_r)
 
 		case 0x0006/2 :	return input_port_read(machine(), "IN3");	// ? Read at boot only
 
-		case 0x0008/2 :	return soundlatch2_r(space,0);		// From sound cpu
+		case 0x0008/2 :	return soundlatch2_byte_r(space,0);		// From sound cpu
 
 		case 0x000c/2 :	return input_port_read(machine(), "IN4");	// DSW 3
 
@@ -538,7 +538,7 @@ READ16_MEMBER(cischeat_state::wildplt_vregs_r)
 
 		case 0x0004/2 :	return input_port_read(machine(), "IN1"); // Buttons
 
-		case 0x0008/2 :	return soundlatch2_r(space,0); // From sound cpu
+		case 0x0008/2 :	return soundlatch2_byte_r(space,0); // From sound cpu
 
 		case 0x0010/2 :	// X, Y
 			return input_port_read(machine(), "IN2") | (input_port_read(machine(), "IN3")<<8);

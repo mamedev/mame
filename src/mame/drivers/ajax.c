@@ -56,7 +56,7 @@ static ADDRESS_MAP_START( ajax_sound_map, AS_PROGRAM, 8, ajax_state )
 	AM_RANGE(0xb80c, 0xb80c) AM_DEVWRITE_LEGACY("k007232_2", k007232_extvol_w)			/* extra volume, goes to the 007232 w/ A11 */
 																/* selecting a different latch for the external port */
 	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)		/* YM2151 */
-	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_r)				/* soundlatch_r */
+	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_byte_r)				/* soundlatch_byte_r */
 ADDRESS_MAP_END
 
 

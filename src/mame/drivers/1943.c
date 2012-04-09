@@ -59,7 +59,7 @@ static ADDRESS_MAP_START( c1943_map, AS_PROGRAM, 8, _1943_state )
 	AM_RANGE(0xc003, 0xc003) AM_READ_PORT("DSWA")
 	AM_RANGE(0xc004, 0xc004) AM_READ_PORT("DSWB")
 	AM_RANGE(0xc007, 0xc007) AM_READ(c1943_protection_r)
-	AM_RANGE(0xc800, 0xc800) AM_WRITE(soundlatch_w)
+	AM_RANGE(0xc800, 0xc800) AM_WRITE(soundlatch_byte_w)
 	AM_RANGE(0xc804, 0xc804) AM_WRITE(c1943_c804_w)	// ROM bank switch, screen flip
 	AM_RANGE(0xc806, 0xc806) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0xc807, 0xc807) AM_WRITENOP // ???
@@ -80,7 +80,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, _1943_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xc800, 0xc800) AM_READ(soundlatch_r)
+	AM_RANGE(0xc800, 0xc800) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0xe000, 0xe001) AM_DEVWRITE_LEGACY("ym1", ym2203_w)
 	AM_RANGE(0xe002, 0xe003) AM_DEVWRITE_LEGACY("ym2", ym2203_w)
 ADDRESS_MAP_END

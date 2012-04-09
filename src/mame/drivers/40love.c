@@ -236,7 +236,7 @@ static TIMER_CALLBACK( nmi_callback )
 
 WRITE8_MEMBER(fortyl_state::sound_command_w)
 {
-	soundlatch_w(space, 0, data);
+	soundlatch_byte_w(space, 0, data);
 	machine().scheduler().synchronize(FUNC(nmi_callback), data);
 }
 
@@ -750,7 +750,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, fortyl_state )
 	AM_RANGE(0xca00, 0xca0d) AM_DEVWRITE_LEGACY("msm", msm5232_w)
 	AM_RANGE(0xcc00, 0xcc00) AM_DEVWRITE_LEGACY("msm", sound_control_0_w)
 	AM_RANGE(0xce00, 0xce00) AM_DEVWRITE_LEGACY("msm", sound_control_1_w)
-	AM_RANGE(0xd800, 0xd800) AM_READ(soundlatch_r) AM_WRITE(to_main_w)
+	AM_RANGE(0xd800, 0xd800) AM_READ(soundlatch_byte_r) AM_WRITE(to_main_w)
 	AM_RANGE(0xda00, 0xda00) AM_READNOP AM_WRITE(nmi_enable_w) /* unknown read */
 	AM_RANGE(0xdc00, 0xdc00) AM_WRITE(nmi_disable_w)
 	AM_RANGE(0xde00, 0xde00) AM_READNOP AM_DEVWRITE_LEGACY("dac", dac_signed_w)		/* signed 8-bit DAC - unknown read */

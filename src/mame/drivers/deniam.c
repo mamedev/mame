@@ -52,7 +52,7 @@ WRITE16_MEMBER(deniam_state::sound_command_w)
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		soundlatch_w(space,offset, (data >> 8) & 0xff);
+		soundlatch_byte_w(space,offset, (data >> 8) & 0xff);
 		device_set_input_line(m_audio_cpu, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
@@ -101,7 +101,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, deniam_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x01, 0x01) AM_READ(soundlatch_r)
+	AM_RANGE(0x01, 0x01) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0x02, 0x03) AM_DEVWRITE_LEGACY("ymsnd", ym3812_w)
 	AM_RANGE(0x05, 0x05) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	AM_RANGE(0x07, 0x07) AM_DEVWRITE_LEGACY("oki", deniam16b_oki_rom_bank_w)

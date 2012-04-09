@@ -241,7 +241,7 @@ READ16_MEMBER(nemesis_state::selected_ip_word_r)
 WRITE16_MEMBER(nemesis_state::nemesis_soundlatch_word_w)
 {
 	if (ACCESSING_BITS_0_7)
-		soundlatch_w(space, offset, data & 0xff);
+		soundlatch_byte_w(space, offset, data & 0xff);
 }
 
 static WRITE8_DEVICE_HANDLER( gx400_speech_start_w )
@@ -426,7 +426,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, nemesis_state )
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
 	AM_RANGE(0xa000, 0xafff) AM_DEVWRITE_LEGACY("k007232", k005289_pitch_A_w)
 	AM_RANGE(0xc000, 0xcfff) AM_DEVWRITE_LEGACY("k007232", k005289_pitch_B_w)
-	AM_RANGE(0xe001, 0xe001) AM_READ(soundlatch_r)
+	AM_RANGE(0xe001, 0xe001) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0xe003, 0xe003) AM_DEVWRITE_LEGACY("k007232", k005289_keylatch_A_w)
 	AM_RANGE(0xe004, 0xe004) AM_DEVWRITE_LEGACY("k007232", k005289_keylatch_B_w)
 	AM_RANGE(0xe005, 0xe005) AM_DEVWRITE_LEGACY("ay2", ay8910_address_w)
@@ -443,7 +443,7 @@ static ADDRESS_MAP_START( gx400_sound_map, AS_PROGRAM, 8, nemesis_state )
 	AM_RANGE(0xa000, 0xafff) AM_DEVWRITE_LEGACY("k007232", k005289_pitch_A_w)
 	AM_RANGE(0xc000, 0xcfff) AM_DEVWRITE_LEGACY("k007232", k005289_pitch_B_w)
 	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE_LEGACY("vlm", vlm5030_data_w)
-	AM_RANGE(0xe001, 0xe001) AM_READ(soundlatch_r)
+	AM_RANGE(0xe001, 0xe001) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0xe003, 0xe003) AM_DEVWRITE_LEGACY("k007232", k005289_keylatch_A_w)
 	AM_RANGE(0xe004, 0xe004) AM_DEVWRITE_LEGACY("k007232", k005289_keylatch_B_w)
 	AM_RANGE(0xe005, 0xe005) AM_DEVWRITE_LEGACY("ay2", ay8910_address_w)
@@ -569,7 +569,7 @@ READ8_MEMBER(nemesis_state::wd_r)
 static ADDRESS_MAP_START( sal_sound_map, AS_PROGRAM, 8, nemesis_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
+	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE_LEGACY("k007232", k007232_r, k007232_w)
 	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0xd000, 0xd000) AM_DEVWRITE_LEGACY("vlm", vlm5030_data_w)
@@ -580,7 +580,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( blkpnthr_sound_map, AS_PROGRAM, 8, nemesis_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
+	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE_LEGACY("k007232", k007232_r, k007232_w)
 	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0xe000, 0xe000) AM_READ(wd_r) /* watchdog?? */
@@ -597,7 +597,7 @@ static ADDRESS_MAP_START( city_sound_map, AS_PROGRAM, 8, nemesis_state )
 	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE_LEGACY("ymsnd", ym3812_r, ym3812_w)
 	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE_LEGACY("k007232", k007232_r, k007232_w)
 	AM_RANGE(0xc000, 0xc000) AM_DEVWRITE_LEGACY("k007232", city_sound_bank_w) /* 7232 bankswitch */
-	AM_RANGE(0xd000, 0xd000) AM_READ(soundlatch_r)
+	AM_RANGE(0xd000, 0xd000) AM_READ(soundlatch_byte_r)
 ADDRESS_MAP_END
 
 /******************************************************************************/

@@ -134,7 +134,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, _88games_state )
 	AM_RANGE(0x3800, 0x3fff) AM_READWRITE(bankedram_r, bankedram_w) AM_BASE(m_ram)
 	AM_RANGE(0x5f84, 0x5f84) AM_WRITE(k88games_5f84_w)
 	AM_RANGE(0x5f88, 0x5f88) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0x5f8c, 0x5f8c) AM_WRITE(soundlatch_w)
+	AM_RANGE(0x5f8c, 0x5f8c) AM_WRITE(soundlatch_byte_w)
 	AM_RANGE(0x5f90, 0x5f90) AM_WRITE(k88games_sh_irqtrigger_w)
 	AM_RANGE(0x5f94, 0x5f94) AM_READ_PORT("IN0")
 	AM_RANGE(0x5f95, 0x5f95) AM_READ_PORT("IN1")
@@ -150,7 +150,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, _88games_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(speech_msg_w)
-	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
+	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(speech_control_w)
 ADDRESS_MAP_END

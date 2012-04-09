@@ -75,7 +75,7 @@ WRITE16_MEMBER(fantland_state::fantland_nmi_enable_16_w)
 
 WRITE8_MEMBER(fantland_state::fantland_soundlatch_w)
 {
-	soundlatch_w(space, 0, data);
+	soundlatch_byte_w(space, 0, data);
 	device_set_input_line(m_audio_cpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -292,13 +292,13 @@ static ADDRESS_MAP_START( fantland_sound_map, AS_PROGRAM, 8, fantland_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fantland_sound_iomap, AS_IO, 8, fantland_state )
-	AM_RANGE( 0x0080, 0x0080 ) AM_READ(soundlatch_r )
+	AM_RANGE( 0x0080, 0x0080 ) AM_READ(soundlatch_byte_r )
 	AM_RANGE( 0x0100, 0x0101 ) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w )
 	AM_RANGE( 0x0180, 0x0180 ) AM_DEVWRITE_LEGACY("dac", dac_w )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( galaxygn_sound_iomap, AS_IO, 8, fantland_state )
-	AM_RANGE( 0x0080, 0x0080 ) AM_READ(soundlatch_r )
+	AM_RANGE( 0x0080, 0x0080 ) AM_READ(soundlatch_byte_r )
 	AM_RANGE( 0x0100, 0x0101 ) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w )
 ADDRESS_MAP_END
 
@@ -400,7 +400,7 @@ static void borntofi_adpcm_int_3(device_t *device) { borntofi_adpcm_int(device, 
 
 static ADDRESS_MAP_START( borntofi_sound_map, AS_PROGRAM, 8, fantland_state )
 	AM_RANGE( 0x00000, 0x003ff ) AM_RAM
-	AM_RANGE( 0x04000, 0x04000 ) AM_READ(soundlatch_r)
+	AM_RANGE( 0x04000, 0x04000 ) AM_READ(soundlatch_byte_r)
 	AM_RANGE( 0x04000, 0x0401f ) AM_WRITE(borntofi_msm5205_w)
 	AM_RANGE( 0x08000, 0x0ffff ) AM_ROM
 	AM_RANGE( 0xf8000, 0xfffff ) AM_ROM
@@ -419,7 +419,7 @@ static ADDRESS_MAP_START( wheelrun_sound_map, AS_PROGRAM, 8, fantland_state )
 	AM_RANGE(0xb000, 0xb000) AM_WRITENOP	// on a car crash / hit
 	AM_RANGE(0xc000, 0xc000) AM_WRITENOP	// ""
 
-	AM_RANGE(0xd000, 0xd000) AM_READ(soundlatch_r )	// during NMI
+	AM_RANGE(0xd000, 0xd000) AM_READ(soundlatch_byte_r )	// during NMI
 ADDRESS_MAP_END
 
 

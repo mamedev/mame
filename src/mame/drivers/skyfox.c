@@ -70,7 +70,7 @@ static ADDRESS_MAP_START( skyfox_sound_map, AS_PROGRAM, 8, skyfox_state )
 	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE_LEGACY("ym1", ym2203_r,ym2203_w)	// YM2203 #1
 //  AM_RANGE(0xb000, 0xb001) AM_WRITENOP                        // ??
 	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE_LEGACY("ym2", ym2203_r,ym2203_w)	// YM2203 #2
-	AM_RANGE(0xb000, 0xb000) AM_READ(soundlatch_r)				// From Main CPU
+	AM_RANGE(0xb000, 0xb000) AM_READ(soundlatch_byte_r)				// From Main CPU
 ADDRESS_MAP_END
 
 

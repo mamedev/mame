@@ -104,7 +104,7 @@ READ16_MEMBER(twin16_state::twin16_gfx_rom2_r)
 WRITE16_MEMBER(twin16_state::sound_command_w)
 {
 	COMBINE_DATA(&m_sound_command);
-	soundlatch_w(space, 0, m_sound_command&0xff );
+	soundlatch_byte_w(space, 0, m_sound_command&0xff );
 }
 
 WRITE16_MEMBER(twin16_state::twin16_CPUA_register_w)
@@ -224,7 +224,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, twin16_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
 	AM_RANGE(0x9000, 0x9000) AM_DEVWRITE_LEGACY("upd", twin16_upd_reset_w)
-	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
+	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE_LEGACY("konami", k007232_r, k007232_w)
 	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0xd000, 0xd000) AM_DEVWRITE_LEGACY("upd", upd7759_port_w)

@@ -200,7 +200,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, exerion_state )
 	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("DSW0")
 	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(exerion_videoreg_w)
-	AM_RANGE(0xc800, 0xc800) AM_WRITE(soundlatch_w)
+	AM_RANGE(0xc800, 0xc800) AM_WRITE(soundlatch_byte_w)
 	AM_RANGE(0xd000, 0xd001) AM_DEVWRITE_LEGACY("ay1", ay8910_address_data_w)
 	AM_RANGE(0xd800, 0xd801) AM_DEVWRITE_LEGACY("ay2", ay8910_address_data_w)
 	AM_RANGE(0xd802, 0xd802) AM_DEVREAD_LEGACY("ay2", ay8910_r)
@@ -217,7 +217,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 8, exerion_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
-	AM_RANGE(0x6000, 0x6000) AM_READ(soundlatch_r)
+	AM_RANGE(0x6000, 0x6000) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0x8000, 0x800c) AM_WRITE(exerion_video_latch_w)
 	AM_RANGE(0xa000, 0xa000) AM_READ(exerion_video_timing_r)
 ADDRESS_MAP_END

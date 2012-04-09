@@ -583,7 +583,7 @@ WRITE16_MEMBER(wecleman_state::wecleman_soundlatch_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		soundlatch_w(space, 0, data & 0xFF);
+		soundlatch_byte_w(space, 0, data & 0xFF);
 		cputag_set_input_line(machine(), "audiocpu", 0, HOLD_LINE);
 	}
 }
@@ -627,7 +627,7 @@ static ADDRESS_MAP_START( wecleman_sound_map, AS_PROGRAM, 8, wecleman_state )
 	AM_RANGE(0x9000, 0x9000) AM_READ(multiply_r)	// Protection
 	AM_RANGE(0x9000, 0x9001) AM_WRITE(multiply_w)	// Protection
 	AM_RANGE(0x9006, 0x9006) AM_WRITENOP	// ?
-	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)	// From main CPU
+	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_byte_r)	// From main CPU
 	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE_LEGACY("konami", k007232_r, k007232_w)	// K007232 (Reading offset 5/b triggers the sample)
 	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0xf000, 0xf000) AM_DEVWRITE_LEGACY("konami", wecleman_K00723216_bank_w)	// Samples banking
@@ -643,7 +643,7 @@ WRITE16_MEMBER(wecleman_state::hotchase_soundlatch_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		soundlatch_w(space, 0, data & 0xFF);
+		soundlatch_byte_w(space, 0, data & 0xFF);
 		cputag_set_input_line(machine(), "audiocpu", M6809_IRQ_LINE, HOLD_LINE);
 	}
 }
@@ -720,7 +720,7 @@ static ADDRESS_MAP_START( hotchase_sound_map, AS_PROGRAM, 8, wecleman_state )
 	AM_RANGE(0x3000, 0x300d) AM_DEVREADWRITE_LEGACY("konami3", hotchase_k007232_r, hotchase_k007232_w)
 	AM_RANGE(0x4000, 0x4007) AM_WRITE(hotchase_sound_control_w)	// Sound volume, banking, etc.
 	AM_RANGE(0x5000, 0x5000) AM_WRITENOP	// ? (written with 0 on IRQ, 1 on FIRQ)
-	AM_RANGE(0x6000, 0x6000) AM_READ(soundlatch_r)	// From main CPU (Read on IRQ)
+	AM_RANGE(0x6000, 0x6000) AM_READ(soundlatch_byte_r)	// From main CPU (Read on IRQ)
 	AM_RANGE(0x7000, 0x7000) AM_WRITENOP	// Command acknowledge ?
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END

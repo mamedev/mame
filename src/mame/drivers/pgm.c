@@ -276,7 +276,7 @@ WRITE16_MEMBER(pgm_state::m68k_l1_w)
 	{
 		if (PGMLOGERROR)
 			logerror("SL 1 m68.w %02x (%06x) IRQ\n", data & 0xff, cpu_get_pc(&space.device()));
-		soundlatch_w(space, 0, data);
+		soundlatch_byte_w(space, 0, data);
 		device_set_input_line(m_soundcpu, INPUT_LINE_NMI, PULSE_LINE );
 	}
 }
@@ -285,7 +285,7 @@ WRITE8_MEMBER(pgm_state::z80_l3_w)
 {
 	if (PGMLOGERROR)
 		logerror("SL 3 z80.w %02x (%04x)\n", data, cpu_get_pc(&space.device()));
-	soundlatch3_w(space, 0, data);
+	soundlatch3_byte_w(space, 0, data);
 }
 
 void pgm_sound_irq( device_t *device, int level )
@@ -310,9 +310,9 @@ ADDRESS_MAP_END
 
 ADDRESS_MAP_START( pgm_z80_io, AS_IO, 8, pgm_state )
 	AM_RANGE(0x8000, 0x8003) AM_DEVREADWRITE_LEGACY("ics", ics2115_device::read, ics2115_device::write)
-	AM_RANGE(0x8100, 0x81ff) AM_READ(soundlatch3_r) AM_WRITE(z80_l3_w)
-	AM_RANGE(0x8200, 0x82ff) AM_READWRITE(soundlatch_r, soundlatch_w)
-	AM_RANGE(0x8400, 0x84ff) AM_READWRITE(soundlatch2_r, soundlatch2_w)
+	AM_RANGE(0x8100, 0x81ff) AM_READ(soundlatch3_byte_r) AM_WRITE(z80_l3_w)
+	AM_RANGE(0x8200, 0x82ff) AM_READWRITE(soundlatch_byte_r, soundlatch_byte_w)
+	AM_RANGE(0x8400, 0x84ff) AM_READWRITE(soundlatch2_byte_r, soundlatch2_byte_w)
 ADDRESS_MAP_END
 
 /*** 68000 (main CPU) + variants for protection devices **********************/

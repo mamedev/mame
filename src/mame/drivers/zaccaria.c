@@ -184,7 +184,7 @@ static WRITE8_DEVICE_HANDLER( zaccaria_port1b_w )
 
 WRITE8_MEMBER(zaccaria_state::sound_command_w)
 {
-	soundlatch_w(space, 0, data);
+	soundlatch_byte_w(space, 0, data);
 	cputag_set_input_line(machine(), "audio2", 0, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
 }
 
@@ -192,7 +192,7 @@ WRITE8_MEMBER(zaccaria_state::sound1_command_w)
 {
 	pia6821_device *pia0 = machine().device<pia6821_device>("pia0");
 	pia0->ca1_w(data & 0x80);
-	soundlatch2_w(space, 0, data);
+	soundlatch2_byte_w(space, 0, data);
 }
 
 static WRITE8_DEVICE_HANDLER( mc1408_data_w )
@@ -330,7 +330,7 @@ static ADDRESS_MAP_START( sound_map_2, AS_PROGRAM, 8, zaccaria_state )
 	AM_RANGE(0x0090, 0x0093) AM_DEVREADWRITE("pia1", pia6821_device, read, write) AM_MIRROR(0x8F6C)
 	AM_RANGE(0x1000, 0x1000) AM_DEVWRITE_LEGACY("dac2", mc1408_data_w) AM_MIRROR(0x83FF) /* MC1408 */
 	AM_RANGE(0x1400, 0x1400) AM_WRITE(sound1_command_w) AM_MIRROR(0xC3FF)
-	AM_RANGE(0x1800, 0x1800) AM_READ(soundlatch_r) AM_MIRROR(0xC3FF)
+	AM_RANGE(0x1800, 0x1800) AM_READ(soundlatch_byte_r) AM_MIRROR(0xC3FF)
 	AM_RANGE(0x2000, 0x2fff) AM_ROM AM_MIRROR(0x8000) // rom 8 with A12 low
 	AM_RANGE(0x3000, 0x3fff) AM_ROM AM_MIRROR(0x8000) // rom 7 with A12 low
 	AM_RANGE(0x6000, 0x6fff) AM_ROM AM_MIRROR(0x8000) // rom 8 with A12 high
@@ -531,7 +531,7 @@ static const ay8910_interface ay8910_config =
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
 	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(driver_device, soundlatch2_r),
+	DEVCB_DRIVER_MEMBER(driver_device, soundlatch2_byte_r),
 	DEVCB_HANDLER(ay8910_port0a_w),
 	DEVCB_NULL
 };

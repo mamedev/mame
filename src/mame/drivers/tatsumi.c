@@ -199,7 +199,7 @@ READ16_MEMBER(tatsumi_state::cyclwarr_input2_r)
 
 WRITE16_MEMBER(tatsumi_state::cyclwarr_sound_w)
 {
-	soundlatch_w(space, 0, data >> 8);
+	soundlatch_byte_w(space, 0, data >> 8);
 	cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -338,7 +338,7 @@ static ADDRESS_MAP_START( cyclwarr_z80_map, AS_PROGRAM, 8, tatsumi_state )
 	AM_RANGE(0xe000, 0xffef) AM_RAM
 	AM_RANGE(0xfff0, 0xfff1) AM_DEVREADWRITE_LEGACY("ymsnd", tatsumi_hack_ym2151_r, ym2151_w)
 	AM_RANGE(0xfff4, 0xfff4) AM_DEVREAD_LEGACY("oki", tatsumi_hack_oki_r) AM_DEVWRITE("oki", okim6295_device, write)
-	AM_RANGE(0xfffc, 0xfffc) AM_READ(soundlatch_r)
+	AM_RANGE(0xfffc, 0xfffc) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0xfffe, 0xfffe) AM_WRITENOP
 ADDRESS_MAP_END
 

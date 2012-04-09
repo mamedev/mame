@@ -513,8 +513,8 @@ static ADDRESS_MAP_START( hardhead_map, AS_PROGRAM, 8, suna8_state )
 	AM_RANGE(0xc000, 0xd7ff) AM_RAM								// RAM
 	AM_RANGE(0xd800, 0xd9ff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_byte_be_w) AM_SHARE("paletteram")	// Palette
 	AM_RANGE(0xda00, 0xda00) AM_RAM_READ(hardhead_ip_r) AM_BASE(m_hardhead_ip)	// Input Port Select
-	AM_RANGE(0xda80, 0xda80) AM_READ(soundlatch2_r) AM_WRITE(hardhead_bankswitch_w	)	// ROM Banking
-	AM_RANGE(0xdb00, 0xdb00) AM_WRITE(soundlatch_w			)	// To Sound CPU
+	AM_RANGE(0xda80, 0xda80) AM_READ(soundlatch2_byte_r) AM_WRITE(hardhead_bankswitch_w	)	// ROM Banking
+	AM_RANGE(0xdb00, 0xdb00) AM_WRITE(soundlatch_byte_w			)	// To Sound CPU
 	AM_RANGE(0xdb80, 0xdb80) AM_WRITE(hardhead_flipscreen_w	)	// Flip Screen + Coin Lockout
 	AM_RANGE(0xdc00, 0xdc00) AM_NOP								// <- R (after bank select)
 	AM_RANGE(0xdc80, 0xdc80) AM_NOP								// <- R (after bank select)
@@ -564,7 +564,7 @@ WRITE8_MEMBER(suna8_state::rranger_bankswitch_w)
 */
 READ8_MEMBER(suna8_state::rranger_soundstatus_r)
 {
-	soundlatch2_r(space, offset);
+	soundlatch2_byte_r(space, offset);
 	return 0x02;
 }
 
@@ -578,7 +578,7 @@ WRITE8_MEMBER(suna8_state::sranger_prot_w)
 static ADDRESS_MAP_START( rranger_map, AS_PROGRAM, 8, suna8_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM								// ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")						// Banked ROM
-	AM_RANGE(0xc000, 0xc000) AM_READWRITE(watchdog_reset_r, soundlatch_w)	// To Sound CPU
+	AM_RANGE(0xc000, 0xc000) AM_READWRITE(watchdog_reset_r, soundlatch_byte_w)	// To Sound CPU
 	AM_RANGE(0xc002, 0xc002) AM_WRITE(rranger_bankswitch_w	)	// ROM Banking
 	AM_RANGE(0xc002, 0xc002) AM_READ_PORT("P1")					// P1 (Inputs)
 	AM_RANGE(0xc003, 0xc003) AM_READ_PORT("P2")					// P2
@@ -619,7 +619,7 @@ WRITE8_MEMBER(suna8_state::brickzn_palettebank_w)
 	if (data & ~0x02)	logerror("CPU #0 - PC %04X: unknown palettebank bits: %02X\n",cpu_get_pc(&space.device()),data);
 
 	/* Also used as soundlatch - depending on c0c0? */
-	soundlatch_w(space,0,data);
+	soundlatch_byte_w(space,0,data);
 }
 
 /*
@@ -773,7 +773,7 @@ static ADDRESS_MAP_START( hardhea2_map, AS_PROGRAM, 8, suna8_state )
 	AM_RANGE(0xc380, 0xc380) AM_WRITE(hardhea2_nmi_w				)	// ? NMI related ?
 	AM_RANGE(0xc400, 0xc400) AM_WRITE(hardhea2_leds_w				)	// Leds + Coin Counter
 	AM_RANGE(0xc480, 0xc480) AM_WRITENOP	// ~ROM Bank
-	AM_RANGE(0xc500, 0xc500) AM_WRITE(soundlatch_w				)	// To Sound CPU
+	AM_RANGE(0xc500, 0xc500) AM_WRITE(soundlatch_byte_w				)	// To Sound CPU
 
 	// *** Protection
 	AM_RANGE(0xc50f, 0xc50f) AM_WRITE(hardhea2_spritebank_1_w )
@@ -824,7 +824,7 @@ static ADDRESS_MAP_START( starfigh_map, AS_PROGRAM, 8, suna8_state )
 	AM_RANGE(0xc280, 0xc280) AM_WRITE(hardhea2_rombank_w			)	// ROM Bank (?mirrored up to c2ff?)
 	AM_RANGE(0xc300, 0xc300) AM_WRITE(hardhea2_flipscreen_w			)	// Flip Screen
 	AM_RANGE(0xc400, 0xc400) AM_WRITE(hardhea2_leds_w				)	// Leds + Coin Counter
-	AM_RANGE(0xc500, 0xc500) AM_WRITE(soundlatch_w					)	// To Sound CPU
+	AM_RANGE(0xc500, 0xc500) AM_WRITE(soundlatch_byte_w					)	// To Sound CPU
 	AM_RANGE(0xc600, 0xc7ff) AM_READWRITE(banked_paletteram_r, paletteram_RRRRGGGGBBBBxxxx_byte_be_w) AM_SHARE("paletteram"	)	// Palette (Banked??)
 	AM_RANGE(0xc800, 0xdfff) AM_RAM									// RAM
 	AM_RANGE(0xe000, 0xffff) AM_READWRITE(suna8_banked_spriteram_r, suna8_banked_spriteram_w)	// Sprites (Banked)
@@ -957,7 +957,7 @@ static ADDRESS_MAP_START( sparkman_map, AS_PROGRAM, 8, suna8_state )
 	AM_RANGE(0xc380, 0xc3ff) AM_WRITE(sparkman_cmd_prot_w		)	// Protection
 	AM_RANGE(0xc400, 0xc400) AM_WRITE(sparkman_leds_w			)	// Leds
 	AM_RANGE(0xc480, 0xc480) AM_WRITE(sparkman_coin_counter_w   )   // Coin Counter
-	AM_RANGE(0xc500, 0xc500) AM_WRITE(soundlatch_w				)	// To Sound CPU
+	AM_RANGE(0xc500, 0xc500) AM_WRITE(soundlatch_byte_w				)	// To Sound CPU
 	AM_RANGE(0xc600, 0xc7ff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_byte_be_w) AM_SHARE("paletteram"	)	// Palette (Banked??)
 	AM_RANGE(0xc800, 0xdfff) AM_RAM_WRITE(suna8_wram_w) AM_BASE(m_wram)								// RAM
 	AM_RANGE(0xe000, 0xffff) AM_READWRITE(suna8_banked_spriteram_r, suna8_banked_spriteram_w)	// Sprites (Banked)
@@ -982,8 +982,8 @@ static ADDRESS_MAP_START( hardhead_sound_map, AS_PROGRAM, 8, suna8_state )
 	AM_RANGE(0xa002, 0xa003) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w		)
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM	// RAM
 	AM_RANGE(0xc800, 0xc800) AM_DEVREAD_LEGACY("ymsnd", ym3812_status_port_r)	// ? unsure
-	AM_RANGE(0xd000, 0xd000) AM_WRITE(soundlatch2_w				)	//
-	AM_RANGE(0xd800, 0xd800) AM_READ(soundlatch_r				)	// From Main CPU
+	AM_RANGE(0xd000, 0xd000) AM_WRITE(soundlatch2_byte_w				)	//
+	AM_RANGE(0xd800, 0xd800) AM_READ(soundlatch_byte_r				)	// From Main CPU
 ADDRESS_MAP_END
 
 
@@ -1002,8 +1002,8 @@ static ADDRESS_MAP_START( rranger_sound_map, AS_PROGRAM, 8, suna8_state )
 	AM_RANGE(0xa000, 0xa001) AM_DEVWRITE_LEGACY("ym1", ym2203_w			)	// Samples + Music
 	AM_RANGE(0xa002, 0xa003) AM_DEVWRITE_LEGACY("ym2", ym2203_w			)	// Music + FX
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM	// RAM
-	AM_RANGE(0xd000, 0xd000) AM_WRITE(soundlatch2_w				)	// To Sound CPU
-	AM_RANGE(0xd800, 0xd800) AM_READ(soundlatch_r				)	// From Main CPU
+	AM_RANGE(0xd000, 0xd000) AM_WRITE(soundlatch2_byte_w				)	// To Sound CPU
+	AM_RANGE(0xd800, 0xd800) AM_READ(soundlatch_byte_r				)	// From Main CPU
 ADDRESS_MAP_END
 
 
@@ -1016,8 +1016,8 @@ static ADDRESS_MAP_START( brickzn_sound_map, AS_PROGRAM, 8, suna8_state )
 	AM_RANGE(0xc000, 0xc001) AM_DEVWRITE_LEGACY("ymsnd", ym3812_w	)
 	AM_RANGE(0xc002, 0xc003) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w		)
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM	// RAM
-	AM_RANGE(0xf000, 0xf000) AM_WRITE(soundlatch2_w				)	// To PCM CPU
-	AM_RANGE(0xf800, 0xf800) AM_READ(soundlatch_r				)	// From Main CPU
+	AM_RANGE(0xf000, 0xf000) AM_WRITE(soundlatch2_byte_w				)	// To PCM CPU
+	AM_RANGE(0xf800, 0xf800) AM_READ(soundlatch_byte_r				)	// From Main CPU
 ADDRESS_MAP_END
 
 
@@ -1037,7 +1037,7 @@ WRITE8_MEMBER(suna8_state::brickzn_pcm_w)
 
 static ADDRESS_MAP_START( brickzn_pcm_io_map, AS_IO, 8, suna8_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(soundlatch2_r		)	// From Sound CPU
+	AM_RANGE(0x00, 0x00) AM_READ(soundlatch2_byte_r		)	// From Sound CPU
 	AM_RANGE(0x00, 0x03) AM_WRITE(brickzn_pcm_w		)	// 4 x DAC
 ADDRESS_MAP_END
 

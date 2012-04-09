@@ -125,7 +125,7 @@ static ADDRESS_MAP_START( lastday_map, AS_PROGRAM, 8, dooyong_state )
 	AM_RANGE(0xc011, 0xc011) AM_READ_PORT("P1")
 	AM_RANGE(0xc011, 0xc011) AM_WRITE(lastday_bankswitch_w)
 	AM_RANGE(0xc012, 0xc012) AM_READ_PORT("P2")
-	AM_RANGE(0xc012, 0xc012) AM_WRITE(soundlatch_w)
+	AM_RANGE(0xc012, 0xc012) AM_WRITE(soundlatch_byte_w)
 	AM_RANGE(0xc013, 0xc013) AM_READ_PORT("DSWA")
 	AM_RANGE(0xc014, 0xc014) AM_READ_PORT("DSWB")
 	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_byte_le_w) AM_SHARE("paletteram")
@@ -146,7 +146,7 @@ static ADDRESS_MAP_START( pollux_map, AS_PROGRAM, 8, dooyong_state )
 	AM_RANGE(0xf003, 0xf003) AM_READ_PORT("P2")
 	AM_RANGE(0xf004, 0xf004) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xf008, 0xf008) AM_WRITE(pollux_ctrl_w)	/* coin counter, flip screen */
-	AM_RANGE(0xf010, 0xf010) AM_WRITE(soundlatch_w)
+	AM_RANGE(0xf010, 0xf010) AM_WRITE(soundlatch_byte_w)
 	AM_RANGE(0xf018, 0xf01f) AM_WRITE(dooyong_bgscroll8_w)
 	AM_RANGE(0xf020, 0xf027) AM_WRITE(dooyong_fgscroll8_w)
 	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_byte_le_w) AM_SHARE("paletteram")
@@ -165,7 +165,7 @@ static ADDRESS_MAP_START( gulfstrm_map, AS_PROGRAM, 8, dooyong_state )
 	AM_RANGE(0xf003, 0xf003) AM_READ_PORT("P1")
 	AM_RANGE(0xf004, 0xf004) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xf008, 0xf008) AM_WRITE(pollux_ctrl_w)	/* coin counter, flip screen */
-	AM_RANGE(0xf010, 0xf010) AM_WRITE(soundlatch_w)
+	AM_RANGE(0xf010, 0xf010) AM_WRITE(soundlatch_byte_w)
 	AM_RANGE(0xf018, 0xf01f) AM_WRITE(dooyong_bgscroll8_w)
 	AM_RANGE(0xf020, 0xf027) AM_WRITE(dooyong_fgscroll8_w)
 	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_byte_le_w) AM_SHARE("paletteram")
@@ -181,7 +181,7 @@ static ADDRESS_MAP_START( bluehawk_map, AS_PROGRAM, 8, dooyong_state )
 	AM_RANGE(0xc003, 0xc003) AM_READ_PORT("P2")
 	AM_RANGE(0xc004, 0xc004) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xc008, 0xc008) AM_WRITE(lastday_bankswitch_w)
-	AM_RANGE(0xc010, 0xc010) AM_WRITE(soundlatch_w)
+	AM_RANGE(0xc010, 0xc010) AM_WRITE(soundlatch_byte_w)
 	AM_RANGE(0xc018, 0xc01f) AM_WRITE(dooyong_fg2scroll8_w)
 	AM_RANGE(0xc040, 0xc047) AM_WRITE(dooyong_bgscroll8_w)
 	AM_RANGE(0xc048, 0xc04f) AM_WRITE(dooyong_fgscroll8_w)
@@ -203,7 +203,7 @@ static ADDRESS_MAP_START( flytiger_map, AS_PROGRAM, 8, dooyong_state )
 	AM_RANGE(0xe006, 0xe006) AM_READ_PORT("DSWA")
 	AM_RANGE(0xe008, 0xe008) AM_READ_PORT("DSWB")
 	AM_RANGE(0xe010, 0xe010) AM_WRITE(flytiger_ctrl_w)	/* coin counter, flip screen */
-	AM_RANGE(0xe020, 0xe020) AM_WRITE(soundlatch_w)
+	AM_RANGE(0xe020, 0xe020) AM_WRITE(soundlatch_byte_w)
 	AM_RANGE(0xe030, 0xe037) AM_WRITE(dooyong_bgscroll8_w)
 	AM_RANGE(0xe040, 0xe047) AM_WRITE(dooyong_fgscroll8_w)
 	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(paletteram_flytiger_w) AM_BASE(m_paletteram_flytiger)
@@ -220,7 +220,7 @@ static ADDRESS_MAP_START( primella_map, AS_PROGRAM, 8, dooyong_state )
 	AM_RANGE(0xf800, 0xf800) AM_READ_PORT("DSWA")
 	AM_RANGE(0xf800, 0xf800) AM_WRITE(primella_ctrl_w)	/* bank switch, flip screen etc */
 	AM_RANGE(0xf810, 0xf810) AM_READ_PORT("DSWB")
-	AM_RANGE(0xf810, 0xf810) AM_WRITE(soundlatch_w)
+	AM_RANGE(0xf810, 0xf810) AM_WRITE(soundlatch_byte_w)
 	AM_RANGE(0xf820, 0xf820) AM_READ_PORT("P1")
 	AM_RANGE(0xf830, 0xf830) AM_READ_PORT("P2")
 	AM_RANGE(0xf840, 0xf840) AM_READ_PORT("SYSTEM")
@@ -287,7 +287,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( lastday_sound_map, AS_PROGRAM, 8, dooyong_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xc800, 0xc800) AM_READ(soundlatch_r)
+	AM_RANGE(0xc800, 0xc800) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0xf000, 0xf001) AM_DEVREADWRITE_LEGACY("ym1", ym2203_r, ym2203_w)
 	AM_RANGE(0xf002, 0xf003) AM_DEVREADWRITE_LEGACY("ym2", ym2203_r, ym2203_w)
 ADDRESS_MAP_END
@@ -295,7 +295,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( pollux_sound_map, AS_PROGRAM, 8, dooyong_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xf800) AM_READ(soundlatch_r)
+	AM_RANGE(0xf800, 0xf800) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0xf802, 0xf803) AM_DEVREADWRITE_LEGACY("ym1", ym2203_r, ym2203_w)
 	AM_RANGE(0xf804, 0xf805) AM_DEVREADWRITE_LEGACY("ym2", ym2203_r, ym2203_w)
 ADDRESS_MAP_END
@@ -303,7 +303,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( bluehawk_sound_map, AS_PROGRAM, 8, dooyong_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xf800) AM_READ(soundlatch_r)
+	AM_RANGE(0xf800, 0xf800) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0xf808, 0xf809) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0xf80a, 0xf80a) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 ADDRESS_MAP_END

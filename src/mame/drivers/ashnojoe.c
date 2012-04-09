@@ -91,7 +91,7 @@ WRITE16_MEMBER(ashnojoe_state::ashnojoe_soundlatch_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		m_soundlatch_status = 1;
-		soundlatch_w(space, 0, data & 0xff);
+		soundlatch_byte_w(space, 0, data & 0xff);
 	}
 }
 
@@ -126,7 +126,7 @@ WRITE8_MEMBER(ashnojoe_state::adpcm_w)
 READ8_MEMBER(ashnojoe_state::sound_latch_r)
 {
 	m_soundlatch_status = 0;
-	return soundlatch_r(space, 0);
+	return soundlatch_byte_r(space, 0);
 }
 
 READ8_MEMBER(ashnojoe_state::sound_latch_status_r)

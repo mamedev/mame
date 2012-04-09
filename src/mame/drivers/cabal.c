@@ -199,13 +199,13 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( cabalbl_sound_map, AS_PROGRAM, 8, cabal_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x2fff) AM_RAM
-	AM_RANGE(0x4000, 0x4000) AM_WRITE(soundlatch3_w)
-	AM_RANGE(0x4002, 0x4002) AM_WRITE(soundlatch4_w)
+	AM_RANGE(0x4000, 0x4000) AM_WRITE(soundlatch3_byte_w)
+	AM_RANGE(0x4002, 0x4002) AM_WRITE(soundlatch4_byte_w)
 	AM_RANGE(0x4004, 0x4004) AM_WRITE(cabalbl_coin_w)
 	AM_RANGE(0x4006, 0x4006) AM_READ_PORT("COIN")
 	AM_RANGE(0x4008, 0x4008) AM_READ(cabalbl_snd2_r)
 	AM_RANGE(0x400a, 0x400a) AM_READ(cabalbl_snd1_r)
-	AM_RANGE(0x400c, 0x400c) AM_WRITE(soundlatch2_w)
+	AM_RANGE(0x400c, 0x400c) AM_WRITE(soundlatch2_byte_w)
 	AM_RANGE(0x400e, 0x400f) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0x6000, 0x6000) AM_WRITENOP  /* ??? */
 	AM_RANGE(0x8000, 0xffff) AM_ROM
@@ -228,7 +228,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cabalbl_talk1_portmap, AS_IO, 8, cabal_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(soundlatch3_r)
+	AM_RANGE(0x00, 0x00) AM_READ(soundlatch3_byte_r)
 	AM_RANGE(0x01, 0x01) AM_DEVWRITE_LEGACY("msm1", cabalbl_adpcm_w)
 ADDRESS_MAP_END
 
@@ -238,7 +238,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cabalbl_talk2_portmap, AS_IO, 8, cabal_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(soundlatch4_r)
+	AM_RANGE(0x00, 0x00) AM_READ(soundlatch4_byte_r)
 	AM_RANGE(0x01, 0x01) AM_DEVWRITE_LEGACY("msm2", cabalbl_adpcm_w)
 ADDRESS_MAP_END
 

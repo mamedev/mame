@@ -67,7 +67,7 @@ WRITE16_MEMBER(xmen_state::eeprom_w)
 
 READ16_MEMBER(xmen_state::sound_status_r)
 {
-	return soundlatch2_r(space, 0);
+	return soundlatch2_byte_r(space, 0);
 }
 
 WRITE16_MEMBER(xmen_state::sound_cmd_w)
@@ -75,7 +75,7 @@ WRITE16_MEMBER(xmen_state::sound_cmd_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		data &= 0xff;
-		soundlatch_w(space, 0, data);
+		soundlatch_byte_w(space, 0, data);
 	}
 }
 
@@ -134,8 +134,8 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, xmen_state )
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe22f) AM_DEVREADWRITE("k054539", k054539_device, read, write)
 	AM_RANGE(0xe800, 0xe801) AM_MIRROR(0x0400) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
-	AM_RANGE(0xf000, 0xf000) AM_WRITE(soundlatch2_w)
-	AM_RANGE(0xf002, 0xf002) AM_READ(soundlatch_r)
+	AM_RANGE(0xf000, 0xf000) AM_WRITE(soundlatch2_byte_w)
+	AM_RANGE(0xf002, 0xf002) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0xf800, 0xf800) AM_WRITE(sound_bankswitch_w)
 ADDRESS_MAP_END
 

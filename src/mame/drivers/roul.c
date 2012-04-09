@@ -166,7 +166,7 @@ WRITE8_MEMBER(roul_state::blitter_cmd_w)
 
 WRITE8_MEMBER(roul_state::sound_latch_w)
 {
-	soundlatch_w(space, 0, data & 0xff);
+	soundlatch_byte_w(space, 0, data & 0xff);
 	cputag_set_input_line(machine(), "soundcpu", 0, HOLD_LINE);
 }
 
@@ -202,7 +202,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_cpu_io_map, AS_IO, 8, roul_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(soundlatch_r)
+	AM_RANGE(0x00, 0x00) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
 ADDRESS_MAP_END
 

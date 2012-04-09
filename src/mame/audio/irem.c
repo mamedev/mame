@@ -66,7 +66,7 @@ WRITE8_HANDLER( irem_sound_cmd_w )
 {
 	driver_device *drvstate = space->machine().driver_data<driver_device>();
 	if ((data & 0x80) == 0)
-		drvstate->soundlatch_w(*space, 0, data & 0x7f);
+		drvstate->soundlatch_byte_w(*space, 0, data & 0x7f);
 	else
 		cputag_set_input_line(space->machine(), "iremsound", 0, ASSERT_LINE);
 }
@@ -251,7 +251,7 @@ static const ay8910_interface irem_ay8910_interface_1 =
 {
 	AY8910_SINGLE_OUTPUT | AY8910_DISCRETE_OUTPUT,
 	{470, 0, 0},
-	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_r),
+	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_byte_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_DEVICE_HANDLER("irem_audio", ay8910_0_portb_w)

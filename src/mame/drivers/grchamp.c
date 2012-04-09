@@ -189,7 +189,7 @@ WRITE8_MEMBER(grchamp_state::cpu0_outputs_w)
 
 		case 0x0e:	/* OUT14 */
 			/* O-21 connector */
-			soundlatch_w(space, 0, data);
+			soundlatch_byte_w(space, 0, data);
 			cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 			break;
 	}
@@ -563,7 +563,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, grchamp_state )
 	AM_RANGE(0x4803, 0x4803) AM_MIRROR(0x07f8) AM_DEVREAD_LEGACY("ay2", ay8910_r)
 	AM_RANGE(0x4804, 0x4805) AM_MIRROR(0x07fa) AM_DEVWRITE_LEGACY("ay3", ay8910_address_data_w)
 	AM_RANGE(0x4805, 0x4805) AM_MIRROR(0x07fa) AM_DEVREAD_LEGACY("ay3", ay8910_r)
-	AM_RANGE(0x5000, 0x5000) AM_READ(soundlatch_r)
+	AM_RANGE(0x5000, 0x5000) AM_READ(soundlatch_byte_r)
 ADDRESS_MAP_END
 
 

@@ -129,7 +129,7 @@ WRITE8_MEMBER(onetwo_state::onetwo_coin_counters_w)
 
 WRITE8_MEMBER(onetwo_state::onetwo_soundlatch_w)
 {
-	soundlatch_w(space, 0, data);
+	soundlatch_byte_w(space, 0, data);
 	device_set_input_line(m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -183,7 +183,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_cpu, AS_PROGRAM, 8, onetwo_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xf800) AM_READ(soundlatch_r)
+	AM_RANGE(0xf800, 0xf800) AM_READ(soundlatch_byte_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_cpu_io, AS_IO, 8, onetwo_state )
@@ -191,7 +191,7 @@ static ADDRESS_MAP_START( sound_cpu_io, AS_IO, 8, onetwo_state )
 	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE_LEGACY("ymsnd", ym3812_status_port_r, ym3812_control_port_w)
 	AM_RANGE(0x20, 0x20) AM_DEVWRITE_LEGACY("ymsnd", ym3812_write_port_w)
 	AM_RANGE(0x40, 0x40) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0xc0, 0xc0) AM_WRITE(soundlatch_clear_w)
+	AM_RANGE(0xc0, 0xc0) AM_WRITE(soundlatch_clear_byte_w)
 ADDRESS_MAP_END
 
 /*************************************

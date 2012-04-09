@@ -397,7 +397,7 @@ WRITE8_MEMBER(thunderx_state::k052109_051960_w)
 
 static ADDRESS_MAP_START( scontra_map, AS_PROGRAM, 8, thunderx_state )
 	AM_RANGE(0x1f80, 0x1f80) AM_WRITE(scontra_bankswitch_w)	/* bankswitch control + coin counters */
-	AM_RANGE(0x1f84, 0x1f84) AM_WRITE(soundlatch_w)
+	AM_RANGE(0x1f84, 0x1f84) AM_WRITE(soundlatch_byte_w)
 	AM_RANGE(0x1f88, 0x1f88) AM_WRITE(thunderx_sh_irqtrigger_w)		/* cause interrupt on audio CPU */
 	AM_RANGE(0x1f8c, 0x1f8c) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x1f90, 0x1f90) AM_READ_PORT("SYSTEM")
@@ -417,7 +417,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( thunderx_map, AS_PROGRAM, 8, thunderx_state )
 	AM_RANGE(0x1f80, 0x1f80) AM_WRITE(thunderx_videobank_w)
-	AM_RANGE(0x1f84, 0x1f84) AM_WRITE(soundlatch_w)
+	AM_RANGE(0x1f84, 0x1f84) AM_WRITE(soundlatch_byte_w)
 	AM_RANGE(0x1f88, 0x1f88) AM_WRITE(thunderx_sh_irqtrigger_w)		/* cause interrupt on audio CPU */
 	AM_RANGE(0x1f8c, 0x1f8c) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x1f90, 0x1f90) AM_READ_PORT("SYSTEM")
@@ -438,7 +438,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( scontra_sound_map, AS_PROGRAM, 8, thunderx_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM					/* ROM */
 	AM_RANGE(0x8000, 0x87ff) AM_RAM					/* RAM */
-	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)			/* soundlatch_r */
+	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_byte_r)			/* soundlatch_byte_r */
 	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE_LEGACY("k007232", k007232_r, k007232_w)		/* 007232 registers */
 	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)		/* YM2151 */
 	AM_RANGE(0xf000, 0xf000) AM_DEVWRITE_LEGACY("k007232", scontra_snd_bankswitch_w)	/* 007232 bank select */
@@ -447,7 +447,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( thunderx_sound_map, AS_PROGRAM, 8, thunderx_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
+	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
 ADDRESS_MAP_END
 

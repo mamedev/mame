@@ -140,9 +140,9 @@ WRITE16_MEMBER(gaiden_state::gaiden_sound_command_w)
 {
 
 	if (ACCESSING_BITS_0_7)
-		soundlatch_w(space, 0, data & 0xff);	/* Ninja Gaiden */
+		soundlatch_byte_w(space, 0, data & 0xff);	/* Ninja Gaiden */
 	if (ACCESSING_BITS_8_15)
-		soundlatch_w(space, 0, data >> 8);	/* Tecmo Knight */
+		soundlatch_byte_w(space, 0, data >> 8);	/* Tecmo Knight */
 	device_set_input_line(m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -151,7 +151,7 @@ WRITE16_MEMBER(gaiden_state::drgnbowl_sound_command_w)
 
 	if (ACCESSING_BITS_8_15)
 	{
-		soundlatch_w(space, 0, data >> 8);
+		soundlatch_byte_w(space, 0, data >> 8);
 		device_set_input_line(m_audiocpu, 0, HOLD_LINE);
 	}
 }
@@ -440,7 +440,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, gaiden_state )
 	AM_RANGE(0xf810, 0xf811) AM_DEVWRITE_LEGACY("ym1", ym2203_w)
 	AM_RANGE(0xf820, 0xf821) AM_DEVWRITE_LEGACY("ym2", ym2203_w)
 	AM_RANGE(0xfc00, 0xfc00) AM_NOP /* ?? */
-	AM_RANGE(0xfc20, 0xfc20) AM_READ(soundlatch_r)
+	AM_RANGE(0xfc20, 0xfc20) AM_READ(soundlatch_byte_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( drgnbowl_sound_map, AS_PROGRAM, 8, gaiden_state )
@@ -452,7 +452,7 @@ static ADDRESS_MAP_START( drgnbowl_sound_port_map, AS_IO, 8, gaiden_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0xc0, 0xc0) AM_READ(soundlatch_r)
+	AM_RANGE(0xc0, 0xc0) AM_READ(soundlatch_byte_r)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( common )
@@ -906,7 +906,7 @@ static ADDRESS_MAP_START( mastninj_sound_map, AS_PROGRAM, 8, gaiden_state )
 	AM_RANGE(0xc400, 0xc401) AM_DEVWRITE_LEGACY("ym1", ym2203_w)
 	AM_RANGE(0xc800, 0xc801) AM_DEVWRITE_LEGACY("ym2", ym2203_w)
 //  AM_RANGE(0xfc00, 0xfc00) AM_NOP /* ?? */
-//  AM_RANGE(0xfc20, 0xfc20) AM_READ(soundlatch_r)
+//  AM_RANGE(0xfc20, 0xfc20) AM_READ(soundlatch_byte_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mastninj_map, AS_PROGRAM, 16, gaiden_state )

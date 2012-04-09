@@ -133,7 +133,7 @@ Stephh's notes (based on the games M6809 code and some tests) :
 
 WRITE8_MEMBER(sidepckt_state::sound_cpu_command_w)
 {
-	soundlatch_w(space, offset, data);
+	soundlatch_byte_w(space, offset, data);
 	cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -247,7 +247,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, sidepckt_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x1001) AM_DEVWRITE_LEGACY("ym1", ym2203_w)
 	AM_RANGE(0x2000, 0x2001) AM_DEVWRITE_LEGACY("ym2", ym3526_w)
-	AM_RANGE(0x3000, 0x3000) AM_READ(soundlatch_r)
+	AM_RANGE(0x3000, 0x3000) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

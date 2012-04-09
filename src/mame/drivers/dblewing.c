@@ -240,7 +240,7 @@ WRITE16_MEMBER(dblewing_state::dblewing_prot_w)
 			//printf("%04x\n",m_280_data);
 			return;
 		case 0x380: // sound write
-			soundlatch_w(space, 0, data & 0xff);
+			soundlatch_byte_w(space, 0, data & 0xff);
 			m_sound_irq |= 0x02;
 			device_set_input_line(m_audiocpu, 0, (m_sound_irq != 0) ? ASSERT_LINE : CLEAR_LINE);
 			return;
@@ -347,7 +347,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, dblewing_state )
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_status_port_r,ym2151_w)
 	AM_RANGE(0xb000, 0xb000) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0xc000, 0xc000) AM_READ(soundlatch_r)
+	AM_RANGE(0xc000, 0xc000) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0xd000, 0xd000) AM_READ(irq_latch_r) //timing? sound latch?
 	AM_RANGE(0xf000, 0xf000) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 ADDRESS_MAP_END

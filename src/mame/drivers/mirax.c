@@ -248,7 +248,7 @@ WRITE8_MEMBER(mirax_state::nmi_mask_w)
 
 WRITE8_MEMBER(mirax_state::mirax_sound_cmd_w)
 {
-	soundlatch_w(space, 0, data & 0xff);
+	soundlatch_byte_w(space, 0, data & 0xff);
 	cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -295,7 +295,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( mirax_sound_map, AS_PROGRAM, 8, mirax_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
-	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
+	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_byte_r)
 
 	AM_RANGE(0xe000, 0xe000) AM_WRITENOP
 	AM_RANGE(0xe001, 0xe001) AM_WRITENOP

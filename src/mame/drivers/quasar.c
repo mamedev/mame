@@ -100,19 +100,19 @@ static WRITE8_HANDLER( quasar_sh_command_w )
 	// not necessarily like this, but it seems to work better than direct mapping
 	// (although schematics has it as direct - but then the schematics are wrong elsewhere to!)
 	quasar_state *state = space->machine().driver_data<quasar_state>();
-	state->soundlatch_w(*space, 0, (data & 8) + ((data >> 1) & 3) + ((data << 2) & 4));
+	state->soundlatch_byte_w(*space, 0, (data & 8) + ((data >> 1) & 3) + ((data << 2) & 4));
 }
 
 static READ8_HANDLER( quasar_sh_command_r )
 {
 	quasar_state *state = space->machine().driver_data<quasar_state>();
-	return state->soundlatch_r(*space, 0) + (input_port_read(space->machine(), "DSW2") & 0x30);
+	return state->soundlatch_byte_r(*space, 0) + (input_port_read(space->machine(), "DSW2") & 0x30);
 }
 
 static READ8_HANDLER( audio_t1_r )
 {
 	quasar_state *state = space->machine().driver_data<quasar_state>();
-	return (state->soundlatch_r(*space, 0) == 0);
+	return (state->soundlatch_byte_r(*space, 0) == 0);
 }
 
 // memory map taken from the manual

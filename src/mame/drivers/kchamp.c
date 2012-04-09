@@ -94,7 +94,7 @@ static WRITE8_DEVICE_HANDLER( sound_control_w )
 
 WRITE8_MEMBER(kchamp_state::sound_command_w)
 {
-	soundlatch_w(space, 0, data);
+	soundlatch_byte_w(space, 0, data);
 	device_set_input_line_and_vector(m_audiocpu, 0, HOLD_LINE, 0xff);
 }
 
@@ -132,7 +132,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( kchampvs_sound_io_map, AS_IO, 8, kchamp_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE_LEGACY("ay1", ay8910_data_address_w)
-	AM_RANGE(0x01, 0x01) AM_READ(soundlatch_r)
+	AM_RANGE(0x01, 0x01) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0x02, 0x03) AM_DEVWRITE_LEGACY("ay2", ay8910_data_address_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE(sound_msm_w)
 	AM_RANGE(0x05, 0x05) AM_DEVWRITE_LEGACY("msm", sound_control_w)
@@ -187,7 +187,7 @@ static ADDRESS_MAP_START( kchamp_sound_io_map, AS_IO, 8, kchamp_state )
 	AM_RANGE(0x02, 0x03) AM_DEVWRITE_LEGACY("ay2", ay8910_data_address_w)
 	AM_RANGE(0x04, 0x04) AM_DEVWRITE_LEGACY("dac", dac_w)
 	AM_RANGE(0x05, 0x05) AM_WRITE(kc_sound_control_w)
-	AM_RANGE(0x06, 0x06) AM_READ(soundlatch_r)
+	AM_RANGE(0x06, 0x06) AM_READ(soundlatch_byte_r)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( kchampvs )

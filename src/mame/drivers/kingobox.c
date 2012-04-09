@@ -39,7 +39,7 @@ WRITE8_MEMBER(kingofb_state::scroll_interrupt_w)
 
 WRITE8_MEMBER(kingofb_state::sound_command_w)
 {
-	soundlatch_w(space, 0, data);
+	soundlatch_byte_w(space, 0, data);
 	device_set_input_line_and_vector(m_audio_cpu, 0, HOLD_LINE, 0xff);
 }
 
@@ -439,7 +439,7 @@ static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_r)
+	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_byte_r)
 };
 
 static INTERRUPT_GEN( kingofb_interrupt )

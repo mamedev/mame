@@ -343,7 +343,7 @@ WRITE32_MEMBER(deco32_state::deco32_irq_controller_w)
 
 WRITE32_MEMBER(deco32_state::deco32_sound_w)
 {
-	soundlatch_w(space,0,data & 0xff);
+	soundlatch_byte_w(space,0,data & 0xff);
 	cputag_set_input_line(machine(), "audiocpu", 0, HOLD_LINE);
 }
 
@@ -669,7 +669,7 @@ WRITE32_MEMBER(deco32_state::nslasher_prot_w)
 	if (offset==0x700/4) {
 
 		/* bit 1 of nslasher_sound_irq specifies IRQ command writes */
-		soundlatch_w(space,0,(data>>16)&0xff);
+		soundlatch_byte_w(space,0,(data>>16)&0xff);
 		m_nslasher_sound_irq |= 0x02;
 		cputag_set_input_line(machine(), "audiocpu", 0, (m_nslasher_sound_irq != 0) ? ASSERT_LINE : CLEAR_LINE);
 	}
@@ -1004,7 +1004,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, deco32_state )
 	AM_RANGE(0x110000, 0x110001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0x120000, 0x120001) AM_DEVREADWRITE("oki1", okim6295_device, read, write)
 	AM_RANGE(0x130000, 0x130001) AM_DEVREADWRITE("oki2", okim6295_device, read, write)
-	AM_RANGE(0x140000, 0x140001) AM_READ(soundlatch_r)
+	AM_RANGE(0x140000, 0x140001) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0x1f0000, 0x1f1fff) AM_RAMBANK("bank8")
 	AM_RANGE(0x1fec00, 0x1fec01) AM_WRITE_LEGACY(h6280_timer_w)
 	AM_RANGE(0x1ff400, 0x1ff403) AM_WRITE_LEGACY(h6280_irq_status_w)
@@ -1015,7 +1015,7 @@ READ8_MEMBER(deco32_state::latch_r)
 	/* bit 1 of nslasher_sound_irq specifies IRQ command writes */
 	m_nslasher_sound_irq &= ~0x02;
 	cputag_set_input_line(machine(), "audiocpu", 0, (m_nslasher_sound_irq != 0) ? ASSERT_LINE : CLEAR_LINE);
-	return soundlatch_r(space,0);
+	return soundlatch_byte_r(space,0);
 }
 
 static ADDRESS_MAP_START( nslasher_sound, AS_PROGRAM, 8, deco32_state )
@@ -3352,7 +3352,8 @@ static DRIVER_INIT( nslasher )
 
 	deco156_decrypt(machine);
 
-	soundlatch_setclearedvalue(machine, 0xff);
+ 	deco32_state *state = machine.driver_data<deco32_state>();
+	state->soundlatch_setclearedvalue(0xff);
 
 	/* The board for Night Slashers is very close to the Fighter's History and
     Tattoo Assassins boards, but has an encrypted ARM cpu. */

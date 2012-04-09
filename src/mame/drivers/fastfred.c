@@ -199,7 +199,7 @@ static ADDRESS_MAP_START( fastfred_map, AS_PROGRAM, 8, fastfred_state )
 	AM_RANGE(0xf007, 0xf007) AM_WRITE_LEGACY(fastfred_flip_screen_y_w)
 	AM_RANGE(0xf116, 0xf116) AM_WRITE_LEGACY(fastfred_flip_screen_x_w)
 	AM_RANGE(0xf117, 0xf117) AM_WRITE_LEGACY(fastfred_flip_screen_y_w)
-	AM_RANGE(0xf800, 0xf800) AM_READWRITE(watchdog_reset_r, soundlatch_w)
+	AM_RANGE(0xf800, 0xf800) AM_READWRITE(watchdog_reset_r, soundlatch_byte_w)
 ADDRESS_MAP_END
 
 
@@ -254,13 +254,13 @@ static ADDRESS_MAP_START( imago_map, AS_PROGRAM, 8, fastfred_state )
 	AM_RANGE(0xf007, 0xf007) AM_WRITE_LEGACY(fastfred_flip_screen_y_w)
 	AM_RANGE(0xf400, 0xf400) AM_WRITENOP // writes 0 or 2
 	AM_RANGE(0xf401, 0xf401) AM_WRITE_LEGACY(imago_sprites_bank_w)
-	AM_RANGE(0xf800, 0xf800) AM_READNOP AM_WRITE(soundlatch_w)
+	AM_RANGE(0xf800, 0xf800) AM_READNOP AM_WRITE(soundlatch_byte_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, fastfred_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
-	AM_RANGE(0x3000, 0x3000) AM_READ(soundlatch_r) AM_WRITE_LEGACY(sound_nmi_mask_w)
+	AM_RANGE(0x3000, 0x3000) AM_READ(soundlatch_byte_r) AM_WRITE_LEGACY(sound_nmi_mask_w)
 	AM_RANGE(0x4000, 0x4000) AM_WRITEONLY  // Reset PSG's
 	AM_RANGE(0x5000, 0x5001) AM_DEVWRITE_LEGACY("ay8910.1", ay8910_address_data_w)
 	AM_RANGE(0x6000, 0x6001) AM_DEVWRITE_LEGACY("ay8910.2", ay8910_address_data_w)

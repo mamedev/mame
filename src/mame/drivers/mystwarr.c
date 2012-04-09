@@ -162,23 +162,23 @@ static INTERRUPT_GEN(ddd_interrupt)
 
 WRITE16_MEMBER(mystwarr_state::sound_cmd1_w)
 {
-	soundlatch_w(space, 0, data&0xff);
+	soundlatch_byte_w(space, 0, data&0xff);
 }
 
 WRITE16_MEMBER(mystwarr_state::sound_cmd1_msb_w)
 {
-	soundlatch_w(space, 0, data>>8);
+	soundlatch_byte_w(space, 0, data>>8);
 }
 
 WRITE16_MEMBER(mystwarr_state::sound_cmd2_w)
 {
-	soundlatch2_w(space, 0, data&0xff);
+	soundlatch2_byte_w(space, 0, data&0xff);
 	return;
 }
 
 WRITE16_MEMBER(mystwarr_state::sound_cmd2_msb_w)
 {
-	soundlatch2_w(space, 0, data>>8);
+	soundlatch2_byte_w(space, 0, data>>8);
 	return;
 }
 
@@ -189,7 +189,7 @@ WRITE16_MEMBER(mystwarr_state::sound_irq_w)
 
 READ16_MEMBER(mystwarr_state::sound_status_r)
 {
-	int latch = soundlatch3_r(space,0);
+	int latch = soundlatch3_byte_r(space,0);
 
 	if ((latch & 0xf) == 0xe) latch |= 1;
 
@@ -198,7 +198,7 @@ READ16_MEMBER(mystwarr_state::sound_status_r)
 
 READ16_MEMBER(mystwarr_state::sound_status_msb_r)
 {
-	int latch = soundlatch3_r(space,0);
+	int latch = soundlatch3_byte_r(space,0);
 
 	if ((latch & 0xf) == 0xe) latch |= 1;
 
@@ -583,9 +583,9 @@ static ADDRESS_MAP_START( mystwarr_sound_map, AS_PROGRAM, 8, mystwarr_state )
 	AM_RANGE(0xe230, 0xe3ff) AM_RAM
 	AM_RANGE(0xe400, 0xe62f) AM_DEVREADWRITE("konami2", k054539_device, read, write)
 	AM_RANGE(0xe630, 0xe7ff) AM_RAM
-	AM_RANGE(0xf000, 0xf000) AM_WRITE(soundlatch3_w)
-	AM_RANGE(0xf002, 0xf002) AM_READ(soundlatch_r)
-	AM_RANGE(0xf003, 0xf003) AM_READ(soundlatch2_r)
+	AM_RANGE(0xf000, 0xf000) AM_WRITE(soundlatch3_byte_w)
+	AM_RANGE(0xf002, 0xf002) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xf003, 0xf003) AM_READ(soundlatch2_byte_r)
 	AM_RANGE(0xf800, 0xf800) AM_WRITE(sound_bankswitch_w)
 	AM_RANGE(0xfff0, 0xfff3) AM_WRITENOP	// unknown write
 ADDRESS_MAP_END

@@ -19,7 +19,7 @@ WRITE16_MEMBER(goal92_state::goal92_sound_command_w)
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		soundlatch_w(space, 0, (data >> 8) & 0xff);
+		soundlatch_byte_w(space, 0, (data >> 8) & 0xff);
 		device_set_input_line(m_audiocpu, 0, HOLD_LINE);
 	}
 }
@@ -87,7 +87,7 @@ static ADDRESS_MAP_START( sound_cpu, AS_PROGRAM, 8, goal92_state )
 	AM_RANGE(0xe800, 0xe801) AM_DEVREADWRITE_LEGACY("ym1", ym2203_r, ym2203_w)
 	AM_RANGE(0xec00, 0xec01) AM_DEVREADWRITE_LEGACY("ym2", ym2203_r, ym2203_w)
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xf800) AM_READ(soundlatch_r)
+	AM_RANGE(0xf800, 0xf800) AM_READ(soundlatch_byte_r)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( goal92 )

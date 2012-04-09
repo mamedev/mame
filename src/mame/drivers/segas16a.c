@@ -194,7 +194,7 @@ static const ppi8255_interface single_ppi_intf =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_w),
+	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_byte_w),
 	DEVCB_HANDLER(video_control_w),
 	DEVCB_HANDLER(tilemap_sound_w)
 };
@@ -433,7 +433,7 @@ static READ8_HANDLER( sound_data_r )
 
 	/* assert ACK */
 	ppi8255_set_port_c(state->m_ppi8255, 0x00);
-	return state->soundlatch_r(*space, offset);
+	return state->soundlatch_byte_r(*space, offset);
 }
 
 

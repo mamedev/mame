@@ -256,8 +256,8 @@ READ16_MEMBER(lordgun_state::lordgun_gun_1_y_r)
 
 WRITE16_MEMBER(lordgun_state::lordgun_soundlatch_w)
 {
-	if (ACCESSING_BITS_0_7)		soundlatch_w (space, 0, (data >> 0) & 0xff);
-	if (ACCESSING_BITS_8_15)	soundlatch2_w(space, 0, (data >> 8) & 0xff);
+	if (ACCESSING_BITS_0_7)		soundlatch_byte_w (space, 0, (data >> 0) & 0xff);
+	if (ACCESSING_BITS_8_15)	soundlatch2_byte_w(space, 0, (data >> 8) & 0xff);
 
 	cputag_set_input_line(machine(), "soundcpu", INPUT_LINE_NMI, PULSE_LINE);
 }
@@ -343,16 +343,16 @@ static WRITE8_DEVICE_HANDLER( lordgun_okibank_w )
 static ADDRESS_MAP_START( lordgun_soundio_map, AS_IO, 8, lordgun_state )
 	AM_RANGE(0x1000, 0x1001) AM_DEVWRITE_LEGACY("ymsnd", ym3812_w )
 	AM_RANGE(0x2000, 0x2000) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0x3000, 0x3000) AM_READ(soundlatch2_r )
-	AM_RANGE(0x4000, 0x4000) AM_READ(soundlatch_r )
+	AM_RANGE(0x3000, 0x3000) AM_READ(soundlatch2_byte_r )
+	AM_RANGE(0x4000, 0x4000) AM_READ(soundlatch_byte_r )
 	AM_RANGE(0x5000, 0x5000) AM_READNOP
 	AM_RANGE(0x6000, 0x6000) AM_DEVWRITE_LEGACY("oki", lordgun_okibank_w )
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( aliencha_soundio_map, AS_IO, 8, lordgun_state )
-	AM_RANGE(0x3000, 0x3000) AM_READ(soundlatch2_r )
-	AM_RANGE(0x4000, 0x4000) AM_READ(soundlatch_r )
+	AM_RANGE(0x3000, 0x3000) AM_READ(soundlatch2_byte_r )
+	AM_RANGE(0x4000, 0x4000) AM_READ(soundlatch_byte_r )
 	AM_RANGE(0x5000, 0x5000) AM_WRITENOP	// writes 03 then 07 at end of NMI
 	AM_RANGE(0x7000, 0x7000) AM_DEVREAD_LEGACY("ymf", ymf278b_r)
 	AM_RANGE(0x7000, 0x7005) AM_DEVWRITE_LEGACY("ymf", ymf278b_w)

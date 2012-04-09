@@ -232,7 +232,7 @@ WRITE8_MEMBER(discoboy_state::discoboy_port_03_w)// sfx? (to sound cpu)
 {
 	//  printf("unk discoboy_port_03_w %02x\n", data);
 	//  device_set_input_line(m_audiocpu, INPUT_LINE_NMI, HOLD_LINE);
-	soundlatch_w(space, 0, data);
+	soundlatch_byte_w(space, 0, data);
 	device_set_input_line(m_audiocpu, 0, HOLD_LINE);
 }
 
@@ -349,7 +349,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, discoboy_state )
 	AM_RANGE(0xe400, 0xe400) AM_WRITE(yunsung8_adpcm_w)
 	AM_RANGE(0xec00, 0xec01) AM_DEVWRITE_LEGACY("ymsnd", ym3812_w)
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xf800) AM_READ(soundlatch_r)
+	AM_RANGE(0xf800, 0xf800) AM_READ(soundlatch_byte_r)
 ADDRESS_MAP_END
 
 

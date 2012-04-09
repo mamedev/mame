@@ -164,7 +164,7 @@ static ADDRESS_MAP_START( main_cpu1_map, AS_PROGRAM, 8, gyruss_state )
 	AM_RANGE(0xc0a0, 0xc0a0) AM_READ_PORT("P1")
 	AM_RANGE(0xc0c0, 0xc0c0) AM_READ_PORT("P2")
 	AM_RANGE(0xc0e0, 0xc0e0) AM_READ_PORT("DSW1")
-	AM_RANGE(0xc100, 0xc100) AM_READ_PORT("DSW3") AM_WRITE(soundlatch_w)
+	AM_RANGE(0xc100, 0xc100) AM_READ_PORT("DSW3") AM_WRITE(soundlatch_byte_w)
 	AM_RANGE(0xc180, 0xc180) AM_WRITE(master_nmi_mask_w)
 	AM_RANGE(0xc185, 0xc185) AM_WRITEONLY AM_BASE(m_flipscreen)
 ADDRESS_MAP_END
@@ -182,7 +182,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( audio_cpu1_map, AS_PROGRAM, 8, gyruss_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x63ff) AM_RAM
-	AM_RANGE(0x8000, 0x8000) AM_READ(soundlatch_r)
+	AM_RANGE(0x8000, 0x8000) AM_READ(soundlatch_byte_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( audio_cpu1_io_map, AS_IO, 8, gyruss_state )
@@ -203,7 +203,7 @@ static ADDRESS_MAP_START( audio_cpu1_io_map, AS_IO, 8, gyruss_state )
 	AM_RANGE(0x11, 0x11) AM_DEVREAD_LEGACY("ay5", ay8910_r)
 	AM_RANGE(0x12, 0x12) AM_DEVWRITE_LEGACY("ay5", ay8910_data_w)
 	AM_RANGE(0x14, 0x14) AM_WRITE(gyruss_i8039_irq_w)
-	AM_RANGE(0x18, 0x18) AM_WRITE(soundlatch2_w)
+	AM_RANGE(0x18, 0x18) AM_WRITE(soundlatch2_byte_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( audio_cpu2_map, AS_PROGRAM, 8, gyruss_state )
@@ -211,7 +211,7 @@ static ADDRESS_MAP_START( audio_cpu2_map, AS_PROGRAM, 8, gyruss_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( audio_cpu2_io_map, AS_IO, 8, gyruss_state )
-	AM_RANGE(0x00, 0xff) AM_READ(soundlatch2_r)
+	AM_RANGE(0x00, 0xff) AM_READ(soundlatch2_byte_r)
 	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_DEVWRITE_LEGACY("discrete", gyruss_dac_w)
 	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(gyruss_irq_clear_w)
 ADDRESS_MAP_END

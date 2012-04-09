@@ -46,13 +46,13 @@ The driver has been updated accordingly.
 
 WRITE8_MEMBER(matmania_state::matmania_sh_command_w)
 {
-	soundlatch_w(space, offset, data);
+	soundlatch_byte_w(space, offset, data);
 	device_set_input_line(m_audiocpu, M6502_IRQ_LINE, HOLD_LINE);
 }
 
 WRITE8_MEMBER(matmania_state::maniach_sh_command_w)
 {
-	soundlatch_w(space, offset, data);
+	soundlatch_byte_w(space, offset, data);
 	device_set_input_line(m_audiocpu, M6809_IRQ_LINE, HOLD_LINE);
 }
 
@@ -105,7 +105,7 @@ static ADDRESS_MAP_START( matmania_sound_map, AS_PROGRAM, 8, matmania_state )
 	AM_RANGE(0x2000, 0x2001) AM_DEVWRITE_LEGACY("ay1", ay8910_data_address_w)
 	AM_RANGE(0x2002, 0x2003) AM_DEVWRITE_LEGACY("ay2", ay8910_data_address_w)
 	AM_RANGE(0x2004, 0x2004) AM_DEVWRITE_LEGACY("dac", dac_signed_w)
-	AM_RANGE(0x2007, 0x2007) AM_READ(soundlatch_r)
+	AM_RANGE(0x2007, 0x2007) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -113,7 +113,7 @@ static ADDRESS_MAP_START( maniach_sound_map, AS_PROGRAM, 8, matmania_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x2000, 0x2001) AM_DEVWRITE_LEGACY("ymsnd", ym3526_w)
 	AM_RANGE(0x2002, 0x2002) AM_DEVWRITE_LEGACY("dac", dac_signed_w)
-	AM_RANGE(0x2004, 0x2004) AM_READ(soundlatch_r)
+	AM_RANGE(0x2004, 0x2004) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

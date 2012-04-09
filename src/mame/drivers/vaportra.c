@@ -25,7 +25,7 @@ WRITE16_MEMBER(vaportra_state::vaportra_sound_w)
 
 	/* Force synchronisation between CPUs with fake timer */
 	machine().scheduler().synchronize();
-	soundlatch_w(space, 0, data & 0xff);
+	soundlatch_byte_w(space, 0, data & 0xff);
 	device_set_input_line(m_audiocpu, 0, ASSERT_LINE);
 }
 
@@ -72,7 +72,7 @@ ADDRESS_MAP_END
 READ8_MEMBER(vaportra_state::vaportra_soundlatch_r)
 {
 	device_set_input_line(m_audiocpu, 0, CLEAR_LINE);
-	return soundlatch_r(space, offset);
+	return soundlatch_byte_r(space, offset);
 }
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, vaportra_state )

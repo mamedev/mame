@@ -106,7 +106,7 @@ static TIMER_CALLBACK( nmi_callback )
 
 WRITE8_MEMBER(lkage_state::lkage_sound_command_w)
 {
-	soundlatch_w(space, offset, data);
+	soundlatch_byte_w(space, offset, data);
 	machine().scheduler().synchronize(FUNC(nmi_callback), data);
 }
 
@@ -187,7 +187,7 @@ static ADDRESS_MAP_START( lkage_sound_map, AS_PROGRAM, 8, lkage_state )
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE_LEGACY("ym1", ym2203_r,ym2203_w)
 	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE_LEGACY("ym2", ym2203_r,ym2203_w)
-	AM_RANGE(0xb000, 0xb000) AM_READ(soundlatch_r) AM_WRITENOP	/* ??? */
+	AM_RANGE(0xb000, 0xb000) AM_READ(soundlatch_byte_r) AM_WRITENOP	/* ??? */
 	AM_RANGE(0xb001, 0xb001) AM_READNOP	/* ??? */ AM_WRITE(lkage_sh_nmi_enable_w)
 	AM_RANGE(0xb002, 0xb002) AM_WRITE(lkage_sh_nmi_disable_w)
 	AM_RANGE(0xb003, 0xb003) AM_WRITENOP

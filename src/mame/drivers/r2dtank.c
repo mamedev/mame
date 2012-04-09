@@ -106,7 +106,7 @@ static WRITE_LINE_DEVICE_HANDLER( main_cpu_irq )
 
 READ8_MEMBER(r2dtank_state::audio_command_r)
 {
-	UINT8 ret = soundlatch_r(space, 0);
+	UINT8 ret = soundlatch_byte_r(space, 0);
 
 if (LOG_AUDIO_COMM) logerror("%08X  CPU#1  Audio Command Read: %x\n", cpu_get_pc(&space.device()), ret);
 
@@ -116,7 +116,7 @@ if (LOG_AUDIO_COMM) logerror("%08X  CPU#1  Audio Command Read: %x\n", cpu_get_pc
 
 WRITE8_MEMBER(r2dtank_state::audio_command_w)
 {
-	soundlatch_w(space, 0, ~data);
+	soundlatch_byte_w(space, 0, ~data);
 	cputag_set_input_line(machine(), "audiocpu", M6800_IRQ_LINE, HOLD_LINE);
 
 if (LOG_AUDIO_COMM) logerror("%08X   CPU#0  Audio Command Write: %x\n", cpu_get_pc(&space.device()), data^0xff);
@@ -125,7 +125,7 @@ if (LOG_AUDIO_COMM) logerror("%08X   CPU#0  Audio Command Write: %x\n", cpu_get_
 
 READ8_MEMBER(r2dtank_state::audio_answer_r)
 {
-	UINT8 ret = soundlatch2_r(space, 0);
+	UINT8 ret = soundlatch2_byte_r(space, 0);
 if (LOG_AUDIO_COMM) logerror("%08X  CPU#0  Audio Answer Read: %x\n", cpu_get_pc(&space.device()), ret);
 
 	return ret;
@@ -138,7 +138,7 @@ WRITE8_MEMBER(r2dtank_state::audio_answer_w)
 	if (cpu_get_pc(&space.device()) == 0xfb12)
 		data = 0x00;
 
-	soundlatch2_w(space, 0, data);
+	soundlatch2_byte_w(space, 0, data);
 	cputag_set_input_line(machine(), "maincpu", M6809_IRQ_LINE, HOLD_LINE);
 
 if (LOG_AUDIO_COMM) logerror("%08X  CPU#1  Audio Answer Write: %x\n", cpu_get_pc(&space.device()), data);

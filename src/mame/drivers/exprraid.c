@@ -232,7 +232,7 @@ READ8_MEMBER(exprraid_state::exprraid_protection_r)
 
 WRITE8_MEMBER(exprraid_state::sound_cpu_command_w)
 {
-	soundlatch_w(space, 0, data);
+	soundlatch_byte_w(space, 0, data);
 	device_set_input_line(m_slave, INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -272,7 +272,7 @@ static ADDRESS_MAP_START( slave_map, AS_PROGRAM, 8, exprraid_state )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x2001) AM_DEVREADWRITE_LEGACY("ym1", ym2203_r, ym2203_w)
 	AM_RANGE(0x4000, 0x4001) AM_DEVREADWRITE_LEGACY("ym2", ym3526_r, ym3526_w)
-	AM_RANGE(0x6000, 0x6000) AM_READ(soundlatch_r)
+	AM_RANGE(0x6000, 0x6000) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

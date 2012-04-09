@@ -78,7 +78,7 @@ public:
 
 WRITE8_MEMBER(dmndrby_state::dderby_sound_w)
 {
-	soundlatch_w(space,0,data);
+	soundlatch_byte_w(space,0,data);
 	cputag_set_input_line(machine(), "audiocpu", 0, HOLD_LINE);
 }
 
@@ -138,7 +138,7 @@ static ADDRESS_MAP_START( dderby_sound_map, AS_PROGRAM, 8, dmndrby_state )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x1000, 0x1000) AM_RAM //???
 	AM_RANGE(0x4000, 0x4001) AM_DEVWRITE_LEGACY("ay1", ay8910_address_data_w)
-	AM_RANGE(0x4000, 0x4000) AM_READ(soundlatch_r)
+	AM_RANGE(0x4000, 0x4000) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0x4001, 0x4001) AM_DEVREAD_LEGACY("ay1", ay8910_r)
 	AM_RANGE(0x6000, 0x67ff) AM_RAM
 ADDRESS_MAP_END

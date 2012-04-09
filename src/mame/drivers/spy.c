@@ -383,7 +383,7 @@ static ADDRESS_MAP_START( spy_map, AS_PROGRAM, 8, spy_state )
 	AM_RANGE(0x3f80, 0x3f80) AM_WRITE(bankswitch_w)
 	AM_RANGE(0x3f90, 0x3f90) AM_WRITE(spy_3f90_w)
 	AM_RANGE(0x3fa0, 0x3fa0) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0x3fb0, 0x3fb0) AM_WRITE(soundlatch_w)
+	AM_RANGE(0x3fb0, 0x3fb0) AM_WRITE(soundlatch_byte_w)
 	AM_RANGE(0x3fc0, 0x3fc0) AM_WRITE(spy_sh_irqtrigger_w)
 	AM_RANGE(0x3fd0, 0x3fd0) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x3fd1, 0x3fd1) AM_READ_PORT("P1")
@@ -402,7 +402,7 @@ static ADDRESS_MAP_START( spy_sound_map, AS_PROGRAM, 8, spy_state )
 	AM_RANGE(0xa000, 0xa00d) AM_DEVREADWRITE_LEGACY("k007232_1", k007232_r, k007232_w)
 	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE_LEGACY("k007232_2", k007232_r, k007232_w)
 	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE_LEGACY("ymsnd", ym3812_r,ym3812_w)
-	AM_RANGE(0xd000, 0xd000) AM_READ(soundlatch_r)
+	AM_RANGE(0xd000, 0xd000) AM_READ(soundlatch_byte_r)
 ADDRESS_MAP_END
 
 

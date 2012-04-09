@@ -61,7 +61,7 @@ static INTERRUPT_GEN( mnchmobl_sound_irq )
 WRITE8_MEMBER(munchmo_state::mnchmobl_soundlatch_w)
 {
 
-	soundlatch_w(space, 0, data);
+	soundlatch_byte_w(space, 0, data);
 	device_set_input_line(m_audiocpu, 0, HOLD_LINE );
 }
 
@@ -110,7 +110,7 @@ ADDRESS_MAP_END
 /* memory map provided thru schematics */
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, munchmo_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x3fff) AM_READ(soundlatch_r)
+	AM_RANGE(0x2000, 0x3fff) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0x4000, 0x4fff) AM_DEVWRITE_LEGACY("ay1", ay8910_data_w)
 	AM_RANGE(0x5000, 0x5fff) AM_DEVWRITE_LEGACY("ay1", ay8910_address_w)
 	AM_RANGE(0x6000, 0x6fff) AM_DEVWRITE_LEGACY("ay2", ay8910_data_w)

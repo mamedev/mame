@@ -301,14 +301,14 @@ static READ8_DEVICE_HANDLER( input_system_r )
 
 WRITE8_MEMBER(jangou_state::sound_latch_w)
 {
-	soundlatch_w(space, 0, data & 0xff);
+	soundlatch_byte_w(space, 0, data & 0xff);
 	device_set_input_line(m_cpu_1, INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 READ8_MEMBER(jangou_state::sound_latch_r)
 {
 	device_set_input_line(m_cpu_1, INPUT_LINE_NMI, CLEAR_LINE);
-	return soundlatch_r(space, 0);
+	return soundlatch_byte_r(space, 0);
 }
 
 /* Jangou HC-55516 CVSD */

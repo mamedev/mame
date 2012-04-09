@@ -51,6 +51,8 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
+typedef delegate<void ()> driver_callback_delegate;
+
 
 // ======================> driver_device
 
@@ -61,6 +63,9 @@ public:
 	// construction/destruction
 	driver_device(const machine_config &mconfig, device_type type, const char *tag);
 	virtual ~driver_device();
+	
+	// getters
+	const game_driver &system() const { assert(m_system != NULL); return *m_system; }
 
 	// indexes into our generic callbacks
 	enum callback_type
@@ -77,6 +82,7 @@ public:
 	// inline configuration helpers
 	static void static_set_game(device_t &device, const game_driver &game);
 	static void static_set_callback(device_t &device, callback_type type, legacy_callback_func callback);
+	static void static_set_callback(device_t &device, callback_type type, driver_callback_delegate callback);
 	static void static_set_palette_init(device_t &device, palette_init_func callback);
 
 	// generic helpers
@@ -86,6 +92,43 @@ public:
 		(downcast<_DriverClass &>(device).*_Function)();
 	}
 	
+	// watchdog read/write handlers
+	DECLARE_WRITE8_MEMBER( watchdog_reset_w );
+	DECLARE_READ8_MEMBER( watchdog_reset_r );
+	DECLARE_WRITE16_MEMBER( watchdog_reset16_w );
+	DECLARE_READ16_MEMBER( watchdog_reset16_r );
+	DECLARE_WRITE32_MEMBER( watchdog_reset32_w );
+	DECLARE_READ32_MEMBER( watchdog_reset32_r );
+	
+	// generic audio
+	void soundlatch_setclearedvalue(UINT16 value) { m_latch_clear_value = value; }
+
+	// sound latch readers
+	DECLARE_READ8_MEMBER( soundlatch_byte_r );
+	DECLARE_READ8_MEMBER( soundlatch2_byte_r );
+	DECLARE_READ8_MEMBER( soundlatch3_byte_r );
+	DECLARE_READ8_MEMBER( soundlatch4_byte_r );
+	DECLARE_READ16_MEMBER( soundlatch_word_r );
+	DECLARE_READ16_MEMBER( soundlatch2_word_r );
+	DECLARE_READ16_MEMBER( soundlatch3_word_r );
+	DECLARE_READ16_MEMBER( soundlatch4_word_r );
+
+	// sound latch writers
+	DECLARE_WRITE8_MEMBER( soundlatch_byte_w );
+	DECLARE_WRITE8_MEMBER( soundlatch2_byte_w );
+	DECLARE_WRITE8_MEMBER( soundlatch3_byte_w );
+	DECLARE_WRITE8_MEMBER( soundlatch4_byte_w );
+	DECLARE_WRITE16_MEMBER( soundlatch_word_w );
+	DECLARE_WRITE16_MEMBER( soundlatch2_word_w );
+	DECLARE_WRITE16_MEMBER( soundlatch3_word_w );
+	DECLARE_WRITE16_MEMBER( soundlatch4_word_w );
+
+	// sound latch clearers
+	DECLARE_WRITE8_MEMBER( soundlatch_clear_byte_w );
+	DECLARE_WRITE8_MEMBER( soundlatch2_clear_byte_w );
+	DECLARE_WRITE8_MEMBER( soundlatch3_clear_byte_w );
+	DECLARE_WRITE8_MEMBER( soundlatch4_clear_byte_w );
+
 	// generic video
 	void flip_screen_set(UINT32 on);
 	void flip_screen_set_no_update(UINT32 on);
@@ -94,40 +137,6 @@ public:
 	UINT32 flip_screen() const { return m_flip_screen_x; }
 	UINT32 flip_screen_x() const { return m_flip_screen_x; }
 	UINT32 flip_screen_y() const { return m_flip_screen_y; }
-
-	// watchdog read/write handlers
-	DECLARE_WRITE8_MEMBER( watchdog_reset_w );
-	DECLARE_READ8_MEMBER( watchdog_reset_r );
-	DECLARE_WRITE16_MEMBER( watchdog_reset16_w );
-	DECLARE_READ16_MEMBER( watchdog_reset16_r );
-	DECLARE_WRITE32_MEMBER( watchdog_reset32_w );
-	DECLARE_READ32_MEMBER( watchdog_reset32_r );
-
-	// sound latch readers
-	DECLARE_READ8_MEMBER( soundlatch_r );
-	DECLARE_READ8_MEMBER( soundlatch2_r );
-	DECLARE_READ8_MEMBER( soundlatch3_r );
-	DECLARE_READ8_MEMBER( soundlatch4_r );
-	DECLARE_READ16_MEMBER( soundlatch_word_r );
-	DECLARE_READ16_MEMBER( soundlatch2_word_r );
-	DECLARE_READ16_MEMBER( soundlatch3_word_r );
-	DECLARE_READ16_MEMBER( soundlatch4_word_r );
-
-	// sound latch writers
-	DECLARE_WRITE8_MEMBER( soundlatch_w );
-	DECLARE_WRITE8_MEMBER( soundlatch2_w );
-	DECLARE_WRITE8_MEMBER( soundlatch3_w );
-	DECLARE_WRITE8_MEMBER( soundlatch4_w );
-	DECLARE_WRITE16_MEMBER( soundlatch_word_w );
-	DECLARE_WRITE16_MEMBER( soundlatch2_word_w );
-	DECLARE_WRITE16_MEMBER( soundlatch3_word_w );
-	DECLARE_WRITE16_MEMBER( soundlatch4_word_w );
-
-	// sound latch clearers
-	DECLARE_WRITE8_MEMBER( soundlatch_clear_w );
-	DECLARE_WRITE8_MEMBER( soundlatch2_clear_w );
-	DECLARE_WRITE8_MEMBER( soundlatch3_clear_w );
-	DECLARE_WRITE8_MEMBER( soundlatch4_clear_w );
 
 	// templatized palette writers for 8-bit palette data
 	template<int _RedBits, int _GreenBits, int _BlueBits, int _RedShift, int _GreenShift, int _BlueShift> DECLARE_WRITE8_MEMBER( palette_8bit_byte_w );
@@ -239,12 +248,6 @@ protected:
 	inline UINT16 paletteram16_split(offs_t offset) const { return m_generic_paletteram_8[offset] | (m_generic_paletteram2_8[offset] << 8); }
 	inline UINT32 paletteram32_be(offs_t offset) const { return m_generic_paletteram_16[offset | 1] | (m_generic_paletteram_16[offset & ~1] << 16); }
 
-	// internal state
-	const game_driver *		m_system;					// pointer to the game driver
-
-	legacy_callback_func	m_callbacks[CB_COUNT];		// generic legacy callbacks
-	palette_init_func		m_palette_init;				// one-time palette init callback
-
 public:
 	// generic pointers
 	optional_shared_ptr<UINT8> m_generic_paletteram_8;
@@ -256,11 +259,23 @@ public:
 
 private:
 	// helpers
+	void soundlatch_sync_callback(void *ptr, INT32 param);
 	void updateflip();
 
+	// internal state
+	const game_driver *		m_system;					// pointer to the game driver
+	palette_init_func		m_palette_init;				// one-time palette init callback
+	driver_callback_delegate m_callbacks[CB_COUNT];		// start/reset callbacks
+	legacy_callback_func 	m_legacy_callbacks[CB_COUNT]; // legacy start/reset callbacks
+
+	// generic audio
+	UINT16					m_latch_clear_value;
+	UINT16					m_latched_value[4];
+	UINT8					m_latch_read[4];
+
 	// generic video
-	UINT32 m_flip_screen_x;
-	UINT32 m_flip_screen_y;
+	UINT32 					m_flip_screen_x;
+	UINT32 					m_flip_screen_y;
 };
 
 

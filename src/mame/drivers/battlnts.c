@@ -70,7 +70,7 @@ static ADDRESS_MAP_START( battlnts_map, AS_PROGRAM, 8, battlnts_state )
 	AM_RANGE(0x2e08, 0x2e08) AM_WRITE(battlnts_bankswitch_w)	/* bankswitch control */
 	AM_RANGE(0x2e0c, 0x2e0c) AM_WRITE(battlnts_spritebank_w)	/* sprite bank select */
 	AM_RANGE(0x2e10, 0x2e10) AM_WRITE(watchdog_reset_w)			/* watchdog reset */
-	AM_RANGE(0x2e14, 0x2e14) AM_WRITE(soundlatch_w)				/* sound code # */
+	AM_RANGE(0x2e14, 0x2e14) AM_WRITE(soundlatch_byte_w)				/* sound code # */
 	AM_RANGE(0x2e18, 0x2e18) AM_WRITE(battlnts_sh_irqtrigger_w)	/* cause interrupt on audio CPU */
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")						/* banked ROM */
 	AM_RANGE(0x8000, 0xffff) AM_ROM								/* ROM 777e02.bin */
@@ -81,7 +81,7 @@ static ADDRESS_MAP_START( battlnts_sound_map, AS_PROGRAM, 8, battlnts_state )
 	AM_RANGE(0x8000, 0x87ff) AM_RAM							/* RAM */
 	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE_LEGACY("ym1", ym3812_r, ym3812_w)		/* YM3812 (chip 1) */
 	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE_LEGACY("ym2", ym3812_r, ym3812_w)		/* YM3812 (chip 2) */
-	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_r)			/* soundlatch_r */
+	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_byte_r)			/* soundlatch_byte_r */
 ADDRESS_MAP_END
 
 /*************************************

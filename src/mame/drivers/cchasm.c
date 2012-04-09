@@ -56,7 +56,7 @@ static ADDRESS_MAP_START( sound_memmap, AS_PROGRAM, 8, cchasm_state )
 	AM_RANGE(0x6001, 0x6001) AM_MIRROR(0xf9e) AM_DEVREAD_LEGACY("ay1", ay8910_r)
 	AM_RANGE(0x6020, 0x6021) AM_MIRROR(0xf9e) AM_DEVWRITE_LEGACY("ay2", ay8910_address_data_w)
 	AM_RANGE(0x6021, 0x6021) AM_MIRROR(0xf9e) AM_DEVREAD_LEGACY("ay2", ay8910_r)
-	AM_RANGE(0x6040, 0x6040) AM_MIRROR(0xf9e) AM_READWRITE(soundlatch_r, soundlatch3_w)
+	AM_RANGE(0x6040, 0x6040) AM_MIRROR(0xf9e) AM_READWRITE(soundlatch_byte_r, soundlatch3_byte_w)
 	AM_RANGE(0x6041, 0x6041) AM_MIRROR(0xf9e) AM_READWRITE_LEGACY(cchasm_soundlatch2_r, cchasm_soundlatch4_w)
 	AM_RANGE(0x6061, 0x6061) AM_MIRROR(0xf9e) AM_WRITE_LEGACY(cchasm_reset_coin_flag_w)
 	AM_RANGE(0x7041, 0x7041) AM_NOP // TODO

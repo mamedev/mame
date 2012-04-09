@@ -80,7 +80,7 @@ WRITE8_MEMBER(tankbust_state::tankbust_e0xx_w)
 		m_irq_mask = data & 1;
 		break;
 
-	case 1:	/* 0xe001 (value 0 then 1) written right after the soundlatch_w */
+	case 1:	/* 0xe001 (value 0 then 1) written right after the soundlatch_byte_w */
 		machine().scheduler().synchronize(FUNC(soundirqline_callback), data);
 		break;
 

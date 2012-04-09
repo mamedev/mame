@@ -47,17 +47,17 @@ WRITE8_MEMBER(nbmj9195_state::nbmj9195_soundbank_w)
 
 READ8_MEMBER(nbmj9195_state::nbmj9195_sound_r)
 {
-	return soundlatch_r(space, 0);
+	return soundlatch_byte_r(space, 0);
 }
 
 WRITE8_MEMBER(nbmj9195_state::nbmj9195_sound_w)
 {
-	soundlatch_w(space, 0, data);
+	soundlatch_byte_w(space, 0, data);
 }
 
 WRITE8_MEMBER(nbmj9195_state::nbmj9195_soundclr_w)
 {
-	soundlatch_clear_w(space, 0, 0);
+	soundlatch_clear_byte_w(space, 0, 0);
 }
 
 static void nbmj9195_outcoin_flag_w(address_space *space, int data)

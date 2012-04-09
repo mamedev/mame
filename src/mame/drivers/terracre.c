@@ -146,12 +146,12 @@ READ16_MEMBER(terracre_state::horekid_IN2_r)
 
 WRITE16_MEMBER(terracre_state::amazon_sound_w)
 {
-	soundlatch_w(space,0,((data & 0x7f) << 1) | 1);
+	soundlatch_byte_w(space,0,((data & 0x7f) << 1) | 1);
 }
 
 READ8_MEMBER(terracre_state::soundlatch_clear_r)
 {
-	soundlatch_clear_w(space,0,0);
+	soundlatch_clear_byte_w(space,0,0);
 	return 0;
 }
 
@@ -239,7 +239,7 @@ static ADDRESS_MAP_START( sound_3526_io_map, AS_IO, 8, terracre_state )
 	AM_RANGE(0x02, 0x02) AM_DEVWRITE_LEGACY("dac1", dac_signed_w)
 	AM_RANGE(0x03, 0x03) AM_DEVWRITE_LEGACY("dac2", dac_signed_w)
 	AM_RANGE(0x04, 0x04) AM_READ(soundlatch_clear_r)
-	AM_RANGE(0x06, 0x06) AM_READ(soundlatch_r)
+	AM_RANGE(0x06, 0x06) AM_READ(soundlatch_byte_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_2203_io_map, AS_IO, 8, terracre_state )
@@ -248,7 +248,7 @@ static ADDRESS_MAP_START( sound_2203_io_map, AS_IO, 8, terracre_state )
 	AM_RANGE(0x02, 0x02) AM_DEVWRITE_LEGACY("dac1", dac_signed_w)
 	AM_RANGE(0x03, 0x03) AM_DEVWRITE_LEGACY("dac2", dac_signed_w)
 	AM_RANGE(0x04, 0x04) AM_READ(soundlatch_clear_r)
-	AM_RANGE(0x06, 0x06) AM_READ(soundlatch_r)
+	AM_RANGE(0x06, 0x06) AM_READ(soundlatch_byte_r)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( terracre )
