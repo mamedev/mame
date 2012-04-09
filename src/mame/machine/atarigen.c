@@ -345,6 +345,8 @@ static TIMER_CALLBACK( scanline_interrupt_callback )
 void atarigen_eeprom_reset(atarigen_state *state)
 {
 	state->m_eeprom_unlocked = 0;
+	if (state->m_eeprom == NULL && state->m_eeprom32 != NULL)
+		state->m_eeprom.set_target(reinterpret_cast<UINT16 *>(state->m_eeprom32.target()), state->m_eeprom32.bytes());
 }
 
 
