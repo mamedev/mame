@@ -162,6 +162,7 @@ FORMATSOBJS = \
 	$(LIBOBJ)/formats/vt_dsk.o		\
 	$(LIBOBJ)/formats/vtech1_dsk.o	\
 	$(LIBOBJ)/formats/wavfile.o		\
+	$(LIBOBJ)/formats/x07_cas.o		\
 	$(LIBOBJ)/formats/x1_tap.o		\
 	$(LIBOBJ)/formats/z80ne_dsk.o	\
 	$(LIBOBJ)/formats/zx81_p.o		\
@@ -208,7 +209,8 @@ SOFTFLOAT_MACROS = $(LIBSRC)/softfloat/softfloat/bits64/softfloat-macros
 
 SOFTFLOATOBJS = \
 	$(LIBOBJ)/softfloat/softfloat.o \
-    $(LIBOBJ)/softfloat/fsincos.o
+    $(LIBOBJ)/softfloat/fsincos.o \
+    $(LIBOBJ)/softfloat/fyl2x.o
 
 $(OBJ)/libsoftfloat.a: $(SOFTFLOATOBJS)
 
