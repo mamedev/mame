@@ -17,7 +17,7 @@
 #if defined(SDLMAME_FREEBSD) || defined(SDLMAME_DRAGONFLY)
 # include <termios.h>
 # include <libutil.h>
-#elif defined(SDLMAME_NETBSD)
+#elif defined(SDLMAME_NETBSD) || defined(SDLMAME_MACOSX)
 # include <util.h>
 #elif defined(SDLMAME_OPENBSD)
 # include <termios.h>
@@ -28,7 +28,11 @@
 
 #include "sdlfile.h"
 
+#if defined(SDLMAME_MACOSX)
+const char *sdlfile_ptty_identifier  = "/dev/pty";
+#else
 const char *sdlfile_ptty_identifier  = "/dev/pts";
+#endif
 
 file_error sdl_open_ptty(const char *path, UINT32 openflags, osd_file **file, UINT64 *filesize)
 {
