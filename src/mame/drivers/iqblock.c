@@ -467,7 +467,7 @@ static DRIVER_INIT( grndtour )
 
 	/* initialize pointers for I/O mapped RAM */
 	state->m_generic_paletteram_8.set_target(rom + 0x12000, 0x800);
-	state->m_generic_paletteram_8.set_target(rom + 0x12800, 0x800);
+	state->m_generic_paletteram2_8.set_target(rom + 0x12800, 0x800);
 	state->m_fgvideoram = rom + 0x16800;
 	state->m_bgvideoram = rom + 0x17000;
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xfe39, 0xfe39, write8_delegate(FUNC(iqblock_state::grndtour_prot_w),state));
