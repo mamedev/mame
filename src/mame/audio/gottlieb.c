@@ -785,7 +785,7 @@ WRITE8_MEMBER( gottlieb_sound_r2_device::speech_control_w )
 		}
 		else
 		{
-			device_t *ay = machine().device((data & 0x08) ? "ay1" : "ay2");
+			ay8913_device *ay = (data & 0x08) ? m_ay1 : m_ay2;
 			ay8910_address_w(ay, 0, m_psg_latch);
 			ay8910_data_w(ay, 0, m_psg_data_latch);
 		}
