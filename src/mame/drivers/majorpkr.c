@@ -469,7 +469,7 @@ public:
 
 	tilemap_t    *m_bg_tilemap,	*m_fg_tilemap;
 
-	UINT8 *m_videoram;
+	UINT8 m_videoram[0x1000];
 
 	required_device<okim6295_device> oki;
 
@@ -594,7 +594,7 @@ WRITE8_MEMBER(majorpkr_state::paletteram_w)
 
 WRITE8_MEMBER(majorpkr_state::vram_bank_w)
 {
-	m_vram_bank = data;
+	m_vram_bank = data & 1;
 }
 
 READ8_MEMBER(majorpkr_state::vram_r)
