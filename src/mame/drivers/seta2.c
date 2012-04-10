@@ -408,7 +408,7 @@ static WRITE16_HANDLER( reelquak_leds_w )
 	}
 	if (ACCESSING_BITS_8_15)
 	{
-		ticket_dispenser_w(space->machine().device("ticket"), 0, (data & 0x0100) >> 1);	// ticket dispenser
+		space->machine().device<ticket_dispenser_device>("ticket")->write(*space, 0, (data & 0x0100) >> 1);	// ticket dispenser
 	}
 
 //  popmessage("LED %04X", data);
@@ -1548,7 +1548,7 @@ static INPUT_PORTS_START( reelquak )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN       )
 
 	PORT_START("TICKET")	// $400003.b
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_SPECIAL       ) PORT_READ_LINE_DEVICE("ticket", ticket_dispenser_line_r)	// ticket sensor
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_SPECIAL       ) PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r)	// ticket sensor
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN       )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN       )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )							// knock down
@@ -2117,7 +2117,7 @@ static MACHINE_CONFIG_DERIVED( reelquak, seta2 )
 	MCFG_CPU_PROGRAM_MAP(reelquak_map)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
-	MCFG_TICKET_DISPENSER_ADD("ticket", 200, TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW)
+	MCFG_TICKET_DISPENSER_ADD("ticket", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW)
 
 	// video hardware
 	MCFG_SCREEN_MODIFY("screen")

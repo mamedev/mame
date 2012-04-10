@@ -531,7 +531,7 @@ static WRITE8_DEVICE_HANDLER( pia_porta_out );
 static const pia6821_interface pia_interface =
 {
 	DEVCB_NULL,		/* port A in */
-	DEVCB_DEVICE_LINE("ticket", ticket_dispenser_line_r),			/* port B in */
+	DEVCB_DEVICE_LINE_MEMBER("ticket", ticket_dispenser_device, line_r),			/* port B in */
 	DEVCB_NULL,		/* line CA1 in */
 	DEVCB_NULL,		/* line CB1 in */
 	DEVCB_NULL,		/* line CA2 in */
@@ -755,7 +755,7 @@ WRITE8_MEMBER(itech8_state::pia_portb_out)
 	/* bit 5 controls the coin counter */
 	/* bit 6 controls the diagnostic sound LED */
 	m_pia_portb_data = data;
-	ticket_dispenser_w(machine().device("ticket"), 0, (data & 0x10) << 3);
+	machine().device<ticket_dispenser_device>("ticket")->write(space, 0, (data & 0x10) << 3);
 	coin_counter_w(machine(), 0, (data & 0x20) >> 5);
 }
 
@@ -770,7 +770,7 @@ static WRITE8_DEVICE_HANDLER( ym2203_portb_out )
 	/* bit 6 controls the diagnostic sound LED */
 	/* bit 7 controls the ticket dispenser */
 	state->m_pia_portb_data = data;
-	ticket_dispenser_w(device->machine().device("ticket"), 0, data & 0x80);
+	device->machine().device<ticket_dispenser_device>("ticket")->write(*device->machine().memory().first_space(), 0, data & 0x80);
 	coin_counter_w(device->machine(), 0, (data & 0x20) >> 5);
 }
 
@@ -1687,7 +1687,7 @@ static MACHINE_CONFIG_START( itech8_core_lo, itech8_state )
 	MCFG_MACHINE_RESET(itech8)
 	MCFG_NVRAM_ADD_RANDOM_FILL("nvram")
 
-	MCFG_TICKET_DISPENSER_ADD("ticket", 200, TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW)
+	MCFG_TICKET_DISPENSER_ADD("ticket", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW)
 
 	/* video hardware */
 	MCFG_TLC34076_ADD("tlc34076", TLC34076_6_BIT)

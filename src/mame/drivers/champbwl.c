@@ -227,7 +227,7 @@ static WRITE8_HANDLER( doraemon_outputs_w )
 	coin_counter_w(space->machine(), 1, data & 2);	// gift out counter
 
 	coin_lockout_w(space->machine(), 0, ~data & 8);	// coin lockout
-	ticket_dispenser_w(space->machine().device("hopper"), 0, (data & 0x04) ? 0x00 : 0x80);	// gift out motor
+	space->machine().device<ticket_dispenser_device>("hopper")->write(*space, 0, (data & 0x04) ? 0x00 : 0x80);	// gift out motor
 
 	memory_set_bank(space->machine(), "bank1", (data & 0x30) >> 4);
 
@@ -396,7 +396,7 @@ static INPUT_PORTS_START( doraemon )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3  )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SPECIAL  ) PORT_READ_LINE_DEVICE("hopper", ticket_dispenser_line_r)	// sensor
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SPECIAL  ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)	// sensor
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 	PORT_SERVICE_NO_TOGGLE( 0x80, IP_ACTIVE_LOW )
 INPUT_PORTS_END
@@ -541,7 +541,7 @@ static MACHINE_CONFIG_START( doraemon, tnzs_state )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_TICKET_DISPENSER_ADD("hopper", 2000, TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_LOW )
+	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(2000), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_LOW )
 
 	MCFG_MACHINE_START(doraemon)
 

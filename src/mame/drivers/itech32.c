@@ -706,7 +706,7 @@ static WRITE8_DEVICE_HANDLER( drivedge_portb_out )
 	set_led_status(space->machine(), 1, data & 0x01);
 	set_led_status(space->machine(), 2, data & 0x02);
 	set_led_status(space->machine(), 3, data & 0x04);
-	ticket_dispenser_w(device->machine().device("ticket"), 0, (data & 0x10) << 3);
+	device->machine().device<ticket_dispenser_device>("ticket")->write(*device->machine().memory().first_space(), 0, (data & 0x10) << 3);
 	coin_counter_w(space->machine(), 0, (data & 0x20) >> 5);
 }
 
@@ -725,7 +725,7 @@ static WRITE8_DEVICE_HANDLER( pia_portb_out )
 	/* bit 4 controls the ticket dispenser */
 	/* bit 5 controls the coin counter */
 	/* bit 6 controls the diagnostic sound LED */
-	ticket_dispenser_w(device->machine().device("ticket"), 0, (data & 0x10) << 3);
+	device->machine().device<ticket_dispenser_device>("ticket")->write(*device->machine().memory().first_space(), 0, (data & 0x10) << 3);
 	coin_counter_w(space->machine(), 0, (data & 0x20) >> 5);
 }
 
@@ -1692,7 +1692,7 @@ static MACHINE_CONFIG_START( timekill, itech32_state )
 	MCFG_MACHINE_RESET(itech32)
 	MCFG_NVRAM_ADD_CUSTOM_DRIVER("nvram", itech32_state, nvram_init)
 
-	MCFG_TICKET_DISPENSER_ADD("ticket", 200, TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
+	MCFG_TICKET_DISPENSER_ADD("ticket", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)

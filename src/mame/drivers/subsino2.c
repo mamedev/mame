@@ -916,7 +916,7 @@ READ16_MEMBER(subsino2_state::bishjan_input_r)
 
 	return	(res << 8) |									// high byte
 			input_port_read(machine(), "SYSTEM") |		// low byte
-			(ticket_dispenser_r(machine().device("hopper"), 0) ? 0x00 : 0x04)	// bit 2: hopper sensor
+			(machine().device<ticket_dispenser_device>("hopper")->read(space, 0) ? 0x00 : 0x04)	// bit 2: hopper sensor
 	;
 }
 
@@ -930,7 +930,7 @@ WRITE16_MEMBER(subsino2_state::bishjan_outputs_w)
 			if (ACCESSING_BITS_0_7)
 			{
 				// coin out         data & 0x01;
-				ticket_dispenser_w(machine().device("hopper"), 0, (data & 0x0002) ? 0x80 : 0);	// hopper
+				machine().device<ticket_dispenser_device>("hopper")->write(space, 0, (data & 0x0002) ? 0x80 : 0);	// hopper
 				coin_counter_w(machine(), 0,	data & 0x0010 );
 			}
 			break;
@@ -2161,7 +2161,7 @@ static MACHINE_CONFIG_START( bishjan, subsino2_state )
 	MCFG_TIMER_ADD_PERIODIC("timer", h8_timer_irq, attotime::from_hz(60)) // timer, ?? Hz
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
-	MCFG_TICKET_DISPENSER_ADD("hopper", 200, TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW)
+	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW)
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)

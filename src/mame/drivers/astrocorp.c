@@ -243,10 +243,10 @@ WRITE16_MEMBER(astrocorp_state::skilldrp_outputs_w)
 		coin_counter_w(machine(), 0,	(data & 0x0001));	// key in  |
 		coin_counter_w(machine(), 0,	(data & 0x0002));	// coin in |- manual shows 1 in- and 1 out- counter
 		coin_counter_w(machine(), 1,	(data & 0x0004));	// key out |
-		ticket_dispenser_w(machine().device("hopper"), 0, (data & 0x0008)<<4);	// hopper motor?
+		machine().device<ticket_dispenser_device>("hopper")->write(space, 0, (data & 0x0008)<<4);	// hopper motor?
 		//                                  (data & 0x0010)     // hopper?
 		set_led_status(machine(), 0,	(data & 0x0020));	// error lamp (coin/hopper jam: "call attendant")
-		ticket_dispenser_w(machine().device("ticket"), 0, data & 0x0080);	// ticket motor?
+		machine().device<ticket_dispenser_device>("ticket")->write(space, 0, data & 0x0080);	// ticket motor?
 	}
 	if (ACCESSING_BITS_8_15)
 	{
@@ -422,9 +422,9 @@ static INPUT_PORTS_START( skilldrp )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW,  IPT_UNKNOWN       )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW,  IPT_UNKNOWN       )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW,  IPT_START2        )	PORT_NAME("Bet")
-	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("ticket", ticket_dispenser_line_r)	// ticket sw
+	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r)	// ticket sw
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW,  IPT_GAMBLE_BOOK   )
-	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("hopper", ticket_dispenser_line_r)	// hopper sw
+	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)	// hopper sw
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW,  IPT_GAMBLE_KEYIN  )
 
 	PORT_START( "EEPROMIN" )
@@ -522,8 +522,8 @@ static MACHINE_CONFIG_START( skilldrp, astrocorp_state )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 	MCFG_EEPROM_93C46_ADD("eeprom")
 
-	MCFG_TICKET_DISPENSER_ADD("ticket", 200, TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW )
-	MCFG_TICKET_DISPENSER_ADD("hopper", 200, TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW )
+	MCFG_TICKET_DISPENSER_ADD("ticket", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW )
+	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
