@@ -55,7 +55,6 @@ public:
 
 /*----------- defined in drivers/st0016.c -----------*/
 
-//OBRISI.ME
 
 
 /*----------- defined in video/st0016.c -----------*/

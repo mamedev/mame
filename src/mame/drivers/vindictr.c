@@ -65,7 +65,6 @@ static MACHINE_RESET( vindictr )
 
 READ16_MEMBER(vindictr_state::port1_r)
 {
-//OBRISI.ME
 	int result = input_port_read(machine(), "260010");
 	if (m_sound_to_cpu_ready) result ^= 0x0004;
 	if (m_cpu_to_sound_ready) result ^= 0x0008;

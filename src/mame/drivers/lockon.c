@@ -53,7 +53,6 @@
 
 WRITE16_MEMBER(lockon_state::adrst_w)
 {
-//OBRISI.ME
 	m_ctrl_reg = data & 0xff;
 
 	/* Bus mastering for shared access */
@@ -64,7 +63,6 @@ WRITE16_MEMBER(lockon_state::adrst_w)
 
 READ16_MEMBER(lockon_state::main_gnd_r)
 {
-//OBRISI.ME
 	address_space *gndspace = m_ground->memory().space(AS_PROGRAM);
 	return gndspace->read_word(V30_GND_ADDR | offset * 2);
 }
@@ -81,14 +79,12 @@ WRITE16_MEMBER(lockon_state::main_gnd_w)
 
 READ16_MEMBER(lockon_state::main_obj_r)
 {
-//OBRISI.ME
 	address_space *objspace = m_object->memory().space(AS_PROGRAM);
 	return objspace->read_word(V30_OBJ_ADDR | offset * 2);
 }
 
 WRITE16_MEMBER(lockon_state::main_obj_w)
 {
-//OBRISI.ME
 	address_space *objspace =m_object->memory().space(AS_PROGRAM);
 
 	if (ACCESSING_BITS_0_7)
@@ -99,7 +95,6 @@ WRITE16_MEMBER(lockon_state::main_obj_w)
 
 WRITE16_MEMBER(lockon_state::tst_w)
 {
-//OBRISI.ME
 
 	if (offset < 0x800)
 	{
@@ -120,27 +115,23 @@ WRITE16_MEMBER(lockon_state::tst_w)
 
 READ16_MEMBER(lockon_state::main_z80_r)
 {
-//OBRISI.ME
 	address_space *sndspace = m_audiocpu->memory().space(AS_PROGRAM);
 	return 0xff00 | sndspace->read_byte(offset);
 }
 
 WRITE16_MEMBER(lockon_state::main_z80_w)
 {
-//OBRISI.ME
 	address_space *sndspace = m_audiocpu->memory().space(AS_PROGRAM);
 	sndspace->write_byte(offset, data);
 }
 
 WRITE16_MEMBER(lockon_state::inten_w)
 {
-//OBRISI.ME
 	m_main_inten = 1;
 }
 
 WRITE16_MEMBER(lockon_state::emres_w)
 {
-//OBRISI.ME
 	watchdog_reset(machine());
 	m_main_inten = 0;
 }
@@ -391,7 +382,6 @@ WRITE8_MEMBER(lockon_state::sound_vol)
 #define LO_RI		100000.0
 #define LO_RP		100000.0
 
-//OBRISI.ME
 
 	static const double gains[16] =
 	{

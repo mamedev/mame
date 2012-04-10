@@ -48,7 +48,6 @@ offsets:
 
 READ8_MEMBER(saturn_state::stv_ioga_r)
 {
-//OBRISI.ME
 	UINT8 res;
 
 	res = 0xff;
@@ -73,7 +72,6 @@ READ8_MEMBER(saturn_state::stv_ioga_r)
 
 WRITE8_MEMBER(saturn_state::stv_ioga_w)
 {
-//OBRISI.ME
 	offset &= 0x1f; // mirror?
 
 	if(offset & 0x20 && !space.debugger_access())
@@ -115,7 +113,6 @@ READ8_MEMBER(saturn_state::critcrsh_ioga_r)
 
 READ8_MEMBER(saturn_state::magzun_ioga_r)
 {
-//OBRISI.ME
 	UINT8 res;
 
 	res = 0xff;
@@ -141,7 +138,6 @@ READ8_MEMBER(saturn_state::magzun_ioga_r)
 
 WRITE8_MEMBER(saturn_state::magzun_ioga_w)
 {
-//OBRISI.ME
 
 	switch(offset)
 	{
@@ -153,7 +149,6 @@ WRITE8_MEMBER(saturn_state::magzun_ioga_w)
 
 READ8_MEMBER(saturn_state::stvmp_ioga_r)
 {
-//OBRISI.ME
 	const char *const mpnames[2][5] = {
 		{"P1_KEY0", "P1_KEY1", "P1_KEY2", "P1_KEY3", "P1_KEY4"},
 		{"P2_KEY0", "P2_KEY1", "P2_KEY2", "P2_KEY3", "P2_KEY4"} };
@@ -186,7 +181,6 @@ READ8_MEMBER(saturn_state::stvmp_ioga_r)
 
 WRITE8_MEMBER(saturn_state::stvmp_ioga_w)
 {
-//OBRISI.ME
 
 	switch(offset)
 	{
@@ -199,7 +193,6 @@ WRITE8_MEMBER(saturn_state::stvmp_ioga_w)
 /* remaps with a 8-bit handler because MAME can't install r/w handlers with a different bus parallelism than the CPU native one, shrug ... */
 READ32_MEMBER(saturn_state::stv_ioga_r32)
 {
-//OBRISI.ME
 	UINT32 res;
 
 	res = 0;
@@ -215,7 +208,6 @@ READ32_MEMBER(saturn_state::stv_ioga_r32)
 
 WRITE32_MEMBER(saturn_state::stv_ioga_w32)
 {
-//OBRISI.ME
 
 	if(ACCESSING_BITS_16_23)
 		stv_ioga_w(space,offset*4+1,data >> 16);
@@ -376,7 +368,6 @@ DRIVER_INIT(critcrsh)
 
 READ32_MEMBER(saturn_state::magzun_hef_hack_r)
 {
-//OBRISI.ME
 
 	if(cpu_get_pc(&space.device())==0x604bf20) return 0x00000001; //HWEF
 
@@ -387,7 +378,6 @@ READ32_MEMBER(saturn_state::magzun_hef_hack_r)
 
 READ32_MEMBER(saturn_state::magzun_rx_hack_r)
 {
-//OBRISI.ME
 
 	if(cpu_get_pc(&space.device())==0x604c006) return 0x40;
 
@@ -675,7 +665,6 @@ bp 6001d22 (60ffef0)
 
 READ32_MEMBER(saturn_state::astrass_hack_r)
 {
-//OBRISI.ME
 
 	if(cpu_get_pc(&space.device()) == 0x60011ba) return 0x00000000;
 

@@ -275,7 +275,6 @@ static INTERRUPT_GEN( vblank_int )
 WRITE16_MEMBER(atarisy2_state::int0_ack_w)
 {
 	/* reset sound IRQ */
-//OBRISI.ME
 	m_p2portrd_state = 0;
 	atarigen_update_interrupts(machine());
 }
@@ -332,7 +331,6 @@ WRITE16_MEMBER(atarisy2_state::bankselect_w)
 		0x8e000, 0x86000, 0x7e000, 0x76000
 	};
 
-//OBRISI.ME
 	int newword = m_bankselect[offset];
 	UINT8 *base;
 
@@ -363,7 +361,6 @@ static void bankselect_postload(running_machine &machine)
 
 READ16_MEMBER(atarisy2_state::switch_r)
 {
-//OBRISI.ME
 	int result = input_port_read(machine(), "1800") | (input_port_read(machine(), "1801") << 8);
 
 	if (m_cpu_to_sound_ready) result ^= 0x20;
@@ -375,7 +372,6 @@ READ16_MEMBER(atarisy2_state::switch_r)
 
 READ8_MEMBER(atarisy2_state::switch_6502_r)
 {
-//OBRISI.ME
 	int result = input_port_read(machine(), "1840");
 
 	if (m_cpu_to_sound_ready) result |= 0x01;
@@ -390,7 +386,6 @@ READ8_MEMBER(atarisy2_state::switch_6502_r)
 
 WRITE8_MEMBER(atarisy2_state::switch_6502_w)
 {
-//OBRISI.ME
 
 	if (m_has_tms5220)
 	{
@@ -409,7 +404,6 @@ WRITE8_MEMBER(atarisy2_state::switch_6502_w)
 
 WRITE16_MEMBER(atarisy2_state::adc_strobe_w)
 {
-//OBRISI.ME
 	m_which_adc = offset & 3;
 }
 
@@ -417,7 +411,6 @@ WRITE16_MEMBER(atarisy2_state::adc_strobe_w)
 READ16_MEMBER(atarisy2_state::adc_r)
 {
 	static const char *const adcnames[] = { "ADC0", "ADC1", "ADC2", "ADC3" };
-//OBRISI.ME
 
 	if (m_which_adc < m_pedal_count)
 		return ~input_port_read(machine(), adcnames[m_which_adc]);
@@ -429,7 +422,6 @@ READ16_MEMBER(atarisy2_state::adc_r)
 READ8_MEMBER(atarisy2_state::leta_r)
 {
 	static const char *const letanames[] = { "LETA0", "LETA1", "LETA2", "LETA3" };
-//OBRISI.ME
 
     if (offset <= 1 && m_pedal_count == -1)   /* 720 */
 	{
@@ -692,7 +684,6 @@ WRITE8_MEMBER(atarisy2_state::mixer_w)
 
 WRITE8_MEMBER(atarisy2_state::sound_reset_w)
 {
-//OBRISI.ME
 
 	/* if no change, do nothing */
 	if ((data & 1) == m_sound_reset_state)
@@ -716,7 +707,6 @@ WRITE8_MEMBER(atarisy2_state::sound_reset_w)
 
 READ16_MEMBER(atarisy2_state::sound_r)
 {
-//OBRISI.ME
 
 	/* clear the p2portwr state on a p1portrd */
 	m_p2portwr_state = 0;
@@ -729,7 +719,6 @@ READ16_MEMBER(atarisy2_state::sound_r)
 
 WRITE8_MEMBER(atarisy2_state::sound_6502_w)
 {
-//OBRISI.ME
 
 	/* clock the state through */
 	m_p2portwr_state = (m_interrupt_enable & 2) != 0;
@@ -742,7 +731,6 @@ WRITE8_MEMBER(atarisy2_state::sound_6502_w)
 
 READ8_MEMBER(atarisy2_state::sound_6502_r)
 {
-//OBRISI.ME
 
 	/* clock the state through */
 	m_p2portrd_state = (m_interrupt_enable & 1) != 0;
@@ -762,7 +750,6 @@ READ8_MEMBER(atarisy2_state::sound_6502_r)
 
 WRITE8_MEMBER(atarisy2_state::tms5220_w)
 {
-//OBRISI.ME
 	if (m_has_tms5220)
 	{
 		tms5220_data_w(machine().device("tms"), 0, data);
@@ -771,7 +758,6 @@ WRITE8_MEMBER(atarisy2_state::tms5220_w)
 
 WRITE8_MEMBER(atarisy2_state::tms5220_strobe_w)
 {
-//OBRISI.ME
 	if (m_has_tms5220)
 	{
 		tms5220_wsq_w(machine().device("tms"), 1-(offset & 1));

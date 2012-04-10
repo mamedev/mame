@@ -108,7 +108,6 @@ READ32_MEMBER(atarigt_state::special_port2_r)
 
 READ32_MEMBER(atarigt_state::special_port3_r)
 {
-//OBRISI.ME
 	int temp = input_port_read(machine(), "COIN");
 	if (m_video_int_state) temp ^= 0x0001;
 	if (m_scanline_int_state) temp ^= 0x0002;
@@ -196,7 +195,6 @@ WRITE32_MEMBER(atarigt_state::latch_w)
 	/* upper byte */
 	if (ACCESSING_BITS_24_31)
 	{
-//OBRISI.ME
 
 		/* bits 13-11 are the MO control bits */
 		atarirle_control_w(m_rle, (data >> 27) & 7);
@@ -213,7 +211,6 @@ WRITE32_MEMBER(atarigt_state::latch_w)
 
 WRITE32_MEMBER(atarigt_state::mo_command_w)
 {
-//OBRISI.ME
 	COMBINE_DATA(m_mo_command);
 	if (ACCESSING_BITS_0_15)
 		atarirle_command_w(m_rle, ((data & 0xffff) == 2) ? ATARIRLE_COMMAND_CHECKSUM : ATARIRLE_COMMAND_DRAW);
@@ -554,7 +551,6 @@ if (LOG_PROTECTION)
 
 READ32_MEMBER(atarigt_state::colorram_protection_r)
 {
-//OBRISI.ME
 	offs_t address = 0xd80000 + offset * 4;
 	UINT32 result32 = 0;
 	UINT16 result;
@@ -578,7 +574,6 @@ READ32_MEMBER(atarigt_state::colorram_protection_r)
 
 WRITE32_MEMBER(atarigt_state::colorram_protection_w)
 {
-//OBRISI.ME
 	offs_t address = 0xd80000 + offset * 4;
 
 	if (ACCESSING_BITS_16_31)

@@ -72,7 +72,6 @@ static MACHINE_RESET( atarig42 )
 
 READ16_MEMBER(atarig42_state::special_port2_r)
 {
-//OBRISI.ME
 	int temp = input_port_read(machine(), "IN2");
 	if (m_cpu_to_sound_ready) temp ^= 0x0020;
 	if (m_sound_to_cpu_ready) temp ^= 0x0010;
@@ -84,7 +83,6 @@ READ16_MEMBER(atarig42_state::special_port2_r)
 WRITE16_MEMBER(atarig42_state::a2d_select_w)
 {
 	static const char *const portnames[] = { "A2D0", "A2D1" };
-//OBRISI.ME
 
 	m_analog_data = input_port_read(machine(), portnames[offset != 0]);
 }
@@ -92,7 +90,6 @@ WRITE16_MEMBER(atarig42_state::a2d_select_w)
 
 READ16_MEMBER(atarig42_state::a2d_data_r)
 {
-//OBRISI.ME
 	return m_analog_data << 8;
 }
 
@@ -102,7 +99,6 @@ WRITE16_MEMBER(atarig42_state::io_latch_w)
 	/* upper byte */
 	if (ACCESSING_BITS_8_15)
 	{
-//OBRISI.ME
 
 		/* bit 14 controls the ASIC65 reset line */
 		asic65_reset(machine(), (~data >> 14) & 1);
@@ -127,7 +123,6 @@ WRITE16_MEMBER(atarig42_state::io_latch_w)
 
 WRITE16_MEMBER(atarig42_state::mo_command_w)
 {
-//OBRISI.ME
 	COMBINE_DATA(m_mo_command);
 	atarirle_command_w(m_rle, (data == 0) ? ATARIRLE_COMMAND_CHECKSUM : ATARIRLE_COMMAND_DRAW);
 }
@@ -266,7 +261,6 @@ void atarig42_state::roadriot_sloop_tweak(int offset)
 
 READ16_MEMBER(atarig42_state::roadriot_sloop_data_r)
 {
-//OBRISI.ME
 	roadriot_sloop_tweak(offset);
 	if (offset < 0x78000/2)
 		return m_sloop_base[offset];
@@ -277,7 +271,6 @@ READ16_MEMBER(atarig42_state::roadriot_sloop_data_r)
 
 WRITE16_MEMBER(atarig42_state::roadriot_sloop_data_w)
 {
-//OBRISI.ME
 	roadriot_sloop_tweak(offset);
 }
 
@@ -325,7 +318,6 @@ void atarig42_state::guardians_sloop_tweak(int offset)
 
 READ16_MEMBER(atarig42_state::guardians_sloop_data_r)
 {
-//OBRISI.ME
 	guardians_sloop_tweak(offset);
 	if (offset < 0x78000/2)
 		return m_sloop_base[offset];
@@ -336,7 +328,6 @@ READ16_MEMBER(atarig42_state::guardians_sloop_data_r)
 
 WRITE16_MEMBER(atarig42_state::guardians_sloop_data_w)
 {
-//OBRISI.ME
 	guardians_sloop_tweak(offset);
 }
 

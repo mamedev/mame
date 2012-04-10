@@ -170,7 +170,6 @@ static int gsword_coins_in(void)
 /* (4004,4005) clear down counter , if (4004,4005)==0 then (402E)=0 */
 READ8_MEMBER(gsword_state::gsword_hack_r)
 {
-//OBRISI.ME
 	UINT8 data = m_cpu2_ram[offset + 4];
 
 	/*if(offset==1)mame_printf_debug("CNT %02X%02X\n",m_cpu2_ram[5],m_cpu2_ram[4]); */
@@ -326,7 +325,6 @@ static WRITE8_DEVICE_HANDLER( gsword_adpcm_data_w )
 
 WRITE8_MEMBER(gsword_state::adpcm_soundcommand_w)
 {
-//OBRISI.ME
 	soundlatch_byte_w(*&space, 0, data);
 	cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }

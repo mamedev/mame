@@ -103,7 +103,6 @@ static MACHINE_RESET( cyberbal2p )
 
 READ16_MEMBER(cyberbal_state::special_port0_r)
 {
-//OBRISI.ME
 	int temp = input_port_read(machine(), "IN0");
 	if (m_cpu_to_sound_ready) temp ^= 0x0080;
 	return temp;
@@ -112,7 +111,6 @@ READ16_MEMBER(cyberbal_state::special_port0_r)
 
 READ16_MEMBER(cyberbal_state::special_port2_r)
 {
-//OBRISI.ME
 	int temp = input_port_read(machine(), "IN2");
 	if (m_cpu_to_sound_ready) temp ^= 0x2000;
 	return temp;
@@ -121,7 +119,6 @@ READ16_MEMBER(cyberbal_state::special_port2_r)
 
 READ16_MEMBER(cyberbal_state::sound_state_r)
 {
-//OBRISI.ME
 	int temp = 0xffff;
 	if (m_cpu_to_sound_ready) temp ^= 0xffff;
 	return temp;

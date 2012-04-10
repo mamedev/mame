@@ -263,7 +263,6 @@ static TIMER_DEVICE_CALLBACK( delayed_joystick_int )
 
 READ16_MEMBER(atarisy1_state::joystick_r)
 {
-//OBRISI.ME
 	int newval = 0xff;
 	static const char *const portnames[] = { "IN0", "IN1" };
 
@@ -294,7 +293,6 @@ READ16_MEMBER(atarisy1_state::joystick_r)
 WRITE16_MEMBER(atarisy1_state::joystick_w)
 {
 	/* the A4 bit enables/disables joystick IRQs */
-//OBRISI.ME
 	m_joystick_int_enable = ((offset >> 3) & 1) ^ 1;
 }
 
@@ -308,7 +306,6 @@ WRITE16_MEMBER(atarisy1_state::joystick_w)
 
 READ16_MEMBER(atarisy1_state::trakball_r)
 {
-//OBRISI.ME
 	int result = 0xff;
 
 	/* Marble Madness trackball type -- rotated 45 degrees! */
@@ -357,7 +354,6 @@ READ16_MEMBER(atarisy1_state::trakball_r)
 
 READ16_MEMBER(atarisy1_state::port4_r)
 {
-//OBRISI.ME
 	int temp = input_port_read(machine(), "F60000");
 	if (m_cpu_to_sound_ready) temp ^= 0x0080;
 	return temp;
@@ -373,7 +369,6 @@ READ16_MEMBER(atarisy1_state::port4_r)
 
 READ8_MEMBER(atarisy1_state::switch_6502_r)
 {
-//OBRISI.ME
 	int temp = input_port_read(machine(), "1820");
 
 	if (m_cpu_to_sound_ready) temp ^= 0x08;

@@ -137,13 +137,11 @@ WRITE8_MEMBER(fastfred_state::imago_dma_irq_w)
 
 WRITE8_MEMBER(fastfred_state::imago_sprites_bank_w)
 {
-//OBRISI.ME
 	m_imago_sprites_bank = (data & 2) >> 1;
 }
 
 WRITE8_MEMBER(fastfred_state::imago_sprites_dma_w)
 {
-//OBRISI.ME
 	UINT8 *rom = (UINT8 *)machine().region("gfx2")->base();
 	UINT8 sprites_data;
 
@@ -161,21 +159,18 @@ WRITE8_MEMBER(fastfred_state::imago_sprites_dma_w)
 
 READ8_MEMBER(fastfred_state::imago_sprites_offset_r)
 {
-//OBRISI.ME
 	m_imago_sprites_address = offset;
 	return 0xff; //not really used
 }
 
 WRITE8_MEMBER(fastfred_state::nmi_mask_w)
 {
-//OBRISI.ME
 
 	m_nmi_mask = data & 1;
 }
 
 WRITE8_MEMBER(fastfred_state::sound_nmi_mask_w)
 {
-//OBRISI.ME
 
 	m_sound_nmi_mask = data & 1;
 }

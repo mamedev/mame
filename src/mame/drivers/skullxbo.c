@@ -97,7 +97,6 @@ static MACHINE_RESET( skullxbo )
 
 READ16_MEMBER(skullxbo_state::special_port1_r)
 {
-//OBRISI.ME
 	int temp = input_port_read(machine(), "FF5802");
 	if (m_cpu_to_sound_ready) temp ^= 0x0040;
 	if (atarigen_get_hblank(*machine().primary_screen)) temp ^= 0x0010;

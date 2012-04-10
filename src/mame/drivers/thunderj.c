@@ -70,7 +70,6 @@ static MACHINE_RESET( thunderj )
 
 READ16_MEMBER(thunderj_state::special_port2_r)
 {
-//OBRISI.ME
 	int result = input_port_read(machine(), "260012");
 
 	if (m_sound_to_cpu_ready) result ^= 0x0004;
@@ -83,7 +82,6 @@ READ16_MEMBER(thunderj_state::special_port2_r)
 
 WRITE16_MEMBER(thunderj_state::latch_w)
 {
-//OBRISI.ME
 
 	/* reset extra CPU */
 	if (ACCESSING_BITS_0_7)

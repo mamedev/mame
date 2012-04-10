@@ -237,7 +237,6 @@ static void galpani2_mcu_nmi2(running_machine &machine)
 
 WRITE8_MEMBER(galpani2_state::galpani2_mcu_nmi1_w)//driven by CPU1's int5 ISR
 {
-//OBRISI.ME
 //for galpan2t:
 //Triggered from 'maincpu' (00007D60),once, with no command, using alternate line, during init
 //Triggered from 'maincpu' (000080BE),once, for unknown command, during init
@@ -250,7 +249,6 @@ WRITE8_MEMBER(galpani2_state::galpani2_mcu_nmi1_w)//driven by CPU1's int5 ISR
 
 WRITE8_MEMBER(galpani2_state::galpani2_mcu_nmi2_w)//driven by CPU2's int5 ISR
 {
-//OBRISI.ME
 	if ( (data & 1) && !(m_old_mcu_nmi2 & 1) )	galpani2_mcu_nmi2(machine());
 	m_old_mcu_nmi2 = data;
 }
@@ -351,7 +349,6 @@ ADDRESS_MAP_END
 
 READ16_MEMBER(galpani2_state::galpani2_bankedrom_r)
 {
-//OBRISI.ME
 	UINT16 *ROM = (UINT16 *) machine().region( "user1" )->base();
 	size_t    len = machine().region( "user1" )->bytes() / 2;
 

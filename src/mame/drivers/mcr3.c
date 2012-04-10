@@ -143,7 +143,6 @@ WRITE8_MEMBER(mcr3_state::mcrmono_control_port_w)
 
 READ8_MEMBER(mcr3_state::demoderm_ip1_r)
 {
-//OBRISI.ME
 	return input_port_read(machine(), "MONO.IP1") |
 		(input_port_read(machine(), m_input_mux ? "MONO.IP1.ALT2" : "MONO.IP1.ALT1") << 2);
 }
@@ -151,7 +150,6 @@ READ8_MEMBER(mcr3_state::demoderm_ip1_r)
 
 READ8_MEMBER(mcr3_state::demoderm_ip2_r)
 {
-//OBRISI.ME
 	return input_port_read(machine(), "MONO.IP2") |
 		(input_port_read(machine(), m_input_mux ? "MONO.IP2.ALT2" : "MONO.IP2.ALT1") << 2);
 }
@@ -159,7 +157,6 @@ READ8_MEMBER(mcr3_state::demoderm_ip2_r)
 
 WRITE8_MEMBER(mcr3_state::demoderm_op6_w)
 {
-//OBRISI.ME
 	/* top 2 bits select the input */
 	if (data & 0x80) m_input_mux = 0;
 	if (data & 0x40) m_input_mux = 1;
@@ -178,14 +175,12 @@ WRITE8_MEMBER(mcr3_state::demoderm_op6_w)
 
 READ8_MEMBER(mcr3_state::maxrpm_ip1_r)
 {
-//OBRISI.ME
 	return m_latched_input;
 }
 
 
 READ8_MEMBER(mcr3_state::maxrpm_ip2_r)
 {
-//OBRISI.ME
 	static const UINT8 shift_bits[5] = { 0x00, 0x05, 0x06, 0x01, 0x02 };
 	UINT8 start = input_port_read(machine(), "MONO.IP0");
 	UINT8 shift = input_port_read(machine(), "SHIFT");
@@ -230,7 +225,6 @@ READ8_MEMBER(mcr3_state::maxrpm_ip2_r)
 
 WRITE8_MEMBER(mcr3_state::maxrpm_op5_w)
 {
-//OBRISI.ME
 	/* latch the low 4 bits as input to the ADC0844 */
 	m_maxrpm_adc_control = data & 0x0f;
 
@@ -241,7 +235,6 @@ WRITE8_MEMBER(mcr3_state::maxrpm_op5_w)
 
 WRITE8_MEMBER(mcr3_state::maxrpm_op6_w)
 {
-//OBRISI.ME
 	static const char *const inputs[] = { "MONO.IP1", "MONO.IP1.ALT1", "MONO.IP1.ALT2", "MONO.IP1.ALT3" };
 	/*
         Reflective Sensor Control:
@@ -352,7 +345,6 @@ WRITE8_MEMBER(mcr3_state::powerdrv_op6_w)
 
 READ8_MEMBER(mcr3_state::stargrds_ip0_r)
 {
-//OBRISI.ME
 	UINT8 result = input_port_read(machine(), "MONO.IP0");
 	if (m_input_mux)
 		result = (result & ~0x0a) | (input_port_read(machine(), "MONO.IP0.ALT") & 0x0a);
@@ -362,7 +354,6 @@ READ8_MEMBER(mcr3_state::stargrds_ip0_r)
 
 WRITE8_MEMBER(mcr3_state::stargrds_op5_w)
 {
-//OBRISI.ME
 	/* bit 1 controls input muxing on port 0 */
 	m_input_mux = (data >> 1) & 1;
 
@@ -403,7 +394,6 @@ READ8_MEMBER(mcr3_state::spyhunt_ip1_r)
 
 READ8_MEMBER(mcr3_state::spyhunt_ip2_r)
 {
-//OBRISI.ME
 	/* multiplexed steering wheel/gas pedal */
 	return input_port_read(machine(), m_input_mux ? "SSIO.IP2.ALT" : "SSIO.IP2");
 }
@@ -411,7 +401,6 @@ READ8_MEMBER(mcr3_state::spyhunt_ip2_r)
 
 WRITE8_MEMBER(mcr3_state::spyhunt_op4_w)
 {
-//OBRISI.ME
 	/* Spy Hunter uses port 4 for talking to the Chip Squeak Deluxe */
 	/* (and for toggling the lamps and muxing the analog inputs) */
 
@@ -456,7 +445,6 @@ WRITE8_MEMBER(mcr3_state::spyhunt_op4_w)
 
 READ8_MEMBER(mcr3_state::turbotag_ip2_r)
 {
-//OBRISI.ME
 	/* multiplexed steering wheel/gas pedal */
 	if (m_input_mux)
 		return input_port_read(machine(), "SSIO.IP2.ALT");

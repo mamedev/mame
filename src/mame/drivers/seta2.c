@@ -217,7 +217,6 @@ ADDRESS_MAP_END
 
 READ16_MEMBER(seta2_state::mj4simai_p1_r)
 {
-//OBRISI.ME
 
 	switch (m_keyboard_row)
 	{
@@ -232,7 +231,6 @@ READ16_MEMBER(seta2_state::mj4simai_p1_r)
 
 READ16_MEMBER(seta2_state::mj4simai_p2_r)
 {
-//OBRISI.ME
 
 	switch (m_keyboard_row)
 	{
@@ -247,7 +245,6 @@ READ16_MEMBER(seta2_state::mj4simai_p2_r)
 
 WRITE16_MEMBER(seta2_state::mj4simai_keyboard_w)
 {
-//OBRISI.ME
 
 	if (ACCESSING_BITS_0_7)
 		m_keyboard_row = data & 0xff;
@@ -518,14 +515,12 @@ ADDRESS_MAP_END
 // RAM shared with the sub CPU
 READ32_MEMBER(seta2_state::funcube_nvram_dword_r)
 {
-//OBRISI.ME
 	UINT16 val = m_nvram[offset];
 	return ((val & 0xff00) << 8) | (val & 0x00ff);
 }
 
 WRITE32_MEMBER(seta2_state::funcube_nvram_dword_w)
 {
-//OBRISI.ME
 	if (ACCESSING_BITS_0_7)
 	{
 		m_nvram[offset] = (m_nvram[offset] & 0xff00) | (data & 0x000000ff);
@@ -538,14 +533,12 @@ WRITE32_MEMBER(seta2_state::funcube_nvram_dword_w)
 
 WRITE16_MEMBER(seta2_state::spriteram16_word_w)
 {
-//OBRISI.ME
 
 	COMBINE_DATA( &m_spriteram[offset] );
 }
 
 READ16_MEMBER(seta2_state::spriteram16_word_r)
 {
-//OBRISI.ME
 
 	return m_spriteram[offset];
 }
@@ -561,14 +554,12 @@ enum {
 
 WRITE32_MEMBER(seta2_state::coldfire_regs_w)
 {
-//OBRISI.ME
 
 	COMBINE_DATA( &m_coldfire_regs[offset] );
 }
 
 READ32_MEMBER(seta2_state::coldfire_regs_r)
 {
-//OBRISI.ME
 
 	switch( offset )
 	{
@@ -647,7 +638,6 @@ ADDRESS_MAP_END
 
 READ8_MEMBER(seta2_state::funcube_coins_r)
 {
-//OBRISI.ME
 	UINT8 ret = input_port_read(machine(),"SWITCH");
 	UINT8 coin_bit0 = 1;	// active low
 	UINT8 coin_bit1 = 1;
@@ -678,7 +668,6 @@ READ8_MEMBER(seta2_state::funcube_coins_r)
 
 READ8_MEMBER(seta2_state::funcube_serial_r)
 {
-//OBRISI.ME
 	UINT8 ret = 0xff;
 
 	switch( m_funcube_serial_count )
@@ -704,7 +693,6 @@ static void funcube_debug_outputs(void)
 
 WRITE8_MEMBER(seta2_state::funcube_leds_w)
 {
-//OBRISI.ME
 
 	*m_funcube_leds = data;
 
@@ -722,7 +710,6 @@ WRITE8_MEMBER(seta2_state::funcube_leds_w)
 
 READ8_MEMBER(seta2_state::funcube_outputs_r)
 {
-//OBRISI.ME
 
 	// Bits 1,2,3 read
 	return *m_funcube_outputs;
@@ -730,7 +717,6 @@ READ8_MEMBER(seta2_state::funcube_outputs_r)
 
 WRITE8_MEMBER(seta2_state::funcube_outputs_w)
 {
-//OBRISI.ME
 
 	*m_funcube_outputs = data;
 

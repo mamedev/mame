@@ -256,7 +256,6 @@ static INTERRUPT_GEN( vblank_int )
 
 READ16_MEMBER(badlands_state::sound_busy_r)
 {
-//OBRISI.ME
 	int temp = 0xfeff;
 	if (m_cpu_to_sound_ready) temp ^= 0x0100;
 	return temp;
@@ -265,14 +264,12 @@ READ16_MEMBER(badlands_state::sound_busy_r)
 
 READ16_MEMBER(badlands_state::pedal_0_r)
 {
-//OBRISI.ME
 	return m_pedal_value[0];
 }
 
 
 READ16_MEMBER(badlands_state::pedal_1_r)
 {
-//OBRISI.ME
 	return m_pedal_value[1];
 }
 
@@ -286,7 +283,6 @@ READ16_MEMBER(badlands_state::pedal_1_r)
 
 READ8_MEMBER(badlands_state::audio_io_r)
 {
-//OBRISI.ME
 	int result = 0xff;
 
 	switch (offset & 0x206)
@@ -335,7 +331,6 @@ READ8_MEMBER(badlands_state::audio_io_r)
 
 WRITE8_MEMBER(badlands_state::audio_io_w)
 {
-//OBRISI.ME
 
 	switch (offset & 0x206)
 	{

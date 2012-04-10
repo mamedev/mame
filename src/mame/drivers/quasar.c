@@ -46,19 +46,16 @@ I8085 Sound Board
 
 WRITE8_MEMBER(quasar_state::video_page_select_w)
 {
-//OBRISI.ME
 	m_page = offset & 0x03;
 }
 
 WRITE8_MEMBER(quasar_state::io_page_select_w)
 {
-//OBRISI.ME
 	m_io_page = offset & 0x03;
 }
 
 WRITE8_MEMBER(quasar_state::quasar_video_w)
 {
-//OBRISI.ME
 
 	switch (m_page)
 	{
@@ -71,7 +68,6 @@ WRITE8_MEMBER(quasar_state::quasar_video_w)
 
 READ8_MEMBER(quasar_state::quasar_IO_r)
 {
-//OBRISI.ME
 	UINT8 ans = 0;
 
 	switch (m_io_page)
@@ -87,7 +83,6 @@ READ8_MEMBER(quasar_state::quasar_IO_r)
 
 WRITE8_MEMBER(quasar_state::quasar_bullet_w)
 {
-//OBRISI.ME
 	m_bullet_ram[offset] = (data ^ 0xff);
 }
 
@@ -99,19 +94,16 @@ WRITE8_MEMBER(quasar_state::quasar_sh_command_w)
 	// lower nibble = command to I8035
 	// not necessarily like this, but it seems to work better than direct mapping
 	// (although schematics has it as direct - but then the schematics are wrong elsewhere to!)
-//OBRISI.ME
 	soundlatch_byte_w(*&space, 0, (data & 8) + ((data >> 1) & 3) + ((data << 2) & 4));
 }
 
 READ8_MEMBER(quasar_state::quasar_sh_command_r)
 {
-//OBRISI.ME
 	return soundlatch_byte_r(*&space, 0) + (input_port_read(machine(), "DSW2") & 0x30);
 }
 
 READ8_MEMBER(quasar_state::audio_t1_r)
 {
-//OBRISI.ME
 	return (soundlatch_byte_r(*&space, 0) == 0);
 }
 

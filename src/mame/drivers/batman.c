@@ -89,7 +89,6 @@ WRITE16_MEMBER(batman_state::batman_atarivc_w)
 
 READ16_MEMBER(batman_state::special_port2_r)
 {
-//OBRISI.ME
 	int result = input_port_read(machine(), "260010");
 	if (m_sound_to_cpu_ready) result ^= 0x0010;
 	if (m_cpu_to_sound_ready) result ^= 0x0020;
@@ -99,7 +98,6 @@ READ16_MEMBER(batman_state::special_port2_r)
 
 WRITE16_MEMBER(batman_state::latch_w)
 {
-//OBRISI.ME
 	int oldword = m_latch_data;
 	COMBINE_DATA(&m_latch_data);
 

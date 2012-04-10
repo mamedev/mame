@@ -94,7 +94,6 @@ WRITE16_MEMBER(shuuz_state::latch_w)
 
 READ16_MEMBER(shuuz_state::leta_r)
 {
-//OBRISI.ME
 	/* trackball -- rotated 45 degrees? */
 	int which = offset & 1;
 

@@ -187,7 +187,6 @@ static MACHINE_RESET( gauntlet )
 
 READ16_MEMBER(gauntlet_state::port4_r)
 {
-//OBRISI.ME
 	int temp = input_port_read(machine(), "803008");
 	if (m_cpu_to_sound_ready) temp ^= 0x0020;
 	if (m_sound_to_cpu_ready) temp ^= 0x0010;
@@ -204,7 +203,6 @@ READ16_MEMBER(gauntlet_state::port4_r)
 
 WRITE16_MEMBER(gauntlet_state::sound_reset_w)
 {
-//OBRISI.ME
 	if (ACCESSING_BITS_0_7)
 	{
 		int oldword = m_sound_reset_val;
@@ -237,7 +235,6 @@ WRITE16_MEMBER(gauntlet_state::sound_reset_w)
 
 READ8_MEMBER(gauntlet_state::switch_6502_r)
 {
-//OBRISI.ME
 	int temp = 0x30;
 
 	if (m_cpu_to_sound_ready) temp ^= 0x80;

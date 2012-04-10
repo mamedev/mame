@@ -68,7 +68,6 @@ static MACHINE_RESET( toobin )
 
 WRITE16_MEMBER(toobin_state::interrupt_scan_w)
 {
-//OBRISI.ME
 	int oldword = m_interrupt_scan[offset];
 	int newword = oldword;
 	COMBINE_DATA(&newword);
@@ -91,7 +90,6 @@ WRITE16_MEMBER(toobin_state::interrupt_scan_w)
 
 READ16_MEMBER(toobin_state::special_port1_r)
 {
-//OBRISI.ME
 	int result = input_port_read(machine(), "FF9000");
 	if (atarigen_get_hblank(*machine().primary_screen)) result ^= 0x8000;
 	if (m_cpu_to_sound_ready) result ^= 0x2000;

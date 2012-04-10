@@ -89,7 +89,6 @@ static MACHINE_RESET( midvplus )
 
 READ32_MEMBER(midvunit_state::port0_r)
 {
-//OBRISI.ME
 	UINT16 val = input_port_read(machine(), "IN0");
 	UINT16 diff = val ^ m_last_port0;
 
@@ -118,7 +117,6 @@ READ32_MEMBER(midvunit_state::port0_r)
 
 READ32_MEMBER(midvunit_state::midvunit_adc_r)
 {
-//OBRISI.ME
 	if (!(m_control_data & 0x40))
 	{
 		cputag_set_input_line(machine(), "maincpu", 3, CLEAR_LINE);
@@ -138,7 +136,6 @@ static TIMER_CALLBACK( adc_ready )
 
 WRITE32_MEMBER(midvunit_state::midvunit_adc_w)
 {
-//OBRISI.ME
 	static const char *const adcnames[] = { "WHEEL", "ACCEL", "BRAKE" };
 
 	if (!(m_control_data & 0x20))
@@ -163,14 +160,12 @@ WRITE32_MEMBER(midvunit_state::midvunit_adc_w)
 
 WRITE32_MEMBER(midvunit_state::midvunit_cmos_protect_w)
 {
-//OBRISI.ME
 	m_cmos_protected = ((data & 0xc00) != 0xc00);
 }
 
 
 WRITE32_MEMBER(midvunit_state::midvunit_cmos_w)
 {
-//OBRISI.ME
 	if (!m_cmos_protected)
 		COMBINE_DATA(m_nvram + offset);
 }
@@ -178,7 +173,6 @@ WRITE32_MEMBER(midvunit_state::midvunit_cmos_w)
 
 READ32_MEMBER(midvunit_state::midvunit_cmos_r)
 {
-//OBRISI.ME
 	return m_nvram[offset];
 }
 
@@ -192,7 +186,6 @@ READ32_MEMBER(midvunit_state::midvunit_cmos_r)
 
 WRITE32_MEMBER(midvunit_state::midvunit_control_w)
 {
-//OBRISI.ME
 	UINT16 olddata = m_control_data;
 	COMBINE_DATA(&m_control_data);
 
@@ -213,7 +206,6 @@ WRITE32_MEMBER(midvunit_state::midvunit_control_w)
 
 WRITE32_MEMBER(midvunit_state::crusnwld_control_w)
 {
-//OBRISI.ME
 	UINT16 olddata = m_control_data;
 	COMBINE_DATA(&m_control_data);
 
@@ -248,7 +240,6 @@ WRITE32_MEMBER(midvunit_state::midvunit_sound_w)
 
 READ32_MEMBER(midvunit_state::tms32031_control_r)
 {
-//OBRISI.ME
 	/* watch for accesses to the timers */
 	if (offset == 0x24 || offset == 0x34)
 	{
@@ -269,7 +260,6 @@ READ32_MEMBER(midvunit_state::tms32031_control_r)
 
 WRITE32_MEMBER(midvunit_state::tms32031_control_w)
 {
-//OBRISI.ME
 	COMBINE_DATA(&m_tms32031_control[offset]);
 
 	/* ignore changes to the memory control register */
@@ -347,7 +337,6 @@ static const UINT32 bit_data[0x10] =
 
 READ32_MEMBER(midvunit_state::bit_data_r)
 {
-//OBRISI.ME
 	int bit = (bit_data[m_bit_index / 32] >> (31 - (m_bit_index % 32))) & 1;
 	m_bit_index = (m_bit_index + 1) % 512;
 	return bit ? m_nvram[offset] : ~m_nvram[offset];
@@ -356,7 +345,6 @@ READ32_MEMBER(midvunit_state::bit_data_r)
 
 WRITE32_MEMBER(midvunit_state::bit_reset_w)
 {
-//OBRISI.ME
 	m_bit_index = 0;
 }
 
@@ -396,7 +384,6 @@ WRITE32_MEMBER(midvunit_state::offroadc_serial_data_w)
 
 READ32_MEMBER(midvunit_state::midvplus_misc_r)
 {
-//OBRISI.ME
 	UINT32 result = m_midvplus_misc[offset];
 
 	switch (offset)
@@ -422,7 +409,6 @@ READ32_MEMBER(midvunit_state::midvplus_misc_r)
 
 WRITE32_MEMBER(midvunit_state::midvplus_misc_w)
 {
-//OBRISI.ME
 	UINT32 olddata = m_midvplus_misc[offset];
 	int logit = 1;
 
@@ -1632,7 +1618,6 @@ ROM_END
 
 READ32_MEMBER(midvunit_state::generic_speedup_r)
 {
-//OBRISI.ME
 	device_eat_cycles(&space.device(), 100);
 	return m_generic_speedup[offset];
 }

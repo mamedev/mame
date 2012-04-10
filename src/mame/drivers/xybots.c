@@ -66,7 +66,6 @@ static MACHINE_RESET( xybots )
 
 READ16_MEMBER(xybots_state::special_port1_r)
 {
-//OBRISI.ME
 	int result = input_port_read(machine(), "FFE200");
 
 	if (m_cpu_to_sound_ready) result ^= 0x0200;

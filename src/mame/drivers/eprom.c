@@ -76,7 +76,6 @@ static MACHINE_RESET( eprom )
 
 READ16_MEMBER(eprom_state::special_port1_r)
 {
-//OBRISI.ME
 	int result = input_port_read(machine(), "260010");
 
 	if (m_sound_to_cpu_ready) result ^= 0x0004;
@@ -89,7 +88,6 @@ READ16_MEMBER(eprom_state::special_port1_r)
 
 READ16_MEMBER(eprom_state::adc_r)
 {
-//OBRISI.ME
 	static const char *const adcnames[] = { "ADC0", "ADC1", "ADC2", "ADC3" };
 	int result = input_port_read(machine(), adcnames[m_last_offset & 3]);
 
@@ -107,7 +105,6 @@ READ16_MEMBER(eprom_state::adc_r)
 
 WRITE16_MEMBER(eprom_state::eprom_latch_w)
 {
-//OBRISI.ME
 
 	if (ACCESSING_BITS_0_7 && (machine().device("extra") != NULL))
 	{
@@ -135,14 +132,12 @@ WRITE16_MEMBER(eprom_state::eprom_latch_w)
 
 READ16_MEMBER(eprom_state::sync_r)
 {
-//OBRISI.ME
 	return m_sync_data[offset];
 }
 
 
 WRITE16_MEMBER(eprom_state::sync_w)
 {
-//OBRISI.ME
 	int oldword = m_sync_data[offset];
 	int newword = oldword;
 	COMBINE_DATA(&newword);

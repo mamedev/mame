@@ -817,7 +817,6 @@ void model3_state::pci_device_set_reg(UINT32 value)
 
 READ64_MEMBER(model3_state::mpc105_addr_r)
 {
-//OBRISI.ME
 	if (ACCESSING_BITS_32_63)
 	{
 		return (UINT64)m_mpc105_addr << 32;
@@ -827,7 +826,6 @@ READ64_MEMBER(model3_state::mpc105_addr_r)
 
 WRITE64_MEMBER(model3_state::mpc105_addr_w)
 {
-//OBRISI.ME
 	if (ACCESSING_BITS_32_63)
 	{
 		UINT32 d = FLIPENDIAN_INT32((UINT32)(data >> 32));
@@ -842,7 +840,6 @@ WRITE64_MEMBER(model3_state::mpc105_addr_w)
 
 READ64_MEMBER(model3_state::mpc105_data_r)
 {
-//OBRISI.ME
 	if(m_pci_device == 0) {
 		return ((UINT64)(FLIPENDIAN_INT32(m_mpc105_regs[(m_pci_reg/2)+1])) << 32) |
 			   ((UINT64)(FLIPENDIAN_INT32(m_mpc105_regs[(m_pci_reg/2)+0])));
@@ -852,7 +849,6 @@ READ64_MEMBER(model3_state::mpc105_data_r)
 
 WRITE64_MEMBER(model3_state::mpc105_data_w)
 {
-//OBRISI.ME
 	if(m_pci_device == 0) {
 		m_mpc105_regs[(m_pci_reg/2)+1] = FLIPENDIAN_INT32((UINT32)(data >> 32));
 		m_mpc105_regs[(m_pci_reg/2)+0] = FLIPENDIAN_INT32((UINT32)(data));
@@ -866,14 +862,12 @@ WRITE64_MEMBER(model3_state::mpc105_data_w)
 
 READ64_MEMBER(model3_state::mpc105_reg_r)
 {
-//OBRISI.ME
 	return ((UINT64)(m_mpc105_regs[(offset*2)+0]) << 32) |
 			(UINT64)(m_mpc105_regs[(offset*2)+1]);
 }
 
 WRITE64_MEMBER(model3_state::mpc105_reg_w)
 {
-//OBRISI.ME
 	m_mpc105_regs[(offset*2)+0] = (UINT32)(data >> 32);
 	m_mpc105_regs[(offset*2)+1] = (UINT32)data;
 }
@@ -900,7 +894,6 @@ static void mpc105_init(running_machine &machine)
 
 READ64_MEMBER(model3_state::mpc106_addr_r)
 {
-//OBRISI.ME
 	if (ACCESSING_BITS_32_63)
 	{
 		return (UINT64)m_mpc106_addr << 32;
@@ -910,7 +903,6 @@ READ64_MEMBER(model3_state::mpc106_addr_r)
 
 WRITE64_MEMBER(model3_state::mpc106_addr_w)
 {
-//OBRISI.ME
 	if (ACCESSING_BITS_32_63)
 	{
 		UINT32 d = FLIPENDIAN_INT32((UINT32)(data >> 32));
@@ -933,7 +925,6 @@ WRITE64_MEMBER(model3_state::mpc106_addr_w)
 
 READ64_MEMBER(model3_state::mpc106_data_r)
 {
-//OBRISI.ME
 	if(m_pci_device == 0) {
 		return ((UINT64)(FLIPENDIAN_INT32(m_mpc106_regs[(m_pci_reg/2)+1])) << 32) |
 			   ((UINT64)(FLIPENDIAN_INT32(m_mpc106_regs[(m_pci_reg/2)+0])));
@@ -950,7 +941,6 @@ READ64_MEMBER(model3_state::mpc106_data_r)
 
 WRITE64_MEMBER(model3_state::mpc106_data_w)
 {
-//OBRISI.ME
 	if(m_pci_device == 0) {
 		m_mpc106_regs[(m_pci_reg/2)+1] = FLIPENDIAN_INT32((UINT32)(data >> 32));
 		m_mpc106_regs[(m_pci_reg/2)+0] = FLIPENDIAN_INT32((UINT32)(data));
@@ -964,14 +954,12 @@ WRITE64_MEMBER(model3_state::mpc106_data_w)
 
 READ64_MEMBER(model3_state::mpc106_reg_r)
 {
-//OBRISI.ME
 	return ((UINT64)(m_mpc106_regs[(offset*2)+0]) << 32) |
 			(UINT64)(m_mpc106_regs[(offset*2)+1]);
 }
 
 WRITE64_MEMBER(model3_state::mpc106_reg_w)
 {
-//OBRISI.ME
 	m_mpc106_regs[(offset*2)+0] = (UINT32)(data >> 32);
 	m_mpc106_regs[(offset*2)+1] = (UINT32)data;
 }
@@ -1081,7 +1069,6 @@ static void scsi_irq_callback(running_machine &machine, int state)
 
 READ64_MEMBER(model3_state::real3d_dma_r)
 {
-//OBRISI.ME
 	switch(offset)
 	{
 		case 1:
@@ -1098,7 +1085,6 @@ READ64_MEMBER(model3_state::real3d_dma_r)
 
 WRITE64_MEMBER(model3_state::real3d_dma_w)
 {
-//OBRISI.ME
 	switch(offset)
 	{
 		case 0:
@@ -1340,7 +1326,6 @@ static MACHINE_RESET(model3_21) { model3_init(machine, 0x21); }
 
 READ64_MEMBER(model3_state::model3_ctrl_r)
 {
-//OBRISI.ME
 	switch( offset )
 	{
 		case 0:
@@ -1417,7 +1402,6 @@ READ64_MEMBER(model3_state::model3_ctrl_r)
 
 WRITE64_MEMBER(model3_state::model3_ctrl_w)
 {
-//OBRISI.ME
 	switch(offset)
 	{
 		case 0:
@@ -1516,7 +1500,6 @@ WRITE64_MEMBER(model3_state::model3_ctrl_w)
 
 READ64_MEMBER(model3_state::model3_sys_r)
 {
-//OBRISI.ME
 //  printf("model3_sys_r: mask %llx @ %x (PC %x)\n", mem_mask, offset, cpu_get_pc(&space.device()));
 
 	switch (offset)
@@ -1553,7 +1536,6 @@ READ64_MEMBER(model3_state::model3_sys_r)
 
 WRITE64_MEMBER(model3_state::model3_sys_w)
 {
-//OBRISI.ME
 //  printf("model3_sys_w: %llx to %x mask %llx\n", data, offset, mem_mask);
 
 	switch (offset)
@@ -1625,7 +1607,6 @@ WRITE64_MEMBER(model3_state::model3_sys_w)
 
 READ64_MEMBER(model3_state::model3_rtc_r)
 {
-//OBRISI.ME
 	UINT64 r = 0;
 	if(ACCESSING_BITS_56_63) {
 		r |= (UINT64)rtc72421_r(*&space, (offset*2)+0, (UINT32)(mem_mask >> 32)) << 32;
@@ -1638,7 +1619,6 @@ READ64_MEMBER(model3_state::model3_rtc_r)
 
 WRITE64_MEMBER(model3_state::model3_rtc_w)
 {
-//OBRISI.ME
 	if(ACCESSING_BITS_56_63) {
 		rtc72421_w(*&space, (offset*2)+0, (UINT32)(data >> 32), (UINT32)(mem_mask >> 32));
 	}
@@ -1649,7 +1629,6 @@ WRITE64_MEMBER(model3_state::model3_rtc_w)
 
 READ64_MEMBER(model3_state::real3d_status_r)
 {
-//OBRISI.ME
 	m_real3d_status ^= U64(0xffffffffffffffff);
 	if (offset == 0)
 	{
@@ -1665,7 +1644,6 @@ READ64_MEMBER(model3_state::real3d_status_r)
 /* SCSP interface */
 WRITE8_MEMBER(model3_state::model3_sound_w)
 {
-//OBRISI.ME
 
 	switch (offset)
 	{
@@ -1700,14 +1678,12 @@ WRITE8_MEMBER(model3_state::model3_sound_w)
 
 READ64_MEMBER(model3_state::network_r)
 {
-//OBRISI.ME
 	mame_printf_debug("network_r: %02X at %08X\n", offset, cpu_get_pc(&space.device()));
 	return m_network_ram[offset];
 }
 
 WRITE64_MEMBER(model3_state::network_w)
 {
-//OBRISI.ME
 	COMBINE_DATA(m_network_ram + offset);
 	mame_printf_debug("network_w: %02X, %08X%08X at %08X\n", offset, (UINT32)(data >> 32), (UINT32)(data), cpu_get_pc(&space.device()));
 }
@@ -1796,7 +1772,6 @@ static const UINT16 oceanhun_prot_data[] =
 
 READ64_MEMBER(model3_state::model3_security_r)
 {
-//OBRISI.ME
 	switch(offset)
 	{
 		case 0x00/8:	return 0;		/* status */

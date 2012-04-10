@@ -71,7 +71,6 @@ WRITE16_MEMBER(atarig1_state::mo_control_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-//OBRISI.ME
 		atarirle_control_w(m_rle, data & 7);
 	}
 }
@@ -79,7 +78,6 @@ WRITE16_MEMBER(atarig1_state::mo_control_w)
 
 WRITE16_MEMBER(atarig1_state::mo_command_w)
 {
-//OBRISI.ME
 	COMBINE_DATA(m_mo_command);
 	atarirle_command_w(m_rle, (data == 0 && m_is_pitfight) ? ATARIRLE_COMMAND_CHECKSUM : ATARIRLE_COMMAND_DRAW);
 }
@@ -94,7 +92,6 @@ WRITE16_MEMBER(atarig1_state::mo_command_w)
 
 READ16_MEMBER(atarig1_state::special_port0_r)
 {
-//OBRISI.ME
 	int temp = input_port_read(machine(), "IN0");
 	if (m_cpu_to_sound_ready) temp ^= 0x1000;
 	temp ^= 0x2000;		/* A2DOK always high for now */
@@ -104,7 +101,6 @@ READ16_MEMBER(atarig1_state::special_port0_r)
 
 WRITE16_MEMBER(atarig1_state::a2d_select_w)
 {
-//OBRISI.ME
 	m_which_input = offset;
 }
 
@@ -112,7 +108,6 @@ WRITE16_MEMBER(atarig1_state::a2d_select_w)
 READ16_MEMBER(atarig1_state::a2d_data_r)
 {
 	static const char *const adcnames[] = { "ADC0", "ADC1", "ADC2" };
-//OBRISI.ME
 
 	/* Pit Fighter has no A2D, just another input port */
 	if (m_is_pitfight)
@@ -161,7 +156,6 @@ static void pitfightb_state_postload(running_machine &machine)
 
 READ16_MEMBER(atarig1_state::pitfightb_cheap_slapstic_r)
 {
-//OBRISI.ME
 	int result = m_bslapstic_base[offset & 0xfff];
 
 	/* the cheap replacement slapstic just triggers on the simple banking */

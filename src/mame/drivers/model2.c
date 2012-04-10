@@ -260,7 +260,6 @@ static void copro_fifoout_push(device_t *device, UINT32 data)
 /* Timers - these count down at 25 MHz and pull IRQ2 when they hit 0 */
 READ32_MEMBER(model2_state::timers_r)
 {
-//OBRISI.ME
 	i960_noburst(&space.device());
 
 	// if timer is running, calculate current value
@@ -278,7 +277,6 @@ READ32_MEMBER(model2_state::timers_r)
 
 WRITE32_MEMBER(model2_state::timers_w)
 {
-//OBRISI.ME
 	attotime period;
 
 	i960_noburst(&space.device());
@@ -411,7 +409,6 @@ static void chcolor(running_machine &machine, pen_t color, UINT16 data)
 
 WRITE32_MEMBER(model2_state::pal32_w)
 {
-//OBRISI.ME
 	COMBINE_DATA(m_paletteram32 + offset);
 	if(ACCESSING_BITS_0_15)
 		chcolor(machine(), offset * 2, m_paletteram32[offset]);
@@ -421,7 +418,6 @@ WRITE32_MEMBER(model2_state::pal32_w)
 
 WRITE32_MEMBER(model2_state::ctrl0_w)
 {
-//OBRISI.ME
 	if(ACCESSING_BITS_0_7)
 	{
 		eeprom_device *eeprom = machine().device<eeprom_device>("eeprom");
@@ -434,14 +430,12 @@ WRITE32_MEMBER(model2_state::ctrl0_w)
 
 WRITE32_MEMBER(model2_state::analog_2b_w)
 {
-//OBRISI.ME
 	m_analog_channel = (data >> 16) & 0x07;
 }
 
 
 READ32_MEMBER(model2_state::fifoctl_r)
 {
-//OBRISI.ME
 	UINT32 r = 0;
 
 	if (m_copro_fifoout_num == 0)
@@ -563,7 +557,6 @@ CUSTOM_INPUT_MEMBER(model2_state::rchase2_devices_r)
 
 WRITE32_MEMBER(model2_state::rchase2_devices_w)
 {
-//OBRISI.ME
 	/*
     0x00040000 start 1 lamp
     0x00080000 start 2 lamp
@@ -576,7 +569,6 @@ WRITE32_MEMBER(model2_state::rchase2_devices_w)
 
 WRITE32_MEMBER(model2_state::srallyc_devices_w)
 {
-//OBRISI.ME
 	/*
     0x00040000 start 1 lamp
     0x00200000 vr lamp
@@ -601,7 +593,6 @@ READ32_MEMBER(model2_state::copro_prg_r)
 
 WRITE32_MEMBER(model2_state::copro_prg_w)
 {
-//OBRISI.ME
 	if (m_coproctl & 0x80000000)
 	{
 		logerror("copro_prg_w: %08X:   %08X\n", m_coprocnt, data);
@@ -615,7 +606,6 @@ WRITE32_MEMBER(model2_state::copro_prg_w)
 
 WRITE32_MEMBER(model2_state::copro_ctl1_w)
 {
-//OBRISI.ME
 	// did hi bit change?
 	if ((data ^ m_coproctl) == 0x80000000)
 	{
@@ -642,7 +632,6 @@ WRITE32_MEMBER(model2_state::copro_ctl1_w)
 
 WRITE32_MEMBER(model2_state::copro_function_port_w)
 {
-//OBRISI.ME
 	UINT32 d = data & 0x800fffff;
 	UINT32 a = (offset >> 2) & 0xff;
 	d |= a << 23;
@@ -662,7 +651,6 @@ READ32_MEMBER(model2_state::copro_fifo_r)
 
 WRITE32_MEMBER(model2_state::copro_fifo_w)
 {
-//OBRISI.ME
 	if (m_coproctl & 0x80000000)
 	{
 		if (m_dsp_type == DSP_TYPE_SHARC)
@@ -688,7 +676,6 @@ WRITE32_MEMBER(model2_state::copro_fifo_w)
 
 WRITE32_MEMBER(model2_state::copro_sharc_iop_w)
 {
-//OBRISI.ME
 	/* FIXME: clean this up */
 	if ((strcmp(machine().system().name, "schamp" ) == 0) ||
 		(strcmp(machine().system().name, "sfight" ) == 0) ||
@@ -727,7 +714,6 @@ WRITE32_MEMBER(model2_state::copro_sharc_iop_w)
 
 WRITE32_MEMBER(model2_state::geo_ctl1_w)
 {
-//OBRISI.ME
 	// did hi bit change?
 	if ((data ^ m_geoctl) == 0x80000000)
 	{
@@ -749,7 +735,6 @@ WRITE32_MEMBER(model2_state::geo_ctl1_w)
 #ifdef UNUSED_FUNCTION
 WRITE32_MEMBER(model2_state::geo_sharc_ctl1_w)
 {
-//OBRISI.ME
     // did hi bit change?
     if ((data ^ m_geoctl) == 0x80000000)
     {
@@ -784,7 +769,6 @@ READ32_MEMBER(model2_state::geo_sharc_fifo_r)
 
 WRITE32_MEMBER(model2_state::geo_sharc_fifo_w)
 {
-//OBRISI.ME
     if (m_geoctl & 0x80000000)
     {
         sharc_external_dma_write(machine().device("dsp2"), m_geocnt, data & 0xffff);
@@ -799,7 +783,6 @@ WRITE32_MEMBER(model2_state::geo_sharc_fifo_w)
 
 WRITE32_MEMBER(model2_state::geo_sharc_iop_w)
 {
-//OBRISI.ME
     if ((strcmp(machine().system().name, "schamp" ) == 0))
     {
         sharc_external_iop_write(machine().device("dsp2"), offset, data);
@@ -835,7 +818,6 @@ READ32_MEMBER(model2_state::geo_prg_r)
 
 WRITE32_MEMBER(model2_state::geo_prg_w)
 {
-//OBRISI.ME
 	if (m_geoctl & 0x80000000)
 	{
 		//logerror("geo_prg_w: %08X:   %08X\n", m_geocnt, data);
@@ -850,7 +832,6 @@ WRITE32_MEMBER(model2_state::geo_prg_w)
 
 READ32_MEMBER(model2_state::geo_r)
 {
-//OBRISI.ME
 	int address = offset * 4;
 	if (address == 0x2008)
 	{
@@ -869,7 +850,6 @@ READ32_MEMBER(model2_state::geo_r)
 
 WRITE32_MEMBER(model2_state::geo_w)
 {
-//OBRISI.ME
 	int address = offset * 4;
 
 	if (address < 0x1000)
@@ -966,7 +946,6 @@ READ32_MEMBER(model2_state::desert_unk_r)
 
 READ32_MEMBER(model2_state::model2_irq_r)
 {
-//OBRISI.ME
 	i960_noburst(&space.device());
 
 	if (offset)
@@ -979,7 +958,6 @@ READ32_MEMBER(model2_state::model2_irq_r)
 
 WRITE32_MEMBER(model2_state::model2_irq_w)
 {
-//OBRISI.ME
 	i960_noburst(&space.device());
 
 	if (offset)
@@ -1070,7 +1048,6 @@ static const UINT8 DCOPKey1326[]=
 
 READ32_MEMBER(model2_state::model2_prot_r)
 {
-//OBRISI.ME
 	UINT32 retval = 0;
 
 	if (offset == 0x10000/4)
@@ -1104,7 +1081,6 @@ READ32_MEMBER(model2_state::model2_prot_r)
 
 WRITE32_MEMBER(model2_state::model2_prot_w)
 {
-//OBRISI.ME
 	if (mem_mask == 0xffff0000)
 	{
 		data >>= 16;
@@ -1177,7 +1153,6 @@ WRITE32_MEMBER(model2_state::model2_prot_w)
 
 READ32_MEMBER(model2_state::maxx_r)
 {
-//OBRISI.ME
 	UINT32 *ROM = (UINT32 *)machine().region("maincpu")->base();
 
 	if (offset <= 0x1f/4)
@@ -1223,7 +1198,6 @@ READ32_MEMBER(model2_state::maxx_r)
 
 READ32_MEMBER(model2_state::network_r)
 {
-//OBRISI.ME
 	if ((mem_mask == 0xffffffff) || (mem_mask == 0x0000ffff) || (mem_mask == 0xffff0000))
 	{
 		return 0xffffffff;
@@ -1248,7 +1222,6 @@ READ32_MEMBER(model2_state::network_r)
 
 WRITE32_MEMBER(model2_state::network_w)
 {
-//OBRISI.ME
 	if ((mem_mask == 0xffffffff) || (mem_mask == 0x0000ffff) || (mem_mask == 0xffff0000))
 	{
 		COMBINE_DATA(&m_netram[offset+0x4000/4]);
@@ -1301,7 +1274,6 @@ WRITE32_MEMBER(model2_state::mode_w)
 
 WRITE32_MEMBER(model2_state::model2o_tex_w0)
 {
-//OBRISI.ME
 	if ( (offset & 1) == 0 )
 	{
 		m_textureram0[offset>>1] &= 0xffff0000;
@@ -1316,7 +1288,6 @@ WRITE32_MEMBER(model2_state::model2o_tex_w0)
 
 WRITE32_MEMBER(model2_state::model2o_tex_w1)
 {
-//OBRISI.ME
 	if ( (offset & 1) == 0 )
 	{
 		m_textureram1[offset>>1] &= 0xffff0000;
@@ -1331,7 +1302,6 @@ WRITE32_MEMBER(model2_state::model2o_tex_w1)
 
 WRITE32_MEMBER(model2_state::model2o_luma_w)
 {
-//OBRISI.ME
 	if ( (offset & 1) == 0 )
 	{
 		m_lumaram[offset>>1] &= 0xffff0000;
@@ -1834,7 +1804,6 @@ static TIMER_DEVICE_CALLBACK(model2c_interrupt)
 
 READ16_MEMBER(model2_state::m1_snd_68k_latch_r)
 {
-//OBRISI.ME
 	return m_to_68k;
 }
 
@@ -1943,13 +1912,11 @@ WRITE32_MEMBER(model2_state::copro_sharc_output_fifo_w)
 
 READ32_MEMBER(model2_state::copro_sharc_buffer_r)
 {
-//OBRISI.ME
 	return m_bufferram[offset & 0x7fff];
 }
 
 WRITE32_MEMBER(model2_state::copro_sharc_buffer_w)
 {
-//OBRISI.ME
 	//mame_printf_debug("sharc_buffer_w: %08X at %08X, %08X, %f\n", offset, cpu_get_pc(&space.device()), data, *(float*)&data);
 	m_bufferram[offset & 0x7fff] = data;
 }
@@ -1971,13 +1938,11 @@ ADDRESS_MAP_END
 
 READ32_MEMBER(model2_state::copro_tgp_buffer_r)
 {
-//OBRISI.ME
 	return m_bufferram[offset & 0x7fff];
 }
 
 WRITE32_MEMBER(model2_state::copro_tgp_buffer_w)
 {
-//OBRISI.ME
 	m_bufferram[offset&0x7fff] = data;
 }
 
@@ -2110,7 +2075,6 @@ MACHINE_CONFIG_END
 
 READ8_MEMBER(model2_state::driveio_port_r)
 {
-//OBRISI.ME
 	return m_driveio_comm_data;
 }
 
@@ -5184,7 +5148,6 @@ static DRIVER_INIT( daytonam )
 
 READ32_MEMBER(model2_state::jaleco_network_r)
 {
-//OBRISI.ME
 	if(offset == 0x4000/4)
 	{
 		if(m_netram[offset] == 0x00000000)
@@ -5204,7 +5167,6 @@ READ32_MEMBER(model2_state::jaleco_network_r)
 
 WRITE32_MEMBER(model2_state::jaleco_network_w)
 {
-//OBRISI.ME
 	COMBINE_DATA(&m_netram[offset]);
 }
 

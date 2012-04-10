@@ -192,7 +192,6 @@ static MACHINE_RESET( ddragon )
 
 WRITE8_MEMBER(ddragon_state::ddragon_bankswitch_w)
 {
-//OBRISI.ME
 	m_scrollx_hi = (data & 0x01);
 	m_scrolly_hi = ((data & 0x02) >> 1);
 	flip_screen_set(~data & 0x04);
@@ -210,7 +209,6 @@ WRITE8_MEMBER(ddragon_state::ddragon_bankswitch_w)
 
 WRITE8_MEMBER(ddragon_state::toffy_bankswitch_w)
 {
-//OBRISI.ME
 	m_scrollx_hi = (data & 0x01);
 	m_scrolly_hi = ((data & 0x02) >> 1);
 
@@ -225,7 +223,6 @@ WRITE8_MEMBER(ddragon_state::toffy_bankswitch_w)
 
 READ8_MEMBER(ddragon_state::darktowr_mcu_bank_r)
 {
-//OBRISI.ME
 	// logerror("BankRead %05x %08x\n",cpu_get_pc(&space.device()),offset);
 
 	/* Horrible hack - the alternate TStrike set is mismatched against the MCU,
@@ -254,7 +251,6 @@ READ8_MEMBER(ddragon_state::darktowr_mcu_bank_r)
 
 WRITE8_MEMBER(ddragon_state::darktowr_mcu_bank_w)
 {
-//OBRISI.ME
 	logerror("BankWrite %05x %08x %08x\n", cpu_get_pc(&space.device()), offset, data);
 
 	if (offset == 0x1400 || offset == 0)
@@ -267,7 +263,6 @@ WRITE8_MEMBER(ddragon_state::darktowr_mcu_bank_w)
 
 WRITE8_MEMBER(ddragon_state::darktowr_bankswitch_w)
 {
-//OBRISI.ME
 	int oldbank = machine().memory().bank("bank1");
 	int newbank = (data & 0xe0) >> 5;
 
@@ -300,7 +295,6 @@ WRITE8_MEMBER(ddragon_state::darktowr_bankswitch_w)
 
 WRITE8_MEMBER(ddragon_state::ddragon_interrupt_w)
 {
-//OBRISI.ME
 	switch (offset)
 	{
 		case 0: /* 380b - NMI ack */
@@ -329,14 +323,12 @@ WRITE8_MEMBER(ddragon_state::ddragon_interrupt_w)
 
 WRITE8_MEMBER(ddragon_state::ddragon2_sub_irq_ack_w)
 {
-//OBRISI.ME
 	device_set_input_line(m_sub_cpu, m_sprite_irq, CLEAR_LINE );
 }
 
 
 WRITE8_MEMBER(ddragon_state::ddragon2_sub_irq_w)
 {
-//OBRISI.ME
 	device_set_input_line(m_maincpu, M6809_IRQ_LINE, ASSERT_LINE);
 }
 
@@ -363,7 +355,6 @@ CUSTOM_INPUT_MEMBER(ddragon_state::sub_cpu_busy)
 
 WRITE8_MEMBER(ddragon_state::darktowr_mcu_w)
 {
-//OBRISI.ME
 	logerror("McuWrite %05x %08x %08x\n",cpu_get_pc(&space.device()), offset, data);
 	m_darktowr_mcu_ports[offset] = data;
 }
@@ -378,7 +369,6 @@ READ8_MEMBER(ddragon_state::ddragon_hd63701_internal_registers_r)
 
 WRITE8_MEMBER(ddragon_state::ddragon_hd63701_internal_registers_w)
 {
-//OBRISI.ME
 
 	/* I don't know why port 0x17 is used..  Doesn't seem to be a standard MCU port */
 	if (offset == 0x17)
@@ -404,7 +394,6 @@ WRITE8_MEMBER(ddragon_state::ddragon_hd63701_internal_registers_w)
 
 READ8_MEMBER(ddragon_state::ddragon_spriteram_r)
 {
-//OBRISI.ME
 
 	/* Double Dragon crash fix - see notes above */
 	if (offset == 0x49 && cpu_get_pc(&space.device()) == 0x6261 && m_spriteram[offset] == 0x1f)
@@ -416,7 +405,6 @@ READ8_MEMBER(ddragon_state::ddragon_spriteram_r)
 
 WRITE8_MEMBER(ddragon_state::ddragon_spriteram_w)
 {
-//OBRISI.ME
 
 	if (&space.device() == m_sub_cpu && offset == 0)
 		m_dd_sub_cpu_busy = 1;
@@ -434,7 +422,6 @@ WRITE8_MEMBER(ddragon_state::ddragon_spriteram_w)
 
 WRITE8_MEMBER(ddragon_state::dd_adpcm_w)
 {
-//OBRISI.ME
 	device_t *adpcm = (offset & 1) ? m_adpcm_2 : m_adpcm_1;
 	int chip = (adpcm == m_adpcm_1) ? 0 : 1;
 
@@ -488,7 +475,6 @@ static void dd_adpcm_int( device_t *device )
 
 READ8_MEMBER(ddragon_state::dd_adpcm_status_r)
 {
-//OBRISI.ME
 	return m_adpcm_idle[0] + (m_adpcm_idle[1] << 1);
 }
 
@@ -575,7 +561,6 @@ ADDRESS_MAP_END
 /* might not be 100% accurate, check bits written */
 WRITE8_MEMBER(ddragon_state::ddragonba_port_w)
 {
-//OBRISI.ME
 	device_set_input_line(m_maincpu, M6809_IRQ_LINE, ASSERT_LINE);
 	device_set_input_line(m_sub_cpu, m_sprite_irq, CLEAR_LINE );
 }

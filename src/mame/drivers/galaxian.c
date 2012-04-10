@@ -463,7 +463,6 @@ static INTERRUPT_GEN( fakechange_interrupt_gen )
 
 WRITE8_MEMBER(galaxian_state::irq_enable_w)
 {
-//OBRISI.ME
 	/* the latched D0 bit here goes to the CLEAR line on the interrupt flip-flop */
 	m_irq_enabled = data & 1;
 
@@ -836,7 +835,6 @@ static const ppi8255_interface sfx_ppi8255_2_intf =
 
 READ8_MEMBER(galaxian_state::monsterz_protection_r)
 {
-//OBRISI.ME
 	return m_protection_result;
 }
 
@@ -1126,7 +1124,6 @@ WRITE8_MEMBER(galaxian_state::zigzag_bankswap_w)
 
 WRITE8_MEMBER(galaxian_state::zigzag_ay8910_w)
 {
-//OBRISI.ME
 	switch (offset & 0x300)
 	{
 		case 0x000:
@@ -1187,21 +1184,18 @@ CUSTOM_INPUT_MEMBER(galaxian_state::kingball_noise_r)
 
 WRITE8_MEMBER(galaxian_state::kingball_speech_dip_w)
 {
-//OBRISI.ME
 	m_kingball_speech_dip = data;
 }
 
 
 WRITE8_MEMBER(galaxian_state::kingball_sound1_w)
 {
-//OBRISI.ME
 	m_kingball_sound = (m_kingball_sound & ~0x01) | data;
 }
 
 
 WRITE8_MEMBER(galaxian_state::kingball_sound2_w)
 {
-//OBRISI.ME
 	m_kingball_sound = (m_kingball_sound & ~0x02) | (data << 1);
 	soundlatch_byte_w(*&space, 0, m_kingball_sound | 0xf0);
 }
@@ -1222,14 +1216,12 @@ static WRITE8_DEVICE_HANDLER( kingball_dac_w )
 
 WRITE8_MEMBER(galaxian_state::mshuttle_ay8910_cs_w)
 {
-//OBRISI.ME
 	m_mshuttle_ay8910_cs = data & 1;
 }
 
 
 WRITE8_MEMBER(galaxian_state::mshuttle_ay8910_control_w)
 {
-//OBRISI.ME
 	if (!m_mshuttle_ay8910_cs)
 		ay8910_address_w(machine().device("aysnd"), offset, data);
 }
@@ -1237,7 +1229,6 @@ WRITE8_MEMBER(galaxian_state::mshuttle_ay8910_control_w)
 
 WRITE8_MEMBER(galaxian_state::mshuttle_ay8910_data_w)
 {
-//OBRISI.ME
 	if (!m_mshuttle_ay8910_cs)
 		ay8910_data_w(machine().device("aysnd"), offset, data);
 }
@@ -1245,7 +1236,6 @@ WRITE8_MEMBER(galaxian_state::mshuttle_ay8910_data_w)
 
 READ8_MEMBER(galaxian_state::mshuttle_ay8910_data_r)
 {
-//OBRISI.ME
 	if (!m_mshuttle_ay8910_cs)
 		return ay8910_r(machine().device("aysnd"), offset);
 	return 0xff;
@@ -1283,7 +1273,6 @@ READ8_MEMBER(galaxian_state::jumpbug_protection_r)
 
 WRITE8_MEMBER(galaxian_state::checkman_sound_command_w)
 {
-//OBRISI.ME
 	soundlatch_byte_w(*&space, 0, data);
 	cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }
@@ -2937,7 +2926,6 @@ static DRIVER_INIT( pacmanbl )
 
 READ8_MEMBER(galaxian_state::tenspot_dsw_read)
 {
-//OBRISI.ME
 	char tmp[64];
 	sprintf(tmp,"IN2_GAME%d", m_tenspot_current_game);
 	return input_port_read_safe(machine(), tmp, 0x00);

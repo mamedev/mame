@@ -381,7 +381,6 @@ INPUT_PORTS_END
 
 READ16_MEMBER(tx1_state::dipswitches_r)
 {
-//OBRISI.ME
 	return (input_port_read(machine(), "DSW") & 0xfffe) | m_ts;
 }
 
@@ -391,14 +390,12 @@ READ16_MEMBER(tx1_state::dipswitches_r)
 */
 WRITE8_MEMBER(tx1_state::ts_w)
 {
-//OBRISI.ME
 //  TS = 1;
 	m_z80_ram[offset] = data;
 }
 
 READ8_MEMBER(tx1_state::ts_r)
 {
-//OBRISI.ME
 //  TS = 1;
 	return m_z80_ram[offset];
 }
@@ -420,7 +417,6 @@ static WRITE8_DEVICE_HANDLER( bb_coin_cnt_w )
 
 WRITE8_MEMBER(tx1_state::tx1_ppi_latch_w)
 {
-//OBRISI.ME
 	m_ppi_latch_a = ((input_port_read(machine(), "AN_BRAKE") & 0xf) << 4) | (input_port_read(machine(), "AN_ACCELERATOR") & 0xf);
 	m_ppi_latch_b = input_port_read(machine(), "AN_STEERING");
 }

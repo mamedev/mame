@@ -553,7 +553,6 @@ WRITE32_MEMBER(namconb1_state::namconb2_cpureg_w)
 
 READ32_MEMBER(namconb1_state::namconb_cpureg_r)
 {
-//OBRISI.ME
 	return (m_namconb_cpureg[offset*4] << 24) | (m_namconb_cpureg[offset*4+1] << 16)
 		| (m_namconb_cpureg[offset*4+2] << 8) | m_namconb_cpureg[offset*4+3];
 }
@@ -663,7 +662,6 @@ static DRIVER_INIT( outfxies )
 
 READ32_MEMBER(namconb1_state::custom_key_r)
 {
-//OBRISI.ME
 	UINT16 old_count = m_count;
 
 	do
@@ -838,13 +836,11 @@ WRITE32_MEMBER(namconb1_state::srand_w)
 
 READ32_MEMBER(namconb1_state::namconb_share_r)
 {
-//OBRISI.ME
 	return (m_namconb_shareram[offset*2] << 16) | m_namconb_shareram[offset*2+1];
 }
 
 WRITE32_MEMBER(namconb1_state::namconb_share_w)
 {
-//OBRISI.ME
 	COMBINE_DATA(m_namconb_shareram+offset*2+1);
 	data >>= 16;
 	mem_mask >>= 16;
@@ -894,7 +890,6 @@ ADDRESS_MAP_END
 
 WRITE16_MEMBER(namconb1_state::nbmcu_shared_w)
 {
-//OBRISI.ME
 	// HACK!  Many games data ROM routines redirect the vector from the sound command read to an RTS.
 	// This needs more investigation.  nebulray and vshoot do NOT do this.
 	// Timers A2 and A3 are set up in "external input counter" mode, this may be related.
@@ -924,19 +919,16 @@ ADDRESS_MAP_END
 
 READ8_MEMBER(namconb1_state::port6_r)
 {
-//OBRISI.ME
 	return m_nbx_port6;
 }
 
 WRITE8_MEMBER(namconb1_state::port6_w)
 {
-//OBRISI.ME
 	m_nbx_port6 = data;
 }
 
 READ8_MEMBER(namconb1_state::port7_r)
 {
-//OBRISI.ME
 	switch (m_nbx_port6 & 0xf0)
 	{
 		case 0x00:

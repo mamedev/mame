@@ -91,7 +91,6 @@
 
 WRITE16_MEMBER(foodf_state::nvram_recall_w)
 {
-//OBRISI.ME
 	m_nvram->recall(0);
 	m_nvram->recall(1);
 	m_nvram->recall(0);
@@ -162,7 +161,6 @@ static MACHINE_RESET( foodf )
 
 WRITE8_MEMBER(foodf_state::digital_w)
 {
-//OBRISI.ME
 	foodf_set_flip(data & 0x01);
 
 	m_nvram->store(data & 0x02);
@@ -190,7 +188,6 @@ WRITE8_MEMBER(foodf_state::digital_w)
 READ16_MEMBER(foodf_state::analog_r)
 {
 	static const char *const portnames[] = { "STICK0_X", "STICK1_X", "STICK0_Y", "STICK1_Y" };
-//OBRISI.ME
 
 	return input_port_read(machine(), portnames[m_whichport]);
 }
@@ -198,7 +195,6 @@ READ16_MEMBER(foodf_state::analog_r)
 
 WRITE16_MEMBER(foodf_state::analog_w)
 {
-//OBRISI.ME
 	m_whichport = offset ^ 3;
 }
 

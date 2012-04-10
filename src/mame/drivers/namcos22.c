@@ -1362,7 +1362,6 @@ InitDSP( running_machine &machine )
 
 READ16_MEMBER(namcos22_state::pdp_status_r)
 {
-//OBRISI.ME
 	return m_mMasterBIOZ;
 } /* pdp_status_r */
 
@@ -1394,7 +1393,6 @@ void namcos22_state::WriteToCommRAM(offs_t offs, UINT32 data )
 
 READ16_MEMBER(namcos22_state::pdp_begin_r)
 {
-//OBRISI.ME
 	/* this feature appears to be only used on Super System22 hardware */
 	if( m_mbSuperSystem22 )
 	{
@@ -1503,13 +1501,11 @@ READ16_MEMBER(namcos22_state::pdp_begin_r)
 
 READ16_MEMBER(namcos22_state::slave_external_ram_r)
 {
-//OBRISI.ME
 	return m_mpSlaveExternalRAM[offset];
 }
 
 WRITE16_MEMBER(namcos22_state::slave_external_ram_w)
 {
-//OBRISI.ME
 	COMBINE_DATA( &m_mpSlaveExternalRAM[offset] );
 }
 
@@ -1542,33 +1538,28 @@ WRITE16_MEMBER(namcos22_state::dsp_XF_output_w)
 
 WRITE16_MEMBER(namcos22_state::point_ram_idx_w)
 {
-//OBRISI.ME
 	m_mPointAddr<<=16;
 	m_mPointAddr |= data;
 }
 
 WRITE16_MEMBER(namcos22_state::point_ram_loword_iw)
 {
-//OBRISI.ME
 	m_mPointData |= data;
 	WriteToPointRAM(m_mPointAddr++, m_mPointData );
 }
 
 WRITE16_MEMBER(namcos22_state::point_ram_hiword_w)
 {
-//OBRISI.ME
 	m_mPointData = (data<<16);
 }
 
 READ16_MEMBER(namcos22_state::point_ram_loword_r)
 {
-//OBRISI.ME
 	return namcos22_point_rom_r(machine(), m_mPointAddr)&0xffff;
 }
 
 READ16_MEMBER(namcos22_state::point_ram_hiword_ir)
 {
-//OBRISI.ME
 	return namcos22_point_rom_r(machine(), m_mPointAddr++)>>16;
 }
 
@@ -1592,7 +1583,6 @@ enum
 
 READ16_MEMBER(namcos22_state::dsp_unk_port3_r)
 {
-//OBRISI.ME
 	m_mMasterBIOZ = 0;
 	m_mDspUploadState = eDSP_UPLOAD_READY;
 	return 0;
@@ -1600,7 +1590,6 @@ READ16_MEMBER(namcos22_state::dsp_unk_port3_r)
 
 WRITE16_MEMBER(namcos22_state::upload_code_to_slave_dsp_w)
 {
-//OBRISI.ME
 
 	switch( m_mDspUploadState )
 	{
@@ -1671,26 +1660,22 @@ READ16_MEMBER(namcos22_state::dsp_upload_status_r)
 
 READ16_MEMBER(namcos22_state::master_external_ram_r)
 {
-//OBRISI.ME
 	return m_mpMasterExternalRAM[offset];
 }
 
 WRITE16_MEMBER(namcos22_state::master_external_ram_w)
 {
-//OBRISI.ME
 	COMBINE_DATA( &m_mpMasterExternalRAM[offset] );
 }
 
 WRITE16_MEMBER(namcos22_state::slave_serial_io_w)
 {
-//OBRISI.ME
 	m_mSerialDataSlaveToMasterNext = data;
 	logerror( "slave_serial_io_w(%04x)\n", data );
 }
 
 READ16_MEMBER(namcos22_state::master_serial_io_r)
 {
-//OBRISI.ME
 	logerror( "master_serial_io_r() == %04x\n",
 		m_mSerialDataSlaveToMasterCurrent );
 	return m_mSerialDataSlaveToMasterCurrent;
@@ -1777,13 +1762,11 @@ WRITE16_MEMBER(namcos22_state::dsp_led_w)
  */
 WRITE16_MEMBER(namcos22_state::dsp_unk8_w)
 {
-//OBRISI.ME
 	m_mRenderBufSize = 0;
 }
 
 WRITE16_MEMBER(namcos22_state::master_render_device_w)
 {
-//OBRISI.ME
 	if( m_mRenderBufSize<MAX_RENDER_CMD_SEQ )
 	{
 		m_mRenderBufData[m_mRenderBufSize++] = data;
@@ -2073,7 +2056,6 @@ WRITE32_MEMBER(namcos22_state::namcos22_C139_SCI_w)
 
 READ32_MEMBER(namcos22_state::namcos22_system_controller_r)
 {
-//OBRISI.ME
 	return m_system_controller[offset];
 }
 
@@ -2118,7 +2100,6 @@ READ32_MEMBER(namcos22_state::namcos22_system_controller_r)
 */
 WRITE32_MEMBER(namcos22_state::namcos22s_system_controller_w)
 {
-//OBRISI.ME
 	int oldreg, newreg;
 
 	// acknowledge irqs
@@ -2249,7 +2230,6 @@ static INTERRUPT_GEN( namcos22s_interrupt )
 */
 WRITE32_MEMBER(namcos22_state::namcos22_system_controller_w)
 {
-//OBRISI.ME
 	int oldreg, newreg;
 
 	// acknowledge irqs
@@ -2396,7 +2376,6 @@ READ32_MEMBER(namcos22_state::namcos22_keycus_r)
 	// this chip is also used for reading random values in some games
 	// for example in timecris to determine where certain enemies will emerge
 	// but it is not yet understood how this works
-//OBRISI.ME
 //  printf("Hit keycus mask %x PC=%x\n", mem_mask, cpu_get_pc(&space.device()));
 
 	if (ACCESSING_BITS_0_15)
@@ -2429,14 +2408,12 @@ WRITE32_MEMBER(namcos22_state::namcos22_keycus_w)
  */
 READ32_MEMBER(namcos22_state::namcos22_portbit_r)
 {
-//OBRISI.ME
 	UINT32 data = m_mSys22PortBits;
 	m_mSys22PortBits>>=1;
 	return data&0x10001;
 }
 WRITE32_MEMBER(namcos22_state::namcos22_portbit_w)
 {
-//OBRISI.ME
 	unsigned dat50000008 = AnalogAsDigital(machine());
 	unsigned dat5000000a = 0xffff;
 	m_mSys22PortBits = (dat50000008<<16)|dat5000000a;
@@ -2449,13 +2426,11 @@ READ32_MEMBER(namcos22_state::namcos22_dipswitch_r)
 
 READ32_MEMBER(namcos22_state::namcos22_mcuram_r)
 {
-//OBRISI.ME
 	return m_shareram[offset];
 }
 
 WRITE32_MEMBER(namcos22_state::namcos22_mcuram_w)
 {
-//OBRISI.ME
 	COMBINE_DATA(&m_shareram[offset]);
 }
 
@@ -2497,13 +2472,11 @@ WRITE32_MEMBER(namcos22_state::namcos22_cpuleds_w)
 
 READ32_MEMBER(namcos22_state::alpinesa_prot_r)
 {
-//OBRISI.ME
 	return m_mAlpineSurferProtData;
 } /* alpinesa_prot_r */
 
 WRITE32_MEMBER(namcos22_state::alpinesa_prot_w)
 {
-//OBRISI.ME
 	switch( data )
 	{
 	case 0:
@@ -2522,7 +2495,6 @@ WRITE32_MEMBER(namcos22_state::alpinesa_prot_w)
 
 WRITE32_MEMBER(namcos22_state::namcos22s_nvmem_w)
 {
-//OBRISI.ME
 	mem_mask &= 0xff00ff00; // 8KB RAM over 16KB address &space
 	COMBINE_DATA(&m_nvmem[offset]);
 }
@@ -2535,7 +2507,6 @@ WRITE32_MEMBER(namcos22_state::namcos22s_chipselect_w)
 	// 4000: spot related (set in dirtdash and testmode)
 	// 0800: fade related?
 	// other bits: no clue
-//OBRISI.ME
 	if (ACCESSING_BITS_16_23)
 		m_chipselect = data >> 16;
 	else if (ACCESSING_BITS_24_31)
@@ -2574,7 +2545,6 @@ ADDRESS_MAP_END
 
 READ16_MEMBER(namcos22_state::s22mcu_shared_r)
 {
-//OBRISI.ME
 	UINT16 *share16 = (UINT16 *)m_shareram;
 
 	return share16[BYTE_XOR_BE(offset)];
@@ -2582,7 +2552,6 @@ READ16_MEMBER(namcos22_state::s22mcu_shared_r)
 
 WRITE16_MEMBER(namcos22_state::s22mcu_shared_w)
 {
-//OBRISI.ME
 	UINT16 *share16 = (UINT16 *)m_shareram;
 
 	COMBINE_DATA(&share16[BYTE_XOR_BE(offset)]);
@@ -2640,13 +2609,11 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(namcos22_state::mcu_port4_w)
 {
-//OBRISI.ME
 	m_p4 = data;
 }
 
 READ8_MEMBER(namcos22_state::mcu_port4_r)
 {
-//OBRISI.ME
 	return m_p4;
 }
 
@@ -2657,7 +2624,6 @@ WRITE8_MEMBER(namcos22_state::mcu_port5_w)
 
 READ8_MEMBER(namcos22_state::mcu_port5_r)
 {
-//OBRISI.ME
 
 	if (m_p4 & 8)
 		return input_port_read_safe(machine(), "MCUP5A", 0xff);
@@ -2748,7 +2714,6 @@ static TIMER_CALLBACK( alpine_steplock_callback )
 
 WRITE8_MEMBER(namcos22_state::alpine_mcu_port5_w)
 {
-//OBRISI.ME
 
 	// bits 1+2 are steplock motor outputs
 	if ((data & 6) == 6)
@@ -2951,7 +2916,6 @@ ADDRESS_MAP_END
 
 READ8_MEMBER(namcos22_state::mcu_port4_s22_r)
 {
-//OBRISI.ME
 	return m_p4 | 0x10;	// for C74, 0x10 selects sound MCU role, 0x00 selects control-reading role
 }
 
@@ -5445,7 +5409,6 @@ INPUT_PORTS_END /* Rave Racer */
 // for MCU BIOS v1.41
 READ16_MEMBER(namcos22_state::mcu141_speedup_r)
 {
-//OBRISI.ME
 	if ((cpu_get_pc(&space.device()) == 0xc12d) && (!(m_su_82 & 0xff00)))
 	{
 		device_spin_until_interrupt(&space.device());
@@ -5456,14 +5419,12 @@ READ16_MEMBER(namcos22_state::mcu141_speedup_r)
 
 WRITE16_MEMBER(namcos22_state::mcu_speedup_w)
 {
-//OBRISI.ME
 	COMBINE_DATA(&m_su_82);
 }
 
 // for MCU BIOS v1.30
 READ16_MEMBER(namcos22_state::mcu130_speedup_r)
 {
-//OBRISI.ME
 	if ((cpu_get_pc(&space.device()) == 0xc12a) && (!(m_su_82 & 0xff00)))
 	{
 		device_spin_until_interrupt(&space.device());
@@ -5475,7 +5436,6 @@ READ16_MEMBER(namcos22_state::mcu130_speedup_r)
 // for NSTX7702 v1.00 (C74)
 READ16_MEMBER(namcos22_state::mcuc74_speedup_r)
 {
-//OBRISI.ME
 	if (((cpu_get_pc(&space.device()) == 0xc0df) || (cpu_get_pc(&space.device()) == 0xc101)) && (!(m_su_82 & 0xff00)))
 	{
 		device_spin_until_interrupt(&space.device());

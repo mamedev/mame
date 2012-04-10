@@ -91,7 +91,6 @@ WRITE16_MEMBER(offtwall_state::offtwall_atarivc_w)
 
 READ16_MEMBER(offtwall_state::special_port3_r)
 {
-//OBRISI.ME
 	int result = input_port_read(machine(), "260010");
 	if (m_cpu_to_sound_ready) result ^= 0x0020;
 	return result;
@@ -151,7 +150,6 @@ WRITE16_MEMBER(offtwall_state::io_latch_w)
 
 READ16_MEMBER(offtwall_state::bankswitch_r)
 {
-//OBRISI.ME
 
 	/* this is the table lookup; the bank is determined by the address that was requested */
 	m_bank_offset = (offset & 3) * 0x1000;
@@ -163,7 +161,6 @@ READ16_MEMBER(offtwall_state::bankswitch_r)
 
 READ16_MEMBER(offtwall_state::bankrom_r)
 {
-//OBRISI.ME
 
 	/* this is the banked ROM read */
 	logerror("%06X: %04X\n", cpu_get_previouspc(&space.device()), offset);
@@ -205,7 +202,6 @@ READ16_MEMBER(offtwall_state::bankrom_r)
 
 READ16_MEMBER(offtwall_state::spritecache_count_r)
 {
-//OBRISI.ME
 	int prevpc = cpu_get_previouspc(&space.device());
 
 	/* if this read is coming from $99f8 or $9992, it's in the sprite copy loop */
@@ -260,7 +256,6 @@ READ16_MEMBER(offtwall_state::spritecache_count_r)
 
 READ16_MEMBER(offtwall_state::unknown_verify_r)
 {
-//OBRISI.ME
 	int prevpc = cpu_get_previouspc(&space.device());
 	if (prevpc < 0x5c5e || prevpc > 0xc432)
 		return m_unknown_verify_base[offset];

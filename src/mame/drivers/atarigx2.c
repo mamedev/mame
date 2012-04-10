@@ -67,7 +67,6 @@ static MACHINE_RESET( atarigx2 )
 
 READ32_MEMBER(atarigx2_state::special_port2_r)
 {
-//OBRISI.ME
 	int temp = input_port_read(machine(), "SERVICE");
 	if (m_cpu_to_sound_ready) temp ^= 0x0020;
 	if (m_sound_to_cpu_ready) temp ^= 0x0010;
@@ -117,7 +116,6 @@ WRITE32_MEMBER(atarigx2_state::latch_w)
 	/* upper byte */
 	if (ACCESSING_BITS_24_31)
 	{
-//OBRISI.ME
 
 		/* bits 13-11 are the MO control bits */
 		atarirle_control_w(m_rle, (data >> 27) & 7);
@@ -131,7 +129,6 @@ WRITE32_MEMBER(atarigx2_state::latch_w)
 
 WRITE32_MEMBER(atarigx2_state::mo_command_w)
 {
-//OBRISI.ME
 	COMBINE_DATA(m_mo_command);
 	if (ACCESSING_BITS_0_15)
 		atarirle_command_w(m_rle, ((data & 0xffff) == 2) ? ATARIRLE_COMMAND_CHECKSUM : ATARIRLE_COMMAND_DRAW);
@@ -148,7 +145,6 @@ WRITE32_MEMBER(atarigx2_state::mo_command_w)
 
 WRITE32_MEMBER(atarigx2_state::atarigx2_protection_w)
 {
-//OBRISI.ME
 	{
 		int pc = cpu_get_previouspc(&space.device());
 //      if (pc == 0x11cbe || pc == 0x11c30)
@@ -1105,7 +1101,6 @@ READ32_MEMBER(atarigx2_state::atarigx2_protection_r)
 		{ 0xffffffff, 0xffff }
 	};
 
-//OBRISI.ME
 	UINT32 result = m_protection_base[offset];
 
 	if (offset == 0x300)

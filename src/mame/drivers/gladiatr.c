@@ -291,21 +291,18 @@ static WRITE8_DEVICE_HANDLER( glad_adpcm_w )
 
 WRITE8_MEMBER(gladiatr_state::glad_cpu_sound_command_w)
 {
-//OBRISI.ME
 	soundlatch_byte_w(*&space,0,data);
 	cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 READ8_MEMBER(gladiatr_state::glad_cpu_sound_command_r)
 {
-//OBRISI.ME
 	cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, CLEAR_LINE);
 	return soundlatch_byte_r(*&space,0);
 }
 
 WRITE8_MEMBER(gladiatr_state::gladiatr_flipscreen_w)
 {
-//OBRISI.ME
 	flip_screen_set(data & 1);
 }
 
@@ -326,7 +323,6 @@ WRITE8_MEMBER(gladiatr_state::gladiatr_irq_patch_w)
 
 WRITE8_MEMBER(gladiatr_state::qx0_w)
 {
-//OBRISI.ME
 	if(!offset)
 	{
 		m_data2=data;
@@ -336,7 +332,6 @@ WRITE8_MEMBER(gladiatr_state::qx0_w)
 
 WRITE8_MEMBER(gladiatr_state::qx1_w)
 {
-//OBRISI.ME
 	if(!offset)
 	{
 		m_data1=data;
@@ -354,7 +349,6 @@ READ8_MEMBER(gladiatr_state::qx3_r){ return machine().rand()&0xf; }
 
 READ8_MEMBER(gladiatr_state::qx0_r)
 {
-//OBRISI.ME
 	if(!offset)
 		 return m_data1;
 	else
@@ -363,7 +357,6 @@ READ8_MEMBER(gladiatr_state::qx0_r)
 
 READ8_MEMBER(gladiatr_state::qx1_r)
 {
-//OBRISI.ME
 	if(!offset)
 		return m_data2;
 	else
@@ -1001,7 +994,6 @@ static DRIVER_INIT( gladiatr )
 
 READ8_MEMBER(gladiatr_state::f6a3_r)
 {
-//OBRISI.ME
 	if(cpu_get_previouspc(&space.device())==0x8e)
 		m_nvram[0x6a3]=1;
 

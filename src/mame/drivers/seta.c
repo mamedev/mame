@@ -1381,7 +1381,6 @@ static void uPD71054_timer_init( running_machine &machine )
 ------------------------------*/
 WRITE16_MEMBER(seta_state::timer_regs_w)
 {
-//OBRISI.ME
 	uPD71054_state *uPD71054 = &m_uPD71054;
 
 	data &= 0xff;
@@ -1465,7 +1464,6 @@ static const ym3438_interface utoukond_ym3438_intf =
 
 READ16_MEMBER(seta_state::sharedram_68000_r)
 {
-//OBRISI.ME
 
 	return ((UINT16)m_sharedram[offset]) & 0xff;
 }
@@ -1474,7 +1472,6 @@ WRITE16_MEMBER(seta_state::sharedram_68000_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-//OBRISI.ME
 		m_sharedram[offset] = data & 0xff;
 	}
 }
@@ -1490,13 +1487,11 @@ WRITE16_MEMBER(seta_state::sharedram_68000_w)
 
 WRITE16_MEMBER(seta_state::sub_ctrl_w)
 {
-//OBRISI.ME
 	switch(offset)
 	{
 		case 0/2:	// bit 0: reset sub cpu?
 			if (ACCESSING_BITS_0_7)
 			{
-//OBRISI.ME
 
 				if ( !(m_sub_ctrl_data & 1) && (data & 1) )
 					cputag_set_input_line(machine(), "sub", INPUT_LINE_RESET, PULSE_LINE);
@@ -1656,7 +1651,6 @@ READ16_MEMBER(seta_state::calibr50_ip_r)
 
 WRITE16_MEMBER(seta_state::calibr50_soundlatch_w)
 {
-//OBRISI.ME
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_word_w(*&space, 0, data, mem_mask);
@@ -1708,7 +1702,6 @@ READ16_MEMBER(seta_state::usclssic_dsw_r)
 READ16_MEMBER(seta_state::usclssic_trackball_x_r)
 {
 	static const char *const portx_name[2] = { "P1X", "P2X" };
-//OBRISI.ME
 
 	switch (offset)
 	{
@@ -1721,7 +1714,6 @@ READ16_MEMBER(seta_state::usclssic_trackball_x_r)
 READ16_MEMBER(seta_state::usclssic_trackball_y_r)
 {
 	static const char *const porty_name[2] = { "P1Y", "P2Y" };
-//OBRISI.ME
 
 	switch (offset)
 	{
@@ -1736,7 +1728,6 @@ WRITE16_MEMBER(seta_state::usclssic_lockout_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-//OBRISI.ME
 		int tiles_offset = (data & 0x10) ? 0x4000: 0;
 
 		m_usclssic_port_select = (data & 0x40) >> 6;
@@ -1874,7 +1865,6 @@ ADDRESS_MAP_END
 READ16_MEMBER(seta_state::zombraid_gun_r)// Serial interface
 {
 	static const char *const portnames[] = { "GUNX1", "GUNY1", "GUNX2", "GUNY2" };
-//OBRISI.ME
 
 	int data = input_port_read(machine(), portnames[m_gun_input_src]);	// Input Ports 5-8
 	return (data >> m_gun_input_bit) & 1;
@@ -1883,7 +1873,6 @@ READ16_MEMBER(seta_state::zombraid_gun_r)// Serial interface
 // Bit 0 is clock, 1 is data, 2 is reset
 WRITE16_MEMBER(seta_state::zombraid_gun_w)
 {
-//OBRISI.ME
 
 	if(data&4) { m_gun_bit_count = 0; return; } // Reset
 
@@ -2069,7 +2058,6 @@ static const UINT16 keroppi_protection_word[] = {
 
 READ16_MEMBER(seta_state::keroppi_protection_r)
 {
-//OBRISI.ME
 	UINT16 result = keroppi_protection_word[m_keroppi_protection_count];
 
 	m_keroppi_protection_count++;
@@ -2081,7 +2069,6 @@ READ16_MEMBER(seta_state::keroppi_protection_r)
 
 READ16_MEMBER(seta_state::keroppi_protection_init_r)
 {
-//OBRISI.ME
 	m_keroppi_protection_count = 0;
 
 	return 0x00;
@@ -2089,7 +2076,6 @@ READ16_MEMBER(seta_state::keroppi_protection_init_r)
 
 READ16_MEMBER(seta_state::keroppi_coin_r)
 {
-//OBRISI.ME
 	UINT16 result = input_port_read(machine(), "COINS");
 
 	if (m_keroppi_prize_hop == 2)
@@ -2109,7 +2095,6 @@ static TIMER_CALLBACK( keroppi_prize_hop_callback )
 
 WRITE16_MEMBER(seta_state::keroppi_prize_w)
 {
-//OBRISI.ME
 	if ((data & 0x0010) && !m_keroppi_prize_hop)
 	{
 		m_keroppi_prize_hop = 1;
@@ -2457,7 +2442,6 @@ ADDRESS_MAP_END
 
 WRITE16_MEMBER(seta_state::msgundam_vregs_w)
 {
-//OBRISI.ME
 	// swap $500002 with $500004
 	switch( offset )
 	{
@@ -2561,7 +2545,6 @@ ADDRESS_MAP_END
 
 READ16_MEMBER(seta_state::kiwame_nvram_r)
 {
-//OBRISI.ME
 	return m_kiwame_nvram[offset] & 0xff;
 }
 
@@ -2569,7 +2552,6 @@ WRITE16_MEMBER(seta_state::kiwame_nvram_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-//OBRISI.ME
 		COMBINE_DATA( &m_kiwame_nvram[offset] );
 	}
 }
@@ -2681,14 +2663,12 @@ ADDRESS_MAP_END
 
 READ8_MEMBER(seta_state::wiggie_soundlatch_r)
 {
-//OBRISI.ME
 
 	return m_wiggie_soundlatch;
 }
 
 WRITE16_MEMBER(seta_state::wiggie_soundlatch_w)
 {
-//OBRISI.ME
 
 	m_wiggie_soundlatch = data >> 8;
 	cputag_set_input_line(machine(), "audiocpu", 0, HOLD_LINE);
@@ -2755,7 +2735,6 @@ ADDRESS_MAP_END
 
 WRITE16_MEMBER(seta_state::utoukond_soundlatch_w)
 {
-//OBRISI.ME
 	if (ACCESSING_BITS_0_7)
 	{
 		cputag_set_input_line(machine(), "audiocpu", 0, HOLD_LINE);
@@ -2789,7 +2768,6 @@ ADDRESS_MAP_END
 
 READ16_MEMBER(seta_state::pairlove_prot_r)
 {
-//OBRISI.ME
 	int retdata;
 
 	retdata = m_pairslove_protram[offset];
@@ -2800,7 +2778,6 @@ READ16_MEMBER(seta_state::pairlove_prot_r)
 
 WRITE16_MEMBER(seta_state::pairlove_prot_w)
 {
-//OBRISI.ME
 	//mame_printf_debug("pairs love protection? write %06x %04x %04x\n",cpu_get_pc(&space.device()), offset,data);
 	m_pairslove_protram_old[offset] = m_pairslove_protram[offset];
 	m_pairslove_protram[offset] = data;
@@ -2868,7 +2845,6 @@ READ16_MEMBER(seta_state::inttoote_dsw_r)
 
 READ16_MEMBER(seta_state::inttoote_key_r)
 {
-//OBRISI.ME
 
 	switch( *m_inttoote_key_select )
 	{
@@ -2885,7 +2861,6 @@ READ16_MEMBER(seta_state::inttoote_key_r)
 
 READ16_MEMBER(seta_state::inttoote_700000_r)
 {
-//OBRISI.ME
 
 	return m_inttoote_700000[offset] & 0x3f;
 }
@@ -2927,7 +2902,6 @@ ADDRESS_MAP_END
 
 READ16_MEMBER(seta_state::jockeyc_mux_r)
 {
-//OBRISI.ME
 
 	switch( m_jockeyc_key_select )
 	{
@@ -2943,7 +2917,6 @@ READ16_MEMBER(seta_state::jockeyc_mux_r)
 
 WRITE16_MEMBER(seta_state::jockeyc_mux_w)
 {
-//OBRISI.ME
 
 	/* other bits used too */
 	m_jockeyc_key_select = data & 0xf8;
@@ -3111,7 +3084,6 @@ static MACHINE_RESET(calibr50)
 
 WRITE8_MEMBER(seta_state::calibr50_soundlatch2_w)
 {
-//OBRISI.ME
 	soundlatch2_byte_w(space,0,data);
 	device_spin_until_time(&space.device(), attotime::from_usec(50));	// Allow the other cpu to reply
 }
@@ -10482,7 +10454,6 @@ READ16_MEMBER(seta_state::twineagl_debug_r)
 /* 2000F8 = A3 enables it, 2000F8 = 00 disables? see downtown too */
 READ16_MEMBER(seta_state::twineagl_200100_r)
 {
-//OBRISI.ME
 
 	// protection check at boot
 	logerror("%04x: twineagl_200100_r %d\n",cpu_get_pc(&space.device()),offset);
@@ -10494,7 +10465,6 @@ WRITE16_MEMBER(seta_state::twineagl_200100_w)
 
 	if (ACCESSING_BITS_0_7)
 	{
-//OBRISI.ME
 		m_twineagl_xram[offset] = data & 0xff;
 	}
 }
@@ -10513,7 +10483,6 @@ static DRIVER_INIT( twineagl )
 /* Protection? NVRAM is handled writing commands here */
 READ16_MEMBER(seta_state::downtown_protection_r)
 {
-//OBRISI.ME
 	int job = m_downtown_protection[0xf8/2] & 0xff;
 
 	switch (job)
@@ -10531,7 +10500,6 @@ READ16_MEMBER(seta_state::downtown_protection_r)
 
 WRITE16_MEMBER(seta_state::downtown_protection_w)
 {
-//OBRISI.ME
 	COMBINE_DATA(&m_downtown_protection[offset]);
 }
 

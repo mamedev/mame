@@ -41,7 +41,6 @@ public:
 
 /*----------- defined in video/atarig1.c -----------*/
 
-//OBRISI.ME
 
 VIDEO_START( atarig1 );
 SCREEN_VBLANK( atarig1 );

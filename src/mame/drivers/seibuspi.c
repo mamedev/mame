@@ -819,7 +819,6 @@ static void z80_fifoin_push(address_space *space, UINT8 data)
 
 READ32_MEMBER(seibuspi_state::sb_coin_r)
 {
-//OBRISI.ME
 	UINT8 r = m_sb_coin_latch;
 
 	m_sb_coin_latch = 0;
@@ -828,7 +827,6 @@ READ32_MEMBER(seibuspi_state::sb_coin_r)
 
 WRITE8_MEMBER(seibuspi_state::sb_coin_w)
 {
-//OBRISI.ME
 	if (data)
 		m_sb_coin_latch = 0xa0 | data;
 	else
@@ -851,7 +849,6 @@ WRITE32_MEMBER(seibuspi_state::sound_fifo_w)
 
 READ32_MEMBER(seibuspi_state::sound_fifo_status_r)
 {
-//OBRISI.ME
 	UINT32 r = 0;
 	if (m_fifoout_read_request)
 	{
@@ -892,7 +889,6 @@ static WRITE32_DEVICE_HANDLER( eeprom_w )
 
 WRITE32_MEMBER(seibuspi_state::z80_prg_fifo_w)
 {
-//OBRISI.ME
 	if( ACCESSING_BITS_0_7 ) {
 		if (m_z80_prg_fifo_pos<0x40000) m_z80_rom[m_z80_prg_fifo_pos] = data & 0xff;
 		m_z80_prg_fifo_pos++;
@@ -901,7 +897,6 @@ WRITE32_MEMBER(seibuspi_state::z80_prg_fifo_w)
 
 WRITE32_MEMBER(seibuspi_state::z80_enable_w)
 {
-//OBRISI.ME
 	// tile banks
 	if( ACCESSING_BITS_16_23 ) {
 		rf2_set_layer_banks(machine(), data >> 16);
@@ -971,7 +966,6 @@ WRITE8_MEMBER(seibuspi_state::z80_soundfifo_w)
 
 READ8_MEMBER(seibuspi_state::z80_soundfifo_status_r)
 {
-//OBRISI.ME
 	UINT8 r = 0;
 	if (m_fifoin_read_request)
 	{
@@ -982,7 +976,6 @@ READ8_MEMBER(seibuspi_state::z80_soundfifo_status_r)
 
 WRITE8_MEMBER(seibuspi_state::z80_bank_w)
 {
-//OBRISI.ME
 	if ((data & 7) != m_z80_lastbank)
 	{
 		m_z80_lastbank = (data & 7);
@@ -1154,7 +1147,6 @@ ADDRESS_MAP_END
 
 WRITE32_MEMBER(seibuspi_state::input_select_w)
 {
-//OBRISI.ME
 	m_ejsakura_input_port = data;
 }
 
@@ -1954,21 +1946,18 @@ MACHINE_CONFIG_END
 
 READ32_MEMBER(seibuspi_state::senkyu_speedup_r)
 {
-//OBRISI.ME
 	if (cpu_get_pc(&space.device())==0x00305bb2) device_spin_until_interrupt(&space.device()); // idle
 	return m_spimainram[(0x0018cb4-0x800)/4];
 }
 
 READ32_MEMBER(seibuspi_state::senkyua_speedup_r)
 {
-//OBRISI.ME
 	if (cpu_get_pc(&space.device())== 0x30582e) device_spin_until_interrupt(&space.device()); // idle
 	return m_spimainram[(0x0018c9c-0x800)/4];
 }
 
 READ32_MEMBER(seibuspi_state::batlball_speedup_r)
 {
-//OBRISI.ME
 //  printf("cpu_get_pc(&space.device()) %06x\n", cpu_get_pc(&space.device()));
 
 	/* batlbalu */
@@ -1982,7 +1971,6 @@ READ32_MEMBER(seibuspi_state::batlball_speedup_r)
 
 READ32_MEMBER(seibuspi_state::rdft_speedup_r)
 {
-//OBRISI.ME
 	/* rdft */
 	if (cpu_get_pc(&space.device())==0x0203f0a) device_spin_until_interrupt(&space.device()); // idle
 
@@ -2005,7 +1993,6 @@ READ32_MEMBER(seibuspi_state::rdft_speedup_r)
 
 READ32_MEMBER(seibuspi_state::viprp1_speedup_r)
 {
-//OBRISI.ME
 	/* viprp1 */
 	if (cpu_get_pc(&space.device())==0x0202769) device_spin_until_interrupt(&space.device()); // idle
 
@@ -2022,7 +2009,6 @@ READ32_MEMBER(seibuspi_state::viprp1_speedup_r)
 
 READ32_MEMBER(seibuspi_state::viprp1o_speedup_r)
 {
-//OBRISI.ME
 	/* viperp1o */
 	if (cpu_get_pc(&space.device())==0x0201f99) device_spin_until_interrupt(&space.device()); // idle
 //  mame_printf_debug("%08x\n",cpu_get_pc(&space.device()));
@@ -2041,7 +2027,6 @@ READ32_MEMBER(seibuspi_state::ejanhs_speedup_r)
 
 READ32_MEMBER(seibuspi_state::rf2_speedup_r)
 {
-//OBRISI.ME
 
 	/* rdft22kc */
 	if (cpu_get_pc(&space.device())==0x0203926) device_spin_until_interrupt(&space.device()); // idle
@@ -2062,7 +2047,6 @@ READ32_MEMBER(seibuspi_state::rf2_speedup_r)
 
 READ32_MEMBER(seibuspi_state::rfjet_speedup_r)
 {
-//OBRISI.ME
 	/* rfjet, rfjetu, rfjeta */
 	if (cpu_get_pc(&space.device())==0x0206082) device_spin_until_interrupt(&space.device()); // idle
 

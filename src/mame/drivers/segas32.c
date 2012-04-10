@@ -761,7 +761,6 @@ WRITE32_MEMBER(segas32_state::io_chip_1_w)
 
 READ16_MEMBER(segas32_state::io_expansion_r)
 {
-//OBRISI.ME
 	if (!m_custom_io_r[0].isnull())
 		return (m_custom_io_r[0])(space, offset, mem_mask);
 	else
@@ -772,7 +771,6 @@ READ16_MEMBER(segas32_state::io_expansion_r)
 
 WRITE16_MEMBER(segas32_state::io_expansion_w)
 {
-//OBRISI.ME
 	/* only LSB matters */
 	if (!ACCESSING_BITS_0_7)
 	return;
@@ -786,7 +784,6 @@ WRITE16_MEMBER(segas32_state::io_expansion_w)
 
 READ32_MEMBER(segas32_state::io_expansion_0_r)
 {
-//OBRISI.ME
 	if (!m_custom_io_r[0].isnull())
 		return (m_custom_io_r[0])(space, offset*2+0, mem_mask) |
 			  ((m_custom_io_r[0])(space, offset*2+1, mem_mask >> 16) << 16);
@@ -798,7 +795,6 @@ READ32_MEMBER(segas32_state::io_expansion_0_r)
 
 WRITE32_MEMBER(segas32_state::io_expansion_0_w)
 {
-//OBRISI.ME
 	/* only LSB matters */
 
 
@@ -826,7 +822,6 @@ WRITE32_MEMBER(segas32_state::io_expansion_0_w)
 
 READ32_MEMBER(segas32_state::io_expansion_1_r)
 {
-//OBRISI.ME
 	if (!m_custom_io_r[1].isnull())
 		return (m_custom_io_r[1])(space, offset*2+0, mem_mask) |
 			  ((m_custom_io_r[1])(space, offset*2+1, mem_mask >> 16) << 16);
@@ -838,7 +833,6 @@ READ32_MEMBER(segas32_state::io_expansion_1_r)
 
 WRITE32_MEMBER(segas32_state::io_expansion_1_w)
 {
-//OBRISI.ME
 	/* only LSB matters */
 	if (ACCESSING_BITS_0_7)
 	{
@@ -866,7 +860,6 @@ WRITE32_MEMBER(segas32_state::io_expansion_1_w)
 
 READ16_MEMBER(segas32_state::analog_custom_io_r)
 {
-//OBRISI.ME
 	UINT16 result;
 	switch (offset)
 	{
@@ -885,7 +878,6 @@ READ16_MEMBER(segas32_state::analog_custom_io_r)
 
 WRITE16_MEMBER(segas32_state::analog_custom_io_w)
 {
-//OBRISI.ME
 	static const char *const names[] = { "ANALOG1", "ANALOG2", "ANALOG3", "ANALOG4" };
 	switch (offset)
 	{
@@ -919,7 +911,6 @@ READ16_MEMBER(segas32_state::extra_custom_io_r)
 
 WRITE16_MEMBER(segas32_state::orunners_custom_io_w)
 {
-//OBRISI.ME
 	static const char *const names[] = { "ANALOG1", "ANALOG2", "ANALOG3", "ANALOG4", "ANALOG5", "ANALOG6", "ANALOG7", "ANALOG8" };
 	switch (offset)
 	{
@@ -940,7 +931,6 @@ WRITE16_MEMBER(segas32_state::orunners_custom_io_w)
 
 READ16_MEMBER(segas32_state::sonic_custom_io_r)
 {
-//OBRISI.ME
 	static const char *const names[] = { "TRACKX1", "TRACKY1", "TRACKX2", "TRACKY2", "TRACKX3", "TRACKY3" };
 
 	switch (offset)
@@ -961,7 +951,6 @@ READ16_MEMBER(segas32_state::sonic_custom_io_r)
 
 WRITE16_MEMBER(segas32_state::sonic_custom_io_w)
 {
-//OBRISI.ME
 	static const char *const names[] = { "TRACKX1", "TRACKY1", "TRACKX2", "TRACKY2", "TRACKX3", "TRACKY3" };
 
 	switch (offset)
@@ -1015,14 +1004,12 @@ READ32_MEMBER(segas32_state::random_number_32_r)
 
 READ16_MEMBER(segas32_state::shared_ram_16_r)
 {
-//OBRISI.ME
 	return m_z80_shared_ram[offset*2+0] | (m_z80_shared_ram[offset*2+1] << 8);
 }
 
 
 WRITE16_MEMBER(segas32_state::shared_ram_16_w)
 {
-//OBRISI.ME
 	if (ACCESSING_BITS_0_7)
 		m_z80_shared_ram[offset*2+0] = data;
 	if (ACCESSING_BITS_8_15)
@@ -1032,7 +1019,6 @@ WRITE16_MEMBER(segas32_state::shared_ram_16_w)
 
 READ32_MEMBER(segas32_state::shared_ram_32_r)
 {
-//OBRISI.ME
 	return m_z80_shared_ram[offset*4+0] | (m_z80_shared_ram[offset*4+1] << 8) |
 	      (m_z80_shared_ram[offset*4+2] << 16) | (m_z80_shared_ram[offset*4+3] << 24);
 }
@@ -1040,7 +1026,6 @@ READ32_MEMBER(segas32_state::shared_ram_32_r)
 
 WRITE32_MEMBER(segas32_state::shared_ram_32_w)
 {
-//OBRISI.ME
 	if (ACCESSING_BITS_0_7)
 		m_z80_shared_ram[offset*4+0] = data;
 	if (ACCESSING_BITS_8_15)
@@ -1106,7 +1091,6 @@ static void clear_sound_irq(running_machine &machine, int which)
 
 WRITE8_MEMBER(segas32_state::sound_int_control_lo_w)
 {
-//OBRISI.ME
 	/* odd offsets are interrupt acks */
 	if (offset & 1)
 	{
@@ -1122,7 +1106,6 @@ WRITE8_MEMBER(segas32_state::sound_int_control_lo_w)
 
 WRITE8_MEMBER(segas32_state::sound_int_control_hi_w)
 {
-//OBRISI.ME
 	m_sound_irq_control[offset] = data;
 	update_sound_irq_state(machine());
 }
@@ -1146,7 +1129,6 @@ static void ym3438_irq_handler(device_t *device, int state)
 
 WRITE8_MEMBER(segas32_state::sound_bank_lo_w)
 {
-//OBRISI.ME
 	m_sound_bank = (m_sound_bank & ~0x3f) | (data & 0x3f);
 	memory_set_bankptr(machine(), "bank1", machine().region("soundcpu")->base() + 0x100000 + 0x2000 * m_sound_bank);
 }
@@ -1154,7 +1136,6 @@ WRITE8_MEMBER(segas32_state::sound_bank_lo_w)
 
 WRITE8_MEMBER(segas32_state::sound_bank_hi_w)
 {
-//OBRISI.ME
 	m_sound_bank = (m_sound_bank & 0x3f) | ((data & 0x04) << 4) | ((data & 0x03) << 7);
 	memory_set_bankptr(machine(), "bank1", machine().region("soundcpu")->base() + 0x100000 + 0x2000 * m_sound_bank);
 }
@@ -1181,14 +1162,12 @@ static WRITE8_DEVICE_HANDLER( scross_bank_w )
 
 READ8_MEMBER(segas32_state::sound_dummy_r)
 {
-//OBRISI.ME
 	return m_sound_dummy_value;
 }
 
 
 WRITE8_MEMBER(segas32_state::sound_dummy_w)
 {
-//OBRISI.ME
 	m_sound_dummy_value = data;
 }
 
@@ -2141,13 +2120,11 @@ static const ym3438_interface ym3438_config =
 
 WRITE16_MEMBER(segas32_state::dual_pcb_comms_w)
 {
-//OBRISI.ME
 	COMBINE_DATA(&m_dual_pcb_comms[offset]);
 }
 
 READ16_MEMBER(segas32_state::dual_pcb_comms_r)
 {
-//OBRISI.ME
 	return m_dual_pcb_comms[offset];
 }
 

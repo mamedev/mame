@@ -1209,13 +1209,11 @@ GFXDECODE_END
 
 READ8_MEMBER(scramble_state::scramble_soundram_r)
 {
-//OBRISI.ME
 	return m_soundram[offset & 0x03ff];
 }
 
 WRITE8_MEMBER(scramble_state::scramble_soundram_w)
 {
-//OBRISI.ME
 	m_soundram[offset & 0x03ff] = data;
 }
 

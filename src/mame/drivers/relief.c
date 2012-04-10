@@ -95,7 +95,6 @@ static MACHINE_RESET( relief )
 
 READ16_MEMBER(relief_state::special_port2_r)
 {
-//OBRISI.ME
 	int result = input_port_read(machine(), "260010");
 	if (m_cpu_to_sound_ready) result ^= 0x0020;
 	if (!(result & 0x0080) || atarigen_get_hblank(*machine().primary_screen)) result ^= 0x0001;
@@ -112,7 +111,6 @@ READ16_MEMBER(relief_state::special_port2_r)
 
 WRITE16_MEMBER(relief_state::audio_control_w)
 {
-//OBRISI.ME
 	if (ACCESSING_BITS_0_7)
 	{
 		m_ym2413_volume = (data >> 1) & 15;
@@ -129,7 +127,6 @@ WRITE16_MEMBER(relief_state::audio_control_w)
 
 WRITE16_MEMBER(relief_state::audio_volume_w)
 {
-//OBRISI.ME
 	if (ACCESSING_BITS_0_7)
 	{
 		m_overall_volume = data & 127;
