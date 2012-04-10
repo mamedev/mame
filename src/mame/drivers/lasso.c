@@ -50,7 +50,7 @@ static INPUT_CHANGED( coin_inserted )
 WRITE8_MEMBER(lasso_state::sound_command_w)
 {
 	soundlatch_byte_w(space, offset, data);
-	generic_pulse_irq_line(m_audiocpu, 0, 1);
+	generic_pulse_irq_line(m_audiocpu->execute(), 0, 1);
 }
 
 WRITE8_MEMBER(lasso_state::pinbo_sound_command_w)

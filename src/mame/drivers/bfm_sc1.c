@@ -303,7 +303,7 @@ WRITE8_MEMBER(bfm_sc1_state::mmtr_w)
 			if ( changed & (1 << i) )
 			{
 				MechMtr_update(i, data & (1 << i) );
-				generic_pulse_irq_line(machine().device("maincpu"), M6809_FIRQ_LINE, 1);
+				generic_pulse_irq_line(machine().device("maincpu")->execute(), M6809_FIRQ_LINE, 1);
 			}
 		}
 	}

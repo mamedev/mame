@@ -1403,7 +1403,7 @@ WRITE8_MEMBER(bfcobra_state::meter_w)
 		if (changed & (1 << i))
 		{
 			MechMtr_update(i, data & (1 << i) );
-			generic_pulse_irq_line(&space.device(), M6809_FIRQ_LINE, 1);
+			generic_pulse_irq_line(space.device().execute(), M6809_FIRQ_LINE, 1);
 		}
 	}
 }

@@ -530,3 +530,42 @@ CUSTOM_INPUT_MEMBER( driver_device::custom_port_read )
 	const char *tag = (const char *)param;
 	return input_port_read(machine(), tag);
 }
+
+
+void generic_pulse_irq_line(device_t *device, int irqline, int cycles) { device->machine().driver_data()->generic_pulse_irq_line(device->execute(), irqline, cycles); }
+void generic_pulse_irq_line_and_vector(device_t *device, int irqline, int vector, int cycles) { device->machine().driver_data()->generic_pulse_irq_line_and_vector(device->execute(), irqline, vector, cycles); }
+
+INTERRUPT_GEN( nmi_line_pulse ) { device->machine().driver_data()->nmi_line_pulse(*device); }
+INTERRUPT_GEN( nmi_line_assert ) { device->machine().driver_data()->nmi_line_assert(*device); }
+
+INTERRUPT_GEN( irq0_line_hold ) { device->machine().driver_data()->irq0_line_hold(*device); }
+INTERRUPT_GEN( irq0_line_pulse ) { device->machine().driver_data()->irq0_line_pulse(*device); }
+INTERRUPT_GEN( irq0_line_assert ) { device->machine().driver_data()->irq0_line_assert(*device); }
+
+INTERRUPT_GEN( irq1_line_hold ) { device->machine().driver_data()->irq1_line_hold(*device); }
+INTERRUPT_GEN( irq1_line_pulse ) { device->machine().driver_data()->irq1_line_pulse(*device); }
+INTERRUPT_GEN( irq1_line_assert ) { device->machine().driver_data()->irq1_line_assert(*device); }
+
+INTERRUPT_GEN( irq2_line_hold ) { device->machine().driver_data()->irq2_line_hold(*device); }
+INTERRUPT_GEN( irq2_line_pulse ) { device->machine().driver_data()->irq2_line_pulse(*device); }
+INTERRUPT_GEN( irq2_line_assert ) { device->machine().driver_data()->irq2_line_assert(*device); }
+
+INTERRUPT_GEN( irq3_line_hold ) { device->machine().driver_data()->irq3_line_hold(*device); }
+INTERRUPT_GEN( irq3_line_pulse ) { device->machine().driver_data()->irq3_line_pulse(*device); }
+INTERRUPT_GEN( irq3_line_assert ) { device->machine().driver_data()->irq3_line_assert(*device); }
+
+INTERRUPT_GEN( irq4_line_hold ) { device->machine().driver_data()->irq4_line_hold(*device); }
+INTERRUPT_GEN( irq4_line_pulse ) { device->machine().driver_data()->irq4_line_pulse(*device); }
+INTERRUPT_GEN( irq4_line_assert ) { device->machine().driver_data()->irq4_line_assert(*device); }
+
+INTERRUPT_GEN( irq5_line_hold ) { device->machine().driver_data()->irq5_line_hold(*device); }
+INTERRUPT_GEN( irq5_line_pulse ) { device->machine().driver_data()->irq5_line_pulse(*device); }
+INTERRUPT_GEN( irq5_line_assert ) { device->machine().driver_data()->irq5_line_assert(*device); }
+
+INTERRUPT_GEN( irq6_line_hold ) { device->machine().driver_data()->irq6_line_hold(*device); }
+INTERRUPT_GEN( irq6_line_pulse ) { device->machine().driver_data()->irq6_line_pulse(*device); }
+INTERRUPT_GEN( irq6_line_assert ) { device->machine().driver_data()->irq6_line_assert(*device); }
+
+INTERRUPT_GEN( irq7_line_hold ) { device->machine().driver_data()->irq7_line_hold(*device); }
+INTERRUPT_GEN( irq7_line_pulse ) { device->machine().driver_data()->irq7_line_pulse(*device); }
+INTERRUPT_GEN( irq7_line_assert ) { device->machine().driver_data()->irq7_line_assert(*device); }
