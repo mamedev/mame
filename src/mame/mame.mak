@@ -2207,5 +2207,6 @@ $(VIDEO)/model2.o:	$(MAMESRC)/video/model2rd.c
 $(VIDEO)/model3.o:	$(MAMESRC)/video/m3raster.c
 $(VIDEO)/n64.o:		$(MAMESRC)/video/rdpfiltr.c
 $(DRIVERS)/bfm_sc4.o: $(MAMESRC)/includes/bfm_sc45.h
+$(DRIVERS)/bfm_sc5.o: $(MAMESRC)/includes/bfm_sc45.h
 
 

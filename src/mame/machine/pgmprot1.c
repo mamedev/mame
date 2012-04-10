@@ -299,16 +299,89 @@ DRIVER_INIT( kovsh )
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x4f0008, 0x4f0009, FUNC(kovsh_fake_region_r));
 }
 
+/* Fake remapping of ASIC commands to the ones used by KOVSH due to the lack of the real ARM rom for this set */
+WRITE16_HANDLER( kovshp_asic27a_write_word )
+{
+	pgm_arm_type1_state *state = space->machine().driver_data<pgm_arm_type1_state>();
+
+	switch (offset)
+	{
+		case 0:
+			state->m_pgm_arm_type1_lowlatch_68k_w = data;
+		return;
+
+		case 1:
+		{
+			unsigned char asic_key = data >> 8;
+			unsigned char asic_cmd = (data & 0xff) ^ asic_key;
+
+			switch (asic_cmd)
+			{
+				case 0x9a: asic_cmd = 0x99; break; // kovshxas
+
+                case 0x38: asic_cmd = 0xad; break;
+                case 0x43: asic_cmd = 0xca; break;
+                case 0x56: asic_cmd = 0xac; break;
+                case 0x73: asic_cmd = 0x93; break;
+                case 0x84: asic_cmd = 0xb3; break;
+                case 0x87: asic_cmd = 0xb1; break;
+                case 0x89: asic_cmd = 0xb6; break;
+                case 0x93: asic_cmd = 0x73; break;
+                case 0xa5: asic_cmd = 0xa9; break;
+                case 0xac: asic_cmd = 0x56; break;
+                case 0xad: asic_cmd = 0x38; break;
+                case 0xb1: asic_cmd = 0x87; break;
+                case 0xb3: asic_cmd = 0x84; break;
+                case 0xb4: asic_cmd = 0x90; break;
+                case 0xb6: asic_cmd = 0x89; break;
+                case 0xc5: asic_cmd = 0x8c; break;
+                case 0xca: asic_cmd = 0x43; break;
+                case 0xcc: asic_cmd = 0xf0; break;
+                case 0xd0: asic_cmd = 0xe0; break;
+                case 0xe0: asic_cmd = 0xd0; break;
+                case 0xe7: asic_cmd = 0x70; break;
+                case 0xed: asic_cmd = 0xcb; break;
+                case 0xf0: asic_cmd = 0xcc; break;
+                case 0xf1: asic_cmd = 0xf5; break;
+                case 0xf2: asic_cmd = 0xf1; break;
+                case 0xf4: asic_cmd = 0xf2; break;
+                case 0xf5: asic_cmd = 0xf4; break;
+                case 0xfc: asic_cmd = 0xc0; break;
+                case 0xfe: asic_cmd = 0xc3; break;
+
+				case 0xa6: asic_cmd = 0xa9; break;
+				case 0xaa: asic_cmd = 0x56; break;
+				case 0xf8: asic_cmd = 0xf3; break;
+			}
+
+			state->m_pgm_arm_type1_highlatch_68k_w = asic_cmd ^ (asic_key | (asic_key << 8));
+		}
+		return;
+	}
+}
+
+
 DRIVER_INIT( kovshp )
 {
 	pgm_basic_init(machine);
 	pgm_kovshp_decrypt(machine);
 	pgm_arm7_type1_latch_init(machine);
-	/* we only have a china internal ROM dumped for now.. allow region to be changed for debugging (to ensure all alt titles / regions can be seen) */
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x4f0008, 0x4f0009, FUNC(kovsh_fake_region_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x500000, 0x500005, FUNC(kovshp_asic27a_write_word));
 }
 
+
+
 /* bootleg inits */
+
+DRIVER_INIT( kovshxas )
+{
+	pgm_basic_init(machine);
+//	pgm_kovshp_decrypt(machine);
+	pgm_arm7_type1_latch_init(machine);
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x4f0008, 0x4f0009, FUNC(kovsh_fake_region_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x500000, 0x500005, FUNC(kovshp_asic27a_write_word));
+}
 
 static void pgm_decode_kovlsqh2_tiles( running_machine &machine )
 {
@@ -411,8 +484,8 @@ DRIVER_INIT( kovlsqh2 )
 	pgm_decode_kovlsqh2_samples(machine);
 	pgm_basic_init(machine);
 	pgm_arm7_type1_latch_init(machine);
-	/* we only have a china internal ROM dumped for now.. allow region to be changed for debugging (to ensure all alt titles / regions can be seen) */
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x4f0008, 0x4f0009, FUNC(kovsh_fake_region_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x500000, 0x500005, FUNC(kovshp_asic27a_write_word));
 }
 
 DRIVER_INIT( kovqhsgs )

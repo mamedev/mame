@@ -2705,11 +2705,10 @@ CPU_GET_INFO( scc68070 )
 
 static READ32_HANDLER( m68340_internal_base_r )
 {
-
-
+	m68ki_cpu_core *m68k = m68k_get_safe_token(&space->device());
 	int pc = cpu_get_pc(&space->device());
-	logerror("%08x m68340_internal_base_r %08x, (%04x)\n", pc, offset*4,mem_mask);
-	return 0x55555555;
+	logerror("%08x m68340_internal_base_r %08x, (%08x)\n", pc, offset*4,mem_mask);
+	return m68k->m68340_base;
 }
 
 static WRITE32_HANDLER( m68340_internal_base_w )
@@ -2717,7 +2716,7 @@ static WRITE32_HANDLER( m68340_internal_base_w )
 	m68ki_cpu_core *m68k = m68k_get_safe_token(&space->device());
 
 	int pc = cpu_get_pc(&space->device());
-	logerror("%08x m68340_internal_base_w %08x, %04x (%04x)\n", pc, offset*4,data,mem_mask);
+	logerror("%08x m68340_internal_base_w %08x, %08x (%08x)\n", pc, offset*4,data,mem_mask);
 
 	// other conditions?
 	if (m68k->dfc==0x7)
@@ -2735,7 +2734,7 @@ static WRITE32_HANDLER( m68340_internal_base_w )
 		}
 
 		COMBINE_DATA(&m68k->m68340_base);
-		logerror("%08x m68340_internal_base_w %08x, %04x (%04x) (m68340_base write)\n", pc, offset*4,data,mem_mask);
+		logerror("%08x m68340_internal_base_w %08x, %08x (%08x) (m68340_base write)\n", pc, offset*4,data,mem_mask);
 
 		// map new modules
 		if (m68k->m68340_base&1)

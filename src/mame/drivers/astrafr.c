@@ -1,6 +1,5 @@
 /* Astra Fruit Machines
- -- Unknown HW platform (related to pluto5.c?)
- -- 68k based
+ -- Unknown 68340 based HW platform (seems related to pluto5.c?)
  -- dumps are of an unknown quality
  -- These might all be the same system with different rom configurations, or different systems (unknown)
  -- Some sets contain what look to be additional sound roms, others have them in the main program roms?
@@ -15,56 +14,209 @@ Platform also used by Lowen? (at least some of their sets use the same address l
 #include "cpu/m68000/m68000.h"
 
 
+
 class astrafr_state : public driver_device
 {
 public:
 	astrafr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag)
+	{ 
+		fgpa_first_read_addr = 0xffff;
+		fgpa_rom_write_addr = 0xffff;
+		fgpa_after_rom_write_addr = 0xffff;
+	}
+
+	// ports move above from game to game..
+	UINT16 fgpa_rom_write_addr;
+	UINT16 fgpa_first_read_addr;
+	UINT16 fgpa_after_rom_write_addr;
+
+	DECLARE_READ8_MEMBER( astra_fgpa_r )
+	{
+		int pc = cpu_get_pc(&space.device());
+		
+		if (offset==fgpa_first_read_addr)
+		{
+			return 0xff;
+		}
+		else
+		{
+			logerror("%08x astra_fgpa_r offset %02x\n", pc, offset);
+			return 0xff;
+		}
+	}
+	
+	DECLARE_WRITE8_MEMBER( astra_fgpa_w )
+	{
+		int pc = cpu_get_pc(&space.device());
+		
+		if (offset==fgpa_rom_write_addr)
+		{
+			// the games write most of the ROM data to a port
+			// I think it kicks the FPGA into life?
+		}
+		else
+		{
+			logerror("%08x astra_fgpa_w offset %02x %02x\n", pc, offset, data);
+		}
+	}
+
+	/* 2nd copy for the 2nd board (assume same addresses for now */
+	DECLARE_READ8_MEMBER( astra_fgpa_slave_r )
+	{
+		int pc = cpu_get_pc(&space.device());
+		
+		if (offset==fgpa_first_read_addr)
+		{
+			return 0xff;
+		}
+		else
+		{
+			logerror("%08x astra_fgpa_slave_r offset %02x\n", pc, offset);
+			return 0xff;
+		}
+	}
+	
+	DECLARE_WRITE8_MEMBER( astra_fgpa_slave_w )
+	{
+		int pc = cpu_get_pc(&space.device());
+		
+		if (offset==fgpa_rom_write_addr)
+		{
+			// the games write most of the ROM data to a port
+			// I think it kicks the FPGA into life?
+		}
+		else
+		{
+			logerror("%08x astra_fgpa_slave_w offset %02x %02x\n", pc, offset, data);
+		}
+	}
+
 };
 
 
 static ADDRESS_MAP_START( astrafr_master_map, AS_PROGRAM, 32, astrafr_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
+	AM_RANGE(0x800000, 0x8000ff) AM_READWRITE8(astra_fgpa_r, astra_fgpa_w, 0xffffffff)
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM // as_partyd set
 ADDRESS_MAP_END
 
-// probably identical, afaik they're linekd units..
+// probably identical, afaik they're linked units..
 static ADDRESS_MAP_START( astrafr_slave_map, AS_PROGRAM, 32, astrafr_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
+	AM_RANGE(0x800000, 0x8000ff) AM_READWRITE8(astra_fgpa_slave_r, astra_fgpa_slave_w, 0xffffffff)
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM // as_partyd set
 ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START( astrafr_master_alt_map, AS_PROGRAM, 32, astrafr_state )
+	AM_RANGE(0x0000000, 0x01fffff) AM_ROM
+	AM_RANGE(0x1000000, 0x1009fff) AM_RAM // ?
+	AM_RANGE(0x2000000, 0x20000ff) AM_READWRITE8(astra_fgpa_r, astra_fgpa_w, 0xffffffff)
+ADDRESS_MAP_END
+
+
 
 
 static ADDRESS_MAP_START( astra_map, AS_PROGRAM, 32, astrafr_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
+	AM_RANGE(0x800000, 0x8000ff) AM_READWRITE8(astra_fgpa_r, astra_fgpa_w, 0xffffffff)
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM // as_partyd set
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( astra_alt_map, AS_PROGRAM, 32, astrafr_state )
+	AM_RANGE(0x0000000, 0x01fffff) AM_ROM
+	AM_RANGE(0x1000000, 0x1009fff) AM_RAM // ?
+	AM_RANGE(0x2000000, 0x20000ff) AM_READWRITE8(astra_fgpa_r, astra_fgpa_w, 0xffffffff)
+ADDRESS_MAP_END
 
 static INPUT_PORTS_START( astrafr )
 INPUT_PORTS_END
 
+/* the FPGA area read/write addresses move around ... */
+static MACHINE_START( astra_37 )
+{
+	astrafr_state *state = machine.driver_data<astrafr_state>();
+	state->fgpa_after_rom_write_addr = 0x30;
+	state->fgpa_first_read_addr = 0x33;
+	state->fgpa_rom_write_addr = 0x37;
+}
+
+static MACHINE_START( astra_2e )
+{
+	astrafr_state *state = machine.driver_data<astrafr_state>();
+	state->fgpa_after_rom_write_addr = 0x20;
+	state->fgpa_first_read_addr = 0x23;
+	state->fgpa_rom_write_addr = 0x2e;
+}
+
 
 static MACHINE_CONFIG_START( astrafr_dual, astrafr_state )
-
-	MCFG_CPU_ADD("maincpu", M68020, 16000000) // probably 68340 like other systems of this era? definitely not plain 68k
+	MCFG_CPU_ADD("maincpu", M68340, 16000000)
 	MCFG_CPU_PROGRAM_MAP(astrafr_master_map)
 
-	MCFG_CPU_ADD("slavecpu", M68020, 16000000) // probably 68340 like other systems of this era? definitely not plain 68k
+	MCFG_CPU_ADD("slavecpu", M68340, 16000000)
 	MCFG_CPU_PROGRAM_MAP(astrafr_slave_map)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( astrafr_dual_2e, astrafr_dual )
+	MCFG_MACHINE_START( astra_2e )
+MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( astra_single, astrafr_state )
+static MACHINE_CONFIG_DERIVED( astrafr_dual_37, astrafr_dual )
+	MCFG_MACHINE_START( astra_37 )
+MACHINE_CONFIG_END
 
-	MCFG_CPU_ADD("maincpu", M68020, 16000000)
-	MCFG_CPU_PROGRAM_MAP(astra_map)
+static MACHINE_CONFIG_START( astrafr_dual_alt, astrafr_state )
+	MCFG_CPU_ADD("maincpu", M68340, 16000000)
+	MCFG_CPU_PROGRAM_MAP(astrafr_master_alt_map)
+
+	MCFG_CPU_ADD("slavecpu", M68340, 16000000)
+	MCFG_CPU_PROGRAM_MAP(astrafr_slave_map)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( astrafr_dual_alt_37, astrafr_dual_alt )
+	MCFG_MACHINE_START( astra_37 )
 MACHINE_CONFIG_END
 
 
 
+static MACHINE_CONFIG_START( astra_single, astrafr_state )
+	MCFG_CPU_ADD("maincpu", M68340, 16000000)
+	MCFG_CPU_PROGRAM_MAP(astra_map)
+MACHINE_CONFIG_END
 
-/* are the ptM roms Master nad ptS roms Slave?
+static MACHINE_CONFIG_DERIVED( astra_single_37, astra_single )
+	MCFG_MACHINE_START( astra_37 )
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( astra_single_2e, astra_single )
+	MCFG_MACHINE_START( astra_2e )
+MACHINE_CONFIG_END
+
+static MACHINE_START( astra_57 )
+{
+	astrafr_state *state = machine.driver_data<astrafr_state>();
+//	state->fgpa_after_rom_write_addr = 0x20;
+//	state->fgpa_first_read_addr = 0x23;
+	state->fgpa_rom_write_addr = 0x57;
+}
+
+
+static MACHINE_CONFIG_START( astra_single_alt, astrafr_state )
+	MCFG_CPU_ADD("maincpu", M68340, 16000000)
+	MCFG_CPU_PROGRAM_MAP(astra_alt_map)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( astra_single_alt_57, astra_single_alt )
+	MCFG_MACHINE_START( astra_57 )
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( astra_single_alt_37, astra_single_alt )
+	MCFG_MACHINE_START( astra_37 )
+MACHINE_CONFIG_END
+
+/* are the ptM roms Master and ptS roms Slave?
   or is as_partyd set actually the master, with the larger roms?
 */
 
@@ -75,8 +227,56 @@ ROM_START( as_party )
 	ROM_REGION( 0x200000, "slavecpu", 0 )
 	ROM_LOAD( "pts105.u1", 0x0000, 0x080000, CRC(0699143f) SHA1(486dff92c27ede8cd0d9395f6e4418ba0d056e90) )
 
-	ROM_REGION( 0x200000, "altrevs", 0 )
+	ROM_REGION( 0x200000, "altrevs", 0 ) /* these were in 'party time' sets, but I don't think they're all party time! */
 	ROM_LOAD( "pts105d.u1", 0x0000, 0x080000, CRC(0f628b8c) SHA1(c970db9274df6b9c0383ae6e0bcf9b24288a40cd) )
+	ROM_LOAD( "ptmv0-02.bin", 0x0000, 0x080000, CRC(e9dd8674) SHA1(ace543bc7fea8d09661e76c1ade4e1f27db5a116) )
+	ROM_LOAD( "ptmv1-04.bin", 0x0000, 0x080000, CRC(32af5358) SHA1(bd61c396824bb2b6845126162c4ff797564ebdf2) )
+	ROM_LOAD( "ptmv1-13.bin", 0x0000, 0x080000, CRC(4f321735) SHA1(3f9b0b64c42011d948291cd774a922393793a4b1) )
+	ROM_LOAD( "joker03.u1", 0x0000, 0x080000, CRC(a3dd15e8) SHA1(95d04de6c991b3c1ff43b0f477f03213e83f63f2) )
+	ROM_LOAD( "joker03.u2", 0x0000, 0x080000, CRC(57b3305a) SHA1(c38bc7db6c9a3f8f5371bb4c555333404fed6a9f) )
+	ROM_LOAD( "jokr03d.u1", 0x0000, 0x080000, CRC(aa268a5b) SHA1(cce89dbaaaf2d44daf127de1ad6d621c46d892fc) )
+	ROM_LOAD( "jokr03g.u1", 0x0000, 0x080000, CRC(cb12f8fa) SHA1(7a9c9fe72b70fe1b4a3be2edfde9d7a54d7a8219) )
+	ROM_LOAD( "jst0-05.u1", 0x0000, 0x080000, CRC(38f2d7b0) SHA1(11ccb5b5a35e43f505a7d3ebc36a0694111fed11) )
+	ROM_LOAD( "jst0-05.u2", 0x0000, 0x080000, CRC(97c14933) SHA1(8515601fbacf76a78a95e4a46a47809fcec021bc) )
+	ROM_LOAD( "jst0-05d.u1", 0x0000, 0x080000, CRC(31094803) SHA1(b7b5fd97681c38de5e877ca7b09909c82316d4d8) )
+	ROM_LOAD( "jst0-05g.u1", 0x0000, 0x080000, CRC(503d3aa2) SHA1(818e79126ca8ae6bbd1eaac2ae13977b3402f497) )
+	ROM_LOAD( "jst0-06.u1", 0x0000, 0x080000, CRC(b6106ca4) SHA1(dedeeff6e8c13da1f62e882cbeb36567a631e563) )
+	ROM_LOAD( "jst0-06.u2", 0x0000, 0x080000, CRC(49a78695) SHA1(af99df8c97a8c3bcb5a81a38b985e1fc92176927) )
+	ROM_LOAD( "jst0-06d.u1", 0x0000, 0x080000, CRC(bfebf317) SHA1(7f1a2a8e3f3de6a03452f535d2c314810bc652da) )
+	ROM_LOAD( "jst0-06g.u1", 0x0000, 0x080000, CRC(dedf81b6) SHA1(0579501c939eacb93d1455eaf74b629c2170b05b) )
+	ROM_LOAD( "l7v1-03.bin", 0x0000, 0x080000, CRC(878d1a3d) SHA1(fd7cb08f698bb6bbfed1c57486e53dce062d22e4) )
+	ROM_LOAD( "l7v1-03d.bin", 0x0000, 0x080000, CRC(91a81e50) SHA1(6086861bd5a53fa17df8b155acd47e9aa45a032d) )
+	ROM_LOAD( "pbmv0-06.u1", 0x0000, 0x080000, CRC(d0283320) SHA1(472f0e0dd45da61081ca12e466ac02dc82eb4431) )
+	ROM_LOAD( "pbmv0-06.u2", 0x0000, 0x080000, CRC(38fb2ff6) SHA1(628dcdcbf4767db62b4bdee7b7feff32715e6a2d) )
+	ROM_LOAD( "pbs0-06d.u1", 0x0000, 0x080000, CRC(f24e84d2) SHA1(d54e787c91c79a26383971249f935529e2a492f4) )
+	ROM_LOAD( "pbs0-06g.u1", 0x0000, 0x080000, CRC(937af673) SHA1(88f33fd3921440a99b662fec7291c8b9845210a5) )
+	ROM_LOAD( "pbsv0-06.u1", 0x0000, 0x080000, CRC(fbb51b61) SHA1(c1459f8f2d9f182e5be55bbcaf143315f7efc3b0) )
+	ROM_LOAD( "pbsv0-06.u2", 0x0000, 0x080000, CRC(2f0934de) SHA1(915a16898087f396457d712e3847f4f7c0bd5c06) )
+	ROM_LOAD( "pgm0-04.u1", 0x0000, 0x040000, CRC(2885367c) SHA1(c33cb554889b1f7390baa416a77953f45a80044f) )
+	ROM_LOAD( "pgm0-04.u2", 0x0000, 0x040000, CRC(c5eed515) SHA1(9b832a6ef301a25bccf2d97cca0c9a012ca0090a) )
+	ROM_LOAD( "pgm1-00.u1", 0x0000, 0x040000, CRC(1fa4e10f) SHA1(787ec967a9aba5934db79fe67efb32370d2c0258) )
+	ROM_LOAD( "pgm1-00.u2", 0x0000, 0x040000, CRC(8b5a6178) SHA1(e1f9898ef37877ce50630a468b3c187a4fe253fa) )
+	ROM_LOAD( "pgs0-04d.u1", 0x0000, 0x040000, CRC(1f5ede2c) SHA1(ac67536a021b531efe18027806f1f86504d72493) )
+	ROM_LOAD( "pgsv0-04.u1", 0x0000, 0x040000, CRC(cb3387be) SHA1(2add224a8839e83cc04901274acc7ca4a781b7d9) )
+	ROM_LOAD( "pgsv0-04.u2", 0x0000, 0x040000, CRC(63054bd6) SHA1(59cf8dd7efdaf2491a2aca8fbcda2d3b8b70fbf7) )
+	ROM_LOAD( "pgsv1-00.u1", 0x0000, 0x040000, CRC(725dd2af) SHA1(f8ecd1282809c0906497c62a68429152c10e2da0) )
+	ROM_LOAD( "pgsv1-00.u2", 0x0000, 0x040000, CRC(067dd0c2) SHA1(ac36aeb63b33969dc0a49150e41bfdd8624072de) )
+	ROM_LOAD( "pgsv100d.u1", 0x0000, 0x040000, CRC(a6308b3d) SHA1(125ed244bcb7a515dfc9c34c12bc74f8cd50e8dd) )
+	ROM_LOAD( "ptp003d.u1", 0x0000, 0x100000, CRC(2b2c05b6) SHA1(541a53c84c07bd7e1f09d4d033cf652ab838b4ef) )
+	ROM_LOAD( "ptp003g.u1", 0x0000, 0x100000, CRC(d9d0e151) SHA1(35fb4412602b9fd3b66e7170cc1984693b9c9ebd) )
+	ROM_LOAD( "ptpv003.u1", 0x0000, 0x100000, CRC(07c189da) SHA1(c4574cdedba87058312db84c6ee7f4a7142eea65) )
+	ROM_LOAD( "ptpv003.u2", 0x0000, 0x100000, CRC(e1f78cf4) SHA1(5f72b2604fd7ee300f6bd5b5a12d98c77b03b9ba) )
+	ROM_LOAD( "pts1-04d.bin", 0x0000, 0x080000, CRC(95564b9f) SHA1(98091d4badd346578882db75a8d72ddaa810b3f5) )
+	ROM_LOAD( "pts1-13d.bin", 0x0000, 0x080000, CRC(876232cf) SHA1(5d2355f85bde636dcb6f3dbd87874294db8e1ded) )
+	ROM_LOAD( "ptsv0-02.bin", 0x0000, 0x080000, CRC(3cc9c022) SHA1(1eb3c237971cf407057d077fd08e4436c765ae43) )
+	ROM_LOAD( "ptsv1-04.bin", 0x0000, 0x080000, CRC(9cadd42c) SHA1(e6ead7112195a17797672112c7bbd4910ae6eb50) )
+	ROM_LOAD( "ptsv1-13.bin", 0x0000, 0x080000, CRC(8e99ad7c) SHA1(d4cfce825b4a718a12d80e79ed943797c6510ad6) )
+	ROM_LOAD( "sov0-03.u1", 0x0000, 0x080000, CRC(4e2e7a79) SHA1(77f32b43d2e01cb0223feccb9e29c3fde0a6e9b7) )
+	ROM_LOAD( "sov0-03.u2", 0x0000, 0x080000, CRC(1ef8712a) SHA1(1a2ef378679384e720e5b20f1420454102f18258) )
+	ROM_LOAD( "sov0-03d.u1", 0x0000, 0x080000, CRC(47d5e5ca) SHA1(d3624a8b8545f67d14bee90bc3967c13b8497e5b) )
+	ROM_LOAD( "hog0-03.u1", 0x0000, 0x080000, CRC(eaa26ab0) SHA1(ee7d76b92c3274ba8c5ba59184bb3334fbbc64c4) )
+	ROM_LOAD( "jjrv1-02.u1", 0x0000, 0x080000, CRC(0f05e392) SHA1(64c885c92fb26c0ed64b8283793cdf86d2bc0e35) )
+	ROM_LOAD( "jjrv1-02.u2", 0x0000, 0x080000, CRC(1d86f26c) SHA1(e7db51b217e9fb8a0440b7c7591c5ea4142540bc) )
 ROM_END
 
 ROM_START( as_partya )
@@ -1387,8 +1587,8 @@ ROM_END
 
 ROM_START( as_stp )
 	ROM_REGION( 0x200000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "1st1_03.bin", 0x0000, 0x080000, CRC(6f34a144) SHA1(69f7e58bf7d868f75ef3f4242a0b6624452a3558) )
-	ROM_LOAD16_BYTE( "2st1_03.bin", 0x0000, 0x080000, CRC(cc04e763) SHA1(532c914d4925d19b2c416d29711e7eb506eb75e5) )
+	ROM_LOAD16_BYTE( "1st1_03.bin", 0x00000, 0x080000, CRC(6f34a144) SHA1(69f7e58bf7d868f75ef3f4242a0b6624452a3558) )
+	ROM_LOAD16_BYTE( "2st1_03.bin", 0x00001, 0x080000, CRC(cc04e763) SHA1(532c914d4925d19b2c416d29711e7eb506eb75e5) )
 
 	ROM_REGION( 0x200000, "altrevs", 0 )
 	ROM_LOAD16_BYTE( "1st1_03g.bin", 0x0000, 0x080000, CRC(f08d5a74) SHA1(ee2c0fb15354178880f9ecf82f6d5f3ca3f0879d) )
@@ -1398,8 +1598,8 @@ ROM_END
 
 ROM_START( as_stpa )
 	ROM_REGION( 0x200000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "stp102.u1", 0x0000, 0x080000, CRC(8df15c17) SHA1(45f6bdd3e213cea5de5feca8e2c4658b17507014) )
-	ROM_LOAD16_BYTE( "stp102.u2", 0x0000, 0x080000, CRC(a06d6e4a) SHA1(d0ca62e98863ae9d07a8f81f8e9c0d655c0eab2b) )
+	ROM_LOAD16_BYTE( "stp102.u1", 0x00000, 0x080000, CRC(8df15c17) SHA1(45f6bdd3e213cea5de5feca8e2c4658b17507014) )
+	ROM_LOAD16_BYTE( "stp102.u2", 0x00001, 0x080000, CRC(a06d6e4a) SHA1(d0ca62e98863ae9d07a8f81f8e9c0d655c0eab2b) )
 
 	ROM_REGION( 0x200000, "altrevs", 0 )
 	ROM_LOAD16_BYTE( "stp102d.u1", 0x0000, 0x080000, CRC(840ac3a4) SHA1(d843c0884bfe470ea3bcf778e1786869fb032619) )
@@ -1407,8 +1607,8 @@ ROM_END
 
 ROM_START( as_stpb )
 	ROM_REGION( 0x200000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "stp105.u1", 0x0000, 0x080000, CRC(c3c600b4) SHA1(e570ed887e8aad6b816872c8468e15ab5b904ad5) )
-	ROM_LOAD16_BYTE( "stp105.u2", 0x0000, 0x080000, CRC(7f23fe83) SHA1(e8b0a141ca3c578a1c0d49b237b309326a01300d) )
+	ROM_LOAD16_BYTE( "stp105.u1", 0x00000, 0x080000, CRC(c3c600b4) SHA1(e570ed887e8aad6b816872c8468e15ab5b904ad5) )
+	ROM_LOAD16_BYTE( "stp105.u2", 0x00001, 0x080000, CRC(7f23fe83) SHA1(e8b0a141ca3c578a1c0d49b237b309326a01300d) )
 
 	ROM_REGION( 0x200000, "altrevs", 0 )
 	ROM_LOAD16_BYTE( "stp105d.u1", 0x0000, 0x080000, CRC(ca3d9f07) SHA1(2f20259aa1adf5a7144bd8e35746b10a2f9e5f54) )
@@ -1795,21 +1995,21 @@ GAME( 200?, as_srbe,   as_srb		, astra_single,    astrafr,    0, ROT0,  "Astra",
 
 
 // Linked games (single rom per CPU with master/slave?)
-GAME( 200?, as_party,    0			, astrafr_dual,    astrafr,    0, ROT0,  "Astra", "Party Time (Astra, V105)", GAME_IS_SKELETON_MECHANICAL)
-GAME( 200?, as_partya,   as_party	, astrafr_dual,    astrafr,    0, ROT0,  "Astra", "Party Time (Astra, V110)", GAME_IS_SKELETON_MECHANICAL)
-GAME( 200?, as_partyb,   as_party	, astrafr_dual,    astrafr,    0, ROT0,  "Astra", "Party Time (Astra, V112)", GAME_IS_SKELETON_MECHANICAL)
-GAME( 200?, as_partyc,   as_party	, astrafr_dual,    astrafr,    0, ROT0,  "Astra", "Party Time (Astra, V206)" ,GAME_IS_SKELETON_MECHANICAL)
-GAME( 200?, as_partyd,   as_party	, astrafr_dual,    astrafr,    0, ROT0,  "Astra", "Party Time (Astra, V401)", GAME_IS_SKELETON_MECHANICAL) // significantly different set
-GAME( 200?, as_partye,   as_party	, astrafr_dual,    astrafr,    0, ROT0,  "Astra", "Party Time (Astra, V907)", GAME_IS_SKELETON_MECHANICAL)
-GAME( 200?, as_partyf,   as_party	, astrafr_dual,    astrafr,    0, ROT0,  "Astra", "Party Time (Astra, V906)", GAME_IS_SKELETON_MECHANICAL)
+GAME( 200?, as_party,    0			, astrafr_dual_2e,    astrafr,    0, ROT0,  "Astra", "Party Time (Astra, V105)", GAME_IS_SKELETON_MECHANICAL)
+GAME( 200?, as_partya,   as_party	, astrafr_dual_2e,    astrafr,    0, ROT0,  "Astra", "Party Time (Astra, V110)", GAME_IS_SKELETON_MECHANICAL)
+GAME( 200?, as_partyb,   as_party	, astrafr_dual_2e,    astrafr,    0, ROT0,  "Astra", "Party Time (Astra, V112)", GAME_IS_SKELETON_MECHANICAL)
+GAME( 200?, as_partyc,   as_party	, astrafr_dual_2e,    astrafr,    0, ROT0,  "Astra", "Party Time (Astra, V206)" ,GAME_IS_SKELETON_MECHANICAL)
+GAME( 200?, as_partyd,   as_party	, astrafr_dual_37,    astrafr,    0, ROT0,  "Astra", "Party Time (Astra, V401)", GAME_IS_SKELETON_MECHANICAL) // significantly different set
+GAME( 200?, as_partye,   as_party	, astrafr_dual_2e,    astrafr,    0, ROT0,  "Astra", "Party Time (Astra, V907)", GAME_IS_SKELETON_MECHANICAL)
+GAME( 200?, as_partyf,   as_party	, astrafr_dual_2e,    astrafr,    0, ROT0,  "Astra", "Party Time (Astra, V906)", GAME_IS_SKELETON_MECHANICAL)
 
-GAME( 200?, as_letsp,    0			, astrafr_dual,    astrafr,    0, ROT0,  "Astra", "Let's Party (Astra, V904)", GAME_IS_SKELETON_MECHANICAL)
+GAME( 200?, as_letsp,    0			, astrafr_dual_2e,    astrafr,    0, ROT0,  "Astra", "Let's Party (Astra, V904)", GAME_IS_SKELETON_MECHANICAL)
 
-GAME( 200?, as_topsl,   0			, astrafr_dual,    astrafr,    0, ROT0,  "Astra", "Top Slot (Astra, V103)", GAME_IS_SKELETON_MECHANICAL)
-GAME( 200?, as_topsla,  as_topsl	, astrafr_dual,    astrafr,    0, ROT0,  "Astra", "Top Slot (Astra, V104)", GAME_IS_SKELETON_MECHANICAL)
-GAME( 200?, as_topslb,  as_topsl	, astrafr_dual,    astrafr,    0, ROT0,  "Astra", "Top Slot (Astra, V201)", GAME_IS_SKELETON_MECHANICAL)
-GAME( 200?, as_topslc,  as_topsl	, astrafr_dual,    astrafr,    0, ROT0,  "Astra", "Top Slot (Astra, V203)", GAME_IS_SKELETON_MECHANICAL)
-GAME( 200?, as_topsld,  as_topsl	, astrafr_dual,    astrafr,    0, ROT0,  "Astra", "Top Slot (Astra, V205)", GAME_IS_SKELETON_MECHANICAL)
+GAME( 200?, as_topsl,   0			, astrafr_dual_2e,    astrafr,    0, ROT0,  "Astra", "Top Slot (Astra, V103)", GAME_IS_SKELETON_MECHANICAL)
+GAME( 200?, as_topsla,  as_topsl	, astrafr_dual_2e,    astrafr,    0, ROT0,  "Astra", "Top Slot (Astra, V104)", GAME_IS_SKELETON_MECHANICAL)
+GAME( 200?, as_topslb,  as_topsl	, astrafr_dual_2e,    astrafr,    0, ROT0,  "Astra", "Top Slot (Astra, V201)", GAME_IS_SKELETON_MECHANICAL)
+GAME( 200?, as_topslc,  as_topsl	, astrafr_dual_2e,    astrafr,    0, ROT0,  "Astra", "Top Slot (Astra, V203)", GAME_IS_SKELETON_MECHANICAL)
+GAME( 200?, as_topsld,  as_topsl	, astrafr_dual_2e,    astrafr,    0, ROT0,  "Astra", "Top Slot (Astra, V205)", GAME_IS_SKELETON_MECHANICAL)
 
 
 // Other HW? (has u1/u2 pairing)
@@ -1822,15 +2022,15 @@ GAME( 200?, as_celebb,  as_celeb	, astra_single ,    astrafr,    astradec, ROT0,
 
 // u1/u2 pairing and Linked?
 
-GAME( 200?, as_hc,     0			, astrafr_dual ,    astrafr,    astradec_dual, ROT0,  "Astra", "Hokey Cokey (Astra, V107)", GAME_IS_SKELETON_MECHANICAL)
-GAME( 200?, as_hca,    as_hc		, astrafr_dual ,    astrafr,    astradec_dual, ROT0,  "Astra", "Hokey Cokey (Astra, V109)", GAME_IS_SKELETON_MECHANICAL)
-GAME( 200?, as_hcb,    as_hc		, astrafr_dual ,    astrafr,    astradec_dual, ROT0,  "Astra", "Hokey Cokey (Astra, V110)", GAME_IS_SKELETON_MECHANICAL)
-GAME( 200?, as_hcc,    as_hc		, astrafr_dual ,    astrafr,    astradec_dual, ROT0,  "Astra", "Hokey Cokey (Astra, V111)", GAME_IS_SKELETON_MECHANICAL)
-GAME( 200?, as_hcd,    as_hc		, astrafr_dual ,    astrafr,    astradec_dual, ROT0,  "Astra", "Hokey Cokey (Astra, V909)", GAME_IS_SKELETON_MECHANICAL)
+GAME( 200?, as_hc,     0			, astrafr_dual_37 ,    astrafr,    astradec_dual, ROT0,  "Astra", "Hokey Cokey (Astra, V107)", GAME_IS_SKELETON_MECHANICAL)
+GAME( 200?, as_hca,    as_hc		, astrafr_dual_37 ,    astrafr,    astradec_dual, ROT0,  "Astra", "Hokey Cokey (Astra, V109)", GAME_IS_SKELETON_MECHANICAL)
+GAME( 200?, as_hcb,    as_hc		, astrafr_dual_37 ,    astrafr,    astradec_dual, ROT0,  "Astra", "Hokey Cokey (Astra, V110)", GAME_IS_SKELETON_MECHANICAL)
+GAME( 200?, as_hcc,    as_hc		, astrafr_dual_37 ,    astrafr,    astradec_dual, ROT0,  "Astra", "Hokey Cokey (Astra, V111)", GAME_IS_SKELETON_MECHANICAL)
+GAME( 200?, as_hcd,    as_hc		, astrafr_dual_37 ,    astrafr,    astradec_dual, ROT0,  "Astra", "Hokey Cokey (Astra, V909)", GAME_IS_SKELETON_MECHANICAL)
 
 // Non-Astra, same hw?
 
-GAME( 200?, as_cshah,  0	        , astra_single ,    astrafr,    astradec, ROT0,  "Lowen", "Cash Ahoi (Lowen, V105)", GAME_IS_SKELETON_MECHANICAL)
+GAME( 200?, as_cshah,  0	        , astra_single_alt_57 ,    astrafr,    astradec, ROT0,  "Lowen", "Cash Ahoi (Lowen, V105)", GAME_IS_SKELETON_MECHANICAL)
 
 
 GAME( 200?, as_big10,    0			, astra_single,    astrafr,    0, ROT0,  "Astra", "Big 10 (Astra, V500)", GAME_IS_SKELETON_MECHANICAL) // BB96
@@ -1842,13 +2042,13 @@ GAME( 200?, as_big15,    0			, astra_single,    astrafr,    0, ROT0,  "Astra", "
 GAME( 200?, as_bigcs,    0			, astra_single,    astrafr,    0, ROT0,  "Astra", "Big Cash (Astra, V101)", GAME_IS_SKELETON_MECHANICAL) // CF97/CF98
 GAME( 200?, as_bigcsa,   as_bigcs	, astra_single,    astrafr,    0, ROT0,  "Astra", "Big Cash (Astra, V103)", GAME_IS_SKELETON_MECHANICAL) // CF97/CF98
 
-GAME( 200?, as_bbr,      0			, astra_single,    astrafr,    0, ROT0,  "Astra", "Bullion Bars (Astra, V101)"		, GAME_IS_SKELETON_MECHANICAL) // FA00/CU98
-GAME( 200?, as_bbra,     as_bbr		, astra_single,    astrafr,    0, ROT0,  "Astra", "Bullion Bars (Astra, V102,alt)"	, GAME_IS_SKELETON_MECHANICAL) // FA00/CU98
-GAME( 200?, as_bbrb,     as_bbr		, astra_single,    astrafr,    0, ROT0,  "Astra", "Bullion Bars (Astra, V201)"		, GAME_IS_SKELETON_MECHANICAL) // FA00/CU98
-GAME( 200?, as_bbrc,     as_bbr		, astra_single,    astrafr,    0, ROT0,  "Astra", "Bullion Bars (Astra, V003)"		, GAME_IS_SKELETON_MECHANICAL) // CU98
-GAME( 200?, as_bbrd,     as_bbr		, astra_single,    astrafr,    0, ROT0,  "Astra", "Bullion Bars (Astra, V102)"		, GAME_IS_SKELETON_MECHANICAL) // CU98
-GAME( 200?, as_bbre,     as_bbr		, astra_single,    astrafr,    0, ROT0,  "Astra", "Bullion Bars (Astra, V105)"		, GAME_IS_SKELETON_MECHANICAL) // FG01
-GAME( 200?, as_bbrf,     as_bbr		, astra_single,    astrafr,    0, ROT0,  "Astra", "Bullion Bars (Astra, V004)"		, GAME_IS_SKELETON_MECHANICAL) // FN01
+GAME( 200?, as_bbr,      0			, astra_single_2e,    astrafr,    0, ROT0,  "Astra", "Bullion Bars (Astra, V101)"		, GAME_IS_SKELETON_MECHANICAL) // FA00/CU98
+GAME( 200?, as_bbra,     as_bbr		, astra_single_2e,    astrafr,    0, ROT0,  "Astra", "Bullion Bars (Astra, V102,alt)"	, GAME_IS_SKELETON_MECHANICAL) // FA00/CU98
+GAME( 200?, as_bbrb,     as_bbr		, astra_single_2e,    astrafr,    0, ROT0,  "Astra", "Bullion Bars (Astra, V201)"		, GAME_IS_SKELETON_MECHANICAL) // FA00/CU98
+GAME( 200?, as_bbrc,     as_bbr		, astra_single_2e,    astrafr,    0, ROT0,  "Astra", "Bullion Bars (Astra, V003)"		, GAME_IS_SKELETON_MECHANICAL) // CU98
+GAME( 200?, as_bbrd,     as_bbr		, astra_single_2e,    astrafr,    0, ROT0,  "Astra", "Bullion Bars (Astra, V102)"		, GAME_IS_SKELETON_MECHANICAL) // CU98
+GAME( 200?, as_bbre,     as_bbr		, astra_single_37,    astrafr,    0, ROT0,  "Astra", "Bullion Bars (Astra, V105)"		, GAME_IS_SKELETON_MECHANICAL) // FG01
+GAME( 200?, as_bbrf,     as_bbr		, astra_single_37,    astrafr,    0, ROT0,  "Astra", "Bullion Bars (Astra, V004)"		, GAME_IS_SKELETON_MECHANICAL) // FN01
 
 GAME( 200?, as_dblcs,    0		    , astra_single,    astrafr,    0, ROT0,  "Astra", "Double Cash (Astra, V110)"		, GAME_IS_SKELETON_MECHANICAL) // BR97
 GAME( 200?, as_dblcsa,   as_dblcs   , astra_single,    astrafr,    0, ROT0,  "Astra", "Double Cash (Astra, V112)"		, GAME_IS_SKELETON_MECHANICAL) // BR97
@@ -1898,59 +2098,59 @@ GAME( 200?, as_koca,  as_koc , astra_single,    astrafr,    0,	ROT0,  "Astra", "
 GAME( 200?, as_lbt,   0		 , astra_single,    astrafr,    0,	ROT0,  "Astra", "Little Big 10 (Astra, V103)"		, GAME_IS_SKELETON_MECHANICAL)
 GAME( 200?, as_lbta,  as_lbt , astra_single,    astrafr,    0,	ROT0,  "Astra", "Little Big 10 (Astra, V102)"		, GAME_IS_SKELETON_MECHANICAL)
 
-GAME( 200?, as_ldl,     0			, astra_single,    astrafr,    astradec_sml,	ROT0,  "Astra", "Little Devils (Astra, V700)"		, GAME_IS_SKELETON_MECHANICAL)
+GAME( 200?, as_ldl,     0			, astra_single_2e,    astrafr,    astradec_sml,	ROT0,  "Astra", "Little Devils (Astra, V700)"		, GAME_IS_SKELETON_MECHANICAL)
 GAME( 200?, as_ldla,    as_ldl		, astra_single,    astrafr,    astradec_sml,	ROT0,  "Astra", "Little Devils (Astra, V600)"		, GAME_IS_SKELETON_MECHANICAL)
 GAME( 200?, as_ldlb,    as_ldl		, astra_single,    astrafr,    astradec_sml,	ROT0,  "Astra", "Little Devils (Astra, V312)"		, GAME_IS_SKELETON_MECHANICAL)
 GAME( 200?, as_ldlc,    as_ldl		, astra_single,    astrafr,    astradec_sml,	ROT0,  "Astra", "Little Devils (Astra, V003)"		, GAME_IS_SKELETON_MECHANICAL)
 GAME( 200?, as_ldld,    as_ldl		, astra_single,    astrafr,    0,				ROT0,  "Astra", "Little Devils (Astra, V102)"		, GAME_IS_SKELETON_MECHANICAL)
 GAME( 200?, as_ldle,    as_ldl		, astra_single,    astrafr,    0,				ROT0,  "Astra", "Little Devils (Astra, V103)"		, GAME_IS_SKELETON_MECHANICAL)
-GAME( 200?, as_mp,     0			, astra_single,    astrafr,    astradec,	ROT0,  "Lowen", "Mission Possible (Lowen, V118)"		, GAME_IS_SKELETON_MECHANICAL)
+GAME( 200?, as_mp,     0			, astra_single_2e,    astrafr,    astradec,	ROT0,  "Lowen", "Mission Possible (Lowen, V118)"		, GAME_IS_SKELETON_MECHANICAL)
 GAME( 200?, as_mp2,     0			, astra_single,    astrafr,    0,	ROT0,  "Lowen", "Mission Possible 2 (Lowen, V114)"		, GAME_IS_SKELETON_MECHANICAL)
-GAME( 200?, as_otr,     0			, astra_single,    astrafr,    astradec_sml,	ROT0,  "Astra", "Over The Rainbow (Astra, V104)"		, GAME_IS_SKELETON_MECHANICAL)
+GAME( 200?, as_otr,     0			, astra_single_2e,    astrafr,    astradec_sml,	ROT0,  "Astra", "Over The Rainbow (Astra, V104)"		, GAME_IS_SKELETON_MECHANICAL)
 GAME( 200?, as_otra,    as_otr		, astra_single,    astrafr,    astradec_sml,	ROT0,  "Astra", "Over The Rainbow (Astra, V102)"		, GAME_IS_SKELETON_MECHANICAL) // incomplete set
-GAME( 200?, as_ptf,    0		, astrafr_dual,    astrafr,    astradec_sml_dual,	ROT0,  "Astra", "Party Fruits (Astra, V102)"		, GAME_IS_SKELETON_MECHANICAL) // strange extra sound(?) roms in here
-GAME( 200?, as_ptfa,   as_ptf	, astrafr_dual,    astrafr,    astradec_sml_dual,	ROT0,  "Astra", "Party Fruits (Astra, V803)"		, GAME_IS_SKELETON_MECHANICAL)
-GAME( 200?, as_ptfb,   as_ptf	, astrafr_dual,    astrafr,    astradec_sml_dual,	ROT0,  "Astra", "Party Fruits (Astra, V905)"		, GAME_IS_SKELETON_MECHANICAL)
-GAME( 200?, as_ptfc,   as_ptf	, astrafr_dual,    astrafr,    astradec_sml_dual,	ROT0,  "Astra", "Party Fruits (Astra)"		, GAME_IS_SKELETON_MECHANICAL)
+GAME( 200?, as_ptf,    0		, astrafr_dual_37,    astrafr,    astradec_sml_dual,	ROT0,  "Astra", "Party Fruits (Astra, V102)"		, GAME_IS_SKELETON_MECHANICAL) // strange extra sound(?) roms in here
+GAME( 200?, as_ptfa,   as_ptf	, astrafr_dual_37,    astrafr,    astradec_sml_dual,	ROT0,  "Astra", "Party Fruits (Astra, V803)"		, GAME_IS_SKELETON_MECHANICAL)
+GAME( 200?, as_ptfb,   as_ptf	, astrafr_dual_37,    astrafr,    astradec_sml_dual,	ROT0,  "Astra", "Party Fruits (Astra, V905)"		, GAME_IS_SKELETON_MECHANICAL)
+GAME( 200?, as_ptfc,   as_ptf	, astrafr_dual_37,    astrafr,    astradec_sml_dual,	ROT0,  "Astra", "Party Fruits (Astra)"		, GAME_IS_SKELETON_MECHANICAL)
 GAME( 200?, as_pia,     0			, astra_single,    astrafr,    0,	ROT0,  "Astra", "Pay It Again (Astra, V202)"		, GAME_IS_SKELETON_MECHANICAL)
 GAME( 200?, as_piaa,    as_pia		, astra_single,    astrafr,    0,	ROT0,  "Astra", "Pay It Again (Astra, V206)"		, GAME_IS_SKELETON_MECHANICAL)
 GAME( 200?, as_piab,    as_pia		, astra_single,    astrafr,    0,	ROT0,  "Astra", "Pay It Again (Astra, V904)"		, GAME_IS_SKELETON_MECHANICAL)
-GAME( 200?, as_pharg,    0		  , astra_single,    astrafr,    astradec,	ROT0,  "Astra", "Pharaoh's Gold (Astra, V005)"		, GAME_IS_SKELETON_MECHANICAL)
+GAME( 200?, as_pharg,    0		  , astra_single_37,    astrafr,    astradec,	ROT0,  "Astra", "Pharaoh's Gold (Astra, V005)"		, GAME_IS_SKELETON_MECHANICAL)
 GAME( 200?, as_pharga,   as_pharg , astra_single,    astrafr,    astradec,	ROT0,  "Astra", "Pharaoh's Gold (Astra, V101)"		, GAME_IS_SKELETON_MECHANICAL)
 GAME( 200?, as_phargb,   as_pharg , astra_single,    astrafr,    astradec,	ROT0,  "Astra", "Pharaoh's Gold (Astra, V102)"		, GAME_IS_SKELETON_MECHANICAL)
 GAME( 200?, as_phargc,   as_pharg , astra_single,    astrafr,    astradec,	ROT0,  "Astra", "Pharaoh's Gold (Astra, V104)"		, GAME_IS_SKELETON_MECHANICAL)
 GAME( 200?, as_phargd,   as_pharg , astra_single,    astrafr,    astradec,	ROT0,  "Astra", "Pharaoh's Gold (Astra, V106)"		, GAME_IS_SKELETON_MECHANICAL)
 GAME( 200?, as_pharge,   as_pharg , astra_single,    astrafr,    astradec,	ROT0,  "Astra", "Pharaoh's Gold (Astra, V107)"		, GAME_IS_SKELETON_MECHANICAL)
-GAME( 200?, as_pb,   0 , astra_single,    astrafr,    0,	ROT0,  "Astra", "Piggy Banking (Astra, V105)"		, GAME_IS_SKELETON_MECHANICAL)
+GAME( 200?, as_pb,   0 , astra_single_2e,    astrafr,    0,	ROT0,  "Astra", "Piggy Banking (Astra, V105)"		, GAME_IS_SKELETON_MECHANICAL)
 // this might be another mix of master / slave sets, and multiple games....
-GAME( 200?, as_rtr,    0		  , astra_single,    astrafr,    astradec,	ROT0,  "Astra", "Ready To Roll (Astra, V101)"		, GAME_IS_SKELETON_MECHANICAL)
-GAME( 200?, as_rtra,   as_rtr	  , astra_single,    astrafr,    astradec,	ROT0,  "Astra", "Ready To Roll (Astra, V101, alt 1)"		, GAME_IS_SKELETON_MECHANICAL)
-GAME( 200?, as_rtrb,   as_rtr	  , astra_single,    astrafr,    astradec,	ROT0,  "Astra", "Ready To Roll (Astra, V101, alt 2)"		, GAME_IS_SKELETON_MECHANICAL)
-GAME( 200?, as_rtrc,   as_rtr	  , astra_single,    astrafr,    astradec,	ROT0,  "Astra", "Ready To Roll (Astra, V101, alt 3)"		, GAME_IS_SKELETON_MECHANICAL)
-GAME( 200?, as_rtrd,   as_rtr	  , astra_single,    astrafr,    astradec,	ROT0,  "Astra", "Ready To Roll (Astra, V100, )"		, GAME_IS_SKELETON_MECHANICAL)
-GAME( 200?, as_rtre,   as_rtr	  , astra_single,    astrafr,    astradec,	ROT0,  "Astra", "Ready To Roll (Astra, V100, alt)"		, GAME_IS_SKELETON_MECHANICAL)
-GAME( 200?, as_rtrf,   as_rtr	  , astra_single,    astrafr,    astradec,	ROT0,  "Astra", "Ready To Roll (Astra, V200)"		, GAME_IS_SKELETON_MECHANICAL)
+GAME( 200?, as_rtr,    0		  , astra_single_2e,    astrafr,    astradec,	ROT0,  "Astra", "Ready To Roll (Astra, V101)"		, GAME_IS_SKELETON_MECHANICAL)
+GAME( 200?, as_rtra,   as_rtr	  , astra_single_2e,    astrafr,    astradec,	ROT0,  "Astra", "Ready To Roll (Astra, V101, alt 1)"		, GAME_IS_SKELETON_MECHANICAL)
+GAME( 200?, as_rtrb,   as_rtr	  , astra_single_2e,    astrafr,    astradec,	ROT0,  "Astra", "Ready To Roll (Astra, V101, alt 2)"		, GAME_IS_SKELETON_MECHANICAL)
+GAME( 200?, as_rtrc,   as_rtr	  , astra_single_2e,    astrafr,    astradec,	ROT0,  "Astra", "Ready To Roll (Astra, V101, alt 3)"		, GAME_IS_SKELETON_MECHANICAL)
+GAME( 200?, as_rtrd,   as_rtr	  , astra_single_2e,    astrafr,    astradec,	ROT0,  "Astra", "Ready To Roll (Astra, V100, )"		, GAME_IS_SKELETON_MECHANICAL)
+GAME( 200?, as_rtre,   as_rtr	  , astra_single_2e,    astrafr,    astradec,	ROT0,  "Astra", "Ready To Roll (Astra, V100, alt)"		, GAME_IS_SKELETON_MECHANICAL)
+GAME( 200?, as_rtrf,   as_rtr	  , astra_single_2e,    astrafr,    astradec,	ROT0,  "Astra", "Ready To Roll (Astra, V200)"		, GAME_IS_SKELETON_MECHANICAL)
 GAME( 200?, as_rtrg,   as_rtr	  , astra_single,    astrafr,    astradec,	ROT0,  "Astra", "Ready To Roll (Astra, V200, alt)"		, GAME_IS_SKELETON_MECHANICAL)
-GAME( 200?, as_rtrh,   as_rtr	  , astra_single,    astrafr,    astradec,	ROT0,  "Astra", "Ready To Roll (Astra, V202)"		, GAME_IS_SKELETON_MECHANICAL)
+GAME( 200?, as_rtrh,   as_rtr	  , astra_single_2e,    astrafr,    astradec,	ROT0,  "Astra", "Ready To Roll (Astra, V202)"		, GAME_IS_SKELETON_MECHANICAL)
 
-GAME( 200?, as_rab,    0		  , astra_single,    astrafr,    0, 	ROT0,  "Astra", "Ring A Bell (Astra, V105)"		, GAME_IS_SKELETON_MECHANICAL)
+GAME( 200?, as_rab,    0		  , astra_single_2e,    astrafr,    0, 	ROT0,  "Astra", "Ring A Bell (Astra, V105)"		, GAME_IS_SKELETON_MECHANICAL)
 GAME( 200?, as_raba,   as_rab	  , astra_single,    astrafr,    0, 	ROT0,  "Astra", "Ring A Bell (Astra, V106)"		, GAME_IS_SKELETON_MECHANICAL)
 GAME( 200?, as_rabb,   as_rab	  , astra_single,    astrafr,    0, 	ROT0,  "Astra", "Ring A Bell (Astra, V107)"		, GAME_IS_SKELETON_MECHANICAL)
 GAME( 200?, as_rabc,   as_rab	  , astra_single,    astrafr,    0, 	ROT0,  "Astra", "Ring A Bell (Astra, V104)"		, GAME_IS_SKELETON_MECHANICAL)
-GAME( 200?, as_rbg,    0		  , astra_single,    astrafr,    0, 	ROT0,  "Astra", "River Boat Gambler (Astra, V304)"		, GAME_IS_SKELETON_MECHANICAL)
+GAME( 200?, as_rbg,    0		  , astra_single_2e,    astrafr,    0, 	ROT0,  "Astra", "River Boat Gambler (Astra, V304)"		, GAME_IS_SKELETON_MECHANICAL)
 GAME( 200?, as_rbga,   as_rab	  , astra_single,    astrafr,    0, 	ROT0,  "Astra", "River Boat Gambler (Astra, V303)"		, GAME_IS_SKELETON_MECHANICAL)
 GAME( 200?, as_rbgb,   as_rab	  , astra_single,    astrafr,    0, 	ROT0,  "Astra", "River Boat Gambler (Astra, V104)"		, GAME_IS_SKELETON_MECHANICAL)
 GAME( 200?, as_rbgc,   as_rab	  , astra_single,    astrafr,    0, 	ROT0,  "Astra", "River Boat Gambler (Astra, V102)"		, GAME_IS_SKELETON_MECHANICAL)
 GAME( 200?, as_rbgd,   as_rab	  , astra_single,    astrafr,    0, 	ROT0,  "Astra", "River Boat Gambler (Astra, V101)"		, GAME_IS_SKELETON_MECHANICAL)
 GAME( 200?, as_rbge,   as_rab	  , astra_single,    astrafr,    0, 	ROT0,  "Astra", "River Boat Gambler (Astra, V008)"		, GAME_IS_SKELETON_MECHANICAL)
-GAME( 200?, as_rbglo,    0		  , astrafr_dual,    astrafr,    astradec_sml_dual, 	ROT0,  "Lowen", "River Boat Gambler (Lowen, V106)"		, GAME_IS_SKELETON_MECHANICAL)
+GAME( 200?, as_rbglo,    0		  , astrafr_dual_37,    astrafr,    astradec_sml_dual, 	ROT0,  "Lowen", "River Boat Gambler (Lowen, V106)"		, GAME_IS_SKELETON_MECHANICAL)
 GAME( 200?, as_rox,    0		  , astra_single,    astrafr,    0, 	ROT0,  "Astra", "Roll X (Astra, V006)"		, GAME_IS_SKELETON_MECHANICAL)
-GAME( 200?, as_csv,    0		  , astra_single,    astrafr,    0, 	ROT0,  "Astra", "Slot Slant (?) (Astra, V202)"		, GAME_IS_SKELETON_MECHANICAL)
+GAME( 200?, as_csv,    0		  , astra_single_37,    astrafr,    0, 	ROT0,  "Astra", "Slot Slant (?) (Astra, V202)"		, GAME_IS_SKELETON_MECHANICAL)
 GAME( 200?, as_sltcl,    0		  , astra_single,    astrafr,    0, 	ROT0,  "Astra", "Slots Classic (?) (Astra)"		, GAME_IS_SKELETON_MECHANICAL)
-GAME( 200?, as_stp,    0		  , astra_single,    astrafr,    astradec,	ROT0,  "Astra", "Stampede (Astra, V103)"		, GAME_IS_SKELETON_MECHANICAL)
+GAME( 200?, as_stp,    0		  , astra_single_2e,    astrafr,    astradec,	ROT0,  "Astra", "Stampede (Astra, V103)"		, GAME_IS_SKELETON_MECHANICAL)
 GAME( 200?, as_stpa,   as_stp	  , astra_single,    astrafr,    astradec,	ROT0,  "Astra", "Stampede (Astra, V102)"		, GAME_IS_SKELETON_MECHANICAL)
 GAME( 200?, as_stpb,   as_stp	  , astra_single,    astrafr,    astradec,	ROT0,  "Astra", "Stampede (Astra, V105)"		, GAME_IS_SKELETON_MECHANICAL)
-GAME( 200?, as_siu,    0		  , astra_single,    astrafr,    astradec_sml,	ROT0,  "Astra", "Step It Up (Astra, V202)"		, GAME_IS_SKELETON_MECHANICAL) // extra sound roms(?) in this set
+GAME( 200?, as_siu,    0		  , astra_single_37,    astrafr,    astradec_sml,	ROT0,  "Astra", "Step It Up (Astra, V202)"		, GAME_IS_SKELETON_MECHANICAL) // extra sound roms(?) in this set
 GAME( 200?, as_siua,   as_siu	  , astra_single,    astrafr,    astradec_sml,	ROT0,  "Astra", "Step It Up (Astra, V203)"		, GAME_IS_SKELETON_MECHANICAL)
 GAME( 200?, as_sld,    0		  , astra_single,    astrafr,    0, 	ROT0,  "Astra", "Super Little Devil (Astra, V700)"		, GAME_IS_SKELETON_MECHANICAL)
 GAME( 200?, as_slda,   as_sld	  , astra_single,    astrafr,    0, 	ROT0,  "Astra", "Super Little Devil (Astra, V600)"		, GAME_IS_SKELETON_MECHANICAL)
@@ -1958,20 +2158,20 @@ GAME( 200?, as_sldb,   as_sld	  , astra_single,    astrafr,    0, 	ROT0,  "Astra
 GAME( 200?, as_sldc,   as_sld	  , astra_single,    astrafr,    0, 	ROT0,  "Astra", "Super Little Devil (Astra, V400)"		, GAME_IS_SKELETON_MECHANICAL)
 GAME( 200?, as_sldd,   as_sld	  , astra_single,    astrafr,    0, 	ROT0,  "Astra", "Super Little Devil (Astra, V200)"		, GAME_IS_SKELETON_MECHANICAL)
 GAME( 200?, as_slde,   as_sld	  , astra_single,    astrafr,    0, 	ROT0,  "Astra", "Super Little Devil (Astra, V101)"		, GAME_IS_SKELETON_MECHANICAL)
-GAME( 200?, as_tem,   0     	  , astra_single,    astrafr,    astradec,	ROT0,  "Astra", "Temptation (Astra, V101)"		, GAME_IS_SKELETON_MECHANICAL)
-GAME( 200?, as_tema,  as_tem	  , astra_single,    astrafr,    astradec,	ROT0,  "Astra", "Temptation (Astra, V006)"		, GAME_IS_SKELETON_MECHANICAL)
-GAME( 200?, as_tbl,   0				  , astra_single,    astrafr,    0, 	ROT0,  "Astra", "Triple Bells (Astra, V104)"		, GAME_IS_SKELETON_MECHANICAL)
+GAME( 200?, as_tem,   0     	  , astra_single_alt_37,    astrafr,    astradec,	ROT0,  "Astra", "Temptation (Astra, V101)"		, GAME_IS_SKELETON_MECHANICAL)
+GAME( 200?, as_tema,  as_tem	  , astra_single_alt_37,    astrafr,    astradec,	ROT0,  "Astra", "Temptation (Astra, V006)"		, GAME_IS_SKELETON_MECHANICAL)
+GAME( 200?, as_tbl,   0				  , astra_single_2e,    astrafr,    0, 	ROT0,  "Astra", "Triple Bells (Astra, V104)"		, GAME_IS_SKELETON_MECHANICAL)
 GAME( 200?, as_tbla,  as_tbl		  , astra_single,    astrafr,    0, 	ROT0,  "Astra", "Triple Bells (Astra, V105)"		, GAME_IS_SKELETON_MECHANICAL)
 GAME( 200?, as_tblb,  as_tbl		  , astra_single,    astrafr,    0, 	ROT0,  "Astra", "Triple Bells (Astra, V106)"		, GAME_IS_SKELETON_MECHANICAL)
 GAME( 200?, as_tblc,  as_tbl		  , astra_single,    astrafr,    0, 	ROT0,  "Astra", "Triple Bells (Astra, V103)"		, GAME_IS_SKELETON_MECHANICAL)
 GAME( 200?, as_tbld,  as_tbl		  , astra_single,    astrafr,    0, 	ROT0,  "Astra", "Triple Bells (Astra, V304)"		, GAME_IS_SKELETON_MECHANICAL)
 GAME( 200?, as_tble,  as_tbl		  , astra_single,    astrafr,    0, 	ROT0,  "Astra", "Triple Bells (Astra, V303)"		, GAME_IS_SKELETON_MECHANICAL)
 GAME( 200?, as_tblf,  as_tbl		  , astra_single,    astrafr,    0, 	ROT0,  "Astra", "Triple Bells (Astra, V301)"		, GAME_IS_SKELETON_MECHANICAL)
-GAME( 200?, as_td,   0  	  , astra_single,    astrafr,    astradec,	ROT0,  "Astra", "Twin Dragons (Astra, V103)"		, GAME_IS_SKELETON_MECHANICAL)
+GAME( 200?, as_td,   0  	  , astra_single_2e,    astrafr,    astradec,	ROT0,  "Astra", "Twin Dragons (Astra, V103)"		, GAME_IS_SKELETON_MECHANICAL)
 
 GAME( 200?, as_twp,   0     	  , astra_single,    astrafr,    0, 	ROT0,  "Astra", "Twin Pots (Astra, V106)"		, GAME_IS_SKELETON_MECHANICAL)
 GAME( 200?, as_twpa,  as_twp      , astra_single,    astrafr,    0, 	ROT0,  "Astra", "Twin Pots (Astra, V104)"		, GAME_IS_SKELETON_MECHANICAL)
-GAME( 200?, as_vn,    0		  , astrafr_dual,    astrafr,    astradec_dual, 	ROT0,  "Astra", "Vegas Nights (Astra, V205)"		, GAME_IS_SKELETON_MECHANICAL)
+GAME( 200?, as_vn,    0		  , astrafr_dual_alt_37,    astrafr,    astradec_dual, 	ROT0,  "Astra", "Vegas Nights (Astra, V205)"		, GAME_IS_SKELETON_MECHANICAL)
 GAME( 200?, as_vcv,    0		  , astra_single,    astrafr,    astradec,	ROT0,  "Astra", "Viva Cash Vegas (Astra, V005)"		, GAME_IS_SKELETON_MECHANICAL)
 GAME( 200?, as_vcva,   as_vcv	  , astra_single,    astrafr,    astradec,	ROT0,  "Astra", "Viva Cash Vegas (Astra, V107)"		, GAME_IS_SKELETON_MECHANICAL)
 GAME( 200?, as_vcvb,   as_vcv	  , astra_single,    astrafr,    astradec,	ROT0,  "Astra", "Viva Cash Vegas (Astra, V106)"		, GAME_IS_SKELETON_MECHANICAL)

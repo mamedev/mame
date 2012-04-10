@@ -286,7 +286,7 @@ DRIVER_INIT( kovsh );
 DRIVER_INIT( kovshp );
 DRIVER_INIT( kovlsqh2 );
 DRIVER_INIT( kovqhsgs );
-
+DRIVER_INIT( kovshxas );
 
 /* simulations */
 DRIVER_INIT( ddp3 );
