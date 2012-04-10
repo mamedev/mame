@@ -516,7 +516,7 @@ ROM_START(stargatp4)
 ROM_END
 
 /*-------------------------------------------------------------------
-/ Street Fighter 2
+/ Street Fighter II
 /-------------------------------------------------------------------*/
 ROM_START(sfight2)
 	ROM_REGION(0x10000, "maincpu", 0)
@@ -941,9 +941,9 @@ GAME(1995,	stargatp1,	stargatp,	gts3,	gts3,	gts3,	ROT0,	"Gottlieb",				"Stargate
 GAME(1995,	stargatp2,	stargatp,	gts3,	gts3,	gts3,	ROT0,	"Gottlieb",				"Stargate (rev.2)",				GAME_IS_SKELETON_MECHANICAL)
 GAME(1995,	stargatp3,	stargatp,	gts3,	gts3,	gts3,	ROT0,	"Gottlieb",				"Stargate (rev.3)",				GAME_IS_SKELETON_MECHANICAL)
 GAME(1995,	stargatp4,	stargatp,	gts3,	gts3,	gts3,	ROT0,	"Gottlieb",				"Stargate (rev.4)",				GAME_IS_SKELETON_MECHANICAL)
-GAME(1993,	sfight2,	0,			gts3,	gts3,	gts3,	ROT0,	"Gottlieb",				"Street Fighter 2",				GAME_IS_SKELETON_MECHANICAL)
-GAME(1993,	sfight2a,	sfight2,	gts3,	gts3,	gts3,	ROT0,	"Gottlieb",				"Street Fighter 2 (rev.1)",				GAME_IS_SKELETON_MECHANICAL)
-GAME(1993,	sfight2b,	sfight2,	gts3,	gts3,	gts3,	ROT0,	"Gottlieb",				"Street Fighter 2 (rev.2)",				GAME_IS_SKELETON_MECHANICAL)
+GAME(1993,	sfight2,	0,			gts3,	gts3,	gts3,	ROT0,	"Gottlieb",				"Street Fighter II",				GAME_IS_SKELETON_MECHANICAL)
+GAME(1993,	sfight2a,	sfight2,	gts3,	gts3,	gts3,	ROT0,	"Gottlieb",				"Street Fighter II (rev.1)",				GAME_IS_SKELETON_MECHANICAL)
+GAME(1993,	sfight2b,	sfight2,	gts3,	gts3,	gts3,	ROT0,	"Gottlieb",				"Street Fighter II (rev.2)",				GAME_IS_SKELETON_MECHANICAL)
 GAME(1992,	smb,		0,			gts3,	gts3,	gts3,	ROT0,	"Gottlieb",				"Super Mario Brothers",				GAME_IS_SKELETON_MECHANICAL)
 GAME(1992,	smb1,		smb,		gts3,	gts3,	gts3,	ROT0,	"Gottlieb",				"Super Mario Brothers (rev.1)",				GAME_IS_SKELETON_MECHANICAL)
 GAME(1992,	smb2,		smb,		gts3,	gts3,	gts3,	ROT0,	"Gottlieb",				"Super Mario Brothers (rev.2)",				GAME_IS_SKELETON_MECHANICAL)
