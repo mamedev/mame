@@ -63,8 +63,8 @@ static UINT8 ssio_duty_cycle[2][3];
 static UINT8 ssio_ayvolume_lookup[16];
 static UINT8 ssio_custom_input_mask[5];
 static UINT8 ssio_custom_output_mask[2];
-static read8_space_func ssio_custom_input[5];
-static write8_space_func ssio_custom_output[2];
+static read8_delegate ssio_custom_input[5];
+static write8_delegate ssio_custom_output[2];
 
 /* Chip Squeak Deluxe-specific globals */
 static device_t *csdeluxe_sound_cpu;
@@ -390,9 +390,9 @@ READ8_HANDLER( ssio_input_port_r )
 {
 	static const char *const port[] = { "SSIO.IP0", "SSIO.IP1", "SSIO.IP2", "SSIO.IP3", "SSIO.IP4" };
 	UINT8 result = input_port_read_safe(space->machine(), port[offset], 0xff);
-	if (ssio_custom_input[offset])
+	if (!ssio_custom_input[offset].isnull())
 		result = (result & ~ssio_custom_input_mask[offset]) |
-		         ((*ssio_custom_input[offset])(space, offset) & ssio_custom_input_mask[offset]);
+		         (ssio_custom_input[offset](*space, offset, 0xff) & ssio_custom_input_mask[offset]);
 	return result;
 }
 
@@ -402,17 +402,17 @@ WRITE8_HANDLER( ssio_output_port_w )
 	int which = offset >> 2;
 	if (which == 0)
 		state->mcr_control_port_w(*space, offset, data);
-	if (ssio_custom_output[which])
-		(*ssio_custom_output[which])(space, offset, data & ssio_custom_output_mask[which]);
+	if (!ssio_custom_output[which].isnull())
+		ssio_custom_output[which](*space, offset, data & ssio_custom_output_mask[which],0xff);
 }
 
-void ssio_set_custom_input(int which, int mask, read8_space_func handler)
+void ssio_set_custom_input(int which, int mask, read8_delegate handler)
 {
 	ssio_custom_input[which] = handler;
 	ssio_custom_input_mask[which] = mask;
 }
 
-void ssio_set_custom_output(int which, int mask, write8_space_func handler)
+void ssio_set_custom_output(int which, int mask, write8_delegate handler)
 {
 	ssio_custom_output[which/4] = handler;
 	ssio_custom_output_mask[which/4] = mask;

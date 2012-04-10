@@ -68,38 +68,38 @@ static MACHINE_RESET( thunderj )
  *
  *************************************/
 
-static READ16_HANDLER( special_port2_r )
+READ16_MEMBER(thunderj_state::special_port2_r)
 {
-	thunderj_state *state = space->machine().driver_data<thunderj_state>();
-	int result = input_port_read(space->machine(), "260012");
+//OBRISI.ME
+	int result = input_port_read(machine(), "260012");
 
-	if (state->m_sound_to_cpu_ready) result ^= 0x0004;
-	if (state->m_cpu_to_sound_ready) result ^= 0x0008;
+	if (m_sound_to_cpu_ready) result ^= 0x0004;
+	if (m_cpu_to_sound_ready) result ^= 0x0008;
 	result ^= 0x0010;
 
 	return result;
 }
 
 
-static WRITE16_HANDLER( latch_w )
+WRITE16_MEMBER(thunderj_state::latch_w)
 {
-	thunderj_state *state = space->machine().driver_data<thunderj_state>();
+//OBRISI.ME
 
 	/* reset extra CPU */
 	if (ACCESSING_BITS_0_7)
 	{
 		/* 0 means hold CPU 2's reset low */
 		if (data & 1)
-			cputag_set_input_line(space->machine(), "extra", INPUT_LINE_RESET, CLEAR_LINE);
+			cputag_set_input_line(machine(), "extra", INPUT_LINE_RESET, CLEAR_LINE);
 		else
-			cputag_set_input_line(space->machine(), "extra", INPUT_LINE_RESET, ASSERT_LINE);
+			cputag_set_input_line(machine(), "extra", INPUT_LINE_RESET, ASSERT_LINE);
 
 		/* bits 2-5 are the alpha bank */
-		if (state->m_alpha_tile_bank != ((data >> 2) & 7))
+		if (m_alpha_tile_bank != ((data >> 2) & 7))
 		{
-			space->machine().primary_screen->update_partial(space->machine().primary_screen->vpos());
-			state->m_alpha_tilemap->mark_all_dirty();
-			state->m_alpha_tile_bank = (data >> 2) & 7;
+			machine().primary_screen->update_partial(machine().primary_screen->vpos());
+			m_alpha_tilemap->mark_all_dirty();
+			m_alpha_tile_bank = (data >> 2) & 7;
 		}
 	}
 }
@@ -112,13 +112,13 @@ static WRITE16_HANDLER( latch_w )
  *
  *************************************/
 
-static READ16_HANDLER( thunderj_atarivc_r )
+READ16_MEMBER(thunderj_state::thunderj_atarivc_r)
 {
 	/* Sigh. CPU #1 reads the video controller register twice per frame, once at
        the beginning of interrupt and once near the end. It stores these values in a
        table starting at $163484. CPU #2 periodically looks at this table to make
        sure that it is getting interrupts at the appropriate times, and that the
-       VBLANK bit is set appropriately. Unfortunately, due to all the device_yield(&space->device())
+       VBLANK bit is set appropriately. Unfortunately, due to all the device_yield(&space.device())
        calls we make to synchronize the two CPUs, we occasionally get out of time
        and generate the interrupt outside of the tight tolerances CPU #2 expects.
 
@@ -130,17 +130,17 @@ static READ16_HANDLER( thunderj_atarivc_r )
 	/* Use these lines to detect when things go south: */
 
 #if 0
-	if (space->read_word(0x163482) > 0xfff)
+	if (read_word(0x163482) > 0xfff)
 		mame_printf_debug("You're screwed!");
 #endif
 
-	return atarivc_r(*space->machine().primary_screen, offset);
+	return atarivc_r(*machine().primary_screen, offset);
 }
 
 
-static WRITE16_HANDLER( thunderj_atarivc_w )
+WRITE16_MEMBER(thunderj_state::thunderj_atarivc_w)
 {
-	atarivc_w(*space->machine().primary_screen, offset, data, mem_mask);
+	atarivc_w(*machine().primary_screen, offset, data, mem_mask);
 }
 
 
@@ -158,14 +158,14 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, thunderj_state )
 	AM_RANGE(0x1f0000, 0x1fffff) AM_WRITE_LEGACY(atarigen_eeprom_enable_w)
 	AM_RANGE(0x260000, 0x26000f) AM_READ_PORT("260000")
 	AM_RANGE(0x260010, 0x260011) AM_READ_PORT("260010")
-	AM_RANGE(0x260012, 0x260013) AM_READ_LEGACY(special_port2_r)
+	AM_RANGE(0x260012, 0x260013) AM_READ(special_port2_r)
 	AM_RANGE(0x260030, 0x260031) AM_READ_LEGACY(atarigen_sound_r)
 	AM_RANGE(0x2e0000, 0x2e0001) AM_WRITE(watchdog_reset16_w)
-	AM_RANGE(0x360010, 0x360011) AM_WRITE_LEGACY(latch_w)
+	AM_RANGE(0x360010, 0x360011) AM_WRITE(latch_w)
 	AM_RANGE(0x360020, 0x360021) AM_WRITE_LEGACY(atarigen_sound_reset_w)
 	AM_RANGE(0x360030, 0x360031) AM_WRITE_LEGACY(atarigen_sound_w)
 	AM_RANGE(0x3e0000, 0x3e0fff) AM_RAM_WRITE_LEGACY(atarigen_666_paletteram_w) AM_SHARE("paletteram")
-	AM_RANGE(0x3effc0, 0x3effff) AM_READWRITE_LEGACY(thunderj_atarivc_r, thunderj_atarivc_w) AM_BASE(m_atarivc_data)
+	AM_RANGE(0x3effc0, 0x3effff) AM_READWRITE(thunderj_atarivc_r, thunderj_atarivc_w) AM_BASE(m_atarivc_data)
 	AM_RANGE(0x3f0000, 0x3f1fff) AM_RAM_WRITE_LEGACY(atarigen_playfield2_latched_msb_w) AM_BASE(m_playfield2)
 	AM_RANGE(0x3f2000, 0x3f3fff) AM_RAM_WRITE_LEGACY(atarigen_playfield_latched_lsb_w) AM_BASE(m_playfield)
 	AM_RANGE(0x3f4000, 0x3f5fff) AM_RAM_WRITE_LEGACY(atarigen_playfield_dual_upper_w) AM_BASE(m_playfield_upper)
@@ -190,10 +190,10 @@ static ADDRESS_MAP_START( extra_map, AS_PROGRAM, 16, thunderj_state )
 	AM_RANGE(0x160000, 0x16ffff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x260000, 0x26000f) AM_READ_PORT("260000")
 	AM_RANGE(0x260010, 0x260011) AM_READ_PORT("260010")
-	AM_RANGE(0x260012, 0x260013) AM_READ_LEGACY(special_port2_r)
+	AM_RANGE(0x260012, 0x260013) AM_READ(special_port2_r)
 	AM_RANGE(0x260030, 0x260031) AM_READ_LEGACY(atarigen_sound_r)
 	AM_RANGE(0x360000, 0x360001) AM_WRITE_LEGACY(atarigen_video_int_ack_w)
-	AM_RANGE(0x360010, 0x360011) AM_WRITE_LEGACY(latch_w)
+	AM_RANGE(0x360010, 0x360011) AM_WRITE(latch_w)
 	AM_RANGE(0x360020, 0x360021) AM_WRITE_LEGACY(atarigen_sound_reset_w)
 	AM_RANGE(0x360030, 0x360031) AM_WRITE_LEGACY(atarigen_sound_w)
 ADDRESS_MAP_END

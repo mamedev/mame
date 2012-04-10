@@ -27,6 +27,14 @@ public:
 	UINT16			m_last_write_offset;
 
 	device_t *		m_rle;
+	DECLARE_READ32_MEMBER(special_port2_r);
+	DECLARE_READ32_MEMBER(special_port3_r);
+	DECLARE_READ32_MEMBER(a2d_data_r);
+	DECLARE_WRITE32_MEMBER(latch_w);
+	DECLARE_WRITE32_MEMBER(mo_command_w);
+	DECLARE_WRITE32_MEMBER(atarigx2_protection_w);
+	DECLARE_READ32_MEMBER(atarigx2_protection_r);
+	DECLARE_READ32_MEMBER(rrreveng_prot_r);
 };
 
 

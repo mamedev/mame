@@ -15,6 +15,7 @@ public:
 	UINT8			m_playfield_tile_bank;
 	UINT16			m_playfield_xscroll;
 	UINT16			m_playfield_yscroll;
+	DECLARE_READ16_MEMBER(port1_r);
 };
 
 

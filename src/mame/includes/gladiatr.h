@@ -33,6 +33,20 @@ public:
 	DECLARE_WRITE8_MEMBER(gladiatr_spritebank_w);
 	DECLARE_WRITE8_MEMBER(ppking_video_registers_w);
 	DECLARE_WRITE8_MEMBER(gladiatr_video_registers_w);
+	DECLARE_WRITE8_MEMBER(gladiatr_bankswitch_w);
+	DECLARE_WRITE8_MEMBER(glad_cpu_sound_command_w);
+	DECLARE_READ8_MEMBER(glad_cpu_sound_command_r);
+	DECLARE_WRITE8_MEMBER(gladiatr_flipscreen_w);
+	DECLARE_WRITE8_MEMBER(gladiatr_irq_patch_w);
+	DECLARE_WRITE8_MEMBER(qx0_w);
+	DECLARE_WRITE8_MEMBER(qx1_w);
+	DECLARE_WRITE8_MEMBER(qx2_w);
+	DECLARE_WRITE8_MEMBER(qx3_w);
+	DECLARE_READ8_MEMBER(qx2_r);
+	DECLARE_READ8_MEMBER(qx3_r);
+	DECLARE_READ8_MEMBER(qx0_r);
+	DECLARE_READ8_MEMBER(qx1_r);
+	DECLARE_READ8_MEMBER(f6a3_r);
 };
 
 /*----------- defined in video/gladiatr.c -----------*/

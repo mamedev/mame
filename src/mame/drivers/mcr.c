@@ -308,7 +308,7 @@ static UINT8 nflfoot_serial_in_numbits;
  *
  *************************************/
 
-static READ8_HANDLER( solarfox_ip0_r )
+READ8_MEMBER(mcr_state::solarfox_ip0_r)
 {
 	/* This is a kludge; according to the wiring diagram, the player 2 */
 	/* controls are hooked up as documented below. If you go into test */
@@ -316,19 +316,19 @@ static READ8_HANDLER( solarfox_ip0_r )
 	/* game in cocktail mode, they don't work at all. So we fake-mux   */
 	/* the controls through player 1's ports */
 	if (mcr_cocktail_flip)
-		return input_port_read(space->machine(), "SSIO.IP0") | 0x08;
+		return input_port_read(machine(), "SSIO.IP0") | 0x08;
 	else
-		return ((input_port_read(space->machine(), "SSIO.IP0") & ~0x14) | 0x08) | ((input_port_read(space->machine(), "SSIO.IP0") & 0x08) >> 1) | ((input_port_read(space->machine(), "SSIO.IP2") & 0x01) << 4);
+		return ((input_port_read(machine(), "SSIO.IP0") & ~0x14) | 0x08) | ((input_port_read(machine(), "SSIO.IP0") & 0x08) >> 1) | ((input_port_read(machine(), "SSIO.IP2") & 0x01) << 4);
 }
 
 
-static READ8_HANDLER( solarfox_ip1_r )
+READ8_MEMBER(mcr_state::solarfox_ip1_r)
 {
 	/*  same deal as above */
 	if (mcr_cocktail_flip)
-		return input_port_read(space->machine(), "SSIO.IP1") | 0xf0;
+		return input_port_read(machine(), "SSIO.IP1") | 0xf0;
 	else
-		return (input_port_read(space->machine(), "SSIO.IP1") >> 4) | 0xf0;
+		return (input_port_read(machine(), "SSIO.IP1") >> 4) | 0xf0;
 }
 
 
@@ -339,9 +339,9 @@ static READ8_HANDLER( solarfox_ip1_r )
  *
  *************************************/
 
-static READ8_HANDLER( kick_ip1_r )
+READ8_MEMBER(mcr_state::kick_ip1_r)
 {
-	return (input_port_read(space->machine(), "DIAL2") << 4) & 0xf0;
+	return (input_port_read(machine(), "DIAL2") << 4) & 0xf0;
 }
 
 
@@ -352,27 +352,27 @@ static READ8_HANDLER( kick_ip1_r )
  *
  *************************************/
 
-static WRITE8_HANDLER( wacko_op4_w )
+WRITE8_MEMBER(mcr_state::wacko_op4_w)
 {
 	input_mux = data & 1;
 }
 
 
-static READ8_HANDLER( wacko_ip1_r )
+READ8_MEMBER(mcr_state::wacko_ip1_r)
 {
 	if (!input_mux)
-		return input_port_read(space->machine(), "SSIO.IP1");
+		return input_port_read(machine(), "SSIO.IP1");
 	else
-		return input_port_read(space->machine(), "SSIO.IP1.ALT");
+		return input_port_read(machine(), "SSIO.IP1.ALT");
 }
 
 
-static READ8_HANDLER( wacko_ip2_r )
+READ8_MEMBER(mcr_state::wacko_ip2_r)
 {
 	if (!input_mux)
-		return input_port_read(space->machine(), "SSIO.IP2");
+		return input_port_read(machine(), "SSIO.IP2");
 	else
-		return input_port_read(space->machine(), "SSIO.IP2.ALT");
+		return input_port_read(machine(), "SSIO.IP2.ALT");
 }
 
 
@@ -383,14 +383,14 @@ static READ8_HANDLER( wacko_ip2_r )
  *
  *************************************/
 
-static READ8_HANDLER( kroozr_ip1_r )
+READ8_MEMBER(mcr_state::kroozr_ip1_r)
 {
-	int dial = input_port_read(space->machine(), "DIAL");
+	int dial = input_port_read(machine(), "DIAL");
 	return ((dial & 0x80) >> 1) | ((dial & 0x70) >> 4);
 }
 
 
-static WRITE8_HANDLER( kroozr_op4_w )
+WRITE8_MEMBER(mcr_state::kroozr_op4_w)
 {
 	/*
         bit 2 = ship control
@@ -407,9 +407,9 @@ static WRITE8_HANDLER( kroozr_op4_w )
  *
  *************************************/
 
-static WRITE8_HANDLER( journey_op4_w )
+WRITE8_MEMBER(mcr_state::journey_op4_w)
 {
-	samples_device *samples = space->machine().device<samples_device>("samples");
+	samples_device *samples = machine().device<samples_device>("samples");
 
 	/* if we're not playing the sample yet, start it */
 	if (!samples->playing(0))
@@ -427,9 +427,9 @@ static WRITE8_HANDLER( journey_op4_w )
  *
  *************************************/
 
-static WRITE8_HANDLER( twotiger_op4_w )
+WRITE8_MEMBER(mcr_state::twotiger_op4_w)
 {
-	samples_device *samples = space->machine().device<samples_device>("samples");
+	samples_device *samples = machine().device<samples_device>("samples");
 
 	for (int i = 0; i < 2; i++)
 	{
@@ -453,7 +453,7 @@ static WRITE8_HANDLER( twotiger_op4_w )
  *
  *************************************/
 
-static WRITE8_HANDLER( dotron_op4_w )
+WRITE8_MEMBER(mcr_state::dotron_op4_w)
 {
 	/*
         Flasher Control:
@@ -512,7 +512,7 @@ static WRITE8_HANDLER( dotron_op4_w )
 
 	/* bit 4 = SEL0 (J1-8) on squawk n talk board */
 	/* bits 3-0 = MD3-0 connected to squawk n talk (J1-4,3,2,1) */
-	squawkntalk_data_w(space, offset, data);
+	squawkntalk_data_w(&space, offset, data);
 }
 
 
@@ -534,7 +534,7 @@ WRITE8_DEVICE_HANDLER( mcr_ipu_sio_transmit )
 }
 
 
-static READ8_HANDLER( nflfoot_ip2_r )
+READ8_MEMBER(mcr_state::nflfoot_ip2_r)
 {
 	/* bit 7 = J3-2 on IPU board = TXDA on SIO */
 	UINT8 val = 0x80;
@@ -548,18 +548,18 @@ static READ8_HANDLER( nflfoot_ip2_r )
 			nflfoot_serial_in_active = FALSE;
 	}
 
-	if (cpu_get_pc(&space->device()) != 0x107)
-		logerror("%04X:ip2_r = %02X\n", cpu_get_pc(&space->device()), val);
+	if (cpu_get_pc(&space.device()) != 0x107)
+		logerror("%04X:ip2_r = %02X\n", cpu_get_pc(&space.device()), val);
 	return val;
 }
 
 
-static WRITE8_HANDLER( nflfoot_op4_w )
+WRITE8_MEMBER(mcr_state::nflfoot_op4_w)
 {
-	device_t *sio = space->machine().device("ipu_sio");
+	device_t *sio = machine().device("ipu_sio");
 
 	/* bit 7 = J3-7 on IPU board = /RXDA on SIO */
-	logerror("%04X:op4_w(%d%d%d)\n", cpu_get_pc(&space->device()), (data >> 7) & 1, (data >> 6) & 1, (data >> 5) & 1);
+	logerror("%04X:op4_w(%d%d%d)\n", cpu_get_pc(&space.device()), (data >> 7) & 1, (data >> 6) & 1, (data >> 5) & 1);
 
 	/* look for a non-zero start bit to go active */
 	if (!nflfoot_serial_out_active && (data & 0x80))
@@ -595,7 +595,7 @@ static WRITE8_HANDLER( nflfoot_op4_w )
 
 	/* bit 4 = SEL0 (J1-8) on squawk n talk board */
 	/* bits 3-0 = MD3-0 connected to squawk n talk (J1-4,3,2,1) */
-	squawkntalk_data_w(space, offset, data);
+	squawkntalk_data_w(&space, offset, data);
 }
 
 
@@ -606,25 +606,25 @@ static WRITE8_HANDLER( nflfoot_op4_w )
  *
  *************************************/
 
-static READ8_HANDLER( demoderb_ip1_r )
+READ8_MEMBER(mcr_state::demoderb_ip1_r)
 {
-	return input_port_read(space->machine(), "SSIO.IP1") |
-		(input_port_read(space->machine(), input_mux ? "SSIO.IP1.ALT2" : "SSIO.IP1.ALT1") << 2);
+	return input_port_read(machine(), "SSIO.IP1") |
+		(input_port_read(machine(), input_mux ? "SSIO.IP1.ALT2" : "SSIO.IP1.ALT1") << 2);
 }
 
 
-static READ8_HANDLER( demoderb_ip2_r )
+READ8_MEMBER(mcr_state::demoderb_ip2_r)
 {
-	return input_port_read(space->machine(), "SSIO.IP2") |
-		(input_port_read(space->machine(), input_mux ? "SSIO.IP2.ALT2" : "SSIO.IP2.ALT1") << 2);
+	return input_port_read(machine(), "SSIO.IP2") |
+		(input_port_read(machine(), input_mux ? "SSIO.IP2.ALT2" : "SSIO.IP2.ALT1") << 2);
 }
 
 
-static WRITE8_HANDLER( demoderb_op4_w )
+WRITE8_MEMBER(mcr_state::demoderb_op4_w)
 {
 	if (data & 0x40) input_mux = 1;
 	if (data & 0x80) input_mux = 0;
-	turbocs_data_w(space, offset, data);
+	turbocs_data_w(&space, offset, data);
 }
 
 
@@ -2584,8 +2584,9 @@ static DRIVER_INIT( solarfox )
 	mcr_init(machine, 90009, 91399, 90908);
 	mcr_sound_init(machine, MCR_SSIO);
 
-	ssio_set_custom_input(0, 0x1c, solarfox_ip0_r);
-	ssio_set_custom_input(1, 0xff, solarfox_ip1_r);
+	mcr_state *state = machine.driver_data<mcr_state>();
+	ssio_set_custom_input(0, 0x1c, read8_delegate(FUNC(mcr_state::solarfox_ip0_r),state));
+	ssio_set_custom_input(1, 0xff, read8_delegate(FUNC(mcr_state::solarfox_ip1_r),state));
 
 	mcr12_sprite_xoffs = 16;
 }
@@ -2596,7 +2597,8 @@ static DRIVER_INIT( kick )
 	mcr_init(machine, 90009, 91399, 90908);
 	mcr_sound_init(machine, MCR_SSIO);
 
-	ssio_set_custom_input(1, 0xf0, kick_ip1_r);
+	mcr_state *state = machine.driver_data<mcr_state>();
+	ssio_set_custom_input(1, 0xf0, read8_delegate(FUNC(mcr_state::kick_ip1_r),state));
 
 	mcr12_sprite_xoffs_flip = 16;
 }
@@ -2614,9 +2616,10 @@ static DRIVER_INIT( wacko )
 	mcr_init(machine, 90010, 91399, 90913);
 	mcr_sound_init(machine, MCR_SSIO);
 
-	ssio_set_custom_input(1, 0xff, wacko_ip1_r);
-	ssio_set_custom_input(2, 0xff, wacko_ip2_r);
-	ssio_set_custom_output(4, 0x01, wacko_op4_w);
+	mcr_state *state = machine.driver_data<mcr_state>();
+	ssio_set_custom_input(1, 0xff, read8_delegate(FUNC(mcr_state::wacko_ip1_r),state));
+	ssio_set_custom_input(2, 0xff, read8_delegate(FUNC(mcr_state::wacko_ip2_r),state));
+	ssio_set_custom_output(4, 0x01, write8_delegate(FUNC(mcr_state::wacko_op4_w),state));
 }
 
 
@@ -2625,8 +2628,8 @@ static DRIVER_INIT( twotiger )
 	mcr_init(machine, 90010, 91399, 90913);
 	mcr_sound_init(machine, MCR_SSIO);
 
-	ssio_set_custom_output(4, 0xff, twotiger_op4_w);
 	mcr_state *state = machine.driver_data<mcr_state>();
+	ssio_set_custom_output(4, 0xff, write8_delegate(FUNC(mcr_state::twotiger_op4_w),state));
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xe800, 0xefff, 0, 0x1000, read8_delegate(FUNC(mcr_state::twotiger_videoram_r),state), write8_delegate(FUNC(mcr_state::twotiger_videoram_w),state));
 }
 
@@ -2636,8 +2639,9 @@ static DRIVER_INIT( kroozr )
 	mcr_init(machine, 90010, 91399, 91483);
 	mcr_sound_init(machine, MCR_SSIO);
 
-	ssio_set_custom_input(1, 0x47, kroozr_ip1_r);
-	ssio_set_custom_output(4, 0x34, kroozr_op4_w);
+	mcr_state *state = machine.driver_data<mcr_state>();
+	ssio_set_custom_input(1, 0x47, read8_delegate(FUNC(mcr_state::kroozr_ip1_r),state));
+	ssio_set_custom_output(4, 0x34, write8_delegate(FUNC(mcr_state::kroozr_op4_w),state));
 }
 
 
@@ -2646,7 +2650,8 @@ static DRIVER_INIT( journey )
 	mcr_init(machine, 91475, 91464, 90913);
 	mcr_sound_init(machine, MCR_SSIO);
 
-	ssio_set_custom_output(4, 0x01, journey_op4_w);
+	mcr_state *state = machine.driver_data<mcr_state>();
+	ssio_set_custom_output(4, 0x01, write8_delegate(FUNC(mcr_state::journey_op4_w),state));
 }
 
 
@@ -2662,7 +2667,8 @@ static DRIVER_INIT( dotrone )
 	mcr_init(machine, 91490, 91464, 91657);
 	mcr_sound_init(machine, MCR_SSIO | MCR_SQUAWK_N_TALK);
 
-	ssio_set_custom_output(4, 0xff, dotron_op4_w);
+	mcr_state *state = machine.driver_data<mcr_state>();
+	ssio_set_custom_output(4, 0xff, write8_delegate(FUNC(mcr_state::dotron_op4_w),state));
 }
 
 
@@ -2671,8 +2677,9 @@ static DRIVER_INIT( nflfoot )
 	mcr_init(machine, 91490, 91464, 91657);
 	mcr_sound_init(machine, MCR_SSIO | MCR_SQUAWK_N_TALK);
 
-	ssio_set_custom_input(2, 0x80, nflfoot_ip2_r);
-	ssio_set_custom_output(4, 0xff, nflfoot_op4_w);
+	mcr_state *state = machine.driver_data<mcr_state>();
+	ssio_set_custom_input(2, 0x80, read8_delegate(FUNC(mcr_state::nflfoot_ip2_r),state));
+	ssio_set_custom_output(4, 0xff, write8_delegate(FUNC(mcr_state::nflfoot_op4_w),state));
 
 	nflfoot_serial_out_active = FALSE;
 	nflfoot_serial_in_active = FALSE;
@@ -2691,9 +2698,10 @@ static DRIVER_INIT( demoderb )
 	mcr_init(machine, 91490, 91464, 90913);
 	mcr_sound_init(machine, MCR_SSIO | MCR_TURBO_CHIP_SQUEAK);
 
-	ssio_set_custom_input(1, 0xfc, demoderb_ip1_r);
-	ssio_set_custom_input(2, 0xfc, demoderb_ip2_r);
-	ssio_set_custom_output(4, 0xff, demoderb_op4_w);
+	mcr_state *state = machine.driver_data<mcr_state>();
+	ssio_set_custom_input(1, 0xfc, read8_delegate(FUNC(mcr_state::demoderb_ip1_r),state));
+	ssio_set_custom_input(2, 0xfc, read8_delegate(FUNC(mcr_state::demoderb_ip2_r),state));
+	ssio_set_custom_output(4, 0xff, write8_delegate(FUNC(mcr_state::demoderb_op4_w),state));
 
 	/* the SSIO Z80 doesn't have any program to execute */
 	machine.device<cpu_device>("tcscpu")->suspend(SUSPEND_REASON_DISABLE, 1);

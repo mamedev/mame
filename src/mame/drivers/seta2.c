@@ -118,15 +118,15 @@ reelquak:
 
 ***************************************************************************/
 
-static WRITE16_HANDLER( seta2_sound_bank_w )
+WRITE16_MEMBER(seta2_state::seta2_sound_bank_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		UINT8 *ROM = space->machine().region( "x1snd" )->base();
-		int banks = (space->machine().region( "x1snd" )->bytes() - 0x100000) / 0x20000;
+		UINT8 *ROM = machine().region( "x1snd" )->base();
+		int banks = (machine().region( "x1snd" )->bytes() - 0x100000) / 0x20000;
 		if (data >= banks)
 		{
-			logerror("CPU #0 PC %06X: invalid sound bank %04X\n",cpu_get_pc(&space->device()),data);
+			logerror("CPU #0 PC %06X: invalid sound bank %04X\n",cpu_get_pc(&space.device()),data);
 			data %= banks;
 		}
 		memcpy(ROM + offset * 0x20000, ROM + 0x100000 + data * 0x20000, 0x20000);
@@ -138,13 +138,13 @@ static WRITE16_HANDLER( seta2_sound_bank_w )
                                 Guardians
 ***************************************************************************/
 
-static WRITE16_HANDLER( grdians_lockout_w )
+WRITE16_MEMBER(seta2_state::grdians_lockout_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
 		// initially 0, then either $25 (coin 1) or $2a (coin 2)
-		coin_counter_w(space->machine(), 0,data & 0x01);	// or 0x04
-		coin_counter_w(space->machine(), 1,data & 0x02);	// or 0x08
+		coin_counter_w(machine(), 0,data & 0x01);	// or 0x04
+		coin_counter_w(machine(), 1,data & 0x02);	// or 0x08
 	}
 //  popmessage("%04X", data & 0xffff);
 }
@@ -159,13 +159,13 @@ static ADDRESS_MAP_START( grdians_map, AS_PROGRAM, 16, seta2_state )
 	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("P2")					// P2
 	AM_RANGE(0x700004, 0x700005) AM_READ_PORT("SYSTEM")				// Coins
 	AM_RANGE(0x70000c, 0x70000d) AM_READ(watchdog_reset16_r)		// Watchdog
-	AM_RANGE(0x800000, 0x800001) AM_WRITE_LEGACY(grdians_lockout_w)
+	AM_RANGE(0x800000, 0x800001) AM_WRITE(grdians_lockout_w)
 	AM_RANGE(0xb00000, 0xb03fff) AM_DEVREADWRITE_LEGACY("x1snd", seta_sound_word_r,seta_sound_word_w)	// Sound
 	AM_RANGE(0xc00000, 0xc3ffff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)		// Sprites
 	AM_RANGE(0xc40000, 0xc4ffff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")	// Palette
 	AM_RANGE(0xc50000, 0xc5ffff) AM_RAM								// cleared
 	AM_RANGE(0xc60000, 0xc6003f) AM_WRITE(seta2_vregs_w) AM_BASE(m_vregs)	// Video Registers
-	AM_RANGE(0xe00010, 0xe0001f) AM_WRITE_LEGACY(seta2_sound_bank_w)		// Samples Banks
+	AM_RANGE(0xe00010, 0xe0001f) AM_WRITE(seta2_sound_bank_w)		// Samples Banks
 	AM_RANGE(0xfffc00, 0xffffff) AM_READWRITE_LEGACY(tmp68301_regs_r, tmp68301_regs_w)	// TMP68301 Registers
 ADDRESS_MAP_END
 
@@ -199,13 +199,13 @@ static ADDRESS_MAP_START( gundamex_map, AS_PROGRAM, 16, seta2_state )
 	AM_RANGE(0x700008, 0x700009) AM_READ_PORT("IN0")				// P1
 	AM_RANGE(0x70000a, 0x70000b) AM_READ_PORT("IN1")				// P2
 	AM_RANGE(0x70000c, 0x70000d) AM_WRITE(watchdog_reset16_w)
-	AM_RANGE(0x800000, 0x800001) AM_WRITE_LEGACY(grdians_lockout_w)
+	AM_RANGE(0x800000, 0x800001) AM_WRITE(grdians_lockout_w)
 	AM_RANGE(0xb00000, 0xb03fff) AM_DEVREADWRITE_LEGACY("x1snd", seta_sound_word_r,seta_sound_word_w)	// Sound
 	AM_RANGE(0xc00000, 0xc3ffff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)	// Sprites
 	AM_RANGE(0xc40000, 0xc4ffff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")	// Palette
 	AM_RANGE(0xc50000, 0xc5ffff) AM_RAM								// cleared
 	AM_RANGE(0xc60000, 0xc6003f) AM_WRITE(seta2_vregs_w) AM_BASE(m_vregs)	// Video Registers
-	AM_RANGE(0xe00010, 0xe0001f) AM_WRITE_LEGACY(seta2_sound_bank_w)		// Samples Banks
+	AM_RANGE(0xe00010, 0xe0001f) AM_WRITE(seta2_sound_bank_w)		// Samples Banks
 	AM_RANGE(0xfffd0a, 0xfffd0b) AM_DEVREADWRITE_LEGACY("eeprom", gundamex_eeprom_r,gundamex_eeprom_w)	// parallel data register
 	AM_RANGE(0xfffc00, 0xffffff) AM_READWRITE_LEGACY(tmp68301_regs_r, tmp68301_regs_w)	// TMP68301 Registers
 ADDRESS_MAP_END
@@ -215,56 +215,56 @@ ADDRESS_MAP_END
                       Wakakusamonogatari Mahjong Yonshimai
 ***************************************************************************/
 
-static READ16_HANDLER( mj4simai_p1_r )
+READ16_MEMBER(seta2_state::mj4simai_p1_r)
 {
-	seta2_state *state = space->machine().driver_data<seta2_state>();
+//OBRISI.ME
 
-	switch (state->m_keyboard_row)
+	switch (m_keyboard_row)
 	{
-		case 0x01: return input_port_read(space->machine(), "P1_KEY0");
-		case 0x02: return input_port_read(space->machine(), "P1_KEY1");
-		case 0x04: return input_port_read(space->machine(), "P1_KEY2");
-		case 0x08: return input_port_read(space->machine(), "P1_KEY3");
-		case 0x10: return input_port_read(space->machine(), "P1_KEY4");
-		default:   logerror("p1_r with keyboard_row = %02x\n", state->m_keyboard_row); return 0xffff;
+		case 0x01: return input_port_read(machine(), "P1_KEY0");
+		case 0x02: return input_port_read(machine(), "P1_KEY1");
+		case 0x04: return input_port_read(machine(), "P1_KEY2");
+		case 0x08: return input_port_read(machine(), "P1_KEY3");
+		case 0x10: return input_port_read(machine(), "P1_KEY4");
+		default:   logerror("p1_r with keyboard_row = %02x\n", m_keyboard_row); return 0xffff;
 	}
 }
 
-static READ16_HANDLER( mj4simai_p2_r )
+READ16_MEMBER(seta2_state::mj4simai_p2_r)
 {
-	seta2_state *state = space->machine().driver_data<seta2_state>();
+//OBRISI.ME
 
-	switch (state->m_keyboard_row)
+	switch (m_keyboard_row)
 	{
-		case 0x01: return input_port_read(space->machine(), "P2_KEY0");
-		case 0x02: return input_port_read(space->machine(), "P2_KEY1");
-		case 0x04: return input_port_read(space->machine(), "P2_KEY2");
-		case 0x08: return input_port_read(space->machine(), "P2_KEY3");
-		case 0x10: return input_port_read(space->machine(), "P2_KEY4");
-		default:   logerror("p2_r with keyboard_row = %02x\n", state->m_keyboard_row); return 0xffff;
+		case 0x01: return input_port_read(machine(), "P2_KEY0");
+		case 0x02: return input_port_read(machine(), "P2_KEY1");
+		case 0x04: return input_port_read(machine(), "P2_KEY2");
+		case 0x08: return input_port_read(machine(), "P2_KEY3");
+		case 0x10: return input_port_read(machine(), "P2_KEY4");
+		default:   logerror("p2_r with keyboard_row = %02x\n", m_keyboard_row); return 0xffff;
 	}
 }
 
-static WRITE16_HANDLER( mj4simai_keyboard_w )
+WRITE16_MEMBER(seta2_state::mj4simai_keyboard_w)
 {
-	seta2_state *state = space->machine().driver_data<seta2_state>();
+//OBRISI.ME
 
 	if (ACCESSING_BITS_0_7)
-		state->m_keyboard_row = data & 0xff;
+		m_keyboard_row = data & 0xff;
 }
 
 static ADDRESS_MAP_START( mj4simai_map, AS_PROGRAM, 16, seta2_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM								// ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM								// RAM
-	AM_RANGE(0x600000, 0x600001) AM_READ_LEGACY(mj4simai_p1_r)				// P1
-	AM_RANGE(0x600002, 0x600003) AM_READ_LEGACY(mj4simai_p2_r)				// P2
-	AM_RANGE(0x600004, 0x600005) AM_WRITE_LEGACY(mj4simai_keyboard_w)		// select keyboard row to read
+	AM_RANGE(0x600000, 0x600001) AM_READ(mj4simai_p1_r)				// P1
+	AM_RANGE(0x600002, 0x600003) AM_READ(mj4simai_p2_r)				// P2
+	AM_RANGE(0x600004, 0x600005) AM_WRITE(mj4simai_keyboard_w)		// select keyboard row to read
 	AM_RANGE(0x600006, 0x600007) AM_READ(watchdog_reset16_r)		// Watchdog
 	AM_RANGE(0x600100, 0x600101) AM_READ_PORT("SYSTEM")				//
 	AM_RANGE(0x600200, 0x600201) AM_WRITENOP						// Leds? Coins?
 	AM_RANGE(0x600300, 0x600301) AM_READ_PORT("DSW1")				// DSW 1
 	AM_RANGE(0x600302, 0x600303) AM_READ_PORT("DSW2")				// DSW 2
-	AM_RANGE(0x600300, 0x60030f) AM_WRITE_LEGACY(seta2_sound_bank_w)		// Samples Banks
+	AM_RANGE(0x600300, 0x60030f) AM_WRITE(seta2_sound_bank_w)		// Samples Banks
 	AM_RANGE(0xb00000, 0xb03fff) AM_DEVREADWRITE_LEGACY("x1snd", seta_sound_word_r,seta_sound_word_w)	// Sound
 	AM_RANGE(0xc00000, 0xc3ffff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)	// Sprites
 	AM_RANGE(0xc40000, 0xc4ffff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")	// Palette
@@ -287,7 +287,7 @@ static ADDRESS_MAP_START( myangel_map, AS_PROGRAM, 16, seta2_state )
 	AM_RANGE(0x700200, 0x700201) AM_WRITENOP						// Leds? Coins?
 	AM_RANGE(0x700300, 0x700301) AM_READ_PORT("DSW1")				// DSW 1
 	AM_RANGE(0x700302, 0x700303) AM_READ_PORT("DSW2")				// DSW 2
-	AM_RANGE(0x700310, 0x70031f) AM_WRITE_LEGACY(seta2_sound_bank_w)		// Samples Banks
+	AM_RANGE(0x700310, 0x70031f) AM_WRITE(seta2_sound_bank_w)		// Samples Banks
 	AM_RANGE(0xb00000, 0xb03fff) AM_DEVREADWRITE_LEGACY("x1snd", seta_sound_word_r,seta_sound_word_w)	// Sound
 	AM_RANGE(0xc00000, 0xc3ffff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)		// Sprites
 	AM_RANGE(0xc40000, 0xc4ffff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")	// Palette
@@ -310,7 +310,7 @@ static ADDRESS_MAP_START( myangel2_map, AS_PROGRAM, 16, seta2_state )
 	AM_RANGE(0x600200, 0x600201) AM_WRITENOP						// Leds? Coins?
 	AM_RANGE(0x600300, 0x600301) AM_READ_PORT("DSW1")				// DSW 1
 	AM_RANGE(0x600302, 0x600303) AM_READ_PORT("DSW2")				// DSW 2
-	AM_RANGE(0x600300, 0x60030f) AM_WRITE_LEGACY(seta2_sound_bank_w)		// Samples Banks
+	AM_RANGE(0x600300, 0x60030f) AM_WRITE(seta2_sound_bank_w)		// Samples Banks
 	AM_RANGE(0xb00000, 0xb03fff) AM_DEVREADWRITE_LEGACY("x1snd", seta_sound_word_r,seta_sound_word_w)	// Sound
 	AM_RANGE(0xd00000, 0xd3ffff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)		// Sprites
 	AM_RANGE(0xd40000, 0xd4ffff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")	// Palette
@@ -325,23 +325,23 @@ ADDRESS_MAP_END
 
 /*  The game checks for a specific value read from the ROM region.
     The offset to use is stored in RAM at address 0x20BA16 */
-static READ16_HANDLER( pzlbowl_protection_r )
+READ16_MEMBER(seta2_state::pzlbowl_protection_r)
 {
-	UINT32 address = (space->read_word(0x20ba16) << 16) | space->read_word(0x20ba18);
-	return space->machine().region("maincpu")->base()[address - 2];
+	UINT32 address = (space.read_word(0x20ba16) << 16) | space.read_word(0x20ba18);
+	return machine().region("maincpu")->base()[address - 2];
 }
 
-static READ16_HANDLER( pzlbowl_coins_r )
+READ16_MEMBER(seta2_state::pzlbowl_coins_r)
 {
-	return input_port_read(space->machine(), "SYSTEM") | (space->machine().rand() & 0x80 );
+	return input_port_read(machine(), "SYSTEM") | (machine().rand() & 0x80 );
 }
 
-static WRITE16_HANDLER( pzlbowl_coin_counter_w )
+WRITE16_MEMBER(seta2_state::pzlbowl_coin_counter_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_counter_w(space->machine(), 0,data & 0x10);
-		coin_counter_w(space->machine(), 1,data & 0x20);
+		coin_counter_w(machine(), 0,data & 0x10);
+		coin_counter_w(machine(), 1,data & 0x20);
 	}
 }
 
@@ -350,12 +350,12 @@ static ADDRESS_MAP_START( pzlbowl_map, AS_PROGRAM, 16, seta2_state )
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM									// RAM
 	AM_RANGE(0x400300, 0x400301) AM_READ_PORT("DSW1")					// DSW 1
 	AM_RANGE(0x400302, 0x400303) AM_READ_PORT("DSW2")					// DSW 2
-	AM_RANGE(0x400300, 0x40030f) AM_WRITE_LEGACY(seta2_sound_bank_w)			// Samples Banks
+	AM_RANGE(0x400300, 0x40030f) AM_WRITE(seta2_sound_bank_w)			// Samples Banks
 	AM_RANGE(0x500000, 0x500001) AM_READ_PORT("P1")						// P1
 	AM_RANGE(0x500002, 0x500003) AM_READ_PORT("P2")						// P2
-	AM_RANGE(0x500004, 0x500005) AM_READWRITE_LEGACY(pzlbowl_coins_r,pzlbowl_coin_counter_w)	// Coins + Protection?
+	AM_RANGE(0x500004, 0x500005) AM_READWRITE(pzlbowl_coins_r,pzlbowl_coin_counter_w)	// Coins + Protection?
 	AM_RANGE(0x500006, 0x500007) AM_READ(watchdog_reset16_r)			// Watchdog
-	AM_RANGE(0x700000, 0x700001) AM_READ_LEGACY(pzlbowl_protection_r)			// Protection
+	AM_RANGE(0x700000, 0x700001) AM_READ(pzlbowl_protection_r)			// Protection
 	AM_RANGE(0x800000, 0x83ffff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)		// Sprites
 	AM_RANGE(0x840000, 0x84ffff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")	// Palette
 	AM_RANGE(0x860000, 0x86003f) AM_WRITE(seta2_vregs_w) AM_BASE(m_vregs)				// Video Registers
@@ -375,13 +375,13 @@ static ADDRESS_MAP_START( penbros_map, AS_PROGRAM, 16, seta2_state )
 	AM_RANGE(0x300000, 0x30ffff) AM_RAM								// RAM
 	AM_RANGE(0x500300, 0x500301) AM_READ_PORT("DSW1")				// DSW 1
 	AM_RANGE(0x500302, 0x500303) AM_READ_PORT("DSW2")				// DSW 2
-	AM_RANGE(0x500300, 0x50030f) AM_WRITE_LEGACY(seta2_sound_bank_w)		// Samples Banks
+	AM_RANGE(0x500300, 0x50030f) AM_WRITE(seta2_sound_bank_w)		// Samples Banks
 	AM_RANGE(0x600000, 0x600001) AM_READ_PORT("P1")					// P1
 	AM_RANGE(0x600002, 0x600003) AM_READ_PORT("P2")					// P2
 	AM_RANGE(0x600004, 0x600005) AM_READ_PORT("SYSTEM")				// Coins
-	AM_RANGE(0x600004, 0x600005) AM_WRITE_LEGACY(pzlbowl_coin_counter_w)	// Coins Counter
+	AM_RANGE(0x600004, 0x600005) AM_WRITE(pzlbowl_coin_counter_w)	// Coins Counter
 	AM_RANGE(0x600006, 0x600007) AM_READ(watchdog_reset16_r)		// Watchdog
-	//AM_RANGE(0x700000, 0x700001) AM_READ_LEGACY(pzlbowl_protection_r)      // Protection
+	//AM_RANGE(0x700000, 0x700001) AM_READ(pzlbowl_protection_r)      // Protection
 	AM_RANGE(0xb00000, 0xb3ffff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)		// Sprites
 	AM_RANGE(0xb40000, 0xb4ffff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")	// Palette
 	AM_RANGE(0xb60000, 0xb6003f) AM_WRITE(seta2_vregs_w) AM_BASE(m_vregs)
@@ -394,34 +394,34 @@ ADDRESS_MAP_END
                               Reel'N Quake
 ***************************************************************************/
 
-static WRITE16_HANDLER( reelquak_leds_w )
+WRITE16_MEMBER(seta2_state::reelquak_leds_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		set_led_status( space->machine(), 0, data & 0x0001 );	// start
-		set_led_status( space->machine(), 1, data & 0x0002 );	// small
-		set_led_status( space->machine(), 2, data & 0x0004 );	// bet
-		set_led_status( space->machine(), 3, data & 0x0008 );	// big
-		set_led_status( space->machine(), 4, data & 0x0010 );	// double up
-		set_led_status( space->machine(), 5, data & 0x0020 );	// collect
-		set_led_status( space->machine(), 6, data & 0x0040 );	// bet cancel
+		set_led_status( machine(), 0, data & 0x0001 );	// start
+		set_led_status( machine(), 1, data & 0x0002 );	// small
+		set_led_status( machine(), 2, data & 0x0004 );	// bet
+		set_led_status( machine(), 3, data & 0x0008 );	// big
+		set_led_status( machine(), 4, data & 0x0010 );	// double up
+		set_led_status( machine(), 5, data & 0x0020 );	// collect
+		set_led_status( machine(), 6, data & 0x0040 );	// bet cancel
 	}
 	if (ACCESSING_BITS_8_15)
 	{
-		space->machine().device<ticket_dispenser_device>("ticket")->write(*space, 0, (data & 0x0100) >> 1);	// ticket dispenser
+		machine().device<ticket_dispenser_device>("ticket")->write(*&space, 0, (data & 0x0100) >> 1);	// ticket dispenser
 	}
 
 //  popmessage("LED %04X", data);
 }
 
-static WRITE16_HANDLER( reelquak_coin_w )
+WRITE16_MEMBER(seta2_state::reelquak_coin_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_counter_w(space->machine(), 0, data & 0x01);	// coin in
-		coin_counter_w(space->machine(), 1, data & 0x02);	// coin in
-		coin_counter_w(space->machine(), 2, data & 0x04);	// pay out
-		coin_counter_w(space->machine(), 3, data & 0x08);	// key in
+		coin_counter_w(machine(), 0, data & 0x01);	// coin in
+		coin_counter_w(machine(), 1, data & 0x02);	// coin in
+		coin_counter_w(machine(), 2, data & 0x04);	// pay out
+		coin_counter_w(machine(), 3, data & 0x08);	// key in
 		//                                data & 0x10); // Sound IRQ Ack.? 1->0
 		//                                data & 0x20); // Vblank IRQ.? 1
 	}
@@ -436,15 +436,15 @@ static ADDRESS_MAP_START( reelquak_map, AS_PROGRAM, 16, seta2_state )
 	AM_RANGE(0x400002, 0x400003) AM_READ_PORT("TICKET")				// Tickets
 	AM_RANGE(0x400004, 0x400005) AM_READ_PORT("SYSTEM")				// Coins
 	AM_RANGE(0x400006, 0x400007) AM_READ(watchdog_reset16_r)		// Watchdog
-	AM_RANGE(0x400200, 0x400201) AM_WRITE_LEGACY(reelquak_coin_w)			// Coin Counters / IRQ Ack
+	AM_RANGE(0x400200, 0x400201) AM_WRITE(reelquak_coin_w)			// Coin Counters / IRQ Ack
 	AM_RANGE(0x400300, 0x400301) AM_READ_PORT("DSW1")				// DSW 1
 	AM_RANGE(0x400302, 0x400303) AM_READ_PORT("DSW2")				// DSW 2
-	AM_RANGE(0x400300, 0x40030f) AM_WRITE_LEGACY(seta2_sound_bank_w)		// Samples Banks
+	AM_RANGE(0x400300, 0x40030f) AM_WRITE(seta2_sound_bank_w)		// Samples Banks
 	AM_RANGE(0xb00000, 0xb03fff) AM_DEVREADWRITE_LEGACY("x1snd", seta_sound_word_r,seta_sound_word_w)	// Sound
 	AM_RANGE(0xc00000, 0xc3ffff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)		// Sprites
 	AM_RANGE(0xc40000, 0xc4ffff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")	// Palette
 	AM_RANGE(0xc60000, 0xc6003f) AM_WRITE(seta2_vregs_w) AM_BASE(m_vregs)				// Video Registers
-	AM_RANGE(0xfffd0a, 0xfffd0b) AM_WRITE_LEGACY(reelquak_leds_w )		// parallel data register (leds)
+	AM_RANGE(0xfffd0a, 0xfffd0b) AM_WRITE(reelquak_leds_w )		// parallel data register (leds)
 	AM_RANGE(0xfffc00, 0xffffff) AM_READWRITE_LEGACY(tmp68301_regs_r, tmp68301_regs_w)		// TMP68301 Registers
 ADDRESS_MAP_END
 
@@ -467,15 +467,15 @@ ADDRESS_MAP_END
                             Sammy Outdoor Shooting
 ***************************************************************************/
 
-static WRITE16_HANDLER( samshoot_coin_w )
+WRITE16_MEMBER(seta2_state::samshoot_coin_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_counter_w(space->machine(), 0, data & 0x10);
-		coin_counter_w(space->machine(), 1, data & 0x20);
+		coin_counter_w(machine(), 0, data & 0x10);
+		coin_counter_w(machine(), 1, data & 0x20);
 		// Are these connected? They are set in I/O test
-		coin_lockout_w(space->machine(), 0,~data & 0x40);
-		coin_lockout_w(space->machine(), 1,~data & 0x80);
+		coin_lockout_w(machine(), 0,~data & 0x40);
+		coin_lockout_w(machine(), 1,~data & 0x80);
 	}
 //  popmessage("%04x",data);
 }
@@ -488,14 +488,14 @@ static ADDRESS_MAP_START( samshoot_map, AS_PROGRAM, 16, seta2_state )
 	AM_RANGE( 0x400000, 0x400001 ) AM_READ_PORT("DSW1")				// DSW 1
 	AM_RANGE( 0x400002, 0x400003 ) AM_READ_PORT("BUTTONS")			// Buttons
 
-	AM_RANGE( 0x400300, 0x40030f ) AM_WRITE_LEGACY(seta2_sound_bank_w )	// Samples Banks
+	AM_RANGE( 0x400300, 0x40030f ) AM_WRITE(seta2_sound_bank_w )	// Samples Banks
 
 	AM_RANGE( 0x500000, 0x500001 ) AM_READ_PORT("GUN1")				// P1
 	AM_RANGE( 0x580000, 0x580001 ) AM_READ_PORT("GUN2")				// P2
 
 	AM_RANGE( 0x700000, 0x700001 ) AM_READ_PORT("TRIGGER")			// Trigger
 	AM_RANGE( 0x700002, 0x700003 ) AM_READ_PORT("PUMP")				// Pump
-	AM_RANGE( 0x700004, 0x700005 ) AM_READ_PORT("COIN")	AM_WRITE_LEGACY(samshoot_coin_w )	// Coins
+	AM_RANGE( 0x700004, 0x700005 ) AM_READ_PORT("COIN")	AM_WRITE(samshoot_coin_w )	// Coins
 	AM_RANGE( 0x700006, 0x700007 ) AM_READ(watchdog_reset16_r )	// Watchdog?
 
 	AM_RANGE( 0x800000, 0x83ffff ) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)	// Sprites
@@ -516,38 +516,38 @@ ADDRESS_MAP_END
 // Bus conversion functions:
 
 // RAM shared with the sub CPU
-static READ32_HANDLER( funcube_nvram_dword_r )
+READ32_MEMBER(seta2_state::funcube_nvram_dword_r)
 {
-	seta2_state *state = space->machine().driver_data<seta2_state>();
-	UINT16 val = state->m_nvram[offset];
+//OBRISI.ME
+	UINT16 val = m_nvram[offset];
 	return ((val & 0xff00) << 8) | (val & 0x00ff);
 }
 
-static WRITE32_HANDLER( funcube_nvram_dword_w )
+WRITE32_MEMBER(seta2_state::funcube_nvram_dword_w)
 {
-	seta2_state *state = space->machine().driver_data<seta2_state>();
+//OBRISI.ME
 	if (ACCESSING_BITS_0_7)
 	{
-		state->m_nvram[offset] = (state->m_nvram[offset] & 0xff00) | (data & 0x000000ff);
+		m_nvram[offset] = (m_nvram[offset] & 0xff00) | (data & 0x000000ff);
 	}
 	if (ACCESSING_BITS_16_23)
 	{
-		state->m_nvram[offset] = (state->m_nvram[offset] & 0x00ff) | ((data & 0x00ff0000) >> 8);
+		m_nvram[offset] = (m_nvram[offset] & 0x00ff) | ((data & 0x00ff0000) >> 8);
 	}
 }
 
-static WRITE16_HANDLER( spriteram16_word_w )
+WRITE16_MEMBER(seta2_state::spriteram16_word_w)
 {
-	seta2_state *state = space->machine().driver_data<seta2_state>();
+//OBRISI.ME
 
-	COMBINE_DATA( &state->m_spriteram[offset] );
+	COMBINE_DATA( &m_spriteram[offset] );
 }
 
-static READ16_HANDLER( spriteram16_word_r )
+READ16_MEMBER(seta2_state::spriteram16_word_r)
 {
-	seta2_state *state = space->machine().driver_data<seta2_state>();
+//OBRISI.ME
 
-	return state->m_spriteram[offset];
+	return m_spriteram[offset];
 }
 
 // Main CPU
@@ -559,35 +559,35 @@ enum {
 	CF_MBSR		=	0x1ec/4
 };
 
-static WRITE32_HANDLER( coldfire_regs_w )
+WRITE32_MEMBER(seta2_state::coldfire_regs_w)
 {
-	seta2_state *state = space->machine().driver_data<seta2_state>();
+//OBRISI.ME
 
-	COMBINE_DATA( &state->m_coldfire_regs[offset] );
+	COMBINE_DATA( &m_coldfire_regs[offset] );
 }
 
-static READ32_HANDLER( coldfire_regs_r )
+READ32_MEMBER(seta2_state::coldfire_regs_r)
 {
-	seta2_state *state = space->machine().driver_data<seta2_state>();
+//OBRISI.ME
 
 	switch( offset )
 	{
 		case CF_MBSR:
-			return space->machine().rand();
+			return machine().rand();
 
 		case CF_PPDAT:
-			return input_port_read(space->machine(), "BATTERY") << 16;
+			return input_port_read(machine(), "BATTERY") << 16;
 	}
 
-	return state->m_coldfire_regs[offset];
+	return m_coldfire_regs[offset];
 }
 
-static READ32_HANDLER( funcube_debug_r )
+READ32_MEMBER(seta2_state::funcube_debug_r)
 {
-	UINT32 ret = input_port_read(space->machine(),"DEBUG");
+	UINT32 ret = input_port_read(machine(),"DEBUG");
 
 	// This bits let you move the crosshair in the inputs / touch panel test with a joystick
-	if (!(space->machine().primary_screen->frame_number() % 3))
+	if (!(machine().primary_screen->frame_number() % 3))
 		ret |= 0x3f;
 
 	return ret;
@@ -616,18 +616,18 @@ static ADDRESS_MAP_START( funcube_map, AS_PROGRAM, 32, seta2_state )
 	AM_RANGE( 0x00000000, 0x0007ffff ) AM_ROM
 	AM_RANGE( 0x00200000, 0x0020ffff ) AM_RAM
 
-	AM_RANGE( 0x00500000, 0x00500003 ) AM_READ_LEGACY(funcube_debug_r )
+	AM_RANGE( 0x00500000, 0x00500003 ) AM_READ(funcube_debug_r )
 	AM_RANGE( 0x00500004, 0x00500007 ) AM_READ(watchdog_reset32_r ) AM_WRITENOP
 
 	AM_RANGE( 0x00600000, 0x00600003 ) AM_DEVREADWRITE_LEGACY("oki", oki_read, oki_write)
 
-	AM_RANGE( 0x00800000, 0x0083ffff ) AM_READWRITE16_LEGACY(spriteram16_word_r,  spriteram16_word_w, 0xffffffff ) AM_BASE_SIZE(m_spriteram, m_spriteram_size)
+	AM_RANGE( 0x00800000, 0x0083ffff ) AM_READWRITE16(spriteram16_word_r,  spriteram16_word_w, 0xffffffff ) AM_BASE_SIZE(m_spriteram, m_spriteram_size)
 	AM_RANGE( 0x00840000, 0x0084ffff ) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_dword_be_w) AM_SHARE("paletteram")
 	AM_RANGE( 0x00860000, 0x0086003f ) AM_WRITE16(seta2_vregs_w, 0xffffffff ) AM_BASE(m_vregs)
 
-	AM_RANGE( 0x00c00000, 0x00c002ff ) AM_READWRITE_LEGACY(funcube_nvram_dword_r, funcube_nvram_dword_w )
+	AM_RANGE( 0x00c00000, 0x00c002ff ) AM_READWRITE(funcube_nvram_dword_r, funcube_nvram_dword_w )
 
-	AM_RANGE(0xf0000000, 0xf00001ff ) AM_READWRITE_LEGACY(coldfire_regs_r, coldfire_regs_w ) AM_BASE(m_coldfire_regs)	// Module
+	AM_RANGE(0xf0000000, 0xf00001ff ) AM_READWRITE(coldfire_regs_r, coldfire_regs_w ) AM_BASE(m_coldfire_regs)	// Module
 	AM_RANGE(0xffffe000, 0xffffffff ) AM_RAM	// SRAM
 ADDRESS_MAP_END
 
@@ -645,52 +645,52 @@ ADDRESS_MAP_END
 
 #define FUNCUBE_SUB_CPU_CLOCK (XTAL_14_7456MHz)
 
-static READ8_HANDLER( funcube_coins_r )
+READ8_MEMBER(seta2_state::funcube_coins_r)
 {
-	seta2_state *state = space->machine().driver_data<seta2_state>();
-	UINT8 ret = input_port_read(space->machine(),"SWITCH");
+//OBRISI.ME
+	UINT8 ret = input_port_read(machine(),"SWITCH");
 	UINT8 coin_bit0 = 1;	// active low
 	UINT8 coin_bit1 = 1;
 
-	UINT8 hopper_bit = (state->m_funcube_hopper_motor && !(space->machine().primary_screen->frame_number()%20)) ? 1 : 0;
+	UINT8 hopper_bit = (m_funcube_hopper_motor && !(machine().primary_screen->frame_number()%20)) ? 1 : 0;
 
 	const UINT64 coin_total_cycles = FUNCUBE_SUB_CPU_CLOCK / (1000/20);
 
-	if ( state->m_funcube_coin_start_cycles )
+	if ( m_funcube_coin_start_cycles )
 	{
-		UINT64 elapsed = downcast<cpu_device *>(&space->device())->total_cycles() - state->m_funcube_coin_start_cycles;
+		UINT64 elapsed = downcast<cpu_device *>(&space.device())->total_cycles() - m_funcube_coin_start_cycles;
 
 		if ( elapsed < coin_total_cycles/2 )
 			coin_bit0 = 0;
 		else if ( elapsed < coin_total_cycles )
 			coin_bit1 = 0;
 		else
-			state->m_funcube_coin_start_cycles = 0;
+			m_funcube_coin_start_cycles = 0;
 	}
 	else
 	{
 		if (!(ret & 1))
-			state->m_funcube_coin_start_cycles = downcast<cpu_device *>(&space->device())->total_cycles();
+			m_funcube_coin_start_cycles = downcast<cpu_device *>(&space.device())->total_cycles();
 	}
 
 	return (ret & ~7) | (hopper_bit << 2) | (coin_bit1 << 1) | coin_bit0;
 }
 
-static READ8_HANDLER( funcube_serial_r )
+READ8_MEMBER(seta2_state::funcube_serial_r)
 {
-	seta2_state *state = space->machine().driver_data<seta2_state>();
+//OBRISI.ME
 	UINT8 ret = 0xff;
 
-	switch( state->m_funcube_serial_count )
+	switch( m_funcube_serial_count )
 	{
-		case 4:	ret = state->m_funcube_serial_fifo[0];	break;
-		case 3:	ret = state->m_funcube_serial_fifo[1];	break;
-		case 2:	ret = state->m_funcube_serial_fifo[2];	break;
-		case 1:	ret = state->m_funcube_serial_fifo[3];	break;
+		case 4:	ret = m_funcube_serial_fifo[0];	break;
+		case 3:	ret = m_funcube_serial_fifo[1];	break;
+		case 2:	ret = m_funcube_serial_fifo[2];	break;
+		case 1:	ret = m_funcube_serial_fifo[3];	break;
 	}
 
-	if (state->m_funcube_serial_count)
-		state->m_funcube_serial_count--;
+	if (m_funcube_serial_count)
+		m_funcube_serial_count--;
 
 	return ret;
 }
@@ -702,59 +702,59 @@ static void funcube_debug_outputs(void)
 #endif
 }
 
-static WRITE8_HANDLER( funcube_leds_w )
+WRITE8_MEMBER(seta2_state::funcube_leds_w)
 {
-	seta2_state *state = space->machine().driver_data<seta2_state>();
+//OBRISI.ME
 
-	*state->m_funcube_leds = data;
+	*m_funcube_leds = data;
 
-	set_led_status( space->machine(), 0, (~data) & 0x01 );	// win lamp (red)
-	set_led_status( space->machine(), 1, (~data) & 0x02 );	// win lamp (green)
+	set_led_status( machine(), 0, (~data) & 0x01 );	// win lamp (red)
+	set_led_status( machine(), 1, (~data) & 0x02 );	// win lamp (green)
 
 	// Set in a moving pattern: 0111 -> 1011 -> 1101 -> 1110
-	set_led_status( space->machine(), 2, (~data) & 0x10 );
-	set_led_status( space->machine(), 3, (~data) & 0x20 );
-	set_led_status( space->machine(), 4, (~data) & 0x40 );
-	set_led_status( space->machine(), 5, (~data) & 0x80 );
+	set_led_status( machine(), 2, (~data) & 0x10 );
+	set_led_status( machine(), 3, (~data) & 0x20 );
+	set_led_status( machine(), 4, (~data) & 0x40 );
+	set_led_status( machine(), 5, (~data) & 0x80 );
 
 	funcube_debug_outputs();
 }
 
-static READ8_HANDLER( funcube_outputs_r )
+READ8_MEMBER(seta2_state::funcube_outputs_r)
 {
-	seta2_state *state = space->machine().driver_data<seta2_state>();
+//OBRISI.ME
 
 	// Bits 1,2,3 read
-	return *state->m_funcube_outputs;
+	return *m_funcube_outputs;
 }
 
-static WRITE8_HANDLER( funcube_outputs_w )
+WRITE8_MEMBER(seta2_state::funcube_outputs_w)
 {
-	seta2_state *state = space->machine().driver_data<seta2_state>();
+//OBRISI.ME
 
-	*state->m_funcube_outputs = data;
+	*m_funcube_outputs = data;
 
 	// Bits 0,1,3 written
 
 	// Bit 0: hopper motor
-	state->m_funcube_hopper_motor = (~data) & 0x01;
+	m_funcube_hopper_motor = (~data) & 0x01;
 
 	// Bit 1: high on pay out
 
 	// Bit 3: low after coining up, blinks on pay out
-	set_led_status( space->machine(), 6, (~data) & 0x08 );
+	set_led_status( machine(), 6, (~data) & 0x08 );
 
 	funcube_debug_outputs();
 }
 
 
 static ADDRESS_MAP_START( funcube_sub_io, AS_IO, 8, seta2_state )
-	AM_RANGE( H8_PORT_7,   H8_PORT_7   )	AM_READ_LEGACY(funcube_coins_r )
+	AM_RANGE( H8_PORT_7,   H8_PORT_7   )	AM_READ(funcube_coins_r )
 	AM_RANGE( H8_PORT_4,   H8_PORT_4   )	AM_NOP	// unused
-	AM_RANGE( H8_PORT_A,   H8_PORT_A   )	AM_READWRITE_LEGACY(funcube_outputs_r, funcube_outputs_w ) AM_BASE(m_funcube_outputs )
-	AM_RANGE( H8_PORT_B,   H8_PORT_B   )	AM_WRITE_LEGACY(funcube_leds_w )                           AM_BASE(m_funcube_leds )
+	AM_RANGE( H8_PORT_A,   H8_PORT_A   )	AM_READWRITE(funcube_outputs_r, funcube_outputs_w ) AM_BASE(m_funcube_outputs )
+	AM_RANGE( H8_PORT_B,   H8_PORT_B   )	AM_WRITE(funcube_leds_w )                           AM_BASE(m_funcube_leds )
 //  AM_RANGE( H8_SERIAL_0, H8_SERIAL_0 )    // cabinets linking (jpunit)
-	AM_RANGE( H8_SERIAL_1, H8_SERIAL_1 )	AM_READ_LEGACY(funcube_serial_r )
+	AM_RANGE( H8_SERIAL_1, H8_SERIAL_1 )	AM_READ(funcube_serial_r )
 ADDRESS_MAP_END
 
 

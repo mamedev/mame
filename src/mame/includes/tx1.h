@@ -140,6 +140,18 @@ public:
 	DECLARE_WRITE16_MEMBER(buggyboy_gas_w);
 	DECLARE_WRITE16_MEMBER(buggyboy_sky_w);
 	DECLARE_WRITE16_MEMBER(buggyboy_scolst_w);
+	DECLARE_WRITE16_MEMBER(z80_busreq_w);
+	DECLARE_WRITE16_MEMBER(resume_math_w);
+	DECLARE_WRITE16_MEMBER(halt_math_w);
+	DECLARE_WRITE8_MEMBER(z80_intreq_w);
+	DECLARE_READ16_MEMBER(z80_shared_r);
+	DECLARE_WRITE16_MEMBER(z80_shared_w);
+	DECLARE_READ16_MEMBER(dipswitches_r);
+	DECLARE_WRITE8_MEMBER(ts_w);
+	DECLARE_READ8_MEMBER(ts_r);
+	DECLARE_WRITE8_MEMBER(tx1_ppi_latch_w);
+	DECLARE_READ8_MEMBER(bb_analog_r);
+	DECLARE_READ8_MEMBER(bbjr_analog_r);
 };
 
 

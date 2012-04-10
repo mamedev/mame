@@ -164,13 +164,13 @@ static TIMER_DEVICE_CALLBACK( galhustl_scanline )
 }
 
 
-static WRITE16_HANDLER( galpanic_6295_bankswitch_w )
+WRITE16_MEMBER(galpanic_state::galpanic_6295_bankswitch_w)
 {
-	device_t *pandora = space->machine().device("pandora");
+	device_t *pandora = machine().device("pandora");
 
 	if (ACCESSING_BITS_8_15)
 	{
-		UINT8 *rom = space->machine().region("oki")->base();
+		UINT8 *rom = machine().region("oki")->base();
 
 		memcpy(&rom[0x30000],&rom[0x40000 + ((data >> 8) & 0x0f) * 0x10000],0x10000);
 
@@ -179,18 +179,18 @@ static WRITE16_HANDLER( galpanic_6295_bankswitch_w )
 	}
 }
 
-static WRITE16_HANDLER( galpanica_6295_bankswitch_w )
+WRITE16_MEMBER(galpanic_state::galpanica_6295_bankswitch_w)
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		UINT8 *rom = space->machine().region("oki")->base();
+		UINT8 *rom = machine().region("oki")->base();
 
 		memcpy(&rom[0x30000],&rom[0x40000 + ((data >> 8) & 0x0f) * 0x10000],0x10000);
 	}
 }
 
 #ifdef UNUSED_FUNCTION
-static WRITE16_HANDLER( galpanica_misc_w )
+WRITE16_MEMBER(galpanic_state::galpanica_misc_w)
 {
 	device_t *pandora = machine.device("pandora");
 
@@ -203,25 +203,25 @@ static WRITE16_HANDLER( galpanica_misc_w )
 }
 #endif
 
-static WRITE16_HANDLER( galpanic_coin_w )
+WRITE16_MEMBER(galpanic_state::galpanic_coin_w)
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		coin_counter_w(space->machine(), 0, data & 0x100);
-		coin_counter_w(space->machine(), 1, data & 0x200);
+		coin_counter_w(machine(), 0, data & 0x100);
+		coin_counter_w(machine(), 1, data & 0x200);
 
-		coin_lockout_w(space->machine(), 0, ~data & 0x400);
-		coin_lockout_w(space->machine(), 1, ~data & 0x800);
+		coin_lockout_w(machine(), 0, ~data & 0x400);
+		coin_lockout_w(machine(), 1, ~data & 0x800);
 	}
 }
 
-static WRITE16_HANDLER( galpanic_bgvideoram_mirror_w )
+WRITE16_MEMBER(galpanic_state::galpanic_bgvideoram_mirror_w)
 {
 	int i;
 	for(i = 0; i < 8; i++)
 	{
 		// or offset + i * 0x2000 ?
-		galpanic_bgvideoram_w(space, offset * 8 + i, data, mem_mask);
+		galpanic_bgvideoram_w(&space, offset * 8 + i, data, mem_mask);
 	}
 }
 
@@ -236,17 +236,17 @@ static ADDRESS_MAP_START( galpanic_map, AS_PROGRAM, 16, galpanic_state )
 	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("DSW1")
 	AM_RANGE(0x800002, 0x800003) AM_READ_PORT("DSW2")
 	AM_RANGE(0x800004, 0x800005) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x900000, 0x900001) AM_WRITE_LEGACY(galpanic_6295_bankswitch_w)
-	AM_RANGE(0xa00000, 0xa00001) AM_WRITE_LEGACY(galpanic_coin_w)	/* coin counters */
+	AM_RANGE(0x900000, 0x900001) AM_WRITE(galpanic_6295_bankswitch_w)
+	AM_RANGE(0xa00000, 0xa00001) AM_WRITE(galpanic_coin_w)	/* coin counters */
 	AM_RANGE(0xb00000, 0xb00001) AM_WRITENOP	/* ??? */
 	AM_RANGE(0xc00000, 0xc00001) AM_WRITENOP	/* ??? */
 	AM_RANGE(0xd00000, 0xd00001) AM_WRITENOP	/* ??? */
 	AM_RANGE(0xe00000, 0xe00015) AM_READWRITE(galpanib_calc_r,galpanib_calc_w) /* CALC1 MCU interaction (simulated) */
 ADDRESS_MAP_END
 
-static READ16_HANDLER( comad_timer_r )
+READ16_MEMBER(galpanic_state::comad_timer_r)
 {
-	return (space->machine().primary_screen->vpos() & 0x07) << 8;
+	return (machine().primary_screen->vpos() & 0x07) << 8;
 }
 
 /* a kludge! */
@@ -271,9 +271,9 @@ static ADDRESS_MAP_START( comad_map, AS_PROGRAM, 16, galpanic_state )
 	AM_RANGE(0x800002, 0x800003) AM_READ_PORT("DSW2")
 	AM_RANGE(0x800004, 0x800005) AM_READ_PORT("SYSTEM")
 //  AM_RANGE(0x800006, 0x800007)    ??
-	AM_RANGE(0x80000a, 0x80000b) AM_READ_LEGACY(comad_timer_r)	/* bits 8-a = timer? palette update code waits for them to be 111 */
-	AM_RANGE(0x80000c, 0x80000d) AM_READ_LEGACY(comad_timer_r)	/* missw96 bits 8-a = timer? palette update code waits for them to be 111 */
-	AM_RANGE(0x900000, 0x900001) AM_WRITE_LEGACY(galpanica_6295_bankswitch_w)	/* not sure */
+	AM_RANGE(0x80000a, 0x80000b) AM_READ(comad_timer_r)	/* bits 8-a = timer? palette update code waits for them to be 111 */
+	AM_RANGE(0x80000c, 0x80000d) AM_READ(comad_timer_r)	/* missw96 bits 8-a = timer? palette update code waits for them to be 111 */
+	AM_RANGE(0x900000, 0x900001) AM_WRITE(galpanica_6295_bankswitch_w)	/* not sure */
 	AM_RANGE(0xc00000, 0xc0ffff) AM_RAM				/* missw96 */
 	AM_RANGE(0xc80000, 0xc8ffff) AM_RAM				/* fantasia, newfant */
 	AM_RANGE(0xf00000, 0xf00001) AM_DEVREAD8_LEGACY("oki", comad_okim6295_r, 0xff00) AM_DEVWRITE8("oki", okim6295_device, write, 0xff00)	/* fantasia, missw96 */
@@ -290,8 +290,8 @@ static ADDRESS_MAP_START( fantsia2_map, AS_PROGRAM, 16, galpanic_state )
 	AM_RANGE(0x800002, 0x800003) AM_READ_PORT("DSW2")
 	AM_RANGE(0x800004, 0x800005) AM_READ_PORT("SYSTEM")
 //  AM_RANGE(0x800006, 0x800007)    ??
-	AM_RANGE(0x800008, 0x800009) AM_READ_LEGACY(comad_timer_r)	/* bits 8-a = timer? palette update code waits for them to be 111 */
-	AM_RANGE(0x900000, 0x900001) AM_WRITE_LEGACY(galpanica_6295_bankswitch_w)	/* not sure */
+	AM_RANGE(0x800008, 0x800009) AM_READ(comad_timer_r)	/* bits 8-a = timer? palette update code waits for them to be 111 */
+	AM_RANGE(0x900000, 0x900001) AM_WRITE(galpanica_6295_bankswitch_w)	/* not sure */
 	AM_RANGE(0xa00000, 0xa00001) AM_WRITENOP	/* coin counters, + ? */
 	AM_RANGE(0xc80000, 0xc80001) AM_DEVREAD8_LEGACY("oki", comad_okim6295_r, 0xff00) AM_DEVWRITE8("oki", okim6295_device, write, 0xff00)
 	AM_RANGE(0xf80000, 0xf8ffff) AM_RAM
@@ -302,7 +302,7 @@ static ADDRESS_MAP_START( galhustl_map, AS_PROGRAM, 16, galpanic_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
     AM_RANGE(0x500000, 0x51ffff) AM_RAM AM_BASE(m_fgvideoram) AM_SIZE(m_fgvideoram_size)
 	AM_RANGE(0x520000, 0x53ffff) AM_WRITE_LEGACY(galpanic_bgvideoram_w) AM_BASE(m_bgvideoram)
-	AM_RANGE(0x580000, 0x583fff) AM_RAM_WRITE_LEGACY(galpanic_bgvideoram_mirror_w)
+	AM_RANGE(0x580000, 0x583fff) AM_RAM_WRITE(galpanic_bgvideoram_mirror_w)
 	AM_RANGE(0x600000, 0x6007ff) AM_RAM_WRITE_LEGACY(galpanic_paletteram_w) AM_SHARE("paletteram")	/* 1024 colors, but only 512 seem to be used */
 	AM_RANGE(0x600800, 0x600fff) AM_RAM	// writes only 1?
 	AM_RANGE(0x680000, 0x68001f) AM_RAM	// regs?
@@ -311,16 +311,16 @@ static ADDRESS_MAP_START( galhustl_map, AS_PROGRAM, 16, galpanic_state )
 	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("DSW1")
 	AM_RANGE(0x800002, 0x800003) AM_READ_PORT("DSW2")
 	AM_RANGE(0x800004, 0x800005) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x900000, 0x900001) AM_WRITE_LEGACY(galpanica_6295_bankswitch_w)
+	AM_RANGE(0x900000, 0x900001) AM_WRITE(galpanica_6295_bankswitch_w)
 	AM_RANGE(0xa00000, 0xa00001) AM_WRITENOP // ?
 	AM_RANGE(0xd00000, 0xd00001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0xff00)
 	AM_RANGE(0xe80000, 0xe8ffff) AM_RAM
 ADDRESS_MAP_END
 
 #ifdef UNUSED_FUNCTION
-READ16_HANDLER( zipzap_random_read )
+READ16_MEMBER(galpanic_state::zipzap_random_read)
 {
-    return space->machine().rand();
+    return machine().rand();
 }
 #endif
 
@@ -328,7 +328,7 @@ static ADDRESS_MAP_START( zipzap_map, AS_PROGRAM, 16, galpanic_state )
 	AM_RANGE(0x000000, 0x4fffff) AM_ROM
 	AM_RANGE(0x500000, 0x51ffff) AM_RAM AM_BASE(m_fgvideoram) AM_SIZE(m_fgvideoram_size)
 	AM_RANGE(0x520000, 0x53ffff) AM_RAM_WRITE_LEGACY(galpanic_bgvideoram_w) AM_BASE(m_bgvideoram)
-	AM_RANGE(0x580000, 0x583fff) AM_RAM_WRITE_LEGACY(galpanic_bgvideoram_mirror_w)
+	AM_RANGE(0x580000, 0x583fff) AM_RAM_WRITE(galpanic_bgvideoram_mirror_w)
 	AM_RANGE(0x600000, 0x600fff) AM_RAM_WRITE_LEGACY(galpanic_paletteram_w) AM_SHARE("paletteram")	/* 1024 colors, but only 512 seem to be used */
 	AM_RANGE(0x680000, 0x68001f) AM_RAM
 	AM_RANGE(0x700000, 0x700fff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
@@ -338,7 +338,7 @@ static ADDRESS_MAP_START( zipzap_map, AS_PROGRAM, 16, galpanic_state )
 	AM_RANGE(0x800002, 0x800003) AM_READ_PORT("DSW2")
 	AM_RANGE(0x800004, 0x800005) AM_READ_PORT("SYSTEM")
 
-	AM_RANGE(0x900000, 0x900001) AM_WRITE_LEGACY(galpanica_6295_bankswitch_w)
+	AM_RANGE(0x900000, 0x900001) AM_WRITE(galpanica_6295_bankswitch_w)
 
 	AM_RANGE(0xc00000, 0xc00001) AM_DEVREAD8_LEGACY("oki", comad_okim6295_r, 0xff00) AM_DEVWRITE8("oki", okim6295_device, write, 0xff00)	/* fantasia, missw96 */
 
@@ -349,7 +349,7 @@ static ADDRESS_MAP_START( supmodel_map, AS_PROGRAM, 16, galpanic_state )
 	AM_RANGE(0x000000, 0x4fffff) AM_ROM
 	AM_RANGE(0x500000, 0x51ffff) AM_RAM AM_BASE(m_fgvideoram) AM_SIZE(m_fgvideoram_size)
 	AM_RANGE(0x520000, 0x53ffff) AM_RAM_WRITE_LEGACY(galpanic_bgvideoram_w) AM_BASE(m_bgvideoram)
-//  AM_RANGE(0x580000, 0x583fff) AM_RAM_WRITE_LEGACY(galpanic_bgvideoram_mirror_w) // can't be right, causes half the display to vanish at times!
+//  AM_RANGE(0x580000, 0x583fff) AM_RAM_WRITE(galpanic_bgvideoram_mirror_w) // can't be right, causes half the display to vanish at times!
 	AM_RANGE(0x600000, 0x600fff) AM_RAM_WRITE_LEGACY(galpanic_paletteram_w) AM_SHARE("paletteram")	/* 1024 colors, but only 512 seem to be used */
 	AM_RANGE(0x680000, 0x68001f) AM_RAM
 	AM_RANGE(0x700000, 0x700fff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
@@ -357,9 +357,9 @@ static ADDRESS_MAP_START( supmodel_map, AS_PROGRAM, 16, galpanic_state )
 	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("DSW1")
 	AM_RANGE(0x800002, 0x800003) AM_READ_PORT("DSW2")
 	AM_RANGE(0x800004, 0x800005) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x800006, 0x800007) AM_READ_LEGACY(comad_timer_r)
-	AM_RANGE(0x800008, 0x800009) AM_READ_LEGACY(comad_timer_r)
-	AM_RANGE(0x900000, 0x900001) AM_WRITE_LEGACY(galpanica_6295_bankswitch_w)	/* not sure */
+	AM_RANGE(0x800006, 0x800007) AM_READ(comad_timer_r)
+	AM_RANGE(0x800008, 0x800009) AM_READ(comad_timer_r)
+	AM_RANGE(0x900000, 0x900001) AM_WRITE(galpanica_6295_bankswitch_w)	/* not sure */
 	AM_RANGE(0xa00000, 0xa00001) AM_WRITENOP
 	AM_RANGE(0xc80000, 0xc8ffff) AM_RAM
 	AM_RANGE(0xd80000, 0xd80001) AM_WRITENOP

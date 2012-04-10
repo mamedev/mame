@@ -78,6 +78,28 @@ public:
 	DECLARE_WRITE32_MEMBER(midvunit_paletteram_w);
 	DECLARE_WRITE32_MEMBER(midvunit_textureram_w);
 	DECLARE_READ32_MEMBER(midvunit_textureram_r);
+	DECLARE_READ32_MEMBER(port0_r);
+	DECLARE_READ32_MEMBER(midvunit_adc_r);
+	DECLARE_WRITE32_MEMBER(midvunit_adc_w);
+	DECLARE_WRITE32_MEMBER(midvunit_cmos_protect_w);
+	DECLARE_WRITE32_MEMBER(midvunit_cmos_w);
+	DECLARE_READ32_MEMBER(midvunit_cmos_r);
+	DECLARE_WRITE32_MEMBER(midvunit_control_w);
+	DECLARE_WRITE32_MEMBER(crusnwld_control_w);
+	DECLARE_WRITE32_MEMBER(midvunit_sound_w);
+	DECLARE_READ32_MEMBER(tms32031_control_r);
+	DECLARE_WRITE32_MEMBER(tms32031_control_w);
+	DECLARE_READ32_MEMBER(crusnwld_serial_status_r);
+	DECLARE_READ32_MEMBER(crusnwld_serial_data_r);
+	DECLARE_WRITE32_MEMBER(crusnwld_serial_data_w);
+	DECLARE_READ32_MEMBER(bit_data_r);
+	DECLARE_WRITE32_MEMBER(bit_reset_w);
+	DECLARE_READ32_MEMBER(offroadc_serial_status_r);
+	DECLARE_READ32_MEMBER(offroadc_serial_data_r);
+	DECLARE_WRITE32_MEMBER(offroadc_serial_data_w);
+	DECLARE_READ32_MEMBER(midvplus_misc_r);
+	DECLARE_WRITE32_MEMBER(midvplus_misc_w);
+	DECLARE_READ32_MEMBER(generic_speedup_r);
 };
 
 

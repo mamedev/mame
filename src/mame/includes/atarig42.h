@@ -31,6 +31,17 @@ public:
 
 	device_t *		m_rle;
 	UINT32			m_last_accesses[8];
+	DECLARE_READ16_MEMBER(special_port2_r);
+	DECLARE_WRITE16_MEMBER(a2d_select_w);
+	DECLARE_READ16_MEMBER(a2d_data_r);
+	DECLARE_WRITE16_MEMBER(io_latch_w);
+	DECLARE_WRITE16_MEMBER(mo_command_w);
+	DECLARE_READ16_MEMBER(roadriot_sloop_data_r);
+	DECLARE_WRITE16_MEMBER(roadriot_sloop_data_w);
+	DECLARE_READ16_MEMBER(guardians_sloop_data_r);
+	DECLARE_WRITE16_MEMBER(guardians_sloop_data_w);
+	void roadriot_sloop_tweak(int offset);
+	void guardians_sloop_tweak(int offset);
 };
 
 

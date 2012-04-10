@@ -20,8 +20,8 @@ READ8_HANDLER( ssio_status_r );
 READ8_HANDLER( ssio_input_port_r );
 WRITE8_HANDLER( ssio_output_port_w );
 void ssio_reset_w(running_machine &machine, int state);
-void ssio_set_custom_input(int which, int mask, read8_space_func handler);
-void ssio_set_custom_output(int which, int mask, write8_space_func handler);
+void ssio_set_custom_input(int which, int mask, read8_delegate handler);
+void ssio_set_custom_output(int which, int mask, write8_delegate handler);
 
 WRITE8_HANDLER( csdeluxe_data_w );
 READ8_HANDLER( csdeluxe_status_r );

@@ -18,6 +18,12 @@ public:
 	UINT8 *			m_bank_source_data;
 
 	UINT8			m_playfield_tile_bank;
+	DECLARE_READ16_MEMBER(sound_busy_r);
+	DECLARE_READ16_MEMBER(pedal_0_r);
+	DECLARE_READ16_MEMBER(pedal_1_r);
+	DECLARE_READ8_MEMBER(audio_io_r);
+	DECLARE_WRITE8_MEMBER(audio_io_w);
+	DECLARE_READ16_MEMBER(badlandsb_unk_r);
 };
 
 

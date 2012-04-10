@@ -746,8 +746,8 @@ static ADDRESS_MAP_START( st0016_io, AS_IO, 8, darkhors_state )
 	//AM_RANGE(0xc0, 0xc0) AM_READ_LEGACY(cmd1_r)
 	//AM_RANGE(0xc1, 0xc1) AM_READ_LEGACY(cmd2_r)
 	//AM_RANGE(0xc2, 0xc2) AM_READ_LEGACY(cmd_stat8_r)
-	AM_RANGE(0xe1, 0xe1) AM_WRITE_LEGACY(st0016_rom_bank_w)
-	AM_RANGE(0xe7, 0xe7) AM_WRITE_LEGACY(st0016_rom_bank_w)
+	AM_RANGE(0xe1, 0xe1) AM_WRITE(st0016_rom_bank_w)
+	AM_RANGE(0xe7, 0xe7) AM_WRITE(st0016_rom_bank_w)
 	//AM_RANGE(0xf0, 0xf0) AM_READ_LEGACY(st0016_dma_r)
 ADDRESS_MAP_END
 

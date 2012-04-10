@@ -37,6 +37,25 @@ public:
 	required_device<cpu_device> m_mcu;
 	DECLARE_READ32_MEMBER(randgen_r);
 	DECLARE_WRITE32_MEMBER(srand_w);
+	DECLARE_WRITE32_MEMBER(namconb1_cpureg_w);
+	DECLARE_WRITE32_MEMBER(namconb2_cpureg_w);
+	DECLARE_READ32_MEMBER(namconb_cpureg_r);
+	DECLARE_READ32_MEMBER(custom_key_r);
+	DECLARE_READ32_MEMBER(gunbulet_gun_r);
+	DECLARE_READ32_MEMBER(namconb_share_r);
+	DECLARE_WRITE32_MEMBER(namconb_share_w);
+	DECLARE_WRITE16_MEMBER(nbmcu_shared_w);
+	DECLARE_READ8_MEMBER(port6_r);
+	DECLARE_WRITE8_MEMBER(port6_w);
+	DECLARE_READ8_MEMBER(port7_r);
+	DECLARE_READ8_MEMBER(dac7_r);
+	DECLARE_READ8_MEMBER(dac6_r);
+	DECLARE_READ8_MEMBER(dac5_r);
+	DECLARE_READ8_MEMBER(dac4_r);
+	DECLARE_READ8_MEMBER(dac3_r);
+	DECLARE_READ8_MEMBER(dac2_r);
+	DECLARE_READ8_MEMBER(dac1_r);
+	DECLARE_READ8_MEMBER(dac0_r);
 };
 
 

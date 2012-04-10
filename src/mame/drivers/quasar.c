@@ -44,54 +44,54 @@ I8085 Sound Board
 
 ************************************************************************/
 
-static WRITE8_HANDLER( video_page_select_w )
+WRITE8_MEMBER(quasar_state::video_page_select_w)
 {
-	quasar_state *state = space->machine().driver_data<quasar_state>();
-	state->m_page = offset & 0x03;
+//OBRISI.ME
+	m_page = offset & 0x03;
 }
 
-static WRITE8_HANDLER( io_page_select_w )
+WRITE8_MEMBER(quasar_state::io_page_select_w)
 {
-	quasar_state *state = space->machine().driver_data<quasar_state>();
-	state->m_io_page = offset & 0x03;
+//OBRISI.ME
+	m_io_page = offset & 0x03;
 }
 
-static WRITE8_HANDLER( quasar_video_w )
+WRITE8_MEMBER(quasar_state::quasar_video_w)
 {
-	quasar_state *state = space->machine().driver_data<quasar_state>();
+//OBRISI.ME
 
-	switch (state->m_page)
+	switch (m_page)
 	{
-	case 0:  state->m_video_ram[offset] = data; break;
-	case 1:  state->m_color_ram[offset] = data & 7; break;	// 3 bits of ram only - 3 x 2102
-	case 2:  state->m_effectram[offset] = data; break;
-	case 3:  state->m_effectcontrol = data; break;
+	case 0:  m_video_ram[offset] = data; break;
+	case 1:  m_color_ram[offset] = data & 7; break;	// 3 bits of ram only - 3 x 2102
+	case 2:  m_effectram[offset] = data; break;
+	case 3:  m_effectcontrol = data; break;
 	}
 }
 
-static READ8_HANDLER( quasar_IO_r )
+READ8_MEMBER(quasar_state::quasar_IO_r)
 {
-	quasar_state *state = space->machine().driver_data<quasar_state>();
+//OBRISI.ME
 	UINT8 ans = 0;
 
-	switch (state->m_io_page)
+	switch (m_io_page)
 	{
-	case 0:  ans = input_port_read(space->machine(), "IN0"); break;
-	case 1:  ans = input_port_read(space->machine(), "IN1"); break;
-	case 2:  ans = input_port_read(space->machine(), "DSW0"); break;
-	case 3:  ans = input_port_read(space->machine(), "DSW1"); break;
+	case 0:  ans = input_port_read(machine(), "IN0"); break;
+	case 1:  ans = input_port_read(machine(), "IN1"); break;
+	case 2:  ans = input_port_read(machine(), "DSW0"); break;
+	case 3:  ans = input_port_read(machine(), "DSW1"); break;
 	}
 
 	return ans;
 }
 
-static WRITE8_HANDLER( quasar_bullet_w )
+WRITE8_MEMBER(quasar_state::quasar_bullet_w)
 {
-	quasar_state *state = space->machine().driver_data<quasar_state>();
-	state->m_bullet_ram[offset] = (data ^ 0xff);
+//OBRISI.ME
+	m_bullet_ram[offset] = (data ^ 0xff);
 }
 
-static WRITE8_HANDLER( quasar_sh_command_w )
+WRITE8_MEMBER(quasar_state::quasar_sh_command_w)
 {
 	// bit 4 = Sound Invader : Linked to an NE555V circuit
 	// Not handled yet
@@ -99,31 +99,31 @@ static WRITE8_HANDLER( quasar_sh_command_w )
 	// lower nibble = command to I8035
 	// not necessarily like this, but it seems to work better than direct mapping
 	// (although schematics has it as direct - but then the schematics are wrong elsewhere to!)
-	quasar_state *state = space->machine().driver_data<quasar_state>();
-	state->soundlatch_byte_w(*space, 0, (data & 8) + ((data >> 1) & 3) + ((data << 2) & 4));
+//OBRISI.ME
+	soundlatch_byte_w(*&space, 0, (data & 8) + ((data >> 1) & 3) + ((data << 2) & 4));
 }
 
-static READ8_HANDLER( quasar_sh_command_r )
+READ8_MEMBER(quasar_state::quasar_sh_command_r)
 {
-	quasar_state *state = space->machine().driver_data<quasar_state>();
-	return state->soundlatch_byte_r(*space, 0) + (input_port_read(space->machine(), "DSW2") & 0x30);
+//OBRISI.ME
+	return soundlatch_byte_r(*&space, 0) + (input_port_read(machine(), "DSW2") & 0x30);
 }
 
-static READ8_HANDLER( audio_t1_r )
+READ8_MEMBER(quasar_state::audio_t1_r)
 {
-	quasar_state *state = space->machine().driver_data<quasar_state>();
-	return (state->soundlatch_byte_r(*space, 0) == 0);
+//OBRISI.ME
+	return (soundlatch_byte_r(*&space, 0) == 0);
 }
 
 // memory map taken from the manual
 
 static ADDRESS_MAP_START( quasar, AS_PROGRAM, 8, quasar_state )
 	AM_RANGE(0x0000, 0x13ff) AM_ROM
-	AM_RANGE(0x1400, 0x14ff) AM_MIRROR(0x6000) AM_READ(cvs_bullet_ram_or_palette_r) AM_WRITE_LEGACY(quasar_bullet_w) AM_BASE(m_bullet_ram)
+	AM_RANGE(0x1400, 0x14ff) AM_MIRROR(0x6000) AM_READ(cvs_bullet_ram_or_palette_r) AM_WRITE(quasar_bullet_w) AM_BASE(m_bullet_ram)
 	AM_RANGE(0x1500, 0x15ff) AM_MIRROR(0x6000) AM_READWRITE(cvs_s2636_0_or_character_ram_r, cvs_s2636_0_or_character_ram_w)
 	AM_RANGE(0x1600, 0x16ff) AM_MIRROR(0x6000) AM_READWRITE(cvs_s2636_1_or_character_ram_r, cvs_s2636_1_or_character_ram_w)
 	AM_RANGE(0x1700, 0x17ff) AM_MIRROR(0x6000) AM_READWRITE(cvs_s2636_2_or_character_ram_r, cvs_s2636_2_or_character_ram_w)
-	AM_RANGE(0x1800, 0x1bff) AM_MIRROR(0x6000) AM_READ(cvs_video_or_color_ram_r) AM_WRITE_LEGACY(quasar_video_w) AM_BASE(m_video_ram)
+	AM_RANGE(0x1800, 0x1bff) AM_MIRROR(0x6000) AM_READ(cvs_video_or_color_ram_r) AM_WRITE(quasar_video_w) AM_BASE(m_video_ram)
 	AM_RANGE(0x1c00, 0x1fff) AM_MIRROR(0x6000) AM_RAM
 	AM_RANGE(0x2000, 0x33ff) AM_ROM
 	AM_RANGE(0x4000, 0x53ff) AM_ROM
@@ -131,9 +131,9 @@ static ADDRESS_MAP_START( quasar, AS_PROGRAM, 8, quasar_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( quasar_io, AS_IO, 8, quasar_state )
-	AM_RANGE(0x00, 0x03) AM_READWRITE_LEGACY(quasar_IO_r, video_page_select_w)
-	AM_RANGE(0x08, 0x0b) AM_WRITE_LEGACY(io_page_select_w)
-	AM_RANGE(S2650_DATA_PORT,  S2650_DATA_PORT) AM_READ(cvs_collision_clear) AM_WRITE_LEGACY(quasar_sh_command_w)
+	AM_RANGE(0x00, 0x03) AM_READWRITE(quasar_IO_r, video_page_select_w)
+	AM_RANGE(0x08, 0x0b) AM_WRITE(io_page_select_w)
+	AM_RANGE(S2650_DATA_PORT,  S2650_DATA_PORT) AM_READ(cvs_collision_clear) AM_WRITE(quasar_sh_command_w)
 	AM_RANGE(S2650_CTRL_PORT,  S2650_CTRL_PORT) AM_READ(cvs_collision_r) AM_WRITENOP
 	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ_PORT("SENSE")
 	AM_RANGE(S2650_FO_PORT, S2650_FO_PORT) AM_RAM AM_BASE(m_fo_state)
@@ -151,8 +151,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_portmap, AS_IO, 8, quasar_state )
 	AM_RANGE(0x00, 0x7f) AM_RAM
-	AM_RANGE(0x80, 0x80) AM_READ_LEGACY(quasar_sh_command_r)
-	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ_LEGACY(audio_t1_r)
+	AM_RANGE(0x80, 0x80) AM_READ(quasar_sh_command_r)
+	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(audio_t1_r)
 	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_DEVWRITE_LEGACY("dac", dac_signed_w)
 ADDRESS_MAP_END
 

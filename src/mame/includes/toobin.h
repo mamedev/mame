@@ -16,6 +16,8 @@ public:
 
 	double			m_brightness;
 	bitmap_ind16 m_pfbitmap;
+	DECLARE_WRITE16_MEMBER(interrupt_scan_w);
+	DECLARE_READ16_MEMBER(special_port1_r);
 };
 
 

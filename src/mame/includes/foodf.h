@@ -23,13 +23,16 @@ public:
 
 	UINT8			m_whichport;
 	UINT16 *m_spriteram;
+	DECLARE_WRITE16_MEMBER(nvram_recall_w);
+	DECLARE_WRITE8_MEMBER(digital_w);
+	DECLARE_READ16_MEMBER(analog_r);
+	DECLARE_WRITE16_MEMBER(analog_w);
+	DECLARE_WRITE16_MEMBER(foodf_paletteram_w);
+	void foodf_set_flip(int flip);
 };
 
 
 /*----------- defined in video/foodf.c -----------*/
 
-WRITE16_HANDLER( foodf_paletteram_w );
-
-void foodf_set_flip(foodf_state *state, int flip);
 VIDEO_START( foodf );
 SCREEN_UPDATE_IND16( foodf );

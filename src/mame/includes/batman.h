@@ -15,6 +15,10 @@ public:
 	UINT16			m_latch_data;
 
 	UINT8			m_alpha_tile_bank;
+	DECLARE_READ16_MEMBER(batman_atarivc_r);
+	DECLARE_WRITE16_MEMBER(batman_atarivc_w);
+	DECLARE_READ16_MEMBER(special_port2_r);
+	DECLARE_WRITE16_MEMBER(latch_w);
 };
 
 

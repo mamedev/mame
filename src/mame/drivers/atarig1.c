@@ -67,21 +67,21 @@ static MACHINE_RESET( atarig1 )
  *
  *************************************/
 
-static WRITE16_HANDLER( mo_control_w )
+WRITE16_MEMBER(atarig1_state::mo_control_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		atarig1_state *state = space->machine().driver_data<atarig1_state>();
-		atarirle_control_w(state->m_rle, data & 7);
+//OBRISI.ME
+		atarirle_control_w(m_rle, data & 7);
 	}
 }
 
 
-static WRITE16_HANDLER( mo_command_w )
+WRITE16_MEMBER(atarig1_state::mo_command_w)
 {
-	atarig1_state *state = space->machine().driver_data<atarig1_state>();
-	COMBINE_DATA(state->m_mo_command);
-	atarirle_command_w(state->m_rle, (data == 0 && state->m_is_pitfight) ? ATARIRLE_COMMAND_CHECKSUM : ATARIRLE_COMMAND_DRAW);
+//OBRISI.ME
+	COMBINE_DATA(m_mo_command);
+	atarirle_command_w(m_rle, (data == 0 && m_is_pitfight) ? ATARIRLE_COMMAND_CHECKSUM : ATARIRLE_COMMAND_DRAW);
 }
 
 
@@ -92,35 +92,35 @@ static WRITE16_HANDLER( mo_command_w )
  *
  *************************************/
 
-static READ16_HANDLER( special_port0_r )
+READ16_MEMBER(atarig1_state::special_port0_r)
 {
-	atarig1_state *state = space->machine().driver_data<atarig1_state>();
-	int temp = input_port_read(space->machine(), "IN0");
-	if (state->m_cpu_to_sound_ready) temp ^= 0x1000;
+//OBRISI.ME
+	int temp = input_port_read(machine(), "IN0");
+	if (m_cpu_to_sound_ready) temp ^= 0x1000;
 	temp ^= 0x2000;		/* A2DOK always high for now */
 	return temp;
 }
 
 
-static WRITE16_HANDLER( a2d_select_w )
+WRITE16_MEMBER(atarig1_state::a2d_select_w)
 {
-	atarig1_state *state = space->machine().driver_data<atarig1_state>();
-	state->m_which_input = offset;
+//OBRISI.ME
+	m_which_input = offset;
 }
 
 
-static READ16_HANDLER( a2d_data_r )
+READ16_MEMBER(atarig1_state::a2d_data_r)
 {
 	static const char *const adcnames[] = { "ADC0", "ADC1", "ADC2" };
-	atarig1_state *state = space->machine().driver_data<atarig1_state>();
+//OBRISI.ME
 
 	/* Pit Fighter has no A2D, just another input port */
-	if (state->m_is_pitfight)
-		return input_port_read(space->machine(), "ADC0");
+	if (m_is_pitfight)
+		return input_port_read(machine(), "ADC0");
 
 	/* otherwise, assume it's hydra */
-	if (state->m_which_input < 3)
-		return input_port_read(space->machine(), adcnames[state->m_which_input]) << 8;
+	if (m_which_input < 3)
+		return input_port_read(machine(), adcnames[m_which_input]) << 8;
 
 	return 0;
 }
@@ -133,19 +133,19 @@ static READ16_HANDLER( a2d_data_r )
  *
  *************************************/
 
-INLINE void update_bank(atarig1_state *state, int bank)
+void atarig1_state::update_bank(int bank)
 {
 	/* if the bank has changed, copy the memory; Pit Fighter needs this */
-	if (bank != state->m_bslapstic_bank)
+	if (bank != m_bslapstic_bank)
 	{
 		/* bank 0 comes from the copy we made earlier */
 		if (bank == 0)
-			memcpy(state->m_bslapstic_base, state->m_bslapstic_bank0, 0x2000);
+			memcpy(m_bslapstic_base, m_bslapstic_bank0, 0x2000);
 		else
-			memcpy(state->m_bslapstic_base, &state->m_bslapstic_base[bank * 0x1000], 0x2000);
+			memcpy(m_bslapstic_base, &m_bslapstic_base[bank * 0x1000], 0x2000);
 
 		/* remember the current bank */
-		state->m_bslapstic_bank = bank;
+		m_bslapstic_bank = bank;
 	}
 }
 
@@ -155,33 +155,33 @@ static void pitfightb_state_postload(running_machine &machine)
 	atarig1_state *state = machine.driver_data<atarig1_state>();
 	int bank = state->m_bslapstic_bank;
 	state->m_bslapstic_bank = -1;
-	update_bank(state, bank);
+	state->update_bank(bank);
 }
 
 
-static READ16_HANDLER( pitfightb_cheap_slapstic_r )
+READ16_MEMBER(atarig1_state::pitfightb_cheap_slapstic_r)
 {
-	atarig1_state *state = space->machine().driver_data<atarig1_state>();
-	int result = state->m_bslapstic_base[offset & 0xfff];
+//OBRISI.ME
+	int result = m_bslapstic_base[offset & 0xfff];
 
 	/* the cheap replacement slapstic just triggers on the simple banking */
 	/* addresses; a software patch ensure that this is good enough */
 
 	/* offset 0 primes the chip */
 	if (offset == 0)
-		state->m_bslapstic_primed = TRUE;
+		m_bslapstic_primed = TRUE;
 
 	/* one of 4 bankswitchers produces the result */
-	else if (state->m_bslapstic_primed)
+	else if (m_bslapstic_primed)
 	{
 		if (offset == 0x42)
-			update_bank(state, 0), state->m_bslapstic_primed = FALSE;
+			update_bank(0), m_bslapstic_primed = FALSE;
 		else if (offset == 0x52)
-			update_bank(state, 1), state->m_bslapstic_primed = FALSE;
+			update_bank(1), m_bslapstic_primed = FALSE;
 		else if (offset == 0x62)
-			update_bank(state, 2), state->m_bslapstic_primed = FALSE;
+			update_bank(2), m_bslapstic_primed = FALSE;
 		else if (offset == 0x72)
-			update_bank(state, 3), state->m_bslapstic_primed = FALSE;
+			update_bank(3), m_bslapstic_primed = FALSE;
 	}
 	return result;
 }
@@ -192,7 +192,7 @@ static void pitfightb_cheap_slapstic_init(running_machine &machine)
 	atarig1_state *state = machine.driver_data<atarig1_state>();
 
 	/* install a read handler */
-	state->m_bslapstic_base = machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x038000, 0x03ffff, FUNC(pitfightb_cheap_slapstic_r));
+	state->m_bslapstic_base = machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x038000, 0x03ffff, read16_delegate(FUNC(atarig1_state::pitfightb_cheap_slapstic_r),state));
 
 	/* allocate memory for a copy of bank 0 */
 	state->m_bslapstic_bank0 = auto_alloc_array(machine, UINT8, 0x2000);
@@ -219,16 +219,16 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, atarig1_state )
 	AM_RANGE(0xf88000, 0xf8ffff) AM_WRITE_LEGACY(atarigen_eeprom_enable_w)
 	AM_RANGE(0xf90000, 0xf90001) AM_WRITE_LEGACY(atarigen_sound_upper_w)
 	AM_RANGE(0xf98000, 0xf98001) AM_WRITE_LEGACY(atarigen_sound_reset_w)
-	AM_RANGE(0xfa0000, 0xfa0001) AM_WRITE_LEGACY(mo_control_w)
+	AM_RANGE(0xfa0000, 0xfa0001) AM_WRITE(mo_control_w)
 	AM_RANGE(0xfb0000, 0xfb0001) AM_WRITE_LEGACY(atarigen_video_int_ack_w)
-	AM_RANGE(0xfc0000, 0xfc0001) AM_READ_LEGACY(special_port0_r)
-	AM_RANGE(0xfc8000, 0xfc8007) AM_READWRITE_LEGACY(a2d_data_r, a2d_select_w)
+	AM_RANGE(0xfc0000, 0xfc0001) AM_READ(special_port0_r)
+	AM_RANGE(0xfc8000, 0xfc8007) AM_READWRITE(a2d_data_r, a2d_select_w)
 	AM_RANGE(0xfd0000, 0xfd0001) AM_READ_LEGACY(atarigen_sound_upper_r)
 	AM_RANGE(0xfd8000, 0xfdffff) AM_READWRITE_LEGACY(atarigen_eeprom_r, atarigen_eeprom_w) AM_SHARE("eeprom")
 /*  AM_RANGE(0xfe0000, 0xfe7fff) AM_READ_LEGACY(from_r)*/
 	AM_RANGE(0xfe8000, 0xfe89ff) AM_RAM_WRITE_LEGACY(atarigen_666_paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0xff0000, 0xff0fff) AM_DEVREADWRITE_LEGACY("rle", atarirle_spriteram_r, atarirle_spriteram_w)
-	AM_RANGE(0xff2000, 0xff2001) AM_WRITE_LEGACY(mo_command_w) AM_BASE(m_mo_command)
+	AM_RANGE(0xff2000, 0xff2001) AM_WRITE(mo_command_w) AM_BASE(m_mo_command)
 	AM_RANGE(0xff4000, 0xff5fff) AM_WRITE_LEGACY(atarigen_playfield_w) AM_BASE(m_playfield)
 	AM_RANGE(0xff6000, 0xff6fff) AM_WRITE_LEGACY(atarigen_alpha_w) AM_BASE(m_alpha)
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM

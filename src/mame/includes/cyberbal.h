@@ -26,6 +26,10 @@ public:
 	UINT8			m_sound_data_from_6502;
 	UINT8			m_sound_data_from_68k_ready;
 	UINT8			m_sound_data_from_6502_ready;
+	DECLARE_READ16_MEMBER(special_port0_r);
+	DECLARE_READ16_MEMBER(special_port2_r);
+	DECLARE_READ16_MEMBER(sound_state_r);
+	DECLARE_WRITE16_MEMBER(p2_reset_w);
 };
 
 

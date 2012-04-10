@@ -11,6 +11,9 @@ class skullxbo_state : public atarigen_state
 public:
 	skullxbo_state(const machine_config &mconfig, device_type type, const char *tag)
 		: atarigen_state(mconfig, type, tag) { }
+	DECLARE_WRITE16_MEMBER(skullxbo_halt_until_hblank_0_w);
+	DECLARE_READ16_MEMBER(special_port1_r);
+	DECLARE_WRITE16_MEMBER(skullxbo_mobwr_w);
 };
 
 

@@ -85,7 +85,7 @@ static MACHINE_RESET( rampart )
  *
  *************************************/
 
-static WRITE16_HANDLER( latch_w )
+WRITE16_MEMBER(rampart_state::latch_w)
 {
 	/* bit layout in this register:
 
@@ -108,19 +108,19 @@ static WRITE16_HANDLER( latch_w )
 	{
 		if (data & 0x1000)
 			logerror("Color bank set to 1!\n");
-		coin_counter_w(space->machine(), 0, (data >> 9) & 1);
-		coin_counter_w(space->machine(), 1, (data >> 8) & 1);
+		coin_counter_w(machine(), 0, (data >> 9) & 1);
+		coin_counter_w(machine(), 1, (data >> 8) & 1);
 	}
 
 	/* lower byte being modified? */
 	if (ACCESSING_BITS_0_7)
 	{
-		atarigen_set_oki6295_vol(space->machine(), (data & 0x0020) ? 100 : 0);
+		atarigen_set_oki6295_vol(machine(), (data & 0x0020) ? 100 : 0);
 		if (!(data & 0x0010))
-			devtag_reset(space->machine(), "oki");
-		atarigen_set_ym2413_vol(space->machine(), ((data >> 1) & 7) * 100 / 7);
+			devtag_reset(machine(), "oki");
+		atarigen_set_ym2413_vol(machine(), ((data >> 1) & 7) * 100 / 7);
 		if (!(data & 0x0001))
-			devtag_reset(space->machine(), "ymsnd");
+			devtag_reset(machine(), "ymsnd");
 	}
 }
 
@@ -148,7 +148,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, rampart_state )
 	AM_RANGE(0x480000, 0x480003) AM_MIRROR(0x019ffc) AM_DEVWRITE8_LEGACY("ymsnd", ym2413_w, 0xff00)
 	AM_RANGE(0x500000, 0x500fff) AM_MIRROR(0x019000) AM_READWRITE_LEGACY(atarigen_eeprom_r, atarigen_eeprom_w) AM_SHARE("eeprom")
 	AM_RANGE(0x5a6000, 0x5a6001) AM_MIRROR(0x019ffe) AM_WRITE_LEGACY(atarigen_eeprom_enable_w)
-	AM_RANGE(0x640000, 0x640001) AM_MIRROR(0x019ffe) AM_WRITE_LEGACY(latch_w)
+	AM_RANGE(0x640000, 0x640001) AM_MIRROR(0x019ffe) AM_WRITE(latch_w)
 	AM_RANGE(0x640000, 0x640001) AM_MIRROR(0x019ffc) AM_READ_PORT("IN0")
 	AM_RANGE(0x640002, 0x640003) AM_MIRROR(0x019ffc) AM_READ_PORT("IN1")
 	AM_RANGE(0x6c0000, 0x6c0001) AM_MIRROR(0x019ff8) AM_READ_PORT("TRACK0")

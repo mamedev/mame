@@ -461,15 +461,15 @@ static INTERRUPT_GEN( fakechange_interrupt_gen )
 	}
 }
 
-static WRITE8_HANDLER( irq_enable_w )
+WRITE8_MEMBER(galaxian_state::irq_enable_w)
 {
-	galaxian_state *state = space->machine().driver_data<galaxian_state>();
+//OBRISI.ME
 	/* the latched D0 bit here goes to the CLEAR line on the interrupt flip-flop */
-	state->m_irq_enabled = data & 1;
+	m_irq_enabled = data & 1;
 
 	/* if CLEAR is held low, we must make sure the interrupt signal is clear */
-	if (!state->m_irq_enabled)
-		device_set_input_line(&space->device(), state->m_irq_line, CLEAR_LINE);
+	if (!m_irq_enabled)
+		device_set_input_line(&space.device(), m_irq_line, CLEAR_LINE);
 }
 
 /*************************************
@@ -478,30 +478,30 @@ static WRITE8_HANDLER( irq_enable_w )
  *
  *************************************/
 
-static WRITE8_HANDLER( start_lamp_w )
+WRITE8_MEMBER(galaxian_state::start_lamp_w)
 {
 	/* offset 0 = 1P START LAMP */
 	/* offset 1 = 2P START LAMP */
-	set_led_status(space->machine(), offset, data & 1);
+	set_led_status(machine(), offset, data & 1);
 }
 
 
-static WRITE8_HANDLER( coin_lock_w )
+WRITE8_MEMBER(galaxian_state::coin_lock_w)
 {
 	/* many variants and bootlegs don't have this */
-	coin_lockout_global_w(space->machine(), ~data & 1);
+	coin_lockout_global_w(machine(), ~data & 1);
 }
 
 
-static WRITE8_HANDLER( coin_count_0_w )
+WRITE8_MEMBER(galaxian_state::coin_count_0_w)
 {
-	coin_counter_w(space->machine(), 0, data & 1);
+	coin_counter_w(machine(), 0, data & 1);
 }
 
 
-static WRITE8_HANDLER( coin_count_1_w )
+WRITE8_MEMBER(galaxian_state::coin_count_1_w)
 {
-	coin_counter_w(space->machine(), 1, data & 1);
+	coin_counter_w(machine(), 1, data & 1);
 }
 
 
@@ -512,29 +512,29 @@ static WRITE8_HANDLER( coin_count_1_w )
  *
  *************************************/
 
-static READ8_HANDLER( konami_ay8910_r )
+READ8_MEMBER(galaxian_state::konami_ay8910_r)
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
 	UINT8 result = 0xff;
-	if (offset & 0x20) result &= ay8910_r(space->machine().device("8910.1"), 0);
-	if (offset & 0x80) result &= ay8910_r(space->machine().device("8910.0"), 0);
+	if (offset & 0x20) result &= ay8910_r(machine().device("8910.1"), 0);
+	if (offset & 0x80) result &= ay8910_r(machine().device("8910.0"), 0);
 	return result;
 }
 
 
-static WRITE8_HANDLER( konami_ay8910_w )
+WRITE8_MEMBER(galaxian_state::konami_ay8910_w)
 {
 	/* AV 4,5 ==> AY8910 #2 */
 	/* the decoding here is very simplistic, and you can address two simultaneously */
 	if (offset & 0x10)
-		ay8910_address_w(space->machine().device("8910.1"), 0, data);
+		ay8910_address_w(machine().device("8910.1"), 0, data);
 	else if (offset & 0x20)
-		ay8910_data_w(space->machine().device("8910.1"), 0, data);
+		ay8910_data_w(machine().device("8910.1"), 0, data);
 	/* AV6,7 ==> AY8910 #1 */
 	if (offset & 0x40)
-		ay8910_address_w(space->machine().device("8910.0"), 0, data);
+		ay8910_address_w(machine().device("8910.0"), 0, data);
 	else if (offset & 0x80)
-		ay8910_data_w(space->machine().device("8910.0"), 0, data);
+		ay8910_data_w(machine().device("8910.0"), 0, data);
 }
 
 
@@ -589,9 +589,9 @@ static READ8_DEVICE_HANDLER( konami_sound_timer_r )
 }
 
 
-static WRITE8_HANDLER( konami_sound_filter_w )
+WRITE8_MEMBER(galaxian_state::konami_sound_filter_w)
 {
-	device_t *discrete = space->machine().device("konami");
+	device_t *discrete = machine().device("konami");
 	static const char *const ayname[2] = { "8910.0", "8910.1" };
 	int which, chan;
 
@@ -599,7 +599,7 @@ static WRITE8_HANDLER( konami_sound_filter_w )
 	/* AV0 .. AV5 ==> AY8910 #2 */
 	/* AV6 .. AV11 ==> AY8910 #1 */
 	for (which = 0; which < 2; which++)
-		if (space->machine().device(ayname[which]) != NULL)
+		if (machine().device(ayname[which]) != NULL)
 			for (chan = 0; chan < 3; chan++)
 			{
 				UINT8 bits = (offset >> (2 * chan + 6 * (1 - which))) & 3;
@@ -652,21 +652,21 @@ static const ppi8255_interface konami_ppi8255_1_intf =
  *
  *************************************/
 
-static READ8_HANDLER( theend_ppi8255_r )
+READ8_MEMBER(galaxian_state::theend_ppi8255_r)
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
 	UINT8 result = 0xff;
-	if (offset & 0x0100) result &= ppi8255_r(space->machine().device("ppi8255_0"), offset & 3);
-	if (offset & 0x0200) result &= ppi8255_r(space->machine().device("ppi8255_1"), offset & 3);
+	if (offset & 0x0100) result &= ppi8255_r(machine().device("ppi8255_0"), offset & 3);
+	if (offset & 0x0200) result &= ppi8255_r(machine().device("ppi8255_1"), offset & 3);
 	return result;
 }
 
 
-static WRITE8_HANDLER( theend_ppi8255_w )
+WRITE8_MEMBER(galaxian_state::theend_ppi8255_w)
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
-	if (offset & 0x0100) ppi8255_w(space->machine().device("ppi8255_0"), offset & 3, data);
-	if (offset & 0x0200) ppi8255_w(space->machine().device("ppi8255_1"), offset & 3, data);
+	if (offset & 0x0100) ppi8255_w(machine().device("ppi8255_0"), offset & 3, data);
+	if (offset & 0x0200) ppi8255_w(machine().device("ppi8255_1"), offset & 3, data);
 }
 
 
@@ -755,9 +755,9 @@ static const ppi8255_interface scramble_ppi8255_1_intf =
  *
  *************************************/
 
-static WRITE8_HANDLER( explorer_sound_control_w )
+WRITE8_MEMBER(galaxian_state::explorer_sound_control_w)
 {
-	cputag_set_input_line(space->machine(), "audiocpu", 0, ASSERT_LINE);
+	cputag_set_input_line(machine(), "audiocpu", 0, ASSERT_LINE);
 }
 
 
@@ -776,20 +776,20 @@ static READ8_DEVICE_HANDLER( explorer_sound_latch_r )
  *
  *************************************/
 
-static READ8_HANDLER( sfx_sample_io_r )
+READ8_MEMBER(galaxian_state::sfx_sample_io_r)
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
 	UINT8 result = 0xff;
-	if (offset & 0x04) result &= ppi8255_r(space->machine().device("ppi8255_2"), offset & 3);
+	if (offset & 0x04) result &= ppi8255_r(machine().device("ppi8255_2"), offset & 3);
 	return result;
 }
 
 
-static WRITE8_HANDLER( sfx_sample_io_w )
+WRITE8_MEMBER(galaxian_state::sfx_sample_io_w)
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
-	if (offset & 0x04) ppi8255_w(space->machine().device("ppi8255_2"), offset & 3, data);
-	if (offset & 0x10) dac_signed_data_w(space->machine().device("dac"), data);
+	if (offset & 0x04) ppi8255_w(machine().device("ppi8255_2"), offset & 3, data);
+	if (offset & 0x10) dac_signed_data_w(machine().device("dac"), data);
 }
 
 
@@ -834,10 +834,10 @@ static const ppi8255_interface sfx_ppi8255_2_intf =
     The data(code) in the extra RAM is later jumped/called to in many parts of the game.
 */
 
-static READ8_HANDLER( monsterz_protection_r )
+READ8_MEMBER(galaxian_state::monsterz_protection_r)
 {
-	galaxian_state *state = space->machine().driver_data<galaxian_state>();
-	return state->m_protection_result;
+//OBRISI.ME
+	return m_protection_result;
 }
 
 
@@ -899,41 +899,41 @@ static const ppi8255_interface monsterz_ppi8255_1_intf =
  *
  *************************************/
 
-static READ8_HANDLER( frogger_ppi8255_r )
+READ8_MEMBER(galaxian_state::frogger_ppi8255_r)
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
 	UINT8 result = 0xff;
-	if (offset & 0x1000) result &= ppi8255_r(space->machine().device("ppi8255_1"), (offset >> 1) & 3);
-	if (offset & 0x2000) result &= ppi8255_r(space->machine().device("ppi8255_0"), (offset >> 1) & 3);
+	if (offset & 0x1000) result &= ppi8255_r(machine().device("ppi8255_1"), (offset >> 1) & 3);
+	if (offset & 0x2000) result &= ppi8255_r(machine().device("ppi8255_0"), (offset >> 1) & 3);
 	return result;
 }
 
 
-static WRITE8_HANDLER( frogger_ppi8255_w )
+WRITE8_MEMBER(galaxian_state::frogger_ppi8255_w)
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
-	if (offset & 0x1000) ppi8255_w(space->machine().device("ppi8255_1"), (offset >> 1) & 3, data);
-	if (offset & 0x2000) ppi8255_w(space->machine().device("ppi8255_0"), (offset >> 1) & 3, data);
+	if (offset & 0x1000) ppi8255_w(machine().device("ppi8255_1"), (offset >> 1) & 3, data);
+	if (offset & 0x2000) ppi8255_w(machine().device("ppi8255_0"), (offset >> 1) & 3, data);
 }
 
 
-static READ8_HANDLER( frogger_ay8910_r )
+READ8_MEMBER(galaxian_state::frogger_ay8910_r)
 {
 	/* the decoding here is very simplistic */
 	UINT8 result = 0xff;
-	if (offset & 0x40) result &= ay8910_r(space->machine().device("8910.0"), 0);
+	if (offset & 0x40) result &= ay8910_r(machine().device("8910.0"), 0);
 	return result;
 }
 
 
-static WRITE8_HANDLER( frogger_ay8910_w )
+WRITE8_MEMBER(galaxian_state::frogger_ay8910_w)
 {
 	/* the decoding here is very simplistic */
 	/* AV6,7 ==> AY8910 #1 */
 	if (offset & 0x40)
-		ay8910_data_w(space->machine().device("8910.0"), 0, data);
+		ay8910_data_w(machine().device("8910.0"), 0, data);
 	else if (offset & 0x80)
-		ay8910_address_w(space->machine().device("8910.0"), 0, data);
+		ay8910_address_w(machine().device("8910.0"), 0, data);
 }
 
 
@@ -945,9 +945,9 @@ static READ8_DEVICE_HANDLER( frogger_sound_timer_r )
 }
 
 
-static WRITE8_HANDLER( froggrmc_sound_control_w )
+WRITE8_MEMBER(galaxian_state::froggrmc_sound_control_w)
 {
-	cputag_set_input_line(space->machine(), "audiocpu", 0, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(machine(), "audiocpu", 0, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -958,21 +958,21 @@ static WRITE8_HANDLER( froggrmc_sound_control_w )
  *
  *************************************/
 
-static READ8_HANDLER( frogf_ppi8255_r )
+READ8_MEMBER(galaxian_state::frogf_ppi8255_r)
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
 	UINT8 result = 0xff;
-	if (offset & 0x1000) result &= ppi8255_r(space->machine().device("ppi8255_0"), (offset >> 3) & 3);
-	if (offset & 0x2000) result &= ppi8255_r(space->machine().device("ppi8255_1"), (offset >> 3) & 3);
+	if (offset & 0x1000) result &= ppi8255_r(machine().device("ppi8255_0"), (offset >> 3) & 3);
+	if (offset & 0x2000) result &= ppi8255_r(machine().device("ppi8255_1"), (offset >> 3) & 3);
 	return result;
 }
 
 
-static WRITE8_HANDLER( frogf_ppi8255_w )
+WRITE8_MEMBER(galaxian_state::frogf_ppi8255_w)
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
-	if (offset & 0x1000) ppi8255_w(space->machine().device("ppi8255_0"), (offset >> 3) & 3, data);
-	if (offset & 0x2000) ppi8255_w(space->machine().device("ppi8255_1"), (offset >> 3) & 3, data);
+	if (offset & 0x1000) ppi8255_w(machine().device("ppi8255_0"), (offset >> 3) & 3, data);
+	if (offset & 0x2000) ppi8255_w(machine().device("ppi8255_1"), (offset >> 3) & 3, data);
 }
 
 
@@ -983,10 +983,10 @@ static WRITE8_HANDLER( frogf_ppi8255_w )
  *
  *************************************/
 
-static READ8_HANDLER( turtles_ppi8255_0_r ) { return ppi8255_r(space->machine().device("ppi8255_0"), (offset >> 4) & 3); }
-static READ8_HANDLER( turtles_ppi8255_1_r ) { return ppi8255_r(space->machine().device("ppi8255_1"), (offset >> 4) & 3); }
-static WRITE8_HANDLER( turtles_ppi8255_0_w ) { ppi8255_w(space->machine().device("ppi8255_0"), (offset >> 4) & 3, data); }
-static WRITE8_HANDLER( turtles_ppi8255_1_w ) { ppi8255_w(space->machine().device("ppi8255_1"), (offset >> 4) & 3, data); }
+READ8_MEMBER(galaxian_state::turtles_ppi8255_0_r){ return ppi8255_r(machine().device("ppi8255_0"), (offset >> 4) & 3); }
+READ8_MEMBER(galaxian_state::turtles_ppi8255_1_r){ return ppi8255_r(machine().device("ppi8255_1"), (offset >> 4) & 3); }
+WRITE8_MEMBER(galaxian_state::turtles_ppi8255_0_w){ ppi8255_w(machine().device("ppi8255_0"), (offset >> 4) & 3, data); }
+WRITE8_MEMBER(galaxian_state::turtles_ppi8255_1_w){ ppi8255_w(machine().device("ppi8255_1"), (offset >> 4) & 3, data); }
 
 
 
@@ -996,26 +996,26 @@ static WRITE8_HANDLER( turtles_ppi8255_1_w ) { ppi8255_w(space->machine().device
  *
  *************************************/
 
-static READ8_HANDLER( scorpion_ay8910_r )
+READ8_MEMBER(galaxian_state::scorpion_ay8910_r)
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
 	UINT8 result = 0xff;
-	if (offset & 0x08) result &= ay8910_r(space->machine().device("8910.2"), 0);
-	if (offset & 0x20) result &= ay8910_r(space->machine().device("8910.1"), 0);
-	if (offset & 0x80) result &= ay8910_r(space->machine().device("8910.0"), 0);
+	if (offset & 0x08) result &= ay8910_r(machine().device("8910.2"), 0);
+	if (offset & 0x20) result &= ay8910_r(machine().device("8910.1"), 0);
+	if (offset & 0x80) result &= ay8910_r(machine().device("8910.0"), 0);
 	return result;
 }
 
 
-static WRITE8_HANDLER( scorpion_ay8910_w )
+WRITE8_MEMBER(galaxian_state::scorpion_ay8910_w)
 {
 	/* the decoding here is very simplistic, and you can address all six simultaneously */
-	if (offset & 0x04) ay8910_address_w(space->machine().device("8910.2"), 0, data);
-	if (offset & 0x08) ay8910_data_w(space->machine().device("8910.2"), 0, data);
-	if (offset & 0x10) ay8910_address_w(space->machine().device("8910.1"), 0, data);
-	if (offset & 0x20) ay8910_data_w(space->machine().device("8910.1"), 0, data);
-	if (offset & 0x40) ay8910_address_w(space->machine().device("8910.0"), 0, data);
-	if (offset & 0x80) ay8910_data_w(space->machine().device("8910.0"), 0, data);
+	if (offset & 0x04) ay8910_address_w(machine().device("8910.2"), 0, data);
+	if (offset & 0x08) ay8910_data_w(machine().device("8910.2"), 0, data);
+	if (offset & 0x10) ay8910_address_w(machine().device("8910.1"), 0, data);
+	if (offset & 0x20) ay8910_data_w(machine().device("8910.1"), 0, data);
+	if (offset & 0x40) ay8910_address_w(machine().device("8910.0"), 0, data);
+	if (offset & 0x80) ay8910_data_w(machine().device("8910.0"), 0, data);
 }
 
 
@@ -1050,9 +1050,9 @@ static WRITE8_DEVICE_HANDLER( scorpion_protection_w )
 	}
 }
 
-static READ8_HANDLER( scorpion_digitalker_intr_r )
+READ8_MEMBER(galaxian_state::scorpion_digitalker_intr_r)
 {
-	device_t *digitalker = space->machine().device("digitalker");
+	device_t *digitalker = machine().device("digitalker");
 	return digitalker_0_intr_r(digitalker);
 }
 
@@ -1117,16 +1117,16 @@ CUSTOM_INPUT_MEMBER(galaxian_state::gmgalax_port_r)
  *
  *************************************/
 
-static WRITE8_HANDLER( zigzag_bankswap_w )
+WRITE8_MEMBER(galaxian_state::zigzag_bankswap_w)
 {
-	memory_set_bank(space->machine(), "bank1", data & 1);
-	memory_set_bank(space->machine(), "bank2", ~data & 1);
+	memory_set_bank(machine(), "bank1", data & 1);
+	memory_set_bank(machine(), "bank2", ~data & 1);
 }
 
 
-static WRITE8_HANDLER( zigzag_ay8910_w )
+WRITE8_MEMBER(galaxian_state::zigzag_ay8910_w)
 {
-	galaxian_state *state = space->machine().driver_data<galaxian_state>();
+//OBRISI.ME
 	switch (offset & 0x300)
 	{
 		case 0x000:
@@ -1134,12 +1134,12 @@ static WRITE8_HANDLER( zigzag_ay8910_w )
 			/* bit 0 = WRITE */
 			/* bit 1 = C/D */
 			if ((offset & 1) != 0)
-				ay8910_data_address_w(space->machine().device("aysnd"), offset >> 1, state->m_zigzag_ay8910_latch);
+				ay8910_data_address_w(machine().device("aysnd"), offset >> 1, m_zigzag_ay8910_latch);
 			break;
 
 		case 0x100:
 			/* data latch */
-			state->m_zigzag_ay8910_latch = offset & 0xff;
+			m_zigzag_ay8910_latch = offset & 0xff;
 			break;
 
 		case 0x200:
@@ -1185,25 +1185,25 @@ CUSTOM_INPUT_MEMBER(galaxian_state::kingball_noise_r)
 }
 
 
-static WRITE8_HANDLER( kingball_speech_dip_w )
+WRITE8_MEMBER(galaxian_state::kingball_speech_dip_w)
 {
-	galaxian_state *state = space->machine().driver_data<galaxian_state>();
-	state->m_kingball_speech_dip = data;
+//OBRISI.ME
+	m_kingball_speech_dip = data;
 }
 
 
-static WRITE8_HANDLER( kingball_sound1_w )
+WRITE8_MEMBER(galaxian_state::kingball_sound1_w)
 {
-	galaxian_state *state = space->machine().driver_data<galaxian_state>();
-	state->m_kingball_sound = (state->m_kingball_sound & ~0x01) | data;
+//OBRISI.ME
+	m_kingball_sound = (m_kingball_sound & ~0x01) | data;
 }
 
 
-static WRITE8_HANDLER( kingball_sound2_w )
+WRITE8_MEMBER(galaxian_state::kingball_sound2_w)
 {
-	galaxian_state *state = space->machine().driver_data<galaxian_state>();
-	state->m_kingball_sound = (state->m_kingball_sound & ~0x02) | (data << 1);
-	state->soundlatch_byte_w(*space, 0, state->m_kingball_sound | 0xf0);
+//OBRISI.ME
+	m_kingball_sound = (m_kingball_sound & ~0x02) | (data << 1);
+	soundlatch_byte_w(*&space, 0, m_kingball_sound | 0xf0);
 }
 
 
@@ -1220,34 +1220,34 @@ static WRITE8_DEVICE_HANDLER( kingball_dac_w )
  *
  *************************************/
 
-static WRITE8_HANDLER( mshuttle_ay8910_cs_w )
+WRITE8_MEMBER(galaxian_state::mshuttle_ay8910_cs_w)
 {
-	galaxian_state *state = space->machine().driver_data<galaxian_state>();
-	state->m_mshuttle_ay8910_cs = data & 1;
+//OBRISI.ME
+	m_mshuttle_ay8910_cs = data & 1;
 }
 
 
-static WRITE8_HANDLER( mshuttle_ay8910_control_w )
+WRITE8_MEMBER(galaxian_state::mshuttle_ay8910_control_w)
 {
-	galaxian_state *state = space->machine().driver_data<galaxian_state>();
-	if (!state->m_mshuttle_ay8910_cs)
-		ay8910_address_w(space->machine().device("aysnd"), offset, data);
+//OBRISI.ME
+	if (!m_mshuttle_ay8910_cs)
+		ay8910_address_w(machine().device("aysnd"), offset, data);
 }
 
 
-static WRITE8_HANDLER( mshuttle_ay8910_data_w )
+WRITE8_MEMBER(galaxian_state::mshuttle_ay8910_data_w)
 {
-	galaxian_state *state = space->machine().driver_data<galaxian_state>();
-	if (!state->m_mshuttle_ay8910_cs)
-		ay8910_data_w(space->machine().device("aysnd"), offset, data);
+//OBRISI.ME
+	if (!m_mshuttle_ay8910_cs)
+		ay8910_data_w(machine().device("aysnd"), offset, data);
 }
 
 
-static READ8_HANDLER( mshuttle_ay8910_data_r )
+READ8_MEMBER(galaxian_state::mshuttle_ay8910_data_r)
 {
-	galaxian_state *state = space->machine().driver_data<galaxian_state>();
-	if (!state->m_mshuttle_ay8910_cs)
-		return ay8910_r(space->machine().device("aysnd"), offset);
+//OBRISI.ME
+	if (!m_mshuttle_ay8910_cs)
+		return ay8910_r(machine().device("aysnd"), offset);
 	return 0xff;
 }
 
@@ -1259,7 +1259,7 @@ static READ8_HANDLER( mshuttle_ay8910_data_r )
  *
  *************************************/
 
-static READ8_HANDLER( jumpbug_protection_r )
+READ8_MEMBER(galaxian_state::jumpbug_protection_r)
 {
 	switch (offset)
 	{
@@ -1269,7 +1269,7 @@ static READ8_HANDLER( jumpbug_protection_r )
 		case 0x0235:  return 0x02;
 		case 0x0311:  return 0xff;  /* not checked */
 	}
-	logerror("Unknown protection read. Offset: %04X  PC=%04X\n",0xb000+offset,cpu_get_pc(&space->device()));
+	logerror("Unknown protection read. Offset: %04X  PC=%04X\n",0xb000+offset,cpu_get_pc(&space.device()));
 	return 0xff;
 }
 
@@ -1281,11 +1281,11 @@ static READ8_HANDLER( jumpbug_protection_r )
  *
  *************************************/
 
-static WRITE8_HANDLER( checkman_sound_command_w )
+WRITE8_MEMBER(galaxian_state::checkman_sound_command_w)
 {
-	galaxian_state *state = space->machine().driver_data<galaxian_state>();
-	state->soundlatch_byte_w(*space, 0, data);
-	cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+//OBRISI.ME
+	soundlatch_byte_w(*&space, 0, data);
+	cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -1295,9 +1295,9 @@ static TIMER_DEVICE_CALLBACK( checkmaj_irq0_gen )
 }
 
 
-static READ8_HANDLER( checkmaj_protection_r )
+READ8_MEMBER(galaxian_state::checkmaj_protection_r)
 {
-	switch (cpu_get_pc(&space->device()))
+	switch (cpu_get_pc(&space.device()))
 	{
 		case 0x0f15:  return 0xf5;
 		case 0x0f8f:  return 0x7c;
@@ -1306,7 +1306,7 @@ static READ8_HANDLER( checkmaj_protection_r )
 		case 0x10f1:  return 0xaa;
 		case 0x1402:  return 0xaa;
 		default:
-			logerror("Unknown protection read. PC=%04X\n",cpu_get_pc(&space->device()));
+			logerror("Unknown protection read. PC=%04X\n",cpu_get_pc(&space.device()));
 	}
 
 	return 0;
@@ -1320,19 +1320,19 @@ static READ8_HANDLER( checkmaj_protection_r )
  *
  *************************************/
 
-static READ8_HANDLER( dingo_3000_r )
+READ8_MEMBER(galaxian_state::dingo_3000_r)
 {
 	return 0xaa;
 }
 
 
-static READ8_HANDLER( dingo_3035_r )
+READ8_MEMBER(galaxian_state::dingo_3035_r)
 {
 	return 0x8c;
 }
 
 
-static READ8_HANDLER( dingoe_3001_r )
+READ8_MEMBER(galaxian_state::dingoe_3001_r)
 {
 	return 0xaa;
 }
@@ -1438,14 +1438,14 @@ static ADDRESS_MAP_START( galaxian_map_base, AS_PROGRAM, 8, galaxian_state )
 	AM_RANGE(0x5000, 0x53ff) AM_MIRROR(0x0400) AM_RAM_WRITE(galaxian_videoram_w) AM_BASE(m_videoram)
 	AM_RANGE(0x5800, 0x58ff) AM_MIRROR(0x0700) AM_RAM_WRITE(galaxian_objram_w) AM_SHARE("spriteram")
 	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x07ff) AM_READ_PORT("IN0")
-	AM_RANGE(0x6000, 0x6001) AM_MIRROR(0x07f8) AM_WRITE_LEGACY(start_lamp_w)
-	AM_RANGE(0x6002, 0x6002) AM_MIRROR(0x07f8) AM_WRITE_LEGACY(coin_lock_w)
-	AM_RANGE(0x6003, 0x6003) AM_MIRROR(0x07f8) AM_WRITE_LEGACY(coin_count_0_w)
+	AM_RANGE(0x6000, 0x6001) AM_MIRROR(0x07f8) AM_WRITE(start_lamp_w)
+	AM_RANGE(0x6002, 0x6002) AM_MIRROR(0x07f8) AM_WRITE(coin_lock_w)
+	AM_RANGE(0x6003, 0x6003) AM_MIRROR(0x07f8) AM_WRITE(coin_count_0_w)
 	//AM_RANGE(0x6004, 0x6007) AM_MIRROR(0x07f8) AM_DEVWRITE_LEGACY(GAL_AUDIO, galaxian_lfo_freq_w)
 	AM_RANGE(0x6800, 0x6800) AM_MIRROR(0x07ff) AM_READ_PORT("IN1")
 	//AM_RANGE(0x6800, 0x6807) AM_MIRROR(0x07f8) AM_DEVWRITE_LEGACY(GAL_AUDIO, galaxian_sound_w)
 	AM_RANGE(0x7000, 0x7000) AM_MIRROR(0x07ff) AM_READ_PORT("IN2")
-	AM_RANGE(0x7001, 0x7001) AM_MIRROR(0x07f8) AM_WRITE_LEGACY(irq_enable_w)
+	AM_RANGE(0x7001, 0x7001) AM_MIRROR(0x07f8) AM_WRITE(irq_enable_w)
 	AM_RANGE(0x7004, 0x7004) AM_MIRROR(0x07f8) AM_WRITE(galaxian_stars_enable_w)
 	AM_RANGE(0x7006, 0x7006) AM_MIRROR(0x07f8) AM_WRITE(galaxian_flip_screen_x_w)
 	AM_RANGE(0x7007, 0x7007) AM_MIRROR(0x07f8) AM_WRITE(galaxian_flip_screen_y_w)
@@ -1474,12 +1474,12 @@ static ADDRESS_MAP_START( mooncrst_map_base, AS_PROGRAM, 8, galaxian_state )
 	AM_RANGE(0x9800, 0x98ff) AM_MIRROR(0x0700) AM_RAM_WRITE(galaxian_objram_w) AM_SHARE("spriteram")
 	AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x07ff) AM_READ_PORT("IN0")
 	AM_RANGE(0xa000, 0xa002) AM_MIRROR(0x07f8) AM_WRITE(galaxian_gfxbank_w)
-	AM_RANGE(0xa003, 0xa003) AM_MIRROR(0x07f8) AM_WRITE_LEGACY(coin_count_0_w)
+	AM_RANGE(0xa003, 0xa003) AM_MIRROR(0x07f8) AM_WRITE(coin_count_0_w)
 //  AM_RANGE(0xa004, 0xa007) AM_MIRROR(0x07f8) AM_DEVWRITE_LEGACY(GAL_AUDIO, galaxian_lfo_freq_w)
 	AM_RANGE(0xa800, 0xa800) AM_MIRROR(0x07ff) AM_READ_PORT("IN1")
 //  AM_RANGE(0xa800, 0xa807) AM_MIRROR(0x07f8) AM_DEVWRITE_LEGACY(GAL_AUDIO, galaxian_sound_w)
 	AM_RANGE(0xb000, 0xb000) AM_MIRROR(0x07ff) AM_READ_PORT("IN2")
-	AM_RANGE(0xb000, 0xb000) AM_MIRROR(0x07f8) AM_WRITE_LEGACY(irq_enable_w)
+	AM_RANGE(0xb000, 0xb000) AM_MIRROR(0x07f8) AM_WRITE(irq_enable_w)
 	AM_RANGE(0xb004, 0xb004) AM_MIRROR(0x07f8) AM_WRITE(galaxian_stars_enable_w)
 	AM_RANGE(0xb006, 0xb006) AM_MIRROR(0x07f8) AM_WRITE(galaxian_flip_screen_x_w)
 	AM_RANGE(0xb007, 0xb007) AM_MIRROR(0x07f8) AM_WRITE(galaxian_flip_screen_y_w)
@@ -1506,7 +1506,7 @@ static ADDRESS_MAP_START( fantastc_map, AS_PROGRAM, 8, galaxian_state )
 	AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x07ff) AM_READ_PORT("IN0")
 	AM_RANGE(0xa800, 0xa800) AM_MIRROR(0x07ff) AM_READ_PORT("IN1")
 	AM_RANGE(0xb000, 0xb000) AM_MIRROR(0x07ff) AM_READ_PORT("IN2")
-	AM_RANGE(0xb000, 0xb000) AM_MIRROR(0x07f8) AM_WRITE_LEGACY(irq_enable_w)
+	AM_RANGE(0xb000, 0xb000) AM_MIRROR(0x07f8) AM_WRITE(irq_enable_w)
 	AM_RANGE(0xb800, 0xb800) AM_MIRROR(0x07ff) AM_READ(watchdog_reset_r)
 	AM_RANGE(0xfffe, 0xfffe) AM_NOP //?
 ADDRESS_MAP_END
@@ -1527,7 +1527,7 @@ static ADDRESS_MAP_START( dambustr_map, AS_PROGRAM, 8, galaxian_state )
 	AM_RANGE(0xe800, 0xe800) AM_MIRROR(0x07ff) AM_READ_PORT("IN1")
 	AM_RANGE(0xe800, 0xe807) AM_MIRROR(0x07f8) AM_WRITE_LEGACY(galaxian_sound_w)
 	AM_RANGE(0xf000, 0xf000) AM_MIRROR(0x07ff) AM_READ_PORT("IN2")
-	AM_RANGE(0xf001, 0xf001) AM_MIRROR(0x07f8) AM_WRITE_LEGACY(irq_enable_w)
+	AM_RANGE(0xf001, 0xf001) AM_MIRROR(0x07f8) AM_WRITE(irq_enable_w)
 	AM_RANGE(0xf004, 0xf004) AM_MIRROR(0x07f8) AM_WRITE(galaxian_stars_enable_w)
 	AM_RANGE(0xf006, 0xf006) AM_MIRROR(0x07f8) AM_WRITE(galaxian_flip_screen_x_w)
 	AM_RANGE(0xf007, 0xf007) AM_MIRROR(0x07f8) AM_WRITE(galaxian_flip_screen_y_w)
@@ -1544,15 +1544,15 @@ static ADDRESS_MAP_START( theend_map, AS_PROGRAM, 8, galaxian_state )
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
 	AM_RANGE(0x4800, 0x4bff) AM_MIRROR(0x0400) AM_RAM_WRITE(galaxian_videoram_w) AM_BASE(m_videoram)
 	AM_RANGE(0x5000, 0x50ff) AM_MIRROR(0x0700) AM_RAM_WRITE(galaxian_objram_w) AM_SHARE("spriteram")
-	AM_RANGE(0x6801, 0x6801) AM_MIRROR(0x07f8) AM_WRITE_LEGACY(irq_enable_w)
-	AM_RANGE(0x6802, 0x6802) AM_MIRROR(0x07f8) AM_WRITE_LEGACY(coin_count_0_w)
+	AM_RANGE(0x6801, 0x6801) AM_MIRROR(0x07f8) AM_WRITE(irq_enable_w)
+	AM_RANGE(0x6802, 0x6802) AM_MIRROR(0x07f8) AM_WRITE(coin_count_0_w)
 	AM_RANGE(0x6803, 0x6803) AM_MIRROR(0x07f8) AM_WRITE(scramble_background_enable_w)
 	AM_RANGE(0x6804, 0x6804) AM_MIRROR(0x07f8) AM_WRITE(galaxian_stars_enable_w)
 	AM_RANGE(0x6805, 0x6805) AM_MIRROR(0x07f8) //POUT2
 	AM_RANGE(0x6806, 0x6806) AM_MIRROR(0x07f8) AM_WRITE(galaxian_flip_screen_x_w)
 	AM_RANGE(0x6807, 0x6807) AM_MIRROR(0x07f8) AM_WRITE(galaxian_flip_screen_y_w)
 	AM_RANGE(0x7000, 0x7000) AM_MIRROR(0x07ff) AM_READ(watchdog_reset_r)
-	AM_RANGE(0x8000, 0xffff) AM_READWRITE_LEGACY(theend_ppi8255_r, theend_ppi8255_w)
+	AM_RANGE(0x8000, 0xffff) AM_READWRITE(theend_ppi8255_r, theend_ppi8255_w)
 ADDRESS_MAP_END
 
 
@@ -1565,8 +1565,8 @@ static ADDRESS_MAP_START( scobra_map, AS_PROGRAM, 8, galaxian_state )
 	AM_RANGE(0x9000, 0x90ff) AM_MIRROR(0x4700) AM_RAM_WRITE(galaxian_objram_w) AM_SHARE("spriteram")
 	AM_RANGE(0x9800, 0x9803) AM_MIRROR(0x47fc) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w)
 	AM_RANGE(0xa000, 0xa003) AM_MIRROR(0x47fc) AM_DEVREADWRITE_LEGACY("ppi8255_1", ppi8255_r, ppi8255_w)
-	AM_RANGE(0xa801, 0xa801) AM_MIRROR(0x47f8) AM_WRITE_LEGACY(irq_enable_w)
-	AM_RANGE(0xa802, 0xa802) AM_MIRROR(0x47f8) AM_WRITE_LEGACY(coin_count_0_w)
+	AM_RANGE(0xa801, 0xa801) AM_MIRROR(0x47f8) AM_WRITE(irq_enable_w)
+	AM_RANGE(0xa802, 0xa802) AM_MIRROR(0x47f8) AM_WRITE(coin_count_0_w)
 	AM_RANGE(0xa803, 0xa803) AM_MIRROR(0x47f8) AM_WRITE(scramble_background_enable_w)
 	AM_RANGE(0xa804, 0xa804) AM_MIRROR(0x47f8) AM_WRITE(galaxian_stars_enable_w)
 	AM_RANGE(0xa805, 0xa805) AM_MIRROR(0x47f8) /* POUT2 */
@@ -1581,8 +1581,8 @@ static ADDRESS_MAP_START( anteateruk_map, AS_PROGRAM, 8, galaxian_state )
 	AM_RANGE(0x0000, 0x03ff) AM_ROM
 	AM_RANGE(0x0400, 0x0bff) AM_RAM
 	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE(galaxian_videoram_w) AM_BASE(m_videoram)
-	AM_RANGE(0x1001, 0x1001) AM_MIRROR(0x01f8) AM_WRITE_LEGACY(irq_enable_w)
-	AM_RANGE(0x1002, 0x1002) AM_MIRROR(0x01f8) AM_WRITE_LEGACY(coin_count_0_w)
+	AM_RANGE(0x1001, 0x1001) AM_MIRROR(0x01f8) AM_WRITE(irq_enable_w)
+	AM_RANGE(0x1002, 0x1002) AM_MIRROR(0x01f8) AM_WRITE(coin_count_0_w)
 	AM_RANGE(0x1003, 0x1003) AM_MIRROR(0x01f8) AM_WRITE(scramble_background_enable_w)
 	AM_RANGE(0x1004, 0x1004) AM_MIRROR(0x01f8) AM_WRITE(galaxian_stars_enable_w)
 	AM_RANGE(0x1005, 0x1005) AM_MIRROR(0x01f8) //POUT2
@@ -1603,8 +1603,8 @@ static ADDRESS_MAP_START( anteaterg_map, AS_PROGRAM, 8, galaxian_state )
 	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE(galaxian_videoram_w) AM_BASE(m_videoram)
 	AM_RANGE(0x2000, 0x20ff) AM_MIRROR(0x0300) AM_RAM_WRITE(galaxian_objram_w) AM_SHARE("spriteram")
 	AM_RANGE(0x2400, 0x2403) AM_MIRROR(0x01fc) AM_DEVREADWRITE_LEGACY("ppi8255_1", ppi8255_r, ppi8255_w)
-	AM_RANGE(0x2601, 0x2601) AM_MIRROR(0x01f8) AM_WRITE_LEGACY(irq_enable_w)
-	AM_RANGE(0x2602, 0x2602) AM_MIRROR(0x01f8) AM_WRITE_LEGACY(coin_count_0_w)
+	AM_RANGE(0x2601, 0x2601) AM_MIRROR(0x01f8) AM_WRITE(irq_enable_w)
+	AM_RANGE(0x2602, 0x2602) AM_MIRROR(0x01f8) AM_WRITE(coin_count_0_w)
 	AM_RANGE(0x2603, 0x2603) AM_MIRROR(0x01f8) AM_WRITE(scramble_background_enable_w)
 	AM_RANGE(0x2604, 0x2604) AM_MIRROR(0x01f8) AM_WRITE(galaxian_stars_enable_w)
 	AM_RANGE(0x2605, 0x2605) AM_MIRROR(0x01f8) //POUT2
@@ -1625,12 +1625,12 @@ static ADDRESS_MAP_START( frogger_map, AS_PROGRAM, 8, galaxian_state )
 	AM_RANGE(0x8800, 0x8800) AM_MIRROR(0x07ff) AM_READ(watchdog_reset_r)
 	AM_RANGE(0xa800, 0xabff) AM_MIRROR(0x0400) AM_RAM_WRITE(galaxian_videoram_w) AM_BASE(m_videoram)
 	AM_RANGE(0xb000, 0xb0ff) AM_MIRROR(0x0700) AM_RAM_WRITE(galaxian_objram_w) AM_SHARE("spriteram")
-	AM_RANGE(0xb808, 0xb808) AM_MIRROR(0x07e3) AM_WRITE_LEGACY(irq_enable_w)
+	AM_RANGE(0xb808, 0xb808) AM_MIRROR(0x07e3) AM_WRITE(irq_enable_w)
 	AM_RANGE(0xb80c, 0xb80c) AM_MIRROR(0x07e3) AM_WRITE(galaxian_flip_screen_y_w)
 	AM_RANGE(0xb810, 0xb810) AM_MIRROR(0x07e3) AM_WRITE(galaxian_flip_screen_x_w)
-	AM_RANGE(0xb818, 0xb818) AM_MIRROR(0x07e3) AM_WRITE_LEGACY(coin_count_0_w)	/* IOPC7 */
-	AM_RANGE(0xb81c, 0xb81c) AM_MIRROR(0x07e3) AM_WRITE_LEGACY(coin_count_1_w)	/* POUT1 */
-	AM_RANGE(0xc000, 0xffff) AM_READWRITE_LEGACY(frogger_ppi8255_r, frogger_ppi8255_w)
+	AM_RANGE(0xb818, 0xb818) AM_MIRROR(0x07e3) AM_WRITE(coin_count_0_w)	/* IOPC7 */
+	AM_RANGE(0xb81c, 0xb81c) AM_MIRROR(0x07e3) AM_WRITE(coin_count_1_w)	/* POUT1 */
+	AM_RANGE(0xc000, 0xffff) AM_READWRITE(frogger_ppi8255_r, frogger_ppi8255_w)
 ADDRESS_MAP_END
 
 
@@ -1642,16 +1642,16 @@ static ADDRESS_MAP_START( turtles_map, AS_PROGRAM, 8, galaxian_state )
 	AM_RANGE(0x9000, 0x93ff) AM_MIRROR(0x4400) AM_RAM_WRITE(galaxian_videoram_w) AM_BASE(m_videoram)
 	AM_RANGE(0x9800, 0x98ff) AM_MIRROR(0x4700) AM_RAM_WRITE(galaxian_objram_w) AM_SHARE("spriteram")
 	AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x47c7) AM_WRITE(scramble_background_red_w)
-	AM_RANGE(0xa008, 0xa008) AM_MIRROR(0x47c7) AM_WRITE_LEGACY(irq_enable_w)
+	AM_RANGE(0xa008, 0xa008) AM_MIRROR(0x47c7) AM_WRITE(irq_enable_w)
 	AM_RANGE(0xa010, 0xa010) AM_MIRROR(0x47c7) AM_WRITE(galaxian_flip_screen_y_w)
 	AM_RANGE(0xa018, 0xa018) AM_MIRROR(0x47c7) AM_WRITE(galaxian_flip_screen_x_w)
 	AM_RANGE(0xa020, 0xa020) AM_MIRROR(0x47c7) AM_WRITE(scramble_background_green_w)
 	AM_RANGE(0xa028, 0xa028) AM_MIRROR(0x47c7) AM_WRITE(scramble_background_blue_w)
-	AM_RANGE(0xa030, 0xa030) AM_MIRROR(0x47c7) AM_WRITE_LEGACY(coin_count_0_w)
-	AM_RANGE(0xa038, 0xa038) AM_MIRROR(0x47c7) AM_WRITE_LEGACY(coin_count_1_w)
+	AM_RANGE(0xa030, 0xa030) AM_MIRROR(0x47c7) AM_WRITE(coin_count_0_w)
+	AM_RANGE(0xa038, 0xa038) AM_MIRROR(0x47c7) AM_WRITE(coin_count_1_w)
 	AM_RANGE(0xa800, 0xa800) AM_MIRROR(0x47ff) AM_READ(watchdog_reset_r)
-	AM_RANGE(0xb000, 0xb03f) AM_MIRROR(0x47cf) AM_READWRITE_LEGACY(turtles_ppi8255_0_r, turtles_ppi8255_0_w)
-	AM_RANGE(0xb800, 0xb83f) AM_MIRROR(0x47cf) AM_READWRITE_LEGACY(turtles_ppi8255_1_r, turtles_ppi8255_1_w)
+	AM_RANGE(0xb000, 0xb03f) AM_MIRROR(0x47cf) AM_READWRITE(turtles_ppi8255_0_r, turtles_ppi8255_0_w)
+	AM_RANGE(0xb800, 0xb83f) AM_MIRROR(0x47cf) AM_READWRITE(turtles_ppi8255_1_r, turtles_ppi8255_1_w)
 ADDRESS_MAP_END
 
 
@@ -1663,15 +1663,15 @@ static ADDRESS_MAP_START( sfx_map, AS_PROGRAM, 8, galaxian_state )
 	AM_RANGE(0x4800, 0x4bff) AM_MIRROR(0x0400) AM_RAM_WRITE(galaxian_videoram_w) AM_BASE(m_videoram)
 	AM_RANGE(0x5000, 0x50ff) AM_MIRROR(0x0700) AM_RAM_WRITE(galaxian_objram_w) AM_SHARE("spriteram")
 	AM_RANGE(0x6800, 0x6800) AM_MIRROR(0x07f8) AM_WRITE(scramble_background_red_w)
-	AM_RANGE(0x6801, 0x6801) AM_MIRROR(0x07f8) AM_WRITE_LEGACY(irq_enable_w)
-	AM_RANGE(0x6802, 0x6802) AM_MIRROR(0x07f8) AM_WRITE_LEGACY(coin_count_0_w)
+	AM_RANGE(0x6801, 0x6801) AM_MIRROR(0x07f8) AM_WRITE(irq_enable_w)
+	AM_RANGE(0x6802, 0x6802) AM_MIRROR(0x07f8) AM_WRITE(coin_count_0_w)
 	AM_RANGE(0x6803, 0x6803) AM_MIRROR(0x07f8) AM_WRITE(scramble_background_blue_w)
 	AM_RANGE(0x6804, 0x6804) AM_MIRROR(0x07f8) AM_WRITE(galaxian_stars_enable_w)
 	AM_RANGE(0x6805, 0x6805) AM_MIRROR(0x07f8) AM_WRITE(scramble_background_green_w)
 	AM_RANGE(0x6806, 0x6806) AM_MIRROR(0x07f8) AM_WRITE(galaxian_flip_screen_x_w)
 	AM_RANGE(0x6807, 0x6807) AM_MIRROR(0x07f8) AM_WRITE(galaxian_flip_screen_y_w)
 	AM_RANGE(0x7000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_READWRITE_LEGACY(theend_ppi8255_r, theend_ppi8255_w)
+	AM_RANGE(0x8000, 0xbfff) AM_READWRITE(theend_ppi8255_r, theend_ppi8255_w)
 	AM_RANGE(0xc000, 0xefff) AM_ROM
 ADDRESS_MAP_END
 
@@ -1683,16 +1683,16 @@ static ADDRESS_MAP_START( monsterz_map, AS_PROGRAM, 8, galaxian_state )
 	AM_RANGE(0x4800, 0x4bff) AM_MIRROR(0x0400) AM_RAM_WRITE(galaxian_videoram_w) AM_BASE(m_videoram)
 	AM_RANGE(0x5000, 0x50ff) AM_MIRROR(0x0700) AM_RAM_WRITE(galaxian_objram_w) AM_SHARE("spriteram")
 	AM_RANGE(0x6800, 0x6800) AM_MIRROR(0x07f8) AM_WRITE(scramble_background_red_w)
-	AM_RANGE(0x6801, 0x6801) AM_MIRROR(0x07f8) AM_WRITE_LEGACY(irq_enable_w)
-	AM_RANGE(0x6802, 0x6802) AM_MIRROR(0x07f8) AM_WRITE_LEGACY(coin_count_0_w)
+	AM_RANGE(0x6801, 0x6801) AM_MIRROR(0x07f8) AM_WRITE(irq_enable_w)
+	AM_RANGE(0x6802, 0x6802) AM_MIRROR(0x07f8) AM_WRITE(coin_count_0_w)
 	AM_RANGE(0x6803, 0x6803) AM_MIRROR(0x07f8) AM_WRITE(scramble_background_blue_w)
 	AM_RANGE(0x6804, 0x6804) AM_MIRROR(0x07f8) AM_WRITE(galaxian_stars_enable_w)
 	AM_RANGE(0x6805, 0x6805) AM_MIRROR(0x07f8) AM_WRITE(scramble_background_green_w)
 	AM_RANGE(0x6806, 0x6806) AM_MIRROR(0x07f8) AM_WRITE(galaxian_flip_screen_x_w)
 	AM_RANGE(0x6807, 0x6807) AM_MIRROR(0x07f8) AM_WRITE(galaxian_flip_screen_y_w)
-	AM_RANGE(0x8000, 0xbfff) AM_READWRITE_LEGACY(theend_ppi8255_r, theend_ppi8255_w)
+	AM_RANGE(0x8000, 0xbfff) AM_READWRITE(theend_ppi8255_r, theend_ppi8255_w)
 	AM_RANGE(0xc000, 0xd7ff) AM_ROM
-	AM_RANGE(0xd800, 0xd800) AM_READ_LEGACY(monsterz_protection_r)
+	AM_RANGE(0xd800, 0xd800) AM_READ(monsterz_protection_r)
 ADDRESS_MAP_END
 
 
@@ -1717,13 +1717,13 @@ static ADDRESS_MAP_START( jumpbug_map, AS_PROGRAM, 8, galaxian_state )
 	AM_RANGE(0x6002, 0x6006) AM_MIRROR(0x07f8) AM_WRITE(galaxian_gfxbank_w)
 	AM_RANGE(0x6800, 0x6800) AM_MIRROR(0x07ff) AM_READ_PORT("IN1")
 	AM_RANGE(0x7000, 0x7000) AM_MIRROR(0x07ff) AM_READ_PORT("IN2")
-	AM_RANGE(0x7001, 0x7001) AM_MIRROR(0x07f8) AM_WRITE_LEGACY(irq_enable_w)
-	AM_RANGE(0x7002, 0x7002) AM_MIRROR(0x07f8) AM_WRITE_LEGACY(coin_count_0_w)
+	AM_RANGE(0x7001, 0x7001) AM_MIRROR(0x07f8) AM_WRITE(irq_enable_w)
+	AM_RANGE(0x7002, 0x7002) AM_MIRROR(0x07f8) AM_WRITE(coin_count_0_w)
 	AM_RANGE(0x7004, 0x7004) AM_MIRROR(0x07f8) AM_WRITE(galaxian_stars_enable_w)
 	AM_RANGE(0x7006, 0x7006) AM_MIRROR(0x07f8) AM_WRITE(galaxian_flip_screen_x_w)
 	AM_RANGE(0x7007, 0x7007) AM_MIRROR(0x07f8) AM_WRITE(galaxian_flip_screen_y_w)
 	AM_RANGE(0x8000, 0xafff) AM_ROM
-	AM_RANGE(0xb000, 0xbfff) AM_READ_LEGACY(jumpbug_protection_r)
+	AM_RANGE(0xb000, 0xbfff) AM_READ(jumpbug_protection_r)
 ADDRESS_MAP_END
 
 
@@ -1734,12 +1734,12 @@ static ADDRESS_MAP_START( frogf_map, AS_PROGRAM, 8, galaxian_state )
 	AM_RANGE(0x8800, 0x8bff) AM_MIRROR(0x0400) AM_RAM_WRITE(galaxian_videoram_w) AM_BASE(m_videoram)
 	AM_RANGE(0x9000, 0x90ff) AM_MIRROR(0x0700) AM_RAM_WRITE(galaxian_objram_w) AM_SHARE("spriteram")
 	AM_RANGE(0xa802, 0xa802) AM_MIRROR(0x07f1) AM_WRITE(galaxian_flip_screen_x_w)
-	AM_RANGE(0xa804, 0xa804) AM_MIRROR(0x07f1) AM_WRITE_LEGACY(irq_enable_w)
+	AM_RANGE(0xa804, 0xa804) AM_MIRROR(0x07f1) AM_WRITE(irq_enable_w)
 	AM_RANGE(0xa806, 0xa806) AM_MIRROR(0x07f1) AM_WRITE(galaxian_flip_screen_y_w)
-	AM_RANGE(0xa808, 0xa808) AM_MIRROR(0x07f1) AM_WRITE_LEGACY(coin_count_1_w)
-	AM_RANGE(0xa80e, 0xa80e) AM_MIRROR(0x07f1) AM_WRITE_LEGACY(coin_count_0_w)
+	AM_RANGE(0xa808, 0xa808) AM_MIRROR(0x07f1) AM_WRITE(coin_count_1_w)
+	AM_RANGE(0xa80e, 0xa80e) AM_MIRROR(0x07f1) AM_WRITE(coin_count_0_w)
 	AM_RANGE(0xb800, 0xb800) AM_MIRROR(0x07ff) AM_READ(watchdog_reset_r)
-	AM_RANGE(0xc000, 0xffff) AM_READWRITE_LEGACY(frogf_ppi8255_r, frogf_ppi8255_w)
+	AM_RANGE(0xc000, 0xffff) AM_READWRITE(frogf_ppi8255_r, frogf_ppi8255_w)
 ADDRESS_MAP_END
 
 
@@ -1751,11 +1751,11 @@ static ADDRESS_MAP_START( mshuttle_map, AS_PROGRAM, 8, galaxian_state )
 	AM_RANGE(0x9000, 0x93ff) AM_MIRROR(0x0400) AM_RAM_WRITE(galaxian_videoram_w) AM_BASE(m_videoram)
 	AM_RANGE(0x9800, 0x98ff) AM_MIRROR(0x0700) AM_RAM_WRITE(galaxian_objram_w) AM_SHARE("spriteram")
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("IN0")
-	AM_RANGE(0xa000, 0xa000) AM_WRITE_LEGACY(irq_enable_w)
+	AM_RANGE(0xa000, 0xa000) AM_WRITE(irq_enable_w)
 	AM_RANGE(0xa001, 0xa001) AM_WRITE(galaxian_stars_enable_w)
 	AM_RANGE(0xa002, 0xa002) AM_WRITE(galaxian_flip_screen_xy_w)
 	AM_RANGE(0xa004, 0xa004) AM_WRITE_LEGACY(cclimber_sample_trigger_w)
-	AM_RANGE(0xa007, 0xa007) AM_WRITE_LEGACY(mshuttle_ay8910_cs_w)
+	AM_RANGE(0xa007, 0xa007) AM_WRITE(mshuttle_ay8910_cs_w)
 	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("IN1")
 	AM_RANGE(0xa800, 0xa800) AM_WRITE_LEGACY(cclimber_sample_rate_w)
 	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("IN2")
@@ -1766,23 +1766,23 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( mshuttle_portmap, AS_IO, 8, galaxian_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x0f)
-	AM_RANGE(0x08, 0x08) AM_WRITE_LEGACY(mshuttle_ay8910_control_w)
-	AM_RANGE(0x09, 0x09) AM_WRITE_LEGACY(mshuttle_ay8910_data_w)
-	AM_RANGE(0x0c, 0x0c) AM_READ_LEGACY(mshuttle_ay8910_data_r)
+	AM_RANGE(0x08, 0x08) AM_WRITE(mshuttle_ay8910_control_w)
+	AM_RANGE(0x09, 0x09) AM_WRITE(mshuttle_ay8910_data_w)
+	AM_RANGE(0x0c, 0x0c) AM_READ(mshuttle_ay8910_data_r)
 ADDRESS_MAP_END
 
 
-static WRITE8_HANDLER( tenspot_unk_6000_w )
+WRITE8_MEMBER(galaxian_state::tenspot_unk_6000_w)
 {
 	logerror("tenspot_unk_6000_w %02x\n",data);
 }
 
-static WRITE8_HANDLER( tenspot_unk_8000_w )
+WRITE8_MEMBER(galaxian_state::tenspot_unk_8000_w)
 {
 	logerror("tenspot_unk_8000_w %02x\n",data);
 }
 
-static WRITE8_HANDLER( tenspot_unk_e000_w )
+WRITE8_MEMBER(galaxian_state::tenspot_unk_e000_w)
 {
 	logerror("tenspot_unk_e000_w %02x\n",data);
 }
@@ -1792,11 +1792,11 @@ static ADDRESS_MAP_START( tenspot_select_map, AS_PROGRAM, 8, galaxian_state )
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
 	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("SELECT2")
-	AM_RANGE(0x6000, 0x6000) AM_WRITE_LEGACY(tenspot_unk_6000_w)
+	AM_RANGE(0x6000, 0x6000) AM_WRITE(tenspot_unk_6000_w)
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("SELECT")
-	AM_RANGE(0x8000, 0x8000) AM_WRITE_LEGACY(tenspot_unk_8000_w)
+	AM_RANGE(0x8000, 0x8000) AM_WRITE(tenspot_unk_8000_w)
 	AM_RANGE(0xa000, 0xa03f) AM_RAM
-	AM_RANGE(0xe000, 0xe000) AM_WRITE_LEGACY(tenspot_unk_e000_w)
+	AM_RANGE(0xe000, 0xe000) AM_WRITE(tenspot_unk_e000_w)
 ADDRESS_MAP_END
 
 /*************************************
@@ -1810,12 +1810,12 @@ static ADDRESS_MAP_START( frogger_sound_map, AS_PROGRAM, 8, galaxian_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0x1c00) AM_RAM
-    AM_RANGE(0x6000, 0x6fff) AM_MIRROR(0x1000) AM_WRITE_LEGACY(konami_sound_filter_w)
+    AM_RANGE(0x6000, 0x6fff) AM_MIRROR(0x1000) AM_WRITE(konami_sound_filter_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( frogger_sound_portmap, AS_IO, 8, galaxian_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0xff) AM_READWRITE_LEGACY(frogger_ay8910_r, frogger_ay8910_w)
+	AM_RANGE(0x00, 0xff) AM_READWRITE(frogger_ay8910_r, frogger_ay8910_w)
 ADDRESS_MAP_END
 
 
@@ -1823,12 +1823,12 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( konami_sound_map, AS_PROGRAM, 8, galaxian_state )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x6c00) AM_RAM
-    AM_RANGE(0x9000, 0x9fff) AM_MIRROR(0x6000) AM_WRITE_LEGACY(konami_sound_filter_w)
+    AM_RANGE(0x9000, 0x9fff) AM_MIRROR(0x6000) AM_WRITE(konami_sound_filter_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( konami_sound_portmap, AS_IO, 8, galaxian_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0xff) AM_READWRITE_LEGACY(konami_ay8910_r, konami_ay8910_w)
+	AM_RANGE(0x00, 0xff) AM_READWRITE(konami_ay8910_r, konami_ay8910_w)
 ADDRESS_MAP_END
 
 
@@ -1881,7 +1881,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sfx_sample_portmap, AS_IO, 8, galaxian_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0xff) AM_READWRITE_LEGACY(sfx_sample_io_r, sfx_sample_io_w)
+	AM_RANGE(0x00, 0xff) AM_READWRITE(sfx_sample_io_r, sfx_sample_io_w)
 ADDRESS_MAP_END
 
 
@@ -2918,28 +2918,29 @@ static DRIVER_INIT( moonqsr )
 	space->set_decrypted_region(0x0000, 0x7fff, decrypt);
 }
 
-static WRITE8_HANDLER( artic_gfxbank_w )
+WRITE8_MEMBER(galaxian_state::artic_gfxbank_w)
 {
 //  printf("artic_gfxbank_w %02x\n",data);
 }
 
 static DRIVER_INIT( pacmanbl )
 {
+	galaxian_state *state = machine.driver_data<galaxian_state>();
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* same as galaxian... */
 	DRIVER_INIT_CALL(galaxian);
 
 	/* ...but coin lockout disabled/disconnected */
-	space->install_legacy_write_handler(0x6002, 0x6002, 0, 0x7f8, FUNC(artic_gfxbank_w));
+	space->install_write_handler(0x6002, 0x6002, 0, 0x7f8, write8_delegate(FUNC(galaxian_state::artic_gfxbank_w),state));
 }
 
-static READ8_HANDLER( tenspot_dsw_read )
+READ8_MEMBER(galaxian_state::tenspot_dsw_read)
 {
-	galaxian_state *state = space->machine().driver_data<galaxian_state>();
+//OBRISI.ME
 	char tmp[64];
-	sprintf(tmp,"IN2_GAME%d", state->m_tenspot_current_game);
-	return input_port_read_safe(space->machine(), tmp, 0x00);
+	sprintf(tmp,"IN2_GAME%d", m_tenspot_current_game);
+	return input_port_read_safe(machine(), tmp, 0x00);
 }
 
 
@@ -3003,13 +3004,13 @@ static DRIVER_INIT( tenspot )
 
 	DRIVER_INIT_CALL(galaxian);
 
-	space->install_legacy_write_handler(0x6002, 0x6002, 0, 0x7f8, FUNC(artic_gfxbank_w));
+	space->install_write_handler(0x6002, 0x6002, 0, 0x7f8, write8_delegate(FUNC(galaxian_state::artic_gfxbank_w),state));
 
 	state->m_tenspot_current_game = 0;
 
 	tenspot_set_game_bank(machine, state->m_tenspot_current_game, 0);
 
-	space->install_legacy_read_handler(0x7000, 0x7000, FUNC(tenspot_dsw_read));
+	space->install_read_handler(0x7000, 0x7000, read8_delegate(FUNC(galaxian_state::tenspot_dsw_read),state));
 }
 
 
@@ -3049,8 +3050,8 @@ static DRIVER_INIT( zigzag )
 	memory_set_bankptr(machine, "bank3", machine.region("maincpu")->base() + 0x0000);
 
 	/* handler for doing the swaps */
-	space->install_legacy_write_handler(0x7002, 0x7002, 0, 0x07f8, FUNC(zigzag_bankswap_w));
-	zigzag_bankswap_w(space, 0, 0);
+	space->install_write_handler(0x7002, 0x7002, 0, 0x07f8, write8_delegate(FUNC(galaxian_state::zigzag_bankswap_w),state));
+	state->zigzag_bankswap_w(*space, 0, 0);
 
 	/* coin lockout disabled */
 	space->unmap_write(0x6002, 0x6002, 0, 0x7f8);
@@ -3059,7 +3060,7 @@ static DRIVER_INIT( zigzag )
 	unmap_galaxian_sound(machine, 0x6000);
 
 	/* install our AY-8910 handler */
-	space->install_legacy_write_handler(0x4800, 0x4fff, FUNC(zigzag_ay8910_w));
+	space->install_write_handler(0x4800, 0x4fff, write8_delegate(FUNC(galaxian_state::zigzag_ay8910_w),state));
 }
 
 
@@ -3074,16 +3075,17 @@ static DRIVER_INIT( checkman )
 {
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	address_space *iospace = machine.device("maincpu")->memory().space(AS_IO);
+	galaxian_state *state = machine.driver_data<galaxian_state>();
 
 	/* video extensions */
 	common_init(machine, galaxian_draw_bullet, galaxian_draw_background, mooncrst_extend_tile_info, mooncrst_extend_sprite_info);
 
 	/* move the interrupt enable from $b000 to $b001 */
 	space->unmap_write(0xb000, 0xb000, 0, 0x7f8);
-	space->install_legacy_write_handler(0xb001, 0xb001, 0, 0x7f8, FUNC(irq_enable_w));
+	space->install_write_handler(0xb001, 0xb001, 0, 0x7f8, write8_delegate(FUNC(galaxian_state::irq_enable_w),state));
 
 	/* attach the sound command handler */
-	iospace->install_legacy_write_handler(0x00, 0x00, 0, 0xffff, FUNC(checkman_sound_command_w));
+	iospace->install_write_handler(0x00, 0x00, 0, 0xffff, write8_delegate(FUNC(galaxian_state::checkman_sound_command_w),state));
 
 	/* decrypt program code */
 	decode_checkman(machine);
@@ -3092,36 +3094,39 @@ static DRIVER_INIT( checkman )
 
 static DRIVER_INIT( checkmaj )
 {
+	galaxian_state *state = machine.driver_data<galaxian_state>();
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* video extensions */
 	common_init(machine, galaxian_draw_bullet, galaxian_draw_background, NULL, NULL);
 
 	/* attach the sound command handler */
-	space->install_legacy_write_handler(0x7800, 0x7800, 0, 0x7ff, FUNC(checkman_sound_command_w));
+	space->install_write_handler(0x7800, 0x7800, 0, 0x7ff, write8_delegate(FUNC(galaxian_state::checkman_sound_command_w),state));
 
 	/* for the title screen */
-	space->install_legacy_read_handler(0x3800, 0x3800, FUNC(checkmaj_protection_r));
+	space->install_read_handler(0x3800, 0x3800, read8_delegate(FUNC(galaxian_state::checkmaj_protection_r),state));
 }
 
 
 static DRIVER_INIT( dingo )
 {
+	galaxian_state *state = machine.driver_data<galaxian_state>();
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* video extensions */
 	common_init(machine, galaxian_draw_bullet, galaxian_draw_background, NULL, NULL);
 
 	/* attach the sound command handler */
-	space->install_legacy_write_handler(0x7800, 0x7800, 0, 0x7ff, FUNC(checkman_sound_command_w));
+	space->install_write_handler(0x7800, 0x7800, 0, 0x7ff, write8_delegate(FUNC(galaxian_state::checkman_sound_command_w),state));
 
-	space->install_legacy_read_handler(0x3000, 0x3000, FUNC(dingo_3000_r));
-	space->install_legacy_read_handler(0x3035, 0x3035, FUNC(dingo_3035_r));
+	space->install_read_handler(0x3000, 0x3000, read8_delegate(FUNC(galaxian_state::dingo_3000_r),state));
+	space->install_read_handler(0x3035, 0x3035, read8_delegate(FUNC(galaxian_state::dingo_3035_r),state));
 }
 
 
 static DRIVER_INIT( dingoe )
 {
+	galaxian_state *state = machine.driver_data<galaxian_state>();
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	address_space *iospace = machine.device("maincpu")->memory().space(AS_IO);
 
@@ -3130,12 +3135,12 @@ static DRIVER_INIT( dingoe )
 
 	/* move the interrupt enable from $b000 to $b001 */
 	space->unmap_write(0xb000, 0xb000, 0, 0x7f8);
-	space->install_legacy_write_handler(0xb001, 0xb001, 0, 0x7f8, FUNC(irq_enable_w));
+	space->install_write_handler(0xb001, 0xb001, 0, 0x7f8, write8_delegate(FUNC(galaxian_state::irq_enable_w),state));
 
 	/* attach the sound command handler */
-	iospace->install_legacy_write_handler(0x00, 0x00, 0, 0xffff, FUNC(checkman_sound_command_w));
+	iospace->install_write_handler(0x00, 0x00, 0, 0xffff, write8_delegate(FUNC(galaxian_state::checkman_sound_command_w),state));
 
-	space->install_legacy_read_handler(0x3001, 0x3001, FUNC(dingoe_3001_r));	/* Protection check */
+	space->install_read_handler(0x3001, 0x3001, read8_delegate(FUNC(galaxian_state::dingoe_3001_r),state));	/* Protection check */
 
 	/* decrypt program code */
 	decode_dingoe(machine);
@@ -3299,10 +3304,10 @@ static DRIVER_INIT( kingball )
 	/* video extensions */
 	common_init(machine, galaxian_draw_bullet, galaxian_draw_background, NULL, NULL);
 
-	space->install_legacy_write_handler(0xb000, 0xb000, 0, 0x7f8, FUNC(kingball_sound1_w));
-	space->install_legacy_write_handler(0xb001, 0xb001, 0, 0x7f8, FUNC(irq_enable_w));
-	space->install_legacy_write_handler(0xb002, 0xb002, 0, 0x7f8, FUNC(kingball_sound2_w));
-	space->install_legacy_write_handler(0xb003, 0xb003, 0, 0x7f8, FUNC(kingball_speech_dip_w));
+	space->install_write_handler(0xb000, 0xb000, 0, 0x7f8, write8_delegate(FUNC(galaxian_state::kingball_sound1_w),state));
+	space->install_write_handler(0xb001, 0xb001, 0, 0x7f8, write8_delegate(FUNC(galaxian_state::irq_enable_w),state));
+	space->install_write_handler(0xb002, 0xb002, 0, 0x7f8, write8_delegate(FUNC(galaxian_state::kingball_sound2_w),state));
+	space->install_write_handler(0xb003, 0xb003, 0, 0x7f8, write8_delegate(FUNC(galaxian_state::kingball_speech_dip_w),state));
 
 	state_save_register_global(machine, state->m_kingball_speech_dip);
 	state_save_register_global(machine, state->m_kingball_sound);
@@ -3311,6 +3316,7 @@ static DRIVER_INIT( kingball )
 
 static DRIVER_INIT( scorpnmc )
 {
+	galaxian_state *state = machine.driver_data<galaxian_state>();
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* video extensions */
@@ -3318,7 +3324,7 @@ static DRIVER_INIT( scorpnmc )
 
 	/* move the interrupt enable from $b000 to $b001 */
 	space->unmap_write(0xb000, 0xb000, 0, 0x7f8);
-	space->install_legacy_write_handler(0xb001, 0xb001, 0, 0x7f8, FUNC(irq_enable_w));
+	space->install_write_handler(0xb001, 0xb001, 0, 0x7f8, write8_delegate(FUNC(galaxian_state::irq_enable_w),state));
 
 	/* extra ROM */
 	space->install_rom(0x5000, 0x67ff, machine.region("maincpu")->base() + 0x5000);
@@ -3332,6 +3338,7 @@ static DRIVER_INIT( scorpnmc )
 
 static DRIVER_INIT( thepitm )
 {
+	galaxian_state *state = machine.driver_data<galaxian_state>();
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* video extensions */
@@ -3339,7 +3346,7 @@ static DRIVER_INIT( thepitm )
 
 	/* move the interrupt enable from $b000 to $b001 */
 	space->unmap_write(0xb000, 0xb000, 0, 0x7f8);
-	space->install_legacy_write_handler(0xb001, 0xb001, 0, 0x7f8, FUNC(irq_enable_w));
+	space->install_write_handler(0xb001, 0xb001, 0, 0x7f8, write8_delegate(FUNC(galaxian_state::irq_enable_w),state));
 
 	/* disable the stars */
 	space->unmap_write(0xb004, 0xb004, 0, 0x07f8);
@@ -3391,7 +3398,7 @@ static DRIVER_INIT( explorer )
 	space->install_read_port(0x8002, 0x8002, 0, 0xffc, "IN2");
 	space->install_read_port(0x8003, 0x8003, 0, 0xffc, "IN3");
 	space->install_write_handler(0x8000, 0x8000, 0, 0xfff, write8_delegate(FUNC(galaxian_state::soundlatch_byte_w),state));
-	space->install_legacy_write_handler(0x9000, 0x9000, 0, 0xfff, FUNC(explorer_sound_control_w));
+	space->install_write_handler(0x9000, 0x9000, 0, 0xfff, write8_delegate(FUNC(galaxian_state::explorer_sound_control_w),state));
 }
 
 
@@ -3461,7 +3468,7 @@ static DRIVER_INIT( froggrmc )
 	common_init(machine, NULL, frogger_draw_background, frogger_extend_tile_info, frogger_extend_sprite_info);
 
 	space->install_write_handler(0xa800, 0xa800, 0, 0x7ff, write8_delegate(FUNC(galaxian_state::soundlatch_byte_w),state));
-	space->install_legacy_write_handler(0xb001, 0xb001, 0, 0x7f8, FUNC(froggrmc_sound_control_w));
+	space->install_write_handler(0xb001, 0xb001, 0, 0x7f8, write8_delegate(FUNC(galaxian_state::froggrmc_sound_control_w),state));
 
 	/* actually needs 2k of RAM */
 	space->install_ram(0x8000, 0x87ff);
@@ -3500,12 +3507,13 @@ static DRIVER_INIT( amidar )
 
 static DRIVER_INIT( scorpion )
 {
+	galaxian_state *state = machine.driver_data<galaxian_state>();
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	common_init(machine, scramble_draw_bullet, scramble_draw_background, batman2_extend_tile_info, upper_extend_sprite_info);
 
 	/* hook up AY8910 */
-	machine.device("audiocpu")->memory().space(AS_IO)->install_legacy_readwrite_handler(0x00, 0xff, FUNC(scorpion_ay8910_r), FUNC(scorpion_ay8910_w));
+	machine.device("audiocpu")->memory().space(AS_IO)->install_readwrite_handler(0x00, 0xff, read8_delegate(FUNC(galaxian_state::scorpion_ay8910_r),state), write8_delegate(FUNC(galaxian_state::scorpion_ay8910_w),state));
 
 	/* extra ROM */
 	space->install_read_bank(0x5800, 0x67ff, "bank1");
@@ -3514,7 +3522,7 @@ static DRIVER_INIT( scorpion )
 	/* no background related */
 //  space->nop_write(0x6803, 0x6803);
 
-	machine.device("audiocpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x3000, 0x3000, FUNC(scorpion_digitalker_intr_r));
+	machine.device("audiocpu")->memory().space(AS_PROGRAM)->install_read_handler(0x3000, 0x3000, read8_delegate(FUNC(galaxian_state::scorpion_digitalker_intr_r),state));
 /*
 {
     const UINT8 *rom = machine.region("speech")->base();

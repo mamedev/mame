@@ -31,6 +31,17 @@ public:
 
 	UINT8 m_nmi_mask;
 	UINT8 m_sound_nmi_mask;
+	DECLARE_READ8_MEMBER(fastfred_custom_io_r);
+	DECLARE_READ8_MEMBER(flyboy_custom1_io_r);
+	DECLARE_READ8_MEMBER(flyboy_custom2_io_r);
+	DECLARE_READ8_MEMBER(jumpcoas_custom_io_r);
+	DECLARE_READ8_MEMBER(boggy84_custom_io_r);
+	DECLARE_WRITE8_MEMBER(imago_dma_irq_w);
+	DECLARE_WRITE8_MEMBER(imago_sprites_bank_w);
+	DECLARE_WRITE8_MEMBER(imago_sprites_dma_w);
+	DECLARE_READ8_MEMBER(imago_sprites_offset_r);
+	DECLARE_WRITE8_MEMBER(nmi_mask_w);
+	DECLARE_WRITE8_MEMBER(sound_nmi_mask_w);
 };
 
 

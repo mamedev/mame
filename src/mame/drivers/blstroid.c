@@ -41,9 +41,9 @@ static void update_interrupts(running_machine &machine)
 }
 
 
-static WRITE16_HANDLER( blstroid_halt_until_hblank_0_w )
+WRITE16_MEMBER(blstroid_state::blstroid_halt_until_hblank_0_w)
 {
-	atarigen_halt_until_hblank_0(*space->machine().primary_screen);
+	atarigen_halt_until_hblank_0(*machine().primary_screen);
 }
 
 
@@ -71,14 +71,14 @@ static MACHINE_RESET( blstroid )
  *
  *************************************/
 
-static READ16_HANDLER( inputs_r )
+READ16_MEMBER(blstroid_state::inputs_r)
 {
 	static const char *const iptnames[] = { "IN0", "IN1" };
-	blstroid_state *state = space->machine().driver_data<blstroid_state>();
-	int temp = input_port_read(space->machine(), iptnames[offset & 1]);
+//OBRISI.ME
+	int temp = input_port_read(machine(), iptnames[offset & 1]);
 
-	if (state->m_cpu_to_sound_ready) temp ^= 0x0040;
-	if (atarigen_get_hblank(*space->machine().primary_screen)) temp ^= 0x0010;
+	if (m_cpu_to_sound_ready) temp ^= 0x0040;
+	if (atarigen_get_hblank(*machine().primary_screen)) temp ^= 0x0010;
 	return temp;
 }
 
@@ -101,11 +101,11 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, blstroid_state )
 	AM_RANGE(0xff8800, 0xff89ff) AM_MIRROR(0x7f8000) AM_WRITEONLY AM_BASE(m_priorityram)
 	AM_RANGE(0xff8a00, 0xff8a01) AM_MIRROR(0x7f81fe) AM_WRITE_LEGACY(atarigen_sound_w)
 	AM_RANGE(0xff8c00, 0xff8c01) AM_MIRROR(0x7f81fe) AM_WRITE_LEGACY(atarigen_sound_reset_w)
-	AM_RANGE(0xff8e00, 0xff8e01) AM_MIRROR(0x7f81fe) AM_WRITE_LEGACY(blstroid_halt_until_hblank_0_w)
+	AM_RANGE(0xff8e00, 0xff8e01) AM_MIRROR(0x7f81fe) AM_WRITE(blstroid_halt_until_hblank_0_w)
 	AM_RANGE(0xff9400, 0xff9401) AM_MIRROR(0x7f83fe) AM_READ_LEGACY(atarigen_sound_r)
 	AM_RANGE(0xff9800, 0xff9801) AM_MIRROR(0x7f83f8) AM_READ_PORT("DIAL0")
 	AM_RANGE(0xff9804, 0xff9805) AM_MIRROR(0x7f83f8) AM_READ_PORT("DIAL1")
-	AM_RANGE(0xff9c00, 0xff9c03) AM_MIRROR(0x7f83fc) AM_READ_LEGACY(inputs_r)
+	AM_RANGE(0xff9c00, 0xff9c03) AM_MIRROR(0x7f83fc) AM_READ(inputs_r)
 	AM_RANGE(0xffa000, 0xffa3ff) AM_MIRROR(0x7f8c00) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0xffb000, 0xffb3ff) AM_MIRROR(0x7f8c00) AM_READWRITE_LEGACY(atarigen_eeprom_r, atarigen_eeprom_w) AM_SHARE("eeprom")
 	AM_RANGE(0xffc000, 0xffcfff) AM_MIRROR(0x7f8000) AM_RAM_WRITE_LEGACY(atarigen_playfield_w) AM_BASE(m_playfield)

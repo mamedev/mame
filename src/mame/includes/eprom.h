@@ -16,6 +16,11 @@ public:
 	int 			m_video_disable;
 	UINT16 *		m_sync_data;
 	int			m_last_offset;
+	DECLARE_READ16_MEMBER(special_port1_r);
+	DECLARE_READ16_MEMBER(adc_r);
+	DECLARE_WRITE16_MEMBER(eprom_latch_w);
+	DECLARE_READ16_MEMBER(sync_r);
+	DECLARE_WRITE16_MEMBER(sync_w);
 };
 
 

@@ -36,6 +36,22 @@ public:
 	DECLARE_READ8_MEMBER(twotiger_videoram_r);
 	DECLARE_WRITE8_MEMBER(twotiger_videoram_w);
 	DECLARE_WRITE8_MEMBER(mcr_91490_videoram_w);
+	DECLARE_READ8_MEMBER(solarfox_ip0_r);
+	DECLARE_READ8_MEMBER(solarfox_ip1_r);
+	DECLARE_READ8_MEMBER(kick_ip1_r);
+	DECLARE_WRITE8_MEMBER(wacko_op4_w);
+	DECLARE_READ8_MEMBER(wacko_ip1_r);
+	DECLARE_READ8_MEMBER(wacko_ip2_r);
+	DECLARE_READ8_MEMBER(kroozr_ip1_r);
+	DECLARE_WRITE8_MEMBER(kroozr_op4_w);
+	DECLARE_WRITE8_MEMBER(journey_op4_w);
+	DECLARE_WRITE8_MEMBER(twotiger_op4_w);
+	DECLARE_WRITE8_MEMBER(dotron_op4_w);
+	DECLARE_READ8_MEMBER(nflfoot_ip2_r);
+	DECLARE_WRITE8_MEMBER(nflfoot_op4_w);
+	DECLARE_READ8_MEMBER(demoderb_ip1_r);
+	DECLARE_READ8_MEMBER(demoderb_ip2_r);
+	DECLARE_WRITE8_MEMBER(demoderb_op4_w);
 };
 
 

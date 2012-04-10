@@ -120,6 +120,23 @@ public:
 	legacy_cpu_device* m_audiocpu;
 
 	bitmap_rgb32 m_tmpbitmap;
+	DECLARE_READ8_MEMBER(stv_ioga_r);
+	DECLARE_WRITE8_MEMBER(stv_ioga_w);
+	DECLARE_READ8_MEMBER(critcrsh_ioga_r);
+	DECLARE_READ8_MEMBER(magzun_ioga_r);
+	DECLARE_WRITE8_MEMBER(magzun_ioga_w);
+	DECLARE_READ8_MEMBER(stvmp_ioga_r);
+	DECLARE_WRITE8_MEMBER(stvmp_ioga_w);
+	DECLARE_READ32_MEMBER(stv_ioga_r32);
+	DECLARE_WRITE32_MEMBER(stv_ioga_w32);
+	DECLARE_READ32_MEMBER(critcrsh_ioga_r32);
+	DECLARE_READ32_MEMBER(stvmp_ioga_r32);
+	DECLARE_WRITE32_MEMBER(stvmp_ioga_w32);
+	DECLARE_READ32_MEMBER(magzun_ioga_r32);
+	DECLARE_WRITE32_MEMBER(magzun_ioga_w32);
+	DECLARE_READ32_MEMBER(magzun_hef_hack_r);
+	DECLARE_READ32_MEMBER(magzun_rx_hack_r);
+	DECLARE_READ32_MEMBER(astrass_hack_r);
 };
 
 #define MASTER_CLOCK_352 57272720

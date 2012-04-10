@@ -8,6 +8,8 @@ public:
 		{ }
 
 	int mux_port;
+	UINT32 m_st0016_rom_bank;
+	
 	required_device<cpu_device> m_maincpu;
 	DECLARE_READ8_MEMBER(mux_r);
 	DECLARE_WRITE8_MEMBER(mux_select_w);
@@ -29,6 +31,7 @@ public:
 	DECLARE_READ8_MEMBER(st0016_vregs_r);
 	DECLARE_READ8_MEMBER(st0016_dma_r);
 	DECLARE_WRITE8_MEMBER(st0016_vregs_w);
+	DECLARE_WRITE8_MEMBER(st0016_rom_bank_w);
 };
 
 #define ISMACS  (st0016_game&0x80)
@@ -52,8 +55,7 @@ public:
 
 /*----------- defined in drivers/st0016.c -----------*/
 
-extern UINT32 st0016_rom_bank;
-WRITE8_HANDLER	(st0016_rom_bank_w);
+//OBRISI.ME
 
 
 /*----------- defined in video/st0016.c -----------*/

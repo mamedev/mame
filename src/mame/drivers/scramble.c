@@ -291,16 +291,16 @@ static ADDRESS_MAP_START( hotshock_sound_io_map, AS_IO, 8, scramble_state )
 	AM_RANGE(0x80, 0x80) AM_DEVWRITE_LEGACY("8910.2", ay8910_address_w)
 ADDRESS_MAP_END
 
-static READ8_HANDLER( hncholms_prot_r )
+READ8_MEMBER(scramble_state::hncholms_prot_r)
 {
-	if(cpu_get_pc(&space->device()) == 0x2b || cpu_get_pc(&space->device()) == 0xa27)
+	if(cpu_get_pc(&space.device()) == 0x2b || cpu_get_pc(&space.device()) == 0xa27)
 		return 1;
 	else
 		return 0;
 }
 
 static ADDRESS_MAP_START( hunchbks_readport, AS_IO, 8, scramble_state )
-	AM_RANGE(0x00, 0x00) AM_READ_LEGACY(hncholms_prot_r)
+	AM_RANGE(0x00, 0x00) AM_READ(hncholms_prot_r)
     AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ_PORT("SENSE")
 ADDRESS_MAP_END
 
@@ -1207,21 +1207,21 @@ GFXDECODE_END
 
 
 
-static READ8_HANDLER(scramble_soundram_r)
+READ8_MEMBER(scramble_state::scramble_soundram_r)
 {
-	scramble_state *state = space->machine().driver_data<scramble_state>();
-	return state->m_soundram[offset & 0x03ff];
+//OBRISI.ME
+	return m_soundram[offset & 0x03ff];
 }
 
-static WRITE8_HANDLER(scramble_soundram_w)
+WRITE8_MEMBER(scramble_state::scramble_soundram_w)
 {
-	scramble_state *state = space->machine().driver_data<scramble_state>();
-	state->m_soundram[offset & 0x03ff] = data;
+//OBRISI.ME
+	m_soundram[offset & 0x03ff] = data;
 }
 
 static ADDRESS_MAP_START( scramble_sound_map, AS_PROGRAM, 8, scramble_state )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
-	AM_RANGE(0x8000, 0x8fff) AM_READWRITE_LEGACY(scramble_soundram_r, scramble_soundram_w)
+	AM_RANGE(0x8000, 0x8fff) AM_READWRITE(scramble_soundram_r, scramble_soundram_w)
 	AM_RANGE(0x8000, 0x83ff) AM_WRITENOP AM_BASE(m_soundram)  /* only here to initialize pointer */
 	AM_RANGE(0x9000, 0x9fff) AM_WRITE_LEGACY(scramble_filter_w)
 ADDRESS_MAP_END

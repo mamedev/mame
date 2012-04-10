@@ -137,7 +137,7 @@ WRITE8_MEMBER(macs_state::macs_rom_bank_w)
 {
 	memory_set_bankptr(machine(),  "bank1", machine().region("maincpu")->base() + (data* 0x4000) + 0x10000 + macs_cart_slot*0x400000 );
 
-	st0016_rom_bank=data;
+	m_st0016_rom_bank=data;
 }
 
 WRITE8_MEMBER(macs_state::macs_output_w)

@@ -116,7 +116,7 @@
 
 
 
-static WRITE8_HANDLER( mcrmono_control_port_w )
+WRITE8_MEMBER(mcr3_state::mcrmono_control_port_w)
 {
 	/*
         Bit layout is as follows:
@@ -130,7 +130,7 @@ static WRITE8_HANDLER( mcrmono_control_port_w )
             D0 = coin meter 1
     */
 
-	coin_counter_w(space->machine(), 0, (data >> 0) & 1);
+	coin_counter_w(machine(), 0, (data >> 0) & 1);
 	mcr_cocktail_flip = (data >> 6) & 1;
 }
 
@@ -141,31 +141,31 @@ static WRITE8_HANDLER( mcrmono_control_port_w )
  *
  *************************************/
 
-static READ8_HANDLER( demoderm_ip1_r )
+READ8_MEMBER(mcr3_state::demoderm_ip1_r)
 {
-	mcr3_state *state = space->machine().driver_data<mcr3_state>();
-	return input_port_read(space->machine(), "MONO.IP1") |
-		(input_port_read(space->machine(), state->m_input_mux ? "MONO.IP1.ALT2" : "MONO.IP1.ALT1") << 2);
+//OBRISI.ME
+	return input_port_read(machine(), "MONO.IP1") |
+		(input_port_read(machine(), m_input_mux ? "MONO.IP1.ALT2" : "MONO.IP1.ALT1") << 2);
 }
 
 
-static READ8_HANDLER( demoderm_ip2_r )
+READ8_MEMBER(mcr3_state::demoderm_ip2_r)
 {
-	mcr3_state *state = space->machine().driver_data<mcr3_state>();
-	return input_port_read(space->machine(), "MONO.IP2") |
-		(input_port_read(space->machine(), state->m_input_mux ? "MONO.IP2.ALT2" : "MONO.IP2.ALT1") << 2);
+//OBRISI.ME
+	return input_port_read(machine(), "MONO.IP2") |
+		(input_port_read(machine(), m_input_mux ? "MONO.IP2.ALT2" : "MONO.IP2.ALT1") << 2);
 }
 
 
-static WRITE8_HANDLER( demoderm_op6_w )
+WRITE8_MEMBER(mcr3_state::demoderm_op6_w)
 {
-	mcr3_state *state = space->machine().driver_data<mcr3_state>();
+//OBRISI.ME
 	/* top 2 bits select the input */
-	if (data & 0x80) state->m_input_mux = 0;
-	if (data & 0x40) state->m_input_mux = 1;
+	if (data & 0x80) m_input_mux = 0;
+	if (data & 0x40) m_input_mux = 1;
 
 	/* low 5 bits control the turbo CS */
-	turbocs_data_w(space, offset, data);
+	turbocs_data_w(&space, offset, data);
 }
 
 
@@ -176,72 +176,72 @@ static WRITE8_HANDLER( demoderm_op6_w )
  *
  *************************************/
 
-static READ8_HANDLER( maxrpm_ip1_r )
+READ8_MEMBER(mcr3_state::maxrpm_ip1_r)
 {
-	mcr3_state *state = space->machine().driver_data<mcr3_state>();
-	return state->m_latched_input;
+//OBRISI.ME
+	return m_latched_input;
 }
 
 
-static READ8_HANDLER( maxrpm_ip2_r )
+READ8_MEMBER(mcr3_state::maxrpm_ip2_r)
 {
-	mcr3_state *state = space->machine().driver_data<mcr3_state>();
+//OBRISI.ME
 	static const UINT8 shift_bits[5] = { 0x00, 0x05, 0x06, 0x01, 0x02 };
-	UINT8 start = input_port_read(space->machine(), "MONO.IP0");
-	UINT8 shift = input_port_read(space->machine(), "SHIFT");
+	UINT8 start = input_port_read(machine(), "MONO.IP0");
+	UINT8 shift = input_port_read(machine(), "SHIFT");
 
 	/* reset on a start */
 	if (!(start & 0x08))
-		state->m_maxrpm_p1_shift = 0;
+		m_maxrpm_p1_shift = 0;
 	if (!(start & 0x04))
-		state->m_maxrpm_p2_shift = 0;
+		m_maxrpm_p2_shift = 0;
 
 	/* increment, decrement on falling edge */
-	if (!(shift & 0x01) && (state->m_maxrpm_last_shift & 0x01))
+	if (!(shift & 0x01) && (m_maxrpm_last_shift & 0x01))
 	{
-		state->m_maxrpm_p1_shift++;
-		if (state->m_maxrpm_p1_shift > 4)
-			state->m_maxrpm_p1_shift = 4;
+		m_maxrpm_p1_shift++;
+		if (m_maxrpm_p1_shift > 4)
+			m_maxrpm_p1_shift = 4;
 	}
-	if (!(shift & 0x02) && (state->m_maxrpm_last_shift & 0x02))
+	if (!(shift & 0x02) && (m_maxrpm_last_shift & 0x02))
 	{
-		state->m_maxrpm_p1_shift--;
-		if (state->m_maxrpm_p1_shift < 0)
-			state->m_maxrpm_p1_shift = 0;
+		m_maxrpm_p1_shift--;
+		if (m_maxrpm_p1_shift < 0)
+			m_maxrpm_p1_shift = 0;
 	}
-	if (!(shift & 0x04) && (state->m_maxrpm_last_shift & 0x04))
+	if (!(shift & 0x04) && (m_maxrpm_last_shift & 0x04))
 	{
-		state->m_maxrpm_p2_shift++;
-		if (state->m_maxrpm_p2_shift > 4)
-			state->m_maxrpm_p2_shift = 4;
+		m_maxrpm_p2_shift++;
+		if (m_maxrpm_p2_shift > 4)
+			m_maxrpm_p2_shift = 4;
 	}
-	if (!(shift & 0x08) && (state->m_maxrpm_last_shift & 0x08))
+	if (!(shift & 0x08) && (m_maxrpm_last_shift & 0x08))
 	{
-		state->m_maxrpm_p2_shift--;
-		if (state->m_maxrpm_p2_shift < 0)
-			state->m_maxrpm_p2_shift = 0;
+		m_maxrpm_p2_shift--;
+		if (m_maxrpm_p2_shift < 0)
+			m_maxrpm_p2_shift = 0;
 	}
 
-	state->m_maxrpm_last_shift = shift;
+	m_maxrpm_last_shift = shift;
 
-	return ~((shift_bits[state->m_maxrpm_p1_shift] << 4) + shift_bits[state->m_maxrpm_p2_shift]);
+	return ~((shift_bits[m_maxrpm_p1_shift] << 4) + shift_bits[m_maxrpm_p2_shift]);
 }
 
 
-static WRITE8_HANDLER( maxrpm_op5_w )
+WRITE8_MEMBER(mcr3_state::maxrpm_op5_w)
 {
-	mcr3_state *state = space->machine().driver_data<mcr3_state>();
+//OBRISI.ME
 	/* latch the low 4 bits as input to the ADC0844 */
-	state->m_maxrpm_adc_control = data & 0x0f;
+	m_maxrpm_adc_control = data & 0x0f;
 
 	/* remaining bits go to standard connections */
 	mcrmono_control_port_w(space, offset, data);
 }
 
 
-static WRITE8_HANDLER( maxrpm_op6_w )
+WRITE8_MEMBER(mcr3_state::maxrpm_op6_w)
 {
-	mcr3_state *state = space->machine().driver_data<mcr3_state>();
+//OBRISI.ME
 	static const char *const inputs[] = { "MONO.IP1", "MONO.IP1.ALT1", "MONO.IP1.ALT2", "MONO.IP1.ALT3" };
 	/*
         Reflective Sensor Control:
@@ -263,16 +263,16 @@ static WRITE8_HANDLER( maxrpm_op6_w )
 
 	/* when the read is toggled is when the ADC value is latched */
 	if (!(data & 0x80))
-		state->m_latched_input = input_port_read(space->machine(), inputs[state->m_maxrpm_adc_select]);
+		m_latched_input = input_port_read(machine(), inputs[m_maxrpm_adc_select]);
 
 	/* when both the write and the enable are low, it's a write to the ADC0844 */
 	/* unfortunately the behavior below doesn't match up with the inputs on the */
 	/* schematics and wiring diagrams, so they must be wrong */
 	if (!(data & 0x40) && !(data & 0x20))
-		state->m_maxrpm_adc_select = (state->m_maxrpm_adc_control >> 1) & 3;
+		m_maxrpm_adc_select = (m_maxrpm_adc_control >> 1) & 3;
 
 	/* low 5 bits control the turbo CS */
-	turbocs_data_w(space, offset, data);
+	turbocs_data_w(&space, offset, data);
 }
 
 
@@ -283,19 +283,19 @@ static WRITE8_HANDLER( maxrpm_op6_w )
  *
  *************************************/
 
-static READ8_HANDLER( rampage_ip4_r )
+READ8_MEMBER(mcr3_state::rampage_ip4_r)
 {
-	return input_port_read(space->machine(), "MONO.IP4") | (soundsgood_status_r(space,0) << 7);
+	return input_port_read(machine(), "MONO.IP4") | (soundsgood_status_r(&space,0) << 7);
 }
 
 
-static WRITE8_HANDLER( rampage_op6_w )
+WRITE8_MEMBER(mcr3_state::rampage_op6_w)
 {
 	/* bit 5 controls reset of the Sounds Good board */
-	soundsgood_reset_w(space->machine(), (~data >> 5) & 1);
+	soundsgood_reset_w(machine(), (~data >> 5) & 1);
 
 	/* low 5 bits go directly to the Sounds Good board */
-	soundsgood_data_w(space, offset, data);
+	soundsgood_data_w(&space, offset, data);
 }
 
 
@@ -306,13 +306,13 @@ static WRITE8_HANDLER( rampage_op6_w )
  *
  *************************************/
 
-static READ8_HANDLER( powerdrv_ip2_r )
+READ8_MEMBER(mcr3_state::powerdrv_ip2_r)
 {
-	return input_port_read(space->machine(), "MONO.IP2") | (soundsgood_status_r(space, 0) << 7);
+	return input_port_read(machine(), "MONO.IP2") | (soundsgood_status_r(&space, 0) << 7);
 }
 
 
-static WRITE8_HANDLER( powerdrv_op5_w )
+WRITE8_MEMBER(mcr3_state::powerdrv_op5_w)
 {
 	/*
         Lamp Board:
@@ -324,22 +324,22 @@ static WRITE8_HANDLER( powerdrv_op5_w )
 	/* bit 3 -> J1-10 = lamp 1 */
 	/* bit 2 -> J1-8 = lamp 2 */
 	/* bit 1 -> J1-6 = lamp 3 */
-	set_led_status(space->machine(), 0, (data >> 3) & 1);
-	set_led_status(space->machine(), 1, (data >> 2) & 1);
-	set_led_status(space->machine(), 2, (data >> 1) & 1);
+	set_led_status(machine(), 0, (data >> 3) & 1);
+	set_led_status(machine(), 1, (data >> 2) & 1);
+	set_led_status(machine(), 2, (data >> 1) & 1);
 
 	/* remaining bits go to standard connections */
 	mcrmono_control_port_w(space, offset, data);
 }
 
 
-static WRITE8_HANDLER( powerdrv_op6_w )
+WRITE8_MEMBER(mcr3_state::powerdrv_op6_w)
 {
 	/* bit 5 controls reset of the Sounds Good board */
-	soundsgood_reset_w(space->machine(), (~data >> 5) & 1);
+	soundsgood_reset_w(machine(), (~data >> 5) & 1);
 
 	/* low 5 bits go directly to the Sounds Good board */
-	soundsgood_data_w(space, offset, data);
+	soundsgood_data_w(&space, offset, data);
 }
 
 
@@ -350,41 +350,41 @@ static WRITE8_HANDLER( powerdrv_op6_w )
  *
  *************************************/
 
-static READ8_HANDLER( stargrds_ip0_r )
+READ8_MEMBER(mcr3_state::stargrds_ip0_r)
 {
-	mcr3_state *state = space->machine().driver_data<mcr3_state>();
-	UINT8 result = input_port_read(space->machine(), "MONO.IP0");
-	if (state->m_input_mux)
-		result = (result & ~0x0a) | (input_port_read(space->machine(), "MONO.IP0.ALT") & 0x0a);
-	return (result & ~0x10) | ((soundsgood_status_r(space, 0) << 4) & 0x10);
+//OBRISI.ME
+	UINT8 result = input_port_read(machine(), "MONO.IP0");
+	if (m_input_mux)
+		result = (result & ~0x0a) | (input_port_read(machine(), "MONO.IP0.ALT") & 0x0a);
+	return (result & ~0x10) | ((soundsgood_status_r(&space, 0) << 4) & 0x10);
 }
 
 
-static WRITE8_HANDLER( stargrds_op5_w )
+WRITE8_MEMBER(mcr3_state::stargrds_op5_w)
 {
-	mcr3_state *state = space->machine().driver_data<mcr3_state>();
+//OBRISI.ME
 	/* bit 1 controls input muxing on port 0 */
-	state->m_input_mux = (data >> 1) & 1;
+	m_input_mux = (data >> 1) & 1;
 
 	/* bit 2 controls light #0 */
 	/* bit 3 controls light #1 */
 	/* bit 4 controls light #2 */
-	set_led_status(space->machine(), 0, (data >> 2) & 1);
-	set_led_status(space->machine(), 1, (data >> 3) & 1);
-	set_led_status(space->machine(), 2, (data >> 4) & 1);
+	set_led_status(machine(), 0, (data >> 2) & 1);
+	set_led_status(machine(), 1, (data >> 3) & 1);
+	set_led_status(machine(), 2, (data >> 4) & 1);
 
 	/* remaining bits go to standard connections */
 	mcrmono_control_port_w(space, offset, data);
 }
 
 
-static WRITE8_HANDLER( stargrds_op6_w )
+WRITE8_MEMBER(mcr3_state::stargrds_op6_w)
 {
 	/* bit 6 controls reset of the Sounds Good board */
-	soundsgood_reset_w(space->machine(), (~data >> 6) & 1);
+	soundsgood_reset_w(machine(), (~data >> 6) & 1);
 
 	/* unline the other games, the STROBE is in the high bit instead of the low bit */
-	soundsgood_data_w(space, offset, (data << 1) | (data >> 7));
+	soundsgood_data_w(&space, offset, (data << 1) | (data >> 7));
 }
 
 
@@ -395,28 +395,28 @@ static WRITE8_HANDLER( stargrds_op6_w )
  *
  *************************************/
 
-static READ8_HANDLER( spyhunt_ip1_r )
+READ8_MEMBER(mcr3_state::spyhunt_ip1_r)
 {
-	return input_port_read(space->machine(), "SSIO.IP1") | (csdeluxe_status_r(space, 0) << 5);
+	return input_port_read(machine(), "SSIO.IP1") | (csdeluxe_status_r(&space, 0) << 5);
 }
 
 
-static READ8_HANDLER( spyhunt_ip2_r )
+READ8_MEMBER(mcr3_state::spyhunt_ip2_r)
 {
-	mcr3_state *state = space->machine().driver_data<mcr3_state>();
+//OBRISI.ME
 	/* multiplexed steering wheel/gas pedal */
-	return input_port_read(space->machine(), state->m_input_mux ? "SSIO.IP2.ALT" : "SSIO.IP2");
+	return input_port_read(machine(), m_input_mux ? "SSIO.IP2.ALT" : "SSIO.IP2");
 }
 
 
-static WRITE8_HANDLER( spyhunt_op4_w )
+WRITE8_MEMBER(mcr3_state::spyhunt_op4_w)
 {
-	mcr3_state *state = space->machine().driver_data<mcr3_state>();
+//OBRISI.ME
 	/* Spy Hunter uses port 4 for talking to the Chip Squeak Deluxe */
 	/* (and for toggling the lamps and muxing the analog inputs) */
 
 	/* mux select is in bit 7 */
-	state->m_input_mux = (data >> 7) & 1;
+	m_input_mux = (data >> 7) & 1;
 
 	/*
         Lamp Driver:
@@ -427,7 +427,7 @@ static WRITE8_HANDLER( spyhunt_op4_w )
             demuxer. The eight outputs directly control 8 lamps.
     */
 	/* bit 5 = STR1 (J1-13) */
-	if (((state->m_last_op4 ^ data) & 0x20) && !(data & 0x20))
+	if (((m_last_op4 ^ data) & 0x20) && !(data & 0x20))
 	{
 		static const char *const lampname[8] =
 		{
@@ -440,10 +440,10 @@ static WRITE8_HANDLER( spyhunt_op4_w )
 		/* bit 0 -> J1-12 (A0) */
 		output_set_value(lampname[data & 7], (data >> 3) & 1);
 	}
-	state->m_last_op4 = data;
+	m_last_op4 = data;
 
 	/* low 5 bits go to control the Chip Squeak Deluxe */
-	csdeluxe_data_w(space, offset, data);
+	csdeluxe_data_w(&space, offset, data);
 }
 
 
@@ -454,25 +454,25 @@ static WRITE8_HANDLER( spyhunt_op4_w )
  *
  *************************************/
 
-static READ8_HANDLER( turbotag_ip2_r )
+READ8_MEMBER(mcr3_state::turbotag_ip2_r)
 {
-	mcr3_state *state = space->machine().driver_data<mcr3_state>();
+//OBRISI.ME
 	/* multiplexed steering wheel/gas pedal */
-	if (state->m_input_mux)
-		return input_port_read(space->machine(), "SSIO.IP2.ALT");
+	if (m_input_mux)
+		return input_port_read(machine(), "SSIO.IP2.ALT");
 
-	return input_port_read(space->machine(), "SSIO.IP2") + 5 * (space->machine().primary_screen->frame_number() & 1);
+	return input_port_read(machine(), "SSIO.IP2") + 5 * (machine().primary_screen->frame_number() & 1);
 }
 
 
-static READ8_HANDLER( turbotag_kludge_r )
+READ8_MEMBER(mcr3_state::turbotag_kludge_r)
 {
 	/* The checksum on the ttprog1.bin ROM seems to be bad by 1 bit */
 	/* The checksum should come out to $82 but it should be $92     */
 	/* Unfortunately, the game refuses to start if any bad ROM is   */
 	/* found; to work around this, we catch the checksum byte read  */
 	/* and modify it to what we know we will be getting.            */
-	if (cpu_get_previouspc(&space->device()) == 0xb29)
+	if (cpu_get_previouspc(&space.device()) == 0xb29)
 		return 0x82;
 	else
 		return 0x92;
@@ -507,7 +507,7 @@ static ADDRESS_MAP_START( mcrmono_portmap, AS_IO, 8, mcr3_state )
 	AM_RANGE(0x02, 0x02) AM_MIRROR(0x78) AM_READ_PORT("MONO.IP2")
 	AM_RANGE(0x03, 0x03) AM_MIRROR(0x78) AM_READ_PORT("MONO.IP3")
 	AM_RANGE(0x04, 0x04) AM_MIRROR(0x78) AM_READ_PORT("MONO.IP4")
-	AM_RANGE(0x05, 0x05) AM_MIRROR(0x78) AM_WRITE_LEGACY(mcrmono_control_port_w)
+	AM_RANGE(0x05, 0x05) AM_MIRROR(0x78) AM_WRITE(mcrmono_control_port_w)
 	AM_RANGE(0x07, 0x07) AM_MIRROR(0x78) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0xf0, 0xf3) AM_MIRROR(0x0c) AM_DEVREADWRITE_LEGACY("ctc", z80ctc_r, z80ctc_w)
 ADDRESS_MAP_END
@@ -1539,9 +1539,10 @@ static void mcr_common_init(running_machine &machine, int sound_board)
 static DRIVER_INIT( demoderm )
 {
 	mcr_common_init(machine, MCR_TURBO_CHIP_SQUEAK);
-	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_read_handler(0x01, 0x01, FUNC(demoderm_ip1_r));
-	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_read_handler(0x02, 0x02, FUNC(demoderm_ip2_r));
-	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0x06, 0x06, FUNC(demoderm_op6_w));
+	mcr3_state *state = machine.driver_data<mcr3_state>();
+	machine.device("maincpu")->memory().space(AS_IO)->install_read_handler(0x01, 0x01, read8_delegate(FUNC(mcr3_state::demoderm_ip1_r),state));
+	machine.device("maincpu")->memory().space(AS_IO)->install_read_handler(0x02, 0x02, read8_delegate(FUNC(mcr3_state::demoderm_ip2_r),state));
+	machine.device("maincpu")->memory().space(AS_IO)->install_write_handler(0x06, 0x06, write8_delegate(FUNC(mcr3_state::demoderm_op6_w),state));
 }
 
 
@@ -1556,10 +1557,10 @@ static DRIVER_INIT( maxrpm )
 {
 	mcr3_state *state = machine.driver_data<mcr3_state>();
 	mcr_common_init(machine, MCR_TURBO_CHIP_SQUEAK);
-	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_read_handler(0x01, 0x01, FUNC(maxrpm_ip1_r));
-	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_read_handler(0x02, 0x02, FUNC(maxrpm_ip2_r));
-	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0x05, 0x05, FUNC(maxrpm_op5_w));
-	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0x06, 0x06, FUNC(maxrpm_op6_w));
+	machine.device("maincpu")->memory().space(AS_IO)->install_read_handler(0x01, 0x01, read8_delegate(FUNC(mcr3_state::maxrpm_ip1_r),state));
+	machine.device("maincpu")->memory().space(AS_IO)->install_read_handler(0x02, 0x02, read8_delegate(FUNC(mcr3_state::maxrpm_ip2_r),state));
+	machine.device("maincpu")->memory().space(AS_IO)->install_write_handler(0x05, 0x05, write8_delegate(FUNC(mcr3_state::maxrpm_op5_w),state));
+	machine.device("maincpu")->memory().space(AS_IO)->install_write_handler(0x06, 0x06, write8_delegate(FUNC(mcr3_state::maxrpm_op6_w),state));
 
 	state_save_register_global(machine, state->m_maxrpm_adc_control);
 	state_save_register_global(machine, state->m_maxrpm_adc_select);
@@ -1571,27 +1572,30 @@ static DRIVER_INIT( maxrpm )
 
 static DRIVER_INIT( rampage )
 {
+	mcr3_state *state = machine.driver_data<mcr3_state>();
 	mcr_common_init(machine, MCR_SOUNDS_GOOD);
-	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_read_handler(0x04, 0x04, FUNC(rampage_ip4_r));
-	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0x06, 0x06, FUNC(rampage_op6_w));
+	machine.device("maincpu")->memory().space(AS_IO)->install_read_handler(0x04, 0x04, read8_delegate(FUNC(mcr3_state::rampage_ip4_r),state));
+	machine.device("maincpu")->memory().space(AS_IO)->install_write_handler(0x06, 0x06, write8_delegate(FUNC(mcr3_state::rampage_op6_w),state));
 }
 
 
 static DRIVER_INIT( powerdrv )
 {
+	mcr3_state *state = machine.driver_data<mcr3_state>();
 	mcr_common_init(machine, MCR_SOUNDS_GOOD);
-	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_read_handler(0x02, 0x02, FUNC(powerdrv_ip2_r));
-	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0x05, 0x05, FUNC(powerdrv_op5_w));
-	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0x06, 0x06, FUNC(powerdrv_op6_w));
+	machine.device("maincpu")->memory().space(AS_IO)->install_read_handler(0x02, 0x02, read8_delegate(FUNC(mcr3_state::powerdrv_ip2_r),state));
+	machine.device("maincpu")->memory().space(AS_IO)->install_write_handler(0x05, 0x05, write8_delegate(FUNC(mcr3_state::powerdrv_op5_w),state));
+	machine.device("maincpu")->memory().space(AS_IO)->install_write_handler(0x06, 0x06, write8_delegate(FUNC(mcr3_state::powerdrv_op6_w),state));
 }
 
 
 static DRIVER_INIT( stargrds )
 {
+	mcr3_state *state = machine.driver_data<mcr3_state>();
 	mcr_common_init(machine, MCR_SOUNDS_GOOD);
-	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_read_handler(0x00, 0x00, FUNC(stargrds_ip0_r));
-	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0x05, 0x05, FUNC(stargrds_op5_w));
-	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0x06, 0x06, FUNC(stargrds_op6_w));
+	machine.device("maincpu")->memory().space(AS_IO)->install_read_handler(0x00, 0x00, read8_delegate(FUNC(mcr3_state::stargrds_ip0_r),state));
+	machine.device("maincpu")->memory().space(AS_IO)->install_write_handler(0x05, 0x05, write8_delegate(FUNC(mcr3_state::stargrds_op5_w),state));
+	machine.device("maincpu")->memory().space(AS_IO)->install_write_handler(0x06, 0x06, write8_delegate(FUNC(mcr3_state::stargrds_op6_w),state));
 }
 
 
@@ -1599,9 +1603,9 @@ static DRIVER_INIT( spyhunt )
 {
 	mcr3_state *state = machine.driver_data<mcr3_state>();
 	mcr_common_init(machine, MCR_SSIO | MCR_CHIP_SQUEAK_DELUXE);
-	ssio_set_custom_input(1, 0x60, spyhunt_ip1_r);
-	ssio_set_custom_input(2, 0xff, spyhunt_ip2_r);
-	ssio_set_custom_output(4, 0xff, spyhunt_op4_w);
+	ssio_set_custom_input(1, 0x60, read8_delegate(FUNC(mcr3_state::spyhunt_ip1_r),state));
+	ssio_set_custom_input(2, 0xff, read8_delegate(FUNC(mcr3_state::spyhunt_ip2_r),state));
+	ssio_set_custom_output(4, 0xff, write8_delegate(FUNC(mcr3_state::spyhunt_op4_w),state));
 
 	state->m_spyhunt_sprite_color_mask = 0x00;
 	state->m_spyhunt_scroll_offset = 16;
@@ -1622,9 +1626,9 @@ static DRIVER_INIT( turbotag )
 {
 	mcr3_state *state = machine.driver_data<mcr3_state>();
 	mcr_common_init(machine, MCR_SSIO | MCR_CHIP_SQUEAK_DELUXE);
-	ssio_set_custom_input(1, 0x60, spyhunt_ip1_r);
-	ssio_set_custom_input(2, 0xff, turbotag_ip2_r);
-	ssio_set_custom_output(4, 0xff, spyhunt_op4_w);
+	ssio_set_custom_input(1, 0x60, read8_delegate(FUNC(mcr3_state::spyhunt_ip1_r),state));
+	ssio_set_custom_input(2, 0xff, read8_delegate(FUNC(mcr3_state::turbotag_ip2_r),state));
+	ssio_set_custom_output(4, 0xff, write8_delegate(FUNC(mcr3_state::spyhunt_op4_w),state));
 
 	state->m_spyhunt_sprite_color_mask = 0x00;
 	state->m_spyhunt_scroll_offset = 88;
@@ -1633,7 +1637,7 @@ static DRIVER_INIT( turbotag )
 	machine.device<cpu_device>("csdcpu")->suspend(SUSPEND_REASON_DISABLE, 1);
 
 	/* kludge for bad ROM read */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x0b53, 0x0b53, FUNC(turbotag_kludge_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x0b53, 0x0b53, read8_delegate(FUNC(mcr3_state::turbotag_kludge_r),state));
 }
 
 

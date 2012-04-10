@@ -23,6 +23,8 @@ public:
 	DECLARE_WRITE8_MEMBER(gsword_charbank_w);
 	DECLARE_WRITE8_MEMBER(gsword_videoctrl_w);
 	DECLARE_WRITE8_MEMBER(gsword_scroll_w);
+	DECLARE_READ8_MEMBER(gsword_hack_r);
+	DECLARE_WRITE8_MEMBER(adpcm_soundcommand_w);
 };
 
 

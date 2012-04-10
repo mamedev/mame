@@ -185,12 +185,12 @@ static MACHINE_RESET( gauntlet )
  *
  *************************************/
 
-static READ16_HANDLER( port4_r )
+READ16_MEMBER(gauntlet_state::port4_r)
 {
-	gauntlet_state *state = space->machine().driver_data<gauntlet_state>();
-	int temp = input_port_read(space->machine(), "803008");
-	if (state->m_cpu_to_sound_ready) temp ^= 0x0020;
-	if (state->m_sound_to_cpu_ready) temp ^= 0x0010;
+//OBRISI.ME
+	int temp = input_port_read(machine(), "803008");
+	if (m_cpu_to_sound_ready) temp ^= 0x0020;
+	if (m_sound_to_cpu_ready) temp ^= 0x0010;
 	return temp;
 }
 
@@ -202,26 +202,26 @@ static READ16_HANDLER( port4_r )
  *
  *************************************/
 
-static WRITE16_HANDLER( sound_reset_w )
+WRITE16_MEMBER(gauntlet_state::sound_reset_w)
 {
-	gauntlet_state *state = space->machine().driver_data<gauntlet_state>();
+//OBRISI.ME
 	if (ACCESSING_BITS_0_7)
 	{
-		int oldword = state->m_sound_reset_val;
-		COMBINE_DATA(&state->m_sound_reset_val);
+		int oldword = m_sound_reset_val;
+		COMBINE_DATA(&m_sound_reset_val);
 
-		if ((oldword ^ state->m_sound_reset_val) & 1)
+		if ((oldword ^ m_sound_reset_val) & 1)
 		{
-			cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_RESET, (state->m_sound_reset_val & 1) ? CLEAR_LINE : ASSERT_LINE);
-			atarigen_sound_reset(space->machine());
-			if (state->m_sound_reset_val & 1)
+			cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_RESET, (m_sound_reset_val & 1) ? CLEAR_LINE : ASSERT_LINE);
+			atarigen_sound_reset(machine());
+			if (m_sound_reset_val & 1)
 			{
-				devtag_reset(space->machine(), "ymsnd");
-				devtag_reset(space->machine(), "tms");
-				tms5220_set_frequency(space->machine().device("tms"), ATARI_CLOCK_14MHz/2 / 11);
-				atarigen_set_ym2151_vol(space->machine(), 0);
-				atarigen_set_pokey_vol(space->machine(), 0);
-				atarigen_set_tms5220_vol(space->machine(), 0);
+				devtag_reset(machine(), "ymsnd");
+				devtag_reset(machine(), "tms");
+				tms5220_set_frequency(machine().device("tms"), ATARI_CLOCK_14MHz/2 / 11);
+				atarigen_set_ym2151_vol(machine(), 0);
+				atarigen_set_pokey_vol(machine(), 0);
+				atarigen_set_tms5220_vol(machine(), 0);
 			}
 		}
 	}
@@ -235,15 +235,15 @@ static WRITE16_HANDLER( sound_reset_w )
  *
  *************************************/
 
-static READ8_HANDLER( switch_6502_r )
+READ8_MEMBER(gauntlet_state::switch_6502_r)
 {
-	gauntlet_state *state = space->machine().driver_data<gauntlet_state>();
+//OBRISI.ME
 	int temp = 0x30;
 
-	if (state->m_cpu_to_sound_ready) temp ^= 0x80;
-	if (state->m_sound_to_cpu_ready) temp ^= 0x40;
-	if (!tms5220_readyq_r(space->machine().device("tms"))) temp ^= 0x20;
-	if (!(input_port_read(space->machine(), "803008") & 0x0008)) temp ^= 0x10;
+	if (m_cpu_to_sound_ready) temp ^= 0x80;
+	if (m_sound_to_cpu_ready) temp ^= 0x40;
+	if (!tms5220_readyq_r(machine().device("tms"))) temp ^= 0x20;
+	if (!(input_port_read(machine(), "803008") & 0x0008)) temp ^= 0x10;
 
 	return temp;
 }
@@ -255,13 +255,13 @@ static READ8_HANDLER( switch_6502_r )
  *
  *************************************/
 
-static WRITE8_HANDLER( sound_ctl_w )
+WRITE8_MEMBER(gauntlet_state::sound_ctl_w)
 {
-	device_t *tms = space->machine().device("tms");
+	device_t *tms = machine().device("tms");
 	switch (offset & 7)
 	{
 		case 0:	/* music reset, bit D7, low reset */
-			if (((data>>7)&1) == 0) devtag_reset(space->machine(), "ymsnd");
+			if (((data>>7)&1) == 0) devtag_reset(machine(), "ymsnd");
 			break;
 
 		case 1:	/* speech write, bit D7, active low */
@@ -287,11 +287,11 @@ static WRITE8_HANDLER( sound_ctl_w )
  *
  *************************************/
 
-static WRITE8_HANDLER( mixer_w )
+WRITE8_MEMBER(gauntlet_state::mixer_w)
 {
-	atarigen_set_ym2151_vol(space->machine(), (data & 7) * 100 / 7);
-	atarigen_set_pokey_vol(space->machine(), ((data >> 3) & 3) * 100 / 3);
-	atarigen_set_tms5220_vol(space->machine(), ((data >> 5) & 7) * 100 / 7);
+	atarigen_set_ym2151_vol(machine(), (data & 7) * 100 / 7);
+	atarigen_set_pokey_vol(machine(), ((data >> 3) & 3) * 100 / 3);
+	atarigen_set_tms5220_vol(machine(), ((data >> 5) & 7) * 100 / 7);
 }
 
 
@@ -316,10 +316,10 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, gauntlet_state )
 	AM_RANGE(0x803002, 0x803003) AM_MIRROR(0x2fcef0) AM_READ_PORT("803002")
 	AM_RANGE(0x803004, 0x803005) AM_MIRROR(0x2fcef0) AM_READ_PORT("803004")
 	AM_RANGE(0x803006, 0x803007) AM_MIRROR(0x2fcef0) AM_READ_PORT("803006")
-	AM_RANGE(0x803008, 0x803009) AM_MIRROR(0x2fcef0) AM_READ_LEGACY(port4_r)
+	AM_RANGE(0x803008, 0x803009) AM_MIRROR(0x2fcef0) AM_READ(port4_r)
 	AM_RANGE(0x80300e, 0x80300f) AM_MIRROR(0x2fcef0) AM_READ_LEGACY(atarigen_sound_r)
 	AM_RANGE(0x803100, 0x803101) AM_MIRROR(0x2fce8e) AM_WRITE(watchdog_reset16_w)
-	AM_RANGE(0x803120, 0x803121) AM_MIRROR(0x2fce8e) AM_WRITE_LEGACY(sound_reset_w)
+	AM_RANGE(0x803120, 0x803121) AM_MIRROR(0x2fce8e) AM_WRITE(sound_reset_w)
 	AM_RANGE(0x803140, 0x803141) AM_MIRROR(0x2fce8e) AM_WRITE_LEGACY(atarigen_video_int_ack_w)
 	AM_RANGE(0x803150, 0x803151) AM_MIRROR(0x2fce8e) AM_WRITE_LEGACY(atarigen_eeprom_enable_w)
 	AM_RANGE(0x803170, 0x803171) AM_MIRROR(0x2fce8e) AM_WRITE_LEGACY(atarigen_sound_w)
@@ -349,8 +349,8 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, gauntlet_state )
 	AM_RANGE(0x0000, 0x0fff) AM_MIRROR(0x2000) AM_RAM
 	AM_RANGE(0x1000, 0x100f) AM_MIRROR(0x27c0) AM_WRITE_LEGACY(atarigen_6502_sound_w)
 	AM_RANGE(0x1010, 0x101f) AM_MIRROR(0x27c0) AM_READ_LEGACY(atarigen_6502_sound_r)
-	AM_RANGE(0x1020, 0x102f) AM_MIRROR(0x27c0) AM_READ_PORT("COIN") AM_WRITE_LEGACY(mixer_w)
-	AM_RANGE(0x1030, 0x103f) AM_MIRROR(0x27c0) AM_READWRITE_LEGACY(switch_6502_r, sound_ctl_w)
+	AM_RANGE(0x1020, 0x102f) AM_MIRROR(0x27c0) AM_READ_PORT("COIN") AM_WRITE(mixer_w)
+	AM_RANGE(0x1030, 0x103f) AM_MIRROR(0x27c0) AM_READWRITE(switch_6502_r, sound_ctl_w)
 	AM_RANGE(0x1800, 0x180f) AM_MIRROR(0x27c0) AM_DEVREADWRITE_LEGACY("pokey", pokey_r, pokey_w)
 	AM_RANGE(0x1810, 0x1811) AM_MIRROR(0x27ce) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0x1820, 0x182f) AM_MIRROR(0x27c0) AM_DEVWRITE_LEGACY("tms", tms5220_data_w)

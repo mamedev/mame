@@ -192,11 +192,11 @@ TODO:
 
 
 /*Rom bankswitching*/
-static WRITE8_HANDLER( gladiatr_bankswitch_w )
+WRITE8_MEMBER(gladiatr_state::gladiatr_bankswitch_w)
 {
-	UINT8 *rom = space->machine().region("maincpu")->base() + 0x10000;
+	UINT8 *rom = machine().region("maincpu")->base() + 0x10000;
 
-	memory_set_bankptr(space->machine(), "bank1", rom + 0x6000 * (data & 0x01));
+	memory_set_bankptr(machine(), "bank1", rom + 0x6000 * (data & 0x01));
 }
 
 
@@ -289,32 +289,32 @@ static WRITE8_DEVICE_HANDLER( glad_adpcm_w )
 	msm5205_vclk_w (device,(data>>4)&1); /* bit4     */
 }
 
-static WRITE8_HANDLER( glad_cpu_sound_command_w )
+WRITE8_MEMBER(gladiatr_state::glad_cpu_sound_command_w)
 {
-	gladiatr_state *state = space->machine().driver_data<gladiatr_state>();
-	state->soundlatch_byte_w(*space,0,data);
-	cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, ASSERT_LINE);
+//OBRISI.ME
+	soundlatch_byte_w(*&space,0,data);
+	cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, ASSERT_LINE);
 }
 
-static READ8_HANDLER( glad_cpu_sound_command_r )
+READ8_MEMBER(gladiatr_state::glad_cpu_sound_command_r)
 {
-	gladiatr_state *state = space->machine().driver_data<gladiatr_state>();
-	cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, CLEAR_LINE);
-	return state->soundlatch_byte_r(*space,0);
+//OBRISI.ME
+	cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, CLEAR_LINE);
+	return soundlatch_byte_r(*&space,0);
 }
 
-static WRITE8_HANDLER( gladiatr_flipscreen_w )
+WRITE8_MEMBER(gladiatr_state::gladiatr_flipscreen_w)
 {
-	gladiatr_state *state = space->machine().driver_data<gladiatr_state>();
-	state->flip_screen_set(data & 1);
+//OBRISI.ME
+	flip_screen_set(data & 1);
 }
 
 
 #if 1
 /* !!!!! patch to IRQ timming for 2nd CPU !!!!! */
-static WRITE8_HANDLER( gladiatr_irq_patch_w )
+WRITE8_MEMBER(gladiatr_state::gladiatr_irq_patch_w)
 {
-	cputag_set_input_line(space->machine(), "sub", 0, HOLD_LINE);
+	cputag_set_input_line(machine(), "sub", 0, HOLD_LINE);
 }
 #endif
 
@@ -324,50 +324,50 @@ static WRITE8_HANDLER( gladiatr_irq_patch_w )
 
 
 
-static WRITE8_HANDLER(qx0_w)
+WRITE8_MEMBER(gladiatr_state::qx0_w)
 {
-	gladiatr_state *state = space->machine().driver_data<gladiatr_state>();
+//OBRISI.ME
 	if(!offset)
 	{
-		state->m_data2=data;
-		state->m_flag2=1;
+		m_data2=data;
+		m_flag2=1;
 	}
 }
 
-static WRITE8_HANDLER(qx1_w)
+WRITE8_MEMBER(gladiatr_state::qx1_w)
 {
-	gladiatr_state *state = space->machine().driver_data<gladiatr_state>();
+//OBRISI.ME
 	if(!offset)
 	{
-		state->m_data1=data;
-		state->m_flag1=1;
+		m_data1=data;
+		m_flag1=1;
 	}
 }
 
-static WRITE8_HANDLER(qx2_w){ }
+WRITE8_MEMBER(gladiatr_state::qx2_w){ }
 
-static WRITE8_HANDLER(qx3_w){ }
+WRITE8_MEMBER(gladiatr_state::qx3_w){ }
 
-static READ8_HANDLER(qx2_r){ return space->machine().rand(); }
+READ8_MEMBER(gladiatr_state::qx2_r){ return machine().rand(); }
 
-static READ8_HANDLER(qx3_r){ return space->machine().rand()&0xf; }
+READ8_MEMBER(gladiatr_state::qx3_r){ return machine().rand()&0xf; }
 
-static READ8_HANDLER(qx0_r)
+READ8_MEMBER(gladiatr_state::qx0_r)
 {
-	gladiatr_state *state = space->machine().driver_data<gladiatr_state>();
+//OBRISI.ME
 	if(!offset)
-		 return state->m_data1;
+		 return m_data1;
 	else
-		return state->m_flag2;
+		return m_flag2;
 }
 
-static READ8_HANDLER(qx1_r)
+READ8_MEMBER(gladiatr_state::qx1_r)
 {
-	gladiatr_state *state = space->machine().driver_data<gladiatr_state>();
+//OBRISI.ME
 	if(!offset)
-		return state->m_data2;
+		return m_data2;
 	else
-		return state->m_flag1;
+		return m_flag1;
 }
 
 static MACHINE_RESET( ppking )
@@ -398,17 +398,17 @@ static ADDRESS_MAP_START( ppking_cpu1_io, AS_IO, 8, gladiatr_state )
 //  ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(gladiatr_spritebuffer_w)
 	AM_RANGE(0xc004, 0xc004) AM_NOP	// WRITE(ppking_irq_patch_w)
-	AM_RANGE(0xc09e, 0xc09f) AM_READ_LEGACY(qx0_r) AM_WRITE_LEGACY(qx0_w)
+	AM_RANGE(0xc09e, 0xc09f) AM_READ(qx0_r) AM_WRITE(qx0_w)
 	AM_RANGE(0xc0bf, 0xc0bf) AM_NOP
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ppking_cpu2_io, AS_IO, 8, gladiatr_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE_LEGACY("ymsnd", ym2203_r, ym2203_w)
-	AM_RANGE(0x20, 0x21) AM_READ_LEGACY(qx1_r) AM_WRITE_LEGACY(qx1_w)
+	AM_RANGE(0x20, 0x21) AM_READ(qx1_r) AM_WRITE(qx1_w)
 	AM_RANGE(0x40, 0x40) AM_READNOP
-	AM_RANGE(0x60, 0x61) AM_READ_LEGACY(qx2_r) AM_WRITE_LEGACY(qx2_w)
-	AM_RANGE(0x80, 0x81) AM_READ_LEGACY(qx3_r) AM_WRITE_LEGACY(qx3_w)
+	AM_RANGE(0x60, 0x61) AM_READWRITE(qx2_r,qx2_w)
+	AM_RANGE(0x80, 0x81) AM_READWRITE(qx3_r,qx3_w)
 ADDRESS_MAP_END
 
 
@@ -433,7 +433,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gladiatr_cpu3_map, AS_PROGRAM, 8, gladiatr_state )
 	AM_RANGE(0x1000, 0x1fff) AM_DEVWRITE_LEGACY("msm", glad_adpcm_w)
-	AM_RANGE(0x2000, 0x2fff) AM_READ_LEGACY(glad_cpu_sound_command_r)
+	AM_RANGE(0x2000, 0x2fff) AM_READ(glad_cpu_sound_command_r)
 	AM_RANGE(0x4000, 0xffff) AM_ROMBANK("bank2")
 ADDRESS_MAP_END
 
@@ -442,9 +442,9 @@ static ADDRESS_MAP_START( gladiatr_cpu1_io, AS_IO, 8, gladiatr_state )
 //  ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(gladiatr_spritebuffer_w)
 	AM_RANGE(0xc001, 0xc001) AM_WRITE(gladiatr_spritebank_w)
-	AM_RANGE(0xc002, 0xc002) AM_WRITE_LEGACY(gladiatr_bankswitch_w)
-	AM_RANGE(0xc004, 0xc004) AM_WRITE_LEGACY(gladiatr_irq_patch_w) /* !!! patch to 2nd CPU IRQ !!! */
-	AM_RANGE(0xc007, 0xc007) AM_WRITE_LEGACY(gladiatr_flipscreen_w)
+	AM_RANGE(0xc002, 0xc002) AM_WRITE(gladiatr_bankswitch_w)
+	AM_RANGE(0xc004, 0xc004) AM_WRITE(gladiatr_irq_patch_w) /* !!! patch to 2nd CPU IRQ !!! */
+	AM_RANGE(0xc007, 0xc007) AM_WRITE(gladiatr_flipscreen_w)
 	AM_RANGE(0xc09e, 0xc09f) AM_READWRITE_LEGACY(TAITO8741_0_r, TAITO8741_0_w)
 	AM_RANGE(0xc0bf, 0xc0bf) AM_NOP	// watchdog_reset_w doesn't work
 ADDRESS_MAP_END
@@ -457,7 +457,7 @@ static ADDRESS_MAP_START( gladiatr_cpu2_io, AS_IO, 8, gladiatr_state )
 	AM_RANGE(0x60, 0x61) AM_READWRITE_LEGACY(TAITO8741_2_r, TAITO8741_2_w)
 	AM_RANGE(0x80, 0x81) AM_READWRITE_LEGACY(TAITO8741_3_r, TAITO8741_3_w)
 	AM_RANGE(0xa0, 0xa7) AM_NOP	// filters on sound output
-	AM_RANGE(0xe0, 0xe0) AM_WRITE_LEGACY(glad_cpu_sound_command_w)
+	AM_RANGE(0xe0, 0xe0) AM_WRITE(glad_cpu_sound_command_w)
 ADDRESS_MAP_END
 
 
@@ -999,13 +999,13 @@ static DRIVER_INIT( gladiatr )
 }
 
 
-static READ8_HANDLER(f6a3_r)
+READ8_MEMBER(gladiatr_state::f6a3_r)
 {
-	gladiatr_state *state = space->machine().driver_data<gladiatr_state>();
-	if(cpu_get_previouspc(&space->device())==0x8e)
-		state->m_nvram[0x6a3]=1;
+//OBRISI.ME
+	if(cpu_get_previouspc(&space.device())==0x8e)
+		m_nvram[0x6a3]=1;
 
-	return state->m_nvram[0x6a3];
+	return m_nvram[0x6a3];
 }
 
 static DRIVER_INIT(ppking)
@@ -1030,8 +1030,8 @@ static DRIVER_INIT(ppking)
 			rom[i+2*j*0x2000] = rom[i+j*0x2000];
 		}
 	}
-
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xf6a3,0xf6a3,FUNC(f6a3_r) );
+	gladiatr_state *state = machine.driver_data<gladiatr_state>();
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xf6a3,0xf6a3,read8_delegate(FUNC(gladiatr_state::f6a3_r),state));
 }
 
 

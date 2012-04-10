@@ -13,6 +13,7 @@ public:
 		: atarigen_state(mconfig, type, tag) { }
 
 	UINT16			m_h256;
+	DECLARE_READ16_MEMBER(special_port1_r);
 };
 
 

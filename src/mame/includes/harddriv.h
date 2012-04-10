@@ -168,6 +168,7 @@ public:
 
 	INT8					m_gfx_finescroll;
 	UINT8					m_gfx_palettebank;
+	DECLARE_READ16_MEMBER(steeltal_dummy_r);
 };
 
 

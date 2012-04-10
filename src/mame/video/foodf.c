@@ -60,12 +60,12 @@ VIDEO_START( foodf )
  *
  *************************************/
 
-void foodf_set_flip(foodf_state *state, int flip)
+void foodf_state::foodf_set_flip(int flip)
 {
-	if (flip != state->m_playfield_flip)
+	if (flip != m_playfield_flip)
 	{
-		state->m_playfield_flip = flip;
-		state->m_playfield_tilemap->mark_all_dirty();
+		m_playfield_flip = flip;
+		m_playfield_tilemap->mark_all_dirty();
 	}
 }
 
@@ -77,33 +77,32 @@ void foodf_set_flip(foodf_state *state, int flip)
  *
  *************************************/
 
-WRITE16_HANDLER( foodf_paletteram_w )
+WRITE16_MEMBER(foodf_state::foodf_paletteram_w)
 {
-	foodf_state *state = space->machine().driver_data<foodf_state>();
 	int newword, r, g, b, bit0, bit1, bit2;
 
-	COMBINE_DATA(&state->m_generic_paletteram_16[offset]);
-	newword = state->m_generic_paletteram_16[offset];
+	COMBINE_DATA(&m_generic_paletteram_16[offset]);
+	newword = m_generic_paletteram_16[offset];
 
 	/* only the bottom 8 bits are used */
 	/* red component */
 	bit0 = (newword >> 0) & 0x01;
 	bit1 = (newword >> 1) & 0x01;
 	bit2 = (newword >> 2) & 0x01;
-	r = combine_3_weights(state->m_rweights, bit0, bit1, bit2);
+	r = combine_3_weights(m_rweights, bit0, bit1, bit2);
 
 	/* green component */
 	bit0 = (newword >> 3) & 0x01;
 	bit1 = (newword >> 4) & 0x01;
 	bit2 = (newword >> 5) & 0x01;
-	g = combine_3_weights(state->m_gweights, bit0, bit1, bit2);
+	g = combine_3_weights(m_gweights, bit0, bit1, bit2);
 
 	/* blue component */
 	bit0 = (newword >> 6) & 0x01;
 	bit1 = (newword >> 7) & 0x01;
-	b = combine_2_weights(state->m_bweights, bit0, bit1);
+	b = combine_2_weights(m_bweights, bit0, bit1);
 
-	palette_set_color(space->machine(), offset, MAKE_RGB(r, g, b));
+	palette_set_color(machine(), offset, MAKE_RGB(r, g, b));
 }
 
 

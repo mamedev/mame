@@ -146,7 +146,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( st0016_io, AS_IO, 8, speglsht_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0xbf) AM_READ(st0016_vregs_r) AM_WRITE(st0016_vregs_w)
-	AM_RANGE(0xe1, 0xe1) AM_WRITE_LEGACY(st0016_rom_bank_w)
+	AM_RANGE(0xe1, 0xe1) AM_WRITE(st0016_rom_bank_w)
 	AM_RANGE(0xe2, 0xe2) AM_WRITE(st0016_sprite_bank_w)
 	AM_RANGE(0xe3, 0xe4) AM_WRITE(st0016_character_bank_w)
 	AM_RANGE(0xe5, 0xe5) AM_WRITE(st0016_palette_bank_w)

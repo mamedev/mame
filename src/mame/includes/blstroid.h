@@ -13,6 +13,8 @@ public:
 		: atarigen_state(mconfig, type, tag) { }
 
 	UINT16 *		m_priorityram;
+	DECLARE_WRITE16_MEMBER(blstroid_halt_until_hblank_0_w);
+	DECLARE_READ16_MEMBER(inputs_r);
 };
 
 

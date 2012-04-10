@@ -29,12 +29,19 @@ public:
 	UINT16			m_playfield_yscroll;
 
 	device_t *		m_rle;
+	DECLARE_WRITE16_MEMBER(mo_control_w);
+	DECLARE_WRITE16_MEMBER(mo_command_w);
+	DECLARE_READ16_MEMBER(special_port0_r);
+	DECLARE_WRITE16_MEMBER(a2d_select_w);
+	DECLARE_READ16_MEMBER(a2d_data_r);
+	DECLARE_READ16_MEMBER(pitfightb_cheap_slapstic_r);
+	void update_bank(int bank);
 };
 
 
 /*----------- defined in video/atarig1.c -----------*/
 
-WRITE16_HANDLER( atarig1_mo_control_w );
+//OBRISI.ME
 
 VIDEO_START( atarig1 );
 SCREEN_VBLANK( atarig1 );

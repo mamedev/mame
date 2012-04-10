@@ -25,6 +25,11 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
+	DECLARE_WRITE8_MEMBER(galpani2_mcu_init_w);
+	DECLARE_WRITE8_MEMBER(galpani2_mcu_nmi1_w);
+	DECLARE_WRITE8_MEMBER(galpani2_mcu_nmi2_w);
+	DECLARE_WRITE8_MEMBER(galpani2_coin_lockout_w);
+	DECLARE_READ16_MEMBER(galpani2_bankedrom_r);
 };
 
 

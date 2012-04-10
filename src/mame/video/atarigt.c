@@ -127,34 +127,34 @@ VIDEO_START( atarigt )
  *
  *************************************/
 
-void atarigt_colorram_w(atarigt_state *state, offs_t address, UINT16 data, UINT16 mem_mask)
+void atarigt_state::atarigt_colorram_w(offs_t address, UINT16 data, UINT16 mem_mask)
 {
 	UINT16 olddata;
 
 	/* update the raw data */
 	address = (address & 0x7ffff) / 2;
-	olddata = state->m_colorram[address];
-	COMBINE_DATA(&state->m_colorram[address]);
+	olddata = m_colorram[address];
+	COMBINE_DATA(&m_colorram[address]);
 
 	/* update the TRAM checksum */
 	if (address >= 0x10000 && address < 0x14000)
-		state->m_tram_checksum += state->m_colorram[address] - olddata;
+		m_tram_checksum += m_colorram[address] - olddata;
 
 	/* update expanded MRAM */
 	else if (address >= 0x20000 && address < 0x28000)
 	{
-		state->m_expanded_mram[0 * MRAM_ENTRIES + (address & 0x7fff)] = (state->m_colorram[address] >> 8) << RSHIFT;
-		state->m_expanded_mram[1 * MRAM_ENTRIES + (address & 0x7fff)] = (state->m_colorram[address] & 0xff) << GSHIFT;
+		m_expanded_mram[0 * MRAM_ENTRIES + (address & 0x7fff)] = (m_colorram[address] >> 8) << RSHIFT;
+		m_expanded_mram[1 * MRAM_ENTRIES + (address & 0x7fff)] = (m_colorram[address] & 0xff) << GSHIFT;
 	}
 	else if (address >= 0x30000 && address < 0x38000)
-		state->m_expanded_mram[2 * MRAM_ENTRIES + (address & 0x7fff)] = (state->m_colorram[address] & 0xff) << BSHIFT;
+		m_expanded_mram[2 * MRAM_ENTRIES + (address & 0x7fff)] = (m_colorram[address] & 0xff) << BSHIFT;
 }
 
 
-UINT16 atarigt_colorram_r(atarigt_state *state, offs_t address)
+UINT16 atarigt_state::atarigt_colorram_r(offs_t address)
 {
 	address &= 0x7ffff;
-	return state->m_colorram[address / 2];
+	return m_colorram[address / 2];
 }
 
 

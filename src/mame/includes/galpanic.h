@@ -13,6 +13,13 @@ public:
 	bitmap_ind16 m_sprites_bitmap;
 	UINT16 *m_spriteram;
 	size_t m_spriteram_size;
+	DECLARE_WRITE16_MEMBER(galpanic_6295_bankswitch_w);
+	DECLARE_WRITE16_MEMBER(galpanica_6295_bankswitch_w);
+	DECLARE_WRITE16_MEMBER(galpanica_misc_w);
+	DECLARE_WRITE16_MEMBER(galpanic_coin_w);
+	DECLARE_WRITE16_MEMBER(galpanic_bgvideoram_mirror_w);
+	DECLARE_READ16_MEMBER(comad_timer_r);
+	DECLARE_READ16_MEMBER(zipzap_random_read);
 };
 
 

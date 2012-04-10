@@ -87,24 +87,24 @@ static MACHINE_RESET( midvplus )
  *
  *************************************/
 
-static READ32_HANDLER( port0_r )
+READ32_MEMBER(midvunit_state::port0_r)
 {
-	midvunit_state *state = space->machine().driver_data<midvunit_state>();
-	UINT16 val = input_port_read(space->machine(), "IN0");
-	UINT16 diff = val ^ state->m_last_port0;
+//OBRISI.ME
+	UINT16 val = input_port_read(machine(), "IN0");
+	UINT16 diff = val ^ m_last_port0;
 
 	/* make sure the shift controls are mutually exclusive */
 	if ((diff & 0x0400) && !(val & 0x0400))
-		state->m_shifter_state = (state->m_shifter_state == 1) ? 0 : 1;
+		m_shifter_state = (m_shifter_state == 1) ? 0 : 1;
 	if ((diff & 0x0800) && !(val & 0x0800))
-		state->m_shifter_state = (state->m_shifter_state == 2) ? 0 : 2;
+		m_shifter_state = (m_shifter_state == 2) ? 0 : 2;
 	if ((diff & 0x1000) && !(val & 0x1000))
-		state->m_shifter_state = (state->m_shifter_state == 4) ? 0 : 4;
+		m_shifter_state = (m_shifter_state == 4) ? 0 : 4;
 	if ((diff & 0x2000) && !(val & 0x2000))
-		state->m_shifter_state = (state->m_shifter_state == 8) ? 0 : 8;
-	state->m_last_port0 = val;
+		m_shifter_state = (m_shifter_state == 8) ? 0 : 8;
+	m_last_port0 = val;
 
-	val = (val | 0x3c00) ^ (state->m_shifter_state << 10);
+	val = (val | 0x3c00) ^ (m_shifter_state << 10);
 
 	return (val << 16) | val;
 }
@@ -116,13 +116,13 @@ static READ32_HANDLER( port0_r )
  *
  *************************************/
 
-static READ32_HANDLER( midvunit_adc_r )
+READ32_MEMBER(midvunit_state::midvunit_adc_r)
 {
-	midvunit_state *state = space->machine().driver_data<midvunit_state>();
-	if (!(state->m_control_data & 0x40))
+//OBRISI.ME
+	if (!(m_control_data & 0x40))
 	{
-		cputag_set_input_line(space->machine(), "maincpu", 3, CLEAR_LINE);
-		return state->m_adc_data << state->m_adc_shift;
+		cputag_set_input_line(machine(), "maincpu", 3, CLEAR_LINE);
+		return m_adc_data << m_adc_shift;
 	}
 	else
 		logerror("adc_r without enabling reads!\n");
@@ -136,18 +136,18 @@ static TIMER_CALLBACK( adc_ready )
 }
 
 
-static WRITE32_HANDLER( midvunit_adc_w )
+WRITE32_MEMBER(midvunit_state::midvunit_adc_w)
 {
-	midvunit_state *state = space->machine().driver_data<midvunit_state>();
+//OBRISI.ME
 	static const char *const adcnames[] = { "WHEEL", "ACCEL", "BRAKE" };
 
-	if (!(state->m_control_data & 0x20))
+	if (!(m_control_data & 0x20))
 	{
-		int which = (data >> state->m_adc_shift) - 4;
+		int which = (data >> m_adc_shift) - 4;
 		if (which < 0 || which > 2)
 			logerror("adc_w: unexpected which = %02X\n", which + 4);
-		state->m_adc_data = input_port_read_safe(space->machine(), adcnames[which], 0);
-		space->machine().scheduler().timer_set(attotime::from_msec(1), FUNC(adc_ready));
+		m_adc_data = input_port_read_safe(machine(), adcnames[which], 0);
+		machine().scheduler().timer_set(attotime::from_msec(1), FUNC(adc_ready));
 	}
 	else
 		logerror("adc_w without enabling writes!\n");
@@ -161,25 +161,25 @@ static WRITE32_HANDLER( midvunit_adc_w )
  *
  *************************************/
 
-static WRITE32_HANDLER( midvunit_cmos_protect_w )
+WRITE32_MEMBER(midvunit_state::midvunit_cmos_protect_w)
 {
-	midvunit_state *state = space->machine().driver_data<midvunit_state>();
-	state->m_cmos_protected = ((data & 0xc00) != 0xc00);
+//OBRISI.ME
+	m_cmos_protected = ((data & 0xc00) != 0xc00);
 }
 
 
-static WRITE32_HANDLER( midvunit_cmos_w )
+WRITE32_MEMBER(midvunit_state::midvunit_cmos_w)
 {
-	midvunit_state *state = space->machine().driver_data<midvunit_state>();
-	if (!state->m_cmos_protected)
-		COMBINE_DATA(state->m_nvram + offset);
+//OBRISI.ME
+	if (!m_cmos_protected)
+		COMBINE_DATA(m_nvram + offset);
 }
 
 
-static READ32_HANDLER( midvunit_cmos_r )
+READ32_MEMBER(midvunit_state::midvunit_cmos_r)
 {
-	midvunit_state *state = space->machine().driver_data<midvunit_state>();
-	return state->m_nvram[offset];
+//OBRISI.ME
+	return m_nvram[offset];
 }
 
 
@@ -190,52 +190,52 @@ static READ32_HANDLER( midvunit_cmos_r )
  *
  *************************************/
 
-static WRITE32_HANDLER( midvunit_control_w )
+WRITE32_MEMBER(midvunit_state::midvunit_control_w)
 {
-	midvunit_state *state = space->machine().driver_data<midvunit_state>();
-	UINT16 olddata = state->m_control_data;
-	COMBINE_DATA(&state->m_control_data);
+//OBRISI.ME
+	UINT16 olddata = m_control_data;
+	COMBINE_DATA(&m_control_data);
 
 	/* bit 7 is the LED */
 
 	/* bit 3 is the watchdog */
-	if ((olddata ^ state->m_control_data) & 0x0008)
-		state->watchdog_reset_w(*space, 0, 0);
+	if ((olddata ^ m_control_data) & 0x0008)
+		watchdog_reset_w(*&space, 0, 0);
 
 	/* bit 1 is the DCS sound reset */
-	dcs_reset_w(space->machine(), (~state->m_control_data >> 1) & 1);
+	dcs_reset_w(machine(), (~m_control_data >> 1) & 1);
 
 	/* log anything unusual */
-	if ((olddata ^ state->m_control_data) & ~0x00e8)
-		logerror("midvunit_control_w: old=%04X new=%04X diff=%04X\n", olddata, state->m_control_data, olddata ^ state->m_control_data);
+	if ((olddata ^ m_control_data) & ~0x00e8)
+		logerror("midvunit_control_w: old=%04X new=%04X diff=%04X\n", olddata, m_control_data, olddata ^ m_control_data);
 }
 
 
-static WRITE32_HANDLER( crusnwld_control_w )
+WRITE32_MEMBER(midvunit_state::crusnwld_control_w)
 {
-	midvunit_state *state = space->machine().driver_data<midvunit_state>();
-	UINT16 olddata = state->m_control_data;
-	COMBINE_DATA(&state->m_control_data);
+//OBRISI.ME
+	UINT16 olddata = m_control_data;
+	COMBINE_DATA(&m_control_data);
 
 	/* bit 11 is the DCS sound reset */
-	dcs_reset_w(space->machine(), (~state->m_control_data >> 11) & 1);
+	dcs_reset_w(machine(), (~m_control_data >> 11) & 1);
 
 	/* bit 9 is the watchdog */
-	if ((olddata ^ state->m_control_data) & 0x0200)
-		state->watchdog_reset_w(*space, 0, 0);
+	if ((olddata ^ m_control_data) & 0x0200)
+		watchdog_reset_w(*&space, 0, 0);
 
 	/* bit 8 is the LED */
 
 	/* log anything unusual */
-	if ((olddata ^ state->m_control_data) & ~0xe800)
-		logerror("crusnwld_control_w: old=%04X new=%04X diff=%04X\n", olddata, state->m_control_data, olddata ^ state->m_control_data);
+	if ((olddata ^ m_control_data) & ~0xe800)
+		logerror("crusnwld_control_w: old=%04X new=%04X diff=%04X\n", olddata, m_control_data, olddata ^ m_control_data);
 }
 
 
-static WRITE32_HANDLER( midvunit_sound_w )
+WRITE32_MEMBER(midvunit_state::midvunit_sound_w)
 {
 	logerror("Sound W = %02X\n", data);
-	dcs_data_w(space->machine(), data & 0xff);
+	dcs_data_w(machine(), data & 0xff);
 }
 
 
@@ -246,31 +246,31 @@ static WRITE32_HANDLER( midvunit_sound_w )
  *
  *************************************/
 
-static READ32_HANDLER( tms32031_control_r )
+READ32_MEMBER(midvunit_state::tms32031_control_r)
 {
-	midvunit_state *state = space->machine().driver_data<midvunit_state>();
+//OBRISI.ME
 	/* watch for accesses to the timers */
 	if (offset == 0x24 || offset == 0x34)
 	{
 		/* timer is clocked at 100ns */
 		int which = (offset >> 4) & 1;
-		INT32 result = (state->m_timer[which]->time_elapsed() * state->m_timer_rate).as_double();
-//      logerror("%06X:tms32031_control_r(%02X) = %08X\n", cpu_get_pc(&space->device()), offset, result);
+		INT32 result = (m_timer[which]->time_elapsed() * m_timer_rate).as_double();
+//      logerror("%06X:tms32031_control_r(%02X) = %08X\n", cpu_get_pc(&space.device()), offset, result);
 		return result;
 	}
 
 	/* log anything else except the memory control register */
 	if (offset != 0x64)
-		logerror("%06X:tms32031_control_r(%02X)\n", cpu_get_pc(&space->device()), offset);
+		logerror("%06X:tms32031_control_r(%02X)\n", cpu_get_pc(&space.device()), offset);
 
-	return state->m_tms32031_control[offset];
+	return m_tms32031_control[offset];
 }
 
 
-static WRITE32_HANDLER( tms32031_control_w )
+WRITE32_MEMBER(midvunit_state::tms32031_control_w)
 {
-	midvunit_state *state = space->machine().driver_data<midvunit_state>();
-	COMBINE_DATA(&state->m_tms32031_control[offset]);
+//OBRISI.ME
+	COMBINE_DATA(&m_tms32031_control[offset]);
 
 	/* ignore changes to the memory control register */
 	if (offset == 0x64)
@@ -280,18 +280,18 @@ static WRITE32_HANDLER( tms32031_control_w )
 	else if (offset == 0x20 || offset == 0x30)
 	{
 		int which = (offset >> 4) & 1;
-//  logerror("%06X:tms32031_control_w(%02X) = %08X\n", cpu_get_pc(&space->device()), offset, data);
+//  logerror("%06X:tms32031_control_w(%02X) = %08X\n", cpu_get_pc(&space.device()), offset, data);
 		if (data & 0x40)
-			state->m_timer[which]->reset();
+			m_timer[which]->reset();
 
 		/* bit 0x200 selects internal clocking, which is 1/2 the main CPU clock rate */
 		if (data & 0x200)
-			state->m_timer_rate = (double)(space->machine().device("maincpu")->unscaled_clock() * 0.5);
+			m_timer_rate = (double)(machine().device("maincpu")->unscaled_clock() * 0.5);
 		else
-			state->m_timer_rate = 10000000.;
+			m_timer_rate = 10000000.;
 	}
 	else
-		logerror("%06X:tms32031_control_w(%02X) = %08X\n", cpu_get_pc(&space->device()), offset, data);
+		logerror("%06X:tms32031_control_w(%02X) = %08X\n", cpu_get_pc(&space.device()), offset, data);
 }
 
 
@@ -303,20 +303,20 @@ static WRITE32_HANDLER( tms32031_control_w )
  *************************************/
 
 #if 0
-static READ32_HANDLER( crusnwld_serial_status_r )
+READ32_MEMBER(midvunit_state::crusnwld_serial_status_r)
 {
 	int status = midway_serial_pic_status_r();
-	return (input_port_read(space->machine(), "991030") & 0x7fff7fff) | (status << 31) | (status << 15);
+	return (input_port_read(machine(), "991030") & 0x7fff7fff) | (status << 31) | (status << 15);
 }
 
 
-static READ32_HANDLER( crusnwld_serial_data_r )
+READ32_MEMBER(midvunit_state::crusnwld_serial_data_r)
 {
 	return midway_serial_pic_r() << 16;
 }
 
 
-static WRITE32_HANDLER( crusnwld_serial_data_w )
+WRITE32_MEMBER(midvunit_state::crusnwld_serial_data_w)
 {
 	if ((data & 0xf0000) == 0x10000)
 	{
@@ -345,19 +345,19 @@ static const UINT32 bit_data[0x10] =
 };
 
 
-static READ32_HANDLER( bit_data_r )
+READ32_MEMBER(midvunit_state::bit_data_r)
 {
-	midvunit_state *state = space->machine().driver_data<midvunit_state>();
-	int bit = (bit_data[state->m_bit_index / 32] >> (31 - (state->m_bit_index % 32))) & 1;
-	state->m_bit_index = (state->m_bit_index + 1) % 512;
-	return bit ? state->m_nvram[offset] : ~state->m_nvram[offset];
+//OBRISI.ME
+	int bit = (bit_data[m_bit_index / 32] >> (31 - (m_bit_index % 32))) & 1;
+	m_bit_index = (m_bit_index + 1) % 512;
+	return bit ? m_nvram[offset] : ~m_nvram[offset];
 }
 
 
-static WRITE32_HANDLER( bit_reset_w )
+WRITE32_MEMBER(midvunit_state::bit_reset_w)
 {
-	midvunit_state *state = space->machine().driver_data<midvunit_state>();
-	state->m_bit_index = 0;
+//OBRISI.ME
+	m_bit_index = 0;
 }
 
 
@@ -368,22 +368,22 @@ static WRITE32_HANDLER( bit_reset_w )
  *
  *************************************/
 
-static READ32_HANDLER( offroadc_serial_status_r )
+READ32_MEMBER(midvunit_state::offroadc_serial_status_r)
 {
-	int status = midway_serial_pic2_status_r(space);
-	return (input_port_read(space->machine(), "991030")  & 0x7fff7fff) | (status << 31) | (status << 15);
+	int status = midway_serial_pic2_status_r(&space);
+	return (input_port_read(machine(), "991030")  & 0x7fff7fff) | (status << 31) | (status << 15);
 }
 
 
-static READ32_HANDLER( offroadc_serial_data_r )
+READ32_MEMBER(midvunit_state::offroadc_serial_data_r)
 {
-	return midway_serial_pic2_r(space) << 16;
+	return midway_serial_pic2_r(&space) << 16;
 }
 
 
-static WRITE32_HANDLER( offroadc_serial_data_w )
+WRITE32_MEMBER(midvunit_state::offroadc_serial_data_w)
 {
-	midway_serial_pic2_w(space, data >> 16);
+	midway_serial_pic2_w(&space, data >> 16);
 }
 
 
@@ -394,10 +394,10 @@ static WRITE32_HANDLER( offroadc_serial_data_w )
  *
  *************************************/
 
-static READ32_HANDLER( midvplus_misc_r )
+READ32_MEMBER(midvunit_state::midvplus_misc_r)
 {
-	midvunit_state *state = space->machine().driver_data<midvunit_state>();
-	UINT32 result = state->m_midvplus_misc[offset];
+//OBRISI.ME
+	UINT32 result = m_midvplus_misc[offset];
 
 	switch (offset)
 	{
@@ -415,26 +415,26 @@ static READ32_HANDLER( midvplus_misc_r )
 	}
 
 	if (offset != 0 && offset != 3)
-		logerror("%06X:midvplus_misc_r(%d) = %08X\n", cpu_get_pc(&space->device()), offset, result);
+		logerror("%06X:midvplus_misc_r(%d) = %08X\n", cpu_get_pc(&space.device()), offset, result);
 	return result;
 }
 
 
-static WRITE32_HANDLER( midvplus_misc_w )
+WRITE32_MEMBER(midvunit_state::midvplus_misc_w)
 {
-	midvunit_state *state = space->machine().driver_data<midvunit_state>();
-	UINT32 olddata = state->m_midvplus_misc[offset];
+//OBRISI.ME
+	UINT32 olddata = m_midvplus_misc[offset];
 	int logit = 1;
 
-	COMBINE_DATA(&state->m_midvplus_misc[offset]);
+	COMBINE_DATA(&m_midvplus_misc[offset]);
 
 	switch (offset)
 	{
 		case 0:
 			/* bit 0x10 resets watchdog */
-			if ((olddata ^ state->m_midvplus_misc[offset]) & 0x0010)
+			if ((olddata ^ m_midvplus_misc[offset]) & 0x0010)
 			{
-				state->watchdog_reset_w(*space, 0, 0);
+				watchdog_reset_w(*&space, 0, 0);
 				logit = 0;
 			}
 			break;
@@ -445,7 +445,7 @@ static WRITE32_HANDLER( midvplus_misc_w )
 	}
 
 	if (logit)
-		logerror("%06X:midvplus_misc_w(%d) = %08X\n", cpu_get_pc(&space->device()), offset, data);
+		logerror("%06X:midvplus_misc_w(%d) = %08X\n", cpu_get_pc(&space.device()), offset, data);
 }
 
 
@@ -479,7 +479,7 @@ static ADDRESS_MAP_START( midvunit_map, AS_PROGRAM, 32, midvunit_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_RAM AM_BASE(m_ram_base)
 	AM_RANGE(0x400000, 0x41ffff) AM_RAM
 	AM_RANGE(0x600000, 0x600000) AM_WRITE(midvunit_dma_queue_w)
-	AM_RANGE(0x808000, 0x80807f) AM_READWRITE_LEGACY(tms32031_control_r, tms32031_control_w) AM_BASE(m_tms32031_control)
+	AM_RANGE(0x808000, 0x80807f) AM_READWRITE(tms32031_control_r, tms32031_control_w) AM_BASE(m_tms32031_control)
 	AM_RANGE(0x809800, 0x809fff) AM_RAM
 	AM_RANGE(0x900000, 0x97ffff) AM_READWRITE(midvunit_videoram_r, midvunit_videoram_w) AM_BASE(m_videoram)
 	AM_RANGE(0x980000, 0x980000) AM_READ(midvunit_dma_queue_entries_r)
@@ -491,15 +491,15 @@ static ADDRESS_MAP_START( midvunit_map, AS_PROGRAM, 32, midvunit_state )
 	AM_RANGE(0x990000, 0x990000) AM_READNOP	// link PAL (low 4 bits must == 4)
 	AM_RANGE(0x991030, 0x991030) AM_READ_PORT("991030")
 //  AM_RANGE(0x991050, 0x991050) AM_READONLY // seems to be another port
-	AM_RANGE(0x991060, 0x991060) AM_READ_LEGACY(port0_r)
+	AM_RANGE(0x991060, 0x991060) AM_READ(port0_r)
 	AM_RANGE(0x992000, 0x992000) AM_READ_PORT("992000")
-	AM_RANGE(0x993000, 0x993000) AM_READWRITE_LEGACY(midvunit_adc_r, midvunit_adc_w)
-	AM_RANGE(0x994000, 0x994000) AM_WRITE_LEGACY(midvunit_control_w)
+	AM_RANGE(0x993000, 0x993000) AM_READWRITE(midvunit_adc_r, midvunit_adc_w)
+	AM_RANGE(0x994000, 0x994000) AM_WRITE(midvunit_control_w)
 	AM_RANGE(0x995000, 0x995000) AM_WRITENOP	// force feedback?
-	AM_RANGE(0x995020, 0x995020) AM_WRITE_LEGACY(midvunit_cmos_protect_w)
+	AM_RANGE(0x995020, 0x995020) AM_WRITE(midvunit_cmos_protect_w)
 	AM_RANGE(0x997000, 0x997000) AM_NOP	// communications
-	AM_RANGE(0x9a0000, 0x9a0000) AM_WRITE_LEGACY(midvunit_sound_w)
-	AM_RANGE(0x9c0000, 0x9c1fff) AM_READWRITE_LEGACY(midvunit_cmos_r, midvunit_cmos_w) AM_SHARE("nvram")
+	AM_RANGE(0x9a0000, 0x9a0000) AM_WRITE(midvunit_sound_w)
+	AM_RANGE(0x9c0000, 0x9c1fff) AM_READWRITE(midvunit_cmos_r, midvunit_cmos_w) AM_SHARE("nvram")
 	AM_RANGE(0x9e0000, 0x9e7fff) AM_RAM_WRITE(midvunit_paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0xa00000, 0xbfffff) AM_READWRITE(midvunit_textureram_r, midvunit_textureram_w) AM_BASE(m_textureram)
 	AM_RANGE(0xc00000, 0xffffff) AM_ROM AM_REGION("user1", 0)
@@ -512,7 +512,7 @@ static ADDRESS_MAP_START( midvplus_map, AS_PROGRAM, 32, midvunit_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_RAM AM_BASE(m_ram_base)
 	AM_RANGE(0x400000, 0x41ffff) AM_RAM AM_BASE(m_fastram_base)
 	AM_RANGE(0x600000, 0x600000) AM_WRITE(midvunit_dma_queue_w)
-	AM_RANGE(0x808000, 0x80807f) AM_READWRITE_LEGACY(tms32031_control_r, tms32031_control_w) AM_BASE(m_tms32031_control)
+	AM_RANGE(0x808000, 0x80807f) AM_READWRITE(tms32031_control_r, tms32031_control_w) AM_BASE(m_tms32031_control)
 	AM_RANGE(0x809800, 0x809fff) AM_RAM
 	AM_RANGE(0x900000, 0x97ffff) AM_READWRITE(midvunit_videoram_r, midvunit_videoram_w) AM_BASE(m_videoram)
 	AM_RANGE(0x980000, 0x980000) AM_READ(midvunit_dma_queue_entries_r)
@@ -522,11 +522,11 @@ static ADDRESS_MAP_START( midvplus_map, AS_PROGRAM, 32, midvunit_state )
 	AM_RANGE(0x980080, 0x980080) AM_NOP
 	AM_RANGE(0x980082, 0x980083) AM_READ(midvunit_dma_trigger_r)
 	AM_RANGE(0x990000, 0x99000f) AM_READWRITE_LEGACY(midway_ioasic_r, midway_ioasic_w)
-	AM_RANGE(0x994000, 0x994000) AM_WRITE_LEGACY(midvunit_control_w)
-	AM_RANGE(0x995020, 0x995020) AM_WRITE_LEGACY(midvunit_cmos_protect_w)
+	AM_RANGE(0x994000, 0x994000) AM_WRITE(midvunit_control_w)
+	AM_RANGE(0x995020, 0x995020) AM_WRITE(midvunit_cmos_protect_w)
 	AM_RANGE(0x9a0000, 0x9a0007) AM_DEVREADWRITE_LEGACY("ide", midway_ide_asic_r, midway_ide_asic_w)
 	AM_RANGE(0x9c0000, 0x9c7fff) AM_RAM_WRITE(midvunit_paletteram_w) AM_SHARE("paletteram")
-	AM_RANGE(0x9d0000, 0x9d000f) AM_READWRITE_LEGACY(midvplus_misc_r, midvplus_misc_w) AM_BASE(m_midvplus_misc)
+	AM_RANGE(0x9d0000, 0x9d000f) AM_READWRITE(midvplus_misc_r, midvplus_misc_w) AM_BASE(m_midvplus_misc)
 	AM_RANGE(0xa00000, 0xbfffff) AM_READWRITE(midvunit_textureram_r, midvunit_textureram_w) AM_BASE(m_textureram)
 	AM_RANGE(0xc00000, 0xcfffff) AM_RAM
 ADDRESS_MAP_END
@@ -1630,11 +1630,11 @@ ROM_END
  *
  *************************************/
 
-static READ32_HANDLER( generic_speedup_r )
+READ32_MEMBER(midvunit_state::generic_speedup_r)
 {
-	midvunit_state *state = space->machine().driver_data<midvunit_state>();
-	device_eat_cycles(&space->device(), 100);
-	return state->m_generic_speedup[offset];
+//OBRISI.ME
+	device_eat_cycles(&space.device(), 100);
+	return m_generic_speedup[offset];
 }
 
 
@@ -1645,7 +1645,7 @@ static void init_crusnusa_common(running_machine &machine, offs_t speedup)
 	state->m_adc_shift = 24;
 
 	/* speedups */
-	state->m_generic_speedup = machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(speedup, speedup + 1, FUNC(generic_speedup_r));
+	state->m_generic_speedup = machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(speedup, speedup + 1, read32_delegate(FUNC(midvunit_state::generic_speedup_r),state));
 }
 static DRIVER_INIT( crusnusa ) { init_crusnusa_common(machine, 0xc93e); }
 static DRIVER_INIT( crusnu40 ) { init_crusnusa_common(machine, 0xc957); }
@@ -1659,21 +1659,21 @@ static void init_crusnwld_common(running_machine &machine, offs_t speedup)
 	state->m_adc_shift = 16;
 
 	/* control register is different */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x994000, 0x994000, FUNC(crusnwld_control_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x994000, 0x994000, write32_delegate(FUNC(midvunit_state::crusnwld_control_w),state));
 
 	/* valid values are 450 or 460 */
 	midway_serial_pic_init(machine, 450);
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x991030, 0x991030, FUNC(offroadc_serial_status_r));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x996000, 0x996000, FUNC(offroadc_serial_data_r));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x996000, 0x996000, FUNC(offroadc_serial_data_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x991030, 0x991030, read32_delegate(FUNC(midvunit_state::offroadc_serial_status_r),state));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x996000, 0x996000, read32_delegate(FUNC(midvunit_state::offroadc_serial_data_r),state));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x996000, 0x996000, write32_delegate(FUNC(midvunit_state::offroadc_serial_data_w),state));
 
 	/* install strange protection device */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x9d0000, 0x9d1fff, FUNC(bit_data_r));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x9d0000, 0x9d0000, FUNC(bit_reset_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x9d0000, 0x9d1fff, read32_delegate(FUNC(midvunit_state::bit_data_r),state));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x9d0000, 0x9d0000, write32_delegate(FUNC(midvunit_state::bit_reset_w),state));
 
 	/* speedups */
 	if (speedup)
-		state->m_generic_speedup = machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(speedup, speedup + 1, FUNC(generic_speedup_r));
+		state->m_generic_speedup = machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(speedup, speedup + 1, read32_delegate(FUNC(midvunit_state::generic_speedup_r),state));
 }
 static DRIVER_INIT( crusnwld ) { init_crusnwld_common(machine, 0xd4c0); }
 #if 0
@@ -1688,15 +1688,15 @@ static DRIVER_INIT( offroadc )
 	state->m_adc_shift = 16;
 
 	/* control register is different */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x994000, 0x994000, FUNC(crusnwld_control_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x994000, 0x994000, write32_delegate(FUNC(midvunit_state::crusnwld_control_w),state));
 
 	/* valid values are 230 or 234 */
 	midway_serial_pic2_init(machine, 230, 94);
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x991030, 0x991030, FUNC(offroadc_serial_status_r));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x996000, 0x996000, FUNC(offroadc_serial_data_r), FUNC(offroadc_serial_data_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x991030, 0x991030, read32_delegate(FUNC(midvunit_state::offroadc_serial_status_r),state));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x996000, 0x996000, read32_delegate(FUNC(midvunit_state::offroadc_serial_data_r),state), write32_delegate(FUNC(midvunit_state::offroadc_serial_data_w),state));
 
 	/* speedups */
-	state->m_generic_speedup = machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x195aa, 0x195aa, FUNC(generic_speedup_r));
+	state->m_generic_speedup = machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x195aa, 0x195aa, read32_delegate(FUNC(midvunit_state::generic_speedup_r),state));
 }
 
 
@@ -1722,7 +1722,7 @@ static DRIVER_INIT( wargods )
 	midway_serial_pic2_set_default_nvram(default_nvram);
 
 	/* speedups */
-	state->m_generic_speedup = machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x2f4c, 0x2f4c, FUNC(generic_speedup_r));
+	state->m_generic_speedup = machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x2f4c, 0x2f4c, read32_delegate(FUNC(midvunit_state::generic_speedup_r),state));
 }
 
 

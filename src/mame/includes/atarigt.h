@@ -46,13 +46,26 @@ public:
 	UINT8			m_protdata[0x800];
 
 	device_t *		m_rle;
+	DECLARE_READ32_MEMBER(special_port2_r);
+	DECLARE_READ32_MEMBER(special_port3_r);
+	DECLARE_READ32_MEMBER(analog_port0_r);
+	DECLARE_READ32_MEMBER(analog_port1_r);
+	DECLARE_WRITE32_MEMBER(latch_w);
+	DECLARE_WRITE32_MEMBER(mo_command_w);
+	DECLARE_WRITE32_MEMBER(led_w);
+	DECLARE_READ32_MEMBER(sound_data_r);
+	DECLARE_WRITE32_MEMBER(sound_data_w);
+	DECLARE_READ32_MEMBER(colorram_protection_r);
+	DECLARE_WRITE32_MEMBER(colorram_protection_w);
+	DECLARE_WRITE32_MEMBER(tmek_pf_w);
+	void atarigt_colorram_w(offs_t address, UINT16 data, UINT16 mem_mask);
+	UINT16 atarigt_colorram_r(offs_t address);
 };
 
 
 /*----------- defined in video/atarigt.c -----------*/
 
-void atarigt_colorram_w(atarigt_state *state, offs_t address, UINT16 data, UINT16 mem_mask);
-UINT16 atarigt_colorram_r(atarigt_state *state, offs_t address);
+
 
 VIDEO_START( atarigt );
 SCREEN_VBLANK( atarigt );

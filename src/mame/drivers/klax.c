@@ -46,10 +46,10 @@ static void scanline_update(screen_device &screen, int scanline)
 }
 
 
-static WRITE16_HANDLER( interrupt_ack_w )
+WRITE16_MEMBER(klax_state::interrupt_ack_w)
 {
-	atarigen_scanline_int_ack_w(space, offset, data, mem_mask);
-	atarigen_video_int_ack_w(space, offset, data, mem_mask);
+	atarigen_scanline_int_ack_w(&space, offset, data, mem_mask);
+	atarigen_video_int_ack_w(&space, offset, data, mem_mask);
 }
 
 
@@ -91,7 +91,7 @@ static ADDRESS_MAP_START( klax_map, AS_PROGRAM, 16, klax_state )
 	AM_RANGE(0x260002, 0x260003) AM_READ_PORT("P2")
 	AM_RANGE(0x270000, 0x270001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x2e0000, 0x2e0001) AM_WRITE(watchdog_reset16_w)
-	AM_RANGE(0x360000, 0x360001) AM_WRITE_LEGACY(interrupt_ack_w)
+	AM_RANGE(0x360000, 0x360001) AM_WRITE(interrupt_ack_w)
 	AM_RANGE(0x3e0000, 0x3e07ff) AM_RAM_WRITE_LEGACY(atarigen_expanded_666_paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0x3f0000, 0x3f0f7f) AM_RAM_WRITE_LEGACY(atarigen_playfield_w) AM_BASE(m_playfield)
 	AM_RANGE(0x3f0f80, 0x3f0fff) AM_READWRITE_LEGACY(atarimo_0_slipram_r, atarimo_0_slipram_w)

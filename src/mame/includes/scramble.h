@@ -13,6 +13,9 @@ public:
 	UINT8 m_xb;
 	DECLARE_CUSTOM_INPUT_MEMBER(darkplnt_custom_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(ckongs_coinage_r);
+	DECLARE_READ8_MEMBER(hncholms_prot_r);
+	DECLARE_READ8_MEMBER(scramble_soundram_r);
+	DECLARE_WRITE8_MEMBER(scramble_soundram_w);
 };
 
 

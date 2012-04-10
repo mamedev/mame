@@ -1724,19 +1724,19 @@ INPUT_PORTS_END
 
 */
 
-static READ8_HANDLER(indianbt_r)
+READ8_MEMBER(_8080bw_state::indianbt_r)
 {
-	switch(cpu_get_pc(&space->device()))
+	switch(cpu_get_pc(&space.device()))
 	{
 		case 0x5fed:	return 0x10;
 		case 0x5ffc:	return 0;
 	}
-	logerror("unknown port 0 read @ %x\n",cpu_get_pc(&space->device()));
-	return space->machine().rand();
+	logerror("unknown port 0 read @ %x\n",cpu_get_pc(&space.device()));
+	return machine().rand();
 }
 
 static ADDRESS_MAP_START( indianbt_io_map, AS_IO, 8, _8080bw_state )
-	AM_RANGE(0x00, 0x00) AM_READ_LEGACY(indianbt_r)
+	AM_RANGE(0x00, 0x00) AM_READ(indianbt_r)
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN0")
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN2") AM_DEVWRITE_LEGACY("mb14241", mb14241_shift_count_w)
 	AM_RANGE(0x03, 0x03) AM_DEVREAD_LEGACY("mb14241", mb14241_shift_result_r) AM_WRITE_LEGACY(indianbt_sh_port_1_w)
@@ -1776,9 +1776,9 @@ MACHINE_CONFIG_END
 /*                                                     */
 /*******************************************************/
 
-static WRITE8_HANDLER( steelwkr_sh_port_3_w )
+WRITE8_MEMBER(_8080bw_state::steelwkr_sh_port_3_w)
 {
-	coin_lockout_global_w(space->machine(), !(~data & 0x03));		/* possibly */
+	coin_lockout_global_w(machine(), !(~data & 0x03));		/* possibly */
 }
 
 static ADDRESS_MAP_START( steelwkr_io_map, AS_IO, 8, _8080bw_state )
@@ -1787,7 +1787,7 @@ static ADDRESS_MAP_START( steelwkr_io_map, AS_IO, 8, _8080bw_state )
 	AM_RANGE(0x03, 0x03) AM_DEVREAD_LEGACY("mb14241", mb14241_shift_result_r) AM_WRITE_LEGACY(invadpt2_sh_port_1_w)
 	AM_RANGE(0x04, 0x04) AM_DEVWRITE_LEGACY("mb14241", mb14241_shift_data_w)
 	AM_RANGE(0x05, 0x05) AM_WRITE_LEGACY(invadpt2_sh_port_2_w)
-	AM_RANGE(0x06, 0x06) AM_WRITE_LEGACY(steelwkr_sh_port_3_w)
+	AM_RANGE(0x06, 0x06) AM_WRITE(steelwkr_sh_port_3_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( steelwkr )

@@ -116,6 +116,37 @@ public:
 	DECLARE_WRITE64_MEMBER(real3d_display_list_w);
 	DECLARE_WRITE64_MEMBER(real3d_polygon_ram_w);
 	DECLARE_WRITE64_MEMBER(real3d_cmd_w);
+	DECLARE_READ64_MEMBER(mpc105_addr_r);
+	DECLARE_WRITE64_MEMBER(mpc105_addr_w);
+	DECLARE_READ64_MEMBER(mpc105_data_r);
+	DECLARE_WRITE64_MEMBER(mpc105_data_w);
+	DECLARE_READ64_MEMBER(mpc105_reg_r);
+	DECLARE_WRITE64_MEMBER(mpc105_reg_w);
+	DECLARE_READ64_MEMBER(mpc106_addr_r);
+	DECLARE_WRITE64_MEMBER(mpc106_addr_w);
+	DECLARE_READ64_MEMBER(mpc106_data_r);
+	DECLARE_WRITE64_MEMBER(mpc106_data_w);
+	DECLARE_READ64_MEMBER(mpc106_reg_r);
+	DECLARE_WRITE64_MEMBER(mpc106_reg_w);
+	DECLARE_READ64_MEMBER(scsi_r);
+	DECLARE_WRITE64_MEMBER(scsi_w);
+	DECLARE_READ64_MEMBER(real3d_dma_r);
+	DECLARE_WRITE64_MEMBER(real3d_dma_w);
+	DECLARE_READ64_MEMBER(model3_ctrl_r);
+	DECLARE_WRITE64_MEMBER(model3_ctrl_w);
+	DECLARE_READ64_MEMBER(model3_sys_r);
+	DECLARE_WRITE64_MEMBER(model3_sys_w);
+	DECLARE_READ64_MEMBER(model3_rtc_r);
+	DECLARE_WRITE64_MEMBER(model3_rtc_w);
+	DECLARE_READ64_MEMBER(real3d_status_r);
+	DECLARE_WRITE8_MEMBER(model3_sound_w);
+	DECLARE_READ64_MEMBER(network_r);
+	DECLARE_WRITE64_MEMBER(network_w);
+	DECLARE_READ64_MEMBER(model3_security_r);
+	DECLARE_WRITE64_MEMBER(daytona2_rombank_w);
+	DECLARE_WRITE16_MEMBER(model3snd_ctrl);
+	UINT32 pci_device_get_reg();
+	void pci_device_set_reg(UINT32 value);
 };
 
 

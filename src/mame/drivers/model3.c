@@ -689,10 +689,10 @@ void model3_set_irq_line(running_machine &machine, UINT8 bit, int line)
 /* Motorola MPC105 PCI Bridge/Memory Controller */
 
 
-static UINT32 pci_device_get_reg(model3_state *state)
+UINT32 model3_state::pci_device_get_reg()
 {
-	int device = state->m_pci_device;
-	int reg = state->m_pci_reg;
+	int device = m_pci_device;
+	int reg = m_pci_reg;
 
 	switch(device)
 	{
@@ -708,7 +708,7 @@ static UINT32 pci_device_get_reg(model3_state *state)
 		case 13:		/* Real3D Controller chip */
 			switch(reg)
 			{
-				case 0:		return state->m_real3d_device_id;	/* PCI Vendor ID & Device ID */
+				case 0:		return m_real3d_device_id;	/* PCI Vendor ID & Device ID */
 				default:
 					logerror("pci_device_get_reg: Real3D controller, unknown reg %02X", reg);
 					break;
@@ -742,10 +742,10 @@ static UINT32 pci_device_get_reg(model3_state *state)
 	return 0;
 }
 
-static void pci_device_set_reg(model3_state *state, UINT32 value)
+void model3_state::pci_device_set_reg(UINT32 value)
 {
-	int device = state->m_pci_device;
-	int reg = state->m_pci_reg;
+	int device = m_pci_device;
+	int reg = m_pci_reg;
 
 	switch(device)
 	{
@@ -815,67 +815,67 @@ static void pci_device_set_reg(model3_state *state, UINT32 value)
 	}
 }
 
-static READ64_HANDLER( mpc105_addr_r )
+READ64_MEMBER(model3_state::mpc105_addr_r)
 {
-	model3_state *state = space->machine().driver_data<model3_state>();
+//OBRISI.ME
 	if (ACCESSING_BITS_32_63)
 	{
-		return (UINT64)state->m_mpc105_addr << 32;
+		return (UINT64)m_mpc105_addr << 32;
 	}
 	return 0;
 }
 
-static WRITE64_HANDLER( mpc105_addr_w )
+WRITE64_MEMBER(model3_state::mpc105_addr_w)
 {
-	model3_state *state = space->machine().driver_data<model3_state>();
+//OBRISI.ME
 	if (ACCESSING_BITS_32_63)
 	{
 		UINT32 d = FLIPENDIAN_INT32((UINT32)(data >> 32));
-		state->m_mpc105_addr = data >> 32;
+		m_mpc105_addr = data >> 32;
 
-		state->m_pci_bus = (d >> 16) & 0xff;
-		state->m_pci_device = (d >> 11) & 0x1f;
-		state->m_pci_function = (d >> 8) & 0x7;
-		state->m_pci_reg = (d >> 2) & 0x3f;
+		m_pci_bus = (d >> 16) & 0xff;
+		m_pci_device = (d >> 11) & 0x1f;
+		m_pci_function = (d >> 8) & 0x7;
+		m_pci_reg = (d >> 2) & 0x3f;
 	}
 }
 
-static READ64_HANDLER( mpc105_data_r )
+READ64_MEMBER(model3_state::mpc105_data_r)
 {
-	model3_state *state = space->machine().driver_data<model3_state>();
-	if(state->m_pci_device == 0) {
-		return ((UINT64)(FLIPENDIAN_INT32(state->m_mpc105_regs[(state->m_pci_reg/2)+1])) << 32) |
-			   ((UINT64)(FLIPENDIAN_INT32(state->m_mpc105_regs[(state->m_pci_reg/2)+0])));
+//OBRISI.ME
+	if(m_pci_device == 0) {
+		return ((UINT64)(FLIPENDIAN_INT32(m_mpc105_regs[(m_pci_reg/2)+1])) << 32) |
+			   ((UINT64)(FLIPENDIAN_INT32(m_mpc105_regs[(m_pci_reg/2)+0])));
 	}
-	return FLIPENDIAN_INT32(pci_device_get_reg(state));
+	return FLIPENDIAN_INT32(pci_device_get_reg());
 }
 
-static WRITE64_HANDLER( mpc105_data_w )
+WRITE64_MEMBER(model3_state::mpc105_data_w)
 {
-	model3_state *state = space->machine().driver_data<model3_state>();
-	if(state->m_pci_device == 0) {
-		state->m_mpc105_regs[(state->m_pci_reg/2)+1] = FLIPENDIAN_INT32((UINT32)(data >> 32));
-		state->m_mpc105_regs[(state->m_pci_reg/2)+0] = FLIPENDIAN_INT32((UINT32)(data));
+//OBRISI.ME
+	if(m_pci_device == 0) {
+		m_mpc105_regs[(m_pci_reg/2)+1] = FLIPENDIAN_INT32((UINT32)(data >> 32));
+		m_mpc105_regs[(m_pci_reg/2)+0] = FLIPENDIAN_INT32((UINT32)(data));
 		return;
 	}
 	if (ACCESSING_BITS_0_31)
 	{
-		pci_device_set_reg(state, FLIPENDIAN_INT32((UINT32)data));
+		pci_device_set_reg(FLIPENDIAN_INT32((UINT32)data));
 	}
 }
 
-static READ64_HANDLER( mpc105_reg_r )
+READ64_MEMBER(model3_state::mpc105_reg_r)
 {
-	model3_state *state = space->machine().driver_data<model3_state>();
-	return ((UINT64)(state->m_mpc105_regs[(offset*2)+0]) << 32) |
-			(UINT64)(state->m_mpc105_regs[(offset*2)+1]);
+//OBRISI.ME
+	return ((UINT64)(m_mpc105_regs[(offset*2)+0]) << 32) |
+			(UINT64)(m_mpc105_regs[(offset*2)+1]);
 }
 
-static WRITE64_HANDLER( mpc105_reg_w )
+WRITE64_MEMBER(model3_state::mpc105_reg_w)
 {
-	model3_state *state = space->machine().driver_data<model3_state>();
-	state->m_mpc105_regs[(offset*2)+0] = (UINT32)(data >> 32);
-	state->m_mpc105_regs[(offset*2)+1] = (UINT32)data;
+//OBRISI.ME
+	m_mpc105_regs[(offset*2)+0] = (UINT32)(data >> 32);
+	m_mpc105_regs[(offset*2)+1] = (UINT32)data;
 }
 
 static void mpc105_init(running_machine &machine)
@@ -898,82 +898,82 @@ static void mpc105_init(running_machine &machine)
 /* Motorola MPC106 PCI Bridge/Memory Controller */
 
 
-static READ64_HANDLER( mpc106_addr_r )
+READ64_MEMBER(model3_state::mpc106_addr_r)
 {
-	model3_state *state = space->machine().driver_data<model3_state>();
+//OBRISI.ME
 	if (ACCESSING_BITS_32_63)
 	{
-		return (UINT64)state->m_mpc106_addr << 32;
+		return (UINT64)m_mpc106_addr << 32;
 	}
 	return 0;
 }
 
-static WRITE64_HANDLER( mpc106_addr_w )
+WRITE64_MEMBER(model3_state::mpc106_addr_w)
 {
-	model3_state *state = space->machine().driver_data<model3_state>();
+//OBRISI.ME
 	if (ACCESSING_BITS_32_63)
 	{
 		UINT32 d = FLIPENDIAN_INT32((UINT32)(data >> 32));
 
 		if (((d >> 8) & 0xffffff) == 0x800000)
 		{
-			state->m_mpc106_addr = d & 0xff;
+			m_mpc106_addr = d & 0xff;
 		}
 		else
 		{
-			state->m_mpc106_addr = data >> 32;
+			m_mpc106_addr = data >> 32;
 
-			state->m_pci_bus = (d >> 16) & 0xff;
-			state->m_pci_device = (d >> 11) & 0x1f;
-			state->m_pci_function = (d >> 8) & 0x7;
-			state->m_pci_reg = (d >> 2) & 0x3f;
+			m_pci_bus = (d >> 16) & 0xff;
+			m_pci_device = (d >> 11) & 0x1f;
+			m_pci_function = (d >> 8) & 0x7;
+			m_pci_reg = (d >> 2) & 0x3f;
 		}
 	}
 }
 
-static READ64_HANDLER( mpc106_data_r )
+READ64_MEMBER(model3_state::mpc106_data_r)
 {
-	model3_state *state = space->machine().driver_data<model3_state>();
-	if(state->m_pci_device == 0) {
-		return ((UINT64)(FLIPENDIAN_INT32(state->m_mpc106_regs[(state->m_pci_reg/2)+1])) << 32) |
-			   ((UINT64)(FLIPENDIAN_INT32(state->m_mpc106_regs[(state->m_pci_reg/2)+0])));
+//OBRISI.ME
+	if(m_pci_device == 0) {
+		return ((UINT64)(FLIPENDIAN_INT32(m_mpc106_regs[(m_pci_reg/2)+1])) << 32) |
+			   ((UINT64)(FLIPENDIAN_INT32(m_mpc106_regs[(m_pci_reg/2)+0])));
 	}
 	if (ACCESSING_BITS_32_63)
 	{
-		return (UINT64)(FLIPENDIAN_INT32(pci_device_get_reg(state))) << 32;
+		return (UINT64)(FLIPENDIAN_INT32(pci_device_get_reg())) << 32;
 	}
 	else
 	{
-		return (UINT64)(FLIPENDIAN_INT32(pci_device_get_reg(state)));
+		return (UINT64)(FLIPENDIAN_INT32(pci_device_get_reg()));
 	}
 }
 
-static WRITE64_HANDLER( mpc106_data_w )
+WRITE64_MEMBER(model3_state::mpc106_data_w)
 {
-	model3_state *state = space->machine().driver_data<model3_state>();
-	if(state->m_pci_device == 0) {
-		state->m_mpc106_regs[(state->m_pci_reg/2)+1] = FLIPENDIAN_INT32((UINT32)(data >> 32));
-		state->m_mpc106_regs[(state->m_pci_reg/2)+0] = FLIPENDIAN_INT32((UINT32)(data));
+//OBRISI.ME
+	if(m_pci_device == 0) {
+		m_mpc106_regs[(m_pci_reg/2)+1] = FLIPENDIAN_INT32((UINT32)(data >> 32));
+		m_mpc106_regs[(m_pci_reg/2)+0] = FLIPENDIAN_INT32((UINT32)(data));
 		return;
 	}
 	if (ACCESSING_BITS_0_31)
 	{
-		pci_device_set_reg(state, FLIPENDIAN_INT32((UINT32)data));
+		pci_device_set_reg(FLIPENDIAN_INT32((UINT32)data));
 	}
 }
 
-static READ64_HANDLER( mpc106_reg_r )
+READ64_MEMBER(model3_state::mpc106_reg_r)
 {
-	model3_state *state = space->machine().driver_data<model3_state>();
-	return ((UINT64)(state->m_mpc106_regs[(offset*2)+0]) << 32) |
-			(UINT64)(state->m_mpc106_regs[(offset*2)+1]);
+//OBRISI.ME
+	return ((UINT64)(m_mpc106_regs[(offset*2)+0]) << 32) |
+			(UINT64)(m_mpc106_regs[(offset*2)+1]);
 }
 
-static WRITE64_HANDLER( mpc106_reg_w )
+WRITE64_MEMBER(model3_state::mpc106_reg_w)
 {
-	model3_state *state = space->machine().driver_data<model3_state>();
-	state->m_mpc106_regs[(offset*2)+0] = (UINT32)(data >> 32);
-	state->m_mpc106_regs[(offset*2)+1] = (UINT32)data;
+//OBRISI.ME
+	m_mpc106_regs[(offset*2)+0] = (UINT32)(data >> 32);
+	m_mpc106_regs[(offset*2)+1] = (UINT32)data;
 }
 
 static void mpc106_init(running_machine &machine)
@@ -999,64 +999,64 @@ static void mpc106_init(running_machine &machine)
 
 /*****************************************************************************/
 
-static READ64_HANDLER(scsi_r)
+READ64_MEMBER(model3_state::scsi_r)
 {
 	int reg = offset*8;
 	UINT64 r = 0;
 	if (ACCESSING_BITS_56_63) {
-		r |= (UINT64)lsi53c810_reg_r(space, reg+0) << 56;
+		r |= (UINT64)lsi53c810_reg_r(&space, reg+0) << 56;
 	}
 	if (ACCESSING_BITS_48_55) {
-		r |= (UINT64)lsi53c810_reg_r(space, reg+1) << 48;
+		r |= (UINT64)lsi53c810_reg_r(&space, reg+1) << 48;
 	}
 	if (ACCESSING_BITS_40_47) {
-		r |= (UINT64)lsi53c810_reg_r(space, reg+2) << 40;
+		r |= (UINT64)lsi53c810_reg_r(&space, reg+2) << 40;
 	}
 	if (ACCESSING_BITS_32_39) {
-		r |= (UINT64)lsi53c810_reg_r(space, reg+3) << 32;
+		r |= (UINT64)lsi53c810_reg_r(&space, reg+3) << 32;
 	}
 	if (ACCESSING_BITS_24_31) {
-		r |= (UINT64)lsi53c810_reg_r(space, reg+4) << 24;
+		r |= (UINT64)lsi53c810_reg_r(&space, reg+4) << 24;
 	}
 	if (ACCESSING_BITS_16_23) {
-		r |= (UINT64)lsi53c810_reg_r(space, reg+5) << 16;
+		r |= (UINT64)lsi53c810_reg_r(&space, reg+5) << 16;
 	}
 	if (ACCESSING_BITS_8_15) {
-		r |= (UINT64)lsi53c810_reg_r(space, reg+6) << 8;
+		r |= (UINT64)lsi53c810_reg_r(&space, reg+6) << 8;
 	}
 	if (ACCESSING_BITS_0_7) {
-		r |= (UINT64)lsi53c810_reg_r(space, reg+7) << 0;
+		r |= (UINT64)lsi53c810_reg_r(&space, reg+7) << 0;
 	}
 
 	return r;
 }
 
-static WRITE64_HANDLER(scsi_w)
+WRITE64_MEMBER(model3_state::scsi_w)
 {
 	int reg = offset*8;
 	if (ACCESSING_BITS_56_63) {
-		lsi53c810_reg_w(space, reg+0, data >> 56);
+		lsi53c810_reg_w(&space, reg+0, data >> 56);
 	}
 	if (ACCESSING_BITS_48_55) {
-		lsi53c810_reg_w(space, reg+1, data >> 48);
+		lsi53c810_reg_w(&space, reg+1, data >> 48);
 	}
 	if (ACCESSING_BITS_40_47) {
-		lsi53c810_reg_w(space, reg+2, data >> 40);
+		lsi53c810_reg_w(&space, reg+2, data >> 40);
 	}
 	if (ACCESSING_BITS_32_39) {
-		lsi53c810_reg_w(space, reg+3, data >> 32);
+		lsi53c810_reg_w(&space, reg+3, data >> 32);
 	}
 	if (ACCESSING_BITS_24_31) {
-		lsi53c810_reg_w(space, reg+4, data >> 24);
+		lsi53c810_reg_w(&space, reg+4, data >> 24);
 	}
 	if (ACCESSING_BITS_16_23) {
-		lsi53c810_reg_w(space, reg+5, data >> 16);
+		lsi53c810_reg_w(&space, reg+5, data >> 16);
 	}
 	if (ACCESSING_BITS_8_15) {
-		lsi53c810_reg_w(space, reg+6, data >> 8);
+		lsi53c810_reg_w(&space, reg+6, data >> 8);
 	}
 	if (ACCESSING_BITS_0_7) {
-		lsi53c810_reg_w(space, reg+7, data >> 0);
+		lsi53c810_reg_w(&space, reg+7, data >> 0);
 	}
 }
 
@@ -1079,16 +1079,16 @@ static void scsi_irq_callback(running_machine &machine, int state)
 /* Real3D DMA */
 
 
-static READ64_HANDLER( real3d_dma_r )
+READ64_MEMBER(model3_state::real3d_dma_r)
 {
-	model3_state *state = space->machine().driver_data<model3_state>();
+//OBRISI.ME
 	switch(offset)
 	{
 		case 1:
-			return (state->m_dma_irq << 24) | (state->m_dma_endian << 8);
+			return (m_dma_irq << 24) | (m_dma_endian << 8);
 		case 2:
 			if(ACCESSING_BITS_0_31) {
-				return state->m_dma_data;
+				return m_dma_data;
 			}
 			break;
 	}
@@ -1096,18 +1096,18 @@ static READ64_HANDLER( real3d_dma_r )
 	return 0;
 }
 
-static WRITE64_HANDLER( real3d_dma_w )
+WRITE64_MEMBER(model3_state::real3d_dma_w)
 {
-	model3_state *state = space->machine().driver_data<model3_state>();
+//OBRISI.ME
 	switch(offset)
 	{
 		case 0:
 			if(ACCESSING_BITS_32_63) {		/* DMA source address */
-				state->m_dma_source = FLIPENDIAN_INT32((UINT32)(data >> 32));
+				m_dma_source = FLIPENDIAN_INT32((UINT32)(data >> 32));
 				return;
 			}
 			if(ACCESSING_BITS_0_31) {		/* DMA destination address */
-				state->m_dma_dest = FLIPENDIAN_INT32((UINT32)(data));
+				m_dma_dest = FLIPENDIAN_INT32((UINT32)(data));
 				return;
 			}
 			break;
@@ -1115,29 +1115,29 @@ static WRITE64_HANDLER( real3d_dma_w )
 			if(ACCESSING_BITS_32_63)		/* DMA length */
 			{
 				int length = FLIPENDIAN_INT32((UINT32)(data >> 32)) * 4;
-				if (state->m_dma_endian & 0x80)
+				if (m_dma_endian & 0x80)
 				{
-					real3d_dma_callback(space->machine(), state->m_dma_source, state->m_dma_dest, length, 0);
+					real3d_dma_callback(machine(), m_dma_source, m_dma_dest, length, 0);
 				}
 				else
 				{
-					real3d_dma_callback(space->machine(), state->m_dma_source, state->m_dma_dest, length, 1);
+					real3d_dma_callback(machine(), m_dma_source, m_dma_dest, length, 1);
 				}
-				state->m_dma_irq |= 0x01;
-				scsi_irq_callback(space->machine(), 1);
+				m_dma_irq |= 0x01;
+				scsi_irq_callback(machine(), 1);
 				return;
 			}
 			else if(ACCESSING_BITS_16_23)
 			{
 				if(data & 0x10000) {
-					state->m_dma_irq &= ~0x1;
-					scsi_irq_callback(space->machine(), 0);
+					m_dma_irq &= ~0x1;
+					scsi_irq_callback(machine(), 0);
 				}
 				return;
 			}
 			else if(ACCESSING_BITS_8_15)
 			{
-				state->m_dma_endian = (data >> 8) & 0xff;
+				m_dma_endian = (data >> 8) & 0xff;
 				return;
 			}
 			break;
@@ -1145,16 +1145,16 @@ static WRITE64_HANDLER( real3d_dma_w )
 			if(ACCESSING_BITS_32_63) {		/* DMA command */
 				UINT32 cmd = FLIPENDIAN_INT32((UINT32)(data >> 32));
 				if(cmd & 0x20000000) {
-					state->m_dma_data = FLIPENDIAN_INT32(state->m_real3d_device_id);	/* (PCI Vendor & Device ID) */
+					m_dma_data = FLIPENDIAN_INT32(m_real3d_device_id);	/* (PCI Vendor & Device ID) */
 				}
 				else if(cmd & 0x80000000) {
-					state->m_dma_status ^= 0xffffffff;
-					state->m_dma_data = state->m_dma_status;
+					m_dma_status ^= 0xffffffff;
+					m_dma_data = m_dma_status;
 				}
 				return;
 			}
 			if(ACCESSING_BITS_0_31) {		/* ??? */
-				state->m_dma_data = 0xffffffff;
+				m_dma_data = 0xffffffff;
 				return;
 			}
 			return;
@@ -1338,25 +1338,25 @@ static MACHINE_RESET(model3_20) { model3_init(machine, 0x20); }
 static MACHINE_RESET(model3_21) { model3_init(machine, 0x21); }
 
 
-static READ64_HANDLER( model3_ctrl_r )
+READ64_MEMBER(model3_state::model3_ctrl_r)
 {
-	model3_state *state = space->machine().driver_data<model3_state>();
+//OBRISI.ME
 	switch( offset )
 	{
 		case 0:
 			if (ACCESSING_BITS_56_63)
 			{
-				return (UINT64)state->m_controls_bank << 56;
+				return (UINT64)m_controls_bank << 56;
 			}
 			else if (ACCESSING_BITS_24_31)
 			{
-				if(state->m_controls_bank & 0x1)
+				if(m_controls_bank & 0x1)
 				{
-					return (input_port_read(space->machine(), "IN1")) << 24;
+					return (input_port_read(machine(), "IN1")) << 24;
 				}
 				else
 				{
-					return (input_port_read(space->machine(), "IN0")) << 24;
+					return (input_port_read(machine(), "IN0")) << 24;
 				}
 			}
 			break;
@@ -1364,11 +1364,11 @@ static READ64_HANDLER( model3_ctrl_r )
 		case 1:
 			if (ACCESSING_BITS_56_63)
 			{
-				return (UINT64)input_port_read(space->machine(), "IN2") << 56;
+				return (UINT64)input_port_read(machine(), "IN2") << 56;
 			}
 			else if (ACCESSING_BITS_24_31)
 			{
-				return input_port_read(space->machine(), "IN3") << 24;
+				return input_port_read(machine(), "IN3") << 24;
 			}
 			break;
 
@@ -1384,14 +1384,14 @@ static READ64_HANDLER( model3_ctrl_r )
 		case 5:
 			if (ACCESSING_BITS_24_31)					/* Serial comm RX FIFO 1 */
 			{
-				return (UINT64)state->m_serial_fifo1 << 24;
+				return (UINT64)m_serial_fifo1 << 24;
 			}
 			break;
 
 		case 6:
 			if (ACCESSING_BITS_56_63)		/* Serial comm RX FIFO 2 */
 			{
-				return (UINT64)state->m_serial_fifo2 << 56;
+				return (UINT64)m_serial_fifo2 << 56;
 			}
 			else if (ACCESSING_BITS_24_31)				/* Serial comm full/empty flags */
 			{
@@ -1403,9 +1403,9 @@ static READ64_HANDLER( model3_ctrl_r )
 			if (ACCESSING_BITS_24_31)		/* ADC Data read */
 			{
 				static const char *const adcnames[] = { "AN0", "AN1", "AN2", "AN3", "AN4", "AN5", "AN6", "AN7" };
-				UINT8 adc_data = input_port_read_safe(space->machine(), adcnames[state->m_adc_channel], 0);
-				state->m_adc_channel++;
-				state->m_adc_channel &= 0x7;
+				UINT8 adc_data = input_port_read_safe(machine(), adcnames[m_adc_channel], 0);
+				m_adc_channel++;
+				m_adc_channel &= 0x7;
 				return (UINT64)adc_data << 24;
 			}
 			break;
@@ -1415,29 +1415,29 @@ static READ64_HANDLER( model3_ctrl_r )
 	return 0;
 }
 
-static WRITE64_HANDLER( model3_ctrl_w )
+WRITE64_MEMBER(model3_state::model3_ctrl_w)
 {
-	model3_state *state = space->machine().driver_data<model3_state>();
+//OBRISI.ME
 	switch(offset)
 	{
 		case 0:
 			if (ACCESSING_BITS_56_63)
 			{
-				eeprom_device *eeprom = space->machine().device<eeprom_device>("eeprom");
+				eeprom_device *eeprom = machine().device<eeprom_device>("eeprom");
 				int reg = (data >> 56) & 0xff;
 				eeprom->write_bit((reg & 0x20) ? 1 : 0);
 				eeprom->set_clock_line((reg & 0x80) ? ASSERT_LINE : CLEAR_LINE);
 				eeprom->set_cs_line((reg & 0x40) ? CLEAR_LINE : ASSERT_LINE);
-				state->m_controls_bank = reg & 0xff;
+				m_controls_bank = reg & 0xff;
 			}
 			return;
 
 		case 2:
-			COMBINE_DATA(&state->m_controls_2);
+			COMBINE_DATA(&m_controls_2);
 			return;
 
 		case 3:
-			COMBINE_DATA(&state->m_controls_3);
+			COMBINE_DATA(&m_controls_3);
 			return;
 
 		case 4:
@@ -1450,46 +1450,46 @@ static WRITE64_HANDLER( model3_ctrl_w )
 				switch(data >> 24)
 				{
 					case 0x00:
-						state->m_lightgun_reg_sel = state->m_serial_fifo2;
+						m_lightgun_reg_sel = m_serial_fifo2;
 						break;
 					case 0x87:
-						state->m_serial_fifo1 = 0;
-						switch(state->m_lightgun_reg_sel)		/* read lightrun register */
+						m_serial_fifo1 = 0;
+						switch(m_lightgun_reg_sel)		/* read lightrun register */
 						{
 							case 0:		/* player 1 gun X-position, lower 8-bits */
-								state->m_serial_fifo2 = input_port_read(space->machine(), "LIGHT0_Y") & 0xff;
+								m_serial_fifo2 = input_port_read(machine(), "LIGHT0_Y") & 0xff;
 								break;
 							case 1:		/* player 1 gun X-position, upper 2-bits */
-								state->m_serial_fifo2 = (input_port_read(space->machine(), "LIGHT0_Y") >> 8) & 0x3;
+								m_serial_fifo2 = (input_port_read(machine(), "LIGHT0_Y") >> 8) & 0x3;
 								break;
 							case 2:		/* player 1 gun Y-position, lower 8-bits */
-								state->m_serial_fifo2 = input_port_read(space->machine(), "LIGHT0_X") & 0xff;
+								m_serial_fifo2 = input_port_read(machine(), "LIGHT0_X") & 0xff;
 								break;
 							case 3:		/* player 1 gun Y-position, upper 2-bits */
-								state->m_serial_fifo2 = (input_port_read(space->machine(), "LIGHT0_X") >> 8) & 0x3;
+								m_serial_fifo2 = (input_port_read(machine(), "LIGHT0_X") >> 8) & 0x3;
 								break;
 							case 4:		/* player 2 gun X-position, lower 8-bits */
-								state->m_serial_fifo2 = input_port_read(space->machine(), "LIGHT1_Y") & 0xff;
+								m_serial_fifo2 = input_port_read(machine(), "LIGHT1_Y") & 0xff;
 								break;
 							case 5:		/* player 2 gun X-position, upper 2-bits */
-								state->m_serial_fifo2 = (input_port_read(space->machine(), "LIGHT1_Y") >> 8) & 0x3;
+								m_serial_fifo2 = (input_port_read(machine(), "LIGHT1_Y") >> 8) & 0x3;
 								break;
 							case 6:		/* player 2 gun Y-position, lower 8-bits */
-								state->m_serial_fifo2 = input_port_read(space->machine(), "LIGHT1_X") & 0xff;
+								m_serial_fifo2 = input_port_read(machine(), "LIGHT1_X") & 0xff;
 								break;
 							case 7:		/* player 2 gun Y-position, upper 2-bits */
-								state->m_serial_fifo2 = (input_port_read(space->machine(), "LIGHT1_X") >> 8) & 0x3;
+								m_serial_fifo2 = (input_port_read(machine(), "LIGHT1_X") >> 8) & 0x3;
 								break;
 							case 8:		/* gun offscreen (bit set = gun offscreen, bit clear = gun on screen) */
-								state->m_serial_fifo2 = 0;	/* bit 0 = player 1, bit 1 = player 2 */
-								if(input_port_read(space->machine(), "OFFSCREEN") & 0x1) {
-									state->m_serial_fifo2 |= 0x01;
+								m_serial_fifo2 = 0;	/* bit 0 = player 1, bit 1 = player 2 */
+								if(input_port_read(machine(), "OFFSCREEN") & 0x1) {
+									m_serial_fifo2 |= 0x01;
 								}
 								break;
 						}
 						break;
 					default:
-						//mame_printf_debug("Lightgun: Unknown command %02X at %08X\n", (UINT32)(data >> 24), cpu_get_pc(&space->device()));
+						//mame_printf_debug("Lightgun: Unknown command %02X at %08X\n", (UINT32)(data >> 24), cpu_get_pc(&space.device()));
 						break;
 				}
 			}
@@ -1498,7 +1498,7 @@ static WRITE64_HANDLER( model3_ctrl_w )
 		case 5:
 			if (ACCESSING_BITS_56_63)	/* Serial comm TX FIFO 2 */
 			{
-				state->m_serial_fifo2 = data >> 56;
+				m_serial_fifo2 = data >> 56;
 				return;
 			}
 			break;
@@ -1506,7 +1506,7 @@ static WRITE64_HANDLER( model3_ctrl_w )
 		case 7:
 			if (ACCESSING_BITS_24_31)	/* ADC Channel selection */
 			{
-				state->m_adc_channel = (data >> 24) & 0xf;
+				m_adc_channel = (data >> 24) & 0xf;
 			}
 			return;
 	}
@@ -1514,36 +1514,36 @@ static WRITE64_HANDLER( model3_ctrl_w )
 	logerror("ctrl_w: %02X, %08X%08X, %08X%08X", offset, (UINT32)(data >> 32), (UINT32)(data), (UINT32)(mem_mask >> 32), (UINT32)(mem_mask));
 }
 
-static READ64_HANDLER( model3_sys_r )
+READ64_MEMBER(model3_state::model3_sys_r)
 {
-	model3_state *state = space->machine().driver_data<model3_state>();
-//  printf("model3_sys_r: mask %llx @ %x (PC %x)\n", mem_mask, offset, cpu_get_pc(&space->device()));
+//OBRISI.ME
+//  printf("model3_sys_r: mask %llx @ %x (PC %x)\n", mem_mask, offset, cpu_get_pc(&space.device()));
 
 	switch (offset)
 	{
 		case 0x08/8:
 			if (ACCESSING_BITS_56_63)
 			{
-				return ((UINT64)state->m_crom_bank << 56);
+				return ((UINT64)m_crom_bank << 56);
 			}
 			break;
 
 		case 0x10/8:
 			if (ACCESSING_BITS_56_63)
 			{
-				UINT64 res = model3_tap_read(space->machine());
+				UINT64 res = model3_tap_read(machine());
 
 				return res<<61;
 			}
 			else if (ACCESSING_BITS_24_31)
 			{
-				return (state->m_irq_enable<<24);
+				return (m_irq_enable<<24);
 			}
 			else logerror("m3_sys: Unk sys_r @ 0x10: mask = %x\n", (UINT32)mem_mask);
 			break;
 		case 0x18/8:
-//          printf("read irq_state %x (PC %x)\n", state->m_irq_state, cpu_get_pc(&space->device()));
-			return (UINT64)state->m_irq_state<<56 | 0xff000000;
+//          printf("read irq_state %x (PC %x)\n", m_irq_state, cpu_get_pc(&space.device()));
+			return (UINT64)m_irq_state<<56 | 0xff000000;
 			break;
 	}
 
@@ -1551,9 +1551,9 @@ static READ64_HANDLER( model3_sys_r )
 	return 0;
 }
 
-static WRITE64_HANDLER( model3_sys_w )
+WRITE64_MEMBER(model3_state::model3_sys_w)
 {
-	model3_state *state = space->machine().driver_data<model3_state>();
+//OBRISI.ME
 //  printf("model3_sys_w: %llx to %x mask %llx\n", data, offset, mem_mask);
 
 	switch (offset)
@@ -1561,14 +1561,14 @@ static WRITE64_HANDLER( model3_sys_w )
 		case 0x10/8:
 			if (ACCESSING_BITS_24_31)
 			{
-				state->m_irq_enable = (data>>24)&0xff;
+				m_irq_enable = (data>>24)&0xff;
 			}
 			else logerror("m3_sys: unknown mask on IRQen write\n");
 			break;
 		case 0x18/8:
 			if ((mem_mask & 0xff000000) == 0xff000000)	// int ACK with bits in REVERSE ORDER from the other registers (Seeeee-gaaaa!)
 			{						// may also be a secondary enable based on behavior of e.g. magtruck VBL handler
-//              UINT32 old_irq = state->m_irq_state;
+//              UINT32 old_irq = m_irq_state;
 				UINT8 ack = (data>>24)&0xff, realack;
 				int i;
 
@@ -1590,7 +1590,7 @@ static WRITE64_HANDLER( model3_sys_w )
 
 //                      printf("%x to ack (realack %x)\n", ack, realack);
 
-						state->m_irq_state &= realack;
+						m_irq_state &= realack;
 						break;
 				}
 			}
@@ -1602,17 +1602,17 @@ static WRITE64_HANDLER( model3_sys_w )
 		case 0x08/8:
 			if (ACCESSING_BITS_56_63)
 			{
-				state->m_crom_bank = data >> 56;
+				m_crom_bank = data >> 56;
 
 				data >>= 56;
 				data = (~data) & 0x7;
 
-				memory_set_bankptr(space->machine(),  "bank1", space->machine().region( "user1" )->base() + 0x800000 + (data * 0x800000)); /* banked CROM */
+				memory_set_bankptr(machine(),  "bank1", machine().region( "user1" )->base() + 0x800000 + (data * 0x800000)); /* banked CROM */
 			}
 			if (ACCESSING_BITS_24_31)
 			{
 				data >>= 24;
-				model3_tap_write(space->machine(),
+				model3_tap_write(machine(),
 					(data >> 6) & 1,// TCK
 					(data >> 2) & 1,// TMS
 					(data >> 5) & 1,// TDI
@@ -1623,74 +1623,74 @@ static WRITE64_HANDLER( model3_sys_w )
 	}
 }
 
-static READ64_HANDLER( model3_rtc_r )
+READ64_MEMBER(model3_state::model3_rtc_r)
 {
-	model3_state *state = space->machine().driver_data<model3_state>();
+//OBRISI.ME
 	UINT64 r = 0;
 	if(ACCESSING_BITS_56_63) {
-		r |= (UINT64)state->rtc72421_r(*space, (offset*2)+0, (UINT32)(mem_mask >> 32)) << 32;
+		r |= (UINT64)rtc72421_r(*&space, (offset*2)+0, (UINT32)(mem_mask >> 32)) << 32;
 	}
 	if(ACCESSING_BITS_24_31) {
-		r |= (UINT64)state->rtc72421_r(*space, (offset*2)+1, (UINT32)(mem_mask));
+		r |= (UINT64)rtc72421_r(*&space, (offset*2)+1, (UINT32)(mem_mask));
 	}
 	return r;
 }
 
-static WRITE64_HANDLER( model3_rtc_w )
+WRITE64_MEMBER(model3_state::model3_rtc_w)
 {
-	model3_state *state = space->machine().driver_data<model3_state>();
+//OBRISI.ME
 	if(ACCESSING_BITS_56_63) {
-		state->rtc72421_w(*space, (offset*2)+0, (UINT32)(data >> 32), (UINT32)(mem_mask >> 32));
+		rtc72421_w(*&space, (offset*2)+0, (UINT32)(data >> 32), (UINT32)(mem_mask >> 32));
 	}
 	if(ACCESSING_BITS_24_31) {
-		state->rtc72421_w(*space, (offset*2)+1, (UINT32)(data), (UINT32)(mem_mask));
+		rtc72421_w(*&space, (offset*2)+1, (UINT32)(data), (UINT32)(mem_mask));
 	}
 }
 
-static READ64_HANDLER(real3d_status_r)
+READ64_MEMBER(model3_state::real3d_status_r)
 {
-	model3_state *state = space->machine().driver_data<model3_state>();
-	state->m_real3d_status ^= U64(0xffffffffffffffff);
+//OBRISI.ME
+	m_real3d_status ^= U64(0xffffffffffffffff);
 	if (offset == 0)
 	{
 		/* pretty sure this is VBLANK */
-		state->m_real3d_status &= ~U64(0x0000000200000000);
-		if (space->machine().primary_screen->vblank())
-			state->m_real3d_status |= U64(0x0000000200000000);
-		return state->m_real3d_status;
+		m_real3d_status &= ~U64(0x0000000200000000);
+		if (machine().primary_screen->vblank())
+			m_real3d_status |= U64(0x0000000200000000);
+		return m_real3d_status;
 	}
-	return state->m_real3d_status;
+	return m_real3d_status;
 }
 
 /* SCSP interface */
-static WRITE8_HANDLER(model3_sound_w)
+WRITE8_MEMBER(model3_state::model3_sound_w)
 {
-	model3_state *state = space->machine().driver_data<model3_state>();
+//OBRISI.ME
 
 	switch (offset)
 	{
 		case 0:
 			// clear the interrupt
-			model3_set_irq_line(space->machine(), 0x40, CLEAR_LINE);
+			model3_set_irq_line(machine(), 0x40, CLEAR_LINE);
 
 			// send to the sound board
-			scsp_midi_in(space->machine().device("scsp1"), 0, data, 0);
+			scsp_midi_in(machine().device("scsp1"), 0, data, 0);
 
-			if (state->m_sound_irq_enable)
+			if (m_sound_irq_enable)
 			{
-				state->m_sound_timer->adjust(attotime::from_msec(1));
+				m_sound_timer->adjust(attotime::from_msec(1));
 			}
 			break;
 
 		case 4:
 			if (data == 0x27)
 			{
-				state->m_sound_irq_enable = 1;
-				state->m_sound_timer->adjust(attotime::from_msec(1));
+				m_sound_irq_enable = 1;
+				m_sound_timer->adjust(attotime::from_msec(1));
 			}
 			else if (data == 0x06)
 			{
-				state->m_sound_irq_enable = 0;
+				m_sound_irq_enable = 0;
 			}
 			break;
 	}
@@ -1698,18 +1698,18 @@ static WRITE8_HANDLER(model3_sound_w)
 
 
 
-static READ64_HANDLER(network_r)
+READ64_MEMBER(model3_state::network_r)
 {
-	model3_state *state = space->machine().driver_data<model3_state>();
-	mame_printf_debug("network_r: %02X at %08X\n", offset, cpu_get_pc(&space->device()));
-	return state->m_network_ram[offset];
+//OBRISI.ME
+	mame_printf_debug("network_r: %02X at %08X\n", offset, cpu_get_pc(&space.device()));
+	return m_network_ram[offset];
 }
 
-static WRITE64_HANDLER(network_w)
+WRITE64_MEMBER(model3_state::network_w)
 {
-	model3_state *state = space->machine().driver_data<model3_state>();
-	COMBINE_DATA(state->m_network_ram + offset);
-	mame_printf_debug("network_w: %02X, %08X%08X at %08X\n", offset, (UINT32)(data >> 32), (UINT32)(data), cpu_get_pc(&space->device()));
+//OBRISI.ME
+	COMBINE_DATA(m_network_ram + offset);
+	mame_printf_debug("network_w: %02X, %08X%08X at %08X\n", offset, (UINT32)(data >> 32), (UINT32)(data), cpu_get_pc(&space.device()));
 }
 
 
@@ -1794,64 +1794,64 @@ static const UINT16 oceanhun_prot_data[] =
    discarded).
 */
 
-static READ64_HANDLER(model3_security_r)
+READ64_MEMBER(model3_state::model3_security_r)
 {
-	model3_state *state = space->machine().driver_data<model3_state>();
+//OBRISI.ME
 	switch(offset)
 	{
 		case 0x00/8:	return 0;		/* status */
 		case 0x1c/8:					/* security board data read */
 		{
-			if (mame_stricmp(space->machine().system().name, "vs299") == 0 ||
-				mame_stricmp(space->machine().system().name, "vs2v991") == 0)
+			if (mame_stricmp(machine().system().name, "vs299") == 0 ||
+				mame_stricmp(machine().system().name, "vs2v991") == 0)
 			{
-				return (UINT64)vs299_prot_data[state->m_prot_data_ptr++] << 48;
+				return (UINT64)vs299_prot_data[m_prot_data_ptr++] << 48;
 			}
-			else if (mame_stricmp(space->machine().system().name, "swtrilgy") == 0 ||
-					 mame_stricmp(space->machine().system().name, "swtrilgya") == 0)
+			else if (mame_stricmp(machine().system().name, "swtrilgy") == 0 ||
+					 mame_stricmp(machine().system().name, "swtrilgya") == 0)
 			{
-				UINT64 data = (UINT64)swt_prot_data[state->m_prot_data_ptr++] << 16;
-				if (state->m_prot_data_ptr > 0x38)
+				UINT64 data = (UINT64)swt_prot_data[m_prot_data_ptr++] << 16;
+				if (m_prot_data_ptr > 0x38)
 				{
-					state->m_prot_data_ptr = 0;
+					m_prot_data_ptr = 0;
 				}
 				return data;
 			}
-			else if (mame_stricmp(space->machine().system().name, "fvipers2") == 0)
+			else if (mame_stricmp(machine().system().name, "fvipers2") == 0)
 			{
-				UINT64 data = (UINT64)fvipers2_prot_data[state->m_prot_data_ptr++] << 16;
-				if (state->m_prot_data_ptr >= 0x41)
+				UINT64 data = (UINT64)fvipers2_prot_data[m_prot_data_ptr++] << 16;
+				if (m_prot_data_ptr >= 0x41)
 				{
-					state->m_prot_data_ptr = 0;
+					m_prot_data_ptr = 0;
 				}
 				return data;
 			}
-			else if (mame_stricmp(space->machine().system().name, "spikeout") == 0 ||
-					 mame_stricmp(space->machine().system().name, "spikeofe") == 0)
+			else if (mame_stricmp(machine().system().name, "spikeout") == 0 ||
+					 mame_stricmp(machine().system().name, "spikeofe") == 0)
 			{
-				UINT64 data = (UINT64)spikeout_prot_data[state->m_prot_data_ptr++] << 16;
-				if (state->m_prot_data_ptr >= 0x55)
+				UINT64 data = (UINT64)spikeout_prot_data[m_prot_data_ptr++] << 16;
+				if (m_prot_data_ptr >= 0x55)
 				{
-					state->m_prot_data_ptr = 0;
+					m_prot_data_ptr = 0;
 				}
 				return data;
 			}
-			else if (mame_stricmp(space->machine().system().name, "eca") == 0 ||
-					 mame_stricmp(space->machine().system().name, "ecax") == 0)
+			else if (mame_stricmp(machine().system().name, "eca") == 0 ||
+					 mame_stricmp(machine().system().name, "ecax") == 0)
 			{
-				UINT64 data = (UINT64)eca_prot_data[state->m_prot_data_ptr++] << 16;
-				if (state->m_prot_data_ptr >= 0x31)
+				UINT64 data = (UINT64)eca_prot_data[m_prot_data_ptr++] << 16;
+				if (m_prot_data_ptr >= 0x31)
 				{
-					state->m_prot_data_ptr = 0;
+					m_prot_data_ptr = 0;
 				}
 				return data;
 			}
-			else if (mame_stricmp(space->machine().system().name, "oceanhun") == 0)
+			else if (mame_stricmp(machine().system().name, "oceanhun") == 0)
 			{
-				UINT64 data = (UINT64)oceanhun_prot_data[state->m_prot_data_ptr++] << 16;
-				if (state->m_prot_data_ptr >= 58)
+				UINT64 data = (UINT64)oceanhun_prot_data[m_prot_data_ptr++] << 16;
+				if (m_prot_data_ptr >= 58)
 				{
-					state->m_prot_data_ptr = 0;
+					m_prot_data_ptr = 0;
 				}
 				return data;
 			}
@@ -1864,32 +1864,32 @@ static READ64_HANDLER(model3_security_r)
 	return U64(0xffffffffffffffff);
 }
 
-static WRITE64_HANDLER(daytona2_rombank_w)
+WRITE64_MEMBER(model3_state::daytona2_rombank_w)
 {
 	if (ACCESSING_BITS_56_63)
 	{
 		data >>= 56;
 		data = (~data) & 0xf;
-		memory_set_bankptr(space->machine(),  "bank1", space->machine().region( "user1" )->base() + 0x800000 + (data * 0x800000)); /* banked CROM */
-		memory_set_bankptr(space->machine(),  "bank2", space->machine().region( "user1" )->base() + 0x800000 + (data * 0x800000)); /* banked CROM */
+		memory_set_bankptr(machine(),  "bank1", machine().region( "user1" )->base() + 0x800000 + (data * 0x800000)); /* banked CROM */
+		memory_set_bankptr(machine(),  "bank2", machine().region( "user1" )->base() + 0x800000 + (data * 0x800000)); /* banked CROM */
 	}
 }
 
 static ADDRESS_MAP_START( model3_mem, AS_PROGRAM, 64, model3_state )
 	AM_RANGE(0x00000000, 0x007fffff) AM_RAM	AM_BASE(m_work_ram)	/* work RAM */
 
-	AM_RANGE(0x84000000, 0x8400003f) AM_READ_LEGACY(real3d_status_r )
+	AM_RANGE(0x84000000, 0x8400003f) AM_READ(real3d_status_r )
 	AM_RANGE(0x88000000, 0x88000007) AM_WRITE(real3d_cmd_w )
 	AM_RANGE(0x8e000000, 0x8e0fffff) AM_WRITE(real3d_display_list_w )
 	AM_RANGE(0x98000000, 0x980fffff) AM_WRITE(real3d_polygon_ram_w )
 
-	AM_RANGE(0xf0040000, 0xf004003f) AM_MIRROR(0x0e000000) AM_READWRITE_LEGACY(model3_ctrl_r, model3_ctrl_w )
-	AM_RANGE(0xf0080000, 0xf008ffff) AM_MIRROR(0x0e000000) AM_WRITE8_LEGACY(model3_sound_w, U64(0xffffffffffffffff) )
+	AM_RANGE(0xf0040000, 0xf004003f) AM_MIRROR(0x0e000000) AM_READWRITE(model3_ctrl_r, model3_ctrl_w )
+	AM_RANGE(0xf0080000, 0xf008ffff) AM_MIRROR(0x0e000000) AM_WRITE8(model3_sound_w, U64(0xffffffffffffffff) )
 	AM_RANGE(0xf00c0000, 0xf00dffff) AM_MIRROR(0x0e000000) AM_RAM AM_SHARE("backup")	/* backup SRAM */
-	AM_RANGE(0xf0100000, 0xf010003f) AM_MIRROR(0x0e000000) AM_READWRITE_LEGACY(model3_sys_r, model3_sys_w )
-	AM_RANGE(0xf0140000, 0xf014003f) AM_MIRROR(0x0e000000) AM_READWRITE_LEGACY(model3_rtc_r, model3_rtc_w )
+	AM_RANGE(0xf0100000, 0xf010003f) AM_MIRROR(0x0e000000) AM_READWRITE(model3_sys_r, model3_sys_w )
+	AM_RANGE(0xf0140000, 0xf014003f) AM_MIRROR(0x0e000000) AM_READWRITE(model3_rtc_r, model3_rtc_w )
 	AM_RANGE(0xf0180000, 0xf019ffff) AM_MIRROR(0x0e000000) AM_RAM							/* Security Board RAM */
-	AM_RANGE(0xf01a0000, 0xf01a003f) AM_MIRROR(0x0e000000) AM_READ_LEGACY(model3_security_r )	/* Security board */
+	AM_RANGE(0xf01a0000, 0xf01a003f) AM_MIRROR(0x0e000000) AM_READ(model3_security_r )	/* Security board */
 
 	AM_RANGE(0xf1000000, 0xf10f7fff) AM_READWRITE(model3_char_r, model3_char_w )	/* character RAM */
 	AM_RANGE(0xf10f8000, 0xf10fffff) AM_READWRITE(model3_tile_r, model3_tile_w )	/* tilemaps */
@@ -5066,21 +5066,21 @@ ROM_END
 
 /* Model 3 sound board emulation */
 
-static WRITE16_HANDLER( model3snd_ctrl )
+WRITE16_MEMBER(model3_state::model3snd_ctrl)
 {
 	// handle sample banking
-	if (space->machine().region("scsp2")->bytes() > 0x800000)
+	if (machine().region("scsp2")->bytes() > 0x800000)
 	{
-		UINT8 *snd = space->machine().region("scsp2")->base();
+		UINT8 *snd = machine().region("scsp2")->base();
 		if (data & 0x20)
 		{
-			memory_set_bankptr(space->machine(), "bank4", snd + 0x200000);
-			memory_set_bankptr(space->machine(), "bank5", snd + 0x600000);
+			memory_set_bankptr(machine(), "bank4", snd + 0x200000);
+			memory_set_bankptr(machine(), "bank5", snd + 0x600000);
 		}
 		else
 		{
-			memory_set_bankptr(space->machine(), "bank4", snd + 0x800000);
-			memory_set_bankptr(space->machine(), "bank5", snd + 0xa00000);
+			memory_set_bankptr(machine(), "bank4", snd + 0x800000);
+			memory_set_bankptr(machine(), "bank5", snd + 0xa00000);
 		}
 	}
 }
@@ -5090,7 +5090,7 @@ static ADDRESS_MAP_START( model3_snd, AS_PROGRAM, 16, model3_state )
 	AM_RANGE(0x100000, 0x100fff) AM_DEVREADWRITE_LEGACY("scsp1", scsp_r, scsp_w)
 	AM_RANGE(0x200000, 0x27ffff) AM_RAM AM_REGION("scsp2", 0)
 	AM_RANGE(0x300000, 0x300fff) AM_DEVREADWRITE_LEGACY("scsp2", scsp_r, scsp_w)
-	AM_RANGE(0x400000, 0x400001) AM_WRITE_LEGACY(model3snd_ctrl)
+	AM_RANGE(0x400000, 0x400001) AM_WRITE(model3snd_ctrl)
 	AM_RANGE(0x600000, 0x67ffff) AM_ROM AM_REGION("audiocpu", 0x80000)
 	AM_RANGE(0x800000, 0x9fffff) AM_ROM AM_REGION("samples", 0)
 	AM_RANGE(0xa00000, 0xdfffff) AM_ROMBANK("bank4")
@@ -5355,57 +5355,62 @@ static void interleave_vroms(running_machine &machine)
 
 static DRIVER_INIT( model3_10 )
 {
+	model3_state *state = machine.driver_data<model3_state>();
 	interleave_vroms(machine);
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xc0000000, 0xc00000ff, FUNC(scsi_r), FUNC(scsi_w) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xc0000000, 0xc00000ff, read64_delegate(FUNC(model3_state::scsi_r),state), write64_delegate(FUNC(model3_state::scsi_w),state));
 
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0xff000000, 0xff7fffff, "bank1" );
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xf0800cf8, 0xf0800cff, FUNC(mpc105_addr_r), FUNC(mpc105_addr_w) );
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xf0c00cf8, 0xf0c00cff, FUNC(mpc105_data_r), FUNC(mpc105_data_w) );
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xf8fff000, 0xf8fff0ff, FUNC(mpc105_reg_r), FUNC(mpc105_reg_w) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xf0800cf8, 0xf0800cff, read64_delegate(FUNC(model3_state::mpc105_addr_r),state), write64_delegate(FUNC(model3_state::mpc105_addr_w),state));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xf0c00cf8, 0xf0c00cff, read64_delegate(FUNC(model3_state::mpc105_data_r),state), write64_delegate(FUNC(model3_state::mpc105_data_w),state));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xf8fff000, 0xf8fff0ff, read64_delegate(FUNC(model3_state::mpc105_reg_r),state), write64_delegate(FUNC(model3_state::mpc105_reg_w),state));
 }
 
 static DRIVER_INIT( model3_15 )
 {
+	model3_state *state = machine.driver_data<model3_state>();
 	interleave_vroms(machine);
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0xff000000, 0xff7fffff, "bank1" );
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xf0800cf8, 0xf0800cff, FUNC(mpc105_addr_r), FUNC(mpc105_addr_w) );
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xf0c00cf8, 0xf0c00cff, FUNC(mpc105_data_r), FUNC(mpc105_data_w) );
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xf8fff000, 0xf8fff0ff, FUNC(mpc105_reg_r), FUNC(mpc105_reg_w) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xf0800cf8, 0xf0800cff, read64_delegate(FUNC(model3_state::mpc105_addr_r),state), write64_delegate(FUNC(model3_state::mpc105_addr_w),state));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xf0c00cf8, 0xf0c00cff, read64_delegate(FUNC(model3_state::mpc105_data_r),state), write64_delegate(FUNC(model3_state::mpc105_data_w),state));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xf8fff000, 0xf8fff0ff, read64_delegate(FUNC(model3_state::mpc105_reg_r),state), write64_delegate(FUNC(model3_state::mpc105_reg_w),state));
 }
 
 static DRIVER_INIT( model3_20 )
 {
+	model3_state *state = machine.driver_data<model3_state>();
 	interleave_vroms(machine);
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0xff000000, 0xff7fffff, "bank1" );
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xc2000000, 0xc20000ff, FUNC(real3d_dma_r), FUNC(real3d_dma_w) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xc2000000, 0xc20000ff, read64_delegate(FUNC(model3_state::real3d_dma_r),state), write64_delegate(FUNC(model3_state::real3d_dma_w),state));
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xfec00000, 0xfedfffff, FUNC(mpc106_addr_r), FUNC(mpc106_addr_w) );
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xfee00000, 0xfeffffff, FUNC(mpc106_data_r), FUNC(mpc106_data_w) );
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xf8fff000, 0xf8fff0ff, FUNC(mpc106_reg_r), FUNC(mpc106_reg_w) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xfec00000, 0xfedfffff, read64_delegate(FUNC(model3_state::mpc106_addr_r),state), write64_delegate(FUNC(model3_state::mpc106_addr_w),state));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xfee00000, 0xfeffffff, read64_delegate(FUNC(model3_state::mpc106_data_r),state), write64_delegate(FUNC(model3_state::mpc106_data_w),state));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xf8fff000, 0xf8fff0ff, read64_delegate(FUNC(model3_state::mpc106_reg_r),state), write64_delegate(FUNC(model3_state::mpc106_reg_w),state));
 }
 
 static DRIVER_INIT( lostwsga )
 {
+	model3_state *state = machine.driver_data<model3_state>();
 	UINT32 *rom = (UINT32*)machine.region("user1")->base();
 
 	DRIVER_INIT_CALL(model3_15);
 	/* TODO: there's an M68K device at 0xC0000000 - FF, maybe lightgun controls ? */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xc1000000, 0xc10000ff, FUNC(scsi_r), FUNC(scsi_w) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xc1000000, 0xc10000ff, read64_delegate(FUNC(model3_state::scsi_r),state), write64_delegate(FUNC(model3_state::scsi_w),state));
 
 	rom[0x7374f0/4] = 0x38840004;		/* This seems to be an actual bug in the original code */
 }
 
 static DRIVER_INIT( scud )
 {
+	model3_state *state = machine.driver_data<model3_state>();
 	UINT32 *rom = (UINT32*)machine.region("user1")->base();
 
 	DRIVER_INIT_CALL(model3_15);
 	/* TODO: network device at 0xC0000000 - FF */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xf9000000, 0xf90000ff, FUNC(scsi_r), FUNC(scsi_w) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xf9000000, 0xf90000ff, read64_delegate(FUNC(model3_state::scsi_r),state), write64_delegate(FUNC(model3_state::scsi_w),state));
 
 	rom[(0x71275c^4)/4] = 0x60000000;
 	rom[(0x71277c^4)/4] = 0x60000000;
@@ -5413,11 +5418,12 @@ static DRIVER_INIT( scud )
 
 static DRIVER_INIT( scudp )
 {
+	model3_state *state = machine.driver_data<model3_state>();
 	UINT32 *rom = (UINT32*)machine.region("user1")->base();
 
 	DRIVER_INIT_CALL(model3_15);
 	/* TODO: network device at 0xC0000000 - FF */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xc1000000, 0xc10000ff, FUNC(scsi_r), FUNC(scsi_w) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xc1000000, 0xc10000ff, read64_delegate(FUNC(model3_state::scsi_r),state), write64_delegate(FUNC(model3_state::scsi_w),state));
 
 	rom[(0x713724^4)/4] = 0x60000000;
 	rom[(0x713744^4)/4] = 0x60000000;
@@ -5430,10 +5436,11 @@ static DRIVER_INIT( scudp )
 
 static DRIVER_INIT( lemans24 )
 {
+	model3_state *state = machine.driver_data<model3_state>();
 	UINT32 *rom = (UINT32*)machine.region("user1")->base();
 	DRIVER_INIT_CALL(model3_15);
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xc1000000, 0xc10000ff, FUNC(scsi_r), FUNC(scsi_w) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xc1000000, 0xc10000ff, read64_delegate(FUNC(model3_state::scsi_r),state), write64_delegate(FUNC(model3_state::scsi_w),state));
 
 	rom[(0x73fe38^4)/4] = 0x38840004;		/* This seems to be an actual bug in the original code */
 
@@ -5457,6 +5464,7 @@ static DRIVER_INIT( vf3 )
 
 static DRIVER_INIT( vs215 )
 {
+	model3_state *state = machine.driver_data<model3_state>();
 	UINT32 *rom = (UINT32*)machine.region("user1")->base();
 
 	rom[(0x70dde0^4)/4] = 0x60000000;
@@ -5466,17 +5474,18 @@ static DRIVER_INIT( vs215 )
 	interleave_vroms(machine);
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0xff000000, 0xff7fffff, "bank1" );
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xf9000000, 0xf90000ff, FUNC(scsi_r), FUNC(scsi_w) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xf9000000, 0xf90000ff, read64_delegate(FUNC(model3_state::scsi_r),state), write64_delegate(FUNC(model3_state::scsi_w),state));
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xf0800cf8, 0xf0800cff, FUNC(mpc106_addr_r), FUNC(mpc106_addr_w) );
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xfec00000, 0xfedfffff, FUNC(mpc106_addr_r), FUNC(mpc106_addr_w) );
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xf0c00cf8, 0xf0c00cff, FUNC(mpc106_data_r), FUNC(mpc106_data_w) );
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xfee00000, 0xfeffffff, FUNC(mpc106_data_r), FUNC(mpc106_data_w) );
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xf8fff000, 0xf8fff0ff, FUNC(mpc106_reg_r), FUNC(mpc106_reg_w) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xf0800cf8, 0xf0800cff, read64_delegate(FUNC(model3_state::mpc106_addr_r),state), write64_delegate(FUNC(model3_state::mpc106_addr_w),state));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xfec00000, 0xfedfffff, read64_delegate(FUNC(model3_state::mpc106_addr_r),state), write64_delegate(FUNC(model3_state::mpc106_addr_w),state));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xf0c00cf8, 0xf0c00cff, read64_delegate(FUNC(model3_state::mpc106_data_r),state), write64_delegate(FUNC(model3_state::mpc106_data_w),state));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xfee00000, 0xfeffffff, read64_delegate(FUNC(model3_state::mpc106_data_r),state), write64_delegate(FUNC(model3_state::mpc106_data_w),state));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xf8fff000, 0xf8fff0ff, read64_delegate(FUNC(model3_state::mpc106_reg_r),state), write64_delegate(FUNC(model3_state::mpc106_reg_w),state));
 }
 
 static DRIVER_INIT( vs29815 )
 {
+	model3_state *state = machine.driver_data<model3_state>();
 	UINT32 *rom = (UINT32*)machine.region("user1")->base();
 
 	rom[(0x6028ec^4)/4] = 0x60000000;
@@ -5485,17 +5494,18 @@ static DRIVER_INIT( vs29815 )
 	interleave_vroms(machine);
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0xff000000, 0xff7fffff, "bank1" );
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xf9000000, 0xf90000ff, FUNC(scsi_r), FUNC(scsi_w) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xf9000000, 0xf90000ff, read64_delegate(FUNC(model3_state::scsi_r),state), write64_delegate(FUNC(model3_state::scsi_w),state));
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xf0800cf8, 0xf0800cff, FUNC(mpc106_addr_r), FUNC(mpc106_addr_w) );
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xfec00000, 0xfedfffff, FUNC(mpc106_addr_r), FUNC(mpc106_addr_w) );
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xf0c00cf8, 0xf0c00cff, FUNC(mpc106_data_r), FUNC(mpc106_data_w) );
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xfee00000, 0xfeffffff, FUNC(mpc106_data_r), FUNC(mpc106_data_w) );
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xf8fff000, 0xf8fff0ff, FUNC(mpc106_reg_r), FUNC(mpc106_reg_w) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xf0800cf8, 0xf0800cff, read64_delegate(FUNC(model3_state::mpc106_addr_r),state), write64_delegate(FUNC(model3_state::mpc106_addr_w),state));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xfec00000, 0xfedfffff, read64_delegate(FUNC(model3_state::mpc106_addr_r),state), write64_delegate(FUNC(model3_state::mpc106_addr_w),state));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xf0c00cf8, 0xf0c00cff, read64_delegate(FUNC(model3_state::mpc106_data_r),state), write64_delegate(FUNC(model3_state::mpc106_data_w),state));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xfee00000, 0xfeffffff, read64_delegate(FUNC(model3_state::mpc106_data_r),state), write64_delegate(FUNC(model3_state::mpc106_data_w),state));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xf8fff000, 0xf8fff0ff, read64_delegate(FUNC(model3_state::mpc106_reg_r),state), write64_delegate(FUNC(model3_state::mpc106_reg_w),state));
 }
 
 static DRIVER_INIT( bass )
 {
+	model3_state *state = machine.driver_data<model3_state>();
 	UINT32 *rom = (UINT32*)machine.region("user1")->base();
 
 	rom[(0x7999a8^4)/4] = 0x60000000;
@@ -5504,25 +5514,26 @@ static DRIVER_INIT( bass )
 	interleave_vroms(machine);
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0xff000000, 0xff7fffff, "bank1" );
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xf9000000, 0xf90000ff, FUNC(scsi_r), FUNC(scsi_w) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xf9000000, 0xf90000ff, read64_delegate(FUNC(model3_state::scsi_r),state), write64_delegate(FUNC(model3_state::scsi_w),state));
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xf0800cf8, 0xf0800cff, FUNC(mpc106_addr_r), FUNC(mpc106_addr_w) );
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xfec00000, 0xfedfffff, FUNC(mpc106_addr_r), FUNC(mpc106_addr_w) );
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xf0c00cf8, 0xf0c00cff, FUNC(mpc106_data_r), FUNC(mpc106_data_w) );
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xfee00000, 0xfeffffff, FUNC(mpc106_data_r), FUNC(mpc106_data_w) );
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xf8fff000, 0xf8fff0ff, FUNC(mpc106_reg_r), FUNC(mpc106_reg_w) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xf0800cf8, 0xf0800cff, read64_delegate(FUNC(model3_state::mpc106_addr_r),state), write64_delegate(FUNC(model3_state::mpc106_addr_w),state));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xfec00000, 0xfedfffff, read64_delegate(FUNC(model3_state::mpc106_addr_r),state), write64_delegate(FUNC(model3_state::mpc106_addr_w),state));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xf0c00cf8, 0xf0c00cff, read64_delegate(FUNC(model3_state::mpc106_data_r),state), write64_delegate(FUNC(model3_state::mpc106_data_w),state));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xfee00000, 0xfeffffff, read64_delegate(FUNC(model3_state::mpc106_data_r),state), write64_delegate(FUNC(model3_state::mpc106_data_w),state));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xf8fff000, 0xf8fff0ff, read64_delegate(FUNC(model3_state::mpc106_reg_r),state), write64_delegate(FUNC(model3_state::mpc106_reg_w),state));
 }
 
 static DRIVER_INIT( getbass )
 {
+	model3_state *state = machine.driver_data<model3_state>();
 	interleave_vroms(machine);
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0xff000000, 0xff7fffff, "bank1" );
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xf9000000, 0xf90000ff, FUNC(scsi_r), FUNC(scsi_w) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xf9000000, 0xf90000ff, read64_delegate(FUNC(model3_state::scsi_r),state), write64_delegate(FUNC(model3_state::scsi_w),state));
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xf0800cf8, 0xf0800cff, FUNC(mpc105_addr_r), FUNC(mpc105_addr_w) );
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xf0c00cf8, 0xf0c00cff, FUNC(mpc105_data_r), FUNC(mpc105_data_w) );
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xf8fff000, 0xf8fff0ff, FUNC(mpc105_reg_r), FUNC(mpc105_reg_w) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xf0800cf8, 0xf0800cff, read64_delegate(FUNC(model3_state::mpc105_addr_r),state), write64_delegate(FUNC(model3_state::mpc105_addr_w),state));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xf0c00cf8, 0xf0c00cff, read64_delegate(FUNC(model3_state::mpc105_data_r),state), write64_delegate(FUNC(model3_state::mpc105_data_w),state));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xf8fff000, 0xf8fff0ff, read64_delegate(FUNC(model3_state::mpc105_reg_r),state), write64_delegate(FUNC(model3_state::mpc105_reg_w),state));
 }
 
 static DRIVER_INIT( vs2 )
@@ -5593,7 +5604,7 @@ static DRIVER_INIT( harley )
 	DRIVER_INIT_CALL(model3_20);
 
 	state->m_network_ram = auto_alloc_array_clear(machine, UINT64, 0x10000);
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xc0000000, 0xc00fffff, FUNC(network_r), FUNC(network_w) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xc0000000, 0xc00fffff, read64_delegate(FUNC(model3_state::network_r),state), write64_delegate(FUNC(model3_state::network_w),state));
 
 	rom[(0x50e8d4^4)/4] = 0x60000000;
 	rom[(0x50e8f4^4)/4] = 0x60000000;
@@ -5609,7 +5620,7 @@ static DRIVER_INIT( harleyb )
 	DRIVER_INIT_CALL(model3_20);
 
 	state->m_network_ram = auto_alloc_array_clear(machine, UINT64, 0x10000);
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xc0000000, 0xc00fffff, FUNC(network_r), FUNC(network_w) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xc0000000, 0xc00fffff, read64_delegate(FUNC(model3_state::network_r),state), write64_delegate(FUNC(model3_state::network_w),state));
 
 	//rom[(0x50e8d4^4)/4] = 0x60000000;
 	//rom[(0x50e8f4^4)/4] = 0x60000000;
@@ -5675,10 +5686,11 @@ static DRIVER_INIT( dirtdvls )
 
 static DRIVER_INIT( daytona2 )
 {
+	model3_state *state = machine.driver_data<model3_state>();
 	UINT32 *rom = (UINT32*)machine.region("user1")->base();
 	DRIVER_INIT_CALL(model3_20);
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xc3800000, 0xc3800007, FUNC(daytona2_rombank_w) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xc3800000, 0xc3800007, write64_delegate(FUNC(model3_state::daytona2_rombank_w),state));
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0xc3000000, 0xc37fffff, "bank2" );
 
 	//rom[(0x68468c^4)/4] = 0x60000000;
@@ -5689,10 +5701,11 @@ static DRIVER_INIT( daytona2 )
 
 static DRIVER_INIT( dayto2pe )
 {
+	model3_state *state = machine.driver_data<model3_state>();
 	UINT32 *rom = (UINT32*)machine.region("user1")->base();
 	DRIVER_INIT_CALL(model3_20);
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xc3800000, 0xc3800007, FUNC(daytona2_rombank_w) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xc3800000, 0xc3800007, write64_delegate(FUNC(model3_state::daytona2_rombank_w),state));
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0xc3000000, 0xc37fffff, "bank2" );
 
 	rom[(0x606784^4)/4] = 0x60000000;

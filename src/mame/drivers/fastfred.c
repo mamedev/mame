@@ -19,9 +19,9 @@
 // These values were derived based on disassembly of the code. Usually, it
 // was pretty obvious what the values should be. Of course, this will have
 // to change if a different ROM set ever surfaces.
-static READ8_HANDLER( fastfred_custom_io_r )
+READ8_MEMBER(fastfred_state::fastfred_custom_io_r)
 {
-    switch (cpu_get_pc(&space->device()))
+    switch (cpu_get_pc(&space.device()))
     {
     case 0x03c0: return 0x9d;
     case 0x03e6: return 0x9f;
@@ -47,14 +47,14 @@ static READ8_HANDLER( fastfred_custom_io_r )
     case 0x7b58: return 0x20;
     }
 
-    logerror("Uncaught custom I/O read %04X at %04X\n", 0xc800+offset, cpu_get_pc(&space->device()));
+    logerror("Uncaught custom I/O read %04X at %04X\n", 0xc800+offset, cpu_get_pc(&space.device()));
     return 0x00;
 }
 
-static READ8_HANDLER( flyboy_custom1_io_r )
+READ8_MEMBER(fastfred_state::flyboy_custom1_io_r)
 {
 
-	switch (cpu_get_pc(&space->device()))
+	switch (cpu_get_pc(&space.device()))
 	{
 	 case 0x049d: return 0xad;	/* compare */
 	 case 0x04b9:			/* compare with 0x9e ??? When ??? */
@@ -75,14 +75,14 @@ static READ8_HANDLER( flyboy_custom1_io_r )
 	 return 0x00;
 	}
 
-	logerror("Uncaught custom I/O read %04X at %04X\n", 0xc085+offset, cpu_get_pc(&space->device()));
+	logerror("Uncaught custom I/O read %04X at %04X\n", 0xc085+offset, cpu_get_pc(&space.device()));
 	return 0x00;
 }
 
-static READ8_HANDLER( flyboy_custom2_io_r )
+READ8_MEMBER(fastfred_state::flyboy_custom2_io_r)
 {
 
-	switch (cpu_get_pc(&space->device()))
+	switch (cpu_get_pc(&space.device()))
 	{
 	 case 0x0395: return 0xf7;	/* $C900 compare         */
 	 case 0x03f5:			/* $c8fd                 */
@@ -100,19 +100,19 @@ static READ8_HANDLER( flyboy_custom2_io_r )
 	 return 0x00;
 	}
 
-	logerror("Uncaught custom I/O read %04X at %04X\n", 0xc8fb+offset, cpu_get_pc(&space->device()));
+	logerror("Uncaught custom I/O read %04X at %04X\n", 0xc8fb+offset, cpu_get_pc(&space.device()));
 	return 0x00;
 }
 
 
-static READ8_HANDLER( jumpcoas_custom_io_r )
+READ8_MEMBER(fastfred_state::jumpcoas_custom_io_r)
 {
 	if (offset == 0x100)  return 0x63;
 
 	return 0x00;
 }
 
-static READ8_HANDLER( boggy84_custom_io_r )
+READ8_MEMBER(fastfred_state::boggy84_custom_io_r)
 {
 	if (offset == 0x100)  return 0x6a;
 
@@ -130,54 +130,54 @@ static MACHINE_START( imago )
 	gfx_element_set_source(machine.gfx[1], state->m_imago_sprites);
 }
 
-static WRITE8_HANDLER( imago_dma_irq_w )
+WRITE8_MEMBER(fastfred_state::imago_dma_irq_w)
 {
-	cputag_set_input_line(space->machine(), "maincpu", 0, data & 1 ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine(), "maincpu", 0, data & 1 ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static WRITE8_HANDLER( imago_sprites_bank_w )
+WRITE8_MEMBER(fastfred_state::imago_sprites_bank_w)
 {
-	fastfred_state *state = space->machine().driver_data<fastfred_state>();
-	state->m_imago_sprites_bank = (data & 2) >> 1;
+//OBRISI.ME
+	m_imago_sprites_bank = (data & 2) >> 1;
 }
 
-static WRITE8_HANDLER( imago_sprites_dma_w )
+WRITE8_MEMBER(fastfred_state::imago_sprites_dma_w)
 {
-	fastfred_state *state = space->machine().driver_data<fastfred_state>();
-	UINT8 *rom = (UINT8 *)space->machine().region("gfx2")->base();
+//OBRISI.ME
+	UINT8 *rom = (UINT8 *)machine().region("gfx2")->base();
 	UINT8 sprites_data;
 
-	sprites_data = rom[state->m_imago_sprites_address + 0x2000*0 + state->m_imago_sprites_bank * 0x1000];
-	state->m_imago_sprites[offset + 0x800*0] = sprites_data;
+	sprites_data = rom[m_imago_sprites_address + 0x2000*0 + m_imago_sprites_bank * 0x1000];
+	m_imago_sprites[offset + 0x800*0] = sprites_data;
 
-	sprites_data = rom[state->m_imago_sprites_address + 0x2000*1 + state->m_imago_sprites_bank * 0x1000];
-	state->m_imago_sprites[offset + 0x800*1] = sprites_data;
+	sprites_data = rom[m_imago_sprites_address + 0x2000*1 + m_imago_sprites_bank * 0x1000];
+	m_imago_sprites[offset + 0x800*1] = sprites_data;
 
-	sprites_data = rom[state->m_imago_sprites_address + 0x2000*2 + state->m_imago_sprites_bank * 0x1000];
-	state->m_imago_sprites[offset + 0x800*2] = sprites_data;
+	sprites_data = rom[m_imago_sprites_address + 0x2000*2 + m_imago_sprites_bank * 0x1000];
+	m_imago_sprites[offset + 0x800*2] = sprites_data;
 
-	gfx_element_mark_dirty(space->machine().gfx[1], offset/32);
+	gfx_element_mark_dirty(machine().gfx[1], offset/32);
 }
 
-static READ8_HANDLER( imago_sprites_offset_r )
+READ8_MEMBER(fastfred_state::imago_sprites_offset_r)
 {
-	fastfred_state *state = space->machine().driver_data<fastfred_state>();
-	state->m_imago_sprites_address = offset;
+//OBRISI.ME
+	m_imago_sprites_address = offset;
 	return 0xff; //not really used
 }
 
-static WRITE8_HANDLER( nmi_mask_w )
+WRITE8_MEMBER(fastfred_state::nmi_mask_w)
 {
-	fastfred_state *state = space->machine().driver_data<fastfred_state>();
+//OBRISI.ME
 
-	state->m_nmi_mask = data & 1;
+	m_nmi_mask = data & 1;
 }
 
-static WRITE8_HANDLER( sound_nmi_mask_w )
+WRITE8_MEMBER(fastfred_state::sound_nmi_mask_w)
 {
-	fastfred_state *state = space->machine().driver_data<fastfred_state>();
+//OBRISI.ME
 
-	state->m_sound_nmi_mask = data & 1;
+	m_sound_nmi_mask = data & 1;
 }
 
 static ADDRESS_MAP_START( fastfred_map, AS_PROGRAM, 8, fastfred_state )
@@ -190,7 +190,7 @@ static ADDRESS_MAP_START( fastfred_map, AS_PROGRAM, 8, fastfred_state )
 	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("BUTTONS") AM_WRITEONLY AM_BASE(m_background_color)
 	AM_RANGE(0xe800, 0xe800) AM_READ_PORT("JOYS")
 	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("DSW") AM_WRITENOP
-	AM_RANGE(0xf001, 0xf001) AM_WRITE_LEGACY(nmi_mask_w)
+	AM_RANGE(0xf001, 0xf001) AM_WRITE(nmi_mask_w)
 	AM_RANGE(0xf002, 0xf002) AM_WRITE_LEGACY(fastfred_colorbank1_w)
 	AM_RANGE(0xf003, 0xf003) AM_WRITE_LEGACY(fastfred_colorbank2_w)
 	AM_RANGE(0xf004, 0xf004) AM_WRITE_LEGACY(fastfred_charbank1_w)
@@ -216,7 +216,7 @@ static ADDRESS_MAP_START( jumpcoas_map, AS_PROGRAM, 8, fastfred_state )
 	AM_RANGE(0xe802, 0xe802) AM_READ_PORT("BUTTONS")
 	AM_RANGE(0xe803, 0xe803) AM_READ_PORT("JOYS")
 	AM_RANGE(0xf000, 0xf000) AM_WRITENOP // Unused, but initialized
-	AM_RANGE(0xf001, 0xf001) AM_WRITE_LEGACY(nmi_mask_w)
+	AM_RANGE(0xf001, 0xf001) AM_WRITE(nmi_mask_w)
 	AM_RANGE(0xf002, 0xf002) AM_WRITE_LEGACY(fastfred_colorbank1_w)
 	AM_RANGE(0xf003, 0xf003) AM_WRITE_LEGACY(fastfred_colorbank2_w)
 	AM_RANGE(0xf004, 0xf004) AM_WRITE_LEGACY(fastfred_charbank1_w)
@@ -232,10 +232,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( imago_map, AS_PROGRAM, 8, fastfred_state )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
-	AM_RANGE(0x1000, 0x1fff) AM_READ_LEGACY(imago_sprites_offset_r)
+	AM_RANGE(0x1000, 0x1fff) AM_READ(imago_sprites_offset_r)
 	AM_RANGE(0x2000, 0x6fff) AM_ROM
 	AM_RANGE(0xb000, 0xb3ff) AM_RAM // same fg videoram (which one of the 2 is really used?)
-	AM_RANGE(0xb800, 0xbfff) AM_RAM_WRITE_LEGACY(imago_sprites_dma_w)
+	AM_RANGE(0xb800, 0xbfff) AM_RAM_WRITE(imago_sprites_dma_w)
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xc800, 0xcbff) AM_RAM_WRITE_LEGACY(imago_fg_videoram_w) AM_BASE(m_imago_fg_videoram)
 	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE_LEGACY(fastfred_videoram_w) AM_BASE(m_videoram)
@@ -245,22 +245,22 @@ static ADDRESS_MAP_START( imago_map, AS_PROGRAM, 8, fastfred_state )
 	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("BUTTONS")
 	AM_RANGE(0xe800, 0xe800) AM_READ_PORT("JOYS")
 	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("DSW") AM_WRITENOP // writes 1 when level starts, 0 when game over
-	AM_RANGE(0xf001, 0xf001) AM_WRITE_LEGACY(nmi_mask_w)
+	AM_RANGE(0xf001, 0xf001) AM_WRITE(nmi_mask_w)
 	AM_RANGE(0xf002, 0xf002) AM_WRITE_LEGACY(fastfred_colorbank1_w)
 	AM_RANGE(0xf003, 0xf003) AM_WRITE_LEGACY(fastfred_colorbank2_w)
-	AM_RANGE(0xf004, 0xf004) AM_WRITE_LEGACY(imago_dma_irq_w)
+	AM_RANGE(0xf004, 0xf004) AM_WRITE(imago_dma_irq_w)
 	AM_RANGE(0xf005, 0xf005) AM_WRITE_LEGACY(imago_charbank_w)
 	AM_RANGE(0xf006, 0xf006) AM_WRITE_LEGACY(fastfred_flip_screen_x_w)
 	AM_RANGE(0xf007, 0xf007) AM_WRITE_LEGACY(fastfred_flip_screen_y_w)
 	AM_RANGE(0xf400, 0xf400) AM_WRITENOP // writes 0 or 2
-	AM_RANGE(0xf401, 0xf401) AM_WRITE_LEGACY(imago_sprites_bank_w)
+	AM_RANGE(0xf401, 0xf401) AM_WRITE(imago_sprites_bank_w)
 	AM_RANGE(0xf800, 0xf800) AM_READNOP AM_WRITE(soundlatch_byte_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, fastfred_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
-	AM_RANGE(0x3000, 0x3000) AM_READ(soundlatch_byte_r) AM_WRITE_LEGACY(sound_nmi_mask_w)
+	AM_RANGE(0x3000, 0x3000) AM_READ(soundlatch_byte_r) AM_WRITE(sound_nmi_mask_w)
 	AM_RANGE(0x4000, 0x4000) AM_WRITEONLY  // Reset PSG's
 	AM_RANGE(0x5000, 0x5001) AM_DEVWRITE_LEGACY("ay8910.1", ay8910_address_data_w)
 	AM_RANGE(0x6000, 0x6001) AM_DEVWRITE_LEGACY("ay8910.2", ay8910_address_data_w)
@@ -1009,8 +1009,8 @@ ROM_END
 static DRIVER_INIT( flyboy )
 {
 	fastfred_state *state = machine.driver_data<fastfred_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc085, 0xc099, FUNC(flyboy_custom1_io_r));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc8fb, 0xc900, FUNC(flyboy_custom2_io_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xc085, 0xc099, read8_delegate(FUNC(fastfred_state::flyboy_custom1_io_r),state));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xc8fb, 0xc900, read8_delegate(FUNC(fastfred_state::flyboy_custom2_io_r),state));
 	state->m_hardware_type = 1;
 }
 
@@ -1023,7 +1023,7 @@ static DRIVER_INIT( flyboyb )
 static DRIVER_INIT( fastfred )
 {
 	fastfred_state *state = machine.driver_data<fastfred_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc800, 0xcfff, FUNC(fastfred_custom_io_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xc800, 0xcfff, read8_delegate(FUNC(fastfred_state::fastfred_custom_io_r),state));
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0xc800, 0xcfff);
 	state->m_hardware_type = 1;
 }
@@ -1031,7 +1031,7 @@ static DRIVER_INIT( fastfred )
 static DRIVER_INIT( jumpcoas )
 {
 	fastfred_state *state = machine.driver_data<fastfred_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc800, 0xcfff, FUNC(jumpcoas_custom_io_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xc800, 0xcfff, read8_delegate(FUNC(fastfred_state::jumpcoas_custom_io_r),state));
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0xc800, 0xcfff);
 	state->m_hardware_type = 0;
 }
@@ -1039,7 +1039,7 @@ static DRIVER_INIT( jumpcoas )
 static DRIVER_INIT( boggy84b )
 {
 	fastfred_state *state = machine.driver_data<fastfred_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc800, 0xcfff, FUNC(jumpcoas_custom_io_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xc800, 0xcfff, read8_delegate(FUNC(fastfred_state::jumpcoas_custom_io_r),state));
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0xc800, 0xcfff);
 	state->m_hardware_type = 2;
 }
@@ -1047,7 +1047,7 @@ static DRIVER_INIT( boggy84b )
 static DRIVER_INIT( boggy84 )
 {
 	fastfred_state *state = machine.driver_data<fastfred_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc800, 0xcfff, FUNC(boggy84_custom_io_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xc800, 0xcfff, read8_delegate(FUNC(fastfred_state::boggy84_custom_io_r),state));
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0xc800, 0xcfff);
 	state->m_hardware_type = 2;
 }

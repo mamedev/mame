@@ -61,6 +61,22 @@ public:
 	DECLARE_WRITE8_MEMBER(ddragon_bgvideoram_w);
 	DECLARE_WRITE8_MEMBER(ddragon_fgvideoram_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(sub_cpu_busy);
+	DECLARE_WRITE8_MEMBER(ddragon_bankswitch_w);
+	DECLARE_WRITE8_MEMBER(toffy_bankswitch_w);
+	DECLARE_READ8_MEMBER(darktowr_mcu_bank_r);
+	DECLARE_WRITE8_MEMBER(darktowr_mcu_bank_w);
+	DECLARE_WRITE8_MEMBER(darktowr_bankswitch_w);
+	DECLARE_WRITE8_MEMBER(ddragon_interrupt_w);
+	DECLARE_WRITE8_MEMBER(ddragon2_sub_irq_ack_w);
+	DECLARE_WRITE8_MEMBER(ddragon2_sub_irq_w);
+	DECLARE_WRITE8_MEMBER(darktowr_mcu_w);
+	DECLARE_READ8_MEMBER(ddragon_hd63701_internal_registers_r);
+	DECLARE_WRITE8_MEMBER(ddragon_hd63701_internal_registers_w);
+	DECLARE_READ8_MEMBER(ddragon_spriteram_r);
+	DECLARE_WRITE8_MEMBER(ddragon_spriteram_w);
+	DECLARE_WRITE8_MEMBER(dd_adpcm_w);
+	DECLARE_READ8_MEMBER(dd_adpcm_status_r);
+	DECLARE_WRITE8_MEMBER(ddragonba_port_w);
 };
 
 

@@ -68,15 +68,15 @@ static MACHINE_RESET( batman )
  *
  *************************************/
 
-static READ16_HANDLER( batman_atarivc_r )
+READ16_MEMBER(batman_state::batman_atarivc_r)
 {
-	return atarivc_r(*space->machine().primary_screen, offset);
+	return atarivc_r(*machine().primary_screen, offset);
 }
 
 
-static WRITE16_HANDLER( batman_atarivc_w )
+WRITE16_MEMBER(batman_state::batman_atarivc_w)
 {
-	atarivc_w(*space->machine().primary_screen, offset, data, mem_mask);
+	atarivc_w(*machine().primary_screen, offset, data, mem_mask);
 }
 
 
@@ -87,34 +87,34 @@ static WRITE16_HANDLER( batman_atarivc_w )
  *
  *************************************/
 
-static READ16_HANDLER( special_port2_r )
+READ16_MEMBER(batman_state::special_port2_r)
 {
-	batman_state *state = space->machine().driver_data<batman_state>();
-	int result = input_port_read(space->machine(), "260010");
-	if (state->m_sound_to_cpu_ready) result ^= 0x0010;
-	if (state->m_cpu_to_sound_ready) result ^= 0x0020;
+//OBRISI.ME
+	int result = input_port_read(machine(), "260010");
+	if (m_sound_to_cpu_ready) result ^= 0x0010;
+	if (m_cpu_to_sound_ready) result ^= 0x0020;
 	return result;
 }
 
 
-static WRITE16_HANDLER( latch_w )
+WRITE16_MEMBER(batman_state::latch_w)
 {
-	batman_state *state = space->machine().driver_data<batman_state>();
-	int oldword = state->m_latch_data;
-	COMBINE_DATA(&state->m_latch_data);
+//OBRISI.ME
+	int oldword = m_latch_data;
+	COMBINE_DATA(&m_latch_data);
 
 	/* bit 4 is connected to the /RESET pin on the 6502 */
-	if (state->m_latch_data & 0x0010)
-		cputag_set_input_line(space->machine(), "jsa", INPUT_LINE_RESET, CLEAR_LINE);
+	if (m_latch_data & 0x0010)
+		cputag_set_input_line(machine(), "jsa", INPUT_LINE_RESET, CLEAR_LINE);
 	else
-		cputag_set_input_line(space->machine(), "jsa", INPUT_LINE_RESET, ASSERT_LINE);
+		cputag_set_input_line(machine(), "jsa", INPUT_LINE_RESET, ASSERT_LINE);
 
 	/* alpha bank is selected by the upper 4 bits */
-	if ((oldword ^ state->m_latch_data) & 0x7000)
+	if ((oldword ^ m_latch_data) & 0x7000)
 	{
-		space->machine().primary_screen->update_partial(space->machine().primary_screen->vpos());
-		state->m_alpha_tilemap->mark_all_dirty();
-		state->m_alpha_tile_bank = (state->m_latch_data >> 12) & 7;
+		machine().primary_screen->update_partial(machine().primary_screen->vpos());
+		m_alpha_tilemap->mark_all_dirty();
+		m_alpha_tile_bank = (m_latch_data >> 12) & 7;
 	}
 }
 
@@ -137,14 +137,14 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, batman_state )
 	AM_RANGE(0x120000, 0x120fff) AM_MIRROR(0x01f000) AM_READWRITE_LEGACY(atarigen_eeprom_r, atarigen_eeprom_w) AM_SHARE("eeprom")
 	AM_RANGE(0x260000, 0x260001) AM_MIRROR(0x11ff8c) AM_READ_PORT("260000")
 	AM_RANGE(0x260002, 0x260003) AM_MIRROR(0x11ff8c) AM_READ_PORT("260002")
-	AM_RANGE(0x260010, 0x260011) AM_MIRROR(0x11ff8e) AM_READ_LEGACY(special_port2_r)
+	AM_RANGE(0x260010, 0x260011) AM_MIRROR(0x11ff8e) AM_READ(special_port2_r)
 	AM_RANGE(0x260030, 0x260031) AM_MIRROR(0x11ff8e) AM_READ_LEGACY(atarigen_sound_r)
 	AM_RANGE(0x260040, 0x260041) AM_MIRROR(0x11ff8e) AM_WRITE_LEGACY(atarigen_sound_w)
-	AM_RANGE(0x260050, 0x260051) AM_MIRROR(0x11ff8e) AM_WRITE_LEGACY(latch_w)
+	AM_RANGE(0x260050, 0x260051) AM_MIRROR(0x11ff8e) AM_WRITE(latch_w)
 	AM_RANGE(0x260060, 0x260061) AM_MIRROR(0x11ff8e) AM_WRITE_LEGACY(atarigen_eeprom_enable_w)
 	AM_RANGE(0x2a0000, 0x2a0001) AM_MIRROR(0x11fffe) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0x3e0000, 0x3e0fff) AM_MIRROR(0x100000) AM_RAM_WRITE_LEGACY(atarigen_666_paletteram_w) AM_SHARE("paletteram")
-	AM_RANGE(0x3effc0, 0x3effff) AM_MIRROR(0x100000) AM_READWRITE_LEGACY(batman_atarivc_r, batman_atarivc_w) AM_BASE(m_atarivc_data)
+	AM_RANGE(0x3effc0, 0x3effff) AM_MIRROR(0x100000) AM_READWRITE(batman_atarivc_r, batman_atarivc_w) AM_BASE(m_atarivc_data)
 	AM_RANGE(0x3f0000, 0x3f1fff) AM_MIRROR(0x100000) AM_WRITE_LEGACY(atarigen_playfield2_latched_msb_w) AM_BASE(m_playfield2)
 	AM_RANGE(0x3f2000, 0x3f3fff) AM_MIRROR(0x100000) AM_WRITE_LEGACY(atarigen_playfield_latched_lsb_w) AM_BASE(m_playfield)
 	AM_RANGE(0x3f4000, 0x3f5fff) AM_MIRROR(0x100000) AM_WRITE_LEGACY(atarigen_playfield_dual_upper_w) AM_BASE(m_playfield_upper)

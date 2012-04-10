@@ -258,36 +258,36 @@ static void copro_fifoout_push(device_t *device, UINT32 data)
 }
 
 /* Timers - these count down at 25 MHz and pull IRQ2 when they hit 0 */
-static READ32_HANDLER( timers_r )
+READ32_MEMBER(model2_state::timers_r)
 {
-	model2_state *state = space->machine().driver_data<model2_state>();
-	i960_noburst(&space->device());
+//OBRISI.ME
+	i960_noburst(&space.device());
 
 	// if timer is running, calculate current value
-	if (state->m_timerrun[offset])
+	if (m_timerrun[offset])
 	{
 		// get elapsed time, convert to units of 25 MHz
-		UINT32 cur = (state->m_timers[offset]->time_elapsed() * 25000000).as_double();
+		UINT32 cur = (m_timers[offset]->time_elapsed() * 25000000).as_double();
 
 		// subtract units from starting value
-		state->m_timervals[offset] = state->m_timerorig[offset] - cur;
+		m_timervals[offset] = m_timerorig[offset] - cur;
 	}
 
-	return state->m_timervals[offset];
+	return m_timervals[offset];
 }
 
-static WRITE32_HANDLER( timers_w )
+WRITE32_MEMBER(model2_state::timers_w)
 {
-	model2_state *state = space->machine().driver_data<model2_state>();
+//OBRISI.ME
 	attotime period;
 
-	i960_noburst(&space->device());
-	COMBINE_DATA(&state->m_timervals[offset]);
+	i960_noburst(&space.device());
+	COMBINE_DATA(&m_timervals[offset]);
 
-	state->m_timerorig[offset] = state->m_timervals[offset];
-	period = attotime::from_hz(25000000) * state->m_timerorig[offset];
-	state->m_timers[offset]->adjust(period);
-	state->m_timerrun[offset] = 1;
+	m_timerorig[offset] = m_timervals[offset];
+	period = attotime::from_hz(25000000) * m_timerorig[offset];
+	m_timers[offset]->adjust(period);
+	m_timerrun[offset] = 1;
 }
 
 static TIMER_DEVICE_CALLBACK( model2_timer_cb )
@@ -409,42 +409,42 @@ static void chcolor(running_machine &machine, pen_t color, UINT16 data)
 	palette_set_color_rgb(machine, color, pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
 }
 
-static WRITE32_HANDLER( pal32_w )
+WRITE32_MEMBER(model2_state::pal32_w)
 {
-	model2_state *state = space->machine().driver_data<model2_state>();
-	COMBINE_DATA(state->m_paletteram32 + offset);
+//OBRISI.ME
+	COMBINE_DATA(m_paletteram32 + offset);
 	if(ACCESSING_BITS_0_15)
-		chcolor(space->machine(), offset * 2, state->m_paletteram32[offset]);
+		chcolor(machine(), offset * 2, m_paletteram32[offset]);
 	if(ACCESSING_BITS_16_31)
-		chcolor(space->machine(), offset * 2 + 1, state->m_paletteram32[offset] >> 16);
+		chcolor(machine(), offset * 2 + 1, m_paletteram32[offset] >> 16);
 }
 
-static WRITE32_HANDLER( ctrl0_w )
+WRITE32_MEMBER(model2_state::ctrl0_w)
 {
-	model2_state *state = space->machine().driver_data<model2_state>();
+//OBRISI.ME
 	if(ACCESSING_BITS_0_7)
 	{
-		eeprom_device *eeprom = space->machine().device<eeprom_device>("eeprom");
-		state->m_ctrlmode = data & 0x01;
+		eeprom_device *eeprom = machine().device<eeprom_device>("eeprom");
+		m_ctrlmode = data & 0x01;
 		eeprom->write_bit(data & 0x20);
 		eeprom->set_clock_line((data & 0x80) ? ASSERT_LINE : CLEAR_LINE);
 		eeprom->set_cs_line((data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
 	}
 }
 
-static WRITE32_HANDLER( analog_2b_w )
+WRITE32_MEMBER(model2_state::analog_2b_w)
 {
-	model2_state *state = space->machine().driver_data<model2_state>();
-	state->m_analog_channel = (data >> 16) & 0x07;
+//OBRISI.ME
+	m_analog_channel = (data >> 16) & 0x07;
 }
 
 
-static READ32_HANDLER( fifoctl_r )
+READ32_MEMBER(model2_state::fifoctl_r)
 {
-	model2_state *state = space->machine().driver_data<model2_state>();
+//OBRISI.ME
 	UINT32 r = 0;
 
-	if (state->m_copro_fifoout_num == 0)
+	if (m_copro_fifoout_num == 0)
 	{
 		r |= 1;
 	}
@@ -453,9 +453,9 @@ static READ32_HANDLER( fifoctl_r )
 	return r | 0x04;
 }
 
-static READ32_HANDLER( videoctl_r )
+READ32_MEMBER(model2_state::videoctl_r)
 {
-	return (space->machine().primary_screen->frame_number() & 1) << 2;
+	return (machine().primary_screen->frame_number() & 1) << 2;
 }
 
 CUSTOM_INPUT_MEMBER(model2_state::_1c00000_r)
@@ -561,22 +561,22 @@ CUSTOM_INPUT_MEMBER(model2_state::rchase2_devices_r)
 	return 0xffff;
 }
 
-static WRITE32_HANDLER( rchase2_devices_w )
+WRITE32_MEMBER(model2_state::rchase2_devices_w)
 {
-	model2_state *state = space->machine().driver_data<model2_state>();
+//OBRISI.ME
 	/*
     0x00040000 start 1 lamp
     0x00080000 start 2 lamp
     */
 
 	if(mem_mask == 0x0000ffff)
-		state->m_cmd_data = data;
+		m_cmd_data = data;
 }
 
 
-static WRITE32_HANDLER( srallyc_devices_w )
+WRITE32_MEMBER(model2_state::srallyc_devices_w)
 {
-	model2_state *state = space->machine().driver_data<model2_state>();
+//OBRISI.ME
 	/*
     0x00040000 start 1 lamp
     0x00200000 vr lamp
@@ -585,27 +585,27 @@ static WRITE32_HANDLER( srallyc_devices_w )
 
 	if(mem_mask == 0x000000ff || mem_mask == 0x0000ffff)
 	{
-		state->m_driveio_comm_data = data & 0xff;
-		cputag_set_input_line(space->machine(), "drivecpu", 0, HOLD_LINE);
+		m_driveio_comm_data = data & 0xff;
+		cputag_set_input_line(machine(), "drivecpu", 0, HOLD_LINE);
 	}
 }
 
 /*****************************************************************************/
 /* COPRO */
 
-static READ32_HANDLER(copro_prg_r)
+READ32_MEMBER(model2_state::copro_prg_r)
 {
 
 	return 0xffffffff;
 }
 
-static WRITE32_HANDLER(copro_prg_w)
+WRITE32_MEMBER(model2_state::copro_prg_w)
 {
-	model2_state *state = space->machine().driver_data<model2_state>();
-	if (state->m_coproctl & 0x80000000)
+//OBRISI.ME
+	if (m_coproctl & 0x80000000)
 	{
-		logerror("copro_prg_w: %08X:   %08X\n", state->m_coprocnt, data);
-		state->m_coprocnt++;
+		logerror("copro_prg_w: %08X:   %08X\n", m_coprocnt, data);
+		m_coprocnt++;
 	}
 	else
 	{
@@ -613,107 +613,107 @@ static WRITE32_HANDLER(copro_prg_w)
 	}
 }
 
-static WRITE32_HANDLER( copro_ctl1_w )
+WRITE32_MEMBER(model2_state::copro_ctl1_w)
 {
-	model2_state *state = space->machine().driver_data<model2_state>();
+//OBRISI.ME
 	// did hi bit change?
-	if ((data ^ state->m_coproctl) == 0x80000000)
+	if ((data ^ m_coproctl) == 0x80000000)
 	{
 		if (data & 0x80000000)
 		{
 			logerror("Start copro upload\n");
-			state->m_coprocnt = 0;
+			m_coprocnt = 0;
 		}
 		else
 		{
-			logerror("Boot copro, %d dwords\n", state->m_coprocnt);
-			if (state->m_dsp_type != DSP_TYPE_TGPX4)
+			logerror("Boot copro, %d dwords\n", m_coprocnt);
+			if (m_dsp_type != DSP_TYPE_TGPX4)
 			{
-				if (state->m_dsp_type == DSP_TYPE_SHARC)
-					cputag_set_input_line(space->machine(), "dsp", INPUT_LINE_HALT, CLEAR_LINE);
+				if (m_dsp_type == DSP_TYPE_SHARC)
+					cputag_set_input_line(machine(), "dsp", INPUT_LINE_HALT, CLEAR_LINE);
 				else
-					cputag_set_input_line(space->machine(), "tgp", INPUT_LINE_HALT, CLEAR_LINE);
+					cputag_set_input_line(machine(), "tgp", INPUT_LINE_HALT, CLEAR_LINE);
 			}
 		}
 	}
 
-	state->m_coproctl = data;
+	m_coproctl = data;
 }
 
-static WRITE32_HANDLER(copro_function_port_w)
+WRITE32_MEMBER(model2_state::copro_function_port_w)
 {
-	model2_state *state = space->machine().driver_data<model2_state>();
+//OBRISI.ME
 	UINT32 d = data & 0x800fffff;
 	UINT32 a = (offset >> 2) & 0xff;
 	d |= a << 23;
 
 	//logerror("copro_function_port_w: %08X, %08X, %08X\n", data, offset, mem_mask);
-	if (state->m_dsp_type == DSP_TYPE_SHARC)
-		copro_fifoin_push(space->machine().device("dsp"), d);
+	if (m_dsp_type == DSP_TYPE_SHARC)
+		copro_fifoin_push(machine().device("dsp"), d);
 	else
-		copro_fifoin_push(space->machine().device("tgp"), d);
+		copro_fifoin_push(machine().device("tgp"), d);
 }
 
-static READ32_HANDLER(copro_fifo_r)
+READ32_MEMBER(model2_state::copro_fifo_r)
 {
 	//logerror("copro_fifo_r: %08X, %08X\n", offset, mem_mask);
-	return copro_fifoout_pop(space);
+	return copro_fifoout_pop(&space);
 }
 
-static WRITE32_HANDLER(copro_fifo_w)
+WRITE32_MEMBER(model2_state::copro_fifo_w)
 {
-	model2_state *state = space->machine().driver_data<model2_state>();
-	if (state->m_coproctl & 0x80000000)
+//OBRISI.ME
+	if (m_coproctl & 0x80000000)
 	{
-		if (state->m_dsp_type == DSP_TYPE_SHARC)
+		if (m_dsp_type == DSP_TYPE_SHARC)
 		{
-			sharc_external_dma_write(space->machine().device("dsp"), state->m_coprocnt, data & 0xffff);
+			sharc_external_dma_write(machine().device("dsp"), m_coprocnt, data & 0xffff);
 		}
-		else if (state->m_dsp_type == DSP_TYPE_TGP)
+		else if (m_dsp_type == DSP_TYPE_TGP)
 		{
-			state->m_tgp_program[state->m_coprocnt] = data;
+			m_tgp_program[m_coprocnt] = data;
 		}
 
-		state->m_coprocnt++;
+		m_coprocnt++;
 	}
 	else
 	{
-		//mame_printf_debug("copro_fifo_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, cpu_get_pc(&space->device()));
-		if (state->m_dsp_type == DSP_TYPE_SHARC)
-			copro_fifoin_push(space->machine().device("dsp"), data);
+		//mame_printf_debug("copro_fifo_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, cpu_get_pc(&space.device()));
+		if (m_dsp_type == DSP_TYPE_SHARC)
+			copro_fifoin_push(machine().device("dsp"), data);
 		else
-			copro_fifoin_push(space->machine().device("tgp"), data);
+			copro_fifoin_push(machine().device("tgp"), data);
 	}
 }
 
-static WRITE32_HANDLER(copro_sharc_iop_w)
+WRITE32_MEMBER(model2_state::copro_sharc_iop_w)
 {
-	model2_state *state = space->machine().driver_data<model2_state>();
+//OBRISI.ME
 	/* FIXME: clean this up */
-	if ((strcmp(space->machine().system().name, "schamp" ) == 0) ||
-		(strcmp(space->machine().system().name, "sfight" ) == 0) ||
-		(strcmp(space->machine().system().name, "fvipers" ) == 0) ||
-		(strcmp(space->machine().system().name, "vstriker" ) == 0) ||
-		(strcmp(space->machine().system().name, "vstrikero" ) == 0) ||
-		(strcmp(space->machine().system().name, "gunblade" ) == 0) ||
-		(strcmp(space->machine().system().name, "von" ) == 0) ||
-		(strcmp(space->machine().system().name, "vonj" ) == 0) ||
-		(strcmp(space->machine().system().name, "rchase2" ) == 0))
+	if ((strcmp(machine().system().name, "schamp" ) == 0) ||
+		(strcmp(machine().system().name, "sfight" ) == 0) ||
+		(strcmp(machine().system().name, "fvipers" ) == 0) ||
+		(strcmp(machine().system().name, "vstriker" ) == 0) ||
+		(strcmp(machine().system().name, "vstrikero" ) == 0) ||
+		(strcmp(machine().system().name, "gunblade" ) == 0) ||
+		(strcmp(machine().system().name, "von" ) == 0) ||
+		(strcmp(machine().system().name, "vonj" ) == 0) ||
+		(strcmp(machine().system().name, "rchase2" ) == 0))
 	{
-		sharc_external_iop_write(space->machine().device("dsp"), offset, data);
+		sharc_external_iop_write(machine().device("dsp"), offset, data);
 	}
 	else
 	{
-		if ((state->m_iop_write_num & 1) == 0)
+		if ((m_iop_write_num & 1) == 0)
 		{
-			state->m_iop_data = data & 0xffff;
+			m_iop_data = data & 0xffff;
 		}
 		else
 		{
-			state->m_iop_data |= (data & 0xffff) << 16;
-			sharc_external_iop_write(space->machine().device("dsp"), offset, state->m_iop_data);
+			m_iop_data |= (data & 0xffff) << 16;
+			sharc_external_iop_write(machine().device("dsp"), offset, m_iop_data);
 		}
-		state->m_iop_write_num++;
+		m_iop_write_num++;
 	}
 }
 
@@ -725,53 +725,53 @@ static WRITE32_HANDLER(copro_sharc_iop_w)
 /* GEO */
 
 
-static WRITE32_HANDLER( geo_ctl1_w )
+WRITE32_MEMBER(model2_state::geo_ctl1_w)
 {
-	model2_state *state = space->machine().driver_data<model2_state>();
+//OBRISI.ME
 	// did hi bit change?
-	if ((data ^ state->m_geoctl) == 0x80000000)
+	if ((data ^ m_geoctl) == 0x80000000)
 	{
 		if (data & 0x80000000)
 		{
 			logerror("Start geo upload\n");
-			state->m_geocnt = 0;
+			m_geocnt = 0;
 		}
 		else
 		{
-			logerror("Boot geo, %d dwords\n", state->m_geocnt);
+			logerror("Boot geo, %d dwords\n", m_geocnt);
 		}
 	}
 
-	state->m_geoctl = data;
+	m_geoctl = data;
 }
 
 
 #ifdef UNUSED_FUNCTION
-static WRITE32_HANDLER( geo_sharc_ctl1_w )
+WRITE32_MEMBER(model2_state::geo_sharc_ctl1_w)
 {
-	model2_state *state = space->machine().driver_data<model2_state>();
+//OBRISI.ME
     // did hi bit change?
-    if ((data ^ state->m_geoctl) == 0x80000000)
+    if ((data ^ m_geoctl) == 0x80000000)
     {
         if (data & 0x80000000)
         {
             logerror("Start geo upload\n");
-            state->m_geocnt = 0;
+            m_geocnt = 0;
         }
         else
         {
-            logerror("Boot geo, %d dwords\n", state->m_geocnt);
-            cputag_set_input_line(space->machine(), "dsp2", INPUT_LINE_HALT, CLEAR_LINE);
-            //device_spin_until_time(&space->device(), attotime::from_usec(1000));       // Give the SHARC enough time to boot itself
+            logerror("Boot geo, %d dwords\n", m_geocnt);
+            cputag_set_input_line(machine(), "dsp2", INPUT_LINE_HALT, CLEAR_LINE);
+            //device_spin_until_time(&space.device(), attotime::from_usec(1000));       // Give the SHARC enough time to boot itself
         }
     }
 
-    state->m_geoctl = data;
+    m_geoctl = data;
 }
 
-static READ32_HANDLER(geo_sharc_fifo_r)
+READ32_MEMBER(model2_state::geo_sharc_fifo_r)
 {
-    if ((strcmp(space->machine().system().name, "manxtt" ) == 0) || (strcmp(space->machine().system().name, "srallyc" ) == 0))
+    if ((strcmp(machine().system().name, "manxtt" ) == 0) || (strcmp(machine().system().name, "srallyc" ) == 0))
     {
         return 8;
     }
@@ -782,94 +782,94 @@ static READ32_HANDLER(geo_sharc_fifo_r)
     }
 }
 
-static WRITE32_HANDLER(geo_sharc_fifo_w)
+WRITE32_MEMBER(model2_state::geo_sharc_fifo_w)
 {
-	model2_state *state = space->machine().driver_data<model2_state>();
-    if (state->m_geoctl & 0x80000000)
+//OBRISI.ME
+    if (m_geoctl & 0x80000000)
     {
-        sharc_external_dma_write(space->machine().device("dsp2"), state->m_geocnt, data & 0xffff);
+        sharc_external_dma_write(machine().device("dsp2"), m_geocnt, data & 0xffff);
 
-        state->m_geocnt++;
+        m_geocnt++;
     }
     else
     {
-        //mame_printf_debug("copro_fifo_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, cpu_get_pc(&space->device()));
+        //mame_printf_debug("copro_fifo_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, cpu_get_pc(&space.device()));
     }
 }
 
-static WRITE32_HANDLER(geo_sharc_iop_w)
+WRITE32_MEMBER(model2_state::geo_sharc_iop_w)
 {
-	model2_state *state = space->machine().driver_data<model2_state>();
-    if ((strcmp(space->machine().system().name, "schamp" ) == 0))
+//OBRISI.ME
+    if ((strcmp(machine().system().name, "schamp" ) == 0))
     {
-        sharc_external_iop_write(space->machine().device("dsp2"), offset, data);
+        sharc_external_iop_write(machine().device("dsp2"), offset, data);
     }
     else
     {
-        if ((state->m_geo_iop_write_num & 1) == 0)
+        if ((m_geo_iop_write_num & 1) == 0)
         {
-            state->m_geo_iop_data = data & 0xffff;
+            m_geo_iop_data = data & 0xffff;
         }
         else
         {
-            state->m_geo_iop_data |= (data & 0xffff) << 16;
-            sharc_external_iop_write(space->machine().device("dsp2"), offset, state->m_geo_iop_data);
+            m_geo_iop_data |= (data & 0xffff) << 16;
+            sharc_external_iop_write(machine().device("dsp2"), offset, m_geo_iop_data);
         }
-        state->m_geo_iop_write_num++;
+        m_geo_iop_write_num++;
     }
 }
 #endif
 
 
-static void push_geo_data(model2_state *state, UINT32 data)
+void model2_state::push_geo_data(UINT32 data)
 {
-	//mame_printf_debug("push_geo_data: %08X: %08X\n", 0x900000+state->m_geo_write_start_address, data);
-	state->m_bufferram[state->m_geo_write_start_address/4] = data;
-	state->m_geo_write_start_address += 4;
+	//mame_printf_debug("push_geo_data: %08X: %08X\n", 0x900000+m_geo_write_start_address, data);
+	m_bufferram[m_geo_write_start_address/4] = data;
+	m_geo_write_start_address += 4;
 }
 
-static READ32_HANDLER(geo_prg_r)
+READ32_MEMBER(model2_state::geo_prg_r)
 {
 	return 0xffffffff;
 }
 
-static WRITE32_HANDLER(geo_prg_w)
+WRITE32_MEMBER(model2_state::geo_prg_w)
 {
-	model2_state *state = space->machine().driver_data<model2_state>();
-	if (state->m_geoctl & 0x80000000)
+//OBRISI.ME
+	if (m_geoctl & 0x80000000)
 	{
-		//logerror("geo_prg_w: %08X:   %08X\n", state->m_geocnt, data);
-		state->m_geocnt++;
+		//logerror("geo_prg_w: %08X:   %08X\n", m_geocnt, data);
+		m_geocnt++;
 	}
 	else
 	{
-		//mame_printf_debug("GEO: %08X: push %08X\n", state->m_geo_write_start_address, data);
-		push_geo_data(state, data);
+		//mame_printf_debug("GEO: %08X: push %08X\n", m_geo_write_start_address, data);
+		push_geo_data(data);
 	}
 }
 
-static READ32_HANDLER( geo_r )
+READ32_MEMBER(model2_state::geo_r)
 {
-	model2_state *state = space->machine().driver_data<model2_state>();
+//OBRISI.ME
 	int address = offset * 4;
 	if (address == 0x2008)
 	{
-		return state->m_geo_write_start_address;
+		return m_geo_write_start_address;
 	}
 	else if (address == 0x3008)
 	{
-		return state->m_geo_read_start_address;
+		return m_geo_read_start_address;
 	}
 
 //  fatalerror("geo_r: %08X, %08X\n", address, mem_mask);
-	mame_printf_debug("geo_r: PC:%08x - %08X\n", cpu_get_pc(&space->device()), address);
+	mame_printf_debug("geo_r: PC:%08x - %08X\n", cpu_get_pc(&space.device()), address);
 
 	return 0;
 }
 
-static WRITE32_HANDLER( geo_w )
+WRITE32_MEMBER(model2_state::geo_w)
 {
-	model2_state *state = space->machine().driver_data<model2_state>();
+//OBRISI.ME
 	int address = offset * 4;
 
 	if (address < 0x1000)
@@ -883,7 +883,7 @@ static WRITE32_HANDLER( geo_w )
             for (i=0; i < 4; i++)
             {
                 mame_printf_debug("   %08X: %08X %08X %08X %08X\n", 0x900000+(a*4)+(i*16),
-                    state->m_bufferram[a+(i*4)+0], state->m_bufferram[a+(i*4)+1], state->m_bufferram[a+(i*4)+2], state->m_bufferram[a+(i*4)+3]);
+                    m_bufferram[a+(i*4)+0], m_bufferram[a+(i*4)+1], m_bufferram[a+(i*4)+2], m_bufferram[a+(i*4)+3]);
             }
         }
         else
@@ -907,7 +907,7 @@ static WRITE32_HANDLER( geo_w )
 			UINT32 r = 0;
 			r |= data & 0x800fffff;
 			r |= ((address >> 4) & 0x3f) << 23;
-			push_geo_data(state, r);
+			push_geo_data(r);
 		}
 		else
 		{
@@ -916,19 +916,19 @@ static WRITE32_HANDLER( geo_w )
 				UINT32 r = 0;
 				r |= data & 0x000fffff;
 				r |= ((address >> 4) & 0x3f) << 23;
-				push_geo_data(state, r);
+				push_geo_data(r);
 			}
 		}
 	}
 	else if (address == 0x1008)
 	{
 		//mame_printf_debug("GEO: Write Start Address: %08X\n", data);
-		state->m_geo_write_start_address = data & 0xfffff;
+		m_geo_write_start_address = data & 0xfffff;
 	}
 	else if (address == 0x3008)
 	{
 		//mame_printf_debug("GEO: Read Start Address: %08X\n", data);
-		state->m_geo_read_start_address = data & 0xfffff;
+		m_geo_read_start_address = data & 0xfffff;
 	}
 	else
 	{
@@ -939,24 +939,24 @@ static WRITE32_HANDLER( geo_w )
 /*****************************************************************************/
 
 
-static READ32_HANDLER(hotd_unk_r)
+READ32_MEMBER(model2_state::hotd_unk_r)
 {
 	return 0x000c0000;
 }
 
 #ifdef UNUSED_FUNCTION
-static READ32_HANDLER(sonic_unk_r)
+READ32_MEMBER(model2_state::sonic_unk_r)
 {
     return 0x001a0000;
 }
 #endif
 
-static READ32_HANDLER(daytona_unk_r)
+READ32_MEMBER(model2_state::daytona_unk_r)
 {
 	return 0x00400000;
 }
 
-static READ32_HANDLER(desert_unk_r)
+READ32_MEMBER(model2_state::desert_unk_r)
 {
 	// vcop needs bit 3 clear (infinite loop otherwise)
 	// desert needs other bits set (not sure which specifically)
@@ -964,31 +964,31 @@ static READ32_HANDLER(desert_unk_r)
 	return 0x00ff00f7;
 }
 
-static READ32_HANDLER(model2_irq_r)
+READ32_MEMBER(model2_state::model2_irq_r)
 {
-	model2_state *state = space->machine().driver_data<model2_state>();
-	i960_noburst(&space->device());
+//OBRISI.ME
+	i960_noburst(&space.device());
 
 	if (offset)
 	{
-		return state->m_intena;
+		return m_intena;
 	}
 
-	return state->m_intreq;
+	return m_intreq;
 }
 
-static WRITE32_HANDLER(model2_irq_w)
+WRITE32_MEMBER(model2_state::model2_irq_w)
 {
-	model2_state *state = space->machine().driver_data<model2_state>();
-	i960_noburst(&space->device());
+//OBRISI.ME
+	i960_noburst(&space.device());
 
 	if (offset)
 	{
-		COMBINE_DATA(&state->m_intena);
+		COMBINE_DATA(&m_intena);
 		return;
 	}
 
-	state->m_intreq &= data;
+	m_intreq &= data;
 }
 
 
@@ -1021,7 +1021,7 @@ static void snd_latch_to_68k_w(address_space *space, int data)
 	device_spin_until_time(&space->device(), attotime::from_usec(40));
 }
 
-static READ32_HANDLER( model2_serial_r )
+READ32_MEMBER(model2_state::model2_serial_r)
 {
 	if ((offset == 0) && (mem_mask == 0xffff0000))
 	{
@@ -1031,22 +1031,22 @@ static READ32_HANDLER( model2_serial_r )
 	return 0xffffffff;
 }
 
-static WRITE32_HANDLER( model2o_serial_w )
+WRITE32_MEMBER(model2_state::model2o_serial_w)
 {
 	if (mem_mask == 0x0000ffff)
 	{
-		snd_latch_to_68k_w(space, data&0xff);
+		snd_latch_to_68k_w(&space, data&0xff);
 	}
 }
 
-static WRITE32_HANDLER( model2_serial_w )
+WRITE32_MEMBER(model2_state::model2_serial_w)
 {
 	if (ACCESSING_BITS_0_7 && (offset == 0))
 	{
-		scsp_midi_in(space->machine().device("scsp"), 0, data&0xff, 0);
+		scsp_midi_in(machine().device("scsp"), 0, data&0xff, 0);
 
 		// give the 68k time to notice
-		device_spin_until_time(&space->device(), attotime::from_usec(40));
+		device_spin_until_time(&space.device(), attotime::from_usec(40));
 	}
 }
 
@@ -1068,9 +1068,9 @@ static const UINT8 DCOPKey1326[]=
 	0x43,0x66,0x54,0x11,0x99,0xfe,0xcc,0x8e,0xdd,0x87,0x11,0x89,0x22,0xdf,0x44,0x09
 };
 
-static READ32_HANDLER( model2_prot_r )
+READ32_MEMBER(model2_state::model2_prot_r)
 {
-	model2_state *state = space->machine().driver_data<model2_state>();
+//OBRISI.ME
 	UINT32 retval = 0;
 
 	if (offset == 0x10000/4)
@@ -1080,31 +1080,31 @@ static READ32_HANDLER( model2_prot_r )
 	}
 	else if (offset == 0x1000e/4)
 	{
-		retval = state->m_protram[state->m_protstate+1] | state->m_protram[state->m_protstate]<<8;
+		retval = m_protram[m_protstate+1] | m_protram[m_protstate]<<8;
 		retval <<= 16;
-		state->m_protstate+=2;
+		m_protstate+=2;
 	}
 	else if (offset == 0x7ff8/4)
 	{
-		retval = state->m_protram[state->m_protstate+1] | state->m_protram[state->m_protstate]<<8;
-		state->m_protstate+=2;
+		retval = m_protram[m_protstate+1] | m_protram[m_protstate]<<8;
+		m_protstate+=2;
 	}
 	else if (offset == 0x400c/4)
 	{
-		state->m_prot_a = !state->m_prot_a;
-		if (state->m_prot_a)
+		m_prot_a = !m_prot_a;
+		if (m_prot_a)
 			return 0xffff;
 		else
 			return 0xfff0;
 	}
-	else logerror("Unhandled Protection READ @ %x mask %x (PC=%x)\n", offset, mem_mask, cpu_get_pc(&space->device()));
+	else logerror("Unhandled Protection READ @ %x mask %x (PC=%x)\n", offset, mem_mask, cpu_get_pc(&space.device()));
 
 	return retval;
 }
 
-static WRITE32_HANDLER( model2_prot_w )
+WRITE32_MEMBER(model2_state::model2_prot_w)
 {
-	model2_state *state = space->machine().driver_data<model2_state>();
+//OBRISI.ME
 	if (mem_mask == 0xffff0000)
 	{
 		data >>= 16;
@@ -1112,7 +1112,7 @@ static WRITE32_HANDLER( model2_prot_w )
 
 	if (offset == 0x10008/4)
 	{
-		state->m_protpos = data;
+		m_protpos = data;
 	}
 	else if (offset == 0x1000c/4)
 	{
@@ -1120,13 +1120,13 @@ static WRITE32_HANDLER( model2_prot_w )
 		{
 			// dynamcop
 			case 0x7700:
-				strcpy((char *)state->m_protram+2, "UCHIDA MOMOKA   ");
+				strcpy((char *)m_protram+2, "UCHIDA MOMOKA   ");
 				break;
 
 			// dynamcop
 			case 0x1326:
-				state->m_protstate = 0;
-				memcpy(state->m_protram+2, DCOPKey1326, sizeof(DCOPKey1326));
+				m_protstate = 0;
+				memcpy(m_protram+2, DCOPKey1326, sizeof(DCOPKey1326));
 				break;
 
 			// zerogun
@@ -1145,18 +1145,18 @@ static WRITE32_HANDLER( model2_prot_w )
 			case 0x98CC:
 			case 0x3422:
 			case 0x10:
-				state->m_protstate = 0;
-				memcpy(state->m_protram+2, ZGUNProt+((2*state->m_protpos)/12)*8, sizeof(ZGUNProt));
+				m_protstate = 0;
+				memcpy(m_protram+2, ZGUNProt+((2*m_protpos)/12)*8, sizeof(ZGUNProt));
 				break;
 
 			// pltkids
 			case 0x7140:
-				state->m_protstate = 0;
-				strcpy((char *)state->m_protram+2, "98-PILOT  ");
+				m_protstate = 0;
+				strcpy((char *)m_protram+2, "98-PILOT  ");
 				break;
 
 			default:
-				state->m_protstate = 0;
+				m_protstate = 0;
 				break;
 		}
 	}
@@ -1164,21 +1164,21 @@ static WRITE32_HANDLER( model2_prot_w )
 	{
 		if (data == 0)
 		{
-			state->m_protstate = 0;
-			strcpy((char *)state->m_protram, "  TECMO LTD.  DEAD OR ALIVE  1996.10.22  VER. 1.00");
+			m_protstate = 0;
+			strcpy((char *)m_protram, "  TECMO LTD.  DEAD OR ALIVE  1996.10.22  VER. 1.00");
 		}
 	}
-	else logerror("Unhandled Protection WRITE %x @ %x mask %x (PC=%x)\n", data, offset, mem_mask, cpu_get_pc(&space->device()));
+	else logerror("Unhandled Protection WRITE %x @ %x mask %x (PC=%x)\n", data, offset, mem_mask, cpu_get_pc(&space.device()));
 
 }
 
 /* Daytona "To The MAXX" PIC protection simulation */
 
 
-static READ32_HANDLER( maxx_r )
+READ32_MEMBER(model2_state::maxx_r)
 {
-	model2_state *state = space->machine().driver_data<model2_state>();
-	UINT32 *ROM = (UINT32 *)space->machine().region("maincpu")->base();
+//OBRISI.ME
+	UINT32 *ROM = (UINT32 *)machine().region("maincpu")->base();
 
 	if (offset <= 0x1f/4)
 	{
@@ -1186,15 +1186,15 @@ static READ32_HANDLER( maxx_r )
 		if (mem_mask == 0xffff0000)
 		{
 			// 16-bit protection reads
-			state->m_maxxstate++;
-			state->m_maxxstate &= 0xf;
-			if (!state->m_maxxstate)
+			m_maxxstate++;
+			m_maxxstate &= 0xf;
+			if (!m_maxxstate)
 			{
 				return 0x00070000;
 			}
 			else
 			{
-				if (state->m_maxxstate & 0x2)
+				if (m_maxxstate & 0x2)
 				{
 					return 0;
 				}
@@ -1221,9 +1221,9 @@ static READ32_HANDLER( maxx_r )
 
 
 
-static READ32_HANDLER( network_r )
+READ32_MEMBER(model2_state::network_r)
 {
-	model2_state *state = space->machine().driver_data<model2_state>();
+//OBRISI.ME
 	if ((mem_mask == 0xffffffff) || (mem_mask == 0x0000ffff) || (mem_mask == 0xffff0000))
 	{
 		return 0xffffffff;
@@ -1231,51 +1231,51 @@ static READ32_HANDLER( network_r )
 
 	if (offset < 0x4000/4)
 	{
-		return state->m_netram[offset];
+		return m_netram[offset];
 	}
 
 	if (mem_mask == 0x00ff0000)
 	{
-		return state->m_sysres<<16;
+		return m_sysres<<16;
 	}
 	else if (mem_mask == 0x000000ff)
 	{
-		return state->m_zflagi;
+		return m_zflagi;
 	}
 
 	return 0xffffffff;
 }
 
-static WRITE32_HANDLER( network_w )
+WRITE32_MEMBER(model2_state::network_w)
 {
-	model2_state *state = space->machine().driver_data<model2_state>();
+//OBRISI.ME
 	if ((mem_mask == 0xffffffff) || (mem_mask == 0x0000ffff) || (mem_mask == 0xffff0000))
 	{
-		COMBINE_DATA(&state->m_netram[offset+0x4000/4]);
+		COMBINE_DATA(&m_netram[offset+0x4000/4]);
 		return;
 	}
 
 	if (offset < 0x4000/4)
 	{
-		COMBINE_DATA(&state->m_netram[offset]);
+		COMBINE_DATA(&m_netram[offset]);
 		return;
 	}
 
 	if (mem_mask == 0x00ff0000)
 	{
-		state->m_sysres = data>>16;
+		m_sysres = data>>16;
 	}
 	else if (mem_mask == 0x000000ff)
 	{
-		state->m_zflagi = data;
-		state->m_zflag = 0;
-		if (data & 0x01) state->m_zflag |= 0x80;
-		if (data & 0x80) state->m_zflag |= 0x01;
+		m_zflagi = data;
+		m_zflag = 0;
+		if (data & 0x01) m_zflag |= 0x80;
+		if (data & 0x80) m_zflag |= 0x01;
 	}
 }
 
 #ifdef UNUSED_FUNCTION
-static WRITE32_HANDLER( copro_w )
+WRITE32_MEMBER(model2_state::copro_w)
 {
 	int address = offset * 4;
 
@@ -1294,59 +1294,59 @@ static WRITE32_HANDLER( copro_w )
 }
 #endif
 
-static WRITE32_HANDLER(mode_w)
+WRITE32_MEMBER(model2_state::mode_w)
 {
 	mame_printf_debug("Mode = %08X\n", data);
 }
 
-static WRITE32_HANDLER(model2o_tex_w0)
+WRITE32_MEMBER(model2_state::model2o_tex_w0)
 {
-	model2_state *state = space->machine().driver_data<model2_state>();
+//OBRISI.ME
 	if ( (offset & 1) == 0 )
 	{
-		state->m_textureram0[offset>>1] &= 0xffff0000;
-		state->m_textureram0[offset>>1] |= data & 0xffff;
+		m_textureram0[offset>>1] &= 0xffff0000;
+		m_textureram0[offset>>1] |= data & 0xffff;
 	}
 	else
 	{
-		state->m_textureram0[offset>>1] &= 0x0000ffff;
-		state->m_textureram0[offset>>1] |= (data & 0xffff) << 16;
+		m_textureram0[offset>>1] &= 0x0000ffff;
+		m_textureram0[offset>>1] |= (data & 0xffff) << 16;
 	}
 }
 
-static WRITE32_HANDLER(model2o_tex_w1)
+WRITE32_MEMBER(model2_state::model2o_tex_w1)
 {
-	model2_state *state = space->machine().driver_data<model2_state>();
+//OBRISI.ME
 	if ( (offset & 1) == 0 )
 	{
-		state->m_textureram1[offset>>1] &= 0xffff0000;
-		state->m_textureram1[offset>>1] |= data & 0xffff;
+		m_textureram1[offset>>1] &= 0xffff0000;
+		m_textureram1[offset>>1] |= data & 0xffff;
 	}
 	else
 	{
-		state->m_textureram1[offset>>1] &= 0x0000ffff;
-		state->m_textureram1[offset>>1] |= (data & 0xffff) << 16;
+		m_textureram1[offset>>1] &= 0x0000ffff;
+		m_textureram1[offset>>1] |= (data & 0xffff) << 16;
 	}
 }
 
-static WRITE32_HANDLER(model2o_luma_w)
+WRITE32_MEMBER(model2_state::model2o_luma_w)
 {
-	model2_state *state = space->machine().driver_data<model2_state>();
+//OBRISI.ME
 	if ( (offset & 1) == 0 )
 	{
-		state->m_lumaram[offset>>1] &= 0xffff0000;
-		state->m_lumaram[offset>>1] |= data & 0xffff;
+		m_lumaram[offset>>1] &= 0xffff0000;
+		m_lumaram[offset>>1] |= data & 0xffff;
 	}
 	else
 	{
-		state->m_lumaram[offset>>1] &= 0x0000ffff;
-		state->m_lumaram[offset>>1] |= (data & 0xffff) << 16;
+		m_lumaram[offset>>1] &= 0x0000ffff;
+		m_lumaram[offset>>1] |= (data & 0xffff) << 16;
 	}
 }
 
-static WRITE32_HANDLER(model2_3d_zclip_w)
+WRITE32_MEMBER(model2_state::model2_3d_zclip_w)
 {
-	model2_3d_set_zclip( space->machine(), data & 0xFF );
+	model2_3d_set_zclip( machine(), data & 0xFF );
 }
 
 /* common map for all Model 2 versions */
@@ -1355,22 +1355,22 @@ static ADDRESS_MAP_START( model2_base_mem, AS_PROGRAM, 32, model2_state )
 
 	AM_RANGE(0x00500000, 0x005fffff) AM_RAM AM_BASE(m_workram)
 
-	AM_RANGE(0x00800000, 0x00803fff) AM_READWRITE_LEGACY(geo_r, geo_w)
+	AM_RANGE(0x00800000, 0x00803fff) AM_READWRITE(geo_r, geo_w)
 	//AM_RANGE(0x00800010, 0x00800013) AM_WRITENOP
 	//AM_RANGE(0x008000b0, 0x008000b3) AM_WRITENOP
 	//AM_RANGE(0x00804004, 0x0080400f) AM_WRITENOP  // quiet psikyo games
 
-	//AM_RANGE(0x00880000, 0x00883fff) AM_WRITE_LEGACY(copro_w)
+	//AM_RANGE(0x00880000, 0x00883fff) AM_WRITE(copro_w)
 
 	AM_RANGE(0x00900000, 0x0097ffff) AM_RAM AM_BASE(m_bufferram)
 
 
-	AM_RANGE(0x00980004, 0x00980007) AM_READ_LEGACY(fifoctl_r)
-	AM_RANGE(0x0098000c, 0x0098000f) AM_READ_LEGACY(videoctl_r)
+	AM_RANGE(0x00980004, 0x00980007) AM_READ(fifoctl_r)
+	AM_RANGE(0x0098000c, 0x0098000f) AM_READ(videoctl_r)
 
-	AM_RANGE(0x00e80000, 0x00e80007) AM_READWRITE_LEGACY(model2_irq_r, model2_irq_w)
+	AM_RANGE(0x00e80000, 0x00e80007) AM_READWRITE(model2_irq_r, model2_irq_w)
 
-	AM_RANGE(0x00f00000, 0x00f0000f) AM_READWRITE_LEGACY(timers_r, timers_w)
+	AM_RANGE(0x00f00000, 0x00f0000f) AM_READWRITE(timers_r, timers_w)
 
 	AM_RANGE(0x01000000, 0x0100ffff) AM_DEVREADWRITE("tile", segas24_tile, tile32_r, tile32_w) AM_MIRROR(0x110000)
 	AM_RANGE(0x01020000, 0x01020003) AM_WRITENOP AM_MIRROR(0x100000)		// Unknown, always 0
@@ -1379,17 +1379,17 @@ static ADDRESS_MAP_START( model2_base_mem, AS_PROGRAM, 32, model2_state )
 	AM_RANGE(0x01070000, 0x01070003) AM_WRITENOP AM_MIRROR(0x100000)		// Video synchronization switch
 	AM_RANGE(0x01080000, 0x010fffff) AM_DEVREADWRITE("tile", segas24_tile, char32_r, char32_w) AM_MIRROR(0x100000)
 
-	AM_RANGE(0x01800000, 0x01803fff) AM_RAM_WRITE_LEGACY(pal32_w) AM_BASE(m_paletteram32)
+	AM_RANGE(0x01800000, 0x01803fff) AM_RAM_WRITE(pal32_w) AM_BASE(m_paletteram32)
 	AM_RANGE(0x01810000, 0x0181bfff) AM_RAM AM_BASE(m_colorxlat)
-	AM_RANGE(0x0181c000, 0x0181c003) AM_WRITE_LEGACY(model2_3d_zclip_w)
-	AM_RANGE(0x01a10000, 0x01a1ffff) AM_READWRITE_LEGACY(network_r, network_w)
+	AM_RANGE(0x0181c000, 0x0181c003) AM_WRITE(model2_3d_zclip_w)
+	AM_RANGE(0x01a10000, 0x01a1ffff) AM_READWRITE(network_r, network_w)
 	AM_RANGE(0x01d00000, 0x01d03fff) AM_RAM AM_SHARE("backup1") // Backup sram
 	AM_RANGE(0x02000000, 0x03ffffff) AM_ROM AM_REGION("user1", 0)
 
 	// "extra" data
 	AM_RANGE(0x06000000, 0x06ffffff) AM_ROM AM_REGION("user1", 0x1000000)
 
-	AM_RANGE(0x10000000, 0x101fffff) AM_WRITE_LEGACY(mode_w)
+	AM_RANGE(0x10000000, 0x101fffff) AM_WRITE(mode_w)
 
 	AM_RANGE(0x11600000, 0x1167ffff) AM_RAM	AM_SHARE("share1") // framebuffer (last bronx)
 	AM_RANGE(0x11680000, 0x116fffff) AM_RAM	AM_SHARE("share1") // FB mirror
@@ -1400,28 +1400,28 @@ static ADDRESS_MAP_START( model2o_mem, AS_PROGRAM, 32, model2_state )
 	AM_RANGE(0x00200000, 0x0021ffff) AM_RAM
 	AM_RANGE(0x00220000, 0x0023ffff) AM_ROM AM_REGION("maincpu", 0x20000)
 
-	AM_RANGE(0x00804000, 0x00807fff) AM_READWRITE_LEGACY(geo_prg_r, geo_prg_w)
+	AM_RANGE(0x00804000, 0x00807fff) AM_READWRITE(geo_prg_r, geo_prg_w)
 
-	AM_RANGE(0x00804000, 0x00807fff) AM_READWRITE_LEGACY(geo_prg_r, geo_prg_w)
-	AM_RANGE(0x00880000, 0x00883fff) AM_WRITE_LEGACY(copro_function_port_w)
-	AM_RANGE(0x00884000, 0x00887fff) AM_READWRITE_LEGACY(copro_fifo_r, copro_fifo_w)
+	AM_RANGE(0x00804000, 0x00807fff) AM_READWRITE(geo_prg_r, geo_prg_w)
+	AM_RANGE(0x00880000, 0x00883fff) AM_WRITE(copro_function_port_w)
+	AM_RANGE(0x00884000, 0x00887fff) AM_READWRITE(copro_fifo_r, copro_fifo_w)
 
-	AM_RANGE(0x00980000, 0x00980003) AM_WRITE_LEGACY(copro_ctl1_w )
-	AM_RANGE(0x00980008, 0x0098000b) AM_WRITE_LEGACY(geo_ctl1_w )
-	AM_RANGE(0x009c0000, 0x009cffff) AM_READWRITE_LEGACY(model2_serial_r, model2o_serial_w )
+	AM_RANGE(0x00980000, 0x00980003) AM_WRITE(copro_ctl1_w )
+	AM_RANGE(0x00980008, 0x0098000b) AM_WRITE(geo_ctl1_w )
+	AM_RANGE(0x009c0000, 0x009cffff) AM_READWRITE(model2_serial_r, model2o_serial_w )
 
-	AM_RANGE(0x12000000, 0x121fffff) AM_RAM_WRITE_LEGACY(model2o_tex_w0) AM_MIRROR(0x200000) AM_BASE(m_textureram0)	// texture RAM 0
-	AM_RANGE(0x12400000, 0x125fffff) AM_RAM_WRITE_LEGACY(model2o_tex_w1) AM_MIRROR(0x200000) AM_BASE(m_textureram1)	// texture RAM 1
-	AM_RANGE(0x12800000, 0x1281ffff) AM_RAM_WRITE_LEGACY(model2o_luma_w) AM_BASE(m_lumaram) // polygon "luma" RAM
+	AM_RANGE(0x12000000, 0x121fffff) AM_RAM_WRITE(model2o_tex_w0) AM_MIRROR(0x200000) AM_BASE(m_textureram0)	// texture RAM 0
+	AM_RANGE(0x12400000, 0x125fffff) AM_RAM_WRITE(model2o_tex_w1) AM_MIRROR(0x200000) AM_BASE(m_textureram1)	// texture RAM 1
+	AM_RANGE(0x12800000, 0x1281ffff) AM_RAM_WRITE(model2o_luma_w) AM_BASE(m_lumaram) // polygon "luma" RAM
 
 	AM_RANGE(0x01c00000, 0x01c00003) AM_READ_PORT("1c00000")
 	AM_RANGE(0x01c00004, 0x01c00007) AM_READ_PORT("1c00004")
 	AM_RANGE(0x01c00010, 0x01c00013) AM_READ_PORT("1c00010")
 	AM_RANGE(0x01c00014, 0x01c00017) AM_READ_PORT("1c00014")
-	AM_RANGE(0x01c0001c, 0x01c0001f) AM_READ_LEGACY(desert_unk_r )
-	AM_RANGE(0x01c00040, 0x01c00043) AM_READ_LEGACY(daytona_unk_r )
+	AM_RANGE(0x01c0001c, 0x01c0001f) AM_READ(desert_unk_r )
+	AM_RANGE(0x01c00040, 0x01c00043) AM_READ(daytona_unk_r )
 	AM_RANGE(0x01c00200, 0x01c002ff) AM_RAM AM_SHARE("backup2")
-	AM_RANGE(0x01c80000, 0x01c80003) AM_READWRITE_LEGACY(model2_serial_r, model2o_serial_w )
+	AM_RANGE(0x01c80000, 0x01c80003) AM_READWRITE(model2_serial_r, model2o_serial_w )
 
 	AM_IMPORT_FROM(model2_base_mem)
 ADDRESS_MAP_END
@@ -1430,27 +1430,27 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( model2a_crx_mem, AS_PROGRAM, 32, model2_state )
 	AM_RANGE(0x00200000, 0x0023ffff) AM_RAM
 
-	AM_RANGE(0x00804000, 0x00807fff) AM_READWRITE_LEGACY(geo_prg_r, geo_prg_w)
+	AM_RANGE(0x00804000, 0x00807fff) AM_READWRITE(geo_prg_r, geo_prg_w)
 
-	AM_RANGE(0x00804000, 0x00807fff) AM_READWRITE_LEGACY(geo_prg_r, geo_prg_w)
-	AM_RANGE(0x00880000, 0x00883fff) AM_WRITE_LEGACY(copro_function_port_w)
-	AM_RANGE(0x00884000, 0x00887fff) AM_READWRITE_LEGACY(copro_fifo_r, copro_fifo_w)
+	AM_RANGE(0x00804000, 0x00807fff) AM_READWRITE(geo_prg_r, geo_prg_w)
+	AM_RANGE(0x00880000, 0x00883fff) AM_WRITE(copro_function_port_w)
+	AM_RANGE(0x00884000, 0x00887fff) AM_READWRITE(copro_fifo_r, copro_fifo_w)
 
-	AM_RANGE(0x00980000, 0x00980003) AM_WRITE_LEGACY(copro_ctl1_w )
-	AM_RANGE(0x00980008, 0x0098000b) AM_WRITE_LEGACY(geo_ctl1_w )
-	AM_RANGE(0x009c0000, 0x009cffff) AM_READWRITE_LEGACY(model2_serial_r, model2_serial_w )
+	AM_RANGE(0x00980000, 0x00980003) AM_WRITE(copro_ctl1_w )
+	AM_RANGE(0x00980008, 0x0098000b) AM_WRITE(geo_ctl1_w )
+	AM_RANGE(0x009c0000, 0x009cffff) AM_READWRITE(model2_serial_r, model2_serial_w )
 
-	AM_RANGE(0x12000000, 0x121fffff) AM_RAM_WRITE_LEGACY(model2o_tex_w0) AM_MIRROR(0x200000) AM_BASE(m_textureram0)	// texture RAM 0
-	AM_RANGE(0x12400000, 0x125fffff) AM_RAM_WRITE_LEGACY(model2o_tex_w1) AM_MIRROR(0x200000) AM_BASE(m_textureram1)	// texture RAM 1
-	AM_RANGE(0x12800000, 0x1281ffff) AM_RAM_WRITE_LEGACY(model2o_luma_w) AM_BASE(m_lumaram) // polygon "luma" RAM
+	AM_RANGE(0x12000000, 0x121fffff) AM_RAM_WRITE(model2o_tex_w0) AM_MIRROR(0x200000) AM_BASE(m_textureram0)	// texture RAM 0
+	AM_RANGE(0x12400000, 0x125fffff) AM_RAM_WRITE(model2o_tex_w1) AM_MIRROR(0x200000) AM_BASE(m_textureram1)	// texture RAM 1
+	AM_RANGE(0x12800000, 0x1281ffff) AM_RAM_WRITE(model2o_luma_w) AM_BASE(m_lumaram) // polygon "luma" RAM
 
-	AM_RANGE(0x01c00000, 0x01c00003) AM_READ_PORT("1c00000") AM_WRITE_LEGACY(ctrl0_w )
+	AM_RANGE(0x01c00000, 0x01c00003) AM_READ_PORT("1c00000") AM_WRITE(ctrl0_w )
 	AM_RANGE(0x01c00004, 0x01c00007) AM_READ_PORT("1c00004")
 	AM_RANGE(0x01c00010, 0x01c00013) AM_READ_PORT("1c00010")
 	AM_RANGE(0x01c00014, 0x01c00017) AM_READ_PORT("1c00014")
-	AM_RANGE(0x01c00018, 0x01c0001b) AM_READ_LEGACY(hotd_unk_r )
-	AM_RANGE(0x01c0001c, 0x01c0001f) AM_READ_PORT("1c0001c") AM_WRITE_LEGACY(analog_2b_w )
-	AM_RANGE(0x01c80000, 0x01c80003) AM_READWRITE_LEGACY(model2_serial_r, model2_serial_w )
+	AM_RANGE(0x01c00018, 0x01c0001b) AM_READ(hotd_unk_r )
+	AM_RANGE(0x01c0001c, 0x01c0001f) AM_READ_PORT("1c0001c") AM_WRITE(analog_2b_w )
+	AM_RANGE(0x01c80000, 0x01c80003) AM_READWRITE(model2_serial_r, model2_serial_w )
 
 	AM_IMPORT_FROM(model2_base_mem)
 ADDRESS_MAP_END
@@ -1459,33 +1459,33 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( model2b_crx_mem, AS_PROGRAM, 32, model2_state )
 	AM_RANGE(0x00200000, 0x0023ffff) AM_RAM
 
-	AM_RANGE(0x00804000, 0x00807fff) AM_READWRITE_LEGACY(geo_prg_r, geo_prg_w)
-	//AM_RANGE(0x00804000, 0x00807fff) AM_READWRITE_LEGACY(geo_sharc_fifo_r, geo_sharc_fifo_w)
-	//AM_RANGE(0x00840000, 0x00840fff) AM_WRITE_LEGACY(geo_sharc_iop_w)
+	AM_RANGE(0x00804000, 0x00807fff) AM_READWRITE(geo_prg_r, geo_prg_w)
+	//AM_RANGE(0x00804000, 0x00807fff) AM_READWRITE(geo_sharc_fifo_r, geo_sharc_fifo_w)
+	//AM_RANGE(0x00840000, 0x00840fff) AM_WRITE(geo_sharc_iop_w)
 
-	AM_RANGE(0x00880000, 0x00883fff) AM_WRITE_LEGACY(copro_function_port_w)
-	AM_RANGE(0x00884000, 0x00887fff) AM_READWRITE_LEGACY(copro_fifo_r, copro_fifo_w)
-	AM_RANGE(0x008c0000, 0x008c0fff) AM_WRITE_LEGACY(copro_sharc_iop_w)
+	AM_RANGE(0x00880000, 0x00883fff) AM_WRITE(copro_function_port_w)
+	AM_RANGE(0x00884000, 0x00887fff) AM_READWRITE(copro_fifo_r, copro_fifo_w)
+	AM_RANGE(0x008c0000, 0x008c0fff) AM_WRITE(copro_sharc_iop_w)
 
-	AM_RANGE(0x00980000, 0x00980003) AM_WRITE_LEGACY(copro_ctl1_w )
+	AM_RANGE(0x00980000, 0x00980003) AM_WRITE(copro_ctl1_w )
 
-	AM_RANGE(0x00980008, 0x0098000b) AM_WRITE_LEGACY(geo_ctl1_w )
-	//AM_RANGE(0x00980008, 0x0098000b) AM_WRITE_LEGACY(geo_sharc_ctl1_w )
+	AM_RANGE(0x00980008, 0x0098000b) AM_WRITE(geo_ctl1_w )
+	//AM_RANGE(0x00980008, 0x0098000b) AM_WRITE(geo_sharc_ctl1_w )
 
-	AM_RANGE(0x009c0000, 0x009cffff) AM_READWRITE_LEGACY(model2_serial_r, model2_serial_w )
+	AM_RANGE(0x009c0000, 0x009cffff) AM_READWRITE(model2_serial_r, model2_serial_w )
 
 	AM_RANGE(0x11000000, 0x111fffff) AM_RAM	AM_BASE(m_textureram0)	// texture RAM 0 (2b/2c)
 	AM_RANGE(0x11200000, 0x113fffff) AM_RAM	AM_BASE(m_textureram1)	// texture RAM 1 (2b/2c)
 	AM_RANGE(0x11400000, 0x1140ffff) AM_RAM	AM_BASE(m_lumaram)		// polygon "luma" RAM (2b/2c)
 
 
-	AM_RANGE(0x01c00000, 0x01c00003) AM_READ_PORT("1c00000") AM_WRITE_LEGACY(ctrl0_w )
+	AM_RANGE(0x01c00000, 0x01c00003) AM_READ_PORT("1c00000") AM_WRITE(ctrl0_w )
 	AM_RANGE(0x01c00004, 0x01c00007) AM_READ_PORT("1c00004")
 	AM_RANGE(0x01c00010, 0x01c00013) AM_READ_PORT("1c00010")
 	AM_RANGE(0x01c00014, 0x01c00017) AM_READ_PORT("1c00014")
-	AM_RANGE(0x01c00018, 0x01c0001b) AM_READ_LEGACY(hotd_unk_r )
-	AM_RANGE(0x01c0001c, 0x01c0001f) AM_READ_PORT("1c0001c") AM_WRITE_LEGACY(analog_2b_w )
-	AM_RANGE(0x01c80000, 0x01c80003) AM_READWRITE_LEGACY(model2_serial_r, model2_serial_w )
+	AM_RANGE(0x01c00018, 0x01c0001b) AM_READ(hotd_unk_r )
+	AM_RANGE(0x01c0001c, 0x01c0001f) AM_READ_PORT("1c0001c") AM_WRITE(analog_2b_w )
+	AM_RANGE(0x01c80000, 0x01c80003) AM_READWRITE(model2_serial_r, model2_serial_w )
 
 	AM_IMPORT_FROM(model2_base_mem)
 ADDRESS_MAP_END
@@ -1494,24 +1494,24 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( model2c_crx_mem, AS_PROGRAM, 32, model2_state )
 	AM_RANGE(0x00200000, 0x0023ffff) AM_RAM
 
-	AM_RANGE(0x00804000, 0x00807fff) AM_READWRITE_LEGACY(geo_prg_r, geo_prg_w)
-	AM_RANGE(0x00884000, 0x00887fff) AM_READWRITE_LEGACY(copro_prg_r, copro_prg_w)
+	AM_RANGE(0x00804000, 0x00807fff) AM_READWRITE(geo_prg_r, geo_prg_w)
+	AM_RANGE(0x00884000, 0x00887fff) AM_READWRITE(copro_prg_r, copro_prg_w)
 
-	AM_RANGE(0x00980000, 0x00980003) AM_WRITE_LEGACY(copro_ctl1_w )
-	AM_RANGE(0x00980008, 0x0098000b) AM_WRITE_LEGACY(geo_ctl1_w )
-	AM_RANGE(0x009c0000, 0x009cffff) AM_READWRITE_LEGACY(model2_serial_r, model2_serial_w )
+	AM_RANGE(0x00980000, 0x00980003) AM_WRITE(copro_ctl1_w )
+	AM_RANGE(0x00980008, 0x0098000b) AM_WRITE(geo_ctl1_w )
+	AM_RANGE(0x009c0000, 0x009cffff) AM_READWRITE(model2_serial_r, model2_serial_w )
 
 	AM_RANGE(0x11000000, 0x111fffff) AM_RAM	AM_BASE(m_textureram0)	// texture RAM 0 (2b/2c)
 	AM_RANGE(0x11200000, 0x113fffff) AM_RAM	AM_BASE(m_textureram1)	// texture RAM 1 (2b/2c)
 	AM_RANGE(0x11400000, 0x1140ffff) AM_RAM	AM_BASE(m_lumaram)		// polygon "luma" RAM (2b/2c)
 
-	AM_RANGE(0x01c00000, 0x01c00003) AM_READ_PORT("1c00000") AM_WRITE_LEGACY(ctrl0_w )
+	AM_RANGE(0x01c00000, 0x01c00003) AM_READ_PORT("1c00000") AM_WRITE(ctrl0_w )
 	AM_RANGE(0x01c00004, 0x01c00007) AM_READ_PORT("1c00004")
 	AM_RANGE(0x01c00010, 0x01c00013) AM_READ_PORT("1c00010")
 	AM_RANGE(0x01c00014, 0x01c00017) AM_READ_PORT("1c00014")
-	AM_RANGE(0x01c00018, 0x01c0001b) AM_READ_LEGACY(hotd_unk_r )
-	AM_RANGE(0x01c0001c, 0x01c0001f) AM_READ_PORT("1c0001c") AM_WRITE_LEGACY(analog_2b_w )
-	AM_RANGE(0x01c80000, 0x01c80003) AM_READWRITE_LEGACY(model2_serial_r, model2_serial_w )
+	AM_RANGE(0x01c00018, 0x01c0001b) AM_READ(hotd_unk_r )
+	AM_RANGE(0x01c0001c, 0x01c0001f) AM_READ_PORT("1c0001c") AM_WRITE(analog_2b_w )
+	AM_RANGE(0x01c80000, 0x01c80003) AM_READWRITE(model2_serial_r, model2_serial_w )
 
 	AM_IMPORT_FROM(model2_base_mem)
 ADDRESS_MAP_END
@@ -1832,13 +1832,13 @@ static TIMER_DEVICE_CALLBACK(model2c_interrupt)
 
 /* Model 1 sound board emulation */
 
-static READ16_HANDLER( m1_snd_68k_latch_r )
+READ16_MEMBER(model2_state::m1_snd_68k_latch_r)
 {
-	model2_state *state = space->machine().driver_data<model2_state>();
-	return state->m_to_68k;
+//OBRISI.ME
+	return m_to_68k;
 }
 
-static READ16_HANDLER( m1_snd_v60_ready_r )
+READ16_MEMBER(model2_state::m1_snd_v60_ready_r)
 {
 	return 1;
 }
@@ -1848,19 +1848,19 @@ static WRITE16_DEVICE_HANDLER( m1_snd_mpcm_bnk_w )
 	multipcm_set_bank(device, 0x100000 * (data & 0xf), 0x100000 * (data & 0xf));
 }
 
-static WRITE16_HANDLER( m1_snd_68k_latch1_w )
+WRITE16_MEMBER(model2_state::m1_snd_68k_latch1_w)
 {
 }
 
-static WRITE16_HANDLER( m1_snd_68k_latch2_w )
+WRITE16_MEMBER(model2_state::m1_snd_68k_latch2_w)
 {
 }
 
 static ADDRESS_MAP_START( model1_snd, AS_PROGRAM, 16, model2_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x0bffff) AM_ROM AM_REGION("audiocpu", 0x20000)	// mirror of second program ROM
-	AM_RANGE(0xc20000, 0xc20001) AM_READWRITE_LEGACY(m1_snd_68k_latch_r, m1_snd_68k_latch1_w )
-	AM_RANGE(0xc20002, 0xc20003) AM_READWRITE_LEGACY(m1_snd_v60_ready_r, m1_snd_68k_latch2_w )
+	AM_RANGE(0xc20000, 0xc20001) AM_READWRITE(m1_snd_68k_latch_r, m1_snd_68k_latch1_w )
+	AM_RANGE(0xc20002, 0xc20003) AM_READWRITE(m1_snd_v60_ready_r, m1_snd_68k_latch2_w )
 	AM_RANGE(0xc40000, 0xc40007) AM_DEVREADWRITE8_LEGACY("sega1", multipcm_r, multipcm_w, 0x00ff )
 	AM_RANGE(0xc40012, 0xc40013) AM_WRITENOP
 	AM_RANGE(0xc50000, 0xc50001) AM_DEVWRITE_LEGACY("sega1", m1_snd_mpcm_bnk_w )
@@ -1872,21 +1872,21 @@ ADDRESS_MAP_END
 
 /* Model 2 sound board emulation */
 
-static WRITE16_HANDLER( model2snd_ctrl )
+WRITE16_MEMBER(model2_state::model2snd_ctrl)
 {
 	// handle sample banking
-	if (space->machine().region("scsp")->bytes() > 0x800000)
+	if (machine().region("scsp")->bytes() > 0x800000)
 	{
-		UINT8 *snd = space->machine().region("scsp")->base();
+		UINT8 *snd = machine().region("scsp")->base();
 		if (data & 0x20)
 		{
-			memory_set_bankptr(space->machine(), "bank4", snd + 0x200000);
-			memory_set_bankptr(space->machine(), "bank5", snd + 0x600000);
+			memory_set_bankptr(machine(), "bank4", snd + 0x200000);
+			memory_set_bankptr(machine(), "bank5", snd + 0x600000);
 		}
 		else
 		{
-			memory_set_bankptr(space->machine(), "bank4", snd + 0x800000);
-			memory_set_bankptr(space->machine(), "bank5", snd + 0xa00000);
+			memory_set_bankptr(machine(), "bank4", snd + 0x800000);
+			memory_set_bankptr(machine(), "bank5", snd + 0xa00000);
 		}
 	}
 }
@@ -1894,7 +1894,7 @@ static WRITE16_HANDLER( model2snd_ctrl )
 static ADDRESS_MAP_START( model2_snd, AS_PROGRAM, 16, model2_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_RAM AM_REGION("audiocpu", 0) AM_BASE(m_soundram)
 	AM_RANGE(0x100000, 0x100fff) AM_DEVREADWRITE_LEGACY("scsp", scsp_r, scsp_w)
-	AM_RANGE(0x400000, 0x400001) AM_WRITE_LEGACY(model2snd_ctrl)
+	AM_RANGE(0x400000, 0x400001) AM_WRITE(model2snd_ctrl)
 	AM_RANGE(0x600000, 0x67ffff) AM_ROM AM_REGION("audiocpu", 0x80000)
 	AM_RANGE(0x800000, 0x9fffff) AM_ROM AM_REGION("scsp", 0)
 	AM_RANGE(0xa00000, 0xdfffff) AM_ROMBANK("bank4")
@@ -1926,38 +1926,38 @@ static const scsp_interface scsp_config =
 /*****************************************************************************/
 // SHARC memory maps
 
-static READ32_HANDLER(copro_sharc_input_fifo_r)
+READ32_MEMBER(model2_state::copro_sharc_input_fifo_r)
 {
 	UINT32 result = 0;
-	//mame_printf_debug("SHARC FIFOIN pop at %08X\n", cpu_get_pc(&space->device()));
+	//mame_printf_debug("SHARC FIFOIN pop at %08X\n", cpu_get_pc(&space.device()));
 
-	copro_fifoin_pop(space->machine().device("dsp"), &result);
+	copro_fifoin_pop(machine().device("dsp"), &result);
 	return result;
 }
 
-static WRITE32_HANDLER(copro_sharc_output_fifo_w)
+WRITE32_MEMBER(model2_state::copro_sharc_output_fifo_w)
 {
 	//mame_printf_debug("SHARC FIFOOUT push %08X\n", data);
-	copro_fifoout_push(space->machine().device("dsp"), data);
+	copro_fifoout_push(machine().device("dsp"), data);
 }
 
-static READ32_HANDLER(copro_sharc_buffer_r)
+READ32_MEMBER(model2_state::copro_sharc_buffer_r)
 {
-	model2_state *state = space->machine().driver_data<model2_state>();
-	return state->m_bufferram[offset & 0x7fff];
+//OBRISI.ME
+	return m_bufferram[offset & 0x7fff];
 }
 
-static WRITE32_HANDLER(copro_sharc_buffer_w)
+WRITE32_MEMBER(model2_state::copro_sharc_buffer_w)
 {
-	model2_state *state = space->machine().driver_data<model2_state>();
-	//mame_printf_debug("sharc_buffer_w: %08X at %08X, %08X, %f\n", offset, cpu_get_pc(&space->device()), data, *(float*)&data);
-	state->m_bufferram[offset & 0x7fff] = data;
+//OBRISI.ME
+	//mame_printf_debug("sharc_buffer_w: %08X at %08X, %08X, %f\n", offset, cpu_get_pc(&space.device()), data, *(float*)&data);
+	m_bufferram[offset & 0x7fff] = data;
 }
 
 static ADDRESS_MAP_START( copro_sharc_map, AS_DATA, 32, model2_state )
-	AM_RANGE(0x0400000, 0x0bfffff) AM_READ_LEGACY(copro_sharc_input_fifo_r)
-	AM_RANGE(0x0c00000, 0x13fffff) AM_WRITE_LEGACY(copro_sharc_output_fifo_w)
-	AM_RANGE(0x1400000, 0x1bfffff) AM_READWRITE_LEGACY(copro_sharc_buffer_r, copro_sharc_buffer_w)
+	AM_RANGE(0x0400000, 0x0bfffff) AM_READ(copro_sharc_input_fifo_r)
+	AM_RANGE(0x0c00000, 0x13fffff) AM_WRITE(copro_sharc_output_fifo_w)
+	AM_RANGE(0x1400000, 0x1bfffff) AM_READWRITE(copro_sharc_buffer_r, copro_sharc_buffer_w)
 	AM_RANGE(0x1c00000, 0x1dfffff) AM_ROM AM_REGION("user5", 0)
 ADDRESS_MAP_END
 
@@ -1969,21 +1969,21 @@ ADDRESS_MAP_END
 /*****************************************************************************/
 /* TGP memory maps */
 
-static READ32_HANDLER(copro_tgp_buffer_r)
+READ32_MEMBER(model2_state::copro_tgp_buffer_r)
 {
-	model2_state *state = space->machine().driver_data<model2_state>();
-	return state->m_bufferram[offset & 0x7fff];
+//OBRISI.ME
+	return m_bufferram[offset & 0x7fff];
 }
 
-static WRITE32_HANDLER(copro_tgp_buffer_w)
+WRITE32_MEMBER(model2_state::copro_tgp_buffer_w)
 {
-	model2_state *state = space->machine().driver_data<model2_state>();
-	state->m_bufferram[offset&0x7fff] = data;
+//OBRISI.ME
+	m_bufferram[offset&0x7fff] = data;
 }
 
 static ADDRESS_MAP_START( copro_tgp_map, AS_PROGRAM, 32, model2_state )
 	AM_RANGE(0x00000000, 0x00007fff) AM_RAM AM_BASE(m_tgp_program)
-	AM_RANGE(0x00400000, 0x00407fff) AM_READWRITE_LEGACY(copro_tgp_buffer_r, copro_tgp_buffer_w)
+	AM_RANGE(0x00400000, 0x00407fff) AM_READWRITE(copro_tgp_buffer_r, copro_tgp_buffer_w)
 	AM_RANGE(0xff800000, 0xff9fffff) AM_ROM AM_REGION("tgp", 0)
 ADDRESS_MAP_END
 
@@ -2108,19 +2108,19 @@ static MACHINE_CONFIG_START( model2a, model2_state )
 	MCFG_SOUND_ROUTE(0, "rspeaker", 2.0)
 MACHINE_CONFIG_END
 
-static READ8_HANDLER( driveio_port_r )
+READ8_MEMBER(model2_state::driveio_port_r)
 {
-	model2_state *state = space->machine().driver_data<model2_state>();
-	return state->m_driveio_comm_data;
+//OBRISI.ME
+	return m_driveio_comm_data;
 }
 
-static WRITE8_HANDLER( driveio_port_w )
+WRITE8_MEMBER(model2_state::driveio_port_w)
 {
 //  TODO: hook up to the main CPU
 //  popmessage("%02x",data);
 }
 
-static READ8_HANDLER( driveio_port_str_r )
+READ8_MEMBER(model2_state::driveio_port_str_r)
 {
 	static const char sega_str[4] = { 'S', 'E', 'G', 'A' };
 
@@ -2135,9 +2135,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( drive_io_map, AS_IO, 8, model2_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITENOP //watchdog
-	AM_RANGE(0x23, 0x23) AM_WRITE_LEGACY(driveio_port_w)
-	AM_RANGE(0x26, 0x27) AM_READ_LEGACY(driveio_port_r)
-	AM_RANGE(0x28, 0x2b) AM_READ_LEGACY(driveio_port_str_r)
+	AM_RANGE(0x23, 0x23) AM_WRITE(driveio_port_w)
+	AM_RANGE(0x26, 0x27) AM_READ(driveio_port_r)
+	AM_RANGE(0x28, 0x2b) AM_READ(driveio_port_str_r)
 	AM_RANGE(0x40, 0x4f) AM_WRITENOP //Oki M6253
 	AM_RANGE(0x80, 0x83) AM_NOP //r/w it during irq
 ADDRESS_MAP_END
@@ -5146,7 +5146,7 @@ ROM_END
 static DRIVER_INIT( genprot )
 {
 	model2_state *state = machine.driver_data<model2_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x01d80000, 0x01dfffff, FUNC(model2_prot_r), FUNC(model2_prot_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x01d80000, 0x01dfffff, read32_delegate(FUNC(model2_state::model2_prot_r),state), write32_delegate(FUNC(model2_state::model2_prot_w),state));
 	state->m_protstate = state->m_protpos = 0;
 }
 
@@ -5155,7 +5155,7 @@ static DRIVER_INIT( pltkids )
 	model2_state *state = machine.driver_data<model2_state>();
 	UINT32 *ROM = (UINT32 *)machine.region("maincpu")->base();
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x01d80000, 0x01dfffff, FUNC(model2_prot_r), FUNC(model2_prot_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x01d80000, 0x01dfffff, read32_delegate(FUNC(model2_state::model2_prot_r),state), write32_delegate(FUNC(model2_state::model2_prot_w),state));
 	state->m_protstate = state->m_protpos = 0;
 
 	// fix bug in program: it destroys the interrupt table and never fixes it
@@ -5167,7 +5167,7 @@ static DRIVER_INIT( zerogun )
 	model2_state *state = machine.driver_data<model2_state>();
 	UINT32 *ROM = (UINT32 *)machine.region("maincpu")->base();
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x01d80000, 0x01dfffff, FUNC(model2_prot_r), FUNC(model2_prot_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x01d80000, 0x01dfffff, read32_delegate(FUNC(model2_state::model2_prot_r),state), write32_delegate(FUNC(model2_state::model2_prot_w),state));
 	state->m_protstate = state->m_protpos = 0;
 
 	// fix bug in program: it destroys the interrupt table and never fixes it
@@ -5176,35 +5176,36 @@ static DRIVER_INIT( zerogun )
 
 static DRIVER_INIT( daytonam )
 {
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x240000, 0x24ffff, FUNC(maxx_r) );
+	model2_state *state = machine.driver_data<model2_state>();
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x240000, 0x24ffff, read32_delegate(FUNC(model2_state::maxx_r),state));
 }
 
 /* very crude support for let the game set itself into stand-alone mode */
 
-static READ32_HANDLER( jaleco_network_r )
+READ32_MEMBER(model2_state::jaleco_network_r)
 {
-	model2_state *state = space->machine().driver_data<model2_state>();
+//OBRISI.ME
 	if(offset == 0x4000/4)
 	{
-		if(state->m_netram[offset] == 0x00000000)
-			state->m_jnet_time_out = 0;
+		if(m_netram[offset] == 0x00000000)
+			m_jnet_time_out = 0;
 
-		if((state->m_netram[offset] & 0xffff) == 0x0001)
-			state->m_jnet_time_out++;
+		if((m_netram[offset] & 0xffff) == 0x0001)
+			m_jnet_time_out++;
 
-		if(state->m_jnet_time_out > 0x80)
-			state->m_netram[offset]|= 0x00800000;
+		if(m_jnet_time_out > 0x80)
+			m_netram[offset]|= 0x00800000;
 
-		return state->m_netram[offset];
+		return m_netram[offset];
 	}
 
-	return state->m_netram[offset];
+	return m_netram[offset];
 }
 
-static WRITE32_HANDLER( jaleco_network_w )
+WRITE32_MEMBER(model2_state::jaleco_network_w)
 {
-	model2_state *state = space->machine().driver_data<model2_state>();
-	COMBINE_DATA(&state->m_netram[offset]);
+//OBRISI.ME
+	COMBINE_DATA(&m_netram[offset]);
 }
 
 static DRIVER_INIT( sgt24h )
@@ -5212,8 +5213,8 @@ static DRIVER_INIT( sgt24h )
 	model2_state *state = machine.driver_data<model2_state>();
 	UINT32 *ROM = (UINT32 *)machine.region("maincpu")->base();
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x01d80000, 0x01dfffff, FUNC(model2_prot_r), FUNC(model2_prot_w));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x01a10000, 0x01a1ffff, FUNC(jaleco_network_r), FUNC(jaleco_network_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x01d80000, 0x01dfffff, read32_delegate(FUNC(model2_state::model2_prot_r),state), write32_delegate(FUNC(model2_state::model2_prot_w),state));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x01a10000, 0x01a1ffff, read32_delegate(FUNC(model2_state::jaleco_network_r),state), write32_delegate(FUNC(model2_state::jaleco_network_w),state));
 
 	state->m_protstate = state->m_protpos = 0;
 
@@ -5223,7 +5224,8 @@ static DRIVER_INIT( sgt24h )
 
 static DRIVER_INIT( overrev )
 {
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x01a10000, 0x01a1ffff, FUNC(jaleco_network_r), FUNC(jaleco_network_w));
+	model2_state *state = machine.driver_data<model2_state>();
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x01a10000, 0x01a1ffff, read32_delegate(FUNC(model2_state::jaleco_network_r),state), write32_delegate(FUNC(model2_state::jaleco_network_w),state));
 
 	//TODO: cache patch?
 }
@@ -5234,7 +5236,7 @@ static DRIVER_INIT( doa )
 	model2_state *state = machine.driver_data<model2_state>();
 	UINT32 *ROM = (UINT32 *)machine.region("maincpu")->base();
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x01d80000, 0x01dfffff, FUNC(model2_prot_r), FUNC(model2_prot_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x01d80000, 0x01dfffff, read32_delegate(FUNC(model2_state::model2_prot_r),state), write32_delegate(FUNC(model2_state::model2_prot_w),state));
 	state->m_protstate = state->m_protpos = 0;
 
 	ROM[0x630/4] = 0x08000004;
@@ -5243,12 +5245,14 @@ static DRIVER_INIT( doa )
 
 static DRIVER_INIT( rchase2 )
 {
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x01c00008, 0x01c0000b, FUNC(rchase2_devices_w));
+	model2_state *state = machine.driver_data<model2_state>();
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x01c00008, 0x01c0000b, write32_delegate(FUNC(model2_state::rchase2_devices_w),state));
 }
 
 static DRIVER_INIT( srallyc )
 {
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x01c00008, 0x01c0000b, FUNC(srallyc_devices_w));
+	model2_state *state = machine.driver_data<model2_state>();
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x01c00008, 0x01c0000b, write32_delegate(FUNC(model2_state::srallyc_devices_w),state));
 }
 
 

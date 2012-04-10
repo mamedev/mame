@@ -4152,7 +4152,7 @@ static DRIVER_INIT( racedrivc1 ) { racedrivc_init_common(machine, 0xfff7ecd0); }
 
 
 
-static READ16_HANDLER( steeltal_dummy_r )
+READ16_MEMBER(harddriv_state::steeltal_dummy_r)
 {
 	/* this is required so that INT 4 is recongized as a sound INT */
 	return ~0;
@@ -4169,7 +4169,7 @@ static void steeltal_init_common(running_machine &machine, offs_t ds3_transfer_p
 	init_dspcom(machine);
 	atarijsa_init(machine, "IN0", 0x0020);
 
-	state->m_maincpu->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x908000, 0x908001, FUNC(steeltal_dummy_r));
+	state->m_maincpu->memory().space(AS_PROGRAM)->install_read_handler(0x908000, 0x908001, read16_delegate(FUNC(harddriv_state::steeltal_dummy_r),state));
 
 	/* set up the SLOOP */
 	if (!proto_sloop)

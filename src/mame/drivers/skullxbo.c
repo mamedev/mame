@@ -65,9 +65,9 @@ static void alpha_row_update(screen_device &screen, int scanline)
 }
 
 
-static WRITE16_HANDLER( skullxbo_halt_until_hblank_0_w )
+WRITE16_MEMBER(skullxbo_state::skullxbo_halt_until_hblank_0_w)
 {
-	atarigen_halt_until_hblank_0(*space->machine().primary_screen);
+	atarigen_halt_until_hblank_0(*machine().primary_screen);
 }
 
 
@@ -95,12 +95,12 @@ static MACHINE_RESET( skullxbo )
  *
  *************************************/
 
-static READ16_HANDLER( special_port1_r )
+READ16_MEMBER(skullxbo_state::special_port1_r)
 {
-	skullxbo_state *state = space->machine().driver_data<skullxbo_state>();
-	int temp = input_port_read(space->machine(), "FF5802");
-	if (state->m_cpu_to_sound_ready) temp ^= 0x0040;
-	if (atarigen_get_hblank(*space->machine().primary_screen)) temp ^= 0x0010;
+//OBRISI.ME
+	int temp = input_port_read(machine(), "FF5802");
+	if (m_cpu_to_sound_ready) temp ^= 0x0040;
+	if (atarigen_get_hblank(*machine().primary_screen)) temp ^= 0x0010;
 	return temp;
 }
 
@@ -112,7 +112,7 @@ static READ16_HANDLER( special_port1_r )
  *
  *************************************/
 
-static WRITE16_HANDLER( skullxbo_mobwr_w )
+WRITE16_MEMBER(skullxbo_state::skullxbo_mobwr_w)
 {
 	logerror("MOBWR[%02X] = %04X\n", offset, data);
 }
@@ -128,7 +128,7 @@ static WRITE16_HANDLER( skullxbo_mobwr_w )
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, skullxbo_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0xff0000, 0xff07ff) AM_WRITE_LEGACY(skullxbo_mobmsb_w)
-	AM_RANGE(0xff0800, 0xff0bff) AM_WRITE_LEGACY(skullxbo_halt_until_hblank_0_w)
+	AM_RANGE(0xff0800, 0xff0bff) AM_WRITE(skullxbo_halt_until_hblank_0_w)
 	AM_RANGE(0xff0c00, 0xff0fff) AM_WRITE_LEGACY(atarigen_eeprom_enable_w)
 	AM_RANGE(0xff1000, 0xff13ff) AM_WRITE_LEGACY(atarigen_video_int_ack_w)
 	AM_RANGE(0xff1400, 0xff17ff) AM_WRITE_LEGACY(atarigen_sound_w)
@@ -143,11 +143,11 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, skullxbo_state )
 	AM_RANGE(0xff1f80, 0xff1fff) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0xff2000, 0xff2fff) AM_RAM_WRITE_LEGACY(atarigen_666_paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0xff4000, 0xff47ff) AM_WRITE_LEGACY(skullxbo_yscroll_w) AM_BASE(m_yscroll)
-	AM_RANGE(0xff4800, 0xff4fff) AM_WRITE_LEGACY(skullxbo_mobwr_w)
+	AM_RANGE(0xff4800, 0xff4fff) AM_WRITE(skullxbo_mobwr_w)
 	AM_RANGE(0xff6000, 0xff6fff) AM_WRITE_LEGACY(atarigen_eeprom_w) AM_SHARE("eeprom")
 	AM_RANGE(0xff5000, 0xff5001) AM_READ_LEGACY(atarigen_sound_r)
 	AM_RANGE(0xff5800, 0xff5801) AM_READ_PORT("FF5800")
-	AM_RANGE(0xff5802, 0xff5803) AM_READ_LEGACY(special_port1_r)
+	AM_RANGE(0xff5802, 0xff5803) AM_READ(special_port1_r)
 	AM_RANGE(0xff6000, 0xff6fff) AM_READ_LEGACY(atarigen_eeprom_r)
 	AM_RANGE(0xff8000, 0xff9fff) AM_RAM_WRITE_LEGACY(atarigen_playfield_latched_lsb_w) AM_BASE(m_playfield)
 	AM_RANGE(0xffa000, 0xffbfff) AM_RAM_WRITE_LEGACY(atarigen_playfield_upper_w) AM_BASE(m_playfield_upper)

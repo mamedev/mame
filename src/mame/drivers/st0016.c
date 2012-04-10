@@ -68,9 +68,9 @@ WRITE8_MEMBER(st0016_state::mux_select_w)
 	mux_port=data;
 }
 
-WRITE8_HANDLER(st0016_rom_bank_w)
+WRITE8_MEMBER(st0016_state::st0016_rom_bank_w)
 {
-	memory_set_bankptr(space->machine(),  "bank1", space->machine().region("maincpu")->base() + (data* 0x4000) + 0x10000 );
+	memory_set_bankptr(machine(),  "bank1", machine().region("maincpu")->base() + (data* 0x4000) + 0x10000 );
 	st0016_rom_bank=data;
 }
 
@@ -82,7 +82,7 @@ static ADDRESS_MAP_START( st0016_io, AS_IO, 8, st0016_state )
 	AM_RANGE(0xc2, 0xc2) AM_READ(mux_r) AM_WRITENOP
 	AM_RANGE(0xc3, 0xc3) AM_READ_PORT("P2") AM_WRITENOP
 	AM_RANGE(0xe0, 0xe0) AM_WRITENOP /* renju = $40, neratte = 0 */
-	AM_RANGE(0xe1, 0xe1) AM_WRITE_LEGACY(st0016_rom_bank_w)
+	AM_RANGE(0xe1, 0xe1) AM_WRITE(st0016_rom_bank_w)
 	AM_RANGE(0xe2, 0xe2) AM_WRITE(st0016_sprite_bank_w)
 	AM_RANGE(0xe3, 0xe4) AM_WRITE(st0016_character_bank_w)
 	AM_RANGE(0xe5, 0xe5) AM_WRITE(st0016_palette_bank_w)
@@ -147,7 +147,7 @@ static ADDRESS_MAP_START( st0016_m2_io, AS_IO, 8, st0016_state )
 	AM_RANGE(0xd2, 0xd2) AM_READ(mux_r) AM_WRITENOP
 	AM_RANGE(0xd3, 0xd3) AM_READ_PORT("P2") AM_WRITENOP
 	AM_RANGE(0xe0, 0xe0) AM_WRITENOP
-	AM_RANGE(0xe1, 0xe1) AM_WRITE_LEGACY(st0016_rom_bank_w)
+	AM_RANGE(0xe1, 0xe1) AM_WRITE(st0016_rom_bank_w)
 	AM_RANGE(0xe2, 0xe2) AM_WRITE(st0016_sprite_bank_w)
 	AM_RANGE(0xe3, 0xe4) AM_WRITE(st0016_character_bank_w)
 	AM_RANGE(0xe5, 0xe5) AM_WRITE(st0016_palette_bank_w)

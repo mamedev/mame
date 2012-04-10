@@ -49,22 +49,22 @@
 
 static void handle_cd32_joystick_cia(running_machine &machine, UINT8 pra, UINT8 dra);
 
-static WRITE32_HANDLER( aga_overlay_w )
+WRITE32_MEMBER(cd32_state::aga_overlay_w)
 {
 	if (ACCESSING_BITS_16_23)
 	{
 		data = (data >> 16) & 1;
 
 		/* switch banks as appropriate */
-		memory_set_bank(space->machine(), "bank1", data & 1);
+		memory_set_bank(machine(), "bank1", data & 1);
 
 		/* swap the write handlers between ROM and bank 1 based on the bit */
 		if ((data & 1) == 0)
 			/* overlay disabled, map RAM on 0x000000 */
-			space->install_write_bank(0x000000, 0x1fffff, "bank1");
+			space.install_write_bank(0x000000, 0x1fffff, "bank1");
 		else
 			/* overlay enabled, map Amiga system ROM on 0x000000 */
-			space->unmap_write(0x000000, 0x1fffff);
+			space.unmap_write(0x000000, 0x1fffff);
 	}
 }
 
@@ -128,7 +128,7 @@ static ADDRESS_MAP_START( cd32_map, AS_PROGRAM, 32, cd32_state )
 	AM_RANGE(0x800000, 0x800003) AM_READ_PORT("DIPSW1")
 	AM_RANGE(0x800010, 0x800013) AM_READ_PORT("DIPSW2")
 	AM_RANGE(0xb80000, 0xb8003f) AM_DEVREADWRITE_LEGACY("akiko", amiga_akiko32_r, amiga_akiko32_w)
-	AM_RANGE(0xbfa000, 0xbfa003) AM_WRITE_LEGACY(aga_overlay_w)
+	AM_RANGE(0xbfa000, 0xbfa003) AM_WRITE(aga_overlay_w)
 	AM_RANGE(0xbfd000, 0xbfefff) AM_READWRITE16_LEGACY(amiga_cia_r, amiga_cia_w, 0xffffffff)
 	AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE16_LEGACY(amiga_custom_r, amiga_custom_w, 0xffffffff) AM_BASE(m_custom_regs)
 	AM_RANGE(0xe00000, 0xe7ffff) AM_ROM AM_REGION("user1", 0x80000)	/* CD32 Extended ROM */

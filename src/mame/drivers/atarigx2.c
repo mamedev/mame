@@ -65,41 +65,41 @@ static MACHINE_RESET( atarigx2 )
  *
  *************************************/
 
-static READ32_HANDLER( special_port2_r )
+READ32_MEMBER(atarigx2_state::special_port2_r)
 {
-	atarigx2_state *state = space->machine().driver_data<atarigx2_state>();
-	int temp = input_port_read(space->machine(), "SERVICE");
-	if (state->m_cpu_to_sound_ready) temp ^= 0x0020;
-	if (state->m_sound_to_cpu_ready) temp ^= 0x0010;
+//OBRISI.ME
+	int temp = input_port_read(machine(), "SERVICE");
+	if (m_cpu_to_sound_ready) temp ^= 0x0020;
+	if (m_sound_to_cpu_ready) temp ^= 0x0010;
 	temp ^= 0x0008;		/* A2D.EOC always high for now */
 	return (temp << 16) | temp;
 }
 
 
-static READ32_HANDLER( special_port3_r )
+READ32_MEMBER(atarigx2_state::special_port3_r)
 {
-	int temp = input_port_read(space->machine(), "SPECIAL");
+	int temp = input_port_read(machine(), "SPECIAL");
 	return (temp << 16) | temp;
 }
 
 
 
-static READ32_HANDLER( a2d_data_r )
+READ32_MEMBER(atarigx2_state::a2d_data_r)
 {
 	/* otherwise, assume it's hydra */
 	switch (offset)
 	{
 		case 0:
-			return (input_port_read(space->machine(), "A2D0") << 24) | (input_port_read(space->machine(), "A2D1") << 8);
+			return (input_port_read(machine(), "A2D0") << 24) | (input_port_read(machine(), "A2D1") << 8);
 		case 1:
-			return (input_port_read(space->machine(), "A2D2") << 24) | (input_port_read(space->machine(), "A2D3") << 8);
+			return (input_port_read(machine(), "A2D2") << 24) | (input_port_read(machine(), "A2D3") << 8);
 	}
 
 	return 0;
 }
 
 
-static WRITE32_HANDLER( latch_w )
+WRITE32_MEMBER(atarigx2_state::latch_w)
 {
 	/*
         D13 = 68.DISA
@@ -117,24 +117,24 @@ static WRITE32_HANDLER( latch_w )
 	/* upper byte */
 	if (ACCESSING_BITS_24_31)
 	{
-		atarigx2_state *state = space->machine().driver_data<atarigx2_state>();
+//OBRISI.ME
 
 		/* bits 13-11 are the MO control bits */
-		atarirle_control_w(state->m_rle, (data >> 27) & 7);
+		atarirle_control_w(m_rle, (data >> 27) & 7);
 	}
 
 	/* lower byte */
 	if (ACCESSING_BITS_16_23)
-		cputag_set_input_line(space->machine(), "jsa", INPUT_LINE_RESET, (data & 0x100000) ? CLEAR_LINE : ASSERT_LINE);
+		cputag_set_input_line(machine(), "jsa", INPUT_LINE_RESET, (data & 0x100000) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
-static WRITE32_HANDLER( mo_command_w )
+WRITE32_MEMBER(atarigx2_state::mo_command_w)
 {
-	atarigx2_state *state = space->machine().driver_data<atarigx2_state>();
-	COMBINE_DATA(state->m_mo_command);
+//OBRISI.ME
+	COMBINE_DATA(m_mo_command);
 	if (ACCESSING_BITS_0_15)
-		atarirle_command_w(state->m_rle, ((data & 0xffff) == 2) ? ATARIRLE_COMMAND_CHECKSUM : ATARIRLE_COMMAND_DRAW);
+		atarirle_command_w(m_rle, ((data & 0xffff) == 2) ? ATARIRLE_COMMAND_CHECKSUM : ATARIRLE_COMMAND_DRAW);
 }
 
 
@@ -146,13 +146,13 @@ static WRITE32_HANDLER( mo_command_w )
  *************************************/
 
 
-static WRITE32_HANDLER( atarigx2_protection_w )
+WRITE32_MEMBER(atarigx2_state::atarigx2_protection_w)
 {
-	atarigx2_state *state = space->machine().driver_data<atarigx2_state>();
+//OBRISI.ME
 	{
-		int pc = cpu_get_previouspc(&space->device());
+		int pc = cpu_get_previouspc(&space.device());
 //      if (pc == 0x11cbe || pc == 0x11c30)
-//          logerror("%06X:Protection W@%04X = %04X  (result to %06X)\n", pc, offset, data, cpu_get_reg(&space->device(), M68K_A2));
+//          logerror("%06X:Protection W@%04X = %04X  (result to %06X)\n", pc, offset, data, cpu_get_reg(&space.device(), M68K_A2));
 //      else
 		if (ACCESSING_BITS_16_31)
 			logerror("%06X:Protection W@%04X = %04X\n", pc, offset * 4, data >> 16);
@@ -160,21 +160,21 @@ static WRITE32_HANDLER( atarigx2_protection_w )
 			logerror("%06X:Protection W@%04X = %04X\n", pc, offset * 4 + 2, data);
 	}
 
-	COMBINE_DATA(&state->m_protection_base[offset]);
+	COMBINE_DATA(&m_protection_base[offset]);
 
 	if (ACCESSING_BITS_16_31)
 	{
-		state->m_last_write = state->m_protection_base[offset] >> 16;
-		state->m_last_write_offset = offset*2;
+		m_last_write = m_protection_base[offset] >> 16;
+		m_last_write_offset = offset*2;
 	}
 	if (ACCESSING_BITS_0_15)
 	{
-		state->m_last_write = state->m_protection_base[offset] & 0xffff;
-		state->m_last_write_offset = offset*2+1;
+		m_last_write = m_protection_base[offset] & 0xffff;
+		m_last_write_offset = offset*2+1;
 	}
 }
 
-static READ32_HANDLER( atarigx2_protection_r )
+READ32_MEMBER(atarigx2_state::atarigx2_protection_r)
 {
 	static const UINT32 lookup_table[][2] =
 	{
@@ -1105,14 +1105,14 @@ static READ32_HANDLER( atarigx2_protection_r )
 		{ 0xffffffff, 0xffff }
 	};
 
-	atarigx2_state *state = space->machine().driver_data<atarigx2_state>();
-	UINT32 result = state->m_protection_base[offset];
+//OBRISI.ME
+	UINT32 result = m_protection_base[offset];
 
 	if (offset == 0x300)
 		result |= 0x80000000;
 	if (offset == 0x3f0)
 	{
-		UINT32 tag = (state->m_last_write_offset << 17) | state->m_last_write;
+		UINT32 tag = (m_last_write_offset << 17) | m_last_write;
 		int i = 0;
 
 		while (lookup_table[i][0] != 0xffffffff)
@@ -1127,18 +1127,18 @@ static READ32_HANDLER( atarigx2_protection_r )
 
 		if (lookup_table[i][0] == 0xffffffff)
 		{
-			if (state->m_last_write_offset*2 >= 0x700 && state->m_last_write_offset*2 < 0x720)
-				result = space->machine().rand() << 16;
+			if (m_last_write_offset*2 >= 0x700 && m_last_write_offset*2 < 0x720)
+				result = machine().rand() << 16;
 			else
 				result = 0xffff << 16;
-			logerror("%06X:Unhandled protection R@%04X = %04X\n", cpu_get_previouspc(&space->device()), offset, result);
+			logerror("%06X:Unhandled protection R@%04X = %04X\n", cpu_get_previouspc(&space.device()), offset, result);
 		}
 	}
 
 	if (ACCESSING_BITS_16_31)
-		logerror("%06X:Protection R@%04X = %04X\n", cpu_get_previouspc(&space->device()), offset * 4, result >> 16);
+		logerror("%06X:Protection R@%04X = %04X\n", cpu_get_previouspc(&space.device()), offset * 4, result >> 16);
 	else
-		logerror("%06X:Protection R@%04X = %04X\n", cpu_get_previouspc(&space->device()), offset * 4 + 2, result);
+		logerror("%06X:Protection R@%04X = %04X\n", cpu_get_previouspc(&space.device()), offset * 4 + 2, result);
 	return result;
 }
 
@@ -1153,23 +1153,23 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 32, atarigx2_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0xc80000, 0xc80fff) AM_RAM
-	AM_RANGE(0xca0000, 0xca0fff) AM_READWRITE_LEGACY(atarigx2_protection_r, atarigx2_protection_w) AM_BASE(m_protection_base)
-	AM_RANGE(0xd00000, 0xd1ffff) AM_READ_LEGACY(a2d_data_r)
+	AM_RANGE(0xca0000, 0xca0fff) AM_READWRITE(atarigx2_protection_r, atarigx2_protection_w) AM_BASE(m_protection_base)
+	AM_RANGE(0xd00000, 0xd1ffff) AM_READ(a2d_data_r)
 	AM_RANGE(0xd20000, 0xd20fff) AM_READWRITE_LEGACY(atarigen_eeprom_upper32_r, atarigen_eeprom32_w) AM_SHARE("eeprom")
 	AM_RANGE(0xd40000, 0xd40fff) AM_RAM_WRITE_LEGACY(atarigen_666_paletteram32_w) AM_SHARE("paletteram")
 	AM_RANGE(0xd72000, 0xd75fff) AM_WRITE_LEGACY(atarigen_playfield32_w) AM_BASE(m_playfield32)
 	AM_RANGE(0xd76000, 0xd76fff) AM_WRITE_LEGACY(atarigen_alpha32_w) AM_BASE(m_alpha32)
 	AM_RANGE(0xd78000, 0xd78fff) AM_DEVREADWRITE_LEGACY("rle", atarirle_spriteram32_r, atarirle_spriteram32_w)
-	AM_RANGE(0xd7a200, 0xd7a203) AM_WRITE_LEGACY(mo_command_w) AM_BASE(m_mo_command)
+	AM_RANGE(0xd7a200, 0xd7a203) AM_WRITE(mo_command_w) AM_BASE(m_mo_command)
 	AM_RANGE(0xd70000, 0xd7ffff) AM_RAM
 	AM_RANGE(0xd80000, 0xd9ffff) AM_WRITE_LEGACY(atarigen_eeprom_enable32_w)
 	AM_RANGE(0xe06000, 0xe06003) AM_WRITE_LEGACY(atarigen_sound_upper32_w)
-	AM_RANGE(0xe08000, 0xe08003) AM_WRITE_LEGACY(latch_w)
+	AM_RANGE(0xe08000, 0xe08003) AM_WRITE(latch_w)
 	AM_RANGE(0xe0c000, 0xe0c003) AM_WRITE_LEGACY(atarigen_video_int_ack32_w)
 	AM_RANGE(0xe0e000, 0xe0e003) AM_WRITENOP//watchdog_reset_w },
 	AM_RANGE(0xe80000, 0xe80003) AM_READ_PORT("P1_P2")
-	AM_RANGE(0xe82000, 0xe82003) AM_READ_LEGACY(special_port2_r)
-	AM_RANGE(0xe82004, 0xe82007) AM_READ_LEGACY(special_port3_r)
+	AM_RANGE(0xe82000, 0xe82003) AM_READ(special_port2_r)
+	AM_RANGE(0xe82004, 0xe82007) AM_READ(special_port3_r)
 	AM_RANGE(0xe86000, 0xe86003) AM_READ_LEGACY(atarigen_sound_upper32_r)
 	AM_RANGE(0xff8000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
@@ -2232,7 +2232,7 @@ XMEM=68.A23*E.A22*!E.A21*68.A20                                 = 1101 xxxx = d0
 */
 }
 
-static READ32_HANDLER( rrreveng_prot_r )
+READ32_MEMBER(atarigx2_state::rrreveng_prot_r)
 {
 	return 0;
 }
@@ -2245,7 +2245,7 @@ static DRIVER_INIT( rrreveng )
 
 	state->m_playfield_base = 0x000;
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xca0fc0, 0xca0fc3, FUNC(rrreveng_prot_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xca0fc0, 0xca0fc3, read32_delegate(FUNC(atarigx2_state::rrreveng_prot_r),state));
 }
 
 

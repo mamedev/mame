@@ -33,6 +33,8 @@ public:
 
 	device_t *m_speaker;
 	DECLARE_CUSTOM_INPUT_MEMBER(sflush_80_r);
+	DECLARE_READ8_MEMBER(indianbt_r);
+	DECLARE_WRITE8_MEMBER(steelwkr_sh_port_3_w);
 };
 
 

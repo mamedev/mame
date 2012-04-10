@@ -97,21 +97,21 @@ static void cage_irq_callback(running_machine &machine, int reason)
  *
  *************************************/
 
-static READ32_HANDLER( special_port2_r )
+READ32_MEMBER(atarigt_state::special_port2_r)
 {
-	int temp = input_port_read(space->machine(), "SERVICE");
+	int temp = input_port_read(machine(), "SERVICE");
 	temp ^= 0x0001;		/* /A2DRDY always high for now */
 	temp ^= 0x0008;		/* A2D.EOC always high for now */
 	return (temp << 16) | temp;
 }
 
 
-static READ32_HANDLER( special_port3_r )
+READ32_MEMBER(atarigt_state::special_port3_r)
 {
-	atarigt_state *state = space->machine().driver_data<atarigt_state>();
-	int temp = input_port_read(space->machine(), "COIN");
-	if (state->m_video_int_state) temp ^= 0x0001;
-	if (state->m_scanline_int_state) temp ^= 0x0002;
+//OBRISI.ME
+	int temp = input_port_read(machine(), "COIN");
+	if (m_video_int_state) temp ^= 0x0001;
+	if (m_scanline_int_state) temp ^= 0x0002;
 	return (temp << 16) | temp;
 }
 
@@ -149,26 +149,26 @@ INLINE void compute_fake_pots(int *pots)
 #endif
 
 
-static READ32_HANDLER( analog_port0_r )
+READ32_MEMBER(atarigt_state::analog_port0_r)
 {
 #if (HACK_TMEK_CONTROLS)
 	int pots[4];
 	compute_fake_pots(pots);
 	return (pots[0] << 24) | (pots[3] << 8);
 #else
-	return (input_port_read(space->machine(), "AN1") << 24) | (input_port_read(space->machine(), "AN2") << 8);
+	return (input_port_read(machine(), "AN1") << 24) | (input_port_read(machine(), "AN2") << 8);
 #endif
 }
 
 
-static READ32_HANDLER( analog_port1_r )
+READ32_MEMBER(atarigt_state::analog_port1_r)
 {
 #if (HACK_TMEK_CONTROLS)
 	int pots[4];
 	compute_fake_pots(pots);
 	return (pots[2] << 24) | (pots[1] << 8);
 #else
-	return (input_port_read(space->machine(), "AN3") << 24) | (input_port_read(space->machine(), "AN4") << 8);
+	return (input_port_read(machine(), "AN3") << 24) | (input_port_read(machine(), "AN4") << 8);
 #endif
 }
 
@@ -180,7 +180,7 @@ static READ32_HANDLER( analog_port1_r )
  *
  *************************************/
 
-static WRITE32_HANDLER( latch_w )
+WRITE32_MEMBER(atarigt_state::latch_w)
 {
 	/*
         D13 = 68.DISA
@@ -196,31 +196,31 @@ static WRITE32_HANDLER( latch_w )
 	/* upper byte */
 	if (ACCESSING_BITS_24_31)
 	{
-		atarigt_state *state = space->machine().driver_data<atarigt_state>();
+//OBRISI.ME
 
 		/* bits 13-11 are the MO control bits */
-		atarirle_control_w(state->m_rle, (data >> 27) & 7);
+		atarirle_control_w(m_rle, (data >> 27) & 7);
 	}
 
 	if (ACCESSING_BITS_16_23)
 	{
-		//cage_reset_w(space, data & 0x00100000);
-		coin_counter_w(space->machine(), 0, data & 0x00080000);
-		coin_counter_w(space->machine(), 1, data & 0x00010000);
+		//cage_reset_w(&space, data & 0x00100000);
+		coin_counter_w(machine(), 0, data & 0x00080000);
+		coin_counter_w(machine(), 1, data & 0x00010000);
 	}
 }
 
 
-static WRITE32_HANDLER( mo_command_w )
+WRITE32_MEMBER(atarigt_state::mo_command_w)
 {
-	atarigt_state *state = space->machine().driver_data<atarigt_state>();
-	COMBINE_DATA(state->m_mo_command);
+//OBRISI.ME
+	COMBINE_DATA(m_mo_command);
 	if (ACCESSING_BITS_0_15)
-		atarirle_command_w(state->m_rle, ((data & 0xffff) == 2) ? ATARIRLE_COMMAND_CHECKSUM : ATARIRLE_COMMAND_DRAW);
+		atarirle_command_w(m_rle, ((data & 0xffff) == 2) ? ATARIRLE_COMMAND_CHECKSUM : ATARIRLE_COMMAND_DRAW);
 }
 
 
-static WRITE32_HANDLER( led_w )
+WRITE32_MEMBER(atarigt_state::led_w)
 {
 //  logerror("LED = %08X & %08X\n", data, mem_mask);
 }
@@ -233,24 +233,24 @@ static WRITE32_HANDLER( led_w )
  *
  *************************************/
 
-static READ32_HANDLER( sound_data_r )
+READ32_MEMBER(atarigt_state::sound_data_r)
 {
 	UINT32 result = 0;
 
 	if (ACCESSING_BITS_0_15)
-		result |= cage_control_r(space->machine());
+		result |= cage_control_r(machine());
 	if (ACCESSING_BITS_16_31)
-		result |= cage_main_r(space) << 16;
+		result |= cage_main_r(&space) << 16;
 	return result;
 }
 
 
-static WRITE32_HANDLER( sound_data_w )
+WRITE32_MEMBER(atarigt_state::sound_data_w)
 {
 	if (ACCESSING_BITS_0_15)
-		cage_control_w(space->machine(), data);
+		cage_control_w(machine(), data);
 	if (ACCESSING_BITS_16_31)
-		cage_main_w(space, data >> 16);
+		cage_main_w(&space, data >> 16);
 }
 
 
@@ -552,23 +552,23 @@ if (LOG_PROTECTION)
  *
  *************************************/
 
-static READ32_HANDLER( colorram_protection_r )
+READ32_MEMBER(atarigt_state::colorram_protection_r)
 {
-	atarigt_state *state = space->machine().driver_data<atarigt_state>();
+//OBRISI.ME
 	offs_t address = 0xd80000 + offset * 4;
 	UINT32 result32 = 0;
 	UINT16 result;
 
 	if (ACCESSING_BITS_16_31)
 	{
-		result = atarigt_colorram_r(state, address);
-		(*state->m_protection_r)(space, address, &result);
+		result = atarigt_colorram_r(address);
+		(*m_protection_r)(&space, address, &result);
 		result32 |= result << 16;
 	}
 	if (ACCESSING_BITS_0_15)
 	{
-		result = atarigt_colorram_r(state, address + 2);
-		(*state->m_protection_r)(space, address + 2, &result);
+		result = atarigt_colorram_r(address + 2);
+		(*m_protection_r)(&space, address + 2, &result);
 		result32 |= result;
 	}
 
@@ -576,22 +576,22 @@ static READ32_HANDLER( colorram_protection_r )
 }
 
 
-static WRITE32_HANDLER( colorram_protection_w )
+WRITE32_MEMBER(atarigt_state::colorram_protection_w)
 {
-	atarigt_state *state = space->machine().driver_data<atarigt_state>();
+//OBRISI.ME
 	offs_t address = 0xd80000 + offset * 4;
 
 	if (ACCESSING_BITS_16_31)
 	{
-		if (!state->m_ignore_writes)
-			atarigt_colorram_w(state, address, data >> 16, mem_mask >> 16);
-		(*state->m_protection_w)(space, address, data >> 16);
+		if (!m_ignore_writes)
+			atarigt_colorram_w(address, data >> 16, mem_mask >> 16);
+		(*m_protection_w)(&space, address, data >> 16);
 	}
 	if (ACCESSING_BITS_0_15)
 	{
-		if (!state->m_ignore_writes)
-			atarigt_colorram_w(state, address + 2, data, mem_mask);
-		(*state->m_protection_w)(space, address + 2, data);
+		if (!m_ignore_writes)
+			atarigt_colorram_w(address + 2, data, mem_mask);
+		(*m_protection_w)(&space, address + 2, data);
 	}
 }
 
@@ -605,25 +605,25 @@ static WRITE32_HANDLER( colorram_protection_w )
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 32, atarigt_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
-	AM_RANGE(0xc00000, 0xc00003) AM_READWRITE_LEGACY(sound_data_r, sound_data_w)
-	AM_RANGE(0xd00014, 0xd00017) AM_READ_LEGACY(analog_port0_r)
-	AM_RANGE(0xd0001c, 0xd0001f) AM_READ_LEGACY(analog_port1_r)
+	AM_RANGE(0xc00000, 0xc00003) AM_READWRITE(sound_data_r, sound_data_w)
+	AM_RANGE(0xd00014, 0xd00017) AM_READ(analog_port0_r)
+	AM_RANGE(0xd0001c, 0xd0001f) AM_READ(analog_port1_r)
 	AM_RANGE(0xd20000, 0xd20fff) AM_READWRITE_LEGACY(atarigen_eeprom_upper32_r, atarigen_eeprom32_w) AM_SHARE("eeprom")
 	AM_RANGE(0xd40000, 0xd4ffff) AM_WRITE_LEGACY(atarigen_eeprom_enable32_w)
 	AM_RANGE(0xd72000, 0xd75fff) AM_WRITE_LEGACY(atarigen_playfield32_w) AM_BASE(m_playfield32)
 	AM_RANGE(0xd76000, 0xd76fff) AM_WRITE_LEGACY(atarigen_alpha32_w) AM_BASE(m_alpha32)
 	AM_RANGE(0xd78000, 0xd78fff) AM_DEVREADWRITE_LEGACY("rle", atarirle_spriteram32_r, atarirle_spriteram32_w)
-	AM_RANGE(0xd7a200, 0xd7a203) AM_WRITE_LEGACY(mo_command_w) AM_BASE(m_mo_command)
+	AM_RANGE(0xd7a200, 0xd7a203) AM_WRITE(mo_command_w) AM_BASE(m_mo_command)
 	AM_RANGE(0xd70000, 0xd7ffff) AM_RAM
-	AM_RANGE(0xd80000, 0xdfffff) AM_READWRITE_LEGACY(colorram_protection_r, colorram_protection_w) AM_BASE(m_colorram)
-	AM_RANGE(0xe04000, 0xe04003) AM_WRITE_LEGACY(led_w)
-	AM_RANGE(0xe08000, 0xe08003) AM_WRITE_LEGACY(latch_w)
+	AM_RANGE(0xd80000, 0xdfffff) AM_READWRITE(colorram_protection_r, colorram_protection_w) AM_BASE(m_colorram)
+	AM_RANGE(0xe04000, 0xe04003) AM_WRITE(led_w)
+	AM_RANGE(0xe08000, 0xe08003) AM_WRITE(latch_w)
 	AM_RANGE(0xe0a000, 0xe0a003) AM_WRITE_LEGACY(atarigen_scanline_int_ack32_w)
 	AM_RANGE(0xe0c000, 0xe0c003) AM_WRITE_LEGACY(atarigen_video_int_ack32_w)
 	AM_RANGE(0xe0e000, 0xe0e003) AM_WRITENOP//watchdog_reset_w },
 	AM_RANGE(0xe80000, 0xe80003) AM_READ_PORT("P1_P2")
-	AM_RANGE(0xe82000, 0xe82003) AM_READ_LEGACY(special_port2_r)
-	AM_RANGE(0xe82004, 0xe82007) AM_READ_LEGACY(special_port3_r)
+	AM_RANGE(0xe82000, 0xe82003) AM_READ(special_port2_r)
+	AM_RANGE(0xe82004, 0xe82007) AM_READ(special_port3_r)
 	AM_RANGE(0xf80000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -1247,23 +1247,23 @@ ROM_END
  *
  *************************************/
 
-static WRITE32_HANDLER( tmek_pf_w )
+WRITE32_MEMBER(atarigt_state::tmek_pf_w)
 {
-	offs_t pc = cpu_get_pc(&space->device());
+	offs_t pc = cpu_get_pc(&space.device());
 
 	/* protected version */
 	if (pc == 0x2EB3C || pc == 0x2EB48)
 	{
-		logerror("%06X:PFW@%06X = %08X & %08X (src=%06X)\n", cpu_get_pc(&space->device()), 0xd72000 + offset*4, data, mem_mask, (UINT32)cpu_get_reg(&space->device(), M68K_A4) - 2);
+		logerror("%06X:PFW@%06X = %08X & %08X (src=%06X)\n", cpu_get_pc(&space.device()), 0xd72000 + offset*4, data, mem_mask, (UINT32)cpu_get_reg(&space.device(), M68K_A4) - 2);
 		/* skip these writes to make more stuff visible */
 		return;
 	}
 
 	/* unprotected version */
 	if (pc == 0x25834 || pc == 0x25860)
-		logerror("%06X:PFW@%06X = %08X & %08X (src=%06X)\n", cpu_get_pc(&space->device()), 0xd72000 + offset*4, data, mem_mask, (UINT32)cpu_get_reg(&space->device(), M68K_A3) - 2);
+		logerror("%06X:PFW@%06X = %08X & %08X (src=%06X)\n", cpu_get_pc(&space.device()), 0xd72000 + offset*4, data, mem_mask, (UINT32)cpu_get_reg(&space.device(), M68K_A3) - 2);
 
-	atarigen_playfield32_w(space, offset, data, mem_mask);
+	atarigen_playfield32_w(&space, offset, data, mem_mask);
 }
 
 static DRIVER_INIT( tmek )
@@ -1281,7 +1281,7 @@ static DRIVER_INIT( tmek )
 	state->m_protection_w = tmek_protection_w;
 
 	/* temp hack */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xd72000, 0xd75fff, FUNC(tmek_pf_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xd72000, 0xd75fff, write32_delegate(FUNC(atarigt_state::tmek_pf_w),state));
 }
 
 

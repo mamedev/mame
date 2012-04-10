@@ -27,6 +27,27 @@ public:
 	DECLARE_WRITE8_MEMBER(spyhunt_videoram_w);
 	DECLARE_WRITE8_MEMBER(spyhunt_alpharam_w);
 	DECLARE_WRITE8_MEMBER(spyhunt_scroll_value_w);
+	DECLARE_WRITE8_MEMBER(mcrmono_control_port_w);
+	DECLARE_READ8_MEMBER(demoderm_ip1_r);
+	DECLARE_READ8_MEMBER(demoderm_ip2_r);
+	DECLARE_WRITE8_MEMBER(demoderm_op6_w);
+	DECLARE_READ8_MEMBER(maxrpm_ip1_r);
+	DECLARE_READ8_MEMBER(maxrpm_ip2_r);
+	DECLARE_WRITE8_MEMBER(maxrpm_op5_w);
+	DECLARE_WRITE8_MEMBER(maxrpm_op6_w);
+	DECLARE_READ8_MEMBER(rampage_ip4_r);
+	DECLARE_WRITE8_MEMBER(rampage_op6_w);
+	DECLARE_READ8_MEMBER(powerdrv_ip2_r);
+	DECLARE_WRITE8_MEMBER(powerdrv_op5_w);
+	DECLARE_WRITE8_MEMBER(powerdrv_op6_w);
+	DECLARE_READ8_MEMBER(stargrds_ip0_r);
+	DECLARE_WRITE8_MEMBER(stargrds_op5_w);
+	DECLARE_WRITE8_MEMBER(stargrds_op6_w);
+	DECLARE_READ8_MEMBER(spyhunt_ip1_r);
+	DECLARE_READ8_MEMBER(spyhunt_ip2_r);
+	DECLARE_WRITE8_MEMBER(spyhunt_op4_w);
+	DECLARE_READ8_MEMBER(turbotag_ip2_r);
+	DECLARE_READ8_MEMBER(turbotag_kludge_r);
 };
 
 

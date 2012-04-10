@@ -29,6 +29,29 @@ public:
 	UINT8 m_funcube_serial_fifo[4];
 	UINT8 m_funcube_serial_count;
 	DECLARE_WRITE16_MEMBER(seta2_vregs_w);
+	DECLARE_WRITE16_MEMBER(seta2_sound_bank_w);
+	DECLARE_WRITE16_MEMBER(grdians_lockout_w);
+	DECLARE_READ16_MEMBER(mj4simai_p1_r);
+	DECLARE_READ16_MEMBER(mj4simai_p2_r);
+	DECLARE_WRITE16_MEMBER(mj4simai_keyboard_w);
+	DECLARE_READ16_MEMBER(pzlbowl_protection_r);
+	DECLARE_READ16_MEMBER(pzlbowl_coins_r);
+	DECLARE_WRITE16_MEMBER(pzlbowl_coin_counter_w);
+	DECLARE_WRITE16_MEMBER(reelquak_leds_w);
+	DECLARE_WRITE16_MEMBER(reelquak_coin_w);
+	DECLARE_WRITE16_MEMBER(samshoot_coin_w);
+	DECLARE_READ32_MEMBER(funcube_nvram_dword_r);
+	DECLARE_WRITE32_MEMBER(funcube_nvram_dword_w);
+	DECLARE_WRITE16_MEMBER(spriteram16_word_w);
+	DECLARE_READ16_MEMBER(spriteram16_word_r);
+	DECLARE_WRITE32_MEMBER(coldfire_regs_w);
+	DECLARE_READ32_MEMBER(coldfire_regs_r);
+	DECLARE_READ32_MEMBER(funcube_debug_r);
+	DECLARE_READ8_MEMBER(funcube_coins_r);
+	DECLARE_READ8_MEMBER(funcube_serial_r);
+	DECLARE_WRITE8_MEMBER(funcube_leds_w);
+	DECLARE_READ8_MEMBER(funcube_outputs_r);
+	DECLARE_WRITE8_MEMBER(funcube_outputs_w);
 };
 
 /*----------- defined in video/seta2.c -----------*/

@@ -26,6 +26,7 @@ public:
 	void (*m_input_hack)(running_machine &machine);
 	int m_oldstate[2];
 	DECLARE_CUSTOM_INPUT_MEMBER(cubo_input);
+	DECLARE_WRITE32_MEMBER(aga_overlay_w);
 };
 
 /*----------- defined in machine/cd32.c -----------*/

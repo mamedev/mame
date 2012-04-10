@@ -66,18 +66,18 @@ static MACHINE_RESET( toobin )
  *
  *************************************/
 
-static WRITE16_HANDLER( interrupt_scan_w )
+WRITE16_MEMBER(toobin_state::interrupt_scan_w)
 {
-	toobin_state *state = space->machine().driver_data<toobin_state>();
-	int oldword = state->m_interrupt_scan[offset];
+//OBRISI.ME
+	int oldword = m_interrupt_scan[offset];
 	int newword = oldword;
 	COMBINE_DATA(&newword);
 
 	/* if something changed, update the word in memory */
 	if (oldword != newword)
 	{
-		state->m_interrupt_scan[offset] = newword;
-		atarigen_scanline_int_set(*space->machine().primary_screen, newword & 0x1ff);
+		m_interrupt_scan[offset] = newword;
+		atarigen_scanline_int_set(*machine().primary_screen, newword & 0x1ff);
 	}
 }
 
@@ -89,12 +89,12 @@ static WRITE16_HANDLER( interrupt_scan_w )
  *
  *************************************/
 
-static READ16_HANDLER( special_port1_r )
+READ16_MEMBER(toobin_state::special_port1_r)
 {
-	toobin_state *state = space->machine().driver_data<toobin_state>();
-	int result = input_port_read(space->machine(), "FF9000");
-	if (atarigen_get_hblank(*space->machine().primary_screen)) result ^= 0x8000;
-	if (state->m_cpu_to_sound_ready) result ^= 0x2000;
+//OBRISI.ME
+	int result = input_port_read(machine(), "FF9000");
+	if (atarigen_get_hblank(*machine().primary_screen)) result ^= 0x8000;
+	if (m_cpu_to_sound_ready) result ^= 0x2000;
 	return result;
 }
 
@@ -118,7 +118,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, toobin_state )
 	AM_RANGE(0xff8000, 0xff8001) AM_MIRROR(0x4500fe) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0xff8100, 0xff8101) AM_MIRROR(0x4500fe) AM_WRITE_LEGACY(atarigen_sound_w)
 	AM_RANGE(0xff8300, 0xff8301) AM_MIRROR(0x45003e) AM_WRITE_LEGACY(toobin_intensity_w)
-	AM_RANGE(0xff8340, 0xff8341) AM_MIRROR(0x45003e) AM_WRITE_LEGACY(interrupt_scan_w) AM_BASE(m_interrupt_scan)
+	AM_RANGE(0xff8340, 0xff8341) AM_MIRROR(0x45003e) AM_WRITE(interrupt_scan_w) AM_BASE(m_interrupt_scan)
 	AM_RANGE(0xff8380, 0xff8381) AM_MIRROR(0x45003e) AM_READWRITE_LEGACY(atarimo_0_slipram_r, toobin_slip_w)
 	AM_RANGE(0xff83c0, 0xff83c1) AM_MIRROR(0x45003e) AM_WRITE_LEGACY(atarigen_scanline_int_ack_w)
 	AM_RANGE(0xff8400, 0xff8401) AM_MIRROR(0x4500fe) AM_WRITE_LEGACY(atarigen_sound_reset_w)
@@ -126,7 +126,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, toobin_state )
 	AM_RANGE(0xff8600, 0xff8601) AM_MIRROR(0x4500fe) AM_WRITE_LEGACY(toobin_xscroll_w) AM_BASE(m_xscroll)
 	AM_RANGE(0xff8700, 0xff8701) AM_MIRROR(0x4500fe) AM_WRITE_LEGACY(toobin_yscroll_w) AM_BASE(m_yscroll)
 	AM_RANGE(0xff8800, 0xff8801) AM_MIRROR(0x4507fe) AM_READ_PORT("FF8800")
-	AM_RANGE(0xff9000, 0xff9001) AM_MIRROR(0x4507fe) AM_READ_LEGACY(special_port1_r)
+	AM_RANGE(0xff9000, 0xff9001) AM_MIRROR(0x4507fe) AM_READ(special_port1_r)
 	AM_RANGE(0xff9800, 0xff9801) AM_MIRROR(0x4507fe) AM_READ_LEGACY(atarigen_sound_r)
 	AM_RANGE(0xffa000, 0xffafff) AM_MIRROR(0x451000) AM_READWRITE_LEGACY(atarigen_eeprom_r, atarigen_eeprom_w) AM_SHARE("eeprom")
 	AM_RANGE(0xffc000, 0xffffff) AM_MIRROR(0x450000) AM_RAM

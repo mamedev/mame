@@ -64,13 +64,13 @@ static MACHINE_RESET( xybots )
  *
  *************************************/
 
-static READ16_HANDLER( special_port1_r )
+READ16_MEMBER(xybots_state::special_port1_r)
 {
-	xybots_state *state = space->machine().driver_data<xybots_state>();
-	int result = input_port_read(space->machine(), "FFE200");
+//OBRISI.ME
+	int result = input_port_read(machine(), "FFE200");
 
-	if (state->m_cpu_to_sound_ready) result ^= 0x0200;
-	result ^= state->m_h256 ^= 0x0400;
+	if (m_cpu_to_sound_ready) result ^= 0x0200;
+	result ^= m_h256 ^= 0x0400;
 	return result;
 }
 
@@ -96,7 +96,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, xybots_state )
 	AM_RANGE(0xffd000, 0xffdfff) AM_MIRROR(0x7f8000) AM_READWRITE_LEGACY(atarigen_eeprom_r, atarigen_eeprom_w) AM_SHARE("eeprom")
 	AM_RANGE(0xffe000, 0xffe0ff) AM_MIRROR(0x7f8000) AM_READ_LEGACY(atarigen_sound_r)
 	AM_RANGE(0xffe100, 0xffe1ff) AM_MIRROR(0x7f8000) AM_READ_PORT("FFE100")
-	AM_RANGE(0xffe200, 0xffe2ff) AM_MIRROR(0x7f8000) AM_READ_LEGACY(special_port1_r)
+	AM_RANGE(0xffe200, 0xffe2ff) AM_MIRROR(0x7f8000) AM_READ(special_port1_r)
 	AM_RANGE(0xffe800, 0xffe8ff) AM_MIRROR(0x7f8000) AM_WRITE_LEGACY(atarigen_eeprom_enable_w)
 	AM_RANGE(0xffe900, 0xffe9ff) AM_MIRROR(0x7f8000) AM_WRITE_LEGACY(atarigen_sound_w)
 	AM_RANGE(0xffea00, 0xffeaff) AM_MIRROR(0x7f8000) AM_WRITE(watchdog_reset16_w)

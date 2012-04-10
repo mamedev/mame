@@ -254,26 +254,26 @@ static INTERRUPT_GEN( vblank_int )
  *
  *************************************/
 
-static READ16_HANDLER( sound_busy_r )
+READ16_MEMBER(badlands_state::sound_busy_r)
 {
-	badlands_state *state = space->machine().driver_data<badlands_state>();
+//OBRISI.ME
 	int temp = 0xfeff;
-	if (state->m_cpu_to_sound_ready) temp ^= 0x0100;
+	if (m_cpu_to_sound_ready) temp ^= 0x0100;
 	return temp;
 }
 
 
-static READ16_HANDLER( pedal_0_r )
+READ16_MEMBER(badlands_state::pedal_0_r)
 {
-	badlands_state *state = space->machine().driver_data<badlands_state>();
-	return state->m_pedal_value[0];
+//OBRISI.ME
+	return m_pedal_value[0];
 }
 
 
-static READ16_HANDLER( pedal_1_r )
+READ16_MEMBER(badlands_state::pedal_1_r)
 {
-	badlands_state *state = space->machine().driver_data<badlands_state>();
-	return state->m_pedal_value[1];
+//OBRISI.ME
+	return m_pedal_value[1];
 }
 
 
@@ -284,9 +284,9 @@ static READ16_HANDLER( pedal_1_r )
  *
  *************************************/
 
-static READ8_HANDLER( audio_io_r )
+READ8_MEMBER(badlands_state::audio_io_r)
 {
-	badlands_state *state = space->machine().driver_data<badlands_state>();
+//OBRISI.ME
 	int result = 0xff;
 
 	switch (offset & 0x206)
@@ -296,7 +296,7 @@ static READ8_HANDLER( audio_io_r )
 			break;
 
 		case 0x002:		/* /RDP */
-			result = atarigen_6502_sound_r(space, offset);
+			result = atarigen_6502_sound_r(&space, offset);
 			break;
 
 		case 0x004:		/* /RDIO */
@@ -310,15 +310,15 @@ static READ8_HANDLER( audio_io_r )
                 0x02 = coin 2
                 0x01 = coin 1
             */
-			result = input_port_read(space->machine(), "AUDIO");
-			if (!(input_port_read(space->machine(), "FE4000") & 0x0080)) result ^= 0x90;
-			if (state->m_cpu_to_sound_ready) result ^= 0x40;
-			if (state->m_sound_to_cpu_ready) result ^= 0x20;
+			result = input_port_read(machine(), "AUDIO");
+			if (!(input_port_read(machine(), "FE4000") & 0x0080)) result ^= 0x90;
+			if (m_cpu_to_sound_ready) result ^= 0x40;
+			if (m_sound_to_cpu_ready) result ^= 0x20;
 			result ^= 0x10;
 			break;
 
 		case 0x006:		/* /IRQACK */
-			atarigen_6502_irq_ack_r(space, 0);
+			atarigen_6502_irq_ack_r(&space, 0);
 			break;
 
 		case 0x200:		/* /VOICE */
@@ -333,9 +333,9 @@ static READ8_HANDLER( audio_io_r )
 }
 
 
-static WRITE8_HANDLER( audio_io_w )
+WRITE8_MEMBER(badlands_state::audio_io_w)
 {
-	badlands_state *state = space->machine().driver_data<badlands_state>();
+//OBRISI.ME
 
 	switch (offset & 0x206)
 	{
@@ -346,7 +346,7 @@ static WRITE8_HANDLER( audio_io_w )
 			break;
 
 		case 0x006:		/* /IRQACK */
-			atarigen_6502_irq_ack_r(space, 0);
+			atarigen_6502_irq_ack_r(&space, 0);
 			break;
 
 		case 0x200:		/* n/c */
@@ -354,7 +354,7 @@ static WRITE8_HANDLER( audio_io_w )
 			break;
 
 		case 0x202:		/* /WRP */
-			atarigen_6502_sound_w(space, offset, data);
+			atarigen_6502_sound_w(&space, offset, data);
 			break;
 
 		case 0x204:		/* WRIO */
@@ -369,7 +369,7 @@ static WRITE8_HANDLER( audio_io_w )
             */
 
 			/* update the bank */
-			memcpy(state->m_bank_base, &state->m_bank_source_data[0x1000 * ((data >> 6) & 3)], 0x1000);
+			memcpy(m_bank_base, &m_bank_source_data[0x1000 * ((data >> 6) & 3)], 0x1000);
 			break;
 	}
 }
@@ -384,15 +384,15 @@ static WRITE8_HANDLER( audio_io_w )
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, badlands_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0xfc0000, 0xfc1fff) AM_READWRITE_LEGACY(sound_busy_r, atarigen_sound_reset_w)
+	AM_RANGE(0xfc0000, 0xfc1fff) AM_READ(sound_busy_r) AM_WRITE_LEGACY(atarigen_sound_reset_w)
 	AM_RANGE(0xfd0000, 0xfd1fff) AM_READWRITE_LEGACY(atarigen_eeprom_r, atarigen_eeprom_w) AM_SHARE("eeprom")
 	AM_RANGE(0xfe0000, 0xfe1fff) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0xfe2000, 0xfe3fff) AM_WRITE_LEGACY(atarigen_video_int_ack_w)
 	AM_RANGE(0xfe4000, 0xfe5fff) AM_READ_PORT("FE4000")
 	AM_RANGE(0xfe6000, 0xfe6001) AM_READ_PORT("FE6000")
 	AM_RANGE(0xfe6002, 0xfe6003) AM_READ_PORT("FE6002")
-	AM_RANGE(0xfe6004, 0xfe6005) AM_READ_LEGACY(pedal_0_r)
-	AM_RANGE(0xfe6006, 0xfe6007) AM_READ_LEGACY(pedal_1_r)
+	AM_RANGE(0xfe6004, 0xfe6005) AM_READ(pedal_0_r)
+	AM_RANGE(0xfe6006, 0xfe6007) AM_READ(pedal_1_r)
 	AM_RANGE(0xfe8000, 0xfe9fff) AM_WRITE_LEGACY(atarigen_sound_upper_w)
 	AM_RANGE(0xfea000, 0xfebfff) AM_READ_LEGACY(atarigen_sound_upper_r)
 	AM_RANGE(0xfec000, 0xfedfff) AM_WRITE_LEGACY(badlands_pf_bank_w)
@@ -414,7 +414,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8, badlands_state )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x2001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
-	AM_RANGE(0x2800, 0x2bff) AM_READWRITE_LEGACY(audio_io_r, audio_io_w)
+	AM_RANGE(0x2800, 0x2bff) AM_READWRITE(audio_io_r, audio_io_w)
 	AM_RANGE(0x3000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -632,7 +632,7 @@ GAME( 1989, badlands, 0, badlands, badlands, badlands, ROT0, "Atari Games", "Bad
 
 */
 
-static READ16_HANDLER( badlandsb_unk_r )
+READ16_MEMBER(badlands_state::badlandsb_unk_r)
 {
 
 	return 0xffff;
@@ -642,14 +642,14 @@ static ADDRESS_MAP_START( bootleg_map, AS_PROGRAM, 16, badlands_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 
 
-	AM_RANGE(0x400008, 0x400009) AM_READ_LEGACY(badlandsb_unk_r )
-	AM_RANGE(0x4000fe, 0x4000ff) AM_READ_LEGACY(badlandsb_unk_r )
+	AM_RANGE(0x400008, 0x400009) AM_READ(badlandsb_unk_r )
+	AM_RANGE(0x4000fe, 0x4000ff) AM_READ(badlandsb_unk_r )
 
-	AM_RANGE(0xfc0000, 0xfc0001) AM_READ_LEGACY(badlandsb_unk_r )
+	AM_RANGE(0xfc0000, 0xfc0001) AM_READ(badlandsb_unk_r )
 
-	AM_RANGE(0xfe4000, 0xfe4001) AM_READ_LEGACY(badlandsb_unk_r )
-	AM_RANGE(0xfe4004, 0xfe4005) AM_READ_LEGACY(badlandsb_unk_r )
-	AM_RANGE(0xfe4006, 0xfe4007) AM_READ_LEGACY(badlandsb_unk_r )
+	AM_RANGE(0xfe4000, 0xfe4001) AM_READ(badlandsb_unk_r )
+	AM_RANGE(0xfe4004, 0xfe4005) AM_READ(badlandsb_unk_r )
+	AM_RANGE(0xfe4006, 0xfe4007) AM_READ(badlandsb_unk_r )
 
 
 	AM_RANGE(0xfd0000, 0xfd1fff) AM_READWRITE_LEGACY(atarigen_eeprom_r, atarigen_eeprom_w) AM_SHARE("eeprom")

@@ -127,7 +127,7 @@ static MACHINE_RESET( arcadecl )
  *
  *************************************/
 
-static WRITE16_HANDLER( latch_w )
+WRITE16_MEMBER(arcadecl_state::latch_w)
 {
 	/* bit layout in this register:
 
@@ -138,9 +138,9 @@ static WRITE16_HANDLER( latch_w )
 	/* lower byte being modified? */
 	if (ACCESSING_BITS_0_7)
 	{
-		okim6295_device *oki = space->machine().device<okim6295_device>("oki");
+		okim6295_device *oki = machine().device<okim6295_device>("oki");
 		oki->set_bank_base((data & 0x80) ? 0x40000 : 0x00000);
-		atarigen_set_oki6295_vol(space->machine(), (data & 0x001f) * 100 / 0x1f);
+		atarigen_set_oki6295_vol(machine(), (data & 0x001f) * 100 / 0x1f);
 	}
 }
 
@@ -167,7 +167,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, arcadecl_state )
 	AM_RANGE(0x640022, 0x640023) AM_READ_PORT("TRACKY2")
 	AM_RANGE(0x640024, 0x640025) AM_READ_PORT("TRACKX1")
 	AM_RANGE(0x640026, 0x640027) AM_READ_PORT("TRACKY1")
-	AM_RANGE(0x640040, 0x64004f) AM_WRITE_LEGACY(latch_w)
+	AM_RANGE(0x640040, 0x64004f) AM_WRITE(latch_w)
 	AM_RANGE(0x640060, 0x64006f) AM_WRITE_LEGACY(atarigen_eeprom_enable_w)
 	AM_RANGE(0x641000, 0x641fff) AM_READWRITE_LEGACY(atarigen_eeprom_r, atarigen_eeprom_w) AM_SHARE("eeprom")
 	AM_RANGE(0x642000, 0x642001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0xff00)

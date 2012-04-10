@@ -55,6 +55,33 @@ public:
 	DECLARE_WRITE32_MEMBER(video_dma_address_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(ejsakura_keyboard_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(ejanhs_encode);
+	DECLARE_READ32_MEMBER(sb_coin_r);
+	DECLARE_WRITE8_MEMBER(sb_coin_w);
+	DECLARE_READ32_MEMBER(sound_fifo_r);
+	DECLARE_WRITE32_MEMBER(sound_fifo_w);
+	DECLARE_READ32_MEMBER(sound_fifo_status_r);
+	DECLARE_READ32_MEMBER(spi_int_r);
+	DECLARE_READ32_MEMBER(spi_unknown_r);
+	DECLARE_WRITE32_MEMBER(z80_prg_fifo_w);
+	DECLARE_WRITE32_MEMBER(z80_enable_w);
+	DECLARE_READ32_MEMBER(spi_controls1_r);
+	DECLARE_READ32_MEMBER(spi_controls2_r);
+	DECLARE_READ8_MEMBER(z80_soundfifo_r);
+	DECLARE_WRITE8_MEMBER(z80_soundfifo_w);
+	DECLARE_READ8_MEMBER(z80_soundfifo_status_r);
+	DECLARE_WRITE8_MEMBER(z80_bank_w);
+	DECLARE_READ8_MEMBER(z80_jp1_r);
+	DECLARE_READ8_MEMBER(z80_coin_r);
+	DECLARE_READ32_MEMBER(soundrom_r);
+	DECLARE_WRITE32_MEMBER(input_select_w);
+	DECLARE_READ32_MEMBER(senkyu_speedup_r);
+	DECLARE_READ32_MEMBER(senkyua_speedup_r);
+	DECLARE_READ32_MEMBER(batlball_speedup_r);
+	DECLARE_READ32_MEMBER(rdft_speedup_r);
+	DECLARE_READ32_MEMBER(viprp1_speedup_r);
+	DECLARE_READ32_MEMBER(viprp1o_speedup_r);
+	DECLARE_READ32_MEMBER(rf2_speedup_r);
+	DECLARE_READ32_MEMBER(rfjet_speedup_r);
 };
 
 

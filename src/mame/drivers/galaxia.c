@@ -80,47 +80,47 @@ static INTERRUPT_GEN( galaxia_interrupt )
 
 ***************************************************************************/
 
-static WRITE8_HANDLER(galaxia_video_w)
+WRITE8_MEMBER(galaxia_state::galaxia_video_w)
 {
-	galaxia_state *state = space->machine().driver_data<galaxia_state>();
-//  space->machine().primary_screen->update_partial(space->machine().primary_screen->vpos());
-	state->m_bg_tilemap->mark_tile_dirty(offset);
-	state->cvs_video_or_color_ram_w(*space, offset, data);
+//OBRISI.ME
+//  machine().primary_screen->update_partial(machine().primary_screen->vpos());
+	m_bg_tilemap->mark_tile_dirty(offset);
+	cvs_video_or_color_ram_w(*&space, offset, data);
 }
 
-static WRITE8_HANDLER(galaxia_scroll_w)
+WRITE8_MEMBER(galaxia_state::galaxia_scroll_w)
 {
-	galaxia_state *state = space->machine().driver_data<galaxia_state>();
-	space->machine().primary_screen->update_partial(space->machine().primary_screen->vpos());
+//OBRISI.ME
+	machine().primary_screen->update_partial(machine().primary_screen->vpos());
 
 	// fixed scrolling area
 	for (int i = 1; i < 6; i++)
-		state->m_bg_tilemap->set_scrolly(i, data);
+		m_bg_tilemap->set_scrolly(i, data);
 }
 
-static WRITE8_HANDLER(galaxia_ctrlport_w)
+WRITE8_MEMBER(galaxia_state::galaxia_ctrlport_w)
 {
 	// d0/d1: maybe coincounter
 	// other bits: unknown
 }
 
-static WRITE8_HANDLER(galaxia_dataport_w)
+WRITE8_MEMBER(galaxia_state::galaxia_dataport_w)
 {
 	// cvs-style video fx? or lamps?
 }
 
-static READ8_HANDLER(galaxia_collision_r)
+READ8_MEMBER(galaxia_state::galaxia_collision_r)
 {
-	galaxia_state *state = space->machine().driver_data<galaxia_state>();
-	space->machine().primary_screen->update_partial(space->machine().primary_screen->vpos());
-	return state->m_collision_register;
+//OBRISI.ME
+	machine().primary_screen->update_partial(machine().primary_screen->vpos());
+	return m_collision_register;
 }
 
-static READ8_HANDLER(galaxia_collision_clear)
+READ8_MEMBER(galaxia_state::galaxia_collision_clear)
 {
-	galaxia_state *state = space->machine().driver_data<galaxia_state>();
-	space->machine().primary_screen->update_partial(space->machine().primary_screen->vpos());
-	state->m_collision_register = 0;
+//OBRISI.ME
+	machine().primary_screen->update_partial(machine().primary_screen->vpos());
+	m_collision_register = 0;
 	return 0xff;
 }
 
@@ -130,7 +130,7 @@ static ADDRESS_MAP_START( galaxia_mem_map, AS_PROGRAM, 8, galaxia_state )
 	AM_RANGE(0x1500, 0x15ff) AM_MIRROR(0x6000) AM_DEVREADWRITE_LEGACY("s2636_0", s2636_work_ram_r, s2636_work_ram_w)
 	AM_RANGE(0x1600, 0x16ff) AM_MIRROR(0x6000) AM_DEVREADWRITE_LEGACY("s2636_1", s2636_work_ram_r, s2636_work_ram_w)
 	AM_RANGE(0x1700, 0x17ff) AM_MIRROR(0x6000) AM_DEVREADWRITE_LEGACY("s2636_2", s2636_work_ram_r, s2636_work_ram_w)
-	AM_RANGE(0x1800, 0x1bff) AM_MIRROR(0x6000) AM_READ(cvs_video_or_color_ram_r) AM_WRITE_LEGACY(galaxia_video_w) AM_BASE(m_video_ram)
+	AM_RANGE(0x1800, 0x1bff) AM_MIRROR(0x6000) AM_READ(cvs_video_or_color_ram_r) AM_WRITE(galaxia_video_w) AM_BASE(m_video_ram)
 	AM_RANGE(0x1c00, 0x1fff) AM_MIRROR(0x6000) AM_RAM
 	AM_RANGE(0x2000, 0x33ff) AM_ROM
 	AM_RANGE(0x7214, 0x7214) AM_READ_PORT("IN0")
@@ -140,21 +140,21 @@ static ADDRESS_MAP_START( astrowar_mem_map, AS_PROGRAM, 8, galaxia_state )
 	AM_RANGE(0x0000, 0x13ff) AM_ROM
 	AM_RANGE(0x1400, 0x14ff) AM_MIRROR(0x6000) AM_RAM
 	AM_RANGE(0x1500, 0x15ff) AM_MIRROR(0x6000) AM_DEVREADWRITE_LEGACY("s2636_0", s2636_work_ram_r, s2636_work_ram_w)
-	AM_RANGE(0x1800, 0x1bff) AM_MIRROR(0x6000) AM_READ(cvs_video_or_color_ram_r) AM_WRITE_LEGACY(galaxia_video_w)  AM_BASE(m_video_ram)
+	AM_RANGE(0x1800, 0x1bff) AM_MIRROR(0x6000) AM_READ(cvs_video_or_color_ram_r) AM_WRITE(galaxia_video_w)  AM_BASE(m_video_ram)
 	AM_RANGE(0x1c00, 0x1cff) AM_MIRROR(0x6000) AM_RAM AM_BASE(m_bullet_ram)
 	AM_RANGE(0x2000, 0x33ff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( galaxia_io_map, AS_IO, 8, galaxia_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00, 0x00) AM_WRITE_LEGACY(galaxia_scroll_w) AM_READ_PORT("IN0")
+	AM_RANGE(0x00, 0x00) AM_WRITE(galaxia_scroll_w) AM_READ_PORT("IN0")
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN1")
 	AM_RANGE(0x05, 0x05) AM_READNOP
 	AM_RANGE(0x06, 0x06) AM_READ_PORT("DSW0")
 	AM_RANGE(0x07, 0x07) AM_READ_PORT("DSW1")
 	AM_RANGE(0xac, 0xac) AM_READNOP
-	AM_RANGE(S2650_CTRL_PORT, S2650_CTRL_PORT) AM_READWRITE_LEGACY(galaxia_collision_r, galaxia_ctrlport_w)
-	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_READWRITE_LEGACY(galaxia_collision_clear, galaxia_dataport_w)
+	AM_RANGE(S2650_CTRL_PORT, S2650_CTRL_PORT) AM_READWRITE(galaxia_collision_r, galaxia_ctrlport_w)
+	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_READWRITE(galaxia_collision_clear, galaxia_dataport_w)
 	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ_PORT("SENSE")
 	AM_RANGE(S2650_FO_PORT, S2650_FO_PORT) AM_RAM AM_BASE(m_fo_state)
 ADDRESS_MAP_END

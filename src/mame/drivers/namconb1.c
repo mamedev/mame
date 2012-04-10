@@ -471,16 +471,16 @@ static void namconb1_cpureg8_w(running_machine &machine, int reg, UINT8 data)
 	}
 }
 
-static WRITE32_HANDLER( namconb1_cpureg_w )
+WRITE32_MEMBER(namconb1_state::namconb1_cpureg_w)
 {
 	if(mem_mask & 0xff000000)
-		namconb1_cpureg8_w(space->machine(), offset*4, data >> 24);
+		namconb1_cpureg8_w(machine(), offset*4, data >> 24);
 	if(mem_mask & 0x00ff0000)
-		namconb1_cpureg8_w(space->machine(), offset*4+1, data >> 16);
+		namconb1_cpureg8_w(machine(), offset*4+1, data >> 16);
 	if(mem_mask & 0x0000ff00)
-		namconb1_cpureg8_w(space->machine(), offset*4+2, data >> 8);
+		namconb1_cpureg8_w(machine(), offset*4+2, data >> 8);
 	if(mem_mask & 0x000000ff)
-		namconb1_cpureg8_w(space->machine(), offset*4+3, data);
+		namconb1_cpureg8_w(machine(), offset*4+3, data);
 }
 
 
@@ -539,23 +539,23 @@ static void namconb2_cpureg8_w(running_machine &machine, int reg, UINT8 data)
 	}
 }
 
-static WRITE32_HANDLER( namconb2_cpureg_w )
+WRITE32_MEMBER(namconb1_state::namconb2_cpureg_w)
 {
 	if(mem_mask & 0xff000000)
-		namconb2_cpureg8_w(space->machine(), offset*4, data >> 24);
+		namconb2_cpureg8_w(machine(), offset*4, data >> 24);
 	if(mem_mask & 0x00ff0000)
-		namconb2_cpureg8_w(space->machine(), offset*4+1, data >> 16);
+		namconb2_cpureg8_w(machine(), offset*4+1, data >> 16);
 	if(mem_mask & 0x0000ff00)
-		namconb2_cpureg8_w(space->machine(), offset*4+2, data >> 8);
+		namconb2_cpureg8_w(machine(), offset*4+2, data >> 8);
 	if(mem_mask & 0x000000ff)
-		namconb2_cpureg8_w(space->machine(), offset*4+3, data);
+		namconb2_cpureg8_w(machine(), offset*4+3, data);
 }
 
-static READ32_HANDLER(namconb_cpureg_r)
+READ32_MEMBER(namconb1_state::namconb_cpureg_r)
 {
-	namconb1_state *state = space->machine().driver_data<namconb1_state>();
-	return (state->m_namconb_cpureg[offset*4] << 24) | (state->m_namconb_cpureg[offset*4+1] << 16)
-		| (state->m_namconb_cpureg[offset*4+2] << 8) | state->m_namconb_cpureg[offset*4+3];
+//OBRISI.ME
+	return (m_namconb_cpureg[offset*4] << 24) | (m_namconb_cpureg[offset*4+1] << 16)
+		| (m_namconb_cpureg[offset*4+2] << 8) | m_namconb_cpureg[offset*4+3];
 }
 
 
@@ -661,15 +661,15 @@ static DRIVER_INIT( outfxies )
 	namcos2_gametype = NAMCONB2_OUTFOXIES;
 }
 
-static READ32_HANDLER( custom_key_r )
+READ32_MEMBER(namconb1_state::custom_key_r)
 {
-	namconb1_state *state = space->machine().driver_data<namconb1_state>();
-	UINT16 old_count = state->m_count;
+//OBRISI.ME
+	UINT16 old_count = m_count;
 
 	do
 	{ /* pick a random number, but don't pick the same twice in a row */
-		state->m_count = space->machine().rand();
-	} while( state->m_count==old_count );
+		m_count = machine().rand();
+	} while( m_count==old_count );
 
 	switch( namcos2_gametype )
 	{
@@ -680,7 +680,7 @@ static READ32_HANDLER( custom_key_r )
 		switch( offset )
 		{
 		case 0: return 0x0189;
-		case 1: return  state->m_count<<16;
+		case 1: return  m_count<<16;
 		}
 		break;
 
@@ -688,7 +688,7 @@ static READ32_HANDLER( custom_key_r )
 		switch( offset )
 		{
 		case 0: return 0x01aa<<16;
-		case 4: return state->m_count<<16;
+		case 4: return m_count<<16;
 		}
 		break;
 
@@ -696,7 +696,7 @@ static READ32_HANDLER( custom_key_r )
 		switch( offset )
 		{
 		case 2: return 0x1b2<<16;
-		case 5: return state->m_count<<16;
+		case 5: return m_count<<16;
 		}
 		break;
 
@@ -704,7 +704,7 @@ static READ32_HANDLER( custom_key_r )
 		switch( offset )
 		{
 		case 0: return 0x0167;
-		case 1: return state->m_count<<16;
+		case 1: return m_count<<16;
 		}
 		break;
 
@@ -712,7 +712,7 @@ static READ32_HANDLER( custom_key_r )
 		switch( offset )
 		{
 		case 1: return 0;
-		case 3: return (0x0171<<16) | state->m_count;
+		case 3: return (0x0171<<16) | m_count;
 		}
 		break;
 
@@ -720,14 +720,14 @@ static READ32_HANDLER( custom_key_r )
 		switch( offset )
 		{
 		case 1: return 0x016e;
-		case 3: return state->m_count;
+		case 3: return m_count;
 		}
 		break;
 
 	case NAMCONB1_VSHOOT:
 		switch( offset )
 		{
-		case 2: return state->m_count<<16;
+		case 2: return m_count<<16;
 		case 3: return 0x0170<<16;
 		}
 		break;
@@ -736,7 +736,7 @@ static READ32_HANDLER( custom_key_r )
 		switch( offset )
 		{
 		case 0: return 0x0186;
-		case 1: return state->m_count<<16;
+		case 1: return m_count<<16;
 		}
 		break;
 
@@ -744,7 +744,7 @@ static READ32_HANDLER( custom_key_r )
 		break; /* no protection? */
 	}
 
-	logerror( "custom_key_r(%d); pc=%08x\n", offset, cpu_get_pc(&space->device()) );
+	logerror( "custom_key_r(%d); pc=%08x\n", offset, cpu_get_pc(&space.device()) );
 	return 0;
 } /* custom_key_r */
 
@@ -809,16 +809,16 @@ GFXDECODE_END /* gfxdecodeinfo2 */
 
 /***************************************************************/
 
-static READ32_HANDLER( gunbulet_gun_r )
+READ32_MEMBER(namconb1_state::gunbulet_gun_r)
 {
 	int result = 0;
 
 	switch( offset )
 	{
-	case 0: case 1: result = (UINT8)(0x0f + input_port_read(space->machine(), "LIGHT1_Y") * 224/255); break; /* Y (p2) */
-	case 2: case 3: result = (UINT8)(0x26 + input_port_read(space->machine(), "LIGHT1_X") * 288/314); break; /* X (p2) */
-	case 4: case 5: result = (UINT8)(0x0f + input_port_read(space->machine(), "LIGHT0_Y") * 224/255); break; /* Y (p1) */
-	case 6: case 7: result = (UINT8)(0x26 + input_port_read(space->machine(), "LIGHT0_X") * 288/314); break; /* X (p1) */
+	case 0: case 1: result = (UINT8)(0x0f + input_port_read(machine(), "LIGHT1_Y") * 224/255); break; /* Y (p2) */
+	case 2: case 3: result = (UINT8)(0x26 + input_port_read(machine(), "LIGHT1_X") * 288/314); break; /* X (p2) */
+	case 4: case 5: result = (UINT8)(0x0f + input_port_read(machine(), "LIGHT0_Y") * 224/255); break; /* Y (p1) */
+	case 6: case 7: result = (UINT8)(0x26 + input_port_read(machine(), "LIGHT0_X") * 288/314); break; /* X (p1) */
 	}
 	return result<<24;
 } /* gunbulet_gun_r */
@@ -836,36 +836,36 @@ WRITE32_MEMBER(namconb1_state::srand_w)
      */
 } /* srand_w */
 
-static READ32_HANDLER(namconb_share_r)
+READ32_MEMBER(namconb1_state::namconb_share_r)
 {
-	namconb1_state *state = space->machine().driver_data<namconb1_state>();
-	return (state->m_namconb_shareram[offset*2] << 16) | state->m_namconb_shareram[offset*2+1];
+//OBRISI.ME
+	return (m_namconb_shareram[offset*2] << 16) | m_namconb_shareram[offset*2+1];
 }
 
-static WRITE32_HANDLER(namconb_share_w)
+WRITE32_MEMBER(namconb1_state::namconb_share_w)
 {
-	namconb1_state *state = space->machine().driver_data<namconb1_state>();
-	COMBINE_DATA(state->m_namconb_shareram+offset*2+1);
+//OBRISI.ME
+	COMBINE_DATA(m_namconb_shareram+offset*2+1);
 	data >>= 16;
 	mem_mask >>= 16;
-	COMBINE_DATA(state->m_namconb_shareram+offset*2);
+	COMBINE_DATA(m_namconb_shareram+offset*2);
 }
 
 static ADDRESS_MAP_START( namconb1_am, AS_PROGRAM, 32, namconb1_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x100000, 0x10001f) AM_READ_LEGACY(gunbulet_gun_r)
+	AM_RANGE(0x100000, 0x10001f) AM_READ(gunbulet_gun_r)
 	AM_RANGE(0x1c0000, 0x1cffff) AM_RAM
 	AM_RANGE(0x1e4000, 0x1e4003) AM_READWRITE(randgen_r,srand_w)
-	AM_RANGE(0x200000, 0x207fff) AM_READWRITE_LEGACY(namconb_share_r, namconb_share_w)
+	AM_RANGE(0x200000, 0x207fff) AM_READWRITE(namconb_share_r, namconb_share_w)
 	AM_RANGE(0x208000, 0x2fffff) AM_RAM
-	AM_RANGE(0x400000, 0x40001f) AM_READWRITE_LEGACY(namconb_cpureg_r, namconb1_cpureg_w)
+	AM_RANGE(0x400000, 0x40001f) AM_READWRITE(namconb_cpureg_r, namconb1_cpureg_w)
 	AM_RANGE(0x580000, 0x5807ff) AM_RAM AM_BASE(m_nvmem32)
 	AM_RANGE(0x600000, 0x61ffff) AM_READWRITE_LEGACY(namco_obj32_r,namco_obj32_w)
 	AM_RANGE(0x620000, 0x620007) AM_READWRITE_LEGACY(namco_spritepos32_r,namco_spritepos32_w)
 	AM_RANGE(0x640000, 0x64ffff) AM_READWRITE_LEGACY(namco_tilemapvideoram32_r,namco_tilemapvideoram32_w )
 	AM_RANGE(0x660000, 0x66003f) AM_READWRITE_LEGACY(namco_tilemapcontrol32_r,namco_tilemapcontrol32_w)
 	AM_RANGE(0x680000, 0x68000f) AM_RAM AM_BASE(m_spritebank32)
-	AM_RANGE(0x6e0000, 0x6e001f) AM_READ_LEGACY(custom_key_r) AM_WRITENOP
+	AM_RANGE(0x6e0000, 0x6e001f) AM_READ(custom_key_r) AM_WRITENOP
 	AM_RANGE(0x700000, 0x707fff) AM_RAM AM_SHARE("paletteram")
 ADDRESS_MAP_END
 
@@ -873,7 +873,7 @@ static ADDRESS_MAP_START( namconb2_am, AS_PROGRAM, 32, namconb1_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x1c0000, 0x1cffff) AM_RAM
 	AM_RANGE(0x1e4000, 0x1e4003) AM_READWRITE(randgen_r,srand_w)
-	AM_RANGE(0x200000, 0x207fff) AM_READWRITE_LEGACY(namconb_share_r, namconb_share_w)
+	AM_RANGE(0x200000, 0x207fff) AM_READWRITE(namconb_share_r, namconb_share_w)
 	AM_RANGE(0x208000, 0x2fffff) AM_RAM
 	AM_RANGE(0x400000, 0x4fffff) AM_ROM AM_REGION("data", 0)
 	AM_RANGE(0x600000, 0x61ffff) AM_READWRITE_LEGACY(namco_obj32_r,namco_obj32_w)
@@ -888,13 +888,13 @@ static ADDRESS_MAP_START( namconb2_am, AS_PROGRAM, 32, namconb1_state )
 	AM_RANGE(0x940000, 0x94000f) AM_RAM AM_BASE(m_tilebank32)
 	AM_RANGE(0x980000, 0x98000f) AM_READ_LEGACY(namco_rozbank32_r) AM_WRITE_LEGACY(namco_rozbank32_w)
 	AM_RANGE(0xa00000, 0xa007ff) AM_RAM AM_BASE(m_nvmem32)
-	AM_RANGE(0xc00000, 0xc0001f) AM_READ_LEGACY(custom_key_r) AM_WRITENOP
-	AM_RANGE(0xf00000, 0xf0001f) AM_READWRITE_LEGACY(namconb_cpureg_r, namconb2_cpureg_w)
+	AM_RANGE(0xc00000, 0xc0001f) AM_READ(custom_key_r) AM_WRITENOP
+	AM_RANGE(0xf00000, 0xf0001f) AM_READWRITE(namconb_cpureg_r, namconb2_cpureg_w)
 ADDRESS_MAP_END
 
-static WRITE16_HANDLER( nbmcu_shared_w )
+WRITE16_MEMBER(namconb1_state::nbmcu_shared_w)
 {
-	namconb1_state *state = space->machine().driver_data<namconb1_state>();
+//OBRISI.ME
 	// HACK!  Many games data ROM routines redirect the vector from the sound command read to an RTS.
 	// This needs more investigation.  nebulray and vshoot do NOT do this.
 	// Timers A2 and A3 are set up in "external input counter" mode, this may be related.
@@ -905,51 +905,51 @@ static WRITE16_HANDLER( nbmcu_shared_w )
 	}
 #endif
 
-	COMBINE_DATA(&state->m_namconb_shareram[offset]);
+	COMBINE_DATA(&m_namconb_shareram[offset]);
 
 	// C74 BIOS has a very short window on the CPU sync signal, so immediately let the '020 at it
 	if ((offset == 0x6000/2) && (data & 0x80))
 	{
-		device_spin_until_time(&space->device(), downcast<cpu_device *>(&space->device())->cycles_to_attotime(300));	// was 300
+		device_spin_until_time(&space.device(), downcast<cpu_device *>(&space.device())->cycles_to_attotime(300));	// was 300
 	}
 }
 
 static ADDRESS_MAP_START( namcoc75_am, AS_PROGRAM, 16, namconb1_state )
 	AM_RANGE(0x002000, 0x002fff) AM_DEVREADWRITE("c352", c352_device, read, write)
-	AM_RANGE(0x004000, 0x00bfff) AM_RAM_WRITE_LEGACY(nbmcu_shared_w) AM_BASE(m_namconb_shareram)
+	AM_RANGE(0x004000, 0x00bfff) AM_RAM_WRITE(nbmcu_shared_w) AM_BASE(m_namconb_shareram)
 	AM_RANGE(0x00c000, 0x00ffff) AM_ROM AM_REGION("c75", 0)
 	AM_RANGE(0x200000, 0x27ffff) AM_ROM AM_REGION("c75data", 0)
 ADDRESS_MAP_END
 
 
-static READ8_HANDLER( port6_r )
+READ8_MEMBER(namconb1_state::port6_r)
 {
-	namconb1_state *state = space->machine().driver_data<namconb1_state>();
-	return state->m_nbx_port6;
+//OBRISI.ME
+	return m_nbx_port6;
 }
 
-static WRITE8_HANDLER( port6_w )
+WRITE8_MEMBER(namconb1_state::port6_w)
 {
-	namconb1_state *state = space->machine().driver_data<namconb1_state>();
-	state->m_nbx_port6 = data;
+//OBRISI.ME
+	m_nbx_port6 = data;
 }
 
-static READ8_HANDLER( port7_r )
+READ8_MEMBER(namconb1_state::port7_r)
 {
-	namconb1_state *state = space->machine().driver_data<namconb1_state>();
-	switch (state->m_nbx_port6 & 0xf0)
+//OBRISI.ME
+	switch (m_nbx_port6 & 0xf0)
 	{
 		case 0x00:
-			return input_port_read_safe(space->machine(), "P4", 0xff);
+			return input_port_read_safe(machine(), "P4", 0xff);
 
 		case 0x20:
-			return input_port_read(space->machine(), "MISC");
+			return input_port_read(machine(), "MISC");
 
 		case 0x40:
-			return input_port_read(space->machine(), "P1");
+			return input_port_read(machine(), "P1");
 
 		case 0x60:
-			return input_port_read(space->machine(), "P2");
+			return input_port_read(machine(), "P2");
 
 		default:
 			break;
@@ -961,57 +961,57 @@ static READ8_HANDLER( port7_r )
 // Is this madness?  No, this is Namco.  They didn't have enough digital ports for all 4 players,
 // so the 8 bits of player 3 got routed to the 8 analog inputs.  +5V on the analog input will
 // register full scale, so it works...
-static READ8_HANDLER(dac7_r)		// bit 7
+READ8_MEMBER(namconb1_state::dac7_r)// bit 7
 {
-	return input_port_read_safe(space->machine(), "P3", 0xff)&0x80;
+	return input_port_read_safe(machine(), "P3", 0xff)&0x80;
 }
 
-static READ8_HANDLER(dac6_r)		// bit 3
+READ8_MEMBER(namconb1_state::dac6_r)// bit 3
 {
-	return (input_port_read_safe(space->machine(), "P3", 0xff)<<1)&0x80;
+	return (input_port_read_safe(machine(), "P3", 0xff)<<1)&0x80;
 }
 
-static READ8_HANDLER(dac5_r)		// bit 2
+READ8_MEMBER(namconb1_state::dac5_r)// bit 2
 {
-	return (input_port_read_safe(space->machine(), "P3", 0xff)<<2)&0x80;
+	return (input_port_read_safe(machine(), "P3", 0xff)<<2)&0x80;
 }
 
-static READ8_HANDLER(dac4_r)		// bit 1
+READ8_MEMBER(namconb1_state::dac4_r)// bit 1
 {
-	return (input_port_read_safe(space->machine(), "P3", 0xff)<<3)&0x80;
+	return (input_port_read_safe(machine(), "P3", 0xff)<<3)&0x80;
 }
 
-static READ8_HANDLER(dac3_r)		// bit 0
+READ8_MEMBER(namconb1_state::dac3_r)// bit 0
 {
-	return (input_port_read_safe(space->machine(), "P3", 0xff)<<4)&0x80;
+	return (input_port_read_safe(machine(), "P3", 0xff)<<4)&0x80;
 }
 
-static READ8_HANDLER(dac2_r)		// bit 4
+READ8_MEMBER(namconb1_state::dac2_r)// bit 4
 {
-	return (input_port_read_safe(space->machine(), "P3", 0xff)<<5)&0x80;
+	return (input_port_read_safe(machine(), "P3", 0xff)<<5)&0x80;
 }
 
-static READ8_HANDLER(dac1_r)		// bit 5
+READ8_MEMBER(namconb1_state::dac1_r)// bit 5
 {
-	return (input_port_read_safe(space->machine(), "P3", 0xff)<<6)&0x80;
+	return (input_port_read_safe(machine(), "P3", 0xff)<<6)&0x80;
 }
 
-static READ8_HANDLER(dac0_r)		// bit 6
+READ8_MEMBER(namconb1_state::dac0_r)// bit 6
 {
-	return (input_port_read_safe(space->machine(), "P3", 0xff)<<7)&0x80;
+	return (input_port_read_safe(machine(), "P3", 0xff)<<7)&0x80;
 }
 
 static ADDRESS_MAP_START( namcoc75_io, AS_IO, 8, namconb1_state )
-	AM_RANGE(M37710_PORT6, M37710_PORT6) AM_READWRITE_LEGACY(port6_r, port6_w)
-	AM_RANGE(M37710_PORT7, M37710_PORT7) AM_READ_LEGACY(port7_r)
-	AM_RANGE(M37710_ADC7_L, M37710_ADC7_L) AM_READ_LEGACY(dac7_r)
-	AM_RANGE(M37710_ADC6_L, M37710_ADC6_L) AM_READ_LEGACY(dac6_r)
-	AM_RANGE(M37710_ADC5_L, M37710_ADC5_L) AM_READ_LEGACY(dac5_r)
-	AM_RANGE(M37710_ADC4_L, M37710_ADC4_L) AM_READ_LEGACY(dac4_r)
-	AM_RANGE(M37710_ADC3_L, M37710_ADC3_L) AM_READ_LEGACY(dac3_r)
-	AM_RANGE(M37710_ADC2_L, M37710_ADC2_L) AM_READ_LEGACY(dac2_r)
-	AM_RANGE(M37710_ADC1_L, M37710_ADC1_L) AM_READ_LEGACY(dac1_r)
-	AM_RANGE(M37710_ADC0_L, M37710_ADC0_L) AM_READ_LEGACY(dac0_r)
+	AM_RANGE(M37710_PORT6, M37710_PORT6) AM_READWRITE(port6_r, port6_w)
+	AM_RANGE(M37710_PORT7, M37710_PORT7) AM_READ(port7_r)
+	AM_RANGE(M37710_ADC7_L, M37710_ADC7_L) AM_READ(dac7_r)
+	AM_RANGE(M37710_ADC6_L, M37710_ADC6_L) AM_READ(dac6_r)
+	AM_RANGE(M37710_ADC5_L, M37710_ADC5_L) AM_READ(dac5_r)
+	AM_RANGE(M37710_ADC4_L, M37710_ADC4_L) AM_READ(dac4_r)
+	AM_RANGE(M37710_ADC3_L, M37710_ADC3_L) AM_READ(dac3_r)
+	AM_RANGE(M37710_ADC2_L, M37710_ADC2_L) AM_READ(dac2_r)
+	AM_RANGE(M37710_ADC1_L, M37710_ADC1_L) AM_READ(dac1_r)
+	AM_RANGE(M37710_ADC0_L, M37710_ADC0_L) AM_READ(dac0_r)
 ADDRESS_MAP_END
 
 #define MASTER_CLOCK_HZ 48384000

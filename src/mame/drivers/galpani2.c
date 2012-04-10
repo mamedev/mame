@@ -112,11 +112,10 @@ static void galpani2_write_kaneko(device_t *device)
 	}
 }
 
-static WRITE8_HANDLER( galpani2_mcu_init_w )
+WRITE8_MEMBER(galpani2_state::galpani2_mcu_init_w)
 {
-	running_machine &machine = space->machine();
-	address_space *srcspace = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	address_space *dstspace = machine.device("sub")->memory().space(AS_PROGRAM);
+	address_space *srcspace = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *dstspace = machine().device("sub")->memory().space(AS_PROGRAM);
 	UINT32 mcu_address, mcu_data;
 
 	for ( mcu_address = 0x100010; mcu_address < (0x100010 + 6); mcu_address += 1 )
@@ -124,7 +123,7 @@ static WRITE8_HANDLER( galpani2_mcu_init_w )
 		mcu_data	=	srcspace->read_byte(mcu_address );
 		dstspace->write_byte(mcu_address-0x10, mcu_data);
 	}
-	cputag_set_input_line(machine, "sub", INPUT_LINE_IRQ7, HOLD_LINE); //MCU Initialised
+	cputag_set_input_line(machine(), "sub", INPUT_LINE_IRQ7, HOLD_LINE); //MCU Initialised
 }
 
 static void galpani2_mcu_nmi1(running_machine &machine)
@@ -236,24 +235,24 @@ static void galpani2_mcu_nmi2(running_machine &machine)
 		//logerror("%s : MCU executes CHECKs synchro\n", machine.describe_context());
 }
 
-static WRITE8_HANDLER( galpani2_mcu_nmi1_w ) //driven by CPU1's int5 ISR
+WRITE8_MEMBER(galpani2_state::galpani2_mcu_nmi1_w)//driven by CPU1's int5 ISR
 {
-	galpani2_state *state = space->machine().driver_data<galpani2_state>();
+//OBRISI.ME
 //for galpan2t:
 //Triggered from 'maincpu' (00007D60),once, with no command, using alternate line, during init
 //Triggered from 'maincpu' (000080BE),once, for unknown command, during init
 //Triggered from 'maincpu' (0000741E),from here on...driven by int5, even if there's no command
-	if ( (data & 1) && !(state->m_old_mcu_nmi1 & 1) )	galpani2_mcu_nmi1(space->machine());
-	//if ( (data & 0x10) && !(state->m_old_mcu_nmi1 & 0x10) )    galpani2_mcu_nmi1(space->machine());
+	if ( (data & 1) && !(m_old_mcu_nmi1 & 1) )	galpani2_mcu_nmi1(machine());
+	//if ( (data & 0x10) && !(m_old_mcu_nmi1 & 0x10) )    galpani2_mcu_nmi1(machine());
 	//alternate line, same function?
-	state->m_old_mcu_nmi1 = data;
+	m_old_mcu_nmi1 = data;
 }
 
-static WRITE8_HANDLER( galpani2_mcu_nmi2_w ) //driven by CPU2's int5 ISR
+WRITE8_MEMBER(galpani2_state::galpani2_mcu_nmi2_w)//driven by CPU2's int5 ISR
 {
-	galpani2_state *state = space->machine().driver_data<galpani2_state>();
-	if ( (data & 1) && !(state->m_old_mcu_nmi2 & 1) )	galpani2_mcu_nmi2(space->machine());
-	state->m_old_mcu_nmi2 = data;
+//OBRISI.ME
+	if ( (data & 1) && !(m_old_mcu_nmi2 & 1) )	galpani2_mcu_nmi2(machine());
+	m_old_mcu_nmi2 = data;
 }
 
 
@@ -265,12 +264,12 @@ static WRITE8_HANDLER( galpani2_mcu_nmi2_w ) //driven by CPU2's int5 ISR
 
 ***************************************************************************/
 
-static WRITE8_HANDLER( galpani2_coin_lockout_w )
+WRITE8_MEMBER(galpani2_state::galpani2_coin_lockout_w)
 {
-		coin_counter_w(space->machine(), 0, data & 0x01);
-		coin_counter_w(space->machine(), 1, data & 0x02);
-		coin_lockout_w(space->machine(), 0,~data & 0x04);
-		coin_lockout_w(space->machine(), 1,~data & 0x08);
+		coin_counter_w(machine(), 0, data & 0x01);
+		coin_counter_w(machine(), 1, data & 0x02);
+		coin_lockout_w(machine(), 0,~data & 0x04);
+		coin_lockout_w(machine(), 1,~data & 0x08);
 		// & 0x10     CARD in lockout?
 		// & 0x20     CARD in lockout?
 		// & 0x40     CARD out
@@ -327,9 +326,9 @@ static ADDRESS_MAP_START( galpani2_mem1, AS_PROGRAM, 16, galpani2_state )
 	AM_RANGE(0x580000, 0x580001) AM_RAM AM_BASE(m_bg8_scrolly[1])			// Background 1 Scroll Y
 	AM_RANGE(0x5c0000, 0x5c0001) AM_WRITENOP										// ? 0 at startup only
 	AM_RANGE(0x600000, 0x600001) AM_WRITENOP										// Watchdog
-	AM_RANGE(0x640000, 0x640001) AM_WRITE8_LEGACY(galpani2_mcu_init_w, 0x00ff			)	// ? 0 before resetting and at startup, Reset mcu ?
-	AM_RANGE(0x680000, 0x680001) AM_WRITE8_LEGACY(galpani2_mcu_nmi1_w, 0x00ff)				// ? 0 -> 1 -> 0 (lev 5) / 0 -> $10 -> 0
-	AM_RANGE(0x6c0000, 0x6c0001) AM_WRITE8_LEGACY(galpani2_coin_lockout_w, 0xff00		)	// Coin + Card Lockout
+	AM_RANGE(0x640000, 0x640001) AM_WRITE8(galpani2_mcu_init_w, 0x00ff			)	// ? 0 before resetting and at startup, Reset mcu ?
+	AM_RANGE(0x680000, 0x680001) AM_WRITE8(galpani2_mcu_nmi1_w, 0x00ff)				// ? 0 -> 1 -> 0 (lev 5) / 0 -> $10 -> 0
+	AM_RANGE(0x6c0000, 0x6c0001) AM_WRITE8(galpani2_coin_lockout_w, 0xff00		)	// Coin + Card Lockout
 	AM_RANGE(0x780000, 0x780001) AM_READ_PORT("DSW1_P1")
 	AM_RANGE(0x780002, 0x780003) AM_READ_PORT("DSW2_P2")
 	AM_RANGE(0x780004, 0x780005) AM_READ_PORT("SPECIAL")
@@ -350,13 +349,13 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 
-static READ16_HANDLER( galpani2_bankedrom_r )
+READ16_MEMBER(galpani2_state::galpani2_bankedrom_r)
 {
-	galpani2_state *state = space->machine().driver_data<galpani2_state>();
-	UINT16 *ROM = (UINT16 *) space->machine().region( "user1" )->base();
-	size_t    len = space->machine().region( "user1" )->bytes() / 2;
+//OBRISI.ME
+	UINT16 *ROM = (UINT16 *) machine().region( "user1" )->base();
+	size_t    len = machine().region( "user1" )->bytes() / 2;
 
-	offset += (0x800000/2) * (*state->m_rombank & 0x0003);
+	offset += (0x800000/2) * (*m_rombank & 0x0003);
 
 	if ( offset < len )	return ROM[offset];
 	else				return 0xffff; //floating bus for absent ROMs
@@ -373,9 +372,9 @@ static ADDRESS_MAP_START( galpani2_mem2, AS_PROGRAM, 16, galpani2_state )
 	AM_RANGE(0x6c0000, 0x6c0001) AM_WRITENOP								// ? 0 at startup only
 	AM_RANGE(0x700000, 0x700001) AM_WRITENOP								// Watchdog
 //  AM_RANGE(0x740000, 0x740001) AM_WRITENOP                                // ? Reset mcu
-	AM_RANGE(0x780000, 0x780001) AM_WRITE8_LEGACY(galpani2_mcu_nmi2_w, 0x00ff)				// ? 0 -> 1 -> 0 (lev 5)
+	AM_RANGE(0x780000, 0x780001) AM_WRITE8(galpani2_mcu_nmi2_w, 0x00ff)				// ? 0 -> 1 -> 0 (lev 5)
 	AM_RANGE(0x7c0000, 0x7c0001) AM_WRITEONLY AM_BASE(m_rombank)	// Rom Bank
-	AM_RANGE(0x800000, 0xffffff) AM_READ_LEGACY(galpani2_bankedrom_r		)		// Banked ROM
+	AM_RANGE(0x800000, 0xffffff) AM_READ(galpani2_bankedrom_r		)		// Banked ROM
 ADDRESS_MAP_END
 
 /***************************************************************************
