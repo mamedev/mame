@@ -50,7 +50,7 @@ struct _h83xx_state
 	UINT8  h8uflag, h8uiflag;
 	UINT8  incheckirqs;
 
-	device_irq_callback irq_cb;
+	device_irq_acknowledge_callback irq_cb;
 	legacy_cpu_device *device;
 
 	address_space *program;

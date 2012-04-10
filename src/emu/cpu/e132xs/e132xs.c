@@ -318,7 +318,7 @@ struct _hyperstone_state
 
 	struct _delay delay;
 
-	device_irq_callback irq_callback;
+	device_irq_acknowledge_callback irq_callback;
 	legacy_cpu_device *device;
 	address_space *program;
 	direct_read_data *direct;
@@ -1527,7 +1527,7 @@ static void set_irq_line(hyperstone_state *cpustate, int irqline, int state)
 		ISR &= ~(1 << irqline);
 }
 
-static void hyperstone_init(legacy_cpu_device *device, device_irq_callback irqcallback, int scale_mask)
+static void hyperstone_init(legacy_cpu_device *device, device_irq_acknowledge_callback irqcallback, int scale_mask)
 {
 	hyperstone_state *cpustate = get_safe_token(device);
 
@@ -1550,7 +1550,7 @@ static void hyperstone_init(legacy_cpu_device *device, device_irq_callback irqca
 	cpustate->clock_scale_mask = scale_mask;
 }
 
-static void e116_init(legacy_cpu_device *device, device_irq_callback irqcallback, int scale_mask)
+static void e116_init(legacy_cpu_device *device, device_irq_acknowledge_callback irqcallback, int scale_mask)
 {
 	hyperstone_state *cpustate = get_safe_token(device);
 	hyperstone_init(device, irqcallback, scale_mask);
@@ -1587,7 +1587,7 @@ static CPU_INIT( gms30c2216 )
 	e116_init(device, irqcallback, 0);
 }
 
-static void e132_init(legacy_cpu_device *device, device_irq_callback irqcallback, int scale_mask)
+static void e132_init(legacy_cpu_device *device, device_irq_acknowledge_callback irqcallback, int scale_mask)
 {
 	hyperstone_state *cpustate = get_safe_token(device);
 	hyperstone_init(device, irqcallback, scale_mask);
@@ -1641,7 +1641,7 @@ static CPU_RESET( hyperstone )
 	//TODO: Add different reset initializations for BCR, MCR, FCR, TPR
 
 	emu_timer *save_timer;
-	device_irq_callback save_irqcallback;
+	device_irq_acknowledge_callback save_irqcallback;
 	UINT32 save_opcodexor;
 
 	save_timer = cpustate->timer;

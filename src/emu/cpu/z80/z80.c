@@ -157,7 +157,7 @@ struct _z80_state
 	UINT8			after_ei;			/* are we in the EI shadow? */
 	UINT8			after_ldair;		/* same, but for LD A,I or LD A,R */
 	UINT32			ea;
-	device_irq_callback irq_callback;
+	device_irq_acknowledge_callback irq_callback;
 	legacy_cpu_device *device;
 	address_space *program;
 	direct_read_data *direct;

@@ -68,7 +68,7 @@ struct _m6502_Regs
 	UINT8	irq_state;
 	UINT8   so_state;
 
-	device_irq_callback irq_callback;
+	device_irq_acknowledge_callback irq_callback;
 	legacy_cpu_device *device;
 	address_space *space;
 	direct_read_data *direct;
@@ -130,7 +130,7 @@ static void default_wdmem_id(address_space *space, offs_t offset, UINT8 data) { 
  *
  *****************************************************************************/
 
-static void m6502_common_init(legacy_cpu_device *device, device_irq_callback irqcallback, UINT8 subtype, void (*const *insn)(m6502_Regs *cpustate), const char *type)
+static void m6502_common_init(legacy_cpu_device *device, device_irq_acknowledge_callback irqcallback, UINT8 subtype, void (*const *insn)(m6502_Regs *cpustate), const char *type)
 {
 	m6502_Regs *cpustate = get_safe_token(device);
 	const m6502_interface *intf = (const m6502_interface *)device->static_config();

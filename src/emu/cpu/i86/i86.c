@@ -39,7 +39,7 @@ struct _i8086_state
 	UINT32 base[4];
 	UINT16 sregs[4];
 	UINT16 flags;
-	device_irq_callback irq_callback;
+	device_irq_acknowledge_callback irq_callback;
 	INT32 AuxVal, OverVal, SignVal, ZeroVal, CarryVal, DirVal;		/* 0 or non-0 valued flags */
 	UINT8 ParityVal;
 	UINT8 TF, IF;				   /* 0 or 1 valued flags */
@@ -232,7 +232,7 @@ static CPU_INIT( i80186 )
 static CPU_RESET( i8086 )
 {
 	i8086_state *cpustate = get_safe_token(device);
-	device_irq_callback save_irqcallback;
+	device_irq_acknowledge_callback save_irqcallback;
 
 	save_irqcallback = cpustate->irq_callback;
 	memset(cpustate, 0, sizeof(*cpustate));

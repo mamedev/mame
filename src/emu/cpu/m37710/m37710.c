@@ -944,7 +944,7 @@ static void m37710_set_irq_line(m37710i_cpu_struct *cpustate, int line, int stat
 
 /* Set the callback that is called when servicing an interrupt */
 #ifdef UNUSED_FUNCTION
-void m37710_set_irq_callback(device_irq_callback callback)
+void m37710_set_irq_callback(device_irq_acknowledge_callback callback)
 {
 	INT_ACK = callback;
 }

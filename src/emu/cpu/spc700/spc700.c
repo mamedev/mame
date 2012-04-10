@@ -86,7 +86,7 @@ typedef struct
 	uint line_nmi;	/* Status of the NMI line */
 	uint line_rst;	/* Status of the RESET line */
 	uint ir;		/* Instruction Register */
-	device_irq_callback int_ack;
+	device_irq_acknowledge_callback int_ack;
 	legacy_cpu_device *device;
 	address_space *program;
 	uint stopped;	/* stopped status */

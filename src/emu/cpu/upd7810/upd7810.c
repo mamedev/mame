@@ -498,7 +498,7 @@ struct _upd7810_state
 	const struct opcode_s *op74;
 	void (*handle_timers)(upd7810_state *cpustate, int cycles);
 	UPD7810_CONFIG config;
-	device_irq_callback irq_callback;
+	device_irq_acknowledge_callback irq_callback;
 	legacy_cpu_device *device;
 	address_space *program;
 	direct_read_data *direct;
@@ -1780,7 +1780,7 @@ static CPU_RESET( upd7810 )
 {
 	upd7810_state *cpustate = get_safe_token(device);
 	UPD7810_CONFIG save_config;
-	device_irq_callback save_irqcallback;
+	device_irq_acknowledge_callback save_irqcallback;
 
 	save_config = cpustate->config;
 	save_irqcallback = cpustate->irq_callback;

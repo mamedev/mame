@@ -281,7 +281,7 @@ struct _mcs51_state_t
 	UINT8	(*sfr_read)(mcs51_state_t *mcs51_state, size_t offset);
 
 	/* Interrupt Callback */
-	device_irq_callback irq_callback;
+	device_irq_acknowledge_callback irq_callback;
 	legacy_cpu_device *device;
 
 	/* Memory spaces */

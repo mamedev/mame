@@ -803,7 +803,7 @@ protected:
 	int					m_icount;
 
 	UINT32				m_iotemp;
-	device_irq_callback	m_irq_callback;
+	device_irq_acknowledge_callback	m_irq_callback;
 	address_space *		m_program;
 	direct_read_data *	m_direct;
 

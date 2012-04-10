@@ -3025,7 +3025,7 @@ static void build_opcode_table(i386_state *cpustate, UINT32 features)
 static CPU_RESET( i386 )
 {
 	i386_state *cpustate = get_safe_token(device);
-	device_irq_callback save_irqcallback;
+	device_irq_acknowledge_callback save_irqcallback;
 
 	save_irqcallback = cpustate->irq_callback;
 	memset( cpustate, 0, sizeof(*cpustate) );
@@ -3512,7 +3512,7 @@ static CPU_INIT( i486 )
 static CPU_RESET( i486 )
 {
 	i386_state *cpustate = get_safe_token(device);
-	device_irq_callback save_irqcallback;
+	device_irq_acknowledge_callback save_irqcallback;
 
 	save_irqcallback = cpustate->irq_callback;
 	memset( cpustate, 0, sizeof(*cpustate) );
@@ -3619,7 +3619,7 @@ static CPU_INIT( pentium )
 static CPU_RESET( pentium )
 {
 	i386_state *cpustate = get_safe_token(device);
-	device_irq_callback save_irqcallback;
+	device_irq_acknowledge_callback save_irqcallback;
 
 	save_irqcallback = cpustate->irq_callback;
 	memset( cpustate, 0, sizeof(*cpustate) );
@@ -3741,7 +3741,7 @@ static CPU_INIT( mediagx )
 static CPU_RESET( mediagx )
 {
 	i386_state *cpustate = get_safe_token(device);
-	device_irq_callback save_irqcallback;
+	device_irq_acknowledge_callback save_irqcallback;
 
 	save_irqcallback = cpustate->irq_callback;
 	memset( cpustate, 0, sizeof(*cpustate) );

@@ -31,7 +31,7 @@ typedef struct
 	PAIR		af2,bc2,de2,hl2;
 	UINT8		halt, after_EI;
 	UINT16		irq_state, irq_mask;
-	device_irq_callback irq_callback;
+	device_irq_acknowledge_callback irq_callback;
 	legacy_cpu_device *device;
 	address_space *program;
 	address_space *io;

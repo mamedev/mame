@@ -81,7 +81,7 @@ struct _saturn_state
 	UINT8   sleeping;       /* low-consumption state */
 	int 	monitor_id;
 	int		monitor_in;
-	device_irq_callback irq_callback;
+	device_irq_acknowledge_callback irq_callback;
 	legacy_cpu_device *device;
 	address_space *program;
 	direct_read_data *direct;

@@ -98,7 +98,7 @@ struct _jaguar_state
 	int			icount;
 	int			bankswitch_icount;
 	void		(*const *table)(jaguar_state *jaguar, UINT16 op);
-	device_irq_callback irq_callback;
+	device_irq_acknowledge_callback irq_callback;
 	jaguar_int_func cpu_interrupt;
 	legacy_cpu_device *device;
 	address_space *program;
@@ -406,7 +406,7 @@ static void jaguar_postload(jaguar_state *jaguar)
 }
 
 
-static void init_common(int isdsp, legacy_cpu_device *device, device_irq_callback irqcallback)
+static void init_common(int isdsp, legacy_cpu_device *device, device_irq_acknowledge_callback irqcallback)
 {
 	const jaguar_cpu_config *configdata = (const jaguar_cpu_config *)device->static_config();
 	jaguar_state *jaguar = get_safe_token(device);

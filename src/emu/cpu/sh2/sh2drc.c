@@ -780,7 +780,7 @@ static CPU_RESET( sh2 )
 	UINT32 *m;
 
 	void (*f)(UINT32 data);
-	device_irq_callback save_irqcallback;
+	device_irq_acknowledge_callback save_irqcallback;
 
 	m = sh2->m;
 	tsave = sh2->timer;

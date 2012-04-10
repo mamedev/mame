@@ -315,7 +315,7 @@ static CPU_DISASSEMBLE( nec )
 	return necv_dasm_one(buffer, pc, oprom, NULL);
 }
 
-static void nec_init(legacy_cpu_device *device, device_irq_callback irqcallback)
+static void nec_init(legacy_cpu_device *device, device_irq_acknowledge_callback irqcallback)
 {
 	nec_state_t *nec_state = get_safe_token(device);
 

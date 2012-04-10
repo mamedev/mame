@@ -2152,7 +2152,7 @@ static CPU_RESET( sh2 )
 	int save_is_slave;
 
 	void (*f)(UINT32 data);
-	device_irq_callback save_irqcallback;
+	device_irq_acknowledge_callback save_irqcallback;
 
 	m = sh2->m;
 	tsave = sh2->timer;

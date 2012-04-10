@@ -83,7 +83,7 @@ struct _v30mz_state
 	UINT32	irq_state;
 	UINT8	no_interrupt;
 
-	device_irq_callback irq_callback;
+	device_irq_acknowledge_callback irq_callback;
 	legacy_cpu_device *device;
 	address_space *program;
 	direct_read_data *direct;
@@ -133,7 +133,7 @@ static CPU_RESET( nec )
 	v30mz_state *cpustate = get_safe_token(device);
     unsigned int i,j,c;
     static const BREGS reg_name[8]={ AL, CL, DL, BL, AH, CH, DH, BH };
-	device_irq_callback save_irqcallback;
+	device_irq_acknowledge_callback save_irqcallback;
 
 	save_irqcallback = cpustate->irq_callback;
 	memset( cpustate, 0, sizeof(*cpustate) );
@@ -933,7 +933,7 @@ static CPU_DISASSEMBLE( nec )
 	return necv_dasm_one(buffer, pc, oprom, cpustate->config);
 }
 
-static void nec_init(legacy_cpu_device *device, device_irq_callback irqcallback, int type)
+static void nec_init(legacy_cpu_device *device, device_irq_acknowledge_callback irqcallback, int type)
 {
 	v30mz_state *cpustate = get_safe_token(device);
 

@@ -302,7 +302,7 @@ static void g65816_set_irq_line(g65816i_cpu_struct *cpustate, int line, int stat
 }
 
 /* Set the callback that is called when servicing an interrupt */
-static void g65816_set_irq_callback(g65816i_cpu_struct *cpustate, device_irq_callback callback)
+static void g65816_set_irq_callback(g65816i_cpu_struct *cpustate, device_irq_acknowledge_callback callback)
 {
 	INT_ACK = callback;
 }

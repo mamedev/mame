@@ -101,7 +101,7 @@ void mie_device::device_start()
 	maple_device::device_start();
 	cpu = subdevice<z80_device>("mie");
 	timer = timer_alloc(0);
-	cpu->set_irq_callback(irq_callback_1);
+	cpu->set_irq_acknowledge_callback(irq_callback_1);
 	jvs = machine().device<mie_jvs_device>(jvs_name);
 
 	save_item(NAME(gpiodir));

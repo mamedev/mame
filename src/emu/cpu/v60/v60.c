@@ -90,7 +90,7 @@ struct _v60_state
 	v60_flags			flags;
 	UINT8				irq_line;
 	UINT8				nmi_line;
-	device_irq_callback	irq_cb;
+	device_irq_acknowledge_callback	irq_cb;
 	legacy_cpu_device *		device;
 	address_space *program;
 	direct_read_data *	direct;
@@ -324,7 +324,7 @@ static UINT32 opUNHANDLED(v60_state *cpustate)
 // Opcode jump table
 #include "optable.c"
 
-static void base_init(legacy_cpu_device *device, device_irq_callback irqcallback)
+static void base_init(legacy_cpu_device *device, device_irq_acknowledge_callback irqcallback)
 {
 	v60_state *cpustate = get_safe_token(device);
 

@@ -110,7 +110,7 @@ struct _m37710i_cpu_struct
 	int ICount;		/* cycle count */
 	uint source;		/* temp register */
 	uint destination;	/* temp register */
-	device_irq_callback int_ack;
+	device_irq_acknowledge_callback int_ack;
 	legacy_cpu_device *device;
 	address_space *program;
 	address_space *io;

@@ -29,7 +29,7 @@ struct _hcd62121_state
 	UINT8 reg[0x80];
 	UINT8 temp1[0x10];
 	UINT8 temp2[0x10];
-	device_irq_callback irq_callback;
+	device_irq_acknowledge_callback irq_callback;
 	legacy_cpu_device *device;
 	address_space *program;
 	address_space *io;

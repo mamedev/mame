@@ -61,7 +61,7 @@ typedef struct
 	UINT8	cc; 			/* Condition codes */
 
 	UINT16	pending_interrupts; /* MB */
-	device_irq_callback irq_callback;
+	device_irq_acknowledge_callback irq_callback;
 	legacy_cpu_device *device;
 	address_space *program;
 	direct_read_data *direct;
@@ -487,7 +487,7 @@ static CPU_RESET( m6805 )
 {
 	m6805_Regs *cpustate = get_safe_token(device);
 
-	device_irq_callback save_irqcallback = cpustate->irq_callback;
+	device_irq_acknowledge_callback save_irqcallback = cpustate->irq_callback;
 	memset(cpustate, 0, sizeof(*cpustate));
 
 	cpustate->iCount=50000;		/* Used to be global */

@@ -268,7 +268,7 @@ struct _i386_state
 	UINT8 opcode;
 
 	UINT8 irq_state;
-	device_irq_callback irq_callback;
+	device_irq_acknowledge_callback irq_callback;
 	legacy_cpu_device *device;
 	address_space *program;
 	direct_read_data *direct;

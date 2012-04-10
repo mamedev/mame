@@ -135,7 +135,7 @@ static void arm7_core_reset(legacy_cpu_device *device)
 {
     arm_state *cpustate = get_safe_token(device);
 
-    device_irq_callback save_irqcallback = cpustate->irq_callback;
+    device_irq_acknowledge_callback save_irqcallback = cpustate->irq_callback;
 
     memset(cpustate, 0, sizeof(arm_state));
     cpustate->irq_callback = save_irqcallback;

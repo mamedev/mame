@@ -49,7 +49,7 @@ struct _sm8500_state
 	UINT8 CheckInterrupts;
 	int halted;
 	int icount;
-	device_irq_callback irq_callback;
+	device_irq_acknowledge_callback irq_callback;
 	legacy_cpu_device *device;
 	address_space *program;
 	UINT16 oldpc;

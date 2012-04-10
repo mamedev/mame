@@ -234,7 +234,7 @@ typedef struct
 	UINT32 coproRegister[16];
 	UINT8 pendingIrq;
 	UINT8 pendingFiq;
-	device_irq_callback irq_callback;
+	device_irq_acknowledge_callback irq_callback;
 	legacy_cpu_device *device;
 	address_space *program;
 	direct_read_data *direct;
@@ -338,7 +338,7 @@ static CPU_RESET( arm )
 {
 	ARM_REGS *cpustate = get_safe_token(device);
 
-	device_irq_callback save_irqcallback = cpustate->irq_callback;
+	device_irq_acknowledge_callback save_irqcallback = cpustate->irq_callback;
 	endianness_t save_endian = cpustate->endian;
 
 	memset(cpustate, 0, sizeof(ARM_REGS));

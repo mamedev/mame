@@ -124,7 +124,7 @@ struct _SHARC_REGS
 	UINT16 *internal_ram;
 	UINT16 *internal_ram_block0, *internal_ram_block1;
 
-	device_irq_callback irq_callback;
+	device_irq_acknowledge_callback irq_callback;
 	legacy_cpu_device *device;
 	address_space *program;
 	address_space *data;

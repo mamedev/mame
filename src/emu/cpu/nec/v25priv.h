@@ -103,7 +103,7 @@ struct _v25_state_t
 	UINT8	RAMEN, TB, PCK;	/* PRC register */
 	UINT32	IDB;
 
-	device_irq_callback irq_callback;
+	device_irq_acknowledge_callback irq_callback;
 	legacy_cpu_device *device;
 	address_space *program;
 	direct_read_data *direct;

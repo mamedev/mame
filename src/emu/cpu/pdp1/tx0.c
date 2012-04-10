@@ -125,7 +125,7 @@ static void tx0_write(tx0_state *cpustate, offs_t address, int data)
 		;
 }
 
-static void tx0_init_common(legacy_cpu_device *device, device_irq_callback irqcallback, int is_64kw)
+static void tx0_init_common(legacy_cpu_device *device, device_irq_acknowledge_callback irqcallback, int is_64kw)
 {
 	tx0_state *cpustate = get_safe_token(device);
 

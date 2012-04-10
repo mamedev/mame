@@ -77,7 +77,7 @@ struct _m6509_Regs {
 	UINT8	nmi_state;
 	UINT8	irq_state;
 	UINT8	so_state;
-	device_irq_callback irq_callback;
+	device_irq_acknowledge_callback irq_callback;
 	legacy_cpu_device *device;
 	address_space *space;
 	direct_read_data *direct;

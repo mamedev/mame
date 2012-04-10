@@ -32,7 +32,7 @@ struct _t11_state
     UINT8				wait_state;
     UINT8				irq_state;
     int					icount;
-	device_irq_callback	irq_callback;
+	device_irq_acknowledge_callback	irq_callback;
 	legacy_cpu_device *		device;
 	address_space *program;
 	direct_read_data *direct;

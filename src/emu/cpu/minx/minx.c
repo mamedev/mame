@@ -83,7 +83,7 @@ typedef struct {
 	UINT8	YI;
 	UINT8	halted;
 	UINT8	interrupt_pending;
-	device_irq_callback irq_callback;
+	device_irq_acknowledge_callback irq_callback;
 	legacy_cpu_device *device;
 	address_space *program;
 	int icount;

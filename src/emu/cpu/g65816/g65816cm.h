@@ -93,7 +93,7 @@ struct _g65816i_cpu_struct
 	uint line_nmi;		/* Status of the NMI line */
 	uint ir;			/* Instruction Register */
 	uint irq_delay;		/* delay 1 instruction before checking irq */
-	device_irq_callback int_ack; /* Interrupt Acknowledge */
+	device_irq_acknowledge_callback int_ack; /* Interrupt Acknowledge */
 	legacy_cpu_device *device;
 	address_space *program;
 	read8_space_func read_vector;	/* Read vector override */

@@ -41,7 +41,7 @@ struct _s2650_regs {
 	UINT8	irq_state;
 
 	int		icount;
-	device_irq_callback irq_callback;
+	device_irq_acknowledge_callback irq_callback;
 	legacy_cpu_device *device;
 	address_space *program;
 	direct_read_data *direct;

@@ -72,7 +72,7 @@ struct _tms7000_state
 	UINT8		irq_state[3];	/* State of the three IRQs */
 	UINT8		rf[0x80];	/* Register file (SJE) */
 	UINT8		pf[0x100];	/* Perpherial file */
-	device_irq_callback irq_callback;
+	device_irq_acknowledge_callback irq_callback;
 	legacy_cpu_device *device;
 	address_space *program;
 	direct_read_data *direct;

@@ -580,7 +580,7 @@ static const int vector_elements_2[16][8] =
 	{ 7, 7, 7, 7, 7, 7, 7, 7 },		// 7
 };
 
-static void rspcom_init(rsp_state *rsp, legacy_cpu_device *device, device_irq_callback irqcallback)
+static void rspcom_init(rsp_state *rsp, legacy_cpu_device *device, device_irq_acknowledge_callback irqcallback)
 {
 	int regIdx = 0;
     int accumIdx;

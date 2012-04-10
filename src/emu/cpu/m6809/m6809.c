@@ -93,7 +93,7 @@ struct _m68_state_t
 	UINT8	irq_state[2];
 
 	int 	extra_cycles; /* cycles used up by interrupts */
-	device_irq_callback irq_callback;
+	device_irq_acknowledge_callback irq_callback;
 	legacy_cpu_device *device;
 	const m6809_config *config;
 	int		icount;

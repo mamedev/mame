@@ -72,7 +72,7 @@ typedef struct
 	int		exception_requesting[128];
 
 	INT8	irq_line_state[17];
-	device_irq_callback irq_callback;
+	device_irq_acknowledge_callback irq_callback;
 	legacy_cpu_device *device;
 	address_space *internal;
 	address_space *program;

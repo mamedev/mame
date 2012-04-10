@@ -551,7 +551,7 @@ struct _powerpc_state
 	UINT32			mmu603_r[4];
 
 	/* internal stuff */
-	device_irq_callback irq_callback;
+	device_irq_acknowledge_callback irq_callback;
 	legacy_cpu_device *	device;
 	address_space *program;
 	direct_read_data *direct;
@@ -573,7 +573,7 @@ struct _powerpc_state
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-void ppccom_init(powerpc_state *ppc, powerpc_flavor flavor, UINT8 cap, int tb_divisor, legacy_cpu_device *device, device_irq_callback irqcallback);
+void ppccom_init(powerpc_state *ppc, powerpc_flavor flavor, UINT8 cap, int tb_divisor, legacy_cpu_device *device, device_irq_acknowledge_callback irqcallback);
 void ppccom_exit(powerpc_state *ppc);
 
 void ppccom_reset(powerpc_state *ppc);

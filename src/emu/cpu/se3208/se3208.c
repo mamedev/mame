@@ -22,7 +22,7 @@ struct _se3208_state_t
 	UINT32 ER;
 	UINT32 PPC;
 
-	device_irq_callback irq_callback;
+	device_irq_acknowledge_callback irq_callback;
 	legacy_cpu_device *device;
 	address_space *program;
 	direct_read_data *direct;
@@ -1714,7 +1714,7 @@ static CPU_RESET( se3208 )
 {
 	se3208_state_t *se3208_state = get_safe_token(device);
 
-	device_irq_callback save_irqcallback = se3208_state->irq_callback;
+	device_irq_acknowledge_callback save_irqcallback = se3208_state->irq_callback;
 	memset(se3208_state,0,sizeof(se3208_state_t));
 	se3208_state->irq_callback = save_irqcallback;
 	se3208_state->device = device;

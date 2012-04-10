@@ -33,7 +33,7 @@ struct _i960_state_t {
 
 	int immediate_irq, immediate_vector, immediate_pri;
 
-	device_irq_callback irq_cb;
+	device_irq_acknowledge_callback irq_cb;
 	legacy_cpu_device *device;
 	address_space *program;
 	direct_read_data *direct;

@@ -21,7 +21,6 @@
 
 static void counters_load(running_machine &machine, int config_type, xml_data_node *parentnode);
 static void counters_save(running_machine &machine, int config_type, xml_data_node *parentnode);
-static void interrupt_reset(running_machine &machine);
 
 
 
@@ -39,31 +38,7 @@ struct _generic_machine_private
 
 	/* memory card status */
 	int 		memcard_inserted;
-
-	/* interrupt status for up to 8 CPUs */
-	device_t *	interrupt_device[8];
-	UINT8		interrupt_enable[8];
 };
-
-
-
-/***************************************************************************
-    INLINE FUNCTIONS
-***************************************************************************/
-
-/*-------------------------------------------------
-    interrupt_enabled - return true if interrupts
-    are enabled for the given CPU
--------------------------------------------------*/
-
-INLINE int interrupt_enabled(device_t *device)
-{
-	generic_machine_private *state = device->machine().generic_machine_data;
-	for (int index = 0; index < ARRAY_LENGTH(state->interrupt_device); index++)
-		if (state->interrupt_device[index] == device)
-			return state->interrupt_enable[index];
-	return TRUE;
-}
 
 
 
@@ -92,13 +67,6 @@ void generic_machine_init(running_machine &machine)
 		state->coinlockedout[counternum] = 0;
 	}
 
-	// map devices to the interrupt state
-	memset(state->interrupt_device, 0, sizeof(state->interrupt_device));
-	execute_interface_iterator iter(machine.root_device());
-	int index = 0;
-	for (device_execute_interface *exec = iter.first(); exec != NULL && index < ARRAY_LENGTH(state->interrupt_device); exec = iter.next())
-		state->interrupt_device[index++] = &exec->device();
-
 	/* register coin save state */
 	machine.save().save_item(NAME(state->coin_count));
 	machine.save().save_item(NAME(state->coinlockedout));
@@ -106,10 +74,6 @@ void generic_machine_init(running_machine &machine)
 
 	/* reset memory card info */
 	state->memcard_inserted = -1;
-
-	/* register a reset callback and save state for interrupt enable */
-	machine.add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(FUNC(interrupt_reset), &machine));
-	machine.save().save_item(NAME(state->interrupt_enable));
 
 	/* register for configuration */
 	config_register(machine, "counters", config_saveload_delegate(FUNC(counters_load), &machine), config_saveload_delegate(FUNC(counters_save), &machine));
@@ -547,151 +511,6 @@ void set_led_status(running_machine &machine, int num, int on)
 	output_set_led_value(num, on);
 }
 
-
-
-/***************************************************************************
-    INTERRUPT ENABLE AND VECTOR HELPERS
-***************************************************************************/
-
-/*-------------------------------------------------
-    interrupt_reset - reset the interrupt enable
-    states on a reset
--------------------------------------------------*/
-
-static void interrupt_reset(running_machine &machine)
-{
-	generic_machine_private *state = machine.generic_machine_data;
-	int cpunum;
-
-	/* on a reset, enable all interrupts */
-	for (cpunum = 0; cpunum < ARRAY_LENGTH(state->interrupt_enable); cpunum++)
-		state->interrupt_enable[cpunum] = 1;
-}
-
-
-/*-------------------------------------------------
-    irq_pulse_clear - clear a "pulsed" IRQ line
--------------------------------------------------*/
-
-static TIMER_CALLBACK( irq_pulse_clear )
-{
-	device_t *device = (device_t *)ptr;
-	int irqline = param;
-	device_set_input_line(device, irqline, CLEAR_LINE);
-}
-
-
-/*-------------------------------------------------
-    generic_pulse_irq_line - "pulse" an IRQ line by
-    asserting it and then clearing it x cycle(s)
-    later
--------------------------------------------------*/
-
-void generic_pulse_irq_line(device_t *device, int irqline, int cycles)
-{
-	assert(irqline != INPUT_LINE_NMI && irqline != INPUT_LINE_RESET && cycles > 0);
-	device_set_input_line(device, irqline, ASSERT_LINE);
-
-	cpu_device *cpudevice = downcast<cpu_device *>(device);
-	attotime target_time = cpudevice->local_time() + cpudevice->cycles_to_attotime(cycles * cpudevice->min_cycles());
-	device->machine().scheduler().timer_set(target_time - device->machine().time(), FUNC(irq_pulse_clear), irqline, (void *)device);
-}
-
-
-/*-------------------------------------------------
-    generic_pulse_irq_line_and_vector - "pulse" an
-    IRQ line by asserting it and then clearing it
-    x cycle(s) later, specifying a vector
--------------------------------------------------*/
-
-void generic_pulse_irq_line_and_vector(device_t *device, int irqline, int vector, int cycles)
-{
-	assert(irqline != INPUT_LINE_NMI && irqline != INPUT_LINE_RESET && cycles > 0);
-	device_set_input_line_and_vector(device, irqline, ASSERT_LINE, vector);
-
-	cpu_device *cpudevice = downcast<cpu_device *>(device);
-	attotime target_time = cpudevice->local_time() + cpudevice->cycles_to_attotime(cycles * cpudevice->min_cycles());
-	device->machine().scheduler().timer_set(target_time - device->machine().time(), FUNC(irq_pulse_clear), irqline, (void *)device);
-}
-
-
-
-/***************************************************************************
-    INTERRUPT GENERATION CALLBACK HELPERS
-***************************************************************************/
-
-/*-------------------------------------------------
-    NMI callbacks
--------------------------------------------------*/
-
-INTERRUPT_GEN( nmi_line_pulse )		{ if (interrupt_enabled(device)) device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE); }
-INTERRUPT_GEN( nmi_line_assert )	{ if (interrupt_enabled(device)) device_set_input_line(device, INPUT_LINE_NMI, ASSERT_LINE); }
-
-
-/*-------------------------------------------------
-    IRQn callbacks
--------------------------------------------------*/
-
-INTERRUPT_GEN( irq0_line_hold )		{ if (interrupt_enabled(device)) device_set_input_line(device, 0, HOLD_LINE); }
-INTERRUPT_GEN( irq0_line_pulse )	{ if (interrupt_enabled(device)) generic_pulse_irq_line(device, 0, 1); }
-INTERRUPT_GEN( irq0_line_assert )	{ if (interrupt_enabled(device)) device_set_input_line(device, 0, ASSERT_LINE); }
-
-INTERRUPT_GEN( irq1_line_hold )		{ if (interrupt_enabled(device)) device_set_input_line(device, 1, HOLD_LINE); }
-INTERRUPT_GEN( irq1_line_pulse )	{ if (interrupt_enabled(device)) generic_pulse_irq_line(device, 1, 1); }
-INTERRUPT_GEN( irq1_line_assert )	{ if (interrupt_enabled(device)) device_set_input_line(device, 1, ASSERT_LINE); }
-
-INTERRUPT_GEN( irq2_line_hold )		{ if (interrupt_enabled(device)) device_set_input_line(device, 2, HOLD_LINE); }
-INTERRUPT_GEN( irq2_line_pulse )	{ if (interrupt_enabled(device)) generic_pulse_irq_line(device, 2, 1); }
-INTERRUPT_GEN( irq2_line_assert )	{ if (interrupt_enabled(device)) device_set_input_line(device, 2, ASSERT_LINE); }
-
-INTERRUPT_GEN( irq3_line_hold )		{ if (interrupt_enabled(device)) device_set_input_line(device, 3, HOLD_LINE); }
-INTERRUPT_GEN( irq3_line_pulse )	{ if (interrupt_enabled(device)) generic_pulse_irq_line(device, 3, 1); }
-INTERRUPT_GEN( irq3_line_assert )	{ if (interrupt_enabled(device)) device_set_input_line(device, 3, ASSERT_LINE); }
-
-INTERRUPT_GEN( irq4_line_hold )		{ if (interrupt_enabled(device)) device_set_input_line(device, 4, HOLD_LINE); }
-INTERRUPT_GEN( irq4_line_pulse )	{ if (interrupt_enabled(device)) generic_pulse_irq_line(device, 4, 1); }
-INTERRUPT_GEN( irq4_line_assert )	{ if (interrupt_enabled(device)) device_set_input_line(device, 4, ASSERT_LINE); }
-
-INTERRUPT_GEN( irq5_line_hold )		{ if (interrupt_enabled(device)) device_set_input_line(device, 5, HOLD_LINE); }
-INTERRUPT_GEN( irq5_line_pulse )	{ if (interrupt_enabled(device)) generic_pulse_irq_line(device, 5, 1); }
-INTERRUPT_GEN( irq5_line_assert )	{ if (interrupt_enabled(device)) device_set_input_line(device, 5, ASSERT_LINE); }
-
-INTERRUPT_GEN( irq6_line_hold )		{ if (interrupt_enabled(device)) device_set_input_line(device, 6, HOLD_LINE); }
-INTERRUPT_GEN( irq6_line_pulse )	{ if (interrupt_enabled(device)) generic_pulse_irq_line(device, 6, 1); }
-INTERRUPT_GEN( irq6_line_assert )	{ if (interrupt_enabled(device)) device_set_input_line(device, 6, ASSERT_LINE); }
-
-INTERRUPT_GEN( irq7_line_hold )		{ if (interrupt_enabled(device)) device_set_input_line(device, 7, HOLD_LINE); }
-INTERRUPT_GEN( irq7_line_pulse )	{ if (interrupt_enabled(device)) generic_pulse_irq_line(device, 7, 1); }
-INTERRUPT_GEN( irq7_line_assert )	{ if (interrupt_enabled(device)) device_set_input_line(device, 7, ASSERT_LINE); }
-
-
-
-/***************************************************************************
-    WATCHDOG READ/WRITE HELPERS
-***************************************************************************/
-
-/*-------------------------------------------------
-    8-bit reset read/write handlers
--------------------------------------------------*/
-
-WRITE8_MEMBER( driver_device::watchdog_reset_w ) { watchdog_reset(machine()); }
-READ8_MEMBER( driver_device::watchdog_reset_r ) { watchdog_reset(machine()); return space.unmap(); }
-
-
-/*-------------------------------------------------
-    16-bit reset read/write handlers
--------------------------------------------------*/
-
-WRITE16_MEMBER( driver_device::watchdog_reset16_w ) { watchdog_reset(machine()); }
-READ16_MEMBER( driver_device::watchdog_reset16_r ) { watchdog_reset(machine()); return space.unmap(); }
-
-
-/*-------------------------------------------------
-    32-bit reset read/write handlers
--------------------------------------------------*/
-
-WRITE32_MEMBER( driver_device::watchdog_reset32_w ) { watchdog_reset(machine()); }
-READ32_MEMBER( driver_device::watchdog_reset32_r ) { watchdog_reset(machine()); return space.unmap(); }
 
 
 

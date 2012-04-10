@@ -62,7 +62,7 @@ struct _hc11_state
 	UINT8 adctl;
 	int ad_channel;
 
-	device_irq_callback irq_callback;
+	device_irq_acknowledge_callback irq_callback;
 	UINT8 irq_state[2];
 	legacy_cpu_device *device;
 	direct_read_data *direct;

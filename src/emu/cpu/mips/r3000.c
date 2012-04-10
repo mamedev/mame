@@ -137,7 +137,7 @@ struct _r3000_state
 	int			icount;
 	int			interrupt_cycles;
 	int			hasfpu;
-	device_irq_callback irq_callback;
+	device_irq_acknowledge_callback irq_callback;
 	legacy_cpu_device *device;
 	address_space *program;
 	direct_read_data *direct;

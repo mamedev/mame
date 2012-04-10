@@ -170,7 +170,7 @@ static CPU_RESET( h6280 )
 {
 	h6280_Regs* cpustate = get_safe_token(device);
 
-	device_irq_callback save_irqcallback;
+	device_irq_acknowledge_callback save_irqcallback;
 	int i;
 
 	/* wipe out the h6280 structure */

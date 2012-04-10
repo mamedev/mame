@@ -165,7 +165,7 @@ struct _tms32025_state
 	int		init_load_addr;			/* 0=No, 1=Yes, 2=Once for repeat mode */
 	int		tms32025_irq_cycles;
 	int		tms32025_dec_cycles;
-	device_irq_callback irq_callback;
+	device_irq_acknowledge_callback irq_callback;
 
 	PAIR	oldacc;
 	UINT32	memaccess;

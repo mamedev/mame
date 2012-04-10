@@ -403,7 +403,7 @@ static CPU_DISASSEMBLE( v25 )
 	return necv_dasm_one(buffer, pc, oprom, nec_state->config);
 }
 
-static void v25_init(legacy_cpu_device *device, device_irq_callback irqcallback)
+static void v25_init(legacy_cpu_device *device, device_irq_acknowledge_callback irqcallback)
 {
 	const nec_config *config = device->static_config() ? (const nec_config *)device->static_config() : &default_config;
 	v25_state_t *nec_state = get_safe_token(device);

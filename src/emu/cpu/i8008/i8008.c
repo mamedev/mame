@@ -40,7 +40,7 @@ struct _i8008_state
 	int					icount;
 	int 				pc_pos; // PC possition in ADDR
 
-	device_irq_callback irq_callback;
+	device_irq_acknowledge_callback irq_callback;
 	UINT8			irq_state;
 };
 

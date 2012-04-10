@@ -71,7 +71,7 @@ struct _tlcs900_state
 	int halted;
 	int icount;
 	int regbank;
-	device_irq_callback irqcallback;
+	device_irq_acknowledge_callback irqcallback;
 	legacy_cpu_device *device;
 	address_space *program;
 };

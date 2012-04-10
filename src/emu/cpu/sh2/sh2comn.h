@@ -118,7 +118,7 @@ typedef struct
 	UINT32 pcflushes[16];			// pcflush entries
 
 	INT8	irq_line_state[17];
-	device_irq_callback irq_callback;
+	device_irq_acknowledge_callback irq_callback;
 	legacy_cpu_device *device;
 	address_space *program;
 	direct_read_data *direct;
@@ -207,7 +207,7 @@ private:
 };
 #endif
 
-void sh2_common_init(sh2_state *sh2, legacy_cpu_device *device, device_irq_callback irqcallback);
+void sh2_common_init(sh2_state *sh2, legacy_cpu_device *device, device_irq_acknowledge_callback irqcallback);
 void sh2_recalc_irq(sh2_state *sh2);
 void sh2_set_irq_line(sh2_state *sh2, int irqline, int state);
 void sh2_exception(sh2_state *sh2, const char *message, int irqline);

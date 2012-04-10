@@ -81,7 +81,7 @@ struct _z8000_state
     z8000_reg_file regs;/* registers */
 	int nmi_state;		/* NMI line state */
 	int irq_state[2];	/* IRQ line states (NVI, VI) */
-	device_irq_callback irq_callback;
+	device_irq_acknowledge_callback irq_callback;
 	legacy_cpu_device *device;
 	address_space *program;
 	direct_read_data *direct;
@@ -393,7 +393,7 @@ static CPU_RESET( z8001 )
 {
 	z8000_state *cpustate = get_safe_token(device);
 
-	device_irq_callback save_irqcallback = cpustate->irq_callback;
+	device_irq_acknowledge_callback save_irqcallback = cpustate->irq_callback;
 	memset(cpustate, 0, sizeof(*cpustate));
 	cpustate->irq_callback = save_irqcallback;
 	cpustate->device = device;
@@ -415,7 +415,7 @@ static CPU_RESET( z8002 )
 {
 	z8000_state *cpustate = get_safe_token(device);
 
-	device_irq_callback save_irqcallback = cpustate->irq_callback;
+	device_irq_acknowledge_callback save_irqcallback = cpustate->irq_callback;
 	memset(cpustate, 0, sizeof(*cpustate));
 	cpustate->irq_callback = save_irqcallback;
 	cpustate->device = device;

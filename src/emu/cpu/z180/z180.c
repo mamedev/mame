@@ -138,7 +138,7 @@ struct _z180_state
 	UINT8	dma0_cnt;						/* dma0 counter / divide by 20 */
 	UINT8	dma1_cnt;						/* dma1 counter / divide by 20 */
 	z80_daisy_chain daisy;
-	device_irq_callback irq_callback;
+	device_irq_acknowledge_callback irq_callback;
 	legacy_cpu_device *device;
 	address_space *program;
 	direct_read_data *direct;

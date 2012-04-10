@@ -149,7 +149,7 @@ struct _mcs48_state
 
 	UINT16		a11;				/* A11 value, either 0x000 or 0x800 */
 
-	device_irq_callback irq_callback;
+	device_irq_acknowledge_callback irq_callback;
 	legacy_cpu_device *device;
 	int			icount;
 
@@ -842,7 +842,7 @@ static const mcs48_ophandler opcode_table[256]=
     mcs48_init - generic MCS-48 initialization
 -------------------------------------------------*/
 
-static void mcs48_init(legacy_cpu_device *device, device_irq_callback irqcallback, UINT8 feature_mask, UINT16 romsize)
+static void mcs48_init(legacy_cpu_device *device, device_irq_acknowledge_callback irqcallback, UINT8 feature_mask, UINT16 romsize)
 {
 	mcs48_state *cpustate = get_safe_token(device);
 

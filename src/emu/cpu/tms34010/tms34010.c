@@ -61,7 +61,7 @@ struct _tms34010_state
 	UINT8				hblank_stable;
 	UINT8				external_host_access;
 	UINT8				executing;
-	device_irq_callback	irq_callback;
+	device_irq_acknowledge_callback	irq_callback;
 	legacy_cpu_device *device;
 	address_space *program;
 	direct_read_data *direct;
@@ -679,7 +679,7 @@ static CPU_RESET( tms34010 )
 	const tms34010_config *config = tms->config;
 	screen_device *screen = tms->screen;
 	UINT16 *shiftreg = tms->shiftreg;
-	device_irq_callback save_irqcallback = tms->irq_callback;
+	device_irq_acknowledge_callback save_irqcallback = tms->irq_callback;
 	emu_timer *save_scantimer = tms->scantimer;
 
 	memset(tms, 0, sizeof(*tms));

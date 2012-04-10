@@ -37,7 +37,7 @@ struct _cp1610_state
 	UINT8	flags;	/* flags */
 	int 	intr_enabled;
 	//int       (*reset_callback)(cp1610_state *cpustate);
-	device_irq_callback irq_callback;
+	device_irq_acknowledge_callback irq_callback;
 	UINT16	intr_vector;
 	int 	reset_state;
 	int		intr_state;

@@ -73,7 +73,7 @@ struct _mb88_state
 
     /* IRQ handling */
     UINT8 pending_interrupt;
-    device_irq_callback irqcallback;
+    device_irq_acknowledge_callback irqcallback;
     legacy_cpu_device *device;
     address_space *program;
     direct_read_data *direct;

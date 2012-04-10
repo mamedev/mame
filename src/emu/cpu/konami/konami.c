@@ -56,7 +56,7 @@ struct _konami_state
     UINT8   cc;
     UINT8	ireg;
     UINT8   irq_state[2];
-	device_irq_callback irq_callback;
+	device_irq_acknowledge_callback irq_callback;
     UINT8   int_state;  /* SYNC and CWAI flags */
 	UINT8	nmi_state;
 	UINT8	nmi_pending;

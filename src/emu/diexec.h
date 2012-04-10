@@ -106,6 +106,10 @@ enum
 // IRQ callback to be called by device implementations when an IRQ is actually taken
 #define IRQ_CALLBACK(func)				int func(device_t *device, int irqline)
 
+// interrupt generator callback called as a VBLANK or periodic interrupt
+#define INTERRUPT_GEN(func)				void func(device_t *device)
+#define INTERRUPT_GEN_MEMBER(func)		void func(device_t &device)
+
 
 
 //**************************************************************************
@@ -118,8 +122,14 @@ enum
 #define MCFG_DEVICE_VBLANK_INT(_tag, _func) \
 	device_execute_interface::static_set_vblank_int(*device, _func, _tag); \
 
+#define MCFG_DEVICE_VBLANK_INT_DRIVER(_tag, _class, _func) \
+	device_execute_interface::static_set_vblank_int(*device, device_interrupt_delegate(&_class::_func, #_class "::" #_func, downcast<_class *>(&config.root_device())), _tag); \
+
 #define MCFG_DEVICE_PERIODIC_INT(_func, _rate)	\
 	device_execute_interface::static_set_periodic_int(*device, _func, attotime::from_hz(_rate)); \
+
+#define MCFG_DEVICE_PERIODIC_INT_DRIVER(_class, _func, _rate) \
+	device_execute_interface::static_set_vblank_int(*device, device_interrupt_delegate(&_class::_func, #_class "::" #_func, downcast<_class *>(&config.root_device())), attotime::from_hz(_rate)); \
 
 
 
@@ -132,10 +142,12 @@ class screen_device;
 
 
 // interrupt callback for VBLANK and timed interrupts
+typedef delegate<void (device_t &)> device_interrupt_delegate;
 typedef void (*device_interrupt_func)(device_t *device);
 
 // IRQ callback to be called by executing devices when an IRQ is actually taken
-typedef int (*device_irq_callback)(device_t *device, int irqnum);
+typedef delegate<void (device_t &, int)> device_irq_acknowledge_delegate;
+typedef int (*device_irq_acknowledge_callback)(device_t *device, int irqnum);
 
 
 
@@ -166,7 +178,9 @@ public:
 	// static inline configuration helpers
 	static void static_set_disable(device_t &device);
 	static void static_set_vblank_int(device_t &device, device_interrupt_func function, const char *tag, int rate = 0);
+	static void static_set_vblank_int(device_t &device, device_interrupt_delegate function, const char *tag, int rate = 0);
 	static void static_set_periodic_int(device_t &device, device_interrupt_func function, attotime rate);
+	static void static_set_periodic_int(device_t &device, device_interrupt_delegate function, attotime rate);
 
 	// execution management
 	bool executing() const;
@@ -180,7 +194,7 @@ public:
 	void set_input_line_vector(int linenum, int vector) { m_input[linenum].set_vector(vector); }
 	void set_input_line_and_vector(int linenum, int state, int vector) { m_input[linenum].set_state_synced(state, vector); }
 	int input_state(int linenum) { return m_input[linenum].m_curstate; }
-	void set_irq_callback(device_irq_callback callback);
+	void set_irq_acknowledge_callback(device_irq_acknowledge_callback callback);
 
 	// suspend/resume
 	void suspend(UINT32 reason, bool eatcycles);
@@ -274,9 +288,11 @@ protected:
 
 	// configuration
 	bool					m_disabled;					// disabled from executing?
-	device_interrupt_func	m_vblank_interrupt;			// for interrupts tied to VBLANK
+	device_interrupt_delegate m_vblank_interrupt;		// for interrupts tied to VBLANK
+	device_interrupt_func 	m_vblank_interrupt_legacy;	// for interrupts tied to VBLANK
 	const char *			m_vblank_interrupt_screen;	// the screen that causes the VBLANK interrupt
-	device_interrupt_func	m_timed_interrupt;			// for interrupts not tied to VBLANK
+	device_interrupt_delegate m_timed_interrupt;		// for interrupts not tied to VBLANK
+	device_interrupt_func 	m_timed_interrupt_legacy;	// for interrupts not tied to VBLANK
 	attotime				m_timed_interrupt_period;	// period for periodic interrupts
 	bool					m_is_octal;					// to determine if messages/debugger will show octal or hex
 
@@ -284,7 +300,7 @@ protected:
 	device_execute_interface *m_nextexec;				// pointer to the next device to execute, in order
 
 	// input states and IRQ callbacks
-	device_irq_callback		m_driver_irq;				// driver-specific IRQ callback
+	device_irq_acknowledge_callback m_driver_irq;		// driver-specific IRQ callback
 	device_input			m_input[MAX_INPUT_LINES];	// data about inputs
 	emu_timer *				m_timedint_timer;			// reference to this device's periodic interrupt timer
 
@@ -449,9 +465,9 @@ inline void device_set_input_line_and_vector(device_t *device, int line, int sta
 }
 
 // install a driver-specific callback for IRQ acknowledge
-inline void device_set_irq_callback(device_t *device, device_irq_callback callback)
+inline void device_set_irq_callback(device_t *device, device_irq_acknowledge_callback callback)
 {
-	device_execute(device)->set_irq_callback(callback);
+	device_execute(device)->set_irq_acknowledge_callback(callback);
 }
 
 

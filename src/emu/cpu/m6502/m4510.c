@@ -142,7 +142,7 @@ struct _m4510_Regs {
 	UINT16  low, high;
 	UINT32	mem[8];
 
-	device_irq_callback irq_callback;
+	device_irq_acknowledge_callback irq_callback;
 	legacy_cpu_device *device;
 	address_space *space;
 	direct_read_data *direct;

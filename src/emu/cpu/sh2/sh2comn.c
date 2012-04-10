@@ -929,7 +929,7 @@ void sh2_exception(sh2_state *sh2, const char *message, int irqline)
 	#endif
 }
 
-void sh2_common_init(sh2_state *sh2, legacy_cpu_device *device, device_irq_callback irqcallback)
+void sh2_common_init(sh2_state *sh2, legacy_cpu_device *device, device_irq_acknowledge_callback irqcallback)
 {
 	const sh2_cpu_core *conf = (const sh2_cpu_core *)device->static_config();
 	int i;

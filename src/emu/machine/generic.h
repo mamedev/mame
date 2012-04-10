@@ -110,9 +110,6 @@ void generic_pulse_irq_line(device_t *device, int irqline, int cycles);
 void generic_pulse_irq_line_and_vector(device_t *device, int irqline, int vector, int cycles);
 
 
-
-/* ----- common interrupt callbacks ----- */
-
 INTERRUPT_GEN( nmi_line_pulse );
 INTERRUPT_GEN( nmi_line_assert );
 

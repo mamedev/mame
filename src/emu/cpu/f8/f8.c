@@ -52,7 +52,7 @@ struct _f8_Regs
 	UINT8	dbus;	/* data bus value */
 	UINT16	io; 	/* last I/O address */
 	UINT16  irq_vector;
-	device_irq_callback irq_callback;
+	device_irq_acknowledge_callback irq_callback;
 	legacy_cpu_device *device;
 	address_space *program;
 	direct_read_data *direct;
@@ -1545,7 +1545,7 @@ static CPU_RESET( f8 )
 	f8_Regs *cpustate = get_safe_token(device);
 	UINT8 data;
 	int i;
-	device_irq_callback save_callback;
+	device_irq_acknowledge_callback save_callback;
 
 	save_callback = cpustate->irq_callback;
 	memset(cpustate, 0, sizeof(f8_Regs));

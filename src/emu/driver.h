@@ -92,6 +92,45 @@ public:
 		(downcast<_DriverClass &>(device).*_Function)();
 	}
 	
+	// generic interrupt generators	
+	void generic_pulse_irq_line(device_execute_interface &exec, int irqline, int cycles);
+	void generic_pulse_irq_line_and_vector(device_execute_interface &exec, int irqline, int vector, int cycles);
+
+	INTERRUPT_GEN_MEMBER( nmi_line_pulse );
+	INTERRUPT_GEN_MEMBER( nmi_line_assert );
+
+	INTERRUPT_GEN_MEMBER( irq0_line_hold );
+	INTERRUPT_GEN_MEMBER( irq0_line_pulse );
+	INTERRUPT_GEN_MEMBER( irq0_line_assert );
+
+	INTERRUPT_GEN_MEMBER( irq1_line_hold );
+	INTERRUPT_GEN_MEMBER( irq1_line_pulse );
+	INTERRUPT_GEN_MEMBER( irq1_line_assert );
+
+	INTERRUPT_GEN_MEMBER( irq2_line_hold );
+	INTERRUPT_GEN_MEMBER( irq2_line_pulse );
+	INTERRUPT_GEN_MEMBER( irq2_line_assert );
+
+	INTERRUPT_GEN_MEMBER( irq3_line_hold );
+	INTERRUPT_GEN_MEMBER( irq3_line_pulse );
+	INTERRUPT_GEN_MEMBER( irq3_line_assert );
+
+	INTERRUPT_GEN_MEMBER( irq4_line_hold );
+	INTERRUPT_GEN_MEMBER( irq4_line_pulse );
+	INTERRUPT_GEN_MEMBER( irq4_line_assert );
+
+	INTERRUPT_GEN_MEMBER( irq5_line_hold );
+	INTERRUPT_GEN_MEMBER( irq5_line_pulse );
+	INTERRUPT_GEN_MEMBER( irq5_line_assert );
+
+	INTERRUPT_GEN_MEMBER( irq6_line_hold );
+	INTERRUPT_GEN_MEMBER( irq6_line_pulse );
+	INTERRUPT_GEN_MEMBER( irq6_line_assert );
+
+	INTERRUPT_GEN_MEMBER( irq7_line_hold );
+	INTERRUPT_GEN_MEMBER( irq7_line_pulse );
+	INTERRUPT_GEN_MEMBER( irq7_line_assert );
+
 	// watchdog read/write handlers
 	DECLARE_WRITE8_MEMBER( watchdog_reset_w );
 	DECLARE_READ8_MEMBER( watchdog_reset_r );
@@ -99,7 +138,7 @@ public:
 	DECLARE_READ16_MEMBER( watchdog_reset16_r );
 	DECLARE_WRITE32_MEMBER( watchdog_reset32_w );
 	DECLARE_READ32_MEMBER( watchdog_reset32_r );
-	
+
 	// generic audio
 	void soundlatch_setclearedvalue(UINT16 value) { m_latch_clear_value = value; }
 
@@ -259,6 +298,7 @@ public:
 
 private:
 	// helpers
+	void irq_pulse_clear(void *ptr, INT32 param);
 	void soundlatch_sync_callback(void *ptr, INT32 param);
 	void updateflip();
 
