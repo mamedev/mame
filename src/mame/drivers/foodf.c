@@ -475,6 +475,6 @@ ROM_END
  *
  *************************************/
 
-GAME( 1982, foodf,  0,     foodf, foodf, 0, ROT0, "Atari", "Food Fight (rev 3)", GAME_SUPPORTS_SAVE )
-GAME( 1982, foodf2, foodf, foodf, foodf, 0, ROT0, "Atari", "Food Fight (rev 2)", GAME_SUPPORTS_SAVE )
-GAME( 1982, foodfc, foodf, foodf, foodf, 0, ROT0, "Atari", "Food Fight (cocktail)", GAME_SUPPORTS_SAVE )
+GAME( 1982, foodf,  0,     foodf, foodf, 0, ROT0, "General Computer Corporation (Atari license)", "Food Fight (rev 3)", GAME_SUPPORTS_SAVE )
+GAME( 1982, foodf2, foodf, foodf, foodf, 0, ROT0, "General Computer Corporation (Atari license)", "Food Fight (rev 2)", GAME_SUPPORTS_SAVE )
+GAME( 1982, foodfc, foodf, foodf, foodf, 0, ROT0, "General Computer Corporation (Atari license)", "Food Fight (cocktail)", GAME_SUPPORTS_SAVE )

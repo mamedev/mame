@@ -337,6 +337,6 @@ ROM_END
  *
  *************************************/
 
-GAME( 1982, quantum,  0,       quantum, quantum, 0, ROT270, "Atari", "Quantum (rev 2)", GAME_SUPPORTS_SAVE )
-GAME( 1982, quantum1, quantum, quantum, quantum, 0, ROT270, "Atari", "Quantum (rev 1)", GAME_SUPPORTS_SAVE )
-GAME( 1982, quantump, quantum, quantum, quantum, 0, ROT270, "Atari", "Quantum (prototype)", GAME_SUPPORTS_SAVE )
+GAME( 1982, quantum,  0,       quantum, quantum, 0, ROT270, "General Computer Corporation (Atari license)", "Quantum (rev 2)", GAME_SUPPORTS_SAVE )
+GAME( 1982, quantum1, quantum, quantum, quantum, 0, ROT270, "General Computer Corporation (Atari license)", "Quantum (rev 1)", GAME_SUPPORTS_SAVE )
+GAME( 1982, quantump, quantum, quantum, quantum, 0, ROT270, "General Computer Corporation (Atari license)", "Quantum (prototype)", GAME_SUPPORTS_SAVE )
