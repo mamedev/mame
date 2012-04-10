@@ -376,12 +376,6 @@ static void nbmj8891_gfxdraw(running_machine &machine)
 
 			color = GFX[gfxaddr++];
 
-			// for hanamomo
-			if ((nb1413m3_type == NB1413M3_HANAMOMO) && ((gfxaddr >= 0x20000) && (gfxaddr < 0x28000)))
-			{
-				color |= ((color & 0x0f) << 4);
-			}
-
 			dx1 = (2 * x + 0) & 0x1ff;
 			dx2 = (2 * x + 1) & 0x1ff;
 
