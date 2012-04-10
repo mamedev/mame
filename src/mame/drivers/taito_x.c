@@ -328,36 +328,41 @@ public:
 		: seta_state(mconfig, type, tag) { }
 
 	int m_banknum;
+	DECLARE_READ16_MEMBER(superman_dsw_input_r);
+	DECLARE_READ16_MEMBER(daisenpu_input_r);
+	DECLARE_WRITE16_MEMBER(daisenpu_input_w);
+	DECLARE_WRITE16_MEMBER(kyustrkr_input_w);
+	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
 };
 
-static READ16_HANDLER( superman_dsw_input_r )
+READ16_MEMBER(taitox_state::superman_dsw_input_r)
 {
 	switch (offset)
 	{
 		case 0x00:
-			return  input_port_read(space->machine(), "DSWA") & 0x0f;
+			return  input_port_read(machine(), "DSWA") & 0x0f;
 		case 0x01:
-			return (input_port_read(space->machine(), "DSWA") & 0xf0) >> 4;
+			return (input_port_read(machine(), "DSWA") & 0xf0) >> 4;
 		case 0x02:
-			return  input_port_read(space->machine(), "DSWB") & 0x0f;
+			return  input_port_read(machine(), "DSWB") & 0x0f;
 		case 0x03:
-			return (input_port_read(space->machine(), "DSWB") & 0xf0) >> 4;
+			return (input_port_read(machine(), "DSWB") & 0xf0) >> 4;
 		default:
 			logerror("taitox unknown dsw read offset: %04x\n", offset);
 			return 0x00;
 	}
 }
 
-static READ16_HANDLER( daisenpu_input_r )
+READ16_MEMBER(taitox_state::daisenpu_input_r)
 {
 	switch (offset)
 	{
 		case 0x00:
-			return input_port_read(space->machine(), "IN0");    /* Player 1 controls + START1 */
+			return input_port_read(machine(), "IN0");    /* Player 1 controls + START1 */
 		case 0x01:
-			return input_port_read(space->machine(), "IN1");    /* Player 2 controls + START2 */
+			return input_port_read(machine(), "IN1");    /* Player 2 controls + START2 */
 		case 0x02:
-			return input_port_read(space->machine(), "IN2");    /* COINn + SERVICE1 + TILT */
+			return input_port_read(machine(), "IN2");    /* COINn + SERVICE1 + TILT */
 
 		default:
 			logerror("taitox unknown input read offset: %04x\n", offset);
@@ -365,15 +370,15 @@ static READ16_HANDLER( daisenpu_input_r )
 	}
 }
 
-static WRITE16_HANDLER( daisenpu_input_w )
+WRITE16_MEMBER(taitox_state::daisenpu_input_w)
 {
 	switch (offset)
 	{
 		case 0x04:	/* coin counters and lockout */
-			coin_counter_w(space->machine(), 0,data & 0x01);
-			coin_counter_w(space->machine(), 1,data & 0x02);
-			coin_lockout_w(space->machine(), 0,~data & 0x04);
-			coin_lockout_w(space->machine(), 1,~data & 0x08);
+			coin_counter_w(machine(), 0,data & 0x01);
+			coin_counter_w(machine(), 1,data & 0x02);
+			coin_lockout_w(machine(), 0,~data & 0x04);
+			coin_lockout_w(machine(), 1,~data & 0x08);
 //logerror("taitox coin control %04x to offset %04x\n",data,offset);
 			break;
 
@@ -383,15 +388,15 @@ static WRITE16_HANDLER( daisenpu_input_w )
 }
 
 
-static WRITE16_HANDLER( kyustrkr_input_w )
+WRITE16_MEMBER(taitox_state::kyustrkr_input_w)
 {
 	switch (offset)
 	{
 		case 0x04:	/* coin counters and lockout */
-			coin_counter_w(space->machine(), 0,data & 0x01);
-			coin_counter_w(space->machine(), 1,data & 0x02);
-			coin_lockout_w(space->machine(), 0,data & 0x04);
-			coin_lockout_w(space->machine(), 1,data & 0x08);
+			coin_counter_w(machine(), 0,data & 0x01);
+			coin_counter_w(machine(), 1,data & 0x02);
+			coin_lockout_w(machine(), 0,data & 0x04);
+			coin_lockout_w(machine(), 1,data & 0x08);
 //logerror("taitox coin control %04x to offset %04x\n",data,offset);
 			break;
 
@@ -410,12 +415,11 @@ static void reset_sound_region(running_machine &machine)
 	memory_set_bankptr(machine,  "bank2", machine.region("audiocpu")->base() + (state->m_banknum * 0x4000) + 0x10000 );
 }
 
-static WRITE8_HANDLER( sound_bankswitch_w )
+WRITE8_MEMBER(taitox_state::sound_bankswitch_w)
 {
-	taitox_state *state = space->machine().driver_data<taitox_state>();
 
-	state->m_banknum = (data - 1) & 3;
-	reset_sound_region(space->machine());
+	m_banknum = (data - 1) & 3;
+	reset_sound_region(machine());
 }
 
 
@@ -425,7 +429,7 @@ static ADDRESS_MAP_START( superman_map, AS_PROGRAM, 16, taitox_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x300000, 0x300001) AM_WRITENOP	/* written each frame at $3a9c, mostly 0x10 */
 	AM_RANGE(0x400000, 0x400001) AM_WRITENOP	/* written each frame at $3aa2, mostly 0x10 */
-	AM_RANGE(0x500000, 0x500007) AM_READ_LEGACY(superman_dsw_input_r)
+	AM_RANGE(0x500000, 0x500007) AM_READ(superman_dsw_input_r)
 	AM_RANGE(0x600000, 0x600001) AM_WRITENOP	/* written each frame at $3ab0, mostly 0x10 */
 	AM_RANGE(0x800000, 0x800001) AM_READNOP AM_DEVWRITE8_LEGACY("tc0140syt", tc0140syt_port_w, 0x00ff)
 	AM_RANGE(0x800002, 0x800003) AM_DEVREADWRITE8_LEGACY("tc0140syt", tc0140syt_comm_r, tc0140syt_comm_w, 0x00ff)
@@ -442,11 +446,11 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( daisenpu_map, AS_PROGRAM, 16, taitox_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 //  AM_RANGE(0x400000, 0x400001) AM_WRITENOP    /* written each frame at $2ac, values change */
-	AM_RANGE(0x500000, 0x50000f) AM_READ_LEGACY(superman_dsw_input_r)
+	AM_RANGE(0x500000, 0x50000f) AM_READ(superman_dsw_input_r)
 //  AM_RANGE(0x600000, 0x600001) AM_WRITENOP    /* written each frame at $2a2, values change */
 	AM_RANGE(0x800000, 0x800001) AM_READNOP AM_DEVWRITE8_LEGACY("tc0140syt", tc0140syt_port_w, 0x00ff)
 	AM_RANGE(0x800002, 0x800003) AM_DEVREADWRITE8_LEGACY("tc0140syt", tc0140syt_comm_r, tc0140syt_comm_w, 0x00ff)
-	AM_RANGE(0x900000, 0x90000f) AM_READWRITE_LEGACY(daisenpu_input_r, daisenpu_input_w)
+	AM_RANGE(0x900000, 0x90000f) AM_READWRITE(daisenpu_input_r, daisenpu_input_w)
 	AM_RANGE(0xb00000, 0xb00fff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0xd00000, 0xd005ff) AM_RAM AM_DEVREADWRITE_LEGACY("spritegen", spriteylow_r16, spriteylow_w16)	// Sprites Y
 	AM_RANGE(0xd00600, 0xd00607) AM_RAM AM_DEVREADWRITE_LEGACY("spritegen", spritectrl_r16, spritectrl_w16)
@@ -457,11 +461,11 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( gigandes_map, AS_PROGRAM, 16, taitox_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x400000, 0x400001) AM_WRITENOP	/* 0x1 written each frame at $d42, watchdog? */
-	AM_RANGE(0x500000, 0x500007) AM_READ_LEGACY(superman_dsw_input_r)
+	AM_RANGE(0x500000, 0x500007) AM_READ(superman_dsw_input_r)
 	AM_RANGE(0x600000, 0x600001) AM_WRITENOP	/* 0x1 written each frame at $d3c, watchdog? */
 	AM_RANGE(0x800000, 0x800001) AM_READNOP AM_DEVWRITE8_LEGACY("tc0140syt", tc0140syt_port_w, 0x00ff)
 	AM_RANGE(0x800002, 0x800003) AM_DEVREADWRITE8_LEGACY("tc0140syt", tc0140syt_comm_r, tc0140syt_comm_w, 0x00ff)
-	AM_RANGE(0x900000, 0x90000f) AM_READWRITE_LEGACY(daisenpu_input_r, daisenpu_input_w)
+	AM_RANGE(0x900000, 0x90000f) AM_READWRITE(daisenpu_input_r, daisenpu_input_w)
 	AM_RANGE(0xb00000, 0xb00fff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0xd00000, 0xd005ff) AM_RAM AM_DEVREADWRITE_LEGACY("spritegen", spriteylow_r16, spriteylow_w16)	// Sprites Y
 	AM_RANGE(0xd00600, 0xd00607) AM_RAM AM_DEVREADWRITE_LEGACY("spritegen", spritectrl_r16, spritectrl_w16)
@@ -472,11 +476,11 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( ballbros_map, AS_PROGRAM, 16, taitox_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x400000, 0x400001) AM_WRITENOP	/* 0x1 written each frame at $c56, watchdog? */
-	AM_RANGE(0x500000, 0x50000f) AM_READ_LEGACY(superman_dsw_input_r)
+	AM_RANGE(0x500000, 0x50000f) AM_READ(superman_dsw_input_r)
 	AM_RANGE(0x600000, 0x600001) AM_WRITENOP	/* 0x1 written each frame at $c4e, watchdog? */
 	AM_RANGE(0x800000, 0x800001) AM_READNOP AM_DEVWRITE8_LEGACY("tc0140syt", tc0140syt_port_w, 0x00ff)
 	AM_RANGE(0x800002, 0x800003) AM_DEVREADWRITE8_LEGACY("tc0140syt", tc0140syt_comm_r, tc0140syt_comm_w, 0x00ff)
-	AM_RANGE(0x900000, 0x90000f) AM_READWRITE_LEGACY(daisenpu_input_r, daisenpu_input_w)
+	AM_RANGE(0x900000, 0x90000f) AM_READWRITE(daisenpu_input_r, daisenpu_input_w)
 	AM_RANGE(0xb00000, 0xb00fff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0xd00000, 0xd005ff) AM_RAM AM_DEVREADWRITE_LEGACY("spritegen", spriteylow_r16, spriteylow_w16)	// Sprites Y
 	AM_RANGE(0xd00600, 0xd00607) AM_RAM AM_DEVREADWRITE_LEGACY("spritegen", spritectrl_r16, spritectrl_w16)
@@ -498,7 +502,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, taitox_state )
 	AM_RANGE(0xea00, 0xea00) AM_READNOP
 	AM_RANGE(0xee00, 0xee00) AM_WRITENOP /* ? */
 	AM_RANGE(0xf000, 0xf000) AM_WRITENOP /* ? */
-	AM_RANGE(0xf200, 0xf200) AM_WRITE_LEGACY(sound_bankswitch_w) /* bankswitch ? */
+	AM_RANGE(0xf200, 0xf200) AM_WRITE(sound_bankswitch_w) /* bankswitch ? */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( daisenpu_sound_map, AS_PROGRAM, 8, taitox_state )
@@ -512,7 +516,7 @@ static ADDRESS_MAP_START( daisenpu_sound_map, AS_PROGRAM, 8, taitox_state )
 	AM_RANGE(0xea00, 0xea00) AM_READNOP
 	AM_RANGE(0xee00, 0xee00) AM_WRITENOP /* ? */
 	AM_RANGE(0xf000, 0xf000) AM_WRITENOP
-	AM_RANGE(0xf200, 0xf200) AM_WRITE_LEGACY(sound_bankswitch_w)
+	AM_RANGE(0xf200, 0xf200) AM_WRITE(sound_bankswitch_w)
 ADDRESS_MAP_END
 
 
@@ -1221,7 +1225,8 @@ ROM_END
 
 static DRIVER_INIT( kyustrkr )
 {
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x900000, 0x90000f, FUNC(kyustrkr_input_w));
+	taitox_state *state = machine.driver_data<taitox_state>();
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x900000, 0x90000f, write16_delegate(FUNC(taitox_state::kyustrkr_input_w),state));
 }
 
 

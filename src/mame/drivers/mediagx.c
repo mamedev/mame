@@ -149,6 +149,21 @@ public:
 	UINT32 m_speedup_hits[12];
 	int m_speedup_count;
 #endif
+	DECLARE_READ32_MEMBER(disp_ctrl_r);
+	DECLARE_WRITE32_MEMBER(disp_ctrl_w);
+	DECLARE_READ32_MEMBER(memory_ctrl_r);
+	DECLARE_WRITE32_MEMBER(memory_ctrl_w);
+	DECLARE_READ32_MEMBER(biu_ctrl_r);
+	DECLARE_WRITE32_MEMBER(biu_ctrl_w);
+	DECLARE_WRITE32_MEMBER(bios_ram_w);
+	DECLARE_READ32_MEMBER(parallel_port_r);
+	DECLARE_WRITE32_MEMBER(parallel_port_w);
+	DECLARE_READ32_MEMBER(ad1847_r);
+	DECLARE_WRITE32_MEMBER(ad1847_w);
+	DECLARE_READ8_MEMBER(at_page8_r);
+	DECLARE_WRITE8_MEMBER(at_page8_w);
+	DECLARE_READ8_MEMBER(pc_dma_read_byte);
+	DECLARE_WRITE8_MEMBER(pc_dma_write_byte);
 };
 
 // Display controller registers
@@ -357,22 +372,21 @@ static SCREEN_UPDATE_RGB32(mediagx)
 	return 0;
 }
 
-static READ32_HANDLER( disp_ctrl_r )
+READ32_MEMBER(mediagx_state::disp_ctrl_r)
 {
-	mediagx_state *state = space->machine().driver_data<mediagx_state>();
-	UINT32 r = state->m_disp_ctrl_reg[offset];
+	UINT32 r = m_disp_ctrl_reg[offset];
 
 	switch (offset)
 	{
 		case DC_TIMING_CFG:
 			r |= 0x40000000;
 
-			if (space->machine().primary_screen->vpos() >= state->m_frame_height)
+			if (machine().primary_screen->vpos() >= m_frame_height)
 				r &= ~0x40000000;
 
 #if SPEEDUP_HACKS
 			// wait for vblank speedup
-			device_spin_until_interrupt(&space->device());
+			device_spin_until_interrupt(&space.device());
 #endif
 			break;
 	}
@@ -380,12 +394,11 @@ static READ32_HANDLER( disp_ctrl_r )
 	return r;
 }
 
-static WRITE32_HANDLER( disp_ctrl_w )
+WRITE32_MEMBER(mediagx_state::disp_ctrl_w)
 {
-	mediagx_state *state = space->machine().driver_data<mediagx_state>();
 
 //  printf("disp_ctrl_w %08X, %08X, %08X\n", data, offset*4, mem_mask);
-	COMBINE_DATA(state->m_disp_ctrl_reg + offset);
+	COMBINE_DATA(m_disp_ctrl_reg + offset);
 }
 
 
@@ -422,68 +435,64 @@ static WRITE32_DEVICE_HANDLER( fdc_w )
 
 
 
-static READ32_HANDLER( memory_ctrl_r )
+READ32_MEMBER(mediagx_state::memory_ctrl_r)
 {
-	mediagx_state *state = space->machine().driver_data<mediagx_state>();
 
-	return state->m_memory_ctrl_reg[offset];
+	return m_memory_ctrl_reg[offset];
 }
 
-static WRITE32_HANDLER( memory_ctrl_w )
+WRITE32_MEMBER(mediagx_state::memory_ctrl_w)
 {
-	mediagx_state *state = space->machine().driver_data<mediagx_state>();
 
 //  printf("memory_ctrl_w %08X, %08X, %08X\n", data, offset*4, mem_mask);
 	if (offset == 0x20/4)
 	{
-		ramdac_device *ramdac = space->machine().device<ramdac_device>("ramdac");
+		ramdac_device *ramdac = machine().device<ramdac_device>("ramdac");
 
-		if((state->m_disp_ctrl_reg[DC_GENERAL_CFG] & 0x00e00000) == 0x00400000)
+		if((m_disp_ctrl_reg[DC_GENERAL_CFG] & 0x00e00000) == 0x00400000)
 		{
 			// guess: crtc params?
 			// ...
 		}
-		else if((state->m_disp_ctrl_reg[DC_GENERAL_CFG] & 0x00f00000) == 0x00000000)
+		else if((m_disp_ctrl_reg[DC_GENERAL_CFG] & 0x00f00000) == 0x00000000)
 		{
-			state->m_pal_index = data;
-			ramdac->index_w( *space, 0, data );
+			m_pal_index = data;
+			ramdac->index_w( *&space, 0, data );
 		}
-		else if((state->m_disp_ctrl_reg[DC_GENERAL_CFG] & 0x00f00000) == 0x00100000)
+		else if((m_disp_ctrl_reg[DC_GENERAL_CFG] & 0x00f00000) == 0x00100000)
 		{
-			state->m_pal[state->m_pal_index] = data & 0xff;
-			state->m_pal_index++;
-			if (state->m_pal_index >= 768)
+			m_pal[m_pal_index] = data & 0xff;
+			m_pal_index++;
+			if (m_pal_index >= 768)
 			{
-				state->m_pal_index = 0;
+				m_pal_index = 0;
 			}
-			ramdac->pal_w( *space, 0, data );
+			ramdac->pal_w( *&space, 0, data );
 		}
 	}
 	else
 	{
-		COMBINE_DATA(state->m_memory_ctrl_reg + offset);
+		COMBINE_DATA(m_memory_ctrl_reg + offset);
 	}
 }
 
 
 
-static READ32_HANDLER( biu_ctrl_r )
+READ32_MEMBER(mediagx_state::biu_ctrl_r)
 {
-	mediagx_state *state = space->machine().driver_data<mediagx_state>();
 
 	if (offset == 0)
 	{
 		return 0xffffff;
 	}
-	return state->m_biu_ctrl_reg[offset];
+	return m_biu_ctrl_reg[offset];
 }
 
-static WRITE32_HANDLER( biu_ctrl_w )
+WRITE32_MEMBER(mediagx_state::biu_ctrl_w)
 {
-	mediagx_state *state = space->machine().driver_data<mediagx_state>();
 
 	//mame_printf_debug("biu_ctrl_w %08X, %08X, %08X\n", data, offset, mem_mask);
-	COMBINE_DATA(state->m_biu_ctrl_reg + offset);
+	COMBINE_DATA(m_biu_ctrl_reg + offset);
 
 	if (offset == 3)		// BC_XMAP_3 register
 	{
@@ -492,7 +501,7 @@ static WRITE32_HANDLER( biu_ctrl_w )
 }
 
 #ifdef UNUSED_FUNCTION
-static WRITE32_HANDLER(bios_ram_w)
+WRITE32_MEMBER(mediagx_state::bios_ram_w)
 {
 
 }
@@ -552,48 +561,46 @@ static WRITE8_DEVICE_HANDLER( io20_w )
 	}
 }
 
-static READ32_HANDLER( parallel_port_r )
+READ32_MEMBER(mediagx_state::parallel_port_r)
 {
-	mediagx_state *state = space->machine().driver_data<mediagx_state>();
 	UINT32 r = 0;
 	//static const char *const portnames[] = { "IN0", "IN1", "IN2", "IN3", "IN4", "IN5", "IN6", "IN7", "IN8" }; // but parallel_pointer takes values 0 -> 23
 
 	if (ACCESSING_BITS_8_15)
 	{
-		UINT8 nibble = state->m_parallel_latched;//(input_port_read_safe(space->machine(), state->m_portnames[state->m_parallel_pointer / 3], 0) >> (4 * (state->m_parallel_pointer % 3))) & 15;
+		UINT8 nibble = m_parallel_latched;//(input_port_read_safe(machine(), m_portnames[m_parallel_pointer / 3], 0) >> (4 * (m_parallel_pointer % 3))) & 15;
 		r |= ((~nibble & 0x08) << 12) | ((nibble & 0x07) << 11);
-		logerror("%08X:parallel_port_r()\n", cpu_get_pc(&space->device()));
+		logerror("%08X:parallel_port_r()\n", cpu_get_pc(&space.device()));
 #if 0
-		if (state->m_controls_data == 0x18)
+		if (m_controls_data == 0x18)
 		{
-			r |= input_port_read(space->machine(), "IN0") << 8;
+			r |= input_port_read(machine(), "IN0") << 8;
 		}
-		else if (state->m_controls_data == 0x60)
+		else if (m_controls_data == 0x60)
 		{
-			r |= input_port_read(space->machine(), "IN1") << 8;
+			r |= input_port_read(machine(), "IN1") << 8;
 		}
-		else if (state->m_controls_data == 0xff || state->m_controls_data == 0x50)
+		else if (m_controls_data == 0xff || m_controls_data == 0x50)
 		{
-			r |= input_port_read(space->machine(), "IN2") << 8;
+			r |= input_port_read(machine(), "IN2") << 8;
 		}
 
-		//r |= state->m_control_read << 8;
+		//r |= m_control_read << 8;
 #endif
 	}
 	if (ACCESSING_BITS_16_23)
 	{
-		r |= state->m_parport & 0xff0000;
+		r |= m_parport & 0xff0000;
 	}
 
 	return r;
 }
 
-static WRITE32_HANDLER( parallel_port_w )
+WRITE32_MEMBER(mediagx_state::parallel_port_w)
 {
-	mediagx_state *state = space->machine().driver_data<mediagx_state>();
 	static const char *const portnames[] = { "IN0", "IN1", "IN2", "IN3", "IN4", "IN5", "IN6", "IN7", "IN8" };	// but parallel_pointer takes values 0 -> 23
 
-	COMBINE_DATA( &state->m_parport );
+	COMBINE_DATA( &m_parport );
 
 	if (ACCESSING_BITS_0_7)
 	{
@@ -612,16 +619,16 @@ static WRITE32_HANDLER( parallel_port_w )
                 7x..ff = advance pointer
         */
 
-		logerror("%08X:", cpu_get_pc(&space->device()));
+		logerror("%08X:", cpu_get_pc(&space.device()));
 
-		state->m_parallel_latched = (input_port_read_safe(space->machine(), portnames[state->m_parallel_pointer / 3], 0) >> (4 * (state->m_parallel_pointer % 3))) & 15;
+		m_parallel_latched = (input_port_read_safe(machine(), portnames[m_parallel_pointer / 3], 0) >> (4 * (m_parallel_pointer % 3))) & 15;
 		//parallel_pointer++;
 		//logerror("[%02X] Advance pointer to %d\n", data, parallel_pointer);
 		switch (data & 0xfc)
 		{
 			case 0x18:
-				state->m_parallel_pointer = data & 3;
-				logerror("[%02X] Reset pointer to %d\n", data, state->m_parallel_pointer);
+				m_parallel_pointer = data & 3;
+				logerror("[%02X] Reset pointer to %d\n", data, m_parallel_pointer);
 				break;
 
 			case 0x20:
@@ -662,8 +669,8 @@ static WRITE32_HANDLER( parallel_port_w )
 			default:
 				if (data >= 0x70)
 				{
-					state->m_parallel_pointer++;
-					logerror("[%02X] Advance pointer to %d\n", data, state->m_parallel_pointer);
+					m_parallel_pointer++;
+					logerror("[%02X] Advance pointer to %d\n", data, m_parallel_pointer);
 				}
 				else
 					logerror("[%02X] Unknown write\n", data);
@@ -748,41 +755,39 @@ static void ad1847_reg_write(running_machine &machine, int reg, UINT8 data)
 	}
 }
 
-static READ32_HANDLER( ad1847_r )
+READ32_MEMBER(mediagx_state::ad1847_r)
 {
-	mediagx_state *state = space->machine().driver_data<mediagx_state>();
 
 	switch (offset)
 	{
 		case 0x14/4:
-			return ((state->m_ad1847_sample_rate) / 100) - state->m_ad1847_sample_counter;
+			return ((m_ad1847_sample_rate) / 100) - m_ad1847_sample_counter;
 	}
 	return 0;
 }
 
-static WRITE32_HANDLER( ad1847_w )
+WRITE32_MEMBER(mediagx_state::ad1847_w)
 {
-	mediagx_state *state = space->machine().driver_data<mediagx_state>();
 
 	if (offset == 0)
 	{
 		if (ACCESSING_BITS_16_31)
 		{
 			UINT16 ldata = (data >> 16) & 0xffff;
-			state->m_dacl[state->m_dacl_ptr++] = ldata;
+			m_dacl[m_dacl_ptr++] = ldata;
 		}
 		if (ACCESSING_BITS_0_15)
 		{
 			UINT16 rdata = data & 0xffff;
-			state->m_dacr[state->m_dacr_ptr++] = rdata;
+			m_dacr[m_dacr_ptr++] = rdata;
 		}
 
-		state->m_ad1847_sample_counter++;
+		m_ad1847_sample_counter++;
 	}
 	else if (offset == 3)
 	{
 		int reg = (data >> 8) & 0xf;
-		ad1847_reg_write(space->machine(), reg, data & 0xff);
+		ad1847_reg_write(machine(), reg, data & 0xff);
 	}
 }
 
@@ -794,49 +799,47 @@ static WRITE32_HANDLER( ad1847_w )
  *************************************************************************/
 
 
-static READ8_HANDLER(at_page8_r)
+READ8_MEMBER(mediagx_state::at_page8_r)
 {
-	mediagx_state *state = space->machine().driver_data<mediagx_state>();
-	UINT8 data = state->m_at_pages[offset % 0x10];
+	UINT8 data = m_at_pages[offset % 0x10];
 
 	switch(offset % 8)
 	{
 	case 1:
-		data = state->m_dma_offset[(offset / 8) & 1][2];
+		data = m_dma_offset[(offset / 8) & 1][2];
 		break;
 	case 2:
-		data = state->m_dma_offset[(offset / 8) & 1][3];
+		data = m_dma_offset[(offset / 8) & 1][3];
 		break;
 	case 3:
-		data = state->m_dma_offset[(offset / 8) & 1][1];
+		data = m_dma_offset[(offset / 8) & 1][1];
 		break;
 	case 7:
-		data = state->m_dma_offset[(offset / 8) & 1][0];
+		data = m_dma_offset[(offset / 8) & 1][0];
 		break;
 	}
 	return data;
 }
 
 
-static WRITE8_HANDLER(at_page8_w)
+WRITE8_MEMBER(mediagx_state::at_page8_w)
 {
-	mediagx_state *state = space->machine().driver_data<mediagx_state>();
 
-	state->m_at_pages[offset % 0x10] = data;
+	m_at_pages[offset % 0x10] = data;
 
 	switch(offset % 8)
 	{
 	case 1:
-		state->m_dma_offset[(offset / 8) & 1][2] = data;
+		m_dma_offset[(offset / 8) & 1][2] = data;
 		break;
 	case 2:
-		state->m_dma_offset[(offset / 8) & 1][3] = data;
+		m_dma_offset[(offset / 8) & 1][3] = data;
 		break;
 	case 3:
-		state->m_dma_offset[(offset / 8) & 1][1] = data;
+		m_dma_offset[(offset / 8) & 1][1] = data;
 		break;
 	case 7:
-		state->m_dma_offset[(offset / 8) & 1][0] = data;
+		m_dma_offset[(offset / 8) & 1][0] = data;
 		break;
 	}
 }
@@ -851,23 +854,21 @@ static WRITE_LINE_DEVICE_HANDLER( pc_dma_hrq_changed )
 }
 
 
-static READ8_HANDLER( pc_dma_read_byte )
+READ8_MEMBER(mediagx_state::pc_dma_read_byte)
 {
-	mediagx_state *state = space->machine().driver_data<mediagx_state>();
-	offs_t page_offset = (((offs_t) state->m_dma_offset[0][state->m_dma_channel]) << 16)
+	offs_t page_offset = (((offs_t) m_dma_offset[0][m_dma_channel]) << 16)
 		& 0xFF0000;
 
-	return space->read_byte(page_offset + offset);
+	return space.read_byte(page_offset + offset);
 }
 
 
-static WRITE8_HANDLER( pc_dma_write_byte )
+WRITE8_MEMBER(mediagx_state::pc_dma_write_byte)
 {
-	mediagx_state *state = space->machine().driver_data<mediagx_state>();
-	offs_t page_offset = (((offs_t) state->m_dma_offset[0][state->m_dma_channel]) << 16)
+	offs_t page_offset = (((offs_t) m_dma_offset[0][m_dma_channel]) << 16)
 		& 0xFF0000;
 
-	space->write_byte(page_offset + offset, data);
+	space.write_byte(page_offset + offset, data);
 }
 
 static void set_dma_channel(device_t *device, int channel, int _state)
@@ -886,8 +887,8 @@ static I8237_INTERFACE( dma8237_1_config )
 {
 	DEVCB_LINE(pc_dma_hrq_changed),
 	DEVCB_NULL,
-	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, pc_dma_read_byte),
-	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, pc_dma_write_byte),
+	DEVCB_DRIVER_MEMBER(mediagx_state, pc_dma_read_byte),
+	DEVCB_DRIVER_MEMBER(mediagx_state, pc_dma_write_byte),
 	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
 	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
 	{ DEVCB_LINE(pc_dack0_w), DEVCB_LINE(pc_dack1_w), DEVCB_LINE(pc_dack2_w), DEVCB_LINE(pc_dack3_w) }
@@ -913,9 +914,9 @@ static ADDRESS_MAP_START( mediagx_map, AS_PROGRAM, 32, mediagx_state )
 	AM_RANGE(0x000b0000, 0x000b7fff) AM_RAM AM_BASE(m_cga_ram)
 	AM_RANGE(0x000c0000, 0x000fffff) AM_RAM AM_BASE(m_bios_ram)
 	AM_RANGE(0x00100000, 0x00ffffff) AM_RAM
-	AM_RANGE(0x40008000, 0x400080ff) AM_READWRITE_LEGACY(biu_ctrl_r, biu_ctrl_w)
-	AM_RANGE(0x40008300, 0x400083ff) AM_READWRITE_LEGACY(disp_ctrl_r, disp_ctrl_w)
-	AM_RANGE(0x40008400, 0x400084ff) AM_READWRITE_LEGACY(memory_ctrl_r, memory_ctrl_w)
+	AM_RANGE(0x40008000, 0x400080ff) AM_READWRITE(biu_ctrl_r, biu_ctrl_w)
+	AM_RANGE(0x40008300, 0x400083ff) AM_READWRITE(disp_ctrl_r, disp_ctrl_w)
+	AM_RANGE(0x40008400, 0x400084ff) AM_READWRITE(memory_ctrl_r, memory_ctrl_w)
 	AM_RANGE(0x40800000, 0x40bfffff) AM_RAM AM_BASE(m_vram)
 	AM_RANGE(0xfffc0000, 0xffffffff) AM_ROM AM_REGION("bios", 0)	/* System BIOS */
 ADDRESS_MAP_END
@@ -926,14 +927,14 @@ static ADDRESS_MAP_START(mediagx_io, AS_IO, 32, mediagx_state )
 	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8_LEGACY("pit8254", pit8253_r, pit8253_w, 0xffffffff)
 	AM_RANGE(0x0060, 0x006f) AM_READWRITE_LEGACY(kbdc8042_32le_r,			kbdc8042_32le_w)
 	AM_RANGE(0x0070, 0x007f) AM_DEVREADWRITE8("rtc", mc146818_device, read, write, 0xffffffff)
-	AM_RANGE(0x0080, 0x009f) AM_READWRITE8_LEGACY(at_page8_r,				at_page8_w, 0xffffffff)
+	AM_RANGE(0x0080, 0x009f) AM_READWRITE8(at_page8_r,				at_page8_w, 0xffffffff)
 	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8_LEGACY("pic8259_slave", pic8259_r, pic8259_w, 0xffffffff)
 	AM_RANGE(0x00c0, 0x00df) AM_DEVREADWRITE8_LEGACY("dma8237_2", at_dma8237_2_r, at_dma8237_2_w, 0xffffffff)
 	AM_RANGE(0x00e8, 0x00eb) AM_NOP		// I/O delay port
 	AM_RANGE(0x01f0, 0x01f7) AM_DEVREADWRITE_LEGACY("ide", ide_r, ide_w)
-	AM_RANGE(0x0378, 0x037b) AM_READWRITE_LEGACY(parallel_port_r, parallel_port_w)
+	AM_RANGE(0x0378, 0x037b) AM_READWRITE(parallel_port_r, parallel_port_w)
 	AM_RANGE(0x03f0, 0x03ff) AM_DEVREADWRITE_LEGACY("ide", fdc_r, fdc_w)
-	AM_RANGE(0x0400, 0x04ff) AM_READWRITE_LEGACY(ad1847_r, ad1847_w)
+	AM_RANGE(0x0400, 0x04ff) AM_READWRITE(ad1847_r, ad1847_w)
 	AM_RANGE(0x0cf8, 0x0cff) AM_DEVREADWRITE_LEGACY("pcibus", pci_32le_r,	pci_32le_w)
 ADDRESS_MAP_END
 

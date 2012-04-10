@@ -322,6 +322,23 @@ public:
 	int m_unk1_bit;
 	UINT32 m_voodoo3_pci_reg[0x100];
 
+	DECLARE_READ32_MEMBER(epic_r);
+	DECLARE_WRITE32_MEMBER(epic_w);
+	DECLARE_WRITE64_MEMBER(unk2_w);
+	DECLARE_READ64_MEMBER(voodoo3_io_r);
+	DECLARE_WRITE64_MEMBER(voodoo3_io_w);
+	DECLARE_READ64_MEMBER(voodoo3_r);
+	DECLARE_WRITE64_MEMBER(voodoo3_w);
+	DECLARE_READ64_MEMBER(voodoo3_lfb_r);
+	DECLARE_WRITE64_MEMBER(voodoo3_lfb_w);
+	DECLARE_READ64_MEMBER(unk1_r);
+	DECLARE_READ64_MEMBER(e70000_r);
+	DECLARE_WRITE64_MEMBER(e70000_w);
+	DECLARE_WRITE64_MEMBER(unk1a_w);
+	DECLARE_WRITE64_MEMBER(unk1b_w);
+	DECLARE_READ64_MEMBER(e00008_r);
+	DECLARE_WRITE64_MEMBER(e00008_w);
+	DECLARE_READ64_MEMBER(e00000_r);
 };
 
 UINT32 m_mpc8240_regs[256/4];
@@ -641,7 +658,7 @@ static void epic_update_interrupts(running_machine &machine)
 	}
 }
 
-static READ32_HANDLER( epic_r )
+READ32_MEMBER(viper_state::epic_r)
 {
 	int reg;
 	reg = offset * 4;
@@ -651,11 +668,11 @@ static READ32_HANDLER( epic_r )
 		const char *regname = epic_get_register_name(reg);
 		if (regname)
 		{
-			printf("EPIC: read %08X (%s) at %08X\n", reg, regname, cpu_get_pc(&space->device()));
+			printf("EPIC: read %08X (%s) at %08X\n", reg, regname, cpu_get_pc(&space.device()));
 		}
 		else
 		{
-			printf("EPIC: read %08X at %08X\n", reg, cpu_get_pc(&space->device()));
+			printf("EPIC: read %08X at %08X\n", reg, cpu_get_pc(&space.device()));
 		}
 	}
 
@@ -699,7 +716,7 @@ static READ32_HANDLER( epic_r )
 							if (epic.i2c_cr & 0x40)
 							{
 								printf("I2C interrupt\n");
-								mpc8240_interrupt(space->machine(), MPC8240_I2C_IRQ);
+								mpc8240_interrupt(machine(), MPC8240_I2C_IRQ);
 
 								// set interrupt flag in status register
 								epic.i2c_sr |= 0x2;
@@ -718,7 +735,7 @@ static READ32_HANDLER( epic_r )
 							/*if (epic.i2c_cr & 0x40)
                             {
                                 printf("I2C interrupt\n");
-                                mpc8240_interrupt(space->machine, MPC8240_I2C_IRQ);
+                                mpc8240_interrupt(machine, MPC8240_I2C_IRQ);
 
                                 // set interrupt flag in status register
                                 epic.i2c_sr |= 0x2;
@@ -805,7 +822,7 @@ static READ32_HANDLER( epic_r )
 			{
 				case 0x00a0:			// Offset 0x600A0 - IACK
 				{
-					epic_update_interrupts(space->machine());
+					epic_update_interrupts(machine());
 
 					if (epic.active_irq >= 0)
 					{
@@ -826,7 +843,7 @@ static READ32_HANDLER( epic_r )
 	return 0;
 }
 
-static WRITE32_HANDLER( epic_w )
+WRITE32_MEMBER(viper_state::epic_w)
 {
 	int reg;
 	reg = offset * 4;
@@ -836,11 +853,11 @@ static WRITE32_HANDLER( epic_w )
 		const char *regname = epic_get_register_name(reg);
 		if (regname)
 		{
-			printf("EPIC: write %08X, %08X (%s) at %08X\n", data, reg, regname, cpu_get_pc(&space->device()));
+			printf("EPIC: write %08X, %08X (%s) at %08X\n", data, reg, regname, cpu_get_pc(&space.device()));
 		}
 		else
 		{
-			printf("EPIC: write %08X, %08X at %08X\n", data, reg, cpu_get_pc(&space->device()));
+			printf("EPIC: write %08X, %08X at %08X\n", data, reg, cpu_get_pc(&space.device()));
 		}
 	}
 
@@ -898,7 +915,7 @@ static WRITE32_HANDLER( epic_w )
 							if (epic.i2c_cr & 0x40)
 							{
 								printf("I2C interrupt\n");
-								mpc8240_interrupt(space->machine(), MPC8240_I2C_IRQ);
+								mpc8240_interrupt(machine(), MPC8240_I2C_IRQ);
 
 								// set interrupt flag in status register
 								epic.i2c_sr |= 0x2;
@@ -916,7 +933,7 @@ static WRITE32_HANDLER( epic_w )
 							if (epic.i2c_cr & 0x40)
 							{
 								printf("I2C interrupt\n");
-								mpc8240_interrupt(space->machine(), MPC8240_I2C_IRQ);
+								mpc8240_interrupt(machine(), MPC8240_I2C_IRQ);
 
 								// set interrupt flag in status register
 								epic.i2c_sr |= 0x2;
@@ -957,7 +974,7 @@ static WRITE32_HANDLER( epic_w )
 					epic.irq[MPC8240_GTIMER0_IRQ + timer_num].priority = (data >> 16) & 0xf;
 					epic.irq[MPC8240_GTIMER0_IRQ + timer_num].vector = data & 0xff;
 
-					epic_update_interrupts(space->machine());
+					epic_update_interrupts(machine());
 					break;
 				}
 				case 0x1130:			// Offset 0x41130 - Global timer 0 destination register
@@ -969,7 +986,7 @@ static WRITE32_HANDLER( epic_w )
 
 					epic.irq[MPC8240_GTIMER0_IRQ + timer_num].destination = data & 0x1;
 
-					epic_update_interrupts(space->machine());
+					epic_update_interrupts(machine());
 					break;
 				}
 				case 0x1110:			// Offset 0x41110 - Global timer 0 base count register
@@ -1029,7 +1046,7 @@ static WRITE32_HANDLER( epic_w )
 					epic.irq[MPC8240_IRQ0 + irq].priority = (data >> 16) & 0xf;
 					epic.irq[MPC8240_IRQ0 + irq].vector = data & 0xff;
 
-					epic_update_interrupts(space->machine());
+					epic_update_interrupts(machine());
 					break;
 				}
 				case 0x1020:			// Offset 0x51020 - I2C IRQ vector/priority register
@@ -1038,7 +1055,7 @@ static WRITE32_HANDLER( epic_w )
 					epic.irq[MPC8240_I2C_IRQ].priority = (data >> 16) & 0xf;
 					epic.irq[MPC8240_I2C_IRQ].vector = data & 0xff;
 
-					epic_update_interrupts(space->machine());
+					epic_update_interrupts(machine());
 					break;
 				}
 				case 0x0210:			// Offset 0x50210 - IRQ0 destination register
@@ -1062,13 +1079,13 @@ static WRITE32_HANDLER( epic_w )
 
 					epic.irq[MPC8240_IRQ0 + irq].destination = data & 0x1;
 
-					epic_update_interrupts(space->machine());
+					epic_update_interrupts(machine());
 					break;
 				}
 				case 0x1030:			// Offset 0x51030 - I2C IRQ destination register
 				{
 					epic.irq[MPC8240_I2C_IRQ].destination = data & 0x1;
-					epic_update_interrupts(space->machine());
+					epic_update_interrupts(machine());
 					break;
 				}
 			}
@@ -1088,23 +1105,23 @@ static WRITE32_HANDLER( epic_w )
 					epic.irq[epic.active_irq].active = 0;
 					epic.active_irq = -1;
 
-					epic_update_interrupts(space->machine());
+					epic_update_interrupts(machine());
 					break;
 			}
 			break;
 		}
 	}
 }
-
-static READ64_HANDLER(epic_64be_r)
+/*
+READ64_MEMBER(viper_state::epic_64be_r)
 {
-	return read64be_with_32le_handler(epic_r, space, offset, mem_mask);
+	return read64be_with_32le_handler(epic_r, &space, offset, mem_mask);
 }
-static WRITE64_HANDLER(epic_64be_w)
+WRITE64_MEMBER(viper_state::epic_64be_w)
 {
-	write64be_with_32le_handler(epic_w, space, offset, data, mem_mask);
+	write64be_with_32le_handler(epic_w, &space, offset, data, mem_mask);
 }
-
+*/
 
 static void mpc8240_interrupt(running_machine &machine, int irq)
 {
@@ -1341,13 +1358,12 @@ static WRITE64_DEVICE_HANDLER(cf_card_w)
 	}
 }
 
-static WRITE64_HANDLER(unk2_w)
+WRITE64_MEMBER(viper_state::unk2_w)
 {
-	viper_state *state = space->machine().driver_data<viper_state>();
 
 	if (ACCESSING_BITS_56_63)
 	{
-		state->m_cf_card_ide = 0;
+		m_cf_card_ide = 0;
 	}
 }
 
@@ -1488,42 +1504,42 @@ static void voodoo3_pci_w(device_t *busdevice, device_t *device, int function, i
 	}
 }
 
-static READ64_HANDLER(voodoo3_io_r)
+READ64_MEMBER(viper_state::voodoo3_io_r)
 {
-	device_t *device = space->machine().device("voodoo");
+	device_t *device = machine().device("voodoo");
 	return read64be_with_32le_device_handler(banshee_io_r, device, offset, mem_mask);
 }
-static WRITE64_HANDLER(voodoo3_io_w)
+WRITE64_MEMBER(viper_state::voodoo3_io_w)
 {
-//  printf("voodoo3_io_w: %08X%08X, %08X at %08X\n", (UINT32)(data >> 32), (UINT32)(data), offset, cpu_get_pc(&space->device()));
+//  printf("voodoo3_io_w: %08X%08X, %08X at %08X\n", (UINT32)(data >> 32), (UINT32)(data), offset, cpu_get_pc(&space.device()));
 
-	device_t *device = space->machine().device("voodoo");
+	device_t *device = machine().device("voodoo");
 	write64be_with_32le_device_handler(banshee_io_w, device, offset, data, mem_mask);
 }
 
-static READ64_HANDLER(voodoo3_r)
+READ64_MEMBER(viper_state::voodoo3_r)
 {
-	device_t *device = space->machine().device("voodoo");
+	device_t *device = machine().device("voodoo");
 	return read64be_with_32le_device_handler(banshee_r, device, offset, mem_mask);
 }
-static WRITE64_HANDLER(voodoo3_w)
+WRITE64_MEMBER(viper_state::voodoo3_w)
 {
-//  printf("voodoo3_w: %08X%08X, %08X at %08X\n", (UINT32)(data >> 32), (UINT32)(data), offset, cpu_get_pc(&space->device()));
+//  printf("voodoo3_w: %08X%08X, %08X at %08X\n", (UINT32)(data >> 32), (UINT32)(data), offset, cpu_get_pc(&space.device()));
 
-	device_t *device = space->machine().device("voodoo");
+	device_t *device = machine().device("voodoo");
 	write64be_with_32le_device_handler(banshee_w, device,  offset, data, mem_mask);
 }
 
-static READ64_HANDLER(voodoo3_lfb_r)
+READ64_MEMBER(viper_state::voodoo3_lfb_r)
 {
-	device_t *device = space->machine().device("voodoo");
+	device_t *device = machine().device("voodoo");
 	return read64be_with_32le_device_handler(banshee_fb_r, device, offset, mem_mask);
 }
-static WRITE64_HANDLER(voodoo3_lfb_w)
+WRITE64_MEMBER(viper_state::voodoo3_lfb_w)
 {
-//  printf("voodoo3_lfb_w: %08X%08X, %08X at %08X\n", (UINT32)(data >> 32), (UINT32)(data), offset, cpu_get_pc(&space->device()));
+//  printf("voodoo3_lfb_w: %08X%08X, %08X at %08X\n", (UINT32)(data >> 32), (UINT32)(data), offset, cpu_get_pc(&space.device()));
 
-	device_t *device = space->machine().device("voodoo");
+	device_t *device = machine().device("voodoo");
 	write64be_with_32le_device_handler(banshee_fb_w, device, offset, data, mem_mask);
 }
 
@@ -1563,7 +1579,7 @@ static TIMER_CALLBACK(ds2430_timer_callback)
 	}
 }
 
-static READ64_HANDLER(unk1_r)
+READ64_MEMBER(viper_state::unk1_r)
 {
 	UINT64 r = 0;
 	//return 0;//U64(0x0000400000000000);
@@ -1588,12 +1604,12 @@ static READ64_HANDLER(unk1_r)
 	}
 	if (ACCESSING_BITS_32_39)
 	{
-		UINT64 reg = input_port_read(space->machine(), "IN0");
+		UINT64 reg = input_port_read(machine(), "IN0");
 		r |= reg << 32;
 	}
 	if (ACCESSING_BITS_24_31)
 	{
-		UINT64 reg = input_port_read(space->machine(), "IN1");
+		UINT64 reg = input_port_read(machine(), "IN1");
 		r |= reg << 24;
 	}
 	if (ACCESSING_BITS_16_23)
@@ -1711,20 +1727,20 @@ static void DS2430_w(int bit)
 
 }
 
-static READ64_HANDLER(e70000_r)
+READ64_MEMBER(viper_state::e70000_r)
 {
 	if (ACCESSING_BITS_56_63)
 	{
 		ds2430_bit_timer->reset();
 		ds2430_bit_timer->start_time();
 
-//      printf("e70000_r: %08X (mask %08X%08X) at %08X\n", offset, (UINT32)(mem_mask >> 32), (UINT32)mem_mask, cpu_get_pc(space->cpu));
+//      printf("e70000_r: %08X (mask %08X%08X) at %08X\n", offset, (UINT32)(mem_mask >> 32), (UINT32)mem_mask, cpu_get_pc(cpu));
 	}
 
 	return 0;
 }
 
-static WRITE64_HANDLER(e70000_w)
+WRITE64_MEMBER(viper_state::e70000_w)
 {
 	if (ACCESSING_BITS_56_63)
 	{
@@ -1733,7 +1749,7 @@ static WRITE64_HANDLER(e70000_w)
 			ds2430_timer->adjust(attotime::from_usec(40), 1);	// presence pulse for 240 microsecs
 
 			unk1_bit = 1;
-//          printf("e70000_w: %08X%08X, %08X (mask %08X%08X) at %08X\n", (UINT32)(data >> 32), (UINT32)data, offset, (UINT32)(mem_mask >> 32), (UINT32)mem_mask, cpu_get_pc(&space->device()));
+//          printf("e70000_w: %08X%08X, %08X (mask %08X%08X) at %08X\n", (UINT32)(data >> 32), (UINT32)data, offset, (UINT32)(mem_mask >> 32), (UINT32)mem_mask, cpu_get_pc(&space.device()));
 		}
 		else
 		{
@@ -1754,26 +1770,26 @@ static WRITE64_HANDLER(e70000_w)
 	}
 }
 
-static WRITE64_HANDLER(unk1a_w)
+WRITE64_MEMBER(viper_state::unk1a_w)
 {
 	if (ACCESSING_BITS_56_63)
 	{
-	//  printf("unk1a_w: %08X%08X, %08X (mask %08X%08X) at %08X\n", (UINT32)(data >> 32), (UINT32)data, offset, (UINT32)(mem_mask >> 32), (UINT32)mem_mask, cpu_get_pc(space->cpu));
+	//  printf("unk1a_w: %08X%08X, %08X (mask %08X%08X) at %08X\n", (UINT32)(data >> 32), (UINT32)data, offset, (UINT32)(mem_mask >> 32), (UINT32)mem_mask, cpu_get_pc(cpu));
 	}
 }
 
-static WRITE64_HANDLER(unk1b_w)
+WRITE64_MEMBER(viper_state::unk1b_w)
 {
 	if (ACCESSING_BITS_56_63)
 	{
 		unk1_bit = 0;
-	//  printf("unk1b_w: %08X%08X, %08X (mask %08X%08X) at %08X\n", (UINT32)(data >> 32), (UINT32)data, offset, (UINT32)(mem_mask >> 32), (UINT32)mem_mask, cpu_get_pc(space->cpu));
+	//  printf("unk1b_w: %08X%08X, %08X (mask %08X%08X) at %08X\n", (UINT32)(data >> 32), (UINT32)data, offset, (UINT32)(mem_mask >> 32), (UINT32)mem_mask, cpu_get_pc(cpu));
 	}
 }
 
 static UINT64 e00008_data;
 
-static READ64_HANDLER(e00008_r)
+READ64_MEMBER(viper_state::e00008_r)
 {
 	UINT64 r = 0;
 	if (ACCESSING_BITS_0_7)
@@ -1784,7 +1800,7 @@ static READ64_HANDLER(e00008_r)
 	return r;
 }
 
-static WRITE64_HANDLER(e00008_w)
+WRITE64_MEMBER(viper_state::e00008_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -1792,7 +1808,7 @@ static WRITE64_HANDLER(e00008_w)
 	}
 }
 
-static READ64_HANDLER(e00000_r)
+READ64_MEMBER(viper_state::e00000_r)
 {
 	UINT64 r = 0;//U64(0xffffffffffffffff);
 	return r;
@@ -1804,24 +1820,24 @@ static READ64_HANDLER(e00000_r)
 
 static ADDRESS_MAP_START(viper_map, AS_PROGRAM, 64, viper_state )
 	AM_RANGE(0x00000000, 0x00ffffff) AM_MIRROR(0x1000000) AM_RAM
-	AM_RANGE(0x80000000, 0x800fffff) AM_READWRITE_LEGACY(epic_64be_r, epic_64be_w)
-	AM_RANGE(0x82000000, 0x83ffffff) AM_READWRITE_LEGACY(voodoo3_r, voodoo3_w)
-	AM_RANGE(0x84000000, 0x85ffffff) AM_READWRITE_LEGACY(voodoo3_lfb_r, voodoo3_lfb_w)
-	AM_RANGE(0xfe800000, 0xfe8000ff) AM_READWRITE_LEGACY(voodoo3_io_r, voodoo3_io_w)
+	AM_RANGE(0x80000000, 0x800fffff) AM_READWRITE32(epic_r, epic_w,0xffffffffffffffff)
+	AM_RANGE(0x82000000, 0x83ffffff) AM_READWRITE(voodoo3_r, voodoo3_w)
+	AM_RANGE(0x84000000, 0x85ffffff) AM_READWRITE(voodoo3_lfb_r, voodoo3_lfb_w)
+	AM_RANGE(0xfe800000, 0xfe8000ff) AM_READWRITE(voodoo3_io_r, voodoo3_io_w)
 	AM_RANGE(0xfec00000, 0xfedfffff) AM_DEVREADWRITE_LEGACY("pcibus", pci_config_addr_r, pci_config_addr_w)
 	AM_RANGE(0xfee00000, 0xfeefffff) AM_DEVREADWRITE_LEGACY("pcibus", pci_config_data_r, pci_config_data_w)
 	// 0xff000000, 0xff000fff - cf_card_data_r/w (installed in DRIVER_INIT(vipercf))
 	// 0xff200000, 0xff200fff - cf_card_r/w (installed in DRIVER_INIT(vipercf))
 	AM_RANGE(0xff300000, 0xff300fff) AM_DEVREADWRITE_LEGACY("ide", ata_r, ata_w)
-	AM_RANGE(0xffe00000, 0xffe00007) AM_READ_LEGACY(e00000_r)
-	AM_RANGE(0xffe00008, 0xffe0000f) AM_READWRITE_LEGACY(e00008_r, e00008_w)
-	AM_RANGE(0xffe10000, 0xffe10007) AM_READ_LEGACY(unk1_r)
+	AM_RANGE(0xffe00000, 0xffe00007) AM_READ(e00000_r)
+	AM_RANGE(0xffe00008, 0xffe0000f) AM_READWRITE(e00008_r, e00008_w)
+	AM_RANGE(0xffe10000, 0xffe10007) AM_READ(unk1_r)
 	AM_RANGE(0xffe30000, 0xffe31fff) AM_DEVREADWRITE8_LEGACY("m48t58", timekeeper_r, timekeeper_w, U64(0xffffffffffffffff))
 	AM_RANGE(0xffe40000, 0xffe4000f) AM_NOP
-	AM_RANGE(0xffe50000, 0xffe50007) AM_WRITE_LEGACY(unk2_w)
-	AM_RANGE(0xffe70000, 0xffe7000f) AM_READWRITE_LEGACY(e70000_r, e70000_w)
-	AM_RANGE(0xffe80000, 0xffe80007) AM_WRITE_LEGACY(unk1a_w)
-	AM_RANGE(0xffe88000, 0xffe88007) AM_WRITE_LEGACY(unk1b_w)
+	AM_RANGE(0xffe50000, 0xffe50007) AM_WRITE(unk2_w)
+	AM_RANGE(0xffe70000, 0xffe7000f) AM_READWRITE(e70000_r, e70000_w)
+	AM_RANGE(0xffe80000, 0xffe80007) AM_WRITE(unk1a_w)
+	AM_RANGE(0xffe88000, 0xffe88007) AM_WRITE(unk1b_w)
 	AM_RANGE(0xffe9a000, 0xffe9bfff) AM_RAM								// World Combat uses this
 	AM_RANGE(0xfff00000, 0xfff3ffff) AM_ROM AM_REGION("user1", 0)		// Boot ROM
 ADDRESS_MAP_END

@@ -373,6 +373,69 @@ public:
 	UINT64 m_main_speedup_last_cycles;
 	UINT64 m_main_speedup_max_cycles;
 	UINT32 *m_main_gpu_wait;
+	DECLARE_WRITE32_MEMBER(jaguar_eeprom_w);
+	DECLARE_READ32_MEMBER(jaguar_eeprom_clk);
+	DECLARE_READ32_MEMBER(jaguar_eeprom_cs);
+	DECLARE_READ32_MEMBER(misc_control_r);
+	DECLARE_WRITE32_MEMBER(misc_control_w);
+	DECLARE_READ32_MEMBER(gpuctrl_r);
+	DECLARE_WRITE32_MEMBER(gpuctrl_w);
+	DECLARE_READ32_MEMBER(dspctrl_r);
+	DECLARE_WRITE32_MEMBER(dspctrl_w);
+	DECLARE_READ32_MEMBER(jaguar_wave_rom_r);
+	DECLARE_READ32_MEMBER(joystick_r);
+	DECLARE_WRITE32_MEMBER(joystick_w);
+	DECLARE_WRITE32_MEMBER(latch_w);
+	DECLARE_READ32_MEMBER(eeprom_data_r);
+	DECLARE_WRITE32_MEMBER(eeprom_enable_w);
+	DECLARE_WRITE32_MEMBER(eeprom_data_w);
+	DECLARE_WRITE32_MEMBER(gpu_jump_w);
+	DECLARE_READ32_MEMBER(gpu_jump_r);
+	DECLARE_READ32_MEMBER(cojagr3k_main_speedup_r);
+	DECLARE_READ32_MEMBER(main_gpu_wait_r);
+	DECLARE_WRITE32_MEMBER(area51_main_speedup_w);
+	DECLARE_WRITE32_MEMBER(area51mx_main_speedup_w);
+	DECLARE_READ16_MEMBER(gpuctrl_r16);
+	DECLARE_WRITE16_MEMBER(gpuctrl_w16);
+	DECLARE_READ16_MEMBER(jaguar_blitter_r16);
+	DECLARE_WRITE16_MEMBER(jaguar_blitter_w16);
+	DECLARE_READ16_MEMBER(jaguar_serial_r16);
+	DECLARE_WRITE16_MEMBER(jaguar_serial_w16);
+	DECLARE_READ16_MEMBER(dspctrl_r16);
+	DECLARE_WRITE16_MEMBER(dspctrl_w16);
+	DECLARE_READ16_MEMBER(jaguar_eeprom_cs16);
+	DECLARE_READ16_MEMBER(jaguar_eeprom_clk16);
+	DECLARE_WRITE16_MEMBER(jaguar_eeprom_w16);
+	DECLARE_READ16_MEMBER(joystick_r16);
+	DECLARE_WRITE16_MEMBER(joystick_w16);
+	DECLARE_READ32_MEMBER(jaguar_shared_ram_r);
+	DECLARE_WRITE32_MEMBER(jaguar_shared_ram_w);
+	DECLARE_READ32_MEMBER(jaguar_rom_base_r);
+	DECLARE_WRITE32_MEMBER(jaguar_rom_base_w);
+	DECLARE_READ32_MEMBER(jaguar_cart_base_r);
+	DECLARE_WRITE32_MEMBER(jaguar_cart_base_w);
+	DECLARE_READ32_MEMBER(high_rom_base_r);
+	DECLARE_WRITE32_MEMBER(high_rom_base_w);
+	DECLARE_READ32_MEMBER(jaguar_dsp_ram_r);
+	DECLARE_WRITE32_MEMBER(jaguar_dsp_ram_w);
+	DECLARE_READ32_MEMBER(jaguar_gpu_clut_r);
+	DECLARE_WRITE32_MEMBER(jaguar_gpu_clut_w);
+	DECLARE_READ32_MEMBER(jaguar_gpu_ram_r);
+	DECLARE_WRITE32_MEMBER(jaguar_gpu_ram_w);
+	DECLARE_READ16_MEMBER(jaguar_shared_ram_r16);
+	DECLARE_WRITE16_MEMBER(jaguar_shared_ram_w16);
+	DECLARE_READ16_MEMBER(jaguar_rom_base_r16);
+	DECLARE_WRITE16_MEMBER(jaguar_rom_base_w16);
+	DECLARE_READ16_MEMBER(jaguar_cart_base_r16);
+	DECLARE_WRITE16_MEMBER(jaguar_cart_base_w16);
+	DECLARE_READ16_MEMBER(high_rom_base_r16);
+	DECLARE_WRITE16_MEMBER(high_rom_base_w16);
+	DECLARE_READ16_MEMBER(jaguar_dsp_ram_r16);
+	DECLARE_WRITE16_MEMBER(jaguar_dsp_ram_w16);
+	DECLARE_READ16_MEMBER(jaguar_gpu_clut_r16);
+	DECLARE_WRITE16_MEMBER(jaguar_gpu_clut_w16);
+	DECLARE_READ16_MEMBER(jaguar_gpu_ram_r16);
+	DECLARE_WRITE16_MEMBER(jaguar_gpu_ram_w16);
 };
 
 
@@ -581,9 +644,9 @@ static NVRAM_HANDLER( jaguar )
     }
 }
 */
-static WRITE32_HANDLER( jaguar_eeprom_w )
+WRITE32_MEMBER(cojag_state::jaguar_eeprom_w)
 {
-	eeprom_device *eeprom = space->machine().device<eeprom_device>("eeprom");
+	eeprom_device *eeprom = machine().device<eeprom_device>("eeprom");
 	eeprom_bit_count++;
 	if (eeprom_bit_count != 9)		/* kill extra bit at end of address */
 	{
@@ -592,16 +655,16 @@ static WRITE32_HANDLER( jaguar_eeprom_w )
 	}
 }
 
-static READ32_HANDLER( jaguar_eeprom_clk )
+READ32_MEMBER(cojag_state::jaguar_eeprom_clk)
 {
-	eeprom_device *eeprom = space->machine().device<eeprom_device>("eeprom");
+	eeprom_device *eeprom = machine().device<eeprom_device>("eeprom");
 	eeprom->set_clock_line(PULSE_LINE);	/* get next bit when reading */
 	return 0;
 }
 
-static READ32_HANDLER( jaguar_eeprom_cs )
+READ32_MEMBER(cojag_state::jaguar_eeprom_cs)
 {
-	eeprom_device *eeprom = space->machine().device<eeprom_device>("eeprom");
+	eeprom_device *eeprom = machine().device<eeprom_device>("eeprom");
 	eeprom->set_cs_line(ASSERT_LINE);	/* must do at end of an operation */
 	eeprom->set_cs_line(CLEAR_LINE);		/* enable chip for next operation */
 	eeprom->write_bit(1);			/* write a start bit */
@@ -618,9 +681,8 @@ static READ32_HANDLER( jaguar_eeprom_cs )
  *
  *************************************/
 
-static READ32_HANDLER( misc_control_r )
+READ32_MEMBER(cojag_state::misc_control_r)
 {
-	cojag_state *state = space->machine().driver_data<cojag_state>();
 	/*  D7    = board reset (low)
         D6    = audio must & reset (high)
         D5    = volume control data (invert on write)
@@ -628,14 +690,13 @@ static READ32_HANDLER( misc_control_r )
         D3-D1 = audio bank 2-0
         D0    = shared memory select (0=XBUS) */
 
-	return state->m_misc_control_data ^ 0x20;
+	return m_misc_control_data ^ 0x20;
 }
 
 
-static WRITE32_HANDLER( misc_control_w )
+WRITE32_MEMBER(cojag_state::misc_control_w)
 {
-	cojag_state *state = space->machine().driver_data<cojag_state>();
-	logerror("%08X:misc_control_w(%02X)\n", cpu_get_previouspc(&space->device()), data);
+	logerror("%08X:misc_control_w(%02X)\n", cpu_get_previouspc(&space.device()), data);
 
 	/*  D7    = board reset (low)
         D6    = audio must & reset (high)
@@ -648,22 +709,22 @@ static WRITE32_HANDLER( misc_control_w )
 	if (!(data & 0x80))
 	{
 		/* clear any spinuntil stuff */
-		jaguar_gpu_resume(space->machine());
-		jaguar_dsp_resume(space->machine());
+		jaguar_gpu_resume(machine());
+		jaguar_dsp_resume(machine());
 
 		/* halt the CPUs */
-		jaguargpu_ctrl_w(space->machine().device("gpu"), G_CTRL, 0, 0xffffffff);
-		jaguardsp_ctrl_w(space->machine().device("audiocpu"), D_CTRL, 0, 0xffffffff);
+		jaguargpu_ctrl_w(machine().device("gpu"), G_CTRL, 0, 0xffffffff);
+		jaguardsp_ctrl_w(machine().device("audiocpu"), D_CTRL, 0, 0xffffffff);
 	}
 
 	/* adjust banking */
-	if (space->machine().region("user2")->base())
+	if (machine().region("user2")->base())
 	{
-		memory_set_bank(space->machine(), "bank2", (data >> 1) & 7);
-		memory_set_bank(space->machine(), "bank9", (data >> 1) & 7);
+		memory_set_bank(machine(), "bank2", (data >> 1) & 7);
+		memory_set_bank(machine(), "bank9", (data >> 1) & 7);
 	}
 
-	COMBINE_DATA(&state->m_misc_control_data);
+	COMBINE_DATA(&m_misc_control_data);
 }
 
 
@@ -674,9 +735,9 @@ static WRITE32_HANDLER( misc_control_w )
  *************************************/
 
 // shouldn't the DSPs be doing this calc, why is this needed for Jaguar?
-static READ32_HANDLER( gpuctrl_r )
+READ32_MEMBER(cojag_state::gpuctrl_r)
 {
-	UINT32 result = jaguargpu_ctrl_r(space->machine().device("gpu"), offset);
+	UINT32 result = jaguargpu_ctrl_r(machine().device("gpu"), offset);
 
 	if (is_jaguar)
 	{
@@ -691,12 +752,12 @@ static READ32_HANDLER( gpuctrl_r )
 }
 
 
-static WRITE32_HANDLER( gpuctrl_w )
+WRITE32_MEMBER(cojag_state::gpuctrl_w)
 {
 	if (is_jaguar)
 		if ((!protection_check) && (offset == 5) && (data == 1)) protection_check++;
 
-	jaguargpu_ctrl_w(space->machine().device("gpu"), offset, data, mem_mask);
+	jaguargpu_ctrl_w(machine().device("gpu"), offset, data, mem_mask);
 }
 
 
@@ -707,19 +768,19 @@ static WRITE32_HANDLER( gpuctrl_w )
  *
  *************************************/
 
-static READ32_HANDLER( dspctrl_r )
+READ32_MEMBER(cojag_state::dspctrl_r)
 {
-	return jaguardsp_ctrl_r(space->machine().device("audiocpu"), offset);
+	return jaguardsp_ctrl_r(machine().device("audiocpu"), offset);
 }
 
 
-static WRITE32_HANDLER( dspctrl_w )
+WRITE32_MEMBER(cojag_state::dspctrl_w)
 {
-	jaguardsp_ctrl_w(space->machine().device("audiocpu"), offset, data, mem_mask);
+	jaguardsp_ctrl_w(machine().device("audiocpu"), offset, data, mem_mask);
 }
 
 
-static READ32_HANDLER( jaguar_wave_rom_r )
+READ32_MEMBER(cojag_state::jaguar_wave_rom_r)
 {
 	return jaguar_wave_rom[offset];
 }
@@ -734,7 +795,7 @@ static READ32_HANDLER( jaguar_wave_rom_r )
  *
  *************************************/
 
-static READ32_HANDLER( joystick_r )
+READ32_MEMBER(cojag_state::joystick_r)
 {
 	UINT16 joystick_result = 0xfffe;
 	UINT16 joybuts_result = 0xffef;
@@ -763,18 +824,18 @@ static READ32_HANDLER( joystick_r )
 	{
 		if ((joystick_data & (0x10000 << i)) == 0)
 		{
-			joystick_result &= input_port_read(space->machine(), keynames[0][i]);
-			joybuts_result &= input_port_read(space->machine(), keynames[1][i]);
+			joystick_result &= input_port_read(machine(), keynames[0][i]);
+			joybuts_result &= input_port_read(machine(), keynames[1][i]);
 		}
 	}
 
-	joystick_result |= space->machine().device<eeprom_device>("eeprom")->read_bit();
-	joybuts_result |= (input_port_read(space->machine(), "CONFIG") & 0x10);
+	joystick_result |= machine().device<eeprom_device>("eeprom")->read_bit();
+	joybuts_result |= (input_port_read(machine(), "CONFIG") & 0x10);
 
 	return (joystick_result << 16) | joybuts_result;
 }
 
-static WRITE32_HANDLER( joystick_w )
+WRITE32_MEMBER(cojag_state::joystick_w)
 {
 	/*
      *   16        12         8         4         0
@@ -832,16 +893,16 @@ static WRITE32_HANDLER( joystick_w )
  *
  *************************************/
 
-static WRITE32_HANDLER( latch_w )
+WRITE32_MEMBER(cojag_state::latch_w)
 {
-	logerror("%08X:latch_w(%X)\n", cpu_get_previouspc(&space->device()), data);
+	logerror("%08X:latch_w(%X)\n", cpu_get_previouspc(&space.device()), data);
 
 	/* adjust banking */
-	if (space->machine().region("user2")->base())
+	if (machine().region("user2")->base())
 	{
 		if (cojag_is_r3000)
-			memory_set_bank(space->machine(), "bank1", data & 1);
-		memory_set_bank(space->machine(), "bank8", data & 1);
+			memory_set_bank(machine(), "bank1", data & 1);
+		memory_set_bank(machine(), "bank8", data & 1);
 	}
 }
 
@@ -853,36 +914,33 @@ static WRITE32_HANDLER( latch_w )
  *
  *************************************/
 
-static READ32_HANDLER( eeprom_data_r )
+READ32_MEMBER(cojag_state::eeprom_data_r)
 {
-	cojag_state *state = space->machine().driver_data<cojag_state>();
 	if (cojag_is_r3000)
-		return state->m_nvram[offset] | 0xffffff00;
+		return m_nvram[offset] | 0xffffff00;
 	else
-		return state->m_nvram[offset] | 0x00ffffff;
+		return m_nvram[offset] | 0x00ffffff;
 }
 
 
-static WRITE32_HANDLER( eeprom_enable_w )
+WRITE32_MEMBER(cojag_state::eeprom_enable_w)
 {
-	cojag_state *state = space->machine().driver_data<cojag_state>();
-	state->m_eeprom_enable = 1;
+	m_eeprom_enable = 1;
 }
 
 
-static WRITE32_HANDLER( eeprom_data_w )
+WRITE32_MEMBER(cojag_state::eeprom_data_w)
 {
-	cojag_state *state = space->machine().driver_data<cojag_state>();
-//  if (state->m_eeprom_enable)
+//  if (m_eeprom_enable)
 	{
 		if (cojag_is_r3000)
-			state->m_nvram[offset] = data & 0x000000ff;
+			m_nvram[offset] = data & 0x000000ff;
 		else
-			state->m_nvram[offset] = data & 0xff000000;
+			m_nvram[offset] = data & 0xff000000;
 	}
 //  else
-//      logerror("%08X:error writing to disabled EEPROM\n", cpu_get_previouspc(&space->device()));
-	state->m_eeprom_enable = 0;
+//      logerror("%08X:error writing to disabled EEPROM\n", cpu_get_previouspc(&space.device()));
+	m_eeprom_enable = 0;
 }
 
 
@@ -924,40 +982,38 @@ static TIMER_CALLBACK( gpu_sync_timer )
 }
 
 
-static WRITE32_HANDLER( gpu_jump_w )
+WRITE32_MEMBER(cojag_state::gpu_jump_w)
 {
-	cojag_state *state = space->machine().driver_data<cojag_state>();
 	/* update the data in memory */
-	COMBINE_DATA(state->m_gpu_jump_address);
-	logerror("%08X:GPU jump address = %08X\n", cpu_get_previouspc(&space->device()), *state->m_gpu_jump_address);
+	COMBINE_DATA(m_gpu_jump_address);
+	logerror("%08X:GPU jump address = %08X\n", cpu_get_previouspc(&space.device()), *m_gpu_jump_address);
 
 	/* if the GPU is suspended, release it now */
-	jaguar_gpu_resume(space->machine());
+	jaguar_gpu_resume(machine());
 
 	/* start the sync timer going, and note that there is a command pending */
-	space->machine().scheduler().synchronize(FUNC(gpu_sync_timer));
-	state->m_gpu_command_pending = 1;
+	machine().scheduler().synchronize(FUNC(gpu_sync_timer));
+	m_gpu_command_pending = 1;
 }
 
 
-static READ32_HANDLER( gpu_jump_r )
+READ32_MEMBER(cojag_state::gpu_jump_r)
 {
-	cojag_state *state = space->machine().driver_data<cojag_state>();
 	/* if the current GPU command is just pointing back to the spin loop, and */
 	/* we're reading it from the spin loop, we can optimize */
-	if (*state->m_gpu_jump_address == state->m_gpu_spin_pc && cpu_get_previouspc(&space->device()) == state->m_gpu_spin_pc)
+	if (*m_gpu_jump_address == m_gpu_spin_pc && cpu_get_previouspc(&space.device()) == m_gpu_spin_pc)
 	{
 #if ENABLE_SPEEDUP_HACKS
 		/* spin if we're allowed */
-		if (jaguar_hacks_enabled) jaguar_gpu_suspend(space->machine());
+		if (jaguar_hacks_enabled) jaguar_gpu_suspend(machine());
 #endif
 
 		/* no command is pending */
-		state->m_gpu_command_pending = 0;
+		m_gpu_command_pending = 0;
 	}
 
 	/* return the current value */
-	return *state->m_gpu_jump_address;
+	return *m_gpu_jump_address;
 }
 
 
@@ -982,31 +1038,30 @@ static READ32_HANDLER( gpu_jump_r )
 #if ENABLE_SPEEDUP_HACKS
 
 
-static READ32_HANDLER( cojagr3k_main_speedup_r )
+READ32_MEMBER(cojag_state::cojagr3k_main_speedup_r)
 {
-	cojag_state *state = space->machine().driver_data<cojag_state>();
-	UINT64 curcycles = state->m_main_cpu->total_cycles();
+	UINT64 curcycles = m_main_cpu->total_cycles();
 
 	/* if it's been less than main_speedup_max_cycles cycles since the last time */
-	if (curcycles - state->m_main_speedup_last_cycles < state->m_main_speedup_max_cycles)
+	if (curcycles - m_main_speedup_last_cycles < m_main_speedup_max_cycles)
 	{
 		/* increment the count; if we hit 5, we can spin until an interrupt comes */
-		if (state->m_main_speedup_hits++ > 5)
+		if (m_main_speedup_hits++ > 5)
 		{
-			device_spin_until_interrupt(&space->device());
-			state->m_main_speedup_hits = 0;
+			device_spin_until_interrupt(&space.device());
+			m_main_speedup_hits = 0;
 		}
 	}
 
 	/* if it's been more than main_speedup_max_cycles cycles, reset our count */
 	else
-		state->m_main_speedup_hits = 0;
+		m_main_speedup_hits = 0;
 
 	/* remember the last cycle count */
-	state->m_main_speedup_last_cycles = curcycles;
+	m_main_speedup_last_cycles = curcycles;
 
 	/* return the real value */
-	return *state->m_main_speedup;
+	return *m_main_speedup;
 }
 
 #endif
@@ -1031,12 +1086,11 @@ static READ32_HANDLER( cojagr3k_main_speedup_r )
 #if ENABLE_SPEEDUP_HACKS
 
 
-static READ32_HANDLER( main_gpu_wait_r )
+READ32_MEMBER(cojag_state::main_gpu_wait_r)
 {
-	cojag_state *state = space->machine().driver_data<cojag_state>();
-	if (state->m_gpu_command_pending)
-		device_spin_until_interrupt(&space->device());
-	return *state->m_main_gpu_wait;
+	if (m_gpu_command_pending)
+		device_spin_until_interrupt(&space.device());
+	return *m_main_gpu_wait;
 }
 
 #endif
@@ -1058,31 +1112,30 @@ static READ32_HANDLER( main_gpu_wait_r )
 
 #if ENABLE_SPEEDUP_HACKS
 
-static WRITE32_HANDLER( area51_main_speedup_w )
+WRITE32_MEMBER(cojag_state::area51_main_speedup_w)
 {
-	cojag_state *state = space->machine().driver_data<cojag_state>();
-	UINT64 curcycles = state->m_main_cpu->total_cycles();
+	UINT64 curcycles = m_main_cpu->total_cycles();
 
 	/* store the data */
-	COMBINE_DATA(state->m_main_speedup);
+	COMBINE_DATA(m_main_speedup);
 
 	/* if it's been less than 400 cycles since the last time */
-	if (*state->m_main_speedup == 0 && curcycles - state->m_main_speedup_last_cycles < 400)
+	if (*m_main_speedup == 0 && curcycles - m_main_speedup_last_cycles < 400)
 	{
 		/* increment the count; if we hit 5, we can spin until an interrupt comes */
-		if (state->m_main_speedup_hits++ > 5)
+		if (m_main_speedup_hits++ > 5)
 		{
-			device_spin_until_interrupt(&space->device());
-			state->m_main_speedup_hits = 0;
+			device_spin_until_interrupt(&space.device());
+			m_main_speedup_hits = 0;
 		}
 	}
 
 	/* if it's been more than 400 cycles, reset our count */
 	else
-		state->m_main_speedup_hits = 0;
+		m_main_speedup_hits = 0;
 
 	/* remember the last cycle count */
-	state->m_main_speedup_last_cycles = curcycles;
+	m_main_speedup_last_cycles = curcycles;
 }
 
 
@@ -1093,31 +1146,30 @@ static WRITE32_HANDLER( area51_main_speedup_w )
     against 0 must handle that explicitly.
 */
 
-static WRITE32_HANDLER( area51mx_main_speedup_w )
+WRITE32_MEMBER(cojag_state::area51mx_main_speedup_w)
 {
-	cojag_state *state = space->machine().driver_data<cojag_state>();
-	UINT64 curcycles = state->m_main_cpu->total_cycles();
+	UINT64 curcycles = m_main_cpu->total_cycles();
 
 	/* store the data */
-	COMBINE_DATA(&state->m_main_speedup[offset]);
+	COMBINE_DATA(&m_main_speedup[offset]);
 
 	/* if it's been less than 450 cycles since the last time */
-	if (((state->m_main_speedup[0] << 16) | (state->m_main_speedup[1] >> 16)) == 0 && curcycles - state->m_main_speedup_last_cycles < 450)
+	if (((m_main_speedup[0] << 16) | (m_main_speedup[1] >> 16)) == 0 && curcycles - m_main_speedup_last_cycles < 450)
 	{
 		/* increment the count; if we hit 5, we can spin until an interrupt comes */
-		if (state->m_main_speedup_hits++ > 10)
+		if (m_main_speedup_hits++ > 10)
 		{
-			device_spin_until_interrupt(&space->device());
-			state->m_main_speedup_hits = 0;
+			device_spin_until_interrupt(&space.device());
+			m_main_speedup_hits = 0;
 		}
 	}
 
 	/* if it's been more than 450 cycles, reset our count */
 	else
-		state->m_main_speedup_hits = 0;
+		m_main_speedup_hits = 0;
 
 	/* remember the last cycle count */
-	state->m_main_speedup_last_cycles = curcycles;
+	m_main_speedup_last_cycles = curcycles;
 }
 
 #endif
@@ -1136,69 +1188,69 @@ static WRITE32_HANDLER( area51mx_main_speedup_w )
 // surely these should be 16-bit natively if the standard Jaguar is driven by a plain 68k?
 // all these trampolines are not good for performance ;-)
 
-static READ16_HANDLER( gpuctrl_r16 )  { if (!(offset&1)) { return gpuctrl_r(space, offset>>1, mem_mask<<16) >> 16;  } else { return gpuctrl_r(space, offset>>1, mem_mask); } }
-static WRITE16_HANDLER( gpuctrl_w16 ) { if (!(offset&1)) { gpuctrl_w(space, offset>>1, data << 16, mem_mask << 16); } else { gpuctrl_w(space, offset>>1, data, mem_mask); } }
-static READ16_HANDLER( jaguar_blitter_r16 )  { if (!(offset&1)) { return jaguar_blitter_r(space, offset>>1, mem_mask<<16) >> 16;  } else { return jaguar_blitter_r(space, offset>>1, mem_mask); } }
-static WRITE16_HANDLER( jaguar_blitter_w16 ) { if (!(offset&1)) { jaguar_blitter_w(space, offset>>1, data << 16, mem_mask << 16); } else { jaguar_blitter_w(space, offset>>1, data, mem_mask); } }
-static READ16_HANDLER( jaguar_serial_r16 )  { if (!(offset&1)) { return jaguar_serial_r(space, offset>>1, mem_mask<<16) >> 16;  } else { return jaguar_serial_r(space, offset>>1, mem_mask); } }
-static WRITE16_HANDLER( jaguar_serial_w16 ) { if (!(offset&1)) { jaguar_serial_w(space, offset>>1, data << 16, mem_mask << 16); } else { jaguar_serial_w(space, offset>>1, data, mem_mask); } }
-static READ16_HANDLER( dspctrl_r16 )  { if (!(offset&1)) { return dspctrl_r(space, offset>>1, mem_mask<<16) >> 16;  } else { return dspctrl_r(space, offset>>1, mem_mask); } }
-static WRITE16_HANDLER( dspctrl_w16 ) { if (!(offset&1)) { dspctrl_w(space, offset>>1, data << 16, mem_mask << 16); } else { dspctrl_w(space, offset>>1, data, mem_mask); } }
-static READ16_HANDLER( jaguar_eeprom_cs16 )  { if (!(offset&1)) { return jaguar_eeprom_cs(space, offset>>1, mem_mask<<16) >> 16;  } else { return jaguar_eeprom_cs(space, offset>>1, mem_mask); } }
-static READ16_HANDLER( jaguar_eeprom_clk16 )  { if (!(offset&1)) { return jaguar_eeprom_clk(space, offset>>1, mem_mask<<16) >> 16;  } else { return jaguar_eeprom_clk(space, offset>>1, mem_mask); } }
-static WRITE16_HANDLER( jaguar_eeprom_w16 ) { if (!(offset&1)) { jaguar_eeprom_w(space, offset>>1, data << 16, mem_mask << 16); } else { jaguar_eeprom_w(space, offset>>1, data, mem_mask); } }
-static READ16_HANDLER( joystick_r16 )  { if (!(offset&1)) { return joystick_r(space, offset>>1, mem_mask<<16) >> 16;  } else { return joystick_r(space, offset>>1, mem_mask); } }
-static WRITE16_HANDLER( joystick_w16 ) { if (!(offset&1)) { joystick_w(space, offset>>1, data << 16, mem_mask << 16); } else { joystick_w(space, offset>>1, data, mem_mask); } }
+READ16_MEMBER(cojag_state::gpuctrl_r16){ if (!(offset&1)) { return gpuctrl_r(space, offset>>1, mem_mask<<16) >> 16;  } else { return gpuctrl_r(space, offset>>1, mem_mask); } }
+WRITE16_MEMBER(cojag_state::gpuctrl_w16){ if (!(offset&1)) { gpuctrl_w(space, offset>>1, data << 16, mem_mask << 16); } else { gpuctrl_w(space, offset>>1, data, mem_mask); } }
+READ16_MEMBER(cojag_state::jaguar_blitter_r16){ if (!(offset&1)) { return jaguar_blitter_r(&space, offset>>1, mem_mask<<16) >> 16;  } else { return jaguar_blitter_r(&space, offset>>1, mem_mask); } }
+WRITE16_MEMBER(cojag_state::jaguar_blitter_w16){ if (!(offset&1)) { jaguar_blitter_w(&space, offset>>1, data << 16, mem_mask << 16); } else { jaguar_blitter_w(&space, offset>>1, data, mem_mask); } }
+READ16_MEMBER(cojag_state::jaguar_serial_r16){ if (!(offset&1)) { return jaguar_serial_r(&space, offset>>1, mem_mask<<16) >> 16;  } else { return jaguar_serial_r(&space, offset>>1, mem_mask); } }
+WRITE16_MEMBER(cojag_state::jaguar_serial_w16){ if (!(offset&1)) { jaguar_serial_w(&space, offset>>1, data << 16, mem_mask << 16); } else { jaguar_serial_w(&space, offset>>1, data, mem_mask); } }
+READ16_MEMBER(cojag_state::dspctrl_r16){ if (!(offset&1)) { return dspctrl_r(space, offset>>1, mem_mask<<16) >> 16;  } else { return dspctrl_r(space, offset>>1, mem_mask); } }
+WRITE16_MEMBER(cojag_state::dspctrl_w16){ if (!(offset&1)) { dspctrl_w(space, offset>>1, data << 16, mem_mask << 16); } else { dspctrl_w(space, offset>>1, data, mem_mask); } }
+READ16_MEMBER(cojag_state::jaguar_eeprom_cs16){ if (!(offset&1)) { return jaguar_eeprom_cs(space, offset>>1, mem_mask<<16) >> 16;  } else { return jaguar_eeprom_cs(space, offset>>1, mem_mask); } }
+READ16_MEMBER(cojag_state::jaguar_eeprom_clk16){ if (!(offset&1)) { return jaguar_eeprom_clk(space, offset>>1, mem_mask<<16) >> 16;  } else { return jaguar_eeprom_clk(space, offset>>1, mem_mask); } }
+WRITE16_MEMBER(cojag_state::jaguar_eeprom_w16){ if (!(offset&1)) { jaguar_eeprom_w(space, offset>>1, data << 16, mem_mask << 16); } else { jaguar_eeprom_w(space, offset>>1, data, mem_mask); } }
+READ16_MEMBER(cojag_state::joystick_r16){ if (!(offset&1)) { return joystick_r(space, offset>>1, mem_mask<<16) >> 16;  } else { return joystick_r(space, offset>>1, mem_mask); } }
+WRITE16_MEMBER(cojag_state::joystick_w16){ if (!(offset&1)) { joystick_w(space, offset>>1, data << 16, mem_mask << 16); } else { joystick_w(space, offset>>1, data, mem_mask); } }
 
-static READ32_HANDLER( jaguar_shared_ram_r ) { return jaguar_shared_ram[offset]; }
-static WRITE32_HANDLER( jaguar_shared_ram_w ) {	COMBINE_DATA(&jaguar_shared_ram[offset]); }
-static READ32_HANDLER( jaguar_rom_base_r ) { return rom_base[offset]; }
-static WRITE32_HANDLER( jaguar_rom_base_w ) { /*ROM!*/ }
-static READ32_HANDLER( jaguar_cart_base_r ) { return cart_base[offset]; }
-static WRITE32_HANDLER( jaguar_cart_base_w ) { /*ROM!*/ }
-static READ32_HANDLER( high_rom_base_r ) { return high_rom_base[offset]; }
-static WRITE32_HANDLER( high_rom_base_w ) { /*ROM!*/ }
-static READ32_HANDLER( jaguar_dsp_ram_r ) {	return jaguar_dsp_ram[offset]; }
-static WRITE32_HANDLER( jaguar_dsp_ram_w ) { COMBINE_DATA(&jaguar_dsp_ram[offset]); }
-static READ32_HANDLER( jaguar_gpu_clut_r ) { return jaguar_gpu_clut[offset]; }
-static WRITE32_HANDLER( jaguar_gpu_clut_w ) { COMBINE_DATA(&jaguar_gpu_clut[offset]); }
-static READ32_HANDLER( jaguar_gpu_ram_r ) { return jaguar_gpu_ram[offset]; }
-static WRITE32_HANDLER( jaguar_gpu_ram_w ) { COMBINE_DATA(&jaguar_gpu_ram[offset]); }
+READ32_MEMBER(cojag_state::jaguar_shared_ram_r){ return jaguar_shared_ram[offset]; }
+WRITE32_MEMBER(cojag_state::jaguar_shared_ram_w){	COMBINE_DATA(&jaguar_shared_ram[offset]); }
+READ32_MEMBER(cojag_state::jaguar_rom_base_r){ return rom_base[offset]; }
+WRITE32_MEMBER(cojag_state::jaguar_rom_base_w){ /*ROM!*/ }
+READ32_MEMBER(cojag_state::jaguar_cart_base_r){ return cart_base[offset]; }
+WRITE32_MEMBER(cojag_state::jaguar_cart_base_w){ /*ROM!*/ }
+READ32_MEMBER(cojag_state::high_rom_base_r){ return high_rom_base[offset]; }
+WRITE32_MEMBER(cojag_state::high_rom_base_w){ /*ROM!*/ }
+READ32_MEMBER(cojag_state::jaguar_dsp_ram_r){	return jaguar_dsp_ram[offset]; }
+WRITE32_MEMBER(cojag_state::jaguar_dsp_ram_w){ COMBINE_DATA(&jaguar_dsp_ram[offset]); }
+READ32_MEMBER(cojag_state::jaguar_gpu_clut_r){ return jaguar_gpu_clut[offset]; }
+WRITE32_MEMBER(cojag_state::jaguar_gpu_clut_w){ COMBINE_DATA(&jaguar_gpu_clut[offset]); }
+READ32_MEMBER(cojag_state::jaguar_gpu_ram_r){ return jaguar_gpu_ram[offset]; }
+WRITE32_MEMBER(cojag_state::jaguar_gpu_ram_w){ COMBINE_DATA(&jaguar_gpu_ram[offset]); }
 
-static READ16_HANDLER( jaguar_shared_ram_r16 )  { if (!(offset&1)) { return jaguar_shared_ram_r(space, offset>>1, mem_mask<<16) >> 16;  } else { return jaguar_shared_ram_r(space, offset>>1, mem_mask); } }
-static WRITE16_HANDLER( jaguar_shared_ram_w16 ) { if (!(offset&1)) { jaguar_shared_ram_w(space, offset>>1, data << 16, mem_mask << 16); } else { jaguar_shared_ram_w(space, offset>>1, data, mem_mask); } }
-static READ16_HANDLER( jaguar_rom_base_r16 )  { if (!(offset&1)) { return jaguar_rom_base_r(space, offset>>1, mem_mask<<16) >> 16;  } else { return jaguar_rom_base_r(space, offset>>1, mem_mask); } }
-static WRITE16_HANDLER( jaguar_rom_base_w16 ) { if (!(offset&1)) { jaguar_rom_base_w(space, offset>>1, data << 16, mem_mask << 16); } else { jaguar_rom_base_w(space, offset>>1, data, mem_mask); } }
-static READ16_HANDLER( jaguar_cart_base_r16 )  { if (!(offset&1)) { return jaguar_cart_base_r(space, offset>>1, mem_mask<<16) >> 16;  } else { return jaguar_cart_base_r(space, offset>>1, mem_mask); } }
-static WRITE16_HANDLER( jaguar_cart_base_w16 ) { if (!(offset&1)) { jaguar_cart_base_w(space, offset>>1, data << 16, mem_mask << 16); } else { jaguar_cart_base_w(space, offset>>1, data, mem_mask); } }
-static READ16_HANDLER( high_rom_base_r16 )  { if (!(offset&1)) { return high_rom_base_r(space, offset>>1, mem_mask<<16) >> 16;  } else { return high_rom_base_r(space, offset>>1, mem_mask); } }
-static WRITE16_HANDLER( high_rom_base_w16 ) { if (!(offset&1)) { high_rom_base_w(space, offset>>1, data << 16, mem_mask << 16); } else { high_rom_base_w(space, offset>>1, data, mem_mask); } }
+READ16_MEMBER(cojag_state::jaguar_shared_ram_r16){ if (!(offset&1)) { return jaguar_shared_ram_r(space, offset>>1, mem_mask<<16) >> 16;  } else { return jaguar_shared_ram_r(space, offset>>1, mem_mask); } }
+WRITE16_MEMBER(cojag_state::jaguar_shared_ram_w16){ if (!(offset&1)) { jaguar_shared_ram_w(space, offset>>1, data << 16, mem_mask << 16); } else { jaguar_shared_ram_w(space, offset>>1, data, mem_mask); } }
+READ16_MEMBER(cojag_state::jaguar_rom_base_r16){ if (!(offset&1)) { return jaguar_rom_base_r(space, offset>>1, mem_mask<<16) >> 16;  } else { return jaguar_rom_base_r(space, offset>>1, mem_mask); } }
+WRITE16_MEMBER(cojag_state::jaguar_rom_base_w16){ if (!(offset&1)) { jaguar_rom_base_w(space, offset>>1, data << 16, mem_mask << 16); } else { jaguar_rom_base_w(space, offset>>1, data, mem_mask); } }
+READ16_MEMBER(cojag_state::jaguar_cart_base_r16){ if (!(offset&1)) { return jaguar_cart_base_r(space, offset>>1, mem_mask<<16) >> 16;  } else { return jaguar_cart_base_r(space, offset>>1, mem_mask); } }
+WRITE16_MEMBER(cojag_state::jaguar_cart_base_w16){ if (!(offset&1)) { jaguar_cart_base_w(space, offset>>1, data << 16, mem_mask << 16); } else { jaguar_cart_base_w(space, offset>>1, data, mem_mask); } }
+READ16_MEMBER(cojag_state::high_rom_base_r16){ if (!(offset&1)) { return high_rom_base_r(space, offset>>1, mem_mask<<16) >> 16;  } else { return high_rom_base_r(space, offset>>1, mem_mask); } }
+WRITE16_MEMBER(cojag_state::high_rom_base_w16){ if (!(offset&1)) { high_rom_base_w(space, offset>>1, data << 16, mem_mask << 16); } else { high_rom_base_w(space, offset>>1, data, mem_mask); } }
 
-static READ16_HANDLER( jaguar_dsp_ram_r16 )  { if (!(offset&1)) { return jaguar_dsp_ram_r(space, offset>>1, mem_mask<<16) >> 16;  } else { return jaguar_dsp_ram_r(space, offset>>1, mem_mask); } }
-static WRITE16_HANDLER( jaguar_dsp_ram_w16 ) { if (!(offset&1)) { jaguar_dsp_ram_w(space, offset>>1, data << 16, mem_mask << 16); } else { jaguar_dsp_ram_w(space, offset>>1, data, mem_mask); } }
-static READ16_HANDLER( jaguar_gpu_clut_r16 )  { if (!(offset&1)) { return jaguar_gpu_clut_r(space, offset>>1, mem_mask<<16) >> 16;  } else { return jaguar_gpu_clut_r(space, offset>>1, mem_mask); } }
-static WRITE16_HANDLER( jaguar_gpu_clut_w16 ) { if (!(offset&1)) { jaguar_gpu_clut_w(space, offset>>1, data << 16, mem_mask << 16); } else { jaguar_gpu_clut_w(space, offset>>1, data, mem_mask); } }
-static READ16_HANDLER( jaguar_gpu_ram_r16 )  { if (!(offset&1)) { return jaguar_gpu_ram_r(space, offset>>1, mem_mask<<16) >> 16;  } else { return jaguar_gpu_ram_r(space, offset>>1, mem_mask); } }
-static WRITE16_HANDLER( jaguar_gpu_ram_w16 ) { if (!(offset&1)) { jaguar_gpu_ram_w(space, offset>>1, data << 16, mem_mask << 16); } else { jaguar_gpu_ram_w(space, offset>>1, data, mem_mask); } }
+READ16_MEMBER(cojag_state::jaguar_dsp_ram_r16){ if (!(offset&1)) { return jaguar_dsp_ram_r(space, offset>>1, mem_mask<<16) >> 16;  } else { return jaguar_dsp_ram_r(space, offset>>1, mem_mask); } }
+WRITE16_MEMBER(cojag_state::jaguar_dsp_ram_w16){ if (!(offset&1)) { jaguar_dsp_ram_w(space, offset>>1, data << 16, mem_mask << 16); } else { jaguar_dsp_ram_w(space, offset>>1, data, mem_mask); } }
+READ16_MEMBER(cojag_state::jaguar_gpu_clut_r16){ if (!(offset&1)) { return jaguar_gpu_clut_r(space, offset>>1, mem_mask<<16) >> 16;  } else { return jaguar_gpu_clut_r(space, offset>>1, mem_mask); } }
+WRITE16_MEMBER(cojag_state::jaguar_gpu_clut_w16){ if (!(offset&1)) { jaguar_gpu_clut_w(space, offset>>1, data << 16, mem_mask << 16); } else { jaguar_gpu_clut_w(space, offset>>1, data, mem_mask); } }
+READ16_MEMBER(cojag_state::jaguar_gpu_ram_r16){ if (!(offset&1)) { return jaguar_gpu_ram_r(space, offset>>1, mem_mask<<16) >> 16;  } else { return jaguar_gpu_ram_r(space, offset>>1, mem_mask); } }
+WRITE16_MEMBER(cojag_state::jaguar_gpu_ram_w16){ if (!(offset&1)) { jaguar_gpu_ram_w(space, offset>>1, data << 16, mem_mask << 16); } else { jaguar_gpu_ram_w(space, offset>>1, data, mem_mask); } }
 
 static ADDRESS_MAP_START( jaguar_map, AS_PROGRAM, 16, cojag_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xffffff)
-	AM_RANGE(0x000000, 0x1fffff) AM_MIRROR(0x200000) AM_READWRITE_LEGACY(jaguar_shared_ram_r16, jaguar_shared_ram_w16 );
-	AM_RANGE(0x800000, 0xdfffff) AM_READWRITE_LEGACY(jaguar_cart_base_r16, jaguar_cart_base_w16 )
-	AM_RANGE(0xe00000, 0xe1ffff) AM_READWRITE_LEGACY(jaguar_rom_base_r16, jaguar_rom_base_w16 )
+	AM_RANGE(0x000000, 0x1fffff) AM_MIRROR(0x200000) AM_READWRITE(jaguar_shared_ram_r16, jaguar_shared_ram_w16 );
+	AM_RANGE(0x800000, 0xdfffff) AM_READWRITE(jaguar_cart_base_r16, jaguar_cart_base_w16 )
+	AM_RANGE(0xe00000, 0xe1ffff) AM_READWRITE(jaguar_rom_base_r16, jaguar_rom_base_w16 )
 	AM_RANGE(0xf00000, 0xf003ff) AM_READWRITE_LEGACY(jaguar_tom_regs_r, jaguar_tom_regs_w) // might be reversed endian of the others..
-	AM_RANGE(0xf00400, 0xf005ff) AM_MIRROR(0x000200) AM_READWRITE_LEGACY(jaguar_gpu_clut_r16, jaguar_gpu_clut_w16 )
-	AM_RANGE(0xf02100, 0xf021ff) AM_MIRROR(0x008000) AM_READWRITE_LEGACY(gpuctrl_r16, gpuctrl_w16)
-	AM_RANGE(0xf02200, 0xf022ff) AM_MIRROR(0x008000) AM_READWRITE_LEGACY(jaguar_blitter_r16, jaguar_blitter_w16)
-	AM_RANGE(0xf03000, 0xf03fff) AM_MIRROR(0x008000) AM_READWRITE_LEGACY(jaguar_gpu_ram_r16, jaguar_gpu_ram_w16 )
+	AM_RANGE(0xf00400, 0xf005ff) AM_MIRROR(0x000200) AM_READWRITE(jaguar_gpu_clut_r16, jaguar_gpu_clut_w16 )
+	AM_RANGE(0xf02100, 0xf021ff) AM_MIRROR(0x008000) AM_READWRITE(gpuctrl_r16, gpuctrl_w16)
+	AM_RANGE(0xf02200, 0xf022ff) AM_MIRROR(0x008000) AM_READWRITE(jaguar_blitter_r16, jaguar_blitter_w16)
+	AM_RANGE(0xf03000, 0xf03fff) AM_MIRROR(0x008000) AM_READWRITE(jaguar_gpu_ram_r16, jaguar_gpu_ram_w16 )
 	AM_RANGE(0xf10000, 0xf103ff) AM_READWRITE_LEGACY(jaguar_jerry_regs_r, jaguar_jerry_regs_w) // might be reversed endian of the others..
-	AM_RANGE(0xf14000, 0xf14003) AM_READWRITE_LEGACY(joystick_r16, joystick_w16)
-	AM_RANGE(0xf14800, 0xf14803) AM_READWRITE_LEGACY(jaguar_eeprom_clk16,jaguar_eeprom_w16)	// GPI00
-	AM_RANGE(0xf15000, 0xf15003) AM_READ_LEGACY(jaguar_eeprom_cs16)				// GPI01
-	AM_RANGE(0xf1a100, 0xf1a13f) AM_READWRITE_LEGACY(dspctrl_r16, dspctrl_w16)
-	AM_RANGE(0xf1a140, 0xf1a17f) AM_READWRITE_LEGACY(jaguar_serial_r16, jaguar_serial_w16)
-	AM_RANGE(0xf1b000, 0xf1cfff) AM_READWRITE_LEGACY(jaguar_dsp_ram_r16, jaguar_dsp_ram_w16)
-	AM_RANGE(0xf1d000, 0xf1dfff) AM_READWRITE_LEGACY(high_rom_base_r16, high_rom_base_w16 )
+	AM_RANGE(0xf14000, 0xf14003) AM_READWRITE(joystick_r16, joystick_w16)
+	AM_RANGE(0xf14800, 0xf14803) AM_READWRITE(jaguar_eeprom_clk16,jaguar_eeprom_w16)	// GPI00
+	AM_RANGE(0xf15000, 0xf15003) AM_READ(jaguar_eeprom_cs16)				// GPI01
+	AM_RANGE(0xf1a100, 0xf1a13f) AM_READWRITE(dspctrl_r16, dspctrl_w16)
+	AM_RANGE(0xf1a140, 0xf1a17f) AM_READWRITE(jaguar_serial_r16, jaguar_serial_w16)
+	AM_RANGE(0xf1b000, 0xf1cfff) AM_READWRITE(jaguar_dsp_ram_r16, jaguar_dsp_ram_w16)
+	AM_RANGE(0xf1d000, 0xf1dfff) AM_READWRITE(high_rom_base_r16, high_rom_base_w16 )
 ADDRESS_MAP_END
 
 
@@ -1216,24 +1268,24 @@ static ADDRESS_MAP_START( r3000_map, AS_PROGRAM, 32, cojag_state )
 	AM_RANGE(0x04e00000, 0x04e003ff) AM_DEVREADWRITE_LEGACY("ide", ide_controller32_r, ide_controller32_w)
 	AM_RANGE(0x04f00000, 0x04f003ff) AM_READWRITE_LEGACY(jaguar_tom_regs32_r, jaguar_tom_regs32_w)
 	AM_RANGE(0x04f00400, 0x04f007ff) AM_RAM AM_BASE_LEGACY(&jaguar_gpu_clut) AM_SHARE("share2")
-	AM_RANGE(0x04f02100, 0x04f021ff) AM_READWRITE_LEGACY(gpuctrl_r, gpuctrl_w)
+	AM_RANGE(0x04f02100, 0x04f021ff) AM_READWRITE(gpuctrl_r, gpuctrl_w)
 	AM_RANGE(0x04f02200, 0x04f022ff) AM_READWRITE_LEGACY(jaguar_blitter_r, jaguar_blitter_w)
 	AM_RANGE(0x04f03000, 0x04f03fff) AM_MIRROR(0x00008000) AM_RAM AM_BASE_LEGACY(&jaguar_gpu_ram) AM_SHARE("share3")
 	AM_RANGE(0x04f10000, 0x04f103ff) AM_READWRITE_LEGACY(jaguar_jerry_regs32_r, jaguar_jerry_regs32_w)
 	AM_RANGE(0x04f16000, 0x04f1600b) AM_READ_LEGACY(cojag_gun_input_r)	// GPI02
 	AM_RANGE(0x04f17000, 0x04f17003) AM_READ_PORT("SYSTEM")		// GPI03
-	AM_RANGE(0x04f17800, 0x04f17803) AM_WRITE_LEGACY(latch_w)			// GPI04
+	AM_RANGE(0x04f17800, 0x04f17803) AM_WRITE(latch_w)			// GPI04
 	AM_RANGE(0x04f17c00, 0x04f17c03) AM_READ_PORT("P1_P2")		// GPI05
-	AM_RANGE(0x04f1a100, 0x04f1a13f) AM_READWRITE_LEGACY(dspctrl_r, dspctrl_w)
+	AM_RANGE(0x04f1a100, 0x04f1a13f) AM_READWRITE(dspctrl_r, dspctrl_w)
 	AM_RANGE(0x04f1a140, 0x04f1a17f) AM_READWRITE_LEGACY(jaguar_serial_r, jaguar_serial_w)
 	AM_RANGE(0x04f1b000, 0x04f1cfff) AM_RAM AM_BASE_LEGACY(&jaguar_dsp_ram) AM_SHARE("share4")
 
-	AM_RANGE(0x06000000, 0x06000003) AM_READWRITE_LEGACY(misc_control_r, misc_control_w)
+	AM_RANGE(0x06000000, 0x06000003) AM_READWRITE(misc_control_r, misc_control_w)
 	AM_RANGE(0x10000000, 0x1007ffff) AM_RAM
 	AM_RANGE(0x12000000, 0x120fffff) AM_RAM		// tested in self-test only?
 	AM_RANGE(0x14000004, 0x14000007) AM_WRITE(watchdog_reset32_w)
-	AM_RANGE(0x16000000, 0x16000003) AM_WRITE_LEGACY(eeprom_enable_w)
-	AM_RANGE(0x18000000, 0x18001fff) AM_READWRITE_LEGACY(eeprom_data_r, eeprom_data_w) AM_SHARE("nvram")
+	AM_RANGE(0x16000000, 0x16000003) AM_WRITE(eeprom_enable_w)
+	AM_RANGE(0x18000000, 0x18001fff) AM_READWRITE(eeprom_data_r, eeprom_data_w) AM_SHARE("nvram")
 	AM_RANGE(0x1fc00000, 0x1fdfffff) AM_ROM AM_REGION("user1", 0) AM_BASE(m_rom_base)
 ADDRESS_MAP_END
 
@@ -1242,23 +1294,23 @@ static ADDRESS_MAP_START( m68020_map, AS_PROGRAM, 32, cojag_state )
 	AM_RANGE(0x000000, 0x7fffff) AM_RAM AM_BASE_LEGACY(&jaguar_shared_ram) AM_SHARE("share1")
 	AM_RANGE(0x800000, 0x9fffff) AM_ROM AM_REGION("user1", 0) AM_BASE(m_rom_base)
 	AM_RANGE(0xa00000, 0xa1ffff) AM_RAM
-	AM_RANGE(0xa20000, 0xa21fff) AM_READWRITE_LEGACY(eeprom_data_r, eeprom_data_w) AM_SHARE("nvram")
+	AM_RANGE(0xa20000, 0xa21fff) AM_READWRITE(eeprom_data_r, eeprom_data_w) AM_SHARE("nvram")
 	AM_RANGE(0xa30000, 0xa30003) AM_WRITE(watchdog_reset32_w)
-	AM_RANGE(0xa40000, 0xa40003) AM_WRITE_LEGACY(eeprom_enable_w)
-	AM_RANGE(0xb70000, 0xb70003) AM_READWRITE_LEGACY(misc_control_r, misc_control_w)
+	AM_RANGE(0xa40000, 0xa40003) AM_WRITE(eeprom_enable_w)
+	AM_RANGE(0xb70000, 0xb70003) AM_READWRITE(misc_control_r, misc_control_w)
 	AM_RANGE(0xc00000, 0xdfffff) AM_ROMBANK("bank2")
 	AM_RANGE(0xe00000, 0xe003ff) AM_DEVREADWRITE_LEGACY("ide",  ide_controller32_r, ide_controller32_w)
 	AM_RANGE(0xf00000, 0xf003ff) AM_READWRITE_LEGACY(jaguar_tom_regs32_r, jaguar_tom_regs32_w)
 	AM_RANGE(0xf00400, 0xf007ff) AM_RAM AM_BASE_LEGACY(&jaguar_gpu_clut) AM_SHARE("share2")
-	AM_RANGE(0xf02100, 0xf021ff) AM_READWRITE_LEGACY(gpuctrl_r, gpuctrl_w)
+	AM_RANGE(0xf02100, 0xf021ff) AM_READWRITE(gpuctrl_r, gpuctrl_w)
 	AM_RANGE(0xf02200, 0xf022ff) AM_READWRITE_LEGACY(jaguar_blitter_r, jaguar_blitter_w)
 	AM_RANGE(0xf03000, 0xf03fff) AM_MIRROR(0x008000) AM_RAM AM_BASE_LEGACY(&jaguar_gpu_ram) AM_SHARE("share3")
 	AM_RANGE(0xf10000, 0xf103ff) AM_READWRITE_LEGACY(jaguar_jerry_regs32_r, jaguar_jerry_regs32_w)
 	AM_RANGE(0xf16000, 0xf1600b) AM_READ_LEGACY(cojag_gun_input_r)	// GPI02
 	AM_RANGE(0xf17000, 0xf17003) AM_READ_PORT("SYSTEM")		// GPI03
-//  AM_RANGE(0xf17800, 0xf17803) AM_WRITE_LEGACY(latch_w)          // GPI04
+//  AM_RANGE(0xf17800, 0xf17803) AM_WRITE(latch_w)          // GPI04
 	AM_RANGE(0xf17c00, 0xf17c03) AM_READ_PORT("P1_P2")		// GPI05
-	AM_RANGE(0xf1a100, 0xf1a13f) AM_READWRITE_LEGACY(dspctrl_r, dspctrl_w)
+	AM_RANGE(0xf1a100, 0xf1a13f) AM_READWRITE(dspctrl_r, dspctrl_w)
 	AM_RANGE(0xf1a140, 0xf1a17f) AM_READWRITE_LEGACY(jaguar_serial_r, jaguar_serial_w)
 	AM_RANGE(0xf1b000, 0xf1cfff) AM_RAM AM_BASE_LEGACY(&jaguar_dsp_ram) AM_SHARE("share4")
 ADDRESS_MAP_END
@@ -1278,7 +1330,7 @@ static ADDRESS_MAP_START( gpu_map, AS_PROGRAM, 32, cojag_state )
 	AM_RANGE(0xe00000, 0xe003ff) AM_DEVREADWRITE_LEGACY("ide", ide_controller32_r, ide_controller32_w)
 	AM_RANGE(0xf00000, 0xf003ff) AM_READWRITE_LEGACY(jaguar_tom_regs32_r, jaguar_tom_regs32_w)
 	AM_RANGE(0xf00400, 0xf007ff) AM_RAM AM_SHARE("share2")
-	AM_RANGE(0xf02100, 0xf021ff) AM_READWRITE_LEGACY(gpuctrl_r, gpuctrl_w)
+	AM_RANGE(0xf02100, 0xf021ff) AM_READWRITE(gpuctrl_r, gpuctrl_w)
 	AM_RANGE(0xf02200, 0xf022ff) AM_READWRITE_LEGACY(jaguar_blitter_r, jaguar_blitter_w)
 	AM_RANGE(0xf03000, 0xf03fff) AM_RAM AM_SHARE("share3")
 	AM_RANGE(0xf10000, 0xf103ff) AM_READWRITE_LEGACY(jaguar_jerry_regs32_r, jaguar_jerry_regs32_w)
@@ -1297,10 +1349,10 @@ static ADDRESS_MAP_START( dsp_map, AS_PROGRAM, 32, cojag_state )
 	AM_RANGE(0x800000, 0xbfffff) AM_ROMBANK("bank8")
 	AM_RANGE(0xc00000, 0xdfffff) AM_ROMBANK("bank9")
 	AM_RANGE(0xf10000, 0xf103ff) AM_READWRITE_LEGACY(jaguar_jerry_regs32_r, jaguar_jerry_regs32_w)
-	AM_RANGE(0xf1a100, 0xf1a13f) AM_READWRITE_LEGACY(dspctrl_r, dspctrl_w)
+	AM_RANGE(0xf1a100, 0xf1a13f) AM_READWRITE(dspctrl_r, dspctrl_w)
 	AM_RANGE(0xf1a140, 0xf1a17f) AM_READWRITE_LEGACY(jaguar_serial_r, jaguar_serial_w)
 	AM_RANGE(0xf1b000, 0xf1cfff) AM_RAM AM_SHARE("share4")
-	AM_RANGE(0xf1d000, 0xf1dfff) AM_READ_LEGACY(jaguar_wave_rom_r) AM_BASE_LEGACY(&jaguar_wave_rom)
+	AM_RANGE(0xf1d000, 0xf1dfff) AM_READ(jaguar_wave_rom_r) AM_BASE_LEGACY(&jaguar_wave_rom)
 ADDRESS_MAP_END
 
 /* ToDo, these maps SHOULD be merged with the ones above */
@@ -1312,12 +1364,12 @@ static ADDRESS_MAP_START( jag_gpu_map, AS_PROGRAM, 32, cojag_state )
 	AM_RANGE(0xe00000, 0xe1ffff) AM_ROM AM_BASE_LEGACY(&rom_base) AM_SIZE_LEGACY(&rom_size)  AM_SHARE("share16") AM_REGION("maincpu", 0xe00000)
 	AM_RANGE(0xf00000, 0xf003ff) AM_READWRITE_LEGACY(jaguar_tom_regs32_r, jaguar_tom_regs32_w)
 	AM_RANGE(0xf00400, 0xf005ff) AM_BASE_LEGACY(&jaguar_gpu_clut) AM_MIRROR(0x000200) AM_RAM AM_SHARE("share2")
-	AM_RANGE(0xf02100, 0xf021ff) AM_MIRROR(0x008000) AM_READWRITE_LEGACY(gpuctrl_r, gpuctrl_w)
+	AM_RANGE(0xf02100, 0xf021ff) AM_MIRROR(0x008000) AM_READWRITE(gpuctrl_r, gpuctrl_w)
 	AM_RANGE(0xf02200, 0xf022ff) AM_MIRROR(0x008000) AM_READWRITE_LEGACY(jaguar_blitter_r, jaguar_blitter_w)
 	AM_RANGE(0xf03000, 0xf03fff) AM_BASE_LEGACY(&jaguar_gpu_ram) AM_MIRROR(0x008000) AM_RAM AM_SHARE("share3")
 	AM_RANGE(0xf10000, 0xf103ff) AM_READWRITE_LEGACY(jaguar_jerry_regs32_r, jaguar_jerry_regs32_w)
-	AM_RANGE(0xf14000, 0xf14003) AM_READWRITE_LEGACY(joystick_r, joystick_w)
-	AM_RANGE(0xf1a100, 0xf1a13f) AM_READWRITE_LEGACY(dspctrl_r, dspctrl_w)
+	AM_RANGE(0xf14000, 0xf14003) AM_READWRITE(joystick_r, joystick_w)
+	AM_RANGE(0xf1a100, 0xf1a13f) AM_READWRITE(dspctrl_r, dspctrl_w)
 	AM_RANGE(0xf1a140, 0xf1a17f) AM_READWRITE_LEGACY(jaguar_serial_r, jaguar_serial_w)
 	AM_RANGE(0xf1b000, 0xf1cfff) AM_BASE_LEGACY(&jaguar_dsp_ram) AM_RAM AM_SHARE("share4")
 	AM_RANGE(0xf1d000, 0xf1dfff) AM_ROM AM_BASE_LEGACY(&high_rom_base) AM_REGION("maincpu", 0xf1d000)
@@ -1330,12 +1382,12 @@ static ADDRESS_MAP_START( jag_dsp_map, AS_PROGRAM, 32, cojag_state )
 	AM_RANGE(0xe00000, 0xe1ffff) AM_ROM AM_SHARE("share16") AM_REGION("maincpu", 0xe00000)
 	AM_RANGE(0xf00000, 0xf003ff) AM_READWRITE_LEGACY(jaguar_tom_regs32_r, jaguar_tom_regs32_w)
 	AM_RANGE(0xf00400, 0xf005ff) AM_MIRROR(0x000200) AM_RAM AM_SHARE("share2")
-	AM_RANGE(0xf02100, 0xf021ff) AM_MIRROR(0x008000) AM_READWRITE_LEGACY(gpuctrl_r, gpuctrl_w)
+	AM_RANGE(0xf02100, 0xf021ff) AM_MIRROR(0x008000) AM_READWRITE(gpuctrl_r, gpuctrl_w)
 	AM_RANGE(0xf02200, 0xf022ff) AM_MIRROR(0x008000) AM_READWRITE_LEGACY(jaguar_blitter_r, jaguar_blitter_w)
 	AM_RANGE(0xf03000, 0xf03fff) AM_MIRROR(0x008000) AM_RAM AM_SHARE("share3")
 	AM_RANGE(0xf10000, 0xf103ff) AM_READWRITE_LEGACY(jaguar_jerry_regs32_r, jaguar_jerry_regs32_w)
-	AM_RANGE(0xf14000, 0xf14003) AM_READWRITE_LEGACY(joystick_r, joystick_w)
-	AM_RANGE(0xf1a100, 0xf1a13f) AM_READWRITE_LEGACY(dspctrl_r, dspctrl_w)
+	AM_RANGE(0xf14000, 0xf14003) AM_READWRITE(joystick_r, joystick_w)
+	AM_RANGE(0xf1a100, 0xf1a13f) AM_READWRITE(dspctrl_r, dspctrl_w)
 	AM_RANGE(0xf1a140, 0xf1a17f) AM_READWRITE_LEGACY(jaguar_serial_r, jaguar_serial_w)
 	AM_RANGE(0xf1b000, 0xf1cfff) AM_RAM AM_SHARE("share4")
 	AM_RANGE(0xf1d000, 0xf1dfff) AM_ROM AM_REGION("maincpu", 0xf1d000)
@@ -2301,10 +2353,10 @@ static void cojag_common_init(running_machine &machine, UINT16 gpu_jump_offs, UI
 
 	/* install synchronization hooks for GPU */
 	if (cojag_is_r3000)
-		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x04f0b000 + gpu_jump_offs, 0x04f0b003 + gpu_jump_offs, FUNC(gpu_jump_w));
+		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x04f0b000 + gpu_jump_offs, 0x04f0b003 + gpu_jump_offs, write32_delegate(FUNC(cojag_state::gpu_jump_w),state));
 	else
-		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xf0b000 + gpu_jump_offs, 0xf0b003 + gpu_jump_offs, FUNC(gpu_jump_w));
-	machine.device("gpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xf03000 + gpu_jump_offs, 0xf03003 + gpu_jump_offs, FUNC(gpu_jump_r));
+		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xf0b000 + gpu_jump_offs, 0xf0b003 + gpu_jump_offs, write32_delegate(FUNC(cojag_state::gpu_jump_w),state));
+	machine.device("gpu")->memory().space(AS_PROGRAM)->install_read_handler(0xf03000 + gpu_jump_offs, 0xf03003 + gpu_jump_offs, read32_delegate(FUNC(cojag_state::gpu_jump_r),state));
 	state->m_gpu_jump_address = &jaguar_gpu_ram[gpu_jump_offs/4];
 	state->m_gpu_spin_pc = 0xf03000 + spin_pc;
 
@@ -2323,7 +2375,7 @@ static DRIVER_INIT( area51a )
 		cojag_state *state = machine.driver_data<cojag_state>();
 
 		/* install speedup for main CPU */
-		state->m_main_speedup = machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xa02030, 0xa02033, FUNC(area51_main_speedup_w));
+		state->m_main_speedup = machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xa02030, 0xa02033, write32_delegate(FUNC(cojag_state::area51_main_speedup_w),state));
 	}
 #endif
 }
@@ -2340,7 +2392,7 @@ static DRIVER_INIT( area51 )
 
 		/* install speedup for main CPU */
 		state->m_main_speedup_max_cycles = 120;
-		state->m_main_speedup = machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x100062e8, 0x100062eb, FUNC(cojagr3k_main_speedup_r));
+		state->m_main_speedup = machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x100062e8, 0x100062eb, read32_delegate(FUNC(cojag_state::cojagr3k_main_speedup_r),state));
 	}
 #endif
 }
@@ -2357,7 +2409,7 @@ static DRIVER_INIT( maxforce )
 #if ENABLE_SPEEDUP_HACKS
 	/* install speedup for main CPU */
 	state->m_main_speedup_max_cycles = 120;
-	state->m_main_speedup = machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x1000865c, 0x1000865f, FUNC(cojagr3k_main_speedup_r));
+	state->m_main_speedup = machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x1000865c, 0x1000865f, read32_delegate(FUNC(cojag_state::cojagr3k_main_speedup_r),state));
 #endif
 }
 
@@ -2373,7 +2425,7 @@ static DRIVER_INIT( area51mx )
 
 #if ENABLE_SPEEDUP_HACKS
 	/* install speedup for main CPU */
-	state->m_main_speedup = machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xa19550, 0xa19557, FUNC(area51mx_main_speedup_w));
+	state->m_main_speedup = machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xa19550, 0xa19557, write32_delegate(FUNC(cojag_state::area51mx_main_speedup_w),state));
 #endif
 }
 
@@ -2390,7 +2442,7 @@ static DRIVER_INIT( a51mxr3k )
 #if ENABLE_SPEEDUP_HACKS
 	/* install speedup for main CPU */
 	state->m_main_speedup_max_cycles = 120;
-	state->m_main_speedup = machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x10006f0c, 0x10006f0f, FUNC(cojagr3k_main_speedup_r));
+	state->m_main_speedup = machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x10006f0c, 0x10006f0f, read32_delegate(FUNC(cojag_state::cojagr3k_main_speedup_r),state));
 #endif
 }
 
@@ -2406,7 +2458,7 @@ static DRIVER_INIT( fishfren )
 
 		/* install speedup for main CPU */
 		state->m_main_speedup_max_cycles = 200;
-		state->m_main_speedup = machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x10021b60, 0x10021b63, FUNC(cojagr3k_main_speedup_r));
+		state->m_main_speedup = machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x10021b60, 0x10021b63, read32_delegate(FUNC(cojag_state::cojagr3k_main_speedup_r),state));
 	}
 #endif
 }
@@ -2423,8 +2475,8 @@ static void init_freeze_common(running_machine &machine, offs_t main_speedup_add
 		/* install speedup for main CPU */
 		state->m_main_speedup_max_cycles = 200;
 		if (main_speedup_addr != 0)
-			state->m_main_speedup = machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(main_speedup_addr, main_speedup_addr + 3, FUNC(cojagr3k_main_speedup_r));
-		state->m_main_gpu_wait = machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x0400d900, 0x0400d900 + 3, FUNC(main_gpu_wait_r));
+			state->m_main_speedup = machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(main_speedup_addr, main_speedup_addr + 3, read32_delegate(FUNC(cojag_state::cojagr3k_main_speedup_r),state));
+		state->m_main_gpu_wait = machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x0400d900, 0x0400d900 + 3, read32_delegate(FUNC(cojag_state::main_gpu_wait_r),state));
 	}
 #endif
 }
@@ -2448,7 +2500,7 @@ static DRIVER_INIT( vcircle )
 
 		/* install speedup for main CPU */
 		state->m_main_speedup_max_cycles = 50;
-		state->m_main_speedup = machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x12005b34, 0x12005b37, FUNC(cojagr3k_main_speedup_r));
+		state->m_main_speedup = machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x12005b34, 0x12005b37, read32_delegate(FUNC(cojag_state::cojagr3k_main_speedup_r),state));
 	}
 #endif
 }

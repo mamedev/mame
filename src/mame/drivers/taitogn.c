@@ -357,6 +357,34 @@ public:
 
 	UINT32 m_coin_info;
 	UINT32 m_mux_data;
+	DECLARE_WRITE32_MEMBER(rf5c296_io_w);
+	DECLARE_READ32_MEMBER(rf5c296_io_r);
+	DECLARE_READ32_MEMBER(rf5c296_mem_r);
+	DECLARE_WRITE32_MEMBER(rf5c296_mem_w);
+	DECLARE_READ32_MEMBER(flash_subbios_r);
+	DECLARE_WRITE32_MEMBER(flash_subbios_w);
+	DECLARE_READ32_MEMBER(flash_mn102_r);
+	DECLARE_WRITE32_MEMBER(flash_mn102_w);
+	DECLARE_READ32_MEMBER(flash_s1_r);
+	DECLARE_WRITE32_MEMBER(flash_s1_w);
+	DECLARE_READ32_MEMBER(flash_s2_r);
+	DECLARE_WRITE32_MEMBER(flash_s2_w);
+	DECLARE_READ32_MEMBER(flash_s3_r);
+	DECLARE_WRITE32_MEMBER(flash_s3_w);
+	DECLARE_READ32_MEMBER(control_r);
+	DECLARE_WRITE32_MEMBER(control_w);
+	DECLARE_WRITE32_MEMBER(control2_w);
+	DECLARE_READ32_MEMBER(control3_r);
+	DECLARE_WRITE32_MEMBER(control3_w);
+	DECLARE_READ32_MEMBER(gn_1fb70000_r);
+	DECLARE_WRITE32_MEMBER(gn_1fb70000_w);
+	DECLARE_READ32_MEMBER(hack1_r);
+	DECLARE_READ32_MEMBER(znsecsel_r);
+	DECLARE_WRITE32_MEMBER(znsecsel_w);
+	DECLARE_READ32_MEMBER(boardconfig_r);
+	DECLARE_WRITE32_MEMBER(coin_w);
+	DECLARE_READ32_MEMBER(coin_r);
+	DECLARE_READ32_MEMBER(gnet_mahjong_panel_r);
 };
 
 
@@ -390,38 +418,36 @@ static UINT8 rf5c296_reg_r(ATTR_UNUSED running_machine &machine, UINT8 reg)
 	return 0x00;
 }
 
-static WRITE32_HANDLER(rf5c296_io_w)
+WRITE32_MEMBER(taitogn_state::rf5c296_io_w)
 {
-	taitogn_state *state = space->machine().driver_data<taitogn_state>();
 
 	if(offset < 2) {
-		ide_controller32_pcmcia_w(space->machine().device(":card"), offset, data, mem_mask);
+		ide_controller32_pcmcia_w(machine().device(":card"), offset, data, mem_mask);
 		return;
 	}
 
 	if(offset == 0x3e0/4) {
 		if(ACCESSING_BITS_0_7)
-			state->m_rf5c296_reg = data;
+			m_rf5c296_reg = data;
 		if(ACCESSING_BITS_8_15)
-			rf5c296_reg_w(space->machine(), state->m_rf5c296_reg, data >> 8);
+			rf5c296_reg_w(machine(), m_rf5c296_reg, data >> 8);
 	}
 }
 
-static READ32_HANDLER(rf5c296_io_r)
+READ32_MEMBER(taitogn_state::rf5c296_io_r)
 {
-	taitogn_state *state = space->machine().driver_data<taitogn_state>();
 
 	if(offset < 2)
-		return ide_controller32_pcmcia_r(space->machine().device(":card"), offset, mem_mask);
+		return ide_controller32_pcmcia_r(machine().device(":card"), offset, mem_mask);
 
 	offset *= 4;
 
 	if(offset == 0x3e0/4) {
 		UINT32 res = 0xffff0000;
 		if(ACCESSING_BITS_0_7)
-			res |= state->m_rf5c296_reg;
+			res |= m_rf5c296_reg;
 		if(ACCESSING_BITS_8_15)
-			res |= rf5c296_reg_r(space->machine(), state->m_rf5c296_reg) << 8;
+			res |= rf5c296_reg_r(machine(), m_rf5c296_reg) << 8;
 		return res;
 	}
 
@@ -430,25 +456,23 @@ static READ32_HANDLER(rf5c296_io_r)
 
 // Hardcoded to reach the pcmcia CIS
 
-static READ32_HANDLER(rf5c296_mem_r)
+READ32_MEMBER(taitogn_state::rf5c296_mem_r)
 {
-	taitogn_state *state = space->machine().driver_data<taitogn_state>();
 
 	if(offset < 0x80)
-		return (state->m_cis[offset*2+1] << 16) | state->m_cis[offset*2];
+		return (m_cis[offset*2+1] << 16) | m_cis[offset*2];
 
 	switch(offset) {
 	case 0x080: return 0x00800041;
 	case 0x081: return 0x0000002e;
-	case 0x100: return state->m_locked ? 0x00010000 : 0;
+	case 0x100: return m_locked ? 0x00010000 : 0;
 	default:
 		return 0;
 	}
 }
 
-static WRITE32_HANDLER(rf5c296_mem_w)
+WRITE32_MEMBER(taitogn_state::rf5c296_mem_w)
 {
-	taitogn_state *state = space->machine().driver_data<taitogn_state>();
 
 	if(offset >= 0x140 && offset <= 0x144) {
 		dynamic_buffer key;
@@ -460,14 +484,14 @@ static WRITE32_HANDLER(rf5c296_mem_w)
 			pos++;
 		} else
 			v = data;
-		get_disk_handle(space->machine(), ":drive_0")->read_metadata(HARD_DISK_KEY_METADATA_TAG, 0, key);
+		get_disk_handle(machine(), ":drive_0")->read_metadata(HARD_DISK_KEY_METADATA_TAG, 0, key);
 		k = pos < key.count() ? key[pos] : 0;
 		if(v == k)
-			state->m_locked &= ~(1 << pos);
+			m_locked &= ~(1 << pos);
 		else
-			state->m_locked |= 1 << pos;
-		if (!state->m_locked) {
-			ide_set_gnet_readlock (space->machine().device(":card"), 0);
+			m_locked |= 1 << pos;
+		if (!m_locked) {
+			ide_set_gnet_readlock (machine().device(":card"), 0);
 		}
 	}
 }
@@ -496,107 +520,96 @@ static void gen_flash_w(intelfsh16_device *device, offs_t offset, UINT32 data, U
 }
 
 
-static READ32_HANDLER(flash_subbios_r)
+READ32_MEMBER(taitogn_state::flash_subbios_r)
 {
-	taitogn_state *state = space->machine().driver_data<taitogn_state>();
 
-	return gen_flash_r(state->m_biosflash, offset, mem_mask);
+	return gen_flash_r(m_biosflash, offset, mem_mask);
 }
 
-static WRITE32_HANDLER(flash_subbios_w)
+WRITE32_MEMBER(taitogn_state::flash_subbios_w)
 {
-	taitogn_state *state = space->machine().driver_data<taitogn_state>();
 
-	gen_flash_w(state->m_biosflash, offset, data, mem_mask);
+	gen_flash_w(m_biosflash, offset, data, mem_mask);
 }
 
-static READ32_HANDLER(flash_mn102_r)
+READ32_MEMBER(taitogn_state::flash_mn102_r)
 {
-	taitogn_state *state = space->machine().driver_data<taitogn_state>();
 
-	return gen_flash_r(state->m_pgmflash, offset, mem_mask);
+	return gen_flash_r(m_pgmflash, offset, mem_mask);
 }
 
-static WRITE32_HANDLER(flash_mn102_w)
+WRITE32_MEMBER(taitogn_state::flash_mn102_w)
 {
-	taitogn_state *state = space->machine().driver_data<taitogn_state>();
 
-	gen_flash_w(state->m_pgmflash, offset, data, mem_mask);
+	gen_flash_w(m_pgmflash, offset, data, mem_mask);
 }
 
-static READ32_HANDLER(flash_s1_r)
+READ32_MEMBER(taitogn_state::flash_s1_r)
 {
-	taitogn_state *state = space->machine().driver_data<taitogn_state>();
 
-	return gen_flash_r(state->m_sndflash[0], offset, mem_mask);
+	return gen_flash_r(m_sndflash[0], offset, mem_mask);
 }
 
-static WRITE32_HANDLER(flash_s1_w)
+WRITE32_MEMBER(taitogn_state::flash_s1_w)
 {
-	taitogn_state *state = space->machine().driver_data<taitogn_state>();
 
-	gen_flash_w(state->m_sndflash[0], offset, data, mem_mask);
+	gen_flash_w(m_sndflash[0], offset, data, mem_mask);
 }
 
-static READ32_HANDLER(flash_s2_r)
+READ32_MEMBER(taitogn_state::flash_s2_r)
 {
-	taitogn_state *state = space->machine().driver_data<taitogn_state>();
 
-	return gen_flash_r(state->m_sndflash[1], offset, mem_mask);
+	return gen_flash_r(m_sndflash[1], offset, mem_mask);
 }
 
-static WRITE32_HANDLER(flash_s2_w)
+WRITE32_MEMBER(taitogn_state::flash_s2_w)
 {
-	taitogn_state *state = space->machine().driver_data<taitogn_state>();
 
-	gen_flash_w(state->m_sndflash[1], offset, data, mem_mask);
+	gen_flash_w(m_sndflash[1], offset, data, mem_mask);
 }
 
-static READ32_HANDLER(flash_s3_r)
+READ32_MEMBER(taitogn_state::flash_s3_r)
 {
-	taitogn_state *state = space->machine().driver_data<taitogn_state>();
 
-	return gen_flash_r(state->m_sndflash[2], offset, mem_mask);
+	return gen_flash_r(m_sndflash[2], offset, mem_mask);
 }
 
-static WRITE32_HANDLER(flash_s3_w)
+WRITE32_MEMBER(taitogn_state::flash_s3_w)
 {
-	taitogn_state *state = space->machine().driver_data<taitogn_state>();
 
-	gen_flash_w(state->m_sndflash[2], offset, data, mem_mask);
+	gen_flash_w(m_sndflash[2], offset, data, mem_mask);
 }
 
 static void install_handlers(running_machine &machine, int mode)
 {
+	taitogn_state *state = machine.driver_data<taitogn_state>();
 	address_space *a = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	if(mode == 0) {
 		// Mode 0 has access to the subbios, the mn102 flash and the rf5c296 mem zone
-		a->install_legacy_readwrite_handler(0x1f000000, 0x1f1fffff, FUNC(flash_subbios_r), FUNC(flash_subbios_w));
-		a->install_legacy_readwrite_handler(0x1f200000, 0x1f2fffff, FUNC(rf5c296_mem_r), FUNC(rf5c296_mem_w));
-		a->install_legacy_readwrite_handler(0x1f300000, 0x1f37ffff, FUNC(flash_mn102_r), FUNC(flash_mn102_w));
+		a->install_readwrite_handler(0x1f000000, 0x1f1fffff, read32_delegate(FUNC(taitogn_state::flash_subbios_r),state), write32_delegate(FUNC(taitogn_state::flash_subbios_w),state));
+		a->install_readwrite_handler(0x1f200000, 0x1f2fffff, read32_delegate(FUNC(taitogn_state::rf5c296_mem_r),state), write32_delegate(FUNC(taitogn_state::rf5c296_mem_w),state));
+		a->install_readwrite_handler(0x1f300000, 0x1f37ffff, read32_delegate(FUNC(taitogn_state::flash_mn102_r),state), write32_delegate(FUNC(taitogn_state::flash_mn102_w),state));
 		a->nop_readwrite(0x1f380000, 0x1f5fffff);
 
 	} else {
 		// Mode 1 has access to the 3 samples flashes
-		a->install_legacy_readwrite_handler(0x1f000000, 0x1f1fffff, FUNC(flash_s1_r), FUNC(flash_s1_w));
-		a->install_legacy_readwrite_handler(0x1f200000, 0x1f3fffff, FUNC(flash_s2_r), FUNC(flash_s2_w));
-		a->install_legacy_readwrite_handler(0x1f400000, 0x1f5fffff, FUNC(flash_s3_r), FUNC(flash_s3_w));
+		a->install_readwrite_handler(0x1f000000, 0x1f1fffff, read32_delegate(FUNC(taitogn_state::flash_s1_r),state), write32_delegate(FUNC(taitogn_state::flash_s1_w),state));
+		a->install_readwrite_handler(0x1f200000, 0x1f3fffff, read32_delegate(FUNC(taitogn_state::flash_s2_r),state), write32_delegate(FUNC(taitogn_state::flash_s2_w),state));
+		a->install_readwrite_handler(0x1f400000, 0x1f5fffff, read32_delegate(FUNC(taitogn_state::flash_s3_r),state), write32_delegate(FUNC(taitogn_state::flash_s3_w),state));
 	}
 }
 
 // Misc. controls
 
-static READ32_HANDLER(control_r)
+READ32_MEMBER(taitogn_state::control_r)
 {
-	taitogn_state *state = space->machine().driver_data<taitogn_state>();
 
-	//      fprintf(stderr, "gn_r %08x @ %08x (%s)\n", 0x1fb00000+4*offset, mem_mask, space->machine().describe_context());
-	return state->m_control;
+	//      fprintf(stderr, "gn_r %08x @ %08x (%s)\n", 0x1fb00000+4*offset, mem_mask, machine().describe_context());
+	return m_control;
 }
 
-static WRITE32_HANDLER(control_w)
+WRITE32_MEMBER(taitogn_state::control_w)
 {
-	taitogn_state *state = space->machine().driver_data<taitogn_state>();
 
 	// 20 = watchdog
 	// 04 = select bank
@@ -604,12 +617,12 @@ static WRITE32_HANDLER(control_w)
 	// According to the rom code, bits 1-0 may be part of the bank
 	// selection too, but they're always 0.
 
-	UINT32 p = state->m_control;
-	device_t *mb3773 = space->machine().device("mb3773");
+	UINT32 p = m_control;
+	device_t *mb3773 = machine().device("mb3773");
 
-	COMBINE_DATA(&state->m_control);
+	COMBINE_DATA(&m_control);
 
-	mb3773_set_ck(mb3773, (state->m_control & 0x20) >> 5);
+	mb3773_set_ck(mb3773, (m_control & 0x20) >> 5);
 
 #if 0
 	if((p ^ control) & ~0x20)
@@ -621,35 +634,32 @@ static WRITE32_HANDLER(control_w)
 				control & 0x04 ? 'f' : '-',
 				control & 0x02 ? '1' : '0',
 				control & 0x01 ? '1' : '0',
-				space->machine().describe_context());
+				machine().describe_context());
 #endif
 
-	if((p ^ state->m_control) & 0x04)
-		install_handlers(space->machine(), state->m_control & 4 ? 1 : 0);
+	if((p ^ m_control) & 0x04)
+		install_handlers(machine(), m_control & 4 ? 1 : 0);
 }
 
-static WRITE32_HANDLER(control2_w)
+WRITE32_MEMBER(taitogn_state::control2_w)
 {
-	taitogn_state *state = space->machine().driver_data<taitogn_state>();
 
-	COMBINE_DATA(&state->m_control2);
+	COMBINE_DATA(&m_control2);
 }
 
-static READ32_HANDLER(control3_r)
+READ32_MEMBER(taitogn_state::control3_r)
 {
-	taitogn_state *state = space->machine().driver_data<taitogn_state>();
 
-	return state->m_control3;
+	return m_control3;
 }
 
-static WRITE32_HANDLER(control3_w)
+WRITE32_MEMBER(taitogn_state::control3_w)
 {
-	taitogn_state *state = space->machine().driver_data<taitogn_state>();
 
-	COMBINE_DATA(&state->m_control3);
+	COMBINE_DATA(&m_control3);
 }
 
-static READ32_HANDLER(gn_1fb70000_r)
+READ32_MEMBER(taitogn_state::gn_1fb70000_r)
 {
 	// (1328) 1348 tests mask 0002, 8 times.
 	// Called by 1434, exit at 143c
@@ -661,19 +671,18 @@ static READ32_HANDLER(gn_1fb70000_r)
 	return 2;
 }
 
-static WRITE32_HANDLER(gn_1fb70000_w)
+WRITE32_MEMBER(taitogn_state::gn_1fb70000_w)
 {
 	// Writes 0 or 1 all the time, it *may* have somthing to do with
 	// i/o port width, but then maybe not
 }
 
-static READ32_HANDLER(hack1_r)
+READ32_MEMBER(taitogn_state::hack1_r)
 {
-	taitogn_state *state = space->machine().driver_data<taitogn_state>();
 
-	state->m_v = state->m_v ^ 8;
+	m_v = m_v ^ 8;
 	// Probably something to do with sound
-	return state->m_v;
+	return m_v;
 }
 
 
@@ -683,11 +692,10 @@ static READ32_HANDLER(hack1_r)
 static const UINT8 tt10[ 8 ] = { 0x80, 0x20, 0x38, 0x08, 0xf1, 0x03, 0xfe, 0xfc };
 static const UINT8 tt16[ 8 ] = { 0xc0, 0x04, 0xf9, 0xe1, 0x60, 0x70, 0xf2, 0x02 };
 
-static READ32_HANDLER( znsecsel_r )
+READ32_MEMBER(taitogn_state::znsecsel_r)
 {
-	taitogn_state *state = space->machine().driver_data<taitogn_state>();
 
-	return state->m_n_znsecsel;
+	return m_n_znsecsel;
 }
 
 static void sio_znsec0_handler( running_machine &machine, int n_data )
@@ -759,38 +767,37 @@ static void sio_dip_handler( running_machine &machine, int n_data )
 	}
 }
 
-static WRITE32_HANDLER( znsecsel_w )
+WRITE32_MEMBER(taitogn_state::znsecsel_w)
 {
-	taitogn_state *state = space->machine().driver_data<taitogn_state>();
 
-	COMBINE_DATA( &state->m_n_znsecsel );
+	COMBINE_DATA( &m_n_znsecsel );
 
-	if( ( state->m_n_znsecsel & 0x80 ) == 0 )
+	if( ( m_n_znsecsel & 0x80 ) == 0 )
         {
-			psx_sio_install_handler( space->machine(), 0, sio_pad_handler );
-			psx_sio_input( space->machine(), 0, PSX_SIO_IN_DSR, 0 );
+			psx_sio_install_handler( machine(), 0, sio_pad_handler );
+			psx_sio_input( machine(), 0, PSX_SIO_IN_DSR, 0 );
         }
-	else if( ( state->m_n_znsecsel & 0x08 ) == 0 )
+	else if( ( m_n_znsecsel & 0x08 ) == 0 )
         {
 			znsec_start( 1 );
-			psx_sio_install_handler( space->machine(), 0, sio_znsec1_handler );
-			psx_sio_input( space->machine(), 0, PSX_SIO_IN_DSR, 0 );
+			psx_sio_install_handler( machine(), 0, sio_znsec1_handler );
+			psx_sio_input( machine(), 0, PSX_SIO_IN_DSR, 0 );
         }
-	else if( ( state->m_n_znsecsel & 0x04 ) == 0 )
+	else if( ( m_n_znsecsel & 0x04 ) == 0 )
         {
 			znsec_start( 0 );
-			psx_sio_install_handler( space->machine(), 0, sio_znsec0_handler );
-			psx_sio_input( space->machine(), 0, PSX_SIO_IN_DSR, 0 );
+			psx_sio_install_handler( machine(), 0, sio_znsec0_handler );
+			psx_sio_input( machine(), 0, PSX_SIO_IN_DSR, 0 );
         }
 	else
         {
-			state->m_n_dip_bit = 0;
-			state->m_b_lastclock = 1;
+			m_n_dip_bit = 0;
+			m_b_lastclock = 1;
 
-			psx_sio_install_handler( space->machine(), 0, sio_dip_handler );
-			psx_sio_input( space->machine(), 0, PSX_SIO_IN_DSR, 0 );
+			psx_sio_install_handler( machine(), 0, sio_dip_handler );
+			psx_sio_input( machine(), 0, PSX_SIO_IN_DSR, 0 );
 
-			state->m_dip_timer->adjust( downcast<cpu_device *>(&space->device())->cycles_to_attotime( 100 ), 1 );
+			m_dip_timer->adjust( downcast<cpu_device *>(&space.device())->cycles_to_attotime( 100 ), 1 );
         }
 }
 
@@ -807,7 +814,7 @@ static TIMER_CALLBACK( dip_timer_fired )
 }
 
 
-static READ32_HANDLER( boardconfig_r )
+READ32_MEMBER(taitogn_state::boardconfig_r)
 {
 	/*
     ------00 mem=4M
@@ -832,9 +839,8 @@ static READ32_HANDLER( boardconfig_r )
 }
 
 
-static WRITE32_HANDLER( coin_w )
+WRITE32_MEMBER(taitogn_state::coin_w)
 {
-	taitogn_state *state = space->machine().driver_data<taitogn_state>();
 
 	/* 0x01=counter
        0x02=coin lock 1
@@ -842,34 +848,32 @@ static WRITE32_HANDLER( coin_w )
        0x20=coin lock 2
        0x80=??
     */
-	COMBINE_DATA (&state->m_coin_info);
+	COMBINE_DATA (&m_coin_info);
 }
 
-static READ32_HANDLER( coin_r )
+READ32_MEMBER(taitogn_state::coin_r)
 {
-	taitogn_state *state = space->machine().driver_data<taitogn_state>();
 
-	return state->m_coin_info;
+	return m_coin_info;
 }
 
 /* mahjong panel handler (for Usagi & Mahjong Oh) */
-static READ32_HANDLER( gnet_mahjong_panel_r )
+READ32_MEMBER(taitogn_state::gnet_mahjong_panel_r)
 {
-	taitogn_state *state = space->machine().driver_data<taitogn_state>();
 
-	state->m_mux_data = state->m_coin_info;
-	state->m_mux_data &= 0xcc;
+	m_mux_data = m_coin_info;
+	m_mux_data &= 0xcc;
 
-	switch(state->m_mux_data)
+	switch(m_mux_data)
 	{
-		case 0x04: return input_port_read(space->machine(), "KEY0");
-		case 0x08: return input_port_read(space->machine(), "KEY1");
-		case 0x40: return input_port_read(space->machine(), "KEY2");
-		case 0x80: return input_port_read(space->machine(), "KEY3");
+		case 0x04: return input_port_read(machine(), "KEY0");
+		case 0x08: return input_port_read(machine(), "KEY1");
+		case 0x40: return input_port_read(machine(), "KEY2");
+		case 0x80: return input_port_read(machine(), "KEY3");
 	}
 
 	/* mux disabled */
-	return input_port_read(space->machine(), "P4");
+	return input_port_read(machine(), "P4");
 }
 
 // Init and reset
@@ -899,7 +903,8 @@ static DRIVER_INIT( coh3002t )
 static DRIVER_INIT( coh3002t_mp )
 {
 	DRIVER_INIT_CALL(coh3002t);
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x1fa10100, 0x1fa10103, FUNC(gnet_mahjong_panel_r) );
+	taitogn_state *state = machine.driver_data<taitogn_state>();
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x1fa10100, 0x1fa10103, read32_delegate(FUNC(taitogn_state::gnet_mahjong_panel_r),state));
 }
 
 static MACHINE_RESET( coh3002t )
@@ -920,26 +925,26 @@ static MACHINE_RESET( coh3002t )
 static ADDRESS_MAP_START( taitogn_map, AS_PROGRAM, 32, taitogn_state )
 	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_SHARE("share1") /* ram */
 	AM_RANGE(0x00400000, 0x007fffff) AM_RAM AM_SHARE("share1") /* ram mirror */
-	AM_RANGE(0x1f000000, 0x1f1fffff) AM_READWRITE_LEGACY(flash_s1_r, flash_s1_w)
-	AM_RANGE(0x1f200000, 0x1f3fffff) AM_READWRITE_LEGACY(flash_s2_r, flash_s2_w)
-	AM_RANGE(0x1f400000, 0x1f5fffff) AM_READWRITE_LEGACY(flash_s3_r, flash_s3_w)
+	AM_RANGE(0x1f000000, 0x1f1fffff) AM_READWRITE(flash_s1_r, flash_s1_w)
+	AM_RANGE(0x1f200000, 0x1f3fffff) AM_READWRITE(flash_s2_r, flash_s2_w)
+	AM_RANGE(0x1f400000, 0x1f5fffff) AM_READWRITE(flash_s3_r, flash_s3_w)
 	AM_RANGE(0x1fa00000, 0x1fa00003) AM_READ_PORT("P1")
 	AM_RANGE(0x1fa00100, 0x1fa00103) AM_READ_PORT("P2")
 	AM_RANGE(0x1fa00200, 0x1fa00203) AM_READ_PORT("SERVICE")
 	AM_RANGE(0x1fa00300, 0x1fa00303) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x1fa10000, 0x1fa10003) AM_READ_PORT("P3")
 	AM_RANGE(0x1fa10100, 0x1fa10103) AM_READ_PORT("P4")
-	AM_RANGE(0x1fa10200, 0x1fa10203) AM_READ_LEGACY(boardconfig_r)
-	AM_RANGE(0x1fa10300, 0x1fa10303) AM_READWRITE_LEGACY(znsecsel_r, znsecsel_w)
-	AM_RANGE(0x1fa20000, 0x1fa20003) AM_READWRITE_LEGACY(coin_r, coin_w)
-	AM_RANGE(0x1fa30000, 0x1fa30003) AM_READWRITE_LEGACY(control3_r, control3_w)
+	AM_RANGE(0x1fa10200, 0x1fa10203) AM_READ(boardconfig_r)
+	AM_RANGE(0x1fa10300, 0x1fa10303) AM_READWRITE(znsecsel_r, znsecsel_w)
+	AM_RANGE(0x1fa20000, 0x1fa20003) AM_READWRITE(coin_r, coin_w)
+	AM_RANGE(0x1fa30000, 0x1fa30003) AM_READWRITE(control3_r, control3_w)
 	AM_RANGE(0x1fa51c00, 0x1fa51dff) AM_READWRITE16_LEGACY(spu_r, spu_w, 0xffffffff) // systematic read at spu_address + 250000, result dropped, maybe other accesses
-	AM_RANGE(0x1fa60000, 0x1fa60003) AM_READ_LEGACY(hack1_r)
+	AM_RANGE(0x1fa60000, 0x1fa60003) AM_READ(hack1_r)
 	AM_RANGE(0x1faf0000, 0x1faf07ff) AM_DEVREADWRITE8_LEGACY("at28c16", at28c16_r, at28c16_w, 0xffffffff) /* eeprom */
-	AM_RANGE(0x1fb00000, 0x1fb0ffff) AM_READWRITE_LEGACY(rf5c296_io_r, rf5c296_io_w)
-	AM_RANGE(0x1fb40000, 0x1fb40003) AM_READWRITE_LEGACY(control_r, control_w)
-	AM_RANGE(0x1fb60000, 0x1fb60003) AM_WRITE_LEGACY(control2_w)
-	AM_RANGE(0x1fb70000, 0x1fb70003) AM_READWRITE_LEGACY(gn_1fb70000_r, gn_1fb70000_w)
+	AM_RANGE(0x1fb00000, 0x1fb0ffff) AM_READWRITE(rf5c296_io_r, rf5c296_io_w)
+	AM_RANGE(0x1fb40000, 0x1fb40003) AM_READWRITE(control_r, control_w)
+	AM_RANGE(0x1fb60000, 0x1fb60003) AM_WRITE(control2_w)
+	AM_RANGE(0x1fb70000, 0x1fb70003) AM_READWRITE(gn_1fb70000_r, gn_1fb70000_w)
 	AM_RANGE(0x1fbe0000, 0x1fbe01ff) AM_RAM // 256 bytes com zone with the mn102, low bytes of words only, with additional comm at 1fb80000
 	AM_RANGE(0x1fc00000, 0x1fc7ffff) AM_ROM AM_SHARE("share2") AM_REGION("mainbios", 0) /* bios */
 	AM_RANGE(0x80000000, 0x803fffff) AM_RAM AM_SHARE("share1") /* ram mirror */

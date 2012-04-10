@@ -468,6 +468,30 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(gn845pwbb_read);
 	DECLARE_CUSTOM_INPUT_MEMBER(gunmania_tank_shutter_sensor);
 	DECLARE_CUSTOM_INPUT_MEMBER(gunmania_cable_holder_sensor);
+	DECLARE_WRITE32_MEMBER(mb89371_w);
+	DECLARE_READ32_MEMBER(mb89371_r);
+	DECLARE_READ32_MEMBER(jamma_r);
+	DECLARE_READ32_MEMBER(control_r);
+	DECLARE_WRITE32_MEMBER(control_w);
+	DECLARE_READ32_MEMBER(atapi_r);
+	DECLARE_WRITE32_MEMBER(atapi_w);
+	DECLARE_WRITE32_MEMBER(atapi_reset_w);
+	DECLARE_WRITE32_MEMBER(security_w);
+	DECLARE_READ32_MEMBER(security_r);
+	DECLARE_READ32_MEMBER(flash_r);
+	DECLARE_WRITE32_MEMBER(flash_w);
+	DECLARE_READ32_MEMBER(ge765pwbba_r);
+	DECLARE_WRITE32_MEMBER(ge765pwbba_w);
+	DECLARE_READ32_MEMBER(gx700pwbf_io_r);
+	DECLARE_WRITE32_MEMBER(gx700pwbf_io_w);
+	DECLARE_READ32_MEMBER(gtrfrks_io_r);
+	DECLARE_WRITE32_MEMBER(gtrfrks_io_w);
+	DECLARE_READ32_MEMBER(gx894pwbba_r);
+	DECLARE_WRITE32_MEMBER(gx894pwbba_w);
+	DECLARE_WRITE32_MEMBER(dmx_io_w);
+	DECLARE_WRITE32_MEMBER(mamboagg_io_w);
+	DECLARE_WRITE32_MEMBER(gunmania_w);
+	DECLARE_READ32_MEMBER(gunmania_r);
 };
 
 INLINE void ATTR_PRINTF(3,4) verboselog( running_machine &machine, int n_level, const char *s_fmt, ... )
@@ -485,28 +509,26 @@ INLINE void ATTR_PRINTF(3,4) verboselog( running_machine &machine, int n_level, 
 
 static const char *const diskregions[] = { ":cdrom0", ":cdrom1" };
 
-static WRITE32_HANDLER( mb89371_w )
+WRITE32_MEMBER(ksys573_state::mb89371_w)
 {
-	verboselog( space->machine(), 2, "mb89371_w %08x %08x %08x\n", offset, mem_mask, data );
+	verboselog( machine(), 2, "mb89371_w %08x %08x %08x\n", offset, mem_mask, data );
 }
 
-static READ32_HANDLER( mb89371_r )
+READ32_MEMBER(ksys573_state::mb89371_r)
 {
 	UINT32 data = 0xffffffff;
-	verboselog( space->machine(), 2, "mb89371_r %08x %08x %08x\n", offset, mem_mask, data );
+	verboselog( machine(), 2, "mb89371_r %08x %08x %08x\n", offset, mem_mask, data );
 	return data;
 }
 
-static READ32_HANDLER( jamma_r )
+READ32_MEMBER(ksys573_state::jamma_r)
 {
-	ksys573_state *state = space->machine().driver_data<ksys573_state>();
-	running_machine &machine = space->machine();
-	int security_cart_number = state->m_security_cart_number;
-	UINT32 data = input_port_read(machine, "IN1");
+	int security_cart_number = m_security_cart_number;
+	UINT32 data = input_port_read(machine(), "IN1");
 	data |= 0x000000c0;
 
-	ds2401_device *ds2401 = space->machine().device<ds2401_device>(security_cart_number ? "game_id" : "install_id");
-	device_secure_serial_flash *secflash = space->machine().device<device_secure_serial_flash>(security_cart_number ? "game_eeprom" : "install_eeprom");
+	ds2401_device *ds2401 = machine().device<ds2401_device>(security_cart_number ? "game_id" : "install_id");
+	device_secure_serial_flash *secflash = machine().device<device_secure_serial_flash>(security_cart_number ? "game_eeprom" : "install_eeprom");
 
 	if( ds2401 )
 	{
@@ -516,71 +538,69 @@ static READ32_HANDLER( jamma_r )
 	if( secflash )
 		data |= secflash->sda_r() << 18;
 
-	if( state->m_flash_device[1][0] == NULL )
+	if( m_flash_device[1][0] == NULL )
 	{
 		data |= ( 1 << 26 );
 	}
-	if( state->m_flash_device[2][0] == NULL )
+	if( m_flash_device[2][0] == NULL )
 	{
 		data |= ( 1 << 27 );
 	}
 
-	verboselog( machine, 2, "jamma_r( %08x, %08x ) %08x\n", offset, mem_mask, data );
+	verboselog( machine(), 2, "jamma_r( %08x, %08x ) %08x\n", offset, mem_mask, data );
 
 	return data;
 }
 
-static READ32_HANDLER( control_r )
+READ32_MEMBER(ksys573_state::control_r)
 {
-	ksys573_state *state = space->machine().driver_data<ksys573_state>();
 
-	verboselog( space->machine(), 2, "control_r( %08x, %08x ) %08x\n", offset, mem_mask, state->m_control );
+	verboselog( machine(), 2, "control_r( %08x, %08x ) %08x\n", offset, mem_mask, m_control );
 
-	return state->m_control;
+	return m_control;
 }
 
-static WRITE32_HANDLER( control_w )
+WRITE32_MEMBER(ksys573_state::control_w)
 {
-	ksys573_state *state = space->machine().driver_data<ksys573_state>();
 	UINT32 control;
-	int old_bank = state->m_flash_bank;
+	int old_bank = m_flash_bank;
 
-	COMBINE_DATA(&state->m_control);
-	control = state->m_control;
+	COMBINE_DATA(&m_control);
+	control = m_control;
 
-	verboselog( space->machine(), 2, "control_w( %08x, %08x, %08x )\n", offset, mem_mask, data );
+	verboselog( machine(), 2, "control_w( %08x, %08x, %08x )\n", offset, mem_mask, data );
 
-	state->m_flash_bank = -1;
+	m_flash_bank = -1;
 
 	// zs01 only, others are reached through security_w
-	device_secure_serial_flash *secflash = space->machine().device<device_secure_serial_flash>(state->m_security_cart_number ? "game_eeprom" : "install_eeprom");
+	device_secure_serial_flash *secflash = machine().device<device_secure_serial_flash>(m_security_cart_number ? "game_eeprom" : "install_eeprom");
 	if( dynamic_cast<zs01_device *>(secflash) )
 		secflash->sda_w( !( ( control >> 6 ) & 1 ) ); /* 0x40 */
 
-	if( state->m_flash_device[0][0] != NULL && ( control & ~0x43 ) == 0x00 )
+	if( m_flash_device[0][0] != NULL && ( control & ~0x43 ) == 0x00 )
 	{
-		state->m_flash_bank = (0 << 8) + ( ( control & 3 ) * 2 );
-		if( state->m_flash_bank != old_bank ) verboselog( space->machine(), 1, "onboard %d\n", control & 3 );
+		m_flash_bank = (0 << 8) + ( ( control & 3 ) * 2 );
+		if( m_flash_bank != old_bank ) verboselog( machine(), 1, "onboard %d\n", control & 3 );
 	}
-	else if( state->m_flash_device[1][0] != NULL && ( control & ~0x47 ) == 0x10 )
+	else if( m_flash_device[1][0] != NULL && ( control & ~0x47 ) == 0x10 )
 	{
-		state->m_flash_bank = (1 << 8) + ( ( control & 7 ) * 2 );
-		if( state->m_flash_bank != old_bank ) verboselog( space->machine(), 1, "pccard1 %d\n", control & 7 );
+		m_flash_bank = (1 << 8) + ( ( control & 7 ) * 2 );
+		if( m_flash_bank != old_bank ) verboselog( machine(), 1, "pccard1 %d\n", control & 7 );
 	}
-	else if( state->m_flash_device[2][0] != NULL && ( control & ~0x47 ) == 0x20 )
+	else if( m_flash_device[2][0] != NULL && ( control & ~0x47 ) == 0x20 )
 	{
-		state->m_flash_bank = (2 << 8) + ( ( control & 7 ) * 2 );
-		if( state->m_flash_bank != old_bank ) verboselog( space->machine(), 1, "pccard2 %d\n", control & 7 );
+		m_flash_bank = (2 << 8) + ( ( control & 7 ) * 2 );
+		if( m_flash_bank != old_bank ) verboselog( machine(), 1, "pccard2 %d\n", control & 7 );
 	}
-	else if( state->m_flash_device[3][0] != NULL && ( control & ~0x47 ) == 0x20 )
+	else if( m_flash_device[3][0] != NULL && ( control & ~0x47 ) == 0x20 )
 	{
-		state->m_flash_bank = (3 << 8) + ( ( control & 7 ) * 2 );
-		if( state->m_flash_bank != old_bank ) verboselog( space->machine(), 1, "pccard3 %d\n", control & 7 );
+		m_flash_bank = (3 << 8) + ( ( control & 7 ) * 2 );
+		if( m_flash_bank != old_bank ) verboselog( machine(), 1, "pccard3 %d\n", control & 7 );
 	}
-	else if( state->m_flash_device[4][0] != NULL && ( control & ~0x47 ) == 0x28 )
+	else if( m_flash_device[4][0] != NULL && ( control & ~0x47 ) == 0x28 )
 	{
-		state->m_flash_bank = (4 << 8) + ( ( control & 7 ) * 2 );
-		if( state->m_flash_bank != old_bank ) verboselog( space->machine(), 1, "pccard4 %d\n", control & 7 );
+		m_flash_bank = (4 << 8) + ( ( control & 7 ) * 2 );
+		if( m_flash_bank != old_bank ) verboselog( machine(), 1, "pccard4 %d\n", control & 7 );
 	}
 }
 
@@ -652,11 +672,9 @@ static TIMER_CALLBACK( atapi_xfer_end )
 	verboselog( machine, 2, "atapi_xfer_end: %d %d\n", state->m_atapi_xferlen, state->m_atapi_xfermod );
 }
 
-static READ32_HANDLER( atapi_r )
+READ32_MEMBER(ksys573_state::atapi_r)
 {
-	ksys573_state *state = space->machine().driver_data<ksys573_state>();
-	UINT8 *atapi_regs = state->m_atapi_regs;
-	running_machine &machine = space->machine();
+	UINT8 *atapi_regs = m_atapi_regs;
 	int reg, data;
 
 	if (mem_mask == 0x0000ffff)	// word-wide command read
@@ -664,28 +682,28 @@ static READ32_HANDLER( atapi_r )
 //      mame_printf_debug("ATAPI: packet read = %04x\n", atapi_data[atapi_data_ptr]);
 
 		// assert IRQ and drop DRQ
-		if (state->m_atapi_data_ptr == 0 && state->m_atapi_data_len == 0)
+		if (m_atapi_data_ptr == 0 && m_atapi_data_len == 0)
 		{
 			// get the data from the device
-			if( state->m_atapi_xferlen > 0 )
+			if( m_atapi_xferlen > 0 )
 			{
-				SCSIReadData( state->m_inserted_cdrom, state->m_atapi_data, state->m_atapi_xferlen );
-				state->m_atapi_data_len = state->m_atapi_xferlen;
+				SCSIReadData( m_inserted_cdrom, m_atapi_data, m_atapi_xferlen );
+				m_atapi_data_len = m_atapi_xferlen;
 			}
 
-			if (state->m_atapi_xfermod > MAX_TRANSFER_SIZE)
+			if (m_atapi_xfermod > MAX_TRANSFER_SIZE)
 			{
-				state->m_atapi_xferlen = MAX_TRANSFER_SIZE;
-				state->m_atapi_xfermod = state->m_atapi_xfermod - MAX_TRANSFER_SIZE;
+				m_atapi_xferlen = MAX_TRANSFER_SIZE;
+				m_atapi_xfermod = m_atapi_xfermod - MAX_TRANSFER_SIZE;
 			}
 			else
 			{
-				state->m_atapi_xferlen = state->m_atapi_xfermod;
-				state->m_atapi_xfermod = 0;
+				m_atapi_xferlen = m_atapi_xfermod;
+				m_atapi_xfermod = 0;
 			}
 
-			verboselog( machine, 2, "atapi_r: atapi_xferlen=%d\n", state->m_atapi_xferlen );
-			if( state->m_atapi_xferlen != 0 )
+			verboselog( machine(), 2, "atapi_r: atapi_xferlen=%d\n", m_atapi_xferlen );
+			if( m_atapi_xferlen != 0 )
 			{
 				atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_DRQ | ATAPI_STAT_SERVDSC;
 				atapi_regs[ATAPI_REG_INTREASON] = ATAPI_INTREASON_IO;
@@ -697,27 +715,27 @@ static READ32_HANDLER( atapi_r )
 				atapi_regs[ATAPI_REG_INTREASON] = ATAPI_INTREASON_IO;
 			}
 
-			atapi_regs[ATAPI_REG_COUNTLOW] = state->m_atapi_xferlen & 0xff;
-			atapi_regs[ATAPI_REG_COUNTHIGH] = (state->m_atapi_xferlen>>8)&0xff;
+			atapi_regs[ATAPI_REG_COUNTLOW] = m_atapi_xferlen & 0xff;
+			atapi_regs[ATAPI_REG_COUNTHIGH] = (m_atapi_xferlen>>8)&0xff;
 
-			psx_irq_set(space->machine(), 0x400);
+			psx_irq_set(machine(), 0x400);
 		}
 
-		if( state->m_atapi_data_ptr < state->m_atapi_data_len )
+		if( m_atapi_data_ptr < m_atapi_data_len )
 		{
-			data = state->m_atapi_data[state->m_atapi_data_ptr++];
-			data |= ( state->m_atapi_data[state->m_atapi_data_ptr++] << 8 );
-			if( state->m_atapi_data_ptr >= state->m_atapi_data_len )
+			data = m_atapi_data[m_atapi_data_ptr++];
+			data |= ( m_atapi_data[m_atapi_data_ptr++] << 8 );
+			if( m_atapi_data_ptr >= m_atapi_data_len )
 			{
-//              verboselog( machine, 2, "atapi_r: read all bytes\n" );
-				state->m_atapi_data_ptr = 0;
-				state->m_atapi_data_len = 0;
+//              verboselog( machine(), 2, "atapi_r: read all bytes\n" );
+				m_atapi_data_ptr = 0;
+				m_atapi_data_len = 0;
 
-				if( state->m_atapi_xferlen == 0 )
+				if( m_atapi_xferlen == 0 )
 				{
 					atapi_regs[ATAPI_REG_CMDSTATUS] = 0;
 					atapi_regs[ATAPI_REG_INTREASON] = ATAPI_INTREASON_IO;
-					psx_irq_set(space->machine(), 0x400);
+					psx_irq_set(machine(), 0x400);
 				}
 			}
 		}
@@ -742,106 +760,104 @@ static READ32_HANDLER( atapi_r )
 		switch( reg )
 		{
 		case ATAPI_REG_DATA:
-			verboselog( machine, 1, "atapi_r: data=%02x\n", data );
+			verboselog( machine(), 1, "atapi_r: data=%02x\n", data );
 			break;
 		case ATAPI_REG_ERRFEAT:
-			verboselog( machine, 1, "atapi_r: errfeat=%02x\n", data );
+			verboselog( machine(), 1, "atapi_r: errfeat=%02x\n", data );
 			break;
 		case ATAPI_REG_INTREASON:
-			verboselog( machine, 1, "atapi_r: intreason=%02x\n", data );
+			verboselog( machine(), 1, "atapi_r: intreason=%02x\n", data );
 			break;
 		case ATAPI_REG_SAMTAG:
-			verboselog( machine, 1, "atapi_r: samtag=%02x\n", data );
+			verboselog( machine(), 1, "atapi_r: samtag=%02x\n", data );
 			break;
 		case ATAPI_REG_COUNTLOW:
-			verboselog( machine, 1, "atapi_r: countlow=%02x\n", data );
+			verboselog( machine(), 1, "atapi_r: countlow=%02x\n", data );
 			break;
 		case ATAPI_REG_COUNTHIGH:
-			verboselog( machine, 1, "atapi_r: counthigh=%02x\n", data );
+			verboselog( machine(), 1, "atapi_r: counthigh=%02x\n", data );
 			break;
 		case ATAPI_REG_DRIVESEL:
-			verboselog( machine, 1, "atapi_r: drivesel=%02x\n", data );
+			verboselog( machine(), 1, "atapi_r: drivesel=%02x\n", data );
 			break;
 		case ATAPI_REG_CMDSTATUS:
-			verboselog( machine, 1, "atapi_r: cmdstatus=%02x\n", data );
+			verboselog( machine(), 1, "atapi_r: cmdstatus=%02x\n", data );
 			break;
 		}
 
-//      mame_printf_debug("ATAPI: read reg %d = %x (PC=%x)\n", reg, data, cpu_get_pc(&space->device()));
+//      mame_printf_debug("ATAPI: read reg %d = %x (PC=%x)\n", reg, data, cpu_get_pc(&space.device()));
 
 		data <<= shift;
 	}
 
-	verboselog( machine, 2, "atapi_r( %08x, %08x ) %08x\n", offset, mem_mask, data );
+	verboselog( machine(), 2, "atapi_r( %08x, %08x ) %08x\n", offset, mem_mask, data );
 	return data;
 }
 
-static WRITE32_HANDLER( atapi_w )
+WRITE32_MEMBER(ksys573_state::atapi_w)
 {
-	ksys573_state *state = space->machine().driver_data<ksys573_state>();
-	UINT8 *atapi_regs = state->m_atapi_regs;
-	UINT8 *atapi_data = state->m_atapi_data;
-	running_machine &machine = space->machine();
+	UINT8 *atapi_regs = m_atapi_regs;
+	UINT8 *atapi_data = m_atapi_data;
 	int reg;
 
-	verboselog( machine, 2, "atapi_w( %08x, %08x, %08x )\n", offset, mem_mask, data );
+	verboselog( machine(), 2, "atapi_w( %08x, %08x, %08x )\n", offset, mem_mask, data );
 
 	if (mem_mask == 0x0000ffff)	// word-wide command write
 	{
-		verboselog( machine, 2, "atapi_w: data=%04x\n", data );
+		verboselog( machine(), 2, "atapi_w: data=%04x\n", data );
 
 //      mame_printf_debug("ATAPI: packet write %04x\n", data);
-		atapi_data[state->m_atapi_data_ptr++] = data & 0xff;
-		atapi_data[state->m_atapi_data_ptr++] = data >> 8;
+		atapi_data[m_atapi_data_ptr++] = data & 0xff;
+		atapi_data[m_atapi_data_ptr++] = data >> 8;
 
-		if (state->m_atapi_cdata_wait)
+		if (m_atapi_cdata_wait)
 		{
-//          mame_printf_debug("ATAPI: waiting, ptr %d wait %d\n", state->m_atapi_data_ptr, state->m_atapi_cdata_wait);
-			if (state->m_atapi_data_ptr == state->m_atapi_cdata_wait)
+//          mame_printf_debug("ATAPI: waiting, ptr %d wait %d\n", m_atapi_data_ptr, m_atapi_cdata_wait);
+			if (m_atapi_data_ptr == m_atapi_cdata_wait)
 			{
 				// send it to the device
-				SCSIWriteData( state->m_inserted_cdrom, atapi_data, state->m_atapi_cdata_wait );
+				SCSIWriteData( m_inserted_cdrom, atapi_data, m_atapi_cdata_wait );
 
 				// assert IRQ
-				psx_irq_set(space->machine(), 0x400);
+				psx_irq_set(machine(), 0x400);
 
 				// not sure here, but clear DRQ at least?
 				atapi_regs[ATAPI_REG_CMDSTATUS] = 0;
 			}
 		}
 
-		else if ( state->m_atapi_data_ptr == 12 )
+		else if ( m_atapi_data_ptr == 12 )
 		{
 			int phase;
 
-			verboselog( machine, 2, "atapi_w: command %02x\n", atapi_data[0]&0xff );
+			verboselog( machine(), 2, "atapi_w: command %02x\n", atapi_data[0]&0xff );
 
 			// reset data pointer for reading SCSI results
-			state->m_atapi_data_ptr = 0;
-			state->m_atapi_data_len = 0;
+			m_atapi_data_ptr = 0;
+			m_atapi_data_len = 0;
 
 			// send it to the SCSI device
-			SCSISetCommand( state->m_inserted_cdrom, state->m_atapi_data, 12 );
-			SCSIExecCommand( state->m_inserted_cdrom, &state->m_atapi_xferlen );
-			SCSIGetPhase( state->m_inserted_cdrom, &phase );
+			SCSISetCommand( m_inserted_cdrom, m_atapi_data, 12 );
+			SCSIExecCommand( m_inserted_cdrom, &m_atapi_xferlen );
+			SCSIGetPhase( m_inserted_cdrom, &phase );
 
-			if (state->m_atapi_xferlen != -1)
+			if (m_atapi_xferlen != -1)
 			{
-//              mame_printf_debug("ATAPI: SCSI command %02x returned %d bytes from the device\n", atapi_data[0]&0xff, state->m_atapi_xferlen);
+//              mame_printf_debug("ATAPI: SCSI command %02x returned %d bytes from the device\n", atapi_data[0]&0xff, m_atapi_xferlen);
 
 				// store the returned command length in the ATAPI regs, splitting into
 				// multiple transfers if necessary
-				state->m_atapi_xfermod = 0;
-				if (state->m_atapi_xferlen > MAX_TRANSFER_SIZE)
+				m_atapi_xfermod = 0;
+				if (m_atapi_xferlen > MAX_TRANSFER_SIZE)
 				{
-					state->m_atapi_xfermod = state->m_atapi_xferlen - MAX_TRANSFER_SIZE;
-					state->m_atapi_xferlen = MAX_TRANSFER_SIZE;
+					m_atapi_xfermod = m_atapi_xferlen - MAX_TRANSFER_SIZE;
+					m_atapi_xferlen = MAX_TRANSFER_SIZE;
 				}
 
-				atapi_regs[ATAPI_REG_COUNTLOW] = state->m_atapi_xferlen & 0xff;
-				atapi_regs[ATAPI_REG_COUNTHIGH] = (state->m_atapi_xferlen>>8)&0xff;
+				atapi_regs[ATAPI_REG_COUNTLOW] = m_atapi_xferlen & 0xff;
+				atapi_regs[ATAPI_REG_COUNTHIGH] = (m_atapi_xferlen>>8)&0xff;
 
-				if (state->m_atapi_xferlen == 0)
+				if (m_atapi_xferlen == 0)
 				{
 					// if no data to return, set the registers properly
 					atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_DRDY;
@@ -857,7 +873,7 @@ static WRITE32_HANDLER( atapi_w )
 				switch( phase )
 				{
 				case SCSI_PHASE_DATAOUT:
-					state->m_atapi_cdata_wait = state->m_atapi_xferlen;
+					m_atapi_cdata_wait = m_atapi_xferlen;
 					break;
 				}
 
@@ -871,12 +887,12 @@ static WRITE32_HANDLER( atapi_w )
 
 					case 0x45: // PLAY
 						atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_BSY;
-						state->m_atapi_timer->adjust( downcast<cpu_device *>(&space->device())->cycles_to_attotime( ATAPI_CYCLES_PER_SECTOR ) );
+						m_atapi_timer->adjust( downcast<cpu_device *>(&space.device())->cycles_to_attotime( ATAPI_CYCLES_PER_SECTOR ) );
 						break;
 				}
 
 				// assert IRQ
-				psx_irq_set(space->machine(), 0x400);
+				psx_irq_set(machine(), 0x400);
 			}
 			else
 			{
@@ -901,37 +917,37 @@ static WRITE32_HANDLER( atapi_w )
 		switch( reg )
 		{
 		case ATAPI_REG_DATA:
-			verboselog( machine, 1, "atapi_w: data=%02x\n", data );
+			verboselog( machine(), 1, "atapi_w: data=%02x\n", data );
 			break;
 		case ATAPI_REG_ERRFEAT:
-			verboselog( machine, 1, "atapi_w: errfeat=%02x\n", data );
+			verboselog( machine(), 1, "atapi_w: errfeat=%02x\n", data );
 			break;
 		case ATAPI_REG_INTREASON:
-			verboselog( machine, 1, "atapi_w: intreason=%02x\n", data );
+			verboselog( machine(), 1, "atapi_w: intreason=%02x\n", data );
 			break;
 		case ATAPI_REG_SAMTAG:
-			verboselog( machine, 1, "atapi_w: samtag=%02x\n", data );
+			verboselog( machine(), 1, "atapi_w: samtag=%02x\n", data );
 			break;
 		case ATAPI_REG_COUNTLOW:
-			verboselog( machine, 1, "atapi_w: countlow=%02x\n", data );
+			verboselog( machine(), 1, "atapi_w: countlow=%02x\n", data );
 			break;
 		case ATAPI_REG_COUNTHIGH:
-			verboselog( machine, 1, "atapi_w: counthigh=%02x\n", data );
+			verboselog( machine(), 1, "atapi_w: counthigh=%02x\n", data );
 			break;
 		case ATAPI_REG_DRIVESEL:
-			verboselog( machine, 1, "atapi_w: drivesel=%02x\n", data );
+			verboselog( machine(), 1, "atapi_w: drivesel=%02x\n", data );
 			break;
 		case ATAPI_REG_CMDSTATUS:
-			verboselog( machine, 1, "atapi_w: cmdstatus=%02x\n", data );
+			verboselog( machine(), 1, "atapi_w: cmdstatus=%02x\n", data );
 			break;
 		}
 
 		atapi_regs[reg] = data;
-//      mame_printf_debug("ATAPI: reg %d = %x (offset %x mask %x PC=%x)\n", reg, data, offset, mem_mask, cpu_get_pc(&space->device()));
+//      mame_printf_debug("ATAPI: reg %d = %x (offset %x mask %x PC=%x)\n", reg, data, offset, mem_mask, cpu_get_pc(&space.device()));
 
 		if (reg == ATAPI_REG_CMDSTATUS)
 		{
-//          mame_printf_debug("ATAPI command %x issued! (PC=%x)\n", data, cpu_get_pc(&space->device()));
+//          mame_printf_debug("ATAPI command %x issued! (PC=%x)\n", data, cpu_get_pc(&space.device()));
 
 			switch (data)
 			{
@@ -939,27 +955,27 @@ static WRITE32_HANDLER( atapi_w )
 					atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_DRQ;
 					atapi_regs[ATAPI_REG_INTREASON] = ATAPI_INTREASON_COMMAND;
 
-					state->m_atapi_data_ptr = 0;
-					state->m_atapi_data_len = 0;
+					m_atapi_data_ptr = 0;
+					m_atapi_data_len = 0;
 
 					/* we have no data */
-					state->m_atapi_xferlen = 0;
-					state->m_atapi_xfermod = 0;
+					m_atapi_xferlen = 0;
+					m_atapi_xfermod = 0;
 
-					state->m_atapi_cdata_wait = 0;
+					m_atapi_cdata_wait = 0;
 					break;
 
 				case 0xa1:	// IDENTIFY PACKET DEVICE
 					atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_DRQ;
 
-					state->m_atapi_data_ptr = 0;
-					state->m_atapi_data_len = 512;
+					m_atapi_data_ptr = 0;
+					m_atapi_data_len = 512;
 
 					/* we have no data */
-					state->m_atapi_xferlen = 0;
-					state->m_atapi_xfermod = 0;
+					m_atapi_xferlen = 0;
+					m_atapi_xfermod = 0;
 
-					memset( atapi_data, 0, state->m_atapi_data_len );
+					memset( atapi_data, 0, m_atapi_data_len );
 
 					atapi_data[ 0 ^ 1 ] = 0x85;	// ATAPI device, cmd set 5 compliant, DRQ within 3 ms of PACKET command
 					atapi_data[ 1 ^ 1 ] = 0x00;
@@ -993,16 +1009,16 @@ static WRITE32_HANDLER( atapi_w )
 					atapi_regs[ATAPI_REG_COUNTLOW] = 0;
 					atapi_regs[ATAPI_REG_COUNTHIGH] = 2;
 
-					psx_irq_set(space->machine(), 0x400);
+					psx_irq_set(machine(), 0x400);
 					break;
 
 				case 0xef:	// SET FEATURES
 					atapi_regs[ATAPI_REG_CMDSTATUS] = 0;
 
-					state->m_atapi_data_ptr = 0;
-					state->m_atapi_data_len = 0;
+					m_atapi_data_ptr = 0;
+					m_atapi_data_len = 0;
 
-					psx_irq_set(space->machine(), 0x400);
+					psx_irq_set(machine(), 0x400);
 					break;
 
 				default:
@@ -1068,16 +1084,15 @@ static void atapi_init(running_machine &machine)
 	state->save_item( NAME(state->m_atapi_xfermod) );
 }
 
-static WRITE32_HANDLER( atapi_reset_w )
+WRITE32_MEMBER(ksys573_state::atapi_reset_w)
 {
-	ksys573_state *state = space->machine().driver_data<ksys573_state>();
-	UINT8 *atapi_regs = state->m_atapi_regs;
+	UINT8 *atapi_regs = m_atapi_regs;
 
-	verboselog( space->machine(), 2, "atapi_reset_w( %08x, %08x, %08x )\n", offset, mem_mask, data );
+	verboselog( machine(), 2, "atapi_reset_w( %08x, %08x, %08x )\n", offset, mem_mask, data );
 
 	if (data)
 	{
-		verboselog( space->machine(), 2, "atapi_reset_w: reset\n" );
+		verboselog( machine(), 2, "atapi_reset_w: reset\n" );
 
 //      mame_printf_debug("ATAPI reset\n");
 
@@ -1086,12 +1101,12 @@ static WRITE32_HANDLER( atapi_reset_w )
 		atapi_regs[ATAPI_REG_COUNTLOW] = 0x14;
 		atapi_regs[ATAPI_REG_COUNTHIGH] = 0xeb;
 
-		state->m_atapi_data_ptr = 0;
-		state->m_atapi_data_len = 0;
-		state->m_atapi_cdata_wait = 0;
+		m_atapi_data_ptr = 0;
+		m_atapi_data_len = 0;
+		m_atapi_cdata_wait = 0;
 
-		state->m_atapi_xferlen = 0;
-		state->m_atapi_xfermod = 0;
+		m_atapi_xferlen = 0;
+		m_atapi_xfermod = 0;
 	}
 }
 
@@ -1114,19 +1129,17 @@ static void cdrom_dma_write( ksys573_state *state, UINT32 n_address, INT32 n_siz
 	state->m_atapi_timer->adjust(state->machine().device<cpu_device>("maincpu")->cycles_to_attotime((ATAPI_CYCLES_PER_SECTOR * (state->m_atapi_xferlen/2048))));
 }
 
-static WRITE32_HANDLER( security_w )
+WRITE32_MEMBER(ksys573_state::security_w)
 {
-	ksys573_state *state = space->machine().driver_data<ksys573_state>();
-	int security_cart_number = state->m_security_cart_number;
-	running_machine &machine = space->machine();
-	COMBINE_DATA( &state->m_n_security_control );
+	int security_cart_number = m_security_cart_number;
+	COMBINE_DATA( &m_n_security_control );
 
-	verboselog( space->machine(), 2, "security_w( %08x, %08x, %08x )\n", offset, mem_mask, data );
+	verboselog( machine(), 2, "security_w( %08x, %08x, %08x )\n", offset, mem_mask, data );
 
 	if( ACCESSING_BITS_0_15 )
 	{
-		ds2401_device *ds2401 = space->machine().device<ds2401_device>(security_cart_number ? "game_id" : "install_id");
-		device_secure_serial_flash *secflash = space->machine().device<device_secure_serial_flash>(security_cart_number ? "game_eeprom" : "install_eeprom");
+		ds2401_device *ds2401 = machine().device<ds2401_device>(security_cart_number ? "game_id" : "install_id");
+		device_secure_serial_flash *secflash = machine().device<device_secure_serial_flash>(security_cart_number ? "game_eeprom" : "install_eeprom");
 
 		if( secflash ) {
 			if( !dynamic_cast<zs01_device *>(secflash) )
@@ -1141,37 +1154,35 @@ static WRITE32_HANDLER( security_w )
 			ds2401->write(!( ( data >> 4 ) & 1 ));
 		}
 
-		if( state->m_security_callback != NULL )
+		if( m_security_callback != NULL )
 		{
-			(*state->m_security_callback)( machine, data & 0xff );
+			(*m_security_callback)( machine(), data & 0xff );
 		}
 	}
 
-	input_port_write_safe( machine, "OUT1", data, mem_mask );
+	input_port_write_safe( machine(), "OUT1", data, mem_mask );
 }
 
-static READ32_HANDLER( security_r )
+READ32_MEMBER(ksys573_state::security_r)
 {
-	ksys573_state *state = space->machine().driver_data<ksys573_state>();
 
-	UINT32 data = state->m_n_security_control;
-	verboselog( space->machine(), 2, "security_r( %08x, %08x ) %08x\n", offset, mem_mask, data );
+	UINT32 data = m_n_security_control;
+	verboselog( machine(), 2, "security_r( %08x, %08x ) %08x\n", offset, mem_mask, data );
 	return data;
 }
 
-static READ32_HANDLER( flash_r )
+READ32_MEMBER(ksys573_state::flash_r)
 {
-	ksys573_state *state = space->machine().driver_data<ksys573_state>();
 	UINT32 data = 0;
 
-	if( state->m_flash_bank < 0 )
+	if( m_flash_bank < 0 )
 	{
-		mame_printf_debug( "%08x: flash_r( %08x, %08x ) no bank selected %08x\n", cpu_get_pc(&space->device()), offset, mem_mask, state->m_control );
+		mame_printf_debug( "%08x: flash_r( %08x, %08x ) no bank selected %08x\n", cpu_get_pc(&space.device()), offset, mem_mask, m_control );
 		data = 0xffffffff;
 	}
 	else
 	{
-		fujitsu_29f016a_device **flash_base = &state->m_flash_device[state->m_flash_bank >> 8][state->m_flash_bank & 0xff];
+		fujitsu_29f016a_device **flash_base = &m_flash_device[m_flash_bank >> 8][m_flash_bank & 0xff];
 		int adr = offset * 2;
 
 		if( ACCESSING_BITS_0_7 )
@@ -1192,24 +1203,23 @@ static READ32_HANDLER( flash_r )
 		}
 	}
 
-	verboselog( space->machine(), 2, "flash_r( %08x, %08x, %08x) bank = %08x\n", offset, mem_mask, data, state->m_flash_bank );
+	verboselog( machine(), 2, "flash_r( %08x, %08x, %08x) bank = %08x\n", offset, mem_mask, data, m_flash_bank );
 
 	return data;
 }
 
-static WRITE32_HANDLER( flash_w )
+WRITE32_MEMBER(ksys573_state::flash_w)
 {
-	ksys573_state *state = space->machine().driver_data<ksys573_state>();
 
-	verboselog( space->machine(), 2, "flash_w( %08x, %08x, %08x\n", offset, mem_mask, data );
+	verboselog( machine(), 2, "flash_w( %08x, %08x, %08x\n", offset, mem_mask, data );
 
-	if( state->m_flash_bank < 0 )
+	if( m_flash_bank < 0 )
 	{
-		mame_printf_debug( "%08x: flash_w( %08x, %08x, %08x ) no bank selected %08x\n", cpu_get_pc(&space->device()), offset, mem_mask, data, state->m_control );
+		mame_printf_debug( "%08x: flash_w( %08x, %08x, %08x ) no bank selected %08x\n", cpu_get_pc(&space.device()), offset, mem_mask, data, m_control );
 	}
 	else
 	{
-		fujitsu_29f016a_device **flash_base = &state->m_flash_device[state->m_flash_bank >> 8][state->m_flash_bank & 0xff];
+		fujitsu_29f016a_device **flash_base = &m_flash_device[m_flash_bank >> 8][m_flash_bank & 0xff];
 		int adr = offset * 2;
 
 		if( ACCESSING_BITS_0_7 )
@@ -1233,18 +1243,18 @@ static WRITE32_HANDLER( flash_w )
 
 static ADDRESS_MAP_START( konami573_map, AS_PROGRAM, 32, ksys573_state )
 	AM_RANGE(0x00000000, 0x003fffff) AM_RAM	AM_SHARE("share1") /* ram */
-	AM_RANGE(0x1f000000, 0x1f3fffff) AM_READWRITE_LEGACY(flash_r, flash_w )
+	AM_RANGE(0x1f000000, 0x1f3fffff) AM_READWRITE(flash_r, flash_w )
 	AM_RANGE(0x1f400000, 0x1f400003) AM_READ_PORT( "IN0" ) AM_WRITE_PORT( "OUT0" )
-	AM_RANGE(0x1f400004, 0x1f400007) AM_READ_LEGACY(jamma_r )
+	AM_RANGE(0x1f400004, 0x1f400007) AM_READ(jamma_r )
 	AM_RANGE(0x1f400008, 0x1f40000b) AM_READ_PORT( "IN2" )
 	AM_RANGE(0x1f40000c, 0x1f40000f) AM_READ_PORT( "IN3" )
-	AM_RANGE(0x1f480000, 0x1f48000f) AM_READWRITE_LEGACY(atapi_r, atapi_w )	// IDE controller, used mostly in ATAPI mode (only 3 pure IDE commands seen so far)
-	AM_RANGE(0x1f500000, 0x1f500003) AM_READWRITE_LEGACY(control_r, control_w )	// Konami can't make a game without a "control" register.
-	AM_RANGE(0x1f560000, 0x1f560003) AM_WRITE_LEGACY(atapi_reset_w )
+	AM_RANGE(0x1f480000, 0x1f48000f) AM_READWRITE(atapi_r, atapi_w )	// IDE controller, used mostly in ATAPI mode (only 3 pure IDE commands seen so far)
+	AM_RANGE(0x1f500000, 0x1f500003) AM_READWRITE(control_r, control_w )	// Konami can't make a game without a "control" register.
+	AM_RANGE(0x1f560000, 0x1f560003) AM_WRITE(atapi_reset_w )
 	AM_RANGE(0x1f5c0000, 0x1f5c0003) AM_WRITENOP				// watchdog?
 	AM_RANGE(0x1f620000, 0x1f623fff) AM_DEVREADWRITE8_LEGACY("m48t58", timekeeper_r, timekeeper_w, 0x00ff00ff)
-	AM_RANGE(0x1f680000, 0x1f68001f) AM_READWRITE_LEGACY(mb89371_r, mb89371_w)
-	AM_RANGE(0x1f6a0000, 0x1f6a0003) AM_READWRITE_LEGACY(security_r, security_w )
+	AM_RANGE(0x1f680000, 0x1f68001f) AM_READWRITE(mb89371_r, mb89371_w)
+	AM_RANGE(0x1f6a0000, 0x1f6a0003) AM_READWRITE(security_r, security_w )
 	AM_RANGE(0x1fc00000, 0x1fc7ffff) AM_ROM AM_SHARE("share2") AM_REGION("bios", 0)
 	AM_RANGE(0x80000000, 0x803fffff) AM_RAM AM_SHARE("share1") /* ram mirror */
 	AM_RANGE(0x9fc00000, 0x9fc7ffff) AM_ROM AM_SHARE("share2") /* bios mirror */
@@ -1398,16 +1408,16 @@ todo:
 
 */
 
-static READ32_HANDLER( ge765pwbba_r )
+READ32_MEMBER(ksys573_state::ge765pwbba_r)
 {
-	device_t *upd4701 = space->machine().device("upd4701");
+	device_t *upd4701 = machine().device("upd4701");
 	UINT32 data = 0;
 
 	switch (offset)
 	{
 	case 0x26:
-		upd4701_y_add(upd4701, 0, input_port_read_safe(space->machine(), "uPD4701_y", 0), 0xffff);
-		upd4701_switches_set(upd4701, 0, input_port_read_safe(space->machine(), "uPD4701_switches", 0));
+		upd4701_y_add(upd4701, 0, input_port_read_safe(machine(), "uPD4701_y", 0), 0xffff);
+		upd4701_switches_set(upd4701, 0, input_port_read_safe(machine(), "uPD4701_switches", 0));
 
 		upd4701_cs_w(upd4701, 0, 0);
 		upd4701_xy_w(upd4701, 0, 1);
@@ -1428,17 +1438,17 @@ static READ32_HANDLER( ge765pwbba_r )
 		break;
 
 	default:
-		verboselog(space->machine(), 0, "ge765pwbba_r: unhandled offset %08x %08x\n", offset, mem_mask);
+		verboselog(machine(), 0, "ge765pwbba_r: unhandled offset %08x %08x\n", offset, mem_mask);
 		break;
 	}
 
-	verboselog(space->machine(), 2, "ge765pwbba_r( %08x, %08x ) %08x\n", offset, mem_mask, data);
+	verboselog(machine(), 2, "ge765pwbba_r( %08x, %08x ) %08x\n", offset, mem_mask, data);
 	return data;
 }
 
-static WRITE32_HANDLER( ge765pwbba_w )
+WRITE32_MEMBER(ksys573_state::ge765pwbba_w)
 {
-	device_t *upd4701 = space->machine().device("upd4701");
+	device_t *upd4701 = machine().device("upd4701");
 	switch (offset)
 	{
 	case 0x04:
@@ -1467,17 +1477,18 @@ static WRITE32_HANDLER( ge765pwbba_w )
 		break;
 
 	default:
-		verboselog(space->machine(), 0, "ge765pwbba_w: unhandled offset %08x %08x %08x\n", offset, mem_mask, data);
+		verboselog(machine(), 0, "ge765pwbba_w: unhandled offset %08x %08x %08x\n", offset, mem_mask, data);
 		break;
 	}
 
-	verboselog(space->machine(), 2, "ge765pwbba_w( %08x, %08x, %08x )\n", offset, mem_mask, data);
+	verboselog(machine(), 2, "ge765pwbba_w( %08x, %08x, %08x )\n", offset, mem_mask, data);
 }
 
 static DRIVER_INIT( ge765pwbba )
 {
+	ksys573_state *state = machine.driver_data<ksys573_state>();
 	DRIVER_INIT_CALL(konami573);
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler( 0x1f640000, 0x1f6400ff, FUNC(ge765pwbba_r), FUNC(ge765pwbba_w) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler( 0x1f640000, 0x1f6400ff, read32_delegate(FUNC(ksys573_state::ge765pwbba_r),state), write32_delegate(FUNC(ksys573_state::ge765pwbba_w),state));
 }
 
 /*
@@ -1488,7 +1499,7 @@ Analogue I/O board
 
 */
 
-static READ32_HANDLER( gx700pwbf_io_r )
+READ32_MEMBER(ksys573_state::gx700pwbf_io_r)
 {
 	UINT32 data = 0;
 	switch( offset )
@@ -1514,7 +1525,7 @@ static READ32_HANDLER( gx700pwbf_io_r )
 		break;
 	}
 
-	verboselog( space->machine(), 2, "gx700pwbf_io_r( %08x, %08x ) %08x\n", offset, mem_mask, data );
+	verboselog( machine(), 2, "gx700pwbf_io_r( %08x, %08x ) %08x\n", offset, mem_mask, data );
 
 	return data;
 }
@@ -1540,9 +1551,9 @@ static void gx700pwbf_output( running_machine &machine, int offset, UINT8 data )
 	state->m_gx700pwbf_output_data[ offset ] = data;
 }
 
-static WRITE32_HANDLER( gx700pwbf_io_w )
+WRITE32_MEMBER(ksys573_state::gx700pwbf_io_w)
 {
-	verboselog( space->machine(), 2, "gx700pwbf_io_w( %08x, %08x, %08x )\n", offset, mem_mask, data );
+	verboselog( machine(), 2, "gx700pwbf_io_w( %08x, %08x, %08x )\n", offset, mem_mask, data );
 
 	switch( offset )
 	{
@@ -1550,28 +1561,28 @@ static WRITE32_HANDLER( gx700pwbf_io_w )
 
 		if( ACCESSING_BITS_0_15 )
 		{
-			gx700pwbf_output( space->machine(), 0, data & 0xff );
+			gx700pwbf_output( machine(), 0, data & 0xff );
 		}
 		break;
 
 	case 0x22:
 		if( ACCESSING_BITS_0_15 )
 		{
-			gx700pwbf_output( space->machine(), 1, data & 0xff );
+			gx700pwbf_output( machine(), 1, data & 0xff );
 		}
 		break;
 
 	case 0x24:
 		if( ACCESSING_BITS_0_15 )
 		{
-			gx700pwbf_output( space->machine(), 2, data & 0xff );
+			gx700pwbf_output( machine(), 2, data & 0xff );
 		}
 		break;
 
 	case 0x26:
 		if( ACCESSING_BITS_0_15 )
 		{
-			gx700pwbf_output( space->machine(), 3, data & 0xff );
+			gx700pwbf_output( machine(), 3, data & 0xff );
 		}
 		break;
 
@@ -1589,7 +1600,7 @@ static void gx700pwfbf_init( running_machine &machine, void (*output_callback_fu
 
 	state->m_gx700pwfbf_output_callback = output_callback_func;
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler( 0x1f640000, 0x1f6400ff, FUNC(gx700pwbf_io_r), FUNC(gx700pwbf_io_w) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler( 0x1f640000, 0x1f6400ff, read32_delegate(FUNC(ksys573_state::gx700pwbf_io_r),state), write32_delegate(FUNC(ksys573_state::gx700pwbf_io_w),state));
 
 	state->save_item( NAME(state->m_gx700pwbf_output_data) );
 }
@@ -1786,7 +1797,7 @@ todo:
 
 */
 
-static READ32_HANDLER( gtrfrks_io_r )
+READ32_MEMBER(ksys573_state::gtrfrks_io_r)
 {
 	UINT32 data = 0;
 	switch( offset )
@@ -1795,17 +1806,17 @@ static READ32_HANDLER( gtrfrks_io_r )
 		break;
 
 	default:
-		verboselog( space->machine(), 0, "gtrfrks_io_r: unhandled offset %08x, %08x\n", offset, mem_mask );
+		verboselog( machine(), 0, "gtrfrks_io_r: unhandled offset %08x, %08x\n", offset, mem_mask );
 		break;
 	}
 
-	verboselog( space->machine(), 2, "gtrfrks_io_r( %08x, %08x ) %08x\n", offset, mem_mask, data );
+	verboselog( machine(), 2, "gtrfrks_io_r( %08x, %08x ) %08x\n", offset, mem_mask, data );
 	return data;
 }
 
-static WRITE32_HANDLER( gtrfrks_io_w )
+WRITE32_MEMBER(ksys573_state::gtrfrks_io_w)
 {
-	verboselog( space->machine(), 2, "gtrfrks_io_w( %08x, %08x ) %08x\n", offset, mem_mask, data );
+	verboselog( machine(), 2, "gtrfrks_io_w( %08x, %08x ) %08x\n", offset, mem_mask, data );
 
 	switch( offset )
 	{
@@ -1820,7 +1831,7 @@ static WRITE32_HANDLER( gtrfrks_io_w )
 		break;
 
 	default:
-		verboselog( space->machine(), 0, "gtrfrks_io_w: unhandled offset %08x, %08x\n", offset, mem_mask );
+		verboselog( machine(), 0, "gtrfrks_io_w: unhandled offset %08x, %08x\n", offset, mem_mask );
 		break;
 	}
 }
@@ -1828,15 +1839,14 @@ static WRITE32_HANDLER( gtrfrks_io_w )
 static DRIVER_INIT( gtrfrks )
 {
 	DRIVER_INIT_CALL(konami573);
-
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler( 0x1f600000, 0x1f6000ff, FUNC(gtrfrks_io_r), FUNC(gtrfrks_io_w) );
+	ksys573_state *state = machine.driver_data<ksys573_state>();
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler( 0x1f600000, 0x1f6000ff, read32_delegate(FUNC(ksys573_state::gtrfrks_io_r),state), write32_delegate(FUNC(ksys573_state::gtrfrks_io_w),state));
 }
 
 /* GX894 digital i/o */
 
-static READ32_HANDLER( gx894pwbba_r )
+READ32_MEMBER(ksys573_state::gx894pwbba_r)
 {
-	ksys573_state *state = space->machine().driver_data<ksys573_state>();
 	UINT32 data = 0;
 
 	switch( offset )
@@ -1853,7 +1863,7 @@ static READ32_HANDLER( gx894pwbba_r )
 	case 0x2b:
 		if( ACCESSING_BITS_0_15 )
 		{
-			mas3507d_device *mas3507d = space->machine().device<mas3507d_device>("mpeg");
+			mas3507d_device *mas3507d = machine().device<mas3507d_device>("mpeg");
 			data |= mas3507d->i2c_scl_r() << 13;
 			data |= mas3507d->i2c_sda_r() << 12;
 		}
@@ -1865,8 +1875,8 @@ static READ32_HANDLER( gx894pwbba_r )
 	case 0x2d:
 		if( ACCESSING_BITS_0_15 )
 		{
-			data |= state->m_gx894_ram[ state->m_gx894_ram_read_offset / 2 ];
-			state->m_gx894_ram_read_offset += 2;
+			data |= m_gx894_ram[ m_gx894_ram_read_offset / 2 ];
+			m_gx894_ram_read_offset += 2;
 		}
 		if( ACCESSING_BITS_16_31 )
 		{
@@ -1914,7 +1924,7 @@ static READ32_HANDLER( gx894pwbba_r )
 	case 0x3b:
 		if( ACCESSING_BITS_16_31 )
 		{
-			data |= space->machine().device<ds2401_device>("digital_id")->read() << 28;
+			data |= machine().device<ds2401_device>("digital_id")->read() << 28;
 		}
 		break;
 	case 0x3d:
@@ -1937,8 +1947,8 @@ static READ32_HANDLER( gx894pwbba_r )
 		break;
 	}
 
-	verboselog( space->machine(), 2, "gx894pwbba_r( %08x, %08x ) %08x\n", offset, mem_mask, data );
-//  printf( "%08x: gx894pwbba_r( %08x, %08x ) %08x\n", cpu_get_pc(&space->device()), offset, mem_mask, data );
+	verboselog( machine(), 2, "gx894pwbba_r( %08x, %08x ) %08x\n", offset, mem_mask, data );
+//  printf( "%08x: gx894pwbba_r( %08x, %08x ) %08x\n", cpu_get_pc(&space.device()), offset, mem_mask, data );
 	return data;
 }
 
@@ -1974,11 +1984,10 @@ static void gx894pwbba_output( running_machine &machine, int offset, UINT8 data 
 	state->m_gx894pwbba_output_data[ offset ] = data;
 }
 
-static WRITE32_HANDLER( gx894pwbba_w )
+WRITE32_MEMBER(ksys573_state::gx894pwbba_w)
 {
-	ksys573_state *state = space->machine().driver_data<ksys573_state>();
 	char buff[33];
-	UINT32 olda=state->m_a,oldb=state->m_b,oldc=state->m_c,oldd=state->m_d;
+	UINT32 olda=m_a,oldb=m_b,oldc=m_c,oldd=m_d;
 
 //  printf( "gx894pwbba_w( %08x, %08x, %08x )\n", offset, mem_mask, data );
 
@@ -1987,7 +1996,7 @@ static WRITE32_HANDLER( gx894pwbba_w )
 		return;
 	}
 
-	verboselog( space->machine(), 2, "gx894pwbba_w( %08x, %08x, %08x) %s\n", offset, mem_mask, data, binary( buff, data ) );
+	verboselog( machine(), 2, "gx894pwbba_w( %08x, %08x, %08x) %s\n", offset, mem_mask, data, binary( buff, data ) );
 
 	switch( offset )
 	{
@@ -2009,7 +2018,7 @@ static WRITE32_HANDLER( gx894pwbba_w )
 		break;
 	case 0x2b:
 		if(ACCESSING_BITS_0_15) {
-			mas3507d_device *mas3507d = space->machine().device<mas3507d_device>("mpeg");
+			mas3507d_device *mas3507d = machine().device<mas3507d_device>("mpeg");
 			mas3507d->i2c_scl_w(data & 0x2000);
 			mas3507d->i2c_sda_w(data & 0x1000);
 		}
@@ -2024,32 +2033,32 @@ static WRITE32_HANDLER( gx894pwbba_w )
 	case 0x2c:
 		if( ACCESSING_BITS_0_15 )
 		{
-			state->m_gx894_ram_write_offset &= 0x0000ffff;
-			state->m_gx894_ram_write_offset |= ( data & 0x0000ffff ) << 16;
+			m_gx894_ram_write_offset &= 0x0000ffff;
+			m_gx894_ram_write_offset |= ( data & 0x0000ffff ) << 16;
 		}
 		if( ACCESSING_BITS_16_31 )
 		{
-			state->m_gx894_ram_write_offset &= 0xffff0000;
-			state->m_gx894_ram_write_offset |= ( data & 0xffff0000 ) >> 16;
+			m_gx894_ram_write_offset &= 0xffff0000;
+			m_gx894_ram_write_offset |= ( data & 0xffff0000 ) >> 16;
 		}
 		break;
 	case 0x2d:
 		if( ACCESSING_BITS_0_15 )
 		{
-			state->m_gx894_ram[ state->m_gx894_ram_write_offset / 2 ] = data & 0xffff;
-			state->m_gx894_ram_write_offset += 2;
+			m_gx894_ram[ m_gx894_ram_write_offset / 2 ] = data & 0xffff;
+			m_gx894_ram_write_offset += 2;
 		}
 		if( ACCESSING_BITS_16_31 )
 		{
-			state->m_gx894_ram_read_offset &= 0x0000ffff;
-			state->m_gx894_ram_read_offset |= ( data & 0xffff0000 ) << 0;
+			m_gx894_ram_read_offset &= 0x0000ffff;
+			m_gx894_ram_read_offset |= ( data & 0xffff0000 ) << 0;
 		}
 		break;
 	case 0x2e:
 		if( ACCESSING_BITS_0_15 )
 		{
-			state->m_gx894_ram_read_offset &= 0xffff0000;
-			state->m_gx894_ram_read_offset |= ( data & 0x0000ffff ) >> 0;
+			m_gx894_ram_read_offset &= 0xffff0000;
+			m_gx894_ram_read_offset |= ( data & 0x0000ffff ) >> 0;
 		}
 		if( ACCESSING_BITS_16_31 )
 		{
@@ -2059,24 +2068,24 @@ static WRITE32_HANDLER( gx894pwbba_w )
 	case 0x38:
 		if( ACCESSING_BITS_16_31 )
 		{
-			gx894pwbba_output( space->machine(), 0, ( data >> 28 ) & 0xf );
+			gx894pwbba_output( machine(), 0, ( data >> 28 ) & 0xf );
 		}
 		if( ACCESSING_BITS_0_15 )
 		{
-			gx894pwbba_output( space->machine(), 1, ( data >> 12 ) & 0xf );
+			gx894pwbba_output( machine(), 1, ( data >> 12 ) & 0xf );
 		}
-		COMBINE_DATA( &state->m_a );
+		COMBINE_DATA( &m_a );
 		break;
 	case 0x39:
 		if( ACCESSING_BITS_16_31 )
 		{
-			gx894pwbba_output( space->machine(), 7, ( data >> 28 ) & 0xf );
+			gx894pwbba_output( machine(), 7, ( data >> 28 ) & 0xf );
 		}
 		if( ACCESSING_BITS_0_15 )
 		{
-			gx894pwbba_output( space->machine(), 3, ( data >> 12 ) & 0xf );
+			gx894pwbba_output( machine(), 3, ( data >> 12 ) & 0xf );
 		}
-		COMBINE_DATA( &state->m_b );
+		COMBINE_DATA( &m_b );
 		break;
 	case 0x3a:
 		if( ACCESSING_BITS_16_31 )
@@ -2087,7 +2096,7 @@ static WRITE32_HANDLER( gx894pwbba_w )
 			logerror("FPGA MPEG key 3/3 %02x\n", data & 0xff);
 		if( ACCESSING_BITS_16_31 )
 		{
-			space->machine().device<ds2401_device>("digital_id")->write( !( ( data >> 28 ) & 1 ) );
+			machine().device<ds2401_device>("digital_id")->write( !( ( data >> 28 ) & 1 ) );
 		}
 		break;
 	case 0x3e:
@@ -2099,39 +2108,39 @@ static WRITE32_HANDLER( gx894pwbba_w )
 			/* 15 */
 
 			/* fpga */
-			state->m_s = ( state->m_s >> 1 ) | ( ( data & 0x8000 ) >> 8 );
-			state->m_f++;
-			if( state->m_f == 8 )
+			m_s = ( m_s >> 1 ) | ( ( data & 0x8000 ) >> 8 );
+			m_f++;
+			if( m_f == 8 )
 			{
 //              printf( "%04x %02x\n", o, s );
-				state->m_c = 0;
-				state->m_f = 0;
-				state->m_o++;
+				m_c = 0;
+				m_f = 0;
+				m_o++;
 			}
 		}
 
 		if( ACCESSING_BITS_16_31 )
 		{
-			gx894pwbba_output( space->machine(), 4, ( data >> 28 ) & 0xf );
+			gx894pwbba_output( machine(), 4, ( data >> 28 ) & 0xf );
 		}
-		COMBINE_DATA( &state->m_c );
+		COMBINE_DATA( &m_c );
 		break;
 	case 0x3f:
 		if( ACCESSING_BITS_16_31 )
 		{
-			gx894pwbba_output( space->machine(), 2, ( data >> 28 ) & 0xf );
+			gx894pwbba_output( machine(), 2, ( data >> 28 ) & 0xf );
 		}
 		if( ACCESSING_BITS_0_15 )
 		{
-			gx894pwbba_output( space->machine(), 5, ( data >> 12 ) & 0xf );
+			gx894pwbba_output( machine(), 5, ( data >> 12 ) & 0xf );
 		}
-		COMBINE_DATA( &state->m_d );
+		COMBINE_DATA( &m_d );
 		break;
 	default:
 //      printf( "write offset %08x\n", offset );
 		break;
 	}
-	if( state->m_a != olda || state->m_b != oldb || state->m_c != oldc || state->m_d != oldd )
+	if( m_a != olda || m_b != oldb || m_c != oldc || m_d != oldd )
 	{
 //      printf( "%08x %08x %08x %08x\n", a, b, c, d );
 	}
@@ -2144,7 +2153,7 @@ static void gx894pwbba_init( running_machine &machine, void (*output_callback_fu
 
 	state->m_gx894pwbba_output_callback = output_callback_func;
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler( 0x1f640000, 0x1f6400ff, FUNC(gx894pwbba_r), FUNC(gx894pwbba_w) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler( 0x1f640000, 0x1f6400ff, read32_delegate(FUNC(ksys573_state::gx894pwbba_r),state), write32_delegate(FUNC(ksys573_state::gx894pwbba_w),state));
 
 	state->m_gx894_ram_write_offset = 0;
 	state->m_gx894_ram_read_offset = 0;
@@ -2170,8 +2179,8 @@ static DRIVER_INIT( gtrfrkdigital )
 	DRIVER_INIT_CALL(konami573);
 
 	gx894pwbba_init( machine, NULL );
-
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler( 0x1f600000, 0x1f6000ff, FUNC(gtrfrks_io_r), FUNC(gtrfrks_io_w) );
+	ksys573_state *state = machine.driver_data<ksys573_state>();
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler( 0x1f600000, 0x1f6000ff, read32_delegate(FUNC(ksys573_state::gtrfrks_io_r),state), write32_delegate(FUNC(ksys573_state::gtrfrks_io_w),state) );
 }
 
 /* ddr solo */
@@ -2436,9 +2445,9 @@ static void dmx_output_callback( running_machine &machine, int offset, int data 
 	}
 }
 
-static WRITE32_HANDLER( dmx_io_w )
+WRITE32_MEMBER(ksys573_state::dmx_io_w)
 {
-	verboselog( space->machine(), 2, "dmx_io_w( %08x, %08x ) %08x\n", offset, mem_mask, data );
+	verboselog( machine(), 2, "dmx_io_w( %08x, %08x ) %08x\n", offset, mem_mask, data );
 
 	switch( offset )
 	{
@@ -2453,7 +2462,7 @@ static WRITE32_HANDLER( dmx_io_w )
 		break;
 
 	default:
-		verboselog( space->machine(), 0, "dmx_io_w: unhandled offset %08x, %08x\n", offset, mem_mask );
+		verboselog( machine(), 0, "dmx_io_w: unhandled offset %08x, %08x\n", offset, mem_mask );
 		break;
 	}
 }
@@ -2463,8 +2472,8 @@ static DRIVER_INIT( dmx )
 	DRIVER_INIT_CALL(konami573);
 
 	gx894pwbba_init( machine, dmx_output_callback );
-
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x1f600000, 0x1f6000ff, FUNC(dmx_io_w) );
+	ksys573_state *state = machine.driver_data<ksys573_state>();
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x1f600000, 0x1f6000ff, write32_delegate(FUNC(ksys573_state::dmx_io_w),state) );
 }
 
 /* salary man champ */
@@ -2600,9 +2609,9 @@ static void mamboagg_output_callback( running_machine &machine, int offset, int 
 	}
 }
 
-static WRITE32_HANDLER( mamboagg_io_w )
+WRITE32_MEMBER(ksys573_state::mamboagg_io_w)
 {
-	verboselog( space->machine(), 2, "mamboagg_io_w( %08x, %08x ) %08x\n", offset, mem_mask, data );
+	verboselog( machine(), 2, "mamboagg_io_w( %08x, %08x ) %08x\n", offset, mem_mask, data );
 
 	switch( offset )
 	{
@@ -2613,7 +2622,7 @@ static WRITE32_HANDLER( mamboagg_io_w )
 		break;
 
 	default:
-		verboselog( space->machine(), 0, "mamboagg_io_w: unhandled offset %08x, %08x\n", offset, mem_mask );
+		verboselog( machine(), 0, "mamboagg_io_w: unhandled offset %08x, %08x\n", offset, mem_mask );
 		break;
 	}
 }
@@ -2623,8 +2632,8 @@ static DRIVER_INIT( mamboagg )
 	DRIVER_INIT_CALL(konami573);
 
 	gx894pwbba_init( machine, mamboagg_output_callback );
-
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x1f600000, 0x1f6000ff, FUNC(mamboagg_io_w) );
+	ksys573_state *state = machine.driver_data<ksys573_state>();
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x1f600000, 0x1f6000ff, write32_delegate(FUNC(ksys573_state::mamboagg_io_w),state));
 }
 
 
@@ -2806,11 +2815,10 @@ static DRIVER_INIT( punchmania )
 
 /* GunMania */
 
-static WRITE32_HANDLER( gunmania_w )
+WRITE32_MEMBER(ksys573_state::gunmania_w)
 {
 	char s[ 1024 ] = "";
-	ksys573_state *state = space->machine().driver_data<ksys573_state>();
-	ds2401_device *ds2401 = space->machine().device<ds2401_device>("gunmania_id");
+	ds2401_device *ds2401 = machine().device<ds2401_device>("gunmania_id");
 
 	switch( offset )
 	{
@@ -2824,13 +2832,13 @@ static WRITE32_HANDLER( gunmania_w )
 		case 0x20:
 			strcat( s, "cable holder motor release " );
 
-			state->m_cable_holder_release = 1;
+			m_cable_holder_release = 1;
 			break;
 
 		case 0x80:
 			strcat( s, "cable holder motor catch " );
 
-			state->m_cable_holder_release = 0;
+			m_cable_holder_release = 0;
 			break;
 
 		case 0xa0:
@@ -2858,9 +2866,9 @@ static WRITE32_HANDLER( gunmania_w )
 		case 0x02:
 			strcat( s, "tank shutter motor close " );
 
-			if( state->m_tank_shutter_position > 0 )
+			if( m_tank_shutter_position > 0 )
 			{
-				state->m_tank_shutter_position--;
+				m_tank_shutter_position--;
 			}
 
 			break;
@@ -2868,9 +2876,9 @@ static WRITE32_HANDLER( gunmania_w )
 		case 0x08:
 			strcat( s, "tank shutter motor open " );
 
-			if( state->m_tank_shutter_position < 100 )
+			if( m_tank_shutter_position < 100 )
 			{
-				state->m_tank_shutter_position++;
+				m_tank_shutter_position++;
 			}
 
 			break;
@@ -2895,7 +2903,7 @@ static WRITE32_HANDLER( gunmania_w )
 		break;
 	}
 
-	verboselog( space->machine(), 2, "gunmania_w %08x %08x %08x\n", offset, mem_mask, data );
+	verboselog( machine(), 2, "gunmania_w %08x %08x %08x\n", offset, mem_mask, data );
 }
 
 CUSTOM_INPUT_MEMBER(ksys573_state::gunmania_tank_shutter_sensor)
@@ -2915,35 +2923,36 @@ CUSTOM_INPUT_MEMBER(ksys573_state::gunmania_cable_holder_sensor)
 	return m_cable_holder_release;
 }
 
-static READ32_HANDLER( gunmania_r )
+READ32_MEMBER(ksys573_state::gunmania_r)
 {
 	UINT32 data = 0;
-	ds2401_device *ds2401 = space->machine().device<ds2401_device>("gunmania_id");
+	ds2401_device *ds2401 = machine().device<ds2401_device>("gunmania_id");
 
 	switch( offset )
 	{
 	case 0x20:
-		data = input_port_read( space->machine(), "GUNX" ) | ds2401->read() << 7;
+		data = input_port_read( machine(), "GUNX" ) | ds2401->read() << 7;
 		break;
 
 	case 0x22:
-		data = input_port_read( space->machine(), "GUNY" ) | input_port_read( space->machine(), "SENSOR" );
+		data = input_port_read( machine(), "GUNY" ) | input_port_read( machine(), "SENSOR" );
 		break;
 
 	case 0x34:
-		data = input_port_read( space->machine(), "ENCODER" );
+		data = input_port_read( machine(), "ENCODER" );
 		popmessage( "encoder %04x", data );
 		break;
 	}
 
-	verboselog( space->machine(), 2, "gunmania_r %08x %08x %08x\n", offset, mem_mask, data );
+	verboselog( machine(), 2, "gunmania_r %08x %08x %08x\n", offset, mem_mask, data );
 	return data;
 }
 
 static DRIVER_INIT( gunmania )
 {
 	DRIVER_INIT_CALL(konami573);
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler( 0x1f640000, 0x1f6400ff, FUNC(gunmania_r), FUNC(gunmania_w) );
+	ksys573_state *state = machine.driver_data<ksys573_state>();
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler( 0x1f640000, 0x1f6400ff, read32_delegate(FUNC(ksys573_state::gunmania_r),state), write32_delegate(FUNC(ksys573_state::gunmania_w),state));
 }
 
 /* ADC0834 Interface */

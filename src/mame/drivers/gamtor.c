@@ -33,9 +33,10 @@ class gaminator_state : public driver_device
 public:
 	gaminator_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
+	DECLARE_WRITE32_MEMBER(gamtor_unk_w);
 };
 
-static WRITE32_HANDLER( gamtor_unk_w )
+WRITE32_MEMBER(gaminator_state::gamtor_unk_w)
 {
 
 }
@@ -45,7 +46,7 @@ static WRITE32_HANDLER( gamtor_unk_w )
 static ADDRESS_MAP_START( gaminator_map, AS_PROGRAM, 32, gaminator_state )
 	AM_RANGE(0x00000000, 0x07ffffff) AM_ROM
 	AM_RANGE(0x08000000, 0x0bffffff) AM_RAM
-	AM_RANGE(0x1e040008, 0x1e04000b) AM_WRITE_LEGACY(gamtor_unk_w )
+	AM_RANGE(0x1e040008, 0x1e04000b) AM_WRITE(gamtor_unk_w )
 
 	AM_RANGE(0x20000000, 0x2003ffff) AM_RAM
 

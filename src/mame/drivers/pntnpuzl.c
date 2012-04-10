@@ -142,6 +142,13 @@ public:
 	int m_touchscr[5];
 
 	required_device<cpu_device> m_maincpu;
+	DECLARE_WRITE16_MEMBER(pntnpuzl_200000_w);
+	DECLARE_WRITE16_MEMBER(pntnpuzl_280018_w);
+	DECLARE_READ16_MEMBER(pntnpuzl_280014_r);
+	DECLARE_READ16_MEMBER(pntnpuzl_28001a_r);
+	DECLARE_READ16_MEMBER(irq1_ack_r);
+	DECLARE_READ16_MEMBER(irq2_ack_r);
+	DECLARE_READ16_MEMBER(irq4_ack_r);
 };
 
 
@@ -204,94 +211,88 @@ write                                     read
 01 03 46 31 38 0d                    ---> 80 0c
 */
 
-static WRITE16_HANDLER( pntnpuzl_200000_w )
+WRITE16_MEMBER(pntnpuzl_state::pntnpuzl_200000_w)
 {
-	pntnpuzl_state *state = space->machine().driver_data<pntnpuzl_state>();
 // logerror("200000: %04x\n",data);
 	// bit 12: set to 1 when going to serial output to 280018
-	if ((state->m_pntpzl_200000 & 0x1000) && !(data & 0x1000))
+	if ((m_pntpzl_200000 & 0x1000) && !(data & 0x1000))
 	{
-		state->m_serial_out = (state->m_serial>>1) & 0xff;
-		state->m_read_count = 0;
-		logerror("serial out: %02x\n",state->m_serial_out);
+		m_serial_out = (m_serial>>1) & 0xff;
+		m_read_count = 0;
+		logerror("serial out: %02x\n",m_serial_out);
 	}
 
-	state->m_pntpzl_200000 = data;
+	m_pntpzl_200000 = data;
 }
 
-static WRITE16_HANDLER( pntnpuzl_280018_w )
+WRITE16_MEMBER(pntnpuzl_state::pntnpuzl_280018_w)
 {
-	pntnpuzl_state *state = space->machine().driver_data<pntnpuzl_state>();
-// logerror("%04x: 280018: %04x\n",cpu_get_pc(&space->device()),data);
-	state->m_serial >>= 1;
+// logerror("%04x: 280018: %04x\n",cpu_get_pc(&space.device()),data);
+	m_serial >>= 1;
 	if (data & 0x2000)
-		state->m_serial |= 0x400;
+		m_serial |= 0x400;
 }
 
-static READ16_HANDLER( pntnpuzl_280014_r )
+READ16_MEMBER(pntnpuzl_state::pntnpuzl_280014_r)
 {
-	pntnpuzl_state *state = space->machine().driver_data<pntnpuzl_state>();
 	static const int startup[3] = { 0x80, 0x0c, 0x00 };
 	int res;
 
-	if (state->m_serial_out == 0x11)
+	if (m_serial_out == 0x11)
 	{
-		if (input_port_read(space->machine(), "IN0") & 0x10)
+		if (input_port_read(machine(), "IN0") & 0x10)
 		{
-			state->m_touchscr[0] = 0x1b;
-			state->m_touchscr[2] = BITSWAP8(input_port_read(space->machine(), "TOUCHX"),0,1,2,3,4,5,6,7);
-			state->m_touchscr[4] = BITSWAP8(input_port_read(space->machine(), "TOUCHY"),0,1,2,3,4,5,6,7);
+			m_touchscr[0] = 0x1b;
+			m_touchscr[2] = BITSWAP8(input_port_read(machine(), "TOUCHX"),0,1,2,3,4,5,6,7);
+			m_touchscr[4] = BITSWAP8(input_port_read(machine(), "TOUCHY"),0,1,2,3,4,5,6,7);
 		}
 		else
-			state->m_touchscr[0] = 0;
+			m_touchscr[0] = 0;
 
-		if (state->m_read_count >= 10) state->m_read_count = 0;
-		res = state->m_touchscr[state->m_read_count/2];
-		state->m_read_count++;
+		if (m_read_count >= 10) m_read_count = 0;
+		res = m_touchscr[m_read_count/2];
+		m_read_count++;
 	}
 	else
 	{
-		if (state->m_read_count >= 6) state->m_read_count = 0;
-		res = startup[state->m_read_count/2];
-		state->m_read_count++;
+		if (m_read_count >= 6) m_read_count = 0;
+		res = startup[m_read_count/2];
+		m_read_count++;
 	}
 	logerror("read 280014: %02x\n",res);
 	return res << 8;
 }
 
-static READ16_HANDLER( pntnpuzl_28001a_r )
+READ16_MEMBER(pntnpuzl_state::pntnpuzl_28001a_r)
 {
 	return 0x4c00;
 }
 
-static READ16_HANDLER( irq1_ack_r )
+READ16_MEMBER(pntnpuzl_state::irq1_ack_r)
 {
-//  pntnpuzl_state *state = space->machine().driver_data<pntnpuzl_state>();
-//  device_set_input_line(state->m_maincpu, 1, CLEAR_LINE);
+//  device_set_input_line(m_maincpu, 1, CLEAR_LINE);
 	return 0;
 }
 
-static READ16_HANDLER( irq2_ack_r )
+READ16_MEMBER(pntnpuzl_state::irq2_ack_r)
 {
-//  pntnpuzl_state *state = space->machine().driver_data<pntnpuzl_state>();
-//  device_set_input_line(state->m_maincpu, 2, CLEAR_LINE);
+//  device_set_input_line(m_maincpu, 2, CLEAR_LINE);
 	return 0;
 }
 
-static READ16_HANDLER( irq4_ack_r )
+READ16_MEMBER(pntnpuzl_state::irq4_ack_r)
 {
-//  pntnpuzl_state *state = space->machine().driver_data<pntnpuzl_state>();
-//  device_set_input_line(state->m_maincpu, 4, CLEAR_LINE);
+//  device_set_input_line(m_maincpu, 4, CLEAR_LINE);
 	return 0;
 }
 
 
 static ADDRESS_MAP_START( pntnpuzl_map, AS_PROGRAM, 16, pntnpuzl_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x080000, 0x080001) AM_READ_LEGACY(irq1_ack_r)
-	AM_RANGE(0x100000, 0x100001) AM_READ_LEGACY(irq2_ack_r)
-	AM_RANGE(0x180000, 0x180001) AM_READ_LEGACY(irq4_ack_r)
-	AM_RANGE(0x200000, 0x200001) AM_WRITE_LEGACY(pntnpuzl_200000_w)
+	AM_RANGE(0x080000, 0x080001) AM_READ(irq1_ack_r)
+	AM_RANGE(0x100000, 0x100001) AM_READ(irq2_ack_r)
+	AM_RANGE(0x180000, 0x180001) AM_READ(irq4_ack_r)
+	AM_RANGE(0x200000, 0x200001) AM_WRITE(pntnpuzl_200000_w)
 	AM_RANGE(0x280000, 0x280001) AM_DEVREAD_LEGACY("eeprom", pntnpuzl_eeprom_r)
 	AM_RANGE(0x280002, 0x280003) AM_READ_PORT("IN2")
 	AM_RANGE(0x280000, 0x280001) AM_DEVWRITE_LEGACY("eeprom", pntnpuzl_eeprom_w)
@@ -299,10 +300,10 @@ static ADDRESS_MAP_START( pntnpuzl_map, AS_PROGRAM, 16, pntnpuzl_state )
 	AM_RANGE(0x28000a, 0x28000b) AM_WRITENOP
 	AM_RANGE(0x280010, 0x280011) AM_WRITENOP
 	AM_RANGE(0x280012, 0x280013) AM_WRITENOP
-	AM_RANGE(0x280014, 0x280015) AM_READ_LEGACY(pntnpuzl_280014_r)
+	AM_RANGE(0x280014, 0x280015) AM_READ(pntnpuzl_280014_r)
 	AM_RANGE(0x280016, 0x280017) AM_WRITENOP
-	AM_RANGE(0x280018, 0x280019) AM_WRITE_LEGACY(pntnpuzl_280018_w)
-	AM_RANGE(0x28001a, 0x28001b) AM_READ_LEGACY(pntnpuzl_28001a_r)
+	AM_RANGE(0x280018, 0x280019) AM_WRITE(pntnpuzl_280018_w)
+	AM_RANGE(0x28001a, 0x28001b) AM_READ(pntnpuzl_28001a_r)
 	AM_RANGE(0x28001a, 0x28001b) AM_WRITENOP
 
 	/* standard VGA */
