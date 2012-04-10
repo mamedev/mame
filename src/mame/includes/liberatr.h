@@ -21,6 +21,9 @@ public:
 		  m_bitmapram(*this, "bitmapram"),
 		  m_colorram(*this, "colorram") { }
 
+	void machine_start_liberatr();
+	void video_start_liberatr();
+
 	DECLARE_WRITE8_MEMBER( led_w );
 	DECLARE_WRITE8_MEMBER( coin_counter_w );
 
@@ -35,10 +38,6 @@ public:
 
 protected:
 	struct planet;
-
-	virtual void machine_start();
-
-	virtual void video_start();
 
 	void init_planet(planet &liberatr_planet, UINT8 *planet_rom);
 	void get_pens(pen_t *pens);

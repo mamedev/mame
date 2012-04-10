@@ -148,8 +148,6 @@ void driver_device::driver_start()
 
 void driver_device::machine_start()
 {
-	if (!m_callbacks[CB_MACHINE_START].isnull())
-		m_callbacks[CB_MACHINE_START]();
 }
 
 
@@ -160,8 +158,6 @@ void driver_device::machine_start()
 
 void driver_device::sound_start()
 {
-	if (!m_callbacks[CB_SOUND_START].isnull())
-		m_callbacks[CB_SOUND_START]();
 }
 
 
@@ -172,8 +168,6 @@ void driver_device::sound_start()
 
 void driver_device::video_start()
 {
-	if (!m_callbacks[CB_VIDEO_START].isnull())
-		m_callbacks[CB_VIDEO_START]();
 }
 
 
@@ -194,8 +188,6 @@ void driver_device::driver_reset()
 
 void driver_device::machine_reset()
 {
-	if (!m_callbacks[CB_MACHINE_RESET].isnull())
-		m_callbacks[CB_MACHINE_RESET]();
 }
 
 
@@ -206,8 +198,6 @@ void driver_device::machine_reset()
 
 void driver_device::sound_reset()
 {
-	if (!m_callbacks[CB_SOUND_RESET].isnull())
-		m_callbacks[CB_SOUND_RESET]();
 }
 
 
@@ -218,8 +208,6 @@ void driver_device::sound_reset()
 
 void driver_device::video_reset()
 {
-	if (!m_callbacks[CB_VIDEO_RESET].isnull())
-		m_callbacks[CB_VIDEO_RESET]();
 }
 
 
@@ -276,9 +264,21 @@ void driver_device::device_start()
 
 	// start the various pieces
 	driver_start();
-	machine_start();
-	sound_start();
-	video_start();
+
+	if (!m_callbacks[CB_MACHINE_START].isnull())
+		m_callbacks[CB_MACHINE_START]();
+	else
+		machine_start();
+
+	if (!m_callbacks[CB_SOUND_START].isnull())
+		m_callbacks[CB_SOUND_START]();
+	else
+		sound_start();
+
+	if (!m_callbacks[CB_VIDEO_START].isnull())
+		m_callbacks[CB_VIDEO_START]();
+	else
+		video_start();
 	
 	// save generic states
 	save_item(NAME(m_flip_screen_x));
@@ -296,9 +296,21 @@ void driver_device::device_reset_after_children()
 {
 	// reset each piece
 	driver_reset();
-	machine_reset();
-	sound_reset();
-	video_reset();
+
+	if (!m_callbacks[CB_MACHINE_RESET].isnull())
+		m_callbacks[CB_MACHINE_RESET]();
+	else
+		machine_reset();
+
+	if (!m_callbacks[CB_SOUND_RESET].isnull())
+		m_callbacks[CB_SOUND_RESET]();
+	else
+		sound_reset();
+
+	if (!m_callbacks[CB_VIDEO_RESET].isnull())
+		m_callbacks[CB_VIDEO_RESET]();
+	else
+		video_reset();
 }
 
 
