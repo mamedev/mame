@@ -365,7 +365,7 @@ LIBS += `sdl-config --libs | sed 's/-lSDLmain//'` -lpthread
 DEFS += -DMACOSX_USE_LIBSDL
 endif   # MACOSX_USE_LIBSDL
 
-endif   # Mac OS X
+else   # ifeq ($(TARGETOS),macosx) 
 
 DEFS += -DSDLMAME_UNIX
 DEBUGOBJS = $(SDLOBJ)/debugwin.o $(SDLOBJ)/dview.o $(SDLOBJ)/debug-sup.o $(SDLOBJ)/debug-intf.o
@@ -373,6 +373,28 @@ LIBGL = -lGL
 ifeq ($(NO_X11),1)
 NO_DEBUGGER = 1
 endif
+
+INCPATH += `$(SDL_CONFIG) --cflags  | sed -e 's:/SDL[2]*::' -e 's:\(-D[^ ]*\)::g'`
+CCOMFLAGS += `$(SDL_CONFIG) --cflags  | sed -e 's:/SDL[2]*::' -e 's:\(-I[^ ]*\)::g'`
+LIBS += -lm `$(SDL_CONFIG) --libs`
+
+ifeq ($(SDL_LIBVER),sdl2)
+ifdef SDL_INSTALL_ROOT
+# FIXME: remove the directfb ref. later. This is just there for now to work around an issue with SDL1.3 and SDL2.0
+INCPATH += -I$(SDL_INSTALL_ROOT)/include/directfb
+endif
+endif
+
+INCPATH += `pkg-config --cflags fontconfig`
+LIBS += `pkg-config --libs fontconfig`
+
+ifeq ($(SDL_LIBVER),sdl2)
+LIBS += -lSDL2_ttf -lutil
+else
+LIBS += -lSDL_ttf -lutil
+endif
+
+endif # not Mac OS X
 
 ifneq (,$(findstring ppc,$(UNAME)))
 # override for preprocessor weirdness on PPC Linux
@@ -399,28 +421,6 @@ CCOMFLAGS += -m32
 LDFLAGS += -m32
 endif
 endif
-
-
-INCPATH += `$(SDL_CONFIG) --cflags  | sed -e 's:/SDL[2]*::' -e 's:\(-D[^ ]*\)::g'`
-CCOMFLAGS += `$(SDL_CONFIG) --cflags  | sed -e 's:/SDL[2]*::' -e 's:\(-I[^ ]*\)::g'`
-LIBS += -lm `$(SDL_CONFIG) --libs`
-
-ifeq ($(SDL_LIBVER),sdl2)
-ifdef SDL_INSTALL_ROOT
-# FIXME: remove the directfb ref. later. This is just there for now to work around an issue with SDL1.3 and SDL2.0
-INCPATH += -I$(SDL_INSTALL_ROOT)/include/directfb
-endif
-endif
-
-INCPATH += `pkg-config --cflags fontconfig`
-LIBS += `pkg-config --libs fontconfig`
-
-ifeq ($(SDL_LIBVER),sdl2)
-LIBS += -lSDL2_ttf -lutil
-else
-LIBS += -lSDL_ttf -lutil
-endif
-
 
 endif # Unix
 
