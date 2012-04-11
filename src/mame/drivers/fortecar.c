@@ -354,9 +354,9 @@ static SCREEN_UPDATE_IND16(fortecar)
 		{
 			int tile,color,bpp;
 
-			tile = (state->m_vram.target()[(count*4)+1] | (state->m_vram.target()[(count*4)+2]<<8)) & 0xfff;
-			color = state->m_vram.target()[(count*4)+3] & 0x1f;
-			bpp = (state->m_vram.target()[(count*4)+3] & 0x20) >> 5;
+			tile = (state->m_vram[(count*4)+1] | (state->m_vram[(count*4)+2]<<8)) & 0xfff;
+			color = state->m_vram[(count*4)+3] & 0x1f;
+			bpp = (state->m_vram[(count*4)+3] & 0x20) >> 5;
 
 			if(bpp)
 				color&=0x3;
@@ -673,7 +673,7 @@ static MACHINE_RESET(fortecar)
 
 	/* apparently there's a random fill in there (checked thru trojan TODO: extract proper algorythm) */
 	for(i=0;i<state->m_vram.bytes();i++)
-		state->m_vram.target()[i] = machine.rand();
+		state->m_vram[i] = machine.rand();
 }
 
 

@@ -170,7 +170,7 @@ static SCREEN_UPDATE_RGB32( atarisy4 )
 
 	for (y = cliprect.min_y; y <= cliprect.max_y; ++y)
 	{
-		UINT16 *src = &state->m_screen_ram.target()[(offset + (4096 * y)) / 2];
+		UINT16 *src = &state->m_screen_ram[(offset + (4096 * y)) / 2];
 		UINT32 *dest = &bitmap.pix32(y, cliprect.min_x);
 		int x;
 
@@ -225,14 +225,14 @@ static void image_mem_to_screen(atarisy4_state *state, bool clip)
 			{
 				if (x >= 0 && x <= 511)
 				{
-					UINT16 pix = state->m_screen_ram.target()[xy_to_screen_addr(x,y) >> 1];
+					UINT16 pix = state->m_screen_ram[xy_to_screen_addr(x,y) >> 1];
 
 					if (x & 1)
 						pix = (pix & (0x00ff)) | gpu.idr << 8;
 					else
 						pix = (pix & (0xff00)) | gpu.idr;
 
-					state->m_screen_ram.target()[xy_to_screen_addr(x,y) >> 1] = pix;
+					state->m_screen_ram[xy_to_screen_addr(x,y) >> 1] = pix;
 				}
 				++x;
 			}
@@ -271,7 +271,7 @@ static void draw_polygon(atarisy4_state *state, UINT16 color)
 	clip.set(0, 511, 0, 511);
 
 	extra->color = color;
-	extra->screen_ram = state->m_screen_ram.target();
+	extra->screen_ram = state->m_screen_ram;
 
 	v1.x = gpu.points[0].x;
 	v1.y = gpu.points[0].y;
@@ -373,7 +373,7 @@ void execute_gpu_command(running_machine &machine)
 
 			for (i = 0; i < gpu.gr[3]; ++i)
 			{
-				UINT16 val = state->m_screen_ram.target()[offset >> 1];
+				UINT16 val = state->m_screen_ram[offset >> 1];
 				val >>= (~offset & 1) << 3;
 
 				if (gpu.gr[4] & 0x10)

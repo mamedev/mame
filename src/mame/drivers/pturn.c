@@ -128,7 +128,7 @@ static const UINT8 tile_lookup[0x10]=
 static TILE_GET_INFO( get_pturn_tile_info )
 {
 	pturn_state *state = machine.driver_data<pturn_state>();
-	UINT8 *videoram = state->m_videoram.target();
+	UINT8 *videoram = state->m_videoram;
 	int tileno;
 	tileno = videoram[tile_index];
 
@@ -164,7 +164,7 @@ static VIDEO_START(pturn)
 static SCREEN_UPDATE_IND16(pturn)
 {
 	pturn_state *state = screen.machine().driver_data<pturn_state>();
-	UINT8 *spriteram = state->m_spriteram.target();
+	UINT8 *spriteram = state->m_spriteram;
 	int offs;
 	int sx, sy;
 	int flipx, flipy;
@@ -219,7 +219,7 @@ READ8_MEMBER(pturn_state::pturn_protection2_r)
 
 WRITE8_MEMBER(pturn_state::pturn_videoram_w)
 {
-	UINT8 *videoram = m_videoram.target();
+	UINT8 *videoram = m_videoram;
 	videoram[offset]=data;
 	m_fgmap->mark_tile_dirty(offset);
 }

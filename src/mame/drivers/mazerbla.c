@@ -395,13 +395,13 @@ READ8_MEMBER(mazerbla_state::vcu_set_cmd_param_r)
 	m_vcu_gfx_param_addr = offset;
 
 	/* offset  = 0 is not known */
-	m_xpos      = m_cfb_ram.target()[m_vcu_gfx_param_addr + 1] | (m_cfb_ram.target()[m_vcu_gfx_param_addr + 2]<<8);
-	m_ypos      = m_cfb_ram.target()[m_vcu_gfx_param_addr + 3] | (m_cfb_ram.target()[m_vcu_gfx_param_addr + 4]<<8);
-	m_color1    = m_cfb_ram.target()[m_vcu_gfx_param_addr + 5];
-	m_color2    = m_cfb_ram.target()[m_vcu_gfx_param_addr + 6];
-	m_mode      = m_cfb_ram.target()[m_vcu_gfx_param_addr + 7];
-	m_pix_xsize = m_cfb_ram.target()[m_vcu_gfx_param_addr + 8];
-	m_pix_ysize = m_cfb_ram.target()[m_vcu_gfx_param_addr + 9];
+	m_xpos      = m_cfb_ram[m_vcu_gfx_param_addr + 1] | (m_cfb_ram[m_vcu_gfx_param_addr + 2]<<8);
+	m_ypos      = m_cfb_ram[m_vcu_gfx_param_addr + 3] | (m_cfb_ram[m_vcu_gfx_param_addr + 4]<<8);
+	m_color1    = m_cfb_ram[m_vcu_gfx_param_addr + 5];
+	m_color2    = m_cfb_ram[m_vcu_gfx_param_addr + 6];
+	m_mode      = m_cfb_ram[m_vcu_gfx_param_addr + 7];
+	m_pix_xsize = m_cfb_ram[m_vcu_gfx_param_addr + 8];
+	m_pix_ysize = m_cfb_ram[m_vcu_gfx_param_addr + 9];
 
 	m_plane = m_mode & 3;
 
@@ -428,7 +428,7 @@ READ8_MEMBER(mazerbla_state::vcu_set_gfx_addr_r)
         logerror("paradr=");
         logerror("%3x ", m_vcu_gfx_param_addr );
 
-        logerror("%02x ", m_cfb_ram.target()[vcu_gfx_param_addr + 0] );
+        logerror("%02x ", m_cfb_ram[vcu_gfx_param_addr + 0] );
         logerror("x=%04x ", m_xpos );                 //1,2
         logerror("y=%04x ", m_ypos );                 //3,4
         logerror("color1=%02x ", m_color1);             //5
@@ -571,7 +571,7 @@ READ8_MEMBER(mazerbla_state::vcu_set_clr_addr_r)
         logerror("paladr=");
         logerror("%3x ", m_vcu_gfx_param_addr );
 
-        logerror("%02x ", m_cfb_ram.target()[m_vcu_gfx_param_addr + 0] );
+        logerror("%02x ", m_cfb_ram[m_vcu_gfx_param_addr + 0] );
         logerror("x=%04x ", m_xpos );                 //1,2
         logerror("y=%04x ", m_ypos );                 //3,4
         logerror("color1=%02x ", m_color1);             //5
@@ -587,7 +587,7 @@ READ8_MEMBER(mazerbla_state::vcu_set_clr_addr_r)
             logerror("%04x: ", offset + y * 16);
             for (x = 0; x < 16; x++)
             {
-                logerror("%02x ", m_cfb_ram.target()[offset + x + y * 16]);
+                logerror("%02x ", m_cfb_ram[offset + x + y * 16]);
             }
             logerror("\n");
         }
@@ -664,7 +664,7 @@ READ8_MEMBER(mazerbla_state::vcu_set_clr_addr_r)
 				{
 					for (x = 0; x < 16; x++)
 					{
-						UINT8 colour = m_cfb_ram.target()[offs + x + y * 16];
+						UINT8 colour = m_cfb_ram[offs + x + y * 16];
 
 						/* red component */
 						bit1 = (colour >> 7) & 0x01;
@@ -699,7 +699,7 @@ READ8_MEMBER(mazerbla_state::vcu_set_clr_addr_r)
 				{
 					for (x = 0; x < 16; x++)
 					{
-						UINT8 dat = m_cfb_ram.target()[offs + x + y * 16];
+						UINT8 dat = m_cfb_ram[offs + x + y * 16];
 						m_lookup_ram[lookup_offs + x + y * 16] = dat;
 					}
 				}
@@ -713,7 +713,7 @@ READ8_MEMBER(mazerbla_state::vcu_set_clr_addr_r)
 				{
 					for (x = 0; x < 16; x++)
 					{
-						UINT8 dat = m_cfb_ram.target()[offs + x + y * 16];
+						UINT8 dat = m_cfb_ram[offs + x + y * 16];
 						m_lookup_ram[lookup_offs + x + y * 16] = dat;
 					}
 				}
@@ -727,7 +727,7 @@ READ8_MEMBER(mazerbla_state::vcu_set_clr_addr_r)
 				{
 					for (x = 0; x < 16; x++)
 					{
-						UINT8 dat = m_cfb_ram.target()[offs + x + y * 16];
+						UINT8 dat = m_cfb_ram[offs + x + y * 16];
 						m_lookup_ram[lookup_offs + x + y * 16] = dat;
 					}
 				}

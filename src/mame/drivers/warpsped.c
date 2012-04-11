@@ -112,7 +112,7 @@ static TILE_GET_INFO( get_warpspeed_text_tile_info )
 {
 	warpspeed_state *state = machine.driver_data<warpspeed_state>();
 
-	UINT8 code = state->m_videoram.target()[tile_index] & 0x3f;
+	UINT8 code = state->m_videoram[tile_index] & 0x3f;
 	SET_TILE_INFO(0, code, 0, 0);
 }
 
@@ -129,7 +129,7 @@ static TILE_GET_INFO( get_warpspeed_starfield_tile_info )
 WRITE8_MEMBER(warpspeed_state::warpspeed_vidram_w)
 {
 
-	m_videoram.target()[offset] = data;
+	m_videoram[offset] = data;
 	m_text_tilemap->mark_tile_dirty(offset);
 }
 

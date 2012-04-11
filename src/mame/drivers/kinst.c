@@ -176,9 +176,9 @@ static MACHINE_START( kinst )
 	mips3drc_set_options(machine.device("maincpu"), MIPS3DRC_FASTEST_OPTIONS);
 
 	/* configure fast RAM regions for DRC */
-	mips3drc_add_fastram(machine.device("maincpu"), 0x08000000, 0x087fffff, FALSE, state->m_rambase2.target());
-	mips3drc_add_fastram(machine.device("maincpu"), 0x00000000, 0x0007ffff, FALSE, state->m_rambase.target());
-	mips3drc_add_fastram(machine.device("maincpu"), 0x1fc00000, 0x1fc7ffff, TRUE,  state->m_rombase.target());
+	mips3drc_add_fastram(machine.device("maincpu"), 0x08000000, 0x087fffff, FALSE, state->m_rambase2);
+	mips3drc_add_fastram(machine.device("maincpu"), 0x00000000, 0x0007ffff, FALSE, state->m_rambase);
+	mips3drc_add_fastram(machine.device("maincpu"), 0x1fc00000, 0x1fc7ffff, TRUE,  state->m_rombase);
 }
 
 
@@ -225,7 +225,7 @@ static MACHINE_RESET( kinst )
 	}
 
 	/* set a safe base location for video */
-	state->m_video_base = &state->m_rambase.target()[0x30000/4];
+	state->m_video_base = &state->m_rambase[0x30000/4];
 }
 
 
@@ -333,7 +333,7 @@ READ32_MEMBER(kinst_state::kinst_control_r)
 
 	/* apply shuffling */
 	offset = m_control_map[offset / 2];
-	result = m_control.target()[offset];
+	result = m_control[offset];
 
 	switch (offset)
 	{
@@ -367,16 +367,16 @@ WRITE32_MEMBER(kinst_state::kinst_control_w)
 
 	/* apply shuffling */
 	offset = m_control_map[offset / 2];
-	olddata = m_control.target()[offset];
-	COMBINE_DATA(&m_control.target()[offset]);
+	olddata = m_control[offset];
+	COMBINE_DATA(&m_control[offset]);
 
 	switch (offset)
 	{
 		case 0:		/* $80 - VRAM buffer control */
 			if (data & 4)
-				m_video_base = &m_rambase.target()[0x58000/4];
+				m_video_base = &m_rambase[0x58000/4];
 			else
-				m_video_base = &m_rambase.target()[0x30000/4];
+				m_video_base = &m_rambase[0x30000/4];
 			break;
 
 		case 1:		/* $88 - sound reset */
@@ -384,8 +384,8 @@ WRITE32_MEMBER(kinst_state::kinst_control_w)
 			break;
 
 		case 2:		/* $90 - sound control */
-			if (!(olddata & 0x02) && (m_control.target()[offset] & 0x02))
-				dcs_data_w(machine(), m_control.target()[3]);
+			if (!(olddata & 0x02) && (m_control[offset] & 0x02))
+				dcs_data_w(machine(), m_control[3]);
 			break;
 
 		case 3:		/* $98 - sound data */

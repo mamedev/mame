@@ -496,7 +496,7 @@ static INTERRUPT_GEN( vblank_irq )
 	imolagp_state *state = device->machine().driver_data<imolagp_state>();
 
 #ifdef HLE_COM
-	memcpy(&state->m_slave_workram.target()[0x80], state->m_mComData, state->m_mComCount);
+	memcpy(&state->m_slave_workram[0x80], state->m_mComData, state->m_mComCount);
 	state->m_mComCount = 0;
 #endif
 	device_set_input_line(device, 0, HOLD_LINE);

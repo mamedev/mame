@@ -41,8 +41,8 @@ public:
 static TILE_GET_INFO( get_tile_info_fg )
 {
 	drtomy_state *state = machine.driver_data<drtomy_state>();
-	int code  = state->m_videoram_fg.target()[tile_index] & 0xfff;
-	int color = (state->m_videoram_fg.target()[tile_index] & 0xf000) >> 12;
+	int code  = state->m_videoram_fg[tile_index] & 0xfff;
+	int color = (state->m_videoram_fg[tile_index] & 0xf000) >> 12;
 	SET_TILE_INFO(2, code, color, 0);
 }
 
@@ -50,8 +50,8 @@ static TILE_GET_INFO( get_tile_info_fg )
 static TILE_GET_INFO( get_tile_info_bg )
 {
 	drtomy_state *state = machine.driver_data<drtomy_state>();
-	int code  = state->m_videoram_bg.target()[tile_index] & 0xfff;
-	int color = (state->m_videoram_bg.target()[tile_index] & 0xf000) >> 12;
+	int code  = state->m_videoram_bg[tile_index] & 0xfff;
+	int color = (state->m_videoram_bg[tile_index] & 0xf000) >> 12;
 	SET_TILE_INFO(1, code, color, 0);
 }
 
@@ -84,11 +84,11 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 
 	for (i = 3; i < 0x1000 / 2; i += 4)
 	{
-		int sx = state->m_spriteram.target()[i + 2] & 0x01ff;
-		int sy = (240 - (state->m_spriteram.target()[i] & 0x00ff)) & 0x00ff;
-		int number = state->m_spriteram.target()[i + 3];
-		int color = (state->m_spriteram.target()[i + 2] & 0x1e00) >> 9;
-		int attr = (state->m_spriteram.target()[i] & 0xfe00) >> 9;
+		int sx = state->m_spriteram[i + 2] & 0x01ff;
+		int sy = (240 - (state->m_spriteram[i] & 0x00ff)) & 0x00ff;
+		int number = state->m_spriteram[i + 3];
+		int color = (state->m_spriteram[i + 2] & 0x1e00) >> 9;
+		int attr = (state->m_spriteram[i] & 0xfe00) >> 9;
 
 		int xflip = attr & 0x20;
 		int yflip = attr & 0x40;
@@ -140,13 +140,13 @@ static SCREEN_UPDATE_IND16( drtomy )
 
 WRITE16_MEMBER(drtomy_state::drtomy_vram_fg_w)
 {
-	COMBINE_DATA(&m_videoram_fg.target()[offset]);
+	COMBINE_DATA(&m_videoram_fg[offset]);
 	m_tilemap_fg->mark_tile_dirty(offset);
 }
 
 WRITE16_MEMBER(drtomy_state::drtomy_vram_bg_w)
 {
-	COMBINE_DATA(&m_videoram_bg.target()[offset]);
+	COMBINE_DATA(&m_videoram_bg[offset]);
 	m_tilemap_bg->mark_tile_dirty(offset);
 }
 

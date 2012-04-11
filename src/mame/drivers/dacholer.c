@@ -88,13 +88,13 @@ public:
 static TILE_GET_INFO( get_bg_tile_info )
 {
 	dacholer_state *state = machine.driver_data<dacholer_state>();
-	SET_TILE_INFO(1, state->m_bgvideoram.target()[tile_index] + state->m_bg_bank * 0x100, 0, 0);
+	SET_TILE_INFO(1, state->m_bgvideoram[tile_index] + state->m_bg_bank * 0x100, 0, 0);
 }
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
 	dacholer_state *state = machine.driver_data<dacholer_state>();
-	SET_TILE_INFO(0, state->m_fgvideoram.target()[tile_index], 0, 0);
+	SET_TILE_INFO(0, state->m_fgvideoram[tile_index], 0, 0);
 }
 
 static VIDEO_START( dacholer )
@@ -123,14 +123,14 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 
 	for (offs = 0; offs < state->m_spriteram.bytes(); offs += 4)
 	{
-		code = state->m_spriteram.target()[offs + 1];
-		attr = state->m_spriteram.target()[offs + 2];
+		code = state->m_spriteram[offs + 1];
+		attr = state->m_spriteram[offs + 2];
 
 		flipx = attr & 0x10;
 		flipy = attr & 0x20;
 
-		sx = (state->m_spriteram.target()[offs + 3] - 128) + 256 * (attr & 0x01);
-		sy = 255 - state->m_spriteram.target()[offs];
+		sx = (state->m_spriteram[offs + 3] - 128) + 256 * (attr & 0x01);
+		sy = 255 - state->m_spriteram[offs];
 
 		if (state->flip_screen())
 		{
@@ -171,13 +171,13 @@ static SCREEN_UPDATE_IND16(dacholer)
 
 WRITE8_MEMBER(dacholer_state::background_w)
 {
-	m_bgvideoram.target()[offset] = data;
+	m_bgvideoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(dacholer_state::foreground_w)
 {
-	m_fgvideoram.target()[offset] = data;
+	m_fgvideoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 

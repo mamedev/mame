@@ -109,8 +109,8 @@ static TILE_GET_INFO( m14_get_tile_info )
 {
 	m14_state *state = machine.driver_data<m14_state>();
 
-	int code = state->m_video_ram.target()[tile_index];
-	int color = state->m_color_ram.target()[tile_index] & 0x0f;
+	int code = state->m_video_ram[tile_index];
+	int color = state->m_color_ram[tile_index] & 0x0f;
 
 	/* colorram & 0xf0 used but unknown purpose*/
 
@@ -140,14 +140,14 @@ static SCREEN_UPDATE_IND16( m14 )
 WRITE8_MEMBER(m14_state::m14_vram_w)
 {
 
-	m_video_ram.target()[offset] = data;
+	m_video_ram[offset] = data;
 	m_m14_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(m14_state::m14_cram_w)
 {
 
-	m_color_ram.target()[offset] = data;
+	m_color_ram[offset] = data;
 	m_m14_tilemap->mark_tile_dirty(offset);
 }
 

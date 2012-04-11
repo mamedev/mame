@@ -44,8 +44,8 @@ static SCREEN_UPDATE_IND16( mosaicf2 )
 
 		if ((x < 0xa0) && (y < 0xe0))
 		{
-			bitmap.pix16(y, (x * 2) + 0) = (state->m_videoram.target()[offs] >> 16) & 0x7fff;
-			bitmap.pix16(y, (x * 2) + 1) = (state->m_videoram.target()[offs] >>  0) & 0x7fff;
+			bitmap.pix16(y, (x * 2) + 0) = (state->m_videoram[offs] >> 16) & 0x7fff;
+			bitmap.pix16(y, (x * 2) + 1) = (state->m_videoram[offs] >>  0) & 0x7fff;
 		}
 	}
 

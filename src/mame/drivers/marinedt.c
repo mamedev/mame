@@ -153,7 +153,7 @@ public:
 WRITE8_MEMBER(marinedt_state::tx_tileram_w)
 {
 
-	m_tx_tileram.target()[offset] = data;
+	m_tx_tileram[offset] = data;
 	m_tx_tilemap->mark_tile_dirty(offset);
 }
 
@@ -479,7 +479,7 @@ bit0 = 0;
 static TILE_GET_INFO( get_tile_info )
 {
 	marinedt_state *state = machine.driver_data<marinedt_state>();
-	int code = state->m_tx_tileram.target()[tile_index];
+	int code = state->m_tx_tileram[tile_index];
 	int color = 0;
 	int flags = TILE_FLIPX;
 

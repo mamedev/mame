@@ -152,7 +152,7 @@ static SCREEN_UPDATE_IND16(gamecstl)
 	gamecstl_state *state = screen.machine().driver_data<gamecstl_state>();
 	int i, j;
 	const gfx_element *gfx = screen.machine().gfx[0];
-	UINT32 *cga = state->m_cga_ram.target();
+	UINT32 *cga = state->m_cga_ram;
 	int index = 0;
 
 	bitmap.fill(0, cliprect);

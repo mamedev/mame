@@ -74,8 +74,8 @@ public:
 static TILE_GET_INFO( y_get_bg_tile_info )
 {
 	albazg_state *state = machine.driver_data<albazg_state>();
-	int code = state->m_videoram.target()[tile_index];
-	int color = state->m_colorram.target()[tile_index];
+	int code = state->m_videoram[tile_index];
+	int color = state->m_colorram[tile_index];
 
 	SET_TILE_INFO(
 			0,
@@ -118,13 +118,13 @@ GFXDECODE_END
 
 WRITE8_MEMBER(albazg_state::yumefuda_vram_w)
 {
-	m_videoram.target()[offset] = data;
+	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(albazg_state::yumefuda_cram_w)
 {
-	m_colorram.target()[offset] = data;
+	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
@@ -132,14 +132,14 @@ WRITE8_MEMBER(albazg_state::yumefuda_cram_w)
 READ8_MEMBER(albazg_state::custom_ram_r)
 {
 //  logerror("Custom RAM read at %02x PC = %x\n", offset + 0xaf80, cpu_get_pc(&space.device()));
-	return m_cus_ram.target()[offset];// ^ 0x55;
+	return m_cus_ram[offset];// ^ 0x55;
 }
 
 WRITE8_MEMBER(albazg_state::custom_ram_w)
 {
 //  logerror("Custom RAM write at %02x : %02x PC = %x\n", offset + 0xaf80, data, cpu_get_pc(&space.device()));
 	if(m_prot_lock)
-		m_cus_ram.target()[offset] = data;
+		m_cus_ram[offset] = data;
 }
 
 /*this might be used as NVRAM commands btw*/

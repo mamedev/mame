@@ -249,7 +249,7 @@ static SCREEN_UPDATE_IND16( igs011 )
 	}
 #endif
 
-	pri_ram = &state->m_priority_ram.target()[(state->m_priority & 7) * 512/2];
+	pri_ram = &state->m_priority_ram[(state->m_priority & 7) * 512/2];
 
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
@@ -2407,8 +2407,8 @@ static SCREEN_VBLANK( vbowl )
 	if (vblank_on)
 	{
 		igs011_state *state = screen.machine().driver_data<igs011_state>();
-		state->m_vbowl_trackball.target()[0] = state->m_vbowl_trackball.target()[1];
-		state->m_vbowl_trackball.target()[1] = (input_port_read(screen.machine(), "AN1") << 8) | input_port_read(screen.machine(), "AN0");
+		state->m_vbowl_trackball[0] = state->m_vbowl_trackball[1];
+		state->m_vbowl_trackball[1] = (input_port_read(screen.machine(), "AN1") << 8) | input_port_read(screen.machine(), "AN0");
 	}
 }
 

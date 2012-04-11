@@ -41,8 +41,8 @@ static TILE_GET_INFO( get_ltcasino_tile_info )
 	ltcasino_state *state = machine.driver_data<ltcasino_state>();
 	int tileno, colour;
 
-	tileno = state->m_tile_num_ram.target()[tile_index];
-	colour = state->m_tile_atr_ram.target()[tile_index];
+	tileno = state->m_tile_num_ram[tile_index];
+	colour = state->m_tile_atr_ram[tile_index];
 
 	tileno += (colour & 0x80) << 1;
 
@@ -58,13 +58,13 @@ static VIDEO_START(ltcasino)
 
 WRITE8_MEMBER(ltcasino_state::ltcasino_tile_num_w)
 {
-	m_tile_num_ram.target()[offset] = data;
+	m_tile_num_ram[offset] = data;
 	m_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(ltcasino_state::ltcasino_tile_atr_w)
 {
-	m_tile_atr_ram.target()[offset] = data;
+	m_tile_atr_ram[offset] = data;
 	m_tilemap->mark_tile_dirty(offset);
 }
 

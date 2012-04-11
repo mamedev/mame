@@ -418,7 +418,7 @@ DIRECT_UPDATE_HANDLER( vcombat_vid_0_direct_handler )
 	vcombat_state *state = machine.driver_data<vcombat_state>();
 	if (address >= 0xfffc0000 && address <= 0xffffffff)
 	{
-		direct.explicit_configure(0xfffc0000, 0xffffffff, 0x3ffff, state->m_vid_0_shared_RAM.target());
+		direct.explicit_configure(0xfffc0000, 0xffffffff, 0x3ffff, state->m_vid_0_shared_RAM);
 		return ~0;
 	}
 	return address;
@@ -429,7 +429,7 @@ DIRECT_UPDATE_HANDLER( vcombat_vid_1_direct_handler )
 	vcombat_state *state = machine.driver_data<vcombat_state>();
 	if (address >= 0xfffc0000 && address <= 0xffffffff)
 	{
-		direct.explicit_configure(0xfffc0000, 0xffffffff, 0x3ffff, state->m_vid_1_shared_RAM.target());
+		direct.explicit_configure(0xfffc0000, 0xffffffff, 0x3ffff, state->m_vid_1_shared_RAM);
 		return ~0;
 	}
 	return address;

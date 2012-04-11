@@ -82,7 +82,7 @@ static SCREEN_UPDATE_IND16(intrscti)
 		for (x=0;x<32;x++)
 		{
 			int dat;
-			dat = state->m_ram.target()[count];
+			dat = state->m_ram[count];
 			drawgfx_transpen(bitmap,cliprect,screen.machine().gfx[0],dat/*+0x100*/,0,0,0,x*8,y*8,0);
 			count++;
 		}

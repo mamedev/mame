@@ -389,7 +389,7 @@ static MACHINE_CONFIG_START( liberatr, liberatr_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK/16) /* 1.25Mhz divided from 20Mhz master clock */
 	MCFG_CPU_PROGRAM_MAP(liberatr_map)
-	MCFG_CPU_PERIODIC_INT(irq0_line_hold,4*60)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(driver_device,irq0_line_hold,4*60)
 
 	MCFG_ER2055_ADD("earom")
 	

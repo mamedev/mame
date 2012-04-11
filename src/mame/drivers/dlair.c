@@ -225,7 +225,7 @@ static PALETTE_INIT( dleuro )
 static SCREEN_UPDATE_IND16( dleuro )
 {
 	dlair_state *state = screen.machine().driver_data<dlair_state>();
-	UINT8 *videoram = state->m_videoram.target();
+	UINT8 *videoram = state->m_videoram;
 	int x, y;
 
 	/* redraw the overlay */

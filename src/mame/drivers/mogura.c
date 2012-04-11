@@ -65,8 +65,8 @@ static PALETTE_INIT( mogura )
 static TILE_GET_INFO( get_mogura_tile_info )
 {
 	mogura_state *state = machine.driver_data<mogura_state>();
-	int code = state->m_tileram.target()[tile_index];
-	int attr = state->m_tileram.target()[tile_index + 0x800];
+	int code = state->m_tileram[tile_index];
+	int attr = state->m_tileram[tile_index + 0x800];
 
 	SET_TILE_INFO(
 			0,
@@ -79,7 +79,7 @@ static TILE_GET_INFO( get_mogura_tile_info )
 static VIDEO_START( mogura )
 {
 	mogura_state *state = machine.driver_data<mogura_state>();
-	gfx_element_set_source(machine.gfx[0], state->m_gfxram.target());
+	gfx_element_set_source(machine.gfx[0], state->m_gfxram);
 	state->m_tilemap = tilemap_create(machine, get_mogura_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
 }
 
@@ -104,7 +104,7 @@ static SCREEN_UPDATE_IND16( mogura )
 
 WRITE8_MEMBER(mogura_state::mogura_tileram_w)
 {
-	m_tileram.target()[offset] = data;
+	m_tileram[offset] = data;
 	m_tilemap->mark_tile_dirty(offset & 0x7ff);
 }
 
@@ -117,7 +117,7 @@ WRITE8_MEMBER(mogura_state::mogura_dac_w)
 
 WRITE8_MEMBER(mogura_state::mogura_gfxram_w)
 {
-	m_gfxram.target()[offset] = data ;
+	m_gfxram[offset] = data ;
 
 	gfx_element_mark_dirty(machine().gfx[0], offset / 16);
 }

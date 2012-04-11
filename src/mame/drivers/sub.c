@@ -149,12 +149,12 @@ static SCREEN_UPDATE_IND16(sub)
 	{
 		for (x=0;x<32;x++)
 		{
-			UINT16 tile = state->m_vid.target()[count];
+			UINT16 tile = state->m_vid[count];
 			UINT8 col;
-			UINT8 y_offs = state->m_scrolly.target()[x];
+			UINT8 y_offs = state->m_scrolly[x];
 
-			tile += (state->m_attr.target()[count]&0xe0)<<3;
-			col = (state->m_attr.target()[count]&0x1f);
+			tile += (state->m_attr[count]&0xe0)<<3;
+			col = (state->m_attr[count]&0x1f);
 
 			drawgfx_opaque(bitmap,cliprect,gfx,tile,col+0x40,0,0,x*8,(y*8)-y_offs);
 			drawgfx_opaque(bitmap,cliprect,gfx,tile,col+0x40,0,0,x*8,(y*8)-y_offs+256);
@@ -175,8 +175,8 @@ static SCREEN_UPDATE_IND16(sub)
     1 --cc cccc color
     */
 	{
-		UINT8 *spriteram = state->m_spriteram.target();
-		UINT8 *spriteram_2 = state->m_spriteram2.target();
+		UINT8 *spriteram = state->m_spriteram;
+		UINT8 *spriteram_2 = state->m_spriteram2;
 		UINT8 x,y,spr_offs,i,col,fx,fy;
 
 		for(i=0;i<0x40;i+=2)
@@ -200,12 +200,12 @@ static SCREEN_UPDATE_IND16(sub)
 	{
 		for (x=0;x<32;x++)
 		{
-			UINT16 tile = state->m_vid.target()[count];
+			UINT16 tile = state->m_vid[count];
 			UINT8 col;
-			UINT8 y_offs = state->m_scrolly.target()[x];
+			UINT8 y_offs = state->m_scrolly[x];
 
-			tile += (state->m_attr.target()[count]&0xe0)<<3;
-			col = (state->m_attr.target()[count]&0x1f);
+			tile += (state->m_attr[count]&0xe0)<<3;
+			col = (state->m_attr[count]&0x1f);
 
 			if(x >= 28)
 			{

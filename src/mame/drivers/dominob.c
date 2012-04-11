@@ -100,21 +100,21 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	{
 		int sx, sy, code;
 
-		sx = state->m_spriteram.target()[offs];
-		sy = 248 - state->m_spriteram.target()[offs + 1];
+		sx = state->m_spriteram[offs];
+		sy = 248 - state->m_spriteram[offs + 1];
 		if (state->flip_screen_x()) sx = 248 - sx;
 		if (state->flip_screen_y()) sy = 248 - sy;
 
-		code = state->m_spriteram.target()[offs + 3] + ((state->m_spriteram.target()[offs + 2] & 0x03) << 8)  ;
+		code = state->m_spriteram[offs + 3] + ((state->m_spriteram[offs + 2] & 0x03) << 8)  ;
 
 		drawgfx_transpen(bitmap,cliprect,machine.gfx[0],
 				2 * code,
-				((state->m_spriteram.target()[offs + 2] & 0xf8) >> 3)  ,
+				((state->m_spriteram[offs + 2] & 0xf8) >> 3)  ,
 				state->flip_screen_x(),state->flip_screen_y(),
 				sx,sy + (state->flip_screen_y() ? 8 : -8),0);
 		drawgfx_transpen(bitmap,cliprect,machine.gfx[0],
 				2 * code + 1,
-				((state->m_spriteram.target()[offs + 2] & 0xf8) >> 3)  ,
+				((state->m_spriteram[offs + 2] & 0xf8) >> 3)  ,
 				state->flip_screen_x(),state->flip_screen_y(),
 				sx,sy,0);
 	}
@@ -135,8 +135,8 @@ static SCREEN_UPDATE_IND16( dominob )
 			drawgfx_opaque(bitmap,
 					cliprect,
 					screen.machine().gfx[1],
-					state->m_bgram.target()[index] + 256 * (state->m_bgram.target()[index + 1] & 0xf),
-					state->m_bgram.target()[index + 1] >> 4,
+					state->m_bgram[index] + 256 * (state->m_bgram[index + 1] & 0xf),
+					state->m_bgram[index + 1] >> 4,
 					0, 0,
 					x * 32, y * 32);
 			index += 2;
@@ -150,8 +150,8 @@ static SCREEN_UPDATE_IND16( dominob )
 			drawgfx_transpen(	bitmap,
 					cliprect,
 					screen.machine().gfx[0],
-					state->m_videoram.target()[(y * 32 + x) * 2 + 1] + (state->m_videoram.target()[(y * 32 + x) * 2] & 7) * 256,
-					(state->m_videoram.target()[(y * 32 + x) * 2] >> 3),
+					state->m_videoram[(y * 32 + x) * 2 + 1] + (state->m_videoram[(y * 32 + x) * 2] & 7) * 256,
+					(state->m_videoram[(y * 32 + x) * 2] >> 3),
 					0, 0,
 					x * 8, y * 8,0);
 		}

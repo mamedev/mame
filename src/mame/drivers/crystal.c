@@ -626,7 +626,7 @@ static MACHINE_RESET( crystal )
 		state->m_Timer[i]->adjust(attotime::never);
 	}
 
-	vr0_snd_set_areas(machine.device("vrender"), state->m_textureram, state->m_frameram.target());
+	vr0_snd_set_areas(machine.device("vrender"), state->m_textureram, state->m_frameram);
 #ifdef IDLE_LOOP_SPEEDUP
 	state->m_FlipCntRead = 0;
 #endif
@@ -672,7 +672,8 @@ static SCREEN_UPDATE_IND16( crystal )
 	}
 
 	Visible  = (UINT16*) Front;
-	DrawDest = (UINT16 *) state->m_frameram.target();
+	// ERROR: This cast is NOT endian-safe without the use of BYTE/WORD/DWORD_XOR_* macros!
+	DrawDest = reinterpret_cast<UINT16 *>(state->m_frameram.target());
 
 
 	if (GetVidReg(space, 0x8c) & 0x80)
@@ -689,7 +690,8 @@ static SCREEN_UPDATE_IND16( crystal )
 	tail = GetVidReg(space, 0x80);
 	while ((head & 0x7ff) != (tail & 0x7ff))
 	{
-		DoFlip = vrender0_ProcessPacket(state->m_vr0video, 0x03800000 + head * 64, DrawDest, (UINT8*)state->m_textureram.target());
+		// ERROR: This cast is NOT endian-safe without the use of BYTE/WORD/DWORD_XOR_* macros!
+		DoFlip = vrender0_ProcessPacket(state->m_vr0video, 0x03800000 + head * 64, DrawDest, reinterpret_cast<UINT8*>(state->m_textureram.target()));
 		head++;
 		head &= 0x7ff;
 		if (DoFlip)

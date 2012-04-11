@@ -145,7 +145,7 @@ public:
 
 WRITE8_MEMBER(jollyjgr_state::jollyjgr_videoram_w)
 {
-	m_videoram.target()[offset] = data;
+	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
@@ -165,7 +165,7 @@ WRITE8_MEMBER(jollyjgr_state::jollyjgr_attrram_w)
 		m_bg_tilemap->set_scrolly(offset >> 1, data);
 	}
 
-	m_colorram.target()[offset] = data;
+	m_colorram[offset] = data;
 }
 
 WRITE8_MEMBER(jollyjgr_state::jollyjgr_misc_w)
@@ -437,9 +437,9 @@ static PALETTE_INIT( jollyjgr )
 static TILE_GET_INFO( get_bg_tile_info )
 {
 	jollyjgr_state *state = machine.driver_data<jollyjgr_state>();
-	int color = state->m_colorram.target()[((tile_index & 0x1f) << 1) | 1] & 7;
+	int color = state->m_colorram[((tile_index & 0x1f) << 1) | 1] & 7;
 	int region = (state->m_tilemap_bank & 0x20) ? 2 : 0;
-	SET_TILE_INFO(region, state->m_videoram.target()[tile_index], color, 0);
+	SET_TILE_INFO(region, state->m_videoram[tile_index], color, 0);
 }
 
 static VIDEO_START( jollyjgr )
@@ -465,9 +465,9 @@ static void draw_bitmap( running_machine &machine, bitmap_ind16 &bitmap )
 		{
 			for(i = 0; i < 8; i++)
 			{
-				bit0 = (state->m_bitmap.target()[count] >> i) & 1;
-				bit1 = (state->m_bitmap.target()[count + 0x2000] >> i) & 1;
-				bit2 = (state->m_bitmap.target()[count + 0x4000] >> i) & 1;
+				bit0 = (state->m_bitmap[count] >> i) & 1;
+				bit1 = (state->m_bitmap[count + 0x2000] >> i) & 1;
+				bit2 = (state->m_bitmap[count + 0x4000] >> i) & 1;
 				color = bit0 | (bit1 << 1) | (bit2 << 2);
 
 				if(color)
@@ -491,7 +491,7 @@ static void draw_bitmap( running_machine &machine, bitmap_ind16 &bitmap )
 static SCREEN_UPDATE_IND16( jollyjgr )
 {
 	jollyjgr_state *state = screen.machine().driver_data<jollyjgr_state>();
-	UINT8 *spriteram = state->m_spriteram.target();
+	UINT8 *spriteram = state->m_spriteram;
 	int offs;
 
 	bitmap.fill(32, cliprect);
@@ -556,8 +556,8 @@ static SCREEN_UPDATE_IND16( fspider )
     Assume bullets to look the same as on Galaxian hw,
     that is, simply 4 pixels. Colours are unknown. */
 	for (int offs=0;offs<0x10;offs+=2) {
-		UINT8 sy=~state->m_bulletram.target()[offs];
-		UINT8 sx=~state->m_bulletram.target()[offs|1];
+		UINT8 sy=~state->m_bulletram[offs];
+		UINT8 sx=~state->m_bulletram[offs|1];
 		UINT16 bc=(offs<4)?
 			32+7: // player, white
 			32+3; // enemy, yellow

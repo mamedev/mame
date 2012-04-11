@@ -494,7 +494,7 @@ DIRECT_UPDATE_HANDLER( missile_direct_handler )
 	if (address < 0x4000)
 	{
 		missile_state *state = direct.space().machine().driver_data<missile_state>();
-		direct.explicit_configure(0x0000 | offset, 0x3fff | offset, 0x3fff, state->m_videoram.target());
+		direct.explicit_configure(0x0000 | offset, 0x3fff | offset, 0x3fff, state->m_videoram);
 		return ~0;
 	}
 
@@ -595,7 +595,7 @@ INLINE offs_t get_bit3_addr(offs_t pixaddr)
 static void write_vram(address_space *space, offs_t address, UINT8 data)
 {
 	missile_state *state = space->machine().driver_data<missile_state>();
-	UINT8 *videoram = state->m_videoram.target();
+	UINT8 *videoram = state->m_videoram;
 	static const UINT8 data_lookup[4] = { 0x00, 0x0f, 0xf0, 0xff };
 	offs_t vramaddr;
 	UINT8 vramdata;
@@ -627,7 +627,7 @@ static void write_vram(address_space *space, offs_t address, UINT8 data)
 static UINT8 read_vram(address_space *space, offs_t address)
 {
 	missile_state *state = space->machine().driver_data<missile_state>();
-	UINT8 *videoram = state->m_videoram.target();
+	UINT8 *videoram = state->m_videoram;
 	offs_t vramaddr;
 	UINT8 vramdata;
 	UINT8 vrammask;
@@ -671,7 +671,7 @@ static UINT8 read_vram(address_space *space, offs_t address)
 static SCREEN_UPDATE_IND16( missile )
 {
 	missile_state *state = screen.machine().driver_data<missile_state>();
-	UINT8 *videoram = state->m_videoram.target();
+	UINT8 *videoram = state->m_videoram;
 	int x, y;
 
 	/* draw the bitmap to the screen, looping over Y */
@@ -713,7 +713,7 @@ static SCREEN_UPDATE_IND16( missile )
 
 WRITE8_MEMBER(missile_state::missile_w)
 {
-	UINT8 *videoram = m_videoram.target();
+	UINT8 *videoram = m_videoram;
 	/* if we're in MADSEL mode, write to video RAM */
 	if (get_madsel(&space))
 	{
@@ -770,7 +770,7 @@ WRITE8_MEMBER(missile_state::missile_w)
 
 READ8_MEMBER(missile_state::missile_r)
 {
-	UINT8 *videoram = m_videoram.target();
+	UINT8 *videoram = m_videoram;
 	UINT8 result = 0xff;
 
 	/* if we're in MADSEL mode, read from video RAM */

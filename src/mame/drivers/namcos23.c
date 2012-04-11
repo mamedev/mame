@@ -1454,14 +1454,14 @@ static TILE_GET_INFO( TextTilemapGetInfo )
 
 WRITE32_MEMBER(namcos23_state::namcos23_textram_w)
 {
-	COMBINE_DATA( &m_textram.target()[offset] );
+	COMBINE_DATA( &m_textram[offset] );
 	m_bgtilemap->mark_tile_dirty(offset*2);
 	m_bgtilemap->mark_tile_dirty((offset*2)+1);
 }
 
 WRITE32_MEMBER(namcos23_state::s23_txtchar_w)
 {
-	COMBINE_DATA(&m_charram.target()[offset]);
+	COMBINE_DATA(&m_charram[offset]);
 	gfx_element_mark_dirty(machine().gfx[0], offset/32);
 }
 
@@ -1862,12 +1862,12 @@ WRITE32_MEMBER(namcos23_state::s23_mcuen_w)
 
 READ32_MEMBER(namcos23_state::gorgon_sharedram_r)
 {
-	return m_shared_ram.target()[offset];
+	return m_shared_ram[offset];
 }
 
 WRITE32_MEMBER(namcos23_state::gorgon_sharedram_w)
 {
-	COMBINE_DATA(&m_shared_ram.target()[offset]);
+	COMBINE_DATA(&m_shared_ram[offset]);
 
 	// hack for final furlong
 	if ((offset == 0x6000/4) && (data == 0) && (mem_mask == 0xff000000))
@@ -2397,7 +2397,7 @@ static void render_run(running_machine &machine, bitmap_rgb32 &bitmap)
 static VIDEO_START( ss23 )
 {
 	namcos23_state *state = machine.driver_data<namcos23_state>();
-	gfx_element_set_source(machine.gfx[0], (UINT8 *)state->m_charram.target());
+	gfx_element_set_source(machine.gfx[0], reinterpret_cast<UINT8 *>(state->m_charram.target()));
 	state->m_bgtilemap = tilemap_create(machine, TextTilemapGetInfo, tilemap_scan_rows, 16, 16, 64, 64);
 	state->m_bgtilemap->set_transparent_pen(0xf);
 
@@ -2518,12 +2518,12 @@ READ32_MEMBER(namcos23_state::gmen_trigger_sh2)
 
 READ32_MEMBER(namcos23_state::sh2_shared_r)
 {
-	return m_gmen_sh2_shared.target()[offset];
+	return m_gmen_sh2_shared[offset];
 }
 
 WRITE32_MEMBER(namcos23_state::sh2_shared_w)
 {
-	COMBINE_DATA(&m_gmen_sh2_shared.target()[offset]);
+	COMBINE_DATA(&m_gmen_sh2_shared[offset]);
 }
 
 static ADDRESS_MAP_START( gmen_mips_map, AS_PROGRAM, 32, namcos23_state )
@@ -2546,7 +2546,7 @@ static MACHINE_RESET(gmen)
 
 WRITE16_MEMBER(namcos23_state::sharedram_sub_w)
 {
-	UINT16 *shared16 = (UINT16 *)m_shared_ram.target();
+	UINT16 *shared16 = reinterpret_cast<UINT16 *>(m_shared_ram.target());
 
 	// fake that an I/O board is connected for games w/o a dump or that aren't properly communicating with it yet
 	if (!m_has_jvsio)
@@ -2562,7 +2562,7 @@ WRITE16_MEMBER(namcos23_state::sharedram_sub_w)
 
 READ16_MEMBER(namcos23_state::sharedram_sub_r)
 {
-	UINT16 *shared16 = (UINT16 *)m_shared_ram.target();
+	UINT16 *shared16 = reinterpret_cast<UINT16 *>(m_shared_ram.target());
 
 	return shared16[BYTE_XOR_BE(offset)];
 }

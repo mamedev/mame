@@ -85,9 +85,9 @@ static SCREEN_UPDATE_RGB32( wldarrow )
 		UINT8 y = offs >> 5;
 		UINT8 x = offs << 3;
 
-		UINT8 data0 = state->m_videoram_0.target()[offs];
-		UINT8 data1 = state->m_videoram_1.target()[offs];
-		UINT8 data2 = state->m_videoram_2.target()[offs];
+		UINT8 data0 = state->m_videoram_0[offs];
+		UINT8 data1 = state->m_videoram_1[offs];
+		UINT8 data2 = state->m_videoram_2[offs];
 
 		/* weird equations, but it matches every flyer screenshot -
            perhaphs they used a look-up PROM? */

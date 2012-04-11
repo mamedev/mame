@@ -60,8 +60,8 @@ public:
 static TILE_GET_INFO( get_tile_info )
 {
 	suprgolf_state *state = machine.driver_data<suprgolf_state>();
-	int code = state->m_videoram.target()[tile_index*2]+256*(state->m_videoram.target()[tile_index*2+1]);
-	int color = state->m_videoram.target()[tile_index*2+0x800] & 0x7f;
+	int code = state->m_videoram[tile_index*2]+256*(state->m_videoram[tile_index*2+1]);
+	int color = state->m_videoram[tile_index*2+0x800] & 0x7f;
 
 	SET_TILE_INFO(
 		0,
@@ -134,7 +134,7 @@ READ8_MEMBER(suprgolf_state::suprgolf_videoram_r)
 	if (m_palette_switch)
 		return m_paletteram[offset];
 	else
-		return m_videoram.target()[offset];
+		return m_videoram[offset];
 }
 
 WRITE8_MEMBER(suprgolf_state::suprgolf_videoram_w)
@@ -155,7 +155,7 @@ WRITE8_MEMBER(suprgolf_state::suprgolf_videoram_w)
 	}
 	else
 	{
-		m_videoram.target()[offset] = data;
+		m_videoram[offset] = data;
 		m_tilemap->mark_tile_dirty((offset & 0x7fe) >> 1);
 	}
 }

@@ -362,11 +362,11 @@ racetrack seems to be stored in 4th and 5th prom.
 can we draw it with the tilemap? maybe not, the layout is a litle strange
 
 */
-//  base = state->m_scroll_ram.target()[0];
+//  base = state->m_scroll_ram[0];
 
-	off=0x1900-(state->m_bg*0x100)+(state->m_scroll_ram.target()[1])*0x100;
-	scrolly = 0xff-(state->m_scroll_ram.target()[0]);
-	if(state->m_scroll_ram.target()[1]==0xff) off=0x1800;
+	off=0x1900-(state->m_bg*0x100)+(state->m_scroll_ram[1])*0x100;
+	scrolly = 0xff-(state->m_scroll_ram[0]);
+	if(state->m_scroll_ram[1]==0xff) off=0x1800;
 	for(x=0;x<16;x++) {
 		for(y=0;y<16;y++) {
 			int chr = state->m_racetrack_tilemap_rom[off];
@@ -398,12 +398,12 @@ wouldnt like to say its the most effective way though...
 		int a=0;
 		int b=0;
 		int base = count*4;
-		int sprx=state->m_sprite_ram.target()[base+3];
-		int spry=state->m_sprite_ram.target()[base+2];
-		//state->m_sprite_ram.target()[base+1];
-		int col = (state->m_sprite_ram.target()[base+1]&0x1f);
-		int anim = (state->m_sprite_ram.target()[base]&0x3)*0x40; // animation frame - probably wrong but seems right
-		int horse = (state->m_sprite_ram.target()[base+1]&0x7)*8+7;  // horse label from 1 - 6
+		int sprx=state->m_sprite_ram[base+3];
+		int spry=state->m_sprite_ram[base+2];
+		//state->m_sprite_ram[base+1];
+		int col = (state->m_sprite_ram[base+1]&0x1f);
+		int anim = (state->m_sprite_ram[base]&0x3)*0x40; // animation frame - probably wrong but seems right
+		int horse = (state->m_sprite_ram[base+1]&0x7)*8+7;  // horse label from 1 - 6
 
 		for (a=0;a<8 ;a++)
 		{
@@ -426,10 +426,10 @@ wouldnt like to say its the most effective way though...
 		for(x=0;x<32;x++)
 		{
 			int tileno,bank,color;
-			tileno=state->m_dderby_vidchars.target()[count];
-			bank=(state->m_dderby_vidattribs.target()[count]&0x20)>>5;
+			tileno=state->m_dderby_vidchars[count];
+			bank=(state->m_dderby_vidattribs[count]&0x20)>>5;
 			tileno|=(bank<<8);
-			color=((state->m_dderby_vidattribs.target()[count])&0x1f);
+			color=((state->m_dderby_vidattribs[count])&0x1f);
 
 			drawgfx_transpen(bitmap,cliprect,gfx,tileno,color,0,0,x*8,y*8,(tileno == 0x38) ? 0 : -1);
 

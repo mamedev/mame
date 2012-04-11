@@ -46,19 +46,19 @@ enum { interrupt_scanline=192 };
 
 WRITE16_MEMBER(pkscram_state::pkscramble_fgtilemap_w)
 {
-	COMBINE_DATA(&m_pkscramble_fgtilemap_ram.target()[offset]);
+	COMBINE_DATA(&m_pkscramble_fgtilemap_ram[offset]);
 	m_fg_tilemap->mark_tile_dirty(offset >> 1);
 }
 
 WRITE16_MEMBER(pkscram_state::pkscramble_mdtilemap_w)
 {
-	COMBINE_DATA(&m_pkscramble_mdtilemap_ram.target()[offset]);
+	COMBINE_DATA(&m_pkscramble_mdtilemap_ram[offset]);
 	m_md_tilemap->mark_tile_dirty(offset >> 1);
 }
 
 WRITE16_MEMBER(pkscram_state::pkscramble_bgtilemap_w)
 {
-	COMBINE_DATA(&m_pkscramble_bgtilemap_ram.target()[offset]);
+	COMBINE_DATA(&m_pkscramble_bgtilemap_ram[offset]);
 	m_bg_tilemap->mark_tile_dirty(offset >> 1);
 }
 
@@ -187,8 +187,8 @@ INPUT_PORTS_END
 static TILE_GET_INFO( get_bg_tile_info )
 {
 	pkscram_state *state = machine.driver_data<pkscram_state>();
-	int tile  = state->m_pkscramble_bgtilemap_ram.target()[tile_index*2];
-	int color = state->m_pkscramble_bgtilemap_ram.target()[tile_index*2 + 1] & 0x7f;
+	int tile  = state->m_pkscramble_bgtilemap_ram[tile_index*2];
+	int color = state->m_pkscramble_bgtilemap_ram[tile_index*2 + 1] & 0x7f;
 
 	SET_TILE_INFO(0,tile,color,0);
 }
@@ -196,8 +196,8 @@ static TILE_GET_INFO( get_bg_tile_info )
 static TILE_GET_INFO( get_md_tile_info )
 {
 	pkscram_state *state = machine.driver_data<pkscram_state>();
-	int tile  = state->m_pkscramble_mdtilemap_ram.target()[tile_index*2];
-	int color = state->m_pkscramble_mdtilemap_ram.target()[tile_index*2 + 1] & 0x7f;
+	int tile  = state->m_pkscramble_mdtilemap_ram[tile_index*2];
+	int color = state->m_pkscramble_mdtilemap_ram[tile_index*2 + 1] & 0x7f;
 
 	SET_TILE_INFO(0,tile,color,0);
 }
@@ -205,8 +205,8 @@ static TILE_GET_INFO( get_md_tile_info )
 static TILE_GET_INFO( get_fg_tile_info )
 {
 	pkscram_state *state = machine.driver_data<pkscram_state>();
-	int tile  = state->m_pkscramble_fgtilemap_ram.target()[tile_index*2];
-	int color = state->m_pkscramble_fgtilemap_ram.target()[tile_index*2 + 1] & 0x7f;
+	int tile  = state->m_pkscramble_fgtilemap_ram[tile_index*2];
+	int color = state->m_pkscramble_fgtilemap_ram[tile_index*2 + 1] & 0x7f;
 
 	SET_TILE_INFO(0,tile,color,0);
 }

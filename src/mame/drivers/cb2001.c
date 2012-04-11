@@ -346,8 +346,8 @@ static SCREEN_UPDATE_RGB32(cb2001)
 					int tile;
 					int colour;
 
-					tile = (state->m_vram_bg.target()[count] & 0x0fff);
-					colour = (state->m_vram_bg.target()[count] & 0xf000)>>12;
+					tile = (state->m_vram_bg[count] & 0x0fff);
+					colour = (state->m_vram_bg[count] & 0xf000)>>12;
 					tile += state->m_videobank*0x2000;
 
 
@@ -365,21 +365,21 @@ static SCREEN_UPDATE_RGB32(cb2001)
 			{
 				UINT16 scroll;
 
-				scroll = state->m_vram_bg.target()[0xa00/2 + i/2];
+				scroll = state->m_vram_bg[0xa00/2 + i/2];
 				if (i&1)
 					scroll >>=8;
 				scroll &=0xff;
 
 				state->m_reel2_tilemap->set_scrolly(i, scroll);
 
-				scroll = state->m_vram_bg.target()[0x800/2 + i/2];
+				scroll = state->m_vram_bg[0x800/2 + i/2];
 				if (i&1)
 					scroll >>=8;
 				scroll &=0xff;
 
 				state->m_reel1_tilemap->set_scrolly(i, scroll);
 
-				scroll = state->m_vram_bg.target()[0xc00/2 + i/2];
+				scroll = state->m_vram_bg[0xc00/2 + i/2];
 				if (i&1)
 					scroll >>=8;
 				scroll &=0xff;
@@ -408,8 +408,8 @@ static SCREEN_UPDATE_RGB32(cb2001)
 			int tile;
 			int colour;
 
-			tile = (state->m_vram_fg.target()[count] & 0x0fff);
-			colour = (state->m_vram_fg.target()[count] & 0xf000)>>12;
+			tile = (state->m_vram_fg[count] & 0x0fff);
+			colour = (state->m_vram_fg[count] & 0xf000)>>12;
 			tile += state->m_videobank*0x2000;
 
 			if (state->m_other2 & 0x4)
@@ -459,7 +459,7 @@ WRITE16_MEMBER(cb2001_state::cb2001_vidctrl2_w)
 static TILE_GET_INFO( get_cb2001_reel1_tile_info )
 {
 	cb2001_state *state = machine.driver_data<cb2001_state>();
-	int code = state->m_vram_bg.target()[(0x0000/2) + tile_index/2];
+	int code = state->m_vram_bg[(0x0000/2) + tile_index/2];
 
 	if (tile_index&1)
 		code >>=8;
@@ -478,7 +478,7 @@ static TILE_GET_INFO( get_cb2001_reel1_tile_info )
 static TILE_GET_INFO( get_cb2001_reel2_tile_info )
 {
 	cb2001_state *state = machine.driver_data<cb2001_state>();
-	int code = state->m_vram_bg.target()[(0x0200/2) + tile_index/2];
+	int code = state->m_vram_bg[(0x0200/2) + tile_index/2];
 
 	if (tile_index&1)
 		code >>=8;
@@ -498,7 +498,7 @@ static TILE_GET_INFO( get_cb2001_reel2_tile_info )
 static TILE_GET_INFO( get_cb2001_reel3_tile_info )
 {
 	cb2001_state *state = machine.driver_data<cb2001_state>();
-	int code = state->m_vram_bg.target()[(0x0400/2) + tile_index/2];
+	int code = state->m_vram_bg[(0x0400/2) + tile_index/2];
 	int colour = 0;//(cb2001_out_c&0x7) + 8;
 
 	if (tile_index&1)
@@ -528,7 +528,7 @@ static VIDEO_START(cb2001)
 
 WRITE16_MEMBER(cb2001_state::cb2001_bg_w)
 {
-	COMBINE_DATA(&m_vram_bg.target()[offset]);
+	COMBINE_DATA(&m_vram_bg[offset]);
 
 	// also used for the reel tilemaps in a different mode
 /*

@@ -79,14 +79,14 @@ public:
 
 WRITE16_MEMBER(k3_state::k3_bgram_w)
 {
-	COMBINE_DATA(&m_bgram.target()[offset]);
+	COMBINE_DATA(&m_bgram[offset]);
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 static TILE_GET_INFO( get_k3_bg_tile_info )
 {
 	k3_state *state = machine.driver_data<k3_state>();
-	int tileno = state->m_bgram.target()[tile_index];
+	int tileno = state->m_bgram[tile_index];
 	SET_TILE_INFO(1, tileno, 0, 0);
 }
 
@@ -100,8 +100,8 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 {
 	k3_state *state = machine.driver_data<k3_state>();
 	const gfx_element *gfx = machine.gfx[0];
-	UINT16 *source = state->m_spriteram_1.target();
-	UINT16 *source2 = state->m_spriteram_2.target();
+	UINT16 *source = state->m_spriteram_1;
+	UINT16 *source2 = state->m_spriteram_2;
 	UINT16 *finish = source + 0x1000 / 2;
 
 	while (source < finish)

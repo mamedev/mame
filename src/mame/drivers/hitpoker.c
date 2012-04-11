@@ -129,7 +129,7 @@ WRITE8_MEMBER(hitpoker_state::hitpoker_vram_w)
 {
 //  UINT8 *ROM = machine().region("maincpu")->base();
 
-//  if(m_sys_regs.target()[0x00] & 0x10)
+//  if(m_sys_regs[0x00] & 0x10)
 	m_videoram[offset] = data;
 }
 
@@ -221,7 +221,7 @@ READ8_MEMBER(hitpoker_state::hitpoker_pic_r)
 		return (m_pic_data & 0x7f) | (m_pic_data & 0x40 ? 0x80 : 0x00);
 	}
 
-	return m_sys_regs.target()[offset];
+	return m_sys_regs[offset];
 }
 
 WRITE8_MEMBER(hitpoker_state::hitpoker_pic_w)
@@ -229,7 +229,7 @@ WRITE8_MEMBER(hitpoker_state::hitpoker_pic_w)
 	if(offset == 0)
 		m_pic_data = (data & 0xff);// | (data & 0x40) ? 0x80 : 0x00;
 //  logerror("%02x W\n",data);
-	m_sys_regs.target()[offset] = data;
+	m_sys_regs[offset] = data;
 }
 
 #if 0

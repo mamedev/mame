@@ -235,9 +235,9 @@ WRITE16_MEMBER(midas_state::midas_gfxregs_w)
 	{
 		case 1:
 		{
-			UINT16 addr = m_gfxregs.target()[0];
+			UINT16 addr = m_gfxregs[0];
 			m_gfxram[addr] = data;
-			m_gfxregs.target()[0] += m_gfxregs.target()[2];
+			m_gfxregs[0] += m_gfxregs[2];
 
 			if ( addr >= 0x7000 && addr <= 0x7fff )	m_tmap->mark_tile_dirty(addr - 0x7000);
 

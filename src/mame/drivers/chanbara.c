@@ -103,28 +103,28 @@ static PALETTE_INIT( chanbara )
 WRITE8_MEMBER(chanbara_state::chanbara_videoram_w)
 {
 
-	m_videoram.target()[offset] = data;
+	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(chanbara_state::chanbara_colorram_w)
 {
 
-	m_colorram.target()[offset] = data;
+	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(chanbara_state::chanbara_videoram2_w)
 {
 
-	m_videoram2.target()[offset] = data;
+	m_videoram2[offset] = data;
 	m_bg2_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(chanbara_state::chanbara_colorram2_w)
 {
 
-	m_colorram2.target()[offset] = data;
+	m_colorram2[offset] = data;
 	m_bg2_tilemap->mark_tile_dirty(offset);
 }
 
@@ -132,8 +132,8 @@ WRITE8_MEMBER(chanbara_state::chanbara_colorram2_w)
 static TILE_GET_INFO( get_bg_tile_info )
 {
 	chanbara_state *state = machine.driver_data<chanbara_state>();
-	int code = state->m_videoram.target()[tile_index] + ((state->m_colorram.target()[tile_index] & 1) << 8);
-	int color = (state->m_colorram.target()[tile_index] >> 1) & 0x1f;
+	int code = state->m_videoram[tile_index] + ((state->m_colorram[tile_index] & 1) << 8);
+	int color = (state->m_colorram[tile_index] >> 1) & 0x1f;
 
 	SET_TILE_INFO(0, code, color, 0);
 }
@@ -141,8 +141,8 @@ static TILE_GET_INFO( get_bg_tile_info )
 static TILE_GET_INFO( get_bg2_tile_info )
 {
 	chanbara_state *state = machine.driver_data<chanbara_state>();
-	int code = state->m_videoram2.target()[tile_index];
-	int color = (state->m_colorram2.target()[tile_index] >> 1) & 0x1f;
+	int code = state->m_videoram2[tile_index];
+	int color = (state->m_colorram2[tile_index] >> 1) & 0x1f;
 
 	SET_TILE_INFO(2, code, color, 0);
 }
@@ -162,21 +162,21 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 
 	for (offs = 0; offs < 0x80; offs += 4)
 	{
-		if (state->m_spriteram.target()[offs + 0x80] & 0x80)
+		if (state->m_spriteram[offs + 0x80] & 0x80)
 		{
-			int attr = state->m_spriteram.target()[offs + 0];
-			int code = state->m_spriteram.target()[offs + 1];
-			int color = state->m_spriteram.target()[offs + 0x80] & 0x1f;
+			int attr = state->m_spriteram[offs + 0];
+			int code = state->m_spriteram[offs + 1];
+			int color = state->m_spriteram[offs + 0x80] & 0x1f;
 			int flipx = 0;
 			int flipy = attr & 2;
-			int sx = 240 - state->m_spriteram.target()[offs + 3];
-			int sy = 232 - state->m_spriteram.target()[offs + 2];
+			int sx = 240 - state->m_spriteram[offs + 3];
+			int sy = 232 - state->m_spriteram[offs + 2];
 
 			sy+=16;
 
-			if (state->m_spriteram.target()[offs + 0x80] & 0x10) code += 0x200;
-			if (state->m_spriteram.target()[offs + 0x80] & 0x20) code += 0x400;
-			if (state->m_spriteram.target()[offs + 0x80] & 0x40) code += 0x100;
+			if (state->m_spriteram[offs + 0x80] & 0x10) code += 0x200;
+			if (state->m_spriteram[offs + 0x80] & 0x20) code += 0x400;
+			if (state->m_spriteram[offs + 0x80] & 0x40) code += 0x100;
 
 			if (attr & 0x10)
 			{

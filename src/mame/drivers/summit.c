@@ -50,7 +50,7 @@ static SCREEN_UPDATE_IND16(summit)
 	{
 		for (x=0;x<32;x++)
 		{
-			int tile = (state->m_vram.target()[count] | ((state->m_attr.target()[count]&1)<<8) );
+			int tile = (state->m_vram[count] | ((state->m_attr[count]&1)<<8) );
 			drawgfx_opaque(bitmap,cliprect,gfx,tile,0,0,0,x*8,y*8);
 
 			count++;

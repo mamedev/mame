@@ -300,20 +300,20 @@ WRITE8_MEMBER(subsino_state::subsino_tiles_offset_w)
 
 WRITE8_MEMBER(subsino_state::subsino_videoram_w)
 {
-	m_videoram.target()[offset] = data;
+	m_videoram[offset] = data;
 	m_tmap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(subsino_state::subsino_colorram_w)
 {
-	m_colorram.target()[offset] = data;
+	m_colorram[offset] = data;
 	m_tmap->mark_tile_dirty(offset);
 }
 
 static TILE_GET_INFO( get_tile_info )
 {
 	subsino_state *state = machine.driver_data<subsino_state>();
-	UINT16 code = state->m_videoram.target()[ tile_index ] + (state->m_colorram.target()[ tile_index ] << 8);
+	UINT16 code = state->m_videoram[ tile_index ] + (state->m_colorram[ tile_index ] << 8);
 	UINT16 color = (code >> 8) & 0x0f;
 	code = ((code & 0xf000) >> 4) + ((code & 0xff) >> 0);
 	code += state->m_tiles_offset;
@@ -323,7 +323,7 @@ static TILE_GET_INFO( get_tile_info )
 static TILE_GET_INFO( get_stisub_tile_info )
 {
 	subsino_state *state = machine.driver_data<subsino_state>();
-	UINT16 code = state->m_videoram.target()[ tile_index ] + (state->m_colorram.target()[ tile_index ] << 8);
+	UINT16 code = state->m_videoram[ tile_index ] + (state->m_colorram[ tile_index ] << 8);
 	code&= 0x3fff;
 	SET_TILE_INFO(0, code, 0, 0);
 }
@@ -341,14 +341,14 @@ static VIDEO_START( subsino )
 
 WRITE8_MEMBER(subsino_state::subsino_reel1_ram_w)
 {
-	m_reel1_ram.target()[offset] = data;
+	m_reel1_ram[offset] = data;
 	m_reel1_tilemap->mark_tile_dirty(offset);
 }
 
 static TILE_GET_INFO( get_subsino_reel1_tile_info )
 {
 	subsino_state *state = machine.driver_data<subsino_state>();
-	int code = state->m_reel1_ram.target()[tile_index];
+	int code = state->m_reel1_ram[tile_index];
 	int colour = (state->m_out_c&0x7) + 8;
 
 	SET_TILE_INFO(
@@ -361,7 +361,7 @@ static TILE_GET_INFO( get_subsino_reel1_tile_info )
 static TILE_GET_INFO( get_stisub_reel1_tile_info )
 {
 	subsino_state *state = machine.driver_data<subsino_state>();
-	int code = state->m_reel1_ram.target()[tile_index];
+	int code = state->m_reel1_ram[tile_index];
 	int attr = state->m_reel1_attr[tile_index];
 
 	SET_TILE_INFO(
@@ -374,14 +374,14 @@ static TILE_GET_INFO( get_stisub_reel1_tile_info )
 
 WRITE8_MEMBER(subsino_state::subsino_reel2_ram_w)
 {
-	m_reel2_ram.target()[offset] = data;
+	m_reel2_ram[offset] = data;
 	m_reel2_tilemap->mark_tile_dirty(offset);
 }
 
 static TILE_GET_INFO( get_subsino_reel2_tile_info )
 {
 	subsino_state *state = machine.driver_data<subsino_state>();
-	int code = state->m_reel2_ram.target()[tile_index];
+	int code = state->m_reel2_ram[tile_index];
 	int colour = (state->m_out_c&0x7) + 8;
 
 	SET_TILE_INFO(
@@ -394,7 +394,7 @@ static TILE_GET_INFO( get_subsino_reel2_tile_info )
 static TILE_GET_INFO( get_stisub_reel2_tile_info )
 {
 	subsino_state *state = machine.driver_data<subsino_state>();
-	int code = state->m_reel2_ram.target()[tile_index];
+	int code = state->m_reel2_ram[tile_index];
 	int attr = state->m_reel2_attr[tile_index];
 
 	SET_TILE_INFO(
@@ -406,14 +406,14 @@ static TILE_GET_INFO( get_stisub_reel2_tile_info )
 
 WRITE8_MEMBER(subsino_state::subsino_reel3_ram_w)
 {
-	m_reel3_ram.target()[offset] = data;
+	m_reel3_ram[offset] = data;
 	m_reel3_tilemap->mark_tile_dirty(offset);
 }
 
 static TILE_GET_INFO( get_subsino_reel3_tile_info )
 {
 	subsino_state *state = machine.driver_data<subsino_state>();
-	int code = state->m_reel3_ram.target()[tile_index];
+	int code = state->m_reel3_ram[tile_index];
 	int colour = (state->m_out_c&0x7) + 8;
 
 	SET_TILE_INFO(
@@ -426,7 +426,7 @@ static TILE_GET_INFO( get_subsino_reel3_tile_info )
 static TILE_GET_INFO( get_stisub_reel3_tile_info )
 {
 	subsino_state *state = machine.driver_data<subsino_state>();
-	int code = state->m_reel3_ram.target()[tile_index];
+	int code = state->m_reel3_ram[tile_index];
 	int attr = state->m_reel3_attr[tile_index];
 
 	SET_TILE_INFO(
@@ -486,9 +486,9 @@ static SCREEN_UPDATE_IND16( subsino_reels )
 
 	for (i= 0;i < 64;i++)
 	{
-		state->m_reel1_tilemap->set_scrolly(i, state->m_reel1_scroll.target()[i]);
-		state->m_reel2_tilemap->set_scrolly(i, state->m_reel2_scroll.target()[i]);
-		state->m_reel3_tilemap->set_scrolly(i, state->m_reel3_scroll.target()[i]);
+		state->m_reel1_tilemap->set_scrolly(i, state->m_reel1_scroll[i]);
+		state->m_reel2_tilemap->set_scrolly(i, state->m_reel2_scroll[i]);
+		state->m_reel3_tilemap->set_scrolly(i, state->m_reel3_scroll[i]);
 	}
 
 	if (state->m_out_c&0x08)
@@ -523,9 +523,9 @@ static SCREEN_UPDATE_IND16( stisub_reels )
 
 	for (i= 0;i < 64;i++)
 	{
-		state->m_reel1_tilemap->set_scrolly(i, state->m_reel1_scroll.target()[i]);
-		state->m_reel2_tilemap->set_scrolly(i, state->m_reel2_scroll.target()[i]);
-		state->m_reel3_tilemap->set_scrolly(i, state->m_reel3_scroll.target()[i]);
+		state->m_reel1_tilemap->set_scrolly(i, state->m_reel1_scroll[i]);
+		state->m_reel2_tilemap->set_scrolly(i, state->m_reel2_scroll[i]);
+		state->m_reel3_tilemap->set_scrolly(i, state->m_reel3_scroll[i]);
 	}
 
 	if (state->m_out_c&0x08)
@@ -1107,15 +1107,15 @@ WRITE8_MEMBER(subsino_state::reel_scrollattr_w)
 		}
 		else if (offset<0x80)
 		{
-			m_reel2_scroll.target()[offset&0x3f] = data;
+			m_reel2_scroll[offset&0x3f] = data;
 		}
 		else if (offset<0xc0)
 		{
-			m_reel1_scroll.target()[offset&0x3f] = data;
+			m_reel1_scroll[offset&0x3f] = data;
 		}
 		else
 		{
-			m_reel3_scroll.target()[offset&0x3f] = data;
+			m_reel3_scroll[offset&0x3f] = data;
 		}
 	}
 }

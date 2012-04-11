@@ -89,7 +89,7 @@ static SCREEN_UPDATE_RGB32( mirage )
 
 	screen.machine().device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, state->m_spriteram->buffer(), 0x400);
 
-	deco16ic_pf_update(state->m_deco_tilegen1, state->m_pf1_rowscroll, state->m_pf2_rowscroll.target());
+	deco16ic_pf_update(state->m_deco_tilegen1, state->m_pf1_rowscroll, state->m_pf2_rowscroll);
 
 	bitmap.fill(256, cliprect); /* not verified */
 

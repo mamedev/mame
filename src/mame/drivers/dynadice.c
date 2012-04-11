@@ -63,7 +63,7 @@ public:
 
 WRITE8_MEMBER(dynadice_state::dynadice_videoram_w)
 {
-	m_videoram.target()[offset] = data;
+	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 	m_top_tilemap->mark_all_dirty();
 }
@@ -193,7 +193,7 @@ GFXDECODE_END
 static TILE_GET_INFO( get_tile_info )
 {
 	dynadice_state *state = machine.driver_data<dynadice_state>();
-	int code = state->m_videoram.target()[tile_index];
+	int code = state->m_videoram[tile_index];
 	SET_TILE_INFO(1, code, 0, 0);
 }
 

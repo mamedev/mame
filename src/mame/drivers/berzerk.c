@@ -363,7 +363,7 @@ WRITE8_MEMBER(berzerk_state::magicram_w)
 {
 	UINT8 alu_output;
 
-	UINT8 current_video_data = m_videoram.target()[offset];
+	UINT8 current_video_data = m_videoram[offset];
 
 	/* shift data towards LSB.  MSB bits are filled by data from last_shift_data.
        The shifter consists of 5 74153 devices @ 7A, 8A, 9A, 10A and 11A,
@@ -390,7 +390,7 @@ WRITE8_MEMBER(berzerk_state::magicram_w)
 	alu_output = (TTL74181_read(LS181_10C, TTL74181_OUTPUT_F0, 4) << 4) |
 				 (TTL74181_read(LS181_12C, TTL74181_OUTPUT_F0, 4) << 0);
 
-	m_videoram.target()[offset] = alu_output ^ 0xff;
+	m_videoram[offset] = alu_output ^ 0xff;
 
 	/* save data for next time */
 	m_last_shift_data = data & 0x7f;
@@ -465,8 +465,8 @@ static SCREEN_UPDATE_RGB32( berzerk )
 	{
 		int i;
 
-		UINT8 data = state->m_videoram.target()[offs];
-		UINT8 color = state->m_colorram.target()[((offs >> 2) & 0x07e0) | (offs & 0x001f)];
+		UINT8 data = state->m_videoram[offs];
+		UINT8 color = state->m_colorram[((offs >> 2) & 0x07e0) | (offs & 0x001f)];
 
 		UINT8 y = offs >> 5;
 		UINT8 x = offs << 3;

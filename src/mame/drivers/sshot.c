@@ -183,7 +183,7 @@ static TILE_GET_INFO( get_supershot_text_tile_info )
 {
 	supershot_state *state = machine.driver_data<supershot_state>();
 
-	UINT8 code = state->m_videoram.target()[tile_index];
+	UINT8 code = state->m_videoram[tile_index];
 	SET_TILE_INFO(0, code, 0, 0);
 }
 
@@ -203,7 +203,7 @@ static SCREEN_UPDATE_IND16( supershot )
 WRITE8_MEMBER(supershot_state::supershot_vidram_w)
 {
 
-	m_videoram.target()[offset] = data;
+	m_videoram[offset] = data;
 	m_tilemap->mark_tile_dirty(offset);
 }
 

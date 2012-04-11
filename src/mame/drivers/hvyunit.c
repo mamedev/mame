@@ -164,8 +164,8 @@ static TILE_GET_INFO( get_bg_tile_info )
 {
 	hvyunit_state *state = machine.driver_data<hvyunit_state>();
 
-	int attr = state->m_colorram.target()[tile_index];
-	int code = state->m_videoram.target()[tile_index] + ((attr & 0x0f) << 8);
+	int attr = state->m_colorram[tile_index];
+	int code = state->m_videoram[tile_index] + ((attr & 0x0f) << 8);
 	int color = (attr >> 4);
 
 	SET_TILE_INFO(1, code, color, 0);
@@ -261,14 +261,14 @@ WRITE8_MEMBER(hvyunit_state::trigger_nmi_on_sound_cpu2)
 WRITE8_MEMBER(hvyunit_state::hu_videoram_w)
 {
 
-	m_videoram.target()[offset] = data;
+	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(hvyunit_state::hu_colorram_w)
 {
 
-	m_colorram.target()[offset] = data;
+	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 

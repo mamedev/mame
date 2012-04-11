@@ -85,8 +85,8 @@ public:
 static TILE_GET_INFO( get_fg_tile_info )
 {
 	onetwo_state *state = machine.driver_data<onetwo_state>();
-	int code = (state->m_fgram.target()[tile_index * 2 + 1] << 8) | state->m_fgram.target()[tile_index * 2];
-	int color = (state->m_fgram.target()[tile_index * 2 + 1] & 0x80) >> 7;
+	int code = (state->m_fgram[tile_index * 2 + 1] << 8) | state->m_fgram[tile_index * 2];
+	int color = (state->m_fgram[tile_index * 2 + 1] & 0x80) >> 7;
 
 	code &= 0x7fff;
 
@@ -114,7 +114,7 @@ static SCREEN_UPDATE_IND16( onetwo )
 
 WRITE8_MEMBER(onetwo_state::onetwo_fgram_w)
 {
-	m_fgram.target()[offset] = data;
+	m_fgram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset / 2);
 }
 
@@ -141,21 +141,21 @@ static void set_color(running_machine &machine, int offset)
 	onetwo_state *state = machine.driver_data<onetwo_state>();
 	int r, g, b;
 
-	r = state->m_paletteram.target()[offset] & 0x1f;
-	g = state->m_paletteram2.target()[offset] & 0x1f;
-	b = ((state->m_paletteram.target()[offset] & 0x60) >> 2) | ((state->m_paletteram2.target()[offset] & 0xe0) >> 5);
+	r = state->m_paletteram[offset] & 0x1f;
+	g = state->m_paletteram2[offset] & 0x1f;
+	b = ((state->m_paletteram[offset] & 0x60) >> 2) | ((state->m_paletteram2[offset] & 0xe0) >> 5);
 	palette_set_color_rgb(machine, offset, pal5bit(r), pal5bit(g), pal5bit(b));
 }
 
 WRITE8_MEMBER(onetwo_state::palette1_w)
 {
-	m_paletteram.target()[offset] = data;
+	m_paletteram[offset] = data;
 	set_color(machine(), offset);
 }
 
 WRITE8_MEMBER(onetwo_state::palette2_w)
 {
-	m_paletteram2.target()[offset] = data;
+	m_paletteram2[offset] = data;
 	set_color(machine(), offset);
 }
 

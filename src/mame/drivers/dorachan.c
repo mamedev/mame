@@ -101,7 +101,7 @@ static SCREEN_UPDATE_RGB32( dorachan )
 		/* the need for +1 is extremely unusual, but definetely correct */
 		offs_t color_address = ((((offs << 2) & 0x03e0) | (offs >> 8)) + 1) & 0x03ff;
 
-		UINT8 data = state->m_videoram.target()[offs];
+		UINT8 data = state->m_videoram[offs];
 
 		if (state->m_flip_screen)
 			fore_color = (color_map_base[color_address] >> 3) & 0x07;

@@ -123,9 +123,9 @@ public:
 static TILE_GET_INFO( get_sc0_tile_info )
 {
 	mil4000_state *state = machine.driver_data<mil4000_state>();
-	UINT32 data = (state->m_sc0_vram.target()[tile_index*2]<<16) | state->m_sc0_vram.target()[tile_index*2+1];
+	UINT32 data = (state->m_sc0_vram[tile_index*2]<<16) | state->m_sc0_vram[tile_index*2+1];
 	int tile = data >> 14;
-	int color = (state->m_sc0_vram.target()[tile_index*2+1] & 0x1f)+0;
+	int color = (state->m_sc0_vram[tile_index*2+1] & 0x1f)+0;
 
 	SET_TILE_INFO(
 			0,
@@ -137,9 +137,9 @@ static TILE_GET_INFO( get_sc0_tile_info )
 static TILE_GET_INFO( get_sc1_tile_info )
 {
 	mil4000_state *state = machine.driver_data<mil4000_state>();
-	UINT32 data = (state->m_sc1_vram.target()[tile_index*2]<<16) | state->m_sc1_vram.target()[tile_index*2+1];
+	UINT32 data = (state->m_sc1_vram[tile_index*2]<<16) | state->m_sc1_vram[tile_index*2+1];
 	int tile = data >> 14;
-	int color = (state->m_sc1_vram.target()[tile_index*2+1] & 0x1f)+0x10;
+	int color = (state->m_sc1_vram[tile_index*2+1] & 0x1f)+0x10;
 
 	SET_TILE_INFO(
 			0,
@@ -151,9 +151,9 @@ static TILE_GET_INFO( get_sc1_tile_info )
 static TILE_GET_INFO( get_sc2_tile_info )
 {
 	mil4000_state *state = machine.driver_data<mil4000_state>();
-	UINT32 data = (state->m_sc2_vram.target()[tile_index*2]<<16) | state->m_sc2_vram.target()[tile_index*2+1];
+	UINT32 data = (state->m_sc2_vram[tile_index*2]<<16) | state->m_sc2_vram[tile_index*2+1];
 	int tile = data >> 14;
-	int color = (state->m_sc2_vram.target()[tile_index*2+1] & 0x1f)+0x20;
+	int color = (state->m_sc2_vram[tile_index*2+1] & 0x1f)+0x20;
 
 	SET_TILE_INFO(
 			0,
@@ -165,9 +165,9 @@ static TILE_GET_INFO( get_sc2_tile_info )
 static TILE_GET_INFO( get_sc3_tile_info )
 {
 	mil4000_state *state = machine.driver_data<mil4000_state>();
-	UINT32 data = (state->m_sc3_vram.target()[tile_index*2]<<16) | state->m_sc3_vram.target()[tile_index*2+1];
+	UINT32 data = (state->m_sc3_vram[tile_index*2]<<16) | state->m_sc3_vram[tile_index*2+1];
 	int tile = data >> 14;
-	int color = (state->m_sc3_vram.target()[tile_index*2+1] & 0x1f)+0x30;
+	int color = (state->m_sc3_vram[tile_index*2+1] & 0x1f)+0x30;
 
 	SET_TILE_INFO(
 			0,
@@ -223,25 +223,25 @@ READ16_MEMBER(mil4000_state::hvretrace_r)
 
 WRITE16_MEMBER(mil4000_state::sc0_vram_w)
 {
-	m_sc0_vram.target()[offset] = data;
+	m_sc0_vram[offset] = data;
 	m_sc0_tilemap->mark_tile_dirty(offset/2);
 }
 
 WRITE16_MEMBER(mil4000_state::sc1_vram_w)
 {
-	m_sc1_vram.target()[offset] = data;
+	m_sc1_vram[offset] = data;
 	m_sc1_tilemap->mark_tile_dirty(offset/2);
 }
 
 WRITE16_MEMBER(mil4000_state::sc2_vram_w)
 {
-	m_sc2_vram.target()[offset] = data;
+	m_sc2_vram[offset] = data;
 	m_sc2_tilemap->mark_tile_dirty(offset/2);
 }
 
 WRITE16_MEMBER(mil4000_state::sc3_vram_w)
 {
-	m_sc3_vram.target()[offset] = data;
+	m_sc3_vram[offset] = data;
 	m_sc3_tilemap->mark_tile_dirty(offset/2);
 }
 

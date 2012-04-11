@@ -57,35 +57,35 @@ public:
 WRITE8_MEMBER(spoker_state::bg_tile_w)
 {
 
-	m_bg_tile_ram.target()[offset] = data;
+	m_bg_tile_ram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
 	spoker_state *state = machine.driver_data<spoker_state>();
-	int code = state->m_bg_tile_ram.target()[tile_index];
+	int code = state->m_bg_tile_ram[tile_index];
 	SET_TILE_INFO(1 + (tile_index & 3), code & 0xff, 0, 0);
 }
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
 	spoker_state *state = machine.driver_data<spoker_state>();
-	int code = state->m_fg_tile_ram.target()[tile_index] | (state->m_fg_color_ram.target()[tile_index] << 8);
+	int code = state->m_fg_tile_ram[tile_index] | (state->m_fg_color_ram[tile_index] << 8);
 	SET_TILE_INFO(0, code, (4*(code >> 14)+3), 0);
 }
 
 WRITE8_MEMBER(spoker_state::fg_tile_w)
 {
 
-	m_fg_tile_ram.target()[offset] = data;
+	m_fg_tile_ram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(spoker_state::fg_color_w)
 {
 
-	m_fg_color_ram.target()[offset] = data;
+	m_fg_color_ram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 

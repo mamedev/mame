@@ -131,7 +131,7 @@ static PALETTE_INIT( wallc )
 
 WRITE8_MEMBER(wallc_state::wallc_videoram_w)
 {
-	UINT8 *videoram = m_videoram.target();
+	UINT8 *videoram = m_videoram;
 	videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
@@ -139,7 +139,7 @@ WRITE8_MEMBER(wallc_state::wallc_videoram_w)
 static TILE_GET_INFO( get_bg_tile_info )
 {
 	wallc_state *state = machine.driver_data<wallc_state>();
-	UINT8 *videoram = state->m_videoram.target();
+	UINT8 *videoram = state->m_videoram;
 	SET_TILE_INFO(0, videoram[tile_index] + 0x100, 1, 0);
 }
 

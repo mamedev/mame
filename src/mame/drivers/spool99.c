@@ -116,8 +116,8 @@ public:
 static TILE_GET_INFO( get_spool99_tile_info )
 {
 	spool99_state *state = machine.driver_data<spool99_state>();
-	int code = ((state->m_vram.target()[tile_index*2+1]<<8) | (state->m_vram.target()[tile_index*2+0]));
-	int color = state->m_cram.target()[tile_index*2+0];
+	int code = ((state->m_vram[tile_index*2+1]<<8) | (state->m_vram[tile_index*2+0]));
+	int color = state->m_cram[tile_index*2+0];
 
 	SET_TILE_INFO(
 			0,
@@ -144,14 +144,14 @@ static SCREEN_UPDATE_IND16(spool99)
 WRITE8_MEMBER(spool99_state::spool99_vram_w)
 {
 
-	m_vram.target()[offset] = data;
+	m_vram[offset] = data;
 	m_sc0_tilemap->mark_tile_dirty(offset/2);
 }
 
 WRITE8_MEMBER(spool99_state::spool99_cram_w)
 {
 
-	m_cram.target()[offset] = data;
+	m_cram[offset] = data;
 	m_sc0_tilemap->mark_tile_dirty(offset/2);
 }
 

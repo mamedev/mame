@@ -129,10 +129,10 @@ static TILE_GET_INFO( get_bg_tile_info )
 static TILE_GET_INFO( get_fg_tile_info )
 {
 	calorie_state *state = machine.driver_data<calorie_state>();
-	int code  = ((state->m_fg_ram.target()[tile_index + 0x400] & 0x30) << 4) | state->m_fg_ram.target()[tile_index];
-	int color = state->m_fg_ram.target()[tile_index + 0x400] & 0x0f;
+	int code  = ((state->m_fg_ram[tile_index + 0x400] & 0x30) << 4) | state->m_fg_ram[tile_index];
+	int color = state->m_fg_ram[tile_index + 0x400] & 0x0f;
 
-	SET_TILE_INFO(0, code, color, TILE_FLIPYX((state->m_fg_ram.target()[tile_index + 0x400] & 0xc0) >> 6));
+	SET_TILE_INFO(0, code, color, TILE_FLIPYX((state->m_fg_ram[tile_index + 0x400] & 0xc0) >> 6));
 }
 
 
@@ -166,16 +166,16 @@ static SCREEN_UPDATE_IND16( calorie )
 	{
 		int xpos, ypos, tileno, color, flipx, flipy;
 
-		tileno = state->m_sprites.target()[x + 0];
-		color = state->m_sprites.target()[x + 1] & 0x0f;
-		flipx = state->m_sprites.target()[x + 1] & 0x40;
+		tileno = state->m_sprites[x + 0];
+		color = state->m_sprites[x + 1] & 0x0f;
+		flipx = state->m_sprites[x + 1] & 0x40;
 		flipy = 0;
-		ypos = 0xff - state->m_sprites.target()[x + 2];
-		xpos = state->m_sprites.target()[x + 3];
+		ypos = 0xff - state->m_sprites[x + 2];
+		xpos = state->m_sprites[x + 3];
 
 		if (state->flip_screen())
 		{
-			if (state->m_sprites.target()[x + 1] & 0x10)
+			if (state->m_sprites[x + 1] & 0x10)
 				ypos = 0xff - ypos + 32;
 			else
 				ypos = 0xff - ypos + 16;
@@ -185,7 +185,7 @@ static SCREEN_UPDATE_IND16( calorie )
 			flipy = !flipy;
 		}
 
-		if (state->m_sprites.target()[x + 1] & 0x10)
+		if (state->m_sprites[x + 1] & 0x10)
 		{
 			 /* 32x32 sprites */
 			drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[3], tileno | 0x40, color, flipx, flipy, xpos, ypos - 31, 0);
@@ -207,7 +207,7 @@ static SCREEN_UPDATE_IND16( calorie )
 
 WRITE8_MEMBER(calorie_state::fg_ram_w)
 {
-	m_fg_ram.target()[offset] = data;
+	m_fg_ram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 

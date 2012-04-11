@@ -104,13 +104,14 @@ VIDEO_START(popobear)
 static void draw_layer(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect, UINT8 layer_n)
 {
 	popobear_state *state = machine.driver_data<popobear_state>();
-	UINT8* vram = (UINT8 *)state->m_vram.target();
-	UINT16* vreg = (UINT16 *)state->m_vregs.target();
+	// ERROR: This cast is NOT endian-safe without the use of BYTE/WORD/DWORD_XOR_* macros!
+	UINT8* vram = reinterpret_cast<UINT8 *>(state->m_vram.target());
+	UINT16* vreg = (UINT16 *)state->m_vregs;
 	int count;
 	const UINT8 vreg_base[] = { 0x10/2, 0x14/2 };
 	int xscroll,yscroll;
 
-//  count = (state->m_vregs.target()[vreg_base[layer_n]]<<5);
+//  count = (state->m_vregs[vreg_base[layer_n]]<<5);
 //  count &= 0xfc000;
 	count = (0xf0000+layer_n*0x4000);
 	if(layer_n & 2)
@@ -177,7 +178,8 @@ static void draw_layer(running_machine &machine, bitmap_ind16 &bitmap,const rect
 static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
 	popobear_state *state = machine.driver_data<popobear_state>();
-	UINT8* vram = (UINT8 *)state->m_spr.target();
+	// ERROR: This cast is NOT endian-safe without the use of BYTE/WORD/DWORD_XOR_* macros!
+	UINT8* vram = reinterpret_cast<UINT8 *>(state->m_spr.target());
 	int i;
 	#if 0
 	static int bank_test = 1;
@@ -259,7 +261,7 @@ SCREEN_UPDATE_IND16( popobear )
 
 	bitmap.fill(0, cliprect);
 
-	//popmessage("%04x",state->m_vregs.target()[0/2]);
+	//popmessage("%04x",state->m_vregs[0/2]);
 
 	draw_layer(screen.machine(),bitmap,cliprect,3);
 	draw_layer(screen.machine(),bitmap,cliprect,2);

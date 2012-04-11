@@ -96,65 +96,65 @@ public:
 static TILE_GET_INFO( get_bg1_tile_info )
 {
 	galaxi_state *state = machine.driver_data<galaxi_state>();
-	UINT16 code = state->m_bg1_ram.target()[tile_index];
+	UINT16 code = state->m_bg1_ram[tile_index];
 	SET_TILE_INFO(0, code, 0x10 + (code >> 12), 0);
 }
 
 static TILE_GET_INFO( get_bg2_tile_info )
 {
 	galaxi_state *state = machine.driver_data<galaxi_state>();
-	UINT16 code = state->m_bg2_ram.target()[tile_index];
+	UINT16 code = state->m_bg2_ram[tile_index];
 	SET_TILE_INFO(0, code, 0x10 + (code >> 12), 0);
 }
 
 static TILE_GET_INFO( get_bg3_tile_info )
 {
 	galaxi_state *state = machine.driver_data<galaxi_state>();
-	UINT16 code = state->m_bg3_ram.target()[tile_index];
+	UINT16 code = state->m_bg3_ram[tile_index];
 	SET_TILE_INFO(0, code, (code >> 12), 0);
 }
 
 static TILE_GET_INFO( get_bg4_tile_info )
 {
 	galaxi_state *state = machine.driver_data<galaxi_state>();
-	UINT16 code = state->m_bg4_ram.target()[tile_index];
+	UINT16 code = state->m_bg4_ram[tile_index];
 	SET_TILE_INFO(0, code, (code >> 12), 0);
 }
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
 	galaxi_state *state = machine.driver_data<galaxi_state>();
-	UINT16 code = state->m_fg_ram.target()[tile_index];
+	UINT16 code = state->m_fg_ram[tile_index];
 	SET_TILE_INFO(1, code, 0x20 + (code >> 12), 0);
 }
 
 WRITE16_MEMBER(galaxi_state::galaxi_bg1_w)
 {
-	COMBINE_DATA(&m_bg1_ram.target()[offset]);
+	COMBINE_DATA(&m_bg1_ram[offset]);
 	m_bg1_tmap->mark_tile_dirty(offset);
 }
 
 WRITE16_MEMBER(galaxi_state::galaxi_bg2_w)
 {
-	COMBINE_DATA(&m_bg2_ram.target()[offset]);
+	COMBINE_DATA(&m_bg2_ram[offset]);
 	m_bg2_tmap->mark_tile_dirty(offset);
 }
 
 WRITE16_MEMBER(galaxi_state::galaxi_bg3_w)
 {
-	COMBINE_DATA(&m_bg3_ram.target()[offset]);
+	COMBINE_DATA(&m_bg3_ram[offset]);
 	m_bg3_tmap->mark_tile_dirty(offset);
 }
 
 WRITE16_MEMBER(galaxi_state::galaxi_bg4_w)
 {
-	COMBINE_DATA(&m_bg4_ram.target()[offset]);
+	COMBINE_DATA(&m_bg4_ram[offset]);
 	m_bg4_tmap->mark_tile_dirty(offset);
 }
 
 WRITE16_MEMBER(galaxi_state::galaxi_fg_w)
 {
-	COMBINE_DATA(&m_fg_ram.target()[offset]);
+	COMBINE_DATA(&m_fg_ram[offset]);
 	m_fg_tmap->mark_tile_dirty(offset);
 }
 

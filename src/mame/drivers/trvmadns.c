@@ -160,7 +160,7 @@ WRITE8_MEMBER(trvmadns_state::trvmadns_banking_w)
 
 WRITE8_MEMBER(trvmadns_state::trvmadns_gfxram_w)
 {
-	m_gfxram.target()[offset] = data;
+	m_gfxram[offset] = data;
 	gfx_element_mark_dirty(machine().gfx[0], offset/16);
 }
 
@@ -208,7 +208,7 @@ WRITE8_MEMBER(trvmadns_state::trvmadns_tileram_w)
 
 	}
 
-	m_tileram.target()[offset] = data;
+	m_tileram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset >> 1);
 }
 
@@ -264,8 +264,8 @@ static TILE_GET_INFO( get_bg_tile_info )
 	trvmadns_state *state = machine.driver_data<trvmadns_state>();
 	int tile,attr,color,flag;
 
-	attr = state->m_tileram.target()[tile_index*2 + 0];
-	tile = state->m_tileram.target()[tile_index*2 + 1] + ((attr & 0x01) << 8);
+	attr = state->m_tileram[tile_index*2 + 0];
+	tile = state->m_tileram[tile_index*2 + 1] + ((attr & 0x01) << 8);
 	color = (attr & 0x18) >> 3;
 	flag = TILE_FLIPXY((attr & 0x06) >> 1);
 
@@ -287,7 +287,7 @@ static VIDEO_START( trvmadns )
 
 //  fg_tilemap->set_transparent_pen(1);
 
-	gfx_element_set_source(machine.gfx[0], state->m_gfxram.target());
+	gfx_element_set_source(machine.gfx[0], state->m_gfxram);
 }
 
 static SCREEN_UPDATE_IND16( trvmadns )
@@ -304,8 +304,8 @@ static SCREEN_UPDATE_IND16( trvmadns )
 	{
 		for (x=0;x<32;x++)
 		{
-			int attr = state->m_tileram.target()[count*2+0];
-			int tile = state->m_tileram.target()[count*2+1] | ((attr & 0x01) << 8);
+			int attr = state->m_tileram[count*2+0];
+			int tile = state->m_tileram[count*2+1] | ((attr & 0x01) << 8);
 			int color = (attr & 0x18) >> 3;
 			int flipx = attr & 4;
 			int flipy = attr & 2;
@@ -322,8 +322,8 @@ static SCREEN_UPDATE_IND16( trvmadns )
 	{
 		for (x=0;x<32;x++)
 		{
-			int attr = state->m_tileram.target()[count*2+0];
-			int tile = state->m_tileram.target()[count*2+1] | ((attr & 0x01) << 8);
+			int attr = state->m_tileram[count*2+0];
+			int tile = state->m_tileram[count*2+1] | ((attr & 0x01) << 8);
 			int color = (attr & 0x18) >> 3;
 			int flipx = attr & 4;
 			int flipy = attr & 2;

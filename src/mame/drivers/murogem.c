@@ -213,8 +213,8 @@ static SCREEN_UPDATE_IND16(murogem)
 	{
 		for(xx=0;xx<32;xx++)
 		{
-			int tileno = state->m_videoram.target()[count]&0x3f;
-			int attr = state->m_videoram.target()[count+0x400]&0x0f;
+			int tileno = state->m_videoram[count]&0x3f;
+			int attr = state->m_videoram[count+0x400]&0x0f;
 
 			drawgfx_transpen(bitmap,cliprect,screen.machine().gfx[0],tileno,attr,0,0,xx*8,yy*8,0);
 

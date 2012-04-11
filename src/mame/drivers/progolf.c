@@ -153,7 +153,7 @@ static SCREEN_UPDATE_IND16( progolf )
 WRITE8_MEMBER(progolf_state::progolf_charram_w)
 {
 	int i;
-	m_fbram.target()[offset] = data;
+	m_fbram[offset] = data;
 
 	if(m_char_pen == 7)
 	{

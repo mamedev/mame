@@ -163,7 +163,7 @@ static TILE_GET_INFO( get_bgtile_info )
 static TILE_GET_INFO( get_txttile_info )
 {
 	panicr_state *state = machine.driver_data<panicr_state>();
-	UINT8 *videoram = state->m_videoram.target();
+	UINT8 *videoram = state->m_videoram;
 	int code=videoram[tile_index*4];
 	int attr=videoram[tile_index*4+2];
 	int color = attr & 0x07;
@@ -224,7 +224,7 @@ static VIDEO_START( panicr )
 static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect )
 {
 	panicr_state *state = machine.driver_data<panicr_state>();
-	UINT8 *spriteram = state->m_spriteram.target();
+	UINT8 *spriteram = state->m_spriteram;
 	int offs,flipx,flipy,x,y,color,sprite;
 
 	for (offs = 0; offs<0x1000; offs+=16)
@@ -236,7 +236,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 		if (spriteram[offs+1] & 0x40) x -= 0x100;
 
 		color = spriteram[offs+1] & 0x0f;
-		sprite = spriteram[offs+0]+(state->m_scrollram.target()[0x0c]<<8);
+		sprite = spriteram[offs+0]+(state->m_scrollram[0x0c]<<8);
 
 		drawgfx_transmask(bitmap,cliprect,machine.gfx[2],
 				sprite,
@@ -250,7 +250,7 @@ static SCREEN_UPDATE_IND16( panicr)
 	panicr_state *state = screen.machine().driver_data<panicr_state>();
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 	state->m_txttilemap ->mark_all_dirty();
-	state->m_bgtilemap->set_scrollx(0, ((state->m_scrollram.target()[0x02]&0x0f)<<12)+((state->m_scrollram.target()[0x02]&0xf0)<<4)+((state->m_scrollram.target()[0x04]&0x7f)<<1)+((state->m_scrollram.target()[0x04]&0x80)>>7) );
+	state->m_bgtilemap->set_scrollx(0, ((state->m_scrollram[0x02]&0x0f)<<12)+((state->m_scrollram[0x02]&0xf0)<<4)+((state->m_scrollram[0x04]&0x7f)<<1)+((state->m_scrollram[0x04]&0x80)>>7) );
 	state->m_bgtilemap->draw(bitmap, cliprect, 0,0);
 	draw_sprites(screen.machine(),bitmap,cliprect);
 	state->m_txttilemap->draw(bitmap, cliprect, 0,0);

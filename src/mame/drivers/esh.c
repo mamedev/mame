@@ -69,13 +69,13 @@ static SCREEN_UPDATE_IND16( esh )
 		{
 			int current_screen_character = (chary*32) + charx;
 
-			int palIndex  = (state->m_tile_control_ram.target()[current_screen_character] & 0x0f);
-			int tileOffs  = (state->m_tile_control_ram.target()[current_screen_character] & 0x10) >> 4;
-			//int blinkLine = (state->m_tile_control_ram.target()[current_screen_character] & 0x40) >> 6;
-			//int blinkChar = (state->m_tile_control_ram.target()[current_screen_character] & 0x80) >> 7;
+			int palIndex  = (state->m_tile_control_ram[current_screen_character] & 0x0f);
+			int tileOffs  = (state->m_tile_control_ram[current_screen_character] & 0x10) >> 4;
+			//int blinkLine = (state->m_tile_control_ram[current_screen_character] & 0x40) >> 6;
+			//int blinkChar = (state->m_tile_control_ram[current_screen_character] & 0x80) >> 7;
 
 			drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[0],
-					state->m_tile_ram.target()[current_screen_character] + (0x100 * tileOffs),
+					state->m_tile_ram[current_screen_character] + (0x100 * tileOffs),
 					palIndex,
 					0, 0, charx*8, chary*8, 0);
 		}

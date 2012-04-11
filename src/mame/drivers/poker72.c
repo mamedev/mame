@@ -47,10 +47,10 @@ static SCREEN_UPDATE_IND16(poker72)
 	{
 		for (x=0;x<64;x++)
 		{
-			int tile = ((state->m_vram.target()[count+1] & 0x0f) << 8 ) | (state->m_vram.target()[count+0] & 0xff); //TODO: tile bank
-			int fx = (state->m_vram.target()[count+1] & 0x10);
-			int fy = (state->m_vram.target()[count+1] & 0x20);
-			int color = (state->m_vram.target()[count+1] & 0xc0) >> 6;
+			int tile = ((state->m_vram[count+1] & 0x0f) << 8 ) | (state->m_vram[count+0] & 0xff); //TODO: tile bank
+			int fx = (state->m_vram[count+1] & 0x10);
+			int fy = (state->m_vram[count+1] & 0x20);
+			int color = (state->m_vram[count+1] & 0xc0) >> 6;
 
 			tile|= state->m_tile_bank << 12;
 
@@ -66,11 +66,11 @@ static SCREEN_UPDATE_IND16(poker72)
 WRITE8_MEMBER(poker72_state::poker72_paletteram_w)
 {
 	int r,g,b;
-	m_pal.target()[offset] = data;
+	m_pal[offset] = data;
 
-	r = m_pal.target()[(offset & 0x3ff)+0x000] & 0x3f;
-	g = m_pal.target()[(offset & 0x3ff)+0x400] & 0x3f;
-	b = m_pal.target()[(offset & 0x3ff)+0x800] & 0x3f;
+	r = m_pal[(offset & 0x3ff)+0x000] & 0x3f;
+	g = m_pal[(offset & 0x3ff)+0x400] & 0x3f;
+	b = m_pal[(offset & 0x3ff)+0x800] & 0x3f;
 
 	palette_set_color_rgb( machine(), offset & 0x3ff, pal6bit(r), pal6bit(g), pal6bit(b));
 }

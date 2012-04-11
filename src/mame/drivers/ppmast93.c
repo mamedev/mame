@@ -159,13 +159,13 @@ public:
 
 WRITE8_MEMBER(ppmast93_state::ppmast93_fgram_w)
 {
-	m_fgram.target()[offset] = data;
+	m_fgram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset/2);
 }
 
 WRITE8_MEMBER(ppmast93_state::ppmast93_bgram_w)
 {
-	m_bgram.target()[offset] = data;
+	m_bgram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset/2);
 }
 
@@ -325,7 +325,7 @@ GFXDECODE_END
 static TILE_GET_INFO( get_ppmast93_bg_tile_info )
 {
 	ppmast93_state *state = machine.driver_data<ppmast93_state>();
-	int code = (state->m_bgram.target()[tile_index*2+1] << 8) | state->m_bgram.target()[tile_index*2];
+	int code = (state->m_bgram[tile_index*2+1] << 8) | state->m_bgram[tile_index*2];
 	SET_TILE_INFO(
 			0,
 			code & 0x0fff,
@@ -336,7 +336,7 @@ static TILE_GET_INFO( get_ppmast93_bg_tile_info )
 static TILE_GET_INFO( get_ppmast93_fg_tile_info )
 {
 	ppmast93_state *state = machine.driver_data<ppmast93_state>();
-	int code = (state->m_fgram.target()[tile_index*2+1] << 8) | state->m_fgram.target()[tile_index*2];
+	int code = (state->m_fgram[tile_index*2+1] << 8) | state->m_fgram[tile_index*2];
 	SET_TILE_INFO(
 			0,
 			(code & 0x0fff)+0x1000,

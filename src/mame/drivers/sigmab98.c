@@ -213,7 +213,7 @@ public:
 static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri_mask)
 {
 	sigmab98_state *state = machine.driver_data<sigmab98_state>();
-	UINT8 *end		=	state->m_spriteram.target() - 0x10;
+	UINT8 *end		=	state->m_spriteram - 0x10;
 	UINT8 *s		=	end + state->m_spriteram.bytes();
 
 	for ( ; s != end; s -= 0x10 )
@@ -902,7 +902,7 @@ READ8_MEMBER(sigmab98_state::haekaka_b000_r)
 
 		case 0x65:	// SPRITERAM
 			if (offset < 0x1000)
-				return m_spriteram.target()[offset];
+				return m_spriteram[offset];
 
 		case 0x67:	// PALETTERAM + TABLE? + REGS
 			if (offset < 0x200)
@@ -923,7 +923,7 @@ WRITE8_MEMBER(sigmab98_state::haekaka_b000_w)
 		case 0x65:	// SPRITERAM
 			if (offset < 0x1000)
 			{
-				m_spriteram.target()[offset] = data;
+				m_spriteram[offset] = data;
 				return;
 			}
 			break;
@@ -1074,8 +1074,8 @@ WRITE8_MEMBER(sigmab98_state::itazuram_rombank_w)
 					break;
 
 				case 0x6c:	// 3800 IS RAM! (1000 bytes) - SPRITERAM
-					memory_set_bankptr(machine(), "rombank0", m_spriteram.target());
-					memory_set_bankptr(machine(), "sprbank0", m_spriteram.target());
+					memory_set_bankptr(machine(), "rombank0", m_spriteram);
+					memory_set_bankptr(machine(), "sprbank0", m_spriteram);
 //                  memory_set_bankptr(machine(), "sprbank1", m_spriteram + 0x1000*4);    // scratch
 					break;
 
@@ -1139,7 +1139,7 @@ WRITE8_MEMBER(sigmab98_state::itazuram_rambank_w)
 			m_rambank = data;
 			switch (data)
 			{
-				case 0x52:	memory_set_bankptr(machine(), "palbank", m_nvram.target());									break;
+				case 0x52:	memory_set_bankptr(machine(), "palbank", m_nvram);									break;
 				case 0x64:	memory_set_bankptr(machine(), "palbank", m_generic_paletteram_8);	break;
 				default:
 					logerror("%s: unknown ram bank = %02x, reg2 = %02x\n", machine().describe_context(), data, m_reg2);
@@ -1177,7 +1177,7 @@ WRITE8_MEMBER(sigmab98_state::itazuram_nvram_palette_w)
 	}
 	else if (m_rambank == 0x52)
 	{
-		m_nvram.target()[offset] = data;
+		m_nvram[offset] = data;
 	}
 	else
 	{
@@ -1378,7 +1378,7 @@ READ8_MEMBER(sigmab98_state::tdoboon_c000_r)
 
 		case 0x64:	// SPRITERAM
 			if (offset < 0x1000)
-				return m_spriteram.target()[offset];
+				return m_spriteram[offset];
 			break;
 
 		case 0x66:	// PALETTERAM + TABLE?
@@ -1403,7 +1403,7 @@ WRITE8_MEMBER(sigmab98_state::tdoboon_c000_w)
 		case 0x64:	// SPRITERAM
 			if (offset < 0x1000)
 			{
-				m_spriteram.target()[offset] = data;
+				m_spriteram[offset] = data;
 				return;
 			}
 			break;

@@ -101,8 +101,8 @@ static VIDEO_START( astrocorp )
 static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	astrocorp_state *state = machine.driver_data<astrocorp_state>();
-	UINT16 *source = state->m_spriteram.target();
-	UINT16 *finish = state->m_spriteram.target() + state->m_spriteram.bytes() / 2;
+	UINT16 *source = state->m_spriteram;
+	UINT16 *finish = state->m_spriteram + state->m_spriteram.bytes() / 2;
 
 	for ( ; source < finish; source += 8 / 2 )
 	{
@@ -279,11 +279,11 @@ READ16_MEMBER(astrocorp_state::astrocorp_unk_r)
 // 5-6-5 Palette: BBBBB-GGGGGG-RRRRR
 WRITE16_MEMBER(astrocorp_state::astrocorp_palette_w)
 {
-	COMBINE_DATA(&m_paletteram.target()[offset]);
+	COMBINE_DATA(&m_paletteram[offset]);
 	palette_set_color_rgb(machine(), offset,
-		pal5bit((m_paletteram.target()[offset] >>  0) & 0x1f),
-		pal6bit((m_paletteram.target()[offset] >>  5) & 0x3f),
-		pal5bit((m_paletteram.target()[offset] >> 11) & 0x1f)
+		pal5bit((m_paletteram[offset] >>  0) & 0x1f),
+		pal6bit((m_paletteram[offset] >>  5) & 0x3f),
+		pal5bit((m_paletteram[offset] >> 11) & 0x1f)
 	);
 }
 

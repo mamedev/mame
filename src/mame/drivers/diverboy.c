@@ -77,7 +77,7 @@ static VIDEO_START(diverboy)
 static void draw_sprites( running_machine& machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	diverboy_state *state = machine.driver_data<diverboy_state>();
-	UINT16 *source = state->m_spriteram.target();
+	UINT16 *source = state->m_spriteram;
 	UINT16 *finish = source + (state->m_spriteram.bytes() / 2);
 
 	while (source < finish)

@@ -468,14 +468,14 @@ public:
 
 WRITE8_MEMBER( avt_state::avt_videoram_w )
 {
-	m_videoram.target()[offset] = data;
+	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
 WRITE8_MEMBER( avt_state::avt_colorram_w )
 {
-	m_colorram.target()[offset] = data;
+	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
@@ -488,8 +488,8 @@ static TILE_GET_INFO( get_bg_tile_info )
     xxxx ----   color code.
     ---- xxxx   seems unused.
 */
-	int attr = state->m_colorram.target()[tile_index];
-	int code = state->m_videoram.target()[tile_index] | ((attr & 1) << 8);
+	int attr = state->m_colorram[tile_index];
+	int code = state->m_videoram[tile_index] | ((attr & 1) << 8);
 	int color = (attr & 0xf0)>>4;
 
 	SET_TILE_INFO( 0, code, color, 0);
@@ -516,8 +516,8 @@ static SCREEN_UPDATE_IND16( avt )
 	{
 		for(x=0;x<mc6845_h_display;x++)
 		{
-			UINT16 tile = state->m_videoram.target()[count] | ((state->m_colorram.target()[count] & 1) << 8);
-			UINT8 color = (state->m_colorram.target()[count] & 0xf0) >> 4;
+			UINT16 tile = state->m_videoram[count] | ((state->m_colorram[count] & 1) << 8);
+			UINT8 color = (state->m_colorram[count] & 0xf0) >> 4;
 
 			drawgfx_opaque(bitmap,cliprect,gfx,tile,color,0,0,x*8,(y*8));
 

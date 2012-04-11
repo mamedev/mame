@@ -111,20 +111,20 @@ public:
 static TILE_GET_INFO( get_fg_tile_info )
 {
 	jackie_state *state = machine.driver_data<jackie_state>();
-	int code = state->m_fg_tile_ram.target()[tile_index] | (state->m_fg_color_ram.target()[tile_index] << 8);
+	int code = state->m_fg_tile_ram[tile_index] | (state->m_fg_color_ram[tile_index] << 8);
 	int tile = code & 0x1fff;
 	SET_TILE_INFO(0, code, tile != 0x1fff ? ((code >> 12) & 0xe) + 1 : 0, 0);
 }
 
 WRITE8_MEMBER(jackie_state::fg_tile_w)
 {
-	m_fg_tile_ram.target()[offset] = data;
+	m_fg_tile_ram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(jackie_state::fg_color_w)
 {
-	m_fg_color_ram.target()[offset] = data;
+	m_fg_color_ram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
@@ -133,20 +133,20 @@ WRITE8_MEMBER(jackie_state::fg_color_w)
 
 WRITE8_MEMBER(jackie_state::bg_scroll_w)
 {
-	m_bg_scroll.target()[offset] = data;
+	m_bg_scroll[offset] = data;
 }
 
 
 WRITE8_MEMBER(jackie_state::jackie_reel1_ram_w)
 {
-	m_reel1_ram.target()[offset] = data;
+	m_reel1_ram[offset] = data;
 	m_reel1_tilemap->mark_tile_dirty(offset);
 }
 
 static TILE_GET_INFO( get_jackie_reel1_tile_info )
 {
 	jackie_state *state = machine.driver_data<jackie_state>();
-	int code = state->m_reel1_ram.target()[tile_index];
+	int code = state->m_reel1_ram[tile_index];
 	SET_TILE_INFO(1, code, 0, 0);
 }
 
@@ -154,28 +154,28 @@ static TILE_GET_INFO( get_jackie_reel1_tile_info )
 
 WRITE8_MEMBER(jackie_state::jackie_reel2_ram_w)
 {
-	m_reel2_ram.target()[offset] = data;
+	m_reel2_ram[offset] = data;
 	m_reel2_tilemap->mark_tile_dirty(offset);
 }
 
 static TILE_GET_INFO( get_jackie_reel2_tile_info )
 {
 	jackie_state *state = machine.driver_data<jackie_state>();
-	int code = state->m_reel2_ram.target()[tile_index];
+	int code = state->m_reel2_ram[tile_index];
 	SET_TILE_INFO(1, code, 0, 0);
 }
 
 
 WRITE8_MEMBER(jackie_state::jackie_reel3_ram_w)
 {
-	m_reel3_ram.target()[offset] = data;
+	m_reel3_ram[offset] = data;
 	m_reel3_tilemap->mark_tile_dirty(offset);
 }
 
 static TILE_GET_INFO( get_jackie_reel3_tile_info )
 {
 	jackie_state *state = machine.driver_data<jackie_state>();
-	int code = state->m_reel3_ram.target()[tile_index];
+	int code = state->m_reel3_ram[tile_index];
 	SET_TILE_INFO(1, code, 0, 0);
 }
 
@@ -206,15 +206,15 @@ static SCREEN_UPDATE_IND16(jackie)
 
 	for (i=0;i < 0x40;i++)
 	{
-		state->m_reel1_tilemap->set_scrolly(i, state->m_bg_scroll.target()[i+0x000]);
-		state->m_reel2_tilemap->set_scrolly(i, state->m_bg_scroll.target()[i+0x040]);
-		state->m_reel3_tilemap->set_scrolly(i, state->m_bg_scroll.target()[i+0x080]);
+		state->m_reel1_tilemap->set_scrolly(i, state->m_bg_scroll[i+0x000]);
+		state->m_reel2_tilemap->set_scrolly(i, state->m_bg_scroll[i+0x040]);
+		state->m_reel3_tilemap->set_scrolly(i, state->m_bg_scroll[i+0x080]);
 	}
 
 	for (j=0; j < 0x100-1; j++)
 	{
 		rectangle clip;
-		int rowenable = state->m_bg_scroll2.target()[j];
+		int rowenable = state->m_bg_scroll2[j];
 
 		/* draw top of screen */
 		clip.set(visarea.min_x, visarea.max_x, startclipmin, startclipmin+1);

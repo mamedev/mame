@@ -493,7 +493,7 @@ static SCREEN_UPDATE_IND16(mastboy)
 
 	for (i=0;i<0x200;i+=2)
 	{
-		int coldat = state->m_colram.target()[i+1] |  (state->m_colram.target()[i+0]<<8);
+		int coldat = state->m_colram[i+1] |  (state->m_colram[i+0]<<8);
 
 		palette_set_color_rgb(screen.machine(),i/2,pal4bit(coldat>>8),pal4bit(coldat>>12),pal4bit(coldat>>4));
 	}
@@ -503,8 +503,8 @@ static SCREEN_UPDATE_IND16(mastboy)
 		for (x=0;x<32;x++)
 		{
 			/* bytes 0 and 3 seem to be unused for rendering , they appear to contain data the game uses internally */
-			int tileno = (state->m_tileram.target()[count+1]|(state->m_tileram.target()[count+2]<<8))&0xfff;
-			int attr = (state->m_tileram.target()[count+2]&0xf0)>>4;
+			int tileno = (state->m_tileram[count+1]|(state->m_tileram[count+2]<<8))&0xfff;
+			int attr = (state->m_tileram[count+2]&0xf0)>>4;
 			gfx_element *gfx;
 
 			if (tileno&0x800)
@@ -606,14 +606,14 @@ WRITE8_MEMBER(mastboy_state::mastboy_bank_w)
 
 READ8_MEMBER(mastboy_state::mastboy_backupram_r)
 {
-	return m_nvram.target()[offset];
+	return m_nvram[offset];
 }
 
 WRITE8_MEMBER(mastboy_state::mastboy_backupram_w)
 {
 //  if (m_backupram_enabled)
 //  {
-		m_nvram.target()[offset] = data;
+		m_nvram[offset] = data;
 //  }
 //  else
 //  {

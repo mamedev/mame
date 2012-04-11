@@ -121,14 +121,14 @@ public:
 
 WRITE8_MEMBER(jokrwild_state::jokrwild_videoram_w)
 {
-	m_videoram.target()[offset] = data;
+	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
 WRITE8_MEMBER(jokrwild_state::jokrwild_colorram_w)
 {
-	m_colorram.target()[offset] = data;
+	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
@@ -141,8 +141,8 @@ static TILE_GET_INFO( get_bg_tile_info )
     xx-- ----   bank select.
     ---- xxxx   color code.
 */
-	int attr = state->m_colorram.target()[tile_index];
-	int code = state->m_videoram.target()[tile_index] | ((attr & 0xc0) << 2);
+	int attr = state->m_colorram[tile_index];
+	int code = state->m_videoram[tile_index] | ((attr & 0xc0) << 2);
 	int color = (attr & 0x0f);
 
 	SET_TILE_INFO( 0, code , color , 0);

@@ -242,7 +242,7 @@ static SCREEN_UPDATE_RGB32( enigma2 )
                and the adder at 16A is activated */
 			if (state->m_flip_screen)  videoram_address = (~videoram_address + 0x0400) & 0x1fff;
 
-			video_data = state->m_videoram.target()[videoram_address];
+			video_data = state->m_videoram[videoram_address];
 
 			fore_color = color_map_base[color_map_address] & 0x07;
 			star_color = star_map_base[star_map_address] & 0x07;
@@ -313,7 +313,7 @@ static SCREEN_UPDATE_RGB32( enigma2a )
                and the adder at 16A is activated */
 			if (state->m_flip_screen)  videoram_address = (~videoram_address + 0x0400) & 0x1fff;
 
-			video_data = state->m_videoram.target()[videoram_address];
+			video_data = state->m_videoram[videoram_address];
 		}
 
 		/* plot the current pixel */

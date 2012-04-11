@@ -174,13 +174,13 @@ public:
 
 WRITE8_MEMBER(miniboy7_state::miniboy7_videoram_w)
 {
-	m_videoram.target()[offset] = data;
+	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(miniboy7_state::miniboy7_colorram_w)
 {
-	m_colorram.target()[offset] = data;
+	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
@@ -193,8 +193,8 @@ static TILE_GET_INFO( get_bg_tile_info )
     ---- --x-   tiles bank.
     xx-- ---x   seems unused. */
 
-	int attr = state->m_colorram.target()[tile_index];
-	int code = state->m_videoram.target()[tile_index];
+	int attr = state->m_colorram[tile_index];
+	int code = state->m_videoram[tile_index];
 	int bank = (attr & 0x02) >> 1;	/* bit 1 switch the gfx banks */
 	int color = (attr & 0x3c);	/* bits 2-3-4-5 for color? */
 

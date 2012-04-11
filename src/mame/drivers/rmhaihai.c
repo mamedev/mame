@@ -60,21 +60,21 @@ public:
 
 WRITE8_MEMBER(rmhaihai_state::rmhaihai_videoram_w)
 {
-	m_videoram.target()[offset] = data;
+	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(rmhaihai_state::rmhaihai_colorram_w)
 {
-	m_colorram.target()[offset] = data;
+	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
 	rmhaihai_state *state = machine.driver_data<rmhaihai_state>();
-	int attr = state->m_colorram.target()[tile_index];
-	int code = state->m_videoram.target()[tile_index] + (state->m_gfxbank << 12) + ((attr & 0x07) << 8) + ((attr & 0x80) << 4);
+	int attr = state->m_colorram[tile_index];
+	int code = state->m_videoram[tile_index] + (state->m_gfxbank << 12) + ((attr & 0x07) << 8) + ((attr & 0x80) << 4);
 	int color = (state->m_gfxbank << 5) + (attr >> 3);
 
 	SET_TILE_INFO(0, code, color, 0);

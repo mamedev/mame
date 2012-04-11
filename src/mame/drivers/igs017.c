@@ -156,27 +156,27 @@ static VIDEO_RESET( igs017 )
 static TILE_GET_INFO( get_fg_tile_info )
 {
 	igs017_state *state = machine.driver_data<igs017_state>();
-	int code = state->m_fg_videoram.target()[tile_index*4+0] + (state->m_fg_videoram.target()[tile_index*4+1] << 8);
-	int attr = state->m_fg_videoram.target()[tile_index*4+2] + (state->m_fg_videoram.target()[tile_index*4+3] << 8);
+	int code = state->m_fg_videoram[tile_index*4+0] + (state->m_fg_videoram[tile_index*4+1] << 8);
+	int attr = state->m_fg_videoram[tile_index*4+2] + (state->m_fg_videoram[tile_index*4+3] << 8);
 	SET_TILE_INFO(0, code, COLOR(attr), TILE_FLIPXY( attr >> 5 ));
 }
 static TILE_GET_INFO( get_bg_tile_info )
 {
 	igs017_state *state = machine.driver_data<igs017_state>();
-	int code = state->m_bg_videoram.target()[tile_index*4+0] + (state->m_bg_videoram.target()[tile_index*4+1] << 8);
-	int attr = state->m_bg_videoram.target()[tile_index*4+2] + (state->m_bg_videoram.target()[tile_index*4+3] << 8);
+	int code = state->m_bg_videoram[tile_index*4+0] + (state->m_bg_videoram[tile_index*4+1] << 8);
+	int attr = state->m_bg_videoram[tile_index*4+2] + (state->m_bg_videoram[tile_index*4+3] << 8);
 	SET_TILE_INFO(0, code, COLOR(attr)+8, TILE_FLIPXY( attr >> 5 ));
 }
 
 WRITE8_MEMBER(igs017_state::fg_w)
 {
-	m_fg_videoram.target()[offset] = data;
+	m_fg_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset/4);
 }
 
 WRITE8_MEMBER(igs017_state::bg_w)
 {
-	m_bg_videoram.target()[offset] = data;
+	m_bg_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset/4);
 }
 
@@ -184,7 +184,7 @@ WRITE8_MEMBER(igs017_state::bg_w)
 
 READ16_MEMBER(igs017_state::fg_lsb_r)
 {
-	return m_fg_videoram.target()[offset];
+	return m_fg_videoram[offset];
 }
 WRITE16_MEMBER(igs017_state::fg_lsb_w)
 {
@@ -194,7 +194,7 @@ WRITE16_MEMBER(igs017_state::fg_lsb_w)
 
 READ16_MEMBER(igs017_state::bg_lsb_r)
 {
-	return m_bg_videoram.target()[offset];
+	return m_bg_videoram[offset];
 }
 WRITE16_MEMBER(igs017_state::bg_lsb_w)
 {
@@ -204,12 +204,12 @@ WRITE16_MEMBER(igs017_state::bg_lsb_w)
 
 READ16_MEMBER(igs017_state::spriteram_lsb_r)
 {
-	return m_spriteram.target()[offset];
+	return m_spriteram[offset];
 }
 WRITE16_MEMBER(igs017_state::spriteram_lsb_w)
 {
 	if (ACCESSING_BITS_0_7)
-		m_spriteram.target()[offset] = data;
+		m_spriteram[offset] = data;
 }
 
 
@@ -306,7 +306,7 @@ static void draw_sprite(running_machine &machine, bitmap_ind16 &bitmap,const rec
 static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
 	igs017_state *state = machine.driver_data<igs017_state>();
-	UINT8 *s	=	state->m_spriteram.target();
+	UINT8 *s	=	state->m_spriteram;
 	UINT8 *end	=	state->m_spriteram + 0x800;
 
 	for ( ; s < end; s += 8 )

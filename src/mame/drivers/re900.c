@@ -174,7 +174,7 @@ static READ8_DEVICE_HANDLER (re_psg_portB_r)
 
 READ8_MEMBER(re900_state::rom_r)
 {
-	return m_rom.target()[offset];
+	return m_rom[offset];
 }
 
 

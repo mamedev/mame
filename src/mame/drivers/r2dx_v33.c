@@ -98,7 +98,7 @@ static TILE_GET_INFO( get_tx_tile_info )
 static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect,int pri)
 {
 	r2dx_v33_state *state = machine.driver_data<r2dx_v33_state>();
-	UINT16 *spriteram16 = state->m_spriteram.target();
+	UINT16 *spriteram16 = state->m_spriteram;
 	int offs,fx,fy,x,y,color,sprite;
 //  int cur_pri;
 	int dx,dy,ax,ay;

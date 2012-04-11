@@ -79,7 +79,7 @@ static SCREEN_UPDATE_RGB32( toratora )
 
 		UINT8 y = offs >> 5;
 		UINT8 x = offs << 3;
-		UINT8 data = state->m_videoram.target()[offs];
+		UINT8 data = state->m_videoram[offs];
 
 		for (i = 0; i < 8; i++)
 		{
@@ -92,7 +92,7 @@ static SCREEN_UPDATE_RGB32( toratora )
 
 		/* the video system clears as it writes out the pixels */
 		if (state->m_clear_tv)
-			state->m_videoram.target()[offs] = 0;
+			state->m_videoram[offs] = 0;
 	}
 
 	state->m_clear_tv = 0;

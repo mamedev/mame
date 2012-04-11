@@ -142,11 +142,12 @@ static SCREEN_UPDATE_IND16(twins)
 	}
 
 	count=0;
+	UINT8 *videoram = reinterpret_cast<UINT8 *>(state->m_videoram.target());
 	for (y=0;y<yyy;y++)
 	{
 		for(x=0;x<xxx;x++)
 		{
-			bitmap.pix16(y, x) = ((UINT8 *)state->m_videoram.target())[BYTE_XOR_LE(count)];
+			bitmap.pix16(y, x) = videoram[BYTE_XOR_LE(count)];
 			count++;
 		}
 	}
@@ -241,11 +242,12 @@ static SCREEN_UPDATE_IND16(twinsa)
 	}
 
 	count=0;
+	UINT8 *videoram = reinterpret_cast<UINT8 *>(state->m_videoram.target());
 	for (y=0;y<yyy;y++)
 	{
 		for(x=0;x<xxx;x++)
 		{
-			bitmap.pix16(y, x) = ((UINT8 *)state->m_videoram.target())[BYTE_XOR_LE(count)];
+			bitmap.pix16(y, x) = videoram[BYTE_XOR_LE(count)];
 			count++;
 		}
 	}

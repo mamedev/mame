@@ -126,13 +126,13 @@ WRITE8_MEMBER(laserbas_state::vrambank_w)
 READ8_MEMBER(laserbas_state::protram_r)
 {
 
-	return m_protram.target()[offset];
+	return m_protram[offset];
 }
 
 WRITE8_MEMBER(laserbas_state::protram_w)
 {
 
-	m_protram.target()[offset] = data;
+	m_protram[offset] = data;
 }
 
 static ADDRESS_MAP_START( laserbas_memory, AS_PROGRAM, 8, laserbas_state )

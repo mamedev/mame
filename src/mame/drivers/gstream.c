@@ -211,21 +211,21 @@ CUSTOM_INPUT_MEMBER(gstream_state::gstream_mirror_r)
 
 WRITE32_MEMBER(gstream_state::gstream_palette_w)
 {
-	COMBINE_DATA(&m_paletteram.target()[offset]);
+	COMBINE_DATA(&m_paletteram[offset]);
 
-	palette_set_color_rgb(machine(), offset * 2, pal5bit(m_paletteram.target()[offset] >> (0 + 16)),
-									pal5bit(m_paletteram.target()[offset] >> (6 + 16)),
-									pal5bit(m_paletteram.target()[offset] >> (11 + 16)));
+	palette_set_color_rgb(machine(), offset * 2, pal5bit(m_paletteram[offset] >> (0 + 16)),
+									pal5bit(m_paletteram[offset] >> (6 + 16)),
+									pal5bit(m_paletteram[offset] >> (11 + 16)));
 
 
-	palette_set_color_rgb(machine(),offset * 2 + 1,pal5bit(m_paletteram.target()[offset] >> (0)),
-									pal5bit(m_paletteram.target()[offset] >> (6)),
-									pal5bit(m_paletteram.target()[offset] >> (11)));
+	palette_set_color_rgb(machine(),offset * 2 + 1,pal5bit(m_paletteram[offset] >> (0)),
+									pal5bit(m_paletteram[offset] >> (6)),
+									pal5bit(m_paletteram[offset] >> (11)));
 }
 
 WRITE32_MEMBER(gstream_state::gstream_vram_w)
 {
-	COMBINE_DATA(&m_vram.target()[offset]);
+	COMBINE_DATA(&m_vram[offset]);
 
 	if (ACCESSING_BITS_24_31)
 	{
@@ -447,16 +447,16 @@ GFXDECODE_END
 static TILE_GET_INFO( get_gs1_tile_info )
 {
 	gstream_state *state = machine.driver_data<gstream_state>();
-	int tileno = (state->m_vram.target()[tile_index + 0x000 / 4] & 0x0fff0000) >> 16;
-	int palette = (state->m_vram.target()[tile_index + 0x000 / 4] & 0xc0000000) >> 30;
+	int tileno = (state->m_vram[tile_index + 0x000 / 4] & 0x0fff0000) >> 16;
+	int palette = (state->m_vram[tile_index + 0x000 / 4] & 0xc0000000) >> 30;
 	SET_TILE_INFO(0, tileno, palette + 0x10, 0);
 }
 
 static TILE_GET_INFO( get_gs2_tile_info )
 {
 	gstream_state *state = machine.driver_data<gstream_state>();
-	int tileno = (state->m_vram.target()[tile_index + 0x400 / 4] & 0x0fff0000) >> 16;
-	int palette = (state->m_vram.target()[tile_index + 0x400 / 4] & 0xc0000000) >> 30;
+	int tileno = (state->m_vram[tile_index + 0x400 / 4] & 0x0fff0000) >> 16;
+	int palette = (state->m_vram[tile_index + 0x400 / 4] & 0xc0000000) >> 30;
 	SET_TILE_INFO(0, tileno + 0x1000, palette + 0x14, 0);
 }
 
@@ -464,8 +464,8 @@ static TILE_GET_INFO( get_gs2_tile_info )
 static TILE_GET_INFO( get_gs3_tile_info )
 {
 	gstream_state *state = machine.driver_data<gstream_state>();
-	int tileno = (state->m_vram.target()[tile_index + 0x800 / 4] & 0x0fff0000) >> 16;
-	int palette = (state->m_vram.target()[tile_index + 0x800 / 4] & 0xc0000000) >> 30;
+	int tileno = (state->m_vram[tile_index + 0x800 / 4] & 0x0fff0000) >> 16;
+	int palette = (state->m_vram[tile_index + 0x800 / 4] & 0xc0000000) >> 30;
 	SET_TILE_INFO(0, tileno + 0x2000, palette + 0x18, 0);
 }
 
@@ -518,10 +518,10 @@ static SCREEN_UPDATE_IND16(gstream)
 	for (i = 0x0000 / 4; i < 0x4000 / 4; i += 4)
 	{
 		/* Upper bits are used by the tilemaps */
-		int code = state->m_vram.target()[i + 0] & 0xffff;
-		int x = state->m_vram.target()[i + 1] & 0xffff;
-		int y = state->m_vram.target()[i + 2] & 0xffff;
-		int col = state->m_vram.target()[i + 3] & 0x1f;
+		int code = state->m_vram[i + 0] & 0xffff;
+		int x = state->m_vram[i + 1] & 0xffff;
+		int y = state->m_vram[i + 2] & 0xffff;
+		int col = state->m_vram[i + 3] & 0x1f;
 
 		/* co-ordinates are signed */
 		if (x & 0x8000) x -= 0x10000;
@@ -642,7 +642,7 @@ READ32_MEMBER(gstream_state::gstream_speedup_r)
 		m_maincpu->eat_cycles(50);
 	}
 
-	return m_workram.target()[0xd1ee0 / 4];
+	return m_workram[0xd1ee0 / 4];
 }
 
 static DRIVER_INIT( gstream )

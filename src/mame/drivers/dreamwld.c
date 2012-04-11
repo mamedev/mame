@@ -229,7 +229,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 
 WRITE32_MEMBER(dreamwld_state::dreamwld_bg_videoram_w)
 {
-	COMBINE_DATA(&m_bg_videoram.target()[offset]);
+	COMBINE_DATA(&m_bg_videoram[offset]);
 	m_bg_tilemap->mark_tile_dirty(offset * 2);
 	m_bg_tilemap->mark_tile_dirty(offset * 2 + 1);
 }
@@ -238,7 +238,7 @@ static TILE_GET_INFO( get_dreamwld_bg_tile_info )
 {
 	dreamwld_state *state = machine.driver_data<dreamwld_state>();
 	int tileno, colour;
-	tileno = (tile_index & 1) ? (state->m_bg_videoram.target()[tile_index >> 1] & 0xffff) : ((state->m_bg_videoram.target()[tile_index >> 1] >> 16) & 0xffff);
+	tileno = (tile_index & 1) ? (state->m_bg_videoram[tile_index >> 1] & 0xffff) : ((state->m_bg_videoram[tile_index >> 1] >> 16) & 0xffff);
 	colour = tileno >> 13;
 	tileno &= 0x1fff;
 	SET_TILE_INFO(1, tileno + state->m_tilebank[0] * 0x2000, 0x80 + colour, 0);
@@ -247,7 +247,7 @@ static TILE_GET_INFO( get_dreamwld_bg_tile_info )
 
 WRITE32_MEMBER(dreamwld_state::dreamwld_bg2_videoram_w)
 {
-	COMBINE_DATA(&m_bg2_videoram.target()[offset]);
+	COMBINE_DATA(&m_bg2_videoram[offset]);
 	m_bg2_tilemap->mark_tile_dirty(offset * 2);
 	m_bg2_tilemap->mark_tile_dirty(offset * 2 + 1);
 }
@@ -256,7 +256,7 @@ static TILE_GET_INFO( get_dreamwld_bg2_tile_info )
 {
 	dreamwld_state *state = machine.driver_data<dreamwld_state>();
 	UINT16 tileno, colour;
-	tileno = (tile_index & 1) ? (state->m_bg2_videoram.target()[tile_index >> 1] & 0xffff) : ((state->m_bg2_videoram.target()[tile_index >> 1] >> 16) & 0xffff);
+	tileno = (tile_index & 1) ? (state->m_bg2_videoram[tile_index >> 1] & 0xffff) : ((state->m_bg2_videoram[tile_index >> 1] >> 16) & 0xffff);
 	colour = tileno >> 13;
 	tileno &= 0x1fff;
 	SET_TILE_INFO(1, tileno + state->m_tilebank[1] * 0x2000, 0xc0 + colour, 0);
@@ -304,13 +304,13 @@ static SCREEN_UPDATE_IND16( dreamwld )
 	tmptilemap0 = state->m_bg_tilemap;
 	tmptilemap1 = state->m_bg2_tilemap;
 
-	int layer0_scrolly = state->m_vregs.target()[(0x400 / 4)] + 32;
-	int layer1_scrolly = state->m_vregs.target()[(0x400 / 4) + 2] + 32;
+	int layer0_scrolly = state->m_vregs[(0x400 / 4)] + 32;
+	int layer1_scrolly = state->m_vregs[(0x400 / 4) + 2] + 32;
 
-	int layer0_scrollx = state->m_vregs.target()[(0x400 / 4) + 1] + 3;
-	int layer1_scrollx = state->m_vregs.target()[(0x400 / 4) + 3] + 5;
-	UINT32 layer0_ctrl = state->m_vregs.target()[0x412 / 4];
-	UINT32 layer1_ctrl = state->m_vregs.target()[0x416 / 4];
+	int layer0_scrollx = state->m_vregs[(0x400 / 4) + 1] + 3;
+	int layer1_scrollx = state->m_vregs[(0x400 / 4) + 3] + 5;
+	UINT32 layer0_ctrl = state->m_vregs[0x412 / 4];
+	UINT32 layer1_ctrl = state->m_vregs[0x416 / 4];
 
 	tmptilemap0->set_scrolly(0, layer0_scrolly);
 	tmptilemap1->set_scrolly(0, layer1_scrolly);
@@ -340,14 +340,15 @@ static SCREEN_UPDATE_IND16( dreamwld )
 		int x0 = 0, x1 = 0;
 
 		/* layer 0 */
+		UINT16 *vregs = reinterpret_cast<UINT16 *>(state->m_vregs.target());
 		if (layer0_ctrl & 0x0300)
 		{
 			if (layer0_ctrl & 0x0200)
 				/* per-tile rowscroll */
-				x0 = ((UINT16 *)state->m_vregs.target())[BYTE_XOR_BE(0x000/2 + i/16)];
+				x0 = vregs[BYTE_XOR_BE(0x000/2 + i/16)];
 			else
 				/* per-line rowscroll */
-				x0 = ((UINT16 *)state->m_vregs.target())[BYTE_XOR_BE(0x000/2 + ((i + layer0_scrolly)&0xff))]; // different handling to psikyo.c? ( + scrolly )
+				x0 = vregs[BYTE_XOR_BE(0x000/2 + ((i + layer0_scrolly)&0xff))]; // different handling to psikyo.c? ( + scrolly )
 		}
 
 
@@ -361,10 +362,10 @@ static SCREEN_UPDATE_IND16( dreamwld )
 		{
 			if (layer1_ctrl & 0x0200)
 				/* per-tile rowscroll */
-				x1 = ((UINT16 *)state->m_vregs.target())[BYTE_XOR_BE(0x200/2 + i/16)];
+				x1 = vregs[BYTE_XOR_BE(0x200/2 + i/16)];
 			else
 				/* per-line rowscroll */
-				x1 = ((UINT16 *)state->m_vregs.target())[BYTE_XOR_BE(0x200/2 + ((i + layer1_scrolly)&0xff))];  // different handling to psikyo.c? ( + scrolly )
+				x1 = vregs[BYTE_XOR_BE(0x200/2 + ((i + layer1_scrolly)&0xff))];  // different handling to psikyo.c? ( + scrolly )
 		}
 
 
@@ -374,8 +375,8 @@ static SCREEN_UPDATE_IND16( dreamwld )
 	}
 
 
-	state->m_tilebank[0] = (state->m_vregs.target()[(0x400 / 4) + 4] >> 6) & 1;
-	state->m_tilebank[1] = (state->m_vregs.target()[(0x400 / 4) + 5] >> 6) & 1;
+	state->m_tilebank[0] = (state->m_vregs[(0x400 / 4) + 4] >> 6) & 1;
+	state->m_tilebank[1] = (state->m_vregs[(0x400 / 4) + 5] >> 6) & 1;
 
 	if (state->m_tilebank[0] != state->m_tilebankold[0])
 	{
@@ -445,13 +446,13 @@ WRITE32_MEMBER(dreamwld_state::dreamwld_palette_w)
 	UINT16 dat;
 	int color;
 
-	COMBINE_DATA(&m_paletteram.target()[offset]);
+	COMBINE_DATA(&m_paletteram[offset]);
 	color = offset * 2;
 
-	dat = m_paletteram.target()[offset] & 0x7fff;
+	dat = m_paletteram[offset] & 0x7fff;
 	palette_set_color_rgb(machine(), color+1, pal5bit(dat >> 10), pal5bit(dat >> 5), pal5bit(dat >> 0));
 
-	dat = (m_paletteram.target()[offset] >> 16) & 0x7fff;
+	dat = (m_paletteram[offset] >> 16) & 0x7fff;
 	palette_set_color_rgb(machine(), color, pal5bit(dat >> 10), pal5bit(dat >> 5), pal5bit(dat >> 0));
 }
 

@@ -239,7 +239,7 @@ static TILEMAP_MAPPER( range3_8x8 )
 static TILE_GET_INFO( get_sc0_tile_info )
 {
 	jalmah_state *state = machine.driver_data<jalmah_state>();
-	int code = state->m_sc0_vram.target()[tile_index];
+	int code = state->m_sc0_vram[tile_index];
 	SET_TILE_INFO(
 			3,
 			(code & 0xfff) + ((state->m_sc0bank & 3) << 12),
@@ -250,7 +250,7 @@ static TILE_GET_INFO( get_sc0_tile_info )
 static TILE_GET_INFO( get_sc1_tile_info )
 {
 	jalmah_state *state = machine.driver_data<jalmah_state>();
-	int code = state->m_sc1_vram.target()[tile_index];
+	int code = state->m_sc1_vram[tile_index];
 	SET_TILE_INFO(
 			2,
 			code & 0xfff,
@@ -261,7 +261,7 @@ static TILE_GET_INFO( get_sc1_tile_info )
 static TILE_GET_INFO( get_sc2_tile_info )
 {
 	jalmah_state *state = machine.driver_data<jalmah_state>();
-	int code = state->m_sc2_vram.target()[tile_index];
+	int code = state->m_sc2_vram[tile_index];
 	SET_TILE_INFO(
 			1,
 			code & 0xfff,
@@ -272,7 +272,7 @@ static TILE_GET_INFO( get_sc2_tile_info )
 static TILE_GET_INFO( get_sc3_tile_info )
 {
 	jalmah_state *state = machine.driver_data<jalmah_state>();
-	int code = state->m_sc3_vram.target()[tile_index];
+	int code = state->m_sc3_vram[tile_index];
 	SET_TILE_INFO(
 			0,
 			code & 0xfff,
@@ -502,7 +502,7 @@ static SCREEN_UPDATE_IND16( urashima )
 
 WRITE16_MEMBER(jalmah_state::sc0_vram_w)
 {
-	COMBINE_DATA(&m_sc0_vram.target()[offset]);
+	COMBINE_DATA(&m_sc0_vram[offset]);
 	/*2048x256 tilemap*/
 	m_sc0_tilemap_0->mark_tile_dirty(offset);
 	/*1024x512 tilemap*/
@@ -515,7 +515,7 @@ WRITE16_MEMBER(jalmah_state::sc0_vram_w)
 
 WRITE16_MEMBER(jalmah_state::sc3_vram_w)
 {
-	COMBINE_DATA(&m_sc3_vram.target()[offset]);
+	COMBINE_DATA(&m_sc3_vram[offset]);
 	/*2048x256 tilemap*/
 	m_sc3_tilemap_0->mark_tile_dirty(offset);
 	/*1024x512 tilemap*/
@@ -526,7 +526,7 @@ WRITE16_MEMBER(jalmah_state::sc3_vram_w)
 
 WRITE16_MEMBER(jalmah_state::sc1_vram_w)
 {
-	COMBINE_DATA(&m_sc1_vram.target()[offset]);
+	COMBINE_DATA(&m_sc1_vram[offset]);
 	/*2048x256 tilemap*/
 	m_sc1_tilemap_0->mark_tile_dirty(offset);
 	/*1024x512 tilemap*/
@@ -539,7 +539,7 @@ WRITE16_MEMBER(jalmah_state::sc1_vram_w)
 
 WRITE16_MEMBER(jalmah_state::sc2_vram_w)
 {
-	COMBINE_DATA(&m_sc2_vram.target()[offset]);
+	COMBINE_DATA(&m_sc2_vram[offset]);
 	/*2048x256 tilemap*/
 	m_sc2_tilemap_0->mark_tile_dirty(offset);
 	/*1024x512 tilemap*/
@@ -617,13 +617,13 @@ WRITE16_MEMBER(jalmah_state::urashima_bank_w)
 
 WRITE16_MEMBER(jalmah_state::urashima_sc0_vram_w)
 {
-	COMBINE_DATA(&m_sc0_vram.target()[offset]);
+	COMBINE_DATA(&m_sc0_vram[offset]);
 	m_sc0_tilemap_0->mark_tile_dirty(offset);
 }
 
 WRITE16_MEMBER(jalmah_state::urashima_sc3_vram_w)
 {
-	COMBINE_DATA(&m_sc3_vram.target()[offset]);
+	COMBINE_DATA(&m_sc3_vram[offset]);
 	m_sc3_tilemap_0->mark_tile_dirty(offset);
 }
 
@@ -739,7 +739,7 @@ static void daireika_palette_dma(running_machine &machine, UINT16 val)
 static void daireika_mcu_run(running_machine &machine)
 {
 	jalmah_state *state = machine.driver_data<jalmah_state>();
-	UINT16 *jm_shared_ram = state->m_jm_shared_ram.target();
+	UINT16 *jm_shared_ram = state->m_jm_shared_ram;
 
 	if(((jm_shared_ram[0x550/2] & 0xf00) == 0x700) && ((jm_shared_ram[0x540/2] & 0xf00) != state->m_dma_old))
 	{
@@ -789,7 +789,7 @@ static void daireika_mcu_run(running_machine &machine)
 static void mjzoomin_mcu_run(running_machine &machine)
 {
 	jalmah_state *state = machine.driver_data<jalmah_state>();
-	UINT16 *jm_shared_ram = state->m_jm_shared_ram.target();
+	UINT16 *jm_shared_ram = state->m_jm_shared_ram;
 
 	if(state->m_test_mode)	//service_mode
 	{
@@ -834,7 +834,7 @@ static void mjzoomin_mcu_run(running_machine &machine)
 static void urashima_mcu_run(running_machine &machine)
 {
 	jalmah_state *state = machine.driver_data<jalmah_state>();
-	UINT16 *jm_shared_ram = state->m_jm_shared_ram.target();
+	UINT16 *jm_shared_ram = state->m_jm_shared_ram;
 
 	if(state->m_test_mode)	//service_mode
 	{
@@ -879,7 +879,7 @@ static void urashima_mcu_run(running_machine &machine)
 static void second_mcu_run(running_machine &machine)
 {
 	jalmah_state *state = machine.driver_data<jalmah_state>();
-	UINT16 *jm_shared_ram = state->m_jm_shared_ram.target();
+	UINT16 *jm_shared_ram = state->m_jm_shared_ram;
 	if(state->m_test_mode)	//service_mode
 	{
 		jm_shared_ram[0x200/2] = input_port_read(machine, "KEY0");
@@ -1759,8 +1759,8 @@ data value is REQ under mjzoomin video test menu.It is related to the MCU?
 */
 WRITE16_MEMBER(jalmah_state::urashima_mcu_w)
 {
-	UINT16 *jm_shared_ram = m_jm_shared_ram.target();
-	UINT16 *jm_mcu_code = m_jm_mcu_code.target();
+	UINT16 *jm_shared_ram = m_jm_shared_ram;
+	UINT16 *jm_mcu_code = m_jm_mcu_code;
 	if(ACCESSING_BITS_0_7 && data)
 	{
 		/*******************************************************
@@ -1980,8 +1980,8 @@ static const UINT16 dai_mcu_code[0x11] = { 0x33c5, 0x0010, 0x07fe, 0x3a39,0x000f
 
 WRITE16_MEMBER(jalmah_state::daireika_mcu_w)
 {
-	UINT16 *jm_shared_ram = m_jm_shared_ram.target();
-	UINT16 *jm_mcu_code = m_jm_mcu_code.target();
+	UINT16 *jm_shared_ram = m_jm_shared_ram;
+	UINT16 *jm_mcu_code = m_jm_mcu_code;
 	UINT16 i;
 
 	if(ACCESSING_BITS_0_7 && data)
@@ -2256,8 +2256,8 @@ data value is REQ under mjzoomin video test menu.It is related to the MCU?
 */
 WRITE16_MEMBER(jalmah_state::mjzoomin_mcu_w)
 {
-	UINT16 *jm_shared_ram = m_jm_shared_ram.target();
-	UINT16 *jm_mcu_code = m_jm_mcu_code.target();
+	UINT16 *jm_shared_ram = m_jm_shared_ram;
+	UINT16 *jm_mcu_code = m_jm_mcu_code;
 	if(ACCESSING_BITS_0_7 && data)
 	{
 		/******************************************************

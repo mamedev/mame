@@ -239,8 +239,8 @@ public:
 static TILE_GET_INFO( get_gfx0b_tile_info )
 {
 	witch_state *state = machine.driver_data<witch_state>();
-	int code  = state->m_gfx0_vram.target()[tile_index];
-	int color = state->m_gfx0_cram.target()[tile_index];
+	int code  = state->m_gfx0_vram[tile_index];
+	int color = state->m_gfx0_cram[tile_index];
 
 	code=code | ((color & 0xe0) << 3);
 
@@ -259,8 +259,8 @@ static TILE_GET_INFO( get_gfx0b_tile_info )
 static TILE_GET_INFO( get_gfx0a_tile_info )
 {
 	witch_state *state = machine.driver_data<witch_state>();
-	int code  = state->m_gfx0_vram.target()[tile_index];
-	int color = state->m_gfx0_cram.target()[tile_index];
+	int code  = state->m_gfx0_vram[tile_index];
+	int color = state->m_gfx0_cram[tile_index];
 
 	code=code | ((color & 0xe0) << 3);
 
@@ -279,8 +279,8 @@ static TILE_GET_INFO( get_gfx0a_tile_info )
 static TILE_GET_INFO( get_gfx1_tile_info )
 {
 	witch_state *state = machine.driver_data<witch_state>();
-	int code  = state->m_gfx1_vram.target()[tile_index];
-	int color = state->m_gfx1_cram.target()[tile_index];
+	int code  = state->m_gfx1_vram[tile_index];
+	int color = state->m_gfx1_cram[tile_index];
 
 	SET_TILE_INFO(
 			0,
@@ -291,25 +291,25 @@ static TILE_GET_INFO( get_gfx1_tile_info )
 
 WRITE8_MEMBER(witch_state::gfx0_vram_w)
 {
-	m_gfx0_vram.target()[offset] = data;
+	m_gfx0_vram[offset] = data;
 	m_gfx0a_tilemap->mark_tile_dirty(offset);
 	m_gfx0b_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(witch_state::gfx0_cram_w)
 {
-	m_gfx0_cram.target()[offset] = data;
+	m_gfx0_cram[offset] = data;
 	m_gfx0a_tilemap->mark_tile_dirty(offset);
 	m_gfx0b_tilemap->mark_tile_dirty(offset);
 }
 READ8_MEMBER(witch_state::gfx0_vram_r)
 {
-	return m_gfx0_vram.target()[offset];
+	return m_gfx0_vram[offset];
 }
 
 READ8_MEMBER(witch_state::gfx0_cram_r)
 {
-	return m_gfx0_cram.target()[offset];
+	return m_gfx0_cram[offset];
 }
 
 #define FIX_OFFSET() do { \
@@ -318,26 +318,26 @@ READ8_MEMBER(witch_state::gfx0_cram_r)
 WRITE8_MEMBER(witch_state::gfx1_vram_w)
 {
 	FIX_OFFSET();
-	m_gfx1_vram.target()[offset] = data;
+	m_gfx1_vram[offset] = data;
 	m_gfx1_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(witch_state::gfx1_cram_w)
 {
 	FIX_OFFSET();
-	m_gfx1_cram.target()[offset] = data;
+	m_gfx1_cram[offset] = data;
 	m_gfx1_tilemap->mark_tile_dirty(offset);
 }
 READ8_MEMBER(witch_state::gfx1_vram_r)
 {
 	FIX_OFFSET();
-	return m_gfx1_vram.target()[offset];
+	return m_gfx1_vram[offset];
 }
 
 READ8_MEMBER(witch_state::gfx1_cram_r)
 {
 	FIX_OFFSET();
-	return m_gfx1_cram.target()[offset];
+	return m_gfx1_cram[offset];
 }
 
 READ8_MEMBER(witch_state::read_a00x)
@@ -724,12 +724,12 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 	for(i=0;i<0x800;i+=0x20) {
 
 
-		sx     = state->m_sprite_ram.target()[i+1];
+		sx     = state->m_sprite_ram[i+1];
 		if(sx!=0xF8) {
-			tileno = (state->m_sprite_ram.target()[i]<<2)  | (( state->m_sprite_ram.target()[i+0x800] & 0x07 ) << 10 );
+			tileno = (state->m_sprite_ram[i]<<2)  | (( state->m_sprite_ram[i+0x800] & 0x07 ) << 10 );
 
-			sy     = state->m_sprite_ram.target()[i+2];
-			flags  = state->m_sprite_ram.target()[i+3];
+			sy     = state->m_sprite_ram[i+2];
+			flags  = state->m_sprite_ram[i+3];
 
 			flipx  = (flags & 0x10 ) ? 1 : 0;
 			flipy  = (flags & 0x20 ) ? 1 : 0;

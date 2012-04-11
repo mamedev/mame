@@ -201,7 +201,7 @@ static SCREEN_UPDATE_IND16( safarir )
 {
 	safarir_state *state = screen.machine().driver_data<safarir_state>();
 
-	state->m_bg_tilemap->set_scrollx(0, *state->m_bg_scroll.target());
+	state->m_bg_tilemap->set_scrollx(0, *state->m_bg_scroll);
 
 	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);

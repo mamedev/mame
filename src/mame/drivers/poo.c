@@ -86,9 +86,9 @@ static SCREEN_UPDATE_IND16(unclepoo)
 	{
 		for (y=0;y<32;y++)
 		{
-			int tile = state->m_vram.target()[count+0x000] | ((state->m_vram.target()[count+0x400] & 3) <<8);
-			int color = (state->m_vram.target()[count+0x400] & 0x38) >> 3;
-			int scrolly = (state->m_scrolly.target()[x*4]);
+			int tile = state->m_vram[count+0x000] | ((state->m_vram[count+0x400] & 3) <<8);
+			int color = (state->m_vram[count+0x400] & 0x38) >> 3;
+			int scrolly = (state->m_scrolly[x*4]);
 
 			drawgfx_opaque(bitmap,cliprect,gfx,tile,color+state->m_vram_colbank,0,0,x*8,256-(y*8)+scrolly);
 			drawgfx_opaque(bitmap,cliprect,gfx,tile,color+state->m_vram_colbank,0,0,x*8,0-(y*8)+scrolly);
@@ -102,10 +102,10 @@ static SCREEN_UPDATE_IND16(unclepoo)
 
 		for(i=0;i<0x80;i+=4)
 		{
-			spr_offs = state->m_sprites.target()[i+2] | (state->m_sprites.target()[i+3] & 3) << 8;
-			y = state->m_sprites.target()[i+0]+8;
-			x = state->m_sprites.target()[i+1];
-			col = (state->m_sprites.target()[i+3] & 0xf8) >> 3;
+			spr_offs = state->m_sprites[i+2] | (state->m_sprites[i+3] & 3) << 8;
+			y = state->m_sprites[i+0]+8;
+			x = state->m_sprites[i+1];
+			col = (state->m_sprites[i+3] & 0xf8) >> 3;
 			fx = 0;
 			fy = 0;
 

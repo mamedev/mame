@@ -79,7 +79,7 @@ READ8_MEMBER(hotblock_state::hotblock_video_read)
 	}
 	else // port 0 = 88 c8
 	{
-		return m_vram.target()[offset];
+		return m_vram[offset];
 	}
 }
 
@@ -117,7 +117,7 @@ WRITE8_MEMBER(hotblock_state::hotblock_video_write)
 	}
 	else // port 0 = 88 c8
 	{
-		m_vram.target()[offset] = data;
+		m_vram[offset] = data;
 	}
 }
 
@@ -163,7 +163,7 @@ static SCREEN_UPDATE_IND16(hotblock)
 		for(x = 0; x < xxx; x++)
 		{
 			if (state->m_port0 & 0x40)
-				bitmap.pix16(y, x) = state->m_vram.target()[count];
+				bitmap.pix16(y, x) = state->m_vram[count];
 			count++;
 		}
 	}

@@ -133,7 +133,7 @@ static SCREEN_UPDATE_IND16( spectrum )
     unsigned char *attr, *scr;
 //  int full_refresh = 1;
 
-    scr=state->m_spectrum_video_ram.target();
+    scr=state->m_spectrum_video_ram;
 
 	bitmap.fill(state->m_spectrum_port_fe & 0x07, cliprect);
 

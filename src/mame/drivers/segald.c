@@ -69,7 +69,7 @@ static void astron_draw_characters(running_machine &machine, bitmap_ind16 &bitma
 		for (characterY = 0; characterY < 32; characterY++)
 		{
 			int current_screen_character = (characterY*32) + characterX;
-			drawgfx_transpen(bitmap, cliprect, machine.gfx[0], state->m_fix_RAM.target()[current_screen_character],
+			drawgfx_transpen(bitmap, cliprect, machine.gfx[0], state->m_fix_RAM[current_screen_character],
 					1, 0, 0, characterX*8, characterY*8, 0);
 		}
 	}
@@ -95,8 +95,8 @@ static void astron_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, 
 	for (spr_number = 0; spr_number < 32; spr_number++)
 	{
 		spr_base = 0x10 * spr_number;
-		sy = state->m_obj_RAM.target()[spr_base + SPR_Y_TOP];
-		sx = state->m_obj_RAM.target()[spr_base + SPR_X_LO];
+		sy = state->m_obj_RAM[spr_base + SPR_Y_TOP];
+		sx = state->m_obj_RAM[spr_base + SPR_X_LO];
 
 		if (sx != 0 || sy != 0)
 			logerror("Hey!  A sprite's not at 0,0 : %d %d", sx, sy);
@@ -132,22 +132,22 @@ READ8_MEMBER(segald_state::astron_DISC_read)
 READ8_MEMBER(segald_state::astron_OUT_read)
 {
 
-	logerror("OUT read   (0x%04x) @ 0x%04x [0x%x]\n", m_out_RAM.target()[offset], offset, cpu_get_pc(&space.device()));
-	return m_out_RAM.target()[offset];
+	logerror("OUT read   (0x%04x) @ 0x%04x [0x%x]\n", m_out_RAM[offset], offset, cpu_get_pc(&space.device()));
+	return m_out_RAM[offset];
 }
 
 READ8_MEMBER(segald_state::astron_OBJ_read)
 {
 
-	logerror("OBJ read   (0x%04x) @ 0x%04x [0x%x]\n", m_obj_RAM.target()[offset], offset, cpu_get_pc(&space.device()));
-	return m_obj_RAM.target()[offset];
+	logerror("OBJ read   (0x%04x) @ 0x%04x [0x%x]\n", m_obj_RAM[offset], offset, cpu_get_pc(&space.device()));
+	return m_obj_RAM[offset];
 }
 
 READ8_MEMBER(segald_state::astron_COLOR_read)
 {
 
-	logerror("COLOR read   (0x%04x) @ 0x%04x [0x%x]\n", m_color_RAM.target()[offset], offset, cpu_get_pc(&space.device()));
-	return m_color_RAM.target()[offset];
+	logerror("COLOR read   (0x%04x) @ 0x%04x [0x%x]\n", m_color_RAM[offset], offset, cpu_get_pc(&space.device()));
+	return m_color_RAM[offset];
 }
 
 
@@ -197,13 +197,13 @@ WRITE8_MEMBER(segald_state::astron_OUT_write)
 			break;
 	}
 
-	m_out_RAM.target()[offset] = data;
+	m_out_RAM[offset] = data;
 }
 
 WRITE8_MEMBER(segald_state::astron_OBJ_write)
 {
 
-	m_obj_RAM.target()[offset] = data;
+	m_obj_RAM[offset] = data;
 	logerror("OBJ write : 0x%04x @ 0x%04x [0x%x]\n", data, offset, cpu_get_pc(&space.device()));
 }
 
@@ -214,11 +214,11 @@ WRITE8_MEMBER(segald_state::astron_COLOR_write)
 	const UINT8 palIndex = offset >> 1;
 
 	/* Combine */
-	m_color_RAM.target()[offset] = data;
+	m_color_RAM[offset] = data;
 
 	/* Easy access */
-	highBits = m_color_RAM.target()[(palIndex<<1)+1] & 0x0f;
-	lowBits  = m_color_RAM.target()[(palIndex<<1)];
+	highBits = m_color_RAM[(palIndex<<1)+1] & 0x0f;
+	lowBits  = m_color_RAM[(palIndex<<1)];
 
 	/* 4-bit RGB */
 	r = (lowBits  & 0x0f);
@@ -233,7 +233,7 @@ WRITE8_MEMBER(segald_state::astron_COLOR_write)
 WRITE8_MEMBER(segald_state::astron_FIX_write)
 {
 
-	m_fix_RAM.target()[offset] = data;
+	m_fix_RAM[offset] = data;
 	/* logerror("FIX write : 0x%04x @ 0x%04x [0x%x]\n", data, offset, cpu_get_pc(&space.device())); */
 }
 

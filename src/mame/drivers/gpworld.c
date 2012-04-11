@@ -92,7 +92,7 @@ static void gpworld_draw_tiles(running_machine &machine, bitmap_ind16 &bitmap,co
 		{
 			int current_screen_character = (characterY*64) + characterX;
 
-			drawgfx_transpen(bitmap, cliprect, machine.gfx[0], state->m_tile_RAM.target()[current_screen_character],
+			drawgfx_transpen(bitmap, cliprect, machine.gfx[0], state->m_tile_RAM[current_screen_character],
 					characterY, 0, 0, characterX*8, characterY*8, 0);
 		}
 	}
@@ -278,15 +278,15 @@ WRITE8_MEMBER(gpworld_state::palette_write)
 	/* This is all just a (bad) guess */
 	int pal_index, r, g, b, a;
 
-	m_palette_RAM.target()[offset] = data;
+	m_palette_RAM[offset] = data;
 
 	/* "Round down" to the nearest palette entry */
 	pal_index = offset & 0xffe;
 
-	g = (m_palette_RAM.target()[pal_index]   & 0xf0) << 0;
-	b = (m_palette_RAM.target()[pal_index]   & 0x0f) << 4;
-	r = (m_palette_RAM.target()[pal_index+1] & 0x0f) << 4;
-	a = (m_palette_RAM.target()[pal_index+1] & 0x80) ? 0 : 255;	/* guess */
+	g = (m_palette_RAM[pal_index]   & 0xf0) << 0;
+	b = (m_palette_RAM[pal_index]   & 0x0f) << 4;
+	r = (m_palette_RAM[pal_index+1] & 0x0f) << 4;
+	a = (m_palette_RAM[pal_index+1] & 0x80) ? 0 : 255;	/* guess */
 
 	/* logerror("PAL WRITE index : %x  rgb : %d %d %d (real %x) at %x\n", pal_index, r,g,b, data, offset); */
 

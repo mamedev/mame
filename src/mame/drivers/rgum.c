@@ -50,7 +50,7 @@ static SCREEN_UPDATE_IND16(royalgum)
 	{
 		for(x=0;x<66;x++)
 		{
-			int tile = state->m_vram.target()[count] | ((state->m_cram.target()[count] & 0xf) <<8);
+			int tile = state->m_vram[count] | ((state->m_cram[count] & 0xf) <<8);
 
 			drawgfx_opaque(bitmap,cliprect,gfx,tile,0,0,0,x*8,y*8);
 

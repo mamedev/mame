@@ -235,7 +235,7 @@ public:
 
 WRITE8_MEMBER(tmspoker_state::tmspoker_videoram_w)
 {
-	m_videoram.target()[offset] = data;
+	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
@@ -249,7 +249,7 @@ static TILE_GET_INFO( get_bg_tile_info )
     ---- ----   seems unused.
 */
 	tmspoker_state *state = machine.driver_data<tmspoker_state>();
-	int code = state->m_videoram.target()[tile_index];
+	int code = state->m_videoram[tile_index];
 
 	SET_TILE_INFO( 0 /* bank */, code, 0 /* color */, 0);
 }

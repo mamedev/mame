@@ -67,7 +67,7 @@ public:
 static TILE_GET_INFO( get_t1_tile_info )
 {
 	koftball_state *state = machine.driver_data<koftball_state>();
-	int data = state->m_bmc_1_videoram.target()[tile_index];
+	int data = state->m_bmc_1_videoram[tile_index];
 	SET_TILE_INFO(
 			0,
 			data,
@@ -78,7 +78,7 @@ static TILE_GET_INFO( get_t1_tile_info )
 static TILE_GET_INFO( get_t2_tile_info )
 {
 	koftball_state *state = machine.driver_data<koftball_state>();
-	int data = state->m_bmc_2_videoram.target()[tile_index];
+	int data = state->m_bmc_2_videoram[tile_index];
 	SET_TILE_INFO(
 			0,
 			data,
@@ -147,13 +147,13 @@ WRITE16_MEMBER(koftball_state::prot_w)
 
 WRITE16_MEMBER(koftball_state::bmc_1_videoram_w)
 {
-	COMBINE_DATA(&m_bmc_1_videoram.target()[offset]);
+	COMBINE_DATA(&m_bmc_1_videoram[offset]);
 	m_tilemap_1->mark_tile_dirty(offset);
 }
 
 WRITE16_MEMBER(koftball_state::bmc_2_videoram_w)
 {
-	COMBINE_DATA(&m_bmc_2_videoram.target()[offset]);
+	COMBINE_DATA(&m_bmc_2_videoram[offset]);
 	m_tilemap_2->mark_tile_dirty(offset);
 }
 
@@ -315,7 +315,7 @@ static DRIVER_INIT(koftball)
 		int offset=0;
 		while(nvram[offset]!=0xffff)
 		{
-			state->m_main_ram.target()[offset]=nvram[offset];
+			state->m_main_ram[offset]=nvram[offset];
 			++offset;
 		}
 	}

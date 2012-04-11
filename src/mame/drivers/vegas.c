@@ -546,8 +546,8 @@ static MACHINE_START( vegas )
 	mips3drc_set_options(machine.device("maincpu"), MIPS3DRC_FASTEST_OPTIONS + MIPS3DRC_STRICT_VERIFY + MIPS3DRC_FLUSH_PC);
 
 	/* configure fast RAM regions for DRC */
-	mips3drc_add_fastram(machine.device("maincpu"), 0x00000000, state->m_rambase.bytes() - 1, FALSE, state->m_rambase.target());
-	mips3drc_add_fastram(machine.device("maincpu"), 0x1fc00000, 0x1fc7ffff, TRUE, state->m_rombase.target());
+	mips3drc_add_fastram(machine.device("maincpu"), 0x00000000, state->m_rambase.bytes() - 1, FALSE, state->m_rambase);
+	mips3drc_add_fastram(machine.device("maincpu"), 0x1fc00000, 0x1fc7ffff, TRUE, state->m_rombase);
 
 	/* register for save states */
 	state_save_register_global(machine, state->m_nile_irq_state);
@@ -845,22 +845,22 @@ static WRITE32_HANDLER( pci_3dfx_w )
 static void update_nile_irqs(running_machine &machine)
 {
 	vegas_state *state = machine.driver_data<vegas_state>();
-	UINT32 intctll = state->m_nile_regs.target()[NREG_INTCTRL+0];
-	UINT32 intctlh = state->m_nile_regs.target()[NREG_INTCTRL+1];
+	UINT32 intctll = state->m_nile_regs[NREG_INTCTRL+0];
+	UINT32 intctlh = state->m_nile_regs[NREG_INTCTRL+1];
 	UINT8 irq[6];
 	int i;
 
 	/* check for UART transmit IRQ enable and synthsize one */
-	if (state->m_nile_regs.target()[NREG_UARTIER] & 2)
+	if (state->m_nile_regs[NREG_UARTIER] & 2)
 		state->m_nile_irq_state |= 0x0010;
 	else
 		state->m_nile_irq_state &= ~0x0010;
 
 	irq[0] = irq[1] = irq[2] = irq[3] = irq[4] = irq[5] = 0;
-	state->m_nile_regs.target()[NREG_INTSTAT0+0] = 0;
-	state->m_nile_regs.target()[NREG_INTSTAT0+1] = 0;
-	state->m_nile_regs.target()[NREG_INTSTAT1+0] = 0;
-	state->m_nile_regs.target()[NREG_INTSTAT1+1] = 0;
+	state->m_nile_regs[NREG_INTSTAT0+0] = 0;
+	state->m_nile_regs[NREG_INTSTAT0+1] = 0;
+	state->m_nile_regs[NREG_INTSTAT1+0] = 0;
+	state->m_nile_regs[NREG_INTSTAT1+1] = 0;
 
 	/* handle the lower interrupts */
 	for (i = 0; i < 8; i++)
@@ -871,7 +871,7 @@ static void update_nile_irqs(running_machine &machine)
 				if (vector < 6)
 				{
 					irq[vector] = 1;
-					state->m_nile_regs.target()[NREG_INTSTAT0 + vector/2] |= 1 << (i + 16*(vector&1));
+					state->m_nile_regs[NREG_INTSTAT0 + vector/2] |= 1 << (i + 16*(vector&1));
 				}
 			}
 
@@ -884,7 +884,7 @@ static void update_nile_irqs(running_machine &machine)
 				if (vector < 6)
 				{
 					irq[vector] = 1;
-					state->m_nile_regs.target()[NREG_INTSTAT0 + vector/2] |= 1 << (i + 8 + 16*(vector&1));
+					state->m_nile_regs[NREG_INTSTAT0 + vector/2] |= 1 << (i + 8 + 16*(vector&1));
 				}
 			}
 
@@ -911,7 +911,7 @@ static TIMER_CALLBACK( nile_timer_callback )
 {
 	vegas_state *state = machine.driver_data<vegas_state>();
 	int which = param;
-	UINT32 *regs = &state->m_nile_regs.target()[NREG_T0CTRL + which * 4];
+	UINT32 *regs = &state->m_nile_regs[NREG_T0CTRL + which * 4];
 	if (LOG_TIMERS) logerror("timer %d fired\n", which);
 
 	/* adjust the timer to fire again */
@@ -943,7 +943,7 @@ static TIMER_CALLBACK( nile_timer_callback )
 static READ32_HANDLER( nile_r )
 {
 	vegas_state *state = space->machine().driver_data<vegas_state>();
-	UINT32 result = state->m_nile_regs.target()[offset];
+	UINT32 result = state->m_nile_regs[offset];
 	int logit = 1, which;
 
 	switch (offset)
@@ -1000,11 +1000,11 @@ static READ32_HANDLER( nile_r )
 		case NREG_T2CNTR:		/* general purpose timer control (counter) */
 		case NREG_T3CNTR:		/* watchdog timer control (counter) */
 			which = (offset - NREG_T0CTRL) / 4;
-			if (state->m_nile_regs.target()[offset - 1] & 1)
+			if (state->m_nile_regs[offset - 1] & 1)
 			{
-				if (state->m_nile_regs.target()[offset] & 2)
+				if (state->m_nile_regs[offset] & 2)
 					logerror("Unexpected value: timer %d is prescaled\n", which);
-				result = state->m_nile_regs.target()[offset + 1] = state->m_timer[which]->remaining().as_double() * (double)SYSTEM_CLOCK;
+				result = state->m_nile_regs[offset + 1] = state->m_timer[which]->remaining().as_double() * (double)SYSTEM_CLOCK;
 			}
 
 			if (LOG_TIMERS) logerror("%08X:NILE READ: timer %d counter(%03X) = %08X\n", cpu_get_pc(&space->device()), which, offset*4, result);
@@ -1012,7 +1012,7 @@ static READ32_HANDLER( nile_r )
 			break;
 
 		case NREG_UARTIIR:			/* serial port interrupt ID */
-			if (state->m_nile_regs.target()[NREG_UARTIER] & 2)
+			if (state->m_nile_regs[NREG_UARTIER] & 2)
 				result = 0x02;			/* transmitter buffer IRQ pending */
 			else
 				result = 0x01;			/* no IRQ pending */
@@ -1056,10 +1056,10 @@ static READ32_HANDLER( nile_r )
 static WRITE32_HANDLER( nile_w )
 {
 	vegas_state *state = space->machine().driver_data<vegas_state>();
-	UINT32 olddata = state->m_nile_regs.target()[offset];
+	UINT32 olddata = state->m_nile_regs[offset];
 	int logit = 1, which;
 
-	COMBINE_DATA(&state->m_nile_regs.target()[offset]);
+	COMBINE_DATA(&state->m_nile_regs[offset]);
 
 	switch (offset)
 	{
@@ -1094,7 +1094,7 @@ static WRITE32_HANDLER( nile_w )
 		case NREG_INTCLR+1:		/* Interrupt clear */
 			if (LOG_NILE) logerror("%08X:NILE WRITE: interrupt clear(%03X) = %08X & %08X\n", cpu_get_pc(&space->device()), offset*4, data, mem_mask);
 			logit = 0;
-			state->m_nile_irq_state &= ~(state->m_nile_regs.target()[offset] & ~0xf00);
+			state->m_nile_irq_state &= ~(state->m_nile_regs[offset] & ~0xf00);
 			update_nile_irqs(space->machine());
 			break;
 
@@ -1115,7 +1115,7 @@ static WRITE32_HANDLER( nile_w )
 			break;
 
 		case NREG_PCIINIT1+0:	/* PCI master */
-			if (((olddata & 0xe) == 0xa) != ((state->m_nile_regs.target()[offset] & 0xe) == 0xa))
+			if (((olddata & 0xe) == 0xa) != ((state->m_nile_regs[offset] & 0xe) == 0xa))
 				remap_dynamic_addresses(space->machine());
 			logit = 0;
 			break;
@@ -1129,22 +1129,22 @@ static WRITE32_HANDLER( nile_w )
 			logit = 0;
 
 			/* timer just enabled? */
-			if (!(olddata & 1) && (state->m_nile_regs.target()[offset] & 1))
+			if (!(olddata & 1) && (state->m_nile_regs[offset] & 1))
 			{
-				UINT32 scale = state->m_nile_regs.target()[offset + 1];
-				if (state->m_nile_regs.target()[offset] & 2)
+				UINT32 scale = state->m_nile_regs[offset + 1];
+				if (state->m_nile_regs[offset] & 2)
 					logerror("Unexpected value: timer %d is prescaled\n", which);
 				if (scale != 0)
 					state->m_timer[which]->adjust(TIMER_PERIOD * scale, which);
-				if (LOG_TIMERS) logerror("Starting timer %d at a rate of %d Hz\n", which, (int)ATTOSECONDS_TO_HZ((TIMER_PERIOD * (state->m_nile_regs.target()[offset + 1] + 1)).attoseconds));
+				if (LOG_TIMERS) logerror("Starting timer %d at a rate of %d Hz\n", which, (int)ATTOSECONDS_TO_HZ((TIMER_PERIOD * (state->m_nile_regs[offset + 1] + 1)).attoseconds));
 			}
 
 			/* timer disabled? */
-			else if ((olddata & 1) && !(state->m_nile_regs.target()[offset] & 1))
+			else if ((olddata & 1) && !(state->m_nile_regs[offset] & 1))
 			{
-				if (state->m_nile_regs.target()[offset] & 2)
+				if (state->m_nile_regs[offset] & 2)
 					logerror("Unexpected value: timer %d is prescaled\n", which);
-				state->m_nile_regs.target()[offset + 1] = state->m_timer[which]->remaining().as_double() * SYSTEM_CLOCK;
+				state->m_nile_regs[offset + 1] = state->m_timer[which]->remaining().as_double() * SYSTEM_CLOCK;
 				state->m_timer[which]->adjust(attotime::never, which);
 			}
 			break;
@@ -1157,11 +1157,11 @@ static WRITE32_HANDLER( nile_w )
 			if (LOG_TIMERS) logerror("%08X:NILE WRITE: timer %d counter(%03X) = %08X & %08X\n", cpu_get_pc(&space->device()), which, offset*4, data, mem_mask);
 			logit = 0;
 
-			if (state->m_nile_regs.target()[offset - 1] & 1)
+			if (state->m_nile_regs[offset - 1] & 1)
 			{
-				if (state->m_nile_regs.target()[offset - 1] & 2)
+				if (state->m_nile_regs[offset - 1] & 2)
 					logerror("Unexpected value: timer %d is prescaled\n", which);
-				state->m_timer[which]->adjust(TIMER_PERIOD * state->m_nile_regs.target()[offset], which);
+				state->m_timer[which]->adjust(TIMER_PERIOD * state->m_nile_regs[offset], which);
 			}
 			break;
 
@@ -1560,7 +1560,7 @@ static void remap_dynamic_addresses(running_machine &machine)
 	state->m_dynamic_count = 0;
 
 	/* DCS2 */
-	base = state->m_nile_regs.target()[NREG_DCS2] & 0x1fffff00;
+	base = state->m_nile_regs[NREG_DCS2] & 0x1fffff00;
 	if (base >= state->m_rambase.bytes())
 	{
 		add_dynamic_address(state, base + 0x0000, base + 0x0003, sio_irq_clear_r, sio_irq_clear_w);
@@ -1574,22 +1574,22 @@ static void remap_dynamic_addresses(running_machine &machine)
 	}
 
 	/* DCS3 */
-	base = state->m_nile_regs.target()[NREG_DCS3] & 0x1fffff00;
+	base = state->m_nile_regs[NREG_DCS3] & 0x1fffff00;
 	if (base >= state->m_rambase.bytes())
 		add_dynamic_address(state, base + 0x0000, base + 0x0003, analog_port_r, analog_port_w);
 
 	/* DCS4 */
-	base = state->m_nile_regs.target()[NREG_DCS4] & 0x1fffff00;
+	base = state->m_nile_regs[NREG_DCS4] & 0x1fffff00;
 	if (base >= state->m_rambase.bytes())
 		add_dynamic_address(state, base + 0x0000, base + 0x7fff, timekeeper_r, timekeeper_w);
 
 	/* DCS5 */
-	base = state->m_nile_regs.target()[NREG_DCS5] & 0x1fffff00;
+	base = state->m_nile_regs[NREG_DCS5] & 0x1fffff00;
 	if (base >= state->m_rambase.bytes())
 		add_dynamic_address(state, base + 0x0000, base + 0x0003, sio_r, sio_w);
 
 	/* DCS6 */
-	base = state->m_nile_regs.target()[NREG_DCS6] & 0x1fffff00;
+	base = state->m_nile_regs[NREG_DCS6] & 0x1fffff00;
 	if (base >= state->m_rambase.bytes())
 	{
 		add_dynamic_address(state, base + 0x0000, base + 0x003f, midway_ioasic_packed_r, midway_ioasic_packed_w);
@@ -1604,7 +1604,7 @@ static void remap_dynamic_addresses(running_machine &machine)
 	}
 
 	/* DCS7 */
-	base = state->m_nile_regs.target()[NREG_DCS7] & 0x1fffff00;
+	base = state->m_nile_regs[NREG_DCS7] & 0x1fffff00;
 	if (base >= state->m_rambase.bytes())
 	{
 		add_dynamic_device_address(state, ethernet, base + 0x1000, base + 0x100f, ethernet_r, ethernet_w);
@@ -1616,9 +1616,9 @@ static void remap_dynamic_addresses(running_machine &machine)
 	}
 
 	/* PCI config space */
-	if ((state->m_nile_regs.target()[NREG_PCIINIT1] & 0xe) == 0xa)
+	if ((state->m_nile_regs[NREG_PCIINIT1] & 0xe) == 0xa)
 	{
-		base = state->m_nile_regs.target()[NREG_PCIW1] & 0x1fffff00;
+		base = state->m_nile_regs[NREG_PCIW1] & 0x1fffff00;
 		if (base >= state->m_rambase.bytes())
 		{
 			add_dynamic_address(state, base + (1 << (21 + 4)) + 0x0000, base + (1 << (21 + 4)) + 0x00ff, pci_3dfx_r, pci_3dfx_w);

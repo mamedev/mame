@@ -104,7 +104,7 @@ static MC6845_UPDATE_ROW( update_row )
 
 	for(cx = 0; cx < x_count; ++cx)
 	{
-		data_address = ((state->m_videoram.target()[ma + cx] + state->m_tile_bank) << 4) | ra;
+		data_address = ((state->m_videoram[ma + cx] + state->m_tile_bank) << 4) | ra;
 		tmp = gfx[data_address] | (gfx[data_address + 0x2000] << 8) | (gfx[data_address + 0x4000] << 16);
 
 		for(x = 0; x < TILE_WIDTH; ++x)

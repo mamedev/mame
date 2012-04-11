@@ -124,13 +124,13 @@ static PALETTE_INIT( olibochu )
 
 WRITE8_MEMBER(olibochu_state::olibochu_videoram_w)
 {
-	m_videoram.target()[offset] = data;
+	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(olibochu_state::olibochu_colorram_w)
 {
-	m_colorram.target()[offset] = data;
+	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
@@ -148,8 +148,8 @@ WRITE8_MEMBER(olibochu_state::olibochu_flipscreen_w)
 static TILE_GET_INFO( get_bg_tile_info )
 {
 	olibochu_state *state = machine.driver_data<olibochu_state>();
-	int attr = state->m_colorram.target()[tile_index];
-	int code = state->m_videoram.target()[tile_index] + ((attr & 0x20) << 3);
+	int attr = state->m_colorram[tile_index];
+	int code = state->m_videoram[tile_index] + ((attr & 0x20) << 3);
 	int color = (attr & 0x1f) + 0x20;
 	int flags = ((attr & 0x40) ? TILE_FLIPX : 0) | ((attr & 0x80) ? TILE_FLIPY : 0);
 
@@ -165,8 +165,8 @@ static VIDEO_START( olibochu )
 static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	olibochu_state *state = machine.driver_data<olibochu_state>();
-	UINT8 *spriteram = state->m_spriteram.target();
-	UINT8 *spriteram_2 = state->m_spriteram2.target();
+	UINT8 *spriteram = state->m_spriteram;
+	UINT8 *spriteram_2 = state->m_spriteram2;
 	int offs;
 
 	/* 16x16 sprites */

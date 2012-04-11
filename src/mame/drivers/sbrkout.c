@@ -98,7 +98,7 @@ static TIMER_CALLBACK( pot_trigger_callback );
 static MACHINE_START( sbrkout )
 {
 	sbrkout_state *state = machine.driver_data<sbrkout_state>();
-	UINT8 *videoram = state->m_videoram.target();
+	UINT8 *videoram = state->m_videoram;
 	memory_set_bankptr(machine, "bank1", &videoram[0x380]);
 	state->m_scanline_timer = machine.scheduler().timer_alloc(FUNC(scanline_callback));
 	state->m_pot_timer = machine.scheduler().timer_alloc(FUNC(pot_trigger_callback));
@@ -126,7 +126,7 @@ static MACHINE_RESET( sbrkout )
 static TIMER_CALLBACK( scanline_callback )
 {
 	sbrkout_state *state = machine.driver_data<sbrkout_state>();
-	UINT8 *videoram = state->m_videoram.target();
+	UINT8 *videoram = state->m_videoram;
 	int scanline = param;
 
 	/* force a partial update before anything happens */
@@ -299,7 +299,7 @@ READ8_MEMBER(sbrkout_state::sync2_r)
 static TILE_GET_INFO( get_bg_tile_info )
 {
 	sbrkout_state *state = machine.driver_data<sbrkout_state>();
-	UINT8 *videoram = state->m_videoram.target();
+	UINT8 *videoram = state->m_videoram;
 	int code = (videoram[tile_index] & 0x80) ? videoram[tile_index] : 0;
 	SET_TILE_INFO(0, code, 0, 0);
 }
@@ -314,7 +314,7 @@ static VIDEO_START( sbrkout )
 
 WRITE8_MEMBER(sbrkout_state::sbrkout_videoram_w)
 {
-	UINT8 *videoram = m_videoram.target();
+	UINT8 *videoram = m_videoram;
 	videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
@@ -330,7 +330,7 @@ WRITE8_MEMBER(sbrkout_state::sbrkout_videoram_w)
 static SCREEN_UPDATE_IND16( sbrkout )
 {
 	sbrkout_state *state = screen.machine().driver_data<sbrkout_state>();
-	UINT8 *videoram = state->m_videoram.target();
+	UINT8 *videoram = state->m_videoram;
 	int ball;
 
 	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);

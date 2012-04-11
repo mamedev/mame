@@ -75,8 +75,8 @@ UINT32 cesclassic_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 				{
 					UINT8 color;
 
-					color = (((m_vram.target()[x+y*16+0x400])>>(15-xi)) & 1);
-					color |= (((m_vram.target()[x+y*16])>>(15-xi)) & 1)<<1;
+					color = (((m_vram[x+y*16+0x400])>>(15-xi)) & 1);
+					color |= (((m_vram[x+y*16])>>(15-xi)) & 1)<<1;
 
 					if((x*16+xi)<256 && ((y)+0)<256)
 						bitmap.pix32(y, x*16+xi) = machine().pens[color];

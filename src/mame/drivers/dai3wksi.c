@@ -140,7 +140,7 @@ static SCREEN_UPDATE_RGB32( dai3wksi )
 
 		UINT8 x = offs << 2;
 		UINT8 y = offs >> 6;
-		UINT8 data = state->m_dai3wksi_videoram.target()[offs];
+		UINT8 data = state->m_dai3wksi_videoram[offs];
 		UINT8 color;
 		int value = (x >> 2) + ((y >> 5) << 6) + 64 * 8 * (state->m_dai3wksi_redterop ? 1 : 0);
 

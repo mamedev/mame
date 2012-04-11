@@ -96,15 +96,15 @@ WRITE8_MEMBER(sbowling_state::sbw_videoram_w)
 	int flip = flip_screen();
 	int x,y,i,v1,v2;
 
-	m_videoram.target()[offset] = data;
+	m_videoram[offset] = data;
 
 	offset &= 0x1fff;
 
 	y = offset / 32;
 	x = (offset % 32) * 8;
 
-	v1 = m_videoram.target()[offset];
-	v2 = m_videoram.target()[offset+0x2000];
+	v1 = m_videoram[offset];
+	v2 = m_videoram[offset+0x2000];
 
 	for (i = 0; i < 8; i++)
 	{
@@ -189,7 +189,7 @@ WRITE8_MEMBER(sbowling_state::system_w)
 	{
 		int offs;
 		for (offs = 0;offs < 0x4000; offs++)
-			sbw_videoram_w(space, offs, m_videoram.target()[offs]);
+			sbw_videoram_w(space, offs, m_videoram[offs]);
 	}
 	m_sbw_system = data;
 }

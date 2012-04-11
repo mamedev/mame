@@ -808,8 +808,8 @@ static void sfbonus_draw_reel_layer(screen_device &screen, bitmap_ind16 &bitmap,
 	UINT8* selectbase = &state->m_videoram[0x600];
 	UINT8* bg_scroll = &state->m_videoram[0x000];
 	UINT8* reels_rowscroll = &state->m_videoram[0x400];
-	int globalyscrollreels = (state->m_vregs.target()[6] | state->m_vregs.target()[7]<<8);
-	int globalxscrollreels = (state->m_vregs.target()[4] | state->m_vregs.target()[5]<<8);
+	int globalyscrollreels = (state->m_vregs[6] | state->m_vregs[7]<<8);
+	int globalxscrollreels = (state->m_vregs[4] | state->m_vregs[5]<<8);
 	globalyscrollreels += 8;
 	globalxscrollreels += 8;
 
@@ -938,8 +938,8 @@ static SCREEN_UPDATE_IND16(sfbonus)
 {
 	sfbonus_state *state = screen.machine().driver_data<sfbonus_state>();
 
-	int globalyscroll = (state->m_vregs.target()[2] | state->m_vregs.target()[3]<<8);
-	int globalxscroll = (state->m_vregs.target()[0] | state->m_vregs.target()[1]<<8);
+	int globalyscroll = (state->m_vregs[2] | state->m_vregs[3]<<8);
+	int globalxscroll = (state->m_vregs[0] | state->m_vregs[1]<<8);
 	UINT8* front_rowscroll = &state->m_videoram[0x200];
 	ioport_constructor ipt;
 	int i;
@@ -997,52 +997,52 @@ static SCREEN_UPDATE_IND16(sfbonus)
 	}
 #if 0
     popmessage("%02x %02x %02x %02x %02x %02x %02x %02x -- %02x -- %02x %02x -- %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x",
-    state->m_3800_regs.target()[0],
-    state->m_3800_regs.target()[1],
-    state->m_3800_regs.target()[2],
-    state->m_3800_regs.target()[3],
-    state->m_3800_regs.target()[4],
-    state->m_3800_regs.target()[5],
-    state->m_3800_regs.target()[6],
-    state->m_3800_regs.target()[7],
-    state->m_3000_regs.target()[0],
-    state->m_2801_regs.target()[0],
-    state->m_2c01_regs.target()[0],
-    state->m_vregs.target()[8],
-    state->m_vregs.target()[0],
-    state->m_vregs.target()[10],
-    state->m_vregs.target()[11],
-    state->m_vregs.target()[12],
-    state->m_vregs.target()[13],
-    state->m_vregs.target()[14],
-    state->m_vregs.target()[15],
-    state->m_vregs.target()[16],
-    state->m_vregs.target()[17],
-    state->m_vregs.target()[18],
-    state->m_vregs.target()[19],
-    state->m_vregs.target()[20],
-    state->m_vregs.target()[21],
-    state->m_vregs.target()[22],
-    state->m_vregs.target()[23],
-    state->m_vregs.target()[24],
-    state->m_vregs.target()[25],
-    state->m_vregs.target()[26],
-    state->m_vregs.target()[27],
-    state->m_vregs.target()[28],
-    state->m_vregs.target()[29],
-    state->m_vregs.target()[30],
-    state->m_vregs.target()[31]
+    state->m_3800_regs[0],
+    state->m_3800_regs[1],
+    state->m_3800_regs[2],
+    state->m_3800_regs[3],
+    state->m_3800_regs[4],
+    state->m_3800_regs[5],
+    state->m_3800_regs[6],
+    state->m_3800_regs[7],
+    state->m_3000_regs[0],
+    state->m_2801_regs[0],
+    state->m_2c01_regs[0],
+    state->m_vregs[8],
+    state->m_vregs[0],
+    state->m_vregs[10],
+    state->m_vregs[11],
+    state->m_vregs[12],
+    state->m_vregs[13],
+    state->m_vregs[14],
+    state->m_vregs[15],
+    state->m_vregs[16],
+    state->m_vregs[17],
+    state->m_vregs[18],
+    state->m_vregs[19],
+    state->m_vregs[20],
+    state->m_vregs[21],
+    state->m_vregs[22],
+    state->m_vregs[23],
+    state->m_vregs[24],
+    state->m_vregs[25],
+    state->m_vregs[26],
+    state->m_vregs[27],
+    state->m_vregs[28],
+    state->m_vregs[29],
+    state->m_vregs[30],
+    state->m_vregs[31]
     );
 
     popmessage("-- %02x %02x %02x %02x %02x %02x %02x %02x",
-    state->m_1800_regs.target()[0],
-    state->m_1800_regs.target()[1],
-    state->m_1800_regs.target()[2],
-    state->m_1800_regs.target()[3],
-    state->m_1800_regs.target()[4],
-    state->m_1800_regs.target()[5],
-    state->m_1800_regs.target()[6],
-    state->m_1800_regs.target()[7]);
+    state->m_1800_regs[0],
+    state->m_1800_regs[1],
+    state->m_1800_regs[2],
+    state->m_1800_regs[3],
+    state->m_1800_regs[4],
+    state->m_1800_regs[5],
+    state->m_1800_regs[6],
+    state->m_1800_regs[7]);
 #endif
 
 	ipt = screen.machine().system().ipt;
@@ -1050,22 +1050,22 @@ static SCREEN_UPDATE_IND16(sfbonus)
 		|| (ipt == INPUT_PORTS_NAME(amcoe2_poker)))
 	{
 		// based on pirpok2
-		output_set_lamp_value(0, (state->m_1800_regs.target()[6] & 0x1) >> 0);
-		output_set_lamp_value(1, (state->m_1800_regs.target()[6] & 0x4) >> 2);
-		output_set_lamp_value(2, (state->m_1800_regs.target()[5] & 0x4) >> 2);
-		output_set_lamp_value(3, (state->m_1800_regs.target()[5] & 0x1) >> 0);
-		output_set_lamp_value(4, (state->m_1800_regs.target()[4] & 0x4) >> 2);
-		output_set_lamp_value(5, (state->m_1800_regs.target()[4] & 0x1) >> 0);
+		output_set_lamp_value(0, (state->m_1800_regs[6] & 0x1) >> 0);
+		output_set_lamp_value(1, (state->m_1800_regs[6] & 0x4) >> 2);
+		output_set_lamp_value(2, (state->m_1800_regs[5] & 0x4) >> 2);
+		output_set_lamp_value(3, (state->m_1800_regs[5] & 0x1) >> 0);
+		output_set_lamp_value(4, (state->m_1800_regs[4] & 0x4) >> 2);
+		output_set_lamp_value(5, (state->m_1800_regs[4] & 0x1) >> 0);
 	}
 	else if ((ipt == INPUT_PORTS_NAME(amcoe1_reels3)) || (ipt == INPUT_PORTS_NAME(amcoe1_reels4))
 		|| (ipt == INPUT_PORTS_NAME(amcoe1_poker)))
 	{
-		output_set_lamp_value(0, (state->m_1800_regs.target()[0] & 0x2) >> 1);
-		output_set_lamp_value(1, (state->m_1800_regs.target()[4] & 0x2) >> 1);
-		output_set_lamp_value(2, (state->m_1800_regs.target()[3] & 0x2) >> 1);
-		output_set_lamp_value(3, (state->m_1800_regs.target()[6] & 0x4) >> 2);
-		output_set_lamp_value(4, (state->m_1800_regs.target()[4] & 0x4) >> 2);
-		output_set_lamp_value(5, (state->m_1800_regs.target()[3] & 0x4) >> 2);
+		output_set_lamp_value(0, (state->m_1800_regs[0] & 0x2) >> 1);
+		output_set_lamp_value(1, (state->m_1800_regs[4] & 0x2) >> 1);
+		output_set_lamp_value(2, (state->m_1800_regs[3] & 0x2) >> 1);
+		output_set_lamp_value(3, (state->m_1800_regs[6] & 0x4) >> 2);
+		output_set_lamp_value(4, (state->m_1800_regs[4] & 0x4) >> 2);
+		output_set_lamp_value(5, (state->m_1800_regs[3] & 0x4) >> 2);
 	}
 
 	return 0;
@@ -1119,27 +1119,27 @@ READ8_MEMBER(sfbonus_state::sfbonus_3800_r)
 // lamps and coin counters
 WRITE8_MEMBER(sfbonus_state::sfbonus_1800_w)
 {
-	m_1800_regs.target()[offset] = data;
+	m_1800_regs[offset] = data;
 }
 
 WRITE8_MEMBER(sfbonus_state::sfbonus_3800_w)
 {
-	m_3800_regs.target()[offset] = data;
+	m_3800_regs[offset] = data;
 }
 
 WRITE8_MEMBER(sfbonus_state::sfbonus_3000_w)
 {
-	m_3000_regs.target()[offset] = data;
+	m_3000_regs[offset] = data;
 }
 
 WRITE8_MEMBER(sfbonus_state::sfbonus_2801_w)
 {
-	m_2801_regs.target()[offset] = data;
+	m_2801_regs[offset] = data;
 }
 
 WRITE8_MEMBER(sfbonus_state::sfbonus_2c01_w)
 {
-	m_2c01_regs.target()[offset] = data;
+	m_2c01_regs[offset] = data;
 }
 
 

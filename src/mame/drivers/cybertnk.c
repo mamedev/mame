@@ -201,7 +201,7 @@ public:
 static TILE_GET_INFO( get_tx_tile_info )
 {
 	cybertnk_state *state = machine.driver_data<cybertnk_state>();
-	int code = state->m_tx_vram.target()[tile_index];
+	int code = state->m_tx_vram[tile_index];
 	SET_TILE_INFO(
 			0,
 			code & 0x1fff,
@@ -238,8 +238,8 @@ static UINT32 update_screen(screen_device &screen, bitmap_ind16 &bitmap, const r
 
 		for (i=0;i<0x1000/4;i+=4)
 		{
-			UINT16 param1 = state->m_roadram.target()[i+2];
-			UINT16 param2 = state->m_roadram.target()[i+0];
+			UINT16 param1 = state->m_roadram[i+2];
+			UINT16 param2 = state->m_roadram[i+0];
 
 			drawgfx_transpen(bitmap,cliprect,gfx,param1,0x23,0,0,-param2+screen_shift,i/4,0);
 
@@ -259,8 +259,8 @@ static UINT32 update_screen(screen_device &screen, bitmap_ind16 &bitmap, const r
 		{
 			for (x=0;x<128;x++)
 			{
-				UINT16 tile = state->m_bg_vram.target()[count] & 0x1fff;
-				UINT16 color = (state->m_fg_vram.target()[count] & 0xe000) >> 13;
+				UINT16 tile = state->m_bg_vram[count] & 0x1fff;
+				UINT16 color = (state->m_fg_vram[count] & 0xe000) >> 13;
 
 				drawgfx_transpen(bitmap,cliprect,gfx,tile,color+0x194,0,0,(x*8)+screen_shift,(y*8),0);
 
@@ -280,8 +280,8 @@ static UINT32 update_screen(screen_device &screen, bitmap_ind16 &bitmap, const r
 		{
 			for (x=0;x<128;x++)
 			{
-				UINT16 tile = state->m_fg_vram.target()[count] & 0x1fff;
-				UINT16 color = (state->m_fg_vram.target()[count] & 0xe000) >> 13;
+				UINT16 tile = state->m_fg_vram[count] & 0x1fff;
+				UINT16 color = (state->m_fg_vram[count] & 0xe000) >> 13;
 
 				drawgfx_transpen(bitmap,cliprect,gfx,tile,color+0x1c0,0,0,(x*8)+screen_shift,(y*8),0);
 
@@ -301,20 +301,20 @@ static UINT32 update_screen(screen_device &screen, bitmap_ind16 &bitmap, const r
 
 		for(offs=0;offs<0x1000/2;offs+=8)
 		{
-			z = (state->m_spr_ram.target()[offs+(0x6/2)] & 0xffff);
-			if(z == 0xffff || state->m_spr_ram.target()[offs+(0x0/2)] == 0x0000) //TODO: check the correct bit
+			z = (state->m_spr_ram[offs+(0x6/2)] & 0xffff);
+			if(z == 0xffff || state->m_spr_ram[offs+(0x0/2)] == 0x0000) //TODO: check the correct bit
 				continue;
-			x = (state->m_spr_ram.target()[offs+(0xa/2)] & 0x3ff);
-			y = (state->m_spr_ram.target()[offs+(0x4/2)] & 0xff);
-			if(state->m_spr_ram.target()[offs+(0x4/2)] & 0x100)
+			x = (state->m_spr_ram[offs+(0xa/2)] & 0x3ff);
+			y = (state->m_spr_ram[offs+(0x4/2)] & 0xff);
+			if(state->m_spr_ram[offs+(0x4/2)] & 0x100)
 				y = 0x100 - y;
-			spr_offs = (((state->m_spr_ram.target()[offs+(0x0/2)] & 7) << 16) | (state->m_spr_ram.target()[offs+(0x2/2)])) << 2;
-			xsize = ((state->m_spr_ram.target()[offs+(0xc/2)] & 0x000f)+1) << 3;
-			ysize = (state->m_spr_ram.target()[offs+(0x8/2)] & 0x00ff)+1;
-			fx = (state->m_spr_ram.target()[offs+(0xa/2)] & 0x8000) >> 15;
-			zoom = (state->m_spr_ram.target()[offs+(0xc/2)] & 0xff00) >> 8;
+			spr_offs = (((state->m_spr_ram[offs+(0x0/2)] & 7) << 16) | (state->m_spr_ram[offs+(0x2/2)])) << 2;
+			xsize = ((state->m_spr_ram[offs+(0xc/2)] & 0x000f)+1) << 3;
+			ysize = (state->m_spr_ram[offs+(0x8/2)] & 0x00ff)+1;
+			fx = (state->m_spr_ram[offs+(0xa/2)] & 0x8000) >> 15;
+			zoom = (state->m_spr_ram[offs+(0xc/2)] & 0xff00) >> 8;
 
-			col_bank = (state->m_spr_ram.target()[offs+(0x0/2)] & 0xff00) >> 8;
+			col_bank = (state->m_spr_ram[offs+(0x0/2)] & 0xff00) >> 8;
 
 			xf = 0;
 			yf = 0;
@@ -522,7 +522,7 @@ static SCREEN_UPDATE_IND16( cybertnk_right ) { return update_screen(screen, bitm
 
 WRITE16_MEMBER(cybertnk_state::tx_vram_w)
 {
-	COMBINE_DATA(&m_tx_vram.target()[offset]);
+	COMBINE_DATA(&m_tx_vram[offset]);
 	m_tx_tilemap->mark_tile_dirty(offset);
 }
 
@@ -537,18 +537,18 @@ READ16_MEMBER(cybertnk_state::io_r)
 		// 0x001100D5 is controller data
 		// 0x00110004 low is controller data ready
 		case 4/2:
-			switch( (m_io_ram.target()[6/2]) & 0xff )
+			switch( (m_io_ram[6/2]) & 0xff )
 			{
 				case 0:
-					m_io_ram.target()[0xd4/2] = input_port_read(machine(), "TRAVERSE");
+					m_io_ram[0xd4/2] = input_port_read(machine(), "TRAVERSE");
 					break;
 
 				case 0x20:
-					m_io_ram.target()[0xd4/2] = input_port_read(machine(), "ELEVATE");
+					m_io_ram[0xd4/2] = input_port_read(machine(), "ELEVATE");
 					break;
 
 				case 0x40:
-					m_io_ram.target()[0xd4/2] = input_port_read(machine(), "ACCEL");
+					m_io_ram[0xd4/2] = input_port_read(machine(), "ACCEL");
 					break;
 
 				case 0x42:
@@ -556,11 +556,11 @@ READ16_MEMBER(cybertnk_state::io_r)
 					// controller return value is stored in $42(a6)
 					// but I don't see it referenced again.
 					//popmessage("unknown controller device 0x42");
-					m_io_ram.target()[0xd4/2] = 0;
+					m_io_ram[0xd4/2] = 0;
 					break;
 
 				case 0x60:
-					m_io_ram.target()[0xd4/2] = input_port_read(machine(), "HANDLE");
+					m_io_ram[0xd4/2] = input_port_read(machine(), "HANDLE");
 					break;
 
 				//default:
@@ -578,19 +578,19 @@ READ16_MEMBER(cybertnk_state::io_r)
 			return input_port_read(machine(), "DSW2");
 
 		case 0xd4/2:
-			return m_io_ram.target()[offset]; // controller data
+			return m_io_ram[offset]; // controller data
 
 		default:
 		{
 			//popmessage("unknown io read 0x%08x", offset);
-			return m_io_ram.target()[offset];
+			return m_io_ram[offset];
 		}
 	}
 }
 
 WRITE16_MEMBER(cybertnk_state::io_w)
 {
-	COMBINE_DATA(&m_io_ram.target()[offset]);
+	COMBINE_DATA(&m_io_ram[offset]);
 
 	switch( offset )
 	{
@@ -651,7 +651,7 @@ WRITE16_MEMBER(cybertnk_state::io_w)
 		case 0x80/2:
 		case 0x82/2:
 		case 0x84/2:
-			popmessage("%02x %02x %02x %02x %02x %02x %02x",m_io_ram.target()[0x40/2],m_io_ram.target()[0x42/2],m_io_ram.target()[0x44/2],m_io_ram.target()[0x46/2],m_io_ram.target()[0x48/2],m_io_ram.target()[0x4a/2],m_io_ram.target()[0x4c/2]);
+			popmessage("%02x %02x %02x %02x %02x %02x %02x",m_io_ram[0x40/2],m_io_ram[0x42/2],m_io_ram[0x44/2],m_io_ram[0x46/2],m_io_ram[0x48/2],m_io_ram[0x4a/2],m_io_ram[0x4c/2]);
 			break;
 
 		default:
@@ -662,7 +662,7 @@ WRITE16_MEMBER(cybertnk_state::io_w)
 
 READ8_MEMBER(cybertnk_state::soundport_r)
 {
-	return m_io_ram.target()[0] & 0xff;
+	return m_io_ram[0] & 0xff;
 }
 
 static ADDRESS_MAP_START( master_mem, AS_PROGRAM, 16, cybertnk_state )

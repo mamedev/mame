@@ -44,7 +44,7 @@ static SCREEN_UPDATE_IND16( ultrsprt )
 	ultrsprt_state *state = screen.machine().driver_data<ultrsprt_state>();
 	int i, j;
 
-	UINT8 *ram = (UINT8 *)state->m_vram.target();
+	UINT8 *ram = reinterpret_cast<UINT8 *>(state->m_vram.target());
 
 	for (j=0; j < 400; j++)
 	{
@@ -107,8 +107,8 @@ static MACHINE_START( ultrsprt )
 	ppcdrc_set_options(machine.device("maincpu"), PPCDRC_COMPATIBLE_OPTIONS);
 
 	/* configure fast RAM regions for DRC */
-	ppcdrc_add_fastram(machine.device("maincpu"), 0x80000000, 0x8007ffff, FALSE, state->m_vram.target());
-	ppcdrc_add_fastram(machine.device("maincpu"), 0xff000000, 0xff01ffff, FALSE, state->m_workram.target());
+	ppcdrc_add_fastram(machine.device("maincpu"), 0x80000000, 0x8007ffff, FALSE, state->m_vram);
+	ppcdrc_add_fastram(machine.device("maincpu"), 0xff000000, 0xff01ffff, FALSE, state->m_workram);
 }
 
 

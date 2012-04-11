@@ -56,8 +56,8 @@ static SCREEN_UPDATE_IND16(jackpool)
 		{
 			for (x=0;x<64;x++)
 			{
-				int tile = (state->m_vram.target()[count+(0x2000/2)] & 0x7fff);
-				int attr = (state->m_vram.target()[count+(0x2000/2)+0x800] & 0x1f00)>>8;
+				int tile = (state->m_vram[count+(0x2000/2)] & 0x7fff);
+				int attr = (state->m_vram[count+(0x2000/2)+0x800] & 0x1f00)>>8;
 
 				drawgfx_opaque(bitmap,cliprect,gfx,tile,attr,0,0,x*8,y*8);
 				count++;
@@ -69,12 +69,12 @@ static SCREEN_UPDATE_IND16(jackpool)
 		{
 			for (x=0;x<64;x++)
 			{
-				int tile = (state->m_vram.target()[count] & 0x7fff);
+				int tile = (state->m_vram[count] & 0x7fff);
 
 				if(tile != 0)
 				{
-					int attr = (state->m_vram.target()[count+0x800] & 0x1f00)>>8;
-					int t_pen = (state->m_vram.target()[count+0x800] & 0x1000);
+					int attr = (state->m_vram[count+0x800] & 0x1f00)>>8;
+					int t_pen = (state->m_vram[count+0x800] & 0x1000);
 
 					drawgfx_transpen(bitmap,cliprect,gfx,tile,attr,0,0,x*8,y*8,(t_pen) ? 0 : -1);
 				}
@@ -119,12 +119,12 @@ READ16_MEMBER(jackpool_state::jackpool_io_r)
 	}
 
 //  printf("R %02x\n",offset*2);
-	return m_io.target()[offset];
+	return m_io[offset];
 }
 
 WRITE16_MEMBER(jackpool_state::jackpool_io_w)
 {
-	COMBINE_DATA(&m_io.target()[offset]);
+	COMBINE_DATA(&m_io[offset]);
 
 	switch(offset*2)
 	{

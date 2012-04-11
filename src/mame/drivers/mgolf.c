@@ -39,7 +39,7 @@ public:
 static TILE_GET_INFO( get_tile_info )
 {
 	mgolf_state *state = machine.driver_data<mgolf_state>();
-	UINT8 code = state->m_video_ram.target()[tile_index];
+	UINT8 code = state->m_video_ram[tile_index];
 
 	SET_TILE_INFO(0, code, code >> 7, 0);
 }
@@ -47,7 +47,7 @@ static TILE_GET_INFO( get_tile_info )
 
 WRITE8_MEMBER(mgolf_state::mgolf_vram_w)
 {
-	m_video_ram.target()[offset] = data;
+	m_video_ram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
@@ -71,18 +71,18 @@ static SCREEN_UPDATE_IND16( mgolf )
 	for (i = 0; i < 2; i++)
 	{
 		drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[1],
-			state->m_video_ram.target()[0x399 + 4 * i],
+			state->m_video_ram[0x399 + 4 * i],
 			i,
 			0, 0,
-			state->m_video_ram.target()[0x390 + 2 * i] - 7,
-			state->m_video_ram.target()[0x398 + 4 * i] - 16, 0);
+			state->m_video_ram[0x390 + 2 * i] - 7,
+			state->m_video_ram[0x398 + 4 * i] - 16, 0);
 
 		drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[1],
-			state->m_video_ram.target()[0x39b + 4 * i],
+			state->m_video_ram[0x39b + 4 * i],
 			i,
 			0, 0,
-			state->m_video_ram.target()[0x390 + 2 * i] - 15,
-			state->m_video_ram.target()[0x39a + 4 * i] - 16, 0);
+			state->m_video_ram[0x390 + 2 * i] - 15,
+			state->m_video_ram[0x39a + 4 * i] - 16, 0);
 	}
 	return 0;
 }
@@ -137,7 +137,7 @@ static double calc_plunger_pos(running_machine &machine)
 
 READ8_MEMBER(mgolf_state::mgolf_wram_r)
 {
-	return m_video_ram.target()[0x380 + offset];
+	return m_video_ram[0x380 + offset];
 }
 
 
@@ -179,7 +179,7 @@ READ8_MEMBER(mgolf_state::mgolf_misc_r)
 
 WRITE8_MEMBER(mgolf_state::mgolf_wram_w)
 {
-	m_video_ram.target()[0x380 + offset] = data;
+	m_video_ram[0x380 + offset] = data;
 }
 
 

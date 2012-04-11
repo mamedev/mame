@@ -124,8 +124,8 @@ xxxx ---- basic color?
 static TILE_GET_INFO( get_sc0_tile_info )
 {
 	kingdrby_state *state = machine.driver_data<kingdrby_state>();
-	int tile = state->m_vram.target()[tile_index] | state->m_attr.target()[tile_index]<<8;
-	int color = (state->m_attr.target()[tile_index] & 0x06)>>1;
+	int tile = state->m_vram[tile_index] | state->m_attr[tile_index]<<8;
+	int color = (state->m_attr[tile_index] & 0x06)>>1;
 
 	tile&=0x1ff;
 
@@ -139,8 +139,8 @@ static TILE_GET_INFO( get_sc0_tile_info )
 static TILE_GET_INFO( get_sc1_tile_info )
 {
 	kingdrby_state *state = machine.driver_data<kingdrby_state>();
-	int tile = state->m_vram.target()[tile_index] | state->m_attr.target()[tile_index]<<8;
-	int color = (state->m_attr.target()[tile_index] & 0x06)>>1;
+	int tile = state->m_vram[tile_index] | state->m_attr[tile_index]<<8;
+	int color = (state->m_attr[tile_index] & 0x06)>>1;
 
 	tile&=0x1ff;
 	//original 0xc
@@ -153,7 +153,7 @@ static TILE_GET_INFO( get_sc1_tile_info )
 			color|0x40,
 			0);
 
-	tileinfo.category = (state->m_attr.target()[tile_index] & 0x08)>>3;
+	tileinfo.category = (state->m_attr[tile_index] & 0x08)>>3;
 }
 
 static VIDEO_START(kingdrby)
@@ -175,7 +175,7 @@ static const UINT8 hw_sprite[16] =
 static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	kingdrby_state *state = machine.driver_data<kingdrby_state>();
-	UINT8 *spriteram = state->m_spriteram.target();
+	UINT8 *spriteram = state->m_spriteram;
 	int count = 0;
 
 	/*sprites not fully understood.*/
@@ -222,10 +222,10 @@ static SCREEN_UPDATE_IND16(kingdrby)
 	kingdrby_state *state = screen.machine().driver_data<kingdrby_state>();
 	const rectangle &visarea = screen.visible_area();
 	rectangle clip;
-	state->m_sc0_tilemap->set_scrollx(0, state->m_vram.target()[0x342]);
-	state->m_sc0_tilemap->set_scrolly(0, state->m_vram.target()[0x341]);
-	state->m_sc1_tilemap->set_scrollx(0, state->m_vram.target()[0x342]);
-	state->m_sc1_tilemap->set_scrolly(0, state->m_vram.target()[0x341]);
+	state->m_sc0_tilemap->set_scrollx(0, state->m_vram[0x342]);
+	state->m_sc0_tilemap->set_scrolly(0, state->m_vram[0x341]);
+	state->m_sc1_tilemap->set_scrollx(0, state->m_vram[0x342]);
+	state->m_sc1_tilemap->set_scrolly(0, state->m_vram[0x341]);
 	state->m_sc0w_tilemap->set_scrolly(0, 32);
 
 	/* maybe it needs two window tilemaps? (one at the top, the other at the bottom)*/
@@ -242,7 +242,7 @@ static SCREEN_UPDATE_IND16(kingdrby)
 
 WRITE8_MEMBER(kingdrby_state::sc0_vram_w)
 {
-	m_vram.target()[offset] = data;
+	m_vram[offset] = data;
 	m_sc0_tilemap->mark_tile_dirty(offset);
 	m_sc0w_tilemap->mark_tile_dirty(offset);
 	m_sc1_tilemap->mark_tile_dirty(offset);
@@ -250,7 +250,7 @@ WRITE8_MEMBER(kingdrby_state::sc0_vram_w)
 
 WRITE8_MEMBER(kingdrby_state::sc0_attr_w)
 {
-	m_attr.target()[offset] = data;
+	m_attr[offset] = data;
 	m_sc0_tilemap->mark_tile_dirty(offset);
 	m_sc0w_tilemap->mark_tile_dirty(offset);
 	m_sc1_tilemap->mark_tile_dirty(offset);

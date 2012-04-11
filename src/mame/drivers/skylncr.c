@@ -110,13 +110,13 @@ public:
 
 WRITE8_MEMBER(skylncr_state::skylncr_videoram_w)
 {
-	m_videoram.target()[offset] = data;
+	m_videoram[offset] = data;
 	m_tmap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(skylncr_state::skylncr_colorram_w)
 {
-	m_colorram.target()[offset] = data;
+	m_colorram[offset] = data;
 	m_tmap->mark_tile_dirty(offset);
 }
 
@@ -124,35 +124,35 @@ WRITE8_MEMBER(skylncr_state::skylncr_colorram_w)
 static TILE_GET_INFO( get_tile_info )
 {
 	skylncr_state *state = machine.driver_data<skylncr_state>();
-	UINT16 code = state->m_videoram.target()[ tile_index ] + (state->m_colorram.target()[ tile_index ] << 8);
+	UINT16 code = state->m_videoram[ tile_index ] + (state->m_colorram[ tile_index ] << 8);
 	SET_TILE_INFO(0, code, 0, TILE_FLIPYX( 0 ));
 }
 
 static TILE_GET_INFO( get_reel_1_tile_info )
 {
 	skylncr_state *state = machine.driver_data<skylncr_state>();
-	UINT16 code = state->m_reeltiles_1_ram.target()[ tile_index ] + (state->m_reeltileshigh_1_ram.target()[ tile_index ] << 8);
+	UINT16 code = state->m_reeltiles_1_ram[ tile_index ] + (state->m_reeltileshigh_1_ram[ tile_index ] << 8);
 	SET_TILE_INFO(1, code, 0, TILE_FLIPYX( 0 ));
 }
 
 static TILE_GET_INFO( get_reel_2_tile_info )
 {
 	skylncr_state *state = machine.driver_data<skylncr_state>();
-	UINT16 code = state->m_reeltiles_2_ram.target()[ tile_index ] + (state->m_reeltileshigh_2_ram.target()[ tile_index ] << 8);
+	UINT16 code = state->m_reeltiles_2_ram[ tile_index ] + (state->m_reeltileshigh_2_ram[ tile_index ] << 8);
 	SET_TILE_INFO(1, code, 0, TILE_FLIPYX( 0 ));
 }
 
 static TILE_GET_INFO( get_reel_3_tile_info )
 {
 	skylncr_state *state = machine.driver_data<skylncr_state>();
-	UINT16 code = state->m_reeltiles_3_ram.target()[ tile_index ] + (state->m_reeltileshigh_3_ram.target()[ tile_index ] << 8);
+	UINT16 code = state->m_reeltiles_3_ram[ tile_index ] + (state->m_reeltileshigh_3_ram[ tile_index ] << 8);
 	SET_TILE_INFO(1, code, 0, TILE_FLIPYX( 0 ));
 }
 
 static TILE_GET_INFO( get_reel_4_tile_info )
 {
 	skylncr_state *state = machine.driver_data<skylncr_state>();
-	UINT16 code = state->m_reeltiles_4_ram.target()[ tile_index ] + (state->m_reeltileshigh_4_ram.target()[ tile_index ] << 8);
+	UINT16 code = state->m_reeltiles_4_ram[ tile_index ] + (state->m_reeltileshigh_4_ram[ tile_index ] << 8);
 	SET_TILE_INFO(1, code, 0, TILE_FLIPYX( 0 ));
 }
 
@@ -196,9 +196,9 @@ static SCREEN_UPDATE_IND16( skylncr )
 
 	for (i= 0;i < 64;i++)
 	{
-		state->m_reel_2_tilemap->set_scrolly(i, state->m_reelscroll2.target()[i]);
-		state->m_reel_3_tilemap->set_scrolly(i, state->m_reelscroll3.target()[i]);
-		state->m_reel_4_tilemap->set_scrolly(i, state->m_reelscroll4.target()[i]);
+		state->m_reel_2_tilemap->set_scrolly(i, state->m_reelscroll2[i]);
+		state->m_reel_3_tilemap->set_scrolly(i, state->m_reelscroll3[i]);
+		state->m_reel_4_tilemap->set_scrolly(i, state->m_reelscroll4[i]);
 	}
 
 	state->m_reel_2_tilemap->draw(bitmap, visible1, 0, 0);
@@ -212,49 +212,49 @@ static SCREEN_UPDATE_IND16( skylncr )
 
 WRITE8_MEMBER(skylncr_state::reeltiles_1_w)
 {
-	m_reeltiles_1_ram.target()[offset] = data;
+	m_reeltiles_1_ram[offset] = data;
 	m_reel_1_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(skylncr_state::reeltiles_2_w)
 {
-	m_reeltiles_2_ram.target()[offset] = data;
+	m_reeltiles_2_ram[offset] = data;
 	m_reel_2_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(skylncr_state::reeltiles_3_w)
 {
-	m_reeltiles_3_ram.target()[offset] = data;
+	m_reeltiles_3_ram[offset] = data;
 	m_reel_3_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(skylncr_state::reeltiles_4_w)
 {
-	m_reeltiles_4_ram.target()[offset] = data;
+	m_reeltiles_4_ram[offset] = data;
 	m_reel_4_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(skylncr_state::reeltileshigh_1_w)
 {
-	m_reeltileshigh_1_ram.target()[offset] = data;
+	m_reeltileshigh_1_ram[offset] = data;
 	m_reel_1_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(skylncr_state::reeltileshigh_2_w)
 {
-	m_reeltileshigh_2_ram.target()[offset] = data;
+	m_reeltileshigh_2_ram[offset] = data;
 	m_reel_2_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(skylncr_state::reeltileshigh_3_w)
 {
-	m_reeltileshigh_3_ram.target()[offset] = data;
+	m_reeltileshigh_3_ram[offset] = data;
 	m_reel_3_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(skylncr_state::reeltileshigh_4_w)
 {
-	m_reeltileshigh_4_ram.target()[offset] = data;
+	m_reeltileshigh_4_ram[offset] = data;
 	m_reel_4_tilemap->mark_tile_dirty(offset);
 }
 
@@ -309,22 +309,22 @@ WRITE8_MEMBER(skylncr_state::skylncr_paletteram2_w)
 
 WRITE8_MEMBER(skylncr_state::reelscroll1_w)
 {
-	m_reelscroll1.target()[offset] = data;
+	m_reelscroll1[offset] = data;
 }
 
 WRITE8_MEMBER(skylncr_state::reelscroll2_w)
 {
-	m_reelscroll2.target()[offset] = data;
+	m_reelscroll2[offset] = data;
 }
 
 WRITE8_MEMBER(skylncr_state::reelscroll3_w)
 {
-	m_reelscroll3.target()[offset] = data;
+	m_reelscroll3[offset] = data;
 }
 
 WRITE8_MEMBER(skylncr_state::reelscroll4_w)
 {
-	m_reelscroll4.target()[offset] = data;
+	m_reelscroll4[offset] = data;
 }
 
 

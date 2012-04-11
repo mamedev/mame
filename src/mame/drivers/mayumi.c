@@ -47,8 +47,8 @@ public:
 static TILE_GET_INFO( get_tile_info )
 {
 	mayumi_state *state = machine.driver_data<mayumi_state>();
-	int code = state->m_videoram.target()[tile_index] + (state->m_videoram.target()[tile_index + 0x800] & 0x1f) * 0x100;
-	int col = (state->m_videoram.target()[tile_index + 0x1000] >> 3) & 0x1f;
+	int code = state->m_videoram[tile_index] + (state->m_videoram[tile_index + 0x800] & 0x1f) * 0x100;
+	int col = (state->m_videoram[tile_index + 0x1000] >> 3) & 0x1f;
 
 	SET_TILE_INFO(0, code, col, 0);
 }
@@ -61,7 +61,7 @@ static VIDEO_START( mayumi )
 
 WRITE8_MEMBER(mayumi_state::mayumi_videoram_w)
 {
-	m_videoram.target()[offset] = data;
+	m_videoram[offset] = data;
 	m_tilemap->mark_tile_dirty(offset & 0x7ff);
 }
 

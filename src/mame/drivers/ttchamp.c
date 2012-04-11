@@ -87,11 +87,12 @@ static SCREEN_UPDATE_IND16(ttchamp)
 //  }
 
 	count=0;
+	UINT8 *videoram = reinterpret_cast<UINT8 *>(state->m_peno_vram.target());
 	for (y=0;y<yyy;y++)
 	{
 		for(x=0;x<xxx;x++)
 		{
-			/*if(hotblock_port0&0x40)*/bitmap.pix16(y, x) = ((UINT8 *)state->m_peno_vram.target())[BYTE_XOR_LE(count)]+0x300;
+			/*if(hotblock_port0&0x40)*/bitmap.pix16(y, x) = videoram[BYTE_XOR_LE(count)]+0x300;
             count++;
         }
     }

@@ -186,8 +186,8 @@ static SCREEN_UPDATE_IND16( shougi )
 		//if (flipscreen[0]) sx = 31 - sx;
 		//if (flipscreen[1]) sy = 31 - sy;
 
-		data1 = state->m_videoram.target()[offs];				/* color */
-		data2 = state->m_videoram.target()[0x4000 + offs];	/* pixel data */
+		data1 = state->m_videoram[offs];				/* color */
+		data2 = state->m_videoram[0x4000 + offs];	/* pixel data */
 
 		for (x=0; x<4; x++) /*4 pixels per byte (2 bitplanes in 2 nibbles: 1st=bits 7-4, 2nd=bits 3-0)*/
 		{

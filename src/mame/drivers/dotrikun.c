@@ -72,7 +72,7 @@ static SCREEN_UPDATE_RGB32( dotrikun )
 	{
 		for (x = 0; x < 256; x+=16)
 		{
-			UINT8 data = state->m_dotrikun_bitmap.target()[((x/16)+((y/2)*16))];
+			UINT8 data = state->m_dotrikun_bitmap[((x/16)+((y/2)*16))];
 
 			for (i = 0; i < 8; i++)
 			{

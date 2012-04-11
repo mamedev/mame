@@ -342,9 +342,10 @@ static MC6845_UPDATE_ROW( update_row )
 
 	offs_t offs = (ma*2 + ra*0x40)*4;
 
+	UINT8 *videoram = reinterpret_cast<UINT8 *>(state->m_videoram.target());
 	for (x = 0; x < x_count*4; x++)
 	{
-		UINT8 pix = ((UINT8*)state->m_videoram.target())[BYTE_XOR_BE(offs + x)];
+		UINT8 pix = videoram[BYTE_XOR_BE(offs + x)];
 		dest[2*x] = pens[((pix >> 4) & 0x0f)];
 		dest[2*x + 1] = pens[(pix & 0x0f)];
 	}

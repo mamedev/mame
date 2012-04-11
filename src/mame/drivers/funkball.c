@@ -1111,8 +1111,8 @@ static MACHINE_START( funkball )
 	kbdc8042_init(machine, &at8042);
 
 	/* defaults, otherwise it won't boot */
-	state->m_unk_ram.target()[0x010/4] = 0x2f8d85ff;
-	state->m_unk_ram.target()[0x018/4] = 0x000018c5;
+	state->m_unk_ram[0x010/4] = 0x2f8d85ff;
+	state->m_unk_ram[0x018/4] = 0x000018c5;
 }
 
 static MACHINE_RESET( funkball )

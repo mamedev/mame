@@ -166,13 +166,13 @@ WRITE8_MEMBER(ddayjlc_state::ddayjlc_bgram_w)
 	if (!offset)
 		m_bg_tilemap->set_scrollx(0, data + 8);
 
-	m_bgram.target()[offset] = data;
+	m_bgram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
 WRITE8_MEMBER(ddayjlc_state::ddayjlc_videoram_w)
 {
-	m_videoram.target()[offset] = data;
+	m_videoram[offset] = data;
 }
 
 
@@ -371,9 +371,9 @@ GFXDECODE_END
 static TILE_GET_INFO( get_tile_info_bg )
 {
 	ddayjlc_state *state = machine.driver_data<ddayjlc_state>();
-	int code = state->m_bgram.target()[tile_index] + ((state->m_bgram.target()[tile_index + 0x400] & 0x08) << 5);
-	int color = (state->m_bgram.target()[tile_index + 0x400] & 0x7);
-	color |= (state->m_bgram.target()[tile_index + 0x400] & 0x40) >> 3;
+	int code = state->m_bgram[tile_index] + ((state->m_bgram[tile_index + 0x400] & 0x08) << 5);
+	int color = (state->m_bgram[tile_index + 0x400] & 0x7);
+	color |= (state->m_bgram[tile_index + 0x400] & 0x40) >> 3;
 
 	SET_TILE_INFO(2, code, color, 0);
 }
@@ -392,10 +392,10 @@ static SCREEN_UPDATE_IND16( ddayjlc )
 
 	for (i = 0; i < 0x400; i += 4)
 	{
-		UINT8  flags = state->m_spriteram.target()[i + 2];
-		UINT8  y = 256 - state->m_spriteram.target()[i + 0] - 8;
-		UINT16 code = state->m_spriteram.target()[i + 1];
-		UINT8  x = state->m_spriteram.target()[i + 3] - 16;
+		UINT8  flags = state->m_spriteram[i + 2];
+		UINT8  y = 256 - state->m_spriteram[i + 0] - 8;
+		UINT16 code = state->m_spriteram[i + 1];
+		UINT8  x = state->m_spriteram[i + 3] - 16;
 		UINT8  xflip = flags & 0x80;
 		UINT8  yflip = (code & 0x80);
 		UINT8  color = flags & 0xf;
@@ -411,7 +411,7 @@ static SCREEN_UPDATE_IND16( ddayjlc )
 		for (y = 0; y < 32; y++)
 			for (x = 0; x < 32; x++)
 			{
-				c = state->m_videoram.target()[y * 32 + x];
+				c = state->m_videoram[y * 32 + x];
 				if (x > 1 && x < 30)
 					drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[1], c + state->m_char_bank * 0x100, 2, 0, 0, x*8, y*8, 0);
 				else

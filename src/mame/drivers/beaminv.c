@@ -179,7 +179,7 @@ static SCREEN_UPDATE_RGB32( beaminv )
 
 		UINT8 y = offs;
 		UINT8 x = offs >> 8 << 3;
-		UINT8 data = state->m_videoram.target()[offs];
+		UINT8 data = state->m_videoram[offs];
 
 		for (i = 0; i < 8; i++)
 		{

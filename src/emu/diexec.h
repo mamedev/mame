@@ -129,7 +129,7 @@ enum
 	device_execute_interface::static_set_periodic_int(*device, _func, attotime::from_hz(_rate)); \
 
 #define MCFG_DEVICE_PERIODIC_INT_DRIVER(_class, _func, _rate) \
-	device_execute_interface::static_set_vblank_int(*device, device_interrupt_delegate(&_class::_func, #_class "::" #_func, downcast<_class *>(&config.root_device())), attotime::from_hz(_rate)); \
+	device_execute_interface::static_set_periodic_int(*device, device_interrupt_delegate(&_class::_func, #_class "::" #_func, downcast<_class *>(&config.root_device())), attotime::from_hz(_rate)); \
 
 
 

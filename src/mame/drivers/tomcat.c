@@ -255,12 +255,12 @@ READ16_MEMBER(tomcat_state::dsp_BIO_r)
 
 READ16_MEMBER(tomcat_state::tomcat_shared_ram_r)
 {
-	return m_shared_ram.target()[offset];
+	return m_shared_ram[offset];
 }
 
 WRITE16_MEMBER(tomcat_state::tomcat_shared_ram_w)
 {
-	COMBINE_DATA(&m_shared_ram.target()[offset]);
+	COMBINE_DATA(&m_shared_ram[offset]);
 }
 
 READ8_MEMBER(tomcat_state::tomcat_nvram_r)
@@ -358,10 +358,10 @@ INPUT_PORTS_END
 static MACHINE_START(tomcat)
 {
 	tomcat_state *state = machine.driver_data<tomcat_state>();
-	((UINT16*)state->m_shared_ram.target())[0x0000] = 0xf600;
-	((UINT16*)state->m_shared_ram.target())[0x0001] = 0x0000;
-	((UINT16*)state->m_shared_ram.target())[0x0002] = 0xf600;
-	((UINT16*)state->m_shared_ram.target())[0x0003] = 0x0000;
+	((UINT16*)state->m_shared_ram)[0x0000] = 0xf600;
+	((UINT16*)state->m_shared_ram)[0x0001] = 0x0000;
+	((UINT16*)state->m_shared_ram)[0x0002] = 0xf600;
+	((UINT16*)state->m_shared_ram)[0x0003] = 0x0000;
 
 	machine.device<nvram_device>("nvram")->set_base(state->m_nvram, 0x800);
 

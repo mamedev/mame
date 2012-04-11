@@ -70,7 +70,7 @@ static void skeetsht_scanline_update(screen_device &screen, bitmap_rgb32 &bitmap
 {
 	skeetsht_state *state = screen.machine().driver_data<skeetsht_state>();
 	const rgb_t *const pens = tlc34076_get_pens(screen.machine().device("tlc34076"));
-	UINT16 *vram = &state->m_tms_vram.target()[(params->rowaddr << 8) & 0x3ff00];
+	UINT16 *vram = &state->m_tms_vram[(params->rowaddr << 8) & 0x3ff00];
 	UINT32 *dest = &bitmap.pix32(scanline);
 	int coladdr = params->coladdr;
 	int x;

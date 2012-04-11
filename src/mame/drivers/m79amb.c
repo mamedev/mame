@@ -82,7 +82,7 @@ public:
 
 WRITE8_MEMBER(m79amb_state::ramtek_videoram_w)
 {
-	m_videoram.target()[offset] = data & ~*m_mask.target();
+	m_videoram[offset] = data & ~*m_mask;
 }
 
 static SCREEN_UPDATE_RGB32( ramtek )
@@ -94,7 +94,7 @@ static SCREEN_UPDATE_RGB32( ramtek )
 	{
 		int i;
 
-		UINT8 data = state->m_videoram.target()[offs];
+		UINT8 data = state->m_videoram[offs];
 		int y = offs >> 5;
 		int x = (offs & 0x1f) << 3;
 

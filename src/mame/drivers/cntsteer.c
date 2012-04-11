@@ -112,7 +112,7 @@ static PALETTE_INIT( zerotrgt )
 static TILE_GET_INFO( get_bg_tile_info )
 {
 	cntsteer_state *state = machine.driver_data<cntsteer_state>();
-	int code = state->m_videoram2.target()[tile_index];
+	int code = state->m_videoram2[tile_index];
 
 	SET_TILE_INFO(2, code + state->m_bg_bank, state->m_bg_color_bank, 0);
 }
@@ -120,8 +120,8 @@ static TILE_GET_INFO( get_bg_tile_info )
 static TILE_GET_INFO( get_fg_tile_info )
 {
 	cntsteer_state *state = machine.driver_data<cntsteer_state>();
-	int code = state->m_videoram.target()[tile_index];
-	int attr = state->m_colorram.target()[tile_index];
+	int code = state->m_videoram[tile_index];
+	int attr = state->m_colorram[tile_index];
 
 	code |= (attr & 0x01) << 8;
 
@@ -172,18 +172,18 @@ static void zerotrgt_draw_sprites( running_machine &machine, bitmap_ind16 &bitma
 	{
 		int multi, fx, fy, sx, sy, code, color;
 
-		if ((state->m_spriteram.target()[offs + 1] & 1) == 1)
+		if ((state->m_spriteram[offs + 1] & 1) == 1)
 			continue;
 
-		code = state->m_spriteram.target()[offs + 3] + ((state->m_spriteram.target()[offs + 1] & 0xc0) << 2);
-		sx = (state->m_spriteram.target()[offs + 2]);
-		sy = 0xf0 - state->m_spriteram.target()[offs];
-		color = 0x10 + ((state->m_spriteram.target()[offs + 1] & 0x20) >> 4) + ((state->m_spriteram.target()[offs + 1] & 0x8)>>3);
+		code = state->m_spriteram[offs + 3] + ((state->m_spriteram[offs + 1] & 0xc0) << 2);
+		sx = (state->m_spriteram[offs + 2]);
+		sy = 0xf0 - state->m_spriteram[offs];
+		color = 0x10 + ((state->m_spriteram[offs + 1] & 0x20) >> 4) + ((state->m_spriteram[offs + 1] & 0x8)>>3);
 
-		fx = !(state->m_spriteram.target()[offs + 1] & 0x04);
-		fy = (state->m_spriteram.target()[offs + 1] & 0x02);
+		fx = !(state->m_spriteram[offs + 1] & 0x04);
+		fy = (state->m_spriteram[offs + 1] & 0x02);
 
-		multi = state->m_spriteram.target()[offs + 1] & 0x10;
+		multi = state->m_spriteram[offs + 1] & 0x10;
 
 		if (state->m_flipscreen)
 		{
@@ -230,18 +230,18 @@ static void cntsteer_draw_sprites( running_machine &machine, bitmap_ind16 &bitma
 	{
 		int multi, fx, fy, sx, sy, code, color;
 
-		if ((state->m_spriteram.target()[offs + 0] & 1) == 0)
+		if ((state->m_spriteram[offs + 0] & 1) == 0)
 			continue;
 
-		code = state->m_spriteram.target()[offs + 1] + ((state->m_spriteram.target()[offs + 0x80] & 0x03) << 8);
-		sx = 0x100 - state->m_spriteram.target()[offs + 3];
-		sy = 0x100 - state->m_spriteram.target()[offs + 2];
-		color = 0x10 + ((state->m_spriteram.target()[offs + 0x80] & 0x70) >> 4);
+		code = state->m_spriteram[offs + 1] + ((state->m_spriteram[offs + 0x80] & 0x03) << 8);
+		sx = 0x100 - state->m_spriteram[offs + 3];
+		sy = 0x100 - state->m_spriteram[offs + 2];
+		color = 0x10 + ((state->m_spriteram[offs + 0x80] & 0x70) >> 4);
 
-		fx = (state->m_spriteram.target()[offs + 0] & 0x04);
-		fy = (state->m_spriteram.target()[offs + 0] & 0x02);
+		fx = (state->m_spriteram[offs + 0] & 0x04);
+		fy = (state->m_spriteram[offs + 0] & 0x02);
 
-		multi = state->m_spriteram.target()[offs + 0] & 0x10;
+		multi = state->m_spriteram[offs + 0] & 0x10;
 
 		if (state->m_flipscreen)
 		{
@@ -433,19 +433,19 @@ WRITE8_MEMBER(cntsteer_state::cntsteer_vregs_w)
 
 WRITE8_MEMBER(cntsteer_state::cntsteer_foreground_vram_w)
 {
-	m_videoram.target()[offset] = data;
+	m_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(cntsteer_state::cntsteer_foreground_attr_w)
 {
-	m_colorram.target()[offset] = data;
+	m_colorram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(cntsteer_state::cntsteer_background_w)
 {
-	m_videoram2.target()[offset] = data;
+	m_videoram2[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 

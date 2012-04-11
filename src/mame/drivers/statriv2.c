@@ -112,7 +112,7 @@ public:
 static TILE_GET_INFO( horizontal_tile_info )
 {
 	statriv2_state *state = machine.driver_data<statriv2_state>();
-	UINT8 *videoram = state->m_videoram.target();
+	UINT8 *videoram = state->m_videoram;
 	int code = videoram[0x400+tile_index];
 	int attr = videoram[tile_index] & 0x3f;
 
@@ -122,7 +122,7 @@ static TILE_GET_INFO( horizontal_tile_info )
 static TILE_GET_INFO( vertical_tile_info )
 {
 	statriv2_state *state = machine.driver_data<statriv2_state>();
-	UINT8 *videoram = state->m_videoram.target();
+	UINT8 *videoram = state->m_videoram;
 	int code = videoram[0x400+tile_index];
 	int attr = videoram[tile_index] & 0x3f;
 
@@ -170,7 +170,7 @@ static VIDEO_START( vertical )
 
 WRITE8_MEMBER(statriv2_state::statriv2_videoram_w)
 {
-	UINT8 *videoram = m_videoram.target();
+	UINT8 *videoram = m_videoram;
 	videoram[offset] = data;
 	m_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
@@ -229,12 +229,12 @@ READ8_MEMBER(statriv2_state::question_data_r)
 	UINT32 address;
 
 	if (m_question_offset_high == 0xff)
-		m_question_offset.target()[m_question_offset_low]++;
+		m_question_offset[m_question_offset_low]++;
 
-	address = m_question_offset.target()[m_question_offset_low];
-	address |= m_question_offset.target()[m_question_offset_mid] << 8;
+	address = m_question_offset[m_question_offset_low];
+	address |= m_question_offset[m_question_offset_mid] << 8;
 	if (m_question_offset_high != 0xff)
-		address |= m_question_offset.target()[m_question_offset_high] << 16;
+		address |= m_question_offset[m_question_offset_high] << 16;
 
 	return (address < qromsize) ? qrom[address] : 0xff;
 }

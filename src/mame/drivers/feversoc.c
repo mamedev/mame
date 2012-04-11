@@ -89,7 +89,7 @@ static VIDEO_START( feversoc )
 static SCREEN_UPDATE_IND16( feversoc )
 {
 	feversoc_state *state = screen.machine().driver_data<feversoc_state>();
-	UINT32 *spriteram32 = state->m_spriteram.target();
+	UINT32 *spriteram32 = state->m_spriteram;
 	int offs,spr_offs,colour,sx,sy,h,w,dx,dy;
 
 	bitmap.fill(screen.machine().pens[0], cliprect); //black pen

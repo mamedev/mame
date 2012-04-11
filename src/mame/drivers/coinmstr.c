@@ -57,7 +57,7 @@ public:
 
 WRITE8_MEMBER(coinmstr_state::quizmstr_bg_w)
 {
-	UINT8 *videoram = m_videoram.target();
+	UINT8 *videoram = m_videoram;
 	videoram[offset] = data;
 
 	if(offset >= 0x0240)
@@ -100,12 +100,12 @@ static void coinmstr_set_pal(running_machine &machine, UINT32 paldat, int col)
 
 WRITE8_MEMBER(coinmstr_state::quizmstr_attr1_w)
 {
-	m_attr_ram1.target()[offset] = data;
+	m_attr_ram1[offset] = data;
 
 	if(offset >= 0x0240)
 	{
 		// the later games also use attr3 for something..
-		UINT32	paldata = (m_attr_ram1.target()[offset] & 0x7f) | ((m_attr_ram2.target()[offset] & 0x7f) << 7);
+		UINT32	paldata = (m_attr_ram1[offset] & 0x7f) | ((m_attr_ram2[offset] & 0x7f) << 7);
 		m_bg_tilemap->mark_tile_dirty(offset - 0x0240);
 
 		coinmstr_set_pal(machine(), paldata, offset - 0x240);
@@ -115,12 +115,12 @@ WRITE8_MEMBER(coinmstr_state::quizmstr_attr1_w)
 
 WRITE8_MEMBER(coinmstr_state::quizmstr_attr2_w)
 {
-	m_attr_ram2.target()[offset] = data;
+	m_attr_ram2[offset] = data;
 
 	if(offset >= 0x0240)
 	{
 		// the later games also use attr3 for something..
-		UINT32	paldata = (m_attr_ram1.target()[offset] & 0x7f) | ((m_attr_ram2.target()[offset] & 0x7f) << 7);
+		UINT32	paldata = (m_attr_ram1[offset] & 0x7f) | ((m_attr_ram2[offset] & 0x7f) << 7);
 		m_bg_tilemap->mark_tile_dirty(offset - 0x0240);
 
 		coinmstr_set_pal(machine(), paldata, offset - 0x240);
@@ -130,7 +130,7 @@ WRITE8_MEMBER(coinmstr_state::quizmstr_attr2_w)
 
 WRITE8_MEMBER(coinmstr_state::quizmstr_attr3_w)
 {
-	m_attr_ram3.target()[offset] = data;
+	m_attr_ram3[offset] = data;
 
 	if(offset >= 0x0240)
 		m_bg_tilemap->mark_tile_dirty(offset - 0x0240);
@@ -901,14 +901,14 @@ GFXDECODE_END
 static TILE_GET_INFO( get_bg_tile_info )
 {
 	coinmstr_state *state = machine.driver_data<coinmstr_state>();
-	UINT8 *videoram = state->m_videoram.target();
+	UINT8 *videoram = state->m_videoram;
 	int tile = videoram[tile_index + 0x0240];
 	int color = tile_index;
 
-	tile |= (state->m_attr_ram1.target()[tile_index + 0x0240] & 0x80) << 1;
-	tile |= (state->m_attr_ram2.target()[tile_index + 0x0240] & 0x80) << 2;
+	tile |= (state->m_attr_ram1[tile_index + 0x0240] & 0x80) << 1;
+	tile |= (state->m_attr_ram2[tile_index + 0x0240] & 0x80) << 2;
 
-	tile |= (state->m_attr_ram3.target()[tile_index + 0x0240] & 0x03) << (6+4);
+	tile |= (state->m_attr_ram3[tile_index + 0x0240] & 0x03) << (6+4);
 
 	SET_TILE_INFO(0, tile, color, 0);
 }

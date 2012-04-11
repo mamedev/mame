@@ -264,7 +264,8 @@ static SCREEN_UPDATE_IND16( goldngam )
 
 	int x, y;
 
-	UINT8 *tmp = (UINT8 *) state->m_videoram.target();
+	// ERROR: This cast is NOT endian-safe without the use of BYTE/WORD/DWORD_XOR_* macros!
+	UINT8 *tmp = reinterpret_cast<UINT8 *>(state->m_videoram.target());
 	int index = 0;
 
 	for(y = 0; y < 512; ++y)

@@ -46,7 +46,7 @@ SCREEN_UPDATE_RGB32( hotstuff )
 
 		for (p=0;p<0x10;p++)
 		{
-			row_palette_data[p] = state->m_bitmapram.target()[count+p];
+			row_palette_data[p] = state->m_bitmapram[count+p];
 
 			row_palette_data_as_rgb32_pen_data[p] = MAKE_RGB( (row_palette_data[p] & 0x0f00)>>4, (row_palette_data[p] & 0x00f0)>>0, (row_palette_data[p] & 0x000f)<<4  );
 
@@ -55,13 +55,13 @@ SCREEN_UPDATE_RGB32( hotstuff )
 		for(x = 0; x < xxx; x++)
 		{
 			{
-				bitmap.pix32(y, x) = row_palette_data_as_rgb32_pen_data[(state->m_bitmapram.target()[count] &0xf000)>>12];
+				bitmap.pix32(y, x) = row_palette_data_as_rgb32_pen_data[(state->m_bitmapram[count] &0xf000)>>12];
 				x++;
-				bitmap.pix32(y, x) = row_palette_data_as_rgb32_pen_data[(state->m_bitmapram.target()[count] &0x0f00)>>8];
+				bitmap.pix32(y, x) = row_palette_data_as_rgb32_pen_data[(state->m_bitmapram[count] &0x0f00)>>8];
 				x++;
-				bitmap.pix32(y, x) = row_palette_data_as_rgb32_pen_data[(state->m_bitmapram.target()[count] &0x00f0)>>4];
+				bitmap.pix32(y, x) = row_palette_data_as_rgb32_pen_data[(state->m_bitmapram[count] &0x00f0)>>4];
 				x++;
-				bitmap.pix32(y, x) = row_palette_data_as_rgb32_pen_data[(state->m_bitmapram.target()[count] &0x000f)>>0];
+				bitmap.pix32(y, x) = row_palette_data_as_rgb32_pen_data[(state->m_bitmapram[count] &0x000f)>>0];
 			}
 
 			count++;

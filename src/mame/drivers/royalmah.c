@@ -278,7 +278,7 @@ WRITE8_MEMBER(royalmah_state::mjderngr_palbank_w)
 static SCREEN_UPDATE_IND16( royalmah )
 {
 	royalmah_state *state = screen.machine().driver_data<royalmah_state>();
-	UINT8 *videoram = state->m_videoram.target();
+	UINT8 *videoram = state->m_videoram;
 
 	offs_t offs;
 
@@ -898,7 +898,7 @@ READ8_MEMBER(royalmah_state::mjifb_rom_io_r)
 
 WRITE8_MEMBER(royalmah_state::mjifb_rom_io_w)
 {
-	UINT8 *videoram = m_videoram.target();
+	UINT8 *videoram = m_videoram;
 	if (m_mjifb_rom_enable)
 	{
 		videoram[offset] = data;
@@ -926,7 +926,7 @@ WRITE8_MEMBER(royalmah_state::mjifb_rom_io_w)
 
 WRITE8_MEMBER(royalmah_state::mjifb_videoram_w)
 {
-	UINT8 *videoram = m_videoram.target();
+	UINT8 *videoram = m_videoram;
 	videoram[offset + 0x4000] = data;
 }
 
@@ -1007,7 +1007,7 @@ READ8_MEMBER(royalmah_state::mjdejavu_rom_io_r)
 
 WRITE8_MEMBER(royalmah_state::mjdejavu_rom_io_w)
 {
-	UINT8 *videoram = m_videoram.target();
+	UINT8 *videoram = m_videoram;
 	if (m_mjifb_rom_enable)
 	{
 		videoram[offset] = data;
@@ -1194,7 +1194,7 @@ READ8_MEMBER(royalmah_state::mjvegasa_rom_io_r)
 
 WRITE8_MEMBER(royalmah_state::mjvegasa_rom_io_w)
 {
-	UINT8 *videoram = m_videoram.target();
+	UINT8 *videoram = m_videoram;
 	if ((m_rombank & 0x70) != 0x70)
 	{
 		videoram[offset] = data;

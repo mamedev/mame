@@ -43,7 +43,7 @@ public:
 static TILE_GET_INFO( get_bg_tile_info )
 {
 	wink_state *state = machine.driver_data<wink_state>();
-	UINT8 *videoram = state->m_videoram.target();
+	UINT8 *videoram = state->m_videoram;
 	int code = videoram[tile_index];
 	code |= 0x200 * state->m_tile_bank;
 
@@ -71,7 +71,7 @@ static SCREEN_UPDATE_IND16( wink )
 
 WRITE8_MEMBER(wink_state::bgram_w)
 {
-	UINT8 *videoram = m_videoram.target();
+	UINT8 *videoram = m_videoram;
 	videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
