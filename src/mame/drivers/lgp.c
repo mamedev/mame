@@ -76,7 +76,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		  m_laserdisc(*this, "laserdisc") ,
 		m_tile_ram(*this, "tile_ram"),
-		m_tile_control_ram(*this, "tile_control_ram"){ }
+		m_tile_control_ram(*this, "tile_ctrl_ram"){ }
 
 	required_device<pioneer_ldv1000_device> m_laserdisc;
 	required_shared_ptr<UINT8> m_tile_ram;
@@ -144,7 +144,7 @@ WRITE8_MEMBER(lgp_state::ldp_write)
 static ADDRESS_MAP_START( main_program_map, AS_PROGRAM, 8, lgp_state )
 	AM_RANGE(0x0000,0x7fff) AM_ROM
 	AM_RANGE(0xe000,0xe3ff) AM_RAM AM_SHARE("tile_ram")
-	AM_RANGE(0xe400,0xe7ff) AM_RAM AM_SHARE("tile_control_ram")
+	AM_RANGE(0xe400,0xe7ff) AM_RAM AM_SHARE("tile_ctrl_ram")
 
 //  AM_RANGE(0xef00,0xef00) AM_READ_PORT("IN_TEST")
 	AM_RANGE(0xef80,0xef80) AM_READWRITE(ldp_read,ldp_write)

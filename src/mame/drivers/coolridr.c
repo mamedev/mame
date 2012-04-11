@@ -271,7 +271,7 @@ public:
 		m_soundcpu(*this,"soundcpu"),
 		m_h1_vram(*this, "h1_vram"),
 		m_h1_charram(*this, "h1_charram"),
-		m_framebuffer_vram(*this, "framebuffer_vram"),
+		m_framebuffer_vram(*this, "fb_vram"),
 		m_txt_vram(*this, "txt_vram"),
 		m_sysh1_txt_blit(*this, "sysh1_txt_blit"),
 		m_sysh1_workram_h(*this, "sysh1_workrah"),
@@ -701,7 +701,7 @@ static ADDRESS_MAP_START( system_h1_map, AS_PROGRAM, 32, coolridr_state )
 	AM_RANGE(0x03000000, 0x030fffff) AM_RAM AM_SHARE("h1_vram")//bg vram
 	AM_RANGE(0x03c00000, 0x03c0ffff) AM_RAM_WRITE(sysh1_pal_w) AM_SHARE("paletteram")
 	AM_RANGE(0x03d00000, 0x03dfffff) AM_RAM_WRITE(sysh1_char_w) AM_SHARE("h1_charram") //FIXME: half size
-	AM_RANGE(0x03e00000, 0x03efffff) AM_RAM_WRITE(sysh1_dma_w) AM_SHARE("framebuffer_vram") //FIXME: not all of it
+	AM_RANGE(0x03e00000, 0x03efffff) AM_RAM_WRITE(sysh1_dma_w) AM_SHARE("fb_vram") //FIXME: not all of it
 
 	AM_RANGE(0x03f00000, 0x03f0ffff) AM_RAM AM_SHARE("share3") /*Communication area RAM*/
 	AM_RANGE(0x03f40000, 0x03f4ffff) AM_RAM AM_SHARE("txt_vram")//text tilemap + "lineram"

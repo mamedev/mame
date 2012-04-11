@@ -49,7 +49,7 @@ class dai3wksi_state : public driver_device
 public:
 	dai3wksi_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
-		m_dai3wksi_videoram(*this, "dai3wksi_videoram"){ }
+		m_dai3wksi_videoram(*this, "videoram"){ }
 
 	/* video */
 	required_shared_ptr<UINT8> m_dai3wksi_videoram;
@@ -509,7 +509,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, dai3wksi_state )
 	AM_RANGE(0x3000, 0x3000) AM_WRITE(dai3wksi_audio_1_w)
 	AM_RANGE(0x3400, 0x3400) AM_WRITE(dai3wksi_audio_2_w)
 	AM_RANGE(0x3800, 0x3800) AM_WRITE(dai3wksi_audio_3_w)
-	AM_RANGE(0x8000, 0xbfff) AM_RAM AM_SHARE("dai3wksi_videoram")
+	AM_RANGE(0x8000, 0xbfff) AM_RAM AM_SHARE("videoram")
 ADDRESS_MAP_END
 
 

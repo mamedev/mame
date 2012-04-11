@@ -428,8 +428,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		  m_nvram(*this, "nvram") ,
 		m_rambase(*this, "rambase"),
-		m_interrupt_enable(*this, "interrupt_enable"),
-		m_interrupt_config(*this, "interrupt_config"),
+		m_interrupt_enable(*this, "int_enable"),
+		m_interrupt_config(*this, "int_config"),
 		m_asic_reset(*this, "asic_reset"),
 		m_rombase(*this, "rombase"){ }
 
@@ -1783,8 +1783,8 @@ static ADDRESS_MAP_START( seattle_map, AS_PROGRAM, 32, seattle_state )
 	AM_RANGE(0x16100000, 0x1611ffff) AM_READWRITE(cmos_r, cmos_w) AM_SHARE("nvram")
 	AM_RANGE(0x17000000, 0x17000003) AM_READWRITE(cmos_protect_r, cmos_protect_w)
 	AM_RANGE(0x17100000, 0x17100003) AM_WRITE(seattle_watchdog_w)
-	AM_RANGE(0x17300000, 0x17300003) AM_RAM_WRITE(seattle_interrupt_enable_w) AM_SHARE("interrupt_enable")
-	AM_RANGE(0x17400000, 0x17400003) AM_RAM_WRITE(interrupt_config_w) AM_SHARE("interrupt_config")
+	AM_RANGE(0x17300000, 0x17300003) AM_RAM_WRITE(seattle_interrupt_enable_w) AM_SHARE("int_enable")
+	AM_RANGE(0x17400000, 0x17400003) AM_RAM_WRITE(interrupt_config_w) AM_SHARE("int_config")
 	AM_RANGE(0x17500000, 0x17500003) AM_READ(interrupt_state_r)
 	AM_RANGE(0x17600000, 0x17600003) AM_READ(interrupt_state2_r)
 	AM_RANGE(0x17700000, 0x17700003) AM_WRITE(vblank_clear_w)

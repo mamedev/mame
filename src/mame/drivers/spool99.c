@@ -99,7 +99,7 @@ class spool99_state : public driver_device
 public:
 	spool99_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
-		m_main(*this, "main"),
+		m_main(*this, "mainram"),
 		m_vram(*this, "vram"),
 		m_cram(*this, "cram"){ }
 
@@ -212,7 +212,7 @@ static WRITE8_DEVICE_HANDLER( eeprom_dataline_w )
 }
 
 static ADDRESS_MAP_START( spool99_map, AS_PROGRAM, 8, spool99_state )
-	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_SHARE("main")
+	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_SHARE("mainram")
 	AM_RANGE(0x0100, 0xaeff) AM_ROM AM_REGION("maincpu", 0x100) AM_WRITENOP
 	AM_RANGE(0xaf00, 0xafff) AM_READ(spool99_io_r)
 	AM_RANGE(0xafed, 0xafed) AM_DEVWRITE_LEGACY("eeprom", eeprom_resetline_w )
@@ -258,7 +258,7 @@ READ8_MEMBER(spool99_state::vcarn_io_r)
 }
 
 static ADDRESS_MAP_START( vcarn_map, AS_PROGRAM, 8, spool99_state )
-	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_SHARE("main")
+	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_SHARE("mainram")
 	AM_RANGE(0x0100, 0xa6ff) AM_ROM AM_REGION("maincpu", 0x100) AM_WRITENOP
 	AM_RANGE(0xa700, 0xa7ff) AM_READ(vcarn_io_r)
 	AM_RANGE(0xa745, 0xa745) AM_DEVWRITE_LEGACY("eeprom", eeprom_resetline_w )

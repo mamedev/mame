@@ -30,18 +30,18 @@ public:
 	segald_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		  m_laserdisc(*this, "laserdisc") ,
-		m_obj_RAM(*this, "obj_RAM"),
-		m_out_RAM(*this, "out_RAM"),
-		m_color_RAM(*this, "color_RAM"),
-		m_fix_RAM(*this, "fix_RAM"){ }
+		m_obj_ram(*this, "obj_ram"),
+		m_out_ram(*this, "out_ram"),
+		m_color_ram(*this, "color_ram"),
+		m_fix_ram(*this, "fix_ram"){ }
 
 	UINT8 m_nmi_enable;
 
 	required_device<pioneer_ldv1000_device> m_laserdisc;
-	required_shared_ptr<UINT8> m_obj_RAM;
-	required_shared_ptr<UINT8> m_out_RAM;
-	required_shared_ptr<UINT8> m_color_RAM;
-	required_shared_ptr<UINT8> m_fix_RAM;
+	required_shared_ptr<UINT8> m_obj_ram;
+	required_shared_ptr<UINT8> m_out_ram;
+	required_shared_ptr<UINT8> m_color_ram;
+	required_shared_ptr<UINT8> m_fix_ram;
 
 	UINT8 m_ldv1000_input_latch;
 	UINT8 m_ldv1000_output_latch;
@@ -69,7 +69,7 @@ static void astron_draw_characters(running_machine &machine, bitmap_ind16 &bitma
 		for (characterY = 0; characterY < 32; characterY++)
 		{
 			int current_screen_character = (characterY*32) + characterX;
-			drawgfx_transpen(bitmap, cliprect, machine.gfx[0], state->m_fix_RAM[current_screen_character],
+			drawgfx_transpen(bitmap, cliprect, machine.gfx[0], state->m_fix_ram[current_screen_character],
 					1, 0, 0, characterX*8, characterY*8, 0);
 		}
 	}
@@ -95,8 +95,8 @@ static void astron_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, 
 	for (spr_number = 0; spr_number < 32; spr_number++)
 	{
 		spr_base = 0x10 * spr_number;
-		sy = state->m_obj_RAM[spr_base + SPR_Y_TOP];
-		sx = state->m_obj_RAM[spr_base + SPR_X_LO];
+		sy = state->m_obj_ram[spr_base + SPR_Y_TOP];
+		sx = state->m_obj_ram[spr_base + SPR_X_LO];
 
 		if (sx != 0 || sy != 0)
 			logerror("Hey!  A sprite's not at 0,0 : %d %d", sx, sy);
@@ -132,22 +132,22 @@ READ8_MEMBER(segald_state::astron_DISC_read)
 READ8_MEMBER(segald_state::astron_OUT_read)
 {
 
-	logerror("OUT read   (0x%04x) @ 0x%04x [0x%x]\n", m_out_RAM[offset], offset, cpu_get_pc(&space.device()));
-	return m_out_RAM[offset];
+	logerror("OUT read   (0x%04x) @ 0x%04x [0x%x]\n", m_out_ram[offset], offset, cpu_get_pc(&space.device()));
+	return m_out_ram[offset];
 }
 
 READ8_MEMBER(segald_state::astron_OBJ_read)
 {
 
-	logerror("OBJ read   (0x%04x) @ 0x%04x [0x%x]\n", m_obj_RAM[offset], offset, cpu_get_pc(&space.device()));
-	return m_obj_RAM[offset];
+	logerror("OBJ read   (0x%04x) @ 0x%04x [0x%x]\n", m_obj_ram[offset], offset, cpu_get_pc(&space.device()));
+	return m_obj_ram[offset];
 }
 
 READ8_MEMBER(segald_state::astron_COLOR_read)
 {
 
-	logerror("COLOR read   (0x%04x) @ 0x%04x [0x%x]\n", m_color_RAM[offset], offset, cpu_get_pc(&space.device()));
-	return m_color_RAM[offset];
+	logerror("COLOR read   (0x%04x) @ 0x%04x [0x%x]\n", m_color_ram[offset], offset, cpu_get_pc(&space.device()));
+	return m_color_ram[offset];
 }
 
 
@@ -197,13 +197,13 @@ WRITE8_MEMBER(segald_state::astron_OUT_write)
 			break;
 	}
 
-	m_out_RAM[offset] = data;
+	m_out_ram[offset] = data;
 }
 
 WRITE8_MEMBER(segald_state::astron_OBJ_write)
 {
 
-	m_obj_RAM[offset] = data;
+	m_obj_ram[offset] = data;
 	logerror("OBJ write : 0x%04x @ 0x%04x [0x%x]\n", data, offset, cpu_get_pc(&space.device()));
 }
 
@@ -214,11 +214,11 @@ WRITE8_MEMBER(segald_state::astron_COLOR_write)
 	const UINT8 palIndex = offset >> 1;
 
 	/* Combine */
-	m_color_RAM[offset] = data;
+	m_color_ram[offset] = data;
 
 	/* Easy access */
-	highBits = m_color_RAM[(palIndex<<1)+1] & 0x0f;
-	lowBits  = m_color_RAM[(palIndex<<1)];
+	highBits = m_color_ram[(palIndex<<1)+1] & 0x0f;
+	lowBits  = m_color_ram[(palIndex<<1)];
 
 	/* 4-bit RGB */
 	r = (lowBits  & 0x0f);
@@ -233,7 +233,7 @@ WRITE8_MEMBER(segald_state::astron_COLOR_write)
 WRITE8_MEMBER(segald_state::astron_FIX_write)
 {
 
-	m_fix_RAM[offset] = data;
+	m_fix_ram[offset] = data;
 	/* logerror("FIX write : 0x%04x @ 0x%04x [0x%x]\n", data, offset, cpu_get_pc(&space.device())); */
 }
 
@@ -251,15 +251,15 @@ static ADDRESS_MAP_START( mainmem, AS_PROGRAM, 8, segald_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 
-	AM_RANGE(0xc000, 0xc7ff) AM_READWRITE(astron_OBJ_read, astron_OBJ_write) AM_SHARE("obj_RAM")	/* OBJ according to the schematics (sprite) */
+	AM_RANGE(0xc000, 0xc7ff) AM_READWRITE(astron_OBJ_read, astron_OBJ_write) AM_SHARE("obj_ram")	/* OBJ according to the schematics (sprite) */
 	AM_RANGE(0xc800, 0xcfff) AM_READWRITE(astron_DISC_read, astron_DISC_write)					/* DISC interface according to schematics */
 	AM_RANGE(0xd000, 0xd000) AM_READ_PORT("DSWA")								/* SW bank 2 (DIPs) */
 	AM_RANGE(0xd001, 0xd001) AM_READ_PORT("DSWB")								/* SW bank 3 (DIPs) */
 	AM_RANGE(0xd002, 0xd002) AM_READ_PORT("IN0")								/* SW bank 0 (IO) */
 	AM_RANGE(0xd003, 0xd003) AM_READ_PORT("IN1")								/* SW bank 1 (IO) */
-	AM_RANGE(0xd800, 0xd803) AM_READWRITE(astron_OUT_read, astron_OUT_write) AM_SHARE("out_RAM")	/* OUT according to schematics (output port) */
-	AM_RANGE(0xe000, 0xe1ff) AM_READWRITE(astron_COLOR_read, astron_COLOR_write) AM_SHARE("color_RAM") /* COLOR according to the schematics */
-	AM_RANGE(0xf000, 0xf7ff) AM_WRITE(astron_FIX_write) AM_SHARE("fix_RAM")						/* FIX according to schematics (characters) */
+	AM_RANGE(0xd800, 0xd803) AM_READWRITE(astron_OUT_read, astron_OUT_write) AM_SHARE("out_ram")	/* OUT according to schematics (output port) */
+	AM_RANGE(0xe000, 0xe1ff) AM_READWRITE(astron_COLOR_read, astron_COLOR_write) AM_SHARE("color_ram") /* COLOR according to the schematics */
+	AM_RANGE(0xf000, 0xf7ff) AM_WRITE(astron_FIX_write) AM_SHARE("fix_ram")						/* FIX according to schematics (characters) */
 	AM_RANGE(0xf800, 0xffff) AM_RAM																/* RAM according to schematics */
 ADDRESS_MAP_END
 

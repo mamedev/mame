@@ -63,8 +63,8 @@ public:
 		: driver_device(mconfig, type, tag) ,
 		m_scroll_ram(*this, "scroll_ram"),
 		m_sprite_ram(*this, "sprite_ram"),
-		m_dderby_vidchars(*this, "dderby_vidchars"),
-		m_dderby_vidattribs(*this, "dderby_vidattribs"){ }
+		m_dderby_vidchars(*this, "vidchars"),
+		m_dderby_vidattribs(*this, "vidattribs"){ }
 
 	required_shared_ptr<UINT8> m_scroll_ram;
 	required_shared_ptr<UINT8> m_sprite_ram;
@@ -134,8 +134,8 @@ static ADDRESS_MAP_START( memmap, AS_PROGRAM, 8, dmndrby_state )
 	AM_RANGE(0xca03, 0xca03) AM_WRITENOP//(timer_irq_w) //???
 	AM_RANGE(0xcc00, 0xcc05) AM_RAM AM_SHARE("scroll_ram")
 	AM_RANGE(0xce08, 0xce1f) AM_RAM AM_SHARE("sprite_ram") // horse sprites
-	AM_RANGE(0xd000, 0xd3ff) AM_RAM AM_SHARE("dderby_vidchars") // char ram
-	AM_RANGE(0xd400, 0xd7ff) AM_RAM AM_SHARE("dderby_vidattribs") // colours/ attrib ram
+	AM_RANGE(0xd000, 0xd3ff) AM_RAM AM_SHARE("vidchars") // char ram
+	AM_RANGE(0xd400, 0xd7ff) AM_RAM AM_SHARE("vidattribs") // colours/ attrib ram
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dderby_sound_map, AS_PROGRAM, 8, dmndrby_state )

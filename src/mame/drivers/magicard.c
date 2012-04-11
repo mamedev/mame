@@ -174,14 +174,14 @@ public:
 		: driver_device(mconfig, type, tag) ,
 		m_magicram(*this, "magicram"),
 		m_pcab_vregs(*this, "pcab_vregs"),
-		m_scc68070_ext_irqc_regs(*this, "scc68070_ext_irqc_regs"),
-		m_scc68070_iic_regs(*this, "scc68070_iic_regs"),
-		m_scc68070_uart_regs(*this, "scc68070_uart_regs"),
-		m_scc68070_timer_regs(*this, "scc68070_timer_regs"),
-		m_scc68070_int_irqc_regs(*this, "scc68070_int_irqc_regs"),
-		m_scc68070_dma_ch1_regs(*this, "scc68070_dma_ch1_regs"),
-		m_scc68070_dma_ch2_regs(*this, "scc68070_dma_ch2_regs"),
-		m_scc68070_mmu_regs(*this, "scc68070_mmu_regs"){ }
+		m_scc68070_ext_irqc_regs(*this, "scc_xirqc_regs"),
+		m_scc68070_iic_regs(*this, "scc_iic_regs"),
+		m_scc68070_uart_regs(*this, "scc_uart_regs"),
+		m_scc68070_timer_regs(*this, "scc_timer_regs"),
+		m_scc68070_int_irqc_regs(*this, "scc_iirqc_regs"),
+		m_scc68070_dma_ch1_regs(*this, "scc_dma1_regs"),
+		m_scc68070_dma_ch2_regs(*this, "scc_dma2_regs"),
+		m_scc68070_mmu_regs(*this, "scc_mmu_regs"){ }
 
 	required_shared_ptr<UINT16> m_magicram;
 	required_shared_ptr<UINT16> m_pcab_vregs;
@@ -671,14 +671,14 @@ static ADDRESS_MAP_START( magicard_mem, AS_PROGRAM, 16, magicard_state )
 	AM_RANGE(0x001ffd80, 0x001ffd81) AM_MIRROR(0x7fe00000) AM_WRITENOP //?
 	AM_RANGE(0x001fff80, 0x001fffbf) AM_MIRROR(0x7fe00000) AM_RAM //DRAM I/O, not accessed by this game, CD buffer?
 	AM_RANGE(0x001fffe0, 0x001fffff) AM_MIRROR(0x7fe00000) AM_READWRITE(philips_66470_r,philips_66470_w) AM_SHARE("pcab_vregs") //video registers
-	AM_RANGE(0x80001000, 0x8000100f) AM_READWRITE(scc68070_ext_irqc_r,scc68070_ext_irqc_w) AM_SHARE("scc68070_ext_irqc_regs") //lir
-	AM_RANGE(0x80002000, 0x8000200f) AM_READWRITE(scc68070_iic_r,scc68070_iic_w) AM_SHARE("scc68070_iic_regs") //i2c
-	AM_RANGE(0x80002010, 0x8000201f) AM_READWRITE(scc68070_uart_r,scc68070_uart_w) AM_SHARE("scc68070_uart_regs")
-	AM_RANGE(0x80002020, 0x8000202f) AM_READWRITE(scc68070_timer_r,scc68070_timer_w) AM_SHARE("scc68070_timer_regs")
-	AM_RANGE(0x80002040, 0x8000204f) AM_READWRITE(scc68070_int_irqc_r,scc68070_int_irqc_w) AM_SHARE("scc68070_int_irqc_regs")
-	AM_RANGE(0x80004000, 0x8000403f) AM_READWRITE(scc68070_dma_ch1_r,scc68070_dma_ch1_w) AM_SHARE("scc68070_dma_ch1_regs")
-	AM_RANGE(0x80004040, 0x8000407f) AM_READWRITE(scc68070_dma_ch2_r,scc68070_dma_ch2_w) AM_SHARE("scc68070_dma_ch2_regs")
-	AM_RANGE(0x80008000, 0x8000807f) AM_READWRITE(scc68070_mmu_r,scc68070_mmu_w) AM_SHARE("scc68070_mmu_regs")
+	AM_RANGE(0x80001000, 0x8000100f) AM_READWRITE(scc68070_ext_irqc_r,scc68070_ext_irqc_w) AM_SHARE("scc_xirqc_regs") //lir
+	AM_RANGE(0x80002000, 0x8000200f) AM_READWRITE(scc68070_iic_r,scc68070_iic_w) AM_SHARE("scc_iic_regs") //i2c
+	AM_RANGE(0x80002010, 0x8000201f) AM_READWRITE(scc68070_uart_r,scc68070_uart_w) AM_SHARE("scc_uart_regs")
+	AM_RANGE(0x80002020, 0x8000202f) AM_READWRITE(scc68070_timer_r,scc68070_timer_w) AM_SHARE("scc_timer_regs")
+	AM_RANGE(0x80002040, 0x8000204f) AM_READWRITE(scc68070_int_irqc_r,scc68070_int_irqc_w) AM_SHARE("scc_iirqc_regs")
+	AM_RANGE(0x80004000, 0x8000403f) AM_READWRITE(scc68070_dma_ch1_r,scc68070_dma_ch1_w) AM_SHARE("scc_dma1_regs")
+	AM_RANGE(0x80004040, 0x8000407f) AM_READWRITE(scc68070_dma_ch2_r,scc68070_dma_ch2_w) AM_SHARE("scc_dma2_regs")
+	AM_RANGE(0x80008000, 0x8000807f) AM_READWRITE(scc68070_mmu_r,scc68070_mmu_w) AM_SHARE("scc_mmu_regs")
 ADDRESS_MAP_END
 
 

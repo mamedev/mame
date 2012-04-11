@@ -121,8 +121,8 @@ public:
 		m_vregs(*this, "vregs"),
 		m_left_fg_vram_top(*this, "left_fg_vratop"),
 		m_right_fg_vram_top(*this, "right_fg_vratop"),
-		m_left_fg_vram_bottom(*this, "left_fg_vrabottom"),
-		m_right_fg_vram_bottom(*this, "right_fg_vrabottom"),
+		m_left_fg_vram_bottom(*this, "left_fg_vrabot"),
+		m_right_fg_vram_bottom(*this, "right_fg_vrabot"),
 		m_back_vram(*this, "back_vram"),
 		m_work_ram(*this, "work_ram"),
 		m_mcu_shared_ram(*this, "mcu_shared_ram"){ }
@@ -474,8 +474,8 @@ static ADDRESS_MAP_START( ddealer, AS_PROGRAM, 16, ddealer_state )
 	/* this might actually be 1 tilemap with some funky rowscroll / columnscroll enabled, I'm not sure */
 	AM_RANGE(0x090000, 0x090fff) AM_RAM AM_SHARE("left_fg_vratop")
 	AM_RANGE(0x091000, 0x091fff) AM_RAM AM_SHARE("right_fg_vratop")
-	AM_RANGE(0x092000, 0x092fff) AM_RAM AM_SHARE("left_fg_vrabottom")
-	AM_RANGE(0x093000, 0x093fff) AM_RAM AM_SHARE("right_fg_vrabottom")
+	AM_RANGE(0x092000, 0x092fff) AM_RAM AM_SHARE("left_fg_vrabot")
+	AM_RANGE(0x093000, 0x093fff) AM_RAM AM_SHARE("right_fg_vrabot")
 	//AM_RANGE(0x094000, 0x094001) AM_NOP // always 0?
 	AM_RANGE(0x098000, 0x098001) AM_WRITE(ddealer_flipscreen_w)
 	AM_RANGE(0x09c000, 0x09cfff) AM_RAM_WRITE(back_vram_w) AM_SHARE("back_vram") // bg tilemap

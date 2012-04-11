@@ -135,7 +135,7 @@ public:
 		m_vidregs(*this, "vidregs"),
 		m_textureram(*this, "textureram"),
 		m_frameram(*this, "frameram"),
-		m_ResetPatch(*this, "ResetPatch"){ }
+		m_reset_patch(*this, "reset_patch"){ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT32> m_sysregs;
@@ -143,7 +143,7 @@ public:
 	required_shared_ptr<UINT32> m_vidregs;
 	required_shared_ptr<UINT32> m_textureram;
 	required_shared_ptr<UINT32> m_frameram;
-	required_shared_ptr<UINT32> m_ResetPatch;
+	required_shared_ptr<UINT32> m_reset_patch;
 //  UINT32 *  m_nvram;    // currently this uses generic nvram handling
 
 #ifdef IDLE_LOOP_SPEEDUP
@@ -508,7 +508,7 @@ static ADDRESS_MAP_START( crystal_mem, AS_PROGRAM, 32, crystal_state )
 	AM_RANGE(0x05000000, 0x05000003) AM_READWRITE(FlashCmd_r, FlashCmd_w)
 	AM_RANGE(0x05000000, 0x05ffffff) AM_ROMBANK("bank1")
 
-	AM_RANGE(0x44414F4C, 0x44414F7F) AM_RAM AM_SHARE("ResetPatch")
+	AM_RANGE(0x44414F4C, 0x44414F7F) AM_RAM AM_SHARE("reset_patch")
 
 ADDRESS_MAP_END
 
@@ -549,7 +549,7 @@ loop:
 		0xdef4d4fa
 	};
 
-	memcpy(state->m_ResetPatch, Patch, sizeof(Patch));
+	memcpy(state->m_reset_patch, Patch, sizeof(Patch));
 #else
 	static const UINT8 Patch[] =
 	{
@@ -558,7 +558,7 @@ loop:
 		0x20,0x3A,0xD0,0xA1,0xFA,0xD4,0xF4,0xDE
 	};
 
-	memcpy(state->m_ResetPatch, Patch, sizeof(Patch));
+	memcpy(state->m_reset_patch, Patch, sizeof(Patch));
 #endif
 }
 

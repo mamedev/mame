@@ -35,7 +35,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		  m_laserdisc(*this, "laserdisc") ,
 		m_tile_ram(*this, "tile_ram"),
-		m_tile_control_ram(*this, "tile_control_ram"){ }
+		m_tile_control_ram(*this, "tile_ctrl_ram"){ }
 
 	required_device<pioneer_ldv1000_device> m_laserdisc;
 	required_shared_ptr<UINT8> m_tile_ram;
@@ -160,7 +160,7 @@ static ADDRESS_MAP_START( z80_0_mem, AS_PROGRAM, 8, esh_state )
 	AM_RANGE(0x0000,0x3fff) AM_ROM
 	AM_RANGE(0xe000,0xe7ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xf000,0xf3ff) AM_RAM AM_SHARE("tile_ram")
-	AM_RANGE(0xf400,0xf7ff) AM_RAM AM_SHARE("tile_control_ram")
+	AM_RANGE(0xf400,0xf7ff) AM_RAM AM_SHARE("tile_ctrl_ram")
 ADDRESS_MAP_END
 
 
