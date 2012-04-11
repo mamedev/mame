@@ -748,9 +748,6 @@ void _class :: _name(address_map &map, const device_t &device) \
 #define AM_SIZE_LEGACY(_size) \
 	curentry->set_sizeptr(_size); \
 
-#define AM_SIZE(_member) \
-	curentry->set_member_sizeptr(myoffsetof(drivdata_class, _member)); \
-
 
 // common shortcuts
 #define AM_ROMBANK(_bank)					AM_READ_BANK(_bank)
@@ -764,7 +761,7 @@ void _class :: _name(address_map &map, const device_t &device) \
 #define AM_RAM_WRITE_LEGACY(_write)			AM_READONLY AM_WRITE_LEGACY(_write)
 #define AM_RAM_DEVWRITE_LEGACY(_tag, _write) AM_READONLY AM_DEVWRITE_LEGACY(_tag, _write)
 
-#define AM_BASE_SIZE(_base, _size)			AM_BASE(_base) AM_SIZE(_size)
+#define AM_BASE_SIZE(_base, _size)			AM_BASE(_base) curentry->set_member_sizeptr(myoffsetof(drivdata_class, _size));
 
 
 

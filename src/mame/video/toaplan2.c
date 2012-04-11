@@ -260,8 +260,8 @@ WRITE16_MEMBER(toaplan2_state::batrider_textdata_dma_w)
 
 	memcpy(dest, m_txvideoram16, m_tx_vram_size);
 	dest += (m_tx_vram_size/2);
-	memcpy(dest, m_generic_paletteram_16, m_paletteram_size);
-	dest += (m_paletteram_size/2);
+	memcpy(dest, m_generic_paletteram_16, m_generic_paletteram_16.bytes());
+	dest += (m_generic_paletteram_16.bytes()/2);
 	memcpy(dest, m_txvideoram16_offs, m_tx_offs_vram_size);
 	dest += (m_tx_offs_vram_size/2);
 	memcpy(dest, m_txscrollram16, m_tx_scroll_vram_size);

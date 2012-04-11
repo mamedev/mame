@@ -182,22 +182,6 @@
         Specifies a pointer to a pointer to the base of the memory backing
         the current bucket.
 
-    AM_SIZE(size)
-        Specifies a pointer to a size_t variable which will be filled in
-        with the size, in bytes, of the current bucket.
-
-    AM_BASE_MEMBER(struct, basefield)
-    AM_SIZE_MEMBER(struct, sizefield)
-        Specifies a field within a given struct as where to store the base
-        or size of the current bucket. The struct is assumed to be hanging
-        off of the machine.driver_data pointer.
-
-    AM_BASE_GENERIC(basefield)
-    AM_SIZE_GENERIC(sizefield)
-        Specifies a field within the global generic_pointers struct as
-        where to store the base or size of the current bucket. The global
-        generic_pointer struct lives in machine.generic.
-
 ***************************************************************************/
 
 #include <list>

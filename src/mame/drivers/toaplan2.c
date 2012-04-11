@@ -1336,7 +1336,7 @@ static ADDRESS_MAP_START( batrider_68k_mem, AS_PROGRAM, 16, toaplan2_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 	// actually 200000 - 20ffff is probably all main RAM, and the text and palette RAM are written via DMA
 	AM_RANGE(0x200000, 0x201fff) AM_RAM_WRITE(toaplan2_txvideoram16_w) AM_BASE_SIZE(m_txvideoram16, m_tx_vram_size)
-	AM_RANGE(0x202000, 0x202fff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram") AM_SIZE(m_paletteram_size)
+	AM_RANGE(0x202000, 0x202fff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x203000, 0x2031ff) AM_RAM_WRITE(toaplan2_txvideoram16_offs_w) AM_BASE_SIZE(m_txvideoram16_offs, m_tx_offs_vram_size)
 	AM_RANGE(0x203200, 0x2033ff) AM_RAM_WRITE(toaplan2_txscrollram16_w) AM_BASE_SIZE(m_txscrollram16, m_tx_scroll_vram_size)
 	AM_RANGE(0x203400, 0x207fff) AM_RAM AM_BASE_SIZE(m_mainram16, m_mainram_overlap_size)
@@ -1366,7 +1366,7 @@ static ADDRESS_MAP_START( bbakraid_68k_mem, AS_PROGRAM, 16, toaplan2_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 	// actually 200000 - 20ffff is probably all main RAM, and the text and palette RAM are written via DMA
 	AM_RANGE(0x200000, 0x201fff) AM_RAM_WRITE(toaplan2_txvideoram16_w) AM_BASE_SIZE(m_txvideoram16, m_tx_vram_size)
-	AM_RANGE(0x202000, 0x202fff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram") AM_SIZE(m_paletteram_size)
+	AM_RANGE(0x202000, 0x202fff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x203000, 0x2031ff) AM_RAM_WRITE(toaplan2_txvideoram16_offs_w) AM_BASE_SIZE(m_txvideoram16_offs, m_tx_offs_vram_size)
 	AM_RANGE(0x203200, 0x2033ff) AM_RAM_WRITE(toaplan2_txscrollram16_w) AM_BASE_SIZE(m_txscrollram16, m_tx_scroll_vram_size)
 	AM_RANGE(0x203400, 0x207fff) AM_RAM AM_BASE_SIZE(m_mainram16, m_mainram_overlap_size)

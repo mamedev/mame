@@ -45,7 +45,6 @@ public:
 	size_t m_tx_vram_size;
 	size_t m_tx_offs_vram_size;
 	size_t m_tx_scroll_vram_size;
-	size_t m_paletteram_size;
 	size_t m_mainram_overlap_size;
 
 	bitmap_ind8 m_custom_priority_bitmap;

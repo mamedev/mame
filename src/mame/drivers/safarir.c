@@ -56,15 +56,16 @@ class safarir_state : public driver_device
 public:
 	safarir_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
-		m_bg_scroll(*this, "bg_scroll"){ }
+		m_bg_scroll(*this, "bg_scroll"),
+		m_ram(*this, "ram") { }
 
 	UINT8 *m_ram_1;
 	UINT8 *m_ram_2;
-	size_t m_ram_size;
 	UINT8 m_ram_bank;
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
 	required_shared_ptr<UINT8> m_bg_scroll;
+	required_shared_ptr<UINT8> m_ram;
 	UINT8 m_port_last;
 	UINT8 m_port_last2;
 	samples_device *m_samples;
@@ -316,15 +317,15 @@ static MACHINE_START( safarir )
 {
 	safarir_state *state = machine.driver_data<safarir_state>();
 
-	state->m_ram_1 = auto_alloc_array(machine, UINT8, state->m_ram_size);
-	state->m_ram_2 = auto_alloc_array(machine, UINT8, state->m_ram_size);
+	state->m_ram_1 = auto_alloc_array(machine, UINT8, state->m_ram.bytes());
+	state->m_ram_2 = auto_alloc_array(machine, UINT8, state->m_ram.bytes());
 	state->m_port_last = 0;
 	state->m_port_last2 = 0;
 	state->m_samples = machine.device<samples_device>("samples");
 
 	/* setup for save states */
-	state->save_pointer(NAME(state->m_ram_1), state->m_ram_size);
-	state->save_pointer(NAME(state->m_ram_2), state->m_ram_size);
+	state->save_pointer(NAME(state->m_ram_1), state->m_ram.bytes());
+	state->save_pointer(NAME(state->m_ram_2), state->m_ram.bytes());
 	state->save_item(NAME(state->m_ram_bank));
 	state->save_item(NAME(state->m_port_last));
 	state->save_item(NAME(state->m_port_last2));
@@ -340,7 +341,7 @@ static MACHINE_START( safarir )
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, safarir_state )
 	AM_RANGE(0x0000, 0x17ff) AM_ROM
-	AM_RANGE(0x2000, 0x27ff) AM_READWRITE(ram_r, ram_w) AM_SIZE(m_ram_size)
+	AM_RANGE(0x2000, 0x27ff) AM_READWRITE(ram_r, ram_w) AM_SHARE("ram")
 	AM_RANGE(0x2800, 0x2800) AM_MIRROR(0x03ff) AM_READNOP AM_WRITE(ram_bank_w)
 	AM_RANGE(0x2c00, 0x2cff) AM_MIRROR(0x03ff) AM_READNOP AM_WRITEONLY AM_SHARE("bg_scroll")
 	AM_RANGE(0x3000, 0x30ff) AM_MIRROR(0x03ff) AM_WRITE(safarir_audio_w)	/* goes to SN76477 */
