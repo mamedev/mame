@@ -53,21 +53,28 @@ class jackie_state : public driver_device
 public:
 	jackie_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this,"maincpu")
-		{ }
+		m_maincpu(*this,"maincpu"),
+		m_bg_scroll2(*this, "bg_scroll2"),
+		m_bg_scroll(*this, "bg_scroll"),
+		m_reel1_ram(*this, "reel1_ram"),
+		m_reel2_ram(*this, "reel2_ram"),
+		m_reel3_ram(*this, "reel3_ram"),
+		m_fg_tile_ram(*this, "fg_tile_ram"),
+		m_fg_color_ram(*this, "fg_color_ram"){ }
 
+	required_device<cpu_device> m_maincpu;
+	required_shared_ptr<UINT8> m_bg_scroll2;
+	required_shared_ptr<UINT8> m_bg_scroll;
+	required_shared_ptr<UINT8> m_reel1_ram;
+	required_shared_ptr<UINT8> m_reel2_ram;
+	required_shared_ptr<UINT8> m_reel3_ram;
+	required_shared_ptr<UINT8> m_fg_tile_ram;
+	required_shared_ptr<UINT8> m_fg_color_ram;
 	int m_exp_bank;
-	UINT8 *m_fg_tile_ram;
-	UINT8 *m_fg_color_ram;
 	tilemap_t *m_fg_tilemap;
-	UINT8 *m_bg_scroll;
-	UINT8 *m_bg_scroll2;
 	tilemap_t *m_reel1_tilemap;
-	UINT8 *m_reel1_ram;
 	tilemap_t *m_reel2_tilemap;
-	UINT8 *m_reel2_ram;
 	tilemap_t *m_reel3_tilemap;
-	UINT8 *m_reel3_ram;
 	int m_irq_enable;
 	int m_nmi_enable;
 	int m_bg_enable;
@@ -75,7 +82,6 @@ public:
 	UINT8 m_out[3];
 	UINT16 m_unk_reg[3][5];
 
-	required_device<cpu_device> m_maincpu;
 	DECLARE_WRITE8_MEMBER(fg_tile_w);
 	DECLARE_WRITE8_MEMBER(fg_color_w);
 	DECLARE_WRITE8_MEMBER(bg_scroll_w);

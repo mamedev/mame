@@ -78,9 +78,10 @@ class ghosteo_state : public driver_device
 {
 public:
 	ghosteo_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_system_memory(*this, "systememory"){ }
 
-	UINT32 *m_system_memory;
+	required_shared_ptr<UINT32> m_system_memory;
 	int m_security_count;
 	UINT32 m_bballoon_port[20];
 	struct nand_t m_nand;
@@ -352,7 +353,7 @@ static ADDRESS_MAP_START( bballoon_map, AS_PROGRAM, 32, ghosteo_state )
 	AM_RANGE(0x10100000, 0x10100003) AM_READ_PORT("10100000")
 	AM_RANGE(0x10200000, 0x10200003) AM_READ_PORT("10200000")
 	AM_RANGE(0x10300000, 0x10300003) AM_WRITE(sound_w)
-	AM_RANGE(0x30000000, 0x31ffffff) AM_RAM AM_BASE(m_system_memory) AM_MIRROR(0x02000000)
+	AM_RANGE(0x30000000, 0x31ffffff) AM_RAM AM_SHARE("systememory") AM_MIRROR(0x02000000)
 ADDRESS_MAP_END
 
 /*

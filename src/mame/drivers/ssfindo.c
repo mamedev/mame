@@ -216,11 +216,12 @@ class ssfindo_state : public driver_device
 {
 public:
 	ssfindo_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_vram(*this, "vram"){ }
 
 	UINT32 m_PS7500_IO[MAXIO];
 	UINT32 m_PS7500_FIFO[256];
-	UINT32 *m_vram;
+	required_shared_ptr<UINT32> m_vram;
 	UINT32 m_flashAdr;
 	UINT32 m_flashOffset;
 	UINT32 m_adrLatch;
@@ -565,7 +566,7 @@ static ADDRESS_MAP_START( ssfindo_map, AS_PROGRAM, 32, ssfindo_state )
 	AM_RANGE(0x0324f000, 0x0324f003) AM_READ(SIMPLEIO_r)
 	AM_RANGE(0x03245000, 0x03245003) AM_WRITENOP /* sound ? */
 	AM_RANGE(0x03400000, 0x03400003) AM_WRITE(FIFO_w)
-	AM_RANGE(0x10000000, 0x11ffffff) AM_RAM AM_BASE(m_vram)
+	AM_RANGE(0x10000000, 0x11ffffff) AM_RAM AM_SHARE("vram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ppcar_map, AS_PROGRAM, 32, ssfindo_state )
@@ -580,7 +581,7 @@ static ADDRESS_MAP_START( ppcar_map, AS_PROGRAM, 32, ssfindo_state )
 	AM_RANGE(0x033c0000, 0x033c0003) AM_READ(io_r) AM_WRITE(io_w)
 	AM_RANGE(0x03400000, 0x03400003) AM_WRITE(FIFO_w)
 	AM_RANGE(0x08000000, 0x08ffffff) AM_RAM
-	AM_RANGE(0x10000000, 0x10ffffff) AM_RAM AM_BASE(m_vram)
+	AM_RANGE(0x10000000, 0x10ffffff) AM_RAM AM_SHARE("vram")
 ADDRESS_MAP_END
 
 READ32_MEMBER(ssfindo_state::tetfight_unk_r)
@@ -602,7 +603,7 @@ static ADDRESS_MAP_START( tetfight_map, AS_PROGRAM, 32, ssfindo_state )
 	AM_RANGE(0x03240004, 0x03240007) AM_READ_PORT("IN0")
 	AM_RANGE(0x03240008, 0x0324000b) AM_READ_PORT("DSW2")
 	AM_RANGE(0x03240020, 0x03240023) AM_READWRITE(tetfight_unk_r, tetfight_unk_w)
-	AM_RANGE(0x10000000, 0x14ffffff) AM_RAM AM_BASE(m_vram)
+	AM_RANGE(0x10000000, 0x14ffffff) AM_RAM AM_SHARE("vram")
 ADDRESS_MAP_END
 
 static MACHINE_RESET( ssfindo )

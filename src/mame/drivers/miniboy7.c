@@ -156,10 +156,12 @@ class miniboy7_state : public driver_device
 {
 public:
 	miniboy7_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"),
+		m_colorram(*this, "colorram"){ }
 
-	UINT8 *m_videoram;
-	UINT8 *m_colorram;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_colorram;
 	tilemap_t *m_bg_tilemap;
 	DECLARE_WRITE8_MEMBER(miniboy7_videoram_w);
 	DECLARE_WRITE8_MEMBER(miniboy7_colorram_w);
@@ -268,8 +270,8 @@ static PALETTE_INIT( miniboy7 )
 
 static ADDRESS_MAP_START( miniboy7_map, AS_PROGRAM, 8, miniboy7_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM	AM_SHARE("nvram") /* battery backed RAM? */
-	AM_RANGE(0x0800, 0x0fff) AM_RAM_WRITE(miniboy7_videoram_w) AM_BASE(m_videoram)
-	AM_RANGE(0x1000, 0x17ff) AM_RAM_WRITE(miniboy7_colorram_w) AM_BASE(m_colorram)
+	AM_RANGE(0x0800, 0x0fff) AM_RAM_WRITE(miniboy7_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x1000, 0x17ff) AM_RAM_WRITE(miniboy7_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0x1800, 0x25ff) AM_RAM	/* looks like videoram */
 	AM_RANGE(0x2600, 0x27ff) AM_RAM
 	AM_RANGE(0x2800, 0x2800) AM_DEVWRITE("crtc", mc6845_device, address_w)

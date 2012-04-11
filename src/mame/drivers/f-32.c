@@ -22,11 +22,12 @@ class mosaicf2_state : public driver_device
 public:
 	mosaicf2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu") { }
+		  m_maincpu(*this, "maincpu") ,
+		m_videoram(*this, "videoram"){ }
 
 	/* memory pointers */
 	required_device<e132xn_device>	m_maincpu;
-	UINT32 *  m_videoram;
+	required_shared_ptr<UINT32> m_videoram;
 	DECLARE_READ32_MEMBER(f32_input_port_1_r);
 };
 
@@ -55,7 +56,7 @@ static SCREEN_UPDATE_IND16( mosaicf2 )
 
 static ADDRESS_MAP_START( common_map, AS_PROGRAM, 32, mosaicf2_state )
 	AM_RANGE(0x00000000, 0x001fffff) AM_RAM
-	AM_RANGE(0x40000000, 0x4003ffff) AM_RAM AM_BASE(m_videoram)
+	AM_RANGE(0x40000000, 0x4003ffff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0x80000000, 0x80ffffff) AM_ROM AM_REGION("user2",0)
 	AM_RANGE(0xfff00000, 0xffffffff) AM_ROM AM_REGION("user1",0)
 ADDRESS_MAP_END

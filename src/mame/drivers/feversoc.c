@@ -68,10 +68,11 @@ class feversoc_state : public driver_device
 {
 public:
 	feversoc_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_spriteram(*this, "spriteram"){ }
 
 	UINT16 m_x;
-	UINT32 *m_spriteram;
+	required_shared_ptr<UINT32> m_spriteram;
 	DECLARE_WRITE32_MEMBER(fs_paletteram_w);
 	DECLARE_READ32_MEMBER(in0_r);
 	DECLARE_WRITE32_MEMBER(output_w);
@@ -88,7 +89,7 @@ static VIDEO_START( feversoc )
 static SCREEN_UPDATE_IND16( feversoc )
 {
 	feversoc_state *state = screen.machine().driver_data<feversoc_state>();
-	UINT32 *spriteram32 = state->m_spriteram;
+	UINT32 *spriteram32 = state->m_spriteram.target();
 	int offs,spr_offs,colour,sx,sy,h,w,dx,dy;
 
 	bitmap.fill(screen.machine().pens[0], cliprect); //black pen
@@ -165,7 +166,7 @@ WRITE32_MEMBER(feversoc_state::output_w)
 static ADDRESS_MAP_START( feversoc_map, AS_PROGRAM, 32, feversoc_state )
 	AM_RANGE(0x00000000, 0x0003ffff) AM_ROM
 	AM_RANGE(0x02000000, 0x0203dfff) AM_RAM //work ram
-	AM_RANGE(0x0203e000, 0x0203ffff) AM_RAM AM_BASE(m_spriteram)
+	AM_RANGE(0x0203e000, 0x0203ffff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x06000000, 0x06000003) AM_WRITE(output_w)
 	AM_RANGE(0x06000004, 0x06000007) AM_WRITENOP //???
 	AM_RANGE(0x06000008, 0x0600000b) AM_READ(in0_r)

@@ -200,16 +200,21 @@ class witch_state : public driver_device
 {
 public:
 	witch_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_gfx0_vram(*this, "gfx0_vram"),
+		m_gfx0_cram(*this, "gfx0_cram"),
+		m_gfx1_vram(*this, "gfx1_vram"),
+		m_gfx1_cram(*this, "gfx1_cram"),
+		m_sprite_ram(*this, "sprite_ram"){ }
 
 	tilemap_t *m_gfx0a_tilemap;
 	tilemap_t *m_gfx0b_tilemap;
 	tilemap_t *m_gfx1_tilemap;
-	UINT8 *m_gfx0_cram;
-	UINT8 *m_gfx0_vram;
-	UINT8 *m_gfx1_cram;
-	UINT8 *m_gfx1_vram;
-	UINT8 *m_sprite_ram;
+	required_shared_ptr<UINT8> m_gfx0_vram;
+	required_shared_ptr<UINT8> m_gfx0_cram;
+	required_shared_ptr<UINT8> m_gfx1_vram;
+	required_shared_ptr<UINT8> m_gfx1_cram;
+	required_shared_ptr<UINT8> m_sprite_ram;
 	int m_scrollx;
 	int m_scrolly;
 	UINT8 m_reg_a002;
@@ -466,11 +471,11 @@ static ADDRESS_MAP_START( map_main, AS_PROGRAM, 8, witch_state )
 	AM_RANGE(0x8000, 0x8001) AM_DEVREADWRITE_LEGACY("ym1", ym2203_r, ym2203_w)
 	AM_RANGE(0x8008, 0x8009) AM_DEVREADWRITE_LEGACY("ym2", ym2203_r, ym2203_w)
 	AM_RANGE(0xa000, 0xa00f) AM_READWRITE(read_a00x, write_a00x)
-	AM_RANGE(0xc000, 0xc3ff) AM_READWRITE(gfx0_vram_r, gfx0_vram_w) AM_BASE(m_gfx0_vram)
-	AM_RANGE(0xc400, 0xc7ff) AM_READWRITE(gfx0_cram_r, gfx0_cram_w) AM_BASE(m_gfx0_cram)
-	AM_RANGE(0xc800, 0xcbff) AM_READWRITE(gfx1_vram_r, gfx1_vram_w) AM_BASE(m_gfx1_vram)
-	AM_RANGE(0xcc00, 0xcfff) AM_READWRITE(gfx1_cram_r, gfx1_cram_w) AM_BASE(m_gfx1_cram)
-	AM_RANGE(0xd000, 0xdfff) AM_RAM AM_BASE(m_sprite_ram)
+	AM_RANGE(0xc000, 0xc3ff) AM_READWRITE(gfx0_vram_r, gfx0_vram_w) AM_SHARE("gfx0_vram")
+	AM_RANGE(0xc400, 0xc7ff) AM_READWRITE(gfx0_cram_r, gfx0_cram_w) AM_SHARE("gfx0_cram")
+	AM_RANGE(0xc800, 0xcbff) AM_READWRITE(gfx1_vram_r, gfx1_vram_w) AM_SHARE("gfx1_vram")
+	AM_RANGE(0xcc00, 0xcfff) AM_READWRITE(gfx1_cram_r, gfx1_cram_w) AM_SHARE("gfx1_cram")
+	AM_RANGE(0xd000, 0xdfff) AM_RAM AM_SHARE("sprite_ram")
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_byte_split_lo_w) AM_SHARE("paletteram")
 	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_byte_split_hi_w) AM_SHARE("paletteram2")
 	AM_RANGE(0xf000, 0xf0ff) AM_RAM AM_SHARE("share1")

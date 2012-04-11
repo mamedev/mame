@@ -81,9 +81,10 @@ class gamecstl_state : public driver_device
 {
 public:
 	gamecstl_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_cga_ram(*this, "cga_ram"){ }
 
-	UINT32 *m_cga_ram;
+	required_shared_ptr<UINT32> m_cga_ram;
 	UINT32 *m_bios_ram;
 	UINT8 m_mxtc_config_reg[256];
 	UINT8 m_piix4_config_reg[4][256];
@@ -151,7 +152,7 @@ static SCREEN_UPDATE_IND16(gamecstl)
 	gamecstl_state *state = screen.machine().driver_data<gamecstl_state>();
 	int i, j;
 	const gfx_element *gfx = screen.machine().gfx[0];
-	UINT32 *cga = state->m_cga_ram;
+	UINT32 *cga = state->m_cga_ram.target();
 	int index = 0;
 
 	bitmap.fill(0, cliprect);
@@ -509,7 +510,7 @@ static I8237_INTERFACE( dma8237_2_config )
 static ADDRESS_MAP_START( gamecstl_map, AS_PROGRAM, 32, gamecstl_state )
 	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
 	AM_RANGE(0x000a0000, 0x000affff) AM_RAM
-	AM_RANGE(0x000b0000, 0x000b7fff) AM_RAM AM_BASE(m_cga_ram)
+	AM_RANGE(0x000b0000, 0x000b7fff) AM_RAM AM_SHARE("cga_ram")
 	AM_RANGE(0x000e0000, 0x000effff) AM_RAM
 	AM_RANGE(0x000f0000, 0x000fffff) AM_ROMBANK("bank1")
 	AM_RANGE(0x000f0000, 0x000fffff) AM_WRITE(bios_ram_w)

@@ -61,10 +61,11 @@ class midas_state : public driver_device
 {
 public:
 	midas_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_gfxregs(*this, "gfxregs"){ }
 
 	UINT16 *m_gfxram;
-	UINT16 *m_gfxregs;
+	required_shared_ptr<UINT16> m_gfxregs;
 	tilemap_t *m_tmap;
 	DECLARE_READ16_MEMBER(ret_ffff);
 	DECLARE_WRITE16_MEMBER(midas_gfxregs_w);

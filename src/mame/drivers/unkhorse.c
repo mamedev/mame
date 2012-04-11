@@ -27,10 +27,12 @@ class horse_state : public driver_device
 {
 public:
 	horse_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_video_ram(*this, "video_ram"),
+		m_color_ram(*this, "color_ram"){ }
 
-	UINT8 *m_video_ram;
-	UINT8 *m_color_ram;
+	required_shared_ptr<UINT8> m_video_ram;
+	required_shared_ptr<UINT8> m_color_ram;
 	UINT8 m_output;
 };
 
@@ -77,8 +79,8 @@ static SCREEN_UPDATE_IND16( horse )
 static ADDRESS_MAP_START( horse_map, AS_PROGRAM, 8, horse_state )
 	AM_RANGE(0x0000, 0x37ff) AM_ROM
 	AM_RANGE(0x4000, 0x40ff) AM_DEVREADWRITE("i8155", i8155_device, memory_r, memory_w)
-	AM_RANGE(0x6000, 0x7fff) AM_RAM AM_BASE(m_video_ram)
-	AM_RANGE(0x8000, 0x879f) AM_RAM AM_BASE(m_color_ram) AM_MIRROR(0x0860)
+	AM_RANGE(0x6000, 0x7fff) AM_RAM AM_SHARE("video_ram")
+	AM_RANGE(0x8000, 0x879f) AM_RAM AM_SHARE("color_ram") AM_MIRROR(0x0860)
 
 ADDRESS_MAP_END
 

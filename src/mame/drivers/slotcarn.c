@@ -34,13 +34,16 @@ class slotcarn_state : public driver_device
 {
 public:
 	slotcarn_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_backup_ram(*this, "backup_ram"),
+		m_ram_attr(*this, "raattr"),
+		m_ram_video(*this, "ravideo"){ }
 
 	pen_t m_pens[NUM_PENS];
-	UINT8 *m_ram_attr;
-	UINT8 *m_ram_video;
+	required_shared_ptr<UINT8> m_backup_ram;
+	required_shared_ptr<UINT8> m_ram_attr;
+	required_shared_ptr<UINT8> m_ram_video;
 	UINT8 *m_ram_palette;
-	UINT8 *m_backup_ram;
 	DECLARE_READ8_MEMBER(palette_r);
 	DECLARE_WRITE8_MEMBER(palette_w);
 };
@@ -181,7 +184,7 @@ static const mc6845_interface mc6845_intf =
 
 static ADDRESS_MAP_START( slotcarn_map, AS_PROGRAM, 8, slotcarn_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0x6000, 0x67ff) AM_RAM AM_BASE(m_backup_ram)
+	AM_RANGE(0x6000, 0x67ff) AM_RAM AM_SHARE("backup_ram")
 	AM_RANGE(0x6800, 0x6fff) AM_RAM // spielbud
 	AM_RANGE(0x7000, 0xafff) AM_ROM // spielbud
 
@@ -201,8 +204,8 @@ static ADDRESS_MAP_START( slotcarn_map, AS_PROGRAM, 8, slotcarn_state )
 	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0xe001, 0xe001) AM_DEVWRITE("crtc", mc6845_device, register_w)
 
-	AM_RANGE(0xe800, 0xefff) AM_RAM AM_BASE(m_ram_attr)
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_BASE(m_ram_video)
+	AM_RANGE(0xe800, 0xefff) AM_RAM AM_SHARE("raattr")
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_SHARE("ravideo")
 	AM_RANGE(0xf800, 0xfbff) AM_READWRITE(palette_r, palette_w)
 ADDRESS_MAP_END
 

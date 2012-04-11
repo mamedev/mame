@@ -107,13 +107,16 @@ class mirax_state : public driver_device
 {
 public:
 	mirax_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"),
+		m_spriteram(*this, "spriteram"),
+		m_colorram(*this, "colorram"){ }
 
-	UINT8 *m_spriteram;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<UINT8> m_colorram;
 	UINT8 m_nAyCtrl;
 	UINT8 m_nmi_mask;
-	UINT8 *m_videoram;
-	UINT8 *m_colorram;
 	UINT8 m_flipscreen_x;
 	UINT8 m_flipscreen_y;
 	DECLARE_WRITE8_MEMBER(audio_w);
@@ -186,7 +189,7 @@ static void draw_tilemap(running_machine &machine, bitmap_ind16 &bitmap, const r
 static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	mirax_state *state = machine.driver_data<mirax_state>();
-	UINT8 *spriteram = state->m_spriteram;
+	UINT8 *spriteram = state->m_spriteram.target();
 	int count;
 
 	for(count=0;count<0x200;count+=4)
@@ -276,9 +279,9 @@ WRITE8_MEMBER(mirax_state::mirax_flip_screen_w)
 static ADDRESS_MAP_START( mirax_main_map, AS_PROGRAM, 8, mirax_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc800, 0xd7ff) AM_RAM
-	AM_RANGE(0xe000, 0xe3ff) AM_RAM AM_BASE(m_videoram)
-	AM_RANGE(0xe800, 0xe9ff) AM_RAM AM_BASE(m_spriteram)
-	AM_RANGE(0xea00, 0xea3f) AM_RAM AM_BASE(m_colorram) //per-column color + bank bits for the videoram
+	AM_RANGE(0xe000, 0xe3ff) AM_RAM AM_SHARE("videoram")
+	AM_RANGE(0xe800, 0xe9ff) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0xea00, 0xea3f) AM_RAM AM_SHARE("colorram") //per-column color + bank bits for the videoram
 	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("P1")
 	AM_RANGE(0xf100, 0xf100) AM_READ_PORT("P2")
 	AM_RANGE(0xf200, 0xf200) AM_READ_PORT("DSW1")

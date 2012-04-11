@@ -171,18 +171,28 @@ class magicard_state : public driver_device
 {
 public:
 	magicard_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_magicram(*this, "magicram"),
+		m_pcab_vregs(*this, "pcab_vregs"),
+		m_scc68070_ext_irqc_regs(*this, "scc68070_ext_irqc_regs"),
+		m_scc68070_iic_regs(*this, "scc68070_iic_regs"),
+		m_scc68070_uart_regs(*this, "scc68070_uart_regs"),
+		m_scc68070_timer_regs(*this, "scc68070_timer_regs"),
+		m_scc68070_int_irqc_regs(*this, "scc68070_int_irqc_regs"),
+		m_scc68070_dma_ch1_regs(*this, "scc68070_dma_ch1_regs"),
+		m_scc68070_dma_ch2_regs(*this, "scc68070_dma_ch2_regs"),
+		m_scc68070_mmu_regs(*this, "scc68070_mmu_regs"){ }
 
-	UINT16 *m_magicram;
-	UINT16 *m_pcab_vregs;
-	UINT16 *m_scc68070_ext_irqc_regs;
-	UINT16 *m_scc68070_iic_regs;
-	UINT16 *m_scc68070_uart_regs;
-	UINT16 *m_scc68070_timer_regs;
-	UINT16 *m_scc68070_int_irqc_regs;
-	UINT16 *m_scc68070_dma_ch1_regs;
-	UINT16 *m_scc68070_dma_ch2_regs;
-	UINT16 *m_scc68070_mmu_regs;
+	required_shared_ptr<UINT16> m_magicram;
+	required_shared_ptr<UINT16> m_pcab_vregs;
+	required_shared_ptr<UINT16> m_scc68070_ext_irqc_regs;
+	required_shared_ptr<UINT16> m_scc68070_iic_regs;
+	required_shared_ptr<UINT16> m_scc68070_uart_regs;
+	required_shared_ptr<UINT16> m_scc68070_timer_regs;
+	required_shared_ptr<UINT16> m_scc68070_int_irqc_regs;
+	required_shared_ptr<UINT16> m_scc68070_dma_ch1_regs;
+	required_shared_ptr<UINT16> m_scc68070_dma_ch2_regs;
+	required_shared_ptr<UINT16> m_scc68070_mmu_regs;
 	struct { int r,g,b,offs,offs_internal; } m_pal;
 	DECLARE_READ16_MEMBER(test_r);
 	DECLARE_WRITE16_MEMBER(paletteram_io_w);
@@ -649,7 +659,7 @@ WRITE16_MEMBER(magicard_state::scc68070_mmu_w)
 
 static ADDRESS_MAP_START( magicard_mem, AS_PROGRAM, 16, magicard_state )
 //  ADDRESS_MAP_GLOBAL_MASK(0x1fffff)
-	AM_RANGE(0x00000000, 0x0017ffff) AM_MIRROR(0x7fe00000) AM_RAM AM_BASE(m_magicram) /*only 0-7ffff accessed in Magic Card*/
+	AM_RANGE(0x00000000, 0x0017ffff) AM_MIRROR(0x7fe00000) AM_RAM AM_SHARE("magicram") /*only 0-7ffff accessed in Magic Card*/
 	AM_RANGE(0x00180000, 0x001ffbff) AM_MIRROR(0x7fe00000) AM_RAM AM_REGION("maincpu", 0)
 	/* 001ffc00-001ffdff System I/O */
 	AM_RANGE(0x001ffc00, 0x001ffc01) AM_MIRROR(0x7fe00000) AM_READ(test_r)
@@ -660,15 +670,15 @@ static ADDRESS_MAP_START( magicard_mem, AS_PROGRAM, 16, magicard_state )
 	AM_RANGE(0x001ffd80, 0x001ffd81) AM_MIRROR(0x7fe00000) AM_READ(test_r)
 	AM_RANGE(0x001ffd80, 0x001ffd81) AM_MIRROR(0x7fe00000) AM_WRITENOP //?
 	AM_RANGE(0x001fff80, 0x001fffbf) AM_MIRROR(0x7fe00000) AM_RAM //DRAM I/O, not accessed by this game, CD buffer?
-	AM_RANGE(0x001fffe0, 0x001fffff) AM_MIRROR(0x7fe00000) AM_READWRITE(philips_66470_r,philips_66470_w) AM_BASE(m_pcab_vregs) //video registers
-	AM_RANGE(0x80001000, 0x8000100f) AM_READWRITE(scc68070_ext_irqc_r,scc68070_ext_irqc_w) AM_BASE(m_scc68070_ext_irqc_regs) //lir
-	AM_RANGE(0x80002000, 0x8000200f) AM_READWRITE(scc68070_iic_r,scc68070_iic_w) AM_BASE(m_scc68070_iic_regs) //i2c
-	AM_RANGE(0x80002010, 0x8000201f) AM_READWRITE(scc68070_uart_r,scc68070_uart_w) AM_BASE(m_scc68070_uart_regs)
-	AM_RANGE(0x80002020, 0x8000202f) AM_READWRITE(scc68070_timer_r,scc68070_timer_w) AM_BASE(m_scc68070_timer_regs)
-	AM_RANGE(0x80002040, 0x8000204f) AM_READWRITE(scc68070_int_irqc_r,scc68070_int_irqc_w) AM_BASE(m_scc68070_int_irqc_regs)
-	AM_RANGE(0x80004000, 0x8000403f) AM_READWRITE(scc68070_dma_ch1_r,scc68070_dma_ch1_w) AM_BASE(m_scc68070_dma_ch1_regs)
-	AM_RANGE(0x80004040, 0x8000407f) AM_READWRITE(scc68070_dma_ch2_r,scc68070_dma_ch2_w) AM_BASE(m_scc68070_dma_ch2_regs)
-	AM_RANGE(0x80008000, 0x8000807f) AM_READWRITE(scc68070_mmu_r,scc68070_mmu_w) AM_BASE(m_scc68070_mmu_regs)
+	AM_RANGE(0x001fffe0, 0x001fffff) AM_MIRROR(0x7fe00000) AM_READWRITE(philips_66470_r,philips_66470_w) AM_SHARE("pcab_vregs") //video registers
+	AM_RANGE(0x80001000, 0x8000100f) AM_READWRITE(scc68070_ext_irqc_r,scc68070_ext_irqc_w) AM_SHARE("scc68070_ext_irqc_regs") //lir
+	AM_RANGE(0x80002000, 0x8000200f) AM_READWRITE(scc68070_iic_r,scc68070_iic_w) AM_SHARE("scc68070_iic_regs") //i2c
+	AM_RANGE(0x80002010, 0x8000201f) AM_READWRITE(scc68070_uart_r,scc68070_uart_w) AM_SHARE("scc68070_uart_regs")
+	AM_RANGE(0x80002020, 0x8000202f) AM_READWRITE(scc68070_timer_r,scc68070_timer_w) AM_SHARE("scc68070_timer_regs")
+	AM_RANGE(0x80002040, 0x8000204f) AM_READWRITE(scc68070_int_irqc_r,scc68070_int_irqc_w) AM_SHARE("scc68070_int_irqc_regs")
+	AM_RANGE(0x80004000, 0x8000403f) AM_READWRITE(scc68070_dma_ch1_r,scc68070_dma_ch1_w) AM_SHARE("scc68070_dma_ch1_regs")
+	AM_RANGE(0x80004040, 0x8000407f) AM_READWRITE(scc68070_dma_ch2_r,scc68070_dma_ch2_w) AM_SHARE("scc68070_dma_ch2_regs")
+	AM_RANGE(0x80008000, 0x8000807f) AM_READWRITE(scc68070_mmu_r,scc68070_mmu_w) AM_SHARE("scc68070_mmu_regs")
 ADDRESS_MAP_END
 
 
@@ -684,7 +694,7 @@ static MACHINE_RESET( magicard )
 {
 	magicard_state *state = machine.driver_data<magicard_state>();
 	UINT16 *src    = (UINT16*)machine.region("maincpu" )->base();
-	UINT16 *dst    = state->m_magicram;
+	UINT16 *dst    = state->m_magicram.target();
 	memcpy (dst, src, 0x80000);
 	machine.device("maincpu")->reset();
 }

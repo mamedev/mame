@@ -55,7 +55,8 @@ class safarir_state : public driver_device
 {
 public:
 	safarir_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_bg_scroll(*this, "bg_scroll"){ }
 
 	UINT8 *m_ram_1;
 	UINT8 *m_ram_2;
@@ -63,7 +64,7 @@ public:
 	UINT8 m_ram_bank;
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
-	UINT8 *m_bg_scroll;
+	required_shared_ptr<UINT8> m_bg_scroll;
 	UINT8 m_port_last;
 	UINT8 m_port_last2;
 	samples_device *m_samples;
@@ -341,7 +342,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, safarir_state )
 	AM_RANGE(0x0000, 0x17ff) AM_ROM
 	AM_RANGE(0x2000, 0x27ff) AM_READWRITE(ram_r, ram_w) AM_SIZE(m_ram_size)
 	AM_RANGE(0x2800, 0x2800) AM_MIRROR(0x03ff) AM_READNOP AM_WRITE(ram_bank_w)
-	AM_RANGE(0x2c00, 0x2cff) AM_MIRROR(0x03ff) AM_READNOP AM_WRITEONLY AM_BASE(m_bg_scroll)
+	AM_RANGE(0x2c00, 0x2cff) AM_MIRROR(0x03ff) AM_READNOP AM_WRITEONLY AM_SHARE("bg_scroll")
 	AM_RANGE(0x3000, 0x30ff) AM_MIRROR(0x03ff) AM_WRITE(safarir_audio_w)	/* goes to SN76477 */
 	AM_RANGE(0x3400, 0x3400) AM_MIRROR(0x03ff) AM_WRITENOP	/* cleared at the beginning */
 	AM_RANGE(0x3800, 0x38ff) AM_MIRROR(0x03ff) AM_READ_PORT("INPUTS") AM_WRITENOP

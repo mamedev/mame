@@ -223,9 +223,10 @@ class coinmvga_state : public driver_device
 {
 public:
 	coinmvga_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_vram(*this, "vram"){ }
 
-	UINT16 *m_vram;
+	required_shared_ptr<UINT16> m_vram;
 	struct { int r,g,b,offs,offs_internal; } m_bgpal, m_fgpal;
 	DECLARE_WRITE8_MEMBER(debug_w);
 	DECLARE_WRITE16_MEMBER(ramdac_bg_w);
@@ -360,7 +361,7 @@ static ADDRESS_MAP_START( coinmvga_map, AS_PROGRAM, 16, coinmvga_state )
 
 //  AM_RANGE(0x0a0000, 0x0fffff) AM_RAM
 //  AM_RANGE(0x100000, 0x1fffff) AM_RAM //colorama
-	AM_RANGE(0x210000, 0x21ffff) AM_RAM AM_BASE(m_vram)
+	AM_RANGE(0x210000, 0x21ffff) AM_RAM AM_SHARE("vram")
 //  AM_RANGE(0x40746e, 0x40746f) AM_READ(test_r) AM_WRITENOP //touch screen related, colorama
 //  AM_RANGE(0x403afa, 0x403afb) AM_READ(test_r) AM_WRITENOP //touch screen related, cmrltv75
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM

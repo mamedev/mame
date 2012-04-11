@@ -27,20 +27,28 @@ class igs009_state : public driver_device
 {
 public:
 	igs009_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_bg_scroll(*this, "bg_scroll"),
+		m_gp98_reel1_ram(*this, "gp98_reel1_ram"),
+		m_gp98_reel2_ram(*this, "gp98_reel2_ram"),
+		m_gp98_reel3_ram(*this, "gp98_reel3_ram"),
+		m_gp98_reel4_ram(*this, "gp98_reel4_ram"),
+		m_bg_scroll2(*this, "bg_scroll2"),
+		m_fg_tile_ram(*this, "fg_tile_ram"),
+		m_fg_color_ram(*this, "fg_color_ram"){ }
 
+	required_shared_ptr<UINT8> m_bg_scroll;
+	required_shared_ptr<UINT8> m_gp98_reel1_ram;
+	required_shared_ptr<UINT8> m_gp98_reel2_ram;
+	required_shared_ptr<UINT8> m_gp98_reel3_ram;
+	required_shared_ptr<UINT8> m_gp98_reel4_ram;
+	required_shared_ptr<UINT8> m_bg_scroll2;
+	required_shared_ptr<UINT8> m_fg_tile_ram;
+	required_shared_ptr<UINT8> m_fg_color_ram;
 	tilemap_t *m_gp98_reel1_tilemap;
-	UINT8 *m_gp98_reel1_ram;
 	tilemap_t *m_gp98_reel2_tilemap;
-	UINT8 *m_gp98_reel2_ram;
 	tilemap_t *m_gp98_reel3_tilemap;
-	UINT8 *m_gp98_reel3_ram;
 	tilemap_t *m_gp98_reel4_tilemap;
-	UINT8 *m_gp98_reel4_ram;
-	UINT8 *m_fg_tile_ram;
-	UINT8 *m_fg_color_ram;
-	UINT8 *m_bg_scroll;
-	UINT8 *m_bg_scroll2;
 	tilemap_t *m_fg_tilemap;
 	int m_video_enable;
 	int m_nmi_enable;

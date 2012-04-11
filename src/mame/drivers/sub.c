@@ -116,13 +116,18 @@ class sub_state : public driver_device
 {
 public:
 	sub_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_attr(*this, "attr"),
+		m_vid(*this, "vid"),
+		m_spriteram(*this, "spriteram"),
+		m_spriteram2(*this, "spriteram2"),
+		m_scrolly(*this, "scrolly"){ }
 
-	UINT8* m_vid;
-	UINT8* m_attr;
-	UINT8* m_scrolly;
-	UINT8* m_spriteram;
-	UINT8* m_spriteram2;
+	required_shared_ptr<UINT8> m_attr;
+	required_shared_ptr<UINT8> m_vid;
+	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<UINT8> m_spriteram2;
+	required_shared_ptr<UINT8> m_scrolly;
 	UINT8 m_nmi_en;
 	DECLARE_WRITE8_MEMBER(subm_to_sound_w);
 	DECLARE_WRITE8_MEMBER(nmi_mask_w);
@@ -170,8 +175,8 @@ static SCREEN_UPDATE_IND16(sub)
     1 --cc cccc color
     */
 	{
-		UINT8 *spriteram = state->m_spriteram;
-		UINT8 *spriteram_2 = state->m_spriteram2;
+		UINT8 *spriteram = state->m_spriteram.target();
+		UINT8 *spriteram_2 = state->m_spriteram2.target();
 		UINT8 x,y,spr_offs,i,col,fx,fy;
 
 		for(i=0;i<0x40;i+=2)
@@ -218,11 +223,11 @@ static SCREEN_UPDATE_IND16(sub)
 static ADDRESS_MAP_START( subm_map, AS_PROGRAM, 8, sub_state )
 	AM_RANGE(0x0000, 0xafff) AM_ROM
 	AM_RANGE(0xb000, 0xbfff) AM_RAM
-	AM_RANGE(0xc000, 0xc3ff) AM_RAM AM_BASE(m_attr)
-	AM_RANGE(0xc400, 0xc7ff) AM_RAM AM_BASE(m_vid)
-	AM_RANGE(0xd000, 0xd03f) AM_RAM AM_BASE(m_spriteram)
-	AM_RANGE(0xd800, 0xd83f) AM_RAM AM_BASE(m_spriteram2)
-	AM_RANGE(0xd840, 0xd85f) AM_RAM AM_BASE(m_scrolly)
+	AM_RANGE(0xc000, 0xc3ff) AM_RAM AM_SHARE("attr")
+	AM_RANGE(0xc400, 0xc7ff) AM_RAM AM_SHARE("vid")
+	AM_RANGE(0xd000, 0xd03f) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0xd800, 0xd83f) AM_RAM AM_SHARE("spriteram2")
+	AM_RANGE(0xd840, 0xd85f) AM_RAM AM_SHARE("scrolly")
 
 	AM_RANGE(0xe000, 0xe000) AM_NOP
 	AM_RANGE(0xe800, 0xe800) AM_NOP

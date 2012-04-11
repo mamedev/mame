@@ -94,9 +94,10 @@ class highvdeo_state : public driver_device
 {
 public:
 	highvdeo_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_blit_ram(*this, "blit_ram"){ }
 
-	UINT16 *m_blit_ram;
+	required_shared_ptr<UINT16> m_blit_ram;
 	UINT16 m_vblank_bit;
 	UINT16 m_brasil_prot_latch;
 	struct { int r,g,b,offs,offs_internal; } m_pal;
@@ -297,7 +298,7 @@ WRITE16_MEMBER(highvdeo_state::write1_w)
 static ADDRESS_MAP_START( tv_vcf_map, AS_PROGRAM, 16, highvdeo_state )
 	AM_RANGE(0x00000, 0x003ff) AM_RAM /*irq vector area*/
 	AM_RANGE(0x00400, 0x03fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x40000, 0x4ffff) AM_RAM AM_BASE(m_blit_ram) /*blitter ram*/
+	AM_RANGE(0x40000, 0x4ffff) AM_RAM AM_SHARE("blit_ram") /*blitter ram*/
 	AM_RANGE(0x80000, 0xbffff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc0000, 0xfffff) AM_ROM AM_REGION("boot_prg",0)
 ADDRESS_MAP_END
@@ -344,7 +345,7 @@ static WRITE16_DEVICE_HANDLER( tv_ncf_oki6376_st_w )
 static ADDRESS_MAP_START( tv_ncf_map, AS_PROGRAM, 16, highvdeo_state )
 	AM_RANGE(0x00000, 0x003ff) AM_RAM /*irq vector area*/
 	AM_RANGE(0x00400, 0x03fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x20000, 0x2ffff) AM_RAM AM_BASE(m_blit_ram) /*blitter ram*/
+	AM_RANGE(0x20000, 0x2ffff) AM_RAM AM_SHARE("blit_ram") /*blitter ram*/
 	AM_RANGE(0x40000, 0xbffff) AM_ROM AM_REGION("user1",0x40000)
 	AM_RANGE(0xc0000, 0xfffff) AM_ROM AM_REGION("boot_prg",0)
 ADDRESS_MAP_END
@@ -388,7 +389,7 @@ WRITE16_MEMBER(highvdeo_state::tv_tcf_bankselect_w)
 static ADDRESS_MAP_START( tv_tcf_map, AS_PROGRAM, 16, highvdeo_state )
 	AM_RANGE(0x00000, 0x003ff) AM_RAM /*irq vector area*/
 	AM_RANGE(0x00400, 0x03fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x40000, 0x5d4bf) AM_RAM AM_BASE(m_blit_ram) /*blitter ram*/
+	AM_RANGE(0x40000, 0x5d4bf) AM_RAM AM_SHARE("blit_ram") /*blitter ram*/
 	AM_RANGE(0x7fe00, 0x7ffff) AM_RAM_WRITE(tv_tcf_paletteram_w ) AM_SHARE("paletteram")
 	AM_RANGE(0x80000, 0xbffff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc0000, 0xfffff) AM_ROM AM_REGION("boot_prg",0)
@@ -445,7 +446,7 @@ WRITE16_MEMBER(highvdeo_state::write2_w)
 static ADDRESS_MAP_START( newmcard_map, AS_PROGRAM, 16, highvdeo_state )
 	AM_RANGE(0x00000, 0x003ff) AM_RAM /*irq vector area*/
 	AM_RANGE(0x00400, 0x0ffff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x40000, 0x7ffff) AM_RAM AM_BASE(m_blit_ram) /*blitter ram*/
+	AM_RANGE(0x40000, 0x7ffff) AM_RAM AM_SHARE("blit_ram") /*blitter ram*/
 	AM_RANGE(0x80000, 0xbffff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc0000, 0xfffff) AM_ROM AM_REGION("boot_prg",0)
 ADDRESS_MAP_END
@@ -512,7 +513,7 @@ WRITE16_MEMBER(highvdeo_state::brasil_status_w)
 static ADDRESS_MAP_START( brasil_map, AS_PROGRAM, 16, highvdeo_state )
 	AM_RANGE(0x00000, 0x003ff) AM_RAM /*irq vector area*/
 	AM_RANGE(0x00400, 0x0ffff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x40000, 0x7ffff) AM_RAM AM_BASE(m_blit_ram) /*blitter ram*/
+	AM_RANGE(0x40000, 0x7ffff) AM_RAM AM_SHARE("blit_ram") /*blitter ram*/
 	AM_RANGE(0x80000, 0xbffff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc0000, 0xfffff) AM_ROM AM_REGION("boot_prg",0)
 ADDRESS_MAP_END

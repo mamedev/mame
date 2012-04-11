@@ -98,12 +98,15 @@ class looping_state : public driver_device
 {
 public:
 	looping_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"),
+		m_colorram(*this, "colorram"),
+		m_spriteram(*this, "spriteram"){ }
 
 	/* memory pointers */
-	UINT8 *		m_videoram;
-	UINT8 *		m_colorram;
-	UINT8 *		m_spriteram;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_colorram;
+	required_shared_ptr<UINT8> m_spriteram;
 	UINT8 *		m_cop_io;
 
 	/* tilemaps */
@@ -266,7 +269,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 	const UINT8 *source;
 	looping_state *state = machine.driver_data<looping_state>();
 
-	for (source = state->m_spriteram; source < state->m_spriteram + 0x40; source += 4)
+	for (source = state->m_spriteram.target(); source < state->m_spriteram + 0x40; source += 4)
 	{
 		int sx = source[3];
 		int sy = 240 - source[0];
@@ -496,10 +499,10 @@ READ8_MEMBER(looping_state::protection_r)
 static ADDRESS_MAP_START( looping_map, AS_PROGRAM, 8, looping_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 
-	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(looping_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(looping_videoram_w) AM_SHARE("videoram")
 
-	AM_RANGE(0x9800, 0x983f) AM_MIRROR(0x0700) AM_RAM_WRITE(looping_colorram_w) AM_BASE(m_colorram)
-	AM_RANGE(0x9840, 0x987f) AM_MIRROR(0x0700) AM_RAM AM_BASE(m_spriteram)
+	AM_RANGE(0x9800, 0x983f) AM_MIRROR(0x0700) AM_RAM_WRITE(looping_colorram_w) AM_SHARE("colorram")
+	AM_RANGE(0x9840, 0x987f) AM_MIRROR(0x0700) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x9880, 0x98ff) AM_MIRROR(0x0700) AM_RAM
 
 	AM_RANGE(0xb001, 0xb001) AM_MIRROR(0x07f8) AM_WRITE(level2_irq_set)

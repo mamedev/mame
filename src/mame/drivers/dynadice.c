@@ -42,10 +42,11 @@ class dynadice_state : public driver_device
 {
 public:
 	dynadice_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"){ }
 
 	/* memory pointers */
-	UINT8 *  m_videoram;
+	required_shared_ptr<UINT8> m_videoram;
 //  UINT8 *  m_nvram;     // currently this uses generic nvram handling
 //  UINT8 *  m_paletteram;    // currently this uses generic palette handling
 
@@ -94,7 +95,7 @@ static WRITE8_DEVICE_HANDLER( sound_control_w )
 
 static ADDRESS_MAP_START( dynadice_map, AS_PROGRAM, 8, dynadice_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x23ff) AM_RAM_WRITE(dynadice_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0x2000, 0x23ff) AM_RAM_WRITE(dynadice_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x4000, 0x40ff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 

@@ -39,7 +39,8 @@ class laserbas_state : public driver_device
 {
 public:
 	laserbas_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_protram(*this, "protram"){ }
 
 	/* misc */
 	int      m_count;
@@ -48,7 +49,7 @@ public:
 	int      m_vrambank;
 	UINT8    m_vram1[0x8000];
 	UINT8    m_vram2[0x8000];
-	UINT8    *m_protram;
+	required_shared_ptr<UINT8> m_protram;
 	DECLARE_READ8_MEMBER(vram_r);
 	DECLARE_WRITE8_MEMBER(vram_w);
 	DECLARE_READ8_MEMBER(read_unk);
@@ -139,7 +140,7 @@ static ADDRESS_MAP_START( laserbas_memory, AS_PROGRAM, 8, laserbas_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0xbfff) AM_READWRITE(vram_r, vram_w)
 	AM_RANGE(0xc000, 0xf7ff) AM_ROM
-	AM_RANGE(0xf800, 0xfbff) AM_READWRITE(protram_r, protram_w) AM_BASE(m_protram) /* protection device */
+	AM_RANGE(0xf800, 0xfbff) AM_READWRITE(protram_r, protram_w) AM_SHARE("protram") /* protection device */
 	AM_RANGE(0xfc00, 0xffff) AM_RAM
 ADDRESS_MAP_END
 

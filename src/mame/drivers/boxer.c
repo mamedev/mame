@@ -24,11 +24,13 @@ class boxer_state : public driver_device
 {
 public:
 	boxer_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_tile_ram(*this, "tile_ram"),
+		m_sprite_ram(*this, "sprite_ram"){ }
 
 	/* memory pointers */
-	UINT8 * m_tile_ram;
-	UINT8 * m_sprite_ram;
+	required_shared_ptr<UINT8> m_tile_ram;
+	required_shared_ptr<UINT8> m_sprite_ram;
 
 	/* misc */
 	UINT8 m_pot_state;
@@ -297,7 +299,7 @@ WRITE8_MEMBER(boxer_state::boxer_led_w)
 static ADDRESS_MAP_START( boxer_map, AS_PROGRAM, 8, boxer_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
-	AM_RANGE(0x0200, 0x03ff) AM_RAM AM_BASE(m_tile_ram)
+	AM_RANGE(0x0200, 0x03ff) AM_RAM AM_SHARE("tile_ram")
 	AM_RANGE(0x0800, 0x08ff) AM_READ(boxer_input_r)
 	AM_RANGE(0x1000, 0x17ff) AM_READ(boxer_misc_r)
 	AM_RANGE(0x1800, 0x1800) AM_WRITE(boxer_pot_w)
@@ -306,7 +308,7 @@ static ADDRESS_MAP_START( boxer_map, AS_PROGRAM, 8, boxer_state )
 	AM_RANGE(0x1b00, 0x1bff) AM_WRITE(boxer_crowd_w)
 	AM_RANGE(0x1c00, 0x1cff) AM_WRITE(boxer_irq_reset_w)
 	AM_RANGE(0x1d00, 0x1dff) AM_WRITE(boxer_bell_w)
-	AM_RANGE(0x1e00, 0x1eff) AM_WRITEONLY AM_BASE(m_sprite_ram)
+	AM_RANGE(0x1e00, 0x1eff) AM_WRITEONLY AM_SHARE("sprite_ram")
 	AM_RANGE(0x1f00, 0x1fff) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x3000, 0x3fff) AM_ROM
 ADDRESS_MAP_END

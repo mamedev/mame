@@ -426,11 +426,19 @@ class seattle_state : public driver_device
 public:
 	seattle_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_nvram(*this, "nvram") { }
+		  m_nvram(*this, "nvram") ,
+		m_rambase(*this, "rambase"),
+		m_interrupt_enable(*this, "interrupt_enable"),
+		m_interrupt_config(*this, "interrupt_config"),
+		m_asic_reset(*this, "asic_reset"),
+		m_rombase(*this, "rombase"){ }
 
 	required_shared_ptr<UINT32>	m_nvram;
-	UINT32 *m_rambase;
-	UINT32 *m_rombase;
+	required_shared_ptr<UINT32> m_rambase;
+	required_shared_ptr<UINT32> m_interrupt_enable;
+	required_shared_ptr<UINT32> m_interrupt_config;
+	required_shared_ptr<UINT32> m_asic_reset;
+	required_shared_ptr<UINT32> m_rombase;
 	galileo_data m_galileo;
 	widget_data m_widget;
 	device_t *m_voodoo;
@@ -445,9 +453,6 @@ public:
 	UINT8 m_vblank_irq_num;
 	UINT8 m_vblank_latch;
 	UINT8 m_vblank_state;
-	UINT32 *m_interrupt_config;
-	UINT32 *m_interrupt_enable;
-	UINT32 *m_asic_reset;
 	UINT8 m_pending_analog_read;
 	UINT8 m_status_leds;
 	UINT32 m_cmos_write_enabled;
@@ -714,7 +719,7 @@ WRITE32_MEMBER(seattle_state::interrupt_config_w)
 
 WRITE32_MEMBER(seattle_state::seattle_interrupt_enable_w)
 {
-	UINT32 old = *m_interrupt_enable;
+	UINT32 old = *m_interrupt_enable.target();
 	COMBINE_DATA(m_interrupt_enable);
 	if (old != *m_interrupt_enable)
 	{
@@ -1767,7 +1772,7 @@ static READ32_DEVICE_HANDLER( seattle_ide_r )
 
 static ADDRESS_MAP_START( seattle_map, AS_PROGRAM, 32, seattle_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000000, 0x007fffff) AM_RAM AM_BASE(m_rambase)	// wg3dh only has 4MB; sfrush, blitz99 8MB
+	AM_RANGE(0x00000000, 0x007fffff) AM_RAM AM_SHARE("rambase")	// wg3dh only has 4MB; sfrush, blitz99 8MB
 	AM_RANGE(0x08000000, 0x08ffffff) AM_DEVREAD_LEGACY("voodoo", voodoo_r) AM_WRITE(seattle_voodoo_w)
 	AM_RANGE(0x0a000000, 0x0a0003ff) AM_DEVREADWRITE_LEGACY("ide", seattle_ide_r, ide_controller32_w)
 	AM_RANGE(0x0a00040c, 0x0a00040f) AM_NOP						// IDE-related, but annoying
@@ -1778,15 +1783,15 @@ static ADDRESS_MAP_START( seattle_map, AS_PROGRAM, 32, seattle_state )
 	AM_RANGE(0x16100000, 0x1611ffff) AM_READWRITE(cmos_r, cmos_w) AM_SHARE("nvram")
 	AM_RANGE(0x17000000, 0x17000003) AM_READWRITE(cmos_protect_r, cmos_protect_w)
 	AM_RANGE(0x17100000, 0x17100003) AM_WRITE(seattle_watchdog_w)
-	AM_RANGE(0x17300000, 0x17300003) AM_RAM_WRITE(seattle_interrupt_enable_w) AM_BASE(m_interrupt_enable)
-	AM_RANGE(0x17400000, 0x17400003) AM_RAM_WRITE(interrupt_config_w) AM_BASE(m_interrupt_config)
+	AM_RANGE(0x17300000, 0x17300003) AM_RAM_WRITE(seattle_interrupt_enable_w) AM_SHARE("interrupt_enable")
+	AM_RANGE(0x17400000, 0x17400003) AM_RAM_WRITE(interrupt_config_w) AM_SHARE("interrupt_config")
 	AM_RANGE(0x17500000, 0x17500003) AM_READ(interrupt_state_r)
 	AM_RANGE(0x17600000, 0x17600003) AM_READ(interrupt_state2_r)
 	AM_RANGE(0x17700000, 0x17700003) AM_WRITE(vblank_clear_w)
 	AM_RANGE(0x17800000, 0x17800003) AM_NOP
 	AM_RANGE(0x17900000, 0x17900003) AM_READWRITE(status_leds_r, status_leds_w)
-	AM_RANGE(0x17f00000, 0x17f00003) AM_RAM_WRITE(asic_reset_w) AM_BASE(m_asic_reset)
-	AM_RANGE(0x1fc00000, 0x1fc7ffff) AM_ROM AM_REGION("user1", 0) AM_BASE(m_rombase)
+	AM_RANGE(0x17f00000, 0x17f00003) AM_RAM_WRITE(asic_reset_w) AM_SHARE("asic_reset")
+	AM_RANGE(0x1fc00000, 0x1fc7ffff) AM_ROM AM_REGION("user1", 0) AM_SHARE("rombase")
 ADDRESS_MAP_END
 
 

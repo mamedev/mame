@@ -49,9 +49,10 @@ class cmmb_state : public driver_device
 {
 public:
 	cmmb_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"){ }
 
-	UINT8 *m_videoram;
+	required_shared_ptr<UINT8> m_videoram;
 	UINT8 m_irq_mask;
 	DECLARE_READ8_MEMBER(cmmb_charram_r);
 	DECLARE_WRITE8_MEMBER(cmmb_charram_w);
@@ -70,7 +71,7 @@ static VIDEO_START( cmmb )
 static SCREEN_UPDATE_IND16( cmmb )
 {
 	cmmb_state *state = screen.machine().driver_data<cmmb_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = state->m_videoram.target();
 	const gfx_element *gfx = screen.machine().gfx[0];
 	int count = 0x00000;
 
@@ -176,7 +177,7 @@ static ADDRESS_MAP_START( cmmb_map, AS_PROGRAM, 8, cmmb_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xffff)
 	AM_RANGE(0x0000, 0x01ff) AM_RAM /* zero page address */
 //  AM_RANGE(0x13c0, 0x13ff) AM_RAM //spriteram
-	AM_RANGE(0x1000, 0x13ff) AM_RAM AM_BASE(m_videoram)
+	AM_RANGE(0x1000, 0x13ff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0x2480, 0x249f) AM_RAM_WRITE(cmmb_paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0x4000, 0x400f) AM_READWRITE(cmmb_input_r,cmmb_output_w) //i/o
 	AM_RANGE(0x4900, 0x4900) AM_READ(kludge_r)

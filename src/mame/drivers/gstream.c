@@ -132,12 +132,20 @@ public:
 		: driver_device(mconfig, type, tag),
 		  m_maincpu(*this, "maincpu"),
 		  m_oki_1(*this, "oki1"),
-		  m_oki_2(*this, "oki2") { }
+		  m_oki_2(*this, "oki2") ,
+		m_workram(*this, "workram"),
+		m_vram(*this, "vram"),
+		m_paletteram(*this, "paletteram"){ }
+
+	/* devices */
+	required_device<e132xt_device> m_maincpu;
+	required_device<okim6295_device> m_oki_1;
+	required_device<okim6295_device> m_oki_2;
 
 	/* memory pointers */
-	UINT32 *  m_vram;
-	UINT32 *  m_workram;
-	UINT32 *  m_paletteram;
+	required_shared_ptr<UINT32> m_workram;
+	required_shared_ptr<UINT32> m_vram;
+	required_shared_ptr<UINT32> m_paletteram;
 //  UINT32 *  m_nvram;    // currently this uses generic nvram handling
 
 	/* video-related */
@@ -155,10 +163,6 @@ public:
 	int       m_oki_bank_0;
 	int       m_oki_bank_1;
 
-	/* devices */
-	required_device<e132xt_device> m_maincpu;
-	required_device<okim6295_device> m_oki_1;
-	required_device<okim6295_device> m_oki_2;
 	DECLARE_WRITE32_MEMBER(gstream_palette_w);
 	DECLARE_WRITE32_MEMBER(gstream_vram_w);
 	DECLARE_WRITE32_MEMBER(gstream_tilemap1_scrollx_w);
@@ -271,13 +275,13 @@ WRITE32_MEMBER(gstream_state::gstream_tilemap3_scrolly_w)
 }
 
 static ADDRESS_MAP_START( gstream_32bit_map, AS_PROGRAM, 32, gstream_state )
-	AM_RANGE(0x00000000, 0x003FFFFF) AM_RAM AM_BASE(m_workram) // work ram
+	AM_RANGE(0x00000000, 0x003FFFFF) AM_RAM AM_SHARE("workram") // work ram
 //  AM_RANGE(0x40000000, 0x40FFFFFF) AM_RAM // ?? lots of data gets copied here if present, but game runs without it??
-	AM_RANGE(0x80000000, 0x80003FFF) AM_RAM_WRITE(gstream_vram_w) AM_BASE(m_vram) // video ram
+	AM_RANGE(0x80000000, 0x80003FFF) AM_RAM_WRITE(gstream_vram_w) AM_SHARE("vram") // video ram
 	AM_RANGE(0x4E000000, 0x4E1FFFFF) AM_ROM AM_REGION("user2",0) // main game rom
 	AM_RANGE(0x4F000000, 0x4F000003) AM_WRITE(gstream_tilemap3_scrollx_w)
 	AM_RANGE(0x4F200000, 0x4F200003) AM_WRITE(gstream_tilemap3_scrolly_w)
-	AM_RANGE(0x4F400000, 0x4F406FFF) AM_RAM_WRITE(gstream_palette_w) AM_BASE(m_paletteram)
+	AM_RANGE(0x4F400000, 0x4F406FFF) AM_RAM_WRITE(gstream_palette_w) AM_SHARE("paletteram")
 	AM_RANGE(0x4F800000, 0x4F800003) AM_WRITE(gstream_tilemap1_scrollx_w)
 	AM_RANGE(0x4FA00000, 0x4FA00003) AM_WRITE(gstream_tilemap1_scrolly_w)
 	AM_RANGE(0x4FC00000, 0x4FC00003) AM_WRITE(gstream_tilemap2_scrollx_w)

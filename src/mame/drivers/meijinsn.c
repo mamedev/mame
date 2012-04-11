@@ -69,12 +69,14 @@ class meijinsn_state : public driver_device
 public:
 	meijinsn_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this,"maincpu")
-		{ }
+		m_maincpu(*this,"maincpu"),
+		m_videoram(*this, "videoram"),
+		m_shared_ram(*this, "shared_ram"){ }
 
+	required_device<cpu_device> m_maincpu;
 	/* memory pointers */
-	UINT16 *   m_shared_ram;
-	UINT16 *   m_videoram;
+	required_shared_ptr<UINT16> m_videoram;
+	required_shared_ptr<UINT16> m_shared_ram;
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;
@@ -88,7 +90,6 @@ public:
 	UINT8 m_coinvalue;
 	int m_mcu_latch;
 
-	required_device<cpu_device> m_maincpu;
 	DECLARE_WRITE16_MEMBER(sound_w);
 	DECLARE_READ16_MEMBER(alpha_mcu_r);
 };
@@ -173,9 +174,9 @@ READ16_MEMBER(meijinsn_state::alpha_mcu_r)
 static ADDRESS_MAP_START( meijinsn_map, AS_PROGRAM, 16, meijinsn_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x080e00, 0x080fff) AM_READ(alpha_mcu_r) AM_WRITENOP
-	AM_RANGE(0x100000, 0x107fff) AM_RAM AM_BASE(m_videoram)
+	AM_RANGE(0x100000, 0x107fff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0x180000, 0x180dff) AM_RAM
-	AM_RANGE(0x180e00, 0x180fff) AM_RAM AM_BASE(m_shared_ram)
+	AM_RANGE(0x180e00, 0x180fff) AM_RAM AM_SHARE("shared_ram")
 	AM_RANGE(0x181000, 0x181fff) AM_RAM
 	AM_RANGE(0x1c0000, 0x1c0001) AM_READ_PORT("P2")
 	AM_RANGE(0x1a0000, 0x1a0001) AM_READ_PORT("P1") AM_WRITE(sound_w)

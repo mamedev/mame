@@ -59,16 +59,20 @@ class olibochu_state : public driver_device
 {
 public:
 	olibochu_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"),
+		m_colorram(*this, "colorram"),
+		m_spriteram(*this, "spriteram"),
+		m_spriteram2(*this, "spriteram2"){ }
 
 	/* memory pointers */
-	UINT8 *  m_videoram;
-	UINT8 *  m_colorram;
-	UINT8 *  m_spriteram;
-	UINT8 *  m_spriteram2;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_colorram;
+	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<UINT8> m_spriteram2;
 //  UINT8 *  m_paletteram;    // currently this uses generic palette handling
-	size_t   m_spriteram_size;
-	size_t   m_spriteram2_size;
+//OBRISI.ME
+//OBRISI.ME
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;
@@ -163,12 +167,12 @@ static VIDEO_START( olibochu )
 static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	olibochu_state *state = machine.driver_data<olibochu_state>();
-	UINT8 *spriteram = state->m_spriteram;
-	UINT8 *spriteram_2 = state->m_spriteram2;
+	UINT8 *spriteram = state->m_spriteram.target();
+	UINT8 *spriteram_2 = state->m_spriteram2.target();
 	int offs;
 
 	/* 16x16 sprites */
-	for (offs = 0; offs < state->m_spriteram_size; offs += 4)
+	for (offs = 0; offs < state->m_spriteram.bytes(); offs += 4)
 	{
 		int attr = spriteram[offs + 1];
 		int code = spriteram[offs];
@@ -194,7 +198,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	}
 
 	/* 8x8 sprites */
-	for (offs = 0; offs < state->m_spriteram2_size; offs += 4)
+	for (offs = 0; offs < state->m_spriteram2.bytes(); offs += 4)
 	{
 		int attr = spriteram_2[offs + 1];
 		int code = spriteram_2[offs];
@@ -247,8 +251,8 @@ WRITE8_MEMBER(olibochu_state::sound_command_w)
 
 static ADDRESS_MAP_START( olibochu_map, AS_PROGRAM, 8, olibochu_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(olibochu_videoram_w) AM_BASE(m_videoram)
-	AM_RANGE(0x8400, 0x87ff) AM_RAM_WRITE(olibochu_colorram_w) AM_BASE(m_colorram)
+	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(olibochu_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x8400, 0x87ff) AM_RAM_WRITE(olibochu_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0x9000, 0x903f) AM_RAM //???
 	AM_RANGE(0x9800, 0x983f) AM_RAM //???
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("IN0")
@@ -259,8 +263,8 @@ static ADDRESS_MAP_START( olibochu_map, AS_PROGRAM, 8, olibochu_state )
 	AM_RANGE(0xa005, 0xa005) AM_READ_PORT("DSW2")
 	AM_RANGE(0xa800, 0xa801) AM_WRITE(sound_command_w)
 	AM_RANGE(0xa802, 0xa802) AM_WRITE(olibochu_flipscreen_w)	/* bit 6 = enable sound? */
-	AM_RANGE(0xf400, 0xf41f) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
-	AM_RANGE(0xf440, 0xf47f) AM_RAM AM_BASE_SIZE(m_spriteram2, m_spriteram2_size)
+	AM_RANGE(0xf400, 0xf41f) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0xf440, 0xf47f) AM_RAM AM_SHARE("spriteram2")
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 

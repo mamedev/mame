@@ -358,13 +358,14 @@ class cojag_state : public driver_device
 public:
 	cojag_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_nvram(*this, "nvram") { }
+		  m_nvram(*this, "nvram") ,
+		m_rom_base(*this, "robase"){ }
 
 	required_shared_ptr<UINT32>	m_nvram;
 	cpu_device *m_main_cpu;
 	UINT32 m_misc_control_data;
 	UINT8 m_eeprom_enable;
-	UINT32 *m_rom_base;
+	required_shared_ptr<UINT32> m_rom_base;
 	UINT32 *m_gpu_jump_address;
 	UINT8 m_gpu_command_pending;
 	UINT32 m_gpu_spin_pc;
@@ -1286,13 +1287,13 @@ static ADDRESS_MAP_START( r3000_map, AS_PROGRAM, 32, cojag_state )
 	AM_RANGE(0x14000004, 0x14000007) AM_WRITE(watchdog_reset32_w)
 	AM_RANGE(0x16000000, 0x16000003) AM_WRITE(eeprom_enable_w)
 	AM_RANGE(0x18000000, 0x18001fff) AM_READWRITE(eeprom_data_r, eeprom_data_w) AM_SHARE("nvram")
-	AM_RANGE(0x1fc00000, 0x1fdfffff) AM_ROM AM_REGION("user1", 0) AM_BASE(m_rom_base)
+	AM_RANGE(0x1fc00000, 0x1fdfffff) AM_ROM AM_REGION("user1", 0) AM_SHARE("robase")
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( m68020_map, AS_PROGRAM, 32, cojag_state )
 	AM_RANGE(0x000000, 0x7fffff) AM_RAM AM_BASE_LEGACY(&jaguar_shared_ram) AM_SHARE("share1")
-	AM_RANGE(0x800000, 0x9fffff) AM_ROM AM_REGION("user1", 0) AM_BASE(m_rom_base)
+	AM_RANGE(0x800000, 0x9fffff) AM_ROM AM_REGION("user1", 0) AM_SHARE("robase")
 	AM_RANGE(0xa00000, 0xa1ffff) AM_RAM
 	AM_RANGE(0xa20000, 0xa21fff) AM_READWRITE(eeprom_data_r, eeprom_data_w) AM_SHARE("nvram")
 	AM_RANGE(0xa30000, 0xa30003) AM_WRITE(watchdog_reset32_w)

@@ -49,14 +49,19 @@ class galaxi_state : public driver_device
 {
 public:
 	galaxi_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_bg1_ram(*this, "bg1_ram"),
+		m_bg2_ram(*this, "bg2_ram"),
+		m_bg3_ram(*this, "bg3_ram"),
+		m_bg4_ram(*this, "bg4_ram"),
+		m_fg_ram(*this, "fg_ram"){ }
 
 	/* memory pointers */
-	UINT16 *  m_bg1_ram;
-	UINT16 *  m_bg2_ram;
-	UINT16 *  m_bg3_ram;
-	UINT16 *  m_bg4_ram;
-	UINT16 *  m_fg_ram;
+	required_shared_ptr<UINT16> m_bg1_ram;
+	required_shared_ptr<UINT16> m_bg2_ram;
+	required_shared_ptr<UINT16> m_bg3_ram;
+	required_shared_ptr<UINT16> m_bg4_ram;
+	required_shared_ptr<UINT16> m_fg_ram;
 //  UINT16 *  m_paletteram;   // currently this uses generic palette handling
 //  UINT16 *  m_nvram;        // currently this uses generic nvram handling
 
@@ -275,12 +280,12 @@ CUSTOM_INPUT_MEMBER(galaxi_state::hopper_r)
 static ADDRESS_MAP_START( galaxi_map, AS_PROGRAM, 16, galaxi_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 
-	AM_RANGE(0x100000, 0x1003ff) AM_RAM_WRITE(galaxi_bg1_w) AM_BASE(m_bg1_ram)
-	AM_RANGE(0x100400, 0x1007ff) AM_RAM_WRITE(galaxi_bg2_w) AM_BASE(m_bg2_ram)
-	AM_RANGE(0x100800, 0x100bff) AM_RAM_WRITE(galaxi_bg3_w) AM_BASE(m_bg3_ram)
-	AM_RANGE(0x100c00, 0x100fff) AM_RAM_WRITE(galaxi_bg4_w) AM_BASE(m_bg4_ram)
+	AM_RANGE(0x100000, 0x1003ff) AM_RAM_WRITE(galaxi_bg1_w) AM_SHARE("bg1_ram")
+	AM_RANGE(0x100400, 0x1007ff) AM_RAM_WRITE(galaxi_bg2_w) AM_SHARE("bg2_ram")
+	AM_RANGE(0x100800, 0x100bff) AM_RAM_WRITE(galaxi_bg3_w) AM_SHARE("bg3_ram")
+	AM_RANGE(0x100c00, 0x100fff) AM_RAM_WRITE(galaxi_bg4_w) AM_SHARE("bg4_ram")
 
-	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE(galaxi_fg_w ) AM_BASE(m_fg_ram)
+	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE(galaxi_fg_w ) AM_SHARE("fg_ram")
 	AM_RANGE(0x102000, 0x1047ff) AM_READNOP	// unknown
 
 	AM_RANGE(0x300000, 0x3007ff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")

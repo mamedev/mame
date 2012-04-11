@@ -38,11 +38,13 @@ class rmhaihai_state : public driver_device
 {
 public:
 	rmhaihai_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_colorram(*this, "colorram"),
+		m_videoram(*this, "videoram"){ }
 
 	int m_gfxbank;
-	UINT8 *m_videoram;
-	UINT8 *m_colorram;
+	required_shared_ptr<UINT8> m_colorram;
+	required_shared_ptr<UINT8> m_videoram;
 	tilemap_t *m_bg_tilemap;
 	int m_keyboard_cmd;
 	DECLARE_WRITE8_MEMBER(rmhaihai_videoram_w);
@@ -197,8 +199,8 @@ static MACHINE_RESET( themj )
 static ADDRESS_MAP_START( rmhaihai_map, AS_PROGRAM, 8, rmhaihai_state )
 	AM_RANGE(0x0000, 0x9fff) AM_ROM
 	AM_RANGE(0xa000, 0xa7ff) AM_RAM
-	AM_RANGE(0xa800, 0xafff) AM_RAM_WRITE(rmhaihai_colorram_w) AM_BASE(m_colorram)
-	AM_RANGE(0xb000, 0xb7ff) AM_RAM_WRITE(rmhaihai_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0xa800, 0xafff) AM_RAM_WRITE(rmhaihai_colorram_w) AM_SHARE("colorram")
+	AM_RANGE(0xb000, 0xb7ff) AM_RAM_WRITE(rmhaihai_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0xb83c, 0xb83c) AM_WRITENOP	// ??
 	AM_RANGE(0xbc00, 0xbc00) AM_WRITENOP	// ??
 	AM_RANGE(0xc000, 0xdfff) AM_ROM
@@ -222,8 +224,8 @@ static ADDRESS_MAP_START( themj_map, AS_PROGRAM, 8, rmhaihai_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")
 	AM_RANGE(0xa000, 0xa7ff) AM_RAM
-	AM_RANGE(0xa800, 0xafff) AM_RAM_WRITE(rmhaihai_colorram_w) AM_BASE(m_colorram)
-	AM_RANGE(0xb000, 0xb7ff) AM_RAM_WRITE(rmhaihai_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0xa800, 0xafff) AM_RAM_WRITE(rmhaihai_colorram_w) AM_SHARE("colorram")
+	AM_RANGE(0xb000, 0xb7ff) AM_RAM_WRITE(rmhaihai_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK("bank2")
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END

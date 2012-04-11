@@ -57,14 +57,19 @@ class chanbara_state : public driver_device
 {
 public:
 	chanbara_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"),
+		m_colorram(*this, "colorram"),
+		m_spriteram(*this, "spriteram"),
+		m_videoram2(*this, "videoram2"),
+		m_colorram2(*this, "colorram2"){ }
 
 	/* memory pointers */
-	UINT8 *  m_videoram;
-	UINT8 *  m_videoram2;
-	UINT8 *  m_colorram;
-	UINT8 *  m_colorram2;
-	UINT8 *  m_spriteram;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_colorram;
+	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<UINT8> m_videoram2;
+	required_shared_ptr<UINT8> m_colorram2;
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;
@@ -209,11 +214,11 @@ static SCREEN_UPDATE_IND16( chanbara )
 
 static ADDRESS_MAP_START( chanbara_map, AS_PROGRAM, 8, chanbara_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(chanbara_videoram_w) AM_BASE(m_videoram)
-	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE(chanbara_colorram_w) AM_BASE(m_colorram)
-	AM_RANGE(0x1000, 0x10ff) AM_RAM AM_BASE(m_spriteram)
-	AM_RANGE(0x1800, 0x19ff) AM_RAM_WRITE(chanbara_videoram2_w) AM_BASE(m_videoram2)
-	AM_RANGE(0x1a00, 0x1bff) AM_RAM_WRITE(chanbara_colorram2_w) AM_BASE(m_colorram2)
+	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(chanbara_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE(chanbara_colorram_w) AM_SHARE("colorram")
+	AM_RANGE(0x1000, 0x10ff) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0x1800, 0x19ff) AM_RAM_WRITE(chanbara_videoram2_w) AM_SHARE("videoram2")
+	AM_RANGE(0x1a00, 0x1bff) AM_RAM_WRITE(chanbara_colorram2_w) AM_SHARE("colorram2")
 	AM_RANGE(0x2000, 0x2000) AM_READ_PORT("DSW1")
 	AM_RANGE(0x2001, 0x2001) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x2002, 0x2002) AM_READ_PORT("P2")

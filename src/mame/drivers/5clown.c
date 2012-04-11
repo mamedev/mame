@@ -455,15 +455,17 @@ class _5clown_state : public driver_device
 {
 public:
 	_5clown_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"),
+		m_colorram(*this, "colorram"){ }
 
 	UINT8 m_main_latch_d800;
 	UINT8 m_snd_latch_0800;
 	UINT8 m_snd_latch_0a02;
 	UINT8 m_ay8910_addr;
 	device_t *m_ay8910;
-	UINT8 *m_videoram;
-	UINT8 *m_colorram;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_colorram;
 	tilemap_t *m_bg_tilemap;
 	int m_mux_data;
 	DECLARE_WRITE8_MEMBER(fclown_videoram_w);
@@ -723,8 +725,8 @@ static ADDRESS_MAP_START( fclown_map, AS_PROGRAM, 8, _5clown_state )
 	AM_RANGE(0x0801, 0x0801) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
 	AM_RANGE(0x0844, 0x0847) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
 	AM_RANGE(0x0848, 0x084b) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
-	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(fclown_videoram_w) AM_BASE(m_videoram)	/* Init'ed at $2042 */
-	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE(fclown_colorram_w) AM_BASE(m_colorram)	/* Init'ed at $2054 */
+	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(fclown_videoram_w) AM_SHARE("videoram")	/* Init'ed at $2042 */
+	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE(fclown_colorram_w) AM_SHARE("colorram")	/* Init'ed at $2054 */
 	AM_RANGE(0x2000, 0x7fff) AM_ROM					/* ROM space */
 
 	AM_RANGE(0xc048, 0xc048) AM_WRITE(cpu_c048_w )

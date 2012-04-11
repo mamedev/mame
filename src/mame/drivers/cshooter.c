@@ -92,15 +92,18 @@ class cshooter_state : public driver_device
 {
 public:
 	cshooter_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_txram(*this, "txram"),
+		m_mainram(*this, "mainram"),
+		m_spriteram(*this, "spriteram"){ }
 
-	UINT8* m_txram;
+	required_shared_ptr<UINT8> m_txram;
 	tilemap_t *m_txtilemap;
-	UINT8 *m_mainram;
+	required_shared_ptr<UINT8> m_mainram;
 	int m_coin_stat;
 	int m_counter;
-	UINT8 *m_spriteram;
-	size_t m_spriteram_size;
+	required_shared_ptr<UINT8> m_spriteram;
+//OBRISI.ME
 	DECLARE_WRITE8_MEMBER(cshooter_txram_w);
 	DECLARE_READ8_MEMBER(cshooter_coin_r);
 	DECLARE_WRITE8_MEMBER(cshooter_c500_w);
@@ -152,9 +155,9 @@ static SCREEN_UPDATE_IND16(cshooter)
 
 	//sprites
 	{
-		UINT8 *spriteram = state->m_spriteram;
+		UINT8 *spriteram = state->m_spriteram.target();
 		int i;
-		for(i=0;i<state->m_spriteram_size;i+=4)
+		for(i=0;i<state->m_spriteram.bytes();i+=4)
 		{
 			if(spriteram[i+3]!=0)
 			{
@@ -275,7 +278,7 @@ static ADDRESS_MAP_START( cshooter_map, AS_PROGRAM, 8, cshooter_state )
 	AM_RANGE(0xc600, 0xc600) AM_WRITENOP			// see notes
 	AM_RANGE(0xc700, 0xc700) AM_WRITE(cshooter_c700_w)
 	AM_RANGE(0xc801, 0xc801) AM_WRITENOP			// see notes
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(cshooter_txram_w) AM_BASE(m_txram)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(cshooter_txram_w) AM_SHARE("txram")
 	AM_RANGE(0xd800, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xffff) AM_RAM
 ADDRESS_MAP_END
@@ -304,13 +307,13 @@ static ADDRESS_MAP_START( airraid_map, AS_PROGRAM, 8, cshooter_state )
 	AM_RANGE(0xc600, 0xc600) AM_WRITENOP			// see notes
 	AM_RANGE(0xc700, 0xc700) AM_WRITE(cshooter_c700_w)
 	AM_RANGE(0xc801, 0xc801) AM_WRITENOP			// see notes
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(cshooter_txram_w) AM_BASE(m_txram)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(cshooter_txram_w) AM_SHARE("txram")
 	AM_RANGE(0xd800, 0xdbff) AM_WRITE(pal2_w) AM_READ(pal_r) AM_SHARE("paletteram")
 	AM_RANGE(0xdc11, 0xdc11) AM_WRITE(bank_w)
 	AM_RANGE(0xdc00, 0xdc1f) AM_RAM //video registers
 	AM_RANGE(0xde00, 0xde0f) AM_READWRITE(seibu_sound_comms_r,seibu_sound_comms_w)
-	AM_RANGE(0xe000, 0xfdff) AM_RAM AM_BASE(m_mainram)
-	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
+	AM_RANGE(0xe000, 0xfdff) AM_RAM AM_SHARE("mainram")
+	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_SHARE("spriteram")
 ADDRESS_MAP_END
 
 

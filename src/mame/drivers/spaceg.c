@@ -177,12 +177,16 @@ class spaceg_state : public driver_device
 {
 public:
 	spaceg_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_colorram(*this, "colorram"),
+		m_videoram(*this, "videoram"),
+		m_io9400(*this, "io9400"),
+		m_io9401(*this, "io9401"){ }
 
-	UINT8 *  m_videoram;
-	UINT8 *  m_colorram;
-	UINT8 *  m_io9400;
-	UINT8 *  m_io9401;
+	required_shared_ptr<UINT8> m_colorram;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_io9400;
+	required_shared_ptr<UINT8> m_io9401;
 	DECLARE_WRITE8_MEMBER(zvideoram_w);
 	DECLARE_READ8_MEMBER(spaceg_colorram_r);
 };
@@ -328,11 +332,11 @@ static ADDRESS_MAP_START( spaceg_map, AS_PROGRAM, 8, spaceg_state )
 	AM_RANGE(0x3000, 0x3fff) AM_ROM
 	AM_RANGE(0x7000, 0x77ff) AM_RAM
 
-	AM_RANGE(0xa000, 0xbfff) AM_RAM_READ(spaceg_colorram_r) AM_BASE(m_colorram)
-	AM_RANGE(0xc000, 0xdfff) AM_RAM_WRITE(zvideoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0xa000, 0xbfff) AM_RAM_READ(spaceg_colorram_r) AM_SHARE("colorram")
+	AM_RANGE(0xc000, 0xdfff) AM_RAM_WRITE(zvideoram_w) AM_SHARE("videoram")
 
-	AM_RANGE(0x9400, 0x9400) AM_WRITEONLY AM_BASE(m_io9400) /* gfx ctrl */
-	AM_RANGE(0x9401, 0x9401) AM_WRITEONLY AM_BASE(m_io9401) /* gfx ctrl */
+	AM_RANGE(0x9400, 0x9400) AM_WRITEONLY AM_SHARE("io9400") /* gfx ctrl */
+	AM_RANGE(0x9401, 0x9401) AM_WRITEONLY AM_SHARE("io9401") /* gfx ctrl */
 	/* 9402 -
         bits 0 and 1 probably control the lamps under the player 1 and player 2 start buttons
         bit 2 - unknown -

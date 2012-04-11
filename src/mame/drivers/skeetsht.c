@@ -21,9 +21,10 @@ class skeetsht_state : public driver_device
 {
 public:
 	skeetsht_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_tms_vram(*this, "tms_vram"){ }
 
-	UINT16 *m_tms_vram;
+	required_shared_ptr<UINT16> m_tms_vram;
 	UINT8 m_porta_latch;
 	UINT8 m_ay_sel;
 	UINT8 m_lastdataw;
@@ -191,7 +192,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tms_program_map, AS_PROGRAM, 16, skeetsht_state )
 	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE_LEGACY(tms34010_io_register_r, tms34010_io_register_w)
-	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_BASE(m_tms_vram)
+	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_SHARE("tms_vram")
 	AM_RANGE(0x00440000, 0x004fffff) AM_READWRITE(ramdac_r, ramdac_w)
 	AM_RANGE(0xff800000, 0xffbfffff) AM_ROM AM_MIRROR(0x00400000) AM_REGION("tms", 0)
 ADDRESS_MAP_END

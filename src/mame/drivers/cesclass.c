@@ -32,15 +32,14 @@ public:
 	cesclassic_state(const machine_config &mconfig, device_type type, const char *tag)
 	: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
-	m_oki(*this, "oki")
-	{ }
+	m_oki(*this, "oki"),
+	m_vram(*this, "vram"){ }
 
 	DECLARE_WRITE16_MEMBER(irq2_ack_w);
 	DECLARE_WRITE16_MEMBER(irq3_ack_w);
 	DECLARE_WRITE16_MEMBER(lamps_w);
 	DECLARE_WRITE16_MEMBER(outputs_w);
 
-	UINT16 *m_vram;
 
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -50,6 +49,7 @@ protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<okim6295_device> m_oki;
 
+	required_shared_ptr<UINT16> m_vram;
 	// driver_device overrides
 	virtual void video_start();
 
@@ -119,7 +119,7 @@ WRITE16_MEMBER( cesclassic_state::outputs_w )
 static ADDRESS_MAP_START( cesclassic_map, AS_PROGRAM, 16, cesclassic_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x400000, 0x40cfff) AM_RAM
-	AM_RANGE(0x40d000, 0x40ffff) AM_RAM AM_BASE(m_vram)
+	AM_RANGE(0x40d000, 0x40ffff) AM_RAM AM_SHARE("vram")
 	AM_RANGE(0x410000, 0x410001) AM_READ_PORT("VBLANK") //probably m68681 lies there instead
 	AM_RANGE(0x410004, 0x410005) AM_WRITE(irq3_ack_w)
 	AM_RANGE(0x410006, 0x410007) AM_WRITE(irq2_ack_w)

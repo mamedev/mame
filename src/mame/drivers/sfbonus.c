@@ -279,7 +279,14 @@ class sfbonus_state : public driver_device
 {
 public:
 	sfbonus_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_nvram(*this, "nvram"),
+		m_1800_regs(*this, "1800_regs"),
+		m_vregs(*this, "vregs"),
+		m_2801_regs(*this, "2801_regs"),
+		m_2c01_regs(*this, "2c01_regs"),
+		m_3000_regs(*this, "3000_regs"),
+		m_3800_regs(*this, "3800_regs"){ }
 
 	bitmap_ind16 *m_temp_reel_bitmap;
 	tilemap_t *m_tilemap;
@@ -293,14 +300,13 @@ public:
 	UINT8 *m_reel3_ram;
 	UINT8 *m_reel4_ram;
 	UINT8* m_videoram;
-	UINT8 *m_vregs;
-	UINT8 *m_nvram;
-	size_t m_nvram_size;
-	UINT8* m_1800_regs;
-	UINT8* m_3800_regs;
-	UINT8* m_3000_regs;
-	UINT8* m_2801_regs;
-	UINT8* m_2c01_regs;
+	required_shared_ptr<UINT8> m_nvram;
+	required_shared_ptr<UINT8> m_1800_regs;
+	required_shared_ptr<UINT8> m_vregs;
+	required_shared_ptr<UINT8> m_2801_regs;
+	required_shared_ptr<UINT8> m_2c01_regs;
+	required_shared_ptr<UINT8> m_3000_regs;
+	required_shared_ptr<UINT8> m_3800_regs;
 	DECLARE_WRITE8_MEMBER(sfbonus_videoram_w);
 	DECLARE_WRITE8_MEMBER(sfbonus_bank_w);
 	DECLARE_READ8_MEMBER(sfbonus_2800_r);
@@ -1069,7 +1075,7 @@ static SCREEN_UPDATE_IND16(sfbonus)
 
 static ADDRESS_MAP_START( sfbonus_map, AS_PROGRAM, 8, sfbonus_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROMBANK("bank1") AM_WRITE(sfbonus_videoram_w)
-	AM_RANGE(0xf000, 0xffff) AM_RAM AM_BASE_SIZE(m_nvram,m_nvram_size)
+	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
 WRITE8_MEMBER(sfbonus_state::sfbonus_bank_w)
@@ -1154,21 +1160,21 @@ static ADDRESS_MAP_START( sfbonus_io, AS_IO, 8, sfbonus_state )
 	AM_RANGE(0x0c01, 0x0c01) AM_DEVWRITE("ramdac", ramdac_device, pal_w)
 	AM_RANGE(0x0c02, 0x0c02) AM_DEVWRITE("ramdac", ramdac_device, mask_w)
 
-	AM_RANGE(0x1800, 0x1807) AM_WRITE(sfbonus_1800_w) AM_BASE(m_1800_regs) // lamps and coin counters
+	AM_RANGE(0x1800, 0x1807) AM_WRITE(sfbonus_1800_w) AM_SHARE("1800_regs") // lamps and coin counters
 
-	AM_RANGE(0x2400, 0x241f) AM_RAM AM_BASE(m_vregs)
+	AM_RANGE(0x2400, 0x241f) AM_RAM AM_SHARE("vregs")
 
 	AM_RANGE(0x2800, 0x2800) AM_READ(sfbonus_2800_r)
-	AM_RANGE(0x2801, 0x2801) AM_READ(sfbonus_2801_r) AM_WRITE(sfbonus_2801_w) AM_BASE(m_2801_regs)
+	AM_RANGE(0x2801, 0x2801) AM_READ(sfbonus_2801_r) AM_WRITE(sfbonus_2801_w) AM_SHARE("2801_regs")
 
 	AM_RANGE(0x2c00, 0x2c00) AM_READ(sfbonus_2c00_r)
-	AM_RANGE(0x2c01, 0x2c01) AM_READ(sfbonus_2c01_r) AM_WRITE(sfbonus_2c01_w) AM_BASE(m_2c01_regs)
+	AM_RANGE(0x2c01, 0x2c01) AM_READ(sfbonus_2c01_r) AM_WRITE(sfbonus_2c01_w) AM_SHARE("2c01_regs")
 
-	AM_RANGE(0x3000, 0x3000) AM_WRITE(sfbonus_3000_w) AM_BASE(m_3000_regs)
+	AM_RANGE(0x3000, 0x3000) AM_WRITE(sfbonus_3000_w) AM_SHARE("3000_regs")
 	AM_RANGE(0x3400, 0x3400) AM_WRITE(sfbonus_bank_w)
 	AM_RANGE(0x3800, 0x3800) AM_READ(sfbonus_3800_r)
 
-	AM_RANGE(0x3800, 0x3807) AM_WRITE(sfbonus_3800_w) AM_BASE(m_3800_regs)
+	AM_RANGE(0x3800, 0x3807) AM_WRITE(sfbonus_3800_w) AM_SHARE("3800_regs")
 ADDRESS_MAP_END
 
 
@@ -1217,18 +1223,18 @@ static NVRAM_HANDLER( sfbonus )
 {
 	sfbonus_state *state = machine.driver_data<sfbonus_state>();
 	if (read_or_write)
-		file->write(state->m_nvram,state->m_nvram_size);
+		file->write(state->m_nvram,state->m_nvram.bytes());
 	else
 	{
 		if (file)
 		{
-			memset(state->m_nvram,0x00,state->m_nvram_size);
-			file->read(state->m_nvram,state->m_nvram_size);
+			memset(state->m_nvram,0x00,state->m_nvram.bytes());
+			file->read(state->m_nvram,state->m_nvram.bytes());
 		}
 		else
 		{
 			UINT8* defaultram = machine.region("defaults")->base();
-			memset(state->m_nvram,0x00,state->m_nvram_size);
+			memset(state->m_nvram,0x00,state->m_nvram.bytes());
 
 			if (defaultram)
 				if ((defaultram[0x02]==0x00) && (defaultram[0x03]==0x00)) // hack! rom region optional regions get cleared with garbage if no rom is present, this is not good!

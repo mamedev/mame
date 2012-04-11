@@ -31,13 +31,14 @@ class _39in1_state : public driver_device
 {
 public:
 	_39in1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_ram(*this, "ram"){ }
 
 	UINT32 m_seed;
 	UINT32 m_magic;
 	UINT32 m_state;
 
-	UINT32* m_ram;
+	required_shared_ptr<UINT32> m_ram;
 
 	PXA255_DMA_Regs m_dma_regs;
 	PXA255_I2S_Regs m_i2s_regs;
@@ -1476,7 +1477,7 @@ static ADDRESS_MAP_START( 39in1_map, AS_PROGRAM, 32, _39in1_state )
 	AM_RANGE(0x40d00000, 0x40d00017) AM_READWRITE(pxa255_intc_r, pxa255_intc_w )
 	AM_RANGE(0x40e00000, 0x40e0006b) AM_READWRITE(pxa255_gpio_r, pxa255_gpio_w )
 	AM_RANGE(0x44000000, 0x4400021f) AM_READWRITE(pxa255_lcd_r,  pxa255_lcd_w )
-	AM_RANGE(0xa0000000, 0xa07fffff) AM_RAM AM_BASE(m_ram)
+	AM_RANGE(0xa0000000, 0xa07fffff) AM_RAM AM_SHARE("ram")
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( 39in1 )

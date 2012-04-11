@@ -204,9 +204,10 @@ class konamim2_state : public driver_device
 {
 public:
 	konamim2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_main_ram(*this, "main_ram"){ }
 
-	UINT64 *m_main_ram;
+	required_shared_ptr<UINT64> m_main_ram;
 	UINT32 m_vdl0_address;
 	UINT32 m_vdl1_address;
 	UINT32 m_irq_enable;
@@ -1134,7 +1135,7 @@ static ADDRESS_MAP_START( m2_main, AS_PROGRAM, 64, konamim2_state )
 	AM_RANGE(0x10000000, 0x10000007) AM_READ(cpu_r)
 	AM_RANGE(0x10000008, 0x10001007) AM_NOP		// ???
 	AM_RANGE(0x20000000, 0x201fffff) AM_ROM AM_SHARE("share2")
-	AM_RANGE(0x40000000, 0x407fffff) AM_RAM AM_SHARE("share3") AM_BASE(m_main_ram)
+	AM_RANGE(0x40000000, 0x407fffff) AM_RAM AM_SHARE("share3") AM_SHARE("main_ram")
 	AM_RANGE(0xfff00000, 0xffffffff) AM_ROM AM_REGION("boot", 0) AM_SHARE("share2")
 ADDRESS_MAP_END
 

@@ -50,11 +50,14 @@ class poo_state : public driver_device
 {
 public:
 	poo_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_sprites(*this, "sprites"),
+		m_scrolly(*this, "scrolly"),
+		m_vram(*this, "vram"){ }
 
-	UINT8 *m_vram;
-	UINT8 *m_scrolly;
-	UINT8 *m_sprites;
+	required_shared_ptr<UINT8> m_sprites;
+	required_shared_ptr<UINT8> m_scrolly;
+	required_shared_ptr<UINT8> m_vram;
 	UINT8 m_vram_colbank;
 	DECLARE_READ8_MEMBER(unk_inp_r);
 	DECLARE_READ8_MEMBER(unk_inp2_r);
@@ -158,8 +161,8 @@ static ADDRESS_MAP_START( unclepoo_main_map, AS_PROGRAM, 8, poo_state )
 	AM_RANGE(0x9000, 0x97ff) AM_RAM
 	AM_RANGE(0x9800, 0x9801) AM_READ(unk_inp_r) //AM_WRITE(unk_w )
 
-	AM_RANGE(0xb000, 0xb07f) AM_RAM AM_BASE(m_sprites)
-	AM_RANGE(0xb080, 0xb0ff) AM_RAM AM_BASE(m_scrolly)
+	AM_RANGE(0xb000, 0xb07f) AM_RAM AM_SHARE("sprites")
+	AM_RANGE(0xb080, 0xb0ff) AM_RAM AM_SHARE("scrolly")
 
 	AM_RANGE(0xb400, 0xb400) AM_WRITE(sound_cmd_w)
 
@@ -171,7 +174,7 @@ static ADDRESS_MAP_START( unclepoo_main_map, AS_PROGRAM, 8, poo_state )
 
 	AM_RANGE(0xb700, 0xb700) AM_WRITE(poo_vregs_w)
 
-	AM_RANGE(0xb800, 0xbfff) AM_RAM AM_BASE(m_vram)
+	AM_RANGE(0xb800, 0xbfff) AM_RAM AM_SHARE("vram")
 
 ADDRESS_MAP_END
 

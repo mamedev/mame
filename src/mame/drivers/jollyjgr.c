@@ -106,14 +106,19 @@ class jollyjgr_state : public driver_device
 {
 public:
 	jollyjgr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"),
+		m_colorram(*this, "colorram"),
+		m_spriteram(*this, "spriteram"),
+		m_bitmap(*this, "bitmap"),
+		m_bulletram(*this, "bulletram"){ }
 
 	/* memory pointers */
-	UINT8 *  m_videoram;
-	UINT8 *  m_colorram;
-	UINT8 *  m_spriteram;
-	UINT8 *  m_bulletram;
-	UINT8 *  m_bitmap;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_colorram;
+	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<UINT8> m_bitmap;
+	required_shared_ptr<UINT8> m_bulletram;
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;
@@ -204,11 +209,11 @@ static ADDRESS_MAP_START( jollyjgr_map, AS_PROGRAM, 8, jollyjgr_state )
 	AM_RANGE(0x8ffc, 0x8ffc) AM_WRITE(jollyjgr_misc_w)
 	AM_RANGE(0x8ffd, 0x8ffd) AM_WRITE(jollyjgr_coin_lookout_w)
 	AM_RANGE(0x8fff, 0x8fff) AM_READ_PORT("DSW2")
-	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(jollyjgr_videoram_w) AM_BASE(m_videoram)
-	AM_RANGE(0x9800, 0x983f) AM_RAM_WRITE(jollyjgr_attrram_w) AM_BASE(m_colorram)
-	AM_RANGE(0x9840, 0x987f) AM_RAM AM_BASE(m_spriteram)
+	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(jollyjgr_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x9800, 0x983f) AM_RAM_WRITE(jollyjgr_attrram_w) AM_SHARE("colorram")
+	AM_RANGE(0x9840, 0x987f) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x9880, 0x9bff) AM_RAM
-	AM_RANGE(0xa000, 0xffff) AM_RAM AM_BASE(m_bitmap)
+	AM_RANGE(0xa000, 0xffff) AM_RAM AM_SHARE("bitmap")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fspider_map, AS_PROGRAM, 8, jollyjgr_state )
@@ -221,13 +226,13 @@ static ADDRESS_MAP_START( fspider_map, AS_PROGRAM, 8, jollyjgr_state )
 	AM_RANGE(0x8ffc, 0x8ffc) AM_WRITE(jollyjgr_misc_w)
 	AM_RANGE(0x8ffd, 0x8ffd) AM_WRITE(jollyjgr_coin_lookout_w)
 	AM_RANGE(0x8fff, 0x8fff) AM_READ_PORT("DSW2")
-	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(jollyjgr_videoram_w) AM_BASE(m_videoram)
-	AM_RANGE(0x9800, 0x983f) AM_RAM_WRITE(jollyjgr_attrram_w) AM_BASE(m_colorram)
-	AM_RANGE(0x9840, 0x987f) AM_RAM AM_BASE(m_spriteram)
+	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(jollyjgr_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x9800, 0x983f) AM_RAM_WRITE(jollyjgr_attrram_w) AM_SHARE("colorram")
+	AM_RANGE(0x9840, 0x987f) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x9880, 0x989f) AM_RAM // ?
-	AM_RANGE(0x98a0, 0x98af) AM_RAM AM_BASE(m_bulletram)
+	AM_RANGE(0x98a0, 0x98af) AM_RAM AM_SHARE("bulletram")
 	AM_RANGE(0x98b0, 0x9bff) AM_RAM // ?
-	AM_RANGE(0xa000, 0xffff) AM_RAM AM_BASE(m_bitmap)
+	AM_RANGE(0xa000, 0xffff) AM_RAM AM_SHARE("bitmap")
 ADDRESS_MAP_END
 
 
@@ -486,7 +491,7 @@ static void draw_bitmap( running_machine &machine, bitmap_ind16 &bitmap )
 static SCREEN_UPDATE_IND16( jollyjgr )
 {
 	jollyjgr_state *state = screen.machine().driver_data<jollyjgr_state>();
-	UINT8 *spriteram = state->m_spriteram;
+	UINT8 *spriteram = state->m_spriteram.target();
 	int offs;
 
 	bitmap.fill(32, cliprect);

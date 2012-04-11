@@ -356,9 +356,10 @@ class missile_state : public driver_device
 {
 public:
 	missile_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"){ }
 
-	UINT8 *m_videoram;
+	required_shared_ptr<UINT8> m_videoram;
 	const UINT8 *m_writeprom;
 	emu_timer *m_irq_timer;
 	emu_timer *m_cpu_timer;
@@ -594,7 +595,7 @@ INLINE offs_t get_bit3_addr(offs_t pixaddr)
 static void write_vram(address_space *space, offs_t address, UINT8 data)
 {
 	missile_state *state = space->machine().driver_data<missile_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = state->m_videoram.target();
 	static const UINT8 data_lookup[4] = { 0x00, 0x0f, 0xf0, 0xff };
 	offs_t vramaddr;
 	UINT8 vramdata;
@@ -626,7 +627,7 @@ static void write_vram(address_space *space, offs_t address, UINT8 data)
 static UINT8 read_vram(address_space *space, offs_t address)
 {
 	missile_state *state = space->machine().driver_data<missile_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = state->m_videoram.target();
 	offs_t vramaddr;
 	UINT8 vramdata;
 	UINT8 vrammask;
@@ -670,7 +671,7 @@ static UINT8 read_vram(address_space *space, offs_t address)
 static SCREEN_UPDATE_IND16( missile )
 {
 	missile_state *state = screen.machine().driver_data<missile_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = state->m_videoram.target();
 	int x, y;
 
 	/* draw the bitmap to the screen, looping over Y */
@@ -712,7 +713,7 @@ static SCREEN_UPDATE_IND16( missile )
 
 WRITE8_MEMBER(missile_state::missile_w)
 {
-	UINT8 *videoram = m_videoram;
+	UINT8 *videoram = m_videoram.target();
 	/* if we're in MADSEL mode, write to video RAM */
 	if (get_madsel(&space))
 	{
@@ -769,7 +770,7 @@ WRITE8_MEMBER(missile_state::missile_w)
 
 READ8_MEMBER(missile_state::missile_r)
 {
-	UINT8 *videoram = m_videoram;
+	UINT8 *videoram = m_videoram.target();
 	UINT8 result = 0xff;
 
 	/* if we're in MADSEL mode, read from video RAM */
@@ -829,7 +830,7 @@ READ8_MEMBER(missile_state::missile_r)
 
 /* complete memory map derived from schematics (implemented above) */
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, missile_state )
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(missile_r, missile_w) AM_BASE(m_videoram)
+	AM_RANGE(0x0000, 0xffff) AM_READWRITE(missile_r, missile_w) AM_SHARE("videoram")
 ADDRESS_MAP_END
 
 

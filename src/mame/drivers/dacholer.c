@@ -43,14 +43,18 @@ public:
 	dacholer_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
-		m_audiocpu(*this,"audiocpu")
-		{ }
+		m_audiocpu(*this,"audiocpu"),
+		m_bgvideoram(*this, "bgvideoram"),
+		m_fgvideoram(*this, "fgvideoram"),
+		m_spriteram(*this, "spriteram"){ }
 
+	/* devices */
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 	/* memory pointers */
-	UINT8 *  m_bgvideoram;
-	UINT8 *  m_fgvideoram;
-	UINT8 *  m_spriteram;
-	size_t   m_spriteram_size;
+	required_shared_ptr<UINT8> m_bgvideoram;
+	required_shared_ptr<UINT8> m_fgvideoram;
+	required_shared_ptr<UINT8> m_spriteram;
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;
@@ -66,9 +70,6 @@ public:
 	UINT8 m_music_interrupt_enable;
 	UINT8 m_snd_ack;
 
-	/* devices */
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_audiocpu;
 	DECLARE_WRITE8_MEMBER(bg_scroll_x_w);
 	DECLARE_WRITE8_MEMBER(bg_scroll_y_w);
 	DECLARE_WRITE8_MEMBER(background_w);
@@ -120,7 +121,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	dacholer_state *state = machine.driver_data<dacholer_state>();
 	int offs, code, attr, sx, sy, flipx, flipy;
 
-	for (offs = 0; offs < state->m_spriteram_size; offs += 4)
+	for (offs = 0; offs < state->m_spriteram.bytes(); offs += 4)
 	{
 		code = state->m_spriteram[offs + 1];
 		attr = state->m_spriteram[offs + 2];
@@ -216,9 +217,9 @@ WRITE8_MEMBER(dacholer_state::main_irq_ack_w)
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, dacholer_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8800, 0x97ff) AM_RAM
-	AM_RANGE(0xc000, 0xc3ff) AM_MIRROR(0x400) AM_RAM_WRITE(background_w) AM_BASE(m_bgvideoram)
-	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(foreground_w) AM_BASE(m_fgvideoram)
-	AM_RANGE(0xe000, 0xe0ff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
+	AM_RANGE(0xc000, 0xc3ff) AM_MIRROR(0x400) AM_RAM_WRITE(background_w) AM_SHARE("bgvideoram")
+	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(foreground_w) AM_SHARE("fgvideoram")
+	AM_RANGE(0xe000, 0xe0ff) AM_RAM AM_SHARE("spriteram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( itaten_main_map, AS_PROGRAM, 8, dacholer_state )

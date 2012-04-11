@@ -60,13 +60,14 @@ class progolf_state : public driver_device
 {
 public:
 	progolf_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_fbram(*this, "fbram"){ }
 
 	UINT8 *m_videoram;
 	UINT8 m_char_pen;
 	UINT8 m_char_pen_vreg;
 	UINT8 *m_fg_fb;
-	UINT8 *m_fbram;
+	required_shared_ptr<UINT8> m_fbram;
 	UINT8 m_scrollx_hi;
 	UINT8 m_scrollx_lo;
 	UINT8 m_gfx_switch;
@@ -243,7 +244,7 @@ WRITE8_MEMBER(progolf_state::progolf_videoram_w)
 
 static ADDRESS_MAP_START( main_cpu, AS_PROGRAM, 8, progolf_state )
 	AM_RANGE(0x0000, 0x5fff) AM_RAM
-	AM_RANGE(0x6000, 0x7fff) AM_RAM_WRITE(progolf_charram_w) AM_BASE(m_fbram)
+	AM_RANGE(0x6000, 0x7fff) AM_RAM_WRITE(progolf_charram_w) AM_SHARE("fbram")
 	AM_RANGE(0x8000, 0x8fff) AM_READWRITE(progolf_videoram_r,progolf_videoram_w)
 	AM_RANGE(0x9000, 0x9000) AM_READ_PORT("IN2") AM_WRITE(progolf_char_vregs_w)
 	AM_RANGE(0x9200, 0x9200) AM_READ_PORT("P1") AM_WRITE(progolf_scrollx_hi_w) //p1 inputs

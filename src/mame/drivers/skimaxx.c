@@ -44,20 +44,23 @@ class skimaxx_state : public driver_device
 {
 public:
 	skimaxx_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_blitter_regs(*this, "blitter_regs"),
+		m_fpga_ctrl(*this, "fpga_ctrl"),
+		m_fg_buffer(*this, "fg_buffer"){ }
 
+	required_shared_ptr<UINT32> m_blitter_regs;
+	required_shared_ptr<UINT32> m_fpga_ctrl;
+	required_shared_ptr<UINT16> m_fg_buffer;
 	UINT32 *m_bg_buffer;
-	UINT16 *m_fg_buffer;
 	UINT32 *m_bg_buffer_front;
 	UINT32 *m_bg_buffer_back;
-	UINT32 *m_blitter_regs;
 	UINT16 *m_blitter_gfx;
 	UINT32 m_blitter_gfx_len;
 	UINT32 m_blitter_src_x;
 	UINT32 m_blitter_src_dx;
 	UINT32 m_blitter_src_y;
 	UINT32 m_blitter_src_dy;
-	UINT32 *m_fpga_ctrl;
 	DECLARE_WRITE32_MEMBER(skimaxx_blitter_w);
 	DECLARE_READ32_MEMBER(skimaxx_blitter_r);
 	DECLARE_WRITE32_MEMBER(m68k_tms_w);
@@ -375,7 +378,7 @@ static ADDRESS_MAP_START( tms_program_map, AS_PROGRAM, 16, skimaxx_state )
 	AM_RANGE(0x00000000, 0x000100ff) AM_RAM
 	AM_RANGE(0x00008000, 0x0003ffff) AM_RAM
 	AM_RANGE(0x00050000, 0x0005ffff) AM_RAM
-	AM_RANGE(0x00220000, 0x003fffff) AM_RAM AM_BASE(m_fg_buffer)
+	AM_RANGE(0x00220000, 0x003fffff) AM_RAM AM_SHARE("fg_buffer")
 	AM_RANGE(0x02000000, 0x0200000f) AM_RAM
 	AM_RANGE(0x02100000, 0x0210000f) AM_RAM
 	AM_RANGE(0x04000000, 0x047fffff) AM_ROM AM_REGION("tmsgfx", 0)

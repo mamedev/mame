@@ -49,9 +49,10 @@ class ttchamp_state : public driver_device
 {
 public:
 	ttchamp_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_peno_vram(*this, "peno_vram"){ }
 
-	UINT16 *m_peno_vram;
+	required_shared_ptr<UINT16> m_peno_vram;
 	UINT16 m_paloff;
 	DECLARE_WRITE16_MEMBER(paloff_w);
 	DECLARE_WRITE16_MEMBER(pcup_prgbank_w);
@@ -90,7 +91,7 @@ static SCREEN_UPDATE_IND16(ttchamp)
 	{
 		for(x=0;x<xxx;x++)
 		{
-			/*if(hotblock_port0&0x40)*/bitmap.pix16(y, x) = ((UINT8 *)state->m_peno_vram)[BYTE_XOR_LE(count)]+0x300;
+			/*if(hotblock_port0&0x40)*/bitmap.pix16(y, x) = ((UINT8 *)state->m_peno_vram.target())[BYTE_XOR_LE(count)]+0x300;
             count++;
         }
     }
@@ -136,7 +137,7 @@ READ16_MEMBER(ttchamp_state::peno_rand2)
 
 static ADDRESS_MAP_START( ttchamp_map, AS_PROGRAM, 16, ttchamp_state )
     AM_RANGE(0x00000, 0x0ffff) AM_RAM
-    AM_RANGE(0x10000, 0x1ffff) AM_RAM AM_BASE(m_peno_vram)
+    AM_RANGE(0x10000, 0x1ffff) AM_RAM AM_SHARE("peno_vram")
     AM_RANGE(0x20000, 0x7ffff) AM_ROMBANK("bank1") // ?
     AM_RANGE(0x80000, 0xfffff) AM_ROMBANK("bank2") // ?
 ADDRESS_MAP_END

@@ -23,9 +23,10 @@ class nexus3d_state : public driver_device
 {
 public:
 	nexus3d_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_mainram(*this, "mainram"){ }
 
-	UINT32* m_mainram;
+	required_shared_ptr<UINT32> m_mainram;
 
 	//
 	UINT8 m_last_flash_cmd;
@@ -151,7 +152,7 @@ READ32_MEMBER(nexus3d_state::nexus3d_unk_r)
 //}
 
 static ADDRESS_MAP_START( nexus3d_map, AS_PROGRAM, 32, nexus3d_state )
-	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_BASE(m_mainram)
+	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_SHARE("mainram")
 
 	AM_RANGE(0x00400000, 0x01ffffff) AM_RAM // ?? uploads various data, + pointers to data in the 0x01ffxxxx range, might be video system related
 

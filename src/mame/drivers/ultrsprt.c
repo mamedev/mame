@@ -21,10 +21,12 @@ class ultrsprt_state : public driver_device
 {
 public:
 	ultrsprt_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_vram(*this, "vram"),
+		m_workram(*this, "workram"){ }
 
-	UINT32 *m_vram;
-	UINT32 *m_workram;
+	required_shared_ptr<UINT32> m_vram;
+	required_shared_ptr<UINT32> m_workram;
 	DECLARE_WRITE32_MEMBER(palette_w);
 	DECLARE_READ32_MEMBER(eeprom_r);
 	DECLARE_WRITE32_MEMBER(eeprom_w);
@@ -42,7 +44,7 @@ static SCREEN_UPDATE_IND16( ultrsprt )
 	ultrsprt_state *state = screen.machine().driver_data<ultrsprt_state>();
 	int i, j;
 
-	UINT8 *ram = (UINT8 *)state->m_vram;
+	UINT8 *ram = (UINT8 *)state->m_vram.target();
 
 	for (j=0; j < 400; j++)
 	{
@@ -112,14 +114,14 @@ static MACHINE_START( ultrsprt )
 
 
 static ADDRESS_MAP_START( ultrsprt_map, AS_PROGRAM, 32, ultrsprt_state )
-	AM_RANGE(0x00000000, 0x0007ffff) AM_RAM AM_BASE(m_vram)
+	AM_RANGE(0x00000000, 0x0007ffff) AM_RAM AM_SHARE("vram")
 	AM_RANGE(0x70000000, 0x70000003) AM_READWRITE(eeprom_r, eeprom_w)
 	AM_RANGE(0x70000020, 0x70000023) AM_READ_PORT("P1")
 	AM_RANGE(0x70000040, 0x70000043) AM_READ_PORT("P2")
 	AM_RANGE(0x70000080, 0x70000087) AM_DEVWRITE_LEGACY("k056800", k056800_host_w)
 	AM_RANGE(0x70000088, 0x7000008f) AM_DEVREAD_LEGACY("k056800", k056800_host_r)
 	AM_RANGE(0x700000e0, 0x700000e3) AM_WRITE(int_ack_w)
-	AM_RANGE(0x7f000000, 0x7f01ffff) AM_RAM AM_BASE(m_workram)
+	AM_RANGE(0x7f000000, 0x7f01ffff) AM_RAM AM_SHARE("workram")
 	AM_RANGE(0x7f700000, 0x7f703fff) AM_RAM_WRITE(palette_w) AM_SHARE("paletteram")
 	AM_RANGE(0x7f800000, 0x7f9fffff) AM_MIRROR(0x00600000) AM_ROM AM_REGION("user1", 0)
 ADDRESS_MAP_END

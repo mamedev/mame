@@ -23,10 +23,12 @@ class summit_state : public driver_device
 {
 public:
 	summit_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_attr(*this, "attr"),
+		m_vram(*this, "vram"){ }
 
-	UINT8 *m_vram;
-	UINT8 *m_attr;
+	required_shared_ptr<UINT8> m_attr;
+	required_shared_ptr<UINT8> m_vram;
 	DECLARE_WRITE8_MEMBER(out_w);
 };
 
@@ -65,8 +67,8 @@ WRITE8_MEMBER(summit_state::out_w)
 static ADDRESS_MAP_START( mainmap, AS_PROGRAM, 8, summit_state )
 	AM_RANGE(0x0000, 0x17ff) AM_ROM
 
-	AM_RANGE(0x2000, 0x23ff) AM_RAM AM_BASE(m_attr)
-	AM_RANGE(0x2800, 0x2bff) AM_RAM AM_BASE(m_vram)
+	AM_RANGE(0x2000, 0x23ff) AM_RAM AM_SHARE("attr")
+	AM_RANGE(0x2800, 0x2bff) AM_RAM AM_SHARE("vram")
 
 	AM_RANGE(0x3800, 0x3800) AM_READ_PORT("IN0")
 //  AM_RANGE(0x3880, 0x3880) AM_WRITE(out_w)

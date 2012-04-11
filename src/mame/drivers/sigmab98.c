@@ -101,11 +101,14 @@ class sigmab98_state : public driver_device
 public:
 	sigmab98_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this,"maincpu")
-		{ }
+		m_maincpu(*this,"maincpu"),
+		m_spriteram(*this, "spriteram"),
+		m_nvram(*this, "nvram"){ }
 
-	UINT8 *m_spriteram;
-	size_t m_spriteram_size;
+	required_device<cpu_device> m_maincpu;
+	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<UINT8> m_nvram;
+
 	UINT8 m_reg;
 	UINT8 m_rombank;
 	UINT8 m_reg2;
@@ -116,9 +119,7 @@ public:
 	UINT8 m_c8;
 	UINT8 m_vblank;
 	UINT8 m_out[3];
-	UINT8 *m_nvram;
 
-	required_device<cpu_device> m_maincpu;
 	UINT8 m_vblank_vector;
 	UINT8 m_timer0_vector;
 	UINT8 m_timer1_vector;
@@ -212,8 +213,8 @@ public:
 static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri_mask)
 {
 	sigmab98_state *state = machine.driver_data<sigmab98_state>();
-	UINT8 *end		=	state->m_spriteram - 0x10;
-	UINT8 *s		=	end + state->m_spriteram_size;
+	UINT8 *end		=	state->m_spriteram.target() - 0x10;
+	UINT8 *s		=	end + state->m_spriteram.bytes();
 
 	for ( ; s != end; s -= 0x10 )
 	{
@@ -489,7 +490,7 @@ static ADDRESS_MAP_START( gegege_mem_map, AS_PROGRAM, 8, sigmab98_state )
 	AM_RANGE( 0x0000, 0x7fff ) AM_ROM
 	AM_RANGE( 0x8000, 0x9fff ) AM_ROMBANK("rombank")
 
-	AM_RANGE( 0xa000, 0xafff ) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
+	AM_RANGE( 0xa000, 0xafff ) AM_RAM AM_SHARE("spriteram")
 
 	AM_RANGE( 0xc000, 0xc1ff ) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_byte_be_w) AM_SHARE("paletteram")
 
@@ -2113,9 +2114,9 @@ static DRIVER_INIT( animalc )
 	memory_configure_bank(machine, "rambank", 1, 4, bankedram, 0x1000);
 	memory_set_bank(machine, "rambank", 0);
 
-	state->m_spriteram = auto_alloc_array(machine, UINT8, 0x1000 * 5);
-	memset(state->m_spriteram, 0, 0x1000 * 5);
-	state->m_spriteram_size = 0x1000;
+	//state->m_spriteram = auto_alloc_array(machine, UINT8, 0x1000 * 5);
+	//memset(state->m_spriteram, 0, 0x1000 * 5);
+	//state->m_spriteram_size = 0x1000;
 	memory_configure_bank(machine, "sprbank", 0, 5, state->m_spriteram, 0x1000);
 	memory_set_bank(machine, "sprbank", 0);
 
@@ -2161,9 +2162,9 @@ static DRIVER_INIT( itazuram )
 	memory_set_bankptr(machine, "palbank", state->m_generic_paletteram_8);
 	state->m_rambank = 0x64;
 
-	state->m_spriteram = auto_alloc_array(machine, UINT8, 0x1000 * 5);
-	memset(state->m_spriteram, 0, 0x1000 * 5);
-	state->m_spriteram_size = 0x1000;
+	//state->m_spriteram = auto_alloc_array(machine, UINT8, 0x1000 * 5);
+	//memset(state->m_spriteram, 0, 0x1000 * 5);
+	//state->m_spriteram_size = 0x1000;
 	memory_set_bankptr(machine, "sprbank0",  state->m_spriteram + 0x1000*4);	// scratch
 	memory_set_bankptr(machine, "sprbank1",  state->m_spriteram + 0x1000*4);	// scratch
 
@@ -2273,9 +2274,9 @@ static DRIVER_INIT( haekaka )
 	state->m_generic_paletteram_8.allocate(0x200);
 	memset(state->m_generic_paletteram_8, 0, 0x200);
 
-	state->m_spriteram = auto_alloc_array(machine, UINT8, 0x1000);
-	memset(state->m_spriteram, 0, 0x1000);
-	state->m_spriteram_size = 0x1000;
+	//state->m_spriteram = auto_alloc_array(machine, UINT8, 0x1000);
+	//memset(state->m_spriteram, 0, 0x1000);
+	//state->m_spriteram_size = 0x1000;
 
 	state->m_rombank = 0x65;
 	state->m_rambank = 0x53;

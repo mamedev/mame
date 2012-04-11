@@ -50,12 +50,15 @@ class onetwo_state : public driver_device
 {
 public:
 	onetwo_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_paletteram(*this, "paletteram"),
+		m_paletteram2(*this, "paletteram2"),
+		m_fgram(*this, "fgram"){ }
 
 	/* memory pointers */
-	UINT8 *  m_fgram;
-	UINT8 *  m_paletteram;
-	UINT8 *  m_paletteram2;
+	required_shared_ptr<UINT8> m_paletteram;
+	required_shared_ptr<UINT8> m_paletteram2;
+	required_shared_ptr<UINT8> m_fgram;
 
 	/* video-related */
 	tilemap_t *m_fg_tilemap;
@@ -165,9 +168,9 @@ WRITE8_MEMBER(onetwo_state::palette2_w)
 static ADDRESS_MAP_START( main_cpu, AS_PROGRAM, 8, onetwo_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("maincpu", 0x10000)
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc800, 0xc87f) AM_RAM_WRITE(palette1_w) AM_BASE(m_paletteram)
-	AM_RANGE(0xc900, 0xc97f) AM_RAM_WRITE(palette2_w) AM_BASE(m_paletteram2)
-	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(onetwo_fgram_w) AM_BASE(m_fgram)
+	AM_RANGE(0xc800, 0xc87f) AM_RAM_WRITE(palette1_w) AM_SHARE("paletteram")
+	AM_RANGE(0xc900, 0xc97f) AM_RAM_WRITE(palette2_w) AM_SHARE("paletteram2")
+	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(onetwo_fgram_w) AM_SHARE("fgram")
 	AM_RANGE(0xe000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 

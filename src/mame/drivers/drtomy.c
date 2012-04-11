@@ -15,12 +15,15 @@ class drtomy_state : public driver_device
 {
 public:
 	drtomy_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram_fg(*this, "videorafg"),
+		m_videoram_bg(*this, "videorabg"),
+		m_spriteram(*this, "spriteram"){ }
 
 	/* memory pointers */
-	UINT16 *  m_spriteram;
-	UINT16 *  m_videoram_bg;
-	UINT16 *  m_videoram_fg;
+	required_shared_ptr<UINT16> m_videoram_fg;
+	required_shared_ptr<UINT16> m_videoram_bg;
+	required_shared_ptr<UINT16> m_spriteram;
 //  UINT16 *  m_paletteram16; // currently this uses generic palette handling
 
 	/* video-related */
@@ -162,10 +165,10 @@ static WRITE16_DEVICE_HANDLER( drtomy_okibank_w )
 
 static ADDRESS_MAP_START( drtomy_map, AS_PROGRAM, 16, drtomy_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM	/* ROM */
-	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(drtomy_vram_fg_w) AM_BASE(m_videoram_fg)	/* Video RAM FG */
-	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE(drtomy_vram_bg_w) AM_BASE(m_videoram_bg) /* Video RAM BG */
+	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(drtomy_vram_fg_w) AM_SHARE("videorafg")	/* Video RAM FG */
+	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE(drtomy_vram_bg_w) AM_SHARE("videorabg") /* Video RAM BG */
 	AM_RANGE(0x200000, 0x2007ff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram") /* Palette */
-	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_BASE(m_spriteram) /* Sprite RAM */
+	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_SHARE("spriteram") /* Sprite RAM */
 	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("DSW1")
 	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("DSW2")
 	AM_RANGE(0x700004, 0x700005) AM_READ_PORT("P1")

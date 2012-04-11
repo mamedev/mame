@@ -21,9 +21,10 @@ class wink_state : public driver_device
 {
 public:
 	wink_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"){ }
 
-	UINT8 *m_videoram;
+	required_shared_ptr<UINT8> m_videoram;
 	tilemap_t *m_bg_tilemap;
 	UINT8 m_sound_flag;
 	UINT8 m_tile_bank;
@@ -42,7 +43,7 @@ public:
 static TILE_GET_INFO( get_bg_tile_info )
 {
 	wink_state *state = machine.driver_data<wink_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = state->m_videoram.target();
 	int code = videoram[tile_index];
 	code |= 0x200 * state->m_tile_bank;
 
@@ -70,7 +71,7 @@ static SCREEN_UPDATE_IND16( wink )
 
 WRITE8_MEMBER(wink_state::bgram_w)
 {
-	UINT8 *videoram = m_videoram;
+	UINT8 *videoram = m_videoram.target();
 	videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
@@ -113,7 +114,7 @@ static ADDRESS_MAP_START( wink_map, AS_PROGRAM, 8, wink_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x9000, 0x97ff) AM_RAM	AM_SHARE("nvram")
-	AM_RANGE(0xa000, 0xa3ff) AM_RAM_WRITE(bgram_w) AM_BASE(m_videoram)
+	AM_RANGE(0xa000, 0xa3ff) AM_RAM_WRITE(bgram_w) AM_SHARE("videoram")
 ADDRESS_MAP_END
 
 

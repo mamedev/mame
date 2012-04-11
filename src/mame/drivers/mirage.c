@@ -51,12 +51,10 @@ public:
 		  m_deco_tilegen1(*this, "tilegen1"),
 		  m_oki_sfx(*this, "oki_sfx"),
 		  m_oki_bgm(*this, "oki_bgm"),
-		  m_spriteram(*this, "spriteram") { }
+		  m_spriteram(*this, "spriteram") ,
+		m_pf1_rowscroll(*this, "pf1_rowscroll"),
+		m_pf2_rowscroll(*this, "pf2_rowscroll"){ }
 
-	/* memory pointers */
-	UINT16 *  m_pf1_rowscroll;
-	UINT16 *  m_pf2_rowscroll;
-//  UINT16 *  m_paletteram;    // currently this uses generic palette handling (in decocomn.c)
 
 	/* misc */
 	UINT8 m_mux_data;
@@ -67,6 +65,10 @@ public:
 	required_device<okim6295_device> m_oki_sfx;
 	required_device<okim6295_device> m_oki_bgm;
 	required_device<buffered_spriteram16_device> m_spriteram;
+	/* memory pointers */
+	required_shared_ptr<UINT16> m_pf1_rowscroll;
+	required_shared_ptr<UINT16> m_pf2_rowscroll;
+//  UINT16 *  m_paletteram;    // currently this uses generic palette handling (in decocomn.c)
 	DECLARE_WRITE16_MEMBER(mirage_mux_w);
 	DECLARE_READ16_MEMBER(mirage_input_r);
 	DECLARE_WRITE16_MEMBER(okim1_rombank_w);
@@ -137,8 +139,8 @@ static ADDRESS_MAP_START( mirage_map, AS_PROGRAM, 16, miragemi_state )
 	AM_RANGE(0x100000, 0x101fff) AM_DEVREADWRITE_LEGACY("tilegen1", deco16ic_pf1_data_r, deco16ic_pf1_data_w) // 0x100000 - 0x101fff tested
 	AM_RANGE(0x102000, 0x103fff) AM_DEVREADWRITE_LEGACY("tilegen1", deco16ic_pf2_data_r, deco16ic_pf2_data_w) // 0x102000 - 0x102fff tested
 	/* linescroll */
-	AM_RANGE(0x110000, 0x110bff) AM_RAM AM_BASE(m_pf1_rowscroll)
-	AM_RANGE(0x112000, 0x112bff) AM_RAM AM_BASE(m_pf2_rowscroll)
+	AM_RANGE(0x110000, 0x110bff) AM_RAM AM_SHARE("pf1_rowscroll")
+	AM_RANGE(0x112000, 0x112bff) AM_RAM AM_SHARE("pf2_rowscroll")
 	AM_RANGE(0x120000, 0x1207ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x130000, 0x1307ff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x140000, 0x14000f) AM_DEVREADWRITE8("oki_sfx", okim6295_device, read, write, 0x00ff)

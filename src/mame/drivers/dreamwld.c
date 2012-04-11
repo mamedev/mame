@@ -125,15 +125,21 @@ class dreamwld_state : public driver_device
 {
 public:
 	dreamwld_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_spriteram(*this, "spriteram"),
+		m_paletteram(*this, "paletteram"),
+		m_bg_videoram(*this, "bg_videoram"),
+		m_bg2_videoram(*this, "bg2_videoram"),
+		m_vregs(*this, "vregs"),
+		m_workram(*this, "workram"){ }
 
 	/* memory pointers */
-	UINT32 *  m_bg_videoram;
-	UINT32 *  m_bg2_videoram;
-	UINT32 *  m_vregs;
-	UINT32 *  m_paletteram;
-	UINT32 *  m_spriteram;
-	UINT32 *  m_workram;
+	required_shared_ptr<UINT32> m_spriteram;
+	required_shared_ptr<UINT32> m_paletteram;
+	required_shared_ptr<UINT32> m_bg_videoram;
+	required_shared_ptr<UINT32> m_bg2_videoram;
+	required_shared_ptr<UINT32> m_vregs;
+	required_shared_ptr<UINT32> m_workram;
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;
@@ -338,10 +344,10 @@ static SCREEN_UPDATE_IND16( dreamwld )
 		{
 			if (layer0_ctrl & 0x0200)
 				/* per-tile rowscroll */
-				x0 = ((UINT16 *)state->m_vregs)[BYTE_XOR_BE(0x000/2 + i/16)];
+				x0 = ((UINT16 *)state->m_vregs.target())[BYTE_XOR_BE(0x000/2 + i/16)];
 			else
 				/* per-line rowscroll */
-				x0 = ((UINT16 *)state->m_vregs)[BYTE_XOR_BE(0x000/2 + ((i + layer0_scrolly)&0xff))]; // different handling to psikyo.c? ( + scrolly )
+				x0 = ((UINT16 *)state->m_vregs.target())[BYTE_XOR_BE(0x000/2 + ((i + layer0_scrolly)&0xff))]; // different handling to psikyo.c? ( + scrolly )
 		}
 
 
@@ -355,10 +361,10 @@ static SCREEN_UPDATE_IND16( dreamwld )
 		{
 			if (layer1_ctrl & 0x0200)
 				/* per-tile rowscroll */
-				x1 = ((UINT16 *)state->m_vregs)[BYTE_XOR_BE(0x200/2 + i/16)];
+				x1 = ((UINT16 *)state->m_vregs.target())[BYTE_XOR_BE(0x200/2 + i/16)];
 			else
 				/* per-line rowscroll */
-				x1 = ((UINT16 *)state->m_vregs)[BYTE_XOR_BE(0x200/2 + ((i + layer1_scrolly)&0xff))];  // different handling to psikyo.c? ( + scrolly )
+				x1 = ((UINT16 *)state->m_vregs.target())[BYTE_XOR_BE(0x200/2 + ((i + layer1_scrolly)&0xff))];  // different handling to psikyo.c? ( + scrolly )
 		}
 
 
@@ -454,11 +460,11 @@ WRITE32_MEMBER(dreamwld_state::dreamwld_palette_w)
 static ADDRESS_MAP_START( baryon_map, AS_PROGRAM, 32, dreamwld_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM  AM_WRITENOP
 
-	AM_RANGE(0x400000, 0x401fff) AM_RAM AM_BASE(m_spriteram)
-	AM_RANGE(0x600000, 0x601fff) AM_RAM AM_WRITE(dreamwld_palette_w) AM_BASE(m_paletteram)
-	AM_RANGE(0x800000, 0x801fff) AM_RAM_WRITE(dreamwld_bg_videoram_w ) AM_BASE(m_bg_videoram)
-	AM_RANGE(0x802000, 0x803fff) AM_RAM_WRITE(dreamwld_bg2_videoram_w ) AM_BASE(m_bg2_videoram)
-	AM_RANGE(0x804000, 0x805fff) AM_RAM AM_BASE(m_vregs)  // scroll regs etc.
+	AM_RANGE(0x400000, 0x401fff) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0x600000, 0x601fff) AM_RAM AM_WRITE(dreamwld_palette_w) AM_SHARE("paletteram")
+	AM_RANGE(0x800000, 0x801fff) AM_RAM_WRITE(dreamwld_bg_videoram_w ) AM_SHARE("bg_videoram")
+	AM_RANGE(0x802000, 0x803fff) AM_RAM_WRITE(dreamwld_bg2_videoram_w ) AM_SHARE("bg2_videoram")
+	AM_RANGE(0x804000, 0x805fff) AM_RAM AM_SHARE("vregs")  // scroll regs etc.
 
 	AM_RANGE(0xc00000, 0xc00003) AM_READ_PORT("INPUTS")
 	AM_RANGE(0xc00004, 0xc00007) AM_READ_PORT("c00004")
@@ -468,7 +474,7 @@ static ADDRESS_MAP_START( baryon_map, AS_PROGRAM, 32, dreamwld_state )
 
 	AM_RANGE(0xc00030, 0xc00033) AM_READ(dreamwld_protdata_r) // it reads protection data (irq code) from here and puts it at ffd000
 
-	AM_RANGE(0xfe0000, 0xffffff) AM_RAM AM_BASE(m_workram) // work ram
+	AM_RANGE(0xfe0000, 0xffffff) AM_RAM AM_SHARE("workram") // work ram
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dreamwld_map, AS_PROGRAM, 32, dreamwld_state )

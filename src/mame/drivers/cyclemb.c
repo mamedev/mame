@@ -79,13 +79,18 @@ class cyclemb_state : public driver_device
 {
 public:
 	cyclemb_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_vram(*this, "vram"),
+		m_cram(*this, "cram"),
+		m_obj1_ram(*this, "obj1_ram"),
+		m_obj2_ram(*this, "obj2_ram"),
+		m_obj3_ram(*this, "obj3_ram"){ }
 
-	UINT8 *m_vram;
-	UINT8 *m_cram;
-	UINT8 *m_obj1_ram;
-	UINT8 *m_obj2_ram;
-	UINT8 *m_obj3_ram;
+	required_shared_ptr<UINT8> m_vram;
+	required_shared_ptr<UINT8> m_cram;
+	required_shared_ptr<UINT8> m_obj1_ram;
+	required_shared_ptr<UINT8> m_obj2_ram;
+	required_shared_ptr<UINT8> m_obj3_ram;
 	DECLARE_WRITE8_MEMBER(cyclemb_bankswitch_w);
 	DECLARE_READ8_MEMBER(mcu_status_r);
 	DECLARE_WRITE8_MEMBER(sound_cmd_w);
@@ -256,11 +261,11 @@ WRITE8_MEMBER(cyclemb_state::cyclemb_flip_w)
 static ADDRESS_MAP_START( cyclemb_map, AS_PROGRAM, 8, cyclemb_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x9000, 0x97ff) AM_RAM AM_BASE(m_vram)
-	AM_RANGE(0x9800, 0x9fff) AM_RAM AM_BASE(m_cram)
-	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_BASE(m_obj1_ram) //ORAM1 (only a000-a3ff tested)
-	AM_RANGE(0xa800, 0xafff) AM_RAM AM_BASE(m_obj2_ram) //ORAM2 (only a800-abff tested)
-	AM_RANGE(0xb000, 0xb7ff) AM_RAM AM_BASE(m_obj3_ram) //ORAM3 (only b000-b3ff tested)
+	AM_RANGE(0x9000, 0x97ff) AM_RAM AM_SHARE("vram")
+	AM_RANGE(0x9800, 0x9fff) AM_RAM AM_SHARE("cram")
+	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_SHARE("obj1_ram") //ORAM1 (only a000-a3ff tested)
+	AM_RANGE(0xa800, 0xafff) AM_RAM AM_SHARE("obj2_ram") //ORAM2 (only a800-abff tested)
+	AM_RANGE(0xb000, 0xb7ff) AM_RAM AM_SHARE("obj3_ram") //ORAM3 (only b000-b3ff tested)
 	AM_RANGE(0xb800, 0xbfff) AM_RAM //WRAM
 ADDRESS_MAP_END
 

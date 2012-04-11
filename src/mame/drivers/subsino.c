@@ -232,21 +232,30 @@ class subsino_state : public driver_device
 {
 public:
 	subsino_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_colorram(*this, "colorram"),
+		m_videoram(*this, "videoram"),
+		m_reel3_scroll(*this, "reel3_scroll"),
+		m_reel2_scroll(*this, "reel2_scroll"),
+		m_reel1_scroll(*this, "reel1_scroll"),
+		m_reel1_ram(*this, "reel1_ram"),
+		m_reel2_ram(*this, "reel2_ram"),
+		m_reel3_ram(*this, "reel3_ram"){ }
 
-	UINT8 *m_videoram;
-	UINT8 *m_colorram;
+	required_shared_ptr<UINT8> m_colorram;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_reel3_scroll;
+	required_shared_ptr<UINT8> m_reel2_scroll;
+	required_shared_ptr<UINT8> m_reel1_scroll;
+	required_shared_ptr<UINT8> m_reel1_ram;
+	required_shared_ptr<UINT8> m_reel2_ram;
+	required_shared_ptr<UINT8> m_reel3_ram;
+
 	tilemap_t *m_tmap;
 	tilemap_t *m_reel1_tilemap;
 	tilemap_t *m_reel2_tilemap;
 	tilemap_t *m_reel3_tilemap;
 	int m_tiles_offset;
-	UINT8* m_reel1_ram;
-	UINT8* m_reel2_ram;
-	UINT8* m_reel3_ram;
-	UINT8* m_reel1_scroll;
-	UINT8* m_reel2_scroll;
-	UINT8* m_reel3_scroll;
 	UINT8 m_out_c;
 	UINT8* m_reel1_attr;
 	UINT8* m_reel2_attr;
@@ -1021,13 +1030,13 @@ static ADDRESS_MAP_START( tisub_map, AS_PROGRAM, 8, subsino_state )
 	AM_RANGE( 0x10000, 0x13fff ) AM_ROM
 	AM_RANGE( 0x14000, 0x14fff ) AM_ROM // reads the card face data here (see rom copy in rom loading)
 
-	AM_RANGE( 0x150c0, 0x150ff ) AM_RAM AM_BASE(m_reel3_scroll)
-	AM_RANGE( 0x15140, 0x1517f ) AM_RAM AM_BASE(m_reel2_scroll)
-	AM_RANGE( 0x15180, 0x151bf ) AM_RAM AM_BASE(m_reel1_scroll)
+	AM_RANGE( 0x150c0, 0x150ff ) AM_RAM AM_SHARE("reel3_scroll")
+	AM_RANGE( 0x15140, 0x1517f ) AM_RAM AM_SHARE("reel2_scroll")
+	AM_RANGE( 0x15180, 0x151bf ) AM_RAM AM_SHARE("reel1_scroll")
 
-	AM_RANGE( 0x15800, 0x159ff ) AM_RAM_WRITE(subsino_reel1_ram_w) AM_BASE(m_reel1_ram)
-	AM_RANGE( 0x15a00, 0x15bff ) AM_RAM_WRITE(subsino_reel2_ram_w) AM_BASE(m_reel2_ram)
-	AM_RANGE( 0x15c00, 0x15dff ) AM_RAM_WRITE(subsino_reel3_ram_w) AM_BASE(m_reel3_ram)
+	AM_RANGE( 0x15800, 0x159ff ) AM_RAM_WRITE(subsino_reel1_ram_w) AM_SHARE("reel1_ram")
+	AM_RANGE( 0x15a00, 0x15bff ) AM_RAM_WRITE(subsino_reel2_ram_w) AM_SHARE("reel2_ram")
+	AM_RANGE( 0x15c00, 0x15dff ) AM_RAM_WRITE(subsino_reel3_ram_w) AM_SHARE("reel3_ram")
 ADDRESS_MAP_END
 
 
@@ -1147,9 +1156,9 @@ static ADDRESS_MAP_START( stisub_map, AS_PROGRAM, 8, subsino_state )
 
 	AM_RANGE( 0xf000, 0xf7ff ) AM_READWRITE(reel_scrollattr_r, reel_scrollattr_w)
 
-	AM_RANGE( 0xf800, 0xf9ff ) AM_RAM_WRITE(subsino_reel1_ram_w) AM_BASE(m_reel1_ram)
-	AM_RANGE( 0xfa00, 0xfbff ) AM_RAM_WRITE(subsino_reel2_ram_w) AM_BASE(m_reel2_ram)
-	AM_RANGE( 0xfc00, 0xfdff ) AM_RAM_WRITE(subsino_reel3_ram_w) AM_BASE(m_reel3_ram)
+	AM_RANGE( 0xf800, 0xf9ff ) AM_RAM_WRITE(subsino_reel1_ram_w) AM_SHARE("reel1_ram")
+	AM_RANGE( 0xfa00, 0xfbff ) AM_RAM_WRITE(subsino_reel2_ram_w) AM_SHARE("reel2_ram")
+	AM_RANGE( 0xfc00, 0xfdff ) AM_RAM_WRITE(subsino_reel3_ram_w) AM_SHARE("reel3_ram")
 ADDRESS_MAP_END
 
 
@@ -1188,9 +1197,9 @@ static ADDRESS_MAP_START( mtrainnv_map, AS_PROGRAM, 8, subsino_state )
 
 	AM_RANGE( 0xf000, 0xf7ff ) AM_READWRITE(reel_scrollattr_r, reel_scrollattr_w)
 
-	AM_RANGE( 0xf800, 0xf9ff ) AM_RAM_WRITE(subsino_reel1_ram_w) AM_BASE(m_reel1_ram)
-	AM_RANGE( 0xfa00, 0xfbff ) AM_RAM_WRITE(subsino_reel2_ram_w) AM_BASE(m_reel2_ram)
-	AM_RANGE( 0xfc00, 0xfdff ) AM_RAM_WRITE(subsino_reel3_ram_w) AM_BASE(m_reel3_ram)
+	AM_RANGE( 0xf800, 0xf9ff ) AM_RAM_WRITE(subsino_reel1_ram_w) AM_SHARE("reel1_ram")
+	AM_RANGE( 0xfa00, 0xfbff ) AM_RAM_WRITE(subsino_reel2_ram_w) AM_SHARE("reel2_ram")
+	AM_RANGE( 0xfc00, 0xfdff ) AM_RAM_WRITE(subsino_reel3_ram_w) AM_SHARE("reel3_ram")
 ADDRESS_MAP_END
 
 
@@ -3544,9 +3553,9 @@ static DRIVER_INIT( stisub )
 	rom[0x957] = 0x18; //patch "losing protection" check
 	state->m_stisub_colorram = auto_alloc_array(machine, UINT8, 256*3);
 
-	state->m_reel1_scroll = auto_alloc_array(machine, UINT8, 0x40);
-	state->m_reel2_scroll = auto_alloc_array(machine, UINT8, 0x40);
-	state->m_reel3_scroll = auto_alloc_array(machine, UINT8, 0x40);
+	//state->m_reel1_scroll = auto_alloc_array(machine, UINT8, 0x40);
+	//state->m_reel2_scroll = auto_alloc_array(machine, UINT8, 0x40);
+	//state->m_reel3_scroll = auto_alloc_array(machine, UINT8, 0x40);
 
 	state->m_reel1_attr = auto_alloc_array(machine, UINT8, 0x200);
 	state->m_reel2_attr = auto_alloc_array(machine, UINT8, 0x200);
@@ -3558,9 +3567,9 @@ static DRIVER_INIT( mtrainnv )
 	subsino_state *state = machine.driver_data<subsino_state>();
 	state->m_stisub_colorram = auto_alloc_array(machine, UINT8, 256*3);
 
-	state->m_reel1_scroll = auto_alloc_array(machine, UINT8, 0x40);
-	state->m_reel2_scroll = auto_alloc_array(machine, UINT8, 0x40);
-	state->m_reel3_scroll = auto_alloc_array(machine, UINT8, 0x40);
+	//state->m_reel1_scroll = auto_alloc_array(machine, UINT8, 0x40);
+	//state->m_reel2_scroll = auto_alloc_array(machine, UINT8, 0x40);
+	//state->m_reel3_scroll = auto_alloc_array(machine, UINT8, 0x40);
 
 	state->m_reel1_attr = auto_alloc_array(machine, UINT8, 0x200);
 	state->m_reel2_attr = auto_alloc_array(machine, UINT8, 0x200);

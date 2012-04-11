@@ -92,14 +92,18 @@ class mediagx_state : public driver_device
 {
 public:
 	mediagx_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_main_ram(*this, "main_ram"),
+		m_cga_ram(*this, "cga_ram"),
+		m_bios_ram(*this, "bios_ram"),
+		m_vram(*this, "vram"){ }
 
-	UINT32 *m_cga_ram;
-	UINT32 *m_bios_ram;
-	UINT32 *m_vram;
+	required_shared_ptr<UINT32> m_main_ram;
+	required_shared_ptr<UINT32> m_cga_ram;
+	required_shared_ptr<UINT32> m_bios_ram;
+	required_shared_ptr<UINT32> m_vram;
 	UINT8 m_pal[768];
 
-	UINT32 *m_main_ram;
 
 	UINT32 m_disp_ctrl_reg[256/4];
 	int m_frame_width;
@@ -339,7 +343,7 @@ static void draw_cga(running_machine &machine, bitmap_rgb32 &bitmap, const recta
 	mediagx_state *state = machine.driver_data<mediagx_state>();
 	int i, j;
 	const gfx_element *gfx = machine.gfx[0];
-	UINT32 *cga = state->m_cga_ram;
+	UINT32 *cga = state->m_cga_ram.target();
 	int index = 0;
 
 	for (j=0; j < 25; j++)
@@ -909,15 +913,15 @@ static I8237_INTERFACE( dma8237_2_config )
 /*****************************************************************************/
 
 static ADDRESS_MAP_START( mediagx_map, AS_PROGRAM, 32, mediagx_state )
-	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM AM_BASE(m_main_ram)
+	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM AM_SHARE("main_ram")
 	AM_RANGE(0x000a0000, 0x000affff) AM_RAM
-	AM_RANGE(0x000b0000, 0x000b7fff) AM_RAM AM_BASE(m_cga_ram)
-	AM_RANGE(0x000c0000, 0x000fffff) AM_RAM AM_BASE(m_bios_ram)
+	AM_RANGE(0x000b0000, 0x000b7fff) AM_RAM AM_SHARE("cga_ram")
+	AM_RANGE(0x000c0000, 0x000fffff) AM_RAM AM_SHARE("bios_ram")
 	AM_RANGE(0x00100000, 0x00ffffff) AM_RAM
 	AM_RANGE(0x40008000, 0x400080ff) AM_READWRITE(biu_ctrl_r, biu_ctrl_w)
 	AM_RANGE(0x40008300, 0x400083ff) AM_READWRITE(disp_ctrl_r, disp_ctrl_w)
 	AM_RANGE(0x40008400, 0x400084ff) AM_READWRITE(memory_ctrl_r, memory_ctrl_w)
-	AM_RANGE(0x40800000, 0x40bfffff) AM_RAM AM_BASE(m_vram)
+	AM_RANGE(0x40800000, 0x40bfffff) AM_RAM AM_SHARE("vram")
 	AM_RANGE(0xfffc0000, 0xffffffff) AM_ROM AM_REGION("bios", 0)	/* System BIOS */
 ADDRESS_MAP_END
 

@@ -47,12 +47,15 @@ class aceal_state : public driver_device
 {
 public:
 	aceal_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_scoreram(*this, "scoreram"),
+		m_ram2(*this, "ram2"),
+		m_characterram(*this, "characterram"){ }
 
 	/* video-related */
-	UINT8 *  m_ram2;
-	UINT8 *  m_scoreram;
-	UINT8 *  m_characterram;
+	required_shared_ptr<UINT8> m_scoreram;
+	required_shared_ptr<UINT8> m_ram2;
+	required_shared_ptr<UINT8> m_characterram;
 
 	/* input-related */
 	int m_objpos[8];
@@ -167,9 +170,9 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, aceal_state )
 
 	AM_RANGE(0x0000, 0x09ff) AM_ROM
 
-	AM_RANGE(0x2000, 0x20ff) AM_RAM_WRITE(ace_scoreram_w) AM_BASE(m_scoreram)	/* 2x2101 */
-	AM_RANGE(0x8300, 0x83ff) AM_RAM AM_BASE(m_ram2)	/* 2x2101 */
-	AM_RANGE(0x8000, 0x80ff) AM_RAM_WRITE(ace_characterram_w) AM_BASE(m_characterram)	/* 3x3101 (3bits: 0, 1, 2) */
+	AM_RANGE(0x2000, 0x20ff) AM_RAM_WRITE(ace_scoreram_w) AM_SHARE("scoreram")	/* 2x2101 */
+	AM_RANGE(0x8300, 0x83ff) AM_RAM AM_SHARE("ram2")	/* 2x2101 */
+	AM_RANGE(0x8000, 0x80ff) AM_RAM_WRITE(ace_characterram_w) AM_SHARE("characterram")	/* 3x3101 (3bits: 0, 1, 2) */
 
 	AM_RANGE(0xc000, 0xc005) AM_WRITE(ace_objpos_w)
 

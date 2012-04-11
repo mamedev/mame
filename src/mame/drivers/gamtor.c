@@ -32,7 +32,7 @@ class gaminator_state : public driver_device
 {
 public:
 	gaminator_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag){ }
 	DECLARE_WRITE32_MEMBER(gamtor_unk_w);
 };
 
@@ -53,8 +53,8 @@ static ADDRESS_MAP_START( gaminator_map, AS_PROGRAM, 32, gaminator_state )
 	/* standard VGA */
 //  AM_RANGE(0x40000000, 0x40000fff) AM_RAM // regs
 	AM_RANGE(0x44000000, 0x4401ffff) AM_RAM // VRAM
-//  AM_RANGE(0x44000000, 0x44007fff) AM_RAM AM_BASE(m_tmapram1) // puts strings here, looks almost like a tilemap, but where are the tiles?
-//  AM_RANGE(0x440a0000, 0x440a1fff) AM_RAM AM_BASE(m_tmapram2) // beetlem (like above, mirror?)
+//  AM_RANGE(0x44000000, 0x44007fff) AM_RAM AM_SHARE("tmapram1") // puts strings here, looks almost like a tilemap, but where are the tiles?
+//  AM_RANGE(0x440a0000, 0x440a1fff) AM_RAM AM_SHARE("tmapram2") // beetlem (like above, mirror?)
 
 	AM_RANGE(0xe0000000, 0xe00001ff) AM_RAM // nvram?
 

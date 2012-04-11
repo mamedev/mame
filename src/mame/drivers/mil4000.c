@@ -95,12 +95,16 @@ class mil4000_state : public driver_device
 {
 public:
 	mil4000_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_sc0_vram(*this, "sc0_vram"),
+		m_sc1_vram(*this, "sc1_vram"),
+		m_sc2_vram(*this, "sc2_vram"),
+		m_sc3_vram(*this, "sc3_vram"){ }
 
-	UINT16 *m_sc0_vram;
-	UINT16 *m_sc1_vram;
-	UINT16 *m_sc2_vram;
-	UINT16 *m_sc3_vram;
+	required_shared_ptr<UINT16> m_sc0_vram;
+	required_shared_ptr<UINT16> m_sc1_vram;
+	required_shared_ptr<UINT16> m_sc2_vram;
+	required_shared_ptr<UINT16> m_sc3_vram;
 	tilemap_t *m_sc0_tilemap;
 	tilemap_t *m_sc1_tilemap;
 	tilemap_t *m_sc2_tilemap;
@@ -273,10 +277,10 @@ WRITE16_MEMBER(mil4000_state::output_w)
 
 static ADDRESS_MAP_START( mil4000_map, AS_PROGRAM, 16, mil4000_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x500000, 0x503fff) AM_RAM_WRITE(sc0_vram_w) AM_BASE(m_sc0_vram)	// CY62256L-70, U77
-	AM_RANGE(0x504000, 0x507fff) AM_RAM_WRITE(sc1_vram_w) AM_BASE(m_sc1_vram)	// CY62256L-70, U77
-	AM_RANGE(0x508000, 0x50bfff) AM_RAM_WRITE(sc2_vram_w) AM_BASE(m_sc2_vram)	// CY62256L-70, U78
-	AM_RANGE(0x50c000, 0x50ffff) AM_RAM_WRITE(sc3_vram_w) AM_BASE(m_sc3_vram)	// CY62256L-70, U78
+	AM_RANGE(0x500000, 0x503fff) AM_RAM_WRITE(sc0_vram_w) AM_SHARE("sc0_vram")	// CY62256L-70, U77
+	AM_RANGE(0x504000, 0x507fff) AM_RAM_WRITE(sc1_vram_w) AM_SHARE("sc1_vram")	// CY62256L-70, U77
+	AM_RANGE(0x508000, 0x50bfff) AM_RAM_WRITE(sc2_vram_w) AM_SHARE("sc2_vram")	// CY62256L-70, U78
+	AM_RANGE(0x50c000, 0x50ffff) AM_RAM_WRITE(sc3_vram_w) AM_SHARE("sc3_vram")	// CY62256L-70, U78
 
 	AM_RANGE(0x708000, 0x708001) AM_READ_PORT("IN0")
 	AM_RANGE(0x708002, 0x708003) AM_READ_PORT("IN1")

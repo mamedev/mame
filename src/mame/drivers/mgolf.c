@@ -11,10 +11,11 @@ class mgolf_state : public driver_device
 {
 public:
 	mgolf_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_video_ram(*this, "video_ram"){ }
 
 	/* memory pointers */
-	UINT8*   m_video_ram;
+	required_shared_ptr<UINT8> m_video_ram;
 
 	/* video-related */
 	tilemap_t* m_bg_tilemap;
@@ -207,7 +208,7 @@ static ADDRESS_MAP_START( cpu_map, AS_PROGRAM, 8, mgolf_state )
 	AM_RANGE(0x006d, 0x006d) AM_WRITENOP
 	AM_RANGE(0x0080, 0x00ff) AM_WRITE(mgolf_wram_w)
 	AM_RANGE(0x0180, 0x01ff) AM_WRITE(mgolf_wram_w)
-	AM_RANGE(0x0800, 0x0bff) AM_WRITE(mgolf_vram_w) AM_BASE(m_video_ram)
+	AM_RANGE(0x0800, 0x0bff) AM_WRITE(mgolf_vram_w) AM_SHARE("video_ram")
 
 	AM_RANGE(0x2000, 0x3fff) AM_ROM
 ADDRESS_MAP_END

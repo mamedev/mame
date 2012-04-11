@@ -56,9 +56,10 @@ class carrera_state : public driver_device
 {
 public:
 	carrera_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_tileram(*this, "tileram"){ }
 
-	UINT8* m_tileram;
+	required_shared_ptr<UINT8> m_tileram;
 };
 
 
@@ -67,7 +68,7 @@ static ADDRESS_MAP_START( carrera_map, AS_PROGRAM, 8, carrera_state )
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM
 	AM_RANGE(0xe800, 0xe800) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0xe801, 0xe801) AM_DEVWRITE("crtc", mc6845_device, register_w)
-	AM_RANGE(0xf000, 0xffff) AM_RAM AM_BASE(m_tileram)
+	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("tileram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( io_map, AS_IO, 8, carrera_state )

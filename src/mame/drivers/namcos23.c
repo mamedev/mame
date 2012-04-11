@@ -1319,7 +1319,11 @@ class namcos23_state : public driver_device
 {
 public:
 	namcos23_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_shared_ram(*this, "shared_ram"),
+		m_charram(*this, "charram"),
+		m_textram(*this, "textram"),
+		m_gmen_sh2_shared(*this, "gmen_sh2_shared"){ }
 
 	c361_t m_c361;
 	c417_t m_c417;
@@ -1329,10 +1333,10 @@ public:
 	render_t m_render;
 
 	tilemap_t *m_bgtilemap;
-	UINT32 *m_textram;
-	UINT32 *m_shared_ram;
-	UINT32 *m_gmen_sh2_shared;
-	UINT32 *m_charram;
+	required_shared_ptr<UINT32> m_shared_ram;
+	required_shared_ptr<UINT32> m_charram;
+	required_shared_ptr<UINT32> m_textram;
+	required_shared_ptr<UINT32> m_gmen_sh2_shared;
 	UINT8 m_jvssense;
 	INT32 m_has_jvsio;
 	bool m_ctl_vbl_active;
@@ -2393,7 +2397,7 @@ static void render_run(running_machine &machine, bitmap_rgb32 &bitmap)
 static VIDEO_START( ss23 )
 {
 	namcos23_state *state = machine.driver_data<namcos23_state>();
-	gfx_element_set_source(machine.gfx[0], (UINT8 *)state->m_charram);
+	gfx_element_set_source(machine.gfx[0], (UINT8 *)state->m_charram.target());
 	state->m_bgtilemap = tilemap_create(machine, TextTilemapGetInfo, tilemap_scan_rows, 16, 16, 64, 64);
 	state->m_bgtilemap->set_transparent_pen(0xf);
 
@@ -2452,7 +2456,7 @@ static ADDRESS_MAP_START( gorgon_map, AS_PROGRAM, 32, namcos23_state )
 	AM_RANGE(0x00000000, 0x003fffff) AM_RAM
 	AM_RANGE(0x01000000, 0x010000ff) AM_READWRITE(p3d_r, p3d_w )
 	AM_RANGE(0x02000000, 0x0200000f) AM_READWRITE16(s23_c417_r, s23_c417_w, 0xffffffff )
-	AM_RANGE(0x04400000, 0x0440ffff) AM_READWRITE(gorgon_sharedram_r, gorgon_sharedram_w ) AM_BASE(m_shared_ram)
+	AM_RANGE(0x04400000, 0x0440ffff) AM_READWRITE(gorgon_sharedram_r, gorgon_sharedram_w ) AM_SHARE("shared_ram")
 
 	AM_RANGE(0x04c3ff08, 0x04c3ff0b) AM_WRITE(s23_mcuen_w )
 	AM_RANGE(0x04c3ff0c, 0x04c3ff0f) AM_RAM
@@ -2461,9 +2465,9 @@ static ADDRESS_MAP_START( gorgon_map, AS_PROGRAM, 32, namcos23_state )
 
 	AM_RANGE(0x06108000, 0x061087ff) AM_RAM		// GAMMA (C404-3S)
 	AM_RANGE(0x06110000, 0x0613ffff) AM_RAM_WRITE(namcos23_paletteram_w ) AM_SHARE("paletteram")
-	AM_RANGE(0x06400000, 0x06403fff) AM_RAM_WRITE(s23_txtchar_w ) AM_BASE(m_charram)	// text layer characters
+	AM_RANGE(0x06400000, 0x06403fff) AM_RAM_WRITE(s23_txtchar_w ) AM_SHARE("charram")	// text layer characters
 	AM_RANGE(0x06404000, 0x0641dfff) AM_RAM
-	AM_RANGE(0x0641e000, 0x0641ffff) AM_RAM_WRITE(namcos23_textram_w ) AM_BASE(m_textram)
+	AM_RANGE(0x0641e000, 0x0641ffff) AM_RAM_WRITE(namcos23_textram_w ) AM_SHARE("textram")
 
 	AM_RANGE(0x08000000, 0x087fffff) AM_ROM AM_REGION("data", 0)	// data ROMs
 
@@ -2483,15 +2487,15 @@ static ADDRESS_MAP_START( ss23_map, AS_PROGRAM, 32, namcos23_state )
 	AM_RANGE(0x00000000, 0x00ffffff) AM_RAM
 	AM_RANGE(0x01000000, 0x010000ff) AM_READWRITE(p3d_r, p3d_w )
 	AM_RANGE(0x02000000, 0x0200000f) AM_READWRITE16(s23_c417_r, s23_c417_w, 0xffffffff )
-	AM_RANGE(0x04400000, 0x0440ffff) AM_RAM AM_BASE(m_shared_ram)
+	AM_RANGE(0x04400000, 0x0440ffff) AM_RAM AM_SHARE("shared_ram")
 	AM_RANGE(0x04c3ff08, 0x04c3ff0b) AM_WRITE(s23_mcuen_w )
 	AM_RANGE(0x04c3ff0c, 0x04c3ff0f) AM_RAM
 	AM_RANGE(0x06000000, 0x0600ffff) AM_RAM AM_SHARE("nvram") // Backup
 	AM_RANGE(0x06200000, 0x06203fff) AM_RAM                             // C422
 	AM_RANGE(0x06400000, 0x0640000f) AM_READWRITE16(s23_c422_r, s23_c422_w, 0xffffffff ) // C422 registers
-	AM_RANGE(0x06800000, 0x06807fff) AM_RAM_WRITE(s23_txtchar_w ) AM_BASE(m_charram) // text layer characters (shown as CGRAM in POST)
+	AM_RANGE(0x06800000, 0x06807fff) AM_RAM_WRITE(s23_txtchar_w ) AM_SHARE("charram") // text layer characters (shown as CGRAM in POST)
 	AM_RANGE(0x06804000, 0x0681dfff) AM_RAM
-	AM_RANGE(0x0681e000, 0x0681ffff) AM_RAM_WRITE(namcos23_textram_w ) AM_BASE(m_textram)
+	AM_RANGE(0x0681e000, 0x0681ffff) AM_RAM_WRITE(namcos23_textram_w ) AM_SHARE("textram")
 	AM_RANGE(0x06820000, 0x0682000f) AM_READWRITE16(s23_c361_r, s23_c361_w, 0xffffffff ) // C361
 	AM_RANGE(0x06a08000, 0x06a087ff) AM_RAM // Blending control & GAMMA (C404)
 	AM_RANGE(0x06a10000, 0x06a3ffff) AM_RAM_WRITE(namcos23_paletteram_w ) AM_SHARE("paletteram")
@@ -2530,7 +2534,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( gmen_sh2_map, AS_PROGRAM, 32, namcos23_state )
-	AM_RANGE( 0x00000000, 0x00007fff ) AM_RAM AM_BASE(m_gmen_sh2_shared)
+	AM_RANGE( 0x00000000, 0x00007fff ) AM_RAM AM_SHARE("gmen_sh2_shared")
 	AM_RANGE( 0x04000000, 0x043fffff ) AM_RAM	// SH-2 main work RAM
 ADDRESS_MAP_END
 
@@ -2542,7 +2546,7 @@ static MACHINE_RESET(gmen)
 
 WRITE16_MEMBER(namcos23_state::sharedram_sub_w)
 {
-	UINT16 *shared16 = (UINT16 *)m_shared_ram;
+	UINT16 *shared16 = (UINT16 *)m_shared_ram.target();
 
 	// fake that an I/O board is connected for games w/o a dump or that aren't properly communicating with it yet
 	if (!m_has_jvsio)
@@ -2558,7 +2562,7 @@ WRITE16_MEMBER(namcos23_state::sharedram_sub_w)
 
 READ16_MEMBER(namcos23_state::sharedram_sub_r)
 {
-	UINT16 *shared16 = (UINT16 *)m_shared_ram;
+	UINT16 *shared16 = (UINT16 *)m_shared_ram.target();
 
 	return shared16[BYTE_XOR_BE(offset)];
 }

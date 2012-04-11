@@ -8,9 +8,10 @@ class hotstuff_state : public driver_device
 {
 public:
 	hotstuff_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_bitmapram(*this, "bitmapram"){ }
 
-	UINT16* m_bitmapram;
+	required_shared_ptr<UINT16> m_bitmapram;
 	struct
 	{
 		UINT8 index;
@@ -114,7 +115,7 @@ static ADDRESS_MAP_START( hotstuff_map, AS_PROGRAM, 16, hotstuff_state )
 	AM_RANGE(0x680000, 0x680001) AM_READWRITE8(ioboard_status_r,ioboard_data_w,0xff00)
 	AM_RANGE(0x680000, 0x680001) AM_READWRITE8(ioboard_unk_r,ioboard_reg_w,0x00ff)
 
-	AM_RANGE(0x980000, 0x9bffff) AM_RAM AM_BASE(m_bitmapram)
+	AM_RANGE(0x980000, 0x9bffff) AM_RAM AM_SHARE("bitmapram")
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( hotstuff )

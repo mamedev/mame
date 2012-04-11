@@ -33,7 +33,11 @@ class splus_state : public driver_device
 public:
 	splus_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_cmosl_ram(*this, "cmosl"), m_cmosh_ram(*this, "cmosh")
+		m_cmosl_ram(*this, "cmosl"), 
+		m_cmosh_ram(*this, "cmosh"), 
+		m_program_ram(*this, "program_ram"), 
+		m_reel_ram(*this, "reel_ram"), 
+		m_io_port(*this, "io_port")
 	{
 		m_sda_dir = 0;
 		m_coin_state = 0;
@@ -58,11 +62,11 @@ public:
 	required_shared_ptr<UINT8> m_cmosh_ram;
 
 	// Program and Reel Data
-	UINT8 *m_program_ram;
-	UINT8 *m_reel_ram;
+	required_shared_ptr<UINT8> m_program_ram;
+	required_shared_ptr<UINT8> m_reel_ram;
 
 	// IO Ports
-	UINT8 *m_io_port;
+	required_shared_ptr<UINT8> m_io_port;
 
 	// EEPROM States
 	int m_sda_dir;
@@ -586,7 +590,7 @@ static DRIVER_INIT( splus )
 *************************/
 
 static ADDRESS_MAP_START( splus_map, AS_PROGRAM, 8, splus_state )
-	AM_RANGE(0x0000, 0xffff) AM_ROM AM_BASE(m_program_ram)
+	AM_RANGE(0x0000, 0xffff) AM_ROM AM_SHARE("prograram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( splus_iomap, AS_IO, 8, splus_state )
@@ -616,10 +620,10 @@ static ADDRESS_MAP_START( splus_iomap, AS_IO, 8, splus_state )
 	AM_RANGE(0x7000, 0x7fff) AM_RAM AM_SHARE("cmosh")
 
     // SSxxxx Reel Chip
-    AM_RANGE(0x8000, 0x9fff) AM_READ(splus_m_reel_ram_r) AM_BASE(m_reel_ram)
+    AM_RANGE(0x8000, 0x9fff) AM_READ(splus_m_reel_ram_r) AM_SHARE("reel_ram")
 
 	// Ports start here
-	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P3) AM_READ(splus_io_r) AM_WRITE(splus_io_w) AM_BASE(m_io_port)
+	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P3) AM_READ(splus_io_r) AM_WRITE(splus_io_w) AM_SHARE("io_port")
 ADDRESS_MAP_END
 
 /*************************

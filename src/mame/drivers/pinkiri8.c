@@ -39,15 +39,22 @@ class pinkiri8_state : public driver_device
 {
 public:
 	pinkiri8_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_janshi_back_vram(*this, "janshi_back_vram"),
+		m_janshi_vram1(*this, "janshi_vram1"),
+		m_janshi_unk1(*this, "janshi_unk1"),
+		m_janshi_widthflags(*this, "janshi_widthflags"),
+		m_janshi_unk2(*this, "janshi_unk2"),
+		m_janshi_vram2(*this, "janshi_vram2"),
+		m_janshi_crtc_regs(*this, "janshi_crtc_regs"){ }
 
-	UINT8* m_janshi_vram1;
-	UINT8* m_janshi_vram2;
-	UINT8* m_janshi_back_vram;
-	UINT8* m_janshi_crtc_regs;
-	UINT8* m_janshi_unk1;
-	UINT8* m_janshi_widthflags;
-	UINT8* m_janshi_unk2;
+	required_shared_ptr<UINT8> m_janshi_back_vram;
+	required_shared_ptr<UINT8> m_janshi_vram1;
+	required_shared_ptr<UINT8> m_janshi_unk1;
+	required_shared_ptr<UINT8> m_janshi_widthflags;
+	required_shared_ptr<UINT8> m_janshi_unk2;
+	required_shared_ptr<UINT8> m_janshi_vram2;
+	required_shared_ptr<UINT8> m_janshi_crtc_regs;
 	UINT32 m_vram_addr;
 	int m_prev_writes;
 	UINT8 m_mux_data;
@@ -68,19 +75,19 @@ public:
 
 static ADDRESS_MAP_START( janshi_vdp_map8, AS_0, 8, pinkiri8_state )
 
-	AM_RANGE(0xfc0000, 0xfc1fff) AM_RAM AM_BASE(m_janshi_back_vram) // bg tilemap?
-	AM_RANGE(0xfc2000, 0xfc2fff) AM_RAM AM_BASE(m_janshi_vram1) // xpos, colour, tile number etc.
+	AM_RANGE(0xfc0000, 0xfc1fff) AM_RAM AM_SHARE("janshi_back_vram") // bg tilemap?
+	AM_RANGE(0xfc2000, 0xfc2fff) AM_RAM AM_SHARE("janshi_vram1") // xpos, colour, tile number etc.
 
-	AM_RANGE(0xfc3700, 0xfc377f) AM_RAM AM_BASE(m_janshi_unk1) // ?? height related?
-	AM_RANGE(0xfc3780, 0xfc37bf) AM_RAM AM_BASE(m_janshi_widthflags)
-	AM_RANGE(0xfc37c0, 0xfc37ff) AM_RAM AM_BASE(m_janshi_unk2) // 2x increasing tables 00 10 20 30 etc.
+	AM_RANGE(0xfc3700, 0xfc377f) AM_RAM AM_SHARE("janshi_unk1") // ?? height related?
+	AM_RANGE(0xfc3780, 0xfc37bf) AM_RAM AM_SHARE("janshi_widthflags")
+	AM_RANGE(0xfc37c0, 0xfc37ff) AM_RAM AM_SHARE("janshi_unk2") // 2x increasing tables 00 10 20 30 etc.
 
-	AM_RANGE(0xfc3800, 0xfc3fff) AM_RAM AM_BASE(m_janshi_vram2) // y pos + unknown
+	AM_RANGE(0xfc3800, 0xfc3fff) AM_RAM AM_SHARE("janshi_vram2") // y pos + unknown
 
 	AM_RANGE(0xff0000, 0xff07ff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_byte_split_lo_w) AM_SHARE("paletteram")
 	AM_RANGE(0xff2000, 0xff27ff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_byte_split_hi_w) AM_SHARE("paletteram2")
 
-	AM_RANGE(0xff6000, 0xff601f) AM_RAM AM_BASE(m_janshi_crtc_regs)
+	AM_RANGE(0xff6000, 0xff601f) AM_RAM AM_SHARE("janshi_crtc_regs")
 ADDRESS_MAP_END
 
 

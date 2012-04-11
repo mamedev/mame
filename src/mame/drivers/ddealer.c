@@ -117,17 +117,25 @@ class ddealer_state : public driver_device
 {
 public:
 	ddealer_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_vregs(*this, "vregs"),
+		m_left_fg_vram_top(*this, "left_fg_vratop"),
+		m_right_fg_vram_top(*this, "right_fg_vratop"),
+		m_left_fg_vram_bottom(*this, "left_fg_vrabottom"),
+		m_right_fg_vram_bottom(*this, "right_fg_vrabottom"),
+		m_back_vram(*this, "back_vram"),
+		m_work_ram(*this, "work_ram"),
+		m_mcu_shared_ram(*this, "mcu_shared_ram"){ }
 
 	/* memory pointers */
-	UINT16 *  m_mcu_shared_ram;
-	UINT16 *  m_work_ram;
-	UINT16 *  m_back_vram;
-	UINT16 *  m_left_fg_vram_top;
-	UINT16 *  m_right_fg_vram_top;
-	UINT16 *  m_left_fg_vram_bottom;
-	UINT16 *  m_right_fg_vram_bottom;
-	UINT16 *  m_vregs;
+	required_shared_ptr<UINT16> m_vregs;
+	required_shared_ptr<UINT16> m_left_fg_vram_top;
+	required_shared_ptr<UINT16> m_right_fg_vram_top;
+	required_shared_ptr<UINT16> m_left_fg_vram_bottom;
+	required_shared_ptr<UINT16> m_right_fg_vram_bottom;
+	required_shared_ptr<UINT16> m_back_vram;
+	required_shared_ptr<UINT16> m_work_ram;
+	required_shared_ptr<UINT16> m_mcu_shared_ram;
 //  UINT16 *  m_paletteram16; // currently this uses generic palette handling
 
 	/* video-related */
@@ -461,18 +469,18 @@ static ADDRESS_MAP_START( ddealer, AS_PROGRAM, 16, ddealer_state )
 	AM_RANGE(0x08000a, 0x08000b) AM_READ_PORT("UNK")
 	AM_RANGE(0x084000, 0x084003) AM_DEVWRITE8_LEGACY("ymsnd", ym2203_w, 0x00ff) // ym ?
 	AM_RANGE(0x088000, 0x0887ff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBRGBx_word_w) AM_SHARE("paletteram") // palette ram
-	AM_RANGE(0x08c000, 0x08cfff) AM_RAM_WRITE(ddealer_vregs_w) AM_BASE(m_vregs) // palette ram
+	AM_RANGE(0x08c000, 0x08cfff) AM_RAM_WRITE(ddealer_vregs_w) AM_SHARE("vregs") // palette ram
 
 	/* this might actually be 1 tilemap with some funky rowscroll / columnscroll enabled, I'm not sure */
-	AM_RANGE(0x090000, 0x090fff) AM_RAM AM_BASE(m_left_fg_vram_top)
-	AM_RANGE(0x091000, 0x091fff) AM_RAM AM_BASE(m_right_fg_vram_top)
-	AM_RANGE(0x092000, 0x092fff) AM_RAM AM_BASE(m_left_fg_vram_bottom)
-	AM_RANGE(0x093000, 0x093fff) AM_RAM AM_BASE(m_right_fg_vram_bottom)
+	AM_RANGE(0x090000, 0x090fff) AM_RAM AM_SHARE("left_fg_vratop")
+	AM_RANGE(0x091000, 0x091fff) AM_RAM AM_SHARE("right_fg_vratop")
+	AM_RANGE(0x092000, 0x092fff) AM_RAM AM_SHARE("left_fg_vrabottom")
+	AM_RANGE(0x093000, 0x093fff) AM_RAM AM_SHARE("right_fg_vrabottom")
 	//AM_RANGE(0x094000, 0x094001) AM_NOP // always 0?
 	AM_RANGE(0x098000, 0x098001) AM_WRITE(ddealer_flipscreen_w)
-	AM_RANGE(0x09c000, 0x09cfff) AM_RAM_WRITE(back_vram_w) AM_BASE(m_back_vram) // bg tilemap
-	AM_RANGE(0x0f0000, 0x0fdfff) AM_RAM AM_BASE(m_work_ram)
-	AM_RANGE(0x0fe000, 0x0fefff) AM_RAM_WRITE(ddealer_mcu_shared_w) AM_BASE(m_mcu_shared_ram)
+	AM_RANGE(0x09c000, 0x09cfff) AM_RAM_WRITE(back_vram_w) AM_SHARE("back_vram") // bg tilemap
+	AM_RANGE(0x0f0000, 0x0fdfff) AM_RAM AM_SHARE("work_ram")
+	AM_RANGE(0x0fe000, 0x0fefff) AM_RAM_WRITE(ddealer_mcu_shared_w) AM_SHARE("mcu_shared_ram")
 	AM_RANGE(0x0ff000, 0x0fffff) AM_RAM
 ADDRESS_MAP_END
 

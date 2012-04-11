@@ -68,10 +68,12 @@ class nsmpoker_state : public driver_device
 {
 public:
 	nsmpoker_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"),
+		m_colorram(*this, "colorram"){ }
 
-	UINT8 *m_videoram;
-	UINT8 *m_colorram;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_colorram;
 	tilemap_t *m_bg_tilemap;
 	DECLARE_WRITE8_MEMBER(nsmpoker_videoram_w);
 	DECLARE_WRITE8_MEMBER(nsmpoker_colorram_w);
@@ -166,8 +168,8 @@ static ADDRESS_MAP_START( nsmpoker_map, AS_PROGRAM, 8, nsmpoker_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x9000, 0xafff) AM_RAM	// OK... cleared at beginning.
 	AM_RANGE(0xb000, 0xcfff) AM_ROM	// WRONG... just to map the last rom somewhere.
-	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(nsmpoker_videoram_w) AM_BASE(m_videoram) // WRONG... just a placeholder.
-	AM_RANGE(0xf000, 0xffff) AM_RAM_WRITE(nsmpoker_colorram_w) AM_BASE(m_colorram) // WRONG... just a placeholder.
+	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(nsmpoker_videoram_w) AM_SHARE("videoram") // WRONG... just a placeholder.
+	AM_RANGE(0xf000, 0xffff) AM_RAM_WRITE(nsmpoker_colorram_w) AM_SHARE("colorram") // WRONG... just a placeholder.
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( nsmpoker_portmap, AS_IO, 8, nsmpoker_state )

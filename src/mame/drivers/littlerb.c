@@ -77,9 +77,13 @@ public:
 		: driver_device(mconfig, type, tag),
 		  m_maincpu(*this, "maincpu"),
 		  m_dacl(*this, "dacl"),
-	      m_dacr(*this, "dacr")
-		{ }
+	      m_dacr(*this, "dacr"),
+		m_region4(*this, "region4"){ }
 
+	required_device<cpu_device> m_maincpu;
+	required_device<dac_device> m_dacl;
+	required_device<dac_device> m_dacr;
+	required_shared_ptr<UINT16> m_region4;
 	UINT16 m_vdp_address_low;
 	UINT16 m_vdp_address_high;
 	UINT16 m_vdp_writemode;
@@ -88,7 +92,6 @@ public:
 	UINT32 m_write_address_laststart;
 	UINT32 m_write_address_lastend;
 
-	UINT16* m_region4;
 	UINT8 m_paldac[3][0x100];
 	int m_paldac_select;
 	int m_paldac_offset;
@@ -97,9 +100,6 @@ public:
 	UINT8 m_sound_index_l,m_sound_index_r;
 	UINT16 m_sound_pointer_l,m_sound_pointer_r;
 
-	required_device<cpu_device> m_maincpu;
-	required_device<dac_device> m_dacl;
-	required_device<dac_device> m_dacr;
 	DECLARE_WRITE16_MEMBER(region4_w);
 	DECLARE_READ16_MEMBER(buffer_status_r);
 	DECLARE_READ16_MEMBER(littlerb_vdp_r);
@@ -133,7 +133,7 @@ static ADDRESS_MAP_START( littlerb_vdp_map8, AS_0, 16, littlerb_state )
 
 	AM_RANGE(0x1ff80804, 0x1ff80805) AM_DEVREAD("^", littlerb_state, buffer_status_r)
 	// most gfx end up here including the sprite list
-	AM_RANGE(0x1ff80000, 0x1fffffff) AM_RAM AM_DEVWRITE("^", littlerb_state, region4_w)  AM_BASE(m_region4)
+	AM_RANGE(0x1ff80000, 0x1fffffff) AM_RAM AM_DEVWRITE("^", littlerb_state, region4_w)  AM_SHARE("region4")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ramdac_map, AS_0, 8, littlerb_state )

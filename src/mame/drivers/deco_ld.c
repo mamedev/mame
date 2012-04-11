@@ -112,11 +112,12 @@ class deco_ld_state : public driver_device
 public:
 	deco_ld_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_laserdisc(*this, "laserdisc") { }
+		  m_laserdisc(*this, "laserdisc") ,
+		m_videoram(*this, "videoram"){ }
 
-	UINT8 *m_videoram;
-	UINT8 m_vram_bank;
 	required_device<pioneer_ldv1000_device> m_laserdisc;
+	required_shared_ptr<UINT8> m_videoram;
+	UINT8 m_vram_bank;
 	UINT8 m_laserdisc_data;
 	int m_nmimask;
 	DECLARE_WRITE8_MEMBER(rblaster_sound_w);
@@ -132,7 +133,7 @@ public:
 static SCREEN_UPDATE_IND16( rblaster )
 {
 	deco_ld_state *state = screen.machine().driver_data<deco_ld_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = state->m_videoram.target();
 	const gfx_element *gfx = screen.machine().gfx[0];
 	int count = 0x0000;
 
@@ -198,7 +199,7 @@ static ADDRESS_MAP_START( begas_map, AS_PROGRAM, 8, deco_ld_state )
 	AM_RANGE(0x1007, 0x1007) AM_READWRITE(laserdisc_r,laserdisc_w) // ld data
 	AM_RANGE(0x1800, 0x1fff) AM_RAM_WRITE(paletteram_RRRGGGBB_byte_w) AM_SHARE("paletteram")
 	AM_RANGE(0x2000, 0x27ff) AM_RAM
-	AM_RANGE(0x2800, 0x2fff) AM_RAM AM_BASE(m_videoram)
+	AM_RANGE(0x2800, 0x2fff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0x3000, 0x3fff) AM_RAM
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -217,7 +218,7 @@ static ADDRESS_MAP_START( cobra_map, AS_PROGRAM, 8, deco_ld_state )
 	AM_RANGE(0x1800, 0x1fff) AM_RAM_WRITE(paletteram_RRRGGGBB_byte_w) AM_SHARE("paletteram")
 	AM_RANGE(0x2000, 0x2fff) AM_RAM
 	AM_RANGE(0x3000, 0x37ff) AM_RAM //vram attr?
-	AM_RANGE(0x3800, 0x3fff) AM_RAM AM_BASE(m_videoram)
+	AM_RANGE(0x3800, 0x3fff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -231,7 +232,7 @@ static ADDRESS_MAP_START( rblaster_map, AS_PROGRAM, 8, deco_ld_state )
 	AM_RANGE(0x1006, 0x1006) AM_NOP //ld status / command
 	AM_RANGE(0x1007, 0x1007) AM_READWRITE(laserdisc_r,laserdisc_w) // ld data
 	AM_RANGE(0x1800, 0x1fff) AM_RAM_WRITE(paletteram_RRRGGGBB_byte_w) AM_SHARE("paletteram")
-	AM_RANGE(0x2800, 0x2fff) AM_RAM AM_BASE(m_videoram)
+	AM_RANGE(0x2800, 0x2fff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0x3000, 0x3fff) AM_RAM
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END

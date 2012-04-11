@@ -32,13 +32,14 @@ class superdq_state : public driver_device
 public:
 	superdq_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_laserdisc(*this, "laserdisc") { }
+		  m_laserdisc(*this, "laserdisc") ,
+		m_videoram(*this, "videoram"){ }
 
 	required_device<pioneer_ldv1000_device> m_laserdisc;
 	UINT8 m_ld_in_latch;
 	UINT8 m_ld_out_latch;
 
-	UINT8 *m_videoram;
+	required_shared_ptr<UINT8> m_videoram;
 	tilemap_t *m_tilemap;
 	int m_color_bank;
 	DECLARE_WRITE8_MEMBER(superdq_videoram_w);
@@ -202,7 +203,7 @@ WRITE8_MEMBER(superdq_state::superdq_ld_w)
 static ADDRESS_MAP_START( superdq_map, AS_PROGRAM, 8, superdq_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
-	AM_RANGE(0x5c00, 0x5fff) AM_RAM_WRITE(superdq_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0x5c00, 0x5fff) AM_RAM_WRITE(superdq_videoram_w) AM_SHARE("videoram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( superdq_io, AS_IO, 8, superdq_state )

@@ -12,10 +12,11 @@ class cball_state : public driver_device
 {
 public:
 	cball_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_video_ram(*this, "video_ram"){ }
 
 	/* memory pointers */
-	UINT8 *  m_video_ram;
+	required_shared_ptr<UINT8> m_video_ram;
 
 	/* video-related */
 	tilemap_t* m_bg_tilemap;
@@ -138,7 +139,7 @@ static ADDRESS_MAP_START( cpu_map, AS_PROGRAM, 8, cball_state )
 	AM_RANGE(0x2800, 0x2800) AM_READ_PORT("2800")
 
 	AM_RANGE(0x0000, 0x03ff) AM_WRITE(cball_wram_w) AM_MASK(0x7f)
-	AM_RANGE(0x0400, 0x07ff) AM_WRITE(cball_vram_w) AM_BASE(m_video_ram)
+	AM_RANGE(0x0400, 0x07ff) AM_WRITE(cball_vram_w) AM_SHARE("video_ram")
 	AM_RANGE(0x1800, 0x1800) AM_NOP /* watchdog? */
 	AM_RANGE(0x1810, 0x1811) AM_NOP
 	AM_RANGE(0x1820, 0x1821) AM_NOP

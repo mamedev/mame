@@ -58,12 +58,14 @@ class m14_state : public driver_device
 {
 public:
 	m14_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_video_ram(*this, "video_ram"),
+		m_color_ram(*this, "color_ram"){ }
 
 	/* video-related */
 	tilemap_t  *m_m14_tilemap;
-	UINT8 *  m_video_ram;
-	UINT8 *  m_color_ram;
+	required_shared_ptr<UINT8> m_video_ram;
+	required_shared_ptr<UINT8> m_color_ram;
 
 	/* input-related */
 	UINT8 m_hop_mux;
@@ -203,8 +205,8 @@ WRITE8_MEMBER(m14_state::hopper_w)
 static ADDRESS_MAP_START( m14_map, AS_PROGRAM, 8, m14_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
-	AM_RANGE(0xe000, 0xe3ff) AM_RAM_WRITE(m14_vram_w) AM_BASE(m_video_ram)
-	AM_RANGE(0xe400, 0xe7ff) AM_RAM_WRITE(m14_cram_w) AM_BASE(m_color_ram)
+	AM_RANGE(0xe000, 0xe3ff) AM_RAM_WRITE(m14_vram_w) AM_SHARE("video_ram")
+	AM_RANGE(0xe400, 0xe7ff) AM_RAM_WRITE(m14_cram_w) AM_SHARE("color_ram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( m14_io_map, AS_IO, 8, m14_state )

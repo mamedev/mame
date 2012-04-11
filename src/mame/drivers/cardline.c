@@ -27,11 +27,13 @@ class cardline_state : public driver_device
 {
 public:
 	cardline_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"),
+		m_colorram(*this, "colorram"){ }
 
 	int m_video;
-	UINT8 *m_videoram;
-	UINT8 *m_colorram;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_colorram;
 	int m_var;
 	DECLARE_WRITE8_MEMBER(vram_w);
 	DECLARE_WRITE8_MEMBER(attr_w);
@@ -129,8 +131,8 @@ static ADDRESS_MAP_START( mem_io, AS_IO, 8, cardline_state )
 	AM_RANGE(0x2840, 0x2840) AM_NOP
 	AM_RANGE(0x2880, 0x2880) AM_NOP
 	AM_RANGE(0x3003, 0x3003) AM_NOP
-	AM_RANGE(0xc000, 0xdfff) AM_WRITE(vram_w) AM_BASE(m_videoram)
-	AM_RANGE(0xe000, 0xffff) AM_WRITE(attr_w) AM_BASE(m_colorram)
+	AM_RANGE(0xc000, 0xdfff) AM_WRITE(vram_w) AM_SHARE("videoram")
+	AM_RANGE(0xe000, 0xffff) AM_WRITE(attr_w) AM_SHARE("colorram")
 	/* Ports */
 	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READWRITE(unk_r, video_w)
 ADDRESS_MAP_END

@@ -42,9 +42,10 @@ class murogmbl_state : public driver_device
 {
 public:
 	murogmbl_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_video(*this, "video"){ }
 
-	UINT8* m_video;
+	required_shared_ptr<UINT8> m_video;
 };
 
 
@@ -77,7 +78,7 @@ static ADDRESS_MAP_START( murogmbl_map, AS_PROGRAM, 8, murogmbl_state )
 	AM_RANGE(0x0000, 0x1fFf) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
 	AM_RANGE(0x4800, 0x4bff) AM_RAM
-	AM_RANGE(0x5800, 0x5bff) AM_RAM AM_BASE(m_video)
+	AM_RANGE(0x5800, 0x5bff) AM_RAM AM_SHARE("video")
 	AM_RANGE(0x5c00, 0x5fff) AM_RAM
 	AM_RANGE(0x6000, 0x6000) AM_READ_PORT("IN0")
 	AM_RANGE(0x6800, 0x6800) AM_READ_PORT("DSW")

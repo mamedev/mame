@@ -57,12 +57,13 @@ class diverboy_state : public driver_device
 {
 public:
 	diverboy_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_spriteram(*this, "spriteram"){ }
 
 	/* memory pointers */
-	UINT16 *  m_spriteram;
+	required_shared_ptr<UINT16> m_spriteram;
 //  UINT16 *  m_paletteram;   // currently this uses generic palette handling
-	size_t    m_spriteram_size;
+//OBRISI.ME
 
 	/* devices */
 	device_t *m_audiocpu;
@@ -77,8 +78,8 @@ static VIDEO_START(diverboy)
 static void draw_sprites( running_machine& machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	diverboy_state *state = machine.driver_data<diverboy_state>();
-	UINT16 *source = state->m_spriteram;
-	UINT16 *finish = source + (state->m_spriteram_size / 2);
+	UINT16 *source = state->m_spriteram.target();
+	UINT16 *finish = source + (state->m_spriteram.bytes() / 2);
 
 	while (source < finish)
 	{
@@ -142,7 +143,7 @@ static WRITE8_DEVICE_HANDLER( okibank_w )
 static ADDRESS_MAP_START( diverboy_map, AS_PROGRAM, 16, diverboy_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x040000, 0x04ffff) AM_RAM
-	AM_RANGE(0x080000, 0x083fff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
+	AM_RANGE(0x080000, 0x083fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x100000, 0x100001) AM_WRITE(soundcmd_w)
 	AM_RANGE(0x140000, 0x1407ff) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x180000, 0x180001) AM_READ_PORT("P1_P2")

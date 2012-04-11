@@ -94,13 +94,16 @@ class vcombat_state : public driver_device
 {
 public:
 	vcombat_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_vid_0_shared_RAM(*this, "vid_0_shared_RAM"),
+		m_vid_1_shared_RAM(*this, "vid_1_shared_RAM"),
+		m_framebuffer_ctrl(*this, "framebuffer_ctrl"){ }
 
 	UINT16* m_m68k_framebuffer[2];
 	UINT16* m_i860_framebuffer[2][2];
-	UINT16* m_framebuffer_ctrl;
-	UINT16* m_vid_0_shared_RAM;
-	UINT16* m_vid_1_shared_RAM;
+	required_shared_ptr<UINT16> m_vid_0_shared_RAM;
+	required_shared_ptr<UINT16> m_vid_1_shared_RAM;
+	required_shared_ptr<UINT16> m_framebuffer_ctrl;
 	int m_crtc_select;
 	DECLARE_WRITE16_MEMBER(main_video_write);
 	DECLARE_READ16_MEMBER(control_1_r);
@@ -329,12 +332,12 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, vcombat_state )
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
 	AM_RANGE(0x300000, 0x30ffff) AM_WRITE(main_video_write)
 
-	AM_RANGE(0x400000, 0x43ffff) AM_RAM AM_BASE(m_vid_0_shared_RAM) AM_SHARE("share2")	/* First i860 shared RAM */
+	AM_RANGE(0x400000, 0x43ffff) AM_RAM AM_SHARE("vid_0_shared_RAM") AM_SHARE("share2")	/* First i860 shared RAM */
 	AM_RANGE(0x440000, 0x440003) AM_RAM AM_SHARE("share6")		/* M0->P0 i860 #1 com 1 */
 	AM_RANGE(0x480000, 0x480003) AM_RAM AM_SHARE("share7")		/* M0<-P0 i860 #1 com 2 */
 	AM_RANGE(0x4c0000, 0x4c0003) AM_WRITE(wiggle_i860p0_pins_w)	/* i860 #1 stop/start/reset */
 
-	AM_RANGE(0x500000, 0x53ffff) AM_RAM AM_BASE(m_vid_1_shared_RAM) AM_SHARE("share3")	/* Second i860 shared RAM */
+	AM_RANGE(0x500000, 0x53ffff) AM_RAM AM_SHARE("vid_1_shared_RAM") AM_SHARE("share3")	/* Second i860 shared RAM */
 	AM_RANGE(0x540000, 0x540003) AM_RAM AM_SHARE("share8")		/* M0->P1 i860 #2 com 1 */
 	AM_RANGE(0x580000, 0x580003) AM_RAM AM_SHARE("share9")		/* M0<-P1 i860 #2 com 2 */
 	AM_RANGE(0x5c0000, 0x5c0003) AM_WRITE(wiggle_i860p1_pins_w)	/* i860 #2 stop/start/reset */
@@ -345,7 +348,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, vcombat_state )
 	AM_RANGE(0x60001c, 0x60001d) AM_NOP
 
 	AM_RANGE(0x60000c, 0x60000d) AM_WRITE(crtc_w)
-	AM_RANGE(0x600010, 0x600011) AM_RAM AM_BASE(m_framebuffer_ctrl)
+	AM_RANGE(0x600010, 0x600011) AM_RAM AM_SHARE("framebuffer_ctrl")
 	AM_RANGE(0x700000, 0x7007ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x701000, 0x701001) AM_READ(main_irqiack_r)
 	AM_RANGE(0x702000, 0x702001) AM_READ(control_3_r)

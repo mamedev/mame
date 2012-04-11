@@ -50,20 +50,30 @@ class mwarr_state : public driver_device
 {
 public:
 	mwarr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_bg_videoram(*this, "bg_videoram"),
+		m_mlow_videoram(*this, "mlow_videoram"),
+		m_mhigh_videoram(*this, "mhigh_videoram"),
+		m_tx_videoram(*this, "tx_videoram"),
+		m_bg_scrollram(*this, "bg_scrollram"),
+		m_mlow_scrollram(*this, "mlow_scrollram"),
+		m_mhigh_scrollram(*this, "mhigh_scrollram"),
+		m_vidattrram(*this, "vidattrram"),
+		m_spriteram(*this, "spriteram"),
+		m_mwarr_ram(*this, "mwarr_ram"){ }
 
 	/* memory pointers */
-	UINT16 *m_bg_videoram;
-	UINT16 *m_mlow_videoram;
-	UINT16 *m_mhigh_videoram;
-	UINT16 *m_tx_videoram;
-	UINT16 *m_bg_scrollram;
-	UINT16 *m_mlow_scrollram;
-	UINT16 *m_mhigh_scrollram;
-	UINT16 *m_vidattrram;
-	UINT16 *m_spriteram;
+	required_shared_ptr<UINT16> m_bg_videoram;
+	required_shared_ptr<UINT16> m_mlow_videoram;
+	required_shared_ptr<UINT16> m_mhigh_videoram;
+	required_shared_ptr<UINT16> m_tx_videoram;
+	required_shared_ptr<UINT16> m_bg_scrollram;
+	required_shared_ptr<UINT16> m_mlow_scrollram;
+	required_shared_ptr<UINT16> m_mhigh_scrollram;
+	required_shared_ptr<UINT16> m_vidattrram;
+	required_shared_ptr<UINT16> m_spriteram;
 //  UINT16 *m_paletteram;    // currently this uses generic palette handling
-	UINT16 *m_mwarr_ram;
+	required_shared_ptr<UINT16> m_mwarr_ram;
 
 	/* video-related */
 	tilemap_t *m_bg_tilemap;
@@ -183,23 +193,23 @@ WRITE16_MEMBER(mwarr_state::mwarr_brightness_w)
 
 static ADDRESS_MAP_START( mwarr_map, AS_PROGRAM, 16, mwarr_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x100000, 0x1007ff) AM_RAM_WRITE(bg_videoram_w) AM_BASE(m_bg_videoram)
-	AM_RANGE(0x100800, 0x100fff) AM_RAM_WRITE(mlow_videoram_w) AM_BASE(m_mlow_videoram)
-	AM_RANGE(0x101000, 0x1017ff) AM_RAM_WRITE(mhigh_videoram_w) AM_BASE(m_mhigh_videoram)
-	AM_RANGE(0x101800, 0x1027ff) AM_RAM_WRITE(tx_videoram_w) AM_BASE(m_tx_videoram)
-	AM_RANGE(0x103000, 0x1033ff) AM_RAM AM_BASE(m_bg_scrollram)
-	AM_RANGE(0x103400, 0x1037ff) AM_RAM AM_BASE(m_mlow_scrollram)
-	AM_RANGE(0x103800, 0x103bff) AM_RAM AM_BASE(m_mhigh_scrollram)
-	AM_RANGE(0x103c00, 0x103fff) AM_RAM AM_BASE(m_vidattrram)
+	AM_RANGE(0x100000, 0x1007ff) AM_RAM_WRITE(bg_videoram_w) AM_SHARE("bg_videoram")
+	AM_RANGE(0x100800, 0x100fff) AM_RAM_WRITE(mlow_videoram_w) AM_SHARE("mlow_videoram")
+	AM_RANGE(0x101000, 0x1017ff) AM_RAM_WRITE(mhigh_videoram_w) AM_SHARE("mhigh_videoram")
+	AM_RANGE(0x101800, 0x1027ff) AM_RAM_WRITE(tx_videoram_w) AM_SHARE("tx_videoram")
+	AM_RANGE(0x103000, 0x1033ff) AM_RAM AM_SHARE("bg_scrollram")
+	AM_RANGE(0x103400, 0x1037ff) AM_RAM AM_SHARE("mlow_scrollram")
+	AM_RANGE(0x103800, 0x103bff) AM_RAM AM_SHARE("mhigh_scrollram")
+	AM_RANGE(0x103c00, 0x103fff) AM_RAM AM_SHARE("vidattrram")
 	AM_RANGE(0x104000, 0x104fff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
-	AM_RANGE(0x108000, 0x108fff) AM_RAM AM_BASE(m_spriteram)
+	AM_RANGE(0x108000, 0x108fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x110000, 0x110001) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x110002, 0x110003) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x110004, 0x110005) AM_READ_PORT("DSW")
 	AM_RANGE(0x110010, 0x110011) AM_DEVWRITE_LEGACY("oki2", oki1_bank_w)
 	AM_RANGE(0x110014, 0x110015) AM_WRITE(mwarr_brightness_w)
 	AM_RANGE(0x110016, 0x110017) AM_WRITE(sprites_commands_w)
-	AM_RANGE(0x110000, 0x11ffff) AM_RAM AM_BASE(m_mwarr_ram)
+	AM_RANGE(0x110000, 0x11ffff) AM_RAM AM_SHARE("mwarr_ram")
 	AM_RANGE(0x180000, 0x180001) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x190000, 0x190001) AM_DEVREADWRITE8("oki2", okim6295_device, read, write, 0x00ff)
 ADDRESS_MAP_END

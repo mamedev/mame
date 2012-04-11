@@ -38,11 +38,13 @@ class go2000_state : public driver_device
 {
 public:
 	go2000_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"),
+		m_videoram2(*this, "videoram2"){ }
 
 	/* memory pointers */
-	UINT16 *  m_videoram;
-	UINT16 *  m_videoram2;
+	required_shared_ptr<UINT16> m_videoram;
+	required_shared_ptr<UINT16> m_videoram2;
 //  UINT16 *  m_paletteram;   // currently this uses generic palette handling
 
 	/* devices */
@@ -61,8 +63,8 @@ WRITE16_MEMBER(go2000_state::sound_cmd_w)
 static ADDRESS_MAP_START( go2000_map, AS_PROGRAM, 16, go2000_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x200000, 0x203fff) AM_RAM
-	AM_RANGE(0x600000, 0x60ffff) AM_RAM AM_BASE(m_videoram)
-	AM_RANGE(0x610000, 0x61ffff) AM_RAM AM_BASE(m_videoram2)
+	AM_RANGE(0x600000, 0x60ffff) AM_RAM AM_SHARE("videoram")
+	AM_RANGE(0x610000, 0x61ffff) AM_RAM AM_SHARE("videoram2")
 	AM_RANGE(0x800000, 0x800fff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0xa00000, 0xa00001) AM_READ_PORT("INPUTS")
 	AM_RANGE(0xa00002, 0xa00003) AM_READ_PORT("DSW")

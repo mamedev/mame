@@ -51,10 +51,11 @@ class othello_state : public driver_device
 {
 public:
 	othello_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"){ }
 
 	/* memory pointers */
-	UINT8 *  m_videoram;
+	required_shared_ptr<UINT8> m_videoram;
 
 	/* video-related */
 	int    m_tile_bank;
@@ -135,7 +136,7 @@ static PALETTE_INIT( othello )
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, othello_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x8000, 0x97ff) AM_NOP /* not populated */
-	AM_RANGE(0x9800, 0x9fff) AM_RAM AM_BASE(m_videoram)
+	AM_RANGE(0x9800, 0x9fff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 

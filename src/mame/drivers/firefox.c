@@ -40,15 +40,20 @@ class firefox_state : public driver_device
 public:
 	firefox_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_laserdisc(*this, "laserdisc") { }
+		  m_laserdisc(*this, "laserdisc") ,
+		m_tileram(*this, "tileram"),
+		m_spriteram(*this, "spriteram"),
+		m_sprite_palette(*this, "sprite_palette"),
+		m_tile_palette(*this, "tile_palette"){ }
 
 	required_device<phillips_22vp931_device> m_laserdisc;
+	required_shared_ptr<unsigned char> m_tileram;
+	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<unsigned char> m_sprite_palette;
+	required_shared_ptr<unsigned char> m_tile_palette;
 	int m_n_disc_lock;
 	int m_n_disc_data;
 	int m_n_disc_read_data;
-	unsigned char *m_tileram;
-	unsigned char *m_tile_palette;
-	unsigned char *m_sprite_palette;
 	x2212_device *m_nvram_1c;
 	x2212_device *m_nvram_1d;
 	tilemap_t *m_bgtiles;
@@ -56,7 +61,6 @@ public:
 	UINT8 m_sound_to_main_flag;
 	UINT8 m_main_to_sound_flag;
 	int m_sprite_bank;
-	UINT8 *m_spriteram;
 	DECLARE_READ8_MEMBER(firefox_disc_status_r);
 	DECLARE_READ8_MEMBER(firefox_disc_data_r);
 	DECLARE_WRITE8_MEMBER(firefox_disc_read_w);
@@ -496,11 +500,11 @@ static MACHINE_START( firefox )
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, firefox_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
-	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(tileram_w) AM_BASE(m_tileram)
-	AM_RANGE(0x2000, 0x27ff) AM_RAM AM_BASE(m_spriteram)
-	AM_RANGE(0x2800, 0x2aff) AM_RAM_WRITE(sprite_palette_w) AM_BASE(m_sprite_palette)
+	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(tileram_w) AM_SHARE("tileram")
+	AM_RANGE(0x2000, 0x27ff) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0x2800, 0x2aff) AM_RAM_WRITE(sprite_palette_w) AM_SHARE("sprite_palette")
 	AM_RANGE(0x2b00, 0x2b00) AM_MIRROR(0x04ff) AM_WRITE(firefox_objram_bank_w)
-	AM_RANGE(0x2c00, 0x2eff) AM_RAM_WRITE(tile_palette_w) AM_BASE(m_tile_palette)
+	AM_RANGE(0x2c00, 0x2eff) AM_RAM_WRITE(tile_palette_w) AM_SHARE("tile_palette")
 	AM_RANGE(0x3000, 0x3fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x4000, 0x40ff) AM_READWRITE(nvram_r, nvram_w)						/* NOVRAM */
 	AM_RANGE(0x4100, 0x4100) AM_MIRROR(0x00f8) AM_READ_PORT("rdin0")			/* RDIN0 */

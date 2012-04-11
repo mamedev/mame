@@ -49,7 +49,8 @@ class egghunt_state : public driver_device
 {
 public:
 	egghunt_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_atram(*this, "atram"){ }
 
 	/* video-related */
 	tilemap_t   *m_bg_tilemap;
@@ -63,7 +64,7 @@ public:
 	device_t *m_audiocpu;
 
 	/* memory */
-	UINT8 *   m_atram;
+	required_shared_ptr<UINT8> m_atram;
 	UINT8     m_bgram[0x1000];
 	UINT8     m_spram[0x1000];
 	DECLARE_READ8_MEMBER(egghunt_bgram_r);
@@ -220,7 +221,7 @@ static WRITE8_DEVICE_HANDLER( egghunt_okibanking_w )
 static ADDRESS_MAP_START( egghunt_map, AS_PROGRAM, 8, egghunt_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_byte_le_w) AM_SHARE("paletteram")
-	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(egghunt_atram_w) AM_BASE(m_atram)
+	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(egghunt_atram_w) AM_SHARE("atram")
 	AM_RANGE(0xd000, 0xdfff) AM_READWRITE(egghunt_bgram_r, egghunt_bgram_w)
 	AM_RANGE(0xe000, 0xffff) AM_RAM
 ADDRESS_MAP_END

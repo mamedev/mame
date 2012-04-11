@@ -88,13 +88,17 @@ class nyny_state : public driver_device
 {
 public:
 	nyny_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram1(*this, "videoram1"),
+		m_colorram1(*this, "colorram1"),
+		m_videoram2(*this, "videoram2"),
+		m_colorram2(*this, "colorram2"){ }
 
 	/* memory pointers */
-	UINT8 *  m_videoram1;
-	UINT8 *  m_videoram2;
-	UINT8 *  m_colorram1;
-	UINT8 *  m_colorram2;
+	required_shared_ptr<UINT8> m_videoram1;
+	required_shared_ptr<UINT8> m_colorram1;
+	required_shared_ptr<UINT8> m_videoram2;
+	required_shared_ptr<UINT8> m_colorram2;
 
 	/* video-related */
 	int      m_flipscreen;
@@ -529,10 +533,10 @@ WRITE8_MEMBER(nyny_state::nyny_pia_1_2_w)
 
 
 static ADDRESS_MAP_START( nyny_main_map, AS_PROGRAM, 8, nyny_state )
-	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_BASE(m_videoram1)
-	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_BASE(m_colorram1)
-	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_BASE(m_videoram2)
-	AM_RANGE(0x6000, 0x7fff) AM_RAM AM_BASE(m_colorram2)
+	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("videoram1")
+	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_SHARE("colorram1")
+	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_SHARE("videoram2")
+	AM_RANGE(0x6000, 0x7fff) AM_RAM AM_SHARE("colorram2")
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
 	AM_RANGE(0xa000, 0xa0ff) AM_RAM AM_SHARE("nvram") /* SRAM (coin counter, shown when holding F2) */
 	AM_RANGE(0xa100, 0xa100) AM_MIRROR(0x00fe) AM_DEVWRITE("crtc", mc6845_device, address_w)

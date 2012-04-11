@@ -32,9 +32,10 @@ class tugboat_state : public driver_device
 {
 public:
 	tugboat_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_ram(*this, "ram"){ }
 
-	UINT8 *m_ram;
+	required_shared_ptr<UINT8> m_ram;
 	UINT8 m_hd46505_0_reg[18];
 	UINT8 m_hd46505_1_reg[18];
 	int m_reg0;
@@ -211,7 +212,7 @@ static MACHINE_RESET( tugboat )
 
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, tugboat_state )
-	AM_RANGE(0x0000, 0x01ff) AM_RAM AM_BASE(m_ram)
+	AM_RANGE(0x0000, 0x01ff) AM_RAM AM_SHARE("ram")
 	AM_RANGE(0x1060, 0x1061) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
 	AM_RANGE(0x10a0, 0x10a1) AM_WRITE(tugboat_hd46505_0_w)	/* scrolling is performed changing the start_addr register (0C/0D) */
 	AM_RANGE(0x10c0, 0x10c1) AM_WRITE(tugboat_hd46505_1_w)

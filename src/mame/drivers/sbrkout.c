@@ -41,9 +41,10 @@ class sbrkout_state : public driver_device
 {
 public:
 	sbrkout_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"){ }
 
-	UINT8 *m_videoram;
+	required_shared_ptr<UINT8> m_videoram;
 	emu_timer *m_scanline_timer;
 	emu_timer *m_pot_timer;
 	tilemap_t *m_bg_tilemap;
@@ -97,7 +98,7 @@ static TIMER_CALLBACK( pot_trigger_callback );
 static MACHINE_START( sbrkout )
 {
 	sbrkout_state *state = machine.driver_data<sbrkout_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = state->m_videoram.target();
 	memory_set_bankptr(machine, "bank1", &videoram[0x380]);
 	state->m_scanline_timer = machine.scheduler().timer_alloc(FUNC(scanline_callback));
 	state->m_pot_timer = machine.scheduler().timer_alloc(FUNC(pot_trigger_callback));
@@ -125,7 +126,7 @@ static MACHINE_RESET( sbrkout )
 static TIMER_CALLBACK( scanline_callback )
 {
 	sbrkout_state *state = machine.driver_data<sbrkout_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = state->m_videoram.target();
 	int scanline = param;
 
 	/* force a partial update before anything happens */
@@ -298,7 +299,7 @@ READ8_MEMBER(sbrkout_state::sync2_r)
 static TILE_GET_INFO( get_bg_tile_info )
 {
 	sbrkout_state *state = machine.driver_data<sbrkout_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = state->m_videoram.target();
 	int code = (videoram[tile_index] & 0x80) ? videoram[tile_index] : 0;
 	SET_TILE_INFO(0, code, 0, 0);
 }
@@ -313,7 +314,7 @@ static VIDEO_START( sbrkout )
 
 WRITE8_MEMBER(sbrkout_state::sbrkout_videoram_w)
 {
-	UINT8 *videoram = m_videoram;
+	UINT8 *videoram = m_videoram.target();
 	videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
@@ -329,7 +330,7 @@ WRITE8_MEMBER(sbrkout_state::sbrkout_videoram_w)
 static SCREEN_UPDATE_IND16( sbrkout )
 {
 	sbrkout_state *state = screen.machine().driver_data<sbrkout_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = state->m_videoram.target();
 	int ball;
 
 	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
@@ -357,7 +358,7 @@ static SCREEN_UPDATE_IND16( sbrkout )
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, sbrkout_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x380) AM_RAMBANK("bank1")
-	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(sbrkout_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(sbrkout_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x0800, 0x083f) AM_READ(switches_r)
 	AM_RANGE(0x0840, 0x0840) AM_MIRROR(0x003f) AM_READ_PORT("COIN")
 	AM_RANGE(0x0880, 0x0880) AM_MIRROR(0x003f) AM_READ_PORT("START")

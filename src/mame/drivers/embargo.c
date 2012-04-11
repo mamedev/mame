@@ -12,11 +12,12 @@ class embargo_state : public driver_device
 {
 public:
 	embargo_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"){ }
 
 	/* memory pointers */
-	UINT8 *  m_videoram;
-	size_t   m_videoram_size;
+	required_shared_ptr<UINT8> m_videoram;
+//OBRISI.ME
 
 	/* misc */
 	UINT8    m_dial_enable_1;
@@ -41,7 +42,7 @@ static SCREEN_UPDATE_RGB32( embargo )
 	embargo_state *state = screen.machine().driver_data<embargo_state>();
 	offs_t offs;
 
-	for (offs = 0; offs < state->m_videoram_size; offs++)
+	for (offs = 0; offs < state->m_videoram.bytes(); offs++)
 	{
 		int i;
 
@@ -155,7 +156,7 @@ WRITE8_MEMBER(embargo_state::input_select_w)
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, embargo_state )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x1e00, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_BASE_SIZE(m_videoram, m_videoram_size)
+	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_SHARE("videoram")
 ADDRESS_MAP_END
 
 

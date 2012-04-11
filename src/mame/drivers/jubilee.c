@@ -94,9 +94,10 @@ class jubilee_state : public driver_device
 {
 public:
 	jubilee_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"){ }
 
-	UINT8 *m_videoram;
+	required_shared_ptr<UINT8> m_videoram;
 	tilemap_t *m_bg_tilemap;
 	DECLARE_WRITE8_MEMBER(jubileep_videoram_w);
 	DECLARE_READ8_MEMBER(unk_r);
@@ -164,7 +165,7 @@ static INTERRUPT_GEN( jubileep_interrupt )
 static ADDRESS_MAP_START( jubileep_map, AS_PROGRAM, 8, jubilee_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
-	AM_RANGE(0x3000, 0x30ff) AM_WRITE(jubileep_videoram_w) AM_BASE(m_videoram)	/* wrong... just placed somewhere */
+	AM_RANGE(0x3000, 0x30ff) AM_WRITE(jubileep_videoram_w) AM_SHARE("videoram")	/* wrong... just placed somewhere */
 	AM_RANGE(0x3100, 0x3fff) AM_RAM
 ADDRESS_MAP_END
 

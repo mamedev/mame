@@ -26,17 +26,22 @@ class umipoker_state : public driver_device
 {
 public:
 	umipoker_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_vram_0(*this, "vra0"),
+		m_vram_1(*this, "vra1"),
+		m_vram_2(*this, "vra2"),
+		m_vram_3(*this, "vra3"),
+		m_z80_wram(*this, "z80_wram"){ }
 
-	UINT16 *m_vram_0;
-	UINT16 *m_vram_1;
-	UINT16 *m_vram_2;
-	UINT16 *m_vram_3;
+	required_shared_ptr<UINT16> m_vram_0;
+	required_shared_ptr<UINT16> m_vram_1;
+	required_shared_ptr<UINT16> m_vram_2;
+	required_shared_ptr<UINT16> m_vram_3;
 	tilemap_t *m_tilemap_0;
 	tilemap_t *m_tilemap_1;
 	tilemap_t *m_tilemap_2;
 	tilemap_t *m_tilemap_3;
-	UINT8 *m_z80_wram;
+	required_shared_ptr<UINT8> m_z80_wram;
 	int m_umipoker_scrolly[4];
 	DECLARE_READ8_MEMBER(z80_rom_readback_r);
 	DECLARE_READ8_MEMBER(z80_shared_ram_r);
@@ -306,10 +311,10 @@ static ADDRESS_MAP_START( umipoker_map, AS_PROGRAM, 16, umipoker_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x400000, 0x403fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x600000, 0x6007ff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")	// Palette
-	AM_RANGE(0x800000, 0x801fff) AM_RAM_WRITE(umipoker_vram_0_w) AM_BASE(m_vram_0)
-	AM_RANGE(0x802000, 0x803fff) AM_RAM_WRITE(umipoker_vram_1_w) AM_BASE(m_vram_1)
-	AM_RANGE(0x804000, 0x805fff) AM_RAM_WRITE(umipoker_vram_2_w) AM_BASE(m_vram_2)
-	AM_RANGE(0x806000, 0x807fff) AM_RAM_WRITE(umipoker_vram_3_w) AM_BASE(m_vram_3)
+	AM_RANGE(0x800000, 0x801fff) AM_RAM_WRITE(umipoker_vram_0_w) AM_SHARE("vra0")
+	AM_RANGE(0x802000, 0x803fff) AM_RAM_WRITE(umipoker_vram_1_w) AM_SHARE("vra1")
+	AM_RANGE(0x804000, 0x805fff) AM_RAM_WRITE(umipoker_vram_2_w) AM_SHARE("vra2")
+	AM_RANGE(0x806000, 0x807fff) AM_RAM_WRITE(umipoker_vram_3_w) AM_SHARE("vra3")
 	AM_RANGE(0xc00000, 0xc0ffff) AM_READ8(z80_rom_readback_r,0x00ff)
 	AM_RANGE(0xc1f000, 0xc1ffff) AM_READWRITE8(z80_shared_ram_r,z80_shared_ram_w,0x00ff)
 	AM_RANGE(0xe00000, 0xe00001) AM_READ_PORT("IN0")
@@ -329,7 +334,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( umipoker_audio_map, AS_PROGRAM, 8, umipoker_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xf800, 0xffff) AM_READWRITE(z80_shared_ram_r,z80_shared_ram_w) AM_BASE(m_z80_wram)
+	AM_RANGE(0xf800, 0xffff) AM_READWRITE(z80_shared_ram_r,z80_shared_ram_w) AM_SHARE("z80_wram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( umipoker_audio_io_map, AS_IO, 8, umipoker_state )

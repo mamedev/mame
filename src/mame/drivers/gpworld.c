@@ -49,17 +49,20 @@ class gpworld_state : public driver_device
 public:
 	gpworld_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_laserdisc(*this, "laserdisc") { }
+		  m_laserdisc(*this, "laserdisc") ,
+		m_sprite_RAM(*this, "sprite_RAM"),
+		m_palette_RAM(*this, "palette_RAM"),
+		m_tile_RAM(*this, "tile_RAM"){ }
 
 	UINT8 m_nmi_enable;
 	UINT8 m_start_lamp;
 	UINT8 m_ldp_read_latch;
 	UINT8 m_ldp_write_latch;
 	UINT8 m_brake_gas;
-	UINT8* m_tile_RAM;
-	UINT8* m_sprite_RAM;
-	UINT8* m_palette_RAM;
 	required_device<pioneer_ldv1000_device> m_laserdisc;
+	required_shared_ptr<UINT8> m_sprite_RAM;
+	required_shared_ptr<UINT8> m_palette_RAM;
+	required_shared_ptr<UINT8> m_tile_RAM;
 	DECLARE_READ8_MEMBER(ldp_read);
 	DECLARE_READ8_MEMBER(pedal_in);
 	DECLARE_WRITE8_MEMBER(ldp_write);
@@ -293,9 +296,9 @@ WRITE8_MEMBER(gpworld_state::palette_write)
 /* PROGRAM MAP */
 static ADDRESS_MAP_START( mainmem, AS_PROGRAM, 8, gpworld_state )
 	AM_RANGE(0x0000,0xbfff) AM_ROM
-	AM_RANGE(0xc000,0xc7ff) AM_RAM AM_BASE(m_sprite_RAM)
-	AM_RANGE(0xc800,0xcfff) AM_WRITE(palette_write) AM_BASE(m_palette_RAM)	/* The memory test reads at 0xc800 */
-	AM_RANGE(0xd000,0xd7ff) AM_RAM AM_BASE(m_tile_RAM)
+	AM_RANGE(0xc000,0xc7ff) AM_RAM AM_SHARE("sprite_RAM")
+	AM_RANGE(0xc800,0xcfff) AM_WRITE(palette_write) AM_SHARE("palette_RAM")	/* The memory test reads at 0xc800 */
+	AM_RANGE(0xd000,0xd7ff) AM_RAM AM_SHARE("tile_RAM")
 	AM_RANGE(0xd800,0xd800) AM_READWRITE(ldp_read,ldp_write)
 /*  AM_RANGE(0xd801,0xd801) AM_READ_LEGACY(???) */
 	AM_RANGE(0xda00,0xda00) AM_READ_PORT("INWHEEL")	//8255 here....

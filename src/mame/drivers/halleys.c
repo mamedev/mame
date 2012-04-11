@@ -210,7 +210,9 @@ class halleys_state : public driver_device
 {
 public:
 	halleys_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_blitter_ram(*this, "blitter_ram"),
+		m_io_ram(*this, "io_ram"){ }
 
 	UINT16 *m_render_layer[MAX_LAYERS];
 	UINT8 m_sound_fifo[MAX_SOUNDS];
@@ -225,10 +227,10 @@ public:
 	UINT32 *m_alpha_table;
 	UINT8 *m_cpu1_base;
 	UINT8 *m_gfx1_base;
-	UINT8 *m_blitter_ram;
-	UINT8 *m_io_ram;
-	size_t m_blitter_ramsize;
-	size_t m_io_ramsize;
+	required_shared_ptr<UINT8> m_blitter_ram;
+	required_shared_ptr<UINT8> m_io_ram;
+//OBRISI.ME
+//OBRISI.ME
 	int m_game_id;
 	int m_blitter_busy;
 	int m_collision_count;
@@ -1650,7 +1652,7 @@ READ8_MEMBER(halleys_state::io_mirror_r)
 // Memory Maps
 
 static ADDRESS_MAP_START( halleys_map, AS_PROGRAM, 8, halleys_state )
-	AM_RANGE(0x0000, 0x0fff) AM_READWRITE(blitter_r, blitter_w) AM_BASE_SIZE(m_blitter_ram,m_blitter_ramsize)
+	AM_RANGE(0x0000, 0x0fff) AM_READWRITE(blitter_r, blitter_w) AM_SHARE("blitter_ram")
 	AM_RANGE(0x1f00, 0x1fff) AM_WRITE(bgtile_w)		// background tiles?(Ben Bero Beh only)
 	AM_RANGE(0x1000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xfeff) AM_RAM					// work ram
@@ -1668,7 +1670,7 @@ static ADDRESS_MAP_START( halleys_map, AS_PROGRAM, 8, halleys_state )
 	AM_RANGE(0xff96, 0xff96) AM_READ_PORT("DSW2")	// dipswitch 3
 	AM_RANGE(0xff97, 0xff97) AM_READ_PORT("DSW3")	// dipswitch 2
 	AM_RANGE(0xff9c, 0xff9c) AM_WRITE(firq_ack_w)
-	AM_RANGE(0xff00, 0xffbf) AM_RAM AM_BASE_SIZE(m_io_ram,m_io_ramsize)	// I/O write fall-through
+	AM_RANGE(0xff00, 0xffbf) AM_RAM AM_SHARE("io_ram")	// I/O write fall-through
 
 	AM_RANGE(0xffc0, 0xffdf) AM_RAM_WRITE(halleys_paletteram_IIRRGGBB_w) AM_SHARE("paletteram")
 	AM_RANGE(0xffe0, 0xffff) AM_READ(vector_r)
@@ -1937,7 +1939,7 @@ static MACHINE_RESET( halleys )
 	state->m_bgcolor         = get_black_pen(machine);
 	state->m_fftail = state->m_ffhead = state->m_ffcount = 0;
 
-	memset(state->m_io_ram, 0xff, state->m_io_ramsize);
+	memset(state->m_io_ram.target(), 0xff, state->m_io_ram.bytes());
 	memset(state->m_render_layer[0], 0, SCREEN_BYTESIZE * MAX_LAYERS);
 }
 

@@ -57,9 +57,10 @@ class twins_state : public driver_device
 {
 public:
 	twins_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"){ }
 
-	UINT16 *m_videoram;
+	required_shared_ptr<UINT16> m_videoram;
 	UINT16 *m_pal;
 	UINT16 m_paloff;
 	DECLARE_READ16_MEMBER(twins_port4_r);
@@ -96,7 +97,7 @@ WRITE16_MEMBER(twins_state::porte_paloff0_w)
 
 static ADDRESS_MAP_START( twins_map, AS_PROGRAM, 16, twins_state )
 	AM_RANGE(0x00000, 0x0ffff) AM_RAM
-	AM_RANGE(0x10000, 0x1ffff) AM_RAM AM_BASE(m_videoram)
+	AM_RANGE(0x10000, 0x1ffff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0x20000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -145,7 +146,7 @@ static SCREEN_UPDATE_IND16(twins)
 	{
 		for(x=0;x<xxx;x++)
 		{
-			bitmap.pix16(y, x) = ((UINT8 *)state->m_videoram)[BYTE_XOR_LE(count)];
+			bitmap.pix16(y, x) = ((UINT8 *)state->m_videoram.target())[BYTE_XOR_LE(count)];
 			count++;
 		}
 	}
@@ -244,7 +245,7 @@ static SCREEN_UPDATE_IND16(twinsa)
 	{
 		for(x=0;x<xxx;x++)
 		{
-			bitmap.pix16(y, x) = ((UINT8 *)state->m_videoram)[BYTE_XOR_LE(count)];
+			bitmap.pix16(y, x) = ((UINT8 *)state->m_videoram.target())[BYTE_XOR_LE(count)];
 			count++;
 		}
 	}

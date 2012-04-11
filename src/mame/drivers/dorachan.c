@@ -19,11 +19,12 @@ class dorachan_state : public driver_device
 {
 public:
 	dorachan_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"){ }
 
 	/* memory pointers */
-	UINT8 *  m_videoram;
-	size_t   m_videoram_size;
+	required_shared_ptr<UINT8> m_videoram;
+//OBRISI.ME
 
 	/* video-related */
 	UINT8    m_flip_screen;
@@ -90,7 +91,7 @@ static SCREEN_UPDATE_RGB32( dorachan )
 
 	color_map_base = screen.machine().region("proms")->base();
 
-	for (offs = 0; offs < state->m_videoram_size; offs++)
+	for (offs = 0; offs < state->m_videoram.bytes(); offs++)
 	{
 		int i;
 		UINT8 fore_color;
@@ -101,7 +102,7 @@ static SCREEN_UPDATE_RGB32( dorachan )
 		/* the need for +1 is extremely unusual, but definetely correct */
 		offs_t color_address = ((((offs << 2) & 0x03e0) | (offs >> 8)) + 1) & 0x03ff;
 
-		UINT8 data = state->m_videoram[offs];
+		UINT8 data = state->m_videoram.target()[offs];
 
 		if (state->m_flip_screen)
 			fore_color = (color_map_base[color_address] >> 3) & 0x07;
@@ -151,7 +152,7 @@ static ADDRESS_MAP_START( dorachan_map, AS_PROGRAM, 8, dorachan_state )
 	AM_RANGE(0x2800, 0x2800) AM_MIRROR(0x03ff) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x2c00, 0x2c00) AM_MIRROR(0x03ff) AM_READ_PORT("JOY")
 	AM_RANGE(0x3800, 0x3800) AM_MIRROR(0x03ff) AM_READ_PORT("V128")
-	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_BASE_SIZE(m_videoram, m_videoram_size)
+	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0x6000, 0x77ff) AM_ROM
 ADDRESS_MAP_END
 

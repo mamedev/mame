@@ -80,11 +80,13 @@ class statriv2_state : public driver_device
 {
 public:
 	statriv2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"),
+		m_question_offset(*this, "question_offset"){ }
 
-	UINT8 *m_videoram;
+	required_shared_ptr<UINT8> m_videoram;
 	tilemap_t *m_tilemap;
-	UINT8 *m_question_offset;
+	required_shared_ptr<UINT8> m_question_offset;
 	UINT8 m_question_offset_low;
 	UINT8 m_question_offset_mid;
 	UINT8 m_question_offset_high;
@@ -110,7 +112,7 @@ public:
 static TILE_GET_INFO( horizontal_tile_info )
 {
 	statriv2_state *state = machine.driver_data<statriv2_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = state->m_videoram.target();
 	int code = videoram[0x400+tile_index];
 	int attr = videoram[tile_index] & 0x3f;
 
@@ -120,7 +122,7 @@ static TILE_GET_INFO( horizontal_tile_info )
 static TILE_GET_INFO( vertical_tile_info )
 {
 	statriv2_state *state = machine.driver_data<statriv2_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = state->m_videoram.target();
 	int code = videoram[0x400+tile_index];
 	int attr = videoram[tile_index] & 0x3f;
 
@@ -168,7 +170,7 @@ static VIDEO_START( vertical )
 
 WRITE8_MEMBER(statriv2_state::statriv2_videoram_w)
 {
-	UINT8 *videoram = m_videoram;
+	UINT8 *videoram = m_videoram.target();
 	videoram[offset] = data;
 	m_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
@@ -294,12 +296,12 @@ static ADDRESS_MAP_START( statriv2_map, AS_PROGRAM, 8, statriv2_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
 	AM_RANGE(0x4800, 0x48ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(statriv2_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(statriv2_videoram_w) AM_SHARE("videoram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( statriv2_io_map, AS_IO, 8, statriv2_state )
 	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE_LEGACY("ppi", ppi8255_r, ppi8255_w)
-	AM_RANGE(0x28, 0x2b) AM_READ(question_data_r) AM_WRITEONLY AM_BASE(m_question_offset)
+	AM_RANGE(0x28, 0x2b) AM_READ(question_data_r) AM_WRITEONLY AM_SHARE("question_offset")
 	AM_RANGE(0xb0, 0xb1) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
 	AM_RANGE(0xb1, 0xb1) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
 	AM_RANGE(0xc0, 0xcf) AM_DEVREADWRITE_LEGACY("tms", tms9927_r, tms9927_w)

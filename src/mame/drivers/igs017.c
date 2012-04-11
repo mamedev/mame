@@ -55,15 +55,21 @@ public:
 	igs017_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_input_addr(-1),
-		m_maincpu(*this, "maincpu")
-		{ }
+		m_maincpu(*this, "maincpu"),
+		m_spriteram(*this, "spriteram"),
+		m_fg_videoram(*this, "fg_videoram"),
+		m_bg_videoram(*this, "bg_videoram"){ }
+
+	int m_input_addr;
+	required_device<cpu_device> m_maincpu;
+	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<UINT8> m_fg_videoram;
+	required_shared_ptr<UINT8> m_bg_videoram;
 
 	int m_toggle;
 	int m_debug_addr;
 	int m_debug_width;
 	UINT8 m_video_disable;
-	UINT8 *m_fg_videoram;
-	UINT8 *m_bg_videoram;
 	tilemap_t *m_fg_tilemap;
 	tilemap_t *m_bg_tilemap;
 	UINT8 *m_sprites_gfx;
@@ -71,16 +77,12 @@ public:
 	int m_nmi_enable;
 	int m_irq_enable;
 	UINT8 m_input_select;
-	int m_input_addr;
 	UINT8 m_hopper;
 	UINT16 m_igs_magic[2];
 	UINT8 m_scramble_data;
 	UINT8 m_prot[2];
 	int m_irq1_enable;
 	int m_irq2_enable;
-	UINT8 *m_spriteram;
-
-	required_device<cpu_device> m_maincpu;
 	DECLARE_WRITE8_MEMBER(video_disable_w);
 	DECLARE_WRITE16_MEMBER(video_disable_lsb_w);
 	DECLARE_WRITE8_MEMBER(fg_w);
@@ -304,7 +306,7 @@ static void draw_sprite(running_machine &machine, bitmap_ind16 &bitmap,const rec
 static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
 	igs017_state *state = machine.driver_data<igs017_state>();
-	UINT8 *s	=	state->m_spriteram;
+	UINT8 *s	=	state->m_spriteram.target();
 	UINT8 *end	=	state->m_spriteram + 0x800;
 
 	for ( ; s < end; s += 8 )
@@ -1294,7 +1296,7 @@ READ8_MEMBER(igs017_state::input_r)
 static ADDRESS_MAP_START( iqblocka_io, AS_IO, 8, igs017_state )
 	AM_RANGE( 0x0000, 0x003f ) AM_RAM // internal regs
 
-	AM_RANGE( 0x1000, 0x17ff ) AM_RAM AM_BASE(m_spriteram)
+	AM_RANGE( 0x1000, 0x17ff ) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE( 0x1800, 0x1bff ) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_byte_le_w ) AM_SHARE("paletteram")
 	AM_RANGE( 0x1c00, 0x1fff ) AM_RAM
 
@@ -1420,7 +1422,7 @@ static ADDRESS_MAP_START( mgcs, AS_PROGRAM, 16, igs017_state )
 	AM_RANGE( 0x300000, 0x303fff ) AM_RAM
 	AM_RANGE( 0x49c000, 0x49c003 ) AM_WRITE(mgcs_magic_w )
 	AM_RANGE( 0x49c002, 0x49c003 ) AM_READ(mgcs_magic_r )
-	AM_RANGE( 0xa02000, 0xa02fff ) AM_READWRITE(spriteram_lsb_r, spriteram_lsb_w ) AM_BASE(m_spriteram)
+	AM_RANGE( 0xa02000, 0xa02fff ) AM_READWRITE(spriteram_lsb_r, spriteram_lsb_w ) AM_SHARE("spriteram")
 	AM_RANGE( 0xa03000, 0xa037ff ) AM_RAM_WRITE(mgcs_paletteram_w ) AM_SHARE("paletteram")
 	AM_RANGE( 0xa04020, 0xa04027 ) AM_DEVREAD8_LEGACY("ppi8255", ppi8255_r, 0x00ff )
 	AM_RANGE( 0xa04024, 0xa04025 ) AM_WRITE(video_disable_lsb_w )
@@ -1517,7 +1519,7 @@ READ16_MEMBER(igs017_state::sdmg2_magic_r)
 static ADDRESS_MAP_START( sdmg2, AS_PROGRAM, 16, igs017_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x1f0000, 0x1fffff) AM_RAM
-	AM_RANGE(0x202000, 0x202fff) AM_READWRITE(spriteram_lsb_r, spriteram_lsb_w ) AM_BASE(m_spriteram)
+	AM_RANGE(0x202000, 0x202fff) AM_READWRITE(spriteram_lsb_r, spriteram_lsb_w ) AM_SHARE("spriteram")
 	AM_RANGE(0x203000, 0x2037ff) AM_RAM_WRITE(sdmg2_paletteram_w ) AM_SHARE("paletteram")
 	AM_RANGE(0x204020, 0x204027) AM_DEVREAD8_LEGACY("ppi8255", ppi8255_r, 0x00ff )
 	AM_RANGE(0x204024, 0x204025) AM_WRITE(video_disable_lsb_w )
@@ -1638,7 +1640,7 @@ static ADDRESS_MAP_START( mgdha_map, AS_PROGRAM, 16, igs017_state )
 	AM_RANGE(0x600000, 0x603fff) AM_RAM
 	AM_RANGE(0x876000, 0x876003) AM_WRITE(mgdha_magic_w )
 	AM_RANGE(0x876002, 0x876003) AM_READ(mgdha_magic_r )
-	AM_RANGE(0xa02000, 0xa02fff) AM_READWRITE(spriteram_lsb_r, spriteram_lsb_w ) AM_BASE(m_spriteram)
+	AM_RANGE(0xa02000, 0xa02fff) AM_READWRITE(spriteram_lsb_r, spriteram_lsb_w ) AM_SHARE("spriteram")
 	AM_RANGE(0xa03000, 0xa037ff) AM_RAM_WRITE(sdmg2_paletteram_w ) AM_SHARE("paletteram")
 //  AM_RANGE(0xa04014, 0xa04015) // written with FF at boot
 	AM_RANGE(0xa04020, 0xa04027) AM_DEVREAD8_LEGACY("ppi8255", ppi8255_r, 0x00ff )
@@ -1727,7 +1729,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( tjsb_io, AS_IO, 8, igs017_state )
 	AM_RANGE( 0x0000, 0x003f ) AM_RAM // internal regs
 
-	AM_RANGE( 0x1000, 0x17ff ) AM_RAM AM_BASE(m_spriteram)
+	AM_RANGE( 0x1000, 0x17ff ) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE( 0x1800, 0x1bff ) AM_RAM_WRITE(tjsb_paletteram_w ) AM_SHARE("paletteram")
 	AM_RANGE( 0x1c00, 0x1fff ) AM_RAM
 
@@ -1815,14 +1817,14 @@ static ADDRESS_MAP_START( lhzb2, AS_PROGRAM, 16, igs017_state )
 	AM_RANGE(0x500000, 0x503fff) AM_RAM
 	AM_RANGE(0x910000, 0x910003) AM_WRITE( lhzb2_magic_w )
 	AM_RANGE(0x910002, 0x910003) AM_READ( lhzb2_magic_r )
-	AM_RANGE(0xb02000, 0xb02fff) AM_READWRITE( spriteram_lsb_r, spriteram_lsb_w ) AM_BASE(m_spriteram)
+	AM_RANGE(0xb02000, 0xb02fff) AM_READWRITE( spriteram_lsb_r, spriteram_lsb_w ) AM_SHARE("spriteram")
 	AM_RANGE(0xb03000, 0xb037ff) AM_RAM_WRITE( lhzb2a_paletteram_w ) AM_SHARE("paletteram")
 	AM_RANGE(0xb04020, 0xb04027) AM_DEVREAD8_LEGACY( "ppi8255", ppi8255_r, 0x00ff )
 	AM_RANGE(0xb04024, 0xb04025) AM_WRITE( video_disable_lsb_w )
 	AM_RANGE(0xb04028, 0xb04029) AM_WRITE( irq2_enable_w )
 	AM_RANGE(0xb0402a, 0xb0402b) AM_WRITE( irq1_enable_w )
-	AM_RANGE(0xb08000, 0xb0bfff) AM_READWRITE( fg_lsb_r, fg_lsb_w ) AM_BASE(m_fg_videoram)
-	AM_RANGE(0xb0c000, 0xb0ffff) AM_READWRITE( bg_lsb_r, bg_lsb_w ) AM_BASE(m_bg_videoram)
+	AM_RANGE(0xb08000, 0xb0bfff) AM_READWRITE( fg_lsb_r, fg_lsb_w ) AM_SHARE("fg_videoram")
+	AM_RANGE(0xb0c000, 0xb0ffff) AM_READWRITE( bg_lsb_r, bg_lsb_w ) AM_SHARE("bg_videoram")
 	AM_RANGE(0xb10000, 0xb10001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff )
 ADDRESS_MAP_END
 
@@ -1947,13 +1949,13 @@ static ADDRESS_MAP_START( lhzb2a, AS_PROGRAM, 16, igs017_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x500000, 0x503fff) AM_RAM
 //  AM_RANGE(0x910000, 0x910003) protection
-	AM_RANGE(0xb02000, 0xb02fff) AM_READWRITE( spriteram_lsb_r, spriteram_lsb_w ) AM_BASE(m_spriteram)
+	AM_RANGE(0xb02000, 0xb02fff) AM_READWRITE( spriteram_lsb_r, spriteram_lsb_w ) AM_SHARE("spriteram")
 	AM_RANGE(0xb03000, 0xb037ff) AM_RAM_WRITE( lhzb2a_paletteram_w ) AM_SHARE("paletteram")
 	AM_RANGE(0xb04024, 0xb04025) AM_WRITE( video_disable_lsb_w )
 	AM_RANGE(0xb04028, 0xb04029) AM_WRITE( irq2_enable_w )
 	AM_RANGE(0xb0402a, 0xb0402b) AM_WRITE( irq1_enable_w )
-	AM_RANGE(0xb08000, 0xb0bfff) AM_READWRITE( fg_lsb_r, fg_lsb_w ) AM_BASE(m_fg_videoram)
-	AM_RANGE(0xb0c000, 0xb0ffff) AM_READWRITE( bg_lsb_r, bg_lsb_w ) AM_BASE(m_bg_videoram)
+	AM_RANGE(0xb08000, 0xb0bfff) AM_READWRITE( fg_lsb_r, fg_lsb_w ) AM_SHARE("fg_videoram")
+	AM_RANGE(0xb0c000, 0xb0ffff) AM_READWRITE( bg_lsb_r, bg_lsb_w ) AM_SHARE("bg_videoram")
 	AM_RANGE(0xb10000, 0xb10001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff )
 	AM_RANGE(0xb12000, 0xb12001) AM_WRITE( lhzb2a_input_select_w )
 //  Inputs dynamically mapped at xx8000, protection at xx4000 (xx = f0 initially). xx written to xxc000
@@ -2028,14 +2030,14 @@ static ADDRESS_MAP_START( slqz2, AS_PROGRAM, 16, igs017_state )
 	AM_RANGE(0x100000, 0x103fff) AM_RAM
 	AM_RANGE(0x602000, 0x602003) AM_WRITE( slqz2_magic_w )
 	AM_RANGE(0x602002, 0x602003) AM_READ( slqz2_magic_r )
-	AM_RANGE(0x902000, 0x902fff) AM_READWRITE( spriteram_lsb_r, spriteram_lsb_w ) AM_BASE(m_spriteram)
+	AM_RANGE(0x902000, 0x902fff) AM_READWRITE( spriteram_lsb_r, spriteram_lsb_w ) AM_SHARE("spriteram")
 	AM_RANGE(0x903000, 0x9037ff) AM_RAM_WRITE( slqz2_paletteram_w ) AM_SHARE("paletteram")
 	AM_RANGE(0x904020, 0x904027) AM_DEVREAD8_LEGACY( "ppi8255", ppi8255_r, 0x00ff )
 	AM_RANGE(0x904024, 0x904025) AM_WRITE( video_disable_lsb_w )
 	AM_RANGE(0x904028, 0x904029) AM_WRITE( irq2_enable_w )
 	AM_RANGE(0x90402a, 0x90402b) AM_WRITE( irq1_enable_w )
-	AM_RANGE(0x908000, 0x90bfff) AM_READWRITE( fg_lsb_r, fg_lsb_w ) AM_BASE(m_fg_videoram)
-	AM_RANGE(0x90c000, 0x90ffff) AM_READWRITE( bg_lsb_r, bg_lsb_w ) AM_BASE(m_bg_videoram)
+	AM_RANGE(0x908000, 0x90bfff) AM_READWRITE( fg_lsb_r, fg_lsb_w ) AM_SHARE("fg_videoram")
+	AM_RANGE(0x90c000, 0x90ffff) AM_READWRITE( bg_lsb_r, bg_lsb_w ) AM_SHARE("bg_videoram")
 	AM_RANGE(0x910000, 0x910001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff )
 ADDRESS_MAP_END
 

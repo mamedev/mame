@@ -29,16 +29,20 @@ class segald_state : public driver_device
 public:
 	segald_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_laserdisc(*this, "laserdisc") { }
+		  m_laserdisc(*this, "laserdisc") ,
+		m_obj_RAM(*this, "obj_RAM"),
+		m_out_RAM(*this, "out_RAM"),
+		m_color_RAM(*this, "color_RAM"),
+		m_fix_RAM(*this, "fix_RAM"){ }
 
 	UINT8 m_nmi_enable;
 
-	UINT8* m_obj_RAM;
-	UINT8* m_color_RAM;
-	UINT8* m_fix_RAM;
-	UINT8* m_out_RAM;
-
 	required_device<pioneer_ldv1000_device> m_laserdisc;
+	required_shared_ptr<UINT8> m_obj_RAM;
+	required_shared_ptr<UINT8> m_out_RAM;
+	required_shared_ptr<UINT8> m_color_RAM;
+	required_shared_ptr<UINT8> m_fix_RAM;
+
 	UINT8 m_ldv1000_input_latch;
 	UINT8 m_ldv1000_output_latch;
 
@@ -247,15 +251,15 @@ static ADDRESS_MAP_START( mainmem, AS_PROGRAM, 8, segald_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 
-	AM_RANGE(0xc000, 0xc7ff) AM_READWRITE(astron_OBJ_read, astron_OBJ_write) AM_BASE(m_obj_RAM)	/* OBJ according to the schematics (sprite) */
+	AM_RANGE(0xc000, 0xc7ff) AM_READWRITE(astron_OBJ_read, astron_OBJ_write) AM_SHARE("obj_RAM")	/* OBJ according to the schematics (sprite) */
 	AM_RANGE(0xc800, 0xcfff) AM_READWRITE(astron_DISC_read, astron_DISC_write)					/* DISC interface according to schematics */
 	AM_RANGE(0xd000, 0xd000) AM_READ_PORT("DSWA")								/* SW bank 2 (DIPs) */
 	AM_RANGE(0xd001, 0xd001) AM_READ_PORT("DSWB")								/* SW bank 3 (DIPs) */
 	AM_RANGE(0xd002, 0xd002) AM_READ_PORT("IN0")								/* SW bank 0 (IO) */
 	AM_RANGE(0xd003, 0xd003) AM_READ_PORT("IN1")								/* SW bank 1 (IO) */
-	AM_RANGE(0xd800, 0xd803) AM_READWRITE(astron_OUT_read, astron_OUT_write) AM_BASE(m_out_RAM)	/* OUT according to schematics (output port) */
-	AM_RANGE(0xe000, 0xe1ff) AM_READWRITE(astron_COLOR_read, astron_COLOR_write) AM_BASE(m_color_RAM) /* COLOR according to the schematics */
-	AM_RANGE(0xf000, 0xf7ff) AM_WRITE(astron_FIX_write) AM_BASE(m_fix_RAM)						/* FIX according to schematics (characters) */
+	AM_RANGE(0xd800, 0xd803) AM_READWRITE(astron_OUT_read, astron_OUT_write) AM_SHARE("out_RAM")	/* OUT according to schematics (output port) */
+	AM_RANGE(0xe000, 0xe1ff) AM_READWRITE(astron_COLOR_read, astron_COLOR_write) AM_SHARE("color_RAM") /* COLOR according to the schematics */
+	AM_RANGE(0xf000, 0xf7ff) AM_WRITE(astron_FIX_write) AM_SHARE("fix_RAM")						/* FIX according to schematics (characters) */
 	AM_RANGE(0xf800, 0xffff) AM_RAM																/* RAM according to schematics */
 ADDRESS_MAP_END
 

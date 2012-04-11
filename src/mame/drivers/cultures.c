@@ -18,17 +18,24 @@ class cultures_state : public driver_device
 {
 public:
 	cultures_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_bg0_videoram(*this, "bg0_videoram"),
+		m_bg0_regs_x(*this, "bg0_regs_x"),
+		m_bg0_regs_y(*this, "bg0_regs_y"),
+		m_bg1_regs_x(*this, "bg1_regs_x"),
+		m_bg1_regs_y(*this, "bg1_regs_y"),
+		m_bg2_regs_x(*this, "bg2_regs_x"),
+		m_bg2_regs_y(*this, "bg2_regs_y"){ }
 
-	/* memory pointers */
-	UINT8 *   m_bg0_videoram;
 	UINT8     m_paletteram[0x4000];
-	UINT8 *   m_bg0_regs_x;
-	UINT8 *   m_bg1_regs_x;
-	UINT8 *   m_bg2_regs_x;
-	UINT8 *   m_bg0_regs_y;
-	UINT8 *   m_bg1_regs_y;
-	UINT8 *   m_bg2_regs_y;
+	/* memory pointers */
+	required_shared_ptr<UINT8> m_bg0_videoram;
+	required_shared_ptr<UINT8> m_bg0_regs_x;
+	required_shared_ptr<UINT8> m_bg0_regs_y;
+	required_shared_ptr<UINT8> m_bg1_regs_x;
+	required_shared_ptr<UINT8> m_bg1_regs_y;
+	required_shared_ptr<UINT8> m_bg2_regs_x;
+	required_shared_ptr<UINT8> m_bg2_regs_y;
 
 	/* video-related */
 	tilemap_t  *m_bg0_tilemap;
@@ -183,7 +190,7 @@ WRITE8_MEMBER(cultures_state::bg_bank_w)
 static ADDRESS_MAP_START( cultures_map, AS_PROGRAM, 8, cultures_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x8000, 0xbfff) AM_RAM_WRITE(bg0_videoram_w) AM_BASE(m_bg0_videoram)
+	AM_RANGE(0x8000, 0xbfff) AM_RAM_WRITE(bg0_videoram_w) AM_SHARE("bg0_videoram")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
@@ -192,12 +199,12 @@ static ADDRESS_MAP_START( cultures_io_map, AS_IO, 8, cultures_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_RAM
 	AM_RANGE(0x10, 0x13) AM_RAM
-	AM_RANGE(0x20, 0x23) AM_RAM AM_BASE(m_bg0_regs_x)
-	AM_RANGE(0x30, 0x33) AM_RAM AM_BASE(m_bg0_regs_y)
-	AM_RANGE(0x40, 0x43) AM_RAM AM_BASE(m_bg1_regs_x)
-	AM_RANGE(0x50, 0x53) AM_RAM AM_BASE(m_bg1_regs_y)
-	AM_RANGE(0x60, 0x63) AM_RAM AM_BASE(m_bg2_regs_x)
-	AM_RANGE(0x70, 0x73) AM_RAM AM_BASE(m_bg2_regs_y)
+	AM_RANGE(0x20, 0x23) AM_RAM AM_SHARE("bg0_regs_x")
+	AM_RANGE(0x30, 0x33) AM_RAM AM_SHARE("bg0_regs_y")
+	AM_RANGE(0x40, 0x43) AM_RAM AM_SHARE("bg1_regs_x")
+	AM_RANGE(0x50, 0x53) AM_RAM AM_SHARE("bg1_regs_y")
+	AM_RANGE(0x60, 0x63) AM_RAM AM_SHARE("bg2_regs_x")
+	AM_RANGE(0x70, 0x73) AM_RAM AM_SHARE("bg2_regs_y")
 	AM_RANGE(0x80, 0x80) AM_WRITE(cpu_bankswitch_w)
 	AM_RANGE(0x90, 0x90) AM_WRITE(misc_w)
 	AM_RANGE(0xa0, 0xa0) AM_WRITE(bg_bank_w)

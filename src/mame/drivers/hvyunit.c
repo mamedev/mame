@@ -75,11 +75,13 @@ class hvyunit_state : public driver_device
 {
 public:
 	hvyunit_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"),
+		m_colorram(*this, "colorram"){ }
 
 	/* Video */
-	UINT8			*m_videoram;
-	UINT8			*m_colorram;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_colorram;
 	tilemap_t		*m_bg_tilemap;
 	UINT16			m_scrollx;
 	UINT16			m_scrolly;
@@ -431,8 +433,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( slave_memory, AS_PROGRAM, 8, hvyunit_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank2")
-	AM_RANGE(0xc000, 0xc3ff) AM_RAM_WRITE(hu_videoram_w) AM_BASE(m_videoram)
-	AM_RANGE(0xc400, 0xc7ff) AM_RAM_WRITE(hu_colorram_w) AM_BASE(m_colorram)
+	AM_RANGE(0xc000, 0xc3ff) AM_RAM_WRITE(hu_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0xc400, 0xc7ff) AM_RAM_WRITE(hu_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0xd000, 0xd1ff) AM_RAM_WRITE(paletteram_xxxxRRRRGGGGBBBB_byte_split_hi_w) AM_SHARE("paletteram2")
 	AM_RANGE(0xd800, 0xd9ff) AM_RAM_WRITE(paletteram_xxxxRRRRGGGGBBBB_byte_split_lo_w) AM_SHARE("paletteram")
 	AM_RANGE(0xd000, 0xdfff) AM_RAM

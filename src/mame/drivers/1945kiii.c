@@ -53,20 +53,23 @@ public:
 	k3_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		  m_oki1(*this, "oki1"),
-		  m_oki2(*this, "oki2") { }
+		  m_oki2(*this, "oki2") ,
+		m_spriteram_1(*this, "spritera1"),
+		m_spriteram_2(*this, "spritera2"),
+		m_bgram(*this, "bgram"){ }
 
+	/* devices */
+	required_device<okim6295_device> m_oki1;
+	required_device<okim6295_device> m_oki2;
 	/* memory pointers */
-	UINT16 *  m_spriteram_1;
-	UINT16 *  m_spriteram_2;
-	UINT16 *  m_bgram;
+	required_shared_ptr<UINT16> m_spriteram_1;
+	required_shared_ptr<UINT16> m_spriteram_2;
+	required_shared_ptr<UINT16> m_bgram;
 //  UINT16 *  m_paletteram16; // currently this uses generic palette handling
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;
 
-	/* devices */
-	required_device<okim6295_device> m_oki1;
-	required_device<okim6295_device> m_oki2;
 	DECLARE_WRITE16_MEMBER(k3_bgram_w);
 	DECLARE_WRITE16_MEMBER(k3_scrollx_w);
 	DECLARE_WRITE16_MEMBER(k3_scrolly_w);
@@ -97,8 +100,8 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 {
 	k3_state *state = machine.driver_data<k3_state>();
 	const gfx_element *gfx = machine.gfx[0];
-	UINT16 *source = state->m_spriteram_1;
-	UINT16 *source2 = state->m_spriteram_2;
+	UINT16 *source = state->m_spriteram_1.target();
+	UINT16 *source2 = state->m_spriteram_2.target();
 	UINT16 *finish = source + 0x1000 / 2;
 
 	while (source < finish)
@@ -151,9 +154,9 @@ static ADDRESS_MAP_START( k3_map, AS_PROGRAM, 16, k3_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM	// ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM	// Main Ram
 	AM_RANGE(0x200000, 0x200fff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")	// palette
-	AM_RANGE(0x240000, 0x240fff) AM_RAM AM_BASE(m_spriteram_1)
-	AM_RANGE(0x280000, 0x280fff) AM_RAM AM_BASE(m_spriteram_2)
-	AM_RANGE(0x2c0000, 0x2c0fff) AM_RAM_WRITE(k3_bgram_w) AM_BASE(m_bgram)
+	AM_RANGE(0x240000, 0x240fff) AM_RAM AM_SHARE("spritera1")
+	AM_RANGE(0x280000, 0x280fff) AM_RAM AM_SHARE("spritera2")
+	AM_RANGE(0x2c0000, 0x2c0fff) AM_RAM_WRITE(k3_bgram_w) AM_SHARE("bgram")
 	AM_RANGE(0x340000, 0x340001) AM_WRITE(k3_scrollx_w)
 	AM_RANGE(0x380000, 0x380001) AM_WRITE(k3_scrolly_w)
 	AM_RANGE(0x3c0000, 0x3c0001) AM_WRITE(k3_soundbanks_w)

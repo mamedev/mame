@@ -18,10 +18,11 @@ class mayumi_state : public driver_device
 {
 public:
 	mayumi_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"){ }
 
 	/* memory pointers */
-	UINT8 *    m_videoram;
+	required_shared_ptr<UINT8> m_videoram;
 //  UINT8 *    m_nvram;       // this currently uses generic nvram handlers
 
 	/* video-related */
@@ -139,7 +140,7 @@ static ADDRESS_MAP_START( mayumi_map, AS_PROGRAM, 8, mayumi_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xe000, 0xf7ff) AM_RAM_WRITE(mayumi_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0xe000, 0xf7ff) AM_RAM_WRITE(mayumi_videoram_w) AM_SHARE("videoram")
 ADDRESS_MAP_END
 
 

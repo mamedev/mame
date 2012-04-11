@@ -26,13 +26,16 @@ class spoker_state : public driver_device
 {
 public:
 	spoker_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_bg_tile_ram(*this, "bg_tile_ram"),
+		m_fg_tile_ram(*this, "fg_tile_ram"),
+		m_fg_color_ram(*this, "fg_color_ram"){ }
 
-	UINT8   *m_bg_tile_ram;
+	required_shared_ptr<UINT8> m_bg_tile_ram;
 	tilemap_t *m_bg_tilemap;
 
-	UINT8 *m_fg_tile_ram;
-	UINT8 *m_fg_color_ram;
+	required_shared_ptr<UINT8> m_fg_tile_ram;
+	required_shared_ptr<UINT8> m_fg_color_ram;
 	tilemap_t *m_fg_tilemap;
 
 	int m_video_enable;

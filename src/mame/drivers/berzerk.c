@@ -21,11 +21,13 @@ class berzerk_state : public driver_device
 {
 public:
 	berzerk_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"),
+		m_colorram(*this, "colorram"){ }
 
-	UINT8 *m_videoram;
-	size_t m_videoram_size;
-	UINT8 *m_colorram;
+	required_shared_ptr<UINT8> m_videoram;
+//OBRISI.ME
+	required_shared_ptr<UINT8> m_colorram;
 	UINT8 m_magicram_control;
 	UINT8 m_last_shift_data;
 	UINT8 m_intercept;
@@ -460,7 +462,7 @@ static SCREEN_UPDATE_RGB32( berzerk )
 
 	get_pens(screen.machine(), pens);
 
-	for (offs = 0; offs < state->m_videoram_size; offs++)
+	for (offs = 0; offs < state->m_videoram.bytes(); offs++)
 	{
 		int i;
 
@@ -597,18 +599,18 @@ static ADDRESS_MAP_START( berzerk_map, AS_PROGRAM, 8, berzerk_state )
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
 	AM_RANGE(0x0800, 0x0bff) AM_MIRROR(0x0400) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x1000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_BASE_SIZE(m_videoram,m_videoram_size) AM_SHARE("share1")
+	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_SHARE("videoram") AM_SHARE("share1")
 	AM_RANGE(0x6000, 0x7fff) AM_RAM_WRITE(magicram_w) AM_SHARE("share1")
-	AM_RANGE(0x8000, 0x87ff) AM_MIRROR(0x3800) AM_RAM AM_BASE(m_colorram)
+	AM_RANGE(0x8000, 0x87ff) AM_MIRROR(0x3800) AM_RAM AM_SHARE("colorram")
 	AM_RANGE(0xc000, 0xffff) AM_NOP
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( frenzy_map, AS_PROGRAM, 8, berzerk_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_BASE_SIZE(m_videoram,m_videoram_size) AM_SHARE("share1")
+	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_SHARE("videoram") AM_SHARE("share1")
 	AM_RANGE(0x6000, 0x7fff) AM_RAM_WRITE(magicram_w) AM_SHARE("share1")
-	AM_RANGE(0x8000, 0x87ff) AM_MIRROR(0x3800) AM_RAM AM_BASE(m_colorram)
+	AM_RANGE(0x8000, 0x87ff) AM_MIRROR(0x3800) AM_RAM AM_SHARE("colorram")
 	AM_RANGE(0xc000, 0xcfff) AM_ROM
 	AM_RANGE(0xf800, 0xfbff) AM_MIRROR(0x0400) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END

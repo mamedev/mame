@@ -31,12 +31,18 @@ class mlanding_state : public driver_device
 {
 public:
 	mlanding_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_g_ram(*this, "g_ram"),
+		m_ml_tileram(*this, "ml_tileram"),
+		m_dma_ram(*this, "dma_ram"),
+		m_ml_dotram(*this, "ml_dotram"),
+		m_mecha_ram(*this, "mecha_ram"){ }
 
-	UINT16 * m_ml_tileram;
-	UINT16 *m_g_ram;
-	UINT16 * m_ml_dotram;
-	UINT16 *m_dma_ram;
+	required_shared_ptr<UINT16> m_g_ram;
+	required_shared_ptr<UINT16> m_ml_tileram;
+	required_shared_ptr<UINT16> m_dma_ram;
+	required_shared_ptr<UINT16> m_ml_dotram;
+	required_shared_ptr<UINT8> m_mecha_ram;
 	UINT32 m_adpcm_pos;
 	UINT32 m_adpcm_end;
 	int m_adpcm_data;
@@ -44,7 +50,6 @@ public:
 	UINT8 m_pal_fg_bank;
 	int m_dma_active;
 	UINT16 m_dsp_HOLD_signal;
-	UINT8 *m_mecha_ram;
 	UINT8 m_trigger;
 	DECLARE_WRITE16_MEMBER(ml_tileram_w);
 	DECLARE_READ16_MEMBER(ml_tileram_r);
@@ -469,9 +474,9 @@ static ADDRESS_MAP_START( mlanding_mem, AS_PROGRAM, 16, mlanding_state )
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
 	AM_RANGE(0x080000, 0x08ffff) AM_RAM
 
-	AM_RANGE(0x100000, 0x17ffff) AM_RAM AM_BASE(m_g_ram)// 512kB G RAM - enough here for double buffered 512x400x8 frame
-	AM_RANGE(0x180000, 0x1bffff) AM_READWRITE(ml_tileram_r, ml_tileram_w) AM_BASE(m_ml_tileram)
-	AM_RANGE(0x1c0000, 0x1c3fff) AM_RAM AM_SHARE("share2") AM_BASE(m_dma_ram)
+	AM_RANGE(0x100000, 0x17ffff) AM_RAM AM_SHARE("g_ram")// 512kB G RAM - enough here for double buffered 512x400x8 frame
+	AM_RANGE(0x180000, 0x1bffff) AM_READWRITE(ml_tileram_r, ml_tileram_w) AM_SHARE("ml_tileram")
+	AM_RANGE(0x1c0000, 0x1c3fff) AM_RAM AM_SHARE("share2") AM_SHARE("dma_ram")
 	AM_RANGE(0x1c4000, 0x1cffff) AM_RAM AM_SHARE("share1")
 
 	AM_RANGE(0x1d0000, 0x1d0001) AM_WRITE(ml_sub_reset_w)
@@ -509,7 +514,7 @@ static ADDRESS_MAP_START( mlanding_sub_mem, AS_PROGRAM, 16, mlanding_state )
 	AM_RANGE(0x050000, 0x0503ff) AM_RAM AM_SHARE("share3")
 	AM_RANGE(0x1c0000, 0x1c3fff) AM_RAM AM_SHARE("share2")
 	AM_RANGE(0x1c4000, 0x1cffff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x200000, 0x203fff) AM_RAM AM_BASE(m_ml_dotram)
+	AM_RANGE(0x200000, 0x203fff) AM_RAM AM_SHARE("ml_dotram")
 ADDRESS_MAP_END
 
 static WRITE8_DEVICE_HANDLER( ml_msm_start_lsb_w )
@@ -566,7 +571,7 @@ READ8_MEMBER(mlanding_state::test_r)
 //mecha driver ?
 static ADDRESS_MAP_START( mlanding_z80_sub_mem, AS_PROGRAM, 8, mlanding_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE(m_mecha_ram)
+	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("mecha_ram")
 	AM_RANGE(0x8800, 0x8fff) AM_RAM
 
 	AM_RANGE(0x9000, 0x9001) AM_READ(test_r)

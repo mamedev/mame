@@ -39,11 +39,13 @@ class good_state : public driver_device
 {
 public:
 	good_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_fg_tilemapram(*this, "fg_tilemapram"),
+		m_bg_tilemapram(*this, "bg_tilemapram"){ }
 
 	/* memory pointers */
-	UINT16 *  m_bg_tilemapram;
-	UINT16 *  m_fg_tilemapram;
+	required_shared_ptr<UINT16> m_fg_tilemapram;
+	required_shared_ptr<UINT16> m_bg_tilemapram;
 	UINT16 *  m_sprites;
 //  UINT16 *  m_paletteram;   // currently this uses generic palette handling
 
@@ -113,8 +115,8 @@ static ADDRESS_MAP_START( good_map, AS_PROGRAM, 16, good_state )
 
 	AM_RANGE(0x800000, 0x8007ff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")
 
-	AM_RANGE(0x820000, 0x820fff) AM_RAM_WRITE(fg_tilemapram_w) AM_BASE(m_fg_tilemapram)
-	AM_RANGE(0x822000, 0x822fff) AM_RAM_WRITE(bg_tilemapram_w) AM_BASE(m_bg_tilemapram)
+	AM_RANGE(0x820000, 0x820fff) AM_RAM_WRITE(fg_tilemapram_w) AM_SHARE("fg_tilemapram")
+	AM_RANGE(0x822000, 0x822fff) AM_RAM_WRITE(bg_tilemapram_w) AM_SHARE("bg_tilemapram")
 
 	AM_RANGE(0xff0000, 0xffefff) AM_RAM
 ADDRESS_MAP_END

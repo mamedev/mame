@@ -57,10 +57,12 @@ class blackt96_state : public driver_device
 {
 public:
 	blackt96_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_tilemapram(*this, "tilemapram"),
+		m_tilemapram2(*this, "tilemapram2"){ }
 
-	UINT16* m_tilemapram;
-	UINT16* m_tilemapram2;
+	required_shared_ptr<UINT16> m_tilemapram;
+	required_shared_ptr<UINT16> m_tilemapram2;
 	DECLARE_WRITE16_MEMBER(blackt96_c0000_w);
 	DECLARE_WRITE16_MEMBER(blackt96_80000_w);
 	DECLARE_READ8_MEMBER(PIC16C5X_T0_clk_r);
@@ -185,8 +187,8 @@ static ADDRESS_MAP_START( blackt96_map, AS_PROGRAM, 16, blackt96_state )
 	AM_RANGE(0x0f0000, 0x0f0001) AM_READ_PORT("DSW1")
 	AM_RANGE(0x0f0008, 0x0f0009) AM_READ_PORT("DSW2")
 
-	AM_RANGE(0x100000, 0x100fff) AM_RAM AM_BASE(m_tilemapram) // text tilemap
-	AM_RANGE(0x200000, 0x207fff) AM_RAM AM_BASE(m_tilemapram2)// sprite list + sprite tilemaps
+	AM_RANGE(0x100000, 0x100fff) AM_RAM AM_SHARE("tilemapram") // text tilemap
+	AM_RANGE(0x200000, 0x207fff) AM_RAM AM_SHARE("tilemapram2")// sprite list + sprite tilemaps
 	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(paletteram_xxxxRRRRGGGGBBBB_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0xc00000, 0xc03fff) AM_RAM // main ram
 

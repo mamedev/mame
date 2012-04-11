@@ -49,10 +49,11 @@ class hotblock_state : public driver_device
 {
 public:
 	hotblock_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_vram(*this, "vram"){ }
 
 	/* memory pointers */
-	UINT8 *  m_vram;
+	required_shared_ptr<UINT8> m_vram;
 
 	/* misc */
 	int      m_port0;
@@ -122,7 +123,7 @@ WRITE8_MEMBER(hotblock_state::hotblock_video_write)
 
 static ADDRESS_MAP_START( hotblock_map, AS_PROGRAM, 8, hotblock_state )
 	AM_RANGE(0x00000, 0x0ffff) AM_RAM
-	AM_RANGE(0x10000, 0x1ffff) AM_READWRITE(hotblock_video_read, hotblock_video_write) AM_BASE(m_vram)
+	AM_RANGE(0x10000, 0x1ffff) AM_READWRITE(hotblock_video_read, hotblock_video_write) AM_SHARE("vram")
 	AM_RANGE(0x20000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 

@@ -18,16 +18,16 @@ class photon2_state : public driver_device
 public:
 	photon2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this,"maincpu")
-		{ }
+		m_maincpu(*this,"maincpu"),
+		m_spectrum_video_ram(*this, "spectruvideo_ram"){ }
 
-	UINT8 *m_spectrum_video_ram;
+	required_device<cpu_device> m_maincpu;
+	required_shared_ptr<UINT8> m_spectrum_video_ram;
 	int m_spectrum_frame_number;
 	int m_spectrum_flash_invert;
 	UINT8 m_spectrum_port_fe;
 	UINT8 m_nmi_enable;
 
-	required_device<cpu_device> m_maincpu;
 	DECLARE_WRITE8_MEMBER(photon2_membank_w);
 	DECLARE_READ8_MEMBER(photon2_fe_r);
 	DECLARE_WRITE8_MEMBER(photon2_fe_w);
@@ -133,7 +133,7 @@ static SCREEN_UPDATE_IND16( spectrum )
     unsigned char *attr, *scr;
 //  int full_refresh = 1;
 
-    scr=state->m_spectrum_video_ram;
+    scr=state->m_spectrum_video_ram.target();
 
 	bitmap.fill(state->m_spectrum_port_fe & 0x07, cliprect);
 

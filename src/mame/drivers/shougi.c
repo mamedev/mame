@@ -91,9 +91,10 @@ class shougi_state : public driver_device
 {
 public:
 	shougi_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"){ }
 
-	UINT8 *m_videoram;
+	required_shared_ptr<UINT8> m_videoram;
 	int m_nmi_enabled;
 	//UINT8 *m_cpu_sharedram;
 	//UINT8 m_cpu_sharedram_control_val;
@@ -308,7 +309,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, shougi_state )
 	AM_RANGE(0x7000, 0x73ff) AM_RAM AM_SHARE("share1") /* 2114 x 2 (0x400 x 4bit each) */
 	AM_RANGE(0x7800, 0x7bff) AM_RAM AM_SHARE("share2") /* 2114 x 2 (0x400 x 4bit each) */
 
-	AM_RANGE(0x8000, 0xffff) AM_RAM AM_BASE(m_videoram)	/* 4116 x 16 (32K) */
+	AM_RANGE(0x8000, 0xffff) AM_RAM AM_SHARE("videoram")	/* 4116 x 16 (32K) */
 ADDRESS_MAP_END
 
 /* sub */

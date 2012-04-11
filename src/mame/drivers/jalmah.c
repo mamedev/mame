@@ -118,7 +118,13 @@ class jalmah_state : public driver_device
 {
 public:
 	jalmah_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_sc0_vram(*this, "sc0_vram"),
+		m_sc1_vram(*this, "sc1_vram"),
+		m_sc2_vram(*this, "sc2_vram"),
+		m_sc3_vram(*this, "sc3_vram"),
+		m_jm_shared_ram(*this, "jshared_ram"),
+		m_jm_mcu_code(*this, "jmcu_code"){ }
 
 	tilemap_t *m_sc0_tilemap_0;
 	tilemap_t *m_sc0_tilemap_1;
@@ -135,10 +141,10 @@ public:
 	tilemap_t *m_sc3_tilemap_0;
 	tilemap_t *m_sc3_tilemap_2;
 	tilemap_t *m_sc3_tilemap_3;
-	UINT16 *m_sc0_vram;
-	UINT16 *m_sc1_vram;
-	UINT16 *m_sc2_vram;
-	UINT16 *m_sc3_vram;
+	required_shared_ptr<UINT16> m_sc0_vram;
+	required_shared_ptr<UINT16> m_sc1_vram;
+	required_shared_ptr<UINT16> m_sc2_vram;
+	required_shared_ptr<UINT16> m_sc3_vram;
 	UINT16 *m_jm_scrollram;
 	UINT16 *m_jm_vregs;
 	UINT16 m_sc0bank;
@@ -147,8 +153,8 @@ public:
 	UINT8 m_sc1_prin;
 	UINT8 m_sc2_prin;
 	UINT8 m_sc3_prin;
-	UINT16 *m_jm_shared_ram;
-	UINT16 *m_jm_mcu_code;
+	required_shared_ptr<UINT16> m_jm_shared_ram;
+	required_shared_ptr<UINT16> m_jm_mcu_code;
 	UINT8 m_mcu_prg;
 	int m_respcount;
 	UINT8 m_test_mode;
@@ -733,7 +739,7 @@ static void daireika_palette_dma(running_machine &machine, UINT16 val)
 static void daireika_mcu_run(running_machine &machine)
 {
 	jalmah_state *state = machine.driver_data<jalmah_state>();
-	UINT16 *jm_shared_ram = state->m_jm_shared_ram;
+	UINT16 *jm_shared_ram = state->m_jm_shared_ram.target();
 
 	if(((jm_shared_ram[0x550/2] & 0xf00) == 0x700) && ((jm_shared_ram[0x540/2] & 0xf00) != state->m_dma_old))
 	{
@@ -783,7 +789,7 @@ static void daireika_mcu_run(running_machine &machine)
 static void mjzoomin_mcu_run(running_machine &machine)
 {
 	jalmah_state *state = machine.driver_data<jalmah_state>();
-	UINT16 *jm_shared_ram = state->m_jm_shared_ram;
+	UINT16 *jm_shared_ram = state->m_jm_shared_ram.target();
 
 	if(state->m_test_mode)	//service_mode
 	{
@@ -828,7 +834,7 @@ static void mjzoomin_mcu_run(running_machine &machine)
 static void urashima_mcu_run(running_machine &machine)
 {
 	jalmah_state *state = machine.driver_data<jalmah_state>();
-	UINT16 *jm_shared_ram = state->m_jm_shared_ram;
+	UINT16 *jm_shared_ram = state->m_jm_shared_ram.target();
 
 	if(state->m_test_mode)	//service_mode
 	{
@@ -873,7 +879,7 @@ static void urashima_mcu_run(running_machine &machine)
 static void second_mcu_run(running_machine &machine)
 {
 	jalmah_state *state = machine.driver_data<jalmah_state>();
-	UINT16 *jm_shared_ram = state->m_jm_shared_ram;
+	UINT16 *jm_shared_ram = state->m_jm_shared_ram.target();
 	if(state->m_test_mode)	//service_mode
 	{
 		jm_shared_ram[0x200/2] = input_port_read(machine, "KEY0");
@@ -994,13 +1000,13 @@ static ADDRESS_MAP_START( jalmah, AS_PROGRAM, 16, jalmah_state )
 	AM_RANGE(0x080040, 0x080041) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 	//       0x084000, 0x084001  ?
 	AM_RANGE(0x088000, 0x0887ff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBRGBx_word_w) AM_SHARE("paletteram") /* Palette RAM */
-	AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE(sc0_vram_w) AM_BASE(m_sc0_vram)
-	AM_RANGE(0x094000, 0x097fff) AM_RAM_WRITE(sc1_vram_w) AM_BASE(m_sc1_vram)
-	AM_RANGE(0x098000, 0x09bfff) AM_RAM_WRITE(sc2_vram_w) AM_BASE(m_sc2_vram)
-	AM_RANGE(0x09c000, 0x09ffff) AM_RAM_WRITE(sc3_vram_w) AM_BASE(m_sc3_vram)
-	AM_RANGE(0x0f0000, 0x0f0fff) AM_RAM AM_BASE(m_jm_shared_ram)/*shared with MCU*/
+	AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE(sc0_vram_w) AM_SHARE("sc0_vram")
+	AM_RANGE(0x094000, 0x097fff) AM_RAM_WRITE(sc1_vram_w) AM_SHARE("sc1_vram")
+	AM_RANGE(0x098000, 0x09bfff) AM_RAM_WRITE(sc2_vram_w) AM_SHARE("sc2_vram")
+	AM_RANGE(0x09c000, 0x09ffff) AM_RAM_WRITE(sc3_vram_w) AM_SHARE("sc3_vram")
+	AM_RANGE(0x0f0000, 0x0f0fff) AM_RAM AM_SHARE("jshared_ram")/*shared with MCU*/
 	AM_RANGE(0x0f1000, 0x0fffff) AM_RAM /*Work Ram*/
-	AM_RANGE(0x100000, 0x10ffff) AM_RAM AM_BASE(m_jm_mcu_code)/*extra RAM for MCU code prg (NOT ON REAL HW!!!)*/
+	AM_RANGE(0x100000, 0x10ffff) AM_RAM AM_SHARE("jmcu_code")/*extra RAM for MCU code prg (NOT ON REAL HW!!!)*/
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( urashima, AS_PROGRAM, 16, jalmah_state )
@@ -1018,18 +1024,18 @@ static ADDRESS_MAP_START( urashima, AS_PROGRAM, 16, jalmah_state )
 	AM_RANGE(0x080040, 0x080041) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 	//       0x084000, 0x084001  ?
 	AM_RANGE(0x088000, 0x0887ff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBRGBx_word_w) AM_SHARE("paletteram") /* Palette RAM */
-	AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE(urashima_sc0_vram_w) AM_BASE(m_sc0_vram)
+	AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE(urashima_sc0_vram_w) AM_SHARE("sc0_vram")
 	AM_RANGE(0x094000, 0x097fff) AM_RAM_WRITE(urashima_sc0_vram_w)
 	AM_RANGE(0x098000, 0x09bfff) AM_RAM_WRITE(urashima_sc0_vram_w)
-//  AM_RANGE(0x094000, 0x097fff) AM_RAM_WRITE_LEGACY(urashima_sc1_vram_w) AM_BASE(m_sc1_vram)/*unused*/
-//  AM_RANGE(0x098000, 0x09bfff) AM_RAM_WRITE_LEGACY(urashima_sc2_vram_w) AM_BASE(m_sc2_vram)/*unused*/
+//  AM_RANGE(0x094000, 0x097fff) AM_RAM_WRITE_LEGACY(urashima_sc1_vram_w) AM_SHARE("sc1_vram")/*unused*/
+//  AM_RANGE(0x098000, 0x09bfff) AM_RAM_WRITE_LEGACY(urashima_sc2_vram_w) AM_SHARE("sc2_vram")/*unused*/
 	/*$9c000-$9cfff Video Registers*/
 /**/AM_RANGE(0x09c000, 0x09dfff) AM_WRITE(urashima_vregs_w)
 /**///AM_RANGE(0x09c480, 0x09c49f) AM_RAM_WRITE_LEGACY(urashima_sc2vregs_w)
-	AM_RANGE(0x09e000, 0x0a1fff) AM_RAM_WRITE(urashima_sc3_vram_w) AM_BASE(m_sc3_vram)
-	AM_RANGE(0x0f0000, 0x0f0fff) AM_RAM AM_BASE(m_jm_shared_ram)/*shared with MCU*/
+	AM_RANGE(0x09e000, 0x0a1fff) AM_RAM_WRITE(urashima_sc3_vram_w) AM_SHARE("sc3_vram")
+	AM_RANGE(0x0f0000, 0x0f0fff) AM_RAM AM_SHARE("jshared_ram")/*shared with MCU*/
 	AM_RANGE(0x0f1000, 0x0fffff) AM_RAM /*Work Ram*/
-	AM_RANGE(0x100000, 0x10ffff) AM_RAM AM_BASE(m_jm_mcu_code)/*extra RAM for MCU code prg (NOT ON REAL HW!!!)*/
+	AM_RANGE(0x100000, 0x10ffff) AM_RAM AM_SHARE("jmcu_code")/*extra RAM for MCU code prg (NOT ON REAL HW!!!)*/
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( common )
@@ -1753,8 +1759,8 @@ data value is REQ under mjzoomin video test menu.It is related to the MCU?
 */
 WRITE16_MEMBER(jalmah_state::urashima_mcu_w)
 {
-	UINT16 *jm_shared_ram = m_jm_shared_ram;
-	UINT16 *jm_mcu_code = m_jm_mcu_code;
+	UINT16 *jm_shared_ram = m_jm_shared_ram.target();
+	UINT16 *jm_mcu_code = m_jm_mcu_code.target();
 	if(ACCESSING_BITS_0_7 && data)
 	{
 		/*******************************************************
@@ -1974,8 +1980,8 @@ static const UINT16 dai_mcu_code[0x11] = { 0x33c5, 0x0010, 0x07fe, 0x3a39,0x000f
 
 WRITE16_MEMBER(jalmah_state::daireika_mcu_w)
 {
-	UINT16 *jm_shared_ram = m_jm_shared_ram;
-	UINT16 *jm_mcu_code = m_jm_mcu_code;
+	UINT16 *jm_shared_ram = m_jm_shared_ram.target();
+	UINT16 *jm_mcu_code = m_jm_mcu_code.target();
 	UINT16 i;
 
 	if(ACCESSING_BITS_0_7 && data)
@@ -2250,8 +2256,8 @@ data value is REQ under mjzoomin video test menu.It is related to the MCU?
 */
 WRITE16_MEMBER(jalmah_state::mjzoomin_mcu_w)
 {
-	UINT16 *jm_shared_ram = m_jm_shared_ram;
-	UINT16 *jm_mcu_code = m_jm_mcu_code;
+	UINT16 *jm_shared_ram = m_jm_shared_ram.target();
+	UINT16 *jm_mcu_code = m_jm_mcu_code.target();
 	if(ACCESSING_BITS_0_7 && data)
 	{
 		/******************************************************

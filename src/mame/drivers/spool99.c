@@ -98,12 +98,15 @@ class spool99_state : public driver_device
 {
 public:
 	spool99_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_main(*this, "main"),
+		m_vram(*this, "vram"),
+		m_cram(*this, "cram"){ }
 
-	UINT8 *m_main;
+	required_shared_ptr<UINT8> m_main;
+	required_shared_ptr<UINT8> m_vram;
+	required_shared_ptr<UINT8> m_cram;
 	tilemap_t *m_sc0_tilemap;
-	UINT8 *m_cram;
-	UINT8 *m_vram;
 	DECLARE_WRITE8_MEMBER(spool99_vram_w);
 	DECLARE_WRITE8_MEMBER(spool99_cram_w);
 	DECLARE_READ8_MEMBER(spool99_io_r);
@@ -209,7 +212,7 @@ static WRITE8_DEVICE_HANDLER( eeprom_dataline_w )
 }
 
 static ADDRESS_MAP_START( spool99_map, AS_PROGRAM, 8, spool99_state )
-	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_BASE(m_main)
+	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_SHARE("main")
 	AM_RANGE(0x0100, 0xaeff) AM_ROM AM_REGION("maincpu", 0x100) AM_WRITENOP
 	AM_RANGE(0xaf00, 0xafff) AM_READ(spool99_io_r)
 	AM_RANGE(0xafed, 0xafed) AM_DEVWRITE_LEGACY("eeprom", eeprom_resetline_w )
@@ -220,8 +223,8 @@ static ADDRESS_MAP_START( spool99_map, AS_PROGRAM, 8, spool99_state )
 	AM_RANGE(0xb000, 0xb3ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_byte_le_w) AM_SHARE("paletteram")
 
 	AM_RANGE(0xb800, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(spool99_vram_w) AM_BASE(m_vram)
-	AM_RANGE(0xf000, 0xffff) AM_RAM_WRITE(spool99_cram_w) AM_BASE(m_cram)
+	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(spool99_vram_w) AM_SHARE("vram")
+	AM_RANGE(0xf000, 0xffff) AM_RAM_WRITE(spool99_cram_w) AM_SHARE("cram")
 ADDRESS_MAP_END
 
 READ8_MEMBER(spool99_state::vcarn_io_r)
@@ -255,7 +258,7 @@ READ8_MEMBER(spool99_state::vcarn_io_r)
 }
 
 static ADDRESS_MAP_START( vcarn_map, AS_PROGRAM, 8, spool99_state )
-	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_BASE(m_main)
+	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_SHARE("main")
 	AM_RANGE(0x0100, 0xa6ff) AM_ROM AM_REGION("maincpu", 0x100) AM_WRITENOP
 	AM_RANGE(0xa700, 0xa7ff) AM_READ(vcarn_io_r)
 	AM_RANGE(0xa745, 0xa745) AM_DEVWRITE_LEGACY("eeprom", eeprom_resetline_w )
@@ -267,8 +270,8 @@ static ADDRESS_MAP_START( vcarn_map, AS_PROGRAM, 8, spool99_state )
 
 	AM_RANGE(0xb000, 0xdfff) AM_RAM
 //  AM_RANGE(0xdf00, 0xdfff) AM_READWRITE(vcarn_io_r,vcarn_io_w) AM_BASE_LEGACY(&vcarn_io)
-	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(spool99_vram_w) AM_BASE(m_vram)
-	AM_RANGE(0xf000, 0xffff) AM_RAM_WRITE(spool99_cram_w) AM_BASE(m_cram)
+	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(spool99_vram_w) AM_SHARE("vram")
+	AM_RANGE(0xf000, 0xffff) AM_RAM_WRITE(spool99_cram_w) AM_SHARE("cram")
 ADDRESS_MAP_END
 
 

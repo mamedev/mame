@@ -101,10 +101,11 @@ class marinedt_state : public driver_device
 {
 public:
 	marinedt_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_tx_tileram(*this, "tx_tileram"){ }
 
 	/* memory pointers */
-	UINT8 *     m_tx_tileram;
+	required_shared_ptr<UINT8> m_tx_tileram;
 
 	/* video-related */
 	bitmap_ind16 *m_tile;
@@ -311,7 +312,7 @@ static ADDRESS_MAP_START( marinedt_map, AS_PROGRAM, 8, marinedt_state )
 	AM_RANGE(0x0000, 0x37ff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
 	AM_RANGE(0x4400, 0x47ff) AM_RAM				//unused, vram mirror?
-	AM_RANGE(0x4800, 0x4bff) AM_RAM_WRITE(tx_tileram_w) AM_BASE(m_tx_tileram)
+	AM_RANGE(0x4800, 0x4bff) AM_RAM_WRITE(tx_tileram_w) AM_SHARE("tx_tileram")
 	AM_RANGE(0x4c00, 0x4c00) AM_WRITENOP	//?? maybe off by one error
 ADDRESS_MAP_END
 

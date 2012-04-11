@@ -94,8 +94,8 @@ public:
 		  m_dma8237_2(*this, "dma8237_2"),
 		  m_pic8259_1(*this, "pic8259_1"),
 		  m_pic8259_2(*this, "pic8259_2"),
-		  m_voodoo(*this, "voodoo_0")
-		  { }
+		  m_voodoo(*this, "voodoo_0"),
+		  m_unk_ram(*this, "unk_ram"){ }
 
 	int m_dma_channel;
 	UINT8 m_dma_offset[2][4];
@@ -105,7 +105,6 @@ public:
 	UINT8 m_funkball_config_regs[256];
 	UINT32 m_cx5510_regs[256/4];
 	UINT16 m_flash_addr;
-	UINT32 *m_unk_ram;
 	UINT8 *m_bios_ram;
 	UINT8 m_flash_cmd;
 	UINT8 m_flash_data_cmd;
@@ -120,6 +119,8 @@ public:
 	required_device<pic8259_device> m_pic8259_1;
 	required_device<pic8259_device> m_pic8259_2;
 	required_device<voodoo_device> m_voodoo;
+
+	required_shared_ptr<UINT32> m_unk_ram;
 
 	DECLARE_READ8_MEMBER( get_slave_ack );
 	DECLARE_WRITE8_MEMBER( flash_w );
@@ -575,7 +576,7 @@ static ADDRESS_MAP_START(funkball_map, AS_PROGRAM, 32, funkball_state)
 	AM_RANGE(0x00100000, 0x07ffffff) AM_RAM
 //  AM_RANGE(0x08000000, 0x0fffffff) AM_NOP
 	AM_RANGE(0x40008000, 0x400080ff) AM_READWRITE(biu_ctrl_r, biu_ctrl_w)
-	AM_RANGE(0x40010e00, 0x40010eff) AM_RAM AM_BASE(m_unk_ram)
+	AM_RANGE(0x40010e00, 0x40010eff) AM_RAM AM_SHARE("unk_ram")
 	AM_RANGE(0xff000000, 0xffffdfff) AM_DEVREADWRITE_LEGACY("voodoo_0", voodoo_r, voodoo_w)
 	AM_RANGE(0xfffe0000, 0xffffffff) AM_ROM AM_REGION("bios", 0)	/* System BIOS */
 ADDRESS_MAP_END

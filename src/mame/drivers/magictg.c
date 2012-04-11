@@ -132,7 +132,8 @@ public:
 		m_mips(*this, "mips"),
 		m_adsp(*this, "adsp"),
 		m_pci(*this, "pcibus")
-	{ }
+	,
+		m_adsp_pram(*this, "adsp_pram"){ }
 
 	required_device<cpu_device>			m_mips;
 	required_device<adsp2181_device>	m_adsp;
@@ -150,7 +151,7 @@ public:
 
 
 	/* ADSP-2181 */
-	UINT32*								m_adsp_pram;
+	required_shared_ptr<UINT32> m_adsp_pram;
 
 	struct
 	{
@@ -851,7 +852,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( adsp_program_map, AS_PROGRAM, 32, magictg_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x3fff) AM_RAM AM_BASE(m_adsp_pram)
+	AM_RANGE(0x0000, 0x3fff) AM_RAM AM_SHARE("adsp_pram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( adsp_data_map, AS_DATA, 16, magictg_state )

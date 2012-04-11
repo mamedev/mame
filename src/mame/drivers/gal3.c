@@ -137,14 +137,16 @@ class gal3_state : public driver_device
 {
 public:
 	gal3_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_nvmem(*this, "nvmem"),
+		m_rsoSharedRAM(*this, "rsoSharedRAM"){ }
 
 	UINT32 *m_mpSharedRAM0;
 	//UINT32 *m_mpSharedRAM1;
-	UINT32 *m_nvmem;
-	size_t m_nvmem_size;
+	required_shared_ptr<UINT32> m_nvmem;
+//OBRISI.ME
 	UINT16 m_namcos21_video_enable;
-	UINT16 *m_rsoSharedRAM;
+	required_shared_ptr<UINT16> m_rsoSharedRAM;
 	UINT32 m_led_mst;
 	UINT32 m_led_slv;
 	DECLARE_READ32_MEMBER(led_mst_r);
@@ -253,7 +255,7 @@ static NVRAM_HANDLER( gal3 )
 	UINT8 data[4];
 	if( read_or_write )
 	{
-		for( i=0; i<state->m_nvmem_size/4; i++ )
+		for( i=0; i<state->m_nvmem.bytes()/4; i++ )
 		{
 			UINT32 dword = state->m_nvmem[i];
 			data[0] = dword>>24;
@@ -267,7 +269,7 @@ static NVRAM_HANDLER( gal3 )
 	{
 		if( file )
 		{
-			for( i=0; i<state->m_nvmem_size/4; i++ )
+			for( i=0; i<state->m_nvmem.bytes()/4; i++ )
 			{
 				file->read( data, 4 );
 				state->m_nvmem[i] = (data[0]<<24)|(data[1]<<16)|(data[2]<<8)|data[3];
@@ -276,7 +278,7 @@ static NVRAM_HANDLER( gal3 )
 		else
 		{
 			/* fill in the default values */
-			memset( state->m_nvmem, 0x00, state->m_nvmem_size );
+			memset( state->m_nvmem, 0x00, state->m_nvmem.bytes() );
 		}
 	}
 }
@@ -358,7 +360,7 @@ WRITE32_MEMBER(gal3_state::rso_w)
 
 static ADDRESS_MAP_START( cpu_mst_map, AS_PROGRAM, 32, gal3_state )
 	AM_RANGE(0x00000000, 0x001fffff) AM_ROM
-	AM_RANGE(0x20000000, 0x20001fff) AM_RAM AM_BASE_SIZE(m_nvmem,m_nvmem_size)	//NVRAM
+	AM_RANGE(0x20000000, 0x20001fff) AM_RAM AM_SHARE("nvmem")	//NVRAM
 /// AM_RANGE(0x40000000, 0x4000ffff) AM_WRITE_LEGACY() //
 	AM_RANGE(0x44000000, 0x44000003) AM_READ_PORT("DSW_CPU_mst"	)
 	AM_RANGE(0x44800000, 0x44800003) AM_READ(led_mst_r) AM_WRITE(led_mst_w)	//LEDs
@@ -435,7 +437,7 @@ static ADDRESS_MAP_START( rs_cpu_map, AS_PROGRAM, 16, gal3_state )
 	AM_RANGE(0x2c3800, 0x2c3801) AM_RAM //?
 	AM_RANGE(0x2c4000, 0x2c4001) AM_RAM //?
 
-	AM_RANGE(0x300000, 0x300fff) AM_RAM AM_BASE(m_rsoSharedRAM)	//shared RAM
+	AM_RANGE(0x300000, 0x300fff) AM_RAM AM_SHARE("rsoSharedRAM")	//shared RAM
 
 	AM_RANGE(0x400000, 0x400017) AM_RAM //MC68681?
 	AM_RANGE(0x480000, 0x480017) AM_RAM //?

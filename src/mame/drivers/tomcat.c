@@ -40,10 +40,11 @@ class tomcat_state : public driver_device
 {
 public:
 	tomcat_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_shared_ram(*this, "shared_ram"){ }
 
 	int m_control_num;
-	UINT16 *m_shared_ram;
+	required_shared_ptr<UINT16> m_shared_ram;
 	UINT8 m_nvram[0x800];
 	int m_dsp_BIO;
 	int m_dsp_idle;
@@ -303,7 +304,7 @@ static ADDRESS_MAP_START( tomcat_map, AS_PROGRAM, 16, tomcat_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dsp_map, AS_PROGRAM, 16, tomcat_state )
-	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_BASE(m_shared_ram)
+	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("shared_ram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dsp_io_map, AS_IO, 16, tomcat_state )

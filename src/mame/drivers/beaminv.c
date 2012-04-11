@@ -60,11 +60,12 @@ class beaminv_state : public driver_device
 {
 public:
 	beaminv_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"){ }
 
 	/* memory pointers */
-	UINT8 *    m_videoram;
-	size_t     m_videoram_size;
+	required_shared_ptr<UINT8> m_videoram;
+//OBRISI.ME
 
 	/* misc */
 	emu_timer  *m_interrupt_timer;
@@ -173,13 +174,13 @@ static SCREEN_UPDATE_RGB32( beaminv )
 	beaminv_state *state = screen.machine().driver_data<beaminv_state>();
 	offs_t offs;
 
-	for (offs = 0; offs < state->m_videoram_size; offs++)
+	for (offs = 0; offs < state->m_videoram.bytes(); offs++)
 	{
 		int i;
 
 		UINT8 y = offs;
 		UINT8 x = offs >> 8 << 3;
-		UINT8 data = state->m_videoram[offs];
+		UINT8 data = state->m_videoram.target()[offs];
 
 		for (i = 0; i < 8; i++)
 		{
@@ -239,7 +240,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, beaminv_state )
 	AM_RANGE(0x2800, 0x2800) AM_MIRROR(0x03ff) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x3400, 0x3400) AM_MIRROR(0x03ff) AM_READ(controller_r)
 	AM_RANGE(0x3800, 0x3800) AM_MIRROR(0x03ff) AM_READ(v128_r)
-	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_BASE_SIZE(m_videoram, m_videoram_size)
+	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_SHARE("videoram")
 ADDRESS_MAP_END
 
 

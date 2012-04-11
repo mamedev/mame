@@ -69,11 +69,14 @@ class supdrapo_state : public driver_device
 {
 public:
 	supdrapo_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_col_line(*this, "col_line"),
+		m_videoram(*this, "videoram"),
+		m_char_bank(*this, "char_bank"){ }
 
-	UINT8 *m_char_bank;
-	UINT8 *m_col_line;
-	UINT8 *m_videoram;
+	required_shared_ptr<UINT8> m_col_line;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_char_bank;
 	UINT8 m_wdog;
 	DECLARE_READ8_MEMBER(sdpoker_rng_r);
 	DECLARE_WRITE8_MEMBER(wdog8000_w);
@@ -251,10 +254,10 @@ static ADDRESS_MAP_START( sdpoker_mem, AS_PROGRAM, 8, supdrapo_state )
 	AM_RANGE(0x0000, 0x4fff) AM_ROM
 	AM_RANGE(0x5000, 0x50ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x57ff, 0x57ff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x5800, 0x58ff) AM_RAM AM_SHARE("share1") AM_BASE(m_col_line)
+	AM_RANGE(0x5800, 0x58ff) AM_RAM AM_SHARE("share1") AM_SHARE("col_line")
 	AM_RANGE(0x6000, 0x67ff) AM_RAM //work ram
-	AM_RANGE(0x6800, 0x6bff) AM_RAM AM_BASE(m_videoram)
-	AM_RANGE(0x6c00, 0x6fff) AM_RAM AM_BASE(m_char_bank)
+	AM_RANGE(0x6800, 0x6bff) AM_RAM AM_SHARE("videoram")
+	AM_RANGE(0x6c00, 0x6fff) AM_RAM AM_SHARE("char_bank")
 	AM_RANGE(0x7000, 0x7bff) AM_RAM //$7600 seems watchdog
 	AM_RANGE(0x7c00, 0x7c00) AM_WRITE(debug7c00_w)
 	AM_RANGE(0x8000, 0x8000) AM_READ_PORT("IN4") AM_WRITE(wdog8000_w)

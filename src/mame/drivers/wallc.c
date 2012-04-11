@@ -57,9 +57,10 @@ class wallc_state : public driver_device
 {
 public:
 	wallc_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"){ }
 
-	UINT8 *m_videoram;
+	required_shared_ptr<UINT8> m_videoram;
 	tilemap_t *m_bg_tilemap;
 	DECLARE_WRITE8_MEMBER(wallc_videoram_w);
 	DECLARE_WRITE8_MEMBER(wallc_coin_counter_w);
@@ -130,7 +131,7 @@ static PALETTE_INIT( wallc )
 
 WRITE8_MEMBER(wallc_state::wallc_videoram_w)
 {
-	UINT8 *videoram = m_videoram;
+	UINT8 *videoram = m_videoram.target();
 	videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
@@ -138,7 +139,7 @@ WRITE8_MEMBER(wallc_state::wallc_videoram_w)
 static TILE_GET_INFO( get_bg_tile_info )
 {
 	wallc_state *state = machine.driver_data<wallc_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = state->m_videoram.target();
 	SET_TILE_INFO(0, videoram[tile_index] + 0x100, 1, 0);
 }
 
@@ -162,7 +163,7 @@ WRITE8_MEMBER(wallc_state::wallc_coin_counter_w)
 
 static ADDRESS_MAP_START( wallc_map, AS_PROGRAM, 8, wallc_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(wallc_videoram_w) AM_MIRROR(0xc00) AM_BASE(m_videoram)	/* 2114, 2114 */
+	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(wallc_videoram_w) AM_MIRROR(0xc00) AM_SHARE("videoram")	/* 2114, 2114 */
 	AM_RANGE(0xa000, 0xa3ff) AM_RAM		/* 2114, 2114 */
 
 	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("DSW1")

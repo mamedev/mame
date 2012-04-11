@@ -68,14 +68,17 @@ class dominob_state : public driver_device
 {
 public:
 	dominob_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"),
+		m_spriteram(*this, "spriteram"),
+		m_bgram(*this, "bgram"){ }
 
 	/* memory pointers */
-	UINT8 *  m_spriteram;
-	UINT8 *  m_videoram;
-	UINT8 *  m_bgram;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<UINT8> m_bgram;
 //  UINT8 *  m_paletteram;    // currently this uses generic palette handling
-	size_t   m_spriteram_size;
+//OBRISI.ME
 
 	/* input-related */
 	//UINT8 m_paddle_select;
@@ -94,16 +97,16 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	dominob_state *state = machine.driver_data<dominob_state>();
 	int offs;
 
-	for (offs = 0; offs < state->m_spriteram_size; offs += 4)
+	for (offs = 0; offs < state->m_spriteram.bytes(); offs += 4)
 	{
 		int sx, sy, code;
 
-		sx = state->m_spriteram[offs];
-		sy = 248 - state->m_spriteram[offs + 1];
+		sx = state->m_spriteram.target()[offs];
+		sy = 248 - state->m_spriteram.target()[offs + 1];
 		if (state->flip_screen_x()) sx = 248 - sx;
 		if (state->flip_screen_y()) sy = 248 - sy;
 
-		code = state->m_spriteram[offs + 3] + ((state->m_spriteram[offs + 2] & 0x03) << 8)  ;
+		code = state->m_spriteram.target()[offs + 3] + ((state->m_spriteram.target()[offs + 2] & 0x03) << 8)  ;
 
 		drawgfx_transpen(bitmap,cliprect,machine.gfx[0],
 				2 * code,
@@ -177,10 +180,10 @@ static ADDRESS_MAP_START( memmap, AS_PROGRAM, 8, dominob_state )
 	AM_RANGE(0xd010, 0xd010) AM_READ_PORT("IN1") AM_WRITENOP
 	AM_RANGE(0xd018, 0xd018) AM_READ_PORT("IN2") AM_WRITENOP
 
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_BASE(m_videoram)
-	AM_RANGE(0xe800, 0xe83f) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("videoram")
+	AM_RANGE(0xe800, 0xe83f) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xe840, 0xefff) AM_RAM
-	AM_RANGE(0xf000, 0xf07f) AM_RAM AM_BASE(m_bgram)
+	AM_RANGE(0xf000, 0xf07f) AM_RAM AM_SHARE("bgram")
 	AM_RANGE(0xf080, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xfbff) AM_RAM_WRITE(paletteram_xxxxRRRRGGGGBBBB_byte_le_w) AM_SHARE("paletteram")
 	AM_RANGE(0xfc00, 0xffff) AM_RAM

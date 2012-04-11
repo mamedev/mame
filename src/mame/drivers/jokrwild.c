@@ -101,10 +101,12 @@ class jokrwild_state : public driver_device
 {
 public:
 	jokrwild_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"),
+		m_colorram(*this, "colorram"){ }
 
-	UINT8 *m_videoram;
-	UINT8 *m_colorram;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_colorram;
 	tilemap_t *m_bg_tilemap;
 	DECLARE_WRITE8_MEMBER(jokrwild_videoram_w);
 	DECLARE_WRITE8_MEMBER(jokrwild_colorram_w);
@@ -193,9 +195,9 @@ READ8_MEMBER(jokrwild_state::rng_r)
 *************************/
 
 static ADDRESS_MAP_START( jokrwild_map, AS_PROGRAM, 8, jokrwild_state )
-	AM_RANGE(0x0000, 0x03ff) AM_RAM_WRITE(jokrwild_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0x0000, 0x03ff) AM_RAM_WRITE(jokrwild_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x0400, 0x07ff) AM_RAM //FIXME: backup RAM
-	AM_RANGE(0x2000, 0x23ff) AM_RAM_WRITE(jokrwild_colorram_w) AM_BASE(m_colorram)
+	AM_RANGE(0x2000, 0x23ff) AM_RAM_WRITE(jokrwild_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0x2400, 0x27ff) AM_RAM //stack RAM
 	AM_RANGE(0x4004, 0x4007) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
 	AM_RANGE(0x4008, 0x400b) AM_DEVREADWRITE("pia1", pia6821_device, read, write) //optical sensor is here

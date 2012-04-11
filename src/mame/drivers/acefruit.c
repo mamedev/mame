@@ -19,11 +19,14 @@ class acefruit_state : public driver_device
 {
 public:
 	acefruit_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"),
+		m_colorram(*this, "colorram"),
+		m_spriteram(*this, "spriteram"){ }
 
-	UINT8 *m_spriteram;
-	UINT8 *m_colorram;
-	UINT8 *m_videoram;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_colorram;
+	required_shared_ptr<UINT8> m_spriteram;
 	emu_timer *m_refresh_timer;
 	DECLARE_WRITE8_MEMBER(acefruit_colorram_w);
 	DECLARE_WRITE8_MEMBER(acefruit_coin_w);
@@ -284,8 +287,8 @@ static PALETTE_INIT( acefruit )
 static ADDRESS_MAP_START( acefruit_map, AS_PROGRAM, 8, acefruit_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x20ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_BASE(m_videoram)
-	AM_RANGE(0x4400, 0x47ff) AM_RAM_WRITE(acefruit_colorram_w) AM_BASE(m_colorram)
+	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_SHARE("videoram")
+	AM_RANGE(0x4400, 0x47ff) AM_RAM_WRITE(acefruit_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0x8000, 0x8000) AM_READ_PORT("IN0")
 	AM_RANGE(0x8001, 0x8001) AM_READ_PORT("IN1")
 	AM_RANGE(0x8002, 0x8002) AM_READ_PORT("IN2")
@@ -294,7 +297,7 @@ static ADDRESS_MAP_START( acefruit_map, AS_PROGRAM, 8, acefruit_state )
 	AM_RANGE(0x8005, 0x8005) AM_READ_PORT("IN5")
 	AM_RANGE(0x8006, 0x8006) AM_READ_PORT("IN6")
 	AM_RANGE(0x8007, 0x8007) AM_READ_PORT("IN7")
-	AM_RANGE(0x6000, 0x6005) AM_RAM AM_BASE(m_spriteram)
+	AM_RANGE(0x6000, 0x6005) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xa000, 0xa001) AM_WRITE(acefruit_lamp_w)
 	AM_RANGE(0xa002, 0xa003) AM_WRITE(acefruit_coin_w)
 	AM_RANGE(0xa004, 0xa004) AM_WRITE(acefruit_solenoid_w)

@@ -17,9 +17,10 @@ class tgtpanic_state : public driver_device
 {
 public:
 	tgtpanic_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_ram(*this, "ram"){ }
 
-	UINT8 *m_ram;
+	required_shared_ptr<UINT8> m_ram;
 	UINT8 m_color;
 	DECLARE_WRITE8_MEMBER(color_w);
 };
@@ -82,7 +83,7 @@ WRITE8_MEMBER(tgtpanic_state::color_w)
 
 static ADDRESS_MAP_START( prg_map, AS_PROGRAM, 8, tgtpanic_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_RAM AM_BASE(m_ram)
+	AM_RANGE(0x8000, 0xbfff) AM_RAM AM_SHARE("ram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( io_map, AS_IO, 8, tgtpanic_state )

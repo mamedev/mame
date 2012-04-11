@@ -76,21 +76,23 @@ class igspoker_state : public driver_device
 public:
 	igspoker_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu")
-		{ }
+		m_maincpu(*this, "maincpu"),
+		m_bg_tile_ram(*this, "bg_tile_ram"),
+		m_fg_tile_ram(*this, "fg_tile_ram"),
+		m_fg_color_ram(*this, "fg_color_ram"){ }
 
+	required_device<cpu_device> m_maincpu;
+	required_shared_ptr<UINT8> m_bg_tile_ram;
+	required_shared_ptr<UINT8> m_fg_tile_ram;
+	required_shared_ptr<UINT8> m_fg_color_ram;
 	int m_nmi_enable;
 	int m_bg_enable;
 	int m_hopper;
-	UINT8 *m_fg_tile_ram;
-	UINT8 *m_fg_color_ram;
-	UINT8 *m_bg_tile_ram;
 	tilemap_t *m_fg_tilemap;
 	tilemap_t *m_bg_tilemap;
 	UINT8 m_out[3];
 	size_t m_protection_res;
 
-	required_device<cpu_device> m_maincpu;
 	DECLARE_READ8_MEMBER(igs_irqack_r);
 	DECLARE_WRITE8_MEMBER(igs_irqack_w);
 	DECLARE_WRITE8_MEMBER(bg_tile_w);

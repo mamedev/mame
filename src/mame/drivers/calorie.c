@@ -87,11 +87,13 @@ class calorie_state : public driver_device
 {
 public:
 	calorie_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_fg_ram(*this, "fg_ram"),
+		m_sprites(*this, "sprites"){ }
 
 	/* memory pointers */
-	UINT8 *  m_fg_ram;
-	UINT8 *  m_sprites;
+	required_shared_ptr<UINT8> m_fg_ram;
+	required_shared_ptr<UINT8> m_sprites;
 //  UINT8 *  m_paletteram;    // currently this uses generic palette handling
 
 	/* video-related */
@@ -244,8 +246,8 @@ static ADDRESS_MAP_START( calorie_map, AS_PROGRAM, 8, calorie_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(fg_ram_w) AM_BASE(m_fg_ram)
-	AM_RANGE(0xd800, 0xdbff) AM_RAM AM_BASE(m_sprites)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(fg_ram_w) AM_SHARE("fg_ram")
+	AM_RANGE(0xd800, 0xdbff) AM_RAM AM_SHARE("sprites")
 	AM_RANGE(0xdc00, 0xdcff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_byte_le_w) AM_SHARE("paletteram")
 	AM_RANGE(0xde00, 0xde00) AM_WRITE(bg_bank_w)
 	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("P1")

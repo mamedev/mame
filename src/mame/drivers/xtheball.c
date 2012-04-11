@@ -18,10 +18,12 @@ class xtheball_state : public driver_device
 {
 public:
 	xtheball_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_vram_bg(*this, "vrabg"),
+		m_vram_fg(*this, "vrafg"){ }
 
-	UINT16 *m_vram_bg;
-	UINT16 *m_vram_fg;
+	required_shared_ptr<UINT16> m_vram_bg;
+	required_shared_ptr<UINT16> m_vram_fg;
 	UINT8 m_bitvals[32];
 	DECLARE_WRITE16_MEMBER(bit_controls_w);
 	DECLARE_READ16_MEMBER(analogx_r);
@@ -210,8 +212,8 @@ READ16_MEMBER(xtheball_state::analogy_watchdog_r)
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, xtheball_state )
 	AM_RANGE(0x00000000, 0x0001ffff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x01000000, 0x010fffff) AM_RAM AM_BASE(m_vram_bg)
-	AM_RANGE(0x02000000, 0x020fffff) AM_RAM AM_BASE(m_vram_fg)
+	AM_RANGE(0x01000000, 0x010fffff) AM_RAM AM_SHARE("vrabg")
+	AM_RANGE(0x02000000, 0x020fffff) AM_RAM AM_SHARE("vrafg")
 	AM_RANGE(0x03000000, 0x030000ff) AM_DEVREADWRITE8_LEGACY("tlc34076", tlc34076_r, tlc34076_w, 0x00ff)
 	AM_RANGE(0x03040000, 0x030401ff) AM_WRITE(bit_controls_w)
 	AM_RANGE(0x03040080, 0x0304008f) AM_READ_PORT("DSW")

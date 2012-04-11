@@ -123,28 +123,30 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
 		m_microtouch(*this,"microtouch")
-		{ }
+		,
+		m_regs(*this, "regs"),
+		m_galgames_ram(*this, "galgames_ram"){ }
 
-	DECLARE_WRITE8_MEMBER(microtouch_tx);
+	required_device<cpu_device> m_maincpu;
+	optional_device<microtouch_device> m_microtouch;
+	required_shared_ptr<UINT16> m_regs;
+	required_shared_ptr<UINT16> m_galgames_ram;
 
 	int m_okibank;
 	UINT8 m_rtc_ram[8];
 	bitmap_ind16 m_bitmap[2][2];
-	UINT16 *m_regs;
 	UINT16 m_color;
 	UINT16 m_addr;
 	UINT32 m_gfx_offs;
 	UINT32 m_gfx_size;
 	int (*m_compute_addr) (UINT16 reg_low, UINT16 reg_mid, UINT16 reg_high);
-	UINT16 *m_galgames_ram;
 	UINT16 m_galgames_cart;
 	UINT32 m_palette_offset;
 	UINT8 m_palette_index;
 	UINT8 m_palette_data[3];
 	device_t *m_duart68681;
 
-	required_device<cpu_device> m_maincpu;
-	optional_device<microtouch_device> m_microtouch;
+	DECLARE_WRITE8_MEMBER(microtouch_tx);
 	DECLARE_READ16_MEMBER(rtc_r);
 	DECLARE_WRITE16_MEMBER(rtc_w);
 	DECLARE_WRITE16_MEMBER(tmaster_color_w);

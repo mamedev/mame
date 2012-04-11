@@ -35,7 +35,9 @@ class ettrivia_state : public driver_device
 {
 public:
 	ettrivia_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_fg_videoram(*this, "fg_videoram"),
+		m_bg_videoram(*this, "bg_videoram"){ }
 
 	int m_palreg;
 	int m_gfx_bank;
@@ -43,8 +45,8 @@ public:
 	int m_b000_val;
 	int m_b000_ret;
 	int m_b800_prev;
-	UINT8 *m_bg_videoram;
-	UINT8 *m_fg_videoram;
+	required_shared_ptr<UINT8> m_fg_videoram;
+	required_shared_ptr<UINT8> m_bg_videoram;
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
 	DECLARE_WRITE8_MEMBER(ettrivia_fg_w);
@@ -139,8 +141,8 @@ static ADDRESS_MAP_START( cpu_map, AS_PROGRAM, 8, ettrivia_state )
 	AM_RANGE(0xa000, 0xa000) AM_WRITENOP
 	AM_RANGE(0xb000, 0xb000) AM_READ(b000_r) AM_WRITE(b000_w)
 	AM_RANGE(0xb800, 0xb800) AM_WRITE(b800_w)
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(ettrivia_fg_w) AM_BASE(m_fg_videoram)
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(ettrivia_bg_w) AM_BASE(m_bg_videoram)
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(ettrivia_fg_w) AM_SHARE("fg_videoram")
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(ettrivia_bg_w) AM_SHARE("bg_videoram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( io_map, AS_IO, 8, ettrivia_state )

@@ -83,13 +83,15 @@ class popobear_state : public driver_device
 public:
 	popobear_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this,"maincpu")
-		{ }
+		m_maincpu(*this,"maincpu"),
+		m_spr(*this, "spr"),
+		m_vram(*this, "vram"),
+		m_vregs(*this, "vregs"){ }
 
-	UINT16 *m_vregs;
-	UINT16 *m_vram;
-	UINT16 *m_spr;
 	required_device<cpu_device> m_maincpu;
+	required_shared_ptr<UINT16> m_spr;
+	required_shared_ptr<UINT16> m_vram;
+	required_shared_ptr<UINT16> m_vregs;
 	DECLARE_READ8_MEMBER(popo_620000_r);
 	DECLARE_WRITE8_MEMBER(popobear_irq_ack_w);
 };
@@ -102,8 +104,8 @@ VIDEO_START(popobear)
 static void draw_layer(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect, UINT8 layer_n)
 {
 	popobear_state *state = machine.driver_data<popobear_state>();
-	UINT8* vram = (UINT8 *)state->m_vram;
-	UINT16* vreg = (UINT16 *)state->m_vregs;
+	UINT8* vram = (UINT8 *)state->m_vram.target();
+	UINT16* vreg = (UINT16 *)state->m_vregs.target();
 	int count;
 	const UINT8 vreg_base[] = { 0x10/2, 0x14/2 };
 	int xscroll,yscroll;
@@ -175,7 +177,7 @@ static void draw_layer(running_machine &machine, bitmap_ind16 &bitmap,const rect
 static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
 	popobear_state *state = machine.driver_data<popobear_state>();
-	UINT8* vram = (UINT8 *)state->m_spr;
+	UINT8* vram = (UINT8 *)state->m_spr.target();
 	int i;
 	#if 0
 	static int bank_test = 1;
@@ -289,11 +291,11 @@ static ADDRESS_MAP_START( popobear_mem, AS_PROGRAM, 16, popobear_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x210000, 0x21ffff) AM_RAM
-	AM_RANGE(0x280000, 0x2fffff) AM_RAM AM_BASE(m_spr) // unknown boundaries, 0x2ff800 contains a sprite list
-	AM_RANGE(0x300000, 0x3fffff) AM_RAM AM_BASE(m_vram)
+	AM_RANGE(0x280000, 0x2fffff) AM_RAM AM_SHARE("spr") // unknown boundaries, 0x2ff800 contains a sprite list
+	AM_RANGE(0x300000, 0x3fffff) AM_RAM AM_SHARE("vram")
 
 	/* Most if not all of these are vregs */
-	AM_RANGE(0x480000, 0x48001f) AM_RAM AM_BASE(m_vregs)
+	AM_RANGE(0x480000, 0x48001f) AM_RAM AM_SHARE("vregs")
 	AM_RANGE(0x480020, 0x480023) AM_RAM
 	AM_RANGE(0x480028, 0x48002d) AM_RAM
 //  AM_RANGE(0x480020, 0x480021) AM_NOP //AM_READ_LEGACY(popo_480020_r) AM_WRITE_LEGACY(popo_480020_w)

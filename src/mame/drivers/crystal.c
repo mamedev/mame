@@ -129,14 +129,21 @@ class crystal_state : public driver_device
 {
 public:
 	crystal_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_sysregs(*this, "sysregs"),
+		m_workram(*this, "workram"),
+		m_vidregs(*this, "vidregs"),
+		m_textureram(*this, "textureram"),
+		m_frameram(*this, "frameram"),
+		m_ResetPatch(*this, "ResetPatch"){ }
 
 	/* memory pointers */
-	UINT32 *  m_workram;
-	UINT32 *  m_textureram;
-	UINT32 *  m_frameram;
-	UINT32 *  m_sysregs;
-	UINT32 *  m_vidregs;
+	required_shared_ptr<UINT32> m_sysregs;
+	required_shared_ptr<UINT32> m_workram;
+	required_shared_ptr<UINT32> m_vidregs;
+	required_shared_ptr<UINT32> m_textureram;
+	required_shared_ptr<UINT32> m_frameram;
+	required_shared_ptr<UINT32> m_ResetPatch;
 //  UINT32 *  m_nvram;    // currently this uses generic nvram handling
 
 #ifdef IDLE_LOOP_SPEEDUP
@@ -152,7 +159,6 @@ public:
 	UINT32    m_PIO;
 	UINT32    m_DMActrl[2];
 	UINT8     m_OldPort4;
-	UINT32    *m_ResetPatch;
 
 	device_t *m_maincpu;
 	device_t *m_ds1302;
@@ -489,20 +495,20 @@ static ADDRESS_MAP_START( crystal_mem, AS_PROGRAM, 32, crystal_state )
 	AM_RANGE(0x01800810, 0x01800813) AM_READWRITE(DMA1_r, DMA1_w)
 
 	AM_RANGE(0x01800c04, 0x01800c07) AM_WRITE(IntAck_w)
-	AM_RANGE(0x01800000, 0x0180ffff) AM_RAM AM_BASE(m_sysregs)
-	AM_RANGE(0x02000000, 0x027fffff) AM_RAM AM_BASE(m_workram)
+	AM_RANGE(0x01800000, 0x0180ffff) AM_RAM AM_SHARE("sysregs")
+	AM_RANGE(0x02000000, 0x027fffff) AM_RAM AM_SHARE("workram")
 
 	AM_RANGE(0x030000a4, 0x030000a7) AM_READWRITE(FlipCount_r, FlipCount_w)
 
-	AM_RANGE(0x03000000, 0x0300ffff) AM_RAM AM_BASE(m_vidregs)
-	AM_RANGE(0x03800000, 0x03ffffff) AM_RAM AM_BASE(m_textureram)
-	AM_RANGE(0x04000000, 0x047fffff) AM_RAM AM_BASE(m_frameram)
+	AM_RANGE(0x03000000, 0x0300ffff) AM_RAM AM_SHARE("vidregs")
+	AM_RANGE(0x03800000, 0x03ffffff) AM_RAM AM_SHARE("textureram")
+	AM_RANGE(0x04000000, 0x047fffff) AM_RAM AM_SHARE("frameram")
 	AM_RANGE(0x04800000, 0x04800fff) AM_DEVREADWRITE_LEGACY("vrender", vr0_snd_read, vr0_snd_write)
 
 	AM_RANGE(0x05000000, 0x05000003) AM_READWRITE(FlashCmd_r, FlashCmd_w)
 	AM_RANGE(0x05000000, 0x05ffffff) AM_ROMBANK("bank1")
 
-	AM_RANGE(0x44414F4C, 0x44414F7F) AM_RAM AM_BASE(m_ResetPatch)
+	AM_RANGE(0x44414F4C, 0x44414F7F) AM_RAM AM_SHARE("ResetPatch")
 
 ADDRESS_MAP_END
 
@@ -666,7 +672,7 @@ static SCREEN_UPDATE_IND16( crystal )
 	}
 
 	Visible  = (UINT16*) Front;
-	DrawDest = (UINT16 *) state->m_frameram;
+	DrawDest = (UINT16 *) state->m_frameram.target();
 
 
 	if (GetVidReg(space, 0x8c) & 0x80)
@@ -683,7 +689,7 @@ static SCREEN_UPDATE_IND16( crystal )
 	tail = GetVidReg(space, 0x80);
 	while ((head & 0x7ff) != (tail & 0x7ff))
 	{
-		DoFlip = vrender0_ProcessPacket(state->m_vr0video, 0x03800000 + head * 64, DrawDest, (UINT8*)state->m_textureram);
+		DoFlip = vrender0_ProcessPacket(state->m_vr0video, 0x03800000 + head * 64, DrawDest, (UINT8*)state->m_textureram.target());
 		head++;
 		head &= 0x7ff;
 		if (DoFlip)

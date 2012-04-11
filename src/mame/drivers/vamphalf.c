@@ -65,15 +65,19 @@ class vamphalf_state : public driver_device
 {
 public:
 	vamphalf_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
+		: driver_device(mconfig, type, tag),
+		  m_tiles(*this,"tiles"),
+		  m_wram(*this,"wram"),
+		  m_tiles32(*this,"tiles32"),
+		  m_wram32(*this,"wram32")
 		{
 			m_has_extra_gfx = 0;
 		}
 
-	UINT16 *m_tiles;
-	UINT16 *m_wram;
-	UINT32 *m_tiles32;
-	UINT32 *m_wram32;
+	required_shared_ptr<UINT16> m_tiles;
+	required_shared_ptr<UINT16> m_wram;
+	required_shared_ptr<UINT32> m_tiles32;
+	required_shared_ptr<UINT32> m_wram32;
 	int m_flip_bit;
 	int m_flipscreen;
 	int m_palshift;
@@ -319,15 +323,15 @@ WRITE16_MEMBER(vamphalf_state::boonggab_lamps_w)
 }
 
 static ADDRESS_MAP_START( common_map, AS_PROGRAM, 16, vamphalf_state )
-	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_BASE(m_wram)
-	AM_RANGE(0x40000000, 0x4003ffff) AM_RAM AM_BASE(m_tiles)
+	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_SHARE("wram")
+	AM_RANGE(0x40000000, 0x4003ffff) AM_RAM AM_SHARE("tiles")
 	AM_RANGE(0x80000000, 0x8000ffff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0xfff00000, 0xffffffff) AM_ROM AM_REGION("user1",0)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( common_32bit_map, AS_PROGRAM, 32, vamphalf_state )
-	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_BASE(m_wram32)
-	AM_RANGE(0x40000000, 0x4003ffff) AM_RAM AM_BASE(m_tiles32)
+	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_SHARE("wram32")
+	AM_RANGE(0x40000000, 0x4003ffff) AM_RAM AM_SHARE("tiles32")
 	AM_RANGE(0x80000000, 0x8000ffff) AM_RAM_WRITE(paletteram32_w) AM_SHARE("paletteram")
 	AM_RANGE(0xfff00000, 0xffffffff) AM_ROM AM_REGION("user1",0)
 ADDRESS_MAP_END
@@ -441,8 +445,8 @@ static ADDRESS_MAP_START( mrdig_io, AS_IO, 16, vamphalf_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( aoh_map, AS_PROGRAM, 32, vamphalf_state )
-	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_BASE(m_wram32)
-	AM_RANGE(0x40000000, 0x4003ffff) AM_RAM AM_BASE(m_tiles32)
+	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_SHARE("wram32")
+	AM_RANGE(0x40000000, 0x4003ffff) AM_RAM AM_SHARE("tiles32")
 	AM_RANGE(0x80000000, 0x8000ffff) AM_RAM_WRITE(paletteram32_w) AM_SHARE("paletteram")
 	AM_RANGE(0x80210000, 0x80210003) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x80220000, 0x80220003) AM_READ_PORT("P1_P2")

@@ -19,12 +19,15 @@ class destroyr_state : public driver_device
 {
 public:
 	destroyr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_alpha_num_ram(*this, "alpha_nuram"),
+		m_major_obj_ram(*this, "major_obj_ram"),
+		m_minor_obj_ram(*this, "minor_obj_ram"){ }
 
 	/* memory pointers */
-	UINT8 *        m_major_obj_ram;
-	UINT8 *        m_minor_obj_ram;
-	UINT8 *        m_alpha_num_ram;
+	required_shared_ptr<UINT8> m_alpha_num_ram;
+	required_shared_ptr<UINT8> m_major_obj_ram;
+	required_shared_ptr<UINT8> m_minor_obj_ram;
 
 	/* video-related */
 	int            m_cursor;
@@ -262,11 +265,11 @@ static ADDRESS_MAP_START( destroyr_map, AS_PROGRAM, 8, destroyr_state )
 	AM_RANGE(0x0000, 0x00ff) AM_MIRROR(0xf00) AM_RAM
 	AM_RANGE(0x1000, 0x1fff) AM_READWRITE(destroyr_input_r, destroyr_output_w)
 	AM_RANGE(0x2000, 0x2fff) AM_READ_PORT("IN2")
-	AM_RANGE(0x3000, 0x30ff) AM_MIRROR(0xf00) AM_WRITEONLY AM_BASE(m_alpha_num_ram)
-	AM_RANGE(0x4000, 0x401f) AM_MIRROR(0xfe0) AM_WRITEONLY AM_BASE(m_major_obj_ram)
+	AM_RANGE(0x3000, 0x30ff) AM_MIRROR(0xf00) AM_WRITEONLY AM_SHARE("alpha_nuram")
+	AM_RANGE(0x4000, 0x401f) AM_MIRROR(0xfe0) AM_WRITEONLY AM_SHARE("major_obj_ram")
 	AM_RANGE(0x5000, 0x5000) AM_MIRROR(0xff8) AM_WRITE(destroyr_cursor_load_w)
 	AM_RANGE(0x5001, 0x5001) AM_MIRROR(0xff8) AM_WRITE(destroyr_interrupt_ack_w)
-	AM_RANGE(0x5002, 0x5007) AM_MIRROR(0xff8) AM_WRITEONLY AM_BASE(m_minor_obj_ram)
+	AM_RANGE(0x5002, 0x5007) AM_MIRROR(0xff8) AM_WRITEONLY AM_SHARE("minor_obj_ram")
 	AM_RANGE(0x6000, 0x6fff) AM_READ(destroyr_scanline_r)
 	AM_RANGE(0x7000, 0x7fff) AM_ROM
 ADDRESS_MAP_END

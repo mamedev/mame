@@ -80,11 +80,13 @@ class pasha2_state : public driver_device
 {
 public:
 	pasha2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_wram(*this, "wram"),
+		m_paletteram(*this, "paletteram"){ }
 
 	/* memory pointers */
-	UINT16 *     m_paletteram;
-	UINT16 *     m_wram;
+	required_shared_ptr<UINT16> m_wram;
+	required_shared_ptr<UINT16> m_paletteram;
 
 	/* video-related */
 	int m_vbuffer;
@@ -209,7 +211,7 @@ WRITE16_MEMBER(pasha2_state::pasha2_lamps_w)
 }
 
 static ADDRESS_MAP_START( pasha2_map, AS_PROGRAM, 16, pasha2_state )
-	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_BASE(m_wram)
+	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_SHARE("wram")
 	AM_RANGE(0x40000000, 0x4001ffff) AM_RAM_WRITE(bitmap_0_w)
 	AM_RANGE(0x40020000, 0x4003ffff) AM_RAM_WRITE(bitmap_1_w)
 	AM_RANGE(0x40060000, 0x40060001) AM_WRITENOP
@@ -220,7 +222,7 @@ static ADDRESS_MAP_START( pasha2_map, AS_PROGRAM, 16, pasha2_state )
 	AM_RANGE(0x40074000, 0x40074001) AM_WRITE(vbuffer_set_w)
 	AM_RANGE(0x40078000, 0x40078001) AM_WRITENOP //once at startup -> to disable the eeprom?
 	AM_RANGE(0x80000000, 0x803fffff) AM_ROMBANK("bank1")
-	AM_RANGE(0xe0000000, 0xe00003ff) AM_RAM_WRITE(pasha2_palette_w) AM_BASE(m_paletteram) //tilemap? palette?
+	AM_RANGE(0xe0000000, 0xe00003ff) AM_RAM_WRITE(pasha2_palette_w) AM_SHARE("paletteram") //tilemap? palette?
 	AM_RANGE(0xfff80000, 0xffffffff) AM_ROM AM_REGION("user1",0)
 ADDRESS_MAP_END
 

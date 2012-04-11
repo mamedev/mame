@@ -92,11 +92,13 @@ class quizpun2_state : public driver_device
 {
 public:
 	quizpun2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_fg_ram(*this, "fg_ram"),
+		m_bg_ram(*this, "bg_ram"){ }
 
 	struct prot_t m_prot;
-	UINT8 *m_bg_ram;
-	UINT8 *m_fg_ram;
+	required_shared_ptr<UINT8> m_fg_ram;
+	required_shared_ptr<UINT8> m_bg_ram;
 	tilemap_t *m_bg_tmap;
 	tilemap_t *m_fg_tmap;
 	DECLARE_WRITE8_MEMBER(bg_ram_w);

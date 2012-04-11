@@ -30,12 +30,15 @@ class istellar_state : public driver_device
 public:
 	istellar_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_laserdisc(*this, "laserdisc") { }
+		  m_laserdisc(*this, "laserdisc") ,
+		m_tile_ram(*this, "tile_ram"),
+		m_tile_control_ram(*this, "tile_control_ram"),
+		m_sprite_ram(*this, "sprite_ram"){ }
 
 	required_device<pioneer_ldv1000_device> m_laserdisc;
-	UINT8 *m_tile_ram;
-	UINT8 *m_tile_control_ram;
-	UINT8 *m_sprite_ram;
+	required_shared_ptr<UINT8> m_tile_ram;
+	required_shared_ptr<UINT8> m_tile_control_ram;
+	required_shared_ptr<UINT8> m_sprite_ram;
 	UINT8 m_ldp_latch1;
 	UINT8 m_ldp_latch2;
 	UINT8 m_z80_2_nmi_enable;
@@ -170,9 +173,9 @@ WRITE8_MEMBER(istellar_state::z80_2_ldp_write)
 static ADDRESS_MAP_START( z80_0_mem, AS_PROGRAM, 8, istellar_state )
 	AM_RANGE(0x0000,0x9fff) AM_ROM
 	AM_RANGE(0xa000,0xa7ff) AM_RAM
-	AM_RANGE(0xa800,0xabff) AM_RAM AM_BASE(m_tile_ram)
-	AM_RANGE(0xac00,0xafff) AM_RAM AM_BASE(m_tile_control_ram)
-	AM_RANGE(0xb000,0xb3ff) AM_RAM AM_BASE(m_sprite_ram)
+	AM_RANGE(0xa800,0xabff) AM_RAM AM_SHARE("tile_ram")
+	AM_RANGE(0xac00,0xafff) AM_RAM AM_SHARE("tile_control_ram")
+	AM_RANGE(0xb000,0xb3ff) AM_RAM AM_SHARE("sprite_ram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( z80_1_mem, AS_PROGRAM, 8, istellar_state )

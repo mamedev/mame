@@ -30,13 +30,16 @@ class dblewing_state : public driver_device
 {
 public:
 	dblewing_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_pf1_rowscroll(*this, "pf1_rowscroll"),
+		m_pf2_rowscroll(*this, "pf2_rowscroll"),
+		m_spriteram(*this, "spriteram"){ }
 
 	/* memory pointers */
-	UINT16 *  m_pf1_rowscroll;
-	UINT16 *  m_pf2_rowscroll;
-	UINT16 *  m_spriteram;
-	size_t    m_spriteram_size;
+	required_shared_ptr<UINT16> m_pf1_rowscroll;
+	required_shared_ptr<UINT16> m_pf2_rowscroll;
+	required_shared_ptr<UINT16> m_spriteram;
+//OBRISI.ME
 
 	/* protection */
 	UINT16 m_008_data;
@@ -310,8 +313,8 @@ static ADDRESS_MAP_START( dblewing_map, AS_PROGRAM, 16, dblewing_state )
 
 	AM_RANGE(0x100000, 0x100fff) AM_DEVREADWRITE_LEGACY("tilegen1", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
 	AM_RANGE(0x102000, 0x102fff) AM_DEVREADWRITE_LEGACY("tilegen1", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
-	AM_RANGE(0x104000, 0x104fff) AM_RAM AM_BASE(m_pf1_rowscroll)
-	AM_RANGE(0x106000, 0x106fff) AM_RAM AM_BASE(m_pf2_rowscroll)
+	AM_RANGE(0x104000, 0x104fff) AM_RAM AM_SHARE("pf1_rowscroll")
+	AM_RANGE(0x106000, 0x106fff) AM_RAM AM_SHARE("pf2_rowscroll")
 
 	/* protection */
 //  AM_RANGE(0x280104, 0x280105) AM_WRITENOP              // ??
@@ -328,7 +331,7 @@ static ADDRESS_MAP_START( dblewing_map, AS_PROGRAM, 16, dblewing_state )
 	AM_RANGE(0x284000, 0x284001) AM_RAM
 	AM_RANGE(0x288000, 0x288001) AM_RAM
 	AM_RANGE(0x28c000, 0x28c00f) AM_RAM_DEVWRITE_LEGACY("tilegen1", deco16ic_pf_control_w)
-	AM_RANGE(0x300000, 0x3007ff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
+	AM_RANGE(0x300000, 0x3007ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x320000, 0x3207ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0xff0000, 0xff3fff) AM_MIRROR(0xc000) AM_RAM
 ADDRESS_MAP_END

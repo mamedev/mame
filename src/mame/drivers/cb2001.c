@@ -50,10 +50,12 @@ class cb2001_state : public driver_device
 {
 public:
 	cb2001_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_vram_fg(*this, "vrafg"),
+		m_vram_bg(*this, "vrabg"){ }
 
-	UINT16 *m_vram_fg;
-	UINT16* m_vram_bg;
+	required_shared_ptr<UINT16> m_vram_fg;
+	required_shared_ptr<UINT16> m_vram_bg;
 	int m_videobank;
 	int m_videomode;
 	tilemap_t *m_reel1_tilemap;
@@ -556,8 +558,8 @@ WRITE16_MEMBER(cb2001_state::cb2001_bg_w)
 
 static ADDRESS_MAP_START( cb2001_map, AS_PROGRAM, 16, cb2001_state )
 	AM_RANGE(0x00000, 0x1ffff) AM_RAM
-	AM_RANGE(0x20000, 0x20fff) AM_RAM AM_BASE(m_vram_fg)
-	AM_RANGE(0x21000, 0x21fff) AM_RAM_WRITE(cb2001_bg_w) AM_BASE(m_vram_bg)
+	AM_RANGE(0x20000, 0x20fff) AM_RAM AM_SHARE("vrafg")
+	AM_RANGE(0x21000, 0x21fff) AM_RAM_WRITE(cb2001_bg_w) AM_SHARE("vrabg")
 	AM_RANGE(0xc0000, 0xfffff) AM_ROM AM_REGION("boot_prg",0)
 ADDRESS_MAP_END
 

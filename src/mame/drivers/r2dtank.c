@@ -53,10 +53,12 @@ class r2dtank_state : public driver_device
 {
 public:
 	r2dtank_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"),
+		m_colorram(*this, "colorram"){ }
 
-	UINT8 *m_videoram;
-	UINT8 *m_colorram;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_colorram;
 	UINT8 m_flipscreen;
 	UINT32 m_ttl74123_output;
 	UINT8 m_AY8910_selected;
@@ -415,9 +417,9 @@ static WRITE8_DEVICE_HANDLER( pia_comp_w )
 
 
 static ADDRESS_MAP_START( r2dtank_main_map, AS_PROGRAM, 8, r2dtank_state )
-	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_BASE(m_videoram)
+	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0x2000, 0x3fff) AM_RAM
-	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_BASE(m_colorram)
+	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_SHARE("colorram")
 	AM_RANGE(0x6000, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0x8003) AM_DEVREAD("pia_main", pia6821_device, read) AM_DEVWRITE_LEGACY("pia_main", pia_comp_w)
 	AM_RANGE(0x8004, 0x8004) AM_READWRITE(audio_answer_r, audio_command_w)

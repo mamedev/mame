@@ -147,7 +147,8 @@ class firebeat_state : public driver_device
 {
 public:
 	firebeat_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_work_ram(*this, "work_ram"){ }
 
 	UINT8 m_extend_board_irq_enable;
 	UINT8 m_extend_board_irq_active;
@@ -170,7 +171,7 @@ public:
 	const int * m_cur_cab_data;
 	int m_keyboard_state[2];
 	UINT8 m_spu_shared_ram[0x400];
-	UINT32 *m_work_ram;
+	required_shared_ptr<UINT32> m_work_ram;
 	IBUTTON m_ibutton;
 	int m_ibutton_state;
 	int m_ibutton_read_subkey_ptr;
@@ -1750,7 +1751,7 @@ static MACHINE_START( firebeat )
 }
 
 static ADDRESS_MAP_START( firebeat_map, AS_PROGRAM, 32, firebeat_state )
-	AM_RANGE(0x00000000, 0x01ffffff) AM_RAM AM_BASE(m_work_ram)
+	AM_RANGE(0x00000000, 0x01ffffff) AM_RAM AM_SHARE("work_ram")
 	AM_RANGE(0x70000000, 0x70000fff) AM_READWRITE_LEGACY(midi_uart_r, midi_uart_w)
 	AM_RANGE(0x70006000, 0x70006003) AM_WRITE_LEGACY(extend_board_irq_w)
 	AM_RANGE(0x70008000, 0x7000800f) AM_READ_LEGACY(keyboard_wheel_r)

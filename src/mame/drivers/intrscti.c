@@ -19,9 +19,10 @@ class intrscti_state : public driver_device
 {
 public:
 	intrscti_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_ram(*this, "ram"){ }
 
-	UINT8 *m_ram;
+	required_shared_ptr<UINT8> m_ram;
 	DECLARE_READ8_MEMBER(unk_r);
 };
 
@@ -34,7 +35,7 @@ READ8_MEMBER(intrscti_state::unk_r)
 static ADDRESS_MAP_START( intrscti_map, AS_PROGRAM, 8, intrscti_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x6000, 0x67ff) AM_RAM
-	AM_RANGE(0x7000, 0x77ff) AM_RAM AM_BASE(m_ram) // video ram
+	AM_RANGE(0x7000, 0x77ff) AM_RAM AM_SHARE("ram") // video ram
 	AM_RANGE(0x8000, 0x8fff) AM_ROM
 ADDRESS_MAP_END
 

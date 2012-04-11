@@ -86,9 +86,10 @@ class re900_state : public driver_device
 {
 public:
 	re900_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_rom(*this, "rom"){ }
 
-	UINT8 *m_rom;
+	required_shared_ptr<UINT8> m_rom;
 	UINT8 m_psg_pa;
 	UINT8 m_psg_pb;
 	UINT8 m_mux_data;
@@ -224,7 +225,7 @@ WRITE8_MEMBER(re900_state::re900_watchdog_reset_w)
 *******************************/
 
 static ADDRESS_MAP_START( mem_prg, AS_PROGRAM, 8, re900_state )
-	AM_RANGE(0x0000, 0xffff) AM_ROM AM_BASE(m_rom)
+	AM_RANGE(0x0000, 0xffff) AM_ROM AM_SHARE("rom")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mem_io, AS_IO, 8, re900_state )

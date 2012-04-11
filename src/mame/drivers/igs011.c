@@ -85,12 +85,15 @@ class igs011_state : public driver_device
 public:
 	igs011_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu")
-		{ }
+		m_maincpu(*this, "maincpu"),
+		m_priority_ram(*this, "priority_ram"),
+		m_vbowl_trackball(*this, "vbowl_trackball"){ }
 
+	required_device<cpu_device> m_maincpu;
+	required_shared_ptr<UINT16> m_priority_ram;
+	required_shared_ptr<UINT16> m_vbowl_trackball;
 	UINT8 *m_layer[8];
 	UINT16 m_priority;
-	UINT16 *m_priority_ram;
 	UINT8 m_lhb2_pen_hi;
 	UINT16 m_igs_dips_sel;
 	UINT16 m_igs_input_sel;
@@ -104,10 +107,8 @@ public:
 	UINT8 m_igs012_prot_mode;
 	UINT16 m_igs003_reg[2];
 	UINT16 m_lhb_irq_enable;
-	UINT16 *m_vbowl_trackball;
 	blitter_t m_blitter;
 
-	required_device<cpu_device> m_maincpu;
 	DECLARE_WRITE16_MEMBER(igs011_priority_w);
 	DECLARE_READ16_MEMBER(igs011_layers_r);
 	DECLARE_WRITE16_MEMBER(igs011_layers_w);
@@ -2343,7 +2344,7 @@ static ADDRESS_MAP_START( lhb2, AS_PROGRAM, 16, igs011_state )
 	AM_RANGE( 0x204000, 0x204003 ) AM_DEVWRITE8_LEGACY("ymsnd", ym2413_w, 0x00ff )
 	AM_RANGE( 0x208000, 0x208003 ) AM_WRITE(lhb2_igs003_w )
 	AM_RANGE( 0x208002, 0x208003 ) AM_READ(lhb2_igs003_r )
-	AM_RANGE( 0x20c000, 0x20cfff ) AM_RAM AM_BASE(m_priority_ram)
+	AM_RANGE( 0x20c000, 0x20cfff ) AM_RAM AM_SHARE("priority_ram")
 	AM_RANGE( 0x210000, 0x211fff ) AM_RAM_WRITE(igs011_palette ) AM_SHARE("paletteram")
 	AM_RANGE( 0x214000, 0x214001 ) AM_READ_PORT( "COIN" )
 	AM_RANGE( 0x300000, 0x3fffff ) AM_READWRITE(igs011_layers_r, igs011_layers_w )

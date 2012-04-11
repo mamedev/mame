@@ -447,9 +447,10 @@ class bingor_state : public driver_device
 {
 public:
 	bingor_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_blit_ram(*this, "blit_ram"){ }
 
-	UINT16 *m_blit_ram;
+	required_shared_ptr<UINT16> m_blit_ram;
 	DECLARE_READ16_MEMBER(test_r);
 	DECLARE_READ8_MEMBER(test8_r);
 };
@@ -512,7 +513,7 @@ static ADDRESS_MAP_START( bingor_map, AS_PROGRAM, 16, bingor_state )
 	AM_RANGE(0x00000, 0x0ffff) AM_RAM
 	AM_RANGE(0x90000, 0x9ffff) AM_ROM AM_REGION("gfx", 0)
 	AM_RANGE(0xa0300, 0xa031f) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBIIII_word_w) AM_SHARE("paletteram") //wrong
-	AM_RANGE(0xa0000, 0xaffff) AM_RAM AM_BASE(m_blit_ram)
+	AM_RANGE(0xa0000, 0xaffff) AM_RAM AM_SHARE("blit_ram")
 	AM_RANGE(0xe0000, 0xfffff) AM_ROM AM_REGION("boot_prg",0)
 ADDRESS_MAP_END
 

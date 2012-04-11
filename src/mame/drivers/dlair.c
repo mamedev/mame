@@ -52,7 +52,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		  m_ldv1000(*this, "ld_ldv1000"),
 		  m_pr7820(*this, "ld_pr7820"),
-		  m_22vp932(*this, "ld_22vp932") { }
+		  m_22vp932(*this, "ld_22vp932") ,
+		m_videoram(*this, "videoram"){ }
 
 	void laserdisc_data_w(UINT8 data)
 	{
@@ -93,10 +94,10 @@ public:
 		return CLEAR_LINE;
 	}
 
-	UINT8 *m_videoram;
 	optional_device<pioneer_ldv1000_device> m_ldv1000;
 	optional_device<pioneer_pr7820_device> m_pr7820;
 	optional_device<phillips_22vp932_device> m_22vp932;
+	required_shared_ptr<UINT8> m_videoram;
 	UINT8 m_last_misc;
 	UINT8 m_laserdisc_data;
 	DECLARE_WRITE8_MEMBER(misc_w);
@@ -224,7 +225,7 @@ static PALETTE_INIT( dleuro )
 static SCREEN_UPDATE_IND16( dleuro )
 {
 	dlair_state *state = screen.machine().driver_data<dlair_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = state->m_videoram.target();
 	int x, y;
 
 	/* redraw the overlay */
@@ -423,7 +424,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( dleuro_map, AS_PROGRAM, 8, dlair_state )
 	AM_RANGE(0x0000, 0x9fff) AM_ROM
 	AM_RANGE(0xa000, 0xa7ff) AM_MIRROR(0x1800) AM_RAM
-	AM_RANGE(0xc000, 0xc7ff) AM_MIRROR(0x1800) AM_RAM AM_BASE(m_videoram)
+	AM_RANGE(0xc000, 0xc7ff) AM_MIRROR(0x1800) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0xe000, 0xe000) AM_MIRROR(0x1f47) // WT LED 1
 	AM_RANGE(0xe008, 0xe008) AM_MIRROR(0x1f47) // WT LED 2
 	AM_RANGE(0xe010, 0xe010) AM_MIRROR(0x1f47) AM_WRITE(led_den1_w)			// WT EXT LED 1

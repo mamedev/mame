@@ -230,11 +230,12 @@ class nwktr_state : public driver_device
 {
 public:
 	nwktr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_work_ram(*this, "work_ram"){ }
 
 	UINT8 m_led_reg0;
 	UINT8 m_led_reg1;
-	UINT32 *m_work_ram;
+	required_shared_ptr<UINT32> m_work_ram;
 	int m_fpga_uploaded;
 	int m_lanc2_ram_r;
 	int m_lanc2_ram_w;
@@ -494,7 +495,7 @@ static MACHINE_START( nwktr )
 }
 
 static ADDRESS_MAP_START( nwktr_map, AS_PROGRAM, 32, nwktr_state )
-	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_BASE(m_work_ram)		/* Work RAM */
+	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_SHARE("work_ram")		/* Work RAM */
 	AM_RANGE(0x74000000, 0x740000ff) AM_DEVREADWRITE_LEGACY("k001604", k001604_reg_r, k001604_reg_w)
 	AM_RANGE(0x74010000, 0x74017fff) AM_RAM_WRITE(paletteram32_w) AM_SHARE("paletteram")
 	AM_RANGE(0x74020000, 0x7403ffff) AM_DEVREADWRITE_LEGACY("k001604", k001604_tile_r, k001604_tile_w)

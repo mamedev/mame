@@ -29,9 +29,10 @@ class r2dx_v33_state : public driver_device
 {
 public:
 	r2dx_v33_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_spriteram(*this, "spriteram"){ }
 
-	UINT16 *m_spriteram;
+	required_shared_ptr<UINT16> m_spriteram;
 	DECLARE_WRITE16_MEMBER(rdx_bg_vram_w);
 	DECLARE_WRITE16_MEMBER(rdx_md_vram_w);
 	DECLARE_WRITE16_MEMBER(rdx_fg_vram_w);
@@ -97,7 +98,7 @@ static TILE_GET_INFO( get_tx_tile_info )
 static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect,int pri)
 {
 	r2dx_v33_state *state = machine.driver_data<r2dx_v33_state>();
-	UINT16 *spriteram16 = state->m_spriteram;
+	UINT16 *spriteram16 = state->m_spriteram.target();
 	int offs,fx,fy,x,y,color,sprite;
 //  int cur_pri;
 	int dx,dy,ax,ay;
@@ -400,7 +401,7 @@ static ADDRESS_MAP_START( rdx_v33_map, AS_PROGRAM, 16, r2dx_v33_state )
 	AM_RANGE(0x00800, 0x00fff) AM_RAM // copies eeprom here?
 	AM_RANGE(0x01000, 0x0bfff) AM_RAM
 
-	AM_RANGE(0x0c000, 0x0c7ff) AM_RAM AM_BASE(m_spriteram)
+	AM_RANGE(0x0c000, 0x0c7ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x0c800, 0x0cfff) AM_RAM
 	AM_RANGE(0x0d000, 0x0d7ff) AM_RAM_WRITE(rdx_bg_vram_w) AM_BASE_LEGACY(&bg_vram)
 	AM_RANGE(0x0d800, 0x0dfff) AM_RAM_WRITE(rdx_md_vram_w) AM_BASE_LEGACY(&md_vram)
@@ -473,7 +474,7 @@ static ADDRESS_MAP_START( nzerotea_map, AS_PROGRAM, 16, r2dx_v33_state )
 	AM_RANGE(0x00800, 0x00fff) AM_RAM
 	AM_RANGE(0x01000, 0x0bfff) AM_RAM
 
-	AM_RANGE(0x0c000, 0x0c7ff) AM_RAM AM_BASE(m_spriteram)
+	AM_RANGE(0x0c000, 0x0c7ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x0c800, 0x0cfff) AM_RAM
 	AM_RANGE(0x0d000, 0x0d7ff) AM_RAM_WRITE(rdx_bg_vram_w) AM_BASE_LEGACY(&bg_vram)
 	AM_RANGE(0x0d800, 0x0dfff) AM_RAM_WRITE(rdx_md_vram_w) AM_BASE_LEGACY(&md_vram)

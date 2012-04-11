@@ -23,15 +23,21 @@ class pzletime_state : public driver_device
 {
 public:
 	pzletime_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_video_regs(*this, "video_regs"),
+		m_tilemap_regs(*this, "tilemap_regs"),
+		m_bg_videoram(*this, "bg_videoram"),
+		m_mid_videoram(*this, "mid_videoram"),
+		m_txt_videoram(*this, "txt_videoram"),
+		m_spriteram(*this, "spriteram"){ }
 
 	/* memory pointers */
-	UINT16 *       m_bg_videoram;
-	UINT16 *       m_mid_videoram;
-	UINT16 *       m_txt_videoram;
-	UINT16 *       m_tilemap_regs;
-	UINT16 *       m_video_regs;
-	UINT16 *       m_spriteram;
+	required_shared_ptr<UINT16> m_video_regs;
+	required_shared_ptr<UINT16> m_tilemap_regs;
+	required_shared_ptr<UINT16> m_bg_videoram;
+	required_shared_ptr<UINT16> m_mid_videoram;
+	required_shared_ptr<UINT16> m_txt_videoram;
+	required_shared_ptr<UINT16> m_spriteram;
 //  UINT16 *       m_paletteram;    // currently this uses generic palette handling
 
 	/* video-related */
@@ -113,7 +119,7 @@ static SCREEN_UPDATE_IND16( pzletime )
 	state->m_mid_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	{
-		UINT16 *spriteram = state->m_spriteram;
+		UINT16 *spriteram = state->m_spriteram.target();
 		int offs, spr_offs, colour, sx, sy;
 
 		for(offs = 0; offs < 0x2000 / 2; offs += 4)
@@ -209,14 +215,14 @@ CUSTOM_INPUT_MEMBER(pzletime_state::ticket_status_r)
 
 static ADDRESS_MAP_START( pzletime_map, AS_PROGRAM, 16, pzletime_state )
 	AM_RANGE(0x000000, 0x3fffff) AM_ROM
-	AM_RANGE(0x700000, 0x700005) AM_RAM_WRITE(video_regs_w) AM_BASE(m_video_regs)
+	AM_RANGE(0x700000, 0x700005) AM_RAM_WRITE(video_regs_w) AM_SHARE("video_regs")
 	AM_RANGE(0x800000, 0x800001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x900000, 0x9005ff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")
-	AM_RANGE(0xa00000, 0xa00007) AM_RAM AM_BASE(m_tilemap_regs)
-	AM_RANGE(0xb00000, 0xb3ffff) AM_RAM AM_BASE(m_bg_videoram)
-	AM_RANGE(0xc00000, 0xc00fff) AM_RAM_WRITE(mid_videoram_w) AM_BASE(m_mid_videoram)
-	AM_RANGE(0xc01000, 0xc01fff) AM_RAM_WRITE(txt_videoram_w) AM_BASE(m_txt_videoram)
-	AM_RANGE(0xd00000, 0xd01fff) AM_RAM AM_BASE(m_spriteram)
+	AM_RANGE(0xa00000, 0xa00007) AM_RAM AM_SHARE("tilemap_regs")
+	AM_RANGE(0xb00000, 0xb3ffff) AM_RAM AM_SHARE("bg_videoram")
+	AM_RANGE(0xc00000, 0xc00fff) AM_RAM_WRITE(mid_videoram_w) AM_SHARE("mid_videoram")
+	AM_RANGE(0xc01000, 0xc01fff) AM_RAM_WRITE(txt_videoram_w) AM_SHARE("txt_videoram")
+	AM_RANGE(0xd00000, 0xd01fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xe00000, 0xe00001) AM_READ_PORT("INPUT") AM_DEVWRITE_LEGACY("eeprom", eeprom_w)
 	AM_RANGE(0xe00002, 0xe00003) AM_READ_PORT("SYSTEM") AM_WRITE(ticket_w)
 	AM_RANGE(0xe00004, 0xe00005) AM_DEVWRITE_LEGACY("oki", oki_bank_w)

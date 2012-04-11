@@ -30,10 +30,12 @@ class neoprint_state : public driver_device
 {
 public:
 	neoprint_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_npvidram(*this, "npvidram"),
+		m_npvidregs(*this, "npvidregs"){ }
 
-	UINT16* m_npvidram;
-	UINT16* m_npvidregs;
+	required_shared_ptr<UINT16> m_npvidram;
+	required_shared_ptr<UINT16> m_npvidregs;
 	UINT8 m_audio_result;
 	UINT8 m_bank_val;
 	UINT8 m_vblank;
@@ -213,7 +215,7 @@ static ADDRESS_MAP_START( neoprint_map, AS_PROGRAM, 16, neoprint_state )
 /*  AM_RANGE(0x100000, 0x17ffff) multi-cart or banking, some writes points here if anything lies there too */
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
 	AM_RANGE(0x300000, 0x30ffff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x400000, 0x43ffff) AM_RAM AM_BASE(m_npvidram)
+	AM_RANGE(0x400000, 0x43ffff) AM_RAM AM_SHARE("npvidram")
 	AM_RANGE(0x500000, 0x51ffff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x600000, 0x600001) AM_READWRITE(neoprint_audio_result_r,audio_command_w)
 	AM_RANGE(0x600002, 0x600003) AM_READWRITE(neoprint_calendar_r,neoprint_calendar_w)
@@ -224,7 +226,7 @@ static ADDRESS_MAP_START( neoprint_map, AS_PROGRAM, 16, neoprint_state )
 	AM_RANGE(0x60000c, 0x60000d) AM_READ_PORT("DSW2")
 	AM_RANGE(0x60000e, 0x60000f) AM_WRITENOP
 
-	AM_RANGE(0x700000, 0x70001b) AM_RAM AM_BASE(m_npvidregs)
+	AM_RANGE(0x700000, 0x70001b) AM_RAM AM_SHARE("npvidregs")
 
 	AM_RANGE(0x70001e, 0x70001f) AM_WRITENOP //watchdog
 ADDRESS_MAP_END
@@ -288,12 +290,12 @@ static ADDRESS_MAP_START( nprsp_map, AS_PROGRAM, 16, neoprint_state )
 	AM_RANGE(0x20000c, 0x20000d) AM_READ_PORT("DSW2")
 	AM_RANGE(0x20000e, 0x20000f) AM_WRITENOP
 
-	AM_RANGE(0x240000, 0x24001b) AM_RAM AM_BASE(m_npvidregs)
+	AM_RANGE(0x240000, 0x24001b) AM_RAM AM_SHARE("npvidregs")
 	AM_RANGE(0x24001e, 0x24001f) AM_WRITENOP //watchdog
 
 	AM_RANGE(0x300000, 0x33ffff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x380000, 0x38ffff) AM_RAM
-	AM_RANGE(0x400000, 0x43ffff) AM_RAM AM_BASE(m_npvidram)
+	AM_RANGE(0x400000, 0x43ffff) AM_RAM AM_SHARE("npvidram")
 	AM_RANGE(0x500000, 0x57ffff) AM_RAM_WRITE(nprsp_palette_w) AM_SHARE("paletteram")
 ADDRESS_MAP_END
 
