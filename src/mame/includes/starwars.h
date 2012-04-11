@@ -51,6 +51,12 @@ public:
 	DECLARE_READ8_MEMBER(starwars_div_rel_r);
 	DECLARE_WRITE8_MEMBER(starwars_math_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(matrix_flag_r);
+	DECLARE_READ8_MEMBER(starwars_sin_r);
+	DECLARE_WRITE8_MEMBER(starwars_sout_w);
+	DECLARE_READ8_MEMBER(starwars_main_read_r);
+	DECLARE_READ8_MEMBER(starwars_main_ready_flag_r);
+	DECLARE_WRITE8_MEMBER(starwars_main_wr_w);
+	DECLARE_WRITE8_MEMBER(starwars_soundrst_w);
 };
 
 
@@ -69,10 +75,4 @@ extern const riot6532_interface starwars_riot6532_intf;
 
 SOUND_START( starwars );
 
-READ8_HANDLER( starwars_main_read_r );
-READ8_HANDLER( starwars_main_ready_flag_r );
-WRITE8_HANDLER( starwars_main_wr_w );
-WRITE8_HANDLER( starwars_soundrst_w );
 
-READ8_HANDLER( starwars_sin_r );
-WRITE8_HANDLER( starwars_sout_w );

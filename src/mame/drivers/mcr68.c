@@ -58,6 +58,7 @@
 #include "audio/mcr.h"
 #include "audio/williams.h"
 #include "machine/nvram.h"
+#include "includes/mcr.h"
 #include "includes/mcr68.h"
 
 
@@ -103,7 +104,7 @@ WRITE16_MEMBER(mcr68_state::xenophobe_control_w)
 {
 	COMBINE_DATA(&m_control_word);
 /*  soundsgood_reset_w(~m_control_word & 0x0020);*/
-	soundsgood_data_w(&space, offset, ((m_control_word & 0x000f) << 1) | ((m_control_word & 0x0010) >> 4));
+	soundsgood_data_w(space, offset, ((m_control_word & 0x000f) << 1) | ((m_control_word & 0x0010) >> 4));
 }
 
 
@@ -118,7 +119,7 @@ WRITE16_MEMBER(mcr68_state::blasted_control_w)
 {
 	COMBINE_DATA(&m_control_word);
 /*  soundsgood_reset_w(~m_control_word & 0x0020);*/
-	soundsgood_data_w(&space, offset, (m_control_word >> 8) & 0x1f);
+	soundsgood_data_w(space, offset, (m_control_word >> 8) & 0x1f);
 }
 
 
@@ -136,14 +137,14 @@ READ16_MEMBER(mcr68_state::spyhunt2_port_0_r)
 	int which = (m_control_word >> 3) & 3;
 	int analog = input_port_read(machine(), portnames[which]);
 
-	return result | ((soundsgood_status_r(&space, 0) & 1) << 5) | (analog << 8);
+	return result | ((soundsgood_status_r(space, 0) & 1) << 5) | (analog << 8);
 }
 
 
 READ16_MEMBER(mcr68_state::spyhunt2_port_1_r)
 {
 	int result = input_port_read(machine(), "IN1");
-	return result | ((turbocs_status_r(&space, 0) & 1) << 7);
+	return result | ((turbocs_status_r(space, 0) & 1) << 7);
 }
 
 
@@ -152,10 +153,10 @@ WRITE16_MEMBER(mcr68_state::spyhunt2_control_w)
 	COMBINE_DATA(&m_control_word);
 
 /*  turbocs_reset_w(~m_control_word & 0x0080);*/
-	turbocs_data_w(&space, offset, (m_control_word >> 8) & 0x001f);
+	turbocs_data_w(space, offset, (m_control_word >> 8) & 0x001f);
 
 	soundsgood_reset_w(machine(), ~m_control_word & 0x2000);
-	soundsgood_data_w(&space, offset, (m_control_word >> 8) & 0x001f);
+	soundsgood_data_w(space, offset, (m_control_word >> 8) & 0x001f);
 }
 
 

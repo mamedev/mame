@@ -27,6 +27,7 @@ public:
 	UINT8          m_ic_h3_data;
 	DECLARE_READ8_MEMBER(copsnrob_misc_r);
 	DECLARE_WRITE8_MEMBER(copsnrob_misc2_w);
+	DECLARE_WRITE8_MEMBER(copsnrob_misc_w);
 };
 
 
@@ -43,4 +44,3 @@ SCREEN_UPDATE_IND16( copsnrob );
 /*----------- defined in audio/copsnrob.c -----------*/
 
 DISCRETE_SOUND_EXTERN( copsnrob );
-WRITE8_HANDLER( copsnrob_misc_w );

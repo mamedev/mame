@@ -1298,8 +1298,8 @@ static DRIVER_INIT( elim2 )
 
 	/* configure sound */
 	state->m_usb = NULL;
-	iospace->install_legacy_write_handler(0x3e, 0x3e, FUNC(elim1_sh_w));
-	iospace->install_legacy_write_handler(0x3f, 0x3f, FUNC(elim2_sh_w));
+	iospace->install_write_handler(0x3e, 0x3e, write8_delegate(FUNC(segag80v_state::elim1_sh_w),state));
+	iospace->install_write_handler(0x3f, 0x3f, write8_delegate(FUNC(segag80v_state::elim2_sh_w),state));
 }
 
 
@@ -1313,8 +1313,8 @@ static DRIVER_INIT( elim4 )
 
 	/* configure sound */
 	state->m_usb = NULL;
-	iospace->install_legacy_write_handler(0x3e, 0x3e, FUNC(elim1_sh_w));
-	iospace->install_legacy_write_handler(0x3f, 0x3f, FUNC(elim2_sh_w));
+	iospace->install_write_handler(0x3e, 0x3e, write8_delegate(FUNC(segag80v_state::elim1_sh_w),state));
+	iospace->install_write_handler(0x3f, 0x3f, write8_delegate(FUNC(segag80v_state::elim2_sh_w),state));
 
 	/* configure inputs */
 	iospace->install_write_handler(0xf8, 0xf8, write8_delegate(FUNC(segag80v_state::spinner_select_w),state));
@@ -1334,8 +1334,8 @@ static DRIVER_INIT( spacfury )
 	state->m_usb = NULL;
 	iospace->install_legacy_write_handler(*machine.device("segaspeech"), 0x38, 0x38, FUNC(sega_speech_data_w));
 	iospace->install_legacy_write_handler(*machine.device("segaspeech"), 0x3b, 0x3b, FUNC(sega_speech_control_w));
-	iospace->install_legacy_write_handler(0x3e, 0x3e, FUNC(spacfury1_sh_w));
-	iospace->install_legacy_write_handler(0x3f, 0x3f, FUNC(spacfury2_sh_w));
+	iospace->install_write_handler(0x3e, 0x3e, write8_delegate(FUNC(segag80v_state::spacfury1_sh_w),state));
+	iospace->install_write_handler(0x3f, 0x3f, write8_delegate(FUNC(segag80v_state::spacfury2_sh_w),state));
 }
 
 
@@ -1353,8 +1353,8 @@ static DRIVER_INIT( zektor )
 	iospace->install_legacy_write_handler(*machine.device("segaspeech"), 0x38, 0x38, FUNC(sega_speech_data_w));
 	iospace->install_legacy_write_handler(*machine.device("segaspeech"), 0x3b, 0x3b, FUNC(sega_speech_control_w));
 	iospace->install_legacy_write_handler(*ay, 0x3c, 0x3d, FUNC(ay8910_address_data_w));
-	iospace->install_legacy_write_handler(0x3e, 0x3e, FUNC(zektor1_sh_w));
-	iospace->install_legacy_write_handler(0x3f, 0x3f, FUNC(zektor2_sh_w));
+	iospace->install_write_handler(0x3e, 0x3e, write8_delegate(FUNC(segag80v_state::zektor1_sh_w),state));
+	iospace->install_write_handler(0x3f, 0x3f, write8_delegate(FUNC(segag80v_state::zektor2_sh_w),state));
 
 	/* configure inputs */
 	iospace->install_write_handler(0xf8, 0xf8, write8_delegate(FUNC(segag80v_state::spinner_select_w),state));

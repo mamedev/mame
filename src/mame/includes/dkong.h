@@ -223,6 +223,8 @@ public:
 	DECLARE_WRITE8_MEMBER(radarscp_grid_color_w);
 	DECLARE_WRITE8_MEMBER(dkong_flipscreen_w);
 	DECLARE_WRITE8_MEMBER(dkong_spritebank_w);
+	DECLARE_WRITE8_MEMBER(dkong_voice_w);
+	DECLARE_WRITE8_MEMBER(dkong_audio_irq_w);
 };
 
 /*----------- defined in video/dkong.c -----------*/
@@ -241,7 +243,6 @@ SCREEN_UPDATE_IND16( spclforc );
 
 /*----------- defined in audio/dkong.c -----------*/
 
-WRITE8_HANDLER( dkong_audio_irq_w );
 
 MACHINE_CONFIG_EXTERN( radarscp_audio );
 MACHINE_CONFIG_EXTERN( dkong2b_audio );

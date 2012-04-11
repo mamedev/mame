@@ -35,57 +35,52 @@ void cyberbal_sound_reset(running_machine &machine)
  *
  *************************************/
 
-READ8_HANDLER( cyberbal_special_port3_r )
+READ8_MEMBER(cyberbal_state::cyberbal_special_port3_r)
 {
-	cyberbal_state *state = space->machine().driver_data<cyberbal_state>();
-	int temp = input_port_read(space->machine(), "JSAII");
-	if (!(input_port_read(space->machine(), "IN0") & 0x8000)) temp ^= 0x80;
-	if (state->m_cpu_to_sound_ready) temp ^= 0x40;
-	if (state->m_sound_to_cpu_ready) temp ^= 0x20;
+	int temp = input_port_read(machine(), "JSAII");
+	if (!(input_port_read(machine(), "IN0") & 0x8000)) temp ^= 0x80;
+	if (m_cpu_to_sound_ready) temp ^= 0x40;
+	if (m_sound_to_cpu_ready) temp ^= 0x20;
 	return temp;
 }
 
 
-READ8_HANDLER( cyberbal_sound_6502_stat_r )
+READ8_MEMBER(cyberbal_state::cyberbal_sound_6502_stat_r)
 {
-	cyberbal_state *state = space->machine().driver_data<cyberbal_state>();
 	int temp = 0xff;
-	if (state->m_sound_data_from_6502_ready) temp ^= 0x80;
-	if (state->m_sound_data_from_68k_ready) temp ^= 0x40;
+	if (m_sound_data_from_6502_ready) temp ^= 0x80;
+	if (m_sound_data_from_68k_ready) temp ^= 0x40;
 	return temp;
 }
 
 
-WRITE8_HANDLER( cyberbal_sound_bank_select_w )
+WRITE8_MEMBER(cyberbal_state::cyberbal_sound_bank_select_w)
 {
-	cyberbal_state *state = space->machine().driver_data<cyberbal_state>();
-	memory_set_bankptr(space->machine(), "soundbank", &state->m_bank_base[0x1000 * ((data >> 6) & 3)]);
-	coin_counter_w(space->machine(), 1, (data >> 5) & 1);
-	coin_counter_w(space->machine(), 0, (data >> 4) & 1);
-	cputag_set_input_line(space->machine(), "dac", INPUT_LINE_RESET, (data & 0x08) ? CLEAR_LINE : ASSERT_LINE);
-	if (!(data & 0x01)) devtag_reset(space->machine(), "ymsnd");
+	memory_set_bankptr(machine(), "soundbank", &m_bank_base[0x1000 * ((data >> 6) & 3)]);
+	coin_counter_w(machine(), 1, (data >> 5) & 1);
+	coin_counter_w(machine(), 0, (data >> 4) & 1);
+	cputag_set_input_line(machine(), "dac", INPUT_LINE_RESET, (data & 0x08) ? CLEAR_LINE : ASSERT_LINE);
+	if (!(data & 0x01)) devtag_reset(machine(), "ymsnd");
 }
 
 
-READ8_HANDLER( cyberbal_sound_68k_6502_r )
+READ8_MEMBER(cyberbal_state::cyberbal_sound_68k_6502_r)
 {
-	cyberbal_state *state = space->machine().driver_data<cyberbal_state>();
-	state->m_sound_data_from_68k_ready = 0;
-	return state->m_sound_data_from_68k;
+	m_sound_data_from_68k_ready = 0;
+	return m_sound_data_from_68k;
 }
 
 
-WRITE8_HANDLER( cyberbal_sound_68k_6502_w )
+WRITE8_MEMBER(cyberbal_state::cyberbal_sound_68k_6502_w)
 {
-	cyberbal_state *state = space->machine().driver_data<cyberbal_state>();
 
-	state->m_sound_data_from_6502 = data;
-	state->m_sound_data_from_6502_ready = 1;
+	m_sound_data_from_6502 = data;
+	m_sound_data_from_6502_ready = 1;
 
-	if (!state->m_io_68k_int)
+	if (!m_io_68k_int)
 	{
-		state->m_io_68k_int = 1;
-		update_sound_68k_interrupts(space->machine());
+		m_io_68k_int = 1;
+		update_sound_68k_interrupts(machine());
 	}
 }
 
@@ -116,50 +111,46 @@ INTERRUPT_GEN( cyberbal_sound_68k_irq_gen )
 }
 
 
-WRITE16_HANDLER( cyberbal_io_68k_irq_ack_w )
+WRITE16_MEMBER(cyberbal_state::cyberbal_io_68k_irq_ack_w)
 {
-	cyberbal_state *state = space->machine().driver_data<cyberbal_state>();
-	if (state->m_io_68k_int)
+	if (m_io_68k_int)
 	{
-		state->m_io_68k_int = 0;
-		update_sound_68k_interrupts(space->machine());
+		m_io_68k_int = 0;
+		update_sound_68k_interrupts(machine());
 	}
 }
 
 
-READ16_HANDLER( cyberbal_sound_68k_r )
+READ16_MEMBER(cyberbal_state::cyberbal_sound_68k_r)
 {
-	cyberbal_state *state = space->machine().driver_data<cyberbal_state>();
-	int temp = (state->m_sound_data_from_6502 << 8) | 0xff;
+	int temp = (m_sound_data_from_6502 << 8) | 0xff;
 
-	state->m_sound_data_from_6502_ready = 0;
+	m_sound_data_from_6502_ready = 0;
 
-	if (state->m_sound_data_from_6502_ready) temp ^= 0x08;
-	if (state->m_sound_data_from_68k_ready) temp ^= 0x04;
+	if (m_sound_data_from_6502_ready) temp ^= 0x08;
+	if (m_sound_data_from_68k_ready) temp ^= 0x04;
 	return temp;
 }
 
 
-WRITE16_HANDLER( cyberbal_sound_68k_w )
+WRITE16_MEMBER(cyberbal_state::cyberbal_sound_68k_w)
 {
-	cyberbal_state *state = space->machine().driver_data<cyberbal_state>();
 	if (ACCESSING_BITS_8_15)
 	{
-		state->m_sound_data_from_68k = (data >> 8) & 0xff;
-		state->m_sound_data_from_68k_ready = 1;
+		m_sound_data_from_68k = (data >> 8) & 0xff;
+		m_sound_data_from_68k_ready = 1;
 	}
 }
 
 
-WRITE16_HANDLER( cyberbal_sound_68k_dac_w )
+WRITE16_MEMBER(cyberbal_state::cyberbal_sound_68k_dac_w)
 {
-	cyberbal_state *state = space->machine().driver_data<cyberbal_state>();
-	device_t *dac = space->machine().device((offset & 8) ? "dac2" : "dac1");
+	device_t *dac = machine().device((offset & 8) ? "dac2" : "dac1");
 	dac_data_16_w(dac, (((data >> 3) & 0x800) | ((data >> 2) & 0x7ff)) << 4);
 
-	if (state->m_fast_68k_int)
+	if (m_fast_68k_int)
 	{
-		state->m_fast_68k_int = 0;
-		update_sound_68k_interrupts(space->machine());
+		m_fast_68k_int = 0;
+		update_sound_68k_interrupts(machine());
 	}
 }

@@ -107,6 +107,23 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(invaders_in0_control_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(invaders_in1_control_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(invaders_in2_control_r);
+	DECLARE_WRITE8_MEMBER(seawolf_audio_w);
+	DECLARE_WRITE8_MEMBER(gunfight_audio_w);
+	DECLARE_WRITE8_MEMBER(zzzap_audio_1_w);
+	DECLARE_WRITE8_MEMBER(zzzap_audio_2_w);
+	DECLARE_WRITE8_MEMBER(gmissile_audio_1_w);
+	DECLARE_WRITE8_MEMBER(gmissile_audio_2_w);
+	DECLARE_WRITE8_MEMBER(gmissile_audio_3_w);
+	DECLARE_WRITE8_MEMBER(m4_audio_1_w);
+	DECLARE_WRITE8_MEMBER(m4_audio_2_w);
+	DECLARE_WRITE8_MEMBER(clowns_audio_1_w);
+	DECLARE_WRITE8_MEMBER(phantom2_audio_1_w);
+	DECLARE_WRITE8_MEMBER(phantom2_audio_2_w);
+	DECLARE_WRITE8_MEMBER(bowler_audio_2_w);
+	DECLARE_WRITE8_MEMBER(bowler_audio_3_w);
+	DECLARE_WRITE8_MEMBER(bowler_audio_4_w);
+	DECLARE_WRITE8_MEMBER(bowler_audio_5_w);
+	DECLARE_WRITE8_MEMBER(bowler_audio_6_w);
 };
 
 
@@ -169,17 +186,13 @@ WRITE8_DEVICE_HANDLER( midway_tone_generator_lo_w );
 WRITE8_DEVICE_HANDLER( midway_tone_generator_hi_w );
 
 MACHINE_CONFIG_EXTERN( seawolf_audio );
-WRITE8_HANDLER( seawolf_audio_w );
 
 MACHINE_CONFIG_EXTERN( gunfight_audio );
-WRITE8_HANDLER( gunfight_audio_w );
 
 MACHINE_CONFIG_EXTERN( tornbase_audio );
 WRITE8_DEVICE_HANDLER( tornbase_audio_w );
 
 MACHINE_CONFIG_EXTERN( zzzap_audio );
-WRITE8_HANDLER( zzzap_audio_1_w );
-WRITE8_HANDLER( zzzap_audio_2_w );
 
 MACHINE_CONFIG_EXTERN( maze_audio );
 void maze_write_discrete(device_t *device, UINT8 maze_tone_timing_state);
@@ -198,16 +211,10 @@ MACHINE_CONFIG_EXTERN( dplay_audio );
 WRITE8_DEVICE_HANDLER( dplay_audio_w );
 
 MACHINE_CONFIG_EXTERN( gmissile_audio );
-WRITE8_HANDLER( gmissile_audio_1_w );
-WRITE8_HANDLER( gmissile_audio_2_w );
-WRITE8_HANDLER( gmissile_audio_3_w );
 
 MACHINE_CONFIG_EXTERN( m4_audio );
-WRITE8_HANDLER( m4_audio_1_w );
-WRITE8_HANDLER( m4_audio_2_w );
 
 MACHINE_CONFIG_EXTERN( clowns_audio );
-WRITE8_HANDLER( clowns_audio_1_w );
 WRITE8_DEVICE_HANDLER( clowns_audio_2_w );
 
 MACHINE_CONFIG_EXTERN( spacwalk_audio );
@@ -227,16 +234,9 @@ WRITE8_DEVICE_HANDLER( spcenctr_audio_2_w );
 WRITE8_DEVICE_HANDLER( spcenctr_audio_3_w );
 
 MACHINE_CONFIG_EXTERN( phantom2_audio );
-WRITE8_HANDLER( phantom2_audio_1_w );
-WRITE8_HANDLER( phantom2_audio_2_w );
 
 MACHINE_CONFIG_EXTERN( bowler_audio );
 WRITE8_DEVICE_HANDLER( bowler_audio_1_w );
-WRITE8_HANDLER( bowler_audio_2_w );
-WRITE8_HANDLER( bowler_audio_3_w );
-WRITE8_HANDLER( bowler_audio_4_w );
-WRITE8_HANDLER( bowler_audio_5_w );
-WRITE8_HANDLER( bowler_audio_6_w );
 
 MACHINE_CONFIG_EXTERN( invaders_samples_audio );
 MACHINE_CONFIG_EXTERN( invaders_audio );

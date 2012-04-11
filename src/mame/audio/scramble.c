@@ -117,9 +117,9 @@ WRITE_LINE_DEVICE_HANDLER( scramble_sh_7474_q_callback )
 	cputag_set_input_line(device->machine(), "audiocpu", 0, !state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE8_HANDLER( hotshock_sh_irqtrigger_w )
+WRITE8_MEMBER(scramble_state::hotshock_sh_irqtrigger_w)
 {
-	cputag_set_input_line(space->machine(), "audiocpu", 0, ASSERT_LINE);
+	cputag_set_input_line(machine(), "audiocpu", 0, ASSERT_LINE);
 }
 
 READ8_DEVICE_HANDLER( hotshock_soundlatch_r )
@@ -143,21 +143,21 @@ static void filter_w(device_t *device, int data)
 		filter_rc_set_RC(device,FLT_RC_LOWPASS,1000,5100,0,CAP_P(C));
 }
 
-WRITE8_HANDLER( scramble_filter_w )
+WRITE8_MEMBER(scramble_state::scramble_filter_w)
 {
-	filter_w(space->machine().device("filter.1.0"), (offset >>  0) & 3);
-	filter_w(space->machine().device("filter.1.1"), (offset >>  2) & 3);
-	filter_w(space->machine().device("filter.1.2"), (offset >>  4) & 3);
-	filter_w(space->machine().device("filter.0.0"), (offset >>  6) & 3);
-	filter_w(space->machine().device("filter.0.1"), (offset >>  8) & 3);
-	filter_w(space->machine().device("filter.0.2"), (offset >> 10) & 3);
+	filter_w(machine().device("filter.1.0"), (offset >>  0) & 3);
+	filter_w(machine().device("filter.1.1"), (offset >>  2) & 3);
+	filter_w(machine().device("filter.1.2"), (offset >>  4) & 3);
+	filter_w(machine().device("filter.0.0"), (offset >>  6) & 3);
+	filter_w(machine().device("filter.0.1"), (offset >>  8) & 3);
+	filter_w(machine().device("filter.0.2"), (offset >> 10) & 3);
 }
 
-WRITE8_HANDLER( frogger_filter_w )
+WRITE8_MEMBER(scramble_state::frogger_filter_w)
 {
-	filter_w(space->machine().device("filter.0.0"), (offset >>  6) & 3);
-	filter_w(space->machine().device("filter.0.1"), (offset >>  8) & 3);
-	filter_w(space->machine().device("filter.0.2"), (offset >> 10) & 3);
+	filter_w(machine().device("filter.0.0"), (offset >>  6) & 3);
+	filter_w(machine().device("filter.0.1"), (offset >>  8) & 3);
+	filter_w(machine().device("filter.0.2"), (offset >> 10) & 3);
 }
 
 void scramble_sh_init(running_machine &machine)

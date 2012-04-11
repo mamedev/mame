@@ -184,7 +184,7 @@ static MACHINE_RESET( spacefb )
 	spacefb_state *state = machine.driver_data<spacefb_state>();
 	/* the 3 output ports are cleared on reset */
 	state->spacefb_port_0_w(*space, 0, 0);
-	spacefb_port_1_w(space, 0, 0);
+	state->spacefb_port_1_w(*space, 0, 0);
 	state->spacefb_port_2_w(*space, 0, 0);
 
 	start_interrupt_timer(machine);
@@ -229,7 +229,7 @@ static ADDRESS_MAP_START( spacefb_main_io_map, AS_IO, 8, spacefb_state )
 	AM_RANGE(0x04, 0x07) AM_READNOP  /* yes, this is correct (1-of-8 decoder) */
 
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0x04) AM_WRITE(spacefb_port_0_w)
-	AM_RANGE(0x01, 0x01) AM_MIRROR(0x04) AM_WRITE_LEGACY(spacefb_port_1_w)
+	AM_RANGE(0x01, 0x01) AM_MIRROR(0x04) AM_WRITE(spacefb_port_1_w)
 	AM_RANGE(0x02, 0x02) AM_MIRROR(0x04) AM_WRITE(spacefb_port_2_w)
 	AM_RANGE(0x03, 0x03) AM_MIRROR(0x04) AM_WRITENOP
 ADDRESS_MAP_END
@@ -237,9 +237,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( spacefb_audio_io_map, AS_IO, 8, spacefb_state )
 	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_DEVWRITE_LEGACY("dac", dac_w)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READ_LEGACY(spacefb_audio_p2_r)
-	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_READ_LEGACY(spacefb_audio_t0_r)
-	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ_LEGACY(spacefb_audio_t1_r)
+	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READ(spacefb_audio_p2_r)
+	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_READ(spacefb_audio_t0_r)
+	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(spacefb_audio_t1_r)
 ADDRESS_MAP_END
 
 

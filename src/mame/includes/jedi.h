@@ -55,6 +55,15 @@ public:
 	DECLARE_WRITE8_MEMBER(jedi_vscroll_w);
 	DECLARE_WRITE8_MEMBER(jedi_hscroll_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(jedi_audio_comm_stat_r);
+	DECLARE_WRITE8_MEMBER(irq_ack_w);
+	DECLARE_WRITE8_MEMBER(jedi_audio_reset_w);
+	DECLARE_WRITE8_MEMBER(jedi_audio_latch_w);
+	DECLARE_READ8_MEMBER(audio_latch_r);
+	DECLARE_READ8_MEMBER(jedi_audio_ack_latch_r);
+	DECLARE_WRITE8_MEMBER(audio_ack_latch_w);
+	DECLARE_WRITE8_MEMBER(speech_strobe_w);
+	DECLARE_READ8_MEMBER(speech_ready_r);
+	DECLARE_WRITE8_MEMBER(speech_reset_w);
 };
 
 
@@ -62,9 +71,6 @@ public:
 
 MACHINE_CONFIG_EXTERN( jedi_audio );
 
-WRITE8_HANDLER( jedi_audio_reset_w );
-WRITE8_HANDLER( jedi_audio_latch_w );
-READ8_HANDLER( jedi_audio_ack_latch_r );
 
 
 /*----------- defined in video/jedi.c -----------*/

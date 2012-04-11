@@ -217,18 +217,17 @@ static SOUND_START( astrob )
  *
  *************************************/
 
-WRITE8_HANDLER( astrob_sound_w )
+WRITE8_MEMBER(segag80r_state::astrob_sound_w)
 {
-	segag80r_state *state = space->machine().driver_data<segag80r_state>();
 	static const float attack_resistor[10] =
 	{
 		120.0f, 82.0f, 62.0f, 56.0f, 47.0f, 39.0f, 33.0f, 27.0f, 24.0f, 22.0f
 	};
-	samples_device *samples = space->machine().device<samples_device>("samples");
+	samples_device *samples = machine().device<samples_device>("samples");
 	float freq_factor;
 
-	UINT8 diff = data ^ state->m_sound_state[offset];
-	state->m_sound_state[offset] = data;
+	UINT8 diff = data ^ m_sound_state[offset];
+	m_sound_state[offset] = data;
 
 	switch (offset)
 	{
@@ -254,7 +253,7 @@ WRITE8_HANDLER( astrob_sound_w )
 			if ((data & 0x10) && samples->playing(4)) samples->stop(4);
 
 			/* MUTE */
-			space->machine().sound().system_mute(data & 0x20);
+			machine().sound().system_mute(data & 0x20);
 
 			/* REFILL: channel 5 */
 			if (!(data & 0x40) && !samples->playing(5)) samples->start(5, 9);
@@ -284,10 +283,10 @@ WRITE8_HANDLER( astrob_sound_w )
 			if ((diff & 0x08) && !(data & 0x08)) samples->start(8, 13);
 
 			/* ATTACK RATE */
-			if ((diff & 0x10) && !(data & 0x10)) state->m_sound_rate = (state->m_sound_rate + 1) % 10;
+			if ((diff & 0x10) && !(data & 0x10)) m_sound_rate = (m_sound_rate + 1) % 10;
 
 			/* RATE RESET */
-			if (!(data & 0x20)) state->m_sound_rate = 0;
+			if (!(data & 0x20)) m_sound_rate = 0;
 
 			/* BONUS: channel 9 */
 			if ((diff & 0x40) && !(data & 0x40)) samples->start(9, 14);
@@ -303,7 +302,7 @@ WRITE8_HANDLER( astrob_sound_w )
 	/* account for the fact that frequency goes up as CV goes down */
 	/* WARP is already taken into account by the differing samples above */
 	freq_factor  = (11.5f - 8.163f) * (-22.0f / attack_resistor[0]) + 8.163f;
-	freq_factor /= (11.5f - 8.163f) * (-22.0f / attack_resistor[state->m_sound_rate]) + 8.163f;
+	freq_factor /= (11.5f - 8.163f) * (-22.0f / attack_resistor[m_sound_rate]) + 8.163f;
 
 	/* adjust the sample rate of invader sounds based the sound_rate */
 	/* this is an approximation */
@@ -688,12 +687,11 @@ static SOUND_START( spaceod )
  *
  *************************************/
 
-WRITE8_HANDLER( spaceod_sound_w )
+WRITE8_MEMBER(segag80r_state::spaceod_sound_w)
 {
-	segag80r_state *state = space->machine().driver_data<segag80r_state>();
-	samples_device *samples = space->machine().device<samples_device>("samples");
-	UINT8 diff = data ^ state->m_sound_state[offset];
-	state->m_sound_state[offset] = data;
+	samples_device *samples = machine().device<samples_device>("samples");
+	UINT8 diff = data ^ m_sound_state[offset];
+	m_sound_state[offset] = data;
 
 	switch (offset)
 	{
@@ -751,10 +749,10 @@ static WRITE8_DEVICE_HANDLER( monsterb_sound_b_w );
 static READ8_DEVICE_HANDLER( n7751_status_r );
 static WRITE8_DEVICE_HANDLER( n7751_command_w );
 static WRITE8_DEVICE_HANDLER( n7751_rom_control_w );
-static READ8_HANDLER( n7751_rom_r );
-static READ8_HANDLER( n7751_command_r );
+
+
 static WRITE8_DEVICE_HANDLER( n7751_p2_w );
-static READ8_HANDLER( n7751_t1_r );
+
 
 /*
     Monster Bash
@@ -797,10 +795,10 @@ static const tms36xx_interface monsterb_tms3617_interface =
  *
  *************************************/
 
-static ADDRESS_MAP_START( monsterb_7751_portmap, AS_IO, 8, driver_device )
-	AM_RANGE(MCS48_PORT_T1,   MCS48_PORT_T1) AM_READ_LEGACY(n7751_t1_r)
-	AM_RANGE(MCS48_PORT_P2,   MCS48_PORT_P2) AM_READ_LEGACY(n7751_command_r)
-	AM_RANGE(MCS48_PORT_BUS,  MCS48_PORT_BUS) AM_READ_LEGACY(n7751_rom_r)
+static ADDRESS_MAP_START( monsterb_7751_portmap, AS_IO, 8, segag80r_state )
+	AM_RANGE(MCS48_PORT_T1,   MCS48_PORT_T1) AM_READ(n7751_t1_r)
+	AM_RANGE(MCS48_PORT_P2,   MCS48_PORT_P2) AM_READ(n7751_command_r)
+	AM_RANGE(MCS48_PORT_BUS,  MCS48_PORT_BUS) AM_READ(n7751_rom_r)
 	AM_RANGE(MCS48_PORT_P1,   MCS48_PORT_P1) AM_DEVWRITE_LEGACY("dac", dac_w)
 	AM_RANGE(MCS48_PORT_P2,   MCS48_PORT_P2) AM_DEVWRITE_LEGACY("audio_8243", n7751_p2_w)
 	AM_RANGE(MCS48_PORT_PROG, MCS48_PORT_PROG) AM_DEVWRITE_LEGACY("audio_8243", i8243_prog_w)
@@ -976,20 +974,18 @@ static WRITE8_DEVICE_HANDLER( n7751_rom_control_w )
 }
 
 
-static READ8_HANDLER( n7751_rom_r )
+READ8_MEMBER(segag80r_state::n7751_rom_r)
 {
-	segag80r_state *state = space->machine().driver_data<segag80r_state>();
 	/* read from BUS */
-	return space->machine().region("n7751")->base()[state->m_sound_addr];
+	return machine().region("n7751")->base()[m_sound_addr];
 }
 
 
-static READ8_HANDLER( n7751_command_r )
+READ8_MEMBER(segag80r_state::n7751_command_r)
 {
-	segag80r_state *state = space->machine().driver_data<segag80r_state>();
 	/* read from P2 - 8255's PC0-2 connects to 7751's S0-2 (P24-P26 on an 8048) */
 	/* bit 0x80 is an alternate way to control the sample on/off; doesn't appear to be used */
-	return 0x80 | ((state->m_n7751_command & 0x07) << 4);
+	return 0x80 | ((m_n7751_command & 0x07) << 4);
 }
 
 
@@ -1005,7 +1001,7 @@ static WRITE8_DEVICE_HANDLER( n7751_p2_w )
 }
 
 
-static READ8_HANDLER( n7751_t1_r )
+READ8_MEMBER(segag80r_state::n7751_t1_r)
 {
 	/* T1 - labelled as "TEST", connected to ground */
 	return 0;

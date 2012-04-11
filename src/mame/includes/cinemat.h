@@ -48,6 +48,8 @@ public:
 	DECLARE_READ8_MEMBER(qb3_frame_r);
 	DECLARE_WRITE8_MEMBER(qb3_ram_bank_w);
 	DECLARE_WRITE8_MEMBER(cinemat_vector_control_w);
+	DECLARE_WRITE8_MEMBER(cinemat_sound_control_w);
+	DECLARE_WRITE8_MEMBER(qb3_sound_w);
 };
 
 
@@ -58,7 +60,6 @@ MACHINE_RESET( cinemat );
 
 /*----------- defined in audio/cinemat.c -----------*/
 
-WRITE8_HANDLER( cinemat_sound_control_w );
 
 MACHINE_CONFIG_EXTERN( spacewar_sound );
 MACHINE_CONFIG_EXTERN( barrier_sound );

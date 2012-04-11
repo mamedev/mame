@@ -1443,7 +1443,7 @@ static DRIVER_INIT( astrob )
 	iospace->install_legacy_write_handler(*speech, 0x3b, 0x3b, FUNC(sega_speech_control_w));
 
 	/* install Astro Blaster sound board */
-	iospace->install_legacy_write_handler(0x3e, 0x3f, FUNC(astrob_sound_w));
+	iospace->install_write_handler(0x3e, 0x3f, write8_delegate(FUNC(segag80r_state::astrob_sound_w),state));
 }
 
 
@@ -1474,7 +1474,7 @@ static DRIVER_INIT( spaceod )
 	iospace->install_readwrite_handler(0x08, 0x0f, read8_delegate(FUNC(segag80r_state::spaceod_back_port_r),state), write8_delegate(FUNC(segag80r_state::spaceod_back_port_w),state));
 
 	/* install Space Odyssey sound board */
-	iospace->install_legacy_write_handler(0x0e, 0x0f, FUNC(spaceod_sound_w));
+	iospace->install_write_handler(0x0e, 0x0f, write8_delegate(FUNC(segag80r_state::spaceod_sound_w),state));
 
 	/* install our wacky mangled ports */
 	iospace->install_read_handler(0xf8, 0xfb, read8_delegate(FUNC(segag80r_state::spaceod_mangled_ports_r),state));

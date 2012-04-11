@@ -80,7 +80,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, aztarac_state )
 	AM_RANGE(0x022000, 0x0220ff) AM_READ(nvram_r) AM_WRITEONLY AM_SHARE("nvram")
 	AM_RANGE(0x027000, 0x027001) AM_READ(joystick_r)
 	AM_RANGE(0x027004, 0x027005) AM_READ_PORT("INPUTS")
-	AM_RANGE(0x027008, 0x027009) AM_READWRITE_LEGACY(aztarac_sound_r, aztarac_sound_w)
+	AM_RANGE(0x027008, 0x027009) AM_READWRITE(aztarac_sound_r, aztarac_sound_w)
 	AM_RANGE(0x02700c, 0x02700d) AM_READ_PORT("DIAL")
 	AM_RANGE(0x02700e, 0x02700f) AM_READ(watchdog_reset16_r)
 	AM_RANGE(0xff8000, 0xffafff) AM_RAM AM_BASE(m_vectorram)
@@ -99,12 +99,12 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, aztarac_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x8800, 0x8800) AM_READ_LEGACY(aztarac_snd_command_r)
+	AM_RANGE(0x8800, 0x8800) AM_READ(aztarac_snd_command_r)
 	AM_RANGE(0x8c00, 0x8c01) AM_DEVREADWRITE_LEGACY("ay1", ay8910_r, ay8910_data_address_w)
 	AM_RANGE(0x8c02, 0x8c03) AM_DEVREADWRITE_LEGACY("ay2", ay8910_r, ay8910_data_address_w)
 	AM_RANGE(0x8c04, 0x8c05) AM_DEVREADWRITE_LEGACY("ay3", ay8910_r, ay8910_data_address_w)
 	AM_RANGE(0x8c06, 0x8c07) AM_DEVREADWRITE_LEGACY("ay4", ay8910_r, ay8910_data_address_w)
-	AM_RANGE(0x9000, 0x9000) AM_READWRITE_LEGACY(aztarac_snd_status_r, aztarac_snd_status_w)
+	AM_RANGE(0x9000, 0x9000) AM_READWRITE(aztarac_snd_status_r, aztarac_snd_status_w)
 ADDRESS_MAP_END
 
 

@@ -42,6 +42,10 @@ public:
 	double m_color_weights_b[2];
 	DECLARE_WRITE8_MEMBER(spacefb_port_0_w);
 	DECLARE_WRITE8_MEMBER(spacefb_port_2_w);
+	DECLARE_READ8_MEMBER(spacefb_audio_p2_r);
+	DECLARE_READ8_MEMBER(spacefb_audio_t0_r);
+	DECLARE_READ8_MEMBER(spacefb_audio_t1_r);
+	DECLARE_WRITE8_MEMBER(spacefb_port_1_w);
 };
 
 
@@ -49,10 +53,6 @@ public:
 
 MACHINE_CONFIG_EXTERN( spacefb_audio );
 
-READ8_HANDLER( spacefb_audio_p2_r );
-READ8_HANDLER( spacefb_audio_t0_r );
-READ8_HANDLER( spacefb_audio_t1_r );
-WRITE8_HANDLER( spacefb_port_1_w );
 
 
 /*----------- defined in video/spacefb.c -----------*/

@@ -331,7 +331,7 @@ static ADDRESS_MAP_START( seawolf_io_map, AS_IO, 8, mw8080bw_state )
 	AM_RANGE(0x02, 0x02) AM_WRITE(seawolf_periscope_lamp_w)
 	AM_RANGE(0x03, 0x03) AM_DEVWRITE_LEGACY("mb14241", mb14241_shift_data_w)
 	AM_RANGE(0x04, 0x04) AM_DEVWRITE_LEGACY("mb14241", mb14241_shift_count_w)
-	AM_RANGE(0x05, 0x05) AM_WRITE_LEGACY(seawolf_audio_w)
+	AM_RANGE(0x05, 0x05) AM_WRITE(seawolf_audio_w)
 ADDRESS_MAP_END
 
 
@@ -421,7 +421,7 @@ MACHINE_CONFIG_END
 WRITE8_MEMBER(mw8080bw_state::gunfight_io_w)
 {
 	if (offset & 0x01)
-		gunfight_audio_w(&space, 0, data);
+		gunfight_audio_w(space, 0, data);
 
 	if (offset & 0x02)
 		mb14241_shift_count_w(m_mb14241, 0, data);
@@ -754,10 +754,10 @@ static ADDRESS_MAP_START( zzzap_io_map, AS_IO, 8, mw8080bw_state )
 	AM_RANGE(0x02, 0x02) AM_MIRROR(0x04) AM_READ_PORT("IN2")
 	AM_RANGE(0x03, 0x03) AM_MIRROR(0x04) AM_DEVREAD_LEGACY("mb14241", mb14241_shift_result_r)
 
-	AM_RANGE(0x02, 0x02) AM_WRITE_LEGACY(zzzap_audio_1_w)
+	AM_RANGE(0x02, 0x02) AM_WRITE(zzzap_audio_1_w)
 	AM_RANGE(0x03, 0x03) AM_DEVWRITE_LEGACY("mb14241", mb14241_shift_data_w)
 	AM_RANGE(0x04, 0x04) AM_DEVWRITE_LEGACY("mb14241", mb14241_shift_count_w)
-	AM_RANGE(0x05, 0x05) AM_WRITE_LEGACY(zzzap_audio_2_w)
+	AM_RANGE(0x05, 0x05) AM_WRITE(zzzap_audio_2_w)
 	AM_RANGE(0x07, 0x07) AM_WRITE(watchdog_reset_w)
 ADDRESS_MAP_END
 
@@ -1520,11 +1520,11 @@ static ADDRESS_MAP_START( gmissile_io_map, AS_IO, 8, mw8080bw_state )
 
 	AM_RANGE(0x01, 0x01) AM_WRITE(mw8080bw_reversable_shift_count_w)
 	AM_RANGE(0x02, 0x02) AM_DEVWRITE_LEGACY("mb14241", mb14241_shift_data_w)
-	AM_RANGE(0x03, 0x03) AM_WRITE_LEGACY(gmissile_audio_1_w)
+	AM_RANGE(0x03, 0x03) AM_WRITE(gmissile_audio_1_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0x05, 0x05) AM_WRITE_LEGACY(gmissile_audio_2_w)
+	AM_RANGE(0x05, 0x05) AM_WRITE(gmissile_audio_2_w)
 	/* also writes 0x00 to 0x06, but it is not connected */
-	AM_RANGE(0x07, 0x07) AM_WRITE_LEGACY(gmissile_audio_3_w)
+	AM_RANGE(0x07, 0x07) AM_WRITE(gmissile_audio_3_w)
 ADDRESS_MAP_END
 
 
@@ -1616,9 +1616,9 @@ static ADDRESS_MAP_START( m4_io_map, AS_IO, 8, mw8080bw_state )
 
 	AM_RANGE(0x01, 0x01) AM_WRITE(mw8080bw_reversable_shift_count_w)
 	AM_RANGE(0x02, 0x02) AM_DEVWRITE_LEGACY("mb14241", mb14241_shift_data_w)
-	AM_RANGE(0x03, 0x03) AM_WRITE_LEGACY(m4_audio_1_w)
+	AM_RANGE(0x03, 0x03) AM_WRITE(m4_audio_1_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0x05, 0x05) AM_WRITE_LEGACY(m4_audio_2_w)
+	AM_RANGE(0x05, 0x05) AM_WRITE(m4_audio_2_w)
 ADDRESS_MAP_END
 
 
@@ -1731,7 +1731,7 @@ static ADDRESS_MAP_START( clowns_io_map, AS_IO, 8, mw8080bw_state )
 
 	AM_RANGE(0x01, 0x01) AM_DEVWRITE_LEGACY("mb14241", mb14241_shift_count_w)
 	AM_RANGE(0x02, 0x02) AM_DEVWRITE_LEGACY("mb14241", mb14241_shift_data_w)
-	AM_RANGE(0x03, 0x03) AM_WRITE_LEGACY(clowns_audio_1_w)
+	AM_RANGE(0x03, 0x03) AM_WRITE(clowns_audio_1_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x05, 0x05) AM_DEVWRITE_LEGACY("discrete", midway_tone_generator_lo_w)
 	AM_RANGE(0x06, 0x06) AM_DEVWRITE_LEGACY("discrete", midway_tone_generator_hi_w)
@@ -2312,8 +2312,8 @@ static ADDRESS_MAP_START( phantom2_io_map, AS_IO, 8, mw8080bw_state )
 	AM_RANGE(0x01, 0x01) AM_DEVWRITE_LEGACY("mb14241", mb14241_shift_count_w)
 	AM_RANGE(0x02, 0x02) AM_DEVWRITE_LEGACY("mb14241", mb14241_shift_data_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0x05, 0x05) AM_WRITE_LEGACY(phantom2_audio_1_w)
-	AM_RANGE(0x06, 0x06) AM_WRITE_LEGACY(phantom2_audio_2_w)
+	AM_RANGE(0x05, 0x05) AM_WRITE(phantom2_audio_1_w)
+	AM_RANGE(0x06, 0x06) AM_WRITE(phantom2_audio_2_w)
 ADDRESS_MAP_END
 
 
@@ -2440,13 +2440,13 @@ static ADDRESS_MAP_START( bowler_io_map, AS_IO, 8, mw8080bw_state )
 	AM_RANGE(0x02, 0x02) AM_DEVWRITE_LEGACY("mb14241", mb14241_shift_data_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x05, 0x05) AM_DEVWRITE_LEGACY("discrete", bowler_audio_1_w)
-	AM_RANGE(0x06, 0x06) AM_WRITE_LEGACY(bowler_audio_2_w)
+	AM_RANGE(0x06, 0x06) AM_WRITE(bowler_audio_2_w)
 	AM_RANGE(0x07, 0x07) AM_WRITE(bowler_lights_1_w)
-	AM_RANGE(0x08, 0x08) AM_WRITE_LEGACY(bowler_audio_3_w)
-	AM_RANGE(0x09, 0x09) AM_WRITE_LEGACY(bowler_audio_4_w)
-	AM_RANGE(0x0a, 0x0a) AM_WRITE_LEGACY(bowler_audio_5_w)
+	AM_RANGE(0x08, 0x08) AM_WRITE(bowler_audio_3_w)
+	AM_RANGE(0x09, 0x09) AM_WRITE(bowler_audio_4_w)
+	AM_RANGE(0x0a, 0x0a) AM_WRITE(bowler_audio_5_w)
 	AM_RANGE(0x0e, 0x0e) AM_WRITE(bowler_lights_2_w)
-	AM_RANGE(0x0f, 0x0f) AM_WRITE_LEGACY(bowler_audio_6_w)
+	AM_RANGE(0x0f, 0x0f) AM_WRITE(bowler_audio_6_w)
 ADDRESS_MAP_END
 
 

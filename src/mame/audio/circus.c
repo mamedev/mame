@@ -170,70 +170,69 @@ DISCRETE_SOUND_END
 /* and also is used to enable the amplifier and trigger the   */
 /* discrete circuitry that produces sound effects and music   */
 
-WRITE8_HANDLER( circus_clown_z_w )
+WRITE8_MEMBER(circus_state::circus_clown_z_w)
 {
-	circus_state *state = space->machine().driver_data<circus_state>();
 
-	state->m_clown_z = (data & 0x0f);
-	*(space->machine().region("maincpu")->base() + 0x8000) = data; logerror("Z:%02x\n",data); //DEBUG
+	m_clown_z = (data & 0x0f);
+	*(machine().region("maincpu")->base() + 0x8000) = data; logerror("Z:%02x\n",data); //DEBUG
 
 	/* Bits 4-6 enable/disable trigger different events */
-	switch (state->m_game_id)
+	switch (m_game_id)
 	{
 		case 1:	/* circus */
 		case 4:	/* ripcord */
 			switch ((data & 0x70) >> 4)
 			{
 				case 0 : /* All Off */
-					discrete_sound_w(state->m_discrete, CIRCUS_MUSIC_BIT, 0);
+					discrete_sound_w(m_discrete, CIRCUS_MUSIC_BIT, 0);
 					break;
 
 				case 1 : /* Music */
-					discrete_sound_w(state->m_discrete, CIRCUS_MUSIC_BIT, 1);
+					discrete_sound_w(m_discrete, CIRCUS_MUSIC_BIT, 1);
 					break;
 
 				case 2 : /* Circus = Pop; Rip Cord = Splash */
-					state->m_samples->start(0, 0);
+					m_samples->start(0, 0);
 					break;
 
 				case 3 : /* Normal Video */
 					break;
 
 				case 4 : /* Circus = Miss; Rip Cord = Scream */
-					state->m_samples->start(1, 1);
+					m_samples->start(1, 1);
 					break;
 
 				case 5 : /* Invert Video */
 					break;
 
 				case 6 : /* Circus = Bounce; Rip Cord = Chute Open */
-					state->m_samples->start(2, 2);
+					m_samples->start(2, 2);
 					break;
 
 				case 7 : /* Circus = not used; Rip Cord = Whistle */
-					if (state->m_game_id == 4)
-						state->m_samples->start(3, 3);
+					if (m_game_id == 4)
+						m_samples->start(3, 3);
 					break;
 			}
 			break;
 
 		case 2:	/* robotbwl */
-			discrete_sound_w(state->m_discrete, ROBOTBWL_MUSIC_BIT, data & 0x08);	/* Footsteps */
+			discrete_sound_w(m_discrete, ROBOTBWL_MUSIC_BIT, data & 0x08);	/* Footsteps */
 
 			if (data & 0x40)	/* Hit */
-				state->m_samples->start(0, 0);
+				m_samples->start(0, 0);
 
 			if (data & 0x20)	/* Roll */
-				state->m_samples->start(1, 1);
+				m_samples->start(1, 1);
 
 			if (data & 0x10)	/* Ball Drop */
-				state->m_samples->start(2, 2);
+				m_samples->start(2, 2);
 
 			if (data & 0x02)	/* Demerit */
-				state->m_samples->start(3, 3);
+				m_samples->start(3, 3);
 
 			if (data & 0x01)	/* Reward */
-				state->m_samples->start(4, 4);
+				m_samples->start(4, 4);
 
 			// if (data & 0x04) /* Invert */
 			break;
@@ -243,26 +242,26 @@ WRITE8_HANDLER( circus_clown_z_w )
 			switch ((data & 0x70) >> 4)
 			{
 				case 0 : /* All Off */
-					discrete_sound_w(state->m_discrete, CRASH_MUSIC_BIT, 0);
+					discrete_sound_w(m_discrete, CRASH_MUSIC_BIT, 0);
 					break;
 
 				case 1 : /* Music */
-					discrete_sound_w(state->m_discrete, CRASH_MUSIC_BIT, 1);
+					discrete_sound_w(m_discrete, CRASH_MUSIC_BIT, 1);
 					break;
 
 				case 2 : /* Crash */
-					state->m_samples->start(0, 0);
+					m_samples->start(0, 0);
 					break;
 
 				case 3 : /* Normal Video and Beep */
-					discrete_sound_w(state->m_discrete, CRASH_BEEPER_EN, 0);
+					discrete_sound_w(m_discrete, CRASH_BEEPER_EN, 0);
 					break;
 
 				case 4 : /* Skid */
 					break;
 
 				case 5 : /* Invert Video and Beep */
-					discrete_sound_w(state->m_discrete, CRASH_BEEPER_EN, 0);
+					discrete_sound_w(m_discrete, CRASH_BEEPER_EN, 0);
 					break;
 
 				case 6 : /* Hi Motor */
@@ -275,5 +274,5 @@ WRITE8_HANDLER( circus_clown_z_w )
 	}
 
 	/* Bit 7 enables amplifier (0 = on) */
-	space->machine().sound().system_mute(data & 0x80);
+	machine().sound().system_mute(data & 0x80);
 }

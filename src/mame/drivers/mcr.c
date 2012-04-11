@@ -512,7 +512,7 @@ WRITE8_MEMBER(mcr_state::dotron_op4_w)
 
 	/* bit 4 = SEL0 (J1-8) on squawk n talk board */
 	/* bits 3-0 = MD3-0 connected to squawk n talk (J1-4,3,2,1) */
-	squawkntalk_data_w(&space, offset, data);
+	squawkntalk_data_w(space, offset, data);
 }
 
 
@@ -595,7 +595,7 @@ WRITE8_MEMBER(mcr_state::nflfoot_op4_w)
 
 	/* bit 4 = SEL0 (J1-8) on squawk n talk board */
 	/* bits 3-0 = MD3-0 connected to squawk n talk (J1-4,3,2,1) */
-	squawkntalk_data_w(&space, offset, data);
+	squawkntalk_data_w(space, offset, data);
 }
 
 
@@ -624,7 +624,7 @@ WRITE8_MEMBER(mcr_state::demoderb_op4_w)
 {
 	if (data & 0x40) input_mux = 1;
 	if (data & 0x80) input_mux = 0;
-	turbocs_data_w(&space, offset, data);
+	turbocs_data_w(space, offset, data);
 }
 
 

@@ -25,12 +25,12 @@ public:
 	DECLARE_WRITE8_MEMBER(gotya_videoram_w);
 	DECLARE_WRITE8_MEMBER(gotya_colorram_w);
 	DECLARE_WRITE8_MEMBER(gotya_video_control_w);
+	DECLARE_WRITE8_MEMBER(gotya_soundlatch_w);
 };
 
 
 /*----------- defined in audio/gotya.c -----------*/
 
-WRITE8_HANDLER( gotya_soundlatch_w );
 
 
 /*----------- defined in video/gotya.c -----------*/

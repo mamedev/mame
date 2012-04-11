@@ -32,59 +32,57 @@
 #define CHANNEL_FUEL	  3
 
 
-WRITE8_HANDLER( astrof_audio_1_w )
+WRITE8_MEMBER(astrof_state::astrof_audio_1_w)
 {
-	astrof_state *state = space->machine().driver_data<astrof_state>();
-	UINT8 rising_bits = data & ~state->m_port_1_last;
+	UINT8 rising_bits = data & ~m_port_1_last;
 
-	if (state->m_astrof_death_playing)
-		state->m_astrof_death_playing = state->m_samples->playing(CHANNEL_EXPLOSION);
+	if (m_astrof_death_playing)
+		m_astrof_death_playing = m_samples->playing(CHANNEL_EXPLOSION);
 
-	if (state->m_astrof_bosskill_playing)
-		state->m_astrof_bosskill_playing = state->m_samples->playing(CHANNEL_EXPLOSION);
+	if (m_astrof_bosskill_playing)
+		m_astrof_bosskill_playing = m_samples->playing(CHANNEL_EXPLOSION);
 
 	/* D2 - explosion */
 	if (rising_bits & 0x04)
 	{
 		/* I *know* that the effect select port will be written shortly
            after this one, so this works */
-		state->m_astrof_start_explosion = 1;
+		m_astrof_start_explosion = 1;
 	}
 
 	/* D0,D1,D3 - background noise */
-	if ((data & 0x08) && (~state->m_port_1_last & 0x08))
+	if ((data & 0x08) && (~m_port_1_last & 0x08))
 	{
 		int sample = SAMPLE_WAVE + (data & 3);
-		state->m_samples->start(CHANNEL_WAVE, sample, 1);
+		m_samples->start(CHANNEL_WAVE, sample, 1);
 	}
 
-	if ((~data & 0x08) && (state->m_port_1_last & 0x08))
-		state->m_samples->stop(CHANNEL_WAVE);
+	if ((~data & 0x08) && (m_port_1_last & 0x08))
+		m_samples->stop(CHANNEL_WAVE);
 
 	/* D4 - boss laser */
-	if ((rising_bits & 0x10) && !state->m_astrof_bosskill_playing)
-		state->m_samples->start(CHANNEL_BOSSFIRE, SAMPLE_BOSSFIRE, 0);
+	if ((rising_bits & 0x10) && !m_astrof_bosskill_playing)
+		m_samples->start(CHANNEL_BOSSFIRE, SAMPLE_BOSSFIRE, 0);
 
 	/* D5 - fire */
-	if ((rising_bits & 0x20) && !state->m_astrof_bosskill_playing)
-		state->m_samples->start(CHANNEL_FIRE, SAMPLE_FIRE, 0);
+	if ((rising_bits & 0x20) && !m_astrof_bosskill_playing)
+		m_samples->start(CHANNEL_FIRE, SAMPLE_FIRE, 0);
 
 	/* D6 - don't know. Probably something to do with the explosion sounds */
 
 	/* D7 - sound enable bit */
-	space->machine().sound().system_enable(data & 0x80);
+	machine().sound().system_enable(data & 0x80);
 
-	state->m_port_1_last = data;
+	m_port_1_last = data;
 }
 
 
-WRITE8_HANDLER( astrof_audio_2_w )
+WRITE8_MEMBER(astrof_state::astrof_audio_2_w)
 {
-	astrof_state *state = space->machine().driver_data<astrof_state>();
-	UINT8 rising_bits = data & ~state->m_port_2_last;
+	UINT8 rising_bits = data & ~m_port_2_last;
 
 	/* D0-D2 - explosion select (triggered by D2 of the other port */
-	if (state->m_astrof_start_explosion)
+	if (m_astrof_start_explosion)
 	{
 		/* this is really a compound effect, made up of I believe 3 sound
            effects, but since our sample contains them all, disable playing
@@ -93,33 +91,33 @@ WRITE8_HANDLER( astrof_audio_2_w )
 		logerror("Explosion: %x\n", data);
 		if (data & 0x04)
 		{
-			if (!state->m_astrof_bosskill_playing)
+			if (!m_astrof_bosskill_playing)
 			{
-				state->m_samples->start(CHANNEL_EXPLOSION, SAMPLE_BOSSKILL, 0);
-				state->m_astrof_bosskill_playing = 1;
+				m_samples->start(CHANNEL_EXPLOSION, SAMPLE_BOSSKILL, 0);
+				m_astrof_bosskill_playing = 1;
 			}
 		}
 		else if (data & 0x02)
-			state->m_samples->start(CHANNEL_EXPLOSION, SAMPLE_BOSSHIT, 0);
+			m_samples->start(CHANNEL_EXPLOSION, SAMPLE_BOSSHIT, 0);
 		else if (data & 0x01)
-			state->m_samples->start(CHANNEL_EXPLOSION, SAMPLE_EKILLED, 0);
+			m_samples->start(CHANNEL_EXPLOSION, SAMPLE_EKILLED, 0);
 		else
 		{
-			if (!state->m_astrof_death_playing)
+			if (!m_astrof_death_playing)
 			{
-				state->m_samples->start(CHANNEL_EXPLOSION, SAMPLE_DEATH, 0);
-				state->m_astrof_death_playing = 1;
+				m_samples->start(CHANNEL_EXPLOSION, SAMPLE_DEATH, 0);
+				m_astrof_death_playing = 1;
 			}
 		}
 
-		state->m_astrof_start_explosion = 0;
+		m_astrof_start_explosion = 0;
 	}
 
 	/* D3 - low fuel warning */
 	if (rising_bits & 0x08)
-		state->m_samples->start(CHANNEL_FUEL, SAMPLE_FUEL, 0);
+		m_samples->start(CHANNEL_FUEL, SAMPLE_FUEL, 0);
 
-	state->m_port_2_last = data;
+	m_port_2_last = data;
 }
 
 
@@ -163,7 +161,7 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-WRITE8_HANDLER( spfghmk2_audio_w )
+WRITE8_MEMBER(astrof_state::spfghmk2_audio_w)
 {
 	/* nothing yet */
 }
@@ -181,9 +179,8 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-WRITE8_HANDLER( tomahawk_audio_w )
+WRITE8_MEMBER(astrof_state::tomahawk_audio_w)
 {
-	astrof_state *state = space->machine().driver_data<astrof_state>();
 
 	/* D0 - sonar */
 
@@ -196,12 +193,12 @@ WRITE8_HANDLER( tomahawk_audio_w )
 	/* D4 - UFO */
 
 	/* D5 - UFO under water */
-	sn76477_enable_w(state->m_sn, (~data >> 5) & 0x01);
+	sn76477_enable_w(m_sn, (~data >> 5) & 0x01);
 
 	/* D6 - explosion */
 
 	/* D7 - sound enable bit */
-	space->machine().sound().system_enable(data & 0x80);
+	machine().sound().system_enable(data & 0x80);
 }
 
 

@@ -19,16 +19,16 @@ public:
 	DECLARE_READ16_MEMBER(nvram_r);
 	DECLARE_READ16_MEMBER(joystick_r);
 	DECLARE_WRITE16_MEMBER(aztarac_ubr_w);
+	DECLARE_READ16_MEMBER(aztarac_sound_r);
+	DECLARE_WRITE16_MEMBER(aztarac_sound_w);
+	DECLARE_READ8_MEMBER(aztarac_snd_command_r);
+	DECLARE_READ8_MEMBER(aztarac_snd_status_r);
+	DECLARE_WRITE8_MEMBER(aztarac_snd_status_w);
 };
 
 /*----------- defined in audio/aztarac.c -----------*/
 
-READ16_HANDLER( aztarac_sound_r );
-WRITE16_HANDLER( aztarac_sound_w );
 
-READ8_HANDLER( aztarac_snd_command_r );
-READ8_HANDLER( aztarac_snd_status_r );
-WRITE8_HANDLER( aztarac_snd_status_w );
 
 INTERRUPT_GEN( aztarac_snd_timed_irq );
 

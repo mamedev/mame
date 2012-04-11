@@ -208,14 +208,14 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, cyberbal_state )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x2001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
-	AM_RANGE(0x2800, 0x2801) AM_WRITE_LEGACY(cyberbal_sound_68k_6502_w)
+	AM_RANGE(0x2800, 0x2801) AM_WRITE(cyberbal_sound_68k_6502_w)
 	AM_RANGE(0x2802, 0x2803) AM_READWRITE_LEGACY(atarigen_6502_irq_ack_r, atarigen_6502_irq_ack_w)
 	AM_RANGE(0x2804, 0x2805) AM_WRITE_LEGACY(atarigen_6502_sound_w)
-	AM_RANGE(0x2806, 0x2807) AM_WRITE_LEGACY(cyberbal_sound_bank_select_w)
+	AM_RANGE(0x2806, 0x2807) AM_WRITE(cyberbal_sound_bank_select_w)
 	AM_RANGE(0x2c00, 0x2c01) AM_READ_LEGACY(atarigen_6502_sound_r)
-	AM_RANGE(0x2c02, 0x2c03) AM_READ_LEGACY(cyberbal_special_port3_r)
-	AM_RANGE(0x2c04, 0x2c05) AM_READ_LEGACY(cyberbal_sound_68k_6502_r)
-	AM_RANGE(0x2c06, 0x2c07) AM_READ_LEGACY(cyberbal_sound_6502_stat_r)
+	AM_RANGE(0x2c02, 0x2c03) AM_READ(cyberbal_special_port3_r)
+	AM_RANGE(0x2c04, 0x2c05) AM_READ(cyberbal_sound_68k_6502_r)
+	AM_RANGE(0x2c06, 0x2c07) AM_READ(cyberbal_sound_6502_stat_r)
 	AM_RANGE(0x3000, 0x3fff) AM_ROMBANK("soundbank")
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -230,10 +230,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_68k_map, AS_PROGRAM, 16, cyberbal_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0xff8000, 0xff87ff) AM_READ_LEGACY(cyberbal_sound_68k_r)
-	AM_RANGE(0xff8800, 0xff8fff) AM_WRITE_LEGACY(cyberbal_sound_68k_w)
-	AM_RANGE(0xff9000, 0xff97ff) AM_WRITE_LEGACY(cyberbal_io_68k_irq_ack_w)
-	AM_RANGE(0xff9800, 0xff9fff) AM_WRITE_LEGACY(cyberbal_sound_68k_dac_w)
+	AM_RANGE(0xff8000, 0xff87ff) AM_READ(cyberbal_sound_68k_r)
+	AM_RANGE(0xff8800, 0xff8fff) AM_WRITE(cyberbal_sound_68k_w)
+	AM_RANGE(0xff9000, 0xff97ff) AM_WRITE(cyberbal_io_68k_irq_ack_w)
+	AM_RANGE(0xff9800, 0xff9fff) AM_WRITE(cyberbal_sound_68k_dac_w)
 	AM_RANGE(0xfff000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 

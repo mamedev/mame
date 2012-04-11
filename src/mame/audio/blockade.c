@@ -42,15 +42,15 @@ WRITE8_DEVICE_HANDLER( blockade_sound_freq_w )
 	return;
 }
 
-WRITE8_HANDLER( blockade_env_on_w )
+WRITE8_MEMBER(blockade_state::blockade_env_on_w)
 {
-	samples_device *samples = space->machine().device<samples_device>("samples");
+	samples_device *samples = machine().device<samples_device>("samples");
 	if (BLOCKADE_LOG) mame_printf_debug("Boom Start\n");
 	samples->start(0,0);
 	return;
 }
 
-WRITE8_HANDLER( blockade_env_off_w )
+WRITE8_MEMBER(blockade_state::blockade_env_off_w)
 {
 	if (BLOCKADE_LOG) mame_printf_debug("Boom End\n");
 	return;

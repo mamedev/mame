@@ -63,10 +63,10 @@ public:
 	DECLARE_READ8_MEMBER(laserbat_input_r);
 	DECLARE_WRITE8_MEMBER(laserbat_cnteff_w);
 	DECLARE_WRITE8_MEMBER(laserbat_cntmov_w);
+	DECLARE_WRITE8_MEMBER(laserbat_csound1_w);
+	DECLARE_WRITE8_MEMBER(laserbat_csound2_w);
 };
 
 
 /*----------- defined in audio/laserbat.c -----------*/
 
-WRITE8_HANDLER( laserbat_csound1_w );
-WRITE8_HANDLER( laserbat_csound2_w );

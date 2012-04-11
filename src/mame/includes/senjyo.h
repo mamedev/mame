@@ -49,6 +49,7 @@ public:
 	DECLARE_WRITE8_MEMBER(senjyo_bg2videoram_w);
 	DECLARE_WRITE8_MEMBER(senjyo_bg3videoram_w);
 	DECLARE_WRITE8_MEMBER(senjyo_bgstripes_w);
+	DECLARE_WRITE8_MEMBER(senjyo_volume_w);
 };
 
 
@@ -59,7 +60,6 @@ extern const z80pio_interface senjyo_pio_intf;
 extern const z80ctc_interface senjyo_ctc_intf;
 
 SAMPLES_START( senjyo_sh_start );
-WRITE8_HANDLER( senjyo_volume_w );
 
 
 /*----------- defined in video/senjyo.c -----------*/

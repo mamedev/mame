@@ -9,43 +9,38 @@
 #include "includes/aztarac.h"
 
 
-READ16_HANDLER( aztarac_sound_r )
+READ16_MEMBER(aztarac_state::aztarac_sound_r)
 {
-	aztarac_state *state = space->machine().driver_data<aztarac_state>();
-    return state->m_sound_status & 0x01;
+    return m_sound_status & 0x01;
 }
 
-WRITE16_HANDLER( aztarac_sound_w )
+WRITE16_MEMBER(aztarac_state::aztarac_sound_w)
 {
-	aztarac_state *state = space->machine().driver_data<aztarac_state>();
 	if (ACCESSING_BITS_0_7)
 	{
 		data &= 0xff;
-		state->soundlatch_byte_w(*space, offset, data);
-		state->m_sound_status ^= 0x21;
-		if (state->m_sound_status & 0x20)
-			cputag_set_input_line(space->machine(), "audiocpu", 0, HOLD_LINE);
+		soundlatch_byte_w(*&space, offset, data);
+		m_sound_status ^= 0x21;
+		if (m_sound_status & 0x20)
+			cputag_set_input_line(machine(), "audiocpu", 0, HOLD_LINE);
 	}
 }
 
-READ8_HANDLER( aztarac_snd_command_r )
+READ8_MEMBER(aztarac_state::aztarac_snd_command_r)
 {
-	aztarac_state *state = space->machine().driver_data<aztarac_state>();
-    state->m_sound_status |= 0x01;
-    state->m_sound_status &= ~0x20;
-    return state->soundlatch_byte_r(*space,offset);
+    m_sound_status |= 0x01;
+    m_sound_status &= ~0x20;
+    return soundlatch_byte_r(*&space,offset);
 }
 
-READ8_HANDLER( aztarac_snd_status_r )
+READ8_MEMBER(aztarac_state::aztarac_snd_status_r)
 {
-	aztarac_state *state = space->machine().driver_data<aztarac_state>();
-    return state->m_sound_status & ~0x01;
+    return m_sound_status & ~0x01;
 }
 
-WRITE8_HANDLER( aztarac_snd_status_w )
+WRITE8_MEMBER(aztarac_state::aztarac_snd_status_w)
 {
-	aztarac_state *state = space->machine().driver_data<aztarac_state>();
-    state->m_sound_status &= ~0x10;
+    m_sound_status &= ~0x10;
 }
 
 INTERRUPT_GEN( aztarac_snd_timed_irq )

@@ -10,11 +10,11 @@ struct counter_state
 	attotime		period;
 };
 
-class mcr68_state : public driver_device
+class mcr68_state : public mcr_state
 {
 public:
 	mcr68_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: mcr_state(mconfig, type, tag) { }
 
 	UINT16 *m_videoram;
 	UINT16 m_control_word;

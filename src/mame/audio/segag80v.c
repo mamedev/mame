@@ -135,9 +135,9 @@ d0      crafts joining
 
 */
 
-WRITE8_HANDLER( elim1_sh_w )
+WRITE8_MEMBER(segag80v_state::elim1_sh_w)
 {
-	samples_device *samples = space->machine().device<samples_device>("samples");
+	samples_device *samples = machine().device<samples_device>("samples");
 	data ^= 0xff;
 
 	/* Play fireball sample */
@@ -169,9 +169,9 @@ WRITE8_HANDLER( elim1_sh_w )
 	}
 }
 
-WRITE8_HANDLER( elim2_sh_w )
+WRITE8_MEMBER(segag80v_state::elim2_sh_w)
 {
-	samples_device *samples = space->machine().device<samples_device>("samples");
+	samples_device *samples = machine().device<samples_device>("samples");
 	data ^= 0xff;
 
 	/* Play thrust sample */
@@ -196,9 +196,9 @@ WRITE8_HANDLER( elim2_sh_w )
 }
 
 
-WRITE8_HANDLER( zektor1_sh_w )
+WRITE8_MEMBER(segag80v_state::zektor1_sh_w)
 {
-	samples_device *samples = space->machine().device<samples_device>("samples");
+	samples_device *samples = machine().device<samples_device>("samples");
 
 	data ^= 0xff;
 
@@ -231,9 +231,9 @@ WRITE8_HANDLER( zektor1_sh_w )
 	}
 }
 
-WRITE8_HANDLER( zektor2_sh_w )
+WRITE8_MEMBER(segag80v_state::zektor2_sh_w)
 {
-	samples_device *samples = space->machine().device<samples_device>("samples");
+	samples_device *samples = machine().device<samples_device>("samples");
 	data ^= 0xff;
 
 	/* Play thrust sample */
@@ -259,9 +259,9 @@ WRITE8_HANDLER( zektor2_sh_w )
 
 
 
-WRITE8_HANDLER( spacfury1_sh_w )
+WRITE8_MEMBER(segag80v_state::spacfury1_sh_w)
 {
-	samples_device *samples = space->machine().device<samples_device>("samples");
+	samples_device *samples = machine().device<samples_device>("samples");
 	data ^= 0xff;
 
 	/* craft growing */
@@ -296,9 +296,9 @@ WRITE8_HANDLER( spacfury1_sh_w )
 
 }
 
-WRITE8_HANDLER( spacfury2_sh_w )
+WRITE8_MEMBER(segag80v_state::spacfury2_sh_w)
 {
-	samples_device *samples = space->machine().device<samples_device>("samples");
+	samples_device *samples = machine().device<samples_device>("samples");
 	data ^= 0xff;
 
 	/* craft joining */

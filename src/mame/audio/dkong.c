@@ -1226,7 +1226,7 @@ static WRITE8_DEVICE_HANDLER( M58817_command_w )
  *
  ****************************************************************/
 
-static WRITE8_HANDLER( dkong_voice_w )
+WRITE8_MEMBER(dkong_state::dkong_voice_w)
 {
 	/* only provided for documentation purposes
      * not actually used
@@ -1270,12 +1270,12 @@ static WRITE8_DEVICE_HANDLER( dkong_p1_w )
  *
  ****************************************************************/
 
-WRITE8_HANDLER( dkong_audio_irq_w )
+WRITE8_MEMBER(dkong_state::dkong_audio_irq_w)
 {
 	if (data)
-		cputag_set_input_line(space->machine(), "soundcpu", 0, ASSERT_LINE);
+		cputag_set_input_line(machine(), "soundcpu", 0, ASSERT_LINE);
 	else
-		cputag_set_input_line(space->machine(), "soundcpu", 0, CLEAR_LINE);
+		cputag_set_input_line(machine(), "soundcpu", 0, CLEAR_LINE);
 }
 
 
@@ -1285,22 +1285,22 @@ WRITE8_HANDLER( dkong_audio_irq_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( dkong_sound_map, AS_PROGRAM, 8, driver_device )
+static ADDRESS_MAP_START( dkong_sound_map, AS_PROGRAM, 8, dkong_state )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dkong_sound_io_map, AS_IO, 8, driver_device )
+static ADDRESS_MAP_START( dkong_sound_io_map, AS_IO, 8, dkong_state )
 	AM_RANGE(0x00, 0xFF) AM_DEVREAD_LEGACY("ls175.3d", dkong_tune_r)
-						 AM_WRITE_LEGACY(dkong_voice_w)
+						 AM_WRITE(dkong_voice_w)
 	AM_RANGE(MCS48_PORT_BUS, MCS48_PORT_BUS) AM_DEVREAD_LEGACY("ls175.3d", dkong_tune_r)
-								   AM_WRITE_LEGACY(dkong_voice_w)
+								   AM_WRITE(dkong_voice_w)
 	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_DEVWRITE_LEGACY("discrete", dkong_p1_w) /* only write to dac */
 	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_LATCH8_READWRITE("virtual_p2")
 	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_LATCH8_READBIT("ls259.6h", 5)
 	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_LATCH8_READBIT("ls259.6h", 4)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dkongjr_sound_io_map, AS_IO, 8, driver_device )
+static ADDRESS_MAP_START( dkongjr_sound_io_map, AS_IO, 8, dkong_state )
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff) AM_LATCH8_READ("ls174.3d")
 	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_DEVWRITE_LEGACY("discrete", dkong_p1_w) /* only write to dac */
 	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_LATCH8_READWRITE("virtual_p2")
@@ -1308,7 +1308,7 @@ static ADDRESS_MAP_START( dkongjr_sound_io_map, AS_IO, 8, driver_device )
 	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_LATCH8_READBIT("ls259.6h", 4)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( radarscp1_sound_io_map, AS_IO, 8, driver_device )
+static ADDRESS_MAP_START( radarscp1_sound_io_map, AS_IO, 8, dkong_state )
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff) AM_DEVREAD_LEGACY("ls175.3d", latch8_r)
 	AM_RANGE(0x00, 0xff) AM_DEVWRITE_LEGACY("discrete", dkong_p1_w) /* DAC here */
 	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_LATCH8_READ("virtual_p1")
@@ -1318,7 +1318,7 @@ static ADDRESS_MAP_START( radarscp1_sound_io_map, AS_IO, 8, driver_device )
 	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_LATCH8_READBIT("ls259.6h", 4)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dkong3_sound1_map, AS_PROGRAM, 8, driver_device )
+static ADDRESS_MAP_START( dkong3_sound1_map, AS_PROGRAM, 8, dkong_state )
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
 	AM_RANGE(0x4016, 0x4016) AM_LATCH8_READ("latch1")		/* overwrite default */
 	AM_RANGE(0x4017, 0x4017) AM_LATCH8_READ("latch2")
@@ -1327,7 +1327,7 @@ static ADDRESS_MAP_START( dkong3_sound1_map, AS_PROGRAM, 8, driver_device )
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dkong3_sound2_map, AS_PROGRAM, 8, driver_device )
+static ADDRESS_MAP_START( dkong3_sound2_map, AS_PROGRAM, 8, dkong_state )
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
 	AM_RANGE(0x4016, 0x4016) AM_LATCH8_READ("latch3")		/* overwrite default */
 	AM_RANGE(0x4000, 0x4017) AM_DEVREAD_LEGACY("nes2", nes_psg_r)

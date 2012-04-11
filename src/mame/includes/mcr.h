@@ -52,6 +52,21 @@ public:
 	DECLARE_READ8_MEMBER(demoderb_ip1_r);
 	DECLARE_READ8_MEMBER(demoderb_ip2_r);
 	DECLARE_WRITE8_MEMBER(demoderb_op4_w);
+	DECLARE_READ8_MEMBER(ssio_irq_clear);
+	DECLARE_WRITE8_MEMBER(ssio_status_w);
+	DECLARE_READ8_MEMBER(ssio_data_r);
+	DECLARE_WRITE8_MEMBER(ssio_data_w);
+	DECLARE_READ8_MEMBER(ssio_status_r);
+	DECLARE_READ8_MEMBER(ssio_input_port_r);
+	DECLARE_WRITE8_MEMBER(ssio_output_port_w);
+	DECLARE_WRITE8_MEMBER(csdeluxe_data_w);
+	DECLARE_READ8_MEMBER(csdeluxe_status_r);
+	DECLARE_WRITE8_MEMBER(soundsgood_data_w);
+	DECLARE_READ8_MEMBER(soundsgood_status_r);
+	DECLARE_WRITE8_MEMBER(turbocs_data_w);
+	DECLARE_READ8_MEMBER(turbocs_status_r);
+	DECLARE_WRITE8_MEMBER(squawkntalk_dac_w);
+	DECLARE_WRITE8_MEMBER(squawkntalk_data_w);
 };
 
 

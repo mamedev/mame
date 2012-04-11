@@ -11,49 +11,45 @@
 #include "includes/spacefb.h"
 
 
-READ8_HANDLER( spacefb_audio_p2_r )
+READ8_MEMBER(spacefb_state::spacefb_audio_p2_r)
 {
-	spacefb_state *state = space->machine().driver_data<spacefb_state>();
-	return (state->m_sound_latch & 0x18) << 1;
+	return (m_sound_latch & 0x18) << 1;
 }
 
 
-READ8_HANDLER( spacefb_audio_t0_r )
+READ8_MEMBER(spacefb_state::spacefb_audio_t0_r)
 {
-	spacefb_state *state = space->machine().driver_data<spacefb_state>();
-	return state->m_sound_latch & 0x20;
+	return m_sound_latch & 0x20;
 }
 
 
-READ8_HANDLER( spacefb_audio_t1_r )
+READ8_MEMBER(spacefb_state::spacefb_audio_t1_r)
 {
-	spacefb_state *state = space->machine().driver_data<spacefb_state>();
-	return state->m_sound_latch & 0x04;
+	return m_sound_latch & 0x04;
 }
 
 
-WRITE8_HANDLER( spacefb_port_1_w )
+WRITE8_MEMBER(spacefb_state::spacefb_port_1_w)
 {
-	spacefb_state *state = space->machine().driver_data<spacefb_state>();
-	samples_device *samples = space->machine().device<samples_device>("samples");
+	samples_device *samples = machine().device<samples_device>("samples");
 
-	cputag_set_input_line(space->machine(), "audiocpu", 0, (data & 0x02) ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(machine(), "audiocpu", 0, (data & 0x02) ? CLEAR_LINE : ASSERT_LINE);
 
 	/* enemy killed */
-	if (!(data & 0x01) && (state->m_sound_latch & 0x01))  samples->start(0,0);
+	if (!(data & 0x01) && (m_sound_latch & 0x01))  samples->start(0,0);
 
 	/* ship fire */
-	if (!(data & 0x40) && (state->m_sound_latch & 0x40))  samples->start(1,1);
+	if (!(data & 0x40) && (m_sound_latch & 0x40))  samples->start(1,1);
 
 	/*
      *  Explosion Noise
      *
      *  Actual sample has a bit of attack at the start, but these doesn't seem to be an easy way
      *  to play the attack part, then loop the middle bit until the sample is turned off
-     *  Fortunately it seems like the recorded sample of the spaceship death is the longest the sample plays for.
+     *  Fortunately it seems like the recorded sample of the &spaceship death is the longest the sample plays for.
      *  We loop it just in case it runs out
      */
-	if ((data & 0x80) != (state->m_sound_latch & 0x80))
+	if ((data & 0x80) != (m_sound_latch & 0x80))
 	{
 		if (data & 0x80)
 			/* play decaying noise */
@@ -63,7 +59,7 @@ WRITE8_HANDLER( spacefb_port_1_w )
 			samples->start(2,2, true);
 	}
 
-	state->m_sound_latch = data;
+	m_sound_latch = data;
 }
 
 

@@ -26,13 +26,13 @@ public:
 	DECLARE_WRITE8_MEMBER(circus_videoram_w);
 	DECLARE_WRITE8_MEMBER(circus_clown_x_w);
 	DECLARE_WRITE8_MEMBER(circus_clown_y_w);
+	DECLARE_WRITE8_MEMBER(circus_clown_z_w);
 };
 
 
 
 /*----------- defined in audio/circus.c -----------*/
 
-extern WRITE8_HANDLER( circus_clown_z_w );
 
 DISCRETE_SOUND_EXTERN( circus );
 DISCRETE_SOUND_EXTERN( robotbwl );

@@ -291,7 +291,7 @@ static INTERRUPT_GEN( ssio_14024_clock )
 		device_set_input_line(device, 0, (ssio_14024_count & 0x40) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static READ8_HANDLER( ssio_irq_clear )
+READ8_MEMBER(mcr_state::ssio_irq_clear)
 {
 	/* a read here asynchronously resets the 14024 count, clearing /SINT */
 	ssio_14024_count = 0;
@@ -299,12 +299,12 @@ static READ8_HANDLER( ssio_irq_clear )
 	return 0xff;
 }
 
-static WRITE8_HANDLER( ssio_status_w )
+WRITE8_MEMBER(mcr_state::ssio_status_w)
 {
 	ssio_status = data;
 }
 
-static READ8_HANDLER( ssio_data_r )
+READ8_MEMBER(mcr_state::ssio_data_r)
 {
 	return ssio_data[offset];
 }
@@ -356,12 +356,12 @@ static WRITE8_DEVICE_HANDLER( ssio_portb1_w )
 }
 
 /********* external interfaces ***********/
-WRITE8_HANDLER( ssio_data_w )
+WRITE8_MEMBER(mcr_state::ssio_data_w)
 {
-	space->machine().scheduler().synchronize(FUNC(ssio_delayed_data_w), (offset << 8) | (data & 0xff));
+	machine().scheduler().synchronize(FUNC(ssio_delayed_data_w), (offset << 8) | (data & 0xff));
 }
 
-READ8_HANDLER( ssio_status_r )
+READ8_MEMBER(mcr_state::ssio_status_r)
 {
 	return ssio_status;
 }
@@ -386,24 +386,23 @@ void ssio_reset_w(running_machine &machine, int state)
 		device_set_input_line(ssio_sound_cpu, INPUT_LINE_RESET, CLEAR_LINE);
 }
 
-READ8_HANDLER( ssio_input_port_r )
+READ8_MEMBER(mcr_state::ssio_input_port_r)
 {
 	static const char *const port[] = { "SSIO.IP0", "SSIO.IP1", "SSIO.IP2", "SSIO.IP3", "SSIO.IP4" };
-	UINT8 result = input_port_read_safe(space->machine(), port[offset], 0xff);
+	UINT8 result = input_port_read_safe(machine(), port[offset], 0xff);
 	if (!ssio_custom_input[offset].isnull())
 		result = (result & ~ssio_custom_input_mask[offset]) |
-		         (ssio_custom_input[offset](*space, offset, 0xff) & ssio_custom_input_mask[offset]);
+		         (ssio_custom_input[offset](*&space, offset, 0xff) & ssio_custom_input_mask[offset]);
 	return result;
 }
 
-WRITE8_HANDLER( ssio_output_port_w )
+WRITE8_MEMBER(mcr_state::ssio_output_port_w)
 {
-	mcr_state *state = space->machine().driver_data<mcr_state>();
 	int which = offset >> 2;
 	if (which == 0)
-		state->mcr_control_port_w(*space, offset, data);
+		mcr_control_port_w(*&space, offset, data);
 	if (!ssio_custom_output[which].isnull())
-		ssio_custom_output[which](*space, offset, data & ssio_custom_output_mask[which],0xff);
+		ssio_custom_output[which](*&space, offset, data & ssio_custom_output_mask[which],0xff);
 }
 
 void ssio_set_custom_input(int which, int mask, read8_delegate handler)
@@ -444,20 +443,20 @@ static const ay8910_interface ssio_ay8910_interface_2 =
 /********* memory interfaces ***********/
 
 /* address map verified from schematics */
-static ADDRESS_MAP_START( ssio_map, AS_PROGRAM, 8, driver_device )
+static ADDRESS_MAP_START( ssio_map, AS_PROGRAM, 8, mcr_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x0c00) AM_RAM
-	AM_RANGE(0x9000, 0x9003) AM_MIRROR(0x0ffc) AM_READ_LEGACY(ssio_data_r)
+	AM_RANGE(0x9000, 0x9003) AM_MIRROR(0x0ffc) AM_READ(ssio_data_r)
 	AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x0ffc) AM_DEVWRITE_LEGACY("ssio.1", ay8910_address_w)
 	AM_RANGE(0xa001, 0xa001) AM_MIRROR(0x0ffc) AM_DEVREAD_LEGACY("ssio.1", ay8910_r)
 	AM_RANGE(0xa002, 0xa002) AM_MIRROR(0x0ffc) AM_DEVWRITE_LEGACY("ssio.1", ay8910_data_w)
 	AM_RANGE(0xb000, 0xb000) AM_MIRROR(0x0ffc) AM_DEVWRITE_LEGACY("ssio.2", ay8910_address_w)
 	AM_RANGE(0xb001, 0xb001) AM_MIRROR(0x0ffc) AM_DEVREAD_LEGACY("ssio.2", ay8910_r)
 	AM_RANGE(0xb002, 0xb002) AM_MIRROR(0x0ffc) AM_DEVWRITE_LEGACY("ssio.2", ay8910_data_w)
-	AM_RANGE(0xc000, 0xcfff) AM_READNOP AM_WRITE_LEGACY(ssio_status_w)
+	AM_RANGE(0xc000, 0xcfff) AM_READNOP AM_WRITE(ssio_status_w)
 	AM_RANGE(0xd000, 0xdfff) AM_WRITENOP	/* low bit controls yellow LED */
-	AM_RANGE(0xe000, 0xefff) AM_READ_LEGACY(ssio_irq_clear)
+	AM_RANGE(0xe000, 0xefff) AM_READ(ssio_irq_clear)
 	AM_RANGE(0xf000, 0xffff) AM_READ_PORT("SSIO.DIP")	/* 6 DIP switches */
 ADDRESS_MAP_END
 
@@ -550,12 +549,12 @@ static WRITE16_DEVICE_HANDLER( csdeluxe_pia_w )
 
 
 /********* external interfaces ***********/
-WRITE8_HANDLER( csdeluxe_data_w )
+WRITE8_MEMBER(mcr_state::csdeluxe_data_w)
 {
-	space->machine().scheduler().synchronize(FUNC(csdeluxe_delayed_data_w), data);
+	machine().scheduler().synchronize(FUNC(csdeluxe_delayed_data_w), data);
 }
 
-READ8_HANDLER( csdeluxe_status_r )
+READ8_MEMBER(mcr_state::csdeluxe_status_r)
 {
 	return csdeluxe_status;
 }
@@ -569,7 +568,7 @@ void csdeluxe_reset_w(running_machine &machine, int state)
 /********* memory interfaces ***********/
 
 /* address map determined by PAL; not verified */
-static ADDRESS_MAP_START( csdeluxe_map, AS_PROGRAM, 16, driver_device )
+static ADDRESS_MAP_START( csdeluxe_map, AS_PROGRAM, 16, mcr_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x1ffff)
 	AM_RANGE(0x000000, 0x007fff) AM_ROM
@@ -669,12 +668,12 @@ static TIMER_CALLBACK( soundsgood_delayed_data_w )
 
 
 /********* external interfaces ***********/
-WRITE8_HANDLER( soundsgood_data_w )
+WRITE8_MEMBER(mcr_state::soundsgood_data_w)
 {
-	space->machine().scheduler().synchronize(FUNC(soundsgood_delayed_data_w), data);
+	machine().scheduler().synchronize(FUNC(soundsgood_delayed_data_w), data);
 }
 
-READ8_HANDLER( soundsgood_status_r )
+READ8_MEMBER(mcr_state::soundsgood_status_r)
 {
 	return soundsgood_status;
 }
@@ -689,7 +688,7 @@ void soundsgood_reset_w(running_machine &machine, int state)
 /********* memory interfaces ***********/
 
 /* address map determined by PAL; not verified */
-static ADDRESS_MAP_START( soundsgood_map, AS_PROGRAM, 16, driver_device )
+static ADDRESS_MAP_START( soundsgood_map, AS_PROGRAM, 16, mcr_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x7ffff)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
@@ -774,12 +773,12 @@ static TIMER_CALLBACK( turbocs_delayed_data_w )
 
 
 /********* external interfaces ***********/
-WRITE8_HANDLER( turbocs_data_w )
+WRITE8_MEMBER(mcr_state::turbocs_data_w)
 {
-	space->machine().scheduler().synchronize(FUNC(turbocs_delayed_data_w), data);
+	machine().scheduler().synchronize(FUNC(turbocs_delayed_data_w), data);
 }
 
-READ8_HANDLER( turbocs_status_r )
+READ8_MEMBER(mcr_state::turbocs_status_r)
 {
 	return turbocs_status;
 }
@@ -793,7 +792,7 @@ void turbocs_reset_w(running_machine &machine, int state)
 /********* memory interfaces ***********/
 
 /* address map verified from schematics */
-static ADDRESS_MAP_START( turbocs_map, AS_PROGRAM, 8, driver_device )
+static ADDRESS_MAP_START( turbocs_map, AS_PROGRAM, 8, mcr_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x3800) AM_RAM
 	AM_RANGE(0x4000, 0x4003) AM_MIRROR(0x3ffc) AM_DEVREADWRITE("tcspia", pia6821_device, read_alt, write_alt)
@@ -847,7 +846,7 @@ static WRITE8_DEVICE_HANDLER( squawkntalk_porta1_w )
 	logerror("Write to AY-8912 = %02X\n", data);
 }
 
-static WRITE8_HANDLER( squawkntalk_dac_w )
+WRITE8_MEMBER(mcr_state::squawkntalk_dac_w)
 {
 	logerror("Write to DAC = %02X\n", data);
 }
@@ -908,9 +907,9 @@ static TIMER_CALLBACK( squawkntalk_delayed_data_w )
 
 
 /********* external interfaces ***********/
-WRITE8_HANDLER( squawkntalk_data_w )
+WRITE8_MEMBER(mcr_state::squawkntalk_data_w)
 {
-	space->machine().scheduler().synchronize(FUNC(squawkntalk_delayed_data_w), data);
+	machine().scheduler().synchronize(FUNC(squawkntalk_delayed_data_w), data);
 }
 
 void squawkntalk_reset_w(running_machine &machine, int state)
@@ -924,24 +923,24 @@ void squawkntalk_reset_w(running_machine &machine, int state)
 /* address map verified from schematics */
 /* note that jumpers control the ROM sizes; if these are changed, use the alternate */
 /* address map below */
-static ADDRESS_MAP_START( squawkntalk_map, AS_PROGRAM, 8, driver_device )
+static ADDRESS_MAP_START( squawkntalk_map, AS_PROGRAM, 8, mcr_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x007f) AM_RAM		/* internal RAM */
 	AM_RANGE(0x0080, 0x0083) AM_MIRROR(0x4f6c) AM_DEVREADWRITE("sntpia0", pia6821_device, read, write)
 	AM_RANGE(0x0090, 0x0093) AM_MIRROR(0x4f6c) AM_DEVREADWRITE("sntpia1", pia6821_device, read, write)
-	AM_RANGE(0x1000, 0x1fff) AM_MIRROR(0x4000) AM_WRITE_LEGACY(squawkntalk_dac_w)
+	AM_RANGE(0x1000, 0x1fff) AM_MIRROR(0x4000) AM_WRITE(squawkntalk_dac_w)
 	AM_RANGE(0x8000, 0xbfff) AM_MIRROR(0x4000) AM_ROM
 ADDRESS_MAP_END
 
 /* alternate address map if the ROM jumpers are changed to support a smaller */
 /* ROM size of 2k */
 #ifdef UNUSED_FUNCTION
-ADDRESS_MAP_START( squawkntalk_alt_map, AS_PROGRAM, 8, driver_device )
+ADDRESS_MAP_START( squawkntalk_alt_map, AS_PROGRAM, 8, mcr_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x007f) AM_RAM		/* internal RAM */
 	AM_RANGE(0x0080, 0x0083) AM_MIRROR(0x676c) AM_DEVREADWRITE("sntpia0", pia6821_device, read, write)
 	AM_RANGE(0x0090, 0x0093) AM_MIRROR(0x676c) AM_DEVREADWRITE("sntpia1", pia6821_device, read, write)
-	AM_RANGE(0x0800, 0x0fff) AM_MIRROR(0x6000) AM_WRITE_LEGACY(squawkntalk_dac_w)
+	AM_RANGE(0x0800, 0x0fff) AM_MIRROR(0x6000) AM_WRITE(squawkntalk_dac_w)
 	AM_RANGE(0x8000, 0x9fff) AM_MIRROR(0x6000) AM_ROM
 ADDRESS_MAP_END
 #endif

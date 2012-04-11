@@ -370,33 +370,31 @@ DEVICE_GET_INFO( micro3d_sound )
 ***************************************************************************/
 
 
-WRITE8_HANDLER( micro3d_snd_dac_a )
+WRITE8_MEMBER(micro3d_state::micro3d_snd_dac_a)
 {
-	micro3d_state *state = space->machine().driver_data<micro3d_state>();
-	state->m_dac_data = data;
+	m_dac_data = data;
 }
 
-WRITE8_HANDLER( micro3d_snd_dac_b )
+WRITE8_MEMBER(micro3d_state::micro3d_snd_dac_b)
 {
 	/* TODO: This controls upd7759 volume */
 }
 
-WRITE8_HANDLER( micro3d_sound_io_w )
+WRITE8_MEMBER(micro3d_state::micro3d_sound_io_w)
 {
-	micro3d_state *state = space->machine().driver_data<micro3d_state>();
 
-	state->m_sound_port_latch[offset] = data;
+	m_sound_port_latch[offset] = data;
 
 	switch (offset)
 	{
 		case 0x01:
 		{
-			micro3d_noise_sh_w(space->machine(), data);
+			micro3d_noise_sh_w(machine(), data);
 			break;
 		}
 		case 0x03:
 		{
-			device_t *upd = space->machine().device("upd7759");
+			device_t *upd = machine().device("upd7759");
 			upd7759_set_bank_base(upd, (data & 0x4) ? 0x20000 : 0);
 			upd7759_reset_w(upd, (data & 0x10) ? 0 : 1);
 			break;
@@ -404,14 +402,13 @@ WRITE8_HANDLER( micro3d_sound_io_w )
 	}
 }
 
-READ8_HANDLER( micro3d_sound_io_r )
+READ8_MEMBER(micro3d_state::micro3d_sound_io_r)
 {
-	micro3d_state *state = space->machine().driver_data<micro3d_state>();
 
 	switch (offset)
 	{
-		case 0x01:	return (state->m_sound_port_latch[offset] & 0x7f) | input_port_read(space->machine(), "SOUND_SW");
-		case 0x03:	return (state->m_sound_port_latch[offset] & 0xf7) | (upd7759_busy_r(space->machine().device("upd7759")) ? 0x08 : 0);
+		case 0x01:	return (m_sound_port_latch[offset] & 0x7f) | input_port_read(machine(), "SOUND_SW");
+		case 0x03:	return (m_sound_port_latch[offset] & 0xf7) | (upd7759_busy_r(machine().device("upd7759")) ? 0x08 : 0);
 		default:	return 0;
 	}
 }

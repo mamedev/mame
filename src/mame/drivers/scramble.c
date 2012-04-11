@@ -202,7 +202,7 @@ static ADDRESS_MAP_START( hotshock_map, AS_PROGRAM, 8, scramble_state )
 	AM_RANGE(0x8001, 0x8001) AM_READ_PORT("IN1")
 	AM_RANGE(0x8002, 0x8002) AM_READ_PORT("IN2")
 	AM_RANGE(0x8003, 0x8003) AM_READ_PORT("IN3")
-	AM_RANGE(0x9000, 0x9000) AM_WRITE_LEGACY(hotshock_sh_irqtrigger_w)
+	AM_RANGE(0x9000, 0x9000) AM_WRITE(hotshock_sh_irqtrigger_w)
 ADDRESS_MAP_END
 
 
@@ -265,7 +265,7 @@ static ADDRESS_MAP_START( ad2083_map, AS_PROGRAM, 8, scramble_state )
 	AM_RANGE(0x6806, 0x6806) AM_WRITE(scrambold_background_red_w)
 	AM_RANGE(0x6807, 0x6807) AM_WRITE(scrambold_background_green_w)
 	AM_RANGE(0x8000, 0x8000) AM_WRITE(soundlatch_byte_w)
-	AM_RANGE(0x9000, 0x9000) AM_WRITE_LEGACY(hotshock_sh_irqtrigger_w)
+	AM_RANGE(0x9000, 0x9000) AM_WRITE(hotshock_sh_irqtrigger_w)
 	AM_RANGE(0x7000, 0x7000) AM_READ(watchdog_reset_r)
 	AM_RANGE(0x8000, 0x8000) AM_READ_PORT("IN0")
 	AM_RANGE(0x8001, 0x8001) AM_READ_PORT("IN1")
@@ -1221,7 +1221,7 @@ static ADDRESS_MAP_START( scramble_sound_map, AS_PROGRAM, 8, scramble_state )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_READWRITE(scramble_soundram_r, scramble_soundram_w)
 	AM_RANGE(0x8000, 0x83ff) AM_WRITENOP AM_BASE(m_soundram)  /* only here to initialize pointer */
-	AM_RANGE(0x9000, 0x9fff) AM_WRITE_LEGACY(scramble_filter_w)
+	AM_RANGE(0x9000, 0x9fff) AM_WRITE(scramble_filter_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( scramble_sound_io_map, AS_IO, 8, scramble_state )

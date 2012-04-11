@@ -66,6 +66,11 @@ public:
 	DECLARE_WRITE8_MEMBER(pignewt_back_port_w);
 	DECLARE_WRITE8_MEMBER(sindbadm_videoram_w);
 	DECLARE_WRITE8_MEMBER(sindbadm_back_port_w);
+	DECLARE_WRITE8_MEMBER(astrob_sound_w);
+	DECLARE_WRITE8_MEMBER(spaceod_sound_w);
+	DECLARE_READ8_MEMBER(n7751_rom_r);
+	DECLARE_READ8_MEMBER(n7751_command_r);
+	DECLARE_READ8_MEMBER(n7751_t1_r);
 };
 
 
@@ -76,9 +81,7 @@ MACHINE_CONFIG_EXTERN( 005_sound_board );
 MACHINE_CONFIG_EXTERN( spaceod_sound_board );
 MACHINE_CONFIG_EXTERN( monsterb_sound_board );
 
-WRITE8_HANDLER( astrob_sound_w );
 
-WRITE8_HANDLER( spaceod_sound_w );
 
 
 /*----------- defined in video/segag80r.c -----------*/

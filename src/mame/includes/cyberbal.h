@@ -30,6 +30,15 @@ public:
 	DECLARE_READ16_MEMBER(special_port2_r);
 	DECLARE_READ16_MEMBER(sound_state_r);
 	DECLARE_WRITE16_MEMBER(p2_reset_w);
+	DECLARE_READ8_MEMBER(cyberbal_special_port3_r);
+	DECLARE_READ8_MEMBER(cyberbal_sound_6502_stat_r);
+	DECLARE_WRITE8_MEMBER(cyberbal_sound_bank_select_w);
+	DECLARE_READ8_MEMBER(cyberbal_sound_68k_6502_r);
+	DECLARE_WRITE8_MEMBER(cyberbal_sound_68k_6502_w);
+	DECLARE_WRITE16_MEMBER(cyberbal_io_68k_irq_ack_w);
+	DECLARE_READ16_MEMBER(cyberbal_sound_68k_r);
+	DECLARE_WRITE16_MEMBER(cyberbal_sound_68k_w);
+	DECLARE_WRITE16_MEMBER(cyberbal_sound_68k_dac_w);
 };
 
 
@@ -40,16 +49,7 @@ void cyberbal_sound_reset(running_machine &machine);
 
 INTERRUPT_GEN( cyberbal_sound_68k_irq_gen );
 
-READ8_HANDLER( cyberbal_special_port3_r );
-READ8_HANDLER( cyberbal_sound_6502_stat_r );
-READ8_HANDLER( cyberbal_sound_68k_6502_r );
-WRITE8_HANDLER( cyberbal_sound_bank_select_w );
-WRITE8_HANDLER( cyberbal_sound_68k_6502_w );
 
-READ16_HANDLER( cyberbal_sound_68k_r );
-WRITE16_HANDLER( cyberbal_io_68k_irq_ack_w );
-WRITE16_HANDLER( cyberbal_sound_68k_w );
-WRITE16_HANDLER( cyberbal_sound_68k_dac_w );
 
 
 /*----------- defined in video/cyberbal.c -----------*/

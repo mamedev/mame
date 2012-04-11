@@ -90,17 +90,16 @@ static TIMER_CALLBACK( sound_callback )
 }
 
 
-READ8_HANDLER( starwars_sin_r )
+READ8_MEMBER(starwars_state::starwars_sin_r)
 {
-	starwars_state *state = space->machine().driver_data<starwars_state>();
-	riot6532_porta_in_set(state->m_riot, 0x00, 0x80);
-	return state->m_sound_data;
+	riot6532_porta_in_set(m_riot, 0x00, 0x80);
+	return m_sound_data;
 }
 
 
-WRITE8_HANDLER( starwars_sout_w )
+WRITE8_MEMBER(starwars_state::starwars_sout_w)
 {
-	space->machine().scheduler().synchronize(FUNC(sound_callback), data);
+	machine().scheduler().synchronize(FUNC(sound_callback), data);
 }
 
 
@@ -111,18 +110,16 @@ WRITE8_HANDLER( starwars_sout_w )
  *
  *************************************/
 
-READ8_HANDLER( starwars_main_read_r )
+READ8_MEMBER(starwars_state::starwars_main_read_r)
 {
-	starwars_state *state = space->machine().driver_data<starwars_state>();
-	riot6532_porta_in_set(state->m_riot, 0x00, 0x40);
-	return state->m_main_data;
+	riot6532_porta_in_set(m_riot, 0x00, 0x40);
+	return m_main_data;
 }
 
 
-READ8_HANDLER( starwars_main_ready_flag_r )
+READ8_MEMBER(starwars_state::starwars_main_ready_flag_r)
 {
-	starwars_state *state = space->machine().driver_data<starwars_state>();
-	return riot6532_porta_in_get(state->m_riot) & 0xc0;	/* only upper two flag bits mapped */
+	return riot6532_porta_in_get(m_riot) & 0xc0;	/* only upper two flag bits mapped */
 }
 
 static TIMER_CALLBACK( main_callback )
@@ -136,17 +133,16 @@ static TIMER_CALLBACK( main_callback )
 	machine.scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
 }
 
-WRITE8_HANDLER( starwars_main_wr_w )
+WRITE8_MEMBER(starwars_state::starwars_main_wr_w)
 {
-	space->machine().scheduler().synchronize(FUNC(main_callback), data);
+	machine().scheduler().synchronize(FUNC(main_callback), data);
 }
 
 
-WRITE8_HANDLER( starwars_soundrst_w )
+WRITE8_MEMBER(starwars_state::starwars_soundrst_w)
 {
-	starwars_state *state = space->machine().driver_data<starwars_state>();
-	riot6532_porta_in_set(state->m_riot, 0x00, 0xc0);
+	riot6532_porta_in_set(m_riot, 0x00, 0xc0);
 
 	/* reset sound CPU here  */
-	cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_RESET, PULSE_LINE);
+	cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_RESET, PULSE_LINE);
 }

@@ -6,6 +6,7 @@
 
 #include "emu.h"
 #include "audio/mcr.h"
+#include "includes/mcr.h"
 #include "includes/mcr68.h"
 
 #define VERBOSE 0
@@ -295,7 +296,7 @@ WRITE_LINE_DEVICE_HANDLER( zwackery_ca2_w )
 {
 	mcr68_state *drvstate = device->machine().driver_data<mcr68_state>();
 	address_space *space = device->machine().device("maincpu")->memory().space(AS_PROGRAM);
-	csdeluxe_data_w(space, 0, (state << 4) | drvstate->m_zwackery_sound_data);
+	drvstate->csdeluxe_data_w(*space, 0, (state << 4) | drvstate->m_zwackery_sound_data);
 }
 
 

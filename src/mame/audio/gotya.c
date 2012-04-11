@@ -39,15 +39,14 @@ static const struct gotya_sample gotya_samples[] =
 	{   -1, 0, 0 }		/* end of array */
 };
 
-WRITE8_HANDLER( gotya_soundlatch_w )
+WRITE8_MEMBER(gotya_state::gotya_soundlatch_w)
 {
-	gotya_state *state = space->machine().driver_data<gotya_state>();
 	int sample_number;
 
 	if (data == 0)
 	{
-		state->m_samples->stop(0);
-		state->m_theme_playing = 0;
+		m_samples->stop(0);
+		m_theme_playing = 0;
 		return;
 	}
 
@@ -56,17 +55,17 @@ WRITE8_HANDLER( gotya_soundlatch_w )
 	{
 		if (gotya_samples[sample_number].sound_command == data)
 		{
-			if (gotya_samples[sample_number].looping && state->m_theme_playing)
+			if (gotya_samples[sample_number].looping && m_theme_playing)
 			{
 				/* don't restart main theme */
 				return;
 			}
 
-			state->m_samples->start(gotya_samples[sample_number].channel, sample_number, gotya_samples[sample_number].looping);
+			m_samples->start(gotya_samples[sample_number].channel, sample_number, gotya_samples[sample_number].looping);
 
 			if (gotya_samples[sample_number].channel == 0)
 			{
-				state->m_theme_playing = gotya_samples[sample_number].looping;
+				m_theme_playing = gotya_samples[sample_number].looping;
 			}
 			return;
 		}

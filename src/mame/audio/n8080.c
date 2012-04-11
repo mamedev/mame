@@ -327,111 +327,102 @@ static TIMER_CALLBACK( delayed_sound_2_callback )
 }
 
 
-WRITE8_HANDLER( n8080_sound_1_w )
+WRITE8_MEMBER(n8080_state::n8080_sound_1_w)
 {
-	space->machine().scheduler().synchronize(FUNC(delayed_sound_1_callback), data); /* force CPUs to sync */
+	machine().scheduler().synchronize(FUNC(delayed_sound_1_callback), data); /* force CPUs to sync */
 }
 
-WRITE8_HANDLER( n8080_sound_2_w )
+WRITE8_MEMBER(n8080_state::n8080_sound_2_w)
 {
-	space->machine().scheduler().synchronize(FUNC(delayed_sound_2_callback), data); /* force CPUs to sync */
+	machine().scheduler().synchronize(FUNC(delayed_sound_2_callback), data); /* force CPUs to sync */
 }
 
 
-static READ8_HANDLER( n8080_8035_p1_r )
+READ8_MEMBER(n8080_state::n8080_8035_p1_r)
 {
-	n8080_state *state = space->machine().driver_data<n8080_state>();
 	UINT8 val = 0;
 
-	if ((state->m_curr_sound_pins >> 0xb) & 1) val |= 0x01;
-	if ((state->m_curr_sound_pins >> 0xa) & 1) val |= 0x02;
-	if ((state->m_curr_sound_pins >> 0x9) & 1) val |= 0x04;
-	if ((state->m_curr_sound_pins >> 0x8) & 1) val |= 0x08;
-	if ((state->m_curr_sound_pins >> 0x5) & 1) val |= 0x10;
-	if ((state->m_curr_sound_pins >> 0x3) & 1) val |= 0x20;
-	if ((state->m_curr_sound_pins >> 0x2) & 1) val |= 0x40;
-	if ((state->m_curr_sound_pins >> 0x1) & 1) val |= 0x80;
+	if ((m_curr_sound_pins >> 0xb) & 1) val |= 0x01;
+	if ((m_curr_sound_pins >> 0xa) & 1) val |= 0x02;
+	if ((m_curr_sound_pins >> 0x9) & 1) val |= 0x04;
+	if ((m_curr_sound_pins >> 0x8) & 1) val |= 0x08;
+	if ((m_curr_sound_pins >> 0x5) & 1) val |= 0x10;
+	if ((m_curr_sound_pins >> 0x3) & 1) val |= 0x20;
+	if ((m_curr_sound_pins >> 0x2) & 1) val |= 0x40;
+	if ((m_curr_sound_pins >> 0x1) & 1) val |= 0x80;
 
 	return val;
 }
 
 
-static READ8_HANDLER( n8080_8035_t0_r )
+READ8_MEMBER(n8080_state::n8080_8035_t0_r)
 {
-	n8080_state *state = space->machine().driver_data<n8080_state>();
-	return (state->m_curr_sound_pins >> 0x7) & 1;
+	return (m_curr_sound_pins >> 0x7) & 1;
 }
-static READ8_HANDLER( n8080_8035_t1_r )
+READ8_MEMBER(n8080_state::n8080_8035_t1_r)
 {
-	n8080_state *state = space->machine().driver_data<n8080_state>();
-	return (state->m_curr_sound_pins >> 0xc) & 1;
+	return (m_curr_sound_pins >> 0xc) & 1;
 }
 
 
-static READ8_HANDLER( helifire_8035_t0_r )
+READ8_MEMBER(n8080_state::helifire_8035_t0_r)
 {
-	n8080_state *state = space->machine().driver_data<n8080_state>();
-	return (state->m_curr_sound_pins >> 0x3) & 1;
+	return (m_curr_sound_pins >> 0x3) & 1;
 }
-static READ8_HANDLER( helifire_8035_t1_r )
+READ8_MEMBER(n8080_state::helifire_8035_t1_r)
 {
-	n8080_state *state = space->machine().driver_data<n8080_state>();
-	return (state->m_curr_sound_pins >> 0x4) & 1;
+	return (m_curr_sound_pins >> 0x4) & 1;
 }
 
 
-static READ8_HANDLER( helifire_8035_external_ram_r )
+READ8_MEMBER(n8080_state::helifire_8035_external_ram_r)
 {
-	n8080_state *state = space->machine().driver_data<n8080_state>();
 	UINT8 val = 0;
 
-	if ((state->m_curr_sound_pins >> 0x7) & 1) val |= 0x01;
-	if ((state->m_curr_sound_pins >> 0x8) & 1) val |= 0x02;
-	if ((state->m_curr_sound_pins >> 0x9) & 1) val |= 0x04;
-	if ((state->m_curr_sound_pins >> 0x1) & 1) val |= 0x08;
+	if ((m_curr_sound_pins >> 0x7) & 1) val |= 0x01;
+	if ((m_curr_sound_pins >> 0x8) & 1) val |= 0x02;
+	if ((m_curr_sound_pins >> 0x9) & 1) val |= 0x04;
+	if ((m_curr_sound_pins >> 0x1) & 1) val |= 0x08;
 
 	return val;
 }
 
 
-static READ8_HANDLER( helifire_8035_p2_r )
+READ8_MEMBER(n8080_state::helifire_8035_p2_r)
 {
-	n8080_state *state = space->machine().driver_data<n8080_state>();
-	return ((state->m_curr_sound_pins >> 0xc) & 1) ? 0x10 : 0x00; /* not used */
+	return ((m_curr_sound_pins >> 0xc) & 1) ? 0x10 : 0x00; /* not used */
 }
 
 
-static WRITE8_HANDLER( n8080_dac_w )
+WRITE8_MEMBER(n8080_state::n8080_dac_w)
 {
-	dac_data_w(space->machine().device("dac"), data & 0x80);
+	dac_data_w(machine().device("dac"), data & 0x80);
 }
 
 
-static WRITE8_HANDLER( helifire_dac_w )
+WRITE8_MEMBER(n8080_state::helifire_dac_w)
 {
-	n8080_state *state = space->machine().driver_data<n8080_state>();
-	dac_data_w(space->machine().device("dac"), data * state->m_helifire_dac_volume);
+	dac_data_w(machine().device("dac"), data * m_helifire_dac_volume);
 }
 
 
-static WRITE8_HANDLER( helifire_sound_ctrl_w )
+WRITE8_MEMBER(n8080_state::helifire_sound_ctrl_w)
 {
-	n8080_state *state = space->machine().driver_data<n8080_state>();
-	state->m_helifire_dac_phase = data & 0x80;
+	m_helifire_dac_phase = data & 0x80;
 
 	/* data & 0x40 not emulated */
 	/* data & 0x20 not emulated */
 
-	if (state->m_helifire_dac_phase)
+	if (m_helifire_dac_phase)
 	{
-		state->m_helifire_dac_timing = ATTACK_RATE * log(1 - state->m_helifire_dac_volume);
+		m_helifire_dac_timing = ATTACK_RATE * log(1 - m_helifire_dac_volume);
 	}
 	else
 	{
-		state->m_helifire_dac_timing = DECAY_RATE * log(state->m_helifire_dac_volume);
+		m_helifire_dac_timing = DECAY_RATE * log(m_helifire_dac_volume);
 	}
 
-	state->m_helifire_dac_timing += space->machine().time().as_double();
+	m_helifire_dac_timing += machine().time().as_double();
 }
 
 
@@ -558,30 +549,30 @@ MACHINE_RESET( helifire_sound )
 }
 
 
-static ADDRESS_MAP_START( n8080_sound_cpu_map, AS_PROGRAM, 8, driver_device )
+static ADDRESS_MAP_START( n8080_sound_cpu_map, AS_PROGRAM, 8, n8080_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x3ff)
 	AM_RANGE(0x0000, 0x03ff) AM_ROM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( n8080_sound_io_map, AS_IO, 8, driver_device )
-	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_READ_LEGACY(n8080_8035_t0_r)
-	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ_LEGACY(n8080_8035_t1_r)
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READ_LEGACY(n8080_8035_p1_r)
+static ADDRESS_MAP_START( n8080_sound_io_map, AS_IO, 8, n8080_state )
+	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_READ(n8080_8035_t0_r)
+	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(n8080_8035_t1_r)
+	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READ(n8080_8035_p1_r)
 
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE_LEGACY(n8080_dac_w)
+	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(n8080_dac_w)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( helifire_sound_io_map, AS_IO, 8, driver_device )
-	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_READ_LEGACY(helifire_8035_t0_r)
-	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ_LEGACY(helifire_8035_t1_r)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READ_LEGACY(helifire_8035_p2_r)
+static ADDRESS_MAP_START( helifire_sound_io_map, AS_IO, 8, n8080_state )
+	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_READ(helifire_8035_t0_r)
+	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(helifire_8035_t1_r)
+	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READ(helifire_8035_p2_r)
 
-	AM_RANGE(0x00, 0x7f) AM_READ_LEGACY(helifire_8035_external_ram_r)
+	AM_RANGE(0x00, 0x7f) AM_READ(helifire_8035_external_ram_r)
 
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_WRITE_LEGACY(helifire_dac_w)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE_LEGACY(helifire_sound_ctrl_w)
+	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_WRITE(helifire_dac_w)
+	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(helifire_sound_ctrl_w)
 ADDRESS_MAP_END
 
 

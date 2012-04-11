@@ -46,13 +46,12 @@ Z80CTC_INTERFACE( senjyo_ctc_intf )
 };
 
 
-WRITE8_HANDLER( senjyo_volume_w )
+WRITE8_MEMBER(senjyo_state::senjyo_volume_w)
 {
-	senjyo_state *state = space->machine().driver_data<senjyo_state>();
-	samples_device *samples = space->machine().device<samples_device>("samples");
+	samples_device *samples = machine().device<samples_device>("samples");
 
-	state->m_single_volume = data & 0x0f;
-	samples->set_volume(0, state->m_single_volume / 15.0);
+	m_single_volume = data & 0x0f;
+	samples->set_volume(0, m_single_volume / 15.0);
 }
 
 

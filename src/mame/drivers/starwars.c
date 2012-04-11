@@ -160,8 +160,8 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, starwars_state )
 	AM_RANGE(0x4340, 0x435f) AM_READ_PORT("DSW0")
 	AM_RANGE(0x4360, 0x437f) AM_READ_PORT("DSW1")
 	AM_RANGE(0x4380, 0x439f) AM_READ(starwars_adc_r)			/* a-d control result */
-	AM_RANGE(0x4400, 0x4400) AM_READWRITE_LEGACY(starwars_main_read_r, starwars_main_wr_w)
-	AM_RANGE(0x4401, 0x4401) AM_READ_LEGACY(starwars_main_ready_flag_r)
+	AM_RANGE(0x4400, 0x4400) AM_READWRITE(starwars_main_read_r, starwars_main_wr_w)
+	AM_RANGE(0x4401, 0x4401) AM_READ(starwars_main_ready_flag_r)
 	AM_RANGE(0x4500, 0x45ff) AM_DEVREADWRITE("x2212", x2212_device, read, write)
 	AM_RANGE(0x4600, 0x461f) AM_WRITE_LEGACY(avgdvg_go_w)
 	AM_RANGE(0x4620, 0x463f) AM_WRITE_LEGACY(avgdvg_reset_w)
@@ -170,7 +170,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, starwars_state )
 	AM_RANGE(0x4680, 0x469f) AM_READNOP AM_WRITE(starwars_out_w)
 	AM_RANGE(0x46a0, 0x46bf) AM_WRITE(starwars_nstore_w)
 	AM_RANGE(0x46c0, 0x46c2) AM_WRITE(starwars_adc_select_w)
-	AM_RANGE(0x46e0, 0x46e0) AM_WRITE_LEGACY(starwars_soundrst_w)
+	AM_RANGE(0x46e0, 0x46e0) AM_WRITE(starwars_soundrst_w)
 	AM_RANGE(0x4700, 0x4707) AM_WRITE(starwars_math_w)
 	AM_RANGE(0x4700, 0x4700) AM_READ(starwars_div_reh_r)
 	AM_RANGE(0x4701, 0x4701) AM_READ(starwars_div_rel_r)
@@ -190,8 +190,8 @@ ADDRESS_MAP_END
  *************************************/
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, starwars_state )
-	AM_RANGE(0x0000, 0x07ff) AM_WRITE_LEGACY(starwars_sout_w)
-	AM_RANGE(0x0800, 0x0fff) AM_READ_LEGACY(starwars_sin_r)		/* SIN Read */
+	AM_RANGE(0x0000, 0x07ff) AM_WRITE(starwars_sout_w)
+	AM_RANGE(0x0800, 0x0fff) AM_READ(starwars_sin_r)		/* SIN Read */
 	AM_RANGE(0x1000, 0x107f) AM_RAM							/* 6532 ram */
 	AM_RANGE(0x1080, 0x109f) AM_DEVREADWRITE_LEGACY("riot", riot6532_r, riot6532_w)
 	AM_RANGE(0x1800, 0x183f) AM_WRITE_LEGACY(quad_pokey_w)

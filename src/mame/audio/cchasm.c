@@ -12,13 +12,12 @@
 #include "sound/dac.h"
 
 
-WRITE8_HANDLER( cchasm_reset_coin_flag_w )
+WRITE8_MEMBER(cchasm_state::cchasm_reset_coin_flag_w)
 {
-	cchasm_state *state = space->machine().driver_data<cchasm_state>();
-	if (state->m_coin_flag)
+	if (m_coin_flag)
 	{
-		state->m_coin_flag = 0;
-		z80ctc_trg0_w(state->m_ctc, state->m_coin_flag);
+		m_coin_flag = 0;
+		z80ctc_trg0_w(m_ctc, m_coin_flag);
 	}
 }
 
@@ -32,32 +31,28 @@ INPUT_CHANGED( cchasm_set_coin_flag )
 	}
 }
 
-READ8_HANDLER( cchasm_coin_sound_r )
+READ8_MEMBER(cchasm_state::cchasm_coin_sound_r)
 {
-	cchasm_state *state = space->machine().driver_data<cchasm_state>();
-	UINT8 coin = (input_port_read(space->machine(), "IN3") >> 4) & 0x7;
-	return state->m_sound_flags | (state->m_coin_flag << 3) | coin;
+	UINT8 coin = (input_port_read(machine(), "IN3") >> 4) & 0x7;
+	return m_sound_flags | (m_coin_flag << 3) | coin;
 }
 
-READ8_HANDLER( cchasm_soundlatch2_r )
+READ8_MEMBER(cchasm_state::cchasm_soundlatch2_r)
 {
-	cchasm_state *state = space->machine().driver_data<cchasm_state>();
-	state->m_sound_flags &= ~0x80;
-	z80ctc_trg2_w(state->m_ctc, 0);
-	return state->soundlatch2_byte_r(*space, offset);
+	m_sound_flags &= ~0x80;
+	z80ctc_trg2_w(m_ctc, 0);
+	return soundlatch2_byte_r(*&space, offset);
 }
 
-WRITE8_HANDLER( cchasm_soundlatch4_w )
+WRITE8_MEMBER(cchasm_state::cchasm_soundlatch4_w)
 {
-	cchasm_state *state = space->machine().driver_data<cchasm_state>();
-	state->m_sound_flags |= 0x40;
-	state->soundlatch4_byte_w(*space, offset, data);
-	cputag_set_input_line(space->machine(), "maincpu", 1, HOLD_LINE);
+	m_sound_flags |= 0x40;
+	soundlatch4_byte_w(*&space, offset, data);
+	cputag_set_input_line(machine(), "maincpu", 1, HOLD_LINE);
 }
 
-WRITE16_HANDLER( cchasm_io_w )
+WRITE16_MEMBER(cchasm_state::cchasm_io_w)
 {
-	cchasm_state *state = space->machine().driver_data<cchasm_state>();
 	//static int led;
 
 	if (ACCESSING_BITS_8_15)
@@ -66,13 +61,13 @@ WRITE16_HANDLER( cchasm_io_w )
 		switch (offset & 0xf)
 		{
 		case 0:
-			state->soundlatch_byte_w(*space, offset, data);
+			soundlatch_byte_w(*&space, offset, data);
 			break;
 		case 1:
-			state->m_sound_flags |= 0x80;
-			state->soundlatch2_byte_w(*space, offset, data);
-			z80ctc_trg2_w(state->m_ctc, 1);
-			cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+			m_sound_flags |= 0x80;
+			soundlatch2_byte_w(*&space, offset, data);
+			z80ctc_trg2_w(m_ctc, 1);
+			cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 			break;
 		case 2:
 			//led = data;
@@ -81,22 +76,21 @@ WRITE16_HANDLER( cchasm_io_w )
 	}
 }
 
-READ16_HANDLER( cchasm_io_r )
+READ16_MEMBER(cchasm_state::cchasm_io_r)
 {
-	cchasm_state *state = space->machine().driver_data<cchasm_state>();
 	switch (offset & 0xf)
 	{
 	case 0x0:
-		return state->soundlatch3_byte_r(*space, offset) << 8;
+		return soundlatch3_byte_r(*&space, offset) << 8;
 	case 0x1:
-		state->m_sound_flags &= ~0x40;
-		return state->soundlatch4_byte_r(*space,offset) << 8;
+		m_sound_flags &= ~0x40;
+		return soundlatch4_byte_r(*&space,offset) << 8;
 	case 0x2:
-		return (state->m_sound_flags| (input_port_read(space->machine(), "IN3") & 0x07) | 0x08) << 8;
+		return (m_sound_flags| (input_port_read(machine(), "IN3") & 0x07) | 0x08) << 8;
 	case 0x5:
-		return input_port_read(space->machine(), "IN2") << 8;
+		return input_port_read(machine(), "IN2") << 8;
 	case 0x8:
-		return input_port_read(space->machine(), "IN1") << 8;
+		return input_port_read(machine(), "IN1") << 8;
 	default:
 		return 0xff << 8;
 	}

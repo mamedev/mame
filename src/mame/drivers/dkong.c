@@ -780,7 +780,7 @@ static ADDRESS_MAP_START( dkong_map, AS_PROGRAM, 8, dkong_state )
     AM_RANGE(0x7d00, 0x7d00) AM_READ(dkong_in2_r)                               /* IN2 */
     AM_RANGE(0x7d00, 0x7d07) AM_DEVWRITE_LEGACY("ls259.6h", latch8_bit0_w)  		/* Sound signals */
 
-    AM_RANGE(0x7d80, 0x7d80) AM_READ_PORT("DSW0") AM_WRITE_LEGACY(dkong_audio_irq_w)   /* DSW0 */
+    AM_RANGE(0x7d80, 0x7d80) AM_READ_PORT("DSW0") AM_WRITE(dkong_audio_irq_w)   /* DSW0 */
     AM_RANGE(0x7d81, 0x7d81) AM_WRITE(radarscp_grid_enable_w)
     AM_RANGE(0x7d82, 0x7d82) AM_WRITE(dkong_flipscreen_w)
     AM_RANGE(0x7d83, 0x7d83) AM_WRITE(dkong_spritebank_w)                       /* 2 PSL Signal */
@@ -805,7 +805,7 @@ static ADDRESS_MAP_START( dkongjr_map, AS_PROGRAM, 8, dkong_state )
     AM_RANGE(0x7d00, 0x7d00) AM_READ(dkongjr_in2_r)                             /* IN2 */
     AM_RANGE(0x7d00, 0x7d07) AM_DEVWRITE_LEGACY("ls259.6h",latch8_bit0_w)      /* Sound addrs */
 
-    AM_RANGE(0x7d80, 0x7d80) AM_READ_PORT("DSW0") AM_WRITE_LEGACY(dkong_audio_irq_w)   /* DSW0 */
+    AM_RANGE(0x7d80, 0x7d80) AM_READ_PORT("DSW0") AM_WRITE(dkong_audio_irq_w)   /* DSW0 */
     AM_RANGE(0x7d82, 0x7d82) AM_WRITE(dkong_flipscreen_w)
     AM_RANGE(0x7d83, 0x7d83) AM_WRITE(dkong_spritebank_w)                       /* 2 PSL Signal */
     AM_RANGE(0x7d84, 0x7d84) AM_WRITE(nmi_mask_w)
@@ -859,7 +859,7 @@ static ADDRESS_MAP_START( s2650_map, AS_PROGRAM, 8, dkong_state )
     AM_RANGE(0x1480, 0x1480) AM_READ_PORT("IN1")
     AM_RANGE(0x1500, 0x1500) AM_MIRROR(0x007f) AM_READ(dkong_in2_r)                                 /* IN2 */
     AM_RANGE(0x1500, 0x1507) AM_DEVWRITE_LEGACY("ls259.6h", latch8_bit0_w)       /* Sound signals */
-    AM_RANGE(0x1580, 0x1580) AM_READ_PORT("DSW0") AM_WRITE_LEGACY(dkong_audio_irq_w)     /* DSW0 */
+    AM_RANGE(0x1580, 0x1580) AM_READ_PORT("DSW0") AM_WRITE(dkong_audio_irq_w)     /* DSW0 */
     AM_RANGE(0x1582, 0x1582) AM_WRITE(dkong_flipscreen_w)
     AM_RANGE(0x1583, 0x1583) AM_WRITE(dkong_spritebank_w)                         /* 2 PSL Signal */
     AM_RANGE(0x1584, 0x1584) AM_NOP                                               /* Possibly still interrupt enable */

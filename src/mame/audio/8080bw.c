@@ -31,27 +31,26 @@ MACHINE_START( extra_8080bw_sh )
 /*                                                     */
 /*******************************************************/
 
-WRITE8_HANDLER( invadpt2_sh_port_1_w )
+WRITE8_MEMBER(_8080bw_state::invadpt2_sh_port_1_w)
 {
-	_8080bw_state *state = space->machine().driver_data<_8080bw_state>();
-	UINT8 rising_bits = data & ~state->m_port_1_last_extra;
+	UINT8 rising_bits = data & ~m_port_1_last_extra;
 
-	sn76477_enable_w(state->m_sn, !(data & 0x01));			/* SAUCER SOUND */
+	sn76477_enable_w(m_sn, !(data & 0x01));			/* SAUCER SOUND */
 
-	if (rising_bits & 0x02) state->m_samples->start(0, 0);		/* MISSLE SOUND */
-	if (rising_bits & 0x04) state->m_samples->start(1, 1);		/* EXPLOSION */
-	if (rising_bits & 0x08) state->m_samples->start(2, 2);		/* INVADER HIT */
-	if (rising_bits & 0x10) state->m_samples->start(5, 8);		/* BONUS MISSILE BASE */
+	if (rising_bits & 0x02) m_samples->start(0, 0);		/* MISSLE SOUND */
+	if (rising_bits & 0x04) m_samples->start(1, 1);		/* EXPLOSION */
+	if (rising_bits & 0x08) m_samples->start(2, 2);		/* INVADER HIT */
+	if (rising_bits & 0x10) m_samples->start(5, 8);		/* BONUS MISSILE BASE */
 
-	state->m_screen_red = data & 0x04;
+	m_screen_red = data & 0x04;
 
-	space->machine().sound().system_enable(data & 0x20);
+	machine().sound().system_enable(data & 0x20);
 
-	state->m_port_1_last_extra = data;
+	m_port_1_last_extra = data;
 
 }
 
-WRITE8_HANDLER( invadpt2_sh_port_2_w )
+WRITE8_MEMBER(_8080bw_state::invadpt2_sh_port_2_w)
 {
 	/* FLEET (movement)
 
@@ -60,18 +59,17 @@ WRITE8_HANDLER( invadpt2_sh_port_2_w )
        D2 = 82K
        D3 = 100K */
 
-	_8080bw_state *state = space->machine().driver_data<_8080bw_state>();
-	UINT8 rising_bits = data & ~state->m_port_2_last_extra;
+	UINT8 rising_bits = data & ~m_port_2_last_extra;
 
-	if (rising_bits & 0x01) state->m_samples->start(4, 3);		/* FLEET */
-	if (rising_bits & 0x02) state->m_samples->start(4, 4);		/* FLEET */
-	if (rising_bits & 0x04) state->m_samples->start(4, 5);		/* FLEET */
-	if (rising_bits & 0x08) state->m_samples->start(4, 6);		/* FLEET */
-	if (rising_bits & 0x10) state->m_samples->start(3, 7);		/* SAUCER HIT */
+	if (rising_bits & 0x01) m_samples->start(4, 3);		/* FLEET */
+	if (rising_bits & 0x02) m_samples->start(4, 4);		/* FLEET */
+	if (rising_bits & 0x04) m_samples->start(4, 5);		/* FLEET */
+	if (rising_bits & 0x08) m_samples->start(4, 6);		/* FLEET */
+	if (rising_bits & 0x10) m_samples->start(3, 7);		/* SAUCER HIT */
 
-	state->m_c8080bw_flip_screen = data & 0x20;
+	m_c8080bw_flip_screen = data & 0x20;
 
-	state->m_port_2_last_extra = data;
+	m_port_2_last_extra = data;
 }
 
 
@@ -81,20 +79,19 @@ WRITE8_HANDLER( invadpt2_sh_port_2_w )
 /*                                                     */
 /*******************************************************/
 
-WRITE8_HANDLER( spcewars_sh_port_w )
+WRITE8_MEMBER(_8080bw_state::spcewars_sh_port_w)
 {
-	_8080bw_state *state = space->machine().driver_data<_8080bw_state>();
-	UINT8 rising_bits = data & ~state->m_port_1_last_extra;
+	UINT8 rising_bits = data & ~m_port_1_last_extra;
 
-	sn76477_enable_w(state->m_sn, !(data & 0x01));			/* Saucer Sound */
+	sn76477_enable_w(m_sn, !(data & 0x01));			/* Saucer Sound */
 
-	if (rising_bits & 0x02) state->m_samples->start(0, 0);		/* Shot Sound */
-	if (rising_bits & 0x04) state->m_samples->start(1, 1);		/* Base Hit */
-	if (rising_bits & 0x08) state->m_samples->start(2, 2);		/* Invader Hit */
+	if (rising_bits & 0x02) m_samples->start(0, 0);		/* Shot Sound */
+	if (rising_bits & 0x04) m_samples->start(1, 1);		/* Base Hit */
+	if (rising_bits & 0x08) m_samples->start(2, 2);		/* Invader Hit */
 
-	speaker_level_w(state->m_speaker, (data & 0x10) ? 1 : 0);		/* Various bitstream tunes */
+	speaker_level_w(m_speaker, (data & 0x10) ? 1 : 0);		/* Various bitstream tunes */
 
-	state->m_port_1_last_extra = data;
+	m_port_1_last_extra = data;
 }
 
 
@@ -125,41 +122,39 @@ const samples_interface lrescue_samples_interface =
 	lrescue_sample_names
 };
 
-WRITE8_HANDLER( lrescue_sh_port_1_w )
+WRITE8_MEMBER(_8080bw_state::lrescue_sh_port_1_w)
 {
-	_8080bw_state *state = space->machine().driver_data<_8080bw_state>();
-	UINT8 rising_bits = data & ~state->m_port_1_last_extra;
+	UINT8 rising_bits = data & ~m_port_1_last_extra;
 
-	if (rising_bits & 0x01) state->m_samples->start(0, 3);		/* Thrust */
-	if (rising_bits & 0x02) state->m_samples->start(1, 2);		/* Shot Sound */
-	if (rising_bits & 0x04) state->m_samples->start(0, 1);		/* Death */
-	if (rising_bits & 0x08) state->m_samples->start(1, 0);		/* Alien Hit */
-	if (rising_bits & 0x10) state->m_samples->start(2, 5);		/* Bonus Ship (not confirmed) */
+	if (rising_bits & 0x01) m_samples->start(0, 3);		/* Thrust */
+	if (rising_bits & 0x02) m_samples->start(1, 2);		/* Shot Sound */
+	if (rising_bits & 0x04) m_samples->start(0, 1);		/* Death */
+	if (rising_bits & 0x08) m_samples->start(1, 0);		/* Alien Hit */
+	if (rising_bits & 0x10) m_samples->start(2, 5);		/* Bonus Ship (not confirmed) */
 
-	space->machine().sound().system_enable(data & 0x20);
+	machine().sound().system_enable(data & 0x20);
 
-	state->m_screen_red = data & 0x04;
+	m_screen_red = data & 0x04;
 
-	state->m_port_1_last_extra = data;
+	m_port_1_last_extra = data;
 }
 
-WRITE8_HANDLER( lrescue_sh_port_2_w )
+WRITE8_MEMBER(_8080bw_state::lrescue_sh_port_2_w)
 {
-	_8080bw_state *state = space->machine().driver_data<_8080bw_state>();
-	UINT8 rising_bits = data & ~state->m_port_2_last_extra;
+	UINT8 rising_bits = data & ~m_port_2_last_extra;
 
-	if (rising_bits & 0x01) state->m_samples->start(1, 8);		/* Footstep high tone */
-	if (rising_bits & 0x02) state->m_samples->start(1, 7);		/* Footstep low tone */
-	if (rising_bits & 0x04) state->m_samples->start(1, 4);		/* Bonus when counting men saved */
+	if (rising_bits & 0x01) m_samples->start(1, 8);		/* Footstep high tone */
+	if (rising_bits & 0x02) m_samples->start(1, 7);		/* Footstep low tone */
+	if (rising_bits & 0x04) m_samples->start(1, 4);		/* Bonus when counting men saved */
 
-	speaker_level_w(state->m_speaker, (data & 0x08) ? 1 : 0);		/* Bitstream tunes - endlevel and bonus1 */
+	speaker_level_w(m_speaker, (data & 0x08) ? 1 : 0);		/* Bitstream tunes - endlevel and bonus1 */
 
-	if (rising_bits & 0x10) state->m_samples->start(3, 6);		/* Shooting Star and Rescue Ship sounds */
-	if ((~data & 0x10) && (state->m_port_2_last_extra & 0x10)) state->m_samples->stop(3);	/* This makes the rescue ship sound beep on and off */
+	if (rising_bits & 0x10) m_samples->start(3, 6);		/* Shooting Star and Rescue Ship sounds */
+	if ((~data & 0x10) && (m_port_2_last_extra & 0x10)) m_samples->stop(3);	/* This makes the rescue ship sound beep on and off */
 
-	state->m_c8080bw_flip_screen = data & 0x20;
+	m_c8080bw_flip_screen = data & 0x20;
 
-	state->m_port_2_last_extra = data;
+	m_port_2_last_extra = data;
 }
 
 
@@ -169,7 +164,7 @@ WRITE8_HANDLER( lrescue_sh_port_2_w )
 /*                                                     */
 /*******************************************************/
 
-WRITE8_HANDLER( cosmo_sh_port_2_w )
+WRITE8_MEMBER(_8080bw_state::cosmo_sh_port_2_w)
 {
 	/* inverted flip screen bit */
 	invadpt2_sh_port_2_w(space, offset, data ^ 0x20);
@@ -183,36 +178,34 @@ WRITE8_HANDLER( cosmo_sh_port_2_w )
 /*                                                     */
 /*******************************************************/
 
-WRITE8_HANDLER( ballbomb_sh_port_1_w )
+WRITE8_MEMBER(_8080bw_state::ballbomb_sh_port_1_w)
 {
-	_8080bw_state *state = space->machine().driver_data<_8080bw_state>();
-	UINT8 rising_bits = data & ~state->m_port_1_last_extra;
+	UINT8 rising_bits = data & ~m_port_1_last_extra;
 
-	if (rising_bits & 0x01) state->m_samples->start(1, 2);		/* Hit a balloon */
-	if (rising_bits & 0x02) state->m_samples->start(2, 0);		/* Shot Sound */
-	if (rising_bits & 0x04) state->m_samples->start(2, 1);		/* Base Hit */
-	if (rising_bits & 0x08) state->m_samples->start(1, 7);		/* Hit a Bomb */
-	if (rising_bits & 0x10) state->m_samples->start(3, 8);		/* Bonus Base at 1500 points */
+	if (rising_bits & 0x01) m_samples->start(1, 2);		/* Hit a balloon */
+	if (rising_bits & 0x02) m_samples->start(2, 0);		/* Shot Sound */
+	if (rising_bits & 0x04) m_samples->start(2, 1);		/* Base Hit */
+	if (rising_bits & 0x08) m_samples->start(1, 7);		/* Hit a Bomb */
+	if (rising_bits & 0x10) m_samples->start(3, 8);		/* Bonus Base at 1500 points */
 
-	space->machine().sound().system_enable(data & 0x20);
+	machine().sound().system_enable(data & 0x20);
 
-	state->m_screen_red = data & 0x04;
+	m_screen_red = data & 0x04;
 
-	state->m_port_1_last_extra = data;
+	m_port_1_last_extra = data;
 }
 
-WRITE8_HANDLER( ballbomb_sh_port_2_w )
+WRITE8_MEMBER(_8080bw_state::ballbomb_sh_port_2_w)
 {
-	_8080bw_state *state = space->machine().driver_data<_8080bw_state>();
-	UINT8 rising_bits = data & ~state->m_port_2_last_extra;
+	UINT8 rising_bits = data & ~m_port_2_last_extra;
 
-	if (data & 0x01) state->m_samples->start(0, 7);		/* Indicates plane will drop bombs */
-	if (data & 0x04) state->m_samples->start(0, 4);		/* Plane is dropping new balloons at start of level */
-	if (rising_bits & 0x10) state->m_samples->start(2, 2);		/* Balloon hit and bomb drops */
+	if (data & 0x01) m_samples->start(0, 7);		/* Indicates plane will drop bombs */
+	if (data & 0x04) m_samples->start(0, 4);		/* Plane is dropping new balloons at start of level */
+	if (rising_bits & 0x10) m_samples->start(2, 2);		/* Balloon hit and bomb drops */
 
-	state->m_c8080bw_flip_screen = data & 0x20;
+	m_c8080bw_flip_screen = data & 0x20;
 
-	state->m_port_2_last_extra = data;
+	m_port_2_last_extra = data;
 }
 
 
@@ -259,35 +252,33 @@ DISCRETE_SOUND_START(indianbt)
 
 DISCRETE_SOUND_END
 
-WRITE8_HANDLER( indianbt_sh_port_1_w )
+WRITE8_MEMBER(_8080bw_state::indianbt_sh_port_1_w)
 {
 	/* bit 4 occurs every 5.25 seconds during gameplay */
-	_8080bw_state *state = space->machine().driver_data<_8080bw_state>();
-	UINT8 rising_bits = data & ~state->m_port_1_last_extra;
+	UINT8 rising_bits = data & ~m_port_1_last_extra;
 
-	if (rising_bits & 0x01) state->m_samples->start(1, 7);		/* Death */
-	if (rising_bits & 0x02) state->m_samples->start(0, 1);		/* Shot Sound */
-	if (rising_bits & 0x04) state->m_samples->start(2, 3);		/* Move */
-	if (rising_bits & 0x08) state->m_samples->start(3, 2);		/* Hit */
+	if (rising_bits & 0x01) m_samples->start(1, 7);		/* Death */
+	if (rising_bits & 0x02) m_samples->start(0, 1);		/* Shot Sound */
+	if (rising_bits & 0x04) m_samples->start(2, 3);		/* Move */
+	if (rising_bits & 0x08) m_samples->start(3, 2);		/* Hit */
 
-	space->machine().sound().system_enable(data & 0x20);
+	machine().sound().system_enable(data & 0x20);
 
-	state->m_screen_red = data & 0x01;
+	m_screen_red = data & 0x01;
 
-	state->m_port_1_last_extra = data;
+	m_port_1_last_extra = data;
 }
 
-WRITE8_HANDLER( indianbt_sh_port_2_w )
+WRITE8_MEMBER(_8080bw_state::indianbt_sh_port_2_w)
 {
-	_8080bw_state *state = space->machine().driver_data<_8080bw_state>();
-	UINT8 rising_bits = data & ~state->m_port_2_last_extra;
+	UINT8 rising_bits = data & ~m_port_2_last_extra;
 
-	if (rising_bits & 0x01) state->m_samples->start(4, 0);		/* Bird dropped an egg, Lasso used */
-	if (rising_bits & 0x02) state->m_samples->start(4, 2);		/* Egg hatches, egg shot */
-	if (rising_bits & 0x08) state->m_samples->start(5, 0);		/* Grabber, Lasso caught something */
-	if (rising_bits & 0x10) state->m_samples->start(3, 7);		/* Lasso sound */
+	if (rising_bits & 0x01) m_samples->start(4, 0);		/* Bird dropped an egg, Lasso used */
+	if (rising_bits & 0x02) m_samples->start(4, 2);		/* Egg hatches, egg shot */
+	if (rising_bits & 0x08) m_samples->start(5, 0);		/* Grabber, Lasso caught something */
+	if (rising_bits & 0x10) m_samples->start(3, 7);		/* Lasso sound */
 
-	state->m_port_2_last_extra = data;
+	m_port_2_last_extra = data;
 }
 
 WRITE8_DEVICE_HANDLER( indianbt_sh_port_3_w )
@@ -787,9 +778,8 @@ static const double schaser_effect_rc[8] =
 	(1.0/ (1.0/RES_K(82) + 1.0/RES_K(39) + 1.0/RES_K(15)) + RES_K(20)) * CAP_U(1)
 };
 
-WRITE8_HANDLER( schaser_sh_port_1_w )
+WRITE8_MEMBER(_8080bw_state::schaser_sh_port_1_w)
 {
-	_8080bw_state *state = space->machine().driver_data<_8080bw_state>();
 	int effect;
 
 	/* bit 0 - Dot Sound Enable (SX0)
@@ -800,8 +790,8 @@ WRITE8_HANDLER( schaser_sh_port_1_w )
        bit 5 - Explosion (SX5) */
 
     //printf( "schaser_sh_port_1_w: %02x\n", data );
-	discrete_sound_w(state->m_discrete, SCHASER_DOT_EN, data & 0x01);
-	discrete_sound_w(state->m_discrete, SCHASER_DOT_SEL, data & 0x02);
+	discrete_sound_w(m_discrete, SCHASER_DOT_EN, data & 0x01);
+	discrete_sound_w(m_discrete, SCHASER_DOT_SEL, data & 0x02);
 
 	/* The effect is a variable rate 555 timer.  A diode/resistor array is used to
      * select the frequency.  Because of the diode voltage drop, we can not use the
@@ -810,50 +800,50 @@ WRITE8_HANDLER( schaser_sh_port_1_w )
      * but the bleed time is so long, that we can just cheat and put the time on hold
      * when effect = 0. */
 	effect = (data >> 2) & 0x07;
-	if (state->m_schaser_last_effect != effect)
+	if (m_schaser_last_effect != effect)
 	{
 		if (effect)
 		{
-			if (state->m_schaser_effect_555_time_remain != attotime::zero)
+			if (m_schaser_effect_555_time_remain != attotime::zero)
 			{
 				/* timer re-enabled, use up remaining 555 high time */
-				state->m_schaser_effect_555_timer->adjust(state->m_schaser_effect_555_time_remain, effect);
+				m_schaser_effect_555_timer->adjust(m_schaser_effect_555_time_remain, effect);
 			}
-			else if (!state->m_schaser_effect_555_is_low)
+			else if (!m_schaser_effect_555_is_low)
 			{
 				/* set 555 high time */
 				attotime new_time = attotime(0, ATTOSECONDS_PER_SECOND * .8873 * schaser_effect_rc[effect]);
-				state->m_schaser_effect_555_timer->adjust(new_time, effect);
+				m_schaser_effect_555_timer->adjust(new_time, effect);
 			}
 		}
 		else
 		{
 			/* disable effect - stops at end of low cycle */
-			if (!state->m_schaser_effect_555_is_low)
+			if (!m_schaser_effect_555_is_low)
 			{
-				state->m_schaser_effect_555_time_remain = state->m_schaser_effect_555_timer->remaining();
-            		state->m_schaser_effect_555_time_remain_savable = state->m_schaser_effect_555_time_remain.as_double();
-				state->m_schaser_effect_555_timer->adjust(attotime::never);
+				m_schaser_effect_555_time_remain = m_schaser_effect_555_timer->remaining();
+            		m_schaser_effect_555_time_remain_savable = m_schaser_effect_555_time_remain.as_double();
+				m_schaser_effect_555_timer->adjust(attotime::never);
 			}
 		}
-		state->m_schaser_last_effect = effect;
+		m_schaser_last_effect = effect;
 	}
 
-	state->m_schaser_explosion = (data >> 5) & 0x01;
-	if (state->m_schaser_explosion)
+	m_schaser_explosion = (data >> 5) & 0x01;
+	if (m_schaser_explosion)
 	{
-		sn76477_amplitude_res_w(state->m_sn, 1.0 / (1.0/RES_K(200) + 1.0/RES_K(68)));
+		sn76477_amplitude_res_w(m_sn, 1.0 / (1.0/RES_K(200) + 1.0/RES_K(68)));
 	}
 	else
 	{
-		sn76477_amplitude_res_w(state->m_sn, RES_K(200));
+		sn76477_amplitude_res_w(m_sn, RES_K(200));
 	}
-	sn76477_enable_w(state->m_sn, !(state->m_schaser_effect_555_is_low || state->m_schaser_explosion));
-	sn76477_one_shot_cap_voltage_w(state->m_sn, !(state->m_schaser_effect_555_is_low || state->m_schaser_explosion) ? 0 : SN76477_EXTERNAL_VOLTAGE_DISCONNECT);
-	sn76477_mixer_b_w(state->m_sn, state->m_schaser_explosion);
+	sn76477_enable_w(m_sn, !(m_schaser_effect_555_is_low || m_schaser_explosion));
+	sn76477_one_shot_cap_voltage_w(m_sn, !(m_schaser_effect_555_is_low || m_schaser_explosion) ? 0 : SN76477_EXTERNAL_VOLTAGE_DISCONNECT);
+	sn76477_mixer_b_w(m_sn, m_schaser_explosion);
 }
 
-WRITE8_HANDLER( schaser_sh_port_2_w )
+WRITE8_MEMBER(_8080bw_state::schaser_sh_port_2_w)
 {
 	/* bit 0 - Music (DAC) (SX6)
        bit 1 - Sound Enable (SX7)
@@ -862,23 +852,22 @@ WRITE8_HANDLER( schaser_sh_port_2_w )
        bit 4 - Field Control B (SX10)
        bit 5 - Flip Screen */
 
-	_8080bw_state *state = space->machine().driver_data<_8080bw_state>();
 
 	//printf( "schaser_sh_port_2_w: %02x\n", data );
 
-	discrete_sound_w(state->m_discrete, SCHASER_MUSIC_BIT, data & 0x01);
+	discrete_sound_w(m_discrete, SCHASER_MUSIC_BIT, data & 0x01);
 
-	discrete_sound_w(state->m_discrete, SCHASER_SND_EN, data & 0x02);
-	space->machine().sound().system_enable(data & 0x02);
+	discrete_sound_w(m_discrete, SCHASER_SND_EN, data & 0x02);
+	machine().sound().system_enable(data & 0x02);
 
-	coin_lockout_global_w(space->machine(), data & 0x04);
+	coin_lockout_global_w(machine(), data & 0x04);
 
-	state->m_schaser_background_disable = (data >> 3) & 0x01;
-	state->m_schaser_background_select = (data >> 4) & 0x01;
+	m_schaser_background_disable = (data >> 3) & 0x01;
+	m_schaser_background_select = (data >> 4) & 0x01;
 
-	state->m_c8080bw_flip_screen = (data & 0x20) && (input_port_read(space->machine(), CABINET_PORT_TAG) & 0x01);
+	m_c8080bw_flip_screen = (data & 0x20) && (input_port_read(machine(), CABINET_PORT_TAG) & 0x01);
 
-	state->m_port_2_last_extra = data;
+	m_port_2_last_extra = data;
 }
 
 
@@ -911,7 +900,7 @@ static void schaser_reinit_555_time_remain(_8080bw_state *state)
 {
 	address_space *space = state->m_maincpu->memory().space(AS_PROGRAM);
 	state->m_schaser_effect_555_time_remain = attotime::from_double(state->m_schaser_effect_555_time_remain_savable);
-	schaser_sh_port_2_w(space, 0, state->m_port_2_last_extra);
+	state->schaser_sh_port_2_w(*space, 0, state->m_port_2_last_extra);
 }
 
 
@@ -936,8 +925,8 @@ MACHINE_RESET( schaser_sh )
 
 	state->m_schaser_effect_555_is_low = 0;
 	state->m_schaser_effect_555_timer->adjust(attotime::never);
-	schaser_sh_port_1_w(space, 0, 0);
-	schaser_sh_port_2_w(space, 0, 0);
+	state->schaser_sh_port_1_w(*space, 0, 0);
+	state->schaser_sh_port_2_w(*space, 0, 0);
 	state->m_schaser_effect_555_time_remain = attotime::zero;
 	state->m_schaser_effect_555_time_remain_savable = state->m_schaser_effect_555_time_remain.as_double();
 }
@@ -949,16 +938,15 @@ MACHINE_RESET( schaser_sh )
 /* - Press Left or Right to choose game to play     */
 /****************************************************/
 
-WRITE8_HANDLER( rollingc_sh_port_w )
+WRITE8_MEMBER(_8080bw_state::rollingc_sh_port_w)
 {
-	_8080bw_state *state = space->machine().driver_data<_8080bw_state>();
-	UINT8 rising_bits = data & ~state->m_port_3_last_extra;
+	UINT8 rising_bits = data & ~m_port_3_last_extra;
 
-	if (rising_bits & 0x02) state->m_samples->start(4, 0);	/* Steering */
-	if (rising_bits & 0x04) state->m_samples->start(0, 1);	/* Collision */
-	if (rising_bits & 0x10) state->m_samples->start(1, 8);	/* Computer car is starting to move */
+	if (rising_bits & 0x02) m_samples->start(4, 0);	/* Steering */
+	if (rising_bits & 0x04) m_samples->start(0, 1);	/* Collision */
+	if (rising_bits & 0x10) m_samples->start(1, 8);	/* Computer car is starting to move */
 
-	state->m_port_3_last_extra = data;
+	m_port_3_last_extra = data;
 }
 
 
@@ -973,31 +961,30 @@ WRITE8_HANDLER( rollingc_sh_port_w )
 /*************************************************************************************/
 
 
-WRITE8_HANDLER( invrvnge_sh_port_w )
+WRITE8_MEMBER(_8080bw_state::invrvnge_sh_port_w)
 {
-	_8080bw_state *state = space->machine().driver_data<_8080bw_state>();
 
 	switch (data)
 	{
 		case 0x06:
-			state->m_samples->start(1, 0);				/* Shoot */
+			m_samples->start(1, 0);				/* Shoot */
 			break;
 
 		case 0x14:
-			state->m_samples->start(2, 2);				/* Hit Alien */
+			m_samples->start(2, 2);				/* Hit Alien */
 			break;
 
 		case 0x16:
-			state->m_samples->start(2, 5);				/* Hit Asteroid */
+			m_samples->start(2, 5);				/* Hit Asteroid */
 			break;
 
 		case 0x1e:
-			state->m_samples->start(3, 1);				/* Death (followed by 0x0a byte), also bit 4 of port 5 */
+			m_samples->start(3, 1);				/* Death (followed by 0x0a byte), also bit 4 of port 5 */
 			break;
 
 		case 0x18:						/* Fuel Low */
 		case 0x30:						/* Fuel bar filling up */
-			state->m_samples->start(4, 7);
+			m_samples->start(4, 7);
 			break;
 
 		case 0x02:						/* Coin */
@@ -1007,7 +994,7 @@ WRITE8_HANDLER( invrvnge_sh_port_w )
 			break;
 
 		case 0x3a:						/* Thrust, Docking, extra ship? */
-			state->m_samples->start(0, 8);
+			m_samples->start(0, 8);
 			break;
 	}
 }
@@ -1018,38 +1005,36 @@ WRITE8_HANDLER( invrvnge_sh_port_w )
 /* Correct samples not available         */
 /*****************************************/
 
-WRITE8_HANDLER( lupin3_sh_port_1_w )
+WRITE8_MEMBER(_8080bw_state::lupin3_sh_port_1_w)
 {
-	_8080bw_state *state = space->machine().driver_data<_8080bw_state>();
-	UINT8 rising_bits = data & ~state->m_port_1_last_extra;
+	UINT8 rising_bits = data & ~m_port_1_last_extra;
 
-	if (rising_bits & 0x01) state->m_samples->start(0, 6);		/* Walking, get money */
+	if (rising_bits & 0x01) m_samples->start(0, 6);		/* Walking, get money */
 
-	sn76477_enable_w(state->m_sn, data & 0x02 ? 0:1);			/* Helicopter */
+	sn76477_enable_w(m_sn, data & 0x02 ? 0:1);			/* Helicopter */
 
-	if (rising_bits & 0x04) state->m_samples->start(0, 7);		/* Translocate */
-	if (rising_bits & 0x08) state->m_samples->start(0, 1);		/* Jail */
-	if (rising_bits & 0x10) state->m_samples->start(3, 8);		/* Bonus Man */
+	if (rising_bits & 0x04) m_samples->start(0, 7);		/* Translocate */
+	if (rising_bits & 0x08) m_samples->start(0, 1);		/* Jail */
+	if (rising_bits & 0x10) m_samples->start(3, 8);		/* Bonus Man */
 
-	state->m_port_1_last_extra = data;
+	m_port_1_last_extra = data;
 }
 
-WRITE8_HANDLER( lupin3_sh_port_2_w )
+WRITE8_MEMBER(_8080bw_state::lupin3_sh_port_2_w)
 {
-	_8080bw_state *state = space->machine().driver_data<_8080bw_state>();
-	UINT8 rising_bits = data & ~state->m_port_2_last_extra;
+	UINT8 rising_bits = data & ~m_port_2_last_extra;
 
-	if (rising_bits & 0x01) state->m_samples->start(0, 3);		/* Lands on top of building, wife kicks man */
-	if (rising_bits & 0x02) state->m_samples->start(1, 2);		/* deposit money, start intermission, end game */
-	if (rising_bits & 0x04) state->m_samples->start(2, 5);		/* deposit money, start intermission, Slides down rope */
-	if (rising_bits & 0x08) state->m_samples->start(3, 0);		/* start intermission, end game */
-	//if (rising_bits & 0x10) state->m_samples->start(3, 9);        /* Dog barking */
+	if (rising_bits & 0x01) m_samples->start(0, 3);		/* Lands on top of building, wife kicks man */
+	if (rising_bits & 0x02) m_samples->start(1, 2);		/* deposit money, start intermission, end game */
+	if (rising_bits & 0x04) m_samples->start(2, 5);		/* deposit money, start intermission, Slides down rope */
+	if (rising_bits & 0x08) m_samples->start(3, 0);		/* start intermission, end game */
+	//if (rising_bits & 0x10) m_samples->start(3, 9);        /* Dog barking */
 
-	state->m_color_map = data & 0x40;
+	m_color_map = data & 0x40;
 
-	state->m_c8080bw_flip_screen = (data & 0x20) && (input_port_read(space->machine(), "IN2") & 0x04);
+	m_c8080bw_flip_screen = (data & 0x20) && (input_port_read(machine(), "IN2") & 0x04);
 
-	state->m_port_2_last_extra = data;
+	m_port_2_last_extra = data;
 }
 
 
@@ -1058,31 +1043,29 @@ WRITE8_HANDLER( lupin3_sh_port_2_w )
 /* Much more work needs to be done       */
 /*****************************************/
 
-WRITE8_HANDLER( schasercv_sh_port_1_w )
+WRITE8_MEMBER(_8080bw_state::schasercv_sh_port_1_w)
 {
 
 	/* bit 2 = 2nd speedup
        bit 3 = 1st speedup
        Death is a stream of ff's with some fe's thrown in */
 
-	_8080bw_state *state = space->machine().driver_data<_8080bw_state>();
-	UINT8 rising_bits = data & ~state->m_port_1_last_extra;
+	UINT8 rising_bits = data & ~m_port_1_last_extra;
 
-	if (rising_bits & 0x02) state->m_samples->start(1, 6);		/* Ran over a dot */
-	if (rising_bits & 0x10) state->m_samples->start(0, 1);		/* Death */
+	if (rising_bits & 0x02) m_samples->start(1, 6);		/* Ran over a dot */
+	if (rising_bits & 0x10) m_samples->start(0, 1);		/* Death */
 
-	state->m_port_1_last_extra = data;
+	m_port_1_last_extra = data;
 }
 
-WRITE8_HANDLER( schasercv_sh_port_2_w )
+WRITE8_MEMBER(_8080bw_state::schasercv_sh_port_2_w)
 {
-	_8080bw_state *state = space->machine().driver_data<_8080bw_state>();
 
-	speaker_level_w(state->m_speaker, (data & 0x01) ? 1 : 0);		/* End-of-Level */
+	speaker_level_w(m_speaker, (data & 0x01) ? 1 : 0);		/* End-of-Level */
 
-	space->machine().sound().system_enable(data & 0x10);
+	machine().sound().system_enable(data & 0x10);
 
-	state->m_c8080bw_flip_screen = data & 0x20;
+	m_c8080bw_flip_screen = data & 0x20;
 }
 
 
@@ -1091,37 +1074,35 @@ WRITE8_HANDLER( schasercv_sh_port_2_w )
 /* No information available as what the correct sounds are         */
 /*******************************************************************/
 
-WRITE8_HANDLER( yosakdon_sh_port_1_w )
+WRITE8_MEMBER(_8080bw_state::yosakdon_sh_port_1_w)
 {
-	_8080bw_state *state = space->machine().driver_data<_8080bw_state>();
-	UINT8 rising_bits = data & ~state->m_port_1_last_extra;
+	UINT8 rising_bits = data & ~m_port_1_last_extra;
 
-	if (rising_bits & 0x01) state->m_samples->start(0, 3);			/* Game Over */
-	if (rising_bits & 0x02) state->m_samples->start(2, 0);			/* Bird dead */
-	if (rising_bits & 0x04) state->m_samples->start(0, 1);			/* Rifle being fired */
-	if (rising_bits & 0x08) state->m_samples->start(1, 2);			/* Man dead */
-	if (rising_bits & 0x10) state->m_samples->start(5, 8);			/* Bonus Man? */
+	if (rising_bits & 0x01) m_samples->start(0, 3);			/* Game Over */
+	if (rising_bits & 0x02) m_samples->start(2, 0);			/* Bird dead */
+	if (rising_bits & 0x04) m_samples->start(0, 1);			/* Rifle being fired */
+	if (rising_bits & 0x08) m_samples->start(1, 2);			/* Man dead */
+	if (rising_bits & 0x10) m_samples->start(5, 8);			/* Bonus Man? */
 
-	space->machine().sound().system_enable(data & 0x20);
+	machine().sound().system_enable(data & 0x20);
 
-	state->m_port_1_last_extra = data;
+	m_port_1_last_extra = data;
 }
 
-WRITE8_HANDLER( yosakdon_sh_port_2_w )
+WRITE8_MEMBER(_8080bw_state::yosakdon_sh_port_2_w)
 {
-	_8080bw_state *state = space->machine().driver_data<_8080bw_state>();
-	UINT8 rising_bits = data & ~state->m_port_2_last_extra;
+	UINT8 rising_bits = data & ~m_port_2_last_extra;
 
-	if (rising_bits & 0x01) state->m_samples->start(1, 6);			/* Ready? , Game Over */
-	if (rising_bits & 0x04) state->m_samples->start(3, 7);			/* Big bird dead */
+	if (rising_bits & 0x01) m_samples->start(1, 6);			/* Ready? , Game Over */
+	if (rising_bits & 0x04) m_samples->start(3, 7);			/* Big bird dead */
 
-	sn76477_enable_w(state->m_sn, data & 0x08 ? 0:1);				/* Big bird */
+	sn76477_enable_w(m_sn, data & 0x08 ? 0:1);				/* Big bird */
 
-	if (rising_bits & 0x10) state->m_samples->start(2, 7);			/* Game Over */
+	if (rising_bits & 0x10) m_samples->start(2, 7);			/* Game Over */
 
-	state->m_c8080bw_flip_screen = data & 0x20;
+	m_c8080bw_flip_screen = data & 0x20;
 
-	state->m_port_2_last_extra = data;
+	m_port_2_last_extra = data;
 }
 
 
@@ -1130,40 +1111,38 @@ WRITE8_HANDLER( yosakdon_sh_port_2_w )
 /* Proper samples are unavailable        */
 /*****************************************/
 
-WRITE8_HANDLER( shuttlei_sh_port_1_w )
+WRITE8_MEMBER(_8080bw_state::shuttlei_sh_port_1_w)
 {
 	/* bit 3 is high while you are alive and playing */
-	_8080bw_state *state = space->machine().driver_data<_8080bw_state>();
-	UINT8 rising_bits = data & ~state->m_port_1_last_extra;
+	UINT8 rising_bits = data & ~m_port_1_last_extra;
 
-	if (rising_bits & 0x01) state->m_samples->start(4, 4);			/* Fleet move */
-	if (rising_bits & 0x02) state->m_samples->start(5, 8);			/* Extra Tank */
+	if (rising_bits & 0x01) m_samples->start(4, 4);			/* Fleet move */
+	if (rising_bits & 0x02) m_samples->start(5, 8);			/* Extra Tank */
 
-	sn76477_enable_w(state->m_sn, data & 0x04 ? 0:1);				/* UFO */
+	sn76477_enable_w(m_sn, data & 0x04 ? 0:1);				/* UFO */
 
-	state->m_port_1_last_extra = data;
+	m_port_1_last_extra = data;
 }
 
-WRITE8_HANDLER( shuttlei_sh_port_2_w )
+WRITE8_MEMBER(_8080bw_state::shuttlei_sh_port_2_w)
 {
-	_8080bw_state *state = space->machine().driver_data<_8080bw_state>();
 
 	switch (data)
 	{
 		case 0x23:
-			state->m_samples->start(2, 2);				/* Hit */
+			m_samples->start(2, 2);				/* Hit */
 			break;
 
 		case 0x2b:
-			state->m_samples->start(0, 0);				/* Shoot */
+			m_samples->start(0, 0);				/* Shoot */
 			break;
 
 		case 0xa3:
-			state->m_samples->start(3, 7);				/* Hit UFO */
+			m_samples->start(3, 7);				/* Hit UFO */
 			break;
 
 		case 0xab:
-			state->m_samples->start(1, 1);				/* Death */
+			m_samples->start(1, 1);				/* Death */
 			break;
 	}
 }

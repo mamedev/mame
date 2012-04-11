@@ -131,7 +131,7 @@ WRITE8_MEMBER(cinemat_state::coin_reset_w)
 WRITE8_MEMBER(cinemat_state::mux_select_w)
 {
 	m_mux_select = data;
-	cinemat_sound_control_w(&space, 0x07, data);
+	cinemat_sound_control_w(space, 0x07, data);
 }
 
 
@@ -323,7 +323,7 @@ static ADDRESS_MAP_START( io_map, AS_IO, 8, cinemat_state )
 
 	AM_RANGE(0x05, 0x05) AM_WRITE(coin_reset_w)
 	AM_RANGE(0x06, 0x06) AM_WRITE(cinemat_vector_control_w)
-	AM_RANGE(0x00, 0x07) AM_WRITE_LEGACY(cinemat_sound_control_w)
+	AM_RANGE(0x00, 0x07) AM_WRITE(cinemat_sound_control_w)
 ADDRESS_MAP_END
 
 

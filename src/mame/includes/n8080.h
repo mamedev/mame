@@ -42,6 +42,18 @@ public:
 	DECLARE_WRITE8_MEMBER(n8080_shift_data_w);
 	DECLARE_READ8_MEMBER(n8080_shift_r);
 	DECLARE_WRITE8_MEMBER(n8080_video_control_w);
+	DECLARE_WRITE8_MEMBER(n8080_sound_1_w);
+	DECLARE_WRITE8_MEMBER(n8080_sound_2_w);
+	DECLARE_READ8_MEMBER(n8080_8035_p1_r);
+	DECLARE_READ8_MEMBER(n8080_8035_t0_r);
+	DECLARE_READ8_MEMBER(n8080_8035_t1_r);
+	DECLARE_READ8_MEMBER(helifire_8035_t0_r);
+	DECLARE_READ8_MEMBER(helifire_8035_t1_r);
+	DECLARE_READ8_MEMBER(helifire_8035_external_ram_r);
+	DECLARE_READ8_MEMBER(helifire_8035_p2_r);
+	DECLARE_WRITE8_MEMBER(n8080_dac_w);
+	DECLARE_WRITE8_MEMBER(helifire_dac_w);
+	DECLARE_WRITE8_MEMBER(helifire_sound_ctrl_w);
 };
 
 
@@ -75,5 +87,3 @@ MACHINE_RESET( spacefev_sound );
 MACHINE_RESET( sheriff_sound );
 MACHINE_RESET( helifire_sound );
 
-WRITE8_HANDLER( n8080_sound_1_w );
-WRITE8_HANDLER( n8080_sound_2_w );

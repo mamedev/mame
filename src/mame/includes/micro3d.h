@@ -100,6 +100,10 @@ public:
 	DECLARE_WRITE32_MEMBER(micro3d_alt_fifo_w);
 	DECLARE_READ32_MEMBER(micro3d_pipe_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(botssa_hwchk_r);
+	DECLARE_WRITE8_MEMBER(micro3d_snd_dac_a);
+	DECLARE_WRITE8_MEMBER(micro3d_snd_dac_b);
+	DECLARE_WRITE8_MEMBER(micro3d_sound_io_w);
+	DECLARE_READ8_MEMBER(micro3d_sound_io_r);
 };
 
 typedef struct _micro3d_vtx_
@@ -129,10 +133,6 @@ DRIVER_INIT( botssa );
 /*----------- defined in audio/micro3d.c -----------*/
 
 WRITE8_DEVICE_HANDLER( micro3d_upd7759_w );
-WRITE8_HANDLER( micro3d_snd_dac_a );
-WRITE8_HANDLER( micro3d_snd_dac_b );
-READ8_HANDLER( micro3d_sound_io_r );
-WRITE8_HANDLER( micro3d_sound_io_w );
 
 void micro3d_noise_sh_w(running_machine &machine, UINT8 data);
 

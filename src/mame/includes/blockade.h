@@ -18,6 +18,8 @@ public:
 	DECLARE_READ8_MEMBER(blockade_input_port_0_r);
 	DECLARE_WRITE8_MEMBER(blockade_coin_latch_w);
 	DECLARE_WRITE8_MEMBER(blockade_videoram_w);
+	DECLARE_WRITE8_MEMBER(blockade_env_on_w);
+	DECLARE_WRITE8_MEMBER(blockade_env_off_w);
 };
 
 
@@ -33,5 +35,3 @@ extern const samples_interface blockade_samples_interface;
 DISCRETE_SOUND_EXTERN( blockade );
 
 WRITE8_DEVICE_HANDLER( blockade_sound_freq_w );
-WRITE8_HANDLER( blockade_env_on_w );
-WRITE8_HANDLER( blockade_env_off_w );

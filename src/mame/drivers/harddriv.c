@@ -642,13 +642,13 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( driversnd_68k_map, AS_PROGRAM, 16, harddriv_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
-	AM_RANGE(0xff0000, 0xff0fff) AM_READWRITE_LEGACY(hdsnd68k_data_r, hdsnd68k_data_w)
-	AM_RANGE(0xff1000, 0xff1fff) AM_READWRITE_LEGACY(hdsnd68k_switches_r, hdsnd68k_latches_w)
-	AM_RANGE(0xff2000, 0xff2fff) AM_READWRITE_LEGACY(hdsnd68k_320port_r, hdsnd68k_speech_w)
-	AM_RANGE(0xff3000, 0xff3fff) AM_READWRITE_LEGACY(hdsnd68k_status_r, hdsnd68k_irqclr_w)
-	AM_RANGE(0xff4000, 0xff5fff) AM_READWRITE_LEGACY(hdsnd68k_320ram_r, hdsnd68k_320ram_w)
-	AM_RANGE(0xff6000, 0xff7fff) AM_READWRITE_LEGACY(hdsnd68k_320ports_r, hdsnd68k_320ports_w)
-	AM_RANGE(0xff8000, 0xffbfff) AM_READWRITE_LEGACY(hdsnd68k_320com_r, hdsnd68k_320com_w)
+	AM_RANGE(0xff0000, 0xff0fff) AM_READWRITE(hdsnd68k_data_r, hdsnd68k_data_w)
+	AM_RANGE(0xff1000, 0xff1fff) AM_READWRITE(hdsnd68k_switches_r, hdsnd68k_latches_w)
+	AM_RANGE(0xff2000, 0xff2fff) AM_READWRITE(hdsnd68k_320port_r, hdsnd68k_speech_w)
+	AM_RANGE(0xff3000, 0xff3fff) AM_READWRITE(hdsnd68k_status_r, hdsnd68k_irqclr_w)
+	AM_RANGE(0xff4000, 0xff5fff) AM_READWRITE(hdsnd68k_320ram_r, hdsnd68k_320ram_w)
+	AM_RANGE(0xff6000, 0xff7fff) AM_READWRITE(hdsnd68k_320ports_r, hdsnd68k_320ports_w)
+	AM_RANGE(0xff8000, 0xffbfff) AM_READWRITE(hdsnd68k_320com_r, hdsnd68k_320com_w)
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -663,15 +663,15 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( driversnd_dsp_io_map, AS_IO, 16, harddriv_state )
-	AM_RANGE(0, 0) AM_READ_LEGACY(hdsnddsp_rom_r) AM_DEVWRITE_LEGACY("dac", hdsnddsp_dac_w)
-	AM_RANGE(1, 1) AM_READ_LEGACY(hdsnddsp_comram_r)
-	AM_RANGE(2, 2) AM_READ_LEGACY(hdsnddsp_compare_r)
+	AM_RANGE(0, 0) AM_READ(hdsnddsp_rom_r) AM_DEVWRITE_LEGACY("dac", hdsnddsp_dac_w)
+	AM_RANGE(1, 1) AM_READ(hdsnddsp_comram_r)
+	AM_RANGE(2, 2) AM_READ(hdsnddsp_compare_r)
 	AM_RANGE(1, 2) AM_WRITENOP
-	AM_RANGE(3, 3) AM_WRITE_LEGACY(hdsnddsp_comport_w)
-	AM_RANGE(4, 4) AM_WRITE_LEGACY(hdsnddsp_mute_w)
-	AM_RANGE(5, 5) AM_WRITE_LEGACY(hdsnddsp_gen68kirq_w)
-	AM_RANGE(6, 7) AM_WRITE_LEGACY(hdsnddsp_soundaddr_w)
-	AM_RANGE(TMS32010_BIO, TMS32010_BIO) AM_READ_LEGACY(hdsnddsp_get_bio)
+	AM_RANGE(3, 3) AM_WRITE(hdsnddsp_comport_w)
+	AM_RANGE(4, 4) AM_WRITE(hdsnddsp_mute_w)
+	AM_RANGE(5, 5) AM_WRITE(hdsnddsp_gen68kirq_w)
+	AM_RANGE(6, 7) AM_WRITE(hdsnddsp_soundaddr_w)
+	AM_RANGE(TMS32010_BIO, TMS32010_BIO) AM_READ(hdsnddsp_get_bio)
 ADDRESS_MAP_END
 
 
@@ -4010,9 +4010,9 @@ static void init_driver_sound(running_machine &machine)
 	hdsnd_init(machine);
 
 	/* install sound handlers */
-	state->m_maincpu->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x840000, 0x840001, FUNC(hd68k_snd_data_r), FUNC(hd68k_snd_data_w));
-	state->m_maincpu->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x844000, 0x844001, FUNC(hd68k_snd_status_r));
-	state->m_maincpu->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x84c000, 0x84c001, FUNC(hd68k_snd_reset_w));
+	state->m_maincpu->memory().space(AS_PROGRAM)->install_readwrite_handler(0x840000, 0x840001, read16_delegate(FUNC(harddriv_state::hd68k_snd_data_r),state), write16_delegate(FUNC(harddriv_state::hd68k_snd_data_w),state));
+	state->m_maincpu->memory().space(AS_PROGRAM)->install_read_handler(0x844000, 0x844001, read16_delegate(FUNC(harddriv_state::hd68k_snd_status_r),state));
+	state->m_maincpu->memory().space(AS_PROGRAM)->install_write_handler(0x84c000, 0x84c001, write16_delegate(FUNC(harddriv_state::hd68k_snd_reset_w),state));
 }
 
 

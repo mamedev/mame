@@ -103,7 +103,7 @@ WRITE8_MEMBER(copsnrob_state::copsnrob_misc2_w)
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, copsnrob_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
-	AM_RANGE(0x0500, 0x0507) AM_WRITE_LEGACY(copsnrob_misc_w)
+	AM_RANGE(0x0500, 0x0507) AM_WRITE(copsnrob_misc_w)
 	AM_RANGE(0x0600, 0x0600) AM_WRITEONLY AM_BASE(m_trucky)
 	AM_RANGE(0x0700, 0x07ff) AM_WRITEONLY AM_BASE(m_truckram)
 	AM_RANGE(0x0800, 0x08ff) AM_RAM AM_BASE(m_bulletsram)

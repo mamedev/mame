@@ -162,7 +162,7 @@ WRITE8_MEMBER(mcr3_state::demoderm_op6_w)
 	if (data & 0x40) m_input_mux = 1;
 
 	/* low 5 bits control the turbo CS */
-	turbocs_data_w(&space, offset, data);
+	turbocs_data_w(space, offset, data);
 }
 
 
@@ -265,7 +265,7 @@ WRITE8_MEMBER(mcr3_state::maxrpm_op6_w)
 		m_maxrpm_adc_select = (m_maxrpm_adc_control >> 1) & 3;
 
 	/* low 5 bits control the turbo CS */
-	turbocs_data_w(&space, offset, data);
+	turbocs_data_w(space, offset, data);
 }
 
 
@@ -278,7 +278,7 @@ WRITE8_MEMBER(mcr3_state::maxrpm_op6_w)
 
 READ8_MEMBER(mcr3_state::rampage_ip4_r)
 {
-	return input_port_read(machine(), "MONO.IP4") | (soundsgood_status_r(&space,0) << 7);
+	return input_port_read(machine(), "MONO.IP4") | (soundsgood_status_r(space,0) << 7);
 }
 
 
@@ -288,7 +288,7 @@ WRITE8_MEMBER(mcr3_state::rampage_op6_w)
 	soundsgood_reset_w(machine(), (~data >> 5) & 1);
 
 	/* low 5 bits go directly to the Sounds Good board */
-	soundsgood_data_w(&space, offset, data);
+	soundsgood_data_w(space, offset, data);
 }
 
 
@@ -301,7 +301,7 @@ WRITE8_MEMBER(mcr3_state::rampage_op6_w)
 
 READ8_MEMBER(mcr3_state::powerdrv_ip2_r)
 {
-	return input_port_read(machine(), "MONO.IP2") | (soundsgood_status_r(&space, 0) << 7);
+	return input_port_read(machine(), "MONO.IP2") | (soundsgood_status_r(space, 0) << 7);
 }
 
 
@@ -332,7 +332,7 @@ WRITE8_MEMBER(mcr3_state::powerdrv_op6_w)
 	soundsgood_reset_w(machine(), (~data >> 5) & 1);
 
 	/* low 5 bits go directly to the Sounds Good board */
-	soundsgood_data_w(&space, offset, data);
+	soundsgood_data_w(space, offset, data);
 }
 
 
@@ -348,7 +348,7 @@ READ8_MEMBER(mcr3_state::stargrds_ip0_r)
 	UINT8 result = input_port_read(machine(), "MONO.IP0");
 	if (m_input_mux)
 		result = (result & ~0x0a) | (input_port_read(machine(), "MONO.IP0.ALT") & 0x0a);
-	return (result & ~0x10) | ((soundsgood_status_r(&space, 0) << 4) & 0x10);
+	return (result & ~0x10) | ((soundsgood_status_r(space, 0) << 4) & 0x10);
 }
 
 
@@ -375,7 +375,7 @@ WRITE8_MEMBER(mcr3_state::stargrds_op6_w)
 	soundsgood_reset_w(machine(), (~data >> 6) & 1);
 
 	/* unline the other games, the STROBE is in the high bit instead of the low bit */
-	soundsgood_data_w(&space, offset, (data << 1) | (data >> 7));
+	soundsgood_data_w(space, offset, (data << 1) | (data >> 7));
 }
 
 
@@ -388,7 +388,7 @@ WRITE8_MEMBER(mcr3_state::stargrds_op6_w)
 
 READ8_MEMBER(mcr3_state::spyhunt_ip1_r)
 {
-	return input_port_read(machine(), "SSIO.IP1") | (csdeluxe_status_r(&space, 0) << 5);
+	return input_port_read(machine(), "SSIO.IP1") | (csdeluxe_status_r(space, 0) << 5);
 }
 
 
@@ -432,7 +432,7 @@ WRITE8_MEMBER(mcr3_state::spyhunt_op4_w)
 	m_last_op4 = data;
 
 	/* low 5 bits go to control the Chip Squeak Deluxe */
-	csdeluxe_data_w(&space, offset, data);
+	csdeluxe_data_w(space, offset, data);
 }
 
 
@@ -1536,8 +1536,9 @@ static DRIVER_INIT( demoderm )
 
 static DRIVER_INIT( sarge )
 {
+	mcr3_state *state = machine.driver_data<mcr3_state>();
 	mcr_common_init(machine, MCR_TURBO_CHIP_SQUEAK);
-	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0x06, 0x06, FUNC(turbocs_data_w));
+	machine.device("maincpu")->memory().space(AS_IO)->install_write_handler(0x06, 0x06, write8_delegate(FUNC(mcr3_state::turbocs_data_w),state));
 }
 
 

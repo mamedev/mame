@@ -35,6 +35,28 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(sflush_80_r);
 	DECLARE_READ8_MEMBER(indianbt_r);
 	DECLARE_WRITE8_MEMBER(steelwkr_sh_port_3_w);
+	DECLARE_WRITE8_MEMBER(invadpt2_sh_port_1_w);
+	DECLARE_WRITE8_MEMBER(invadpt2_sh_port_2_w);
+	DECLARE_WRITE8_MEMBER(spcewars_sh_port_w);
+	DECLARE_WRITE8_MEMBER(lrescue_sh_port_1_w);
+	DECLARE_WRITE8_MEMBER(lrescue_sh_port_2_w);
+	DECLARE_WRITE8_MEMBER(cosmo_sh_port_2_w);
+	DECLARE_WRITE8_MEMBER(ballbomb_sh_port_1_w);
+	DECLARE_WRITE8_MEMBER(ballbomb_sh_port_2_w);
+	DECLARE_WRITE8_MEMBER(indianbt_sh_port_1_w);
+	DECLARE_WRITE8_MEMBER(indianbt_sh_port_2_w);
+	DECLARE_WRITE8_MEMBER(schaser_sh_port_1_w);
+	DECLARE_WRITE8_MEMBER(schaser_sh_port_2_w);
+	DECLARE_WRITE8_MEMBER(rollingc_sh_port_w);
+	DECLARE_WRITE8_MEMBER(invrvnge_sh_port_w);
+	DECLARE_WRITE8_MEMBER(lupin3_sh_port_1_w);
+	DECLARE_WRITE8_MEMBER(lupin3_sh_port_2_w);
+	DECLARE_WRITE8_MEMBER(schasercv_sh_port_1_w);
+	DECLARE_WRITE8_MEMBER(schasercv_sh_port_2_w);
+	DECLARE_WRITE8_MEMBER(yosakdon_sh_port_1_w);
+	DECLARE_WRITE8_MEMBER(yosakdon_sh_port_2_w);
+	DECLARE_WRITE8_MEMBER(shuttlei_sh_port_1_w);
+	DECLARE_WRITE8_MEMBER(shuttlei_sh_port_2_w);
 };
 
 
@@ -42,22 +64,12 @@ public:
 
 MACHINE_START( extra_8080bw_sh );
 
-WRITE8_HANDLER( invadpt2_sh_port_1_w );
-WRITE8_HANDLER( invadpt2_sh_port_2_w );
 
-WRITE8_HANDLER( spcewars_sh_port_w );
 
-WRITE8_HANDLER( lrescue_sh_port_1_w );
-WRITE8_HANDLER( lrescue_sh_port_2_w );
 extern const samples_interface lrescue_samples_interface;
 
-WRITE8_HANDLER( cosmo_sh_port_2_w );
 
-WRITE8_HANDLER( ballbomb_sh_port_1_w );
-WRITE8_HANDLER( ballbomb_sh_port_2_w );
 
-WRITE8_HANDLER( indianbt_sh_port_1_w );
-WRITE8_HANDLER( indianbt_sh_port_2_w );
 WRITE8_DEVICE_HANDLER( indianbt_sh_port_3_w );
 DISCRETE_SOUND_EXTERN( indianbt );
 
@@ -68,26 +80,14 @@ DISCRETE_SOUND_EXTERN( polaris );
 
 MACHINE_RESET( schaser_sh );
 MACHINE_START( schaser_sh );
-WRITE8_HANDLER( schaser_sh_port_1_w );
-WRITE8_HANDLER( schaser_sh_port_2_w );
 extern const sn76477_interface schaser_sn76477_interface;
 DISCRETE_SOUND_EXTERN( schaser );
 
-WRITE8_HANDLER( rollingc_sh_port_w );
 
-WRITE8_HANDLER( invrvnge_sh_port_w );
 
-WRITE8_HANDLER( lupin3_sh_port_1_w );
-WRITE8_HANDLER( lupin3_sh_port_2_w );
 
-WRITE8_HANDLER( schasercv_sh_port_1_w );
-WRITE8_HANDLER( schasercv_sh_port_2_w );
 
-WRITE8_HANDLER( yosakdon_sh_port_1_w );
-WRITE8_HANDLER( yosakdon_sh_port_2_w );
 
-WRITE8_HANDLER( shuttlei_sh_port_1_w );
-WRITE8_HANDLER( shuttlei_sh_port_2_w );
 
 
 /*----------- defined in video/8080bw.c -----------*/

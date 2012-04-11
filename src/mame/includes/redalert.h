@@ -26,15 +26,17 @@ public:
 	DECLARE_READ8_MEMBER(panther_interrupt_clear_r);
 	DECLARE_READ8_MEMBER(panther_unk_r);
 	DECLARE_WRITE8_MEMBER(redalert_bitmap_videoram_w);
+	DECLARE_WRITE8_MEMBER(redalert_audio_command_w);
+	DECLARE_READ8_MEMBER(redalert_ay8910_latch_1_r);
+	DECLARE_WRITE8_MEMBER(redalert_ay8910_latch_2_w);
+	DECLARE_WRITE8_MEMBER(redalert_voice_command_w);
+	DECLARE_WRITE8_MEMBER(demoneye_audio_command_w);
 };
 
 
 /*----------- defined in audio/redalert.c -----------*/
 
-WRITE8_HANDLER( redalert_audio_command_w );
-WRITE8_HANDLER( redalert_voice_command_w );
 
-WRITE8_HANDLER( demoneye_audio_command_w );
 
 MACHINE_CONFIG_EXTERN( redalert_audio );
 MACHINE_CONFIG_EXTERN( ww3_audio );
