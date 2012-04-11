@@ -37,7 +37,6 @@ public:
 	DECLARE_WRITE8_MEMBER(bosco_latch_w);
 	DECLARE_WRITE8_MEMBER(galaga_videoram_w);
 	DECLARE_WRITE8_MEMBER(gatsbee_bank_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(shifted_port_r);
 };
 
 class xevious_state : public galaga_state
@@ -92,6 +91,7 @@ public:
 	UINT8 m_tx_color_mode;
 	UINT8 m_bg_disable;
 	UINT8 m_bg_color_bank;
+	DECLARE_CUSTOM_INPUT_MEMBER(shifted_port_r);
 };
 
 

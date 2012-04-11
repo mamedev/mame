@@ -777,7 +777,7 @@ WRITE8_MEMBER(galaga_state::bosco_latch_w)
 	}
 }
 
-CUSTOM_INPUT_MEMBER(galaga_state::shifted_port_r){ return input_port_read(machine(), (const char *)param) >> 4; }
+CUSTOM_INPUT_MEMBER(digdug_state::shifted_port_r){ return input_port_read(machine(), (const char *)param) >> 4; }
 
 static WRITE8_DEVICE_HANDLER( out_0 )
 {
@@ -1416,7 +1416,7 @@ static INPUT_PORTS_START( digdug )
 	PORT_DIPSETTING(    0xc0, "5" )
 
 	PORT_START("DSWA_HI")
-	PORT_BIT( 0x0f, 0x00, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, bosco_state,shifted_port_r, "DSWA")
+	PORT_BIT( 0x0f, 0x00, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, digdug_state,shifted_port_r, "DSWA")
 
 	PORT_START("DSWB") // reverse order against SWA
 	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Coin_A ) )           PORT_DIPLOCATION("SWB:1,2")
@@ -1443,7 +1443,7 @@ static INPUT_PORTS_START( digdug )
 	PORT_DIPSETTING(    0x03, DEF_STR( Hardest ) )
 
 	PORT_START("DSWB_HI")
-	PORT_BIT( 0x0f, 0x00, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, bosco_state,shifted_port_r, "DSWB")
+	PORT_BIT( 0x0f, 0x00, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, digdug_state,shifted_port_r, "DSWB")
 INPUT_PORTS_END
 
 /*
