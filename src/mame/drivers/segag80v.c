@@ -377,7 +377,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, segag80v_state )
 	AM_RANGE(0x0000, 0x07ff) AM_ROM		/* CPU board ROM */
 	AM_RANGE(0x0800, 0xbfff) AM_ROM		/* PROM board ROM area */
 	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(mainram_w) AM_BASE(m_mainram)
-	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(vectorram_w) AM_BASE(m_vectorram) AM_SIZE(m_vectorram_size)
+	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(vectorram_w) AM_BASE_SIZE(m_vectorram,m_vectorram_size)
 ADDRESS_MAP_END
 
 

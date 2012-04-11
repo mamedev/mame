@@ -180,7 +180,7 @@ static ADDRESS_MAP_START( fastfred_map, AS_PROGRAM, 8, fastfred_state )
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xd000, 0xd3ff) AM_MIRROR(0x400) AM_RAM_WRITE_LEGACY(fastfred_videoram_w) AM_BASE(m_videoram)
 	AM_RANGE(0xd800, 0xd83f) AM_RAM_WRITE_LEGACY(fastfred_attributes_w) AM_BASE(m_attributesram)
-	AM_RANGE(0xd840, 0xd85f) AM_RAM AM_BASE(m_spriteram) AM_SIZE(m_spriteram_size)
+	AM_RANGE(0xd840, 0xd85f) AM_RAM AM_BASE_SIZE(m_spriteram,m_spriteram_size)
 	AM_RANGE(0xd860, 0xdbff) AM_RAM // Unused, but initialized
 	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("BUTTONS") AM_WRITEONLY AM_BASE(m_background_color)
 	AM_RANGE(0xe800, 0xe800) AM_READ_PORT("JOYS")
@@ -202,7 +202,7 @@ static ADDRESS_MAP_START( jumpcoas_map, AS_PROGRAM, 8, fastfred_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xd000, 0xd03f) AM_RAM_WRITE_LEGACY(fastfred_attributes_w) AM_BASE(m_attributesram)
-	AM_RANGE(0xd040, 0xd05f) AM_RAM AM_BASE(m_spriteram) AM_SIZE(m_spriteram_size)
+	AM_RANGE(0xd040, 0xd05f) AM_RAM AM_BASE_SIZE(m_spriteram,m_spriteram_size)
 	AM_RANGE(0xd060, 0xd3ff) AM_RAM
 	AM_RANGE(0xd800, 0xdbff) AM_MIRROR(0x400) AM_RAM_WRITE_LEGACY(fastfred_videoram_w) AM_BASE(m_videoram)
 	AM_RANGE(0xe000, 0xe000) AM_WRITEONLY AM_BASE(m_background_color)
@@ -235,7 +235,7 @@ static ADDRESS_MAP_START( imago_map, AS_PROGRAM, 8, fastfred_state )
 	AM_RANGE(0xc800, 0xcbff) AM_RAM_WRITE_LEGACY(imago_fg_videoram_w) AM_BASE(m_imago_fg_videoram)
 	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE_LEGACY(fastfred_videoram_w) AM_BASE(m_videoram)
 	AM_RANGE(0xd800, 0xd83f) AM_RAM_WRITE_LEGACY(fastfred_attributes_w) AM_BASE(m_attributesram)
-	AM_RANGE(0xd840, 0xd85f) AM_RAM AM_BASE(m_spriteram) AM_SIZE(m_spriteram_size)
+	AM_RANGE(0xd840, 0xd85f) AM_RAM AM_BASE_SIZE(m_spriteram,m_spriteram_size)
 	AM_RANGE(0xd860, 0xd8ff) AM_RAM // Unused, but initialized
 	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("BUTTONS")
 	AM_RANGE(0xe800, 0xe800) AM_READ_PORT("JOYS")

@@ -1702,7 +1702,7 @@ static void remap_dynamic_addresses(running_machine &machine)
 
 static ADDRESS_MAP_START( vegas_map_8mb, AS_PROGRAM, 32, vegas_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000000, 0x007fffff) AM_RAM AM_BASE(m_rambase) AM_SIZE(m_ramsize)
+	AM_RANGE(0x00000000, 0x007fffff) AM_RAM AM_BASE_SIZE(m_rambase,m_ramsize)
 	AM_RANGE(0x1fa00000, 0x1fa00fff) AM_READWRITE_LEGACY(nile_r, nile_w) AM_BASE(m_nile_regs)
 	AM_RANGE(0x1fc00000, 0x1fc7ffff) AM_ROM AM_REGION("user1", 0) AM_BASE(m_rombase)
 ADDRESS_MAP_END
@@ -1710,7 +1710,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( vegas_map_32mb, AS_PROGRAM, 32, vegas_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000000, 0x01ffffff) AM_RAM AM_BASE(m_rambase) AM_SIZE(m_ramsize)
+	AM_RANGE(0x00000000, 0x01ffffff) AM_RAM AM_BASE_SIZE(m_rambase,m_ramsize)
 	AM_RANGE(0x1fa00000, 0x1fa00fff) AM_READWRITE_LEGACY(nile_r, nile_w) AM_BASE(m_nile_regs)
 	AM_RANGE(0x1fc00000, 0x1fc7ffff) AM_ROM AM_REGION("user1", 0) AM_BASE(m_rombase)
 ADDRESS_MAP_END

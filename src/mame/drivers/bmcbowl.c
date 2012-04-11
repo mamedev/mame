@@ -343,7 +343,7 @@ static ADDRESS_MAP_START( bmcbowl_mem, AS_PROGRAM, 16, bmcbowl_state )
 	AM_RANGE(0x092800, 0x092803) AM_DEVWRITE8_LEGACY("aysnd", ay8910_data_address_w, 0xff00)
 	AM_RANGE(0x092802, 0x092803) AM_DEVREAD8_LEGACY("aysnd", ay8910_r, 0xff00)
 	AM_RANGE(0x093802, 0x093803) AM_READ_PORT("IN0")
-	AM_RANGE(0x095000, 0x095fff) AM_RAM AM_BASE(m_stats_ram) AM_SIZE(m_stats_ram_size) /* 8 bit */
+	AM_RANGE(0x095000, 0x095fff) AM_RAM AM_BASE_SIZE(m_stats_ram,m_stats_ram_size) /* 8 bit */
 	AM_RANGE(0x097000, 0x097001) AM_READNOP
 	AM_RANGE(0x140000, 0x1bffff) AM_ROM
 	AM_RANGE(0x1c0000, 0x1effff) AM_RAM AM_BASE(m_vid1)

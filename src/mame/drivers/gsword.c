@@ -335,7 +335,7 @@ static ADDRESS_MAP_START( cpu1_map, AS_PROGRAM , 8, gsword_state )
 	AM_RANGE(0xa000, 0xa37f) AM_RAM
 	AM_RANGE(0xa380, 0xa3ff) AM_RAM AM_BASE(m_spritetile_ram)
 	AM_RANGE(0xa400, 0xa77f) AM_RAM
-	AM_RANGE(0xa780, 0xa7ff) AM_RAM AM_BASE(m_spritexy_ram) AM_SIZE(m_spritexy_size)
+	AM_RANGE(0xa780, 0xa7ff) AM_RAM AM_BASE_SIZE(m_spritexy_ram,m_spritexy_size)
 	AM_RANGE(0xa980, 0xa980) AM_WRITE(gsword_charbank_w)
 	AM_RANGE(0xaa80, 0xaa80) AM_WRITE(gsword_videoctrl_w)	/* flip screen, char palette bank */
 	AM_RANGE(0xab00, 0xab00) AM_WRITE(gsword_scroll_w)

@@ -1069,7 +1069,7 @@ static SCREEN_UPDATE_IND16(sfbonus)
 
 static ADDRESS_MAP_START( sfbonus_map, AS_PROGRAM, 8, sfbonus_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROMBANK("bank1") AM_WRITE(sfbonus_videoram_w)
-	AM_RANGE(0xf000, 0xffff) AM_RAM AM_BASE(m_nvram) AM_SIZE(m_nvram_size)
+	AM_RANGE(0xf000, 0xffff) AM_RAM AM_BASE_SIZE(m_nvram,m_nvram_size)
 ADDRESS_MAP_END
 
 WRITE8_MEMBER(sfbonus_state::sfbonus_bank_w)

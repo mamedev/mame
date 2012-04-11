@@ -228,7 +228,7 @@ WRITE16_MEMBER(galpanic_state::galpanic_bgvideoram_mirror_w)
 static ADDRESS_MAP_START( galpanic_map, AS_PROGRAM, 16, galpanic_state )
 	AM_RANGE(0x000000, 0x3fffff) AM_ROM
 	AM_RANGE(0x400000, 0x400001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x500000, 0x51ffff) AM_RAM AM_BASE(m_fgvideoram) AM_SIZE(m_fgvideoram_size)
+	AM_RANGE(0x500000, 0x51ffff) AM_RAM AM_BASE_SIZE(m_fgvideoram,m_fgvideoram_size)
 	AM_RANGE(0x520000, 0x53ffff) AM_RAM_WRITE_LEGACY(galpanic_bgvideoram_w) AM_BASE(m_bgvideoram)	/* + work RAM */
 	AM_RANGE(0x600000, 0x6007ff) AM_RAM_WRITE_LEGACY(galpanic_paletteram_w) AM_SHARE("paletteram")	/* 1024 colors, but only 512 seem to be used */
 	AM_RANGE(0x700000, 0x701fff) AM_DEVREADWRITE_LEGACY("pandora", pandora_spriteram_LSB_r, pandora_spriteram_LSB_w)
@@ -263,7 +263,7 @@ static READ8_DEVICE_HANDLER( comad_okim6295_r )
 
 static ADDRESS_MAP_START( comad_map, AS_PROGRAM, 16, galpanic_state )
 	AM_RANGE(0x000000, 0x4fffff) AM_ROM
-	AM_RANGE(0x500000, 0x51ffff) AM_RAM AM_BASE(m_fgvideoram) AM_SIZE(m_fgvideoram_size)
+	AM_RANGE(0x500000, 0x51ffff) AM_RAM AM_BASE_SIZE(m_fgvideoram,m_fgvideoram_size)
 	AM_RANGE(0x520000, 0x53ffff) AM_RAM_WRITE_LEGACY(galpanic_bgvideoram_w) AM_BASE(m_bgvideoram)	/* + work RAM */
 	AM_RANGE(0x600000, 0x6007ff) AM_RAM_WRITE_LEGACY(galpanic_paletteram_w) AM_SHARE("paletteram")	/* 1024 colors, but only 512 seem to be used */
 	AM_RANGE(0x700000, 0x700fff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
@@ -282,7 +282,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fantsia2_map, AS_PROGRAM, 16, galpanic_state )
 	AM_RANGE(0x000000, 0x4fffff) AM_ROM
-	AM_RANGE(0x500000, 0x51ffff) AM_RAM AM_BASE(m_fgvideoram) AM_SIZE(m_fgvideoram_size)
+	AM_RANGE(0x500000, 0x51ffff) AM_RAM AM_BASE_SIZE(m_fgvideoram,m_fgvideoram_size)
 	AM_RANGE(0x520000, 0x53ffff) AM_RAM_WRITE_LEGACY(galpanic_bgvideoram_w) AM_BASE(m_bgvideoram)	/* + work RAM */
 	AM_RANGE(0x600000, 0x6007ff) AM_RAM_WRITE_LEGACY(galpanic_paletteram_w) AM_SHARE("paletteram")	/* 1024 colors, but only 512 seem to be used */
 	AM_RANGE(0x700000, 0x700fff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
@@ -300,7 +300,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( galhustl_map, AS_PROGRAM, 16, galpanic_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-    AM_RANGE(0x500000, 0x51ffff) AM_RAM AM_BASE(m_fgvideoram) AM_SIZE(m_fgvideoram_size)
+    AM_RANGE(0x500000, 0x51ffff) AM_RAM AM_BASE_SIZE(m_fgvideoram,m_fgvideoram_size)
 	AM_RANGE(0x520000, 0x53ffff) AM_WRITE_LEGACY(galpanic_bgvideoram_w) AM_BASE(m_bgvideoram)
 	AM_RANGE(0x580000, 0x583fff) AM_RAM_WRITE(galpanic_bgvideoram_mirror_w)
 	AM_RANGE(0x600000, 0x6007ff) AM_RAM_WRITE_LEGACY(galpanic_paletteram_w) AM_SHARE("paletteram")	/* 1024 colors, but only 512 seem to be used */
@@ -326,7 +326,7 @@ READ16_MEMBER(galpanic_state::zipzap_random_read)
 
 static ADDRESS_MAP_START( zipzap_map, AS_PROGRAM, 16, galpanic_state )
 	AM_RANGE(0x000000, 0x4fffff) AM_ROM
-	AM_RANGE(0x500000, 0x51ffff) AM_RAM AM_BASE(m_fgvideoram) AM_SIZE(m_fgvideoram_size)
+	AM_RANGE(0x500000, 0x51ffff) AM_RAM AM_BASE_SIZE(m_fgvideoram,m_fgvideoram_size)
 	AM_RANGE(0x520000, 0x53ffff) AM_RAM_WRITE_LEGACY(galpanic_bgvideoram_w) AM_BASE(m_bgvideoram)
 	AM_RANGE(0x580000, 0x583fff) AM_RAM_WRITE(galpanic_bgvideoram_mirror_w)
 	AM_RANGE(0x600000, 0x600fff) AM_RAM_WRITE_LEGACY(galpanic_paletteram_w) AM_SHARE("paletteram")	/* 1024 colors, but only 512 seem to be used */
@@ -347,7 +347,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( supmodel_map, AS_PROGRAM, 16, galpanic_state )
 	AM_RANGE(0x000000, 0x4fffff) AM_ROM
-	AM_RANGE(0x500000, 0x51ffff) AM_RAM AM_BASE(m_fgvideoram) AM_SIZE(m_fgvideoram_size)
+	AM_RANGE(0x500000, 0x51ffff) AM_RAM AM_BASE_SIZE(m_fgvideoram,m_fgvideoram_size)
 	AM_RANGE(0x520000, 0x53ffff) AM_RAM_WRITE_LEGACY(galpanic_bgvideoram_w) AM_BASE(m_bgvideoram)
 //  AM_RANGE(0x580000, 0x583fff) AM_RAM_WRITE(galpanic_bgvideoram_mirror_w) // can't be right, causes half the display to vanish at times!
 	AM_RANGE(0x600000, 0x600fff) AM_RAM_WRITE_LEGACY(galpanic_paletteram_w) AM_SHARE("paletteram")	/* 1024 colors, but only 512 seem to be used */

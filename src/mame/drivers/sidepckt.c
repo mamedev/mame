@@ -226,11 +226,11 @@ WRITE8_MEMBER(sidepckt_state::sidepctj_i8751_w)
 
 static ADDRESS_MAP_START( sidepckt_map, AS_PROGRAM, 8, sidepckt_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
-	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(sidepckt_videoram_w) AM_BASE(m_videoram) AM_SIZE(m_videoram_size)
+	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(sidepckt_videoram_w) AM_BASE_SIZE(m_videoram,m_videoram_size)
 	AM_RANGE(0x1400, 0x17ff) AM_RAM // ???
 	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE(sidepckt_colorram_w) AM_BASE(m_colorram)
 	AM_RANGE(0x1c00, 0x1fff) AM_RAM // ???
-	AM_RANGE(0x2000, 0x20ff) AM_RAM AM_BASE(m_spriteram) AM_SIZE(m_spriteram_size)
+	AM_RANGE(0x2000, 0x20ff) AM_RAM AM_BASE_SIZE(m_spriteram,m_spriteram_size)
 	AM_RANGE(0x2100, 0x24ff) AM_RAM // ???
 	AM_RANGE(0x3000, 0x3000) AM_READ_PORT("P1")
 	AM_RANGE(0x3001, 0x3001) AM_READ_PORT("P2")

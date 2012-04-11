@@ -184,7 +184,7 @@ static WRITE8_DEVICE_HANDLER( wldarrow_dac_4_w )
 static ADDRESS_MAP_START( wldarrow_map, AS_PROGRAM, 8, wldarrow_state )
 	AM_RANGE(0x0000, 0x37ff) AM_ROM
 	AM_RANGE(0x3800, 0x3800) AM_READ_PORT("IN0")
-	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_BASE(m_videoram_0) AM_SIZE(m_videoram_size)
+	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_BASE_SIZE(m_videoram_0,m_videoram_size)
 	AM_RANGE(0x6000, 0x7fff) AM_RAM AM_BASE(m_videoram_1)
 	AM_RANGE(0x8000, 0x9fff) AM_RAM AM_BASE(m_videoram_2)
 	AM_RANGE(0xcd00, 0xcdff) AM_RAM AM_SHARE("nvram")

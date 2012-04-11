@@ -413,8 +413,8 @@ static ADDRESS_MAP_START( galaxold_map, AS_PROGRAM, 8, galaxold_state )
 	AM_RANGE(0x5000, 0x53ff) AM_RAM_WRITE(galaxold_videoram_w) AM_BASE(m_videoram)
 	AM_RANGE(0x5400, 0x57ff) AM_READ(galaxold_videoram_r)
 	AM_RANGE(0x5800, 0x583f) AM_RAM_WRITE(galaxold_attributesram_w) AM_BASE(m_attributesram)
-	AM_RANGE(0x5840, 0x585f) AM_RAM AM_BASE(m_spriteram) AM_SIZE(m_spriteram_size)
-	AM_RANGE(0x5860, 0x587f) AM_RAM AM_BASE(m_bulletsram) AM_SIZE(m_bulletsram_size)
+	AM_RANGE(0x5840, 0x585f) AM_RAM AM_BASE_SIZE(m_spriteram,m_spriteram_size)
+	AM_RANGE(0x5860, 0x587f) AM_RAM AM_BASE_SIZE(m_bulletsram,m_bulletsram_size)
 	AM_RANGE(0x5880, 0x58ff) AM_RAM
 	AM_RANGE(0x6000, 0x6000) AM_READ_PORT("IN0")
 	AM_RANGE(0x6000, 0x6001) AM_WRITE(galaxold_leds_w)
@@ -443,8 +443,8 @@ static ADDRESS_MAP_START( mooncrst_map, AS_PROGRAM, 8, galaxold_state )
 	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(galaxold_videoram_w) AM_BASE(m_videoram)
 	AM_RANGE(0x9400, 0x97ff) AM_READ(galaxold_videoram_r)
 	AM_RANGE(0x9800, 0x983f) AM_RAM_WRITE(galaxold_attributesram_w) AM_BASE(m_attributesram)
-	AM_RANGE(0x9840, 0x985f) AM_RAM AM_BASE(m_spriteram) AM_SIZE(m_spriteram_size)
-	AM_RANGE(0x9860, 0x987f) AM_RAM AM_BASE(m_bulletsram) AM_SIZE(m_bulletsram_size)
+	AM_RANGE(0x9840, 0x985f) AM_RAM AM_BASE_SIZE(m_spriteram,m_spriteram_size)
+	AM_RANGE(0x9860, 0x987f) AM_RAM AM_BASE_SIZE(m_bulletsram,m_bulletsram_size)
 	AM_RANGE(0x9880, 0x98ff) AM_RAM
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("IN0")
 	AM_RANGE(0xa003, 0xa003) AM_WRITE(galaxold_coin_counter_w)
@@ -475,8 +475,8 @@ static ADDRESS_MAP_START( rockclim_map, AS_PROGRAM, 8, galaxold_state )
 	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(galaxold_videoram_w) AM_BASE(m_videoram)
 	AM_RANGE(0x9400, 0x97ff) AM_READ(galaxold_videoram_r)
 	AM_RANGE(0x9800, 0x983f) AM_RAM_WRITE(galaxold_attributesram_w) AM_BASE(m_attributesram)
-	AM_RANGE(0x9840, 0x985f) AM_RAM AM_BASE(m_spriteram) AM_SIZE(m_spriteram_size)
-	AM_RANGE(0x9860, 0x987f) AM_RAM AM_BASE(m_bulletsram) AM_SIZE(m_bulletsram_size)
+	AM_RANGE(0x9840, 0x985f) AM_RAM AM_BASE_SIZE(m_spriteram,m_spriteram_size)
+	AM_RANGE(0x9860, 0x987f) AM_RAM AM_BASE_SIZE(m_bulletsram,m_bulletsram_size)
 	AM_RANGE(0x9880, 0x98ff) AM_RAM
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("IN0")
 	AM_RANGE(0xa000, 0xa002) AM_WRITE(galaxold_gfxbank_w)// a002 - sprite bank
@@ -500,8 +500,8 @@ static ADDRESS_MAP_START( ckongg_map, AS_PROGRAM, 8, galaxold_state )
 	AM_RANGE(0x6000, 0x6fff) AM_RAM
 	AM_RANGE(0x9000, 0x93ff) AM_READWRITE(galaxold_videoram_r, galaxold_videoram_w) AM_BASE(m_videoram)
 	AM_RANGE(0x9800, 0x983f) AM_RAM_WRITE(galaxold_attributesram_w) AM_BASE(m_attributesram)
-	AM_RANGE(0x9840, 0x985f) AM_RAM AM_BASE(m_spriteram) AM_SIZE(m_spriteram_size)
-	AM_RANGE(0x9860, 0x987f) AM_RAM AM_BASE(m_bulletsram) AM_SIZE(m_bulletsram_size)
+	AM_RANGE(0x9840, 0x985f) AM_RAM AM_BASE_SIZE(m_spriteram,m_spriteram_size)
+	AM_RANGE(0x9860, 0x987f) AM_RAM AM_BASE_SIZE(m_bulletsram,m_bulletsram_size)
 	AM_RANGE(0x9880, 0x98ff) AM_RAM
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("IN0")
 	AM_RANGE(0xc000, 0xc001) AM_WRITE(galaxold_leds_w)
@@ -527,8 +527,8 @@ static ADDRESS_MAP_START( ckongmc_map, AS_PROGRAM, 8, galaxold_state )
 	AM_RANGE(0x6000, 0x6fff) AM_RAM
 	AM_RANGE(0x9000, 0x93ff) AM_READWRITE(galaxold_videoram_r, galaxold_videoram_w) AM_BASE(m_videoram)
 	AM_RANGE(0x9800, 0x983f) AM_RAM_WRITE(galaxold_attributesram_w) AM_BASE(m_attributesram)
-	AM_RANGE(0x9840, 0x985f) AM_RAM AM_BASE(m_spriteram) AM_SIZE(m_spriteram_size)
-	AM_RANGE(0x9860, 0x987f) AM_RAM AM_BASE(m_bulletsram) AM_SIZE(m_bulletsram_size)
+	AM_RANGE(0x9840, 0x985f) AM_RAM AM_BASE_SIZE(m_spriteram,m_spriteram_size)
+	AM_RANGE(0x9860, 0x987f) AM_RAM AM_BASE_SIZE(m_bulletsram,m_bulletsram_size)
 	AM_RANGE(0x9880, 0x98ff) AM_RAM
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("IN0")
 	AM_RANGE(0xa001, 0xa002) AM_WRITE(galaxold_leds_w)                                              /* GUESS */
@@ -554,8 +554,8 @@ static ADDRESS_MAP_START( scramblb_map, AS_PROGRAM, 8, galaxold_state )
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
 	AM_RANGE(0x4800, 0x4bff) AM_RAM_WRITE(galaxold_videoram_w) AM_BASE(m_videoram)
 	AM_RANGE(0x5000, 0x503f) AM_RAM_WRITE(galaxold_attributesram_w) AM_BASE(m_attributesram)
-	AM_RANGE(0x5040, 0x505f) AM_RAM AM_BASE(m_spriteram) AM_SIZE(m_spriteram_size)
-	AM_RANGE(0x5060, 0x507f) AM_RAM AM_BASE(m_bulletsram) AM_SIZE(m_bulletsram_size)
+	AM_RANGE(0x5040, 0x505f) AM_RAM AM_BASE_SIZE(m_spriteram,m_spriteram_size)
+	AM_RANGE(0x5060, 0x507f) AM_RAM AM_BASE_SIZE(m_bulletsram,m_bulletsram_size)
 	AM_RANGE(0x5080, 0x50ff) AM_RAM
 	AM_RANGE(0x6000, 0x6000) AM_READ_PORT("IN0")
 	AM_RANGE(0x6000, 0x6001) AM_WRITENOP  /* sound triggers */
@@ -590,8 +590,8 @@ static ADDRESS_MAP_START( scramb2_map, AS_PROGRAM, 8, galaxold_state )
 	AM_RANGE(0x4800, 0x4bff) AM_RAM_WRITE(galaxold_videoram_w) AM_BASE(m_videoram)
 	AM_RANGE(0x4c00, 0x4fff) AM_WRITE(galaxold_videoram_w) // mirror
 	AM_RANGE(0x5000, 0x503f) AM_RAM_WRITE(galaxold_attributesram_w) AM_BASE(m_attributesram)
-	AM_RANGE(0x5040, 0x505f) AM_RAM AM_BASE(m_spriteram) AM_SIZE(m_spriteram_size)
-	AM_RANGE(0x5060, 0x507f) AM_RAM AM_BASE(m_bulletsram) AM_SIZE(m_bulletsram_size)
+	AM_RANGE(0x5040, 0x505f) AM_RAM AM_BASE_SIZE(m_spriteram,m_spriteram_size)
+	AM_RANGE(0x5060, 0x507f) AM_RAM AM_BASE_SIZE(m_bulletsram,m_bulletsram_size)
 	AM_RANGE(0x5080, 0x50ff) AM_RAM
 	AM_RANGE(0x5800, 0x5fff) AM_READ(scramb2_protection_r) // must return 0x25
 	AM_RANGE(0x6000, 0x6007) AM_READ(scramb2_port0_r) // reads from 8 addresses, 1 bit per address
@@ -615,8 +615,8 @@ static ADDRESS_MAP_START( _4in1_map, AS_PROGRAM, 8, galaxold_state )
 	AM_RANGE(0x5000, 0x53ff) AM_RAM_WRITE(galaxold_videoram_w) AM_BASE(m_videoram)
 	AM_RANGE(0x5400, 0x57ff) AM_READ(galaxold_videoram_r)
 	AM_RANGE(0x5800, 0x583f) AM_RAM_WRITE(galaxold_attributesram_w) AM_BASE(m_attributesram)
-	AM_RANGE(0x5840, 0x585f) AM_RAM AM_BASE(m_spriteram) AM_SIZE(m_spriteram_size)
-	AM_RANGE(0x5860, 0x587f) AM_RAM AM_BASE(m_bulletsram) AM_SIZE(m_bulletsram_size)
+	AM_RANGE(0x5840, 0x585f) AM_RAM AM_BASE_SIZE(m_spriteram,m_spriteram_size)
+	AM_RANGE(0x5860, 0x587f) AM_RAM AM_BASE_SIZE(m_bulletsram,m_bulletsram_size)
 	AM_RANGE(0x5880, 0x58ff) AM_RAM
 	AM_RANGE(0x6000, 0x6000) AM_READ_PORT("IN0")
 	AM_RANGE(0x6000, 0x6001) AM_WRITE(galaxold_leds_w)
@@ -646,8 +646,8 @@ static ADDRESS_MAP_START( bagmanmc_map, AS_PROGRAM, 8, galaxold_state )
 	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(galaxold_videoram_w) AM_BASE(m_videoram)
 	AM_RANGE(0x9400, 0x97ff) AM_READ(galaxold_videoram_r)
 	AM_RANGE(0x9800, 0x983f) AM_RAM_WRITE(galaxold_attributesram_w) AM_BASE(m_attributesram)
-	AM_RANGE(0x9840, 0x985f) AM_RAM AM_BASE(m_spriteram) AM_SIZE(m_spriteram_size)
-	AM_RANGE(0x9860, 0x987f) AM_RAM AM_BASE(m_bulletsram) AM_SIZE(m_bulletsram_size)
+	AM_RANGE(0x9840, 0x985f) AM_RAM AM_BASE_SIZE(m_spriteram,m_spriteram_size)
+	AM_RANGE(0x9860, 0x987f) AM_RAM AM_BASE_SIZE(m_bulletsram,m_bulletsram_size)
 	AM_RANGE(0x9880, 0x98ff) AM_RAM
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("IN0")
 	AM_RANGE(0xa003, 0xa003) AM_WRITE(galaxold_coin_counter_w)
@@ -667,8 +667,8 @@ static ADDRESS_MAP_START( dkongjrm_map, AS_PROGRAM, 8, galaxold_state )
 	AM_RANGE(0x7000, 0x7fff) AM_ROM
 	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(galaxold_videoram_w) AM_BASE(m_videoram)
 	AM_RANGE(0x9800, 0x983f) AM_WRITE(galaxold_attributesram_w) AM_BASE(m_attributesram)
-	AM_RANGE(0x9840, 0x987f) AM_WRITEONLY AM_BASE(m_spriteram) AM_SIZE(m_spriteram_size)
-	AM_RANGE(0x98c0, 0x98ff) AM_WRITEONLY AM_BASE(m_spriteram2) AM_SIZE(m_spriteram2_size)
+	AM_RANGE(0x9840, 0x987f) AM_WRITEONLY AM_BASE_SIZE(m_spriteram,m_spriteram_size)
+	AM_RANGE(0x98c0, 0x98ff) AM_WRITEONLY AM_BASE_SIZE(m_spriteram2,m_spriteram2_size)
 	AM_RANGE(0xa000, 0xa0ff) AM_READ_PORT("IN0")
 	AM_RANGE(0xa003, 0xa003) AM_WRITE(galaxold_coin_counter_w)
   //AM_RANGE(0xa004, 0xa007) AM_WRITE_LEGACY(galaxian_lfo_freq_w)
@@ -692,8 +692,8 @@ static ADDRESS_MAP_START( tazzmang, AS_PROGRAM, 8, galaxold_state )
 	AM_RANGE(0x7000, 0x7000) AM_READ_PORT("DSW0") /* mirror */
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x8800, 0x883f) AM_RAM_WRITE(galaxold_attributesram_w) AM_BASE(m_attributesram)
-	AM_RANGE(0x8840, 0x885f) AM_RAM AM_BASE(m_spriteram) AM_SIZE(m_spriteram_size)
-	AM_RANGE(0x8860, 0x887f) AM_RAM AM_BASE(m_bulletsram) AM_SIZE(m_bulletsram_size)
+	AM_RANGE(0x8840, 0x885f) AM_RAM AM_BASE_SIZE(m_spriteram,m_spriteram_size)
+	AM_RANGE(0x8860, 0x887f) AM_RAM AM_BASE_SIZE(m_bulletsram,m_bulletsram_size)
 	AM_RANGE(0x8880, 0x8bff) AM_WRITENOP
 	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(galaxold_videoram_w) AM_BASE(m_videoram)
 	AM_RANGE(0x9800, 0x9800) AM_READ(watchdog_reset_r)
@@ -719,8 +719,8 @@ static ADDRESS_MAP_START( bongo, AS_PROGRAM, 8, galaxold_state )
 	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(galaxold_videoram_w) AM_BASE(m_videoram)
 	AM_RANGE(0x9400, 0x97ff) AM_WRITENOP // not used
 	AM_RANGE(0x9800, 0x983f) AM_RAM_WRITE(galaxold_attributesram_w) AM_BASE(m_attributesram)
-	AM_RANGE(0x9840, 0x985f) AM_RAM AM_BASE(m_spriteram) AM_SIZE(m_spriteram_size)
-	AM_RANGE(0x9860, 0x987f) AM_RAM AM_BASE(m_bulletsram) AM_SIZE(m_bulletsram_size)
+	AM_RANGE(0x9840, 0x985f) AM_RAM AM_BASE_SIZE(m_spriteram,m_spriteram_size)
+	AM_RANGE(0x9860, 0x987f) AM_RAM AM_BASE_SIZE(m_bulletsram,m_bulletsram_size)
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("IN0")
 	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("IN1")
 	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("DSW0")
@@ -745,7 +745,7 @@ static ADDRESS_MAP_START( ozon1_map, AS_PROGRAM, 8, galaxold_state )
 	AM_RANGE(0x4800, 0x4bff) AM_READWRITE(galaxold_videoram_r, galaxold_videoram_w) AM_BASE(m_videoram)
 	AM_RANGE(0x4c00, 0x4fff) AM_WRITE(galaxold_videoram_w)
 	AM_RANGE(0x5000, 0x503f) AM_RAM_WRITE(galaxold_attributesram_w) AM_BASE(m_attributesram)
-	AM_RANGE(0x5040, 0x505f) AM_RAM AM_BASE(m_spriteram) AM_SIZE(m_spriteram_size)
+	AM_RANGE(0x5040, 0x505f) AM_RAM AM_BASE_SIZE(m_spriteram,m_spriteram_size)
 	AM_RANGE(0x6801, 0x6801) AM_WRITENOP //continuosly 0 and 1
 	AM_RANGE(0x6802, 0x6802) AM_WRITE(galaxold_coin_counter_w)
 	AM_RANGE(0x6806, 0x6806) AM_WRITE(galaxold_flip_screen_x_w)
@@ -781,7 +781,7 @@ static ADDRESS_MAP_START( harem_cpu1, AS_PROGRAM, 8, galaxold_state )
 	AM_RANGE(0x6103, 0x6103) AM_WRITENOP
 	AM_RANGE(0x6200, 0x6203) AM_WRITENOP AM_BASE(m_attributesram)
 	AM_RANGE(0x8000, 0x9fff) AM_ROM
-	AM_RANGE(0xffe6, 0xffff) AM_RAM AM_BASE(m_spriteram) AM_SIZE(m_spriteram_size)
+	AM_RANGE(0xffe6, 0xffff) AM_RAM AM_BASE_SIZE(m_spriteram,m_spriteram_size)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( harem_cpu2, AS_PROGRAM, 8, galaxold_state )
@@ -804,7 +804,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( hunchbkg, AS_PROGRAM, 8, galaxold_state )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x1480, 0x14bf) AM_MIRROR(0x6000) AM_RAM_WRITE(galaxold_attributesram_w) AM_BASE(m_attributesram)
-	AM_RANGE(0x14c0, 0x14ff) AM_MIRROR(0x6000) AM_WRITEONLY AM_BASE(m_spriteram) AM_SIZE(m_spriteram_size)
+	AM_RANGE(0x14c0, 0x14ff) AM_MIRROR(0x6000) AM_WRITEONLY AM_BASE_SIZE(m_spriteram,m_spriteram_size)
 	AM_RANGE(0x1500, 0x1500) AM_MIRROR(0x6000) AM_READ_PORT("IN0")
 	AM_RANGE(0x1500, 0x1501) AM_MIRROR(0x6000) AM_WRITE(galaxold_leds_w)			/* not connected ... */
 	AM_RANGE(0x1502, 0x1502) AM_MIRROR(0x6000) AM_WRITE(galaxold_coin_lockout_w)	/* not connected ... */
@@ -839,7 +839,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( drivfrcg, AS_PROGRAM, 8, galaxold_state )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x1480, 0x14bf) AM_MIRROR(0x6000) AM_WRITE(galaxold_attributesram_w) AM_BASE(m_attributesram)
-	AM_RANGE(0x14c0, 0x14ff) AM_MIRROR(0x6000) AM_WRITEONLY AM_BASE(m_spriteram) AM_SIZE(m_spriteram_size)
+	AM_RANGE(0x14c0, 0x14ff) AM_MIRROR(0x6000) AM_WRITEONLY AM_BASE_SIZE(m_spriteram,m_spriteram_size)
 	AM_RANGE(0x1500, 0x1500) AM_MIRROR(0x6000) AM_READ_PORT("IN0")
 	AM_RANGE(0x1503, 0x1503) AM_MIRROR(0x6000) AM_WRITE(galaxold_coin_counter_w)
 	AM_RANGE(0x1580, 0x1580) AM_MIRROR(0x6000) AM_READ_PORT("IN1")
@@ -867,7 +867,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( racknrol, AS_PROGRAM, 8, galaxold_state )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x1400, 0x143f) AM_MIRROR(0x6000) AM_RAM_WRITE(galaxold_attributesram_w) AM_BASE(m_attributesram)
-	AM_RANGE(0x1440, 0x14bf) AM_MIRROR(0x6000) AM_RAM AM_BASE(m_spriteram) AM_SIZE(m_spriteram_size)
+	AM_RANGE(0x1440, 0x14bf) AM_MIRROR(0x6000) AM_RAM AM_BASE_SIZE(m_spriteram,m_spriteram_size)
 	AM_RANGE(0x14c0, 0x14ff) AM_MIRROR(0x6000) AM_RAM
 	AM_RANGE(0x1500, 0x1500) AM_MIRROR(0x6000) AM_READ_PORT("IN0")
 	AM_RANGE(0x1580, 0x1580) AM_MIRROR(0x6000) AM_READ_PORT("IN1")

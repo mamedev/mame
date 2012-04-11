@@ -556,7 +556,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( wecleman_sub_map, AS_PROGRAM, 16, wecleman_state )
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM	// ROM
-	AM_RANGE(0x060000, 0x060fff) AM_RAM AM_BASE(m_roadram) AM_SIZE(m_roadram_size)	// Road
+	AM_RANGE(0x060000, 0x060fff) AM_RAM AM_BASE_SIZE(m_roadram,m_roadram_size)	// Road
 	AM_RANGE(0x070000, 0x073fff) AM_RAM AM_SHARE("share1")	// RAM (Shared with main CPU)
 ADDRESS_MAP_END
 
@@ -567,7 +567,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hotchase_sub_map, AS_PROGRAM, 16, wecleman_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM	// ROM
-	AM_RANGE(0x020000, 0x020fff) AM_RAM AM_BASE(m_roadram) AM_SIZE(m_roadram_size)	// Road
+	AM_RANGE(0x020000, 0x020fff) AM_RAM AM_BASE_SIZE(m_roadram,m_roadram_size)	// Road
 	AM_RANGE(0x040000, 0x043fff) AM_RAM AM_SHARE("share1") // Shared with main CPU
 	AM_RANGE(0x060000, 0x060fff) AM_RAM // a table, presumably road related
 	AM_RANGE(0x061000, 0x06101f) AM_RAM // road vregs?
