@@ -53,7 +53,6 @@ public:
 
 	/* video */
 	required_shared_ptr<UINT8> m_dai3wksi_videoram;
-//OBRISI.ME
 	int         m_dai3wksi_flipscreen;
 	int         m_dai3wksi_redscreen;
 	int         m_dai3wksi_redterop;

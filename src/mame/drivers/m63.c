@@ -137,7 +137,6 @@ public:
 	required_shared_ptr<UINT8> m_videoram2;
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_colorram;
-//OBRISI.ME
 
 	UINT8    m_nmi_mask;
 

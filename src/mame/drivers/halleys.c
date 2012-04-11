@@ -229,8 +229,6 @@ public:
 	UINT8 *m_gfx1_base;
 	required_shared_ptr<UINT8> m_blitter_ram;
 	required_shared_ptr<UINT8> m_io_ram;
-//OBRISI.ME
-//OBRISI.ME
 	int m_game_id;
 	int m_blitter_busy;
 	int m_collision_count;

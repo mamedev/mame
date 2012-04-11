@@ -44,7 +44,6 @@ public:
 	required_shared_ptr<UINT8> m_videoram_0;
 	required_shared_ptr<UINT8> m_videoram_1;
 	required_shared_ptr<UINT8> m_videoram_2;
-//OBRISI.ME
 	DECLARE_WRITE8_MEMBER(lights_1_w);
 	DECLARE_WRITE8_MEMBER(lights_2_w);
 	DECLARE_WRITE8_MEMBER(counter_w);

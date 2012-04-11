@@ -59,7 +59,6 @@ public:
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_cfb_ram;
-//OBRISI.ME
 
 	/* video-related */
 	bitmap_ind16 m_tmpbitmaps[4];

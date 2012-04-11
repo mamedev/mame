@@ -23,7 +23,6 @@ public:
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_videoram;
-//OBRISI.ME
 };
 
 /*************************************

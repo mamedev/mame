@@ -71,8 +71,6 @@ public:
 	required_shared_ptr<UINT8> m_spriteram;
 	required_shared_ptr<UINT8> m_spriteram2;
 //  UINT8 *  m_paletteram;    // currently this uses generic palette handling
-//OBRISI.ME
-//OBRISI.ME
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;

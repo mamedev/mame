@@ -39,7 +39,6 @@ public:
 	required_shared_ptr<UINT16> m_pf1_rowscroll;
 	required_shared_ptr<UINT16> m_pf2_rowscroll;
 	required_shared_ptr<UINT16> m_spriteram;
-//OBRISI.ME
 
 	/* protection */
 	UINT16 m_008_data;

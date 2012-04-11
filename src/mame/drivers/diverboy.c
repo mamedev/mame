@@ -63,7 +63,6 @@ public:
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_spriteram;
 //  UINT16 *  m_paletteram;   // currently this uses generic palette handling
-//OBRISI.ME
 
 	/* devices */
 	device_t *m_audiocpu;

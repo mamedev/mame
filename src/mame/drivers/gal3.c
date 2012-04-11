@@ -144,7 +144,6 @@ public:
 	UINT32 *m_mpSharedRAM0;
 	//UINT32 *m_mpSharedRAM1;
 	required_shared_ptr<UINT32> m_nvmem;
-//OBRISI.ME
 	UINT16 m_namcos21_video_enable;
 	required_shared_ptr<UINT16> m_rsoSharedRAM;
 	UINT32 m_led_mst;

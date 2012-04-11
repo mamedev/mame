@@ -120,7 +120,6 @@ public:
 	required_shared_ptr<UINT16> m_vid1;
 	required_shared_ptr<UINT16> m_vid2;
 	UINT8 *m_bmc_colorram;
-//OBRISI.ME
 	int m_clr_offset;
 	int m_bmc_input;
 	DECLARE_READ16_MEMBER(bmc_random_read);

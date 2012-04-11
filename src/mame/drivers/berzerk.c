@@ -26,7 +26,6 @@ public:
 		m_colorram(*this, "colorram"){ }
 
 	required_shared_ptr<UINT8> m_videoram;
-//OBRISI.ME
 	required_shared_ptr<UINT8> m_colorram;
 	UINT8 m_magicram_control;
 	UINT8 m_last_shift_data;

@@ -78,7 +78,6 @@ public:
 	required_shared_ptr<UINT8> m_spriteram;
 	required_shared_ptr<UINT8> m_bgram;
 //  UINT8 *  m_paletteram;    // currently this uses generic palette handling
-//OBRISI.ME
 
 	/* input-related */
 	//UINT8 m_paddle_select;

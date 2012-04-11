@@ -103,7 +103,6 @@ public:
 	int m_coin_stat;
 	int m_counter;
 	required_shared_ptr<UINT8> m_spriteram;
-//OBRISI.ME
 	DECLARE_WRITE8_MEMBER(cshooter_txram_w);
 	DECLARE_READ8_MEMBER(cshooter_coin_r);
 	DECLARE_WRITE8_MEMBER(cshooter_c500_w);

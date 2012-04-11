@@ -65,7 +65,6 @@ public:
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_videoram;
-//OBRISI.ME
 
 	/* misc */
 	emu_timer  *m_interrupt_timer;

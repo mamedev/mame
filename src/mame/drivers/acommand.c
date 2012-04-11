@@ -81,7 +81,6 @@ public:
 	UINT16 m_led1;
 	UINT16 m_ufo_sw1;
 	UINT16 m_ufo_sw2;
-//OBRISI.ME
 	DECLARE_WRITE16_MEMBER(ac_bgvram_w);
 	DECLARE_WRITE16_MEMBER(ac_txvram_w);
 	DECLARE_WRITE16_MEMBER(ac_bgscroll_w);

@@ -50,7 +50,6 @@ public:
 
 	UINT8 *    m_colorram;
 	required_shared_ptr<UINT8> m_videoram;
-//OBRISI.ME
 
 	emu_timer  *m_int_timer;
 	UINT8      m_sound_state[2];

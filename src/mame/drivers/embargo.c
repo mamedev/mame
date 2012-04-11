@@ -17,7 +17,6 @@ public:
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_videoram;
-//OBRISI.ME
 
 	/* misc */
 	UINT8    m_dial_enable_1;

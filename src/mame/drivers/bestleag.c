@@ -42,7 +42,6 @@ public:
 	tilemap_t *m_tx_tilemap;
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
-//OBRISI.ME
 	DECLARE_WRITE16_MEMBER(bestleag_txram_w);
 	DECLARE_WRITE16_MEMBER(bestleag_bgram_w);
 	DECLARE_WRITE16_MEMBER(bestleag_fgram_w);

@@ -98,7 +98,6 @@ public:
 	int m_nmi_main;
 	int m_nmi_sub;
 	required_shared_ptr<UINT8> m_spriteram;
-//OBRISI.ME
 	DECLARE_WRITE8_MEMBER(pturn_videoram_w);
 	DECLARE_WRITE8_MEMBER(nmi_main_enable_w);
 	DECLARE_WRITE8_MEMBER(nmi_sub_enable_w);

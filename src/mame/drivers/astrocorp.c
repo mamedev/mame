@@ -47,7 +47,6 @@ public:
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_spriteram;
 	required_shared_ptr<UINT16> m_paletteram;
-//OBRISI.ME
 
 	/* video-related */
 	bitmap_ind16 m_bitmap;
