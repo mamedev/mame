@@ -115,6 +115,7 @@ private:
 	int m_c;					// command
 	int m_clk;					// shift clock
 	int m_tp;					// time pulse
+    int m_c_unlatched;          // command waiting for STB
 
 	// timers
 	emu_timer *m_timer_clock;
