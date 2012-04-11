@@ -103,7 +103,7 @@ static SCREEN_UPDATE_IND16(murogmbl)
 	{
 		for (x = 0; x < 32; x++)
 		{
-			int tile = state->m_video[count];
+			int tile = state->m_video.target()[count];
 			drawgfx_opaque(bitmap, cliprect, gfx, tile, 0, 0, 0, x * 8, y * 8);
 
 			count++;

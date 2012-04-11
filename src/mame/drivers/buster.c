@@ -41,7 +41,7 @@ static SCREEN_UPDATE_IND16(buster)
 	{
 		for (x=0;x<32;x++)
 		{
-			int tile = (state->m_vram[count+1])|(state->m_vram[count]<<8);
+			int tile = (state->m_vram.target()[count+1])|(state->m_vram.target()[count]<<8);
 			//int colour = tile>>12;
 			drawgfx_opaque(bitmap,cliprect,gfx,tile,0,0,0,x*8,y*4);
 

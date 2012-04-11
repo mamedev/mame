@@ -126,7 +126,7 @@ WRITE8_MEMBER(astinvad_state::color_latch_w)
 
 WRITE8_MEMBER(astinvad_state::spaceint_videoram_w)
 {
-	m_videoram[offset] = data;
+	m_videoram.target()[offset] = data;
 	m_colorram[offset] = m_color_latch;
 }
 
@@ -167,7 +167,7 @@ static SCREEN_UPDATE_RGB32( astinvad )
 		for (x = cliprect.min_x & ~7; x <= cliprect.max_x; x += 8)
 		{
 			UINT8 color = color_prom[((y & 0xf8) << 2) | (x >> 3)] >> (state->m_screen_flip ? 0 : 4);
-			UINT8 data = state->m_videoram[(((y ^ state->m_screen_flip) + yoffs) << 5) | ((x ^ state->m_screen_flip) >> 3)];
+			UINT8 data = state->m_videoram.target()[(((y ^ state->m_screen_flip) + yoffs) << 5) | ((x ^ state->m_screen_flip) >> 3)];
 			plot_byte(screen.machine(), bitmap, y, x, data, state->m_screen_red ? 1 : color);
 		}
 
@@ -183,7 +183,7 @@ static SCREEN_UPDATE_RGB32( spaceint )
 
 	for (offs = 0; offs < state->m_videoram.bytes(); offs++)
 	{
-		UINT8 data = state->m_videoram[offs];
+		UINT8 data = state->m_videoram.target()[offs];
 		UINT8 color = state->m_colorram[offs];
 
 		UINT8 y = ~offs;

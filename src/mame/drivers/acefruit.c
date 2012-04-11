@@ -49,7 +49,7 @@ static void acefruit_update_irq(running_machine &machine, int vpos )
 	for( col = 0; col < 32; col++ )
 	{
 		int tile_index = ( col * 32 ) + row;
-		int color = state->m_colorram[ tile_index ];
+		int color = state->m_colorram.target()[ tile_index ];
 
 		switch( color )
 		{
@@ -104,8 +104,8 @@ static SCREEN_UPDATE_IND16( acefruit )
 		for( col = 0; col < 32; col++ )
 		{
 			int tile_index = ( col * 32 ) + row;
-			int code = state->m_videoram[ tile_index ];
-			int color = state->m_colorram[ tile_index ];
+			int code = state->m_videoram.target()[ tile_index ];
+			int color = state->m_colorram.target()[ tile_index ];
 
 			if( color < 0x4 )
 			{
@@ -121,7 +121,7 @@ static SCREEN_UPDATE_IND16( acefruit )
 
 				for( x = 0; x < 16; x++ )
 				{
-					int sprite = ( state->m_spriteram[ ( spriteindex / 64 ) % 6 ] & 0xf ) ^ 0xf;
+					int sprite = ( state->m_spriteram.target()[ ( spriteindex / 64 ) % 6 ] & 0xf ) ^ 0xf;
 					const UINT8 *gfxdata = gfx_element_get_data(gfx, sprite);
 
 					for( y = 0; y < 8; y++ )
@@ -228,7 +228,7 @@ CUSTOM_INPUT_MEMBER(acefruit_state::starspnr_payout_r)
 
 WRITE8_MEMBER(acefruit_state::acefruit_colorram_w)
 {
-	m_colorram[ offset ] = data & 0xf;
+	m_colorram.target()[ offset ] = data & 0xf;
 }
 
 WRITE8_MEMBER(acefruit_state::acefruit_coin_w)

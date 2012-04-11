@@ -379,13 +379,13 @@ READ8_MEMBER(nightgal_state::royalqn_nsc_blit_r)
 READ8_MEMBER(nightgal_state::royalqn_comm_r)
 {
 
-	return (m_comms_ram[offset] & 0x80) | (0x7f); //bits 6-0 are undefined, presumably open bus
+	return (m_comms_ram.target()[offset] & 0x80) | (0x7f); //bits 6-0 are undefined, presumably open bus
 }
 
 WRITE8_MEMBER(nightgal_state::royalqn_comm_w)
 {
 
-	m_comms_ram[offset] = data & 0x80;
+	m_comms_ram.target()[offset] = data & 0x80;
 }
 
 #ifdef UNUSED_CODE

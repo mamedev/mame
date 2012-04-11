@@ -101,7 +101,7 @@ static TILEMAP_MAPPER( bg_scan )
 static TILE_GET_INFO( ac_get_bg_tile_info )
 {
 	acommand_state *state = machine.driver_data<acommand_state>();
-	int code = state->m_ac_bgvram[tile_index];
+	int code = state->m_ac_bgvram.target()[tile_index];
 	SET_TILE_INFO(
 			1,
 			code & 0xfff,
@@ -112,7 +112,7 @@ static TILE_GET_INFO( ac_get_bg_tile_info )
 static TILE_GET_INFO( ac_get_tx_tile_info )
 {
 	acommand_state *state = machine.driver_data<acommand_state>();
-	int code = state->m_ac_txvram[tile_index];
+	int code = state->m_ac_txvram.target()[tile_index];
 	SET_TILE_INFO(
 			0,
 			code & 0xfff,
@@ -269,13 +269,13 @@ static SCREEN_UPDATE_IND16( acommand )
 
 WRITE16_MEMBER(acommand_state::ac_bgvram_w)
 {
-	COMBINE_DATA(&m_ac_bgvram[offset]);
+	COMBINE_DATA(&m_ac_bgvram.target()[offset]);
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE16_MEMBER(acommand_state::ac_txvram_w)
 {
-	COMBINE_DATA(&m_ac_txvram[offset]);
+	COMBINE_DATA(&m_ac_txvram.target()[offset]);
 	m_tx_tilemap->mark_tile_dirty(offset);
 }
 
@@ -345,24 +345,24 @@ READ16_MEMBER(acommand_state::ac_devices_r)
             */
         //22dc8
 		{
-			m_ufo_sw1 = m_ac_devram[offset] & 3;
-			if(m_ac_devram[offset] & 0x10)
+			m_ufo_sw1 = m_ac_devram.target()[offset] & 3;
+			if(m_ac_devram.target()[offset] & 0x10)
 				m_ufo_sw1|= 0x10;
-			if(m_ac_devram[offset] & 0x40)
+			if(m_ac_devram.target()[offset] & 0x40)
 				m_ufo_sw1|= 0x20;
-			if(m_ac_devram[offset] & 0x100)
+			if(m_ac_devram.target()[offset] & 0x100)
 				m_ufo_sw1|=0x100;
-			if(m_ac_devram[offset] & 0x400)
+			if(m_ac_devram.target()[offset] & 0x400)
 				m_ufo_sw1|=0x200;
-			if(m_ac_devram[offset] & 0x1000)
+			if(m_ac_devram.target()[offset] & 0x1000)
 				m_ufo_sw1|=0x1000;
-			if(m_ac_devram[offset] & 0x4000)
+			if(m_ac_devram.target()[offset] & 0x4000)
 				m_ufo_sw1|=0x2000;
-//          if(m_ac_devram[0x0048/2] & 0x0001)
+//          if(m_ac_devram.target()[0x0048/2] & 0x0001)
 //              m_ufo_sw1|=0x0040;
-//          if(m_ac_devram[0x0048/2] & 0x0004)
+//          if(m_ac_devram.target()[0x0048/2] & 0x0004)
 //              m_ufo_sw1|=0x0400;
-//          if(m_ac_devram[0x0048/2] & 0x0100)
+//          if(m_ac_devram.target()[0x0048/2] & 0x0100)
 //              m_ufo_sw1|=0x4000;
 			return m_ufo_sw1;
 		}
@@ -375,18 +375,18 @@ READ16_MEMBER(acommand_state::ac_devices_r)
             */
 		{
 			m_ufo_sw2 = 0;
-			if(m_ac_devram[offset] & 0x01)
+			if(m_ac_devram.target()[offset] & 0x01)
 				m_ufo_sw2|= 1;
-			if(m_ac_devram[offset] & 0x04)
+			if(m_ac_devram.target()[offset] & 0x04)
 				m_ufo_sw2|= 2;
-			if(m_ac_devram[offset] & 0x10)
+			if(m_ac_devram.target()[offset] & 0x10)
 				m_ufo_sw2|=0x10;
-			if(m_ac_devram[offset] & 0x40)
+			if(m_ac_devram.target()[offset] & 0x40)
 				m_ufo_sw2|=0x20;
 			return m_ufo_sw2;
 		}
 		case 0x0048/2:
-			return m_ac_devram[offset];
+			return m_ac_devram.target()[offset];
 		case 0x005c/2:
 			/*
                 xxxx xxxx ---- ---- DIPSW4
@@ -394,12 +394,12 @@ READ16_MEMBER(acommand_state::ac_devices_r)
             */
 			return input_port_read(machine(), "IN1");
 	}
-	return m_ac_devram[offset];
+	return m_ac_devram.target()[offset];
 }
 
 WRITE16_MEMBER(acommand_state::ac_devices_w)
 {
-	COMBINE_DATA(&m_ac_devram[offset]);
+	COMBINE_DATA(&m_ac_devram.target()[offset]);
 	switch(offset)
 	{
 		case 0x00/2:
@@ -437,11 +437,11 @@ WRITE16_MEMBER(acommand_state::ac_devices_w)
 		case 0x48/2:
 			break;
 		case 0x50/2:
-			m_led0 = m_ac_devram[offset];
+			m_led0 = m_ac_devram.target()[offset];
 			//popmessage("%04x",m_led0);
 			break;
 		case 0x54/2:
-			m_led1 = m_ac_devram[offset];
+			m_led1 = m_ac_devram.target()[offset];
 			//popmessage("%04x",m_led0);
 			break;
 	}

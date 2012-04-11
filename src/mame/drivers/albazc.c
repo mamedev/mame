@@ -65,12 +65,12 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 
 	for (i = 511; i >= 0; i--)
 	{
-		int code = state->m_spriteram1[i] | (state->m_spriteram2[i] << 8);
-		int color = (state->m_spriteram2[i + 0x200] & 0xf8) >> 3;
+		int code = state->m_spriteram1.target()[i] | (state->m_spriteram2.target()[i] << 8);
+		int color = (state->m_spriteram2.target()[i + 0x200] & 0xf8) >> 3;
 		int flipx = 0;
 		int flipy = 0;
-		int sx = state->m_spriteram1[i + 0x200] | ((state->m_spriteram2[i + 0x200] & 0x07) << 8);
-		int sy = 242 - state->m_spriteram3[i];
+		int sx = state->m_spriteram1.target()[i + 0x200] | ((state->m_spriteram2.target()[i + 0x200] & 0x07) << 8);
+		int sy = 242 - state->m_spriteram3.target()[i];
 
 		if (state->m_flip_bit)
 		{

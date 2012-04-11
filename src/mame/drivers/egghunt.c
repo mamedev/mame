@@ -119,7 +119,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 {
 	egghunt_state *state = machine.driver_data<egghunt_state>();
 	int code = ((state->m_bgram[tile_index * 2 + 1] << 8) | state->m_bgram[tile_index * 2]) & 0x3fff;
-	int colour = state->m_atram[tile_index] & 0x3f;
+	int colour = state->m_atram.target()[tile_index] & 0x3f;
 
 	if(code & 0x2000)
 	{
@@ -161,7 +161,7 @@ WRITE8_MEMBER(egghunt_state::egghunt_bgram_w)
 
 WRITE8_MEMBER(egghunt_state::egghunt_atram_w)
 {
-	m_atram[offset] = data;
+	m_atram.target()[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 

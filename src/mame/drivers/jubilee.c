@@ -111,7 +111,7 @@ public:
 
 WRITE8_MEMBER(jubilee_state::jubileep_videoram_w)
 {
-	m_videoram[offset] = data;
+	m_videoram.target()[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
@@ -119,7 +119,7 @@ WRITE8_MEMBER(jubilee_state::jubileep_videoram_w)
 static TILE_GET_INFO( get_bg_tile_info )
 {
 	jubilee_state *state = machine.driver_data<jubilee_state>();
-	int code = state->m_videoram[tile_index];
+	int code = state->m_videoram.target()[tile_index];
 
 	SET_TILE_INFO( 0, code, 0, 0);
 }

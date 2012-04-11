@@ -120,27 +120,27 @@ public:
 static TILE_GET_INFO( get_bg_tile_info )
 {
 	quizpun2_state *state = machine.driver_data<quizpun2_state>();
-	UINT16 code = state->m_bg_ram[ tile_index * 2 ] + state->m_bg_ram[ tile_index * 2 + 1 ] * 256;
+	UINT16 code = state->m_bg_ram.target()[ tile_index * 2 ] + state->m_bg_ram.target()[ tile_index * 2 + 1 ] * 256;
 	SET_TILE_INFO(0, code, 0, 0);
 }
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
 	quizpun2_state *state = machine.driver_data<quizpun2_state>();
-	UINT16 code  = state->m_fg_ram[ tile_index * 4 ] + state->m_fg_ram[ tile_index * 4 + 1 ] * 256;
-	UINT8  color = state->m_fg_ram[ tile_index * 4 + 2 ];
+	UINT16 code  = state->m_fg_ram.target()[ tile_index * 4 ] + state->m_fg_ram.target()[ tile_index * 4 + 1 ] * 256;
+	UINT8  color = state->m_fg_ram.target()[ tile_index * 4 + 2 ];
 	SET_TILE_INFO(1, code, color & 0x0f, 0);
 }
 
 WRITE8_MEMBER(quizpun2_state::bg_ram_w)
 {
-	m_bg_ram[offset] = data;
+	m_bg_ram.target()[offset] = data;
 	m_bg_tmap->mark_tile_dirty(offset/2);
 }
 
 WRITE8_MEMBER(quizpun2_state::fg_ram_w)
 {
-	m_fg_ram[offset] = data;
+	m_fg_ram.target()[offset] = data;
 	m_fg_tmap->mark_tile_dirty(offset/4);
 }
 

@@ -61,13 +61,13 @@ public:
 
 WRITE8_MEMBER(ettrivia_state::ettrivia_fg_w)
 {
-	m_fg_videoram[offset] = data;
+	m_fg_videoram.target()[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(ettrivia_state::ettrivia_bg_w)
 {
-	m_bg_videoram[offset] = data;
+	m_bg_videoram.target()[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 

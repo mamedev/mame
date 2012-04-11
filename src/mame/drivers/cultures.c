@@ -73,7 +73,7 @@ static TILE_GET_INFO( get_bg2_tile_info )
 static TILE_GET_INFO( get_bg0_tile_info )
 {
 	cultures_state *state = machine.driver_data<cultures_state>();
-	int code = state->m_bg0_videoram[tile_index * 2] + (state->m_bg0_videoram[tile_index * 2 + 1] << 8);
+	int code = state->m_bg0_videoram.target()[tile_index * 2] + (state->m_bg0_videoram.target()[tile_index * 2 + 1] << 8);
 	SET_TILE_INFO(0, code, code >> 12, 0);
 }
 
@@ -102,22 +102,22 @@ static SCREEN_UPDATE_IND16( cultures )
 	int attr;
 
 	// tilemaps attributes
-	attr = (state->m_bg0_regs_x[3] & 1 ? TILEMAP_FLIPX : 0) | (state->m_bg0_regs_y[3] & 1 ? TILEMAP_FLIPY : 0);
+	attr = (state->m_bg0_regs_x.target()[3] & 1 ? TILEMAP_FLIPX : 0) | (state->m_bg0_regs_y.target()[3] & 1 ? TILEMAP_FLIPY : 0);
 	state->m_bg0_tilemap->set_flip(attr);
 
-	attr = (state->m_bg1_regs_x[3] & 1 ? TILEMAP_FLIPX : 0) | (state->m_bg1_regs_y[3] & 1 ? TILEMAP_FLIPY : 0);
+	attr = (state->m_bg1_regs_x.target()[3] & 1 ? TILEMAP_FLIPX : 0) | (state->m_bg1_regs_y.target()[3] & 1 ? TILEMAP_FLIPY : 0);
 	state->m_bg1_tilemap->set_flip(attr);
 
-	attr = (state->m_bg2_regs_x[3] & 1 ? TILEMAP_FLIPX : 0) | (state->m_bg2_regs_y[3] & 1 ? TILEMAP_FLIPY : 0);
+	attr = (state->m_bg2_regs_x.target()[3] & 1 ? TILEMAP_FLIPX : 0) | (state->m_bg2_regs_y.target()[3] & 1 ? TILEMAP_FLIPY : 0);
 	state->m_bg2_tilemap->set_flip(attr);
 
 	// tilemaps scrolls
-	state->m_bg0_tilemap->set_scrollx(0, (state->m_bg0_regs_x[2] << 8) + state->m_bg0_regs_x[0]);
-	state->m_bg1_tilemap->set_scrollx(0, (state->m_bg1_regs_x[2] << 8) + state->m_bg1_regs_x[0]);
-	state->m_bg2_tilemap->set_scrollx(0, (state->m_bg2_regs_x[2] << 8) + state->m_bg2_regs_x[0]);
-	state->m_bg0_tilemap->set_scrolly(0, (state->m_bg0_regs_y[2] << 8) + state->m_bg0_regs_y[0]);
-	state->m_bg1_tilemap->set_scrolly(0, (state->m_bg1_regs_y[2] << 8) + state->m_bg1_regs_y[0]);
-	state->m_bg2_tilemap->set_scrolly(0, (state->m_bg2_regs_y[2] << 8) + state->m_bg2_regs_y[0]);
+	state->m_bg0_tilemap->set_scrollx(0, (state->m_bg0_regs_x.target()[2] << 8) + state->m_bg0_regs_x.target()[0]);
+	state->m_bg1_tilemap->set_scrollx(0, (state->m_bg1_regs_x.target()[2] << 8) + state->m_bg1_regs_x.target()[0]);
+	state->m_bg2_tilemap->set_scrollx(0, (state->m_bg2_regs_x.target()[2] << 8) + state->m_bg2_regs_x.target()[0]);
+	state->m_bg0_tilemap->set_scrolly(0, (state->m_bg0_regs_y.target()[2] << 8) + state->m_bg0_regs_y.target()[0]);
+	state->m_bg1_tilemap->set_scrolly(0, (state->m_bg1_regs_y.target()[2] << 8) + state->m_bg1_regs_y.target()[0]);
+	state->m_bg2_tilemap->set_scrolly(0, (state->m_bg2_regs_y.target()[2] << 8) + state->m_bg2_regs_y.target()[0]);
 
 	state->m_bg2_tilemap->draw(bitmap, cliprect, 0, 0);
 	state->m_bg0_tilemap->draw(bitmap, cliprect, 0, 0);
@@ -149,7 +149,7 @@ WRITE8_MEMBER(cultures_state::bg0_videoram_w)
 	}
 	else
 	{
-		m_bg0_videoram[offset] = data;
+		m_bg0_videoram.target()[offset] = data;
 		m_bg0_tilemap->mark_tile_dirty(offset >> 1);
 	}
 }

@@ -103,28 +103,28 @@ public:
 WRITE16_MEMBER(mwarr_state::bg_videoram_w)
 {
 
-	COMBINE_DATA(&m_bg_videoram[offset]);
+	COMBINE_DATA(&m_bg_videoram.target()[offset]);
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE16_MEMBER(mwarr_state::mlow_videoram_w)
 {
 
-	COMBINE_DATA(&m_mlow_videoram[offset]);
+	COMBINE_DATA(&m_mlow_videoram.target()[offset]);
 	m_mlow_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE16_MEMBER(mwarr_state::mhigh_videoram_w)
 {
 
-	COMBINE_DATA(&m_mhigh_videoram[offset]);
+	COMBINE_DATA(&m_mhigh_videoram.target()[offset]);
 	m_mhigh_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE16_MEMBER(mwarr_state::tx_videoram_w)
 {
 
-	COMBINE_DATA(&m_tx_videoram[offset]);
+	COMBINE_DATA(&m_tx_videoram.target()[offset]);
 	m_tx_tilemap->mark_tile_dirty(offset);
 }
 
@@ -157,7 +157,7 @@ WRITE16_MEMBER(mwarr_state::sprites_commands_w)
 			/* refresh sprites on screen */
 			for (i = 0; i < 0x800; i++)
 			{
-				m_sprites_buffer[i] = m_spriteram[i];
+				m_sprites_buffer[i] = m_spriteram.target()[i];
 			}
 			break;
 
@@ -175,7 +175,7 @@ WRITE16_MEMBER(mwarr_state::mwarr_brightness_w)
 	int i;
 	double brightness;
 
-	COMBINE_DATA(&m_mwarr_ram[0x14 / 2]);
+	COMBINE_DATA(&m_mwarr_ram.target()[0x14 / 2]);
 
 	brightness = (double)(data & 0xff);
 	for (i = 0; i < 0x800; i++)
@@ -352,8 +352,8 @@ GFXDECODE_END
 static TILE_GET_INFO( get_bg_tile_info )
 {
 	mwarr_state *state = machine.driver_data<mwarr_state>();
-	int tileno = state->m_bg_videoram[tile_index] & 0x1fff;
-	int colour = (state->m_bg_videoram[tile_index] & 0xe000) >> 13;
+	int tileno = state->m_bg_videoram.target()[tile_index] & 0x1fff;
+	int colour = (state->m_bg_videoram.target()[tile_index] & 0xe000) >> 13;
 
 	SET_TILE_INFO(4, tileno, colour, 0);
 }
@@ -361,8 +361,8 @@ static TILE_GET_INFO( get_bg_tile_info )
 static TILE_GET_INFO( get_mlow_tile_info )
 {
 	mwarr_state *state = machine.driver_data<mwarr_state>();
-	int tileno = state->m_mlow_videoram[tile_index] & 0x1fff;
-	int colour = (state->m_mlow_videoram[tile_index] & 0xe000) >> 13;
+	int tileno = state->m_mlow_videoram.target()[tile_index] & 0x1fff;
+	int colour = (state->m_mlow_videoram.target()[tile_index] & 0xe000) >> 13;
 
 	SET_TILE_INFO(3, tileno, colour, 0);
 }
@@ -370,8 +370,8 @@ static TILE_GET_INFO( get_mlow_tile_info )
 static TILE_GET_INFO( get_mhigh_tile_info )
 {
 	mwarr_state *state = machine.driver_data<mwarr_state>();
-	int tileno = state->m_mhigh_videoram[tile_index] & 0x1fff;
-	int colour = (state->m_mhigh_videoram[tile_index] & 0xe000) >> 13;
+	int tileno = state->m_mhigh_videoram.target()[tile_index] & 0x1fff;
+	int colour = (state->m_mhigh_videoram.target()[tile_index] & 0xe000) >> 13;
 
 	SET_TILE_INFO(2, tileno, colour, 0);
 }
@@ -379,8 +379,8 @@ static TILE_GET_INFO( get_mhigh_tile_info )
 static TILE_GET_INFO( get_tx_tile_info )
 {
 	mwarr_state *state = machine.driver_data<mwarr_state>();
-	int tileno = state->m_tx_videoram[tile_index] & 0x1fff;
-	int colour = (state->m_tx_videoram[tile_index] & 0xe000) >> 13;
+	int tileno = state->m_tx_videoram.target()[tile_index] & 0x1fff;
+	int colour = (state->m_tx_videoram.target()[tile_index] & 0xe000) >> 13;
 
 	SET_TILE_INFO(1, tileno, colour, 0);
 }
@@ -483,45 +483,45 @@ static SCREEN_UPDATE_IND16( mwarr )
 
 	screen.machine().priority_bitmap.fill(0, cliprect);
 
-	if (BIT(state->m_vidattrram[6], 0))
+	if (BIT(state->m_vidattrram.target()[6], 0))
 	{
 		for (i = 0; i < 256; i++)
-			state->m_bg_tilemap->set_scrollx(i, state->m_bg_scrollram[i] + 20);
+			state->m_bg_tilemap->set_scrollx(i, state->m_bg_scrollram.target()[i] + 20);
 	}
 	else
 	{
 		for (i = 0; i < 256; i++)
-			state->m_bg_tilemap->set_scrollx(i, state->m_bg_scrollram[0] + 19);
+			state->m_bg_tilemap->set_scrollx(i, state->m_bg_scrollram.target()[0] + 19);
 	}
 
-	if (BIT(state->m_vidattrram[6], 2))
+	if (BIT(state->m_vidattrram.target()[6], 2))
 	{
 		for (i = 0; i < 256; i++)
-			state->m_mlow_tilemap->set_scrollx(i, state->m_mlow_scrollram[i] + 19);
+			state->m_mlow_tilemap->set_scrollx(i, state->m_mlow_scrollram.target()[i] + 19);
 	}
 	else
 	{
 		for (i = 0; i < 256; i++)
-			state->m_mlow_tilemap->set_scrollx(i, state->m_mlow_scrollram[0] + 19);
+			state->m_mlow_tilemap->set_scrollx(i, state->m_mlow_scrollram.target()[0] + 19);
 	}
 
-	if (BIT(state->m_vidattrram[6], 4))
+	if (BIT(state->m_vidattrram.target()[6], 4))
 	{
 		for (i = 0; i < 256; i++)
-			state->m_mhigh_tilemap->set_scrollx(i, state->m_mhigh_scrollram[i] + 19);
+			state->m_mhigh_tilemap->set_scrollx(i, state->m_mhigh_scrollram.target()[i] + 19);
 	}
 	else
 	{
 		for (i = 0; i < 256; i++)
-			state->m_mhigh_tilemap->set_scrollx(i, state->m_mhigh_scrollram[0] + 19);
+			state->m_mhigh_tilemap->set_scrollx(i, state->m_mhigh_scrollram.target()[0] + 19);
 	}
 
-	state->m_bg_tilemap->set_scrolly(0, state->m_vidattrram[1] + 1);
-	state->m_mlow_tilemap->set_scrolly(0, state->m_vidattrram[2] + 1);
-	state->m_mhigh_tilemap->set_scrolly(0, state->m_vidattrram[3] + 1);
+	state->m_bg_tilemap->set_scrolly(0, state->m_vidattrram.target()[1] + 1);
+	state->m_mlow_tilemap->set_scrolly(0, state->m_vidattrram.target()[2] + 1);
+	state->m_mhigh_tilemap->set_scrolly(0, state->m_vidattrram.target()[3] + 1);
 
-	state->m_tx_tilemap->set_scrollx(0, state->m_vidattrram[0] + 16);
-	state->m_tx_tilemap->set_scrolly(0, state->m_vidattrram[4] + 1);
+	state->m_tx_tilemap->set_scrollx(0, state->m_vidattrram.target()[0] + 16);
+	state->m_tx_tilemap->set_scrolly(0, state->m_vidattrram.target()[4] + 1);
 
 	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0x01);
 	state->m_mlow_tilemap->draw(bitmap, cliprect, 0, 0x02);

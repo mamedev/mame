@@ -488,13 +488,13 @@ public:
 
 WRITE8_MEMBER(_5clown_state::fclown_videoram_w)
 {
-	m_videoram[offset] = data;
+	m_videoram.target()[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(_5clown_state::fclown_colorram_w)
 {
-	m_colorram[offset] = data;
+	m_colorram.target()[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
@@ -512,8 +512,8 @@ static TILE_GET_INFO( get_fclown_tile_info )
     x--- ----   Extra color for 7's.
 */
 
-	int attr = state->m_colorram[tile_index];
-	int code = ((attr & 0x01) << 8) | ((attr & 0x40) << 2) | state->m_videoram[tile_index];	/* bit 8 for extended char set */
+	int attr = state->m_colorram.target()[tile_index];
+	int code = ((attr & 0x01) << 8) | ((attr & 0x40) << 2) | state->m_videoram.target()[tile_index];	/* bit 8 for extended char set */
 	int bank = (attr & 0x02) >> 1;													/* bit 1 switch the gfx banks */
 	int color = (attr & 0x3c) >> 2 | ((attr & 0x80) >> 3);							/* bits 2-3-4-5-7 for color */
 

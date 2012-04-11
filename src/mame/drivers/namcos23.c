@@ -1454,14 +1454,14 @@ static TILE_GET_INFO( TextTilemapGetInfo )
 
 WRITE32_MEMBER(namcos23_state::namcos23_textram_w)
 {
-	COMBINE_DATA( &m_textram[offset] );
+	COMBINE_DATA( &m_textram.target()[offset] );
 	m_bgtilemap->mark_tile_dirty(offset*2);
 	m_bgtilemap->mark_tile_dirty((offset*2)+1);
 }
 
 WRITE32_MEMBER(namcos23_state::s23_txtchar_w)
 {
-	COMBINE_DATA(&m_charram[offset]);
+	COMBINE_DATA(&m_charram.target()[offset]);
 	gfx_element_mark_dirty(machine().gfx[0], offset/32);
 }
 
@@ -1862,12 +1862,12 @@ WRITE32_MEMBER(namcos23_state::s23_mcuen_w)
 
 READ32_MEMBER(namcos23_state::gorgon_sharedram_r)
 {
-	return m_shared_ram[offset];
+	return m_shared_ram.target()[offset];
 }
 
 WRITE32_MEMBER(namcos23_state::gorgon_sharedram_w)
 {
-	COMBINE_DATA(&m_shared_ram[offset]);
+	COMBINE_DATA(&m_shared_ram.target()[offset]);
 
 	// hack for final furlong
 	if ((offset == 0x6000/4) && (data == 0) && (mem_mask == 0xff000000))
@@ -2518,12 +2518,12 @@ READ32_MEMBER(namcos23_state::gmen_trigger_sh2)
 
 READ32_MEMBER(namcos23_state::sh2_shared_r)
 {
-	return m_gmen_sh2_shared[offset];
+	return m_gmen_sh2_shared.target()[offset];
 }
 
 WRITE32_MEMBER(namcos23_state::sh2_shared_w)
 {
-	COMBINE_DATA(&m_gmen_sh2_shared[offset]);
+	COMBINE_DATA(&m_gmen_sh2_shared.target()[offset]);
 }
 
 static ADDRESS_MAP_START( gmen_mips_map, AS_PROGRAM, 32, namcos23_state )

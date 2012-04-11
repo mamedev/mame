@@ -494,7 +494,7 @@ DIRECT_UPDATE_HANDLER( missile_direct_handler )
 	if (address < 0x4000)
 	{
 		missile_state *state = direct.space().machine().driver_data<missile_state>();
-		direct.explicit_configure(0x0000 | offset, 0x3fff | offset, 0x3fff, state->m_videoram);
+		direct.explicit_configure(0x0000 | offset, 0x3fff | offset, 0x3fff, state->m_videoram.target());
 		return ~0;
 	}
 

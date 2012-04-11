@@ -192,8 +192,8 @@ static PALETTE_INIT( looping )
 static TILE_GET_INFO( get_tile_info )
 {
 	looping_state *state = machine.driver_data<looping_state>();
-	int tile_number = state->m_videoram[tile_index];
-	int color = state->m_colorram[(tile_index & 0x1f) * 2 + 1] & 0x07;
+	int tile_number = state->m_videoram.target()[tile_index];
+	int color = state->m_colorram.target()[(tile_index & 0x1f) * 2 + 1] & 0x07;
 	SET_TILE_INFO(0, tile_number, color, 0);
 }
 
@@ -231,7 +231,7 @@ WRITE8_MEMBER(looping_state::flip_screen_y_w)
 
 WRITE8_MEMBER(looping_state::looping_videoram_w)
 {
-	m_videoram[offset] = data;
+	m_videoram.target()[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
@@ -240,7 +240,7 @@ WRITE8_MEMBER(looping_state::looping_colorram_w)
 {
 	int i;
 
-	m_colorram[offset] = data;
+	m_colorram.target()[offset] = data;
 
 	/* odd bytes are column color attribute */
 	if (offset & 1)

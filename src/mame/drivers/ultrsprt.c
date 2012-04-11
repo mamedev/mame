@@ -107,8 +107,8 @@ static MACHINE_START( ultrsprt )
 	ppcdrc_set_options(machine.device("maincpu"), PPCDRC_COMPATIBLE_OPTIONS);
 
 	/* configure fast RAM regions for DRC */
-	ppcdrc_add_fastram(machine.device("maincpu"), 0x80000000, 0x8007ffff, FALSE, state->m_vram);
-	ppcdrc_add_fastram(machine.device("maincpu"), 0xff000000, 0xff01ffff, FALSE, state->m_workram);
+	ppcdrc_add_fastram(machine.device("maincpu"), 0x80000000, 0x8007ffff, FALSE, state->m_vram.target());
+	ppcdrc_add_fastram(machine.device("maincpu"), 0xff000000, 0xff01ffff, FALSE, state->m_workram.target());
 }
 
 

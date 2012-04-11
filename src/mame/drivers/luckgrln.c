@@ -149,13 +149,13 @@ public:
 
 WRITE8_MEMBER(luckgrln_state::luckgrln_reel1_ram_w)
 {
-	m_reel1_ram[offset] = data;
+	m_reel1_ram.target()[offset] = data;
 	m_reel1_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(luckgrln_state::luckgrln_reel1_attr_w)
 {
-	m_reel1_attr[offset] = data;
+	m_reel1_attr.target()[offset] = data;
 	m_reel1_tilemap->mark_tile_dirty(offset);
 }
 
@@ -164,8 +164,8 @@ WRITE8_MEMBER(luckgrln_state::luckgrln_reel1_attr_w)
 static TILE_GET_INFO( get_luckgrln_reel1_tile_info )
 {
 	luckgrln_state *state = machine.driver_data<luckgrln_state>();
-	int code = state->m_reel1_ram[tile_index];
-	int attr = state->m_reel1_attr[tile_index];
+	int code = state->m_reel1_ram.target()[tile_index];
+	int attr = state->m_reel1_attr.target()[tile_index];
 	int col = (attr & 0x1f);
 
 	code |= (attr & 0xe0)<<3;
@@ -181,13 +181,13 @@ static TILE_GET_INFO( get_luckgrln_reel1_tile_info )
 
 WRITE8_MEMBER(luckgrln_state::luckgrln_reel2_ram_w)
 {
-	m_reel2_ram[offset] = data;
+	m_reel2_ram.target()[offset] = data;
 	m_reel2_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(luckgrln_state::luckgrln_reel2_attr_w)
 {
-	m_reel2_attr[offset] = data;
+	m_reel2_attr.target()[offset] = data;
 	m_reel2_tilemap->mark_tile_dirty(offset);
 }
 
@@ -195,8 +195,8 @@ WRITE8_MEMBER(luckgrln_state::luckgrln_reel2_attr_w)
 static TILE_GET_INFO( get_luckgrln_reel2_tile_info )
 {
 	luckgrln_state *state = machine.driver_data<luckgrln_state>();
-	int code = state->m_reel2_ram[tile_index];
-	int attr = state->m_reel2_attr[tile_index];
+	int code = state->m_reel2_ram.target()[tile_index];
+	int attr = state->m_reel2_attr.target()[tile_index];
 	int col = (attr & 0x1f);
 
 	code |= (attr & 0xe0)<<3;
@@ -211,13 +211,13 @@ static TILE_GET_INFO( get_luckgrln_reel2_tile_info )
 
 WRITE8_MEMBER(luckgrln_state::luckgrln_reel3_ram_w)
 {
-	m_reel3_ram[offset] = data;
+	m_reel3_ram.target()[offset] = data;
 	m_reel3_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(luckgrln_state::luckgrln_reel3_attr_w)
 {
-	m_reel3_attr[offset] = data;
+	m_reel3_attr.target()[offset] = data;
 	m_reel3_tilemap->mark_tile_dirty(offset);
 }
 
@@ -225,8 +225,8 @@ WRITE8_MEMBER(luckgrln_state::luckgrln_reel3_attr_w)
 static TILE_GET_INFO( get_luckgrln_reel3_tile_info )
 {
 	luckgrln_state *state = machine.driver_data<luckgrln_state>();
-	int code = state->m_reel3_ram[tile_index];
-	int attr = state->m_reel3_attr[tile_index];
+	int code = state->m_reel3_ram.target()[tile_index];
+	int attr = state->m_reel3_attr.target()[tile_index];
 	int col = (attr & 0x1f);
 
 	code |= (attr & 0xe0)<<3;
@@ -240,13 +240,13 @@ static TILE_GET_INFO( get_luckgrln_reel3_tile_info )
 
 WRITE8_MEMBER(luckgrln_state::luckgrln_reel4_ram_w)
 {
-	m_reel4_ram[offset] = data;
+	m_reel4_ram.target()[offset] = data;
 	m_reel4_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(luckgrln_state::luckgrln_reel4_attr_w)
 {
-	m_reel4_attr[offset] = data;
+	m_reel4_attr.target()[offset] = data;
 	m_reel4_tilemap->mark_tile_dirty(offset);
 }
 
@@ -254,8 +254,8 @@ WRITE8_MEMBER(luckgrln_state::luckgrln_reel4_attr_w)
 static TILE_GET_INFO( get_luckgrln_reel4_tile_info )
 {
 	luckgrln_state *state = machine.driver_data<luckgrln_state>();
-	int code = state->m_reel4_ram[tile_index];
-	int attr = state->m_reel4_attr[tile_index];
+	int code = state->m_reel4_ram.target()[tile_index];
+	int attr = state->m_reel4_attr.target()[tile_index];
 	int col = (attr & 0x1f);
 
 	code |= (attr & 0xe0)<<3;
@@ -300,10 +300,10 @@ static SCREEN_UPDATE_IND16(luckgrln)
 
 	for (i= 0;i < 64;i++)
 	{
-		state->m_reel1_tilemap->set_scrolly(i, state->m_reel1_scroll[i]);
-		state->m_reel2_tilemap->set_scrolly(i, state->m_reel2_scroll[i]);
-		state->m_reel3_tilemap->set_scrolly(i, state->m_reel3_scroll[i]);
-		state->m_reel4_tilemap->set_scrolly(i, state->m_reel4_scroll[i]);
+		state->m_reel1_tilemap->set_scrolly(i, state->m_reel1_scroll.target()[i]);
+		state->m_reel2_tilemap->set_scrolly(i, state->m_reel2_scroll.target()[i]);
+		state->m_reel3_tilemap->set_scrolly(i, state->m_reel3_scroll.target()[i]);
+		state->m_reel4_tilemap->set_scrolly(i, state->m_reel4_scroll.target()[i]);
 	}
 
 
@@ -317,9 +317,9 @@ static SCREEN_UPDATE_IND16(luckgrln)
 
 		for (x=0;x<64;x++)
 		{
-			UINT16 tile = (state->m_luck_vram1[count] & 0xff);
-			UINT16 tile_high = (state->m_luck_vram2[count]);
-			UINT16 tileattr = (state->m_luck_vram3[count]);
+			UINT16 tile = (state->m_luck_vram1.target()[count] & 0xff);
+			UINT16 tile_high = (state->m_luck_vram2.target()[count]);
+			UINT16 tileattr = (state->m_luck_vram3.target()[count]);
 			UINT8 col = 0;
 			UINT8 region = 0;
 			UINT8 bgenable;

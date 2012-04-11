@@ -51,7 +51,7 @@ public:
 static TILE_GET_INFO( get_tile_info )
 {
 	superdq_state *state = machine.driver_data<superdq_state>();
-	int tile = state->m_videoram[tile_index];
+	int tile = state->m_videoram.target()[tile_index];
 
 	SET_TILE_INFO(0, tile, state->m_color_bank, 0);
 }
@@ -147,7 +147,7 @@ static INTERRUPT_GEN( superdq_vblank )
 WRITE8_MEMBER(superdq_state::superdq_videoram_w)
 {
 
-	m_videoram[offset] = data;
+	m_videoram.target()[offset] = data;
 	m_tilemap->mark_tile_dirty(offset);
 }
 

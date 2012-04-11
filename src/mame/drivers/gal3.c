@@ -256,7 +256,7 @@ static NVRAM_HANDLER( gal3 )
 	{
 		for( i=0; i<state->m_nvmem.bytes()/4; i++ )
 		{
-			UINT32 dword = state->m_nvmem[i];
+			UINT32 dword = state->m_nvmem.target()[i];
 			data[0] = dword>>24;
 			data[1] = (dword&0x00ff0000)>>16;
 			data[2] = (dword&0x0000ff00)>>8;
@@ -271,7 +271,7 @@ static NVRAM_HANDLER( gal3 )
 			for( i=0; i<state->m_nvmem.bytes()/4; i++ )
 			{
 				file->read( data, 4 );
-				state->m_nvmem[i] = (data[0]<<24)|(data[1]<<16)|(data[2]<<8)|data[3];
+				state->m_nvmem.target()[i] = (data[0]<<24)|(data[1]<<16)|(data[2]<<8)|data[3];
 			}
 		}
 		else
@@ -343,17 +343,17 @@ READ32_MEMBER(gal3_state::rso_r)
     Check @$009a==1 to start DEMO
     HACK*/
 	offset *= 2;
-	return (m_rsoSharedRAM[offset]<<16)|m_rsoSharedRAM[offset+1];
+	return (m_rsoSharedRAM.target()[offset]<<16)|m_rsoSharedRAM.target()[offset+1];
 }
 
 WRITE32_MEMBER(gal3_state::rso_w)
 {
 	UINT32 v;
 	offset *= 2;
-	v = (m_rsoSharedRAM[offset]<<16)|m_rsoSharedRAM[offset+1];
+	v = (m_rsoSharedRAM.target()[offset]<<16)|m_rsoSharedRAM.target()[offset+1];
 	COMBINE_DATA( &v );
-	m_rsoSharedRAM[offset+0] = v>>16;
-	m_rsoSharedRAM[offset+1] = v&0xffff;
+	m_rsoSharedRAM.target()[offset+0] = v>>16;
+	m_rsoSharedRAM.target()[offset+1] = v&0xffff;
 }
 
 

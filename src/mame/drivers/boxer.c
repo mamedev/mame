@@ -130,11 +130,11 @@ static void draw_boxer( running_machine &machine, bitmap_ind16 &bitmap, const re
 
 		int i, j;
 
-		int x = 196 - state->m_sprite_ram[0 + 2 * n];
-		int y = 192 - state->m_sprite_ram[1 + 2 * n];
+		int x = 196 - state->m_sprite_ram.target()[0 + 2 * n];
+		int y = 192 - state->m_sprite_ram.target()[1 + 2 * n];
 
-		int l = state->m_sprite_ram[4 + 2 * n] & 15;
-		int r = state->m_sprite_ram[5 + 2 * n] & 15;
+		int l = state->m_sprite_ram.target()[4 + 2 * n] & 15;
+		int r = state->m_sprite_ram.target()[5 + 2 * n] & 15;
 
 		for (i = 0; i < 8; i++)
 		{
@@ -178,7 +178,7 @@ static SCREEN_UPDATE_IND16( boxer )
 	{
 		for (j = 0; j < 32; j++)
 		{
-			UINT8 code = state->m_tile_ram[32 * i + j];
+			UINT8 code = state->m_tile_ram.target()[32 * i + j];
 
 			drawgfx_transpen(bitmap, cliprect,
 				screen.machine().gfx[2],

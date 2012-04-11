@@ -45,7 +45,7 @@ static SCREEN_UPDATE_RGB32( sstrangr )
 
 		UINT8 x = offs << 3;
 		int y = offs >> 5;
-		UINT8 data = state->m_ram[offs];
+		UINT8 data = state->m_ram.target()[offs];
 
 		for (i = 0; i < 8; i++)
 		{
@@ -103,7 +103,7 @@ static SCREEN_UPDATE_RGB32( sstrngr2 )
 
 		offs_t color_address = (offs >> 9 << 5) | (offs & 0x1f);
 
-		UINT8 data = state->m_ram[offs];
+		UINT8 data = state->m_ram.target()[offs];
 		UINT8 fore_color = color_map_base[color_address] & 0x07;
 
 		for (i = 0; i < 8; i++)

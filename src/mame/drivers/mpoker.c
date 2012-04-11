@@ -215,8 +215,8 @@ static SCREEN_UPDATE_IND16(mpoker)
 	{
 		for (x=0;x<32;x++)
 		{
-			UINT16 dat = state->m_video[count];
-			UINT16 col = state->m_video[count+0x400] & 0x7f;
+			UINT16 dat = state->m_video.target()[count];
+			UINT16 col = state->m_video.target()[count+0x400] & 0x7f;
 			drawgfx_opaque(bitmap,cliprect,gfx,dat,col,0,0,x*16,y*16);
 			count++;
 		}

@@ -167,8 +167,8 @@ static void draw_tilemap(running_machine &machine, bitmap_ind16 &bitmap, const r
 	{
 		for (x=0;x<32;x++)
 		{
-			int tile = state->m_videoram[32*y+x];
-			int color = (state->m_colorram[x*2]<<8) | (state->m_colorram[(x*2)+1]);
+			int tile = state->m_videoram.target()[32*y+x];
+			int color = (state->m_colorram.target()[x*2]<<8) | (state->m_colorram.target()[(x*2)+1]);
 			int x_scroll = (color & 0xff00)>>8;
 			tile |= ((color & 0xe0)<<3);
 

@@ -183,8 +183,8 @@ static SCREEN_UPDATE_IND16(go2000)
 	{
 		for (y = 0; y < 32; y++)
 		{
-			int tile = state->m_videoram[count];
-			int attr = state->m_videoram2[count];
+			int tile = state->m_videoram.target()[count];
+			int attr = state->m_videoram2.target()[count];
 			drawgfx_opaque(bitmap, cliprect, screen.machine().gfx[0], tile, attr, 0, 0, x * 8, y * 8);
 			count++;
 		}
@@ -195,8 +195,8 @@ static SCREEN_UPDATE_IND16(go2000)
 	{
 		for (y = 0; y < 32; y++)
 		{
-			int tile = state->m_videoram[count];
-			int attr = state->m_videoram2[count];
+			int tile = state->m_videoram.target()[count];
+			int attr = state->m_videoram2.target()[count];
 			drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[0], tile, attr, 0, 0, x * 8, y * 8, 0xf);
 			count++;
 		}
@@ -217,9 +217,9 @@ static SCREEN_UPDATE_IND16(go2000)
 		int dx, dy;
 		int flipx, y0;
 
-		int y = state->m_videoram[offs + 0 + 0x00000 / 2];
-		int x = state->m_videoram[offs + 1 + 0x00000 / 2];
-		int dim = state->m_videoram2[offs + 0 + 0x00000 / 2];
+		int y = state->m_videoram.target()[offs + 0 + 0x00000 / 2];
+		int x = state->m_videoram.target()[offs + 1 + 0x00000 / 2];
+		int dim = state->m_videoram2.target()[offs + 0 + 0x00000 / 2];
 
 		int bank	=	(x >> 12) & 0xf;
 
@@ -268,8 +268,8 @@ static SCREEN_UPDATE_IND16(go2000)
 			for (dx = 0; dx < dimx * 8; dx += 8)
 			{
 				int addr = (srcpg * 0x20 * 0x20) + ((srcx + tile_x) & 0x1f) * 0x20 + ((srcy + tile_y) & 0x1f);
-				int tile = state->m_videoram[addr + 0x00000 / 2];
-				int attr = state->m_videoram2[addr + 0x00000 / 2];
+				int tile = state->m_videoram.target()[addr + 0x00000 / 2];
+				int attr = state->m_videoram2.target()[addr + 0x00000 / 2];
 
 				int sx = x + dx;
 				int sy = (y + dy) & 0xff;

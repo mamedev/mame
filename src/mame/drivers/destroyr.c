@@ -61,8 +61,8 @@ static SCREEN_UPDATE_IND16( destroyr )
 	/* draw major objects */
 	for (i = 0; i < 16; i++)
 	{
-		int attr = state->m_major_obj_ram[2 * i + 0] ^ 0xff;
-		int horz = state->m_major_obj_ram[2 * i + 1];
+		int attr = state->m_major_obj_ram.target()[2 * i + 0] ^ 0xff;
+		int horz = state->m_major_obj_ram.target()[2 * i + 1];
 
 		int num = attr & 3;
 		int scan = attr & 4;
@@ -87,7 +87,7 @@ static SCREEN_UPDATE_IND16( destroyr )
 	{
 		for (j = 0; j < 32; j++)
 		{
-			int num = state->m_alpha_num_ram[32 * i + j];
+			int num = state->m_alpha_num_ram.target()[32 * i + j];
 
 			drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[0], num, 0, 0, 0, 8 * j, 8 * i, 0);
 		}
@@ -96,9 +96,9 @@ static SCREEN_UPDATE_IND16( destroyr )
 	/* draw minor objects */
 	for (i = 0; i < 2; i++)
 	{
-		int num = i << 4 | (state->m_minor_obj_ram[i + 0] & 0xf);
-		int horz = 256 - state->m_minor_obj_ram[i + 2];
-		int vert = 256 - state->m_minor_obj_ram[i + 4];
+		int num = i << 4 | (state->m_minor_obj_ram.target()[i + 0] & 0xf);
+		int horz = 256 - state->m_minor_obj_ram.target()[i + 2];
+		int vert = 256 - state->m_minor_obj_ram.target()[i + 4];
 
 		drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[1], num, 0, 0, 0, horz, vert, 0);
 	}

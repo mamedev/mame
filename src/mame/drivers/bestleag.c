@@ -54,7 +54,7 @@ public:
 static TILE_GET_INFO( get_tx_tile_info )
 {
 	bestleag_state *state = machine.driver_data<bestleag_state>();
-	int code = state->m_txram[tile_index];
+	int code = state->m_txram.target()[tile_index];
 
 	SET_TILE_INFO(
 			0,
@@ -66,7 +66,7 @@ static TILE_GET_INFO( get_tx_tile_info )
 static TILE_GET_INFO( get_bg_tile_info )
 {
 	bestleag_state *state = machine.driver_data<bestleag_state>();
-	int code = state->m_bgram[tile_index];
+	int code = state->m_bgram.target()[tile_index];
 
 	SET_TILE_INFO(
 			1,
@@ -78,7 +78,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 static TILE_GET_INFO( get_fg_tile_info )
 {
 	bestleag_state *state = machine.driver_data<bestleag_state>();
-	int code = state->m_fgram[tile_index];
+	int code = state->m_fgram.target()[tile_index];
 
 	SET_TILE_INFO(
 			1,
@@ -140,7 +140,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 			return;
 
 		/* it can change sprites color mask like the original set */
-		if(state->m_vregs[0x00/2] & 0x1000)
+		if(state->m_vregs.target()[0x00/2] & 0x1000)
 			color &= 7;
 
 		drawgfx_transpen(bitmap,cliprect,machine.gfx[2],
@@ -173,12 +173,12 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 static SCREEN_UPDATE_IND16(bestleag)
 {
 	bestleag_state *state = screen.machine().driver_data<bestleag_state>();
-	state->m_bg_tilemap->set_scrollx(0,(state->m_vregs[0x00/2] & 0xfff) + (state->m_vregs[0x08/2] & 0x7) - 3);
-	state->m_bg_tilemap->set_scrolly(0,state->m_vregs[0x02/2]);
-	state->m_tx_tilemap->set_scrollx(0,state->m_vregs[0x04/2]);
-	state->m_tx_tilemap->set_scrolly(0,state->m_vregs[0x06/2]);
-	state->m_fg_tilemap->set_scrollx(0,state->m_vregs[0x08/2] & 0xfff8);
-	state->m_fg_tilemap->set_scrolly(0,state->m_vregs[0x0a/2]);
+	state->m_bg_tilemap->set_scrollx(0,(state->m_vregs.target()[0x00/2] & 0xfff) + (state->m_vregs.target()[0x08/2] & 0x7) - 3);
+	state->m_bg_tilemap->set_scrolly(0,state->m_vregs.target()[0x02/2]);
+	state->m_tx_tilemap->set_scrollx(0,state->m_vregs.target()[0x04/2]);
+	state->m_tx_tilemap->set_scrolly(0,state->m_vregs.target()[0x06/2]);
+	state->m_fg_tilemap->set_scrollx(0,state->m_vregs.target()[0x08/2] & 0xfff8);
+	state->m_fg_tilemap->set_scrolly(0,state->m_vregs.target()[0x0a/2]);
 
 	state->m_bg_tilemap->draw(bitmap, cliprect, 0,0);
 	state->m_fg_tilemap->draw(bitmap, cliprect, 0,0);
@@ -190,12 +190,12 @@ static SCREEN_UPDATE_IND16(bestleag)
 static SCREEN_UPDATE_IND16(bestleaw)
 {
 	bestleag_state *state = screen.machine().driver_data<bestleag_state>();
-	state->m_bg_tilemap->set_scrollx(0,state->m_vregs[0x08/2]);
-	state->m_bg_tilemap->set_scrolly(0,state->m_vregs[0x0a/2]);
-	state->m_tx_tilemap->set_scrollx(0,state->m_vregs[0x00/2]);
-	state->m_tx_tilemap->set_scrolly(0,state->m_vregs[0x02/2]);
-	state->m_fg_tilemap->set_scrollx(0,state->m_vregs[0x04/2]);
-	state->m_fg_tilemap->set_scrolly(0,state->m_vregs[0x06/2]);
+	state->m_bg_tilemap->set_scrollx(0,state->m_vregs.target()[0x08/2]);
+	state->m_bg_tilemap->set_scrolly(0,state->m_vregs.target()[0x0a/2]);
+	state->m_tx_tilemap->set_scrollx(0,state->m_vregs.target()[0x00/2]);
+	state->m_tx_tilemap->set_scrolly(0,state->m_vregs.target()[0x02/2]);
+	state->m_fg_tilemap->set_scrollx(0,state->m_vregs.target()[0x04/2]);
+	state->m_fg_tilemap->set_scrolly(0,state->m_vregs.target()[0x06/2]);
 
 	state->m_bg_tilemap->draw(bitmap, cliprect, 0,0);
 	state->m_fg_tilemap->draw(bitmap, cliprect, 0,0);
@@ -206,19 +206,19 @@ static SCREEN_UPDATE_IND16(bestleaw)
 
 WRITE16_MEMBER(bestleag_state::bestleag_txram_w)
 {
-	m_txram[offset] = data;
+	m_txram.target()[offset] = data;
 	m_tx_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE16_MEMBER(bestleag_state::bestleag_bgram_w)
 {
-	m_bgram[offset] = data;
+	m_bgram.target()[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE16_MEMBER(bestleag_state::bestleag_fgram_w)
 {
-	m_fgram[offset] = data;
+	m_fgram.target()[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 

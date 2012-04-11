@@ -70,7 +70,7 @@ static SCREEN_UPDATE_IND16( istellar )
 	/*
     for (charx = 0; charx < 0x400; charx ++)
     {
-        printf ("%x ", state->m_sprite_ram[charx]) ;
+        printf ("%x ", state->m_sprite_ram.target()[charx]) ;
     }
     printf("\n\n\n");
     */
@@ -83,8 +83,8 @@ static SCREEN_UPDATE_IND16( istellar )
 			int current_screen_character = (chary*32) + charx;
 
 			drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[0],
-					state->m_tile_ram[current_screen_character],
-					(state->m_tile_control_ram[current_screen_character] & 0x0f),
+					state->m_tile_ram.target()[current_screen_character],
+					(state->m_tile_control_ram.target()[current_screen_character] & 0x0f),
 					0, 0, charx*8, chary*8, 0);
 		}
 	}

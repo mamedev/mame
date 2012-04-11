@@ -40,8 +40,8 @@ public:
 static TILE_GET_INFO( get_tile_info )
 {
 	tattack_state *state = machine.driver_data<tattack_state>();
-	int code = state->m_videoram[tile_index];
-	int color = state->m_colorram[tile_index];
+	int code = state->m_videoram.target()[tile_index];
+	int color = state->m_colorram.target()[tile_index];
 
 	if((color&1 ) || (color>15) )
 		logerror("COLOR %i\n",color);

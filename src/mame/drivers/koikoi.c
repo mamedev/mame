@@ -78,9 +78,9 @@ public:
 static TILE_GET_INFO( get_tile_info )
 {
 	koikoi_state *state = machine.driver_data<koikoi_state>();
-	int code  = state->m_videoram[tile_index] | ((state->m_videoram[tile_index + 0x400] & 0x40) << 2);
-	int color = (state->m_videoram[tile_index + 0x400] & 0x1f);
-	int flip  = (state->m_videoram[tile_index + 0x400] & 0x80) ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0;
+	int code  = state->m_videoram.target()[tile_index] | ((state->m_videoram.target()[tile_index + 0x400] & 0x40) << 2);
+	int color = (state->m_videoram.target()[tile_index + 0x400] & 0x1f);
+	int flip  = (state->m_videoram.target()[tile_index + 0x400] & 0x80) ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0;
 
 	SET_TILE_INFO( 0, code, color, flip);
 }
@@ -151,7 +151,7 @@ static SCREEN_UPDATE_IND16(koikoi)
 
 WRITE8_MEMBER(koikoi_state::vram_w)
 {
-	m_videoram[offset] = data;
+	m_videoram.target()[offset] = data;
 	m_tmap->mark_tile_dirty(offset & 0x3ff);
 }
 

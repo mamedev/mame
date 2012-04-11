@@ -363,14 +363,14 @@ WRITE16_MEMBER(srmp6_state::video_regs_w)
 			logerror("video_regs_w (PC=%06X): %04x = %04x & %04x\n", cpu_get_previouspc(&space.device()), offset*2, data, mem_mask);
 			break;
 	}
-	COMBINE_DATA(&m_video_regs[offset]);
+	COMBINE_DATA(&m_video_regs.target()[offset]);
 }
 
 READ16_MEMBER(srmp6_state::video_regs_r)
 {
 
 	logerror("video_regs_r (PC=%06X): %04x\n", cpu_get_previouspc(&space.device()), offset*2);
-	return m_video_regs[offset];
+	return m_video_regs.target()[offset];
 }
 
 
@@ -487,14 +487,14 @@ WRITE16_MEMBER(srmp6_state::srmp6_dma_w)
 READ16_MEMBER(srmp6_state::tileram_r)
 {
 
-	return m_chrram[offset];
+	return m_chrram.target()[offset];
 }
 
 WRITE16_MEMBER(srmp6_state::tileram_w)
 {
 
 	//UINT16 tmp;
-	COMBINE_DATA(&m_chrram[offset]);
+	COMBINE_DATA(&m_chrram.target()[offset]);
 
 	/* are the DMA registers enabled some other way, or always mapped here, over RAM? */
 	if (offset >= 0xfff00/2 && offset <= 0xfff1a/2 )

@@ -190,13 +190,13 @@ WRITE8_MEMBER(firefox_state::firefox_disc_data_w)
 static TILE_GET_INFO( bgtile_get_info )
 {
 	firefox_state *state = machine.driver_data<firefox_state>();
-	SET_TILE_INFO(0, state->m_tileram[tile_index], 0, 0);
+	SET_TILE_INFO(0, state->m_tileram.target()[tile_index], 0, 0);
 }
 
 
 WRITE8_MEMBER(firefox_state::tileram_w)
 {
-	m_tileram[offset] = data;
+	m_tileram.target()[offset] = data;
 	m_bgtiles->mark_tile_dirty(offset);
 }
 
@@ -265,13 +265,13 @@ static void set_rgba( running_machine &machine, int start, int index, unsigned c
 
 WRITE8_MEMBER(firefox_state::tile_palette_w)
 {
-	m_tile_palette[ offset ] = data;
+	m_tile_palette.target()[ offset ] = data;
 	set_rgba( machine(), 0, offset & 0xff, m_tile_palette );
 }
 
 WRITE8_MEMBER(firefox_state::sprite_palette_w)
 {
-	m_sprite_palette[ offset ] = data;
+	m_sprite_palette.target()[ offset ] = data;
 	set_rgba( machine(), 256, offset & 0xff, m_sprite_palette );
 }
 

@@ -360,8 +360,8 @@ static SCREEN_UPDATE_IND16( tmaster )
 
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
-	if (layers_ctrl & 1)	copybitmap_trans(bitmap, state->m_bitmap[0][(state->m_regs[0x02/2]>>8)&1], 0,0,0,0, cliprect, 0xff);
-	if (layers_ctrl & 2)	copybitmap_trans(bitmap, state->m_bitmap[1][(state->m_regs[0x02/2]>>9)&1], 0,0,0,0, cliprect, 0xff);
+	if (layers_ctrl & 1)	copybitmap_trans(bitmap, state->m_bitmap[0][(state->m_regs.target()[0x02/2]>>8)&1], 0,0,0,0, cliprect, 0xff);
+	if (layers_ctrl & 2)	copybitmap_trans(bitmap, state->m_bitmap[1][(state->m_regs.target()[0x02/2]>>9)&1], 0,0,0,0, cliprect, 0xff);
 
 	return 0;
 }
@@ -385,15 +385,15 @@ static void tmaster_draw(running_machine &machine)
 
 	UINT16 pen;
 
-	buffer	=	(state->m_regs[0x02/2] >> 8) & 3;	// 1 bit per layer, selects the currently displayed buffer
-	sw		=	 state->m_regs[0x04/2];
-	sx		=	 state->m_regs[0x06/2];
-	sh		=	 state->m_regs[0x08/2] + 1;
-	sy		=	 state->m_regs[0x0a/2];
+	buffer	=	(state->m_regs.target()[0x02/2] >> 8) & 3;	// 1 bit per layer, selects the currently displayed buffer
+	sw		=	 state->m_regs.target()[0x04/2];
+	sx		=	 state->m_regs.target()[0x06/2];
+	sh		=	 state->m_regs.target()[0x08/2] + 1;
+	sy		=	 state->m_regs.target()[0x0a/2];
 	addr	=	(*state->m_compute_addr)(
-				 state->m_regs[0x0c/2],
-				 state->m_regs[0x0e/2], state->m_addr);
-	mode	=	 state->m_regs[0x10/2];
+				 state->m_regs.target()[0x0c/2],
+				 state->m_regs.target()[0x0e/2], state->m_addr);
+	mode	=	 state->m_regs.target()[0x10/2];
 
 	layer	=	(mode >> 7) & 1;	// layer to draw to
 	buffer	=	((mode >> 6) & 1) ^ ((buffer >> layer) & 1);	// bit 6 selects whether to use the opposite buffer to that displayed

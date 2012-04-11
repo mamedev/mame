@@ -63,8 +63,8 @@ public:
 static TILE_GET_INFO( get_tile_info_0 )
 {
 	umipoker_state *state = machine.driver_data<umipoker_state>();
-	int tile = state->m_vram_0[tile_index*2+0];
-	int color = state->m_vram_0[tile_index*2+1] & 0x3f;
+	int tile = state->m_vram_0.target()[tile_index*2+0];
+	int color = state->m_vram_0.target()[tile_index*2+1] & 0x3f;
 
 	SET_TILE_INFO(
 			0,
@@ -76,8 +76,8 @@ static TILE_GET_INFO( get_tile_info_0 )
 static TILE_GET_INFO( get_tile_info_1 )
 {
 	umipoker_state *state = machine.driver_data<umipoker_state>();
-	int tile = state->m_vram_1[tile_index*2+0];
-	int color = state->m_vram_1[tile_index*2+1] & 0x3f;
+	int tile = state->m_vram_1.target()[tile_index*2+0];
+	int color = state->m_vram_1.target()[tile_index*2+1] & 0x3f;
 
 	SET_TILE_INFO(
 			0,
@@ -89,8 +89,8 @@ static TILE_GET_INFO( get_tile_info_1 )
 static TILE_GET_INFO( get_tile_info_2 )
 {
 	umipoker_state *state = machine.driver_data<umipoker_state>();
-	int tile = state->m_vram_2[tile_index*2+0];
-	int color = state->m_vram_2[tile_index*2+1] & 0x3f;
+	int tile = state->m_vram_2.target()[tile_index*2+0];
+	int color = state->m_vram_2.target()[tile_index*2+1] & 0x3f;
 
 	SET_TILE_INFO(
 			0,
@@ -102,8 +102,8 @@ static TILE_GET_INFO( get_tile_info_2 )
 static TILE_GET_INFO( get_tile_info_3 )
 {
 	umipoker_state *state = machine.driver_data<umipoker_state>();
-	int tile = state->m_vram_3[tile_index*2+0];
-	int color = state->m_vram_3[tile_index*2+1] & 0x3f;
+	int tile = state->m_vram_3.target()[tile_index*2+0];
+	int color = state->m_vram_3.target()[tile_index*2+1] & 0x3f;
 
 	SET_TILE_INFO(
 			0,
@@ -159,7 +159,7 @@ READ8_MEMBER(umipoker_state::z80_shared_ram_r)
 
 	machine().scheduler().synchronize(); // force resync
 
-	return m_z80_wram[offset];
+	return m_z80_wram.target()[offset];
 }
 
 WRITE8_MEMBER(umipoker_state::z80_shared_ram_w)
@@ -167,7 +167,7 @@ WRITE8_MEMBER(umipoker_state::z80_shared_ram_w)
 
 	machine().scheduler().synchronize(); // force resync
 
-	m_z80_wram[offset] = data;
+	m_z80_wram.target()[offset] = data;
 }
 
 WRITE16_MEMBER(umipoker_state::umipoker_irq_ack_w)
@@ -187,14 +187,14 @@ WRITE16_MEMBER(umipoker_state::umipoker_scrolly_3_w){ COMBINE_DATA(&m_umipoker_s
 WRITE16_MEMBER(umipoker_state::umipoker_vram_0_w)
 {
 
-	COMBINE_DATA(&m_vram_0[offset]);
+	COMBINE_DATA(&m_vram_0.target()[offset]);
 	m_tilemap_0->mark_tile_dirty(offset >> 1);
 }
 
 WRITE16_MEMBER(umipoker_state::umipoker_vram_1_w)
 {
 
-	COMBINE_DATA(&m_vram_1[offset]);
+	COMBINE_DATA(&m_vram_1.target()[offset]);
 	m_tilemap_1->mark_tile_dirty(offset >> 1);
 }
 
@@ -202,14 +202,14 @@ WRITE16_MEMBER(umipoker_state::umipoker_vram_1_w)
 WRITE16_MEMBER(umipoker_state::umipoker_vram_2_w)
 {
 
-	COMBINE_DATA(&m_vram_2[offset]);
+	COMBINE_DATA(&m_vram_2.target()[offset]);
 	m_tilemap_2->mark_tile_dirty(offset >> 1);
 }
 
 WRITE16_MEMBER(umipoker_state::umipoker_vram_3_w)
 {
 
-	COMBINE_DATA(&m_vram_3[offset]);
+	COMBINE_DATA(&m_vram_3.target()[offset]);
 	m_tilemap_3->mark_tile_dirty(offset >> 1);
 }
 

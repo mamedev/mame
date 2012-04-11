@@ -119,20 +119,20 @@ static SCREEN_UPDATE_IND16( backfire_left )
 	screen.machine().priority_bitmap.fill(0);
 	bitmap.fill(0x100, cliprect);
 
-	if (state->m_left_priority[0] == 0)
+	if (state->m_left_priority.target()[0] == 0)
 	{
 		deco16ic_tilemap_1_draw(state->m_deco_tilegen2, bitmap, cliprect, 0, 1);
 		deco16ic_tilemap_1_draw(state->m_deco_tilegen1, bitmap, cliprect, 0, 2);
 		screen.machine().device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, state->m_spriteram_1, 0x800);
 	}
-	else if (state->m_left_priority[0] == 2)
+	else if (state->m_left_priority.target()[0] == 2)
 	{
 		deco16ic_tilemap_1_draw(state->m_deco_tilegen1, bitmap, cliprect, 0, 2);
 		deco16ic_tilemap_1_draw(state->m_deco_tilegen2, bitmap, cliprect, 0, 4);
 		screen.machine().device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, state->m_spriteram_1, 0x800);
 	}
 	else
-		popmessage( "unknown left priority %08x", state->m_left_priority[0]);
+		popmessage( "unknown left priority %08x", state->m_left_priority.target()[0]);
 
 	return 0;
 }
@@ -152,20 +152,20 @@ static SCREEN_UPDATE_IND16( backfire_right )
 	screen.machine().priority_bitmap.fill(0);
 	bitmap.fill(0x500, cliprect);
 
-	if (state->m_right_priority[0] == 0)
+	if (state->m_right_priority.target()[0] == 0)
 	{
 		deco16ic_tilemap_2_draw(state->m_deco_tilegen2, bitmap, cliprect, 0, 1);
 		deco16ic_tilemap_2_draw(state->m_deco_tilegen1, bitmap, cliprect, 0, 2);
 		screen.machine().device<decospr_device>("spritegen2")->draw_sprites(bitmap, cliprect, state->m_spriteram_2, 0x800);
 	}
-	else if (state->m_right_priority[0] == 2)
+	else if (state->m_right_priority.target()[0] == 2)
 	{
 		deco16ic_tilemap_2_draw(state->m_deco_tilegen1, bitmap, cliprect, 0, 2);
 		deco16ic_tilemap_2_draw(state->m_deco_tilegen2, bitmap, cliprect, 0, 4);
 		screen.machine().device<decospr_device>("spritegen2")->draw_sprites(bitmap, cliprect, state->m_spriteram_2, 0x800);
 	}
 	else
-		popmessage( "unknown right priority %08x", state->m_right_priority[0]);
+		popmessage( "unknown right priority %08x", state->m_right_priority.target()[0]);
 
 	return 0;
 }
@@ -699,7 +699,7 @@ READ32_MEMBER(backfire_state::backfire_speedup_r)
 	if (cpu_get_pc(&space.device() )== 0xce44)  device_spin_until_time(&space.device(), attotime::from_usec(400)); // backfire
 	if (cpu_get_pc(&space.device()) == 0xcee4)  device_spin_until_time(&space.device(), attotime::from_usec(400)); // backfirea
 
-	return m_mainram[0x18/4];
+	return m_mainram.target()[0x18/4];
 }
 
 

@@ -205,7 +205,7 @@ static SCREEN_UPDATE_IND16( pinkiri8 )
 		for (i=0x00;i<0x40;i+=2)
 		{
 
-			printf("%02x, ", state->m_janshi_widthflags[i+1]);
+			printf("%02x, ", state->m_janshi_widthflags.target()[i+1]);
 
 			count2++;
 
@@ -223,8 +223,8 @@ static SCREEN_UPDATE_IND16( pinkiri8 )
 
 
 
-	//popmessage("%02x",state->m_janshi_crtc_regs[0x0a]);
-	col_bank = (state->m_janshi_crtc_regs[0x0a] & 0x40) >> 6;
+	//popmessage("%02x",state->m_janshi_crtc_regs.target()[0x0a]);
+	col_bank = (state->m_janshi_crtc_regs.target()[0x0a] & 0x40) >> 6;
 
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
@@ -238,8 +238,8 @@ static SCREEN_UPDATE_IND16( pinkiri8 )
 		{
 			for(x=0;x<32;x++)
 			{
-				tile = state->m_janshi_back_vram[count+1]<<8 | state->m_janshi_back_vram[count+0];
-				attr = state->m_janshi_back_vram[count+2] ^ 0xf0;
+				tile = state->m_janshi_back_vram.target()[count+1]<<8 | state->m_janshi_back_vram.target()[count+0];
+				attr = state->m_janshi_back_vram.target()[count+2] ^ 0xf0;
 				col = (attr >> 4) | 0x10;
 
 				drawgfx_transpen(bitmap,cliprect,gfx,tile,col,0,0,x*16,y*8,0);
@@ -275,15 +275,15 @@ static SCREEN_UPDATE_IND16( pinkiri8 )
 
           */
 
-			spr_offs = ((state->m_janshi_vram1[(i*4)+0] & 0xff) | (state->m_janshi_vram1[(i*4)+1]<<8)) & 0xffff;
-			col = (state->m_janshi_vram1[(i*4)+2] & 0xf8) >> 3;
-			x =   state->m_janshi_vram1[(i*4)+3];
+			spr_offs = ((state->m_janshi_vram1.target()[(i*4)+0] & 0xff) | (state->m_janshi_vram1.target()[(i*4)+1]<<8)) & 0xffff;
+			col = (state->m_janshi_vram1.target()[(i*4)+2] & 0xf8) >> 3;
+			x =   state->m_janshi_vram1.target()[(i*4)+3];
 
 			x &= 0xff;
 			x *= 2;
 
-//          unk2 = state->m_janshi_vram2[(i*2)+1];
-			y = (state->m_janshi_vram2[(i*2)+0]);
+//          unk2 = state->m_janshi_vram2.target()[(i*2)+1];
+			y = (state->m_janshi_vram2.target()[(i*2)+0]);
 
 			y = 0x100-y;
 
@@ -296,7 +296,7 @@ static SCREEN_UPDATE_IND16( pinkiri8 )
 
 
 			// these bits seem to somehow determine the sprite height / widths for the sprite ram region?
-			int bit = state->m_janshi_widthflags[(i/0x20)*2 + 1];
+			int bit = state->m_janshi_widthflags.target()[(i/0x20)*2 + 1];
 
 			if (bit)
 			{

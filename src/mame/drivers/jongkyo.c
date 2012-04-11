@@ -90,8 +90,8 @@ static SCREEN_UPDATE_IND16( jongkyo )
 
 
 
-			data1 = state->m_videoram[0x4000 + x / 4 + y * 64];
-			data2 = state->m_videoram[x / 4 + y * 64];
+			data1 = state->m_videoram.target()[0x4000 + x / 4 + y * 64];
+			data2 = state->m_videoram.target()[x / 4 + y * 64];
 
 			for (b = 0; b < 4; ++b)
 			{

@@ -99,8 +99,8 @@ static SCREEN_UPDATE_IND16( chinsan )
 		for (x = 0; x < 64; x++)
 		{
 			int tileno, colour;
-			tileno = state->m_video[count] | (state->m_video[count + 0x800] << 8);
-			colour = state->m_video[count + 0x1000] >> 3;
+			tileno = state->m_video.target()[count] | (state->m_video.target()[count + 0x800] << 8);
+			colour = state->m_video.target()[count + 0x1000] >> 3;
 			drawgfx_opaque(bitmap,cliprect,screen.machine().gfx[0],tileno,colour,0,0,x*8,y*8);
 			count++;
 		}

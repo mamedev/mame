@@ -72,8 +72,8 @@ public:
 static TILE_GET_INFO( get_sc0_tile_info )
 {
 	caswin_state *state = machine.driver_data<caswin_state>();
-	int tile = (state->m_sc0_vram[tile_index] | ((state->m_sc0_attr[tile_index] & 0x70)<<4)) & 0x7ff;
-	int colour = state->m_sc0_attr[tile_index] & 0xf;
+	int tile = (state->m_sc0_vram.target()[tile_index] | ((state->m_sc0_attr.target()[tile_index] & 0x70)<<4)) & 0x7ff;
+	int colour = state->m_sc0_attr.target()[tile_index] & 0xf;
 
 	SET_TILE_INFO(
 			0,
@@ -97,13 +97,13 @@ static SCREEN_UPDATE_IND16(vvillage)
 
 WRITE8_MEMBER(caswin_state::sc0_vram_w)
 {
-	m_sc0_vram[offset] = data;
+	m_sc0_vram.target()[offset] = data;
 	m_sc0_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(caswin_state::sc0_attr_w)
 {
-	m_sc0_attr[offset] = data;
+	m_sc0_attr.target()[offset] = data;
 	m_sc0_tilemap->mark_tile_dirty(offset);
 }
 

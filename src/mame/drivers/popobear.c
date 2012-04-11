@@ -110,7 +110,7 @@ static void draw_layer(running_machine &machine, bitmap_ind16 &bitmap,const rect
 	const UINT8 vreg_base[] = { 0x10/2, 0x14/2 };
 	int xscroll,yscroll;
 
-//  count = (state->m_vregs[vreg_base[layer_n]]<<5);
+//  count = (state->m_vregs.target()[vreg_base[layer_n]]<<5);
 //  count &= 0xfc000;
 	count = (0xf0000+layer_n*0x4000);
 	if(layer_n & 2)
@@ -259,7 +259,7 @@ SCREEN_UPDATE_IND16( popobear )
 
 	bitmap.fill(0, cliprect);
 
-	//popmessage("%04x",state->m_vregs[0/2]);
+	//popmessage("%04x",state->m_vregs.target()[0/2]);
 
 	draw_layer(screen.machine(),bitmap,cliprect,3);
 	draw_layer(screen.machine(),bitmap,cliprect,2);

@@ -262,12 +262,12 @@ static SCREEN_UPDATE_IND16( m2 )
 	UINT32 fb_start = 0xffffffff;
 	if (state->m_vdl0_address != 0)
 	{
-		fb_start = *(UINT32*)&state->m_main_ram[(state->m_vdl0_address - 0x40000000) / 8] - 0x40000000;
+		fb_start = *(UINT32*)&state->m_main_ram.target()[(state->m_vdl0_address - 0x40000000) / 8] - 0x40000000;
 	}
 
 	if (fb_start <= 0x800000)
 	{
-		UINT16 *frame = (UINT16*)&state->m_main_ram[fb_start/8];
+		UINT16 *frame = (UINT16*)&state->m_main_ram.target()[fb_start/8];
 		for (j=0; j < 384; j++)
 		{
 			UINT16 *fb = &frame[(j*512)];

@@ -279,11 +279,11 @@ READ16_MEMBER(astrocorp_state::astrocorp_unk_r)
 // 5-6-5 Palette: BBBBB-GGGGGG-RRRRR
 WRITE16_MEMBER(astrocorp_state::astrocorp_palette_w)
 {
-	COMBINE_DATA(&m_paletteram[offset]);
+	COMBINE_DATA(&m_paletteram.target()[offset]);
 	palette_set_color_rgb(machine(), offset,
-		pal5bit((m_paletteram[offset] >>  0) & 0x1f),
-		pal6bit((m_paletteram[offset] >>  5) & 0x3f),
-		pal5bit((m_paletteram[offset] >> 11) & 0x1f)
+		pal5bit((m_paletteram.target()[offset] >>  0) & 0x1f),
+		pal6bit((m_paletteram.target()[offset] >>  5) & 0x3f),
+		pal5bit((m_paletteram.target()[offset] >> 11) & 0x1f)
 	);
 }
 

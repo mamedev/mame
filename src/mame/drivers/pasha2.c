@@ -138,14 +138,14 @@ WRITE16_MEMBER(pasha2_state::pasha2_palette_w)
 {
 	int color;
 
-	COMBINE_DATA(&m_paletteram[offset]);
+	COMBINE_DATA(&m_paletteram.target()[offset]);
 
 	offset &= 0xff;
 
-	color = (m_paletteram[offset] >> 8) | (m_paletteram[offset + 0x100] & 0xff00);
+	color = (m_paletteram.target()[offset] >> 8) | (m_paletteram.target()[offset + 0x100] & 0xff00);
 	palette_set_color_rgb(machine(), offset * 2 + 0, pal5bit(color), pal5bit(color >> 5), pal5bit(color >> 10));
 
-	color = (m_paletteram[offset] & 0xff) | ((m_paletteram[offset + 0x100] & 0xff) << 8);
+	color = (m_paletteram.target()[offset] & 0xff) | ((m_paletteram.target()[offset + 0x100] & 0xff) << 8);
 	palette_set_color_rgb(machine(), offset * 2 + 1, pal5bit(color), pal5bit(color >> 5), pal5bit(color >> 10));
 }
 
@@ -468,7 +468,7 @@ READ16_MEMBER(pasha2_state::pasha2_speedup_r)
 	if(cpu_get_pc(&space.device()) == 0x8302)
 		device_spin_until_interrupt(&space.device());
 
-	return m_wram[(0x95744 / 2) + offset];
+	return m_wram.target()[(0x95744 / 2) + offset];
 }
 
 static DRIVER_INIT( pasha2 )

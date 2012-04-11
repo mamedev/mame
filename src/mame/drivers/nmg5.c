@@ -271,13 +271,13 @@ public:
 
 WRITE16_MEMBER(nmg5_state::fg_videoram_w)
 {
-	COMBINE_DATA(&m_fg_videoram[offset]);
+	COMBINE_DATA(&m_fg_videoram.target()[offset]);
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE16_MEMBER(nmg5_state::bg_videoram_w)
 {
-	COMBINE_DATA(&m_bg_videoram[offset]);
+	COMBINE_DATA(&m_bg_videoram.target()[offset]);
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
@@ -866,13 +866,13 @@ static void draw_bitmap( running_machine &machine, bitmap_ind16 &bitmap )
 	{
 		for (x = 0; x < xxx; x++)
 		{
-			pix = (state->m_bitmap[count] & 0xf000) >> 12;
+			pix = (state->m_bitmap.target()[count] & 0xf000) >> 12;
 			if (pix) bitmap.pix16(y + yoff, x * 4 + 0 + xoff) = pix + 0x300;
-			pix = (state->m_bitmap[count] & 0x0f00) >> 8;
+			pix = (state->m_bitmap.target()[count] & 0x0f00) >> 8;
 			if (pix) bitmap.pix16(y + yoff, x * 4 + 1 + xoff) = pix + 0x300;
-			pix = (state->m_bitmap[count] & 0x00f0) >> 4;
+			pix = (state->m_bitmap.target()[count] & 0x00f0) >> 4;
 			if (pix) bitmap.pix16(y + yoff, x * 4 + 2 + xoff) = pix + 0x300;
-			pix = (state->m_bitmap[count] & 0x000f) >> 0;
+			pix = (state->m_bitmap.target()[count] & 0x000f) >> 0;
 			if (pix) bitmap.pix16(y + yoff, x * 4 + 3 + xoff) = pix + 0x300;
 
 			count++;
@@ -885,10 +885,10 @@ static SCREEN_UPDATE_IND16( nmg5 )
 {
 	nmg5_state *state = screen.machine().driver_data<nmg5_state>();
 
-	state->m_bg_tilemap->set_scrolly(0, state->m_scroll_ram[3] + 9);
-	state->m_bg_tilemap->set_scrollx(0, state->m_scroll_ram[2] + 3);
-	state->m_fg_tilemap->set_scrolly(0, state->m_scroll_ram[1] + 9);
-	state->m_fg_tilemap->set_scrollx(0, state->m_scroll_ram[0] - 1);
+	state->m_bg_tilemap->set_scrolly(0, state->m_scroll_ram.target()[3] + 9);
+	state->m_bg_tilemap->set_scrollx(0, state->m_scroll_ram.target()[2] + 3);
+	state->m_fg_tilemap->set_scrolly(0, state->m_scroll_ram.target()[1] + 9);
+	state->m_fg_tilemap->set_scrollx(0, state->m_scroll_ram.target()[0] - 1);
 
 	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 

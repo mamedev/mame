@@ -405,7 +405,7 @@ static MACHINE_START( zr107 )
 	ppcdrc_set_options(machine.device("maincpu"), PPCDRC_COMPATIBLE_OPTIONS);
 
 	/* configure fast RAM regions for DRC */
-	ppcdrc_add_fastram(machine.device("maincpu"), 0x00000000, 0x000fffff, FALSE, state->m_workram);
+	ppcdrc_add_fastram(machine.device("maincpu"), 0x00000000, 0x000fffff, FALSE, state->m_workram.target());
 }
 
 static ADDRESS_MAP_START( zr107_map, AS_PROGRAM, 32, zr107_state )

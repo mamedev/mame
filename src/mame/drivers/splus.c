@@ -183,21 +183,21 @@ WRITE8_MEMBER(splus_state::splus_io_w)
 #endif
 	}
 
-	m_io_port[offset] = data;
+	m_io_port.target()[offset] = data;
 }
 
 WRITE8_MEMBER(splus_state::splus_load_pulse_w)
 {
 
 //  UINT8 out = 0;
-//    out = ((~m_io_port[1] & 0xf0)>>4); // Output Bank
+//    out = ((~m_io_port.target()[1] & 0xf0)>>4); // Output Bank
 }
 
 WRITE8_MEMBER(splus_state::splus_serial_w)
 {
 
     UINT8 out = 0;
-    out = ((~m_io_port[1] & 0xe0)>>5); // Output Bank
+    out = ((~m_io_port.target()[1] & 0xe0)>>5); // Output Bank
 
 	switch (out)
 	{
@@ -346,8 +346,8 @@ WRITE8_MEMBER(splus_state::splus_7seg_w)
     seg = ((~data & 0xf0)>>4); // Segment Number
     val = (~data & 0x0f); // Digit Value
 
-    // Need to add ~m_io_port[1]-1 to seg value
-    if (seg < 0x0a && (m_io_port[1] & 0xe0) == 0xe0)
+    // Need to add ~m_io_port.target()[1]-1 to seg value
+    if (seg < 0x0a && (m_io_port.target()[1] & 0xe0) == 0xe0)
         output_set_digit_value(seg, ls48_map[val]);
 }
 
@@ -378,7 +378,7 @@ READ8_MEMBER(splus_state::splus_serial_r)
 
     UINT8 in = 0x00;
     UINT8 val = 0x00;
-    in = ((~m_io_port[1] & 0xe0)>>5); // Input Bank
+    in = ((~m_io_port.target()[1] & 0xe0)>>5); // Input Bank
 
 	switch (in)
 	{
@@ -512,16 +512,16 @@ READ8_MEMBER(splus_state::splus_serial_r)
 
 READ8_MEMBER(splus_state::splus_m_reel_ram_r)
 {
-	return m_reel_ram[offset];
+	return m_reel_ram.target()[offset];
 }
 
 READ8_MEMBER(splus_state::splus_io_r)
 {
 
     if (offset == 3)
-        return m_io_port[offset] & 0xf3; // Ignore Int0 and Int1, or machine will loop forever waiting
+        return m_io_port.target()[offset] & 0xf3; // Ignore Int0 and Int1, or machine will loop forever waiting
     else
-    	return m_io_port[offset];
+    	return m_io_port.target()[offset];
 }
 
 READ8_MEMBER(splus_state::splus_duart_r)

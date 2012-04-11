@@ -1027,7 +1027,7 @@ READ8_MEMBER(halleys_state::blitter_r)
 
 	if (i==0 || i==4) return(1);
 
-	return(m_blitter_ram[offset]);
+	return(m_blitter_ram.target()[offset]);
 }
 
 
@@ -1042,7 +1042,7 @@ WRITE8_MEMBER(halleys_state::blitter_w)
 {
 	int i = offset & 0xf;
 
-	m_blitter_ram[offset] = data;
+	m_blitter_ram.target()[offset] = data;
 
 	if (i==0) blit(offset);
 
@@ -1093,7 +1093,7 @@ READ8_MEMBER(halleys_state::collision_id_r)
 		return(0);
 	}
 
-	return(m_io_ram[0x66]);
+	return(m_io_ram.target()[0x66]);
 }
 
 
@@ -1496,9 +1496,9 @@ static SCREEN_UPDATE_IND16( halleys )
 	copy_fixed_xp (bitmap, state->m_render_layer[0]);
 
 	// HALF-HACK: apply RGB filter when the following conditions are met
-	i = state->m_io_ram[0xa0];
-	j = state->m_io_ram[0xa1];
-	if (state->m_io_ram[0x2b] && (i>0xc6 && i<0xfe) && (j==0xc0 || j==0xed)) filter_bitmap(screen.machine(), bitmap, i);
+	i = state->m_io_ram.target()[0xa0];
+	j = state->m_io_ram.target()[0xa1];
+	if (state->m_io_ram.target()[0x2b] && (i>0xc6 && i<0xfe) && (j==0xc0 || j==0xed)) filter_bitmap(screen.machine(), bitmap, i);
 	return 0;
 }
 
@@ -1506,7 +1506,7 @@ static SCREEN_UPDATE_IND16( halleys )
 static SCREEN_UPDATE_IND16( benberob )
 {
 	halleys_state *state = screen.machine().driver_data<halleys_state>();
-	if (state->m_io_ram[0xa0] & 0x80)
+	if (state->m_io_ram.target()[0xa0] & 0x80)
 		copy_scroll_op(bitmap, state->m_render_layer[2], *state->m_scrollx1, *state->m_scrolly1);
 	else
 		bitmap.fill(state->m_bgcolor, cliprect);
@@ -1526,7 +1526,7 @@ READ8_MEMBER(halleys_state::zero_r){ return(0); }
 
 READ8_MEMBER(halleys_state::debug_r)
 {
-	return(m_io_ram[offset]);
+	return(m_io_ram.target()[offset]);
 }
 
 #endif
@@ -1598,7 +1598,7 @@ READ8_MEMBER(halleys_state::vector_r)
 
 WRITE8_MEMBER(halleys_state::firq_ack_w)
 {
-	m_io_ram[0x9c] = data;
+	m_io_ram.target()[0x9c] = data;
 
 	if (m_firq_level) m_firq_level--;
 	cputag_set_input_line(machine(), "maincpu", M6809_FIRQ_LINE, CLEAR_LINE);
@@ -1615,7 +1615,7 @@ static WRITE8_DEVICE_HANDLER( sndnmi_msk_w )
 WRITE8_MEMBER(halleys_state::soundcommand_w)
 {
 
-	m_io_ram[0x8a] = data;
+	m_io_ram.target()[0x8a] = data;
 	soundlatch_byte_w(space,offset,data);
 	cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }

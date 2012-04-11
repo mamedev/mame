@@ -90,9 +90,9 @@ static void draw_strip(running_machine &machine, bitmap_ind16 &bitmap, const rec
 
 	for (y=0;y<32;y++)
 	{
-		UINT16 tile = (state->m_tilemapram2[count*2 + (base/2)+1]&0x3fff);
-		UINT16 flipx = (state->m_tilemapram2[count*2 + (base/2)+1]&0x4000);
-		UINT16 colour = (state->m_tilemapram2[count*2 + (base/2)]&0x00ff);
+		UINT16 tile = (state->m_tilemapram2.target()[count*2 + (base/2)+1]&0x3fff);
+		UINT16 flipx = (state->m_tilemapram2.target()[count*2 + (base/2)+1]&0x4000);
+		UINT16 colour = (state->m_tilemapram2.target()[count*2 + (base/2)]&0x00ff);
 
 		if (tile&0x2000)
 		{
@@ -121,8 +121,8 @@ static void draw_main(running_machine &machine, bitmap_ind16 &bitmap, const rect
 		int yy;
 		int s = 0;
 
-		xx=  ((state->m_tilemapram2[x+0]&0x001f)<<4) | (state->m_tilemapram2[x+1]&0xf000)>>12;
-		yy = ((state->m_tilemapram2[x+1]&0x1ff));
+		xx=  ((state->m_tilemapram2.target()[x+0]&0x001f)<<4) | (state->m_tilemapram2.target()[x+1]&0xf000)>>12;
+		yy = ((state->m_tilemapram2.target()[x+1]&0x1ff));
 
 		if (xx&0x100) xx-=0x200;
 		yy = 0x1ff-yy;
@@ -156,7 +156,7 @@ static SCREEN_UPDATE_IND16( blackt96 )
 	{
 		for (y=0;y<32;y++)
 		{
-			UINT16 tile = (state->m_tilemapram[count*2]&0x7ff)+0x800; // +0xc00 for korean text
+			UINT16 tile = (state->m_tilemapram.target()[count*2]&0x7ff)+0x800; // +0xc00 for korean text
 			drawgfx_transpen(bitmap,cliprect,gfx,tile,0,0,0,x*8,-16+y*8,0);
 			count++;
 		}

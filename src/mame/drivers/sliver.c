@@ -132,9 +132,9 @@ static void plot_pixel_pal(running_machine &machine, int x, int y, int addr)
 	if (y < 0 || x < 0 || x > 383 || y > 255)
 		return;
 
-	b=(state->m_colorram[addr] << 2) | (state->m_colorram[addr] & 0x3);
-	g=(state->m_colorram[addr+0x100] << 2) | (state->m_colorram[addr+0x100] & 3);
-	r=(state->m_colorram[addr+0x200] << 2) | (state->m_colorram[addr+0x200] & 3);
+	b=(state->m_colorram.target()[addr] << 2) | (state->m_colorram.target()[addr] & 0x3);
+	g=(state->m_colorram.target()[addr+0x100] << 2) | (state->m_colorram.target()[addr+0x100] & 3);
+	r=(state->m_colorram.target()[addr+0x200] << 2) | (state->m_colorram.target()[addr+0x200] & 3);
 
 	state->m_bitmap_fg.pix32(y, x) = r | (g<<8) | (b<<16);
 }

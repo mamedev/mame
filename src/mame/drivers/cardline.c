@@ -45,8 +45,8 @@ public:
 
 
 #define DRAW_TILE(machine, offset, transparency) drawgfx_transpen(bitmap, cliprect, (machine).gfx[0],\
-					(state->m_videoram[index+offset] | (state->m_colorram[index+offset]<<8))&0x3fff,\
-					(state->m_colorram[index+offset]&0x80)>>7,\
+					(state->m_videoram.target()[index+offset] | (state->m_colorram.target()[index+offset]<<8))&0x3fff,\
+					(state->m_colorram.target()[index+offset]&0x80)>>7,\
 					0,0,\
 					x<<3, y<<3,\
 					transparency?transparency:(UINT32)-1);
@@ -80,13 +80,13 @@ static SCREEN_UPDATE_IND16( cardline )
 WRITE8_MEMBER(cardline_state::vram_w)
 {
 	offset+=0x1000*((m_video&2)>>1);
-	m_videoram[offset]=data;
+	m_videoram.target()[offset]=data;
 }
 
 WRITE8_MEMBER(cardline_state::attr_w)
 {
 	offset+=0x1000*((m_video&2)>>1);
-	m_colorram[offset]=data;
+	m_colorram.target()[offset]=data;
 }
 
 WRITE8_MEMBER(cardline_state::video_w)

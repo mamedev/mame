@@ -980,13 +980,13 @@ public:
 
 WRITE8_MEMBER(goldnpkr_state::goldnpkr_videoram_w)
 {
-	m_videoram[offset] = data;
+	m_videoram.target()[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(goldnpkr_state::goldnpkr_colorram_w)
 {
-	m_colorram[offset] = data;
+	m_colorram.target()[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
@@ -1001,8 +1001,8 @@ static TILE_GET_INFO( get_bg_tile_info )
     xx-- ----   unused.
 */
 
-	int attr = state->m_colorram[tile_index];
-	int code = ((attr & 1) << 8) | state->m_videoram[tile_index];
+	int attr = state->m_colorram.target()[tile_index];
+	int code = ((attr & 1) << 8) | state->m_videoram.target()[tile_index];
 	int bank = (attr & 0x02) >> 1;	/* bit 1 switch the gfx banks */
 	int color = (attr & 0x3c) >> 2;	/* bits 2-3-4-5 for color */
 
@@ -1020,8 +1020,8 @@ static TILE_GET_INFO( wcrdxtnd_get_bg_tile_info )
     xx-- --xx   tiles bank.
 */
 
-	int attr = state->m_colorram[tile_index];
-	int code = ((attr & 1) << 8) | state->m_videoram[tile_index];
+	int attr = state->m_colorram.target()[tile_index];
+	int code = ((attr & 1) << 8) | state->m_videoram.target()[tile_index];
 	int bank = (attr & 0x03) + ((attr & 0xc0) >> 4);	/* bits 0, 1, 6 & 7 switch the gfx banks */
 	int color = (attr & 0x3c) >> 2;	/* bits 2-3-4-5 for color */
 

@@ -84,12 +84,12 @@ READ8_MEMBER(deshoros_state::io_r)
 		case 0x03: return input_port_read(machine(), "KEY0" );
 		case 0x04: return input_port_read(machine(), "KEY1" );
 		case 0x05: return input_port_read(machine(), "SYSTEM" );
-		case 0x0a: return m_io_ram[offset]; //"buzzer" 0 read
-		case 0x0b: return m_io_ram[offset]; //"buzzer" 1 read
+		case 0x0a: return m_io_ram.target()[offset]; //"buzzer" 0 read
+		case 0x0b: return m_io_ram.target()[offset]; //"buzzer" 1 read
 	}
 //  printf("R -> [%02x]\n",offset);
 
-	return m_io_ram[offset];
+	return m_io_ram.target()[offset];
 }
 
 WRITE8_MEMBER(deshoros_state::io_w)
@@ -98,13 +98,13 @@ WRITE8_MEMBER(deshoros_state::io_w)
 	{
 		case 0x00: /*Printer data*/						return;
 		case 0x02: update_led_array(data);              return;
-		case 0x05: coin_lockout_w(machine(), 0,m_io_ram[offset] & 1);return;
+		case 0x05: coin_lockout_w(machine(), 0,m_io_ram.target()[offset] & 1);return;
 		case 0x06: /*Printer IRQ enable*/   		    return;
 //      case 0x0a: "buzzer" 0 write
 //      case 0x0b: "buzzer" 1 write
 		case 0x0c: answer_bankswitch(machine(),data&0x03); return; //data & 0x10 enabled too,dunno if it is worth to shift the data...
 	}
-	m_io_ram[offset] = data;
+	m_io_ram.target()[offset] = data;
 //  printf("%02x -> [%02x]\n",data,offset);
 }
 

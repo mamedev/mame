@@ -174,7 +174,7 @@ READ8_MEMBER(merit_state::palette_r)
 {
 	int co;
 
-	co = ((m_ram_attr[offset] & 0x7F) << 3) | (offset & 0x07);
+	co = ((m_ram_attr.target()[offset] & 0x7F) << 3) | (offset & 0x07);
 	return m_ram_palette[co];
 }
 
@@ -185,7 +185,7 @@ WRITE8_MEMBER(merit_state::palette_w)
 	machine().primary_screen->update_now();
 	data &= 0x0f;
 
-	co = ((m_ram_attr[offset] & 0x7F) << 3) | (offset & 0x07);
+	co = ((m_ram_attr.target()[offset] & 0x7F) << 3) | (offset & 0x07);
 	m_ram_palette[co] = data;
 
 }
@@ -228,9 +228,9 @@ static MC6845_UPDATE_ROW( update_row )
 	for (cx = 0; cx < x_count; cx++)
 	{
 		int i;
-		int attr = state->m_ram_attr[ma & 0x7ff];
+		int attr = state->m_ram_attr.target()[ma & 0x7ff];
 		int region = (attr & 0x40) >> 6;
-		int addr = ((state->m_ram_video[ma & 0x7ff] | ((attr & 0x80) << 1) | (state->m_extra_video_bank_bit)) << 4) | (ra & 0x0f);
+		int addr = ((state->m_ram_video.target()[ma & 0x7ff] | ((attr & 0x80) << 1) | (state->m_extra_video_bank_bit)) << 4) | (ra & 0x0f);
 		int colour = (attr & 0x7f) << 3;
 		UINT8	*data;
 
@@ -328,7 +328,7 @@ static WRITE8_DEVICE_HANDLER( misc_couple_w )
 	/* other bits unknown */
 
 	/*kludge to avoid jumps on ram area in The Couples*/
-	state->m_backup_ram[0x1011] = 0xc9; //ret
+	state->m_backup_ram.target()[0x1011] = 0xc9; //ret
 }
 
 WRITE8_MEMBER(merit_state::casino5_bank_w)

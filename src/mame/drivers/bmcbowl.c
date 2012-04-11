@@ -154,28 +154,28 @@ static SCREEN_UPDATE_IND16( bmcbowl )
 	{
 		for (x=0;x<280;x+=2)
 		{
-			pixdat = state->m_vid2[0x8000+z];
+			pixdat = state->m_vid2.target()[0x8000+z];
 
 			if(pixdat&0xff)
 				bitmap.pix16(y, x+1) = (pixdat&0xff);
 			if(pixdat>>8)
 				bitmap.pix16(y, x) = (pixdat>>8);
 
-			pixdat = state->m_vid2[z];
+			pixdat = state->m_vid2.target()[z];
 
 			if(pixdat&0xff)
 				bitmap.pix16(y, x+1) = (pixdat&0xff);
 			if(pixdat>>8)
 				bitmap.pix16(y, x) = (pixdat>>8);
 
-			pixdat = state->m_vid1[0x8000+z];
+			pixdat = state->m_vid1.target()[0x8000+z];
 
 			if(pixdat&0xff)
 				bitmap.pix16(y, x+1) = (pixdat&0xff);
 			if(pixdat>>8)
 				bitmap.pix16(y, x) = (pixdat>>8);
 
-			pixdat = state->m_vid1[z];
+			pixdat = state->m_vid1.target()[z];
 
 			if(pixdat&0xff)
 				bitmap.pix16(y, x+1) = (pixdat&0xff);
@@ -297,7 +297,7 @@ static void init_stats(bmcbowl_state *state, const UINT8 *table, int table_len, 
 {
 	int i;
 	for (i=0; i<table_len; i++)
-		state->m_stats_ram[address+2*i]=table[i];
+		state->m_stats_ram.target()[address+2*i]=table[i];
 }
 #endif
 
@@ -312,7 +312,7 @@ static NVRAM_HANDLER( bmcbowl )
 
 #ifdef NVRAM_HACK
 	for (i = 0; i < state->m_stats_ram.bytes(); i++)
-		state->m_stats_ram[i] = 0xff;
+		state->m_stats_ram.target()[i] = 0xff;
 
 	init_stats(state,bmc_nv1,ARRAY_LENGTH(bmc_nv1),0);
 	init_stats(state,bmc_nv2,ARRAY_LENGTH(bmc_nv2),0x3b0);
@@ -323,7 +323,7 @@ static NVRAM_HANDLER( bmcbowl )
 	else
 
 		for (i = 0; i < state->m_stats_ram.bytes(); i++)
-			state->m_stats_ram[i] = 0xff;
+			state->m_stats_ram.target()[i] = 0xff;
 #endif
 
 }

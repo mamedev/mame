@@ -277,7 +277,7 @@ static void draw_framebuffer(running_machine &machine, bitmap_rgb32 &bitmap, con
 
 	if (state->m_disp_ctrl_reg[DC_OUTPUT_CFG] & 0x1)		// 8-bit mode
 	{
-		UINT8 *framebuf = (UINT8*)&state->m_vram[state->m_disp_ctrl_reg[DC_FB_ST_OFFSET]/4];
+		UINT8 *framebuf = (UINT8*)&state->m_vram.target()[state->m_disp_ctrl_reg[DC_FB_ST_OFFSET]/4];
 		UINT8 *pal = state->m_pal;
 
 		for (j=0; j < state->m_frame_height; j++)
@@ -297,7 +297,7 @@ static void draw_framebuffer(running_machine &machine, bitmap_rgb32 &bitmap, con
 	}
 	else			// 16-bit
 	{
-		UINT16 *framebuf = (UINT16*)&state->m_vram[state->m_disp_ctrl_reg[DC_FB_ST_OFFSET]/4];
+		UINT16 *framebuf = (UINT16*)&state->m_vram.target()[state->m_disp_ctrl_reg[DC_FB_ST_OFFSET]/4];
 
 		// RGB 5-6-5 mode
 		if ((state->m_disp_ctrl_reg[DC_OUTPUT_CFG] & 0x2) == 0)
@@ -1243,7 +1243,7 @@ INLINE UINT32 generic_speedup(address_space *space, int idx)
 		state->m_speedup_hits[idx]++;
 		device_spin_until_interrupt(&space->device());
 	}
-	return state->m_main_ram[state->m_speedup_table[idx].offset/4];
+	return state->m_main_ram.target()[state->m_speedup_table[idx].offset/4];
 }
 
 static READ32_HANDLER( speedup0_r ) { return generic_speedup(space, 0); }

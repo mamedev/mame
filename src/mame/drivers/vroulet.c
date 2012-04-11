@@ -85,21 +85,21 @@ WRITE8_MEMBER(vroulet_state::vroulet_paletteram_w)
 
 WRITE8_MEMBER(vroulet_state::vroulet_videoram_w)
 {
-	m_videoram[offset] = data;
+	m_videoram.target()[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(vroulet_state::vroulet_colorram_w)
 {
-	m_colorram[offset] = data;
+	m_colorram.target()[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
 	vroulet_state *state = machine.driver_data<vroulet_state>();
-	int attr = state->m_colorram[tile_index];
-	int code = state->m_videoram[tile_index] + ((attr & 0xc0) << 2);
+	int attr = state->m_colorram.target()[tile_index];
+	int code = state->m_videoram.target()[tile_index] + ((attr & 0xc0) << 2);
 	int color = attr & 0x1f;
 
 	SET_TILE_INFO(0, code, color, 0);
@@ -117,7 +117,7 @@ static SCREEN_UPDATE_IND16(vroulet)
 	vroulet_state *state = screen.machine().driver_data<vroulet_state>();
 	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[0], 0x320, 1, 0, 0,
-		state->m_ball[1], state->m_ball[0] - 12, 0);
+		state->m_ball.target()[1], state->m_ball.target()[0] - 12, 0);
 	return 0;
 }
 

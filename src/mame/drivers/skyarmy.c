@@ -65,8 +65,8 @@ WRITE8_MEMBER(skyarmy_state::skyarmy_flip_screen_y_w)
 static TILE_GET_INFO( get_skyarmy_tile_info )
 {
 	skyarmy_state *state = machine.driver_data<skyarmy_state>();
-	int code = state->m_videoram[tile_index];
-	int attr = BITSWAP8(state->m_colorram[tile_index], 7, 6, 5, 4, 3, 0, 1, 2) & 7;
+	int code = state->m_videoram.target()[tile_index];
+	int attr = BITSWAP8(state->m_colorram.target()[tile_index], 7, 6, 5, 4, 3, 0, 1, 2) & 7;
 
 	SET_TILE_INFO( 0, code, attr, 0);
 }
@@ -74,14 +74,14 @@ static TILE_GET_INFO( get_skyarmy_tile_info )
 WRITE8_MEMBER(skyarmy_state::skyarmy_videoram_w)
 {
 
-	m_videoram[offset] = data;
+	m_videoram.target()[offset] = data;
 	m_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(skyarmy_state::skyarmy_colorram_w)
 {
 
-	m_colorram[offset] = data;
+	m_colorram.target()[offset] = data;
 	m_tilemap->mark_tile_dirty(offset);
 }
 
@@ -130,7 +130,7 @@ static SCREEN_UPDATE_IND16( skyarmy )
 	int i;
 
 	for(i=0;i<0x20;i++)
-		state->m_tilemap->set_scrolly(i,state->m_scrollram[i]);
+		state->m_tilemap->set_scrolly(i,state->m_scrollram.target()[i]);
 
 	state->m_tilemap->draw(bitmap, cliprect, 0,0);
 

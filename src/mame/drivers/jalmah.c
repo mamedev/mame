@@ -239,7 +239,7 @@ static TILEMAP_MAPPER( range3_8x8 )
 static TILE_GET_INFO( get_sc0_tile_info )
 {
 	jalmah_state *state = machine.driver_data<jalmah_state>();
-	int code = state->m_sc0_vram[tile_index];
+	int code = state->m_sc0_vram.target()[tile_index];
 	SET_TILE_INFO(
 			3,
 			(code & 0xfff) + ((state->m_sc0bank & 3) << 12),
@@ -250,7 +250,7 @@ static TILE_GET_INFO( get_sc0_tile_info )
 static TILE_GET_INFO( get_sc1_tile_info )
 {
 	jalmah_state *state = machine.driver_data<jalmah_state>();
-	int code = state->m_sc1_vram[tile_index];
+	int code = state->m_sc1_vram.target()[tile_index];
 	SET_TILE_INFO(
 			2,
 			code & 0xfff,
@@ -261,7 +261,7 @@ static TILE_GET_INFO( get_sc1_tile_info )
 static TILE_GET_INFO( get_sc2_tile_info )
 {
 	jalmah_state *state = machine.driver_data<jalmah_state>();
-	int code = state->m_sc2_vram[tile_index];
+	int code = state->m_sc2_vram.target()[tile_index];
 	SET_TILE_INFO(
 			1,
 			code & 0xfff,
@@ -272,7 +272,7 @@ static TILE_GET_INFO( get_sc2_tile_info )
 static TILE_GET_INFO( get_sc3_tile_info )
 {
 	jalmah_state *state = machine.driver_data<jalmah_state>();
-	int code = state->m_sc3_vram[tile_index];
+	int code = state->m_sc3_vram.target()[tile_index];
 	SET_TILE_INFO(
 			0,
 			code & 0xfff,
@@ -502,7 +502,7 @@ static SCREEN_UPDATE_IND16( urashima )
 
 WRITE16_MEMBER(jalmah_state::sc0_vram_w)
 {
-	COMBINE_DATA(&m_sc0_vram[offset]);
+	COMBINE_DATA(&m_sc0_vram.target()[offset]);
 	/*2048x256 tilemap*/
 	m_sc0_tilemap_0->mark_tile_dirty(offset);
 	/*1024x512 tilemap*/
@@ -515,7 +515,7 @@ WRITE16_MEMBER(jalmah_state::sc0_vram_w)
 
 WRITE16_MEMBER(jalmah_state::sc3_vram_w)
 {
-	COMBINE_DATA(&m_sc3_vram[offset]);
+	COMBINE_DATA(&m_sc3_vram.target()[offset]);
 	/*2048x256 tilemap*/
 	m_sc3_tilemap_0->mark_tile_dirty(offset);
 	/*1024x512 tilemap*/
@@ -526,7 +526,7 @@ WRITE16_MEMBER(jalmah_state::sc3_vram_w)
 
 WRITE16_MEMBER(jalmah_state::sc1_vram_w)
 {
-	COMBINE_DATA(&m_sc1_vram[offset]);
+	COMBINE_DATA(&m_sc1_vram.target()[offset]);
 	/*2048x256 tilemap*/
 	m_sc1_tilemap_0->mark_tile_dirty(offset);
 	/*1024x512 tilemap*/
@@ -539,7 +539,7 @@ WRITE16_MEMBER(jalmah_state::sc1_vram_w)
 
 WRITE16_MEMBER(jalmah_state::sc2_vram_w)
 {
-	COMBINE_DATA(&m_sc2_vram[offset]);
+	COMBINE_DATA(&m_sc2_vram.target()[offset]);
 	/*2048x256 tilemap*/
 	m_sc2_tilemap_0->mark_tile_dirty(offset);
 	/*1024x512 tilemap*/
@@ -617,13 +617,13 @@ WRITE16_MEMBER(jalmah_state::urashima_bank_w)
 
 WRITE16_MEMBER(jalmah_state::urashima_sc0_vram_w)
 {
-	COMBINE_DATA(&m_sc0_vram[offset]);
+	COMBINE_DATA(&m_sc0_vram.target()[offset]);
 	m_sc0_tilemap_0->mark_tile_dirty(offset);
 }
 
 WRITE16_MEMBER(jalmah_state::urashima_sc3_vram_w)
 {
-	COMBINE_DATA(&m_sc3_vram[offset]);
+	COMBINE_DATA(&m_sc3_vram.target()[offset]);
 	m_sc3_tilemap_0->mark_tile_dirty(offset);
 }
 

@@ -467,15 +467,15 @@ WRITE32_MEMBER(nwktr_state::lanc2_w)
 	{
 		if (mame_stricmp(machine().system().name, "thrilld") == 0)
 		{
-			m_work_ram[(0x3ffed0/4) + 0] = 0x472a3731;
-			m_work_ram[(0x3ffed0/4) + 1] = 0x33202020;
-			m_work_ram[(0x3ffed0/4) + 2] = 0x2d2d2a2a;
-			m_work_ram[(0x3ffed0/4) + 3] = 0x2a207878;
+			m_work_ram.target()[(0x3ffed0/4) + 0] = 0x472a3731;
+			m_work_ram.target()[(0x3ffed0/4) + 1] = 0x33202020;
+			m_work_ram.target()[(0x3ffed0/4) + 2] = 0x2d2d2a2a;
+			m_work_ram.target()[(0x3ffed0/4) + 3] = 0x2a207878;
 
-			m_work_ram[(0x3fff40/4) + 0] = 0x47433731;
-			m_work_ram[(0x3fff40/4) + 1] = 0x33000000;
-			m_work_ram[(0x3fff40/4) + 2] = 0x19994a41;
-			m_work_ram[(0x3fff40/4) + 3] = 0x4100a9b1;
+			m_work_ram.target()[(0x3fff40/4) + 0] = 0x47433731;
+			m_work_ram.target()[(0x3fff40/4) + 1] = 0x33000000;
+			m_work_ram.target()[(0x3fff40/4) + 2] = 0x19994a41;
+			m_work_ram.target()[(0x3fff40/4) + 3] = 0x4100a9b1;
 		}
 	}
 
@@ -491,7 +491,7 @@ static MACHINE_START( nwktr )
 	ppcdrc_set_options(machine.device("maincpu"), PPCDRC_COMPATIBLE_OPTIONS);
 
 	/* configure fast RAM regions for DRC */
-	ppcdrc_add_fastram(machine.device("maincpu"), 0x00000000, 0x003fffff, FALSE, state->m_work_ram);
+	ppcdrc_add_fastram(machine.device("maincpu"), 0x00000000, 0x003fffff, FALSE, state->m_work_ram.target());
 }
 
 static ADDRESS_MAP_START( nwktr_map, AS_PROGRAM, 32, nwktr_state )

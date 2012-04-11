@@ -112,7 +112,7 @@ public:
 
 WRITE16_MEMBER(littlerb_state::region4_w)
 {
-	COMBINE_DATA(&m_region4[offset]);
+	COMBINE_DATA(&m_region4.target()[offset]);
 }
 
 READ16_MEMBER(littlerb_state::buffer_status_r)
@@ -472,7 +472,7 @@ static SCREEN_UPDATE_IND16(littlerb)
 	littlerb_state *state = screen.machine().driver_data<littlerb_state>();
 	int x,y,offs;
 	int xsize,ysize;
-	UINT16* spriteregion = &state->m_region4[0x400];
+	UINT16* spriteregion = &state->m_region4.target()[0x400];
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 	//printf("frame\n");
 	/* the spriteram format is something like this .. */

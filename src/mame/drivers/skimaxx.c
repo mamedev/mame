@@ -83,7 +83,7 @@ public:
 // Set up blit parameters
 WRITE32_MEMBER(skimaxx_state::skimaxx_blitter_w)
 {
-	UINT32 newdata = COMBINE_DATA( &m_blitter_regs[offset] );
+	UINT32 newdata = COMBINE_DATA( &m_blitter_regs.target()[offset] );
 
 	switch (offset)
 	{
@@ -167,13 +167,13 @@ static SCREEN_UPDATE_IND16( skimaxx )
 static void skimaxx_to_shiftreg(address_space *space, UINT32 address, UINT16 *shiftreg)
 {
 	skimaxx_state *state = space->machine().driver_data<skimaxx_state>();
-	memcpy(shiftreg, &state->m_fg_buffer[TOWORD(address)], 512 * sizeof(UINT16));
+	memcpy(shiftreg, &state->m_fg_buffer.target()[TOWORD(address)], 512 * sizeof(UINT16));
 }
 
 static void skimaxx_from_shiftreg(address_space *space, UINT32 address, UINT16 *shiftreg)
 {
 	skimaxx_state *state = space->machine().driver_data<skimaxx_state>();
-	memcpy(&state->m_fg_buffer[TOWORD(address)], shiftreg, 512 * sizeof(UINT16));
+	memcpy(&state->m_fg_buffer.target()[TOWORD(address)], shiftreg, 512 * sizeof(UINT16));
 }
 
 
@@ -191,7 +191,7 @@ static void skimaxx_scanline_update(screen_device &screen, bitmap_ind16 &bitmap,
 	if (params->rowaddr >= 0x220)
 	{
 		UINT32 rowaddr = (params->rowaddr - 0x220);
-		UINT16 *fg = &state->m_fg_buffer[rowaddr << 8];
+		UINT16 *fg = &state->m_fg_buffer.target()[rowaddr << 8];
 		UINT32 *bg = &state->m_bg_buffer_front[rowaddr/2 * 1024/2];
 		UINT16 *dest = &bitmap.pix16(scanline);
 		//int coladdr = params->coladdr;

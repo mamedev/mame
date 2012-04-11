@@ -373,8 +373,8 @@ WRITE8_MEMBER(peplus_state::peplus_crtc_display_w)
 {
 	UINT8 *videoram = m_videoram.target();
 	videoram[m_vid_address] = data;
-	m_palette_ram[m_vid_address] = m_io_port[1];
-	m_palette_ram2[m_vid_address] = m_io_port[3];
+	m_palette_ram[m_vid_address] = m_io_port.target()[1];
+	m_palette_ram2[m_vid_address] = m_io_port.target()[3];
 
 	m_bg_tilemap->mark_tile_dirty(m_vid_address);
 
@@ -384,7 +384,7 @@ WRITE8_MEMBER(peplus_state::peplus_crtc_display_w)
 
 WRITE8_MEMBER(peplus_state::peplus_io_w)
 {
-	m_io_port[offset] = data;
+	m_io_port.target()[offset] = data;
 }
 
 WRITE8_MEMBER(peplus_state::peplus_duart_w)
@@ -403,37 +403,37 @@ WRITE8_MEMBER(peplus_state::peplus_cmos_w)
 		peplus_load_superdata(machine(), bank_name);
 	}
 
-	m_cmos_ram[offset] = data;
+	m_cmos_ram.target()[offset] = data;
 }
 
 WRITE8_MEMBER(peplus_state::peplus_s3000_w)
 {
-	m_s3000_ram[offset] = data;
+	m_s3000_ram.target()[offset] = data;
 }
 
 WRITE8_MEMBER(peplus_state::peplus_s5000_w)
 {
-	m_s5000_ram[offset] = data;
+	m_s5000_ram.target()[offset] = data;
 }
 
 WRITE8_MEMBER(peplus_state::peplus_s7000_w)
 {
-	m_s7000_ram[offset] = data;
+	m_s7000_ram.target()[offset] = data;
 }
 
 WRITE8_MEMBER(peplus_state::peplus_sb000_w)
 {
-	m_sb000_ram[offset] = data;
+	m_sb000_ram.target()[offset] = data;
 }
 
 WRITE8_MEMBER(peplus_state::peplus_sd000_w)
 {
-	m_sd000_ram[offset] = data;
+	m_sd000_ram.target()[offset] = data;
 }
 
 WRITE8_MEMBER(peplus_state::peplus_sf000_w)
 {
-	m_sf000_ram[offset] = data;
+	m_sf000_ram.target()[offset] = data;
 }
 
 WRITE8_MEMBER(peplus_state::peplus_output_bank_a_w)
@@ -491,7 +491,7 @@ static WRITE8_DEVICE_HANDLER(i2c_nvram_w)
 
 READ8_MEMBER(peplus_state::peplus_io_r)
 {
-    return m_io_port[offset];
+    return m_io_port.target()[offset];
 }
 
 READ8_MEMBER(peplus_state::peplus_duart_r)
@@ -502,37 +502,37 @@ READ8_MEMBER(peplus_state::peplus_duart_r)
 
 READ8_MEMBER(peplus_state::peplus_cmos_r)
 {
-	return m_cmos_ram[offset];
+	return m_cmos_ram.target()[offset];
 }
 
 READ8_MEMBER(peplus_state::peplus_s3000_r)
 {
-	return m_s3000_ram[offset];
+	return m_s3000_ram.target()[offset];
 }
 
 READ8_MEMBER(peplus_state::peplus_s5000_r)
 {
-	return m_s5000_ram[offset];
+	return m_s5000_ram.target()[offset];
 }
 
 READ8_MEMBER(peplus_state::peplus_s7000_r)
 {
-	return m_s7000_ram[offset];
+	return m_s7000_ram.target()[offset];
 }
 
 READ8_MEMBER(peplus_state::peplus_sb000_r)
 {
-	return m_sb000_ram[offset];
+	return m_sb000_ram.target()[offset];
 }
 
 READ8_MEMBER(peplus_state::peplus_sd000_r)
 {
-	return m_sd000_ram[offset];
+	return m_sd000_ram.target()[offset];
 }
 
 READ8_MEMBER(peplus_state::peplus_sf000_r)
 {
-	return m_sf000_ram[offset];
+	return m_sf000_ram.target()[offset];
 }
 
 /* Last Color in Every Palette is bgcolor */
@@ -1019,22 +1019,22 @@ static MACHINE_RESET( peplus )
 	peplus_state *state = machine.driver_data<peplus_state>();
 
 	// pepp0158
-	state->m_program_ram[0xa19f] = 0x22; // RET - Disable Memory Test
-	state->m_program_ram[0xddea] = 0x22; // RET - Disable Program Checksum
+	state->m_program_ram.target()[0xa19f] = 0x22; // RET - Disable Memory Test
+	state->m_program_ram.target()[0xddea] = 0x22; // RET - Disable Program Checksum
 	state->m_autohold_addr = 0x5ffe; // AutoHold Address
 
 	// pepp0188
-	state->m_program_ram[0x9a8d] = 0x22; // RET - Disable Memory Test
-	state->m_program_ram[0xf429] = 0x22; // RET - Disable Program Checksum
+	state->m_program_ram.target()[0x9a8d] = 0x22; // RET - Disable Memory Test
+	state->m_program_ram.target()[0xf429] = 0x22; // RET - Disable Program Checksum
 	state->m_autohold_addr = 0x742f; // AutoHold Address
 
 	// pepp0516
-	state->m_program_ram[0x9a24] = 0x22; // RET - Disable Memory Test
-	state->m_program_ram[0xd61d] = 0x22; // RET - Disable Program Checksum
+	state->m_program_ram.target()[0x9a24] = 0x22; // RET - Disable Memory Test
+	state->m_program_ram.target()[0xd61d] = 0x22; // RET - Disable Program Checksum
 	state->m_autohold_addr = 0x5e7e; // AutoHold Address
 
 	if (state->m_autohold_addr)
-		state->m_program_ram[state->m_autohold_addr] = input_port_read_safe(machine, "AUTOHOLD",0x00) & 0x01;
+		state->m_program_ram.target()[state->m_autohold_addr] = input_port_read_safe(machine, "AUTOHOLD",0x00) & 0x01;
 #endif
 }
 

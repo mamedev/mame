@@ -57,8 +57,8 @@ public:
 static TILE_GET_INFO( get_mid_tile_info )
 {
 	pzletime_state *state = machine.driver_data<pzletime_state>();
-	int tileno = state->m_mid_videoram[tile_index] & 0x0fff;
-	int colour = state->m_mid_videoram[tile_index] & 0xf000;
+	int tileno = state->m_mid_videoram.target()[tile_index] & 0x0fff;
+	int colour = state->m_mid_videoram.target()[tile_index] & 0xf000;
 	colour = colour >> 12;
 	SET_TILE_INFO(2, tileno, colour, 0);
 }
@@ -66,8 +66,8 @@ static TILE_GET_INFO( get_mid_tile_info )
 static TILE_GET_INFO( get_txt_tile_info )
 {
 	pzletime_state *state = machine.driver_data<pzletime_state>();
-	int tileno = state->m_txt_videoram[tile_index] & 0x0fff;
-	int colour = state->m_txt_videoram[tile_index] & 0xf000;
+	int tileno = state->m_txt_videoram.target()[tile_index] & 0x0fff;
+	int colour = state->m_txt_videoram.target()[tile_index] & 0xf000;
 	colour = colour >> 12;
 
 	SET_TILE_INFO(0, tileno, colour, 0);
@@ -94,13 +94,13 @@ static SCREEN_UPDATE_IND16( pzletime )
 
 	bitmap.fill(screen.machine().pens[0], cliprect); //bg pen
 
-	state->m_txt_tilemap->set_scrolly(0, state->m_tilemap_regs[0] - 3);
-	state->m_txt_tilemap->set_scrollx(0, state->m_tilemap_regs[1]);
+	state->m_txt_tilemap->set_scrolly(0, state->m_tilemap_regs.target()[0] - 3);
+	state->m_txt_tilemap->set_scrollx(0, state->m_tilemap_regs.target()[1]);
 
-	state->m_mid_tilemap->set_scrolly(0, state->m_tilemap_regs[2] - 3);
-	state->m_mid_tilemap->set_scrollx(0, state->m_tilemap_regs[3] - 7);
+	state->m_mid_tilemap->set_scrolly(0, state->m_tilemap_regs.target()[2] - 3);
+	state->m_mid_tilemap->set_scrollx(0, state->m_tilemap_regs.target()[3] - 7);
 
-	if (state->m_video_regs[2] & 1)
+	if (state->m_video_regs.target()[2] & 1)
 	{
 		count = 0;
 
@@ -108,8 +108,8 @@ static SCREEN_UPDATE_IND16( pzletime )
 		{
 			for (x = 0; x < 512; x++)
 			{
-				if (state->m_bg_videoram[count] & 0x8000)
-					bitmap.pix16((y - 18) & 0xff, (x - 32) & 0x1ff) = 0x300 + (state->m_bg_videoram[count] & 0x7fff);
+				if (state->m_bg_videoram.target()[count] & 0x8000)
+					bitmap.pix16((y - 18) & 0xff, (x - 32) & 0x1ff) = 0x300 + (state->m_bg_videoram.target()[count] & 0x7fff);
 
 				count++;
 			}
@@ -147,13 +147,13 @@ static SCREEN_UPDATE_IND16( pzletime )
 
 WRITE16_MEMBER(pzletime_state::mid_videoram_w)
 {
-	COMBINE_DATA(&m_mid_videoram[offset]);
+	COMBINE_DATA(&m_mid_videoram.target()[offset]);
 	m_mid_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE16_MEMBER(pzletime_state::txt_videoram_w)
 {
-	COMBINE_DATA(&m_txt_videoram[offset]);
+	COMBINE_DATA(&m_txt_videoram.target()[offset]);
 	m_txt_tilemap->mark_tile_dirty(offset);
 }
 
@@ -179,25 +179,25 @@ WRITE16_MEMBER(pzletime_state::video_regs_w)
 {
 	int i;
 
-	COMBINE_DATA(&m_video_regs[offset]);
+	COMBINE_DATA(&m_video_regs.target()[offset]);
 
 	if (offset == 0)
 	{
-		if (m_video_regs[0] > 0)
+		if (m_video_regs.target()[0] > 0)
 		{
 			for (i = 0; i < 0x300; i++)
 			{
-				palette_set_pen_contrast(machine(), i, (double)0x8000/(double)m_video_regs[0]);
+				palette_set_pen_contrast(machine(), i, (double)0x8000/(double)m_video_regs.target()[0]);
 			}
 		}
 	}
 	else if (offset == 1)
 	{
-		if (m_video_regs[1] > 0)
+		if (m_video_regs.target()[1] > 0)
 		{
 			for (i = 0x300; i < 32768 + 0x300; i++)
 			{
-				palette_set_pen_contrast(machine(), i, (double)0x8000/(double)m_video_regs[1]);
+				palette_set_pen_contrast(machine(), i, (double)0x8000/(double)m_video_regs.target()[1]);
 			}
 		}
 	}

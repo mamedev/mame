@@ -119,8 +119,8 @@ public:
 static TILE_GET_INFO( get_cstx_tile_info )
 {
 	cshooter_state *state = machine.driver_data<cshooter_state>();
-	int code = (state->m_txram[tile_index*2]);
-	int attr = (state->m_txram[tile_index*2+1]);
+	int code = (state->m_txram.target()[tile_index*2]);
+	int attr = (state->m_txram.target()[tile_index*2+1]);
 	int rg;
 	rg=0;
 	if (attr & 0x20) rg = 1;
@@ -135,7 +135,7 @@ static TILE_GET_INFO( get_cstx_tile_info )
 
 WRITE8_MEMBER(cshooter_state::cshooter_txram_w)
 {
-	m_txram[offset] = data;
+	m_txram.target()[offset] = data;
 	m_txtilemap->mark_tile_dirty(offset/2);
 }
 

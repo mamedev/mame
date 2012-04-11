@@ -114,7 +114,7 @@ static SCREEN_UPDATE_IND16( lgp )
 			/* Somewhere there's a flag that offsets the tilemap by 0x100*x */
 			/* Palette is likely set somewhere as well (tile_control_ram?) */
 			drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[0],
-					state->m_tile_ram[current_screen_character],
+					state->m_tile_ram.target()[current_screen_character],
 					0,
 					0, 0, charx*8, chary*8, 0);
 		}

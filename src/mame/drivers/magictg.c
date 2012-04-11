@@ -242,7 +242,7 @@ void magictg_state::machine_reset()
 		word |= adsp_boot[i*3 + 1] << 8;
 		word |= adsp_boot[i*3 + 2];
 
-		m_adsp_pram[i] = word;
+		m_adsp_pram.target()[i] = word;
 	}
 }
 

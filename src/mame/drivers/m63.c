@@ -236,21 +236,21 @@ static PALETTE_INIT( m63 )
 WRITE8_MEMBER(m63_state::m63_videoram_w)
 {
 
-	m_videoram[offset] = data;
+	m_videoram.target()[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(m63_state::m63_colorram_w)
 {
 
-	m_colorram[offset] = data;
+	m_colorram.target()[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(m63_state::m63_videoram2_w)
 {
 
-	m_videoram2[offset] = data;
+	m_videoram2.target()[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
@@ -285,8 +285,8 @@ static TILE_GET_INFO( get_bg_tile_info )
 {
 	m63_state *state = machine.driver_data<m63_state>();
 
-	int attr = state->m_colorram[tile_index];
-	int code = state->m_videoram[tile_index] | ((attr & 0x30) << 4);
+	int attr = state->m_colorram.target()[tile_index];
+	int code = state->m_videoram.target()[tile_index] | ((attr & 0x30) << 4);
 	int color = (attr & 0x0f) + (state->m_pal_bank << 4);
 
 	SET_TILE_INFO(1, code, color, 0);
@@ -296,7 +296,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 {
 	m63_state *state = machine.driver_data<m63_state>();
 
-	int code = state->m_videoram2[tile_index];
+	int code = state->m_videoram2.target()[tile_index];
 
 	SET_TILE_INFO(0, code, 0, state->m_fg_flag);
 }
@@ -319,12 +319,12 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 
 	for (offs = 0; offs < state->m_spriteram.bytes(); offs += 4)
 	{
-		int code = state->m_spriteram[offs + 1] | ((state->m_spriteram[offs + 2] & 0x10) << 4);
-		int color = (state->m_spriteram[offs + 2] & 0x0f) + (state->m_pal_bank << 4);
-		int flipx = state->m_spriteram[offs + 2] & 0x20;
+		int code = state->m_spriteram.target()[offs + 1] | ((state->m_spriteram.target()[offs + 2] & 0x10) << 4);
+		int color = (state->m_spriteram.target()[offs + 2] & 0x0f) + (state->m_pal_bank << 4);
+		int flipx = state->m_spriteram.target()[offs + 2] & 0x20;
 		int flipy = 0;
-		int sx = state->m_spriteram[offs + 3];
-		int sy = state->m_sy_offset - state->m_spriteram[offs];
+		int sx = state->m_spriteram.target()[offs + 3];
+		int sy = state->m_sy_offset - state->m_spriteram.target()[offs];
 
 		if (state->flip_screen())
 		{
@@ -360,7 +360,7 @@ static SCREEN_UPDATE_IND16( m63 )
 	int col;
 
 	for (col = 0; col < 32; col++)
-		state->m_bg_tilemap->set_scrolly(col, state->m_scrollram[col * 8]);
+		state->m_bg_tilemap->set_scrolly(col, state->m_scrollram.target()[col * 8]);
 
 	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect);

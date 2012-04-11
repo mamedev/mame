@@ -79,14 +79,14 @@ public:
 
 WRITE16_MEMBER(k3_state::k3_bgram_w)
 {
-	COMBINE_DATA(&m_bgram[offset]);
+	COMBINE_DATA(&m_bgram.target()[offset]);
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 static TILE_GET_INFO( get_k3_bg_tile_info )
 {
 	k3_state *state = machine.driver_data<k3_state>();
-	int tileno = state->m_bgram[tile_index];
+	int tileno = state->m_bgram.target()[tile_index];
 	SET_TILE_INFO(1, tileno, 0, 0);
 }
 

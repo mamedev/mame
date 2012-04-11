@@ -49,8 +49,8 @@ public:
 static TILE_GET_INFO( get_sc0_tile_info )
 {
 	d9final_state *state = machine.driver_data<d9final_state>();
-	int tile = ((state->m_hi_vram[tile_index] & 0x3f)<<8) | state->m_lo_vram[tile_index];
-	int color = state->m_cram[tile_index] & 0x3f;
+	int tile = ((state->m_hi_vram.target()[tile_index] & 0x3f)<<8) | state->m_lo_vram.target()[tile_index];
+	int color = state->m_cram.target()[tile_index] & 0x3f;
 
 	SET_TILE_INFO(
 			0,
@@ -74,19 +74,19 @@ static SCREEN_UPDATE_IND16(d9final)
 
 WRITE8_MEMBER(d9final_state::sc0_lovram)
 {
-	m_lo_vram[offset] = data;
+	m_lo_vram.target()[offset] = data;
 	m_sc0_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(d9final_state::sc0_hivram)
 {
-	m_hi_vram[offset] = data;
+	m_hi_vram.target()[offset] = data;
 	m_sc0_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(d9final_state::sc0_cram)
 {
-	m_cram[offset] = data;
+	m_cram.target()[offset] = data;
 	m_sc0_tilemap->mark_tile_dirty(offset);
 }
 

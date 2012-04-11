@@ -72,8 +72,8 @@ public:
 static TILE_GET_INFO( get_bg_tile_info )
 {
 	superwng_state *state = machine.driver_data<superwng_state>();
-	int code = state->m_videoram_bg[tile_index];
-	int attr = state->m_colorram_bg[tile_index];
+	int code = state->m_videoram_bg.target()[tile_index];
+	int attr = state->m_colorram_bg.target()[tile_index];
 
 	code= (code&0x7f) | ((attr&0x40)<<1) | ((code&0x80)<<1);
 	code|=state->m_tile_bank?0x200:0;
@@ -87,8 +87,8 @@ static TILE_GET_INFO( get_bg_tile_info )
 static TILE_GET_INFO( get_fg_tile_info )
 {
 	superwng_state *state = machine.driver_data<superwng_state>();
-	int code = state->m_videoram_fg[tile_index];
-	int attr = state->m_colorram_fg[tile_index];
+	int code = state->m_videoram_fg.target()[tile_index];
+	int attr = state->m_colorram_fg.target()[tile_index];
 
 	code= (code&0x7f) | ((attr&0x40)<<1) | ((code&0x80)<<1);
 
@@ -143,10 +143,10 @@ static SCREEN_UPDATE_IND16( superwng )
 
 		for(int i=0x3e; i>=0; i-=2)
 		{
-			int code=(state->m_videoram_bg[i]>>2)+0x40;
-			int sx=256-state->m_videoram_bg[i+1]-8;
-			int sy = state->m_colorram_bg[i]+8;
-			int attr = state->m_colorram_bg[i+1];
+			int code=(state->m_videoram_bg.target()[i]>>2)+0x40;
+			int sx=256-state->m_videoram_bg.target()[i+1]-8;
+			int sy = state->m_colorram_bg.target()[i]+8;
+			int attr = state->m_colorram_bg.target()[i+1];
 
 			if (flip)
 			{
@@ -154,7 +154,7 @@ static SCREEN_UPDATE_IND16( superwng )
 				sx-=8;
 			}
 
-			if(state->m_videoram_bg[i+1] | state->m_colorram_bg[i])
+			if(state->m_videoram_bg.target()[i+1] | state->m_colorram_bg.target()[i])
 			{
 
 				drawgfx_transpen(bitmap, cliprect,screen.machine().gfx[1],
@@ -246,25 +246,25 @@ static INTERRUPT_GEN( superwng_sound_nmi_assert )
 
 WRITE8_MEMBER(superwng_state::superwng_bg_vram_w)
 {
-	m_videoram_bg[offset] = data;
+	m_videoram_bg.target()[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(superwng_state::superwng_bg_cram_w)
 {
-	m_colorram_bg[offset] = data;
+	m_colorram_bg.target()[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(superwng_state::superwng_fg_vram_w)
 {
-	m_videoram_fg[offset] = data;
+	m_videoram_fg.target()[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(superwng_state::superwng_fg_cram_w)
 {
-	m_colorram_fg[offset] = data;
+	m_colorram_fg.target()[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 

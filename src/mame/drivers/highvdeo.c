@@ -141,12 +141,12 @@ static SCREEN_UPDATE_RGB32(tourvisn)
 		{
 			UINT32 color;
 
-			color = ((state->m_blit_ram[count]) & 0x00ff)>>0;
+			color = ((state->m_blit_ram.target()[count]) & 0x00ff)>>0;
 
 			if(cliprect.contains((x*2)+0, y))
 				bitmap.pix32(y, (x*2)+0) = screen.machine().pens[color];
 
-			color = ((state->m_blit_ram[count]) & 0xff00)>>8;
+			color = ((state->m_blit_ram.target()[count]) & 0xff00)>>8;
 
 			if(cliprect.contains((x*2)+1, y))
 				bitmap.pix32(y, (x*2)+1) = screen.machine().pens[color];
@@ -175,7 +175,7 @@ static SCREEN_UPDATE_RGB32(brasil)
 			UINT32 g;
 			UINT32 r;
 
-			color = (state->m_blit_ram[count]) & 0xffff;
+			color = (state->m_blit_ram.target()[count]) & 0xffff;
 
 			b = (color & 0x001f) << 3;
 			g = (color & 0x07e0) >> 3;

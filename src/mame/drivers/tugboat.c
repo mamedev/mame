@@ -87,8 +87,8 @@ WRITE8_MEMBER(tugboat_state::tugboat_hd46505_1_w)
 
 WRITE8_MEMBER(tugboat_state::tugboat_score_w)
 {
-      if (offset>=0x8) m_ram[0x291d + 32*offset + 32*(1-8)] = data ^ 0x0f;
-      if (offset<0x8 ) m_ram[0x291d + 32*offset + 32*9] = data ^ 0x0f;
+      if (offset>=0x8) m_ram.target()[0x291d + 32*offset + 32*(1-8)] = data ^ 0x0f;
+      if (offset<0x8 ) m_ram.target()[0x291d + 32*offset + 32*9] = data ^ 0x0f;
 }
 
 static void draw_tilemap(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect,
@@ -101,7 +101,7 @@ static void draw_tilemap(running_machine &machine, bitmap_ind16 &bitmap,const re
 	{
 		for (x = 0;x < 32;x++)
 		{
-			int code = (state->m_ram[addr + 0x400] << 8) | state->m_ram[addr];
+			int code = (state->m_ram.target()[addr + 0x400] << 8) | state->m_ram.target()[addr];
 			int color = (code & 0x3c00) >> 10;
 			int rgn;
 

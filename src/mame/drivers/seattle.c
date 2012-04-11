@@ -534,8 +534,8 @@ static MACHINE_START( seattle )
 	mips3drc_set_options(machine.device("maincpu"), MIPS3DRC_FASTEST_OPTIONS + MIPS3DRC_STRICT_VERIFY);
 
 	/* configure fast RAM regions for DRC */
-	mips3drc_add_fastram(machine.device("maincpu"), 0x00000000, 0x007fffff, FALSE, state->m_rambase);
-	mips3drc_add_fastram(machine.device("maincpu"), 0x1fc00000, 0x1fc7ffff, TRUE,  state->m_rombase);
+	mips3drc_add_fastram(machine.device("maincpu"), 0x00000000, 0x007fffff, FALSE, state->m_rambase.target());
+	mips3drc_add_fastram(machine.device("maincpu"), 0x1fc00000, 0x1fc7ffff, TRUE,  state->m_rombase.target());
 
 	/* register for save states */
 	state_save_register_global_array(machine, state->m_galileo.reg);
@@ -677,7 +677,7 @@ READ32_MEMBER(seattle_state::interrupt_state2_r)
 WRITE32_MEMBER(seattle_state::interrupt_config_w)
 {
 	int irq;
-	COMBINE_DATA(m_interrupt_config);
+	COMBINE_DATA(m_interrupt_config.target());
 
 	/* VBLANK: clear anything pending on the old IRQ */
 	if (m_vblank_irq_num != 0)
@@ -720,8 +720,8 @@ WRITE32_MEMBER(seattle_state::interrupt_config_w)
 WRITE32_MEMBER(seattle_state::seattle_interrupt_enable_w)
 {
 	UINT32 old = *m_interrupt_enable.target();
-	COMBINE_DATA(m_interrupt_enable);
-	if (old != *m_interrupt_enable)
+	COMBINE_DATA(m_interrupt_enable.target());
+	if (old != *m_interrupt_enable.target())
 	{
 		if (m_vblank_latch)
 			update_vblank_irq(machine());
@@ -1628,7 +1628,7 @@ WRITE32_MEMBER(seattle_state::cmos_w)
 
 READ32_MEMBER(seattle_state::cmos_r)
 {
-	return m_nvram[offset];
+	return m_nvram.target()[offset];
 }
 
 
@@ -1659,7 +1659,7 @@ WRITE32_MEMBER(seattle_state::seattle_watchdog_w)
 
 WRITE32_MEMBER(seattle_state::asic_reset_w)
 {
-	COMBINE_DATA(m_asic_reset);
+	COMBINE_DATA(m_asic_reset.target());
 	if (!(*m_asic_reset & 0x0002))
 		midway_ioasic_reset(machine());
 }
@@ -2937,7 +2937,7 @@ static DRIVER_INIT( blitz )
 	init_common(machine, MIDWAY_IOASIC_BLITZ99, 444/* or 528 */, 80, SEATTLE_CONFIG);
 
 	/* for some reason, the code in the ROM appears buggy; this is a small patch to fix it */
-	state->m_rombase[0x934/4] += 4;
+	state->m_rombase.target()[0x934/4] += 4;
 
 	/* main CPU speedups */
 	mips3drc_add_hotspot(machine.device("maincpu"), 0x80135510, 0x3C028024, 250);		/* confirmed */

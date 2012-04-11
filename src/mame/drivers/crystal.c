@@ -626,7 +626,7 @@ static MACHINE_RESET( crystal )
 		state->m_Timer[i]->adjust(attotime::never);
 	}
 
-	vr0_snd_set_areas(machine.device("vrender"), state->m_textureram, state->m_frameram);
+	vr0_snd_set_areas(machine.device("vrender"), state->m_textureram, state->m_frameram.target());
 #ifdef IDLE_LOOP_SPEEDUP
 	state->m_FlipCntRead = 0;
 #endif

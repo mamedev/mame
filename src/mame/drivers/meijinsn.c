@@ -107,16 +107,16 @@ READ16_MEMBER(meijinsn_state::alpha_mcu_r)
 	static const UINT8 coinage1[2][2] = {{1,1}, {1,2}};
 	static const UINT8 coinage2[2][2] = {{1,5}, {2,1}};
 
-	int source = m_shared_ram[offset];
+	int source = m_shared_ram.target()[offset];
 
 	switch (offset)
 	{
 		case 0: /* Dipswitch 2 */
-			m_shared_ram[0] = (source & 0xff00) | input_port_read(machine(), "DSW");
+			m_shared_ram.target()[0] = (source & 0xff00) | input_port_read(machine(), "DSW");
 			return 0;
 
 		case 0x22: /* Coin value */
-			m_shared_ram[0x22] = (source & 0xff00) | (m_credits & 0x00ff);
+			m_shared_ram.target()[0x22] = (source & 0xff00) | (m_credits & 0x00ff);
 			return 0;
 
 		case 0x29: /* Query microcontroller for coin insert */
@@ -128,8 +128,8 @@ READ16_MEMBER(meijinsn_state::alpha_mcu_r)
 
 			if ((input_port_read(machine(), "COINS") & 0x1) == 0 && !m_mcu_latch)
 			{
-				m_shared_ram[0x29] = (source & 0xff00) | 0x22;	// coinA
-				m_shared_ram[0x22] = (source & 0xff00) | 0x00;
+				m_shared_ram.target()[0x29] = (source & 0xff00) | 0x22;	// coinA
+				m_shared_ram.target()[0x22] = (source & 0xff00) | 0x00;
 				m_mcu_latch = 1;
 
 				m_coinvalue = (~input_port_read(machine(), "DSW")>>3) & 1;
@@ -145,8 +145,8 @@ READ16_MEMBER(meijinsn_state::alpha_mcu_r)
 			}
 			else if ((input_port_read(machine(), "COINS") & 0x2) == 0 && !m_mcu_latch)
 			{
-				m_shared_ram[0x29] = (source & 0xff00) | 0x22;	// coinA
-				m_shared_ram[0x22] = (source & 0xff00) | 0x00;
+				m_shared_ram.target()[0x29] = (source & 0xff00) | 0x22;	// coinA
+				m_shared_ram.target()[0x22] = (source & 0xff00) | 0x00;
 				m_mcu_latch = 1;
 
 				m_coinvalue = (~input_port_read(machine(), "DSW") >> 3) & 1;
@@ -162,7 +162,7 @@ READ16_MEMBER(meijinsn_state::alpha_mcu_r)
 			}
 			else
 			{
-				m_shared_ram[0x29] = (source & 0xff00) | 0x22;
+				m_shared_ram.target()[0x29] = (source & 0xff00) | 0x22;
 			}
 			return 0;
 	}
@@ -297,8 +297,8 @@ static SCREEN_UPDATE_IND16(meijinsn)
 		sx = offs >> 8;
 		sy = offs & 0xff;
 
-		data1 = state->m_videoram[offs] >> 8;
-		data2 = state->m_videoram[offs] & 0xff;
+		data1 = state->m_videoram.target()[offs] >> 8;
+		data2 = state->m_videoram.target()[offs] & 0xff;
 
 		for (x = 0; x < 4; x++)
 		{

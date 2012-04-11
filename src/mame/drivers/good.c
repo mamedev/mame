@@ -59,29 +59,29 @@ public:
 
 WRITE16_MEMBER(good_state::fg_tilemapram_w)
 {
-	COMBINE_DATA(&m_fg_tilemapram[offset]);
+	COMBINE_DATA(&m_fg_tilemapram.target()[offset]);
 	m_fg_tilemap->mark_tile_dirty(offset / 2);
 }
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
 	good_state *state = machine.driver_data<good_state>();
-	int tileno = state->m_fg_tilemapram[tile_index * 2];
-	int attr = state->m_fg_tilemapram[tile_index * 2 + 1] & 0xf;
+	int tileno = state->m_fg_tilemapram.target()[tile_index * 2];
+	int attr = state->m_fg_tilemapram.target()[tile_index * 2 + 1] & 0xf;
 	SET_TILE_INFO(0, tileno, attr, 0);
 }
 
 WRITE16_MEMBER(good_state::bg_tilemapram_w)
 {
-	COMBINE_DATA(&m_bg_tilemapram[offset]);
+	COMBINE_DATA(&m_bg_tilemapram.target()[offset]);
 	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
 	good_state *state = machine.driver_data<good_state>();
-	int tileno = state->m_bg_tilemapram[tile_index * 2];
-	int attr = state->m_bg_tilemapram[tile_index * 2 + 1] & 0xf;
+	int tileno = state->m_bg_tilemapram.target()[tile_index * 2];
+	int attr = state->m_bg_tilemapram.target()[tile_index * 2 + 1] & 0xf;
 	SET_TILE_INFO(1, tileno, attr, 0);
 }
 

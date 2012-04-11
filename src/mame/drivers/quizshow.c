@@ -88,7 +88,7 @@ PALETTE_INIT( quizshow )
 static TILE_GET_INFO( get_tile_info )
 {
 	quizshow_state *state = machine.driver_data<quizshow_state>();
-	UINT8 code = state->m_main_ram[tile_index];
+	UINT8 code = state->m_main_ram.target()[tile_index];
 
 	// d6: blink, d7: invert
 	UINT8 color = (code & (state->m_blink_state | 0x80)) >> 6;
@@ -200,7 +200,7 @@ READ8_MEMBER(quizshow_state::quizshow_tape_signal_r)
 
 WRITE8_MEMBER(quizshow_state::quizshow_main_ram_w)
 {
-	m_main_ram[offset]=data;
+	m_main_ram.target()[offset]=data;
 	m_tilemap->mark_tile_dirty(offset);
 }
 

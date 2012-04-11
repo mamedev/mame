@@ -100,7 +100,7 @@ public:
 static TILE_GET_INFO( get_tile_info )
 {
 	pipeline_state *state = machine.driver_data<pipeline_state>();
-	int code = state->m_vram2[tile_index]+state->m_vram2[tile_index+0x800]*256;
+	int code = state->m_vram2.target()[tile_index]+state->m_vram2.target()[tile_index+0x800]*256;
 	SET_TILE_INFO(
 		0,
 		code,
@@ -111,8 +111,8 @@ static TILE_GET_INFO( get_tile_info )
 static TILE_GET_INFO( get_tile_info2 )
 {
 	pipeline_state *state = machine.driver_data<pipeline_state>();
-	int code =state->m_vram1[tile_index]+((state->m_vram1[tile_index+0x800]>>4))*256;
-	int color=((state->m_vram1[tile_index+0x800])&0xf);
+	int code =state->m_vram1.target()[tile_index]+((state->m_vram1.target()[tile_index+0x800]>>4))*256;
+	int color=((state->m_vram1.target()[tile_index+0x800])&0xf);
 	SET_TILE_INFO
 	(
 		1,
@@ -151,7 +151,7 @@ WRITE8_MEMBER(pipeline_state::vram2_w)
 	if(!(m_vidctrl&1))
 	{
 		m_tilemap1->mark_tile_dirty(offset&0x7ff);
-		m_vram2[offset]=data;
+		m_vram2.target()[offset]=data;
 	}
 	else
 	{
@@ -167,7 +167,7 @@ WRITE8_MEMBER(pipeline_state::vram2_w)
 WRITE8_MEMBER(pipeline_state::vram1_w)
 {
 	m_tilemap2->mark_tile_dirty(offset&0x7ff);
-	m_vram1[offset]=data;
+	m_vram1.target()[offset]=data;
 }
 
 static READ8_DEVICE_HANDLER(protection_r)

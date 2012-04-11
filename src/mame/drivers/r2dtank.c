@@ -353,8 +353,8 @@ static MC6845_UPDATE_ROW( update_row )
 		if (state->m_flipscreen)
 			offs = offs ^ 0x1fff;
 
-		data = state->m_videoram[offs];
-		fore_color = (state->m_colorram[offs] >> 5) & 0x07;
+		data = state->m_videoram.target()[offs];
+		fore_color = (state->m_colorram.target()[offs] >> 5) & 0x07;
 
 		for (i = 0; i < 8; i++)
 		{

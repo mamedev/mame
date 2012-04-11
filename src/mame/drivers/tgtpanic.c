@@ -46,7 +46,7 @@ static SCREEN_UPDATE_RGB32( tgtpanic )
 
 	for (offs = 0; offs < 0x2000; ++offs)
 	{
-		UINT8 val = state->m_ram[offs];
+		UINT8 val = state->m_ram.target()[offs];
 
 		y = (offs & 0x7f) << 1;
 		x = (offs >> 7) << 2;

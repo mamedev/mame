@@ -89,14 +89,14 @@ public:
 
 WRITE8_MEMBER(nsmpoker_state::nsmpoker_videoram_w)
 {
-	m_videoram[offset] = data;
+	m_videoram.target()[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
 WRITE8_MEMBER(nsmpoker_state::nsmpoker_colorram_w)
 {
-	m_colorram[offset] = data;
+	m_colorram.target()[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
@@ -110,8 +110,8 @@ static TILE_GET_INFO( get_bg_tile_info )
     ---- ----   color code.
     ---- ----   seems unused.
 */
-//  int attr = state->m_colorram[tile_index];
-	int code = state->m_videoram[tile_index];
+//  int attr = state->m_colorram.target()[tile_index];
+	int code = state->m_videoram.target()[tile_index];
 //  int bank = (attr & 0x08) >> 3;
 //  int color = (attr & 0x03);
 

@@ -82,10 +82,10 @@ READ8_MEMBER(aceal_state::ace_objpos_r)
 static VIDEO_START( ace )
 {
 	aceal_state *state = machine.driver_data<aceal_state>();
-	gfx_element_set_source(machine.gfx[1], state->m_characterram);
-	gfx_element_set_source(machine.gfx[2], state->m_characterram);
-	gfx_element_set_source(machine.gfx[3], state->m_characterram);
-	gfx_element_set_source(machine.gfx[4], state->m_scoreram);
+	gfx_element_set_source(machine.gfx[1], state->m_characterram.target());
+	gfx_element_set_source(machine.gfx[2], state->m_characterram.target());
+	gfx_element_set_source(machine.gfx[3], state->m_characterram.target());
+	gfx_element_set_source(machine.gfx[4], state->m_scoreram.target());
 }
 
 static SCREEN_UPDATE_IND16( ace )
@@ -136,14 +136,14 @@ static PALETTE_INIT( ace )
 
 WRITE8_MEMBER(aceal_state::ace_characterram_w)
 {
-	if (m_characterram[offset] != data)
+	if (m_characterram.target()[offset] != data)
 	{
 		if (data & ~0x07)
 		{
 			logerror("write to %04x data = %02x\n", 0x8000 + offset, data);
 			popmessage("write to %04x data = %02x\n", 0x8000 + offset, data);
 		}
-		m_characterram[offset] = data;
+		m_characterram.target()[offset] = data;
 		gfx_element_mark_dirty(machine().gfx[1], 0);
 		gfx_element_mark_dirty(machine().gfx[2], 0);
 		gfx_element_mark_dirty(machine().gfx[3], 0);
@@ -152,7 +152,7 @@ WRITE8_MEMBER(aceal_state::ace_characterram_w)
 
 WRITE8_MEMBER(aceal_state::ace_scoreram_w)
 {
-	m_scoreram[offset] = data;
+	m_scoreram.target()[offset] = data;
 	gfx_element_mark_dirty(machine().gfx[4], offset / 32);
 }
 

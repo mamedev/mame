@@ -475,22 +475,22 @@ static SCREEN_UPDATE_RGB32(bingor)
 		{
 			UINT32 color;
 
-			color = (state->m_blit_ram[count] & 0xf000)>>12;
+			color = (state->m_blit_ram.target()[count] & 0xf000)>>12;
 
 			if(cliprect.contains(x+3, y))
 				bitmap.pix32(y, x+3) = screen.machine().pens[color];
 
-			color = (state->m_blit_ram[count] & 0x0f00)>>8;
+			color = (state->m_blit_ram.target()[count] & 0x0f00)>>8;
 
 			if(cliprect.contains(x+2, y))
 				bitmap.pix32(y, x+2) = screen.machine().pens[color];
 
-			color = (state->m_blit_ram[count] & 0x00f0)>>4;
+			color = (state->m_blit_ram.target()[count] & 0x00f0)>>4;
 
 			if(cliprect.contains(x+1, y))
 				bitmap.pix32(y, x+1) = screen.machine().pens[color];
 
-			color = (state->m_blit_ram[count] & 0x000f)>>0;
+			color = (state->m_blit_ram.target()[count] & 0x000f)>>0;
 
 			if(cliprect.contains(x+0, y))
 				bitmap.pix32(y, x+0) = screen.machine().pens[color];

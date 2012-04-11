@@ -443,13 +443,13 @@ public:
 
 WRITE8_MEMBER(magicfly_state::magicfly_videoram_w)
 {
-	m_videoram[offset] = data;
+	m_videoram.target()[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(magicfly_state::magicfly_colorram_w)
 {
-	m_colorram[offset] = data;
+	m_colorram.target()[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
@@ -465,16 +465,16 @@ static TILE_GET_INFO( get_magicfly_tile_info )
     x--- ----   Mirrored from bit 3. The code check this one to boot the game.
 
 */
-	int attr = state->m_colorram[tile_index];
-	int code = state->m_videoram[tile_index];
+	int attr = state->m_colorram.target()[tile_index];
+	int code = state->m_videoram.target()[tile_index];
 	int bank = (attr & 0x10) >> 4;   /* bit 4 switch the gfx banks */
 	int color = attr & 0x07;         /* bits 0-2 for color */
 
     /* Seems that bit 7 is mirrored from bit 3 to have a normal boot */
     /* Boot only check the first color RAM offset */
 
-	state->m_colorram[0] = state->m_colorram[0] | ((state->m_colorram[0] & 0x08) << 4);	/* only for 1st offset */
-	//state->m_colorram[tile_index] = attr | ((attr & 0x08) << 4);         /* for the whole color RAM */
+	state->m_colorram.target()[0] = state->m_colorram.target()[0] | ((state->m_colorram.target()[0] & 0x08) << 4);	/* only for 1st offset */
+	//state->m_colorram.target()[tile_index] = attr | ((attr & 0x08) << 4);         /* for the whole color RAM */
 
 	SET_TILE_INFO(bank, code, color, 0);
 }
@@ -497,16 +497,16 @@ static TILE_GET_INFO( get_7mezzo_tile_info )
     x--- ----   Mirrored from bit 2. The code check this one to boot the game.
 
 */
-	int attr = state->m_colorram[tile_index];
-	int code = state->m_videoram[tile_index];
+	int attr = state->m_colorram.target()[tile_index];
+	int code = state->m_videoram.target()[tile_index];
 	int bank = (attr & 0x10) >> 4;    /* bit 4 switch the gfx banks */
 	int color = attr & 0x07;          /* bits 0-2 for color */
 
     /* Seems that bit 7 is mirrored from bit 2 to have a normal boot */
     /* Boot only check the first color RAM offset */
 
-	state->m_colorram[0] = state->m_colorram[0] | ((state->m_colorram[0] & 0x04) << 5);	/* only for 1st offset */
-	//state->m_colorram[tile_index] = attr | ((attr & 0x04) << 5);         /* for the whole color RAM */
+	state->m_colorram.target()[0] = state->m_colorram.target()[0] | ((state->m_colorram.target()[0] & 0x04) << 5);	/* only for 1st offset */
+	//state->m_colorram.target()[tile_index] = attr | ((attr & 0x04) << 5);         /* for the whole color RAM */
 
 	SET_TILE_INFO(bank, code, color, 0);
 }

@@ -258,7 +258,7 @@ static SCREEN_UPDATE_IND16( coinmvga )
 	{
 		for (x=0;x<128;x++)
 		{
-			int tile = state->m_vram[count];
+			int tile = state->m_vram.target()[count];
 			//int colour = tile>>12;
 			drawgfx_opaque(bitmap,cliprect,gfx,tile,0,0,0,x*8,y*8);
 

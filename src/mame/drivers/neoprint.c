@@ -73,9 +73,9 @@ static void draw_layer(running_machine &machine, bitmap_ind16 &bitmap,const rect
 	const gfx_element *gfx = machine.gfx[0];
 	INT16 scrollx, scrolly;
 
-	i = (state->m_npvidregs[((layer*8)+0x06)/2] & 7) * 0x1000/4;
-	scrollx = ((state->m_npvidregs[((layer*8)+0x00)/2] - (0xd8 + layer*4)) & 0x03ff);
-	scrolly = ((state->m_npvidregs[((layer*8)+0x02)/2] - 0xffeb) & 0x03ff);
+	i = (state->m_npvidregs.target()[((layer*8)+0x06)/2] & 7) * 0x1000/4;
+	scrollx = ((state->m_npvidregs.target()[((layer*8)+0x00)/2] - (0xd8 + layer*4)) & 0x03ff);
+	scrolly = ((state->m_npvidregs.target()[((layer*8)+0x02)/2] - 0xffeb) & 0x03ff);
 
 	scrollx/=2;
 	scrolly/=2;
@@ -84,14 +84,14 @@ static void draw_layer(running_machine &machine, bitmap_ind16 &bitmap,const rect
 	{
 		for (x=0;x<32;x++)
 		{
-			UINT16 dat = state->m_npvidram[i*2] >> data_shift; // a video register?
+			UINT16 dat = state->m_npvidram.target()[i*2] >> data_shift; // a video register?
 			UINT16 color;
-			if(state->m_npvidram[i*2+1] & 0x0020) // TODO: 8bpp switch?
-				color = ((state->m_npvidram[i*2+1] & 0x8000) << 1) | 0x200 | ((state->m_npvidram[i*2+1] & 0xff00) >> 7);
+			if(state->m_npvidram.target()[i*2+1] & 0x0020) // TODO: 8bpp switch?
+				color = ((state->m_npvidram.target()[i*2+1] & 0x8000) << 1) | 0x200 | ((state->m_npvidram.target()[i*2+1] & 0xff00) >> 7);
 			else
-				color = ((state->m_npvidram[i*2+1] & 0xff00) >> 8) | ((state->m_npvidram[i*2+1] & 0x0010) << 4);
-			UINT8 fx = (state->m_npvidram[i*2+1] & 0x0040);
-			UINT8 fy = (state->m_npvidram[i*2+1] & 0x0080);
+				color = ((state->m_npvidram.target()[i*2+1] & 0xff00) >> 8) | ((state->m_npvidram.target()[i*2+1] & 0x0010) << 4);
+			UINT8 fx = (state->m_npvidram.target()[i*2+1] & 0x0040);
+			UINT8 fy = (state->m_npvidram.target()[i*2+1] & 0x0080);
 
 			drawgfx_transpen(bitmap,cliprect,gfx,dat,color,fx,fy,x*16+scrollx,y*16-scrolly,0);
 			drawgfx_transpen(bitmap,cliprect,gfx,dat,color,fx,fy,x*16+scrollx-512,y*16-scrolly,0);

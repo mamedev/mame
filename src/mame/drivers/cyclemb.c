@@ -143,12 +143,12 @@ static SCREEN_UPDATE_IND16( cyclemb )
 	{
 		for (x=0;x<64;x++)
 		{
-			int attr = state->m_cram[count];
-			int tile = (state->m_vram[count]) | ((attr & 3)<<8);
+			int attr = state->m_cram.target()[count];
+			int tile = (state->m_vram.target()[count]) | ((attr & 3)<<8);
 			int color = ((attr & 0xf8) >> 3) ^ 0x1f;
 			int odd_line = y & 1 ? 0x40 : 0x00;
 //          int sx_offs = flip_screen ? 512 : 0
-			int scrollx = ((state->m_vram[(y/2)+odd_line]) + (state->m_cram[(y/2)+odd_line]<<8) + 48) & 0x1ff;
+			int scrollx = ((state->m_vram.target()[(y/2)+odd_line]) + (state->m_cram.target()[(y/2)+odd_line]<<8) + 48) & 0x1ff;
 
 			if(flip_screen)
 			{
@@ -193,24 +193,24 @@ static SCREEN_UPDATE_IND16( cyclemb )
 
 		for(i=0;i<0x40;i+=2)
 		{
-			y = 0xf1 - state->m_obj2_ram[i];
-			x = state->m_obj2_ram[i+1] - 56;
-			spr_offs = (state->m_obj1_ram[i+0]);
-			col = (state->m_obj1_ram[i+1] & 0x3f);
-			region = ((state->m_obj3_ram[i] & 0x10) >> 4) + 1;
+			y = 0xf1 - state->m_obj2_ram.target()[i];
+			x = state->m_obj2_ram.target()[i+1] - 56;
+			spr_offs = (state->m_obj1_ram.target()[i+0]);
+			col = (state->m_obj1_ram.target()[i+1] & 0x3f);
+			region = ((state->m_obj3_ram.target()[i] & 0x10) >> 4) + 1;
 			if(region == 2)
 			{
 				spr_offs >>= 2;
-				spr_offs += ((state->m_obj3_ram[i+0] & 3) << 5);
+				spr_offs += ((state->m_obj3_ram.target()[i+0] & 3) << 5);
 				y-=16;
 			}
 
-			if(state->m_obj3_ram[i+1] & 1)
+			if(state->m_obj3_ram.target()[i+1] & 1)
 				x+=256;
-			//if(state->m_obj3_ram[i+1] & 2)
+			//if(state->m_obj3_ram.target()[i+1] & 2)
 //              x-=256;
-			fx = (state->m_obj3_ram[i+0] & 4) >> 2;
-			fy = (state->m_obj3_ram[i+0] & 8) >> 3;
+			fx = (state->m_obj3_ram.target()[i+0] & 4) >> 2;
+			fy = (state->m_obj3_ram.target()[i+0] & 8) >> 3;
 
 			if(flip_screen)
 			{

@@ -121,19 +121,19 @@ public:
 
 WRITE16_MEMBER(magic10_state::layer0_videoram_w)
 {
-	COMBINE_DATA(&m_layer0_videoram[offset]);
+	COMBINE_DATA(&m_layer0_videoram.target()[offset]);
 	m_layer0_tilemap->mark_tile_dirty(offset >> 1);
 }
 
 WRITE16_MEMBER(magic10_state::layer1_videoram_w)
 {
-	COMBINE_DATA(&m_layer1_videoram[offset]);
+	COMBINE_DATA(&m_layer1_videoram.target()[offset]);
 	m_layer1_tilemap->mark_tile_dirty(offset >> 1);
 }
 
 WRITE16_MEMBER(magic10_state::layer2_videoram_w)
 {
-	COMBINE_DATA(&m_layer2_videoram[offset]);
+	COMBINE_DATA(&m_layer2_videoram.target()[offset]);
 	m_layer2_tilemap->mark_tile_dirty(offset >> 1);
 }
 
@@ -150,9 +150,9 @@ static TILE_GET_INFO( get_layer0_tile_info )
 	SET_TILE_INFO
 	(
 		1,
-		state->m_layer0_videoram[tile_index * 2],
-		state->m_layer0_videoram[tile_index * 2 + 1] & 0x0f,
-		TILE_FLIPYX((state->m_layer0_videoram[tile_index * 2 + 1] & 0xc0) >> 6)
+		state->m_layer0_videoram.target()[tile_index * 2],
+		state->m_layer0_videoram.target()[tile_index * 2 + 1] & 0x0f,
+		TILE_FLIPYX((state->m_layer0_videoram.target()[tile_index * 2 + 1] & 0xc0) >> 6)
 	);
 }
 
@@ -162,9 +162,9 @@ static TILE_GET_INFO( get_layer1_tile_info )
 	SET_TILE_INFO
 	(
 		1,
-		state->m_layer1_videoram[tile_index * 2],
-		state->m_layer1_videoram[tile_index * 2 + 1] & 0x0f,
-		TILE_FLIPYX((state->m_layer1_videoram[tile_index * 2 + 1] & 0xc0) >> 6)
+		state->m_layer1_videoram.target()[tile_index * 2],
+		state->m_layer1_videoram.target()[tile_index * 2 + 1] & 0x0f,
+		TILE_FLIPYX((state->m_layer1_videoram.target()[tile_index * 2 + 1] & 0xc0) >> 6)
 	);
 }
 
@@ -174,8 +174,8 @@ static TILE_GET_INFO( get_layer2_tile_info )
 	SET_TILE_INFO
 	(
 		0,
-		state->m_layer2_videoram[tile_index * 2],
-		state->m_layer2_videoram[tile_index * 2 + 1] & 0x0f,
+		state->m_layer2_videoram.target()[tile_index * 2],
+		state->m_layer2_videoram.target()[tile_index * 2 + 1] & 0x0f,
 		0
 	);
 }
@@ -203,8 +203,8 @@ static SCREEN_UPDATE_IND16( magic10 )
     4 and 6 are y/x global register writes.
     0 and 2 are y/x writes for the scrolling layer.
     */
-	state->m_layer1_tilemap->set_scrolly(0, (state->m_vregs[0/2] - state->m_vregs[4/2])+0);
-	state->m_layer1_tilemap->set_scrollx(0, (state->m_vregs[2/2] - state->m_vregs[6/2])+4);
+	state->m_layer1_tilemap->set_scrolly(0, (state->m_vregs.target()[0/2] - state->m_vregs.target()[4/2])+0);
+	state->m_layer1_tilemap->set_scrollx(0, (state->m_vregs.target()[2/2] - state->m_vregs.target()[6/2])+4);
 
 	state->m_layer0_tilemap->draw(bitmap, cliprect, 0, 0);
 	state->m_layer1_tilemap->draw(bitmap, cliprect, 0, 0);

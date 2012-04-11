@@ -229,12 +229,12 @@ READ8_MEMBER(statriv2_state::question_data_r)
 	UINT32 address;
 
 	if (m_question_offset_high == 0xff)
-		m_question_offset[m_question_offset_low]++;
+		m_question_offset.target()[m_question_offset_low]++;
 
-	address = m_question_offset[m_question_offset_low];
-	address |= m_question_offset[m_question_offset_mid] << 8;
+	address = m_question_offset.target()[m_question_offset_low];
+	address |= m_question_offset.target()[m_question_offset_mid] << 8;
 	if (m_question_offset_high != 0xff)
-		address |= m_question_offset[m_question_offset_high] << 16;
+		address |= m_question_offset.target()[m_question_offset_high] << 16;
 
 	return (address < qromsize) ? qrom[address] : 0xff;
 }

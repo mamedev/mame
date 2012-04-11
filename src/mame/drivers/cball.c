@@ -32,7 +32,7 @@ public:
 static TILE_GET_INFO( get_tile_info )
 {
 	cball_state *state = machine.driver_data<cball_state>();
-	UINT8 code = state->m_video_ram[tile_index];
+	UINT8 code = state->m_video_ram.target()[tile_index];
 
 	SET_TILE_INFO(0, code, code >> 7, 0);
 }
@@ -41,7 +41,7 @@ static TILE_GET_INFO( get_tile_info )
 WRITE8_MEMBER(cball_state::cball_vram_w)
 {
 
-	m_video_ram[offset] = data;
+	m_video_ram.target()[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
@@ -62,11 +62,11 @@ static SCREEN_UPDATE_IND16( cball )
 
 	/* draw sprite */
 	drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[1],
-		state->m_video_ram[0x399] >> 4,
+		state->m_video_ram.target()[0x399] >> 4,
 		0,
 		0, 0,
-		240 - state->m_video_ram[0x390],
-		240 - state->m_video_ram[0x398], 0);
+		240 - state->m_video_ram.target()[0x390],
+		240 - state->m_video_ram.target()[0x398], 0);
 	return 0;
 }
 
@@ -113,14 +113,14 @@ static PALETTE_INIT( cball )
 READ8_MEMBER(cball_state::cball_wram_r)
 {
 
-	return m_video_ram[0x380 + offset];
+	return m_video_ram.target()[0x380 + offset];
 }
 
 
 WRITE8_MEMBER(cball_state::cball_wram_w)
 {
 
-	m_video_ram[0x380 + offset] = data;
+	m_video_ram.target()[0x380 + offset] = data;
 }
 
 

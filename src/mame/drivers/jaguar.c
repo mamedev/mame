@@ -918,9 +918,9 @@ WRITE32_MEMBER(cojag_state::latch_w)
 READ32_MEMBER(cojag_state::eeprom_data_r)
 {
 	if (cojag_is_r3000)
-		return m_nvram[offset] | 0xffffff00;
+		return m_nvram.target()[offset] | 0xffffff00;
 	else
-		return m_nvram[offset] | 0x00ffffff;
+		return m_nvram.target()[offset] | 0x00ffffff;
 }
 
 
@@ -935,9 +935,9 @@ WRITE32_MEMBER(cojag_state::eeprom_data_w)
 //  if (m_eeprom_enable)
 	{
 		if (cojag_is_r3000)
-			m_nvram[offset] = data & 0x000000ff;
+			m_nvram.target()[offset] = data & 0x000000ff;
 		else
-			m_nvram[offset] = data & 0xff000000;
+			m_nvram.target()[offset] = data & 0xff000000;
 	}
 //  else
 //      logerror("%08X:error writing to disabled EEPROM\n", cpu_get_previouspc(&space.device()));
@@ -2405,7 +2405,7 @@ static DRIVER_INIT( maxforce )
 	cojag_common_init(machine, 0x0c0, 0x09e);
 
 	/* patch the protection */
-	state->m_rom_base[0x220/4] = 0x03e00008;
+	state->m_rom_base.target()[0x220/4] = 0x03e00008;
 
 #if ENABLE_SPEEDUP_HACKS
 	/* install speedup for main CPU */
@@ -2422,7 +2422,7 @@ static DRIVER_INIT( area51mx )
 	cojag_common_init(machine, 0x0c0, 0x09e);
 
 	/* patch the protection */
-	state->m_rom_base[0x418/4] = 0x4e754e75;
+	state->m_rom_base.target()[0x418/4] = 0x4e754e75;
 
 #if ENABLE_SPEEDUP_HACKS
 	/* install speedup for main CPU */
@@ -2438,7 +2438,7 @@ static DRIVER_INIT( a51mxr3k )
 	cojag_common_init(machine, 0x0c0, 0x09e);
 
 	/* patch the protection */
-	state->m_rom_base[0x220/4] = 0x03e00008;
+	state->m_rom_base.target()[0x220/4] = 0x03e00008;
 
 #if ENABLE_SPEEDUP_HACKS
 	/* install speedup for main CPU */

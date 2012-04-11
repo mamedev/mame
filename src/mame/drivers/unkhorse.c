@@ -58,8 +58,8 @@ static SCREEN_UPDATE_IND16( horse )
 	{
 		for (int x = 0; x < 32; x++)
 		{
-			UINT8 data = state->m_video_ram[y << 5 | x];
-			UINT8 color = state->m_color_ram[(y << 3 & 0x780) | x] >> 4;
+			UINT8 data = state->m_video_ram.target()[y << 5 | x];
+			UINT8 color = state->m_color_ram.target()[(y << 3 & 0x780) | x] >> 4;
 
 			for (int i = 0; i < 8; i++)
 				bitmap.pix16(y, x << 3 | i) = (data >> i & 1) ? color : 0;

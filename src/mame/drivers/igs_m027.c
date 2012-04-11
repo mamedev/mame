@@ -63,9 +63,9 @@ public:
 /* CGLayer */
 WRITE32_MEMBER(igs_m027_state::igs_cg_videoram_w)
 {
-	COMBINE_DATA(&m_igs_cg_videoram[offset]);
+	COMBINE_DATA(&m_igs_cg_videoram.target()[offset]);
 	//if(data!=0)
-	logerror("PC(%08X) CG @%x = %x!\n",cpu_get_pc(&space.device()),offset ,m_igs_cg_videoram[offset]);
+	logerror("PC(%08X) CG @%x = %x!\n",cpu_get_pc(&space.device()),offset ,m_igs_cg_videoram.target()[offset]);
 
 
 
@@ -106,10 +106,10 @@ WRITE32_MEMBER(igs_m027_state::igs_cg_videoram_w)
 /* TX Layer */
 WRITE32_MEMBER(igs_m027_state::igs_tx_videoram_w)
 {
-	COMBINE_DATA(&m_igs_tx_videoram[offset]);
+	COMBINE_DATA(&m_igs_tx_videoram.target()[offset]);
 	m_igs_tx_tilemap->mark_tile_dirty(offset);
 	//if(data!=0)
-	//logerror( "TX VIDEO RAM OFFSET %x ,data %x!\n",offset ,m_igs_tx_videoram[offset]);
+	//logerror( "TX VIDEO RAM OFFSET %x ,data %x!\n",offset ,m_igs_tx_videoram.target()[offset]);
 }
 
 static TILE_GET_INFO( get_tx_tilemap_tile_info )
@@ -117,8 +117,8 @@ static TILE_GET_INFO( get_tx_tilemap_tile_info )
 	igs_m027_state *state = machine.driver_data<igs_m027_state>();
 	//ppppppppNNNNNNNN
 	int tileno,colour;
-	tileno = state->m_igs_tx_videoram[tile_index] & 0xffff;
-	colour = (state->m_igs_tx_videoram[tile_index]>>0x10) & 0xffff;
+	tileno = state->m_igs_tx_videoram.target()[tile_index] & 0xffff;
+	colour = (state->m_igs_tx_videoram.target()[tile_index]>>0x10) & 0xffff;
 
 	SET_TILE_INFO(0,tileno,colour,0);
 }
@@ -126,10 +126,10 @@ static TILE_GET_INFO( get_tx_tilemap_tile_info )
 /* BG Layer */
 WRITE32_MEMBER(igs_m027_state::igs_bg_videoram_w)
 {
-	COMBINE_DATA(&m_igs_bg_videoram[offset]);
+	COMBINE_DATA(&m_igs_bg_videoram.target()[offset]);
 	m_igs_bg_tilemap->mark_tile_dirty(offset);
 	//if(data!=0)
-	logerror("BG VIDEO RAM OFFSET %x ,data %x!\n",offset ,m_igs_bg_videoram[offset]);
+	logerror("BG VIDEO RAM OFFSET %x ,data %x!\n",offset ,m_igs_bg_videoram.target()[offset]);
 }
 
 static TILE_GET_INFO( get_bg_tilemap_tile_info )
@@ -137,8 +137,8 @@ static TILE_GET_INFO( get_bg_tilemap_tile_info )
 	igs_m027_state *state = machine.driver_data<igs_m027_state>();
 	//ppppppppNNNNNNNN
 	int tileno,colour;
-	tileno = state->m_igs_bg_videoram[tile_index] & 0xffff;
-	colour = (state->m_igs_bg_videoram[tile_index]>>0x10) & 0xffff;
+	tileno = state->m_igs_bg_videoram.target()[tile_index] & 0xffff;
+	colour = (state->m_igs_bg_videoram.target()[tile_index]>>0x10) & 0xffff;
 
 	SET_TILE_INFO(0,tileno,colour,0);
 }
@@ -148,11 +148,11 @@ static TILE_GET_INFO( get_bg_tilemap_tile_info )
 WRITE32_MEMBER(igs_m027_state::igs_palette32_w)
 {
 	m_generic_paletteram_16.set_target((UINT16 *)m_igs_palette32.target(), 0x800);
-	COMBINE_DATA(&m_igs_palette32[offset]);
+	COMBINE_DATA(&m_igs_palette32.target()[offset]);
 	//paletteram_xGGGGGRRRRRBBBBB_word_w(offset*2,m_generic_paletteram_16[offset*2],0);
 	//paletteram_xGGGGGRRRRRBBBBB_word_w(offset*2+1,m_generic_paletteram_16[offset*2+1],0);
 	//if(data!=0)
-	//fprintf(stdout,"PALETTE RAM OFFSET %x ,data %x!\n",offset ,m_igs_palette32[offset]);
+	//fprintf(stdout,"PALETTE RAM OFFSET %x ,data %x!\n",offset ,m_igs_palette32.target()[offset]);
 }
 
 

@@ -113,8 +113,8 @@ static TIMER_CALLBACK( setup_gun_interrupts )
 	state->m_setup_gun_timer->adjust(machine.primary_screen->time_until_pos(0));
 
 	/* only do work if the palette is flashed */
-	if (state->m_control)
-		if (!state->m_control[2])
+	if (state->m_control.target())
+		if (!state->m_control.target()[2])
 			return;
 
 	/* generate interrupts for player 1's gun */
@@ -155,14 +155,14 @@ static VIDEO_START( tickee )
 static void scanline_update(screen_device &screen, bitmap_rgb32 &bitmap, int scanline, const tms34010_display_params *params)
 {
 	tickee_state *state = screen.machine().driver_data<tickee_state>();
-	UINT16 *src = &state->m_vram[(params->rowaddr << 8) & 0x3ff00];
+	UINT16 *src = &state->m_vram.target()[(params->rowaddr << 8) & 0x3ff00];
 	UINT32 *dest = &bitmap.pix32(scanline);
 	const rgb_t *pens = tlc34076_get_pens(screen.machine().device("tlc34076"));
 	int coladdr = params->coladdr << 1;
 	int x;
 
 	/* blank palette: fill with pen 255 */
-	if (state->m_control[2])
+	if (state->m_control.target()[2])
 	{
 		for (x = params->heblnk; x < params->hsblnk; x++)
 			dest[x] = pens[0xff];
@@ -181,7 +181,7 @@ static void scanline_update(screen_device &screen, bitmap_rgb32 &bitmap, int sca
 static void rapidfir_scanline_update(screen_device &screen, bitmap_rgb32 &bitmap, int scanline, const tms34010_display_params *params)
 {
 	tickee_state *state = screen.machine().driver_data<tickee_state>();
-	UINT16 *src = &state->m_vram[(params->rowaddr << 8) & 0x3ff00];
+	UINT16 *src = &state->m_vram.target()[(params->rowaddr << 8) & 0x3ff00];
 	UINT32 *dest = &bitmap.pix32(scanline);
 	const rgb_t *pens = tlc34076_get_pens(screen.machine().device("tlc34076"));
 	int coladdr = params->coladdr << 1;
@@ -240,13 +240,13 @@ WRITE16_MEMBER(tickee_state::rapidfir_transparent_w)
 {
 	if (!(data & 0xff00)) mem_mask &= 0x00ff;
 	if (!(data & 0x00ff)) mem_mask &= 0xff00;
-	COMBINE_DATA(&m_vram[offset]);
+	COMBINE_DATA(&m_vram.target()[offset]);
 }
 
 
 READ16_MEMBER(tickee_state::rapidfir_transparent_r)
 {
-	return m_vram[offset];
+	return m_vram.target()[offset];
 }
 
 
@@ -254,7 +254,7 @@ static void rapidfir_to_shiftreg(address_space *space, UINT32 address, UINT16 *s
 {
 	tickee_state *state = space->machine().driver_data<tickee_state>();
 	if (address < 0x800000)
-		memcpy(shiftreg, &state->m_vram[TOWORD(address)], TOBYTE(0x2000));
+		memcpy(shiftreg, &state->m_vram.target()[TOWORD(address)], TOBYTE(0x2000));
 }
 
 
@@ -262,7 +262,7 @@ static void rapidfir_from_shiftreg(address_space *space, UINT32 address, UINT16 
 {
 	tickee_state *state = space->machine().driver_data<tickee_state>();
 	if (address < 0x800000)
-		memcpy(&state->m_vram[TOWORD(address)], shiftreg, TOBYTE(0x2000));
+		memcpy(&state->m_vram.target()[TOWORD(address)], shiftreg, TOBYTE(0x2000));
 }
 
 
@@ -275,7 +275,7 @@ static void rapidfir_from_shiftreg(address_space *space, UINT32 address, UINT16 
 
 WRITE16_MEMBER(tickee_state::tickee_control_w)
 {
-	UINT16 olddata = m_control[offset];
+	UINT16 olddata = m_control.target()[offset];
 
 	/* offsets:
 
@@ -284,7 +284,7 @@ WRITE16_MEMBER(tickee_state::tickee_control_w)
         6 = lamps? (changing all the time)
     */
 
-	COMBINE_DATA(&m_control[offset]);
+	COMBINE_DATA(&m_control.target()[offset]);
 
 	if (offset == 3)
 	{
@@ -292,8 +292,8 @@ WRITE16_MEMBER(tickee_state::tickee_control_w)
 		machine().device<ticket_dispenser_device>("ticket2")->write(space, 0, (data & 4) << 5);
 	}
 
-	if (olddata != m_control[offset])
-		logerror("%08X:tickee_control_w(%d) = %04X (was %04X)\n", cpu_get_pc(&space.device()), offset, m_control[offset], olddata);
+	if (olddata != m_control.target()[offset])
+		logerror("%08X:tickee_control_w(%d) = %04X (was %04X)\n", cpu_get_pc(&space.device()), offset, m_control.target()[offset], olddata);
 }
 
 

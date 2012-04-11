@@ -109,9 +109,9 @@ static SCREEN_UPDATE_IND16( supdrapo )
 	{
 		for(x = 0; x < 32; x++)
 		{
-			int tile = state->m_videoram[count] + state->m_char_bank[count] * 0x100;
+			int tile = state->m_videoram.target()[count] + state->m_char_bank.target()[count] * 0x100;
 			/* Global Column Coloring, GUESS! */
-			color = state->m_col_line[(x*2) + 1] ? (state->m_col_line[(x*2) + 1] - 1) & 7 : 0;
+			color = state->m_col_line.target()[(x*2) + 1] ? (state->m_col_line.target()[(x*2) + 1] - 1) & 7 : 0;
 
 			drawgfx_opaque(bitmap, cliprect, screen.machine().gfx[0], tile,color, 0, 0, x*8, y*8);
 

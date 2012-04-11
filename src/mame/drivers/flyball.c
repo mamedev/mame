@@ -75,7 +75,7 @@ static TILEMAP_MAPPER( flyball_get_memory_offset )
 static TILE_GET_INFO( flyball_get_tile_info )
 {
 	flyball_state *state = machine.driver_data<flyball_state>();
-	UINT8 data = state->m_playfield_ram[tile_index];
+	UINT8 data = state->m_playfield_ram.target()[tile_index];
 	int flags = ((data & 0x40) ? TILE_FLIPX : 0) | ((data & 0x80) ? TILE_FLIPY : 0);
 	int code = data & 63;
 
@@ -392,7 +392,7 @@ static MACHINE_RESET( flyball )
 	UINT8* ROM = machine.region("maincpu")->base() + 0x2000;
 
 	for (i = 0; i < 0x1000; i++)
-		state->m_rombase[i] = ROM[i ^ 0x1ff];
+		state->m_rombase.target()[i] = ROM[i ^ 0x1ff];
 
 	machine.device("maincpu")->reset();
 
