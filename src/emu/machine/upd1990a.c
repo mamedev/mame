@@ -429,10 +429,8 @@ WRITE_LINE_MEMBER( upd1990a_device::clk_w )
 
 	if (!m_clk && state) // rising edge
 	{
-        logerror("Rising edge\n");
 		if (m_c == MODE_SHIFT)
 		{
-            logerror("MODE_SHIFT\n");
 			m_shift_reg[0] >>= 1;
 			m_shift_reg[0] |= (BIT(m_shift_reg[1], 0) << 7);
 
@@ -450,7 +448,6 @@ WRITE_LINE_MEMBER( upd1990a_device::clk_w )
 
 			if (m_oe)
 			{
-                logerror("OE\n");
 				m_data_out = BIT(m_shift_reg[0], 0);
 
 				if (LOG) logerror("uPD1990A '%s' DATA OUT %u\n", tag(), m_data_out);
