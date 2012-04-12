@@ -141,7 +141,7 @@ WRITE32_MEMBER(groundfx_state::groundfx_input_w)
 		case 0x00:
 			if (ACCESSING_BITS_24_31)	/* $500000 is watchdog */
 			{
-				watchdog_reset(machine());
+				machine().watchdog_reset();
 			}
 
 			if (ACCESSING_BITS_0_7)

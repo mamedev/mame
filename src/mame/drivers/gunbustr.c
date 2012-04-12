@@ -102,7 +102,7 @@ popmessage(t);
 		{
 			if (ACCESSING_BITS_24_31)	/* $400000 is watchdog */
 			{
-				watchdog_reset(machine());
+				machine().watchdog_reset();
 			}
 
 			if (ACCESSING_BITS_0_7)

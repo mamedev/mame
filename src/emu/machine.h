@@ -378,6 +378,10 @@ public:
 	memory_region *region_alloc(const char *name, UINT32 length, UINT8 width, endianness_t endian);
 	void region_free(const char *name);
 
+	// watchdog control
+	void watchdog_reset();
+	void watchdog_enable(bool enable = true);
+
 	// misc
 	void CLIB_DECL logerror(const char *format, ...);
 	void CLIB_DECL vlogerror(const char *format, va_list args);
@@ -419,6 +423,8 @@ private:
 	void fill_systime(system_time &systime, time_t t);
 	void handle_saveload();
 	void soft_reset(void *ptr = NULL, INT32 param = 0);
+	void watchdog_fired(void *ptr = NULL, INT32 param = 0);
+	void watchdog_vblank(screen_device &screen, bool vblank_state);
 
 	// internal callbacks
 	static void logfile_callback(running_machine &machine, const char *buffer);
@@ -458,6 +464,11 @@ private:
 	bool					m_exit_to_game_select;	// when we exit, go we go back to the game select?
 	const game_driver *		m_new_driver_pending;	// pointer to the next pending driver
 	emu_timer *				m_soft_reset_timer;		// timer used to schedule a soft reset
+
+	// watchdog state
+	bool					m_watchdog_enabled;		// is the watchdog enabled?
+	INT32					m_watchdog_counter;		// counter for watchdog tracking
+	emu_timer *				m_watchdog_timer;		// timer for watchdog tracking
 
 	// misc state
 	UINT32					m_rand_seed;			// current random number seed

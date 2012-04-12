@@ -62,7 +62,7 @@ ADDRESS_MAP_END
 
 static WRITE8_DEVICE_HANDLER( watchdog_w )
 {
-	watchdog_reset(device->machine());
+	device->machine().watchdog_reset();
 }
 
 static const riot6532_interface r6532_interface_0 =

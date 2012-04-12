@@ -136,7 +136,7 @@ static WRITE8_DEVICE_HANDLER( shr_w )
 
 	/* bit 3 = watchdog */
 	if (data & 0x08)
-		watchdog_reset(device->machine());
+		device->machine().watchdog_reset();
 
 	/* bit 2-0 = SH0-2 */
 	state->m_sh = data & 0x07;

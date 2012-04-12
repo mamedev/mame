@@ -184,7 +184,7 @@ WRITE8_MEMBER(grchamp_state::cpu0_outputs_w)
 			break;
 
 		case 0x0d:	/* OUT13 */
-			watchdog_reset(machine());
+			machine().watchdog_reset();
 			break;
 
 		case 0x0e:	/* OUT14 */

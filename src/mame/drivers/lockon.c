@@ -132,7 +132,7 @@ WRITE16_MEMBER(lockon_state::inten_w)
 
 WRITE16_MEMBER(lockon_state::emres_w)
 {
-	watchdog_reset(machine());
+	machine().watchdog_reset();
 	m_main_inten = 0;
 }
 

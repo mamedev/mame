@@ -111,7 +111,7 @@ static INTERRUPT_GEN( sprint2 )
 
 	/* interrupts and watchdog are disabled during service mode */
 
-	watchdog_enable(device->machine(), !service_mode(device->machine()));
+	device->machine().watchdog_enable(!service_mode(device->machine()));
 
 	if (!service_mode(device->machine()))
 		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);

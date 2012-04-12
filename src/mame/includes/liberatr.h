@@ -21,9 +21,6 @@ public:
 		  m_bitmapram(*this, "bitmapram"),
 		  m_colorram(*this, "colorram") { }
 
-	void machine_start_liberatr();
-	void video_start_liberatr();
-
 	DECLARE_WRITE8_MEMBER( led_w );
 	DECLARE_WRITE8_MEMBER( coin_counter_w );
 
@@ -37,6 +34,9 @@ public:
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 protected:
+	virtual void machine_start();
+	virtual void video_start();
+
 	struct planet;
 
 	void init_planet(planet &liberatr_planet, UINT8 *planet_rom);

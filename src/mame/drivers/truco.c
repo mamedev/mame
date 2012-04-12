@@ -231,7 +231,7 @@ static WRITE8_DEVICE_HANDLER( pia_ca2_w )
     Legs 07 [OSC IN] and 08 [OSC SEL] aren't connected,
     setting 1.6 seconds as WD timeout.
 */
-	watchdog_reset(device->machine());
+	device->machine().watchdog_reset();
 }
 
 static WRITE8_DEVICE_HANDLER( portb_w )

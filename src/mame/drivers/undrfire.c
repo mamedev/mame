@@ -282,7 +282,7 @@ WRITE32_MEMBER(undrfire_state::undrfire_input_w)
 		{
 			if (ACCESSING_BITS_24_31)	/* $500000 is watchdog */
 			{
-				watchdog_reset(machine());
+				machine().watchdog_reset();
 			}
 
 			if (ACCESSING_BITS_0_7)

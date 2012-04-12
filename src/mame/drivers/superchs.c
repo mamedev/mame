@@ -136,7 +136,7 @@ WRITE32_MEMBER(superchs_state::superchs_input_w)
 		{
 			if (ACCESSING_BITS_24_31)	/* $300000 is watchdog */
 			{
-				watchdog_reset(machine());
+				machine().watchdog_reset();
 			}
 
 			if (ACCESSING_BITS_0_7)

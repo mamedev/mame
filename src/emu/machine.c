@@ -67,7 +67,6 @@
                 - calls input_port_init() [inptport.c] to set up the input ports
                 - calls rom_init() [romload.c] to load the game's ROMs
                 - calls memory_init() [memory.c] to process the game's memory maps
-                - calls watchdog_init() [watchdog.c] to initialize the watchdog system
                 - calls the driver's DRIVER_INIT callback
                 - calls device_list_start() [devintrf.c] to start any devices
                 - calls video_init() [video.c] to start the video system
@@ -278,7 +277,9 @@ void running_machine::start()
 	// these operations must proceed in this order
 	rom_init(*this);
 	m_memory = auto_alloc(*this, memory_manager(*this));
-	watchdog_init(*this);
+	m_watchdog_timer = m_scheduler.timer_alloc(timer_expired_delegate(FUNC(running_machine::watchdog_fired), this));
+	save().save_item(NAME(m_watchdog_enabled));
+	save().save_item(NAME(m_watchdog_counter));
 
 	// allocate the gfx elements prior to device initialization
 	gfx_init(*this);
@@ -846,11 +847,97 @@ void running_machine::soft_reset(void *ptr, INT32 param)
 	// temporarily in the reset phase
 	m_current_phase = MACHINE_PHASE_RESET;
 
+	// set up the watchdog timer; only start off enabled if explicitly configured
+	m_watchdog_enabled = (config().m_watchdog_vblank_count != 0 || config().m_watchdog_time != attotime::zero);
+	watchdog_reset();
+	m_watchdog_enabled = true;
+
 	// call all registered reset callbacks
 	call_notifiers(MACHINE_NOTIFY_RESET);
 
 	// now we're running
 	m_current_phase = MACHINE_PHASE_RUNNING;
+}
+
+
+//-------------------------------------------------
+//  watchdog_reset - reset the watchdog timer
+//-------------------------------------------------
+
+void running_machine::watchdog_reset()
+{
+	// if we're not enabled, skip it
+	if (!m_watchdog_enabled)
+		m_watchdog_timer->adjust(attotime::never);
+
+	// VBLANK-based watchdog?
+	else if (config().m_watchdog_vblank_count != 0)
+	{
+		// register a VBLANK callback for the primary screen
+		m_watchdog_counter = config().m_watchdog_vblank_count;
+		if (primary_screen != NULL)
+			primary_screen->register_vblank_callback(vblank_state_delegate(FUNC(running_machine::watchdog_vblank), this));
+	}
+
+	// timer-based watchdog?
+	else if (config().m_watchdog_time != attotime::zero)
+		m_watchdog_timer->adjust(config().m_watchdog_time);
+
+	// default to an obscene amount of time (3 seconds)
+	else
+		m_watchdog_timer->adjust(attotime::from_seconds(3));
+}
+
+
+//-------------------------------------------------
+//  watchdog_enable - reset the watchdog timer
+//-------------------------------------------------
+
+void running_machine::watchdog_enable(bool enable)
+{
+	// when re-enabled, we reset our state
+	if (m_watchdog_enabled != enable)
+	{
+		m_watchdog_enabled = enable;
+		watchdog_reset();
+	}
+}
+
+
+//-------------------------------------------------
+//  watchdog_fired - watchdog timer callback
+//-------------------------------------------------
+
+void running_machine::watchdog_fired(void *ptr, INT32 param)
+{
+	logerror("Reset caused by the watchdog!!!\n");
+
+	bool verbose = options().verbose();
+#ifdef MAME_DEBUG
+	verbose = true;
+#endif
+	if (verbose)
+		popmessage("Reset caused by the watchdog!!!\n");
+
+	schedule_soft_reset();
+}
+
+
+//-------------------------------------------------
+//  watchdog_vblank - VBLANK state callback for
+//  watchdog timers
+//-------------------------------------------------
+
+void running_machine::watchdog_vblank(screen_device &screen, bool vblank_state)
+{
+	// VBLANK starting
+	if (vblank_state && m_watchdog_enabled)
+	{
+		// check the watchdog
+		if (config().m_watchdog_vblank_count != 0)
+			if (--m_watchdog_counter == 0)
+				watchdog_fired();
+	}
 }
 
 

@@ -228,13 +228,15 @@ ATTR_COLD device_t *MACHINE_CONFIG_NAME(_name)(machine_config &config, device_t 
 	MACHINE_CONFIG_NAME(_name)(config, owner);
 
 
-// core parameters
+// scheduling parameters
 #define MCFG_QUANTUM_TIME(_time) \
 	config.m_minimum_quantum = _time; \
 
 #define MCFG_QUANTUM_PERFECT_CPU(_cputag) \
 	config.m_perfect_cpu_quantum = _cputag; \
 
+
+// watchdog configuration
 #define MCFG_WATCHDOG_VBLANK_INIT(_count) \
 	config.m_watchdog_vblank_count = _count; \
 
@@ -252,6 +254,7 @@ ATTR_COLD device_t *MACHINE_CONFIG_NAME(_name)(machine_config &config, device_t 
 #define MCFG_NVRAM_HANDLER_CLEAR() \
 	config.m_nvram_handler = NULL; \
 
+
 // core video parameters
 #define MCFG_VIDEO_ATTRIBUTES(_flags) \
 	config.m_video_attributes = _flags; \
@@ -264,51 +267,6 @@ ATTR_COLD device_t *MACHINE_CONFIG_NAME(_name)(machine_config &config, device_t 
 
 #define MCFG_DEFAULT_LAYOUT(_layout) \
 	config.m_default_layout = &(_layout)[0]; \
-
-
-// core machine functions
-#define MCFG_MACHINE_START(_func) \
-	driver_device::static_set_callback(*owner, driver_device::CB_MACHINE_START, MACHINE_START_NAME(_func)); \
-
-#define MCFG_MACHINE_START_DRIVER(_class, _func) \
-	driver_device::static_set_callback(*owner, driver_device::CB_MACHINE_START, driver_callback_delegate(&_class::_func, #_class "::" #_func, downcast<_class *>(&config.root_device())));
-
-#define MCFG_MACHINE_RESET(_func) \
-	driver_device::static_set_callback(*owner, driver_device::CB_MACHINE_RESET, MACHINE_RESET_NAME(_func)); \
-
-#define MCFG_MACHINE_RESET_DRIVER(_class, _func) \
-	driver_device::static_set_callback(*owner, driver_device::CB_MACHINE_RESET, driver_callback_delegate(&_class::_func, #_class "::" #_func, downcast<_class *>(&config.root_device())));
-
-
-// core sound functions
-#define MCFG_SOUND_START(_func) \
-	driver_device::static_set_callback(*owner, driver_device::CB_SOUND_START, SOUND_START_NAME(_func)); \
-
-#define MCFG_SOUND_START_DRIVER(_class, _func) \
-	driver_device::static_set_callback(*owner, driver_device::CB_SOUND_START, driver_callback_delegate(&_class::_func, #_class "::" #_func, downcast<_class *>(&config.root_device())));
-
-#define MCFG_SOUND_RESET(_func) \
-	driver_device::static_set_callback(*owner, driver_device::CB_SOUND_RESET, SOUND_RESET_NAME(_func)); \
-
-#define MCFG_SOUND_RESET_DRIVER(_class, _func) \
-	driver_device::static_set_callback(*owner, driver_device::CB_SOUND_RESET, driver_callback_delegate(&_class::_func, #_class "::" #_func, downcast<_class *>(&config.root_device())));
-
-
-// core video functions
-#define MCFG_PALETTE_INIT(_func) \
-	driver_device::static_set_palette_init(*owner, PALETTE_INIT_NAME(_func)); \
-
-#define MCFG_VIDEO_START(_func) \
-	driver_device::static_set_callback(*owner, driver_device::CB_VIDEO_START, VIDEO_START_NAME(_func)); \
-
-#define MCFG_VIDEO_START_DRIVER(_class, _func) \
-	driver_device::static_set_callback(*owner, driver_device::CB_VIDEO_START, driver_callback_delegate(&_class::_func, #_class "::" #_func, downcast<_class *>(&config.root_device())));
-
-#define MCFG_VIDEO_RESET(_func) \
-	driver_device::static_set_callback(*owner, driver_device::CB_VIDEO_RESET, VIDEO_RESET_NAME(_func)); \
-
-#define MCFG_VIDEO_RESET_DRIVER(_class, _func) \
-	driver_device::static_set_callback(*owner, driver_device::CB_VIDEO_RESET, driver_callback_delegate(&_class::_func, #_class "::" #_func, downcast<_class *>(&config.root_device())));
 
 
 // add/remove devices

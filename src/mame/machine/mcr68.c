@@ -277,7 +277,7 @@ static TIMER_CALLBACK( mcr68_493_callback )
 WRITE8_DEVICE_HANDLER( zwackery_pia0_w )
 {
 	/* bit 7 is the watchdog */
-	if (!(data & 0x80)) watchdog_reset(device->machine());
+	if (!(data & 0x80)) device->machine().watchdog_reset();
 
 	/* bits 5 and 6 control hflip/vflip */
 	/* bits 3 and 4 control coin counters? */

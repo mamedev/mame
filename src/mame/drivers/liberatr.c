@@ -140,7 +140,7 @@
 #define MASTER_CLOCK 20000000 /* 20Mhz Main Clock Xtal */
 
 
-void liberatr_state::machine_start_liberatr()
+void liberatr_state::machine_start()
 {
 	atarigen_state::machine_start();
 
@@ -393,10 +393,7 @@ static MACHINE_CONFIG_START( liberatr, liberatr_state )
 
 	MCFG_ER2055_ADD("earom")
 	
-	MCFG_MACHINE_START_DRIVER(liberatr_state, machine_start_liberatr)
-
 	/* video hardware */
-	MCFG_VIDEO_START_DRIVER(liberatr_state, video_start_liberatr)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)

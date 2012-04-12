@@ -361,7 +361,7 @@ WRITE8_MEMBER(zr107_state::sysreg_w)
                 0x01 = AFE
             */
 			if (data & 0x01)
-				watchdog_reset(machine());
+				machine().watchdog_reset();
 			break;
 
 	}

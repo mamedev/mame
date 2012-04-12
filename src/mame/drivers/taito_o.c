@@ -41,7 +41,7 @@ WRITE16_MEMBER(taitoo_state::io_w)
 {
 	switch(offset)
 	{
-		case 2: watchdog_reset(machine()); break;
+		case 2: machine().watchdog_reset(); break;
 
 		default: logerror("IO W %x %x %x\n", offset, data, mem_mask);
 	}

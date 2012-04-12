@@ -127,7 +127,7 @@ WRITE8_DEVICE_HANDLER( tc0220ioc_w )
 	{
 
 		case 0x00:
-			watchdog_reset(device->machine());
+			device->machine().watchdog_reset();
 			break;
 
 		case 0x04:	/* coin counters and lockout, hi nibble irrelevant */
@@ -284,7 +284,7 @@ WRITE8_DEVICE_HANDLER( tc0510nio_w )
 	switch (offset)
 	{
 		case 0x00:
-			watchdog_reset(device->machine());
+			device->machine().watchdog_reset();
 			break;
 
 		case 0x04:	/* coin counters and lockout */
@@ -435,7 +435,7 @@ WRITE8_DEVICE_HANDLER( tc0640fio_w )
 	{
 
 		case 0x00:
-			watchdog_reset(device->machine());
+			device->machine().watchdog_reset();
 			break;
 
 		case 0x04:	/* coin counters and lockout */

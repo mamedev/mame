@@ -238,7 +238,7 @@ WRITE16_MEMBER(tecmosys_state::unk880000_w)
 			break;
 
 		case 0x22/2:
-			watchdog_reset( machine() );
+			machine().watchdog_reset();
 			//logerror( "watchdog_w( %06x, %04x ) @ %06x\n", (offset * 2)+0x880000, data, cpu_get_pc(&space.device()) );
 			break;
 

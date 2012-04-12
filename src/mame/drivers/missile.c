@@ -750,7 +750,7 @@ WRITE8_MEMBER(missile_state::missile_w)
 
 	/* watchdog */
 	else if (offset >= 0x4c00 && offset < 0x4d00)
-		watchdog_reset(machine());
+		machine().watchdog_reset();
 
 	/* interrupt ack */
 	else if (offset >= 0x4d00 && offset < 0x4e00)

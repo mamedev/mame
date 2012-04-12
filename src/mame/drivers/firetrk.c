@@ -20,7 +20,7 @@ static void set_service_mode(running_machine &machine, int enable)
 	state->m_in_service_mode = enable;
 
 	/* watchdog is disabled during service mode */
-	watchdog_enable(machine, !enable);
+	machine.watchdog_enable(!enable);
 
 	/* change CPU clock speed according to service switch change */
 	machine.device("maincpu")->set_unscaled_clock(enable ? (MASTER_CLOCK/12) : (MASTER_CLOCK/16));

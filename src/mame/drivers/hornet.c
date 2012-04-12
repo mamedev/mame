@@ -567,7 +567,7 @@ WRITE8_MEMBER(hornet_state::sysreg_w)
                 0x80 = WDTCLK
             */
 			if (data & 0x80)
-				watchdog_reset(machine());
+				machine().watchdog_reset();
 			break;
 
 		case 7:	/* CG Control Register */

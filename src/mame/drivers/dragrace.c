@@ -29,7 +29,7 @@ static TIMER_DEVICE_CALLBACK( dragrace_frame_callback )
 	}
 
 	/* watchdog is disabled during service mode */
-	watchdog_enable(timer.machine(), input_port_read(timer.machine(), "IN0") & 0x20);
+	timer.machine().watchdog_enable(input_port_read(timer.machine(), "IN0") & 0x20);
 }
 
 

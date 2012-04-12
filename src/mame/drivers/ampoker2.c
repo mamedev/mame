@@ -588,7 +588,7 @@ WRITE8_MEMBER(ampoker2_state::ampoker2_watchdog_reset_w)
 
 	if (((data >> 3) & 0x01) == 0)		/* check for refresh value (0x08) */
 	{
-		watchdog_reset(machine());
+		machine().watchdog_reset();
 //      popmessage("%02x", data);
 	}
 	else

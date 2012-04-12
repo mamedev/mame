@@ -73,7 +73,7 @@ WRITE32_MEMBER(taito_f3_state::f3_control_w)
 	switch (offset)
 	{
 		case 0x00: /* Watchdog */
-			watchdog_reset(machine());
+			machine().watchdog_reset();
 			return;
 
 		case 0x01: /* Coin counters & lockouts */

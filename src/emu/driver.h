@@ -48,6 +48,56 @@
 
 
 //**************************************************************************
+//  CONFIGURATION MACROS
+//**************************************************************************
+
+// core machine callbacks
+#define MCFG_MACHINE_START(_func) \
+	driver_device::static_set_callback(*owner, driver_device::CB_MACHINE_START, MACHINE_START_NAME(_func)); \
+
+#define MCFG_MACHINE_START_OVERRIDE(_class, _func) \
+	driver_device::static_set_callback(*owner, driver_device::CB_MACHINE_START, driver_callback_delegate(&_class::_func, #_class "::" #_func, downcast<_class *>(&config.root_device())));
+
+#define MCFG_MACHINE_RESET(_func) \
+	driver_device::static_set_callback(*owner, driver_device::CB_MACHINE_RESET, MACHINE_RESET_NAME(_func)); \
+
+#define MCFG_MACHINE_RESET_OVERRIDE(_class, _func) \
+	driver_device::static_set_callback(*owner, driver_device::CB_MACHINE_RESET, driver_callback_delegate(&_class::_func, #_class "::" #_func, downcast<_class *>(&config.root_device())));
+
+
+// core sound callbacks
+#define MCFG_SOUND_START(_func) \
+	driver_device::static_set_callback(*owner, driver_device::CB_SOUND_START, SOUND_START_NAME(_func)); \
+
+#define MCFG_SOUND_START_OVERRIDE(_class, _func) \
+	driver_device::static_set_callback(*owner, driver_device::CB_SOUND_START, driver_callback_delegate(&_class::_func, #_class "::" #_func, downcast<_class *>(&config.root_device())));
+
+#define MCFG_SOUND_RESET(_func) \
+	driver_device::static_set_callback(*owner, driver_device::CB_SOUND_RESET, SOUND_RESET_NAME(_func)); \
+
+#define MCFG_SOUND_RESET_OVERRIDE(_class, _func) \
+	driver_device::static_set_callback(*owner, driver_device::CB_SOUND_RESET, driver_callback_delegate(&_class::_func, #_class "::" #_func, downcast<_class *>(&config.root_device())));
+
+
+// core video callbacks
+#define MCFG_PALETTE_INIT(_func) \
+	driver_device::static_set_palette_init(*owner, PALETTE_INIT_NAME(_func)); \
+
+#define MCFG_VIDEO_START(_func) \
+	driver_device::static_set_callback(*owner, driver_device::CB_VIDEO_START, VIDEO_START_NAME(_func)); \
+
+#define MCFG_VIDEO_START_OVERRIDE(_class, _func) \
+	driver_device::static_set_callback(*owner, driver_device::CB_VIDEO_START, driver_callback_delegate(&_class::_func, #_class "::" #_func, downcast<_class *>(&config.root_device())));
+
+#define MCFG_VIDEO_RESET(_func) \
+	driver_device::static_set_callback(*owner, driver_device::CB_VIDEO_RESET, VIDEO_RESET_NAME(_func)); \
+
+#define MCFG_VIDEO_RESET_OVERRIDE(_class, _func) \
+	driver_device::static_set_callback(*owner, driver_device::CB_VIDEO_RESET, driver_callback_delegate(&_class::_func, #_class "::" #_func, downcast<_class *>(&config.root_device())));
+
+
+
+//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 

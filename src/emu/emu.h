@@ -108,7 +108,6 @@ typedef device_t * (*machine_config_constructor)(machine_config &config, device_
 
 // timers, CPU and scheduling
 #include "devcpu.h"
-#include "watchdog.h"
 
 // machine and driver configuration
 #include "mconfig.h"

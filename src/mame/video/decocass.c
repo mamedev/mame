@@ -530,9 +530,9 @@ SCREEN_UPDATE_IND16( decocass )
 		device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, ASSERT_LINE);
 
 	if (0 == (state->m_watchdog_flip & 0x04))
-		watchdog_reset(screen.machine());
+		screen.machine().watchdog_reset();
 	else if (state->m_watchdog_count-- > 0)
-		watchdog_reset(screen.machine());
+		screen.machine().watchdog_reset();
 
 #ifdef MAME_DEBUG
 	{

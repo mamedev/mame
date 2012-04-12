@@ -508,7 +508,7 @@ Seems to work properly, but must be checked closely...
 */
 	if (((data >> 7) & 0x01) == 0)		/* check for bit7 */
 	{
-		watchdog_reset(device->machine());
+		device->machine().watchdog_reset();
 	}
 
 //  logerror("AY port B write %02x\n",data);
