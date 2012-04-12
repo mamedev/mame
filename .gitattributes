@@ -4023,6 +4023,7 @@ src/mame/layout/gamball.lay svneol=native#text/plain
 src/mame/layout/geebee.lay svneol=native#text/plain
 src/mame/layout/gldncrwn.lay svneol=native#text/plain
 src/mame/layout/gldnpkr.lay svneol=native#text/plain
+src/mame/layout/globalfr.lay svneol=native#text/plain
 src/mame/layout/goldenc.lay svneol=native#text/plain
 src/mame/layout/goldnpkr.lay svneol=native#text/plain
 src/mame/layout/gorf.lay svneol=native#text/plain

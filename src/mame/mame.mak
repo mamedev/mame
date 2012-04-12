@@ -1998,6 +1998,8 @@ $(DRIVERS)/galaxi.o:	$(LAYOUT)/galaxi.lh
 $(DRIVERS)/gatron.o:	$(LAYOUT)/poker41.lh \
 			$(LAYOUT)/pulltabs.lh
 
+$(DRIVERS)/globalfr.o:	$(LAYOUT)/globalfr.lh
+
 $(DRIVERS)/goldnpkr.o:	$(LAYOUT)/goldnpkr.lh \
 			$(LAYOUT)/pmpoker.lh \
 			$(LAYOUT)/upndown.lh

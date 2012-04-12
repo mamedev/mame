@@ -2,12 +2,12 @@
 //                                                                       //
 // steppers.c steppermotor emulation                                     //
 //                                                                       //
-// Emulates : 48 step motors driven with full step or half step          //
+// Emulates : stepper motors driven with full step or half step          //
 //            also emulates the index optic                              //
 //                                                                       //
 //                                                                       //
-// TODO:  add different types of stepper motors if needed                //
-//        someone who understands the device system may want to convert  //
+// TODO:  add further types of stepper motors if needed (Konami/IGT?)    //
+//        Someone who understands the device system may want to convert  //
 //        this                                                           //
 ///////////////////////////////////////////////////////////////////////////
 
@@ -18,9 +18,20 @@
 #define MAX_STEPPERS		    8			/* maximum number of steppers */
 
 #define STARPOINT_48STEP_REEL   0			/* STARPOINT RMXXX reel unit */
-#define BARCREST_48STEP_REEL    1			/* Barcrest bespoke reel unit */
-#define STARPOINT_144STEPS_DICE 2			/* STARPOINT 1DCU DICE mechanism */
-#define MPU3_48STEP_REEL        3
+#define STARPOINT_144STEP_DICE  1			/* STARPOINT 1DCU DICE mechanism */
+#define STARPOINT_200STEP_REEL  2
+
+#define BARCREST_48STEP_REEL    3			/* Barcrest bespoke reel unit */
+#define MPU3_48STEP_REEL        4
+
+#define ECOIN_200STEP_REEL      5			/* Probably not bespoke, but can't find a part number */
+
+#define GAMESMAN_48STEP_REEL    6
+#define GAMESMAN_100STEP_REEL   7
+#define GAMESMAN_200STEP_REEL   8
+
+#define PROJECT_48STEP_REEL     9			
+
 /*------------- Stepper motor interface structure -----------------*/
 
 typedef struct _stepper_interface stepper_interface;
@@ -34,6 +45,7 @@ struct _stepper_interface
 };
 
 extern const stepper_interface starpoint_interface_48step;
+extern const stepper_interface starpoint_interface_200step_reel;
 
 void stepper_config(running_machine &machine, int which, const stepper_interface *intf);
 

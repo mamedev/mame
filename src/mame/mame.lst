@@ -19657,12 +19657,23 @@ hg_frd		// Fruit Deuce
 /* Global Games 'Stealth' */
 
 gl_dow		// Deals On Wheels (Global)
+gl_dowp
 gl_dowcl	// Deals On Wheels Club (Global)
+gl_dowclp
 gl_wywh		// Wish You Were Here Club (Global)
+gl_wywhp
+gl_wywh24
+gl_wywh24p
 gl_coc		// Carry On Clubbin' (Global)
+gl_cocp
+gl_coc29
+gl_coc29p
 gl_uyr		// Up Yer Riggin Club (Global)
+gl_uyrp
 gl_hbh		// Heartbreak Hotel (Global)
 gl_hbhcl	// Heartbreak Hotel Club (Global)
+gl_hbhclp
+gl_hbhcla
 
 /* Unknown, Pluto? */
 

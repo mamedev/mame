@@ -5,6 +5,10 @@
 // Emulates : Stepper motors driven with full step or half step          //
 //            also emulates the index optic                              //
 //                                                                       //
+// 09-04-2012: J. Wallace - Studied some old reel motors and added a     //
+//                          number of new stepper types. I am yet to     //
+//                          add them to drivers, but barring some init   //
+//                          stuff, they should work.                     //
 // 15-01-2012: J. Wallace - Total internal rewrite to remove the table   //
 //                          hoodoo that stops anyone but me actually     //
 //                          updating this. In theory, we should be able  //
@@ -20,7 +24,7 @@
 // 29-12-2006: J. Wallace - Added state save support                     //
 // 05-03-2004: Re-Animator                                               //
 //                                                                       //
-// TODO:  add further different types of stepper motors if needed        //
+// TODO:  add further types of stepper motors if needed (Konami/IGT?)    //
 //        Someone who understands the device system may want to convert  //
 //        this                                                           //
 ///////////////////////////////////////////////////////////////////////////
@@ -75,6 +79,15 @@ const stepper_interface starpoint_interface_48step_reverse =
 	1
 };
 
+const stepper_interface starpoint_interface_200step_reel =
+{
+	STARPOINT_200STEP_REEL,
+	12,
+	24,
+	0x09,
+	0
+};
+
 ///////////////////////////////////////////////////////////////////////////
 void stepper_config(running_machine &machine, int which, const stepper_interface *intf)
 {
@@ -102,13 +115,22 @@ void stepper_config(running_machine &machine, int which, const stepper_interface
 		case STARPOINT_48STEP_REEL:  /* STARPOINT RMxxx */
 		case BARCREST_48STEP_REEL :  /* Barcrest Reel unit */
 		case MPU3_48STEP_REEL :
+		case GAMESMAN_48STEP_REEL :  /* Gamesman GMxxxx */
+		case PROJECT_48STEP_REEL :
 		step[which].max_steps = (48*2);
 		break;
-		case STARPOINT_144STEPS_DICE :/* STARPOINT 1DCU DICE mechanism */
+		case GAMESMAN_100STEP_REEL :
+		step[which].max_steps = (100*2);
+		break;
+		case STARPOINT_144STEP_DICE :/* STARPOINT 1DCU DICE mechanism */
 		//Dice reels are 48 step motors, but complete three full cycles between opto updates
 		step[which].max_steps = ((48*3)*2);
 		break;
-
+		case STARPOINT_200STEP_REEL :
+		case GAMESMAN_200STEP_REEL :
+		case ECOIN_200STEP_REEL :
+		step[which].max_steps = (200*2);
+		break;
 	}
 
 	state_save_register_item(machine, "stepper", NULL, which, step[which].index_start);
@@ -179,7 +201,7 @@ void stepper_reset_position(int which)
 	step[which].pattern     = 0x00;
 	step[which].old_pattern = 0x00;
 	step[which].phase		= 0x00;
-	if ((step[which].type == STARPOINT_48STEP_REEL)||(step[which].type == STARPOINT_144STEPS_DICE))
+	if ((step[which].type == STARPOINT_48STEP_REEL)||(step[which].type == STARPOINT_144STEP_DICE)||(step[which].type == STARPOINT_200STEP_REEL))
 	{//Starpoint motor power on partially energises reel to a known state (straight up)-  Bellfruit games rely on this behaviour.
 		step[which].phase = 0x07;
 		step[which].old_phase = 0x07;
@@ -227,14 +249,19 @@ int stepper_update(int which, UINT8 pattern)
 
 	int pos,steps=0;
 	step[which].pattern = pattern;
-
 	switch ( step[which].type )
 	{
 		default:
-		case STARPOINT_48STEP_REEL :	/* STARPOINT RMxxx */
-		case STARPOINT_144STEPS_DICE :  /* STARPOINT 1DCU DICE mechanism */
+		logerror("No reel type specified for %x!\n",which);
+		break;
+		
+		case STARPOINT_48STEP_REEL : /* STARPOINT RMxxx */
+		case STARPOINT_200STEP_REEL :
+		case GAMESMAN_200STEP_REEL : /* Gamesman GMxxxx */		
+		case STARPOINT_144STEP_DICE :/* STARPOINT 1DCU DICE mechanism */
 		//Standard drive table is 2,6,4,5,1,9,8,a
-		//this runs through the stator patterns in such a way as to drive the reel forward (downwards from the player's view, clockwise on our rose)
+		//NOTE: This runs through the stator patterns in such a way as to drive the reel forward (downwards from the player's view, clockwise on our rose)
+		//The Heber 'Pluto' controller runs this in reverse
 		switch (pattern)
 		{             //Black  Blue  Red  Yellow
 			case 0x02://  0     0     1     0
@@ -290,8 +317,10 @@ int stepper_update(int which, UINT8 pattern)
 		break;
 
 		case BARCREST_48STEP_REEL :
+		case GAMESMAN_48STEP_REEL :
+		case GAMESMAN_100STEP_REEL :
 		//Standard drive table is 1,3,2,6,4,C,8,9
-		//this runs through the stator patterns in such a way as to drive the reel forward (downwards from the player's view)
+		//Gamesman 48 step uses this pattern shifted one place forward, though this shouldn't matter
 		switch (pattern)
 		{
 		 //             Yellow   Black  Orange Brown
@@ -372,6 +401,123 @@ int stepper_update(int which, UINT8 pattern)
 			break;
 		}
 		break;
+		
+		case ECOIN_200STEP_REEL :
+		//While the 48 and 100 step models appear to be reverse driven Starpoint reels, the 200 step model seems bespoke, certainly in terms of wiring.
+		//On a Proconn machine this same pattern is seen but running in reverse
+		//Standard drive table is 8,c,4,6,2,3,1,9
+		switch (pattern)
+		{
+			case 0x08://  0     0     1     0
+			step[which].phase = 7;
+			break;
+			case 0x0c://  0     1     1     0
+			step[which].phase = 6;
+			break;
+			case 0x04://  0     1     0     0
+			step[which].phase = 5;
+			break;
+			case 0x06://  0     1     0     1
+			step[which].phase = 4;
+			break;
+			case 0x02://  0     0     0     1
+			step[which].phase = 3;
+			break;
+			case 0x03://  1     0     0     1
+			step[which].phase = 2;
+			break;
+			case 0x01://  1     0     0     0
+			step[which].phase = 1;
+			break;
+			case 0x09://  1     0     1     0
+			step[which].phase = 0;
+			break;
+			case 0x0a://  0     0     1     1
+			{
+				if ((step[which].old_phase ==6)||(step[which].old_phase == 0)) // if the previous pattern had the drum in the northern quadrant, it will point north now
+				{
+					step[which].phase = 7;
+				}
+				else //otherwise it will line up due south
+				{
+					step[which].phase = 3;
+				}
+			}
+			break;
+			case 0x07://  1     1     0     0
+			{
+				if ((step[which].old_phase ==6)||(step[which].old_phase == 4)) // if the previous pattern had the drum in the eastern quadrant, it will point east now
+				{
+					step[which].phase = 5;
+				}
+				else //otherwise it will line up due west
+				{
+					step[which].phase = 1;
+				}
+			}
+			break;
+		}
+		break;
+
+		case PROJECT_48STEP_REEL :
+		//Standard drive table is 8,c,4,5,1,3,2,a
+		//This appears to be basically a rewired Gamesman (the reel PCB looks like it does some shuffling)
+		//TODO: Not sure if this should be represented as a type here, or by defining it as a Gamesman in the driver and bitswapping.
+		switch (pattern)
+		{
+			case 0x08://  0     0     1     0
+			step[which].phase = 7;
+			break;
+			case 0x0c://  0     1     1     0
+			step[which].phase = 6;
+			break;
+			case 0x04://  0     1     0     0
+			step[which].phase = 5;
+			break;
+			case 0x05://  0     1     0     1
+			step[which].phase = 4;
+			break;
+			case 0x01://  0     0     0     1
+			step[which].phase = 3;
+			break;
+			case 0x03://  1     0     0     1
+			step[which].phase = 2;
+			break;
+			case 0x02://  1     0     0     0
+			step[which].phase = 1;
+			break;
+			case 0x0a://  1     0     1     0
+			step[which].phase = 0;
+			break;
+			case 0x09://  0     0     1     1
+			{
+				if ((step[which].old_phase ==6)||(step[which].old_phase == 0)) // if the previous pattern had the drum in the northern quadrant, it will point north now
+				{
+					step[which].phase = 7;
+				}
+				else //otherwise it will line up due south
+				{
+					step[which].phase = 3;
+				}
+			}
+			break;
+			case 0x06://  1     1     0     0
+			{
+				if ((step[which].old_phase ==6)||(step[which].old_phase == 4)) // if the previous pattern had the drum in the eastern quadrant, it will point east now
+				{
+					step[which].phase = 5;
+				}
+				else //otherwise it will line up due west
+				{
+					step[which].phase = 1;
+				}
+			}
+			break;
+		}
+		break;
+
+
+
 	}
 
 	steps = step[which].old_phase - step[which].phase;
