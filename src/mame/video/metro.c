@@ -284,7 +284,7 @@ static void expand_gfx1(metro_state &state)
 	}
 }
 
-VIDEO_START( metro_14100 )
+VIDEO_START( metro_i4100 )
 {
 	metro_state *state = machine.driver_data<metro_state>();
 	expand_gfx1(*state);
@@ -306,7 +306,7 @@ VIDEO_START( metro_14100 )
 	state->m_bg_tilemap_scrolldx[2] = 0;
 }
 
-VIDEO_START( metro_14220 )
+VIDEO_START( metro_i4220 )
 {
 	metro_state *state = machine.driver_data<metro_state>();
 	expand_gfx1(*state);
@@ -328,7 +328,7 @@ VIDEO_START( metro_14220 )
 	state->m_bg_tilemap_scrolldx[2] = -2;
 }
 
-VIDEO_START( metro_14300 )
+VIDEO_START( metro_i4300 )
 {
 	metro_state *state = machine.driver_data<metro_state>();
 	expand_gfx1(*state);
@@ -354,7 +354,7 @@ VIDEO_START( blzntrnd )
 {
 	metro_state *state = machine.driver_data<metro_state>();
 
-	VIDEO_START_CALL(metro_14220);
+	VIDEO_START_CALL(metro_i4220);
 
 	state->m_has_zoom = 1;
 
@@ -369,7 +369,7 @@ VIDEO_START( gstrik2 )
 {
 	metro_state *state = machine.driver_data<metro_state>();
 
-	VIDEO_START_CALL(metro_14220);
+	VIDEO_START_CALL(metro_i4220);
 
 	state->m_has_zoom = 1;
 

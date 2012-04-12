@@ -7,9 +7,9 @@
 
 Main  CPU    :  MC68000 Or H8/3007
 
-Video Chips  :  Imagetek 14100 052  Or
-                Imagetek 14220 071  Or
-                Imagetek 14300 095
+Video Chips  :  Imagetek I4100 052  Or
+                Imagetek I4220 071  Or
+                Imagetek I4300 095
 
 Sound CPU    :  NEC78C10 [Optional]
 
@@ -21,36 +21,36 @@ Other        :  Memory Blitter
 -----------------------------------------------------------------------------
 Year + Game                     PCB         Video Chip    Issues / Notes
 -----------------------------------------------------------------------------
-92  Last Fortress - Toride      VG420         14100
-92  Last Fortress - Toride (Ger)VG460-(A)     14100
-92  Pang Pom's                  VG420         14100
-92  Sky Alert                   VG420         14100
-92  The Karate Tournament       VG460-B       14100
-93? Lady Killer / Moeyo Gonta!! VG460-B       14100
-93  Poitto!                     MTR5260-A     14100
+92  Last Fortress - Toride      VG420         I4100
+92  Last Fortress - Toride (Ger)VG460-(A)     I4100
+92  Pang Pom's                  VG420         I4100
+92  Sky Alert                   VG420         I4100
+92  The Karate Tournament       VG460-B       I4100
+93? Lady Killer / Moeyo Gonta!! VG460-B       I4100
+93  Poitto!                     MTR5260-A     I4100
 
-94  Blazing Tornado             HUM-002-A-(B) 14220    Also has Konami 053936 gfx chip
-94  Dharma Doujou               MTR5260-A     14220
-94  Dharma Doujou (Korea)       MTR527        14220
-94  Gun Master                  MTR5260-A     14220
-94  Toride II Adauchi Gaiden    MTR5260-A     14220
-95  Daitoride                   MTR5260-A     14220
-95  Mouse Shooter GoGo          -             14220    No sound CPU
-95  Pururun                     MTR5260-A     14220
-95  Puzzli                      MTR5260-A     14220
-96  Bal Cube                    -             14220    No sound CPU
-96  Bang Bang Ball              -             14220    No sound CPU
-96  Daitoride (YMF278B)         -             14220    No sound CPU
-96  Grand Striker 2             HUM-003(A)    14220    Also has Konami 053936 gfx chip
-96  Sankokushi                  MTR5260-A     14220
-99  Battle Bubble v2.00         LM2D-Y        14220    No sound CPU
+94  Blazing Tornado             HUM-002-A-(B) I4220    Also has Konami 053936 gfx chip
+94  Dharma Doujou               MTR5260-A     I4220
+94  Dharma Doujou (Korea)       MTR527        I4220
+94  Gun Master                  MTR5260-A     I4220
+94  Toride II Adauchi Gaiden    MTR5260-A     I4220
+95  Daitoride                   MTR5260-A     I4220
+95  Mouse Shooter GoGo          -             I4220    No sound CPU
+95  Pururun                     MTR5260-A     I4220
+95  Puzzli                      MTR5260-A     I4220
+96  Bal Cube                    -             I4220    No sound CPU
+96  Bang Bang Ball              -             I4220    No sound CPU
+96  Daitoride (YMF278B)         -             I4220    No sound CPU
+96  Grand Striker 2             HUM-003(A)    I4220    Also has Konami 053936 gfx chip
+96  Sankokushi                  MTR5260-A     I4220
+99  Battle Bubble v2.00         LM2D-Y        I4220    No sound CPU
 
-95  Mahjong Doukyuhsei          VG330-B       14300    No sound CPU
-95  Mahjong Doukyuusei Special  VG340-A       14300    No sound CPU
-96  Mouja                       VG410-B       14300    No sound CPU
-97  Mahjong Gakuensai           VG340-A       14300    No sound CPU
-98  Mahjong Gakuensai 2         VG340-A       14300    No sound CPU
-00  Puzzlet                     VG2200-(B)    14300    Z86E02 Zilog Z8 8-bit MCU
+95  Mahjong Doukyuhsei          VG330-B       I4300    No sound CPU
+95  Mahjong Doukyuusei Special  VG340-A       I4300    No sound CPU
+96  Mouja                       VG410-B       I4300    No sound CPU
+97  Mahjong Gakuensai           VG340-A       I4300    No sound CPU
+98  Mahjong Gakuensai 2         VG340-A       I4300    No sound CPU
+00  Puzzlet                     VG2200-(B)    I4300    Z86E02 Zilog Z8 8-bit MCU
 -----------------------------------------------------------------------------
 
 Mouse Shooter GoGo, Bal Cube, Bang Bang Ball & Daitoride (YMF278B) PCBs have
@@ -64,7 +64,7 @@ To Do:
 -   Coin lockout
 -   Some gfx problems in ladykill, 3kokushi, puzzli, gakusai
   -  Seems related to how we handle windows and wrapping
--   Are the 16x16 tiles used by Mouja a Imagetek 14300-only feature?
+-   Are the 16x16 tiles used by Mouja a Imagetek I4300-only feature?
 -   Interrupt timing needs figuring out properly, having it incorrect
     causes scrolling glitches in some games.  Test cases Mouse Go Go
     title screen, GunMaster title screen.  Changing it can cause
@@ -3430,11 +3430,11 @@ static const gfx_layout layout_053936_16 =
 	8*8*8*4
 };
 
-static GFXDECODE_START( 14100 )
+static GFXDECODE_START( i4100 )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_8x8x4,    0x0, 0x200 ) // [0] 4 Bit Tiles
 GFXDECODE_END
 
-static GFXDECODE_START( 14220 )
+static GFXDECODE_START( i4220 )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_8x8x4,    0x0, 0x200 ) // [0] 4 Bit Tiles
 	GFXDECODE_ENTRY( "gfx1", 0, layout_8x8x8h,   0x0,  0x20 ) // [1] 8 Bit Tiles
 GFXDECODE_END
@@ -3451,7 +3451,7 @@ static GFXDECODE_START( gstrik2 )
 	GFXDECODE_ENTRY( "gfx3", 0, layout_053936_16,0x0,  0x20 ) // [2] 053936 Tiles
 GFXDECODE_END
 
-static GFXDECODE_START( 14300 )
+static GFXDECODE_START( i4300 )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_8x8x4,    0x0, 0x200 ) // [0] 4 Bit Tiles
 	GFXDECODE_ENTRY( "gfx1", 0, layout_8x8x8h,   0x0,  0x20 ) // [1] 8 Bit Tiles
 	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x4q, 0x0, 0x200 ) // [2] 4 Bit Tiles 16x16
@@ -3516,10 +3516,10 @@ static MACHINE_CONFIG_START( balcube, metro_state )
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, 224)
 	MCFG_SCREEN_UPDATE_STATIC(metro)
 
-	MCFG_GFXDECODE(14220)
+	MCFG_GFXDECODE(i4220)
 	MCFG_PALETTE_LENGTH(8192)
 
-	MCFG_VIDEO_START(metro_14220)
+	MCFG_VIDEO_START(metro_i4220)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -3546,10 +3546,10 @@ static MACHINE_CONFIG_START( daitoa, metro_state )
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_STATIC(metro)
 
-	MCFG_GFXDECODE(14220)
+	MCFG_GFXDECODE(i4220)
 	MCFG_PALETTE_LENGTH(8192)
 
-	MCFG_VIDEO_START(metro_14220)
+	MCFG_VIDEO_START(metro_i4220)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -3576,10 +3576,10 @@ static MACHINE_CONFIG_START( msgogo, metro_state )
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, 224)
 	MCFG_SCREEN_UPDATE_STATIC(metro)
 
-	MCFG_GFXDECODE(14220)
+	MCFG_GFXDECODE(i4220)
 	MCFG_PALETTE_LENGTH(8192)
 
-	MCFG_VIDEO_START(metro_14220)
+	MCFG_VIDEO_START(metro_i4220)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -3606,10 +3606,10 @@ static MACHINE_CONFIG_START( bangball, metro_state )
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, 224)
 	MCFG_SCREEN_UPDATE_STATIC(metro)
 
-	MCFG_GFXDECODE(14220)
+	MCFG_GFXDECODE(i4220)
 	MCFG_PALETTE_LENGTH(8192)
 
-	MCFG_VIDEO_START(metro_14220)
+	MCFG_VIDEO_START(metro_i4220)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -3636,10 +3636,10 @@ static MACHINE_CONFIG_START( batlbubl, metro_state )
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, 224)
 	MCFG_SCREEN_UPDATE_STATIC(metro)
 
-	MCFG_GFXDECODE(14220)
+	MCFG_GFXDECODE(i4220)
 	MCFG_PALETTE_LENGTH(8192)
 
-	MCFG_VIDEO_START(metro_14220)
+	MCFG_VIDEO_START(metro_i4220)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -3670,10 +3670,10 @@ static MACHINE_CONFIG_START( daitorid, metro_state )
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART) // was 58fps?
 	MCFG_SCREEN_UPDATE_STATIC(metro)
 
-	MCFG_GFXDECODE(14220)
+	MCFG_GFXDECODE(i4220)
 	MCFG_PALETTE_LENGTH(8192)
 
-	MCFG_VIDEO_START(metro_14220)
+	MCFG_VIDEO_START(metro_i4220)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -3709,10 +3709,10 @@ static MACHINE_CONFIG_START( dharma, metro_state )
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_STATIC(metro)
 
-	MCFG_GFXDECODE(14100)
+	MCFG_GFXDECODE(i4100)
 	MCFG_PALETTE_LENGTH(8192)
 
-	MCFG_VIDEO_START(metro_14100)
+	MCFG_VIDEO_START(metro_i4100)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -3747,10 +3747,10 @@ static MACHINE_CONFIG_START( karatour, metro_state )
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART) // was 58fps?
 	MCFG_SCREEN_UPDATE_STATIC(metro)
 
-	MCFG_GFXDECODE(14100)
+	MCFG_GFXDECODE(i4100)
 	MCFG_PALETTE_LENGTH(8192)
 
-	MCFG_VIDEO_START(metro_14100)
+	MCFG_VIDEO_START(metro_i4100)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -3785,10 +3785,10 @@ static MACHINE_CONFIG_START( 3kokushi, metro_state )
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART) // was 58fps?
 	MCFG_SCREEN_UPDATE_STATIC(metro)
 
-	MCFG_GFXDECODE(14220)
+	MCFG_GFXDECODE(i4220)
 	MCFG_PALETTE_LENGTH(8192)
 
-	MCFG_VIDEO_START(metro_14220)
+	MCFG_VIDEO_START(metro_i4220)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -3823,10 +3823,10 @@ static MACHINE_CONFIG_START( lastfort, metro_state )
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART  + 40, VTOTAL, VBEND, VBSTART) // was 58fps?
 	MCFG_SCREEN_UPDATE_STATIC(metro)
 
-	MCFG_GFXDECODE(14100)
+	MCFG_GFXDECODE(i4100)
 	MCFG_PALETTE_LENGTH(8192)
 
-	MCFG_VIDEO_START(metro_14100)
+	MCFG_VIDEO_START(metro_i4100)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -3860,10 +3860,10 @@ static MACHINE_CONFIG_START( lastforg, metro_state )
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART + 40, VTOTAL, VBEND, 224) // was 58fps?
 	MCFG_SCREEN_UPDATE_STATIC(metro)
 
-	MCFG_GFXDECODE(14100)
+	MCFG_GFXDECODE(i4100)
 	MCFG_PALETTE_LENGTH(8192)
 
-	MCFG_VIDEO_START(metro_14100)
+	MCFG_VIDEO_START(metro_i4100)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -3892,10 +3892,10 @@ static MACHINE_CONFIG_START( dokyusei, metro_state )
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, 224)
 	MCFG_SCREEN_UPDATE_STATIC(metro)
 
-	MCFG_GFXDECODE(14300)
+	MCFG_GFXDECODE(i4300)
 	MCFG_PALETTE_LENGTH(8192)
 
-	MCFG_VIDEO_START(metro_14300)
+	MCFG_VIDEO_START(metro_i4300)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -3925,10 +3925,10 @@ static MACHINE_CONFIG_START( dokyusp, metro_state )
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, 384, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_STATIC(metro)
 
-	MCFG_GFXDECODE(14300)
+	MCFG_GFXDECODE(i4300)
 	MCFG_PALETTE_LENGTH(8192)
 
-	MCFG_VIDEO_START(metro_14300)
+	MCFG_VIDEO_START(metro_i4300)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -3959,10 +3959,10 @@ static MACHINE_CONFIG_START( gakusai, metro_state )
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_STATIC(metro)
 
-	MCFG_GFXDECODE(14300)
+	MCFG_GFXDECODE(i4300)
 	MCFG_PALETTE_LENGTH(8192)
 
-	MCFG_VIDEO_START(metro_14300)
+	MCFG_VIDEO_START(metro_i4300)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -3993,10 +3993,10 @@ static MACHINE_CONFIG_START( gakusai2, metro_state )
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_STATIC(metro)
 
-	MCFG_GFXDECODE(14300)
+	MCFG_GFXDECODE(i4300)
 	MCFG_PALETTE_LENGTH(8192)
 
-	MCFG_VIDEO_START(metro_14300)
+	MCFG_VIDEO_START(metro_i4300)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -4031,10 +4031,10 @@ static MACHINE_CONFIG_START( pangpoms, metro_state )
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART + 40, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_STATIC(metro)
 
-	MCFG_GFXDECODE(14100)
+	MCFG_GFXDECODE(i4100)
 	MCFG_PALETTE_LENGTH(8192)
 
-	MCFG_VIDEO_START(metro_14100)
+	MCFG_VIDEO_START(metro_i4100)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -4069,10 +4069,10 @@ static MACHINE_CONFIG_START( poitto, metro_state )
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART + 40, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_STATIC(metro)
 
-	MCFG_GFXDECODE(14100)
+	MCFG_GFXDECODE(i4100)
 	MCFG_PALETTE_LENGTH(8192)
 
-	MCFG_VIDEO_START(metro_14100)
+	MCFG_VIDEO_START(metro_i4100)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -4108,10 +4108,10 @@ static MACHINE_CONFIG_START( pururun, metro_state )
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_STATIC(metro)
 
-	MCFG_GFXDECODE(14100)
+	MCFG_GFXDECODE(i4100)
 	MCFG_PALETTE_LENGTH(8192)
 
-	MCFG_VIDEO_START(metro_14100)
+	MCFG_VIDEO_START(metro_i4100)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -4147,10 +4147,10 @@ static MACHINE_CONFIG_START( skyalert, metro_state )
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART + 40, VTOTAL, VBEND, VBSTART) // was 58fps?
 	MCFG_SCREEN_UPDATE_STATIC(metro)
 
-	MCFG_GFXDECODE(14100)
+	MCFG_GFXDECODE(i4100)
 	MCFG_PALETTE_LENGTH(8192)
 
-	MCFG_VIDEO_START(metro_14100)
+	MCFG_VIDEO_START(metro_i4100)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -4185,10 +4185,10 @@ static MACHINE_CONFIG_START( toride2g, metro_state )
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_STATIC(metro)
 
-	MCFG_GFXDECODE(14100)
+	MCFG_GFXDECODE(i4100)
 	MCFG_PALETTE_LENGTH(8192)
 
-	MCFG_VIDEO_START(metro_14100)
+	MCFG_VIDEO_START(metro_i4100)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -4218,10 +4218,10 @@ static MACHINE_CONFIG_START( mouja, metro_state )
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART) // was 58fps?
 	MCFG_SCREEN_UPDATE_STATIC(metro)
 
-	MCFG_GFXDECODE(14300)
+	MCFG_GFXDECODE(i4300)
 	MCFG_PALETTE_LENGTH(8192)
 
-	MCFG_VIDEO_START(metro_14300)
+	MCFG_VIDEO_START(metro_i4300)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -4372,10 +4372,10 @@ static MACHINE_CONFIG_START( puzzlet, metro_state )
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, 224) // was 58fps?
 	MCFG_SCREEN_UPDATE_STATIC(metro)
 
-	MCFG_GFXDECODE(14300)
+	MCFG_GFXDECODE(i4300)
 	MCFG_PALETTE_LENGTH(8192)
 
-	MCFG_VIDEO_START(metro_14300)
+	MCFG_VIDEO_START(metro_i4300)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -4410,7 +4410,7 @@ Metro 1996
 |M                                           |
 |M                                           |
 |A           ALTERA 16MHz     Imagetek       |
-|     BAL-CUBE_06 BAL-CUBE_05 14220          |
+|     BAL-CUBE_06 BAL-CUBE_05 I4220          |
 |SW1      CY7C199 CY7C199                    |
 |SW2        68000-16          CY7C199 61C64  |
 |SW3                26.666MHz CY7C199        |
@@ -4420,7 +4420,7 @@ CPU  : TMP68HC000P-16
 Sound: YAMAHA OPL YMF278B-F + YRW801-M
 OSC  : 16.0000MHz (OSC1) 26.6660MHz (OSC2) 33.869MHz (OSC3)
 PLD  : ALTERA EPM7032LC44-15T
-Video: Imagetek 14220
+Video: Imagetek I4220
 
 SW3 - Not Populated
 ***************************************************************************/
@@ -4456,7 +4456,7 @@ Bang Bang Ball
 |M                                           |
 |M                                           |
 |A           ALTERA 16MHz     Imagetek       |
-|         rom#006 rom#005     14220          |
+|         rom#006 rom#005     I4220          |
 |SW1      CY7C199 CY7C199                    |
 |SW2        68000-16          CY7C199 61C64  |
 |SW3                26.666MHz CY7C199        |
@@ -4466,7 +4466,7 @@ CPU  : TMP68HC000P-16
 Sound: YAMAHA OPL YMF278B-F + YRW801-M
 OSC  : 16.0000MHz (OSC1) 26.6660MHz (OSC2) 33.869MHz (OSC3)
 PLD  : ALTERA EPM7032LC44-15T D9522
-Video: Imagetek 14220 071 9403EK701
+Video: Imagetek I4220 071 9403EK701
 
 SW3 - Not Populated
 
@@ -4550,7 +4550,7 @@ Sound:  Z80-8
     YMF286K
 OSC:    16.0000MHz
     26.666MHz
-Chips:  Imagetek 14220 071
+Chips:  Imagetek I4220 071
     Konami 053936 (PSAC2)
 
 ***************************************************************************/
@@ -4614,7 +4614,7 @@ HUM-003(A)
 |A                                                                      |
 |M                                               |--------|             |
 |M                   PRG2  PRG3                  |IMAGETEK|   6264      |
-|A                                               |14220   |             |
+|A                                               |I4220   |             |
 |                    PRG0  PRG1                  |--------|             |
 |     16MHz  68000   62256  62256    26.666MHz                          |
 |                                                                       |
@@ -4728,7 +4728,7 @@ MTR5260-A
    26.666MHz        YM2151          DT7  DT8
                             M6295
      7C199                             78C10
-     7C199       Imagetek14220
+     7C199       Imagetek I4220
      61C64
 
                   68000-16             DT1
@@ -4750,7 +4750,7 @@ Metro 1996
 |M                                           |
 |M                                           |
 |A           ALTERA 16MHz     Imagetek       |
-|         DT_JA-6 DT_JA-5     14220          |
+|         DT_JA-6 DT_JA-5     I4220          |
 |SW1      CY7C199 CY7C199                    |
 |SW2        68000-16          CY7C199 61C64  |
 |SW3                26.666MHz CY7C199        |
@@ -4760,7 +4760,7 @@ CPU  : TMP68HC000P-16
 Sound: YAMAHA OPL YMF278B-F + YRW801-M
 OSC  : 16.0000MHz (OSC1) 26.6660MHz (OSC2) 33.869MHz (OSC3)
 PLD  : ALTERA EPM7032LC44-15T D9519
-Video: Imagetek 14220 071 9338EK709
+Video: Imagetek I4220 071 9338EK709
 
 SW3 - Not Populated
 ***************************************************************************/
@@ -4815,7 +4815,7 @@ MTR5260-A
 |            7C199                              |
 |J           7C199          |--------|  D78C10  |
 |A           7C199          |IMAGETEK|          |
-|M                          |14220   |          |
+|M                          |I4220   |          |
 |M               MM1035     |        |          |
 |A         |------------|   |--------|          |
 |          |  68000-12  |              DD_JB-1  |
@@ -4909,7 +4909,7 @@ MTR5260-A
 |            6264                               |
 |J           6264           |--------|  D78C10  |
 |A           6264           |IMAGETEK|          |
-|M                          |14220   |          |
+|M                          |I4220   |          |
 |M               MM1035     |        |          |
 |A         |------------|   |--------|          |
 |          |    68000   |               GMJA-1  |
@@ -4975,7 +4975,7 @@ I can see a large square surface-mounted chip with
 these markings...
 
 ImageTek Inc.
-14100
+I4100
 052
 9227KK702
 
@@ -5095,7 +5095,7 @@ VG420
 
                            4064   4064   TR_   TR_          68000-12
        Imagetek                          JC10  JC09
-       14100
+       I4100
 
     TR_  TR_  TR_  TR_  TR_  TR_  TR_  TR_
     JC08 JC07 JC06 JC05 JC04 JC03 JC02 JC01
@@ -5103,7 +5103,7 @@ VG420
 CPU     :MC68000P12
 Sound   :Yamaha YM2413, OKI M6295
 OSC     :24.0000MHz, 3.579545MHz
-other   :D78C10ACW, Imagetek Inc 14100 052
+other   :D78C10ACW, Imagetek Inc I4100 052
 
 Clock measurements by the Guru:
 Master clock: 24.00MHz
@@ -5230,7 +5230,7 @@ Board: VG330-B
 CPU   : 68000 16MHz
 Sound : YM2413, M6295
 OSC   : 16.0000MHz 3.579545MHz 26.666MHz
-Custom: Imagetek Inc 14300
+Custom: Imagetek Inc I4300
 
 ***************************************************************************/
 
@@ -5263,7 +5263,7 @@ Sound:  M6295
 OSC:    32.0000MHz
         3.579545MHz
 EEPROM: 93C46
-Custom: Imagetek Inc 14300 095
+Custom: Imagetek Inc I4300 095
 
 ***************************************************************************/
 
@@ -5299,7 +5299,7 @@ Sound:  M6295
 OSC:    26.6660MHz
         3.5795MHz
 
-Custom: 14300 095
+Custom: I4300 095
 
 ***************************************************************************/
 
@@ -5336,7 +5336,7 @@ Sound:  M6295
 OSC:    26.6660MHz
         3.579545MHz
 
-Custom: 14300 095
+Custom: I4300 095
 
 ***************************************************************************/
 
@@ -5375,7 +5375,7 @@ VG410-B
 |M   M6295 16MHz LH53882B|
 |M LH538711              |
 |A 26.666MHz     LH53882C|
-|        14300           |
+|        I4300           |
 |  61S256        LH53882D|
 |  61S256 61C64          |
 |                LH53882E|
@@ -5384,7 +5384,7 @@ VG410-B
 CPU     :TMP68H000P-16
 Sound   :Yamaha YM2413, OKI M6295
 OSC     :16000.00KHz, 3.579545MHz, 26.666MHz
-other   :Imagetek Inc 14300 095, ALTERA EPM7032LC44-15T
+other   :Imagetek Inc I4300 095, ALTERA EPM7032LC44-15T
 
 * SW3 & SW4 are unpopulated
 
@@ -5445,7 +5445,7 @@ Metro 1995
 |M                                           |
 |M                                           |
 |A           ALTERA 16MHz     Imagetek       |
-|         MS_WA-6 MS_WA-5     14220          |
+|         MS_WA-6 MS_WA-5     I4220          |
 |SW1      CY7C199 CY7C199                    |
 |SW2        68000-16          CY7C199  61C64 |
 |SW3                26.666MHz CY7C199        |
@@ -5455,7 +5455,7 @@ CPU  : TMP68HC000P-16
 Sound: YAMAHA OPL YMF278B-F + YRW801-M
 OSC  : 16.0000MHz (OSC1) 26.6660MHz (OSC2) 33.869MHz (OSC3)
 PLD  : ALTERA EPM7032LC44-15T D9443
-Video: Imagetek 14220 071 9430WK440
+Video: Imagetek I4220 071 9430WK440
 
 SW3 - Not Populated
 
@@ -5496,7 +5496,7 @@ Cpus:  M68000, Z80
 Clocks: 24 MHz, 3.579 MHz
 Sound: M6295, YM2413, _unused_ slot for a YM2151
 
-Custom graphics chip - Imagetek 14100 052 9227KK701 (same as Karate Tournament)
+Custom graphics chip - Imagetek I4100 052 9227KK701 (same as Karate Tournament)
 
 ***************************************************************************/
 
@@ -5573,7 +5573,7 @@ pt-jc07.3g - Sound data (27c020)
 pt-jc08.3i - Sound program (27c010)
 
 Others:
-Imagetek 14100 052 9309EK701 (208pin PQFP)
+Imagetek I4100 052 9309EK701 (208pin PQFP)
 AMD MACH110-20 (CPLD)
 
 ***************************************************************************/
@@ -5616,7 +5616,7 @@ VG2200-(B)
 |          20MHz                             |
 |  MM1035             |---------|            |
 |      H8/3007        |IMAGETEK |    CY7C199 |
-|TD62307     HM6216255|14300    |            |
+|TD62307     HM6216255|I4300    |            |
 |TD62064              |         | CY7C199    |
 |                     |         |            |
 |  Z86E02             |---------| CY7C199    |
@@ -5625,7 +5625,7 @@ VG2200-(B)
 Notes:
       H8/3007   - Hitachi HD6413007F20 CPU. Clock 20MHz
       M6295     - Clock 4MHz [20/5]. Pin7 LOW
-      14300     - Imagetek 14300 Graphics Generator IC
+      I4300     - Imagetek I4300 Graphics Generator IC
       VSync     - 58Hz
       HSync     - 15.26kHz
       Z86E02    - DIP18 surface scratched, decapping reveals Zilog Z8 MCU
@@ -5667,7 +5667,7 @@ MTR5260-A                3.5759MHz  12MHz
    26.666MHz           M6295    PZ_JB7  PZ_JB8
                                      78C10
       7C199         Imagetek
-      7C199           14220
+      7C199           I4220
       61C64
 
                                           PZ_JB1
@@ -5756,7 +5756,7 @@ pu9-19-7.3g - Sound data (27c020)
 pu9-19-8.3i - Sound program (27c010)
 
 Others:
-Imagetek 14220 071 9338EK707 (208pin PQFP)
+Imagetek I4220 071 9338EK707 (208pin PQFP)
 AMD MACH110-20 (CPLD)
 
 ***************************************************************************/
@@ -5797,7 +5797,7 @@ VG420
 
                            4064   4064   SA   SA          68000-12
        Imagetek                          C10  C09
-       14100
+       I4100
 
 
     SA  SA  SA  SA  SA  SA  SA  SA
@@ -5806,7 +5806,7 @@ VG420
 CPU     :MC68000P12
 Sound   :Yamaha YM2413, OKI M6295
 OSC     :24.0000MHz, 3.579545MHz
-other   :D78C10ACW, Imagetek Inc 14100 052
+other   :D78C10ACW, Imagetek Inc I4100 052
 
 Master clock: 24.00MHz
  D7810 clock: 12.00MHz (24 / 2)
@@ -5866,7 +5866,7 @@ tr2aja-7.3g - Sound data (27c010)
 tr2aja-8.3i - Sound program (27c010)
 
 Others:
-Imagetek 14220 071 9338EK700 (208pin PQFP)
+Imagetek I4220 071 9338EK700 (208pin PQFP)
 AMD MACH110-20 (CPLD)
 
 ***************************************************************************/

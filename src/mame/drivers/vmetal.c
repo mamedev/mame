@@ -21,7 +21,7 @@ ES-9309B-B
 |A                                           |
 |                 |--------|          1.U29  |
 |         62256   |Imagetek|                 |
-|         62256   |14220   |          2.U31  |
+|         62256   |I4220   |          2.U31  |
 |                 |        |                 |
 |                 |--------|          3.U28  |
 |                                            |
@@ -42,7 +42,7 @@ Notes:
       6264    - 8k x8 SRAM (DIP28)
       TA7222  - Toshiba TA7222 5.8 Watt Audio Power Amplifier (SIP10)
       EPM7032 - Altera EPM7032LC44-15T High Performance EEPROM-based Programmable Logic Device (PLCC44)
-      Custom  - Imagetek 14220 Graphics Controller (QFP208)
+      Custom  - Imagetek I4220 Graphics Controller (QFP208)
       VSync   - 58.2328Hz
       HSync   - 15.32kHz
       ROMs    -

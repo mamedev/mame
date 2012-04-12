@@ -1,6 +1,6 @@
 /***************************************************************************
 
-                     -= 68020 + Imagetek 15000 Games =-
+                     -= 68020 + Imagetek I5000 Games =-
 
             driver by   David Haywood ( hazemamewip (at) hotmail.com )
             partly based on metro.c driver by Luca Elia
@@ -8,15 +8,15 @@
 
 Main  CPU    :  MC68020
 
-Video Chips   : Imagetek 15000 |
-Sound Chips   : Imagetek 15000 |\- both sound and gfx
-Other Features: Memory Blitter (part of Imagetek 15000)
+Video Chips   : Imagetek I5000 |
+Sound Chips   : Imagetek I5000 |\- both sound and gfx
+Other Features: Memory Blitter (part of Imagetek I5000)
 
 ---------------------------------------------------------------------------
 Year + Game                     PCB         Video Chip  Issues / Notes
 ---------------------------------------------------------------------------
-97  Rabbit                      VG5330-B    15000
-97? Tokimeki Mahjong Paradise(1)VG5550-B    15000
+97  Rabbit                      VG5330-B    I5000
+97? Tokimeki Mahjong Paradise(1)VG5550-B    I5000
 ---------------------------------------------------------------------------
 Not dumped yet:
 unknown
@@ -51,7 +51,7 @@ VG5330-B
 |                        41    40 |
 |                                 |
 |J     IMAGETEK          33    32 |
-|A      15000            23    22 |
+|A      I5000            23    22 |
 |M            40MHz               |
 |M                       13    12 |
 |A             68EC020   03    02 |
@@ -78,7 +78,7 @@ CPU:    MC68EC020FG25
 OSC:    40.00000MHz
     24.00000MHz
 
-Custom: Imagetek 15000 (2ch video & 2ch sound)
+Custom: Imagetek I5000 (2ch video & 2ch sound)
 
 */
 

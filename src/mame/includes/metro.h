@@ -125,9 +125,9 @@ public:
 /*----------- defined in video/metro.c -----------*/
 
 
-VIDEO_START( metro_14100 );
-VIDEO_START( metro_14220 );
-VIDEO_START( metro_14300 );
+VIDEO_START( metro_i4100 );
+VIDEO_START( metro_i4220 );
+VIDEO_START( metro_i4300 );
 VIDEO_START( blzntrnd );
 VIDEO_START( gstrik2 );
 
