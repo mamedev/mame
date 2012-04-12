@@ -43,7 +43,10 @@ class blitz68k_state : public driver_device
 public:
 	blitz68k_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_nvram(*this, "nvram") { }
+		  m_nvram(*this, "nvram"),
+		  m_leds0(*this, "leds0"),
+		  m_leds1(*this, "leds1"),
+		  m_leds2(*this, "leds2") { }
 
 	optional_shared_ptr<UINT16>	m_nvram;
 	UINT8 *m_blit_buffer;
@@ -55,7 +58,9 @@ public:
 	UINT16 *m_blit_dst_ram_hiword;
 	UINT16 *m_blit_vregs;
 	UINT16 *m_blit_transpen;
-	UINT16 *m_leds[3];
+	required_shared_ptr<UINT16> m_leds0;
+	required_shared_ptr<UINT16> m_leds1;
+	optional_shared_ptr<UINT16> m_leds2;
 	DECLARE_WRITE16_MEMBER(blit_copy_w);
 	DECLARE_READ8_MEMBER(blit_status_r);
 	DECLARE_WRITE8_MEMBER(blit_x_w);
@@ -505,13 +510,13 @@ WRITE8_MEMBER(blitz68k_state::blit_hwyxa_draw_w)
 void blitz68k_state::show_leds123()
 {
 #ifdef MAME_DEBUG
-	popmessage("led %02x %02x %02x", m_leds[0][0]>>8, m_leds[1][0]>>8, m_leds[2][0]>>8);
+	popmessage("led %02x %02x %02x", m_leds0[0]>>8, m_leds1[0]>>8, m_leds2[0]>>8);
 #endif
 }
 void blitz68k_state::show_leds12()
 {
 #ifdef MAME_DEBUG
-	popmessage("led %02x %02x", m_leds[0][0]>>8, m_leds[1][0]>>8);
+	popmessage("led %02x %02x", m_leds0[0]>>8, m_leds1[0]>>8);
 #endif
 }
 
@@ -793,7 +798,7 @@ ADDRESS_MAP_END
 
 WRITE16_MEMBER(blitz68k_state::cjffruit_leds1_w)
 {
-	data = COMBINE_DATA(m_leds[0]);
+	data = COMBINE_DATA(m_leds0);
 	if (ACCESSING_BITS_8_15)
 	{
 		coin_counter_w(machine(), 0, data & 0x0100);	// coin in
@@ -810,7 +815,7 @@ WRITE16_MEMBER(blitz68k_state::cjffruit_leds1_w)
 
 WRITE16_MEMBER(blitz68k_state::cjffruit_leds2_w)
 {
-	data = COMBINE_DATA(m_leds[1]);
+	data = COMBINE_DATA(m_leds1);
 	if (ACCESSING_BITS_8_15)
 	{
 		set_led_status(machine(),  7, data & 0x0100);	// start
@@ -827,7 +832,7 @@ WRITE16_MEMBER(blitz68k_state::cjffruit_leds2_w)
 
 WRITE16_MEMBER(blitz68k_state::cjffruit_leds3_w)
 {
-	data = COMBINE_DATA(m_leds[2]);
+	data = COMBINE_DATA(m_leds2);
 	if (ACCESSING_BITS_8_15)
 	{
 		set_led_status(machine(), 15, data & 0x0100);	// hopper coins?
@@ -902,9 +907,9 @@ static ADDRESS_MAP_START( cjffruit_map, AS_PROGRAM, 16, blitz68k_state )
 
 	AM_RANGE(0x8e0000, 0x8e0001) AM_WRITE(cjffruit_mcu_w )
 
-	AM_RANGE(0x8f8000, 0x8f8001) AM_WRITE(cjffruit_leds1_w) AM_BASE(m_leds[0])
-	AM_RANGE(0x8fa000, 0x8fa001) AM_WRITE(cjffruit_leds2_w) AM_BASE(m_leds[1])
-	AM_RANGE(0x8fc000, 0x8fc001) AM_WRITE(cjffruit_leds3_w) AM_BASE(m_leds[2])
+	AM_RANGE(0x8f8000, 0x8f8001) AM_WRITE(cjffruit_leds1_w) AM_SHARE("leds0")
+	AM_RANGE(0x8fa000, 0x8fa001) AM_WRITE(cjffruit_leds2_w) AM_SHARE("leds1")
+	AM_RANGE(0x8fc000, 0x8fc001) AM_WRITE(cjffruit_leds3_w) AM_SHARE("leds2")
 
 	AM_RANGE(0x8fe000, 0x8fe003) AM_WRITE8(blit_flags_w, 0xffff)	// flipx,y,solid,trans
 	AM_RANGE(0x8fe004, 0x8fe005) AM_WRITEONLY
@@ -932,7 +937,7 @@ WRITE16_MEMBER(blitz68k_state::deucesw2_mcu_w)
 
 WRITE16_MEMBER(blitz68k_state::deucesw2_leds1_w)
 {
-	data = COMBINE_DATA(m_leds[0]);
+	data = COMBINE_DATA(m_leds0);
 	if (ACCESSING_BITS_8_15)
 	{
 		coin_counter_w(machine(), 0, data & 0x0100);	// coin in
@@ -949,7 +954,7 @@ WRITE16_MEMBER(blitz68k_state::deucesw2_leds1_w)
 
 WRITE16_MEMBER(blitz68k_state::deucesw2_leds2_w)
 {
-	data = COMBINE_DATA(m_leds[1]);
+	data = COMBINE_DATA(m_leds1);
 	if (ACCESSING_BITS_8_15)
 	{
 		set_led_status(machine(),  7, data & 0x0100);	// start
@@ -966,7 +971,7 @@ WRITE16_MEMBER(blitz68k_state::deucesw2_leds2_w)
 
 WRITE16_MEMBER(blitz68k_state::deucesw2_leds3_w)
 {
-	data = COMBINE_DATA(m_leds[2]);
+	data = COMBINE_DATA(m_leds2);
 	if (ACCESSING_BITS_8_15)
 	{
 		set_led_status(machine(), 15, data & 0x0100);	// hopper coins?
@@ -1001,9 +1006,9 @@ static ADDRESS_MAP_START( deucesw2_map, AS_PROGRAM, 16, blitz68k_state )
 
 	AM_RANGE(0x896000, 0x896001) AM_WRITE(deucesw2_mcu_w )
 
-	AM_RANGE(0x898000, 0x898001) AM_WRITE(deucesw2_leds1_w) AM_BASE(m_leds[0])
-	AM_RANGE(0x89a000, 0x89a001) AM_WRITE(deucesw2_leds2_w) AM_BASE(m_leds[1])
-	AM_RANGE(0x89c000, 0x89c001) AM_WRITE(deucesw2_leds3_w) AM_BASE(m_leds[2])
+	AM_RANGE(0x898000, 0x898001) AM_WRITE(deucesw2_leds1_w) AM_SHARE("leds0")
+	AM_RANGE(0x89a000, 0x89a001) AM_WRITE(deucesw2_leds2_w) AM_SHARE("leds1")
+	AM_RANGE(0x89c000, 0x89c001) AM_WRITE(deucesw2_leds3_w) AM_SHARE("leds2")
 
 	AM_RANGE(0x89e000, 0x89e003) AM_WRITE8(blit_flags_w, 0xffff)	// flipx,y,solid,trans
 	AM_RANGE(0x89e004, 0x89e005) AM_WRITEONLY
@@ -1122,7 +1127,7 @@ WRITE16_MEMBER(blitz68k_state::hermit_mcu_w)
 
 WRITE16_MEMBER(blitz68k_state::hermit_leds1_w)
 {
-	data = COMBINE_DATA(m_leds[0]);
+	data = COMBINE_DATA(m_leds0);
 	if (ACCESSING_BITS_8_15)
 	{
 		coin_counter_w(machine(), 0, data & 0x0100);	// coin in
@@ -1132,7 +1137,7 @@ WRITE16_MEMBER(blitz68k_state::hermit_leds1_w)
 
 WRITE16_MEMBER(blitz68k_state::hermit_leds2_w)
 {
-	data = COMBINE_DATA(m_leds[1]);
+	data = COMBINE_DATA(m_leds1);
 	if (ACCESSING_BITS_8_15)
 	{
 		set_led_status(machine(),  7, data & 0x0100);	// button
@@ -1176,8 +1181,8 @@ static ADDRESS_MAP_START( hermit_map, AS_PROGRAM, 16, blitz68k_state )
 	AM_RANGE(0x9d0000, 0x9d0001) AM_READ_PORT("IN2")
 	AM_RANGE(0x9d8000, 0x9d8001) AM_READ_PORT("DSW")
 
-	AM_RANGE(0x9e0000, 0x9e0001) AM_WRITE(hermit_leds1_w) AM_BASE(m_leds[0])
-	AM_RANGE(0x9e8000, 0x9e8001) AM_WRITE(hermit_leds2_w) AM_BASE(m_leds[1])
+	AM_RANGE(0x9e0000, 0x9e0001) AM_WRITE(hermit_leds1_w) AM_SHARE("leds0")
+	AM_RANGE(0x9e8000, 0x9e8001) AM_WRITE(hermit_leds2_w) AM_SHARE("leds1")
 
 	AM_RANGE(0x9f0000, 0x9f0003) AM_WRITE8(blit_flags_w, 0xffff)	// flipx,y,solid,trans
 	AM_RANGE(0x9f0004, 0x9f0005) AM_WRITEONLY

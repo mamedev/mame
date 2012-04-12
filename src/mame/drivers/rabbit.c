@@ -93,23 +93,32 @@ class rabbit_state : public driver_device
 {
 public:
 	rabbit_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_viewregs0(*this, "viewregs0"),
+		  m_viewregs6(*this, "viewregs6"),
+		  m_viewregs7(*this, "viewregs7"),
+		  m_viewregs9(*this, "viewregs9"),
+		  m_viewregs10(*this, "viewregs10"),
+		  m_tilemap_regs(*this, "tilemap_regs"),
+		  m_spriteregs(*this, "spriteregs"),
+		  m_blitterregs(*this, "blitterregs"),
+		  m_spriteram(*this, "spriteram") { }
 
-	UINT32 *m_viewregs0;
-	UINT32 *m_viewregs6;
-	UINT32 *m_viewregs7;
-	UINT32 *m_viewregs9;
-	UINT32 *m_viewregs10;
-	UINT32 *m_tilemap_regs[4];
-	UINT32 *m_spriteregs;
-	UINT32 *m_blitterregs;
+	required_shared_ptr<UINT32> m_viewregs0;
+	required_shared_ptr<UINT32> m_viewregs6;
+	required_shared_ptr<UINT32> m_viewregs7;
+	required_shared_ptr<UINT32> m_viewregs9;
+	required_shared_ptr<UINT32> m_viewregs10;
+	required_shared_ptr_array<UINT32, 4> m_tilemap_regs;
+	required_shared_ptr<UINT32> m_spriteregs;
+	required_shared_ptr<UINT32> m_blitterregs;
 	bitmap_ind16 *m_sprite_bitmap;
 	rectangle m_sprite_clip;
 	int m_vblirqlevel;
 	int m_bltirqlevel;
 	int m_banking;
 	UINT32 *m_tilemap_ram[4];
-	UINT32 *m_spriteram;
+	required_shared_ptr<UINT32> m_spriteram;
 	tilemap_t *m_tilemap[4];
 	DECLARE_WRITE32_MEMBER(rabbit_tilemap0_w);
 	DECLARE_WRITE32_MEMBER(rabbit_tilemap1_w);
@@ -747,20 +756,20 @@ static ADDRESS_MAP_START( rabbit_map, AS_PROGRAM, 32, rabbit_state )
 	AM_RANGE(0x400980, 0x400983) AM_READ(randomrabbits) // sound chip status?
 	AM_RANGE(0x400984, 0x400987) AM_READ(randomrabbits) // sound chip status?
 	/* this lot are probably gfxchip/blitter etc. related */
-	AM_RANGE(0x400010, 0x400013) AM_WRITEONLY AM_BASE(m_viewregs0 )
-	AM_RANGE(0x400100, 0x400117) AM_WRITEONLY AM_BASE(m_tilemap_regs[0] ) // tilemap regs1
-	AM_RANGE(0x400120, 0x400137) AM_WRITEONLY AM_BASE(m_tilemap_regs[1] ) // tilemap regs2
-	AM_RANGE(0x400140, 0x400157) AM_WRITEONLY AM_BASE(m_tilemap_regs[2] ) // tilemap regs3
-	AM_RANGE(0x400160, 0x400177) AM_WRITEONLY AM_BASE(m_tilemap_regs[3] ) // tilemap regs4
-	AM_RANGE(0x400200, 0x40021b) AM_WRITEONLY AM_BASE(m_spriteregs ) // sprregs?
+	AM_RANGE(0x400010, 0x400013) AM_WRITEONLY AM_SHARE("viewregs0" )
+	AM_RANGE(0x400100, 0x400117) AM_WRITEONLY AM_SHARE("tilemap_regs.0" ) // tilemap regs1
+	AM_RANGE(0x400120, 0x400137) AM_WRITEONLY AM_SHARE("tilemap_regs.1" ) // tilemap regs2
+	AM_RANGE(0x400140, 0x400157) AM_WRITEONLY AM_SHARE("tilemap_regs.2" ) // tilemap regs3
+	AM_RANGE(0x400160, 0x400177) AM_WRITEONLY AM_SHARE("tilemap_regs.3" ) // tilemap regs4
+	AM_RANGE(0x400200, 0x40021b) AM_WRITEONLY AM_SHARE("spriteregs" ) // sprregs?
 	AM_RANGE(0x400300, 0x400303) AM_WRITE(rabbit_rombank_w) // used during rom testing, rombank/area select + something else?
-	AM_RANGE(0x400400, 0x400413) AM_WRITEONLY AM_BASE(m_viewregs6 ) // some global controls? (brightness etc.?)
-	AM_RANGE(0x400500, 0x400503) AM_WRITEONLY AM_BASE(m_viewregs7 )
-	AM_RANGE(0x400700, 0x40070f) AM_WRITE(rabbit_blitter_w) AM_BASE(m_blitterregs )
-	AM_RANGE(0x400800, 0x40080f) AM_WRITEONLY AM_BASE(m_viewregs9 ) // never changes?
+	AM_RANGE(0x400400, 0x400413) AM_WRITEONLY AM_SHARE("viewregs6" ) // some global controls? (brightness etc.?)
+	AM_RANGE(0x400500, 0x400503) AM_WRITEONLY AM_SHARE("viewregs7" )
+	AM_RANGE(0x400700, 0x40070f) AM_WRITE(rabbit_blitter_w) AM_SHARE("blitterregs" )
+	AM_RANGE(0x400800, 0x40080f) AM_WRITEONLY AM_SHARE("viewregs9" ) // never changes?
 	AM_RANGE(0x400900, 0x40098f) AM_WRITE(rabbit_audio_w)
 	/* hmm */
-	AM_RANGE(0x479700, 0x479713) AM_WRITEONLY AM_BASE(m_viewregs10 )
+	AM_RANGE(0x479700, 0x479713) AM_WRITEONLY AM_SHARE("viewregs10" )
 
 	AM_RANGE(0x440000, 0x47ffff) AM_ROMBANK("bank1") // data (gfx / sound) rom readback for ROM testing
 	/* tilemaps */
@@ -768,7 +777,7 @@ static ADDRESS_MAP_START( rabbit_map, AS_PROGRAM, 32, rabbit_state )
 	AM_RANGE(0x484000, 0x487fff) AM_READWRITE(rabbit_tilemap1_r,rabbit_tilemap1_w)
 	AM_RANGE(0x488000, 0x48bfff) AM_READWRITE(rabbit_tilemap2_r,rabbit_tilemap2_w)
 	AM_RANGE(0x48c000, 0x48ffff) AM_READWRITE(rabbit_tilemap3_r,rabbit_tilemap3_w)
-	AM_RANGE(0x494000, 0x497fff) AM_RAM AM_BASE(m_spriteram) // sprites?
+	AM_RANGE(0x494000, 0x497fff) AM_RAM AM_SHARE("spriteram") // sprites?
 	AM_RANGE(0x4a0000, 0x4affff) AM_RAM_WRITE(rabbit_paletteram_dword_w) AM_SHARE("paletteram")
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END

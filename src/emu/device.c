@@ -116,12 +116,12 @@ device_t::device_t(const machine_config &mconfig, device_type type, const char *
 	  m_machine_config(mconfig),
 	  m_static_config(NULL),
 	  m_input_defaults(NULL),
-	  m_auto_finder_list(NULL),
 	  m_machine(NULL),
 	  m_save(NULL),
 	  m_basetag(tag),
 	  m_config_complete(false),
-	  m_started(false)
+	  m_started(false),
+	  m_auto_finder_list(NULL)
 {
 	if (owner != NULL)
 		m_tag.cpy((owner->owner() == NULL) ? "" : owner->tag()).cat(":").cat(tag);
@@ -863,7 +863,11 @@ void *device_t::finder_base::find_memory(UINT8 width, size_t &bytes, bool requir
 {
 	memory_share *share = m_base.machine().memory().shared(m_base, m_tag);
 	if (share == NULL)
+	{
+		if (required)
+			throw emu_fatalerror("Shared ptr '%s' not found", m_tag);
 		return NULL;
+	}
 	if (share->width() != width)
 	{
 		if (required)

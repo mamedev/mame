@@ -39,12 +39,15 @@ class tmmjprd_state : public driver_device
 {
 public:
 	tmmjprd_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_tilemap_regs(*this, "tilemap_regs"),
+		  m_spriteregs(*this, "spriteregs"),
+		  m_spriteram(*this, "spriteram") { }
 
-	UINT32 *m_tilemap_regs[4];
-	UINT32 *m_spriteregs;
+	required_shared_ptr_array<UINT32, 4> m_tilemap_regs;
+	required_shared_ptr<UINT32> m_spriteregs;
 	UINT32 *m_tilemap_ram[4];
-	UINT32 *m_spriteram;
+	required_shared_ptr<UINT32> m_spriteram;
 	UINT8 m_mux_data;
 	UINT8 m_system_in;
 	double m_old_brt1;
@@ -672,11 +675,11 @@ static ADDRESS_MAP_START( tmmjprd_map, AS_PROGRAM, 32, tmmjprd_state )
 	AM_RANGE(0x200984, 0x200987) AM_READ(randomtmmjprds) // sound chip status?
 	/* check these are used .. */
 //  AM_RANGE(0x200010, 0x200013) AM_WRITEONLY AM_BASE_LEGACY(&tmmjprd_viewregs0 )
-	AM_RANGE(0x200100, 0x200117) AM_WRITEONLY AM_BASE(m_tilemap_regs[0] ) // tilemap regs1
-	AM_RANGE(0x200120, 0x200137) AM_WRITEONLY AM_BASE(m_tilemap_regs[1] ) // tilemap regs2
-	AM_RANGE(0x200140, 0x200157) AM_WRITEONLY AM_BASE(m_tilemap_regs[2] ) // tilemap regs3
-	AM_RANGE(0x200160, 0x200177) AM_WRITEONLY AM_BASE(m_tilemap_regs[3] ) // tilemap regs4
-	AM_RANGE(0x200200, 0x20021b) AM_WRITEONLY AM_BASE(m_spriteregs ) // sprregs?
+	AM_RANGE(0x200100, 0x200117) AM_WRITEONLY AM_SHARE("tilemap_regs.0" ) // tilemap regs1
+	AM_RANGE(0x200120, 0x200137) AM_WRITEONLY AM_SHARE("tilemap_regs.1" ) // tilemap regs2
+	AM_RANGE(0x200140, 0x200157) AM_WRITEONLY AM_SHARE("tilemap_regs.2" ) // tilemap regs3
+	AM_RANGE(0x200160, 0x200177) AM_WRITEONLY AM_SHARE("tilemap_regs.3" ) // tilemap regs4
+	AM_RANGE(0x200200, 0x20021b) AM_WRITEONLY AM_SHARE("spriteregs" ) // sprregs?
 //  AM_RANGE(0x200300, 0x200303) AM_WRITE_LEGACY(tmmjprd_rombank_w) // used during rom testing, rombank/area select + something else?
 	AM_RANGE(0x20040c, 0x20040f) AM_WRITE(tmmjprd_brt_1_w)
     AM_RANGE(0x200410, 0x200413) AM_WRITE(tmmjprd_brt_2_w)
@@ -692,7 +695,7 @@ static ADDRESS_MAP_START( tmmjprd_map, AS_PROGRAM, 32, tmmjprd_state )
 	AM_RANGE(0x288000, 0x28bfff) AM_READWRITE(tmmjprd_tilemap2_r,tmmjprd_tilemap2_w)
 	AM_RANGE(0x28c000, 0x28ffff) AM_READWRITE(tmmjprd_tilemap3_r,tmmjprd_tilemap3_w)
 	/* ?? is palette ram shared with sprites in this case or just a different map */
-	AM_RANGE(0x290000, 0x29bfff) AM_RAM AM_BASE(m_spriteram)
+	AM_RANGE(0x290000, 0x29bfff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x29c000, 0x29ffff) AM_RAM_WRITE(tmmjprd_paletteram_dword_w) AM_SHARE("paletteram")
 
 	AM_RANGE(0x400000, 0x400003) AM_READ(tmmjprd_mux_r) AM_DEVWRITE_LEGACY("eeprom", tmmjprd_eeprom_write)

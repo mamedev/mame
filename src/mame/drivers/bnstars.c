@@ -98,24 +98,37 @@ class bnstars_state : public driver_device
 {
 public:
 	bnstars_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_ms32_tx0_ram(*this, "tx0_ram"),
+		  m_ms32_tx1_ram(*this, "tx1_ram"),
+		  m_ms32_bg0_ram(*this, "bg0_ram"),
+		  m_ms32_bg1_ram(*this, "bg1_ram"),
+		  m_ms32_roz0_ram(*this, "roz0_ram"),
+		  m_ms32_roz1_ram(*this, "roz1_ram"),
+		  m_ms32_pal_ram(*this, "pal_ram"),
+		  m_ms32_roz_ctrl(*this, "roz_ctrl"),
+		  m_ms32_spram(*this, "spram"),
+		  m_ms32_tx0_scroll(*this, "tx0_scroll"),
+		  m_ms32_bg0_scroll(*this, "bg0_scroll"),
+		  m_ms32_tx1_scroll(*this, "tx1_scroll"),
+		  m_ms32_bg1_scroll(*this, "bg1_scroll") { }
 
 	tilemap_t *m_ms32_tx_tilemap[2];
 	tilemap_t *m_ms32_bg_tilemap[2];
 	tilemap_t *m_ms32_roz_tilemap[2];
-	UINT32 *m_ms32_tx0_ram;
-	UINT32 *m_ms32_tx1_ram;
-	UINT32 *m_ms32_bg0_ram;
-	UINT32 *m_ms32_bg1_ram;
-	UINT32 *m_ms32_roz0_ram;
-	UINT32 *m_ms32_roz1_ram;
-	UINT32 *m_ms32_pal_ram[2];
-	UINT32 *m_ms32_roz_ctrl[2];
-	UINT32 *m_ms32_spram;
-	UINT32 *m_ms32_tx0_scroll;
-	UINT32 *m_ms32_bg0_scroll;
-	UINT32 *m_ms32_tx1_scroll;
-	UINT32 *m_ms32_bg1_scroll;
+	required_shared_ptr<UINT32> m_ms32_tx0_ram;
+	required_shared_ptr<UINT32> m_ms32_tx1_ram;
+	required_shared_ptr<UINT32> m_ms32_bg0_ram;
+	required_shared_ptr<UINT32> m_ms32_bg1_ram;
+	required_shared_ptr<UINT32> m_ms32_roz0_ram;
+	required_shared_ptr<UINT32> m_ms32_roz1_ram;
+	required_shared_ptr_array<UINT32, 2> m_ms32_pal_ram;
+	required_shared_ptr_array<UINT32, 2> m_ms32_roz_ctrl;
+	required_shared_ptr<UINT32> m_ms32_spram;
+	required_shared_ptr<UINT32> m_ms32_tx0_scroll;
+	required_shared_ptr<UINT32> m_ms32_bg0_scroll;
+	required_shared_ptr<UINT32> m_ms32_tx1_scroll;
+	required_shared_ptr<UINT32> m_ms32_bg1_scroll;
 	UINT32 m_bnstars1_mahjong_select;
 	int m_ms32_reverse_sprite_order;
 	int m_flipscreen;
@@ -1276,27 +1289,27 @@ static ADDRESS_MAP_START( bnstars_map, AS_PROGRAM, 32, bnstars_state )
 	AM_RANGE(0xfce00058, 0xfce0005b) AM_WRITENOP
 	AM_RANGE(0xfce0005c, 0xfce0005f) AM_WRITENOP
 
-	AM_RANGE(0xfce00400, 0xfce0045f) AM_WRITEONLY AM_BASE(m_ms32_roz_ctrl[0])
-	AM_RANGE(0xfce00700, 0xfce0075f) AM_WRITEONLY AM_BASE(m_ms32_roz_ctrl[1]) // guess
-	AM_RANGE(0xfce00a00, 0xfce00a17) AM_WRITEONLY AM_BASE(m_ms32_tx0_scroll)
-	AM_RANGE(0xfce00a20, 0xfce00a37) AM_WRITEONLY AM_BASE(m_ms32_bg0_scroll)
-	AM_RANGE(0xfce00c00, 0xfce00c17) AM_WRITEONLY AM_BASE(m_ms32_tx1_scroll)
-	AM_RANGE(0xfce00c20, 0xfce00c37) AM_WRITEONLY AM_BASE(m_ms32_bg1_scroll)
+	AM_RANGE(0xfce00400, 0xfce0045f) AM_WRITEONLY AM_SHARE("roz_ctrl.0")
+	AM_RANGE(0xfce00700, 0xfce0075f) AM_WRITEONLY AM_SHARE("roz_ctrl.1") // guess
+	AM_RANGE(0xfce00a00, 0xfce00a17) AM_WRITEONLY AM_SHARE("tx0_scroll")
+	AM_RANGE(0xfce00a20, 0xfce00a37) AM_WRITEONLY AM_SHARE("bg0_scroll")
+	AM_RANGE(0xfce00c00, 0xfce00c17) AM_WRITEONLY AM_SHARE("tx1_scroll")
+	AM_RANGE(0xfce00c20, 0xfce00c37) AM_WRITEONLY AM_SHARE("bg1_scroll")
 
 	AM_RANGE(0xfce00e00, 0xfce00e03) AM_WRITE(bnstars1_mahjong_select_w) // ?
 
 	/* wrote together */
 	AM_RANGE(0xfd040000, 0xfd047fff) AM_RAM // priority ram
 	AM_RANGE(0xfd080000, 0xfd087fff) AM_RAM
-	AM_RANGE(0xfd200000, 0xfd237fff) AM_RAM_WRITE(ms32_pal1_ram_w) AM_BASE(m_ms32_pal_ram[1])
-	AM_RANGE(0xfd400000, 0xfd437fff) AM_RAM_WRITE(ms32_pal0_ram_w) AM_BASE(m_ms32_pal_ram[0])
-	AM_RANGE(0xfe000000, 0xfe01ffff) AM_RAM_WRITE(ms32_roz1_ram_w) AM_BASE(m_ms32_roz1_ram)
-	AM_RANGE(0xfe400000, 0xfe41ffff) AM_RAM_WRITE(ms32_roz0_ram_w) AM_BASE(m_ms32_roz0_ram)
-	AM_RANGE(0xfe800000, 0xfe83ffff) AM_RAM_WRITE(ms32_spramx_w) AM_BASE(m_ms32_spram)
-	AM_RANGE(0xfea00000, 0xfea07fff) AM_RAM_WRITE(ms32_tx1_ram_w) AM_BASE(m_ms32_tx1_ram)
-	AM_RANGE(0xfea08000, 0xfea0ffff) AM_RAM_WRITE(ms32_bg1_ram_w) AM_BASE(m_ms32_bg1_ram)
-	AM_RANGE(0xfec00000, 0xfec07fff) AM_RAM_WRITE(ms32_tx0_ram_w) AM_BASE(m_ms32_tx0_ram)
-	AM_RANGE(0xfec08000, 0xfec0ffff) AM_RAM_WRITE(ms32_bg0_ram_w) AM_BASE(m_ms32_bg0_ram)
+	AM_RANGE(0xfd200000, 0xfd237fff) AM_RAM_WRITE(ms32_pal1_ram_w) AM_SHARE("pal_ram.1")
+	AM_RANGE(0xfd400000, 0xfd437fff) AM_RAM_WRITE(ms32_pal0_ram_w) AM_SHARE("pal_ram.0")
+	AM_RANGE(0xfe000000, 0xfe01ffff) AM_RAM_WRITE(ms32_roz1_ram_w) AM_SHARE("roz1_ram")
+	AM_RANGE(0xfe400000, 0xfe41ffff) AM_RAM_WRITE(ms32_roz0_ram_w) AM_SHARE("roz0_ram")
+	AM_RANGE(0xfe800000, 0xfe83ffff) AM_RAM_WRITE(ms32_spramx_w) AM_SHARE("spram")
+	AM_RANGE(0xfea00000, 0xfea07fff) AM_RAM_WRITE(ms32_tx1_ram_w) AM_SHARE("tx1_ram")
+	AM_RANGE(0xfea08000, 0xfea0ffff) AM_RAM_WRITE(ms32_bg1_ram_w) AM_SHARE("bg1_ram")
+	AM_RANGE(0xfec00000, 0xfec07fff) AM_RAM_WRITE(ms32_tx0_ram_w) AM_SHARE("tx0_ram")
+	AM_RANGE(0xfec08000, 0xfec0ffff) AM_RAM_WRITE(ms32_bg0_ram_w) AM_SHARE("bg0_ram")
 
 	AM_RANGE(0xfee00000, 0xfee1ffff) AM_RAM
 	AM_RANGE(0xffe00000, 0xffffffff) AM_ROMBANK("bank1")

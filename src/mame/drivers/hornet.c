@@ -327,12 +327,16 @@ class hornet_state : public driver_device
 {
 public:
 	hornet_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_workram(*this, "workram"),
+		  m_sharc_dataram0(*this, "share_dataram0"),
+		  m_sharc_dataram1(*this, "share_dataram1") { }
 
 	UINT8 m_led_reg0;
 	UINT8 m_led_reg1;
-	UINT32 *m_workram;
-	UINT32 *m_sharc_dataram[2];
+	required_shared_ptr<UINT32> m_workram;
+	required_shared_ptr<UINT32> m_sharc_dataram0;
+	required_shared_ptr<UINT32> m_sharc_dataram1;
 	UINT8 *m_jvs_sdata;
 	UINT32 m_jvs_sdata_ptr;
 	emu_timer *m_sound_irq_timer;
@@ -622,7 +626,7 @@ WRITE32_MEMBER(hornet_state::gun_w)
 /*****************************************************************************/
 
 static ADDRESS_MAP_START( hornet_map, AS_PROGRAM, 32, hornet_state )
-	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_BASE(m_workram)		/* Work RAM */
+	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_SHARE("workram")		/* Work RAM */
 	AM_RANGE(0x74000000, 0x740000ff) AM_READWRITE(hornet_k037122_reg_r, hornet_k037122_reg_w)
 	AM_RANGE(0x74020000, 0x7403ffff) AM_READWRITE(hornet_k037122_sram_r, hornet_k037122_sram_w)
 	AM_RANGE(0x74040000, 0x7407ffff) AM_READWRITE(hornet_k037122_char_r, hornet_k037122_char_w)
@@ -699,27 +703,27 @@ ADDRESS_MAP_END
 
 READ32_MEMBER(hornet_state::dsp_dataram0_r)
 {
-	return m_sharc_dataram[0][offset] & 0xffff;
+	return m_sharc_dataram0[offset] & 0xffff;
 }
 
 WRITE32_MEMBER(hornet_state::dsp_dataram0_w)
 {
-	m_sharc_dataram[0][offset] = data;
+	m_sharc_dataram0[offset] = data;
 }
 
 READ32_MEMBER(hornet_state::dsp_dataram1_r)
 {
-	return m_sharc_dataram[1][offset] & 0xffff;
+	return m_sharc_dataram1[offset] & 0xffff;
 }
 
 WRITE32_MEMBER(hornet_state::dsp_dataram1_w)
 {
-	m_sharc_dataram[1][offset] = data;
+	m_sharc_dataram1[offset] = data;
 }
 
 static ADDRESS_MAP_START( sharc0_map, AS_DATA, 32, hornet_state )
 	AM_RANGE(0x0400000, 0x041ffff) AM_READWRITE_LEGACY(cgboard_0_shared_sharc_r, cgboard_0_shared_sharc_w)
-	AM_RANGE(0x0500000, 0x05fffff) AM_READWRITE(dsp_dataram0_r, dsp_dataram0_w) AM_BASE(m_sharc_dataram[0])
+	AM_RANGE(0x0500000, 0x05fffff) AM_READWRITE(dsp_dataram0_r, dsp_dataram0_w) AM_SHARE("sharc_dataram0")
 	AM_RANGE(0x1400000, 0x14fffff) AM_RAM
 	AM_RANGE(0x2400000, 0x27fffff) AM_DEVREADWRITE_LEGACY("voodoo0", voodoo_r, voodoo_w)
 	AM_RANGE(0x3400000, 0x34000ff) AM_READWRITE_LEGACY(cgboard_0_comm_sharc_r, cgboard_0_comm_sharc_w)
@@ -729,7 +733,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sharc1_map, AS_DATA, 32, hornet_state )
 	AM_RANGE(0x0400000, 0x041ffff) AM_READWRITE_LEGACY(cgboard_1_shared_sharc_r, cgboard_1_shared_sharc_w)
-	AM_RANGE(0x0500000, 0x05fffff) AM_READWRITE(dsp_dataram1_r, dsp_dataram1_w) AM_BASE(m_sharc_dataram[1])
+	AM_RANGE(0x0500000, 0x05fffff) AM_READWRITE(dsp_dataram1_r, dsp_dataram1_w) AM_SHARE("sharc_dataram1")
 	AM_RANGE(0x1400000, 0x14fffff) AM_RAM
 	AM_RANGE(0x2400000, 0x27fffff) AM_DEVREADWRITE_LEGACY("voodoo1", voodoo_r, voodoo_w)
 	AM_RANGE(0x3400000, 0x34000ff) AM_READWRITE_LEGACY(cgboard_1_comm_sharc_r, cgboard_1_comm_sharc_w)
