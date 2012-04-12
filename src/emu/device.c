@@ -101,10 +101,12 @@ device_t::device_t(const machine_config &mconfig, device_type type, const char *
 	  m_name(name),
 	  m_owner(owner),
 	  m_next(NULL),
+	  
 	  m_interface_list(NULL),
 	  m_execute(NULL),
 	  m_memory(NULL),
 	  m_state(NULL),
+	  
 	  m_configured_clock(clock),
 	  m_unscaled_clock(clock),
 	  m_clock(clock),
@@ -116,6 +118,7 @@ device_t::device_t(const machine_config &mconfig, device_type type, const char *
 	  m_machine_config(mconfig),
 	  m_static_config(NULL),
 	  m_input_defaults(NULL),
+
 	  m_machine(NULL),
 	  m_save(NULL),
 	  m_basetag(tag),
@@ -139,10 +142,12 @@ device_t::device_t(const machine_config &mconfig, device_type type, const char *
 	  m_searchpath(shortname),
 	  m_owner(owner),
 	  m_next(NULL),
+	  
 	  m_interface_list(NULL),
 	  m_execute(NULL),
 	  m_memory(NULL),
 	  m_state(NULL),
+	  
 	  m_configured_clock(clock),
 	  m_unscaled_clock(clock),
 	  m_clock(clock),
@@ -154,12 +159,13 @@ device_t::device_t(const machine_config &mconfig, device_type type, const char *
 	  m_machine_config(mconfig),
 	  m_static_config(NULL),
 	  m_input_defaults(NULL),
-	  m_auto_finder_list(NULL),
+
 	  m_machine(NULL),
 	  m_save(NULL),
 	  m_basetag(tag),
 	  m_config_complete(false),
-	  m_started(false)
+	  m_started(false),
+	  m_auto_finder_list(NULL)
 {
 	if (owner != NULL)
 		m_tag.cpy((owner->owner() == NULL) ? "" : owner->tag()).cat(":").cat(tag);

@@ -252,9 +252,9 @@ static MACHINE_RESET( supdrapo )
 
 static ADDRESS_MAP_START( sdpoker_mem, AS_PROGRAM, 8, supdrapo_state )
 	AM_RANGE(0x0000, 0x4fff) AM_ROM
-	AM_RANGE(0x5000, 0x50ff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x57ff, 0x57ff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x5800, 0x58ff) AM_RAM AM_SHARE("share1") AM_SHARE("col_line")
+	AM_RANGE(0x5000, 0x50ff) AM_RAM AM_SHARE("col_line")
+	AM_RANGE(0x57ff, 0x57ff) AM_RAM AM_SHARE("col_line")
+	AM_RANGE(0x5800, 0x58ff) AM_RAM AM_SHARE("col_line")
 	AM_RANGE(0x6000, 0x67ff) AM_RAM //work ram
 	AM_RANGE(0x6800, 0x6bff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0x6c00, 0x6fff) AM_RAM AM_SHARE("char_bank")

@@ -113,7 +113,7 @@ public:
 	void set_read_type(map_handler_type _type) { m_read.m_type = _type; }
 	void set_write_type(map_handler_type _type) { m_write.m_type = _type; }
 	void set_region(const char *tag, offs_t offset) { m_region = tag; m_rgnoffs = offset; }
-	void set_share(const char *tag) { m_share = tag; }
+	void set_share(const char *tag) { assert(m_share == NULL); m_share = tag; }
 	void set_sizeptr(size_t *_sizeptr) { m_sizeptr = _sizeptr; }
 	void set_member_baseptr(FPTR offs) { m_baseptroffs_plus1 = offs + 1; }
 	void set_member_sizeptr(FPTR offs) { m_sizeptroffs_plus1 = offs + 1; }
