@@ -37,9 +37,9 @@ class wldarrow_state : public driver_device
 public:
 	wldarrow_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
-		m_videoram_0(*this, "videoram_0"),
-		m_videoram_1(*this, "videora1"),
-		m_videoram_2(*this, "videora2"){ }
+		m_videoram_0(*this, "vram0"),
+		m_videoram_1(*this, "vram1"),
+		m_videoram_2(*this, "vram2"){ }
 
 	required_shared_ptr<UINT8> m_videoram_0;
 	required_shared_ptr<UINT8> m_videoram_1;
@@ -186,9 +186,9 @@ static WRITE8_DEVICE_HANDLER( wldarrow_dac_4_w )
 static ADDRESS_MAP_START( wldarrow_map, AS_PROGRAM, 8, wldarrow_state )
 	AM_RANGE(0x0000, 0x37ff) AM_ROM
 	AM_RANGE(0x3800, 0x3800) AM_READ_PORT("IN0")
-	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_SHARE("videora0")
-	AM_RANGE(0x6000, 0x7fff) AM_RAM AM_SHARE("videora1")
-	AM_RANGE(0x8000, 0x9fff) AM_RAM AM_SHARE("videora2")
+	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_SHARE("vram0")
+	AM_RANGE(0x6000, 0x7fff) AM_RAM AM_SHARE("vram1")
+	AM_RANGE(0x8000, 0x9fff) AM_RAM AM_SHARE("vram2")
 	AM_RANGE(0xcd00, 0xcdff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("BITSW") AM_DEVWRITE_LEGACY("dac", wldarrow_dac_1_w)
 	AM_RANGE(0xf004, 0xf004) AM_READ_PORT("IN1") AM_WRITE(lights_1_w)
