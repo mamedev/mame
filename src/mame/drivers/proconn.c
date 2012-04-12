@@ -1,26 +1,124 @@
 /*
- Project PROCONN Fruit Machine hardware
+ Project PROCONN (and PC92/PC98) Fruit Machine hardware
   skeleton driver!
 
-  some sets might be misidentified.
+  what's the difference between the platforms, sound hardware?
+
 */
 
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/z80pio.h"
+#include "machine/z80ctc.h"
+#include "machine/z80sio.h"
+#include "sound/ay8910.h"
 
 class proconn_state : public driver_device
 {
 public:
 	proconn_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu")
+		  m_maincpu(*this, "maincpu"),
+		  m_z80pio_1(*this, "z80pio_1"),
+		  m_z80pio_2(*this, "z80pio_2"),
+		  m_z80pio_3(*this, "z80pio_3"),
+		  m_z80pio_4(*this, "z80pio_4"),
+		  m_z80pio_5(*this, "z80pio_5"),
+		  m_z80ctc(*this, "z80ctc"),
+		  m_z80sio(*this, "z80sio"),
+		  m_ay(*this, "aysnd")
 	{ }
+
+
+	DECLARE_WRITE8_MEMBER( ay_w0 ) { ay8910_address_data_w(m_ay, 0, data); }
+	DECLARE_WRITE8_MEMBER( ay_w1 ) { ay8910_address_data_w(m_ay, 1, data); }
+
+	DECLARE_WRITE8_MEMBER( ctc_w0 ) { z80ctc_w(m_z80ctc, 0, data); }
+	DECLARE_WRITE8_MEMBER( ctc_w1 ) { z80ctc_w(m_z80ctc, 1, data); }
+	DECLARE_WRITE8_MEMBER( ctc_w2 ) { z80ctc_w(m_z80ctc, 2, data); }
+	DECLARE_WRITE8_MEMBER( ctc_w3 ) { z80ctc_w(m_z80ctc, 3, data); }
+
+	DECLARE_WRITE8_MEMBER( sio_w0 ) { z80sio_cd_ba_w(m_z80sio, 0, data); }
+	DECLARE_WRITE8_MEMBER( sio_w1 ) { z80sio_cd_ba_w(m_z80sio, 1, data); }
+	DECLARE_WRITE8_MEMBER( sio_w2 ) { z80sio_cd_ba_w(m_z80sio, 2, data); }
+	DECLARE_WRITE8_MEMBER( sio_w3 ) { z80sio_cd_ba_w(m_z80sio, 3, data); }
+
+	DECLARE_WRITE8_MEMBER( pio1_w0 ) { z80pio_cd_ba_w(m_z80pio_1, 0, data); }
+	DECLARE_WRITE8_MEMBER( pio1_w1 ) { z80pio_cd_ba_w(m_z80pio_1, 1, data); }
+	DECLARE_WRITE8_MEMBER( pio1_w2 ) { z80pio_cd_ba_w(m_z80pio_1, 2, data); }
+	DECLARE_WRITE8_MEMBER( pio1_w3 ) { z80pio_cd_ba_w(m_z80pio_1, 3, data); }
+
+	DECLARE_WRITE8_MEMBER( pio2_w0 ) { z80pio_cd_ba_w(m_z80pio_2, 0, data); }
+	DECLARE_WRITE8_MEMBER( pio2_w1 ) { z80pio_cd_ba_w(m_z80pio_2, 1, data); }
+	DECLARE_WRITE8_MEMBER( pio2_w2 ) { z80pio_cd_ba_w(m_z80pio_2, 2, data); }
+	DECLARE_WRITE8_MEMBER( pio2_w3 ) { z80pio_cd_ba_w(m_z80pio_2, 3, data); }
+
+	DECLARE_WRITE8_MEMBER( pio3_w0 ) { z80pio_cd_ba_w(m_z80pio_3, 0, data); }
+	DECLARE_WRITE8_MEMBER( pio3_w1 ) { z80pio_cd_ba_w(m_z80pio_3, 1, data); }
+	DECLARE_WRITE8_MEMBER( pio3_w2 ) { z80pio_cd_ba_w(m_z80pio_3, 2, data); }
+	DECLARE_WRITE8_MEMBER( pio3_w3 ) { z80pio_cd_ba_w(m_z80pio_3, 3, data); }
+
+	DECLARE_WRITE8_MEMBER( pio4_w0 ) { z80pio_cd_ba_w(m_z80pio_4, 0, data); }
+	DECLARE_WRITE8_MEMBER( pio4_w1 ) { z80pio_cd_ba_w(m_z80pio_4, 1, data); }
+	DECLARE_WRITE8_MEMBER( pio4_w2 ) { z80pio_cd_ba_w(m_z80pio_4, 2, data); }
+	DECLARE_WRITE8_MEMBER( pio4_w3 ) { z80pio_cd_ba_w(m_z80pio_4, 3, data); }
+
+	DECLARE_WRITE8_MEMBER( pio5_w0 ) { z80pio_cd_ba_w(m_z80pio_5, 0, data); }
+	DECLARE_WRITE8_MEMBER( pio5_w1 ) { z80pio_cd_ba_w(m_z80pio_5, 1, data); }
+	DECLARE_WRITE8_MEMBER( pio5_w2 ) { z80pio_cd_ba_w(m_z80pio_5, 2, data); }
+	DECLARE_WRITE8_MEMBER( pio5_w3 ) { z80pio_cd_ba_w(m_z80pio_5, 3, data); }
+
+	DECLARE_READ8_MEMBER( ay_r0 ) { return ay8910_r(m_ay, 0); }
+
+	DECLARE_READ8_MEMBER( ctc_r0 ) { return z80ctc_r(m_z80ctc, 0); }
+	DECLARE_READ8_MEMBER( ctc_r1 ) { return z80ctc_r(m_z80ctc, 1); }
+	DECLARE_READ8_MEMBER( ctc_r2 ) { return z80ctc_r(m_z80ctc, 2); }
+	DECLARE_READ8_MEMBER( ctc_r3 ) { return z80ctc_r(m_z80ctc, 3); }
+
+	DECLARE_READ8_MEMBER( sio_r0 ) { return z80sio_cd_ba_r(m_z80sio, 0); }
+	DECLARE_READ8_MEMBER( sio_r1 ) { return z80sio_cd_ba_r(m_z80sio, 1); }
+	DECLARE_READ8_MEMBER( sio_r2 ) { return z80sio_cd_ba_r(m_z80sio, 2); }
+	DECLARE_READ8_MEMBER( sio_r3 ) { return z80sio_cd_ba_r(m_z80sio, 3); }
+
+	DECLARE_READ8_MEMBER( pio1_r0 ) { return z80pio_cd_ba_r(m_z80pio_1, 0); }
+	DECLARE_READ8_MEMBER( pio1_r1 ) { return z80pio_cd_ba_r(m_z80pio_1, 1); }
+	DECLARE_READ8_MEMBER( pio1_r2 ) { return z80pio_cd_ba_r(m_z80pio_1, 2); }
+	DECLARE_READ8_MEMBER( pio1_r3 ) { return z80pio_cd_ba_r(m_z80pio_1, 3); }
+
+	DECLARE_READ8_MEMBER( pio2_r0 ) { return z80pio_cd_ba_r(m_z80pio_2, 0); }
+	DECLARE_READ8_MEMBER( pio2_r1 ) { return z80pio_cd_ba_r(m_z80pio_2, 1); }
+	DECLARE_READ8_MEMBER( pio2_r2 ) { return z80pio_cd_ba_r(m_z80pio_2, 2); }
+	DECLARE_READ8_MEMBER( pio2_r3 ) { return z80pio_cd_ba_r(m_z80pio_2, 3); }
+
+	DECLARE_READ8_MEMBER( pio3_r0 ) { return z80pio_cd_ba_r(m_z80pio_3, 0); }
+	DECLARE_READ8_MEMBER( pio3_r1 ) { return z80pio_cd_ba_r(m_z80pio_3, 1); }
+	DECLARE_READ8_MEMBER( pio3_r2 ) { return z80pio_cd_ba_r(m_z80pio_3, 2); }
+	DECLARE_READ8_MEMBER( pio3_r3 ) { return z80pio_cd_ba_r(m_z80pio_3, 3); }
+
+	DECLARE_READ8_MEMBER( pio4_r0 ) { return z80pio_cd_ba_r(m_z80pio_4, 0); }
+	DECLARE_READ8_MEMBER( pio4_r1 ) { return z80pio_cd_ba_r(m_z80pio_4, 1); }
+	DECLARE_READ8_MEMBER( pio4_r2 ) { return z80pio_cd_ba_r(m_z80pio_4, 2); }
+	DECLARE_READ8_MEMBER( pio4_r3 ) { return z80pio_cd_ba_r(m_z80pio_4, 3); }
+
+	DECLARE_READ8_MEMBER( pio5_r0 ) { return z80pio_cd_ba_r(m_z80pio_5, 0); }
+	DECLARE_READ8_MEMBER( pio5_r1 ) { return z80pio_cd_ba_r(m_z80pio_5, 1); }
+	DECLARE_READ8_MEMBER( pio5_r2 ) { return z80pio_cd_ba_r(m_z80pio_5, 2); }
+	DECLARE_READ8_MEMBER( pio5_r3 ) { return z80pio_cd_ba_r(m_z80pio_5, 3); }
 
 protected:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
+	required_device<z80pio_device> m_z80pio_1;
+	required_device<z80pio_device> m_z80pio_2;
+	required_device<z80pio_device> m_z80pio_3;
+	required_device<z80pio_device> m_z80pio_4;
+	required_device<z80pio_device> m_z80pio_5;
+	required_device<z80ctc_device> m_z80ctc;
+	required_device<z80sio_device> m_z80sio;
+	required_device<ay8910_device> m_ay;
+
 };
 
 
@@ -31,18 +129,182 @@ static ADDRESS_MAP_START( proconn_map, AS_PROGRAM, 8, proconn_state )
 ADDRESS_MAP_END
 
 
+
+
+// the mapping of the devices is rather ugly with address bits 8-9 providing the usual address bits 0-1 or 'offset'
+// r0/r1/r2/r3 and w0/w1/w2/w3 might still be in the wrong order at the moment.
 static ADDRESS_MAP_START( proconn_portmap, AS_IO, 8, proconn_state )
+//	ADDRESS_MAP_GLOBAL_MASK(0x3ff)
+
+	// sio (vfd should be connected to it?)
+	AM_RANGE(0x00ff, 0x00ff) AM_READWRITE(sio_r0, sio_w0)
+	AM_RANGE(0x01ff, 0x01ff) AM_READWRITE(sio_r1, sio_w1)
+	AM_RANGE(0x02ff, 0x02ff) AM_READWRITE(sio_r2, sio_w2)
+	AM_RANGE(0x03ff, 0x03ff) AM_READWRITE(sio_r3, sio_w3)
+
+	// ctc
+	AM_RANGE(0x00fe, 0x00fe) AM_READWRITE(ctc_r0, ctc_w0)
+	AM_RANGE(0x01fe, 0x01fe) AM_READWRITE(ctc_r1, ctc_w1)
+	AM_RANGE(0x02fe, 0x02fe) AM_READWRITE(ctc_r2, ctc_w2)
+	AM_RANGE(0x03fe, 0x03fe) AM_READWRITE(ctc_r3, ctc_w3)
+
+	// ay (meters connected to it?)
+	AM_RANGE(0x00fd, 0x00fd) AM_READWRITE(ay_r0, ay_w0) 
+	AM_RANGE(0x00fc, 0x00fc) AM_WRITE(ay_w1) 
+
+	// ??
+	AM_RANGE(0xfbf9, 0xfbf9) AM_WRITENOP
+	AM_RANGE(0xfff9, 0xfff9) AM_WRITENOP
+	
+	// pio5 (lamps?)
+	AM_RANGE(0x00f0, 0x00f0) AM_READWRITE(pio5_r0, pio5_w0)
+	AM_RANGE(0x01f0, 0x01f0) AM_READWRITE(pio5_r1, pio5_w1)
+	AM_RANGE(0x02f0, 0x02f0) AM_READWRITE(pio5_r2, pio5_w2)
+	AM_RANGE(0x03f0, 0x03f0) AM_READWRITE(pio5_r3, pio5_w3)
+
+	// pio4 (triacs + 7segs)
+	AM_RANGE(0x00e8, 0x00e8) AM_READWRITE(pio4_r0, pio4_w0)
+	AM_RANGE(0x01e8, 0x01e8) AM_READWRITE(pio4_r1, pio4_w1)
+	AM_RANGE(0x02e8, 0x02e8) AM_READWRITE(pio4_r2, pio4_w2)
+	AM_RANGE(0x03e8, 0x03e8) AM_READWRITE(pio4_r3, pio4_w3)
+
+	// pio3 (lamps? + opto in?)
+	AM_RANGE(0x00d8, 0x00d8) AM_READWRITE(pio3_r0, pio3_w0)
+	AM_RANGE(0x01d8, 0x01d8) AM_READWRITE(pio3_r1, pio3_w1)
+	AM_RANGE(0x02d8, 0x02d8) AM_READWRITE(pio3_r2, pio3_w2)
+	AM_RANGE(0x03d8, 0x03d8) AM_READWRITE(pio3_r3, pio3_w3)
+
+	// pio2 (reels?)
+	AM_RANGE(0x00b8, 0x00b8) AM_READWRITE(pio2_r0, pio2_w0)
+	AM_RANGE(0x01b8, 0x01b8) AM_READWRITE(pio2_r1, pio2_w1)
+	AM_RANGE(0x02b8, 0x02b8) AM_READWRITE(pio2_r2, pio2_w2)
+	AM_RANGE(0x03b8, 0x03b8) AM_READWRITE(pio2_r3, pio2_w3)
+
+	// pio1 (reels? + inputs?)
+	AM_RANGE(0x0078, 0x0078) AM_READWRITE(pio1_r0, pio1_w0)
+	AM_RANGE(0x0178, 0x0178) AM_READWRITE(pio1_r1, pio1_w1)
+	AM_RANGE(0x0278, 0x0278) AM_READWRITE(pio1_r2, pio1_w2)
+	AM_RANGE(0x0378, 0x0378) AM_READWRITE(pio1_r3, pio1_w3)
 ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( proconn )
 INPUT_PORTS_END
 
+static Z80PIO_INTERFACE( pio_interface_1 )
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
+};
+
+static Z80PIO_INTERFACE( pio_interface_2 )
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
+};
+
+static Z80PIO_INTERFACE( pio_interface_3 )
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
+};
+
+static Z80PIO_INTERFACE( pio_interface_4 )
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
+};
+
+static Z80PIO_INTERFACE( pio_interface_5 )
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
+};
+
+static Z80CTC_INTERFACE( ctc_intf )
+{
+	0,							// timer disables
+	DEVCB_NULL,					// interrupt handler
+	DEVCB_NULL,					// ZC/TO0 callback
+	DEVCB_NULL,					// ZC/TO1 callback
+	DEVCB_NULL					// ZC/TO2 callback
+};
+
+static WRITE8_DEVICE_HANDLER( serial_transmit )
+{
+	logerror("serial_transmit %02x\n", data);
+}
+
+
+static int serial_receive(device_t *device, int channel)
+{
+	return -1;
+}
+
+
+static const z80sio_interface sio_intf =
+{
+	0,					/* interrupt handler */
+	0,					/* DTR changed handler */
+	0,					/* RTS changed handler */
+	0,					/* BREAK changed handler */
+	serial_transmit,	/* transmit handler */
+	serial_receive		/* receive handler */
+};
+
+static const ay8910_interface ay8910_config =
+{
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	DEVCB_NULL,
+	DEVCB_NULL
+};
+
+
 
 static MACHINE_CONFIG_START( proconn, proconn_state )
 	MCFG_CPU_ADD("maincpu", Z80, 4000000) /* ?? Mhz */
 	MCFG_CPU_PROGRAM_MAP(proconn_map)
 	MCFG_CPU_IO_MAP(proconn_portmap)
+
+	MCFG_Z80PIO_ADD( "z80pio_1", 1000000, pio_interface_1 ) /* ?? Mhz */
+	MCFG_Z80PIO_ADD( "z80pio_2", 1000000, pio_interface_2 ) /* ?? Mhz */
+	MCFG_Z80PIO_ADD( "z80pio_3", 1000000, pio_interface_3 ) /* ?? Mhz */
+	MCFG_Z80PIO_ADD( "z80pio_4", 1000000, pio_interface_4 ) /* ?? Mhz */
+	MCFG_Z80PIO_ADD( "z80pio_5", 1000000, pio_interface_5 ) /* ?? Mhz */
+	MCFG_Z80CTC_ADD( "z80ctc",   1000000, ctc_intf ) /* ?? Mhz */
+	MCFG_Z80SIO_ADD( "z80sio",   1000000, sio_intf ) /* ?? Mhz */
+
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_SOUND_ADD("aysnd", AY8910, 1000000) /* ?? Mhz */ // YM2149F on PC92?
+	MCFG_SOUND_CONFIG(ay8910_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.33)
 MACHINE_CONFIG_END
 
 
