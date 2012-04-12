@@ -28,6 +28,7 @@ public:
 	DECLARE_WRITE8_MEMBER(cchasm_soundlatch4_w);
 	DECLARE_WRITE16_MEMBER(cchasm_io_w);
 	DECLARE_READ16_MEMBER(cchasm_io_r);
+	INPUT_CHANGED_MEMBER(cchasm_set_coin_flag);
 };
 
 
@@ -37,9 +38,6 @@ public:
 /*----------- defined in audio/cchasm.c -----------*/
 
 extern const z80ctc_interface cchasm_ctc_intf;
-
-INPUT_CHANGED( cchasm_set_coin_flag );
-
 
 SOUND_START( cchasm );
 

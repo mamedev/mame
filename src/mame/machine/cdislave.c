@@ -117,10 +117,9 @@ void cdislave_device::perform_mouse_update()
     }
 }
 
-INPUT_CHANGED( cdislave_device::mouse_update )
+INPUT_CHANGED_MEMBER( cdislave_device::mouse_update )
 {
-    cdislave_device *slave = static_cast<cdislave_device *>(field.machine().device("slave"));
-    slave->perform_mouse_update();
+    perform_mouse_update();
 }
 
 READ16_DEVICE_HANDLER( slave_r )

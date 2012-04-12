@@ -55,6 +55,8 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(ladybug_p2_control_r);
 	DECLARE_INPUT_CHANGED_MEMBER(coin1_inserted);
 	DECLARE_INPUT_CHANGED_MEMBER(coin2_inserted);
+	DECLARE_INPUT_CHANGED_MEMBER(left_coin_inserted);
+	DECLARE_INPUT_CHANGED_MEMBER(right_coin_inserted);
 };
 
 

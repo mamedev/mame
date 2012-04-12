@@ -21,13 +21,12 @@ WRITE8_MEMBER(cchasm_state::cchasm_reset_coin_flag_w)
 	}
 }
 
-INPUT_CHANGED( cchasm_set_coin_flag )
+INPUT_CHANGED_MEMBER(cchasm_state::cchasm_set_coin_flag )
 {
-	cchasm_state *state = field.machine().driver_data<cchasm_state>();
-	if (!newval && !state->m_coin_flag)
+	if (!newval && !m_coin_flag)
 	{
-		state->m_coin_flag = 1;
-		z80ctc_trg0_w(state->m_ctc, state->m_coin_flag);
+		m_coin_flag = 1;
+		z80ctc_trg0_w(m_ctc, m_coin_flag);
 	}
 }
 

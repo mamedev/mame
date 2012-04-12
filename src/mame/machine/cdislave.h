@@ -49,7 +49,7 @@ public:
     cdislave_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
     // external callbacks
-    static INPUT_CHANGED( mouse_update );
+    DECLARE_INPUT_CHANGED_MEMBER( mouse_update );
 
     UINT8* get_lcd_state() { return m_lcd_state; }
     void readback_trigger();
