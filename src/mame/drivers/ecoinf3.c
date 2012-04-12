@@ -1,20 +1,141 @@
 /* Electrocoin Pyramid HW type */
 
+// this seems to not like our Z180 timers much?
+// also quite a few of the reads / writes are fall-through from Z180 internal reads/writes
+
+// assuming this is like the other hardware EC produced the IO devices should probably
+// be several 8255s on 4-byte boundaries
+
 #include "emu.h"
 #include "cpu/z180/z180.h"
+#include "machine/i8255.h"
 
 class ecoinf3_state : public driver_device
 {
 public:
 	ecoinf3_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
-	DECLARE_WRITE8_MEMBER(py_port58_out_w);
+
+
+
 };
 
-WRITE8_MEMBER(ecoinf3_state::py_port58_out_w)
+
+static I8255_INTERFACE (ppi8255_intf_a)
 {
-	// Watchdog?
+	DEVCB_NULL,						/* Port A read */
+	DEVCB_NULL,						/* Port A write */
+	DEVCB_NULL,						/* Port B read */
+	DEVCB_NULL,						/* Port B write */
+	DEVCB_NULL,						/* Port C read */
+	DEVCB_NULL						/* Port C write */
+};
+
+static I8255_INTERFACE (ppi8255_intf_b)
+{
+	DEVCB_NULL,						/* Port A read */
+	DEVCB_NULL,						/* Port A write */
+	DEVCB_NULL,						/* Port B read */
+	DEVCB_NULL,						/* Port B write */
+	DEVCB_NULL,						/* Port C read */
+	DEVCB_NULL						/* Port C write */
+};
+
+static I8255_INTERFACE (ppi8255_intf_c)
+{
+	DEVCB_NULL,						/* Port A read */
+	DEVCB_NULL,						/* Port A write */
+	DEVCB_NULL,						/* Port B read */
+	DEVCB_NULL,						/* Port B write */
+	DEVCB_NULL,						/* Port C read */
+	DEVCB_NULL						/* Port C write */
+};
+
+static I8255_INTERFACE (ppi8255_intf_d)
+{
+	DEVCB_NULL,						/* Port A read */
+	DEVCB_NULL,						/* Port A write */
+	DEVCB_NULL,						/* Port B read */
+	DEVCB_NULL,						/* Port B write */
+	DEVCB_NULL,						/* Port C read */
+	DEVCB_NULL						/* Port C write */
+};
+
+static WRITE8_DEVICE_HANDLER( ppi8255_intf_e_write_a )
+{
+	// writes the 'PYRAMID' string from RAM (copied from ROM) here...
+	// along with port 40/41/42 accesses 
+	// also error messages? (well it looks like it should, but code is strange and skips them) I guess it's a debug port or the vfd?
+	// watch ram around e3e0
+
+	// Pyramid - Writes PYRAMID V6, and 10MS INIT ERROR
+	// Labyrinth - Same behavior as Pyramid
+	// Secret Castle - Same behavior as Pyramid
+	
+	// Sphinx - Writes "No % Key"  -- depends on port 0x51, writes "SPHINX  V- 1" if it's happy with that .. after that you get COIN TAMPER,  a count down with COINS TRIM and a reboot
+	// Pennies from Heaven - same behavior as Sphinx
+	static int count = 0;
+
+	if ((data>=0x20) && (data<0x5b))
+	{
+		if (count%80 == 0) printf("\n");		
+
+		printf("%c", data);
+		count++;
+	}
 }
+
+static WRITE8_DEVICE_HANDLER( ppi8255_intf_e_write_b )
+{
+//	printf("\nwrite b %02x\n", data);
+}
+
+static WRITE8_DEVICE_HANDLER( ppi8255_intf_e_write_c )
+{
+//	printf("\nwrite c %02x\n", data);
+
+}
+
+static I8255_INTERFACE (ppi8255_intf_e)
+{
+	DEVCB_NULL,						/* Port A read */
+	DEVCB_HANDLER(ppi8255_intf_e_write_a),						/* Port A write */
+	DEVCB_NULL,						/* Port B read */
+	DEVCB_HANDLER(ppi8255_intf_e_write_b),						/* Port B write */
+	DEVCB_NULL,						/* Port C read */
+	DEVCB_HANDLER(ppi8255_intf_e_write_c)						/* Port C write */
+};
+
+static I8255_INTERFACE (ppi8255_intf_f)
+{
+	DEVCB_NULL,						/* Port A read */
+	DEVCB_NULL,						/* Port A write */
+	DEVCB_NULL,						/* Port B read */
+	DEVCB_NULL,						/* Port B write */
+	DEVCB_NULL,						/* Port C read */
+	DEVCB_NULL						/* Port C write */
+};
+
+static I8255_INTERFACE (ppi8255_intf_g)
+{
+	DEVCB_NULL,						/* Port A read */
+	DEVCB_NULL,						/* Port A write */
+	DEVCB_NULL,						/* Port B read */
+	DEVCB_NULL,						/* Port B write */
+	DEVCB_NULL,						/* Port C read */
+	DEVCB_NULL						/* Port C write */
+};
+
+static I8255_INTERFACE (ppi8255_intf_h)
+{
+	DEVCB_NULL,						/* Port A read */
+	DEVCB_NULL,						/* Port A write */
+	DEVCB_NULL,						/* Port B read */
+	DEVCB_NULL,						/* Port B write */
+	DEVCB_NULL,						/* Port C read */
+	DEVCB_NULL						/* Port C write */
+};
+
 
 static ADDRESS_MAP_START( pyramid_memmap, AS_PROGRAM, 8, ecoinf3_state )
 	AM_RANGE(0x0000, 0xdfff) AM_ROM
@@ -23,8 +144,17 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pyramid_portmap, AS_IO, 8, ecoinf3_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x00, 0x3f) AM_RAM // z180 internal area!
 
-	AM_RANGE(0x58, 0x58) AM_WRITE(py_port58_out_w)
+	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE("ppi8255_a", i8255_device, read, write)
+	AM_RANGE(0x44, 0x47) AM_DEVREADWRITE("ppi8255_b", i8255_device, read, write)
+	AM_RANGE(0x48, 0x4b) AM_DEVREADWRITE("ppi8255_c", i8255_device, read, write)
+	AM_RANGE(0x4c, 0x4f) AM_DEVREADWRITE("ppi8255_d", i8255_device, read, write)
+	AM_RANGE(0x50, 0x53) AM_DEVREADWRITE("ppi8255_e", i8255_device, read, write)
+	AM_RANGE(0x54, 0x57) AM_DEVREADWRITE("ppi8255_f", i8255_device, read, write)
+	AM_RANGE(0x58, 0x5b) AM_DEVREADWRITE("ppi8255_g", i8255_device, read, write)
+	AM_RANGE(0x5c, 0x5f) AM_DEVREADWRITE("ppi8255_h", i8255_device, read, write)
+	// frequently accesses DB after 5B, mirror? bug?
 ADDRESS_MAP_END
 
 /*
@@ -252,6 +382,16 @@ static MACHINE_CONFIG_START( ecoinf3_pyramid, ecoinf3_state )
 	MCFG_CPU_PROGRAM_MAP(pyramid_memmap)
 	MCFG_CPU_IO_MAP(pyramid_portmap)
 
+	MCFG_I8255_ADD( "ppi8255_a", ppi8255_intf_a )
+	MCFG_I8255_ADD( "ppi8255_b", ppi8255_intf_b )
+	MCFG_I8255_ADD( "ppi8255_c", ppi8255_intf_c )
+	MCFG_I8255_ADD( "ppi8255_d", ppi8255_intf_d )
+	MCFG_I8255_ADD( "ppi8255_e", ppi8255_intf_e )
+	MCFG_I8255_ADD( "ppi8255_f", ppi8255_intf_f )
+	MCFG_I8255_ADD( "ppi8255_g", ppi8255_intf_g )
+	MCFG_I8255_ADD( "ppi8255_h", ppi8255_intf_h )
+
+
 	// sphinx and pyramid on this hw contain a weird rom, looks almost like half a pair for a 16-bit cpu, but contains
 	// what looks like vectors at the end, no idea what it is.
 	//MCFG_CPU_ADD("subcpu", HD6301, 4000000) // ??
@@ -333,9 +473,9 @@ DRIVER_INIT( ecoinf3 )
 
 
 // another hw type (similar to stuff in ecoinf2.c) (watchdog on port 58?)
-GAME( 19??, ec_pyram,   0		 , ecoinf3_pyramid,   ecoinf3,   ecoinf3,	ROT0,  "Electrocoin", "Pyramid (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 19??, ec_sphin,   0		 , ecoinf3_pyramid,   ecoinf3,   ecoinf3,	ROT0,  "Electrocoin", "Sphinx (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 19??, ec_penni,   0		 , ecoinf3_pyramid,   ecoinf3,   ecoinf3,	ROT0,  "Electrocoin", "Pennies From Heaven (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 19??, ec_laby,    0		 , ecoinf3_pyramid,   ecoinf3,   ecoinf3,	ROT0,  "Electrocoin", "Labyrinth (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 19??, ec_secrt,   0		 , ecoinf3_pyramid,   ecoinf3,   ecoinf3,	ROT0,  "Electrocoin", "Secret Castle (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 19??, ec_pyram,   0		 , ecoinf3_pyramid,   ecoinf3,   ecoinf3,	ROT0,  "Electrocoin", "Pyramid (v6) (Electrocoin)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 19??, ec_sphin,   0		 , ecoinf3_pyramid,   ecoinf3,   ecoinf3,	ROT0,  "Electrocoin", "Sphinx (v1) (Electrocoin)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 19??, ec_penni,   0		 , ecoinf3_pyramid,   ecoinf3,   ecoinf3,	ROT0,  "Electrocoin", "Pennies From Heaven (v1) (Electrocoin)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 19??, ec_laby,    0		 , ecoinf3_pyramid,   ecoinf3,   ecoinf3,	ROT0,  "Electrocoin", "Labyrinth (v8) (Electrocoin)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 19??, ec_secrt,   0		 , ecoinf3_pyramid,   ecoinf3,   ecoinf3,	ROT0,  "Electrocoin", "Secret Castle (v1) (Electrocoin)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
 
