@@ -54,6 +54,7 @@ public:
 	DECLARE_WRITE8_MEMBER(mcu_tdr_w);
 	DECLARE_READ8_MEMBER(mcu_tcr_r);
 	DECLARE_WRITE8_MEMBER(mcu_tcr_w);
+	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 };
 
 
@@ -253,10 +254,10 @@ static MACHINE_RESET(supervisor_board)
 	output_set_digit_value(2, 0x00);
 }
 
-static INPUT_CHANGED( coin_inserted )
+INPUT_CHANGED_MEMBER(maxaflex_state::coin_inserted)
 {
 	if (!newval)
-		cputag_set_input_line(field.machine(), "mcu", M6805_IRQ_LINE, HOLD_LINE );
+		cputag_set_input_line(machine(), "mcu", M6805_IRQ_LINE, HOLD_LINE );
 }
 
 int atari_input_disabled(running_machine &machine)
@@ -337,7 +338,7 @@ static INPUT_PORTS_START( a600xl )
 
 	/* Max-A-Flex specific ports */
 	PORT_START("coin")	/* IN4 coin */
-	PORT_BIT(0x1, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED(coin_inserted, 0)
+	PORT_BIT(0x1, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, maxaflex_state,coin_inserted, 0)
 
 	PORT_START("dsw")	/* IN5 DSW */
 	PORT_DIPNAME(0xf, 0x9, "Coin/Time" )

@@ -1079,23 +1079,22 @@ static const ppi8255_interface scorpion_ppi8255_1_intf =
  *
  *************************************/
 
-static INPUT_CHANGED( gmgalax_game_changed )
+INPUT_CHANGED_MEMBER(galaxian_state::gmgalax_game_changed)
 {
-	galaxian_state *state = field.machine().driver_data<galaxian_state>();
-	address_space *space = field.machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* new value is the selected game */
-	state->m_gmgalax_selected_game = newval;
+	m_gmgalax_selected_game = newval;
 
 	/* select the bank and graphics bank based on it */
-	memory_set_bank(field.machine(), "bank1", state->m_gmgalax_selected_game);
-	state->galaxian_gfxbank_w(*space, 0, state->m_gmgalax_selected_game);
+	memory_set_bank(machine(), "bank1", m_gmgalax_selected_game);
+	galaxian_gfxbank_w(*space, 0, m_gmgalax_selected_game);
 
 	/* reset the stars */
-	state->galaxian_stars_enable_w(*space, 0, 0);
+	galaxian_stars_enable_w(*space, 0, 0);
 
 	/* reset the CPU */
-	cputag_set_input_line(field.machine(), "maincpu", INPUT_LINE_RESET, PULSE_LINE);
+	cputag_set_input_line(machine(), "maincpu", INPUT_LINE_RESET, PULSE_LINE);
 }
 
 
@@ -2814,7 +2813,7 @@ static DRIVER_INIT( gmgalax )
 	memory_configure_bank(machine, "bank1", 0, 2, machine.region("maincpu")->base() + 0x10000, 0x4000);
 
 	/* callback when the game select is toggled */
-	gmgalax_game_changed(*state, *machine.m_portlist.first()->fieldlist().first(), NULL, 0, 0);
+	state->gmgalax_game_changed(*machine.m_portlist.first()->fieldlist().first(), NULL, 0, 0);
 	state_save_register_global(machine, state->m_gmgalax_selected_game);
 }
 
@@ -2937,7 +2936,6 @@ void tenspot_set_game_bank(running_machine& machine, int bank, int from_game)
 	char tmp[64];
 	UINT8* srcregion;
 	UINT8* dstregion;
-	UINT8* color_prom;
 	int x;
 
 	sprintf(tmp,"game_%d_cpu", bank);
@@ -2971,7 +2969,6 @@ void tenspot_set_game_bank(running_machine& machine, int bank, int from_game)
 	dstregion = machine.region("proms")->base();
 	memcpy(dstregion, srcregion, 0x20);
 
-	color_prom = dstregion;
 	PALETTE_INIT_CALL(galaxian);
 }
 

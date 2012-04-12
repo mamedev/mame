@@ -72,6 +72,7 @@ public:
 	DECLARE_WRITE8_MEMBER(m10_colorram_w);
 	DECLARE_WRITE8_MEMBER(m10_chargen_w);
 	DECLARE_WRITE8_MEMBER(m15_chargen_w);
+	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 };
 
 

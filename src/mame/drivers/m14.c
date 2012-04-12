@@ -78,6 +78,8 @@ public:
 	DECLARE_READ8_MEMBER(input_buttons_r);
 	DECLARE_WRITE8_MEMBER(test_w);
 	DECLARE_WRITE8_MEMBER(hopper_w);
+	DECLARE_INPUT_CHANGED_MEMBER(left_coin_inserted);
+	DECLARE_INPUT_CHANGED_MEMBER(right_coin_inserted);
 };
 
 
@@ -224,20 +226,18 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static INPUT_CHANGED( left_coin_inserted )
+INPUT_CHANGED_MEMBER(m14_state::left_coin_inserted)
 {
-	m14_state *state = field.machine().driver_data<m14_state>();
 	/* left coin insertion causes a rst6.5 (vector 0x34) */
 	if (newval)
-		device_set_input_line(state->m_maincpu, I8085_RST65_LINE, HOLD_LINE);
+		device_set_input_line(m_maincpu, I8085_RST65_LINE, HOLD_LINE);
 }
 
-static INPUT_CHANGED( right_coin_inserted )
+INPUT_CHANGED_MEMBER(m14_state::right_coin_inserted)
 {
-	m14_state *state = field.machine().driver_data<m14_state>();
 	/* right coin insertion causes a rst5.5 (vector 0x2c) */
 	if (newval)
-		device_set_input_line(state->m_maincpu, I8085_RST55_LINE, HOLD_LINE);
+		device_set_input_line(m_maincpu, I8085_RST55_LINE, HOLD_LINE);
 }
 
 static INPUT_PORTS_START( m14 )
@@ -291,8 +291,8 @@ static INPUT_PORTS_START( m14 )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_START("FAKE")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1) PORT_CHANGED(left_coin_inserted, 0) //coin x 5
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(1) PORT_CHANGED(right_coin_inserted, 0) //coin x 1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, m14_state,left_coin_inserted, 0) //coin x 5
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, m14_state,right_coin_inserted, 0) //coin x 1
 INPUT_PORTS_END
 
 static const gfx_layout charlayout =

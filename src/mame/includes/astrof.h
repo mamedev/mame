@@ -55,6 +55,8 @@ public:
 	DECLARE_WRITE8_MEMBER(astrof_audio_2_w);
 	DECLARE_WRITE8_MEMBER(spfghmk2_audio_w);
 	DECLARE_WRITE8_MEMBER(tomahawk_audio_w);
+	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+	DECLARE_INPUT_CHANGED_MEMBER(service_coin_inserted);
 };
 
 /*----------- defined in audio/astrof.c -----------*/

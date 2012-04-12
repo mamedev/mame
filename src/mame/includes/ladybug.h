@@ -53,6 +53,8 @@ public:
 	DECLARE_WRITE8_MEMBER(sraider_io_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(ladybug_p1_control_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(ladybug_p2_control_r);
+	DECLARE_INPUT_CHANGED_MEMBER(coin1_inserted);
+	DECLARE_INPUT_CHANGED_MEMBER(coin2_inserted);
 };
 
 

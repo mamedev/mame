@@ -59,6 +59,8 @@ public:
 	DECLARE_WRITE8_MEMBER(bwing_scrollram_w);
 	DECLARE_WRITE8_MEMBER(bwing_scrollreg_w);
 	DECLARE_WRITE8_MEMBER(bwing_paletteram_w);
+	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+	DECLARE_INPUT_CHANGED_MEMBER(tilt_pressed);
 };
 
 

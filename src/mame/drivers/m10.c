@@ -499,11 +499,10 @@ READ8_MEMBER(m10_state::m11_a700_r)
  *
  *************************************/
 
-static INPUT_CHANGED( coin_inserted )
+INPUT_CHANGED_MEMBER(m10_state::coin_inserted)
 {
-	m10_state *state = field.machine().driver_data<m10_state>();
 	/* coin insertion causes an NMI */
-	device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(m_maincpu, INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -646,7 +645,7 @@ static INPUT_PORTS_START( skychut )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_START("FAKE")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED(coin_inserted, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, m10_state,coin_inserted, 0)
 
 	CAB_PORTENV
 INPUT_PORTS_END
@@ -687,7 +686,7 @@ static INPUT_PORTS_START( ipminvad )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_START("FAKE")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED(coin_inserted, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, m10_state,coin_inserted, 0)
 
 	CAB_PORTENV
 INPUT_PORTS_END
@@ -721,7 +720,7 @@ static INPUT_PORTS_START( spacbeam )
 	PORT_DIPSETTING (  0x20, "1 Coin 2 Plays" )
 
 	PORT_START("FAKE")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED(coin_inserted, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, m10_state,coin_inserted, 0)
 
 	CAB_PORTENV
 INPUT_PORTS_END
@@ -761,7 +760,7 @@ static INPUT_PORTS_START( headoni )
 	PORT_DIPSETTING (  0x20, "1 Coin 2 Plays" )
 
 	PORT_START("FAKE")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED(coin_inserted, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, m10_state,coin_inserted, 0)
 
 	CAB_PORTENV
 INPUT_PORTS_END

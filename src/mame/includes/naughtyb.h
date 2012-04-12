@@ -23,6 +23,7 @@ public:
 	DECLARE_WRITE8_MEMBER(trvmstr_questions_w);
 	DECLARE_WRITE8_MEMBER(naughtyb_videoreg_w);
 	DECLARE_WRITE8_MEMBER(popflame_videoreg_w);
+	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 };
 
 

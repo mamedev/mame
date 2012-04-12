@@ -32,6 +32,8 @@ public:
 	DECLARE_WRITE8_MEMBER(kopunch_scroll_x_w);
 	DECLARE_WRITE8_MEMBER(kopunch_scroll_y_w);
 	DECLARE_WRITE8_MEMBER(kopunch_gfxbank_w);
+	DECLARE_INPUT_CHANGED_MEMBER(left_coin_inserted);
+	DECLARE_INPUT_CHANGED_MEMBER(right_coin_inserted);
 };
 
 /*----------- defined in video/kopunch.c -----------*/

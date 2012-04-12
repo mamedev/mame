@@ -142,14 +142,14 @@ static ADDRESS_MAP_START( flower_sound_cpu, AS_PROGRAM, 8, flower_state )
 ADDRESS_MAP_END
 
 
-static INPUT_CHANGED( coin_inserted )
+INPUT_CHANGED_MEMBER(flower_state::coin_inserted)
 {
-	cputag_set_input_line(field.machine(), "maincpu", INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(machine(), "maincpu", INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static INPUT_PORTS_START( flower )
 	PORT_START("IN0CPU0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED(coin_inserted, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, flower_state,coin_inserted, 0)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START1  )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_DIPNAME( 0x08, 0x08, "Energy Decrease" )		PORT_DIPLOCATION("SW2:4")

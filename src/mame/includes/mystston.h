@@ -33,6 +33,7 @@ public:
 	DECLARE_WRITE8_MEMBER(irq_clear_w);
 	DECLARE_WRITE8_MEMBER(mystston_ay8910_select_w);
 	DECLARE_WRITE8_MEMBER(mystston_video_control_w);
+	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 };
 
 

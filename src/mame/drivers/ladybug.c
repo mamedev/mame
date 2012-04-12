@@ -182,21 +182,19 @@ ADDRESS_MAP_END
 
 
 
-static INPUT_CHANGED( coin1_inserted )
+INPUT_CHANGED_MEMBER(ladybug_state::coin1_inserted)
 {
-	ladybug_state *state = field.machine().driver_data<ladybug_state>();
 
 	/* left coin insertion causes an NMI */
-	device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(m_maincpu, INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static INPUT_CHANGED( coin2_inserted )
+INPUT_CHANGED_MEMBER(ladybug_state::coin2_inserted)
 {
-	ladybug_state *state = field.machine().driver_data<ladybug_state>();
 
 	/* right coin insertion causes an IRQ */
 	if (newval)
-		device_set_input_line(state->m_maincpu, 0, HOLD_LINE);
+		device_set_input_line(m_maincpu, 0, HOLD_LINE);
 }
 
 
@@ -293,8 +291,8 @@ static INPUT_PORTS_START( ladybug )
 	/* settings 0x00 through 0x50 all give 1 Coin/1 Credit */
 
 	PORT_START("COIN")	/* FAKE */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED(coin1_inserted, 0)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_CHANGED(coin2_inserted, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, ladybug_state,coin1_inserted, 0)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, ladybug_state,coin2_inserted, 0)
 
 	PORT_START(LADYBUG_P1_CONTROL_PORT_TAG)
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY
@@ -392,8 +390,8 @@ static INPUT_PORTS_START( snapjack )
 	/* settings 0x00 through 0x04 all give 1 Coin/1 Credit */
 
 	PORT_START("COIN")	/* FAKE */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED(coin1_inserted, 0)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_CHANGED(coin2_inserted, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, ladybug_state,coin1_inserted, 0)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, ladybug_state,coin2_inserted, 0)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( cavenger )
@@ -475,8 +473,8 @@ static INPUT_PORTS_START( cavenger )
 	/* settings 0x00 through 0x50 all give 1 Coin/1 Credit */
 
 	PORT_START("COIN")	/* FAKE */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED(coin1_inserted, 0)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_CHANGED(coin2_inserted, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, ladybug_state,coin1_inserted, 0)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, ladybug_state,coin2_inserted, 0)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( dorodon )
@@ -558,8 +556,8 @@ static INPUT_PORTS_START( dorodon )
 	/* settings 0x00 through 0x50 all give 1 Coin/1 Credit */
 
 	PORT_START("COIN")	/* FAKE */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED(coin1_inserted, 0)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_CHANGED(coin2_inserted, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, ladybug_state,coin1_inserted, 0)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, ladybug_state,coin2_inserted, 0)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( sraider )

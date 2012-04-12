@@ -276,16 +276,14 @@ static ADDRESS_MAP_START( slave_map, AS_PROGRAM, 8, exprraid_state )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static INPUT_CHANGED( coin_inserted_deco16 )
+INPUT_CHANGED_MEMBER(exprraid_state::coin_inserted_deco16)
 {
-	exprraid_state *state = field.machine().driver_data<exprraid_state>();
-	device_set_input_line(state->m_maincpu, DECO16_IRQ_LINE, newval ? CLEAR_LINE : ASSERT_LINE);
+	device_set_input_line(m_maincpu, DECO16_IRQ_LINE, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
-static INPUT_CHANGED( coin_inserted_nmi )
+INPUT_CHANGED_MEMBER(exprraid_state::coin_inserted_nmi)
 {
-	exprraid_state *state = field.machine().driver_data<exprraid_state>();
-	device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
+	device_set_input_line(m_maincpu, INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static INPUT_PORTS_START( exprraid )
@@ -339,8 +337,8 @@ static INPUT_PORTS_START( exprraid )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1) PORT_CHANGED(coin_inserted_deco16, 0)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(1) PORT_CHANGED(coin_inserted_deco16, 0)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, exprraid_state,coin_inserted_deco16, 0)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, exprraid_state,coin_inserted_deco16, 0)
 
 	PORT_START("DSW1")	/* 0x1803 */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )            PORT_DIPLOCATION("SW2:1,2")
@@ -368,8 +366,8 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( exprboot )
 	PORT_INCLUDE( exprraid )
 	PORT_MODIFY("IN2")	/* 0x1802 */
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED(coin_inserted_nmi, 0)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_CHANGED(coin_inserted_nmi, 0)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, exprraid_state,coin_inserted_nmi, 0)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, exprraid_state,coin_inserted_nmi, 0)
 INPUT_PORTS_END
 
 static const gfx_layout charlayout =

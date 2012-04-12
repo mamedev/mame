@@ -12,13 +12,12 @@
 #include "includes/cheekyms.h"
 
 
-static INPUT_CHANGED( coin_inserted )
+INPUT_CHANGED_MEMBER(cheekyms_state::coin_inserted)
 {
-	cheekyms_state *state = field.machine().driver_data<cheekyms_state>();
 
 	/* this starts a 556 one-shot timer (and triggers a sound effect) */
 	if (newval)
-		device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(m_maincpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -73,7 +72,7 @@ static INPUT_PORTS_START( cheekyms )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
 
 	PORT_START("COIN")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED(coin_inserted, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, cheekyms_state,coin_inserted, 0)
 INPUT_PORTS_END
 
 

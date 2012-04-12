@@ -42,6 +42,7 @@ public:
 	DECLARE_WRITE8_MEMBER(lasso_video_control_w);
 	DECLARE_WRITE8_MEMBER(wwjgtin_video_control_w);
 	DECLARE_WRITE8_MEMBER(pinbo_video_control_w);
+	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 };
 
 

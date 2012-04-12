@@ -25,6 +25,7 @@ public:
 	required_device<cpu_device> m_videocpu;
 	required_device<cpu_device> m_pia;
 
+	DECLARE_INPUT_CHANGED_MEMBER(test_switch_press);
 //  UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 protected:
 
@@ -56,18 +57,17 @@ static ADDRESS_MAP_START( by133_video_map, AS_PROGRAM, 8, by133_state )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static INPUT_CHANGED( test_switch_press )
+INPUT_CHANGED_MEMBER(by133_state::test_switch_press)
 {
-	by133_state *state = field.machine().driver_data<by133_state>();
 
 	if(newval)
-		device_set_input_line(state->m_videocpu, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(m_videocpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static INPUT_PORTS_START( by133 )
 	/* service switch is directly hard-wired with the NMI signal */
 	PORT_START("TEST")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_IMPULSE(1) PORT_CHANGED(test_switch_press, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, by133_state,test_switch_press, 0)
 INPUT_PORTS_END
 
 void by133_state::machine_reset()

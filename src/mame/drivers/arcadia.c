@@ -65,6 +65,7 @@ public:
 	UINT8 coin_counter[2];
 	DECLARE_WRITE16_MEMBER(arcadia_multibios_change_game);
 	DECLARE_CUSTOM_INPUT_MEMBER(coin_counter_r);
+	DECLARE_INPUT_CHANGED_MEMBER(coin_changed_callback);
 };
 
 
@@ -166,10 +167,9 @@ CUSTOM_INPUT_MEMBER(arcadia_amiga_state::coin_counter_r)
 }
 
 
-static INPUT_CHANGED( coin_changed_callback )
+INPUT_CHANGED_MEMBER(arcadia_amiga_state::coin_changed_callback)
 {
 	int coin = (FPTR)param;
-	UINT8 *coin_counter = field.machine().driver_data<arcadia_amiga_state>()->coin_counter;
 
 	/* check for a 0 -> 1 transition */
 	if (!oldval && newval && coin_counter[coin] < 3)
@@ -260,8 +260,8 @@ static INPUT_PORTS_START( arcadia )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
 
 	PORT_START("COINS")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED(coin_changed_callback, 0)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_CHANGED(coin_changed_callback, 1)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, arcadia_amiga_state,coin_changed_callback, 0)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, arcadia_amiga_state,coin_changed_callback, 1)
 INPUT_PORTS_END
 
 

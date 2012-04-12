@@ -22,6 +22,7 @@ public:
 	DECLARE_WRITE8_MEMBER(tryout_vram_w);
 	DECLARE_WRITE8_MEMBER(tryout_vram_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(tryout_flipscreen_w);
+	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 };
 
 

@@ -57,6 +57,7 @@ public:
 	DECLARE_READ8_MEMBER(quizshow_tape_signal_r);
 	DECLARE_WRITE8_MEMBER(quizshow_main_ram_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(quizshow_tape_headpos_r);
+	DECLARE_INPUT_CHANGED_MEMBER(quizshow_category_select);
 };
 
 
@@ -242,13 +243,12 @@ CUSTOM_INPUT_MEMBER(quizshow_state::quizshow_tape_headpos_r)
 	return 1 << m_tape_head_pos;
 }
 
-static INPUT_CHANGED(quizshow_category_select)
+INPUT_CHANGED_MEMBER(quizshow_state::quizshow_category_select)
 {
 	if (newval)
 	{
-		quizshow_state *state = field.machine().driver_data<quizshow_state>();
-		if (state->m_category_enable)
-			state->m_tape_head_pos = (state->m_tape_head_pos + 1) & 3;
+		if (m_category_enable)
+			m_tape_head_pos = (m_tape_head_pos + 1) & 3;
 	}
 }
 
@@ -319,7 +319,7 @@ static INPUT_PORTS_START( quizshow )
 	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("CAT")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Category Select") PORT_CHANGED(quizshow_category_select, NULL)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Category Select") PORT_CHANGED_MEMBER(DEVICE_SELF, quizshow_state,quizshow_category_select, NULL)
 
 INPUT_PORTS_END
 

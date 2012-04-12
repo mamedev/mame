@@ -29,6 +29,7 @@ public:
     scc68070_regs_t m_scc68070_regs;
     mcd212_regs_t m_mcd212_regs;
     mcd212_ab_t m_mcd212_ab;
+	DECLARE_INPUT_CHANGED_MEMBER(mcu_input);
 };
 
 /*----------- debug defines -----------*/

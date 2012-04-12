@@ -27,6 +27,7 @@ public:
 	DECLARE_WRITE8_MEMBER(flower_bg0ram_w);
 	DECLARE_WRITE8_MEMBER(flower_bg1ram_w);
 	DECLARE_WRITE8_MEMBER(flower_flipscreen_w);
+	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 };
 
 

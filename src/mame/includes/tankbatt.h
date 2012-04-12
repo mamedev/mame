@@ -23,6 +23,7 @@ public:
 	DECLARE_WRITE8_MEMBER(tankbatt_coin_counter_w);
 	DECLARE_WRITE8_MEMBER(tankbatt_coin_lockout_w);
 	DECLARE_WRITE8_MEMBER(tankbatt_videoram_w);
+	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 };
 
 

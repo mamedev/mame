@@ -70,6 +70,9 @@ public:
 	DECLARE_WRITE8_MEMBER(bnj_video_control_w);
 	DECLARE_WRITE8_MEMBER(zoar_video_control_w);
 	DECLARE_WRITE8_MEMBER(disco_video_control_w);
+	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted_irq_hi);
+	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted_irq_lo);
+	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted_nmi_lo);
 };
 
 

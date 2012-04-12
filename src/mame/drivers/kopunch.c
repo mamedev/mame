@@ -68,22 +68,20 @@ static ADDRESS_MAP_START( kopunch_io_map, AS_IO, 8, kopunch_state )
 	AM_RANGE(0x3f, 0x3f) AM_WRITENOP
 ADDRESS_MAP_END
 
-static INPUT_CHANGED( left_coin_inserted )
+INPUT_CHANGED_MEMBER(kopunch_state::left_coin_inserted)
 {
-	kopunch_state *state = field.machine().driver_data<kopunch_state>();
 
 	/* left coin insertion causes a rst6.5 (vector 0x34) */
 	if (newval)
-		device_set_input_line(state->m_maincpu, I8085_RST65_LINE, HOLD_LINE);
+		device_set_input_line(m_maincpu, I8085_RST65_LINE, HOLD_LINE);
 }
 
-static INPUT_CHANGED( right_coin_inserted )
+INPUT_CHANGED_MEMBER(kopunch_state::right_coin_inserted)
 {
-	kopunch_state *state = field.machine().driver_data<kopunch_state>();
 
 	/* right coin insertion causes a rst5.5 (vector 0x2c) */
 	if (newval)
-		device_set_input_line(state->m_maincpu, I8085_RST55_LINE, HOLD_LINE);
+		device_set_input_line(m_maincpu, I8085_RST55_LINE, HOLD_LINE);
 }
 
 static INPUT_PORTS_START( kopunch )
@@ -99,11 +97,11 @@ static INPUT_PORTS_START( kopunch )
 
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* punch strength (high 3 bits) */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(1) PORT_CHANGED(right_coin_inserted, 0)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, kopunch_state,right_coin_inserted, 0)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON6 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON7 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1) PORT_CHANGED(left_coin_inserted, 0)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, kopunch_state,left_coin_inserted, 0)
 
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )

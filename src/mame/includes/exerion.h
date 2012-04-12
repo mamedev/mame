@@ -51,6 +51,7 @@ public:
 	DECLARE_WRITE8_MEMBER(exerion_video_latch_w);
 	DECLARE_READ8_MEMBER(exerion_video_timing_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(exerion_controls_r);
+	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 };
 
 

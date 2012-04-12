@@ -50,6 +50,7 @@ public:
 	DECLARE_WRITE8_MEMBER(cinemat_vector_control_w);
 	DECLARE_WRITE8_MEMBER(cinemat_sound_control_w);
 	DECLARE_WRITE8_MEMBER(qb3_sound_w);
+	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 };
 
 

@@ -77,6 +77,9 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(skid_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(crash_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(gear_r);
+	DECLARE_INPUT_CHANGED_MEMBER(service_mode_switch_changed);
+	DECLARE_INPUT_CHANGED_MEMBER(firetrk_horn_changed);
+	DECLARE_INPUT_CHANGED_MEMBER(gear_changed);
 };
 
 

@@ -16,10 +16,10 @@
 #define SOUND_CLOCK XTAL_4MHz
 
 
-static INPUT_CHANGED( coin_inserted )
+INPUT_CHANGED_MEMBER(madalien_state::coin_inserted)
 {
 	/* coin insertion causes an NMI */
-	cputag_set_input_line(field.machine(), "maincpu", INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(machine(), "maincpu", INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -153,7 +153,7 @@ static INPUT_PORTS_START( madalien )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED(coin_inserted, 0)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, madalien_state,coin_inserted, 0)
 INPUT_PORTS_END
 
 

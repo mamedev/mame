@@ -57,6 +57,7 @@ public:
 	DECLARE_WRITE8_MEMBER(firetrap_bg1_scrolly_w);
 	DECLARE_WRITE8_MEMBER(firetrap_bg2_scrollx_w);
 	DECLARE_WRITE8_MEMBER(firetrap_bg2_scrolly_w);
+	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 };
 
 

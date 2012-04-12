@@ -87,25 +87,25 @@ CUSTOM_INPUT_MEMBER(vicdual_state::vicdual_read_coin_status)
 }
 
 
-static INPUT_CHANGED( coin_changed )
+INPUT_CHANGED_MEMBER(vicdual_state::coin_changed)
 {
 	if (newval && !oldval)
 	{
 		/* increment the coin counter */
-		coin_counter_w(field.machine(), 0, 1);
-		coin_counter_w(field.machine(), 0, 0);
+		coin_counter_w(machine(), 0, 1);
+		coin_counter_w(machine(), 0, 0);
 
-		cputag_set_input_line(field.machine(), "maincpu", INPUT_LINE_RESET, PULSE_LINE);
+		cputag_set_input_line(machine(), "maincpu", INPUT_LINE_RESET, PULSE_LINE);
 
 		/* simulate the coin switch being closed for a while */
-		field.machine().scheduler().timer_set(4 * field.machine().primary_screen->frame_period(), FUNC(clear_coin_status));
+		machine().scheduler().timer_set(4 * machine().primary_screen->frame_period(), FUNC(clear_coin_status));
 	}
 }
 
 
 #define PORT_COIN									\
 	PORT_START(COIN_PORT_TAG)					\
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED(coin_changed, NULL) \
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, vicdual_state,coin_changed, NULL) \
 	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 

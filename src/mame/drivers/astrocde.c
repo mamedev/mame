@@ -832,13 +832,12 @@ static INPUT_PORTS_START( ebases )
 INPUT_PORTS_END
 
 
-static INPUT_CHANGED( spacezap_monitor )
+INPUT_CHANGED_MEMBER(astrocde_state::spacezap_monitor)
 {
-	astrocde_state *state = field.machine().driver_data<astrocde_state>();
 	if (newval)
-		state->m_video_config &= ~AC_MONITOR_BW;
+		m_video_config &= ~AC_MONITOR_BW;
 	else
-		state->m_video_config |= AC_MONITOR_BW;
+		m_video_config |= AC_MONITOR_BW;
 }
 
 static INPUT_PORTS_START( spacezap )
@@ -889,7 +888,7 @@ static INPUT_PORTS_START( spacezap )
 	PORT_START("FAKE")
 	/* Dedicated cabinets had a B/W monitor and color overlay,
        some (unofficial/repaired?) cabinets had a color monitor. */
-	PORT_CONFNAME( 0x01, 0x00, "Monitor" ) PORT_CHANGED(spacezap_monitor, 0)
+	PORT_CONFNAME( 0x01, 0x00, "Monitor" ) PORT_CHANGED_MEMBER(DEVICE_SELF, astrocde_state,spacezap_monitor, 0)
 	PORT_CONFSETTING(    0x00, "B/W" )
 	PORT_CONFSETTING(    0x01, "Color" )
 INPUT_PORTS_END

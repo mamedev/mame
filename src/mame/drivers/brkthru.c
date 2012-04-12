@@ -96,13 +96,12 @@ WRITE8_MEMBER(brkthru_state::brkthru_soundlatch_w)
 	device_set_input_line(m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static INPUT_CHANGED( coin_inserted )
+INPUT_CHANGED_MEMBER(brkthru_state::coin_inserted)
 {
-	brkthru_state *state = field.machine().driver_data<brkthru_state>();
 
 	/* coin insertion causes an IRQ */
 	if(oldval)
-		device_set_input_line(state->m_maincpu, 0, ASSERT_LINE);
+		device_set_input_line(m_maincpu, 0, ASSERT_LINE);
 }
 
 
@@ -227,9 +226,9 @@ static INPUT_PORTS_START( brkthru )
 //  PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 //  PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	/* SW2:7,8 ALWAYS OFF according to the manual  */
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED(coin_inserted, 0)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_CHANGED(coin_inserted, 0)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_CHANGED(coin_inserted, 0)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, brkthru_state,coin_inserted, 0)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, brkthru_state,coin_inserted, 0)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, brkthru_state,coin_inserted, 0)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( brkthruj )
@@ -269,9 +268,9 @@ static INPUT_PORTS_START( darwin )
 //  PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 //  PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	/* SW2:5,7,8 ALWAYS OFF according to the manual  */
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED(coin_inserted, 0)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_CHANGED(coin_inserted, 0)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_CHANGED(coin_inserted, 0)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, brkthru_state,coin_inserted, 0)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, brkthru_state,coin_inserted, 0)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, brkthru_state,coin_inserted, 0)
 INPUT_PORTS_END
 
 

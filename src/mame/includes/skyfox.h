@@ -26,6 +26,7 @@ public:
 	device_t *m_maincpu;
 	DECLARE_READ8_MEMBER(skyfox_vregs_r);
 	DECLARE_WRITE8_MEMBER(skyfox_vregs_w);
+	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 };
 
 /*----------- defined in video/skyfox.c -----------*/

@@ -25,6 +25,7 @@ public:
 	DECLARE_WRITE8_MEMBER(ssozumo_paletteram_w);
 	DECLARE_WRITE8_MEMBER(ssozumo_scroll_w);
 	DECLARE_WRITE8_MEMBER(ssozumo_flipscreen_w);
+	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 };
 
 

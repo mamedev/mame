@@ -51,6 +51,11 @@ public:
 	DECLARE_WRITE8_MEMBER(flip_screen_w);
 	DECLARE_WRITE8_MEMBER(cosmic_color_register_w);
 	DECLARE_WRITE8_MEMBER(cosmic_background_enable_w);
+	DECLARE_INPUT_CHANGED_MEMBER(panic_coin_inserted);
+	DECLARE_INPUT_CHANGED_MEMBER(cosmica_coin_inserted);
+	DECLARE_INPUT_CHANGED_MEMBER(cosmicg_coin_inserted);
+	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted_irq0);
+	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted_nmi);
 };
 
 

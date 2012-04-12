@@ -71,6 +71,7 @@ public:
 	DECLARE_READ8_MEMBER(n7751_rom_r);
 	DECLARE_READ8_MEMBER(n7751_command_r);
 	DECLARE_READ8_MEMBER(n7751_t1_r);
+	DECLARE_INPUT_CHANGED_MEMBER(service_switch);
 };
 
 

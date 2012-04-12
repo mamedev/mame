@@ -78,6 +78,7 @@ public:
 	DECLARE_READ16_MEMBER(unk_r);
 	DECLARE_WRITE16_MEMBER(mux_w);
 	DECLARE_READ16_MEMBER(mux_r);
+	DECLARE_INPUT_CHANGED_MEMBER(touchscreen_press);
 };
 
 
@@ -401,22 +402,21 @@ static TIMER_CALLBACK( touch_cb )
 	}
 }
 
-static INPUT_CHANGED( touchscreen_press )
+INPUT_CHANGED_MEMBER(jpmsys5_state::touchscreen_press)
 {
-	jpmsys5_state *state = field.machine().driver_data<jpmsys5_state>();
 	if (newval == 0)
 	{
 		attotime rx_period = attotime::from_hz(10000) * 16;
 
 		/* Each touch screen packet is 3 bytes */
-		state->m_touch_data[0] = 0x2a;
-		state->m_touch_data[1] = 0x7 - (input_port_read(field.machine(), "TOUCH_Y") >> 5) + 0x30;
-		state->m_touch_data[2] = (input_port_read(field.machine(), "TOUCH_X") >> 5) + 0x30;
+		m_touch_data[0] = 0x2a;
+		m_touch_data[1] = 0x7 - (input_port_read(machine(), "TOUCH_Y") >> 5) + 0x30;
+		m_touch_data[2] = (input_port_read(machine(), "TOUCH_X") >> 5) + 0x30;
 
 		/* Start sending the data to the 68000 serially */
-		state->m_touch_data_count = 0;
-		state->m_touch_state = START;
-		state->m_touch_timer->adjust(rx_period, 0, rx_period);
+		m_touch_data_count = 0;
+		m_touch_state = START;
+		m_touch_timer->adjust(rx_period, 0, rx_period);
 	}
 }
 
@@ -481,7 +481,7 @@ static INPUT_PORTS_START( monopoly )
 	PORT_BIT( 0xc3, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("TOUCH_PUSH")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CHANGED(touchscreen_press, NULL)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, jpmsys5_state,touchscreen_press, NULL)
 
 	PORT_START("TOUCH_X")
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(45) PORT_KEYDELTA(15)

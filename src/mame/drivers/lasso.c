@@ -37,12 +37,11 @@ DIP locations verified for:
 #include "includes/lasso.h"
 
 
-static INPUT_CHANGED( coin_inserted )
+INPUT_CHANGED_MEMBER(lasso_state::coin_inserted)
 {
-	lasso_state *state = field.machine().driver_data<lasso_state>();
 
 	/* coin insertion causes an NMI */
-	device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
+	device_set_input_line(m_maincpu, INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -266,8 +265,8 @@ static INPUT_PORTS_START( lasso )
 	PORT_DIPNAME( 0x08, 0x00, "Invulnerability (Cheat)") PORT_DIPLOCATION("SW1:!6") /* Listed as "Test" */
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_CHANGED(coin_inserted, 0)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED(coin_inserted, 0)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, lasso_state,coin_inserted, 0)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, lasso_state,coin_inserted, 0)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START2  )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_START1  )
 INPUT_PORTS_END
@@ -324,8 +323,8 @@ static INPUT_PORTS_START( wwjgtin )
 	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
 	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x00, "SW1:!5" )		/* probably unused */
 	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x00, "SW1:!6" )		/* probably unused */
-	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_COIN2 ) PORT_CHANGED(coin_inserted, 0)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_COIN1 ) PORT_CHANGED(coin_inserted, 0)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_COIN2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, lasso_state,coin_inserted, 0)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, lasso_state,coin_inserted, 0)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_START2 )
 INPUT_PORTS_END

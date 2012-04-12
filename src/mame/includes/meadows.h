@@ -37,6 +37,7 @@ public:
 	DECLARE_READ8_MEMBER(audio_hardware_r);
 	DECLARE_WRITE8_MEMBER(meadows_videoram_w);
 	DECLARE_WRITE8_MEMBER(meadows_spriteram_w);
+	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 };
 
 

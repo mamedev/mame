@@ -27,6 +27,7 @@ public:
 	UINT8          m_irq_mask;
 	DECLARE_WRITE8_MEMBER(cheekyms_port_40_w);
 	DECLARE_WRITE8_MEMBER(cheekyms_port_80_w);
+	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 };
 
 

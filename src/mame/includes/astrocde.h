@@ -102,6 +102,7 @@ public:
 	DECLARE_WRITE8_MEMBER(profpac_videoram_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(ebases_trackball_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(demndragn_joystick_r);
+	DECLARE_INPUT_CHANGED_MEMBER(spacezap_monitor);
 };
 
 

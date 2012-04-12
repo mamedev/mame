@@ -39,6 +39,7 @@ public:
 	DECLARE_WRITE8_MEMBER(metlclsh_gfxbank_w);
 	DECLARE_WRITE8_MEMBER(metlclsh_bgram_w);
 	DECLARE_WRITE8_MEMBER(metlclsh_fgram_w);
+	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 };
 
 
