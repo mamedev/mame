@@ -51,29 +51,12 @@
 #include "render.h"
 #include "rendutil.h"
 #include "options.h"
+#include "rendersw.c"
 
 // MAMEOS headers
 #include "winmain.h"
 #include "window.h"
 #include "config.h"
-
-
-
-//============================================================
-//  DEBUGGING
-//============================================================
-
-
-
-//============================================================
-//  CONSTANTS
-//============================================================
-
-
-
-//============================================================
-//  MACROS
-//============================================================
 
 
 
@@ -199,16 +182,6 @@ static void blit_to_primary(win_window_info *window, int srcwidth, int srcheight
 static int config_adapter_mode(win_window_info *window);
 static void get_adapter_for_monitor(dd_info *dd, win_monitor_info *monitor);
 static void pick_best_mode(win_window_info *window);
-
-// rendering
-static void drawdd_rgb888_draw_primitives(const render_primitive_list &primlist, void *dstdata, UINT32 width, UINT32 height, UINT32 pitch);
-static void drawdd_bgr888_draw_primitives(const render_primitive_list &primlist, void *dstdata, UINT32 width, UINT32 height, UINT32 pitch);
-static void drawdd_rgb565_draw_primitives(const render_primitive_list &primlist, void *dstdata, UINT32 width, UINT32 height, UINT32 pitch);
-static void drawdd_rgb555_draw_primitives(const render_primitive_list &primlist, void *dstdata, UINT32 width, UINT32 height, UINT32 pitch);
-static void drawdd_rgb888_nr_draw_primitives(const render_primitive_list &primlist, void *dstdata, UINT32 width, UINT32 height, UINT32 pitch);
-static void drawdd_bgr888_nr_draw_primitives(const render_primitive_list &primlist, void *dstdata, UINT32 width, UINT32 height, UINT32 pitch);
-static void drawdd_rgb565_nr_draw_primitives(const render_primitive_list &primlist, void *dstdata, UINT32 width, UINT32 height, UINT32 pitch);
-static void drawdd_rgb555_nr_draw_primitives(const render_primitive_list &primlist, void *dstdata, UINT32 width, UINT32 height, UINT32 pitch);
 
 
 
@@ -407,10 +380,10 @@ static int drawdd_window_draw(win_window_info *window, HDC dc, int update)
 		// based on the target format, use one of our standard renderers
 		switch (dd->blitdesc.ddpfPixelFormat.dwRBitMask)
 		{
-			case 0x00ff0000:	drawdd_rgb888_draw_primitives(*window->primlist, dd->membuffer, dd->blitwidth, dd->blitheight, dd->blitwidth);	break;
-			case 0x000000ff:	drawdd_bgr888_draw_primitives(*window->primlist, dd->membuffer, dd->blitwidth, dd->blitheight, dd->blitwidth);	break;
-			case 0xf800:		drawdd_rgb565_draw_primitives(*window->primlist, dd->membuffer, dd->blitwidth, dd->blitheight, dd->blitwidth);	break;
-			case 0x7c00:		drawdd_rgb555_draw_primitives(*window->primlist, dd->membuffer, dd->blitwidth, dd->blitheight, dd->blitwidth);	break;
+			case 0x00ff0000:	software_renderer<UINT32, 0,0,0, 16,8,0>::draw_primitives(*window->primlist, dd->membuffer, dd->blitwidth, dd->blitheight, dd->blitwidth);	break;
+			case 0x000000ff:	software_renderer<UINT32, 0,0,0, 0,8,16>::draw_primitives(*window->primlist, dd->membuffer, dd->blitwidth, dd->blitheight, dd->blitwidth);	break;
+			case 0xf800:		software_renderer<UINT16, 3,2,3, 11,5,0>::draw_primitives(*window->primlist, dd->membuffer, dd->blitwidth, dd->blitheight, dd->blitwidth);	break;
+			case 0x7c00:		software_renderer<UINT16, 3,3,3, 10,5,0>::draw_primitives(*window->primlist, dd->membuffer, dd->blitwidth, dd->blitheight, dd->blitwidth);	break;
 			default:
 				mame_printf_verbose("DirectDraw: Unknown target mode: R=%08X G=%08X B=%08X\n", (int)dd->blitdesc.ddpfPixelFormat.dwRBitMask, (int)dd->blitdesc.ddpfPixelFormat.dwGBitMask, (int)dd->blitdesc.ddpfPixelFormat.dwBBitMask);
 				break;
@@ -443,10 +416,10 @@ static int drawdd_window_draw(win_window_info *window, HDC dc, int update)
 		// based on the target format, use one of our standard renderers
 		switch (dd->blitdesc.ddpfPixelFormat.dwRBitMask)
 		{
-			case 0x00ff0000:	drawdd_rgb888_nr_draw_primitives(*window->primlist, dd->blitdesc.lpSurface, dd->blitwidth, dd->blitheight, dd->blitdesc.lPitch / 4);	break;
-			case 0x000000ff:	drawdd_bgr888_nr_draw_primitives(*window->primlist, dd->blitdesc.lpSurface, dd->blitwidth, dd->blitheight, dd->blitdesc.lPitch / 4);	break;
-			case 0xf800:		drawdd_rgb565_nr_draw_primitives(*window->primlist, dd->blitdesc.lpSurface, dd->blitwidth, dd->blitheight, dd->blitdesc.lPitch / 2);	break;
-			case 0x7c00:		drawdd_rgb555_nr_draw_primitives(*window->primlist, dd->blitdesc.lpSurface, dd->blitwidth, dd->blitheight, dd->blitdesc.lPitch / 2);	break;
+			case 0x00ff0000:	software_renderer<UINT32, 0,0,0, 16,8,0, true>::draw_primitives(*window->primlist, dd->blitdesc.lpSurface, dd->blitwidth, dd->blitheight, dd->blitdesc.lPitch / 4);	break;
+			case 0x000000ff:	software_renderer<UINT32, 0,0,0, 0,8,16, true>::draw_primitives(*window->primlist, dd->blitdesc.lpSurface, dd->blitwidth, dd->blitheight, dd->blitdesc.lPitch / 4);	break;
+			case 0xf800:		software_renderer<UINT32, 3,2,3, 11,5,0, true>::draw_primitives(*window->primlist, dd->blitdesc.lpSurface, dd->blitwidth, dd->blitheight, dd->blitdesc.lPitch / 2);	break;
+			case 0x7c00:		software_renderer<UINT32, 3,3,3, 10,5,0, true>::draw_primitives(*window->primlist, dd->blitdesc.lpSurface, dd->blitwidth, dd->blitheight, dd->blitdesc.lPitch / 2);	break;
 			default:
 				mame_printf_verbose("DirectDraw: Unknown target mode: R=%08X G=%08X B=%08X\n", (int)dd->blitdesc.ddpfPixelFormat.dwRBitMask, (int)dd->blitdesc.ddpfPixelFormat.dwGBitMask, (int)dd->blitdesc.ddpfPixelFormat.dwBBitMask);
 				break;
@@ -1359,107 +1332,3 @@ static void pick_best_mode(win_window_info *window)
 	if (result != DD_OK) mame_printf_verbose("DirectDraw: Error %08X during EnumDisplayModes call\n", (int)result);
 	mame_printf_verbose("DirectDraw: Mode selected = %4dx%4d@%3dHz\n", dd->width, dd->height, dd->refresh);
 }
-
-
-
-//============================================================
-//  SOFTWARE RENDERING
-//============================================================
-
-#define FUNC_PREFIX(x)		drawdd_rgb888_##x
-#define PIXEL_TYPE			UINT32
-#define SRCSHIFT_R			0
-#define SRCSHIFT_G			0
-#define SRCSHIFT_B			0
-#define DSTSHIFT_R			16
-#define DSTSHIFT_G			8
-#define DSTSHIFT_B			0
-
-#include "rendersw.c"
-
-#define FUNC_PREFIX(x)		drawdd_bgr888_##x
-#define PIXEL_TYPE			UINT32
-#define SRCSHIFT_R			0
-#define SRCSHIFT_G			0
-#define SRCSHIFT_B			0
-#define DSTSHIFT_R			0
-#define DSTSHIFT_G			8
-#define DSTSHIFT_B			16
-
-#include "rendersw.c"
-
-#define FUNC_PREFIX(x)		drawdd_rgb565_##x
-#define PIXEL_TYPE			UINT16
-#define SRCSHIFT_R			3
-#define SRCSHIFT_G			2
-#define SRCSHIFT_B			3
-#define DSTSHIFT_R			11
-#define DSTSHIFT_G			5
-#define DSTSHIFT_B			0
-
-#include "rendersw.c"
-
-#define FUNC_PREFIX(x)		drawdd_rgb555_##x
-#define PIXEL_TYPE			UINT16
-#define SRCSHIFT_R			3
-#define SRCSHIFT_G			3
-#define SRCSHIFT_B			3
-#define DSTSHIFT_R			10
-#define DSTSHIFT_G			5
-#define DSTSHIFT_B			0
-
-#include "rendersw.c"
-
-
-
-//============================================================
-//  SOFTWARE RENDERING -- NO READING VARIANTS
-//============================================================
-
-#define FUNC_PREFIX(x)		drawdd_rgb888_nr_##x
-#define PIXEL_TYPE			UINT32
-#define SRCSHIFT_R			0
-#define SRCSHIFT_G			0
-#define SRCSHIFT_B			0
-#define DSTSHIFT_R			16
-#define DSTSHIFT_G			8
-#define DSTSHIFT_B			0
-#define NO_DEST_READ		1
-
-#include "rendersw.c"
-
-#define FUNC_PREFIX(x)		drawdd_bgr888_nr_##x
-#define PIXEL_TYPE			UINT32
-#define SRCSHIFT_R			0
-#define SRCSHIFT_G			0
-#define SRCSHIFT_B			0
-#define DSTSHIFT_R			0
-#define DSTSHIFT_G			8
-#define DSTSHIFT_B			16
-#define NO_DEST_READ		1
-
-#include "rendersw.c"
-
-#define FUNC_PREFIX(x)		drawdd_rgb565_nr_##x
-#define PIXEL_TYPE			UINT16
-#define SRCSHIFT_R			3
-#define SRCSHIFT_G			2
-#define SRCSHIFT_B			3
-#define DSTSHIFT_R			11
-#define DSTSHIFT_G			5
-#define DSTSHIFT_B			0
-#define NO_DEST_READ		1
-
-#include "rendersw.c"
-
-#define FUNC_PREFIX(x)		drawdd_rgb555_nr_##x
-#define PIXEL_TYPE			UINT16
-#define SRCSHIFT_R			3
-#define SRCSHIFT_G			3
-#define SRCSHIFT_B			3
-#define DSTSHIFT_R			10
-#define DSTSHIFT_G			5
-#define DSTSHIFT_B			0
-#define NO_DEST_READ		1
-
-#include "rendersw.c"

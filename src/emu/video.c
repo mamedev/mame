@@ -45,6 +45,7 @@
 #include "ui.h"
 #include "aviio.h"
 #include "crsshair.h"
+#include "rendersw.c"
 
 #include "snap.lh"
 
@@ -78,15 +79,6 @@ const UINT8 video_manager::s_skiptable[FRAMESKIP_LEVELS][FRAMESKIP_LEVELS] =
 	{ 0,1,1,1,1,1,0,1,1,1,1,1 },
 	{ 0,1,1,1,1,1,1,1,1,1,1,1 }
 };
-
-
-
-//**************************************************************************
-//  FUNCTION PROTOTYPES
-//**************************************************************************
-
-// software rendering
-static void rgb888_draw_primitives(const render_primitive_list &primlist, void *dstdata, UINT32 width, UINT32 height, UINT32 pitch);
 
 
 
@@ -1076,7 +1068,7 @@ void video_manager::create_snapshot_bitmap(screen_device *screen)
 	// render the screen there
 	render_primitive_list &primlist = m_snap_target->get_primitives();
 	primlist.acquire_lock();
-	rgb888_draw_primitives(primlist, &m_snap_bitmap.pix32(0), width, height, m_snap_bitmap.rowpixels());
+	software_renderer<UINT32, 0,0,0, 16,8,0, false, true>::draw_primitives(primlist, &m_snap_bitmap.pix32(0), width, height, m_snap_bitmap.rowpixels());
 	primlist.release_lock();
 }
 
@@ -1299,21 +1291,3 @@ bool video_assert_out_of_range_pixels(running_machine &machine, bitmap_ind16 &bi
 #endif
 	return false;
 }
-
-
-
-//**************************************************************************
-//  SOFTWARE RENDERING
-//**************************************************************************
-
-#define FUNC_PREFIX(x)		rgb888_##x
-#define PIXEL_TYPE			UINT32
-#define SRCSHIFT_R			0
-#define SRCSHIFT_G			0
-#define SRCSHIFT_B			0
-#define DSTSHIFT_R			16
-#define DSTSHIFT_G			8
-#define DSTSHIFT_B			0
-#define BILINEAR_FILTER		1
-
-#include "rendersw.c"

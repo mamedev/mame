@@ -45,6 +45,7 @@
 
 // MAME headers
 #include "emu.h"
+#include "rendersw.c"
 
 // MAMEOS headers
 #include "window.h"
@@ -77,9 +78,6 @@ static int drawgdi_window_init(win_window_info *window);
 static void drawgdi_window_destroy(win_window_info *window);
 static render_primitive_list *drawgdi_window_get_primitives(win_window_info *window);
 static int drawgdi_window_draw(win_window_info *window, HDC dc, int update);
-
-// rendering
-static void drawgdi_rgb888_draw_primitives(const render_primitive_list &primlist, void *dstdata, UINT32 width, UINT32 height, UINT32 pitch);
 
 
 
@@ -216,7 +214,7 @@ static int drawgdi_window_draw(win_window_info *window, HDC dc, int update)
 
 	// draw the primitives to the bitmap
 	window->primlist->acquire_lock();
-	drawgdi_rgb888_draw_primitives(*window->primlist, gdi->bmdata, width, height, pitch);
+	software_renderer<UINT32, 0,0,0, 16,8,0>::draw_primitives(*window->primlist, gdi->bmdata, width, height, pitch);
 	window->primlist->release_lock();
 
 	// fill in bitmap-specific info
@@ -230,20 +228,3 @@ static int drawgdi_window_draw(win_window_info *window, HDC dc, int update)
 				gdi->bmdata, &gdi->bminfo, DIB_RGB_COLORS, SRCCOPY);
 	return 0;
 }
-
-
-
-//============================================================
-//  SOFTWARE RENDERING
-//============================================================
-
-#define FUNC_PREFIX(x)		drawgdi_rgb888_##x
-#define PIXEL_TYPE			UINT32
-#define SRCSHIFT_R			0
-#define SRCSHIFT_G			0
-#define SRCSHIFT_B			0
-#define DSTSHIFT_R			16
-#define DSTSHIFT_G			8
-#define DSTSHIFT_B			0
-
-#include "rendersw.c"

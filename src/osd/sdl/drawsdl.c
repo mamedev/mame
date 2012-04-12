@@ -16,6 +16,7 @@
 // MAME headers
 #include "emu.h"
 #include "ui.h"
+#include "rendersw.c"
 
 // standard SDL headers
 #include "sdlinc.h"
@@ -114,13 +115,6 @@ static int drawsdl_xy_to_render_target(sdl_window_info *window, int x, int y, in
 #if (SDLMAME_SDL2)
 static void setup_texture(sdl_window_info *window, int tempwidth, int tempheight);
 #endif
-
-// soft rendering
-static void drawsdl_rgb888_draw_primitives(const render_primitive_list &primlist, void *dstdata, UINT32 width, UINT32 height, UINT32 pitch);
-static void drawsdl_bgr888_draw_primitives(const render_primitive_list &primlist, void *dstdata, UINT32 width, UINT32 height, UINT32 pitch);
-static void drawsdl_bgra888_draw_primitives(const render_primitive_list &primlist, void *dstdata, UINT32 width, UINT32 height, UINT32 pitch);
-static void drawsdl_rgb565_draw_primitives(const render_primitive_list &primlist, void *dstdata, UINT32 width, UINT32 height, UINT32 pitch);
-static void drawsdl_rgb555_draw_primitives(const render_primitive_list &primlist, void *dstdata, UINT32 width, UINT32 height, UINT32 pitch);
 
 // YUV overlays
 
@@ -810,23 +804,23 @@ static int drawsdl_window_draw(sdl_window_info *window, UINT32 dc, int update)
 		switch (rmask)
 		{
 			case 0x0000ff00:
-				drawsdl_bgra888_draw_primitives(*window->primlist, surfptr, mamewidth, mameheight, pitch / 4);
+				software_renderer<UINT32, 0,0,0, 8,16,24>::draw_primitives(*window->primlist, surfptr, mamewidth, mameheight, pitch / 4);
 				break;
 
 			case 0x00ff0000:
-				drawsdl_rgb888_draw_primitives(*window->primlist, surfptr, mamewidth, mameheight, pitch / 4);
+				software_renderer<UINT32, 0,0,0, 16,8,0>::draw_primitives(*window->primlist, surfptr, mamewidth, mameheight, pitch / 4);
 				break;
 
 			case 0x000000ff:
-				drawsdl_bgr888_draw_primitives(*window->primlist, surfptr, mamewidth, mameheight, pitch / 4);
+				software_renderer<UINT32, 0,0,0, 0,8,16>::draw_primitives(*window->primlist, surfptr, mamewidth, mameheight, pitch / 4);
 				break;
 
 			case 0xf800:
-				drawsdl_rgb565_draw_primitives(*window->primlist, surfptr, mamewidth, mameheight, pitch / 2);
+				software_renderer<UINT16, 3,2,3, 11,5,0>::draw_primitives(*window->primlist, surfptr, mamewidth, mameheight, pitch / 2);
 				break;
 
 			case 0x7c00:
-				drawsdl_rgb555_draw_primitives(*window->primlist, surfptr, mamewidth, mameheight, pitch / 2);
+				software_renderer<UINT16, 3,3,3, 10,5,0>::draw_primitives(*window->primlist, surfptr, mamewidth, mameheight, pitch / 2);
 				break;
 
 			default:
@@ -838,7 +832,7 @@ static int drawsdl_window_draw(sdl_window_info *window, UINT32 dc, int update)
 	{
 		assert (sdl->yuv_bitmap != NULL);
 		assert (surfptr != NULL);
-		drawsdl_rgb555_draw_primitives(*window->primlist, sdl->yuv_bitmap, sdl->hw_scale_width, sdl->hw_scale_height, sdl->hw_scale_width);
+		software_renderer<UINT16, 3,3,3, 10,5,0>::draw_primitives(*window->primlist, sdl->yuv_bitmap, sdl->hw_scale_width, sdl->hw_scale_height, sdl->hw_scale_width);
 		sm->yuv_blit((UINT16 *)sdl->yuv_bitmap, sdl, surfptr, pitch);
 	}
 
@@ -879,66 +873,6 @@ static int drawsdl_window_draw(sdl_window_info *window, UINT32 dc, int update)
 #endif
 	return 0;
 }
-
-//============================================================
-//  SOFTWARE RENDERING
-//============================================================
-
-#define FUNC_PREFIX(x)		drawsdl_rgb888_##x
-#define PIXEL_TYPE			UINT32
-#define SRCSHIFT_R			0
-#define SRCSHIFT_G			0
-#define SRCSHIFT_B			0
-#define DSTSHIFT_R			16
-#define DSTSHIFT_G			8
-#define DSTSHIFT_B			0
-
-#include "rendersw.c"
-
-#define FUNC_PREFIX(x)		drawsdl_bgr888_##x
-#define PIXEL_TYPE			UINT32
-#define SRCSHIFT_R			0
-#define SRCSHIFT_G			0
-#define SRCSHIFT_B			0
-#define DSTSHIFT_R			0
-#define DSTSHIFT_G			8
-#define DSTSHIFT_B			16
-
-#include "rendersw.c"
-
-#define FUNC_PREFIX(x)		drawsdl_bgra888_##x
-#define PIXEL_TYPE			UINT32
-#define SRCSHIFT_R			0
-#define SRCSHIFT_G			0
-#define SRCSHIFT_B			0
-#define DSTSHIFT_R			8
-#define DSTSHIFT_G			16
-#define DSTSHIFT_B			24
-
-#include "rendersw.c"
-
-#define FUNC_PREFIX(x)		drawsdl_rgb565_##x
-#define PIXEL_TYPE			UINT16
-#define SRCSHIFT_R			3
-#define SRCSHIFT_G			2
-#define SRCSHIFT_B			3
-#define DSTSHIFT_R			11
-#define DSTSHIFT_G			5
-#define DSTSHIFT_B			0
-
-#include "rendersw.c"
-
-#define FUNC_PREFIX(x)		drawsdl_rgb555_##x
-#define PIXEL_TYPE			UINT16
-#define SRCSHIFT_R			3
-#define SRCSHIFT_G			3
-#define SRCSHIFT_B			3
-#define DSTSHIFT_R			10
-#define DSTSHIFT_G			5
-#define DSTSHIFT_B			0
-
-#include "rendersw.c"
-
 //============================================================
 // YUV Blitting
 //============================================================
