@@ -77,6 +77,7 @@ sprites.
 
 PALETTE_INIT( ghostb )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i;
 
 	for (i = 0; i < machine.total_colors(); i++)

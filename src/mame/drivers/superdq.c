@@ -82,6 +82,7 @@ static SCREEN_UPDATE_IND16( superdq )
 
 static PALETTE_INIT( superdq )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i;
 	static const int resistances[3] = { 820, 390, 200 };
 	double rweights[3], gweights[3], bweights[2];

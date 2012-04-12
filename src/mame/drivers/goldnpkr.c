@@ -1049,6 +1049,7 @@ static SCREEN_UPDATE_IND16( goldnpkr )
 
 static PALETTE_INIT( goldnpkr )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 /*  prom bits
     7654 3210
     ---- ---x   red component.
@@ -1092,6 +1093,7 @@ static PALETTE_INIT( goldnpkr )
 
 static PALETTE_INIT( witchcrd )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 /*
     This hardware has a feature called BLUE KILLER.
     Using the original intensity line, the PCB has a bridge
@@ -1139,6 +1141,7 @@ static PALETTE_INIT( witchcrd )
 
 static PALETTE_INIT( wcrdxtnd )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 /*
     Using the original intensity line, the PCB has a bridge
     that allow (as default) turn the background dark blue.

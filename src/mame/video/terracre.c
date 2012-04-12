@@ -95,6 +95,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 
 PALETTE_INIT( amazon )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i;
 
 	/* allocate the colortable */

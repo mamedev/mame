@@ -112,6 +112,7 @@ enum
 
 PALETTE_INIT( tx1 )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i;
 
 	static const res_net_info tx1_net_info =
@@ -1248,6 +1249,7 @@ SCREEN_UPDATE_IND16( tx1_right )
 
 PALETTE_INIT( buggyboy )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i;
 
 	for (i = 0; i < 0x100; i++)

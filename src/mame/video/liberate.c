@@ -253,6 +253,7 @@ WRITE8_MEMBER(liberate_state::prosport_paletteram_w)
 
 PALETTE_INIT( liberate )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i, bit0, bit1, bit2, g, r, b;
 
 	for (i = 0;i < 32;i++)

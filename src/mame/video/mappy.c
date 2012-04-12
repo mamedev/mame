@@ -32,6 +32,7 @@
 
 PALETTE_INIT( superpac )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	static const int resistances[3] = { 1000, 470, 220 };
 	double rweights[3], gweights[3], bweights[2];
 	int i;
@@ -91,6 +92,7 @@ PALETTE_INIT( superpac )
 
 PALETTE_INIT( mappy )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	static const int resistances[3] = { 1000, 470, 220 };
 	double rweights[3], gweights[3], bweights[2];
 	int i;
@@ -162,6 +164,7 @@ PALETTE_INIT( mappy )
 
 PALETTE_INIT( phozon )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	static const int resistances[4] = { 2200, 1000, 470, 220 };
 	double rweights[4], gweights[4], bweights[4];
 	int i;

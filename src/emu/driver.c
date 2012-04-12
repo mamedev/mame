@@ -58,7 +58,6 @@ driver_device::driver_device(const machine_config &mconfig, device_type type, co
 	  m_generic_paletteram_32(*this, "paletteram"),
 	  m_generic_paletteram2_32(*this, "paletteram2"),
 	  m_system(NULL),
-	  m_palette_init(NULL),
 	  m_latch_clear_value(0),
 	  m_flip_screen_x(0),
 	  m_flip_screen_y(0)
@@ -120,18 +119,6 @@ void driver_device::static_set_callback(device_t &device, callback_type type, dr
 
 
 //-------------------------------------------------
-//  static_set_palette_init - set the legacy
-//  palette init callback in the device
-//  configuration
-//-------------------------------------------------
-
-void driver_device::static_set_palette_init(device_t &device, palette_init_func callback)
-{
-	downcast<driver_device &>(device).m_palette_init = callback;
-}
-
-
-//-------------------------------------------------
 //  driver_start - default implementation which
 //  does nothing
 //-------------------------------------------------
@@ -157,6 +144,16 @@ void driver_device::machine_start()
 //-------------------------------------------------
 
 void driver_device::sound_start()
+{
+}
+
+
+//-------------------------------------------------
+//  palette_init - default implementation which
+//  does nothing
+//-------------------------------------------------
+
+void driver_device::palette_init()
 {
 }
 
@@ -259,8 +256,10 @@ void driver_device::device_start()
 	image_postdevice_init(machine());
 
 	// call palette_init if present
-	if (m_palette_init != NULL)
-		(*m_palette_init)(machine(), machine().region("proms")->base());
+	if (!m_callbacks[CB_PALETTE_INIT].isnull())
+		m_callbacks[CB_PALETTE_INIT]();
+	else
+		palette_init();
 
 	// start the various pieces
 	driver_start();

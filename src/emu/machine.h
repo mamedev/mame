@@ -110,37 +110,6 @@ const int DEBUG_FLAG_OSD_ENABLED	= 0x00001000;		// The OSD debugger is enabled
 //  MACROS
 //**************************************************************************
 
-// macros to wrap legacy callbacks
-#define MACHINE_START_NAME(name)	machine_start_##name
-#define MACHINE_START(name)			void MACHINE_START_NAME(name)(running_machine &machine)
-#define MACHINE_START_CALL(name)	MACHINE_START_NAME(name)(machine)
-
-#define MACHINE_RESET_NAME(name)	machine_reset_##name
-#define MACHINE_RESET(name)			void MACHINE_RESET_NAME(name)(running_machine &machine)
-#define MACHINE_RESET_CALL(name)	MACHINE_RESET_NAME(name)(machine)
-
-#define SOUND_START_NAME(name)		sound_start_##name
-#define SOUND_START(name)			void SOUND_START_NAME(name)(running_machine &machine)
-#define SOUND_START_CALL(name)		SOUND_START_NAME(name)(machine)
-
-#define SOUND_RESET_NAME(name)		sound_reset_##name
-#define SOUND_RESET(name)			void SOUND_RESET_NAME(name)(running_machine &machine)
-#define SOUND_RESET_CALL(name)		SOUND_RESET_NAME(name)(machine)
-
-#define VIDEO_START_NAME(name)		video_start_##name
-#define VIDEO_START(name)			void VIDEO_START_NAME(name)(running_machine &machine)
-#define VIDEO_START_CALL(name)		VIDEO_START_NAME(name)(machine)
-
-#define VIDEO_RESET_NAME(name)		video_reset_##name
-#define VIDEO_RESET(name)			void VIDEO_RESET_NAME(name)(running_machine &machine)
-#define VIDEO_RESET_CALL(name)		VIDEO_RESET_NAME(name)(machine)
-
-#define PALETTE_INIT_NAME(name)		palette_init_##name
-#define PALETTE_INIT(name)			void PALETTE_INIT_NAME(name)(running_machine &machine, const UINT8 *color_prom)
-#define PALETTE_INIT_CALL(name)		PALETTE_INIT_NAME(name)(machine, color_prom)
-
-
-
 // NULL versions
 #define machine_start_0 			NULL
 #define machine_reset_0 			NULL
@@ -189,12 +158,6 @@ typedef struct _input_port_private input_port_private;
 typedef struct _ui_input_private ui_input_private;
 typedef struct _debugcpu_private debugcpu_private;
 typedef struct _generic_machine_private generic_machine_private;
-
-
-// legacy callback functions
-typedef void   (*legacy_callback_func)(running_machine &machine);
-typedef void   (*palette_init_func)(running_machine &machine, const UINT8 *color_prom);
-
 
 
 // ======================> memory_region

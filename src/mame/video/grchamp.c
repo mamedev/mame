@@ -14,6 +14,7 @@
 
 PALETTE_INIT( grchamp )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	static const int resistances[3] = { 100, 270, 470 };
 	double rweights[3], gweights[3], bweights[2];
 	grchamp_state *state = machine.driver_data<grchamp_state>();

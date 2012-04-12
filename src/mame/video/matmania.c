@@ -43,6 +43,7 @@
 ***************************************************************************/
 PALETTE_INIT( matmania )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i;
 
 	for (i = 0; i < 64; i++)

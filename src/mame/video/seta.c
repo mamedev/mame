@@ -665,6 +665,7 @@ PALETTE_INIT( zingzip )
 // color prom
 PALETTE_INIT( inttoote )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int x;
 	for (x = 0; x < 0x200 ; x++)
 	{
@@ -683,6 +684,7 @@ PALETTE_INIT( setaroul )
 
 PALETTE_INIT( usclssic )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int color, pen;
 	int x;
 

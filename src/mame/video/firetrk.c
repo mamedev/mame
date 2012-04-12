@@ -65,6 +65,7 @@ static void prom_to_palette(running_machine &machine, int number, UINT8 val)
 
 PALETTE_INIT( montecar )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	firetrk_state *state = machine.driver_data<firetrk_state>();
 	int i;
 

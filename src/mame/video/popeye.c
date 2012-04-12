@@ -115,6 +115,7 @@ static void convert_color_prom(running_machine &machine,const UINT8 *color_prom)
 
 PALETTE_INIT( popeye )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	popeye_state *state = machine.driver_data<popeye_state>();
 	state->m_invertmask = 0xff;
 
@@ -123,6 +124,7 @@ PALETTE_INIT( popeye )
 
 PALETTE_INIT( popeyebl )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	popeye_state *state = machine.driver_data<popeye_state>();
 	state->m_invertmask = 0x00;
 

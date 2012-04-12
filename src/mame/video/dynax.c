@@ -28,6 +28,7 @@
 /* 0 B01234 G01234 R01234 */
 PALETTE_INIT( sprtmtch )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i;
 
 	for (i = 0; i < machine.total_colors(); i++)

@@ -224,6 +224,7 @@ INPUT_PORTS_END
 
 static PALETTE_INIT( esh )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i;
 
 	/* Oddly enough, the top 4 bits of each byte is 0 */

@@ -700,6 +700,7 @@ static SCREEN_UPDATE_IND16( peplus )
 
 static PALETTE_INIT( peplus )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 /*  prom bits
     7654 3210
     ---- -xxx   red component.

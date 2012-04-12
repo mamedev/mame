@@ -383,6 +383,7 @@ SCREEN_UPDATE_IND16( alpha68k_I )
 
 PALETTE_INIT( kyros )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i;
 
 	/* allocate the colortable */
@@ -410,6 +411,7 @@ PALETTE_INIT( kyros )
 
 PALETTE_INIT( paddlem )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i;
 
 	/* allocate the colortable */

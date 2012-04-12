@@ -364,6 +364,7 @@ static SCREEN_UPDATE_IND16( megadpkr )
 
 static PALETTE_INIT( megadpkr )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 /*
     This hardware has a feature called BLUE KILLER.
     Using the original intensity line, the PCB has a bridge

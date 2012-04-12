@@ -133,6 +133,7 @@
 
 PALETTE_INIT( tubep )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	tubep_state *state = machine.driver_data<tubep_state>();
 	int i,r,g,b;
 
@@ -685,6 +686,7 @@ SCREEN_UPDATE_IND16( tubep )
 
 PALETTE_INIT( rjammer )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i;
 
 	static const int resistors_rg[3] = { 1000, 470, 220 };

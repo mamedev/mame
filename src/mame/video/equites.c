@@ -10,6 +10,7 @@
 
 PALETTE_INIT( equites )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i;
 
 	machine.colortable = colortable_alloc(machine, 256);
@@ -29,6 +30,7 @@ PALETTE_INIT( equites )
 
 PALETTE_INIT( splndrbt )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i;
 
 	machine.colortable = colortable_alloc(machine, 256);

@@ -48,6 +48,7 @@ WRITE8_MEMBER( zodiack_state::flipscreen_w )
 
 PALETTE_INIT( zodiack )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i;
 
 	/* allocate the colortable */

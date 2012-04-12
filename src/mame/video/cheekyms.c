@@ -17,6 +17,7 @@ Functions to emulate the video hardware of the machine.
 
 PALETTE_INIT( cheekyms )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i, j, bit, r, g, b;
 
 	for (i = 0; i < 6; i++)

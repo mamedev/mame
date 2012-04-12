@@ -11,6 +11,7 @@ Functions to emulate the video hardware of the machine.
 
 PALETTE_INIT( srmp2 )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i;
 
 	for (i = 0; i < machine.total_colors(); i++)
@@ -25,6 +26,7 @@ PALETTE_INIT( srmp2 )
 
 PALETTE_INIT( srmp3 )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i;
 
 	for (i = 0; i < machine.total_colors(); i++)

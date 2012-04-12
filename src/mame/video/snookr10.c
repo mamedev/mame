@@ -57,6 +57,7 @@ WRITE8_MEMBER(snookr10_state::snookr10_colorram_w)
 
 PALETTE_INIT( snookr10 )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	/* GGBBBRRR */
 
 	int i;
@@ -117,6 +118,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 PALETTE_INIT( apple10 )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	/* GGBBBRRR */
 
 	int i, cn;

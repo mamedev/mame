@@ -46,6 +46,7 @@ static const res_net_info popper_net_info =
 
 PALETTE_INIT( popper )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	rgb_t	*rgb;
 
 	rgb = compute_res_net_all(machine, color_prom, &popper_decode_info, &popper_net_info);

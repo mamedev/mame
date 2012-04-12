@@ -47,6 +47,7 @@ other 2 bits (output & 0x0c) unknown
 
 PALETTE_INIT( 1943 )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i;
 
 	/* allocate the colortable */

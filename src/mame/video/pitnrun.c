@@ -117,6 +117,7 @@ static void pitnrun_spotlights(running_machine &machine)
 
 PALETTE_INIT (pitnrun)
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i;
 	int bit0,bit1,bit2,r,g,b;
 	for (i = 0;i < 32*3; i++)

@@ -215,6 +215,7 @@ static TILE_GET_INFO( get_tile_info_fg )
 
 static PALETTE_INIT( ettrivia )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	static const int resistances[2] = { 270, 130 };
 	double weights[2];
 	int i;

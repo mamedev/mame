@@ -32,6 +32,7 @@
 
 PALETTE_INIT( arknoid2 )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i, col;
 
 	for (i = 0; i < machine.total_colors(); i++)

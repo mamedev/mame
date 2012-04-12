@@ -26,6 +26,7 @@
 
 PALETTE_INIT( 1942 )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	rgb_t palette[256];
 	int i, colorbase;
 

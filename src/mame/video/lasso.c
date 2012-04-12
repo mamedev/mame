@@ -66,6 +66,7 @@ static rgb_t get_color( int data )
 
 PALETTE_INIT( lasso )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i;
 
 	for (i = 0; i < 0x40; i++)
@@ -75,6 +76,7 @@ PALETTE_INIT( lasso )
 
 PALETTE_INIT( wwjgtin )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i;
 
 	/* allocate the colortable */

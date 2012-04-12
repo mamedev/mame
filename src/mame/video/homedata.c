@@ -315,6 +315,7 @@ finish:
 
 PALETTE_INIT( mrokumei )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i;
 
 	/* initialize 555 RGB palette */
@@ -337,6 +338,7 @@ PALETTE_INIT( mrokumei )
 
 PALETTE_INIT( reikaids )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i;
 
 	/* initialize 555 RGB palette */
@@ -359,6 +361,7 @@ PALETTE_INIT( reikaids )
 
 PALETTE_INIT( pteacher )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i;
 
 	/* initialize 555 RGB palette */
@@ -381,6 +384,7 @@ PALETTE_INIT( pteacher )
 
 PALETTE_INIT( mirderby )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i;
 
 	for (i = 0; i < 0x100; i++)

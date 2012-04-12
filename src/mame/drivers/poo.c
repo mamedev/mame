@@ -291,6 +291,7 @@ GFXDECODE_END
 
 static PALETTE_INIT( unclepoo )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i,r,g,b,val;
 	int bit0,bit1,bit2;
 

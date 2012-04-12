@@ -54,6 +54,7 @@ background: 0x4000 bytes of ROM:    76543210    tile code low bits
 
 PALETTE_INIT( galivan )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i;
 
 	/* allocate the colortable */

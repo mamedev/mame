@@ -30,6 +30,7 @@
 ***************************************************************************/
 PALETTE_INIT( suprloco )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i;
 
 

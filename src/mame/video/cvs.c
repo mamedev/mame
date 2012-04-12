@@ -27,6 +27,7 @@
 
 PALETTE_INIT( cvs )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i, attr;
 
 	/* allocate the colortable */

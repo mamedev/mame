@@ -9,6 +9,7 @@
 
 PALETTE_INIT( shootout )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i;
 
 

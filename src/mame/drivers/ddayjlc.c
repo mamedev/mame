@@ -486,6 +486,7 @@ static MACHINE_RESET( ddayjlc )
 
 static PALETTE_INIT( ddayjlc )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i,r,g,b,val;
 	int bit0,bit1,bit2;
 

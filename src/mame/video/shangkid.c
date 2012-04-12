@@ -201,6 +201,7 @@ SCREEN_UPDATE_IND16( shangkid )
 
 PALETTE_INIT( dynamski )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i;
 
 	/* allocate the colortable */

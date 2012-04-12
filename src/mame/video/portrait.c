@@ -77,6 +77,7 @@ VIDEO_START( portrait )
 
 PALETTE_INIT( portrait )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i;
 	UINT8* lookup = machine.region("tileattr")->base();
 

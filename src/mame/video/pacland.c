@@ -90,6 +90,7 @@ static void switch_palette(running_machine &machine)
 
 PALETTE_INIT( pacland )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	pacland_state *state = machine.driver_data<pacland_state>();
 	int i;
 

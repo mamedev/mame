@@ -27,6 +27,7 @@
 ***************************************************************************/
 PALETTE_INIT( seicross )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i;
 
 

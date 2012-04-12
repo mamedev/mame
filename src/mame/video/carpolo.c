@@ -66,6 +66,7 @@
 
 PALETTE_INIT( carpolo )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i;
 
 	/* thanks to Jarek Burczynski for analyzing the circuit */

@@ -20,6 +20,7 @@
 
 PALETTE_INIT( gomoku )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i;
 	int bit0, bit1, bit2, r, g, b;
 

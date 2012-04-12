@@ -3703,7 +3703,12 @@ MACHINE_CONFIG_FRAGMENT( psxgpu )
 	((screen_device *)device)->register_vblank_callback(vblank_state_delegate(FUNC(psxgpu_device::vblank), (psxgpu_device *) owner));
 
 	MCFG_PALETTE_LENGTH( 65536 )
-	driver_device::static_set_palette_init(*owner->owner(), PALETTE_INIT_NAME(psx)); // MCFG_PALETTE_INIT( psx )
+	{
+		device_t *original_owner = owner;
+		owner = owner->owner();
+		MCFG_PALETTE_INIT(psx)
+		owner = original_owner;
+	}
 MACHINE_CONFIG_END
 
 //-------------------------------------------------

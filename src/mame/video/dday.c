@@ -50,6 +50,7 @@ static void start_countdown_timer(running_machine &machine)
 
 PALETTE_INIT( dday )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i;
 
 	palette_set_shadow_factor(machine, 1.0 / 8);

@@ -5,6 +5,7 @@
 
 PALETTE_INIT( spdodgeb )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i;
 
 

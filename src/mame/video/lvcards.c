@@ -12,6 +12,7 @@
 
 PALETTE_INIT( ponttehk )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i;
 
 	for ( i = 0; i < machine.total_colors(); i++ )
@@ -47,6 +48,7 @@ PALETTE_INIT( ponttehk )
 
 PALETTE_INIT( lvcards ) //Ever so slightly different, but different enough.
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i;
 
 	for ( i = 0; i < machine.total_colors(); i++ )

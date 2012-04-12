@@ -32,6 +32,7 @@ static const res_net_info carjmbre_net_info =
 
 PALETTE_INIT( carjmbre )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	rgb_t *rgb;
 
 	rgb = compute_res_net_all(machine, color_prom, &carjmbre_decode_info, &carjmbre_net_info);

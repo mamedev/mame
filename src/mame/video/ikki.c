@@ -13,6 +13,7 @@ Video hardware driver by Uki
 
 PALETTE_INIT( ikki )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	ikki_state *state = machine.driver_data<ikki_state>();
 	int i;
 

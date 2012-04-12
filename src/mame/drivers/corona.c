@@ -353,6 +353,7 @@ public:
 
 static PALETTE_INIT( winner )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int bit6, bit7, bit0, bit1, r, g, b;
 	int i;
 

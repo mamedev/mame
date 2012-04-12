@@ -89,6 +89,7 @@ WRITE8_MEMBER(skyfox_state::skyfox_vregs_w)
 
 PALETTE_INIT( skyfox )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i;
 
 	for (i = 0; i < 256; i++)

@@ -16,6 +16,7 @@ Knuckle Joe - (c) 1985 Taito Corporation
 
 PALETTE_INIT( kncljoe )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i;
 
 	/* allocate the colortable */

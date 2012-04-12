@@ -39,6 +39,7 @@ J Clegg
 
 PALETTE_INIT( travrusa )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i;
 
 	/* allocate the colortable */
@@ -114,6 +115,7 @@ PALETTE_INIT( travrusa )
 
 PALETTE_INIT( shtrider )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i;
 
 	/* allocate the colortable */

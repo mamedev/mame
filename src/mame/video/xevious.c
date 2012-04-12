@@ -26,6 +26,7 @@
 ***************************************************************************/
 PALETTE_INIT( xevious )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i;
 	#define TOTAL_COLORS(gfxn) (machine.gfx[gfxn]->total_colors * machine.gfx[gfxn]->color_granularity)
 
@@ -99,6 +100,7 @@ PALETTE_INIT( xevious )
 
 PALETTE_INIT( battles )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i;
 
 	machine.colortable = colortable_alloc(machine, 128+1);

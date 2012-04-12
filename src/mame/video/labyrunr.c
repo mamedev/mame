@@ -4,6 +4,7 @@
 
 PALETTE_INIT( labyrunr )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int pal;
 
 	/* allocate the colortable */

@@ -38,6 +38,7 @@
 ***************************************************************************/
 PALETTE_INIT( cclimber )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	static const int resistances_rg[3] = { 1000, 470, 220 };
 	static const int resistances_b [2] = { 470, 220 };
 	double weights_rg[3], weights_b[2];
@@ -114,6 +115,7 @@ PALETTE_INIT( cclimber )
 
 PALETTE_INIT( swimmer )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i;
 
 	for (i = 0; i < 0x100; i++)
@@ -182,6 +184,7 @@ PALETTE_INIT( swimmer )
 
 PALETTE_INIT( yamato )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i;
 
 	/* chars - 12 bits RGB */
@@ -249,6 +252,7 @@ PALETTE_INIT( yamato )
 
 PALETTE_INIT( toprollr )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i;
 
 	for (i = 0; i < 0xa0; i++)

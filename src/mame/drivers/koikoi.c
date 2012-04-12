@@ -87,6 +87,7 @@ static TILE_GET_INFO( get_tile_info )
 
 static PALETTE_INIT( koikoi )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i;
 
 	/* allocate the colortable */

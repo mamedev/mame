@@ -160,6 +160,7 @@ PALETTE_INIT( monochrome_green )
 
 PALETTE_INIT( RRRR_GGGG_BBBB )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i;
 
 	for (i = 0; i < machine.total_colors(); i++)

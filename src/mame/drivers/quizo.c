@@ -51,6 +51,7 @@ static const UINT8 rombankLookup[]={ 2, 3, 4, 4, 4, 4, 4, 5, 0, 1};
 
 static PALETTE_INIT(quizo)
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i;
 	for (i = 0;i < 16;i++)
 	{

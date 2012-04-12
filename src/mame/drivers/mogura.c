@@ -32,6 +32,7 @@ public:
 
 static PALETTE_INIT( mogura )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i, j;
 
 	j = 0;

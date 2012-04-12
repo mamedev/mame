@@ -81,7 +81,10 @@
 
 // core video callbacks
 #define MCFG_PALETTE_INIT(_func) \
-	driver_device::static_set_palette_init(*owner, PALETTE_INIT_NAME(_func)); \
+	driver_device::static_set_callback(*owner, driver_device::CB_PALETTE_INIT, PALETTE_INIT_NAME(_func)); \
+
+#define MCFG_PALETTE_INIT_OVERRIDE(_class, _func) \
+	driver_device::static_set_callback(*owner, driver_device::CB_PALETTE_INIT, driver_callback_delegate(&_class::_func, #_class "::" #_func, downcast<_class *>(&config.root_device())));
 
 #define MCFG_VIDEO_START(_func) \
 	driver_device::static_set_callback(*owner, driver_device::CB_VIDEO_START, VIDEO_START_NAME(_func)); \
@@ -98,10 +101,48 @@
 
 
 //**************************************************************************
+//  OTHER MACROS
+//**************************************************************************
+
+// macros to wrap legacy callbacks
+#define MACHINE_START_NAME(name)	machine_start_##name
+#define MACHINE_START(name)			void MACHINE_START_NAME(name)(running_machine &machine)
+#define MACHINE_START_CALL(name)	MACHINE_START_NAME(name)(machine)
+
+#define MACHINE_RESET_NAME(name)	machine_reset_##name
+#define MACHINE_RESET(name)			void MACHINE_RESET_NAME(name)(running_machine &machine)
+#define MACHINE_RESET_CALL(name)	MACHINE_RESET_NAME(name)(machine)
+
+#define SOUND_START_NAME(name)		sound_start_##name
+#define SOUND_START(name)			void SOUND_START_NAME(name)(running_machine &machine)
+#define SOUND_START_CALL(name)		SOUND_START_NAME(name)(machine)
+
+#define SOUND_RESET_NAME(name)		sound_reset_##name
+#define SOUND_RESET(name)			void SOUND_RESET_NAME(name)(running_machine &machine)
+#define SOUND_RESET_CALL(name)		SOUND_RESET_NAME(name)(machine)
+
+#define PALETTE_INIT_NAME(name)		palette_init_##name
+#define PALETTE_INIT(name)			void PALETTE_INIT_NAME(name)(running_machine &machine)
+#define PALETTE_INIT_CALL(name)		PALETTE_INIT_NAME(name)(machine)
+
+#define VIDEO_START_NAME(name)		video_start_##name
+#define VIDEO_START(name)			void VIDEO_START_NAME(name)(running_machine &machine)
+#define VIDEO_START_CALL(name)		VIDEO_START_NAME(name)(machine)
+
+#define VIDEO_RESET_NAME(name)		video_reset_##name
+#define VIDEO_RESET(name)			void VIDEO_RESET_NAME(name)(running_machine &machine)
+#define VIDEO_RESET_CALL(name)		VIDEO_RESET_NAME(name)(machine)
+
+
+
+//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
 typedef delegate<void ()> driver_callback_delegate;
+
+// legacy callback functions
+typedef void   (*legacy_callback_func)(running_machine &machine);
 
 
 // ======================> driver_device
@@ -124,6 +165,7 @@ public:
 		CB_MACHINE_RESET,
 		CB_SOUND_START,
 		CB_SOUND_RESET,
+		CB_PALETTE_INIT,
 		CB_VIDEO_START,
 		CB_VIDEO_RESET,
 		CB_COUNT
@@ -133,7 +175,6 @@ public:
 	static void static_set_game(device_t &device, const game_driver &game);
 	static void static_set_callback(device_t &device, callback_type type, legacy_callback_func callback);
 	static void static_set_callback(device_t &device, callback_type type, driver_callback_delegate callback);
-	static void static_set_palette_init(device_t &device, palette_init_func callback);
 
 	// generic helpers
 	template<class _DriverClass, void (_DriverClass::*_Function)()>
@@ -317,6 +358,7 @@ protected:
 	virtual void driver_start();
 	virtual void machine_start();
 	virtual void sound_start();
+	virtual void palette_init();
 	virtual void video_start();
 
 	// helpers called at reset
@@ -354,7 +396,6 @@ private:
 
 	// internal state
 	const game_driver *		m_system;					// pointer to the game driver
-	palette_init_func		m_palette_init;				// one-time palette init callback
 	driver_callback_delegate m_callbacks[CB_COUNT];		// start/reset callbacks
 	legacy_callback_func 	m_legacy_callbacks[CB_COUNT]; // legacy start/reset callbacks
 

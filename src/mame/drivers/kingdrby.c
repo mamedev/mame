@@ -954,6 +954,7 @@ static const ym2203_interface cowrace_ym2203_interface =
 
 static PALETTE_INIT(kingdrby)
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int	bit0, bit1, bit2 , r, g, b;
 	int	i;
 

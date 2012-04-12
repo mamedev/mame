@@ -30,6 +30,7 @@
 
 PALETTE_INIT( bking )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	static const int resistances_rg[3] = { 220, 390, 820 };
 	static const int resistances_b [2] = { 220, 390 };
 	double rweights[3], gweights[3], bweights[2];

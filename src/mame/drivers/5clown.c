@@ -537,6 +537,7 @@ static SCREEN_UPDATE_IND16( fclown )
 
 static PALETTE_INIT( fclown )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 /*
     7654 3210
     ---- ---x   RED component.

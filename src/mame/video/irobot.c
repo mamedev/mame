@@ -39,6 +39,7 @@
 
 PALETTE_INIT( irobot )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i;
 
 	/* convert the color prom for the text palette */

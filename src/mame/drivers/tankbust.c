@@ -115,6 +115,7 @@ READ8_MEMBER(tankbust_state::debug_output_area_r)
 
 static PALETTE_INIT( tankbust )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i;
 
 	for (i = 0; i < 128; i++)

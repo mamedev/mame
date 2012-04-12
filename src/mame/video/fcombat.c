@@ -39,6 +39,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 PALETTE_INIT( fcombat )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i;
 
 	/* allocate the colortable */

@@ -27,6 +27,7 @@
 
 PALETTE_INIT( tnk3 )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i;
 	int num_colors = 0x400;
 

@@ -199,6 +199,7 @@ static void m62_amplify_contrast(palette_t *palette, UINT32 numcolors)
 
 PALETTE_INIT( m62 )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	m62_state *state = machine.driver_data<m62_state>();
 	rgb_t *rgb;
 
@@ -219,6 +220,7 @@ PALETTE_INIT( m62 )
 
 PALETTE_INIT( lotlot )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	m62_state *state = machine.driver_data<m62_state>();
 	rgb_t *rgb;
 
@@ -239,6 +241,7 @@ PALETTE_INIT( lotlot )
 
 PALETTE_INIT( battroad )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	m62_state *state = machine.driver_data<m62_state>();
 	rgb_t *rgb;
 
@@ -265,6 +268,7 @@ PALETTE_INIT( battroad )
 
 PALETTE_INIT( spelunk2 )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	m62_state *state = machine.driver_data<m62_state>();
 	rgb_t *rgb;
 

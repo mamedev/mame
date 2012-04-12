@@ -4,6 +4,7 @@
 
 PALETTE_INIT( kopunch )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i;
 
 	color_prom += 24;	/* first 24 colors are black */

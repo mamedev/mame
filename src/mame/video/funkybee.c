@@ -11,6 +11,7 @@
 
 PALETTE_INIT( funkybee )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i;
 
 	/* first, the character/sprite palette */

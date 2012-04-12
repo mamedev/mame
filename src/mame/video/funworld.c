@@ -107,6 +107,7 @@
 
 PALETTE_INIT(funworld)
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i;
 	static const int resistances_rb[3] = { 1000, 470, 220 };
 	static const int resistances_g [2] = { 470, 220 };

@@ -9,6 +9,7 @@ Super Cross II (JPN Ver.)
 
 PALETTE_INIT( sprcros2 )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i;
 
 	/* allocate the colortable */

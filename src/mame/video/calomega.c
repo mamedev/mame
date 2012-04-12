@@ -70,6 +70,7 @@ SCREEN_UPDATE_IND16( calomega )
 
 PALETTE_INIT( calomega )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 /*  prom bits
     7654 3210
     ---- ---x   red component.

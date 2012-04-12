@@ -78,6 +78,7 @@ static const res_net_info survival_net_info =
 
 PALETTE_INIT( phoenix )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i;
 	rgb_t	*rgb;
 
@@ -95,6 +96,7 @@ PALETTE_INIT( phoenix )
 
 PALETTE_INIT( survival )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i;
 	rgb_t	*rgb;
 
@@ -112,6 +114,7 @@ PALETTE_INIT( survival )
 
 PALETTE_INIT( pleiads )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i;
 	rgb_t	*rgb;
 

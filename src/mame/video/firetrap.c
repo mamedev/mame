@@ -36,6 +36,7 @@
 
 PALETTE_INIT( firetrap )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i;
 
 

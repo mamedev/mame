@@ -24,6 +24,7 @@
 
 PALETTE_INIT( chaknpop )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i;
 
 	for (i = 0; i < 1024; i++)

@@ -20,6 +20,7 @@
 
 PALETTE_INIT( tceptor )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	tceptor_state *state = machine.driver_data<tceptor_state>();
 	int i;
 

@@ -94,6 +94,7 @@ static void dambustr_draw_background(running_machine &machine, bitmap_ind16 &bit
 ***************************************************************************/
 PALETTE_INIT( galaxold )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i, len;
 
 
@@ -168,6 +169,7 @@ PALETTE_INIT( stratgyx )
 
 PALETTE_INIT( rockclim )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i, len;
 
 
@@ -216,6 +218,7 @@ PALETTE_INIT( rockclim )
 ***************************************************************************/
 PALETTE_INIT( darkplnt )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i;
 
 
@@ -335,6 +338,7 @@ PALETTE_INIT( mariner )
 /* swapped r/g/b hook-up */
 PALETTE_INIT( dambustr )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int base = BACKGROUND_COLOR_BASE;
 	int i, len;
 

@@ -22,6 +22,7 @@
 
 PALETTE_INIT( champbas )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	static const int resistances_rg[3] = { 1000, 470, 220 };
 	static const int resistances_b [2] = { 470, 220 };
 	double rweights[3], gweights[3], bweights[2];
@@ -74,6 +75,7 @@ PALETTE_INIT( champbas )
 
 PALETTE_INIT( exctsccr )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i;
 
 	/* allocate the colortable */

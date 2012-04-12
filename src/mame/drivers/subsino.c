@@ -548,6 +548,7 @@ static SCREEN_UPDATE_IND16( stisub_reels )
 
 static PALETTE_INIT( subsino_2proms )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i,r,g,b,val;
 	int bit0,bit1,bit2;
 
@@ -574,6 +575,7 @@ static PALETTE_INIT( subsino_2proms )
 
 static PALETTE_INIT( subsino_3proms )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i,r,g,b,val;
 	int bit0,bit1,bit2;
 

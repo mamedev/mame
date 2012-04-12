@@ -372,6 +372,7 @@ static SCREEN_UPDATE_IND16(fortecar)
 
 static PALETTE_INIT( fortecar )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 /* Video resistors...
 
 O1 (LS374) R1K  RED

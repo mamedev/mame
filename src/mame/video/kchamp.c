@@ -12,6 +12,7 @@
 
 PALETTE_INIT( kchamp )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i, red, green, blue;
 
 	for (i = 0; i < machine.total_colors(); i++)

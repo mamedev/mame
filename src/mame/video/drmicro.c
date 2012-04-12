@@ -60,6 +60,7 @@ static TILE_GET_INFO( get_bg2_tile_info )
 
 PALETTE_INIT( drmicro )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i;
 
 	/* allocate the colortable */

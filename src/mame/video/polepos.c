@@ -27,6 +27,7 @@
 
 PALETTE_INIT( polepos )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	polepos_state *state = machine.driver_data<polepos_state>();
 	int i, j;
 

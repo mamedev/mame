@@ -3,6 +3,7 @@
 
 PALETTE_INIT( xyonix )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i;
 
 

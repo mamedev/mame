@@ -71,6 +71,7 @@ static TILE_GET_INFO( get_txttile_info )
 
 PALETTE_INIT(darkmist)
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i;
 
 	/* allocate the colortable */

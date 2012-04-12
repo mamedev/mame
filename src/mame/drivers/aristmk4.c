@@ -1587,6 +1587,7 @@ static const ppi8255_interface ppi8255_intf1 =
 /* same as Casino Winner HW */
 static PALETTE_INIT( aristmk4 )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i;
 
 	for (i = 0;i < machine.total_colors();i++)

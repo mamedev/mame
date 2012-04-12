@@ -35,6 +35,7 @@ VIDEO_START( wiz )
 ***************************************************************************/
 PALETTE_INIT( wiz )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i;
 
 

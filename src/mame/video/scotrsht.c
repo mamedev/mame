@@ -5,6 +5,7 @@
 /* Similar as Iron Horse */
 PALETTE_INIT( scotrsht )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i;
 
 	/* allocate the colortable */

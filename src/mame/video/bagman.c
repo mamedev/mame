@@ -44,6 +44,7 @@ WRITE8_MEMBER(bagman_state::bagman_colorram_w)
 ***************************************************************************/
 PALETTE_INIT( bagman )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i;
 	static const int resistances_rg[3] = { 1000, 470, 220 };
 	static const int resistances_b [2] = { 470, 220 };

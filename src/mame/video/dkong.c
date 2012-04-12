@@ -201,6 +201,7 @@ static const res_net_info radarscp_grid_net_info =
 
 PALETTE_INIT( dkong2b)
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	dkong_state *state = machine.driver_data<dkong_state>();
 	rgb_t	*rgb;
 	int i;
@@ -231,6 +232,7 @@ PALETTE_INIT( dkong2b)
 #ifdef UNUSED_FUNCTION
 PALETTE_INIT( dkong4b )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	dkong_state *state = machine.driver_data<dkong_state>();
 	int i;
 	int r,g,b;
@@ -270,6 +272,7 @@ PALETTE_INIT( dkong4b )
 
 PALETTE_INIT( radarscp )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	dkong_state *state = machine.driver_data<dkong_state>();
 	int i;
 	int r,g,b;
@@ -334,6 +337,7 @@ PALETTE_INIT( radarscp )
 
 PALETTE_INIT( radarscp1 )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	dkong_state *state = machine.driver_data<dkong_state>();
 	int i;
 	int r,g,b;
@@ -434,6 +438,7 @@ PALETTE_INIT( radarscp1 )
 
 PALETTE_INIT( dkong3 )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	dkong_state *state = machine.driver_data<dkong_state>();
 	rgb_t	*rgb;
 

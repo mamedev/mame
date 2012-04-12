@@ -12,6 +12,7 @@
 
 PALETTE_INIT( combatsc )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int pal;
 
 	/* allocate the colortable */
@@ -62,6 +63,7 @@ PALETTE_INIT( combatsc )
 
 PALETTE_INIT( combatscb )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int pal;
 
 	/* allocate the colortable */

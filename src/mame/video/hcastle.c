@@ -11,6 +11,7 @@
 
 PALETTE_INIT( hcastle )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int chip;
 
 	/* allocate the colortable */

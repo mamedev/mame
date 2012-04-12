@@ -402,6 +402,7 @@ INPUT_PORTS_END
 
 static PALETTE_INIT( jollyjgr )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i;
 
 	/* tilemap / sprites palette */

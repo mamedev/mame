@@ -18,6 +18,7 @@
 
 PALETTE_INIT( vulgus )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i;
 
 	machine.colortable = colortable_alloc(machine, 256);

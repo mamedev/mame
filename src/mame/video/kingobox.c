@@ -123,11 +123,13 @@ static void ringking_get_rgb_data( const UINT8 *color_prom, int i, int *r_data, 
 
 PALETTE_INIT( kingofb )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	palette_init_common(machine, color_prom, kingofb_get_rgb_data);
 }
 
 PALETTE_INIT( ringking )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	palette_init_common(machine, color_prom, ringking_get_rgb_data);
 }
 

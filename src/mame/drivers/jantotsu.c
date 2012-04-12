@@ -200,6 +200,7 @@ WRITE8_MEMBER(jantotsu_state::bankaddr_w)
 
 static PALETTE_INIT( jantotsu )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int	bit0, bit1, bit2, r, g, b;
 	int	i;
 

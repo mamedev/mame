@@ -94,6 +94,7 @@ public:
 
 static PALETTE_INIT( wallc )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i;
 
 	static const int resistances_rg[2] = { 330, 220 };

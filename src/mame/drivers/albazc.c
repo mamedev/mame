@@ -40,6 +40,7 @@ public:
 
 static PALETTE_INIT( hanaroku )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i;
 	int r, g, b;
 

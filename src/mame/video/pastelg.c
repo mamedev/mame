@@ -21,6 +21,7 @@ static void pastelg_gfxdraw(running_machine &machine);
 ******************************************************************************/
 PALETTE_INIT( pastelg )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i;
 	int bit0, bit1, bit2, bit3, r, g, b;
 

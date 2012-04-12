@@ -100,6 +100,7 @@ static const res_net_info lockon_pd_net_info =
 
 PALETTE_INIT( lockon )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i;
 
 	for (i = 0; i < 1024; ++i)

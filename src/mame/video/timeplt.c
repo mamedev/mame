@@ -39,6 +39,7 @@
 
 PALETTE_INIT( timeplt )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	rgb_t palette[32];
 	int i;
 

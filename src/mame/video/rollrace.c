@@ -22,6 +22,7 @@
 ***************************************************************************/
 PALETTE_INIT( rollrace )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i;
 
 

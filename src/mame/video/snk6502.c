@@ -24,6 +24,7 @@
 ***************************************************************************/
 PALETTE_INIT( snk6502 )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	snk6502_state *state = machine.driver_data<snk6502_state>();
 	int i;
 
@@ -209,6 +210,7 @@ SCREEN_UPDATE_IND16( snk6502 )
 
 PALETTE_INIT( satansat )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	snk6502_state *state = machine.driver_data<snk6502_state>();
 	int i;
 

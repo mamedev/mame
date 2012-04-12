@@ -274,6 +274,7 @@ static const ay8910_interface ay8910_config =
 
 static PALETTE_INIT( caswin )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int	bit0, bit1, bit2 , r, g, b;
 	int	i;
 

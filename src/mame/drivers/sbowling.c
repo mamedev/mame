@@ -342,6 +342,7 @@ GFXDECODE_END
 
 static PALETTE_INIT( sbowling )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i;
 
 	static const int resistances_rg[3] = { 470, 270, 100 };

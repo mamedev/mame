@@ -290,6 +290,7 @@ WRITE8_MEMBER(centiped_state::centiped_paletteram_w)
 
 PALETTE_INIT( warlords )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i;
 
 	for (i = 0; i < machine.total_colors(); i++)

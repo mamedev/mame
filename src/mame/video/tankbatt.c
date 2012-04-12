@@ -17,6 +17,7 @@
 ***************************************************************************/
 PALETTE_INIT( tankbatt )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i;
 
 	#define RES_1	0xc0 /* this is a guess */

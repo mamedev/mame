@@ -347,6 +347,7 @@ static SCREEN_UPDATE_IND16( drw80pkr )
 
 static PALETTE_INIT( drw80pkr )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int j;
 
 	for (j = 0; j < machine.total_colors(); j++)

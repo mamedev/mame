@@ -255,6 +255,7 @@ static void bullets_draw(running_machine &machine, bitmap_rgb32 &bitmap, const r
 
 PALETTE_INIT( galaxian )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	galaxian_state *state = machine.driver_data<galaxian_state>();
 	static const int rgb_resistances[3] = { 1000, 470, 220 };
 	double rweights[3], gweights[3], bweights[2];

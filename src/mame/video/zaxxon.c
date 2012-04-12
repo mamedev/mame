@@ -17,6 +17,7 @@
 
 PALETTE_INIT( zaxxon )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	zaxxon_state *state = machine.driver_data<zaxxon_state>();
 	static const int resistances[3] = { 1000, 470, 220 };
 	double rweights[3], gweights[3], bweights[2];

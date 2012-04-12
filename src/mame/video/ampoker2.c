@@ -73,6 +73,7 @@
 
 PALETTE_INIT( ampoker2 )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 /*    - bits -
       76543210
       RRRGGGBB

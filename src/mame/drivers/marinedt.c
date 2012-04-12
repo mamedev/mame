@@ -445,6 +445,7 @@ GFXDECODE_END
 
 static PALETTE_INIT( marinedt )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i,r,b,g;
 
 	for (i = 0; i < machine.total_colors(); i++)

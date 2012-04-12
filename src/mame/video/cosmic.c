@@ -77,6 +77,7 @@ static pen_t magspot_map_color( running_machine &machine, UINT8 x, UINT8 y )
 
 PALETTE_INIT( panic )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	cosmic_state *state = machine.driver_data<cosmic_state>();
 	int i;
 
@@ -119,6 +120,7 @@ PALETTE_INIT( panic )
 
 PALETTE_INIT( cosmica )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	cosmic_state *state = machine.driver_data<cosmic_state>();
 	int i;
 
@@ -180,6 +182,7 @@ PALETTE_INIT( cosmicg )
 
 PALETTE_INIT( magspot )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	cosmic_state *state = machine.driver_data<cosmic_state>();
 	int i;
 
@@ -214,6 +217,7 @@ PALETTE_INIT( magspot )
 
 PALETTE_INIT( nomnlnd )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	cosmic_state *state = machine.driver_data<cosmic_state>();
 	int i;
 

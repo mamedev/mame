@@ -21,6 +21,7 @@ WRITE8_MEMBER(higemaru_state::higemaru_colorram_w)
 
 PALETTE_INIT( higemaru )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i;
 
 	/* allocate the colortable */

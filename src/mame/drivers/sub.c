@@ -386,6 +386,7 @@ GFXDECODE_END
 
 static PALETTE_INIT( sub )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i;
 	UINT8* lookup = machine.region("proms2")->base();
 

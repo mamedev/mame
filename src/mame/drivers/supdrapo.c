@@ -126,6 +126,7 @@ static SCREEN_UPDATE_IND16( supdrapo )
 /*Maybe bit 2 & 3 of the second color prom are intensity bits? */
 static PALETTE_INIT( sdpoker )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int	bit0, bit1, bit2 , r, g, b;
 	int	i;
 

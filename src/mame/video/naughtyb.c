@@ -58,6 +58,7 @@ static const res_net_info naughtyb_net_info =
 
 PALETTE_INIT( naughtyb )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	static const int resistances[2] = { 270, 130 };
 	double weights[2];
 	int i;

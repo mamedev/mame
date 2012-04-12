@@ -101,6 +101,7 @@ public:
 
 static PALETTE_INIT( cyclemb )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i,r,g,b,val;
 	int bit0,bit1,bit2;
 
