@@ -2741,7 +2741,7 @@ static WRITE32_HANDLER( m68340_internal_base_w )
 		{
 			int base = m68k->m68340_base & 0xfffff000;
 
-			m68k->internal->install_legacy_readwrite_handler(base + 0x000, base + 0x05f, FUNC(m68340_internal_sim_r),    FUNC(m68340_internal_sim_w));
+			m68k->internal->install_legacy_readwrite_handler(base + 0x000, base + 0x05f, FUNC(m68340_internal_sim_r),    FUNC(m68340_internal_sim_w),0xffffffff);
 			m68k->internal->install_legacy_readwrite_handler(base + 0x600, base + 0x67f, FUNC(m68340_internal_timer_r),  FUNC(m68340_internal_timer_w));
 			m68k->internal->install_legacy_readwrite_handler(base + 0x700, base + 0x723, FUNC(m68340_internal_serial_r), FUNC(m68340_internal_serial_w));
 			m68k->internal->install_legacy_readwrite_handler(base + 0x780, base + 0x7bf, FUNC(m68340_internal_dma_r),    FUNC(m68340_internal_dma_w));

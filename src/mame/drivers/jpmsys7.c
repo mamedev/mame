@@ -1,7 +1,7 @@
 /* Unkonwn JPM Platform */
-/* seems to be 68340 (or similar) based, so probably after IMPACT - uses opcodes not handled by 68020, similar to SC5 */
+/* seems to be Coldfire based */
 /* only Ker - Chinq has sound roms, they seem to map in cpu space, but are missing from the rest? */
-/* I don't think this is Pluto, or other known platforms */
+/* Could be Pluto 6? */
 
 
 
@@ -24,18 +24,24 @@ protected:
 
 
 static ADDRESS_MAP_START( jpmsys7_map, AS_PROGRAM, 32, jpmsys7_state )
-	AM_RANGE(0x000000, 0x2fffff) AM_ROM
+	AM_RANGE(0x00000000, 0x002fffff) AM_ROM
+	AM_RANGE(0x10000000, 0x1000ffff) AM_RAM
+	AM_RANGE(0x20000018, 0x2000001b) AM_WRITENOP // large data upload like astra/pluto?
+	AM_RANGE(0x50000000, 0x50001fff) AM_RAM
+
+//	AM_RANGE(0xf0000000, 0xf0000fff) AM_RAM
+
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START(  jpmsys7 )
 INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( jpmsys7, jpmsys7_state )
-	MCFG_CPU_ADD("maincpu", M68020, 16000000)	 // 68340?
+	MCFG_CPU_ADD("maincpu", MCF5206E, 40000000)	 // seems to be a Coldfire of some kind
 	MCFG_CPU_PROGRAM_MAP(jpmsys7_map)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	/* unknown sound */
+	/* unknown sound (probably DMA driven DAC) */
 MACHINE_CONFIG_END
 
 

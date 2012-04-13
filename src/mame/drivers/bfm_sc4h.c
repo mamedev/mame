@@ -34,6 +34,10 @@
 #include "machine/68681.h"
 #include "bfm_sc4.lh"
 #include "machine/bfm_bd1.h"
+#include "video/awpvid.h"
+#include "machine/steppers.h" // stepper motor
+
+
 
 class sc4_state : public driver_device
 {
@@ -57,6 +61,15 @@ public:
 
 	UINT8 vfd_ser_value;
 	int vfd_ser_count;
+
+	int m_reel_changed;
+	int m_reels;
+	int m_reel12_latch;
+	int m_reel3_latch;
+	int m_reel4_latch;
+	int m_reel56_latch;
+	int m_optic_pattern;
+
 	DECLARE_READ16_MEMBER(sc4_mem_r);
 	DECLARE_WRITE16_MEMBER(sc4_mem_w);
 };
@@ -181,6 +194,9 @@ READ16_MEMBER(sc4_state::sc4_mem_r)
 	return 0x0000;
 }
 
+static WRITE8_HANDLER( bfm_sc4_reel4_w );
+
+
 WRITE16_MEMBER(sc4_state::sc4_mem_w)
 {
 	int pc = cpu_get_pc(&space.device());
@@ -222,6 +238,9 @@ WRITE16_MEMBER(sc4_state::sc4_mem_w)
 						ymz280b_w(m_ymz,1, data & 0xff);
 						break;
 
+					case 0x1330:
+						bfm_sc4_reel4_w(&space,0,data&0xf);
+						break;
 
 					default:
 						logerror("%08x maincpu write access offset %08x data %04x mem_mask %04x cs %d (LAMPS etc.)\n", pc, offset*2, data, mem_mask, cs);
@@ -326,9 +345,50 @@ void bfm_sc4_write_serial_vfd(running_machine &machine, bool cs, bool clock, boo
 
 static WRITE8_HANDLER( bfm_sc4_68307_porta_w )
 {
-	int pc = cpu_get_pc(&space->device());
-	logerror("%08x bfm_sc4_68307_porta_w %04x\n", pc, data);
+	sc4_state *state = space->machine().driver_data<sc4_state>();
+
+	state->m_reel12_latch = data;
+
+	if ( stepper_update(0, data&0x0f   ) ) state->m_reel_changed |= 0x01;
+	if ( stepper_update(1, (data>>4))&0x0f ) state->m_reel_changed |= 0x02;
+
+	if ( stepper_optic_state(0) ) state->m_optic_pattern |=  0x01;
+	else                          state->m_optic_pattern &= ~0x01;
+	if ( stepper_optic_state(1) ) state->m_optic_pattern |=  0x02;
+	else                          state->m_optic_pattern &= ~0x02;
+
+	awp_draw_reel(0);
+	awp_draw_reel(1);
 }
+
+static WRITE8_HANDLER( bfm_sc4_reel3_w )
+{
+	sc4_state *state = space->machine().driver_data<sc4_state>();
+
+	state->m_reel3_latch = data;
+
+	if ( stepper_update(2, data&0x0f ) ) state->m_reel_changed |= 0x04;
+
+	if ( stepper_optic_state(2) ) state->m_optic_pattern |=  0x04;
+	else                          state->m_optic_pattern &= ~0x04;
+
+	awp_draw_reel(2);
+}
+
+static WRITE8_HANDLER( bfm_sc4_reel4_w )
+{
+	sc4_state *state = space->machine().driver_data<sc4_state>();
+
+	state->m_reel4_latch = data;
+
+	if ( stepper_update(3, data&0x0f ) ) state->m_reel_changed |= 0x08;
+
+	if ( stepper_optic_state(3) ) state->m_optic_pattern |=  0x08;
+	else                          state->m_optic_pattern &= ~0x08;
+
+	awp_draw_reel(3);
+}
+
 
 static WRITE16_HANDLER( bfm_sc4_68307_portb_w )
 {
@@ -337,11 +397,9 @@ static WRITE16_HANDLER( bfm_sc4_68307_portb_w )
 	// serial output to the VFD at least..
 	logerror("%08x bfm_sc4_68307_portb_w %04x %04x\n", pc, data, mem_mask);
 
-	// this seems good for the earlier sets which use the VFD, but I think the later games use a generic DMD of some kind instead?
-	// we have game specific DMD roms in a couple of cases, is it possible ALL the later games are meant to have
-	// their own DMD roms rather than it being something generic? (if so we're missing a lot of DMD roms..)
 	bfm_sc4_write_serial_vfd(space->machine(), (data & 0x4000)?1:0, (data & 0x1000)?1:0, !(data & 0x2000)?1:0);
-//  bfm_sc4_write_serial_vfd(space->machine(), (data & 0x1000)?1:0, (data & 0x4000)?0:1, !(data & 0x2000)?1:0);
+
+	bfm_sc4_reel3_w(space, 0, (data&0x0f00)>>8);
 
 }
 
@@ -359,6 +417,21 @@ static READ16_HANDLER( bfm_sc4_68307_portb_r )
 	return 0x0000;//0xffff;//space->machine().rand();
 }
 
+static MACHINE_RESET( sc4 )
+{
+	sc4_state *state = machine.driver_data<sc4_state>();
+
+	int pattern =0, i;
+
+	for ( i = 0; i < state->m_reels; i++)
+	{
+		stepper_reset_position(i);
+		if ( stepper_optic_state(i) ) pattern |= 1<<i;
+	}
+
+	state->m_optic_pattern = pattern;
+}
+
 static MACHINE_START( sc4 )
 {
 	sc4_state *state = machine.driver_data<sc4_state>();
@@ -373,7 +446,19 @@ static MACHINE_START( sc4 )
 		bfm_sc4_68307_portb_w );
 	BFM_BD1_init(0);
 
+	int reels = 6;
+	state->m_reels=reels;
 
+	// todo, make reel configs a per game structure
+	for ( int n = 0; n < reels; n++ )
+	{
+		if (n!=3) stepper_config(machine, n, &starpoint_interface_48step);
+		else  stepper_config(machine, n, &starpoint_interface_200step_reel); // luckb
+	}
+	if (reels)
+	{
+		awp_reel_setup();
+	}
 }
 
 
@@ -403,14 +488,28 @@ void bfm_sc4_duart_tx(device_t *device, int channel, UINT8 data)
 
 UINT8 bfm_sc4_duart_input_r(device_t *device)
 {
-	logerror("bfm_sc4_duart_input_r\n");
-	return 0x2;
+	sc4_state *state = device->machine().driver_data<sc4_state>();
+//	printf("bfm_sc4_duart_input_r\n");
+	return state->m_optic_pattern;
 }
 
 void bfm_sc4_duart_output_w(device_t *device, UINT8 data)
 {
-	logerror("bfm_sc4_duart_output_w\n");
-//  cputag_set_input_line(device->machine(), "audiocpu", INPUT_LINE_RESET, data & 0x20 ? CLEAR_LINE : ASSERT_LINE);
+//	logerror("bfm_sc4_duart_output_w\n");
+	sc4_state *state = device->machine().driver_data<sc4_state>();
+
+	state->m_reel56_latch = data;
+
+	if ( stepper_update(4, data&0x0f   ) ) state->m_reel_changed |= 0x10;
+	if ( stepper_update(5, (data>>4)&0x0f) ) state->m_reel_changed |= 0x20;
+
+	if ( stepper_optic_state(4) ) state->m_optic_pattern |=  0x10;
+	else                          state->m_optic_pattern &= ~0x10;
+	if ( stepper_optic_state(5) ) state->m_optic_pattern |=  0x20;
+	else                          state->m_optic_pattern &= ~0x20;
+
+	awp_draw_reel(4);
+	awp_draw_reel(5);
 }
 
 
@@ -458,6 +557,7 @@ MACHINE_CONFIG_START( sc4, sc4_state )
 	MCFG_CPU_PERIODIC_INT(sc4_fake_int_check,1000)
 
 	MCFG_MACHINE_START( sc4 )
+	MCFG_MACHINE_RESET( sc4 )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -465,7 +565,7 @@ MACHINE_CONFIG_START( sc4, sc4_state )
 	MCFG_DUART68681_ADD("duart68681", 16000000/4, bfm_sc4_duart68681_config) // ?? Mhz
 
 
-	MCFG_DEFAULT_LAYOUT(layout_bfm_sc4)
+	MCFG_DEFAULT_LAYOUT(layout_awpvid14)
 
 	MCFG_SOUND_ADD("ymz", YMZ280B, 16000000) // ?? Mhz
 	MCFG_SOUND_CONFIG(ymz280b_config)

@@ -693,6 +693,7 @@ $(MAMEOBJ)/exidy.a: \
 
 $(MAMEOBJ)/f32.a: \
 	$(DRIVERS)/crospang.o $(VIDEO)/crospang.o \
+	$(DRIVERS)/silvmil.o \
 	$(DRIVERS)/f-32.o \
 
 $(MAMEOBJ)/funworld.a: \

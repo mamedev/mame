@@ -2970,6 +2970,7 @@ src/mame/drivers/sidepckt.c svneol=native#text/plain
 src/mame/drivers/sigmab52.c svneol=native#text/plain
 src/mame/drivers/sigmab98.c svneol=native#text/plain
 src/mame/drivers/silkroad.c svneol=native#text/plain
+src/mame/drivers/silvmil.c svneol=native#text/plain
 src/mame/drivers/simpl156.c svneol=native#text/plain
 src/mame/drivers/simpsons.c svneol=native#text/plain
 src/mame/drivers/skeetsht.c svneol=native#text/plain

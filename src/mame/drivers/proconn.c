@@ -13,6 +13,8 @@
 #include "machine/z80ctc.h"
 #include "machine/z80sio.h"
 #include "sound/ay8910.h"
+#include "video/awpvid.h"
+#include "machine/roc10937.h"
 
 class proconn_state : public driver_device
 {
@@ -121,8 +123,6 @@ protected:
 
 };
 
-
-
 static ADDRESS_MAP_START( proconn_map, AS_PROGRAM, 8, proconn_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xffff) AM_RAM
@@ -138,14 +138,14 @@ static ADDRESS_MAP_START( proconn_portmap, AS_IO, 8, proconn_state )
 
 	// sio (vfd should be connected to it?)
 	AM_RANGE(0x00ff, 0x00ff) AM_READWRITE(sio_r0, sio_w0)
-	AM_RANGE(0x01ff, 0x01ff) AM_READWRITE(sio_r1, sio_w1)
-	AM_RANGE(0x02ff, 0x02ff) AM_READWRITE(sio_r2, sio_w2)
+	AM_RANGE(0x01ff, 0x01ff) AM_READWRITE(sio_r2, sio_w2)
+	AM_RANGE(0x02ff, 0x02ff) AM_READWRITE(sio_r1, sio_w1)
 	AM_RANGE(0x03ff, 0x03ff) AM_READWRITE(sio_r3, sio_w3)
 
 	// ctc
 	AM_RANGE(0x00fe, 0x00fe) AM_READWRITE(ctc_r0, ctc_w0)
-	AM_RANGE(0x01fe, 0x01fe) AM_READWRITE(ctc_r1, ctc_w1)
-	AM_RANGE(0x02fe, 0x02fe) AM_READWRITE(ctc_r2, ctc_w2)
+	AM_RANGE(0x01fe, 0x01fe) AM_READWRITE(ctc_r2, ctc_w2)
+	AM_RANGE(0x02fe, 0x02fe) AM_READWRITE(ctc_r1, ctc_w1)
 	AM_RANGE(0x03fe, 0x03fe) AM_READWRITE(ctc_r3, ctc_w3)
 
 	// ay (meters connected to it?)
@@ -246,10 +246,11 @@ static Z80PIO_INTERFACE( pio_interface_5 )
 	DEVCB_NULL
 };
 
+
 static Z80CTC_INTERFACE( ctc_intf )
 {
 	0,							// timer disables
-	DEVCB_NULL,					// interrupt handler
+	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),	/* interrupt handler */
 	DEVCB_NULL,					// ZC/TO0 callback
 	DEVCB_NULL,					// ZC/TO1 callback
 	DEVCB_NULL					// ZC/TO2 callback
@@ -257,13 +258,17 @@ static Z80CTC_INTERFACE( ctc_intf )
 
 static WRITE8_DEVICE_HANDLER( serial_transmit )
 {
-	logerror("serial_transmit %02x\n", data);
+//	if (offset == 0)
+	{
+		ROC10937_newdata(0, data);
+		ROC10937_draw_16seg(0);
+	}
 }
 
 
 static int serial_receive(device_t *device, int channel)
 {
-	return -1;
+	return 0xff;
 }
 
 
@@ -286,21 +291,44 @@ static const ay8910_interface ay8910_config =
 };
 
 
+static const z80_daisy_config z80_daisy_chain[] =
+{
+	{ "z80ctc" },
+	{ "z80sio" },
+	{ NULL }
+};
+
+static MACHINE_RESET( proconn )
+{
+	ROC10937_reset(0);
+	ROC10937_draw_16seg(0);
+}
+
+static MACHINE_START( proconn )
+{
+	ROC10937_init(0, ROCKWELL10937,1);
+}
 
 static MACHINE_CONFIG_START( proconn, proconn_state )
 	MCFG_CPU_ADD("maincpu", Z80, 4000000) /* ?? Mhz */
+	MCFG_CPU_CONFIG(z80_daisy_chain)
 	MCFG_CPU_PROGRAM_MAP(proconn_map)
 	MCFG_CPU_IO_MAP(proconn_portmap)
 
-	MCFG_Z80PIO_ADD( "z80pio_1", 1000000, pio_interface_1 ) /* ?? Mhz */
-	MCFG_Z80PIO_ADD( "z80pio_2", 1000000, pio_interface_2 ) /* ?? Mhz */
-	MCFG_Z80PIO_ADD( "z80pio_3", 1000000, pio_interface_3 ) /* ?? Mhz */
-	MCFG_Z80PIO_ADD( "z80pio_4", 1000000, pio_interface_4 ) /* ?? Mhz */
-	MCFG_Z80PIO_ADD( "z80pio_5", 1000000, pio_interface_5 ) /* ?? Mhz */
-	MCFG_Z80CTC_ADD( "z80ctc",   1000000, ctc_intf ) /* ?? Mhz */
-	MCFG_Z80SIO_ADD( "z80sio",   1000000, sio_intf ) /* ?? Mhz */
+	MCFG_Z80PIO_ADD( "z80pio_1", 4000000, pio_interface_1 ) /* ?? Mhz */
+	MCFG_Z80PIO_ADD( "z80pio_2", 4000000, pio_interface_2 ) /* ?? Mhz */
+	MCFG_Z80PIO_ADD( "z80pio_3", 4000000, pio_interface_3 ) /* ?? Mhz */
+	MCFG_Z80PIO_ADD( "z80pio_4", 4000000, pio_interface_4 ) /* ?? Mhz */
+	MCFG_Z80PIO_ADD( "z80pio_5", 4000000, pio_interface_5 ) /* ?? Mhz */
+	MCFG_Z80CTC_ADD( "z80ctc",   4000000, ctc_intf ) /* ?? Mhz */
+	MCFG_Z80SIO_ADD( "z80sio",   4000000, sio_intf ) /* ?? Mhz */
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_MACHINE_START( proconn )
+	MCFG_MACHINE_RESET( proconn )
+
+	MCFG_DEFAULT_LAYOUT(layout_awpvid16)
 
 	MCFG_SOUND_ADD("aysnd", AY8910, 1000000) /* ?? Mhz */ // YM2149F on PC92?
 	MCFG_SOUND_CONFIG(ay8910_config)

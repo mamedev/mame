@@ -378,7 +378,7 @@ INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( ecoinf3_pyramid, ecoinf3_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z180,4000000) // certainly not a plain z80 at least, invalid opcodes for that
+	MCFG_CPU_ADD("maincpu", Z180,16000000) // certainly not a plain z80 at least, invalid opcodes for that
 	MCFG_CPU_PROGRAM_MAP(pyramid_memmap)
 	MCFG_CPU_IO_MAP(pyramid_portmap)
 
