@@ -5,8 +5,9 @@
   this one seems similar to (but not identical to)
   the crospang.c hardware from F2 system
 
-  todo: check clocks, refresh rate, audio balance
-        add dipswitches
+  todo: refresh rate & audio balance
+        verify dipswitches - difficulty & unknown dips
+        verify clocks for Z80 & OKI6295
 
 OSC on the PCB are 12MHz, 14.31818MHz & 4.096MHz
 
@@ -204,7 +205,7 @@ static INPUT_PORTS_START( silvmil )
 	PORT_DIPSETTING(      0x0002, DEF_STR( Easy ) )
 	PORT_DIPSETTING(      0x0003, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Hard ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Very_Hard ) )
 	PORT_DIPNAME( 0x0004, 0x0004, "DSW1:3 - Unknown" )		PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -313,7 +314,7 @@ static MACHINE_CONFIG_START( silvmil, silvmil_state )
 	MCFG_CPU_PROGRAM_MAP(silvmil_map)
 	MCFG_CPU_VBLANK_INT("screen", irq6_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_4_096MHz) // ??
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_4_096MHz) // 4.096MHz or 3.579545MHz - Need to verify
 	MCFG_CPU_PROGRAM_MAP(silvmil_sound_map)
 
 	MCFG_MACHINE_START(silvmil)
@@ -339,12 +340,12 @@ static MACHINE_CONFIG_START( silvmil, silvmil_state )
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymsnd", YM2151, XTAL_14_31818MHz/4) // ??
+	MCFG_SOUND_ADD("ymsnd", YM2151, XTAL_14_31818MHz/4)
 	MCFG_SOUND_CONFIG(silvmil_ym2151_interface)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_4_096MHz, OKIM6295_PIN7_HIGH) // ??
+	MCFG_OKIM6295_ADD("oki", XTAL_4_096MHz, OKIM6295_PIN7_HIGH) // Need to verify
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.2)
 MACHINE_CONFIG_END
