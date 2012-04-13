@@ -85,8 +85,7 @@ Custom: Imagetek I5000 (2ch video & 2ch sound)
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/eeprom.h"
-
-#define VERBOSE_AUDIO_LOG (0)	// enable to show audio writes (very noisy when music is playing)
+#include "sound/i5000.h"
 
 
 class rabbit_state : public driver_device
@@ -131,7 +130,6 @@ public:
 	DECLARE_READ32_MEMBER(rabbit_tilemap3_r);
 	DECLARE_READ32_MEMBER(randomrabbits);
 	DECLARE_WRITE32_MEMBER(rabbit_rombank_w);
-	DECLARE_WRITE32_MEMBER(rabbit_audio_w);
 	DECLARE_WRITE32_MEMBER(rabbit_blitter_w);
 };
 
@@ -536,81 +534,6 @@ WRITE32_MEMBER(rabbit_state::rabbit_rombank_w)
 
 }
 
-/*
-    Audio notes:
-
-    There are 16 PCM voices.  Each voice has 4 16-bit wide registers.
-    Voice 0 uses registers 0-3, 1 uses registers 4-7, etc.
-
-    The first 2 registers for each voice are the LSW and MSW of the sample
-    starting address.  The remaining 2 haven't been figured out yet.
-
-    Registers 64 and up are "global", they don't belong to any specific voice.
-
-    Register 66 is key-on (bitmapped so bit 0 = voice 0, bit 15 = voice 15).
-    Register 67 is key-off (bitmapped identically to the key-on register).
-
-    There are a few other "global" registers, their purpose is unknown at this
-    time (timer?  the game seems to "play music" fine with just the VBL).
-*/
-
-WRITE32_MEMBER(rabbit_state::rabbit_audio_w)
-{
-	int reg, voice, base, i;
-
-if (VERBOSE_AUDIO_LOG)
-{
-	if (mem_mask == 0xffff0000)
-	{
-		reg = offset*2;
-		data >>= 16;
-	}
-	else if (mem_mask == 0x0000ffff)
-	{
-		reg = (offset*2)+1;
-		data &= 0xffff;
-	}
-	else	logerror("audio error: unknown mask %08x\n", mem_mask);
-
-	if (reg < 64)
-	{
-		voice = reg / 4;
-		base = voice*4;
-		logerror("V%02d: parm %d = %04x\n", voice, reg-base, data);
-	}
-	else
-	{
-		if (reg == 66)
-		{
-			logerror("Key on [%04x]: ", data);
-			for (i = 0; i < 16; i++)
-			{
-				if (data & (1<<i))
-				{
-					logerror("%02d ", i);
-				}
-			}
-			logerror("\n");
-		}
-		else if (reg == 67)
-		{
-			logerror("Key off [%04x]: ", data);
-			for (i = 0; i < 16; i++)
-			{
-				if (data & (1<<i))
-				{
-					logerror("%02d ", i);
-				}
-			}
-			logerror("\n");
-		}
-		else
-		{
-			logerror("Unknown write %04x to global reg %d\n", data, reg);
-		}
-	}
-}
-}
 
 #define BLITCMDLOG 0
 #define BLITLOG 0
@@ -753,8 +676,6 @@ static ADDRESS_MAP_START( rabbit_map, AS_PROGRAM, 32, rabbit_state )
 	AM_RANGE(0x00719c, 0x00719f) AM_WRITENOP // bug in code / emulation?
 	AM_RANGE(0x200000, 0x200003) AM_READ_PORT("INPUTS") AM_DEVWRITE_LEGACY("eeprom", rabbit_eeprom_write)
 	AM_RANGE(0x400010, 0x400013) AM_READ(randomrabbits) // gfx chip status?
-	AM_RANGE(0x400980, 0x400983) AM_READ(randomrabbits) // sound chip status?
-	AM_RANGE(0x400984, 0x400987) AM_READ(randomrabbits) // sound chip status?
 	/* this lot are probably gfxchip/blitter etc. related */
 	AM_RANGE(0x400010, 0x400013) AM_WRITEONLY AM_SHARE("viewregs0" )
 	AM_RANGE(0x400100, 0x400117) AM_WRITEONLY AM_SHARE("tilemap_regs.0" ) // tilemap regs1
@@ -767,7 +688,7 @@ static ADDRESS_MAP_START( rabbit_map, AS_PROGRAM, 32, rabbit_state )
 	AM_RANGE(0x400500, 0x400503) AM_WRITEONLY AM_SHARE("viewregs7" )
 	AM_RANGE(0x400700, 0x40070f) AM_WRITE(rabbit_blitter_w) AM_SHARE("blitterregs" )
 	AM_RANGE(0x400800, 0x40080f) AM_WRITEONLY AM_SHARE("viewregs9" ) // never changes?
-	AM_RANGE(0x400900, 0x40098f) AM_WRITE(rabbit_audio_w)
+	AM_RANGE(0x400900, 0x4009ff) AM_DEVREADWRITE16("i5000snd", i5000snd_device, read, write, 0xffffffff)
 	/* hmm */
 	AM_RANGE(0x479700, 0x479713) AM_WRITEONLY AM_SHARE("viewregs10" )
 
@@ -963,7 +884,7 @@ static TIMER_DEVICE_CALLBACK( rabbit_scanline )
 
 
 static MACHINE_CONFIG_START( rabbit, rabbit_state )
-	MCFG_CPU_ADD("maincpu",M68EC020,24000000) /* 24 MHz */
+	MCFG_CPU_ADD("maincpu", M68EC020, XTAL_24MHz)
 	MCFG_CPU_PROGRAM_MAP(rabbit_map)
 	MCFG_TIMER_ADD_SCANLINE("scantimer", rabbit_scanline, "screen", 0, 1)
 
@@ -984,6 +905,13 @@ static MACHINE_CONFIG_START( rabbit, rabbit_state )
 	MCFG_PALETTE_INIT( all_black ) // the status bar palette doesn't get transfered (or our colour select is wrong).. more obvious when it's black than in 'MAME default' colours
 
 	MCFG_VIDEO_START(rabbit)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_I5000_SND_ADD("i5000snd", XTAL_40MHz)
+	MCFG_SOUND_ROUTE(0, "rspeaker", 1.00)
+	MCFG_SOUND_ROUTE(1, "lspeaker", 1.00)
 MACHINE_CONFIG_END
 
 
@@ -1034,7 +962,7 @@ ROM_START( rabbit )
 	ROM_LOAD( "jbg1.50", 0x200000, 0x200000, CRC(1fc7f6e0) SHA1(b36062d2a9683683ffffd3003d5244a185f53280) )
 	ROM_LOAD( "jbg2.60", 0x400000, 0x200000, CRC(aee265fc) SHA1(ec420ab30b9b5141162223fc1fbf663ad9f211e6) )
 
-	ROM_REGION( 0x400000, "unknown", 0 ) /* sound rom */
+	ROM_REGION( 0x400000, "i5000snd", 0 ) /* sound rom */
 	ROM_LOAD( "jsn0.11", 0x0000000, 0x400000, CRC(e1f726e8) SHA1(598d75f3ff9e43ec8ce6131ed37f4345bf2f2d8e) )
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
@@ -1042,4 +970,4 @@ ROM_START( rabbit )
 ROM_END
 
 
-GAME( 1997, rabbit,        0, rabbit,  rabbit,  rabbit,  ROT0, "Electronic Arts / Aorn", "Rabbit (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND ) // somewhat playable
+GAME( 1997, rabbit,        0, rabbit,  rabbit,  rabbit,  ROT0, "Aorn / Electronic Arts", "Rabbit (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) // somewhat playable
