@@ -345,7 +345,7 @@ static MACHINE_CONFIG_START( silvmil, silvmil_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_4_096MHz, OKIM6295_PIN7_HIGH) // Need to verify
+	MCFG_OKIM6295_ADD("oki", XTAL_4_096MHz/4, OKIM6295_PIN7_HIGH) // Need to verify
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.2)
 MACHINE_CONFIG_END
