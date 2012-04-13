@@ -8,13 +8,14 @@
   todo: check clocks, refresh rate, audio balance
         add dipswitches
 
+OSC on the PCB are 12MHz, 14.31818MHz & 4.096MHz
+
 */
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
-#include "sound/3812intf.h"
 #include "video/decospr.h"
 #include "sound/2151intf.h"
 
@@ -198,55 +199,51 @@ static INPUT_PORTS_START( silvmil )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0xfc00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("DSW")
-	PORT_DIPNAME( 0x0001, 0x0001, "DSW1:1" )
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0002, "DSW1:2" )
-	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0004, "DSW1:3" )
+	PORT_START("DSW") /* According to Service Mode - Need verification!! */
+	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Difficulty ) )		PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPSETTING(      0x0002, DEF_STR( Easy ) )
+	PORT_DIPSETTING(      0x0003, DEF_STR( Normal ) )
+	PORT_DIPSETTING(      0x0001, DEF_STR( Hard ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )
+	PORT_DIPNAME( 0x0004, 0x0004, "DSW1:3 - Unknown" )		PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, "DSW1:4" )
+	PORT_DIPNAME( 0x0008, 0x0008, "DSW1:4 - Unknown" )		PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0010, "DSW1:5" )
+	PORT_DIPNAME( 0x0010, 0x0010, "DSW1:5 - Unknown" )		PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, "DSW1:6" )
+	PORT_DIPNAME( 0x0020, 0x0020, "DSW1:6 - Unknown" )		PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, "DSW1:7" )
+	PORT_DIPNAME( 0x0040, 0x0040, "DSW1:7 - Unknown" )		PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, "DSW1:8" )
+	PORT_DIPNAME( 0x0080, 0x0080, "DSW1:8 - Unknown" )		PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0100, 0x0100, "DSW2:1" )
+	PORT_DIPNAME( 0x0100, 0x0100, "DSW2:1 - Unknown" )		PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0200, 0x0200, "DSW2:2" )
+	PORT_DIPNAME( 0x0200, 0x0200, "DSW2:2 - Unknown" )		PORT_DIPLOCATION("SW2:2")
 	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0400, 0x0400, "DSW2:3" )
-	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0800, 0x0800, "DSW2:4" )
-	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x1000, 0x1000, "DSW2:5" )
-	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x2000, 0x2000, "DSW2:6" )
-	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x4000, 0x4000, "DSW2:7" )
-	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x8000, "DSW2:8" )
-	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0400, 0x0000, DEF_STR( Language ) )		PORT_DIPLOCATION("SW2:3") /* Verified */
+	PORT_DIPSETTING(      0x0400, DEF_STR( Korean ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( English ) )
+	PORT_DIPNAME( 0x3800, 0x3800, DEF_STR( Coinage ) )		PORT_DIPLOCATION("SW2:4,5,6") /* Verified */
+	PORT_DIPSETTING(      0x0800, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(      0x1800, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( 4C_2C ) ) /* Works the same as 2C/1C */
+	PORT_DIPSETTING(      0x2800, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(      0x1000, DEF_STR( 3C_2C ) ) /* Works like 2C/1C then 1C/1C repeat */
+	PORT_DIPSETTING(      0x2000, DEF_STR( 2C_2C ) ) /* Works the same as 1C/1C */
+	PORT_DIPSETTING(      0x3800, DEF_STR( 1C_1C ) )
+	PORT_DIPNAME( 0x4000, 0x4000, "Coin Box" )			PORT_DIPLOCATION("SW2:7") /* Funtionally reversed?? */
+	PORT_DIPSETTING(      0x4000, "1" ) /* Credits from Coin1 or Coin2 */
+	PORT_DIPSETTING(      0x0000, "2" ) /* Doesn't credit up from Coin2 */
+	PORT_SERVICE_DIPLOC(  0x8000, IP_ACTIVE_LOW, "SW2:8" ) /* Verified */
 INPUT_PORTS_END
 
 static const gfx_layout tlayout =
@@ -312,11 +309,11 @@ static const ym2151_interface silvmil_ym2151_interface =
 static MACHINE_CONFIG_START( silvmil, silvmil_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 14000000) // ??
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz)
 	MCFG_CPU_PROGRAM_MAP(silvmil_map)
 	MCFG_CPU_VBLANK_INT("screen", irq6_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 14000000/4) // ??
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_4_096MHz) // ??
 	MCFG_CPU_PROGRAM_MAP(silvmil_sound_map)
 
 	MCFG_MACHINE_START(silvmil)
@@ -342,12 +339,12 @@ static MACHINE_CONFIG_START( silvmil, silvmil_state )
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymsnd", YM2151, 3427190) // ??
+	MCFG_SOUND_ADD("ymsnd", YM2151, XTAL_14_31818MHz/4) // ??
 	MCFG_SOUND_CONFIG(silvmil_ym2151_interface)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
-	MCFG_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH) // ??
+	MCFG_OKIM6295_ADD("oki", XTAL_4_096MHz, OKIM6295_PIN7_HIGH) // ??
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.2)
 MACHINE_CONFIG_END
