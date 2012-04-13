@@ -58,8 +58,8 @@ public:
 	UINT16 *m_blit_dst_ram_hiword;
 	UINT16 *m_blit_vregs;
 	UINT16 *m_blit_transpen;
-	required_shared_ptr<UINT16> m_leds0;
-	required_shared_ptr<UINT16> m_leds1;
+	optional_shared_ptr<UINT16> m_leds0;
+	optional_shared_ptr<UINT16> m_leds1;
 	optional_shared_ptr<UINT16> m_leds2;
 	DECLARE_WRITE16_MEMBER(blit_copy_w);
 	DECLARE_READ8_MEMBER(blit_status_r);
