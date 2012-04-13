@@ -126,9 +126,6 @@ Current Problem(s) - in order of priority
 
  Protection - it isn't emulated, until it is the games will never work.
 
- Sprite Encryption - this is 99% complete for Raiden 2 / DX, just a few bad
- bits remain.  No decryption support for Zero Team yet.
-
  Video emulation - used to be more complete than it is now, tile banking is
  currently broken.
 
