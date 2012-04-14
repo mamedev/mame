@@ -46,10 +46,10 @@
 			<orientation rotate="270" />
 		</screen>
 		<screen index="1">
-			<bounds x="9" y="0" width="16" height="12" />
+			<bounds x="9.1" y="0" width="16" height="12" />
 		</screen>
 		<screen index="2">
-			<bounds x="28.36" y="0" width="9" height="12" />
+			<bounds x="25.2" y="0" width="9" height="12" />
 			<orientation rotate="270" />
 		</screen>
 	</view>

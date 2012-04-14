@@ -32,12 +32,26 @@ Notes:
     enter a test mode or use the service coin either !?
 
 ***************************************************************************/
+/***************************************************************************
+
+ Jaleco's "Stepping Stage" Series
+
+ A PC computer (Harddisk not dumped yet) + Two 68000 based board set.
+ One 68000 drives 3 screens, another handles players input.
+
+stepstag:
+
+- 108070.w = 3 to pass boot tests
+- 108688.w = 1 (after ram test) to enable all items in test mode
+
+***************************************************************************/
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
 #include "sound/ymz280b.h"
 #include "rocknms.lh"
+#include "stepstag.lh"
 #include "includes/tetrisp2.h"
 #include "machine/nvram.h"
 
@@ -519,6 +533,158 @@ ADDRESS_MAP_END
 
 /***************************************************************************
 
+                              Stepping Stage
+
+***************************************************************************/
+
+READ16_MEMBER(stepstag_state::stepstag_coins_r)
+{
+	// bits 8 & 9?
+	return	( input_port_read(machine(), "COINS") &  0xfcff ) |
+			(                 machine().rand()  & ~0xfcff ) |
+			(      1 << (8 + (machine().rand()&1)) );
+}
+
+READ16_MEMBER(stepstag_state::unknown_read_0xc00000)
+{
+	return machine().rand();
+}
+
+READ16_MEMBER(stepstag_state::unknown_read_0xffff00)
+{
+	return machine().rand();
+}
+
+READ16_MEMBER(stepstag_state::unk_a42000_r)
+{
+	return 0x2000;
+}
+
+WRITE16_MEMBER(stepstag_state::stepstag_soundlatch_word_w)
+{
+	stepstag_state *state = machine().driver_data<stepstag_state>();
+
+	state->soundlatch_word_w(space, offset, data, mem_mask);
+
+	device_set_input_line(machine().device("sub"), M68K_IRQ_6, HOLD_LINE);
+
+	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
+}
+
+
+WRITE16_MEMBER(stepstag_state::stepstag_leds_w)
+{
+//	data = COMBINE_DATA()
+	if (ACCESSING_BITS_0_7)
+	{
+		set_led_status(machine(),  0,	data & 0x0001);	// P2 Front-Left
+		set_led_status(machine(),  1,	data & 0x0002);	// P2 Front-Right
+		set_led_status(machine(),  2,	data & 0x0004);	// P2 Left
+		set_led_status(machine(),  3,	data & 0x0008);	// P2 Right
+		set_led_status(machine(),  4,	data & 0x0010);	// P2 Back-Left
+		set_led_status(machine(),  5,	data & 0x0020);	// P2 Back-Right
+	}
+	if (ACCESSING_BITS_8_15)
+	{
+		set_led_status(machine(),  6,	data & 0x0100);	// P1 Front-Left
+		set_led_status(machine(),  7,	data & 0x0200);	// P1 Front-Right
+		set_led_status(machine(),  8,	data & 0x0400);	// P1 Left
+		set_led_status(machine(),  9,	data & 0x0800);	// P1 Right
+		set_led_status(machine(), 10,	data & 0x1000);	// P1 Back-Left
+		set_led_status(machine(), 11,	data & 0x2000);	// P1 Back-Right
+	}
+
+//	popmessage("FEET %02x",data);
+}
+
+// Main CPU
+static ADDRESS_MAP_START( stepstag_map, AS_PROGRAM, 16, stepstag_state )
+	AM_RANGE(0x000000, 0x0fffff) AM_ROM
+	AM_RANGE(0x100000, 0x103fff) AM_RAM															// Object RAM
+	AM_RANGE(0x108000, 0x10ffff) AM_RAM															// Work RAM
+	AM_RANGE(0x200000, 0x23ffff) AM_READWRITE8(tetrisp2_priority_r, rockn_priority_w, 0x00ff)	// Priority
+	AM_RANGE(0x300000, 0x31ffff) AM_RAM															// Palette
+	AM_RANGE(0x400000, 0x403fff) AM_RAM_WRITE(tetrisp2_vram_fg_w) AM_BASE( m_vram_fg )			// Foreground
+	AM_RANGE(0x404000, 0x407fff) AM_RAM_WRITE(tetrisp2_vram_bg_w) AM_BASE( m_vram_bg )			// Background
+//	AM_RANGE(0x408000, 0x409fff) AM_RAM															// ???
+	AM_RANGE(0x500000, 0x50ffff) AM_RAM															// Line
+	AM_RANGE(0x600000, 0x60ffff) AM_RAM_WRITE(tetrisp2_vram_rot_w) AM_BASE( m_vram_rot )		// Rotation
+	AM_RANGE(0x900000, 0x903fff) AM_READWRITE(tetrisp2_nvram_r, tetrisp2_nvram_w) AM_BASE( m_nvram) AM_SHARE("nvram")	// NVRAM
+	AM_RANGE(0x904000, 0x907fff) AM_READWRITE(tetrisp2_nvram_r, tetrisp2_nvram_w)				// NVRAM (mirror)
+
+	AM_RANGE(0xa10000, 0xa10001) AM_READ_PORT("FEET") AM_WRITE(stepstag_leds_w)					// I/O
+//	AM_RANGE(0xa30000, 0xa30001) AM_NOP	// PC?
+	AM_RANGE(0xa42000, 0xa42001) AM_READ( unk_a42000_r ) // visual ready flag + ???
+	AM_RANGE(0xa44000, 0xa44001) AM_READNOP		// watchdog
+//	AM_RANGE(0xa48000, 0xa48001) AM_WRITENOP	// PC?
+//	AM_RANGE(0xa4c000, 0xa4c001) AM_WRITENOP	// PC?
+	AM_RANGE(0xa50000, 0xa50001) AM_READWRITE( soundlatch_word_r, stepstag_soundlatch_word_w )
+	AM_RANGE(0xa60000, 0xa60003) AM_DEVWRITE8_LEGACY("ymz", ymz280b_w, 0x00ff)					// Sound
+
+	AM_RANGE(0xb00000, 0xb00001) AM_WRITENOP													// Coin Counter plus other things
+	AM_RANGE(0xb20000, 0xb20001) AM_WRITENOP													// protection related?
+	AM_RANGE(0xb40000, 0xb4000b) AM_WRITEONLY AM_BASE( m_scroll_fg )							// Foreground Scrolling
+	AM_RANGE(0xb40010, 0xb4001b) AM_WRITEONLY AM_BASE( m_scroll_bg )							// Background Scrolling
+	AM_RANGE(0xb4003e, 0xb4003f) AM_WRITENOP													// scr_size
+	AM_RANGE(0xb60000, 0xb6002f) AM_WRITEONLY AM_BASE( m_rotregs )								// Rotation Registers
+	AM_RANGE(0xba0000, 0xba001f) AM_WRITE(rockn_systemregs_w)									// System param
+	AM_RANGE(0xba001e, 0xba001f) AM_WRITENOP													// Lev 2 irq ack
+	AM_RANGE(0xbe0000, 0xbe0001) AM_READNOP														// INT-level1 dummy read
+	AM_RANGE(0xbe0002, 0xbe0003) AM_READ_PORT("BUTTONS")										// Inputs
+	AM_RANGE(0xbe0004, 0xbe0005) AM_READ(stepstag_coins_r)										// Inputs & protection
+	AM_RANGE(0xbe0008, 0xbe0009) AM_READ_PORT("DSW")											// Inputs
+	AM_RANGE(0xbe000a, 0xbe000b) AM_READNOP														// watchdog
+ADDRESS_MAP_END
+
+
+// Sub CPU (sprites)
+
+static ADDRESS_MAP_START( stepstag_sub_map, AS_PROGRAM, 16, stepstag_state )
+	AM_RANGE(0x000000, 0x0fffff) AM_ROM
+	AM_RANGE(0x200000, 0x20ffff) AM_RAM
+
+	// scrambled palettes?
+	AM_RANGE(0x300000, 0x33ffff) AM_RAM/*_WRITE(stepstag_palette_w) AM_SHARE("paletteram")*/
+
+	AM_RANGE(0x400000, 0x43ffff) AM_RAM/*_WRITE(stepstag_palette_w) AM_SHARE("paletteram2")*/
+
+	AM_RANGE(0x500000, 0x53ffff) AM_RAM/*_WRITE(stepstag_palette_w) AM_SHARE("paletteram3")*/
+
+	// rgb brightness?
+	AM_RANGE(0x700000, 0x700001) AM_WRITENOP // 0-f
+	AM_RANGE(0x700002, 0x700003) AM_WRITENOP //	0-f
+	AM_RANGE(0x700004, 0x700005) AM_WRITENOP // 0-f
+	AM_RANGE(0x700006, 0x700007) AM_WRITENOP // 0-3f (high bits?)
+
+	// left screen sprites
+	AM_RANGE(0x800000, 0x803fff) AM_RAM AM_SHARE("spriteram")		// Object RAM
+	AM_RANGE(0x800000, 0x87ffff) AM_RAM
+	AM_RANGE(0x880000, 0x880001) AM_WRITENOP // cleared after writing this sprite list
+//	AM_RANGE(0x8c0000, 0x8c0001) AM_WRITENOP // cleared at boot
+
+	// middle screen sprites
+	AM_RANGE(0x900000, 0x903fff) AM_RAM AM_SHARE("spriteram2")		// Object RAM
+	AM_RANGE(0x900000, 0x97ffff) AM_RAM
+	AM_RANGE(0x980000, 0x980001) AM_WRITENOP // cleared after writing this sprite list
+//	AM_RANGE(0x9c0000, 0x9c0001) AM_WRITENOP // cleared at boot
+
+	// right screen sprites
+	AM_RANGE(0xa00000, 0xa03fff) AM_RAM AM_SHARE("spriteram3")		// Object RAM
+	AM_RANGE(0xa00000, 0xa7ffff) AM_RAM
+	AM_RANGE(0xa80000, 0xa80001) AM_WRITENOP // cleared after writing this sprite list
+//	AM_RANGE(0xac0000, 0xac0001) AM_WRITENOP // cleared at boot
+
+	AM_RANGE(0xb00000, 0xb00001) AM_READWRITE( soundlatch_word_r, soundlatch_word_w )
+
+	AM_RANGE(0xc00000, 0xc00001) AM_READ(unknown_read_0xc00000) AM_WRITENOP //??
+	AM_RANGE(0xd00000, 0xd00001) AM_READNOP	// watchdog
+	AM_RANGE(0xf00000, 0xf00001) AM_WRITENOP //??
+	AM_RANGE(0xffff00, 0xffff01) AM_READ(unknown_read_0xffff00)
+ADDRESS_MAP_END
+
+
+/***************************************************************************
+
 
                                 Input Ports
 
@@ -944,6 +1110,73 @@ static INPUT_PORTS_START( rocknms )
 INPUT_PORTS_END
 
 
+/***************************************************************************
+                              Stepping Stage
+***************************************************************************/
+
+static INPUT_PORTS_START( stepstag )
+	PORT_START("BUTTONS") // $be0002.w
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)		// P2 start (middle)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)		// P2 start (left)		
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)		// P2 start (right)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)		// P1 start (middle)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)		// P1 start (left)		
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)		// P1 start (right)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("COINS") // $be0004.w
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_SERVICE( 0x0010, IP_ACTIVE_LOW )			// service mode
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_SERVICE1 )	// service coin
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_COIN1    )	// coin
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_SPECIAL )	// ?
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_SPECIAL )	// ?
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("FEET") // $a10000.w
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_OTHER   ) PORT_NAME("P2 Top-Left" ) PORT_CODE(KEYCODE_I)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_OTHER   ) PORT_NAME("P2 Top-Right") PORT_CODE(KEYCODE_O)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_OTHER   ) PORT_NAME("P2 Mid-Left" ) PORT_CODE(KEYCODE_J)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_OTHER   ) PORT_NAME("P2 Mid-Right") PORT_CODE(KEYCODE_K)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_OTHER   ) PORT_NAME("P2 Btm-Left" ) PORT_CODE(KEYCODE_N)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_OTHER   ) PORT_NAME("P2 Btm-Right") PORT_CODE(KEYCODE_M)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_OTHER   ) PORT_NAME("P1 Top-Left" ) PORT_CODE(KEYCODE_E)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_OTHER   ) PORT_NAME("P1 Top-Right") PORT_CODE(KEYCODE_R)
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_OTHER   ) PORT_NAME("P1 Mid-Left" ) PORT_CODE(KEYCODE_D)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_OTHER   ) PORT_NAME("P1 Mid-Right") PORT_CODE(KEYCODE_F)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_OTHER   ) PORT_NAME("P1 Btm-Left" ) PORT_CODE(KEYCODE_C)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_OTHER   ) PORT_NAME("P1 Btm-Right") PORT_CODE(KEYCODE_V)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("DSW") // $be0008.w
+	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNKNOWN  )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_SERVICE2 )	// ?
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_SERVICE3 )	// ?
+	PORT_BIT( 0x7c00, IP_ACTIVE_LOW, IPT_UNKNOWN  )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_SERVICE4 )	// ?
+INPUT_PORTS_END
+
 
 /***************************************************************************
 
@@ -1001,6 +1234,11 @@ static GFXDECODE_START( rocknms )
 	GFXDECODE_ENTRY( "gfx8", 0, layout_8x8x8,   0xe000, 0x10 ) // [3] Foreground
 GFXDECODE_END
 
+static GFXDECODE_START( stepstag )
+	GFXDECODE_ENTRY( "sprites_horiz", 0, spritelayout, 0x2400, 0x10 ) // [0] Sprites (middle screen, horizontal)
+	GFXDECODE_ENTRY( "sprites_vert",  0, spritelayout, 0x6000, 0x10 ) // [1] Sprites (left and right screens, vertical)
+	GFXDECODE_ENTRY( "foreground",    0, layout_8x8x8, 0x6000, 0x10 ) // [2] Foreground (needs RAM->tile remapping though)
+GFXDECODE_END
 
 /***************************************************************************
 
@@ -1082,6 +1320,13 @@ static DRIVER_INIT( rockn3 )
 	tetrisp2_state *state = machine.driver_data<tetrisp2_state>();
 	init_rockn_timer(machine);
 	state->m_rockn_protectdata = 4;
+}
+
+static DRIVER_INIT( stepstag )
+{
+	tetrisp2_state *state = machine.driver_data<tetrisp2_state>();
+	init_rockn_timer(machine);		// used
+	state->m_rockn_protectdata = 1;	// unused?
 }
 
 
@@ -1245,6 +1490,55 @@ static MACHINE_CONFIG_START( rocknms, tetrisp2_state )
 	MCFG_VIDEO_START(rocknms)
 
 	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_SOUND_ADD("ymz", YMZ280B, 16934400)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+MACHINE_CONFIG_END
+
+
+static MACHINE_CONFIG_START( stepstag, stepstag_state )
+	MCFG_CPU_ADD("maincpu", M68000, 16000000 ) //??
+	MCFG_CPU_PROGRAM_MAP(stepstag_map)
+	MCFG_CPU_VBLANK_INT("screen", irq2_line_hold) // lev 4 triggered by system timer
+
+	MCFG_CPU_ADD("sub", M68000, 16000000 ) //??
+	MCFG_CPU_PROGRAM_MAP(stepstag_sub_map)
+	MCFG_CPU_VBLANK_INT("screen", irq4_line_hold) // lev 6 triggered by main CPU
+
+	MCFG_NVRAM_ADD_0FILL("nvram")
+
+	// video hardware
+	MCFG_SCREEN_ADD("lscreen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(0x160, 0x100)
+	MCFG_SCREEN_VISIBLE_AREA(0, 0x160-1, 0, 0xf0-1)
+	MCFG_SCREEN_UPDATE_STATIC(stepstag_left)
+
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(0x160, 0x100)
+	MCFG_SCREEN_VISIBLE_AREA(0, 0x160-1, 0, 0xf0-1)
+	MCFG_SCREEN_UPDATE_STATIC(stepstag_mid)
+
+	MCFG_SCREEN_ADD("rscreen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(0x160, 0x100)
+	MCFG_SCREEN_VISIBLE_AREA(0, 0x160-1, 0, 0xf0-1)
+	MCFG_SCREEN_UPDATE_STATIC(stepstag_right)
+
+	MCFG_PALETTE_LENGTH(0x8000)	// 0x8000 * 3 needed I guess, but it hits an assert
+
+	MCFG_VIDEO_START( stepstag )
+	MCFG_GFXDECODE(stepstag)
+
+	MCFG_DEFAULT_LAYOUT(layout_stepstag)
+
+	// sound hardware
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ymz", YMZ280B, 16934400)
@@ -1818,6 +2112,96 @@ ROM_START( rocknms )
 	ROM_LOAD( "sound20", 0x5c00000, 0x0400000, CRC(dd5e9680) SHA1(5a2826641ad75757ce4a583e0ea901d54d20ffca)  ) // bank 6
 ROM_END
 
+
+/***************************************************************************
+
+ Stepping Stage Special
+
+ dump is incomplete, these are leftovers from an upgrade
+ music roms are missing at least
+***************************************************************************/
+
+ROM_START( stepstag )
+	ROM_REGION( 0x100000, "maincpu", 0 ) // 68000
+	ROM_LOAD16_BYTE( "vj98344ver11.4", 0x00000, 0x80000, CRC(391ca913) SHA1(2cc329aa6419f8a0d7e0fb8a9f4c2b8ca25197b3) )
+	ROM_LOAD16_BYTE( "vj98344ver11.1", 0x00001, 0x80000, CRC(aedcb225) SHA1(f167c390e79ffbf7c019c326384ae656ae8b7d13) )
+
+	ROM_REGION( 0x100000, "sub", 0 ) // 68000
+	ROM_LOAD16_BYTE( "vj98348ver11.11", 0x00000, 0x80000, CRC(29b7f848) SHA1(c4d89e5c9be622b2d9038c359a5f65ce0dd461b0) )
+	ROM_LOAD16_BYTE( "vj98348ver11.14", 0x00001, 0x80000, CRC(e3314c6c) SHA1(61b0e9f9d0126d9f475304866a03cfa21701d9aa) )
+
+	ROM_REGION( 0x2000000, "sprites_horiz", 0 ) // middle screen sprites (horizontal)
+	ROM_LOAD( "mr99001-03", 0x0000000, 0x400000, CRC(40fee0df) SHA1(94c3567e82f8039b3169bf4dcb1fcd9e39c6eb27) )	// HORIZONTAL TRUSTED
+	ROM_LOAD( "mr99001-04", 0x0400000, 0x400000, CRC(d6837981) SHA1(56709d73304f0b186c70844ae96f73400b541609) )	// HORIZONTAL TRUSTED
+	ROM_LOAD( "mr99001-05", 0x0800000, 0x400000, CRC(3958473b) SHA1(12279a587263290945744b22aafb80460eea77f7) )	// HORIZONTAL TRUSTED
+	ROM_LOAD( "mr99001-06", 0x0c00000, 0x400000, CRC(cfa27c93) SHA1(a0837877736e8e898f3acc64bc87ee0cc4d9f243) )	// HORIZONTAL
+	ROM_LOAD( "s.s.s._vj-98348_19_pr99021-02", 0x1000000, 0x400000, CRC(2d98da1a) SHA1(b09375fa1b4b2e0794632d6e237459009f40310d) )	// HORIZONTAL TRUSTED
+	ROM_FILL(               0x1400000, 0x400000, 0x03 )	// debug
+	ROM_FILL(               0x1800000, 0x400000, 0x04 )	// debug
+	ROM_FILL(               0x1c00000, 0x400000, 0x05 )	// debug
+
+	ROM_REGION( 0x0c00000, "sprites_vert", 0 )	// left and right screens sprites (vertical)
+	ROM_LOAD( "mr99001-01", 0x000000, 0x400000, CRC(aa92cebf) SHA1(2ccc0d2ef9bc92c27f0a625819154bbcf9cfde0c) )	// VERTICAL
+	ROM_LOAD( "mr99001-02", 0x400000, 0x400000, CRC(12c65d86) SHA1(7fe5853fa3ba086f8da15702b126eb13c6ea30a9) )	// VERTICAL
+	// rom _26_ seems a bad dump of rom _3_, overwrite it:
+	ROM_LOAD( "s.s.s._vj-98348_26_pr99021-01", 0x800000, 0x400000, BAD_DUMP CRC(fefb3777) SHA1(df624e105ab1dea52317e318ad29caa02b900788) )	// VERTICAL
+	ROM_LOAD( "s.s.s._vj-98348_3_pr99021-01",  0x800000, 0x400000, CRC(e0fbc6f1) SHA1(7ca4507702f3f81bb9de3f9b5d270d379e439633) )			// VERTICAL
+
+	ROM_REGION( 0x400000, "foreground", 0 ) // foreground tiles
+	ROM_LOAD( "mr99001-05", 0x000000, 0x400000, CRC(3958473b) SHA1(12279a587263290945744b22aafb80460eea77f7) )	// HORIZONTAL Temporary hack
+
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE )	// Samples
+	ROM_LOAD( "stepstag-sound", 0x000000, 0x400000, NO_DUMP )
+
+	DISK_REGION( "disks" )
+	DISK_IMAGE("stepstag", 0, NO_DUMP)
+ROM_END
+
+/***************************************************************************
+
+ Stepping 3 Superior
+
+ dump is incomplete, these are leftovers from an upgrade
+ music roms are missing at least
+***************************************************************************/
+
+ROM_START( step3 )
+	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASE00 ) // 68000
+	ROM_LOAD16_BYTE( "vj98344_step3.4", 0x00000, 0x80000, NO_DUMP )
+	ROM_LOAD16_BYTE( "vj98344_step3.1", 0x00001, 0x80000, NO_DUMP )
+
+	ROM_REGION( 0x100000, "sub", 0 ) // 68000
+	ROM_LOAD16_BYTE( "vj98348_step3_11_v1.1", 0x00000, 0x80000, CRC(9c36aef5) SHA1(bbac48c2c7949a6f8a6ec83515e94a343c88d1b6) )
+	ROM_LOAD16_BYTE( "vj98348_step3_14_v1.1", 0x00001, 0x80000, CRC(b86be557) SHA1(49dbd6ef1c50adcf3386d5423da8ae7685649c46) )
+
+	ROM_REGION( 0xc00000, "sprites_horiz", 0 )	 // middle screen sprites (horizontal)
+	ROM_LOAD( "mr99030-04.ic17", 0x000000, 0x400000, CRC(3eac3591) SHA1(3b294e94af23fd92fdf51d2c9c43f60d2ebd1688) )  // 8x8 HORIZONTAL
+	ROM_LOAD( "mr99030-05.ic18", 0x400000, 0x400000, CRC(dea7b8d6) SHA1(d7d98675eb3998a8057929f90aa340c1e5f6a617) )	 // 8x8 HORIZONTAL
+	ROM_LOAD( "mr99030-06.ic19", 0x800000, 0x400000, CRC(71489d79) SHA1(0398a354c2588e3974cb76a331e46165db6af06d) )	 // 8x8 HORIZONTAL
+
+	ROM_REGION( 0x1800000, "sprites_vert", 0 )	// left and right screens sprites (vertical)
+	// these roms appear twice
+	ROM_LOAD( "mr9930-01.ic2",         0x0000000, 0x400000, CRC(9e3e054e) SHA1(06a4fa76cb83dbe9d565d5ccd0a5ecc5067887c9) )	// sprites? VERTICAL (2x)
+	ROM_LOAD( "mr9930-01.ic30",        0x0000000, 0x400000, CRC(9e3e054e) SHA1(06a4fa76cb83dbe9d565d5ccd0a5ecc5067887c9) )	// sprites? VERTICAL (2x)
+	ROM_LOAD( "mr9930-02.ic3",         0x0400000, 0x400000, CRC(b23c29f4) SHA1(a7b10a3a9af43db319baf8633bb3728120960923) )	// 8x8 VERTICAL (2x)
+	ROM_LOAD( "mr9930-02.ic29",        0x0400000, 0x400000, CRC(b23c29f4) SHA1(a7b10a3a9af43db319baf8633bb3728120960923) )	// 8x8 VERTICAL (2x)
+	ROM_LOAD( "mr9930-03.ic28",        0x0800000, 0x400000, CRC(9a5d070f) SHA1(b4668b4f299033140a2c56499cc2712ba111cb57) )	// 8x8 VERTICAL (2x)
+	ROM_LOAD( "mr9930-03.ic4",         0x0800000, 0x400000, CRC(9a5d070f) SHA1(b4668b4f299033140a2c56499cc2712ba111cb57) )	// 8x8 VERTICAL
+	ROM_LOAD( "vj98348_step3_4_v1.1",  0x0c00000, 0x400000, CRC(dec612df) SHA1(acb86bb90c1cc61c7db3e022c69a5ff0611ffbae) )	// 8x8 VERTICAL?
+	ROM_LOAD( "vj98348_step3_18_v1.1", 0x1000000, 0x400000, CRC(bc92f0a0) SHA1(49c08de7a898a27972d4209709ddf447c5dca36a) )	// 8x8 VERTICAL?
+	ROM_LOAD( "vj98348_step3_25_v1.1", 0x1400000, 0x400000, CRC(dec612df) SHA1(acb86bb90c1cc61c7db3e022c69a5ff0611ffbae) )	// 8x8 VERTICAL?
+
+	ROM_REGION( 0x400000, "foreground", 0 ) // foreground tiles
+	ROM_LOAD( "mr99030-05.ic18", 0x000000, 0x400000, CRC(dea7b8d6) SHA1(d7d98675eb3998a8057929f90aa340c1e5f6a617) )	 // 8x8 HORIZONTAL Temporary hack
+
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE )	/* Samples */
+	ROM_LOAD( "step3-sound", 0x000000, 0x400000, NO_DUMP )
+
+	DISK_REGION( "disks" )
+	DISK_IMAGE("step3", 0, NO_DUMP)
+ROM_END
+
+
 /***************************************************************************
 
 
@@ -1838,3 +2222,11 @@ GAME( 1999, rockn2,   0,        rockn2,   rockn,   rockn2,   ROT270, "Jaleco",  
 GAME( 1999, rocknms,  0,        rocknms,  rocknms, rocknms,  ROT0,   "Jaleco",                      "Rock'n MegaSession (Japan)",      GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
 GAME( 1999, rockn3,   0,        rockn2,   rockn,   rockn3,   ROT270, "Jaleco",                      "Rock'n 3 (Japan)",                GAME_SUPPORTS_SAVE )
 GAME( 2000, rockn4,   0,        rockn2,   rockn,   rockn3,   ROT270, "Jaleco / PCCWJ",              "Rock'n 4 (Japan, prototype)",     GAME_SUPPORTS_SAVE )
+
+// Undumped:
+// - Stepping Stage <- the original Game
+// - Stepping Stage 2 Supreme
+// Dumped (partly):
+GAME( 1999, stepstag, 0, stepstag, stepstag, stepstag, ROT0, "Jaleco", "Stepping Stage Special", GAME_NO_SOUND| GAME_NOT_WORKING)
+GAME( 1999, step3,    0, stepstag, stepstag, stepstag, ROT0, "Jaleco", "Stepping 3 Superior",    GAME_NO_SOUND| GAME_NOT_WORKING)
+

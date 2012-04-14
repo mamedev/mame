@@ -142,7 +142,6 @@ WRITE16_MEMBER(tetrisp2_state::tetrisp2_vram_bg_w)
 }
 
 
-
 #define NX_1  (0x40)
 #define NY_1  (0x40)
 
@@ -344,12 +343,10 @@ VIDEO_START( rocknms )
                 ---- ---- 7654 3210     Tile's X position in the tile page (*)
 
     4.w         fedc ---- ---- ----     Color
-                ---- ba98 7--- ----
-                ---- ---- -654 3210     Tile Page (32x32 tiles = 256x256 pixels each)
+                ---- ba98 7654 3210     Tile Page (32x32 tiles = 256x256 pixels each)
 
-    6.w         fedc ba98 ---- ----
-                ---- ---- 7654 ----     Y Size - 1 (*)
-                ---- ---- ---- 3210     X Size - 1 (*)
+    6.w         fedc ba98 ---- ----     Y Size - 1 (*)
+                ---- ---- 7654 3210     X Size - 1 (*)
 
     8.w         fedc ba-- ---- ----
                 ---- --98 7654 3210     Y (Signed)
@@ -370,7 +367,8 @@ VIDEO_START( rocknms )
   -- it appears that sprites which should be shadows are often rendered *UNDER* the tilemaps, maybe related?
 */
 template<class _BitmapClass>
-static void tetrisp2_draw_sprites(running_machine &machine, _BitmapClass &bitmap, bitmap_ind8 &bitmap_pri, const rectangle &cliprect, UINT8* priority_ram, UINT16 *sprram_top, size_t sprram_size, int gfxnum, int flip)
+static void tetrisp2_draw_sprites(	running_machine &machine, _BitmapClass &bitmap, bitmap_ind8 &bitmap_pri, const rectangle &cliprect, UINT8* priority_ram,
+									UINT16 *sprram_top, size_t sprram_size, int gfxnum, int flip	)
 {
 	int tx, ty, sx, sy, flipx, flipy;
 	int xsize, ysize;
@@ -380,7 +378,7 @@ static void tetrisp2_draw_sprites(running_machine &machine, _BitmapClass &bitmap
 	UINT32 primask;
 	gfx_element *gfx = machine.gfx[gfxnum];
 
-	UINT16		*source	=	sprram_top;
+	UINT16	*source	=	sprram_top;
 	UINT16	*finish	=	sprram_top + (sprram_size - 0x10) / 2;
 
 	for (; source<finish; source+=8)
@@ -389,7 +387,8 @@ static void tetrisp2_draw_sprites(running_machine &machine, _BitmapClass &bitmap
 
 		pri = (attr & 0x00f0);
 
-		if ((attr & 0x0004) == 0)			continue;
+		if ((attr & 0x0004) == 0)
+			continue;
 
 		flipx	=	attr & 1;
 		flipy	=	attr & 2;
@@ -410,8 +409,8 @@ static void tetrisp2_draw_sprites(running_machine &machine, _BitmapClass &bitmap
 		sx		=	(source[5] & 0x3ff) - (source[5] & 0x400);
 		sy		=	(source[4] & 0x1ff) - (source[4] & 0x200);
 
-		xzoom = 0x10000;
-		yzoom = 0x10000;
+		xzoom	=	1 << 16;
+		yzoom	=	1 << 16;
 
 		gfx_element_set_source_clip(gfx, tx, xsize, ty, ysize);
 
@@ -530,7 +529,8 @@ SCREEN_UPDATE_IND16( tetrisp2 )
 	else if (asc_pri == 2)
 		state->m_tilemap_fg->draw(bitmap, cliprect, 0, 1 << 2);
 
-	tetrisp2_draw_sprites(screen.machine(), bitmap, screen.machine().priority_bitmap, cliprect, state->m_priority, state->m_spriteram, state->m_spriteram.bytes(), 0, (state->m_systemregs[0x00] & 0x02));
+	tetrisp2_draw_sprites(	screen.machine(), bitmap, screen.machine().priority_bitmap, cliprect, state->m_priority,
+							state->m_spriteram, state->m_spriteram.bytes(), 0, (state->m_systemregs[0x00] & 0x02)	);
 	return 0;
 }
 
@@ -615,7 +615,8 @@ SCREEN_UPDATE_IND16( rockntread )
 	else if (asc_pri == 2)
 		state->m_tilemap_fg->draw(bitmap, cliprect, 0, 1 << 2);
 
-	tetrisp2_draw_sprites(screen.machine(), bitmap, screen.machine().priority_bitmap,cliprect, state->m_priority, state->m_spriteram, state->m_spriteram.bytes(), 0, (state->m_systemregs[0x00] & 0x02));
+	tetrisp2_draw_sprites(	screen.machine(), bitmap, screen.machine().priority_bitmap, cliprect, state->m_priority,
+							state->m_spriteram, state->m_spriteram.bytes(), 0, (state->m_systemregs[0x00] & 0x02)	);
 	return 0;
 }
 
@@ -677,7 +678,8 @@ SCREEN_UPDATE_RGB32( rocknms_left )
 	else if (asc_pri == 2)
 		state->m_tilemap_sub_fg->draw(bitmap, cliprect, 0, 1 << 2);
 
-	tetrisp2_draw_sprites(screen.machine(), bitmap, screen.machine().priority_bitmap,cliprect, state->m_priority, state->m_spriteram2, state->m_spriteram2.bytes(), 4, (state->m_systemregs[0x00] & 0x02));
+	tetrisp2_draw_sprites(	screen.machine(), bitmap, screen.machine().priority_bitmap, cliprect, state->m_priority,
+							state->m_spriteram2, state->m_spriteram2.bytes(), 4, (state->m_systemregs[0x00] & 0x02)	);
 
 	return 0;
 }
@@ -738,7 +740,118 @@ SCREEN_UPDATE_RGB32( rocknms_right )
 	else if (asc_pri == 2)
 		state->m_tilemap_fg->draw(bitmap, cliprect, 0, 1 << 2);
 
-	tetrisp2_draw_sprites(screen.machine(), bitmap, screen.machine().priority_bitmap,cliprect, state->m_priority, state->m_spriteram, state->m_spriteram.bytes(), 0, (state->m_systemregs[0x00] & 0x02));
+	tetrisp2_draw_sprites(	screen.machine(), bitmap, screen.machine().priority_bitmap, cliprect, state->m_priority,
+							state->m_spriteram, state->m_spriteram.bytes(), 0, (state->m_systemregs[0x00] & 0x02)	);
 
 	return 0;
+}
+
+/***************************************************************************
+
+                              Stepping Stage
+
+***************************************************************************/
+
+// Temporary hack for stpestag: unaltered ASCII bytes are written in the most significant byte
+// of code_hi, one of the CPUs probably reads them and writes the actual tile codes somewhere.
+static TILE_GET_INFO( stepstag_get_tile_info_fg )
+{
+	stepstag_state *state = machine.driver_data<stepstag_state>();
+	UINT16 code_hi = state->m_vram_fg[ 2 * tile_index + 0];
+	UINT16 code_lo = state->m_vram_fg[ 2 * tile_index + 1];
+
+	// ASCII -> tile codes
+	code_hi = (code_hi & 0xff00) >> 8;
+	code_hi = (code_hi & 0x0f) + (code_hi & 0xf0)*2;
+	code_hi += 0xbd6c;
+
+	SET_TILE_INFO(
+			2,
+			code_hi,
+			code_lo & 0xf,
+			0);
+}
+
+VIDEO_START( stepstag )
+{
+	stepstag_state *state = machine.driver_data<stepstag_state>();
+	state->m_flipscreen_old = -1;
+
+	state->m_tilemap_bg = tilemap_create(	machine, get_tile_info_bg,tilemap_scan_rows,
+											16,16,NX_0,NY_0);
+
+	// Temporary hack
+	state->m_tilemap_fg = tilemap_create(	machine, stepstag_get_tile_info_fg,tilemap_scan_rows,
+											8,8,NX_1,NY_1);
+
+	state->m_tilemap_rot = tilemap_create(	machine, get_tile_info_rot,tilemap_scan_rows,
+											16,16,NX_0*2,NY_0*2);
+
+	state->m_tilemap_bg->set_transparent_pen(0);
+	state->m_tilemap_fg->set_transparent_pen(0);
+	state->m_tilemap_rot->set_transparent_pen(0);
+
+	// should be smaller and mirrored like m32 I guess
+	state->m_priority = auto_alloc_array(machine, UINT8, 0x40000);
+
+	ms32_rearrange_sprites(machine, "sprites_horiz");
+	ms32_rearrange_sprites(machine, "sprites_vert");
+}
+
+SCREEN_UPDATE_IND16( stepstag_left )
+{
+	stepstag_state *state = screen.machine().driver_data<stepstag_state>();
+
+	bitmap.fill(0, cliprect);
+	screen.machine().priority_bitmap.fill(0);
+
+	tetrisp2_draw_sprites(	screen.machine(), bitmap, screen.machine().priority_bitmap, cliprect, state->m_priority,
+							state->m_spriteram, state->m_spriteram.bytes(), 1, (state->m_systemregs[0x00] & 0x02)	);
+	return 0;
+}
+SCREEN_UPDATE_IND16( stepstag_right )
+{
+	stepstag_state *state = screen.machine().driver_data<stepstag_state>();
+
+	bitmap.fill(0, cliprect);
+	screen.machine().priority_bitmap.fill(0);
+
+	tetrisp2_draw_sprites(	screen.machine(), bitmap, screen.machine().priority_bitmap, cliprect, state->m_priority,
+							state->m_spriteram3, state->m_spriteram3.bytes(), 1, (state->m_systemregs[0x00] & 0x02)	);
+	return 0;
+}
+
+SCREEN_UPDATE_IND16( stepstag_mid )
+{
+	stepstag_state *state = screen.machine().driver_data<stepstag_state>();
+
+	bitmap.fill(0, cliprect);
+	screen.machine().priority_bitmap.fill(0);
+
+	tetrisp2_draw_sprites(	screen.machine(), bitmap, screen.machine().priority_bitmap, cliprect, state->m_priority,
+							state->m_spriteram2, state->m_spriteram2.bytes(), 0, (state->m_systemregs[0x00] & 0x02)	);
+
+	state->m_tilemap_fg->draw(bitmap, cliprect, 0, 1 << 2);
+
+	return 0;
+}
+
+// scrambled palettes?
+static inline int mypal(int x)
+{
+//	return pal5bit(x >> 3);
+	return pal5bit((x^0xff) >> 3);
+//	return (((x - 0x80) >= 0) ? (x - 0x80) : 0) ^ 0x7f;
+//	return (x - 0x80);
+}
+
+WRITE16_MEMBER(stepstag_state::stepstag_palette_w)
+{
+	data = COMBINE_DATA(&m_generic_paletteram_16[offset]);
+//	if ((offset & 1) == 0)
+		palette_set_color_rgb(machine(),offset/4,
+			mypal(m_generic_paletteram_16[offset/4*4+0] & 0xff),
+			mypal(m_generic_paletteram_16[offset/4*4+1] & 0xff),
+			mypal(m_generic_paletteram_16[offset/4*4+2] & 0xff)
+	);
 }

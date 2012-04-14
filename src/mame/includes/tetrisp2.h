@@ -76,6 +76,23 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(rocknms_main2sub_status_r);
 };
 
+class stepstag_state : public tetrisp2_state
+{
+public:
+	stepstag_state(const machine_config &mconfig, device_type type, const char *tag)
+		: tetrisp2_state(mconfig, type, tag),
+		  m_spriteram3(*this, "spriteram3") { }
+
+	required_shared_ptr<UINT16> m_spriteram3;
+	DECLARE_READ16_MEMBER(stepstag_coins_r);
+	DECLARE_READ16_MEMBER(unknown_read_0xc00000);
+	DECLARE_READ16_MEMBER(unknown_read_0xffff00);
+	DECLARE_READ16_MEMBER(unk_a42000_r);
+	DECLARE_WRITE16_MEMBER(stepstag_soundlatch_word_w);
+	DECLARE_WRITE16_MEMBER(stepstag_leds_w);
+	DECLARE_WRITE16_MEMBER( stepstag_palette_w );
+};
+
 /*----------- defined in video/tetrisp2.c -----------*/
 
 
@@ -92,3 +109,8 @@ SCREEN_UPDATE_RGB32( rocknms_left );
 SCREEN_UPDATE_RGB32( rocknms_right );
 
 VIDEO_START( nndmseal );
+
+VIDEO_START( stepstag );
+SCREEN_UPDATE_IND16( stepstag_left );
+SCREEN_UPDATE_IND16( stepstag_mid );
+SCREEN_UPDATE_IND16( stepstag_right );

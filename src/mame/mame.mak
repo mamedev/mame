@@ -814,7 +814,6 @@ $(MAMEOBJ)/jaleco.a: \
 	$(DRIVERS)/psychic5.o $(VIDEO)/psychic5.o \
 	$(DRIVERS)/pturn.o \
 	$(DRIVERS)/skyfox.o $(VIDEO)/skyfox.o \
-	$(DRIVERS)/stepstag.o \
 	$(DRIVERS)/tetrisp2.o $(VIDEO)/tetrisp2.o \
 	$(MACHINE)/jalcrpt.o \
 	$(VIDEO)/jalblend.o \
@@ -2117,8 +2116,6 @@ $(DRIVERS)/sspeedr.o:	$(LAYOUT)/sspeedr.lh
 
 $(DRIVERS)/stactics.o:	$(LAYOUT)/stactics.lh
 
-$(DRIVERS)/stepstag.o:	$(LAYOUT)/stepstag.lh
-
 $(DRIVERS)/sstrangr.o:	$(LAYOUT)/sstrangr.lh
 
 $(DRIVERS)/subsino.o:	$(LAYOUT)/victor5.lh \
@@ -2143,7 +2140,8 @@ $(DRIVERS)/tceptor.o:	$(LAYOUT)/tceptor2.lh
 
 $(DRIVERS)/tehkanwc.o:	$(LAYOUT)/gridiron.lh
 
-$(DRIVERS)/tetrisp2.o:	$(LAYOUT)/rocknms.lh
+$(DRIVERS)/tetrisp2.o:	$(LAYOUT)/rocknms.lh \
+			$(LAYOUT)/stepstag.lh
 
 $(DRIVERS)/thayers.o:	$(LAYOUT)/dlair.lh
 
