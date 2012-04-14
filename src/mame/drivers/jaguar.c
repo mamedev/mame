@@ -361,11 +361,11 @@ public:
 		  m_nvram(*this, "nvram") ,
 		m_rom_base(*this, "robase"){ }
 
-	required_shared_ptr<UINT32>	m_nvram;
+	optional_shared_ptr<UINT32>	m_nvram;
 	cpu_device *m_main_cpu;
 	UINT32 m_misc_control_data;
 	UINT8 m_eeprom_enable;
-	required_shared_ptr<UINT32> m_rom_base;
+	optional_shared_ptr<UINT32> m_rom_base;
 	UINT32 *m_gpu_jump_address;
 	UINT8 m_gpu_command_pending;
 	UINT32 m_gpu_spin_pc;
@@ -1769,7 +1769,7 @@ static MACHINE_CONFIG_DERIVED( cojag68k, cojagr3k )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( jaguar, driver_device )
+static MACHINE_CONFIG_START( jaguar, cojag_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, JAGUAR_CLOCK/2)
