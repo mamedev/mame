@@ -744,7 +744,7 @@ static DRIVER_INIT(nzerotea)
 {
 	memory_configure_bank(machine, "bank1", 0, 2, machine.region("mainprg")->base(), 0x20000);
 
-	raiden2_decrypt_sprites(machine);
+	zeroteam_decrypt_sprites(machine);
 
 	memory_set_bank(machine, "bank1", 1);
 
