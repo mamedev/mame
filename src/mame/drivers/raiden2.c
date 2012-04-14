@@ -1,6 +1,7 @@
 /* Seibu Protected 1993-94 era hardware, V30 based (sequel to the 68k based hardware)
     TODO: figure out the rest of the protection
-    TODO: Zero team needs COIN3 and COIN4 found and hooked up, they may be on the sound cpu
+    TODO: Zero Team needs COIN3 and COIN4 found and hooked up, they may be on the sound cpu
+    TODO: Zero Team presumably needs additive blending on the character screen
 */
 
 /* raiden 2 board test note 17/04/08 (based on test by dox)
