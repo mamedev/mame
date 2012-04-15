@@ -2962,6 +2962,9 @@ ROM_END
  **************************************************************************************************************************
     Holosseum
     not protected
+     Game: 833-8887-01 HOLOSSEUM
+Rom board: 833-8888-01
+
 */
 ROM_START( holo )
 	ROM_REGION( 0x200000, "maincpu", 0 ) /* v60 code + data */
