@@ -96,8 +96,8 @@ VIDEO_START( atarisy2 )
 	atarisy2_state *state = machine.driver_data<atarisy2_state>();
 
 	/* initialize banked memory */
-	state->m_alpha = &state->m_vram[0x0000];
-	state->m_playfield = &state->m_vram[0x2000];
+	state->m_alpha.set_target(&state->m_vram[0x0000], 0x2000);
+	state->m_playfield.set_target(&state->m_vram[0x2000], 0x2000);
 
 	/* initialize the playfield */
 	state->m_playfield_tilemap = tilemap_create(machine, get_playfield_tile_info, tilemap_scan_rows,  8,8, 128,64);

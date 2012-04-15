@@ -992,7 +992,7 @@ void atarivc_reset(screen_device &screen, UINT16 *eof_data, int playfields)
 	atarigen_state *state = screen.machine().driver_data<atarigen_state>();
 
 	/* this allows us to manually reset eof_data to NULL if it's not used */
-	state->m_atarivc_eof_data = eof_data;
+	state->m_atarivc_eof_data.set_target(eof_data, 0x100);
 	state->m_atarivc_playfields = playfields;
 
 	/* clear the RAM we use */

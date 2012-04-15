@@ -43,7 +43,7 @@ static ADDRESS_MAP_START( kyugo_main_map, AS_PROGRAM, 8, kyugo_state )
 	AM_RANGE(0xa800, 0xa800) AM_WRITE(kyugo_scroll_x_lo_w)
 	AM_RANGE(0xb000, 0xb000) AM_WRITE(kyugo_gfxctrl_w)
 	AM_RANGE(0xb800, 0xb800) AM_WRITE(kyugo_scroll_y_w)
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_SHARE("share1") AM_SHARE("shared_ram")
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_SHARE("shared_ram")
 ADDRESS_MAP_END
 
 
@@ -82,7 +82,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gyrodine_sub_map, AS_PROGRAM, 8, kyugo_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_SHARE("share1")
+	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_SHARE("shared_ram")
 	AM_RANGE(0x8000, 0x8000) AM_READ_PORT("P2")
 	AM_RANGE(0x8040, 0x8040) AM_READ_PORT("P1")
 	AM_RANGE(0x8080, 0x8080) AM_READ_PORT("SYSTEM")
@@ -91,7 +91,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( repulse_sub_map, AS_PROGRAM, 8, kyugo_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_SHARE("share1")
+	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_SHARE("shared_ram")
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("P2")
 	AM_RANGE(0xc040, 0xc040) AM_READ_PORT("P1")
 	AM_RANGE(0xc080, 0xc080) AM_READ_PORT("SYSTEM")
@@ -100,7 +100,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( srdmissn_sub_map, AS_PROGRAM, 8, kyugo_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("share1")
+	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("shared_ram")
 	AM_RANGE(0xf400, 0xf400) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xf401, 0xf401) AM_READ_PORT("P1")
 	AM_RANGE(0xf402, 0xf402) AM_READ_PORT("P2")
@@ -109,7 +109,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( legend_sub_map, AS_PROGRAM, 8, kyugo_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("share1")
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("shared_ram")
 	AM_RANGE(0xf800, 0xf800) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xf801, 0xf801) AM_READ_PORT("P1")
 	AM_RANGE(0xf802, 0xf802) AM_READ_PORT("P2")
@@ -121,7 +121,7 @@ static ADDRESS_MAP_START( flashgala_sub_map, AS_PROGRAM, 8, kyugo_state )
 	AM_RANGE(0xc040, 0xc040) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xc080, 0xc080) AM_READ_PORT("P1")
 	AM_RANGE(0xc0c0, 0xc0c0) AM_READ_PORT("P2")
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("share1")
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("shared_ram")
 ADDRESS_MAP_END
 
 

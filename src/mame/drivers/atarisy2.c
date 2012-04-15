@@ -214,7 +214,7 @@ DIRECT_UPDATE_HANDLER( atarisy2_direct_handler )
 	if (address >= 0x8000 && address < 0x8200)
 	{
 		atarisy2_state *state = machine.driver_data<atarisy2_state>();
-		direct.explicit_configure(0x8000, 0x81ff, 0x1ff, (UINT8 *)state->m_slapstic_base);
+		direct.explicit_configure(0x8000, 0x81ff, 0x1ff, reinterpret_cast<UINT8 *>(state->m_slapstic_base.target()));
 		return ~0;
 	}
 	return address;

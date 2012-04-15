@@ -27,8 +27,8 @@ public:
 	required_shared_ptr<UINT16> m_nmk_bgvideoram1;
 	required_shared_ptr<UINT16> m_nmk_bgvideoram2;
 	required_shared_ptr<UINT16> m_nmk_bgvideoram3;
-	required_shared_ptr<UINT16> m_afega_scroll_0;
-	required_shared_ptr<UINT16> m_afega_scroll_1;
+	optional_shared_ptr<UINT16> m_afega_scroll_0;
+	optional_shared_ptr<UINT16> m_afega_scroll_1;
 	int m_simple_scroll;
 	int m_redraw_bitmap;
 	UINT16 *m_spriteram_old;

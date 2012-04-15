@@ -1336,7 +1336,7 @@ public:
 	required_shared_ptr<UINT32> m_shared_ram;
 	required_shared_ptr<UINT32> m_charram;
 	required_shared_ptr<UINT32> m_textram;
-	required_shared_ptr<UINT32> m_gmen_sh2_shared;
+	optional_shared_ptr<UINT32> m_gmen_sh2_shared;
 	UINT8 m_jvssense;
 	INT32 m_has_jvsio;
 	bool m_ctl_vbl_active;

@@ -446,14 +446,14 @@ static ADDRESS_MAP_START( hyprduel_map, AS_PROGRAM, 16, hyprduel_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hyprduel_map2, AS_PROGRAM, 16, hyprduel_state )
-	AM_RANGE(0x000000, 0x003fff) AM_RAM AM_SHARE("share1")						/* shadow ($c00000 - $c03fff : vector) */
-	AM_RANGE(0x004000, 0x007fff) AM_READONLY AM_WRITENOP AM_SHARE("share3")			/* shadow ($fe4000 - $fe7fff : read only) */
+	AM_RANGE(0x000000, 0x003fff) AM_RAM AM_SHARE("sharedram1")						/* shadow ($c00000 - $c03fff : vector) */
+	AM_RANGE(0x004000, 0x007fff) AM_READONLY AM_WRITENOP AM_SHARE("sharedram3")			/* shadow ($fe4000 - $fe7fff : read only) */
 	AM_RANGE(0x400000, 0x400003) AM_DEVREADWRITE8_LEGACY("ymsnd", ym2151_r, ym2151_w, 0x00ff )
 	AM_RANGE(0x400004, 0x400005) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x800000, 0x800001) AM_NOP
-	AM_RANGE(0xc00000, 0xc07fff) AM_RAM AM_SHARE("share1")
+	AM_RANGE(0xc00000, 0xc07fff) AM_RAM AM_SHARE("sharedram1")
 	AM_RANGE(0xfe0000, 0xfe3fff) AM_RAM AM_SHARE("share2")
-	AM_RANGE(0xfe4000, 0xffffff) AM_RAM AM_SHARE("share3")
+	AM_RANGE(0xfe4000, 0xffffff) AM_RAM AM_SHARE("sharedram3")
 ADDRESS_MAP_END
 
 
@@ -482,13 +482,13 @@ static ADDRESS_MAP_START( magerror_map, AS_PROGRAM, 16, hyprduel_state )
 	AM_RANGE(0x8788aa, 0x8788ab) AM_RAM AM_SHARE("rombank")		/* Rom Bank */
 	AM_RANGE(0x8788ac, 0x8788ad) AM_RAM AM_SHARE("screenctrl")	/* Screen Control */
 	AM_RANGE(0x879700, 0x879713) AM_RAM AM_SHARE("videoregs")	/* Video Registers */
-	AM_RANGE(0xc00000, 0xc1ffff) AM_RAM AM_SHARE("share1") AM_SHARE("sharedram1")
+	AM_RANGE(0xc00000, 0xc1ffff) AM_RAM AM_SHARE("sharedram1")
 	AM_RANGE(0xe00000, 0xe00001) AM_READ_PORT("SERVICE") AM_WRITENOP
 	AM_RANGE(0xe00002, 0xe00003) AM_READ_PORT("DSW")
 	AM_RANGE(0xe00004, 0xe00005) AM_READ_PORT("P1_P2")
 	AM_RANGE(0xe00006, 0xe00007) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xfe0000, 0xfe3fff) AM_RAM AM_SHARE("share2")
-	AM_RANGE(0xfe4000, 0xffffff) AM_RAM AM_SHARE("share3") AM_SHARE("sharedram3")
+	AM_RANGE(0xfe4000, 0xffffff) AM_RAM AM_SHARE("sharedram3")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( magerror_map2, AS_PROGRAM, 16, hyprduel_state )

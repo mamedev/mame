@@ -16,7 +16,7 @@ public:
 	required_shared_ptr<UINT8> m_spriteram;
 	required_shared_ptr<UINT8> m_colorram;
 	required_shared_ptr<UINT8> m_spriteram2;
-	required_shared_ptr<UINT8> m_mcu_ram;
+	optional_shared_ptr<UINT8> m_mcu_ram;
 
 	/* video-related */
 	bitmap_ind16    *m_tmp_bitmap1;

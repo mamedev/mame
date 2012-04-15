@@ -35,11 +35,11 @@ public:
 
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_spriteram;
-	required_shared_ptr<UINT8> m_spriteram2;
+	optional_shared_ptr<UINT8> m_spriteram2;
 	required_shared_ptr<UINT8> m_attributesram;
 	required_shared_ptr<UINT8> m_bulletsram;
-	required_shared_ptr<UINT8> m_rockclim_videoram;
-	required_shared_ptr<UINT8> m_racknrol_tiles_bank;
+	optional_shared_ptr<UINT8> m_rockclim_videoram;
+	optional_shared_ptr<UINT8> m_racknrol_tiles_bank;
 
 	int m_irq_line;
 	UINT8 m__4in1_bank;

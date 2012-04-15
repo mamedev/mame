@@ -10,8 +10,8 @@ public:
 
 	required_shared_ptr<UINT8> m_ram;
 	required_shared_ptr<UINT8> m_spriteram;
-	required_shared_ptr<UINT8> m_nob_mcu_latch;
-	required_shared_ptr<UINT8> m_nob_mcu_status;
+	optional_shared_ptr<UINT8> m_nob_mcu_latch;
+	optional_shared_ptr<UINT8> m_nob_mcu_status;
 
 	UINT8 *m_videoram;
 	void (*m_videomode_custom)(running_machine &machine, UINT8 data, UINT8 prevdata);

@@ -20,6 +20,7 @@ public:
 	itech32_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
 		m_main_ram(*this, "main_ram"),
+		m_nvram(*this, "nvram"),
 		m_video(*this, "video"),
 		m_main_rom(*this, "main_rom"),
 		m_drivedge_zbuf_control(*this, "drivedge_zctl"),
@@ -27,7 +28,8 @@ public:
 		m_tms1_ram(*this, "tms1_ram"),
 		m_tms2_ram(*this, "tms2_ram"){ }
 
-	required_shared_ptr<UINT16> m_main_ram;
+	optional_shared_ptr<UINT16> m_main_ram;
+	required_shared_ptr<UINT16> m_nvram;
 	required_shared_ptr<UINT16> m_video;
 	required_shared_ptr<UINT16> m_main_rom;
 	required_shared_ptr<UINT32> m_drivedge_zbuf_control;

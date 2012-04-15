@@ -49,7 +49,7 @@ public:
 
 	UINT16 *m_videoram;
 	UINT16 *m_spriteram;
-	required_shared_ptr<UINT32> m_f3_ram;
+	optional_shared_ptr<UINT32> m_f3_ram;
 	UINT16 *m_f3_vram;
 	UINT16 *m_f3_line_ram;
 	UINT16 *m_f3_pf_data;

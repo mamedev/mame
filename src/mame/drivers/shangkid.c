@@ -247,9 +247,9 @@ static ADDRESS_MAP_START( chinhero_main_map, AS_PROGRAM, 8, shangkid_state )
 	AM_RANGE(0xb802, 0xb802) AM_READ_PORT("P2")
 	AM_RANGE(0xb803, 0xb803) AM_READ_PORT("P1")
 	AM_RANGE(0xc000, 0xc002) AM_WRITEONLY AM_SHARE("videoreg")
-	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(shangkid_videoram_w) AM_SHARE("videoram") AM_SHARE("share1")
+	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(shangkid_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0xe000, 0xfdff) AM_RAM AM_SHARE("share2")
-	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_SHARE("spriteram") AM_SHARE("share3")
+	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_SHARE("spriteram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( shangkid_main_map, AS_PROGRAM, 8, shangkid_state )
@@ -268,9 +268,9 @@ static ADDRESS_MAP_START( shangkid_main_map, AS_PROGRAM, 8, shangkid_state )
 	AM_RANGE(0xb802, 0xb802) AM_READ_PORT("P2")
 	AM_RANGE(0xb803, 0xb803) AM_READ_PORT("P1")
 	AM_RANGE(0xc000, 0xc002) AM_WRITEONLY AM_SHARE("videoreg")
-	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(shangkid_videoram_w) AM_SHARE("videoram") AM_SHARE("share1")
+	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(shangkid_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0xe000, 0xfdff) AM_RAM AM_SHARE("share2")
-	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_SHARE("spriteram") AM_SHARE("share3")
+	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_SHARE("spriteram")
 ADDRESS_MAP_END
 
 /***************************************************************************************/
@@ -288,9 +288,9 @@ static ADDRESS_MAP_START( chinhero_bbx_map, AS_PROGRAM, 8, shangkid_state )
 	AM_RANGE(0xb801, 0xb801) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xb802, 0xb802) AM_READ_PORT("P2")
 	AM_RANGE(0xb803, 0xb803) AM_READ_PORT("P1")
-	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(shangkid_videoram_w) AM_SHARE("share1")
+	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(shangkid_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0xe000, 0xfdff) AM_RAM AM_SHARE("share2")
-	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_SHARE("share3")
+	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_SHARE("spriteram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( shangkid_bbx_map, AS_PROGRAM, 8, shangkid_state )
@@ -307,9 +307,9 @@ static ADDRESS_MAP_START( shangkid_bbx_map, AS_PROGRAM, 8, shangkid_state )
 	AM_RANGE(0xb801, 0xb801) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xb802, 0xb802) AM_READ_PORT("P2")
 	AM_RANGE(0xb803, 0xb803) AM_READ_PORT("P1")
-	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(shangkid_videoram_w) AM_SHARE("share1")
+	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(shangkid_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0xe000, 0xfdff) AM_RAM AM_SHARE("share2")
-	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_SHARE("share3")
+	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_SHARE("spriteram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( chinhero_bbx_portmap, AS_IO, 8, shangkid_state )

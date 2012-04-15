@@ -20,7 +20,7 @@ public:
 
 	UINT8 *    m_colorram;
 	required_shared_ptr<UINT8> m_astrof_color;
-	required_shared_ptr<UINT8> m_tomahawk_protection;
+	optional_shared_ptr<UINT8> m_tomahawk_protection;
 
 	UINT8      m_astrof_palette_bank;
 	UINT8      m_red_on;

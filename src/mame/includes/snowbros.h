@@ -14,7 +14,7 @@ public:
 	int m_sb3_music;
 	UINT8 m_semicom_prot_offset;
 	UINT8 *m_spriteram;
-	required_shared_ptr<UINT16> m_bootleg_spriteram16;
+	optional_shared_ptr<UINT16> m_bootleg_spriteram16;
 
 	required_device<cpu_device> m_maincpu;
 	DECLARE_WRITE16_MEMBER(snowbros_flipscreen_w);

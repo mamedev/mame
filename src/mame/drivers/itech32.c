@@ -899,7 +899,7 @@ void itech32_state::nvram_init(nvram_device &nvram, void *base, size_t length)
 
 /*------ Time Killers memory layout ------*/
 static ADDRESS_MAP_START( timekill_map, AS_PROGRAM, 16, itech32_state )
-	AM_RANGE(0x000000, 0x003fff) AM_RAM AM_SHARE("main_ram") AM_SHARE("nvram")
+	AM_RANGE(0x000000, 0x003fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x040000, 0x040001) AM_READ_PORT("P1")
 	AM_RANGE(0x048000, 0x048001) AM_READ_PORT("P2")
 	AM_RANGE(0x050000, 0x050001) AM_READ_PORT("SYSTEM") AM_WRITE(timekill_intensity_w)
@@ -917,7 +917,7 @@ ADDRESS_MAP_END
 
 /*------ BloodStorm and later games memory layout ------*/
 static ADDRESS_MAP_START( bloodstm_map, AS_PROGRAM, 16, itech32_state )
-	AM_RANGE(0x000000, 0x00ffff) AM_RAM AM_SHARE("main_ram") AM_SHARE("nvram")
+	AM_RANGE(0x000000, 0x00ffff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x080000, 0x080001) AM_READ_PORT("P1") AM_WRITE(int1_ack_w)
 	AM_RANGE(0x100000, 0x100001) AM_READ_PORT("P2")
 	AM_RANGE(0x180000, 0x180001) AM_READ_PORT("P3")
@@ -981,7 +981,7 @@ static ADDRESS_MAP_START( drivedge_map, AS_PROGRAM, 32, itech32_state )
 AM_RANGE(0x000100, 0x0003ff) AM_MIRROR(0x40000) AM_READWRITE(test1_r, test1_w)
 AM_RANGE(0x000c00, 0x007fff) AM_MIRROR(0x40000) AM_READWRITE(test2_r, test2_w)
 #endif
-	AM_RANGE(0x000000, 0x03ffff) AM_MIRROR(0x40000) AM_RAM AM_SHARE("main_ram") AM_SHARE("nvram")
+	AM_RANGE(0x000000, 0x03ffff) AM_MIRROR(0x40000) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x080000, 0x080003) AM_READ_PORT("80000")
 	AM_RANGE(0x082000, 0x082003) AM_READ_PORT("82000")
 	AM_RANGE(0x084000, 0x084003) AM_READWRITE(sound_data32_r, sound_data32_w)
@@ -998,20 +998,20 @@ AM_RANGE(0x000c00, 0x007fff) AM_MIRROR(0x40000) AM_READWRITE(test2_r, test2_w)
 	AM_RANGE(0x1e4000, 0x1e4003) AM_WRITE(tms_reset_assert_w)
 	AM_RANGE(0x1ec000, 0x1ec003) AM_WRITE(tms_reset_clear_w)
 	AM_RANGE(0x200000, 0x200003) AM_READ_PORT("200000")
-	AM_RANGE(0x280000, 0x280fff) AM_RAM_WRITE(tms1_68k_ram_w) AM_SHARE("share1")
-	AM_RANGE(0x300000, 0x300fff) AM_RAM_WRITE(tms2_68k_ram_w) AM_SHARE("share2")
+	AM_RANGE(0x280000, 0x280fff) AM_RAM_WRITE(tms1_68k_ram_w) AM_SHARE("tms1_ram")
+	AM_RANGE(0x300000, 0x300fff) AM_RAM_WRITE(tms2_68k_ram_w) AM_SHARE("tms2_ram")
 	AM_RANGE(0x380000, 0x380003) AM_WRITENOP // AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0x600000, 0x607fff) AM_ROM AM_REGION("user1", 0) AM_SHARE("main_rom")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( drivedge_tms1_map, AS_PROGRAM, 32, itech32_state )
 	AM_RANGE(0x000000, 0x001fff) AM_RAM AM_SHARE("tms1_boot")
-	AM_RANGE(0x008000, 0x0083ff) AM_MIRROR(0x400) AM_RAM_WRITE(tms1_trigger_w) AM_SHARE("share1") AM_SHARE("tms1_ram")
+	AM_RANGE(0x008000, 0x0083ff) AM_MIRROR(0x400) AM_RAM_WRITE(tms1_trigger_w) AM_SHARE("tms1_ram")
 	AM_RANGE(0x080000, 0x0bffff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( drivedge_tms2_map, AS_PROGRAM, 32, itech32_state )
-	AM_RANGE(0x008000, 0x0083ff) AM_MIRROR(0x8400) AM_RAM_WRITE(tms2_trigger_w) AM_SHARE("share2") AM_SHARE("tms2_ram")
+	AM_RANGE(0x008000, 0x0083ff) AM_MIRROR(0x8400) AM_RAM_WRITE(tms2_trigger_w) AM_SHARE("tms2_ram")
 	AM_RANGE(0x080000, 0x08ffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -3951,6 +3951,8 @@ ROM_END
 static void init_program_rom(running_machine &machine)
 {
 	itech32_state *state = machine.driver_data<itech32_state>();
+	if (state->m_main_ram == NULL)
+		state->m_main_ram.set_target(state->m_nvram, state->m_nvram.bytes());
 	memcpy(state->m_main_ram, state->m_main_rom, 0x80);
 }
 

@@ -98,7 +98,16 @@ public:
 		: driver_device(mconfig, type, tag),
 		  m_earom(*this, "earom"),
 		  m_eeprom(*this, "eeprom"),
-		  m_eeprom32(*this, "eeprom") { }
+		  m_eeprom32(*this, "eeprom"),
+		  m_playfield(*this, "playfield"),
+		  m_playfield2(*this, "playfield2"),
+		  m_playfield_upper(*this, "playfield_upper"),
+		  m_alpha(*this, "alpha"),
+		  m_alpha2(*this, "alpha2"),
+		  m_xscroll(*this, "xscroll"),
+		  m_yscroll(*this, "yscroll"),
+		  m_atarivc_data(*this, "atarivc_data"),
+		  m_atarivc_eof_data(*this, "atarivc_eof_data") { }
 
 	// users must call through to these
 	virtual void machine_start();
@@ -126,13 +135,13 @@ public:
 	UINT8				m_cpu_to_sound_ready;
 	UINT8				m_sound_to_cpu_ready;
 
-	UINT16 *			m_playfield;
-	UINT16 *			m_playfield2;
-	UINT16 *			m_playfield_upper;
-	UINT16 *			m_alpha;
-	UINT16 *			m_alpha2;
-	UINT16 *			m_xscroll;
-	UINT16 *			m_yscroll;
+	optional_shared_ptr<UINT16> m_playfield;
+	optional_shared_ptr<UINT16> m_playfield2;
+	optional_shared_ptr<UINT16> m_playfield_upper;
+	optional_shared_ptr<UINT16> m_alpha;
+	optional_shared_ptr<UINT16> m_alpha2;
+	optional_shared_ptr<UINT16> m_xscroll;
+	optional_shared_ptr<UINT16> m_yscroll;
 
 	UINT32 *			m_playfield32;
 	UINT32 *			m_alpha32;
@@ -142,8 +151,8 @@ public:
 	tilemap_t *			m_alpha_tilemap;
 	tilemap_t *			m_alpha2_tilemap;
 
-	UINT16 *			m_atarivc_data;
-	UINT16 *			m_atarivc_eof_data;
+	optional_shared_ptr<UINT16> m_atarivc_data;
+	optional_shared_ptr<UINT16> m_atarivc_eof_data;
 	atarivc_state_desc	m_atarivc_state;
 
 	/* internal state */

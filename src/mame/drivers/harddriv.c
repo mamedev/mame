@@ -438,10 +438,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( driver_msp_map, AS_PROGRAM, 16, harddriv_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000000, 0x000fffff) AM_RAM AM_SHARE("share1") AM_SHARE("msp_ram")
-	AM_RANGE(0x00700000, 0x007fffff) AM_RAM AM_SHARE("share1")
+	AM_RANGE(0x00000000, 0x000fffff) AM_RAM AM_SHARE("msp_ram")
+	AM_RANGE(0x00700000, 0x007fffff) AM_RAM AM_SHARE("msp_ram")
 	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE_LEGACY(tms34010_io_register_r, tms34010_io_register_w)
-	AM_RANGE(0xfff00000, 0xffffffff) AM_RAM AM_SHARE("share1")
+	AM_RANGE(0xfff00000, 0xffffffff) AM_RAM AM_SHARE("msp_ram")
 ADDRESS_MAP_END
 
 
