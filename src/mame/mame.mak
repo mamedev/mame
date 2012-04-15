@@ -2012,6 +2012,8 @@ $(DRIVERS)/grchamp.o:	$(LAYOUT)/grchamp.lh
 
 $(DRIVERS)/highvdeo.o:	$(LAYOUT)/fashion.lh
 
+$(DRIVERS)/icecold.o:	$(LAYOUT)/icecold.lh
+
 $(DRIVERS)/igspoker.o:	$(LAYOUT)/igspoker.lh
 
 $(DRIVERS)/jankenmn.o:	$(LAYOUT)/jankenmn.lh
