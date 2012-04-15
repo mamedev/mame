@@ -16,10 +16,10 @@ public:
 
 	required_shared_ptr<UINT16> m_spriteram;
 	required_shared_ptr<UINT16> m_vregs;
-	required_shared_ptr<UINT32> m_coldfire_regs;
+	optional_shared_ptr<UINT32> m_coldfire_regs;
 
-	required_shared_ptr<UINT8> m_funcube_outputs;
-	required_shared_ptr<UINT8> m_funcube_leds;
+	optional_shared_ptr<UINT8> m_funcube_outputs;
+	optional_shared_ptr<UINT8> m_funcube_leds;
 	int m_xoffset;
 	int m_yoffset;
 	int m_keyboard_row;

@@ -331,7 +331,7 @@ public:
 	virtual ~finder_base();
 
 	// getters
-	virtual void findit() = 0;
+	virtual bool findit() = 0;
 
 protected:
 	// helpers
@@ -365,15 +365,19 @@ public:
 	_DeviceClass *target() const { return m_target; }
 
 	// setter for setting the object
-	void set_target(_DeviceClass *target)
-	{
-		m_target = target;
-		if (target == 0 && _Required)
-			throw emu_fatalerror("Unable to find required device '%s'", this->m_tag);
-	}
+	void set_target(_DeviceClass *target) { m_target = target; }
 
 	// finder
-	virtual void findit() { set_target(m_base.subdevice<_DeviceClass>(m_tag)); }
+	virtual bool findit()
+	{
+		device_t *device = m_base.subdevice(m_tag);
+		if (_Required && device == NULL)
+			mame_printf_error("Unable to find required device '%s'\n", this->m_tag);
+		m_target = downcast<_DeviceClass *>(device);
+		if (device != NULL && m_target == NULL)
+			mame_printf_warning("Device '%s' found but is of the incorrect type\n", m_tag);
+		return (!_Required || m_target != NULL);
+	}
 
 protected:
 	// internal state
@@ -425,13 +429,7 @@ public:
 	UINT32 bytes() const { return m_bytes; }
 
 	// setter for setting the object
-	void set_target(_PointerType *target, size_t bytes)
-	{
-		m_target = target;
-		m_bytes = bytes;
-		if (target == 0 && _Required)
-			throw emu_fatalerror("Unable to find required shared pointer '%s'", this->m_tag);
-	}
+	void set_target(_PointerType *target, size_t bytes) { m_target = target; m_bytes = bytes; }
 
 	// dynamic allocation of a shared pointer
 	void allocate(UINT32 entries)
@@ -444,7 +442,7 @@ public:
 	}
 
 	// finder
-	virtual void findit() { m_target = reinterpret_cast<_PointerType *>(find_memory(m_width, m_bytes, _Required)); }
+	virtual bool findit() { m_target = reinterpret_cast<_PointerType *>(find_memory(m_width, m_bytes, _Required)); return (!_Required || m_target != NULL); }
 
 protected:
 	// internal state

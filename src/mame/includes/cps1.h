@@ -68,7 +68,10 @@ public:
 		m_cps_a_regs(*this, "cps_a_regs"),
 		m_cps_b_regs(*this, "cps_b_regs"),
 		m_qsound_sharedram1(*this, "qsound_ram1"),
-		m_qsound_sharedram2(*this, "qsound_ram2") { }
+		m_qsound_sharedram2(*this, "qsound_ram2"),
+		m_objram1(*this, "objram1"),
+		m_objram2(*this, "objram2"),
+		m_output(*this, "output") { }
 
 	/* memory pointers */
 	// cps1
@@ -81,14 +84,13 @@ public:
 	UINT16 *     m_obj;
 	UINT16 *     m_other;
 	UINT16 *     m_buffered_obj;
-	required_shared_ptr<UINT8> m_qsound_sharedram1;
-	required_shared_ptr<UINT8> m_qsound_sharedram2;
+	optional_shared_ptr<UINT8> m_qsound_sharedram1;
+	optional_shared_ptr<UINT8> m_qsound_sharedram2;
 	// cps2
-	UINT16 *     m_objram1;
-	UINT16 *     m_objram2;
-	UINT16 *     m_output;
+	optional_shared_ptr<UINT16> m_objram1;
+	optional_shared_ptr<UINT16> m_objram2;
+	optional_shared_ptr<UINT16> m_output;
 	UINT16 *     m_cps2_buffered_obj;
-	size_t       m_output_size;
 	// game-specific
 	UINT16 *     m_gigaman2_dummyqsound_ram;
 

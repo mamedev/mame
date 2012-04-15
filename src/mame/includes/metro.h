@@ -42,9 +42,9 @@ public:
 	optional_device<device_t> m_ymsnd;
 	optional_device<k053936_device> m_k053936;
 	/* memory pointers */
-	required_shared_ptr<UINT16> m_vram_0;
-	required_shared_ptr<UINT16> m_vram_1;
-	required_shared_ptr<UINT16> m_vram_2;
+	optional_shared_ptr<UINT16> m_vram_0;
+	optional_shared_ptr<UINT16> m_vram_1;
+	optional_shared_ptr<UINT16> m_vram_2;
 	required_shared_ptr<UINT16> m_spriteram;
 	required_shared_ptr<UINT16> m_tiletable;
 	UINT16 *    m_tiletable_old;
@@ -52,13 +52,13 @@ public:
 	required_shared_ptr<UINT16> m_scroll;
 	required_shared_ptr<UINT16> m_window;
 	required_shared_ptr<UINT16> m_irq_enable;
-	required_shared_ptr<UINT16> m_irq_levels;
-	required_shared_ptr<UINT16> m_irq_vectors;
+	optional_shared_ptr<UINT16> m_irq_levels;
+	optional_shared_ptr<UINT16> m_irq_vectors;
 	required_shared_ptr<UINT16> m_rombank;
 	required_shared_ptr<UINT16> m_videoregs;
 	required_shared_ptr<UINT16> m_screenctrl;
-	required_shared_ptr<UINT16> m_input_sel;
-	required_shared_ptr<UINT16> m_k053936_ram;
+	optional_shared_ptr<UINT16> m_input_sel;
+	optional_shared_ptr<UINT16> m_k053936_ram;
 
 
 	int         m_flip_screen;

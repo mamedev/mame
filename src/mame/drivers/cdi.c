@@ -131,11 +131,11 @@ static INPUT_PORTS_START( cdi )
     PORT_BIT(0x3ff, 0x000, IPT_MOUSE_X) PORT_SENSITIVITY(100) PORT_MINMAX(0x000, 0x3ff) PORT_KEYDELTA(2) PORT_CHANGED_MEMBER("slave", cdislave_device, mouse_update, 0)
 
 	PORT_START("MOUSEY")
-    PORT_BIT(0x3ff, 0x000, IPT_MOUSE_Y) PORT_SENSITIVITY(100) PORT_MINMAX(0x000, 0x3ff) PORT_KEYDELTA(2) PORT_CHANGED_MEMBER("slave", cdislave_device, cdislave_device::mouse_update, 0)
+    PORT_BIT(0x3ff, 0x000, IPT_MOUSE_Y) PORT_SENSITIVITY(100) PORT_MINMAX(0x000, 0x3ff) PORT_KEYDELTA(2) PORT_CHANGED_MEMBER("slave", cdislave_device, mouse_update, 0)
 
 	PORT_START("MOUSEBTN")
-    PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_CODE(MOUSECODE_BUTTON1) PORT_NAME("Mouse Button 1") PORT_CHANGED_MEMBER("slave", cdislave_device, cdislave_device::mouse_update, 0)
-    PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_CODE(MOUSECODE_BUTTON2) PORT_NAME("Mouse Button 2") PORT_CHANGED_MEMBER("slave", cdislave_device, cdislave_device::mouse_update, 0)
+    PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_CODE(MOUSECODE_BUTTON1) PORT_NAME("Mouse Button 1") PORT_CHANGED_MEMBER("slave", cdislave_device, mouse_update, 0)
+    PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_CODE(MOUSECODE_BUTTON2) PORT_NAME("Mouse Button 2") PORT_CHANGED_MEMBER("slave", cdislave_device, mouse_update, 0)
 	PORT_BIT(0xfc, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("DEBUG")

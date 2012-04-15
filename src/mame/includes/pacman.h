@@ -22,8 +22,8 @@ public:
 	optional_shared_ptr<UINT8> m_s2650_spriteram;
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_colorram;
-	required_shared_ptr<UINT8> m_s2650games_tileram;
-	required_shared_ptr<UINT8> m_rocktrv2_prot_data;
+	optional_shared_ptr<UINT8> m_s2650games_tileram;
+	optional_shared_ptr<UINT8> m_rocktrv2_prot_data;
 
 	UINT8 m_cannonb_bit_to_read;
 	int m_mystery;

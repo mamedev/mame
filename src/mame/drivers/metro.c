@@ -5964,23 +5964,16 @@ static DRIVER_INIT( metro )
 
 static DRIVER_INIT( karatour )
 {
-	//metro_state *state = machine.driver_data<metro_state>();
-	UINT16 *RAM = auto_alloc_array(machine, UINT16, 0x20000*3/2);
-	int i;
-
-	//TODO:FIX
-	//state->m_vram_0 = RAM + (0x20000/2) * 0;
-	//state->m_vram_1 = RAM + (0x20000/2) * 1;
-	//state->m_vram_2 = RAM + (0x20000/2) * 2;
-
-	for (i = 0; i < (0x20000 * 3) / 2; i++)
-		RAM[i] = machine.rand();
-
-	DRIVER_INIT_CALL(metro);
-
-	//state->save_pointer(NAME(state->m_vram_0), 0x20000/2);
-	//state->save_pointer(NAME(state->m_vram_1), 0x20000/2);
-	//state->save_pointer(NAME(state->m_vram_2), 0x20000/2);
+	metro_state *state = machine.driver_data<metro_state>();
+	state->m_vram_0.allocate(0x20000/2);
+	state->m_vram_1.allocate(0x20000/2);
+	state->m_vram_2.allocate(0x20000/2);
+	for (int i = 0; i < 0x20000 / 2; i++)
+	{
+		state->m_vram_0[i] = machine.rand();
+		state->m_vram_1[i] = machine.rand();
+		state->m_vram_2[i] = machine.rand();
+	}
 }
 
 static DRIVER_INIT( daitorid )

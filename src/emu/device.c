@@ -383,8 +383,11 @@ void device_t::start()
 	m_region = machine().region(tag());
 
 	// find all the registered devices
+	bool allfound = true;
 	for (finder_base *autodev = m_auto_finder_list; autodev != NULL; autodev = autodev->m_next)
-		autodev->findit();
+		allfound &= autodev->findit();
+	if (!allfound)
+		throw emu_fatalerror("Missing some required objects, unable to proceed");
 
 	// let the interfaces do their pre-work
 	for (device_interface *intf = m_interface_list; intf != NULL; intf = intf->interface_next())
@@ -871,7 +874,7 @@ void *device_t::finder_base::find_memory(UINT8 width, size_t &bytes, bool requir
 	if (share == NULL)
 	{
 		if (required)
-			throw emu_fatalerror("Shared ptr '%s' not found", m_tag);
+			mame_printf_error("Shared ptr '%s' not found\n", m_tag);
 		return NULL;
 	}
 	if (share->width() != width)
