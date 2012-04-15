@@ -844,24 +844,24 @@ READ32_MEMBER(taitojc_state::jc_lan_r)
 static ADDRESS_MAP_START( taitojc_map, AS_PROGRAM, 32, taitojc_state )
 	AM_RANGE(0x00000000, 0x001fffff) AM_ROM AM_MIRROR(0x200000)
 	AM_RANGE(0x00400000, 0x01bfffff) AM_ROM AM_REGION("gfx1", 0)
-	AM_RANGE(0x04000000, 0x040f7fff) AM_RAM AM_BASE(m_vram)
+	AM_RANGE(0x04000000, 0x040f7fff) AM_RAM AM_SHARE("vram")
 	AM_RANGE(0x040f8000, 0x040fbfff) AM_READWRITE(taitojc_tile_r, taitojc_tile_w)
 	AM_RANGE(0x040fc000, 0x040fefff) AM_READWRITE(taitojc_char_r, taitojc_char_w)
-	AM_RANGE(0x040ff000, 0x040fffff) AM_RAM AM_BASE(m_objlist)
+	AM_RANGE(0x040ff000, 0x040fffff) AM_RAM AM_SHARE("objlist")
 	AM_RANGE(0x05800000, 0x0580003f) AM_READ8(jc_pcbid_r,0xffffffff)
 	AM_RANGE(0x05900000, 0x05900007) AM_READWRITE(mcu_comm_r, mcu_comm_w)
 	//AM_RANGE(0x05a00000, 0x05a01fff)
 	//AM_RANGE(0x05fc0000, 0x05fc3fff)
-	AM_RANGE(0x06400000, 0x0641ffff) AM_READWRITE(taitojc_palette_r, taitojc_palette_w) AM_BASE(m_palette_ram)
+	AM_RANGE(0x06400000, 0x0641ffff) AM_READWRITE(taitojc_palette_r, taitojc_palette_w) AM_SHARE("palette_ram")
 	AM_RANGE(0x06600000, 0x0660001f) AM_READ(jc_control_r)
 	AM_RANGE(0x06600000, 0x06600003) AM_WRITE(jc_control1_w) // watchdog
 	AM_RANGE(0x06600010, 0x06600013) AM_WRITE(jc_coin_counters_w)
 	AM_RANGE(0x06600040, 0x0660004f) AM_WRITE(jc_control_w)
 	//AM_RANGE(0x06800000, 0x06801fff) AM_NOP       // unknown
-	AM_RANGE(0x06a00000, 0x06a01fff) AM_READWRITE(f3_share_r, f3_share_w) AM_SHARE("f3_shared") AM_BASE(m_f3_shared_ram)
+	AM_RANGE(0x06a00000, 0x06a01fff) AM_READWRITE(f3_share_r, f3_share_w) AM_SHARE("f3_shared") AM_SHARE("f3_shared_ram")
 	AM_RANGE(0x06c00000, 0x06c0001f) AM_READ(jc_lan_r) AM_WRITENOP // Dangerous Curves
 	AM_RANGE(0x06e00000, 0x06e00007) AM_WRITE(jc_meters_w)
-	AM_RANGE(0x08000000, 0x080fffff) AM_RAM AM_BASE(m_main_ram)
+	AM_RANGE(0x08000000, 0x080fffff) AM_RAM AM_SHARE("main_ram")
 	AM_RANGE(0x10000000, 0x10001fff) AM_READWRITE(dsp_shared_r, dsp_shared_w)
 ADDRESS_MAP_END
 
@@ -1113,7 +1113,7 @@ static ADDRESS_MAP_START( tms_data_map, AS_DATA, 16, taitojc_state )
 	AM_RANGE(0x701d, 0x701f) AM_READ(dsp_projection_r)
 	AM_RANGE(0x7022, 0x7022) AM_READ(dsp_unk_r)
 	AM_RANGE(0x7ffe, 0x7ffe) AM_READWRITE(dsp_to_main_r,dsp_to_main_w)
-	AM_RANGE(0x7800, 0x7fff) AM_RAM AM_BASE(m_dsp_shared_ram)
+	AM_RANGE(0x7800, 0x7fff) AM_RAM AM_SHARE("dsp_shared_ram")
 	AM_RANGE(0x8000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 

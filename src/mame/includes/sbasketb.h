@@ -2,15 +2,21 @@ class sbasketb_state : public driver_device
 {
 public:
 	sbasketb_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_colorram(*this, "colorram"),
+		m_videoram(*this, "videoram"),
+		m_spriteram(*this, "spriteram"),
+		m_palettebank(*this, "palettebank"),
+		m_spriteram_select(*this, "spriteramsel"),
+		m_scroll(*this, "scroll"){ }
 
 	/* memory pointers */
-	UINT8 *  m_videoram;
-	UINT8 *  m_colorram;
-	UINT8 *  m_scroll;
-	UINT8 *  m_spriteram;
-	UINT8 *  m_palettebank;
-	UINT8 *  m_spriteram_select;
+	required_shared_ptr<UINT8> m_colorram;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<UINT8> m_palettebank;
+	required_shared_ptr<UINT8> m_spriteram_select;
+	required_shared_ptr<UINT8> m_scroll;
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;

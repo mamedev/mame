@@ -189,7 +189,7 @@ static ADDRESS_MAP_START( skydiver_map, AS_PROGRAM, 8, skydiver_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x4300) AM_READWRITE(skydiver_wram_r, skydiver_wram_w)
 	AM_RANGE(0x0080, 0x00ff) AM_MIRROR(0x4000) AM_RAM		/* RAM B1 */
-	AM_RANGE(0x0400, 0x07ff) AM_MIRROR(0x4000) AM_RAM_WRITE(skydiver_videoram_w) AM_BASE(m_videoram)		/* RAMs K1,M1,P1,J1,N1,K/L1,L1,H/J1 */
+	AM_RANGE(0x0400, 0x07ff) AM_MIRROR(0x4000) AM_RAM_WRITE(skydiver_videoram_w) AM_SHARE("videoram")		/* RAMs K1,M1,P1,J1,N1,K/L1,L1,H/J1 */
 	AM_RANGE(0x0800, 0x0801) AM_MIRROR(0x47f0) AM_WRITE(skydiver_lamp_s_w)
 	AM_RANGE(0x0802, 0x0803) AM_MIRROR(0x47f0) AM_WRITE(skydiver_lamp_k_w)
 	AM_RANGE(0x0804, 0x0805) AM_MIRROR(0x47f0) AM_WRITE(skydiver_start_lamp_1_w)

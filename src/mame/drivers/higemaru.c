@@ -38,9 +38,9 @@ static ADDRESS_MAP_START( higemaru_map, AS_PROGRAM, 8, higemaru_state )
 	AM_RANGE(0xc800, 0xc800) AM_WRITE(higemaru_c800_w)
 	AM_RANGE(0xc801, 0xc802) AM_DEVWRITE_LEGACY("ay1", ay8910_address_data_w)
 	AM_RANGE(0xc803, 0xc804) AM_DEVWRITE_LEGACY("ay2", ay8910_address_data_w)
-	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(higemaru_videoram_w) AM_BASE(m_videoram)
-	AM_RANGE(0xd400, 0xd7ff) AM_RAM_WRITE(higemaru_colorram_w) AM_BASE(m_colorram)
-	AM_RANGE(0xd880, 0xd9ff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
+	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(higemaru_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0xd400, 0xd7ff) AM_RAM_WRITE(higemaru_colorram_w) AM_SHARE("colorram")
+	AM_RANGE(0xd880, 0xd9ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xe000, 0xefff) AM_RAM
 ADDRESS_MAP_END
 

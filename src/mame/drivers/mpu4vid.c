@@ -999,7 +999,7 @@ static VIDEO_START( mpu4_vid )
 	/* if anything uses tile sizes other than 8x8 we can't really do it this way.. we'll have to draw tiles by hand.
       All Barcrest stuff uses 8x8, son unless the BwB is different, we don't need to */
 
-	state->m_vid_vidram = auto_alloc_array(machine, UINT16, 0x20000/2);
+	state->m_vid_vidram.allocate(0x20000/2);
 
 	memset(state->m_vid_vidram,0,0x20000);
 
@@ -1011,10 +1011,10 @@ static VIDEO_START( mpu4_vid )
 	assert(state->m_gfx_index != MAX_GFX_ELEMENTS);
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	machine.gfx[state->m_gfx_index+0] = gfx_element_alloc(machine, &mpu4_vid_char_8x8_layout, (UINT8 *)state->m_vid_vidram, machine.total_colors() / 16, 0);
-	machine.gfx[state->m_gfx_index+1] = gfx_element_alloc(machine, &mpu4_vid_char_8x16_layout, (UINT8 *)state->m_vid_vidram, machine.total_colors() / 16, 0);
-	machine.gfx[state->m_gfx_index+2] = gfx_element_alloc(machine, &mpu4_vid_char_16x8_layout, (UINT8 *)state->m_vid_vidram, machine.total_colors() / 16, 0);
-	machine.gfx[state->m_gfx_index+3] = gfx_element_alloc(machine, &mpu4_vid_char_16x16_layout, (UINT8 *)state->m_vid_vidram, machine.total_colors() / 16, 0);
+	machine.gfx[state->m_gfx_index+0] = gfx_element_alloc(machine, &mpu4_vid_char_8x8_layout, reinterpret_cast<UINT8 *>(state->m_vid_vidram.target()), machine.total_colors() / 16, 0);
+	machine.gfx[state->m_gfx_index+1] = gfx_element_alloc(machine, &mpu4_vid_char_8x16_layout, reinterpret_cast<UINT8 *>(state->m_vid_vidram.target()), machine.total_colors() / 16, 0);
+	machine.gfx[state->m_gfx_index+2] = gfx_element_alloc(machine, &mpu4_vid_char_16x8_layout, reinterpret_cast<UINT8 *>(state->m_vid_vidram.target()), machine.total_colors() / 16, 0);
+	machine.gfx[state->m_gfx_index+3] = gfx_element_alloc(machine, &mpu4_vid_char_16x16_layout, reinterpret_cast<UINT8 *>(state->m_vid_vidram.target()), machine.total_colors() / 16, 0);
 
 	state->m_scn2674_IR_pointer = 0;
 }
@@ -1976,7 +1976,7 @@ static MACHINE_RESET( mpu4_vid )
 
 static ADDRESS_MAP_START( mpu4_68k_map, AS_PROGRAM, 16, mpu4_state )
 	AM_RANGE(0x000000, 0x7fffff) AM_ROM
-	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_BASE(m_vid_mainram)
+	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_SHARE("vid_mainram")
 //  AM_RANGE(0x810000, 0x81ffff) AM_RAM /* ? */
 	AM_RANGE(0x900000, 0x900001) AM_DEVWRITE8_LEGACY("saa", saa1099_data_w, 0x00ff)
 	AM_RANGE(0x900002, 0x900003) AM_DEVWRITE8_LEGACY("saa", saa1099_control_w, 0x00ff)
@@ -1994,7 +1994,7 @@ static ADDRESS_MAP_START( mpu4oki_68k_map, AS_PROGRAM, 16, mpu4_state )
 	AM_RANGE(0x000000, 0x5fffff) AM_ROM //AM_WRITENOP
 	AM_RANGE(0x600000, 0x63ffff) AM_RAM	/* The Mating Game has an extra 256kB RAM on the program card */
 //  AM_RANGE(0x640000, 0x7fffff) AM_NOP /* Possible bug, reads and writes here */
-	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_BASE(m_vid_mainram)
+	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_SHARE("vid_mainram")
 	AM_RANGE(0x900000, 0x900001) AM_DEVWRITE8_LEGACY("saa", saa1099_data_w, 0x00ff)
 	AM_RANGE(0x900002, 0x900003) AM_DEVWRITE8_LEGACY("saa", saa1099_control_w, 0x00ff)
 	AM_RANGE(0xa00000, 0xa00003) AM_READWRITE_LEGACY(ef9369_r, ef9369_w)
@@ -2030,7 +2030,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bwbvid_68k_map, AS_PROGRAM, 16, mpu4_state )
 	AM_RANGE(0x000000, 0x7fffff) AM_ROM
-	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_BASE(m_vid_mainram)
+	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_SHARE("vid_mainram")
 	AM_RANGE(0x810000, 0x81ffff) AM_RAM /* ? */
 	AM_RANGE(0x900000, 0x900001) AM_DEVWRITE8_LEGACY("saa", saa1099_data_w, 0x00ff)
 	AM_RANGE(0x900002, 0x900003) AM_DEVWRITE8_LEGACY("saa", saa1099_control_w, 0x00ff)
@@ -2047,7 +2047,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bwbvid5_68k_map, AS_PROGRAM, 16, mpu4_state )
 	AM_RANGE(0x000000, 0x7fffff) AM_ROM
-	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_BASE(m_vid_mainram)
+	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_SHARE("vid_mainram")
 	AM_RANGE(0x810000, 0x81ffff) AM_RAM /* ? */
 	AM_RANGE(0x900000, 0x900001) AM_DEVWRITE8_LEGACY("saa", saa1099_data_w, 0x00ff)
 	AM_RANGE(0x900002, 0x900003) AM_DEVWRITE8_LEGACY("saa", saa1099_control_w, 0x00ff)
@@ -2213,7 +2213,7 @@ static ADDRESS_MAP_START( dealem_memmap, AS_PROGRAM, 8, mpu4_state )
 	AM_RANGE(0x0e00, 0x0e03) AM_DEVREADWRITE("pia_ic7", pia6821_device, read, write)		/* PIA6821 IC7 */
 	AM_RANGE(0x0f00, 0x0f03) AM_DEVREADWRITE("pia_ic8", pia6821_device, read, write)		/* PIA6821 IC8 */
 
-	AM_RANGE(0x1000, 0x2fff) AM_RAM AM_BASE(m_dealem_videoram)
+	AM_RANGE(0x1000, 0x2fff) AM_RAM AM_SHARE("dealem_videoram")
 	AM_RANGE(0x8000, 0xffff) AM_ROM	AM_WRITENOP/* 64k  paged ROM (4 pages) */
 ADDRESS_MAP_END
 

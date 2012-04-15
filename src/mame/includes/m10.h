@@ -32,15 +32,19 @@ class m10_state : public driver_device
 {
 public:
 	m10_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_memory(*this, "memory"),
+		m_rom(*this, "rom"),
+		m_videoram(*this, "videoram"),
+		m_colorram(*this, "colorram"),
+		m_chargen(*this, "chargen"){ }
 
 	/* memory pointers */
-	UINT8 *             m_chargen;
-	UINT8 *             m_memory;
-	UINT8 *             m_rom;
-	UINT8 *             m_videoram;
-	UINT8 *             m_colorram;
-	size_t              m_videoram_size;
+	required_shared_ptr<UINT8> m_memory;
+	required_shared_ptr<UINT8> m_rom;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_colorram;
+	required_shared_ptr<UINT8> m_chargen;
 
 	/* video-related */
 	tilemap_t *           m_tx_tilemap;

@@ -5,13 +5,17 @@ class armedf_state : public driver_device
 public:
 	armedf_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_spriteram(*this, "spriteram") { }
+		  m_spriteram(*this, "spriteram") ,
+		m_spr_pal_clut(*this, "spr_pal_clut"),
+		m_fg_videoram(*this, "fg_videoram"),
+		m_bg_videoram(*this, "bg_videoram"){ }
 
 	/* memory pointers */
 	UINT8  *  m_text_videoram;
-	UINT16 *  m_bg_videoram;
-	UINT16 *  m_fg_videoram;
-	UINT16 *  m_spr_pal_clut;
+	required_device<buffered_spriteram16_device> m_spriteram;
+	required_shared_ptr<UINT16> m_spr_pal_clut;
+	required_shared_ptr<UINT16> m_fg_videoram;
+	required_shared_ptr<UINT16> m_bg_videoram;
 	UINT16 m_legion_cmd[4];	// legiono only!
 //  UINT16 *  m_paletteram;   // currently this uses generic palette handling
 
@@ -30,7 +34,6 @@ public:
 	int      m_old_mcu_mode;
 	int      m_waiting_msb;
 
-	required_device<buffered_spriteram16_device> m_spriteram;
 	DECLARE_WRITE16_MEMBER(terraf_io_w);
 	DECLARE_WRITE16_MEMBER(terrafb_io_w);
 	DECLARE_WRITE16_MEMBER(bootleg_io_w);
@@ -63,9 +66,10 @@ class bigfghtr_state : public armedf_state
 {
 public:
 	bigfghtr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: armedf_state(mconfig, type, tag) { }
+		: armedf_state(mconfig, type, tag),
+		m_sharedram(*this, "sharedram") { }
 
-	UINT16 *      m_sharedram;
+	required_shared_ptr<UINT16> m_sharedram;
 
 	/* misc */
 	int           m_read_latch;

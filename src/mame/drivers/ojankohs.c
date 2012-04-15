@@ -194,18 +194,18 @@ WRITE8_MEMBER(ojankohs_state::ccasino_coinctr_w)
 
 static ADDRESS_MAP_START( ojankohs_map, AS_PROGRAM, 8, ojankohs_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x8fff) AM_RAM_WRITE(ojankohs_videoram_w) AM_BASE(m_videoram)
-	AM_RANGE(0x9000, 0x9fff) AM_RAM_WRITE(ojankohs_colorram_w) AM_BASE(m_colorram)
+	AM_RANGE(0x8000, 0x8fff) AM_RAM_WRITE(ojankohs_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x9000, 0x9fff) AM_RAM_WRITE(ojankohs_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0xa000, 0xb7ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xb800, 0xbfff) AM_RAM_WRITE(ojankohs_palette_w) AM_BASE(m_paletteram)
+	AM_RANGE(0xb800, 0xbfff) AM_RAM_WRITE(ojankohs_palette_w) AM_SHARE("paletteram")
 	AM_RANGE(0xc000, 0xffff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( ojankoy_map, AS_PROGRAM, 8, ojankohs_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x9fff) AM_RAM_WRITE(ojankohs_videoram_w) AM_BASE(m_videoram)
-	AM_RANGE(0xa000, 0xafff) AM_RAM_WRITE(ojankohs_colorram_w) AM_BASE(m_colorram)
+	AM_RANGE(0x8000, 0x9fff) AM_RAM_WRITE(ojankohs_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0xa000, 0xafff) AM_RAM_WRITE(ojankohs_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0xb000, 0xbfff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xc000, 0xffff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
@@ -253,7 +253,7 @@ static ADDRESS_MAP_START( ccasino_io_map, AS_IO, 8, ojankohs_state )
 	AM_RANGE(0x05, 0x05) AM_WRITE(ojankohs_msm5205_w)
 	AM_RANGE(0x06, 0x06) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
 	AM_RANGE(0x06, 0x07) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_address_w)
-	AM_RANGE(0x08, 0x0f) AM_WRITE(ccasino_palette_w) AM_BASE(m_paletteram)		// 16bit address access
+	AM_RANGE(0x08, 0x0f) AM_WRITE(ccasino_palette_w) AM_SHARE("paletteram")		// 16bit address access
 	AM_RANGE(0x10, 0x10) AM_WRITENOP
 	AM_RANGE(0x11, 0x11) AM_WRITENOP
 ADDRESS_MAP_END

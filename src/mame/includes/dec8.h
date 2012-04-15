@@ -5,16 +5,24 @@ class dec8_state : public driver_device
 public:
 	dec8_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_spriteram(*this, "spriteram") { }
+		  m_spriteram(*this, "spriteram") ,
+		m_videoram(*this, "videoram"),
+		m_bg_data(*this, "bg_data"){ }
+
+	/* devices */
+	device_t *m_maincpu;
+	device_t *m_subcpu;
+	device_t *m_audiocpu;
+	device_t *m_mcu;
+	required_device<buffered_spriteram8_device> m_spriteram;
 
 	/* memory pointers */
-	UINT8 *  m_videoram;
-	UINT8 *  m_bg_data;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_bg_data;
 	UINT8 *  m_pf1_data;
 	UINT8 *  m_row;
 //  UINT8 *  m_paletteram;    // currently this uses generic palette handling
 //  UINT8 *  m_paletteram_2;  // currently this uses generic palette handling
-	size_t   m_videoram_size;
 	UINT16   m_buffered_spriteram16[0x800/2]; // for the mxc06 sprite chip emulation (oscar, cobra)
 
 	/* video-related */
@@ -46,12 +54,6 @@ public:
 	int      m_msm5205next;
 	int      m_toggle;
 
-	/* devices */
-	device_t *m_maincpu;
-	device_t *m_subcpu;
-	device_t *m_audiocpu;
-	device_t *m_mcu;
-	required_device<buffered_spriteram8_device> m_spriteram;
 	DECLARE_WRITE8_MEMBER(dec8_mxc06_karn_buffer_spriteram_w);
 	DECLARE_READ8_MEMBER(i8751_h_r);
 	DECLARE_READ8_MEMBER(i8751_l_r);

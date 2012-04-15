@@ -2,20 +2,33 @@ class nmk16_state : public driver_device
 {
 public:
 	nmk16_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_nmk_bgvideoram0(*this, "nmk_bgvideoram0"),
+		m_nmk_txvideoram(*this, "nmk_txvideoram"),
+		m_mainram(*this, "mainram"),
+		m_gunnail_scrollram(*this, "scrollram"),
+		m_spriteram(*this, "spriteram"),
+		m_nmk_fgvideoram(*this, "nmk_fgvideoram"),
+		m_gunnail_scrollramy(*this, "scrollramy"),
+		m_nmk_bgvideoram1(*this, "nmk_bgvideoram1"),
+		m_nmk_bgvideoram2(*this, "nmk_bgvideoram2"),
+		m_nmk_bgvideoram3(*this, "nmk_bgvideoram3"),
+		m_afega_scroll_0(*this, "afega_scroll_0"),
+		m_afega_scroll_1(*this, "afega_scroll_1"){ }
 
 	int mask[4*2];
-	UINT16* m_mainram;
-	UINT16 *m_nmk_bgvideoram0;
-	UINT16 *m_nmk_bgvideoram1;
-	UINT16 *m_nmk_bgvideoram2;
-	UINT16 *m_nmk_bgvideoram3;
-	UINT16 *m_nmk_fgvideoram;
-	UINT16 *m_nmk_txvideoram;
-	UINT16 *m_gunnail_scrollram;
-	UINT16 *m_gunnail_scrollramy;
-	UINT16 *m_afega_scroll_0;
-	UINT16 *m_afega_scroll_1;
+	required_shared_ptr<UINT16> m_nmk_bgvideoram0;
+	required_shared_ptr<UINT16> m_nmk_txvideoram;
+	required_shared_ptr<UINT16> m_mainram;
+	required_shared_ptr<UINT16> m_gunnail_scrollram;
+	required_shared_ptr<UINT8> m_spriteram;	
+	required_shared_ptr<UINT16> m_nmk_fgvideoram;
+	required_shared_ptr<UINT16> m_gunnail_scrollramy;
+	required_shared_ptr<UINT16> m_nmk_bgvideoram1;
+	required_shared_ptr<UINT16> m_nmk_bgvideoram2;
+	required_shared_ptr<UINT16> m_nmk_bgvideoram3;
+	required_shared_ptr<UINT16> m_afega_scroll_0;
+	required_shared_ptr<UINT16> m_afega_scroll_1;
 	int m_simple_scroll;
 	int m_redraw_bitmap;
 	UINT16 *m_spriteram_old;
@@ -35,8 +48,6 @@ public:
 	UINT8 m_scroll[4];
 	UINT8 m_scroll_2[4];
 	UINT16 m_vscroll[4];
-	UINT8 *m_spriteram;
-	size_t m_spriteram_size;
 	int m_prot_count;
 	UINT8 m_input_pressed;
 	UINT8 m_start_helper;

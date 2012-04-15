@@ -99,9 +99,9 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, retofinv_state )
 	AM_RANGE(0x7fff, 0x7fff) AM_WRITE(coincounter_w)
 	AM_RANGE(0x7b00, 0x7bff) AM_ROM	/* space for diagnostic ROM? The code looks */
 									/* for a string here, and jumps if it's present */
-	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(retofinv_fg_videoram_w) AM_SHARE("share2") AM_BASE(m_fg_videoram)
-	AM_RANGE(0x8800, 0x9fff) AM_RAM AM_SHARE("share1") AM_BASE(m_sharedram)
-	AM_RANGE(0xa000, 0xa7ff) AM_RAM_WRITE(retofinv_bg_videoram_w) AM_SHARE("share3") AM_BASE(m_bg_videoram)
+	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(retofinv_fg_videoram_w) AM_SHARE("share2") AM_SHARE("fg_videoram")
+	AM_RANGE(0x8800, 0x9fff) AM_RAM AM_SHARE("share1") AM_SHARE("sharedram")
+	AM_RANGE(0xa000, 0xa7ff) AM_RAM_WRITE(retofinv_bg_videoram_w) AM_SHARE("share3") AM_SHARE("bg_videoram")
 	AM_RANGE(0xb800, 0xb802) AM_WRITE(retofinv_gfx_ctrl_w)
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("P1")
 	AM_RANGE(0xc001, 0xc001) AM_READ_PORT("P2")

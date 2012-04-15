@@ -90,7 +90,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 
 	/* Drawing sprites: 64 in total */
 
-	for (offset = 0;offset < state->m_spriteram_size;offset += 4)
+	for (offset = 0;offset < state->m_spriteram.bytes();offset += 4)
 	{
 		if(!(spriteram[offset + 2] & 0x80))
 			continue;

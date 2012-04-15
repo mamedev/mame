@@ -11,17 +11,25 @@ public:
 		: driver_device(mconfig, type, tag),
 		  m_spriteram(*this, "spriteram"),
 		  m_spriteram2(*this, "spriteram2"),
-		  m_s2650_spriteram(*this, "s2650_spriteram") { }
+		  m_s2650_spriteram(*this, "s2650_spriteram") ,
+		m_videoram(*this, "videoram"),
+		m_colorram(*this, "colorram"),
+		m_s2650games_tileram(*this, "s2650_tileram"),
+		m_rocktrv2_prot_data(*this, "rocktrv2_prot"){ }
+
+	optional_shared_ptr<UINT8> m_spriteram;
+	optional_shared_ptr<UINT8> m_spriteram2;
+	optional_shared_ptr<UINT8> m_s2650_spriteram;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_colorram;
+	required_shared_ptr<UINT8> m_s2650games_tileram;
+	required_shared_ptr<UINT8> m_rocktrv2_prot_data;
 
 	UINT8 m_cannonb_bit_to_read;
 	int m_mystery;
 	UINT8 m_counter;
 	int m_bigbucks_bank;
-	UINT8 *m_rocktrv2_prot_data;
 	UINT8 m_rocktrv2_question_bank;
-	UINT8 *m_videoram;
-	UINT8 *m_colorram;
-	UINT8 *m_s2650games_tileram;
 	tilemap_t *m_bg_tilemap;
 	UINT8 m_charbank;
 	UINT8 m_spritebank;
@@ -32,9 +40,7 @@ public:
 	int m_xoffsethack;
 	UINT8 m_inv_spr;
 	UINT8 m_irq_mask;
-	optional_shared_ptr<UINT8> m_spriteram;
-	optional_shared_ptr<UINT8> m_spriteram2;
-	optional_shared_ptr<UINT8> m_s2650_spriteram;
+
 	DECLARE_WRITE8_MEMBER(pacman_interrupt_vector_w);
 	DECLARE_WRITE8_MEMBER(piranha_interrupt_vector_w);
 	DECLARE_WRITE8_MEMBER(nmouse_interrupt_vector_w);

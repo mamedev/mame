@@ -408,7 +408,7 @@ READ8_MEMBER(lazercmd_state::lazercmd_hardware_r)
 static ADDRESS_MAP_START( lazercmd_map, AS_PROGRAM, 8, lazercmd_state )
 	AM_RANGE(0x0000, 0x0bff) AM_ROM
 	AM_RANGE(0x1c00, 0x1c1f) AM_RAM
-	AM_RANGE(0x1c20, 0x1eff) AM_RAM AM_BASE_SIZE(m_videoram, m_videoram_size)
+	AM_RANGE(0x1c20, 0x1eff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0x1f00, 0x1f03) AM_WRITE(lazercmd_hardware_w)
 	AM_RANGE(0x1f00, 0x1f07) AM_READ(lazercmd_hardware_r)
 ADDRESS_MAP_END
@@ -418,7 +418,7 @@ static ADDRESS_MAP_START( medlanes_map, AS_PROGRAM, 8, lazercmd_state )
 	AM_RANGE(0x0000, 0x0bff) AM_ROM
 	AM_RANGE(0x1000, 0x17ff) AM_ROM
 	AM_RANGE(0x1c00, 0x1c1f) AM_RAM
-	AM_RANGE(0x1c20, 0x1eff) AM_RAM AM_BASE_SIZE(m_videoram, m_videoram_size)
+	AM_RANGE(0x1c20, 0x1eff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0x1f00, 0x1f03) AM_WRITE(medlanes_hardware_w)
 	AM_RANGE(0x1f00, 0x1f07) AM_READ(lazercmd_hardware_r)
 ADDRESS_MAP_END
@@ -427,7 +427,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( bbonk_map, AS_PROGRAM, 8, lazercmd_state )
 	AM_RANGE(0x0000, 0x0bff) AM_ROM
 	AM_RANGE(0x1c00, 0x1c1f) AM_RAM
-	AM_RANGE(0x1c20, 0x1eff) AM_RAM AM_BASE_SIZE(m_videoram, m_videoram_size)
+	AM_RANGE(0x1c20, 0x1eff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0x1f00, 0x1f03) AM_WRITE(bbonk_hardware_w)
 	AM_RANGE(0x1f00, 0x1f07) AM_READ(lazercmd_hardware_r)
 ADDRESS_MAP_END

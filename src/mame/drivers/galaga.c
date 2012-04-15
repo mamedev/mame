@@ -926,16 +926,16 @@ static ADDRESS_MAP_START( bosco_map, AS_PROGRAM, 8, bosco_state )
 	AM_RANGE(0x7000, 0x70ff) AM_DEVREADWRITE_LEGACY("06xx_0", namco_06xx_data_r, namco_06xx_data_w)
 	AM_RANGE(0x7100, 0x7100) AM_DEVREADWRITE_LEGACY("06xx_0", namco_06xx_ctrl_r, namco_06xx_ctrl_w)
 	AM_RANGE(0x7800, 0x7fff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x8000, 0x8fff) AM_RAM_WRITE_LEGACY(bosco_videoram_w) AM_BASE(m_videoram) AM_SHARE("bvr")	/* + sprite registers */
+	AM_RANGE(0x8000, 0x8fff) AM_RAM_WRITE_LEGACY(bosco_videoram_w) AM_SHARE("videoram") AM_SHARE("bvr")	/* + sprite registers */
 	AM_RANGE(0x9000, 0x90ff) AM_DEVREADWRITE_LEGACY("06xx_1", namco_06xx_data_r, namco_06xx_data_w)
 	AM_RANGE(0x9100, 0x9100) AM_DEVREADWRITE_LEGACY("06xx_1", namco_06xx_ctrl_r, namco_06xx_ctrl_w)
-	AM_RANGE(0x9800, 0x980f) AM_WRITEONLY AM_SHARE("share2") AM_BASE(m_bosco_radarattr)
+	AM_RANGE(0x9800, 0x980f) AM_WRITEONLY AM_SHARE("share2") AM_SHARE("bosco_radarattr")
 	AM_RANGE(0x9810, 0x9810) AM_WRITE_LEGACY(bosco_scrollx_w)
 	AM_RANGE(0x9820, 0x9820) AM_WRITE_LEGACY(bosco_scrolly_w)
-	AM_RANGE(0x9830, 0x9830) AM_WRITEONLY AM_BASE(m_bosco_starcontrol) AM_SHARE("bsc")
+	AM_RANGE(0x9830, 0x9830) AM_WRITEONLY AM_SHARE("bosco_starcontrol") AM_SHARE("bsc")
 	AM_RANGE(0x9840, 0x9840) AM_WRITE_LEGACY(bosco_starclr_w)
 	AM_RANGE(0x9870, 0x9870) AM_WRITE(bosco_flip_screen_w)
-	AM_RANGE(0x9874, 0x9875) AM_WRITEONLY AM_BASE(m_bosco_starblink) AM_SHARE("bsb")
+	AM_RANGE(0x9874, 0x9875) AM_WRITEONLY AM_SHARE("bosco_starblink") AM_SHARE("bsb")
 ADDRESS_MAP_END
 
 
@@ -947,11 +947,11 @@ static ADDRESS_MAP_START( galaga_map, AS_PROGRAM, 8, galaga_state )
 	AM_RANGE(0x6830, 0x6830) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x7000, 0x70ff) AM_DEVREADWRITE_LEGACY("06xx", namco_06xx_data_r, namco_06xx_data_w)
 	AM_RANGE(0x7100, 0x7100) AM_DEVREADWRITE_LEGACY("06xx", namco_06xx_ctrl_r, namco_06xx_ctrl_w)
-	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(galaga_videoram_w) AM_BASE(m_videoram) AM_SHARE("gvr")
-	AM_RANGE(0x8800, 0x8bff) AM_RAM AM_SHARE("share1") AM_BASE(m_galaga_ram1)
-	AM_RANGE(0x9000, 0x93ff) AM_RAM AM_SHARE("share2") AM_BASE(m_galaga_ram2)
-	AM_RANGE(0x9800, 0x9bff) AM_RAM AM_SHARE("share3") AM_BASE(m_galaga_ram3)
-	AM_RANGE(0xa000, 0xa005) AM_WRITEONLY AM_BASE(m_galaga_starcontrol) AM_SHARE("gsc")
+	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(galaga_videoram_w) AM_SHARE("videoram") AM_SHARE("gvr")
+	AM_RANGE(0x8800, 0x8bff) AM_RAM AM_SHARE("share1") AM_SHARE("galaga_ram1")
+	AM_RANGE(0x9000, 0x93ff) AM_RAM AM_SHARE("share2") AM_SHARE("galaga_ram2")
+	AM_RANGE(0x9800, 0x9bff) AM_RAM AM_SHARE("share3") AM_SHARE("galaga_ram3")
+	AM_RANGE(0xa000, 0xa005) AM_WRITEONLY AM_SHARE("galaga_starcontrol") AM_SHARE("gsc")
 	AM_RANGE(0xa007, 0xa007) AM_WRITE(galaga_flip_screen_w)
 ADDRESS_MAP_END
 
@@ -965,13 +965,13 @@ static ADDRESS_MAP_START( xevious_map, AS_PROGRAM, 8, xevious_state )
 	AM_RANGE(0x7000, 0x70ff) AM_DEVREADWRITE_LEGACY("06xx", namco_06xx_data_r, namco_06xx_data_w)
 	AM_RANGE(0x7100, 0x7100) AM_DEVREADWRITE_LEGACY("06xx", namco_06xx_ctrl_r, namco_06xx_ctrl_w)
 	AM_RANGE(0x7800, 0x7fff) AM_RAM AM_SHARE("share1")							/* work RAM */
-	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("share2") AM_BASE(m_xevious_sr1)	/* work RAM + sprite registers */
-	AM_RANGE(0x9000, 0x97ff) AM_RAM AM_SHARE("share3") AM_BASE(m_xevious_sr2)	/* work RAM + sprite registers */
-	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_SHARE("share4") AM_BASE(m_xevious_sr3)	/* work RAM + sprite registers */
-	AM_RANGE(0xb000, 0xb7ff) AM_RAM_WRITE_LEGACY(xevious_fg_colorram_w) AM_BASE(m_xevious_fg_colorram) AM_SHARE("fgc")
-	AM_RANGE(0xb800, 0xbfff) AM_RAM_WRITE_LEGACY(xevious_bg_colorram_w) AM_BASE(m_xevious_bg_colorram) AM_SHARE("bgc")
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE_LEGACY(xevious_fg_videoram_w) AM_BASE(m_xevious_fg_videoram) AM_SHARE("fgv")
-	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE_LEGACY(xevious_bg_videoram_w) AM_BASE(m_xevious_bg_videoram) AM_SHARE("bgv")
+	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("share2") AM_SHARE("xevious_sr1")	/* work RAM + sprite registers */
+	AM_RANGE(0x9000, 0x97ff) AM_RAM AM_SHARE("share3") AM_SHARE("xevious_sr2")	/* work RAM + sprite registers */
+	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_SHARE("share4") AM_SHARE("xevious_sr3")	/* work RAM + sprite registers */
+	AM_RANGE(0xb000, 0xb7ff) AM_RAM_WRITE_LEGACY(xevious_fg_colorram_w) AM_SHARE("xevious_fg_colorram") AM_SHARE("fgc")
+	AM_RANGE(0xb800, 0xbfff) AM_RAM_WRITE_LEGACY(xevious_bg_colorram_w) AM_SHARE("xevious_bg_colorram") AM_SHARE("bgc")
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE_LEGACY(xevious_fg_videoram_w) AM_SHARE("xevious_fg_videoram") AM_SHARE("fgv")
+	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE_LEGACY(xevious_bg_videoram_w) AM_SHARE("xevious_bg_videoram") AM_SHARE("bgv")
 	AM_RANGE(0xd000, 0xd07f) AM_WRITE_LEGACY(xevious_vh_latch_w)
 	AM_RANGE(0xf000, 0xffff) AM_READWRITE_LEGACY(xevious_bb_r, xevious_bs_w)
 ADDRESS_MAP_END
@@ -984,11 +984,11 @@ static ADDRESS_MAP_START( digdug_map, AS_PROGRAM, 8, digdug_state )
 	AM_RANGE(0x6830, 0x6830) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x7000, 0x70ff) AM_DEVREADWRITE_LEGACY("06xx", namco_06xx_data_r, namco_06xx_data_w)
 	AM_RANGE(0x7100, 0x7100) AM_DEVREADWRITE_LEGACY("06xx", namco_06xx_ctrl_r, namco_06xx_ctrl_w)
-	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE_LEGACY(digdug_videoram_w) AM_BASE(m_videoram)	AM_SHARE("dvr")/* tilemap RAM (bottom half of RAM 0 */
+	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE_LEGACY(digdug_videoram_w) AM_SHARE("videoram")	AM_SHARE("dvr")/* tilemap RAM (bottom half of RAM 0 */
 	AM_RANGE(0x8400, 0x87ff) AM_RAM AM_SHARE("share1")							/* work RAM (top half for RAM 0 */
-	AM_RANGE(0x8800, 0x8bff) AM_RAM AM_SHARE("share2") AM_BASE(m_digdug_objram)	/* work RAM + sprite registers */
-	AM_RANGE(0x9000, 0x93ff) AM_RAM AM_SHARE("share3") AM_BASE(m_digdug_posram)	/* work RAM + sprite registers */
-	AM_RANGE(0x9800, 0x9bff) AM_RAM AM_SHARE("share4") AM_BASE(m_digdug_flpram)	/* work RAM + sprite registers */
+	AM_RANGE(0x8800, 0x8bff) AM_RAM AM_SHARE("share2") AM_SHARE("digdug_objram")	/* work RAM + sprite registers */
+	AM_RANGE(0x9000, 0x93ff) AM_RAM AM_SHARE("share3") AM_SHARE("digdug_posram")	/* work RAM + sprite registers */
+	AM_RANGE(0x9800, 0x9bff) AM_RAM AM_SHARE("share4") AM_SHARE("digdug_flpram")	/* work RAM + sprite registers */
 	AM_RANGE(0xa000, 0xa007) AM_READNOP AM_WRITE_LEGACY(digdug_PORT_w)		/* video latches (spurious reads when setting latch bits) */
 	AM_RANGE(0xb800, 0xb83f) AM_DEVREADWRITE("earom", atari_vg_earom_device, read, write)	/* non volatile memory data */
 	AM_RANGE(0xb840, 0xb840) AM_DEVWRITE("earom", atari_vg_earom_device, ctrl_w)					/* non volatile memory control */

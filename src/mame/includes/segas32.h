@@ -17,9 +17,19 @@ class segas32_state : public driver_device
 {
 public:
 	segas32_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_z80_shared_ram(*this,"z80_shared_ram"),
+		m_ga2_dpram(*this,"ga2_dpram"),
+		m_system32_workram(*this,"workram"),
+		m_system32_videoram(*this,"videoram"),
+		m_system32_spriteram(*this,"spriteram") { }
 
-	UINT8 *m_z80_shared_ram;
+	required_shared_ptr<UINT8> m_z80_shared_ram;
+	required_shared_ptr<UINT8> m_ga2_dpram;
+	required_shared_ptr<UINT16> m_system32_workram;
+	required_shared_ptr<UINT16> m_system32_videoram;
+	required_shared_ptr<UINT16> m_system32_spriteram;
+
 	UINT8 m_v60_irq_control[0x10];
 	timer_device *m_v60_irq_timer[2];
 	UINT8 m_sound_irq_control[4];
@@ -36,11 +46,7 @@ public:
 	sys32_output_callback m_sw2_output;
 	sys32_output_callback m_sw3_output;
 	UINT16* m_dual_pcb_comms;
-	UINT8 *m_ga2_dpram;
-	UINT16 *m_system32_workram;
 	UINT16 *m_system32_protram;
-	UINT16 *m_system32_videoram;
-	UINT16 *m_system32_spriteram;
 	UINT16 *m_system32_paletteram[2];
 	UINT16 m_system32_displayenable[2];
 	UINT16 m_system32_tilebank_external;

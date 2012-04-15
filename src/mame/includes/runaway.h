@@ -2,11 +2,13 @@ class runaway_state : public driver_device
 {
 public:
 	runaway_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_video_ram(*this, "video_ram"),
+		m_sprite_ram(*this, "sprite_ram"){ }
 
 	emu_timer *m_interrupt_timer;
-	UINT8* m_video_ram;
-	UINT8* m_sprite_ram;
+	required_shared_ptr<UINT8> m_video_ram;
+	required_shared_ptr<UINT8> m_sprite_ram;
 	tilemap_t *m_bg_tilemap;
 	int m_tile_bank;
 	DECLARE_READ8_MEMBER(runaway_input_r);

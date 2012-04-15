@@ -5,17 +5,22 @@ class playmark_state : public driver_device
 {
 public:
 	playmark_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_bgvideoram(*this, "bgvideoram"),
+		m_videoram1(*this, "videoram1"),
+		m_videoram2(*this, "videoram2"),
+		m_videoram3(*this, "videoram3"),
+		m_spriteram(*this, "spriteram"),
+		m_rowscroll(*this, "rowscroll"){ }
 
 	/* memory pointers */
-	UINT16 *     m_bgvideoram;
-	UINT16 *     m_videoram1;
-	UINT16 *     m_videoram2;
-	UINT16 *     m_videoram3;
-	UINT16 *     m_rowscroll;
-	UINT16 *     m_spriteram;
+	required_shared_ptr<UINT16> m_bgvideoram;
+	required_shared_ptr<UINT16> m_videoram1;
+	required_shared_ptr<UINT16> m_videoram2;
+	required_shared_ptr<UINT16> m_videoram3;
+	required_shared_ptr<UINT16> m_spriteram;
+	required_shared_ptr<UINT16> m_rowscroll;
 //      UINT16 *     m_paletteram;    // currently this uses generic palette handling
-	size_t       m_spriteram_size;
 
 	/* video-related */
 	tilemap_t   *m_tx_tilemap;

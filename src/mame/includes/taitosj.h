@@ -2,27 +2,41 @@ class taitosj_state : public driver_device
 {
 public:
 	taitosj_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram_1(*this, "videoram_1"),
+		m_videoram_2(*this, "videoram_2"),
+		m_videoram_3(*this, "videoram_3"),
+		m_spriteram(*this, "spriteram"),
+		m_paletteram(*this, "paletteram"),
+		m_characterram(*this, "characterram"),
+		m_scroll(*this, "scroll"),
+		m_colscrolly(*this, "colscrolly"),
+		m_gfxpointer(*this, "gfxpointer"),
+		m_colorbank(*this, "colorbank"),
+		m_video_mode(*this, "video_mode"),
+		m_video_priority(*this, "video_priority"),
+		m_collision_reg(*this, "collision_reg"),
+		m_kikstart_scrollram(*this, "kikstart_scroll"){ }
 
 	UINT8 m_sndnmi_disable;
 	UINT8 m_input_port_4_f0;
 	UINT8 m_kikstart_gears[2];
 	INT8 m_dac_out;
 	UINT8 m_dac_vol;
-	UINT8 *m_videoram_1;
-	UINT8 *m_videoram_2;
-	UINT8 *m_videoram_3;
-	UINT8 *m_spriteram;
-	UINT8 *m_paletteram;
-	UINT8 *m_characterram;
-	UINT8 *m_scroll;
-	UINT8 *m_colscrolly;
-	UINT8 *m_gfxpointer;
-	UINT8 *m_colorbank;
-	UINT8 *m_video_mode;
-	UINT8 *m_video_priority;
-	UINT8 *m_collision_reg;
-	UINT8 *m_kikstart_scrollram;
+	required_shared_ptr<UINT8> m_videoram_1;
+	required_shared_ptr<UINT8> m_videoram_2;
+	required_shared_ptr<UINT8> m_videoram_3;
+	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<UINT8> m_paletteram;
+	required_shared_ptr<UINT8> m_characterram;
+	required_shared_ptr<UINT8> m_scroll;
+	required_shared_ptr<UINT8> m_colscrolly;
+	required_shared_ptr<UINT8> m_gfxpointer;
+	required_shared_ptr<UINT8> m_colorbank;
+	required_shared_ptr<UINT8> m_video_mode;
+	required_shared_ptr<UINT8> m_video_priority;
+	required_shared_ptr<UINT8> m_collision_reg;
+	required_shared_ptr<UINT8> m_kikstart_scrollram;
 	UINT8 m_fromz80;
 	UINT8 m_toz80;
 	UINT8 m_zaccept;

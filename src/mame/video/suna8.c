@@ -170,7 +170,8 @@ static void suna8_vh_start_common(running_machine &machine, int dim)
 	if (!(state->m_text_dim > 0))
 	{
 		state->m_generic_paletteram_8.allocate(0x200 * 2);
-		state->m_spriteram = auto_alloc_array(machine, UINT8, 0x2000 * 2);
+		//TODO:FIX
+		//state->m_spriteram = auto_alloc_array(machine, UINT8, 0x2000 * 2);
 		state->m_spritebank  = 0;
 		state->m_palettebank = 0;
 	}

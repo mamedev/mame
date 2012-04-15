@@ -639,7 +639,7 @@ READ16_MEMBER(coolpool_state::coolpool_input_r)
  *************************************/
 
 static ADDRESS_MAP_START( amerdart_map, AS_PROGRAM, 16, coolpool_state )
-	AM_RANGE(0x00000000, 0x000fffff) AM_RAM AM_BASE(m_vram_base)
+	AM_RANGE(0x00000000, 0x000fffff) AM_RAM AM_SHARE("vram_base")
 	AM_RANGE(0x04000000, 0x0400000f) AM_WRITE(amerdart_misc_w)
 	AM_RANGE(0x05000000, 0x0500000f) AM_READWRITE(amerdart_iop_r, amerdart_iop_w)
 	AM_RANGE(0x06000000, 0x06007fff) AM_RAM_WRITE(nvram_thrash_data_w) AM_SHARE("nvram")
@@ -649,7 +649,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( coolpool_map, AS_PROGRAM, 16, coolpool_state )
-	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_BASE(m_vram_base)
+	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_SHARE("vram_base")
 	AM_RANGE(0x01000000, 0x010000ff) AM_DEVREADWRITE8_LEGACY("tlc34076", tlc34076_r, tlc34076_w, 0x00ff)	// IMSG176P-40
 	AM_RANGE(0x02000000, 0x020000ff) AM_READWRITE(coolpool_iop_r, coolpool_iop_w)
 	AM_RANGE(0x03000000, 0x0300000f) AM_WRITE(coolpool_misc_w)
@@ -661,7 +661,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( nballsht_map, AS_PROGRAM, 16, coolpool_state )
-	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_BASE(m_vram_base)
+	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_SHARE("vram_base")
 	AM_RANGE(0x02000000, 0x020000ff) AM_READWRITE(coolpool_iop_r, coolpool_iop_w)
 	AM_RANGE(0x03000000, 0x0300000f) AM_WRITE(coolpool_misc_w)
 	AM_RANGE(0x04000000, 0x040000ff) AM_DEVREADWRITE8_LEGACY("tlc34076", tlc34076_r, tlc34076_w, 0x00ff)	// IMSG176P-40

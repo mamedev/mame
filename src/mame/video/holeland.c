@@ -112,7 +112,7 @@ static void holeland_draw_sprites( running_machine &machine, bitmap_ind16 &bitma
 	int offs, code, sx, sy, color, flipx, flipy;
 
 	/* Weird, sprites entries don't start on DWORD boundary */
-	for (offs = 3; offs < state->m_spriteram_size - 1; offs += 4)
+	for (offs = 3; offs < state->m_spriteram.bytes() - 1; offs += 4)
 	{
 		sy = 236 - spriteram[offs];
 		sx = spriteram[offs + 2];
@@ -152,7 +152,7 @@ static void crzrally_draw_sprites( running_machine &machine, bitmap_ind16 &bitma
 	int offs, code, sx, sy, color, flipx, flipy;
 
 	/* Weird, sprites entries don't start on DWORD boundary */
-	for (offs = 3; offs < state->m_spriteram_size - 1; offs += 4)
+	for (offs = 3; offs < state->m_spriteram.bytes() - 1; offs += 4)
 	{
 		sy = 236 - spriteram[offs];
 		sx = spriteram[offs + 2];

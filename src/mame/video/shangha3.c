@@ -113,7 +113,7 @@ WRITE16_MEMBER(shangha3_state::shangha3_blitter_go_w)
 
 	g_profiler.start(PROFILER_VIDEO);
 
-	for (offs = m_gfxlist_addr << 3; offs < m_ram_size/2; offs += 16)
+	for (offs = m_gfxlist_addr << 3; offs < m_ram.bytes()/2; offs += 16)
 	{
 		int sx,sy,x,y,code,color,flipx,flipy,sizex,sizey,zoomx,zoomy;
 

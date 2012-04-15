@@ -3,7 +3,11 @@ class xmen_state : public driver_device
 {
 public:
 	xmen_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_xmen6p_spriteramleft(*this, "spriteramleft"),
+		m_xmen6p_spriteramright(*this, "spriteramright"),
+		m_xmen6p_tilemapleft(*this, "tilemapleft"),
+		m_xmen6p_tilemapright(*this, "tilemapright"){ }
 
 	/* memory pointers */
 //  UINT16 *   m_paletteram;    // currently this uses generic palette handling
@@ -16,10 +20,10 @@ public:
 	/* for xmen6p */
 	bitmap_ind16   *m_screen_right;
 	bitmap_ind16   *m_screen_left;
-	UINT16 *   m_xmen6p_spriteramleft;
-	UINT16 *   m_xmen6p_spriteramright;
-	UINT16 *   m_xmen6p_tilemapleft;
-	UINT16 *   m_xmen6p_tilemapright;
+	required_shared_ptr<UINT16> m_xmen6p_spriteramleft;
+	required_shared_ptr<UINT16> m_xmen6p_spriteramright;
+	required_shared_ptr<UINT16> m_xmen6p_tilemapleft;
+	required_shared_ptr<UINT16> m_xmen6p_tilemapright;
 	UINT16 *   m_k053247_ram;
 
 	/* misc */

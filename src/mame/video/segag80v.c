@@ -326,7 +326,7 @@ static void sega_generate_vector_list(running_machine &machine)
 VIDEO_START( segag80v )
 {
 	segag80v_state *state = machine.driver_data<segag80v_state>();
-	assert_always(state->m_vectorram_size != 0, "vectorram==0");
+	assert_always(state->m_vectorram.bytes() != 0, "vectorram==0");
 
 	state->m_min_x =machine.primary_screen->visible_area().min_x;
 	state->m_min_y =machine.primary_screen->visible_area().min_y;

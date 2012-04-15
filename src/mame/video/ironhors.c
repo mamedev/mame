@@ -163,7 +163,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	else
 		sr = state->m_spriteram2;
 
-	for (offs = 0; offs < state->m_spriteram_size; offs += 5)
+	for (offs = 0; offs < state->m_spriteram.bytes(); offs += 5)
 	{
 		int sx = sr[offs + 3];
 		int sy = sr[offs + 2];
@@ -275,7 +275,7 @@ static void farwest_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap
 	UINT8 *sr = state->m_spriteram2;
 	UINT8 *sr2 = state->m_spriteram;
 
-	for (offs = 0; offs < state->m_spriteram_size; offs += 4)
+	for (offs = 0; offs < state->m_spriteram.bytes(); offs += 4)
 	{
 		int sx = sr[offs + 2];
 		int sy = sr[offs + 1];

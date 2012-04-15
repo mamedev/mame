@@ -753,7 +753,7 @@ static ADDRESS_MAP_START( saturn_mem, AS_PROGRAM, 32, saturn_state )
 	AM_RANGE(0x00000000, 0x0007ffff) AM_ROM AM_SHARE("share6")  // bios
 	AM_RANGE(0x00100000, 0x0010007f) AM_READWRITE8_LEGACY(saturn_SMPC_r, saturn_SMPC_w,0xffffffff)
 	AM_RANGE(0x00180000, 0x0018ffff) AM_READWRITE8_LEGACY(saturn_backupram_r, saturn_backupram_w,0xffffffff) AM_SHARE("share1")
-	AM_RANGE(0x00200000, 0x002fffff) AM_RAM AM_MIRROR(0x20100000) AM_SHARE("share2") AM_BASE(m_workram_l)
+	AM_RANGE(0x00200000, 0x002fffff) AM_RAM AM_MIRROR(0x20100000) AM_SHARE("workram_l")
 	AM_RANGE(0x01000000, 0x017fffff) AM_WRITE_LEGACY(minit_w)
 	AM_RANGE(0x01800000, 0x01ffffff) AM_WRITE_LEGACY(sinit_w)
 	AM_RANGE(0x02000000, 0x023fffff) AM_ROM AM_SHARE("share7") AM_REGION("maincpu", 0x80000)	// cartridge space
@@ -772,7 +772,7 @@ static ADDRESS_MAP_START( saturn_mem, AS_PROGRAM, 32, saturn_state )
 	AM_RANGE(0x05f00000, 0x05f7ffff) AM_READWRITE_LEGACY(saturn_vdp2_cram_r, saturn_vdp2_cram_w)
 	AM_RANGE(0x05f80000, 0x05fbffff) AM_READWRITE16_LEGACY(saturn_vdp2_regs_r, saturn_vdp2_regs_w,0xffffffff)
 	AM_RANGE(0x05fe0000, 0x05fe00cf) AM_READWRITE_LEGACY(saturn_scu_r, saturn_scu_w)
-	AM_RANGE(0x06000000, 0x060fffff) AM_RAM AM_MIRROR(0x21f00000) AM_SHARE("share3") AM_BASE(m_workram_h)
+	AM_RANGE(0x06000000, 0x060fffff) AM_RAM AM_MIRROR(0x21f00000) AM_SHARE("workram_h")
 	AM_RANGE(0x20000000, 0x2007ffff) AM_ROM AM_SHARE("share6")  // bios mirror
 	AM_RANGE(0x22000000, 0x24ffffff) AM_ROM AM_SHARE("share7")  // cart mirror
 	AM_RANGE(0x45000000, 0x46ffffff) AM_WRITENOP
@@ -783,8 +783,8 @@ static ADDRESS_MAP_START( stv_mem, AS_PROGRAM, 32, saturn_state )
 	AM_RANGE(0x00000000, 0x0007ffff) AM_ROM AM_SHARE("share6")  // bios
 	AM_RANGE(0x00100000, 0x0010007f) AM_READWRITE8_LEGACY(stv_SMPC_r, stv_SMPC_w,0xffffffff)
 	AM_RANGE(0x00180000, 0x0018ffff) AM_READWRITE8_LEGACY(saturn_backupram_r,saturn_backupram_w,0xffffffff) AM_SHARE("share1")
-	AM_RANGE(0x00200000, 0x002fffff) AM_RAM AM_MIRROR(0x20100000) AM_SHARE("share2") AM_BASE(m_workram_l)
-//  AM_RANGE(0x00400000, 0x0040001f) AM_READWRITE_LEGACY(stv_ioga_r32, stv_io_w32) AM_BASE(m_ioga) AM_SHARE("share4") AM_MIRROR(0x20) /* installed with per-game specific */
+	AM_RANGE(0x00200000, 0x002fffff) AM_RAM AM_MIRROR(0x20100000) AM_SHARE("workram_l")
+//  AM_RANGE(0x00400000, 0x0040001f) AM_READWRITE_LEGACY(stv_ioga_r32, stv_io_w32) AM_SHARE("ioga") AM_MIRROR(0x20) /* installed with per-game specific */
 	AM_RANGE(0x01000000, 0x017fffff) AM_WRITE_LEGACY(minit_w)
 	AM_RANGE(0x01800000, 0x01ffffff) AM_WRITE_LEGACY(sinit_w)
 	AM_RANGE(0x02000000, 0x04ffffff) AM_ROM AM_SHARE("share7") AM_REGION("abus", 0) // cartridge
@@ -800,14 +800,14 @@ static ADDRESS_MAP_START( stv_mem, AS_PROGRAM, 32, saturn_state )
 	AM_RANGE(0x05f00000, 0x05f7ffff) AM_READWRITE_LEGACY(saturn_vdp2_cram_r, saturn_vdp2_cram_w)
 	AM_RANGE(0x05f80000, 0x05fbffff) AM_READWRITE16_LEGACY(saturn_vdp2_regs_r, saturn_vdp2_regs_w,0xffffffff)
 	AM_RANGE(0x05fe0000, 0x05fe00cf) AM_READWRITE_LEGACY(saturn_scu_r, saturn_scu_w)
-	AM_RANGE(0x06000000, 0x060fffff) AM_RAM AM_MIRROR(0x21f00000) AM_SHARE("share3") AM_BASE(m_workram_h)
+	AM_RANGE(0x06000000, 0x060fffff) AM_RAM AM_MIRROR(0x21f00000) AM_SHARE("workram_h")
 	AM_RANGE(0x20000000, 0x2007ffff) AM_ROM AM_SHARE("share6")  // bios mirror
 	AM_RANGE(0x22000000, 0x24ffffff) AM_ROM AM_SHARE("share7")  // cart mirror
 	AM_RANGE(0xc0000000, 0xc00007ff) AM_RAM // cache RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_mem, AS_PROGRAM, 16, saturn_state )
-	AM_RANGE(0x000000, 0x0fffff) AM_RAM AM_BASE(m_sound_ram)
+	AM_RANGE(0x000000, 0x0fffff) AM_RAM AM_SHARE("sound_ram")
 	AM_RANGE(0x100000, 0x100fff) AM_DEVREADWRITE_LEGACY("scsp", scsp_r, scsp_w)
 ADDRESS_MAP_END
 

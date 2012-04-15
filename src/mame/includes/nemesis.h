@@ -2,24 +2,33 @@ class nemesis_state : public driver_device
 {
 public:
 	nemesis_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_charram(*this, "charram"),
+		m_xscroll1(*this, "xscroll1"),
+		m_xscroll2(*this, "xscroll2"),
+		m_yscroll2(*this, "yscroll2"),
+		m_yscroll1(*this, "yscroll1"),
+		m_videoram1(*this, "videoram1"),
+		m_videoram2(*this, "videoram2"),
+		m_colorram1(*this, "colorram1"),
+		m_colorram2(*this, "colorram2"),
+		m_spriteram(*this, "spriteram"),
+		m_paletteram(*this, "paletteram"),
+		m_gx400_shared_ram(*this, "gx400_shared"){ }
 
 	/* memory pointers */
-	UINT16 *  m_videoram1;
-	UINT16 *  m_videoram2;
-	UINT16 *  m_colorram1;
-	UINT16 *  m_colorram2;
-	UINT16 *  m_charram;
-	UINT16 *  m_spriteram;
-	UINT16 *  m_paletteram;
-	UINT16 *  m_xscroll1;
-	UINT16 *  m_xscroll2;
-	UINT16 *  m_yscroll1;
-	UINT16 *  m_yscroll2;
-	UINT8 *   m_gx400_shared_ram;
-
-	size_t    m_charram_size;
-	size_t    m_spriteram_size;
+	required_shared_ptr<UINT16> m_charram;
+	required_shared_ptr<UINT16> m_xscroll1;
+	required_shared_ptr<UINT16> m_xscroll2;
+	required_shared_ptr<UINT16> m_yscroll2;
+	required_shared_ptr<UINT16> m_yscroll1;
+	required_shared_ptr<UINT16> m_videoram1;
+	required_shared_ptr<UINT16> m_videoram2;
+	required_shared_ptr<UINT16> m_colorram1;
+	required_shared_ptr<UINT16> m_colorram2;
+	required_shared_ptr<UINT16> m_spriteram;
+	required_shared_ptr<UINT16> m_paletteram;
+	required_shared_ptr<UINT8> m_gx400_shared_ram;
 
 	/* video-related */
 	tilemap_t *m_background;

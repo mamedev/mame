@@ -2,17 +2,23 @@ class system1_state : public driver_device
 {
 public:
 	system1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_ram(*this, "ram"),
+		m_spriteram(*this, "spriteram"),
+		m_nob_mcu_latch(*this, "nob_mcu_latch"),
+		m_nob_mcu_status(*this, "nob_mcu_status"){ }
+
+	required_shared_ptr<UINT8> m_ram;
+	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<UINT8> m_nob_mcu_latch;
+	required_shared_ptr<UINT8> m_nob_mcu_status;
 
 	UINT8 *m_videoram;
 	void (*m_videomode_custom)(running_machine &machine, UINT8 data, UINT8 prevdata);
 	UINT8 m_mute_xor;
-	UINT8 *m_ram;
 	UINT8 m_dakkochn_mux_data;
 	UINT8 m_videomode_prev;
 	UINT8 m_mcu_control;
-	UINT8 *m_nob_mcu_status;
-	UINT8 *m_nob_mcu_latch;
 	UINT8 m_nob_maincpu_latch;
 	int m_nobb_inport23_step;
 	UINT8 *m_mix_collide;
@@ -24,7 +30,7 @@ public:
 	UINT8 m_videoram_bank;
 	tilemap_t *m_tilemap_page[8];
 	UINT8 m_tilemap_pages;
-	UINT8 *m_spriteram;
+
 	DECLARE_WRITE8_MEMBER(videomode_w);
 	DECLARE_READ8_MEMBER(sound_data_r);
 	DECLARE_WRITE8_MEMBER(soundport_w);

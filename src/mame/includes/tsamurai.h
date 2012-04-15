@@ -2,16 +2,20 @@ class tsamurai_state : public driver_device
 {
 public:
 	tsamurai_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"),
+		m_colorram(*this, "colorram"),
+		m_bg_videoram(*this, "bg_videoram"),
+		m_spriteram(*this, "spriteram"){ }
 
 	int m_nmi_enabled;
 	int m_sound_command1;
 	int m_sound_command2;
 	int m_sound_command3;
 	int m_vsgongf_sound_nmi_enabled;
-	UINT8 *m_videoram;
-	UINT8 *m_colorram;
-	UINT8 *m_bg_videoram;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_colorram;
+	required_shared_ptr<UINT8> m_bg_videoram;
 	int m_bgcolor;
 	int m_textbank1;
 	int m_textbank2;
@@ -20,7 +24,7 @@ public:
 	int m_flicker;
 	int m_vsgongf_color;
 	int m_key_count;
-	UINT8 *m_spriteram;
+	required_shared_ptr<UINT8> m_spriteram;
 	DECLARE_WRITE8_MEMBER(nmi_enable_w);
 	DECLARE_READ8_MEMBER(unknown_d803_r);
 	DECLARE_READ8_MEMBER(unknown_d803_m660_r);

@@ -88,7 +88,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	goindol_state *state = machine.driver_data<goindol_state>();
 	int offs, sx, sy, tile, palette;
 
-	for (offs = 0; offs < state->m_spriteram_size; offs += 4)
+	for (offs = 0; offs < state->m_spriteram.bytes(); offs += 4)
 	{
 		sx = sprite_ram[offs];
 		sy = 240 - sprite_ram[offs + 1];

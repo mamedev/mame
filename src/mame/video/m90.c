@@ -201,7 +201,7 @@ static void bomblord_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap
 	int x,y,sprite,colour,fx,fy;
 
 
-	while ((offs < state->m_spriteram_size/2) & (spriteram16[offs+0] != 0x8000))
+	while ((offs < state->m_spriteram.bytes()/2) & (spriteram16[offs+0] != 0x8000))
 	{
 		last_sprite = offs;
 		offs += 4;
@@ -240,7 +240,7 @@ static void dynablsb_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap
 	int offs = 0, last_sprite = 0;
 	int x,y,sprite,colour,fx,fy;
 
-	while ((offs < state->m_spriteram_size/2) & (spriteram16[offs+0] != 0xffff))
+	while ((offs < state->m_spriteram.bytes()/2) & (spriteram16[offs+0] != 0xffff))
 	{
 		last_sprite = offs;
 		offs += 4;

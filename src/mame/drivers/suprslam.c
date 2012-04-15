@@ -125,12 +125,12 @@ WRITE8_MEMBER(suprslam_state::suprslam_sh_bankswitch_w)
 
 static ADDRESS_MAP_START( suprslam_map, AS_PROGRAM, 16, suprslam_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0xfb0000, 0xfb1fff) AM_RAM AM_BASE(m_spriteram)
-	AM_RANGE(0xfc0000, 0xfcffff) AM_RAM AM_BASE(m_sp_videoram)
+	AM_RANGE(0xfb0000, 0xfb1fff) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0xfc0000, 0xfcffff) AM_RAM AM_SHARE("sp_videoram")
 	AM_RANGE(0xfd0000, 0xfdffff) AM_RAM
-	AM_RANGE(0xfe0000, 0xfe0fff) AM_RAM_WRITE(suprslam_screen_videoram_w) AM_BASE(m_screen_videoram)
-	AM_RANGE(0xff0000, 0xff1fff) AM_RAM_WRITE(suprslam_bg_videoram_w) AM_BASE(m_bg_videoram)
-	AM_RANGE(0xff2000, 0xff203f) AM_RAM AM_BASE(m_screen_vregs)
+	AM_RANGE(0xfe0000, 0xfe0fff) AM_RAM_WRITE(suprslam_screen_videoram_w) AM_SHARE("screen_videoram")
+	AM_RANGE(0xff0000, 0xff1fff) AM_RAM_WRITE(suprslam_bg_videoram_w) AM_SHARE("bg_videoram")
+	AM_RANGE(0xff2000, 0xff203f) AM_RAM AM_SHARE("screen_vregs")
 //  AM_RANGE(0xff3000, 0xff3001) AM_WRITENOP // sprite buffer trigger?
 	AM_RANGE(0xff8000, 0xff8fff) AM_DEVREADWRITE_LEGACY("k053936", k053936_linectrl_r, k053936_linectrl_w)
 	AM_RANGE(0xff9000, 0xff9001) AM_WRITE(sound_command_w)
@@ -142,7 +142,7 @@ static ADDRESS_MAP_START( suprslam_map, AS_PROGRAM, 16, suprslam_state )
 	AM_RANGE(0xfff004, 0xfff005) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xfff006, 0xfff007) AM_READ_PORT("DSW1")
 	AM_RANGE(0xfff008, 0xfff009) AM_READ_PORT("DSW2")
-	AM_RANGE(0xfff00c, 0xfff00d) AM_WRITEONLY AM_BASE(m_spr_ctrl)
+	AM_RANGE(0xfff00c, 0xfff00d) AM_WRITEONLY AM_SHARE("spr_ctrl")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, suprslam_state )

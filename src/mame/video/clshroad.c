@@ -292,7 +292,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 	UINT8 *spriteram = state->m_spriteram;
 	int i;
 
-	for (i = 0; i < state->m_spriteram_size ; i += 8)
+	for (i = 0; i < state->m_spriteram.bytes() ; i += 8)
 	{
 		int y		=	 240 - spriteram[i+1];
 		int code	=	(spriteram[i+3] & 0x3f) + (spriteram[i+2] << 6);

@@ -207,7 +207,10 @@ public:
 		  m_maincpu(*this, "maincpu"),
 		  m_laserdisc(*this, "laserdisc"),
 		  m_r1_sound(*this, "r1sound"),
-		  m_r2_sound(*this, "r2sound") { }
+		  m_r2_sound(*this, "r2sound"),
+		  m_videoram(*this, "videoram"),
+		  m_charram(*this, "charram"),
+		  m_spriteram(*this, "spriteram") { }
 
 	// devices
 	required_device<i8088_device> m_maincpu;
@@ -215,7 +218,10 @@ public:
 	optional_device<gottlieb_sound_r1_device> m_r1_sound;
 	optional_device<gottlieb_sound_r2_device> m_r2_sound;
 
-	UINT8 *m_videoram;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_charram;
+	required_shared_ptr<UINT8> m_spriteram;
+
 	UINT8 m_joystick_select;
 	UINT8 m_track[2];
 	emu_timer *m_laserdisc_bit_timer;
@@ -233,13 +239,11 @@ public:
 	UINT8 m_laserdisc_audio_bit_count;
 	UINT8 m_gfxcharlo;
 	UINT8 m_gfxcharhi;
-	UINT8 *m_charram;
 	UINT8 m_background_priority;
 	UINT8 m_spritebank;
 	UINT8 m_transparent0;
 	tilemap_t *m_bg_tilemap;
 	double m_weights[4];
-	UINT8 *m_spriteram;
 	DECLARE_WRITE8_MEMBER(gottlieb_analog_reset_w);
 	DECLARE_WRITE8_MEMBER(general_output_w);
 	DECLARE_WRITE8_MEMBER(reactor_output_w);

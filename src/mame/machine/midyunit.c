@@ -245,7 +245,7 @@ WRITE8_MEMBER(midyunit_state::cvsd_protection_w)
 static void init_generic(running_machine &machine, int bpp, int sound, int prot_start, int prot_end)
 {
 	midyunit_state *state = machine.driver_data<midyunit_state>();
-	offs_t gfx_chunk = state->m_gfx_rom_size / 4;
+	offs_t gfx_chunk = state->m_gfx_rom.bytes() / 4;
 	UINT8 d1, d2, d3, d4, d5, d6;
 	UINT8 *base;
 	int i;
@@ -255,7 +255,7 @@ static void init_generic(running_machine &machine, int bpp, int sound, int prot_
 	switch (bpp)
 	{
 		case 4:
-			for (i = 0; i < state->m_gfx_rom_size; i += 2)
+			for (i = 0; i < state->m_gfx_rom.bytes(); i += 2)
 			{
 				d1 = ((base[0 * gfx_chunk + (i + 0) / 4]) >> (2 * ((i + 0) % 4))) & 3;
 				d2 = ((base[1 * gfx_chunk + (i + 0) / 4]) >> (2 * ((i + 0) % 4))) & 3;
@@ -268,7 +268,7 @@ static void init_generic(running_machine &machine, int bpp, int sound, int prot_
 			break;
 
 		case 6:
-			for (i = 0; i < state->m_gfx_rom_size; i += 2)
+			for (i = 0; i < state->m_gfx_rom.bytes(); i += 2)
 			{
 				d1 = ((base[0 * gfx_chunk + (i + 0) / 4]) >> (2 * ((i + 0) % 4))) & 3;
 				d2 = ((base[1 * gfx_chunk + (i + 0) / 4]) >> (2 * ((i + 0) % 4))) & 3;
@@ -283,7 +283,7 @@ static void init_generic(running_machine &machine, int bpp, int sound, int prot_
 			break;
 
 		case 8:
-			for (i = 0; i < state->m_gfx_rom_size; i += 4)
+			for (i = 0; i < state->m_gfx_rom.bytes(); i += 4)
 			{
 				state->m_gfx_rom[i + 0] = base[0 * gfx_chunk + i / 4];
 				state->m_gfx_rom[i + 1] = base[1 * gfx_chunk + i / 4];

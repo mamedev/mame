@@ -9,16 +9,23 @@ class ddragon_state : public driver_device
 {
 public:
 	ddragon_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_rambase(*this, "rambase"),
+		m_bgvideoram(*this, "bgvideoram"),
+		m_fgvideoram(*this, "fgvideoram"),
+		m_spriteram(*this, "spriteram"),
+		m_scrollx_lo(*this, "scrollx_lo"),
+		m_scrolly_lo(*this, "scrolly_lo"),
+		m_darktowr_mcu_ports(*this, "darktowr_mcu"){ }
 
 	/* memory pointers */
-	UINT8 *        m_rambase;
-	UINT8 *        m_bgvideoram;
-	UINT8 *        m_fgvideoram;
-	UINT8 *        m_spriteram;
-	UINT8 *        m_scrollx_lo;
-	UINT8 *        m_scrolly_lo;
-	UINT8 *        m_darktowr_mcu_ports;
+	required_shared_ptr<UINT8> m_rambase;
+	required_shared_ptr<UINT8> m_bgvideoram;
+	required_shared_ptr<UINT8> m_fgvideoram;
+	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<UINT8> m_scrollx_lo;
+	required_shared_ptr<UINT8> m_scrolly_lo;
+	required_shared_ptr<UINT8> m_darktowr_mcu_ports;
 //  UINT8 *        m_paletteram;  // currently this uses generic palette handling
 //  UINT8 *        m_paletteram_2;    // currently this uses generic palette handling
 	size_t         m_spriteram_size;	// FIXME: this appears in chinagat.c, but is it really used?

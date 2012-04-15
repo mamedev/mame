@@ -87,10 +87,10 @@ static TIMER_DEVICE_CALLBACK( merlinmm_interrupt )
 
 static ADDRESS_MAP_START( pingpong_map, AS_PROGRAM, 8, pingpong_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(pingpong_colorram_w) AM_BASE(m_colorram)
-	AM_RANGE(0x8400, 0x87ff) AM_RAM_WRITE(pingpong_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(pingpong_colorram_w) AM_SHARE("colorram")
+	AM_RANGE(0x8400, 0x87ff) AM_RAM_WRITE(pingpong_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x9000, 0x9002) AM_RAM
-	AM_RANGE(0x9003, 0x9052) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
+	AM_RANGE(0x9003, 0x9052) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x9053, 0x97ff) AM_RAM
 	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xa880, 0xa880) AM_READ_PORT("INPUTS")
@@ -108,10 +108,10 @@ static ADDRESS_MAP_START( merlinmm_map, AS_PROGRAM, 8, pingpong_state )
 	AM_RANGE(0x5400, 0x57ff) AM_RAM
 	AM_RANGE(0x6000, 0x6007) AM_WRITENOP /* solenoid writes */
 	AM_RANGE(0x7000, 0x7000) AM_READ_PORT("IN4")
-	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(pingpong_colorram_w) AM_BASE(m_colorram)
-	AM_RANGE(0x8400, 0x87ff) AM_RAM_WRITE(pingpong_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(pingpong_colorram_w) AM_SHARE("colorram")
+	AM_RANGE(0x8400, 0x87ff) AM_RAM_WRITE(pingpong_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x9000, 0x9002) AM_RAM
-	AM_RANGE(0x9003, 0x9052) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
+	AM_RANGE(0x9003, 0x9052) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x9053, 0x97ff) AM_RAM
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(coin_w)	/* irq enables */
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("IN0")

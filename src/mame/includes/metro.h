@@ -17,29 +17,49 @@ public:
 		  m_audiocpu(*this, "audiocpu"),
 		  m_oki(*this, "oki"),
 		  m_ymsnd(*this, "ymsnd"),
-		  m_k053936(*this, "k053936") { }
+		  m_k053936(*this, "k053936") ,
+		m_vram_0(*this, "vram_0"),
+		m_vram_1(*this, "vram_1"),
+		m_vram_2(*this, "vram_2"),
+		m_spriteram(*this, "spriteram"),
+		m_tiletable(*this, "tiletable"),
+		m_blitter_regs(*this, "blitter_regs"),
+		m_scroll(*this, "scroll"),
+		m_window(*this, "window"),
+		m_irq_enable(*this, "irq_enable"),
+		m_irq_levels(*this, "irq_levels"),
+		m_irq_vectors(*this, "irq_vectors"),
+		m_rombank(*this, "rombank"),
+		m_videoregs(*this, "videoregs"),
+		m_screenctrl(*this, "screenctrl"),
+		m_input_sel(*this, "input_sel"),
+		m_k053936_ram(*this, "k053936_ram"){ }
 
+	/* devices */
+	required_device<cpu_device> m_maincpu;
+	optional_device<cpu_device> m_audiocpu;
+	optional_device<okim6295_device> m_oki;
+	optional_device<device_t> m_ymsnd;
+	optional_device<k053936_device> m_k053936;
 	/* memory pointers */
-	UINT16 *    m_vram_0;
-	UINT16 *    m_vram_1;
-	UINT16 *    m_vram_2;
-	UINT16 *    m_spriteram;
-	UINT16 *    m_tiletable;
+	required_shared_ptr<UINT16> m_vram_0;
+	required_shared_ptr<UINT16> m_vram_1;
+	required_shared_ptr<UINT16> m_vram_2;
+	required_shared_ptr<UINT16> m_spriteram;
+	required_shared_ptr<UINT16> m_tiletable;
 	UINT16 *    m_tiletable_old;
-	UINT16 *    m_blitter_regs;
-	UINT16 *    m_scroll;
-	UINT16 *    m_window;
-	UINT16 *    m_irq_enable;
-	UINT16 *    m_irq_levels;
-	UINT16 *    m_irq_vectors;
-	UINT16 *    m_rombank;
-	UINT16 *    m_videoregs;
-	UINT16 *    m_screenctrl;
-	UINT16 *    m_input_sel;
-	UINT16 *    m_k053936_ram;
+	required_shared_ptr<UINT16> m_blitter_regs;
+	required_shared_ptr<UINT16> m_scroll;
+	required_shared_ptr<UINT16> m_window;
+	required_shared_ptr<UINT16> m_irq_enable;
+	required_shared_ptr<UINT16> m_irq_levels;
+	required_shared_ptr<UINT16> m_irq_vectors;
+	required_shared_ptr<UINT16> m_rombank;
+	required_shared_ptr<UINT16> m_videoregs;
+	required_shared_ptr<UINT16> m_screenctrl;
+	required_shared_ptr<UINT16> m_input_sel;
+	required_shared_ptr<UINT16> m_k053936_ram;
 
-	size_t      m_spriteram_size;
-	size_t      m_tiletable_size;
 
 	int         m_flip_screen;
 
@@ -75,12 +95,7 @@ public:
 	int         m_gakusai_oki_bank_lo;
 	int         m_gakusai_oki_bank_hi;
 
-	/* devices */
-	required_device<cpu_device> m_maincpu;
-	optional_device<cpu_device> m_audiocpu;
-	optional_device<okim6295_device> m_oki;
-	optional_device<device_t> m_ymsnd;
-	optional_device<k053936_device> m_k053936;
+
 	DECLARE_READ16_MEMBER(metro_irq_cause_r);
 	DECLARE_WRITE16_MEMBER(metro_irq_cause_w);
 	DECLARE_WRITE16_MEMBER(mouja_irq_timer_ctrl_w);

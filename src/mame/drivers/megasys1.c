@@ -179,13 +179,13 @@ static ADDRESS_MAP_START( megasys1A_map, AS_PROGRAM, 16, megasys1_state )
 	AM_RANGE(0x080004, 0x080005) AM_READ_PORT("P2")
 	AM_RANGE(0x080006, 0x080007) AM_READ_PORT("DSW")
 	AM_RANGE(0x080008, 0x080009) AM_READ(soundlatch2_word_r)	/* from sound cpu */
-	AM_RANGE(0x084000, 0x0843ff) AM_RAM_WRITE(megasys1_vregs_A_w) AM_BASE(m_vregs)
+	AM_RANGE(0x084000, 0x0843ff) AM_RAM_WRITE(megasys1_vregs_A_w) AM_SHARE("vregs")
 	AM_RANGE(0x088000, 0x0887ff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBRGBx_word_w) AM_SHARE("paletteram")
-	AM_RANGE(0x08e000, 0x08ffff) AM_RAM AM_BASE(m_objectram)
-	AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE(megasys1_scrollram_0_w) AM_BASE(m_scrollram[0])
-	AM_RANGE(0x094000, 0x097fff) AM_RAM_WRITE(megasys1_scrollram_1_w) AM_BASE(m_scrollram[1])
-	AM_RANGE(0x098000, 0x09bfff) AM_RAM_WRITE(megasys1_scrollram_2_w) AM_BASE(m_scrollram[2])
-	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM AM_BASE(m_ram)
+	AM_RANGE(0x08e000, 0x08ffff) AM_RAM AM_SHARE("objectram")
+	AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE(megasys1_scrollram_0_w) AM_SHARE("scrollram.0")
+	AM_RANGE(0x094000, 0x097fff) AM_RAM_WRITE(megasys1_scrollram_1_w) AM_SHARE("scrollram.1")
+	AM_RANGE(0x098000, 0x09bfff) AM_RAM_WRITE(megasys1_scrollram_2_w) AM_SHARE("scrollram.2")
+	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM AM_SHARE("ram")
 ADDRESS_MAP_END
 
 
@@ -256,13 +256,13 @@ WRITE16_MEMBER(megasys1_state::ip_select_w)
 static ADDRESS_MAP_START( megasys1B_map, AS_PROGRAM, 16, megasys1_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xfffff)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x044000, 0x0443ff) AM_RAM_WRITE(megasys1_vregs_A_w) AM_BASE(m_vregs)
+	AM_RANGE(0x044000, 0x0443ff) AM_RAM_WRITE(megasys1_vregs_A_w) AM_SHARE("vregs")
 	AM_RANGE(0x048000, 0x0487ff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBRGBx_word_w) AM_SHARE("paletteram")
-	AM_RANGE(0x04e000, 0x04ffff) AM_RAM AM_BASE(m_objectram)
-	AM_RANGE(0x050000, 0x053fff) AM_RAM_WRITE(megasys1_scrollram_0_w) AM_BASE(m_scrollram[0])
-	AM_RANGE(0x054000, 0x057fff) AM_RAM_WRITE(megasys1_scrollram_1_w) AM_BASE(m_scrollram[1])
-	AM_RANGE(0x058000, 0x05bfff) AM_RAM_WRITE(megasys1_scrollram_2_w) AM_BASE(m_scrollram[2])
-	AM_RANGE(0x060000, 0x07ffff) AM_RAM AM_BASE(m_ram)
+	AM_RANGE(0x04e000, 0x04ffff) AM_RAM AM_SHARE("objectram")
+	AM_RANGE(0x050000, 0x053fff) AM_RAM_WRITE(megasys1_scrollram_0_w) AM_SHARE("scrollram.0")
+	AM_RANGE(0x054000, 0x057fff) AM_RAM_WRITE(megasys1_scrollram_1_w) AM_SHARE("scrollram.1")
+	AM_RANGE(0x058000, 0x05bfff) AM_RAM_WRITE(megasys1_scrollram_2_w) AM_SHARE("scrollram.2")
+	AM_RANGE(0x060000, 0x07ffff) AM_RAM AM_SHARE("ram")
 	AM_RANGE(0x080000, 0x0bffff) AM_ROM
 	AM_RANGE(0x0e0000, 0x0e0001) AM_READWRITE(ip_select_r,ip_select_w)
 ADDRESS_MAP_END
@@ -279,14 +279,14 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( megasys1C_map, AS_PROGRAM, 16, megasys1_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x1fffff)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x0c0000, 0x0cffff) AM_READWRITE(megasys1_vregs_C_r,megasys1_vregs_C_w) AM_BASE(m_vregs)
-	AM_RANGE(0x0d2000, 0x0d3fff) AM_RAM AM_BASE(m_objectram)
-	AM_RANGE(0x0e0000, 0x0e3fff) AM_RAM_WRITE(megasys1_scrollram_0_w) AM_BASE(m_scrollram[0])
-	AM_RANGE(0x0e8000, 0x0ebfff) AM_RAM_WRITE(megasys1_scrollram_1_w) AM_BASE(m_scrollram[1])
-	AM_RANGE(0x0f0000, 0x0f3fff) AM_RAM_WRITE(megasys1_scrollram_2_w) AM_BASE(m_scrollram[2])
+	AM_RANGE(0x0c0000, 0x0cffff) AM_READWRITE(megasys1_vregs_C_r,megasys1_vregs_C_w) AM_SHARE("vregs")
+	AM_RANGE(0x0d2000, 0x0d3fff) AM_RAM AM_SHARE("objectram")
+	AM_RANGE(0x0e0000, 0x0e3fff) AM_RAM_WRITE(megasys1_scrollram_0_w) AM_SHARE("scrollram.0")
+	AM_RANGE(0x0e8000, 0x0ebfff) AM_RAM_WRITE(megasys1_scrollram_1_w) AM_SHARE("scrollram.1")
+	AM_RANGE(0x0f0000, 0x0f3fff) AM_RAM_WRITE(megasys1_scrollram_2_w) AM_SHARE("scrollram.2")
 	AM_RANGE(0x0f8000, 0x0f87ff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBRGBx_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x0d8000, 0x0d8001) AM_READWRITE(ip_select_r,ip_select_w)
-	AM_RANGE(0x1c0000, 0x1cffff) AM_MIRROR(0x30000) AM_RAM AM_BASE(m_ram) //0x1f****, Cybattler reads attract mode inputs at 0x1d****
+	AM_RANGE(0x1c0000, 0x1cffff) AM_MIRROR(0x30000) AM_RAM AM_SHARE("ram") //0x1f****, Cybattler reads attract mode inputs at 0x1d****
 ADDRESS_MAP_END
 
 
@@ -301,17 +301,17 @@ static INTERRUPT_GEN( megasys1D_irq )
 
 static ADDRESS_MAP_START( megasys1D_map, AS_PROGRAM, 16, megasys1_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x0c0000, 0x0c9fff) AM_RAM_WRITE(megasys1_vregs_D_w) AM_BASE(m_vregs)
-	AM_RANGE(0x0ca000, 0x0cbfff) AM_RAM AM_BASE(m_objectram)
-	AM_RANGE(0x0d0000, 0x0d3fff) AM_RAM_WRITE(megasys1_scrollram_1_w) AM_BASE(m_scrollram[1])
-	AM_RANGE(0x0d4000, 0x0d7fff) AM_RAM_WRITE(megasys1_scrollram_2_w) AM_BASE(m_scrollram[2])
+	AM_RANGE(0x0c0000, 0x0c9fff) AM_RAM_WRITE(megasys1_vregs_D_w) AM_SHARE("vregs")
+	AM_RANGE(0x0ca000, 0x0cbfff) AM_RAM AM_SHARE("objectram")
+	AM_RANGE(0x0d0000, 0x0d3fff) AM_RAM_WRITE(megasys1_scrollram_1_w) AM_SHARE("scrollram.1")
+	AM_RANGE(0x0d4000, 0x0d7fff) AM_RAM_WRITE(megasys1_scrollram_2_w) AM_SHARE("scrollram.2")
 	AM_RANGE(0x0d8000, 0x0d87ff) AM_MIRROR(0x3000) AM_RAM_WRITE(paletteram_RRRRRGGGGGBBBBBx_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x0e0000, 0x0e0001) AM_READ_PORT("DSW")
-	AM_RANGE(0x0e8000, 0x0ebfff) AM_RAM_WRITE(megasys1_scrollram_0_w) AM_BASE(m_scrollram[0])
+	AM_RANGE(0x0e8000, 0x0ebfff) AM_RAM_WRITE(megasys1_scrollram_0_w) AM_SHARE("scrollram.0")
 	AM_RANGE(0x0f0000, 0x0f0001) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x0f8000, 0x0f8001) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff)
 //  AM_RANGE(0x100000, 0x100001) // protection
-	AM_RANGE(0x1f0000, 0x1fffff) AM_RAM AM_BASE(m_ram)
+	AM_RANGE(0x1f0000, 0x1fffff) AM_RAM AM_SHARE("ram")
 ADDRESS_MAP_END
 
 
@@ -3743,7 +3743,8 @@ static DRIVER_INIT( avspirit )
 	/* kludge: avspirit has 0x10000 bytes of RAM while edf has 0x20000. The */
 	/* following is needed to make vh_start() pick the correct address */
 	/* for spriteram16. */
-	state->m_ram += 0x10000/2;
+	//TODO:FIX
+	//state->m_ram += 0x10000/2;
 }
 
 static DRIVER_INIT( bigstrik )
@@ -4030,7 +4031,8 @@ static DRIVER_INIT( monkelf )
 
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xe0000, 0xe000f, read16_delegate(FUNC(megasys1_state::monkelf_input_r),state));
 
-	state->m_ram += 0x10000/2;
+	//TODO:FIX
+	//state->m_ram += 0x10000/2;
 
 }
 

@@ -3,14 +3,17 @@ class nycaptor_state : public driver_device
 {
 public:
 	nycaptor_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"),
+		m_scrlram(*this, "scrlram"),
+		m_sharedram(*this, "sharedram"){ }
 
 	/* memory pointers */
-	UINT8 *      m_sharedram;
-	UINT8 *      m_scrlram;
-	UINT8 *      m_videoram;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_scrlram;
+	required_shared_ptr<UINT8> m_sharedram;
+
 	UINT8 *      m_spriteram;
-	size_t       m_videoram_size;
 
 	/* video-related */
 	tilemap_t *m_bg_tilemap;

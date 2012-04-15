@@ -7,14 +7,16 @@ class dogfgt_state : public driver_device
 {
 public:
 	dogfgt_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_bgvideoram(*this, "bgvideoram"),
+		m_spriteram(*this, "spriteram"),
+		m_sharedram(*this, "sharedram") { }
 
 	/* memory pointers */
-	UINT8 *    m_bgvideoram;
-	UINT8 *    m_spriteram;
-	UINT8 *    m_sharedram;
+	required_shared_ptr<UINT8> m_bgvideoram;
+	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<UINT8> m_sharedram;
 //  UINT8 *    m_paletteram;  // currently this uses generic palette handling
-	size_t     m_spriteram_size;
 
 	/* video-related */
 	bitmap_ind16 m_pixbitmap;

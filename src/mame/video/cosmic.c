@@ -258,7 +258,7 @@ static void draw_bitmap( running_machine &machine, bitmap_ind16 &bitmap, const r
 	cosmic_state *state = machine.driver_data<cosmic_state>();
 	offs_t offs;
 
-	for (offs = 0; offs < state->m_videoram_size; offs++)
+	for (offs = 0; offs < state->m_videoram.bytes(); offs++)
 	{
 		int i;
 		UINT8 data = state->m_videoram[offs];
@@ -290,7 +290,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	cosmic_state *state = machine.driver_data<cosmic_state>();
 	int offs;
 
-	for (offs = state->m_spriteram_size - 4;offs >= 0;offs -= 4)
+	for (offs = state->m_spriteram.bytes() - 4;offs >= 0;offs -= 4)
 	{
 		if (state->m_spriteram[offs] != 0)
         {

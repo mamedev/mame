@@ -8,19 +8,23 @@ class megazone_state : public driver_device
 {
 public:
 	megazone_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_scrolly(*this, "scrolly"),
+		m_scrollx(*this, "scrollx"),
+		m_videoram(*this, "videoram"),
+		m_videoram2(*this, "videoram2"),
+		m_colorram(*this, "colorram"),
+		m_colorram2(*this, "colorram2"),
+		m_spriteram(*this, "spriteram"){ }
 
 	/* memory pointers */
-	UINT8 *       m_scrollx;
-	UINT8 *       m_scrolly;
-	UINT8 *       m_videoram;
-	UINT8 *       m_colorram;
-	UINT8 *       m_videoram2;
-	UINT8 *       m_colorram2;
-	UINT8 *       m_spriteram;
-	size_t        m_spriteram_size;
-	size_t        m_videoram_size;
-	size_t        m_videoram2_size;
+	required_shared_ptr<UINT8> m_scrolly;
+	required_shared_ptr<UINT8> m_scrollx;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_videoram2;
+	required_shared_ptr<UINT8> m_colorram;
+	required_shared_ptr<UINT8> m_colorram2;
+	required_shared_ptr<UINT8> m_spriteram;
 
 	/* video-related */
 	bitmap_ind16      *m_tmpbitmap;

@@ -46,10 +46,9 @@ static VIDEO_START( qix )
 	qix_state *state = machine.driver_data<qix_state>();
 
 	/* allocate memory for the full video RAM */
-	state->m_videoram = auto_alloc_array(machine, UINT8, 256 * 256);
+	state->m_videoram.allocate(256 * 256);
 
 	/* set up save states */
-	state->save_pointer(NAME(state->m_videoram), 256 * 256);
 	state->save_item(NAME(state->m_flip));
 	state->save_item(NAME(state->m_palette_bank));
 	state->save_item(NAME(state->m_leds));
@@ -343,10 +342,10 @@ static ADDRESS_MAP_START( qix_video_map, AS_PROGRAM, 8, qix_state )
 	AM_RANGE(0x8800, 0x8800) AM_MIRROR(0x03ff) AM_WRITE(qix_palettebank_w)
 	AM_RANGE(0x8c00, 0x8c00) AM_MIRROR(0x03fe) AM_READWRITE(qix_data_firq_r, qix_data_firq_w)
 	AM_RANGE(0x8c01, 0x8c01) AM_MIRROR(0x03fe) AM_READWRITE(qix_video_firq_ack_r, qix_video_firq_ack_w)
-	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(qix_paletteram_w) AM_BASE(m_paletteram)
+	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(qix_paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0x9400, 0x9400) AM_MIRROR(0x03fc) AM_READWRITE(qix_addresslatch_r, qix_addresslatch_w)
-	AM_RANGE(0x9402, 0x9403) AM_MIRROR(0x03fc) AM_WRITEONLY AM_BASE(m_videoram_address)
-	AM_RANGE(0x9800, 0x9800) AM_MIRROR(0x03ff) AM_READONLY AM_BASE(m_scanline_latch)
+	AM_RANGE(0x9402, 0x9403) AM_MIRROR(0x03fc) AM_WRITEONLY AM_SHARE("videoram_addr")
+	AM_RANGE(0x9800, 0x9800) AM_MIRROR(0x03ff) AM_READONLY AM_SHARE("scanline_latch")
 	AM_RANGE(0x9c00, 0x9c00) AM_MIRROR(0x03fe) AM_DEVWRITE("vid_u18", mc6845_device, address_w)
 	AM_RANGE(0x9c01, 0x9c01) AM_MIRROR(0x03fe) AM_DEVREADWRITE("vid_u18", mc6845_device, register_r, register_w)
 	AM_RANGE(0xa000, 0xffff) AM_ROM
@@ -361,10 +360,10 @@ static ADDRESS_MAP_START( zookeep_video_map, AS_PROGRAM, 8, qix_state )
 	AM_RANGE(0x8801, 0x8801) AM_MIRROR(0x03fe) AM_WRITE(zookeep_bankswitch_w)
 	AM_RANGE(0x8c00, 0x8c00) AM_MIRROR(0x03fe) AM_READWRITE(qix_data_firq_r, qix_data_firq_w)
 	AM_RANGE(0x8c01, 0x8c01) AM_MIRROR(0x03fe) AM_READWRITE(qix_video_firq_ack_r, qix_video_firq_ack_w)
-	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(qix_paletteram_w) AM_BASE(m_paletteram)
+	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(qix_paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0x9400, 0x9400) AM_MIRROR(0x03fc) AM_READWRITE(qix_addresslatch_r, qix_addresslatch_w)
-	AM_RANGE(0x9402, 0x9403) AM_MIRROR(0x03fc) AM_WRITEONLY AM_BASE(m_videoram_address)
-	AM_RANGE(0x9800, 0x9800) AM_MIRROR(0x03ff) AM_READONLY AM_BASE(m_scanline_latch)
+	AM_RANGE(0x9402, 0x9403) AM_MIRROR(0x03fc) AM_WRITEONLY AM_SHARE("videoram_addr")
+	AM_RANGE(0x9800, 0x9800) AM_MIRROR(0x03ff) AM_READONLY AM_SHARE("scanline_latch")
 	AM_RANGE(0x9c00, 0x9c00) AM_MIRROR(0x03fe) AM_DEVWRITE("vid_u18", mc6845_device, address_w)
 	AM_RANGE(0x9c01, 0x9c01) AM_MIRROR(0x03fe) AM_DEVREADWRITE("vid_u18", mc6845_device, register_r, register_w)
 	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK("bank1")
@@ -379,11 +378,11 @@ static ADDRESS_MAP_START( slither_video_map, AS_PROGRAM, 8, qix_state )
 	AM_RANGE(0x8800, 0x8800) AM_MIRROR(0x03ff) AM_WRITE(qix_palettebank_w)
 	AM_RANGE(0x8c00, 0x8c00) AM_MIRROR(0x03fe) AM_READWRITE(qix_data_firq_r, qix_data_firq_w)
 	AM_RANGE(0x8c01, 0x8c01) AM_MIRROR(0x03fe) AM_READWRITE(qix_video_firq_ack_r, qix_video_firq_ack_w)
-	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(qix_paletteram_w) AM_BASE(m_paletteram)
+	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(qix_paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0x9400, 0x9400) AM_MIRROR(0x03fc) AM_READWRITE(qix_addresslatch_r, slither_addresslatch_w)
-	AM_RANGE(0x9401, 0x9401) AM_MIRROR(0x03fc) AM_WRITEONLY AM_BASE(m_videoram_mask)
-	AM_RANGE(0x9402, 0x9403) AM_MIRROR(0x03fc) AM_WRITEONLY AM_BASE(m_videoram_address)
-	AM_RANGE(0x9800, 0x9800) AM_MIRROR(0x03ff) AM_READONLY AM_BASE(m_scanline_latch)
+	AM_RANGE(0x9401, 0x9401) AM_MIRROR(0x03fc) AM_WRITEONLY AM_SHARE("videoram_mask")
+	AM_RANGE(0x9402, 0x9403) AM_MIRROR(0x03fc) AM_WRITEONLY AM_SHARE("videoram_addr")
+	AM_RANGE(0x9800, 0x9800) AM_MIRROR(0x03ff) AM_READONLY AM_SHARE("scanline_latch")
 	AM_RANGE(0x9c00, 0x9c00) AM_MIRROR(0x03fe) AM_DEVWRITE("vid_u18", mc6845_device, address_w)
 	AM_RANGE(0x9c01, 0x9c01) AM_MIRROR(0x03fe) AM_DEVREADWRITE("vid_u18", mc6845_device, register_r, register_w)
 	AM_RANGE(0xa000, 0xffff) AM_ROM

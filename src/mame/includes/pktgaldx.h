@@ -8,17 +8,21 @@ class pktgaldx_state : public driver_device
 {
 public:
 	pktgaldx_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_pf1_rowscroll(*this, "pf1_rowscroll"),
+		m_pf2_rowscroll(*this, "pf2_rowscroll"),
+		m_spriteram(*this, "spriteram"),
+		m_pktgaldb_fgram(*this, "pktgaldb_fgram"),
+		m_pktgaldb_sprites(*this, "pktgaldb_spr"){ }
 
 	/* memory pointers */
-	UINT16 *  m_pf1_rowscroll;
-	UINT16 *  m_pf2_rowscroll;
-	UINT16 *  m_spriteram;
+	required_shared_ptr<UINT16> m_pf1_rowscroll;
+	required_shared_ptr<UINT16> m_pf2_rowscroll;
+	required_shared_ptr<UINT16> m_spriteram;
 //  UINT16 *  paletteram;    // currently this uses generic palette handling (in decocomn.c)
-	size_t    m_spriteram_size;
 
-	UINT16*   m_pktgaldb_fgram;
-	UINT16*   m_pktgaldb_sprites;
+	required_shared_ptr<UINT16> m_pktgaldb_fgram;
+	required_shared_ptr<UINT16> m_pktgaldb_sprites;
 
 	/* devices */
 	device_t *m_maincpu;

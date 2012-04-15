@@ -10,7 +10,10 @@ class dynax_state : public driver_device
 {
 public:
 	dynax_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
+		: driver_device(mconfig, type, tag),
+		  m_dsw_sel16(*this, "dsw_sel16"),
+		  m_protection1(*this, "protection1"),
+		  m_protection2(*this, "protection2")
 		{ }
 
 	// up to 8 layers, 2 images per layer (interleaved on screen)
@@ -132,9 +135,9 @@ public:
 	int m_okibank;
 	UINT8 m_rongrong_blitter_busy_select;
 
-	UINT16 *m_dsw_sel16;
-	UINT16 *m_protection1;
-	UINT16 *m_protection2;
+	required_shared_ptr<UINT16> m_dsw_sel16;
+	required_shared_ptr<UINT16> m_protection1;
+	required_shared_ptr<UINT16> m_protection2;
 	UINT8 m_prot_val;
 	UINT16 m_prot_16;
 	UINT16 m_quiz365_protection[2];

@@ -89,7 +89,7 @@ static ADDRESS_MAP_START( actfan_map, AS_PROGRAM, 8, actfancr_state )
 	AM_RANGE(0x130003, 0x130003) AM_READ_PORT("DSW2")
 	AM_RANGE(0x140000, 0x140001) AM_READ_PORT("SYSTEM")	/* VBL */
 	AM_RANGE(0x150000, 0x150001) AM_WRITE(actfancr_sound_w)
-	AM_RANGE(0x1f0000, 0x1f3fff) AM_RAM AM_BASE(m_main_ram) /* Main ram */
+	AM_RANGE(0x1f0000, 0x1f3fff) AM_RAM AM_SHARE("main_ram") /* Main ram */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( triothep_map, AS_PROGRAM, 8, actfancr_state )
@@ -107,7 +107,7 @@ static ADDRESS_MAP_START( triothep_map, AS_PROGRAM, 8, actfancr_state )
 	AM_RANGE(0x120000, 0x1207ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x130000, 0x1305ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_byte_le_w) AM_SHARE("paletteram")
 	AM_RANGE(0x140000, 0x140001) AM_READNOP /* Value doesn't matter */
-	AM_RANGE(0x1f0000, 0x1f3fff) AM_RAM AM_BASE(m_main_ram) /* Main ram */
+	AM_RANGE(0x1f0000, 0x1f3fff) AM_RAM AM_SHARE("main_ram") /* Main ram */
 	AM_RANGE(0x1ff000, 0x1ff001) AM_READWRITE(triothep_control_r, triothep_control_select_w)
 	AM_RANGE(0x1ff400, 0x1ff403) AM_WRITE_LEGACY(h6280_irq_status_w)
 ADDRESS_MAP_END

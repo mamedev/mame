@@ -2,18 +2,22 @@ class terracre_state : public driver_device
 {
 public:
 	terracre_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_spriteram(*this, "spriteram"),
+		m_amazon_videoram(*this, "amazon_videoram"),
+		m_videoram(*this, "videoram"){ }
 
-	UINT16 *m_videoram;
+	required_shared_ptr<UINT16> m_spriteram;
+	required_shared_ptr<UINT16> m_amazon_videoram;
+	required_shared_ptr<UINT16> m_videoram;
+	
 	const UINT16 *m_mpProtData;
 	UINT8 m_mAmazonProtCmd;
 	UINT8 m_mAmazonProtReg[6];
-	UINT16 *m_amazon_videoram;
 	UINT16 m_xscroll;
 	UINT16 m_yscroll;
 	tilemap_t *m_background;
 	tilemap_t *m_foreground;
-	UINT16 *m_spriteram;
 	DECLARE_READ16_MEMBER(horekid_IN2_r);
 	DECLARE_WRITE16_MEMBER(amazon_sound_w);
 	DECLARE_READ8_MEMBER(soundlatch_clear_r);

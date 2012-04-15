@@ -102,17 +102,17 @@ static ADDRESS_MAP_START( blmbycar_map, AS_PROGRAM, 16, blmbycar_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0xfec000, 0xfeffff) AM_RAM
 	AM_RANGE(0x100000, 0x103fff) AM_WRITEONLY												// ???
-	AM_RANGE(0x104000, 0x105fff) AM_RAM_WRITE(blmbycar_vram_1_w) AM_BASE(m_vram_1)	// Layer 1
-	AM_RANGE(0x106000, 0x107fff) AM_RAM_WRITE(blmbycar_vram_0_w) AM_BASE(m_vram_0)	// Layer 0
+	AM_RANGE(0x104000, 0x105fff) AM_RAM_WRITE(blmbycar_vram_1_w) AM_SHARE("vram_1")	// Layer 1
+	AM_RANGE(0x106000, 0x107fff) AM_RAM_WRITE(blmbycar_vram_0_w) AM_SHARE("vram_0")	// Layer 0
 	AM_RANGE(0x108000, 0x10bfff) AM_WRITEONLY												// ???
-	AM_RANGE(0x10c000, 0x10c003) AM_WRITEONLY AM_BASE(m_scroll_1)				// Scroll 1
-	AM_RANGE(0x10c004, 0x10c007) AM_WRITEONLY AM_BASE(m_scroll_0)				// Scroll 0
+	AM_RANGE(0x10c000, 0x10c003) AM_WRITEONLY AM_SHARE("scroll_1")				// Scroll 1
+	AM_RANGE(0x10c004, 0x10c007) AM_WRITEONLY AM_SHARE("scroll_0")				// Scroll 0
 	AM_RANGE(0x200000, 0x2005ff) AM_RAM_WRITE(blmbycar_palette_w)							// Palette
 	AM_RANGE(0x200600, 0x203fff) AM_RAM
-	AM_RANGE(0x204000, 0x2045ff) AM_RAM_WRITE(blmbycar_palette_w) AM_BASE(m_paletteram)	// Palette
+	AM_RANGE(0x204000, 0x2045ff) AM_RAM_WRITE(blmbycar_palette_w) AM_SHARE("paletteram")	// Palette
 	AM_RANGE(0x204600, 0x207fff) AM_RAM
 	AM_RANGE(0x440000, 0x441fff) AM_RAM
-	AM_RANGE(0x444000, 0x445fff) AM_WRITEONLY AM_BASE_SIZE(m_spriteram, m_spriteram_size)// Sprites (size?)
+	AM_RANGE(0x444000, 0x445fff) AM_WRITEONLY AM_SHARE("spriteram")// Sprites (size?)
 	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("DSW")
 	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x700004, 0x700005) AM_READ(blmbycar_opt_wheel_r)								// Wheel (optical)
@@ -136,17 +136,17 @@ static ADDRESS_MAP_START( watrball_map, AS_PROGRAM, 16, blmbycar_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0xfec000, 0xfeffff) AM_RAM
 	AM_RANGE(0x100000, 0x103fff) AM_WRITEONLY												// ???
-	AM_RANGE(0x104000, 0x105fff) AM_RAM_WRITE(blmbycar_vram_1_w) AM_BASE(m_vram_1)	// Layer 1
-	AM_RANGE(0x106000, 0x107fff) AM_RAM_WRITE(blmbycar_vram_0_w) AM_BASE(m_vram_0)	// Layer 0
+	AM_RANGE(0x104000, 0x105fff) AM_RAM_WRITE(blmbycar_vram_1_w) AM_SHARE("vram_1")	// Layer 1
+	AM_RANGE(0x106000, 0x107fff) AM_RAM_WRITE(blmbycar_vram_0_w) AM_SHARE("vram_0")	// Layer 0
 	AM_RANGE(0x108000, 0x10bfff) AM_WRITEONLY												// ???
-	AM_RANGE(0x10c000, 0x10c003) AM_WRITEONLY AM_BASE(m_scroll_1)					// Scroll 1
-	AM_RANGE(0x10c004, 0x10c007) AM_WRITEONLY AM_BASE(m_scroll_0)					// Scroll 0
+	AM_RANGE(0x10c000, 0x10c003) AM_WRITEONLY AM_SHARE("scroll_1")					// Scroll 1
+	AM_RANGE(0x10c004, 0x10c007) AM_WRITEONLY AM_SHARE("scroll_0")					// Scroll 0
 	AM_RANGE(0x200000, 0x2005ff) AM_RAM_WRITE(blmbycar_palette_w)							// Palette
 	AM_RANGE(0x200600, 0x203fff) AM_RAM
-	AM_RANGE(0x204000, 0x2045ff) AM_RAM_WRITE(blmbycar_palette_w) AM_BASE(m_paletteram)	// Palette
+	AM_RANGE(0x204000, 0x2045ff) AM_RAM_WRITE(blmbycar_palette_w) AM_SHARE("paletteram")	// Palette
 	AM_RANGE(0x204600, 0x207fff) AM_RAM
 	AM_RANGE(0x440000, 0x441fff) AM_RAM
-	AM_RANGE(0x444000, 0x445fff) AM_WRITEONLY AM_BASE_SIZE(m_spriteram, m_spriteram_size)// Sprites (size?)
+	AM_RANGE(0x444000, 0x445fff) AM_WRITEONLY AM_SHARE("spriteram")// Sprites (size?)
 	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("DSW")
 	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x700006, 0x700007) AM_READNOP													// read

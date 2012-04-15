@@ -2139,7 +2139,7 @@ static ADDRESS_MAP_START( drgnwrld, AS_PROGRAM, 16, igs011_state )
 
 	AM_RANGE( 0x000000, 0x07ffff ) AM_ROM
 	AM_RANGE( 0x100000, 0x103fff ) AM_RAM AM_SHARE("nvram")
-	AM_RANGE( 0x200000, 0x200fff ) AM_RAM AM_BASE(m_priority_ram )
+	AM_RANGE( 0x200000, 0x200fff ) AM_RAM AM_SHARE("priority_ram")
 	AM_RANGE( 0x400000, 0x401fff ) AM_RAM_WRITE(igs011_palette ) AM_SHARE("paletteram")
 	AM_RANGE( 0x500000, 0x500001 ) AM_READ_PORT( "COIN" )
 	AM_RANGE( 0x600000, 0x600001 ) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff )
@@ -2224,7 +2224,7 @@ static ADDRESS_MAP_START( lhb, AS_PROGRAM, 16, igs011_state )
 
 	AM_RANGE( 0x000000, 0x07ffff ) AM_ROM
 	AM_RANGE( 0x100000, 0x103fff ) AM_RAM AM_SHARE("nvram")
-	AM_RANGE( 0x200000, 0x200fff ) AM_RAM AM_BASE(m_priority_ram )
+	AM_RANGE( 0x200000, 0x200fff ) AM_RAM AM_SHARE("priority_ram")
 	AM_RANGE( 0x300000, 0x3fffff ) AM_READWRITE(igs011_layers_r, igs011_layers_w )
 	AM_RANGE( 0x400000, 0x401fff ) AM_RAM_WRITE(igs011_palette ) AM_SHARE("paletteram")
 	AM_RANGE( 0x600000, 0x600001 ) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff )
@@ -2265,7 +2265,7 @@ static ADDRESS_MAP_START( xymg, AS_PROGRAM, 16, igs011_state )
 	AM_RANGE( 0x000000, 0x07ffff ) AM_ROM
 	AM_RANGE( 0x100000, 0x103fff ) AM_RAM
 	AM_RANGE( 0x1f0000, 0x1f3fff ) AM_RAM AM_SHARE("nvram") // extra ram
-	AM_RANGE( 0x200000, 0x200fff ) AM_RAM AM_BASE(m_priority_ram )
+	AM_RANGE( 0x200000, 0x200fff ) AM_RAM AM_SHARE("priority_ram")
 	AM_RANGE( 0x300000, 0x3fffff ) AM_READWRITE(igs011_layers_r, igs011_layers_w )
 	AM_RANGE( 0x400000, 0x401fff ) AM_RAM_WRITE(igs011_palette ) AM_SHARE("paletteram")
 	AM_RANGE( 0x600000, 0x600001 ) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff )
@@ -2301,7 +2301,7 @@ static ADDRESS_MAP_START( wlcc, AS_PROGRAM, 16, igs011_state )
 
 	AM_RANGE( 0x000000, 0x07ffff ) AM_ROM
 	AM_RANGE( 0x100000, 0x103fff ) AM_RAM AM_SHARE("nvram")
-	AM_RANGE( 0x200000, 0x200fff ) AM_RAM AM_BASE(m_priority_ram )
+	AM_RANGE( 0x200000, 0x200fff ) AM_RAM AM_SHARE("priority_ram")
 	AM_RANGE( 0x300000, 0x3fffff ) AM_READWRITE(igs011_layers_r, igs011_layers_w )
 	AM_RANGE( 0x400000, 0x401fff ) AM_RAM_WRITE(igs011_palette ) AM_SHARE("paletteram")
 	AM_RANGE( 0x520000, 0x520001 ) AM_READ_PORT( "COIN" )
@@ -2458,12 +2458,12 @@ static ADDRESS_MAP_START( vbowl, AS_PROGRAM, 16, igs011_state )
 
 	AM_RANGE( 0x000000, 0x07ffff ) AM_ROM
 	AM_RANGE( 0x100000, 0x103fff ) AM_RAM AM_SHARE("nvram")
-	AM_RANGE( 0x200000, 0x200fff ) AM_RAM AM_BASE(m_priority_ram )
+	AM_RANGE( 0x200000, 0x200fff ) AM_RAM AM_SHARE("priority_ram")
 	AM_RANGE( 0x300000, 0x3fffff ) AM_READWRITE(igs011_layers_r, igs011_layers_w )
 	AM_RANGE( 0x400000, 0x401fff ) AM_RAM_WRITE(igs011_palette ) AM_SHARE("paletteram")
 	AM_RANGE( 0x520000, 0x520001 ) AM_READ_PORT( "COIN" )
 	AM_RANGE( 0x600000, 0x600007 ) AM_DEVREADWRITE_LEGACY("ics", ics2115_word_r, ics2115_word_w )
-	AM_RANGE( 0x700000, 0x700003 ) AM_RAM AM_BASE(m_vbowl_trackball )
+	AM_RANGE( 0x700000, 0x700003 ) AM_RAM AM_SHARE("vbowl_trackball")
 	AM_RANGE( 0x700004, 0x700005 ) AM_WRITE(vbowl_pen_hi_w )
 	AM_RANGE( 0x800000, 0x800003 ) AM_WRITE(vbowl_igs003_w )
 	AM_RANGE( 0x800002, 0x800003 ) AM_READ(vbowl_igs003_r )

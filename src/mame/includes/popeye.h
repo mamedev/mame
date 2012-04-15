@@ -2,24 +2,29 @@ class popeye_state : public driver_device
 {
 public:
 	popeye_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_background_pos(*this, "background_pos"),
+		m_palettebank(*this, "palettebank"),
+		m_spriteram(*this, "spriteram"),
+		m_videoram(*this, "videoram"),
+		m_colorram(*this, "colorram"){ }
 
 	UINT8 m_prot0;
 	UINT8 m_prot1;
 	UINT8 m_prot_shift;
 	int m_dswbit;
-	UINT8 *m_videoram;
-	UINT8 *m_colorram;
-	UINT8 *m_background_pos;
-	UINT8 *m_palettebank;
+	required_shared_ptr<UINT8> m_background_pos;
+	required_shared_ptr<UINT8> m_palettebank;
+	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_colorram;
 	UINT8 *m_bitmapram;
 	bitmap_ind16 *m_tmpbitmap2;
 	UINT8 m_invertmask;
 	UINT8 m_bitmap_type;
 	tilemap_t *m_fg_tilemap;
 	UINT8 m_lastflip;
-	UINT8 *m_spriteram;
-	size_t m_spriteram_size;
+
 	DECLARE_READ8_MEMBER(protection_r);
 	DECLARE_WRITE8_MEMBER(protection_w);
 	DECLARE_WRITE8_MEMBER(popeye_videoram_w);

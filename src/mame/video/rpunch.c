@@ -80,7 +80,7 @@ VIDEO_START( rpunch )
 	state->m_background[1]->set_transparent_pen(15);
 
 	if (state->m_bitmapram)
-		memset(state->m_bitmapram, 0xff, state->m_bitmapram_size);
+		memset(state->m_bitmapram, 0xff, state->m_bitmapram.bytes());
 
 	/* reset the timer */
 	state->m_crtc_timer = machine.scheduler().timer_alloc(FUNC(crtc_interrupt_gen));

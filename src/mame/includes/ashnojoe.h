@@ -8,18 +8,26 @@ class ashnojoe_state : public driver_device
 {
 public:
 	ashnojoe_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_tileram_3(*this, "tileram_3"),
+		m_tileram_4(*this, "tileram_4"),
+		m_tileram_5(*this, "tileram_5"),
+		m_tileram_2(*this, "tileram_2"),
+		m_tileram_6(*this, "tileram_6"),
+		m_tileram_7(*this, "tileram_7"),
+		m_tileram(*this, "tileram"),
+		m_tilemap_reg(*this, "tilemap_reg"){ }
 
 	/* memory pointers */
-	UINT16 *    m_tileram;
 	UINT16 *    m_tileram_1;
-	UINT16 *    m_tileram_2;
-	UINT16 *    m_tileram_3;
-	UINT16 *    m_tileram_4;
-	UINT16 *    m_tileram_5;
-	UINT16 *    m_tileram_6;
-	UINT16 *    m_tileram_7;
-	UINT16 *    m_tilemap_reg;
+	required_shared_ptr<UINT16> m_tileram_3;
+	required_shared_ptr<UINT16> m_tileram_4;
+	required_shared_ptr<UINT16> m_tileram_5;
+	required_shared_ptr<UINT16> m_tileram_2;
+	required_shared_ptr<UINT16> m_tileram_6;
+	required_shared_ptr<UINT16> m_tileram_7;
+	required_shared_ptr<UINT16> m_tileram;
+	required_shared_ptr<UINT16> m_tilemap_reg;
 //  UINT16 *    m_paletteram; // currently this uses generic palette handling
 
 	/* video-related */

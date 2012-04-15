@@ -108,8 +108,8 @@ Sound PCB
 
 static ADDRESS_MAP_START( sbugger_map, AS_PROGRAM, 8, sbugger_state )
 	AM_RANGE(0x0000, 0x37ff) AM_ROM
-	AM_RANGE(0xc800, 0xcbff) AM_RAM_WRITE(sbugger_videoram_attr_w) AM_BASE(m_videoram_attr)
-	AM_RANGE(0xcc00, 0xcfff) AM_RAM_WRITE(sbugger_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0xc800, 0xcbff) AM_RAM_WRITE(sbugger_videoram_attr_w) AM_SHARE("videoram_attr")
+	AM_RANGE(0xcc00, 0xcfff) AM_RAM_WRITE(sbugger_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0xe000, 0xe0ff) AM_DEVREADWRITE("i8156", i8155_device, memory_r, memory_w) /* sp is set to e0ff */
 	AM_RANGE(0xf400, 0xffff) AM_RAM
 ADDRESS_MAP_END

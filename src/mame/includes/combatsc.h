@@ -8,13 +8,14 @@ class combatsc_state : public driver_device
 {
 public:
 	combatsc_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_paletteram(*this, "paletteram"){ }
 
 	/* memory pointers */
 	UINT8 *    m_videoram;
 	UINT8 *    m_scrollram;
 	UINT8 *    m_io_ram;
-	UINT8 *    m_paletteram;
+	required_shared_ptr<UINT8> m_paletteram;
 	UINT8 *    m_spriteram[2];
 
 	/* video-related */

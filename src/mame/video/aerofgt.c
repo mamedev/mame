@@ -139,14 +139,12 @@ VIDEO_START( spinlbrk )
 	/* sprite maps are hardcoded in this game */
 
 	/* enemy sprites use ROM instead of RAM */
-	state->m_spriteram2 = (UINT16 *)machine.region("gfx5")->base();
-	state->m_spriteram2_size = 0x20000;
+	state->m_spriteram2.set_target(reinterpret_cast<UINT16 *>(machine.region("gfx5")->base()), 0x20000);
 
 	/* front sprites are direct maps */
-	state->m_spriteram1 = state->m_spriteram2 + state->m_spriteram2_size / 2;
-	state->m_spriteram1_size = 0x4000;
+	state->m_spriteram1.set_target(state->m_spriteram2 + state->m_spriteram2.bytes() / 2, 0x4000);
 
-	for (i = 0; i < state->m_spriteram1_size / 2; i++)
+	for (i = 0; i < state->m_spriteram1.bytes() / 2; i++)
 	{
 		state->m_spriteram1[i] = i;
 	}
@@ -453,9 +451,9 @@ static void turbofrc_draw_sprites( running_machine &machine, _BitmapClass &bitma
 					sx = ((ox + zoomx * x / 2 + 16) & 0x1ff) - 16;
 
 				if (chip == 0)
-					code = state->m_spriteram1[map_start % (state->m_spriteram1_size/2)];
+					code = state->m_spriteram1[map_start % (state->m_spriteram1.bytes()/2)];
 				else
-					code = state->m_spriteram2[map_start % (state->m_spriteram2_size/2)];
+					code = state->m_spriteram2[map_start % (state->m_spriteram2.bytes()/2)];
 
 				pdrawgfxzoom_transpen(bitmap,cliprect,machine.gfx[state->m_sprite_gfx + chip],
 							 code,
@@ -537,9 +535,9 @@ static void spinlbrk_draw_sprites( running_machine &machine, bitmap_ind16 &bitma
 					sx = ((ox + zoomx * x / 2 + 16) & 0x1ff) - 16;
 
 				if (chip == 0)
-					code = state->m_spriteram1[map_start % (state->m_spriteram1_size/2)];
+					code = state->m_spriteram1[map_start % (state->m_spriteram1.bytes()/2)];
 				else
-					code = state->m_spriteram2[map_start % (state->m_spriteram2_size/2)];
+					code = state->m_spriteram2[map_start % (state->m_spriteram2.bytes()/2)];
 
 				pdrawgfxzoom_transpen(bitmap,cliprect,machine.gfx[state->m_sprite_gfx + chip],
 							 code,
@@ -622,9 +620,9 @@ static void aerfboo2_draw_sprites( running_machine &machine, bitmap_ind16 &bitma
 					sx = ((ox + zoomx * x / 2 + 16) & 0x1ff) - 16;
 
 				if (chip == 0)
-					code = state->m_spriteram1[map_start % (state->m_spriteram1_size/2)];
+					code = state->m_spriteram1[map_start % (state->m_spriteram1.bytes()/2)];
 				else
-					code = state->m_spriteram2[map_start % (state->m_spriteram2_size/2)];
+					code = state->m_spriteram2[map_start % (state->m_spriteram2.bytes()/2)];
 
 				pdrawgfxzoom_transpen(bitmap,cliprect,machine.gfx[state->m_sprite_gfx + chip],
 							 code,
@@ -649,7 +647,7 @@ static void pspikesb_draw_sprites( running_machine &machine, bitmap_ind16 &bitma
 	aerofgt_state *state = machine.driver_data<aerofgt_state>();
 	int i;
 
-	for (i = 4; i < state->m_spriteram3_size / 2; i += 4)
+	for (i = 4; i < state->m_spriteram3.bytes() / 2; i += 4)
 	{
 		int xpos, ypos, color, flipx, flipy, code;
 
@@ -687,7 +685,7 @@ static void spikes91_draw_sprites( running_machine &machine, bitmap_ind16 &bitma
 	lookup = machine.region("user1")->base();
 	state->m_spritepalettebank = 1;
 
-	for (i = state->m_spriteram3_size / 2 - 4; i >= 4; i -= 4)
+	for (i = state->m_spriteram3.bytes() / 2 - 4; i >= 4; i -= 4)
 	{
 		int xpos, ypos, color, flipx, flipy, code, realcode;
 
@@ -728,7 +726,7 @@ static void aerfboot_draw_sprites( running_machine &machine, bitmap_ind16 &bitma
 
 	last = ((state->m_rasterram[0x404 / 2] << 5) - 0x8000) / 2;
 
-	for (attr_start = state->m_spriteram3_size / 2 - 4; attr_start >= last; attr_start -= 4)
+	for (attr_start = state->m_spriteram3.bytes() / 2 - 4; attr_start >= last; attr_start -= 4)
 	{
 		int code;
 		int ox, oy, sx, sy, zoomx, zoomy, flipx, flipy, color, pri;
@@ -766,7 +764,7 @@ static void aerfboot_draw_sprites( running_machine &machine, bitmap_ind16 &bitma
 
 	last = ((state->m_rasterram[0x402 / 2] << 5) - 0x8000) / 2;
 
-	for (attr_start = ((state->m_spriteram3_size / 2) / 2) - 4; attr_start >= last; attr_start -= 4)
+	for (attr_start = ((state->m_spriteram3.bytes() / 2) / 2) - 4; attr_start >= last; attr_start -= 4)
 	{
 		int code;
 		int ox, oy, sx, sy, zoomx, zoomy, flipx, flipy, color, pri;

@@ -8,22 +8,27 @@ class gberet_state : public driver_device
 {
 public:
 	gberet_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_colorram(*this, "colorram"),
+		m_videoram(*this, "videoram"),
+		m_spriteram2(*this, "spriteram2"),
+		m_spriteram(*this, "spriteram"),
+		m_scrollram(*this, "scrollram"),
+		m_soundlatch(*this, "soundlatch"){ }
 
 	/* memory pointers */
-	UINT8 *     m_videoram;
-	UINT8 *     m_colorram;
-	UINT8 *     m_spriteram;
-	UINT8 *     m_spriteram2;
-	UINT8 *     m_scrollram;
-	size_t      m_spriteram_size;
+	required_shared_ptr<UINT8> m_colorram;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_spriteram2;
+	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<UINT8> m_scrollram;
+	required_shared_ptr<UINT8> m_soundlatch;
 
 	/* video-related */
 	tilemap_t * m_bg_tilemap;
 	UINT8       m_spritebank;
 
 	/* misc */
-	UINT8 *     m_soundlatch;
 	UINT8       m_interrupt_mask;
 	UINT8       m_interrupt_ticks;
 	DECLARE_WRITE8_MEMBER(gberet_coin_counter_w);

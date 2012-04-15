@@ -196,9 +196,9 @@ static MACHINE_START( amazon )
 
 static ADDRESS_MAP_START( terracre_map, AS_PROGRAM, 16, terracre_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
-	AM_RANGE(0x020000, 0x0201ff) AM_RAM AM_BASE(m_spriteram)
+	AM_RANGE(0x020000, 0x0201ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x020200, 0x021fff) AM_RAM
-	AM_RANGE(0x022000, 0x022fff) AM_WRITE(amazon_background_w) AM_BASE(m_amazon_videoram)
+	AM_RANGE(0x022000, 0x022fff) AM_WRITE(amazon_background_w) AM_SHARE("amazon_videoram")
 	AM_RANGE(0x023000, 0x023fff) AM_RAM
 	AM_RANGE(0x024000, 0x024001) AM_READ_PORT("P1")
 	AM_RANGE(0x024002, 0x024003) AM_READ_PORT("P2")
@@ -208,14 +208,14 @@ static ADDRESS_MAP_START( terracre_map, AS_PROGRAM, 16, terracre_state )
 	AM_RANGE(0x026002, 0x026003) AM_WRITE(amazon_scrollx_w)
 	AM_RANGE(0x026004, 0x026005) AM_WRITE(amazon_scrolly_w)
 	AM_RANGE(0x02600c, 0x02600d) AM_WRITE(amazon_sound_w)
-	AM_RANGE(0x028000, 0x0287ff) AM_WRITE(amazon_foreground_w) AM_BASE(m_videoram)
+	AM_RANGE(0x028000, 0x0287ff) AM_WRITE(amazon_foreground_w) AM_SHARE("videoram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( amazon_map, AS_PROGRAM, 16, terracre_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
-	AM_RANGE(0x040000, 0x0401ff) AM_RAM AM_BASE(m_spriteram)
+	AM_RANGE(0x040000, 0x0401ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x040200, 0x040fff) AM_RAM
-	AM_RANGE(0x042000, 0x042fff) AM_WRITE(amazon_background_w) AM_BASE(m_amazon_videoram)
+	AM_RANGE(0x042000, 0x042fff) AM_WRITE(amazon_background_w) AM_SHARE("amazon_videoram")
 	AM_RANGE(0x044000, 0x044001) AM_READ_PORT("IN0")
 	AM_RANGE(0x044002, 0x044003) AM_READ_PORT("IN1")
 	AM_RANGE(0x044004, 0x044005) AM_READ_PORT("IN2")
@@ -224,7 +224,7 @@ static ADDRESS_MAP_START( amazon_map, AS_PROGRAM, 16, terracre_state )
 	AM_RANGE(0x046002, 0x046003) AM_WRITE(amazon_scrollx_w)
 	AM_RANGE(0x046004, 0x046005) AM_WRITE(amazon_scrolly_w)
 	AM_RANGE(0x04600c, 0x04600d) AM_WRITE(amazon_sound_w)
-	AM_RANGE(0x050000, 0x050fff) AM_WRITE(amazon_foreground_w) AM_BASE(m_videoram)
+	AM_RANGE(0x050000, 0x050fff) AM_WRITE(amazon_foreground_w) AM_SHARE("videoram")
 	AM_RANGE(0x070000, 0x070003) AM_READWRITE(amazon_protection_r, amazon_protection_w)
 ADDRESS_MAP_END
 

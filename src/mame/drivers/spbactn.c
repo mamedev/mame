@@ -143,9 +143,9 @@ WRITE16_MEMBER(spbactn_state::soundcommand_w)
 static ADDRESS_MAP_START( spbactn_map, AS_PROGRAM, 16, spbactn_state )
 	AM_RANGE(0x00000, 0x3ffff) AM_ROM
 	AM_RANGE(0x40000, 0x43fff) AM_RAM	// main ram
-	AM_RANGE(0x50000, 0x50fff) AM_RAM AM_BASE(m_spvideoram)
-	AM_RANGE(0x60000, 0x67fff) AM_RAM AM_BASE(m_fgvideoram)
-	AM_RANGE(0x70000, 0x77fff) AM_RAM AM_BASE(m_bgvideoram)
+	AM_RANGE(0x50000, 0x50fff) AM_RAM AM_SHARE("spvideoram")
+	AM_RANGE(0x60000, 0x67fff) AM_RAM AM_SHARE("fgvideoram")
+	AM_RANGE(0x70000, 0x77fff) AM_RAM AM_SHARE("bgvideoram")
 	AM_RANGE(0x80000, 0x827ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x90000, 0x90001) AM_READ_PORT("IN0")
 	AM_RANGE(0x90010, 0x90011) AM_READ_PORT("IN1")

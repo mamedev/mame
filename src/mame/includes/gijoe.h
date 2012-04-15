@@ -8,11 +8,13 @@ class gijoe_state : public driver_device
 {
 public:
 	gijoe_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_spriteram(*this, "spriteram"),
+		m_workram(*this, "workram"){ }
 
 	/* memory pointers */
-	UINT16 *    m_workram;
-	UINT16 *    m_spriteram;
+	required_shared_ptr<UINT16> m_spriteram;
+	required_shared_ptr<UINT16> m_workram;
 //  UINT16 *    m_paletteram;    // currently this uses generic palette handling
 
 	/* video-related */

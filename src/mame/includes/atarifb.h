@@ -19,15 +19,19 @@ class atarifb_state : public driver_device
 {
 public:
 	atarifb_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_alphap1_videoram(*this, "p1_videoram"),
+		m_alphap2_videoram(*this, "p2_videoram"),
+		m_field_videoram(*this, "field_videoram"),
+		m_spriteram(*this, "spriteram"),
+		m_scroll_register(*this, "scroll_register"){ }
 
 	/* video-related */
-	UINT8 *  m_alphap1_videoram;
-	UINT8 *  m_alphap2_videoram;
-	UINT8 *  m_field_videoram;
-	UINT8 *  m_spriteram;
-	UINT8 *  m_scroll_register;
-	size_t   m_spriteram_size;
+	required_shared_ptr<UINT8> m_alphap1_videoram;
+	required_shared_ptr<UINT8> m_alphap2_videoram;
+	required_shared_ptr<UINT8> m_field_videoram;
+	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<UINT8> m_scroll_register;
 
 	tilemap_t  *m_alpha1_tilemap;
 	tilemap_t  *m_alpha2_tilemap;

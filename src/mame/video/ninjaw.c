@@ -28,7 +28,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	int unknown = 0;
 #endif
 
-	for (offs = (state->m_spriteram_size / 2) - 4; offs >= 0; offs -= 4)
+	for (offs = (state->m_spriteram.bytes() / 2) - 4; offs >= 0; offs -= 4)
 	{
 		data = spriteram[offs + 2];
 		tilenum = data & 0x7fff;

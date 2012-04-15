@@ -2,12 +2,13 @@ class pokechmp_state : public driver_device
 {
 public:
 	pokechmp_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"),
+		m_spriteram(*this, "spriteram"){ }
 
-	UINT8 *m_videoram;
+	required_shared_ptr<UINT8> m_videoram;
 	tilemap_t *m_bg_tilemap;
-	UINT8 *m_spriteram;
-	size_t m_spriteram_size;
+	required_shared_ptr<UINT8> m_spriteram;
 	DECLARE_WRITE8_MEMBER(pokechmp_bank_w);
 	DECLARE_WRITE8_MEMBER(pokechmp_sound_bank_w);
 	DECLARE_WRITE8_MEMBER(pokechmp_sound_w);

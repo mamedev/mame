@@ -8,19 +8,23 @@ class goindol_state : public driver_device
 {
 public:
 	goindol_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_ram(*this, "ram"),
+		m_fg_scrolly(*this, "fg_scrolly"),
+		m_fg_scrollx(*this, "fg_scrollx"),
+		m_spriteram(*this, "spriteram"),
+		m_bg_videoram(*this, "bg_videoram"),
+		m_spriteram2(*this, "spriteram2"),
+		m_fg_videoram(*this, "fg_videoram"){ }
 
 	/* memory pointers */
-	UINT8 *    m_bg_videoram;
-	UINT8 *    m_fg_videoram;
-	UINT8 *    m_fg_scrollx;
-	UINT8 *    m_fg_scrolly;
-	UINT8 *    m_ram;
-	UINT8 *    m_spriteram;
-	UINT8 *    m_spriteram2;
-	size_t     m_fg_videoram_size;
-	size_t     m_bg_videoram_size;
-	size_t     m_spriteram_size;
+	required_shared_ptr<UINT8> m_ram;
+	required_shared_ptr<UINT8> m_fg_scrolly;
+	required_shared_ptr<UINT8> m_fg_scrollx;
+	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<UINT8> m_bg_videoram;
+	required_shared_ptr<UINT8> m_spriteram2;
+	required_shared_ptr<UINT8> m_fg_videoram;
 
 	/* video-related */
 	tilemap_t     *m_bg_tilemap;

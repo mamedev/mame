@@ -94,9 +94,9 @@ WRITE8_MEMBER(pitnrun_state::pitnrun_vflip_w)
 static ADDRESS_MAP_START( pitnrun_map, AS_PROGRAM, 8, pitnrun_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(pitnrun_videoram_w) AM_BASE(m_videoram)
-	AM_RANGE(0x9000, 0x9fff) AM_RAM_WRITE(pitnrun_videoram2_w) AM_BASE(m_videoram2)
-	AM_RANGE(0xa000, 0xa0ff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
+	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(pitnrun_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x9000, 0x9fff) AM_RAM_WRITE(pitnrun_videoram2_w) AM_SHARE("videoram2")
+	AM_RANGE(0xa000, 0xa0ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xa800, 0xa807) AM_WRITENOP /* Analog Sound */
 	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("DSW") AM_WRITE(nmi_enable_w)

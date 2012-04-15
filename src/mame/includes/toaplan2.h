@@ -13,7 +13,14 @@ class toaplan2_state : public driver_device
 {
 public:
 	toaplan2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
+		: driver_device(mconfig, type, tag),
+		m_shared_ram(*this, "shared_ram"),
+		m_shared_ram16(*this, "shared_ram16"),
+		m_txvideoram16(*this, "txvideoram16"),
+		m_txvideoram16_offs(*this, "txvram_offs"),
+		m_txscrollram16(*this, "txscrollram16"),
+		m_tx_gfxram16(*this, "tx_gfxram16"),
+		m_mainram16(*this, "mainram16")
 	{
 		m_vdp0 = NULL;
 		m_vdp1 = NULL;
@@ -22,8 +29,8 @@ public:
 	gp9001vdp_device* m_vdp0;
 	gp9001vdp_device* m_vdp1;
 
-	UINT8 *m_shared_ram;		/* 8 bit RAM shared between 68K and sound CPU */
-	UINT16 *m_shared_ram16;	/* Really 8 bit RAM connected to Z180 */
+	required_shared_ptr<UINT8> m_shared_ram; // 8 bit RAM shared between 68K and sound CPU
+	required_shared_ptr<UINT16> m_shared_ram16;  	// Really 8 bit RAM connected to Z180
 
 	device_t *m_main_cpu;
 	device_t *m_sub_cpu;
@@ -36,16 +43,12 @@ public:
 	UINT8 m_sndirq_line;		/* IRQ4 for batrider, IRQ2 for bbakraid */
 	UINT8 m_z80_busreq;
 
-	UINT16 *m_txvideoram16;
-	UINT16 *m_txvideoram16_offs;
-	UINT16 *m_txscrollram16;
-	UINT16 *m_tx_gfxram16;
-	UINT16 *m_mainram16;
+	required_shared_ptr<UINT16> m_txvideoram16;
+	required_shared_ptr<UINT16> m_txvideoram16_offs;
+	required_shared_ptr<UINT16> m_txscrollram16;
+	required_shared_ptr<UINT16> m_tx_gfxram16;
+	required_shared_ptr<UINT16> m_mainram16;
 
-	size_t m_tx_vram_size;
-	size_t m_tx_offs_vram_size;
-	size_t m_tx_scroll_vram_size;
-	size_t m_mainram_overlap_size;
 
 	bitmap_ind8 m_custom_priority_bitmap;
 	bitmap_ind16 m_secondary_render_bitmap;

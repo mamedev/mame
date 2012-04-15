@@ -2,13 +2,15 @@ class tankbatt_state : public driver_device
 {
 public:
 	tankbatt_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_bulletsram(*this, "bulletsram"),
+		m_videoram(*this, "videoram"){ }
 
-	UINT8 *m_videoram;
+	required_shared_ptr<UINT8> m_bulletsram;
+	required_shared_ptr<UINT8> m_videoram;
 	int m_nmi_enable;
 	int m_sound_enable;
-	UINT8 *m_bulletsram;
-	size_t m_bulletsram_size;
+
 	tilemap_t *m_bg_tilemap;
 	DECLARE_WRITE8_MEMBER(tankbatt_led_w);
 	DECLARE_READ8_MEMBER(tankbatt_in0_r);

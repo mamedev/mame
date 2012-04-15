@@ -79,7 +79,7 @@ SCREEN_UPDATE_RGB32( epos )
 
 	get_pens(screen.machine(), pens);
 
-	for (offs = 0; offs < state->m_videoram_size; offs++)
+	for (offs = 0; offs < state->m_videoram.bytes(); offs++)
 	{
 		UINT8 data = state->m_videoram[offs];
 

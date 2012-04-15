@@ -108,7 +108,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	int max_x = machine.primary_screen->width()  - 1;
 	int max_y = machine.primary_screen->height() - 1;
 
-	for (i = 0; i < state->m_spriteram_size ; i += 4)
+	for (i = 0; i < state->m_spriteram.bytes() ; i += 4)
 	{
 		int y = spriteram[i + 0];
 		int x = spriteram[i + 1];

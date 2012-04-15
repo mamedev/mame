@@ -683,9 +683,9 @@ static READ8_DEVICE_HANDLER( caterplr_AY8910_r )
 
 static ADDRESS_MAP_START( centiped_map, AS_PROGRAM, 8, centiped_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
-	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_BASE(m_rambase)
-	AM_RANGE(0x0400, 0x07bf) AM_RAM_WRITE(centiped_videoram_w) AM_BASE(m_videoram)
-	AM_RANGE(0x07c0, 0x07ff) AM_RAM AM_BASE(m_spriteram)
+	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_SHARE("rambase")
+	AM_RANGE(0x0400, 0x07bf) AM_RAM_WRITE(centiped_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x07c0, 0x07ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x0800, 0x0800) AM_READ_PORT("DSW1")		/* DSW1 */
 	AM_RANGE(0x0801, 0x0801) AM_READ_PORT("DSW2")		/* DSW2 */
 	AM_RANGE(0x0c00, 0x0c00) AM_READ(centiped_IN0_r)	/* IN0 */
@@ -709,8 +709,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( centipdb_map, AS_PROGRAM, 8, centiped_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x4000) AM_RAM
-	AM_RANGE(0x0400, 0x07bf) AM_MIRROR(0x4000) AM_RAM_WRITE(centiped_videoram_w) AM_BASE(m_videoram)
-	AM_RANGE(0x07c0, 0x07ff) AM_MIRROR(0x4000) AM_RAM AM_BASE(m_spriteram)
+	AM_RANGE(0x0400, 0x07bf) AM_MIRROR(0x4000) AM_RAM_WRITE(centiped_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x07c0, 0x07ff) AM_MIRROR(0x4000) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x0800, 0x0800) AM_MIRROR(0x4000) AM_READ_PORT("DSW1")		/* DSW1 */
 	AM_RANGE(0x0801, 0x0801) AM_MIRROR(0x4000) AM_READ_PORT("DSW2")		/* DSW2 */
 	AM_RANGE(0x0c00, 0x0c00) AM_MIRROR(0x4000) AM_READ(centiped_IN0_r)	/* IN0 */
@@ -745,8 +745,8 @@ static ADDRESS_MAP_START( milliped_map, AS_PROGRAM, 8, centiped_state )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
 	AM_RANGE(0x0400, 0x040f) AM_DEVREADWRITE_LEGACY("pokey", pokey_r, pokey_w)
 	AM_RANGE(0x0800, 0x080f) AM_DEVREADWRITE_LEGACY("pokey2", pokey_r, pokey_w)
-	AM_RANGE(0x1000, 0x13bf) AM_RAM_WRITE(centiped_videoram_w) AM_BASE(m_videoram)
-	AM_RANGE(0x13c0, 0x13ff) AM_RAM AM_BASE(m_spriteram)
+	AM_RANGE(0x1000, 0x13bf) AM_RAM_WRITE(centiped_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x13c0, 0x13ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x2000, 0x2000) AM_READ(centiped_IN0_r)
 	AM_RANGE(0x2001, 0x2001) AM_READ(milliped_IN1_r)
 	AM_RANGE(0x2010, 0x2010) AM_READ(milliped_IN2_r)
@@ -776,8 +776,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( warlords_map, AS_PROGRAM, 8, centiped_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
-	AM_RANGE(0x0400, 0x07bf) AM_RAM_WRITE(centiped_videoram_w) AM_BASE(m_videoram)
-	AM_RANGE(0x07c0, 0x07ff) AM_RAM AM_BASE(m_spriteram)
+	AM_RANGE(0x0400, 0x07bf) AM_RAM_WRITE(centiped_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x07c0, 0x07ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x0800, 0x0800) AM_READ_PORT("DSW1")	/* DSW1 */
 	AM_RANGE(0x0801, 0x0801) AM_READ_PORT("DSW2")	/* DSW2 */
 	AM_RANGE(0x0c00, 0x0c00) AM_READ_PORT("IN0")	/* IN0 */
@@ -803,8 +803,8 @@ static ADDRESS_MAP_START( mazeinv_map, AS_PROGRAM, 8, centiped_state )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
 	AM_RANGE(0x0400, 0x040f) AM_DEVREADWRITE_LEGACY("pokey", pokey_r, pokey_w)
 	AM_RANGE(0x0800, 0x080f) AM_DEVREADWRITE_LEGACY("pokey2", pokey_r, pokey_w)
-	AM_RANGE(0x1000, 0x13bf) AM_RAM_WRITE(centiped_videoram_w) AM_BASE(m_videoram)
-	AM_RANGE(0x13c0, 0x13ff) AM_RAM AM_BASE(m_spriteram)
+	AM_RANGE(0x1000, 0x13bf) AM_RAM_WRITE(centiped_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x13c0, 0x13ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x2000, 0x2000) AM_READ_PORT("IN0")
 	AM_RANGE(0x2001, 0x2001) AM_READ_PORT("IN1")
 	AM_RANGE(0x2010, 0x2010) AM_READ_PORT("IN2")
@@ -847,8 +847,8 @@ static ADDRESS_MAP_START( bullsdrt_map, AS_PROGRAM, 8, centiped_state )
 	AM_RANGE(0x1487, 0x1487) AM_MIRROR(0x6000) AM_WRITE(centiped_flip_screen_w)
 	AM_RANGE(0x1500, 0x1500) AM_MIRROR(0x6000) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x1580, 0x1580) AM_MIRROR(0x6000) AM_NOP
-	AM_RANGE(0x1800, 0x1bbf) AM_MIRROR(0x6000) AM_WRITE(centiped_videoram_w) AM_BASE(m_videoram)
-	AM_RANGE(0x1bc0, 0x1bff) AM_MIRROR(0x6000) AM_RAM AM_BASE(m_spriteram)
+	AM_RANGE(0x1800, 0x1bbf) AM_MIRROR(0x6000) AM_WRITE(centiped_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x1bc0, 0x1bff) AM_MIRROR(0x6000) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x1c00, 0x1fff) AM_MIRROR(0x6000) AM_RAM
 	AM_RANGE(0x2000, 0x2fff) AM_ROM
 	AM_RANGE(0x4000, 0x4fff) AM_ROM
@@ -857,7 +857,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bullsdrt_port_map, AS_IO, 8, centiped_state )
 	AM_RANGE(0x00, 0x00) AM_WRITE(bullsdrt_sprites_bank_w)
-	AM_RANGE(0x20, 0x3f) AM_WRITE(bullsdrt_tilesbank_w) AM_BASE(m_bullsdrt_tiles_bankram)
+	AM_RANGE(0x20, 0x3f) AM_WRITE(bullsdrt_tilesbank_w) AM_SHARE("bullsdrt_bank")
 	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_READ(bullsdrt_data_port_r) AM_DEVWRITE_LEGACY("snsnd", sn76496_w)
 ADDRESS_MAP_END
 

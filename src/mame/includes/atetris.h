@@ -9,10 +9,11 @@ class atetris_state : public driver_device
 public:
 	atetris_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_nvram(*this, "nvram") { }
+		  m_nvram(*this, "nvram") ,
+		m_videoram(*this, "videoram"){ }
 
 	required_shared_ptr<UINT8>	m_nvram;
-	UINT8 *m_videoram;
+	required_shared_ptr<UINT8> m_videoram;
 	UINT8 *m_slapstic_source;
 	UINT8 *m_slapstic_base;
 	UINT8 m_current_bank;

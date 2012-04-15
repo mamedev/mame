@@ -8,16 +8,21 @@ class kingofb_state : public driver_device
 {
 public:
 	kingofb_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_scroll_y(*this, "scroll_y"),
+		m_videoram(*this, "videoram"),
+		m_colorram(*this, "colorram"),
+		m_videoram2(*this, "videoram2"),
+		m_colorram2(*this, "colorram2"),
+		m_spriteram(*this, "spriteram"){ }
 
 	/* memory pointers */
-	UINT8 *    m_videoram;
-	UINT8 *    m_videoram2;
-	UINT8 *    m_colorram;
-	UINT8 *    m_colorram2;
-	UINT8 *    m_spriteram;
-	UINT8 *    m_scroll_y;
-	size_t     m_spriteram_size;
+	required_shared_ptr<UINT8> m_scroll_y;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_colorram;
+	required_shared_ptr<UINT8> m_videoram2;
+	required_shared_ptr<UINT8> m_colorram2;
+	required_shared_ptr<UINT8> m_spriteram;
 
 	/* video-related */
 	tilemap_t    *m_bg_tilemap;

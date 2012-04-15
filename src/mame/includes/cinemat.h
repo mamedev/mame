@@ -9,7 +9,8 @@ class cinemat_state : public driver_device
 {
 public:
 	cinemat_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_rambase(*this, "rambase"){ }
 
 	UINT8 m_sound_control;
 	void (*m_sound_handler)(running_machine &,UINT8 sound_val, UINT8 bits_changed);
@@ -24,7 +25,7 @@ public:
 	UINT8 m_last_portb_write;
 	float m_target_volume;
 	float m_current_volume;
-	UINT16 *m_rambase;
+	required_shared_ptr<UINT16> m_rambase;
 	UINT8 m_coin_detected;
 	UINT8 m_coin_last_reset;
 	UINT8 m_mux_select;

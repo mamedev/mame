@@ -2,10 +2,12 @@ class sbugger_state : public driver_device
 {
 public:
 	sbugger_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram_attr(*this, "videoram_attr"),
+		m_videoram(*this, "videoram"){ }
 
-	UINT8 *m_videoram;
-	UINT8 *m_videoram_attr;
+	required_shared_ptr<UINT8> m_videoram_attr;
+	required_shared_ptr<UINT8> m_videoram;
 
 	tilemap_t *m_tilemap;
 	DECLARE_WRITE8_MEMBER(sbugger_videoram_w);

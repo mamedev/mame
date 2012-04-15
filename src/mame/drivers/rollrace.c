@@ -41,11 +41,11 @@ static ADDRESS_MAP_START( rollrace_map, AS_PROGRAM, 8, rollrace_state )
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
 	AM_RANGE(0xd806, 0xd806) AM_READNOP /* looks like a watchdog, bit4 checked*/
 	AM_RANGE(0xd900, 0xd900) AM_READWRITE(ra_fake_d800_r,ra_fake_d800_w) /* protection ??*/
-	AM_RANGE(0xe000, 0xe3ff) AM_RAM AM_BASE(m_videoram)
-	AM_RANGE(0xe400, 0xe47f) AM_RAM AM_BASE(m_colorram)
+	AM_RANGE(0xe000, 0xe3ff) AM_RAM AM_SHARE("videoram")
+	AM_RANGE(0xe400, 0xe47f) AM_RAM AM_SHARE("colorram")
 	AM_RANGE(0xe800, 0xe800) AM_WRITE(soundlatch_byte_w)
 	AM_RANGE(0xec00, 0xec0f) AM_NOP /* Analog sound effects ?? ec00 sound enable ?*/
-	AM_RANGE(0xf000, 0xf0ff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
+	AM_RANGE(0xf000, 0xf0ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xf400, 0xf400) AM_WRITE(rollrace_backgroundcolor_w)
 	AM_RANGE(0xf800, 0xf800) AM_READ_PORT("P1")
 	AM_RANGE(0xf801, 0xf801) AM_READ_PORT("P2") AM_WRITE(rollrace_bkgpen_w)

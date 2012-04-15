@@ -330,7 +330,7 @@ void midvunit_renderer::process_dma_queue()
 	/* set up the object data for this triangle */
 	midvunit_object_data &objectdata = object_data_alloc();
 	objectdata.destbase = &m_state.m_videoram[(m_state.m_page_control & 4) ? 0x40000 : 0x00000];
-	objectdata.texbase = (UINT8 *)m_state.m_textureram + (m_state.m_dma_data[14] * 256);
+	objectdata.texbase = (UINT8 *)m_state.m_textureram.target() + (m_state.m_dma_data[14] * 256);
 	objectdata.pixdata = m_state.m_dma_data[1] | (m_state.m_dma_data[0] & 0x00ff);
 	objectdata.dither = ((m_state.m_dma_data[0] & 0x2000) != 0);
 
@@ -494,7 +494,7 @@ WRITE32_MEMBER(midvunit_state::midvunit_paletteram_w)
 
 WRITE32_MEMBER(midvunit_state::midvunit_textureram_w)
 {
-	UINT8 *base = (UINT8 *)m_textureram;
+	UINT8 *base = (UINT8 *)m_textureram.target();
 	m_poly->wait("Texture RAM write");
 	base[offset * 2] = data;
 	base[offset * 2 + 1] = data >> 8;
@@ -503,7 +503,7 @@ WRITE32_MEMBER(midvunit_state::midvunit_textureram_w)
 
 READ32_MEMBER(midvunit_state::midvunit_textureram_r)
 {
-	UINT8 *base = (UINT8 *)m_textureram;
+	UINT8 *base = (UINT8 *)m_textureram.target();
 	return (base[offset * 2 + 1] << 8) | base[offset * 2];
 }
 

@@ -15,19 +15,25 @@ class model3_state : public driver_device
 public:
 	model3_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this,"maincpu")
-		{ }
+		m_maincpu(*this,"maincpu"),
+		m_work_ram(*this, "work_ram"),
+		m_paletteram64(*this, "paletteram64"),
+		m_soundram(*this, "soundram"){ }
+
+	required_device<cpu_device> m_maincpu;
+
+	required_shared_ptr<UINT64> m_work_ram;
+	required_shared_ptr<UINT64> m_paletteram64;
+	required_shared_ptr<UINT16> m_soundram;
 
     int m_sound_irq_enable;
     emu_timer *m_sound_timer;
 	UINT8 m_irq_enable;
 	UINT8 m_irq_state;
 	UINT8 m_scsi_irq_state;
-	UINT64 *m_work_ram;
 	int m_crom_bank;
 	int m_controls_bank;
 	UINT32 m_real3d_device_id;
-	UINT16 *m_soundram;
 	UINT32 m_mpc105_regs[0x40];
 	UINT32 m_mpc105_addr;
 	int m_pci_bus;
@@ -54,7 +60,6 @@ public:
 	int m_scsp_last_line;
 	UINT32 *m_vrom;
 	int m_step;
-	UINT64 *m_paletteram64;
 	int m_m3_step;
 	INT32 m_tap_state;
 	UINT64 m_ir;
@@ -102,7 +107,6 @@ public:
 	UINT32 m_matrix_base_address;
 	cached_texture *m_texcache[2][1024/32][2048/32];
 
-	required_device<cpu_device> m_maincpu;
 	DECLARE_READ32_MEMBER(rtc72421_r);
 	DECLARE_WRITE32_MEMBER(rtc72421_w);
 	DECLARE_READ64_MEMBER(model3_char_r);

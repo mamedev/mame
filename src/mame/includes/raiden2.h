@@ -2,7 +2,12 @@ class raiden2_state : public driver_device
 {
 public:
 	raiden2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  back_data(*this, "back_data"),
+		  fore_data(*this, "fore_data"),
+		  mid_data(*this, "mid_data"),
+		  text_data(*this, "text_data"),
+		  sprites(*this, "sprites") { }
 
 	DECLARE_WRITE16_MEMBER( cop_itoa_low_w );
 	DECLARE_WRITE16_MEMBER( cop_itoa_high_w );
@@ -67,7 +72,7 @@ public:
 	void common_reset();
 
 	tilemap_t *background_layer,*midground_layer,*foreground_layer,*text_layer;
-	UINT16 *back_data,*fore_data,*mid_data, *text_data, *sprites;
+	required_shared_ptr<UINT16> back_data,fore_data,mid_data, text_data, sprites;
 	int bg_bank, fg_bank, mid_bank;
 	UINT16 raiden2_tilemap_enable;
 	UINT8 prg_bank,prot_data;

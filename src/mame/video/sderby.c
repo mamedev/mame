@@ -70,7 +70,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 	int height = machine.gfx[0]->height;
 	int colordiv = machine.gfx[0]->color_granularity / 16;
 
-	for (offs = 4;offs < state->m_spriteram_size/2;offs += 4)
+	for (offs = 4;offs < state->m_spriteram.bytes()/2;offs += 4)
 	{
 		int sx,sy,code,color,flipx;
 

@@ -8,19 +8,27 @@ class contra_state : public driver_device
 {
 public:
 	contra_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_paletteram(*this, "paletteram"),
+		m_fg_cram(*this, "fg_cram"),
+		m_fg_vram(*this, "fg_vram"),
+		m_tx_cram(*this, "tx_cram"),
+		m_tx_vram(*this, "tx_vram"),
+		m_spriteram(*this, "spriteram"),
+		m_bg_cram(*this, "bg_cram"),
+		m_bg_vram(*this, "bg_vram"){ }
 
 	/* memory pointers */
-	UINT8 *        m_spriteram;
 	UINT8 *        m_buffered_spriteram;
 	UINT8 *        m_buffered_spriteram_2;
-	UINT8 *        m_paletteram;
-	UINT8 *        m_bg_vram;
-	UINT8 *        m_bg_cram;
-	UINT8 *        m_fg_vram;
-	UINT8 *        m_fg_cram;
-	UINT8 *        m_tx_vram;
-	UINT8 *        m_tx_cram;
+	required_shared_ptr<UINT8> m_paletteram;
+	required_shared_ptr<UINT8> m_fg_cram;
+	required_shared_ptr<UINT8> m_fg_vram;
+	required_shared_ptr<UINT8> m_tx_cram;
+	required_shared_ptr<UINT8> m_tx_vram;
+	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<UINT8> m_bg_cram;
+	required_shared_ptr<UINT8> m_bg_vram;
 
 	/* video-related */
 	tilemap_t *m_bg_tilemap;

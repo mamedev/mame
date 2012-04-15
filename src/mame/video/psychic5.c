@@ -311,7 +311,7 @@ static void draw_sprites(running_machine &machine, bitmap_rgb32 &bitmap, const r
 	int offs;
 
 	/* Draw the sprites */
-	for (offs = 0; offs < state->m_spriteram_size; offs += 16)
+	for (offs = 0; offs < state->m_spriteram.bytes(); offs += 16)
 	{
 		int attr  = spriteram[offs + 13];
 		int code  = spriteram[offs + 14] | ((attr & 0xc0) << 2);

@@ -19,17 +19,17 @@ public:
 	namcofl_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
-		m_mcu(*this,"mcu")
-		{ }
-
-	emu_timer *m_raster_interrupt_timer;
-	UINT32 *m_workram;
-	UINT16 *m_shareram;
-	UINT8 m_mcu_port6;
-	UINT32 m_sprbank;
+		m_mcu(*this,"mcu"),
+		m_shareram(*this, "shareram"){ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_mcu;
+	emu_timer *m_raster_interrupt_timer;
+	UINT32 *m_workram;
+	required_shared_ptr<UINT16> m_shareram;
+	UINT8 m_mcu_port6;
+	UINT32 m_sprbank;
+
 	DECLARE_READ32_MEMBER(fl_unk1_r);
 	DECLARE_READ32_MEMBER(fl_network_r);
 	DECLARE_READ32_MEMBER(namcofl_sysreg_r);

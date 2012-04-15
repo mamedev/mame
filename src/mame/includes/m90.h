@@ -2,11 +2,12 @@ class m90_state : public driver_device
 {
 public:
 	m90_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_video_data(*this, "video_data"),
+		m_spriteram(*this, "spriteram"){ }
 
-	UINT16 *m_video_data;
-	UINT16 *m_spriteram;
-	size_t m_spriteram_size;
+	required_shared_ptr<UINT16> m_video_data;
+	required_shared_ptr<UINT16> m_spriteram;
 	UINT16 m_video_control_data[8];
 	tilemap_t *m_pf1_layer;
 	tilemap_t *m_pf2_layer;

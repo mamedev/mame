@@ -2,13 +2,16 @@ class namcos86_state : public driver_device
 {
 public:
 	namcos86_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_rthunder_videoram1(*this, "videoram1"),
+		m_rthunder_videoram2(*this, "videoram2"),
+		m_rthunder_spriteram(*this, "spriteram"){ }
 
 	UINT8 *m_spriteram;
 	int m_wdog;
-	UINT8 *m_rthunder_videoram1;
-	UINT8 *m_rthunder_videoram2;
-	UINT8 *m_rthunder_spriteram;
+	required_shared_ptr<UINT8> m_rthunder_videoram1;
+	required_shared_ptr<UINT8> m_rthunder_videoram2;
+	required_shared_ptr<UINT8> m_rthunder_spriteram;
 	int m_tilebank;
 	int m_xscroll[4];
 	int m_yscroll[4];

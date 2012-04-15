@@ -311,7 +311,7 @@ static ADDRESS_MAP_START( data_map, AS_DATA, 16, cinemat_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( data_map_qb3, AS_DATA, 16, cinemat_state )
-	AM_RANGE(0x0000, 0x03ff) AM_RAMBANK("bank1") AM_BASE(m_rambase)
+	AM_RANGE(0x0000, 0x03ff) AM_RAMBANK("bank1") AM_SHARE("rambase")
 ADDRESS_MAP_END
 
 

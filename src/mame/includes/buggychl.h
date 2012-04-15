@@ -6,16 +6,19 @@ class buggychl_state : public driver_device
 {
 public:
 	buggychl_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_charram(*this, "charram"),
+		m_videoram(*this, "videoram"),
+		m_spriteram(*this, "spriteram"),
+		m_scrollv(*this, "scrollv"),
+		m_scrollh(*this, "scrollh"){ }
 
 	/* memory pointers */
-	UINT8 *     m_videoram;
-	UINT8 *     m_spriteram;
-	UINT8 *     m_scrollv;
-	UINT8 *     m_scrollh;
-	UINT8 *     m_charram;
-	size_t      m_videoram_size;
-	size_t      m_spriteram_size;
+	required_shared_ptr<UINT8> m_charram;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<UINT8> m_scrollv;
+	required_shared_ptr<UINT8> m_scrollh;
 
 	/* video-related */
 	bitmap_ind16 m_tmp_bitmap1;

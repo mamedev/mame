@@ -51,19 +51,24 @@ class gaelco3d_state : public driver_device
 {
 public:
 	gaelco3d_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_adsp_ram_base(*this,"adsp_ram_base"),
+		  m_m68k_ram_base(*this,"m68k_ram_base"),
+		  m_tms_comm_base(*this,"tms_comm_base"),
+		  m_adsp_control_regs(*this,"adsp_regs"),
+		  m_adsp_fastram_base(*this,"adsp_fastram") { }
 
-	UINT32 *m_adsp_ram_base;
-	UINT16 *m_m68k_ram_base;
-	UINT16 *m_tms_comm_base;
+	required_shared_ptr<UINT32> m_adsp_ram_base;
+	required_shared_ptr<UINT16> m_m68k_ram_base;
+	required_shared_ptr<UINT16> m_tms_comm_base;
+	required_shared_ptr<UINT16> m_adsp_control_regs;
+	required_shared_ptr<UINT16> m_adsp_fastram_base;
 	UINT16 m_sound_data;
 	UINT8 m_sound_status;
 	offs_t m_tms_offset_xor;
 	UINT8 m_analog_ports[4];
 	UINT8 m_framenum;
 	timer_device *m_adsp_autobuffer_timer;
-	UINT16 *m_adsp_control_regs;
-	UINT16 *m_adsp_fastram_base;
 	UINT8 m_adsp_ireg;
 	offs_t m_adsp_ireg_base;
 	offs_t m_adsp_incs;

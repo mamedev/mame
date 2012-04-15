@@ -22,14 +22,12 @@ public:
 		  m_deco_tilegen2(*this, "tilegen2"),
 		  m_oki2(*this, "oki2"),
 		  m_spriteram(*this, "spriteram"),
-		  m_spriteram2(*this, "spriteram2") { }
-
-	/* memory pointers */
-	UINT16 *  m_pf2_rowscroll;
-	UINT16 *  m_pf4_rowscroll;
-	UINT16 *  m_ram;
-	UINT16 *  m_ram2;
-	UINT16 *  m_shared_ram;
+		  m_spriteram2(*this, "spriteram2") ,
+		m_pf2_rowscroll(*this, "pf2_rowscroll"),
+		m_pf4_rowscroll(*this, "pf4_rowscroll"),
+		m_ram(*this, "ram"),
+		m_shared_ram(*this, "shared_ram"),
+		m_ram2(*this, "ram2"){ }
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -41,6 +39,14 @@ public:
 	required_device<okim6295_device> m_oki2;
 	required_device<buffered_spriteram16_device> m_spriteram;
 	required_device<buffered_spriteram16_device> m_spriteram2;
+
+	/* memory pointers */
+	required_shared_ptr<UINT16> m_pf2_rowscroll;
+	required_shared_ptr<UINT16> m_pf4_rowscroll;
+	required_shared_ptr<UINT16> m_ram;
+	required_shared_ptr<UINT16> m_shared_ram;
+	required_shared_ptr<UINT16> m_ram2;
+
 	DECLARE_READ16_MEMBER(dassault_control_r);
 	DECLARE_WRITE16_MEMBER(dassault_control_w);
 	DECLARE_READ16_MEMBER(dassault_sub_control_r);

@@ -9,14 +9,17 @@ class deniam_state : public driver_device
 {
 public:
 	deniam_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"),
+		m_textram(*this, "textram"),
+		m_spriteram(*this, "spriteram"),
+		m_paletteram(*this, "paletteram"){ }
 
 	/* memory pointers */
-	UINT16 *       m_videoram;
-	UINT16 *       m_textram;
-	UINT16 *       m_spriteram;
-	UINT16 *       m_paletteram;
-	size_t         m_spriteram_size;
+	required_shared_ptr<UINT16> m_videoram;
+	required_shared_ptr<UINT16> m_textram;
+	required_shared_ptr<UINT16> m_spriteram;
+	required_shared_ptr<UINT16> m_paletteram;
 
 	/* video-related */
 	tilemap_t        *m_fg_tilemap;

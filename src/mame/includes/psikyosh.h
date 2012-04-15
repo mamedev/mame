@@ -22,14 +22,20 @@ class psikyosh_state : public driver_device
 public:
 	psikyosh_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_spriteram(*this, "spriteram") { }
+		  m_spriteram(*this, "spriteram") ,
+		m_bgram(*this, "bgram"),
+		m_paletteram(*this, "paletteram"),
+		m_zoomram(*this, "zoomram"),
+		m_vidregs(*this, "vidregs"),
+		m_ram(*this, "ram"){ }
 
 	/* memory pointers */
-	UINT32 *       m_bgram;
-	UINT32 *       m_zoomram;
-	UINT32 *       m_vidregs;
-	UINT32 *       m_ram;
-	UINT32 *       m_paletteram;
+	required_device<buffered_spriteram32_device> m_spriteram;
+	required_shared_ptr<UINT32> m_bgram;
+	required_shared_ptr<UINT32> m_paletteram;
+	required_shared_ptr<UINT32> m_zoomram;
+	required_shared_ptr<UINT32> m_vidregs;
+	required_shared_ptr<UINT32> m_ram;
 
 	/* video-related */
 	bitmap_ind8 m_zoom_bitmap;
@@ -40,7 +46,7 @@ public:
 
 	/* devices */
 	device_t *m_maincpu;
-	required_device<buffered_spriteram32_device> m_spriteram;
+
 	DECLARE_WRITE32_MEMBER(psikyosh_irqctrl_w);
 	DECLARE_WRITE32_MEMBER(paletteram32_RRRRRRRRGGGGGGGGBBBBBBBBxxxxxxxx_dword_w);
 	DECLARE_WRITE32_MEMBER(psikyosh_vidregs_w);

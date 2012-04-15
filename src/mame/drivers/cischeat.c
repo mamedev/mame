@@ -213,19 +213,19 @@ WRITE16_MEMBER(cischeat_state::bigrun_paletteram16_w)
 
 static ADDRESS_MAP_START( bigrun_map, AS_PROGRAM, 16, cischeat_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM																	// ROM
-	AM_RANGE(0x080000, 0x083fff) AM_READWRITE(bigrun_vregs_r, bigrun_vregs_w) AM_BASE(m_vregs)	// Vregs
+	AM_RANGE(0x080000, 0x083fff) AM_READWRITE(bigrun_vregs_r, bigrun_vregs_w) AM_SHARE("vregs")	// Vregs
 	AM_RANGE(0x084000, 0x087fff) AM_RAM													// Linking with other units
 	AM_RANGE(0x088000, 0x08bfff) AM_RAM AM_SHARE("share2") // Sharedram with sub CPU#2
 	AM_RANGE(0x08c000, 0x08ffff) AM_RAM AM_SHARE("share1") // Sharedram with sub CPU#1
 
 	/* Only writes to the first 0x40000 bytes affect the tilemaps:             */
 	/* either these games support larger tilemaps or have more ram than needed */
-	AM_RANGE(0x090000, 0x093fff) AM_WRITE(cischeat_scrollram_0_w) AM_BASE(m_scrollram[0])		// Scroll ram 0
-	AM_RANGE(0x094000, 0x097fff) AM_WRITE(cischeat_scrollram_1_w) AM_BASE(m_scrollram[1])		// Scroll ram 1
-	AM_RANGE(0x098000, 0x09bfff) AM_WRITE(cischeat_scrollram_2_w) AM_BASE(m_scrollram[2])		// Scroll ram 2
+	AM_RANGE(0x090000, 0x093fff) AM_WRITE(cischeat_scrollram_0_w) AM_SHARE("scrollram.0")		// Scroll ram 0
+	AM_RANGE(0x094000, 0x097fff) AM_WRITE(cischeat_scrollram_1_w) AM_SHARE("scrollram.1")		// Scroll ram 1
+	AM_RANGE(0x098000, 0x09bfff) AM_WRITE(cischeat_scrollram_2_w) AM_SHARE("scrollram.2")		// Scroll ram 2
 
 	AM_RANGE(0x09c000, 0x09ffff) AM_WRITE(bigrun_paletteram16_w) AM_SHARE("paletteram")				// Palettes
-	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM AM_BASE(m_ram)											// RAM
+	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM AM_SHARE("ram")											// RAM
 	AM_RANGE(0x100000, 0x13ffff) AM_ROM AM_REGION("user1",0)														// ROM
 ADDRESS_MAP_END
 
@@ -266,7 +266,7 @@ WRITE16_MEMBER(cischeat_state::cischeat_paletteram16_w)
 
 static ADDRESS_MAP_START( cischeat_map, AS_PROGRAM, 16, cischeat_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM 																	// ROM
-	AM_RANGE(0x080000, 0x087fff) AM_READWRITE(cischeat_vregs_r, cischeat_vregs_w)  AM_BASE(m_vregs)	// Vregs
+	AM_RANGE(0x080000, 0x087fff) AM_READWRITE(cischeat_vregs_r, cischeat_vregs_w)  AM_SHARE("vregs")	// Vregs
 	AM_RANGE(0x088000, 0x088fff) AM_RAM 																	// Linking with other units
 
 /*  Only the first 0x800 bytes are tested but:
@@ -280,13 +280,13 @@ static ADDRESS_MAP_START( cischeat_map, AS_PROGRAM, 16, cischeat_state )
 
 	/* Only writes to the first 0x40000 bytes affect the tilemaps:             */
 	/* either these games support larger tilemaps or have more ram than needed */
-	AM_RANGE(0x0a0000, 0x0a7fff) AM_RAM_WRITE(cischeat_scrollram_0_w) AM_BASE(m_scrollram[0])		// Scroll ram 0
-	AM_RANGE(0x0a8000, 0x0affff) AM_RAM_WRITE(cischeat_scrollram_1_w) AM_BASE(m_scrollram[1])		// Scroll ram 1
-	AM_RANGE(0x0b0000, 0x0b7fff) AM_RAM_WRITE(cischeat_scrollram_2_w) AM_BASE(m_scrollram[2])		// Scroll ram 2
+	AM_RANGE(0x0a0000, 0x0a7fff) AM_RAM_WRITE(cischeat_scrollram_0_w) AM_SHARE("scrollram.0")		// Scroll ram 0
+	AM_RANGE(0x0a8000, 0x0affff) AM_RAM_WRITE(cischeat_scrollram_1_w) AM_SHARE("scrollram.1")		// Scroll ram 1
+	AM_RANGE(0x0b0000, 0x0b7fff) AM_RAM_WRITE(cischeat_scrollram_2_w) AM_SHARE("scrollram.2")		// Scroll ram 2
 
 	AM_RANGE(0x0b8000, 0x0bffff) AM_RAM_WRITE(cischeat_paletteram16_w) AM_SHARE("paletteram")				// Palettes
 
-	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM AM_BASE(m_ram)												// RAM
+	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM AM_SHARE("ram")												// RAM
 	AM_RANGE(0x100000, 0x17ffff) AM_ROM AM_REGION("user1",0)															// ROM
 ADDRESS_MAP_END
 
@@ -326,7 +326,7 @@ WRITE16_MEMBER(cischeat_state::f1gpstar_paletteram16_w)
 
 static ADDRESS_MAP_START( f1gpstar_map, AS_PROGRAM, 16, cischeat_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM 																	// ROM
-	AM_RANGE(0x080000, 0x087fff) AM_READWRITE(f1gpstar_vregs_r, f1gpstar_vregs_w) AM_BASE(m_vregs)	// Vregs
+	AM_RANGE(0x080000, 0x087fff) AM_READWRITE(f1gpstar_vregs_r, f1gpstar_vregs_w) AM_SHARE("vregs")	// Vregs
 	AM_RANGE(0x088000, 0x088fff) AM_RAM																		// Linking with other units
 
 	AM_RANGE(0x090000, 0x097fff) AM_RAM AM_SHARE("share2") // Sharedram with sub CPU#2
@@ -334,13 +334,13 @@ static ADDRESS_MAP_START( f1gpstar_map, AS_PROGRAM, 16, cischeat_state )
 
 	/* Only writes to the first 0x40000 bytes affect the tilemaps:             */
 	/* either these games support larger tilemaps or have more ram than needed */
-	AM_RANGE(0x0a0000, 0x0a7fff) AM_RAM_WRITE(cischeat_scrollram_0_w) AM_BASE(m_scrollram[0])		// Scroll ram 0
-	AM_RANGE(0x0a8000, 0x0affff) AM_RAM_WRITE(cischeat_scrollram_1_w) AM_BASE(m_scrollram[1])		// Scroll ram 1
-	AM_RANGE(0x0b0000, 0x0b7fff) AM_RAM_WRITE(cischeat_scrollram_2_w) AM_BASE(m_scrollram[2])		// Scroll ram 2
+	AM_RANGE(0x0a0000, 0x0a7fff) AM_RAM_WRITE(cischeat_scrollram_0_w) AM_SHARE("scrollram.0")		// Scroll ram 0
+	AM_RANGE(0x0a8000, 0x0affff) AM_RAM_WRITE(cischeat_scrollram_1_w) AM_SHARE("scrollram.1")		// Scroll ram 1
+	AM_RANGE(0x0b0000, 0x0b7fff) AM_RAM_WRITE(cischeat_scrollram_2_w) AM_SHARE("scrollram.2")		// Scroll ram 2
 
 	AM_RANGE(0x0b8000, 0x0bffff) AM_RAM_WRITE(f1gpstar_paletteram16_w) AM_SHARE("paletteram")				// Palettes
 
-	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM AM_BASE(m_ram)												// RAM
+	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM AM_SHARE("ram")												// RAM
 	AM_RANGE(0x100000, 0x17ffff) AM_ROM AM_REGION("user1",0)															// ROM
 ADDRESS_MAP_END
 
@@ -352,7 +352,7 @@ ADDRESS_MAP_END
 // Same as f1gpstar, but vregs are slightly different:
 static ADDRESS_MAP_START( f1gpstr2_map, AS_PROGRAM, 16, cischeat_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM																		// ROM
-	AM_RANGE(0x080000, 0x087fff) AM_READWRITE(f1gpstr2_vregs_r, f1gpstr2_vregs_w) AM_BASE(m_vregs)	// Vregs (slightly different from f1gpstar)
+	AM_RANGE(0x080000, 0x087fff) AM_READWRITE(f1gpstr2_vregs_r, f1gpstr2_vregs_w) AM_SHARE("vregs")	// Vregs (slightly different from f1gpstar)
 	AM_RANGE(0x088000, 0x088fff) AM_RAM																		// Linking with other units
 
 	AM_RANGE(0x090000, 0x097fff) AM_RAM AM_SHARE("share2") // Sharedram with sub CPU#2
@@ -360,13 +360,13 @@ static ADDRESS_MAP_START( f1gpstr2_map, AS_PROGRAM, 16, cischeat_state )
 
 	/* Only writes to the first 0x40000 bytes affect the tilemaps:             */
 	/* either these games support larger tilemaps or have more ram than needed */
-	AM_RANGE(0x0a0000, 0x0a7fff) AM_RAM_WRITE(cischeat_scrollram_0_w) AM_BASE(m_scrollram[0])		// Scroll ram 0
-	AM_RANGE(0x0a8000, 0x0affff) AM_RAM_WRITE(cischeat_scrollram_1_w) AM_BASE(m_scrollram[1])		// Scroll ram 1
-	AM_RANGE(0x0b0000, 0x0b7fff) AM_RAM_WRITE(cischeat_scrollram_2_w) AM_BASE(m_scrollram[2])		// Scroll ram 2
+	AM_RANGE(0x0a0000, 0x0a7fff) AM_RAM_WRITE(cischeat_scrollram_0_w) AM_SHARE("scrollram.0")		// Scroll ram 0
+	AM_RANGE(0x0a8000, 0x0affff) AM_RAM_WRITE(cischeat_scrollram_1_w) AM_SHARE("scrollram.1")		// Scroll ram 1
+	AM_RANGE(0x0b0000, 0x0b7fff) AM_RAM_WRITE(cischeat_scrollram_2_w) AM_SHARE("scrollram.2")		// Scroll ram 2
 
 	AM_RANGE(0x0b8000, 0x0bffff) AM_RAM_WRITE(f1gpstar_paletteram16_w) AM_SHARE("paletteram")				// Palettes
 
-	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM AM_BASE(m_ram)												// RAM
+	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM AM_SHARE("ram")												// RAM
 	AM_RANGE(0x100000, 0x17ffff) AM_ROM AM_REGION("user1",0)															// ROM
 ADDRESS_MAP_END
 
@@ -492,11 +492,11 @@ WRITE16_MEMBER(cischeat_state::scudhamm_oki_bank_w)
 
 static ADDRESS_MAP_START( scudhamm_map, AS_PROGRAM, 16, cischeat_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM																	// ROM
-	AM_RANGE(0x082000, 0x082fff) AM_RAM_WRITE(scudhamm_vregs_w) AM_BASE(m_vregs)				// Video Registers + RAM
-	AM_RANGE(0x0a0000, 0x0a3fff) AM_RAM_WRITE(cischeat_scrollram_0_w) AM_BASE(m_scrollram[0])	// Scroll RAM 0
-	AM_RANGE(0x0b0000, 0x0b3fff) AM_RAM_WRITE(cischeat_scrollram_2_w) AM_BASE(m_scrollram[2])	// Scroll RAM 2
+	AM_RANGE(0x082000, 0x082fff) AM_RAM_WRITE(scudhamm_vregs_w) AM_SHARE("vregs")				// Video Registers + RAM
+	AM_RANGE(0x0a0000, 0x0a3fff) AM_RAM_WRITE(cischeat_scrollram_0_w) AM_SHARE("scrollram.0")	// Scroll RAM 0
+	AM_RANGE(0x0b0000, 0x0b3fff) AM_RAM_WRITE(cischeat_scrollram_2_w) AM_SHARE("scrollram.2")	// Scroll RAM 2
 	AM_RANGE(0x0b8000, 0x0bffff) AM_RAM_WRITE(scudhamm_paletteram16_w) AM_SHARE("paletteram")			// Palette
-	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM AM_BASE(m_ram)											// Work RAM + Spriteram
+	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM AM_SHARE("ram")											// Work RAM + Spriteram
 	AM_RANGE(0x100000, 0x100001) AM_WRITE(scudhamm_oki_bank_w)											// Sound
 	AM_RANGE(0x100008, 0x100009) AM_READ_PORT("IN0") AM_WRITE(scudhamm_leds_w)							// Buttons
 	AM_RANGE(0x100014, 0x100015) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff)				// Sound
@@ -573,11 +573,11 @@ WRITE16_MEMBER(cischeat_state::armchmp2_leds_w)
 
 static ADDRESS_MAP_START( armchmp2_map, AS_PROGRAM, 16, cischeat_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM 																// ROM
-	AM_RANGE(0x082000, 0x082fff) AM_RAM_WRITE(scudhamm_vregs_w) AM_BASE(m_vregs)				// Video Registers + RAM
-	AM_RANGE(0x0a0000, 0x0a3fff) AM_RAM_WRITE(cischeat_scrollram_0_w) AM_BASE(m_scrollram[0])	// Scroll RAM 0
-	AM_RANGE(0x0b0000, 0x0b3fff) AM_RAM_WRITE(cischeat_scrollram_2_w) AM_BASE(m_scrollram[2])	// Scroll RAM 2
+	AM_RANGE(0x082000, 0x082fff) AM_RAM_WRITE(scudhamm_vregs_w) AM_SHARE("vregs")				// Video Registers + RAM
+	AM_RANGE(0x0a0000, 0x0a3fff) AM_RAM_WRITE(cischeat_scrollram_0_w) AM_SHARE("scrollram.0")	// Scroll RAM 0
+	AM_RANGE(0x0b0000, 0x0b3fff) AM_RAM_WRITE(cischeat_scrollram_2_w) AM_SHARE("scrollram.2")	// Scroll RAM 2
 	AM_RANGE(0x0b8000, 0x0bffff) AM_RAM_WRITE(scudhamm_paletteram16_w) AM_SHARE("paletteram")			// Palette
-	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM AM_BASE(m_ram)											// Work RAM + Spriteram
+	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM AM_SHARE("ram")											// Work RAM + Spriteram
 	AM_RANGE(0x100000, 0x100001) AM_READ_PORT("IN2") AM_WRITE(scudhamm_oki_bank_w)						// DSW + Sound
 	AM_RANGE(0x100004, 0x100005) AM_READ_PORT("IN3")													// DSW
 	AM_RANGE(0x100008, 0x100009) AM_READWRITE(armchmp2_buttons_r, armchmp2_leds_w)						// Leds + Coin Counters + Buttons + Sensors
@@ -603,14 +603,14 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( bigrun_map2, AS_PROGRAM, 16, cischeat_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM 												// ROM
 	AM_RANGE(0x040000, 0x047fff) AM_RAM AM_SHARE("share1")								// Shared RAM (with Main CPU)
-	AM_RANGE(0x080000, 0x0807ff) AM_RAM AM_BASE(m_roadram[0])	// Road RAM
+	AM_RANGE(0x080000, 0x0807ff) AM_RAM AM_SHARE("roadram.0")	// Road RAM
 	AM_RANGE(0x0c0000, 0x0c3fff) AM_RAM 												// RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bigrun_map3, AS_PROGRAM, 16, cischeat_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM													// ROM
 	AM_RANGE(0x040000, 0x047fff) AM_RAM AM_SHARE("share2")								// Shared RAM (with Main CPU)
-	AM_RANGE(0x080000, 0x0807ff) AM_RAM AM_BASE(m_roadram[1])	// Road RAM
+	AM_RANGE(0x080000, 0x0807ff) AM_RAM AM_SHARE("roadram.1")	// Road RAM
 	AM_RANGE(0x0c0000, 0x0c3fff) AM_RAM													// RAM
 ADDRESS_MAP_END
 
@@ -622,7 +622,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( cischeat_map2, AS_PROGRAM, 16, cischeat_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM													// ROM
 	AM_RANGE(0x040000, 0x047fff) AM_RAM AM_SHARE("share1")								// Shared RAM (with Main CPU)
-	AM_RANGE(0x080000, 0x0807ff) AM_RAM AM_BASE(m_roadram[0])	// Road RAM
+	AM_RANGE(0x080000, 0x0807ff) AM_RAM AM_SHARE("roadram.0")	// Road RAM
 	AM_RANGE(0x0c0000, 0x0c3fff) AM_RAM													// RAM
 	AM_RANGE(0x100000, 0x100001) AM_WRITENOP											// watchdog
 	AM_RANGE(0x200000, 0x23ffff) AM_ROM AM_REGION("cpu2",0x40000)										// ROM
@@ -631,7 +631,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( cischeat_map3, AS_PROGRAM, 16, cischeat_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM													// ROM
 	AM_RANGE(0x040000, 0x047fff) AM_RAM AM_SHARE("share2")								// Shared RAM (with Main CPU)
-	AM_RANGE(0x080000, 0x0807ff) AM_RAM AM_BASE(m_roadram[1])	// Road RAM
+	AM_RANGE(0x080000, 0x0807ff) AM_RAM AM_SHARE("roadram.1")	// Road RAM
 	AM_RANGE(0x0c0000, 0x0c3fff) AM_RAM													// RAM
 	AM_RANGE(0x100000, 0x100001) AM_WRITENOP											// watchdog
 	AM_RANGE(0x200000, 0x23ffff) AM_ROM AM_REGION("cpu3",0x40000)										// ROM
@@ -646,7 +646,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( f1gpstar_map2, AS_PROGRAM, 16, cischeat_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM													// ROM
 	AM_RANGE(0x080000, 0x0807ff) AM_RAM AM_SHARE("share1")								// Shared RAM (with Main CPU)
-	AM_RANGE(0x100000, 0x1007ff) AM_RAM AM_BASE(m_roadram[0])	// Road RAM
+	AM_RANGE(0x100000, 0x1007ff) AM_RAM AM_SHARE("roadram.0")	// Road RAM
 	AM_RANGE(0x180000, 0x183fff) AM_RAM													// RAM
 	AM_RANGE(0x200000, 0x200001) AM_WRITENOP											// watchdog
 ADDRESS_MAP_END
@@ -654,7 +654,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( f1gpstar_map3, AS_PROGRAM, 16, cischeat_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM													// ROM
 	AM_RANGE(0x080000, 0x0807ff) AM_RAM AM_SHARE("share2")								// Shared RAM (with Main CPU)
-	AM_RANGE(0x100000, 0x1007ff) AM_RAM AM_BASE(m_roadram[1])	// Road RAM
+	AM_RANGE(0x100000, 0x1007ff) AM_RAM AM_SHARE("roadram.1")	// Road RAM
 	AM_RANGE(0x180000, 0x183fff) AM_RAM													// RAM
 	AM_RANGE(0x200000, 0x200001) AM_WRITENOP											// watchdog
 ADDRESS_MAP_END
@@ -773,7 +773,7 @@ WRITE16_MEMBER(cischeat_state::f1gpstr2_io_w)
 static ADDRESS_MAP_START( f1gpstr2_io_map, AS_PROGRAM, 16, cischeat_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM											// ROM
 	AM_RANGE(0x080000, 0x080fff) AM_READWRITE(f1gpstr2_io_r, f1gpstr2_io_w)		//
-	AM_RANGE(0x100000, 0x100001) AM_WRITEONLY AM_BASE(m_f1gpstr2_ioready)	//
+	AM_RANGE(0x100000, 0x100001) AM_WRITEONLY AM_SHARE("ioready")	//
 	AM_RANGE(0x180000, 0x183fff) AM_RAM											// RAM
 	AM_RANGE(0x200000, 0x200001) AM_WRITENOP								//
 ADDRESS_MAP_END

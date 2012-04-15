@@ -81,7 +81,7 @@ static WRITE8_DEVICE_HANDLER( funybubl_oki_bank_sw )
 static ADDRESS_MAP_START( funybubl_map, AS_PROGRAM, 8, funybubl_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank2") // banked port 1?
-	AM_RANGE(0xc400, 0xcfff) AM_RAM_WRITE(funybubl_paldatawrite) AM_BASE(m_paletteram) // palette
+	AM_RANGE(0xc400, 0xcfff) AM_RAM_WRITE(funybubl_paldatawrite) AM_SHARE("paletteram") // palette
 	AM_RANGE(0xd000, 0xdfff) AM_RAMBANK("bank1") // banked port 0?
 	AM_RANGE(0xe000, 0xffff) AM_RAM
 ADDRESS_MAP_END

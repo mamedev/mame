@@ -6,19 +6,25 @@ class drgnmst_state : public driver_device
 public:
 	drgnmst_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+		m_vidregs(*this, "vidregs"),
+		m_fg_videoram(*this, "fg_videoram"),
+		m_bg_videoram(*this, "bg_videoram"),
+		m_md_videoram(*this, "md_videoram"),
+		m_rowscrollram(*this, "rowscrollram"),
+		m_vidregs2(*this, "vidregs2"),
+		m_spriteram(*this, "spriteram"),
 		  m_oki_1(*this, "oki1"),
 		  m_oki_2(*this, "oki2") { }
 
 	/* memory pointers */
-	UINT16 *    m_vidregs;
-	UINT16 *    m_fg_videoram;
-	UINT16 *    m_bg_videoram;
-	UINT16 *    m_md_videoram;
-	UINT16 *    m_rowscrollram;
-	UINT16 *    m_vidregs2;
-	UINT16 *    m_spriteram;
+	required_shared_ptr<UINT16> m_vidregs;
+	required_shared_ptr<UINT16> m_fg_videoram;
+	required_shared_ptr<UINT16> m_bg_videoram;
+	required_shared_ptr<UINT16> m_md_videoram;
+	required_shared_ptr<UINT16> m_rowscrollram;
+	required_shared_ptr<UINT16> m_vidregs2;
+	required_shared_ptr<UINT16> m_spriteram;
 //  UINT16 *    m_paletteram;     // currently this uses generic palette handling
-	size_t      m_spriteram_size;
 
 	/* video-related */
 	tilemap_t     *m_bg_tilemap;

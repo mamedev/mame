@@ -996,7 +996,7 @@ SCREEN_UPDATE_IND16( pestplce )
 	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	/* Draw the sprites. */
-	for (offs = 0;offs < state->m_sprite_ram_size;offs += 4)
+	for (offs = 0;offs < state->m_sprite_ram.bytes();offs += 4)
 	{
 		if (state->m_sprite_ram[offs])
 		{

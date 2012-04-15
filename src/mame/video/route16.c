@@ -76,7 +76,7 @@ SCREEN_UPDATE_RGB32( route16 )
 	UINT8 *color_prom1 = &screen.machine().region("proms")->base()[0x000];
 	UINT8 *color_prom2 = &screen.machine().region("proms")->base()[0x100];
 
-	for (offs = 0; offs < state->m_videoram_size; offs++)
+	for (offs = 0; offs < state->m_videoram1.bytes(); offs++)
 	{
 		int i;
 
@@ -133,7 +133,7 @@ static int video_update_stratvox_ttmahjng(running_machine &machine, bitmap_rgb32
 	UINT8 *color_prom1 = &machine.region("proms")->base()[0x000];
 	UINT8 *color_prom2 = &machine.region("proms")->base()[0x100];
 
-	for (offs = 0; offs < state->m_videoram_size; offs++)
+	for (offs = 0; offs < state->m_videoram1.bytes(); offs++)
 	{
 		int i;
 

@@ -2,10 +2,11 @@ class bking_state : public driver_device
 {
 public:
 	bking_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_playfield_ram(*this, "playfield_ram"){ }
 
 	/* memory pointers */
-	UINT8 *     m_playfield_ram;
+	required_shared_ptr<UINT8> m_playfield_ram;
 
 	/* video-related */
 	bitmap_ind16    m_tmp_bitmap1;

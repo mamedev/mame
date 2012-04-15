@@ -211,7 +211,7 @@ static void kingofb_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,
 	UINT8 *spriteram = state->m_spriteram;
 	int offs;
 
-	for (offs = 0; offs < state->m_spriteram_size; offs += 4)
+	for (offs = 0; offs < state->m_spriteram.bytes(); offs += 4)
 	{
 		int roffs, bank, code, color, flipx, flipy, sx, sy;
 
@@ -280,7 +280,7 @@ static void ringking_draw_sprites( running_machine &machine, bitmap_ind16 &bitma
 	UINT8 *spriteram = state->m_spriteram;
 	int offs;
 
-	for (offs = 0; offs < state->m_spriteram_size; offs += 4)
+	for (offs = 0; offs < state->m_spriteram.bytes(); offs += 4)
 	{
 		int bank = (spriteram[offs + 1] & 0x04) >> 2;
 		int code = spriteram[offs + 3] + ((spriteram[offs + 1] & 0x03) << 8);

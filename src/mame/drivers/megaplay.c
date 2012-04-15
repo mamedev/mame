@@ -595,7 +595,7 @@ static ADDRESS_MAP_START( megaplay_bios_map, AS_PROGRAM, 8, mplay_state )
 	AM_RANGE(0x6404, 0x6404) AM_READWRITE_LEGACY(megaplay_bios_6404_r, megaplay_bios_6404_w)
 	AM_RANGE(0x6600, 0x6600) AM_READWRITE_LEGACY(megaplay_bios_6600_r, megaplay_bios_6600_w)
 	AM_RANGE(0x6001, 0x67ff) AM_WRITEONLY
-	AM_RANGE(0x6800, 0x77ff) AM_RAM AM_BASE(m_ic3_ram)
+	AM_RANGE(0x6800, 0x77ff) AM_RAM AM_SHARE("ic3_ram")
 	AM_RANGE(0x8000, 0xffff) AM_READWRITE_LEGACY(bank_r, bank_w)
 ADDRESS_MAP_END
 

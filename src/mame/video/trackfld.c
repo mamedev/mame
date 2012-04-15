@@ -197,7 +197,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	UINT8 *spriteram_2 = state->m_spriteram2;
 	int offs;
 
-	for (offs = state->m_spriteram_size - 2; offs >= 0; offs -= 2)
+	for (offs = state->m_spriteram.bytes() - 2; offs >= 0; offs -= 2)
 	{
 		int attr = spriteram_2[offs];
 		int code = spriteram[offs + 1];

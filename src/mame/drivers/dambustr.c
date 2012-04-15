@@ -84,11 +84,11 @@ static ADDRESS_MAP_START( dambustr_map, AS_PROGRAM, 8, dambustr_state )
 
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 
-	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(galaxold_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(galaxold_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0xd400, 0xd7ff) AM_READ(galaxold_videoram_r)
-	AM_RANGE(0xd800, 0xd83f) AM_RAM_WRITE(galaxold_attributesram_w) AM_BASE(m_attributesram)
-	AM_RANGE(0xd840, 0xd85f) AM_RAM AM_BASE_SIZE(m_spriteram,m_spriteram_size)
-	AM_RANGE(0xd860, 0xd87f) AM_RAM AM_BASE_SIZE(m_bulletsram,m_bulletsram_size)
+	AM_RANGE(0xd800, 0xd83f) AM_RAM_WRITE(galaxold_attributesram_w) AM_SHARE("attributesram")
+	AM_RANGE(0xd840, 0xd85f) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0xd860, 0xd87f) AM_RAM AM_SHARE("bulletsram")
 
 	AM_RANGE(0xd880, 0xd8ff) AM_RAM
 

@@ -108,7 +108,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 	int offs,data0,data1,data2;
 	UINT16 *spriteram16 = state->m_spriteram;
 
-	for( offs = state->m_spriteram_size/2 - 4; offs >= 0; offs -= 4 )
+	for( offs = state->m_spriteram.bytes()/2 - 4; offs >= 0; offs -= 4 )
 	{
 		data0 = spriteram16[offs];
 		data1 = spriteram16[offs+1];

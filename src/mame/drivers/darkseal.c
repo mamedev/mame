@@ -61,7 +61,7 @@ READ16_MEMBER(darkseal_state::darkseal_control_r)
 
 static ADDRESS_MAP_START( darkseal_map, AS_PROGRAM, 16, darkseal_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x100000, 0x103fff) AM_RAM AM_BASE(m_ram)
+	AM_RANGE(0x100000, 0x103fff) AM_RAM AM_SHARE("ram")
 	AM_RANGE(0x120000, 0x1207ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x140000, 0x140fff) AM_RAM_WRITE(darkseal_palette_24bit_rg_w) AM_SHARE("paletteram")
 	AM_RANGE(0x141000, 0x141fff) AM_RAM_WRITE(darkseal_palette_24bit_b_w) AM_SHARE("paletteram2")
@@ -71,9 +71,9 @@ static ADDRESS_MAP_START( darkseal_map, AS_PROGRAM, 16, darkseal_state )
 	AM_RANGE(0x202000, 0x203fff) AM_DEVREADWRITE_LEGACY("tilegen2", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
 	AM_RANGE(0x240000, 0x24000f) AM_DEVWRITE_LEGACY("tilegen2", deco16ic_pf_control_w)
 
-	AM_RANGE(0x220000, 0x220fff) AM_RAM AM_BASE(m_pf1_rowscroll)
+	AM_RANGE(0x220000, 0x220fff) AM_RAM AM_SHARE("pf1_rowscroll")
 	// pf2 & 4 rowscrolls are where? (maybe don't exist?)
-	AM_RANGE(0x222000, 0x222fff) AM_RAM AM_BASE(m_pf3_rowscroll)
+	AM_RANGE(0x222000, 0x222fff) AM_RAM AM_SHARE("pf3_rowscroll")
 
 	AM_RANGE(0x260000, 0x261fff) AM_DEVREADWRITE_LEGACY("tilegen1", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
 	AM_RANGE(0x262000, 0x263fff) AM_DEVREADWRITE_LEGACY("tilegen1", deco16ic_pf2_data_r, deco16ic_pf2_data_w)

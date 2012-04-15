@@ -8,16 +8,18 @@ class momoko_state : public driver_device
 {
 public:
 	momoko_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_spriteram(*this, "spriteram"),
+		m_videoram(*this, "videoram"),
+		m_bg_scrolly(*this, "bg_scrolly"),
+		m_bg_scrollx(*this, "bg_scrollx"){ }
 
 	/* memory pointers */
-	UINT8 *        m_bg_scrollx;
-	UINT8 *        m_bg_scrolly;
-	UINT8 *        m_videoram;
-	UINT8 *        m_spriteram;
+	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_bg_scrolly;
+	required_shared_ptr<UINT8> m_bg_scrollx;
 //  UINT8 *        paletteram;    // currently this uses generic palette handling
-	size_t         m_spriteram_size;
-	size_t         m_videoram_size;
 
 	/* video-related */
 	UINT8          m_fg_scrollx;

@@ -8,7 +8,8 @@ class policetr_state : public driver_device
 {
 public:
 	policetr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_rambase(*this, "rambase"){ }
 
 	UINT32 m_control_data;
 	UINT32 m_bsmt_data_bank;
@@ -17,7 +18,7 @@ public:
 	UINT64 m_last_cycles;
 	UINT32 m_loop_count;
 	offs_t m_speedup_pc;
-	UINT32 *	m_rambase;
+	required_shared_ptr<UINT32> m_rambase;
 	UINT32 m_palette_offset;
 	UINT8 m_palette_index;
 	UINT8 m_palette_data[3];

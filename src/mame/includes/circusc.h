@@ -8,16 +8,21 @@ class circusc_state : public driver_device
 {
 public:
 	circusc_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_spritebank(*this, "spritebank"),
+		m_scroll(*this, "scroll"),
+		m_colorram(*this, "colorram"),
+		m_videoram(*this, "videoram"),
+		m_spriteram_2(*this, "spriteram_2"),
+		m_spriteram(*this, "spriteram"){ }
 
 	/* memory pointers */
-	UINT8 *        m_videoram;
-	UINT8 *        m_colorram;
-	UINT8 *        m_spriteram;
-	UINT8 *        m_spriteram_2;
-	UINT8 *        m_spritebank;
-	UINT8 *        m_scroll;
-	size_t         m_spriteram_size;
+	required_shared_ptr<UINT8> m_spritebank;
+	required_shared_ptr<UINT8> m_scroll;
+	required_shared_ptr<UINT8> m_colorram;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_spriteram_2;
+	required_shared_ptr<UINT8> m_spriteram;
 
 	/* video-related */
 	tilemap_t        *m_bg_tilemap;

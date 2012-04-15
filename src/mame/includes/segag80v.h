@@ -10,9 +10,11 @@ class segag80v_state : public driver_device
 {
 public:
 	segag80v_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_mainram(*this, "mainram"),
+		m_vectorram(*this, "vectorram"){ }
 
-	UINT8 *m_mainram;
+	required_shared_ptr<UINT8> m_mainram;
 	device_t *m_usb;
 	UINT8 m_mult_data[2];
 	UINT16 m_mult_result;
@@ -20,8 +22,7 @@ public:
 	UINT8 m_spinner_sign;
 	UINT8 m_spinner_count;
 	segag80_decrypt_func m_decrypt;
-	UINT8 *m_vectorram;
-	size_t m_vectorram_size;
+	required_shared_ptr<UINT8> m_vectorram;
 	int m_min_x;
 	int m_min_y;
 	DECLARE_WRITE8_MEMBER(mainram_w);

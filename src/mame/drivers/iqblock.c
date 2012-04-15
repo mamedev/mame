@@ -126,7 +126,7 @@ static const ppi8255_interface ppi8255_intf =
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, iqblock_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
-	AM_RANGE(0xf000, 0xffff) AM_RAM AM_BASE(m_rambase)
+	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("rambase")
 ADDRESS_MAP_END
 
 

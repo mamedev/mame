@@ -181,7 +181,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 		{42,43,46,47,58,59,62,63}
 	};
 
-	for (offs = state->m_spriteram_size-8;offs >= 0;offs -= 8)
+	for (offs = state->m_spriteram.bytes()-8;offs >= 0;offs -= 8)
 	{
 		int flags = spriteram[offs+3];
 		int priority = flags>>6;

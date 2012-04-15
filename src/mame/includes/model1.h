@@ -12,12 +12,22 @@ public:
 		: driver_device(mconfig, type, tag),
         m_maincpu(*this, "maincpu"),
         m_audiocpu(*this, "maincpu"),
-        m_dsbz80(*this, DSBZ80_TAG)
-        { }
+        m_dsbz80(*this, DSBZ80_TAG),
+		m_mr2(*this, "mr2"),
+		m_mr(*this, "mr"),
+		m_display_list0(*this, "display_list0"),
+		m_display_list1(*this, "display_list1"),
+		m_color_xlat(*this, "color_xlat"){ }
 
     required_device<cpu_device> m_maincpu;      // V60
     required_device<cpu_device> m_audiocpu;     // sound 68000
     optional_device<dsbz80_device> m_dsbz80;    // Digital Sound Board
+
+	required_shared_ptr<UINT16> m_mr2;
+	required_shared_ptr<UINT16> m_mr;
+	required_shared_ptr<UINT16> m_display_list0;
+	required_shared_ptr<UINT16> m_display_list1;
+	required_shared_ptr<UINT16> m_color_xlat;
 
 	struct view *m_view;
 	struct point *m_pointdb;
@@ -30,12 +40,7 @@ public:
 	int m_fifo_wptr;
 	int m_fifo_rptr;
 	int m_last_irq;
-	UINT16 *m_mr;
-	UINT16 *m_mr2;
 	int m_dump;
-	UINT16 *m_display_list0;
-	UINT16 *m_display_list1;
-	UINT16 *m_color_xlat;
 	offs_t m_pushpc;
 	int m_fifoin_rpos;
 	int m_fifoin_wpos;

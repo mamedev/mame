@@ -2,15 +2,21 @@ class liberate_state : public driver_device
 {
 public:
 	liberate_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_paletteram(*this, "paletteram"),
+		m_bg_vram(*this, "bg_vram"),
+		m_colorram(*this, "colorram"),
+		m_videoram(*this, "videoram"),
+		m_spriteram(*this, "spriteram"),
+		m_scratchram(*this, "scratchram"){ }
 
-	UINT8 *m_videoram;
-	UINT8 *m_colorram;
-	UINT8 *m_paletteram;
-	UINT8 *m_spriteram;
-	UINT8 *m_scratchram;
+	required_shared_ptr<UINT8> m_paletteram;
+	required_shared_ptr<UINT8> m_bg_vram; /* prosport */
+	required_shared_ptr<UINT8> m_colorram;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<UINT8> m_scratchram;
 	UINT8 *m_charram;	/* prosoccr */
-	UINT8 *m_bg_vram; /* prosport */
 
 	UINT8 m_io_ram[16];
 

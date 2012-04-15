@@ -151,8 +151,8 @@ READ8_MEMBER(starfire_state::fireone_input_r)
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, starfire_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_READWRITE(starfire_scratch_r, starfire_scratch_w)
-	AM_RANGE(0xa000, 0xbfff) AM_READWRITE(starfire_colorram_r, starfire_colorram_w) AM_BASE(m_starfire_colorram)
-	AM_RANGE(0xc000, 0xffff) AM_READWRITE(starfire_videoram_r, starfire_videoram_w) AM_BASE(m_starfire_videoram)
+	AM_RANGE(0xa000, 0xbfff) AM_READWRITE(starfire_colorram_r, starfire_colorram_w) AM_SHARE("colorram")
+	AM_RANGE(0xc000, 0xffff) AM_READWRITE(starfire_videoram_r, starfire_videoram_w) AM_SHARE("videoram")
 ADDRESS_MAP_END
 
 

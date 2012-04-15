@@ -199,7 +199,7 @@ INPUT_PORTS_END
 static ADDRESS_MAP_START( hostmem, AS_PROGRAM, 16, micro3d_state )
 	AM_RANGE(0x000000, 0x143fff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x800000, 0x83ffff) AM_RAM AM_BASE(m_shared_ram)
+	AM_RANGE(0x800000, 0x83ffff) AM_RAM AM_SHARE("shared_ram")
 	AM_RANGE(0x900000, 0x900001) AM_WRITE(host_drmath_int_w)
 	AM_RANGE(0x920000, 0x920001) AM_READ_PORT("INPUTS_C_D")
 	AM_RANGE(0x940000, 0x940001) AM_READ_PORT("INPUTS_A_B")
@@ -221,7 +221,7 @@ ADDRESS_MAP_END
  *************************************/
 
 static ADDRESS_MAP_START( vgbmem, AS_PROGRAM, 16, micro3d_state )
-	AM_RANGE(0x00000000, 0x007fffff) AM_RAM AM_BASE(m_micro3d_sprite_vram)
+	AM_RANGE(0x00000000, 0x007fffff) AM_RAM AM_SHARE("sprite_vram")
 	AM_RANGE(0x00800000, 0x00bfffff) AM_RAM
 	AM_RANGE(0x00c00000, 0x00c0000f) AM_READ_PORT("VGB_SW")
 	AM_RANGE(0x00e00000, 0x00e0000f) AM_WRITE(micro3d_xfer3dk_w)
@@ -254,7 +254,7 @@ static ADDRESS_MAP_START( drmath_data, AS_DATA, 32, micro3d_state )
 	AM_RANGE(0x00a00000, 0x00a00003) AM_WRITE(drmath_int_w)
 	AM_RANGE(0x01000000, 0x01000003) AM_WRITE(micro3d_mac1_w)
 	AM_RANGE(0x01000004, 0x01000007) AM_READWRITE(micro3d_mac2_r, micro3d_mac2_w)
-	AM_RANGE(0x01200000, 0x01203fff) AM_RAM AM_BASE(m_mac_sram)
+	AM_RANGE(0x01200000, 0x01203fff) AM_RAM AM_SHARE("mac_sram")
 	AM_RANGE(0x01400000, 0x01400003) AM_READWRITE(micro3d_pipe_r, micro3d_fifo_w)
 	AM_RANGE(0x01600000, 0x01600003) AM_WRITE(drmath_intr2_ack)
 	AM_RANGE(0x01800000, 0x01800003) AM_WRITE(micro3d_alt_fifo_w)

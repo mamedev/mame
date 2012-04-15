@@ -161,10 +161,10 @@ WRITE8_MEMBER(baraduke_state::baraduke_irq_ack_w)
 
 
 static ADDRESS_MAP_START( baraduke_map, AS_PROGRAM, 8, baraduke_state )
-	AM_RANGE(0x0000, 0x1fff) AM_READWRITE(baraduke_spriteram_r,baraduke_spriteram_w) AM_BASE(m_spriteram)	/* Sprite RAM */
-	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(baraduke_videoram_r,baraduke_videoram_w) AM_BASE(m_videoram)	/* Video RAM */
+	AM_RANGE(0x0000, 0x1fff) AM_READWRITE(baraduke_spriteram_r,baraduke_spriteram_w) AM_SHARE("spriteram")	/* Sprite RAM */
+	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(baraduke_videoram_r,baraduke_videoram_w) AM_SHARE("videoram")	/* Video RAM */
 	AM_RANGE(0x4000, 0x43ff) AM_DEVREADWRITE_LEGACY("namco", namcos1_cus30_r,namcos1_cus30_w)		/* PSG device, shared RAM */
-	AM_RANGE(0x4800, 0x4fff) AM_READWRITE(baraduke_textram_r,baraduke_textram_w) AM_BASE(m_textram)/* video RAM (text layer) */
+	AM_RANGE(0x4800, 0x4fff) AM_READWRITE(baraduke_textram_r,baraduke_textram_w) AM_SHARE("textram")/* video RAM (text layer) */
 	AM_RANGE(0x8000, 0x8000) AM_WRITE(watchdog_reset_w)			/* watchdog reset */
 	AM_RANGE(0x8800, 0x8800) AM_WRITE(baraduke_irq_ack_w)		/* irq acknowledge */
 	AM_RANGE(0xb000, 0xb002) AM_WRITE(baraduke_scroll0_w)		/* scroll (layer 0) */

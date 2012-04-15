@@ -13,10 +13,12 @@ class carpolo_state : public driver_device
 {
 public:
 	carpolo_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_alpharam(*this, "alpharam"),
+		m_spriteram(*this, "spriteram"){ }
 
-	UINT8 *m_alpharam;
-	UINT8 *m_spriteram;
+	required_shared_ptr<UINT8> m_alpharam;
+	required_shared_ptr<UINT8> m_spriteram;
 	UINT8 m_ball_screen_collision_cause;
 	UINT8 m_car_ball_collision_x;
 	UINT8 m_car_ball_collision_y;

@@ -253,7 +253,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 	UINT8 *spr_reg;
 
 
-	for (spr_number = 0;spr_number < (state->m_spriteram_size >> 4);spr_number++)
+	for (spr_number = 0;spr_number < (state->m_spriteram.bytes() >> 4);spr_number++)
 	{
 		spr_reg = state->m_spriteram + 0x10 * spr_number;
 		if (spr_reg[SPR_X] != 0xff)

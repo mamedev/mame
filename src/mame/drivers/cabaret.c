@@ -178,15 +178,15 @@ static ADDRESS_MAP_START( cabaret_portmap, AS_IO, 8, cabaret_state )
 
 	AM_RANGE( 0x00e0, 0x00e1 ) AM_DEVWRITE_LEGACY("ymsnd", ym2413_w )
 
-	AM_RANGE( 0x2000, 0x27ff ) AM_RAM_WRITE(fg_tile_w )  AM_BASE(m_fg_tile_ram )
-	AM_RANGE( 0x2800, 0x2fff ) AM_RAM_WRITE(fg_color_w ) AM_BASE(m_fg_color_ram )
+	AM_RANGE( 0x2000, 0x27ff ) AM_RAM_WRITE(fg_tile_w )  AM_SHARE("fg_tile_ram")
+	AM_RANGE( 0x2800, 0x2fff ) AM_RAM_WRITE(fg_color_w ) AM_SHARE("fg_color_ram")
 
 	AM_RANGE( 0x3000, 0x37ff ) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_byte_split_lo_w ) AM_SHARE("paletteram")
 	AM_RANGE( 0x3800, 0x3fff ) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_byte_split_hi_w ) AM_SHARE("paletteram2")
 
-	AM_RANGE( 0x1000, 0x103f ) AM_RAM_WRITE(bg_scroll_w ) AM_BASE(m_bg_scroll )
+	AM_RANGE( 0x1000, 0x103f ) AM_RAM_WRITE(bg_scroll_w ) AM_SHARE("bg_scroll")
 
-	AM_RANGE( 0x1800, 0x19ff ) AM_RAM_WRITE(bg_tile_w )  AM_BASE(m_bg_tile_ram )
+	AM_RANGE( 0x1800, 0x19ff ) AM_RAM_WRITE(bg_tile_w )  AM_SHARE("bg_tile_ram")
 	AM_RANGE( 0x8000, 0xffff ) AM_ROM AM_REGION("gfx3", 0)
 ADDRESS_MAP_END
 

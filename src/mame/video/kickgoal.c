@@ -96,7 +96,7 @@ static void kickgoal_draw_sprites( running_machine &machine, bitmap_ind16 &bitma
 	const gfx_element *gfx = machine.gfx[1];
 	int offs;
 
-	for (offs = 0; offs < state->m_spriteram_size / 2; offs += 4)
+	for (offs = 0; offs < state->m_spriteram.bytes() / 2; offs += 4)
 	{
 		int xpos = spriteram[offs + 3];
 		int ypos = spriteram[offs + 0] & 0x00ff;
@@ -229,7 +229,7 @@ static void actionhw_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap
 	const gfx_element *gfx = machine.gfx[1];
 	int offs;
 
-	for (offs = 0; offs < state->m_spriteram_size / 2; offs += 4)
+	for (offs = 0; offs < state->m_spriteram.bytes() / 2; offs += 4)
 	{
 		int xpos = spriteram[offs + 3];
 		int ypos = spriteram[offs + 0] & 0x00ff;

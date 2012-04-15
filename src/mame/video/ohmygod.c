@@ -78,12 +78,12 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	UINT16 *spriteram = state->m_spriteram;
 	int offs;
 
-	for (offs = 0; offs < state->m_spriteram_size / 4; offs += 4)
+	for (offs = 0; offs < state->m_spriteram.bytes() / 4; offs += 4)
 	{
 		int sx, sy, code, color, flipx;
 		UINT16 *sr;
 
-		sr = state->m_spritebank ? (spriteram + state->m_spriteram_size / 4) : spriteram;
+		sr = state->m_spritebank ? (spriteram + state->m_spriteram.bytes() / 4) : spriteram;
 
 		code = sr[offs + 3] & 0x0fff;
 		color = sr[offs + 2] & 0x000f;

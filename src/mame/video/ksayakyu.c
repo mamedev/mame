@@ -82,7 +82,7 @@ static TILE_GET_INFO( get_text_tile_info )
 static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	ksayakyu_state *state = machine.driver_data<ksayakyu_state>();
-	const UINT8 *source = state->m_spriteram + state->m_spriteram_size - 4;
+	const UINT8 *source = state->m_spriteram + state->m_spriteram.bytes() - 4;
 	const UINT8 *finish = state->m_spriteram;
 
 	while (source>=finish) /* is order correct ? */

@@ -19,11 +19,13 @@ class orbit_state : public driver_device
 {
 public:
 	orbit_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_playfield_ram(*this, "playfield_ram"),
+		m_sprite_ram(*this, "sprite_ram"){ }
 
 	/* memory pointers */
-	UINT8 *    m_playfield_ram;
-	UINT8 *    m_sprite_ram;
+	required_shared_ptr<UINT8> m_playfield_ram;
+	required_shared_ptr<UINT8> m_sprite_ram;
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;

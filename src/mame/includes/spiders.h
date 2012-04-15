@@ -11,9 +11,10 @@ class spiders_state : public driver_device
 {
 public:
 	spiders_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_ram(*this, "ram"){ }
 
-	UINT8 *m_ram;
+	required_shared_ptr<UINT8> m_ram;
 	UINT8 m_flipscreen;
 	UINT16 m_gfx_rom_address;
 	UINT8 m_gfx_rom_ctrl_mode;

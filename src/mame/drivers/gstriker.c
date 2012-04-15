@@ -278,10 +278,10 @@ static const ym2610_interface ym2610_config =
 
 static ADDRESS_MAP_START( gstriker_map, AS_PROGRAM, 16, gstriker_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x100000, 0x103fff) AM_RAM_WRITE(MB60553_0_vram_w) AM_BASE(m_MB60553[0].vram)
-	AM_RANGE(0x140000, 0x141fff) AM_RAM AM_BASE(m_CG10103[0].vram)
-	AM_RANGE(0x180000, 0x180fff) AM_RAM_WRITE(VS920A_0_vram_w) AM_BASE(m_VS920A[0].vram)
-	AM_RANGE(0x181000, 0x181fff) AM_RAM AM_BASE(m_lineram)
+	AM_RANGE(0x100000, 0x103fff) AM_RAM_WRITE(MB60553_0_vram_w) AM_SHARE("mb60553_vram")
+	AM_RANGE(0x140000, 0x141fff) AM_RAM AM_SHARE("cg10103_vram")
+	AM_RANGE(0x180000, 0x180fff) AM_RAM_WRITE(VS920A_0_vram_w) AM_SHARE("vs920a_vram")
+	AM_RANGE(0x181000, 0x181fff) AM_RAM AM_SHARE("lineram")
 	AM_RANGE(0x1c0000, 0x1c0fff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")
 
 	AM_RANGE(0x200000, 0x20000f) AM_RAM_WRITE(MB60553_0_regs_w)
@@ -295,7 +295,7 @@ static ADDRESS_MAP_START( gstriker_map, AS_PROGRAM, 16, gstriker_state )
 	AM_RANGE(0x20008e, 0x20008f) AM_READ(dmmy_8f)
 	AM_RANGE(0x2000a0, 0x2000a1) AM_WRITE(sound_command_w)
 
-	AM_RANGE(0xffc000, 0xffffff) AM_RAM AM_BASE(m_work_ram)
+	AM_RANGE(0xffc000, 0xffffff) AM_RAM AM_SHARE("work_ram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, gstriker_state )
@@ -315,10 +315,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( vgoal_map, AS_PROGRAM, 16, gstriker_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x100000, 0x103fff) AM_RAM_WRITE(MB60553_0_vram_w) AM_BASE(m_MB60553[0].vram)
-	AM_RANGE(0x140000, 0x141fff) AM_RAM AM_BASE(m_CG10103[0].vram)
-	AM_RANGE(0x180000, 0x180fff) AM_RAM_WRITE(VS920A_0_vram_w) AM_BASE(m_VS920A[0].vram)
-	AM_RANGE(0x181000, 0x181fff) AM_RAM AM_BASE(m_lineram)
+	AM_RANGE(0x100000, 0x103fff) AM_RAM_WRITE(MB60553_0_vram_w) AM_SHARE("mb60553.vram")
+	AM_RANGE(0x140000, 0x141fff) AM_RAM AM_SHARE("cg10103.vram")
+	AM_RANGE(0x180000, 0x180fff) AM_RAM_WRITE(VS920A_0_vram_w) AM_SHARE("vs920a.vram")
+	AM_RANGE(0x181000, 0x181fff) AM_RAM AM_SHARE("lineram")
 	AM_RANGE(0x1c0000, 0x1c4fff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x200000, 0x20000f) AM_RAM_WRITE(MB60553_0_regs_w)
 	AM_RANGE(0x200040, 0x20005f) AM_RAM //AM_BASE_LEGACY(&gs_mixer_regs)
@@ -331,7 +331,7 @@ static ADDRESS_MAP_START( vgoal_map, AS_PROGRAM, 16, gstriker_state )
 	AM_RANGE(0x20008e, 0x20008f) AM_READ(dmmy_8f)
 
 	AM_RANGE(0x2000a0, 0x2000a1) AM_WRITE(sound_command_w)
-	AM_RANGE(0xffc000, 0xffffff) AM_RAM AM_BASE(m_work_ram)
+	AM_RANGE(0xffc000, 0xffffff) AM_RAM AM_SHARE("work_ram")
 ADDRESS_MAP_END
 
 /*** INPUT PORTS *************************************************************/

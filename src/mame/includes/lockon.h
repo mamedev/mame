@@ -19,14 +19,19 @@ class lockon_state : public driver_device
 {
 public:
 	lockon_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_char_ram(*this, "char_ram"),
+		m_hud_ram(*this, "hud_ram"),
+		m_scene_ram(*this, "scene_ram"),
+		m_ground_ram(*this, "ground_ram"),
+		m_object_ram(*this, "object_ram"){ }
 
 	/* memory pointers */
-	UINT16	*m_char_ram;
-	UINT16	*m_hud_ram;
-	UINT16	*m_scene_ram;
-	UINT16	*m_ground_ram;
-	UINT16	*m_object_ram;
+	required_shared_ptr<UINT16> m_char_ram;
+	required_shared_ptr<UINT16> m_hud_ram;
+	required_shared_ptr<UINT16> m_scene_ram;
+	required_shared_ptr<UINT16> m_ground_ram;
+	required_shared_ptr<UINT16> m_object_ram;
 
 	size_t	m_hudram_size;
 	size_t	m_objectram_size;

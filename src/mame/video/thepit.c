@@ -237,7 +237,7 @@ static void draw_sprites(running_machine &machine,
 	thepit_state *state = machine.driver_data<thepit_state>();
 	int offs;
 
-	for (offs = state->m_spriteram_size - 4; offs >= 0; offs -= 4)
+	for (offs = state->m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
 	{
 		if (((state->m_spriteram[offs + 2] & 0x08) >> 3) == priority_to_draw)
 		{

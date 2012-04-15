@@ -42,10 +42,11 @@ class _2mindril_state : public taito_f3_state
 {
 public:
 	_2mindril_state(const machine_config &mconfig, device_type type, const char *tag)
-		: taito_f3_state(mconfig, type, tag) { }
+		: taito_f3_state(mconfig, type, tag),
+		  m_iodata(*this, "iodata") { }
 
 	/* memory pointers */
-	UINT16 *      m_iodata;
+	required_shared_ptr<UINT16> m_iodata;
 
 	/* input-related */
 	UINT16        m_defender_sensor;
@@ -212,7 +213,7 @@ static ADDRESS_MAP_START( drill_map, AS_PROGRAM, 16, _2mindril_state )
 	AM_RANGE(0x600000, 0x600007) AM_DEVREADWRITE8_LEGACY("ymsnd", ym2610_r, ym2610_w, 0x00ff)
 	AM_RANGE(0x60000c, 0x60000d) AM_READWRITE(drill_irq_r,drill_irq_w)
 	AM_RANGE(0x60000e, 0x60000f) AM_RAM // unknown purpose, zeroed at start-up and nothing else
-	AM_RANGE(0x700000, 0x70000f) AM_READWRITE(drill_io_r,drill_io_w) AM_BASE(m_iodata) // i/o
+	AM_RANGE(0x700000, 0x70000f) AM_READWRITE(drill_io_r,drill_io_w) AM_SHARE("iodata") // i/o
 	AM_RANGE(0x800000, 0x800001) AM_WRITE(sensors_w)
 ADDRESS_MAP_END
 

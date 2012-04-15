@@ -3,13 +3,15 @@ class mexico86_state : public driver_device
 {
 public:
 	mexico86_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_objectram(*this, "objectram"),
+		m_protection_ram(*this, "protection_ram"),
+		m_videoram(*this, "videoram"){ }
 
 	/* memory pointers */
-	UINT8 *     m_protection_ram;
-	UINT8 *     m_videoram;
-	UINT8 *     m_objectram;
-	size_t      m_objectram_size;
+	required_shared_ptr<UINT8> m_objectram;
+	required_shared_ptr<UINT8> m_protection_ram;
+	required_shared_ptr<UINT8> m_videoram;
 
 	/* video-related */
 	int      m_charbank;

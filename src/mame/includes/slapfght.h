@@ -17,16 +17,23 @@ class slapfght_state : public driver_device
 public:
 	slapfght_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+		  m_slapfight_videoram(*this, "videoram"),
+		  m_slapfight_colorram(*this, "colorram"),
+		  m_slapfight_fixvideoram(*this, "fixvideoram"),
+		  m_slapfight_fixcolorram(*this, "fixcolorram"),
+		  m_slapfight_scrollx_lo(*this, "scrollx_lo"),
+		  m_slapfight_scrollx_hi(*this, "scrollx_hi"),
+		  m_slapfight_scrolly(*this, "scrolly"),
 		  m_spriteram(*this, "spriteram") { }
 
 	int m_getstar_id;
-	UINT8 *m_slapfight_videoram;
-	UINT8 *m_slapfight_colorram;
-	UINT8 *m_slapfight_fixvideoram;
-	UINT8 *m_slapfight_fixcolorram;
-	UINT8 *m_slapfight_scrollx_lo;
-	UINT8 *m_slapfight_scrollx_hi;
-	UINT8 *m_slapfight_scrolly;
+	required_shared_ptr<UINT8> m_slapfight_videoram;
+	required_shared_ptr<UINT8> m_slapfight_colorram;
+	required_shared_ptr<UINT8> m_slapfight_fixvideoram;
+	required_shared_ptr<UINT8> m_slapfight_fixcolorram;
+	required_shared_ptr<UINT8> m_slapfight_scrollx_lo;
+	required_shared_ptr<UINT8> m_slapfight_scrollx_hi;
+	required_shared_ptr<UINT8> m_slapfight_scrolly;
 	int m_slapfight_status;
 	int m_getstar_sequence_index;
 	int m_getstar_sh_intenabled;

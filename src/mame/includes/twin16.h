@@ -5,9 +5,18 @@ class twin16_state : public driver_device
 public:
 	twin16_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_spriteram(*this, "spriteram") { }
+		  m_spriteram(*this, "spriteram") ,
+		m_text_ram(*this, "text_ram"),
+		m_videoram(*this, "videoram"),
+		m_tile_gfx_ram(*this, "tile_gfx_ram"),
+		m_sprite_gfx_ram(*this, "sprite_gfx_ram"){ }
 
-	UINT16 *m_videoram;
+	required_device<buffered_spriteram16_device> m_spriteram;
+	required_shared_ptr<UINT16> m_text_ram;
+	required_shared_ptr<UINT16> m_videoram;
+	required_shared_ptr<UINT16> m_tile_gfx_ram;
+	required_shared_ptr<UINT16> m_sprite_gfx_ram;
+	
 	UINT16 m_CPUA_register;
 	UINT16 m_CPUB_register;
 	UINT16 m_sound_command;
@@ -15,9 +24,6 @@ public:
 	UINT16 m_cuebrickj_nvram[0x400*0x20];
 	UINT16 m_custom_video;
 	UINT16 *m_gfx_rom;
-	UINT16 *m_text_ram;
-	UINT16 *m_sprite_gfx_ram;
-	UINT16 *m_tile_gfx_ram;
 	UINT16 m_sprite_buffer[0x800];
 	emu_timer *m_sprite_timer;
 	int m_sprite_busy;
@@ -27,7 +33,6 @@ public:
 	UINT16 m_scrolly[3];
 	UINT16 m_video_register;
 	tilemap_t *m_text_tilemap;
-	required_device<buffered_spriteram16_device> m_spriteram;
 	DECLARE_READ16_MEMBER(videoram16_r);
 	DECLARE_WRITE16_MEMBER(videoram16_w);
 	DECLARE_READ16_MEMBER(extra_rom_r);

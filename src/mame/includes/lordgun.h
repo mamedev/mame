@@ -15,22 +15,26 @@ class lordgun_state : public driver_device
 {
 public:
 	lordgun_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_priority_ram(*this, "priority_ram"),
+		  m_scrollram(*this, "scrollram"),
+	      m_spriteram(*this, "spriteram") { }
+
+	required_shared_ptr<UINT16> m_priority_ram;
+	required_shared_ptr<UINT16> m_scrollram;
+	required_shared_ptr<UINT16> m_spriteram;
 
 	UINT8 m_old;
 	UINT8 m_aliencha_dip_sel;
-	UINT16 *m_priority_ram;
 	UINT16 m_priority;
 	UINT16 *m_vram[4];
 	UINT16 *m_scroll_x[4];
 	UINT16 *m_scroll_y[4];
-	UINT16 *m_scrollram;
 	int m_whitescreen;
 	lordgun_gun_data m_gun[2];
 	tilemap_t *m_tilemap[4];
 	bitmap_ind16 *m_bitmaps[5];
-	UINT16 *m_spriteram;
-	size_t m_spriteram_size;
+
 	DECLARE_WRITE16_MEMBER(lordgun_priority_w);
 	DECLARE_READ16_MEMBER(lordgun_gun_0_x_r);
 	DECLARE_READ16_MEMBER(lordgun_gun_0_y_r);

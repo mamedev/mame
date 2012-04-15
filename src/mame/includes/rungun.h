@@ -8,10 +8,13 @@ class rungun_state : public driver_device
 {
 public:
 	rungun_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
-
+		: driver_device(mconfig, type, tag) ,
+		m_sysreg(*this, "sysreg"),
+		m_936_videoram(*this, "936_videoram"){ }
+	
 	/* memory pointers */
-	UINT16 *    m_936_videoram;
+	required_shared_ptr<UINT16> m_sysreg;
+	required_shared_ptr<UINT16> m_936_videoram;
 //  UINT16 *    m_paletteram;    // currently this uses generic palette handling
 
 	/* video-related */
@@ -22,7 +25,6 @@ public:
 	int         m_sprite_colorbase;
 
 	/* misc */
-	UINT16      m_sysreg[0x20];
 	int         m_z80_control;
 	int         m_sound_status;
 

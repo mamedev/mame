@@ -11,10 +11,12 @@ class blktiger_state : public driver_device
 public:
 	blktiger_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_spriteram(*this, "spriteram") { }
+		  m_spriteram(*this, "spriteram") ,
+		m_txvideoram(*this, "txvideoram"){ }
 
 	/* memory pointers */
-	UINT8 * m_txvideoram;
+	required_device<buffered_spriteram8_device> m_spriteram;
+	required_shared_ptr<UINT8> m_txvideoram;
 //  UINT8 * m_paletteram; // currently this uses generic palette handling
 //  UINT8 * m_paletteram2;    // currently this uses generic palette handling
 
@@ -38,7 +40,6 @@ public:
 	/* devices */
 	device_t *m_mcu;
 	device_t *m_audiocpu;
-	required_device<buffered_spriteram8_device> m_spriteram;
 	DECLARE_READ8_MEMBER(blktiger_from_mcu_r);
 	DECLARE_WRITE8_MEMBER(blktiger_to_mcu_w);
 	DECLARE_READ8_MEMBER(blktiger_from_main_r);

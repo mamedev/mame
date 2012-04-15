@@ -165,7 +165,7 @@ SCREEN_UPDATE_IND16( darkmist)
 
 */
 		int i,fx,fy,tile,palette;
-		for(i=0;i<state->m_spriteram_size;i+=32)
+		for(i=0;i<state->m_spriteram.bytes();i+=32)
 		{
 			fy=spriteram[i+1]&0x40;
 			fx=spriteram[i+1]&0x80;

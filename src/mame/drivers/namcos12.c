@@ -1046,9 +1046,10 @@ class namcos12_state : public psx_state
 {
 public:
 	namcos12_state(const machine_config &mconfig, device_type type, const char *tag)
-		: psx_state(mconfig, type, tag) { }
+		: psx_state(mconfig, type, tag),
+		  m_sharedram(*this, "sharedram") { }
 
-	UINT32 *m_sharedram;
+	required_shared_ptr<UINT32> m_sharedram;
 	UINT32 m_n_bankoffset;
 
 	UINT32 m_n_dmaoffset;
@@ -1124,7 +1125,7 @@ READ32_MEMBER(namcos12_state::sharedram_r)
 WRITE16_MEMBER(namcos12_state::sharedram_sub_w)
 {
 
-	UINT16 *shared16 = (UINT16 *)m_sharedram;
+	UINT16 *shared16 = reinterpret_cast<UINT16 *>(m_sharedram.target());
 
 	COMBINE_DATA(&shared16[BYTE_XOR_LE(offset)]);
 }
@@ -1132,7 +1133,7 @@ WRITE16_MEMBER(namcos12_state::sharedram_sub_w)
 READ16_MEMBER(namcos12_state::sharedram_sub_r)
 {
 
-	UINT16 *shared16 = (UINT16 *)m_sharedram;
+	UINT16 *shared16 = reinterpret_cast<UINT16 *>(m_sharedram.target());
 
 	return shared16[BYTE_XOR_LE(offset)];
 }
@@ -1250,7 +1251,7 @@ WRITE32_MEMBER(namcos12_state::s12_dma_bias_w)
 static ADDRESS_MAP_START( namcos12_map, AS_PROGRAM, 32, namcos12_state )
 	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_SHARE("share1") /* ram */
 	AM_RANGE(0x1f000000, 0x1f000003) AM_READNOP AM_WRITE(bankoffset_w)			/* banking */
-	AM_RANGE(0x1f080000, 0x1f083fff) AM_READWRITE(sharedram_r, sharedram_w) AM_BASE(m_sharedram) /* shared ram?? */
+	AM_RANGE(0x1f080000, 0x1f083fff) AM_READWRITE(sharedram_r, sharedram_w) AM_SHARE("sharedram") /* shared ram?? */
 	AM_RANGE(0x1f140000, 0x1f140fff) AM_DEVREADWRITE8_LEGACY("at28c16", at28c16_r, at28c16_w, 0x00ff00ff) /* eeprom */
 	AM_RANGE(0x1f1bff08, 0x1f1bff0f) AM_WRITENOP    /* ?? */
 	AM_RANGE(0x1f700000, 0x1f70ffff) AM_WRITE(dmaoffset_w)  /* dma */

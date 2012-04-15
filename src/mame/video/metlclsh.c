@@ -177,7 +177,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	gfx_element *gfx = machine.gfx[0];
 	int offs;
 
-	for (offs = 0; offs < state->m_spriteram_size; offs += 4)
+	for (offs = 0; offs < state->m_spriteram.bytes(); offs += 4)
 	{
 		int attr, code, color, sx, sy, flipx, flipy, wrapy, sizey;
 

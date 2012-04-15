@@ -11,11 +11,14 @@ class gng_state : public driver_device
 public:
 	gng_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_spriteram(*this, "spriteram") { }
+		  m_spriteram(*this, "spriteram") ,
+		m_fgvideoram(*this, "fgvideoram"),
+		m_bgvideoram(*this, "bgvideoram"){ }
 
 	/* memory pointers */
-	UINT8 *    m_bgvideoram;
-	UINT8 *    m_fgvideoram;
+	required_device<buffered_spriteram8_device> m_spriteram;
+	required_shared_ptr<UINT8> m_fgvideoram;
+	required_shared_ptr<UINT8> m_bgvideoram;
 //  UINT8 *    m_paletteram;  // currently this uses generic palette handling
 //  UINT8 *    m_paletteram2; // currently this uses generic palette handling
 
@@ -25,7 +28,6 @@ public:
 	UINT8      m_scrollx[2];
 	UINT8      m_scrolly[2];
 
-	required_device<buffered_spriteram8_device> m_spriteram;
 	DECLARE_WRITE8_MEMBER(gng_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(gng_coin_counter_w);
 	DECLARE_READ8_MEMBER(diamond_hack_r);

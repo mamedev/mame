@@ -154,12 +154,12 @@ WRITE16_MEMBER(sshangha_state::paletteram16_xbgr_word_be_tilehigh_w)
 
 static ADDRESS_MAP_START( sshangha_map, AS_PROGRAM, 16, sshangha_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x100000, 0x10000f) AM_RAM AM_BASE(m_sound_shared_ram)
+	AM_RANGE(0x100000, 0x10000f) AM_RAM AM_SHARE("sound_shared")
 
 	AM_RANGE(0x200000, 0x201fff) AM_DEVREADWRITE_LEGACY("tilegen1", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
 	AM_RANGE(0x202000, 0x203fff) AM_DEVREADWRITE_LEGACY("tilegen1", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
-	AM_RANGE(0x204000, 0x2047ff) AM_RAM AM_BASE(m_pf1_rowscroll)
-	AM_RANGE(0x206000, 0x2067ff) AM_RAM AM_BASE(m_pf2_rowscroll)
+	AM_RANGE(0x204000, 0x2047ff) AM_RAM AM_SHARE("pf1_rowscroll")
+	AM_RANGE(0x206000, 0x2067ff) AM_RAM AM_SHARE("pf2_rowscroll")
 	AM_RANGE(0x206800, 0x207fff) AM_RAM
 	AM_RANGE(0x300000, 0x30000f) AM_DEVWRITE_LEGACY("tilegen1", deco16ic_pf_control_w)
 	AM_RANGE(0x320000, 0x320001) AM_WRITE(sshangha_video_w)
@@ -173,25 +173,25 @@ static ADDRESS_MAP_START( sshangha_map, AS_PROGRAM, 16, sshangha_state )
 	AM_RANGE(0x370000, 0x370001) AM_READ(deco_71_r)
 	AM_RANGE(0x370000, 0x370007) AM_WRITENOP
 
-	AM_RANGE(0x380000, 0x3803ff) AM_RAM_WRITE(paletteram16_xbgr_word_be_sprites_w) AM_BASE(m_sprite_paletteram)
-	AM_RANGE(0x380400, 0x3807ff) AM_RAM_WRITE(paletteram16_xbgr_word_be_tilehigh_w) AM_BASE(m_tile_paletteram2)
-	AM_RANGE(0x380800, 0x380bff) AM_RAM_WRITE(paletteram16_xbgr_word_be_sprites2_w) AM_BASE(m_sprite_paletteram2)
-	AM_RANGE(0x380c00, 0x380fff) AM_RAM_WRITE(paletteram16_xbgr_word_be_tilelow_w) AM_BASE(m_tile_paletteram1)
+	AM_RANGE(0x380000, 0x3803ff) AM_RAM_WRITE(paletteram16_xbgr_word_be_sprites_w) AM_SHARE("sprite_palram")
+	AM_RANGE(0x380400, 0x3807ff) AM_RAM_WRITE(paletteram16_xbgr_word_be_tilehigh_w) AM_SHARE("tile_palram2")
+	AM_RANGE(0x380800, 0x380bff) AM_RAM_WRITE(paletteram16_xbgr_word_be_sprites2_w) AM_SHARE("sprite_palram2")
+	AM_RANGE(0x380c00, 0x380fff) AM_RAM_WRITE(paletteram16_xbgr_word_be_tilelow_w) AM_SHARE("tile_palram1")
 	AM_RANGE(0x381000, 0x383fff) AM_RAM // unused palette area
 
 	AM_RANGE(0xfec000, 0xff3fff) AM_RAM
-	AM_RANGE(0xff4000, 0xff47ff) AM_READWRITE(sshangha_protection16_r,sshangha_protection16_w) AM_BASE(m_prot_data)
+	AM_RANGE(0xff4000, 0xff47ff) AM_READWRITE(sshangha_protection16_r,sshangha_protection16_w) AM_SHARE("prot_data")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sshanghb_map, AS_PROGRAM, 16, sshangha_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x084000, 0x0847ff) AM_READ(sshanghb_protection16_r)
-	AM_RANGE(0x101000, 0x10100f) AM_RAM AM_BASE(m_sound_shared_ram) /* the bootleg writes here */
+	AM_RANGE(0x101000, 0x10100f) AM_RAM AM_SHARE("sound_shared") /* the bootleg writes here */
 
 	AM_RANGE(0x200000, 0x201fff) AM_DEVREADWRITE_LEGACY("tilegen1", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
 	AM_RANGE(0x202000, 0x203fff) AM_DEVREADWRITE_LEGACY("tilegen1", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
-	AM_RANGE(0x204000, 0x2047ff) AM_RAM AM_BASE(m_pf1_rowscroll)
-	AM_RANGE(0x206000, 0x2067ff) AM_RAM AM_BASE(m_pf2_rowscroll)
+	AM_RANGE(0x204000, 0x2047ff) AM_RAM AM_SHARE("pf1_rowscroll")
+	AM_RANGE(0x206000, 0x2067ff) AM_RAM AM_SHARE("pf2_rowscroll")
 	AM_RANGE(0x206800, 0x207fff) AM_RAM
 	AM_RANGE(0x300000, 0x30000f) AM_DEVWRITE_LEGACY("tilegen1", deco16ic_pf_control_w)
 	AM_RANGE(0x320000, 0x320001) AM_WRITE(sshangha_video_w)
@@ -200,10 +200,10 @@ static ADDRESS_MAP_START( sshanghb_map, AS_PROGRAM, 16, sshangha_state )
 
 	AM_RANGE(0x340000, 0x340fff) AM_RAM // original spriteram
 
-	AM_RANGE(0x380000, 0x3803ff) AM_RAM_WRITE(paletteram16_xbgr_word_be_sprites_w) AM_BASE(m_sprite_paletteram)
-	AM_RANGE(0x380400, 0x3807ff) AM_RAM_WRITE(paletteram16_xbgr_word_be_tilehigh_w) AM_BASE(m_tile_paletteram2)
-	AM_RANGE(0x380800, 0x380bff) AM_RAM_WRITE(paletteram16_xbgr_word_be_sprites2_w) AM_BASE(m_sprite_paletteram2)
-	AM_RANGE(0x380c00, 0x380fff) AM_RAM_WRITE(paletteram16_xbgr_word_be_tilelow_w) AM_BASE(m_tile_paletteram1)
+	AM_RANGE(0x380000, 0x3803ff) AM_RAM_WRITE(paletteram16_xbgr_word_be_sprites_w) AM_SHARE("sprite_palram")
+	AM_RANGE(0x380400, 0x3807ff) AM_RAM_WRITE(paletteram16_xbgr_word_be_tilehigh_w) AM_SHARE("tile_palram2")
+	AM_RANGE(0x380800, 0x380bff) AM_RAM_WRITE(paletteram16_xbgr_word_be_sprites2_w) AM_SHARE("sprite_palram2")
+	AM_RANGE(0x380c00, 0x380fff) AM_RAM_WRITE(paletteram16_xbgr_word_be_tilelow_w) AM_SHARE("tile_palram1")
 	AM_RANGE(0x381000, 0x383fff) AM_RAM // unused palette area
 
 	AM_RANGE(0x3c0000, 0x3c0fff) AM_RAM AM_SHARE("spriteram") // bootleg spriteram

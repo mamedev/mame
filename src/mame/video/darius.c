@@ -53,7 +53,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	UINT16 code, data, sx, sy;
 	UINT8 flipx, flipy, color, priority;
 
-	for (offs = state->m_spriteram_size / 2 - 4; offs >= 0; offs -= 4)
+	for (offs = state->m_spriteram.bytes() / 2 - 4; offs >= 0; offs -= 4)
 	{
 		code = spriteram[offs + 2] & 0x1fff;
 

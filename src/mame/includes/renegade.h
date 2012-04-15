@@ -5,8 +5,10 @@ class renegade_state : public driver_device
 public:
 	renegade_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this,"maincpu")
-		{ }
+		m_videoram(*this, "videoram"),
+		m_videoram2(*this, "videoram2"),
+		m_spriteram(*this, "spriteram"),
+		m_maincpu(*this,"maincpu"){ }
 
 	UINT8 m_bank;
 	int m_mcu_sim;
@@ -31,12 +33,12 @@ public:
 	const UINT8 *m_mcu_encrypt_table;
 	int m_mcu_encrypt_table_len;
 	int m_coin;
-	UINT8 *m_videoram;
-	UINT8 *m_videoram2;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_videoram2;
 	INT32 m_scrollx;
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
-	UINT8 *m_spriteram;
+	required_shared_ptr<UINT8> m_spriteram;
 
 	required_device<cpu_device> m_maincpu;
 	DECLARE_WRITE8_MEMBER(sound_w);

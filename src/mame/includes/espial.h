@@ -8,15 +8,22 @@ class espial_state : public driver_device
 {
 public:
 	espial_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"),
+		m_attributeram(*this, "attributeram"),
+		m_scrollram(*this, "scrollram"),
+		m_spriteram_1(*this, "spriteram_1"),
+		m_spriteram_2(*this, "spriteram_2"),
+		m_spriteram_3(*this, "spriteram_3"),
+		m_colorram(*this, "colorram"){ }
 
-	UINT8 *   m_videoram;
-	UINT8 *   m_colorram;
-	UINT8 *   m_attributeram;
-	UINT8 *   m_scrollram;
-	UINT8 *   m_spriteram_1;
-	UINT8 *   m_spriteram_2;
-	UINT8 *   m_spriteram_3;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_attributeram;
+	required_shared_ptr<UINT8> m_scrollram;
+	required_shared_ptr<UINT8> m_spriteram_1;
+	required_shared_ptr<UINT8> m_spriteram_2;
+	required_shared_ptr<UINT8> m_spriteram_3;
+	required_shared_ptr<UINT8> m_colorram;
 
 	/* video-related */
 	tilemap_t   *m_bg_tilemap;

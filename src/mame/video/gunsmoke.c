@@ -143,7 +143,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	UINT8 *spriteram = state->m_spriteram;
 	int offs;
 
-	for (offs = state->m_spriteram_size - 32; offs >= 0; offs -= 32)
+	for (offs = state->m_spriteram.bytes() - 32; offs >= 0; offs -= 32)
 	{
 		int attr = spriteram[offs + 1];
 		int bank = (attr & 0xc0) >> 6;

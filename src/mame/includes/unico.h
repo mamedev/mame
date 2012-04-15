@@ -2,17 +2,21 @@ class unico_state : public driver_device
 {
 public:
 	unico_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_vram(*this, "vram"),
+		m_scroll(*this, "scroll"),
+		m_vram32(*this, "vram32"),
+		m_scroll32(*this, "scroll32"),
+		m_spriteram(*this, "spriteram"){ }
 
-	UINT16 *m_vram;
-	UINT16 *m_scroll;
-	UINT32 *m_vram32;
-	UINT32 *m_scroll32;
+	required_shared_ptr<UINT16> m_vram;
+	required_shared_ptr<UINT16> m_scroll;
+	required_shared_ptr<UINT32> m_vram32;
+	required_shared_ptr<UINT32> m_scroll32;
 	tilemap_t *m_tilemap[3];
 	int m_sprites_scrolldx;
 	int m_sprites_scrolldy;
-	UINT16 *m_spriteram;
-	size_t m_spriteram_size;
+	required_shared_ptr<UINT16> m_spriteram;
 	DECLARE_WRITE16_MEMBER(zeropnt_sound_bank_w);
 	DECLARE_READ16_MEMBER(unico_gunx_0_msb_r);
 	DECLARE_READ16_MEMBER(unico_guny_0_msb_r);

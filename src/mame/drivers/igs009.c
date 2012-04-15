@@ -460,19 +460,19 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( jingbell_portmap, AS_IO, 8, igs009_state )
 	AM_RANGE( 0x0000, 0x003f ) AM_RAM // Z180 internal regs
 
-	AM_RANGE( 0x1000, 0x11ff ) AM_RAM_WRITE(bg_scroll_w ) AM_BASE(m_bg_scroll )
+	AM_RANGE( 0x1000, 0x11ff ) AM_RAM_WRITE(bg_scroll_w ) AM_SHARE("bg_scroll")
 
 	AM_RANGE( 0x2000, 0x23ff ) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_byte_split_lo_w ) AM_SHARE("paletteram")
 	AM_RANGE( 0x2400, 0x27ff ) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_byte_split_hi_w ) AM_SHARE("paletteram2")
 
-	AM_RANGE( 0x3000, 0x33ff ) AM_RAM_WRITE(gp98_reel1_ram_w )  AM_BASE(m_gp98_reel1_ram )
-	AM_RANGE( 0x3400, 0x37ff ) AM_RAM_WRITE(gp98_reel2_ram_w )  AM_BASE(m_gp98_reel2_ram )
-	AM_RANGE( 0x3800, 0x3bff ) AM_RAM_WRITE(gp98_reel3_ram_w )  AM_BASE(m_gp98_reel3_ram )
-	AM_RANGE( 0x3c00, 0x3fff ) AM_RAM_WRITE(gp98_reel4_ram_w )  AM_BASE(m_gp98_reel4_ram )
+	AM_RANGE( 0x3000, 0x33ff ) AM_RAM_WRITE(gp98_reel1_ram_w )  AM_SHARE("gp98_reel1_ram")
+	AM_RANGE( 0x3400, 0x37ff ) AM_RAM_WRITE(gp98_reel2_ram_w )  AM_SHARE("gp98_reel2_ram")
+	AM_RANGE( 0x3800, 0x3bff ) AM_RAM_WRITE(gp98_reel3_ram_w )  AM_SHARE("gp98_reel3_ram")
+	AM_RANGE( 0x3c00, 0x3fff ) AM_RAM_WRITE(gp98_reel4_ram_w )  AM_SHARE("gp98_reel4_ram")
 
-	AM_RANGE( 0x4000, 0x407f ) AM_RAM AM_BASE(m_bg_scroll2 )
+	AM_RANGE( 0x4000, 0x407f ) AM_RAM AM_SHARE("bg_scroll2")
 
-	AM_RANGE( 0x5000, 0x5fff ) AM_RAM_WRITE(fg_tile_w )  AM_BASE(m_fg_tile_ram )
+	AM_RANGE( 0x5000, 0x5fff ) AM_RAM_WRITE(fg_tile_w )  AM_SHARE("fg_tile_ram")
 
 	AM_RANGE( 0x6480, 0x6480 ) AM_WRITE(jingbell_nmi_and_coins_w )
 
@@ -489,7 +489,7 @@ static ADDRESS_MAP_START( jingbell_portmap, AS_IO, 8, igs009_state )
 
 	AM_RANGE( 0x64d0, 0x64d1 ) AM_READWRITE(jingbell_magic_r, jingbell_magic_w )	// DSW1-5
 
-	AM_RANGE( 0x7000, 0x7fff ) AM_RAM_WRITE(fg_color_w ) AM_BASE(m_fg_color_ram )
+	AM_RANGE( 0x7000, 0x7fff ) AM_RAM_WRITE(fg_color_w ) AM_SHARE("fg_color_ram")
 
 	AM_RANGE( 0x8000, 0xffff ) AM_ROM AM_REGION("data", 0)
 ADDRESS_MAP_END

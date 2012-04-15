@@ -30,20 +30,35 @@ public:
 	seta_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
-		m_subcpu(*this,"sub")
-		{ }
+		m_subcpu(*this,"sub"),
+		m_sharedram(*this,"sharedram"),
+		m_workram(*this,"workram"),
+		m_vregs(*this,"vregs"),
+		m_vram_0(*this,"vram_0"),
+		m_vctrl_0(*this,"vctrl_0"),
+		m_vram_2(*this,"vram_2"),
+		m_vctrl_2(*this,"vctrl_2"),
+		m_paletteram(*this,"paletteram"),
+		m_paletteram2(*this,"paletteram2"),
+		m_kiwame_nvram(*this,"kiwame_nvram"),
+		m_inttoote_key_select(*this,"inttoote_keysel"),
+		m_inttoote_700000(*this,"inttoote_700000") { }
 
-	UINT8 *m_sharedram;
-	UINT16 *m_workram;
-	UINT16 *m_vregs;
-	UINT16 *m_vram_0;
-	UINT16 *m_vctrl_0;
-	UINT16 *m_vram_2;
-	UINT16 *m_vctrl_2;
-	UINT16 *m_paletteram;
-	size_t m_paletteram_size;
-	UINT16 *m_paletteram2;
-	size_t m_paletteram2_size;
+	required_device<cpu_device> m_maincpu;
+	optional_device<cpu_device> m_subcpu;
+
+	required_shared_ptr<UINT8> m_sharedram;
+	required_shared_ptr<UINT16> m_workram;
+	required_shared_ptr<UINT16> m_vregs;
+	required_shared_ptr<UINT16> m_vram_0;
+	required_shared_ptr<UINT16> m_vctrl_0;
+	required_shared_ptr<UINT16> m_vram_2;
+	required_shared_ptr<UINT16> m_vctrl_2;
+	required_shared_ptr<UINT16> m_paletteram;
+	required_shared_ptr<UINT16> m_paletteram2;
+	required_shared_ptr<UINT16> m_kiwame_nvram;
+	required_shared_ptr<UINT16> m_inttoote_key_select;
+	required_shared_ptr<UINT16> m_inttoote_700000;
 
 	int m_tiles_offset;
 	tilemap_t *m_tilemap_0;
@@ -71,12 +86,9 @@ public:
 	UINT8 m_usclssic_port_select;
 	int m_keroppi_prize_hop;
 	int m_keroppi_protection_count;
-	UINT16 *m_kiwame_nvram;
 
 	int m_wiggie_soundlatch;
 
-	UINT16 *m_inttoote_key_select;
-	UINT16 *m_inttoote_700000;
 	UINT8 m_jockeyc_key_select;
 
 	UINT8 m_twineagl_xram[8];
@@ -86,8 +98,6 @@ public:
 	UINT16 m_pairslove_protram_old[0x200];
 	UINT16 m_downtown_protection[0x200/2];
 
-	required_device<cpu_device> m_maincpu;
-	optional_device<cpu_device> m_subcpu;
 	DECLARE_WRITE16_MEMBER(seta_vregs_w);
 	DECLARE_WRITE16_MEMBER(seta_vram_0_w);
 	DECLARE_WRITE16_MEMBER(seta_vram_2_w);

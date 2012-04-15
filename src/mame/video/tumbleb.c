@@ -397,7 +397,7 @@ void tumbleb_draw_common(running_machine &machine, bitmap_ind16 &bitmap, const r
 	else
 		state->m_pf1_alt_tilemap->draw(bitmap, cliprect, 0, 0);
 
-	machine.device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, state->m_spriteram, state->m_spriteram_size/2);
+	machine.device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, state->m_spriteram, state->m_spriteram.bytes()/2);
 }
 
 SCREEN_UPDATE_IND16( tumblepb )
@@ -534,7 +534,7 @@ SCREEN_UPDATE_IND16( sdfight )
 
 	tumbleb_draw_common(screen.machine(),bitmap,cliprect, offs2, -16, offs, 0);
 
-	screen.machine().device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, state->m_spriteram, state->m_spriteram_size/2);
+	screen.machine().device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, state->m_spriteram, state->m_spriteram.bytes()/2);
 	return 0;
 }
 
@@ -608,7 +608,7 @@ SCREEN_UPDATE_IND16( jumppop )
 	else
 		state->m_pf1_tilemap->draw(bitmap, cliprect, 0, 0);
 
-	screen.machine().device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, state->m_spriteram, state->m_spriteram_size/2);
+	screen.machine().device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, state->m_spriteram, state->m_spriteram.bytes()/2);
 
 	return 0;
 }
@@ -626,7 +626,7 @@ SCREEN_UPDATE_IND16( suprtrio )
 	state->m_pf2_tilemap->draw(bitmap, cliprect, 0, 0);
 	state->m_pf1_alt_tilemap->draw(bitmap, cliprect, 0, 0);
 
-	screen.machine().device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, state->m_spriteram, state->m_spriteram_size/2);
+	screen.machine().device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, state->m_spriteram, state->m_spriteram.bytes()/2);
 	return 0;
 }
 

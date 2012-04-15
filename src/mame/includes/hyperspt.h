@@ -2,16 +2,19 @@ class hyperspt_state : public driver_device
 {
 public:
 	hyperspt_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_spriteram(*this, "spriteram"),
+		m_scroll(*this, "scroll"),
+		m_videoram(*this, "videoram"),
+		m_colorram(*this, "colorram"){ }
 
 	/* memory pointers */
-	UINT8 *  m_videoram;
-	UINT8 *  m_colorram;
-	UINT8 *  m_scroll;
+	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<UINT8> m_scroll;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_colorram;
 	UINT8 *  m_scroll2;
-	UINT8 *  m_spriteram;
 	UINT8 *  m_spriteram2;
-	size_t   m_spriteram_size;
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;

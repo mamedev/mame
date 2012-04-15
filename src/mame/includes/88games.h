@@ -8,14 +8,17 @@ class _88games_state : public driver_device
 {
 public:
 	_88games_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_banked_rom(*this, "banked_rom"),
+		m_paletteram_1000(*this, "paletteram_1000"),
+		m_ram(*this, "ram"){ }
 
 	/* memory pointers */
-	UINT8 *      m_ram;
-	UINT8 *      m_banked_rom;
+	required_shared_ptr<UINT8> m_banked_rom;
+	required_shared_ptr<UINT8> m_paletteram_1000;
+	required_shared_ptr<UINT8> m_ram;
 //  UINT8 *      m_paletteram_1000;   // this currently uses generic palette handling
 //  UINT8 *      m_nvram; // this currently uses generic nvram handling
-	UINT8 *m_paletteram_1000;
 
 	/* video-related */
 	int          m_k88games_priority;

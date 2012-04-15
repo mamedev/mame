@@ -2,16 +2,19 @@ class thepit_state : public driver_device
 {
 public:
 	thepit_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"),
+		m_colorram(*this, "colorram"),
+		m_attributesram(*this, "attributesram"),
+		m_spriteram(*this, "spriteram"){ }
 
 	int m_question_address;
 	int m_question_rom;
 	int m_remap_address[16];
-	UINT8 *m_videoram;
-	UINT8 *m_colorram;
-	UINT8 *m_attributesram;
-	UINT8 *m_spriteram;
-	size_t m_spriteram_size;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_colorram;
+	required_shared_ptr<UINT8> m_attributesram;
+	required_shared_ptr<UINT8> m_spriteram;
 	UINT8 m_graphics_bank;
 	UINT8 m_flip_screen_x;
 	UINT8 m_flip_screen_y;

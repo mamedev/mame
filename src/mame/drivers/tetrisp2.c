@@ -300,21 +300,21 @@ static ADDRESS_MAP_START( tetrisp2_map, AS_PROGRAM, 16, tetrisp2_state )
 	AM_RANGE(0x108000, 0x10ffff) AM_RAM															// Work RAM
 	AM_RANGE(0x200000, 0x23ffff) AM_READWRITE8(tetrisp2_priority_r, tetrisp2_priority_w, 0x00ff)
 	AM_RANGE(0x300000, 0x31ffff) AM_RAM_WRITE(tetrisp2_palette_w) AM_SHARE("paletteram")		// Palette
-	AM_RANGE(0x400000, 0x403fff) AM_RAM_WRITE(tetrisp2_vram_fg_w) AM_BASE(m_vram_fg)	// Foreground
-	AM_RANGE(0x404000, 0x407fff) AM_RAM_WRITE(tetrisp2_vram_bg_w) AM_BASE(m_vram_bg)	// Background
+	AM_RANGE(0x400000, 0x403fff) AM_RAM_WRITE(tetrisp2_vram_fg_w) AM_SHARE("vram_fg")	// Foreground
+	AM_RANGE(0x404000, 0x407fff) AM_RAM_WRITE(tetrisp2_vram_bg_w) AM_SHARE("vram_bg")	// Background
 	AM_RANGE(0x408000, 0x409fff) AM_RAM															// ???
 	AM_RANGE(0x500000, 0x50ffff) AM_RAM															// Line
-	AM_RANGE(0x600000, 0x60ffff) AM_RAM_WRITE(tetrisp2_vram_rot_w) AM_BASE(m_vram_rot)	// Rotation
+	AM_RANGE(0x600000, 0x60ffff) AM_RAM_WRITE(tetrisp2_vram_rot_w) AM_SHARE("vram_rot")	// Rotation
 	AM_RANGE(0x650000, 0x651fff) AM_RAM_WRITE(tetrisp2_vram_rot_w)								// Rotation (mirror)
 	AM_RANGE(0x800000, 0x800003) AM_DEVREADWRITE8_LEGACY("ymz", ymz280b_r, ymz280b_w, 0x00ff)	// Sound
-	AM_RANGE(0x900000, 0x903fff) AM_READ(tetrisp2_nvram_r) AM_WRITE(tetrisp2_nvram_w) AM_BASE(m_nvram) AM_SHARE("nvram")	// NVRAM
+	AM_RANGE(0x900000, 0x903fff) AM_READ(tetrisp2_nvram_r) AM_WRITE(tetrisp2_nvram_w) AM_SHARE("nvram") AM_SHARE("nvram")	// NVRAM
 	AM_RANGE(0x904000, 0x907fff) AM_READ(tetrisp2_nvram_r) AM_WRITE(tetrisp2_nvram_w)				// NVRAM (mirror)
 	AM_RANGE(0xb00000, 0xb00001) AM_WRITE(tetrisp2_coincounter_w)								// Coin Counter
 	AM_RANGE(0xb20000, 0xb20001) AM_WRITENOP													// ???
-	AM_RANGE(0xb40000, 0xb4000b) AM_WRITEONLY AM_BASE(m_scroll_fg)						// Foreground Scrolling
-	AM_RANGE(0xb40010, 0xb4001b) AM_WRITEONLY AM_BASE(m_scroll_bg)						// Background Scrolling
+	AM_RANGE(0xb40000, 0xb4000b) AM_WRITEONLY AM_SHARE("scroll_fg")						// Foreground Scrolling
+	AM_RANGE(0xb40010, 0xb4001b) AM_WRITEONLY AM_SHARE("scroll_bg")						// Background Scrolling
 	AM_RANGE(0xb4003e, 0xb4003f) AM_WRITENOP													// scr_size
-	AM_RANGE(0xb60000, 0xb6002f) AM_WRITEONLY AM_BASE(m_rotregs)						// Rotation Registers
+	AM_RANGE(0xb60000, 0xb6002f) AM_WRITEONLY AM_SHARE("rotregs")						// Rotation Registers
 	AM_RANGE(0xba0000, 0xba001f) AM_WRITE(tetrisp2_systemregs_w)								// system param
 	AM_RANGE(0xba001a, 0xba001b) AM_WRITENOP													// Lev 4 irq ack
 	AM_RANGE(0xba001e, 0xba001f) AM_WRITENOP													// Lev 2 irq ack
@@ -358,27 +358,27 @@ static ADDRESS_MAP_START( nndmseal_map, AS_PROGRAM, 16, tetrisp2_state )
 	AM_RANGE(0x200000, 0x23ffff) AM_WRITE8(tetrisp2_priority_w, 0x00ff)	// Priority
 	AM_RANGE(0x200000, 0x23ffff) AM_READ(nndmseal_priority_r)
 	AM_RANGE(0x300000, 0x31ffff) AM_RAM_WRITE(tetrisp2_palette_w) AM_SHARE("paletteram")	// Palette
-	AM_RANGE(0x400000, 0x403fff) AM_RAM_WRITE(tetrisp2_vram_fg_w) AM_BASE(m_vram_fg	)	// Foreground
-	AM_RANGE(0x404000, 0x407fff) AM_RAM_WRITE(tetrisp2_vram_bg_w) AM_BASE(m_vram_bg	)	// Background
+	AM_RANGE(0x400000, 0x403fff) AM_RAM_WRITE(tetrisp2_vram_fg_w) AM_SHARE("vram_fg")	// Foreground
+	AM_RANGE(0x404000, 0x407fff) AM_RAM_WRITE(tetrisp2_vram_bg_w) AM_SHARE("vram_bg")	// Background
 
 	AM_RANGE(0x408000, 0x409fff) AM_RAM	// ???
 	AM_RANGE(0x500000, 0x50ffff) AM_RAM	// Line
 
-	AM_RANGE(0x600000, 0x60ffff) AM_RAM_WRITE(tetrisp2_vram_rot_w) AM_BASE(m_vram_rot	)	// Rotation
+	AM_RANGE(0x600000, 0x60ffff) AM_RAM_WRITE(tetrisp2_vram_rot_w) AM_SHARE("vram_rot")	// Rotation
 	AM_RANGE(0x650000, 0x651fff) AM_RAM_WRITE(tetrisp2_vram_rot_w)	// Rotation (mirror)
 
 	AM_RANGE(0x800000, 0x800003) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff )	// Sound
 
-	AM_RANGE(0x900000, 0x903fff) AM_READWRITE(tetrisp2_nvram_r, tetrisp2_nvram_w) AM_BASE(m_nvram) AM_SHARE("nvram")	// NVRAM
+	AM_RANGE(0x900000, 0x903fff) AM_READWRITE(tetrisp2_nvram_r, tetrisp2_nvram_w) AM_SHARE("nvram") AM_SHARE("nvram")	// NVRAM
 
 	AM_RANGE(0xb00000, 0xb00001) AM_WRITE(nndmseal_coincounter_w)	// Coin Counter
 	AM_RANGE(0xb20000, 0xb20001) AM_WRITE(nndmseal_b20000_w)		// ???
 
-	AM_RANGE(0xb40000, 0xb4000b) AM_WRITEONLY AM_BASE(m_scroll_fg	)	// Foreground Scrolling
-	AM_RANGE(0xb40010, 0xb4001b) AM_WRITEONLY AM_BASE(m_scroll_bg	)	// Background Scrolling
+	AM_RANGE(0xb40000, 0xb4000b) AM_WRITEONLY AM_SHARE("scroll_fg")	// Foreground Scrolling
+	AM_RANGE(0xb40010, 0xb4001b) AM_WRITEONLY AM_SHARE("scroll_bg")	// Background Scrolling
 	AM_RANGE(0xb4003e, 0xb4003f) AM_WRITENOP	// scr_size
 
-	AM_RANGE(0xb60000, 0xb6002f) AM_WRITEONLY AM_BASE(m_rotregs)	// Rotation Registers
+	AM_RANGE(0xb60000, 0xb6002f) AM_WRITEONLY AM_SHARE("rotregs")	// Rotation Registers
 
 	AM_RANGE(0xb80000, 0xb80001) AM_WRITE(nndmseal_sound_bank_w)
 
@@ -403,22 +403,22 @@ static ADDRESS_MAP_START( rockn1_map, AS_PROGRAM, 16, tetrisp2_state )
 	AM_RANGE(0x108000, 0x10ffff) AM_RAM															// Work RAM
 	AM_RANGE(0x200000, 0x23ffff) AM_READWRITE8(tetrisp2_priority_r, rockn_priority_w, 0x00ff)		// Priority
 	AM_RANGE(0x300000, 0x31ffff) AM_RAM_WRITE(tetrisp2_palette_w) AM_SHARE("paletteram")		// Palette
-	AM_RANGE(0x400000, 0x403fff) AM_RAM_WRITE(tetrisp2_vram_fg_w) AM_BASE(m_vram_fg)	// Foreground
-	AM_RANGE(0x404000, 0x407fff) AM_RAM_WRITE(tetrisp2_vram_bg_w) AM_BASE(m_vram_bg)	// Background
+	AM_RANGE(0x400000, 0x403fff) AM_RAM_WRITE(tetrisp2_vram_fg_w) AM_SHARE("vram_fg")	// Foreground
+	AM_RANGE(0x404000, 0x407fff) AM_RAM_WRITE(tetrisp2_vram_bg_w) AM_SHARE("vram_bg")	// Background
 	AM_RANGE(0x408000, 0x409fff) AM_RAM															// ???
 	AM_RANGE(0x500000, 0x50ffff) AM_RAM															// Line
-	AM_RANGE(0x600000, 0x60ffff) AM_RAM_WRITE(tetrisp2_vram_rot_w) AM_BASE(m_vram_rot)	// Rotation
-	AM_RANGE(0x900000, 0x903fff) AM_READ(rockn_nvram_r) AM_WRITE(tetrisp2_nvram_w) AM_BASE(m_nvram) AM_SHARE("nvram")	// NVRAM
+	AM_RANGE(0x600000, 0x60ffff) AM_RAM_WRITE(tetrisp2_vram_rot_w) AM_SHARE("vram_rot")	// Rotation
+	AM_RANGE(0x900000, 0x903fff) AM_READ(rockn_nvram_r) AM_WRITE(tetrisp2_nvram_w) AM_SHARE("nvram") AM_SHARE("nvram")	// NVRAM
 	AM_RANGE(0xa30000, 0xa30001) AM_READWRITE(rockn_soundvolume_r, rockn_soundvolume_w)			// Sound Volume
 	AM_RANGE(0xa40000, 0xa40003) AM_DEVREADWRITE8_LEGACY("ymz", ymz280b_r, ymz280b_w, 0x00ff)	// Sound
 	AM_RANGE(0xa44000, 0xa44001) AM_READWRITE(rockn_adpcmbank_r, rockn_adpcmbank_w)				// Sound Bank
 	AM_RANGE(0xa48000, 0xa48001) AM_NOP															// YMZ280 Reset
 	AM_RANGE(0xb00000, 0xb00001) AM_WRITE(tetrisp2_coincounter_w)								// Coin Counter
 	AM_RANGE(0xb20000, 0xb20001) AM_NOP															// ???
-	AM_RANGE(0xb40000, 0xb4000b) AM_WRITEONLY AM_BASE(m_scroll_fg)						// Foreground Scrolling
-	AM_RANGE(0xb40010, 0xb4001b) AM_WRITEONLY AM_BASE(m_scroll_bg)						// Background Scrolling
+	AM_RANGE(0xb40000, 0xb4000b) AM_WRITEONLY AM_SHARE("scroll_fg")						// Foreground Scrolling
+	AM_RANGE(0xb40010, 0xb4001b) AM_WRITEONLY AM_SHARE("scroll_bg")						// Background Scrolling
 	AM_RANGE(0xb4003e, 0xb4003f) AM_WRITENOP													// scr_size
-	AM_RANGE(0xb60000, 0xb6002f) AM_WRITEONLY AM_BASE(m_rotregs)						// Rotation Registers
+	AM_RANGE(0xb60000, 0xb6002f) AM_WRITEONLY AM_SHARE("rotregs")						// Rotation Registers
 	AM_RANGE(0xba0000, 0xba001f) AM_WRITE(rockn_systemregs_w)									// system param
 	AM_RANGE(0xba001a, 0xba001b) AM_WRITENOP													// Lev 4 irq ack
 	AM_RANGE(0xba001e, 0xba001f) AM_WRITENOP													// Lev 2 irq ack
@@ -438,21 +438,21 @@ static ADDRESS_MAP_START( rockn2_map, AS_PROGRAM, 16, tetrisp2_state )
 	AM_RANGE(0x200000, 0x23ffff) AM_READWRITE8(tetrisp2_priority_r, rockn_priority_w, 0x00ff)	// Priority
 	AM_RANGE(0x300000, 0x31ffff) AM_RAM_WRITE(tetrisp2_palette_w) AM_SHARE("paletteram")		// Palette
 	AM_RANGE(0x500000, 0x50ffff) AM_RAM															// Line
-	AM_RANGE(0x600000, 0x60ffff) AM_RAM_WRITE(tetrisp2_vram_rot_w) AM_BASE(m_vram_rot)	// Rotation
-	AM_RANGE(0x800000, 0x803fff) AM_RAM_WRITE(tetrisp2_vram_fg_w) AM_BASE(m_vram_fg)	// Foreground
-	AM_RANGE(0x804000, 0x807fff) AM_RAM_WRITE(tetrisp2_vram_bg_w) AM_BASE(m_vram_bg)	// Background
+	AM_RANGE(0x600000, 0x60ffff) AM_RAM_WRITE(tetrisp2_vram_rot_w) AM_SHARE("vram_rot")	// Rotation
+	AM_RANGE(0x800000, 0x803fff) AM_RAM_WRITE(tetrisp2_vram_fg_w) AM_SHARE("vram_fg")	// Foreground
+	AM_RANGE(0x804000, 0x807fff) AM_RAM_WRITE(tetrisp2_vram_bg_w) AM_SHARE("vram_bg")	// Background
 	AM_RANGE(0x808000, 0x809fff) AM_RAM															// ???
-	AM_RANGE(0x900000, 0x903fff) AM_READ(rockn_nvram_r) AM_WRITE(tetrisp2_nvram_w) AM_BASE(m_nvram) AM_SHARE("nvram")	// NVRAM
+	AM_RANGE(0x900000, 0x903fff) AM_READ(rockn_nvram_r) AM_WRITE(tetrisp2_nvram_w) AM_SHARE("nvram") AM_SHARE("nvram")	// NVRAM
 	AM_RANGE(0xa30000, 0xa30001) AM_READWRITE(rockn_soundvolume_r, rockn_soundvolume_w)			// Sound Volume
 	AM_RANGE(0xa40000, 0xa40003) AM_DEVREADWRITE8_LEGACY("ymz", ymz280b_r, ymz280b_w, 0x00ff)	// Sound
 	AM_RANGE(0xa44000, 0xa44001) AM_READWRITE(rockn_adpcmbank_r, rockn2_adpcmbank_w)			// Sound Bank
 	AM_RANGE(0xa48000, 0xa48001) AM_WRITENOP													// YMZ280 Reset
 	AM_RANGE(0xb00000, 0xb00001) AM_WRITE(tetrisp2_coincounter_w)								// Coin Counter
 	AM_RANGE(0xb20000, 0xb20001) AM_WRITENOP													// ???
-	AM_RANGE(0xb40000, 0xb4000b) AM_WRITEONLY AM_BASE(m_scroll_fg)					// Foreground Scrolling
-	AM_RANGE(0xb40010, 0xb4001b) AM_WRITEONLY AM_BASE(m_scroll_bg)					// Background Scrolling
+	AM_RANGE(0xb40000, 0xb4000b) AM_WRITEONLY AM_SHARE("scroll_fg")					// Foreground Scrolling
+	AM_RANGE(0xb40010, 0xb4001b) AM_WRITEONLY AM_SHARE("scroll_bg")					// Background Scrolling
 	AM_RANGE(0xb4003e, 0xb4003f) AM_WRITENOP													// scr_size
-	AM_RANGE(0xb60000, 0xb6002f) AM_WRITEONLY AM_BASE(m_rotregs)					// Rotation Registers
+	AM_RANGE(0xb60000, 0xb6002f) AM_WRITEONLY AM_SHARE("rotregs")					// Rotation Registers
 	AM_RANGE(0xba0000, 0xba001f) AM_WRITE(rockn_systemregs_w)									// system param
 	AM_RANGE(0xba001a, 0xba001b) AM_WRITENOP													// Lev 4 irq ack
 	AM_RANGE(0xba001e, 0xba001f) AM_WRITENOP													// Lev 2 irq ack
@@ -472,11 +472,11 @@ static ADDRESS_MAP_START( rocknms_main_map, AS_PROGRAM, 16, tetrisp2_state )
 	AM_RANGE(0x200000, 0x23ffff) AM_READWRITE8(tetrisp2_priority_r, rockn_priority_w, 0x00ff)		// Priority
 	AM_RANGE(0x300000, 0x31ffff) AM_RAM_WRITE(tetrisp2_palette_w) AM_SHARE("paletteram")		// Palette
 //  AM_RANGE(0x500000, 0x50ffff) AM_RAM                                                         // Line
-	AM_RANGE(0x600000, 0x60ffff) AM_RAM_WRITE(tetrisp2_vram_rot_w) AM_BASE(m_vram_rot)	// Rotation
-	AM_RANGE(0x800000, 0x803fff) AM_RAM_WRITE(tetrisp2_vram_fg_w) AM_BASE(m_vram_fg)	// Foreground
-	AM_RANGE(0x804000, 0x807fff) AM_RAM_WRITE(tetrisp2_vram_bg_w) AM_BASE(m_vram_bg)	// Background
+	AM_RANGE(0x600000, 0x60ffff) AM_RAM_WRITE(tetrisp2_vram_rot_w) AM_SHARE("vram_rot")	// Rotation
+	AM_RANGE(0x800000, 0x803fff) AM_RAM_WRITE(tetrisp2_vram_fg_w) AM_SHARE("vram_fg")	// Foreground
+	AM_RANGE(0x804000, 0x807fff) AM_RAM_WRITE(tetrisp2_vram_bg_w) AM_SHARE("vram_bg")	// Background
 //  AM_RANGE(0x808000, 0x809fff) AM_RAM                                                         // ???
-	AM_RANGE(0x900000, 0x903fff) AM_READ(rockn_nvram_r) AM_WRITE(tetrisp2_nvram_w) AM_BASE(m_nvram) AM_SHARE("nvram")	// NVRAM
+	AM_RANGE(0x900000, 0x903fff) AM_READ(rockn_nvram_r) AM_WRITE(tetrisp2_nvram_w) AM_SHARE("nvram") AM_SHARE("nvram")	// NVRAM
 	AM_RANGE(0xa30000, 0xa30001) AM_READWRITE(rockn_soundvolume_r, rockn_soundvolume_w)			// Sound Volume
 	AM_RANGE(0xa40000, 0xa40003) AM_DEVREADWRITE8_LEGACY("ymz", ymz280b_r, ymz280b_w, 0x00ff)	// Sound
 	AM_RANGE(0xa44000, 0xa44001) AM_READWRITE(rockn_adpcmbank_r, rockn_adpcmbank_w)				// Sound Bank
@@ -484,10 +484,10 @@ static ADDRESS_MAP_START( rocknms_main_map, AS_PROGRAM, 16, tetrisp2_state )
 	AM_RANGE(0xa00000, 0xa00001) AM_WRITE(rocknms_main2sub_w)									// MAIN -> SUB Communication
 	AM_RANGE(0xb00000, 0xb00001) AM_WRITE(tetrisp2_coincounter_w)								// Coin Counter
 	AM_RANGE(0xb20000, 0xb20001) AM_WRITENOP													// ???
-	AM_RANGE(0xb40000, 0xb4000b) AM_WRITEONLY AM_BASE(m_scroll_fg)						// Foreground Scrolling
-	AM_RANGE(0xb40010, 0xb4001b) AM_WRITEONLY AM_BASE(m_scroll_bg)						// Background Scrolling
+	AM_RANGE(0xb40000, 0xb4000b) AM_WRITEONLY AM_SHARE("scroll_fg")						// Foreground Scrolling
+	AM_RANGE(0xb40010, 0xb4001b) AM_WRITEONLY AM_SHARE("scroll_bg")						// Background Scrolling
 	AM_RANGE(0xb4003e, 0xb4003f) AM_WRITENOP													// scr_size
-	AM_RANGE(0xb60000, 0xb6002f) AM_WRITEONLY AM_BASE(m_rotregs)						// Rotation Registers
+	AM_RANGE(0xb60000, 0xb6002f) AM_WRITEONLY AM_SHARE("rotregs")						// Rotation Registers
 	AM_RANGE(0xba0000, 0xba001f) AM_WRITE(rockn_systemregs_w)									// system param
 	AM_RANGE(0xba001a, 0xba001b) AM_WRITENOP													// Lev 4 irq ack
 	AM_RANGE(0xba001e, 0xba001f) AM_WRITENOP													// Lev 2 irq ack
@@ -504,12 +504,12 @@ static ADDRESS_MAP_START( rocknms_sub_map, AS_PROGRAM, 16, tetrisp2_state )
 	AM_RANGE(0x100000, 0x103fff) AM_RAM AM_SHARE("spriteram2")		// Object RAM
 	AM_RANGE(0x104000, 0x107fff) AM_RAM															// Spare Object RAM
 	AM_RANGE(0x108000, 0x10ffff) AM_RAM															// Work RAM
-	AM_RANGE(0x200000, 0x23ffff) AM_RAM_WRITE(rocknms_sub_priority_w) AM_BASE(m_rocknms_sub_priority) // Priority
+	AM_RANGE(0x200000, 0x23ffff) AM_RAM_WRITE(rocknms_sub_priority_w) AM_SHARE("sub_priority") // Priority
 	AM_RANGE(0x300000, 0x31ffff) AM_RAM_WRITE(rocknms_sub_palette_w) AM_SHARE("paletteram2")	// Palette
 //  AM_RANGE(0x500000, 0x50ffff) AM_RAM                                                         // Line
-	AM_RANGE(0x600000, 0x60ffff) AM_RAM_WRITE(rocknms_sub_vram_rot_w) AM_BASE(m_rocknms_sub_vram_rot) // Rotation
-	AM_RANGE(0x800000, 0x803fff) AM_RAM_WRITE(rocknms_sub_vram_fg_w) AM_BASE(m_rocknms_sub_vram_fg) // Foreground
-	AM_RANGE(0x804000, 0x807fff) AM_RAM_WRITE(rocknms_sub_vram_bg_w) AM_BASE(m_rocknms_sub_vram_bg) // Background
+	AM_RANGE(0x600000, 0x60ffff) AM_RAM_WRITE(rocknms_sub_vram_rot_w) AM_SHARE("sub_vram_rot") // Rotation
+	AM_RANGE(0x800000, 0x803fff) AM_RAM_WRITE(rocknms_sub_vram_fg_w) AM_SHARE("sub_vram_fg") // Foreground
+	AM_RANGE(0x804000, 0x807fff) AM_RAM_WRITE(rocknms_sub_vram_bg_w) AM_SHARE("sub_vram_bg") // Background
 //  AM_RANGE(0x808000, 0x809fff) AM_RAM                                                         // ???
 	AM_RANGE(0x900000, 0x907fff) AM_RAM															// NVRAM
 	AM_RANGE(0xa30000, 0xa30001) AM_WRITE(rockn_soundvolume_w)									// Sound Volume
@@ -518,10 +518,10 @@ static ADDRESS_MAP_START( rocknms_sub_map, AS_PROGRAM, 16, tetrisp2_state )
 	AM_RANGE(0xa48000, 0xa48001) AM_WRITENOP													// YMZ280 Reset
 	AM_RANGE(0xb00000, 0xb00001) AM_WRITE(rocknms_sub2main_w)									// MAIN <- SUB Communication
 	AM_RANGE(0xb20000, 0xb20001) AM_WRITENOP													// ???
-	AM_RANGE(0xb40000, 0xb4000b) AM_WRITEONLY AM_BASE(m_rocknms_sub_scroll_fg)					// Foreground Scrolling
-	AM_RANGE(0xb40010, 0xb4001b) AM_WRITEONLY AM_BASE(m_rocknms_sub_scroll_bg)					// Background Scrolling
+	AM_RANGE(0xb40000, 0xb4000b) AM_WRITEONLY AM_SHARE("sub_scroll_fg")					// Foreground Scrolling
+	AM_RANGE(0xb40010, 0xb4001b) AM_WRITEONLY AM_SHARE("sub_scroll_bg")					// Background Scrolling
 	AM_RANGE(0xb4003e, 0xb4003f) AM_WRITENOP													// scr_size
-	AM_RANGE(0xb60000, 0xb6002f) AM_WRITEONLY AM_BASE(m_rocknms_sub_rotregs)						// Rotation Registers
+	AM_RANGE(0xb60000, 0xb6002f) AM_WRITEONLY AM_SHARE("sub_rotregs")						// Rotation Registers
 	AM_RANGE(0xba0000, 0xba001f) AM_WRITE(rocknms_sub_systemregs_w)								// system param
 	AM_RANGE(0xba001a, 0xba001b) AM_WRITENOP													// Lev 4 irq ack
 	AM_RANGE(0xba001e, 0xba001f) AM_WRITENOP													// Lev 2 irq ack
@@ -604,12 +604,12 @@ static ADDRESS_MAP_START( stepstag_map, AS_PROGRAM, 16, stepstag_state )
 	AM_RANGE(0x108000, 0x10ffff) AM_RAM															// Work RAM
 	AM_RANGE(0x200000, 0x23ffff) AM_READWRITE8(tetrisp2_priority_r, rockn_priority_w, 0x00ff)	// Priority
 	AM_RANGE(0x300000, 0x31ffff) AM_RAM															// Palette
-	AM_RANGE(0x400000, 0x403fff) AM_RAM_WRITE(tetrisp2_vram_fg_w) AM_BASE( m_vram_fg )			// Foreground
-	AM_RANGE(0x404000, 0x407fff) AM_RAM_WRITE(tetrisp2_vram_bg_w) AM_BASE( m_vram_bg )			// Background
+	AM_RANGE(0x400000, 0x403fff) AM_RAM_WRITE(tetrisp2_vram_fg_w) AM_SHARE("vram_fg")			// Foreground
+	AM_RANGE(0x404000, 0x407fff) AM_RAM_WRITE(tetrisp2_vram_bg_w) AM_SHARE("vram_bg")			// Background
 //	AM_RANGE(0x408000, 0x409fff) AM_RAM															// ???
 	AM_RANGE(0x500000, 0x50ffff) AM_RAM															// Line
-	AM_RANGE(0x600000, 0x60ffff) AM_RAM_WRITE(tetrisp2_vram_rot_w) AM_BASE( m_vram_rot )		// Rotation
-	AM_RANGE(0x900000, 0x903fff) AM_READWRITE(tetrisp2_nvram_r, tetrisp2_nvram_w) AM_BASE( m_nvram) AM_SHARE("nvram")	// NVRAM
+	AM_RANGE(0x600000, 0x60ffff) AM_RAM_WRITE(tetrisp2_vram_rot_w) AM_SHARE("vram_rot")		// Rotation
+	AM_RANGE(0x900000, 0x903fff) AM_READWRITE(tetrisp2_nvram_r, tetrisp2_nvram_w) AM_SHARE("nvram")	// NVRAM
 	AM_RANGE(0x904000, 0x907fff) AM_READWRITE(tetrisp2_nvram_r, tetrisp2_nvram_w)				// NVRAM (mirror)
 
 	AM_RANGE(0xa10000, 0xa10001) AM_READ_PORT("FEET") AM_WRITE(stepstag_leds_w)					// I/O
@@ -623,10 +623,10 @@ static ADDRESS_MAP_START( stepstag_map, AS_PROGRAM, 16, stepstag_state )
 
 	AM_RANGE(0xb00000, 0xb00001) AM_WRITENOP													// Coin Counter plus other things
 	AM_RANGE(0xb20000, 0xb20001) AM_WRITENOP													// protection related?
-	AM_RANGE(0xb40000, 0xb4000b) AM_WRITEONLY AM_BASE( m_scroll_fg )							// Foreground Scrolling
-	AM_RANGE(0xb40010, 0xb4001b) AM_WRITEONLY AM_BASE( m_scroll_bg )							// Background Scrolling
+	AM_RANGE(0xb40000, 0xb4000b) AM_WRITEONLY AM_SHARE("scroll_fg")							// Foreground Scrolling
+	AM_RANGE(0xb40010, 0xb4001b) AM_WRITEONLY AM_SHARE("scroll_bg")							// Background Scrolling
 	AM_RANGE(0xb4003e, 0xb4003f) AM_WRITENOP													// scr_size
-	AM_RANGE(0xb60000, 0xb6002f) AM_WRITEONLY AM_BASE( m_rotregs )								// Rotation Registers
+	AM_RANGE(0xb60000, 0xb6002f) AM_WRITEONLY AM_SHARE("rotregs")								// Rotation Registers
 	AM_RANGE(0xba0000, 0xba001f) AM_WRITE(rockn_systemregs_w)									// System param
 	AM_RANGE(0xba001e, 0xba001f) AM_WRITENOP													// Lev 2 irq ack
 	AM_RANGE(0xbe0000, 0xbe0001) AM_READNOP														// INT-level1 dummy read

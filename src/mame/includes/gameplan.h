@@ -26,13 +26,14 @@ class gameplan_state : public driver_device
 public:
 	gameplan_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+		  m_trvquest_question(*this, "trvquest_q"),
 		  m_via_0(*this, "via6522_0"),
 		  m_via_1(*this, "via6522_1"),
 		  m_via_2(*this, "via6522_2") { }
 
 	/* machine state */
 	UINT8   m_current_port;
-	UINT8   *m_trvquest_question;
+	optional_shared_ptr<UINT8> m_trvquest_question;
 
 	/* video state */
 	UINT8   *m_videoram;

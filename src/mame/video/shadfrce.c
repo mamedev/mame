@@ -76,7 +76,7 @@ VIDEO_START( shadfrce )
 
 	state->m_bg1tilemap = tilemap_create(machine, get_shadfrce_bg1tile_info,tilemap_scan_rows, 16, 16,32,32);
 
-	state->m_spvideoram_old = auto_alloc_array(machine, UINT16, state->m_spvideoram_size/2);
+	state->m_spvideoram_old = auto_alloc_array(machine, UINT16, state->m_spvideoram.bytes()/2);
 }
 
 WRITE16_MEMBER(shadfrce_state::shadfrce_bg0scrollx_w)
@@ -183,6 +183,6 @@ SCREEN_VBLANK( shadfrce )
 		shadfrce_state *state = screen.machine().driver_data<shadfrce_state>();
 
 		/* looks like sprites are *two* frames ahead */
-		memcpy(state->m_spvideoram_old, state->m_spvideoram, state->m_spvideoram_size);
+		memcpy(state->m_spvideoram_old, state->m_spvideoram, state->m_spvideoram.bytes());
 	}
 }

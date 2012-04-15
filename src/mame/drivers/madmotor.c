@@ -55,7 +55,7 @@ static ADDRESS_MAP_START( madmotor_map, AS_PROGRAM, 16, madmotor_state )
 	AM_RANGE(0x1a0010, 0x1a0017) AM_DEVWRITE_LEGACY("tilegen3", deco_bac06_pf_control_1_w)
 	AM_RANGE(0x1a4000, 0x1a4fff) AM_DEVREADWRITE_LEGACY("tilegen3", deco_bac06_pf_data_r, deco_bac06_pf_data_w)
 	AM_RANGE(0x3e0000, 0x3e3fff) AM_RAM
-	AM_RANGE(0x3e8000, 0x3e87ff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
+	AM_RANGE(0x3e8000, 0x3e87ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x3f0000, 0x3f07ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x3f8002, 0x3f8003) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x3f8004, 0x3f8005) AM_READ_PORT("DSW")

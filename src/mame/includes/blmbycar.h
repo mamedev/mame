@@ -8,16 +8,21 @@ class blmbycar_state : public driver_device
 {
 public:
 	blmbycar_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_vram_1(*this, "vram_1"),
+		m_vram_0(*this, "vram_0"),
+		m_scroll_1(*this, "scroll_1"),
+		m_scroll_0(*this, "scroll_0"),
+		m_paletteram(*this, "paletteram"),
+		m_spriteram(*this, "spriteram"){ }
 
 	/* memory pointers */
-	UINT16 *    m_vram_0;
-	UINT16 *    m_scroll_0;
-	UINT16 *    m_vram_1;
-	UINT16 *    m_scroll_1;
-	UINT16 *    m_spriteram;
-	UINT16 *    m_paletteram;
-	size_t      m_spriteram_size;
+	required_shared_ptr<UINT16> m_vram_1;
+	required_shared_ptr<UINT16> m_vram_0;
+	required_shared_ptr<UINT16> m_scroll_1;
+	required_shared_ptr<UINT16> m_scroll_0;
+	required_shared_ptr<UINT16> m_paletteram;
+	required_shared_ptr<UINT16> m_spriteram;
 
 	/* video-related */
 	tilemap_t     *m_tilemap_0;

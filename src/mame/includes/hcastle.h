@@ -12,12 +12,17 @@ public:
 	hcastle_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		  m_spriteram(*this, "spriteram"),
-		  m_spriteram2(*this, "spriteram2") { }
+		  m_spriteram2(*this, "spriteram2") ,
+		m_paletteram(*this, "paletteram"),
+		m_pf1_videoram(*this, "pf1_videoram"),
+		m_pf2_videoram(*this, "pf2_videoram"){ }
 
+	required_device<buffered_spriteram8_device> m_spriteram;
+	required_device<buffered_spriteram8_device> m_spriteram2;
 	/* memory pointers */
-	UINT8 *    m_pf1_videoram;
-	UINT8 *    m_pf2_videoram;
-	UINT8 *    m_paletteram;
+	required_shared_ptr<UINT8> m_paletteram;
+	required_shared_ptr<UINT8> m_pf1_videoram;
+	required_shared_ptr<UINT8> m_pf2_videoram;
 
 	/* video-related */
 	tilemap_t    *m_fg_tilemap;
@@ -33,8 +38,6 @@ public:
 	device_t *m_k007121_1;
 	device_t *m_k007121_2;
 
-	required_device<buffered_spriteram8_device> m_spriteram;
-	required_device<buffered_spriteram8_device> m_spriteram2;
 	DECLARE_WRITE8_MEMBER(hcastle_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(hcastle_soundirq_w);
 	DECLARE_WRITE8_MEMBER(hcastle_coin_w);

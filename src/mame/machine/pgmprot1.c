@@ -184,7 +184,7 @@ static ADDRESS_MAP_START( 55857E_arm7_map, AS_PROGRAM, 32, pgm_arm_type1_state )
 	AM_RANGE(0x40000000, 0x40000003) AM_READWRITE_LEGACY(pgm_arm7_type1_protlatch_r, pgm_arm7_type1_protlatch_w)
 	AM_RANGE(0x40000008, 0x4000000b) AM_WRITENOP // ?
 	AM_RANGE(0x4000000c, 0x4000000f) AM_READ_LEGACY(pgm_arm7_type1_unk_r)
-	AM_RANGE(0x50800000, 0x5080003f) AM_READWRITE_LEGACY(pgm_arm7_type1_shareram_r, pgm_arm7_type1_shareram_w) AM_BASE(m_arm7_shareram)
+	AM_RANGE(0x50800000, 0x5080003f) AM_READWRITE_LEGACY(pgm_arm7_type1_shareram_r, pgm_arm7_type1_shareram_w) AM_SHARE("arm7_shareram")
 	AM_RANGE(0x50000000, 0x500003ff) AM_RAM // uploads xor table to decrypt 68k rom here
 ADDRESS_MAP_END
 

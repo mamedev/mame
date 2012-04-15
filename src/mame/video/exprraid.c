@@ -96,7 +96,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	exprraid_state *state = machine.driver_data<exprraid_state>();
 	int offs;
 
-	for (offs = 0; offs < state->m_spriteram_size; offs += 4)
+	for (offs = 0; offs < state->m_spriteram.bytes(); offs += 4)
 	{
 		int attr = state->m_spriteram[offs + 1];
 		int code = state->m_spriteram[offs + 3] + ((attr & 0xe0) << 3);

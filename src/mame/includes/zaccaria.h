@@ -2,7 +2,11 @@ class zaccaria_state : public driver_device
 {
 public:
 	zaccaria_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"),
+		m_attributesram(*this, "attributesram"),
+		m_spriteram(*this, "spriteram"),
+		m_spriteram2(*this, "spriteram2"){ }
 
 	int m_dsw;
 	int m_active_8910;
@@ -10,11 +14,11 @@ public:
 	int m_acs;
 	int m_last_port0b;
 	int m_toggle;
-	UINT8 *m_videoram;
-	UINT8 *m_attributesram;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_attributesram;
 	tilemap_t *m_bg_tilemap;
-	UINT8 *m_spriteram;
-	UINT8 *m_spriteram2;
+	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<UINT8> m_spriteram2;
 	UINT8 m_nmi_mask;
 	DECLARE_READ8_MEMBER(zaccaria_dsw_r);
 	DECLARE_WRITE8_MEMBER(sound_command_w);

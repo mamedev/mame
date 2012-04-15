@@ -3,15 +3,16 @@ class bublbobl_state : public driver_device
 {
 public:
 	bublbobl_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"),
+		m_objectram(*this, "objectram"),
+		m_mcu_sharedram(*this, "mcu_sharedram"){ }
 
 	/* memory pointers */
-	UINT8 *  m_mcu_sharedram;
-	UINT8 *  m_videoram;
-	UINT8 *  m_objectram;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_objectram;
+	required_shared_ptr<UINT8> m_mcu_sharedram;
 //  UINT8 *  paletteram;    // currently this uses generic palette handling
-	size_t   m_videoram_size;
-	size_t   m_objectram_size;
 
 	/* video-related */
 	int      m_video_enable;

@@ -8,12 +8,14 @@ class jackal_state : public driver_device
 {
 public:
 	jackal_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoctrl(*this, "videoctrl"),
+		m_paletteram(*this, "paletteram"){ }
 
 	/* memory pointers */
-	UINT8 *  m_videoctrl;
+	required_shared_ptr<UINT8> m_videoctrl;
 	UINT8 *  m_scrollram;
-	UINT8 *  m_paletteram;
+	required_shared_ptr<UINT8> m_paletteram;
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;

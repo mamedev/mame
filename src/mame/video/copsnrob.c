@@ -15,7 +15,7 @@ SCREEN_UPDATE_IND16( copsnrob )
 
 	/* redrawing the entire display is faster in this case */
 
-	for (offs = state->m_videoram_size; offs >= 0; offs--)
+	for (offs = state->m_videoram.bytes(); offs >= 0; offs--)
 	{
 		int sx,sy;
 

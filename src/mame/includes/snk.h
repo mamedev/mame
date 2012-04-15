@@ -8,7 +8,11 @@ class snk_state : public driver_device
 {
 public:
 	snk_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_spriteram(*this, "spriteram"),
+		m_fg_videoram(*this, "fg_videoram"),
+		m_bg_videoram(*this, "bg_videoram"),
+		m_tx_videoram(*this, "tx_videoram"){ }
 
 	int m_countryc_trackball;
 	int m_last_value[2];
@@ -18,10 +22,10 @@ public:
 	// FIXME this should be initialised on machine reset
 	int m_sound_status;
 
-	UINT8 *m_spriteram;
-	UINT8 *m_tx_videoram;
-	UINT8 *m_fg_videoram;
-	UINT8 *m_bg_videoram;
+	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<UINT8> m_fg_videoram;
+	required_shared_ptr<UINT8> m_bg_videoram;
+	required_shared_ptr<UINT8> m_tx_videoram;
 
 	tilemap_t *m_tx_tilemap;
 	tilemap_t *m_fg_tilemap;

@@ -11,15 +11,19 @@ class jailbrek_state : public driver_device
 {
 public:
 	jailbrek_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_colorram(*this, "colorram"),
+		m_videoram(*this, "videoram"),
+		m_spriteram(*this, "spriteram"),
+		m_scroll_x(*this, "scroll_x"),
+		m_scroll_dir(*this, "scroll_dir"){ }
 
 	/* memory pointers */
-	UINT8 *      m_videoram;
-	UINT8 *      m_colorram;
-	UINT8 *      m_spriteram;
-	UINT8 *      m_scroll_x;
-	UINT8 *      m_scroll_dir;
-	size_t       m_spriteram_size;
+	required_shared_ptr<UINT8> m_colorram;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<UINT8> m_scroll_x;
+	required_shared_ptr<UINT8> m_scroll_dir;
 
 	/* video-related */
 	tilemap_t      *m_bg_tilemap;

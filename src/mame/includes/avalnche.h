@@ -11,11 +11,11 @@ class avalnche_state : public driver_device
 {
 public:
 	avalnche_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"){ }
 
 	/* video-related */
-	UINT8 *  m_videoram;
-	size_t   m_videoram_size;
+	required_shared_ptr<UINT8> m_videoram;
 
 	UINT8    m_avalance_video_inverted;
 	DECLARE_WRITE8_MEMBER(avalance_video_invert_w);

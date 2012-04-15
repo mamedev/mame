@@ -68,17 +68,17 @@ WRITE8_MEMBER(sbasketb_state::irq_mask_w)
 
 static ADDRESS_MAP_START( sbasketb_map, AS_PROGRAM, 8, sbasketb_state )
 	AM_RANGE(0x2000, 0x2fff) AM_RAM
-	AM_RANGE(0x3000, 0x33ff) AM_RAM_WRITE(sbasketb_colorram_w) AM_BASE(m_colorram)
-	AM_RANGE(0x3400, 0x37ff) AM_RAM_WRITE(sbasketb_videoram_w) AM_BASE(m_videoram)
-	AM_RANGE(0x3800, 0x39ff) AM_RAM AM_BASE(m_spriteram)
+	AM_RANGE(0x3000, 0x33ff) AM_RAM_WRITE(sbasketb_colorram_w) AM_SHARE("colorram")
+	AM_RANGE(0x3400, 0x37ff) AM_RAM_WRITE(sbasketb_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x3800, 0x39ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x3a00, 0x3bff) AM_RAM           /* Probably unused, but initialized */
 	AM_RANGE(0x3c00, 0x3c00) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x3c10, 0x3c10) AM_READNOP    /* ???? */
-	AM_RANGE(0x3c20, 0x3c20) AM_WRITEONLY AM_BASE(m_palettebank)
+	AM_RANGE(0x3c20, 0x3c20) AM_WRITEONLY AM_SHARE("palettebank")
 	AM_RANGE(0x3c80, 0x3c80) AM_WRITE(sbasketb_flipscreen_w)
 	AM_RANGE(0x3c81, 0x3c81) AM_WRITE(irq_mask_w)
 	AM_RANGE(0x3c83, 0x3c84) AM_WRITE(sbasketb_coin_counter_w)
-	AM_RANGE(0x3c85, 0x3c85) AM_WRITEONLY AM_BASE(m_spriteram_select)
+	AM_RANGE(0x3c85, 0x3c85) AM_WRITEONLY AM_SHARE("spriteramsel")
 	AM_RANGE(0x3d00, 0x3d00) AM_WRITE(soundlatch_byte_w)
 	AM_RANGE(0x3d80, 0x3d80) AM_WRITE(sbasketb_sh_irqtrigger_w)
 	AM_RANGE(0x3e00, 0x3e00) AM_READ_PORT("SYSTEM")
@@ -87,7 +87,7 @@ static ADDRESS_MAP_START( sbasketb_map, AS_PROGRAM, 8, sbasketb_state )
 	AM_RANGE(0x3e03, 0x3e03) AM_READNOP
 	AM_RANGE(0x3e80, 0x3e80) AM_READ_PORT("DSW2")
 	AM_RANGE(0x3f00, 0x3f00) AM_READ_PORT("DSW1")
-	AM_RANGE(0x3f80, 0x3f80) AM_WRITEONLY AM_BASE(m_scroll)
+	AM_RANGE(0x3f80, 0x3f80) AM_WRITEONLY AM_SHARE("scroll")
 	AM_RANGE(0x6000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

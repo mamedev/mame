@@ -61,11 +61,11 @@ WRITE8_MEMBER(scotrsht_state::scotrsht_soundlatch_w)
 }
 
 static ADDRESS_MAP_START( scotrsht_map, AS_PROGRAM, 8, scotrsht_state )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM_WRITE(scotrsht_colorram_w) AM_BASE(m_colorram)
-	AM_RANGE(0x0800, 0x0fff) AM_RAM_WRITE(scotrsht_videoram_w) AM_BASE(m_videoram)
-	AM_RANGE(0x1000, 0x10bf) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size) /* sprites */
+	AM_RANGE(0x0000, 0x07ff) AM_RAM_WRITE(scotrsht_colorram_w) AM_SHARE("colorram")
+	AM_RANGE(0x0800, 0x0fff) AM_RAM_WRITE(scotrsht_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x1000, 0x10bf) AM_RAM AM_SHARE("spriteram") /* sprites */
 	AM_RANGE(0x10c0, 0x1fff) AM_RAM /* work ram */
-	AM_RANGE(0x2000, 0x201f) AM_RAM AM_BASE(m_scroll) /* scroll registers */
+	AM_RANGE(0x2000, 0x201f) AM_RAM AM_SHARE("scroll") /* scroll registers */
 	AM_RANGE(0x2040, 0x2040) AM_WRITENOP
 	AM_RANGE(0x2041, 0x2041) AM_WRITENOP
 	AM_RANGE(0x2042, 0x2042) AM_WRITENOP  /* it should be -> bit 2 = scroll direction like in jailbrek, but it's not used */

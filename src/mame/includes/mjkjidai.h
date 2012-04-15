@@ -2,17 +2,21 @@ class mjkjidai_state : public driver_device
 {
 public:
 	mjkjidai_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_nvram(*this, "nvram"),
+		m_spriteram1(*this, "spriteram1"),
+		m_spriteram2(*this, "spriteram2"),
+		m_spriteram3(*this, "spriteram3"),
+		m_videoram(*this, "videoram"){ }
 
-	UINT8 *m_videoram;
-	UINT8 *m_spriteram1;
-	UINT8 *m_spriteram2;
-	UINT8 *m_spriteram3;
+	required_shared_ptr<UINT8> m_nvram;
+	required_shared_ptr<UINT8> m_spriteram1;
+	required_shared_ptr<UINT8> m_spriteram2;
+	required_shared_ptr<UINT8> m_spriteram3;
+	required_shared_ptr<UINT8> m_videoram;
 
 	int m_keyb;
 	int m_nvram_init_count;
-	UINT8 *m_nvram;
-	size_t m_nvram_size;
 	int m_display_enable;
 	tilemap_t *m_bg_tilemap;
 

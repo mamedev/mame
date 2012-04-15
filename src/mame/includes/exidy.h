@@ -23,18 +23,27 @@ class exidy_state : public driver_device
 {
 public:
 	exidy_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"),
+		m_sprite1_xpos(*this, "sprite1_xpos"),
+		m_sprite1_ypos(*this, "sprite1_ypos"),
+		m_sprite2_xpos(*this, "sprite2_xpos"),
+		m_sprite2_ypos(*this, "sprite2_ypos"),
+		m_spriteno(*this, "spriteno"),
+		m_sprite_enable(*this, "sprite_enable"),
+		m_color_latch(*this, "color_latch"),
+		m_characterram(*this, "characterram"){ }
 
 	UINT8 m_last_dial;
-	UINT8 *m_videoram;
-	UINT8 *m_characterram;
-	UINT8 *m_color_latch;
-	UINT8 *m_sprite1_xpos;
-	UINT8 *m_sprite1_ypos;
-	UINT8 *m_sprite2_xpos;
-	UINT8 *m_sprite2_ypos;
-	UINT8 *m_spriteno;
-	UINT8 *m_sprite_enable;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_sprite1_xpos;
+	required_shared_ptr<UINT8> m_sprite1_ypos;
+	required_shared_ptr<UINT8> m_sprite2_xpos;
+	required_shared_ptr<UINT8> m_sprite2_ypos;
+	required_shared_ptr<UINT8> m_spriteno;
+	required_shared_ptr<UINT8> m_sprite_enable;
+	required_shared_ptr<UINT8> m_color_latch;
+	required_shared_ptr<UINT8> m_characterram;
 	UINT8 m_collision_mask;
 	UINT8 m_collision_invert;
 	int m_is_2bpp;

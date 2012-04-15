@@ -3,11 +3,13 @@ class taitob_state : public driver_device
 {
 public:
 	taitob_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_spriteram(*this, "spriteram"),
+		m_pixelram(*this, "pixelram"){ }
 
 	/* memory pointers */
-	UINT16 *      m_spriteram;
-	UINT16 *      m_pixelram;
+	required_shared_ptr<UINT16> m_spriteram;
+	required_shared_ptr<UINT16> m_pixelram;
 //  UINT16 *      m_paletteram;   // this currently uses generic palette handlers
 
 	/* video-related */

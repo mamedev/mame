@@ -818,8 +818,8 @@ static ADDRESS_MAP_START( srider_map, AS_PROGRAM, 8, subsino_state )
 
 	AM_RANGE( 0x0d01b, 0x0d01b ) AM_WRITE(subsino_tiles_offset_w )
 
-	AM_RANGE( 0x0e000, 0x0e7ff ) AM_RAM_WRITE(subsino_colorram_w ) AM_BASE(m_colorram )
-	AM_RANGE( 0x0e800, 0x0efff ) AM_RAM_WRITE(subsino_videoram_w ) AM_BASE(m_videoram )
+	AM_RANGE( 0x0e000, 0x0e7ff ) AM_RAM_WRITE(subsino_colorram_w ) AM_SHARE("colorram")
+	AM_RANGE( 0x0e800, 0x0efff ) AM_RAM_WRITE(subsino_videoram_w ) AM_SHARE("videoram")
 ADDRESS_MAP_END
 
 
@@ -846,8 +846,8 @@ static ADDRESS_MAP_START( sharkpy_map, AS_PROGRAM, 8, subsino_state )
 	AM_RANGE( 0x0901b, 0x0901b ) AM_WRITE(subsino_tiles_offset_w )
 
 	AM_RANGE( 0x07800, 0x07fff ) AM_RAM
-	AM_RANGE( 0x08000, 0x087ff ) AM_RAM_WRITE(subsino_colorram_w ) AM_BASE(m_colorram )
-	AM_RANGE( 0x08800, 0x08fff ) AM_RAM_WRITE(subsino_videoram_w ) AM_BASE(m_videoram )
+	AM_RANGE( 0x08000, 0x087ff ) AM_RAM_WRITE(subsino_colorram_w ) AM_SHARE("colorram")
+	AM_RANGE( 0x08800, 0x08fff ) AM_RAM_WRITE(subsino_videoram_w ) AM_SHARE("videoram")
 
 	AM_RANGE( 0x00000, 0x13fff ) AM_ROM //overlap unmapped regions
 ADDRESS_MAP_END
@@ -880,8 +880,8 @@ static ADDRESS_MAP_START( victor21_map, AS_PROGRAM, 8, subsino_state )
 	AM_RANGE( 0x0900d, 0x0900d ) AM_WRITE(subsino_tiles_offset_w )
 
 	AM_RANGE( 0x07800, 0x07fff ) AM_RAM
-	AM_RANGE( 0x08000, 0x087ff ) AM_RAM_WRITE(subsino_videoram_w ) AM_BASE(m_videoram )
-	AM_RANGE( 0x08800, 0x08fff ) AM_RAM_WRITE(subsino_colorram_w ) AM_BASE(m_colorram )
+	AM_RANGE( 0x08000, 0x087ff ) AM_RAM_WRITE(subsino_videoram_w ) AM_SHARE("videoram")
+	AM_RANGE( 0x08800, 0x08fff ) AM_RAM_WRITE(subsino_colorram_w ) AM_SHARE("colorram")
 
 	AM_RANGE( 0x00000, 0x08fff ) AM_ROM //overlap unmapped regions
 	AM_RANGE( 0x10000, 0x13fff ) AM_ROM
@@ -976,8 +976,8 @@ static ADDRESS_MAP_START( crsbingo_map, AS_PROGRAM, 8, subsino_state )
 //  AM_RANGE( 0x0900d, 0x0900d ) AM_WRITE(subsino_tiles_offset_w )
 
 	AM_RANGE( 0x07800, 0x07fff ) AM_RAM
-	AM_RANGE( 0x08000, 0x087ff ) AM_RAM_WRITE(subsino_videoram_w ) AM_BASE(m_videoram )
-	AM_RANGE( 0x08800, 0x08fff ) AM_RAM_WRITE(subsino_colorram_w ) AM_BASE(m_colorram )
+	AM_RANGE( 0x08000, 0x087ff ) AM_RAM_WRITE(subsino_videoram_w ) AM_SHARE("videoram")
+	AM_RANGE( 0x08800, 0x08fff ) AM_RAM_WRITE(subsino_colorram_w ) AM_SHARE("colorram")
 
 	AM_RANGE( 0x00000, 0x8fff ) AM_ROM //overlap unmapped regions
 
@@ -1025,8 +1025,8 @@ static ADDRESS_MAP_START( tisub_map, AS_PROGRAM, 8, subsino_state )
 	AM_RANGE( 0x0901b, 0x0901b ) AM_WRITE(subsino_tiles_offset_w )
 
 	AM_RANGE( 0x07800, 0x07fff ) AM_RAM
-	AM_RANGE( 0x08800, 0x08fff ) AM_RAM_WRITE(subsino_videoram_w ) AM_BASE(m_videoram )
-	AM_RANGE( 0x08000, 0x087ff ) AM_RAM_WRITE(subsino_colorram_w ) AM_BASE(m_colorram )
+	AM_RANGE( 0x08800, 0x08fff ) AM_RAM_WRITE(subsino_videoram_w ) AM_SHARE("videoram")
+	AM_RANGE( 0x08000, 0x087ff ) AM_RAM_WRITE(subsino_colorram_w ) AM_SHARE("colorram")
 
 	AM_RANGE( 0x00000, 0x0bfff ) AM_ROM // overlap unmapped regions
 	AM_RANGE( 0x10000, 0x13fff ) AM_ROM
@@ -1153,8 +1153,8 @@ static ADDRESS_MAP_START( stisub_map, AS_PROGRAM, 8, subsino_state )
 
 //  AM_RANGE( 0x0d01b, 0x0d01b ) AM_WRITE(subsino_tiles_offset_w )
 
-	AM_RANGE( 0x0e000, 0x0e7ff ) AM_RAM_WRITE(subsino_colorram_w ) AM_BASE(m_colorram )
-	AM_RANGE( 0x0e800, 0x0efff ) AM_RAM_WRITE(subsino_videoram_w ) AM_BASE(m_videoram )
+	AM_RANGE( 0x0e000, 0x0e7ff ) AM_RAM_WRITE(subsino_colorram_w ) AM_SHARE("colorram")
+	AM_RANGE( 0x0e800, 0x0efff ) AM_RAM_WRITE(subsino_videoram_w ) AM_SHARE("videoram")
 
 	AM_RANGE( 0xf000, 0xf7ff ) AM_READWRITE(reel_scrollattr_r, reel_scrollattr_w)
 
@@ -1194,8 +1194,8 @@ static ADDRESS_MAP_START( mtrainnv_map, AS_PROGRAM, 8, subsino_state )
 
 //  AM_RANGE( 0x0d018, 0x0d018 ) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 
-	AM_RANGE( 0x0e000, 0x0e7ff ) AM_RAM_WRITE(subsino_colorram_w ) AM_BASE(m_colorram )
-	AM_RANGE( 0x0e800, 0x0efff ) AM_RAM_WRITE(subsino_videoram_w ) AM_BASE(m_videoram )
+	AM_RANGE( 0x0e000, 0x0e7ff ) AM_RAM_WRITE(subsino_colorram_w ) AM_SHARE("colorram")
+	AM_RANGE( 0x0e800, 0x0efff ) AM_RAM_WRITE(subsino_videoram_w ) AM_SHARE("videoram")
 
 	AM_RANGE( 0xf000, 0xf7ff ) AM_READWRITE(reel_scrollattr_r, reel_scrollattr_w)
 

@@ -47,12 +47,12 @@ static ADDRESS_MAP_START( gotya_map, AS_PROGRAM, 8, gotya_state )
 	AM_RANGE(0x6002, 0x6002) AM_READ_PORT("DSW")
 	AM_RANGE(0x6004, 0x6004) AM_WRITE(gotya_video_control_w)
 	AM_RANGE(0x6005, 0x6005) AM_WRITE(gotya_soundlatch_w)
-	AM_RANGE(0x6006, 0x6006) AM_WRITEONLY AM_BASE(m_scroll)
+	AM_RANGE(0x6006, 0x6006) AM_WRITEONLY AM_SHARE("scroll")
 	AM_RANGE(0x6007, 0x6007) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(gotya_videoram_w) AM_BASE(m_videoram)
-	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(gotya_colorram_w) AM_BASE(m_colorram)
-	AM_RANGE(0xd000, 0xd3df) AM_RAM AM_BASE(m_videoram2)
-	AM_RANGE(0xd3e0, 0xd3ff) AM_RAM AM_BASE(m_spriteram)
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(gotya_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(gotya_colorram_w) AM_SHARE("colorram")
+	AM_RANGE(0xd000, 0xd3df) AM_RAM AM_SHARE("videoram2")
+	AM_RANGE(0xd3e0, 0xd3ff) AM_RAM AM_SHARE("spriteram")
 ADDRESS_MAP_END
 
 

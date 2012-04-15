@@ -45,7 +45,7 @@ YM2151:
 static ADDRESS_MAP_START( memmap, AS_PROGRAM, 8, mustache_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xcfff) AM_RAM_WRITE(mustache_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0xc000, 0xcfff) AM_RAM_WRITE(mustache_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0xd000, 0xd000) AM_WRITE_LEGACY(t5182_sound_irq_w)
 	AM_RANGE(0xd001, 0xd001) AM_READ_LEGACY(t5182_sharedram_semaphore_snd_r)
 	AM_RANGE(0xd002, 0xd002) AM_WRITE_LEGACY(t5182_sharedram_semaphore_main_acquire_w)
@@ -58,7 +58,7 @@ static ADDRESS_MAP_START( memmap, AS_PROGRAM, 8, mustache_state )
 	AM_RANGE(0xd804, 0xd804) AM_READ_PORT("DSWB")
 	AM_RANGE(0xd806, 0xd806) AM_WRITE(mustache_scroll_w)
 	AM_RANGE(0xd807, 0xd807) AM_WRITE(mustache_video_control_w)
-	AM_RANGE(0xe800, 0xefff) AM_WRITEONLY AM_BASE_SIZE(m_spriteram, m_spriteram_size)
+	AM_RANGE(0xe800, 0xefff) AM_WRITEONLY AM_SHARE("spriteram")
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 

@@ -22,18 +22,12 @@ public:
 		  m_raster_irq_timer(*this, "raster_timer"),
 		  m_oki2(*this, "oki2"),
 		  m_spriteram(*this, "spriteram"),
-		  m_spriteram2(*this, "spriteram2") { }
-
-	/* memory pointers */
-	UINT16 *   m_ram;
-	UINT16 *   m_pf1_rowscroll;
-	UINT16 *   m_pf2_rowscroll;
-	UINT16 *   m_pf3_rowscroll;
-	UINT16 *   m_pf4_rowscroll;
-
-	/* misc */
-	int        m_scanline;
-	int        m_irq_mask;
+		  m_spriteram2(*this, "spriteram2") ,
+		m_pf1_rowscroll(*this, "pf1_rowscroll"),
+		m_pf2_rowscroll(*this, "pf2_rowscroll"),
+		m_pf3_rowscroll(*this, "pf3_rowscroll"),
+		m_pf4_rowscroll(*this, "pf4_rowscroll"),
+		m_ram(*this, "ram"){ }
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -45,6 +39,17 @@ public:
 	optional_device<okim6295_device> m_oki2;
 	required_device<buffered_spriteram16_device> m_spriteram;
 	optional_device<buffered_spriteram16_device> m_spriteram2;
+	/* memory pointers */
+	required_shared_ptr<UINT16> m_pf1_rowscroll;
+	required_shared_ptr<UINT16> m_pf2_rowscroll;
+	required_shared_ptr<UINT16> m_pf3_rowscroll;
+	required_shared_ptr<UINT16> m_pf4_rowscroll;
+	required_shared_ptr<UINT16> m_ram;
+
+	/* misc */
+	int        m_scanline;
+	int        m_irq_mask;
+
 	DECLARE_WRITE16_MEMBER(cninja_sound_w);
 	DECLARE_WRITE16_MEMBER(stoneage_sound_w);
 	DECLARE_READ16_MEMBER(cninja_irq_r);

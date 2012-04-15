@@ -72,17 +72,35 @@ class galpani3_state : public kaneko16_state
 public:
 	galpani3_state(const machine_config &mconfig, device_type type, const char *tag)
 		: kaneko16_state(mconfig, type, tag),
+		m_priority_buffer(*this, "priority_buffer"),
+		m_framebuffer1(*this, "framebuffer1"),
+		m_framebuffer2(*this, "framebuffer2"),
+		m_framebuffer3(*this, "framebuffer3"),
+		m_framebuffer1_palette(*this, "fb1_palette"),
+		m_framebuffer2_palette(*this, "fb2_palette"),
+		m_framebuffer3_palette(*this, "fb3_palette"),
+		m_framebuffer1_bgcol(*this, "fb1_bgcol"),
+		m_framebuffer2_bgcol(*this, "fb2_bgcol"),
+		m_framebuffer3_bgcol(*this, "fb3_bgcol"),
+		m_framebuffer3_bright1(*this, "fb3_bright1"),
+		m_framebuffer3_bright2(*this, "fb3_bright2"),
+		m_framebuffer2_bright1(*this, "fb2_bright1"),
+		m_framebuffer2_bright2(*this, "fb2_bright2"),
+		m_framebuffer1_bright1(*this, "fb1_bright1"),
+		m_framebuffer1_bright2(*this, "fb1_bright2"),
+		m_sprregs(*this, "sprregs"),
 		m_sprite_bitmap_1(1024, 1024),
+		m_mcu_ram(*this, "mcu_ram"),
 		m_maincpu(*this,"maincpu")
 		{ }
 
-	UINT16* m_priority_buffer;
-	UINT16* m_framebuffer1;
-	UINT16* m_framebuffer2;
-	UINT16* m_framebuffer3;
-	UINT16* m_framebuffer1_palette;
-	UINT16* m_framebuffer2_palette;
-	UINT16* m_framebuffer3_palette;
+	required_shared_ptr<UINT16> m_priority_buffer;
+	required_shared_ptr<UINT16> m_framebuffer1;
+	required_shared_ptr<UINT16> m_framebuffer2;
+	required_shared_ptr<UINT16> m_framebuffer3;
+	required_shared_ptr<UINT16> m_framebuffer1_palette;
+	required_shared_ptr<UINT16> m_framebuffer2_palette;
+	required_shared_ptr<UINT16> m_framebuffer3_palette;
 	UINT16 m_framebuffer3_scrolly;
 	UINT16 m_framebuffer3_scrollx;
 	UINT16 m_framebuffer2_scrolly;
@@ -94,20 +112,20 @@ public:
 	UINT16 m_framebuffer1_enable;
 	UINT16 m_framebuffer2_enable;
 	UINT16 m_framebuffer3_enable;
-	UINT16* m_framebuffer1_bgcol;
-	UINT16* m_framebuffer2_bgcol;
-	UINT16* m_framebuffer3_bgcol;
-	UINT16* m_framebuffer3_bright1;
-	UINT16* m_framebuffer3_bright2;
-	UINT16* m_framebuffer2_bright1;
-	UINT16* m_framebuffer2_bright2;
-	UINT16* m_framebuffer1_bright1;
-	UINT16* m_framebuffer1_bright2;
-	UINT16 *m_sprregs;
+	required_shared_ptr<UINT16> m_framebuffer1_bgcol;
+	required_shared_ptr<UINT16> m_framebuffer2_bgcol;
+	required_shared_ptr<UINT16> m_framebuffer3_bgcol;
+	required_shared_ptr<UINT16> m_framebuffer3_bright1;
+	required_shared_ptr<UINT16> m_framebuffer3_bright2;
+	required_shared_ptr<UINT16> m_framebuffer2_bright1;
+	required_shared_ptr<UINT16> m_framebuffer2_bright2;
+	required_shared_ptr<UINT16> m_framebuffer1_bright1;
+	required_shared_ptr<UINT16> m_framebuffer1_bright2;
+	required_shared_ptr<UINT16> m_sprregs;
 	UINT32 m_spriteram32[0x4000/4];
 	UINT32 m_spc_regs[0x40/4];
 	bitmap_ind16 m_sprite_bitmap_1;
-	UINT16 *m_mcu_ram;
+	required_shared_ptr<UINT16> m_mcu_ram;
 	UINT16 m_mcu_com[4];
 	int m_regs1_i;
 	int m_regs2_i;
@@ -903,9 +921,9 @@ static ADDRESS_MAP_START( galpani3_map, AS_PROGRAM, 16, galpani3_state )
 	AM_RANGE(0x280000, 0x287fff) AM_RAM_WRITE(paletteram_xGGGGGRRRRRBBBBB_word_w)   AM_SHARE("paletteram") // area [A] - palette for sprites
 
 	AM_RANGE(0x300000, 0x303fff) AM_RAM_WRITE(galpani3_suprnova_sprite32_w) AM_SHARE("spriteram")
-	AM_RANGE(0x380000, 0x38003f) AM_RAM_WRITE(galpani3_suprnova_sprite32regs_w) AM_BASE(m_sprregs)
+	AM_RANGE(0x380000, 0x38003f) AM_RAM_WRITE(galpani3_suprnova_sprite32regs_w) AM_SHARE("sprregs")
 
-	AM_RANGE(0x400000, 0x40ffff) AM_RAM AM_BASE(m_mcu_ram) // area [C]
+	AM_RANGE(0x400000, 0x40ffff) AM_RAM AM_SHARE("mcu_ram") // area [C]
 
 	AM_RANGE(0x580000, 0x580001) AM_WRITE(galpani3_mcu_com0_w)	// ] see $387e8: these 2 locations are written (w.#$ffff)
 	AM_RANGE(0x600000, 0x600001) AM_WRITE(galpani3_mcu_com1_w)	// ] then bit #0 of $780000.l is tested: 0 = OK!
@@ -919,14 +937,14 @@ static ADDRESS_MAP_START( galpani3_map, AS_PROGRAM, 16, galpani3_state )
 	AM_RANGE(0x800800, 0x800bff) AM_RAM // ??? see subroutine $39f42 (R?)
 	AM_RANGE(0x800c00, 0x800c01) AM_WRITE(galpani3_framebuffer1_scrolly_w) // scroll?
 	AM_RANGE(0x800c02, 0x800c03) AM_WRITE(galpani3_framebuffer1_enable_w) // enable?
-	AM_RANGE(0x800c06, 0x800c07) AM_WRITE(galpani3_framebuffer1_bgcol_w) AM_BASE(m_framebuffer1_bgcol) // bg colour? cycles ingame, for girls?
-	AM_RANGE(0x800c10, 0x800c11) AM_RAM AM_BASE(m_framebuffer1_bright1) // brightness / blend amount?
-	AM_RANGE(0x800c12, 0x800c13) AM_RAM AM_BASE(m_framebuffer1_bright2) // similar.
+	AM_RANGE(0x800c06, 0x800c07) AM_WRITE(galpani3_framebuffer1_bgcol_w) AM_SHARE("fb1_bgcol") // bg colour? cycles ingame, for girls?
+	AM_RANGE(0x800c10, 0x800c11) AM_RAM AM_SHARE("fb1_bright1") // brightness / blend amount?
+	AM_RANGE(0x800c12, 0x800c13) AM_RAM AM_SHARE("fb1_bright2") // similar.
 	AM_RANGE(0x800c18, 0x800c1b) AM_WRITE(galpani3_regs1_address_w) // ROM address of RLE data, in bytes
 	AM_RANGE(0x800c1e, 0x800c1f) AM_WRITE(galpani3_regs1_go_w) // ?
 	AM_RANGE(0x800c00, 0x800c1f) AM_READ(galpani3_regs1_r)// ? R layer regs ? see subroutine $3a03e
-	AM_RANGE(0x880000, 0x8801ff) AM_RAM_WRITE(galpani3_framebuffer1_palette_w) AM_BASE(m_framebuffer1_palette) // palette
-	AM_RANGE(0x900000, 0x97ffff) AM_RAM AM_BASE(m_framebuffer1)// area [D] - R area ? odd bytes only, initialized 00..ff,00..ff,...
+	AM_RANGE(0x880000, 0x8801ff) AM_RAM_WRITE(galpani3_framebuffer1_palette_w) AM_SHARE("fb1_palette") // palette
+	AM_RANGE(0x900000, 0x97ffff) AM_RAM AM_SHARE("framebuffer1")// area [D] - R area ? odd bytes only, initialized 00..ff,00..ff,...
 
 	// GRAP2 2?
 	AM_RANGE(0xa00000, 0xa003ff) AM_RAM // ??? see subroutine $39f42 (G?)
@@ -934,14 +952,14 @@ static ADDRESS_MAP_START( galpani3_map, AS_PROGRAM, 16, galpani3_state )
 	AM_RANGE(0xa00800, 0xa00bff) AM_RAM // ??? see subroutine $39f42 (G?)
 	AM_RANGE(0xa00c00, 0xa00c01) AM_WRITE(galpani3_framebuffer2_scrolly_w)
 	AM_RANGE(0xa00c02, 0xa00c03) AM_WRITE(galpani3_framebuffer2_enable_w) // enable?
-	AM_RANGE(0xa00c06, 0xa00c07) AM_WRITE(galpani3_framebuffer2_bgcol_w) AM_BASE(m_framebuffer2_bgcol) // bg colour? same values as previous layer
-	AM_RANGE(0xa00c10, 0xa00c11) AM_RAM AM_BASE(m_framebuffer2_bright1) // similar..
-	AM_RANGE(0xa00c12, 0xa00c13) AM_RAM AM_BASE(m_framebuffer2_bright2) // brightness / blend amount?
+	AM_RANGE(0xa00c06, 0xa00c07) AM_WRITE(galpani3_framebuffer2_bgcol_w) AM_SHARE("fb2_bgcol") // bg colour? same values as previous layer
+	AM_RANGE(0xa00c10, 0xa00c11) AM_RAM AM_SHARE("fb2_bright1") // similar..
+	AM_RANGE(0xa00c12, 0xa00c13) AM_RAM AM_SHARE("fb2_bright2") // brightness / blend amount?
 	AM_RANGE(0xa00c00, 0xa00c1f) AM_READ(galpani3_regs2_r) // ? G layer regs ? see subroutine $3a03e
 	AM_RANGE(0xa00c18, 0xa00c1b) AM_WRITE(galpani3_regs2_address_w) // ROM address of RLE data, in bytes
 	AM_RANGE(0xa00c1e, 0xa00c1f) AM_WRITE(galpani3_regs2_go_w) // ?
-	AM_RANGE(0xa80000, 0xa801ff) AM_RAM_WRITE(galpani3_framebuffer2_palette_w) AM_BASE(m_framebuffer2_palette) // palette
-	AM_RANGE(0xb00000, 0xb7ffff) AM_RAM AM_BASE(m_framebuffer2) // area [E] - G area ? odd bytes only, initialized 00..ff,00..ff,...
+	AM_RANGE(0xa80000, 0xa801ff) AM_RAM_WRITE(galpani3_framebuffer2_palette_w) AM_SHARE("fb2_palette") // palette
+	AM_RANGE(0xb00000, 0xb7ffff) AM_RAM AM_SHARE("framebuffer2") // area [E] - G area ? odd bytes only, initialized 00..ff,00..ff,...
 
 	// GRAP2 3?
 	AM_RANGE(0xc00000, 0xc003ff) AM_RAM // row scroll??
@@ -949,17 +967,17 @@ static ADDRESS_MAP_START( galpani3_map, AS_PROGRAM, 16, galpani3_state )
 	AM_RANGE(0xc00800, 0xc00bff) AM_RAM // column scroll??
 	AM_RANGE(0xc00c00, 0xc00c01) AM_WRITE(galpani3_framebuffer3_scrolly_w) // scroll?
 	AM_RANGE(0xc00c02, 0xc00c03) AM_WRITE(galpani3_framebuffer3_enable_w) // enable?
-	AM_RANGE(0xc00c06, 0xc00c07) AM_WRITE(galpani3_framebuffer3_bgcol_w) AM_BASE(m_framebuffer3_bgcol) // bg colour? not used?
-	AM_RANGE(0xc00c10, 0xc00c11) AM_RAM AM_BASE(m_framebuffer3_bright1) // brightness / blend amount?
-	AM_RANGE(0xc00c12, 0xc00c13) AM_RAM AM_BASE(m_framebuffer3_bright2) // similar..
+	AM_RANGE(0xc00c06, 0xc00c07) AM_WRITE(galpani3_framebuffer3_bgcol_w) AM_SHARE("fb3_bgcol") // bg colour? not used?
+	AM_RANGE(0xc00c10, 0xc00c11) AM_RAM AM_SHARE("fb3_bright1") // brightness / blend amount?
+	AM_RANGE(0xc00c12, 0xc00c13) AM_RAM AM_SHARE("fb3_bright2") // similar..
 	AM_RANGE(0xc00c18, 0xc00c1b) AM_WRITE(galpani3_regs3_address_w) // ROM address of RLE data, in bytes
 	AM_RANGE(0xc00c1e, 0xc00c1f) AM_WRITE(galpani3_regs3_go_w) // ?
 	AM_RANGE(0xc00c00, 0xc00c1f) AM_READ(galpani3_regs3_r) // ? B layer regs ? see subroutine $3a03e
-	AM_RANGE(0xc80000, 0xc801ff) AM_RAM_WRITE(galpani3_framebuffer3_palette_w) AM_BASE(m_framebuffer3_palette) // palette
-	AM_RANGE(0xd00000, 0xd7ffff) AM_RAM AM_BASE(m_framebuffer3) // area [F] - B area ? odd bytes only, initialized 00..ff,00..ff,...
+	AM_RANGE(0xc80000, 0xc801ff) AM_RAM_WRITE(galpani3_framebuffer3_palette_w) AM_SHARE("fb3_palette") // palette
+	AM_RANGE(0xd00000, 0xd7ffff) AM_RAM AM_SHARE("framebuffer3") // area [F] - B area ? odd bytes only, initialized 00..ff,00..ff,...
 
 	// ?? priority / alpha buffer?
-	AM_RANGE(0xe00000, 0xe7ffff) AM_RAM AM_BASE(m_priority_buffer) // area [J] - A area ? odd bytes only, initialized 00..ff,00..ff,..., then cleared
+	AM_RANGE(0xe00000, 0xe7ffff) AM_RAM AM_SHARE("priority_buffer") // area [J] - A area ? odd bytes only, initialized 00..ff,00..ff,..., then cleared
 	AM_RANGE(0xe80000, 0xe80001) AM_WRITE(galpani3_priority_buffer_scrollx_w) // scroll?
 	AM_RANGE(0xe80002, 0xe80003) AM_WRITE(galpani3_priority_buffer_scrolly_w) // scroll?
 

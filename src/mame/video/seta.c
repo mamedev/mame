@@ -718,7 +718,7 @@ static void set_pens(running_machine &machine)
 	seta_state *state = machine.driver_data<seta_state>();
 	offs_t i;
 
-	for (i = 0; i < state->m_paletteram_size / 2; i++)
+	for (i = 0; i < state->m_paletteram.bytes() / 2; i++)
 	{
 		UINT16 data = state->m_paletteram[i];
 
@@ -732,16 +732,16 @@ static void set_pens(running_machine &machine)
 
 	if(state->m_paletteram2 != NULL)
 	{
-		for (i = 0; i < state->m_paletteram2_size / 2; i++)
+		for (i = 0; i < state->m_paletteram2.bytes() / 2; i++)
 		{
 			UINT16 data = state->m_paletteram2[i];
 
 			rgb_t color = MAKE_RGB(pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
 
 			if (machine.colortable != NULL)
-				colortable_palette_set_color(machine.colortable, i + state->m_paletteram_size / 2, color);
+				colortable_palette_set_color(machine.colortable, i + state->m_paletteram.bytes() / 2, color);
 			else
-				palette_set_color(machine, i + state->m_paletteram_size / 2, color);
+				palette_set_color(machine, i + state->m_paletteram.bytes() / 2, color);
 		}
 	}
 }

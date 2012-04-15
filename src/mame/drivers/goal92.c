@@ -49,19 +49,19 @@ READ16_MEMBER(goal92_state::goal92_inputs_r)
 static ADDRESS_MAP_START( goal92_map, AS_PROGRAM, 16, goal92_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x1007ff) AM_RAM
-	AM_RANGE(0x100800, 0x100fff) AM_RAM_WRITE(goal92_background_w) AM_BASE(m_bg_data)
-	AM_RANGE(0x101000, 0x1017ff) AM_RAM_WRITE(goal92_foreground_w) AM_BASE(m_fg_data)
+	AM_RANGE(0x100800, 0x100fff) AM_RAM_WRITE(goal92_background_w) AM_SHARE("bg_data")
+	AM_RANGE(0x101000, 0x1017ff) AM_RAM_WRITE(goal92_foreground_w) AM_SHARE("fg_data")
 	AM_RANGE(0x101800, 0x101fff) AM_RAM // it has tiles for clouds, but they aren't used
-	AM_RANGE(0x102000, 0x102fff) AM_RAM_WRITE(goal92_text_w) AM_BASE(m_tx_data)
+	AM_RANGE(0x102000, 0x102fff) AM_RAM_WRITE(goal92_text_w) AM_SHARE("tx_data")
 	AM_RANGE(0x103000, 0x103fff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x104000, 0x13ffff) AM_RAM
-	AM_RANGE(0x140000, 0x1407ff) AM_RAM AM_BASE(m_spriteram)
+	AM_RANGE(0x140000, 0x1407ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x140800, 0x140801) AM_WRITENOP
 	AM_RANGE(0x140802, 0x140803) AM_WRITENOP
 	AM_RANGE(0x180000, 0x18000f) AM_READ(goal92_inputs_r)
 	AM_RANGE(0x180008, 0x180009) AM_WRITE(goal92_sound_command_w)
 	AM_RANGE(0x18000a, 0x18000b) AM_WRITENOP
-	AM_RANGE(0x180010, 0x180017) AM_WRITEONLY AM_BASE(m_scrollram)
+	AM_RANGE(0x180010, 0x180017) AM_WRITEONLY AM_SHARE("scrollram")
 	AM_RANGE(0x18001c, 0x18001d) AM_READWRITE(goal92_fg_bank_r, goal92_fg_bank_w)
 ADDRESS_MAP_END
 

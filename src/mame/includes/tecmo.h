@@ -2,22 +2,25 @@ class tecmo_state : public driver_device
 {
 public:
 	tecmo_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_txvideoram(*this, "txvideoram"),
+		m_fgvideoram(*this, "fgvideoram"),
+		m_bgvideoram(*this, "bgvideoram"),
+		m_spriteram(*this, "spriteram"){ }
 
 	int m_adpcm_pos;
 	int m_adpcm_end;
 	int m_adpcm_data;
 	int m_video_type;
-	UINT8 *m_txvideoram;
-	UINT8 *m_fgvideoram;
-	UINT8 *m_bgvideoram;
+	required_shared_ptr<UINT8> m_txvideoram;
+	required_shared_ptr<UINT8> m_fgvideoram;
+	required_shared_ptr<UINT8> m_bgvideoram;
 	tilemap_t *m_tx_tilemap;
 	tilemap_t *m_fg_tilemap;
 	tilemap_t *m_bg_tilemap;
 	UINT8 m_fgscroll[3];
 	UINT8 m_bgscroll[3];
-	UINT8 *m_spriteram;
-	size_t m_spriteram_size;
+	required_shared_ptr<UINT8> m_spriteram;
 	DECLARE_WRITE8_MEMBER(tecmo_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(tecmo_sound_command_w);
 	DECLARE_WRITE8_MEMBER(tecmo_adpcm_end_w);

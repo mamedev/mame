@@ -333,7 +333,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap_bg, bitm
 
 	bitmap_ind16 &bitmap = bitmap_bg;
 
-	for (offs = state->m_spriteram_size/2 - 8;offs >= 0;offs -= 8)
+	for (offs = state->m_spriteram.bytes()/2 - 8;offs >= 0;offs -= 8)
 	{
 		if (spriteram16[offs] & 0x04)	/* enable */
 		{

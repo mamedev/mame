@@ -39,11 +39,22 @@ class midvunit_state : public driver_device
 public:
 	midvunit_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_nvram(*this, "nvram") { }
+		  m_nvram(*this, "nvram"),
+		  m_ram_base(*this, "m_ram_base"),
+		  m_fastram_base(*this, "m_fastram_base"),
+		  m_tms32031_control(*this, "m_tms32031_control"),
+		  m_midvplus_misc(*this, "m_midvplus_misc"),
+		  m_videoram(*this, "m_videoram"),
+		  m_textureram(*this, "m_textureram") { }
 
 	optional_shared_ptr<UINT32>	m_nvram;
-	UINT32 *m_ram_base;
-	UINT32 *m_fastram_base;
+	required_shared_ptr<UINT32> m_ram_base;
+	required_shared_ptr<UINT32> m_fastram_base;
+	required_shared_ptr<UINT32> m_tms32031_control;
+	required_shared_ptr<UINT32> m_midvplus_misc;
+	required_shared_ptr<UINT16> m_videoram;
+	required_shared_ptr<UINT32> m_textureram;
+
 	UINT8 m_cmos_protected;
 	UINT16 m_control_data;
 	UINT8 m_adc_data;
@@ -52,13 +63,9 @@ public:
 	UINT8 m_shifter_state;
 	timer_device *m_timer[2];
 	double m_timer_rate;
-	UINT32 *m_tms32031_control;
-	UINT32 *m_midvplus_misc;
 	UINT16 m_bit_index;
 	int m_lastval;
 	UINT32 *m_generic_speedup;
-	UINT16 *m_videoram;
-	UINT32 *m_textureram;
 	UINT16 m_video_regs[16];
 	UINT16 m_dma_data[16];
 	UINT8 m_dma_data_index;

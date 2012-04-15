@@ -73,12 +73,13 @@ class dkong_state : public driver_device
 {
 public:
 	dkong_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_video_ram(*this,"video_ram"),
+		m_sprite_ram(*this,"sprite_ram") { }
 
 	/* memory pointers */
-	UINT8 *           m_video_ram;
-	UINT8 *           m_sprite_ram;
-	size_t            m_sprite_ram_size;
+	required_shared_ptr<UINT8> m_video_ram;
+	required_shared_ptr<UINT8> m_sprite_ram;
 
 	/* devices */
 	device_t *m_dev_n2a03a;

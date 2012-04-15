@@ -217,9 +217,9 @@ static void f1gp_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, c
 				else sx = ((ox + zoomx * x + 16) & 0x1ff) - 16;
 
 				if (chip == 0)
-					code = state->m_spr1cgram[map_start % (state->m_spr1cgram_size / 2)];
+					code = state->m_spr1cgram[map_start % (state->m_spr1cgram.bytes() / 2)];
 				else
-					code = state->m_spr2cgram[map_start % (state->m_spr2cgram_size / 2)];
+					code = state->m_spr2cgram[map_start % (state->m_spr2cgram.bytes() / 2)];
 
 				pdrawgfxzoom_transpen(bitmap,cliprect,machine.gfx[1 + chip],
 						code,
@@ -271,10 +271,10 @@ static void f1gpb_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap,c
 {
 	f1gp_state *state = machine.driver_data<f1gp_state>();
 	UINT16 *spriteram = state->m_spriteram;
-	int attr_start, start_offset = state->m_spriteram_size / 2 - 4;
+	int attr_start, start_offset = state->m_spriteram.bytes() / 2 - 4;
 
 	// find the "end of list" to draw the sprites in reverse order
-	for (attr_start = 4; attr_start < state->m_spriteram_size / 2; attr_start += 4)
+	for (attr_start = 4; attr_start < state->m_spriteram.bytes() / 2; attr_start += 4)
 	{
 		if (spriteram[attr_start + 3 - 4] == 0xffff) /* end of list marker */
 		{

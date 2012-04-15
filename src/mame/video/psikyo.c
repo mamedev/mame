@@ -74,7 +74,7 @@ Offset:
 static TILE_GET_INFO( get_tile_info_0 )
 {
 	psikyo_state *state = machine.driver_data<psikyo_state>();
-	UINT16 code = ((UINT16 *)state->m_vram_0)[BYTE_XOR_BE(tile_index)];
+	UINT16 code = ((UINT16 *)state->m_vram_0.target())[BYTE_XOR_BE(tile_index)];
 	SET_TILE_INFO(
 			1,
 			(code & 0x1fff) + 0x2000 * state->m_tilemap_0_bank,
@@ -85,7 +85,7 @@ static TILE_GET_INFO( get_tile_info_0 )
 static TILE_GET_INFO( get_tile_info_1 )
 {
 	psikyo_state *state = machine.driver_data<psikyo_state>();
-	UINT16 code = ((UINT16 *)state->m_vram_1)[BYTE_XOR_BE(tile_index)];
+	UINT16 code = ((UINT16 *)state->m_vram_1.target())[BYTE_XOR_BE(tile_index)];
 	SET_TILE_INFO(
 			1,
 			(code & 0x1fff) + 0x2000 * state->m_tilemap_1_bank,
@@ -629,10 +629,10 @@ SCREEN_UPDATE_IND16( psikyo )
 		{
 			if (layer0_ctrl & 0x0200)
 				/* per-tile rowscroll */
-				x0 = ((UINT16 *)state->m_vregs)[BYTE_XOR_BE(0x000/2 + i/16)];
+				x0 = ((UINT16 *)state->m_vregs.target())[BYTE_XOR_BE(0x000/2 + i/16)];
 			else
 				/* per-line rowscroll */
-				x0 = ((UINT16 *)state->m_vregs)[BYTE_XOR_BE(0x000/2 + i)];
+				x0 = ((UINT16 *)state->m_vregs.target())[BYTE_XOR_BE(0x000/2 + i)];
 		}
 
 
@@ -646,10 +646,10 @@ SCREEN_UPDATE_IND16( psikyo )
 		{
 			if (layer1_ctrl & 0x0200)
 				/* per-tile rowscroll */
-				x1 = ((UINT16 *)state->m_vregs)[BYTE_XOR_BE(0x200/2 + i/16)];
+				x1 = ((UINT16 *)state->m_vregs.target())[BYTE_XOR_BE(0x200/2 + i/16)];
 			else
 				/* per-line rowscroll */
-				x1 = ((UINT16 *)state->m_vregs)[BYTE_XOR_BE(0x200/2 + i)];
+				x1 = ((UINT16 *)state->m_vregs.target())[BYTE_XOR_BE(0x200/2 + i)];
 		}
 
 
@@ -803,10 +803,10 @@ SCREEN_UPDATE_IND16( psikyo_bootleg )
 		{
 			if (layer0_ctrl & 0x0200)
 				/* per-tile rowscroll */
-				x0 = ((UINT16 *)state->m_vregs)[BYTE_XOR_BE(0x000/2 + i/16)];
+				x0 = ((UINT16 *)state->m_vregs.target())[BYTE_XOR_BE(0x000/2 + i/16)];
 			else
 				/* per-line rowscroll */
-				x0 = ((UINT16 *)state->m_vregs)[BYTE_XOR_BE(0x000/2 + i)];
+				x0 = ((UINT16 *)state->m_vregs.target())[BYTE_XOR_BE(0x000/2 + i)];
 		}
 
 
@@ -820,10 +820,10 @@ SCREEN_UPDATE_IND16( psikyo_bootleg )
 		{
 			if (layer1_ctrl & 0x0200)
 				/* per-tile rowscroll */
-				x1 = ((UINT16 *)state->m_vregs)[BYTE_XOR_BE(0x200/2 + i/16)];
+				x1 = ((UINT16 *)state->m_vregs.target())[BYTE_XOR_BE(0x200/2 + i/16)];
 			else
 				/* per-line rowscroll */
-				x1 = ((UINT16 *)state->m_vregs)[BYTE_XOR_BE(0x200/2 + i)];
+				x1 = ((UINT16 *)state->m_vregs.target())[BYTE_XOR_BE(0x200/2 + i)];
 		}
 
 

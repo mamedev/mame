@@ -7,24 +7,34 @@ public:
 		: driver_device(mconfig, type, tag),
 		 m_deco_tilegen1(*this, "tilegen1"),
 		 m_spriteram(*this, "spriteram"),
-		 m_spriteram2(*this, "spriteram2")
-		{ }
-
-	UINT16 *m_prot_data;
-	UINT16 *m_sound_shared_ram;
-	int m_video_control;
-
-	UINT16* m_pf1_rowscroll;
-	UINT16* m_pf2_rowscroll;
-
-	UINT16* m_sprite_paletteram;
-	UINT16* m_sprite_paletteram2;
-	UINT16* m_tile_paletteram1;
-	UINT16* m_tile_paletteram2;
+		 m_spriteram2(*this, "spriteram2"),
+		m_sound_shared_ram(*this, "sound_shared"),
+		m_pf1_rowscroll(*this, "pf1_rowscroll"),
+		m_pf2_rowscroll(*this, "pf2_rowscroll"),
+		m_sprite_paletteram(*this, "sprite_palram"),
+		m_tile_paletteram2(*this, "tile_palram2"),
+		m_sprite_paletteram2(*this, "sprite_palram2"),
+		m_tile_paletteram1(*this, "tile_palram1"),
+		m_prot_data(*this, "prot_data"){ }
 
 	required_device<deco16ic_device> m_deco_tilegen1;
 	required_shared_ptr<UINT16> m_spriteram;
 	optional_shared_ptr<UINT16> m_spriteram2;
+
+	required_shared_ptr<UINT16> m_sound_shared_ram;
+	required_shared_ptr<UINT16> m_pf1_rowscroll;
+	required_shared_ptr<UINT16> m_pf2_rowscroll;
+
+	required_shared_ptr<UINT16> m_sprite_paletteram;
+	required_shared_ptr<UINT16> m_tile_paletteram2;
+	required_shared_ptr<UINT16> m_sprite_paletteram2;
+	required_shared_ptr<UINT16> m_tile_paletteram1;
+
+	required_shared_ptr<UINT16> m_prot_data;
+	int m_video_control;
+
+
+
 	DECLARE_WRITE16_MEMBER(sshangha_protection16_w);
 	DECLARE_READ16_MEMBER(sshangha_protection16_r);
 	DECLARE_READ16_MEMBER(sshanghb_protection16_r);

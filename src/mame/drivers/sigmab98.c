@@ -732,7 +732,7 @@ READ8_MEMBER(sigmab98_state::sammymdl_coin_hopper_r)
 static ADDRESS_MAP_START( animalc_map, AS_PROGRAM, 8, sigmab98_state )
 	AM_RANGE( 0x0000, 0x3fff ) AM_ROM
 	AM_RANGE( 0x4000, 0x7fff ) AM_ROMBANK( "rombank" )
-	AM_RANGE( 0x8000, 0x8fff ) AM_RAMBANK( "rambank" ) AM_SHARE( "nvram" ) AM_BASE(m_nvram )
+	AM_RANGE( 0x8000, 0x8fff ) AM_RAMBANK( "rambank" ) AM_SHARE( "nvram" )
 
 	AM_RANGE( 0x9000, 0x9fff ) AM_RAM
 	AM_RANGE( 0xa000, 0xafff ) AM_RAM
@@ -976,7 +976,7 @@ WRITE8_MEMBER(sigmab98_state::haekaka_coin_w)
 static ADDRESS_MAP_START( haekaka_map, AS_PROGRAM, 8, sigmab98_state )
 	AM_RANGE( 0x0000, 0x7fff ) AM_ROM
 	AM_RANGE( 0xb000, 0xcfff ) AM_READWRITE(haekaka_b000_r, haekaka_b000_w )
-	AM_RANGE( 0xd000, 0xefff ) AM_RAM AM_SHARE( "nvram" ) AM_BASE(m_nvram )
+	AM_RANGE( 0xd000, 0xefff ) AM_RAM AM_SHARE( "nvram" )
 	AM_RANGE( 0xfe00, 0xffff ) AM_RAM	// High speed internal RAM
 ADDRESS_MAP_END
 
@@ -1214,7 +1214,7 @@ static ADDRESS_MAP_START( itazuram_map, AS_PROGRAM, 8, sigmab98_state )
 
 	AM_RANGE( 0x6811, 0x6811 ) AM_WRITENOP	// IRQ Enable? Screen disable?
 	AM_RANGE( 0x6813, 0x6813 ) AM_WRITENOP	// IRQ Ack?
-	AM_RANGE( 0xdc00, 0xfdff ) AM_READ_BANK( "palbank" ) AM_WRITE(itazuram_nvram_palette_w ) AM_SHARE( "nvram" ) AM_BASE(m_nvram )	// nvram | paletteram
+	AM_RANGE( 0xdc00, 0xfdff ) AM_READ_BANK( "palbank" ) AM_WRITE(itazuram_nvram_palette_w ) AM_SHARE( "nvram" )	// nvram | paletteram
 
 	AM_RANGE( 0xfe00, 0xffff ) AM_RAM	// High speed internal RAM
 ADDRESS_MAP_END
@@ -1429,7 +1429,7 @@ WRITE8_MEMBER(sigmab98_state::tdoboon_c000_w)
 static ADDRESS_MAP_START( tdoboon_map, AS_PROGRAM, 8, sigmab98_state )
 	AM_RANGE( 0x0000, 0xbfff ) AM_ROM
 	AM_RANGE( 0xc000, 0xcfff ) AM_READWRITE(tdoboon_c000_r, tdoboon_c000_w )
-	AM_RANGE( 0xd000, 0xefff ) AM_RAM AM_SHARE( "nvram" ) AM_BASE(m_nvram )
+	AM_RANGE( 0xd000, 0xefff ) AM_RAM AM_SHARE( "nvram" )
 	AM_RANGE( 0xfe00, 0xffff ) AM_RAM	// High speed internal RAM
 ADDRESS_MAP_END
 

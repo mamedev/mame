@@ -89,8 +89,8 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, bsktball_state )
 	AM_RANGE(0x102c, 0x102d) AM_DEVWRITE_LEGACY("discrete", bsktball_noise_reset_w) /* Noise Reset */
 	AM_RANGE(0x102e, 0x102f) AM_WRITE(bsktball_nmion_w) /* NMI On */
 	AM_RANGE(0x1030, 0x1030) AM_DEVWRITE_LEGACY("discrete", bsktball_note_w) /* Music Ckt Note Dvsr */
-	AM_RANGE(0x1800, 0x1bbf) AM_RAM_WRITE(bsktball_videoram_w) AM_BASE(m_videoram) /* DISPLAY */
-	AM_RANGE(0x1bc0, 0x1bff) AM_RAM AM_BASE(m_motion)
+	AM_RANGE(0x1800, 0x1bbf) AM_RAM_WRITE(bsktball_videoram_w) AM_SHARE("videoram") /* DISPLAY */
+	AM_RANGE(0x1bc0, 0x1bff) AM_RAM AM_SHARE("motion")
 	AM_RANGE(0x1c00, 0x1cff) AM_RAM
 	AM_RANGE(0x2000, 0x3fff) AM_ROM /* PROGRAM */
 ADDRESS_MAP_END

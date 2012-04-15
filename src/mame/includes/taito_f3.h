@@ -44,18 +44,19 @@ class taito_f3_state : public driver_device
 {
 public:
 	taito_f3_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_f3_ram(*this,"f3_ram") { }
 
 	UINT16 *m_videoram;
 	UINT16 *m_spriteram;
-//  size_t m_spriteram_size;
-	UINT32 m_coin_word[2];
-	UINT32 *m_f3_ram;
-	int m_f3_game;
+	required_shared_ptr<UINT32> m_f3_ram;
 	UINT16 *m_f3_vram;
 	UINT16 *m_f3_line_ram;
 	UINT16 *m_f3_pf_data;
 	UINT16 *m_f3_pivot_ram;
+
+	UINT32 m_coin_word[2];
+	int m_f3_game;
 	tilemap_t *m_pf1_tilemap;
 	tilemap_t *m_pf2_tilemap;
 	tilemap_t *m_pf3_tilemap;
@@ -193,6 +194,7 @@ public:
 	int (*m_dpix_n[8][16])(taito_f3_state *state, UINT32 s_pix);
 	int (**m_dpix_lp[5])(taito_f3_state *state, UINT32 s_pix);
 	int (**m_dpix_sp[9])(taito_f3_state *state, UINT32 s_pix);
+	
 	DECLARE_READ32_MEMBER(f3_control_r);
 	DECLARE_WRITE32_MEMBER(f3_control_w);
 	DECLARE_WRITE32_MEMBER(f3_sound_reset_0_w);

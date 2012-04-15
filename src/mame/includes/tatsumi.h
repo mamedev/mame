@@ -2,34 +2,52 @@ class tatsumi_state : public driver_device
 {
 public:
 	tatsumi_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"),
+		m_cyclwarr_cpua_ram(*this, "cw_cpua_ram"),
+		m_cyclwarr_cpub_ram(*this, "cw_cpub_ram"),
+		m_apache3_g_ram(*this, "apache3_g_ram"),
+		m_roundup5_d0000_ram(*this, "ru5_d0000_ram"),
+		m_roundup5_e0000_ram(*this, "ru5_e0000_ram"),
+		m_roundup5_unknown0(*this, "ru5_unknown0"),
+		m_roundup5_unknown1(*this, "ru5_unknown1"),
+		m_roundup5_unknown2(*this, "ru5_unknown2"),
+		m_68k_ram(*this, "68k_ram"),
+		m_apache3_z80_ram(*this, "apache3_z80_ram"),
+		m_sprite_control_ram(*this, "sprite_ctlram"),
+		m_cyclwarr_videoram0(*this, "cw_videoram0"),
+		m_cyclwarr_videoram1(*this, "cw_videoram1"),
+		m_roundup_r_ram(*this, "roundup_r_ram"),
+		m_roundup_p_ram(*this, "roundup_p_ram"),
+		m_roundup_l_ram(*this, "roundup_l_ram"),
+		m_spriteram(*this, "spriteram") { }
 
-	UINT16 *m_videoram;
-	UINT16 *m_cyclwarr_cpua_ram;
-	UINT16 *m_cyclwarr_cpub_ram;
+	required_shared_ptr<UINT16> m_videoram;
+	required_shared_ptr<UINT16> m_cyclwarr_cpua_ram;
+	required_shared_ptr<UINT16> m_cyclwarr_cpub_ram;
 	UINT16 m_bigfight_a20000[8];
 	UINT16 m_bigfight_a60000[2];
-	UINT16 *m_apache3_g_ram;
+	required_shared_ptr<UINT16> m_apache3_g_ram;
 	UINT16 m_bigfight_a40000[2];
 	UINT8 *m_rom_sprite_lookup1;
 	UINT8 *m_rom_sprite_lookup2;
 	UINT8 *m_rom_clut0;
 	UINT8 *m_rom_clut1;
-	UINT16 *m_roundup5_d0000_ram;
-	UINT16 *m_roundup5_e0000_ram;
-	UINT16 *m_roundup5_unknown0;
-	UINT16 *m_roundup5_unknown1;
-	UINT16 *m_roundup5_unknown2;
-	UINT16 *m_68k_ram;
-	UINT8 *m_apache3_z80_ram;
+	required_shared_ptr<UINT16> m_roundup5_d0000_ram;
+	required_shared_ptr<UINT16> m_roundup5_e0000_ram;
+	required_shared_ptr<UINT16> m_roundup5_unknown0;
+	required_shared_ptr<UINT16> m_roundup5_unknown1;
+	required_shared_ptr<UINT16> m_roundup5_unknown2;
+	required_shared_ptr<UINT16> m_68k_ram;
+	required_shared_ptr<UINT8> m_apache3_z80_ram;
 	UINT16 m_control_word;
 	UINT16 m_apache3_rotate_ctrl[12];
-	UINT16* m_sprite_control_ram;
-	UINT16 *m_cyclwarr_videoram0;
-	UINT16 *m_cyclwarr_videoram1;
-	UINT16 *m_roundup_r_ram;
-	UINT16 *m_roundup_p_ram;
-	UINT16 *m_roundup_l_ram;
+	required_shared_ptr<UINT16> m_sprite_control_ram;
+	required_shared_ptr<UINT16> m_cyclwarr_videoram0;
+	required_shared_ptr<UINT16> m_cyclwarr_videoram1;
+	required_shared_ptr<UINT16> m_roundup_r_ram;
+	required_shared_ptr<UINT16> m_roundup_p_ram;
+	required_shared_ptr<UINT16> m_roundup_l_ram;
 	UINT16 m_last_control;
 	UINT8 m_apache3_adc;
 	int m_apache3_rot_idx;
@@ -47,7 +65,7 @@ public:
 	UINT8 m_roundupt_crt_selected_reg;
 	UINT8 m_roundupt_crt_reg[64];
 	UINT8* m_shadow_pen_array;
-	UINT16 *m_spriteram;
+	required_shared_ptr<UINT16> m_spriteram;
 	DECLARE_READ16_MEMBER(cyclwarr_cpu_bb_r);
 	DECLARE_WRITE16_MEMBER(cyclwarr_cpu_bb_w);
 	DECLARE_READ16_MEMBER(cyclwarr_palette_r);

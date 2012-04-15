@@ -2,10 +2,19 @@ class ms32_state : public driver_device
 {
 public:
 	ms32_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_mainram(*this, "mainram"),
+		m_roz_ctrl(*this, "roz_ctrl"),
+		m_tx_scroll(*this, "tx_scroll"),
+		m_bg_scroll(*this, "bg_scroll"),
+		m_mahjong_input_select(*this, "mahjong_select"){ }
 
+	required_shared_ptr<UINT32> m_mainram;
+	required_shared_ptr<UINT32> m_roz_ctrl;
+	required_shared_ptr<UINT32> m_tx_scroll;
+	required_shared_ptr<UINT32> m_bg_scroll;
+	required_shared_ptr<UINT32> m_mahjong_input_select;
 	UINT8 *m_nvram_8;
-	UINT32 *m_mahjong_input_select;
 	UINT32 m_to_main;
 	UINT16 m_irqreq;
 	tilemap_t *m_tx_tilemap;
@@ -22,10 +31,6 @@ public:
 	UINT32 m_tilemaplayoutcontrol;
 	UINT16* m_f1superb_extraram_16;
 	tilemap_t* m_extra_tilemap;
-	UINT32 *m_roz_ctrl;
-	UINT32 *m_tx_scroll;
-	UINT32 *m_bg_scroll;
-	UINT32 *m_mainram;
 	bitmap_ind16 m_temp_bitmap_tilemaps;
 	bitmap_ind16 m_temp_bitmap_sprites;
 	bitmap_ind8 m_temp_bitmap_sprites_pri;

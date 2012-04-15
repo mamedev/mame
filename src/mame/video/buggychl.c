@@ -167,7 +167,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	g_profiler.start(PROFILER_USER1);
 
 	gfx = machine.region("gfx2")->base();
-	for (offs = 0; offs < state->m_spriteram_size; offs += 4)
+	for (offs = 0; offs < state->m_spriteram.bytes(); offs += 4)
 	{
 		int sx, sy, flipy, zoom, ch, x, px, y;
 		const UINT8 *lookup;

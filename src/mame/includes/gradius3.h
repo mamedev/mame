@@ -8,10 +8,11 @@ class gradius3_state : public driver_device
 {
 public:
 	gradius3_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_gfxram(*this, "gfxram"){ }
 
 	/* memory pointers */
-	UINT16 *    m_gfxram;
+	required_shared_ptr<UINT16> m_gfxram;
 //  UINT16 *    m_paletteram;    // currently this uses generic palette handling
 
 	/* video-related */

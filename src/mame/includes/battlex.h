@@ -8,13 +8,15 @@ class battlex_state : public driver_device
 {
 public:
 	battlex_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"),
+		m_spriteram(*this, "spriteram"){ }
 
 	UINT8 m_in0_b4;
 
 	/* memory pointers */
-	UINT8 * m_videoram;
-	UINT8 * m_spriteram;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_spriteram;
 
 	/* video-related */
 	tilemap_t *m_bg_tilemap;

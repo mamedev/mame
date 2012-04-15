@@ -8,7 +8,20 @@ class m72_state : public driver_device
 {
 public:
 	m72_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_spriteram(*this, "spriteram"),
+		m_videoram1(*this, "videoram1"),
+		m_videoram2(*this, "videoram2"),
+		m_majtitle_rowscrollram(*this, "majtitle_rowscr"),
+		m_spriteram2(*this, "spriteram2"),
+		m_soundram(*this, "soundram"){ }
+
+	required_shared_ptr<UINT16> m_spriteram;
+	required_shared_ptr<UINT16> m_videoram1;
+	required_shared_ptr<UINT16> m_videoram2;
+	required_shared_ptr<UINT16> m_majtitle_rowscrollram;
+	required_shared_ptr<UINT16> m_spriteram2;
+	required_shared_ptr<UINT8> m_soundram;
 
 	UINT16 *m_protection_ram;
 	emu_timer *m_scanline_timer;
@@ -18,17 +31,10 @@ public:
 	UINT32 m_mcu_sample_addr;
 	const UINT8 *m_protection_code;
 	const UINT8 *m_protection_crc;
-	UINT8 *m_soundram;
 	int m_prev[4];
 	int m_diff[4];
-	UINT16 *m_videoram1;
-	UINT16 *m_videoram2;
-	UINT16 *m_majtitle_rowscrollram;
 	UINT32 m_raster_irq_position;
-	UINT16 *m_spriteram;
-	UINT16 *m_spriteram2;
 	UINT16 *m_buffered_spriteram;
-	size_t m_spriteram_size;
 	tilemap_t *m_fg_tilemap;
 	tilemap_t *m_bg_tilemap;
 	INT32 m_scrollx1;

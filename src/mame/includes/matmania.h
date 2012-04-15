@@ -3,23 +3,29 @@ class matmania_state : public driver_device
 {
 public:
 	matmania_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"),
+		m_videoram2(*this, "videoram2"),
+		m_videoram3(*this, "videoram3"),
+		m_colorram(*this, "colorram"),
+		m_colorram2(*this, "colorram2"),
+		m_colorram3(*this, "colorram3"),
+		m_scroll(*this, "scroll"),
+		m_pageselect(*this, "pageselect"),
+		m_spriteram(*this, "spriteram"),
+		m_paletteram(*this, "paletteram"){ }
 
 	/* memory pointers */
-	UINT8 *         m_videoram;
-	UINT8 *         m_videoram2;
-	UINT8 *         m_videoram3;
-	UINT8 *         m_colorram;
-	UINT8 *         m_colorram2;
-	UINT8 *         m_colorram3;
-	UINT8 *         m_scroll;
-	UINT8 *         m_pageselect;
-	UINT8 *         m_spriteram;
-	UINT8 *         m_paletteram;
-	size_t          m_videoram_size;
-	size_t          m_videoram2_size;
-	size_t          m_videoram3_size;
-	size_t          m_spriteram_size;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_videoram2;
+	required_shared_ptr<UINT8> m_videoram3;
+	required_shared_ptr<UINT8> m_colorram;
+	required_shared_ptr<UINT8> m_colorram2;
+	required_shared_ptr<UINT8> m_colorram3;
+	required_shared_ptr<UINT8> m_scroll;
+	required_shared_ptr<UINT8> m_pageselect;
+	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<UINT8> m_paletteram;
 
 	/* video-related */
 	bitmap_ind16        *m_tmpbitmap;

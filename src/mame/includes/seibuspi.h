@@ -6,10 +6,13 @@ class seibuspi_state : public driver_device
 {
 public:
 	seibuspi_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_spi_scrollram(*this, "spi_scrollram"),
+		m_spimainram(*this, "spimainram"){ }
 
-	UINT32 *m_spimainram;
-	UINT32 *m_spi_scrollram;
+	required_shared_ptr<UINT32> m_spi_scrollram;
+	required_shared_ptr<UINT32> m_spimainram;
+
 	intel_e28f008sa_device *m_flash[2];
 	UINT8 *m_z80_rom;
 	int m_z80_prg_fifo_pos;

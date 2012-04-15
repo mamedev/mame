@@ -276,7 +276,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	int offs;
 
 	/* spriteram #1 */
-	for (offs = 0; offs < state->m_spriteram_size; offs += 4)
+	for (offs = 0; offs < state->m_spriteram.bytes(); offs += 4)
 	{
 		int code, color, sx, sy, flipx, flipy;
 
@@ -304,7 +304,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	}
 
 	/* spriteram #2 */
-	for (offs = 0; offs < state->m_spriteram2_size; offs += 4)
+	for (offs = 0; offs < state->m_spriteram2.bytes(); offs += 4)
 	{
 		int code, color, sx, sy, flipx, flipy;
 

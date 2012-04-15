@@ -24,17 +24,17 @@ static ADDRESS_MAP_START( holeland_map, AS_PROGRAM, 8, holeland_state )
 	AM_RANGE(0xa000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc001) AM_WRITE(holeland_pal_offs_w)
 	AM_RANGE(0xc006, 0xc007) AM_WRITE(holeland_flipscreen_w)
-	AM_RANGE(0xe000, 0xe3ff) AM_WRITE(holeland_colorram_w) AM_BASE(m_colorram)
-	AM_RANGE(0xe400, 0xe7ff) AM_WRITE(holeland_videoram_w) AM_BASE_SIZE(m_videoram, m_videoram_size)
-	AM_RANGE(0xf000, 0xf3ff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
+	AM_RANGE(0xe000, 0xe3ff) AM_WRITE(holeland_colorram_w) AM_SHARE("colorram")
+	AM_RANGE(0xe400, 0xe7ff) AM_WRITE(holeland_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0xf000, 0xf3ff) AM_RAM AM_SHARE("spriteram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( crzrally_map, AS_PROGRAM, 8, holeland_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xe000, 0xe3ff) AM_WRITE(holeland_colorram_w) AM_BASE(m_colorram)
-	AM_RANGE(0xe400, 0xe7ff) AM_WRITE(holeland_videoram_w) AM_BASE_SIZE(m_videoram, m_videoram_size)
-	AM_RANGE(0xe800, 0xebff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
+	AM_RANGE(0xe000, 0xe3ff) AM_WRITE(holeland_colorram_w) AM_SHARE("colorram")
+	AM_RANGE(0xe400, 0xe7ff) AM_WRITE(holeland_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0xe800, 0xebff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(holeland_scroll_w)
 	AM_RANGE(0xf800, 0xf801) AM_WRITE(holeland_pal_offs_w)
 ADDRESS_MAP_END

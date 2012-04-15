@@ -104,11 +104,11 @@ static ADDRESS_MAP_START( oneshot_map, AS_PROGRAM, 16, oneshot_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x080000, 0x087fff) AM_RAM
 	AM_RANGE(0x0c0000, 0x0c07ff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
-	AM_RANGE(0x120000, 0x120fff) AM_RAM AM_BASE(m_sprites)
-	AM_RANGE(0x180000, 0x180fff) AM_RAM_WRITE(oneshot_mid_videoram_w) AM_BASE(m_mid_videoram) // some people , girl etc.
-	AM_RANGE(0x181000, 0x181fff) AM_RAM_WRITE(oneshot_fg_videoram_w) AM_BASE(m_fg_videoram) // credits etc.
-	AM_RANGE(0x182000, 0x182fff) AM_RAM_WRITE(oneshot_bg_videoram_w) AM_BASE(m_bg_videoram) // credits etc.
-	AM_RANGE(0x188000, 0x18800f) AM_WRITEONLY AM_BASE(m_scroll)	// scroll registers
+	AM_RANGE(0x120000, 0x120fff) AM_RAM AM_SHARE("sprites")
+	AM_RANGE(0x180000, 0x180fff) AM_RAM_WRITE(oneshot_mid_videoram_w) AM_SHARE("mid_videoram") // some people , girl etc.
+	AM_RANGE(0x181000, 0x181fff) AM_RAM_WRITE(oneshot_fg_videoram_w) AM_SHARE("fg_videoram") // credits etc.
+	AM_RANGE(0x182000, 0x182fff) AM_RAM_WRITE(oneshot_bg_videoram_w) AM_SHARE("bg_videoram") // credits etc.
+	AM_RANGE(0x188000, 0x18800f) AM_WRITEONLY AM_SHARE("scroll")	// scroll registers
 	AM_RANGE(0x190002, 0x190003) AM_READ(soundlatch_word_r)
 	AM_RANGE(0x190010, 0x190011) AM_WRITE(soundlatch_word_w)
 	AM_RANGE(0x190018, 0x190019) AM_DEVWRITE_LEGACY("oki", soundbank_w)

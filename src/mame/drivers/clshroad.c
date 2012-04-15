@@ -43,13 +43,13 @@ static ADDRESS_MAP_START( clshroad_map, AS_PROGRAM, 8, clshroad_state )
 	AM_RANGE(0x8000, 0x95ff) AM_RAM
 	AM_RANGE(0x9600, 0x97ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x9800, 0x9dff) AM_RAM
-	AM_RANGE(0x9e00, 0x9fff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
+	AM_RANGE(0x9e00, 0x9fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xa001, 0xa001) AM_WRITENOP	// ? Interrupt related
 	AM_RANGE(0xa004, 0xa004) AM_WRITE(clshroad_flipscreen_w)
 	AM_RANGE(0xa100, 0xa107) AM_READ(clshroad_input_r)
-	AM_RANGE(0xa800, 0xafff) AM_RAM_WRITE(clshroad_vram_1_w) AM_BASE(m_vram_1)	// Layer 1
-	AM_RANGE(0xb000, 0xb003) AM_WRITEONLY AM_BASE(m_vregs)	// Scroll
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(clshroad_vram_0_w) AM_BASE(m_vram_0)	// Layer 0
+	AM_RANGE(0xa800, 0xafff) AM_RAM_WRITE(clshroad_vram_1_w) AM_SHARE("vram_1")	// Layer 1
+	AM_RANGE(0xb000, 0xb003) AM_WRITEONLY AM_SHARE("vregs")	// Scroll
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(clshroad_vram_0_w) AM_SHARE("vram_0")	// Layer 0
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( clshroad_sound_map, AS_PROGRAM, 8, clshroad_state )

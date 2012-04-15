@@ -12,14 +12,18 @@ class williams_state : public driver_device
 public:
 	williams_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_nvram(*this, "nvram") { }
+		  m_nvram(*this, "nvram") ,
+		m_videoram(*this, "videoram"),
+		m_blaster_palette_0(*this, "blaster_pal0"),
+		m_blaster_scanline_control(*this, "blaster_scan"),
+		m_williams2_tileram(*this, "williams2_tile"){ }
 
 	required_shared_ptr<UINT8>	m_nvram;
 	UINT8 *m_mayday_protection;
-	UINT8 *m_videoram;
-	UINT8 *m_williams2_tileram;
-	UINT8 *m_blaster_palette_0;
-	UINT8 *m_blaster_scanline_control;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_blaster_palette_0;
+	required_shared_ptr<UINT8> m_blaster_scanline_control;
+	required_shared_ptr<UINT8> m_williams2_tileram;
 	UINT8 m_blitter_config;
 	UINT16 m_blitter_clip_address;
 	UINT8 m_blitter_window_enable;

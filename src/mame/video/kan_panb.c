@@ -154,7 +154,7 @@ SCREEN_UPDATE_IND16( wintbob )
 
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
-	for (offs = 0;offs < state->m_spriteram_size/2;offs += 8)
+	for (offs = 0;offs < state->m_bootleg_spriteram16.bytes()/2;offs += 8)
 	{
 		int xpos  = spriteram16[offs] & 0xff;
 		int ypos  = spriteram16[offs+4] & 0xff;
@@ -222,7 +222,7 @@ SCREEN_UPDATE_IND16( snowbro3 )
 
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
-	for (offs = 0;offs < state->m_spriteram_size/2;offs += 8)
+	for (offs = 0;offs < state->m_bootleg_spriteram16.bytes()/2;offs += 8)
 	{
 		gfx_element *gfx = screen.machine().gfx[0];
 		int dx = spriteram16[offs+4] & 0xff;

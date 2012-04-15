@@ -2,15 +2,18 @@ class naughtyb_state : public driver_device
 {
 public:
 	naughtyb_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"),
+		m_videoram2(*this, "videoram2"),
+		m_scrollreg(*this, "scrollreg"){ }
 
-	UINT8 *m_videoram;
+	required_shared_ptr<UINT8> m_videoram;
 	UINT8 m_popflame_prot_seed;
 	int m_r_index;
 	int m_prot_count;
 	int m_question_offset;
-	UINT8 *m_videoram2;
-	UINT8 *m_scrollreg;
+	required_shared_ptr<UINT8> m_videoram2;
+	required_shared_ptr<UINT8> m_scrollreg;
 	int m_cocktail;
 	UINT8 m_palreg;
 	int m_bankreg;

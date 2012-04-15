@@ -10,19 +10,26 @@ class esd16_state : public driver_device
 {
 public:
 	esd16_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_vram_0(*this, "vram_0"),
+		m_vram_1(*this, "vram_1"),
+		m_scroll_0(*this, "scroll_0"),
+		m_scroll_1(*this, "scroll_1"),
+		m_spriteram(*this, "spriteram"),
+		m_head_layersize(*this, "head_layersize"),
+		m_headpanic_platform_x(*this, "platform_x"),
+		m_headpanic_platform_y(*this, "platform_y"){ }
 
 	/* memory pointers */
-	UINT16 *       m_vram_0;
-	UINT16 *       m_vram_1;
-	UINT16 *       m_scroll_0;
-	UINT16 *       m_scroll_1;
-	UINT16 *       m_spriteram;
-	UINT16 *       m_head_layersize;
-	UINT16 *       m_headpanic_platform_x;
-	UINT16 *       m_headpanic_platform_y;
+	required_shared_ptr<UINT16> m_vram_0;
+	required_shared_ptr<UINT16> m_vram_1;
+	required_shared_ptr<UINT16> m_scroll_0;
+	required_shared_ptr<UINT16> m_scroll_1;
+	required_shared_ptr<UINT16> m_spriteram;
+	required_shared_ptr<UINT16> m_head_layersize;
+	required_shared_ptr<UINT16> m_headpanic_platform_x;
+	required_shared_ptr<UINT16> m_headpanic_platform_y;
 //  UINT16 *       m_paletteram;  // currently this uses generic palette handling
-	size_t         m_spriteram_size;
 
 	/* video-related */
 	tilemap_t       *m_tilemap_0_16x16;

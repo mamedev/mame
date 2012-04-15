@@ -364,11 +364,11 @@ static VIDEO_START( common_14220 )
 	hyprduel_state *state = machine.driver_data<hyprduel_state>();
 	expand_gfx1(*state);
 	alloc_empty_tiles(machine);
-	state->m_tiletable_old = auto_alloc_array(machine, UINT16, state->m_tiletable_size / 2);
-	state->m_dirtyindex = auto_alloc_array(machine, UINT8, state->m_tiletable_size / 4);
+	state->m_tiletable_old = auto_alloc_array(machine, UINT16, state->m_tiletable.bytes() / 2);
+	state->m_dirtyindex = auto_alloc_array(machine, UINT8, state->m_tiletable.bytes() / 4);
 
-	state->save_pointer(NAME(state->m_tiletable_old), state->m_tiletable_size / 2);
-	state->save_pointer(NAME(state->m_dirtyindex), state->m_tiletable_size / 4);
+	state->save_pointer(NAME(state->m_tiletable_old), state->m_tiletable.bytes() / 2);
+	state->save_pointer(NAME(state->m_dirtyindex), state->m_tiletable.bytes() / 4);
 
 	state->m_bg_tilemap[0] = tilemap_create(machine, get_tile_info_0_8bit, tilemap_scan_rows, 8, 8, WIN_NX, WIN_NY);
 	state->m_bg_tilemap[1] = tilemap_create(machine, get_tile_info_1_8bit, tilemap_scan_rows, 8, 8, WIN_NX, WIN_NY);
@@ -478,7 +478,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	int max_x = machine.primary_screen->width();
 	int max_y = machine.primary_screen->height();
 
-	int max_sprites = state->m_spriteram_size / 8;
+	int max_sprites = state->m_spriteram.bytes() / 8;
 	int sprites = state->m_videoregs[0x00 / 2] % max_sprites;
 
 	int color_start = ((state->m_videoregs[0x08 / 2] & 0xf) << 4) + 0x100;
@@ -687,8 +687,8 @@ SCREEN_UPDATE_IND16( hyprduel )
 	{
 		int dirty = 0;
 
-		memset(state->m_dirtyindex, 0, state->m_tiletable_size / 4);
-		for (i = 0; i < state->m_tiletable_size / 4; i++)
+		memset(state->m_dirtyindex, 0, state->m_tiletable.bytes() / 4);
+		for (i = 0; i < state->m_tiletable.bytes() / 4; i++)
 		{
 			UINT32 tile_new = (state->m_tiletable[2 * i + 0] << 16 ) + state->m_tiletable[2 * i + 1];
 			UINT32 tile_old = (state->m_tiletable_old[2 * i + 0] << 16 ) + state->m_tiletable_old[2 * i + 1];
@@ -699,7 +699,7 @@ SCREEN_UPDATE_IND16( hyprduel )
 				dirty = 1;
 			}
 		}
-		memcpy(state->m_tiletable_old, state->m_tiletable, state->m_tiletable_size);
+		memcpy(state->m_tiletable_old, state->m_tiletable, state->m_tiletable.bytes());
 
 		if (dirty)
 		{

@@ -87,7 +87,7 @@ WRITE8_MEMBER(surpratk_state::surpratk_5fc0_w)
 /********************************************/
 
 static ADDRESS_MAP_START( surpratk_map, AS_PROGRAM, 8, surpratk_state )
-	AM_RANGE(0x0000, 0x07ff) AM_READWRITE(bankedram_r, bankedram_w) AM_BASE(m_ram)
+	AM_RANGE(0x0000, 0x07ff) AM_READWRITE(bankedram_r, bankedram_w) AM_SHARE("ram")
 	AM_RANGE(0x0800, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("bank1")					/* banked ROM */
 	AM_RANGE(0x5f8c, 0x5f8c) AM_READ_PORT("P1")

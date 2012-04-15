@@ -2,14 +2,16 @@ class sderby_state : public driver_device
 {
 public:
 	sderby_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"),
+		m_md_videoram(*this, "md_videoram"),
+		m_fg_videoram(*this, "fg_videoram"),
+		m_spriteram(*this, "spriteram"){ }
 
-	UINT16 *m_spriteram;
-	size_t m_spriteram_size;
-
-	UINT16 *m_videoram;
-	UINT16 *m_md_videoram;
-	UINT16 *m_fg_videoram;
+	required_shared_ptr<UINT16> m_videoram;
+	required_shared_ptr<UINT16> m_md_videoram;
+	required_shared_ptr<UINT16> m_fg_videoram;
+	required_shared_ptr<UINT16> m_spriteram;
 
 	tilemap_t *m_tilemap;
 	tilemap_t *m_md_tilemap;

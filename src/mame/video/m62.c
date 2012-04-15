@@ -355,7 +355,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	m62_state *state = machine.driver_data<m62_state>();
 	int offs;
 
-	for (offs = 0; offs < state->m_spriteram_size; offs += 8)
+	for (offs = 0; offs < state->m_spriteram.bytes(); offs += 8)
 	{
 		int i, incr, code, col, flipx, flipy, sx, sy;
 

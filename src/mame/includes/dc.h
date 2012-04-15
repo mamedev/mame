@@ -11,12 +11,18 @@ class dc_state : public driver_device
 {
 	public:
 		dc_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		dc_framebuffer_ram(*this, "frameram"),
+		dc_texture_ram(*this, "dc_texture_ram"),
+		dc_sound_ram(*this, "dc_sound_ram"),
+		pvr2_texture_ram(*this, "textureram2"),
+		pvr2_framebuffer_ram(*this, "frameram2"),
+		elan_ram(*this, "elan_ram") { }
 
-	UINT64 *dc_framebuffer_ram; // '32-bit access area'
-	UINT64 *dc_texture_ram; // '64-bit access area'
+	required_shared_ptr<UINT64> dc_framebuffer_ram; // '32-bit access area'
+	required_shared_ptr<UINT64> dc_texture_ram; // '64-bit access area'
 
-	UINT32 *dc_sound_ram;
+	required_shared_ptr<UINT32> dc_sound_ram;
 
 	/* machine related */
 	UINT32 dc_rtcregister[4];
@@ -62,9 +68,9 @@ class dc_state : public driver_device
 	int next_y;
 
 	/* Naomi 2 specific (To be moved) */
-	UINT64 *pvr2_texture_ram;
-	UINT64 *pvr2_framebuffer_ram;
-	UINT64 *elan_ram;
+	optional_shared_ptr<UINT64> pvr2_texture_ram;
+	optional_shared_ptr<UINT64> pvr2_framebuffer_ram;
+	optional_shared_ptr<UINT64> elan_ram;
 };
 
 /*----------- defined in machine/dc.c -----------*/

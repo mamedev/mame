@@ -63,18 +63,18 @@ static ADDRESS_MAP_START( c1943_map, AS_PROGRAM, 8, _1943_state )
 	AM_RANGE(0xc804, 0xc804) AM_WRITE(c1943_c804_w)	// ROM bank switch, screen flip
 	AM_RANGE(0xc806, 0xc806) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0xc807, 0xc807) AM_WRITENOP // ???
-	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(c1943_videoram_w) AM_BASE(m_videoram)
-	AM_RANGE(0xd400, 0xd7ff) AM_RAM_WRITE(c1943_colorram_w) AM_BASE(m_colorram)
-	AM_RANGE(0xd800, 0xd801) AM_RAM AM_BASE(m_scrollx)
-	AM_RANGE(0xd802, 0xd802) AM_RAM AM_BASE(m_scrolly)
-	AM_RANGE(0xd803, 0xd804) AM_RAM AM_BASE(m_bgscrollx)
+	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(c1943_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0xd400, 0xd7ff) AM_RAM_WRITE(c1943_colorram_w) AM_SHARE("colorram")
+	AM_RANGE(0xd800, 0xd801) AM_RAM AM_SHARE("scrollx")
+	AM_RANGE(0xd802, 0xd802) AM_RAM AM_SHARE("scrolly")
+	AM_RANGE(0xd803, 0xd804) AM_RAM AM_SHARE("bgscrollx")
 	AM_RANGE(0xd806, 0xd806) AM_WRITE(c1943_d806_w)	// sprites, bg1, bg2 enable
 	AM_RANGE(0xd808, 0xd808) AM_WRITENOP // ???
 	AM_RANGE(0xd868, 0xd868) AM_WRITENOP // ???
 	AM_RANGE(0xd888, 0xd888) AM_WRITENOP // ???
 	AM_RANGE(0xd8a8, 0xd8a8) AM_WRITENOP // ???
 	AM_RANGE(0xe000, 0xefff) AM_RAM
-	AM_RANGE(0xf000, 0xffff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
+	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("spriteram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, _1943_state )

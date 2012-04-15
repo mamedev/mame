@@ -28,7 +28,7 @@ WRITE8_MEMBER(suprloco_state::suprloco_soundport_w)
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, suprloco_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc1ff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
+	AM_RANGE(0xc000, 0xc1ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xc800, 0xc800) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xd000, 0xd000) AM_READ_PORT("P1")
 	AM_RANGE(0xd800, 0xd800) AM_READ_PORT("P2")
@@ -36,9 +36,9 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, suprloco_state )
 	AM_RANGE(0xe001, 0xe001) AM_READ_PORT("DSW2")
 	AM_RANGE(0xe800, 0xe800) AM_WRITE(suprloco_soundport_w)
 	AM_RANGE(0xe801, 0xe801) AM_READWRITE(suprloco_control_r, suprloco_control_w)
-	AM_RANGE(0xf000, 0xf6ff) AM_RAM_WRITE(suprloco_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0xf000, 0xf6ff) AM_RAM_WRITE(suprloco_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0xf700, 0xf7df) AM_RAM /* unused */
-	AM_RANGE(0xf7e0, 0xf7ff) AM_RAM_WRITE(suprloco_scrollram_w) AM_BASE(m_scrollram)
+	AM_RANGE(0xf7e0, 0xf7ff) AM_RAM_WRITE(suprloco_scrollram_w) AM_SHARE("scrollram")
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 

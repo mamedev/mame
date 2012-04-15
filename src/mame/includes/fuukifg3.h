@@ -13,18 +13,23 @@ class fuuki32_state : public driver_device
 {
 public:
 	fuuki32_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_vram(*this, "vram"),
+		m_spriteram(*this, "spriteram"),
+		m_paletteram(*this, "paletteram"),
+		m_vregs(*this, "vregs"),
+		m_priority(*this, "priority"),
+		m_tilebank(*this, "tilebank"){ }
 
 	/* memory pointers */
-	UINT32 *    m_vram[4];
-	UINT32 *    m_vregs;
-	UINT32 *    m_priority;
-	UINT32 *    m_tilebank;
-	UINT32 *    m_spriteram;
+	required_shared_ptr_array<UINT32,4> m_vram;
+	required_shared_ptr<UINT32> m_spriteram;
+	required_shared_ptr<UINT32> m_paletteram;
+	required_shared_ptr<UINT32> m_vregs;
+	required_shared_ptr<UINT32> m_priority;
+	required_shared_ptr<UINT32> m_tilebank;
 	UINT32 *    m_buf_spriteram;
 	UINT32 *    m_buf_spriteram2;
-	UINT32 *    m_paletteram;
-	size_t      m_spriteram_size;
 
 	/* video-related */
 	tilemap_t     *m_tilemap[4];

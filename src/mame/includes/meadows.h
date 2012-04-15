@@ -10,9 +10,12 @@ class meadows_state : public driver_device
 {
 public:
 	meadows_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_spriteram(*this, "spriteram"),
+		m_videoram(*this, "videoram"){ }
 
-	UINT8 *m_videoram;
+	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<UINT8> m_videoram;
 	UINT8 m_dac;
 	int m_dac_enable;
 	int m_channel;
@@ -28,7 +31,6 @@ public:
 	UINT8 m_0c02;
 	UINT8 m_0c03;
 	tilemap_t *m_bg_tilemap;
-	UINT8 *m_spriteram;
 	DECLARE_READ8_MEMBER(hsync_chain_r);
 	DECLARE_READ8_MEMBER(vsync_chain_hi_r);
 	DECLARE_READ8_MEMBER(vsync_chain_lo_r);

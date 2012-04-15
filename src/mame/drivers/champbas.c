@@ -217,9 +217,9 @@ static ADDRESS_MAP_START( talbot_map, AS_PROGRAM, 8, champbas_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x63ff) AM_RAM AM_SHARE("share1") /* MCU shared RAM */
 	AM_RANGE(0x7000, 0x7001) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_address_w)
-	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(champbas_bg_videoram_w) AM_BASE(m_bg_videoram)
+	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(champbas_bg_videoram_w) AM_SHARE("bg_videoram")
 	AM_RANGE(0x8800, 0x8fef) AM_RAM
-	AM_RANGE(0x8ff0, 0x8fff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
+	AM_RANGE(0x8ff0, 0x8fff) AM_RAM AM_SHARE("spriteram")
 
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("P1")
 	AM_RANGE(0xa040, 0xa040) AM_READ_PORT("P2")
@@ -235,7 +235,7 @@ static ADDRESS_MAP_START( talbot_map, AS_PROGRAM, 8, champbas_state )
 	AM_RANGE(0xa006, 0xa006) AM_WRITE(champbas_mcu_halt_w)
 	AM_RANGE(0xa007, 0xa007) AM_WRITE(champbas_mcu_switch_w)
 
-	AM_RANGE(0xa060, 0xa06f) AM_WRITEONLY AM_BASE(m_spriteram_2)
+	AM_RANGE(0xa060, 0xa06f) AM_WRITEONLY AM_SHARE("spriteram_2")
 	AM_RANGE(0xa0c0, 0xa0c0) AM_WRITE(champbas_watchdog_reset_w)
 ADDRESS_MAP_END
 
@@ -245,9 +245,9 @@ static ADDRESS_MAP_START( champbas_main_map, AS_PROGRAM, 8, champbas_state )
 	AM_RANGE(0x6000, 0x63ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x7000, 0x7001) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_address_w)
 	AM_RANGE(0x7800, 0x7fff) AM_ROM	// champbb2 only
-	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(champbas_bg_videoram_w) AM_BASE(m_bg_videoram)
+	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(champbas_bg_videoram_w) AM_SHARE("bg_videoram")
 	AM_RANGE(0x8800, 0x8fef) AM_RAM
-	AM_RANGE(0x8ff0, 0x8fff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
+	AM_RANGE(0x8ff0, 0x8fff) AM_RAM AM_SHARE("spriteram")
 
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("P1")
 	AM_RANGE(0xa040, 0xa040) AM_READ_PORT("P2")
@@ -263,7 +263,7 @@ static ADDRESS_MAP_START( champbas_main_map, AS_PROGRAM, 8, champbas_state )
 	AM_RANGE(0xa006, 0xa006) AM_WRITE(champbas_mcu_halt_w)	// MCU not present/not used in champbas
 	AM_RANGE(0xa007, 0xa007) AM_WRITE(champbas_mcu_switch_w)	// MCU not present/not used in champbas
 
-	AM_RANGE(0xa060, 0xa06f) AM_RAM AM_BASE(m_spriteram_2)
+	AM_RANGE(0xa060, 0xa06f) AM_RAM AM_SHARE("spriteram_2")
 	AM_RANGE(0xa080, 0xa080) AM_WRITE(soundlatch_byte_w)
 /*  AM_RANGE(0xa0a0, 0xa0a0)    ???? */
 	AM_RANGE(0xa0c0, 0xa0c0) AM_WRITE(champbas_watchdog_reset_w)
@@ -277,8 +277,8 @@ static ADDRESS_MAP_START( exctsccrb_main_map, AS_PROGRAM, 8, champbas_state )
 //  AM_RANGE(0x6000, 0x63ff) AM_RAM AM_SHARE("share1") // MCU not used (though it's present on the board)
 	AM_RANGE(0x7000, 0x7001) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_address_w)
 //  AM_RANGE(0x7800, 0x7fff) AM_ROM // champbb2 only
-	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(champbas_bg_videoram_w) AM_BASE(m_bg_videoram)
-	AM_RANGE(0x8800, 0x8fff) AM_RAM AM_BASE(m_spriteram_2) /* ??? */
+	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(champbas_bg_videoram_w) AM_SHARE("bg_videoram")
+	AM_RANGE(0x8800, 0x8fff) AM_RAM AM_SHARE("spriteram_2") /* ??? */
 
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("P1")
 	AM_RANGE(0xa040, 0xa040) AM_READ_PORT("P2")
@@ -292,7 +292,7 @@ static ADDRESS_MAP_START( exctsccrb_main_map, AS_PROGRAM, 8, champbas_state )
 	AM_RANGE(0xa006, 0xa006) AM_WRITENOP	/* MCU is not used, but some leftover code still writes here */
 	AM_RANGE(0xa007, 0xa007) AM_WRITENOP	/* MCU is not used, but some leftover code still writes here */
 
-	AM_RANGE(0xa040, 0xa06f) AM_WRITEONLY AM_BASE(m_spriteram) /* Sprite Pos */
+	AM_RANGE(0xa040, 0xa06f) AM_WRITEONLY AM_SHARE("spriteram") /* Sprite Pos */
 	AM_RANGE(0xa080, 0xa080) AM_WRITE(soundlatch_byte_w)
 	AM_RANGE(0xa0c0, 0xa0c0) AM_WRITE(watchdog_reset_w)
 ADDRESS_MAP_END
@@ -302,8 +302,8 @@ static ADDRESS_MAP_START( exctsccr_main_map, AS_PROGRAM, 8, champbas_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x63ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x7c00, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(champbas_bg_videoram_w) AM_BASE(m_bg_videoram)
-	AM_RANGE(0x8800, 0x8bff) AM_RAM AM_BASE(m_spriteram_2) /* ??? */
+	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(champbas_bg_videoram_w) AM_SHARE("bg_videoram")
+	AM_RANGE(0x8800, 0x8bff) AM_RAM AM_SHARE("spriteram_2") /* ??? */
 
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("P1")
 	AM_RANGE(0xa040, 0xa040) AM_READ_PORT("P2")
@@ -317,7 +317,7 @@ static ADDRESS_MAP_START( exctsccr_main_map, AS_PROGRAM, 8, champbas_state )
 	AM_RANGE(0xa006, 0xa006) AM_WRITE(champbas_mcu_halt_w)
 	AM_RANGE(0xa007, 0xa007) AM_WRITENOP /* This is also MCU control, but i dont need it */
 
-	AM_RANGE(0xa040, 0xa06f) AM_WRITEONLY AM_BASE(m_spriteram) /* Sprite pos */
+	AM_RANGE(0xa040, 0xa06f) AM_WRITEONLY AM_SHARE("spriteram") /* Sprite pos */
 	AM_RANGE(0xa080, 0xa080) AM_WRITE(soundlatch_byte_w)
 	AM_RANGE(0xa0c0, 0xa0c0) AM_WRITE(watchdog_reset_w)
 ADDRESS_MAP_END

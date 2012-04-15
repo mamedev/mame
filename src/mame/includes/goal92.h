@@ -8,15 +8,20 @@ class goal92_state : public driver_device
 {
 public:
 	goal92_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_bg_data(*this, "bg_data"),
+		m_fg_data(*this, "fg_data"),
+		m_tx_data(*this, "tx_data"),
+		m_spriteram(*this, "spriteram"),
+		m_scrollram(*this, "scrollram"){ }
 
 	/* memory pointers */
-	UINT16 *    m_bg_data;
-	UINT16 *    m_fg_data;
-	UINT16 *    m_tx_data;
-	UINT16 *    m_scrollram;
+	required_shared_ptr<UINT16> m_bg_data;
+	required_shared_ptr<UINT16> m_fg_data;
+	required_shared_ptr<UINT16> m_tx_data;
+	required_shared_ptr<UINT16> m_spriteram;
+	required_shared_ptr<UINT16> m_scrollram;
 //  UINT16 *    m_paletteram; // this currently use generic palette handling
-	UINT16 *    m_spriteram;
 	UINT16 *    m_buffered_spriteram;
 
 	/* video-related */

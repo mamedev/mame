@@ -163,11 +163,13 @@ class _3do_state : public driver_device
 {
 public:
 	_3do_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_dram(*this, "dram"),
+		m_vram(*this, "vram"){ }
 
 	legacy_cpu_device* m_maincpu;
-	UINT32 *m_dram;
-	UINT32 *m_vram;
+	required_shared_ptr<UINT32> m_dram;
+	required_shared_ptr<UINT32> m_vram;
 	SLOW2 m_slow2;
 	MADAM m_madam;
 	CLIO m_clio;

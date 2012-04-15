@@ -2,13 +2,16 @@ class mainsnk_state : public driver_device
 {
 public:
 	mainsnk_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_bgram(*this, "bgram"),
+		m_spriteram(*this, "spriteram"),
+		m_fgram(*this, "fgram"){ }
 
 	tilemap_t *m_tx_tilemap;
 	tilemap_t *m_bg_tilemap;
-	UINT8 *m_spriteram;
-	UINT8 *m_fgram;
-	UINT8 *m_bgram;
+	required_shared_ptr<UINT8> m_bgram;
+	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<UINT8> m_fgram;
 
 	int m_sound_cpu_busy;
 	UINT32 m_bg_tile_offset;

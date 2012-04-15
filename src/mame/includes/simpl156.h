@@ -16,21 +16,23 @@ public:
 		  m_maincpu(*this, "maincpu"),
 		  m_deco_tilegen1(*this, "tilegen1"),
 		  m_eeprom(*this, "eeprom"),
-		  m_okimusic(*this, "okimusic") { }
-
-	/* memory pointers */
-	UINT16 *  m_pf1_rowscroll;
-	UINT16 *  m_pf2_rowscroll;
-	UINT32 *  m_mainram;
-	UINT32 *  m_systemram;
-	UINT16 *m_spriteram;
-	size_t m_spriteram_size;
+		  m_okimusic(*this, "okimusic") ,
+		m_mainram(*this, "mainram"),
+		m_systemram(*this, "systemram"){ }
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<deco16ic_device> m_deco_tilegen1;
 	required_device<eeprom_device> m_eeprom;
 	required_device<okim6295_device> m_okimusic;
+	/* memory pointers */
+	UINT16 *  m_pf1_rowscroll;
+	UINT16 *  m_pf2_rowscroll;
+	required_shared_ptr<UINT32> m_mainram;
+	required_shared_ptr<UINT32> m_systemram;
+	UINT16 *m_spriteram;
+	size_t m_spriteram_size;
+
 	DECLARE_READ32_MEMBER(simpl156_inputs_read);
 	DECLARE_READ32_MEMBER(simpl156_palette_r);
 	DECLARE_WRITE32_MEMBER(simpl156_palette_w);

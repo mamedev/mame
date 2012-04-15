@@ -21,13 +21,19 @@ class taitoair_state : public driver_device
 {
 public:
 	taitoair_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_m68000_mainram(*this, "m68000_mainram"),
+		  m_line_ram(*this, "line_ram"),
+		  m_dsp_ram(*this, "dsp_ram"),
+		  m_paletteram(*this, "paletteram"),
+		  m_gradram(*this, "gradram"),
+		  m_backregs(*this, "backregs") { }
 
 	/* memory pointers */
-	UINT16 *      m_m68000_mainram;
-	UINT16 *      m_line_ram;
-	UINT16 *      m_dsp_ram;	/* Shared 68000/TMS32025 RAM */
-	UINT16 *      m_paletteram;
+	required_shared_ptr<UINT16> m_m68000_mainram;
+	required_shared_ptr<UINT16> m_line_ram;
+	required_shared_ptr<UINT16> m_dsp_ram;      	// Shared 68000/TMS32025 RAM
+	required_shared_ptr<UINT16> m_paletteram;
 
 	/* video-related */
 	taitoair_poly  m_q;
@@ -41,8 +47,8 @@ public:
 	device_t *m_dsp;
 	device_t *m_tc0080vco;
 
-	UINT16 *      m_gradram;
-	UINT16 *      m_backregs;
+	required_shared_ptr<UINT16> m_gradram;
+	required_shared_ptr<UINT16> m_backregs;
 
 	bitmap_ind16 *m_framebuffer[2];
 

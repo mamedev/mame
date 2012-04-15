@@ -2,11 +2,14 @@ class thoop2_state : public driver_device
 {
 public:
 	thoop2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"),
+		m_vregs(*this, "vregs"),
+		m_spriteram(*this, "spriteram"){ }
 
-	UINT16 *m_vregs;
-	UINT16 *m_videoram;
-	UINT16 *m_spriteram;
+	required_shared_ptr<UINT16> m_videoram;
+	required_shared_ptr<UINT16> m_vregs;
+	required_shared_ptr<UINT16> m_spriteram;
 	int m_sprite_count[5];
 	int *m_sprite_table[5];
 	tilemap_t *m_pant[2];

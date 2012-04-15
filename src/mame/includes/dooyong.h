@@ -6,10 +6,14 @@ public:
 	dooyong_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		  m_spriteram(*this, "spriteram"),
-		  m_spriteram16(*this, "spriteram16") { }
+		  m_spriteram16(*this, "spriteram16") ,
+		m_txvideoram(*this, "txvideoram"),
+		m_paletteram_flytiger(*this, "flytiger_palram"){ }
 
-	UINT8 *m_txvideoram;
-	UINT8 *m_paletteram_flytiger;
+	optional_device<buffered_spriteram8_device> m_spriteram;
+	optional_device<buffered_spriteram16_device> m_spriteram16;
+	required_shared_ptr<UINT8> m_txvideoram;
+	required_shared_ptr<UINT8> m_paletteram_flytiger;
 	UINT8 m_sprites_disabled;
 	UINT8 m_flytiger_palette_bank;
 	UINT8 m_flytiger_pri;
@@ -40,8 +44,7 @@ public:
 
 	int m_interrupt_line_1;
 	int m_interrupt_line_2;
-	optional_device<buffered_spriteram8_device> m_spriteram;
-	optional_device<buffered_spriteram16_device> m_spriteram16;
+
 	DECLARE_WRITE8_MEMBER(lastday_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(flip_screen_w);
 	DECLARE_WRITE8_MEMBER(dooyong_bgscroll8_w);

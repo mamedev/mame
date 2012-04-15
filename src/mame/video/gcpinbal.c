@@ -180,7 +180,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	/* According to Raine, word in ioc_ram determines sprite/tile priority... */
 	priority = (state->m_ioc_ram[0x68 / 2] & 0x8800) ? 0 : 1;
 
-	for (offs = state->m_spriteram_size / 2 - 8; offs >= 0; offs -= 8)
+	for (offs = state->m_spriteram.bytes() / 2 - 8; offs >= 0; offs -= 8)
 	{
 		code = ((spriteram[offs + 5]) & 0xff) + (((spriteram[offs + 6]) & 0xff) << 8);
 		code &= 0x3fff;

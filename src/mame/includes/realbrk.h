@@ -2,23 +2,32 @@ class realbrk_state : public driver_device
 {
 public:
 	realbrk_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_spriteram(*this, "spriteram"),
+		m_vram_0(*this, "vram_0"),
+		m_vram_1(*this, "vram_1"),
+		m_vram_2(*this, "vram_2"),
+		m_vregs(*this, "vregs"),
+		m_dsw_select(*this, "dsw_select"),
+		m_backup_ram(*this, "backup_ram"),
+		m_vram_0ras(*this, "vram_0ras"),
+		m_vram_1ras(*this, "vram_1ras"){ }
 
-	UINT16 *m_dsw_select;
-	UINT16 *m_backup_ram;
-	UINT16 *m_vram_0;
-	UINT16 *m_vram_1;
-	UINT16 *m_vram_2;
-	UINT16 *m_vregs;
-	UINT16 *m_vram_0ras;
-	UINT16 *m_vram_1ras;
+	required_shared_ptr<UINT16> m_spriteram;
+	required_shared_ptr<UINT16> m_vram_0;
+	required_shared_ptr<UINT16> m_vram_1;
+	required_shared_ptr<UINT16> m_vram_2;
+	required_shared_ptr<UINT16> m_vregs;
+	required_shared_ptr<UINT16> m_dsw_select;
+	required_shared_ptr<UINT16> m_backup_ram;
+	required_shared_ptr<UINT16> m_vram_0ras;
+	required_shared_ptr<UINT16> m_vram_1ras;
 	bitmap_ind16 *m_tmpbitmap0;
 	bitmap_ind16 *m_tmpbitmap1;
 	int m_disable_video;
 	tilemap_t *m_tilemap_0;
 	tilemap_t *m_tilemap_1;
 	tilemap_t *m_tilemap_2;
-	UINT16 *m_spriteram;
 	DECLARE_READ16_MEMBER(realbrk_dsw_r);
 	DECLARE_READ16_MEMBER(pkgnsh_input_r);
 	DECLARE_READ16_MEMBER(pkgnshdx_input_r);

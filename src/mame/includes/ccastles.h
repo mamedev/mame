@@ -14,11 +14,17 @@ public:
 		: driver_device(mconfig, type, tag),
 		  m_maincpu(*this, "maincpu"),
 		  m_nvram_4b(*this, "nvram_4b"),
-		  m_nvram_4a(*this, "nvram_4a") { }
+		  m_nvram_4a(*this, "nvram_4a") ,
+		m_videoram(*this, "videoram"),
+		m_spriteram(*this, "spriteram"){ }
 
+	/* devices */
+	required_device<m6502_device> m_maincpu;
+	required_device<x2212_device> m_nvram_4b;
+	required_device<x2212_device> m_nvram_4a;
 	/* memory pointers */
-	UINT8 *  m_videoram;
-	UINT8 *  m_spriteram;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_spriteram;
 
 	/* video-related */
 	const UINT8 *m_syncprom;
@@ -40,10 +46,6 @@ public:
 	UINT8    m_irq_state;
 	UINT8    m_nvram_store[2];
 
-	/* devices */
-	required_device<m6502_device> m_maincpu;
-	required_device<x2212_device> m_nvram_4b;
-	required_device<x2212_device> m_nvram_4a;
 	DECLARE_WRITE8_MEMBER(irq_ack_w);
 	DECLARE_WRITE8_MEMBER(led_w);
 	DECLARE_WRITE8_MEMBER(ccounter_w);

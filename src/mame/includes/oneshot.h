@@ -3,14 +3,19 @@ class oneshot_state : public driver_device
 {
 public:
 	oneshot_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_sprites(*this, "sprites"),
+		m_bg_videoram(*this, "bg_videoram"),
+		m_mid_videoram(*this, "mid_videoram"),
+		m_fg_videoram(*this, "fg_videoram"),
+		m_scroll(*this, "scroll"){ }
 
 	/* memory pointers */
-	UINT16 *        m_sprites;
-	UINT16 *        m_bg_videoram;
-	UINT16 *        m_mid_videoram;
-	UINT16 *        m_fg_videoram;
-	UINT16 *        m_scroll;
+	required_shared_ptr<UINT16> m_sprites;
+	required_shared_ptr<UINT16> m_bg_videoram;
+	required_shared_ptr<UINT16> m_mid_videoram;
+	required_shared_ptr<UINT16> m_fg_videoram;
+	required_shared_ptr<UINT16> m_scroll;
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;

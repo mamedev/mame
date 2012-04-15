@@ -2,13 +2,16 @@ class baraduke_state : public driver_device
 {
 public:
 	baraduke_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_spriteram(*this, "spriteram"),
+		m_videoram(*this, "videoram"),
+		m_textram(*this, "textram"){ }
 
 	int m_inputport_selected;
 	int m_counter;
-	UINT8 *m_textram;
-	UINT8 *m_videoram;
-	UINT8 *m_spriteram;
+	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_textram;
 	tilemap_t *m_tx_tilemap;
 	tilemap_t *m_bg_tilemap[2];
 	int m_xscroll[2];

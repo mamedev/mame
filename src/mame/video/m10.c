@@ -158,7 +158,7 @@ SCREEN_UPDATE_IND16( m10 )
 			plot_pixel_m10(screen.machine(), bitmap, 16, y, 1);
 	}
 
-	for (offs = state->m_videoram_size - 1; offs >= 0; offs--)
+	for (offs = state->m_videoram.bytes() - 1; offs >= 0; offs--)
 		state->m_tx_tilemap->mark_tile_dirty(offs);
 
 	state->m_tx_tilemap->set_flip(state->m_flip ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
@@ -179,7 +179,7 @@ SCREEN_UPDATE_IND16( m15 )
 	m10_state *state = screen.machine().driver_data<m10_state>();
 	int offs;
 
-	for (offs = state->m_videoram_size - 1; offs >= 0; offs--)
+	for (offs = state->m_videoram.bytes() - 1; offs >= 0; offs--)
 		state->m_tx_tilemap->mark_tile_dirty(offs);
 
 	//state->m_tx_tilemap->mark_all_dirty();

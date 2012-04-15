@@ -2,12 +2,15 @@ class prehisle_state : public driver_device
 {
 public:
 	prehisle_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"),
+		m_spriteram(*this, "spriteram"),
+		m_bg_videoram16(*this, "bg_videoram16"){ }
 
 
-	UINT16 *m_spriteram;
-	UINT16 *m_videoram;
-	UINT16 *m_bg_videoram16;
+	required_shared_ptr<UINT16> m_videoram;
+	required_shared_ptr<UINT16> m_spriteram;
+	required_shared_ptr<UINT16> m_bg_videoram16;
 	UINT16 m_invert_controls;
 
 	tilemap_t *m_bg2_tilemap;

@@ -142,7 +142,7 @@ static ADDRESS_MAP_START( irobot_map, AS_PROGRAM, 8, irobot_state )
     AM_RANGE(0x1900, 0x19ff) AM_WRITEONLY            /* Watchdog reset */
     AM_RANGE(0x1a00, 0x1a00) AM_WRITE(irobot_clearfirq_w)
     AM_RANGE(0x1b00, 0x1bff) AM_WRITE(irobot_control_w)
-    AM_RANGE(0x1c00, 0x1fff) AM_RAM AM_BASE(m_videoram)
+    AM_RANGE(0x1c00, 0x1fff) AM_RAM AM_SHARE("videoram")
     AM_RANGE(0x2000, 0x3fff) AM_READWRITE(irobot_sharedmem_r, irobot_sharedmem_w)
     AM_RANGE(0x4000, 0x5fff) AM_ROMBANK("bank1")
     AM_RANGE(0x6000, 0xffff) AM_ROM

@@ -3,18 +3,19 @@ class sprcros2_state : public driver_device
 public:
 	sprcros2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+		m_fgvideoram(*this, "fgvideoram"),
+		m_bgvideoram(*this, "bgvideoram"),
+		m_spriteram(*this, "spriteram"),
 		m_master(*this,"master"),
-		m_slave(*this,"slave")
-		{ }
+		m_slave(*this,"slave"){ }
 
 	UINT8 m_s_port3;
 	UINT8 m_port7;
 	tilemap_t *m_bgtilemap;
 	tilemap_t *m_fgtilemap;
-	UINT8 *m_fgvideoram;
-	UINT8 *m_bgvideoram;
-	UINT8 *m_spriteram;
-	size_t m_spriteram_size;
+	required_shared_ptr<UINT8> m_fgvideoram;
+	required_shared_ptr<UINT8> m_bgvideoram;
+	required_shared_ptr<UINT8> m_spriteram;
 
 	required_device<cpu_device> m_master;
 	required_device<cpu_device> m_slave;

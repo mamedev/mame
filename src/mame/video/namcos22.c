@@ -2610,7 +2610,7 @@ static void
 SimulateSlaveDSP( running_machine &machine, bitmap_rgb32 &bitmap )
 {
 	namcos22_state *state = machine.driver_data<namcos22_state>();
-	const INT32 *pSource = 0x300 + (INT32 *)state->m_polygonram;
+	const INT32 *pSource = 0x300 + (INT32 *)state->m_polygonram.target();
 	INT16 len;
 
 	matrix3d_Identity( state->m_mViewMatrix );
@@ -2649,7 +2649,7 @@ SimulateSlaveDSP( running_machine &machine, bitmap_rgb32 &bitmap )
 			break;
 
 		default:
-			logerror( "unk 3d data(%d) addr=0x%x!", len, (int)(pSource-(INT32*)state->m_polygonram) );
+			logerror( "unk 3d data(%d) addr=0x%x!", len, (int)(pSource-(INT32*)state->m_polygonram.target()) );
 			{
 				int i;
 				for( i=0; i<len; i++ )
@@ -2665,7 +2665,7 @@ SimulateSlaveDSP( running_machine &machine, bitmap_rgb32 &bitmap )
 		pSource += len;
 		pSource++; /* always 0xffff */
 		next = (INT16)*pSource++; /* link to next command */
-		if( (next&0x7fff) != (pSource - (INT32 *)state->m_polygonram) )
+		if( (next&0x7fff) != (pSource - (INT32 *)state->m_polygonram.target()) )
 		{ /* end of list */
 			break;
 		}
@@ -2752,7 +2752,7 @@ static VIDEO_START( common )
 	machine.add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(FUNC(namcos22_reset), &machine));
 	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(namcos22_exit), &machine));
 
-	gfx_element_set_source(machine.gfx[GFX_CHAR], (UINT8 *)state->m_cgram);
+	gfx_element_set_source(machine.gfx[GFX_CHAR], (UINT8 *)state->m_cgram.target());
 }
 
 VIDEO_START( namcos22 )

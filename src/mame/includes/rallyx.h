@@ -11,13 +11,15 @@ class rallyx_state : public driver_device
 {
 public:
 	rallyx_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_videoram(*this, "videoram"),
+		m_radarattr(*this, "radarattr") { }
 
 	/* memory pointers */
-	UINT8 *  m_videoram;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_radarattr;
 	UINT8 *  m_spriteram;
 	UINT8 *  m_spriteram2;
-	UINT8 *  m_radarattr;
 	UINT8 *  m_radarx;
 	UINT8 *  m_radary;
 

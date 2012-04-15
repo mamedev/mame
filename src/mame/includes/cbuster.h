@@ -8,15 +8,21 @@ class cbuster_state : public driver_device
 {
 public:
 	cbuster_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_ram(*this, "ram"),
+		m_pf1_rowscroll(*this, "pf1_rowscroll"),
+		m_pf2_rowscroll(*this, "pf2_rowscroll"),
+		m_pf3_rowscroll(*this, "pf3_rowscroll"),
+		m_pf4_rowscroll(*this, "pf4_rowscroll"),
+		m_spriteram16(*this, "spriteram16"){ }
 
 	/* memory pointers */
-	UINT16 *  m_pf1_rowscroll;
-	UINT16 *  m_pf2_rowscroll;
-	UINT16 *  m_pf3_rowscroll;
-	UINT16 *  m_pf4_rowscroll;
-	UINT16 *  m_ram;
-	UINT16 *  m_spriteram16;
+	required_shared_ptr<UINT16> m_ram;
+	required_shared_ptr<UINT16> m_pf1_rowscroll;
+	required_shared_ptr<UINT16> m_pf2_rowscroll;
+	required_shared_ptr<UINT16> m_pf3_rowscroll;
+	required_shared_ptr<UINT16> m_pf4_rowscroll;
+	required_shared_ptr<UINT16> m_spriteram16;
 	UINT16    m_spriteram16_buffer[0x400];
 
 	/* misc */

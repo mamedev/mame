@@ -26,10 +26,12 @@ class missb2_state : public bublbobl_state
 {
 public:
 	missb2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: bublbobl_state(mconfig, type, tag) { }
+		: bublbobl_state(mconfig, type, tag),
+		  m_bgvram(*this, "bgvram"),
+		  m_bg_paletteram(*this, "bg_paletteram") { }
 
-	UINT8 *  m_bgvram;
-	UINT8 *  m_bg_paletteram;
+	required_shared_ptr<UINT8> m_bgvram;
+	required_shared_ptr<UINT8> m_bg_paletteram;
 	DECLARE_WRITE8_MEMBER(bg_paletteram_RRRRGGGGBBBBxxxx_be_w);
 	DECLARE_WRITE8_MEMBER(missb2_bg_bank_w);
 };
@@ -71,7 +73,7 @@ static SCREEN_UPDATE_IND16( missb2 )
 	sx = 0;
 
 	prom = screen.machine().region("proms")->base();
-	for (offs = 0; offs < state->m_objectram_size; offs += 4)
+	for (offs = 0; offs < state->m_objectram.bytes(); offs += 4)
 	{
 		/* skip empty sprites */
 		/* this is dword aligned so the UINT32 * cast shouldn't give problems */
@@ -161,8 +163,8 @@ WRITE8_MEMBER(missb2_state::missb2_bg_bank_w)
 static ADDRESS_MAP_START( master_map, AS_PROGRAM, 8, missb2_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xdcff) AM_RAM AM_BASE_SIZE(m_videoram, m_videoram_size)
-	AM_RANGE(0xdd00, 0xdfff) AM_RAM AM_BASE_SIZE(m_objectram, m_objectram_size)
+	AM_RANGE(0xc000, 0xdcff) AM_RAM AM_SHARE("videoram")
+	AM_RANGE(0xdd00, 0xdfff) AM_RAM AM_SHARE("objectram")
 	AM_RANGE(0xe000, 0xf7ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xf800, 0xf9ff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_byte_be_w) AM_SHARE("paletteram")
 	AM_RANGE(0xfa00, 0xfa00) AM_WRITE(bublbobl_sound_command_w)
@@ -186,11 +188,11 @@ static ADDRESS_MAP_START( slave_map, AS_PROGRAM, 8, missb2_state )
 	AM_RANGE(0x9000, 0x9fff) AM_ROMBANK("bank2")	// ROM data for the background palette ram
 	AM_RANGE(0xa000, 0xafff) AM_ROMBANK("bank3")	// ROM data for the background palette ram
 	AM_RANGE(0xb000, 0xb1ff) AM_ROM			// banked ???
-	AM_RANGE(0xc000, 0xc1ff) AM_RAM_WRITE(bg_paletteram_RRRRGGGGBBBBxxxx_be_w) AM_BASE(m_bg_paletteram)
+	AM_RANGE(0xc000, 0xc1ff) AM_RAM_WRITE(bg_paletteram_RRRRGGGGBBBBxxxx_be_w) AM_SHARE("bg_paletteram")
 	AM_RANGE(0xc800, 0xcfff) AM_RAM			// main ???
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(missb2_bg_bank_w)
 	AM_RANGE(0xd002, 0xd002) AM_WRITENOP
-	AM_RANGE(0xd003, 0xd003) AM_RAM AM_BASE(m_bgvram)
+	AM_RANGE(0xd003, 0xd003) AM_RAM AM_SHARE("bgvram")
 	AM_RANGE(0xe000, 0xf7ff) AM_RAM AM_SHARE("share1")
 ADDRESS_MAP_END
 

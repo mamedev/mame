@@ -8,15 +8,20 @@ class equites_state : public driver_device
 {
 public:
 	equites_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_bg_videoram(*this, "bg_videoram"),
+		m_spriteram(*this, "spriteram"),
+		m_workram(*this, "workram"),
+		m_spriteram_2(*this, "spriteram_2"),
+		m_mcu_ram(*this, "mcu_ram"){ }
 
 	/* memory pointers */
-	UINT16 *  m_bg_videoram;
+	required_shared_ptr<UINT16> m_bg_videoram;
 	UINT8  *  m_fg_videoram;	// 8bits
-	UINT16 *  m_spriteram;
-	UINT16 *  m_spriteram_2;
-	UINT16 *  m_workram;
-	UINT8  *  m_mcu_ram;	// 8bits
+	required_shared_ptr<UINT16> m_spriteram;
+	required_shared_ptr<UINT16> m_workram;
+	required_shared_ptr<UINT16> m_spriteram_2;
+	required_shared_ptr<UINT8>  m_mcu_ram;    	// 8bits
 //  UINT16 *  m_nvram;    // currently this uses generic nvram handling
 
 	/* video-related */

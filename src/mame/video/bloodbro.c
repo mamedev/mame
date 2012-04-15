@@ -147,7 +147,7 @@ static void bloodbro_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap
 	bloodbro_state *state = machine.driver_data<bloodbro_state>();
 	UINT16 *spriteram16 = state->m_spriteram;
 	int offs;
-	for (offs = 0;offs < state->m_spriteram_size/2;offs += 4)
+	for (offs = 0;offs < state->m_spriteram.bytes()/2;offs += 4)
 	{
 		int sx,sy,x,y,width,height,attributes,tile_number,color,flipx,flipy,pri_mask;
 
@@ -198,7 +198,7 @@ static void weststry_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap
 	int offs;
 
 	/* TODO: the last two entries are not sprites - control registers? */
-	for (offs = 0;offs < state->m_spriteram_size/2 - 8;offs += 4)
+	for (offs = 0;offs < state->m_spriteram.bytes()/2 - 8;offs += 4)
 	{
 		int data = spriteram16[offs+2];
 		int data0 = spriteram16[offs+0];

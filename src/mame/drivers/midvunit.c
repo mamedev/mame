@@ -462,12 +462,12 @@ static void midvplus_xf1_w(tms3203x_device &device, UINT8 val)
  *************************************/
 
 static ADDRESS_MAP_START( midvunit_map, AS_PROGRAM, 32, midvunit_state )
-	AM_RANGE(0x000000, 0x01ffff) AM_RAM AM_BASE(m_ram_base)
+	AM_RANGE(0x000000, 0x01ffff) AM_RAM AM_SHARE("ram_base")
 	AM_RANGE(0x400000, 0x41ffff) AM_RAM
 	AM_RANGE(0x600000, 0x600000) AM_WRITE(midvunit_dma_queue_w)
-	AM_RANGE(0x808000, 0x80807f) AM_READWRITE(tms32031_control_r, tms32031_control_w) AM_BASE(m_tms32031_control)
+	AM_RANGE(0x808000, 0x80807f) AM_READWRITE(tms32031_control_r, tms32031_control_w) AM_SHARE("32031_control")
 	AM_RANGE(0x809800, 0x809fff) AM_RAM
-	AM_RANGE(0x900000, 0x97ffff) AM_READWRITE(midvunit_videoram_r, midvunit_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0x900000, 0x97ffff) AM_READWRITE(midvunit_videoram_r, midvunit_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x980000, 0x980000) AM_READ(midvunit_dma_queue_entries_r)
 	AM_RANGE(0x980020, 0x980020) AM_READ(midvunit_scanline_r)
 	AM_RANGE(0x980020, 0x98002b) AM_WRITE(midvunit_video_control_w)
@@ -487,7 +487,7 @@ static ADDRESS_MAP_START( midvunit_map, AS_PROGRAM, 32, midvunit_state )
 	AM_RANGE(0x9a0000, 0x9a0000) AM_WRITE(midvunit_sound_w)
 	AM_RANGE(0x9c0000, 0x9c1fff) AM_READWRITE(midvunit_cmos_r, midvunit_cmos_w) AM_SHARE("nvram")
 	AM_RANGE(0x9e0000, 0x9e7fff) AM_RAM_WRITE(midvunit_paletteram_w) AM_SHARE("paletteram")
-	AM_RANGE(0xa00000, 0xbfffff) AM_READWRITE(midvunit_textureram_r, midvunit_textureram_w) AM_BASE(m_textureram)
+	AM_RANGE(0xa00000, 0xbfffff) AM_READWRITE(midvunit_textureram_r, midvunit_textureram_w) AM_SHARE("textureram")
 	AM_RANGE(0xc00000, 0xffffff) AM_ROM AM_REGION("user1", 0)
 ADDRESS_MAP_END
 
@@ -495,12 +495,12 @@ ADDRESS_MAP_END
 static const tms3203x_config midvplus_config = { 0, NULL, midvplus_xf1_w };
 
 static ADDRESS_MAP_START( midvplus_map, AS_PROGRAM, 32, midvunit_state )
-	AM_RANGE(0x000000, 0x01ffff) AM_RAM AM_BASE(m_ram_base)
-	AM_RANGE(0x400000, 0x41ffff) AM_RAM AM_BASE(m_fastram_base)
+	AM_RANGE(0x000000, 0x01ffff) AM_RAM AM_SHARE("ram_base")
+	AM_RANGE(0x400000, 0x41ffff) AM_RAM AM_SHARE("fastram_base")
 	AM_RANGE(0x600000, 0x600000) AM_WRITE(midvunit_dma_queue_w)
-	AM_RANGE(0x808000, 0x80807f) AM_READWRITE(tms32031_control_r, tms32031_control_w) AM_BASE(m_tms32031_control)
+	AM_RANGE(0x808000, 0x80807f) AM_READWRITE(tms32031_control_r, tms32031_control_w) AM_SHARE("32031_control")
 	AM_RANGE(0x809800, 0x809fff) AM_RAM
-	AM_RANGE(0x900000, 0x97ffff) AM_READWRITE(midvunit_videoram_r, midvunit_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0x900000, 0x97ffff) AM_READWRITE(midvunit_videoram_r, midvunit_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x980000, 0x980000) AM_READ(midvunit_dma_queue_entries_r)
 	AM_RANGE(0x980020, 0x980020) AM_READ(midvunit_scanline_r)
 	AM_RANGE(0x980020, 0x98002b) AM_WRITE(midvunit_video_control_w)
@@ -512,8 +512,8 @@ static ADDRESS_MAP_START( midvplus_map, AS_PROGRAM, 32, midvunit_state )
 	AM_RANGE(0x995020, 0x995020) AM_WRITE(midvunit_cmos_protect_w)
 	AM_RANGE(0x9a0000, 0x9a0007) AM_DEVREADWRITE_LEGACY("ide", midway_ide_asic_r, midway_ide_asic_w)
 	AM_RANGE(0x9c0000, 0x9c7fff) AM_RAM_WRITE(midvunit_paletteram_w) AM_SHARE("paletteram")
-	AM_RANGE(0x9d0000, 0x9d000f) AM_READWRITE(midvplus_misc_r, midvplus_misc_w) AM_BASE(m_midvplus_misc)
-	AM_RANGE(0xa00000, 0xbfffff) AM_READWRITE(midvunit_textureram_r, midvunit_textureram_w) AM_BASE(m_textureram)
+	AM_RANGE(0x9d0000, 0x9d000f) AM_READWRITE(midvplus_misc_r, midvplus_misc_w) AM_SHARE("midvplus_misc")
+	AM_RANGE(0xa00000, 0xbfffff) AM_READWRITE(midvunit_textureram_r, midvunit_textureram_w) AM_SHARE("textureram")
 	AM_RANGE(0xc00000, 0xcfffff) AM_RAM
 ADDRESS_MAP_END
 

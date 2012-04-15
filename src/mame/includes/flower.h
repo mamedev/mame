@@ -4,15 +4,22 @@ class flower_state : public driver_device
 {
 public:
 	flower_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_sn_nmi_enable(*this, "sn_nmi_enable"),
+		m_spriteram(*this, "spriteram"),
+		m_textram(*this, "textram"),
+		m_bg0ram(*this, "bg0ram"),
+		m_bg1ram(*this, "bg1ram"),
+		m_bg0_scroll(*this, "bg0_scroll"),
+		m_bg1_scroll(*this, "bg1_scroll"){ }
 
-	UINT8 *m_sn_nmi_enable;
-	UINT8 *m_spriteram;
-	UINT8 *m_textram;
-	UINT8 *m_bg0ram;
-	UINT8 *m_bg1ram;
-	UINT8 *m_bg0_scroll;
-	UINT8 *m_bg1_scroll;
+	required_shared_ptr<UINT8> m_sn_nmi_enable;
+	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<UINT8> m_textram;
+	required_shared_ptr<UINT8> m_bg0ram;
+	required_shared_ptr<UINT8> m_bg1ram;
+	required_shared_ptr<UINT8> m_bg0_scroll;
+	required_shared_ptr<UINT8> m_bg1_scroll;
 	tilemap_t *m_bg0_tilemap;
 	tilemap_t *m_bg1_tilemap;
 	tilemap_t *m_text_tilemap;

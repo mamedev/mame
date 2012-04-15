@@ -3,13 +3,18 @@ class mugsmash_state : public driver_device
 {
 public:
 	mugsmash_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram1(*this, "videoram1"),
+		m_videoram2(*this, "videoram2"),
+		m_regs1(*this, "regs1"),
+		m_regs2(*this, "regs2"),
+		m_spriteram(*this, "spriteram"){ }
 
-	UINT16 *m_videoram1;
-	UINT16 *m_videoram2;
-	UINT16 *m_spriteram;
-	UINT16 *m_regs1;
-	UINT16 *m_regs2;
+	required_shared_ptr<UINT16> m_videoram1;
+	required_shared_ptr<UINT16> m_videoram2;
+	required_shared_ptr<UINT16> m_regs1;
+	required_shared_ptr<UINT16> m_regs2;
+	required_shared_ptr<UINT16> m_spriteram;
 
 	tilemap_t *m_tilemap1;
 	tilemap_t *m_tilemap2;

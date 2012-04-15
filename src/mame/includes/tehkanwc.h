@@ -2,22 +2,25 @@ class tehkanwc_state : public driver_device
 {
 public:
 	tehkanwc_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"),
+		m_colorram(*this, "colorram"),
+		m_videoram2(*this, "videoram2"),
+		m_spriteram(*this, "spriteram"){ }
 
 	int m_track0[2];
 	int m_track1[2];
 	int m_msm_data_offs;
 	int m_toggle;
-	UINT8 *m_videoram;
-	UINT8 *m_colorram;
-	UINT8 *m_videoram2;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_colorram;
+	required_shared_ptr<UINT8> m_videoram2;
 	UINT8 m_scroll_x[2];
 	UINT8 m_led0;
 	UINT8 m_led1;
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
-	UINT8 *m_spriteram;
-	size_t m_spriteram_size;
+	required_shared_ptr<UINT8> m_spriteram;
 	DECLARE_WRITE8_MEMBER(sub_cpu_halt_w);
 	DECLARE_READ8_MEMBER(tehkanwc_track_0_r);
 	DECLARE_READ8_MEMBER(tehkanwc_track_1_r);

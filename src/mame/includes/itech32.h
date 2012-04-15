@@ -18,7 +18,22 @@ class itech32_state : public driver_device
 {
 public:
 	itech32_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_main_ram(*this, "main_ram"),
+		m_video(*this, "video"),
+		m_main_rom(*this, "main_rom"),
+		m_drivedge_zbuf_control(*this, "drivedge_zctl"),
+		m_tms1_boot(*this, "tms1_boot"),
+		m_tms1_ram(*this, "tms1_ram"),
+		m_tms2_ram(*this, "tms2_ram"){ }
+
+	required_shared_ptr<UINT16> m_main_ram;
+	required_shared_ptr<UINT16> m_video;
+	required_shared_ptr<UINT16> m_main_rom;
+	required_shared_ptr<UINT32> m_drivedge_zbuf_control;
+	required_shared_ptr<UINT32> m_tms1_boot;
+	required_shared_ptr<UINT32> m_tms1_ram;
+	required_shared_ptr<UINT32> m_tms2_ram;
 
 	void nvram_init(nvram_device &nvram, void *base, size_t length);
 
@@ -29,12 +44,7 @@ public:
 	UINT8 m_sound_data;
 	UINT8 m_sound_return;
 	UINT8 m_sound_int_state;
-	UINT16 *m_main_rom;
-	UINT16 *m_main_ram;
 	offs_t m_itech020_prot_address;
-	UINT32 *m_tms1_ram;
-	UINT32 *m_tms2_ram;
-	UINT32 *m_tms1_boot;
 	UINT8 m_tms_spinning[2];
 	int m_special_result;
 	int m_p1_effx;
@@ -47,8 +57,6 @@ public:
 	attotime m_p2_lasttime;
 	UINT8 m_written[0x8000];
 	int m_is_drivedge;
-	UINT16 *m_video;
-	UINT32 *m_drivedge_zbuf_control;
 	UINT8 m_planes;
 	UINT16 m_vram_height;
 	UINT16 m_xfer_xcount;

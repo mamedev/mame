@@ -8,20 +8,24 @@ class centiped_state : public driver_device
 {
 public:
 	centiped_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_rambase(*this, "rambase"),
+		m_videoram(*this, "videoram"),
+		m_spriteram(*this, "spriteram"),
+		m_bullsdrt_tiles_bankram(*this, "bullsdrt_bank"){ }
 
-	UINT8 *m_videoram;
+	required_shared_ptr<UINT8> m_rambase;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<UINT8> m_bullsdrt_tiles_bankram;
 	UINT8 m_oldpos[4];
 	UINT8 m_sign[4];
 	UINT8 m_dsw_select;
 	UINT8 m_control_select;
-	UINT8 *m_rambase;
 	UINT8 m_flipscreen;
-	UINT8 *m_bullsdrt_tiles_bankram;
 	tilemap_t *m_bg_tilemap;
 	UINT8 m_bullsdrt_sprites_bank;
 	UINT8 m_penmask[64];
-	UINT8 *m_spriteram;
 	DECLARE_WRITE8_MEMBER(irq_ack_w);
 	DECLARE_READ8_MEMBER(centiped_IN0_r);
 	DECLARE_READ8_MEMBER(centiped_IN2_r);

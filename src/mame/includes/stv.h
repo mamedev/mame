@@ -5,14 +5,17 @@ class saturn_state : public driver_device
 {
 public:
 	saturn_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_workram_l(*this, "workram_l"),
+		  m_workram_h(*this, "workram_h"),
+		  m_sound_ram(*this, "sound_ram") { }
 
-	UINT32    *m_workram_l;
-	UINT32    *m_workram_h;
+	required_shared_ptr<UINT32> m_workram_l;
+	required_shared_ptr<UINT32> m_workram_h;
 	UINT8     *m_backupram;
 	UINT8     *m_cart_backupram;
 	UINT32    *m_scu_regs;
-	UINT16    *m_sound_ram;
+	required_shared_ptr<UINT16> m_sound_ram;
 	UINT16    *m_scsp_regs;
 	UINT16    *m_vdp2_regs;
 	UINT32    *m_vdp2_vram;

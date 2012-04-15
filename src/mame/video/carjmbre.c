@@ -129,11 +129,11 @@ SCREEN_UPDATE_IND16( carjmbre )
 	//--xx---- unused
 	//----xxxx colour
 	//+3       x pos
-	for (offs = state->m_spriteram_size - 4; offs >= 0; offs -= 4)
+	for (offs = state->m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
 	{
 		//before copying the sprites to spriteram the game reorders the first
 		//sprite to last, sprite ordering is incorrect if this isn't undone
-		troffs = (offs - 4 + state->m_spriteram_size) % state->m_spriteram_size;
+		troffs = (offs - 4 + state->m_spriteram.bytes()) % state->m_spriteram.bytes();
 
 		//unused sprites are marked with ypos <= 0x02 (or >= 0xfd if screen flipped)
 		if (state->m_spriteram[troffs] > 0x02 && state->m_spriteram[troffs] < 0xfd)

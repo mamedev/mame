@@ -2,7 +2,8 @@ class djmain_state : public driver_device
 {
 public:
 	djmain_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_obj_ram(*this, "obj_ram"){ }
 
 	int m_sndram_bank;
 	UINT8 *m_sndram;
@@ -14,7 +15,7 @@ public:
 	UINT32 m_obj_regs[0xa0/4];
 	const UINT8 *m_ide_user_password;
 	const UINT8 *m_ide_master_password;
-	UINT32 *m_obj_ram;
+	required_shared_ptr<UINT32> m_obj_ram;
 	DECLARE_WRITE32_MEMBER(paletteram32_w);
 	DECLARE_WRITE32_MEMBER(sndram_bank_w);
 	DECLARE_READ32_MEMBER(sndram_r);

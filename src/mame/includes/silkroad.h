@@ -2,13 +2,18 @@ class silkroad_state : public driver_device
 {
 public:
 	silkroad_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_vidram(*this, "vidram"),
+		m_vidram2(*this, "vidram2"),
+		m_vidram3(*this, "vidram3"),
+		m_sprram(*this, "sprram"),
+		m_regs(*this, "regs"){ }
 
-	UINT32 *m_vidram;
-	UINT32 *m_vidram2;
-	UINT32 *m_vidram3;
-	UINT32 *m_sprram;
-	UINT32 *m_regs;
+	required_shared_ptr<UINT32> m_vidram;
+	required_shared_ptr<UINT32> m_vidram2;
+	required_shared_ptr<UINT32> m_vidram3;
+	required_shared_ptr<UINT32> m_sprram;
+	required_shared_ptr<UINT32> m_regs;
 	tilemap_t *m_fg_tilemap;
 	tilemap_t *m_fg2_tilemap;
 	tilemap_t *m_fg3_tilemap;

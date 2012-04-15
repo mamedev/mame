@@ -8,11 +8,11 @@ class skyfox_state : public driver_device
 {
 public:
 	skyfox_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_spriteram(*this, "spriteram"){ }
 
 	/* memory pointers */
-	UINT8 *    m_spriteram;
-	size_t     m_spriteram_size;
+	required_shared_ptr<UINT8> m_spriteram;
 
 	/* video-related */
 	UINT8      m_vreg[8];

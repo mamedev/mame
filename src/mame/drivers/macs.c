@@ -65,12 +65,13 @@ class macs_state : public st0016_state
 {
 public:
 	macs_state(const machine_config &mconfig, device_type type, const char *tag)
-		: st0016_state(mconfig, type, tag) { }
+		: st0016_state(mconfig, type, tag),
+		  m_ram2(*this, "ram2") { }
 
 	UINT8 m_mux_data;
 	UINT8 m_rev;
 	UINT8 *m_ram1;
-	UINT8 *m_ram2;
+	required_shared_ptr<UINT8> m_ram2;
 	DECLARE_WRITE8_MEMBER(rambank_w);
 	DECLARE_READ8_MEMBER(macs_input_r);
 	DECLARE_WRITE8_MEMBER(macs_rom_bank_w);
@@ -87,7 +88,7 @@ static ADDRESS_MAP_START( macs_mem, AS_PROGRAM, 8, macs_state )
 	AM_RANGE(0xc000, 0xcfff) AM_READ(st0016_sprite_ram_r) AM_WRITE(st0016_sprite_ram_w)
 	AM_RANGE(0xd000, 0xdfff) AM_READ(st0016_sprite2_ram_r) AM_WRITE(st0016_sprite2_ram_w)
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM /* work ram ? */
-	AM_RANGE(0xe800, 0xe87f) AM_RAM AM_BASE(m_ram2)
+	AM_RANGE(0xe800, 0xe87f) AM_RAM AM_SHARE("ram2")
 	AM_RANGE(0xe900, 0xe9ff) AM_DEVREADWRITE_LEGACY("stsnd", st0016_snd_r, st0016_snd_w)
 	AM_RANGE(0xea00, 0xebff) AM_READ(st0016_palette_ram_r) AM_WRITE(st0016_palette_ram_w)
 	AM_RANGE(0xec00, 0xec1f) AM_READ(st0016_character_ram_r) AM_WRITE(st0016_character_ram_w)

@@ -243,8 +243,8 @@ DIP locations verified for:
  *************************************/
 
 static ADDRESS_MAP_START( cpu1_map, AS_PROGRAM, 8, balsente_state )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE(m_spriteram)
-	AM_RANGE(0x0800, 0x7fff) AM_RAM_WRITE(balsente_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0x0800, 0x7fff) AM_RAM_WRITE(balsente_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x8000, 0x8fff) AM_RAM_WRITE(balsente_paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0x9000, 0x9007) AM_WRITE(balsente_adc_select_w)
 	AM_RANGE(0x9400, 0x9401) AM_READ(balsente_adc_data_r)
@@ -301,8 +301,8 @@ ADDRESS_MAP_END
 /* CPU 1 read addresses */
 static ADDRESS_MAP_START( shrike68k_map, AS_PROGRAM, 16, balsente_state )
 	AM_RANGE(0x000000, 0x003fff) AM_ROM
-	AM_RANGE(0x010000, 0x01001f) AM_RAM AM_BASE(m_shrike_io)
-	AM_RANGE(0x018000, 0x018fff) AM_RAM AM_BASE(m_shrike_shared)
+	AM_RANGE(0x010000, 0x01001f) AM_RAM AM_SHARE("shrike_io")
+	AM_RANGE(0x018000, 0x018fff) AM_RAM AM_SHARE("shrike_shared")
 ADDRESS_MAP_END
 
 

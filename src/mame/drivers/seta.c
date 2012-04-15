@@ -1583,7 +1583,7 @@ static ADDRESS_MAP_START( tndrcade_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0x200000, 0x200001) AM_WRITENOP						// ? 0
 	AM_RANGE(0x280000, 0x280001) AM_WRITENOP						// ? 0 / 1 (sub cpu related?)
 	AM_RANGE(0x300000, 0x300001) AM_WRITENOP						// ? 0 / 1
-	AM_RANGE(0x380000, 0x3803ff) AM_RAM AM_BASE_SIZE(m_paletteram, m_paletteram_size) // Palette
+	AM_RANGE(0x380000, 0x3803ff) AM_RAM AM_SHARE("paletteram") // Palette
 /**/AM_RANGE(0x400000, 0x400001) AM_WRITENOP						// ? $4000
 /**/AM_RANGE(0x600000, 0x6005ff) AM_RAM AM_DEVREADWRITE_LEGACY("spritegen", spriteylow_r16, spriteylow_w16)		// Sprites Y
 	AM_RANGE(0x600600, 0x600607) AM_RAM AM_DEVREADWRITE_LEGACY("spritegen", spritectrl_r16, spritectrl_w16)
@@ -1609,9 +1609,9 @@ static ADDRESS_MAP_START( downtown_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0x400000, 0x400007) AM_WRITE(twineagl_tilebank_w)		// special tile banking to animate water in twineagl
 	AM_RANGE(0x500000, 0x500001) AM_WRITENOP						// ?
 	AM_RANGE(0x600000, 0x600003) AM_READ(seta_dsw_r)				// DSW
-	AM_RANGE(0x700000, 0x7003ff) AM_RAM AM_BASE_SIZE(m_paletteram, m_paletteram_size)	// Palette
-	AM_RANGE(0x800000, 0x800005) AM_WRITEONLY AM_BASE(m_vctrl_0)// VRAM Ctrl
-	AM_RANGE(0x900000, 0x903fff) AM_RAM_WRITE(seta_vram_0_w) AM_BASE(m_vram_0)	// VRAM
+	AM_RANGE(0x700000, 0x7003ff) AM_RAM AM_SHARE("paletteram")	// Palette
+	AM_RANGE(0x800000, 0x800005) AM_WRITEONLY AM_SHARE("vctrl_0")// VRAM Ctrl
+	AM_RANGE(0x900000, 0x903fff) AM_RAM_WRITE(seta_vram_0_w) AM_SHARE("vram_0")	// VRAM
 	AM_RANGE(0xa00000, 0xa00007) AM_WRITE(sub_ctrl_w)				// Sub CPU Control?
 	AM_RANGE(0xb00000, 0xb00fff) AM_READWRITE(sharedram_68000_r,sharedram_68000_w)	// Shared RAM
 	AM_RANGE(0xc00000, 0xc00001) AM_WRITENOP						// ? $4000
@@ -1669,9 +1669,9 @@ static ADDRESS_MAP_START( calibr50_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0x400000, 0x400001) AM_READ(watchdog_reset16_r)		// Watchdog
 	AM_RANGE(0x500000, 0x500001) AM_WRITENOP						// ?
 	AM_RANGE(0x600000, 0x600003) AM_READ(seta_dsw_r)				// DSW
-	AM_RANGE(0x700000, 0x7003ff) AM_RAM AM_BASE_SIZE(m_paletteram, m_paletteram_size)	// Palette
-	AM_RANGE(0x800000, 0x800005) AM_WRITEONLY AM_BASE(m_vctrl_0)// VRAM Ctrl
-	AM_RANGE(0x900000, 0x903fff) AM_RAM_WRITE(seta_vram_0_w) AM_BASE(m_vram_0)	// VRAM
+	AM_RANGE(0x700000, 0x7003ff) AM_RAM AM_SHARE("paletteram")	// Palette
+	AM_RANGE(0x800000, 0x800005) AM_WRITEONLY AM_SHARE("vctrl_0")// VRAM Ctrl
+	AM_RANGE(0x900000, 0x903fff) AM_RAM_WRITE(seta_vram_0_w) AM_SHARE("vram_0")	// VRAM
 
 	AM_RANGE(0x904000, 0x904fff) AM_RAM								//
 	AM_RANGE(0xa00000, 0xa00019) AM_READ(calibr50_ip_r)				// Input Ports
@@ -1747,8 +1747,8 @@ static ADDRESS_MAP_START( usclssic_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0x800000, 0x8005ff) AM_RAM AM_DEVREADWRITE_LEGACY("spritegen", spriteylow_r16, spriteylow_w16) // Sprites Y
 	AM_RANGE(0x800600, 0x800607) AM_RAM AM_DEVREADWRITE_LEGACY("spritegen", spritectrl_r16, spritectrl_w16)
 /**/AM_RANGE(0x900000, 0x900001) AM_RAM									// ? $4000
-	AM_RANGE(0xa00000, 0xa00005) AM_RAM AM_BASE(m_vctrl_0)			// VRAM Ctrl
-/**/AM_RANGE(0xb00000, 0xb003ff) AM_RAM AM_BASE_SIZE(m_paletteram, m_paletteram_size)	// Palette
+	AM_RANGE(0xa00000, 0xa00005) AM_RAM AM_SHARE("vctrl_0")			// VRAM Ctrl
+/**/AM_RANGE(0xb00000, 0xb003ff) AM_RAM AM_SHARE("paletteram")	// Palette
 	AM_RANGE(0xb40000, 0xb40003) AM_READ(usclssic_trackball_x_r)		// TrackBall X
 	AM_RANGE(0xb40000, 0xb40001) AM_WRITE(usclssic_lockout_w)			// Coin Lockout + Tiles Banking
 	AM_RANGE(0xb40004, 0xb40007) AM_READ(usclssic_trackball_y_r)		// TrackBall Y + Buttons
@@ -1759,7 +1759,7 @@ static ADDRESS_MAP_START( usclssic_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0xb40018, 0xb40019) AM_WRITE(watchdog_reset16_w)			// Watchdog
 	AM_RANGE(0xb80000, 0xb80001) AM_READNOP								// Watchdog (value is discarded)?
 	AM_RANGE(0xc00000, 0xc03fff) AM_RAM AM_DEVREADWRITE_LEGACY("spritegen", spritecode_r16, spritecode_w16)			// Sprites Code + X + Attr
-	AM_RANGE(0xd00000, 0xd03fff) AM_RAM_WRITE(seta_vram_0_w) AM_BASE(m_vram_0)	// VRAM
+	AM_RANGE(0xd00000, 0xd03fff) AM_RAM_WRITE(seta_vram_0_w) AM_SHARE("vram_0")	// VRAM
 	AM_RANGE(0xd04000, 0xd04fff) AM_RAM									//
 	AM_RANGE(0xe00000, 0xe00fff) AM_RAM									// NVRAM? (odd bytes)
 ADDRESS_MAP_END
@@ -1777,7 +1777,7 @@ static ADDRESS_MAP_START( atehate_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0x300000, 0x300001) AM_WRITENOP						// ? 0 (irq ack lev 2?)
 	AM_RANGE(0x500000, 0x500001) AM_WRITENOP						// ? (end of lev 1: bit 4 goes 1,0,1)
 	AM_RANGE(0x600000, 0x600003) AM_READ(seta_dsw_r)				// DSW
-	AM_RANGE(0x700000, 0x7003ff) AM_RAM AM_BASE_SIZE(m_paletteram, m_paletteram_size)	// Palette
+	AM_RANGE(0x700000, 0x7003ff) AM_RAM AM_SHARE("paletteram")	// Palette
 	AM_RANGE(0xa00000, 0xa005ff) AM_RAM AM_DEVREADWRITE_LEGACY("spritegen", spriteylow_r16, spriteylow_w16)		// Sprites Y
 	AM_RANGE(0xa00600, 0xa00607) AM_RAM AM_DEVREADWRITE_LEGACY("spritegen", spritectrl_r16, spritectrl_w16)
 	AM_RANGE(0xb00000, 0xb00001) AM_READ_PORT("P1")					// P1
@@ -1800,20 +1800,20 @@ static ADDRESS_MAP_START( blandia_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0x400000, 0x400001) AM_READ_PORT("P1")					// P1
 	AM_RANGE(0x400002, 0x400003) AM_READ_PORT("P2")					// P2
 	AM_RANGE(0x400004, 0x400005) AM_READ_PORT("COINS")				// Coins
-	AM_RANGE(0x500000, 0x500005) AM_RAM_WRITE(seta_vregs_w) AM_BASE(m_vregs)	// (gundhara) Coin Lockout + Video Registers
+	AM_RANGE(0x500000, 0x500005) AM_RAM_WRITE(seta_vregs_w) AM_SHARE("vregs")	// (gundhara) Coin Lockout + Video Registers
 	AM_RANGE(0x600000, 0x600003) AM_READ(seta_dsw_r)				// DSW
 	AM_RANGE(0x700000, 0x7003ff) AM_RAM								// (rezon,jjsquawk)
-	AM_RANGE(0x700400, 0x700fff) AM_RAM AM_BASE_SIZE(m_paletteram, m_paletteram_size)	// Palette
-	AM_RANGE(0x703c00, 0x7047ff) AM_RAM AM_BASE_SIZE(m_paletteram2, m_paletteram2_size)	// 2nd Palette for the palette offset effect
+	AM_RANGE(0x700400, 0x700fff) AM_RAM AM_SHARE("paletteram")	// Palette
+	AM_RANGE(0x703c00, 0x7047ff) AM_RAM AM_SHARE("paletteram2")	// 2nd Palette for the palette offset effect
 /**/AM_RANGE(0x800000, 0x8005ff) AM_RAM AM_DEVREADWRITE_LEGACY("spritegen", spriteylow_r16, spriteylow_w16)		// Sprites Y
 	AM_RANGE(0x800600, 0x800607) AM_RAM AM_DEVREADWRITE_LEGACY("spritegen", spritectrl_r16, spritectrl_w16)
 	AM_RANGE(0x880000, 0x880001) AM_RAM								// ? 0xc000
 	AM_RANGE(0x900000, 0x903fff) AM_RAM AM_DEVREADWRITE_LEGACY("spritegen", spritecode_r16, spritecode_w16)		// Sprites Code + X + Attr
-/**/AM_RANGE(0xa00000, 0xa00005) AM_RAM AM_BASE(m_vctrl_0)		// VRAM 0&1 Ctrl
-/**/AM_RANGE(0xa80000, 0xa80005) AM_RAM AM_BASE(m_vctrl_2)		// VRAM 2&3 Ctrl
-	AM_RANGE(0xb00000, 0xb03fff) AM_RAM_WRITE(seta_vram_0_w) AM_BASE(m_vram_0)	// VRAM 0&1
+/**/AM_RANGE(0xa00000, 0xa00005) AM_RAM AM_SHARE("vctrl_0")		// VRAM 0&1 Ctrl
+/**/AM_RANGE(0xa80000, 0xa80005) AM_RAM AM_SHARE("vctrl_2")		// VRAM 2&3 Ctrl
+	AM_RANGE(0xb00000, 0xb03fff) AM_RAM_WRITE(seta_vram_0_w) AM_SHARE("vram_0")	// VRAM 0&1
 	AM_RANGE(0xb04000, 0xb0ffff) AM_RAM								// (jjsquawk)
-	AM_RANGE(0xb80000, 0xb83fff) AM_RAM_WRITE(seta_vram_2_w) AM_BASE(m_vram_2)	// VRAM 2&3
+	AM_RANGE(0xb80000, 0xb83fff) AM_RAM_WRITE(seta_vram_2_w) AM_SHARE("vram_2")	// VRAM 2&3
 	AM_RANGE(0xb84000, 0xb8ffff) AM_RAM								// (jjsquawk)
 	AM_RANGE(0xc00000, 0xc03fff) AM_DEVREADWRITE_LEGACY("x1snd", seta_sound_word_r,seta_sound_word_w)	// Sound
 	AM_RANGE(0xd00000, 0xd00007) AM_WRITENOP						// ?
@@ -1835,17 +1835,17 @@ static ADDRESS_MAP_START( blandiap_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0x400000, 0x400001) AM_READ_PORT("P1")					// P1
 	AM_RANGE(0x400002, 0x400003) AM_READ_PORT("P2")					// P2
 	AM_RANGE(0x400004, 0x400005) AM_READ_PORT("COINS")				// Coins
-	AM_RANGE(0x500000, 0x500005) AM_RAM_WRITE(seta_vregs_w) AM_BASE(m_vregs) // (gundhara) Coin Lockout + Video Registers
+	AM_RANGE(0x500000, 0x500005) AM_RAM_WRITE(seta_vregs_w) AM_SHARE("vregs") // (gundhara) Coin Lockout + Video Registers
 	AM_RANGE(0x600000, 0x600003) AM_READ(seta_dsw_r)				// DSW
 	AM_RANGE(0x700000, 0x7003ff) AM_RAM								// (rezon,jjsquawk)
-	AM_RANGE(0x700400, 0x700fff) AM_RAM AM_BASE_SIZE(m_paletteram, m_paletteram_size)	// Palette
-	AM_RANGE(0x703c00, 0x7047ff) AM_RAM AM_BASE_SIZE(m_paletteram2, m_paletteram2_size)	// 2nd Palette for the palette offset effect
-	AM_RANGE(0x800000, 0x803fff) AM_RAM_WRITE(seta_vram_0_w) AM_BASE(m_vram_0)	// VRAM 0&1
+	AM_RANGE(0x700400, 0x700fff) AM_RAM AM_SHARE("paletteram")	// Palette
+	AM_RANGE(0x703c00, 0x7047ff) AM_RAM AM_SHARE("paletteram2")	// 2nd Palette for the palette offset effect
+	AM_RANGE(0x800000, 0x803fff) AM_RAM_WRITE(seta_vram_0_w) AM_SHARE("vram_0")	// VRAM 0&1
 	AM_RANGE(0x804000, 0x80ffff) AM_RAM								// (jjsquawk)
-	AM_RANGE(0x880000, 0x883fff) AM_RAM_WRITE(seta_vram_2_w) AM_BASE(m_vram_2)	// VRAM 2&3
+	AM_RANGE(0x880000, 0x883fff) AM_RAM_WRITE(seta_vram_2_w) AM_SHARE("vram_2")	// VRAM 2&3
 	AM_RANGE(0x884000, 0x88ffff) AM_RAM								// (jjsquawk)
-/**/AM_RANGE(0x900000, 0x900005) AM_RAM AM_BASE(m_vctrl_0)		// VRAM 0&1 Ctrl
-/**/AM_RANGE(0x980000, 0x980005) AM_RAM AM_BASE(m_vctrl_2)		// VRAM 2&3 Ctrl
+/**/AM_RANGE(0x900000, 0x900005) AM_RAM AM_SHARE("vctrl_0")		// VRAM 0&1 Ctrl
+/**/AM_RANGE(0x980000, 0x980005) AM_RAM AM_SHARE("vctrl_2")		// VRAM 2&3 Ctrl
 /**/AM_RANGE(0xa00000, 0xa005ff) AM_RAM AM_DEVREADWRITE_LEGACY("spritegen", spriteylow_r16, spriteylow_w16)		// Sprites Y
 	AM_RANGE(0xa00600, 0xa00607) AM_RAM AM_DEVREADWRITE_LEGACY("spritegen", spritectrl_r16, spritectrl_w16)
 /**/AM_RANGE(0xa80000, 0xa80001) AM_RAM								// ? 0x4000
@@ -1909,24 +1909,24 @@ WRITE16_MEMBER(seta_state::zombraid_gun_w)
 
 static ADDRESS_MAP_START( wrofaero_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM								// ROM (up to 2MB)
-	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_BASE(m_workram)		// RAM (pointer for zombraid crosshair hack)
+	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_SHARE("workram")		// RAM (pointer for zombraid crosshair hack)
 	AM_RANGE(0x210000, 0x21ffff) AM_RAM								// RAM (gundhara)
 	AM_RANGE(0x300000, 0x30ffff) AM_RAM								// RAM (wrofaero only?)
 	AM_RANGE(0x400000, 0x400001) AM_READ_PORT("P1")					// P1
 	AM_RANGE(0x400002, 0x400003) AM_READ_PORT("P2")					// P2
 	AM_RANGE(0x400004, 0x400005) AM_READ_PORT("COINS")				// Coins
-	AM_RANGE(0x500000, 0x500005) AM_RAM_WRITE(seta_vregs_w) AM_BASE(m_vregs)	// (gundhara) Coin Lockout + Video Registers
+	AM_RANGE(0x500000, 0x500005) AM_RAM_WRITE(seta_vregs_w) AM_SHARE("vregs")	// (gundhara) Coin Lockout + Video Registers
 
 	AM_RANGE(0x600000, 0x600003) AM_READ(seta_dsw_r)				// DSW
 	AM_RANGE(0x700000, 0x7003ff) AM_RAM								// (rezon,jjsquawk)
-	AM_RANGE(0x700400, 0x700fff) AM_RAM AM_BASE_SIZE(m_paletteram, m_paletteram_size)	// Palette
+	AM_RANGE(0x700400, 0x700fff) AM_RAM AM_SHARE("paletteram")	// Palette
 	AM_RANGE(0x701000, 0x70ffff) AM_RAM								//
-	AM_RANGE(0x800000, 0x803fff) AM_RAM_WRITE(seta_vram_0_w) AM_BASE(m_vram_0)	// VRAM 0&1
+	AM_RANGE(0x800000, 0x803fff) AM_RAM_WRITE(seta_vram_0_w) AM_SHARE("vram_0")	// VRAM 0&1
 	AM_RANGE(0x804000, 0x80ffff) AM_RAM								// (jjsquawk)
-	AM_RANGE(0x880000, 0x883fff) AM_RAM_WRITE(seta_vram_2_w) AM_BASE(m_vram_2)	// VRAM 2&3
+	AM_RANGE(0x880000, 0x883fff) AM_RAM_WRITE(seta_vram_2_w) AM_SHARE("vram_2")	// VRAM 2&3
 	AM_RANGE(0x884000, 0x88ffff) AM_RAM								// (jjsquawk)
-/**/AM_RANGE(0x900000, 0x900005) AM_RAM AM_BASE(m_vctrl_0)		// VRAM 0&1 Ctrl
-/**/AM_RANGE(0x980000, 0x980005) AM_RAM AM_BASE(m_vctrl_2)		// VRAM 2&3 Ctrl
+/**/AM_RANGE(0x900000, 0x900005) AM_RAM AM_SHARE("vctrl_0")		// VRAM 0&1 Ctrl
+/**/AM_RANGE(0x980000, 0x980005) AM_RAM AM_SHARE("vctrl_2")		// VRAM 2&3 Ctrl
 /**/AM_RANGE(0xa00000, 0xa005ff) AM_RAM AM_DEVREADWRITE_LEGACY("spritegen", spriteylow_r16, spriteylow_w16)		// Sprites Y
 	AM_RANGE(0xa00600, 0xa00607) AM_RAM AM_DEVREADWRITE_LEGACY("spritegen", spritectrl_r16, spritectrl_w16)
 /**/AM_RANGE(0xa80000, 0xa80001) AM_RAM								// ? 0x4000
@@ -1948,28 +1948,28 @@ READ16_MEMBER(seta_state::zingzipbl_unknown_r)
 
 static ADDRESS_MAP_START( zingzipbl_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM								// ROM (up to 2MB)
-	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_BASE(m_workram)		// RAM (pointer for zombraid crosshair hack)
+	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_SHARE("workram")		// RAM (pointer for zombraid crosshair hack)
 	AM_RANGE(0x210000, 0x21ffff) AM_RAM								// RAM (gundhara)
 	AM_RANGE(0x300000, 0x30ffff) AM_RAM								// RAM (wrofaero only?)
 //  AM_RANGE(0x400000, 0x400001) AM_READ_PORT("P1")                 // P1
 //  AM_RANGE(0x400002, 0x400003) AM_READ_PORT("P2")                 // P2
 	AM_RANGE(0x400002, 0x400003) AM_READ(zingzipbl_unknown_r)		// P2
 //  AM_RANGE(0x400004, 0x400005) AM_READ_PORT("COINS")              // Coins
-	AM_RANGE(0x500000, 0x500005) AM_RAM_WRITE(seta_vregs_w) AM_BASE(m_vregs)	// (gundhara) Coin Lockout + Video Registers
+	AM_RANGE(0x500000, 0x500005) AM_RAM_WRITE(seta_vregs_w) AM_SHARE("vregs")	// (gundhara) Coin Lockout + Video Registers
 
 	//AM_RANGE(0x600000, 0x600003) AM_READ(seta_dsw_r)              // DSW
 	AM_RANGE(0x700000, 0x7003ff) AM_RAM								// (rezon,jjsquawk)
-	AM_RANGE(0x700400, 0x700fff) AM_RAM AM_BASE_SIZE(m_paletteram, m_paletteram_size)	// Palette
+	AM_RANGE(0x700400, 0x700fff) AM_RAM AM_SHARE("paletteram")	// Palette
 	AM_RANGE(0x701000, 0x70ffff) AM_RAM								//
-	AM_RANGE(0x800000, 0x803fff) AM_RAM_WRITE(seta_vram_0_w) AM_BASE(m_vram_0)	// VRAM 0&1
+	AM_RANGE(0x800000, 0x803fff) AM_RAM_WRITE(seta_vram_0_w) AM_SHARE("vram_0")	// VRAM 0&1
 	AM_RANGE(0x804000, 0x80ffff) AM_RAM								// (jjsquawk)
-	AM_RANGE(0x880000, 0x883fff) AM_RAM_WRITE(seta_vram_2_w) AM_BASE(m_vram_2)	// VRAM 2&3
+	AM_RANGE(0x880000, 0x883fff) AM_RAM_WRITE(seta_vram_2_w) AM_SHARE("vram_2")	// VRAM 2&3
 	AM_RANGE(0x884000, 0x88ffff) AM_RAM								// (jjsquawk)
-/**/AM_RANGE(0x900000, 0x900005) AM_RAM AM_BASE(m_vctrl_0)		// VRAM 0&1 Ctrl
+/**/AM_RANGE(0x900000, 0x900005) AM_RAM AM_SHARE("vctrl_0")		// VRAM 0&1 Ctrl
 
 	AM_RANGE(0x902010, 0x902013) AM_READ(zingzipbl_unknown_r )
 
-/**/AM_RANGE(0x980000, 0x980005) AM_RAM AM_BASE(m_vctrl_2)		// VRAM 2&3 Ctrl
+/**/AM_RANGE(0x980000, 0x980005) AM_RAM AM_SHARE("vctrl_2")		// VRAM 2&3 Ctrl
 /**/AM_RANGE(0xa00000, 0xa005ff) AM_RAM AM_DEVREADWRITE_LEGACY("spritegen", spriteylow_r16, spriteylow_w16)		// Sprites Y
 	AM_RANGE(0xa00600, 0xa00607) AM_RAM AM_DEVREADWRITE_LEGACY("spritegen", spritectrl_r16, spritectrl_w16)
 /**/AM_RANGE(0xa80000, 0xa80001) AM_RAM								// ? 0x4000
@@ -1986,23 +1986,23 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( jjsquawb_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM								// ROM (up to 2MB)
-	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_BASE(m_workram)		// RAM (pointer for zombraid crosshair hack)
+	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_SHARE("workram")		// RAM (pointer for zombraid crosshair hack)
 	AM_RANGE(0x210000, 0x21ffff) AM_RAM								// RAM (gundhara)
 	AM_RANGE(0x300000, 0x30ffff) AM_RAM								// RAM (wrofaero only?)
 	AM_RANGE(0x400000, 0x400001) AM_READ_PORT("P1")					// P1
 	AM_RANGE(0x400002, 0x400003) AM_READ_PORT("P2")					// P2
 	AM_RANGE(0x400004, 0x400005) AM_READ_PORT("COINS")				// Coins
-	AM_RANGE(0x500000, 0x500005) AM_RAM_WRITE(seta_vregs_w) AM_BASE(m_vregs)	// (gundhara) Coin Lockout + Video Registers
+	AM_RANGE(0x500000, 0x500005) AM_RAM_WRITE(seta_vregs_w) AM_SHARE("vregs")	// (gundhara) Coin Lockout + Video Registers
 
 	AM_RANGE(0x600000, 0x600003) AM_READ(seta_dsw_r)				// DSW
 	AM_RANGE(0x700000, 0x70b3ff) AM_RAM								// RZ: (rezon,jjsquawk)
-	AM_RANGE(0x70b400, 0x70bfff) AM_RAM AM_BASE_SIZE(m_paletteram, m_paletteram_size)	// Palette
+	AM_RANGE(0x70b400, 0x70bfff) AM_RAM AM_SHARE("paletteram")	// Palette
 	AM_RANGE(0x70c000, 0x70ffff) AM_RAM								//
-	AM_RANGE(0x800000, 0x803fff) AM_RAM_WRITE(seta_vram_0_w) AM_BASE(m_vram_0)	// VRAM 0
-	AM_RANGE(0x804000, 0x807fff) AM_RAM_WRITE(seta_vram_2_w) AM_BASE(m_vram_2)	// VRAM 2
+	AM_RANGE(0x800000, 0x803fff) AM_RAM_WRITE(seta_vram_0_w) AM_SHARE("vram_0")	// VRAM 0
+	AM_RANGE(0x804000, 0x807fff) AM_RAM_WRITE(seta_vram_2_w) AM_SHARE("vram_2")	// VRAM 2
 	AM_RANGE(0x884000, 0x88ffff) AM_RAM								// (jjsquawk)
-	AM_RANGE(0x908000, 0x908005) AM_RAM AM_BASE(m_vctrl_0)		// VRAM 0&1 Ctrl
-	AM_RANGE(0x909000, 0x909005) AM_RAM AM_BASE(m_vctrl_2)		// VRAM 2&3 Ctrl
+	AM_RANGE(0x908000, 0x908005) AM_RAM AM_SHARE("vctrl_0")		// VRAM 0&1 Ctrl
+	AM_RANGE(0x909000, 0x909005) AM_RAM AM_SHARE("vctrl_2")		// VRAM 2&3 Ctrl
 	AM_RANGE(0xa0a000, 0xa0a5ff) AM_RAM AM_DEVREADWRITE_LEGACY("spritegen", spriteylow_r16, spriteylow_w16)		// RZ: Sprites Y
 	AM_RANGE(0xa0a600, 0xa0a607) AM_RAM AM_DEVREADWRITE_LEGACY("spritegen", spritectrl_r16, spritectrl_w16)
 // AM_RANGE(0xa80000, 0xa80001) AM_RAM                              // ? 0x4000
@@ -2035,7 +2035,7 @@ static ADDRESS_MAP_START( orbs_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0x8000f0, 0x8000f1) AM_RAM								// NVRAM
 	AM_RANGE(0x800100, 0x8001ff) AM_RAM								// NVRAM
 	AM_RANGE(0xa00000, 0xa03fff) AM_DEVREADWRITE_LEGACY("x1snd", seta_sound_word_r,seta_sound_word_w)	// Sound
-	AM_RANGE(0xb00000, 0xb003ff) AM_RAM AM_BASE_SIZE(m_paletteram, m_paletteram_size)	// Palette
+	AM_RANGE(0xb00000, 0xb003ff) AM_RAM AM_SHARE("paletteram")	// Palette
 	AM_RANGE(0xc00000, 0xc03fff) AM_RAM AM_DEVREADWRITE_LEGACY("spritegen", spritecode_r16, spritecode_w16)		// Sprites Code + X + Attr
 /**/AM_RANGE(0xd00000, 0xd00001) AM_RAM								// ? 0x4000
 /**/AM_RANGE(0xe00000, 0xe005ff) AM_RAM AM_DEVREADWRITE_LEGACY("spritegen", spriteylow_r16, spriteylow_w16)		// Sprites Y
@@ -2117,7 +2117,7 @@ static ADDRESS_MAP_START( keroppi_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0x900000, 0x900001) AM_WRITENOP						// ?
 	AM_RANGE(0x900002, 0x900003) AM_WRITE(keroppi_prize_w)			//
 	AM_RANGE(0xa00000, 0xa03fff) AM_DEVREADWRITE_LEGACY("x1snd", seta_sound_word_r,seta_sound_word_w)	// Sound
-	AM_RANGE(0xb00000, 0xb003ff) AM_RAM AM_BASE_SIZE(m_paletteram, m_paletteram_size)	// Palette
+	AM_RANGE(0xb00000, 0xb003ff) AM_RAM AM_SHARE("paletteram")	// Palette
 	AM_RANGE(0xc00000, 0xc03fff) AM_RAM AM_DEVREADWRITE_LEGACY("spritegen", spritecode_r16, spritecode_w16)		// Sprites Code + X + Attr
 /**/AM_RANGE(0xd00000, 0xd00001) AM_RAM								// ? 0x4000
 /**/AM_RANGE(0xe00000, 0xe005ff) AM_RAM AM_DEVREADWRITE_LEGACY("spritegen", spriteylow_r16, spriteylow_w16)		// Sprites Y
@@ -2144,12 +2144,12 @@ static ADDRESS_MAP_START( blockcar_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0x100000, 0x100001) AM_WRITENOP						// ? 1 (start of interrupts, main loop: watchdog?)
 	AM_RANGE(0x200000, 0x200001) AM_WRITENOP						// ? 0/1 (IRQ acknowledge?)
 	AM_RANGE(0x300000, 0x300003) AM_READ(seta_dsw_r)				// DSW
-	AM_RANGE(0x400000, 0x400001) AM_RAM_WRITE(seta_vregs_w) AM_BASE(m_vregs)	// Coin Lockout + Sound Enable (bit 4?)
+	AM_RANGE(0x400000, 0x400001) AM_RAM_WRITE(seta_vregs_w) AM_SHARE("vregs")	// Coin Lockout + Sound Enable (bit 4?)
 	AM_RANGE(0x500000, 0x500001) AM_READ_PORT("P1")					// P1
 	AM_RANGE(0x500002, 0x500003) AM_READ_PORT("P2")					// P2
 	AM_RANGE(0x500004, 0x500005) AM_READ_PORT("COINS")				// Coins
 	AM_RANGE(0xa00000, 0xa03fff) AM_DEVREADWRITE_LEGACY("x1snd", seta_sound_word_r,seta_sound_word_w)	// Sound
-	AM_RANGE(0xb00000, 0xb003ff) AM_RAM AM_BASE_SIZE(m_paletteram, m_paletteram_size)	// Palette
+	AM_RANGE(0xb00000, 0xb003ff) AM_RAM AM_SHARE("paletteram")	// Palette
 	AM_RANGE(0xc00000, 0xc03fff) AM_RAM AM_DEVREADWRITE_LEGACY("spritegen", spritecode_r16, spritecode_w16)	// Sprites Code + X + Attr
 /**/AM_RANGE(0xd00000, 0xd00001) AM_RAM	// ? 0x4000
 /**/AM_RANGE(0xe00000, 0xe005ff) AM_RAM AM_DEVREADWRITE_LEGACY("spritegen", spriteylow_r16, spriteylow_w16)	// Sprites Y
@@ -2167,18 +2167,18 @@ static ADDRESS_MAP_START( daioh_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0x400000, 0x400001) AM_READ_PORT("P1")					// P1
 	AM_RANGE(0x400002, 0x400003) AM_READ_PORT("P2")					// P2
 	AM_RANGE(0x400004, 0x400005) AM_READ_PORT("COINS")				// Coins
-	AM_RANGE(0x500000, 0x500005) AM_RAM_WRITE(seta_vregs_w) AM_BASE(m_vregs)	// Coin Lockout + Video Registers
+	AM_RANGE(0x500000, 0x500005) AM_RAM_WRITE(seta_vregs_w) AM_SHARE("vregs")	// Coin Lockout + Video Registers
 	AM_RANGE(0x500006, 0x500007) AM_READ_PORT("EXTRA")				// Buttons 4,5,6
 	AM_RANGE(0x600000, 0x600003) AM_READ(seta_dsw_r				)	// DSW
 	AM_RANGE(0x700000, 0x7003ff) AM_RAM
-	AM_RANGE(0x700400, 0x700fff) AM_RAM AM_BASE_SIZE(m_paletteram, m_paletteram_size)	// Palette
+	AM_RANGE(0x700400, 0x700fff) AM_RAM AM_SHARE("paletteram")	// Palette
 	AM_RANGE(0x701000, 0x70ffff) AM_RAM								//
-	AM_RANGE(0x800000, 0x803fff) AM_RAM_WRITE(seta_vram_0_w) AM_BASE(m_vram_0	)	// VRAM 0&1
+	AM_RANGE(0x800000, 0x803fff) AM_RAM_WRITE(seta_vram_0_w) AM_SHARE("vram_0")	// VRAM 0&1
 	AM_RANGE(0x804000, 0x80ffff) AM_RAM								//
-	AM_RANGE(0x880000, 0x883fff) AM_RAM_WRITE(seta_vram_2_w) AM_BASE(m_vram_2	)	// VRAM 2&3
+	AM_RANGE(0x880000, 0x883fff) AM_RAM_WRITE(seta_vram_2_w) AM_SHARE("vram_2")	// VRAM 2&3
 	AM_RANGE(0x884000, 0x88ffff) AM_RAM								//
-	AM_RANGE(0x900000, 0x900005) AM_RAM AM_BASE(m_vctrl_0)		// VRAM 0&1 Ctrl
-	AM_RANGE(0x980000, 0x980005) AM_RAM AM_BASE(m_vctrl_2)		// VRAM 2&3 Ctrl
+	AM_RANGE(0x900000, 0x900005) AM_RAM AM_SHARE("vctrl_0")		// VRAM 0&1 Ctrl
+	AM_RANGE(0x980000, 0x980005) AM_RAM AM_SHARE("vctrl_2")		// VRAM 2&3 Ctrl
 	AM_RANGE(0xa00000, 0xa005ff) AM_RAM AM_DEVREADWRITE_LEGACY("spritegen", spriteylow_r16, spriteylow_w16)	// Sprites Y
 	AM_RANGE(0xa00600, 0xa00607) AM_RAM AM_DEVREADWRITE_LEGACY("spritegen", spritectrl_r16, spritectrl_w16)
 
@@ -2201,11 +2201,11 @@ static ADDRESS_MAP_START( drgnunit_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0x100000, 0x103fff) AM_DEVREADWRITE_LEGACY("x1snd", seta_sound_word_r,seta_sound_word_w)	// Sound
 	AM_RANGE(0x200000, 0x200001) AM_WRITENOP						// Watchdog
 	AM_RANGE(0x300000, 0x300001) AM_WRITENOP						// ? IRQ Ack
-	AM_RANGE(0x500000, 0x500001) AM_RAM_WRITE(seta_vregs_w) AM_BASE(m_vregs)	// Coin Lockout + Video Registers
+	AM_RANGE(0x500000, 0x500001) AM_RAM_WRITE(seta_vregs_w) AM_SHARE("vregs")	// Coin Lockout + Video Registers
 	AM_RANGE(0x600000, 0x600003) AM_READ(seta_dsw_r)				// DSW
-	AM_RANGE(0x700000, 0x7003ff) AM_RAM AM_BASE_SIZE(m_paletteram, m_paletteram_size)	// Palette
-	AM_RANGE(0x800000, 0x800005) AM_RAM AM_BASE(m_vctrl_0)		// VRAM Ctrl
-	AM_RANGE(0x900000, 0x903fff) AM_RAM_WRITE(seta_vram_0_w) AM_BASE(m_vram_0	)	// VRAM
+	AM_RANGE(0x700000, 0x7003ff) AM_RAM AM_SHARE("paletteram")	// Palette
+	AM_RANGE(0x800000, 0x800005) AM_RAM AM_SHARE("vctrl_0")		// VRAM Ctrl
+	AM_RANGE(0x900000, 0x903fff) AM_RAM_WRITE(seta_vram_0_w) AM_SHARE("vram_0")	// VRAM
 	AM_RANGE(0x904000, 0x90ffff) AM_WRITENOP						// unused (qzkklogy)
 	AM_RANGE(0xb00000, 0xb00001) AM_READ_PORT("P1")					// P1
 	AM_RANGE(0xb00002, 0xb00003) AM_READ_PORT("P2")					// P2
@@ -2279,8 +2279,8 @@ static ADDRESS_MAP_START( setaroul_map, AS_PROGRAM, 16, seta_state )
 
 	AM_RANGE(0xdc0000, 0xdc3fff) AM_RAM
 
-	AM_RANGE(0xe00000, 0xe03fff) AM_RAM_WRITE(seta_vram_0_w) AM_BASE(m_vram_0	)	// VRAM - draws wheel if you reset enough times..
-	AM_RANGE(0xe40000, 0xe40005) AM_RAM AM_BASE(m_vctrl_0)		// VRAM Ctrl
+	AM_RANGE(0xe00000, 0xe03fff) AM_RAM_WRITE(seta_vram_0_w) AM_SHARE("vram_0")	// VRAM - draws wheel if you reset enough times..
+	AM_RANGE(0xe40000, 0xe40005) AM_RAM AM_SHARE("vctrl_0")		// VRAM Ctrl
 	AM_RANGE(0xf00000, 0xf03fff) AM_READWRITE(setaroul_spritecode_r, setaroul_spritecode_w)
 	AM_RANGE(0xf40000, 0xf40bff) AM_WRITE(setaroul_spriteylow_w)
 	AM_RANGE(0xf40c00, 0xf40c11) AM_WRITE(setaroul_spritectrl_w)
@@ -2301,16 +2301,16 @@ static ADDRESS_MAP_START( extdwnhl_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0x400004, 0x400005) AM_READ_PORT("COINS")				// Coins
 	AM_RANGE(0x400008, 0x40000b) AM_READ(seta_dsw_r)				// DSW
 	AM_RANGE(0x40000c, 0x40000d) AM_READWRITE(watchdog_reset16_r,watchdog_reset16_w)	// Watchdog (extdwnhl (R) & sokonuke (W) MUST RETURN $FFFF)
-	AM_RANGE(0x500000, 0x500003) AM_RAM_WRITE(seta_vregs_w) AM_BASE(m_vregs)	// Coin Lockout + Video Registers
+	AM_RANGE(0x500000, 0x500003) AM_RAM_WRITE(seta_vregs_w) AM_SHARE("vregs")	// Coin Lockout + Video Registers
 	AM_RANGE(0x500004, 0x500007) AM_NOP								// IRQ Ack  (extdwnhl (R) & sokonuke (W))
-	AM_RANGE(0x600400, 0x600fff) AM_RAM AM_BASE_SIZE(m_paletteram, m_paletteram_size)	// Palette
+	AM_RANGE(0x600400, 0x600fff) AM_RAM AM_SHARE("paletteram")	// Palette
 	AM_RANGE(0x601000, 0x610bff) AM_RAM								//
-	AM_RANGE(0x800000, 0x803fff) AM_RAM_WRITE(seta_vram_0_w) AM_BASE(m_vram_0)	// VRAM 0&1
+	AM_RANGE(0x800000, 0x803fff) AM_RAM_WRITE(seta_vram_0_w) AM_SHARE("vram_0")	// VRAM 0&1
 	AM_RANGE(0x804000, 0x80ffff) AM_RAM								//
-	AM_RANGE(0x880000, 0x883fff) AM_RAM_WRITE(seta_vram_2_w) AM_BASE(m_vram_2)	// VRAM 2&3
+	AM_RANGE(0x880000, 0x883fff) AM_RAM_WRITE(seta_vram_2_w) AM_SHARE("vram_2")	// VRAM 2&3
 	AM_RANGE(0x884000, 0x88ffff) AM_RAM								//
-/**/AM_RANGE(0x900000, 0x900005) AM_RAM AM_BASE(m_vctrl_0)		// VRAM 0&1 Ctrl
-/**/AM_RANGE(0x980000, 0x980005) AM_RAM AM_BASE(m_vctrl_2)		// VRAM 2&3 Ctrl
+/**/AM_RANGE(0x900000, 0x900005) AM_RAM AM_SHARE("vctrl_0")		// VRAM 0&1 Ctrl
+/**/AM_RANGE(0x980000, 0x980005) AM_RAM AM_SHARE("vctrl_2")		// VRAM 2&3 Ctrl
 /**/AM_RANGE(0xa00000, 0xa005ff) AM_RAM AM_DEVREADWRITE_LEGACY("spritegen", spriteylow_r16, spriteylow_w16)		// Sprites Y
 	AM_RANGE(0xa00600, 0xa00607) AM_RAM AM_DEVREADWRITE_LEGACY("spritegen", spritectrl_r16, spritectrl_w16)
 /**/AM_RANGE(0xa80000, 0xa80001) AM_RAM								// ? 0x4000
@@ -2332,17 +2332,17 @@ static ADDRESS_MAP_START( kamenrid_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0x500004, 0x500007) AM_READ(seta_dsw_r)				// DSW
 	AM_RANGE(0x500008, 0x500009) AM_READ_PORT("COINS")				// Coins
 	AM_RANGE(0x50000c, 0x50000d) AM_READWRITE(watchdog_reset16_r,watchdog_reset16_w)	// xx Watchdog? (sokonuke)
-	AM_RANGE(0x600000, 0x600005) AM_RAM_WRITE(seta_vregs_w) AM_BASE(m_vregs)	// ? Coin Lockout + Video Registers
+	AM_RANGE(0x600000, 0x600005) AM_RAM_WRITE(seta_vregs_w) AM_SHARE("vregs")	// ? Coin Lockout + Video Registers
 	AM_RANGE(0x600006, 0x600007) AM_WRITENOP						// ?
 	AM_RANGE(0x700000, 0x7003ff) AM_RAM								// Palette RAM (tested)
-	AM_RANGE(0x700400, 0x700fff) AM_RAM AM_BASE_SIZE(m_paletteram, m_paletteram_size)	// Palette
+	AM_RANGE(0x700400, 0x700fff) AM_RAM AM_SHARE("paletteram")	// Palette
 	AM_RANGE(0x701000, 0x703fff) AM_RAM 							// Palette
-	AM_RANGE(0x800000, 0x803fff) AM_RAM_WRITE(seta_vram_0_w) AM_BASE(m_vram_0	)	// VRAM 0&1
+	AM_RANGE(0x800000, 0x803fff) AM_RAM_WRITE(seta_vram_0_w) AM_SHARE("vram_0")	// VRAM 0&1
 	AM_RANGE(0x804000, 0x807fff) AM_RAM	// tested
-	AM_RANGE(0x880000, 0x883fff) AM_RAM_WRITE(seta_vram_2_w) AM_BASE(m_vram_2	)	// VRAM 2&3
+	AM_RANGE(0x880000, 0x883fff) AM_RAM_WRITE(seta_vram_2_w) AM_SHARE("vram_2")	// VRAM 2&3
 	AM_RANGE(0x884000, 0x887fff) AM_RAM	// tested
-	AM_RANGE(0x900000, 0x900005) AM_RAM AM_BASE(m_vctrl_0)		// VRAM 0&1 Ctrl
-	AM_RANGE(0x980000, 0x980005) AM_RAM AM_BASE(m_vctrl_2)		// VRAM 2&3 Ctrl
+	AM_RANGE(0x900000, 0x900005) AM_RAM AM_SHARE("vctrl_0")		// VRAM 0&1 Ctrl
+	AM_RANGE(0x980000, 0x980005) AM_RAM AM_SHARE("vctrl_2")		// VRAM 2&3 Ctrl
 	AM_RANGE(0xa00000, 0xa005ff) AM_RAM AM_DEVREADWRITE_LEGACY("spritegen", spriteylow_r16, spriteylow_w16)		// Sprites Y
 	AM_RANGE(0xa00600, 0xa00607) AM_RAM AM_DEVREADWRITE_LEGACY("spritegen", spritectrl_r16, spritectrl_w16)
 	AM_RANGE(0xa80000, 0xa80001) AM_RAM								// ? $4000
@@ -2365,13 +2365,13 @@ static ADDRESS_MAP_START( madshark_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0x500004, 0x500005) AM_READ_PORT("COINS")				// Coins
 	AM_RANGE(0x500008, 0x50000b) AM_READ(seta_dsw_r)				// DSW
 	AM_RANGE(0x50000c, 0x50000d) AM_WRITE(watchdog_reset16_w)		// Watchdog
-	AM_RANGE(0x600000, 0x600005) AM_RAM_WRITE(seta_vregs_w) AM_BASE(m_vregs)	// ? Coin Lockout + Video Registers
+	AM_RANGE(0x600000, 0x600005) AM_RAM_WRITE(seta_vregs_w) AM_SHARE("vregs")	// ? Coin Lockout + Video Registers
 	AM_RANGE(0x600006, 0x600007) AM_WRITENOP						// ?
-	AM_RANGE(0x700400, 0x700fff) AM_RAM AM_BASE_SIZE(m_paletteram, m_paletteram_size)	// Palette
-	AM_RANGE(0x800000, 0x803fff) AM_RAM_WRITE(seta_vram_0_w) AM_BASE(m_vram_0)	// VRAM 0&1
-	AM_RANGE(0x880000, 0x883fff) AM_RAM_WRITE(seta_vram_2_w) AM_BASE(m_vram_2)	// VRAM 2&3
-	AM_RANGE(0x900000, 0x900005) AM_RAM AM_BASE(m_vctrl_0)		// VRAM 0&1 Ctrl
-	AM_RANGE(0x980000, 0x980005) AM_RAM AM_BASE(m_vctrl_2)		// VRAM 2&3 Ctrl
+	AM_RANGE(0x700400, 0x700fff) AM_RAM AM_SHARE("paletteram")	// Palette
+	AM_RANGE(0x800000, 0x803fff) AM_RAM_WRITE(seta_vram_0_w) AM_SHARE("vram_0")	// VRAM 0&1
+	AM_RANGE(0x880000, 0x883fff) AM_RAM_WRITE(seta_vram_2_w) AM_SHARE("vram_2")	// VRAM 2&3
+	AM_RANGE(0x900000, 0x900005) AM_RAM AM_SHARE("vctrl_0")		// VRAM 0&1 Ctrl
+	AM_RANGE(0x980000, 0x980005) AM_RAM AM_SHARE("vctrl_2")		// VRAM 2&3 Ctrl
 
 	AM_RANGE(0xa00000, 0xa005ff) AM_RAM AM_DEVREADWRITE_LEGACY("spritegen", spriteylow_r16, spriteylow_w16)		// Sprites Y
 	AM_RANGE(0xa00600, 0xa00607) AM_RAM AM_DEVREADWRITE_LEGACY("spritegen", spritectrl_r16, spritectrl_w16)
@@ -2428,7 +2428,7 @@ static ADDRESS_MAP_START( krzybowl_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0x8000f0, 0x8000f1) AM_RAM								// NVRAM
 	AM_RANGE(0x800100, 0x8001ff) AM_RAM								// NVRAM
 	AM_RANGE(0xa00000, 0xa03fff) AM_DEVREADWRITE_LEGACY("x1snd", seta_sound_word_r,seta_sound_word_w)	// Sound
-	AM_RANGE(0xb00000, 0xb003ff) AM_RAM AM_BASE_SIZE(m_paletteram, m_paletteram_size)	// Palette
+	AM_RANGE(0xb00000, 0xb003ff) AM_RAM AM_SHARE("paletteram")	// Palette
 	AM_RANGE(0xc00000, 0xc03fff) AM_RAM AM_DEVREADWRITE_LEGACY("spritegen", spritecode_r16, spritecode_w16)		// Sprites Code + X + Attr
 /**/AM_RANGE(0xd00000, 0xd00001) AM_RAM								// ? 0x4000
 /**/AM_RANGE(0xe00000, 0xe005ff) AM_RAM AM_DEVREADWRITE_LEGACY("spritegen", spriteylow_r16, spriteylow_w16)		// Sprites Y
@@ -2462,17 +2462,17 @@ static ADDRESS_MAP_START( msgundam_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0x400004, 0x400005) AM_READ_PORT("COINS")				// Coins
 	AM_RANGE(0x400000, 0x400001) AM_WRITENOP						// Lev 2 IRQ Ack
 	AM_RANGE(0x400004, 0x400005) AM_WRITENOP						// Lev 4 IRQ Ack
-	AM_RANGE(0x500000, 0x500005) AM_RAM_WRITE(msgundam_vregs_w) AM_BASE(m_vregs)	// Coin Lockout + Video Registers
+	AM_RANGE(0x500000, 0x500005) AM_RAM_WRITE(msgundam_vregs_w) AM_SHARE("vregs")	// Coin Lockout + Video Registers
 	AM_RANGE(0x600000, 0x600003) AM_READ(seta_dsw_r)				// DSW
-	AM_RANGE(0x700400, 0x700fff) AM_RAM AM_BASE_SIZE(m_paletteram, m_paletteram_size)	// Palette
+	AM_RANGE(0x700400, 0x700fff) AM_RAM AM_SHARE("paletteram")	// Palette
 	AM_RANGE(0x800000, 0x8005ff) AM_RAM AM_DEVREADWRITE_LEGACY("spritegen", spriteylow_r16, spriteylow_w16)		// Sprites Y
 	AM_RANGE(0x800600, 0x800607) AM_RAM AM_DEVREADWRITE_LEGACY("spritegen", spritectrl_r16, spritectrl_w16)
 	AM_RANGE(0x880000, 0x880001) AM_RAM								// ? 0x4000
 	AM_RANGE(0x900000, 0x903fff) AM_RAM AM_DEVREADWRITE_LEGACY("spritegen", spritecode_r16, spritecode_w16)		// Sprites Code + X + Attr
-	AM_RANGE(0xa00000, 0xa03fff) AM_RAM_WRITE(seta_vram_0_w) AM_BASE(m_vram_0)	// VRAM 0&1
-	AM_RANGE(0xa80000, 0xa83fff) AM_RAM_WRITE(seta_vram_2_w) AM_BASE(m_vram_2)	// VRAM 2&3
-	AM_RANGE(0xb00000, 0xb00005) AM_RAM AM_BASE(m_vctrl_0)		// VRAM 0&1 Ctrl
-	AM_RANGE(0xb80000, 0xb80005) AM_RAM AM_BASE(m_vctrl_2)		// VRAM 2&3 Ctrl
+	AM_RANGE(0xa00000, 0xa03fff) AM_RAM_WRITE(seta_vram_0_w) AM_SHARE("vram_0")	// VRAM 0&1
+	AM_RANGE(0xa80000, 0xa83fff) AM_RAM_WRITE(seta_vram_2_w) AM_SHARE("vram_2")	// VRAM 2&3
+	AM_RANGE(0xb00000, 0xb00005) AM_RAM AM_SHARE("vctrl_0")		// VRAM 0&1 Ctrl
+	AM_RANGE(0xb80000, 0xb80005) AM_RAM AM_SHARE("vctrl_2")		// VRAM 2&3 Ctrl
 	AM_RANGE(0xc00000, 0xc03fff) AM_DEVREADWRITE_LEGACY("x1snd", seta_sound_word_r,seta_sound_word_w)	// Sound
 #if __uPD71054_TIMER
 	AM_RANGE(0xd00000, 0xd00007) AM_WRITE(timer_regs_w)	// ?
@@ -2496,17 +2496,17 @@ static ADDRESS_MAP_START( oisipuzl_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0x400002, 0x400003) AM_READ_PORT("P2")					// P2
 	AM_RANGE(0x400004, 0x400005) AM_READ_PORT("COINS")				// Coins
 	AM_RANGE(0x400000, 0x400001) AM_WRITENOP						// ? IRQ Ack
-	AM_RANGE(0x500000, 0x500005) AM_RAM_WRITE(seta_vregs_w) AM_BASE(m_vregs)	// Coin Lockout + Video Registers
+	AM_RANGE(0x500000, 0x500005) AM_RAM_WRITE(seta_vregs_w) AM_SHARE("vregs")	// Coin Lockout + Video Registers
 	AM_RANGE(0x700000, 0x703fff) AM_DEVREADWRITE_LEGACY("x1snd", seta_sound_word_r,seta_sound_word_w)	// Sound
-	AM_RANGE(0x800000, 0x803fff) AM_RAM_WRITE(seta_vram_0_w) AM_BASE(m_vram_0)	// VRAM 0&1
-	AM_RANGE(0x880000, 0x883fff) AM_RAM_WRITE(seta_vram_2_w) AM_BASE(m_vram_2)	// VRAM 2&3
-/**/AM_RANGE(0x900000, 0x900005) AM_RAM AM_BASE(m_vctrl_0)		// VRAM 0&1 Ctrl
-/**/AM_RANGE(0x980000, 0x980005) AM_RAM AM_BASE(m_vctrl_2)		// VRAM 2&3 Ctrl
+	AM_RANGE(0x800000, 0x803fff) AM_RAM_WRITE(seta_vram_0_w) AM_SHARE("vram_0")	// VRAM 0&1
+	AM_RANGE(0x880000, 0x883fff) AM_RAM_WRITE(seta_vram_2_w) AM_SHARE("vram_2")	// VRAM 2&3
+/**/AM_RANGE(0x900000, 0x900005) AM_RAM AM_SHARE("vctrl_0")		// VRAM 0&1 Ctrl
+/**/AM_RANGE(0x980000, 0x980005) AM_RAM AM_SHARE("vctrl_2")		// VRAM 2&3 Ctrl
 /**/AM_RANGE(0xa00000, 0xa005ff) AM_RAM AM_DEVREADWRITE_LEGACY("spritegen", spriteylow_r16, spriteylow_w16)		// Sprites Y
 	AM_RANGE(0xa00600, 0xa00607) AM_RAM AM_DEVREADWRITE_LEGACY("spritegen", spritectrl_r16, spritectrl_w16)
 /**/AM_RANGE(0xa80000, 0xa80001) AM_RAM 							// ? 0x4000
 	AM_RANGE(0xb00000, 0xb03fff) AM_RAM AM_DEVREADWRITE_LEGACY("spritegen", spritecode_r16, spritecode_w16)		// Sprites Code + X + Attr
-	AM_RANGE(0xc00400, 0xc00fff) AM_RAM AM_BASE_SIZE(m_paletteram, m_paletteram_size)	// Palette
+	AM_RANGE(0xc00400, 0xc00fff) AM_RAM AM_SHARE("paletteram")	// Palette
 ADDRESS_MAP_END
 
 
@@ -2525,17 +2525,17 @@ static ADDRESS_MAP_START( triplfun_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0x400002, 0x400003) AM_READ_PORT("P2")					// P2
 	AM_RANGE(0x400004, 0x400005) AM_READ_PORT("COINS")				// Coins
 	AM_RANGE(0x400000, 0x400001) AM_WRITENOP						// ? IRQ Ack
-	AM_RANGE(0x500000, 0x500005) AM_RAM_WRITE(seta_vregs_w) AM_BASE(m_vregs)	// Coin Lockout + Video Registers
+	AM_RANGE(0x500000, 0x500005) AM_RAM_WRITE(seta_vregs_w) AM_SHARE("vregs")	// Coin Lockout + Video Registers
 	AM_RANGE(0x500006, 0x500007) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff) // tfun sound
-	AM_RANGE(0x800000, 0x803fff) AM_RAM_WRITE(seta_vram_0_w) AM_BASE(m_vram_0)	// VRAM 0&1
-	AM_RANGE(0x880000, 0x883fff) AM_RAM_WRITE(seta_vram_2_w) AM_BASE(m_vram_2)	// VRAM 2&3
-/**/AM_RANGE(0x900000, 0x900005) AM_RAM AM_BASE(m_vctrl_0)		// VRAM 0&1 Ctrl
-/**/AM_RANGE(0x980000, 0x980005) AM_RAM AM_BASE(m_vctrl_2)		// VRAM 2&3 Ctrl
+	AM_RANGE(0x800000, 0x803fff) AM_RAM_WRITE(seta_vram_0_w) AM_SHARE("vram_0")	// VRAM 0&1
+	AM_RANGE(0x880000, 0x883fff) AM_RAM_WRITE(seta_vram_2_w) AM_SHARE("vram_2")	// VRAM 2&3
+/**/AM_RANGE(0x900000, 0x900005) AM_RAM AM_SHARE("vctrl_0")		// VRAM 0&1 Ctrl
+/**/AM_RANGE(0x980000, 0x980005) AM_RAM AM_SHARE("vctrl_2")		// VRAM 2&3 Ctrl
 /**/AM_RANGE(0xa00000, 0xa005ff) AM_RAM AM_DEVREADWRITE_LEGACY("spritegen", spriteylow_r16, spriteylow_w16)		// Sprites Y
 	AM_RANGE(0xa00600, 0xa00607) AM_RAM AM_DEVREADWRITE_LEGACY("spritegen", spritectrl_r16, spritectrl_w16)
 /**/AM_RANGE(0xa80000, 0xa80001) AM_RAM 							// ? 0x4000
 	AM_RANGE(0xb00000, 0xb03fff) AM_RAM AM_DEVREADWRITE_LEGACY("spritegen", spritecode_r16, spritecode_w16)		// Sprites Code + X + Attr
-	AM_RANGE(0xc00400, 0xc00fff) AM_RAM AM_BASE_SIZE(m_paletteram, m_paletteram_size)	// Palette
+	AM_RANGE(0xc00400, 0xc00fff) AM_RAM AM_SHARE("paletteram")	// Palette
 ADDRESS_MAP_END
 
 
@@ -2582,12 +2582,12 @@ READ16_MEMBER(seta_state::kiwame_input_r)
 static ADDRESS_MAP_START( kiwame_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM								// ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM								// RAM
-	AM_RANGE(0xfffc00, 0xffffff) AM_READWRITE(kiwame_nvram_r, kiwame_nvram_w) AM_BASE(m_kiwame_nvram)	// NVRAM + Regs ?
+	AM_RANGE(0xfffc00, 0xffffff) AM_READWRITE(kiwame_nvram_r, kiwame_nvram_w) AM_SHARE("kiwame_nvram")	// NVRAM + Regs ?
 	AM_RANGE(0x800000, 0x803fff) AM_RAM AM_DEVREADWRITE_LEGACY("spritegen", spritecode_r16, spritecode_w16)		// Sprites Code + X + Attr
 /**/AM_RANGE(0x900000, 0x900001) AM_RAM								// ? 0x4000
 /**/AM_RANGE(0xa00000, 0xa005ff) AM_RAM AM_DEVREADWRITE_LEGACY("spritegen", spriteylow_r16, spriteylow_w16)		// Sprites Y
 	AM_RANGE(0xa00600, 0xa00607) AM_RAM AM_DEVREADWRITE_LEGACY("spritegen", spritectrl_r16, spritectrl_w16)
-	AM_RANGE(0xb00000, 0xb003ff) AM_RAM AM_BASE_SIZE(m_paletteram, m_paletteram_size)	// Palette
+	AM_RANGE(0xb00000, 0xb003ff) AM_RAM AM_SHARE("paletteram")	// Palette
 	AM_RANGE(0xc00000, 0xc03fff) AM_DEVREADWRITE_LEGACY("x1snd", seta_sound_word_r,seta_sound_word_w)	// Sound
 	AM_RANGE(0xd00000, 0xd00009) AM_READ(kiwame_input_r)			// mahjong panel
 	AM_RANGE(0xe00000, 0xe00003) AM_READ(seta_dsw_r)				// DSW
@@ -2617,9 +2617,9 @@ static ADDRESS_MAP_START( thunderl_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0x200000, 0x200001) AM_WRITENOP						// ?
 	AM_RANGE(0x300000, 0x300001) AM_WRITENOP						// ?
 	AM_RANGE(0x400000, 0x40ffff) AM_WRITE(thunderl_protection_w)	// Protection (not in wits)
-	AM_RANGE(0x500000, 0x500001) AM_RAM_WRITE(seta_vregs_w) AM_BASE(m_vregs)	// Coin Lockout
+	AM_RANGE(0x500000, 0x500001) AM_RAM_WRITE(seta_vregs_w) AM_SHARE("vregs")	// Coin Lockout
 	AM_RANGE(0x600000, 0x600003) AM_READ(seta_dsw_r)				// DSW
-	AM_RANGE(0x700000, 0x7003ff) AM_RAM AM_BASE_SIZE(m_paletteram, m_paletteram_size)	// Palette
+	AM_RANGE(0x700000, 0x7003ff) AM_RAM AM_SHARE("paletteram")	// Palette
 	AM_RANGE(0xb00000, 0xb00001) AM_READ_PORT("P1")					// P1
 	AM_RANGE(0xb00002, 0xb00003) AM_READ_PORT("P2")					// P2
 	AM_RANGE(0xb00004, 0xb00005) AM_READ_PORT("COINS")				// Coins
@@ -2641,9 +2641,9 @@ static ADDRESS_MAP_START( thunderlbl_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0x200000, 0x200001) AM_WRITENOP						// ?
 	AM_RANGE(0x300000, 0x300001) AM_WRITENOP						// ?
 //  AM_RANGE(0x400000, 0x40ffff) AM_WRITE(thunderl_protection_w)    // Protection (not in wits)
-	AM_RANGE(0x500000, 0x500001) AM_RAM_WRITE(seta_vregs_w) AM_BASE(m_vregs)	// Coin Lockout
+	AM_RANGE(0x500000, 0x500001) AM_RAM_WRITE(seta_vregs_w) AM_SHARE("vregs")	// Coin Lockout
 	AM_RANGE(0x600000, 0x600003) AM_READ(seta_dsw_r)				// DSW
-	AM_RANGE(0x700000, 0x7003ff) AM_RAM AM_BASE_SIZE(m_paletteram, m_paletteram_size)	// Palette
+	AM_RANGE(0x700000, 0x7003ff) AM_RAM AM_SHARE("paletteram")	// Palette
 	AM_RANGE(0xb00000, 0xb00001) AM_READ_PORT("P1")					// P1
 	AM_RANGE(0xb00002, 0xb00003) AM_READ_PORT("P2")					// P2
 	AM_RANGE(0xb00004, 0xb00005) AM_READ_PORT("COINS")				// Coins
@@ -2681,9 +2681,9 @@ static ADDRESS_MAP_START( wiggie_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0x200000, 0x200001) AM_WRITENOP						// ?
 	AM_RANGE(0x300000, 0x300001) AM_WRITENOP						// ?
 	AM_RANGE(0x400000, 0x40ffff) AM_WRITE(thunderl_protection_w)	// Protection (not in wits)
-	AM_RANGE(0x500000, 0x500001) AM_RAM_WRITE(seta_vregs_w) AM_BASE(m_vregs)	// Coin Lockout
+	AM_RANGE(0x500000, 0x500001) AM_RAM_WRITE(seta_vregs_w) AM_SHARE("vregs")	// Coin Lockout
 	AM_RANGE(0x600000, 0x600003) AM_READ(seta_dsw_r)				// DSW
-	AM_RANGE(0x700000, 0x7003ff) AM_RAM AM_BASE_SIZE(m_paletteram, m_paletteram_size)	// Palette
+	AM_RANGE(0x700000, 0x7003ff) AM_RAM AM_SHARE("paletteram")	// Palette
 	AM_RANGE(0xb00000, 0xb00001) AM_READ_PORT("P1")					// P1
 	AM_RANGE(0xb00002, 0xb00003) AM_READ_PORT("P2")					// P2
 	AM_RANGE(0xb00004, 0xb00005) AM_READ_PORT("COINS")				// Coins
@@ -2712,14 +2712,14 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( umanclub_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM								// ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM								// RAM
-	AM_RANGE(0x300000, 0x3003ff) AM_RAM AM_BASE_SIZE(m_paletteram, m_paletteram_size)	// Palette
+	AM_RANGE(0x300000, 0x3003ff) AM_RAM AM_SHARE("paletteram")	// Palette
 	AM_RANGE(0x300400, 0x300fff) AM_RAM								//
 	AM_RANGE(0x400000, 0x400001) AM_READ_PORT("P1")					// P1
 	AM_RANGE(0x400002, 0x400003) AM_READ_PORT("P2")					// P2
 	AM_RANGE(0x400004, 0x400005) AM_READ_PORT("COINS")				// Coins
 	AM_RANGE(0x400000, 0x400001) AM_WRITENOP						// ? (end of lev 2)
 	AM_RANGE(0x400004, 0x400005) AM_WRITENOP						// ? (end of lev 2)
-	AM_RANGE(0x500000, 0x500001) AM_RAM_WRITE(seta_vregs_w) AM_BASE(m_vregs)	// Coin Lockout + Video Registers
+	AM_RANGE(0x500000, 0x500001) AM_RAM_WRITE(seta_vregs_w) AM_SHARE("vregs")	// Coin Lockout + Video Registers
 	AM_RANGE(0x600000, 0x600003) AM_READ(seta_dsw_r)				// DSW
 	AM_RANGE(0xa00000, 0xa005ff) AM_RAM AM_DEVREADWRITE_LEGACY("spritegen", spriteylow_r16, spriteylow_w16)		// Sprites Y
 	AM_RANGE(0xa00600, 0xa00607) AM_RAM AM_DEVREADWRITE_LEGACY("spritegen", spritectrl_r16, spritectrl_w16)
@@ -2748,13 +2748,13 @@ static ADDRESS_MAP_START( utoukond_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0x400000, 0x400001) AM_READ_PORT("P1")					// P1
 	AM_RANGE(0x400002, 0x400003) AM_READ_PORT("P2")					// P2
 	AM_RANGE(0x400004, 0x400005) AM_READ_PORT("COINS")				// Coins
-	AM_RANGE(0x500000, 0x500005) AM_RAM_WRITE(seta_vregs_w) AM_BASE(m_vregs)	// ? Coin Lockout + Video Registers
+	AM_RANGE(0x500000, 0x500005) AM_RAM_WRITE(seta_vregs_w) AM_SHARE("vregs")	// ? Coin Lockout + Video Registers
 	AM_RANGE(0x600000, 0x600003) AM_READ(seta_dsw_r)				// DSW
-	AM_RANGE(0x700400, 0x700fff) AM_RAM	AM_BASE_SIZE(m_paletteram, m_paletteram_size)	// Palette
-	AM_RANGE(0x800000, 0x803fff) AM_RAM_WRITE(seta_vram_0_w) AM_BASE(m_vram_0)	// VRAM 0&1
-	AM_RANGE(0x880000, 0x883fff) AM_RAM_WRITE(seta_vram_2_w) AM_BASE(m_vram_2)	// VRAM 2&3
-	AM_RANGE(0x900000, 0x900005) AM_WRITEONLY AM_BASE(m_vctrl_0)// VRAM 0&1 Ctrl
-	AM_RANGE(0x980000, 0x980005) AM_WRITEONLY AM_BASE(m_vctrl_2)// VRAM 2&3 Ctrl
+	AM_RANGE(0x700400, 0x700fff) AM_RAM	AM_SHARE("paletteram")	// Palette
+	AM_RANGE(0x800000, 0x803fff) AM_RAM_WRITE(seta_vram_0_w) AM_SHARE("vram_0")	// VRAM 0&1
+	AM_RANGE(0x880000, 0x883fff) AM_RAM_WRITE(seta_vram_2_w) AM_SHARE("vram_2")	// VRAM 2&3
+	AM_RANGE(0x900000, 0x900005) AM_WRITEONLY AM_SHARE("vctrl_0")// VRAM 0&1 Ctrl
+	AM_RANGE(0x980000, 0x980005) AM_WRITEONLY AM_SHARE("vctrl_2")// VRAM 2&3 Ctrl
 	AM_RANGE(0xa00000, 0xa005ff) AM_RAM AM_DEVREADWRITE_LEGACY("spritegen", spriteylow_r16, spriteylow_w16)		// Sprites Y
 	AM_RANGE(0xa00600, 0xa00607) AM_RAM AM_DEVREADWRITE_LEGACY("spritegen", spritectrl_r16, spritectrl_w16)
 	AM_RANGE(0xb00000, 0xb03fff) AM_RAM AM_DEVREADWRITE_LEGACY("spritegen", spritecode_r16, spritecode_w16)		// Sprites Code + X + Attr
@@ -2788,13 +2788,13 @@ static ADDRESS_MAP_START( pairlove_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0x100000, 0x100001) AM_WRITENOP						// ? 1 (start of interrupts, main loop: watchdog?)
 	AM_RANGE(0x200000, 0x200001) AM_WRITENOP						// ? 0/1 (IRQ acknowledge?)
 	AM_RANGE(0x300000, 0x300003) AM_READ(seta_dsw_r)				// DSW
-	AM_RANGE(0x400000, 0x400001) AM_RAM_WRITE(seta_vregs_w) AM_BASE(m_vregs)	// Coin Lockout + Sound Enable (bit 4?)
+	AM_RANGE(0x400000, 0x400001) AM_RAM_WRITE(seta_vregs_w) AM_SHARE("vregs")	// Coin Lockout + Sound Enable (bit 4?)
 	AM_RANGE(0x500000, 0x500001) AM_READ_PORT("P1")					// P1
 	AM_RANGE(0x500002, 0x500003) AM_READ_PORT("P2")					// P2
 	AM_RANGE(0x500004, 0x500005) AM_READ_PORT("COINS")				// Coins
 	AM_RANGE(0x900000, 0x9001ff) AM_READWRITE(pairlove_prot_r,pairlove_prot_w)
 	AM_RANGE(0xa00000, 0xa03fff) AM_DEVREADWRITE_LEGACY("x1snd", seta_sound_word_r,seta_sound_word_w)	// Sound
-	AM_RANGE(0xb00000, 0xb00fff) AM_RAM AM_BASE_SIZE(m_paletteram, m_paletteram_size)	// Palette
+	AM_RANGE(0xb00000, 0xb00fff) AM_RAM AM_SHARE("paletteram")	// Palette
 	AM_RANGE(0xc00000, 0xc03fff) AM_RAM AM_DEVREADWRITE_LEGACY("spritegen", spritecode_r16, spritecode_w16)		// Sprites Code + X + Attr
 	AM_RANGE(0xd00000, 0xd00001) AM_RAM								// ? 0x4000
 	AM_RANGE(0xe00000, 0xe005ff) AM_RAM AM_DEVREADWRITE_LEGACY("spritegen", spriteylow_r16, spriteylow_w16)		// Sprites Y
@@ -2816,14 +2816,14 @@ static ADDRESS_MAP_START( crazyfgt_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0x610006, 0x610007) AM_WRITENOP
 	AM_RANGE(0x620000, 0x620003) AM_WRITENOP	// protection
 	AM_RANGE(0x630000, 0x630003) AM_READ(seta_dsw_r)
-	AM_RANGE(0x640400, 0x640fff) AM_WRITEONLY AM_BASE_SIZE(m_paletteram, m_paletteram_size)	// Palette
+	AM_RANGE(0x640400, 0x640fff) AM_WRITEONLY AM_SHARE("paletteram")	// Palette
 	AM_RANGE(0x650000, 0x650003) AM_DEVWRITE8_LEGACY("ymsnd", ym3812_w, 0x00ff)
 	AM_RANGE(0x658000, 0x658001) AM_DEVWRITE8("oki", okim6295_device, write, 0x00ff)
 	AM_RANGE(0x670000, 0x670001) AM_READNOP		// watchdog?
-	AM_RANGE(0x800000, 0x803fff) AM_WRITE(seta_vram_2_w) AM_BASE(m_vram_2) // VRAM 2
-	AM_RANGE(0x880000, 0x883fff) AM_WRITE(seta_vram_0_w) AM_BASE(m_vram_0) // VRAM 0
-	AM_RANGE(0x900000, 0x900005) AM_RAM AM_BASE(m_vctrl_2)	// VRAM 2&3 Ctrl
-	AM_RANGE(0x980000, 0x980005) AM_RAM AM_BASE(m_vctrl_0)	// VRAM 0&1 Ctrl
+	AM_RANGE(0x800000, 0x803fff) AM_WRITE(seta_vram_2_w) AM_SHARE("vram_2") // VRAM 2
+	AM_RANGE(0x880000, 0x883fff) AM_WRITE(seta_vram_0_w) AM_SHARE("vram_0") // VRAM 0
+	AM_RANGE(0x900000, 0x900005) AM_RAM AM_SHARE("vctrl_2")	// VRAM 2&3 Ctrl
+	AM_RANGE(0x980000, 0x980005) AM_RAM AM_SHARE("vctrl_0")	// VRAM 0&1 Ctrl
 	AM_RANGE(0xa00000, 0xa005ff) AM_RAM AM_DEVREADWRITE_LEGACY("spritegen", spriteylow_r16, spriteylow_w16)	// Sprites Y
 	AM_RANGE(0xa00600, 0xa00607) AM_RAM AM_DEVREADWRITE_LEGACY("spritegen", spritectrl_r16, spritectrl_w16)
 	AM_RANGE(0xa80000, 0xa80001) AM_WRITENOP	// ? 0x4000
@@ -2868,7 +2868,7 @@ READ16_MEMBER(seta_state::inttoote_700000_r)
 static ADDRESS_MAP_START( inttoote_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM	// ROM (up to 2MB)
 
-	AM_RANGE(0x200000, 0x200001) AM_RAM_READ(inttoote_key_r) AM_BASE(m_inttoote_key_select)
+	AM_RANGE(0x200000, 0x200001) AM_RAM_READ(inttoote_key_r) AM_SHARE("inttoote_keysel")
 	AM_RANGE(0x200002, 0x200003) AM_READ_PORT("P1")
 	AM_RANGE(0x200010, 0x200011) AM_READ_PORT("P2") AM_WRITENOP
 
@@ -2881,14 +2881,14 @@ static ADDRESS_MAP_START( inttoote_map, AS_PROGRAM, 16, seta_state )
 
 	AM_RANGE(0x500000, 0x500003) AM_READ(inttoote_dsw_r)	// DSW x 3
 
-	AM_RANGE(0x700000, 0x700101) AM_RAM_READ(inttoote_700000_r) AM_BASE(m_inttoote_700000)
+	AM_RANGE(0x700000, 0x700101) AM_RAM_READ(inttoote_700000_r) AM_SHARE("inttoote_700000")
 
 	AM_RANGE(0x800000, 0x80001f) AM_DEVREADWRITE8("rtc", msm6242_device, read, write, 0x00ff)
 
 	AM_RANGE(0x900000, 0x903fff) AM_DEVREADWRITE_LEGACY("x1snd", seta_sound_word_r, seta_sound_word_w		)	// Sound
 
-	AM_RANGE(0xa00000, 0xa00005) AM_WRITEONLY AM_BASE(m_vctrl_0		)	// VRAM 0&1 Ctrl
-	AM_RANGE(0xb00000, 0xb03fff) AM_RAM_WRITE(seta_vram_0_w) AM_BASE(m_vram_0	)	// VRAM 0&1
+	AM_RANGE(0xa00000, 0xa00005) AM_WRITEONLY AM_SHARE("vctrl_0")	// VRAM 0&1 Ctrl
+	AM_RANGE(0xb00000, 0xb03fff) AM_RAM_WRITE(seta_vram_0_w) AM_SHARE("vram_0")	// VRAM 0&1
 
 	AM_RANGE(0xc00000, 0xc00001) AM_RAM		// ? 0x4000
 
@@ -2951,8 +2951,8 @@ static ADDRESS_MAP_START( jockeyc_map, AS_PROGRAM, 16, seta_state )
 
 	AM_RANGE(0x900000, 0x903fff) AM_DEVREADWRITE_LEGACY("x1snd", seta_sound_word_r, seta_sound_word_w)	// Sound
 
-	AM_RANGE(0xa00000, 0xa00005) AM_WRITEONLY AM_BASE(m_vctrl_0)	// VRAM 0&1 Ctrl
-	AM_RANGE(0xb00000, 0xb03fff) AM_RAM_WRITE(seta_vram_0_w) AM_BASE(m_vram_0)	// VRAM 0&1
+	AM_RANGE(0xa00000, 0xa00005) AM_WRITEONLY AM_SHARE("vctrl_0")	// VRAM 0&1 Ctrl
+	AM_RANGE(0xb00000, 0xb03fff) AM_RAM_WRITE(seta_vram_0_w) AM_SHARE("vram_0")	// VRAM 0&1
 	AM_RANGE(0xb04000, 0xb0ffff) AM_WRITENOP // likely left-over
 
 	AM_RANGE(0xc00000, 0xc00001) AM_RAM		// ? 0x4000
@@ -3005,7 +3005,7 @@ static ADDRESS_MAP_START( tndrcade_sub_map, AS_PROGRAM, 8, seta_state )
 	AM_RANGE(0x1002, 0x1002) AM_READ_PORT("COINS")				// Coins
 	AM_RANGE(0x2000, 0x2001) AM_DEVREADWRITE_LEGACY("ym1", ym2203_r,ym2203_w)
 	AM_RANGE(0x3000, 0x3001) AM_DEVWRITE_LEGACY("ym2", ym3812_w)
-	AM_RANGE(0x5000, 0x57ff) AM_RAM	AM_BASE(m_sharedram)		// Shared RAM
+	AM_RANGE(0x5000, 0x57ff) AM_RAM	AM_SHARE("sharedram")		// Shared RAM
 	AM_RANGE(0x6000, 0x7fff) AM_ROM								// ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")						// Banked ROM
 	AM_RANGE(0xc000, 0xffff) AM_ROM								// ROM
@@ -3024,7 +3024,7 @@ static ADDRESS_MAP_START( twineagl_sub_map, AS_PROGRAM, 8, seta_state )
 	AM_RANGE(0x1000, 0x1000) AM_WRITE(sub_bankswitch_lockout_w)	// ROM Bank + Coin Lockout
 	AM_RANGE(0x1001, 0x1001) AM_READ_PORT("P2")				// P2
 	AM_RANGE(0x1002, 0x1002) AM_READ_PORT("COINS")			// Coins
-	AM_RANGE(0x5000, 0x57ff) AM_RAM AM_BASE(m_sharedram)		// Shared RAM
+	AM_RANGE(0x5000, 0x57ff) AM_RAM AM_SHARE("sharedram")		// Shared RAM
 	AM_RANGE(0x7000, 0x7fff) AM_ROM							// ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")					// Banked ROM
 	AM_RANGE(0xc000, 0xffff) AM_ROM							// ROM
@@ -3064,7 +3064,7 @@ static ADDRESS_MAP_START( downtown_sub_map, AS_PROGRAM, 8, seta_state )
 	AM_RANGE(0x0801, 0x0801) AM_READ(soundlatch2_byte_r)			//
 	AM_RANGE(0x1000, 0x1007) AM_READ(downtown_ip_r)			// Input Ports
 	AM_RANGE(0x1000, 0x1000) AM_WRITE(sub_bankswitch_lockout_w)	// ROM Bank + Coin Lockout
-	AM_RANGE(0x5000, 0x57ff) AM_RAM AM_BASE(m_sharedram)		// Shared RAM
+	AM_RANGE(0x5000, 0x57ff) AM_RAM AM_SHARE("sharedram")		// Shared RAM
 	AM_RANGE(0x7000, 0x7fff) AM_ROM							// ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")					// Banked ROM
 	AM_RANGE(0xc000, 0xffff) AM_ROM							// ROM
@@ -3111,7 +3111,7 @@ static ADDRESS_MAP_START( metafox_sub_map, AS_PROGRAM, 8, seta_state )
 	AM_RANGE(0x1002, 0x1002) AM_READ_PORT("P1")				// P1
 	//AM_RANGE(0x1004, 0x1004) AM_READNOP                     // ?
 	AM_RANGE(0x1006, 0x1006) AM_READ_PORT("P2")				// P2
-	AM_RANGE(0x5000, 0x57ff) AM_RAM AM_BASE(m_sharedram)		// Shared RAM
+	AM_RANGE(0x5000, 0x57ff) AM_RAM AM_SHARE("sharedram")		// Shared RAM
 	AM_RANGE(0x7000, 0x7fff) AM_ROM							// ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")					// Banked ROM
 	AM_RANGE(0xc000, 0xffff) AM_ROM							// ROM
@@ -10646,14 +10646,15 @@ static DRIVER_INIT( wiggie )
 
 static DRIVER_INIT( crazyfgt )
 {
-	seta_state *state = machine.driver_data<seta_state>();
+	//seta_state *state = machine.driver_data<seta_state>();
 	UINT16 *RAM = (UINT16 *) machine.region("maincpu")->base();
 
 	// protection check at boot
 	RAM[0x1078/2] = 0x4e71;
 
 	// fixed priorities?
-	state->m_vregs = auto_alloc_array_clear(machine, UINT16, 3);
+	//TODO:FIX
+	//state->m_vregs = auto_alloc_array_clear(machine, UINT16, 3);
 
 	DRIVER_INIT_CALL(blandia);
 }
@@ -10664,11 +10665,12 @@ static DRIVER_INIT( crazyfgt )
 
 static DRIVER_INIT( inttoote )
 {
-	seta_state *state = machine.driver_data<seta_state>();
+	//seta_state *state = machine.driver_data<seta_state>();
 	UINT16 *ROM = (UINT16 *)machine.region( "maincpu" )->base();
 
 	// missing / unused video regs
-	state->m_vregs = auto_alloc_array_clear(machine, UINT16, 3);
+	//TODO:FIX
+	//state->m_vregs = auto_alloc_array_clear(machine, UINT16, 3);
 
 	// code patches (to be removed...)
 	ROM[0x4de0/2] = 0x4e71;	// hardware test errors
@@ -10679,11 +10681,12 @@ static DRIVER_INIT( inttoote )
 
 static DRIVER_INIT( inttootea )
 {
-	seta_state *state = machine.driver_data<seta_state>();
+	//seta_state *state = machine.driver_data<seta_state>();
 	//UINT16 *ROM = (UINT16 *)machine.region( "maincpu" )->base();
 
 	// missing / unused video regs
-	state->m_vregs = auto_alloc_array_clear(machine, UINT16, 3);
+	//TODO:FIX
+	//state->m_vregs = auto_alloc_array_clear(machine, UINT16, 3);
 
 	// code patches (to be removed...)
 	//ROM[0x4de0/2] = 0x4e71;   // hardware test errors

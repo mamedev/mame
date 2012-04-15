@@ -63,7 +63,7 @@ static ADDRESS_MAP_START( hyhoo_io_map, AS_IO, 8, hyhoo_state )
 	AM_RANGE(0x90, 0x97) AM_WRITE(hyhoo_blitter_w)
 	AM_RANGE(0xa0, 0xa0) AM_READWRITE_LEGACY(nb1413m3_inputport1_r, nb1413m3_inputportsel_w)
 	AM_RANGE(0xb0, 0xb0) AM_READWRITE_LEGACY(nb1413m3_inputport2_r, nb1413m3_sndrombank1_w)
-	AM_RANGE(0xc0, 0xcf) AM_WRITEONLY AM_BASE(m_clut)
+	AM_RANGE(0xc0, 0xcf) AM_WRITEONLY AM_SHARE("clut")
 	AM_RANGE(0xd0, 0xd0) AM_READNOP AM_DEVWRITE_LEGACY("dac", DAC_WRITE)		// unknown read
 	AM_RANGE(0xe0, 0xe0) AM_WRITE(hyhoo_romsel_w)
 	AM_RANGE(0xe0, 0xe1) AM_READ_LEGACY(nb1413m3_gfxrom_r)

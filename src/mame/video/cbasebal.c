@@ -145,7 +145,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 
 	/* the last entry is not a sprite, we skip it otherwise spang shows a bubble */
 	/* moving diagonally across the screen */
-	for (offs = state->m_spriteram_size - 8; offs >= 0; offs -= 4)
+	for (offs = state->m_spriteram.bytes() - 8; offs >= 0; offs -= 4)
 	{
 		int code = spriteram[offs];
 		int attr = spriteram[offs + 1];

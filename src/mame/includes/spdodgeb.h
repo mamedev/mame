@@ -3,8 +3,9 @@ class spdodgeb_state : public driver_device
 public:
 	spdodgeb_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this,"maincpu")
-		{ }
+		m_videoram(*this, "videoram"),
+		m_spriteram(*this, "spriteram"),
+		m_maincpu(*this,"maincpu"){ }
 
 	int m_toggle;
 	int m_adpcm_pos[2];
@@ -24,13 +25,12 @@ public:
 	int m_countdown[2][2];
 	int m_prev[2];
 #endif
-	UINT8 *m_videoram;
+	required_shared_ptr<UINT8> m_videoram;
 	int m_tile_palbank;
 	int m_sprite_palbank;
 	tilemap_t *m_bg_tilemap;
 	int m_lastscroll;
-	UINT8 *m_spriteram;
-	size_t m_spriteram_size;
+	required_shared_ptr<UINT8> m_spriteram;
 
 	required_device<cpu_device> m_maincpu;
 	DECLARE_WRITE8_MEMBER(sound_command_w);

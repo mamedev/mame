@@ -89,12 +89,12 @@ WRITE16_MEMBER(taotaido_state::sound_command_w)
 }
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, taotaido_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x800000, 0x803fff) AM_RAM_WRITE(taotaido_bgvideoram_w) AM_BASE(m_bgram)	// bg ram?
-	AM_RANGE(0xa00000, 0xa01fff) AM_RAM AM_BASE(m_spriteram)		// sprite ram
-	AM_RANGE(0xc00000, 0xc0ffff) AM_RAM AM_BASE(m_spriteram2)		// sprite tile lookup ram
+	AM_RANGE(0x800000, 0x803fff) AM_RAM_WRITE(taotaido_bgvideoram_w) AM_SHARE("bgram")	// bg ram?
+	AM_RANGE(0xa00000, 0xa01fff) AM_RAM AM_SHARE("spriteram")		// sprite ram
+	AM_RANGE(0xc00000, 0xc0ffff) AM_RAM AM_SHARE("spriteram2")		// sprite tile lookup ram
 	AM_RANGE(0xfe0000, 0xfeffff) AM_RAM										// main ram
 	AM_RANGE(0xffc000, 0xffcfff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")	// palette ram
-	AM_RANGE(0xffe000, 0xffe3ff) AM_RAM AM_BASE(m_scrollram)		// rowscroll / rowselect / scroll ram
+	AM_RANGE(0xffe000, 0xffe3ff) AM_RAM AM_SHARE("scrollram")		// rowscroll / rowselect / scroll ram
 	AM_RANGE(0xffff80, 0xffff81) AM_READ_PORT("P1")
 	AM_RANGE(0xffff82, 0xffff83) AM_READ_PORT("P2")
 	AM_RANGE(0xffff84, 0xffff85) AM_READ_PORT("SYSTEM")

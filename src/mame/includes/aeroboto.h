@@ -8,19 +8,27 @@ class aeroboto_state : public driver_device
 {
 public:
 	aeroboto_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_mainram(*this, "mainram"),
+		m_videoram(*this, "videoram"),
+		m_hscroll(*this, "hscroll"),
+		m_tilecolor(*this, "tilecolor"),
+		m_spriteram(*this, "spriteram"),
+		m_vscroll(*this, "vscroll"),
+		m_starx(*this, "starx"),
+		m_stary(*this, "stary"),
+		m_bgcolor(*this, "bgcolor"){ }
 
 	/* memory pointers */
-	UINT8 * m_mainram;
-	UINT8 * m_spriteram;
-	UINT8 * m_videoram;
-	UINT8 * m_hscroll;
-	UINT8 * m_vscroll;
-	UINT8 * m_tilecolor;
-	UINT8 * m_starx;
-	UINT8 * m_stary;
-	UINT8 * m_bgcolor;
-	size_t  m_spriteram_size;
+	required_shared_ptr<UINT8> m_mainram;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_hscroll;
+	required_shared_ptr<UINT8> m_tilecolor;
+	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<UINT8> m_vscroll;
+	required_shared_ptr<UINT8> m_starx;
+	required_shared_ptr<UINT8> m_stary;
+	required_shared_ptr<UINT8> m_bgcolor;
 
 	/* stars layout */
 	UINT8 * m_stars_rom;

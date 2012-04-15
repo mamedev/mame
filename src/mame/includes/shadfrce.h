@@ -2,18 +2,21 @@ class shadfrce_state : public driver_device
 {
 public:
 	shadfrce_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_fgvideoram(*this, "fgvideoram"),
+		m_bg0videoram(*this, "bg0videoram"),
+		m_bg1videoram(*this, "bg1videoram"),
+		m_spvideoram(*this, "spvideoram"){ }
 
 	tilemap_t *m_fgtilemap;
 	tilemap_t *m_bg0tilemap;
 	tilemap_t *m_bg1tilemap;
 
-	UINT16 *m_fgvideoram;
-	UINT16 *m_bg0videoram;
-	UINT16 *m_bg1videoram;
-	UINT16 *m_spvideoram;
+	required_shared_ptr<UINT16> m_fgvideoram;
+	required_shared_ptr<UINT16> m_bg0videoram;
+	required_shared_ptr<UINT16> m_bg1videoram;
+	required_shared_ptr<UINT16> m_spvideoram;
 	UINT16 *m_spvideoram_old;
-	size_t m_spvideoram_size;
 
 	int m_video_enable;
 	int m_irqs_enable;

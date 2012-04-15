@@ -806,7 +806,7 @@ static void mcd212_process_vsr(mcd212_regs_t *mcd212, int channel, UINT8 *pixels
 {
     running_machine &machine = mcd212->machine();
     cdi_state *state = machine.driver_data<cdi_state>();
-    UINT8 *data = channel ? (UINT8*)state->m_planeb : (UINT8*)state->m_planea;
+    UINT8 *data = reinterpret_cast<UINT8 *>(channel ? state->m_planeb.target() : state->m_planea.target());
     UINT32 vsr = mcd212_get_vsr(mcd212, channel) & 0x0007ffff;
     UINT8 done = 0;
     UINT32 x = 0;

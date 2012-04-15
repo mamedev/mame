@@ -25,14 +25,15 @@ class sprint2_state : public driver_device
 {
 public:
 	sprint2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_video_ram(*this, "video_ram"){ }
 
 	int m_attract;
 	int m_steering[2];
 	int m_gear[2];
 	int m_game;
 	UINT8 m_dial[2];
-	UINT8* m_video_ram;
+	required_shared_ptr<UINT8> m_video_ram;
 	tilemap_t* m_bg_tilemap;
 	bitmap_ind16 m_helper;
 	int m_collision[2];

@@ -2,16 +2,21 @@ class tceptor_state : public driver_device
 {
 public:
 	tceptor_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_tile_ram(*this, "tile_ram"),
+		m_tile_attr(*this, "tile_attr"),
+		m_bg_ram(*this, "bg_ram"),
+		m_m68k_shared_ram(*this, "m68k_shared_ram"),
+		m_sprite_ram(*this, "sprite_ram"){ }
 
 	UINT8 m_m6809_irq_enable;
 	UINT8 m_m68k_irq_enable;
 	UINT8 m_mcu_irq_enable;
-	UINT8 *m_m68k_shared_ram;
-	UINT8 *m_tile_ram;
-	UINT8 *m_tile_attr;
-	UINT8 *m_bg_ram;
-	UINT16 *m_sprite_ram;
+	required_shared_ptr<UINT8> m_tile_ram;
+	required_shared_ptr<UINT8> m_tile_attr;
+	required_shared_ptr<UINT8> m_bg_ram;
+	required_shared_ptr<UINT8> m_m68k_shared_ram;
+	required_shared_ptr<UINT16> m_sprite_ram;
 	int m_sprite16;
 	int m_sprite32;
 	int m_bg;

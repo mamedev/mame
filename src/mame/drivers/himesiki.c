@@ -108,9 +108,9 @@ WRITE8_MEMBER(himesiki_state::himesiki_sound_w)
 static ADDRESS_MAP_START( himesiki_prm0, AS_PROGRAM, 8, himesiki_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
-	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_BASE(m_spriteram)
+	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xa800, 0xafff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_byte_le_w) AM_SHARE("paletteram")
-	AM_RANGE(0xb000, 0xbfff) AM_RAM_WRITE(himesiki_bg_ram_w) AM_BASE(m_bg_ram)
+	AM_RANGE(0xb000, 0xbfff) AM_RAM_WRITE(himesiki_bg_ram_w) AM_SHARE("bg_ram")
 	AM_RANGE(0xc000, 0xffff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 

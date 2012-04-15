@@ -38,7 +38,7 @@ static ADDRESS_MAP_START( memmap, AS_PROGRAM, 16, cchasm_state )
 	AM_RANGE(0x060000, 0x060001) AM_READ_PORT("DSW") AM_WRITE(cchasm_led_w)
 	AM_RANGE(0x070000, 0x070001) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0xf80000, 0xf800ff) AM_READWRITE(cchasm_io_r,cchasm_io_w)
-	AM_RANGE(0xffb000, 0xffffff) AM_RAM AM_BASE(m_ram)
+	AM_RANGE(0xffb000, 0xffffff) AM_RAM AM_SHARE("ram")
 ADDRESS_MAP_END
 
 /*************************************

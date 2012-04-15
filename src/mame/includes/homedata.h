@@ -3,11 +3,13 @@ class homedata_state : public driver_device
 {
 public:
 	homedata_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_vreg(*this, "vreg"),
+		m_videoram(*this, "videoram"){ }
 
 	/* memory pointers */
-	UINT8 *  m_vreg;
-	UINT8 *  m_videoram;
+	required_shared_ptr<UINT8> m_vreg;
+	required_shared_ptr<UINT8> m_videoram;
 
 	/* video-related */
 	tilemap_t *m_bg_tilemap[2][4];

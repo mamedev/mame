@@ -12,18 +12,20 @@ class undrfire_state : public driver_device
 {
 public:
 	undrfire_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_ram(*this, "ram"),
+		  m_shared_ram(*this, "shared_ram"),
+		  m_spriteram(*this, "spriteram") { }
 
 	UINT16 m_coin_word;
 	UINT16 m_port_sel;
 	int m_frame_counter;
-	UINT32 *m_ram;
-	UINT32 *m_shared_ram;
+	required_shared_ptr<UINT32> m_ram;
+	required_shared_ptr<UINT32> m_shared_ram;
 	struct tempsprite *m_spritelist;
 	UINT16 m_rotate_ctrl[8];
 	UINT8 m_dislayer[6];
-	UINT32 *m_spriteram;
-	size_t m_spriteram_size;
+	required_shared_ptr<UINT32> m_spriteram;
 	DECLARE_WRITE32_MEMBER(color_ram_w);
 	DECLARE_READ32_MEMBER(undrfire_input_r);
 	DECLARE_WRITE32_MEMBER(undrfire_input_w);

@@ -8,12 +8,12 @@ class madmotor_state : public driver_device
 {
 public:
 	madmotor_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_spriteram(*this, "spriteram"){ }
 
 	/* memory pointers */
-	UINT16 *        m_spriteram;
+	required_shared_ptr<UINT16> m_spriteram;
 //  UINT16 *        m_paletteram;     // this currently uses generic palette handlers
-	size_t          m_spriteram_size;
 
 	/* video-related */
 	int             m_flipscreen;

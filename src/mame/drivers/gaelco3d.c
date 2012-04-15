@@ -792,8 +792,8 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, gaelco3d_state )
 	AM_RANGE(0x510156, 0x510157) AM_WRITE(analog_port_clock_w)
 	AM_RANGE(0x510166, 0x510167) AM_WRITE(analog_port_latch_w)
 	AM_RANGE(0x510176, 0x510177) AM_DEVWRITE8_LEGACY("serial", gaelco_serial_unknown_w, 0x00ff)
-	AM_RANGE(0xfe7f80, 0xfe7fff) AM_WRITE(tms_comm_w) AM_BASE(m_tms_comm_base)
-	AM_RANGE(0xfe0000, 0xfeffff) AM_RAM AM_BASE(m_m68k_ram_base)
+	AM_RANGE(0xfe7f80, 0xfe7fff) AM_WRITE(tms_comm_w) AM_SHARE("tms_comm_base")
+	AM_RANGE(0xfe0000, 0xfeffff) AM_RAM AM_SHARE("m68k_ram_base")
 ADDRESS_MAP_END
 
 
@@ -823,8 +823,8 @@ static ADDRESS_MAP_START( main020_map, AS_PROGRAM, 32, gaelco3d_state )
 	AM_RANGE(0x510154, 0x510157) AM_WRITE16(analog_port_clock_w, 0x0000ffff)
 	AM_RANGE(0x510164, 0x510167) AM_WRITE16(analog_port_latch_w, 0x0000ffff)
 	AM_RANGE(0x510174, 0x510177) AM_DEVWRITE8_LEGACY("serial", gaelco_serial_unknown_w, 0x000000ff)
-	AM_RANGE(0xfe7f80, 0xfe7fff) AM_WRITE16(tms_comm_w, 0xffffffff) AM_BASE(m_tms_comm_base)
-	AM_RANGE(0xfe0000, 0xfeffff) AM_RAM AM_BASE(m_m68k_ram_base)
+	AM_RANGE(0xfe7f80, 0xfe7fff) AM_WRITE16(tms_comm_w, 0xffffffff) AM_SHARE("tms_comm_base")
+	AM_RANGE(0xfe0000, 0xfeffff) AM_RAM AM_SHARE("m68k_ram_base")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tms_map, AS_PROGRAM, 32, gaelco3d_state )
@@ -835,7 +835,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( adsp_program_map, AS_PROGRAM, 32, gaelco3d_state )
-	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_BASE(m_adsp_ram_base)		/* 1k words internal RAM */
+	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_SHARE("adsp_ram_base")		/* 1k words internal RAM */
 	AM_RANGE(0x37ff, 0x37ff) AM_READNOP							/* speedup hammers this for no apparent reason */
 ADDRESS_MAP_END
 
@@ -843,8 +843,8 @@ static ADDRESS_MAP_START( adsp_data_map, AS_DATA, 16, gaelco3d_state )
 	AM_RANGE(0x0000, 0x0001) AM_WRITE(adsp_rombank_w)
 	AM_RANGE(0x0000, 0x1fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x2000, 0x2000) AM_READWRITE(sound_data_r, sound_status_w)
-	AM_RANGE(0x3800, 0x39ff) AM_RAM AM_BASE(m_adsp_fastram_base)	/* 512 words internal RAM */
-	AM_RANGE(0x3fe0, 0x3fff) AM_WRITE(adsp_control_w) AM_BASE(m_adsp_control_regs)
+	AM_RANGE(0x3800, 0x39ff) AM_RAM AM_SHARE("adsp_fastram")	/* 512 words internal RAM */
+	AM_RANGE(0x3fe0, 0x3fff) AM_WRITE(adsp_control_w) AM_SHARE("adsp_regs")
 ADDRESS_MAP_END
 
 

@@ -68,14 +68,14 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, ambush_state )
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xa000, 0xa000) AM_READ(watchdog_reset_r)
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xc080, 0xc09f) AM_BASE(m_scrollram)
-	AM_RANGE(0xc100, 0xc1ff) AM_BASE(m_colorram)
-	AM_RANGE(0xc200, 0xc3ff) AM_BASE_SIZE(m_spriteram, m_spriteram_size)
-	AM_RANGE(0xc400, 0xc7ff) AM_BASE_SIZE(m_videoram, m_videoram_size)
+	AM_RANGE(0xc080, 0xc09f) AM_SHARE("scrollram")
+	AM_RANGE(0xc100, 0xc1ff) AM_SHARE("colorram")
+	AM_RANGE(0xc200, 0xc3ff) AM_SHARE("spriteram")
+	AM_RANGE(0xc400, 0xc7ff) AM_SHARE("videoram")
 	AM_RANGE(0xc800, 0xc800) AM_READ_PORT("DSW1")
 	AM_RANGE(0xcc00, 0xcc03) AM_WRITENOP
 	AM_RANGE(0xcc04, 0xcc04) AM_WRITE(flip_screen_w)
-	AM_RANGE(0xcc05, 0xcc05) AM_WRITEONLY AM_BASE(m_colorbank)
+	AM_RANGE(0xcc05, 0xcc05) AM_WRITEONLY AM_SHARE("colorbank")
 	AM_RANGE(0xcc07, 0xcc07) AM_WRITE(ambush_coin_counter_w)
 ADDRESS_MAP_END
 

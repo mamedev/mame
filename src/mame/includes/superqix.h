@@ -3,8 +3,17 @@ class superqix_state : public driver_device
 public:
 	superqix_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this,"maincpu")
-		{ }
+		m_maincpu(*this,"maincpu"),
+		m_spriteram(*this, "spriteram"),
+		m_videoram(*this, "videoram"),
+		m_bitmapram(*this, "bitmapram"),
+		m_bitmapram2(*this, "bitmapram2"){ }
+
+	required_device<cpu_device> m_maincpu;
+	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_bitmapram;
+	required_shared_ptr<UINT8> m_bitmapram2;
 
 	INT16 *m_samplebuf;
 	UINT8 m_port1;
@@ -23,18 +32,12 @@ public:
 	UINT8 m_portB_out;
 	UINT8 m_portC;
 	int m_curr_player;
-	UINT8 *m_videoram;
-	UINT8 *m_bitmapram;
-	UINT8 *m_bitmapram2;
 	int m_gfxbank;
 	bitmap_ind16 *m_fg_bitmap[2];
 	int m_show_bitmap;
 	tilemap_t *m_bg_tilemap;
-	UINT8 *m_spriteram;
-	size_t m_spriteram_size;
 	UINT8 m_nmi_mask;
 
-	required_device<cpu_device> m_maincpu;
 	DECLARE_WRITE8_MEMBER(pbillian_sample_trigger_w);
 	DECLARE_READ8_MEMBER(mcu_acknowledge_r);
 	DECLARE_WRITE8_MEMBER(bootleg_mcu_p1_w);

@@ -4,7 +4,13 @@ class taitojc_state : public driver_device
 {
 public:
 	taitojc_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_vram(*this, "vram"),
+		m_objlist(*this, "objlist"),
+		m_f3_shared_ram(*this, "f3_shared_ram"),
+		m_main_ram(*this, "main_ram"),
+		m_dsp_shared_ram(*this, "dsp_shared_ram"),
+		m_palette_ram(*this, "palette_ram") { }
 
 	int m_texture_x;
 	int m_texture_y;
@@ -27,8 +33,8 @@ public:
 	bitmap_ind16 m_framebuffer;
 	bitmap_ind16 m_zbuffer;
 
-	UINT32 *m_vram;
-	UINT32 *m_objlist;
+	required_shared_ptr<UINT32> m_vram;
+	required_shared_ptr<UINT32> m_objlist;
 
 	//int debug_tex_pal;
 
@@ -40,10 +46,10 @@ public:
 
 	poly_manager *m_poly;
 
-	UINT32 *m_f3_shared_ram;
-	UINT32 *m_main_ram;
-	UINT16 *m_dsp_shared_ram;
-	UINT32 *m_palette_ram;
+	required_shared_ptr<UINT32> m_f3_shared_ram;
+	required_shared_ptr<UINT32> m_main_ram;
+	required_shared_ptr<UINT16> m_dsp_shared_ram;
+	required_shared_ptr<UINT32> m_palette_ram;
 
 	UINT16 *m_polygon_fifo;
 	int m_polygon_fifo_ptr;

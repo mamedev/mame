@@ -86,7 +86,7 @@ VIDEO_START( gradius3 )
 	for (i = 0; i < TOTAL_SPRITES; i++)
 		gfx_element_mark_dirty(machine.gfx[1], i);
 
-	gfx_element_set_source(machine.gfx[0], (UINT8 *)state->m_gfxram);
+	gfx_element_set_source(machine.gfx[0], (UINT8 *)state->m_gfxram.target());
 
 	machine.save().register_postload(save_prepost_delegate(FUNC(gradius3_postload), &machine));
 }

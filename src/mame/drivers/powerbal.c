@@ -81,7 +81,7 @@ static ADDRESS_MAP_START( magicstk_main_map, AS_PROGRAM, 16, playmark_state )
 	AM_RANGE(0x094000, 0x094001) AM_WRITENOP
 	AM_RANGE(0x094002, 0x094003) AM_WRITENOP
 	AM_RANGE(0x094004, 0x094005) AM_WRITE_LEGACY(tile_banking_w)
-	AM_RANGE(0x098180, 0x09917f) AM_RAM_WRITE_LEGACY(magicstk_bgvideoram_w) AM_BASE(m_videoram1)
+	AM_RANGE(0x098180, 0x09917f) AM_RAM_WRITE_LEGACY(magicstk_bgvideoram_w) AM_SHARE("videoram1")
 	AM_RANGE(0x0c2010, 0x0c2011) AM_READ_PORT("IN0")
 	AM_RANGE(0x0c2012, 0x0c2013) AM_READ_PORT("IN1")
 	AM_RANGE(0x0c2014, 0x0c2015) AM_READ_PORT("IN2") AM_DEVWRITE_LEGACY("eeprom", magicstk_coin_eeprom_w)
@@ -91,7 +91,7 @@ static ADDRESS_MAP_START( magicstk_main_map, AS_PROGRAM, 16, playmark_state )
 	AM_RANGE(0x0c201e, 0x0c201f) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x0c4000, 0x0c4001) AM_WRITENOP
 	AM_RANGE(0x0e0000, 0x0fffff) AM_RAM
-	AM_RANGE(0x100000, 0x100fff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
+	AM_RANGE(0x100000, 0x100fff) AM_RAM AM_SHARE("spriteram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( powerbal_main_map, AS_PROGRAM, 16, playmark_state )
@@ -100,7 +100,7 @@ static ADDRESS_MAP_START( powerbal_main_map, AS_PROGRAM, 16, playmark_state )
 	AM_RANGE(0x094000, 0x094001) AM_WRITENOP
 	AM_RANGE(0x094002, 0x094003) AM_WRITENOP
 	AM_RANGE(0x094004, 0x094005) AM_WRITE_LEGACY(tile_banking_w)
-	AM_RANGE(0x098000, 0x098fff) AM_RAM_WRITE_LEGACY(magicstk_bgvideoram_w) AM_BASE(m_videoram1)
+	AM_RANGE(0x098000, 0x098fff) AM_RAM_WRITE_LEGACY(magicstk_bgvideoram_w) AM_SHARE("videoram1")
 	AM_RANGE(0x099000, 0x09bfff) AM_RAM // not used
 	AM_RANGE(0x0c2010, 0x0c2011) AM_READ_PORT("IN0")
 	AM_RANGE(0x0c2012, 0x0c2013) AM_READ_PORT("IN1")
@@ -111,7 +111,7 @@ static ADDRESS_MAP_START( powerbal_main_map, AS_PROGRAM, 16, playmark_state )
 	AM_RANGE(0x0c201e, 0x0c201f) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x0c4000, 0x0c4001) AM_WRITENOP
 	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM
-	AM_RANGE(0x101000, 0x101fff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
+	AM_RANGE(0x101000, 0x101fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x102000, 0x10200d) AM_WRITENOP // not used scroll regs?
 	AM_RANGE(0x103000, 0x103fff) AM_RAM
 ADDRESS_MAP_END
@@ -395,7 +395,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	int offs;
 	int height = machine.gfx[0]->height;
 
-	for (offs = 4; offs < state->m_spriteram_size / 2; offs += 4)
+	for (offs = 4; offs < state->m_spriteram.bytes() / 2; offs += 4)
 	{
 		int sx, sy, code, color, flipx;
 

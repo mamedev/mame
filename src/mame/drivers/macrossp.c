@@ -399,25 +399,25 @@ WRITE32_MEMBER(macrossp_state::macrossp_palette_fade_w)
 
 static ADDRESS_MAP_START( macrossp_map, AS_PROGRAM, 32, macrossp_state )
 	AM_RANGE(0x000000, 0x3fffff) AM_ROM
-	AM_RANGE(0x800000, 0x802fff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
+	AM_RANGE(0x800000, 0x802fff) AM_RAM AM_SHARE("spriteram")
 	/* SCR A Layer */
-	AM_RANGE(0x900000, 0x903fff) AM_RAM_WRITE(macrossp_scra_videoram_w) AM_BASE(m_scra_videoram)
+	AM_RANGE(0x900000, 0x903fff) AM_RAM_WRITE(macrossp_scra_videoram_w) AM_SHARE("scra_videoram")
 	AM_RANGE(0x904200, 0x9043ff) AM_WRITEONLY /* W/O? */
-	AM_RANGE(0x905000, 0x90500b) AM_WRITEONLY AM_BASE(m_scra_videoregs) /* W/O? */
+	AM_RANGE(0x905000, 0x90500b) AM_WRITEONLY AM_SHARE("scra_videoregs") /* W/O? */
 	/* SCR B Layer */
-	AM_RANGE(0x908000, 0x90bfff) AM_RAM_WRITE(macrossp_scrb_videoram_w) AM_BASE(m_scrb_videoram)
+	AM_RANGE(0x908000, 0x90bfff) AM_RAM_WRITE(macrossp_scrb_videoram_w) AM_SHARE("scrb_videoram")
 	AM_RANGE(0x90c200, 0x90c3ff) AM_WRITEONLY /* W/O? */
-	AM_RANGE(0x90d000, 0x90d00b) AM_WRITEONLY AM_BASE(m_scrb_videoregs) /* W/O? */
+	AM_RANGE(0x90d000, 0x90d00b) AM_WRITEONLY AM_SHARE("scrb_videoregs") /* W/O? */
 	/* SCR C Layer */
-	AM_RANGE(0x910000, 0x913fff) AM_RAM_WRITE(macrossp_scrc_videoram_w) AM_BASE(m_scrc_videoram)
+	AM_RANGE(0x910000, 0x913fff) AM_RAM_WRITE(macrossp_scrc_videoram_w) AM_SHARE("scrc_videoram")
 	AM_RANGE(0x914200, 0x9143ff) AM_WRITEONLY /* W/O? */
-	AM_RANGE(0x915000, 0x91500b) AM_WRITEONLY AM_BASE(m_scrc_videoregs) /* W/O? */
+	AM_RANGE(0x915000, 0x91500b) AM_WRITEONLY AM_SHARE("scrc_videoregs") /* W/O? */
 	/* Text Layer */
-	AM_RANGE(0x918000, 0x91bfff) AM_RAM_WRITE(macrossp_text_videoram_w) AM_BASE(m_text_videoram)
+	AM_RANGE(0x918000, 0x91bfff) AM_RAM_WRITE(macrossp_text_videoram_w) AM_SHARE("text_videoram")
 	AM_RANGE(0x91c200, 0x91c3ff) AM_WRITEONLY /* W/O? */
-	AM_RANGE(0x91d000, 0x91d00b) AM_WRITEONLY AM_BASE(m_text_videoregs) /* W/O? */
+	AM_RANGE(0x91d000, 0x91d00b) AM_WRITEONLY AM_SHARE("text_videoregs") /* W/O? */
 
-	AM_RANGE(0xa00000, 0xa03fff) AM_RAM_WRITE(paletteram32_macrossp_w) AM_BASE(m_paletteram)
+	AM_RANGE(0xa00000, 0xa03fff) AM_RAM_WRITE(paletteram32_macrossp_w) AM_SHARE("paletteram")
 
 	AM_RANGE(0xb00000, 0xb00003) AM_READ_PORT("INPUTS")
 	AM_RANGE(0xb00004, 0xb00007) AM_READ(macrossp_soundstatus_r) AM_WRITENOP // irq related?
@@ -428,7 +428,7 @@ static ADDRESS_MAP_START( macrossp_map, AS_PROGRAM, 32, macrossp_state )
 
 	AM_RANGE(0xc00000, 0xc00003) AM_WRITE(macrossp_soundcmd_w)
 
-	AM_RANGE(0xf00000, 0xf1ffff) AM_RAM AM_BASE(m_mainram) /* Main Ram */
+	AM_RANGE(0xf00000, 0xf1ffff) AM_RAM AM_SHARE("mainram") /* Main Ram */
 //  AM_RANGE(0xfe0000, 0xfe0003) AM_NOP
 ADDRESS_MAP_END
 

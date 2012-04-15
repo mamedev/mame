@@ -8,17 +8,23 @@ class mermaid_state : public driver_device
 {
 public:
 	mermaid_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram2(*this, "videoram2"),
+		m_videoram(*this, "videoram"),
+		m_bg_scrollram(*this, "bg_scrollram"),
+		m_fg_scrollram(*this, "fg_scrollram"),
+		m_spriteram(*this, "spriteram"),
+		m_colorram(*this, "colorram"),
+		m_ay8910_enable(*this, "ay8910_enable"){ }
 
 	/* memory pointers */
-	UINT8 *    m_videoram;
-	UINT8 *    m_colorram;
-	UINT8 *    m_videoram2;
-	UINT8 *    m_spriteram;
-	UINT8 *    m_bg_scrollram;
-	UINT8 *    m_fg_scrollram;
-	UINT8 *    m_ay8910_enable;
-	size_t     m_spriteram_size;
+	required_shared_ptr<UINT8> m_videoram2;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_bg_scrollram;
+	required_shared_ptr<UINT8> m_fg_scrollram;
+	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<UINT8> m_colorram;
+	required_shared_ptr<UINT8> m_ay8910_enable;
 
 	/* video-related */
 	tilemap_t *m_bg_tilemap;

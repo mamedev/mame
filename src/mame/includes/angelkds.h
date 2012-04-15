@@ -8,14 +8,19 @@ class angelkds_state : public driver_device
 {
 public:
 	angelkds_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_bgtopvideoram(*this, "bgtopvideoram"),
+		m_bgbotvideoram(*this, "bgbotvideoram"),
+		m_txvideoram(*this, "txvideoram"),
+		m_spriteram(*this, "spriteram"),
+		m_paletteram(*this, "paletteram"){ }
 
 	/* memory pointers */
-	UINT8 *    m_paletteram;
-	UINT8 *    m_spriteram;
-	UINT8 *    m_txvideoram;
-	UINT8 *    m_bgtopvideoram;
-	UINT8 *    m_bgbotvideoram;
+	required_shared_ptr<UINT8> m_bgtopvideoram;
+	required_shared_ptr<UINT8> m_bgbotvideoram;
+	required_shared_ptr<UINT8> m_txvideoram;
+	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<UINT8> m_paletteram;
 
 	tilemap_t    *m_tx_tilemap;
 	tilemap_t    *m_bgbot_tilemap;

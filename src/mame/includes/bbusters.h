@@ -7,11 +7,25 @@ public:
 		: driver_device(mconfig, type, tag),
 		  m_eprom_data(*this, "eeprom"),
 		  m_spriteram(*this, "spriteram"),
-		  m_spriteram2(*this, "spriteram2") { }
+		  m_spriteram2(*this, "spriteram2") ,
+		m_ram(*this, "ram"),
+		m_videoram(*this, "videoram"),
+		m_pf1_data(*this, "pf1_data"),
+		m_pf2_data(*this, "pf2_data"),
+		m_pf1_scroll_data(*this, "pf1_scroll_data"),
+		m_pf2_scroll_data(*this, "pf2_scroll_data"){ }
 
-	UINT16 *m_videoram;
-	UINT16 *m_ram;
 	optional_shared_ptr<UINT16> m_eprom_data;
+	required_device<buffered_spriteram16_device> m_spriteram;
+	optional_device<buffered_spriteram16_device> m_spriteram2;
+
+	required_shared_ptr<UINT16> m_ram;
+	required_shared_ptr<UINT16> m_videoram;
+	required_shared_ptr<UINT16> m_pf1_data;
+	required_shared_ptr<UINT16> m_pf2_data;
+	required_shared_ptr<UINT16> m_pf1_scroll_data;
+	required_shared_ptr<UINT16> m_pf2_scroll_data;
+
 	int m_sound_status;
 	int m_gun_select;
 
@@ -21,13 +35,7 @@ public:
 	const UINT8 *m_scale_table_ptr;
 	UINT8 m_scale_line_count;
 
-	UINT16 *m_pf1_data;
-	UINT16 *m_pf2_data;
-	UINT16 *m_pf1_scroll_data;
-	UINT16 *m_pf2_scroll_data;
 
-	required_device<buffered_spriteram16_device> m_spriteram;
-	optional_device<buffered_spriteram16_device> m_spriteram2;
 	DECLARE_READ16_MEMBER(sound_status_r);
 	DECLARE_WRITE8_MEMBER(sound_status_w);
 	DECLARE_WRITE16_MEMBER(sound_cpu_w);

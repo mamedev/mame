@@ -2,17 +2,22 @@ class tryout_state : public driver_device
 {
 public:
 	tryout_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"),
+		m_spriteram(*this, "spriteram"),
+		m_spriteram2(*this, "spriteram2"),
+		m_gfx_control(*this, "gfx_control"){ }
 
-	UINT8 *m_videoram;
-	UINT8 *m_gfx_control;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<UINT8> m_spriteram2;
+	required_shared_ptr<UINT8> m_gfx_control;
+
 	tilemap_t *m_fg_tilemap;
 	tilemap_t *m_bg_tilemap;
 	UINT8 m_vram_bank;
 	UINT8 *m_vram;
 	UINT8 *m_vram_gfx;
-	UINT8 *m_spriteram;
-	UINT8 *m_spriteram2;
 	DECLARE_WRITE8_MEMBER(tryout_nmi_ack_w);
 	DECLARE_WRITE8_MEMBER(tryout_sound_w);
 	DECLARE_WRITE8_MEMBER(tryout_sound_irq_ack_w);

@@ -11,14 +11,19 @@ class exidy440_state : public driver_device
 {
 public:
 	exidy440_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_imageram(*this, "imageram"),
+		m_spriteram(*this, "spriteram"),
+		m_scanline(*this, "scanline"){ }
+
+	required_shared_ptr<UINT8> m_imageram;
+	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<UINT8> m_scanline;
 
 	UINT8 m_bank;
 	const UINT8 *m_showdown_bank_data[2];
 	INT8 m_showdown_bank_select;
 	UINT8 m_showdown_bank_offset;
-	UINT8 *m_imageram;
-	UINT8 *m_scanline;
 	UINT8 m_firq_vblank;
 	UINT8 m_firq_beam;
 	UINT8 *m_topsecex_yscroll;
@@ -29,7 +34,6 @@ public:
 	UINT8 m_firq_select;
 	UINT8 m_palettebank_io;
 	UINT8 m_palettebank_vis;
-	UINT8 *m_spriteram;
 	device_t *m_custom;
 	DECLARE_WRITE8_MEMBER(bankram_w);
 	DECLARE_READ8_MEMBER(exidy440_input_port_3_r);

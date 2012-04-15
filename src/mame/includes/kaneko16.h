@@ -74,29 +74,43 @@ public:
 	kaneko16_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_spriteram(*this, "spriteram")
-		{ }
+		m_spriteram(*this, "spriteram"),
+		m_bg15_reg(*this, "bg15_reg"),
+		m_bg15_select(*this, "bg15_select"),
+		m_sprites_regs(*this, "sprites_regs"),
+		m_vram(*this, "vram"),
+		m_vscroll(*this, "vscroll"),
+		m_layers_0_regs(*this, "layers_0_regs"),
+		m_layers_1_regs(*this, "layers_1_regs"),
+		m_mcu_ram(*this, "mcu_ram"),
+		m_mainram(*this, "mainram"),
+		m_galsnew_bg_pixram(*this, "galsnew_bgram"),
+		m_galsnew_fg_pixram(*this, "galsnew_fgram") { }
 
-	UINT16 *m_mcu_ram;
+
+	required_device<cpu_device> m_maincpu;
+	optional_shared_ptr<UINT16> m_spriteram;
+	required_shared_ptr<UINT16> m_bg15_reg;
+	required_shared_ptr<UINT16> m_bg15_select;
+	required_shared_ptr<UINT16> m_sprites_regs;
+	required_shared_ptr_array<UINT16,4> m_vram;
+	required_shared_ptr_array<UINT16,4> m_vscroll;
+	required_shared_ptr<UINT16> m_layers_0_regs;
+	required_shared_ptr<UINT16> m_layers_1_regs;
+	required_shared_ptr<UINT16> m_mcu_ram;
+	required_shared_ptr<UINT16> m_mainram;
+	
 	UINT8 m_nvram_save[128];
-	UINT16 *m_vram[4];
-	UINT16 *m_layers_0_regs;
-	UINT16 *m_layers_1_regs;
-	UINT16 *m_vscroll[4];
 	int m_sprite_type;
 	int m_sprite_fliptype;
 	UINT16 m_sprite_xoffs;
 	UINT16 m_sprite_flipx;
 	UINT16 m_sprite_yoffs;
 	UINT16 m_sprite_flipy;
-	UINT16 *m_sprites_regs;
-	UINT16 *m_bg15_select;
-	UINT16 *m_bg15_reg;
 	struct tempsprite *m_first_sprite;
 	kaneko16_priority_t m_priority;
-	UINT16* m_galsnew_bg_pixram;
-	UINT16* m_galsnew_fg_pixram;
-	UINT16* m_mainram;
+	optional_shared_ptr<UINT16> m_galsnew_bg_pixram;
+	optional_shared_ptr<UINT16> m_galsnew_fg_pixram;	
 	calc1_hit_t m_hit;
 	calc3_hit_t m_hit3;
 	calc3_t m_calc3;
@@ -108,8 +122,6 @@ public:
 	bitmap_ind16 m_bg15_bitmap;
 	bitmap_ind16 m_sprites_bitmap;
 
-	required_device<cpu_device> m_maincpu;
-	optional_shared_ptr<UINT16> m_spriteram;
 	DECLARE_READ16_MEMBER(kaneko16_rnd_r);
 	DECLARE_WRITE16_MEMBER(kaneko16_coin_lockout_w);
 	DECLARE_WRITE16_MEMBER(kaneko16_soundlatch_w);

@@ -215,7 +215,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	int offs;
 	UINT8 *gfx = machine.region("gfx2")->base();
 
-	for (offs = state->m_spriteram_size / 2 - 8; offs >= 0; offs -= 8)
+	for (offs = state->m_spriteram.bytes() / 2 - 8; offs >= 0; offs -= 8)
 	{
 		int sx, starty, endy, x, y, start, color, width, flipx, primask;
 		UINT8 *rom = gfx;

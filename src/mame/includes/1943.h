@@ -8,16 +8,21 @@ class _1943_state : public driver_device
 {
 public:
 	_1943_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"),
+		m_colorram(*this, "colorram"),
+		m_scrollx(*this, "scrollx"),
+		m_scrolly(*this, "scrolly"),
+		m_bgscrollx(*this, "bgscrollx"),
+		m_spriteram(*this, "spriteram"){ }
 
 	/* memory pointers */
-	UINT8 * m_videoram;
-	UINT8 * m_colorram;
-	UINT8 * m_spriteram;
-	UINT8 * m_scrollx;
-	UINT8 * m_scrolly;
-	UINT8 * m_bgscrollx;
-	size_t  m_spriteram_size;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_colorram;
+	required_shared_ptr<UINT8> m_scrollx;
+	required_shared_ptr<UINT8> m_scrolly;
+	required_shared_ptr<UINT8> m_bgscrollx;
+	required_shared_ptr<UINT8> m_spriteram;
 
 	/* video-related */
 	tilemap_t *m_fg_tilemap;

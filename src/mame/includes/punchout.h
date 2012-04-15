@@ -2,18 +2,26 @@ class punchout_state : public driver_device
 {
 public:
 	punchout_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_bg_top_videoram(*this, "bg_top_videoram"),
+		m_spr1_ctrlram(*this, "spr1_ctrlram"),
+		m_spr2_ctrlram(*this, "spr2_ctrlram"),
+		m_palettebank(*this, "palettebank"),
+		m_spr1_videoram(*this, "spr1_videoram"),
+		m_spr2_videoram(*this, "spr2_videoram"),
+		m_bg_bot_videoram(*this, "bg_bot_videoram"),
+		m_armwrest_fg_videoram(*this, "armwrest_fgram"){ }
 
 	int m_rp5c01_mode_sel;
 	int m_rp5c01_mem[16*4];
-	UINT8 *m_bg_top_videoram;
-	UINT8 *m_bg_bot_videoram;
-	UINT8 *m_armwrest_fg_videoram;
-	UINT8 *m_spr1_videoram;
-	UINT8 *m_spr2_videoram;
-	UINT8 *m_spr1_ctrlram;
-	UINT8 *m_spr2_ctrlram;
-	UINT8 *m_palettebank;
+	required_shared_ptr<UINT8> m_bg_top_videoram;
+	required_shared_ptr<UINT8> m_spr1_ctrlram;
+	required_shared_ptr<UINT8> m_spr2_ctrlram;
+	required_shared_ptr<UINT8> m_palettebank;
+	required_shared_ptr<UINT8> m_spr1_videoram;
+	required_shared_ptr<UINT8> m_spr2_videoram;
+	required_shared_ptr<UINT8> m_bg_bot_videoram;
+	required_shared_ptr<UINT8> m_armwrest_fg_videoram;
 	tilemap_t *m_bg_top_tilemap;
 	tilemap_t *m_bg_bot_tilemap;
 	tilemap_t *m_fg_tilemap;

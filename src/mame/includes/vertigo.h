@@ -85,9 +85,10 @@ class vertigo_state : public driver_device
 {
 public:
 	vertigo_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_vectorram(*this, "vectorram") { }
 
-	UINT16 *m_vectorram;
+	required_shared_ptr<UINT16> m_vectorram;
 	device_t *m_ttl74148;
 	device_t *m_custom;
 	attotime m_irq4_time;

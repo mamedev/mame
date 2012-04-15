@@ -11,14 +11,18 @@ class redalert_state : public driver_device
 {
 public:
 	redalert_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_bitmap_videoram(*this, "bitmap_videoram"),
+		m_charmap_videoram(*this, "charram"),
+		m_video_control(*this, "video_control"),
+		m_bitmap_color(*this, "bitmap_color"){ }
 
 	UINT8 m_ay8910_latch_1;
 	UINT8 m_ay8910_latch_2;
-	UINT8 *m_bitmap_videoram;
-	UINT8 *m_bitmap_color;
-	UINT8 *m_charmap_videoram;
-	UINT8 *m_video_control;
+	required_shared_ptr<UINT8> m_bitmap_videoram;
+	required_shared_ptr<UINT8> m_charmap_videoram;
+	required_shared_ptr<UINT8> m_video_control;
+	required_shared_ptr<UINT8> m_bitmap_color;
 	UINT8 *m_bitmap_colorram;
 	UINT8 m_control_xor;
 	DECLARE_READ8_MEMBER(redalert_interrupt_clear_r);

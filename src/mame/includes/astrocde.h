@@ -18,16 +18,18 @@ class astrocde_state : public driver_device
 {
 public:
 	astrocde_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"),
+		m_protected_ram(*this, "protected_ram"){ }
 
-	UINT8 *m_videoram;
+	required_shared_ptr<UINT8> m_videoram;
 	UINT8 m_video_config;
 	UINT8 m_sparkle[4];
 	char m_totalword[256];
 	char *m_totalword_ptr;
 	char m_oldword[256];
 	int m_plural;
-	UINT8 *m_protected_ram;
+	required_shared_ptr<UINT8> m_protected_ram;
 	UINT8 m_port_1_last;
 	UINT8 m_port_2_last;
 	UINT8 m_ram_write_enable;

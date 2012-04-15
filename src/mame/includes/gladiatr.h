@@ -3,16 +3,22 @@ class gladiatr_state : public driver_device
 public:
 	gladiatr_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_nvram(*this, "nvram") { }
+		  m_nvram(*this, "nvram") ,
+		m_spriteram(*this, "spriteram"),
+		m_videoram(*this, "videoram"),
+		m_colorram(*this, "colorram"),
+		m_textram(*this, "textram"){ }
 
 	required_shared_ptr<UINT8>	m_nvram;
+	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_colorram;
+	required_shared_ptr<UINT8> m_textram;
+
 	int m_data1;
 	int m_data2;
 	int m_flag1;
 	int m_flag2;
-	UINT8 *m_videoram;
-	UINT8 *m_colorram;
-	UINT8 *m_textram;
 	int m_video_attributes;
 	int m_fg_scrollx;
 	int m_fg_scrolly;
@@ -24,7 +30,7 @@ public:
 	tilemap_t *m_bg_tilemap;
 	int m_fg_tile_bank;
 	int m_bg_tile_bank;
-	UINT8 *m_spriteram;
+
 	DECLARE_WRITE8_MEMBER(gladiatr_videoram_w);
 	DECLARE_WRITE8_MEMBER(gladiatr_colorram_w);
 	DECLARE_WRITE8_MEMBER(gladiatr_textram_w);

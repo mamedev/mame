@@ -18,7 +18,16 @@ class megasys1_state : public driver_device
 {
 public:
 	megasys1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_vregs(*this, "vregs"),
+		m_objectram(*this, "objectram"),
+		m_scrollram(*this, "scrollram"),
+		m_ram(*this, "ram"){ }
+
+	required_shared_ptr<UINT16> m_vregs;
+	required_shared_ptr<UINT16> m_objectram;
+	required_shared_ptr_array<UINT16,3> m_scrollram;
+	required_shared_ptr<UINT16> m_ram;
 
 	UINT16 *m_spriteram;
 	UINT16 m_ip_select;
@@ -26,10 +35,6 @@ public:
 	UINT8 m_ignore_oki_status;
 	UINT16 m_protection_val;
 	int m_bank;
-	UINT16 *m_scrollram[3];
-	UINT16 *m_objectram;
-	UINT16 *m_vregs;
-	UINT16 *m_ram;
 	int m_scrollx[3];
 	int m_scrolly[3];
 	int m_active_layers;

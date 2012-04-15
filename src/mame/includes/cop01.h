@@ -8,13 +8,15 @@ class cop01_state : public driver_device
 {
 public:
 	cop01_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_bgvideoram(*this, "bgvideoram"),
+		m_spriteram(*this, "spriteram"),
+		m_fgvideoram(*this, "fgvideoram"){ }
 
 	/* memory pointers */
-	UINT8 *        m_bgvideoram;
-	UINT8 *        m_fgvideoram;
-	UINT8 *        m_spriteram;
-	size_t         m_spriteram_size;
+	required_shared_ptr<UINT8> m_bgvideoram;
+	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<UINT8> m_fgvideoram;
 
 	/* video-related */
 	tilemap_t        *m_bg_tilemap;

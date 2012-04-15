@@ -3,16 +3,20 @@ class inufuku_state : public driver_device
 {
 public:
 	inufuku_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_bg_videoram(*this, "bg_videoram"),
+		m_bg_rasterram(*this, "bg_rasterram"),
+		m_tx_videoram(*this, "tx_videoram"),
+		m_spriteram1(*this, "spriteram1"),
+		m_spriteram2(*this, "spriteram2"){ }
 
 	/* memory pointers */
-	UINT16 *  m_bg_videoram;
-	UINT16 *  m_bg_rasterram;
-	UINT16 *  m_tx_videoram;
-	UINT16 *  m_spriteram1;
-	UINT16 *  m_spriteram2;
+	required_shared_ptr<UINT16> m_bg_videoram;
+	required_shared_ptr<UINT16> m_bg_rasterram;
+	required_shared_ptr<UINT16> m_tx_videoram;
+	required_shared_ptr<UINT16> m_spriteram1;
+	required_shared_ptr<UINT16> m_spriteram2;
 //      UINT16 *  m_paletteram;    // currently this uses generic palette handling
-	size_t    m_spriteram1_size;
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;

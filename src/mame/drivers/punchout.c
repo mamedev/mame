@@ -315,13 +315,13 @@ static ADDRESS_MAP_START( punchout_map, AS_PROGRAM, 8, punchout_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc3ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM
-	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(punchout_bg_top_videoram_w) AM_BASE(m_bg_top_videoram)
-	AM_RANGE(0xdff0, 0xdff7) AM_BASE(m_spr1_ctrlram)
-	AM_RANGE(0xdff8, 0xdffc) AM_BASE(m_spr2_ctrlram)
-	AM_RANGE(0xdffd, 0xdffd) AM_BASE(m_palettebank)
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(punchout_spr1_videoram_w) AM_BASE(m_spr1_videoram)
-	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(punchout_spr2_videoram_w) AM_BASE(m_spr2_videoram)
-	AM_RANGE(0xf000, 0xffff) AM_RAM_WRITE(punchout_bg_bot_videoram_w) AM_BASE(m_bg_bot_videoram)	// also contains scroll RAM
+	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(punchout_bg_top_videoram_w) AM_SHARE("bg_top_videoram")
+	AM_RANGE(0xdff0, 0xdff7) AM_SHARE("spr1_ctrlram")
+	AM_RANGE(0xdff8, 0xdffc) AM_SHARE("spr2_ctrlram")
+	AM_RANGE(0xdffd, 0xdffd) AM_SHARE("palettebank")
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(punchout_spr1_videoram_w) AM_SHARE("spr1_videoram")
+	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(punchout_spr2_videoram_w) AM_SHARE("spr2_videoram")
+	AM_RANGE(0xf000, 0xffff) AM_RAM_WRITE(punchout_bg_bot_videoram_w) AM_SHARE("bg_bot_videoram")	// also contains scroll RAM
 ADDRESS_MAP_END
 
 
@@ -329,14 +329,14 @@ static ADDRESS_MAP_START( armwrest_map, AS_PROGRAM, 8, punchout_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc3ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM
-	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(armwrest_fg_videoram_w) AM_BASE(m_armwrest_fg_videoram)
-	AM_RANGE(0xdff0, 0xdff7) AM_BASE(m_spr1_ctrlram)
-	AM_RANGE(0xdff8, 0xdffc) AM_BASE(m_spr2_ctrlram)
-	AM_RANGE(0xdffd, 0xdffd) AM_BASE(m_palettebank)
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(punchout_spr1_videoram_w) AM_BASE(m_spr1_videoram)
-	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(punchout_spr2_videoram_w) AM_BASE(m_spr2_videoram)
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(punchout_bg_bot_videoram_w) AM_BASE(m_bg_bot_videoram)
-	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(punchout_bg_top_videoram_w) AM_BASE(m_bg_top_videoram)
+	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(armwrest_fg_videoram_w) AM_SHARE("armwrest_fgram")
+	AM_RANGE(0xdff0, 0xdff7) AM_SHARE("spr1_ctrlram")
+	AM_RANGE(0xdff8, 0xdffc) AM_SHARE("spr2_ctrlram")
+	AM_RANGE(0xdffd, 0xdffd) AM_SHARE("palettebank")
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(punchout_spr1_videoram_w) AM_SHARE("spr1_videoram")
+	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(punchout_spr2_videoram_w) AM_SHARE("spr2_videoram")
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(punchout_bg_bot_videoram_w) AM_SHARE("bg_bot_videoram")
+	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(punchout_bg_top_videoram_w) AM_SHARE("bg_top_videoram")
 ADDRESS_MAP_END
 
 WRITE8_MEMBER(punchout_state::nmi_mask_w)

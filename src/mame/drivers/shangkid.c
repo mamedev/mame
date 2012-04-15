@@ -246,10 +246,10 @@ static ADDRESS_MAP_START( chinhero_main_map, AS_PROGRAM, 8, shangkid_state )
 	AM_RANGE(0xb801, 0xb801) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xb802, 0xb802) AM_READ_PORT("P2")
 	AM_RANGE(0xb803, 0xb803) AM_READ_PORT("P1")
-	AM_RANGE(0xc000, 0xc002) AM_WRITEONLY AM_BASE(m_videoreg)
-	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(shangkid_videoram_w) AM_BASE(m_videoram) AM_SHARE("share1")
+	AM_RANGE(0xc000, 0xc002) AM_WRITEONLY AM_SHARE("videoreg")
+	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(shangkid_videoram_w) AM_SHARE("videoram") AM_SHARE("share1")
 	AM_RANGE(0xe000, 0xfdff) AM_RAM AM_SHARE("share2")
-	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_BASE(m_spriteram) AM_SHARE("share3")
+	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_SHARE("spriteram") AM_SHARE("share3")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( shangkid_main_map, AS_PROGRAM, 8, shangkid_state )
@@ -267,10 +267,10 @@ static ADDRESS_MAP_START( shangkid_main_map, AS_PROGRAM, 8, shangkid_state )
 	AM_RANGE(0xb801, 0xb801) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xb802, 0xb802) AM_READ_PORT("P2")
 	AM_RANGE(0xb803, 0xb803) AM_READ_PORT("P1")
-	AM_RANGE(0xc000, 0xc002) AM_WRITEONLY AM_BASE(m_videoreg)
-	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(shangkid_videoram_w) AM_BASE(m_videoram) AM_SHARE("share1")
+	AM_RANGE(0xc000, 0xc002) AM_WRITEONLY AM_SHARE("videoreg")
+	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(shangkid_videoram_w) AM_SHARE("videoram") AM_SHARE("share1")
 	AM_RANGE(0xe000, 0xfdff) AM_RAM AM_SHARE("share2")
-	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_BASE(m_spriteram) AM_SHARE("share3")
+	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_SHARE("spriteram") AM_SHARE("share3")
 ADDRESS_MAP_END
 
 /***************************************************************************************/
@@ -435,7 +435,7 @@ MACHINE_CONFIG_END
 
 static ADDRESS_MAP_START( dynamski_map, AS_PROGRAM, 8, shangkid_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_BASE(m_videoram) /* tilemap */
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("videoram") /* tilemap */
 	AM_RANGE(0xc800, 0xcbff) AM_RAM
 	AM_RANGE(0xd000, 0xd3ff) AM_RAM
 	AM_RANGE(0xd800, 0xdbff) AM_RAM

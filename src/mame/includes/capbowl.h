@@ -10,12 +10,13 @@ class capbowl_state : public driver_device
 {
 public:
 	capbowl_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_rowaddress(*this, "rowaddress"){ }
 
 	void init_nvram(nvram_device &nvram, void *base, size_t size);
 
 	/* memory pointers */
-	UINT8 *  m_rowaddress;
+	required_shared_ptr<UINT8> m_rowaddress;
 
 	/* video-related */
 	offs_t m_blitter_addr;

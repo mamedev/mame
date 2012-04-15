@@ -19,13 +19,14 @@ class videopin_state : public driver_device
 {
 public:
 	videopin_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_video_ram(*this, "video_ram"){ }
 
 	attotime m_time_pushed;
 	attotime m_time_released;
 	UINT8 m_prev;
 	UINT8 m_mask;
-	UINT8* m_video_ram;
+	required_shared_ptr<UINT8> m_video_ram;
 	int m_ball_x;
 	int m_ball_y;
 	tilemap_t* m_bg_tilemap;

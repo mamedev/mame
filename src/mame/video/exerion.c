@@ -358,7 +358,7 @@ SCREEN_UPDATE_IND16( exerion )
 	draw_background(screen.machine(), bitmap, cliprect);
 
 	/* draw sprites */
-	for (i = 0; i < state->m_spriteram_size; i += 4)
+	for (i = 0; i < state->m_spriteram.bytes(); i += 4)
 	{
 		int flags = state->m_spriteram[i + 0];
 		int y = state->m_spriteram[i + 1] ^ 255;

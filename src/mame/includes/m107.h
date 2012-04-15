@@ -17,17 +17,20 @@ class m107_state : public driver_device
 {
 public:
 	m107_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_spriteram(*this, "spriteram"),
+		  m_vram_data(*this, "vram_data") { }
+
+	required_shared_ptr<UINT16> m_spriteram;
+	required_shared_ptr<UINT16> m_vram_data;
 
 	UINT8 m_irq_vectorbase;
 	int m_sound_status;
-	UINT16 *m_vram_data;
 	UINT8 m_spritesystem;
 	UINT8 m_sprite_display;
 	UINT16 m_raster_irq_position;
 	pf_layer_info m_pf_layer[4];
 	UINT16 m_control[0x10];
-	UINT16 *m_spriteram;
 	UINT16 *m_buffered_spriteram;
 	DECLARE_WRITE16_MEMBER(m107_coincounter_w);
 	DECLARE_WRITE16_MEMBER(m107_bankswitch_w);

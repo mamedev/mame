@@ -55,7 +55,7 @@ static void draw_chars( running_machine &machine, bitmap_ind16 &bitmap, const re
 
 	transpen = (priority == 0) ? -1 : 0;
 
-	for (offs = 0; offs < state->m_videoram_size; offs++)
+	for (offs = 0; offs < state->m_videoram.bytes(); offs++)
 	{
 		int code, sx, sy, col;
 		UINT8 scroll;
@@ -99,7 +99,7 @@ SCREEN_UPDATE_IND16( ambush )
 	draw_chars(screen.machine(), bitmap, cliprect, 0x00);
 
 	/* Draw the sprites. */
-	for (offs = state->m_spriteram_size - 4; offs >= 0; offs -= 4)
+	for (offs = state->m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
 	{
 		int code, col, sx, sy, flipx, flipy, gfx;
 

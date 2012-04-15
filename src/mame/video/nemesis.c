@@ -278,7 +278,7 @@ static void nemesis_postload(running_machine &machine)
 	nemesis_state *state = machine.driver_data<nemesis_state>();
 	int i, offs;
 
-	for (offs = 0; offs < state->m_charram_size; offs++)
+	for (offs = 0; offs < state->m_charram.bytes(); offs++)
 	{
 		for (i = 0; i < 8; i++)
 		{
@@ -297,7 +297,7 @@ VIDEO_START( nemesis )
 {
 	nemesis_state *state = machine.driver_data<nemesis_state>();
 
-	state->m_spriteram_words = state->m_spriteram_size / 2;
+	state->m_spriteram_words = state->m_spriteram.bytes() / 2;
 
 	state->m_background = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows,  8, 8, 64, 32);
 	state->m_foreground = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows,  8, 8, 64, 32);
@@ -307,17 +307,17 @@ VIDEO_START( nemesis )
 	state->m_background->set_scroll_rows(256);
 	state->m_foreground->set_scroll_rows(256);
 
-	memset(state->m_charram, 0, state->m_charram_size);
+	memset(state->m_charram, 0, state->m_charram.bytes());
 	memset(state->m_blank_tile, 0, ARRAY_LENGTH(state->m_blank_tile));
 
-	gfx_element_set_source(machine.gfx[0], (UINT8 *)state->m_charram);
-	gfx_element_set_source(machine.gfx[1], (UINT8 *)state->m_charram);
-	gfx_element_set_source(machine.gfx[2], (UINT8 *)state->m_charram);
-	gfx_element_set_source(machine.gfx[3], (UINT8 *)state->m_charram);
-	gfx_element_set_source(machine.gfx[4], (UINT8 *)state->m_charram);
-	gfx_element_set_source(machine.gfx[5], (UINT8 *)state->m_charram);
-	gfx_element_set_source(machine.gfx[6], (UINT8 *)state->m_charram);
-	gfx_element_set_source(machine.gfx[7], (UINT8 *)state->m_charram);
+	gfx_element_set_source(machine.gfx[0], (UINT8 *)state->m_charram.target());
+	gfx_element_set_source(machine.gfx[1], (UINT8 *)state->m_charram.target());
+	gfx_element_set_source(machine.gfx[2], (UINT8 *)state->m_charram.target());
+	gfx_element_set_source(machine.gfx[3], (UINT8 *)state->m_charram.target());
+	gfx_element_set_source(machine.gfx[4], (UINT8 *)state->m_charram.target());
+	gfx_element_set_source(machine.gfx[5], (UINT8 *)state->m_charram.target());
+	gfx_element_set_source(machine.gfx[6], (UINT8 *)state->m_charram.target());
+	gfx_element_set_source(machine.gfx[7], (UINT8 *)state->m_charram.target());
 
 	/* Set up save state */
 	machine.save().register_postload(save_prepost_delegate(FUNC(nemesis_postload), &machine));

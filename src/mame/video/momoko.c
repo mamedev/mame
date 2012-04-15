@@ -219,7 +219,7 @@ SCREEN_UPDATE_IND16( momoko )
 
 
 	/* draw sprites (others) */
-	for (offs = 9 * 4; offs < state->m_spriteram_size; offs += 4)
+	for (offs = 9 * 4; offs < state->m_spriteram.bytes(); offs += 4)
 	{
 		chr = spriteram[offs + 1] | ((spriteram[offs + 2] & 0x60) << 3);
 		chr = ((chr & 0x380) << 1) | (chr & 0x7f);

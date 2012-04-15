@@ -2,17 +2,21 @@ class tubep_state : public driver_device
 {
 public:
 	tubep_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_textram(*this, "textram"),
+		m_backgroundram(*this, "backgroundram"),
+		m_sprite_colorsharedram(*this, "sprite_color"),
+		m_rjammer_backgroundram(*this, "rjammer_bgram"){ }
 
 	UINT8 m_sound_latch;
 	UINT8 m_ls74;
 	UINT8 m_ls377;
 	emu_timer *m_interrupt_timer;
 	int m_curr_scanline;
-	UINT8 *m_rjammer_backgroundram;
-	UINT8 *m_backgroundram;
-	UINT8 *m_textram;
-	UINT8 *m_sprite_colorsharedram;
+	required_shared_ptr<UINT8> m_textram;
+	required_shared_ptr<UINT8> m_backgroundram;
+	required_shared_ptr<UINT8> m_sprite_colorsharedram;
+	required_shared_ptr<UINT8> m_rjammer_backgroundram;
 	UINT8 *m_spritemap;
 	UINT8 m_prom2[32];
 	UINT32 m_romD_addr;

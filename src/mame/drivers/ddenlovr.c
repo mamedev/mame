@@ -1773,7 +1773,7 @@ static ADDRESS_MAP_START( ddenlovj_map, AS_PROGRAM, 16, dynax_state )
 	AM_RANGE(0x300184, 0x300185) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x300186, 0x300187) AM_READ(ddenlovj_dsw_r)								// DSW
 	AM_RANGE(0x300188, 0x300189) AM_WRITE(ddenlovj_coincounter_w)						// Coin Counters
-	AM_RANGE(0x30018a, 0x30018b) AM_WRITEONLY AM_BASE(m_dsw_sel16)			// DSW select
+	AM_RANGE(0x30018a, 0x30018b) AM_WRITEONLY AM_SHARE("dsw_sel16")			// DSW select
 	AM_RANGE(0x30018c, 0x30018d) AM_DEVWRITE_LEGACY("oki", ddenlovr_oki_bank_w)
 	AM_RANGE(0x3001ca, 0x3001cb) AM_WRITE(ddenlovr_blitter_irq_ack_w)					// Blitter irq acknowledge
 	AM_RANGE(0x300240, 0x300241) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)// Sound
@@ -1808,8 +1808,8 @@ WRITE16_MEMBER(dynax_state::ddenlovrk_protection2_w)
 static ADDRESS_MAP_START( ddenlovrk_map, AS_PROGRAM, 16, dynax_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM														// ROM
 
-	AM_RANGE(0x100000, 0x100001) AM_RAM_READ(ddenlovrk_protection1_r) AM_BASE(m_protection1)
-	AM_RANGE(0x200000, 0x200001) AM_READWRITE(ddenlovrk_protection2_r, ddenlovrk_protection2_w) AM_BASE(m_protection2)
+	AM_RANGE(0x100000, 0x100001) AM_RAM_READ(ddenlovrk_protection1_r) AM_SHARE("protection1")
+	AM_RANGE(0x200000, 0x200001) AM_READWRITE(ddenlovrk_protection2_r, ddenlovrk_protection2_w) AM_SHARE("protection2")
 
 	AM_RANGE(0xd00000, 0xd003ff) AM_WRITE(ddenlovr_palette_w)								// Palette
 //  AM_RANGE(0xd01000, 0xd017ff) AM_RAM                                                    // ? B0 on startup, then 00
@@ -1935,7 +1935,7 @@ static ADDRESS_MAP_START( nettoqc_map, AS_PROGRAM, 16, dynax_state )
 
 	AM_RANGE(0x200000, 0x2003ff) AM_WRITE(ddenlovr_palette_w)								// Palette
 	AM_RANGE(0x200c02, 0x200c03) AM_READ(nettoqc_protection_r)								//
-	AM_RANGE(0x200e0a, 0x200e0d) AM_WRITEONLY AM_BASE(m_protection1)			//
+	AM_RANGE(0x200e0a, 0x200e0d) AM_WRITEONLY AM_SHARE("protection1")			//
 	AM_RANGE(0x201000, 0x2017ff) AM_WRITEONLY											// ?
 
 	AM_RANGE(0x300040, 0x300047) AM_WRITE(ddenlovr16_palette_base_w)
@@ -3356,7 +3356,7 @@ static ADDRESS_MAP_START( akamaru_map, AS_PROGRAM, 16, dynax_state )
 	AM_RANGE(0xe00104, 0xe00105) AM_READ_PORT("SYSTEM")
 
 	AM_RANGE(0xe00106, 0xe00107) AM_READ(akamaru_protection2_r)
-	AM_RANGE(0xe00108, 0xe0010b) AM_WRITEONLY AM_BASE(m_protection2)
+	AM_RANGE(0xe00108, 0xe0010b) AM_WRITEONLY AM_SHARE("protection2")
 
 	AM_RANGE(0xe0010c, 0xe0010d) AM_READ(akamaru_e0010d_r)
 	AM_RANGE(0xe00200, 0xe00201) AM_READ(akamaru_dsw_r)										// DSW
@@ -3364,7 +3364,7 @@ static ADDRESS_MAP_START( akamaru_map, AS_PROGRAM, 16, dynax_state )
 	AM_RANGE(0xe00204, 0xe00205) AM_READ(akamaru_blitter_r)									// Blitter Busy & IRQ
 	AM_RANGE(0xe00302, 0xe00303) AM_WRITE(ddenlovr_blitter_irq_ack_w)						// Blitter irq acknowledge
 
-	AM_RANGE(0xe00304, 0xe00307) AM_WRITEONLY AM_BASE(m_dsw_sel16)				// DSW select
+	AM_RANGE(0xe00304, 0xe00307) AM_WRITEONLY AM_SHARE("dsw_sel16")				// DSW select
 	AM_RANGE(0xe00308, 0xe00309) AM_WRITE(ddenlovr_coincounter_0_w)							// Coin Counters
 	AM_RANGE(0xe0030c, 0xe0030d) AM_WRITE(ddenlovr_coincounter_1_w)							//
 

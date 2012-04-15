@@ -29,7 +29,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 #endif
 
 	/* pdrawgfx() needs us to draw sprites front to back */
-	for (offs = 0; offs < state->m_spriteram_size / 2; offs += 4)
+	for (offs = 0; offs < state->m_spriteram.bytes() / 2; offs += 4)
 	{
 		data = spriteram[offs + 1];
 		tilenum = data & 0x7fff;

@@ -232,7 +232,7 @@ static void toaplan1_paletteram_alloc(running_machine &machine)
 {
 	toaplan1_state *state = machine.driver_data<toaplan1_state>();
 
-	UINT32 bytes = (state->m_colorram1_size + state->m_colorram2_size)/2;
+	UINT32 bytes = (state->m_colorram1.bytes() + state->m_colorram2.bytes())/2;
 	state->m_generic_paletteram_16.allocate(bytes);
 }
 
@@ -263,17 +263,14 @@ static void toaplan1_spritevram_alloc(running_machine &machine)
 {
 	toaplan1_state *state = machine.driver_data<toaplan1_state>();
 
-	state->m_spriteram = auto_alloc_array_clear(machine, UINT16, TOAPLAN1_SPRITERAM_SIZE/2);
+	state->m_spriteram.allocate(TOAPLAN1_SPRITERAM_SIZE/2);
 	state->m_buffered_spriteram = auto_alloc_array_clear(machine, UINT16, TOAPLAN1_SPRITERAM_SIZE/2);
 	state->m_spritesizeram16 = auto_alloc_array_clear(machine, UINT16, TOAPLAN1_SPRITESIZERAM_SIZE/2);
 	state->m_buffered_spritesizeram16 = auto_alloc_array_clear(machine, UINT16, TOAPLAN1_SPRITESIZERAM_SIZE/2);
 
-	state->save_pointer(NAME(state->m_spriteram), TOAPLAN1_SPRITERAM_SIZE/2);
 	state->save_pointer(NAME(state->m_buffered_spriteram), TOAPLAN1_SPRITERAM_SIZE/2);
 	state->save_pointer(NAME(state->m_spritesizeram16), TOAPLAN1_SPRITESIZERAM_SIZE/2);
 	state->save_pointer(NAME(state->m_buffered_spritesizeram16), TOAPLAN1_SPRITESIZERAM_SIZE/2);
-
-	state->m_spriteram_size = TOAPLAN1_SPRITERAM_SIZE;
 }
 
 static void toaplan1_set_scrolls(running_machine &machine)
@@ -344,8 +341,8 @@ VIDEO_START( rallybik )
 	toaplan1_paletteram_alloc(machine);
 	toaplan1_vram_alloc(machine);
 
-	state->m_buffered_spriteram = auto_alloc_array_clear(machine, UINT16, state->m_spriteram_size/2);
-	state->save_pointer(NAME(state->m_buffered_spriteram), state->m_spriteram_size/2);
+	state->m_buffered_spriteram = auto_alloc_array_clear(machine, UINT16, state->m_spriteram.bytes()/2);
+	state->save_pointer(NAME(state->m_buffered_spriteram), state->m_spriteram.bytes()/2);
 
 	state->m_scrollx_offs1 = 0x00d + 6;
 	state->m_scrollx_offs2 = 0x00d + 4;
@@ -522,7 +519,7 @@ WRITE16_MEMBER(toaplan1_state::toaplan1_colorram2_w)
 {
 
 	COMBINE_DATA(&m_colorram2[offset]);
-	paletteram_xBBBBBGGGGGRRRRR_word_w(space, offset+(m_colorram1_size/2), data, mem_mask);
+	paletteram_xBBBBBGGGGGRRRRR_word_w(space, offset+(m_colorram1.bytes()/2), data, mem_mask);
 }
 
 READ16_MEMBER(toaplan1_state::toaplan1_spriteram16_r)
@@ -756,7 +753,7 @@ static void toaplan1_log_vram(running_machine &machine)
 			logerror("Scrolls    PF1-X  PF1-Y     PF2-X  PF2-Y     PF3-X  PF3-Y     PF4-X  PF4-Y\n");
 			logerror("------>    #%04x  #%04x     #%04x  #%04x     #%04x  #%04x     #%04x  #%04x\n",
 				state->m_pf1_scrollx, state->m_pf1_scrolly, state->m_pf2_scrollx, state->m_pf2_scrolly, state->m_pf3_scrollx, state->m_pf3_scrolly, state->m_pf4_scrollx, state->m_pf4_scrolly);
-			for ( sprite_voffs = 0; sprite_voffs < state->m_spriteram_size/2; sprite_voffs += 4 )
+			for ( sprite_voffs = 0; sprite_voffs < state->m_spriteram.bytes()/2; sprite_voffs += 4 )
 			{
 				bschar = buffered_spriteram16[sprite_voffs];
 				bsattr = buffered_spriteram16[sprite_voffs + 1];
@@ -777,7 +774,7 @@ static void toaplan1_log_vram(running_machine &machine)
 			logerror("Scrolls    PF1-X  PF1-Y     PF2-X  PF2-Y     PF3-X  PF3-Y     PF4-X  PF4-Y\n");
 			logerror("------>    #%04x  #%04x     #%04x  #%04x     #%04x  #%04x     #%04x  #%04x\n",
 				state->m_pf1_scrollx, state->m_pf1_scrolly, state->m_pf2_scrollx, state->m_pf2_scrolly, state->m_pf3_scrollx, state->m_pf3_scrolly, state->m_pf4_scrollx, state->m_pf4_scrolly);
-			for ( sprite_voffs = 0; sprite_voffs < state->m_spriteram_size/2; sprite_voffs += 4 )
+			for ( sprite_voffs = 0; sprite_voffs < state->m_spriteram.bytes()/2; sprite_voffs += 4 )
 			{
 				bschar = buffered_spriteram16[sprite_voffs];
 				bsattr = buffered_spriteram16[sprite_voffs + 1];
@@ -1041,7 +1038,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 	int fcu_flipscreen = state->m_fcu_flipscreen;
 	int offs;
 
-	for (offs = state->m_spriteram_size/2 - 4; offs >= 0; offs -= 4)
+	for (offs = state->m_spriteram.bytes()/2 - 4; offs >= 0; offs -= 4)
 	{
 		if (!(source[offs] & 0x8000))
 		{
@@ -1107,7 +1104,7 @@ static void rallybik_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap
 	UINT16 *buffered_spriteram16 = state->m_buffered_spriteram;
 	int offs;
 
-	for (offs = 0; offs < state->m_spriteram_size/2; offs += 4)
+	for (offs = 0; offs < state->m_spriteram.bytes()/2; offs += 4)
 	{
 		int attrib, sx, sy, flipx, flipy;
 		int sprite, color;
@@ -1202,7 +1199,7 @@ SCREEN_VBLANK( rallybik )
 	{
 		toaplan1_state *state = screen.machine().driver_data<toaplan1_state>();
 
-		memcpy(state->m_buffered_spriteram, state->m_spriteram, state->m_spriteram_size);
+		memcpy(state->m_buffered_spriteram, state->m_spriteram, state->m_spriteram.bytes());
 	}
 }
 
@@ -1213,7 +1210,7 @@ SCREEN_VBLANK( toaplan1 )
 	{
 		toaplan1_state *state = screen.machine().driver_data<toaplan1_state>();
 
-		memcpy(state->m_buffered_spriteram, state->m_spriteram, state->m_spriteram_size);
+		memcpy(state->m_buffered_spriteram, state->m_spriteram, state->m_spriteram.bytes());
 		memcpy(state->m_buffered_spritesizeram16, state->m_spritesizeram16, TOAPLAN1_SPRITESIZERAM_SIZE);
 	}
 }
@@ -1225,7 +1222,7 @@ SCREEN_VBLANK( samesame )
 	{
 		toaplan1_state *state = screen.machine().driver_data<toaplan1_state>();
 
-		memcpy(state->m_buffered_spriteram, state->m_spriteram, state->m_spriteram_size);
+		memcpy(state->m_buffered_spriteram, state->m_spriteram, state->m_spriteram.bytes());
 		memcpy(state->m_buffered_spritesizeram16, state->m_spritesizeram16, TOAPLAN1_SPRITESIZERAM_SIZE);
 		cputag_set_input_line(screen.machine(), "maincpu", M68K_IRQ_2, HOLD_LINE);	/* Frame done */
 	}

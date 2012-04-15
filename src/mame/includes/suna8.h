@@ -7,8 +7,15 @@ class suna8_state : public driver_device
 public:
 	suna8_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this,"maincpu")
-		{ }
+		m_maincpu(*this,"maincpu"),
+		m_hardhead_ip(*this, "hardhead_ip"),
+		m_spriteram(*this, "spriteram"),
+		m_wram(*this, "wram"){ }
+
+	required_device<cpu_device> m_maincpu;
+	required_shared_ptr<UINT8> m_hardhead_ip;
+	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<UINT8> m_wram;
 
 	UINT8 m_rombank;
 	UINT8 m_spritebank;
@@ -20,9 +27,6 @@ public:
 	UINT8 m_spritebank_latch;
 	UINT8 m_trash_prot;
 
-	UINT8 *m_hardhead_ip;
-	UINT8 *m_wram;
-	UINT8 *m_spriteram;
 
 	int m_text_dim; /* specifies format of text layer */
 
@@ -36,7 +40,6 @@ public:
 	INT16 *m_samplebuf;
 	int m_sample;
 
-	required_device<cpu_device> m_maincpu;
 	DECLARE_READ8_MEMBER(hardhead_protection_r);
 	DECLARE_WRITE8_MEMBER(hardhead_protection_w);
 	DECLARE_READ8_MEMBER(hardhead_ip_r);

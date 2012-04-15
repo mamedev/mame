@@ -70,7 +70,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
        while processing sprite ram and then draw them all at the end */
 	struct tempsprite *sprite_ptr = state->m_spritelist;
 
-	for (offs = (state->m_spriteram_size/4-4);offs >= 0;offs -= 4)
+	for (offs = (state->m_spriteram.bytes()/4-4);offs >= 0;offs -= 4)
 	{
 		data = spriteram32[offs+0];
 		flipx =    (data & 0x00800000) >> 23;

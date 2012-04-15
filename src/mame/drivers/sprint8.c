@@ -101,22 +101,22 @@ WRITE8_MEMBER(sprint8_state::sprint8_int_reset_w)
 
 static ADDRESS_MAP_START( sprint8_map, AS_PROGRAM, 8, sprint8_state )
 	AM_RANGE(0x0000, 0x00ff) AM_RAM
-	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE(sprint8_video_ram_w) AM_BASE(m_video_ram)
+	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE(sprint8_video_ram_w) AM_SHARE("video_ram")
 	AM_RANGE(0x1c00, 0x1c00) AM_READ(sprint8_collision_r)
 	AM_RANGE(0x1c01, 0x1c08) AM_READ(sprint8_input_r)
 	AM_RANGE(0x1c09, 0x1c09) AM_READ_PORT("IN0")
 	AM_RANGE(0x1c0a, 0x1c0a) AM_READ_PORT("IN1")
 	AM_RANGE(0x1c0f, 0x1c0f) AM_READ_PORT("VBLANK")
-	AM_RANGE(0x1c00, 0x1c0f) AM_WRITEONLY AM_BASE(m_pos_h_ram)
-	AM_RANGE(0x1c10, 0x1c1f) AM_WRITEONLY AM_BASE(m_pos_v_ram)
-	AM_RANGE(0x1c20, 0x1c2f) AM_WRITEONLY AM_BASE(m_pos_d_ram)
+	AM_RANGE(0x1c00, 0x1c0f) AM_WRITEONLY AM_SHARE("pos_h_ram")
+	AM_RANGE(0x1c10, 0x1c1f) AM_WRITEONLY AM_SHARE("pos_v_ram")
+	AM_RANGE(0x1c20, 0x1c2f) AM_WRITEONLY AM_SHARE("pos_d_ram")
 	AM_RANGE(0x1c30, 0x1c37) AM_WRITE(sprint8_lockout_w)
 	AM_RANGE(0x1d00, 0x1d00) AM_WRITE(sprint8_int_reset_w)
 	AM_RANGE(0x1d01, 0x1d01) AM_DEVWRITE_LEGACY("discrete", sprint8_crash_w)
 	AM_RANGE(0x1d02, 0x1d02) AM_DEVWRITE_LEGACY("discrete", sprint8_screech_w)
 	AM_RANGE(0x1d03, 0x1d03) AM_WRITENOP
 	AM_RANGE(0x1d04, 0x1d04) AM_WRITENOP
-	AM_RANGE(0x1d05, 0x1d05) AM_WRITEONLY AM_BASE(m_team)
+	AM_RANGE(0x1d05, 0x1d05) AM_WRITEONLY AM_SHARE("team")
 	AM_RANGE(0x1d06, 0x1d06) AM_DEVWRITE_LEGACY("discrete", sprint8_attract_w)
 	AM_RANGE(0x1e00, 0x1e07) AM_DEVWRITE_LEGACY("discrete", sprint8_motor_w)
 	AM_RANGE(0x1f00, 0x1f00) AM_WRITENOP /* probably a watchdog, disabled in service mode */

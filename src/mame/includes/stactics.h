@@ -11,21 +11,29 @@ class stactics_state : public driver_device
 {
 public:
 	stactics_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_palette(*this, "palette"),
+		m_motor_on(*this, "motor_on"),
+		m_lamps(*this, "lamps"),
+		m_display_buffer(*this, "display_buffer"),
+		m_videoram_b(*this, "videoram_b"),
+		m_videoram_d(*this, "videoram_d"),
+		m_videoram_e(*this, "videoram_e"),
+		m_videoram_f(*this, "videoram_f"){ }
 
 	/* machine state */
 	int    m_vert_pos;
 	int    m_horiz_pos;
-	UINT8 *m_motor_on;
-
 	/* video state */
-	UINT8 *m_videoram_b;
-	UINT8 *m_videoram_d;
-	UINT8 *m_videoram_e;
-	UINT8 *m_videoram_f;
-	UINT8 *m_palette;
-	UINT8 *m_display_buffer;
-	UINT8 *m_lamps;
+
+	required_shared_ptr<UINT8> m_palette;
+	required_shared_ptr<UINT8> m_motor_on;
+	required_shared_ptr<UINT8> m_lamps;
+	required_shared_ptr<UINT8> m_display_buffer;
+	required_shared_ptr<UINT8> m_videoram_b;
+	required_shared_ptr<UINT8> m_videoram_d;
+	required_shared_ptr<UINT8> m_videoram_e;
+	required_shared_ptr<UINT8> m_videoram_f;
 
 	UINT8  m_y_scroll_d;
 	UINT8  m_y_scroll_e;

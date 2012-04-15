@@ -48,16 +48,16 @@ static ADDRESS_MAP_START( bigstrkb_map, AS_PROGRAM, 16, bigstrkb_state )
 
 	AM_RANGE(0x0D0000, 0x0dffff) AM_RAM  // 0xd2000 - 0xd3fff?   0xd8000?
 
-	AM_RANGE(0x0e0000, 0x0e3fff) AM_RAM_WRITE(bsb_videoram2_w) AM_BASE(m_videoram2)
-	AM_RANGE(0x0e8000, 0x0ebfff) AM_RAM_WRITE(bsb_videoram3_w) AM_BASE(m_videoram3)
-	AM_RANGE(0x0ec000, 0x0effff) AM_RAM_WRITE(bsb_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0x0e0000, 0x0e3fff) AM_RAM_WRITE(bsb_videoram2_w) AM_SHARE("videoram2")
+	AM_RANGE(0x0e8000, 0x0ebfff) AM_RAM_WRITE(bsb_videoram3_w) AM_SHARE("videoram3")
+	AM_RANGE(0x0ec000, 0x0effff) AM_RAM_WRITE(bsb_videoram_w) AM_SHARE("videoram")
 
 	AM_RANGE(0x0f0000, 0x0f7fff) AM_RAM
 	AM_RANGE(0x0f8000, 0x0f87ff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBRGBx_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x0f8800, 0x0fffff) AM_RAM
 
 	AM_RANGE(0x1f0000, 0x1f7fff) AM_RAM
-	AM_RANGE(0x1f8000, 0x1f87ff) AM_RAM AM_BASE(m_spriteram)
+	AM_RANGE(0x1f8000, 0x1f87ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x1f8800, 0x1fffff) AM_RAM
 
 	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("DSW0")
@@ -65,8 +65,8 @@ static ADDRESS_MAP_START( bigstrkb_map, AS_PROGRAM, 16, bigstrkb_state )
 	AM_RANGE(0x700004, 0x700005) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x70000a, 0x70000b) AM_READ_PORT("P2")
 	AM_RANGE(0x70000c, 0x70000d) AM_READ_PORT("P1")
-	AM_RANGE(0x700020, 0x700027) AM_WRITEONLY AM_BASE(m_vidreg1)
-	AM_RANGE(0x700030, 0x700037) AM_WRITEONLY AM_BASE(m_vidreg2)
+	AM_RANGE(0x700020, 0x700027) AM_WRITEONLY AM_SHARE("vidreg1")
+	AM_RANGE(0x700030, 0x700037) AM_WRITEONLY AM_SHARE("vidreg2")
 
 	AM_RANGE(0xB00000, 0xB00001) AM_WRITENOP
 

@@ -1416,14 +1416,14 @@ static READ64_HANDLER( naomi_arm_r )
 {
 	dc_state *state = space->machine().driver_data<dc_state>();
 
-	return *((UINT64 *)state->dc_sound_ram+offset);
+	return *(reinterpret_cast<UINT64 *>(state->dc_sound_ram.target())+offset);
 }
 
 static WRITE64_HANDLER( naomi_arm_w )
 {
 	dc_state *state = space->machine().driver_data<dc_state>();
 
-	COMBINE_DATA((UINT64 *)state->dc_sound_ram + offset);
+	COMBINE_DATA(reinterpret_cast<UINT64 *>(state->dc_sound_ram.target()) + offset);
 }
 
 static READ64_HANDLER( naomi_unknown1_r )
@@ -1573,8 +1573,8 @@ static ADDRESS_MAP_START( naomi_map, AS_PROGRAM, 64, dc_state )
 	AM_RANGE(0x0103ff00, 0x0103ffff) AM_MIRROR(0x02000000) AM_READWRITE_LEGACY(naomi_unknown1_r, naomi_unknown1_w ) // bios uses it, actual start and end addresses not known
 
 	/* Area 1 */
-	AM_RANGE(0x04000000, 0x04ffffff) AM_MIRROR(0x02000000) AM_RAM AM_BASE(dc_texture_ram )      // texture memory 64 bit access
-	AM_RANGE(0x05000000, 0x05ffffff) AM_MIRROR(0x02000000) AM_RAM AM_BASE(dc_framebuffer_ram ) // apparently this actually accesses the same memory as the 64-bit texture memory access, but in a different format, keep it apart for now
+	AM_RANGE(0x04000000, 0x04ffffff) AM_MIRROR(0x02000000) AM_RAM AM_SHARE("dc_texture_ram")      // texture memory 64 bit access
+	AM_RANGE(0x05000000, 0x05ffffff) AM_MIRROR(0x02000000) AM_RAM AM_SHARE("frameram") // apparently this actually accesses the same memory as the 64-bit texture memory access, but in a different format, keep it apart for now
 
 	/* Area 2*/
 	AM_RANGE(0x08000000, 0x09ffffff) AM_MIRROR(0x02000000) AM_NOP // 'Unassigned'
@@ -1629,17 +1629,17 @@ static ADDRESS_MAP_START( naomi2_map, AS_PROGRAM, 64, dc_state )
 	AM_RANGE(0x025f8000, 0x025f9fff) AM_READWRITE_LEGACY(pvr2_ta_r, pvr2_ta_w )
 
 	/* Area 1 */
-	AM_RANGE(0x04000000, 0x04ffffff) AM_RAM AM_BASE(dc_texture_ram )      // texture memory 64 bit access
-	AM_RANGE(0x05000000, 0x05ffffff) AM_RAM AM_BASE(dc_framebuffer_ram ) // apparently this actually accesses the same memory as the 64-bit texture memory access, but in a different format, keep it apart for now
-	AM_RANGE(0x06000000, 0x06ffffff) AM_RAM AM_BASE(pvr2_texture_ram )   // 64 bit access 2nd PVR RAM
-	AM_RANGE(0x07000000, 0x07ffffff) AM_RAM AM_BASE(pvr2_framebuffer_ram )// 32 bit access 2nd PVR RAM
+	AM_RANGE(0x04000000, 0x04ffffff) AM_RAM AM_SHARE("dc_texture_ram")      // texture memory 64 bit access
+	AM_RANGE(0x05000000, 0x05ffffff) AM_RAM AM_SHARE("frameram") // apparently this actually accesses the same memory as the 64-bit texture memory access, but in a different format, keep it apart for now
+	AM_RANGE(0x06000000, 0x06ffffff) AM_RAM AM_SHARE("textureram2")   // 64 bit access 2nd PVR RAM
+	AM_RANGE(0x07000000, 0x07ffffff) AM_RAM AM_SHARE("frameram2")// 32 bit access 2nd PVR RAM
 
 	/* Area 2*/
 	AM_RANGE(0x085f6800, 0x085f69ff) AM_WRITE_LEGACY(dc_sysctrl_w ) // writes to BOTH PVRs
 	AM_RANGE(0x085f8000, 0x085f9fff) AM_WRITE_LEGACY(pvrs_ta_w ) // writes to BOTH PVRs
 	AM_RANGE(0x08800000, 0x088000ff) AM_READWRITE32_LEGACY(elan_regs_r, elan_regs_w, U64(0xffffffffffffffff) ) // T&L chip registers
 //  AM_RANGE(0x09000000, 0x09??????) T&L command processing
-    AM_RANGE(0x0a000000, 0x0bffffff) AM_RAM AM_BASE(elan_ram ) // T&L chip RAM
+    AM_RANGE(0x0a000000, 0x0bffffff) AM_RAM AM_SHARE("elan_ram") // T&L chip RAM
 
 	/* Area 3 */
 	AM_RANGE(0x0c000000, 0x0dffffff) AM_MIRROR(0xa2000000) AM_RAM AM_BASE_LEGACY(&naomi_ram64)
@@ -1777,8 +1777,8 @@ static ADDRESS_MAP_START( aw_map, AS_PROGRAM, 64, dc_state )
 	AM_RANGE(0x0103ff00, 0x0103ffff) AM_READWRITE_LEGACY(naomi_unknown1_r, naomi_unknown1_w ) // bios uses it, actual start and end addresses not known
 
 	/* Area 1 - half the texture memory, like dreamcast, not naomi */
-	AM_RANGE(0x04000000, 0x047fffff) AM_RAM	AM_MIRROR(0x00800000) AM_BASE(dc_texture_ram )      // texture memory 64 bit access
-	AM_RANGE(0x05000000, 0x057fffff) AM_RAM AM_MIRROR(0x00800000) AM_BASE(dc_framebuffer_ram ) // apparently this actually accesses the same memory as the 64-bit texture memory access, but in a different format, keep it apart for now
+	AM_RANGE(0x04000000, 0x047fffff) AM_RAM	AM_MIRROR(0x00800000) AM_SHARE("dc_texture_ram")      // texture memory 64 bit access
+	AM_RANGE(0x05000000, 0x057fffff) AM_RAM AM_MIRROR(0x00800000) AM_SHARE("frameram") // apparently this actually accesses the same memory as the 64-bit texture memory access, but in a different format, keep it apart for now
 
 	/* Area 2*/
 	AM_RANGE(0x08000000, 0x0bffffff) AM_NOP // 'Unassigned'
@@ -1829,7 +1829,7 @@ static const aica_interface aica_config =
 
 static ADDRESS_MAP_START( dc_audio_map, AS_PROGRAM, 32, dc_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000000, 0x007fffff) AM_RAM	AM_BASE(dc_sound_ram )                /* shared with SH-4 */
+	AM_RANGE(0x00000000, 0x007fffff) AM_RAM	AM_SHARE("dc_sound_ram")                /* shared with SH-4 */
 	AM_RANGE(0x00800000, 0x00807fff) AM_DEVREADWRITE_LEGACY("aica", dc_arm_aica_r, dc_arm_aica_w)
 ADDRESS_MAP_END
 

@@ -20,18 +20,23 @@ class triplhnt_state : public driver_device
 {
 public:
 	triplhnt_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_playfield_ram(*this, "playfield_ram"),
+		m_vpos_ram(*this, "vpos_ram"),
+		m_hpos_ram(*this, "hpos_ram"),
+		m_orga_ram(*this, "orga_ram"),
+		m_code_ram(*this, "code_ram"){ }
 
 	UINT8 m_cmos[16];
 	UINT8 m_da_latch;
 	UINT8 m_misc_flags;
 	UINT8 m_cmos_latch;
 	UINT8 m_hit_code;
-	UINT8* m_playfield_ram;
-	UINT8* m_vpos_ram;
-	UINT8* m_hpos_ram;
-	UINT8* m_code_ram;
-	UINT8* m_orga_ram;
+	required_shared_ptr<UINT8> m_playfield_ram;
+	required_shared_ptr<UINT8> m_vpos_ram;
+	required_shared_ptr<UINT8> m_hpos_ram;
+	required_shared_ptr<UINT8> m_orga_ram;
+	required_shared_ptr<UINT8> m_code_ram;
 	int m_sprite_zoom;
 	int m_sprite_bank;
 	bitmap_ind16 m_helper;

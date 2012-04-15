@@ -96,7 +96,11 @@ class mpu4_state : public driver_device
 {
 public:
 	mpu4_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_vid_vidram(*this, "vid_vidram"),
+		  m_vid_mainram(*this, "vid_mainram"),
+		  m_dealem_videoram(*this, "dealem_videoram")
+		   { }
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 	{
@@ -172,8 +176,8 @@ public:
 	UINT8 m_m6809_acia_rts;
 	UINT8 m_m6809_acia_dcd;
 	int m_gfx_index;
-	UINT16 * m_vid_vidram;
-	UINT16 * m_vid_mainram;
+	required_shared_ptr<UINT16> m_vid_vidram;
+	required_shared_ptr<UINT16> m_vid_mainram;
 //  UINT8 m_scn2674_IR[16];
 	UINT8 m_scn2674_IR_pointer;
 	UINT8 m_scn2674_screen1_l;
@@ -229,7 +233,7 @@ public:
 	UINT8 m_scn2674_spl2;
 	UINT8 m_scn2674_dbl1;
 	INT8 m_cur[2];
-	UINT8 *m_dealem_videoram;
+	optional_shared_ptr<UINT8> m_dealem_videoram;
 	int m_rowcounter;
 	int m_linecounter;
 	struct ef9369_t m_pal;

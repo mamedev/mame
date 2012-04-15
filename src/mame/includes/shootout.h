@@ -2,13 +2,16 @@ class shootout_state : public driver_device
 {
 public:
 	shootout_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_spriteram(*this, "spriteram"),
+		m_textram(*this, "textram"),
+		m_videoram(*this, "videoram"){ }
 
 	tilemap_t *m_background;
 	tilemap_t *m_foreground;
-	UINT8 *m_spriteram;
-	UINT8 *m_videoram;
-	UINT8 *m_textram;
+	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<UINT8> m_textram;
+	required_shared_ptr<UINT8> m_videoram;
 	int m_bFlicker;
 	DECLARE_WRITE8_MEMBER(shootout_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(sound_cpu_command_w);

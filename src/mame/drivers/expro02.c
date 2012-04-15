@@ -380,21 +380,21 @@ static ADDRESS_MAP_START( galsnew_map, AS_PROGRAM, 16, expro02_state )
 	AM_RANGE(0x400000, 0x400001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 
 
-	AM_RANGE(0x500000, 0x51ffff) AM_RAM AM_BASE(m_galsnew_bg_pixram)
-	AM_RANGE(0x520000, 0x53ffff) AM_RAM AM_BASE(m_galsnew_fg_pixram)
+	AM_RANGE(0x500000, 0x51ffff) AM_RAM AM_SHARE("galsnew_bgram")
+	AM_RANGE(0x520000, 0x53ffff) AM_RAM AM_SHARE("galsnew_fgram")
 
-	AM_RANGE(0x580000, 0x580fff) AM_RAM_WRITE(kaneko16_vram_1_w) AM_BASE(m_vram[1])	// Layers 0
-	AM_RANGE(0x581000, 0x581fff) AM_RAM_WRITE(kaneko16_vram_0_w) AM_BASE(m_vram[0])	//
-	AM_RANGE(0x582000, 0x582fff) AM_RAM AM_BASE(m_vscroll[1])									//
-	AM_RANGE(0x583000, 0x583fff) AM_RAM AM_BASE(m_vscroll[0])									//
+	AM_RANGE(0x580000, 0x580fff) AM_RAM_WRITE(kaneko16_vram_1_w) AM_SHARE("vram.1")	// Layers 0
+	AM_RANGE(0x581000, 0x581fff) AM_RAM_WRITE(kaneko16_vram_0_w) AM_SHARE("vram.0")	//
+	AM_RANGE(0x582000, 0x582fff) AM_RAM AM_SHARE("vscroll.1")									//
+	AM_RANGE(0x583000, 0x583fff) AM_RAM AM_SHARE("vscroll.0")									//
 
 	AM_RANGE(0x600000, 0x600fff) AM_RAM_WRITE(galsnew_paletteram_w) AM_SHARE("paletteram") // palette?
 
-	AM_RANGE(0x680000, 0x68001f) AM_RAM_WRITE(kaneko16_layers_0_regs_w) AM_BASE(m_layers_0_regs) // sprite regs? tileregs?
+	AM_RANGE(0x680000, 0x68001f) AM_RAM_WRITE(kaneko16_layers_0_regs_w) AM_SHARE("layers_0_regs") // sprite regs? tileregs?
 
 	AM_RANGE(0x700000, 0x700fff) AM_RAM AM_SHARE("spriteram")	 // sprites? 0x72f words tested
 
-	AM_RANGE(0x780000, 0x78001f) AM_RAM_WRITE(kaneko16_sprites_regs_w) AM_BASE(m_sprites_regs) // sprite regs? tileregs?
+	AM_RANGE(0x780000, 0x78001f) AM_RAM_WRITE(kaneko16_sprites_regs_w) AM_SHARE("sprites_regs") // sprite regs? tileregs?
 
 	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("DSW1")
 	AM_RANGE(0x800002, 0x800003) AM_READ_PORT("DSW2")
@@ -418,16 +418,16 @@ ADDRESS_MAP_END
 //  no CALC mcu
 static ADDRESS_MAP_START( fantasia_map, AS_PROGRAM, 16, expro02_state )
 	AM_RANGE(0x000000, 0x4fffff) AM_ROM
-	AM_RANGE(0x500000, 0x51ffff) AM_RAM AM_BASE(m_galsnew_bg_pixram)
-	AM_RANGE(0x520000, 0x53ffff) AM_RAM AM_BASE(m_galsnew_fg_pixram)
-	AM_RANGE(0x580000, 0x580fff) AM_RAM_WRITE(kaneko16_vram_1_w) AM_BASE(m_vram[1])	// Layers 0
-	AM_RANGE(0x581000, 0x581fff) AM_RAM_WRITE(kaneko16_vram_0_w) AM_BASE(m_vram[0])	//
-	AM_RANGE(0x582000, 0x582fff) AM_RAM AM_BASE(m_vscroll[1])									//
-	AM_RANGE(0x583000, 0x583fff) AM_RAM AM_BASE(m_vscroll[0])									//
+	AM_RANGE(0x500000, 0x51ffff) AM_RAM AM_SHARE("galsnew_bgram")
+	AM_RANGE(0x520000, 0x53ffff) AM_RAM AM_SHARE("galsnew_fgram")
+	AM_RANGE(0x580000, 0x580fff) AM_RAM_WRITE(kaneko16_vram_1_w) AM_SHARE("vram.1")	// Layers 0
+	AM_RANGE(0x581000, 0x581fff) AM_RAM_WRITE(kaneko16_vram_0_w) AM_SHARE("vram.0")	//
+	AM_RANGE(0x582000, 0x582fff) AM_RAM AM_SHARE("vscroll.1")									//
+	AM_RANGE(0x583000, 0x583fff) AM_RAM AM_SHARE("vscroll.0")									//
 	AM_RANGE(0x600000, 0x600fff) AM_RAM_WRITE(galsnew_paletteram_w) AM_SHARE("paletteram") // palette?
-	AM_RANGE(0x680000, 0x68001f) AM_RAM_WRITE(kaneko16_layers_0_regs_w) AM_BASE(m_layers_0_regs) // sprite regs? tileregs?
+	AM_RANGE(0x680000, 0x68001f) AM_RAM_WRITE(kaneko16_layers_0_regs_w) AM_SHARE("layers_0_regs") // sprite regs? tileregs?
 	AM_RANGE(0x700000, 0x700fff) AM_RAM AM_SHARE("spriteram")	 // sprites? 0x72f words tested
-	AM_RANGE(0x780000, 0x78001f) AM_RAM_WRITE(kaneko16_sprites_regs_w) AM_BASE(m_sprites_regs) // sprite regs? tileregs?
+	AM_RANGE(0x780000, 0x78001f) AM_RAM_WRITE(kaneko16_sprites_regs_w) AM_SHARE("sprites_regs") // sprite regs? tileregs?
 	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("DSW1")
 	AM_RANGE(0x800002, 0x800003) AM_READ_PORT("DSW2")
 	AM_RANGE(0x800004, 0x800005) AM_READ_PORT("DSW3")

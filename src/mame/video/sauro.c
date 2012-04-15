@@ -106,7 +106,7 @@ static void sauro_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, c
 	int offs,code,sx,sy,color,flipx;
 	int flipy = state->flip_screen();
 
-	for (offs = 3; offs < state->m_spriteram_size - 1; offs += 4)
+	for (offs = 3; offs < state->m_spriteram.bytes() - 1; offs += 4)
 	{
 		sy = spriteram[offs];
 		if (sy == 0xf8) continue;
@@ -175,7 +175,7 @@ static void trckydoc_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap
 	int flipy = state->flip_screen();
 
 	/* Weird, sprites entries don't start on DWORD boundary */
-	for (offs = 3; offs < state->m_spriteram_size - 1; offs += 4)
+	for (offs = 3; offs < state->m_spriteram.bytes() - 1; offs += 4)
 	{
 		sy = spriteram[offs];
 

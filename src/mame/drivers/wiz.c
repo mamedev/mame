@@ -224,18 +224,18 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, wiz_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xc800, 0xc801) AM_WRITE(wiz_coin_counter_w)
-	AM_RANGE(0xd000, 0xd3ff) AM_BASE(m_videoram2)					/* Fallthrough */
-	AM_RANGE(0xd400, 0xd7ff) AM_BASE(m_colorram2)
-	AM_RANGE(0xd800, 0xd83f) AM_BASE(m_attributesram2)
-	AM_RANGE(0xd840, 0xd85f) AM_BASE_SIZE(m_spriteram2,m_spriteram_size)
+	AM_RANGE(0xd000, 0xd3ff) AM_SHARE("videoram2")					/* Fallthrough */
+	AM_RANGE(0xd400, 0xd7ff) AM_SHARE("colorram2")
+	AM_RANGE(0xd800, 0xd83f) AM_SHARE("attributesram2")
+	AM_RANGE(0xd840, 0xd85f) AM_SHARE("spriteram2")
 	AM_RANGE(0xd000, 0xd85f) AM_RAM
-	AM_RANGE(0xe000, 0xe3ff) AM_BASE(m_videoram)	/* Fallthrough */
+	AM_RANGE(0xe000, 0xe3ff) AM_SHARE("videoram")	/* Fallthrough */
 	AM_RANGE(0xe400, 0xe7ff) AM_RAM
-	AM_RANGE(0xe800, 0xe83f) AM_BASE(m_attributesram)
-	AM_RANGE(0xe840, 0xe85f) AM_BASE(m_spriteram)
+	AM_RANGE(0xe800, 0xe83f) AM_SHARE("attributesram")
+	AM_RANGE(0xe840, 0xe85f) AM_SHARE("spriteram")
 	AM_RANGE(0xe000, 0xe85f) AM_RAM
 	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("DSW0")
-	AM_RANGE(0xf000, 0xf000) AM_RAM AM_BASE(m_sprite_bank)
+	AM_RANGE(0xf000, 0xf000) AM_RAM AM_SHARE("sprite_bank")
 	AM_RANGE(0xf001, 0xf001) AM_WRITE(wiz_main_nmi_mask_w)
 	AM_RANGE(0xf002, 0xf003) AM_WRITE(wiz_palettebank_w)
 	AM_RANGE(0xf004, 0xf005) AM_WRITE(wiz_char_bank_select_w)

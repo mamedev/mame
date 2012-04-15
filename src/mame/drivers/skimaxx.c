@@ -354,9 +354,9 @@ static ADDRESS_MAP_START( 68030_2_map, AS_PROGRAM, 32, skimaxx_state )
 	AM_RANGE(0x00000000, 0x003fffff) AM_ROM
 
 	AM_RANGE(0x20000000, 0x2007ffff) AM_READ(skimaxx_blitter_r )	// do blit
-	AM_RANGE(0x30000000, 0x3000000f) AM_WRITE(skimaxx_blitter_w ) AM_BASE(m_blitter_regs )
+	AM_RANGE(0x30000000, 0x3000000f) AM_WRITE(skimaxx_blitter_w ) AM_SHARE("blitter_regs")
 
-	AM_RANGE(0x40000000, 0x40000003) AM_WRITE(skimaxx_fpga_ctrl_w ) AM_BASE(m_fpga_ctrl )
+	AM_RANGE(0x40000000, 0x40000003) AM_WRITE(skimaxx_fpga_ctrl_w ) AM_SHARE("fpga_ctrl")
 
 	AM_RANGE(0x50000000, 0x5007ffff) AM_RAMBANK("bank1")	// background ram allocated here at video_start (skimaxx_bg_buffer_back/front)
 //  AM_RANGE(0xfffc0000, 0xfffc7fff) AM_RAM AM_SHARE("share1")

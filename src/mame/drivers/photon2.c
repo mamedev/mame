@@ -227,7 +227,7 @@ WRITE8_MEMBER(photon2_state::photon2_misc_w)
 
 static ADDRESS_MAP_START (spectrum_mem, AS_PROGRAM, 8, photon2_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x4000, 0x5aff) AM_RAM AM_BASE(m_spectrum_video_ram )
+	AM_RANGE(0x4000, 0x5aff) AM_RAM AM_SHARE("spectrum_vram")
 	AM_RANGE(0x5b00, 0xffff) AM_RAM
 ADDRESS_MAP_END
 

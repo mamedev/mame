@@ -4,13 +4,20 @@ class galaga_state : public driver_device
 {
 public:
 	galaga_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"),
+		m_galaga_ram1(*this, "galaga_ram1"),
+		m_galaga_ram2(*this, "galaga_ram2"),
+		m_galaga_ram3(*this, "galaga_ram3"),
+		m_galaga_starcontrol(*this, "galaga_starcontrol")
+		{ }
 
 	/* memory pointers */
-	UINT8 *m_galaga_ram1;
-	UINT8 *m_galaga_ram2;
-	UINT8 *m_galaga_ram3;
-	UINT8 *m_galaga_starcontrol;	// 6 addresses
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_galaga_ram1;
+	required_shared_ptr<UINT8> m_galaga_ram2;
+	required_shared_ptr<UINT8> m_galaga_ram3;
+	required_shared_ptr<UINT8> m_galaga_starcontrol; 	// 6 addresses
 	emu_timer *m_cpu3_interrupt_timer;
 	UINT8 m_custom_mod;
 
@@ -25,7 +32,6 @@ public:
 	/* bank support */
 
 	/* shared */
-	UINT8 *m_videoram;
 	tilemap_t *m_fg_tilemap;
 	tilemap_t *m_bg_tilemap;
 
@@ -43,15 +49,22 @@ class xevious_state : public galaga_state
 {
 public:
 	xevious_state(const machine_config &mconfig, device_type type, const char *tag)
-		: galaga_state(mconfig, type, tag) { }
+		: galaga_state(mconfig, type, tag),
+		m_xevious_sr1(*this, "xevious_sr1"),
+		m_xevious_sr2(*this, "xevious_sr2"),
+		m_xevious_sr3(*this, "xevious_sr3"),
+		m_xevious_fg_colorram(*this, "xevious_fg_colorram"),
+		m_xevious_bg_colorram(*this, "xevious_bg_colorram"),
+		m_xevious_fg_videoram(*this, "xevious_fg_videoram"),
+		m_xevious_bg_videoram(*this, "xevious_bg_videoram") { }
 
-	UINT8 *m_xevious_fg_videoram;
-	UINT8 *m_xevious_fg_colorram;
-	UINT8 *m_xevious_bg_videoram;
-	UINT8 *m_xevious_bg_colorram;
-	UINT8 *m_xevious_sr1;
-	UINT8 *m_xevious_sr2;
-	UINT8 *m_xevious_sr3;
+	required_shared_ptr<UINT8> m_xevious_sr1;
+	required_shared_ptr<UINT8> m_xevious_sr2;
+	required_shared_ptr<UINT8> m_xevious_sr3;
+	required_shared_ptr<UINT8> m_xevious_fg_colorram;
+	required_shared_ptr<UINT8> m_xevious_bg_colorram;
+	required_shared_ptr<UINT8> m_xevious_fg_videoram;
+	required_shared_ptr<UINT8> m_xevious_bg_videoram;
 
 	INT32 m_xevious_bs[2];
 };
@@ -61,12 +74,15 @@ class bosco_state : public galaga_state
 {
 public:
 	bosco_state(const machine_config &mconfig, device_type type, const char *tag)
-		: galaga_state(mconfig, type, tag) { }
+		: galaga_state(mconfig, type, tag),
+		  m_bosco_radarattr(*this, "bosco_radarattr"),
+		  m_bosco_starcontrol(*this, "bosco_starcontrol"),
+		  m_bosco_starblink(*this, "bosco_starblink") { }
 
-	UINT8 *m_bosco_radarattr;
+	required_shared_ptr<UINT8> m_bosco_radarattr;
 
-	UINT8 *m_bosco_starcontrol;
-	UINT8 *m_bosco_starblink;
+	required_shared_ptr<UINT8> m_bosco_starcontrol;
+	required_shared_ptr<UINT8> m_bosco_starblink;
 
 	UINT8 *m_bosco_radarx;
 	UINT8 *m_bosco_radary;
@@ -81,11 +97,14 @@ class digdug_state : public galaga_state
 {
 public:
 	digdug_state(const machine_config &mconfig, device_type type, const char *tag)
-		: galaga_state(mconfig, type, tag) { }
+		: galaga_state(mconfig, type, tag),
+		m_digdug_objram(*this, "digdug_objram"),
+		m_digdug_posram(*this, "digdug_posram"),
+		m_digdug_flpram(*this, "digdug_flpram")		{ }
 
-	UINT8 *m_digdug_objram;
-	UINT8 *m_digdug_posram;
-	UINT8 *m_digdug_flpram;
+	required_shared_ptr<UINT8> m_digdug_objram;
+	required_shared_ptr<UINT8> m_digdug_posram;
+	required_shared_ptr<UINT8> m_digdug_flpram;
 
 	UINT8 m_bg_select;
 	UINT8 m_tx_color_mode;

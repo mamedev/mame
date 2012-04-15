@@ -4,16 +4,20 @@ class fuuki16_state : public driver_device
 {
 public:
 	fuuki16_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_vram(*this, "vram"),
+		m_spriteram(*this, "spriteram"),
+		m_vregs(*this, "vregs"),
+		m_unknown(*this, "unknown"),
+		m_priority(*this, "priority"){ }
 
 	/* memory pointers */
-	UINT16 *    m_vram[4];
-	UINT16 *    m_vregs;
-	UINT16 *    m_priority;
-	UINT16 *    m_unknown;
-	UINT16 *    m_spriteram;
+	required_shared_ptr_array<UINT16,4> m_vram;
+	required_shared_ptr<UINT16> m_spriteram;
+	required_shared_ptr<UINT16> m_vregs;
+	required_shared_ptr<UINT16> m_unknown;
+	required_shared_ptr<UINT16> m_priority;
 //  UINT16 *    m_paletteram; // currently this uses generic palette handling
-	size_t      m_spriteram_size;
 
 	/* video-related */
 	tilemap_t     *m_tilemap[4];

@@ -8,15 +8,17 @@ class toaplan1_state : public driver_device
 {
 public:
 	toaplan1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_colorram1(*this, "colorram1"),
+		m_colorram2(*this, "colorram2"),
+		m_sharedram(*this, "sharedram"),
+		m_spriteram(*this, "spriteram"){ }
 
 	int m_unk_reset_port;
-	UINT16 *m_colorram1;
-	UINT16 *m_colorram2;
-	size_t m_colorram1_size;
-	size_t m_colorram2_size;
+	required_shared_ptr<UINT16> m_colorram1;
+	required_shared_ptr<UINT16> m_colorram2;
 
-	UINT8 *m_sharedram;
+	required_shared_ptr<UINT8> m_sharedram;
 
 	int m_coin_count; /* coin count increments on startup ? , so dont count it */
 	int m_intenable;
@@ -37,8 +39,7 @@ public:
 	UINT16 *m_pf2_tilevram16;	/* \||/ */
 	UINT16 *m_pf1_tilevram16;	/*  \/  */
 
-	size_t m_spriteram_size;
-	UINT16 *m_spriteram;
+	required_shared_ptr<UINT16> m_spriteram;
 	UINT16 *m_buffered_spriteram;
 	UINT16 *m_spritesizeram16;
 	UINT16 *m_buffered_spritesizeram16;

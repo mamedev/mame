@@ -738,24 +738,24 @@ WRITE16_MEMBER(namcona1_state::mcu_mailbox_w_mcu)
 }
 
 static ADDRESS_MAP_START( namcona1_main_map, AS_PROGRAM, 16, namcona1_state )
-	AM_RANGE(0x000000, 0x07ffff) AM_RAM AM_BASE(m_workram)
+	AM_RANGE(0x000000, 0x07ffff) AM_RAM AM_SHARE("workram")
 	AM_RANGE(0x3f8000, 0x3fffff) AM_READWRITE(mcu_mailbox_r, mcu_mailbox_w_68k)
 	AM_RANGE(0x400000, 0xbfffff) AM_ROM AM_REGION("maincpu", 0x280000)	/* data */
 	AM_RANGE(0xc00000, 0xdfffff) AM_ROM AM_REGION("maincpu", 0x080000)	/* code */
 	AM_RANGE(0xe00000, 0xe00fff) AM_READWRITE(namcona1_nvram_r, namcona1_nvram_w)
 	AM_RANGE(0xe40000, 0xe4000f) AM_READWRITE(custom_key_r, custom_key_w)
-	AM_RANGE(0xefff00, 0xefffff) AM_READWRITE(namcona1_vreg_r, namcona1_vreg_w) AM_BASE(m_vreg)
+	AM_RANGE(0xefff00, 0xefffff) AM_READWRITE(namcona1_vreg_r, namcona1_vreg_w) AM_SHARE("vreg")
 	AM_RANGE(0xf00000, 0xf01fff) AM_READWRITE(namcona1_paletteram_r, namcona1_paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0xf40000, 0xf7ffff) AM_READWRITE(namcona1_gfxram_r, namcona1_gfxram_w)
-	AM_RANGE(0xff0000, 0xffbfff) AM_READWRITE(namcona1_videoram_r,    namcona1_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0xff0000, 0xffbfff) AM_READWRITE(namcona1_videoram_r,    namcona1_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0xffd000, 0xffdfff) AM_RAM /* unknown */
-	AM_RANGE(0xffe000, 0xffefff) AM_RAM	AM_BASE(m_scroll)		/* scroll registers */
-	AM_RANGE(0xfff000, 0xffffff) AM_RAM	AM_BASE(m_spriteram)			/* spriteram */
+	AM_RANGE(0xffe000, 0xffefff) AM_RAM	AM_SHARE("scroll")		/* scroll registers */
+	AM_RANGE(0xfff000, 0xffffff) AM_RAM	AM_SHARE("spriteram")			/* spriteram */
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( namcona2_main_map, AS_PROGRAM, 16, namcona1_state )
-	AM_RANGE(0x000000, 0x07ffff) AM_RAM AM_BASE(m_workram)
+	AM_RANGE(0x000000, 0x07ffff) AM_RAM AM_SHARE("workram")
 	AM_RANGE(0x3f8000, 0x3fffff) AM_READWRITE(mcu_mailbox_r, mcu_mailbox_w_68k)
 	AM_RANGE(0x400000, 0xbfffff) AM_ROM AM_REGION("maincpu", 0x280000)	/* data */
 	AM_RANGE(0xd00000, 0xd00001) AM_WRITENOP /* xday: serial out? */
@@ -766,13 +766,13 @@ static ADDRESS_MAP_START( namcona2_main_map, AS_PROGRAM, 16, namcona1_state )
 	AM_RANGE(0xe00000, 0xe00fff) AM_READWRITE(namcona1_nvram_r, namcona1_nvram_w)
 	/* xday: additional battery-backed ram at 00E024FA? */
 	AM_RANGE(0xe40000, 0xe4000f) AM_READWRITE(custom_key_r, custom_key_w)
-	AM_RANGE(0xefff00, 0xefffff) AM_READWRITE(namcona1_vreg_r, namcona1_vreg_w) AM_BASE(m_vreg)
+	AM_RANGE(0xefff00, 0xefffff) AM_READWRITE(namcona1_vreg_r, namcona1_vreg_w) AM_SHARE("vreg")
 	AM_RANGE(0xf00000, 0xf01fff) AM_READWRITE(namcona1_paletteram_r, namcona1_paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0xf40000, 0xf7ffff) AM_READWRITE(namcona1_gfxram_r, namcona1_gfxram_w)
-	AM_RANGE(0xff0000, 0xffbfff) AM_READWRITE(namcona1_videoram_r,    namcona1_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0xff0000, 0xffbfff) AM_READWRITE(namcona1_videoram_r,    namcona1_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0xffd000, 0xffdfff) AM_RAM /* unknown */
-	AM_RANGE(0xffe000, 0xffefff) AM_RAM	AM_BASE(m_scroll)		/* scroll registers */
-	AM_RANGE(0xfff000, 0xffffff) AM_RAM	AM_BASE(m_spriteram)			/* spriteram */
+	AM_RANGE(0xffe000, 0xffefff) AM_RAM	AM_SHARE("scroll")		/* scroll registers */
+	AM_RANGE(0xfff000, 0xffffff) AM_RAM	AM_SHARE("spriteram")			/* spriteram */
 ADDRESS_MAP_END
 
 

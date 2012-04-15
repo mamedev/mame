@@ -8,9 +8,12 @@ class artmagic_state : public driver_device
 {
 public:
 	artmagic_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_control(*this, "control"),
+		m_vram0(*this, "vram0"),
+		m_vram1(*this, "vram1"){ }
 
-	UINT16 *m_control;
+	required_shared_ptr<UINT16> m_control;
 	UINT8 m_tms_irq;
 	UINT8 m_hack_irq;
 	UINT8 m_prot_input[16];
@@ -21,8 +24,8 @@ public:
 	UINT8 m_prot_bit_index;
 	UINT16 m_prot_save;
 	void (*m_protection_handler)(running_machine &);
-	UINT16 *m_vram0;
-	UINT16 *m_vram1;
+	required_shared_ptr<UINT16> m_vram0;
+	required_shared_ptr<UINT16> m_vram1;
 	int m_xor[16];
 	int m_is_stoneball;
 	UINT16 *m_blitter_base;

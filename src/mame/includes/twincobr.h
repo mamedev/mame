@@ -12,12 +12,13 @@ class twincobr_state : public driver_device
 {
 public:
 	twincobr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		  m_spriteram(*this, "spriteram") { }
+		: driver_device(mconfig, type, tag) ,
+		m_sharedram(*this, "sharedram"),
+		m_spriteram(*this, "spriteram"){ }
 
 	int m_toaplan_main_cpu;
 	int m_wardner_membank;
-	UINT8 *m_sharedram;
+	required_shared_ptr<UINT8> m_sharedram;
 	INT32 m_fg_rom_bank;
 	INT32 m_bg_ram_bank;
 	INT32 m_wardner_sprite_hack;

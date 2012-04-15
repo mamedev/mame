@@ -227,7 +227,7 @@ void capbowl_state::init_nvram(nvram_device &nvram, void *base, size_t size)
 
 static ADDRESS_MAP_START( capbowl_map, AS_PROGRAM, 8, capbowl_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x4000, 0x4000) AM_WRITEONLY AM_BASE(m_rowaddress)
+	AM_RANGE(0x4000, 0x4000) AM_WRITEONLY AM_SHARE("rowaddress")
 	AM_RANGE(0x4800, 0x4800) AM_WRITE(capbowl_rom_select_w)
 	AM_RANGE(0x5000, 0x57ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x5800, 0x5fff) AM_READWRITE(capbowl_tms34061_r, capbowl_tms34061_w)
@@ -241,7 +241,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bowlrama_map, AS_PROGRAM, 8, capbowl_state )
 	AM_RANGE(0x0000, 0x001f) AM_READWRITE(bowlrama_blitter_r, bowlrama_blitter_w)
-	AM_RANGE(0x4000, 0x4000) AM_WRITEONLY AM_BASE(m_rowaddress)
+	AM_RANGE(0x4000, 0x4000) AM_WRITEONLY AM_SHARE("rowaddress")
 	AM_RANGE(0x5000, 0x57ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x5800, 0x5fff) AM_READWRITE(capbowl_tms34061_r, capbowl_tms34061_w)
 	AM_RANGE(0x6000, 0x6000) AM_WRITE(capbowl_sndcmd_w)

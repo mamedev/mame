@@ -3,16 +3,18 @@ class suna16_state : public driver_device
 public:
 	suna16_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this,"maincpu")
-		{ }
+		m_maincpu(*this,"maincpu"),
+		m_spriteram(*this, "spriteram"),
+		m_spriteram2(*this, "spriteram2"){ }
+
+	required_device<cpu_device> m_maincpu;
+	required_shared_ptr<UINT16> m_spriteram;
+	required_shared_ptr<UINT16> m_spriteram2;
 
 	UINT16 m_prot;
 	UINT16 *m_paletteram;
-	UINT16 *m_spriteram;
-	UINT16 *m_spriteram2;
 	int m_color_bank;
 
-	required_device<cpu_device> m_maincpu;
 	DECLARE_WRITE16_MEMBER(suna16_soundlatch_w);
 	DECLARE_WRITE16_MEMBER(bssoccer_leds_w);
 	DECLARE_WRITE16_MEMBER(uballoon_leds_w);

@@ -2,12 +2,16 @@ class dec0_state : public driver_device
 {
 public:
 	dec0_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_ram(*this, "ram"),
+		m_spriteram(*this, "spriteram"),
+		m_robocop_shared_ram(*this, "robocop_shared"){ }
 
 	UINT8 m_automat_adpcm_byte;
 	int m_automat_msm5205_vclk_toggle;
-	UINT16 *m_ram;
-	UINT8 *m_robocop_shared_ram;
+	required_shared_ptr<UINT16> m_ram;
+	required_shared_ptr<UINT16> m_spriteram;
+	required_shared_ptr<UINT8> m_robocop_shared_ram;
 
 	int m_GAME;
 	int m_i8751_return;
@@ -18,7 +22,6 @@ public:
 	int m_hippodrm_lsb;
 	UINT8 m_i8751_ports[4];
 
-	UINT16 *m_spriteram;
 	UINT16 *m_buffered_spriteram;
 	UINT16 m_pri;
 	DECLARE_WRITE16_MEMBER(dec0_control_w);

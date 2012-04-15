@@ -290,26 +290,26 @@ static WRITE8_DEVICE_HANDLER( galpani2_oki2_bank_w )
 
 static ADDRESS_MAP_START( galpani2_mem1, AS_PROGRAM, 16, galpani2_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM												// ROM
-	AM_RANGE(0x100000, 0x10ffff) AM_RAM AM_BASE(m_ram)		// Work RAM
+	AM_RANGE(0x100000, 0x10ffff) AM_RAM AM_SHARE("ram")		// Work RAM
 	AM_RANGE(0x110000, 0x11000f) AM_RAM												// ? corrupted? stack dumper on POST failure, pc+sr on gp2se
 	AM_RANGE(0x300000, 0x301fff) AM_RAM												// ?
 	AM_RANGE(0x302000, 0x303fff) AM_RAM AM_SHARE("spriteram")	// Sprites
-	AM_RANGE(0x304000, 0x30401f) AM_RAM_WRITE(kaneko16_sprites_regs_w) AM_BASE(m_sprites_regs)	// Sprites Regs
+	AM_RANGE(0x304000, 0x30401f) AM_RAM_WRITE(kaneko16_sprites_regs_w) AM_SHARE("sprites_regs")	// Sprites Regs
 	AM_RANGE(0x308000, 0x308001) AM_WRITENOP										// ? 0 at startup
 	AM_RANGE(0x30c000, 0x30c001) AM_WRITENOP										// ? hblank effect ?
-	AM_RANGE(0x310000, 0x3101ff) AM_RAM_WRITE_LEGACY(galpani2_palette_0_w) AM_BASE(m_palette[0])	// ?
+	AM_RANGE(0x310000, 0x3101ff) AM_RAM_WRITE_LEGACY(galpani2_palette_0_w) AM_SHARE("palette.0")	// ?
 	AM_RANGE(0x314000, 0x314001) AM_WRITENOP										// ? flip backgrounds ?
 	AM_RANGE(0x318000, 0x318001) AM_DEVREADWRITE_LEGACY("eeprom", galpani2_eeprom_r, galpani2_eeprom_w)	// EEPROM
 	AM_RANGE(0x380000, 0x387fff) AM_RAM												// Palette?
 	AM_RANGE(0x388000, 0x38ffff) AM_RAM_WRITE(paletteram_xGGGGGRRRRRBBBBB_word_w) AM_SHARE("paletteram"	)	// Palette
 	AM_RANGE(0x390000, 0x3901ff) AM_WRITENOP										// ? at startup of service mode
 
-	AM_RANGE(0x400000, 0x43ffff) AM_RAM_WRITE_LEGACY(galpani2_bg8_0_w) AM_BASE(m_bg8[0])	// Background 0
-	AM_RANGE(0x440000, 0x440001) AM_RAM AM_BASE(m_bg8_scrollx[0])			// Background 0 Scroll X
-	AM_RANGE(0x480000, 0x480001) AM_RAM AM_BASE(m_bg8_scrolly[0])			// Background 0 Scroll Y
+	AM_RANGE(0x400000, 0x43ffff) AM_RAM_WRITE_LEGACY(galpani2_bg8_0_w) AM_SHARE("bg8.0")	// Background 0
+	AM_RANGE(0x440000, 0x440001) AM_RAM AM_SHARE("bg8_scrollx.0")			// Background 0 Scroll X
+	AM_RANGE(0x480000, 0x480001) AM_RAM AM_SHARE("bg8_scrolly.0")			// Background 0 Scroll Y
 	AM_RANGE(0x4c0000, 0x4c0001) AM_WRITENOP										// ? 0 at startup only
-	AM_RANGE(0x500000, 0x53ffff) AM_RAM_WRITE_LEGACY(galpani2_bg8_1_w) AM_BASE(m_bg8[1])	// Background 1
-	AM_RANGE(0x540000, 0x540001) AM_RAM AM_BASE(m_bg8_scrollx[1])			// Background 1 Scroll X
+	AM_RANGE(0x500000, 0x53ffff) AM_RAM_WRITE_LEGACY(galpani2_bg8_1_w) AM_SHARE("bg8.1")	// Background 1
+	AM_RANGE(0x540000, 0x540001) AM_RAM AM_SHARE("bg8_scrollx.1")			// Background 1 Scroll X
 
 	AM_RANGE(0x540572, 0x540573) AM_READNOP											// ? galpani2 at F0A4
 	AM_RANGE(0x54057a, 0x54057b) AM_READNOP											// ? galpani2 at F148
@@ -321,7 +321,7 @@ static ADDRESS_MAP_START( galpani2_mem1, AS_PROGRAM, 16, galpani2_state )
 	AM_RANGE(0x5405c2, 0x5405c3) AM_READNOP											// ? galpani2 at F0A4 and F148
 	AM_RANGE(0x5405ca, 0x5405cb) AM_READNOP											// ? galpani2 at F148
 
-	AM_RANGE(0x580000, 0x580001) AM_RAM AM_BASE(m_bg8_scrolly[1])			// Background 1 Scroll Y
+	AM_RANGE(0x580000, 0x580001) AM_RAM AM_SHARE("bg8_scrolly.1")			// Background 1 Scroll Y
 	AM_RANGE(0x5c0000, 0x5c0001) AM_WRITENOP										// ? 0 at startup only
 	AM_RANGE(0x600000, 0x600001) AM_WRITENOP										// Watchdog
 	AM_RANGE(0x640000, 0x640001) AM_WRITE8(galpani2_mcu_init_w, 0x00ff			)	// ? 0 before resetting and at startup, Reset mcu ?
@@ -360,8 +360,8 @@ READ16_MEMBER(galpani2_state::galpani2_bankedrom_r)
 
 static ADDRESS_MAP_START( galpani2_mem2, AS_PROGRAM, 16, galpani2_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM																// ROM
-	AM_RANGE(0x100000, 0x13ffff) AM_RAM AM_BASE(m_ram2)										// Work RAM
-	AM_RANGE(0x400000, 0x4fffff) AM_RAM_WRITE_LEGACY(galpani2_bg15_w) AM_BASE(m_bg15)	// bg15
+	AM_RANGE(0x100000, 0x13ffff) AM_RAM AM_SHARE("ram2")										// Work RAM
+	AM_RANGE(0x400000, 0x4fffff) AM_RAM_WRITE_LEGACY(galpani2_bg15_w) AM_SHARE("bg15")	// bg15
 	AM_RANGE(0x500000, 0x5fffff) AM_RAM																// bg15
 	AM_RANGE(0x600000, 0x600001) AM_NOP	// ? 0 at startup only
 	AM_RANGE(0x640000, 0x640001) AM_WRITENOP								// ? 0 at startup only
@@ -370,7 +370,7 @@ static ADDRESS_MAP_START( galpani2_mem2, AS_PROGRAM, 16, galpani2_state )
 	AM_RANGE(0x700000, 0x700001) AM_WRITENOP								// Watchdog
 //  AM_RANGE(0x740000, 0x740001) AM_WRITENOP                                // ? Reset mcu
 	AM_RANGE(0x780000, 0x780001) AM_WRITE8(galpani2_mcu_nmi2_w, 0x00ff)				// ? 0 -> 1 -> 0 (lev 5)
-	AM_RANGE(0x7c0000, 0x7c0001) AM_WRITEONLY AM_BASE(m_rombank)	// Rom Bank
+	AM_RANGE(0x7c0000, 0x7c0001) AM_WRITEONLY AM_SHARE("rombank")	// Rom Bank
 	AM_RANGE(0x800000, 0xffffff) AM_READ(galpani2_bankedrom_r		)		// Banked ROM
 ADDRESS_MAP_END
 

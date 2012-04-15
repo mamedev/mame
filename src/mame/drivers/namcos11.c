@@ -284,11 +284,12 @@ class namcos11_state : public psx_state
 public:
 	namcos11_state(const machine_config &mconfig, device_type type, const char *tag)
 		: psx_state(mconfig, type, tag),
+		m_sharedram(*this,"sharedram"),
 		m_maincpu(*this,"maincpu"),
 		m_mcu(*this,"c76")
 		{ }
 
-	UINT32 *m_sharedram;
+	required_shared_ptr<UINT32> m_sharedram;
 	UINT32 *m_keycus;
 	size_t m_keycus_size;
 	UINT8 m_su_83;
@@ -712,7 +713,7 @@ READ32_MEMBER(namcos11_state::lightgun_r)
 
 static ADDRESS_MAP_START( namcos11_map, AS_PROGRAM, 32, namcos11_state )
 	AM_RANGE(0x00000000, 0x003fffff) AM_RAM	AM_SHARE("share1") /* ram */
-	AM_RANGE(0x1fa04000, 0x1fa0ffff) AM_RAM AM_BASE(m_sharedram) /* shared ram with C76 */
+	AM_RANGE(0x1fa04000, 0x1fa0ffff) AM_RAM AM_SHARE("sharedram") /* shared ram with C76 */
 	AM_RANGE(0x1fa20000, 0x1fa2ffff) AM_WRITE(keycus_w) AM_BASE_SIZE(m_keycus, m_keycus_size) /* keycus */
 	AM_RANGE(0x1fa30000, 0x1fa30fff) AM_DEVREADWRITE8_LEGACY("at28c16", at28c16_r, at28c16_w, 0x00ff00ff) /* eeprom */
 	AM_RANGE(0x1fb00000, 0x1fb00003) AM_WRITENOP /* ?? */
@@ -727,14 +728,16 @@ ADDRESS_MAP_END
 
 READ16_MEMBER(namcos11_state::c76_shared_r)
 {
-	UINT16 *share16 = (UINT16 *)m_sharedram;
+	// ERROR: This cast is NOT endian-safe without the use of BYTE/WORD/DWORD_XOR_* macros!
+	UINT16 *share16 = reinterpret_cast<UINT16 *>(m_sharedram.target());
 
 	return share16[offset];
 }
 
 WRITE16_MEMBER(namcos11_state::c76_shared_w)
 {
-	UINT16 *share16 = (UINT16 *)m_sharedram;
+	// ERROR: This cast is NOT endian-safe without the use of BYTE/WORD/DWORD_XOR_* macros!
+	UINT16 *share16 = reinterpret_cast<UINT16 *>(m_sharedram.target());
 
 	COMBINE_DATA(&share16[offset]);
 }

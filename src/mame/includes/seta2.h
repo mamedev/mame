@@ -4,23 +4,27 @@ public:
 	seta2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		  m_maincpu(*this,"maincpu"),
-		  m_nvram(*this, "nvram") { }
+		  m_nvram(*this, "nvram") ,
+		m_spriteram(*this, "spriteram"),
+		m_vregs(*this, "vregs"),
+		m_coldfire_regs(*this, "coldfire_regs"),
+		m_funcube_outputs(*this, "funcube_outputs"),
+		m_funcube_leds(*this, "funcube_leds"){ }
 
 	required_device<cpu_device> m_maincpu;
 	optional_shared_ptr<UINT16> m_nvram;
 
-	UINT16 *m_vregs;
+	required_shared_ptr<UINT16> m_spriteram;
+	required_shared_ptr<UINT16> m_vregs;
+	required_shared_ptr<UINT32> m_coldfire_regs;
+
+	required_shared_ptr<UINT8> m_funcube_outputs;
+	required_shared_ptr<UINT8> m_funcube_leds;
 	int m_xoffset;
 	int m_yoffset;
 	int m_keyboard_row;
 
-	UINT16 *m_spriteram;
-	size_t m_spriteram_size;
 	UINT16 *m_buffered_spriteram;
-	UINT32 *m_coldfire_regs;
-
-	UINT8 *m_funcube_outputs;
-	UINT8 *m_funcube_leds;
 
 	UINT64 m_funcube_coin_start_cycles;
 	UINT8 m_funcube_hopper_motor;
@@ -28,6 +32,7 @@ public:
 
 	UINT8 m_funcube_serial_fifo[4];
 	UINT8 m_funcube_serial_count;
+
 	DECLARE_WRITE16_MEMBER(seta2_vregs_w);
 	DECLARE_WRITE16_MEMBER(seta2_sound_bank_w);
 	DECLARE_WRITE16_MEMBER(grdians_lockout_w);

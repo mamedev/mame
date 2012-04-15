@@ -19,7 +19,16 @@ class jedi_state : public driver_device
 public:
 	jedi_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_nvram(*this, "nvram") { }
+		  m_nvram(*this, "nvram") ,
+		m_foreground_bank(*this, "foreground_bank"),
+		m_video_off(*this, "video_off"),
+		m_backgroundram(*this, "backgroundram"),
+		m_paletteram(*this, "paletteram"),
+		m_foregroundram(*this, "foregroundram"),
+		m_spriteram(*this, "spriteram"),
+		m_smoothing_table(*this, "smoothing_table"),
+		m_audio_comm_stat(*this, "audio_comm_stat"),
+		m_speech_data(*this, "speech_data") { }
 
 	required_shared_ptr<UINT8> m_nvram;
 
@@ -29,21 +38,21 @@ public:
 	emu_timer *m_interrupt_timer;
 
 	/* video state */
-	UINT8 *m_foregroundram;
-	UINT8 *m_backgroundram;
-	UINT8 *m_spriteram;
-	UINT8 *m_paletteram;
-	UINT8 *m_foreground_bank;
-	UINT8 *m_video_off;
-	UINT8 *m_smoothing_table;
+	required_shared_ptr<UINT8> m_foreground_bank;
+	required_shared_ptr<UINT8> m_video_off;
+	required_shared_ptr<UINT8> m_backgroundram;
+	required_shared_ptr<UINT8> m_paletteram;
+	required_shared_ptr<UINT8> m_foregroundram;
+	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<UINT8> m_smoothing_table;
 	UINT32 m_vscroll;
 	UINT32 m_hscroll;
 
 	/* audio state */
 	UINT8  m_audio_latch;
 	UINT8  m_audio_ack_latch;
-	UINT8 *m_audio_comm_stat;
-	UINT8 *m_speech_data;
+	required_shared_ptr<UINT8> m_audio_comm_stat;
+	required_shared_ptr<UINT8> m_speech_data;
 	UINT8  m_speech_strobe_state;
 	DECLARE_WRITE8_MEMBER(main_irq_ack_w);
 	DECLARE_WRITE8_MEMBER(rom_banksel_w);

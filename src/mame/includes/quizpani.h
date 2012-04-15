@@ -2,11 +2,14 @@ class quizpani_state : public driver_device
 {
 public:
 	quizpani_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_scrollreg(*this, "scrollreg"),
+		m_bg_videoram(*this, "bg_videoram"),
+		m_txt_videoram(*this, "txt_videoram"){ }
 
-	UINT16 *m_bg_videoram;
-	UINT16 *m_txt_videoram;
-	UINT16 *m_scrollreg;
+	required_shared_ptr<UINT16> m_scrollreg;
+	required_shared_ptr<UINT16> m_bg_videoram;
+	required_shared_ptr<UINT16> m_txt_videoram;
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_txt_tilemap;
 	int m_bgbank;

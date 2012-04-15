@@ -4,12 +4,20 @@ class cischeat_state : public driver_device
 {
 public:
 	cischeat_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_vregs(*this, "vregs"),
+		m_scrollram(*this, "scrollram"),
+		m_ram(*this, "ram"),
+		m_roadram(*this, "roadram"),
+		m_f1gpstr2_ioready(*this, "ioready"){ }
 
-	UINT16 *m_scrollram[3];
+	required_shared_ptr<UINT16> m_vregs;
+	required_shared_ptr_array<UINT16,3> m_scrollram;
+	required_shared_ptr<UINT16> m_ram;
+	required_shared_ptr_array<UINT16,2> m_roadram;
+	required_shared_ptr<UINT16> m_f1gpstr2_ioready;
+
 	UINT16 *m_objectram;
-	UINT16 *m_vregs;
-	UINT16 *m_ram;
 	tilemap_t *m_tmap[3];
 	tilemap_t *m_tilemap[3][2][4];
 	int m_scrollx[3];
@@ -21,8 +29,6 @@ public:
 	int m_prev;
 	int m_armold;
 	UINT16 m_scudhamm_motor_command;
-	UINT16 *m_roadram[2];
-	UINT16 *m_f1gpstr2_ioready;
 	int m_ip_select;
 	UINT8 m_drawmode_table[16];
 	int m_debugsprites;

@@ -34,14 +34,18 @@ class starshp1_state : public driver_device
 {
 public:
 	starshp1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_playfield_ram(*this, "playfield_ram"),
+		m_hpos_ram(*this, "hpos_ram"),
+		m_vpos_ram(*this, "vpos_ram"),
+		m_obj_ram(*this, "obj_ram"){ }
 
 	int m_analog_in_select;
 	int m_attract;
-	UINT8 *m_playfield_ram;
-	UINT8 *m_hpos_ram;
-	UINT8 *m_vpos_ram;
-	UINT8 *m_obj_ram;
+	required_shared_ptr<UINT8> m_playfield_ram;
+	required_shared_ptr<UINT8> m_hpos_ram;
+	required_shared_ptr<UINT8> m_vpos_ram;
+	required_shared_ptr<UINT8> m_obj_ram;
 	int m_ship_explode;
 	int m_ship_picture;
 	int m_ship_hoffset;

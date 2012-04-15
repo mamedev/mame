@@ -8,10 +8,12 @@ class cloak_state : public driver_device
 {
 public:
 	cloak_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"),
+		m_spriteram(*this, "spriteram"){ }
 
-	UINT8 *m_videoram;
-	UINT8 *m_spriteram;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_spriteram;
 	int m_nvram_enabled;
 	UINT8 m_bitmap_videoram_selected;
 	UINT8 m_bitmap_videoram_address_x;

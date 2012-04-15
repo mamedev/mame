@@ -3,10 +3,11 @@ class iqblock_state : public driver_device
 public:
 	iqblock_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this,"maincpu")
-		{ }
+		m_maincpu(*this,"maincpu"),
+		m_rambase(*this, "rambase"){ }
 
-	UINT8 *m_rambase;
+	required_device<cpu_device> m_maincpu;
+	required_shared_ptr<UINT8> m_rambase;
 	UINT8 *m_bgvideoram;
 	UINT8 *m_fgvideoram;
 	int m_videoenable;
@@ -14,7 +15,6 @@ public:
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
 
-	required_device<cpu_device> m_maincpu;
 	DECLARE_WRITE8_MEMBER(iqblock_prot_w);
 	DECLARE_WRITE8_MEMBER(grndtour_prot_w);
 	DECLARE_WRITE8_MEMBER(iqblock_irqack_w);

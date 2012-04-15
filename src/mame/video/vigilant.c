@@ -236,7 +236,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 	UINT8 *spriteram = state->m_spriteram;
 	int offs;
 
-	for (offs = 0;offs < state->m_spriteram_size;offs += 8)
+	for (offs = 0;offs < state->m_spriteram.bytes();offs += 8)
 	{
 		int code,color,sx,sy,flipx,flipy,h,y;
 

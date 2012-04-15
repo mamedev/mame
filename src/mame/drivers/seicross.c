@@ -53,7 +53,7 @@ static NVRAM_HANDLER( seicross )
 {
 	seicross_state *state = machine.driver_data<seicross_state>();
 	UINT8 *nvram = state->m_nvram;
-	size_t nvram_size = state->m_nvram_size;
+	size_t nvram_size = state->m_nvram.bytes();
 
 	if (read_or_write)
 		file->write(nvram,nvram_size);
@@ -114,11 +114,11 @@ static WRITE8_DEVICE_HANDLER( friskyt_portB_w )
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, seicross_state )
 	AM_RANGE(0x0000, 0x77ff) AM_ROM
 	AM_RANGE(0x7800, 0x7fff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x8820, 0x887f) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
-	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(seicross_videoram_w) AM_BASE(m_videoram)	/* video RAM */
-	AM_RANGE(0x9800, 0x981f) AM_RAM AM_BASE(m_row_scroll)
-	AM_RANGE(0x9880, 0x989f) AM_WRITEONLY AM_BASE_SIZE(m_spriteram2, m_spriteram2_size)
-	AM_RANGE(0x9c00, 0x9fff) AM_RAM_WRITE(seicross_colorram_w) AM_BASE(m_colorram)
+	AM_RANGE(0x8820, 0x887f) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(seicross_videoram_w) AM_SHARE("videoram")	/* video RAM */
+	AM_RANGE(0x9800, 0x981f) AM_RAM AM_SHARE("row_scroll")
+	AM_RANGE(0x9880, 0x989f) AM_WRITEONLY AM_SHARE("spriteram2")
+	AM_RANGE(0x9c00, 0x9fff) AM_RAM_WRITE(seicross_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("IN0")		/* IN0 */
 	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("IN1")		/* IN1 */
 	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("TEST")		/* test */
@@ -134,7 +134,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mcu_nvram_map, AS_PROGRAM, 8, seicross_state )
 	AM_RANGE(0x0000, 0x007f) AM_RAM
-	AM_RANGE(0x1000, 0x10ff) AM_RAM AM_BASE_SIZE(m_nvram, m_nvram_size)
+	AM_RANGE(0x1000, 0x10ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x2000, 0x2000) AM_DEVWRITE_LEGACY("dac", dac_w)
 	AM_RANGE(0x8000, 0xf7ff) AM_ROM
 	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("share1")

@@ -6,14 +6,16 @@ class crshrace_state : public driver_device
 public:
 	crshrace_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+		m_videoram1(*this, "videoram1"),
+		m_videoram2(*this, "videoram2"),
 		  m_audiocpu(*this, "audiocpu"),
 		  m_k053936(*this, "k053936"),
 		  m_spriteram(*this, "spriteram"),
 		  m_spriteram2(*this, "spriteram2") { }
 
 	/* memory pointers */
-	UINT16 *  m_videoram1;
-	UINT16 *  m_videoram2;
+	required_shared_ptr<UINT16> m_videoram1;
+	required_shared_ptr<UINT16> m_videoram2;
 //      UINT16 *  m_paletteram;   // currently this uses generic palette handling
 
 	/* video-related */

@@ -2,12 +2,16 @@ class stfight_state : public driver_device
 {
 public:
 	stfight_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_text_char_ram(*this, "text_char_ram"),
+		m_text_attr_ram(*this, "text_attr_ram"),
+		m_vh_latch_ram(*this, "vh_latch_ram"),
+		m_sprite_ram(*this, "sprite_ram"){ }
 
-	UINT8 *m_text_char_ram;
-	UINT8 *m_text_attr_ram;
-	UINT8 *m_vh_latch_ram;
-	UINT8 *m_sprite_ram;
+	required_shared_ptr<UINT8> m_text_char_ram;
+	required_shared_ptr<UINT8> m_text_attr_ram;
+	required_shared_ptr<UINT8> m_vh_latch_ram;
+	required_shared_ptr<UINT8> m_sprite_ram;
 	UINT8 *m_decrypt;
 	int m_adpcm_data_offs;
 	int m_adpcm_data_end;

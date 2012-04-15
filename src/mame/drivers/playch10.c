@@ -368,8 +368,8 @@ static WRITE8_DEVICE_HANDLER( psg_4017_w )
 static ADDRESS_MAP_START( bios_map, AS_PROGRAM, 8, playch10_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM	// 8V
-	AM_RANGE(0x8800, 0x8fff) AM_READWRITE(ram_8w_r, ram_8w_w) AM_BASE(m_ram_8w)	// 8W
-	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE(playch10_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0x8800, 0x8fff) AM_READWRITE(ram_8w_r, ram_8w_w) AM_SHARE("ram_8w")	// 8W
+	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE(playch10_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0xc000, 0xdfff) AM_ROM
 	AM_RANGE(0xe000, 0xffff) AM_READWRITE(pc10_prot_r, pc10_prot_w)
 ADDRESS_MAP_END
@@ -388,11 +388,11 @@ static ADDRESS_MAP_START( bios_io_map, AS_IO, 8, playch10_state )
 	AM_RANGE(0x0a, 0x0a) AM_WRITE(pc10_PPURES_w)
 	AM_RANGE(0x0b, 0x0e) AM_WRITE(pc10_CARTSEL_w)
 	AM_RANGE(0x0f, 0x0f) AM_WRITE(up8w_w)
-	AM_RANGE(0x10, 0x13) AM_WRITE(time_w) AM_BASE(m_timedata)
+	AM_RANGE(0x10, 0x13) AM_WRITE(time_w) AM_SHARE("timedata")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cart_map, AS_PROGRAM, 8, playch10_state )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_MIRROR(0x1800) AM_BASE(m_work_ram)
+	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_MIRROR(0x1800) AM_SHARE("work_ram")
 	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE("ppu", ppu2c0x_device, read, write)
 	AM_RANGE(0x4011, 0x4011) AM_DEVWRITE_LEGACY("dac", dac_w)
 	AM_RANGE(0x4000, 0x4013) AM_DEVREADWRITE_LEGACY("nes", nes_psg_r, nes_psg_w)

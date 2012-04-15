@@ -19,7 +19,7 @@
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, zac2650_state )
 	AM_RANGE(0x0000, 0x17ff) AM_ROM
-	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE(tinvader_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE(tinvader_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x1c00, 0x1cff) AM_RAM
 	AM_RANGE(0x1d00, 0x1dff) AM_RAM
 	AM_RANGE(0x1e80, 0x1e80) AM_READ(tinvader_port_0_r) AM_WRITE(tinvader_sound_w)
@@ -27,7 +27,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, zac2650_state )
     AM_RANGE(0x1e82, 0x1e82) AM_READ_PORT("1E82")
 	AM_RANGE(0x1e85, 0x1e85) AM_READ_PORT("1E85")					/* Dodgem Only */
 	AM_RANGE(0x1e86, 0x1e86) AM_READ_PORT("1E86") AM_WRITENOP		/* Dodgem Only */
-	AM_RANGE(0x1f00, 0x1fff) AM_READWRITE(zac_s2636_r, zac_s2636_w) AM_BASE(m_s2636_0_ram)
+	AM_RANGE(0x1f00, 0x1fff) AM_READWRITE(zac_s2636_r, zac_s2636_w) AM_SHARE("s2636_0_ram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( port_map, AS_IO, 8, zac2650_state )

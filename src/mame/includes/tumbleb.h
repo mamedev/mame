@@ -3,15 +3,19 @@ class tumbleb_state : public driver_device
 {
 public:
 	tumbleb_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_mainram(*this, "mainram"),
+		m_spriteram(*this, "spriteram"),
+		m_pf1_data(*this, "pf1_data"),
+		m_pf2_data(*this, "pf2_data"),
+		m_control(*this, "control"){ }
 
 	/* memory pointers */
-	UINT16 *    m_pf1_data;
-	UINT16 *    m_pf2_data;
-	UINT16 *    m_mainram;
-	UINT16 *    m_spriteram;
-	UINT16 *    m_control;
-	size_t      m_spriteram_size;
+	required_shared_ptr<UINT16> m_mainram;
+	required_shared_ptr<UINT16> m_spriteram;
+	required_shared_ptr<UINT16> m_pf1_data;
+	required_shared_ptr<UINT16> m_pf2_data;
+	required_shared_ptr<UINT16> m_control;
 //  UINT16 *    m_paletteram;    // currently this uses generic palette handling
 
 	/* misc */

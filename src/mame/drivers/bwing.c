@@ -147,12 +147,12 @@ WRITE8_MEMBER(bwing_state::bwp2_ctrl_w)
 // Main CPU
 static ADDRESS_MAP_START( bwp1_map, AS_PROGRAM, 8, bwing_state )
 	AM_RANGE(0x1b00, 0x1b07) AM_READ(bwp1_io_r)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM_WRITE(bwp12_sharedram1_w) AM_BASE(m_bwp1_sharedram1)
+	AM_RANGE(0x0000, 0x07ff) AM_RAM_WRITE(bwp12_sharedram1_w) AM_SHARE("bwp1_sharedram1")
 	AM_RANGE(0x0800, 0x0fff) AM_RAM
-	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(bwing_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(bwing_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x1400, 0x17ff) AM_RAM
-	AM_RANGE(0x1800, 0x19ff) AM_RAM_WRITE(bwing_spriteram_w) AM_BASE(m_spriteram)
-	AM_RANGE(0x1a00, 0x1aff) AM_RAM_WRITE(bwing_paletteram_w) AM_BASE(m_paletteram)
+	AM_RANGE(0x1800, 0x19ff) AM_RAM_WRITE(bwing_spriteram_w) AM_SHARE("spriteram")
+	AM_RANGE(0x1a00, 0x1aff) AM_RAM_WRITE(bwing_paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0x1b00, 0x1b07) AM_RAM_WRITE(bwing_scrollreg_w)
 	AM_RANGE(0x1c00, 0x1c07) AM_RAM_WRITE(bwp1_ctrl_w)
 	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(bwing_scrollram_r, bwing_scrollram_w)
@@ -162,7 +162,7 @@ ADDRESS_MAP_END
 
 // Sub CPU
 static ADDRESS_MAP_START( bwp2_map, AS_PROGRAM, 8, bwing_state )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM_WRITE(bwp12_sharedram1_w) AM_BASE(m_bwp2_sharedram1)
+	AM_RANGE(0x0000, 0x07ff) AM_RAM_WRITE(bwp12_sharedram1_w) AM_SHARE("bwp2_sharedram1")
 	AM_RANGE(0x0800, 0x0fff) AM_RAM
 	AM_RANGE(0x1800, 0x1803) AM_WRITE(bwp2_ctrl_w)
 	AM_RANGE(0xa000, 0xffff) AM_ROM
@@ -180,7 +180,7 @@ static ADDRESS_MAP_START( bwp3_map, AS_PROGRAM, 8, bwing_state )
 	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE_LEGACY("ay2", ay8910_address_w)
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(bwp3_nmimask_w)
-	AM_RANGE(0xe000, 0xffff) AM_ROM AM_BASE_SIZE(m_bwp3_rombase, m_bwp3_romsize)
+	AM_RANGE(0xe000, 0xffff) AM_ROM AM_SHARE("bwp3_rombase")
 ADDRESS_MAP_END
 
 
@@ -570,7 +570,7 @@ static void fix_bwp3( running_machine &machine )
 {
 	bwing_state *state = machine.driver_data<bwing_state>();
 	UINT8 *rom = state->m_bwp3_rombase;
-	int i, j = state->m_bwp3_romsize;
+	int i, j = state->m_bwp3_rombase.bytes();
 
 	// swap nibbles
 	for (i = 0; i < j; i++)

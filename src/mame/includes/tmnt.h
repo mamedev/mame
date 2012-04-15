@@ -4,16 +4,20 @@ class tmnt_state : public driver_device
 {
 public:
 	tmnt_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_spriteram(*this, "spriteram"),
+		m_tmnt2_rom(*this, "tmnt2_rom"),
+		m_sunset_104000(*this, "sunset_104000"),
+		m_tmnt2_1c0800(*this, "tmnt2_1c0800"){ }
 
 	/* memory pointers */
-	UINT16 *   m_tmnt2_1c0800;
-	UINT16 *   m_sunset_104000;
-	UINT16 *   m_tmnt2_rom;
+	required_shared_ptr<UINT16> m_spriteram;
+	required_shared_ptr<UINT16> m_tmnt2_rom;
+	required_shared_ptr<UINT16> m_sunset_104000;
+	required_shared_ptr<UINT16> m_tmnt2_1c0800;
 //  UINT16 *    m_paletteram;    // currently this uses generic palette handling
 //  UINT8 *     m_nvram;    // currently cuebrick uses generic nvram handling
 //  UINT8 *     m_cuebrick_nvram;
-	UINT16 *m_spriteram;
 
 	/* video-related */
 	int        m_layer_colorbase[3];

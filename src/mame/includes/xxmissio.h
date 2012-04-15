@@ -2,12 +2,15 @@ class xxmissio_state : public driver_device
 {
 public:
 	xxmissio_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_bgram(*this, "bgram"),
+		m_fgram(*this, "fgram"),
+		m_spriteram(*this, "spriteram"){ }
 
 	UINT8 m_status;
-	UINT8 *m_bgram;
-	UINT8 *m_fgram;
-	UINT8 *m_spriteram;
+	required_shared_ptr<UINT8> m_bgram;
+	required_shared_ptr<UINT8> m_fgram;
+	required_shared_ptr<UINT8> m_spriteram;
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
 	UINT8 m_xscroll;

@@ -4,16 +4,19 @@ class skyraid_state : public driver_device
 {
 public:
 	skyraid_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_pos_ram(*this, "pos_ram"),
+		m_alpha_num_ram(*this, "alpha_num_ram"),
+		m_obj_ram(*this, "obj_ram"){ }
 
 	int m_analog_range;
 	int m_analog_offset;
 
 	int m_scroll;
 
-	UINT8* m_alpha_num_ram;
-	UINT8* m_pos_ram;
-	UINT8* m_obj_ram;
+	required_shared_ptr<UINT8> m_pos_ram;
+	required_shared_ptr<UINT8> m_alpha_num_ram;
+	required_shared_ptr<UINT8> m_obj_ram;
 
 	bitmap_ind16 m_helper;
 	DECLARE_READ8_MEMBER(skyraid_port_0_r);

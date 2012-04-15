@@ -100,7 +100,7 @@ static WRITE16_HANDLER( arm7_latch_68k_w )
 static READ16_HANDLER( arm7_ram_r )
 {
 	pgm_arm_type2_state *state = space->machine().driver_data<pgm_arm_type2_state>();
-	UINT16 *share16 = (UINT16 *)state->m_arm7_shareram;
+	UINT16 *share16 = reinterpret_cast<UINT16 *>(state->m_arm7_shareram.target());
 
 	if (PGMARM7LOGERROR)
 		logerror("M68K: ARM7 Shared RAM Read: %04x = %04x (%08x) (%06x)\n", BYTE_XOR_LE(offset), share16[BYTE_XOR_LE(offset)], mem_mask, cpu_get_pc(&space->device()));
@@ -110,7 +110,7 @@ static READ16_HANDLER( arm7_ram_r )
 static WRITE16_HANDLER( arm7_ram_w )
 {
 	pgm_arm_type2_state *state = space->machine().driver_data<pgm_arm_type2_state>();
-	UINT16 *share16 = (UINT16 *)state->m_arm7_shareram;
+	UINT16 *share16 = reinterpret_cast<UINT16 *>(state->m_arm7_shareram.target());
 
 	if (PGMARM7LOGERROR)
 		logerror("M68K: ARM7 Shared RAM Write: %04x = %04x (%04x) (%06x)\n", BYTE_XOR_LE(offset), data, mem_mask, cpu_get_pc(&space->device()));
@@ -132,9 +132,9 @@ static ADDRESS_MAP_START( 55857F_arm7_map, AS_PROGRAM, 32, pgm_arm_type2_state )
 	AM_RANGE(0x00000000, 0x00003fff) AM_ROM
 	AM_RANGE(0x08000000, 0x083fffff) AM_ROM AM_REGION("user1", 0)
 	AM_RANGE(0x10000000, 0x100003ff) AM_RAM
-	AM_RANGE(0x18000000, 0x1800ffff) AM_RAM AM_BASE(m_arm_ram)
+	AM_RANGE(0x18000000, 0x1800ffff) AM_RAM AM_SHARE("arm_ram")
 	AM_RANGE(0x38000000, 0x38000003) AM_READWRITE_LEGACY(arm7_latch_arm_r, arm7_latch_arm_w) /* 68k Latch */
-	AM_RANGE(0x48000000, 0x4800ffff) AM_READWRITE_LEGACY(arm7_shareram_r, arm7_shareram_w) AM_BASE(m_arm7_shareram)
+	AM_RANGE(0x48000000, 0x4800ffff) AM_READWRITE_LEGACY(arm7_shareram_r, arm7_shareram_w) AM_SHARE("arm7_shareram")
 	AM_RANGE(0x50000000, 0x500003ff) AM_RAM
 ADDRESS_MAP_END
 

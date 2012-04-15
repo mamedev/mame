@@ -108,10 +108,10 @@ static ADDRESS_MAP_START( mikie_map, AS_PROGRAM, 8, mikie_state )
 	AM_RANGE(0x2403, 0x2403) AM_READ_PORT("DSW3")
 	AM_RANGE(0x2500, 0x2500) AM_READ_PORT("DSW1")
 	AM_RANGE(0x2501, 0x2501) AM_READ_PORT("DSW2")
-	AM_RANGE(0x2800, 0x288f) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
+	AM_RANGE(0x2800, 0x288f) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x2890, 0x37ff) AM_RAM
-	AM_RANGE(0x3800, 0x3bff) AM_RAM_WRITE(mikie_colorram_w) AM_BASE(m_colorram)
-	AM_RANGE(0x3c00, 0x3fff) AM_RAM_WRITE(mikie_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0x3800, 0x3bff) AM_RAM_WRITE(mikie_colorram_w) AM_SHARE("colorram")
+	AM_RANGE(0x3c00, 0x3fff) AM_RAM_WRITE(mikie_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x4000, 0x5fff) AM_ROM	// Machine checks for extra rom
 	AM_RANGE(0x6000, 0xffff) AM_ROM
 ADDRESS_MAP_END

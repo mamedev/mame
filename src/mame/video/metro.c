@@ -453,7 +453,7 @@ void metro_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const r
 	int max_x = visarea.max_x + 1;
 	int max_y = visarea.max_y + 1;
 
-	int max_sprites = state->m_spriteram_size / 8;
+	int max_sprites = state->m_spriteram.bytes() / 8;
 	int sprites     = state->m_videoregs[0x00/2] % max_sprites;
 
 	int color_start = ((state->m_videoregs[0x08/2] & 0x0f) << 4) + 0x100;

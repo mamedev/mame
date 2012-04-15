@@ -226,7 +226,7 @@ static void unico_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,co
 	int offs;
 
 	/* Draw them backwards, for pdrawgfx */
-	for ( offs = (state->m_spriteram_size-8)/2; offs >= 0 ; offs -= 8/2 )
+	for ( offs = (state->m_spriteram.bytes()-8)/2; offs >= 0 ; offs -= 8/2 )
 	{
 		int x, startx, endx, incx;
 
@@ -277,11 +277,11 @@ static void unico_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,co
 static void zeropnt2_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
 	unico_state *state = machine.driver_data<unico_state>();
-	UINT32 *spriteram32 = (UINT32 *)state->m_spriteram;
+	UINT32 *spriteram32 = reinterpret_cast<UINT32 *>(state->m_spriteram.target());
 	int offs;
 
 	/* Draw them backwards, for pdrawgfx */
-	for ( offs = (state->m_spriteram_size-8)/4; offs >= 0 ; offs -= 8/4 )
+	for ( offs = (state->m_spriteram.bytes()-8)/4; offs >= 0 ; offs -= 8/4 )
 	{
 		int x, startx, endx, incx;
 

@@ -63,22 +63,26 @@ class cps_state : public driver_device
 {
 public:
 	cps_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_gfxram(*this, "gfxram"),
+		m_cps_a_regs(*this, "cps_a_regs"),
+		m_cps_b_regs(*this, "cps_b_regs"),
+		m_qsound_sharedram1(*this, "qsound_ram1"),
+		m_qsound_sharedram2(*this, "qsound_ram2") { }
 
 	/* memory pointers */
 	// cps1
-	UINT16 *     m_gfxram;
-	UINT16 *     m_cps_a_regs;
-	UINT16 *     m_cps_b_regs;
+	required_shared_ptr<UINT16> m_gfxram;
+	required_shared_ptr<UINT16> m_cps_a_regs;
+	required_shared_ptr<UINT16> m_cps_b_regs;
 	UINT16 *     m_scroll1;
 	UINT16 *     m_scroll2;
 	UINT16 *     m_scroll3;
 	UINT16 *     m_obj;
 	UINT16 *     m_other;
 	UINT16 *     m_buffered_obj;
-	UINT8  *     m_qsound_sharedram1;
-	UINT8  *     m_qsound_sharedram2;
-	size_t       m_gfxram_size;
+	required_shared_ptr<UINT8> m_qsound_sharedram1;
+	required_shared_ptr<UINT8> m_qsound_sharedram2;
 	// cps2
 	UINT16 *     m_objram1;
 	UINT16 *     m_objram2;

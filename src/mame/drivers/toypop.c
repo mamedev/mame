@@ -187,9 +187,9 @@ WRITE16_MEMBER(toypop_state::toypop_m68000_interrupt_disable_w)
  *************************************/
 
 static ADDRESS_MAP_START( liblrabl_map, AS_PROGRAM, 8, toypop_state )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM_WRITE(toypop_videoram_w) AM_BASE(m_videoram)	/* video RAM */
-	AM_RANGE(0x0800, 0x1fff) AM_RAM	AM_BASE(m_spriteram)										/* general RAM, area 1 */
-	AM_RANGE(0x2800, 0x2fff) AM_RAM AM_BASE(m_m68000_sharedram)		/* shared RAM with the 68000 CPU */
+	AM_RANGE(0x0000, 0x07ff) AM_RAM_WRITE(toypop_videoram_w) AM_SHARE("videoram")	/* video RAM */
+	AM_RANGE(0x0800, 0x1fff) AM_RAM	AM_SHARE("spriteram")										/* general RAM, area 1 */
+	AM_RANGE(0x2800, 0x2fff) AM_RAM AM_SHARE("m68k_shared")		/* shared RAM with the 68000 CPU */
 	AM_RANGE(0x6000, 0x63ff) AM_DEVREADWRITE_LEGACY("namco", namco_snd_sharedram_r, namco_snd_sharedram_w) /* shared RAM with sound CPU */
 	AM_RANGE(0x6800, 0x680f) AM_DEVREADWRITE_LEGACY("58xx", namcoio_r, namcoio_w)				/* custom I/O */
 	AM_RANGE(0x6810, 0x681f) AM_DEVREADWRITE_LEGACY("56xx_1", namcoio_r, namcoio_w)				/* custom I/O */
@@ -205,9 +205,9 @@ static ADDRESS_MAP_START( liblrabl_map, AS_PROGRAM, 8, toypop_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( toypop_map, AS_PROGRAM, 8, toypop_state )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM_WRITE(toypop_videoram_w) AM_BASE(m_videoram)	/* video RAM */
-	AM_RANGE(0x0800, 0x1fff) AM_RAM	AM_BASE(m_spriteram)										/* general RAM, area 1 */
-	AM_RANGE(0x2800, 0x2fff) AM_RAM AM_BASE(m_m68000_sharedram)		/* shared RAM with the 68000 CPU */
+	AM_RANGE(0x0000, 0x07ff) AM_RAM_WRITE(toypop_videoram_w) AM_SHARE("videoram")	/* video RAM */
+	AM_RANGE(0x0800, 0x1fff) AM_RAM	AM_SHARE("spriteram")										/* general RAM, area 1 */
+	AM_RANGE(0x2800, 0x2fff) AM_RAM AM_SHARE("m68k_shared")		/* shared RAM with the 68000 CPU */
 	AM_RANGE(0x6000, 0x600f) AM_DEVREADWRITE_LEGACY("58xx", namcoio_r, namcoio_w)				/* custom I/O */
 	AM_RANGE(0x6010, 0x601f) AM_DEVREADWRITE_LEGACY("56xx_1", namcoio_r, namcoio_w)				/* custom I/O */
 	AM_RANGE(0x6020, 0x602f) AM_DEVREADWRITE_LEGACY("56xx_2", namcoio_r, namcoio_w)				/* custom I/O */
@@ -250,7 +250,7 @@ static ADDRESS_MAP_START( m68k_map, AS_PROGRAM, 16, toypop_state )
 	AM_RANGE(0x100000, 0x100fff) AM_READWRITE(toypop_m68000_sharedram_r, toypop_m68000_sharedram_w)	/* shared RAM with the main CPU */
 	AM_RANGE(0x180000, 0x187fff) AM_READWRITE(toypop_merged_background_r, toypop_merged_background_w) /* RAM that has to be merged with the background image */
 	AM_RANGE(0x18fffc, 0x18ffff) AM_WRITE(toypop_flipscreen_w)				/* flip mode */
-	AM_RANGE(0x190000, 0x1dffff) AM_RAM AM_BASE(m_bg_image)			/* RAM containing the background image */
+	AM_RANGE(0x190000, 0x1dffff) AM_RAM AM_SHARE("bg_image")			/* RAM containing the background image */
 	AM_RANGE(0x300000, 0x300001) AM_WRITE(toypop_m68000_interrupt_enable_w)	/* interrupt enable */
 	AM_RANGE(0x380000, 0x380001) AM_WRITE(toypop_m68000_interrupt_disable_w)/* interrupt disable */
 ADDRESS_MAP_END

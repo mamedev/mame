@@ -10,10 +10,11 @@ class namcond1_state : public driver_device
 {
 public:
 	namcond1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_shared_ram(*this, "shared_ram"){ }
 
 	UINT8 m_h8_irq5_enabled;
-	UINT16 *m_shared_ram;
+	required_shared_ptr<UINT16> m_shared_ram;
 	int m_p8;
 	DECLARE_WRITE16_MEMBER(sharedram_sub_w);
 	DECLARE_READ16_MEMBER(sharedram_sub_r);

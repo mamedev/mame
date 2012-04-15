@@ -201,8 +201,8 @@ public:
 
 static ADDRESS_MAP_START( 4roses_map, AS_PROGRAM, 8, _4roses_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM	// AM_SHARE("nvram")
-	AM_RANGE(0x6000, 0x6fff) AM_RAM_WRITE(funworld_videoram_w) AM_BASE(m_videoram)
-	AM_RANGE(0x7000, 0x7fff) AM_RAM_WRITE(funworld_colorram_w) AM_BASE(m_colorram)
+	AM_RANGE(0x6000, 0x6fff) AM_RAM_WRITE(funworld_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x7000, 0x7fff) AM_RAM_WRITE(funworld_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

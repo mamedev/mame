@@ -8,14 +8,26 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_decobsmt(*this, "decobsmt"),
-		m_spriteram(*this, "spriteram")
-    { }
+		m_spriteram(*this, "spriteram"),
+		m_ram(*this, "ram"),
+		m_pf1_rowscroll32(*this, "pf1_rowscroll32"),
+		m_pf2_rowscroll32(*this, "pf2_rowscroll32"),
+		m_pf3_rowscroll32(*this, "pf3_rowscroll32"),
+		m_pf4_rowscroll32(*this, "pf4_rowscroll32"),
+		m_ace_ram(*this, "ace_ram"){ }
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<decobsmt_device> m_decobsmt;
 	optional_device<buffered_spriteram32_device> m_spriteram;
+	required_shared_ptr<UINT32> m_ram;
+	// we use the pointers below to store a 32-bit copy..
+	required_shared_ptr<UINT32> m_pf1_rowscroll32;
+	required_shared_ptr<UINT32> m_pf2_rowscroll32;
+	required_shared_ptr<UINT32> m_pf3_rowscroll32;
+	required_shared_ptr<UINT32> m_pf4_rowscroll32;
 
-	UINT32 *m_ram;
+	required_shared_ptr<UINT32> m_ace_ram;
+
 	int m_raster_enable;
 	timer_device *m_raster_irq_timer;
 	UINT8 m_nslasher_sound_irq;
@@ -30,7 +42,6 @@ public:
 
 	int m_ace_ram_dirty;
 	int m_has_ace_ram;
-	UINT32 *m_ace_ram;
 
 	UINT8 *m_dirty_palette;
 
@@ -46,11 +57,6 @@ public:
 	UINT16    m_pf2_rowscroll[0x1000];
 	UINT16    m_pf3_rowscroll[0x1000];
 	UINT16    m_pf4_rowscroll[0x1000];
-	// we use the pointers below to store a 32-bit copy..
-	UINT32 *m_pf1_rowscroll32;
-	UINT32 *m_pf2_rowscroll32;
-	UINT32 *m_pf3_rowscroll32;
-	UINT32 *m_pf4_rowscroll32;
 
 	device_t *m_deco_tilegen1;
 	device_t *m_deco_tilegen2;
@@ -94,12 +100,16 @@ class dragngun_state : public deco32_state
 {
 public:
 	dragngun_state(const machine_config &mconfig, device_type type, const char *tag)
-		: deco32_state(mconfig, type, tag) { }
+		: deco32_state(mconfig, type, tag),
+		  m_dragngun_sprite_layout_0_ram(*this, "dragngun_lay0"),
+		  m_dragngun_sprite_layout_1_ram(*this, "dragngun_lay1"),
+		  m_dragngun_sprite_lookup_0_ram(*this, "dragngun_look0"),
+		  m_dragngun_sprite_lookup_1_ram(*this, "dragngun_look1") { }
 
-	UINT32 *m_dragngun_sprite_layout_0_ram;
-	UINT32 *m_dragngun_sprite_layout_1_ram;
-	UINT32 *m_dragngun_sprite_lookup_0_ram;
-	UINT32 *m_dragngun_sprite_lookup_1_ram;
+	required_shared_ptr<UINT32> m_dragngun_sprite_layout_0_ram;
+	required_shared_ptr<UINT32> m_dragngun_sprite_layout_1_ram;
+	required_shared_ptr<UINT32> m_dragngun_sprite_lookup_0_ram;
+	required_shared_ptr<UINT32> m_dragngun_sprite_lookup_1_ram;
 	UINT32 m_dragngun_sprite_ctrl;
 	int m_dragngun_lightgun_port;
 	DECLARE_READ32_MEMBER(dragngun_lightgun_r);

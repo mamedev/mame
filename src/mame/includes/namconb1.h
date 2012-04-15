@@ -19,22 +19,26 @@ public:
 	namconb1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
-		m_mcu(*this,"mcu")
-		{ }
+		m_mcu(*this,"mcu"),
+		m_nvmem32(*this, "nvmem32"),
+		m_spritebank32(*this, "spritebank32"),
+		m_tilebank32(*this, "tilebank32"),
+		m_namconb_shareram(*this, "namconb_share"){ }
 
-	UINT32 *m_nvmem32;
-	UINT16 *m_namconb_shareram;
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_mcu;
+	required_shared_ptr<UINT32> m_nvmem32;
+	required_shared_ptr<UINT32> m_spritebank32;
+	required_shared_ptr<UINT32> m_tilebank32;
+	required_shared_ptr<UINT16> m_namconb_shareram;
+
 	UINT8 m_namconb_cpureg[32];
 	int m_vblank_irq_active;
 	int m_pos_irq_active;
 	UINT16 m_count;
 	UINT8 m_nbx_port6;
-	UINT32 *m_spritebank32;
-	UINT32 *m_tilebank32;
 	UINT32 m_tilemap_tile_bank[4];
 
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_mcu;
 	DECLARE_READ32_MEMBER(randgen_r);
 	DECLARE_WRITE32_MEMBER(srand_w);
 	DECLARE_WRITE32_MEMBER(namconb1_cpureg_w);

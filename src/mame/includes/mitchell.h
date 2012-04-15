@@ -13,12 +13,17 @@ public:
 		: driver_device(mconfig, type, tag),
 		  m_maincpu(*this, "maincpu"),
 		  m_audiocpu(*this, "audiocpu"),
-		  m_oki(*this, "oki") { }
+		  m_oki(*this, "oki") ,
+		m_colorram(*this, "colorram"),
+		m_videoram(*this, "videoram"){ }
 
+	/* devices */
+	required_device<cpu_device> m_maincpu;
+	optional_device<cpu_device> m_audiocpu;
+	optional_device<okim6295_device> m_oki;
 	/* memory pointers */
-	UINT8 *    m_videoram;
-	UINT8 *    m_colorram;
-	size_t     m_videoram_size;
+	required_shared_ptr<UINT8> m_colorram;
+	required_shared_ptr<UINT8> m_videoram;
 
 	/* video-related */
 	tilemap_t    *m_bg_tilemap;
@@ -38,10 +43,6 @@ public:
 	int        m_dir[2];
 	int        m_keymatrix;
 
-	/* devices */
-	required_device<cpu_device> m_maincpu;
-	optional_device<cpu_device> m_audiocpu;
-	optional_device<okim6295_device> m_oki;
 	UINT8 *m_nvram;
 	size_t m_nvram_size;
 	UINT8 m_irq_source;

@@ -8,11 +8,13 @@ class battlane_state : public driver_device
 {
 public:
 	battlane_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_tileram(*this, "tileram"),
+		m_spriteram(*this, "spriteram"){ }
 
 	/* memory pointers */
-	UINT8 *     m_tileram;
-	UINT8 *     m_spriteram;
+	required_shared_ptr<UINT8> m_tileram;
+	required_shared_ptr<UINT8> m_spriteram;
 
 	/* video-related */
 	tilemap_t     *m_bg_tilemap;

@@ -71,9 +71,9 @@ WRITE8_MEMBER(wiping_state::sound_irq_mask_w)
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, wiping_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0x8000, 0x83ff) AM_BASE(m_videoram)
-	AM_RANGE(0x8400, 0x87ff) AM_BASE(m_colorram)
-	AM_RANGE(0x8800, 0x88ff) AM_BASE_SIZE(m_spriteram, m_spriteram_size)
+	AM_RANGE(0x8000, 0x83ff) AM_SHARE("videoram")
+	AM_RANGE(0x8400, 0x87ff) AM_SHARE("colorram")
+	AM_RANGE(0x8800, 0x88ff) AM_SHARE("spriteram")
 	AM_RANGE(0x8000, 0x8bff) AM_RAM
 	AM_RANGE(0x9000, 0x93ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x9800, 0x9bff) AM_RAM AM_SHARE("share2")

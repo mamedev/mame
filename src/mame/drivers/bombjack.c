@@ -138,9 +138,9 @@ WRITE8_MEMBER(bombjack_state::irq_mask_w)
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, bombjack_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
-	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(bombjack_videoram_w) AM_BASE(m_videoram)
-	AM_RANGE(0x9400, 0x97ff) AM_RAM_WRITE(bombjack_colorram_w) AM_BASE(m_colorram)
-	AM_RANGE(0x9820, 0x987f) AM_WRITEONLY AM_BASE_SIZE(m_spriteram, m_spriteram_size)
+	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(bombjack_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x9400, 0x97ff) AM_RAM_WRITE(bombjack_colorram_w) AM_SHARE("colorram")
+	AM_RANGE(0x9820, 0x987f) AM_WRITEONLY AM_SHARE("spriteram")
 	AM_RANGE(0x9a00, 0x9a00) AM_WRITENOP
 	AM_RANGE(0x9c00, 0x9cff) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_byte_le_w) AM_SHARE("paletteram")
 	AM_RANGE(0x9e00, 0x9e00) AM_WRITE(bombjack_background_w)

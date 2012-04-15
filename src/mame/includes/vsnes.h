@@ -2,10 +2,12 @@ class vsnes_state : public driver_device
 {
 public:
 	vsnes_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_work_ram(*this, "work_ram"),
+		m_work_ram_1(*this, "work_ram_1"){ }
 
-	UINT8 *m_work_ram;
-	UINT8 *m_work_ram_1;
+	required_shared_ptr<UINT8> m_work_ram;
+	required_shared_ptr<UINT8> m_work_ram_1;
 	int m_coin;
 	int m_do_vrom_bank;
 	int m_input_latch[4];

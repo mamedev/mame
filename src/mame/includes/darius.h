@@ -11,12 +11,13 @@ class darius_state : public driver_device
 {
 public:
 	darius_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_spriteram(*this, "spriteram"),
+		m_fg_ram(*this, "fg_ram"){ }
 
 	/* memory pointers */
-	UINT16 *    m_spriteram;
-	UINT16 *    m_fg_ram;
-	size_t      m_spriteram_size;
+	required_shared_ptr<UINT16> m_spriteram;
+	required_shared_ptr<UINT16> m_fg_ram;
 
 	/* video-related */
 	tilemap_t  *m_fg_tilemap;

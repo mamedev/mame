@@ -8,10 +8,11 @@ class taitoh_state : public driver_device
 {
 public:
 	taitoh_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_m68000_mainram(*this, "m68000_mainram"){ }
 
 	/* memory pointers */
-	UINT16 *    m_m68000_mainram;
+	required_shared_ptr<UINT16> m_m68000_mainram;
 //  UINT16 *    paletteram;    // currently this uses generic palette handling
 
 	/* misc */

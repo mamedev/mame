@@ -523,7 +523,7 @@ WRITE8_MEMBER(homedata_state::bankswitch_w)
 
 
 static ADDRESS_MAP_START( mrokumei_map, AS_PROGRAM, 8, homedata_state )
-	AM_RANGE(0x0000, 0x3fff) AM_RAM_WRITE(mrokumei_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0x0000, 0x3fff) AM_RAM_WRITE(mrokumei_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x4000, 0x5fff) AM_RAM
 	AM_RANGE(0x6000, 0x6fff) AM_RAM /* work ram */
 	AM_RANGE(0x7000, 0x77ff) AM_RAM /* hourouki expects this to act as RAM */
@@ -532,7 +532,7 @@ static ADDRESS_MAP_START( mrokumei_map, AS_PROGRAM, 8, homedata_state )
 	AM_RANGE(0x7803, 0x7803) AM_READ_PORT("IN0")			// coin, service
 	AM_RANGE(0x7804, 0x7804) AM_READ_PORT("DSW1")			// DSW1
 	AM_RANGE(0x7805, 0x7805) AM_READ_PORT("DSW2")			// DSW2
-	AM_RANGE(0x7ff0, 0x7ffd) AM_WRITEONLY AM_BASE(m_vreg)
+	AM_RANGE(0x7ff0, 0x7ffd) AM_WRITEONLY AM_SHARE("vreg")
 	AM_RANGE(0x7ffe, 0x7ffe) AM_READNOP	// ??? read every vblank, value discarded
 	AM_RANGE(0x8000, 0x8000) AM_WRITE(mrokumei_blitter_start_w)	// in some games also ROM bank switch to access service ROM
 	AM_RANGE(0x8001, 0x8001) AM_WRITE(mrokumei_keyboard_select_w)
@@ -557,14 +557,14 @@ ADDRESS_MAP_END
 /********************************************************************************/
 
 static ADDRESS_MAP_START( reikaids_map, AS_PROGRAM, 8, homedata_state )
-	AM_RANGE(0x0000, 0x3fff) AM_RAM_WRITE(reikaids_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0x0000, 0x3fff) AM_RAM_WRITE(reikaids_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x4000, 0x5fff) AM_RAM
 	AM_RANGE(0x6000, 0x6fff) AM_RAM	/* work RAM */
 	AM_RANGE(0x7800, 0x7800) AM_RAM	/* behaves as normal RAM */
 	AM_RANGE(0x7801, 0x7801) AM_READ_PORT("IN0")
 	AM_RANGE(0x7802, 0x7802) AM_READ_PORT("IN1")
 	AM_RANGE(0x7803, 0x7803) AM_READ(reikaids_io_r)	// coin, blitter, upd7807
-	AM_RANGE(0x7ff0, 0x7ffd) AM_WRITEONLY AM_BASE(m_vreg)
+	AM_RANGE(0x7ff0, 0x7ffd) AM_WRITEONLY AM_SHARE("vreg")
 	AM_RANGE(0x7ffe, 0x7ffe) AM_WRITE(reikaids_blitter_bank_w)
 	AM_RANGE(0x7fff, 0x7fff) AM_WRITE(reikaids_blitter_start_w)
 	AM_RANGE(0x8000, 0x8000) AM_WRITE(bankswitch_w)
@@ -591,14 +591,14 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( pteacher_map, AS_PROGRAM, 8, homedata_state )
-	AM_RANGE(0x0000, 0x3fff) AM_RAM_WRITE(mrokumei_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0x0000, 0x3fff) AM_RAM_WRITE(mrokumei_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x4000, 0x5eff) AM_RAM
 	AM_RANGE(0x5f00, 0x5fff) AM_RAM
 	AM_RANGE(0x6000, 0x6fff) AM_RAM /* work ram */
 	AM_RANGE(0x7800, 0x7800) AM_RAM /* behaves as normal RAM */
 	AM_RANGE(0x7801, 0x7801) AM_READ(pteacher_io_r)	// vblank, visible page
 	AM_RANGE(0x7ff2, 0x7ff2) AM_READ(pteacher_snd_r)
-	AM_RANGE(0x7ff0, 0x7ffd) AM_WRITEONLY AM_BASE(m_vreg)
+	AM_RANGE(0x7ff0, 0x7ffd) AM_WRITEONLY AM_SHARE("vreg")
 	AM_RANGE(0x7fff, 0x7fff) AM_WRITE(pteacher_blitter_start_w)
 	AM_RANGE(0x8000, 0x8000) AM_WRITE(bankswitch_w)
 	AM_RANGE(0x8002, 0x8002) AM_WRITE(pteacher_snd_command_w)
@@ -1437,7 +1437,7 @@ WRITE8_MEMBER(homedata_state::mirderby_prot_w)
 
 
 static ADDRESS_MAP_START( cpu2_map, AS_PROGRAM, 8, homedata_state )
-	AM_RANGE(0x0000, 0x3fff) AM_RAM_WRITE(mrokumei_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0x0000, 0x3fff) AM_RAM_WRITE(mrokumei_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x4000, 0x5fff) AM_RAM
 	AM_RANGE(0x6000, 0x6fff) AM_RAM /* work ram */
 	AM_RANGE(0x7000, 0x77ff) AM_RAM

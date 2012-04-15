@@ -2,15 +2,18 @@ class snk68_state : public driver_device
 {
 public:
 	snk68_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_pow_fg_videoram(*this, "pow_fg_videoram"),
+		m_spriteram(*this, "spriteram"),
+		m_paletteram(*this, "paletteram"){ }
 
 	int m_invert_controls;
 	int m_sound_status;
 
-	UINT16* m_pow_fg_videoram;
+	required_shared_ptr<UINT16> m_pow_fg_videoram;
 
-	UINT16 *m_spriteram;
-	UINT16 *m_paletteram;
+	required_shared_ptr<UINT16> m_spriteram;
+	required_shared_ptr<UINT16> m_paletteram;
 	int m_sprite_flip_axis;
 	tilemap_t *m_fg_tilemap;
 	int m_flipscreen;

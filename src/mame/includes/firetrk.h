@@ -34,22 +34,31 @@ class firetrk_state : public driver_device
 {
 public:
 	firetrk_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_alpha_num_ram(*this, "alpha_num_ram"),
+		m_playfield_ram(*this, "playfield_ram"),
+		m_scroll_y(*this, "scroll_y"),
+		m_scroll_x(*this, "scroll_x"),
+		m_car_rot(*this, "car_rot"),
+		m_blink(*this, "blink"),
+		m_drone_x(*this, "drone_x"),
+		m_drone_y(*this, "drone_y"),
+		m_drone_rot(*this, "drone_rot"){ }
 
 	UINT8 m_in_service_mode;
 	UINT32 m_dial[2];
 	UINT8 m_steer_dir[2];
 	UINT8 m_steer_flag[2];
 	UINT8 m_gear;
-	UINT8 *m_alpha_num_ram;
-	UINT8 *m_playfield_ram;
-	UINT8 *m_scroll_x;
-	UINT8 *m_scroll_y;
-	UINT8 *m_car_rot;
-	UINT8 *m_drone_rot;
-	UINT8 *m_drone_x;
-	UINT8 *m_drone_y;
-	UINT8 *m_blink;
+	required_shared_ptr<UINT8> m_alpha_num_ram;
+	required_shared_ptr<UINT8> m_playfield_ram;
+	required_shared_ptr<UINT8> m_scroll_y;
+	required_shared_ptr<UINT8> m_scroll_x;
+	required_shared_ptr<UINT8> m_car_rot;
+	required_shared_ptr<UINT8> m_blink;
+	required_shared_ptr<UINT8> m_drone_x;
+	required_shared_ptr<UINT8> m_drone_y;
+	required_shared_ptr<UINT8> m_drone_rot;
 	UINT8 m_flash;
 	UINT8 m_crash[2];
 	UINT8 m_skid[2];

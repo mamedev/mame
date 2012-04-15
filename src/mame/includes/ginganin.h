@@ -8,15 +8,18 @@ class ginganin_state : public driver_device
 {
 public:
 	ginganin_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_txtram(*this, "txtram"),
+		m_spriteram(*this, "spriteram"),
+		m_vregs(*this, "vregs"),
+		m_fgram(*this, "fgram"){ }
 
 	/* memory pointers */
-	UINT16 *    m_fgram;
-	UINT16 *    m_txtram;
-	UINT16 *    m_vregs;
-	UINT16 *    m_spriteram;
+	required_shared_ptr<UINT16> m_txtram;
+	required_shared_ptr<UINT16> m_spriteram;
+	required_shared_ptr<UINT16> m_vregs;
+	required_shared_ptr<UINT16> m_fgram;
 //  UINT16 *    m_paletteram; // currently this uses generic palette handling
-	size_t      m_spriteram_size;
 
 	/* video-related */
 	tilemap_t     *m_bg_tilemap;

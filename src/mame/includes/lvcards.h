@@ -2,13 +2,15 @@ class lvcards_state : public driver_device
 {
 public:
 	lvcards_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"),
+		m_colorram(*this, "colorram"){ }
 
 	UINT8 m_payout;
 	UINT8 m_pulse;
 	UINT8 m_result;
-	UINT8 *m_videoram;
-	UINT8 *m_colorram;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_colorram;
 	tilemap_t *m_bg_tilemap;
 	DECLARE_WRITE8_MEMBER(control_port_2_w);
 	DECLARE_WRITE8_MEMBER(control_port_2a_w);

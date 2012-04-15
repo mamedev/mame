@@ -94,11 +94,11 @@ WRITE32_MEMBER(fuuki32_state::fuuki32_vram_3_w){ fuuki32_vram_w(&space, offset, 
 VIDEO_START( fuuki32 )
 {
 	fuuki32_state *state = machine.driver_data<fuuki32_state>();
-	state->m_buf_spriteram = auto_alloc_array(machine, UINT32, state->m_spriteram_size / 4);
-	state->m_buf_spriteram2 = auto_alloc_array(machine, UINT32, state->m_spriteram_size / 4);
+	state->m_buf_spriteram = auto_alloc_array(machine, UINT32, state->m_spriteram.bytes() / 4);
+	state->m_buf_spriteram2 = auto_alloc_array(machine, UINT32, state->m_spriteram.bytes() / 4);
 
-	state->save_pointer(NAME(state->m_buf_spriteram), state->m_spriteram_size / 4);
-	state->save_pointer(NAME(state->m_buf_spriteram2), state->m_spriteram_size / 4);
+	state->save_pointer(NAME(state->m_buf_spriteram), state->m_spriteram.bytes() / 4);
+	state->save_pointer(NAME(state->m_buf_spriteram2), state->m_spriteram.bytes() / 4);
 
 	state->m_tilemap[0] = tilemap_create(machine, get_tile_info_0, tilemap_scan_rows, 16, 16, 64, 32);
 	state->m_tilemap[1] = tilemap_create(machine, get_tile_info_1, tilemap_scan_rows, 16, 16, 64, 32);
@@ -156,7 +156,7 @@ static void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rec
 	UINT32 *src = state->m_buf_spriteram2; /* Use spriteram buffered by 2 frames, need palette buffered by one frame? */
 
 	/* Draw them backwards, for pdrawgfx */
-	for (offs = (state->m_spriteram_size - 8) / 4; offs >= 0; offs -= 8/4)
+	for (offs = (state->m_spriteram.bytes() - 8) / 4; offs >= 0; offs -= 8/4)
 	{
 		int x, y, xstart, ystart, xend, yend, xinc, yinc;
 		int xnum, ynum, xzoom, yzoom, flipx, flipy;
@@ -377,7 +377,7 @@ SCREEN_VBLANK( fuuki32 )
 		/* Buffer sprites and tilebank by 2 frames */
 		state->m_spr_buffered_tilebank[1] = state->m_spr_buffered_tilebank[0];
 		state->m_spr_buffered_tilebank[0] = state->m_tilebank[0];
-		memcpy(state->m_buf_spriteram2, state->m_buf_spriteram, state->m_spriteram_size);
-		memcpy(state->m_buf_spriteram, state->m_spriteram, state->m_spriteram_size);
+		memcpy(state->m_buf_spriteram2, state->m_buf_spriteram, state->m_spriteram.bytes());
+		memcpy(state->m_buf_spriteram, state->m_spriteram, state->m_spriteram.bytes());
 	}
 }

@@ -34,8 +34,8 @@ static WRITE8_HANDLER( irqack_w )
 static ADDRESS_MAP_START( zerohour_map, AS_PROGRAM, 8, ladybug_state )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0x3000, 0x37ff) AM_RAM
-	AM_RANGE(0x3800, 0x3bff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
-	AM_RANGE(0x4000, 0x43ff) AM_RAM_WRITE_LEGACY(redclash_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0x3800, 0x3bff) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0x4000, 0x43ff) AM_RAM_WRITE_LEGACY(redclash_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x4800, 0x4800) AM_READ_PORT("IN0")	/* IN0 */
 	AM_RANGE(0x4801, 0x4801) AM_READ_PORT("IN1")	/* IN1 */
 	AM_RANGE(0x4802, 0x4802) AM_READ_PORT("DSW1")	/* DSW0 */
@@ -54,7 +54,7 @@ static ADDRESS_MAP_START( redclash_map, AS_PROGRAM, 8, ladybug_state )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 //  AM_RANGE(0x3000, 0x3000) AM_WRITENOP
 //  AM_RANGE(0x3800, 0x3800) AM_WRITENOP
-	AM_RANGE(0x4000, 0x43ff) AM_RAM_WRITE_LEGACY(redclash_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0x4000, 0x43ff) AM_RAM_WRITE_LEGACY(redclash_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x4800, 0x4800) AM_READ_PORT("IN0")	/* IN0 */
 	AM_RANGE(0x4801, 0x4801) AM_READ_PORT("IN1")	/* IN1 */
 	AM_RANGE(0x4802, 0x4802) AM_READ_PORT("DSW1")	/* DSW0 */
@@ -66,7 +66,7 @@ static ADDRESS_MAP_START( redclash_map, AS_PROGRAM, 8, ladybug_state )
 	AM_RANGE(0x5806, 0x5806) AM_WRITE_LEGACY(redclash_star2_w)
 	AM_RANGE(0x5807, 0x5807) AM_WRITE_LEGACY(redclash_flipscreen_w)
 	AM_RANGE(0x6000, 0x67ff) AM_RAM
-	AM_RANGE(0x6800, 0x6bff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
+	AM_RANGE(0x6800, 0x6bff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x7000, 0x7000) AM_WRITE_LEGACY(redclash_star_reset_w)
 	AM_RANGE(0x7800, 0x7800) AM_WRITE_LEGACY(irqack_w)
 ADDRESS_MAP_END

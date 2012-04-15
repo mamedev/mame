@@ -14,7 +14,9 @@ class starfire_state : public driver_device
 {
 public:
 	starfire_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_starfire_colorram(*this, "colorram"),
+		m_starfire_videoram(*this, "videoram"){ }
 
     read8_delegate m_input_read;
 
@@ -25,8 +27,8 @@ public:
     UINT8 m_starfire_color;
     UINT16 m_starfire_colors[STARFIRE_NUM_PENS];
 
-    UINT8 *m_starfire_videoram;
-    UINT8 *m_starfire_colorram;
+	required_shared_ptr<UINT8> m_starfire_colorram;
+	required_shared_ptr<UINT8> m_starfire_videoram;
 
     emu_timer* m_scanline_timer;
     bitmap_rgb32 m_starfire_screen;

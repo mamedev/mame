@@ -112,7 +112,7 @@ VIDEO_START( truxton2 )
 	VIDEO_START_CALL( toaplan2 );
 
 	/* Create the Text tilemap for this game */
-	gfx_element_set_source(machine.gfx[2], (UINT8 *)state->m_tx_gfxram16);
+	gfx_element_set_source(machine.gfx[2], reinterpret_cast<UINT8 *>(state->m_tx_gfxram16.target()));
 	machine.save().register_postload(save_prepost_delegate(FUNC(truxton2_postload), &machine));
 
 	truxton2_create_tx_tilemap(machine);
@@ -176,9 +176,8 @@ VIDEO_START( batrider )
 	state->m_vdp0->sp.use_sprite_buffer = 0; // disable buffering on this game
 
 	/* Create the Text tilemap for this game */
-	state->m_tx_gfxram16 = auto_alloc_array_clear(machine, UINT16, RAIZING_TX_GFXRAM_SIZE/2);
-	state->save_pointer(NAME(state->m_tx_gfxram16), RAIZING_TX_GFXRAM_SIZE/2);
-	gfx_element_set_source(machine.gfx[2], (UINT8 *)state->m_tx_gfxram16);
+	state->m_tx_gfxram16.allocate(RAIZING_TX_GFXRAM_SIZE/2);
+	gfx_element_set_source(machine.gfx[2], reinterpret_cast<UINT8 *>(state->m_tx_gfxram16.target()));
 	machine.save().register_postload(save_prepost_delegate(FUNC(truxton2_postload), &machine));
 
 	truxton2_create_tx_tilemap(machine);
@@ -192,7 +191,7 @@ WRITE16_MEMBER(toaplan2_state::toaplan2_txvideoram16_w)
 {
 
 	COMBINE_DATA(&m_txvideoram16[offset]);
-	if (offset < (m_tx_vram_size/4))
+	if (offset < m_txvideoram16.bytes()/4)
 		m_tx_tilemap->mark_tile_dirty(offset);
 }
 
@@ -258,15 +257,15 @@ WRITE16_MEMBER(toaplan2_state::batrider_textdata_dma_w)
 
 	UINT16 *dest = m_tx_gfxram16;
 
-	memcpy(dest, m_txvideoram16, m_tx_vram_size);
-	dest += (m_tx_vram_size/2);
+	memcpy(dest, m_txvideoram16, m_txvideoram16.bytes());
+	dest += (m_txvideoram16.bytes()/2);
 	memcpy(dest, m_generic_paletteram_16, m_generic_paletteram_16.bytes());
 	dest += (m_generic_paletteram_16.bytes()/2);
-	memcpy(dest, m_txvideoram16_offs, m_tx_offs_vram_size);
-	dest += (m_tx_offs_vram_size/2);
-	memcpy(dest, m_txscrollram16, m_tx_scroll_vram_size);
-	dest += (m_tx_scroll_vram_size/2);
-	memcpy(dest, m_mainram16, m_mainram_overlap_size);
+	memcpy(dest, m_txvideoram16_offs, m_txvideoram16_offs.bytes());
+	dest += (m_txvideoram16_offs.bytes()/2);
+	memcpy(dest, m_txscrollram16, m_txscrollram16.bytes());
+	dest += (m_txscrollram16.bytes()/2);
+	memcpy(dest, m_mainram16, m_mainram16.bytes());
 
 	for (int i = 0; i < 1024; i++)
 		gfx_element_mark_dirty(machine().gfx[2], i);

@@ -56,13 +56,13 @@ INLINE void verboselog(running_machine &machine, int n_level, const char *s_fmt,
 *************************/
 
 static ADDRESS_MAP_START( cdimono1_mem, AS_PROGRAM, 16, cdi_state )
-    AM_RANGE(0x00000000, 0x0007ffff) AM_RAM AM_BASE(m_planea)
-    AM_RANGE(0x00200000, 0x0027ffff) AM_RAM AM_BASE(m_planeb)
+    AM_RANGE(0x00000000, 0x0007ffff) AM_RAM AM_SHARE("planea")
+    AM_RANGE(0x00200000, 0x0027ffff) AM_RAM AM_SHARE("planeb")
 #if ENABLE_UART_PRINTING
     AM_RANGE(0x00301400, 0x00301403) AM_READ_LEGACY(uart_loopback_enable)
 #endif
 	AM_RANGE(0x00300000, 0x00303bff) AM_DEVREADWRITE_LEGACY("cdic", cdic_ram_r, cdic_ram_w)
-    //AM_RANGE(0x00300000, 0x00303bff) AM_RAM AM_BASE(m_cdic_regs.ram)
+    //AM_RANGE(0x00300000, 0x00303bff) AM_RAM AM_SHARE("cdic_regs.ram")
 	AM_RANGE(0x00303c00, 0x00303fff) AM_DEVREADWRITE_LEGACY("cdic", cdic_r, cdic_w)
 	AM_RANGE(0x00310000, 0x00317fff) AM_DEVREADWRITE_LEGACY("slave", slave_r, slave_w)
     //AM_RANGE(0x00318000, 0x0031ffff) AM_NOP

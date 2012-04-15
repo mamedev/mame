@@ -50,10 +50,10 @@ public:
 		m_reeltiles_2_ram(*this, "reeltiles_2_ram"),
 		m_reeltiles_3_ram(*this, "reeltiles_3_ram"),
 		m_reeltiles_4_ram(*this, "reeltiles_4_ram"),
-		m_reeltileshigh_1_ram(*this, "reeltileshigh_1_ram"),
-		m_reeltileshigh_2_ram(*this, "reeltileshigh_2_ram"),
-		m_reeltileshigh_3_ram(*this, "reeltileshigh_3_ram"),
-		m_reeltileshigh_4_ram(*this, "reeltileshigh_4_ram"),
+		m_reeltileshigh_1_ram(*this, "rthigh_1_ram"),
+		m_reeltileshigh_2_ram(*this, "rthigh_2_ram"),
+		m_reeltileshigh_3_ram(*this, "rthigh_3_ram"),
+		m_reeltileshigh_4_ram(*this, "rthigh_4_ram"),
 		m_reelscroll1(*this, "reelscroll1"),
 		m_reelscroll2(*this, "reelscroll2"),
 		m_reelscroll3(*this, "reelscroll3"),
@@ -363,17 +363,17 @@ static ADDRESS_MAP_START( mem_map_skylncr, AS_PROGRAM, 8, skylncr_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("nvram")
 
-	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(skylncr_videoram_w ) AM_BASE(m_videoram )
-	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE(skylncr_colorram_w ) AM_BASE(m_colorram )
+	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(skylncr_videoram_w ) AM_SHARE("videoram")
+	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE(skylncr_colorram_w ) AM_SHARE("colorram")
 
-	AM_RANGE(0x9800, 0x99ff) AM_RAM_WRITE(reeltiles_1_w ) AM_BASE(m_reeltiles_1_ram )
-	AM_RANGE(0x9a00, 0x9bff) AM_RAM_WRITE(reeltiles_2_w ) AM_BASE(m_reeltiles_2_ram )
-	AM_RANGE(0x9c00, 0x9dff) AM_RAM_WRITE(reeltiles_3_w ) AM_BASE(m_reeltiles_3_ram )
-	AM_RANGE(0x9e00, 0x9fff) AM_RAM_WRITE(reeltiles_4_w ) AM_BASE(m_reeltiles_4_ram )
-	AM_RANGE(0xa000, 0xa1ff) AM_RAM_WRITE(reeltileshigh_1_w ) AM_BASE(m_reeltileshigh_1_ram )
-	AM_RANGE(0xa200, 0xa3ff) AM_RAM_WRITE(reeltileshigh_2_w ) AM_BASE(m_reeltileshigh_2_ram )
-	AM_RANGE(0xa400, 0xa5ff) AM_RAM_WRITE(reeltileshigh_3_w ) AM_BASE(m_reeltileshigh_3_ram )
-	AM_RANGE(0xa600, 0xa7ff) AM_RAM_WRITE(reeltileshigh_4_w ) AM_BASE(m_reeltileshigh_4_ram )
+	AM_RANGE(0x9800, 0x99ff) AM_RAM_WRITE(reeltiles_1_w ) AM_SHARE("reeltiles_1_ram")
+	AM_RANGE(0x9a00, 0x9bff) AM_RAM_WRITE(reeltiles_2_w ) AM_SHARE("reeltiles_2_ram")
+	AM_RANGE(0x9c00, 0x9dff) AM_RAM_WRITE(reeltiles_3_w ) AM_SHARE("reeltiles_3_ram")
+	AM_RANGE(0x9e00, 0x9fff) AM_RAM_WRITE(reeltiles_4_w ) AM_SHARE("reeltiles_4_ram")
+	AM_RANGE(0xa000, 0xa1ff) AM_RAM_WRITE(reeltileshigh_1_w ) AM_SHARE("rthigh_1_ram")
+	AM_RANGE(0xa200, 0xa3ff) AM_RAM_WRITE(reeltileshigh_2_w ) AM_SHARE("rthigh_2_ram")
+	AM_RANGE(0xa400, 0xa5ff) AM_RAM_WRITE(reeltileshigh_3_w ) AM_SHARE("rthigh_3_ram")
+	AM_RANGE(0xa600, 0xa7ff) AM_RAM_WRITE(reeltileshigh_4_w ) AM_SHARE("rthigh_4_ram")
 
 	AM_RANGE(0xaa55, 0xaa55) AM_READ(ret_ff )
 

@@ -144,7 +144,8 @@ class mplay_state : public md_base_state
 {
 public:
 	mplay_state(const machine_config &mconfig, device_type type, const char *tag)
-	: md_base_state(mconfig, type, tag) { }
+	: md_base_state(mconfig, type, tag),
+	m_ic3_ram(*this, "ic3_ram") { }
 
 	UINT32 m_bios_mode;  // determines whether ROM banks or Game data
 	// is to read from 0x8000-0xffff
@@ -161,7 +162,7 @@ public:
 	UINT8 m_bios_6404;
 
 	UINT16 *m_genesis_io_ram;
-	UINT8* m_ic3_ram;
+	required_shared_ptr<UINT8> m_ic3_ram;
 	UINT8* m_ic37_ram;
 	UINT16 *m_ic36_ram;
 };

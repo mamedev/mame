@@ -25,16 +25,18 @@ class silvmil_state : public driver_device
 {
 public:
 	silvmil_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { 
+		: driver_device(mconfig, type, tag),
+		  m_bg_videoram(*this, "bg_videoram"),
+		  m_fg_videoram(*this, "fg_videoram"),
+		  m_spriteram(*this, "spriteram")  { 
 	
 
 	}
 
 	/* memory pointers */
-	UINT16 *  m_bg_videoram;
-	UINT16 *  m_fg_videoram;
-	UINT16 *  m_spriteram;
-	size_t    m_spriteram_size;
+	required_shared_ptr<UINT16> m_bg_videoram;
+	required_shared_ptr<UINT16> m_fg_videoram;
+	required_shared_ptr<UINT16> m_spriteram;
 
 	/* video-related */
 	tilemap_t   *m_bg_layer;
@@ -163,10 +165,10 @@ static ADDRESS_MAP_START( silvmil_map, AS_PROGRAM, 16, silvmil_state )
 	AM_RANGE(0x100008, 0x100009) AM_WRITE(silvmil_bg_scrolly_w)
 	AM_RANGE(0x10000e, 0x10000f) AM_WRITE(silvmil_tilebank_w)
 
-	AM_RANGE(0x120000, 0x120fff) AM_RAM_WRITE(silvmil_fg_videoram_w) AM_BASE(m_fg_videoram)
-	AM_RANGE(0x122000, 0x122fff) AM_RAM_WRITE(silvmil_bg_videoram_w) AM_BASE(m_bg_videoram)
+	AM_RANGE(0x120000, 0x120fff) AM_RAM_WRITE(silvmil_fg_videoram_w) AM_SHARE("fg_videoram")
+	AM_RANGE(0x122000, 0x122fff) AM_RAM_WRITE(silvmil_bg_videoram_w) AM_SHARE("bg_videoram")
 	AM_RANGE(0x200000, 0x2005ff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")
-	AM_RANGE(0x210000, 0x2107ff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
+	AM_RANGE(0x210000, 0x2107ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x270000, 0x270001) AM_WRITE(silvmil_soundcmd_w)
 	AM_RANGE(0x280000, 0x280001) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x280002, 0x280003) AM_READ_PORT("COIN")

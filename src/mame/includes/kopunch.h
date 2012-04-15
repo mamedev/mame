@@ -8,11 +8,13 @@ class kopunch_state : public driver_device
 {
 public:
 	kopunch_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"),
+		m_videoram2(*this, "videoram2"){ }
 
 	/* memory pointers */
-	UINT8 *    m_videoram;
-	UINT8 *    m_videoram2;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_videoram2;
 	UINT8 *    m_colorram;
 	UINT8 *    m_spriteram;
 	size_t     m_spriteram_size;

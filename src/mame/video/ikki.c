@@ -71,7 +71,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 
 	state->m_sprite_bitmap.fill(state->m_punch_through_pen, cliprect);
 
-	for (offs = 0; offs < state->m_spriteram_size; offs += 4)
+	for (offs = 0; offs < state->m_spriteram.bytes(); offs += 4)
 	{
 		int code = (spriteram[offs + 2] & 0x80) | (spriteram[offs + 1] >> 1);
 		int color = spriteram[offs + 2] & 0x3f;
@@ -132,7 +132,7 @@ SCREEN_UPDATE_IND16( ikki )
 
 	/* draw bg layer */
 
-	for (offs = 0; offs < (state->m_videoram_size / 2); offs++)
+	for (offs = 0; offs < (state->m_videoram.bytes() / 2); offs++)
 	{
 		int color, bank;
 
@@ -189,7 +189,7 @@ SCREEN_UPDATE_IND16( ikki )
 
 	/* mask sprites */
 
-	for (offs = 0; offs < (state->m_videoram_size / 2); offs++)
+	for (offs = 0; offs < (state->m_videoram.bytes() / 2); offs++)
 	{
 		int sx = offs / 32;
 		int sy = offs % 32;

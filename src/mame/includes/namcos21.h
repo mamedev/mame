@@ -27,29 +27,37 @@ class namcos21_state : public driver_device
 {
 public:
 	namcos21_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_winrun_dspbios(*this,"winrun_dspbios"),
+		m_winrun_polydata(*this,"winrun_polydata"),
+		m_winrun_gpucomram(*this,"winrun_comram"),
+		m_dspram16(*this,"dspram16"),
+		m_mpSharedRAM1(*this,"mpsharedram1"),
+		m_mpDualPortRAM(*this,"mpdualportram"),
+		m_master_dsp_code(*this,"master_dsp_code") { }
+
+	required_shared_ptr<UINT16> m_winrun_dspbios;
+	required_shared_ptr<UINT16> m_winrun_polydata;
+	required_shared_ptr<UINT16> m_winrun_gpucomram;
+	required_shared_ptr<UINT16> m_dspram16;
+	required_shared_ptr<UINT16> m_mpSharedRAM1;
+	required_shared_ptr<UINT8> m_mpDualPortRAM;
+	required_shared_ptr<UINT16> m_master_dsp_code;
 
 	UINT8 *m_videoram;
-	UINT16 *m_winrun_dspbios;
 	UINT16 *m_winrun_dspcomram;
 	UINT16 m_winrun_poly_buf[WINRUN_MAX_POLY_PARAM];
 	int m_winrun_poly_index;
 	UINT32 m_winrun_pointrom_addr;
-	UINT16 *m_winrun_polydata;
 	int m_winrun_dsp_alive;
-	UINT16 *m_winrun_gpucomram;
 	UINT16 m_winrun_dspcomram_control[8];
 	UINT16 m_video_enable;
 	UINT8 *m_pointram;
 	int m_pointram_idx;
-	UINT16 *m_dspram16;
 	UINT16 *m_mpDataROM;
-	UINT16 *m_mpSharedRAM1;
-	UINT8 *m_mpDualPortRAM;
 	UINT16 m_pointram_control;
 	dsp_state *m_mpDspState;
 	int m_mbNeedsKickstart;
-	UINT16 *m_master_dsp_code;
 	UINT32 m_pointrom_idx;
 	UINT8 m_mPointRomMSB;
 	int m_mbPointRomDataAvailable;

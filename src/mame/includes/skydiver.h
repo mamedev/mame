@@ -23,12 +23,14 @@ class skydiver_state : public driver_device
 {
 public:
 	skydiver_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_videoram(*this, "videoram") { }
 
+	required_shared_ptr<UINT8> m_videoram;
 	int m_nmion;
-	UINT8 *m_videoram;
 	tilemap_t *m_bg_tilemap;
 	int m_width;
+
 	DECLARE_WRITE8_MEMBER(skydiver_nmion_w);
 	DECLARE_WRITE8_MEMBER(skydiver_videoram_w);
 	DECLARE_READ8_MEMBER(skydiver_wram_r);

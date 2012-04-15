@@ -182,8 +182,8 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, arabian_state )
 	AM_RANGE(0x8000, 0xbfff) AM_WRITE(arabian_videoram_w)
 	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0x01ff) AM_READ_PORT("IN0")
 	AM_RANGE(0xc200, 0xc200) AM_MIRROR(0x01ff) AM_READ_PORT("DSW1")
-	AM_RANGE(0xd000, 0xd7ff) AM_MIRROR(0x0800) AM_RAM AM_BASE(m_custom_cpu_ram)
-	AM_RANGE(0xe000, 0xe007) AM_MIRROR(0x0ff8) AM_WRITE(arabian_blitter_w) AM_BASE(m_blitter)
+	AM_RANGE(0xd000, 0xd7ff) AM_MIRROR(0x0800) AM_RAM AM_SHARE("custom_cpu_ram")
+	AM_RANGE(0xe000, 0xe007) AM_MIRROR(0x0ff8) AM_WRITE(arabian_blitter_w) AM_SHARE("blitter")
 ADDRESS_MAP_END
 
 

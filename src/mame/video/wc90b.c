@@ -102,7 +102,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 	int offs, sx, sy;
 
 	/* draw all visible sprites of specified priority */
-	for ( offs = state->m_spriteram_size - 8 ; offs >= 0 ; offs -= 8 )
+	for ( offs = state->m_spriteram.bytes() - 8 ; offs >= 0 ; offs -= 8 )
 	{
 		if ( ( ~( spriteram[offs+3] >> 7 ) & 1 ) == priority )
 		{

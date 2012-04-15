@@ -8,23 +8,33 @@ class macrossp_state : public driver_device
 {
 public:
 	macrossp_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_spriteram(*this, "spriteram"),
+		m_scra_videoram(*this, "scra_videoram"),
+		m_scra_videoregs(*this, "scra_videoregs"),
+		m_scrb_videoram(*this, "scrb_videoram"),
+		m_scrb_videoregs(*this, "scrb_videoregs"),
+		m_scrc_videoram(*this, "scrc_videoram"),
+		m_scrc_videoregs(*this, "scrc_videoregs"),
+		m_text_videoram(*this, "text_videoram"),
+		m_text_videoregs(*this, "text_videoregs"),
+		m_paletteram(*this, "paletteram"),
+		m_mainram(*this, "mainram"){ }
 
 	/* memory pointers */
-	UINT32 *         m_mainram;
-	UINT32 *         m_scra_videoram;
-	UINT32 *         m_scra_videoregs;
-	UINT32 *         m_scrb_videoram;
-	UINT32 *         m_scrb_videoregs;
-	UINT32 *         m_scrc_videoram;
-	UINT32 *         m_scrc_videoregs;
-	UINT32 *         m_text_videoram;
-	UINT32 *         m_text_videoregs;
-	UINT32 *         m_spriteram;
+	required_shared_ptr<UINT32> m_spriteram;
+	required_shared_ptr<UINT32> m_scra_videoram;
+	required_shared_ptr<UINT32> m_scra_videoregs;
+	required_shared_ptr<UINT32> m_scrb_videoram;
+	required_shared_ptr<UINT32> m_scrb_videoregs;
+	required_shared_ptr<UINT32> m_scrc_videoram;
+	required_shared_ptr<UINT32> m_scrc_videoregs;
+	required_shared_ptr<UINT32> m_text_videoram;
+	required_shared_ptr<UINT32> m_text_videoregs;
+	required_shared_ptr<UINT32> m_paletteram;
+	required_shared_ptr<UINT32> m_mainram;
 	UINT32 *         m_spriteram_old;
 	UINT32 *         m_spriteram_old2;
-	UINT32 *         m_paletteram;
-	size_t           m_spriteram_size;
 
 	/* video-related */
 	tilemap_t  *m_scra_tilemap;

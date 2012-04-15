@@ -2,14 +2,17 @@ class suprloco_state : public driver_device
 {
 public:
 	suprloco_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_spriteram(*this, "spriteram"),
+		m_videoram(*this, "videoram"),
+		m_scrollram(*this, "scrollram"){ }
 
-	UINT8 *m_videoram;
-	UINT8 *m_scrollram;
+	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_scrollram;
 	tilemap_t *m_bg_tilemap;
 	int m_control;
-	UINT8 *m_spriteram;
-	size_t m_spriteram_size;
+
 	DECLARE_WRITE8_MEMBER(suprloco_soundport_w);
 	DECLARE_WRITE8_MEMBER(suprloco_videoram_w);
 	DECLARE_WRITE8_MEMBER(suprloco_scrollram_w);

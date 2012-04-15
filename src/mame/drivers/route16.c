@@ -215,62 +215,62 @@ WRITE8_MEMBER(route16_state::speakres_out2_w)
 static ADDRESS_MAP_START( route16_cpu1_map, AS_PROGRAM, 8, route16_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
   /*AM_RANGE(0x3000, 0x3001) AM_NOP   protection device */
-	AM_RANGE(0x4000, 0x43ff) AM_READWRITE(sharedram_r, route16_sharedram_w) AM_BASE(m_sharedram)
+	AM_RANGE(0x4000, 0x43ff) AM_READWRITE(sharedram_r, route16_sharedram_w) AM_SHARE("sharedram")
 	AM_RANGE(0x4800, 0x4800) AM_READ_PORT("DSW") AM_WRITE(route16_out0_w)
 	AM_RANGE(0x5000, 0x5000) AM_READ_PORT("P1") AM_WRITE(route16_out1_w)
 	AM_RANGE(0x5800, 0x5800) AM_READ_PORT("P2")
-	AM_RANGE(0x8000, 0xbfff) AM_RAM AM_BASE_SIZE(m_videoram1,m_videoram_size)
+	AM_RANGE(0x8000, 0xbfff) AM_RAM AM_SHARE("videoram1")
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( routex_cpu1_map, AS_PROGRAM, 8, route16_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x43ff) AM_READWRITE(sharedram_r, route16_sharedram_w) AM_BASE(m_sharedram)
+	AM_RANGE(0x4000, 0x43ff) AM_READWRITE(sharedram_r, route16_sharedram_w) AM_SHARE("sharedram")
 	AM_RANGE(0x4800, 0x4800) AM_READ_PORT("DSW") AM_WRITE(route16_out0_w)
 	AM_RANGE(0x5000, 0x5000) AM_READ_PORT("P1") AM_WRITE(route16_out1_w)
 	AM_RANGE(0x5800, 0x5800) AM_READ_PORT("P2")
 	AM_RANGE(0x6400, 0x6400) AM_READ(routex_prot_read)
-	AM_RANGE(0x8000, 0xbfff) AM_RAM AM_BASE_SIZE(m_videoram1,m_videoram_size)
+	AM_RANGE(0x8000, 0xbfff) AM_RAM AM_SHARE("videoram1")
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( stratvox_cpu1_map, AS_PROGRAM, 8, route16_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x43ff) AM_READWRITE(sharedram_r, sharedram_w) AM_BASE(m_sharedram)
+	AM_RANGE(0x4000, 0x43ff) AM_READWRITE(sharedram_r, sharedram_w) AM_SHARE("sharedram")
 	AM_RANGE(0x4800, 0x4800) AM_READ_PORT("DSW") AM_WRITE(route16_out0_w)
 	AM_RANGE(0x5000, 0x5000) AM_READ_PORT("P1") AM_WRITE(route16_out1_w)
 	AM_RANGE(0x5800, 0x5800) AM_READ_PORT("P2")
-	AM_RANGE(0x8000, 0xbfff) AM_RAM AM_BASE_SIZE(m_videoram1,m_videoram_size)
+	AM_RANGE(0x8000, 0xbfff) AM_RAM AM_SHARE("videoram1")
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( speakres_cpu1_map, AS_PROGRAM, 8, route16_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x43ff) AM_READWRITE(sharedram_r, sharedram_w) AM_BASE(m_sharedram)
+	AM_RANGE(0x4000, 0x43ff) AM_READWRITE(sharedram_r, sharedram_w) AM_SHARE("sharedram")
 	AM_RANGE(0x4800, 0x4800) AM_READ_PORT("DSW") AM_WRITE(route16_out0_w)
 	AM_RANGE(0x5000, 0x5000) AM_READ_PORT("P1") AM_WRITE(route16_out1_w)
 	AM_RANGE(0x5800, 0x5800) AM_READ_PORT("P2") AM_WRITE(speakres_out2_w)
 	AM_RANGE(0x6000, 0x6000) AM_READ(speakres_in3_r)
-	AM_RANGE(0x8000, 0xbfff) AM_RAM AM_BASE_SIZE(m_videoram1,m_videoram_size)
+	AM_RANGE(0x8000, 0xbfff) AM_RAM AM_SHARE("videoram1")
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( ttmahjng_cpu1_map, AS_PROGRAM, 8, route16_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x43ff) AM_READWRITE(sharedram_r, sharedram_w) AM_BASE(m_sharedram)
+	AM_RANGE(0x4000, 0x43ff) AM_READWRITE(sharedram_r, sharedram_w) AM_SHARE("sharedram")
 	AM_RANGE(0x4800, 0x4800) AM_READ_PORT("DSW") AM_WRITE(route16_out0_w)
 	AM_RANGE(0x5000, 0x5000) AM_READ_PORT("IN0") AM_WRITE(route16_out1_w)
 	AM_RANGE(0x5800, 0x5800) AM_READWRITE(ttmahjng_input_port_matrix_r, ttmahjng_input_port_matrix_w)
 	AM_RANGE(0x6800, 0x6800) AM_DEVWRITE_LEGACY("ay8910", ay8910_data_w)
 	AM_RANGE(0x6900, 0x6900) AM_DEVWRITE_LEGACY("ay8910", ay8910_address_w)
-	AM_RANGE(0x8000, 0xbfff) AM_RAM AM_BASE_SIZE(m_videoram1,m_videoram_size)
+	AM_RANGE(0x8000, 0xbfff) AM_RAM AM_SHARE("videoram1")
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( route16_cpu2_map, AS_PROGRAM, 8, route16_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_READWRITE(sharedram_r, route16_sharedram_w)
-	AM_RANGE(0x8000, 0xbfff) AM_RAM AM_BASE(m_videoram2)
+	AM_RANGE(0x8000, 0xbfff) AM_RAM AM_SHARE("videoram2")
 ADDRESS_MAP_END
 
 
@@ -278,7 +278,7 @@ static ADDRESS_MAP_START( stratvox_cpu2_map, AS_PROGRAM, 8, route16_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2800, 0x2800) AM_DEVWRITE_LEGACY("dac", dac_w)
 	AM_RANGE(0x4000, 0x43ff) AM_READWRITE(sharedram_r, sharedram_w)
-	AM_RANGE(0x8000, 0xbfff) AM_RAM AM_BASE(m_videoram2)
+	AM_RANGE(0x8000, 0xbfff) AM_RAM AM_SHARE("videoram2")
 ADDRESS_MAP_END
 
 

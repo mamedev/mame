@@ -45,9 +45,9 @@ static ADDRESS_MAP_START( shaolins_map, AS_PROGRAM, 8, shaolins_state )
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(shaolins_scroll_w)
 	AM_RANGE(0x2800, 0x2bff) AM_RAM							/* RAM BANK 2 */
 	AM_RANGE(0x3000, 0x30ff) AM_RAM							/* RAM BANK 1 */
-	AM_RANGE(0x3100, 0x33ff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
-	AM_RANGE(0x3800, 0x3bff) AM_RAM_WRITE(shaolins_colorram_w) AM_BASE(m_colorram)
-	AM_RANGE(0x3c00, 0x3fff) AM_RAM_WRITE(shaolins_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0x3100, 0x33ff) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0x3800, 0x3bff) AM_RAM_WRITE(shaolins_colorram_w) AM_SHARE("colorram")
+	AM_RANGE(0x3c00, 0x3fff) AM_RAM_WRITE(shaolins_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x4000, 0x5fff) AM_ROM 						/* Machine checks for extra rom */
 	AM_RANGE(0x6000, 0xffff) AM_ROM
 ADDRESS_MAP_END

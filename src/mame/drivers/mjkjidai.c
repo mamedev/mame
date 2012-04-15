@@ -157,9 +157,9 @@ static NVRAM_HANDLER( mjkjidai )
 	mjkjidai_state *state = machine.driver_data<mjkjidai_state>();
 
 	if (read_or_write)
-		file->write(state->m_nvram, state->m_nvram_size);
+		file->write(state->m_nvram, state->m_nvram.bytes());
 	else if (file)
-		file->read(state->m_nvram, state->m_nvram_size);
+		file->read(state->m_nvram, state->m_nvram.bytes());
 	else
 	{
 		state->m_nvram_init_count = 1;
@@ -172,11 +172,11 @@ static ADDRESS_MAP_START( mjkjidai_map, AS_PROGRAM, 8, mjkjidai_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
-	AM_RANGE(0xd000, 0xdfff) AM_RAM	AM_BASE_SIZE(m_nvram,m_nvram_size)	// cleared and initialized on startup if bit 6 if port 00 is 0
-	AM_RANGE(0xe000, 0xe01f) AM_RAM AM_BASE(m_spriteram1)			// shared with tilemap ram
-	AM_RANGE(0xe800, 0xe81f) AM_RAM AM_BASE(m_spriteram2)		// shared with tilemap ram
-	AM_RANGE(0xf000, 0xf01f) AM_RAM AM_BASE(m_spriteram3)		// shared with tilemap ram
-	AM_RANGE(0xe000, 0xf7ff) AM_RAM_WRITE(mjkjidai_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0xd000, 0xdfff) AM_RAM	AM_SHARE("nvram")	// cleared and initialized on startup if bit 6 if port 00 is 0
+	AM_RANGE(0xe000, 0xe01f) AM_RAM AM_SHARE("spriteram1")			// shared with tilemap ram
+	AM_RANGE(0xe800, 0xe81f) AM_RAM AM_SHARE("spriteram2")		// shared with tilemap ram
+	AM_RANGE(0xf000, 0xf01f) AM_RAM AM_SHARE("spriteram3")		// shared with tilemap ram
+	AM_RANGE(0xe000, 0xf7ff) AM_RAM_WRITE(mjkjidai_videoram_w) AM_SHARE("videoram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mjkjidai_io_map, AS_IO, 8, mjkjidai_state )

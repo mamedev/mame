@@ -2120,7 +2120,7 @@ static VIDEO_START( cps )
 		state->m_cps2_buffered_obj = auto_alloc_array_clear(machine, UINT16, state->m_cps2_obj_size / 2);
 
 	/* clear RAM regions */
-	memset(state->m_gfxram, 0, state->m_gfxram_size);   /* Clear GFX RAM */
+	memset(state->m_gfxram, 0, state->m_gfxram.bytes());   /* Clear GFX RAM */
 	memset(state->m_cps_a_regs, 0, 0x40);   /* Clear CPS-A registers */
 	memset(state->m_cps_b_regs, 0, 0x40);   /* Clear CPS-B registers */
 

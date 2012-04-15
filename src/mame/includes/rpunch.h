@@ -2,15 +2,17 @@ class rpunch_state : public driver_device
 {
 public:
 	rpunch_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"),
+		m_bitmapram(*this, "bitmapram"),
+		m_spriteram(*this, "spriteram"){ }
 
-	UINT16 *m_videoram;
+	required_shared_ptr<UINT16> m_videoram;
 	UINT8 m_sound_data;
 	UINT8 m_sound_busy;
 	UINT8 m_ym2151_irq;
 	UINT8 m_upd_rom_bank;
-	UINT16 *m_bitmapram;
-	size_t m_bitmapram_size;
+	required_shared_ptr<UINT16> m_bitmapram;
 	int m_sprite_palette;
 	tilemap_t *m_background[2];
 	UINT16 m_videoflags;
@@ -18,7 +20,7 @@ public:
 	emu_timer *m_crtc_timer;
 	UINT8 m_bins;
 	UINT8 m_gins;
-	UINT16 *m_spriteram;
+	required_shared_ptr<UINT16> m_spriteram;
 	DECLARE_WRITE16_MEMBER(sound_command_w);
 	DECLARE_READ8_MEMBER(sound_command_r);
 	DECLARE_READ16_MEMBER(sound_busy_r);

@@ -104,8 +104,8 @@ Part list of Goldstar 3DO Interactive Multiplayer
 
 
 static ADDRESS_MAP_START( 3do_mem, AS_PROGRAM, 32, _3do_state )
-	AM_RANGE(0x00000000, 0x001FFFFF) AM_RAMBANK("bank1") AM_BASE(m_dram)						/* DRAM */
-	AM_RANGE(0x00200000, 0x003FFFFF) AM_RAM	AM_BASE(m_vram)									/* VRAM */
+	AM_RANGE(0x00000000, 0x001FFFFF) AM_RAMBANK("bank1") AM_SHARE("dram")						/* DRAM */
+	AM_RANGE(0x00200000, 0x003FFFFF) AM_RAM	AM_SHARE("vram")									/* VRAM */
 	AM_RANGE(0x03000000, 0x030FFFFF) AM_ROMBANK("bank2")									/* BIOS */
 	AM_RANGE(0x03100000, 0x0313FFFF) AM_RAM													/* Brooktree? */
 	AM_RANGE(0x03140000, 0x0315FFFF) AM_READWRITE(_3do_nvarea_r, _3do_nvarea_w)				/* NVRAM */

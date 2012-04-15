@@ -54,12 +54,12 @@ READ8_MEMBER(ssrj_state::ssrj_wheel_r)
 
 static ADDRESS_MAP_START( ssrj_map, AS_PROGRAM, 8, ssrj_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(ssrj_vram1_w) AM_BASE(m_vram1)
-	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(ssrj_vram2_w) AM_BASE(m_vram2)
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_BASE(m_vram3)
-	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(ssrj_vram4_w) AM_BASE(m_vram4)
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(ssrj_vram1_w) AM_SHARE("vram1")
+	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(ssrj_vram2_w) AM_SHARE("vram2")
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_SHARE("vram3")
+	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(ssrj_vram4_w) AM_SHARE("vram4")
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM
-	AM_RANGE(0xe800, 0xefff) AM_RAM AM_BASE(m_scrollram)
+	AM_RANGE(0xe800, 0xefff) AM_RAM AM_SHARE("scrollram")
 	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("IN0")
 	AM_RANGE(0xf001, 0xf001) AM_READ(ssrj_wheel_r)
 	AM_RANGE(0xf002, 0xf002) AM_READ_PORT("IN2")

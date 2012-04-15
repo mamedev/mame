@@ -166,7 +166,7 @@ static void pbillian_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap
 	UINT8 *spriteram = state->m_spriteram;
 	int offs;
 
-	for (offs = 0; offs < state->m_spriteram_size; offs += 4)
+	for (offs = 0; offs < state->m_spriteram.bytes(); offs += 4)
 	{
 		int attr = spriteram[offs + 3];
 		int code = ((spriteram[offs] & 0xfc) >> 2) + 64 * (attr & 0x0f);
@@ -194,7 +194,7 @@ static void superqix_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap
 	UINT8 *spriteram = state->m_spriteram;
 	int offs;
 
-	for (offs = 0; offs < state->m_spriteram_size; offs += 4)
+	for (offs = 0; offs < state->m_spriteram.bytes(); offs += 4)
 	{
 		int attr = spriteram[offs + 3];
 		int code = spriteram[offs] + 256 * (attr & 0x01);

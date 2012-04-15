@@ -58,7 +58,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	inufuku_state *state = machine.driver_data<inufuku_state>();
 	int offs;
 
-	for (offs = (state->m_spriteram1_size / 16) - 1; offs >= 0; offs--)
+	for (offs = (state->m_spriteram1.bytes() / 16) - 1; offs >= 0; offs--)
 	{
 		if ((state->m_spriteram1[offs] & 0x8000) == 0x0000)
 		{

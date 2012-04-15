@@ -135,7 +135,7 @@ WRITE8_MEMBER(xyonix_state::xyonix_io_w)
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, xyonix_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xffff) AM_RAM_WRITE(xyonix_vidram_w) AM_BASE(m_vidram)
+	AM_RANGE(0xe000, 0xffff) AM_RAM_WRITE(xyonix_vidram_w) AM_SHARE("vidram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( port_map, AS_IO, 8, xyonix_state )

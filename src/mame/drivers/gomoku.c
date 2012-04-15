@@ -41,9 +41,9 @@ READ8_MEMBER(gomoku_state::input_port_r)
 static ADDRESS_MAP_START( gomoku_map, AS_PROGRAM, 8, gomoku_state )
 	AM_RANGE(0x0000, 0x47ff) AM_ROM
 	AM_RANGE(0x4800, 0x4fff) AM_RAM
-	AM_RANGE(0x5000, 0x53ff) AM_RAM_WRITE(gomoku_videoram_w) AM_BASE(m_videoram)
-	AM_RANGE(0x5400, 0x57ff) AM_RAM_WRITE(gomoku_colorram_w) AM_BASE(m_colorram)
-	AM_RANGE(0x5800, 0x58ff) AM_RAM_WRITE(gomoku_bgram_w) AM_BASE(m_bgram)
+	AM_RANGE(0x5000, 0x53ff) AM_RAM_WRITE(gomoku_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x5400, 0x57ff) AM_RAM_WRITE(gomoku_colorram_w) AM_SHARE("colorram")
+	AM_RANGE(0x5800, 0x58ff) AM_RAM_WRITE(gomoku_bgram_w) AM_SHARE("bgram")
 	AM_RANGE(0x6000, 0x601f) AM_DEVWRITE_LEGACY("gomoku", gomoku_sound1_w)
 	AM_RANGE(0x6800, 0x681f) AM_DEVWRITE_LEGACY("gomoku", gomoku_sound2_w)
 	AM_RANGE(0x7000, 0x7000) AM_WRITENOP

@@ -20,20 +20,32 @@ public:
 	skns_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
-		m_spriteram(*this,"spriteram")
-		{ }
+		m_spriteram(*this,"spriteram"),
+		m_spc_regs(*this, "spc_regs"),
+		m_v3_regs(*this, "v3_regs"),
+		m_tilemapA_ram(*this, "tilemapa_ram"),
+		m_tilemapB_ram(*this, "tilemapb_ram"),
+		m_v3slc_ram(*this, "v3slc_ram"),
+		m_pal_regs(*this, "pal_regs"),
+		m_palette_ram(*this, "palette_ram"),
+		m_v3t_ram(*this, "v3t_ram"),
+		m_main_ram(*this, "main_ram"),
+		m_cache_ram(*this, "cache_ram"){ }
+
+	required_device<cpu_device> m_maincpu;
+	required_shared_ptr<UINT32> m_spriteram;
 
 	sknsspr_device* m_spritegen;
-	UINT32 *m_tilemapA_ram;
-	UINT32 *m_tilemapB_ram;
-	UINT32 *m_v3slc_ram;
-	UINT32 *m_palette_ram;
-	UINT32 *m_pal_regs;
-	UINT32 *m_v3_regs;
-	UINT32 *m_spc_regs;
-	UINT32 *m_v3t_ram;
-	UINT32 *m_main_ram;
-	UINT32 *m_cache_ram;
+	required_shared_ptr<UINT32> m_spc_regs;
+	required_shared_ptr<UINT32> m_v3_regs;
+	required_shared_ptr<UINT32> m_tilemapA_ram;
+	required_shared_ptr<UINT32> m_tilemapB_ram;
+	required_shared_ptr<UINT32> m_v3slc_ram;
+	required_shared_ptr<UINT32> m_pal_regs;
+	required_shared_ptr<UINT32> m_palette_ram;
+	required_shared_ptr<UINT32> m_v3t_ram;
+	required_shared_ptr<UINT32> m_main_ram;
+	required_shared_ptr<UINT32> m_cache_ram;
 	hit_t m_hit;
 	UINT32 m_timer_0_temp[4];
 	bitmap_ind16 m_sprite_bitmap;
@@ -67,8 +79,6 @@ public:
 
 	UINT8 m_region;
 
-	required_device<cpu_device> m_maincpu;
-	required_shared_ptr<UINT32> m_spriteram;
 	DECLARE_WRITE32_MEMBER(skns_hit_w);
 	DECLARE_WRITE32_MEMBER(skns_hit2_w);
 	DECLARE_READ32_MEMBER(skns_hit_r);

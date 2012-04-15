@@ -15,17 +15,18 @@ class taitof2_state : public driver_device
 public:
 	taitof2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+		  m_sprite_extension(*this, "sprite_ext"),
+		  m_spriteram(*this, "spriteram"),
+		  m_cchip2_ram(*this, "cchip2_ram"),
 		  m_oki(*this, "oki") { }
 
 	/* memory pointers */
-	UINT16 *        m_sprite_extension;
-	UINT16 *        m_spriteram;
+	required_shared_ptr<UINT16> m_sprite_extension;
+	required_shared_ptr<UINT16> m_spriteram;
 	UINT16 *        m_spriteram_buffered;
 	UINT16 *        m_spriteram_delayed;
-	UINT16 *        m_cchip2_ram;	// for megablst only
+	required_shared_ptr<UINT16> m_cchip2_ram;        	// for megablst only
 //  UINT16 *        m_paletteram;    // currently this uses generic palette handling
-	size_t          m_spriteram_size;
-	size_t          m_spriteext_size;
 
 
 	/* video-related */

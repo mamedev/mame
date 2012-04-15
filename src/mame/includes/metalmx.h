@@ -12,18 +12,21 @@ public:
 		  m_gsp(*this, "gsp"),
 		  m_adsp(*this, "adsp"),
 		  m_dsp32c_1(*this, "dsp32c_1"),
-		  m_dsp32c_2(*this, "dsp32c_2") { }
+		  m_dsp32c_2(*this, "dsp32c_2") ,
+		m_adsp_internal_program_ram(*this, "adsp_intprog"),
+		m_gsp_dram(*this, "gsp_dram"),
+		m_gsp_vram(*this, "gsp_vram"){ }
 
 	required_device<m68ec020_device> m_maincpu;
 	required_device<tms34020_device> m_gsp;
 	required_device<adsp2105_device> m_adsp;
 	required_device<dsp32c_device> m_dsp32c_1;
 	required_device<dsp32c_device> m_dsp32c_2;
+	
+	required_shared_ptr<UINT32> m_adsp_internal_program_ram;
+	required_shared_ptr<UINT16> m_gsp_dram;
+	required_shared_ptr<UINT16> m_gsp_vram;
 
-	UINT16				*m_gsp_dram;
-	UINT16				*m_gsp_vram;
-
-	UINT32				*m_adsp_internal_program_ram;
 	DECLARE_READ32_MEMBER(unk_r);
 	DECLARE_READ32_MEMBER(watchdog_r);
 	DECLARE_WRITE32_MEMBER(shifter_w);

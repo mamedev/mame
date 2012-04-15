@@ -6,9 +6,11 @@ class polyplay_state : public driver_device
 {
 public:
 	polyplay_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"),
+		m_characterram(*this, "characterram"){ }
 
-	UINT8 *m_videoram;
+	required_shared_ptr<UINT8> m_videoram;
 	int m_freq1;
 	int m_freq2;
 	int m_channel_playing1;
@@ -22,7 +24,7 @@ public:
 	int m_channel2_const;
 	timer_device* m_timer;
 	int m_last;
-	UINT8 *m_characterram;
+	required_shared_ptr<UINT8> m_characterram;
 	DECLARE_WRITE8_MEMBER(polyplay_sound_channel);
 	DECLARE_WRITE8_MEMBER(polyplay_start_timer2);
 	DECLARE_READ8_MEMBER(polyplay_random_read);

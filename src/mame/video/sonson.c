@@ -144,7 +144,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	UINT8 *spriteram = state->m_spriteram;
 	int offs;
 
-	for (offs = state->m_spriteram_size - 4; offs >= 0; offs -= 4)
+	for (offs = state->m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
 	{
 		int code = spriteram[offs + 2] + ((spriteram[offs + 1] & 0x20) << 3);
 		int color = spriteram[offs + 1] & 0x1f;

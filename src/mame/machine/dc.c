@@ -818,7 +818,7 @@ MACHINE_START( dc )
 	state_save_register_global_pointer(machine,state->tafifo_buff,32);
 	state_save_register_global(machine, state->scanline);
 	state_save_register_global(machine, state->next_y);
-	state_save_register_global_pointer(machine,state->dc_sound_ram,sizeof(state->dc_sound_ram));
+	state_save_register_global_pointer(machine,state->dc_sound_ram.target(),state->dc_sound_ram.bytes());
 }
 
 MACHINE_RESET( dc )

@@ -2,20 +2,28 @@ class wecleman_state : public driver_device
 {
 public:
 	wecleman_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videostatus(*this, "videostatus"),
+		m_protection_ram(*this, "protection_ram"),
+		m_blitter_regs(*this, "blitter_regs"),
+		m_pageram(*this, "pageram"),
+		m_txtram(*this, "txtram"),
+		m_spriteram(*this, "spriteram"),
+		m_roadram(*this, "roadram"){ }
 
-	UINT16 *m_blitter_regs;
+	required_shared_ptr<UINT16> m_videostatus;
+	required_shared_ptr<UINT16> m_protection_ram;
+	required_shared_ptr<UINT16> m_blitter_regs;
+	required_shared_ptr<UINT16> m_pageram;
+	required_shared_ptr<UINT16> m_txtram;
+	required_shared_ptr<UINT16> m_spriteram;
+	required_shared_ptr<UINT16> m_roadram;
+
 	int m_multiply_reg[2];
-	UINT16 *m_protection_ram;
 	int m_spr_color_offs;
 	int m_prot_state;
 	int m_selected_ip;
 	int m_irqctrl;
-	UINT16 *m_videostatus;
-	UINT16 *m_pageram;
-	UINT16 *m_txtram;
-	UINT16 *m_roadram;
-	size_t m_roadram_size;
 	int m_bgpage[4];
 	int m_fgpage[4];
 	const int *m_gfx_bank;
@@ -36,7 +44,6 @@ public:
 	pen_t m_black_pen;
 	struct sprite *m_sprite_list;
 	struct sprite **m_spr_ptr_list;
-	UINT16 *m_spriteram;
 	DECLARE_READ16_MEMBER(wecleman_protection_r);
 	DECLARE_WRITE16_MEMBER(wecleman_protection_w);
 	DECLARE_WRITE16_MEMBER(irqctrl_w);

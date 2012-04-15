@@ -103,7 +103,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 	UINT8 *spriteram_2 = state->m_spriteram2;
 	int offs;
 
-	for (offs = state->m_spriteram_size - 4; offs >= 0; offs -= 4)
+	for (offs = state->m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
 	{
 		int x = spriteram[offs + 3];
 		drawgfx_transpen(bitmap,cliprect,machine.gfx[1],
@@ -119,7 +119,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 					x-256,240-spriteram[offs + 2],0);
 	}
 
-	for (offs = state->m_spriteram2_size - 4; offs >= 0; offs -= 4)
+	for (offs = state->m_spriteram2.bytes() - 4; offs >= 0; offs -= 4)
 	{
 		int x = spriteram_2[offs + 3];
 		drawgfx_transpen(bitmap,cliprect,machine.gfx[1],

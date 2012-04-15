@@ -128,8 +128,8 @@ static ADDRESS_MAP_START( fantland_map, AS_PROGRAM, 16, fantland_state )
 	AM_RANGE( 0xa3000, 0xa3001 ) AM_READ_PORT("a3000") AM_WRITE(fantland_nmi_enable_16_w )
 	AM_RANGE( 0xa3002, 0xa3003 ) AM_READ_PORT("a3002") AM_WRITE(fantland_soundlatch_16_w )
 
-	AM_RANGE( 0xa4000, 0xa67ff ) AM_READWRITE(spriteram_16_r,  spriteram_16_w  ) AM_BASE(m_spriteram)
-	AM_RANGE( 0xc0000, 0xcffff ) AM_READWRITE(spriteram2_16_r, spriteram2_16_w ) AM_BASE(m_spriteram2)
+	AM_RANGE( 0xa4000, 0xa67ff ) AM_READWRITE(spriteram_16_r,  spriteram_16_w  ) AM_SHARE("spriteram")
+	AM_RANGE( 0xc0000, 0xcffff ) AM_READWRITE(spriteram2_16_r, spriteram2_16_w ) AM_SHARE("spriteram2")
 
 	AM_RANGE( 0xe0000, 0xfffff ) AM_ROM
 ADDRESS_MAP_END
@@ -150,8 +150,8 @@ static ADDRESS_MAP_START( galaxygn_map, AS_PROGRAM, 8, fantland_state )
 	AM_RANGE( 0x53002, 0x53002 ) AM_READ_PORT("DSW1") AM_WRITE(fantland_soundlatch_w )
 	AM_RANGE( 0x53003, 0x53003 ) AM_READ_PORT("P2")
 
-	AM_RANGE( 0x54000, 0x567ff ) AM_RAM AM_BASE(m_spriteram)
-	AM_RANGE( 0x60000, 0x6ffff ) AM_RAM AM_BASE(m_spriteram2)
+	AM_RANGE( 0x54000, 0x567ff ) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE( 0x60000, 0x6ffff ) AM_RAM AM_SHARE("spriteram2")
 
 	AM_RANGE( 0x70000, 0x7ffff ) AM_ROM
 	AM_RANGE( 0xf0000, 0xfffff ) AM_ROM
@@ -240,14 +240,14 @@ static ADDRESS_MAP_START( borntofi_map, AS_PROGRAM, 8, fantland_state )
 	AM_RANGE( 0x53002, 0x53002 ) AM_READ_PORT( "DSW" ) AM_WRITE(fantland_soundlatch_w )
 	AM_RANGE( 0x53003, 0x53003 ) AM_READ_PORT( "Controls" )
 
-	AM_RANGE( 0x54000, 0x567ff ) AM_RAM AM_BASE(m_spriteram)
+	AM_RANGE( 0x54000, 0x567ff ) AM_RAM AM_SHARE("spriteram")
 
 	AM_RANGE( 0x57000, 0x57000 ) AM_READ_PORT( "P1 Lightgun Y" )
 	AM_RANGE( 0x57001, 0x57001 ) AM_READ_PORT( "P1 Lightgun X" )
 	AM_RANGE( 0x57002, 0x57002 ) AM_READ_PORT( "P2 Lightgun Y" )
 	AM_RANGE( 0x57003, 0x57003 ) AM_READ_PORT( "P2 Lightgun X" )
 
-	AM_RANGE( 0x60000, 0x6ffff ) AM_RAM AM_BASE(m_spriteram2)
+	AM_RANGE( 0x60000, 0x6ffff ) AM_RAM AM_SHARE("spriteram2")
 
 	AM_RANGE( 0x70000, 0x7ffff ) AM_ROM
 	AM_RANGE( 0xf0000, 0xfffff ) AM_ROM
@@ -271,8 +271,8 @@ static ADDRESS_MAP_START( wheelrun_map, AS_PROGRAM, 8, fantland_state )
 	AM_RANGE(0x53002, 0x53002) AM_READ_PORT( "53002" ) AM_WRITE(fantland_soundlatch_w )
 	AM_RANGE(0x53003, 0x53003) AM_READ_PORT( "53003" ) AM_WRITENOP
 
-	AM_RANGE(0x54000, 0x567ff) AM_RAM AM_BASE(m_spriteram)
-	AM_RANGE(0x60000, 0x6ffff) AM_RAM AM_BASE(m_spriteram2)
+	AM_RANGE(0x54000, 0x567ff) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0x60000, 0x6ffff) AM_RAM AM_SHARE("spriteram2")
 
 	AM_RANGE(0xf0000, 0xfffff) AM_ROM
 ADDRESS_MAP_END

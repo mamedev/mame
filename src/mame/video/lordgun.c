@@ -244,7 +244,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 {
 	lordgun_state *state = machine.driver_data<lordgun_state>();
 	UINT16 *s		=	state->m_spriteram;
-	UINT16 *end		=	state->m_spriteram + state->m_spriteram_size/2;
+	UINT16 *end		=	state->m_spriteram + state->m_spriteram.bytes()/2;
 
 	for ( ; s < end; s += 8/2 )
 	{

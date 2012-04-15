@@ -97,9 +97,9 @@ static ADDRESS_MAP_START( map1, AS_PROGRAM, 8, xxmissio_state )
 	AM_RANGE(0xa002, 0xa002) AM_WRITE(xxmissio_status_m_w)
 	AM_RANGE(0xa003, 0xa003) AM_WRITE(xxmissio_flipscreen_w)
 
-	AM_RANGE(0xc000, 0xc7ff) AM_SHARE("share1") AM_RAM AM_BASE(m_fgram)
-	AM_RANGE(0xc800, 0xcfff) AM_SHARE("share2") AM_READWRITE(xxmissio_bgram_r, xxmissio_bgram_w) AM_BASE(m_bgram)
-	AM_RANGE(0xd000, 0xd7ff) AM_SHARE("share3") AM_RAM AM_BASE(m_spriteram)
+	AM_RANGE(0xc000, 0xc7ff) AM_SHARE("share1") AM_RAM AM_SHARE("fgram")
+	AM_RANGE(0xc800, 0xcfff) AM_SHARE("share2") AM_READWRITE(xxmissio_bgram_r, xxmissio_bgram_w) AM_SHARE("bgram")
+	AM_RANGE(0xd000, 0xd7ff) AM_SHARE("share3") AM_RAM AM_SHARE("spriteram")
 
 	AM_RANGE(0xd800, 0xdaff) AM_SHARE("paletteram") AM_RAM_WRITE(xxmissio_paletteram_w)
 

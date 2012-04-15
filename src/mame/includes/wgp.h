@@ -8,18 +8,20 @@ class wgp_state : public driver_device
 {
 public:
 	wgp_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_spritemap(*this, "spritemap"),
+		m_spriteram(*this, "spriteram"),
+		m_pivram(*this, "pivram"),
+		m_piv_ctrlram(*this, "piv_ctrlram"),
+		m_sharedram(*this, "sharedram"){ }
 
 	/* memory pointers */
-	UINT16 *    m_spritemap;
-	UINT16 *    m_spriteram;
-	UINT16 *    m_pivram;
-	UINT16 *    m_piv_ctrlram;
-	UINT16 *    m_sharedram;
+	required_shared_ptr<UINT16> m_spritemap;
+	required_shared_ptr<UINT16> m_spriteram;
+	required_shared_ptr<UINT16> m_pivram;
+	required_shared_ptr<UINT16> m_piv_ctrlram;
+	required_shared_ptr<UINT16> m_sharedram;
 //  UINT16 *    m_paletteram;    // currently this uses generic palette handling
-	size_t      m_sharedram_size;
-	size_t      m_spritemap_size;
-	size_t      m_spriteram_size;
 
 	/* video-related */
 	tilemap_t   *m_piv_tilemap[3];

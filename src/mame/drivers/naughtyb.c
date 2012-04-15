@@ -246,10 +246,10 @@ WRITE8_MEMBER(naughtyb_state::popflame_protection_w)
 static ADDRESS_MAP_START( naughtyb_map, AS_PROGRAM, 8, naughtyb_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE(m_videoram)
-	AM_RANGE(0x8800, 0x8fff) AM_RAM AM_BASE(m_videoram2)
+	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("videoram")
+	AM_RANGE(0x8800, 0x8fff) AM_RAM AM_SHARE("videoram2")
 	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE(naughtyb_videoreg_w)
-	AM_RANGE(0x9800, 0x9fff) AM_RAM AM_BASE(m_scrollreg)
+	AM_RANGE(0x9800, 0x9fff) AM_RAM AM_SHARE("scrollreg")
 	AM_RANGE(0xa000, 0xa7ff) AM_DEVWRITE_LEGACY("cust", pleiads_sound_control_a_w)
 	AM_RANGE(0xa800, 0xafff) AM_DEVWRITE_LEGACY("cust", pleiads_sound_control_b_w)
 	AM_RANGE(0xb000, 0xb7ff) AM_READ(in0_port_r)	// IN0
@@ -259,10 +259,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( popflame_map, AS_PROGRAM, 8, naughtyb_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE(m_videoram)
-	AM_RANGE(0x8800, 0x8fff) AM_RAM AM_BASE(m_videoram2)
+	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("videoram")
+	AM_RANGE(0x8800, 0x8fff) AM_RAM AM_SHARE("videoram2")
 	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE(popflame_videoreg_w)
-	AM_RANGE(0x9800, 0x9fff) AM_RAM AM_BASE(m_scrollreg)
+	AM_RANGE(0x9800, 0x9fff) AM_RAM AM_SHARE("scrollreg")
 	AM_RANGE(0xa000, 0xa7ff) AM_DEVWRITE_LEGACY("cust", pleiads_sound_control_a_w)
 	AM_RANGE(0xa800, 0xafff) AM_DEVWRITE_LEGACY("cust", pleiads_sound_control_b_w)
 	AM_RANGE(0xb000, 0xb7ff) AM_READ(in0_port_r)	// IN0

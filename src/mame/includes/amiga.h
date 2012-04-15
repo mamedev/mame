@@ -373,13 +373,14 @@ class amiga_state : public driver_device
 {
 public:
 	amiga_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_custom_regs(*this, "custom_regs") { }
 
 	UINT16 *m_chip_ram;
 	size_t m_chip_ram_size;
 	UINT16 (*m_chip_ram_r)(amiga_state *state, offs_t offset);
 	void (*m_chip_ram_w)(amiga_state *state, offs_t offset, UINT16 data);
-	UINT16 *m_custom_regs;
+	required_shared_ptr<UINT16> m_custom_regs;
 
 	const amiga_machine_interface *m_intf;
 	autoconfig_device *m_autoconfig_list;

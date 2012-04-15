@@ -134,7 +134,7 @@ SCREEN_UPDATE_IND16( matmania )
 
 
 	/* Update the tiles in the left tile ram bank */
-	for (offs = state->m_videoram_size - 1; offs >= 0; offs--)
+	for (offs = state->m_videoram.bytes() - 1; offs >= 0; offs--)
 	{
 		int sx = 15 - offs / 32;
 		int sy = offs % 32;
@@ -147,7 +147,7 @@ SCREEN_UPDATE_IND16( matmania )
 	}
 
 	/* Update the tiles in the right tile ram bank */
-	for (offs = state->m_videoram3_size - 1; offs >= 0; offs--)
+	for (offs = state->m_videoram3.bytes() - 1; offs >= 0; offs--)
 	{
 		int sx = 15 - offs / 32;
 		int sy = offs % 32;
@@ -170,7 +170,7 @@ SCREEN_UPDATE_IND16( matmania )
 
 
 	/* Draw the sprites */
-	for (offs = 0; offs < state->m_spriteram_size; offs += 4)
+	for (offs = 0; offs < state->m_spriteram.bytes(); offs += 4)
 	{
 		if (spriteram[offs] & 0x01)
 		{
@@ -184,7 +184,7 @@ SCREEN_UPDATE_IND16( matmania )
 
 
 	/* draw the frontmost playfield. They are characters, but draw them as sprites */
-	for (offs = state->m_videoram2_size - 1; offs >= 0; offs--)
+	for (offs = state->m_videoram2.bytes() - 1; offs >= 0; offs--)
 	{
 		int sx = 31 - offs / 32;
 		int sy = offs % 32;
@@ -206,7 +206,7 @@ SCREEN_UPDATE_IND16( maniach )
 
 
 	/* Update the tiles in the left tile ram bank */
-	for (offs = state->m_videoram_size - 1; offs >= 0; offs--)
+	for (offs = state->m_videoram.bytes() - 1; offs >= 0; offs--)
 	{
 		int sx = 15 - offs / 32;
 		int sy = offs % 32;
@@ -219,7 +219,7 @@ SCREEN_UPDATE_IND16( maniach )
 	}
 
 	/* Update the tiles in the right tile ram bank */
-	for (offs = state->m_videoram3_size - 1; offs >= 0; offs--)
+	for (offs = state->m_videoram3.bytes() - 1; offs >= 0; offs--)
 	{
 		int sx = 15 - offs / 32;
 		int sy = offs % 32;
@@ -244,7 +244,7 @@ SCREEN_UPDATE_IND16( maniach )
 
 
 	/* Draw the sprites */
-	for (offs = 0; offs < state->m_spriteram_size; offs += 4)
+	for (offs = 0; offs < state->m_spriteram.bytes(); offs += 4)
 	{
 		if (spriteram[offs] & 0x01)
 		{
@@ -258,7 +258,7 @@ SCREEN_UPDATE_IND16( maniach )
 
 
 	/* draw the frontmost playfield. They are characters, but draw them as sprites */
-	for (offs = state->m_videoram2_size - 1; offs >= 0; offs--)
+	for (offs = state->m_videoram2.bytes() - 1; offs >= 0; offs--)
 	{
 		int sx = 31 - offs / 32;
 		int sy = offs % 32;

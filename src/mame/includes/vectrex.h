@@ -22,10 +22,10 @@ class vectrex_state : public driver_device
 {
 public:
 	vectrex_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_gce_vectorram(*this, "gce_vectorram"){ }
 
-	UINT8 *m_gce_vectorram;
-	size_t m_gce_vectorram_size;
+	required_shared_ptr<UINT8> m_gce_vectorram;
 	int m_imager_status;
 	UINT32 m_beam_color;
 	unsigned char m_via_out[2];

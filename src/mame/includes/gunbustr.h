@@ -12,14 +12,17 @@ class gunbustr_state : public driver_device
 {
 public:
 	gunbustr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_ram(*this,"ram"),
+		m_spriteram(*this,"spriteram") { }
+
+	required_shared_ptr<UINT32> m_ram;
+	required_shared_ptr<UINT32> m_spriteram;
 
 	UINT16 m_coin_word;
-	UINT32 *m_ram;
 	struct tempsprite *m_spritelist;
 	UINT32 m_mem[2];
-	UINT32 *m_spriteram;
-	size_t m_spriteram_size;
+
 	DECLARE_WRITE32_MEMBER(gunbustr_palette_w);
 	DECLARE_WRITE32_MEMBER(gunbustr_input_w);
 	DECLARE_WRITE32_MEMBER(motor_control_w);

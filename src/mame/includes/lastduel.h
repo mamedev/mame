@@ -13,14 +13,21 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_spriteram(*this, "spriteram")
-		{ }
+		m_spriteram(*this, "spriteram"),
+		m_vram(*this, "vram"),
+		m_scroll1(*this, "scroll1"),
+		m_scroll2(*this, "scroll2"),
+		m_paletteram(*this, "paletteram"){ }
 
+	/* devices */
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 	/* memory pointers */
-	UINT16 *    m_vram;
-	UINT16 *    m_scroll1;
-	UINT16 *    m_scroll2;
-	UINT16 *    m_paletteram;
+	required_device<buffered_spriteram16_device> m_spriteram;
+	required_shared_ptr<UINT16> m_vram;
+	required_shared_ptr<UINT16> m_scroll1;
+	required_shared_ptr<UINT16> m_scroll2;
+	required_shared_ptr<UINT16> m_paletteram;
 
 	/* video-related */
 	tilemap_t     *m_bg_tilemap;
@@ -31,10 +38,6 @@ public:
 	int         m_sprite_pri_mask;
 	int         m_tilemap_priority;
 
-	/* devices */
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_audiocpu;
-	required_device<buffered_spriteram16_device> m_spriteram;
 	DECLARE_WRITE16_MEMBER(lastduel_sound_w);
 	DECLARE_WRITE8_MEMBER(mg_bankswitch_w);
 	DECLARE_WRITE16_MEMBER(lastduel_flip_w);

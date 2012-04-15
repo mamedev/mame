@@ -2,16 +2,21 @@ class tbowl_state : public driver_device
 {
 public:
 	tbowl_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_shared_ram(*this, "shared_ram"),
+		m_txvideoram(*this, "txvideoram"),
+		m_bgvideoram(*this, "bgvideoram"),
+		m_bg2videoram(*this, "bg2videoram"),
+		m_spriteram(*this, "spriteram"){ }
 
 	int m_adpcm_pos[2];
 	int m_adpcm_end[2];
 	int m_adpcm_data[2];
-	UINT8 *m_shared_ram;
-	UINT8 *m_txvideoram;
-	UINT8 *m_bgvideoram;
-	UINT8 *m_bg2videoram;
-	UINT8 *m_spriteram;
+	required_shared_ptr<UINT8> m_shared_ram;
+	required_shared_ptr<UINT8> m_txvideoram;
+	required_shared_ptr<UINT8> m_bgvideoram;
+	required_shared_ptr<UINT8> m_bg2videoram;
+	required_shared_ptr<UINT8> m_spriteram;
 	tilemap_t *m_tx_tilemap;
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_bg2_tilemap;

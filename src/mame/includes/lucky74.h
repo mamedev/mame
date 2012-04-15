@@ -2,7 +2,11 @@ class lucky74_state : public driver_device
 {
 public:
 	lucky74_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_fg_videoram(*this, "fg_videoram"),
+		m_fg_colorram(*this, "fg_colorram"),
+		m_bg_videoram(*this, "bg_videoram"),
+		m_bg_colorram(*this, "bg_colorram"){ }
 
 	UINT8 m_ym2149_portb;
 	UINT8 m_usart_8251;
@@ -12,10 +16,10 @@ public:
 	int m_adpcm_data;
 	UINT8 m_adpcm_reg[6];
 	UINT8 m_adpcm_busy_line;
-	UINT8 *m_fg_videoram;
-	UINT8 *m_fg_colorram;
-	UINT8 *m_bg_videoram;
-	UINT8 *m_bg_colorram;
+	required_shared_ptr<UINT8> m_fg_videoram;
+	required_shared_ptr<UINT8> m_fg_colorram;
+	required_shared_ptr<UINT8> m_bg_videoram;
+	required_shared_ptr<UINT8> m_bg_colorram;
 	tilemap_t *m_fg_tilemap;
 	tilemap_t *m_bg_tilemap;
 	DECLARE_READ8_MEMBER(custom_09R81P_port_r);

@@ -500,8 +500,8 @@ static ADDRESS_MAP_START( tx1_main, AS_PROGRAM, 16, tx1_state )
 	AM_RANGE(0x02000, 0x02fff) AM_MIRROR(0x1000) AM_RAM
 	AM_RANGE(0x04000, 0x04fff) AM_MIRROR(0x1000) AM_RAM	AM_SHARE("nvram")
 	AM_RANGE(0x06000, 0x06fff) AM_READWRITE(tx1_crtc_r, tx1_crtc_w)
-	AM_RANGE(0x08000, 0x09fff) AM_RAM AM_BASE(m_vram)
-	AM_RANGE(0x0a000, 0x0afff) AM_RAM AM_SHARE("share1") AM_BASE(m_rcram)
+	AM_RANGE(0x08000, 0x09fff) AM_RAM AM_SHARE("vram")
+	AM_RANGE(0x0a000, 0x0afff) AM_RAM AM_SHARE("share1") AM_SHARE("rcram")
 	AM_RANGE(0x0b000, 0x0b001) AM_READWRITE(dipswitches_r, z80_busreq_w)
 	AM_RANGE(0x0c000, 0x0c001) AM_WRITE(tx1_scolst_w)
 	AM_RANGE(0x0d000, 0x0d003) AM_WRITE(tx1_slincs_w)
@@ -512,10 +512,10 @@ static ADDRESS_MAP_START( tx1_main, AS_PROGRAM, 16, tx1_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tx1_math, AS_PROGRAM, 16, tx1_state )
-	AM_RANGE(0x00000, 0x007ff) AM_RAM AM_BASE(m_math_ram)
+	AM_RANGE(0x00000, 0x007ff) AM_RAM AM_SHARE("math_ram")
 	AM_RANGE(0x00800, 0x00fff) AM_READWRITE(tx1_spcs_ram_r, tx1_spcs_ram_w)
 	AM_RANGE(0x01000, 0x01fff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x02000, 0x022ff) AM_RAM AM_BASE(m_objram)
+	AM_RANGE(0x02000, 0x022ff) AM_RAM AM_SHARE("objram")
 	AM_RANGE(0x02400, 0x027ff) AM_WRITE(tx1_bankcs_w)
 	AM_RANGE(0x02800, 0x02bff) AM_WRITE(halt_math_w)
 	AM_RANGE(0x02C00, 0x02fff) AM_WRITE(tx1_flgcs_w)
@@ -528,7 +528,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tx1_sound_prg, AS_PROGRAM, 8, tx1_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x3000, 0x37ff) AM_RAM AM_MIRROR(0x800) AM_BASE(m_z80_ram)
+	AM_RANGE(0x3000, 0x37ff) AM_RAM AM_MIRROR(0x800) AM_SHARE("z80_ram")
 	AM_RANGE(0x4000, 0x4000) AM_WRITE(z80_intreq_w)
 	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE_LEGACY("ppi8255", ppi8255_r, ppi8255_w)
 	AM_RANGE(0x6000, 0x6003) AM_DEVREADWRITE_LEGACY("tx1", tx1_pit8253_r, tx1_pit8253_w)
@@ -551,8 +551,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( buggyboy_main, AS_PROGRAM, 16, tx1_state )
 	AM_RANGE(0x00000, 0x03fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x04000, 0x04fff) AM_READWRITE(tx1_crtc_r, tx1_crtc_w)
-	AM_RANGE(0x08000, 0x09fff) AM_RAM AM_BASE(m_vram)
-	AM_RANGE(0x0a000, 0x0afff) AM_RAM AM_SHARE("share1") AM_BASE(m_rcram)
+	AM_RANGE(0x08000, 0x09fff) AM_RAM AM_SHARE("vram")
+	AM_RANGE(0x0a000, 0x0afff) AM_RAM AM_SHARE("share1") AM_SHARE("rcram")
 	AM_RANGE(0x0b000, 0x0b001) AM_READWRITE(dipswitches_r, z80_busreq_w)
 	AM_RANGE(0x0c000, 0x0c001) AM_WRITE(buggyboy_scolst_w)
 	AM_RANGE(0x0d000, 0x0d003) AM_WRITE(tx1_slincs_w)
@@ -566,8 +566,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( buggybjr_main, AS_PROGRAM, 16, tx1_state )
 	AM_RANGE(0x00000, 0x03fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x04000, 0x04fff) AM_READWRITE(tx1_crtc_r, tx1_crtc_w)
-	AM_RANGE(0x08000, 0x08fff) AM_RAM AM_BASE(m_vram)
-	AM_RANGE(0x0a000, 0x0afff) AM_RAM AM_SHARE("share1") AM_BASE(m_rcram)
+	AM_RANGE(0x08000, 0x08fff) AM_RAM AM_SHARE("vram")
+	AM_RANGE(0x0a000, 0x0afff) AM_RAM AM_SHARE("share1") AM_SHARE("rcram")
 	AM_RANGE(0x0b000, 0x0b001) AM_READWRITE(dipswitches_r, z80_busreq_w)
 	AM_RANGE(0x0c000, 0x0c001) AM_WRITE(buggyboy_scolst_w)
 	AM_RANGE(0x0d000, 0x0d003) AM_WRITE(tx1_slincs_w)
@@ -579,10 +579,10 @@ static ADDRESS_MAP_START( buggybjr_main, AS_PROGRAM, 16, tx1_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( buggyboy_math, AS_PROGRAM, 16, tx1_state )
-	AM_RANGE(0x00000, 0x007ff) AM_RAM AM_BASE(m_math_ram)
+	AM_RANGE(0x00000, 0x007ff) AM_RAM AM_SHARE("math_ram")
 	AM_RANGE(0x00800, 0x00fff) AM_READWRITE(buggyboy_spcs_ram_r, buggyboy_spcs_ram_w)
 	AM_RANGE(0x01000, 0x01fff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x02000, 0x022ff) AM_RAM AM_BASE(m_objram)
+	AM_RANGE(0x02000, 0x022ff) AM_RAM AM_SHARE("objram")
 	AM_RANGE(0x02400, 0x024ff) AM_WRITE(buggyboy_gas_w)
 	AM_RANGE(0x03000, 0x03fff) AM_READWRITE(buggyboy_math_r, buggyboy_math_w)
 	AM_RANGE(0x04000, 0x04fff) AM_ROM
@@ -595,7 +595,7 @@ ADDRESS_MAP_END
 /* Buggy Boy Sound PCB TC033A */
 static ADDRESS_MAP_START( buggyboy_sound_prg, AS_PROGRAM, 8, tx1_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_BASE(m_z80_ram)
+	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_SHARE("z80_ram")
 	AM_RANGE(0x6000, 0x6001) AM_READ(bb_analog_r)
 	AM_RANGE(0x6800, 0x6803) AM_DEVREADWRITE_LEGACY("ppi8255", ppi8255_r, ppi8255_w)
 	AM_RANGE(0x7000, 0x7003) AM_DEVREADWRITE_LEGACY("buggyboy", tx1_pit8253_r, tx1_pit8253_w)
@@ -606,7 +606,7 @@ ADDRESS_MAP_END
 /* Buggy Boy Jr Sound PCB TC043 */
 static ADDRESS_MAP_START( buggybjr_sound_prg, AS_PROGRAM, 8, tx1_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_BASE(m_z80_ram)
+	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_SHARE("z80_ram")
 	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE_LEGACY("buggyboy", tx1_pit8253_r, tx1_pit8253_w)
 	AM_RANGE(0x6000, 0x6001) AM_READ(bbjr_analog_r)
 	AM_RANGE(0x7000, 0x7000) AM_WRITE(z80_intreq_w)

@@ -8,14 +8,16 @@ class crospang_state : public driver_device
 {
 public:
 	crospang_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_fg_videoram(*this, "fg_videoram"),
+		m_bg_videoram(*this, "bg_videoram"),
+		m_spriteram(*this, "spriteram"){ }
 
 	/* memory pointers */
-	UINT16 *  m_bg_videoram;
-	UINT16 *  m_fg_videoram;
-	UINT16 *  m_spriteram;
+	required_shared_ptr<UINT16> m_fg_videoram;
+	required_shared_ptr<UINT16> m_bg_videoram;
+	required_shared_ptr<UINT16> m_spriteram;
 //  UINT16 *  m_paletteram;       // currently this uses generic palette handling
-	size_t    m_spriteram_size;
 
 	/* video-related */
 	tilemap_t   *m_bg_layer;

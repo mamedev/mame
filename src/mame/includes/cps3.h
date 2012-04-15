@@ -11,25 +11,36 @@ class cps3_state : public driver_device
 {
 public:
 	cps3_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_mainram(*this, "mainram"),
+		m_spriteram(*this, "spriteram"),
+		m_colourram(*this, "colourram"),
+		m_tilemap20_regs_base(*this, "tmap20_regs"),
+		m_tilemap30_regs_base(*this, "tmap30_regs"),
+		m_tilemap40_regs_base(*this, "tmap40_regs"),
+		m_tilemap50_regs_base(*this, "tmap50_regs"),
+		m_fullscreenzoom(*this, "fullscreenzoom"),
+		m_0xc0000000_ram(*this, "0xc0000000_ram"){ }
+
+	required_shared_ptr<UINT32> m_mainram;
+	required_shared_ptr<UINT32> m_spriteram;
+	required_shared_ptr<UINT32> m_colourram;
+	required_shared_ptr<UINT32> m_tilemap20_regs_base;
+	required_shared_ptr<UINT32> m_tilemap30_regs_base;
+	required_shared_ptr<UINT32> m_tilemap40_regs_base;
+	required_shared_ptr<UINT32> m_tilemap50_regs_base;
+	required_shared_ptr<UINT32> m_fullscreenzoom;
+	required_shared_ptr<UINT32> m_0xc0000000_ram;
 
 	fujitsu_29f016a_device *m_simm[7][8];
 	UINT32* m_decrypted_bios;
 	UINT32* m_decrypted_gamerom;
 	UINT32 m_cram_gfxflash_bank;
 	UINT32* m_nops;
-	UINT32* m_tilemap20_regs_base;
-	UINT32* m_tilemap30_regs_base;
-	UINT32* m_tilemap40_regs_base;
-	UINT32* m_tilemap50_regs_base;
-	UINT32* m_0xc0000000_ram;
 	UINT32* m_0xc0000000_ram_decrypted;
 	UINT32* m_char_ram;
-	UINT32* m_spriteram;
 	UINT32* m_eeprom;
-	UINT32* m_fullscreenzoom;
 	UINT32 m_ss_pal_base;
-	UINT32* m_colourram;
 	UINT32 m_unk_vidregs[0x20/4];
 	UINT32 m_ss_bank_base;
 	UINT32 m_screenwidth;
@@ -56,7 +67,6 @@ public:
 	int m_last_normal_byte;
 	unsigned short m_lastb;
 	unsigned short m_lastb2;
-	UINT32* m_mainram;
 	UINT8* m_user5region;
 	DECLARE_READ32_MEMBER(cps3_ssram_r);
 	DECLARE_WRITE32_MEMBER(cps3_ssram_w);

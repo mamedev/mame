@@ -10,24 +10,40 @@ class model2_state : public driver_device
 public:
 	model2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this,"maincpu")
-		{ }
+		m_maincpu(*this,"maincpu"),
+		m_workram(*this, "workram"),
+		m_bufferram(*this, "bufferram"),
+		m_paletteram32(*this, "paletteram32"),
+		m_colorxlat(*this, "colorxlat"),
+		m_textureram0(*this, "textureram0"),
+		m_textureram1(*this, "textureram1"),
+		m_lumaram(*this, "lumaram"),
+		m_soundram(*this, "soundram"),
+		m_tgp_program(*this, "tgp_program"){ }
 
-	UINT32 *m_workram;
+	required_device<cpu_device> m_maincpu;
+	required_shared_ptr<UINT32> m_workram;
+	required_shared_ptr<UINT32> m_bufferram;
+	required_shared_ptr<UINT32> m_paletteram32;
+	required_shared_ptr<UINT32> m_colorxlat;
+	required_shared_ptr<UINT32> m_textureram0;
+	required_shared_ptr<UINT32> m_textureram1;
+	required_shared_ptr<UINT32> m_lumaram;
+	required_shared_ptr<UINT16> m_soundram;
+	required_shared_ptr<UINT32> m_tgp_program;
+	
 	UINT32 m_intreq;
 	UINT32 m_intena;
 	UINT32 m_coproctl;
 	UINT32 m_coprocnt;
 	UINT32 m_geoctl;
 	UINT32 m_geocnt;
-	UINT16 *m_soundram;
 	UINT32 m_timervals[4];
 	UINT32 m_timerorig[4];
 	int m_timerrun[4];
 	timer_device *m_timers[4];
 	int m_ctrlmode;
 	int m_analog_channel;
-	UINT32 *m_tgp_program;
 	int m_dsp_type;
 	int m_copro_fifoin_rpos;
 	int m_copro_fifoin_wpos;
@@ -57,18 +73,11 @@ public:
 	int m_jnet_time_out;
 	UINT32 m_geo_read_start_address;
 	UINT32 m_geo_write_start_address;
-	UINT32 *m_bufferram;
-	UINT32 *m_colorxlat;
-	UINT32 *m_textureram0;
-	UINT32 *m_textureram1;
-	UINT32 *m_lumaram;
-	UINT32 *m_paletteram32;
 	poly_manager *m_poly;
 	raster_state *m_raster;
 	geo_state *m_geo;
 	bitmap_rgb32 m_sys24_bitmap;
 
-	required_device<cpu_device> m_maincpu;
 	DECLARE_CUSTOM_INPUT_MEMBER(_1c00000_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(_1c0001c_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(rchase2_devices_r);

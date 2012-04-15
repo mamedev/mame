@@ -8,14 +8,17 @@ class firetrap_state : public driver_device
 {
 public:
 	firetrap_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_bg1videoram(*this, "bg1videoram"),
+		m_bg2videoram(*this, "bg2videoram"),
+		m_fgvideoram(*this, "fgvideoram"),
+		m_spriteram(*this, "spriteram"){ }
 
 	/* memory pointers */
-	UINT8 *       m_bg1videoram;
-	UINT8 *       m_bg2videoram;
-	UINT8 *       m_fgvideoram;
-	UINT8 *       m_spriteram;
-	size_t        m_spriteram_size;
+	required_shared_ptr<UINT8> m_bg1videoram;
+	required_shared_ptr<UINT8> m_bg2videoram;
+	required_shared_ptr<UINT8> m_fgvideoram;
+	required_shared_ptr<UINT8> m_spriteram;
 
 	/* video-related */
 	tilemap_t       *m_fg_tilemap;

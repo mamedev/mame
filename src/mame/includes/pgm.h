@@ -13,19 +13,22 @@ class pgm_state : public driver_device
 {
 public:
 	pgm_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
+		: driver_device(mconfig, type, tag),
+		  m_videoregs(*this, "videoregs"),
+		  m_videoram(*this, "videoram"),
+		  m_z80_mainram(*this, "z80_mainram")
 		{
 			m_irq4_disabled = 0;
 		}
 
 	/* memory pointers */
+	required_shared_ptr<UINT16> m_videoregs;
+	required_shared_ptr<UINT16> m_videoram;
+	required_shared_ptr<UINT8> m_z80_mainram;
 //  UINT16 *      m_mainram;  // currently this is also used by nvram handler
 	UINT16 *      m_bg_videoram;
 	UINT16 *      m_tx_videoram;
-	UINT16 *      m_videoregs;
 	UINT16 *      m_rowscrollram;
-	UINT16 *      m_videoram;
-	UINT8  *      m_z80_mainram;
 	UINT8  *      m_sprite_a_region;
 	size_t        m_sprite_a_region_size;
 	UINT16 *      m_spritebufferram; // buffered spriteram
@@ -144,15 +147,17 @@ class pgm_arm_type2_state : public pgm_state
 {
 public:
 	pgm_arm_type2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: pgm_state(mconfig, type, tag) {
+		: pgm_state(mconfig, type, tag),
+		  m_arm_ram(*this, "arm_ram"),
+		  m_arm7_shareram(*this, "arm7_shareram") {
 
 	}
 	// kov2
 	UINT32        m_kov2_latchdata_68k_w;
 	UINT32        m_kov2_latchdata_arm_w;
 
-	UINT32*       m_arm_ram;
-	UINT32 *      m_arm7_shareram;
+	required_shared_ptr<UINT32> m_arm_ram;
+	required_shared_ptr<UINT32> m_arm7_shareram;
 
 	cpu_device *m_prot;
 };
@@ -164,7 +169,8 @@ class pgm_arm_type3_state : public pgm_state
 {
 public:
 	pgm_arm_type3_state(const machine_config &mconfig, device_type type, const char *tag)
-		: pgm_state(mconfig, type, tag) {
+		: pgm_state(mconfig, type, tag),
+		  m_arm_ram(*this, "arm_ram") {
 
 	}
 	// svg
@@ -173,7 +179,7 @@ public:
 
 	UINT32        m_svg_latchdata_68k_w;
 	UINT32        m_svg_latchdata_arm_w;
-	UINT32*       m_arm_ram;
+	required_shared_ptr<UINT32> m_arm_ram;
 
 	cpu_device *m_prot;
 };
@@ -184,7 +190,8 @@ class pgm_022_025_state : public pgm_state
 {
 public:
 	pgm_022_025_state(const machine_config &mconfig, device_type type, const char *tag)
-		: pgm_state(mconfig, type, tag) {
+		: pgm_state(mconfig, type, tag),
+		  m_sharedprotram(*this, "sharedprotram") {
 
 	}
 	int           m_kb_cmd;
@@ -192,7 +199,7 @@ public:
 	int           m_kb_ptr;
 	int			  m_kb_region_sequence_position;
 	UINT32        m_kb_regs[0x10];
-	UINT16 *      m_sharedprotram;
+	required_shared_ptr<UINT16> m_sharedprotram;
 
 };
 
@@ -201,7 +208,8 @@ class pgm_028_025_state : public pgm_state
 {
 public:
 	pgm_028_025_state(const machine_config &mconfig, device_type type, const char *tag)
-		: pgm_state(mconfig, type, tag) {
+		: pgm_state(mconfig, type, tag),
+		  m_sharedprotram(*this, "sharedprotram") {
 
 	}
 	// olds
@@ -210,7 +218,7 @@ public:
 	int           m_kb_ptr;
 	UINT16        m_olds_bs;
 	UINT16        m_olds_cmd3;
-	UINT16 *      m_sharedprotram;
+	required_shared_ptr<UINT16> m_sharedprotram;
 
 };
 

@@ -20,22 +20,25 @@ class decocass_state : public driver_device
 {
 public:
 	decocass_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_rambase(*this, "rambase"),
+		  m_charram(*this, "charram"),
+		  m_fgvideoram(*this, "fgvideoram"),
+		  m_colorram(*this, "colorram"),
+		  m_tileram(*this, "tileram"),
+		  m_objectram(*this, "objectram"),
+		  m_paletteram(*this, "paletteram") { }
 
 	/* memory pointers */
-	UINT8 *   m_rambase;
-	UINT8 *   m_charram;
-	UINT8 *   m_fgvideoram;
-	UINT8 *   m_colorram;
+	required_shared_ptr<UINT8> m_rambase;
+	required_shared_ptr<UINT8> m_charram;
+	required_shared_ptr<UINT8> m_fgvideoram;
+	required_shared_ptr<UINT8> m_colorram;
 	UINT8 *   m_bgvideoram;	/* shares bits D0-3 with tileram! */
-	UINT8 *   m_tileram;
-	UINT8 *   m_objectram;
-	UINT8 *   m_paletteram;
-	size_t    m_fgvideoram_size;
-	size_t    m_colorram_size;
+	required_shared_ptr<UINT8> m_tileram;
+	required_shared_ptr<UINT8> m_objectram;
+	required_shared_ptr<UINT8> m_paletteram;
 	size_t    m_bgvideoram_size;
-	size_t    m_tileram_size;
-	size_t    m_objectram_size;
 
 	/* video-related */
 	tilemap_t   *m_fg_tilemap;

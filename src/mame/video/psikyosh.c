@@ -1088,7 +1088,7 @@ static void draw_sprites(running_machine &machine, bitmap_rgb32 &bitmap, const r
 	UINT32 *src = state->m_spriteram->buffer(); /* Use buffered spriteram */
 	UINT16 *list = (UINT16 *)src + 0x3800 / 2;
 	UINT16 listlen = 0x800/2;
-	UINT16 *zoom_table = (UINT16 *)state->m_zoomram;
+	UINT16 *zoom_table = (UINT16 *)state->m_zoomram.target();
 	UINT8  *alpha_table = (UINT8 *)&(state->m_vidregs[0]);
 
 	UINT16 listcntr = 0;

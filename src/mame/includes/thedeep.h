@@ -3,23 +3,26 @@ class thedeep_state : public driver_device
 public:
 	thedeep_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+		m_spriteram(*this, "spriteram"),
+		m_vram_0(*this, "vram_0"),
+		m_vram_1(*this, "vram_1"),
+		m_scroll(*this, "scroll"),
+		m_scroll2(*this, "scroll2"),
 		m_maincpu(*this,"maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_mcu(*this, "mcu")
-		{ }
+		m_mcu(*this, "mcu"){ }
 
-	UINT8 *m_spriteram;
-	size_t m_spriteram_size;
+	required_shared_ptr<UINT8> m_spriteram;
 	int m_nmi_enable;
 	UINT8 m_protection_command;
 	UINT8 m_protection_data;
 	int m_protection_index;
 	int m_protection_irq;
 	int m_rombank;
-	UINT8 *m_vram_0;
-	UINT8 *m_vram_1;
-	UINT8 *m_scroll;
-	UINT8 *m_scroll2;
+	required_shared_ptr<UINT8> m_vram_0;
+	required_shared_ptr<UINT8> m_vram_1;
+	required_shared_ptr<UINT8> m_scroll;
+	required_shared_ptr<UINT8> m_scroll2;
 	tilemap_t *m_tilemap_0;
 	tilemap_t *m_tilemap_1;
 	UINT8 m_mcu_p3_reg;

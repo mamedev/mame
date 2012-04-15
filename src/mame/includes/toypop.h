@@ -2,12 +2,16 @@ class toypop_state : public driver_device
 {
 public:
 	toypop_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"),
+		m_spriteram(*this, "spriteram"),
+		m_m68000_sharedram(*this, "m68k_shared"),
+		m_bg_image(*this, "bg_image"){ }
 
-	UINT8 *m_videoram;
-	UINT8 *m_spriteram;
-	UINT16 *m_bg_image;
-	UINT8 *m_m68000_sharedram;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<UINT8> m_m68000_sharedram;
+	required_shared_ptr<UINT16> m_bg_image;
 	tilemap_t *m_bg_tilemap;
 
 	int m_bitmapflip;

@@ -3,21 +3,26 @@ class aerofgt_state : public driver_device
 {
 public:
 	aerofgt_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_bg1videoram(*this, "bg1videoram"),
+		m_bg2videoram(*this, "bg2videoram"),
+		m_rasterram(*this, "rasterram"),
+		m_bitmapram(*this, "bitmapram"),
+		m_spriteram1(*this, "spriteram1"),
+		m_spriteram2(*this, "spriteram2"),
+		m_spriteram3(*this, "spriteram3"),
+		m_tx_tilemap_ram(*this, "tx_tilemap_ram"){ }
 
 	/* memory pointers */
-	UINT16 *  m_bg1videoram;
-	UINT16 *  m_bg2videoram;
-	UINT16 *  m_rasterram;
-	UINT16 *  m_bitmapram;
-	UINT16 *  m_spriteram1;
-	UINT16 *  m_spriteram2;
-	UINT16 *  m_spriteram3;
-	UINT16 *  m_tx_tilemap_ram;
+	required_shared_ptr<UINT16> m_bg1videoram;
+	required_shared_ptr<UINT16> m_bg2videoram;
+	required_shared_ptr<UINT16> m_rasterram;
+	required_shared_ptr<UINT16> m_bitmapram;
+	required_shared_ptr<UINT16> m_spriteram1;
+	required_shared_ptr<UINT16> m_spriteram2;
+	required_shared_ptr<UINT16> m_spriteram3;
+	required_shared_ptr<UINT16> m_tx_tilemap_ram;
 //  UINT16 *  m_paletteram;   // currently this uses generic palette handling
-	size_t    m_spriteram1_size;
-	size_t    m_spriteram2_size;
-	size_t    m_spriteram3_size;
 
 	/* video-related */
 	tilemap_t   *m_bg1_tilemap;

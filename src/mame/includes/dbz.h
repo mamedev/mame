@@ -8,11 +8,13 @@ class dbz_state : public driver_device
 {
 public:
 	dbz_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_bg1_videoram(*this, "bg1_videoram"),
+		m_bg2_videoram(*this, "bg2_videoram"){ }
 
 	/* memory pointers */
-	UINT16 *      m_bg1_videoram;
-	UINT16 *      m_bg2_videoram;
+	required_shared_ptr<UINT16> m_bg1_videoram;
+	required_shared_ptr<UINT16> m_bg2_videoram;
 //  UINT16 *      m_paletteram;    // currently this uses generic palette handling
 
 	/* video-related */

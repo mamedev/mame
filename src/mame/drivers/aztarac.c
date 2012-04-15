@@ -83,7 +83,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, aztarac_state )
 	AM_RANGE(0x027008, 0x027009) AM_READWRITE(aztarac_sound_r, aztarac_sound_w)
 	AM_RANGE(0x02700c, 0x02700d) AM_READ_PORT("DIAL")
 	AM_RANGE(0x02700e, 0x02700f) AM_READ(watchdog_reset16_r)
-	AM_RANGE(0xff8000, 0xffafff) AM_RAM AM_BASE(m_vectorram)
+	AM_RANGE(0xff8000, 0xffafff) AM_RAM AM_SHARE("vectorram")
 	AM_RANGE(0xffb000, 0xffb001) AM_WRITE(aztarac_ubr_w)
 	AM_RANGE(0xffe000, 0xffffff) AM_RAM
 ADDRESS_MAP_END

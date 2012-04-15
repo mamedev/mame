@@ -296,7 +296,7 @@ static void draw_chars( running_machine &machine, bitmap_ind16 &bitmap, const re
 	btime_state *state = machine.driver_data<btime_state>();
 	offs_t offs;
 
-	for (offs = 0; offs < state->m_videoram_size; offs++)
+	for (offs = 0; offs < state->m_videoram.bytes(); offs++)
 	{
 		UINT8 x = 31 - (offs / 32);
 		UINT8 y = offs % 32;
@@ -490,7 +490,7 @@ SCREEN_UPDATE_IND16( bnj )
 	{
 		int scroll, offs;
 
-		for (offs = state->m_bnj_backgroundram_size - 1; offs >=0; offs--)
+		for (offs = state->m_bnj_backgroundram.bytes() - 1; offs >=0; offs--)
 		{
 			int sx, sy;
 
@@ -538,7 +538,7 @@ SCREEN_UPDATE_IND16( cookrace )
 	btime_state *state = screen.machine().driver_data<btime_state>();
 	int offs;
 
-	for (offs = state->m_bnj_backgroundram_size - 1; offs >=0; offs--)
+	for (offs = state->m_bnj_backgroundram.bytes() - 1; offs >=0; offs--)
 	{
 		int sx, sy;
 

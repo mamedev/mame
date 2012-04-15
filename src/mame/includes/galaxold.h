@@ -24,18 +24,23 @@ class galaxold_state : public driver_device
 {
 public:
 	galaxold_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_videoram(*this,"videoram"),
+		  m_spriteram(*this,"spriteram"),
+		  m_spriteram2(*this,"spriteram2"),
+		  m_attributesram(*this,"attributesram"),
+		  m_bulletsram(*this,"bulletsram"),
+		  m_rockclim_videoram(*this,"rockclim_vram"),
+		  m_racknrol_tiles_bank(*this,"racknrol_tbank") { }
 
-	UINT8 *m_videoram;
-	UINT8 *m_spriteram;
-	UINT8 *m_spriteram2;
-	UINT8 *m_attributesram;
-	UINT8 *m_bulletsram;
-	UINT8 *m_rockclim_videoram;
-	UINT8 *m_racknrol_tiles_bank;
-	size_t m_spriteram_size;
-	size_t m_spriteram2_size;
-	size_t m_bulletsram_size;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<UINT8> m_spriteram2;
+	required_shared_ptr<UINT8> m_attributesram;
+	required_shared_ptr<UINT8> m_bulletsram;
+	required_shared_ptr<UINT8> m_rockclim_videoram;
+	required_shared_ptr<UINT8> m_racknrol_tiles_bank;
+
 	int m_irq_line;
 	UINT8 m__4in1_bank;
 	tilemap_t *m_bg_tilemap;

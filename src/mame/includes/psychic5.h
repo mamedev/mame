@@ -2,7 +2,8 @@ class psychic5_state : public driver_device
 {
 public:
 	psychic5_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_spriteram(*this, "spriteram"){ }
 
 	UINT8 m_bank_latch;
 	UINT8 m_ps5_vram_page;
@@ -24,8 +25,7 @@ public:
 	int m_sx1;
 	int m_sy1;
 	int m_sy2;
-	UINT8 *m_spriteram;
-	size_t m_spriteram_size;
+	required_shared_ptr<UINT8> m_spriteram;
 	DECLARE_READ8_MEMBER(psychic5_bankselect_r);
 	DECLARE_WRITE8_MEMBER(psychic5_bankselect_w);
 	DECLARE_WRITE8_MEMBER(bombsa_bankselect_w);

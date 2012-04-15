@@ -8,15 +8,19 @@ class popper_state : public driver_device
 {
 public:
 	popper_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_ol_videoram(*this, "ol_videoram"),
+		m_videoram(*this, "videoram"),
+		m_ol_attribram(*this, "ol_attribram"),
+		m_attribram(*this, "attribram"),
+		m_spriteram(*this, "spriteram"){ }
 
 	/* memory pointers */
-	UINT8 * m_videoram;
-	UINT8 * m_ol_videoram;
-	UINT8 * m_attribram;
-	UINT8 * m_ol_attribram;
-	UINT8 * m_spriteram;
-	size_t  m_spriteram_size;
+	required_shared_ptr<UINT8> m_ol_videoram;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_ol_attribram;
+	required_shared_ptr<UINT8> m_attribram;
+	required_shared_ptr<UINT8> m_spriteram;
 
 	/* video-related */
 	tilemap_t *m_p123_tilemap;

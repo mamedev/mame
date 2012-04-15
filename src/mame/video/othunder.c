@@ -80,7 +80,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
        while processing sprite ram and then draw them all at the end */
 	struct othunder_tempsprite *sprite_ptr = state->m_spritelist;
 
-	for (offs = (state->m_spriteram_size / 2) - 4; offs >= 0; offs -= 4)
+	for (offs = (state->m_spriteram.bytes() / 2) - 4; offs >= 0; offs -= 4)
 	{
 		data = spriteram16[offs + 0];
 		zoomy = (data & 0xfe00) >> 9;

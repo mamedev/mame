@@ -2,26 +2,37 @@ class goldstar_state : public driver_device
 {
 public:
 	goldstar_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_fg_vidram(*this, "fg_vidram"),
+		m_fg_atrram(*this, "fg_atrram"),
+		m_reel1_ram(*this, "reel1_ram"),
+		m_reel2_ram(*this, "reel2_ram"),
+		m_reel3_ram(*this, "reel3_ram"),
+		m_reel1_scroll(*this, "reel1_scroll"),
+		m_reel2_scroll(*this, "reel2_scroll"),
+		m_reel3_scroll(*this, "reel3_scroll"),
+		m_reel1_attrram(*this, "reel1_attrram"),
+		m_reel2_attrram(*this, "reel2_attrram"),
+		m_reel3_attrram(*this, "reel3_attrram"){ }
 
 	int m_dataoffset;
 
 	UINT8 *m_atrram;
-	UINT8 *m_fg_atrram;
-	UINT8 *m_fg_vidram;
+	required_shared_ptr<UINT8> m_fg_vidram;
+	required_shared_ptr<UINT8> m_fg_atrram;
 
-	UINT8 *m_reel1_scroll;
-	UINT8 *m_reel2_scroll;
-	UINT8 *m_reel3_scroll;
+	required_shared_ptr<UINT8> m_reel1_ram;
+	required_shared_ptr<UINT8> m_reel2_ram;
+	required_shared_ptr<UINT8> m_reel3_ram;
 
-	UINT8 *m_reel1_ram;
-	UINT8 *m_reel2_ram;
-	UINT8 *m_reel3_ram;
+	required_shared_ptr<UINT8> m_reel1_scroll;
+	required_shared_ptr<UINT8> m_reel2_scroll;
+	required_shared_ptr<UINT8> m_reel3_scroll;
 
 	/* reelx_attrram for unkch sets */
-	UINT8 *m_reel1_attrram;
-	UINT8 *m_reel2_attrram;
-	UINT8 *m_reel3_attrram;
+	required_shared_ptr<UINT8> m_reel1_attrram;
+	required_shared_ptr<UINT8> m_reel2_attrram;
+	required_shared_ptr<UINT8> m_reel3_attrram;
 	UINT8 m_unkch_vidreg;
 
 	tilemap_t *m_reel1_tilemap;

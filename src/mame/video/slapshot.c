@@ -9,8 +9,8 @@ VIDEO_START( slapshot )
 	slapshot_state *state = machine.driver_data<slapshot_state>();
 	int i;
 
-	state->m_spriteram_delayed = auto_alloc_array(machine, UINT16, state->m_spriteram_size / 2);
-	state->m_spriteram_buffered = auto_alloc_array(machine, UINT16, state->m_spriteram_size / 2);
+	state->m_spriteram_delayed = auto_alloc_array(machine, UINT16, state->m_spriteram.bytes() / 2);
+	state->m_spriteram_buffered = auto_alloc_array(machine, UINT16, state->m_spriteram.bytes() / 2);
 	state->m_spritelist = auto_alloc_array(machine, struct slapshot_tempsprite, 0x400);
 
 	for (i = 0; i < 8; i ++)
@@ -26,8 +26,8 @@ VIDEO_START( slapshot )
 	state->save_item(NAME(state->m_sprites_master_scrolly));
 	state->save_item(NAME(state->m_sprites_flipscreen));
 	state->save_item(NAME(state->m_prepare_sprites));
-	state->save_pointer(NAME(state->m_spriteram_delayed), state->m_spriteram_size / 2);
-	state->save_pointer(NAME(state->m_spriteram_buffered), state->m_spriteram_size / 2);
+	state->save_pointer(NAME(state->m_spriteram_delayed), state->m_spriteram.bytes() / 2);
+	state->save_pointer(NAME(state->m_spriteram_buffered), state->m_spriteram.bytes() / 2);
 }
 
 /************************************************************
@@ -383,7 +383,7 @@ static void taito_handle_sprite_buffering( running_machine &machine )
 
 	if (state->m_prepare_sprites)	/* no buffering */
 	{
-		memcpy(state->m_spriteram_buffered, state->m_spriteram, state->m_spriteram_size);
+		memcpy(state->m_spriteram_buffered, state->m_spriteram, state->m_spriteram.bytes());
 		state->m_prepare_sprites = 0;
 	}
 }

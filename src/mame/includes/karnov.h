@@ -11,12 +11,16 @@ class karnov_state : public driver_device
 public:
 	karnov_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_spriteram(*this, "spriteram") { }
+		  m_spriteram(*this, "spriteram") ,
+		m_ram(*this, "ram"),
+		m_videoram(*this, "videoram"),
+		m_pf_data(*this, "pf_data"){ }
 
+	required_device<buffered_spriteram16_device> m_spriteram;
 	/* memory pointers */
-	UINT16 *    m_videoram;
-	UINT16 *    m_ram;
-	UINT16 *    m_pf_data;
+	required_shared_ptr<UINT16> m_ram;
+	required_shared_ptr<UINT16> m_videoram;
+	required_shared_ptr<UINT16> m_pf_data;
 
 	/* video-related */
 	bitmap_ind16    *m_bitmap_f;
@@ -37,7 +41,6 @@ public:
 	/* devices */
 	device_t *m_maincpu;
 	device_t *m_audiocpu;
-	required_device<buffered_spriteram16_device> m_spriteram;
 	DECLARE_WRITE16_MEMBER(karnov_control_w);
 	DECLARE_READ16_MEMBER(karnov_control_r);
 	DECLARE_WRITE16_MEMBER(karnov_videoram_w);

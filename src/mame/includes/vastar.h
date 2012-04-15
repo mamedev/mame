@@ -2,24 +2,33 @@ class vastar_state : public driver_device
 {
 public:
 	vastar_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_bg1videoram(*this, "bg1videoram"),
+		m_bg2videoram(*this, "bg2videoram"),
+		m_fgvideoram(*this, "fgvideoram"),
+		m_bg1_scroll(*this, "bg1_scroll"),
+		m_bg2_scroll(*this, "bg2_scroll"),
+		m_sprite_priority(*this, "sprite_priority"),
+		m_sharedram(*this, "sharedram"),
+		m_spriteram1(*this, "spriteram1"),
+		m_spriteram2(*this, "spriteram2"),
+		m_spriteram3(*this, "spriteram3"){ }
 
-	UINT8 *m_spriteram1;
-	UINT8 *m_spriteram2;
-	UINT8 *m_spriteram3;
-
-	UINT8 *m_bg1videoram;
-	UINT8 *m_bg2videoram;
-	UINT8 *m_fgvideoram;
-	UINT8 *m_bg1_scroll;
-	UINT8 *m_bg2_scroll;
-	UINT8 *m_sprite_priority;
+	required_shared_ptr<UINT8> m_bg1videoram;
+	required_shared_ptr<UINT8> m_bg2videoram;
+	required_shared_ptr<UINT8> m_fgvideoram;
+	required_shared_ptr<UINT8> m_bg1_scroll;
+	required_shared_ptr<UINT8> m_bg2_scroll;
+	required_shared_ptr<UINT8> m_sprite_priority;
+	required_shared_ptr<UINT8> m_sharedram;
+	required_shared_ptr<UINT8> m_spriteram1;
+	required_shared_ptr<UINT8> m_spriteram2;
+	required_shared_ptr<UINT8> m_spriteram3;
 
 	tilemap_t *m_fg_tilemap;
 	tilemap_t *m_bg1_tilemap;
 	tilemap_t *m_bg2_tilemap;
 
-	UINT8 *m_sharedram;
 
 	UINT8 m_nmi_mask;
 	DECLARE_WRITE8_MEMBER(vastar_hold_cpu2_w);

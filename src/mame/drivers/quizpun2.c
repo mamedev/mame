@@ -362,8 +362,8 @@ static ADDRESS_MAP_START( quizpun2_map, AS_PROGRAM, 8, quizpun2_state )
 	AM_RANGE( 0x0000, 0x7fff ) AM_ROM
 	AM_RANGE( 0x8000, 0x9fff ) AM_ROMBANK("bank1")
 
-	AM_RANGE( 0xa000, 0xbfff ) AM_RAM_WRITE(fg_ram_w ) AM_BASE(m_fg_ram )	// 4 * 800
-	AM_RANGE( 0xc000, 0xc7ff ) AM_RAM_WRITE(bg_ram_w ) AM_BASE(m_bg_ram )	// 4 * 400
+	AM_RANGE( 0xa000, 0xbfff ) AM_RAM_WRITE(fg_ram_w ) AM_SHARE("fg_ram")	// 4 * 800
+	AM_RANGE( 0xc000, 0xc7ff ) AM_RAM_WRITE(bg_ram_w ) AM_SHARE("bg_ram")	// 4 * 400
 	AM_RANGE( 0xc800, 0xcfff ) AM_RAM										//
 
 	AM_RANGE( 0xd000, 0xd3ff ) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_byte_le_w )  AM_SHARE("paletteram")

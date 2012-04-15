@@ -5,15 +5,30 @@ class ssv_state : public driver_device
 public:
 	ssv_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_dsp(*this, "dsp")
-	{ }
+		m_dsp(*this, "dsp"),
+		m_mainram(*this, "mainram"),
+		m_spriteram(*this, "spriteram"),
+		m_paletteram(*this, "paletteram"),
+		m_scroll(*this, "scroll"),
+		m_irq_vectors(*this, "irq_vectors"),
+		m_gdfs_tmapram(*this, "gdfs_tmapram"),
+		m_gdfs_tmapscroll(*this, "gdfs_tmapscroll"),
+		m_spriteram2(*this, "spriteram2"),
+		m_gdfs_blitram(*this, "gdfs_blitram"),
+		m_input_sel(*this, "input_sel"){ }
 
 	optional_device<upd96050_device> m_dsp;
 
-	UINT16 *m_scroll;
-	UINT16 *m_paletteram;
-	UINT16 *m_spriteram;
-	UINT16 *m_spriteram2;
+	required_shared_ptr<UINT16> m_mainram;
+	required_shared_ptr<UINT16> m_spriteram;
+	required_shared_ptr<UINT16> m_paletteram;
+	required_shared_ptr<UINT16> m_scroll;
+	required_shared_ptr<UINT16> m_irq_vectors;
+	required_shared_ptr<UINT16> m_gdfs_tmapram;
+	required_shared_ptr<UINT16> m_gdfs_tmapscroll;
+	required_shared_ptr<UINT16> m_spriteram2;
+	required_shared_ptr<UINT16> m_gdfs_blitram;
+	required_shared_ptr<UINT16> m_input_sel;
 
 	int m_tile_code[16];
 
@@ -22,24 +37,18 @@ public:
 	int m_shadow_pen_shift;
 
 	UINT8 m_requested_int;
-	UINT16 *m_irq_vectors;
 	UINT16 m_irq_enable;
-	UINT16 *m_mainram;
 
 	UINT16 *m_dsp_ram;
 
 	UINT16 *m_eaglshot_gfxram;
-	UINT16 *m_gdfs_tmapram;
-	UINT16 *m_gdfs_tmapscroll;
 
 	tilemap_t *m_gdfs_tmap;
 
 	int m_interrupt_ultrax;
 
-	UINT16 *m_input_sel;
 	int m_gdfs_gfxram_bank;
 	int m_gdfs_lightgun_select;
-	UINT16 *m_gdfs_blitram;
 
 	UINT16 m_sxyreact_serial;
 	int m_sxyreact_dial;

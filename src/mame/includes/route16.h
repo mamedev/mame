@@ -2,14 +2,16 @@ class route16_state : public driver_device
 {
 public:
 	route16_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_sharedram(*this, "sharedram"),
+		m_videoram1(*this, "videoram1"),
+		m_videoram2(*this, "videoram2"){ }
 
-	UINT8 *m_sharedram;
+	required_shared_ptr<UINT8> m_sharedram;
 	UINT8 m_ttmahjng_port_select;
 	int m_speakres_vrx;
-	UINT8 *m_videoram1;
-	UINT8 *m_videoram2;
-	size_t m_videoram_size;
+	required_shared_ptr<UINT8> m_videoram1;
+	required_shared_ptr<UINT8> m_videoram2;
 	UINT8 m_flipscreen;
 	UINT8 m_palette_1;
 	UINT8 m_palette_2;

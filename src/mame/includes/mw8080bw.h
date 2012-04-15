@@ -35,12 +35,12 @@ class mw8080bw_state : public driver_device
 {
 public:
 	mw8080bw_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_main_ram(*this, "main_ram"){ }
 
 	/* memory pointers */
-	UINT8 *     m_main_ram;
+	required_shared_ptr<UINT8> m_main_ram;
 	UINT8 *     m_colorram;
-	size_t      m_main_ram_size;
 
 	/* sound-related */
 	UINT8       m_port_1_last;

@@ -2,21 +2,24 @@ class tankbust_state : public driver_device
 {
 public:
 	tankbust_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_txtram(*this, "txtram"),
+		m_videoram(*this, "videoram"),
+		m_colorram(*this, "colorram"),
+		m_spriteram(*this, "spriteram"){ }
 
 	int m_latch;
 	UINT32 m_timer1;
 	int m_e0xx_data[8];
 	UINT8 m_variable_data;
-	UINT8 *m_txtram;
-	UINT8 *m_videoram;
-	UINT8 *m_colorram;
+	required_shared_ptr<UINT8> m_txtram;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_colorram;
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_txt_tilemap;
 	UINT8 m_xscroll[2];
 	UINT8 m_yscroll[2];
-	UINT8 *m_spriteram;
-	size_t m_spriteram_size;
+	required_shared_ptr<UINT8> m_spriteram;
 
 	UINT8 m_irq_mask;
 	DECLARE_WRITE8_MEMBER(tankbust_soundlatch_w);

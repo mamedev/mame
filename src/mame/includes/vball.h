@@ -2,11 +2,15 @@ class vball_state : public driver_device
 {
 public:
 	vball_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_vb_attribram(*this, "vb_attribram"),
+		m_vb_videoram(*this, "vb_videoram"),
+		m_vb_scrolly_lo(*this, "vb_scrolly_lo"),
+		m_spriteram(*this, "spriteram"){ }
 
-	UINT8 *m_vb_attribram;
-	UINT8 *m_vb_videoram;
-	UINT8 *m_vb_scrolly_lo;
+	required_shared_ptr<UINT8> m_vb_attribram;
+	required_shared_ptr<UINT8> m_vb_videoram;
+	required_shared_ptr<UINT8> m_vb_scrolly_lo;
 	int m_vb_scrollx_hi;
 	int m_vb_scrolly_hi;
 	int m_vb_scrollx_lo;
@@ -15,8 +19,7 @@ public:
 	int m_vb_bgprombank;
 	int m_vb_spprombank;
 	tilemap_t *m_bg_tilemap;
-	UINT8 *m_spriteram;
-	size_t m_spriteram_size;
+	required_shared_ptr<UINT8> m_spriteram;
 	DECLARE_WRITE8_MEMBER(vball_irq_ack_w);
 	DECLARE_WRITE8_MEMBER(vb_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(cpu_sound_command_w);

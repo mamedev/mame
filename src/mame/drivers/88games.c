@@ -127,11 +127,11 @@ WRITE8_MEMBER(_88games_state::k052109_051960_w)
  *************************************/
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, _88games_state )
-	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_BASE(m_banked_rom) /* banked ROM + palette RAM */
-	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_byte_be_w) AM_BASE(m_paletteram_1000)	/* banked ROM + palette RAM */
+	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("banked_rom") /* banked ROM + palette RAM */
+	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_byte_be_w) AM_SHARE("paletteram_1000")	/* banked ROM + palette RAM */
 	AM_RANGE(0x2000, 0x2fff) AM_RAM
 	AM_RANGE(0x3000, 0x37ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x3800, 0x3fff) AM_READWRITE(bankedram_r, bankedram_w) AM_BASE(m_ram)
+	AM_RANGE(0x3800, 0x3fff) AM_READWRITE(bankedram_r, bankedram_w) AM_SHARE("ram")
 	AM_RANGE(0x5f84, 0x5f84) AM_WRITE(k88games_5f84_w)
 	AM_RANGE(0x5f88, 0x5f88) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x5f8c, 0x5f8c) AM_WRITE(soundlatch_byte_w)

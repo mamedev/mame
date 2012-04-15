@@ -11,16 +11,21 @@ class crgolf_state : public driver_device
 {
 public:
 	crgolf_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_color_select(*this, "color_select"),
+		m_screen_flip(*this, "screen_flip"),
+		m_screen_select(*this, "screen_select"),
+		m_screenb_enable(*this, "screenb_enable"),
+		m_screena_enable(*this, "screena_enable"){ }
 
 	/* memory pointers */
 	UINT8 *  m_videoram_a;
 	UINT8 *  m_videoram_b;
-	UINT8 *  m_color_select;
-	UINT8 *  m_screen_flip;
-	UINT8 *  m_screen_select;
-	UINT8 *  m_screena_enable;
-	UINT8 *  m_screenb_enable;
+	required_shared_ptr<UINT8> m_color_select;
+	required_shared_ptr<UINT8> m_screen_flip;
+	required_shared_ptr<UINT8> m_screen_select;
+	required_shared_ptr<UINT8> m_screenb_enable;
+	required_shared_ptr<UINT8> m_screena_enable;
 
 	/* misc */
 	UINT8    m_port_select;

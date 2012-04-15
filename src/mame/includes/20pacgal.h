@@ -11,14 +11,19 @@ class _20pacgal_state : public driver_device
 {
 public:
 	_20pacgal_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_video_ram(*this, "video_ram"),
+		m_char_gfx_ram(*this, "char_gfx_ram"),
+		m_stars_seed(*this, "stars_seed"),
+		m_stars_ctrl(*this, "stars_ctrl"),
+		m_flip(*this, "flip"){ }
 
 	/* memory pointers */
-	UINT8 *m_char_gfx_ram;
-	UINT8 *m_video_ram;
-	UINT8 *m_flip;
-	UINT8 *m_stars_seed;
-	UINT8 *m_stars_ctrl;
+	required_shared_ptr<UINT8> m_video_ram;
+	required_shared_ptr<UINT8> m_char_gfx_ram;
+	required_shared_ptr<UINT8> m_stars_seed;
+	required_shared_ptr<UINT8> m_stars_ctrl;
+	required_shared_ptr<UINT8> m_flip;
 
 	/* machine state */
 	UINT8 m_game_selected;	/* 0 = Ms. Pac-Man, 1 = Galaga */

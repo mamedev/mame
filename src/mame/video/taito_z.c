@@ -157,7 +157,7 @@ static void contcirc_draw_sprites_16x8( running_machine &machine, bitmap_ind16 &
 	int bad_chunks;
 	static const int primasks[2] = { 0xf0, 0xfc };
 
-	for (offs = 0; offs < state->m_spriteram_size / 2; offs += 4)
+	for (offs = 0; offs < state->m_spriteram.bytes() / 2; offs += 4)
 	{
 		data = spriteram[offs + 0];
 		zoomy = (data & 0xfe00) >> 9;
@@ -252,7 +252,7 @@ static void chasehq_draw_sprites_16x16( running_machine &machine, bitmap_ind16 &
 	int bad_chunks;
 	static const int primasks[2] = { 0xf0, 0xfc };
 
-	for (offs = state->m_spriteram_size / 2 - 4; offs >= 0; offs -= 4)
+	for (offs = state->m_spriteram.bytes() / 2 - 4; offs >= 0; offs -= 4)
 	{
 		data = spriteram[offs + 0];
 		zoomy = (data & 0xfe00) >> 9;
@@ -438,7 +438,7 @@ static void bshark_draw_sprites_16x8( running_machine &machine, bitmap_ind16 &bi
 	int bad_chunks;
 	static const int primasks[2] = { 0xf0, 0xfc };
 
-	for (offs = state->m_spriteram_size / 2 - 4; offs >= 0; offs -= 4)
+	for (offs = state->m_spriteram.bytes() / 2 - 4; offs >= 0; offs -= 4)
 	{
 		data = spriteram[offs + 0];
 		zoomy = (data & 0x7e00) >> 9;
@@ -639,7 +639,7 @@ static void aquajack_draw_sprites_16x8(running_machine &machine, bitmap_ind16 &b
 	int bad_chunks;
 	static const int primasks[2] = { 0xf0, 0xfc };
 
-	for (offs = 0; offs < state->m_spriteram_size / 2; offs += 4)
+	for (offs = 0; offs < state->m_spriteram.bytes() / 2; offs += 4)
 	{
 		data = spriteram[offs + 0];
 		zoomy = (data & 0x7e00) >> 9;
@@ -734,7 +734,7 @@ static void spacegun_draw_sprites_16x8(running_machine &machine, bitmap_ind16 &b
 	int bad_chunks;
 	static const int primasks[2] = { 0xf0, 0xfc };
 
-	for (offs = 0; offs < state->m_spriteram_size / 2 - 4; offs += 4)
+	for (offs = 0; offs < state->m_spriteram.bytes() / 2 - 4; offs += 4)
 	{
 		data = spriteram[offs + 0];
 		zoomy = (data & 0xfe00) >> 9;

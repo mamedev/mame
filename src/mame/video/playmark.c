@@ -389,13 +389,13 @@ WRITE16_MEMBER(playmark_state::hrdtimes_scroll_w)
 static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int codeshift )
 {
 	playmark_state *state = machine.driver_data<playmark_state>();
-	int offs, start_offset = state->m_spriteram_size / 2 - 4;
+	int offs, start_offset = state->m_spriteram.bytes() / 2 - 4;
 	int height = machine.gfx[0]->height;
 	int colordiv = machine.gfx[0]->color_granularity / 16;
 	UINT16 *spriteram = state->m_spriteram;
 
 	// find the "end of list" to draw the sprites in reverse order
-	for (offs = 4; offs < state->m_spriteram_size / 2; offs += 4)
+	for (offs = 4; offs < state->m_spriteram.bytes() / 2; offs += 4)
 	{
 		if (spriteram[offs + 3 - 4] == 0x2000) /* end of list marker */
 		{
@@ -433,12 +433,12 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 static void bigtwinb_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int codeshift )
 {
 	playmark_state *state = machine.driver_data<playmark_state>();
-	int offs, start_offset = state->m_spriteram_size / 2 - 4;
+	int offs, start_offset = state->m_spriteram.bytes() / 2 - 4;
 	int height = machine.gfx[0]->height;
 	UINT16 *spriteram = state->m_spriteram;
 
 	// find the "end of list" to draw the sprites in reverse order
-	for (offs = 4; offs < state->m_spriteram_size / 2; offs += 4)
+	for (offs = 4; offs < state->m_spriteram.bytes() / 2; offs += 4)
 	{
 		if (spriteram[offs + 3 - 4] == 0x2000) /* end of list marker */
 		{

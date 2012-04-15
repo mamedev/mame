@@ -83,13 +83,18 @@ class vmetal_state : public metro_state
 {
 public:
 	vmetal_state(const machine_config &mconfig, device_type type, const char *tag)
-		: metro_state(mconfig, type, tag) { }
+		: metro_state(mconfig, type, tag),
+		  m_texttileram(*this, "texttileram"),
+		  m_mid1tileram(*this, "mid1tileram"),
+		  m_mid2tileram(*this, "mid2tileram"),
+		  m_tlookup(*this, "tlookup"),
+		  m_vmetal_videoregs(*this, "vmetal_regs") { }
 
-	UINT16 *m_texttileram;
-	UINT16 *m_mid1tileram;
-	UINT16 *m_mid2tileram;
-	UINT16 *m_tlookup;
-	UINT16 *m_vmetal_videoregs;
+	required_shared_ptr<UINT16> m_texttileram;
+	required_shared_ptr<UINT16> m_mid1tileram;
+	required_shared_ptr<UINT16> m_mid2tileram;
+	required_shared_ptr<UINT16> m_tlookup;
+	required_shared_ptr<UINT16> m_vmetal_videoregs;
 
 	tilemap_t *m_texttilemap;
 	tilemap_t *m_mid1tilemap;
@@ -230,18 +235,18 @@ static WRITE8_DEVICE_HANDLER( vmetal_es8712_w )
 
 static ADDRESS_MAP_START( varia_program_map, AS_PROGRAM, 16, vmetal_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x100000, 0x11ffff) AM_RAM_WRITE(vmetal_texttileram_w) AM_BASE(m_texttileram)
-	AM_RANGE(0x120000, 0x13ffff) AM_RAM_WRITE(vmetal_mid1tileram_w) AM_BASE(m_mid1tileram)
-	AM_RANGE(0x140000, 0x15ffff) AM_RAM_WRITE(vmetal_mid2tileram_w) AM_BASE(m_mid2tileram)
+	AM_RANGE(0x100000, 0x11ffff) AM_RAM_WRITE(vmetal_texttileram_w) AM_SHARE("texttileram")
+	AM_RANGE(0x120000, 0x13ffff) AM_RAM_WRITE(vmetal_mid1tileram_w) AM_SHARE("mid1tileram")
+	AM_RANGE(0x140000, 0x15ffff) AM_RAM_WRITE(vmetal_mid2tileram_w) AM_SHARE("mid2tileram")
 
 	AM_RANGE(0x160000, 0x16ffff) AM_READ(varia_crom_read) // cgrom read window ..
 
 	AM_RANGE(0x170000, 0x173fff) AM_RAM_WRITE(paletteram_GGGGGRRRRRBBBBBx_word_w) AM_SHARE("paletteram")	// Palette
-	AM_RANGE(0x174000, 0x174fff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
+	AM_RANGE(0x174000, 0x174fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x175000, 0x177fff) AM_RAM
-	AM_RANGE(0x178000, 0x1787ff) AM_RAM AM_BASE(m_tlookup)
-	AM_RANGE(0x178800, 0x1796ff) AM_RAM AM_BASE(m_vmetal_videoregs)
-	AM_RANGE(0x179700, 0x179713) AM_WRITEONLY AM_BASE(m_videoregs)	// Metro sprite chip Video Registers
+	AM_RANGE(0x178000, 0x1787ff) AM_RAM AM_SHARE("tlookup")
+	AM_RANGE(0x178800, 0x1796ff) AM_RAM AM_SHARE("vmetal_regs")
+	AM_RANGE(0x179700, 0x179713) AM_WRITEONLY AM_SHARE("videoregs")	// Metro sprite chip Video Registers
 
 	AM_RANGE(0x200000, 0x200001) AM_READ_PORT("P1_P2") AM_DEVWRITE8_LEGACY("essnd", vmetal_control_w, 0x00ff)
 	AM_RANGE(0x200002, 0x200003) AM_READ_PORT("SYSTEM")

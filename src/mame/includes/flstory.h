@@ -3,17 +3,19 @@ class flstory_state : public driver_device
 {
 public:
 	flstory_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"),
+		m_spriteram(*this, "spriteram"),
+		m_scrlram(*this, "scrlram"),
+		m_workram(*this, "workram"){ }
 
 	/* memory pointers */
-	UINT8 *  m_videoram;
-	UINT8 *  m_workram;
-	UINT8 *  m_scrlram;
-	UINT8 *  m_spriteram;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<UINT8> m_scrlram;
+	required_shared_ptr<UINT8> m_workram;
 //  UINT8 *  m_paletteram;    // currently this uses generic palette handling
 //  UINT8 *  m_paletteram_2;  // currently this uses generic palette handling
-	size_t   m_videoram_size;
-	size_t   m_spriteram_size;
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;

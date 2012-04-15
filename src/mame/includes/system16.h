@@ -5,12 +5,21 @@ class segas1x_bootleg_state : public driver_device
 {
 public:
 	segas1x_bootleg_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_textram(*this, "textram"),
+		m_bg0_tileram(*this, "bg0_tileram"),
+		m_bg1_tileram(*this, "bg1_tileram"),
+		m_tileram(*this, "tileram"),
+		m_goldnaxeb2_bgpage(*this, "gab2_bgpage"),
+		m_goldnaxeb2_fgpage(*this, "gab2_fgpage"){ }
 
-	UINT16 *    m_bg0_tileram;
-	UINT16 *    m_bg1_tileram;
-	UINT16 *    m_textram;
-	UINT16 *    m_tileram;
+	required_shared_ptr<UINT16> m_textram;
+	required_shared_ptr<UINT16> m_bg0_tileram;
+	required_shared_ptr<UINT16> m_bg1_tileram;
+	required_shared_ptr<UINT16> m_tileram;
+	required_shared_ptr<UINT16> m_goldnaxeb2_bgpage;
+	required_shared_ptr<UINT16> m_goldnaxeb2_fgpage;
+
 
 	UINT16 m_coinctrl;
 
@@ -22,9 +31,6 @@ public:
 	int m_beautyb_unkx;
 
 	int m_shinobl_kludge;
-
-	UINT16* m_goldnaxeb2_fgpage;
-	UINT16* m_goldnaxeb2_bgpage;
 
 	int m_eswat_tilebank0;
 

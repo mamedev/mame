@@ -120,7 +120,7 @@ WRITE8_MEMBER(blockade_state::blockade_coin_latch_w)
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, blockade_state )
     AM_RANGE(0x0000, 0x07ff) AM_ROM AM_MIRROR(0x6000)
-    AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(blockade_videoram_w) AM_BASE(m_videoram) AM_MIRROR(0x6c00)
+    AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(blockade_videoram_w) AM_SHARE("videoram") AM_MIRROR(0x6c00)
     AM_RANGE(0x9000, 0x90ff) AM_RAM AM_MIRROR(0x6f00)
 ADDRESS_MAP_END
 

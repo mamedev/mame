@@ -12,17 +12,21 @@ class kickgoal_state : public driver_device
 public:
 	kickgoal_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_adpcm(*this, "oki"),
-		  m_eeprom(*this, "eeprom") { }
+		m_fgram(*this, "fgram"),
+		m_bgram(*this, "bgram"),
+		m_bg2ram(*this, "bg2ram"),
+		m_scrram(*this, "scrram"),
+		m_spriteram(*this, "spriteram"),
+		m_adpcm(*this, "oki"),
+		m_eeprom(*this, "eeprom") { }
 
 	/* memory pointers */
-	UINT16 *    m_fgram;
-	UINT16 *    m_bgram;
-	UINT16 *    m_bg2ram;
-	UINT16 *    m_scrram;
-	UINT16 *    m_spriteram;
+	required_shared_ptr<UINT16> m_fgram;
+	required_shared_ptr<UINT16> m_bgram;
+	required_shared_ptr<UINT16> m_bg2ram;
+	required_shared_ptr<UINT16> m_scrram;
+	required_shared_ptr<UINT16> m_spriteram;
 //      UINT16 *    m_paletteram;    // currently this uses generic palette handling
-	size_t      m_spriteram_size;
 
 	/* video-related */
 	tilemap_t     *m_fgtm;

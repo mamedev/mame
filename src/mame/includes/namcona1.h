@@ -22,11 +22,21 @@ public:
 	namcona1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
-		m_mcu(*this,"mcu")
+		m_mcu(*this,"mcu"),
+		m_videoram(*this,"videoram"),
+		m_spriteram(*this,"spriteram"),
+		m_workram(*this,"workram"),
+		m_vreg(*this,"vreg"),
+		m_scroll(*this,"scroll")
 		{ }
 
-	UINT16 *m_videoram;
-	UINT16 *m_spriteram;
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_mcu;
+	required_shared_ptr<UINT16> m_videoram;
+	required_shared_ptr<UINT16> m_spriteram;
+	required_shared_ptr<UINT16> m_workram;
+	required_shared_ptr<UINT16> m_vreg;
+	required_shared_ptr<UINT16> m_scroll;
 	UINT16 *m_mpBank0;
 	UINT16 *m_mpBank1;
 	int m_mEnableInterrupts;
@@ -39,9 +49,6 @@ public:
 	UINT8 m_mcu_port5;
 	UINT8 m_mcu_port6;
 	UINT8 m_mcu_port8;
-	UINT16 *m_workram;
-	UINT16 *m_vreg;
-	UINT16 *m_scroll;
 	UINT16 *m_shaperam;
 	UINT16 *m_cgram;
 	tilemap_t *m_roz_tilemap;
@@ -52,8 +59,6 @@ public:
 	UINT8 m_mask_data[8];
 	UINT8 m_conv_data[9];
 
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_mcu;
 	DECLARE_READ16_MEMBER(namcona1_nvram_r);
 	DECLARE_WRITE16_MEMBER(namcona1_nvram_w);
 	DECLARE_READ16_MEMBER(custom_key_r);

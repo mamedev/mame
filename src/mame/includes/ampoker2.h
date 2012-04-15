@@ -2,9 +2,10 @@ class ampoker2_state : public driver_device
 {
 public:
 	ampoker2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"){ }
 
-	UINT8 *m_videoram;
+	required_shared_ptr<UINT8> m_videoram;
 	tilemap_t *m_bg_tilemap;
 	DECLARE_WRITE8_MEMBER(ampoker2_port30_w);
 	DECLARE_WRITE8_MEMBER(ampoker2_port31_w);

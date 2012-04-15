@@ -10,11 +10,14 @@ class gaplus_state : public driver_device
 {
 public:
 	gaplus_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_customio_3(*this,"customio_3"),
+		  m_videoram(*this,"videoram"),
+		  m_spriteram(*this,"spriteram") { }
 
-	UINT8 *m_customio_3;
-	UINT8 *m_videoram;
-	UINT8 *m_spriteram;
+	required_shared_ptr<UINT8> m_customio_3;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_spriteram;
 	tilemap_t *m_bg_tilemap;
 	UINT8 m_starfield_control[4];
 	int m_total_stars;

@@ -161,7 +161,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 /*  240-SY   Z|F|CLR|WCH WHICH    SX
     xxxxxxxx x|x|xxx|xxx xxxxxxxx xxxxxxxx
 */
-	for (i = 0;i < state->m_spriteram_size;i += 4)
+	for (i = 0;i < state->m_spriteram.bytes();i += 4)
 	{
 		int attr = src[i+1];
 		int which = src[i+2]+((attr & 0x07)<<8);

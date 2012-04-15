@@ -8,22 +8,36 @@ class tecmosys_state : public driver_device
 {
 public:
 	tecmosys_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_spriteram(*this, "spriteram"),
+		m_tilemap_paletteram16(*this, "tmap_palette"),
+		m_bg2tilemap_ram(*this, "bg2tilemap_ram"),
+		m_bg1tilemap_ram(*this, "bg1tilemap_ram"),
+		m_bg0tilemap_ram(*this, "bg0tilemap_ram"),
+		m_fgtilemap_ram(*this, "fgtilemap_ram"),
+		m_bg0tilemap_lineram(*this, "bg0_lineram"),
+		m_bg1tilemap_lineram(*this, "bg1_lineram"),
+		m_bg2tilemap_lineram(*this, "bg2_lineram"),
+		m_a80000regs(*this, "a80000regs"),
+		m_b00000regs(*this, "b00000regs"),
+		m_c00000regs(*this, "c00000regs"),
+		m_c80000regs(*this, "c80000regs"),
+		m_880000regs(*this, "880000regs"){ }
 
-	UINT16* m_spriteram;
-	UINT16* m_tilemap_paletteram16;
-	UINT16* m_bg2tilemap_ram;
-	UINT16* m_bg1tilemap_ram;
-	UINT16* m_bg0tilemap_ram;
-	UINT16* m_fgtilemap_ram;
-	UINT16* m_bg0tilemap_lineram;
-	UINT16* m_bg1tilemap_lineram;
-	UINT16* m_bg2tilemap_lineram;
-	UINT16* m_a80000regs;
-	UINT16* m_b00000regs;
-	UINT16* m_c00000regs;
-	UINT16* m_c80000regs;
-	UINT16* m_880000regs;
+	required_shared_ptr<UINT16> m_spriteram;
+	required_shared_ptr<UINT16> m_tilemap_paletteram16;
+	required_shared_ptr<UINT16> m_bg2tilemap_ram;
+	required_shared_ptr<UINT16> m_bg1tilemap_ram;
+	required_shared_ptr<UINT16> m_bg0tilemap_ram;
+	required_shared_ptr<UINT16> m_fgtilemap_ram;
+	required_shared_ptr<UINT16> m_bg0tilemap_lineram;
+	required_shared_ptr<UINT16> m_bg1tilemap_lineram;
+	required_shared_ptr<UINT16> m_bg2tilemap_lineram;
+	required_shared_ptr<UINT16> m_a80000regs;
+	required_shared_ptr<UINT16> m_b00000regs;
+	required_shared_ptr<UINT16> m_c00000regs;
+	required_shared_ptr<UINT16> m_c80000regs;
+	required_shared_ptr<UINT16> m_880000regs;
 	int m_spritelist;
 	bitmap_ind16 m_sprite_bitmap;
 	bitmap_ind16 m_tmp_tilemap_composebitmap;

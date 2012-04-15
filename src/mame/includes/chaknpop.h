@@ -7,14 +7,17 @@ class chaknpop_state : public driver_device
 {
 public:
 	chaknpop_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_mcu_ram(*this, "mcu_ram"),
+		m_tx_ram(*this, "tx_ram"),
+		m_attr_ram(*this, "attr_ram"),
+		m_spr_ram(*this, "spr_ram"){ }
 
 	/* memory pointers */
-	UINT8 *  m_mcu_ram;
-	UINT8 *  m_tx_ram;
-	UINT8 *  m_spr_ram;
-	UINT8 *  m_attr_ram;
-	size_t   m_spr_ram_size;
+	required_shared_ptr<UINT8> m_mcu_ram;
+	required_shared_ptr<UINT8> m_tx_ram;
+	required_shared_ptr<UINT8> m_attr_ram;
+	required_shared_ptr<UINT8> m_spr_ram;
 
 	/* mcu-related */
 	UINT8 m_mcu_seed;

@@ -275,8 +275,8 @@ static ADDRESS_MAP_START( moo_map, AS_PROGRAM, 16, moo_state )
 	AM_RANGE(0x0dc002, 0x0dc003) AM_READ_PORT("IN1")
 	AM_RANGE(0x0de000, 0x0de001) AM_READWRITE(control2_r, control2_w)
 	AM_RANGE(0x100000, 0x17ffff) AM_ROM
-	AM_RANGE(0x180000, 0x18ffff) AM_RAM	AM_BASE(m_workram)		/* Work RAM */
-	AM_RANGE(0x190000, 0x19ffff) AM_RAM AM_BASE(m_spriteram)	/* Sprite RAM */
+	AM_RANGE(0x180000, 0x18ffff) AM_RAM	AM_SHARE("workram")		/* Work RAM */
+	AM_RANGE(0x190000, 0x19ffff) AM_RAM AM_SHARE("spriteram")	/* Sprite RAM */
 	AM_RANGE(0x1a0000, 0x1a1fff) AM_DEVREADWRITE_LEGACY("k056832", k056832_ram_word_r, k056832_ram_word_w)	/* Graphic planes */
 	AM_RANGE(0x1a2000, 0x1a3fff) AM_DEVREADWRITE_LEGACY("k056832", k056832_ram_word_r, k056832_ram_word_w)	/* Graphic planes mirror */
 	AM_RANGE(0x1b0000, 0x1b1fff) AM_DEVREAD_LEGACY("k056832", k056832_rom_word_r)	/* Passthrough to tile roms */
@@ -308,8 +308,8 @@ static ADDRESS_MAP_START( moobl_map, AS_PROGRAM, 16, moo_state )
 	AM_RANGE(0x0dc002, 0x0dc003) AM_READ_PORT("IN1")
 	AM_RANGE(0x0de000, 0x0de001) AM_READWRITE(control2_r, control2_w)
 	AM_RANGE(0x100000, 0x17ffff) AM_ROM
-	AM_RANGE(0x180000, 0x18ffff) AM_RAM AM_BASE(m_workram)		 /* Work RAM */
-	AM_RANGE(0x190000, 0x19ffff) AM_RAM AM_BASE(m_spriteram)	 /* Sprite RAM */
+	AM_RANGE(0x180000, 0x18ffff) AM_RAM AM_SHARE("workram")		 /* Work RAM */
+	AM_RANGE(0x190000, 0x19ffff) AM_RAM AM_SHARE("spriteram")	 /* Sprite RAM */
 	AM_RANGE(0x1a0000, 0x1a1fff) AM_DEVREADWRITE_LEGACY("k056832", k056832_ram_word_r, k056832_ram_word_w) /* Graphic planes */
 	AM_RANGE(0x1a2000, 0x1a3fff) AM_DEVREADWRITE_LEGACY("k056832", k056832_ram_word_r, k056832_ram_word_w)	/* Graphic planes mirror */
 	AM_RANGE(0x1b0000, 0x1b1fff) AM_DEVREAD_LEGACY("k056832", k056832_rom_word_r)	/* Passthrough to tile roms */
@@ -319,7 +319,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( bucky_map, AS_PROGRAM, 16, moo_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x08ffff) AM_RAM
-	AM_RANGE(0x090000, 0x09ffff) AM_RAM AM_BASE(m_spriteram)	/* Sprite RAM */
+	AM_RANGE(0x090000, 0x09ffff) AM_RAM AM_SHARE("spriteram")	/* Sprite RAM */
 	AM_RANGE(0x0a0000, 0x0affff) AM_RAM							/* extra sprite RAM? */
 	AM_RANGE(0x0c0000, 0x0c003f) AM_DEVWRITE_LEGACY("k056832", k056832_word_w)
 	AM_RANGE(0x0c2000, 0x0c2007) AM_DEVWRITE_LEGACY("k053246", k053246_word_w)

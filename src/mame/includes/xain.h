@@ -2,7 +2,11 @@ class xain_state : public driver_device
 {
 public:
 	xain_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_charram(*this, "charram"),
+		m_bgram0(*this, "bgram0"),
+		m_bgram1(*this, "bgram1"),
+		m_spriteram(*this, "spriteram"){ }
 
 	int m_vblank;
 	int m_from_main;
@@ -18,9 +22,9 @@ public:
 	UINT8 m_port_c_in;
 	int m_mcu_ready;
 	int m_mcu_accept;
-	UINT8 *m_charram;
-	UINT8 *m_bgram0;
-	UINT8 *m_bgram1;
+	required_shared_ptr<UINT8> m_charram;
+	required_shared_ptr<UINT8> m_bgram0;
+	required_shared_ptr<UINT8> m_bgram1;
 	UINT8 m_pri;
 	tilemap_t *m_char_tilemap;
 	tilemap_t *m_bgram0_tilemap;
@@ -29,8 +33,7 @@ public:
 	UINT8 m_scrollyP0[2];
 	UINT8 m_scrollxP1[2];
 	UINT8 m_scrollyP1[2];
-	UINT8 *m_spriteram;
-	size_t m_spriteram_size;
+	required_shared_ptr<UINT8> m_spriteram;
 	DECLARE_WRITE8_MEMBER(xainCPUA_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(xainCPUB_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(xain_sound_command_w);

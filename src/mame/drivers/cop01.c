@@ -123,9 +123,9 @@ READ8_MEMBER(cop01_state::cop01_sound_irq_ack_w)
 static ADDRESS_MAP_START( cop01_map, AS_PROGRAM, 8, cop01_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM /* c000-c7ff in cop01 */
-	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(cop01_background_w) AM_BASE(m_bgvideoram)
-	AM_RANGE(0xe000, 0xe0ff) AM_WRITEONLY AM_BASE_SIZE(m_spriteram, m_spriteram_size)
-	AM_RANGE(0xf000, 0xf3ff) AM_WRITE(cop01_foreground_w) AM_BASE(m_fgvideoram)
+	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(cop01_background_w) AM_SHARE("bgvideoram")
+	AM_RANGE(0xe000, 0xe0ff) AM_WRITEONLY AM_SHARE("spriteram")
+	AM_RANGE(0xf000, 0xf3ff) AM_WRITE(cop01_foreground_w) AM_SHARE("fgvideoram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( io_map, AS_IO, 8, cop01_state )

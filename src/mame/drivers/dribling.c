@@ -213,9 +213,9 @@ static const ppi8255_interface ppi8255_intf[2] =
 
 static ADDRESS_MAP_START( dribling_map, AS_PROGRAM, 8, dribling_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_BASE(m_videoram)
+	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0x4000, 0x7fff) AM_ROM
-	AM_RANGE(0xc000, 0xdfff) AM_RAM_WRITE(dribling_colorram_w) AM_BASE(m_colorram)
+	AM_RANGE(0xc000, 0xdfff) AM_RAM_WRITE(dribling_colorram_w) AM_SHARE("colorram")
 ADDRESS_MAP_END
 
 

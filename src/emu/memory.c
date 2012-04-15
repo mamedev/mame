@@ -178,10 +178,6 @@
         specify the share 'tag' will use its memory as backing for all
         future buckets that specify AM_SHARE with the same 'tag'.
 
-    AM_BASE(base)
-        Specifies a pointer to a pointer to the base of the memory backing
-        the current bucket.
-
 ***************************************************************************/
 
 #include <list>

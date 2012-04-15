@@ -571,7 +571,7 @@ static READ8_DEVICE_HANDLER( gfx_rom_r )
  *************************************/
 
 static ADDRESS_MAP_START( spiders_main_map, AS_PROGRAM, 8, spiders_state )
-	AM_RANGE(0x0000, 0xbfff) AM_RAM AM_BASE(m_ram)
+	AM_RANGE(0x0000, 0xbfff) AM_RAM AM_SHARE("ram")
 	AM_RANGE(0xc000, 0xc000) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0xc001, 0xc001) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
 	AM_RANGE(0xc020, 0xc027) AM_RAM AM_SHARE("nvram")

@@ -104,7 +104,7 @@ SCREEN_UPDATE_IND16( finalizr )
 		UINT8 *sr = state->m_spriterambank ? state->m_spriteram_2 : state->m_spriteram;
 
 
-		for (offs = 0; offs <= state->m_spriteram_size - 5; offs += 5)
+		for (offs = 0; offs <= state->m_spriteram.bytes() - 5; offs += 5)
 		{
 			int sx, sy, flipx, flipy, code, color, size;
 

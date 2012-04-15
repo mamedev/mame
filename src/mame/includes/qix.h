@@ -23,23 +23,30 @@ class qix_state : public driver_device
 {
 public:
 	qix_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_68705_port_out(*this, "68705_port_out"),
+		m_68705_ddr(*this, "68705_ddr"),
+		m_videoram(*this, "videoram"),
+		m_videoram_address(*this, "videoram_addr"),
+		m_videoram_mask(*this, "videoram_mask"),
+		m_paletteram(*this, "paletteram"),
+		m_scanline_latch(*this, "scanline_latch") { }
 
 	/* machine state */
-	UINT8 *m_68705_port_out;
-	UINT8 *m_68705_ddr;
+	required_shared_ptr<UINT8> m_68705_port_out;
+	required_shared_ptr<UINT8> m_68705_ddr;
 	UINT8  m_68705_port_in[3];
 	UINT8  m_coinctrl;
 
 	/* video state */
-	UINT8 *m_videoram;
-	UINT8 *m_videoram_address;
-	UINT8 *m_videoram_mask;
-	UINT8 *m_paletteram;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_videoram_address;
+	optional_shared_ptr<UINT8> m_videoram_mask;
+	required_shared_ptr<UINT8> m_paletteram;
 	UINT8  m_flip;
 	UINT8  m_palette_bank;
 	UINT8  m_leds;
-	UINT8 *m_scanline_latch;
+	required_shared_ptr<UINT8> m_scanline_latch;
 	pen_t m_pens[NUM_PENS];
 	DECLARE_WRITE8_MEMBER(zookeep_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(qix_data_firq_w);

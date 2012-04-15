@@ -2,11 +2,14 @@ class pitnrun_state : public driver_device
 {
 public:
 	pitnrun_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"),
+		m_videoram2(*this, "videoram2"),
+		m_spriteram(*this, "spriteram"){ }
 
-	UINT8 *m_videoram;
+	required_shared_ptr<UINT8> m_videoram;
 	int m_nmi;
-	UINT8* m_videoram2;
+	required_shared_ptr<UINT8> m_videoram2;
 	UINT8 m_fromz80;
 	UINT8 m_toz80;
 	int m_zaccept;
@@ -23,8 +26,7 @@ public:
 	bitmap_ind16 *m_tmp_bitmap[4];
 	tilemap_t *m_bg;
 	tilemap_t *m_fg;
-	UINT8 *m_spriteram;
-	size_t m_spriteram_size;
+	required_shared_ptr<UINT8> m_spriteram;
 	DECLARE_WRITE8_MEMBER(nmi_enable_w);
 	DECLARE_WRITE8_MEMBER(pitnrun_hflip_w);
 	DECLARE_WRITE8_MEMBER(pitnrun_vflip_w);

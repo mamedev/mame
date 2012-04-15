@@ -165,7 +165,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 	gsword_state *state = machine.driver_data<gsword_state>();
 	int offs;
 
-	for (offs = 0; offs < state->m_spritexy_size - 1; offs+=2)
+	for (offs = 0; offs < state->m_spritexy_ram.bytes() - 1; offs+=2)
 	{
 		int sx,sy,flipx,flipy,spritebank,tile,color;
 

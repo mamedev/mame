@@ -12,12 +12,15 @@ class poolshrk_state : public driver_device
 {
 public:
 	poolshrk_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_playfield_ram(*this, "playfield_ram"),
+		m_hpos_ram(*this, "hpos_ram"),
+		m_vpos_ram(*this, "vpos_ram"){ }
 
 	int m_da_latch;
-	UINT8* m_playfield_ram;
-	UINT8* m_hpos_ram;
-	UINT8* m_vpos_ram;
+	required_shared_ptr<UINT8> m_playfield_ram;
+	required_shared_ptr<UINT8> m_hpos_ram;
+	required_shared_ptr<UINT8> m_vpos_ram;
 	tilemap_t* m_bg_tilemap;
 	DECLARE_WRITE8_MEMBER(poolshrk_da_latch_w);
 	DECLARE_WRITE8_MEMBER(poolshrk_led_w);

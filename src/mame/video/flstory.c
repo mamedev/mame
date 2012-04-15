@@ -172,7 +172,7 @@ static void flstory_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap
 
 	for (i = 0; i < 0x20; i++)
 	{
-		int pr = state->m_spriteram[state->m_spriteram_size - 1 - i];
+		int pr = state->m_spriteram[state->m_spriteram.bytes() - 1 - i];
 		int offs = (pr & 0x1f) * 4;
 
 		if ((pr & 0x80) == pri)
@@ -229,7 +229,7 @@ static void victnine_draw_sprites( running_machine &machine, bitmap_ind16 &bitma
 
 	for (i = 0; i < 0x20; i++)
 	{
-		int pr = state->m_spriteram[state->m_spriteram_size - 1 - i];
+		int pr = state->m_spriteram[state->m_spriteram.bytes() - 1 - i];
 		int offs = (pr & 0x1f) * 4;
 
 		//if ((pr & 0x80) == pri)

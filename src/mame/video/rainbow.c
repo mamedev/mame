@@ -105,7 +105,7 @@ SCREEN_UPDATE_IND16( jumping )
 	pc080sn_tilemap_draw(state->m_pc080sn, bitmap, cliprect, layer[0], TILEMAP_DRAW_OPAQUE, 0);
 
 	/* Draw the sprites. 128 sprites in total */
-	for (offs = state->m_spriteram_size / 2 - 8; offs >= 0; offs -= 8)
+	for (offs = state->m_spriteram.bytes() / 2 - 8; offs >= 0; offs -= 8)
 	{
 		int tile = spriteram[offs];
 		if (tile < screen.machine().gfx[1]->total_elements)

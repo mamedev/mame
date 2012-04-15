@@ -2,13 +2,19 @@ class tecmo16_state : public driver_device
 {
 public:
 	tecmo16_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"),
+		m_colorram(*this, "colorram"),
+		m_videoram2(*this, "videoram2"),
+		m_colorram2(*this, "colorram2"),
+		m_charram(*this, "charram"),
+		m_spriteram(*this, "spriteram"){ }
 
-	UINT16 *m_videoram;
-	UINT16 *m_colorram;
-	UINT16 *m_videoram2;
-	UINT16 *m_colorram2;
-	UINT16 *m_charram;
+	required_shared_ptr<UINT16> m_videoram;
+	required_shared_ptr<UINT16> m_colorram;
+	required_shared_ptr<UINT16> m_videoram2;
+	required_shared_ptr<UINT16> m_colorram2;
+	required_shared_ptr<UINT16> m_charram;
 	tilemap_t *m_fg_tilemap;
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_tx_tilemap;
@@ -23,8 +29,7 @@ public:
 	UINT16 m_scroll2_y_w;
 	UINT16 m_scroll_char_x_w;
 	UINT16 m_scroll_char_y_w;
-	UINT16 *m_spriteram;
-	size_t m_spriteram_size;
+	required_shared_ptr<UINT16> m_spriteram;
 	DECLARE_WRITE16_MEMBER(tecmo16_sound_command_w);
 	DECLARE_WRITE16_MEMBER(tecmo16_videoram_w);
 	DECLARE_WRITE16_MEMBER(tecmo16_colorram_w);

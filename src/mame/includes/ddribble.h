@@ -8,16 +8,23 @@ class ddribble_state : public driver_device
 {
 public:
 	ddribble_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_paletteram(*this, "paletteram"),
+		m_fg_videoram(*this, "fg_videoram"),
+		m_spriteram_1(*this, "spriteram_1"),
+		m_sharedram(*this, "sharedram"),
+		m_bg_videoram(*this, "bg_videoram"),
+		m_spriteram_2(*this, "spriteram_2"),
+		m_snd_sharedram(*this, "snd_sharedram"){ }
 
 	/* memory pointers */
-	UINT8 *     m_sharedram;
-	UINT8 *     m_snd_sharedram;
-	UINT8 *     m_spriteram_1;
-	UINT8 *     m_spriteram_2;
-	UINT8 *     m_bg_videoram;
-	UINT8 *     m_fg_videoram;
-	UINT8 *     m_paletteram;
+	required_shared_ptr<UINT8> m_paletteram;
+	required_shared_ptr<UINT8> m_fg_videoram;
+	required_shared_ptr<UINT8> m_spriteram_1;
+	required_shared_ptr<UINT8> m_sharedram;
+	required_shared_ptr<UINT8> m_bg_videoram;
+	required_shared_ptr<UINT8> m_spriteram_2;
+	required_shared_ptr<UINT8> m_snd_sharedram;
 
 	/* video-related */
 	tilemap_t     *m_fg_tilemap;

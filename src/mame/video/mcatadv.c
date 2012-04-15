@@ -54,7 +54,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 {
 	mcatadv_state *state = machine.driver_data<mcatadv_state>();
 	UINT16 *source = state->m_spriteram_old;
-	UINT16 *finish = source + (state->m_spriteram_size / 2) /2;
+	UINT16 *finish = source + (state->m_spriteram.bytes() / 2) /2;
 	int global_x = state->m_vidregs[0] - 0x184;
 	int global_y = state->m_vidregs[1] - 0x1f1;
 
@@ -68,8 +68,8 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 
 	if (state->m_vidregs_old[2] == 0x0001) /* Double Buffered */
 	{
-		source += (state->m_spriteram_size / 2) / 2;
-		finish += (state->m_spriteram_size / 2) / 2;
+		source += (state->m_spriteram.bytes() / 2) / 2;
+		finish += (state->m_spriteram.bytes() / 2) / 2;
 	}
 	else if (state->m_vidregs_old[2]) /* I suppose it's possible that there is 4 banks, haven't seen it used though */
 	{
@@ -259,13 +259,13 @@ VIDEO_START( mcatadv )
 	state->m_tilemap2 = tilemap_create(machine, get_mcatadv_tile_info2, tilemap_scan_rows, 16, 16, 32, 32);
 	state->m_tilemap2->set_transparent_pen(0);
 
-	state->m_spriteram_old = auto_alloc_array_clear(machine, UINT16, state->m_spriteram_size / 2);
+	state->m_spriteram_old = auto_alloc_array_clear(machine, UINT16, state->m_spriteram.bytes() / 2);
 	state->m_vidregs_old = auto_alloc_array(machine, UINT16, (0x0f + 1) / 2);
 
 	state->m_palette_bank1 = 0;
 	state->m_palette_bank2 = 0;
 
-	state->save_pointer(NAME(state->m_spriteram_old), state->m_spriteram_size / 2);
+	state->save_pointer(NAME(state->m_spriteram_old), state->m_spriteram.bytes() / 2);
 	state->save_pointer(NAME(state->m_vidregs_old), (0x0f + 1) / 2);
 }
 
@@ -275,7 +275,7 @@ SCREEN_VBLANK( mcatadv )
 	if (vblank_on)
 	{
 		mcatadv_state *state = screen.machine().driver_data<mcatadv_state>();
-		memcpy(state->m_spriteram_old, state->m_spriteram, state->m_spriteram_size);
+		memcpy(state->m_spriteram_old, state->m_spriteram, state->m_spriteram.bytes());
 		memcpy(state->m_vidregs_old, state->m_vidregs, 0xf);
 	}
 }

@@ -222,9 +222,9 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, atarig1_state )
 /*  AM_RANGE(0xfe0000, 0xfe7fff) AM_READ_LEGACY(from_r)*/
 	AM_RANGE(0xfe8000, 0xfe89ff) AM_RAM_WRITE_LEGACY(atarigen_666_paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0xff0000, 0xff0fff) AM_DEVREADWRITE_LEGACY("rle", atarirle_spriteram_r, atarirle_spriteram_w)
-	AM_RANGE(0xff2000, 0xff2001) AM_WRITE(mo_command_w) AM_BASE(m_mo_command)
-	AM_RANGE(0xff4000, 0xff5fff) AM_WRITE_LEGACY(atarigen_playfield_w) AM_BASE(m_playfield)
-	AM_RANGE(0xff6000, 0xff6fff) AM_WRITE_LEGACY(atarigen_alpha_w) AM_BASE(m_alpha)
+	AM_RANGE(0xff2000, 0xff2001) AM_WRITE(mo_command_w) AM_SHARE("mo_command")
+	AM_RANGE(0xff4000, 0xff5fff) AM_WRITE_LEGACY(atarigen_playfield_w) AM_SHARE("playfield")
+	AM_RANGE(0xff6000, 0xff6fff) AM_WRITE_LEGACY(atarigen_alpha_w) AM_SHARE("alpha")
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 

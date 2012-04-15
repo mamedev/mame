@@ -102,9 +102,9 @@ WRITE8_MEMBER(sprcros2_state::sprcros2_s_port3_w)
 static ADDRESS_MAP_START( sprcros2_master_map, AS_PROGRAM, 8, sprcros2_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(sprcros2_fgvideoram_w) AM_BASE(m_fgvideoram)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(sprcros2_fgvideoram_w) AM_SHARE("fgvideoram")
 	AM_RANGE(0xe800, 0xe817) AM_RAM						//always zero
-	AM_RANGE(0xe818, 0xe83f) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
+	AM_RANGE(0xe818, 0xe83f) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xe840, 0xefff) AM_RAM						//always zero
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("share1")			//shared with slave cpu
@@ -123,7 +123,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sprcros2_slave_map, AS_PROGRAM, 8, sprcros2_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK("bank2")
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(sprcros2_bgvideoram_w) AM_BASE(m_bgvideoram)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(sprcros2_bgvideoram_w) AM_SHARE("bgvideoram")
 	AM_RANGE(0xe800, 0xefff) AM_RAM						//always zero
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("share1")

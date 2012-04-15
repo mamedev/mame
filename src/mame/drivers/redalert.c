@@ -152,15 +152,15 @@ READ8_MEMBER(redalert_state::panther_unk_r)
 
 static ADDRESS_MAP_START( redalert_main_map, AS_PROGRAM, 8, redalert_state )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x3fff) AM_RAM_WRITE(redalert_bitmap_videoram_w) AM_BASE(m_bitmap_videoram)
-	AM_RANGE(0x4000, 0x4fff) AM_RAM AM_BASE(m_charmap_videoram)
+	AM_RANGE(0x2000, 0x3fff) AM_RAM_WRITE(redalert_bitmap_videoram_w) AM_SHARE("bitmap_videoram")
+	AM_RANGE(0x4000, 0x4fff) AM_RAM AM_SHARE("charram")
 	AM_RANGE(0x5000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0x0f8f) AM_READ_PORT("C000") AM_WRITENOP
 	AM_RANGE(0xc010, 0xc010) AM_MIRROR(0x0f8f) AM_READ_PORT("C010") AM_WRITENOP
 	AM_RANGE(0xc020, 0xc020) AM_MIRROR(0x0f8f) AM_READ_PORT("C020") AM_WRITENOP
 	AM_RANGE(0xc030, 0xc030) AM_MIRROR(0x0f8f) AM_READNOP AM_WRITE(redalert_audio_command_w)
-	AM_RANGE(0xc040, 0xc040) AM_MIRROR(0x0f8f) AM_READNOP AM_WRITEONLY AM_BASE(m_video_control)
-	AM_RANGE(0xc050, 0xc050) AM_MIRROR(0x0f8f) AM_READNOP AM_WRITEONLY AM_BASE(m_bitmap_color)
+	AM_RANGE(0xc040, 0xc040) AM_MIRROR(0x0f8f) AM_READNOP AM_WRITEONLY AM_SHARE("video_control")
+	AM_RANGE(0xc050, 0xc050) AM_MIRROR(0x0f8f) AM_READNOP AM_WRITEONLY AM_SHARE("bitmap_color")
 	AM_RANGE(0xc060, 0xc060) AM_MIRROR(0x0f8f) AM_READNOP AM_WRITE(redalert_voice_command_w)
 	AM_RANGE(0xc070, 0xc070) AM_MIRROR(0x0f8f) AM_READWRITE(redalert_interrupt_clear_r, redalert_interrupt_clear_w)
 	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION("maincpu", 0x8000)
@@ -168,45 +168,45 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ww3_main_map, AS_PROGRAM, 8, redalert_state )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x3fff) AM_RAM_WRITE(redalert_bitmap_videoram_w) AM_BASE(m_bitmap_videoram)
-	AM_RANGE(0x4000, 0x4fff) AM_RAM AM_BASE(m_charmap_videoram)
+	AM_RANGE(0x2000, 0x3fff) AM_RAM_WRITE(redalert_bitmap_videoram_w) AM_SHARE("bitmap_videoram")
+	AM_RANGE(0x4000, 0x4fff) AM_RAM AM_SHARE("charram")
 	AM_RANGE(0x5000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0x0f8f) AM_READ_PORT("C000") AM_WRITENOP
 	AM_RANGE(0xc010, 0xc010) AM_MIRROR(0x0f8f) AM_READ_PORT("C010") AM_WRITENOP
 	AM_RANGE(0xc020, 0xc020) AM_MIRROR(0x0f8f) AM_READ_PORT("C020") AM_WRITENOP
 	AM_RANGE(0xc030, 0xc030) AM_MIRROR(0x0f8f) AM_READNOP AM_WRITE(redalert_audio_command_w)
-	AM_RANGE(0xc040, 0xc040) AM_MIRROR(0x0f8f) AM_READNOP AM_WRITEONLY AM_BASE(m_video_control)
-	AM_RANGE(0xc050, 0xc050) AM_MIRROR(0x0f8f) AM_READNOP AM_WRITEONLY AM_BASE(m_bitmap_color)
+	AM_RANGE(0xc040, 0xc040) AM_MIRROR(0x0f8f) AM_READNOP AM_WRITEONLY AM_SHARE("video_control")
+	AM_RANGE(0xc050, 0xc050) AM_MIRROR(0x0f8f) AM_READNOP AM_WRITEONLY AM_SHARE("bitmap_color")
 	AM_RANGE(0xc070, 0xc070) AM_MIRROR(0x0f8f) AM_READWRITE(redalert_interrupt_clear_r, redalert_interrupt_clear_w)
 	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION("maincpu", 0x8000)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( panther_main_map, AS_PROGRAM, 8, redalert_state )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x3fff) AM_RAM_WRITE(redalert_bitmap_videoram_w) AM_BASE(m_bitmap_videoram)
-	AM_RANGE(0x4000, 0x4fff) AM_RAM AM_BASE(m_charmap_videoram)
+	AM_RANGE(0x2000, 0x3fff) AM_RAM_WRITE(redalert_bitmap_videoram_w) AM_SHARE("bitmap_videoram")
+	AM_RANGE(0x4000, 0x4fff) AM_RAM AM_SHARE("charram")
 	AM_RANGE(0x5000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0x0f8f) AM_READ_PORT("C000") AM_WRITENOP
 	AM_RANGE(0xc010, 0xc010) AM_MIRROR(0x0f8f) AM_READ_PORT("C010") AM_WRITENOP
 	AM_RANGE(0xc020, 0xc020) AM_MIRROR(0x0f8f) AM_READ(panther_unk_r) /* vblank? */
 	AM_RANGE(0xc030, 0xc030) AM_MIRROR(0x0f8f) AM_READNOP AM_WRITE(redalert_audio_command_w)
-	AM_RANGE(0xc040, 0xc040) AM_MIRROR(0x0f8f) AM_READNOP AM_WRITEONLY AM_BASE(m_video_control)
-	AM_RANGE(0xc050, 0xc050) AM_MIRROR(0x0f8f) AM_READNOP AM_WRITEONLY AM_BASE(m_bitmap_color)
+	AM_RANGE(0xc040, 0xc040) AM_MIRROR(0x0f8f) AM_READNOP AM_WRITEONLY AM_SHARE("video_control")
+	AM_RANGE(0xc050, 0xc050) AM_MIRROR(0x0f8f) AM_READNOP AM_WRITEONLY AM_SHARE("bitmap_color")
 	AM_RANGE(0xc070, 0xc070) AM_MIRROR(0x0f8f) AM_READWRITE(panther_interrupt_clear_r, redalert_interrupt_clear_w)
 	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION("maincpu", 0x8000)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( demoneye_main_map, AS_PROGRAM, 8, redalert_state )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x3fff) AM_RAM_WRITE(redalert_bitmap_videoram_w) AM_BASE(m_bitmap_videoram)
-	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_BASE(m_charmap_videoram)
+	AM_RANGE(0x2000, 0x3fff) AM_RAM_WRITE(redalert_bitmap_videoram_w) AM_SHARE("bitmap_videoram")
+	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_SHARE("charram")
 	AM_RANGE(0x6000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0x0f8f) AM_READ_PORT("C000") AM_WRITENOP
 	AM_RANGE(0xc010, 0xc010) AM_MIRROR(0x0f8f) AM_READ_PORT("C010") AM_WRITENOP
 	AM_RANGE(0xc020, 0xc020) AM_MIRROR(0x0f8f) AM_READ_PORT("C020") AM_WRITENOP
 	AM_RANGE(0xc030, 0xc030) AM_MIRROR(0x0f8f) AM_READNOP AM_WRITE(demoneye_audio_command_w)
-	AM_RANGE(0xc040, 0xc040) AM_MIRROR(0x0f8f) AM_READNOP AM_WRITEONLY AM_BASE(m_video_control)
-	AM_RANGE(0xc050, 0xc050) AM_MIRROR(0x0f8f) AM_READNOP AM_WRITEONLY AM_BASE(m_bitmap_color)
+	AM_RANGE(0xc040, 0xc040) AM_MIRROR(0x0f8f) AM_READNOP AM_WRITEONLY AM_SHARE("video_control")
+	AM_RANGE(0xc050, 0xc050) AM_MIRROR(0x0f8f) AM_READNOP AM_WRITEONLY AM_SHARE("bitmap_color")
 	AM_RANGE(0xc060, 0xc060) AM_MIRROR(0x0f80) AM_NOP	/* unknown */
 	AM_RANGE(0xc061, 0xc061) AM_MIRROR(0x0f80) AM_NOP	/* unknown */
 	AM_RANGE(0xc062, 0xc062) AM_MIRROR(0x0f80) AM_NOP	/* unknown */

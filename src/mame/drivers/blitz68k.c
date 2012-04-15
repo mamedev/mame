@@ -44,20 +44,28 @@ public:
 	blitz68k_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		  m_nvram(*this, "nvram"),
+		  m_frame_buffer(*this, "frame_buffer"),
+		  m_blit_romaddr(*this, "blit_romaddr"),
+		  m_blit_attr1_ram(*this, "blit_attr1_ram"),
+		  m_blit_dst_ram_loword(*this, "blitram_loword"),
+		  m_blit_attr2_ram(*this, "blit_attr2_ram"),
+		  m_blit_dst_ram_hiword(*this, "blitram_hiword"),
+		  m_blit_vregs(*this, "blit_vregs"),
+		  m_blit_transpen(*this, "blit_transpen"),
 		  m_leds0(*this, "leds0"),
 		  m_leds1(*this, "leds1"),
 		  m_leds2(*this, "leds2") { }
 
 	optional_shared_ptr<UINT16>	m_nvram;
 	UINT8 *m_blit_buffer;
-	UINT16 *m_frame_buffer;
-	UINT16 *m_blit_romaddr;
-	UINT16 *m_blit_attr1_ram;
-	UINT16 *m_blit_dst_ram_loword;
-	UINT16 *m_blit_attr2_ram;
-	UINT16 *m_blit_dst_ram_hiword;
-	UINT16 *m_blit_vregs;
-	UINT16 *m_blit_transpen;
+	required_shared_ptr<UINT16> m_frame_buffer;
+	required_shared_ptr<UINT16> m_blit_romaddr;
+	required_shared_ptr<UINT16> m_blit_attr1_ram;
+	required_shared_ptr<UINT16> m_blit_dst_ram_loword;
+	required_shared_ptr<UINT16> m_blit_attr2_ram;
+	required_shared_ptr<UINT16> m_blit_dst_ram_hiword;
+	required_shared_ptr<UINT16> m_blit_vregs;
+	required_shared_ptr<UINT16> m_blit_transpen;
 	optional_shared_ptr<UINT16> m_leds0;
 	optional_shared_ptr<UINT16> m_leds1;
 	optional_shared_ptr<UINT16> m_leds2;
@@ -568,13 +576,13 @@ static ADDRESS_MAP_START( ilpag_map, AS_PROGRAM, 16, blitz68k_state )
 	AM_RANGE(0x900000, 0x900001) AM_DEVWRITE8("ramdac",ramdac_device, index_w, 0xff00 )
 	AM_RANGE(0x900002, 0x900003) AM_DEVWRITE8("ramdac",ramdac_device, pal_w, 0xff00 )
 	AM_RANGE(0x900004, 0x900005) AM_DEVWRITE8("ramdac",ramdac_device, mask_w, 0xff00 )
-	AM_RANGE(0x980000, 0x98000f) AM_RAM AM_BASE(m_blit_transpen) //video registers for the blitter write
-	AM_RANGE(0x990000, 0x990007) AM_RAM AM_BASE(m_blit_vregs) //pens
-	AM_RANGE(0x998000, 0x998001) AM_RAM AM_BASE(m_blit_romaddr)
-	AM_RANGE(0x9a0000, 0x9a0001) AM_RAM AM_BASE(m_blit_attr1_ram)
-	AM_RANGE(0x9a8000, 0x9a8001) AM_RAM AM_BASE(m_blit_dst_ram_loword)
-	AM_RANGE(0x9b0000, 0x9b0001) AM_RAM AM_BASE(m_blit_attr2_ram)
-	AM_RANGE(0x9b8000, 0x9b8001) AM_RAM_WRITE(blit_copy_w ) AM_BASE(m_blit_dst_ram_hiword)
+	AM_RANGE(0x980000, 0x98000f) AM_RAM AM_SHARE("blit_transpen") //video registers for the blitter write
+	AM_RANGE(0x990000, 0x990007) AM_RAM AM_SHARE("blit_vregs") //pens
+	AM_RANGE(0x998000, 0x998001) AM_RAM AM_SHARE("blit_romaddr")
+	AM_RANGE(0x9a0000, 0x9a0001) AM_RAM AM_SHARE("blit_attr1_ram")
+	AM_RANGE(0x9a8000, 0x9a8001) AM_RAM AM_SHARE("blitram_loword")
+	AM_RANGE(0x9b0000, 0x9b0001) AM_RAM AM_SHARE("blit_attr2_ram")
+	AM_RANGE(0x9b8000, 0x9b8001) AM_RAM_WRITE(blit_copy_w ) AM_SHARE("blitram_hiword")
 	AM_RANGE(0x9e0000, 0x9e0001) AM_READ(blitter_status_r)
 
 	AM_RANGE(0xc00000, 0xc00001) AM_WRITE(lamps_w)
@@ -598,13 +606,13 @@ static ADDRESS_MAP_START( steaser_map, AS_PROGRAM, 16, blitz68k_state )
 	AM_RANGE(0x900002, 0x900003) AM_DEVWRITE8("ramdac",ramdac_device, pal_w, 0xff00 )
 	AM_RANGE(0x900004, 0x900005) AM_DEVWRITE8("ramdac",ramdac_device, mask_w, 0xff00 )
 	AM_RANGE(0x940000, 0x940001) AM_WRITENOP //? Seems a dword write for some read, written consecutively
-	AM_RANGE(0x980000, 0x98000f) AM_RAM AM_BASE(m_blit_transpen)//probably transparency pens
-	AM_RANGE(0x990000, 0x990005) AM_RAM AM_BASE(m_blit_vregs)
-	AM_RANGE(0x998000, 0x998001) AM_RAM AM_BASE(m_blit_romaddr)
-	AM_RANGE(0x9a0000, 0x9a0001) AM_RAM AM_BASE(m_blit_attr1_ram)
-	AM_RANGE(0x9a8000, 0x9a8001) AM_RAM AM_BASE(m_blit_dst_ram_loword)
-	AM_RANGE(0x9b0000, 0x9b0001) AM_RAM AM_BASE(m_blit_attr2_ram)
-	AM_RANGE(0x9b8000, 0x9b8001) AM_RAM_WRITE(blit_copy_w ) AM_BASE(m_blit_dst_ram_hiword)
+	AM_RANGE(0x980000, 0x98000f) AM_RAM AM_SHARE("blit_transpen")//probably transparency pens
+	AM_RANGE(0x990000, 0x990005) AM_RAM AM_SHARE("blit_vregs")
+	AM_RANGE(0x998000, 0x998001) AM_RAM AM_SHARE("blit_romaddr")
+	AM_RANGE(0x9a0000, 0x9a0001) AM_RAM AM_SHARE("blit_attr1_ram")
+	AM_RANGE(0x9a8000, 0x9a8001) AM_RAM AM_SHARE("blitram_loword")
+	AM_RANGE(0x9b0000, 0x9b0001) AM_RAM AM_SHARE("blit_attr2_ram")
+	AM_RANGE(0x9b8000, 0x9b8001) AM_RAM_WRITE(blit_copy_w ) AM_SHARE("blitram_hiword")
 	AM_RANGE(0x9c0002, 0x9c0003) AM_READNOP //pen control?
 	AM_RANGE(0x9d0000, 0x9d0001) AM_READNOP //?
 	AM_RANGE(0x9e0000, 0x9e0001) AM_READ(blitter_status_r)
@@ -1234,7 +1242,7 @@ static ADDRESS_MAP_START( maxidbl_map, AS_PROGRAM, 16, blitz68k_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
 
-	AM_RANGE(0x400000, 0x40ffff) AM_RAM AM_BASE(m_frame_buffer)
+	AM_RANGE(0x400000, 0x40ffff) AM_RAM AM_SHARE("frame_buffer")
 
 	AM_RANGE(0x30000c, 0x30000d) AM_WRITENOP	// 0->1 (IRQ3 ack.?)
 	AM_RANGE(0x30000e, 0x30000f) AM_WRITENOP	// 1->0 (MCU related?)

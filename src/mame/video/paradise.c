@@ -190,7 +190,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	paradise_state *state = machine.driver_data<paradise_state>();
 	UINT8 *spriteram = state->m_spriteram;
 	int i;
-	for (i = 0; i < state->m_spriteram_size ; i += state->m_sprite_inc)
+	for (i = 0; i < state->m_spriteram.bytes() ; i += state->m_sprite_inc)
 	{
 		int code = spriteram[i + 0];
 		int x    = spriteram[i + 1];

@@ -2,16 +2,21 @@ class fortyl_state : public driver_device
 {
 public:
 	fortyl_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"),
+		m_video_ctrl(*this, "video_ctrl"),
+		m_spriteram(*this, "spriteram"),
+		m_colorram(*this, "colorram"),
+		m_spriteram2(*this, "spriteram2"),
+		m_mcu_ram(*this, "mcu_ram"){ }
 
 	/* memory pointers */
-	UINT8 *     m_videoram;
-	UINT8 *     m_colorram;
-	UINT8 *     m_spriteram;
-	UINT8 *     m_spriteram2;
-	UINT8 *     m_video_ctrl;
-	size_t      m_spriteram_size;
-	size_t      m_spriteram2_size;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_video_ctrl;
+	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<UINT8> m_colorram;
+	required_shared_ptr<UINT8> m_spriteram2;
+	required_shared_ptr<UINT8> m_mcu_ram;
 
 	/* video-related */
 	bitmap_ind16    *m_tmp_bitmap1;
@@ -31,7 +36,6 @@ public:
 	int			m_pending_nmi;
 
 	/* fake mcu */
-	UINT8 *     m_mcu_ram;
 	UINT8       m_from_mcu;
 	int         m_mcu_sent;
 	int			m_main_sent;

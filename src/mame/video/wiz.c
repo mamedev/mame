@@ -180,7 +180,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,
 	wiz_state *state = machine.driver_data<wiz_state>();
 	int offs;
 
-	for (offs = state->m_spriteram_size - 4;offs >= 0;offs -= 4)
+	for (offs = state->m_spriteram.bytes() - 4;offs >= 0;offs -= 4)
 	{
 		int sx,sy;
 

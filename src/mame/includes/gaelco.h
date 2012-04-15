@@ -8,13 +8,17 @@ class gaelco_state : public driver_device
 {
 public:
 	gaelco_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"),
+		m_vregs(*this, "vregs"),
+		m_spriteram(*this, "spriteram"),
+		m_screen(*this, "screen"){ }
 
 	/* memory pointers */
-	UINT16 *     m_videoram;
-	UINT16 *     m_spriteram;
-	UINT16 *     m_vregs;
-	UINT16 *     m_screen;
+	required_shared_ptr<UINT16> m_videoram;
+	required_shared_ptr<UINT16> m_vregs;
+	required_shared_ptr<UINT16> m_spriteram;
+	required_shared_ptr<UINT16> m_screen;
 //  UINT16 *     paletteram;    // currently this uses generic palette handling
 
 	/* video-related */

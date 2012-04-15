@@ -273,7 +273,7 @@ static ADDRESS_MAP_START( livequiz_map, AS_PROGRAM, 16, midas_state )
 
 	AM_RANGE(0x9a0000, 0x9a0001) AM_DEVWRITE_LEGACY("eeprom", midas_eeprom_w )
 
-	AM_RANGE(0x9c0000, 0x9c0005) AM_WRITE(midas_gfxregs_w ) AM_BASE(m_gfxregs )
+	AM_RANGE(0x9c0000, 0x9c0005) AM_WRITE(midas_gfxregs_w ) AM_SHARE("gfxregs")
 
 	AM_RANGE(0xa00000, 0xa3ffff) AM_RAM_WRITE(paletteram_xrgb_word_be_w ) AM_SHARE("paletteram")
 	AM_RANGE(0xa40000, 0xa7ffff) AM_RAM
@@ -352,7 +352,7 @@ static ADDRESS_MAP_START( hammer_map, AS_PROGRAM, 16, midas_state )
 
 	AM_RANGE(0x9a0000, 0x9a0001) AM_DEVWRITE_LEGACY("eeprom", midas_eeprom_w )
 
-	AM_RANGE(0x9c0000, 0x9c0005) AM_WRITE(midas_gfxregs_w ) AM_BASE(m_gfxregs )
+	AM_RANGE(0x9c0000, 0x9c0005) AM_WRITE(midas_gfxregs_w ) AM_SHARE("gfxregs")
 
 	AM_RANGE(0xa00000, 0xa3ffff) AM_RAM_WRITE(paletteram_xrgb_word_be_w ) AM_SHARE("paletteram")
 	AM_RANGE(0xa40000, 0xa7ffff) AM_RAM

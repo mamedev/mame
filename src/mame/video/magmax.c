@@ -174,7 +174,7 @@ SCREEN_UPDATE_IND16( magmax )
 	}
 
 	/* draw the sprites */
-	for (offs = 0; offs < state->m_spriteram_size/2; offs += 4)
+	for (offs = 0; offs < state->m_spriteram.bytes()/2; offs += 4)
 	{
 		int sx, sy;
 

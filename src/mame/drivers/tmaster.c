@@ -122,8 +122,7 @@ public:
 	tmaster_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
-		m_microtouch(*this,"microtouch")
-		,
+		m_microtouch(*this,"microtouch"),
 		m_regs(*this, "regs"),
 		m_galgames_ram(*this, "galgames_ram"){ }
 
@@ -535,7 +534,7 @@ static ADDRESS_MAP_START( tmaster_map, AS_PROGRAM, 16, tmaster_state )
 
 	AM_RANGE( 0x300070, 0x300071 ) AM_WRITE(tmaster_addr_w )
 
-	AM_RANGE( 0x500000, 0x500011 ) AM_WRITE(tmaster_blitter_w ) AM_BASE(m_regs )
+	AM_RANGE( 0x500000, 0x500011 ) AM_WRITE(tmaster_blitter_w ) AM_SHARE("regs")
 	AM_RANGE( 0x500010, 0x500011 ) AM_READ(tmaster_blitter_r )
 
 	AM_RANGE( 0x580000, 0x580001 ) AM_WRITENOP // often
@@ -742,12 +741,12 @@ READ16_MEMBER(tmaster_state::dummy_read_01)
 
 static ADDRESS_MAP_START( galgames_map, AS_PROGRAM, 16, tmaster_state )
 
-	AM_RANGE( 0x000000, 0x03ffff ) AM_READ_BANK(GALGAMES_BANK_000000_R) AM_WRITE_BANK(GALGAMES_BANK_000000_W) AM_BASE(m_galgames_ram )
+	AM_RANGE( 0x000000, 0x03ffff ) AM_READ_BANK(GALGAMES_BANK_000000_R) AM_WRITE_BANK(GALGAMES_BANK_000000_W) AM_SHARE("galgames_ram")
 	AM_RANGE( 0x040000, 0x1fffff ) AM_ROM AM_REGION( "maincpu", 0x40000 )
 	AM_RANGE( 0x200000, 0x23ffff ) AM_READ_BANK(GALGAMES_BANK_200000_R) AM_WRITE_BANK(GALGAMES_BANK_200000_W)
 	AM_RANGE( 0x240000, 0x3fffff ) AM_READ_BANK(GALGAMES_BANK_240000_R)
 
-	AM_RANGE( 0x400000, 0x400011 ) AM_WRITE(tmaster_blitter_w ) AM_BASE(m_regs )
+	AM_RANGE( 0x400000, 0x400011 ) AM_WRITE(tmaster_blitter_w ) AM_SHARE("regs")
 	AM_RANGE( 0x400012, 0x400013 ) AM_WRITE(tmaster_addr_w )
 	AM_RANGE( 0x400014, 0x400015 ) AM_WRITE(tmaster_color_w )
 	AM_RANGE( 0x400020, 0x400021 ) AM_READ(tmaster_blitter_r )

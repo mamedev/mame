@@ -1694,7 +1694,7 @@ static void draw_bullets_common(running_machine &machine, bitmap_ind16 &bitmap, 
 	int offs;
 
 
-	for (offs = 0;offs < state->m_bulletsram_size;offs += 4)
+	for (offs = 0;offs < state->m_bulletsram.bytes();offs += 4)
 	{
 		UINT8 sx,sy;
 
@@ -1797,11 +1797,11 @@ SCREEN_UPDATE_IND16( galaxold )
 	}
 
 
-	draw_sprites(screen.machine(), bitmap, state->m_spriteram, state->m_spriteram_size);
+	draw_sprites(screen.machine(), bitmap, state->m_spriteram, state->m_spriteram.bytes());
 
 	if (state->m_spriteram2_present)
 	{
-		draw_sprites(screen.machine(), bitmap, state->m_spriteram2, state->m_spriteram2_size);
+		draw_sprites(screen.machine(), bitmap, state->m_spriteram2, state->m_spriteram2.bytes());
 	}
 	return 0;
 }
@@ -1830,7 +1830,7 @@ SCREEN_UPDATE_IND16( dambustr )
 		draw_bullets_common(screen.machine(), bitmap, cliprect);
 	}
 
-	draw_sprites(screen.machine(), bitmap, state->m_spriteram, state->m_spriteram_size);
+	draw_sprites(screen.machine(), bitmap, state->m_spriteram, state->m_spriteram.bytes());
 
 	if (state->m_dambustr_bg_priority)
 	{

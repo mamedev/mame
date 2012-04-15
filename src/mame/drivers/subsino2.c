@@ -988,7 +988,7 @@ static ADDRESS_MAP_START( bishjan_map, AS_PROGRAM, 16, subsino2_state )
 	AM_RANGE( 0xc00002, 0xc00003 ) AM_READ_PORT("JOY") AM_WRITE(bishjan_input_w )	// IN C
 	AM_RANGE( 0xc00004, 0xc00005 ) AM_READ(bishjan_input_r )						// IN A & B
 	AM_RANGE( 0xc00006, 0xc00007 ) AM_READ(bishjan_serial_r )						// IN D
-	AM_RANGE( 0xc00008, 0xc00009 ) AM_READ_PORT("RESET") AM_WRITE(bishjan_outputs_w ) AM_BASE(m_outputs16 )
+	AM_RANGE( 0xc00008, 0xc00009 ) AM_READ_PORT("RESET") AM_WRITE(bishjan_outputs_w ) AM_SHARE("outputs16")
 ADDRESS_MAP_END
 
 /***************************************************************************
@@ -1132,7 +1132,7 @@ static ADDRESS_MAP_START( mtrain_map, AS_PROGRAM, 8, subsino2_state )
 
 	AM_RANGE( 0x0912f, 0x0912f ) AM_WRITE(ss9601_byte_lo_w )
 
-	AM_RANGE( 0x09140, 0x09142 ) AM_WRITE(mtrain_outputs_w ) AM_BASE(m_outputs )
+	AM_RANGE( 0x09140, 0x09142 ) AM_WRITE(mtrain_outputs_w ) AM_SHARE("outputs")
 	AM_RANGE( 0x09143, 0x09143 ) AM_READ_PORT( "IN D" )	// (not shown in system test) 0x40 serial out, 0x80 serial in
 	AM_RANGE( 0x09144, 0x09144 ) AM_READ_PORT( "IN A" )	// A
 	AM_RANGE( 0x09145, 0x09145 ) AM_READ_PORT( "IN B" )	// B
@@ -1224,7 +1224,7 @@ static ADDRESS_MAP_START( saklove_io, AS_IO, 8, subsino2_state )
 	AM_RANGE(0x021f, 0x021f) AM_WRITE(ss9601_disable_w )
 	AM_RANGE(0x0220, 0x0225) AM_WRITE(ss9601_scroll_w )
 
-	AM_RANGE(0x0300, 0x0303) AM_WRITE(saklove_outputs_w ) AM_BASE(m_outputs )
+	AM_RANGE(0x0300, 0x0303) AM_WRITE(saklove_outputs_w ) AM_SHARE("outputs")
 	AM_RANGE(0x0303, 0x0303) AM_READ_PORT( "IN D" )	// 0x40 serial out, 0x80 serial in
 	AM_RANGE(0x0304, 0x0304) AM_READ_PORT( "IN A" )
 	AM_RANGE(0x0305, 0x0305) AM_READ_PORT( "IN B" )
@@ -1236,7 +1236,7 @@ static ADDRESS_MAP_START( saklove_io, AS_IO, 8, subsino2_state )
 	AM_RANGE(0x0312, 0x0312) AM_READ(vblank_bit2_r ) AM_DEVWRITE_LEGACY("oki", oki_bank_bit0_w )
 
 	// Peripheral Control Block
-	AM_RANGE(0xff00, 0xffff) AM_READWRITE(am188em_regs_r, am188em_regs_w ) AM_BASE(m_am188em_regs )
+	AM_RANGE(0xff00, 0xffff) AM_READWRITE(am188em_regs_r, am188em_regs_w ) AM_SHARE("am188em_regs")
 ADDRESS_MAP_END
 
 /***************************************************************************
@@ -1335,10 +1335,10 @@ static ADDRESS_MAP_START( xplan_io, AS_IO, 8, subsino2_state )
 	AM_RANGE(0x0306, 0x0306) AM_READ_PORT( "IN D" )	// 0x40 serial out, 0x80 serial in
 
 	// 306 = d, 307 = c, 308 = b, 309 = a
-	AM_RANGE(0x0306, 0x0309) AM_WRITE(xplan_outputs_w ) AM_BASE(m_outputs )
+	AM_RANGE(0x0306, 0x0309) AM_WRITE(xplan_outputs_w ) AM_SHARE("outputs")
 
 	// Peripheral Control Block
-	AM_RANGE(0xff00, 0xffff) AM_READWRITE(am188em_regs_r, am188em_regs_w ) AM_BASE(m_am188em_regs )
+	AM_RANGE(0xff00, 0xffff) AM_READWRITE(am188em_regs_r, am188em_regs_w ) AM_SHARE("am188em_regs")
 ADDRESS_MAP_END
 
 /***************************************************************************
@@ -1381,14 +1381,14 @@ WRITE8_MEMBER(subsino2_state::xtrain_outputs_w)
 
 static ADDRESS_MAP_START( expcard_io, AS_IO, 8, subsino2_state )
 	// 306 = d, 307 = c, 308 = b, 309 = a
-	AM_RANGE(0x0306, 0x0309) AM_WRITE(expcard_outputs_w ) AM_BASE(m_outputs )
+	AM_RANGE(0x0306, 0x0309) AM_WRITE(expcard_outputs_w ) AM_SHARE("outputs")
 
 	AM_IMPORT_FROM( xplan_io )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( xtrain_io, AS_IO, 8, subsino2_state )
 	// 306 = d, 307 = c, 308 = b, 309 = a
-	AM_RANGE(0x0306, 0x0309) AM_WRITE(xtrain_outputs_w ) AM_BASE(m_outputs )
+	AM_RANGE(0x0306, 0x0309) AM_WRITE(xtrain_outputs_w ) AM_SHARE("outputs")
 
 	AM_IMPORT_FROM( xplan_io )
 ADDRESS_MAP_END

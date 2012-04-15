@@ -2,14 +2,17 @@ class nova2001_state : public driver_device
 {
 public:
 	nova2001_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_fg_videoram(*this, "fg_videoram"),
+		m_bg_videoram(*this, "bg_videoram"),
+		m_spriteram(*this, "spriteram"){ }
 
 	UINT8 m_ninjakun_io_a002_ctrl;
-	UINT8 *m_fg_videoram;
-	UINT8 *m_bg_videoram;
+	required_shared_ptr<UINT8> m_fg_videoram;
+	required_shared_ptr<UINT8> m_bg_videoram;
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
-	UINT8 *m_spriteram;
+	required_shared_ptr<UINT8> m_spriteram;
 	DECLARE_WRITE8_MEMBER(ninjakun_cpu1_io_A002_w);
 	DECLARE_WRITE8_MEMBER(ninjakun_cpu2_io_A002_w);
 	DECLARE_WRITE8_MEMBER(ninjakun_paletteram_w);

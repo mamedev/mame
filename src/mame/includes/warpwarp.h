@@ -4,10 +4,12 @@ class warpwarp_state : public driver_device
 {
 public:
 	warpwarp_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_geebee_videoram(*this, "geebee_videoram"),
+		m_videoram(*this, "videoram"){ }
 
-	UINT8 *m_geebee_videoram;
-	UINT8 *m_videoram;
+	required_shared_ptr<UINT8> m_geebee_videoram;
+	required_shared_ptr<UINT8> m_videoram;
 	int m_geebee_bgw;
 	int m_ball_on;
 	int m_ball_h;

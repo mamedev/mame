@@ -201,10 +201,10 @@ static ADDRESS_MAP_START( msisaac_map, AS_PROGRAM, 8, msisaac_state )
 	AM_RANGE(0xf084, 0xf084) AM_READ_PORT("IN1")
 //  AM_RANGE(0xf086, 0xf086) AM_READ_PORT("IN2")
 
-	AM_RANGE(0xf100, 0xf17f) AM_RAM AM_BASE(m_spriteram)	//sprites
-	AM_RANGE(0xf400, 0xf7ff) AM_RAM_WRITE(msisaac_fg_videoram_w) AM_BASE(m_videoram)
-	AM_RANGE(0xf800, 0xfbff) AM_RAM_WRITE(msisaac_bg2_videoram_w) AM_BASE(m_videoram3)
-	AM_RANGE(0xfc00, 0xffff) AM_RAM_WRITE(msisaac_bg_videoram_w) AM_BASE(m_videoram2)
+	AM_RANGE(0xf100, 0xf17f) AM_RAM AM_SHARE("spriteram")	//sprites
+	AM_RANGE(0xf400, 0xf7ff) AM_RAM_WRITE(msisaac_fg_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0xf800, 0xfbff) AM_RAM_WRITE(msisaac_bg2_videoram_w) AM_SHARE("videoram3")
+	AM_RANGE(0xfc00, 0xffff) AM_RAM_WRITE(msisaac_bg_videoram_w) AM_SHARE("videoram2")
 //  AM_RANGE(0xf801, 0xf801) AM_WRITE_LEGACY(msisaac_bgcolor_w)
 //  AM_RANGE(0xfc00, 0xfc00) AM_WRITE(flip_screen_w)
 //  AM_RANGE(0xfc03, 0xfc04) AM_WRITE(msisaac_coin_counter_w)

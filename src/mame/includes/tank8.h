@@ -27,14 +27,19 @@ class tank8_state : public driver_device
 {
 public:
 	tank8_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_video_ram(*this, "video_ram"),
+		m_pos_h_ram(*this, "pos_h_ram"),
+		m_pos_v_ram(*this, "pos_v_ram"),
+		m_pos_d_ram(*this, "pos_d_ram"),
+		m_team(*this, "team"){ }
 
 	int m_collision_index;
-	UINT8 *m_video_ram;
-	UINT8 *m_pos_h_ram;
-	UINT8 *m_pos_v_ram;
-	UINT8 *m_pos_d_ram;
-	UINT8 *m_team;
+	required_shared_ptr<UINT8> m_video_ram;
+	required_shared_ptr<UINT8> m_pos_h_ram;
+	required_shared_ptr<UINT8> m_pos_v_ram;
+	required_shared_ptr<UINT8> m_pos_d_ram;
+	required_shared_ptr<UINT8> m_team;
 	tilemap_t *m_tilemap;
 	bitmap_ind16 m_helper1;
 	bitmap_ind16 m_helper2;

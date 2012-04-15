@@ -8,15 +8,21 @@ class kyugo_state : public driver_device
 {
 public:
 	kyugo_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_fgvideoram(*this, "fgvideoram"),
+		m_bgvideoram(*this, "bgvideoram"),
+		m_bgattribram(*this, "bgattribram"),
+		m_spriteram_1(*this, "spriteram_1"),
+		m_spriteram_2(*this, "spriteram_2"),
+		m_shared_ram(*this, "shared_ram"){ }
 
 	/* memory pointers */
-	UINT8 *     m_fgvideoram;
-	UINT8 *     m_bgvideoram;
-	UINT8 *     m_bgattribram;
-	UINT8 *     m_spriteram_1;
-	UINT8 *     m_spriteram_2;
-	UINT8 *     m_shared_ram;
+	required_shared_ptr<UINT8> m_fgvideoram;
+	required_shared_ptr<UINT8> m_bgvideoram;
+	required_shared_ptr<UINT8> m_bgattribram;
+	required_shared_ptr<UINT8> m_spriteram_1;
+	required_shared_ptr<UINT8> m_spriteram_2;
+	required_shared_ptr<UINT8> m_shared_ram;
 
 	/* video-related */
 	tilemap_t     *m_bg_tilemap;

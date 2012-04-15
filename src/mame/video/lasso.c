@@ -278,12 +278,12 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	if (reverse)
 	{
 		source = state->m_spriteram;
-		finish = state->m_spriteram + state->m_spriteram_size;
+		finish = state->m_spriteram + state->m_spriteram.bytes();
 		inc = 4;
 	}
 	else
 	{
-		source = state->m_spriteram + state->m_spriteram_size - 4;
+		source = state->m_spriteram + state->m_spriteram.bytes() - 4;
 		finish = state->m_spriteram - 4;
 		inc = -4;
 	}

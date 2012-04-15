@@ -8,14 +8,17 @@ class gaiden_state : public driver_device
 {
 public:
 	gaiden_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"),
+		m_videoram2(*this, "videoram2"),
+		m_videoram3(*this, "videoram3"),
+		m_spriteram(*this, "spriteram"){ }
 
 	/* memory pointers */
-	UINT16 *    m_videoram;
-	UINT16 *    m_videoram2;
-	UINT16 *    m_videoram3;
-	UINT16 *    m_spriteram;
-	size_t      m_spriteram_size;
+	required_shared_ptr<UINT16> m_videoram;
+	required_shared_ptr<UINT16> m_videoram2;
+	required_shared_ptr<UINT16> m_videoram3;
+	required_shared_ptr<UINT16> m_spriteram;
 
 	/* video-related */
 	tilemap_t   *m_text_layer;

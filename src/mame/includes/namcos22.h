@@ -32,23 +32,48 @@ class namcos22_state : public driver_device
 {
 public:
 	namcos22_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_spriteram(*this,"m_spriteram"),
+		  m_shareram(*this,"m_shareram"),
+		  m_system_controller(*this,"m_system_controller"),
+		  m_nvmem(*this,"m_nvmem"),
+		  m_mpSlaveExternalRAM(*this,"m_mpSlaveExternalRAM"),
+		  m_mpMasterExternalRAM(*this,"m_mpMasterExternalRAM"),
+		  m_cgram(*this,"m_cgram"),
+		  m_textram(*this,"m_textram"),
+		  m_polygonram(*this,"m_polygonram"),
+		  m_gamma(*this,"m_gamma"),
+		  m_vics_data(*this,"m_vics_data"),
+		  m_vics_control(*this,"m_vics_control"),
+		  m_czattr(*this,"m_czattr"),
+		  m_tilemapattr(*this,"m_tilemapattr"),
+		  m_czram(*this,"m_czram") { }
 
-	UINT32 *m_spriteram;
+	required_shared_ptr<UINT32> m_spriteram;
+	required_shared_ptr<UINT32> m_shareram;
+	required_shared_ptr<UINT32> m_system_controller;
+	required_shared_ptr<UINT32> m_nvmem;
+	required_shared_ptr<UINT16> m_mpSlaveExternalRAM;
+	required_shared_ptr<UINT16> m_mpMasterExternalRAM;
+	required_shared_ptr<UINT32> m_cgram;
+	required_shared_ptr<UINT32> m_textram;
+	required_shared_ptr<UINT32> m_polygonram;
+	required_shared_ptr<UINT32> m_gamma;
+	required_shared_ptr<UINT32> m_vics_data;
+	required_shared_ptr<UINT32> m_vics_control;
+	required_shared_ptr<UINT32> m_czattr;
+	required_shared_ptr<UINT32> m_tilemapattr;
+	required_shared_ptr<UINT32> m_czram;
+
 	int m_mbEnableDspIrqs;
-	UINT32 *m_shareram;
-	UINT32 *m_system_controller;
-	UINT32 *m_nvmem;
-	size_t m_nvmem_size;
+
 	UINT16 m_mMasterBIOZ;
 	UINT32 *m_mpPointRAM;
 	UINT32 m_old_coin_state;
 	UINT32 m_credits1;
 	UINT32 m_credits2;
-	UINT16 *m_mpSlaveExternalRAM;
 	UINT32 m_mPointAddr;
 	UINT32 m_mPointData;
-	UINT16 *m_mpMasterExternalRAM;
 	UINT16 m_mSerialDataSlaveToMasterNext;
 	UINT16 m_mSerialDataSlaveToMasterCurrent;
 	int m_mRenderBufSize;
@@ -65,20 +90,11 @@ public:
 	UINT16 m_keycus_id;
 	int m_gametype;
 	int m_mbSuperSystem22;
-	UINT32 *m_cgram;
-	UINT32 *m_textram;
-	UINT32 *m_polygonram;
-	UINT32 *m_gamma;
-	UINT32 *m_vics_data;
-	UINT32 *m_vics_control;
-	UINT32 *m_czattr;
-	UINT32 *m_tilemapattr;
 	int m_chipselect;
 	int m_spot_enable;
 	int m_spot_read_address;
 	int m_spot_write_address;
 	UINT16 *m_spotram;
-	UINT32 *m_czram;
 	UINT16 *m_banked_czram[4];
 	UINT8 *m_recalc_czram[4];
 	UINT32 m_cz_was_written[4];
@@ -106,6 +122,7 @@ public:
 	UINT8 *m_dirtypal;
 	bitmap_ind16 *m_mix_bitmap;
 	tilemap_t *m_bgtilemap;
+	
 	DECLARE_READ32_MEMBER(namcos22_gamma_r);
 	DECLARE_WRITE32_MEMBER(namcos22_gamma_w);
 	DECLARE_WRITE32_MEMBER(namcos22s_czram_w);

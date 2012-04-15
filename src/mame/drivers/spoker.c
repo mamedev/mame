@@ -230,9 +230,9 @@ static ADDRESS_MAP_START( spoker_portmap, AS_IO, 8, spoker_state )
 	AM_RANGE( 0x2000, 0x23ff ) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_byte_split_lo_w ) AM_SHARE("paletteram")
 	AM_RANGE( 0x2400, 0x27ff ) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_byte_split_hi_w ) AM_SHARE("paletteram2")
 
-	AM_RANGE( 0x3000, 0x33ff ) AM_RAM_WRITE(bg_tile_w ) AM_BASE(m_bg_tile_ram )
+	AM_RANGE( 0x3000, 0x33ff ) AM_RAM_WRITE(bg_tile_w ) AM_SHARE("bg_tile_ram")
 
-	AM_RANGE( 0x5000, 0x5fff ) AM_RAM_WRITE(fg_tile_w )  AM_BASE(m_fg_tile_ram )
+	AM_RANGE( 0x5000, 0x5fff ) AM_RAM_WRITE(fg_tile_w )  AM_SHARE("fg_tile_ram")
 
 	/* TODO: ppi #1 */
 	AM_RANGE( 0x6480, 0x6480 ) AM_WRITE(spoker_nmi_and_coins_w )
@@ -252,7 +252,7 @@ static ADDRESS_MAP_START( spoker_portmap, AS_IO, 8, spoker_state )
 
 	AM_RANGE( 0x64d0, 0x64d1 ) AM_READWRITE(spoker_magic_r, spoker_magic_w )	// DSW1-5
 
-	AM_RANGE( 0x7000, 0x7fff ) AM_RAM_WRITE(fg_color_w ) AM_BASE(m_fg_color_ram )
+	AM_RANGE( 0x7000, 0x7fff ) AM_RAM_WRITE(fg_color_w ) AM_SHARE("fg_color_ram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( 3super8_portmap, AS_IO, 8, spoker_state )
@@ -261,7 +261,7 @@ static ADDRESS_MAP_START( 3super8_portmap, AS_IO, 8, spoker_state )
 	AM_RANGE( 0x2000, 0x27ff ) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_byte_split_lo_w ) AM_SHARE("paletteram")
 	AM_RANGE( 0x2800, 0x2fff ) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_byte_split_hi_w ) AM_SHARE("paletteram2")
 
-	AM_RANGE( 0x3000, 0x33ff ) AM_RAM_WRITE(bg_tile_w ) AM_BASE(m_bg_tile_ram )
+	AM_RANGE( 0x3000, 0x33ff ) AM_RAM_WRITE(bg_tile_w ) AM_SHARE("bg_tile_ram")
 
 	AM_RANGE( 0x4000, 0x4000 ) AM_READ_PORT( "DSW1" )
 	AM_RANGE( 0x4001, 0x4001 ) AM_READ_PORT( "DSW2" )
@@ -271,7 +271,7 @@ static ADDRESS_MAP_START( 3super8_portmap, AS_IO, 8, spoker_state )
 
 //  AM_RANGE( 0x4000, 0x40ff ) AM_WRITENOP
 
-	AM_RANGE( 0x5000, 0x5fff ) AM_RAM_WRITE(fg_tile_w )  AM_BASE(m_fg_tile_ram )
+	AM_RANGE( 0x5000, 0x5fff ) AM_RAM_WRITE(fg_tile_w )  AM_SHARE("fg_tile_ram")
 
 	AM_RANGE( 0x6480, 0x6480 ) AM_READ_PORT( "IN0" )
 	AM_RANGE( 0x6490, 0x6490 ) AM_READ_PORT( "IN1" )
@@ -282,7 +282,7 @@ static ADDRESS_MAP_START( 3super8_portmap, AS_IO, 8, spoker_state )
 
 	AM_RANGE( 0x64f0, 0x64f0 ) AM_WRITE(spoker_nmi_and_coins_w )
 
-	AM_RANGE( 0x7000, 0x7fff ) AM_RAM_WRITE(fg_color_w ) AM_BASE(m_fg_color_ram )
+	AM_RANGE( 0x7000, 0x7fff ) AM_RAM_WRITE(fg_color_w ) AM_SHARE("fg_color_ram")
 ADDRESS_MAP_END
 
 

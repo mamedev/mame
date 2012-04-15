@@ -12,7 +12,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	UINT8 col, flipx, flipy, chain;
 	UINT16 code;
 
-	for (offs = 0; offs < state->m_spriteram_size / 2; offs += 8)
+	for (offs = 0; offs < state->m_spriteram.bytes() / 2; offs += 8)
 	{
 		code = ((state->m_spriteram[offs + 5]) & 0xff) + (((state->m_spriteram[offs + 6]) & 0xff) << 8);
 		code &= 0x3fff;

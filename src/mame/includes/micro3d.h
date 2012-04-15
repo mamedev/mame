@@ -16,9 +16,12 @@ class micro3d_state : public driver_device
 {
 public:
 	micro3d_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_shared_ram(*this, "shared_ram"),
+		m_mac_sram(*this, "mac_sram"),
+		m_micro3d_sprite_vram(*this, "sprite_vram"){ }
 
-	UINT16				*m_shared_ram;
+	required_shared_ptr<UINT16> m_shared_ram;
 	device_t			*m_duart68681;
 	UINT8				m_m68681_tx0;
 
@@ -38,7 +41,7 @@ public:
 	UINT8				m_botssa_latch;
 
 	/* MAC */
-	UINT32				*m_mac_sram;
+	required_shared_ptr<UINT32> m_mac_sram;
 	UINT32				m_sram_r_addr;
 	UINT32				m_sram_w_addr;
 	UINT32				m_vtx_addr;
@@ -47,7 +50,7 @@ public:
 	UINT32				m_mac_inst;
 
 	/* 2D video */
-	UINT16				*m_micro3d_sprite_vram;
+	required_shared_ptr<UINT16> m_micro3d_sprite_vram;
 	UINT16				m_creg;
 	UINT16				m_xfer3dk;
 

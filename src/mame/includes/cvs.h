@@ -18,15 +18,21 @@ class cvs_state : public driver_device
 {
 public:
 	cvs_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_video_ram(*this, "video_ram"),
+		  m_bullet_ram(*this, "bullet_ram"),
+		  m_fo_state(*this, "fo_state"),
+		  m_cvs_4_bit_dac_data(*this, "4bit_dac"),
+		  m_tms5110_ctl_data(*this, "tms5110_ctl"),
+		  m_dac3_state(*this, "dac3_state") { }
 
 	/* memory pointers */
-	UINT8 *    m_video_ram;
-	UINT8 *    m_bullet_ram;
-	UINT8 *    m_fo_state;
-	UINT8 *    m_cvs_4_bit_dac_data;
-	UINT8 *    m_tms5110_ctl_data;
-	UINT8 *    m_dac3_state;
+	required_shared_ptr<UINT8> m_video_ram;
+	required_shared_ptr<UINT8> m_bullet_ram;
+	required_shared_ptr<UINT8> m_fo_state;
+	required_shared_ptr<UINT8> m_cvs_4_bit_dac_data;
+	required_shared_ptr<UINT8> m_tms5110_ctl_data;
+	required_shared_ptr<UINT8> m_dac3_state;
 
 	/* video-related */
 	struct cvs_star m_stars[CVS_MAX_STARS];

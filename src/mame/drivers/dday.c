@@ -58,10 +58,10 @@ write:
 static ADDRESS_MAP_START( dday_map, AS_PROGRAM, 8, dday_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x4000) AM_WRITE(dday_sl_control_w)
-	AM_RANGE(0x5000, 0x53ff) AM_RAM_WRITE(dday_textvideoram_w) AM_BASE(m_textvideoram)
-	AM_RANGE(0x5400, 0x57ff) AM_RAM_WRITE(dday_fgvideoram_w) AM_BASE(m_fgvideoram)
-	AM_RANGE(0x5800, 0x5bff) AM_RAM_WRITE(dday_bgvideoram_w) AM_BASE(m_bgvideoram)
-	AM_RANGE(0x5c00, 0x5fff) AM_READWRITE(dday_colorram_r, dday_colorram_w) AM_BASE(m_colorram)
+	AM_RANGE(0x5000, 0x53ff) AM_RAM_WRITE(dday_textvideoram_w) AM_SHARE("textvideoram")
+	AM_RANGE(0x5400, 0x57ff) AM_RAM_WRITE(dday_fgvideoram_w) AM_SHARE("fgvideoram")
+	AM_RANGE(0x5800, 0x5bff) AM_RAM_WRITE(dday_bgvideoram_w) AM_SHARE("bgvideoram")
+	AM_RANGE(0x5c00, 0x5fff) AM_READWRITE(dday_colorram_r, dday_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0x6000, 0x63ff) AM_RAM
 	AM_RANGE(0x6400, 0x6401) AM_MIRROR(0x000e) AM_DEVWRITE_LEGACY("ay1", ay8910_address_data_w)
 	AM_RANGE(0x6800, 0x6801) AM_DEVWRITE_LEGACY("ay2", ay8910_address_data_w)

@@ -53,7 +53,8 @@ class jpmimpct_state : public driver_device
 {
 public:
 	jpmimpct_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_vram(*this, "vram") { }
 
 	UINT8 m_tms_irq;
 	UINT8 m_duart_1_irq;
@@ -70,7 +71,7 @@ public:
 	int m_slidesout;
 	int m_hopper[3];
 	int m_motor[3];
-	UINT16 *m_vram;
+	required_shared_ptr<UINT16> m_vram;
 	struct bt477_t m_bt477;
 	DECLARE_WRITE16_MEMBER(m68k_tms_w);
 	DECLARE_READ16_MEMBER(m68k_tms_r);

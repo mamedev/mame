@@ -80,7 +80,7 @@ SCREEN_UPDATE_IND16( exzisus )
 
 	/* ---------- 1st TC0010VCU ---------- */
 	sx = 0;
-	for (offs = 0 ; offs < state->m_objectram_size0 ; offs += 4)
+	for (offs = 0 ; offs < state->m_objectram0.bytes() ; offs += 4)
     {
 		int height;
 
@@ -150,7 +150,7 @@ SCREEN_UPDATE_IND16( exzisus )
 
 	/* ---------- 2nd TC0010VCU ---------- */
 	sx = 0;
-	for (offs = 0 ; offs < state->m_objectram_size1 ; offs += 4)
+	for (offs = 0 ; offs < state->m_objectram1.bytes() ; offs += 4)
     {
 		int height;
 

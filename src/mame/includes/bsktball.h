@@ -17,11 +17,13 @@ class bsktball_state : public driver_device
 {
 public:
 	bsktball_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"),
+		m_motion(*this, "motion"){ }
 
 	/* memory pointers */
-	UINT8 *  m_videoram;
-	UINT8 *  m_motion;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_motion;
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;
