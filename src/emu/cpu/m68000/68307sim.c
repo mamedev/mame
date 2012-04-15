@@ -37,9 +37,9 @@ READ16_HANDLER( m68307_internal_sim_r )
 		}
 	}
 
-
 	return 0x0000;
 }
+
 
 WRITE16_HANDLER( m68307_internal_sim_w )
 {

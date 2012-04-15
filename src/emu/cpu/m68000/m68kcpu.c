@@ -1790,6 +1790,15 @@ void m68307_set_port_callbacks(device_t *device, m68307_porta_read_callback port
 	m68k->m_m68307_portb_w = portb_w;
 }
 
+void m68307_set_duart68681(device_t* cpudev, device_t* duart68681)
+{
+	m68ki_cpu_core *m68k = m68k_get_safe_token(cpudev);
+	if (m68k->m68307SERIAL)
+		m68k->m68307SERIAL->m68307ser_set_duart68681(duart68681);
+}
+
+
+
 
 UINT16 m68307_get_cs(device_t *device, offs_t address)
 {
@@ -1954,11 +1963,10 @@ void m68307_timer1_interrupt(legacy_cpu_device *cpudev)
 	m68307_set_interrupt(cpudev, prioritylevel, vector);
 }
 
-void m68307_serial_interrupt(legacy_cpu_device *cpudev)
+void m68307_serial_interrupt(legacy_cpu_device *cpudev, int vector)
 {
 	m68ki_cpu_core* m68k = m68k_get_safe_token(cpudev);
 	int prioritylevel = (m68k->m68307SIM->m_picr & 0x0070)>>4;
-	int vector        = (m68k->m68307SERIAL->m_uivr);
 	m68307_set_interrupt(cpudev, prioritylevel, vector);
 }
 
@@ -2063,9 +2071,9 @@ static WRITE16_HANDLER( m68307_internal_base_w )
 			//mask = (m68k->m68307_base & 0xe000) >> 13;
 			//if ( m68k->m68307_base & 0x1000 ) mask |= 7;
 			m68k->internal->install_legacy_readwrite_handler(base + 0x000, base + 0x04f, FUNC(m68307_internal_sim_r),    FUNC(m68307_internal_sim_w));
-			m68k->internal->install_legacy_readwrite_handler(base + 0x100, base + 0x11f, FUNC(m68307_internal_serial_r), FUNC(m68307_internal_serial_w));
+			m68k->internal->install_legacy_readwrite_handler(base + 0x100, base + 0x11f, FUNC(m68307_internal_serial_r), FUNC(m68307_internal_serial_w), 0xffff);
 			m68k->internal->install_legacy_readwrite_handler(base + 0x120, base + 0x13f, FUNC(m68307_internal_timer_r),  FUNC(m68307_internal_timer_w));
-			m68k->internal->install_legacy_readwrite_handler(base + 0x140, base + 0x149, FUNC(m68307_internal_mbus_r),   FUNC(m68307_internal_mbus_w));
+			m68k->internal->install_legacy_readwrite_handler(base + 0x140, base + 0x149, FUNC(m68307_internal_mbus_r),   FUNC(m68307_internal_mbus_w), 0xffff);
 
 			break;
 
@@ -2741,7 +2749,9 @@ static WRITE32_HANDLER( m68340_internal_base_w )
 		{
 			int base = m68k->m68340_base & 0xfffff000;
 
-			m68k->internal->install_legacy_readwrite_handler(base + 0x000, base + 0x05f, FUNC(m68340_internal_sim_r),    FUNC(m68340_internal_sim_w),0xffffffff);
+			m68k->internal->install_legacy_readwrite_handler(base + 0x000, base + 0x03f, FUNC(m68340_internal_sim_r),    FUNC(m68340_internal_sim_w),0xffffffff);
+			m68k->internal->install_legacy_readwrite_handler(base + 0x010, base + 0x01f, FUNC(m68340_internal_sim_ports_r), FUNC(m68340_internal_sim_ports_w),0xffffffff);
+			m68k->internal->install_legacy_readwrite_handler(base + 0x040, base + 0x05f, FUNC(m68340_internal_sim_cs_r), FUNC(m68340_internal_sim_cs_w));
 			m68k->internal->install_legacy_readwrite_handler(base + 0x600, base + 0x67f, FUNC(m68340_internal_timer_r),  FUNC(m68340_internal_timer_w));
 			m68k->internal->install_legacy_readwrite_handler(base + 0x700, base + 0x723, FUNC(m68340_internal_serial_r), FUNC(m68340_internal_serial_w));
 			m68k->internal->install_legacy_readwrite_handler(base + 0x780, base + 0x7bf, FUNC(m68340_internal_dma_r),    FUNC(m68340_internal_dma_w));

@@ -444,6 +444,8 @@ static MACHINE_START( sc4 )
 		bfm_sc4_68307_porta_w,
 		bfm_sc4_68307_portb_r,
 		bfm_sc4_68307_portb_w );
+	m68307_set_duart68681(machine.device("maincpu"),machine.device("m68307_68681"));
+
 	BFM_BD1_init(0);
 
 	int reels = 6;
@@ -521,46 +523,63 @@ static const duart68681_config bfm_sc4_duart68681_config =
 	bfm_sc4_duart_output_w
 };
 
-// generate some fake interrupts for force things to go a bit further
-// until we have the peripheral hookups working..
-static INTERRUPT_GEN( sc4_fake_int_check )
+
+
+void m68307_duart_irq_handler(device_t *device, UINT8 vector)
 {
-	int which_int = 0;
-	static int count = 0;
+	printf("m68307_duart_irq_handler\n");
+	m68307_serial_interrupt((legacy_cpu_device*)device->machine().device("maincpu"), vector);
+};
 
-	count++;
-
-	if (count>30000)
+void m68307_duart_tx(device_t *device, int channel, UINT8 data)
+{
+	if (channel==0)
 	{
-		which_int = device->machine().rand() % 5;
-
-		/*
-        if ( device->machine().input().code_pressed_once(KEYCODE_Q) ) which_int = 1;
-        if ( device->machine().input().code_pressed_once(KEYCODE_W) ) which_int = 2;
-        if ( device->machine().input().code_pressed_once(KEYCODE_E) ) which_int = 3;
-        if ( device->machine().input().code_pressed_once(KEYCODE_R) ) which_int = 4;
-        if ( device->machine().input().code_pressed_once(KEYCODE_T) ) which_int = 5;
-        */
-
-		//if (which_int==1) m68307_timer0_interrupt((legacy_cpu_device*)device->machine().device("maincpu"));
-		//if (which_int==2) m68307_timer1_interrupt((legacy_cpu_device*)device->machine().device("maincpu"));
-		if (which_int==3) m68307_serial_interrupt((legacy_cpu_device*)device->machine().device("maincpu"));
-		//if (which_int==4) m68307_mbus_interrupt((legacy_cpu_device*)device->machine().device("maincpu"));
-	//  if (which_int==5) m68307_licr2_interrupt((legacy_cpu_device*)device->machine().device("maincpu"));
+		printf("m68307_duart_tx %02x\n",data);
 	}
+	else
+	{
+		printf("(illegal channel 1) m68307_duart_tx %02x\n",data);
+	}
+};
+
+UINT8 m68307_duart_input_r(device_t *device)
+{
+	printf("m68307_duart_input_r\n");
+	return 0x00;
 }
+
+void m68307_duart_output_w(device_t *device, UINT8 data)
+{
+	printf("m68307_duart_output_w %02x\n", data);
+}
+
+
+
+static const duart68681_config m68307_duart68681_config =
+{
+	m68307_duart_irq_handler,
+	m68307_duart_tx,
+	m68307_duart_input_r,
+	m68307_duart_output_w
+};
+
 
 
 MACHINE_CONFIG_START( sc4, sc4_state )
 	MCFG_CPU_ADD("maincpu", M68307, 16000000)	 // 68307! (EC000 core)
 	MCFG_CPU_PROGRAM_MAP(sc4_map)
-	MCFG_CPU_PERIODIC_INT(sc4_fake_int_check,1000)
+
+	// internal duart of the 68307... paired in machine start
+	MCFG_DUART68681_ADD("m68307_68681", 16000000/4, m68307_duart68681_config) // ?? Mhz
 
 	MCFG_MACHINE_START( sc4 )
 	MCFG_MACHINE_RESET( sc4 )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+
 
 	MCFG_DUART68681_ADD("duart68681", 16000000/4, bfm_sc4_duart68681_config) // ?? Mhz
 
