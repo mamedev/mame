@@ -870,6 +870,7 @@ src/emu/machine/i8251.h svneol=native#text/plain
 src/emu/machine/i8255.c svneol=native#text/plain
 src/emu/machine/i8255.h svneol=native#text/plain
 src/emu/machine/i8279.c svneol=native#text/plain
+src/emu/machine/i8279.h svneol=native#text/plain
 src/emu/machine/i8355.c svneol=native#text/plain
 src/emu/machine/i8355.h svneol=native#text/plain
 src/emu/machine/idectrl.c svneol=native#text/plain
