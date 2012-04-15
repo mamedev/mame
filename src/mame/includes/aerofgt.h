@@ -17,11 +17,11 @@ public:
 	required_shared_ptr<UINT16> m_bg1videoram;
 	required_shared_ptr<UINT16> m_bg2videoram;
 	required_shared_ptr<UINT16> m_rasterram;
-	required_shared_ptr<UINT16> m_bitmapram;
+	optional_shared_ptr<UINT16> m_bitmapram;
 	required_shared_ptr<UINT16> m_spriteram1;
 	required_shared_ptr<UINT16> m_spriteram2;
 	required_shared_ptr<UINT16> m_spriteram3;
-	required_shared_ptr<UINT16> m_tx_tilemap_ram;
+	optional_shared_ptr<UINT16> m_tx_tilemap_ram;
 //  UINT16 *  m_paletteram;   // currently this uses generic palette handling
 
 	/* video-related */

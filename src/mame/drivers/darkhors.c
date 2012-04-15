@@ -83,14 +83,14 @@ public:
 
 	tilemap_t *m_tmap;
 	tilemap_t *m_tmap2;
-	required_shared_ptr<UINT32> m_tmapram;
-	required_shared_ptr<UINT32> m_tmapscroll;
-	required_shared_ptr<UINT32> m_tmapram2;
-	required_shared_ptr<UINT32> m_tmapscroll2;
+	optional_shared_ptr<UINT32> m_tmapram;
+	optional_shared_ptr<UINT32> m_tmapscroll;
+	optional_shared_ptr<UINT32> m_tmapram2;
+	optional_shared_ptr<UINT32> m_tmapscroll2;
 	UINT32 m_input_sel;
 	optional_shared_ptr<UINT32> m_jclub2_tileram;
 	int m_jclub2_gfx_index;
-	required_shared_ptr<UINT32> m_spriteram;
+	optional_shared_ptr<UINT32> m_spriteram;
 
 	required_device<cpu_device> m_maincpu;
 	DECLARE_WRITE32_MEMBER(darkhors_tmapram_w);

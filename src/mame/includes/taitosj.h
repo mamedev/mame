@@ -36,7 +36,7 @@ public:
 	required_shared_ptr<UINT8> m_video_mode;
 	required_shared_ptr<UINT8> m_video_priority;
 	required_shared_ptr<UINT8> m_collision_reg;
-	required_shared_ptr<UINT8> m_kikstart_scrollram;
+	optional_shared_ptr<UINT8> m_kikstart_scrollram;
 	UINT8 m_fromz80;
 	UINT8 m_toz80;
 	UINT8 m_zaccept;

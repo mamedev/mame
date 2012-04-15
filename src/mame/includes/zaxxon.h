@@ -14,7 +14,7 @@ public:
 		m_colorram(*this, "colorram"){ }
 
 	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_spriteram;
+	optional_shared_ptr<UINT8> m_spriteram;
 	required_shared_ptr<UINT8> m_colorram;
 	
 	UINT8 m_int_enabled;

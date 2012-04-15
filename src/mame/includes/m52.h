@@ -10,7 +10,7 @@ public:
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_colorram;
-	required_shared_ptr<UINT8> m_spriteram;
+	optional_shared_ptr<UINT8> m_spriteram;
 
 	/* video-related */
 	tilemap_t*             m_bg_tilemap;

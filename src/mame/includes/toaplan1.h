@@ -39,7 +39,7 @@ public:
 	UINT16 *m_pf2_tilevram16;	/* \||/ */
 	UINT16 *m_pf1_tilevram16;	/*  \/  */
 
-	required_shared_ptr<UINT16> m_spriteram;
+	optional_shared_ptr<UINT16> m_spriteram;
 	UINT16 *m_buffered_spriteram;
 	UINT16 *m_spritesizeram16;
 	UINT16 *m_buffered_spritesizeram16;

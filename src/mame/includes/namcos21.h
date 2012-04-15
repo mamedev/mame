@@ -36,9 +36,9 @@ public:
 		m_mpDualPortRAM(*this,"mpdualportram"),
 		m_master_dsp_code(*this,"master_dsp_code") { }
 
-	required_shared_ptr<UINT16> m_winrun_dspbios;
-	required_shared_ptr<UINT16> m_winrun_polydata;
-	required_shared_ptr<UINT16> m_winrun_gpucomram;
+	optional_shared_ptr<UINT16> m_winrun_dspbios;
+	optional_shared_ptr<UINT16> m_winrun_polydata;
+	optional_shared_ptr<UINT16> m_winrun_gpucomram;
 	required_shared_ptr<UINT16> m_dspram16;
 	required_shared_ptr<UINT16> m_mpSharedRAM1;
 	required_shared_ptr<UINT8> m_mpDualPortRAM;

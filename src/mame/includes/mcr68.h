@@ -14,9 +14,11 @@ class mcr68_state : public mcr_state
 {
 public:
 	mcr68_state(const machine_config &mconfig, device_type type, const char *tag)
-		: mcr_state(mconfig, type, tag) { }
+		: mcr_state(mconfig, type, tag),
+		  m_videoram16(*this, "videoram16"),
+		  m_spriteram16(*this, "spriteram16") { }
 
-	UINT16 *m_videoram;
+	required_shared_ptr<UINT16> m_videoram16;
 	UINT16 m_control_word;
 	UINT8 m_protection_data[5];
 	attotime m_timing_factor;
@@ -38,8 +40,7 @@ public:
 	attotime m_m6840_internal_counter_period;
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
-	UINT16 *m_spriteram;
-	size_t m_spriteram_size;
+	required_shared_ptr<UINT16> m_spriteram16;
 	DECLARE_READ16_MEMBER(zwackery_6840_r);
 	DECLARE_WRITE16_MEMBER(xenophobe_control_w);
 	DECLARE_WRITE16_MEMBER(blasted_control_w);

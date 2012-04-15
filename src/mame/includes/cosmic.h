@@ -20,7 +20,7 @@ public:
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_spriteram;
+	optional_shared_ptr<UINT8> m_spriteram;
 
 	/* video-related */
 	pen_t          (*m_map_color)(running_machine &machine, UINT8 x, UINT8 y);

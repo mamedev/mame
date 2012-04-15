@@ -23,7 +23,7 @@ public:
 	int m_sound_status;
 
 	required_shared_ptr<UINT8> m_spriteram;
-	required_shared_ptr<UINT8> m_fg_videoram;
+	optional_shared_ptr<UINT8> m_fg_videoram;
 	required_shared_ptr<UINT8> m_bg_videoram;
 	required_shared_ptr<UINT8> m_tx_videoram;
 

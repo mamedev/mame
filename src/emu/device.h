@@ -370,10 +370,12 @@ public:
 	// finder
 	virtual bool findit()
 	{
+		void mame_printf_warning(const char *format, ...) ATTR_PRINTF(1,2);
+		void mame_printf_error(const char *format, ...) ATTR_PRINTF(1,2);
 		device_t *device = m_base.subdevice(m_tag);
 		if (_Required && device == NULL)
 			mame_printf_error("Unable to find required device '%s'\n", this->m_tag);
-		m_target = downcast<_DeviceClass *>(device);
+		m_target = dynamic_cast<_DeviceClass *>(device);
 		if (device != NULL && m_target == NULL)
 			mame_printf_warning("Device '%s' found but is of the incorrect type\n", m_tag);
 		return (!_Required || m_target != NULL);

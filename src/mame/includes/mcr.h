@@ -23,9 +23,11 @@ public:
 		  m_spriteram(*this, "spriteram") ,
 		m_videoram(*this, "videoram"){ }
 
-	required_device<z80_device> m_maincpu;
-	required_shared_ptr<UINT8> m_spriteram;
-	required_shared_ptr<UINT8> m_videoram;
+	// these should be required but can't because mcr68 shares with us
+	// once the sound boards are properly device-ified, fix this
+	optional_device<z80_device> m_maincpu;
+	optional_shared_ptr<UINT8> m_spriteram;
+	optional_shared_ptr<UINT8> m_videoram;
 	
 	DECLARE_WRITE8_MEMBER(mcr_control_port_w);
 	DECLARE_WRITE8_MEMBER(mcr_ipu_laserdisk_w);

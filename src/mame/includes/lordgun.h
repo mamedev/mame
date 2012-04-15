@@ -18,7 +18,10 @@ public:
 		: driver_device(mconfig, type, tag),
 		  m_priority_ram(*this, "priority_ram"),
 		  m_scrollram(*this, "scrollram"),
-	      m_spriteram(*this, "spriteram") { }
+	      m_spriteram(*this, "spriteram"),
+	      m_vram(*this, "vram"),
+	      m_scroll_x(*this, "scroll_x"),
+	      m_scroll_y(*this, "scroll_y") { }
 
 	required_shared_ptr<UINT16> m_priority_ram;
 	required_shared_ptr<UINT16> m_scrollram;
@@ -27,9 +30,9 @@ public:
 	UINT8 m_old;
 	UINT8 m_aliencha_dip_sel;
 	UINT16 m_priority;
-	UINT16 *m_vram[4];
-	UINT16 *m_scroll_x[4];
-	UINT16 *m_scroll_y[4];
+	required_shared_ptr_array<UINT16, 4> m_vram;
+	required_shared_ptr_array<UINT16, 4> m_scroll_x;
+	required_shared_ptr_array<UINT16, 4> m_scroll_y;
 	int m_whitescreen;
 	lordgun_gun_data m_gun[2];
 	tilemap_t *m_tilemap[4];

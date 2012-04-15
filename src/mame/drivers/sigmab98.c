@@ -106,7 +106,7 @@ public:
 		m_nvram(*this, "nvram"){ }
 
 	required_device<cpu_device> m_maincpu;
-	required_shared_ptr<UINT8> m_spriteram;
+	optional_shared_ptr<UINT8> m_spriteram;
 	required_shared_ptr<UINT8> m_nvram;
 
 	UINT8 m_reg;

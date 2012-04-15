@@ -22,10 +22,11 @@ public:
 		m_ga2_dpram(*this,"ga2_dpram"),
 		m_system32_workram(*this,"workram"),
 		m_system32_videoram(*this,"videoram"),
-		m_system32_spriteram(*this,"spriteram") { }
+		m_system32_spriteram(*this,"spriteram"),
+		m_system32_paletteram(*this,"paletteram") { }
 
 	required_shared_ptr<UINT8> m_z80_shared_ram;
-	required_shared_ptr<UINT8> m_ga2_dpram;
+	optional_shared_ptr<UINT8> m_ga2_dpram;
 	required_shared_ptr<UINT16> m_system32_workram;
 	required_shared_ptr<UINT16> m_system32_videoram;
 	required_shared_ptr<UINT16> m_system32_spriteram;
@@ -47,7 +48,7 @@ public:
 	sys32_output_callback m_sw3_output;
 	UINT16* m_dual_pcb_comms;
 	UINT16 *m_system32_protram;
-	UINT16 *m_system32_paletteram[2];
+	optional_shared_ptr_array<UINT16, 2> m_system32_paletteram;
 	UINT16 m_system32_displayenable[2];
 	UINT16 m_system32_tilebank_external;
 	UINT16 m_arescue_dsp_io[6];

@@ -27,6 +27,8 @@ public:
 	cave_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag), 
 		  m_videoregs(*this, "videoregs"),
+		  m_vram(*this, "vram"),
+		  m_vctrl(*this, "vctrl"),
 		  m_spriteram(*this, "spriteram"),
 		  m_spriteram_2(*this, "spriteram_2"),
 		  m_paletteram(*this, "paletteram"),
@@ -35,8 +37,8 @@ public:
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_videoregs;
-	UINT16 *     m_vram[4];
-	UINT16 *     m_vctrl[4];
+	optional_shared_ptr_array<UINT16, 4> m_vram;
+	optional_shared_ptr_array<UINT16, 4> m_vctrl;
 	required_shared_ptr<UINT16> m_spriteram;
 	required_shared_ptr<UINT16> m_spriteram_2;
 	required_shared_ptr<UINT16> m_paletteram;

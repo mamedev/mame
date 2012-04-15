@@ -19,11 +19,11 @@ public:
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_colorram;
 //  UINT8 *  m_paletteram;    // currently this uses generic palette handling
-	required_shared_ptr<UINT8> m_bnj_backgroundram;
-	required_shared_ptr<UINT8> m_zoar_scrollram;
-	required_shared_ptr<UINT8> m_lnc_charbank;
-	required_shared_ptr<UINT8> m_deco_charram;
-	required_shared_ptr<UINT8> m_spriteram;   	// used by disco
+	optional_shared_ptr<UINT8> m_bnj_backgroundram;
+	optional_shared_ptr<UINT8> m_zoar_scrollram;
+	optional_shared_ptr<UINT8> m_lnc_charbank;
+	optional_shared_ptr<UINT8> m_deco_charram;
+	optional_shared_ptr<UINT8> m_spriteram;   	// used by disco
 //  UINT8 *  m_decrypted;
 	required_shared_ptr<UINT8> m_audio_rambase;
 

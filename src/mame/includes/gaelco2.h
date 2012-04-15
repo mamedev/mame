@@ -14,7 +14,7 @@ public:
 	required_device<m68000_device> m_maincpu;
 	required_device<buffered_spriteram16_device> m_spriteram;
 	required_shared_ptr<UINT16> m_vregs;
-	required_shared_ptr<UINT16> m_snowboar_protection;
+	optional_shared_ptr<UINT16> m_snowboar_protection;
 
 	int m_clr_gun_int;
 	UINT8 m_analog_ports[2];

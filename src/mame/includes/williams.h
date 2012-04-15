@@ -21,9 +21,9 @@ public:
 	required_shared_ptr<UINT8>	m_nvram;
 	UINT8 *m_mayday_protection;
 	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_blaster_palette_0;
-	required_shared_ptr<UINT8> m_blaster_scanline_control;
-	required_shared_ptr<UINT8> m_williams2_tileram;
+	optional_shared_ptr<UINT8> m_blaster_palette_0;
+	optional_shared_ptr<UINT8> m_blaster_scanline_control;
+	optional_shared_ptr<UINT8> m_williams2_tileram;
 	UINT8 m_blitter_config;
 	UINT16 m_blitter_clip_address;
 	UINT8 m_blitter_window_enable;

@@ -47,18 +47,18 @@ public:
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_subcpu;
 
-	required_shared_ptr<UINT8> m_sharedram;
-	required_shared_ptr<UINT16> m_workram;
+	optional_shared_ptr<UINT8> m_sharedram;
+	optional_shared_ptr<UINT16> m_workram;
 	required_shared_ptr<UINT16> m_vregs;
 	required_shared_ptr<UINT16> m_vram_0;
 	required_shared_ptr<UINT16> m_vctrl_0;
 	required_shared_ptr<UINT16> m_vram_2;
 	required_shared_ptr<UINT16> m_vctrl_2;
 	required_shared_ptr<UINT16> m_paletteram;
-	required_shared_ptr<UINT16> m_paletteram2;
-	required_shared_ptr<UINT16> m_kiwame_nvram;
-	required_shared_ptr<UINT16> m_inttoote_key_select;
-	required_shared_ptr<UINT16> m_inttoote_700000;
+	optional_shared_ptr<UINT16> m_paletteram2;
+	optional_shared_ptr<UINT16> m_kiwame_nvram;
+	optional_shared_ptr<UINT16> m_inttoote_key_select;
+	optional_shared_ptr<UINT16> m_inttoote_700000;
 
 	int m_tiles_offset;
 	tilemap_t *m_tilemap_0;
