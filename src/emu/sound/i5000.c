@@ -81,6 +81,8 @@ void i5000snd_device::sound_stream_update(sound_stream &stream, stream_sample_t 
 			
 			m_channels[ch].output_r = data * m_channels[ch].vol_r;
 			m_channels[ch].output_l = data * m_channels[ch].vol_l;
+			mix_r += m_channels[ch].output_r;
+			mix_l += m_channels[ch].output_l;
 		}
 		
 		outputs[0][i] = mix_r / (16*8);
