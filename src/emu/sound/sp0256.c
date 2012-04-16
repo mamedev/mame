@@ -1357,6 +1357,14 @@ WRITE16_DEVICE_HANDLER( spb640_w )
 	}
 }
 
+void sp0256_set_clock(device_t *device, int clock)
+{
+    sp0256_state *sp = get_safe_token(device);
+
+    device->set_unscaled_clock(clock);
+    sp->stream->set_sample_rate(clock / CLOCK_DIVIDER);
+}
+
 /**************************************************************************
  * Generic get_info
  **************************************************************************/
