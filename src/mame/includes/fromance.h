@@ -11,14 +11,14 @@ class fromance_state : public driver_device
 {
 public:
 	fromance_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_videoram(*this, "videoram"),
+		  m_spriteram(*this, "spriteram") { }
 
 	/* memory pointers (used by pipedrm) */
-	UINT8 *  m_videoram;
-	UINT8 *  m_spriteram;
+	optional_shared_ptr<UINT8> m_videoram;
+	optional_shared_ptr<UINT8> m_spriteram;
 //  UINT8 *  m_paletteram;    // currently this uses generic palette handling
-	size_t   m_videoram_size;
-	size_t   m_spriteram_size;
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;

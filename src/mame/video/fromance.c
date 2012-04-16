@@ -304,7 +304,7 @@ static void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rec
 	int offs;
 
 	/* draw the sprites */
-	for (offs = 0; offs < state->m_spriteram_size; offs += 8)
+	for (offs = 0; offs < state->m_spriteram.bytes(); offs += 8)
 	{
 		int data2 = spriteram[offs + 4] | (spriteram[offs + 5] << 8);
 		int priority = (data2 >> 4) & 1;

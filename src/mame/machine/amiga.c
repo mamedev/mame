@@ -155,16 +155,16 @@ static TIMER_CALLBACK( scanline_callback );
 static UINT16 amiga_chip_ram16_r(amiga_state *state, offs_t offset)
 {
 	offset &= state->m_intf->chip_ram_mask;
-	return (offset < state->m_chip_ram_size) ? state->m_chip_ram[offset/2] : 0xffff;
+	return (offset < state->m_chip_ram.bytes()) ? state->m_chip_ram[offset/2] : 0xffff;
 }
 
 static UINT16 amiga_chip_ram32_r(amiga_state *state, offs_t offset)
 {
 	offset &= state->m_intf->chip_ram_mask;
 
-	if (offset < state->m_chip_ram_size)
+	if (offset < state->m_chip_ram.bytes())
 	{
-		UINT32 *amiga_chip_ram32 = (UINT32 *)state->m_chip_ram;
+		UINT32 *amiga_chip_ram32 = reinterpret_cast<UINT32 *>(state->m_chip_ram.target());
 		UINT32	dat = amiga_chip_ram32[offset / 4];
 
 		if ( offset & 2 )
@@ -180,7 +180,7 @@ static void amiga_chip_ram16_w(amiga_state *state, offs_t offset, UINT16 data)
 {
 	offset &= state->m_intf->chip_ram_mask;
 
-	if (offset < state->m_chip_ram_size)
+	if (offset < state->m_chip_ram.bytes())
 		state->m_chip_ram[offset/2] = data;
 }
 
@@ -188,9 +188,9 @@ static void amiga_chip_ram32_w(amiga_state *state, offs_t offset, UINT16 data)
 {
 	offset &= state->m_intf->chip_ram_mask;
 
-	if (offset < state->m_chip_ram_size)
+	if (offset < state->m_chip_ram.bytes())
 	{
-		UINT32 *amiga_chip_ram32 = (UINT32 *)state->m_chip_ram;
+		UINT32 *amiga_chip_ram32 = reinterpret_cast<UINT32 *>(state->m_chip_ram.target());
 		UINT32	dat = amiga_chip_ram32[offset / 4];
 
 		if ( offset & 2 )

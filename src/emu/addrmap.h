@@ -757,9 +757,6 @@ void _class :: _name(address_map &map, const device_t &device) \
 #define AM_RAM_WRITE_LEGACY(_write)			AM_READONLY AM_WRITE_LEGACY(_write)
 #define AM_RAM_DEVWRITE_LEGACY(_tag, _write) AM_READONLY AM_DEVWRITE_LEGACY(_tag, _write)
 
-#define myoffsetof(_struct, _member)  ((FPTR)&((_struct *)0x1000)->_member - 0x1000)
-#define AM_BASE_SIZE(_base, _size)			curentry->set_member_baseptr(myoffsetof(drivdata_class, _base)); curentry->set_member_sizeptr(myoffsetof(drivdata_class, _size));
-
 
 
 
