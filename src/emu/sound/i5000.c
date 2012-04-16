@@ -7,11 +7,9 @@
     16-channel ADPCM player.
 
     TODO:
-    - How does it determine sample length??? Right now the channels
-      continue playing forever, until stopped with reg 0x43.
     - Tokimeki Mahjong Paradise uses several different sample formats
       (4-bit ADPCM, 3-bit ADPCM, and unknown(s))
-    - verify volume balance (is it really linear?)
+    - improve volume balance (is it really linear?)
     - verify that 4-bit ADPCM is the same as standard OKI ADPCM
 
 ***************************************************************************/
@@ -73,8 +71,16 @@ void i5000snd_device::sound_stream_update(sound_stream &stream, stream_sample_t 
 			}
 			m_channels[ch].timer += m_channels[ch].freq;
 			
-			// get amplitude for 4-bit adpcm
 			int data = m_rom_base[m_channels[ch].address >> 1 & m_rom_mask];
+			
+			// check sample end ID
+			if (data == 0x7f && data == m_rom_base[((m_channels[ch].address >> 1) + 1) & m_rom_mask])
+			{
+				m_channels[ch].is_playing = false;
+				continue;
+			}
+
+			// get amplitude for 4-bit adpcm
 			if (m_channels[ch].address & 1) data >>= 4;
 			m_channels[ch].address++;
 			data = m_channels[ch].m_adpcm.clock(data & 0xf);
@@ -128,8 +134,20 @@ void i5000snd_device::write_reg16(UINT8 reg, UINT16 data)
 				{
 					if (data & (1 << ch))
 					{
+						UINT32 address = (m_regs[ch << 2 | 1] << 16 | m_regs[ch << 2]) << 1;
+						UINT16 start = m_rom_base[(address + 0) & m_rom_mask] << 8 | m_rom_base[(address + 1) & m_rom_mask];
+//						UINT16 param = m_rom_base[(address + 2) & m_rom_mask] << 8 | m_rom_base[(address + 3) & m_rom_mask];
+						
+						// check sample start ID
+						if (start != 0x7f7f)
+						{
+							logerror("i5000snd: channel %d wrong sample start ID %04X!\n", ch, start);
+							continue;
+						}
+						
+						m_channels[ch].address = (address + 4) << 1;
+
 						m_channels[ch].is_playing = true;
-						m_channels[ch].address = (m_regs[ch << 2 | 1] << 16 | m_regs[ch << 2]) << 2;
 						m_channels[ch].timer = 0;
 						m_channels[ch].output_l = 0;
 						m_channels[ch].output_r = 0;
