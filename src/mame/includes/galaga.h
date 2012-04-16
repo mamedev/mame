@@ -9,7 +9,7 @@ public:
 		m_galaga_ram1(*this, "galaga_ram1"),
 		m_galaga_ram2(*this, "galaga_ram2"),
 		m_galaga_ram3(*this, "galaga_ram3"),
-		m_galaga_starcontrol(*this, "galaga_starcontrol")
+		m_galaga_starcontrol(*this, "starcontrol")
 		{ }
 
 	/* memory pointers */
@@ -53,10 +53,10 @@ public:
 		m_xevious_sr1(*this, "xevious_sr1"),
 		m_xevious_sr2(*this, "xevious_sr2"),
 		m_xevious_sr3(*this, "xevious_sr3"),
-		m_xevious_fg_colorram(*this, "xevious_fg_colorram"),
-		m_xevious_bg_colorram(*this, "xevious_bg_colorram"),
-		m_xevious_fg_videoram(*this, "xevious_fg_videoram"),
-		m_xevious_bg_videoram(*this, "xevious_bg_videoram") { }
+		m_xevious_fg_colorram(*this, "fg_colorram"),
+		m_xevious_bg_colorram(*this, "bg_colorram"),
+		m_xevious_fg_videoram(*this, "fg_videoram"),
+		m_xevious_bg_videoram(*this, "bg_videoram") { }
 
 	required_shared_ptr<UINT8> m_xevious_sr1;
 	required_shared_ptr<UINT8> m_xevious_sr2;
@@ -76,7 +76,7 @@ public:
 	bosco_state(const machine_config &mconfig, device_type type, const char *tag)
 		: galaga_state(mconfig, type, tag),
 		  m_bosco_radarattr(*this, "bosco_radarattr"),
-		  m_bosco_starcontrol(*this, "bosco_starcontrol"),
+		  m_bosco_starcontrol(*this, "starcontrol"),
 		  m_bosco_starblink(*this, "bosco_starblink") { }
 
 	required_shared_ptr<UINT8> m_bosco_radarattr;

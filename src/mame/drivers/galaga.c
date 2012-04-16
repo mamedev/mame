@@ -932,7 +932,7 @@ static ADDRESS_MAP_START( bosco_map, AS_PROGRAM, 8, bosco_state )
 	AM_RANGE(0x9800, 0x980f) AM_WRITEONLY AM_SHARE("bosco_radarattr")
 	AM_RANGE(0x9810, 0x9810) AM_WRITE_LEGACY(bosco_scrollx_w)
 	AM_RANGE(0x9820, 0x9820) AM_WRITE_LEGACY(bosco_scrolly_w)
-	AM_RANGE(0x9830, 0x9830) AM_WRITEONLY AM_SHARE("bosco_starcontrol")
+	AM_RANGE(0x9830, 0x9830) AM_WRITEONLY AM_SHARE("starcontrol")
 	AM_RANGE(0x9840, 0x9840) AM_WRITE_LEGACY(bosco_starclr_w)
 	AM_RANGE(0x9870, 0x9870) AM_WRITE(bosco_flip_screen_w)
 	AM_RANGE(0x9874, 0x9875) AM_WRITEONLY AM_SHARE("bosco_starblink")
@@ -951,7 +951,7 @@ static ADDRESS_MAP_START( galaga_map, AS_PROGRAM, 8, galaga_state )
 	AM_RANGE(0x8800, 0x8bff) AM_RAM AM_SHARE("galaga_ram1")
 	AM_RANGE(0x9000, 0x93ff) AM_RAM AM_SHARE("galaga_ram2")
 	AM_RANGE(0x9800, 0x9bff) AM_RAM AM_SHARE("galaga_ram3")
-	AM_RANGE(0xa000, 0xa005) AM_WRITEONLY AM_SHARE("galaga_starcontrol")
+	AM_RANGE(0xa000, 0xa005) AM_WRITEONLY AM_SHARE("starcontrol")
 	AM_RANGE(0xa007, 0xa007) AM_WRITE(galaga_flip_screen_w)
 ADDRESS_MAP_END
 
@@ -968,10 +968,10 @@ static ADDRESS_MAP_START( xevious_map, AS_PROGRAM, 8, xevious_state )
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("xevious_sr1")	/* work RAM + sprite registers */
 	AM_RANGE(0x9000, 0x97ff) AM_RAM AM_SHARE("xevious_sr2")	/* work RAM + sprite registers */
 	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_SHARE("xevious_sr3")	/* work RAM + sprite registers */
-	AM_RANGE(0xb000, 0xb7ff) AM_RAM_WRITE_LEGACY(xevious_fg_colorram_w) AM_SHARE("xevious_fg_colorram")
-	AM_RANGE(0xb800, 0xbfff) AM_RAM_WRITE_LEGACY(xevious_bg_colorram_w) AM_SHARE("xevious_bg_colorram")
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE_LEGACY(xevious_fg_videoram_w) AM_SHARE("xevious_fg_videoram")
-	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE_LEGACY(xevious_bg_videoram_w) AM_SHARE("xevious_bg_videoram")
+	AM_RANGE(0xb000, 0xb7ff) AM_RAM_WRITE_LEGACY(xevious_fg_colorram_w) AM_SHARE("fg_colorram")
+	AM_RANGE(0xb800, 0xbfff) AM_RAM_WRITE_LEGACY(xevious_bg_colorram_w) AM_SHARE("bg_colorram")
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE_LEGACY(xevious_fg_videoram_w) AM_SHARE("fg_videoram")
+	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE_LEGACY(xevious_bg_videoram_w) AM_SHARE("bg_videoram")
 	AM_RANGE(0xd000, 0xd07f) AM_WRITE_LEGACY(xevious_vh_latch_w)
 	AM_RANGE(0xf000, 0xffff) AM_READWRITE_LEGACY(xevious_bb_r, xevious_bs_w)
 ADDRESS_MAP_END
