@@ -1778,6 +1778,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/majorpkr.o \
 	$(DRIVERS)/malzak.o $(VIDEO)/malzak.o \
 	$(DRIVERS)/mcatadv.o $(VIDEO)/mcatadv.o \
+	$(DRIVERS)/meyc8080.o \
 	$(DRIVERS)/micro3d.o $(MACHINE)/micro3d.o $(VIDEO)/micro3d.o $(AUDIO)/micro3d.o \
 	$(DRIVERS)/midas.o \
 	$(DRIVERS)/miniboy7.o \
@@ -1873,7 +1874,6 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/vp101.o \
 	$(DRIVERS)/vpoker.o \
 	$(DRIVERS)/vroulet.o \
-	$(DRIVERS)/wldarrow.o \
 	$(DRIVERS)/xtom3d.o \
 	$(DRIVERS)/xyonix.o $(VIDEO)/xyonix.o \
 	$(DRIVERS)/gamtor.o \
@@ -2060,6 +2060,10 @@ $(DRIVERS)/mw8080bw.o:	$(LAYOUT)/280zzzap.lh \
 
 $(DRIVERS)/meadows.o:	$(LAYOUT)/deadeye.lh \
 			$(LAYOUT)/gypsyjug.lh
+
+$(DRIVERS)/meyc8080.o:	$(LAYOUT)/wldarrow.lh \
+			$(LAYOUT)/mdrawpkr.lh \
+			$(LAYOUT)/meybjack.lh
 
 $(DRIVERS)/midzeus.o:	$(LAYOUT)/crusnexo.lh
 
