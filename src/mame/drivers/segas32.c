@@ -2963,7 +2963,7 @@ ROM_END
     Holosseum
     not protected
      Game: 833-8887-01 HOLOSSEUM
-Rom board: 833-8888-01
+Rom board: 834-8888-01
 
 */
 ROM_START( holo )
