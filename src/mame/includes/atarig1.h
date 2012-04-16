@@ -10,12 +10,13 @@ class atarig1_state : public atarigen_state
 {
 public:
 	atarig1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: atarigen_state(mconfig, type, tag) { }
+		: atarigen_state(mconfig, type, tag),
+		  m_mo_command(*this, "mo_command") { }
 
 	UINT8			m_is_pitfight;
 
 	UINT8			m_which_input;
-	UINT16 *		m_mo_command;
+	required_shared_ptr<UINT16> m_mo_command;
 
 	UINT16 *		m_bslapstic_base;
 	void *			m_bslapstic_bank0;

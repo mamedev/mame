@@ -58,14 +58,14 @@ public:
 
 	optional_shared_ptr<UINT16>	m_nvram;
 	UINT8 *m_blit_buffer;
-	required_shared_ptr<UINT16> m_frame_buffer;
-	required_shared_ptr<UINT16> m_blit_romaddr;
-	required_shared_ptr<UINT16> m_blit_attr1_ram;
-	required_shared_ptr<UINT16> m_blit_dst_ram_loword;
-	required_shared_ptr<UINT16> m_blit_attr2_ram;
-	required_shared_ptr<UINT16> m_blit_dst_ram_hiword;
-	required_shared_ptr<UINT16> m_blit_vregs;
-	required_shared_ptr<UINT16> m_blit_transpen;
+	optional_shared_ptr<UINT16> m_frame_buffer;
+	optional_shared_ptr<UINT16> m_blit_romaddr;
+	optional_shared_ptr<UINT16> m_blit_attr1_ram;
+	optional_shared_ptr<UINT16> m_blit_dst_ram_loword;
+	optional_shared_ptr<UINT16> m_blit_attr2_ram;
+	optional_shared_ptr<UINT16> m_blit_dst_ram_hiword;
+	optional_shared_ptr<UINT16> m_blit_vregs;
+	optional_shared_ptr<UINT16> m_blit_transpen;
 	optional_shared_ptr<UINT16> m_leds0;
 	optional_shared_ptr<UINT16> m_leds1;
 	optional_shared_ptr<UINT16> m_leds2;

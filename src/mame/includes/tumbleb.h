@@ -11,11 +11,11 @@ public:
 		m_control(*this, "control"){ }
 
 	/* memory pointers */
-	required_shared_ptr<UINT16> m_mainram;
+	optional_shared_ptr<UINT16> m_mainram;
 	required_shared_ptr<UINT16> m_spriteram;
 	required_shared_ptr<UINT16> m_pf1_data;
 	required_shared_ptr<UINT16> m_pf2_data;
-	required_shared_ptr<UINT16> m_control;
+	optional_shared_ptr<UINT16> m_control;
 //  UINT16 *    m_paletteram;    // currently this uses generic palette handling
 
 	/* misc */

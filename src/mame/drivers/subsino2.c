@@ -95,8 +95,8 @@ public:
 	int m_hm86171_offs;
 	UINT8 m_dsw_mask;
 	required_shared_ptr<UINT16> m_outputs16;
-	required_shared_ptr<UINT8> m_outputs;
-	required_shared_ptr<UINT8> m_am188em_regs;
+	optional_shared_ptr<UINT8> m_outputs;
+	optional_shared_ptr<UINT8> m_am188em_regs;
 	UINT16 m_bishjan_sel;
 	UINT16 m_bishjan_input;
 	DECLARE_WRITE8_MEMBER(ss9601_byte_lo_w);

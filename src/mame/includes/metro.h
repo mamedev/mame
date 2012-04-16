@@ -46,17 +46,17 @@ public:
 	optional_shared_ptr<UINT16> m_vram_1;
 	optional_shared_ptr<UINT16> m_vram_2;
 	required_shared_ptr<UINT16> m_spriteram;
-	required_shared_ptr<UINT16> m_tiletable;
+	optional_shared_ptr<UINT16> m_tiletable;
 	UINT16 *    m_tiletable_old;
-	required_shared_ptr<UINT16> m_blitter_regs;
-	required_shared_ptr<UINT16> m_scroll;
-	required_shared_ptr<UINT16> m_window;
-	required_shared_ptr<UINT16> m_irq_enable;
+	optional_shared_ptr<UINT16> m_blitter_regs;
+	optional_shared_ptr<UINT16> m_scroll;
+	optional_shared_ptr<UINT16> m_window;
+	optional_shared_ptr<UINT16> m_irq_enable;
 	optional_shared_ptr<UINT16> m_irq_levels;
 	optional_shared_ptr<UINT16> m_irq_vectors;
-	required_shared_ptr<UINT16> m_rombank;
+	optional_shared_ptr<UINT16> m_rombank;
 	required_shared_ptr<UINT16> m_videoregs;
-	required_shared_ptr<UINT16> m_screenctrl;
+	optional_shared_ptr<UINT16> m_screenctrl;
 	optional_shared_ptr<UINT16> m_input_sel;
 	optional_shared_ptr<UINT16> m_k053936_ram;
 

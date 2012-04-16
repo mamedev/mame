@@ -12,8 +12,8 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<UINT8> m_spriteram;
 	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_bitmapram;
-	required_shared_ptr<UINT8> m_bitmapram2;
+	optional_shared_ptr<UINT8> m_bitmapram;
+	optional_shared_ptr<UINT8> m_bitmapram2;
 
 	INT16 *m_samplebuf;
 	UINT8 m_port1;

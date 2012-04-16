@@ -49,12 +49,12 @@ public:
 
 	optional_shared_ptr<UINT8> m_sharedram;
 	optional_shared_ptr<UINT16> m_workram;
-	required_shared_ptr<UINT16> m_vregs;
-	required_shared_ptr<UINT16> m_vram_0;
-	required_shared_ptr<UINT16> m_vctrl_0;
-	required_shared_ptr<UINT16> m_vram_2;
-	required_shared_ptr<UINT16> m_vctrl_2;
-	required_shared_ptr<UINT16> m_paletteram;
+	optional_shared_ptr<UINT16> m_vregs;
+	optional_shared_ptr<UINT16> m_vram_0;
+	optional_shared_ptr<UINT16> m_vctrl_0;
+	optional_shared_ptr<UINT16> m_vram_2;
+	optional_shared_ptr<UINT16> m_vctrl_2;
+	optional_shared_ptr<UINT16> m_paletteram;
 	optional_shared_ptr<UINT16> m_paletteram2;
 	optional_shared_ptr<UINT16> m_kiwame_nvram;
 	optional_shared_ptr<UINT16> m_inttoote_key_select;

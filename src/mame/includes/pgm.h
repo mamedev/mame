@@ -101,7 +101,8 @@ class pgm_arm_type1_state : public pgm_state
 {
 public:
 	pgm_arm_type1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: pgm_state(mconfig, type, tag) {
+		: pgm_state(mconfig, type, tag),
+		  m_arm7_shareram(*this, "arm7_shareram") {
 
 		m_curslots = 0;
 		m_puzzli_54_trigger = 0;
@@ -137,7 +138,7 @@ public:
 	UINT16        m_pgm_arm_type1_highlatch_68k_w;
 	UINT16        m_pgm_arm_type1_lowlatch_68k_w;
 	UINT32        m_pgm_arm_type1_counter;
-	UINT32 *      m_arm7_shareram;
+	required_shared_ptr<UINT32> m_arm7_shareram;
 
 	cpu_device *m_prot;
 };

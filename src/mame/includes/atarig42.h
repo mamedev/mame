@@ -10,7 +10,8 @@ class atarig42_state : public atarigen_state
 {
 public:
 	atarig42_state(const machine_config &mconfig, device_type type, const char *tag)
-		: atarigen_state(mconfig, type, tag) { }
+		: atarigen_state(mconfig, type, tag),
+		  m_mo_command(*this, "mo_command") { }
 
 	UINT16			m_playfield_base;
 
@@ -21,7 +22,7 @@ public:
 	UINT16			m_playfield_yscroll;
 
 	UINT8			m_analog_data;
-	UINT16 *		m_mo_command;
+	required_shared_ptr<UINT16> m_mo_command;
 
 	int 			m_sloop_bank;
 	int 			m_sloop_next_bank;

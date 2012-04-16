@@ -28,7 +28,7 @@ public:
 	required_shared_ptr<UINT16> m_colorram2;
 	required_shared_ptr<UINT16> m_spriteram;
 	required_shared_ptr<UINT16> m_paletteram;
-	required_shared_ptr<UINT8> m_gx400_shared_ram;
+	optional_shared_ptr<UINT8> m_gx400_shared_ram;
 
 	/* video-related */
 	tilemap_t *m_background;

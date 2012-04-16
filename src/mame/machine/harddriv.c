@@ -61,7 +61,7 @@ MACHINE_START( harddriv )
 	/* predetermine memory regions */
 	state->m_sim_memory = (UINT16 *)machine.region("user1")->base();
 	state->m_sim_memory_size = machine.region("user1")->bytes() / 2;
-	state->m_adsp_pgm_memory_word = (UINT16 *)((UINT8 *)state->m_adsp_pgm_memory + 1);
+	state->m_adsp_pgm_memory_word = (UINT16 *)(reinterpret_cast<UINT8 *>(state->m_adsp_pgm_memory.target()) + 1);
 }
 
 

@@ -37,7 +37,7 @@ public:
 	required_shared_ptr<UINT8> m_spriteram;
 	optional_shared_ptr<UINT8> m_spriteram2;
 	required_shared_ptr<UINT8> m_attributesram;
-	required_shared_ptr<UINT8> m_bulletsram;
+	optional_shared_ptr<UINT8> m_bulletsram;
 	optional_shared_ptr<UINT8> m_rockclim_videoram;
 	optional_shared_ptr<UINT8> m_racknrol_tiles_bank;
 

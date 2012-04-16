@@ -19,17 +19,17 @@ public:
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_sharedram;
-	required_shared_ptr<UINT16> m_spr1vram;
-	required_shared_ptr<UINT16> m_spr2vram;
-	required_shared_ptr<UINT16> m_spr1cgram;
-	required_shared_ptr<UINT16> m_spr2cgram;
+	optional_shared_ptr<UINT16> m_spr1vram;
+	optional_shared_ptr<UINT16> m_spr2vram;
+	optional_shared_ptr<UINT16> m_spr1cgram;
+	optional_shared_ptr<UINT16> m_spr2cgram;
 	required_shared_ptr<UINT16> m_fgvideoram;
 	required_shared_ptr<UINT16> m_rozvideoram;
-	required_shared_ptr<UINT16> m_sprcgram;
-	required_shared_ptr<UINT16> m_spritelist;
-	required_shared_ptr<UINT16> m_spriteram;
-	required_shared_ptr<UINT16> m_fgregs;
-	required_shared_ptr<UINT16> m_rozregs;
+	optional_shared_ptr<UINT16> m_sprcgram;
+	optional_shared_ptr<UINT16> m_spritelist;
+	optional_shared_ptr<UINT16> m_spriteram;
+	optional_shared_ptr<UINT16> m_fgregs;
+	optional_shared_ptr<UINT16> m_rozregs;
 	UINT16 *  m_zoomdata;
 //      UINT16 *  m_paletteram;    // currently this uses generic palette handling
 

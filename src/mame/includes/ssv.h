@@ -24,11 +24,11 @@ public:
 	required_shared_ptr<UINT16> m_paletteram;
 	required_shared_ptr<UINT16> m_scroll;
 	required_shared_ptr<UINT16> m_irq_vectors;
-	required_shared_ptr<UINT16> m_gdfs_tmapram;
-	required_shared_ptr<UINT16> m_gdfs_tmapscroll;
-	required_shared_ptr<UINT16> m_spriteram2;
-	required_shared_ptr<UINT16> m_gdfs_blitram;
-	required_shared_ptr<UINT16> m_input_sel;
+	optional_shared_ptr<UINT16> m_gdfs_tmapram;
+	optional_shared_ptr<UINT16> m_gdfs_tmapscroll;
+	optional_shared_ptr<UINT16> m_spriteram2;
+	optional_shared_ptr<UINT16> m_gdfs_blitram;
+	optional_shared_ptr<UINT16> m_input_sel;
 
 	int m_tile_code[16];
 

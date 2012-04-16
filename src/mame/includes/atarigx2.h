@@ -10,12 +10,14 @@ class atarigx2_state : public atarigen_state
 {
 public:
 	atarigx2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: atarigen_state(mconfig, type, tag) { }
+		: atarigen_state(mconfig, type, tag),
+		  m_mo_command(*this, "mo_command"),
+		  m_protection_base(*this, "protection_base") { }
 
 	UINT16			m_playfield_base;
 
-	UINT32 *		m_mo_command;
-	UINT32 *		m_protection_base;
+	required_shared_ptr<UINT32> m_mo_command;
+	required_shared_ptr<UINT32> m_protection_base;
 
 	UINT16			m_current_control;
 	UINT8			m_playfield_tile_bank;

@@ -21,7 +21,7 @@ public:
 	required_shared_ptr<UINT8> m_spr1_videoram;
 	required_shared_ptr<UINT8> m_spr2_videoram;
 	required_shared_ptr<UINT8> m_bg_bot_videoram;
-	required_shared_ptr<UINT8> m_armwrest_fg_videoram;
+	optional_shared_ptr<UINT8> m_armwrest_fg_videoram;
 	tilemap_t *m_bg_top_tilemap;
 	tilemap_t *m_bg_bot_tilemap;
 	tilemap_t *m_fg_tilemap;

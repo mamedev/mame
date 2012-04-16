@@ -19,9 +19,9 @@ public:
 	required_shared_ptr<UINT16> m_vram_2;
 	required_shared_ptr<UINT16> m_vregs;
 	required_shared_ptr<UINT16> m_dsw_select;
-	required_shared_ptr<UINT16> m_backup_ram;
-	required_shared_ptr<UINT16> m_vram_0ras;
-	required_shared_ptr<UINT16> m_vram_1ras;
+	optional_shared_ptr<UINT16> m_backup_ram;
+	optional_shared_ptr<UINT16> m_vram_0ras;
+	optional_shared_ptr<UINT16> m_vram_1ras;
 	bitmap_ind16 *m_tmpbitmap0;
 	bitmap_ind16 *m_tmpbitmap1;
 	int m_disable_video;

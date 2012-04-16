@@ -106,6 +106,8 @@ public:
 		  m_alpha2(*this, "alpha2"),
 		  m_xscroll(*this, "xscroll"),
 		  m_yscroll(*this, "yscroll"),
+		  m_playfield32(*this, "playfield32"),
+		  m_alpha32(*this, "alpha32"),
 		  m_atarivc_data(*this, "atarivc_data"),
 		  m_atarivc_eof_data(*this, "atarivc_eof_data") { }
 
@@ -143,8 +145,8 @@ public:
 	optional_shared_ptr<UINT16> m_xscroll;
 	optional_shared_ptr<UINT16> m_yscroll;
 
-	UINT32 *			m_playfield32;
-	UINT32 *			m_alpha32;
+	optional_shared_ptr<UINT32> m_playfield32;
+	optional_shared_ptr<UINT32> m_alpha32;
 
 	tilemap_t *			m_playfield_tilemap;
 	tilemap_t *			m_playfield2_tilemap;

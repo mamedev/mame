@@ -91,7 +91,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<UINT16> m_priority_ram;
-	required_shared_ptr<UINT16> m_vbowl_trackball;
+	optional_shared_ptr<UINT16> m_vbowl_trackball;
 	UINT8 *m_layer[8];
 	UINT16 m_priority;
 	UINT8 m_lhb2_pen_hi;

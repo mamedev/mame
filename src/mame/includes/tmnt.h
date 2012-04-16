@@ -12,9 +12,9 @@ public:
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_spriteram;
-	required_shared_ptr<UINT16> m_tmnt2_rom;
-	required_shared_ptr<UINT16> m_sunset_104000;
-	required_shared_ptr<UINT16> m_tmnt2_1c0800;
+	optional_shared_ptr<UINT16> m_tmnt2_rom;
+	optional_shared_ptr<UINT16> m_sunset_104000;
+	optional_shared_ptr<UINT16> m_tmnt2_1c0800;
 //  UINT16 *    m_paletteram;    // currently this uses generic palette handling
 //  UINT8 *     m_nvram;    // currently cuebrick uses generic nvram handling
 //  UINT8 *     m_cuebrick_nvram;

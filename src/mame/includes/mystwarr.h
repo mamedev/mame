@@ -3,10 +3,12 @@ class mystwarr_state : public konamigx_state
 public:
 	mystwarr_state(const machine_config &mconfig, device_type type, const char *tag)
 		: konamigx_state(mconfig, type, tag),
+		m_gx_workram(*this,"gx_workram"),
+		m_spriteram(*this,"spriteram"),
 		m_maincpu(*this,"maincpu")
 		{ }
 
-	UINT16 *m_gx_workram;
+	required_shared_ptr<UINT16> m_gx_workram;
 	UINT8 m_mw_irq_control;
 	int m_cur_sound_region;
 	int m_layer_colorbase[6];
@@ -20,7 +22,7 @@ public:
 	int m_roz_rombank;
 	tilemap_t *m_ult_936_tilemap;
 	UINT16 m_clip;
-	UINT16 *m_spriteram;
+	required_shared_ptr<UINT16> m_spriteram;
 
 	required_device<cpu_device> m_maincpu;
 	DECLARE_READ16_MEMBER(eeprom_r);

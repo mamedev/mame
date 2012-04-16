@@ -15,7 +15,7 @@ public:
 	required_shared_ptr<UINT8> m_row_scroll;
 	required_shared_ptr<UINT8> m_spriteram2;
 	required_shared_ptr<UINT8> m_colorram;
-	required_shared_ptr<UINT8> m_nvram;
+	optional_shared_ptr<UINT8> m_nvram;
 
 	UINT8 m_portb;
 	tilemap_t *m_bg_tilemap;

@@ -11,11 +11,11 @@ public:
 		m_scratchram(*this, "scratchram"){ }
 
 	required_shared_ptr<UINT8> m_paletteram;
-	required_shared_ptr<UINT8> m_bg_vram; /* prosport */
+	optional_shared_ptr<UINT8> m_bg_vram; /* prosport */
 	required_shared_ptr<UINT8> m_colorram;
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_spriteram;
-	required_shared_ptr<UINT8> m_scratchram;
+	optional_shared_ptr<UINT8> m_scratchram;
 	UINT8 *m_charram;	/* prosoccr */
 
 	UINT8 m_io_ram[16];

@@ -118,7 +118,7 @@ static WRITE16_HANDLER( pgm_arm7_type1_68k_protlatch_w )
 static READ16_HANDLER( pgm_arm7_type1_ram_r )
 {
 	pgm_arm_type1_state *state = space->machine().driver_data<pgm_arm_type1_state>();
-	UINT16 *share16 = (UINT16 *)state->m_arm7_shareram;
+	UINT16 *share16 = reinterpret_cast<UINT16 *>(state->m_arm7_shareram.target());
 
 	if (PGMARM7LOGERROR)
 		logerror("M68K: ARM7 Shared RAM Read: %04x = %04x (%08x) (%06x)\n", BYTE_XOR_LE(offset), share16[BYTE_XOR_LE(offset)], mem_mask, cpu_get_pc(&space->device()));
@@ -128,7 +128,7 @@ static READ16_HANDLER( pgm_arm7_type1_ram_r )
 static WRITE16_HANDLER( pgm_arm7_type1_ram_w )
 {
 	pgm_arm_type1_state *state = space->machine().driver_data<pgm_arm_type1_state>();
-	UINT16 *share16 = (UINT16 *)state->m_arm7_shareram;
+	UINT16 *share16 = reinterpret_cast<UINT16 *>(state->m_arm7_shareram.target());
 
 	if (PGMARM7LOGERROR)
 		logerror("M68K: ARM7 Shared RAM Write: %04x = %04x (%04x) (%06x)\n", BYTE_XOR_LE(offset), data, mem_mask, cpu_get_pc(&space->device()));
@@ -277,7 +277,7 @@ static READ16_HANDLER( kovsh_fake_region_r )
 	if (regionhack != 0xff) return regionhack;
 
 	offset = 0x4;
-	UINT16 *share16 = (UINT16 *)state->m_arm7_shareram;
+	UINT16 *share16 = reinterpret_cast<UINT16 *>(state->m_arm7_shareram.target());
 	return share16[BYTE_XOR_LE(offset << 1)];
 }
 

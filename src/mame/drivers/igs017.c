@@ -62,9 +62,9 @@ public:
 
 	int m_input_addr;
 	required_device<cpu_device> m_maincpu;
-	required_shared_ptr<UINT8> m_spriteram;
-	required_shared_ptr<UINT8> m_fg_videoram;
-	required_shared_ptr<UINT8> m_bg_videoram;
+	optional_shared_ptr<UINT8> m_spriteram;
+	optional_shared_ptr<UINT8> m_fg_videoram;
+	optional_shared_ptr<UINT8> m_bg_videoram;
 
 	int m_toggle;
 	int m_debug_addr;

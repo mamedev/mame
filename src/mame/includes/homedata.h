@@ -8,7 +8,7 @@ public:
 		m_videoram(*this, "videoram"){ }
 
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_vreg;
+	optional_shared_ptr<UINT8> m_vreg;
 	required_shared_ptr<UINT8> m_videoram;
 
 	/* video-related */

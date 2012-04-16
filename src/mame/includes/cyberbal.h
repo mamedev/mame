@@ -10,10 +10,12 @@ class cyberbal_state : public atarigen_state
 {
 public:
 	cyberbal_state(const machine_config &mconfig, device_type type, const char *tag)
-		: atarigen_state(mconfig, type, tag) { }
+		: atarigen_state(mconfig, type, tag),
+		  m_paletteram_0(*this, "paletteram_0"),
+		  m_paletteram_1(*this, "paletteram_1") { }
 
-	UINT16 *		m_paletteram_0;
-	UINT16 *		m_paletteram_1;
+	optional_shared_ptr<UINT16> m_paletteram_0;
+	optional_shared_ptr<UINT16> m_paletteram_1;
 	UINT16			m_current_slip[2];
 	UINT8			m_playfield_palette_bank[2];
 	UINT16			m_playfield_xscroll[2];

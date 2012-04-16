@@ -13,7 +13,7 @@ public:
 	optional_device<buffered_spriteram8_device> m_spriteram;
 	optional_device<buffered_spriteram16_device> m_spriteram16;
 	required_shared_ptr<UINT8> m_txvideoram;
-	required_shared_ptr<UINT8> m_paletteram_flytiger;
+	optional_shared_ptr<UINT8> m_paletteram_flytiger;
 	UINT8 m_sprites_disabled;
 	UINT8 m_flytiger_palette_bank;
 	UINT8 m_flytiger_pri;

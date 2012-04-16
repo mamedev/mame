@@ -29,7 +29,7 @@ public:
 	required_device<cpu_device> m_mcu;
 	required_shared_ptr<UINT32> m_nvmem32;
 	required_shared_ptr<UINT32> m_spritebank32;
-	required_shared_ptr<UINT32> m_tilebank32;
+	optional_shared_ptr<UINT32> m_tilebank32;
 	required_shared_ptr<UINT16> m_namconb_shareram;
 
 	UINT8 m_namconb_cpureg[32];

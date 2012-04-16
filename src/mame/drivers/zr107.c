@@ -188,7 +188,7 @@ public:
 	UINT8 m_led_reg1;
 	int m_ccu_vcth;
 	int m_ccu_vctl;
-	required_shared_ptr<UINT32> m_workram;
+	optional_shared_ptr<UINT32> m_workram;
 	UINT32 *m_sharc_dataram;
 	DECLARE_WRITE32_MEMBER(paletteram32_w);
 	DECLARE_READ8_MEMBER(sysreg_r);

@@ -85,7 +85,7 @@ VIDEO_START( harddriv )
 		}
 
 	/* init VRAM pointers */
-	state->m_vram_mask = state->m_gsp_vram_size - 1;
+	state->m_vram_mask = state->m_gsp_vram.bytes() - 1;
 }
 
 

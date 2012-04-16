@@ -23,10 +23,10 @@ public:
 	required_shared_ptr<UINT8> m_colorram;
 	required_shared_ptr<UINT8> m_spriteram;
 	required_shared_ptr<UINT8> m_back_color;
-	required_shared_ptr<UINT8> m_chip_data;
-	required_shared_ptr<UINT8> m_bitmap_ram;   	/* 0x2000 bytes for a 256 x 256 x 1 bitmap */
-	required_shared_ptr<UINT8> m_last_colors;
-	required_shared_ptr<UINT8> m_track_scroll;
+	optional_shared_ptr<UINT8> m_chip_data;
+	optional_shared_ptr<UINT8> m_bitmap_ram;   	/* 0x2000 bytes for a 256 x 256 x 1 bitmap */
+	optional_shared_ptr<UINT8> m_last_colors;
+	optional_shared_ptr<UINT8> m_track_scroll;
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;

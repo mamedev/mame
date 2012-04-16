@@ -305,12 +305,12 @@ static void perform_blit(address_space *space)
 	if (FULL_LOGGING)
 		logerror("Blit: scan=%d  src=%06x @ (%05x) for %dx%d ... flags=%02x\n",
 				space->machine().primary_screen->vpos(),
-				(*state->m_grom_bank << 16) | (BLITTER_ADDRHI << 8) | BLITTER_ADDRLO,
+				(state->m_grom_bank << 16) | (BLITTER_ADDRHI << 8) | BLITTER_ADDRLO,
 				tms_state.regs[TMS34061_XYADDRESS] | ((tms_state.regs[TMS34061_XYOFFSET] & 0x300) << 8),
 				BLITTER_WIDTH, BLITTER_HEIGHT, BLITTER_FLAGS);
 
 	/* initialize the fetcher */
-	state->m_fetch_offset = (*state->m_grom_bank << 16) | (BLITTER_ADDRHI << 8) | BLITTER_ADDRLO;
+	state->m_fetch_offset = (state->m_grom_bank << 16) | (BLITTER_ADDRHI << 8) | BLITTER_ADDRLO;
 	state->m_fetch_rle_count = 0;
 
 	/* RLE starts with a couple of extra 0's */
@@ -484,7 +484,7 @@ WRITE8_MEMBER(itech8_state::itech8_blitter_w)
 		{
 			logerror("Blit: XY=%1X%04X SRC=%02X%02X%02X SIZE=%3dx%3d FLAGS=%02x",
 						(tms_state.regs[TMS34061_XYOFFSET] >> 8) & 0x0f, tms_state.regs[TMS34061_XYADDRESS],
-						*m_grom_bank, blitter_data[0], blitter_data[1],
+						m_grom_bank, blitter_data[0], blitter_data[1],
 						blitter_data[4], blitter_data[5],
 						blitter_data[2]);
 			logerror("   %02X %02X %02X [%02X] %02X %02X %02X [%02X]-%02X %02X %02X %02X [%02X %02X %02X %02X]\n",

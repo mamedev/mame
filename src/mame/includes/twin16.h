@@ -14,8 +14,8 @@ public:
 	required_device<buffered_spriteram16_device> m_spriteram;
 	required_shared_ptr<UINT16> m_text_ram;
 	required_shared_ptr<UINT16> m_videoram;
-	required_shared_ptr<UINT16> m_tile_gfx_ram;
-	required_shared_ptr<UINT16> m_sprite_gfx_ram;
+	optional_shared_ptr<UINT16> m_tile_gfx_ram;
+	optional_shared_ptr<UINT16> m_sprite_gfx_ram;
 	
 	UINT16 m_CPUA_register;
 	UINT16 m_CPUB_register;

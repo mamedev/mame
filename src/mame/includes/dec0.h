@@ -11,7 +11,7 @@ public:
 	int m_automat_msm5205_vclk_toggle;
 	required_shared_ptr<UINT16> m_ram;
 	required_shared_ptr<UINT16> m_spriteram;
-	required_shared_ptr<UINT8> m_robocop_shared_ram;
+	optional_shared_ptr<UINT8> m_robocop_shared_ram;
 
 	int m_GAME;
 	int m_i8751_return;

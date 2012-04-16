@@ -9,7 +9,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<UINT16> m_spriteram;
-	required_shared_ptr<UINT16> m_spriteram2;
+	optional_shared_ptr<UINT16> m_spriteram2;
 
 	UINT16 m_prot;
 	UINT16 *m_paletteram;

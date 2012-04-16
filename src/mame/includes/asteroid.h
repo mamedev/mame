@@ -14,8 +14,8 @@ public:
 		m_ram1(*this, "ram1"),
 		m_ram2(*this, "ram2"){ }
 
-	required_shared_ptr<UINT8> m_ram1;
-	required_shared_ptr<UINT8> m_ram2;
+	optional_shared_ptr<UINT8> m_ram1;
+	optional_shared_ptr<UINT8> m_ram2;
 	DECLARE_WRITE8_MEMBER(astdelux_coin_counter_w);
 	DECLARE_WRITE8_MEMBER(llander_led_w);
 	DECLARE_READ8_MEMBER(asteroid_IN0_r);

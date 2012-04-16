@@ -113,14 +113,15 @@ class segac2_state : public md_base_state
 {
 public:
 	segac2_state(const machine_config &mconfig, device_type type, const char *tag)
-	: md_base_state(mconfig, type, tag) { }
+	: md_base_state(mconfig, type, tag),
+	  m_paletteram(*this, "paletteram") { }
 
 	// for Print Club only
 	int m_cam_data;
 
 	int m_segac2_enable_display;
 
-	UINT16* m_paletteram;
+	required_shared_ptr<UINT16> m_paletteram;
 
 	/* internal states */
 	UINT8		m_misc_io_data[0x10];	/* holds values written to the I/O chip */

@@ -10,9 +10,10 @@ class blstroid_state : public atarigen_state
 {
 public:
 	blstroid_state(const machine_config &mconfig, device_type type, const char *tag)
-		: atarigen_state(mconfig, type, tag) { }
+		: atarigen_state(mconfig, type, tag),
+		  m_priorityram(*this, "priorityram") { }
 
-	UINT16 *		m_priorityram;
+	required_shared_ptr<UINT16>	m_priorityram;
 	DECLARE_WRITE16_MEMBER(blstroid_halt_until_hblank_0_w);
 	DECLARE_READ16_MEMBER(inputs_r);
 };

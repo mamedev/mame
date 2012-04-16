@@ -18,8 +18,8 @@ public:
 	int m_snd_bank;
 
 	required_shared_ptr<UINT16> m_bg_tileram;
-	required_shared_ptr<UINT16> m_md_tileram;
-	required_shared_ptr<UINT16> m_tx_tileram;
+	optional_shared_ptr<UINT16> m_md_tileram;
+	optional_shared_ptr<UINT16> m_tx_tileram;
 	required_shared_ptr<UINT16> m_regs;
 	required_shared_ptr<UINT16> m_spriteram;
 

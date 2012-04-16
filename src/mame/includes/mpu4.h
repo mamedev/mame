@@ -176,8 +176,8 @@ public:
 	UINT8 m_m6809_acia_rts;
 	UINT8 m_m6809_acia_dcd;
 	int m_gfx_index;
-	required_shared_ptr<UINT16> m_vid_vidram;
-	required_shared_ptr<UINT16> m_vid_mainram;
+	optional_shared_ptr<UINT16> m_vid_vidram;
+	optional_shared_ptr<UINT16> m_vid_mainram;
 //  UINT8 m_scn2674_IR[16];
 	UINT8 m_scn2674_IR_pointer;
 	UINT8 m_scn2674_screen1_l;

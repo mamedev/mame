@@ -7,7 +7,7 @@ public:
 		m_work_ram_1(*this, "work_ram_1"){ }
 
 	required_shared_ptr<UINT8> m_work_ram;
-	required_shared_ptr<UINT8> m_work_ram_1;
+	optional_shared_ptr<UINT8> m_work_ram_1;
 	int m_coin;
 	int m_do_vrom_bank;
 	int m_input_latch[4];

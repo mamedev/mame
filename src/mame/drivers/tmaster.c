@@ -129,7 +129,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	optional_device<microtouch_device> m_microtouch;
 	required_shared_ptr<UINT16> m_regs;
-	required_shared_ptr<UINT16> m_galgames_ram;
+	optional_shared_ptr<UINT16> m_galgames_ram;
 
 	int m_okibank;
 	UINT8 m_rtc_ram[8];

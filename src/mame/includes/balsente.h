@@ -127,8 +127,8 @@ public:
 	
 	required_shared_ptr<UINT8> m_spriteram;
 	required_shared_ptr<UINT8> m_videoram;	
-	required_shared_ptr<UINT16> m_shrike_io;
-	required_shared_ptr<UINT16> m_shrike_shared;
+	optional_shared_ptr<UINT16> m_shrike_io;
+	optional_shared_ptr<UINT16> m_shrike_shared;
 
 	DECLARE_WRITE8_MEMBER(balsente_random_reset_w);
 	DECLARE_READ8_MEMBER(balsente_random_num_r);

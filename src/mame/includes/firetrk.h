@@ -55,10 +55,10 @@ public:
 	required_shared_ptr<UINT8> m_scroll_y;
 	required_shared_ptr<UINT8> m_scroll_x;
 	required_shared_ptr<UINT8> m_car_rot;
-	required_shared_ptr<UINT8> m_blink;
-	required_shared_ptr<UINT8> m_drone_x;
-	required_shared_ptr<UINT8> m_drone_y;
-	required_shared_ptr<UINT8> m_drone_rot;
+	optional_shared_ptr<UINT8> m_blink;
+	optional_shared_ptr<UINT8> m_drone_x;
+	optional_shared_ptr<UINT8> m_drone_y;
+	optional_shared_ptr<UINT8> m_drone_rot;
 	UINT8 m_flash;
 	UINT8 m_crash[2];
 	UINT8 m_skid[2];

@@ -2,11 +2,9 @@ class mcr3_state : public mcr_state
 {
 public:
 	mcr3_state(const machine_config &mconfig, device_type type, const char *tag)
-		: mcr_state(mconfig, type, tag) { }
+		: mcr_state(mconfig, type, tag),
+		  m_spyhunt_alpharam(*this, "spyhunt_alpha") { }
 
-	UINT8 *m_videoram;
-	UINT8 *m_spriteram;
-	size_t m_spriteram_size;
 	UINT8 m_input_mux;
 	UINT8 m_latched_input;
 	UINT8 m_last_op4;
@@ -17,7 +15,7 @@ public:
 	INT8 m_maxrpm_p2_shift;
 	UINT8 m_spyhunt_sprite_color_mask;
 	INT16 m_spyhunt_scroll_offset;
-	UINT8 *m_spyhunt_alpharam;
+	optional_shared_ptr<UINT8> m_spyhunt_alpharam;
 	INT16 m_spyhunt_scrollx;
 	INT16 m_spyhunt_scrolly;
 	tilemap_t *m_bg_tilemap;

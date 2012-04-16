@@ -14,8 +14,8 @@ public:
 	int m_sound_command3;
 	int m_vsgongf_sound_nmi_enabled;
 	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_colorram;
-	required_shared_ptr<UINT8> m_bg_videoram;
+	optional_shared_ptr<UINT8> m_colorram;
+	optional_shared_ptr<UINT8> m_bg_videoram;
 	int m_bgcolor;
 	int m_textbank1;
 	int m_textbank2;

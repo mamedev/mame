@@ -8,8 +8,8 @@ public:
 		m_geebee_videoram(*this, "geebee_videoram"),
 		m_videoram(*this, "videoram"){ }
 
-	required_shared_ptr<UINT8> m_geebee_videoram;
-	required_shared_ptr<UINT8> m_videoram;
+	optional_shared_ptr<UINT8> m_geebee_videoram;
+	optional_shared_ptr<UINT8> m_videoram;
 	int m_geebee_bgw;
 	int m_ball_on;
 	int m_ball_h;

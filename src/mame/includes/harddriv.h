@@ -26,6 +26,15 @@ public:
 		  m_dsp32(*this, "dsp32"),
 		  m_ds4cpu1(*this, "ds4cpu1"),
 		  m_ds4cpu2(*this, "ds4cpu2"),
+		  m_msp_ram(*this, "msp_ram"),
+		  m_adsp_data_memory(*this, "adsp_data"),
+		  m_adsp_pgm_memory(*this, "adsp_pgm_memory"),
+		  m_sounddsp_ram(*this, "sounddsp_ram"),
+		  m_gsp_vram(*this, "gsp_vram", 16),
+		  m_gsp_control_lo(*this, "gsp_control_lo"),
+		  m_gsp_control_hi(*this, "gsp_control_hi"),
+		  m_gsp_paletteram_lo(*this, "gsp_palram_lo"),
+		  m_gsp_paletteram_hi(*this, "gsp_palram_hi"),
 		  m_duart_timer(*this, "duart_timer") { }
 
 	required_device<cpu_device> m_maincpu;
@@ -42,15 +51,15 @@ public:
 	UINT8					m_hd34010_host_access;
 	UINT8					m_dsk_pio_access;
 
-	UINT16 *				m_msp_ram;
+	optional_shared_ptr<UINT16> m_msp_ram;
 	UINT16 *				m_dsk_ram;
 	UINT16 *				m_dsk_rom;
 	UINT16 *				m_dsk_zram;
 	UINT16 *				m_m68k_slapstic_base;
 	UINT16 *				m_m68k_sloop_alt_base;
 
-	UINT16 *				m_adsp_data_memory;
-	UINT32 *				m_adsp_pgm_memory;
+	optional_shared_ptr<UINT16> m_adsp_data_memory;
+	optional_shared_ptr<UINT32> m_adsp_pgm_memory;
 
 	UINT16 *				m_gsp_protection;
 
@@ -70,15 +79,14 @@ public:
 	UINT32					m_msp_speedup_count[4];
 	UINT32					m_adsp_speedup_count[4];
 
-	UINT16 *				m_sounddsp_ram;
+	optional_shared_ptr<UINT16> m_sounddsp_ram;
 
 	UINT8					m_gsp_multisync;
-	UINT8 *					m_gsp_vram;
-	UINT16 *				m_gsp_control_lo;
-	UINT16 *				m_gsp_control_hi;
-	UINT16 *				m_gsp_paletteram_lo;
-	UINT16 *				m_gsp_paletteram_hi;
-	size_t					m_gsp_vram_size;
+	optional_shared_ptr<UINT8> m_gsp_vram;
+	optional_shared_ptr<UINT16> m_gsp_control_lo;
+	optional_shared_ptr<UINT16> m_gsp_control_hi;
+	optional_shared_ptr<UINT16> m_gsp_paletteram_lo;
+	optional_shared_ptr<UINT16> m_gsp_paletteram_hi;
 
 	/* machine state */
 	UINT8					m_irq_state;

@@ -20,10 +20,10 @@ public:
 	/* for xmen6p */
 	bitmap_ind16   *m_screen_right;
 	bitmap_ind16   *m_screen_left;
-	required_shared_ptr<UINT16> m_xmen6p_spriteramleft;
-	required_shared_ptr<UINT16> m_xmen6p_spriteramright;
-	required_shared_ptr<UINT16> m_xmen6p_tilemapleft;
-	required_shared_ptr<UINT16> m_xmen6p_tilemapright;
+	optional_shared_ptr<UINT16> m_xmen6p_spriteramleft;
+	optional_shared_ptr<UINT16> m_xmen6p_spriteramright;
+	optional_shared_ptr<UINT16> m_xmen6p_tilemapleft;
+	optional_shared_ptr<UINT16> m_xmen6p_tilemapright;
 	UINT16 *   m_k053247_ram;
 
 	/* misc */

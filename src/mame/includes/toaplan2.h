@@ -29,8 +29,8 @@ public:
 	gp9001vdp_device* m_vdp0;
 	gp9001vdp_device* m_vdp1;
 
-	required_shared_ptr<UINT8> m_shared_ram; // 8 bit RAM shared between 68K and sound CPU
-	required_shared_ptr<UINT16> m_shared_ram16;  	// Really 8 bit RAM connected to Z180
+	optional_shared_ptr<UINT8> m_shared_ram; // 8 bit RAM shared between 68K and sound CPU
+	optional_shared_ptr<UINT16> m_shared_ram16;  	// Really 8 bit RAM connected to Z180
 
 	device_t *m_main_cpu;
 	device_t *m_sub_cpu;
@@ -43,11 +43,11 @@ public:
 	UINT8 m_sndirq_line;		/* IRQ4 for batrider, IRQ2 for bbakraid */
 	UINT8 m_z80_busreq;
 
-	required_shared_ptr<UINT16> m_txvideoram16;
-	required_shared_ptr<UINT16> m_txvideoram16_offs;
-	required_shared_ptr<UINT16> m_txscrollram16;
-	required_shared_ptr<UINT16> m_tx_gfxram16;
-	required_shared_ptr<UINT16> m_mainram16;
+	optional_shared_ptr<UINT16> m_txvideoram16;
+	optional_shared_ptr<UINT16> m_txvideoram16_offs;
+	optional_shared_ptr<UINT16> m_txscrollram16;
+	optional_shared_ptr<UINT16> m_tx_gfxram16;
+	optional_shared_ptr<UINT16> m_mainram16;
 
 
 	bitmap_ind8 m_custom_priority_bitmap;

@@ -21,8 +21,8 @@ public:
 	required_shared_ptr<UINT16> m_spriteram;
 //  UINT16 *  paletteram;    // currently this uses generic palette handling (in decocomn.c)
 
-	required_shared_ptr<UINT16> m_pktgaldb_fgram;
-	required_shared_ptr<UINT16> m_pktgaldb_sprites;
+	optional_shared_ptr<UINT16> m_pktgaldb_fgram;
+	optional_shared_ptr<UINT16> m_pktgaldb_sprites;
 
 	/* devices */
 	device_t *m_maincpu;

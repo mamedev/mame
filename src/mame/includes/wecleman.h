@@ -15,7 +15,7 @@ public:
 	required_shared_ptr<UINT16> m_protection_ram;
 	required_shared_ptr<UINT16> m_blitter_regs;
 	required_shared_ptr<UINT16> m_pageram;
-	required_shared_ptr<UINT16> m_txtram;
+	optional_shared_ptr<UINT16> m_txtram;
 	required_shared_ptr<UINT16> m_spriteram;
 	required_shared_ptr<UINT16> m_roadram;
 

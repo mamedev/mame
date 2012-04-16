@@ -46,7 +46,7 @@ public:
 
 	poly_manager *m_poly;
 
-	required_shared_ptr<UINT32> m_f3_shared_ram;
+	optional_shared_ptr<UINT32> m_f3_shared_ram;
 	required_shared_ptr<UINT32> m_main_ram;
 	required_shared_ptr<UINT16> m_dsp_shared_ram;
 	required_shared_ptr<UINT32> m_palette_ram;

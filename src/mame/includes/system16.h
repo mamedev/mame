@@ -14,11 +14,11 @@ public:
 		m_goldnaxeb2_fgpage(*this, "gab2_fgpage"){ }
 
 	required_shared_ptr<UINT16> m_textram;
-	required_shared_ptr<UINT16> m_bg0_tileram;
-	required_shared_ptr<UINT16> m_bg1_tileram;
+	optional_shared_ptr<UINT16> m_bg0_tileram;
+	optional_shared_ptr<UINT16> m_bg1_tileram;
 	required_shared_ptr<UINT16> m_tileram;
-	required_shared_ptr<UINT16> m_goldnaxeb2_bgpage;
-	required_shared_ptr<UINT16> m_goldnaxeb2_fgpage;
+	optional_shared_ptr<UINT16> m_goldnaxeb2_bgpage;
+	optional_shared_ptr<UINT16> m_goldnaxeb2_fgpage;
 
 
 	UINT16 m_coinctrl;

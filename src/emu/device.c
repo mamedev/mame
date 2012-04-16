@@ -877,7 +877,7 @@ void *device_t::finder_base::find_memory(UINT8 width, size_t &bytes, bool requir
 			mame_printf_error("Shared ptr '%s' not found\n", m_tag);
 		return NULL;
 	}
-	if (share->width() != width)
+	if (width != 0 && share->width() != width)
 	{
 		if (required)
 			mame_printf_warning("Shared ptr '%s' found but is width %d, not %d as requested\n", m_tag, share->width(), width);

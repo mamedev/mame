@@ -12,8 +12,8 @@ public:
 	required_shared_ptr<UINT8> m_spriteram;
 
 	required_shared_ptr<UINT8> m_m62_tileram;
-	required_shared_ptr<UINT8> m_m62_textram;
-	required_shared_ptr<UINT8> m_scrollram;
+	optional_shared_ptr<UINT8> m_m62_textram;
+	optional_shared_ptr<UINT8> m_scrollram;
 
 	/* video-related */
 	tilemap_t*             m_bg_tilemap;

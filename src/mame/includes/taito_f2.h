@@ -21,11 +21,11 @@ public:
 		  m_oki(*this, "oki") { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT16> m_sprite_extension;
+	optional_shared_ptr<UINT16> m_sprite_extension;
 	required_shared_ptr<UINT16> m_spriteram;
 	UINT16 *        m_spriteram_buffered;
 	UINT16 *        m_spriteram_delayed;
-	required_shared_ptr<UINT16> m_cchip2_ram;        	// for megablst only
+	optional_shared_ptr<UINT16> m_cchip2_ram;        	// for megablst only
 //  UINT16 *        m_paletteram;    // currently this uses generic palette handling
 
 

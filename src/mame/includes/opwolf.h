@@ -12,7 +12,7 @@ public:
 		m_cchip_ram(*this, "cchip_ram"){ }
 
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_cchip_ram;
+	optional_shared_ptr<UINT8> m_cchip_ram;
 
 	/* video-related */
 	UINT16       m_sprite_ctrl;

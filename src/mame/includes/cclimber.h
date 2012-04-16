@@ -23,11 +23,11 @@ public:
 	required_shared_ptr<UINT8> m_bigsprite_control;
 	required_shared_ptr<UINT8> m_colorram;
 	required_shared_ptr<UINT8> m_flip_screen;
-	required_shared_ptr<UINT8> m_swimmer_side_background_enabled;
-	required_shared_ptr<UINT8> m_swimmer_palettebank;
-	required_shared_ptr<UINT8> m_swimmer_background_color;
-	required_shared_ptr<UINT8> m_toprollr_bg_videoram;
-	required_shared_ptr<UINT8> m_toprollr_bg_coloram;
+	optional_shared_ptr<UINT8> m_swimmer_side_background_enabled;
+	optional_shared_ptr<UINT8> m_swimmer_palettebank;
+	optional_shared_ptr<UINT8> m_swimmer_background_color;
+	optional_shared_ptr<UINT8> m_toprollr_bg_videoram;
+	optional_shared_ptr<UINT8> m_toprollr_bg_coloram;
 	
 	UINT8 m_yamato_p0;
 	UINT8 m_yamato_p1;

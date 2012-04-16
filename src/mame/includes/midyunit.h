@@ -32,11 +32,11 @@ class midyunit_state : public driver_device
 public:
 	midyunit_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_gfx_rom(*this,"gfx_rom") { }
+		  m_gfx_rom(*this, "gfx_rom", 16) { }
 
 	UINT16 *m_cmos_ram;
 	UINT32 m_cmos_page;
-	required_shared_ptr<UINT8> m_gfx_rom;
+	optional_shared_ptr<UINT8> m_gfx_rom;
 	UINT16 m_prot_result;
 	UINT16 m_prot_sequence[3];
 	UINT8 m_prot_index;

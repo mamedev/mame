@@ -18,7 +18,7 @@ public:
 
 	int m_toaplan_main_cpu;
 	int m_wardner_membank;
-	required_shared_ptr<UINT8> m_sharedram;
+	optional_shared_ptr<UINT8> m_sharedram;
 	INT32 m_fg_rom_bank;
 	INT32 m_bg_ram_bank;
 	INT32 m_wardner_sprite_hack;

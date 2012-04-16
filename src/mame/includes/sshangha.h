@@ -30,7 +30,7 @@ public:
 	required_shared_ptr<UINT16> m_sprite_paletteram2;
 	required_shared_ptr<UINT16> m_tile_paletteram1;
 
-	required_shared_ptr<UINT16> m_prot_data;
+	optional_shared_ptr<UINT16> m_prot_data;
 	int m_video_control;
 
 

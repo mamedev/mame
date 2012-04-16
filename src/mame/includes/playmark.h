@@ -14,12 +14,12 @@ public:
 		m_rowscroll(*this, "rowscroll"){ }
 
 	/* memory pointers */
-	required_shared_ptr<UINT16> m_bgvideoram;
+	optional_shared_ptr<UINT16> m_bgvideoram;
 	required_shared_ptr<UINT16> m_videoram1;
-	required_shared_ptr<UINT16> m_videoram2;
-	required_shared_ptr<UINT16> m_videoram3;
+	optional_shared_ptr<UINT16> m_videoram2;
+	optional_shared_ptr<UINT16> m_videoram3;
 	required_shared_ptr<UINT16> m_spriteram;
-	required_shared_ptr<UINT16> m_rowscroll;
+	optional_shared_ptr<UINT16> m_rowscroll;
 //      UINT16 *     m_paletteram;    // currently this uses generic palette handling
 
 	/* video-related */

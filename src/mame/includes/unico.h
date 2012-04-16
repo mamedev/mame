@@ -11,8 +11,8 @@ public:
 
 	required_shared_ptr<UINT16> m_vram;
 	required_shared_ptr<UINT16> m_scroll;
-	required_shared_ptr<UINT32> m_vram32;
-	required_shared_ptr<UINT32> m_scroll32;
+	optional_shared_ptr<UINT32> m_vram32;
+	optional_shared_ptr<UINT32> m_scroll32;
 	tilemap_t *m_tilemap[3];
 	int m_sprites_scrolldx;
 	int m_sprites_scrolldy;

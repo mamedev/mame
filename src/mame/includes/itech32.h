@@ -29,13 +29,13 @@ public:
 		m_tms2_ram(*this, "tms2_ram"){ }
 
 	optional_shared_ptr<UINT16> m_main_ram;
-	required_shared_ptr<UINT16> m_nvram;
-	required_shared_ptr<UINT16> m_video;
-	required_shared_ptr<UINT16> m_main_rom;
-	required_shared_ptr<UINT32> m_drivedge_zbuf_control;
-	required_shared_ptr<UINT32> m_tms1_boot;
-	required_shared_ptr<UINT32> m_tms1_ram;
-	required_shared_ptr<UINT32> m_tms2_ram;
+	optional_shared_ptr<UINT16> m_nvram;
+	optional_shared_ptr<UINT16> m_video;
+	optional_shared_ptr<UINT16> m_main_rom;
+	optional_shared_ptr<UINT32> m_drivedge_zbuf_control;
+	optional_shared_ptr<UINT32> m_tms1_boot;
+	optional_shared_ptr<UINT32> m_tms1_ram;
+	optional_shared_ptr<UINT32> m_tms2_ram;
 
 	void nvram_init(nvram_device &nvram, void *base, size_t length);
 

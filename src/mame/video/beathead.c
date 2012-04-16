@@ -156,7 +156,7 @@ WRITE32_MEMBER( beathead_state::hsync_ram_w )
 
 UINT32 beathead_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 *videoram = reinterpret_cast<UINT8 *>(m_videoram);
+	UINT8 *videoram = reinterpret_cast<UINT8 *>(m_videoram.target());
 	int x, y;
 
 	/* generate the final screen */

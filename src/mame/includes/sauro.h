@@ -12,8 +12,8 @@ public:
 	required_shared_ptr<UINT8> m_spriteram;
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_colorram;
-	required_shared_ptr<UINT8> m_videoram2;
-	required_shared_ptr<UINT8> m_colorram2;
+	optional_shared_ptr<UINT8> m_videoram2;
+	optional_shared_ptr<UINT8> m_colorram2;
 
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;

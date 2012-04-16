@@ -40,7 +40,7 @@ public:
 	optional_shared_ptr_array<UINT16, 4> m_vram;
 	optional_shared_ptr_array<UINT16, 4> m_vctrl;
 	required_shared_ptr<UINT16> m_spriteram;
-	required_shared_ptr<UINT16> m_spriteram_2;
+	optional_shared_ptr<UINT16> m_spriteram_2;
 	required_shared_ptr<UINT16> m_paletteram;
 
 	/* video-related */
@@ -104,7 +104,7 @@ public:
 	/* game specific */
 	// sailormn
 	int          m_sailormn_tilebank;
-	required_shared_ptr<UINT8> m_mirror_ram;
+	optional_shared_ptr<UINT8> m_mirror_ram;
 	// korokoro
 	UINT16       m_leds[2];
 	int          m_hopper;

@@ -16,7 +16,7 @@ public:
 	required_shared_ptr<UINT8> m_textram;
 	required_shared_ptr<UINT8> m_backgroundram;
 	required_shared_ptr<UINT8> m_sprite_colorsharedram;
-	required_shared_ptr<UINT8> m_rjammer_backgroundram;
+	optional_shared_ptr<UINT8> m_rjammer_backgroundram;
 	UINT8 *m_spritemap;
 	UINT8 m_prom2[32];
 	UINT32 m_romD_addr;

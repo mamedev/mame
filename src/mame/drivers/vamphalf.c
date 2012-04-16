@@ -74,10 +74,10 @@ public:
 			m_has_extra_gfx = 0;
 		}
 
-	required_shared_ptr<UINT16> m_tiles;
-	required_shared_ptr<UINT16> m_wram;
-	required_shared_ptr<UINT32> m_tiles32;
-	required_shared_ptr<UINT32> m_wram32;
+	optional_shared_ptr<UINT16> m_tiles;
+	optional_shared_ptr<UINT16> m_wram;
+	optional_shared_ptr<UINT32> m_tiles32;
+	optional_shared_ptr<UINT32> m_wram32;
 	int m_flip_bit;
 	int m_flipscreen;
 	int m_palshift;

@@ -90,13 +90,13 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	optional_shared_ptr<UINT16> m_spriteram;
-	required_shared_ptr<UINT16> m_bg15_reg;
-	required_shared_ptr<UINT16> m_bg15_select;
+	optional_shared_ptr<UINT16> m_bg15_reg;
+	optional_shared_ptr<UINT16> m_bg15_select;
 	required_shared_ptr<UINT16> m_sprites_regs;
-	required_shared_ptr_array<UINT16,4> m_vram;
-	required_shared_ptr_array<UINT16,4> m_vscroll;
+	optional_shared_ptr_array<UINT16,4> m_vram;
+	optional_shared_ptr_array<UINT16,4> m_vscroll;
 	required_shared_ptr<UINT16> m_layers_0_regs;
-	required_shared_ptr<UINT16> m_layers_1_regs;
+	optional_shared_ptr<UINT16> m_layers_1_regs;
 	required_shared_ptr<UINT16> m_mcu_ram;
 	required_shared_ptr<UINT16> m_mainram;
 	

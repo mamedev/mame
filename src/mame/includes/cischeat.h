@@ -15,7 +15,7 @@ public:
 	required_shared_ptr_array<UINT16,3> m_scrollram;
 	required_shared_ptr<UINT16> m_ram;
 	required_shared_ptr_array<UINT16,2> m_roadram;
-	required_shared_ptr<UINT16> m_f1gpstr2_ioready;
+	optional_shared_ptr<UINT16> m_f1gpstr2_ioready;
 
 	UINT16 *m_objectram;
 	tilemap_t *m_tmap[3];

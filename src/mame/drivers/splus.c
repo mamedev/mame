@@ -62,7 +62,7 @@ public:
 	required_shared_ptr<UINT8> m_cmosh_ram;
 
 	// Program and Reel Data
-	required_shared_ptr<UINT8> m_program_ram;
+	optional_shared_ptr<UINT8> m_program_ram;
 	required_shared_ptr<UINT8> m_reel_ram;
 
 	// IO Ports

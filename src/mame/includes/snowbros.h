@@ -9,7 +9,7 @@ public:
 		m_bootleg_spriteram16(*this, "spriteram16b"),
 		m_maincpu(*this,"maincpu"){ }
 
-	required_shared_ptr<UINT16> m_hyperpac_ram;
+	optional_shared_ptr<UINT16> m_hyperpac_ram;
 	int m_sb3_music_is_playing;
 	int m_sb3_music;
 	UINT8 m_semicom_prot_offset;

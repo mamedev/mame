@@ -30,7 +30,7 @@ public:
 	required_shared_ptr<UINT32> m_textureram1;
 	required_shared_ptr<UINT32> m_lumaram;
 	required_shared_ptr<UINT16> m_soundram;
-	required_shared_ptr<UINT32> m_tgp_program;
+	optional_shared_ptr<UINT32> m_tgp_program;
 	
 	UINT32 m_intreq;
 	UINT32 m_intena;

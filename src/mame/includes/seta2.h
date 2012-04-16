@@ -14,8 +14,8 @@ public:
 	required_device<cpu_device> m_maincpu;
 	optional_shared_ptr<UINT16> m_nvram;
 
-	required_shared_ptr<UINT16> m_spriteram;
-	required_shared_ptr<UINT16> m_vregs;
+	optional_shared_ptr<UINT16> m_spriteram;
+	optional_shared_ptr<UINT16> m_vregs;
 	optional_shared_ptr<UINT32> m_coldfire_regs;
 
 	optional_shared_ptr<UINT8> m_funcube_outputs;

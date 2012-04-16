@@ -14,11 +14,10 @@ class itech8_state : public driver_device
 public:
 	itech8_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_visarea(0, 0, 0, 0) ,
-		m_grom_bank(*this, "grom_bank"){ }
+		  m_visarea(0, 0, 0, 0){ }
 
 	rectangle m_visarea;
-	required_shared_ptr<UINT8> m_grom_bank;
+	UINT8 m_grom_bank;
 
 	UINT8 m_blitter_int;
 	UINT8 m_tms34061_int;
@@ -62,6 +61,7 @@ public:
 	DECLARE_WRITE8_MEMBER(sound_data_w);
 	DECLARE_WRITE8_MEMBER(gtg2_sound_data_w);
 	DECLARE_READ8_MEMBER(sound_data_r);
+	DECLARE_WRITE8_MEMBER(grom_bank_w);
 	DECLARE_WRITE16_MEMBER(grom_bank16_w);
 	DECLARE_WRITE16_MEMBER(display_page16_w);
 	DECLARE_WRITE16_MEMBER(palette16_w);

@@ -17,7 +17,7 @@ public:
 	required_shared_ptr<UINT8> m_rambase;
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_spriteram;
-	required_shared_ptr<UINT8> m_bullsdrt_tiles_bankram;
+	optional_shared_ptr<UINT8> m_bullsdrt_tiles_bankram;
 	UINT8 m_oldpos[4];
 	UINT8 m_sign[4];
 	UINT8 m_dsw_select;

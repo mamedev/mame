@@ -329,8 +329,8 @@ public:
 	hornet_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		  m_workram(*this, "workram"),
-		  m_sharc_dataram0(*this, "share_dataram0"),
-		  m_sharc_dataram1(*this, "share_dataram1") { }
+		  m_sharc_dataram0(*this, "sharc_dataram0"),
+		  m_sharc_dataram1(*this, "sharc_dataram1") { }
 
 	UINT8 m_led_reg0;
 	UINT8 m_led_reg1;

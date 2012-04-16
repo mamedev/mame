@@ -49,7 +49,7 @@ public:
 		  m_tilemapattr(*this,"tilemapattr"),
 		  m_czram(*this,"czram") { }
 
-	required_shared_ptr<UINT32> m_spriteram;
+	optional_shared_ptr<UINT32> m_spriteram;
 	required_shared_ptr<UINT32> m_shareram;
 	required_shared_ptr<UINT32> m_system_controller;
 	required_shared_ptr<UINT32> m_nvmem;
@@ -59,9 +59,9 @@ public:
 	required_shared_ptr<UINT32> m_textram;
 	required_shared_ptr<UINT32> m_polygonram;
 	required_shared_ptr<UINT32> m_gamma;
-	required_shared_ptr<UINT32> m_vics_data;
-	required_shared_ptr<UINT32> m_vics_control;
-	required_shared_ptr<UINT32> m_czattr;
+	optional_shared_ptr<UINT32> m_vics_data;
+	optional_shared_ptr<UINT32> m_vics_control;
+	optional_shared_ptr<UINT32> m_czattr;
 	required_shared_ptr<UINT32> m_tilemapattr;
 	optional_shared_ptr<UINT32> m_czram;
 

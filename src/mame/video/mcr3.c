@@ -210,7 +210,7 @@ static void mcr3_update_sprites(running_machine &machine, bitmap_ind16 &bitmap, 
 	machine.priority_bitmap.fill(1, cliprect);
 
 	/* loop over sprite RAM */
-	for (offs = state->m_spriteram_size - 4; offs >= 0; offs -= 4)
+	for (offs = state->m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
 	{
 		int code, color, flipx, flipy, sx, sy, flags;
 

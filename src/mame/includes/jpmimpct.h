@@ -71,7 +71,7 @@ public:
 	int m_slidesout;
 	int m_hopper[3];
 	int m_motor[3];
-	required_shared_ptr<UINT16> m_vram;
+	optional_shared_ptr<UINT16> m_vram;
 	struct bt477_t m_bt477;
 	DECLARE_WRITE16_MEMBER(m68k_tms_w);
 	DECLARE_READ16_MEMBER(m68k_tms_r);

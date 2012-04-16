@@ -244,12 +244,12 @@ public:
 
 	required_shared_ptr<UINT8> m_colorram;
 	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_reel3_scroll;
-	required_shared_ptr<UINT8> m_reel2_scroll;
-	required_shared_ptr<UINT8> m_reel1_scroll;
-	required_shared_ptr<UINT8> m_reel1_ram;
-	required_shared_ptr<UINT8> m_reel2_ram;
-	required_shared_ptr<UINT8> m_reel3_ram;
+	optional_shared_ptr<UINT8> m_reel3_scroll;
+	optional_shared_ptr<UINT8> m_reel2_scroll;
+	optional_shared_ptr<UINT8> m_reel1_scroll;
+	optional_shared_ptr<UINT8> m_reel1_ram;
+	optional_shared_ptr<UINT8> m_reel2_ram;
+	optional_shared_ptr<UINT8> m_reel3_ram;
 
 	tilemap_t *m_tmap;
 	tilemap_t *m_reel1_tilemap;

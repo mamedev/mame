@@ -47,7 +47,7 @@ public:
 		: scramble_state(mconfig, type, tag),
 		  m_soundram(*this, "soundram") { }
 
-	required_shared_ptr<UINT8> m_soundram;
+	optional_shared_ptr<UINT8> m_soundram;
 	DECLARE_READ8_MEMBER(scobra_soundram_r);
 	DECLARE_WRITE8_MEMBER(scobra_soundram_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(stratgyx_coinage_r);

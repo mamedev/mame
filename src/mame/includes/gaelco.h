@@ -18,7 +18,7 @@ public:
 	required_shared_ptr<UINT16> m_videoram;
 	required_shared_ptr<UINT16> m_vregs;
 	required_shared_ptr<UINT16> m_spriteram;
-	required_shared_ptr<UINT16> m_screen;
+	optional_shared_ptr<UINT16> m_screen;
 //  UINT16 *     paletteram;    // currently this uses generic palette handling
 
 	/* video-related */

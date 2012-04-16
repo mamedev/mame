@@ -11,12 +11,13 @@ class atarisy1_state : public atarigen_state
 public:
 	atarisy1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: atarigen_state(mconfig, type, tag),
+		  m_bankselect(*this, "bankselect"),
 		  m_joystick_timer(*this, "joystick_timer"),
 		  m_yscroll_reset_timer(*this, "yreset_timer"),
 		  m_scanline_timer(*this, "scan_timer"),
 		  m_int3off_timer(*this, "int3off_timer") { }
 
-	UINT16 *		m_bankselect;
+	required_shared_ptr<UINT16> m_bankselect;
 
 	UINT8			m_joystick_type;
 	UINT8			m_trackball_type;

@@ -29,11 +29,11 @@ public:
 	int m_getstar_id;
 	required_shared_ptr<UINT8> m_slapfight_videoram;
 	required_shared_ptr<UINT8> m_slapfight_colorram;
-	required_shared_ptr<UINT8> m_slapfight_fixvideoram;
-	required_shared_ptr<UINT8> m_slapfight_fixcolorram;
-	required_shared_ptr<UINT8> m_slapfight_scrollx_lo;
-	required_shared_ptr<UINT8> m_slapfight_scrollx_hi;
-	required_shared_ptr<UINT8> m_slapfight_scrolly;
+	optional_shared_ptr<UINT8> m_slapfight_fixvideoram;
+	optional_shared_ptr<UINT8> m_slapfight_fixcolorram;
+	optional_shared_ptr<UINT8> m_slapfight_scrollx_lo;
+	optional_shared_ptr<UINT8> m_slapfight_scrollx_hi;
+	optional_shared_ptr<UINT8> m_slapfight_scrolly;
 	int m_slapfight_status;
 	int m_getstar_sequence_index;
 	int m_getstar_sh_intenabled;

@@ -18,7 +18,7 @@ public:
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_bg_data;
+	optional_shared_ptr<UINT8> m_bg_data;
 	UINT8 *  m_pf1_data;
 	UINT8 *  m_row;
 //  UINT8 *  m_paletteram;    // currently this uses generic palette handling

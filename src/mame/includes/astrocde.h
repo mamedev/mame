@@ -29,7 +29,7 @@ public:
 	char *m_totalword_ptr;
 	char m_oldword[256];
 	int m_plural;
-	required_shared_ptr<UINT8> m_protected_ram;
+	optional_shared_ptr<UINT8> m_protected_ram;
 	UINT8 m_port_1_last;
 	UINT8 m_port_2_last;
 	UINT8 m_ram_write_enable;

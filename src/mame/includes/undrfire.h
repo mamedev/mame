@@ -20,8 +20,8 @@ public:
 	UINT16 m_coin_word;
 	UINT16 m_port_sel;
 	int m_frame_counter;
-	required_shared_ptr<UINT32> m_ram;
-	required_shared_ptr<UINT32> m_shared_ram;
+	optional_shared_ptr<UINT32> m_ram;
+	optional_shared_ptr<UINT32> m_shared_ram;
 	struct tempsprite *m_spritelist;
 	UINT16 m_rotate_ctrl[8];
 	UINT8 m_dislayer[6];

@@ -20,7 +20,7 @@ public:
 	required_shared_ptr<UINT32> m_vram_0;
 	required_shared_ptr<UINT32> m_vram_1;
 	required_shared_ptr<UINT32> m_vregs;
-	required_shared_ptr<UINT32> m_bootleg_spritebuffer;
+	optional_shared_ptr<UINT32> m_bootleg_spritebuffer;
 	UINT32 *       m_spritebuf1;
 	UINT32 *       m_spritebuf2;
 //      UINT32 *       m_paletteram;  // currently this uses generic palette handling

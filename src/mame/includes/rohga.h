@@ -40,8 +40,8 @@ public:
 	optional_device<buffered_spriteram16_device> m_spriteram2;
 
 	/* memory pointers */
-	required_shared_ptr<UINT16> m_pf1_rowscroll;
-	required_shared_ptr<UINT16> m_pf2_rowscroll;
+	optional_shared_ptr<UINT16> m_pf1_rowscroll;
+	optional_shared_ptr<UINT16> m_pf2_rowscroll;
 	required_shared_ptr<UINT16> m_pf3_rowscroll;
 	required_shared_ptr<UINT16> m_pf4_rowscroll;
 

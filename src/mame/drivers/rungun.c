@@ -380,7 +380,6 @@ static MACHINE_START( rng )
 
 	state->save_item(NAME(state->m_z80_control));
 	state->save_item(NAME(state->m_sound_status));
-	state->save_item(NAME(state->m_sysreg));
 	state->save_item(NAME(state->m_ttl_vram));
 }
 

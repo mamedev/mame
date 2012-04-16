@@ -411,12 +411,12 @@ class device_t::shared_ptr_finder : public device_t::finder_base
 {
 public:
 	// construction/destruction
-	shared_ptr_finder(device_t &base, const char *tag, UINT8 width = 0)
+	shared_ptr_finder(device_t &base, const char *tag, UINT8 width = sizeof(_PointerType) * 8)
 		: finder_base(base, tag),
 		  m_target(0),
 		  m_bytes(0),
 		  m_allocated(false),
-		  m_width((width != 0) ? width : sizeof(_PointerType) * 8) { }
+		  m_width(width) { }
 
 	virtual ~shared_ptr_finder() { if (m_allocated) global_free(m_target); }
 
@@ -459,7 +459,7 @@ template<class _PointerType>
 class device_t::optional_shared_ptr : public device_t::shared_ptr_finder<_PointerType, false>
 {
 public:
-	optional_shared_ptr(device_t &base, const char *tag, UINT8 width = 0) : shared_ptr_finder<_PointerType, false>(base, tag, width) { }
+	optional_shared_ptr(device_t &base, const char *tag, UINT8 width = sizeof(_PointerType) * 8) : shared_ptr_finder<_PointerType, false>(base, tag, width) { }
 };
 
 // required shared pointer finder
@@ -467,7 +467,7 @@ template<class _PointerType>
 class device_t::required_shared_ptr : public device_t::shared_ptr_finder<_PointerType, true>
 {
 public:
-	required_shared_ptr(device_t &base, const char *tag, UINT8 width = 0) : shared_ptr_finder<_PointerType, true>(base, tag, width) { }
+	required_shared_ptr(device_t &base, const char *tag, UINT8 width = sizeof(_PointerType) * 8) : shared_ptr_finder<_PointerType, true>(base, tag, width) { }
 };
 
 
@@ -481,7 +481,7 @@ class device_t::shared_ptr_array_finder
 	
 public:
 	// construction/destruction
-	shared_ptr_array_finder(device_t &base, const char *basetag, UINT8 width = 0)
+	shared_ptr_array_finder(device_t &base, const char *basetag, UINT8 width = sizeof(_PointerType) * 8)
 	{
 		for (int index = 0; index < _Count; index++)
 			m_array[index] = global_alloc(shared_ptr_type(base, m_tag[index].format("%s.%d", basetag, index), width));
@@ -508,7 +508,7 @@ template<class _PointerType, int _Count>
 class device_t::optional_shared_ptr_array : public device_t::shared_ptr_array_finder<_PointerType, _Count, false>
 {
 public:
-	optional_shared_ptr_array(device_t &base, const char *tag, UINT8 width = 0) : shared_ptr_array_finder<_PointerType, _Count, false>(base, tag, width) { }
+	optional_shared_ptr_array(device_t &base, const char *tag, UINT8 width = sizeof(_PointerType) * 8) : shared_ptr_array_finder<_PointerType, _Count, false>(base, tag, width) { }
 };
 
 // required shared pointer array finder
@@ -516,7 +516,7 @@ template<class _PointerType, int _Count>
 class device_t::required_shared_ptr_array : public device_t::shared_ptr_array_finder<_PointerType, _Count, true>
 {
 public:
-	required_shared_ptr_array(device_t &base, const char *tag, UINT8 width = 0) : shared_ptr_array_finder<_PointerType, _Count, true>(base, tag, width) { }
+	required_shared_ptr_array(device_t &base, const char *tag, UINT8 width = sizeof(_PointerType) * 8) : shared_ptr_array_finder<_PointerType, _Count, true>(base, tag, width) { }
 };
 
 

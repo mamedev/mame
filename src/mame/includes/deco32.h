@@ -26,7 +26,7 @@ public:
 	required_shared_ptr<UINT32> m_pf3_rowscroll32;
 	required_shared_ptr<UINT32> m_pf4_rowscroll32;
 
-	required_shared_ptr<UINT32> m_ace_ram;
+	optional_shared_ptr<UINT32> m_ace_ram;
 
 	int m_raster_enable;
 	timer_device *m_raster_irq_timer;

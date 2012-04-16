@@ -15,7 +15,7 @@ public:
 
 	required_shared_ptr<UINT8> m_videoram;
 	optional_shared_ptr<UINT8> m_spriteram;
-	required_shared_ptr<UINT8> m_colorram;
+	optional_shared_ptr<UINT8> m_colorram;
 	
 	UINT8 m_int_enabled;
 	UINT8 m_coin_status[3];

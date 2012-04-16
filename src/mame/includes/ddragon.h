@@ -19,13 +19,13 @@ public:
 		m_darktowr_mcu_ports(*this, "darktowr_mcu"){ }
 
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_rambase;
+	optional_shared_ptr<UINT8> m_rambase;
 	required_shared_ptr<UINT8> m_bgvideoram;
 	required_shared_ptr<UINT8> m_fgvideoram;
 	required_shared_ptr<UINT8> m_spriteram;
 	required_shared_ptr<UINT8> m_scrollx_lo;
 	required_shared_ptr<UINT8> m_scrolly_lo;
-	required_shared_ptr<UINT8> m_darktowr_mcu_ports;
+	optional_shared_ptr<UINT8> m_darktowr_mcu_ports;
 //  UINT8 *        m_paletteram;  // currently this uses generic palette handling
 //  UINT8 *        m_paletteram_2;    // currently this uses generic palette handling
 	size_t         m_spriteram_size;	// FIXME: this appears in chinagat.c, but is it really used?

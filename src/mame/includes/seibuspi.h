@@ -10,7 +10,7 @@ public:
 		m_spi_scrollram(*this, "spi_scrollram"),
 		m_spimainram(*this, "spimainram"){ }
 
-	required_shared_ptr<UINT32> m_spi_scrollram;
+	optional_shared_ptr<UINT32> m_spi_scrollram;
 	required_shared_ptr<UINT32> m_spimainram;
 
 	intel_e28f008sa_device *m_flash[2];

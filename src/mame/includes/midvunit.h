@@ -40,12 +40,12 @@ public:
 	midvunit_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		  m_nvram(*this, "nvram"),
-		  m_ram_base(*this, "m_ram_base"),
-		  m_fastram_base(*this, "m_fastram_base"),
-		  m_tms32031_control(*this, "m_tms32031_control"),
-		  m_midvplus_misc(*this, "m_midvplus_misc"),
-		  m_videoram(*this, "m_videoram"),
-		  m_textureram(*this, "m_textureram") { }
+		  m_ram_base(*this, "ram_base"),
+		  m_fastram_base(*this, "fastram_base"),
+		  m_tms32031_control(*this, "tms32031_control"),
+		  m_midvplus_misc(*this, "midvplus_misc"),
+		  m_videoram(*this, "videoram"),
+		  m_textureram(*this, "textureram") { }
 
 	optional_shared_ptr<UINT32>	m_nvram;
 	required_shared_ptr<UINT32> m_ram_base;

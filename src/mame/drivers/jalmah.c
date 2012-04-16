@@ -142,8 +142,8 @@ public:
 	tilemap_t *m_sc3_tilemap_2;
 	tilemap_t *m_sc3_tilemap_3;
 	required_shared_ptr<UINT16> m_sc0_vram;
-	required_shared_ptr<UINT16> m_sc1_vram;
-	required_shared_ptr<UINT16> m_sc2_vram;
+	optional_shared_ptr<UINT16> m_sc1_vram;
+	optional_shared_ptr<UINT16> m_sc2_vram;
 	required_shared_ptr<UINT16> m_sc3_vram;
 	UINT16 *m_jm_scrollram;
 	UINT16 *m_jm_vregs;

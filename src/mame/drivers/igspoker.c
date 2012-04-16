@@ -82,7 +82,7 @@ public:
 		m_fg_color_ram(*this, "fg_color_ram"){ }
 
 	required_device<cpu_device> m_maincpu;
-	required_shared_ptr<UINT8> m_bg_tile_ram;
+	optional_shared_ptr<UINT8> m_bg_tile_ram;
 	required_shared_ptr<UINT8> m_fg_tile_ram;
 	required_shared_ptr<UINT8> m_fg_color_ram;
 	int m_nmi_enable;

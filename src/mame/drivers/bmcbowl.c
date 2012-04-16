@@ -116,7 +116,7 @@ public:
 		m_vid1(*this, "vid1"),
 		m_vid2(*this, "vid2"){ }
 
-	required_shared_ptr<UINT8> m_stats_ram;
+	optional_shared_ptr<UINT8> m_stats_ram;
 	required_shared_ptr<UINT16> m_vid1;
 	required_shared_ptr<UINT16> m_vid2;
 	UINT8 *m_bmc_colorram;

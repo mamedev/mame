@@ -25,7 +25,7 @@ public:
 	UINT8 m_last_portb_write;
 	float m_target_volume;
 	float m_current_volume;
-	required_shared_ptr<UINT16> m_rambase;
+	optional_shared_ptr<UINT16> m_rambase;
 	UINT8 m_coin_detected;
 	UINT8 m_coin_last_reset;
 	UINT8 m_mux_select;

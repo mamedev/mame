@@ -117,7 +117,7 @@ void atarigen_init(running_machine &machine)
 
 	/* allocate timers for all screens */
 	screen_device_iterator iter(machine.root_device());
-	assert(iter.count() < ARRAY_LENGTH(state->m_screen_timer));
+	assert(iter.count() <= ARRAY_LENGTH(state->m_screen_timer));
 	for (i = 0, screen = iter.first(); screen != NULL; i++, screen = iter.next())
 	{
 		state->m_screen_timer[i].screen = screen;

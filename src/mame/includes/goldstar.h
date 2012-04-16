@@ -30,9 +30,9 @@ public:
 	required_shared_ptr<UINT8> m_reel3_scroll;
 
 	/* reelx_attrram for unkch sets */
-	required_shared_ptr<UINT8> m_reel1_attrram;
-	required_shared_ptr<UINT8> m_reel2_attrram;
-	required_shared_ptr<UINT8> m_reel3_attrram;
+	optional_shared_ptr<UINT8> m_reel1_attrram;
+	optional_shared_ptr<UINT8> m_reel2_attrram;
+	optional_shared_ptr<UINT8> m_reel3_attrram;
 	UINT8 m_unkch_vidreg;
 
 	tilemap_t *m_reel1_tilemap;

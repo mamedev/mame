@@ -14,7 +14,13 @@ public:
 	beathead_state(const machine_config &mconfig, device_type type, const char *tag)
 		: atarigen_state(mconfig, type, tag),
 		  m_maincpu(*this, "maincpu"),
-		  m_nvram(*this, "nvram") { }
+		  m_nvram(*this, "nvram"),
+		  m_videoram(*this, "videoram"),
+		  m_paletteram(*this, "paletteram"),
+		  m_vram_bulk_latch(*this, "vram_bulk_latch"),
+		  m_palette_select(*this, "palette_select"),
+		  m_ram_base(*this, "ram_base"),
+		  m_rom_base(*this, "rom_base") { }
 
 	virtual void machine_start();
 	virtual void machine_reset();
@@ -27,11 +33,11 @@ public:
 
 	required_shared_ptr<UINT32>	m_nvram;
 
-	UINT32 *		m_videoram;
-	UINT32 *		m_paletteram;
+	required_shared_ptr<UINT32> m_videoram;
+	required_shared_ptr<UINT32> m_paletteram;
 
-	UINT32 *		m_vram_bulk_latch;
-	UINT32 *		m_palette_select;
+	required_shared_ptr<UINT32> m_vram_bulk_latch;
+	required_shared_ptr<UINT32> m_palette_select;
 
 	UINT32			m_finescroll;
 	offs_t			m_vram_latch_offset;
@@ -40,8 +46,8 @@ public:
 	offs_t			m_hsyncram_start;
 	UINT8			m_hsyncram[0x800];
 
-	UINT32 *		m_ram_base;
-	UINT32 *		m_rom_base;
+	required_shared_ptr<UINT32> m_ram_base;
+	required_shared_ptr<UINT32> m_rom_base;
 
 	attotime		m_hblank_offset;
 

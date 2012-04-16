@@ -83,7 +83,7 @@ public:
 	UINT16* m_tileram;
 	required_shared_ptr<UINT16> m_sprram;
 	required_shared_ptr<UINT16> m_chrram;
-	required_shared_ptr<UINT16> m_dmaram;
+	optional_shared_ptr<UINT16> m_dmaram;
 	required_shared_ptr<UINT16> m_video_regs;
 
 	UINT16 *m_sprram_old;

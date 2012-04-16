@@ -14,8 +14,8 @@ public:
 	required_shared_ptr<UINT16> m_videoram;
 	required_shared_ptr<UINT16> m_vregs;
 	required_shared_ptr<UINT16> m_spriteram;
-	required_shared_ptr<UINT16> m_protdata;
-	required_shared_ptr<UINT16> m_bitmap_mode;
+	optional_shared_ptr<UINT16> m_protdata;
+	optional_shared_ptr<UINT16> m_bitmap_mode;
 	
 	int m_bitmap_type;
 	int m_sprite_attr2_shift;
