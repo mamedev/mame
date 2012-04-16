@@ -104,23 +104,28 @@ void cassette_image_device::update()
 
 	if (is_motor_on())
 	{
-		double new_position = m_position + (cur_time - m_position_time);
+		double new_position = m_position + (cur_time - m_position_time)*m_speed*m_direction;
 
 		switch(m_state & CASSETTE_MASK_UISTATE) {
 		case CASSETTE_RECORD:
-			cassette_put_sample(m_cassette, 0, m_position, new_position - m_position, m_value);
+			cassette_put_sample(m_cassette, m_channel, m_position, new_position - m_position, m_value);
 			break;
 
 		case CASSETTE_PLAY:
 			if ( m_cassette )
 			{
-				cassette_get_sample(m_cassette, 0, new_position, 0.0, &m_value);
+				cassette_get_sample(m_cassette, m_channel, new_position, 0.0, &m_value);
 				/* See if reached end of tape */
 				double length = get_length();
 				if (new_position > length)
 				{
 					m_state = (cassette_state)(( m_state & ~CASSETTE_MASK_UISTATE ) | CASSETTE_STOPPED);
 					new_position = length;
+				}
+				else if (new_position < 0)
+				{
+					m_state = (cassette_state)(( m_state & ~CASSETTE_MASK_UISTATE ) | CASSETTE_STOPPED);
+					new_position = 0;
 				}
 			}
 			break;
@@ -182,7 +187,7 @@ double cassette_image_device::get_position()
 	double position = m_position;
 
 	if (is_motor_on())
-		position += device().machine().time().as_double() - m_position_time;
+		position += (device().machine().time().as_double() - m_position_time)*m_speed*m_direction;
 	return position;
 }
 
@@ -196,6 +201,25 @@ double cassette_image_device::get_length()
 	return ((double) info.sample_count) / info.sample_frequency;
 }
 
+void cassette_image_device::set_channel(int channel)
+{
+	m_channel = channel;
+}
+
+void cassette_image_device::set_speed(double speed)
+{
+	m_speed = speed;
+}
+
+void cassette_image_device::go_forward()
+{
+	m_direction = 1;
+}
+
+void cassette_image_device::go_reverse()
+{
+	m_direction = -1;
+}
 
 
 void cassette_image_device::seek(double time, int origin)
@@ -300,6 +324,11 @@ bool cassette_image_device::call_load()
 	/* reset the position */
 	m_position = 0.0;
 	m_position_time = device().machine().time().as_double();
+	
+	/* default channel to 0, speed multiplier to 1 */
+	m_channel = 0;
+	m_speed = 1;
+	m_direction = 1;
 
 	return IMAGE_INIT_PASS;
 

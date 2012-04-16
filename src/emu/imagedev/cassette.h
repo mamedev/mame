@@ -92,6 +92,10 @@ public:
 	cassette_image *get_image() { return m_cassette; }
 	double get_position();
 	double get_length();
+	void set_speed(double speed);
+	void set_channel(int channel);
+	void go_forward();
+	void go_reverse();
 	void seek(double time, int origin);
 
 protected:
@@ -107,6 +111,9 @@ private:
 	double			m_position;
 	double			m_position_time;
 	INT32			m_value;
+	int				m_channel;
+	double			m_speed; // speed multiplier for tape speeds other than standard 1.875ips (used in adam driver)
+	int				m_direction; // direction select
 	char			m_extension_list[256];
 };
 

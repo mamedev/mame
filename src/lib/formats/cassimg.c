@@ -479,7 +479,7 @@ casserr_t cassette_get_samples(cassette_image *cassette, int channel,
 
 		/* and write out the result */
 		dest_ptr = (UINT8*)samples;
-		dest_ptr += waveform_bytes_per_sample(waveform_flags) * sample_index;
+		dest_ptr += waveform_bytes_per_sample(waveform_flags) * sample_index * cassette->channels;
 		switch(waveform_bytes_per_sample(waveform_flags))
 		{
 			case 1:
