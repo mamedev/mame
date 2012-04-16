@@ -9,6 +9,8 @@
 #ifndef __I5000_H__
 #define __I5000_H__
 
+#include "sound/okim6295.h"
+
 
 //**************************************************************************
 //  INTERFACE CONFIGURATION MACROS
@@ -48,6 +50,15 @@ private:
     typedef struct
     {
         bool is_playing;
+    	adpcm_state m_adpcm;	// 4-bit adpcm state (okim6295.h)
+
+        UINT32 address;
+        int timer;
+        int freq;
+        int vol_r;
+        int vol_l;
+        int output_r;
+        int output_l;
 
     } channel_t;
 
@@ -57,6 +68,8 @@ private:
 
     UINT8 *m_rom_base;
     UINT32 m_rom_mask;
+    
+    void write_reg16(UINT8 reg, UINT16 data);
 };
 
 
