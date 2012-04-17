@@ -1838,13 +1838,13 @@ static void snes_init_ram( running_machine &machine )
 }
 
 
-DIRECT_UPDATE_HANDLER( snes_spc_direct )
+DIRECT_UPDATE_MEMBER(snes_state::snes_spc_direct)
 {
-	direct.explicit_configure(0x0000, 0xffff, 0xffff, spc_get_ram(machine.device("spc700")));
+	direct.explicit_configure(0x0000, 0xffff, 0xffff, spc_get_ram(machine().device("spc700")));
 	return ~0;
 }
 
-DIRECT_UPDATE_HANDLER( snes_direct )
+DIRECT_UPDATE_MEMBER(snes_state::snes_direct)
 {
 	direct.explicit_configure(0x0000, 0xffff, 0xffff, snes_ram);
 	return ~0;
@@ -1860,8 +1860,8 @@ MACHINE_START( snes )
 	state->m_spc700 = machine.device<snes_sound_device>("spc700");
 	state->m_superfx = machine.device<cpu_device>("superfx");
 
-	state->m_maincpu->space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(snes_direct), &machine));
-	state->m_soundcpu->space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(snes_spc_direct), &machine));
+	state->m_maincpu->space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(snes_state::snes_direct), state));
+	state->m_soundcpu->space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(snes_state::snes_spc_direct), state));
 
 	// power-on sets these registers like this
 	snes_ram[WRIO] = 0xff;

@@ -455,21 +455,19 @@ static void slapstic_postload(running_machine &machine)
 }
 
 
-DIRECT_UPDATE_HANDLER( atarigen_slapstic_setdirect )
+DIRECT_UPDATE_MEMBER(atarigen_state::atarigen_slapstic_setdirect)
 {
-	atarigen_state *state = machine.driver_data<atarigen_state>();
-
 	/* if we jump to an address in the slapstic region, tweak the slapstic
        at that address and return ~0; this will cause us to be called on
        subsequent fetches as well */
-	address &= ~state->m_slapstic_mirror;
-	if (address >= state->m_slapstic_base && address < state->m_slapstic_base + 0x8000)
+	address &= ~m_slapstic_mirror;
+	if (address >= m_slapstic_base && address < m_slapstic_base + 0x8000)
 	{
 		offs_t pc = cpu_get_previouspc(&direct.space().device());
-		if (pc != state->m_slapstic_last_pc || address != state->m_slapstic_last_address)
+		if (pc != m_slapstic_last_pc || address != m_slapstic_last_address)
 		{
-			state->m_slapstic_last_pc = pc;
-			state->m_slapstic_last_address = address;
+			m_slapstic_last_pc = pc;
+			m_slapstic_last_address = address;
 			atarigen_slapstic_r(&direct.space(), (address >> 1) & 0x3fff, 0xffff);
 		}
 		return ~0;
@@ -514,7 +512,7 @@ void atarigen_slapstic_init(device_t *device, offs_t base, offs_t mirror, int ch
 		state->m_slapstic_mirror = mirror;
 
 		address_space *space = downcast<cpu_device *>(device)->space(AS_PROGRAM);
-		space->set_direct_update_handler(direct_update_delegate(FUNC(atarigen_slapstic_setdirect), &device->machine()));
+		space->set_direct_update_handler(direct_update_delegate(FUNC(atarigen_state::atarigen_slapstic_setdirect), state));
 	}
 }
 

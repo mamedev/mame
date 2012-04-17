@@ -487,6 +487,9 @@ public:
 	cpu_device *m_superfx;
 	upd7725_device *m_upd7725;
 	upd96050_device *m_upd96050;
+
+	DECLARE_DIRECT_UPDATE_MEMBER(snes_spc_direct);
+	DECLARE_DIRECT_UPDATE_MEMBER(snes_direct);
 };
 
 /* Special chips, checked at init and used in memory handlers */
