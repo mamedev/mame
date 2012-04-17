@@ -53,8 +53,13 @@ private:
     	adpcm_state m_adpcm;	// 4-bit adpcm state (okim6295.h)
 
         UINT32 address;
-        int timer;
-        int freq;
+        int freq_timer;
+        int freq_base;
+        int freq_min;
+        UINT16 sample;
+        UINT8 shift_pos;
+        UINT8 shift_amount;
+        UINT8 shift_mask;
         int vol_r;
         int vol_l;
         int output_r;
@@ -66,9 +71,10 @@ private:
 
 	UINT16 m_regs[0x80];
 
-    UINT8 *m_rom_base;
+    UINT16 *m_rom_base;
     UINT32 m_rom_mask;
     
+    bool read_sample(int ch);
     void write_reg16(UINT8 reg, UINT16 data);
 };
 

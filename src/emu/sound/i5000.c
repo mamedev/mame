@@ -7,10 +7,8 @@
     16-channel ADPCM player.
 
     TODO:
-    - Tokimeki Mahjong Paradise uses several different sample formats
-      (4-bit ADPCM, 3-bit ADPCM, and unknown(s))
     - improve volume balance (is it really linear?)
-    - verify that 4-bit ADPCM is the same as standard OKI ADPCM
+    - verify that ADPCM is the same as standard OKI ADPCM
 
 ***************************************************************************/
 
@@ -33,8 +31,8 @@ void i5000snd_device::device_start()
 	// create the stream
 	m_stream = machine().sound().stream_alloc(*this, 0, 2, clock() / 0x400, this);
 
-	m_rom_base = device().machine().region(":i5000snd")->base();
-	m_rom_mask = device().machine().region(":i5000snd")->bytes() - 1;
+	m_rom_base = (UINT16 *)device().machine().region(":i5000snd")->base();
+	m_rom_mask = device().machine().region(":i5000snd")->bytes() / 2 - 1;
 }
 
 
@@ -46,6 +44,35 @@ void i5000snd_device::device_reset()
 	// reset channel regs
 	for (int i = 0; i < 0x40; i++)
 		write_reg16(i, 0);
+}
+
+
+bool i5000snd_device::read_sample(int ch)
+{
+	m_channels[ch].shift_pos &= 0xf;
+	m_channels[ch].sample = m_rom_base[m_channels[ch].address];
+	m_channels[ch].address = (m_channels[ch].address + 1) & m_rom_mask;
+
+	// handle command
+	if (m_channels[ch].sample == 0x7f7f)
+	{
+		UINT16 cmd = m_rom_base[m_channels[ch].address];
+		m_channels[ch].address = (m_channels[ch].address + 1) & m_rom_mask;
+
+		// volume envelope? or loop sample?
+		if ((cmd & 0x00ff) == 0x0007)
+		{
+			// TODO
+			return false;
+		}
+		
+		// cmd 0x0000 = end sample
+		// other values: unused
+		else return false;
+		
+	}
+	
+	return true;
 }
 
 
@@ -62,31 +89,32 @@ void i5000snd_device::sound_stream_update(sound_stream &stream, stream_sample_t 
 			if (!m_channels[ch].is_playing)
 				continue;
 
-			m_channels[ch].timer -= 0x100;
-			if (m_channels[ch].timer > 0)
+			m_channels[ch].freq_timer -= m_channels[ch].freq_min;
+			if (m_channels[ch].freq_timer > 0)
 			{
 				mix_r += m_channels[ch].output_r;
 				mix_l += m_channels[ch].output_l;
 				continue;
 			}
-			m_channels[ch].timer += m_channels[ch].freq;
+			m_channels[ch].freq_timer += m_channels[ch].freq_base;
 			
-			int data = m_rom_base[m_channels[ch].address >> 1 & m_rom_mask];
-			
-			// check sample end ID
-			if (data == 0x7f && data == m_rom_base[((m_channels[ch].address >> 1) + 1) & m_rom_mask])
+			int adpcm_data = m_channels[ch].sample >> m_channels[ch].shift_pos;
+			m_channels[ch].shift_pos += m_channels[ch].shift_amount;
+			if (m_channels[ch].shift_pos & 0x10)
 			{
-				m_channels[ch].is_playing = false;
-				continue;
-			}
+				if (!read_sample(ch))
+				{
+					m_channels[ch].is_playing = false;
+					continue;
+				}
 
-			// get amplitude for 4-bit adpcm
-			if (m_channels[ch].address & 1) data >>= 4;
-			m_channels[ch].address++;
-			data = m_channels[ch].m_adpcm.clock(data & 0xf);
+				adpcm_data |= (m_channels[ch].sample << (m_channels[ch].shift_amount - m_channels[ch].shift_pos));
+			}
 			
-			m_channels[ch].output_r = data * m_channels[ch].vol_r;
-			m_channels[ch].output_l = data * m_channels[ch].vol_l;
+			adpcm_data = m_channels[ch].m_adpcm.clock(adpcm_data & m_channels[ch].shift_mask);
+			
+			m_channels[ch].output_r = adpcm_data * m_channels[ch].vol_r;
+			m_channels[ch].output_l = adpcm_data * m_channels[ch].vol_l;
 			mix_r += m_channels[ch].output_r;
 			mix_l += m_channels[ch].output_l;
 		}
@@ -109,7 +137,7 @@ void i5000snd_device::write_reg16(UINT8 reg, UINT16 data)
 			
 			// 2: frequency
 			case 2:
-				m_channels[ch].freq = (0x1ff - (data & 0xff)) << (~data >> 8 & 3);
+				m_channels[ch].freq_base = (0x1ff - (data & 0xff)) << (~data >> 8 & 3);
 				break;
 
 			// 3: left/right volume
@@ -134,9 +162,9 @@ void i5000snd_device::write_reg16(UINT8 reg, UINT16 data)
 				{
 					if (data & (1 << ch))
 					{
-						UINT32 address = (m_regs[ch << 2 | 1] << 16 | m_regs[ch << 2]) << 1;
-						UINT16 start = m_rom_base[(address + 0) & m_rom_mask] << 8 | m_rom_base[(address + 1) & m_rom_mask];
-//						UINT16 param = m_rom_base[(address + 2) & m_rom_mask] << 8 | m_rom_base[(address + 3) & m_rom_mask];
+						UINT32 address = m_regs[ch << 2 | 1] << 16 | m_regs[ch << 2];
+						UINT16 start = m_rom_base[(address + 0) & m_rom_mask];
+						UINT16 param = m_rom_base[(address + 1) & m_rom_mask];
 						
 						// check sample start ID
 						if (start != 0x7f7f)
@@ -144,11 +172,35 @@ void i5000snd_device::write_reg16(UINT8 reg, UINT16 data)
 							logerror("i5000snd: channel %d wrong sample start ID %04X!\n", ch, start);
 							continue;
 						}
+
+						switch (param)
+						{
+							// 3-bit ADPCM
+							case 0x0104:
+							case 0x0304: // same?
+								m_channels[ch].freq_min = 0x100 * (4.0 / 3.0);
+								m_channels[ch].shift_amount = 3;
+								m_channels[ch].shift_mask = 0xe;
+								break;
+
+							default:
+								logerror("i5000snd: channel %d unknown sample param %04X!\n", ch, param);
+								// fall through (take settings from 0x0184)
+							// 4-bit ADPCM
+							case 0x0184:
+								m_channels[ch].freq_min = 0x100;
+								m_channels[ch].shift_amount = 4;
+								m_channels[ch].shift_mask = 0xf;
+								break;
+						}
 						
-						m_channels[ch].address = (address + 4) << 1;
+						m_channels[ch].address = (address + 4) & m_rom_mask;
+						m_channels[ch].sample = m_rom_base[m_channels[ch].address];
+						m_channels[ch].address=(m_channels[ch].address+1)&m_rom_mask;
 
 						m_channels[ch].is_playing = true;
-						m_channels[ch].timer = 0;
+						m_channels[ch].freq_timer = 0;
+						m_channels[ch].shift_pos = 0;
 						m_channels[ch].output_l = 0;
 						m_channels[ch].output_r = 0;
 						
