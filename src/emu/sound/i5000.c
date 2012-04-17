@@ -160,7 +160,7 @@ void i5000snd_device::write_reg16(UINT8 reg, UINT16 data)
 			case 0x42:
 				for (int ch = 0; ch < 16; ch++)
 				{
-					if (data & (1 << ch))
+					if (data & (1 << ch) && !m_channels[ch].is_playing)
 					{
 						UINT32 address = m_regs[ch << 2 | 1] << 16 | m_regs[ch << 2];
 						UINT16 start = m_rom_base[(address + 0) & m_rom_mask];
@@ -195,16 +195,14 @@ void i5000snd_device::write_reg16(UINT8 reg, UINT16 data)
 						}
 						
 						m_channels[ch].address = (address + 4) & m_rom_mask;
-						m_channels[ch].sample = m_rom_base[m_channels[ch].address];
-						m_channels[ch].address=(m_channels[ch].address+1)&m_rom_mask;
 
-						m_channels[ch].is_playing = true;
 						m_channels[ch].freq_timer = 0;
 						m_channels[ch].shift_pos = 0;
 						m_channels[ch].output_l = 0;
 						m_channels[ch].output_r = 0;
 						
 						m_channels[ch].m_adpcm.reset();
+						m_channels[ch].is_playing = read_sample(ch);
 					}
 				}
 				break;
