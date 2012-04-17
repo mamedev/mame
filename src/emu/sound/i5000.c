@@ -7,8 +7,10 @@
     16-channel ADPCM player.
 
     TODO:
-    - improve volume balance (is it really linear?)
     - verify that ADPCM is the same as standard OKI ADPCM
+    - verify volume balance
+    - sample command 0x0007
+    - any more sound formats than 3-bit and 4-bit ADPCM?
 
 ***************************************************************************/
 
@@ -28,6 +30,15 @@ i5000snd_device::i5000snd_device(const machine_config &mconfig, const char *tag,
 
 void i5000snd_device::device_start()
 {
+	// fill volume table
+	double div = 1.025;
+	double vol = 255.0;
+	for (int i = 0; i < 0x100; i++)
+	{
+		m_lut_volume[i] = vol + 0.5;
+		vol /= div;
+	}
+	
 	// create the stream
 	m_stream = machine().sound().stream_alloc(*this, 0, 2, clock() / 0x400, this);
 
@@ -142,8 +153,8 @@ void i5000snd_device::write_reg16(UINT8 reg, UINT16 data)
 
 			// 3: left/right volume
 			case 3:
-				m_channels[ch].vol_r = ~data & 0xff;
-				m_channels[ch].vol_l = ~data >> 8 & 0xff;
+				m_channels[ch].vol_r = m_lut_volume[data & 0xff];
+				m_channels[ch].vol_l = m_lut_volume[data >> 8 & 0xff];
 				break;
 			
 			default:

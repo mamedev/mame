@@ -74,6 +74,8 @@ private:
     UINT16 *m_rom_base;
     UINT32 m_rom_mask;
     
+    int m_lut_volume[0x100];
+    
     bool read_sample(int ch);
     void write_reg16(UINT8 reg, UINT16 data);
 };
