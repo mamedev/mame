@@ -9,7 +9,7 @@
 #include "machine/z80ctc.h"
 #include "machine/z80pio.h"
 #include "machine/z80sio.h"
-#include "audio/mcr.h"
+#include "audio/midway.h"
 
 /* constants */
 #define MAIN_OSC_MCR_I		XTAL_19_968MHz

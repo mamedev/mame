@@ -104,7 +104,7 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/z80ctc.h"
-#include "audio/mcr.h"
+#include "audio/midway.h"
 #include "machine/nvram.h"
 #include "includes/mcr.h"
 #include "includes/mcr3.h"

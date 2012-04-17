@@ -976,7 +976,7 @@ $(MAMEOBJ)/midway.a: \
 	$(DRIVERS)/astrocde.o $(VIDEO)/astrocde.o \
 	$(DRIVERS)/balsente.o $(MACHINE)/balsente.o $(VIDEO)/balsente.o \
 	$(DRIVERS)/gridlee.o $(AUDIO)/gridlee.o $(VIDEO)/gridlee.o \
-	$(DRIVERS)/mcr.o $(MACHINE)/mcr.o $(AUDIO)/mcr.o $(VIDEO)/mcr.o \
+	$(DRIVERS)/mcr.o $(MACHINE)/mcr.o $(VIDEO)/mcr.o \
 	$(DRIVERS)/mcr3.o $(VIDEO)/mcr3.o \
 	$(DRIVERS)/mcr68.o $(MACHINE)/mcr68.o $(VIDEO)/mcr68.o \
 	$(DRIVERS)/midqslvr.o \
@@ -994,6 +994,7 @@ $(MAMEOBJ)/midway.a: \
 	$(MACHINE)/midwayic.o \
 	$(AUDIO)/dcs.o \
 	$(AUDIO)/gorf.o \
+	$(AUDIO)/midway.o \
 	$(AUDIO)/wow.o \
 
 $(MAMEOBJ)/namco.a: \

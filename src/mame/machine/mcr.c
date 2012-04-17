@@ -5,7 +5,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "audio/mcr.h"
+#include "audio/midway.h"
 #include "includes/mcr.h"
 
 #define VERBOSE 0

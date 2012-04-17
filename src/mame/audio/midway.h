@@ -1,6 +1,6 @@
 /***************************************************************************
 
-    audio/mcr.h
+    audio/midway.h
 
     Functions to emulate general the various Midway sound cards.
 

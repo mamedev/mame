@@ -283,7 +283,7 @@
 
 
 #include "emu.h"
-#include "audio/mcr.h"
+#include "audio/midway.h"
 #include "sound/samples.h"
 #include "machine/nvram.h"
 #include "includes/mcr.h"

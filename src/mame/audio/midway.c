@@ -40,7 +40,7 @@
 #include "emu.h"
 #include "audio/williams.h"
 #include "includes/mcr.h"
-#include "audio/mcr.h"
+#include "audio/midway.h"
 
 
 
