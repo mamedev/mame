@@ -26,8 +26,10 @@ static struct
 	UINT8	scroll_active,		// flag <>0, scrolling active
 			display_mode,		// display scroll   mode, 0/1/2/3
 			display_blanking,	// display blanking mode, 0/1/2/3
+			blank_flag,
 			flash_rate,			// flash rate 0-F
-			flash_control;		// flash control 0/1/2/3
+			flash_control,		// flash control 0/1/2/3
+			flash_flag;
 
 	UINT8	string[18];			// text buffer
 	UINT32  segments[16],		// segments
@@ -278,8 +280,25 @@ int BFM_BD1_newdata(int id, int data)
 	{
 		case 0x80:	// 0x80 - 0x8F Set display blanking
 
-		bd1[id].display_blanking = data & 0x0F;
-		change = 1;
+		//TODO: Implement this, MAME artwork not mature enough
+		switch ( data & 0x04 )
+		{
+			case 0x00:	// blank all
+			break;
+			case 0x01:	// blank inside window
+			break;
+ 
+			case 0x02:	// blank outside window
+			break;
+
+			case 0x03:	// blank entire display
+			break;
+
+			case 0x04:	// futaba setup
+
+			bd1[id].blank_flag = 1;
+			break;
+		}
 		break;
 
 		case 0x90:	// 0x90 - 0x9F Set cursor pos
@@ -382,7 +401,29 @@ int BFM_BD1_newdata(int id, int data)
 
 		default:
 
-		change = BD1_setdata(id, BD1charset[data & 0x3F], data);
+		if (bd1[id].blank_flag || bd1[id].flash_flag)
+		{
+			if (bd1[id].blank_flag)
+			{
+				bd1[id].display_blanking = data & 0x0F;
+				change = 1;
+				bd1[id].blank_flag = 0;
+			}
+			if (bd1[id].flash_flag)
+			{
+				//not setting yet
+				bd1[id].blank_flag = 0;
+			}
+		}
+		else 
+		{
+			
+			if (data > 0x3F)
+			{
+			//	logerror("Undefined character %x \n", data);
+			}
+			change = BD1_setdata(id, BD1charset[data & 0x3F], data);
+		}
 		break;
 	}
 	return change;
@@ -409,6 +450,7 @@ static void ScrollLeft(int id)
 
 static int BD1_setdata(int id, int segdata, int data)
 {
+
 	int change = 0, move = 0;
 
 	switch ( data )
