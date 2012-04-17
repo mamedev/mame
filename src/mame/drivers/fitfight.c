@@ -87,6 +87,11 @@ Stephh's notes :
 #include "sound/okim6295.h"
 #include "includes/fitfight.h"
 
+READ16_MEMBER( fitfight_state::hotmindff_unk_r )
+{
+	// won't boot unless things in here change, this is p1/p2 inputs in fitfight
+	return space.machine().rand();
+}
 
 READ16_MEMBER(fitfight_state::fitfight_700000_r)
 {
@@ -169,6 +174,7 @@ static ADDRESS_MAP_START( fitfight_main_map, AS_PROGRAM, 16, fitfight_state )
 	AM_RANGE(0xd00000, 0xd007ff) AM_RAM AM_SHARE("spriteram")
 
 	AM_RANGE(0xe00000, 0xe0ffff) AM_RAM
+	AM_RANGE(0xff0000, 0xffffff) AM_RAM // hot mind uses RAM here (mirror?)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bbprot_main_map, AS_PROGRAM, 16, fitfight_state )
@@ -965,6 +971,33 @@ ROM_START( bbprot )
 	ROM_LOAD( "s16_h_mc.bin",  0x080000, 0x080000, CRC(3b9091de) SHA1(b426dab6361f5d48519dc9de146e1b2270af6c8b) )
 ROM_END
 
+ROM_START( hotmindff )
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
+	ROM_LOAD16_BYTE( "21.u138", 0x000001, 0x020000, CRC(00d9ba73) SHA1(5f33f7e9b9446cdc380e6236381d86c46f55ede7) )
+	ROM_LOAD16_BYTE( "20.u125", 0x000000, 0x020000, CRC(8a7b2cc2) SHA1(031255cff4764dd61f5418be8090310193aa2e59) )
+
+	ROM_REGION( 0x01c000, "audiocpu", 0 ) /* Sound Program */
+	ROM_LOAD( "22.u23",  0x000000, 0x004000, CRC(ca0327a2) SHA1(b725f625860dae4723e0ed4a6c7c29a2b1a3d15f) )
+	ROM_CONTINUE(          0x010000, 0x00c000 )
+
+	ROM_REGION( 0x100000, "oki", 0 ) /* OKI Samples? */
+	ROM_LOAD( "19.u18",  0x000000, 0x040000, CRC(296d71da) SHA1(49735012691a9e65c4da6132428f7a9149504fd3) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 ) /* GFX */
+	ROM_LOAD( "29.bin",  0x000000, 0x020000, CRC(cd4cab01) SHA1(90165f57adbfd7d85eaccfe794d347ed795dfba1) )
+	ROM_LOAD( "30.bin",  0x040000, 0x020000, CRC(33f991b5) SHA1(8fddb5a3c78e73eb2a741aa970ff2c650a847317) )
+	ROM_LOAD( "25.bin",  0x080000, 0x020000, CRC(21e7c729) SHA1(bf2a89ab54ef362bfee9fdcb7623d0f092559793) )
+	ROM_LOAD( "26.bin",  0x0c0000, 0x020000, CRC(5802e7d0) SHA1(6a6661c753b31492295813952fc559e5189aae9f) )
+
+	ROM_REGION( 0x400000, "gfx2", 0 ) /* Sprites */
+	ROM_LOAD( "23.bin",  0x000000, 0x020000, CRC(4d2c79ed) SHA1(df7004b11f5bcd51f7629fa1cc907976d9b8c8dc) )
+	ROM_LOAD( "24.bin",  0x100000, 0x020000, CRC(f43618d0) SHA1(7c383582ebcab713f2d8e6b4c73fc0415465d62d) )
+	ROM_LOAD( "27.bin",  0x200000, 0x020000, CRC(9cee7e50) SHA1(3e131b4acf35b58d511f7313425d002e939a7ff9) )
+	ROM_LOAD( "28.bin",  0x300000, 0x020000, CRC(059c7bcf) SHA1(b9d8b1e1482baeede750a54749834c68c2d0cfef) )
+ROM_END
+
+
+
 /* INIT */
 
 static DRIVER_INIT( fitfight )
@@ -991,8 +1024,17 @@ static DRIVER_INIT( bbprot )
 	state->m_bbprot_kludge = 1;
 }
 
+DRIVER_INIT( hotmindff )
+{
+	fitfight_state *state = machine.driver_data<fitfight_state>();
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x200000, 0x200001, 0, 0, read16_delegate(FUNC(fitfight_state::hotmindff_unk_r),state));
+	DRIVER_INIT_CALL(fitfight);
+}
+
+
 /* GAME */
 
 GAME( 199?, fitfight, 0, fitfight, fitfight, fitfight, ROT0, "bootleg", "Fit of Fighting", GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 199?, histryma, 0, fitfight, histryma, histryma, ROT0, "bootleg", "The History of Martial Arts", GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 199?, bbprot,   0, bbprot,   bbprot,   bbprot,   ROT0, "<unknown>", "unknown fighting game 'BB' (prototype)", GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 199?, hotmindff,  hotmind, fitfight,   fitfight,   hotmindff,   ROT0, "Playmark", "Hot Mind (Fit of Fighting hardware)", GAME_NOT_WORKING | GAME_NO_SOUND ) // need to fix scroll offsets + inputs

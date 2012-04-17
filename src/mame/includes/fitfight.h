@@ -49,6 +49,8 @@ public:
 	DECLARE_WRITE16_MEMBER(fof_bak_tileram_w);
 	DECLARE_WRITE16_MEMBER(fof_mid_tileram_w);
 	DECLARE_WRITE16_MEMBER(fof_txt_tileram_w);
+
+	DECLARE_READ16_MEMBER( hotmindff_unk_r );
 };
 
 
