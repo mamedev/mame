@@ -988,7 +988,7 @@ static ADDRESS_MAP_START( digdug_map, AS_PROGRAM, 8, digdug_state )
 	AM_RANGE(0x8400, 0x87ff) AM_RAM AM_SHARE("share1")							/* work RAM (top half for RAM 0 */
 	AM_RANGE(0x8800, 0x8bff) AM_RAM AM_SHARE("digdug_objram")	/* work RAM + sprite registers */
 	AM_RANGE(0x9000, 0x93ff) AM_RAM AM_SHARE("digdug_posram")	/* work RAM + sprite registers */
-	AM_RANGE(0x9800, 0x9bff) AM_RAM AM_SHARE("share4") AM_SHARE("digdug_flpram")	/* work RAM + sprite registers */
+	AM_RANGE(0x9800, 0x9bff) AM_RAM AM_SHARE("digdug_flpram")	/* work RAM + sprite registers */
 	AM_RANGE(0xa000, 0xa007) AM_READNOP AM_WRITE_LEGACY(digdug_PORT_w)		/* video latches (spurious reads when setting latch bits) */
 	AM_RANGE(0xb800, 0xb83f) AM_DEVREADWRITE("earom", atari_vg_earom_device, read, write)	/* non volatile memory data */
 	AM_RANGE(0xb840, 0xb840) AM_DEVWRITE("earom", atari_vg_earom_device, ctrl_w)					/* non volatile memory control */

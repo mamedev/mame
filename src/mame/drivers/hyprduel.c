@@ -436,13 +436,13 @@ static ADDRESS_MAP_START( hyprduel_map, AS_PROGRAM, 16, hyprduel_state )
 	AM_RANGE(0x4788ac, 0x4788ad) AM_RAM AM_SHARE("screenctrl")	/* Screen Control */
 	AM_RANGE(0x479700, 0x479713) AM_RAM AM_SHARE("videoregs")	/* Video Registers */
 	AM_RANGE(0x800000, 0x800001) AM_WRITE(hyprduel_subcpu_control_w)
-	AM_RANGE(0xc00000, 0xc07fff) AM_RAM AM_SHARE("share1") AM_SHARE("sharedram1")
+	AM_RANGE(0xc00000, 0xc07fff) AM_RAM AM_SHARE("sharedram1")
 	AM_RANGE(0xe00000, 0xe00001) AM_READ_PORT("SERVICE") AM_WRITENOP
 	AM_RANGE(0xe00002, 0xe00003) AM_READ_PORT("DSW")
 	AM_RANGE(0xe00004, 0xe00005) AM_READ_PORT("P1_P2")
 	AM_RANGE(0xe00006, 0xe00007) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xfe0000, 0xfe3fff) AM_RAM AM_SHARE("share2")
-	AM_RANGE(0xfe4000, 0xffffff) AM_RAM AM_SHARE("share3") AM_SHARE("sharedram3")
+	AM_RANGE(0xfe4000, 0xffffff) AM_RAM AM_SHARE("sharedram3")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hyprduel_map2, AS_PROGRAM, 16, hyprduel_state )
