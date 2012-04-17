@@ -1,9 +1,91 @@
 /* Scorpion 4 + 5 driver releated includes */
 /* mainly used for stuff which is currently shared between sc4 / 5 sets to avoid duplication */
 
+#include "machine/sec.h"
+#include "machine/steppers.h" // stepper motor
+
+
+class sc4_state : public driver_device
+{
+public:
+	sc4_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
+		  m_maincpu(*this, "maincpu")
+	{
+		m_chk41addr = -1;
+		m_dochk41 = false;
+	}
+
+	UINT16* m_cpuregion;
+	UINT16* m_mainram;
+	// devices
+	device_t* m_duart;
+	device_t* m_ymz;
+	required_device<cpu_device> m_maincpu;
+
+	// serial vfd
+	int vfd_enabled;
+	bool vfd_old_clock;
+
+	UINT8 vfd_ser_value;
+	int vfd_ser_count;
+
+	const stepper_interface **m_reel_setup; 
+	int m_reel_changed;
+	int m_reels;
+	int m_reel12_latch;
+	int m_reel3_latch;
+	int m_reel4_latch;
+	int m_reel56_latch;
+	int m_optic_pattern;
+	SEC	sec;
+
+	int m_meterstatus;
+
+	int m_chk41addr;
+	bool m_dochk41;
+
+
+
+	DECLARE_READ16_MEMBER(sc4_mem_r);
+	DECLARE_WRITE16_MEMBER(sc4_mem_w);
+};
+
+class sc4_adder4_state : public sc4_state
+{
+public:
+	sc4_adder4_state(const machine_config &mconfig, device_type type, const char *tag)
+		: sc4_state(mconfig, type, tag),
+		  m_adder4cpu(*this, "adder4")
+	{ }
+
+	// devices
+	required_device<cpu_device> m_adder4cpu;
+};
+
+
 MACHINE_CONFIG_EXTERN( sc4 );
 MACHINE_CONFIG_EXTERN( sc4_adder4 );
-INPUT_PORTS_EXTERN( sc4 );
+INPUT_PORTS_EXTERN( sc4_base );
+
+#define SC4_JACKPOT_KEY_SETTINGS \
+	PORT_DIPSETTING(    0x00, "No Key" ) \
+	PORT_DIPSETTING(    0x01, "75GBP (club)" ) \
+	PORT_DIPSETTING(    0x02, "100GBP (club)" ) \
+	PORT_DIPSETTING(    0x03, "250GBP (club)" ) \
+	PORT_DIPSETTING(    0x04, "150GBP (club)" ) \
+	PORT_DIPSETTING(    0x05, "5" ) \
+	PORT_DIPSETTING(    0x06, "6" ) \
+	PORT_DIPSETTING(    0x07, "500GBP (club)" ) \
+	PORT_DIPSETTING(    0x08, "5GBP" ) \
+	PORT_DIPSETTING(    0x09, "9" ) \
+	PORT_DIPSETTING(    0x0a, "4GBP / 25GBP" ) \
+	PORT_DIPSETTING(    0x0b, "11" ) \
+	PORT_DIPSETTING(    0x0c, "35GBP" ) \
+	PORT_DIPSETTING(    0x0d, "70GBP" ) \
+	PORT_DIPSETTING(    0x0e, "14" ) \
+	PORT_DIPSETTING(    0x0f, "15" ) \
+
 
 
 #define sc_ivply_others \
@@ -152,7 +234,7 @@ INPUT_PORTS_EXTERN( sc4 );
 
 #define sc_bonbx_others \
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "barx sounds", 0x0000, 0x100000, NO_DUMP ) \
+	ROM_LOAD( "95008992.bin", 0x0000, 0x0aa536, CRC(aad10089) SHA1(d8a32f66432ee901be05435e8930d3897f4b4e33) ) /* BARX - right header, wrong sounds */ \
 
 #define sc_brksp_others \
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
@@ -825,7 +907,10 @@ INPUT_PORTS_EXTERN( sc4 );
 	ROM_LOAD( "95008780.bin", 0x100000, 0x100000, CRC(ec270dbe) SHA1(f649ffd4530feed491dc050f40aa0205f4bfdd89) ) \
 
 #define sc_dndww_others \
-	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 )  \
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
+	ROM_LOAD( "95008688.bin", 0x000000, 0x100000, CRC(9a5c8ac0) SHA1(988a26b042acd1462927c1b8ad300fe67c8d7c00) ) \
+	ROM_LOAD( "95008689.bin", 0x100000, 0x100000, CRC(5c1cf5fb) SHA1(c05b819158622ab96c265c85072b48ae3593b962) ) \
+	ROM_REGION( 0x400000, "others", ROMREGION_ERASE00 ) /* casino set */ \
 	ROM_LOAD( "95008730.bin", 0x0000, 0x100000, CRC(e2aebdb0) SHA1(d22fee7ff3d5912ea9a7440ec82de52a7d016090) ) /* casino wow */ \
 
 #define sc_dndtr_others \

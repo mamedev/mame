@@ -10,6 +10,7 @@ READ8_HANDLER( m68307_internal_mbus_r )
 	m68ki_cpu_core *m68k = m68k_get_safe_token(&space->device());
 	m68307_mbus* mbus = m68k->m68307MBUS;
 	assert(mbus != NULL);
+	UINT8 retval;
 
 	if (mbus)
 	{
@@ -27,16 +28,21 @@ READ8_HANDLER( m68307_internal_mbus_r )
 				return space->machine().rand();
 
 			case m68307BUS_MBCR:
-				logerror("%08x m68307_internal_mbus_r %08x (MFDR - M-Bus Control Register)\n", pc, offset);
-				return space->machine().rand();
+				logerror("%08x m68307_internal_mbus_r %08x (MFCR - M-Bus Control Register)\n", pc, offset);
+				return mbus->m_MFCR;//space->machine().rand();
 
 			case m68307BUS_MBSR:
 				logerror("%08x m68307_internal_mbus_r %08x (MBSR - M-Bus Status Register)\n", pc, offset);
-				return space->machine().rand();
+				retval = 0;
+				if (mbus->m_busy) retval |= 0x20;
+				if (mbus->m_intpend) retval |= 0x02;			
+				
+				return retval;
 
 			case m68307BUS_MBDR:
 				logerror("%08x m68307_internal_mbus_r %08x (MBDR - M-Bus Data I/O Register)\n", pc, offset);
-				return space->machine().rand();
+				mbus->m_intpend = true;
+				return 0xff;//space->machine().rand();
 
 			default:
 				logerror("%08x m68307_internal_mbus_r %08x (UNKNOWN / ILLEGAL)\n", pc, offset);
@@ -68,7 +74,16 @@ WRITE8_HANDLER( m68307_internal_mbus_w )
 				break;
 
 			case m68307BUS_MBCR:
-				logerror("%08x m68307_internal_mbus_w %08x, %02x (MFDR - M-Bus Control Register)\n", pc, offset,data);
+				logerror("%08x m68307_internal_mbus_w %08x, %02x (MFCR - M-Bus Control Register)\n", pc, offset,data);
+				
+				mbus->m_MFCR = data;
+				if (data & 0x80)
+				{
+					mbus->m_busy = false;
+					mbus->m_intpend = false;
+				}
+				if (data & 0x20) mbus->m_busy = true;
+				
 				break;
 
 			case m68307BUS_MBSR:
@@ -77,6 +92,9 @@ WRITE8_HANDLER( m68307_internal_mbus_w )
 			
 			case m68307BUS_MBDR:
 				logerror("%08x m68307_internal_mbus_w %08x, %02x (MBDR - M-Bus Data I/O Register)\n", pc, offset,data);
+
+				mbus->m_intpend = true;
+
 				break;
 
 			default:
@@ -88,5 +106,5 @@ WRITE8_HANDLER( m68307_internal_mbus_w )
 
 void m68307_mbus::reset(void)
 {
-
+	m_busy = false;
 }

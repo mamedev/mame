@@ -993,6 +993,17 @@ static CPU_RESET( m68k )
 
 	// disable instruction hook
 	m68k->instruction_hook = NULL;
+
+	if (m68k->m68307SIM) m68k->m68307SIM->reset();
+	if (m68k->m68307MBUS) m68k->m68307MBUS->reset();
+	if (m68k->m68307SERIAL) m68k->m68307SERIAL->reset();
+	if (m68k->m68307TIMER) m68k->m68307TIMER->reset();
+
+	m68k->m68307_base = 0xbfff;
+	m68k->m68307_scrhigh = 0x0007;
+	m68k->m68307_scrlow = 0xf010;
+
+
 }
 
 static CPU_DISASSEMBLE( m68k )

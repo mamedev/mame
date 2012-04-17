@@ -380,7 +380,7 @@ int BFM_BD1_newdata(int id, int data)
 		}
 		break;
 
-		default:	// normal character
+		default:
 
 		change = BD1_setdata(id, BD1charset[data & 0x3F], data);
 		break;

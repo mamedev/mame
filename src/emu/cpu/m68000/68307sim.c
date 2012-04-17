@@ -79,7 +79,7 @@ WRITE16_HANDLER( m68307_internal_sim_w )
 				break;
 
 			case m68307SIM_PBDAT:
-				sim->write_pbdat(space, data,mem_mask);
+				sim->write_pbdat(space, data, mem_mask);
 				break;
 
 
@@ -161,12 +161,13 @@ UINT16 m68307_sim::read_padat(address_space *space, UINT16 mem_mask)
 		// and anything configured as input is read from the port
 		UINT8 outputbits = m_paddr;
 		UINT8 inputbits = ~m_paddr;
-		UINT8 indat = m68k->m_m68307_porta_r(space, 0) & inputbits;
-		UINT8 outdat = m_padat & outputbits;
-
-		// dedicated bits behave in a different way..  todo
 		UINT8 general_purpose_bits = ~m_pacnt;
-		return ((indat | outdat) & general_purpose_bits);
+		UINT8 indat = m68k->m_m68307_porta_r(space, false, (inputbits & general_purpose_bits)&mem_mask) & ((inputbits & general_purpose_bits) & mem_mask); // read general purpose input lines
+		indat |= m68k->m_m68307_porta_r(space, true, (inputbits & ~general_purpose_bits)&mem_mask) & ((inputbits & ~general_purpose_bits)& mem_mask); // read dedicated input lines
+		UINT8 outdat = (m_padat & outputbits) & general_purpose_bits; // read general purpose output lines (reads latched data)
+
+		return (indat | outdat);
+
 	}
 	else
 	{
@@ -184,7 +185,7 @@ void m68307_sim::write_padat(address_space *space, UINT16 data, UINT16 mem_mask)
 
 	if (m68k->m_m68307_porta_w)
 	{
-		m68k->m_m68307_porta_w(space, 0, data);
+		m68k->m_m68307_porta_w(space, false, data, 0xff);
 	}
 	else
 	{
@@ -213,12 +214,13 @@ UINT16 m68307_sim::read_pbdat(address_space *space, UINT16 mem_mask)
 		// and anything configured as input is read from the port
 		UINT16 outputbits = m_pbddr;
 		UINT16 inputbits = ~m_pbddr;
-		UINT16 indat = m68k->m_m68307_portb_r(space, 0, mem_mask) & inputbits;
-		UINT16 outdat = m_pbdat & outputbits;
-
-		// dedicated bits behave in a different way..  todo
 		UINT16 general_purpose_bits = ~m_pbcnt;
-		return ((indat | outdat) & general_purpose_bits);
+
+		UINT16 indat = m68k->m_m68307_portb_r(space, false, (inputbits & general_purpose_bits)&mem_mask) & ((inputbits & general_purpose_bits) & mem_mask); // read general purpose input lines
+		indat |= m68k->m_m68307_portb_r(space, true, (inputbits & ~general_purpose_bits)&mem_mask) & ((inputbits & ~general_purpose_bits)& mem_mask); // read dedicated input lines
+		UINT16 outdat = (m_pbdat & outputbits) & general_purpose_bits; // read general purpose output lines (reads latched data)
+
+		return (indat | outdat);
 	}
 	else
 	{
@@ -236,7 +238,7 @@ void m68307_sim::write_pbdat(address_space *space, UINT16 data, UINT16 mem_mask)
 
 	if (m68k->m_m68307_portb_w)
 	{
-		m68k->m_m68307_portb_w(space, 0, data, mem_mask);
+		m68k->m_m68307_portb_w(space, false, data, mem_mask);
 	}
 	else
 	{
