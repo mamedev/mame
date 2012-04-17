@@ -31,13 +31,14 @@ i5000snd_device::i5000snd_device(const machine_config &mconfig, const char *tag,
 void i5000snd_device::device_start()
 {
 	// fill volume table
-	double div = 1.025;
-	double vol = 255.0;
+	double div = 1.032;
+	double vol = 2047.0;
 	for (int i = 0; i < 0x100; i++)
 	{
 		m_lut_volume[i] = vol + 0.5;
 		vol /= div;
 	}
+	m_lut_volume[0xff] = 0;
 	
 	// create the stream
 	m_stream = machine().sound().stream_alloc(*this, 0, 2, clock() / 0x400, this);
@@ -124,8 +125,8 @@ void i5000snd_device::sound_stream_update(sound_stream &stream, stream_sample_t 
 			
 			adpcm_data = m_channels[ch].m_adpcm.clock(adpcm_data & m_channels[ch].shift_mask);
 			
-			m_channels[ch].output_r = adpcm_data * m_channels[ch].vol_r / 16;
-			m_channels[ch].output_l = adpcm_data * m_channels[ch].vol_l / 16;
+			m_channels[ch].output_r = adpcm_data * m_channels[ch].vol_r / 128;
+			m_channels[ch].output_l = adpcm_data * m_channels[ch].vol_l / 128;
 			mix_r += m_channels[ch].output_r;
 			mix_l += m_channels[ch].output_l;
 		}
