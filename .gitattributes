@@ -3205,6 +3205,7 @@ src/mame/drivers/vindictr.c svneol=native#text/plain
 src/mame/drivers/viper.c svneol=native#text/plain
 src/mame/drivers/vmetal.c svneol=native#text/plain
 src/mame/drivers/volfied.c svneol=native#text/plain
+src/mame/drivers/voyager.c svneol=native#text/plain
 src/mame/drivers/vp101.c svneol=native#text/plain
 src/mame/drivers/vpoker.c svneol=native#text/plain
 src/mame/drivers/vroulet.c svneol=native#text/plain
