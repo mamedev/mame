@@ -162,7 +162,7 @@ WRITE8_MEMBER(mcr3_state::demoderm_op6_w)
 	if (data & 0x40) m_input_mux = 1;
 
 	/* low 5 bits control the turbo CS */
-	turbocs_data_w(space, offset, data);
+	m_turbo_chip_squeak->write(space, offset, data);
 }
 
 
@@ -265,7 +265,7 @@ WRITE8_MEMBER(mcr3_state::maxrpm_op6_w)
 		m_maxrpm_adc_select = (m_maxrpm_adc_control >> 1) & 3;
 
 	/* low 5 bits control the turbo CS */
-	turbocs_data_w(space, offset, data);
+	m_turbo_chip_squeak->write(space, offset, data);
 }
 
 
@@ -278,17 +278,17 @@ WRITE8_MEMBER(mcr3_state::maxrpm_op6_w)
 
 READ8_MEMBER(mcr3_state::rampage_ip4_r)
 {
-	return input_port_read(machine(), "MONO.IP4") | (soundsgood_status_r(space,0) << 7);
+	return input_port_read(machine(), "MONO.IP4") | (m_sounds_good->read(space,0) << 7);
 }
 
 
 WRITE8_MEMBER(mcr3_state::rampage_op6_w)
 {
 	/* bit 5 controls reset of the Sounds Good board */
-	soundsgood_reset_w(machine(), (~data >> 5) & 1);
+	m_sounds_good->reset_write((~data >> 5) & 1);
 
 	/* low 5 bits go directly to the Sounds Good board */
-	soundsgood_data_w(space, offset, data);
+	m_sounds_good->write(space, offset, data);
 }
 
 
@@ -301,7 +301,7 @@ WRITE8_MEMBER(mcr3_state::rampage_op6_w)
 
 READ8_MEMBER(mcr3_state::powerdrv_ip2_r)
 {
-	return input_port_read(machine(), "MONO.IP2") | (soundsgood_status_r(space, 0) << 7);
+	return input_port_read(machine(), "MONO.IP2") | (m_sounds_good->read(space, 0) << 7);
 }
 
 
@@ -329,10 +329,10 @@ WRITE8_MEMBER(mcr3_state::powerdrv_op5_w)
 WRITE8_MEMBER(mcr3_state::powerdrv_op6_w)
 {
 	/* bit 5 controls reset of the Sounds Good board */
-	soundsgood_reset_w(machine(), (~data >> 5) & 1);
+	m_sounds_good->reset_write((~data >> 5) & 1);
 
 	/* low 5 bits go directly to the Sounds Good board */
-	soundsgood_data_w(space, offset, data);
+	m_sounds_good->write(space, offset, data);
 }
 
 
@@ -348,7 +348,7 @@ READ8_MEMBER(mcr3_state::stargrds_ip0_r)
 	UINT8 result = input_port_read(machine(), "MONO.IP0");
 	if (m_input_mux)
 		result = (result & ~0x0a) | (input_port_read(machine(), "MONO.IP0.ALT") & 0x0a);
-	return (result & ~0x10) | ((soundsgood_status_r(space, 0) << 4) & 0x10);
+	return (result & ~0x10) | ((m_sounds_good->read(space, 0) << 4) & 0x10);
 }
 
 
@@ -372,10 +372,10 @@ WRITE8_MEMBER(mcr3_state::stargrds_op5_w)
 WRITE8_MEMBER(mcr3_state::stargrds_op6_w)
 {
 	/* bit 6 controls reset of the Sounds Good board */
-	soundsgood_reset_w(machine(), (~data >> 6) & 1);
+	m_sounds_good->reset_write((~data >> 6) & 1);
 
 	/* unline the other games, the STROBE is in the high bit instead of the low bit */
-	soundsgood_data_w(space, offset, (data << 1) | (data >> 7));
+	m_sounds_good->write(space, offset, (data << 1) | (data >> 7));
 }
 
 
@@ -388,14 +388,14 @@ WRITE8_MEMBER(mcr3_state::stargrds_op6_w)
 
 READ8_MEMBER(mcr3_state::spyhunt_ip1_r)
 {
-	return input_port_read(machine(), "SSIO.IP1") | (csdeluxe_status_r(space, 0) << 5);
+	return input_port_read(machine(), "ssio:IP1") | (m_chip_squeak_deluxe->read(space, 0) << 5);
 }
 
 
 READ8_MEMBER(mcr3_state::spyhunt_ip2_r)
 {
 	/* multiplexed steering wheel/gas pedal */
-	return input_port_read(machine(), m_input_mux ? "SSIO.IP2.ALT" : "SSIO.IP2");
+	return input_port_read(machine(), m_input_mux ? "ssio:IP2.ALT" : "ssio:IP2");
 }
 
 
@@ -432,7 +432,7 @@ WRITE8_MEMBER(mcr3_state::spyhunt_op4_w)
 	m_last_op4 = data;
 
 	/* low 5 bits go to control the Chip Squeak Deluxe */
-	csdeluxe_data_w(space, offset, data);
+	m_chip_squeak_deluxe->write(space, offset, data);
 }
 
 
@@ -447,9 +447,9 @@ READ8_MEMBER(mcr3_state::turbotag_ip2_r)
 {
 	/* multiplexed steering wheel/gas pedal */
 	if (m_input_mux)
-		return input_port_read(machine(), "SSIO.IP2.ALT");
+		return input_port_read(machine(), "ssio:IP2.ALT");
 
-	return input_port_read(machine(), "SSIO.IP2") + 5 * (machine().primary_screen->frame_number() & 1);
+	return input_port_read(machine(), "ssio:IP2") + 5 * (machine().primary_screen->frame_number() & 1);
 }
 
 
@@ -523,7 +523,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( spyhunt_portmap, AS_IO, 8, mcr3_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	SSIO_INPUT_PORTS
+	SSIO_INPUT_PORTS("ssio")
 	AM_RANGE(0x84, 0x86) AM_WRITE(spyhunt_scroll_value_w)
 	AM_RANGE(0xe0, 0xe0) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0xe8, 0xe8) AM_WRITENOP
@@ -886,7 +886,7 @@ INPUT_PORTS_END
 
 /* verified from wiring diagram, plus DIP switches from manual */
 static INPUT_PORTS_START( spyhunt )
-	PORT_START("SSIO.IP0")	/* J4 1-8 */
+	PORT_START("ssio:IP0")	/* J4 1-8 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0c, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -895,7 +895,7 @@ static INPUT_PORTS_START( spyhunt )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 
-	PORT_START("SSIO.IP1")	/* J4 10-13,15-18 */
+	PORT_START("ssio:IP1")	/* J4 10-13,15-18 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Oil Slick")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Missiles")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Weapon Truck")
@@ -904,10 +904,10 @@ static INPUT_PORTS_START( spyhunt )
 	PORT_BIT( 0x60, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* status from CS deluxe, never read */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("SSIO.IP2")	/* J5 1-8 */
+	PORT_START("ssio:IP2")	/* J5 1-8 */
 	PORT_BIT( 0xff, 0x30, IPT_PEDAL ) PORT_MINMAX(0x30,0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(10)
 
-	PORT_START("SSIO.IP3")	/* DIPSW @ B3 */
+	PORT_START("ssio:IP3")	/* DIPSW @ B3 */
 	PORT_DIPNAME( 0x01, 0x01, "Game Timer" )
 	PORT_DIPSETTING(    0x00, "1:00" )
 	PORT_DIPSETTING(    0x01, "1:30" )
@@ -918,20 +918,20 @@ static INPUT_PORTS_START( spyhunt )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("SSIO.IP4")	/* J6 1-8 */
+	PORT_START("ssio:IP4")	/* J6 1-8 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("SSIO.DIP")
+	PORT_START("ssio:DIP")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("SSIO.IP2.ALT")
+	PORT_START("ssio:IP2.ALT")
 	PORT_BIT( 0xff, 0x74, IPT_PADDLE ) PORT_MINMAX(0x34,0xb4) PORT_SENSITIVITY(40) PORT_KEYDELTA(10)
 INPUT_PORTS_END
 
 
 /* not verified, no manual found */
 static INPUT_PORTS_START( crater )
-	PORT_START("SSIO.IP0")	/* J4 1-8 */
+	PORT_START("ssio:IP0")	/* J4 1-8 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
@@ -941,10 +941,10 @@ static INPUT_PORTS_START( crater )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 
-	PORT_START("SSIO.IP1")	/* J4 10-13,15-18 */
+	PORT_START("ssio:IP1")	/* J4 10-13,15-18 */
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X) PORT_REVERSE
 
-	PORT_START("SSIO.IP2")	/* J5 1-8 */
+	PORT_START("ssio:IP2")	/* J5 1-8 */
 	PORT_BIT( 0x03, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_2WAY
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_2WAY
@@ -953,20 +953,20 @@ static INPUT_PORTS_START( crater )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("SSIO.IP3")	/* DIPSW @ B3 */
+	PORT_START("ssio:IP3")	/* DIPSW @ B3 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("SSIO.IP4")	/* J6 1-8 */
+	PORT_START("ssio:IP4")	/* J6 1-8 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("SSIO.DIP")
+	PORT_START("ssio:DIP")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 
 /* not verified, no manual found */
 static INPUT_PORTS_START( turbotag )
-	PORT_START("SSIO.IP0")	/* J4 1-8 */
+	PORT_START("ssio:IP0")	/* J4 1-8 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0c, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -975,7 +975,7 @@ static INPUT_PORTS_START( turbotag )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 
-	PORT_START("SSIO.IP1")	/* J4 10-13,15-18 */
+	PORT_START("ssio:IP1")	/* J4 10-13,15-18 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Left Button")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Left Trigger")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Center Button")
@@ -984,10 +984,10 @@ static INPUT_PORTS_START( turbotag )
 	PORT_BIT( 0x60, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* status from CS deluxe, never read */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("SSIO.IP2")	/* J5 1-8 */
+	PORT_START("ssio:IP2")	/* J5 1-8 */
 	PORT_BIT( 0xff, 0x3c, IPT_PEDAL ) PORT_MINMAX(60,180) PORT_SENSITIVITY(100) PORT_KEYDELTA(10)
 
-	PORT_START("SSIO.IP3")	/* DIPSW @ B3 */
+	PORT_START("ssio:IP3")	/* DIPSW @ B3 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
@@ -996,13 +996,13 @@ static INPUT_PORTS_START( turbotag )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("SSIO.IP4")	/* J6 1-8 */
+	PORT_START("ssio:IP4")	/* J6 1-8 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("SSIO.DIP")
+	PORT_START("ssio:DIP")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("SSIO.IP2.ALT")
+	PORT_START("ssio:IP2.ALT")
 	PORT_BIT( 0xff, 0x60, IPT_PADDLE ) PORT_SENSITIVITY(40) PORT_KEYDELTA(10)
 INPUT_PORTS_END
 
@@ -1089,6 +1089,9 @@ static MACHINE_CONFIG_START( mcrmono, mcr3_state )
 	MCFG_MACHINE_START(mcr)
 	MCFG_MACHINE_RESET(mcr)
 	MCFG_NVRAM_ADD_0FILL("nvram")
+	
+	// sound hardware
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -1114,7 +1117,9 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( mono_tcs, mcrmono )
 
 	/* basic machine hardware */
-	MCFG_FRAGMENT_ADD(turbo_chip_squeak)
+	MCFG_MIDWAY_TURBO_CHIP_SQUEAK_ADD("tcs")
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -1122,7 +1127,9 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( mono_sg, mcrmono )
 
 	/* basic machine hardware */
-	MCFG_FRAGMENT_ADD(sounds_good)
+	MCFG_MIDWAY_SOUNDS_GOOD_ADD("sg")
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -1133,7 +1140,9 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( mcrscroll, mcrmono )
 
 	/* basic machine hardware */
-	MCFG_FRAGMENT_ADD(mcr_ssio)
+	MCFG_MIDWAY_SSIO_ADD("ssio")
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(spyhunt_map)
@@ -1156,7 +1165,9 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( mcrsc_csd, mcrscroll )
 
 	/* basic machine hardware */
-	MCFG_FRAGMENT_ADD(chip_squeak_deluxe_stereo)
+	MCFG_MIDWAY_CHIP_SQUEAK_DELUXE_ADD("csd")
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -1173,7 +1184,7 @@ ROM_START( demoderm )
 	ROM_LOAD( "pro1.5b",      0x08000, 0x8000, CRC(034c00fc) SHA1(0f0e8f123a34c330021bce76ed7f38bcb2e9af4e) )
 	ROM_FILL(                 0x0e000, 0x2000, 0xff )	/* upper 8k is not mapped on monoboard */
 
-	ROM_REGION( 0x10000, "tcscpu", 0 )	/* 64k for the Turbo Cheap Squeak */
+	ROM_REGION( 0x10000, "tcs:cpu", 0 )	/* 64k for the Turbo Cheap Squeak */
 	ROM_LOAD( "tcs_u5.bin",   0x0c000, 0x2000, CRC(eca33b2c) SHA1(938b021ea3b0f23aed7a98a930a58af371a02303) )
 	ROM_LOAD( "tcs_u4.bin",   0x0e000, 0x2000, CRC(3490289a) SHA1(a9d56ea60bb901267da41ab408f8e1ed3742b0ac) )
 
@@ -1199,7 +1210,7 @@ ROM_START( sarge )
 	ROM_LOAD( "cpu_5b.bin",   0x08000, 0x8000, CRC(6800e746) SHA1(018c2b622b3654530ebc2c299b3f745777163d4b) )
 	ROM_FILL(                 0x0e000, 0x2000, 0xff )	/* upper 8k is not mapped on monoboard */
 
-	ROM_REGION( 0x10000, "tcscpu", 0 )  /* 64k for the Turbo Cheap Squeak */
+	ROM_REGION( 0x10000, "tcs:cpu", 0 )  /* 64k for the Turbo Cheap Squeak */
 	ROM_LOAD( "tcs_u5.bin",   0xc000, 0x2000, CRC(a894ef8a) SHA1(7f53927fc185fff8ba1b1747f0d565e089d879e6) )
 	ROM_LOAD( "tcs_u4.bin",   0xe000, 0x2000, CRC(6ca6faf3) SHA1(4647e633dd11f55a65c3acf81adeb3af93624991) )
 
@@ -1230,7 +1241,7 @@ ROM_START( maxrpm )
 	ROM_LOAD( "pro.1",        0x08000, 0x8000, CRC(f628bb30) SHA1(0514906b9764a7f02a730a610affea4d42a4510d) )
 	ROM_FILL(                 0x0e000, 0x2000, 0xff )	/* upper 8k is not mapped on monoboard */
 
-	ROM_REGION( 0x10000, "tcscpu", 0 )  /* 64k for the Turbo Cheap Squeak */
+	ROM_REGION( 0x10000, "tcs:cpu", 0 )  /* 64k for the Turbo Cheap Squeak */
 	ROM_LOAD( "turbskwk.u5",   0x8000, 0x4000, CRC(55c3b759) SHA1(89d690a007a996e9c7df7b365942e4da755d15d7) )
 	ROM_LOAD( "turbskwk.u4",   0xc000, 0x4000, CRC(31a2da2e) SHA1(582434b5d6bc8e84f39191976d8aa0ef9245f253) )
 
@@ -1252,7 +1263,7 @@ ROM_START( rampage )
 	ROM_LOAD( "pro1rev3.5b",  0x08000, 0x8000, CRC(d89bd9a4) SHA1(3531464ffe49dfaf2755d9e2dc1aea23819b3a5d) )
 	ROM_FILL(                 0x0e000, 0x2000, 0xff )	/* upper 8k is not mapped on monoboard */
 
-	ROM_REGION( 0x40000, "sgcpu", 0 )  /* 256k for the Sounds Good board */
+	ROM_REGION( 0x40000, "sg:cpu", 0 )  /* 256k for the Sounds Good board */
 	ROM_LOAD16_BYTE( "ramp_u7.snd",  0x00000, 0x8000, CRC(cffd7fa5) SHA1(7c5cecce1d428f847fea37d53eb09c6f62055c6f) )	/* these are Revision 2 sound ROMs */
 	ROM_LOAD16_BYTE( "ramp_u17.snd", 0x00001, 0x8000, CRC(e92c596b) SHA1(4e2d87398f2e7b637cbad6cb16d832dfa8f8288c) )
 	ROM_LOAD16_BYTE( "ramp_u8.snd",  0x10000, 0x8000, CRC(11f787e4) SHA1(1fa195bf9169608099d17be5801738a4e17bec3d) )
@@ -1276,7 +1287,7 @@ ROM_START( rampage2 )
 	ROM_LOAD( "pro1rev2.5b",  0x08000, 0x8000, CRC(58523d75) SHA1(5cd512864568ec7793bda0164f21e7d72a7ea817) )
 	ROM_FILL(                 0x0e000, 0x2000, 0xff )	/* upper 8k is not mapped on monoboard */
 
-	ROM_REGION( 0x40000, "sgcpu", 0 )  /* 256k for the Sounds Good board */
+	ROM_REGION( 0x40000, "sg:cpu", 0 )  /* 256k for the Sounds Good board */
 	ROM_LOAD16_BYTE( "ramp_u7.snd",  0x00000, 0x8000, CRC(cffd7fa5) SHA1(7c5cecce1d428f847fea37d53eb09c6f62055c6f) )    /* these are Revision 2 sound ROMs */
 	ROM_LOAD16_BYTE( "ramp_u17.snd", 0x00001, 0x8000, CRC(e92c596b) SHA1(4e2d87398f2e7b637cbad6cb16d832dfa8f8288c) )
 	ROM_LOAD16_BYTE( "ramp_u8.snd",  0x10000, 0x8000, CRC(11f787e4) SHA1(1fa195bf9169608099d17be5801738a4e17bec3d) )
@@ -1300,7 +1311,7 @@ ROM_START( powerdrv )
 	ROM_LOAD( "pdrv5b.bin",   0x08000, 0x8000, CRC(fa0544ad) SHA1(55a9cf8c8648761443e4a5a3b214f4d6236cbaff) )
 	ROM_FILL(                 0x0e000, 0x2000, 0xff )	/* upper 8k is not mapped on monoboard */
 
-	ROM_REGION( 0x40000, "sgcpu", 0 )  /* 256k for the Sounds Good board */
+	ROM_REGION( 0x40000, "sg:cpu", 0 )  /* 256k for the Sounds Good board */
 	ROM_LOAD16_BYTE( "pdsndu7.bin",  0x00000, 0x8000, CRC(78713e78) SHA1(11382c024536f743e051ba208ae02d0f5e07cf5e) )
 	ROM_LOAD16_BYTE( "pdsndu17.bin", 0x00001, 0x8000, CRC(c41de6e4) SHA1(0391afd96ee80dd1d4a34e661e5df1e01fbbd57a) )
 	ROM_LOAD16_BYTE( "pdsndu8.bin",  0x10000, 0x8000, CRC(15714036) SHA1(77ca5f703eb7f146e13d9c01f4427f6aaa31df39) )
@@ -1324,7 +1335,7 @@ ROM_START( stargrds )
 	ROM_LOAD( "pro-1.5b",  0x08000, 0x8000, CRC(dba428b0) SHA1(72efa2f02e95f05a5503ced136fbdf3fcdf57554) )
 	ROM_FILL(              0x0e000, 0x2000, 0xff )	/* upper 8k is not mapped on monoboard */
 
-	ROM_REGION( 0x40000, "sgcpu", 0 )  /* 256k for the Sounds Good board */
+	ROM_REGION( 0x40000, "sg:cpu", 0 )  /* 256k for the Sounds Good board */
 	ROM_LOAD16_BYTE( "snd0.u7",      0x00000, 0x8000, CRC(7755a493) SHA1(a888fba45a2a31de5b3082bfc5ccef94dafc4d16) )
 	ROM_LOAD16_BYTE( "snd1.u17",     0x00001, 0x8000, CRC(d98d14ae) SHA1(51dbb97655ab8a389ca67f0e796ab57894f5bb32) )
 
@@ -1349,11 +1360,11 @@ ROM_START( spyhunt )
 	ROM_LOAD( "cpu_pg4.10d",  0x8000, 0x2000, CRC(a3033c15) SHA1(e9811450a7c952561912777d679fe45a6b5a794a) )
 	ROM_LOAD( "cpu_pg5.11d",  0xa000, 0x4000, CRC(53a4f7cd) SHA1(051b07ae993e14b329507710c0f7cadaa952f9ae) )
 
-	ROM_REGION( 0x10000, "ssiocpu", 0 )
+	ROM_REGION( 0x10000, "ssio:cpu", 0 )
 	ROM_LOAD( "snd_0sd.a8",   0x0000, 0x1000, CRC(c95cf31e) SHA1(d1b0e299a27e306ddbc0654fd3a9d981c92afe8c) )
 	ROM_LOAD( "snd_1sd.a7",   0x1000, 0x1000, CRC(12aaa48e) SHA1(c6b835fc45e4484a4d52b682ce015caa242c8b4f) )
 
-	ROM_REGION( 0x8000, "csdcpu", 0 )  /* 32k for the Chip Squeak Deluxe */
+	ROM_REGION( 0x8000, "csd:cpu", 0 )  /* 32k for the Chip Squeak Deluxe */
 	ROM_LOAD16_BYTE( "csd_u7a.u7",   0x00000, 0x2000, CRC(6e689fe7) SHA1(38ad2e9f12b9d389fb2568ebcb32c8bd1ac6879e) )
 	ROM_LOAD16_BYTE( "csd_u17b.u17", 0x00001, 0x2000, CRC(0d9ddce6) SHA1(d955c0e67fc78b517cc229601ab4023cc5a644c2) )
 	ROM_LOAD16_BYTE( "csd_u8c.u8",   0x04000, 0x2000, CRC(35563cd0) SHA1(5708d374dd56758194c95118f096ea51bf12bf64) )
@@ -1392,11 +1403,11 @@ ROM_START( spyhuntp )
 	ROM_LOAD( "sh_mb_6.bin",  0x8000, 0x2000, CRC(8cbf04d8) SHA1(e45cb36935367e46ea41de0177b3453cd8bdce85) )
 	ROM_LOAD( "cpu_pg5.11d",  0xa000, 0x4000, CRC(53a4f7cd) SHA1(051b07ae993e14b329507710c0f7cadaa952f9ae) )
 
-	ROM_REGION( 0x10000, "ssiocpu", 0 )
+	ROM_REGION( 0x10000, "ssio:cpu", 0 )
 	ROM_LOAD( "snd_0sd.a8",   0x0000, 0x1000, CRC(c95cf31e) SHA1(d1b0e299a27e306ddbc0654fd3a9d981c92afe8c) )
 	ROM_LOAD( "snd_1sd.a7",   0x1000, 0x1000, CRC(12aaa48e) SHA1(c6b835fc45e4484a4d52b682ce015caa242c8b4f) )
 
-	ROM_REGION( 0x8000, "csdcpu", 0 )  /* 32k for the Chip Squeak Deluxe */
+	ROM_REGION( 0x8000, "csd:cpu", 0 )  /* 32k for the Chip Squeak Deluxe */
 	ROM_LOAD16_BYTE( "csd_u7a.u7",   0x00000, 0x2000, CRC(6e689fe7) SHA1(38ad2e9f12b9d389fb2568ebcb32c8bd1ac6879e) )
 	ROM_LOAD16_BYTE( "csd_u17b.u17", 0x00001, 0x2000, CRC(0d9ddce6) SHA1(d955c0e67fc78b517cc229601ab4023cc5a644c2) )
 	ROM_LOAD16_BYTE( "csd_u8c.u8",   0x04000, 0x2000, CRC(35563cd0) SHA1(5708d374dd56758194c95118f096ea51bf12bf64) )
@@ -1434,7 +1445,7 @@ ROM_START( crater )
 	ROM_LOAD( "crcpu.9d",     0x6000, 0x2000, CRC(a03c4b11) SHA1(6a442a0828942dc51dbe0d3f19be855a52c12f39) )
 	ROM_LOAD( "crcpu.10d",    0x8000, 0x2000, CRC(44ae4cbd) SHA1(2188bf697f1b3fcbb2ad6cbd4d9098e3b8d56a95) )
 
-	ROM_REGION( 0x10000, "ssiocpu", 0 )
+	ROM_REGION( 0x10000, "ssio:cpu", 0 )
 	ROM_LOAD( "crsnd4.a7",    0x0000, 0x1000, CRC(fd666cb5) SHA1(257174266e264db8ac9af5f2296fd0a22847f85f) )
 	ROM_LOAD( "crsnd1.a8",    0x1000, 0x1000, CRC(90bf2c4c) SHA1(7adfbf2251b5d46043d614554320e2fe544cc570) )
 	ROM_LOAD( "crsnd2.a9",    0x2000, 0x1000, CRC(3b8deef1) SHA1(a14186a33a7b5ca07086ce44fb1c8c64900654d0) )
@@ -1474,9 +1485,9 @@ ROM_START( turbotag )
 	ROM_LOAD( "ttprog5.bin",  0xa000, 0x2000, CRC(11e62fe4) SHA1(72897702c61486b654e4b4a3f6560c144c862e1f) )
 	ROM_RELOAD(               0xc000, 0x2000 )
 
-	ROM_REGION( 0x10000, "ssiocpu", ROMREGION_ERASE00 )
+	ROM_REGION( 0x10000, "ssio:cpu", ROMREGION_ERASE00 )
 
-	ROM_REGION( 0x8000, "csdcpu", 0 )  /* 32k for the Chip Squeak Deluxe */
+	ROM_REGION( 0x8000, "csd:cpu", 0 )  /* 32k for the Chip Squeak Deluxe */
 	ROM_LOAD16_BYTE( "ttu7.bin",  0x00000, 0x2000, CRC(8ebb3302) SHA1(c516abdae6eea524a6d2a039ed9bd7dff72ab986) )
 	ROM_LOAD16_BYTE( "ttu17.bin", 0x00001, 0x2000, CRC(605d6c74) SHA1(a6c2bc95cca372fa823ab256c9dd1f92b6ba45fd) )
 	ROM_LOAD16_BYTE( "ttu8.bin",  0x04000, 0x2000, CRC(6bfcb22a) SHA1(7b895e3ae1e99f195bb32b052f801b58c63a401c) )
@@ -1538,7 +1549,7 @@ static DRIVER_INIT( sarge )
 {
 	mcr3_state *state = machine.driver_data<mcr3_state>();
 	mcr_common_init(machine, MCR_TURBO_CHIP_SQUEAK);
-	machine.device("maincpu")->memory().space(AS_IO)->install_write_handler(0x06, 0x06, write8_delegate(FUNC(mcr3_state::turbocs_data_w),state));
+	machine.device("maincpu")->memory().space(AS_IO)->install_write_handler(0x06, 0x06, write8_delegate(FUNC(midway_turbo_chip_squeak_device::write),state->m_turbo_chip_squeak.target()));
 }
 
 
@@ -1592,9 +1603,9 @@ static DRIVER_INIT( spyhunt )
 {
 	mcr3_state *state = machine.driver_data<mcr3_state>();
 	mcr_common_init(machine, MCR_SSIO | MCR_CHIP_SQUEAK_DELUXE);
-	ssio_set_custom_input(1, 0x60, read8_delegate(FUNC(mcr3_state::spyhunt_ip1_r),state));
-	ssio_set_custom_input(2, 0xff, read8_delegate(FUNC(mcr3_state::spyhunt_ip2_r),state));
-	ssio_set_custom_output(4, 0xff, write8_delegate(FUNC(mcr3_state::spyhunt_op4_w),state));
+	machine.device<midway_ssio_device>("ssio")->set_custom_input(1, 0x60, read8_delegate(FUNC(mcr3_state::spyhunt_ip1_r),state));
+	machine.device<midway_ssio_device>("ssio")->set_custom_input(2, 0xff, read8_delegate(FUNC(mcr3_state::spyhunt_ip2_r),state));
+	machine.device<midway_ssio_device>("ssio")->set_custom_output(4, 0xff, write8_delegate(FUNC(mcr3_state::spyhunt_op4_w),state));
 
 	state->m_spyhunt_sprite_color_mask = 0x00;
 	state->m_spyhunt_scroll_offset = 16;
@@ -1615,15 +1626,15 @@ static DRIVER_INIT( turbotag )
 {
 	mcr3_state *state = machine.driver_data<mcr3_state>();
 	mcr_common_init(machine, MCR_SSIO | MCR_CHIP_SQUEAK_DELUXE);
-	ssio_set_custom_input(1, 0x60, read8_delegate(FUNC(mcr3_state::spyhunt_ip1_r),state));
-	ssio_set_custom_input(2, 0xff, read8_delegate(FUNC(mcr3_state::turbotag_ip2_r),state));
-	ssio_set_custom_output(4, 0xff, write8_delegate(FUNC(mcr3_state::spyhunt_op4_w),state));
+	machine.device<midway_ssio_device>("ssio")->set_custom_input(1, 0x60, read8_delegate(FUNC(mcr3_state::spyhunt_ip1_r),state));
+	machine.device<midway_ssio_device>("ssio")->set_custom_input(2, 0xff, read8_delegate(FUNC(mcr3_state::turbotag_ip2_r),state));
+	machine.device<midway_ssio_device>("ssio")->set_custom_output(4, 0xff, write8_delegate(FUNC(mcr3_state::spyhunt_op4_w),state));
 
 	state->m_spyhunt_sprite_color_mask = 0x00;
 	state->m_spyhunt_scroll_offset = 88;
 
 	/* the SSIO Z80 doesn't have any program to execute */
-	machine.device<cpu_device>("csdcpu")->suspend(SUSPEND_REASON_DISABLE, 1);
+	machine.device<cpu_device>("csd:cpu")->suspend(SUSPEND_REASON_DISABLE, 1);
 
 	/* kludge for bad ROM read */
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x0b53, 0x0b53, read8_delegate(FUNC(mcr3_state::turbotag_kludge_r),state));

@@ -10,15 +10,23 @@ struct counter_state
 	attotime		period;
 };
 
-class mcr68_state : public mcr_state
+class mcr68_state : public driver_device
 {
 public:
 	mcr68_state(const machine_config &mconfig, device_type type, const char *tag)
-		: mcr_state(mconfig, type, tag),
-		  m_videoram16(*this, "videoram16"),
-		  m_spriteram16(*this, "spriteram16") { }
+		: driver_device(mconfig, type, tag),
+		m_chip_squeak_deluxe(*this, "csd"),
+		m_sounds_good(*this, "sg"),
+		m_turbo_chip_squeak(*this, "tcs"),
+		  m_videoram(*this, "videoram"),
+		  m_spriteram(*this, "spriteram") { }
 
-	required_shared_ptr<UINT16> m_videoram16;
+	optional_device<midway_chip_squeak_deluxe_device> m_chip_squeak_deluxe;
+	optional_device<midway_sounds_good_device> m_sounds_good;
+	optional_device<midway_turbo_chip_squeak_device> m_turbo_chip_squeak;
+
+	required_shared_ptr<UINT16> m_videoram;
+	required_shared_ptr<UINT16> m_spriteram;
 	UINT16 m_control_word;
 	UINT8 m_protection_data[5];
 	attotime m_timing_factor;
@@ -40,7 +48,6 @@ public:
 	attotime m_m6840_internal_counter_period;
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
-	required_shared_ptr<UINT16> m_spriteram16;
 	DECLARE_READ16_MEMBER(zwackery_6840_r);
 	DECLARE_WRITE16_MEMBER(xenophobe_control_w);
 	DECLARE_WRITE16_MEMBER(blasted_control_w);

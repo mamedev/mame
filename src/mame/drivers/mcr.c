@@ -302,6 +302,27 @@ static UINT8 nflfoot_serial_in_numbits;
 
 
 
+WRITE8_MEMBER(mcr_state::mcr_control_port_w)
+{
+	/*
+        Bit layout is as follows:
+            D7 = n/c
+            D6 = cocktail flip
+            D5 = red LED
+            D4 = green LED
+            D3 = n/c
+            D2 = coin meter 3
+            D1 = coin meter 2
+            D0 = coin meter 1
+    */
+
+	coin_counter_w(machine(), 0, (data >> 0) & 1);
+	coin_counter_w(machine(), 1, (data >> 1) & 1);
+	coin_counter_w(machine(), 2, (data >> 2) & 1);
+	mcr_cocktail_flip = (data >> 6) & 1;
+}
+
+
 /*************************************
  *
  *  Solar Fox input ports
@@ -316,9 +337,9 @@ READ8_MEMBER(mcr_state::solarfox_ip0_r)
 	/* game in cocktail mode, they don't work at all. So we fake-mux   */
 	/* the controls through player 1's ports */
 	if (mcr_cocktail_flip)
-		return input_port_read(machine(), "SSIO.IP0") | 0x08;
+		return input_port_read(machine(), "ssio:IP0") | 0x08;
 	else
-		return ((input_port_read(machine(), "SSIO.IP0") & ~0x14) | 0x08) | ((input_port_read(machine(), "SSIO.IP0") & 0x08) >> 1) | ((input_port_read(machine(), "SSIO.IP2") & 0x01) << 4);
+		return ((input_port_read(machine(), "ssio:IP0") & ~0x14) | 0x08) | ((input_port_read(machine(), "ssio:IP0") & 0x08) >> 1) | ((input_port_read(machine(), "ssio:IP2") & 0x01) << 4);
 }
 
 
@@ -326,9 +347,9 @@ READ8_MEMBER(mcr_state::solarfox_ip1_r)
 {
 	/*  same deal as above */
 	if (mcr_cocktail_flip)
-		return input_port_read(machine(), "SSIO.IP1") | 0xf0;
+		return input_port_read(machine(), "ssio:IP1") | 0xf0;
 	else
-		return (input_port_read(machine(), "SSIO.IP1") >> 4) | 0xf0;
+		return (input_port_read(machine(), "ssio:IP1") >> 4) | 0xf0;
 }
 
 
@@ -361,18 +382,18 @@ WRITE8_MEMBER(mcr_state::wacko_op4_w)
 READ8_MEMBER(mcr_state::wacko_ip1_r)
 {
 	if (!input_mux)
-		return input_port_read(machine(), "SSIO.IP1");
+		return input_port_read(machine(), "ssio:IP1");
 	else
-		return input_port_read(machine(), "SSIO.IP1.ALT");
+		return input_port_read(machine(), "ssio:IP1.ALT");
 }
 
 
 READ8_MEMBER(mcr_state::wacko_ip2_r)
 {
 	if (!input_mux)
-		return input_port_read(machine(), "SSIO.IP2");
+		return input_port_read(machine(), "ssio:IP2");
 	else
-		return input_port_read(machine(), "SSIO.IP2.ALT");
+		return input_port_read(machine(), "ssio:IP2.ALT");
 }
 
 
@@ -512,7 +533,7 @@ WRITE8_MEMBER(mcr_state::dotron_op4_w)
 
 	/* bit 4 = SEL0 (J1-8) on squawk n talk board */
 	/* bits 3-0 = MD3-0 connected to squawk n talk (J1-4,3,2,1) */
-	squawkntalk_data_w(space, offset, data);
+	m_squawk_n_talk->write(space, offset, data);
 }
 
 
@@ -595,7 +616,7 @@ WRITE8_MEMBER(mcr_state::nflfoot_op4_w)
 
 	/* bit 4 = SEL0 (J1-8) on squawk n talk board */
 	/* bits 3-0 = MD3-0 connected to squawk n talk (J1-4,3,2,1) */
-	squawkntalk_data_w(space, offset, data);
+	m_squawk_n_talk->write(space, offset, data);
 }
 
 
@@ -608,15 +629,15 @@ WRITE8_MEMBER(mcr_state::nflfoot_op4_w)
 
 READ8_MEMBER(mcr_state::demoderb_ip1_r)
 {
-	return input_port_read(machine(), "SSIO.IP1") |
-		(input_port_read(machine(), input_mux ? "SSIO.IP1.ALT2" : "SSIO.IP1.ALT1") << 2);
+	return input_port_read(machine(), "ssio:IP1") |
+		(input_port_read(machine(), input_mux ? "ssio:IP1.ALT2" : "ssio:IP1.ALT1") << 2);
 }
 
 
 READ8_MEMBER(mcr_state::demoderb_ip2_r)
 {
-	return input_port_read(machine(), "SSIO.IP2") |
-		(input_port_read(machine(), input_mux ? "SSIO.IP2.ALT2" : "SSIO.IP2.ALT1") << 2);
+	return input_port_read(machine(), "ssio:IP2") |
+		(input_port_read(machine(), input_mux ? "ssio:IP2.ALT2" : "ssio:IP2.ALT1") << 2);
 }
 
 
@@ -624,7 +645,7 @@ WRITE8_MEMBER(mcr_state::demoderb_op4_w)
 {
 	if (data & 0x40) input_mux = 1;
 	if (data & 0x80) input_mux = 0;
-	turbocs_data_w(space, offset, data);
+	m_turbo_chip_squeak->write(space, offset, data);
 }
 
 
@@ -650,7 +671,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( cpu_90009_portmap, AS_IO, 8, mcr_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	SSIO_INPUT_PORTS
+	SSIO_INPUT_PORTS("ssio")
 	AM_RANGE(0xe0, 0xe0) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0xe8, 0xe8) AM_WRITENOP
 	AM_RANGE(0xf0, 0xf3) AM_DEVREADWRITE_LEGACY("ctc", z80ctc_r, z80ctc_w)
@@ -677,7 +698,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( cpu_90010_portmap, AS_IO, 8, mcr_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	SSIO_INPUT_PORTS
+	SSIO_INPUT_PORTS("ssio")
 	AM_RANGE(0xe0, 0xe0) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0xe8, 0xe8) AM_WRITENOP
 	AM_RANGE(0xf0, 0xf3) AM_DEVREADWRITE_LEGACY("ctc", z80ctc_r, z80ctc_w)
@@ -705,7 +726,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( cpu_91490_portmap, AS_IO, 8, mcr_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	SSIO_INPUT_PORTS
+	SSIO_INPUT_PORTS("ssio")
 	AM_RANGE(0xe0, 0xe0) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0xe8, 0xe8) AM_WRITENOP
 	AM_RANGE(0xf0, 0xf3) AM_DEVREADWRITE_LEGACY("ctc", z80ctc_r, z80ctc_w)
@@ -748,7 +769,7 @@ ADDRESS_MAP_END
 
 /* verified from wiring diagram, plus DIP switches from manual */
 static INPUT_PORTS_START( solarfox )
-	PORT_START("SSIO.IP0")	/* J4 1-8 */
+	PORT_START("ssio:IP0")	/* J4 1-8 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 )
@@ -758,7 +779,7 @@ static INPUT_PORTS_START( solarfox )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 
-	PORT_START("SSIO.IP1")	/* J4 10-13,15-18 */
+	PORT_START("ssio:IP1")	/* J4 10-13,15-18 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY
@@ -768,11 +789,11 @@ static INPUT_PORTS_START( solarfox )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_COCKTAIL
 
-	PORT_START("SSIO.IP2")	/* J5 1-8 */
+	PORT_START("ssio:IP2")	/* J5 1-8 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("SSIO.IP3")	/* DIPSW @ B3 */
+	PORT_START("ssio:IP3")	/* DIPSW @ B3 */
 	PORT_DIPNAME( 0x03, 0x03, "Bonus" )
 	PORT_DIPSETTING(    0x02, DEF_STR( None ) )
 	PORT_DIPSETTING(    0x03, "After 10 racks" )
@@ -789,17 +810,17 @@ static INPUT_PORTS_START( solarfox )
 	PORT_DIPSETTING(    0x80, DEF_STR( Upright ))
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ))
 
-	PORT_START("SSIO.IP4")	/* J6 1-8 */
+	PORT_START("ssio:IP4")	/* J6 1-8 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("SSIO.DIP")
+	PORT_START("ssio:DIP")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 
 /* verified from wiring diagram, plus DIP switches from manual */
 static INPUT_PORTS_START( kick )
-	PORT_START("SSIO.IP0")	/* J4 1-8 */
+	PORT_START("ssio:IP0")	/* J4 1-8 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
@@ -809,22 +830,22 @@ static INPUT_PORTS_START( kick )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 
-	PORT_START("SSIO.IP1")	/* J4 10-13,15-18 */
+	PORT_START("ssio:IP1")	/* J4 10-13,15-18 */
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(3) PORT_KEYDELTA(50) PORT_REVERSE
 
-	PORT_START("SSIO.IP2")	/* J5 1-8 */
+	PORT_START("ssio:IP2")	/* J5 1-8 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("SSIO.IP3")	/* DIPSW @ B3 */
+	PORT_START("ssio:IP3")	/* DIPSW @ B3 */
 	PORT_DIPNAME( 0x01, 0x00, "Music" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ))
 	PORT_DIPSETTING(    0x00, DEF_STR( On ))
 	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("SSIO.IP4")	/* J6 1-8 */
+	PORT_START("ssio:IP4")	/* J6 1-8 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("SSIO.DIP")
+	PORT_START("ssio:DIP")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DIAL2")
@@ -834,7 +855,7 @@ INPUT_PORTS_END
 
 /* verified from wiring diagram, plus DIP switches from manual */
 static INPUT_PORTS_START( kickc )
-	PORT_START("SSIO.IP0")	/* J4 1-8 */
+	PORT_START("ssio:IP0")	/* J4 1-8 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
@@ -844,14 +865,14 @@ static INPUT_PORTS_START( kickc )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 
-	PORT_START("SSIO.IP1")	/* J4 10-13,15-18 */
+	PORT_START("ssio:IP1")	/* J4 10-13,15-18 */
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(3) PORT_KEYDELTA(50) PORT_REVERSE
 
-	PORT_START("SSIO.IP2")	/* J5 1-8 */
+	PORT_START("ssio:IP2")	/* J5 1-8 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("SSIO.IP3")	/* DIPSW @ B3 */
+	PORT_START("ssio:IP3")	/* DIPSW @ B3 */
 	PORT_DIPNAME( 0x01, 0x00, "Music" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ))
 	PORT_DIPSETTING(    0x00, DEF_STR( On ))
@@ -861,10 +882,10 @@ static INPUT_PORTS_START( kickc )
 	PORT_DIPSETTING(    0x40, DEF_STR( Cocktail ))
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("SSIO.IP4")	/* J6 1-8 */
+	PORT_START("ssio:IP4")	/* J6 1-8 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("SSIO.DIP")
+	PORT_START("ssio:DIP")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DIAL2")
@@ -874,7 +895,7 @@ INPUT_PORTS_END
 
 /* verified from wiring diagram, plus DIP switches from manual */
 static INPUT_PORTS_START( shollow )
-	PORT_START("SSIO.IP0")	/* J4 1-8 */
+	PORT_START("ssio:IP0")	/* J4 1-8 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
@@ -884,7 +905,7 @@ static INPUT_PORTS_START( shollow )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 
-	PORT_START("SSIO.IP1")	/* J4 10-13,15-18 */
+	PORT_START("ssio:IP1")	/* J4 10-13,15-18 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 )
@@ -894,10 +915,10 @@ static INPUT_PORTS_START( shollow )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 
-	PORT_START("SSIO.IP2")	/* J5 1-8 */
+	PORT_START("ssio:IP2")	/* J5 1-8 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("SSIO.IP3")	/* DIPSW @ B3 */
+	PORT_START("ssio:IP3")	/* DIPSW @ B3 */
 	PORT_DIPNAME( 0x01, 0x01, "Coin Meters" )
 	PORT_DIPSETTING(    0x01, "1" )
 	PORT_DIPSETTING(    0x00, "2" )
@@ -906,17 +927,17 @@ static INPUT_PORTS_START( shollow )
 	PORT_DIPSETTING(    0x02, DEF_STR( Cocktail ) )
 	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("SSIO.IP4")	/* J6 1-8 */
+	PORT_START("ssio:IP4")	/* J6 1-8 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("SSIO.DIP")
+	PORT_START("ssio:DIP")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 
 /* verified from wiring diagram, plus DIP switches from manual */
 static INPUT_PORTS_START( tron )
-	PORT_START("SSIO.IP0")	/* J4 1-8 */
+	PORT_START("ssio:IP0")	/* J4 1-8 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
@@ -926,10 +947,10 @@ static INPUT_PORTS_START( tron )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 
-	PORT_START("SSIO.IP1")	/* J4 10-13,15-18 */
+	PORT_START("ssio:IP1")	/* J4 10-13,15-18 */
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X) PORT_REVERSE
 
-	PORT_START("SSIO.IP2")	/* J5 1-8 */
+	PORT_START("ssio:IP2")	/* J5 1-8 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
@@ -939,7 +960,7 @@ static INPUT_PORTS_START( tron )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
 
-	PORT_START("SSIO.IP3")	/* DIPSW @ B3 */
+	PORT_START("ssio:IP3")	/* DIPSW @ B3 */
 	PORT_DIPNAME( 0x01, 0x00, "Coin Meters" )  PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x01, "1" )
 	PORT_DIPSETTING(    0x00, "2" )
@@ -958,16 +979,16 @@ static INPUT_PORTS_START( tron )
 	// According to the manual, SW1 is a bank of *10* switches (9 is unused and 10 is freeze)
 	// Where are the values for the other two bits read?
 
-	PORT_START("SSIO.IP4")	/* J6 1-8 */
+	PORT_START("ssio:IP4")	/* J6 1-8 */
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_REVERSE PORT_COCKTAIL
 
-	PORT_START("SSIO.DIP")
+	PORT_START("ssio:DIP")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( tron3 )
-	PORT_START("SSIO.IP0")	/* J4 1-8 */
+	PORT_START("ssio:IP0")	/* J4 1-8 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
@@ -977,10 +998,10 @@ static INPUT_PORTS_START( tron3 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 
-	PORT_START("SSIO.IP1")	/* J4 10-13,15-18 */
+	PORT_START("ssio:IP1")	/* J4 10-13,15-18 */
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X) PORT_REVERSE
 
-	PORT_START("SSIO.IP2")	/* J5 1-8 */
+	PORT_START("ssio:IP2")	/* J5 1-8 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
@@ -990,7 +1011,7 @@ static INPUT_PORTS_START( tron3 )
 //  PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
 //  PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
 
-	PORT_START("SSIO.IP3")	/* DIPSW @ B3 */
+	PORT_START("ssio:IP3")	/* DIPSW @ B3 */
 	PORT_DIPNAME( 0x01, 0x00, "Coin Meters" )  PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x01, "1" )
 	PORT_DIPSETTING(    0x00, "2" )
@@ -1009,11 +1030,11 @@ static INPUT_PORTS_START( tron3 )
 	// According to the manual, SW1 is a bank of *10* switches (9 is unused and 10 is freeze)
 	// Where are the values for the other two bits read?
 
-	PORT_START("SSIO.IP4")	/* J6 1-8 */
+	PORT_START("ssio:IP4")	/* J6 1-8 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 //  PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_REVERSE PORT_COCKTAIL
 
-	PORT_START("SSIO.DIP")
+	PORT_START("ssio:DIP")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 INPUT_PORTS_END
@@ -1022,7 +1043,7 @@ INPUT_PORTS_END
 
 /* verified from wiring diagram, plus DIP switches from manual */
 static INPUT_PORTS_START( kroozr )
-	PORT_START("SSIO.IP0")	/* J4 1-8 */
+	PORT_START("ssio:IP0")	/* J4 1-8 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
@@ -1032,7 +1053,7 @@ static INPUT_PORTS_START( kroozr )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 
-	PORT_START("SSIO.IP1")	/* J4 10-13,15-18 */
+	PORT_START("ssio:IP1")	/* J4 10-13,15-18 */
 	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* low 3 bits of spinner */
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* sensor J1-10 */
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* sensor J1-9 */
@@ -1040,20 +1061,20 @@ static INPUT_PORTS_START( kroozr )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* upper 1 bit of spinner */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 )
 
-	PORT_START("SSIO.IP2")	/* J5 1-8 */
+	PORT_START("ssio:IP2")	/* J5 1-8 */
 	PORT_BIT( 0xff, 0x64, IPT_AD_STICK_X ) PORT_MINMAX(48,152) PORT_SENSITIVITY(100) PORT_KEYDELTA(52)
 
-	PORT_START("SSIO.IP3")	/* DIPSW @ B3 */
+	PORT_START("ssio:IP3")	/* DIPSW @ B3 */
 	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Cocktail ) )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("SSIO.IP4")	/* J6 1-8 */
+	PORT_START("ssio:IP4")	/* J6 1-8 */
 	PORT_BIT( 0xff, 0x64, IPT_AD_STICK_Y ) PORT_MINMAX(48,152) PORT_SENSITIVITY(100) PORT_KEYDELTA(52)
 
-	PORT_START("SSIO.DIP")
+	PORT_START("ssio:DIP")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DIAL")
@@ -1063,7 +1084,7 @@ INPUT_PORTS_END
 
 /* verified from wiring diagram, plus DIP switches from manual */
 static INPUT_PORTS_START( domino )
-	PORT_START("SSIO.IP0")	/* J4 1-8 */
+	PORT_START("ssio:IP0")	/* J4 1-8 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
@@ -1073,14 +1094,14 @@ static INPUT_PORTS_START( domino )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 
-	PORT_START("SSIO.IP1")	/* J4 10-13,15-18 */
+	PORT_START("ssio:IP1")	/* J4 10-13,15-18 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("SSIO.IP2")	/* J5 1-8 */
+	PORT_START("ssio:IP2")	/* J5 1-8 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_COCKTAIL
@@ -1088,7 +1109,7 @@ static INPUT_PORTS_START( domino )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("SSIO.IP3")	/* DIPSW @ B3 */
+	PORT_START("ssio:IP3")	/* DIPSW @ B3 */
 	PORT_DIPNAME( 0x01, 0x00, "Music" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ))
 	PORT_DIPSETTING(    0x00, DEF_STR( On ))
@@ -1103,17 +1124,17 @@ static INPUT_PORTS_START( domino )
 	PORT_DIPSETTING(    0x80, "1" )
 	PORT_DIPSETTING(    0x00, "2" )
 
-	PORT_START("SSIO.IP4")	/* J6 1-8 */
+	PORT_START("ssio:IP4")	/* J6 1-8 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("SSIO.DIP")
+	PORT_START("ssio:DIP")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 
 /* verified from wiring diagram, plus DIP switches from manual */
 static INPUT_PORTS_START( journey )
-	PORT_START("SSIO.IP0")	/* J4 1-8 */
+	PORT_START("ssio:IP0")	/* J4 1-8 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
@@ -1123,14 +1144,14 @@ static INPUT_PORTS_START( journey )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 
-	PORT_START("SSIO.IP1")	/* J4 10-13,15-18 */
+	PORT_START("ssio:IP1")	/* J4 10-13,15-18 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("SSIO.IP2")	/* J5 1-8 */
+	PORT_START("ssio:IP2")	/* J5 1-8 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_COCKTAIL
@@ -1138,7 +1159,7 @@ static INPUT_PORTS_START( journey )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("SSIO.IP3")	/* DIPSW @ B3 */
+	PORT_START("ssio:IP3")	/* DIPSW @ B3 */
 	PORT_DIPNAME( 0x01, 0x01, "Coin Meters" )
 	PORT_DIPSETTING(    0x01, "1" )
 	PORT_DIPSETTING(    0x00, "2" )
@@ -1147,17 +1168,17 @@ static INPUT_PORTS_START( journey )
 	PORT_DIPSETTING(    0x02, DEF_STR( Cocktail ) )
 	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("SSIO.IP4")	/* J6 1-8 */
+	PORT_START("ssio:IP4")	/* J6 1-8 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("SSIO.DIP")
+	PORT_START("ssio:DIP")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 
 /* verified from wiring diagram, plus DIP switches from manual */
 static INPUT_PORTS_START( wacko )
-	PORT_START("SSIO.IP0")	/* J4 1-8 */
+	PORT_START("ssio:IP0")	/* J4 1-8 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
@@ -1167,13 +1188,13 @@ static INPUT_PORTS_START( wacko )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 
-	PORT_START("SSIO.IP1")	/* J4 10-13,15-18 */
+	PORT_START("ssio:IP1")	/* J4 10-13,15-18 */
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10)
 
-	PORT_START("SSIO.IP2")	/* J5 1-8 */
+	PORT_START("ssio:IP2")	/* J5 1-8 */
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_REVERSE
 
-	PORT_START("SSIO.IP3")	/* DIPSW @ B3 */
+	PORT_START("ssio:IP3")	/* DIPSW @ B3 */
 	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
@@ -1182,7 +1203,7 @@ static INPUT_PORTS_START( wacko )
 	PORT_DIPSETTING(    0x80, "1" )
 	PORT_DIPSETTING(    0x00, "2" )
 
-	PORT_START("SSIO.IP4")	/* J6 1-8 */
+	PORT_START("ssio:IP4")	/* J6 1-8 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_RIGHT ) PORT_4WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_LEFT ) PORT_4WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_DOWN ) PORT_4WAY
@@ -1192,20 +1213,20 @@ static INPUT_PORTS_START( wacko )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_DOWN ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_UP ) PORT_4WAY PORT_COCKTAIL
 
-	PORT_START("SSIO.DIP")
+	PORT_START("ssio:DIP")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("SSIO.IP1.ALT")
+	PORT_START("ssio:IP1.ALT")
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_COCKTAIL
 
-	PORT_START("SSIO.IP2.ALT")
+	PORT_START("ssio:IP2.ALT")
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_REVERSE PORT_COCKTAIL
 INPUT_PORTS_END
 
 
 /* not verified, no manual found */
 static INPUT_PORTS_START( twotiger )
-	PORT_START("SSIO.IP0")	/* J4 1-8 */
+	PORT_START("ssio:IP0")	/* J4 1-8 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START2 )
@@ -1215,13 +1236,13 @@ static INPUT_PORTS_START( twotiger )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 
-	PORT_START("SSIO.IP1")	/* J4 10-13,15-18 */
+	PORT_START("ssio:IP1")	/* J4 10-13,15-18 */
 	PORT_BIT( 0xff, 0x67, IPT_AD_STICK_X ) PORT_MINMAX(0, 206) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(2)
 
-	PORT_START("SSIO.IP2")	/* J5 1-8 */
+	PORT_START("ssio:IP2")	/* J5 1-8 */
 	PORT_BIT( 0xff, 0x67, IPT_AD_STICK_X ) PORT_MINMAX(0, 206) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
-	PORT_START("SSIO.IP3")	/* DIPSW @ B3 */
+	PORT_START("ssio:IP3")	/* DIPSW @ B3 */
 	PORT_DIPNAME( 0x01, 0x00, "Shot Speed" )
 	PORT_DIPSETTING(    0x01, "Fast" )
 	PORT_DIPSETTING(    0x00, "Slow" )
@@ -1230,7 +1251,7 @@ static INPUT_PORTS_START( twotiger )
 	PORT_DIPSETTING(    0x02, "2 Credits" )
 	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("SSIO.IP4")	/* J6 1-8 */
+	PORT_START("ssio:IP4")	/* J6 1-8 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 )
@@ -1239,14 +1260,14 @@ static INPUT_PORTS_START( twotiger )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("SSIO.DIP")
+	PORT_START("ssio:DIP")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 
 /* not verified, no manual found */
 static INPUT_PORTS_START( twotigrc )
-	PORT_START("SSIO.IP0")	/* J4 1-8 */
+	PORT_START("ssio:IP0")	/* J4 1-8 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
@@ -1256,30 +1277,30 @@ static INPUT_PORTS_START( twotigrc )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 
-	PORT_START("SSIO.IP1")	/* J4 10-13,15-18 */
+	PORT_START("ssio:IP1")	/* J4 10-13,15-18 */
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(10) PORT_KEYDELTA(10) PORT_REVERSE
 
-	PORT_START("SSIO.IP2")	/* J5 1-8 */
+	PORT_START("ssio:IP2")	/* J5 1-8 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("SSIO.IP3")	/* DIPSW @ B3 */
+	PORT_START("ssio:IP3")	/* DIPSW @ B3 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("SSIO.IP4")	/* J6 1-8 */
+	PORT_START("ssio:IP4")	/* J6 1-8 */
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(10) PORT_KEYDELTA(10) PORT_REVERSE PORT_PLAYER(2)
 
-	PORT_START("SSIO.DIP")
+	PORT_START("ssio:DIP")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 
 /* verified from wiring diagram, plus DIP switches from manual */
 static INPUT_PORTS_START( tapper )
-	PORT_START("SSIO.IP0")	/* J4 1-8 */
+	PORT_START("ssio:IP0")	/* J4 1-8 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
@@ -1289,7 +1310,7 @@ static INPUT_PORTS_START( tapper )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 
-	PORT_START("SSIO.IP1")	/* J4 10-13,15-18 */
+	PORT_START("ssio:IP1")	/* J4 10-13,15-18 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY
@@ -1297,7 +1318,7 @@ static INPUT_PORTS_START( tapper )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("SSIO.IP2")	/* J5 1-8 */
+	PORT_START("ssio:IP2")	/* J5 1-8 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_COCKTAIL
@@ -1305,7 +1326,7 @@ static INPUT_PORTS_START( tapper )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("SSIO.IP3")	/* DIPSW @ B3 */
+	PORT_START("ssio:IP3")	/* DIPSW @ B3 */
 	PORT_BIT( 0x03, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
@@ -1318,17 +1339,17 @@ static INPUT_PORTS_START( tapper )
 	PORT_DIPSETTING(    0x80, "1" )
 	PORT_DIPSETTING(    0x00, "2" )
 
-	PORT_START("SSIO.IP4")	/* J6 1-8 */
+	PORT_START("ssio:IP4")	/* J6 1-8 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("SSIO.DIP")
+	PORT_START("ssio:DIP")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 
 /* not verified, no manual found */
 static INPUT_PORTS_START( timber )
-	PORT_START("SSIO.IP0")	/* J4 1-8 */
+	PORT_START("ssio:IP0")	/* J4 1-8 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
@@ -1338,7 +1359,7 @@ static INPUT_PORTS_START( timber )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 
-	PORT_START("SSIO.IP1")	/* J4 10-13,15-18 */
+	PORT_START("ssio:IP1")	/* J4 10-13,15-18 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_PLAYER(1)
@@ -1347,7 +1368,7 @@ static INPUT_PORTS_START( timber )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("SSIO.IP2")	/* J5 1-8 */
+	PORT_START("ssio:IP2")	/* J5 1-8 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_PLAYER(2)
@@ -1356,7 +1377,7 @@ static INPUT_PORTS_START( timber )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("SSIO.IP3")	/* DIPSW @ B3 */
+	PORT_START("ssio:IP3")	/* DIPSW @ B3 */
 	PORT_BIT( 0x03, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
@@ -1369,17 +1390,17 @@ static INPUT_PORTS_START( timber )
 	PORT_DIPSETTING(    0x80, "1" )
 	PORT_DIPSETTING(    0x00, "2" )
 
-	PORT_START("SSIO.IP4")	/* J6 1-8 */
+	PORT_START("ssio:IP4")	/* J6 1-8 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("SSIO.DIP")
+	PORT_START("ssio:DIP")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 
 /* verified from wiring diagram, plus DIP switches from manual */
 static INPUT_PORTS_START( dotron )
-	PORT_START("SSIO.IP0")	/* J4 1-8 */
+	PORT_START("ssio:IP0")	/* J4 1-8 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
@@ -1389,11 +1410,11 @@ static INPUT_PORTS_START( dotron )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 
-	PORT_START("SSIO.IP1")	/* J4 10-13,15-18 */
+	PORT_START("ssio:IP1")	/* J4 10-13,15-18 */
 	PORT_BIT( 0x7f, 0x00, IPT_DIAL ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X) PORT_REVERSE
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("SSIO.IP2")	/* J5 1-8 */
+	PORT_START("ssio:IP2")	/* J5 1-8 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
@@ -1405,16 +1426,16 @@ static INPUT_PORTS_START( dotron )
 	PORT_DIPSETTING(    0x00, "Environmental" )
 	PORT_DIPSETTING(    0x80, DEF_STR( Upright ) )
 
-	PORT_START("SSIO.IP3")	/* DIPSW @ B3 */
+	PORT_START("ssio:IP3")	/* DIPSW @ B3 */
 	PORT_DIPNAME( 0x01, 0x01, "Coin Meters" )
 	PORT_DIPSETTING(    0x01, "1" )
 	PORT_DIPSETTING(    0x00, "2" )
 	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("SSIO.IP4")	/* J6 1-8 */
+	PORT_START("ssio:IP4")	/* J6 1-8 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("SSIO.DIP")
+	PORT_START("ssio:DIP")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("FAKE")	/* fake port to make aiming up & down easier */
@@ -1424,7 +1445,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( dotrone )
 	PORT_INCLUDE(dotron)
 
-	PORT_MODIFY("SSIO.IP2")
+	PORT_MODIFY("ssio:IP2")
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x00, "Environmental" )
 	PORT_DIPSETTING(    0x80, DEF_STR( Upright ) )
@@ -1433,7 +1454,7 @@ INPUT_PORTS_END
 
 /* verified from wiring diagram, plus DIP switches from manual */
 static INPUT_PORTS_START( nflfoot )
-	PORT_START("SSIO.IP0")	/* J4 1-8 */
+	PORT_START("ssio:IP0")	/* J4 1-8 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BILL1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START2 )		/* continue game */
@@ -1443,7 +1464,7 @@ static INPUT_PORTS_START( nflfoot )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 
-	PORT_START("SSIO.IP1")	/* J4 10-13,15-18 */
+	PORT_START("ssio:IP1")	/* J4 10-13,15-18 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) 	/* left engage */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) 	/* left select #1 play */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) 	/* left select #2 play */
@@ -1453,7 +1474,7 @@ static INPUT_PORTS_START( nflfoot )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_PLAYER(1)		/* select one player */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("SSIO.IP2")	/* J5 1-8 */
+	PORT_START("ssio:IP2")	/* J5 1-8 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) 	/* right engage */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) 	/* right select #1 play */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) 	/* right select #2 play */
@@ -1463,16 +1484,16 @@ static INPUT_PORTS_START( nflfoot )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_PLAYER(2)		/* select two player */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL )					/* connects to IPU board */
 
-	PORT_START("SSIO.IP3")	/* DIPSW @ B3 */
+	PORT_START("ssio:IP3")	/* DIPSW @ B3 */
 	PORT_DIPNAME( 0x01, 0x01, "Coin Meters" )
 	PORT_DIPSETTING(    0x01, "1" )
 	PORT_DIPSETTING(    0x00, "2" )
 	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("SSIO.IP4")	/* J6 1-8 */
+	PORT_START("ssio:IP4")	/* J6 1-8 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("SSIO.DIP")
+	PORT_START("ssio:DIP")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
@@ -1480,7 +1501,7 @@ INPUT_PORTS_END
 /* "wiring diagram was not available at time of publication" according to the manual */
 /* DIPs verified from the manual */
 static INPUT_PORTS_START( demoderb )
-	PORT_START("SSIO.IP0")	/* J4 1-8 */
+	PORT_START("ssio:IP0")	/* J4 1-8 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
@@ -1490,27 +1511,27 @@ static INPUT_PORTS_START( demoderb )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("SSIO.IP1")	/* J4 10-13,15-18 */	/* The high 6 bits contain the steering wheel value */
+	PORT_START("ssio:IP1")	/* J4 10-13,15-18 */	/* The high 6 bits contain the steering wheel value */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 
-	PORT_START("SSIO.IP1.ALT1")	/* J4 10-13,15-18 */	/* The high 6 bits contain the steering wheel value */
+	PORT_START("ssio:IP1.ALT1")	/* J4 10-13,15-18 */	/* The high 6 bits contain the steering wheel value */
 	PORT_BIT( 0x3f, 0x00, IPT_DIAL ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_REVERSE PORT_PLAYER(1)
 
-	PORT_START("SSIO.IP1.ALT2")	/* IN1 (muxed) -- the high 6 bits contain the steering wheel value */
+	PORT_START("ssio:IP1.ALT2")	/* IN1 (muxed) -- the high 6 bits contain the steering wheel value */
 	PORT_BIT( 0x3f, 0x00, IPT_DIAL ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_REVERSE PORT_PLAYER(3)
 
-	PORT_START("SSIO.IP2")	/* J5 1-8 */	/* The high 6 bits contain the steering wheel value */
+	PORT_START("ssio:IP2")	/* J5 1-8 */	/* The high 6 bits contain the steering wheel value */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 
-	PORT_START("SSIO.IP2.ALT1")	/* J5 1-8 */	/* The high 6 bits contain the steering wheel value */
+	PORT_START("ssio:IP2.ALT1")	/* J5 1-8 */	/* The high 6 bits contain the steering wheel value */
 	PORT_BIT( 0x3f, 0x00, IPT_DIAL ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_REVERSE PORT_PLAYER(2)
 
-	PORT_START("SSIO.IP2.ALT2")	/* IN2 (muxed) -- the high 6 bits contain the steering wheel value */
+	PORT_START("ssio:IP2.ALT2")	/* IN2 (muxed) -- the high 6 bits contain the steering wheel value */
 	PORT_BIT( 0x3f, 0x00, IPT_DIAL ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_REVERSE PORT_PLAYER(4)
 
-	PORT_START("SSIO.IP3")	/* DIPSW @ B3 */
+	PORT_START("ssio:IP3")	/* DIPSW @ B3 */
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x01, "2P Upright" )
 	PORT_DIPSETTING(    0x00, "4P Cocktail" )
@@ -1530,7 +1551,7 @@ static INPUT_PORTS_START( demoderb )
 	PORT_DIPSETTING(    0x10, DEF_STR( 1C_2C ) )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("SSIO.IP4")	/* J6 1-8 */
+	PORT_START("ssio:IP4")	/* J6 1-8 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN3 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN4 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START3 )
@@ -1540,7 +1561,7 @@ static INPUT_PORTS_START( demoderb )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(4)
 
-	PORT_START("SSIO.DIP")
+	PORT_START("ssio:DIP")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 INPUT_PORTS_END
@@ -1635,7 +1656,10 @@ static MACHINE_CONFIG_START( mcr_90009, mcr_state )
 	MCFG_VIDEO_START(mcr)
 
 	/* sound hardware */
-	MCFG_FRAGMENT_ADD(mcr_ssio)
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_MIDWAY_SSIO_ADD("ssio")
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -1693,7 +1717,9 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( mcr_91490_snt, mcr_91490 )
 
 	/* basic machine hardware */
-	MCFG_FRAGMENT_ADD(squawk_n_talk)
+	MCFG_MIDWAY_SQUAWK_N_TALK_ADD("snt")
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -1721,7 +1747,9 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( mcr_91490_tcs, mcr_91490 )
 
 	/* basic machine hardware */
-	MCFG_FRAGMENT_ADD(turbo_chip_squeak)
+	MCFG_MIDWAY_TURBO_CHIP_SQUEAK_ADD("tcs")
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -1742,7 +1770,7 @@ ROM_START( solarfox )
 	ROM_LOAD( "sfcpu.6d",     0x5000, 0x1000, CRC(bd993cd9) SHA1(c074a6a40d0b9c0f4bf3fc5982263c89549fb338) )
 	ROM_LOAD( "sfcpu.7d",     0x6000, 0x1000, CRC(8ad8731d) SHA1(ffd19c3fbad3c5a240ab27963812cc300f3d7b89) )
 
-	ROM_REGION( 0x10000, "ssiocpu", 0 )
+	ROM_REGION( 0x10000, "ssio:cpu", 0 )
 	ROM_LOAD( "sfsnd.7a",     0x0000, 0x1000, CRC(cdecf83a) SHA1(5acd2709e214408d756b39916bb98cd4ecda7988) )
 	ROM_LOAD( "sfsnd.8a",     0x1000, 0x1000, CRC(cb7788cb) SHA1(9e86f9131a6f0fc96dd436e21baf45e215ee65f4) )
 	ROM_LOAD( "sfsnd.9a",     0x2000, 0x1000, CRC(304896ce) SHA1(00ff640eab50022da980cdc5ce8cedebaaebc9cf) )
@@ -1771,7 +1799,7 @@ ROM_START( kick )
 	ROM_LOAD( "1600e-v2.d5",  0x4000, 0x1000, CRC(1d2834c0) SHA1(176fad90ab14c922a575c3d12a2c8a339d1518d4) )
 	ROM_LOAD( "1700f-v2.d6",  0x5000, 0x1000, CRC(ddf84ce1) SHA1(6f80b9a5cbd75b6e4af569ca4bcfcde7daaad64f) )
 
-	ROM_REGION( 0x10000, "ssiocpu", 0 )
+	ROM_REGION( 0x10000, "ssio:cpu", 0 )
 	ROM_LOAD( "4200-a.a7",    0x0000, 0x1000, CRC(9e35c02e) SHA1(92afd0126dcfb2d4401927b2cf261090e186b6fa) )
 	ROM_LOAD( "4300-b.a8",    0x1000, 0x1000, CRC(ca2b7c28) SHA1(fdcca3b755822c045c3c321cccc3f58112e2ad11) )
 	ROM_LOAD( "4400-c.a9",    0x2000, 0x1000, CRC(d1901551) SHA1(fd7d6059f8ac59f95ae6f8ef12fbfce7ed16ec12) )
@@ -1800,7 +1828,7 @@ ROM_START( kickman )
 	ROM_LOAD( "1600-e-ur.d5",  0x4000, 0x1000, CRC(f24bc0d7) SHA1(31dc996898c01f3427403e396a47444732904674) )
 	ROM_LOAD( "1700-f-ur.d6",  0x5000, 0x1000, CRC(672361fc) SHA1(010029460c25935f2156eb64c9109c26ce40b752) )
 
-	ROM_REGION( 0x10000, "ssiocpu", 0 )
+	ROM_REGION( 0x10000, "ssio:cpu", 0 )
 	ROM_LOAD( "4200-a.a7",    0x0000, 0x1000, CRC(9e35c02e) SHA1(92afd0126dcfb2d4401927b2cf261090e186b6fa) )
 	ROM_LOAD( "4300-b.a8",    0x1000, 0x1000, CRC(ca2b7c28) SHA1(fdcca3b755822c045c3c321cccc3f58112e2ad11) )
 	ROM_LOAD( "4400-c.a9",    0x2000, 0x1000, CRC(d1901551) SHA1(fd7d6059f8ac59f95ae6f8ef12fbfce7ed16ec12) )
@@ -1829,7 +1857,7 @@ ROM_START( kickc )
 	ROM_LOAD( "1600-e.d5",    0x4000, 0x1000, CRC(eaaa78a7) SHA1(3c057d486f3938561fb9947e0463b1255ae04ef9) )
 	ROM_LOAD( "1700-f.d6",    0x5000, 0x1000, CRC(c06c880f) SHA1(d5ac5682de316b9cb09d433e2c02746efadd2a81) )
 
-	ROM_REGION( 0x10000, "ssiocpu", 0 )
+	ROM_REGION( 0x10000, "ssio:cpu", 0 )
 	ROM_LOAD( "4200-a.a7",    0x0000, 0x1000, CRC(9e35c02e) SHA1(92afd0126dcfb2d4401927b2cf261090e186b6fa) )
 	ROM_LOAD( "4300-b.a8",    0x1000, 0x1000, CRC(ca2b7c28) SHA1(fdcca3b755822c045c3c321cccc3f58112e2ad11) )
 	ROM_LOAD( "4400-c.a9",    0x2000, 0x1000, CRC(d1901551) SHA1(fd7d6059f8ac59f95ae6f8ef12fbfce7ed16ec12) )
@@ -1859,7 +1887,7 @@ ROM_START( shollow )
 	ROM_LOAD( "sh-pro.04",    0x8000, 0x2000, CRC(22fa9175) SHA1(fd8ea76b3a7ffaf48fc11dd3b7c58e548e3e57c5) )
 	ROM_LOAD( "sh-pro.05",    0xa000, 0x2000, CRC(1716e2bb) SHA1(771e4c20d63e4e1d99723e6355db67064a278ae5) )
 
-	ROM_REGION( 0x10000, "ssiocpu", 0 )
+	ROM_REGION( 0x10000, "ssio:cpu", 0 )
 	ROM_LOAD( "sh-snd.01",    0x0000, 0x1000, CRC(55a297cc) SHA1(b34f37fca61cdba26b5671feee991d133b8697a4) )
 	ROM_LOAD( "sh-snd.02",    0x1000, 0x1000, CRC(46fc31f6) SHA1(9b1a56962b2d210b1013bc35de780c6d5b3eb4bc) )
 	ROM_LOAD( "sh-snd.03",    0x2000, 0x1000, CRC(b1f4a6a8) SHA1(ba724f9cc0cc35dd31d4ad8b36a51da9d6cbfbcf) )
@@ -1887,7 +1915,7 @@ ROM_START( shollow2 )
 	ROM_LOAD( "sh-pro.04",    0x8000, 0x2000, CRC(22fa9175) SHA1(fd8ea76b3a7ffaf48fc11dd3b7c58e548e3e57c5) )
 	ROM_LOAD( "sh-pro.05",    0xa000, 0x2000, CRC(1716e2bb) SHA1(771e4c20d63e4e1d99723e6355db67064a278ae5) )
 
-	ROM_REGION( 0x10000, "ssiocpu", 0 )
+	ROM_REGION( 0x10000, "ssio:cpu", 0 )
 	ROM_LOAD( "snd-0.a7",     0x0000, 0x1000, CRC(9d815bb3) SHA1(51af797e08dbe3921e11ce70c3d0da50979336a4) )
 	ROM_LOAD( "snd-1.a8",     0x1000, 0x1000, CRC(9f253412) SHA1(a526e864073a2f9e67e2cbe53ab17fe726336241) )
 	ROM_LOAD( "snd-2.a9",     0x2000, 0x1000, CRC(7783d6c6) SHA1(1fb2117532e7da28afdb9837bcb6848165cf8173) )
@@ -1919,7 +1947,7 @@ ROM_START( tron )
 	ROM_LOAD( "scpu_pge.d6", 0x8000, 0x2000, CRC(24c185d8) SHA1(45ac7c53f6f4eba5c7bf3fc6559cddd3821eddad) )
 	ROM_LOAD( "scpu_pgf.d7", 0xA000, 0x2000, CRC(38c4bbaf) SHA1(a7cd496ce75199b8279ea963520cf70d5f562bb2) )
 
-	ROM_REGION( 0x10000, "ssiocpu", 0 ) /* ROM's located on the Super Sound I/O Board (90913) */
+	ROM_REGION( 0x10000, "ssio:cpu", 0 ) /* ROM's located on the Super Sound I/O Board (90913) */
 	ROM_LOAD( "ssi_0a.a7",   0x0000, 0x1000, CRC(765e6eba) SHA1(42efeefc8571dfc237c0be3368248f1e56add92e) )
 	ROM_LOAD( "ssi_0b.a8",   0x1000, 0x1000, CRC(1b90ccdd) SHA1(0876e5eeaa63bb8cc97f3634a6ddd8a29a9b012f) )
 	ROM_LOAD( "ssi_0c.a9",   0x2000, 0x1000, CRC(3a4bc629) SHA1(ce8452a99a313ae7429de471bbea39de08c9fd4b) )
@@ -1958,7 +1986,7 @@ ROM_START( tron2 )
 	ROM_LOAD( "scpu_pge.d6", 0x8000, 0x2000, CRC(24c185d8) SHA1(45ac7c53f6f4eba5c7bf3fc6559cddd3821eddad) )
 	ROM_LOAD( "scpu_pgf.d7", 0xa000, 0x2000, CRC(38c4bbaf) SHA1(a7cd496ce75199b8279ea963520cf70d5f562bb2) )
 
-	ROM_REGION( 0x10000, "ssiocpu", 0 ) /* ROM's located on the Super Sound I/O Board (90913) */
+	ROM_REGION( 0x10000, "ssio:cpu", 0 ) /* ROM's located on the Super Sound I/O Board (90913) */
 	ROM_LOAD( "ssi_0a.a7",   0x0000, 0x1000, CRC(765e6eba) SHA1(42efeefc8571dfc237c0be3368248f1e56add92e) )
 	ROM_LOAD( "ssi_0b.a8",   0x1000, 0x1000, CRC(1b90ccdd) SHA1(0876e5eeaa63bb8cc97f3634a6ddd8a29a9b012f) )
 	ROM_LOAD( "ssi_0c.a9",   0x2000, 0x1000, CRC(3a4bc629) SHA1(ce8452a99a313ae7429de471bbea39de08c9fd4b) )
@@ -1997,7 +2025,7 @@ ROM_START( tron3 )
 	ROM_LOAD( "scpu_pge(__0617).d6", 0x8000, 0x2000, CRC(ea198fa8) SHA1(d8c97ea87d504e77edc38c87c2953c8c4f1a405b) )
 	ROM_LOAD( "scpu_pgf(__0617).d7", 0xa000, 0x2000, CRC(4325fb08) SHA1(70727aa37354425315d8a8b3ca07bbe91f7e8f08) )
 
-	ROM_REGION( 0x10000, "ssiocpu", 0 ) /* ROM's located on the Super Sound I/O Board (90913) */
+	ROM_REGION( 0x10000, "ssio:cpu", 0 ) /* ROM's located on the Super Sound I/O Board (90913) */
 	ROM_LOAD( "ssi_0a.a7",   0x0000, 0x1000, CRC(765e6eba) SHA1(42efeefc8571dfc237c0be3368248f1e56add92e) )
 	ROM_LOAD( "ssi_0b.a8",   0x1000, 0x1000, CRC(1b90ccdd) SHA1(0876e5eeaa63bb8cc97f3634a6ddd8a29a9b012f) )
 	ROM_LOAD( "ssi_0c.a9",   0x2000, 0x1000, CRC(3a4bc629) SHA1(ce8452a99a313ae7429de471bbea39de08c9fd4b) )
@@ -2036,7 +2064,7 @@ ROM_START( tron4 )
 	ROM_LOAD( "pge-615.d6",   0x8000, 0x2000, CRC(ea198fa8) SHA1(d8c97ea87d504e77edc38c87c2953c8c4f1a405b) )
 	ROM_LOAD( "pgf-615.d7",   0xa000, 0x2000, CRC(790ee743) SHA1(14dc84b2bbaab22772e0579f11fe0bf136a0ddab) )
 
-	ROM_REGION( 0x10000, "ssiocpu", 0 ) /* ROM's located on the Super Sound I/O Board (90913) */
+	ROM_REGION( 0x10000, "ssio:cpu", 0 ) /* ROM's located on the Super Sound I/O Board (90913) */
 	ROM_LOAD( "ssi_oa.a7",    0x0000, 0x1000, CRC(2cbb332b) SHA1(48d1cbb336733588af728a3d0e02c8613d2b5fb2) )
 	ROM_LOAD( "ssi_ob.a8",    0x1000, 0x1000, CRC(1355b7e6) SHA1(61ed045212da67cd449910ae601058cf209b37e5) )
 	ROM_LOAD( "ssi_oc.a9",    0x2000, 0x1000, CRC(6dd4b7c9) SHA1(1ce78c242d1a7d9a4524a663a42fc8bc2870053a) )
@@ -2071,7 +2099,7 @@ ROM_START( kroozr )
 	ROM_LOAD( "kozmkcpu.5d",  0x6000, 0x2000, CRC(a0ec38c1) SHA1(adf3ef36355d255e4ebc0d4dc86b9d7910e26b03) )
 	ROM_LOAD( "kozmkcpu.6d",  0x8000, 0x2000, CRC(7044f2b6) SHA1(55b64c9233fe0c8b351688fab29aad049d49faf2) )
 
-	ROM_REGION( 0x10000, "ssiocpu", 0 )
+	ROM_REGION( 0x10000, "ssio:cpu", 0 )
 	ROM_LOAD( "kozmksnd.7a",  0x0000, 0x1000, CRC(6736e433) SHA1(d43216ef34a67f047b7c35001767d838386add7d) )
 	ROM_LOAD( "kozmksnd.8a",  0x1000, 0x1000, CRC(ea9cd919) SHA1(a1533b2857c881c83adce2c7bbfaa4a3148ead8e) )
 	ROM_LOAD( "kozmksnd.9a",  0x2000, 0x1000, CRC(9dfa7994) SHA1(0a2d824e9fe1d48c43027f5f10f4c43476f08e07) )
@@ -2098,7 +2126,7 @@ ROM_START( domino )
 	ROM_LOAD( "dmanpg2.bin",  0x4000, 0x2000, CRC(7dd2177a) SHA1(b4b17e2580679fbe340d8b8d8cb7171c49ae0a21) )
 	ROM_LOAD( "dmanpg3.bin",  0x6000, 0x2000, CRC(f2e0aa44) SHA1(2f04dc74c69dfe3847d5e4330e560b0a9f18c33a) )
 
-	ROM_REGION( 0x10000, "ssiocpu", 0 )
+	ROM_REGION( 0x10000, "ssio:cpu", 0 )
 	ROM_LOAD( "dm-a7.snd",    0x0000, 0x1000, CRC(fa982dcc) SHA1(970340bfa0ac13ad8c2bf5adc21d7ca7aa9e525a) )
 	ROM_LOAD( "dm-a8.snd",    0x1000, 0x1000, CRC(72839019) SHA1(4aa278cfb00fac76cba88600bb300ee88ec3f7ee) )
 	ROM_LOAD( "dm-a9.snd",    0x2000, 0x1000, CRC(ad760da7) SHA1(024fce0f5d46e82b66c4283925556130735b863e) )
@@ -2126,7 +2154,7 @@ ROM_START( wacko )
 	ROM_LOAD( "wackocpu.4d",  0x4000, 0x2000, CRC(515edff7) SHA1(9288cb5efb51086ef8610eecf8e3feae1da9fc2a) )
 	ROM_LOAD( "wackocpu.5d",  0x6000, 0x2000, CRC(9b01bf32) SHA1(d209ba2503d7b54786f74107bb399313a08a09ba) )
 
-	ROM_REGION( 0x10000, "ssiocpu", 0 )
+	ROM_REGION( 0x10000, "ssio:cpu", 0 )
 	ROM_LOAD( "wackosnd.7a",  0x0000, 0x1000, CRC(1a58763f) SHA1(37f0870d67d52c86ae2d188e9beaa56a3a8fa130) )
 	ROM_LOAD( "wackosnd.8a",  0x1000, 0x1000, CRC(a4e3c771) SHA1(fe677090423e1d80cde07d2e74be8380d8c55e95) )
 	ROM_LOAD( "wackosnd.9a",  0x2000, 0x1000, CRC(155ba3dd) SHA1(51aaeeb68b2b7eb8238c7c3b06e84dcf44683ee9) )
@@ -2153,7 +2181,7 @@ ROM_START( twotiger )
 	ROM_LOAD( "cpu_d4",  0x4000, 0x2000, CRC(f1ab8c4d) SHA1(0c410ddd2e1cd8a19c73bc0c7aca70d8c4308eeb) )
 	ROM_LOAD( "cpu_d5",  0x6000, 0x2000, CRC(d7129900) SHA1(af5093082cfbc9fa4b42cfc74e62adbf9b6c63db) )
 
-	ROM_REGION( 0x10000, "ssiocpu", 0 )
+	ROM_REGION( 0x10000, "ssio:cpu", 0 )
 	ROM_LOAD( "ssio_a7",   0x0000, 0x1000, CRC(64ddc16c) SHA1(e119e1702ea00ffb86d413ed8e68b4e9dfefa79e) )
 	ROM_LOAD( "ssio_a8",   0x1000, 0x1000, CRC(c3467612) SHA1(c968776d9561a7ac67e95a987b6d826ec2dc748e) )
 	ROM_LOAD( "ssio_a9",   0x2000, 0x1000, CRC(c50f7b2d) SHA1(0f4779d4955d500c50b544d945fa78a5428b86ce) )
@@ -2179,7 +2207,7 @@ ROM_START( twotigerc )
 	ROM_LOAD( "2tgrpg2.bin",  0x4000, 0x2000, CRC(b5ca3f17) SHA1(ac51eefe9ff49bc358daf58525e529070684ed1b) )
 	ROM_LOAD( "2tgrpg3.bin",  0x6000, 0x2000, CRC(8aa82049) SHA1(6e42d082d29986f5c0698ae39750fb8f9eb1e6cd) )
 
-	ROM_REGION( 0x10000, "ssiocpu", 0 )
+	ROM_REGION( 0x10000, "ssio:cpu", 0 )
 	ROM_LOAD( "2tgra7.bin",   0x0000, 0x1000, CRC(4620d970) SHA1(2c2c1da84199b846575a6291dc235f30539959fa) )
 	ROM_LOAD( "2tgra8.bin",   0x1000, 0x1000, CRC(e95d8cfe) SHA1(846d5543596bb86cf08f998056c1fc695cb4f62c) )
 	ROM_LOAD( "2tgra9.bin",   0x2000, 0x1000, CRC(81e6ce0e) SHA1(77e145e150763bfe5760ac3e4f68218a65b9bfe0) )
@@ -2207,7 +2235,7 @@ ROM_START( journey )
 	ROM_LOAD( "d5",           0x6000, 0x2000, CRC(c3023931) SHA1(e591a18c5fc8befcd9f2b93d9131374c572cdbcd) )
 	ROM_LOAD( "d6",           0x8000, 0x2000, CRC(5d445c99) SHA1(df2bce203f510b4bda42bb7114b79eb0b2b4e2e0) )
 
-	ROM_REGION( 0x10000, "ssiocpu", 0 )
+	ROM_REGION( 0x10000, "ssio:cpu", 0 )
 	ROM_LOAD( "a",            0x0000, 0x1000, CRC(2524a2aa) SHA1(4bd78b4fb42c2506fa6734419b42cbbe4c240e94) )
 	ROM_LOAD( "b",            0x1000, 0x1000, CRC(b8e35814) SHA1(379308431d1204d6cb5ae8a13e378ec7b3fab0a9) )
 	ROM_LOAD( "c",            0x2000, 0x1000, CRC(09c488cf) SHA1(7aa3321db748f2612693f8348e590369e8d48140) )
@@ -2239,7 +2267,7 @@ ROM_START( tapper )
 	ROM_LOAD( "tappg2.bin",   0x08000, 0x4000, CRC(3a1f8778) SHA1(cb46a2248289ced7282b1463f433dcb970c42c1a) )
 	ROM_LOAD( "tappg3.bin",   0x0c000, 0x2000, CRC(e8dcdaa4) SHA1(45bf1571a2418c7dc00ccc7061a3e04e65cb6bff) )
 
-	ROM_REGION( 0x10000, "ssiocpu", 0 )
+	ROM_REGION( 0x10000, "ssio:cpu", 0 )
 	ROM_LOAD( "tapsnda7.bin", 0x0000, 0x1000, CRC(0e8bb9d5) SHA1(9e281c340b7702523c86d56317efad9e3688e585) )
 	ROM_LOAD( "tapsnda8.bin", 0x1000, 0x1000, CRC(0cf0e29b) SHA1(14334b9d2bfece3fe5bda0cbd53158ead8d27e53) )
 	ROM_LOAD( "tapsnda9.bin", 0x2000, 0x1000, CRC(31eb6dc6) SHA1(b38bba5f12516d899e023f99147868e3402fbd7b) )
@@ -2270,7 +2298,7 @@ ROM_START( tappera )
 	ROM_LOAD( "pr02_3c.128",   0x08000, 0x4000, CRC(b3755d41) SHA1(434d3c27b9f1e43def081d79b9f56dbce93a9207) )
 	ROM_LOAD( "pr03_4c.64",    0x0c000, 0x2000, CRC(77273096) SHA1(5e4e2dc1703b39f588ba374f6a610f273d710532) )
 
-	ROM_REGION( 0x10000, "ssiocpu", 0 )
+	ROM_REGION( 0x10000, "ssio:cpu", 0 )
 	ROM_LOAD( "tapsnda7.bin", 0x0000, 0x1000, CRC(0e8bb9d5) SHA1(9e281c340b7702523c86d56317efad9e3688e585) )
 	ROM_LOAD( "tapsnda8.bin", 0x1000, 0x1000, CRC(0cf0e29b) SHA1(14334b9d2bfece3fe5bda0cbd53158ead8d27e53) )
 	ROM_LOAD( "tapsnda9.bin", 0x2000, 0x1000, CRC(31eb6dc6) SHA1(b38bba5f12516d899e023f99147868e3402fbd7b) )
@@ -2301,7 +2329,7 @@ ROM_START( sutapper )
 	ROM_LOAD( "5793",         0x8000, 0x4000, CRC(fecbf683) SHA1(de365f4e567d93a9ed9672fabbc739a3a0d47d59) )
 	ROM_LOAD( "5794",         0xc000, 0x2000, CRC(5bdc1916) SHA1(ee038443ae55598568bd1a53c0a671a2828d3949) )
 
-	ROM_REGION( 0x10000, "ssiocpu", 0 )
+	ROM_REGION( 0x10000, "ssio:cpu", 0 )
 	ROM_LOAD( "5788",         0x00000, 0x1000, CRC(5c1d0982) SHA1(c2c94ab26ebce30ce4efc239e555c6368794d265) )
 	ROM_LOAD( "5787",         0x01000, 0x1000, CRC(09e74ed8) SHA1(f5c8585d443bca67d4065314a06431d1f104c553) )
 	ROM_LOAD( "5786",         0x02000, 0x1000, CRC(c3e98284) SHA1(2a4dc0deca48f4d2ac9fe673ecb9548415c996a9) )
@@ -2332,7 +2360,7 @@ ROM_START( rbtapper )
 	ROM_LOAD( "rbtpg2.bin",   0x08000, 0x4000, CRC(0b332c97) SHA1(b9878c8a61a98e787e547bb6ab81c809875891f3) )
 	ROM_LOAD( "rbtpg3.bin",   0x0c000, 0x2000, CRC(698c06f2) SHA1(ddb21e39ede2222cb2286ec9dba06341fe1c9db7) )
 
-	ROM_REGION( 0x10000, "ssiocpu", 0 )
+	ROM_REGION( 0x10000, "ssio:cpu", 0 )
 	ROM_LOAD( "5788",         0x00000, 0x1000, CRC(5c1d0982) SHA1(c2c94ab26ebce30ce4efc239e555c6368794d265) )
 	ROM_LOAD( "5787",         0x01000, 0x1000, CRC(09e74ed8) SHA1(f5c8585d443bca67d4065314a06431d1f104c553) )
 	ROM_LOAD( "5786",         0x02000, 0x1000, CRC(c3e98284) SHA1(2a4dc0deca48f4d2ac9fe673ecb9548415c996a9) )
@@ -2364,7 +2392,7 @@ ROM_START( timber )
 	ROM_LOAD( "timpg2.bin",   0x08000, 0x4000, CRC(632989f9) SHA1(9e9dc343746299bb0dc7ada206211366c5a05075) )
 	ROM_LOAD( "timpg3.bin",   0x0c000, 0x2000, CRC(dae8a0dc) SHA1(f065fa3184efa6524d4f950616f3fbae4ea17513) )
 
-	ROM_REGION( 0x10000, "ssiocpu", 0 )
+	ROM_REGION( 0x10000, "ssio:cpu", 0 )
 	ROM_LOAD( "tima7.bin",    0x00000, 0x1000, CRC(c615dc3e) SHA1(664d5e3ac3936fd04a855ee0c88f1c1b4d1dea5b) )
 	ROM_LOAD( "tima8.bin",    0x01000, 0x1000, CRC(83841c87) SHA1(bd5a2e567e015e10e45651e15b42ffb3b69d2305) )
 	ROM_LOAD( "tima9.bin",    0x02000, 0x1000, CRC(22bcdcd3) SHA1(69cedc8cec52ca310f828dfe73d7de04729b06d3) )
@@ -2395,7 +2423,7 @@ ROM_START( dotron )
 	ROM_LOAD( "loc-pg2.3c",   0x08000, 0x4000, CRC(ab0b3800) SHA1(457a18bd98a3c4a9f893a3704dbc7d0fde4ef8ba) )
 	ROM_LOAD( "loc-pg1.4c",   0x0c000, 0x2000, CRC(f98c9f8e) SHA1(a215f0fd6cd9e8cacbe06cb7bfe4e2cced150c86) )
 
-	ROM_REGION( 0x10000, "ssiocpu", 0 )
+	ROM_REGION( 0x10000, "ssio:cpu", 0 )
 	ROM_LOAD( "sound0.a7",    0x00000, 0x1000, CRC(6d39bf19) SHA1(3d27466fcb6d41133f16119cddb815833c8b4eda) )
 	ROM_LOAD( "sound1.a8",    0x01000, 0x1000, CRC(ac872e1d) SHA1(c2833b20e124c505be3d5be2c885b9cf9927ca4c) )
 	ROM_LOAD( "sound2.a9",    0x02000, 0x1000, CRC(e8ef6519) SHA1(261b0463a73b403bc46df3e04f3d12173787d6e7) )
@@ -2426,7 +2454,7 @@ ROM_START( dotrona )
 	ROM_LOAD( "aloc-pg2.3c",  0x08000, 0x4000, CRC(cb89c9be) SHA1(c773a68891fbf94808a2ee0036928c0c48d6673d) )
 	ROM_LOAD( "aloc-pg1.4c",  0x0c000, 0x2000, CRC(5098faf4) SHA1(9f861f99cb170513b68aee48bbfd60ee439d7fa9) )
 
-	ROM_REGION( 0x10000, "ssiocpu", 0 )
+	ROM_REGION( 0x10000, "ssio:cpu", 0 )
 	ROM_LOAD( "asound0.a7",   0x00000, 0x1000, CRC(7fb54293) SHA1(6d538a3e48f98e269623850f1f6774848a89fd59) )
 	ROM_LOAD( "asound1.a8",   0x01000, 0x1000, CRC(edef7326) SHA1(5c9a64604252eea0628bf9d6221e8add82f66abe) )
 	ROM_LOAD( "sound2.a9",    0x02000, 0x1000, CRC(e8ef6519) SHA1(261b0463a73b403bc46df3e04f3d12173787d6e7) )
@@ -2457,13 +2485,13 @@ ROM_START( dotrone )
 	ROM_LOAD( "loc-cpu3",     0x08000, 0x4000, CRC(94bb1a0e) SHA1(af4769fac39e67eff840675bf93cc4304f2875fd) )
 	ROM_LOAD( "loc-cpu4",     0x0c000, 0x2000, CRC(c137383c) SHA1(ccf7cf9c7c0528aa819cfca34c1c0e89ab2d586a) )
 
-	ROM_REGION( 0x10000, "ssiocpu", 0 )
+	ROM_REGION( 0x10000, "ssio:cpu", 0 )
 	ROM_LOAD( "loc-a",        0x00000, 0x1000, CRC(2de6a8a8) SHA1(6bba00daed8836297f3189db4e4fe8e158adc465) )
 	ROM_LOAD( "loc-b",        0x01000, 0x1000, CRC(4097663e) SHA1(afb5224529550cec378415a5cd81b47f6c6c101b) )
 	ROM_LOAD( "loc-c",        0x02000, 0x1000, CRC(f576b9e7) SHA1(4ff39c46c390aa93d900f5f7a0b35fa71f066863) )
 	ROM_LOAD( "loc-d",        0x03000, 0x1000, CRC(74b0059e) SHA1(1fe393721446538036fb6110fdc3920959ebd596) )
 
-	ROM_REGION( 0x10000, "sntcpu", 0 )
+	ROM_REGION( 0x10000, "snt:cpu", 0 )
 	ROM_LOAD( "pre.u3",       0x09000, 0x1000, CRC(c3d0f762) SHA1(a1857641c35b5bcb33f29fe79a1a581c4cbf129b) )
 	ROM_LOAD( "pre.u4",       0x0a000, 0x1000, CRC(7ca79b43) SHA1(c995e1e67d70706a090eb777e9fec0f1ba03f82d) )
 	ROM_LOAD( "pre.u5",       0x0b000, 0x1000, CRC(24e9618e) SHA1(eb245ff381a76b314a0ed3519e140444afae341c) )
@@ -2494,12 +2522,12 @@ ROM_START( nflfoot )
 	ROM_LOAD( "nflcpupg.2c",  0x04000, 0x4000, CRC(2aa76168) SHA1(608df883f5e960153a963404d5cc4b4ce4ec435d) )
 	ROM_LOAD( "nflcpupg.3c",  0x08000, 0x4000, CRC(5ec01e09) SHA1(2bf60ab7d47f53583b677195976d6f6a9e90c55c) )
 
-	ROM_REGION( 0x10000, "ssiocpu", 0 )
+	ROM_REGION( 0x10000, "ssio:cpu", 0 )
 	ROM_LOAD( "nflsnd.a7",    0x0000, 0x1000, CRC(1339be2e) SHA1(5c1743f4d20f94053eb306d3749057608df4a6a2) )
 	ROM_LOAD( "nflsnd.a8",    0x1000, 0x1000, CRC(8630b560) SHA1(0c537f48184d3a7a9ee51c30d7c33dc39c46e823) )
 	ROM_LOAD( "nflsnd.a9",    0x2000, 0x1000, CRC(1e0fe4c8) SHA1(718dfaced2d8d84dab4c32265bed422e07af0f9e) )
 
-	ROM_REGION( 0x10000, "sntcpu", 0 )
+	ROM_REGION( 0x10000, "snt:cpu", 0 )
 	ROM_LOAD( "nfl-sqtk-11-15-83.u2", 0x08000, 0x1000, CRC(aeddda31) SHA1(8ebe9d8606c4328b1b3f4633db30d7636acf210b) )
 	ROM_LOAD( "nfl-sqtk-11-15-83.u3", 0x09000, 0x1000, CRC(36229d13) SHA1(d174098ce1e4bc89ded15a08db37933ab9532f2b) )
 	ROM_LOAD( "nfl-sqtk-11-15-83.u4", 0x0a000, 0x1000, CRC(b202439b) SHA1(b09e94b0b176f80b12fb4cefa6efd5b2cccb6192) )
@@ -2534,9 +2562,9 @@ ROM_START( demoderb )
 	ROM_LOAD( "dd_pro1",      0x04000, 0x4000, CRC(4c713bfe) SHA1(493b6ba01e86e7586ad123c53cf7f0a0c191d670) )
 	ROM_LOAD( "dd_pro2",      0x08000, 0x4000, CRC(c2cbd2a4) SHA1(fa642b2f61ff5529ab688a43c1dc14357a4eba6f) )
 
-	ROM_REGION( 0x10000, "ssiocpu", ROMREGION_ERASE00 )	/* 64k for the audio CPU, not populated */
+	ROM_REGION( 0x10000, "ssio:cpu", ROMREGION_ERASE00 )	/* 64k for the audio CPU, not populated */
 
-	ROM_REGION( 0x10000, "tcscpu", 0 )	/* 64k for the Turbo Cheap Squeak */
+	ROM_REGION( 0x10000, "tcs:cpu", 0 )	/* 64k for the Turbo Cheap Squeak */
 	ROM_LOAD( "tcs_u5.bin",   0x0c000, 0x2000, CRC(eca33b2c) SHA1(938b021ea3b0f23aed7a98a930a58af371a02303) )
 	ROM_LOAD( "tcs_u4.bin",   0x0e000, 0x2000, CRC(3490289a) SHA1(a9d56ea60bb901267da41ab408f8e1ed3742b0ac) )
 
@@ -2576,6 +2604,13 @@ static void mcr_init(running_machine &machine, int cpuboard, int vidboard, int s
 
 	state_save_register_global(machine, input_mux);
 	state_save_register_global(machine, last_op4);
+	
+	midway_ssio_device *ssio = machine.device<midway_ssio_device>("ssio");
+	if (ssio != NULL)
+	{
+		mcr_state *state = machine.driver_data<mcr_state>();
+		ssio->set_custom_output(0, 0xff, write8_delegate(FUNC(mcr_state::mcr_control_port_w), state));
+	}
 }
 
 
@@ -2585,8 +2620,8 @@ static DRIVER_INIT( solarfox )
 	mcr_sound_init(machine, MCR_SSIO);
 
 	mcr_state *state = machine.driver_data<mcr_state>();
-	ssio_set_custom_input(0, 0x1c, read8_delegate(FUNC(mcr_state::solarfox_ip0_r),state));
-	ssio_set_custom_input(1, 0xff, read8_delegate(FUNC(mcr_state::solarfox_ip1_r),state));
+	machine.device<midway_ssio_device>("ssio")->set_custom_input(0, 0x1c, read8_delegate(FUNC(mcr_state::solarfox_ip0_r),state));
+	machine.device<midway_ssio_device>("ssio")->set_custom_input(1, 0xff, read8_delegate(FUNC(mcr_state::solarfox_ip1_r),state));
 
 	mcr12_sprite_xoffs = 16;
 }
@@ -2598,7 +2633,7 @@ static DRIVER_INIT( kick )
 	mcr_sound_init(machine, MCR_SSIO);
 
 	mcr_state *state = machine.driver_data<mcr_state>();
-	ssio_set_custom_input(1, 0xf0, read8_delegate(FUNC(mcr_state::kick_ip1_r),state));
+	machine.device<midway_ssio_device>("ssio")->set_custom_input(1, 0xf0, read8_delegate(FUNC(mcr_state::kick_ip1_r),state));
 
 	mcr12_sprite_xoffs_flip = 16;
 }
@@ -2617,9 +2652,9 @@ static DRIVER_INIT( wacko )
 	mcr_sound_init(machine, MCR_SSIO);
 
 	mcr_state *state = machine.driver_data<mcr_state>();
-	ssio_set_custom_input(1, 0xff, read8_delegate(FUNC(mcr_state::wacko_ip1_r),state));
-	ssio_set_custom_input(2, 0xff, read8_delegate(FUNC(mcr_state::wacko_ip2_r),state));
-	ssio_set_custom_output(4, 0x01, write8_delegate(FUNC(mcr_state::wacko_op4_w),state));
+	machine.device<midway_ssio_device>("ssio")->set_custom_input(1, 0xff, read8_delegate(FUNC(mcr_state::wacko_ip1_r),state));
+	machine.device<midway_ssio_device>("ssio")->set_custom_input(2, 0xff, read8_delegate(FUNC(mcr_state::wacko_ip2_r),state));
+	machine.device<midway_ssio_device>("ssio")->set_custom_output(4, 0x01, write8_delegate(FUNC(mcr_state::wacko_op4_w),state));
 }
 
 
@@ -2629,7 +2664,7 @@ static DRIVER_INIT( twotiger )
 	mcr_sound_init(machine, MCR_SSIO);
 
 	mcr_state *state = machine.driver_data<mcr_state>();
-	ssio_set_custom_output(4, 0xff, write8_delegate(FUNC(mcr_state::twotiger_op4_w),state));
+	machine.device<midway_ssio_device>("ssio")->set_custom_output(4, 0xff, write8_delegate(FUNC(mcr_state::twotiger_op4_w),state));
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xe800, 0xefff, 0, 0x1000, read8_delegate(FUNC(mcr_state::twotiger_videoram_r),state), write8_delegate(FUNC(mcr_state::twotiger_videoram_w),state));
 }
 
@@ -2640,8 +2675,8 @@ static DRIVER_INIT( kroozr )
 	mcr_sound_init(machine, MCR_SSIO);
 
 	mcr_state *state = machine.driver_data<mcr_state>();
-	ssio_set_custom_input(1, 0x47, read8_delegate(FUNC(mcr_state::kroozr_ip1_r),state));
-	ssio_set_custom_output(4, 0x34, write8_delegate(FUNC(mcr_state::kroozr_op4_w),state));
+	machine.device<midway_ssio_device>("ssio")->set_custom_input(1, 0x47, read8_delegate(FUNC(mcr_state::kroozr_ip1_r),state));
+	machine.device<midway_ssio_device>("ssio")->set_custom_output(4, 0x34, write8_delegate(FUNC(mcr_state::kroozr_op4_w),state));
 }
 
 
@@ -2651,7 +2686,7 @@ static DRIVER_INIT( journey )
 	mcr_sound_init(machine, MCR_SSIO);
 
 	mcr_state *state = machine.driver_data<mcr_state>();
-	ssio_set_custom_output(4, 0x01, write8_delegate(FUNC(mcr_state::journey_op4_w),state));
+	machine.device<midway_ssio_device>("ssio")->set_custom_output(4, 0x01, write8_delegate(FUNC(mcr_state::journey_op4_w),state));
 }
 
 
@@ -2668,7 +2703,7 @@ static DRIVER_INIT( dotrone )
 	mcr_sound_init(machine, MCR_SSIO | MCR_SQUAWK_N_TALK);
 
 	mcr_state *state = machine.driver_data<mcr_state>();
-	ssio_set_custom_output(4, 0xff, write8_delegate(FUNC(mcr_state::dotron_op4_w),state));
+	machine.device<midway_ssio_device>("ssio")->set_custom_output(4, 0xff, write8_delegate(FUNC(mcr_state::dotron_op4_w),state));
 }
 
 
@@ -2678,8 +2713,8 @@ static DRIVER_INIT( nflfoot )
 	mcr_sound_init(machine, MCR_SSIO | MCR_SQUAWK_N_TALK);
 
 	mcr_state *state = machine.driver_data<mcr_state>();
-	ssio_set_custom_input(2, 0x80, read8_delegate(FUNC(mcr_state::nflfoot_ip2_r),state));
-	ssio_set_custom_output(4, 0xff, write8_delegate(FUNC(mcr_state::nflfoot_op4_w),state));
+	machine.device<midway_ssio_device>("ssio")->set_custom_input(2, 0x80, read8_delegate(FUNC(mcr_state::nflfoot_ip2_r),state));
+	machine.device<midway_ssio_device>("ssio")->set_custom_output(4, 0xff, write8_delegate(FUNC(mcr_state::nflfoot_op4_w),state));
 
 	nflfoot_serial_out_active = FALSE;
 	nflfoot_serial_in_active = FALSE;
@@ -2699,12 +2734,12 @@ static DRIVER_INIT( demoderb )
 	mcr_sound_init(machine, MCR_SSIO | MCR_TURBO_CHIP_SQUEAK);
 
 	mcr_state *state = machine.driver_data<mcr_state>();
-	ssio_set_custom_input(1, 0xfc, read8_delegate(FUNC(mcr_state::demoderb_ip1_r),state));
-	ssio_set_custom_input(2, 0xfc, read8_delegate(FUNC(mcr_state::demoderb_ip2_r),state));
-	ssio_set_custom_output(4, 0xff, write8_delegate(FUNC(mcr_state::demoderb_op4_w),state));
+	machine.device<midway_ssio_device>("ssio")->set_custom_input(1, 0xfc, read8_delegate(FUNC(mcr_state::demoderb_ip1_r),state));
+	machine.device<midway_ssio_device>("ssio")->set_custom_input(2, 0xfc, read8_delegate(FUNC(mcr_state::demoderb_ip2_r),state));
+	machine.device<midway_ssio_device>("ssio")->set_custom_output(4, 0xff, write8_delegate(FUNC(mcr_state::demoderb_op4_w),state));
 
 	/* the SSIO Z80 doesn't have any program to execute */
-	machine.device<cpu_device>("tcscpu")->suspend(SUSPEND_REASON_DISABLE, 1);
+	machine.device<cpu_device>("ssio:cpu")->suspend(SUSPEND_REASON_DISABLE, 1);
 }
 
 

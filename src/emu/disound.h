@@ -75,14 +75,18 @@ const int AUTO_ALLOC_INPUT	= 65535;
 #define MCFG_SOUND_CONFIG(_config) \
 	MCFG_DEVICE_CONFIG(_config)
 
+#define MCFG_SOUND_ROUTE(_output, _target, _gain) \
+	device_sound_interface::static_add_route(*device, _output, _target, _gain); \
+
 #define MCFG_SOUND_ROUTE_EX(_output, _target, _gain, _input) \
 	device_sound_interface::static_add_route(*device, _output, _target, _gain, _input); \
 
-#define MCFG_SOUND_ROUTE(_output, _target, _gain) \
-	MCFG_SOUND_ROUTE_EX(_output, _target, _gain, AUTO_ALLOC_INPUT)
-
 #define MCFG_SOUND_ROUTES_RESET() \
 	device_sound_interface::static_reset_routes(*device); \
+
+
+#define MCFG_MIXER_ROUTE(_output, _target, _gain, _mixoutput) \
+	device_sound_interface::static_add_route(*device, _output, _target, _gain, AUTO_ALLOC_INPUT, _mixoutput); \
 
 
 
@@ -101,13 +105,14 @@ public:
 	class sound_route
 	{
 	public:
-		sound_route(int output, int input, float gain, const char *target);
+		sound_route(int output, int input, float gain, const char *target, UINT32 mixoutput);
 
 		const sound_route *next() const { return m_next; }
 
 		sound_route *		m_next;				// pointer to next route
 		UINT32				m_output;			// output index, or ALL_OUTPUTS
 		UINT32				m_input;			// target input index
+		UINT32				m_mixoutput;		// target mixer output
 		float				m_gain;				// gain
 		astring				m_target;			// target tag
 	};
@@ -120,7 +125,7 @@ public:
 	const sound_route *first_route() const { return m_route_list.first(); }
 
 	// static inline configuration helpers
-	static void static_add_route(device_t &device, UINT32 output, const char *target, double gain, UINT32 input = AUTO_ALLOC_INPUT);
+	static sound_route &static_add_route(device_t &device, UINT32 output, const char *target, double gain, UINT32 input = AUTO_ALLOC_INPUT, UINT32 mixoutput = 0);
 	static void static_reset_routes(device_t &device);
 
 	// sound stream update overrides
@@ -173,6 +178,7 @@ protected:
 
 	// internal state
 	UINT8				m_outputs;				// number of outputs
+	dynamic_array<UINT8> m_outputmap;			// map of inputs to outputs
 	sound_stream *		m_mixer_stream;			// mixing stream
 };
 

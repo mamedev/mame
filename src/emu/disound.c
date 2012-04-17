@@ -71,7 +71,7 @@ device_sound_interface::~device_sound_interface()
 //  a new route to the device
 //-------------------------------------------------
 
-void device_sound_interface::static_add_route(device_t &device, UINT32 output, const char *target, double gain, UINT32 input)
+device_sound_interface::sound_route &device_sound_interface::static_add_route(device_t &device, UINT32 output, const char *target, double gain, UINT32 input, UINT32 mixoutput)
 {
 	// find our sound interface
 	device_sound_interface *sound;
@@ -79,7 +79,7 @@ void device_sound_interface::static_add_route(device_t &device, UINT32 output, c
 		throw emu_fatalerror("MCFG_SOUND_ROUTE called on device '%s' with no sound interface", device.tag());
 
 	// append a new route to the list
-	sound->m_route_list.append(*global_alloc(sound_route(output, input, gain, target)));
+	return sound->m_route_list.append(*global_alloc(sound_route(output, input, gain, target, mixoutput)));
 }
 
 
@@ -356,10 +356,11 @@ void device_sound_interface::interface_pre_reset()
 //  sound_route - constructor
 //-------------------------------------------------
 
-device_sound_interface::sound_route::sound_route(int output, int input, float gain, const char *target)
+device_sound_interface::sound_route::sound_route(int output, int input, float gain, const char *target, UINT32 mixoutput)
 	: m_next(NULL),
 	  m_output(output),
 	  m_input(input),
+	  m_mixoutput(mixoutput),
 	  m_gain(gain),
 	  m_target(target)
 {
@@ -409,6 +410,24 @@ void device_mixer_interface::interface_pre_start()
 		return;
 	}
 
+	// generate the output map
+	m_outputmap.resize(m_auto_allocated_inputs);
+
+	// iterate through all routes that point to us and note their mixer output
+	sound_interface_iterator iter(m_device.machine().root_device());
+	for (device_sound_interface *sound = iter.first(); sound != NULL; sound = iter.next())
+		for (const sound_route *route = sound->first_route(); route != NULL; route = route->next())
+		{
+			// see if we are the target of this route
+			device_t *target_device = sound->device().siblingdevice(route->m_target);
+			if (target_device == &device() && route->m_input < m_auto_allocated_inputs)
+			{
+				int count = (route->m_output == ALL_OUTPUTS) ? sound->outputs() : 1;
+				for (int output = 0; output < count; output++)
+					m_outputmap[route->m_input + output] = route->m_mixoutput;
+			}
+		}
+
 	// allocate the mixer stream
 	m_mixer_stream = stream_alloc(m_auto_allocated_inputs, m_outputs, device().machine().sample_rate());
 }
@@ -435,13 +454,16 @@ void device_mixer_interface::interface_post_load()
 
 void device_mixer_interface::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
+	// clear output buffers
+	for (int output = 0; output < m_outputs; output++)
+		memset(outputs[output], 0, samples * sizeof(outputs[0][0]));
+
 	// loop over samples
+	const UINT8 *outmap = &m_outputmap[0];
 	for (int pos = 0; pos < samples; pos++)
 	{
-		// add up all the inputs
-		INT32 sample = inputs[0][pos];
-		for (int inp = 1; inp < m_auto_allocated_inputs; inp++)
-			sample += inputs[inp][pos];
-		outputs[0][pos] = sample;
+		// for each input, add it to the appropriate output
+		for (int inp = 0; inp < m_auto_allocated_inputs; inp++)
+			outputs[outmap[inp]][pos] += inputs[inp][pos];
 	}
 }

@@ -228,33 +228,6 @@ TIMER_DEVICE_CALLBACK( mcr_ipu_interrupt )
 
 /*************************************
  *
- *  Generic MCR port write handlers
- *
- *************************************/
-
-WRITE8_MEMBER(mcr_state::mcr_control_port_w)
-{
-	/*
-        Bit layout is as follows:
-            D7 = n/c
-            D6 = cocktail flip
-            D5 = red LED
-            D4 = green LED
-            D3 = n/c
-            D2 = coin meter 3
-            D1 = coin meter 2
-            D0 = coin meter 1
-    */
-
-	coin_counter_w(machine(), 0, (data >> 0) & 1);
-	coin_counter_w(machine(), 1, (data >> 1) & 1);
-	coin_counter_w(machine(), 2, (data >> 2) & 1);
-	mcr_cocktail_flip = (data >> 6) & 1;
-}
-
-
-/*************************************
- *
  *  NFL Football IPU board
  *
  *************************************/

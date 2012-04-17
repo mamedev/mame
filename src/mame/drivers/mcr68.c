@@ -103,8 +103,8 @@ READ16_MEMBER(mcr68_state::zwackery_6840_r)
 WRITE16_MEMBER(mcr68_state::xenophobe_control_w)
 {
 	COMBINE_DATA(&m_control_word);
-/*  soundsgood_reset_w(~m_control_word & 0x0020);*/
-	soundsgood_data_w(space, offset, ((m_control_word & 0x000f) << 1) | ((m_control_word & 0x0010) >> 4));
+/*  m_sounds_good->reset_write(~m_control_word & 0x0020);*/
+	m_sounds_good->write(space, offset, ((m_control_word & 0x000f) << 1) | ((m_control_word & 0x0010) >> 4));
 }
 
 
@@ -118,8 +118,8 @@ WRITE16_MEMBER(mcr68_state::xenophobe_control_w)
 WRITE16_MEMBER(mcr68_state::blasted_control_w)
 {
 	COMBINE_DATA(&m_control_word);
-/*  soundsgood_reset_w(~m_control_word & 0x0020);*/
-	soundsgood_data_w(space, offset, (m_control_word >> 8) & 0x1f);
+/*  m_sounds_good->reset_write(~m_control_word & 0x0020);*/
+	m_sounds_good->write(space, offset, (m_control_word >> 8) & 0x1f);
 }
 
 
@@ -137,14 +137,14 @@ READ16_MEMBER(mcr68_state::spyhunt2_port_0_r)
 	int which = (m_control_word >> 3) & 3;
 	int analog = input_port_read(machine(), portnames[which]);
 
-	return result | ((soundsgood_status_r(space, 0) & 1) << 5) | (analog << 8);
+	return result | ((m_sounds_good->read(space, 0) & 1) << 5) | (analog << 8);
 }
 
 
 READ16_MEMBER(mcr68_state::spyhunt2_port_1_r)
 {
 	int result = input_port_read(machine(), "IN1");
-	return result | ((turbocs_status_r(space, 0) & 1) << 7);
+	return result | ((m_turbo_chip_squeak->read(space, 0) & 1) << 7);
 }
 
 
@@ -152,11 +152,11 @@ WRITE16_MEMBER(mcr68_state::spyhunt2_control_w)
 {
 	COMBINE_DATA(&m_control_word);
 
-/*  turbocs_reset_w(~m_control_word & 0x0080);*/
-	turbocs_data_w(space, offset, (m_control_word >> 8) & 0x001f);
+/*  m_turbo_chip_squeak->reset_write(~m_control_word & 0x0080);*/
+	m_turbo_chip_squeak->write(space, offset, (m_control_word >> 8) & 0x001f);
 
-	soundsgood_reset_w(machine(), ~m_control_word & 0x2000);
-	soundsgood_data_w(space, offset, (m_control_word >> 8) & 0x001f);
+	m_sounds_good->reset_write(~m_control_word & 0x2000);
+	m_sounds_good->write(space, offset, (m_control_word >> 8) & 0x001f);
 }
 
 
@@ -305,9 +305,9 @@ static ADDRESS_MAP_START( mcr68_map, AS_PROGRAM, 16, mcr68_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x1fffff)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x060000, 0x063fff) AM_RAM
-	AM_RANGE(0x070000, 0x070fff) AM_RAM_WRITE(mcr68_videoram_w) AM_SHARE("videoram16")
+	AM_RANGE(0x070000, 0x070fff) AM_RAM_WRITE(mcr68_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x071000, 0x071fff) AM_RAM
-	AM_RANGE(0x080000, 0x080fff) AM_RAM AM_SHARE("spriteram16")
+	AM_RANGE(0x080000, 0x080fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x090000, 0x09007f) AM_WRITE(mcr68_paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0x0a0000, 0x0a000f) AM_READWRITE(mcr68_6840_upper_r, mcr68_6840_upper_w)
 	AM_RANGE(0x0b0000, 0x0bffff) AM_WRITE(watchdog_reset16_w)
@@ -333,9 +333,9 @@ static ADDRESS_MAP_START( zwackery_map, AS_PROGRAM, 16, mcr68_state )
 	AM_RANGE(0x104000, 0x104007) AM_DEVREADWRITE8("pia0", pia6821_device, read, write, 0xff00)
 	AM_RANGE(0x108000, 0x108007) AM_DEVREADWRITE8("pia1", pia6821_device, read, write, 0x00ff)
 	AM_RANGE(0x10c000, 0x10c007) AM_DEVREADWRITE8("pia2", pia6821_device, read, write, 0x00ff)
-	AM_RANGE(0x800000, 0x800fff) AM_RAM_WRITE(zwackery_videoram_w) AM_SHARE("videoram16")
+	AM_RANGE(0x800000, 0x800fff) AM_RAM_WRITE(zwackery_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x802000, 0x803fff) AM_RAM_WRITE(zwackery_paletteram_w) AM_SHARE("paletteram")
-	AM_RANGE(0xc00000, 0xc00fff) AM_RAM_WRITE(zwackery_spriteram_w) AM_SHARE("spriteram16")
+	AM_RANGE(0xc00000, 0xc00fff) AM_RAM_WRITE(zwackery_spriteram_w) AM_SHARE("spriteram")
 ADDRESS_MAP_END
 
 
@@ -354,10 +354,10 @@ static ADDRESS_MAP_START( pigskin_map, AS_PROGRAM, 16, mcr68_state )
 	AM_RANGE(0x0a0000, 0x0affff) AM_READ(pigskin_port_2_r)
 	AM_RANGE(0x0c0000, 0x0c007f) AM_WRITE(mcr68_paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0x0e0000, 0x0effff) AM_WRITE(watchdog_reset16_w)
-	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(mcr68_videoram_w) AM_SHARE("videoram16")
+	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(mcr68_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x120000, 0x120001) AM_READWRITE(pigskin_protection_r, pigskin_protection_w)
 	AM_RANGE(0x140000, 0x143fff) AM_RAM
-	AM_RANGE(0x160000, 0x1607ff) AM_RAM AM_SHARE("spriteram16")
+	AM_RANGE(0x160000, 0x1607ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x180000, 0x18000f) AM_READWRITE(mcr68_6840_upper_r, mcr68_6840_upper_w)
 	AM_RANGE(0x1a0000, 0x1affff) AM_WRITE(archrivl_control_w)
 	AM_RANGE(0x1e0000, 0x1effff) AM_READ_PORT("IN0")
@@ -379,8 +379,8 @@ static ADDRESS_MAP_START( trisport_map, AS_PROGRAM, 16, mcr68_state )
 	AM_RANGE(0x0a0000, 0x0affff) AM_READ_PORT("DSW")
 	AM_RANGE(0x100000, 0x103fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x120000, 0x12007f) AM_WRITE(mcr68_paletteram_w) AM_SHARE("paletteram")
-	AM_RANGE(0x140000, 0x1407ff) AM_RAM AM_SHARE("spriteram16")
-	AM_RANGE(0x160000, 0x160fff) AM_RAM_WRITE(mcr68_videoram_w) AM_SHARE("videoram16")
+	AM_RANGE(0x140000, 0x1407ff) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0x160000, 0x160fff) AM_RAM_WRITE(mcr68_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x180000, 0x18000f) AM_READWRITE(mcr68_6840_upper_r, mcr68_6840_upper_w)
 	AM_RANGE(0x1a0000, 0x1affff) AM_WRITE(archrivl_control_w)
 	AM_RANGE(0x1c0000, 0x1cffff) AM_WRITE(watchdog_reset16_w)
@@ -991,7 +991,9 @@ static MACHINE_CONFIG_START( zwackery, mcr68_state )
 	MCFG_VIDEO_START(zwackery)
 
 	/* sound hardware */
-	MCFG_FRAGMENT_ADD(chip_squeak_deluxe)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_MIDWAY_CHIP_SQUEAK_DELUXE_ADD("csd")
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -1020,19 +1022,22 @@ static MACHINE_CONFIG_START( mcr68, mcr68_state )
 	MCFG_VIDEO_START(mcr68)
 
 	/* sound hardware -- determined by specific machine */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( xenophob, mcr68 )
 
 	/* basic machine hardware */
-	MCFG_FRAGMENT_ADD(sounds_good)
+	MCFG_MIDWAY_SOUNDS_GOOD_ADD("sg")
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( intlaser, mcr68 )
 
 	/* basic machine hardware */
-	MCFG_FRAGMENT_ADD(sounds_good)
+	MCFG_MIDWAY_SOUNDS_GOOD_ADD("sg")
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_WATCHDOG_VBLANK_INIT(800)
 MACHINE_CONFIG_END
@@ -1041,15 +1046,17 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( spyhunt2, mcr68 )
 
 	/* basic machine hardware */
-	MCFG_FRAGMENT_ADD(sounds_good)
-	MCFG_DEVICE_REMOVE("mono")
-	MCFG_FRAGMENT_ADD(turbo_chip_squeak)
+	MCFG_MIDWAY_SOUNDS_GOOD_ADD("sg")
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_MIDWAY_TURBO_CHIP_SQUEAK_ADD("tcs")
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( archrivl, mcr68 )
 
 	/* basic machine hardware */
+	MCFG_DEVICE_REMOVE("mono")
 	MCFG_FRAGMENT_ADD(williams_cvsd_sound)
 MACHINE_CONFIG_END
 
@@ -1057,6 +1064,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( pigskin, mcr68 )
 
 	/* basic machine hardware */
+	MCFG_DEVICE_REMOVE("mono")
 	MCFG_FRAGMENT_ADD(williams_cvsd_sound)
 
 	MCFG_CPU_MODIFY("maincpu")
@@ -1067,6 +1075,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( trisport, mcr68 )
 
 	/* basic machine hardware */
+	MCFG_DEVICE_REMOVE("mono")
 	MCFG_FRAGMENT_ADD(williams_cvsd_sound)
 
 	MCFG_CPU_MODIFY("maincpu")
@@ -1100,7 +1109,7 @@ ROM_START( zwackery )
 	ROM_LOAD16_BYTE( "pro12.bin",  0x30000, 0x4000, CRC(e2d25e1f) SHA1(5d8ff303441eccf431422b453a173983a4513630) )
 	ROM_LOAD16_BYTE( "pro13.bin",  0x30001, 0x4000, CRC(e131f9b8) SHA1(08b131f2acc84d4c2c931bfd24e7de3d92a8a817) )
 
-	ROM_REGION( 0x20000, "csdcpu", 0 )
+	ROM_REGION( 0x20000, "csd:cpu", 0 )
 	ROM_LOAD16_BYTE( "csd7.bin",  0x00000, 0x2000, CRC(5501f54b) SHA1(84c0851fb868e81400cfe3ebfd7b91fe98a47bac) )
 	ROM_LOAD16_BYTE( "csd17.bin", 0x00001, 0x2000, CRC(2e482580) SHA1(92bd3e64ff580800ee16579d97bcb8b3bd9f755c) )
 	ROM_LOAD16_BYTE( "csd8.bin",  0x04000, 0x2000, CRC(13366575) SHA1(bcf25a7d4c6b2ccd7cd9978edafc66ef0cadfe72) )
@@ -1158,7 +1167,7 @@ ROM_START( xenophob ) /* Service mode shows "VERSION CO" */
 	ROM_LOAD16_BYTE( "xeno_pro.2c",  0x20000, 0x10000, CRC(e45bf669) SHA1(52b0ffd2311e4d300410de57fbddacab4b9857a1) )
 	ROM_LOAD16_BYTE( "xeno_pro.2b",  0x20001, 0x10000, CRC(da5d39d5) SHA1(f61b239eb3108faec2f3dbb8139c8d01b0e29873) )
 
-	ROM_REGION( 0x40000, "sgcpu", 0 )  /* Sounds Good board */
+	ROM_REGION( 0x40000, "sg:cpu", 0 )  /* Sounds Good board */
 	ROM_LOAD16_BYTE( "xeno_snd.u7",  0x00000, 0x10000, CRC(77561d15) SHA1(8c23a9270d54be6380f2d23939b6c6d8c31e334b) )
 	ROM_LOAD16_BYTE( "xeno_snd.u17", 0x00001, 0x10000, CRC(837a1a71) SHA1(d7d60ef1fd11e5e84dd1ffb9a077686bd2fb452e) )
 	ROM_LOAD16_BYTE( "xeno_snd.u8",  0x20000, 0x10000, CRC(6e2915c7) SHA1(df1f35f6b743afbab0a3a29adce3639a8c9dc66f) )
@@ -1202,11 +1211,11 @@ ROM_START( spyhunt2 )
 	ROM_LOAD16_BYTE( "sh22c.bin",  0x20000, 0x10000, CRC(8ee65009) SHA1(6adb00888f739b59e3ace1a6eaf1c58c4583d7fd) )
 	ROM_LOAD16_BYTE( "sh22b.bin",  0x20001, 0x10000, CRC(850c21ad) SHA1(3b944545cb469e2c53166a91eb2834c5f3891ddf) )
 
-	ROM_REGION( 0x10000, "tcscpu", 0 )  /* 64k for the Turbo Cheap Squeak */
+	ROM_REGION( 0x10000, "tcs:cpu", 0 )  /* 64k for the Turbo Cheap Squeak */
 	ROM_LOAD( "turbo-cs.u5", 0x08000, 0x4000, CRC(4b1d8a66) SHA1(a1a2f9fe3fc42b668ec97ad6c6ea6032f1dc0695) )
 	ROM_LOAD( "turbo-cs.u4", 0x0c000, 0x4000, CRC(3722ce48) SHA1(ae064be590c067bda66ca7a72c212ad47f3eb1c5) )
 
-	ROM_REGION( 0x40000, "sgcpu", 0 )  /* Sounds Good board */
+	ROM_REGION( 0x40000, "sg:cpu", 0 )  /* Sounds Good board */
 	ROM_LOAD16_BYTE( "sh2u7.bin",  0x00000, 0x10000, CRC(02362ea4) SHA1(2d37f06c9156554b8140ed565f6fdd1ef67bb54f) )
 	ROM_LOAD16_BYTE( "sh2u17.bin", 0x00001, 0x10000, CRC(e29a2c37) SHA1(e0d4df90b533d3325c905d42ddc6876667f32c82) )
 
@@ -1239,11 +1248,11 @@ ROM_START( spyhunt2a )
 	ROM_LOAD16_BYTE( "2c",  0x20000, 0x10000, CRC(bc834f3f) SHA1(05f6ab508ce2ebe55665e97114070e9d81db48c8) )
 	ROM_LOAD16_BYTE( "2b",  0x20001, 0x10000, CRC(8a9f7ef3) SHA1(353ebb0a3782c183cc9be800584903e23ca507d9) )
 
-	ROM_REGION( 0x10000, "tcscpu", 0 )  /* 64k for the Turbo Cheap Squeak */
+	ROM_REGION( 0x10000, "tcs:cpu", 0 )  /* 64k for the Turbo Cheap Squeak */
 	ROM_LOAD( "turbo-cs.u5", 0x08000, 0x4000, CRC(4b1d8a66) SHA1(a1a2f9fe3fc42b668ec97ad6c6ea6032f1dc0695) )
 	ROM_LOAD( "turbo-cs.u4", 0x0c000, 0x4000, CRC(3722ce48) SHA1(ae064be590c067bda66ca7a72c212ad47f3eb1c5) )
 
-	ROM_REGION( 0x40000, "sgcpu", 0 )  /* Sounds Good board */
+	ROM_REGION( 0x40000, "sg:cpu", 0 )  /* Sounds Good board */
 	ROM_LOAD16_BYTE( "sh2u7.bin",  0x00000, 0x10000, CRC(02362ea4) SHA1(2d37f06c9156554b8140ed565f6fdd1ef67bb54f) )
 	ROM_LOAD16_BYTE( "sh2u17.bin", 0x00001, 0x10000, CRC(e29a2c37) SHA1(e0d4df90b533d3325c905d42ddc6876667f32c82) )
 
@@ -1276,7 +1285,7 @@ ROM_START( blasted ) /* Service mode shows "prod. code v.1" and the date 4/27/88
 	ROM_LOAD16_BYTE( "2c",  0x20000, 0x10000, CRC(026f30bf) SHA1(de327ab5bd4dc9456fa5a91f3ccd293b3ab8c5c2) )
 	ROM_LOAD16_BYTE( "2b",  0x20001, 0x10000, CRC(8e0e91a9) SHA1(2dc2927a1fd552ead446606a902a2ba0c4595798) )
 
-	ROM_REGION( 0x40000, "sgcpu", 0 )  /* Sounds Good board */
+	ROM_REGION( 0x40000, "sg:cpu", 0 )  /* Sounds Good board */
 	ROM_LOAD16_BYTE( "blasted.u7",  0x00000, 0x10000, CRC(8d7c8ef6) SHA1(a414e91c20202f800f3e01e4c430e3f99e3df5bb) )
 	ROM_LOAD16_BYTE( "blasted.u17", 0x00001, 0x10000, CRC(c79040b9) SHA1(e6fa173ff5fb681ddfef831f1ef237a7c4303f32) )
 	ROM_LOAD16_BYTE( "blasted.u8",  0x20000, 0x10000, CRC(c53094c0) SHA1(8c54cefe8030bf18b9585008a4a6cf8a7dc23f71) )
@@ -1310,7 +1319,7 @@ ROM_START( intlaser ) /* Service mode shows "TOP SECRET PROJ. #F01" and the date
 	ROM_LOAD16_BYTE( "2c.bin",  0x20000, 0x10000, CRC(d2cca853) SHA1(69e4ee8203c6dda7b4ec97c247fbcdc9fdc9ff8d) )
 	ROM_LOAD16_BYTE( "2b.bin",  0x20001, 0x10000, CRC(3802cfe2) SHA1(d10c802500bae14acc3230ca34c2d1806b68ce4a) )
 
-	ROM_REGION( 0x40000, "sgcpu", 0 )  /* Sounds Good board */
+	ROM_REGION( 0x40000, "sg:cpu", 0 )  /* Sounds Good board */
 	ROM_LOAD16_BYTE( "u7.bin",  0x00000, 0x10000, CRC(19ad1e45) SHA1(838ad7304248690d3fdf9e4edf3856936bf36d42) )
 	ROM_LOAD16_BYTE( "u17.bin", 0x00001, 0x10000, CRC(d6118949) SHA1(9e059f28d9eb8dee10301662a65588cffaf6fd16) )
 	ROM_LOAD16_BYTE( "u8.bin",  0x20000, 0x10000, CRC(d6cc99aa) SHA1(b970d6e87778959cf7322158b8df26c5028e3f45) )
