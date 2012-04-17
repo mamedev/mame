@@ -135,12 +135,11 @@ WRITE16_MEMBER(atarig42_state::mo_command_w)
  *
  *************************************/
 
-DIRECT_UPDATE_HANDLER( atarig42_sloop_direct_handler )
+DIRECT_UPDATE_MEMBER( atarig42_state::atarig42_sloop_direct_handler )
 {
 	if (address < 0x80000)
 	{
-		atarig42_state *state = machine.driver_data<atarig42_state>();
-		direct.explicit_configure(0x00000, 0x7ffff, 0x7ffff, state->m_sloop_base);
+		direct.explicit_configure(0x00000, 0x7ffff, 0x7ffff, m_sloop_base);
 		return (offs_t)-1;
 	}
 	return address;
@@ -792,7 +791,7 @@ static DRIVER_INIT( roadriot )
 
 	address_space *main = machine.device<m68000_device>("maincpu")->space(AS_PROGRAM);
 	state->m_sloop_base = main->install_readwrite_handler(0x000000, 0x07ffff, read16_delegate(FUNC(atarig42_state::roadriot_sloop_data_r),state), write16_delegate(FUNC(atarig42_state::roadriot_sloop_data_w),state));
-	main->set_direct_update_handler(direct_update_delegate(FUNC(atarig42_sloop_direct_handler), &machine));
+	main->set_direct_update_handler(direct_update_delegate(FUNC(atarig42_state::atarig42_sloop_direct_handler), state));
 
 	asic65_config(machine, ASIC65_ROMBASED);
 /*
@@ -831,7 +830,7 @@ static DRIVER_INIT( guardian )
 
 	address_space *main = machine.device<m68000_device>("maincpu")->space(AS_PROGRAM);
 	state->m_sloop_base = main->install_readwrite_handler(0x000000, 0x07ffff, read16_delegate(FUNC(atarig42_state::guardians_sloop_data_r),state), write16_delegate(FUNC(atarig42_state::guardians_sloop_data_w),state));
-	main->set_direct_update_handler(direct_update_delegate(FUNC(atarig42_sloop_direct_handler), &machine));
+	main->set_direct_update_handler(direct_update_delegate(FUNC(atarig42_state::atarig42_sloop_direct_handler), state));
 
 	asic65_config(machine, ASIC65_GUARDIANS);
 /*

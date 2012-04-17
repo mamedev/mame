@@ -43,6 +43,7 @@ public:
 	DECLARE_WRITE16_MEMBER(guardians_sloop_data_w);
 	void roadriot_sloop_tweak(int offset);
 	void guardians_sloop_tweak(int offset);
+	DECLARE_DIRECT_UPDATE_MEMBER(atarig42_sloop_direct_handler);
 };
 
 

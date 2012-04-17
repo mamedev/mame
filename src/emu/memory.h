@@ -814,6 +814,7 @@ private:
 // opcode base adjustment handler function macro
 #define DIRECT_UPDATE_MEMBER(name)		offs_t name(ATTR_UNUSED direct_read_data &direct, ATTR_UNUSED offs_t address)
 #define DIRECT_UPDATE_HANDLER(name)		offs_t name(ATTR_UNUSED running_machine &machine, ATTR_UNUSED direct_read_data &direct, ATTR_UNUSED offs_t address)
+#define DECLARE_DIRECT_UPDATE_MEMBER(name)	offs_t name(ATTR_UNUSED direct_read_data &direct, ATTR_UNUSED offs_t address)
 
 
 // space read/write handler function macros

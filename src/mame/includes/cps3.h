@@ -98,6 +98,7 @@ public:
 	DECLARE_WRITE32_MEMBER(cps3_unk_vidregs_w);
 	DECLARE_READ32_MEMBER(cps3_colourram_r);
 	DECLARE_WRITE32_MEMBER(cps3_colourram_w);
+	DECLARE_DIRECT_UPDATE_MEMBER(cps3_direct_handler);
 };
 
 

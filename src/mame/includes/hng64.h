@@ -151,6 +151,7 @@ public:
 	DECLARE_READ8_MEMBER(hng64_comm_shared_r);
 	DECLARE_WRITE8_MEMBER(hng64_comm_shared_w);
 	DECLARE_WRITE32_MEMBER(hng64_videoram_w);
+	DECLARE_DIRECT_UPDATE_MEMBER(KL5C80_direct_handler);
 };
 
 

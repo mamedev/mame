@@ -120,9 +120,8 @@ WRITE8_MEMBER(starwars_state::esb_slapstic_w)
  *
  *************************************/
 
-DIRECT_UPDATE_HANDLER( esb_setdirect )
+DIRECT_UPDATE_MEMBER(starwars_state::esb_setdirect)
 {
-	starwars_state *state = machine.driver_data<starwars_state>();
 	/* if we are in the slapstic region, process it */
 	if ((address & 0xe000) == 0x8000)
 	{
@@ -133,10 +132,10 @@ DIRECT_UPDATE_HANDLER( esb_setdirect )
             1. Because we have read/write handlers backing the current address
             2. Because the CPU core executed a jump to a new address
         */
-		if (pc != state->m_slapstic_last_pc || address != state->m_slapstic_last_address)
+		if (pc != m_slapstic_last_pc || address != m_slapstic_last_address)
 		{
-			state->m_slapstic_last_pc = pc;
-			state->m_slapstic_last_address = address;
+			m_slapstic_last_pc = pc;
+			m_slapstic_last_address = address;
 			esb_slapstic_tweak(&direct.space(), address & 0x1fff);
 		}
 		return ~0;
@@ -520,7 +519,7 @@ static DRIVER_INIT( esb )
 
 	/* install an opcode base handler */
 	address_space *space = machine.device<m6809_device>("maincpu")->space(AS_PROGRAM);
-	space->set_direct_update_handler(direct_update_delegate(FUNC(esb_setdirect), &machine));
+	space->set_direct_update_handler(direct_update_delegate(FUNC(starwars_state::esb_setdirect), state));
 
 	/* install read/write handlers for it */
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x8000, 0x9fff, read8_delegate(FUNC(starwars_state::esb_slapstic_r),state), write8_delegate(FUNC(starwars_state::esb_slapstic_w),state));

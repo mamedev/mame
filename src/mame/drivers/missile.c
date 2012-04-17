@@ -371,6 +371,7 @@ public:
 	DECLARE_WRITE8_MEMBER(missile_w);
 	DECLARE_READ8_MEMBER(missile_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(get_vblank);
+	DECLARE_DIRECT_UPDATE_MEMBER(missile_direct_handler);
 };
 
 
@@ -484,7 +485,7 @@ static TIMER_CALLBACK( adjust_cpu_speed )
 }
 
 
-DIRECT_UPDATE_HANDLER( missile_direct_handler )
+DIRECT_UPDATE_MEMBER(missile_state::missile_direct_handler)
 {
 	/* offset accounts for lack of A15 decoding */
 	int offset = address & 0x8000;
@@ -493,8 +494,7 @@ DIRECT_UPDATE_HANDLER( missile_direct_handler )
 	/* RAM? */
 	if (address < 0x4000)
 	{
-		missile_state *state = direct.space().machine().driver_data<missile_state>();
-		direct.explicit_configure(0x0000 | offset, 0x3fff | offset, 0x3fff, state->m_videoram);
+		direct.explicit_configure(0x0000 | offset, 0x3fff | offset, 0x3fff, m_videoram);
 		return ~0;
 	}
 
@@ -519,7 +519,7 @@ static MACHINE_START( missile )
 
 	/* set up an opcode base handler since we use mapped handlers for RAM */
 	address_space *space = machine.device<m6502_device>("maincpu")->space(AS_PROGRAM);
-	space->set_direct_update_handler(direct_update_delegate(FUNC(missile_direct_handler), &machine));
+	space->set_direct_update_handler(direct_update_delegate(FUNC(missile_state::missile_direct_handler), state));
 
 	/* create a timer to speed/slow the CPU */
 	state->m_cpu_timer = machine.scheduler().timer_alloc(FUNC(adjust_cpu_speed));

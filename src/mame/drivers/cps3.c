@@ -620,8 +620,6 @@ INLINE void cps3_drawgfxzoom(bitmap_rgb32 &dest_bmp,const rectangle &clip,const 
 
 
 
-DIRECT_UPDATE_HANDLER( cps3_direct_handler );
-
 /* Encryption */
 
 
@@ -724,7 +722,7 @@ static void init_common(running_machine &machine, UINT32 key1, UINT32 key2, int 
 	state->m_0xc0000000_ram_decrypted = auto_alloc_array(machine, UINT32, 0x400/4);
 
 	address_space *main = machine.device<sh2_device>("maincpu")->space(AS_PROGRAM);
-	main->set_direct_update_handler(direct_update_delegate(FUNC(cps3_direct_handler), &machine));
+	main->set_direct_update_handler(direct_update_delegate(FUNC(cps3_state::cps3_direct_handler), state));
 
 	// flash roms
 	astring tempstr;
@@ -1278,9 +1276,8 @@ WRITE32_MEMBER(cps3_state::cps3_0xc0000000_ram_w)
 
 
 
-DIRECT_UPDATE_HANDLER( cps3_direct_handler )
+DIRECT_UPDATE_MEMBER(cps3_state::cps3_direct_handler)
 {
-	cps3_state *state = machine.driver_data<cps3_state>();
 //  if(DEBUG_PRINTF) printf("address %04x\n",address);
 
 	/* BIOS ROM */
@@ -1292,10 +1289,10 @@ DIRECT_UPDATE_HANDLER( cps3_direct_handler )
 	/* RAM */
 	else if (address >= 0x06000000 && address <= 0x06ffffff)
 	{
-		UINT8 *decrypted = (UINT8*)state->m_decrypted_gamerom;
+		UINT8 *decrypted = (UINT8*)m_decrypted_gamerom;
 		UINT8 *raw = decrypted;
 
-		if (state->m_altEncryption) raw = (UINT8*) state->m_user4region;
+		if (m_altEncryption) raw = (UINT8*) m_user4region;
 
 		direct.explicit_configure(0x06000000, 0x06ffffff, 0x00ffffff, raw, decrypted);
 
@@ -1303,13 +1300,13 @@ DIRECT_UPDATE_HANDLER( cps3_direct_handler )
 	}
 	else if (address >= 0xc0000000 && address <= 0xc00003ff)
 	{
-		//direct->decrypted = (void*)state->m_0xc0000000_ram_decrypted;
-		direct.explicit_configure(0xc0000000, 0xc00003ff, 0x3ff, (UINT8*)state->m_0xc0000000_ram.target(), (UINT8*)state->m_0xc0000000_ram_decrypted);
+		//direct->decrypted = (void*)m_0xc0000000_ram_decrypted;
+		direct.explicit_configure(0xc0000000, 0xc00003ff, 0x3ff, (UINT8*)m_0xc0000000_ram.target(), (UINT8*)m_0xc0000000_ram_decrypted);
 		return ~0;
 	}
 
 	/* anything else falls through to NOPs */
-	direct.explicit_configure(address, address, 0, (UINT8*)state->m_nops, (UINT8*)state->m_nops);
+	direct.explicit_configure(address, address, 0, (UINT8*)m_nops, (UINT8*)m_nops);
 	return ~0;
 }
 

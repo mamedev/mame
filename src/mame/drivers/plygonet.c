@@ -313,26 +313,24 @@ READ16_MEMBER(polygonet_state::dsp56k_bootload_r)
 	return 0x7fff;
 }
 
-DIRECT_UPDATE_HANDLER( plygonet_dsp56k_direct_handler )
+DIRECT_UPDATE_MEMBER(polygonet_state::plygonet_dsp56k_direct_handler)
 {
-	polygonet_state *state = machine.driver_data<polygonet_state>();
-
 	/* Call the dsp's update handler first */
-	if (!state->m_dsp56k_update_handler.isnull())
+	if (!m_dsp56k_update_handler.isnull())
 	{
-		if (state->m_dsp56k_update_handler(direct, address) == ~0)
+		if (m_dsp56k_update_handler(direct, address) == ~0)
 			return ~0;
 	}
 
 	/* If the requested region wasn't in there, see if it needs to be caught driver-side */
 	if (address >= (0x7000<<1) && address <= (0x7fff<<1))
 	{
-		direct.explicit_configure(0x7000<<1, 0x7fff<<1, (0xfff<<1) | 1, state->m_dsp56k_p_mirror);
+		direct.explicit_configure(0x7000<<1, 0x7fff<<1, (0xfff<<1) | 1, m_dsp56k_p_mirror);
 		return ~0;
 	}
 	else if (address >= (0x8000<<1) && address <= (0x87ff<<1))
 	{
-		direct.explicit_configure(0x8000<<1, 0x87ff<<1, (0x7ff<<1) | 1, state->m_dsp56k_p_8000);
+		direct.explicit_configure(0x8000<<1, 0x87ff<<1, (0x7ff<<1) | 1, m_dsp56k_p_8000);
 		return ~0;
 	}
 
@@ -743,7 +741,7 @@ static DRIVER_INIT(polygonet)
 
 	/* The dsp56k occasionally executes out of mapped memory */
 	address_space *space = machine.device<dsp56k_device>("dsp")->space(AS_PROGRAM);
-	state->m_dsp56k_update_handler = space->set_direct_update_handler(direct_update_delegate(FUNC(plygonet_dsp56k_direct_handler), &machine));
+	state->m_dsp56k_update_handler = space->set_direct_update_handler(direct_update_delegate(FUNC(polygonet_state::plygonet_dsp56k_direct_handler), state));
 
     /* save states */
 	state->save_item(NAME(state->m_dsp56k_bank00_ram));

@@ -67,6 +67,7 @@ public:
 	DECLARE_WRITE8_MEMBER(tms5220_w);
 	DECLARE_WRITE8_MEMBER(tms5220_strobe_w);
 	DECLARE_WRITE8_MEMBER(coincount_w);
+	DECLARE_DIRECT_UPDATE_MEMBER(atarisy2_direct_handler);
 };
 
 
