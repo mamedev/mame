@@ -113,14 +113,14 @@ void i5000snd_device::sound_stream_update(sound_stream &stream, stream_sample_t 
 			
 			adpcm_data = m_channels[ch].m_adpcm.clock(adpcm_data & m_channels[ch].shift_mask);
 			
-			m_channels[ch].output_r = adpcm_data * m_channels[ch].vol_r;
-			m_channels[ch].output_l = adpcm_data * m_channels[ch].vol_l;
+			m_channels[ch].output_r = adpcm_data * m_channels[ch].vol_r / 16;
+			m_channels[ch].output_l = adpcm_data * m_channels[ch].vol_l / 16;
 			mix_r += m_channels[ch].output_r;
 			mix_l += m_channels[ch].output_l;
 		}
 		
-		outputs[0][i] = mix_r / (16*8);
-		outputs[1][i] = mix_l / (16*8);
+		outputs[0][i] = mix_r / 16;
+		outputs[1][i] = mix_l / 16;
 	}
 }
 
@@ -178,7 +178,7 @@ void i5000snd_device::write_reg16(UINT8 reg, UINT16 data)
 							// 3-bit ADPCM
 							case 0x0104:
 							case 0x0304: // same?
-								m_channels[ch].freq_min = 0x100 * (4.0 / 3.0);
+								m_channels[ch].freq_min = 0x140;
 								m_channels[ch].shift_amount = 3;
 								m_channels[ch].shift_mask = 0xe;
 								break;
@@ -198,8 +198,6 @@ void i5000snd_device::write_reg16(UINT8 reg, UINT16 data)
 
 						m_channels[ch].freq_timer = 0;
 						m_channels[ch].shift_pos = 0;
-						m_channels[ch].output_l = 0;
-						m_channels[ch].output_r = 0;
 						
 						m_channels[ch].m_adpcm.reset();
 						m_channels[ch].is_playing = read_sample(ch);
