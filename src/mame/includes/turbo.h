@@ -11,16 +11,6 @@
 #define TURBO_X_SCALE		2
 
 
-struct i8279_state
-{
-	UINT8		command;
-	UINT8		mode;
-	UINT8		prescale;
-	UINT8		inhibit;
-	UINT8		clear;
-	UINT8		ram[16];
-};
-
 
 class turbo_state : public driver_device
 {
@@ -38,7 +28,7 @@ public:
 	UINT8 *		m_buckrog_bitmap_ram;
 
 	/* machine states */
-	i8279_state	m_i8279;
+	UINT8 		m_i8279_scanlines;
 
 	/* sound state */
 	UINT8		m_turbo_osel;
@@ -82,8 +72,9 @@ public:
 	UINT8		m_buckrog_command;
 	UINT8		m_buckrog_myship;
 	int m_last_sound_a;
-	DECLARE_READ8_MEMBER(turbo_8279_r);
-	DECLARE_WRITE8_MEMBER(turbo_8279_w);
+	
+	DECLARE_WRITE8_MEMBER(scanlines_w);
+	DECLARE_WRITE8_MEMBER(digit_w);
 	DECLARE_READ8_MEMBER(turbo_collision_r);
 	DECLARE_WRITE8_MEMBER(turbo_collision_clear_w);
 	DECLARE_WRITE8_MEMBER(turbo_analog_reset_w);

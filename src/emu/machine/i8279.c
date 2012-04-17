@@ -173,13 +173,22 @@ void i8279_device::device_reset()
 void i8279_device::timer_adjust()
 {
 // Real device runs at about 100kHz internally, clock divider is chosen so that
-// this is the case. We do not need such speed, 200Hz is enough.
+// this is the case. We do not need such speed, 2000Hz is enough.
+// If this is too long, the sensor mode doesn't work correctly.
 
-	//UINT8 divider = (m_cmd[1]) ? m_cmd[1] : 1;
-	//m_clock = clock() / divider;
+#if 0
+	UINT8 divider = (m_cmd[1]) ? m_cmd[1] : 1;
+	UINT32 new_clock = clock() / divider;
+#else
+	UINT32 new_clock = 2000;
+#endif
 
-	m_clock = 200;
-	m_timer->adjust(attotime::from_hz(m_clock), 0, attotime::from_hz(m_clock));
+	if (m_clock != new_clock)
+	{
+		m_timer->adjust(attotime::from_hz(new_clock), 0, attotime::from_hz(new_clock));
+
+		m_clock = new_clock;
+	}
 }
 
 
