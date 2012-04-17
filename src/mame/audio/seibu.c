@@ -37,6 +37,7 @@
 #include "sound/3812intf.h"
 #include "sound/2151intf.h"
 #include "sound/2203intf.h"
+#include "sound/okiadpcm.h"
 #include "sound/okim6295.h"
 
 
@@ -142,7 +143,7 @@ const seibu_adpcm_interface seibu_adpcm2_intf =
 typedef struct _seibu_adpcm_state seibu_adpcm_state;
 struct _seibu_adpcm_state
 {
-	adpcm_state m_adpcm;
+	oki_adpcm_state m_adpcm;
 	sound_stream *m_stream;
 	UINT32 m_current;
 	UINT32 m_end;
@@ -191,10 +192,10 @@ static DEVICE_START( seibu_adpcm )
 	state->m_stream = device->machine().sound().stream_alloc(*device, 0, 1, device->clock(), state, seibu_adpcm_callback);
 	state->m_base = machine.region(intf->rom_region)->base();
 
-	// because legacy device tokens are just allocated as a blob, the constructor for adpcm_state
+	// because legacy device tokens are just allocated as a blob, the constructor for oki_adpcm_state
 	// is not called, so use placement new to force it to set up; when this is converted to a
 	// modern device, we can remove this grossness
-	new(&state->m_adpcm) adpcm_state;
+	new(&state->m_adpcm) oki_adpcm_state;
 	state->m_adpcm.reset();
 }
 

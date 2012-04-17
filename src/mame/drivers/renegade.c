@@ -105,7 +105,7 @@ $8000 - $ffff   ROM
 #include "cpu/m6809/m6809.h"
 #include "cpu/m6805/m6805.h"
 #include "sound/3526intf.h"
-#include "sound/okim6295.h"
+#include "sound/okiadpcm.h"
 #include "includes/renegade.h"
 
 
@@ -114,7 +114,7 @@ $8000 - $ffff   ROM
 typedef struct _renegade_adpcm_state renegade_adpcm_state;
 struct _renegade_adpcm_state
 {
-	adpcm_state m_adpcm;
+	oki_adpcm_state m_adpcm;
 	sound_stream *m_stream;
 	UINT32 m_current;
 	UINT32 m_end;

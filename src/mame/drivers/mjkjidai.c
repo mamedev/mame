@@ -24,14 +24,14 @@ TODO:
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/sn76496.h"
-#include "sound/okim6295.h"
+#include "sound/okiadpcm.h"
 #include "includes/mjkjidai.h"
 
 /* Start of ADPCM custom chip code */
 typedef struct _mjkjidai_adpcm_state mjkjidai_adpcm_state;
 struct _mjkjidai_adpcm_state
 {
-	adpcm_state m_adpcm;
+	oki_adpcm_state m_adpcm;
 	sound_stream *m_stream;
 	UINT32 m_current;
 	UINT32 m_end;

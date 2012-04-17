@@ -9,7 +9,7 @@
 #ifndef __I5000_H__
 #define __I5000_H__
 
-#include "sound/okim6295.h"
+#include "sound/okiadpcm.h"
 
 
 //**************************************************************************
@@ -50,7 +50,7 @@ private:
     typedef struct
     {
         bool is_playing;
-    	adpcm_state m_adpcm;	// 4-bit adpcm state (okim6295.h)
+    	oki_adpcm_state m_adpcm;
 
         UINT32 address;
         int freq_timer;

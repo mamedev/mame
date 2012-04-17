@@ -11,6 +11,7 @@
 #ifndef __OKIM6295_H__
 #define __OKIM6295_H__
 
+#include "sound/okiadpcm.h"
 
 
 
@@ -46,30 +47,6 @@ enum
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
-
-
-// ======================> adpcm_state
-
-// Internal ADPCM state, used by external ADPCM generators with compatible specs to the OKIM 6295.
-class adpcm_state
-{
-public:
-	adpcm_state() { compute_tables(); reset(); }
-
-	void reset();
-	INT16 clock(UINT8 nibble);
-
-	INT32	m_signal;
-	INT32	m_step;
-
-private:
-	static const INT8 s_index_shift[8];
-	static int s_diff_lookup[49*16];
-
-	static void compute_tables();
-	static bool s_tables_computed;
-};
-
 
 
 // ======================> okim6295_device
@@ -115,12 +92,12 @@ protected:
 		okim_voice();
 		void generate_adpcm(direct_read_data &direct, stream_sample_t *buffer, int samples);
 
-		adpcm_state m_adpcm;			// current ADPCM state
-		bool		m_playing;
-		offs_t		m_base_offset;		// pointer to the base memory location
-		UINT32		m_sample;			// current sample number
-		UINT32		m_count;			// total samples to play
-		INT8		m_volume;			// output volume
+		oki_adpcm_state m_adpcm;		// current ADPCM state
+		bool			m_playing;
+		offs_t			m_base_offset;	// pointer to the base memory location
+		UINT32			m_sample;		// current sample number
+		UINT32			m_count;		// total samples to play
+		INT8			m_volume;		// output volume
 	};
 
 	// configuration state
