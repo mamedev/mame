@@ -745,7 +745,6 @@ williams_adpcm_sound_device::williams_adpcm_sound_device(const machine_config &m
 	: device_t(mconfig, WILLIAMS_ADPCM_SOUND, "Williams ADPCM Sound Board", "wmsadpcm", tag, owner, clock),
 	  device_mixer_interface(mconfig, *this),
 	  m_cpu(*this, "cpu"),
-	  m_oki6295(*this, "oki"),
 	  m_latch(0),
 	  m_talkback(0),
 	  m_sound_int_state(0)
@@ -812,7 +811,7 @@ WRITE8_MEMBER(williams_adpcm_sound_device::bank_select_w)
 
 WRITE8_MEMBER(williams_adpcm_sound_device::oki6295_bank_select_w)
 {
-	m_oki6295->set_bank_base((data & 7) * 0x40000);
+	subbank("okibank")->set_entry(data & 7);
 }
 
 
@@ -872,6 +871,16 @@ ADDRESS_MAP_END
 
 
 //-------------------------------------------------
+//  OKI6295 map
+//-------------------------------------------------
+
+static ADDRESS_MAP_START( williams_adpcm_oki_map, AS_0, 8, williams_adpcm_sound_device )
+	AM_RANGE(0x00000, 0x1ffff) AM_ROMBANK("okibank")
+	AM_RANGE(0x20000, 0x3ffff) AM_ROM AM_REGION("oki", 0x60000)
+ADDRESS_MAP_END
+
+
+//-------------------------------------------------
 //  YM2151 configuration
 //-------------------------------------------------
 
@@ -897,6 +906,7 @@ static MACHINE_CONFIG_FRAGMENT( williams_adpcm_sound )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.50)
 
 	MCFG_OKIM6295_ADD("oki", ADPCM_MASTER_CLOCK/8, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADDRESS_MAP(AS_0, williams_adpcm_oki_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.50)
 MACHINE_CONFIG_END
 
@@ -924,23 +934,16 @@ void williams_adpcm_sound_device::device_start()
 	subbank("romupper")->set_base(&rom[0x10000 + 0x4000 + 7 * 0x8000]);
 
 	// expand ADPCM data
-	// it is assumed that U12 is loaded @ 0x00000 and U13 is loaded @ 0x40000
 	rom = subregion("oki")->base();
-	memcpy(rom + 0x1c0000, rom + 0x080000, 0x20000);	// expand individual banks
-	memcpy(rom + 0x180000, rom + 0x0a0000, 0x20000);
-	memcpy(rom + 0x140000, rom + 0x0c0000, 0x20000);
-	memcpy(rom + 0x100000, rom + 0x0e0000, 0x20000);
-	memcpy(rom + 0x0c0000, rom + 0x000000, 0x20000);
-	memcpy(rom + 0x000000, rom + 0x040000, 0x20000);
-	memcpy(rom + 0x080000, rom + 0x020000, 0x20000);
-
-	memcpy(rom + 0x1e0000, rom + 0x060000, 0x20000);	// copy common bank
-	memcpy(rom + 0x1a0000, rom + 0x060000, 0x20000);
-	memcpy(rom + 0x160000, rom + 0x060000, 0x20000);
-	memcpy(rom + 0x120000, rom + 0x060000, 0x20000);
-	memcpy(rom + 0x0e0000, rom + 0x060000, 0x20000);
-	memcpy(rom + 0x0a0000, rom + 0x060000, 0x20000);
-	memcpy(rom + 0x020000, rom + 0x060000, 0x20000);
+	// it is assumed that U12 is loaded @ 0x00000 and U13 is loaded @ 0x40000
+	subbank("okibank")->configure_entry(0, &rom[0x40000]);
+	subbank("okibank")->configure_entry(1, &rom[0x40000]);
+	subbank("okibank")->configure_entry(2, &rom[0x20000]);
+	subbank("okibank")->configure_entry(3, &rom[0x00000]);
+	subbank("okibank")->configure_entry(4, &rom[0xe0000]);
+	subbank("okibank")->configure_entry(5, &rom[0xc0000]);
+	subbank("okibank")->configure_entry(6, &rom[0xa0000]);
+	subbank("okibank")->configure_entry(7, &rom[0x80000]);
 
 	// register for save states
 	save_item(NAME(m_latch));

@@ -212,7 +212,6 @@ protected:
 private:
 	// devices
 	required_device<m6809e_device> m_cpu;
-	required_device<okim6295_device> m_oki6295;
 
 	// internal state
 	UINT8 m_latch;
