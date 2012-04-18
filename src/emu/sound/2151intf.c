@@ -19,7 +19,8 @@ struct _ym2151_state
 	emu_timer *				timer[2];
 	void *					chip;
 	UINT8					lastreg;
-	const ym2151_interface *intf;
+	devcb_resolved_write_line irqhandler;
+	devcb_resolved_write8 portwritehandler;
 };
 
 
@@ -37,14 +38,27 @@ static STREAM_UPDATE( ym2151_update )
 	ym2151_update_one(info->chip, outputs, samples);
 }
 
+static void ym2151_irq_frontend(device_t *device, int irq)
+{
+	ym2151_state *info = get_safe_token(device);
+	info->irqhandler(irq);
+}
+
+static void ym2151_port_write_frontend(device_t *device, offs_t offset, UINT8 data)
+{
+	ym2151_state *info = get_safe_token(device);
+	info->portwritehandler(offset, data);
+}
 
 static DEVICE_START( ym2151 )
 {
-	static const ym2151_interface dummy = { 0 };
+	static const ym2151_interface dummy = { DEVCB_NULL };
 	ym2151_state *info = get_safe_token(device);
 	int rate;
 
-	info->intf = device->static_config() ? (const ym2151_interface *)device->static_config() : &dummy;
+	const ym2151_interface *intf = device->static_config() ? (const ym2151_interface *)device->static_config() : &dummy;
+	info->irqhandler.resolve(intf->irqhandler, *device);
+	info->portwritehandler.resolve(intf->portwritehandler, *device);
 
 	rate = device->clock()/64;
 
@@ -54,8 +68,8 @@ static DEVICE_START( ym2151 )
 	info->chip = ym2151_init(device,device->clock(),rate);
 	assert_always(info->chip != NULL, "Error creating YM2151 chip");
 
-	ym2151_set_irq_handler(info->chip,info->intf->irqhandler);
-	ym2151_set_port_write_handler(info->chip,info->intf->portwritehandler);
+	ym2151_set_irq_handler(info->chip,ym2151_irq_frontend);
+	ym2151_set_port_write_handler(info->chip,ym2151_port_write_frontend);
 }
 
 

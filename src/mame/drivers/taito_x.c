@@ -794,7 +794,7 @@ static const ym2610_interface ym2610_config =
 
 static const ym2151_interface ym2151_config =
 {
-	irqhandler
+	DEVCB_LINE(irqhandler)
 };
 
 static MACHINE_START( taitox )

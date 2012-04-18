@@ -669,13 +669,13 @@ GFXDECODE_END
 
 static const ym2151_interface ym2151_config =
 {
-	m72_ym2151_irq_handler
+	DEVCB_LINE(m72_ym2151_irq_handler)
 };
 
 /* this bootleg polls the YM2151 instead of taking interrupts from it */
 static const ym2151_interface dynablsb_ym2151_config =
 {
-	NULL
+	DEVCB_NULL
 };
 
 static INTERRUPT_GEN( fake_nmi )

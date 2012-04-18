@@ -307,7 +307,7 @@ static void silvmil_irqhandler( device_t *device, int irq )
 
 static const ym2151_interface silvmil_ym2151_interface =
 {
-	silvmil_irqhandler
+	DEVCB_LINE(silvmil_irqhandler)
 };
 
 

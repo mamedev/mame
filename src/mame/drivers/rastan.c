@@ -346,8 +346,8 @@ static void irqhandler( device_t *device, int irq )
 
 static const ym2151_interface ym2151_config =
 {
-	irqhandler,
-	rastan_bankswitch_w
+	DEVCB_LINE(irqhandler),
+	DEVCB_HANDLER(rastan_bankswitch_w)
 };
 
 static const msm5205_interface msm5205_config =

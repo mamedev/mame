@@ -781,8 +781,8 @@ static const ym2610_interface ym2610_config =
 
 static const ym2151_interface ym2151_config =
 {
-	irq_handler,
-	sound_bankswitch_2151_w
+	DEVCB_LINE(irq_handler),
+	DEVCB_HANDLER(sound_bankswitch_2151_w)
 };
 
 static const msm5205_interface msm5205_config =

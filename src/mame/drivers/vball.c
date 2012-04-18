@@ -401,7 +401,7 @@ static void vball_irq_handler(device_t *device, int irq)
 
 static const ym2151_interface ym2151_config =
 {
-	vball_irq_handler
+	DEVCB_LINE(vball_irq_handler)
 };
 
 

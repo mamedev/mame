@@ -917,7 +917,7 @@ INPUT_PORTS_END
 
 static const ym2151_interface ym2151_config =
 {
-	sound_cpu_irq
+	DEVCB_LINE(sound_cpu_irq)
 };
 
 

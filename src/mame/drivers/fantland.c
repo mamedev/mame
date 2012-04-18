@@ -893,7 +893,7 @@ static void galaxygn_sound_irq( device_t *device, int line )
 
 static const ym2151_interface galaxygn_ym2151_interface =
 {
-	galaxygn_sound_irq
+	DEVCB_LINE(galaxygn_sound_irq)
 };
 
 static MACHINE_CONFIG_START( galaxygn, fantland_state )

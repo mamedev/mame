@@ -500,7 +500,7 @@ static void chinagat_irq_handler( device_t *device, int irq )
 
 static const ym2151_interface ym2151_config =
 {
-	chinagat_irq_handler
+	DEVCB_LINE(chinagat_irq_handler)
 };
 
 /* This on the bootleg board, instead of the m6295 */

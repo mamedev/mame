@@ -778,7 +778,7 @@ static const ym2203_interface ym2203_config =
 
 static const ym2151_interface ym2151_config =
 {
-	sound_irq
+	DEVCB_LINE(sound_irq)
 };
 
 

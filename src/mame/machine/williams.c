@@ -5,7 +5,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "audio/williams.h"
 #include "cpu/m6800/m6800.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/6821pia.h"
@@ -988,18 +987,13 @@ MACHINE_START( joust2 )
 {
 	williams_state *state = machine.driver_data<williams_state>();
 	MACHINE_START_CALL(williams2);
-	williams_cvsd_init(machine);
 	state_save_register_global(machine, state->m_joust2_current_sound_data);
 }
 
 
 MACHINE_RESET( joust2 )
 {
-	pia6821_device *pia_3 = machine.device<pia6821_device>("cvsdpia");
-
-	/* standard init */
 	MACHINE_RESET_CALL(williams2);
-	pia_3->ca1_w(1);
 }
 
 
@@ -1013,10 +1007,8 @@ static TIMER_CALLBACK( joust2_deferred_snd_cmd_w )
 static WRITE8_DEVICE_HANDLER( joust2_pia_3_cb1_w )
 {
 	williams_state *state = device->machine().driver_data<williams_state>();
-	pia6821_device *pia_3 = device->machine().device<pia6821_device>("cvsdpia");
-
 	state->m_joust2_current_sound_data = (state->m_joust2_current_sound_data & ~0x100) | ((data << 8) & 0x100);
-	pia_3->cb1_w(data);
+	state->m_cvsd_sound->write(*device->machine().memory().first_space(), 0, state->m_joust2_current_sound_data);
 }
 
 
@@ -1024,6 +1016,6 @@ static WRITE8_DEVICE_HANDLER( joust2_snd_cmd_w )
 {
 	williams_state *state = device->machine().driver_data<williams_state>();
 	state->m_joust2_current_sound_data = (state->m_joust2_current_sound_data & ~0xff) | (data & 0xff);
-	williams_cvsd_data_w(device->machine(), state->m_joust2_current_sound_data);
+	state->m_cvsd_sound->write(*device->machine().memory().first_space(), 0, state->m_joust2_current_sound_data);
 	device->machine().scheduler().synchronize(FUNC(joust2_deferred_snd_cmd_w), state->m_joust2_current_sound_data);
 }

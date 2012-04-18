@@ -263,7 +263,7 @@ WRITE8_MEMBER(ddragon_state::darktowr_mcu_bank_w)
 
 WRITE8_MEMBER(ddragon_state::darktowr_bankswitch_w)
 {
-	int oldbank = machine().memory().bank("bank1");
+	int oldbank = machine().memory().bank("bank1")->entry();
 	int newbank = (data & 0xe0) >> 5;
 
 	m_scrollx_hi = (data & 0x01);
@@ -946,7 +946,7 @@ GFXDECODE_END
 
 static const ym2151_interface ym2151_config =
 {
-	irq_handler
+	DEVCB_LINE(irq_handler)
 };
 
 static const msm5205_interface msm5205_config =

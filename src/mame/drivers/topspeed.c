@@ -621,8 +621,8 @@ static void irq_handler( device_t *device, int irq )	/* assumes Z80 sandwiched b
 
 static const ym2151_interface ym2151_config =
 {
-	irq_handler,
-	sound_bankswitch_w
+	DEVCB_LINE(irq_handler),
+	DEVCB_HANDLER(sound_bankswitch_w)
 };
 
 static const msm5205_interface msm5205_config =

@@ -1558,125 +1558,6 @@ memory_manager::memory_manager(running_machine &machine)
 //**************************************************************************
 
 //-------------------------------------------------
-//  configure_bank - configure the addresses for a
-//  bank
-//-------------------------------------------------
-
-void memory_manager::configure_bank(const char *tag, int startentry, int numentries, void *base, offs_t stride)
-{
-	configure_bank(machine().root_device(), tag, startentry, numentries, base, stride);
-}
-
-void memory_manager::configure_bank(device_t &device, const char *tag, int startentry, int numentries, void *base, offs_t stride)
-{
-	// validation checks
-	astring fulltag;
-	memory_bank *bank = m_bankmap.find_hash_only(device.subtag(fulltag, tag));
-	if (bank == NULL)
-		fatalerror("configure_bank called for unknown bank '%s'", fulltag.cstr());
-	if (base == NULL)
-		fatalerror("configure_bank called NULL base");
-
-	// fill in the requested bank entries (backwards to improve allocation)
-	for (int entrynum = startentry + numentries - 1; entrynum >= startentry; entrynum--)
-		bank->configure(entrynum, reinterpret_cast<UINT8 *>(base) + (entrynum - startentry) * stride);
-}
-
-
-//-------------------------------------------------
-//  configure_bank_decrypted - configure the
-//  decrypted addresses for a bank
-//-------------------------------------------------
-
-void memory_manager::configure_bank_decrypted(const char *tag, int startentry, int numentries, void *base, offs_t stride)
-{
-	memory_configure_bank_decrypted(machine().root_device(), tag, startentry, numentries, base, stride);
-}
-
-void memory_manager::configure_bank_decrypted(device_t &device, const char *tag, int startentry, int numentries, void *base, offs_t stride)
-{
-	// validation checks
-	astring fulltag;
-	memory_bank *bank = m_bankmap.find_hash_only(device.subtag(fulltag, tag));
-	if (bank == NULL)
-		fatalerror("configure_bank_decrypted called for unknown bank '%s'", fulltag.cstr());
-	if (base == NULL)
-		fatalerror("configure_bank_decrypted called NULL base");
-
-	// fill in the requested bank entries (backwards to improve allocation)
-	for (int entrynum = startentry + numentries - 1; entrynum >= startentry; entrynum--)
-		bank->configure_decrypted(entrynum, reinterpret_cast<UINT8 *>(base) + (entrynum - startentry) * stride);
-}
-
-
-//-------------------------------------------------
-//  set_bank - select one pre-configured entry to
-//  be the new bank base
-//-------------------------------------------------
-
-void memory_manager::set_bank(const char *tag, int entrynum)
-{
-	set_bank(machine().root_device(), tag, entrynum);
-}
-
-void memory_manager::set_bank(device_t &device, const char *tag, int entrynum)
-{
-	// validation checks
-	astring fulltag;
-	memory_bank *bank = m_bankmap.find_hash_only(device.subtag(fulltag, tag));
-	if (bank == NULL)
-		fatalerror("set_bank called for unknown bank '%s'", fulltag.cstr());
-
-	// set the base
-	bank->set_entry(entrynum);
-}
-
-
-//-------------------------------------------------
-//  get_bank - return the currently selected bank
-//-------------------------------------------------
-
-int memory_manager::bank(const char *tag)
-{
-	return bank(machine().root_device(), tag);
-}
-
-int memory_manager::bank(device_t &device, const char *tag)
-{
-	// validation checks
-	astring fulltag;
-	memory_bank *bank = m_bankmap.find_hash_only(device.subtag(fulltag, tag));
-	if (bank == NULL)
-		fatalerror("bank() called for unknown bank '%s'", fulltag.cstr());
-
-	// return the current entry
-	return bank->entry();
-}
-
-
-//-------------------------------------------------
-//  set_bankptr - set the base of a bank
-//-------------------------------------------------
-
-void memory_manager::set_bankptr(const char *tag, void *base)
-{
-	set_bankptr(machine().root_device(), tag, base);
-}
-
-void memory_manager::set_bankptr(device_t &device, const char *tag, void *base)
-{
-	// validation checks
-	astring fulltag;
-	memory_bank *bank = m_bankmap.find_hash_only(device.subtag(fulltag, tag));
-	if (bank == NULL)
-		throw emu_fatalerror("memory_set_bankptr called for unknown bank '%s'", fulltag.cstr());
-
-	// set the base
-	bank->set_base(base);
-}
-
-
-//-------------------------------------------------
 //  shared - get a pointer to a shared memory
 //  region by tag
 //-------------------------------------------------
@@ -3015,18 +2896,18 @@ memory_bank &address_space::bank_find_or_allocate(const char *tag, offs_t addrst
 	adjust_addresses(bytestart, byteend, bytemask, bytemirror);
 
 	// if this bank is named, look it up
-	memory_bank *bank = NULL;
+	memory_bank *membank = NULL;
 	if (tag != NULL)
-		bank = manager().m_bankmap.find_hash_only(tag);
+		membank = manager().bank(tag);
 
 	// else try to find an exact match
 	else
-		for (bank = manager().m_banklist.first(); bank != NULL; bank = bank->next())
-			if (bank->anonymous() && bank->references_space(*this, ROW_READWRITE) && bank->matches_exactly(bytestart, byteend))
+		for (membank = manager().m_banklist.first(); membank != NULL; membank = membank->next())
+			if (membank->anonymous() && membank->references_space(*this, ROW_READWRITE) && membank->matches_exactly(bytestart, byteend))
 				break;
 
 	// if we don't have a bank yet, find a free one
-	if (bank == NULL)
+	if (membank == NULL)
 	{
 		// handle failure
 		int banknum = manager().m_banknext++;
@@ -3039,17 +2920,17 @@ memory_bank &address_space::bank_find_or_allocate(const char *tag, offs_t addrst
 		}
 
 		// allocate the bank
-		bank = global_alloc(memory_bank(*this, banknum, bytestart, byteend, tag));
-		manager().m_banklist.append(*bank);
+		membank = global_alloc(memory_bank(*this, banknum, bytestart, byteend, tag));
+		manager().m_banklist.append(*membank);
 
 		// for named banks, add to the map and register for save states
 		if (tag != NULL)
-			manager().m_bankmap.add_unique_hash(tag, bank, false);
+			manager().m_bankmap.add_unique_hash(tag, membank, false);
 	}
 
 	// add a reference for this space
-	bank->add_reference(*this, readorwrite);
-	return *bank;
+	membank->add_reference(*this, readorwrite);
+	return *membank;
 }
 
 
@@ -4463,14 +4344,14 @@ void memory_bank::expand_entries(int entrynum)
 
 
 //-------------------------------------------------
-//  configure - configure an entry
+//  configure_entry - configure an entry
 //-------------------------------------------------
 
-void memory_bank::configure(int entrynum, void *base)
+void memory_bank::configure_entry(int entrynum, void *base)
 {
 	// must be positive
 	if (entrynum < 0)
-		throw emu_fatalerror("memory_bank::configure called with out-of-range entry %d", entrynum);
+		throw emu_fatalerror("memory_bank::configure_entry called with out-of-range entry %d", entrynum);
 
 	// if we haven't allocated this many entries yet, expand our array
 	if (entrynum >= m_entry_count)
@@ -4486,15 +4367,27 @@ void memory_bank::configure(int entrynum, void *base)
 
 
 //-------------------------------------------------
-//  configure_decrypted - configure a decrypted
-//  entry
+//  configure_entries - configure multiple entries
 //-------------------------------------------------
 
-void memory_bank::configure_decrypted(int entrynum, void *base)
+void memory_bank::configure_entries(int startentry, int numentries, void *base, offs_t stride)
+{
+	// fill in the requested bank entries (backwards to improve allocation)
+	for (int entrynum = startentry + numentries - 1; entrynum >= startentry; entrynum--)
+		configure_entry(entrynum, reinterpret_cast<UINT8 *>(base) + (entrynum - startentry) * stride);
+}
+
+
+//-------------------------------------------------
+//  configure_decrypted_entry - configure a 
+//  decrypted entry
+//-------------------------------------------------
+
+void memory_bank::configure_decrypted_entry(int entrynum, void *base)
 {
 	// must be positive
 	if (entrynum < 0)
-		throw emu_fatalerror("memory_bank::configure called with out-of-range entry %d", entrynum);
+		throw emu_fatalerror("memory_bank::configure_decrypted_entry called with out-of-range entry %d", entrynum);
 
 	// if we haven't allocated this many entries yet, expand our array
 	if (entrynum >= m_entry_count)
@@ -4508,6 +4401,18 @@ void memory_bank::configure_decrypted(int entrynum, void *base)
 		*m_basedptr = m_entry[entrynum].m_decrypted;
 }
 
+
+//-------------------------------------------------
+//  configure_decrypted_entries - configure 
+//  multiple decrypted entries
+//-------------------------------------------------
+
+void memory_bank::configure_decrypted_entries(int startentry, int numentries, void *base, offs_t stride)
+{
+	// fill in the requested bank entries (backwards to improve allocation)
+	for (int entrynum = startentry + numentries - 1; entrynum >= startentry; entrynum--)
+		configure_decrypted_entry(entrynum, reinterpret_cast<UINT8 *>(base) + (entrynum - startentry) * stride);
+}
 
 
 //**************************************************************************
@@ -5637,17 +5542,13 @@ void handler_entry_write::write_stub_legacy(address_space &space, offs_t offset,
 
 
 // configure the addresses for a bank
-void memory_configure_bank(running_machine &machine, const char *tag, int startentry, int numentries, void *base, offs_t stride) { machine.memory().configure_bank(tag, startentry, numentries, base, stride); }
-void memory_configure_bank(device_t &device, const char *tag, int startentry, int numentries, void *base, offs_t stride) { device.machine().memory().configure_bank(device, tag, startentry, numentries, base, stride); }
+void memory_configure_bank(running_machine &machine, const char *tag, int startentry, int numentries, void *base, offs_t stride) { machine.root_device().subbank(tag)->configure_entries(startentry, numentries, base, stride); }
 
 // configure the decrypted addresses for a bank
-void memory_configure_bank_decrypted(running_machine &machine, const char *tag, int startentry, int numentries, void *base, offs_t stride) { machine.memory().configure_bank_decrypted(tag, startentry, numentries, base, stride); }
-void memory_configure_bank_decrypted(device_t &device, const char *tag, int startentry, int numentries, void *base, offs_t stride) { device.machine().memory().configure_bank_decrypted(device, tag, startentry, numentries, base, stride); }
+void memory_configure_bank_decrypted(running_machine &machine, const char *tag, int startentry, int numentries, void *base, offs_t stride) { machine.root_device().subbank(tag)->configure_decrypted_entries(startentry, numentries, base, stride); }
 
 // select one pre-configured entry to be the new bank base
-void memory_set_bank(running_machine &machine, const char *tag, int entrynum) { machine.memory().set_bank(tag, entrynum); }
-void memory_set_bank(device_t &device, const char *tag, int entrynum) { device.machine().memory().set_bank(device, tag, entrynum); }
+void memory_set_bank(running_machine &machine, const char *tag, int entrynum) { machine.root_device().subbank(tag)->set_entry(entrynum); }
 
 // set the absolute address of a bank base
-void memory_set_bankptr(running_machine &machine, const char *tag, void *base) { machine.memory().set_bankptr(tag, base); }
-void memory_set_bankptr(device_t &device, const char *tag, void *base) { device.machine().memory().set_bankptr(device, tag, base); }
+void memory_set_bankptr(running_machine &machine, const char *tag, void *base) { machine.root_device().subbank(tag)->set_base(base); }

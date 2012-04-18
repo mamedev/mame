@@ -1063,7 +1063,7 @@ static void namcos1_sound_interrupt( device_t *device, int irq )
 
 static const ym2151_interface ym2151_config =
 {
-	namcos1_sound_interrupt
+	DEVCB_LINE(namcos1_sound_interrupt)
 };
 
 static const namco_interface namco_config =

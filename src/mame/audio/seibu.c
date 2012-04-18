@@ -470,7 +470,7 @@ const ym3812_interface seibu_ym3812_interface =
 
 const ym2151_interface seibu_ym2151_interface =
 {
-	seibu_ym2151_irqhandler
+	DEVCB_LINE(seibu_ym2151_irqhandler)
 };
 
 const ym2203_interface seibu_ym2203_interface =

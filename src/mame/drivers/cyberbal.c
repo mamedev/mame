@@ -416,7 +416,7 @@ GFXDECODE_END
 
 static const ym2151_interface ym2151_config =
 {
-	atarigen_ym2151_irq_gen
+	DEVCB_LINE(atarigen_ym2151_irq_gen)
 };
 
 

@@ -532,7 +532,7 @@ static void metro_sound_irq_handler( device_t *device, int state )
 
 static const ym2151_interface ym2151_config =
 {
-	metro_sound_irq_handler	/* irq handler */
+	DEVCB_LINE(metro_sound_irq_handler)	/* irq handler */
 };
 
 

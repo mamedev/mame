@@ -6,17 +6,21 @@
 
 
 #include "machine/6821pia.h"
+#include "audio/williams.h"
 
 class williams_state : public driver_device
 {
 public:
 	williams_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+		  m_cvsd_sound(*this, "cvsd"),
 		  m_nvram(*this, "nvram") ,
 		m_videoram(*this, "videoram"),
 		m_blaster_palette_0(*this, "blaster_pal0"),
 		m_blaster_scanline_control(*this, "blaster_scan"),
 		m_williams2_tileram(*this, "williams2_tile"){ }
+
+	optional_device<williams_cvsd_sound_device> m_cvsd_sound;
 
 	required_shared_ptr<UINT8>	m_nvram;
 	UINT8 *m_mayday_protection;

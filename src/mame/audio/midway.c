@@ -44,90 +44,15 @@
 
 
 
-/*************************************
- *
- *  Constants
- *
- *************************************/
+//**************************************************************************
+//  CONSTANTS
+//**************************************************************************
 
 #define SSIO_CLOCK			XTAL_16MHz
 #define CSDELUXE_CLOCK		XTAL_16MHz
 #define SOUNDSGOOD_CLOCK	XTAL_16MHz
 #define TURBOCS_CLOCK		XTAL_8MHz
 #define SQUAWKTALK_CLOCK	XTAL_3_579545MHz
-
-
-
-/*************************************
- *
- *  Global variables
- *
- *************************************/
-
-static UINT8 mcr_sound_config;
-
-
-
-/*************************************
- *
- *  Generic MCR sound initialization
- *
- *************************************/
-
-void mcr_sound_init(running_machine &machine, UINT8 config)
-{
-	mcr_sound_config = config;
-
-	// Advanced Audio
-	if (mcr_sound_config & MCR_WILLIAMS_SOUND)
-		williams_cvsd_init(machine);
-}
-
-
-void mcr_sound_reset(running_machine &machine)
-{
-	// SSIO
-	if (mcr_sound_config & MCR_SSIO)
-	{
-		machine.device<midway_ssio_device>("ssio")->reset_write(1);
-		machine.device<midway_ssio_device>("ssio")->reset_write(0);
-	}
-
-	// Turbo Chip Squeak
-	if (mcr_sound_config & MCR_TURBO_CHIP_SQUEAK)
-	{
-		machine.device<midway_turbo_chip_squeak_device>("tcs")->reset_write(1);
-		machine.device<midway_turbo_chip_squeak_device>("tcs")->reset_write(0);
-	}
-
-	// Chip Squeak Deluxe
-	if (mcr_sound_config & MCR_CHIP_SQUEAK_DELUXE)
-	{
-		machine.device<midway_chip_squeak_deluxe_device>("csd")->reset_write(1);
-		machine.device<midway_chip_squeak_deluxe_device>("csd")->reset_write(0);
-	}
-
-	// Sounds Good
-	if (mcr_sound_config & MCR_SOUNDS_GOOD)
-	{
-		machine.device<midway_sounds_good_device>("sg")->reset_write(1);
-		machine.device<midway_sounds_good_device>("sg")->reset_write(0);
-	}
-
-	// Squawk n Talk
-	if (mcr_sound_config & MCR_SQUAWK_N_TALK)
-	{
-		machine.device<midway_squawk_n_talk_device>("snt")->reset_write(1);
-		machine.device<midway_squawk_n_talk_device>("snt")->reset_write(0);
-	}
-
-	// Advanced Audio
-	if (mcr_sound_config & MCR_WILLIAMS_SOUND)
-	{
-		williams_cvsd_reset_w(machine, 1);
-		williams_cvsd_reset_w(machine, 0);
-	}
-}
 
 
 
@@ -508,7 +433,7 @@ ADDRESS_MAP_END
 //  machine configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_FRAGMENT( midway_ssio )
+static MACHINE_CONFIG_FRAGMENT( midway_ssio )
 	MCFG_CPU_ADD("cpu", Z80, SSIO_CLOCK/2/4)
 	MCFG_CPU_PROGRAM_MAP(ssio_map)
 	MCFG_DEVICE_PERIODIC_INT_DEVICE(DEVICE_SELF_OWNER, midway_ssio_device, clock_14024, SSIO_CLOCK/2/16/10)
@@ -743,7 +668,7 @@ static const pia6821_interface csdeluxe_pia_intf =
 //  machine configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_FRAGMENT(midway_chip_squeak_deluxe)
+static MACHINE_CONFIG_FRAGMENT(midway_chip_squeak_deluxe)
 	MCFG_CPU_ADD("cpu", M68000, CSDELUXE_CLOCK/2)
 	MCFG_CPU_PROGRAM_MAP(csdeluxe_map)
 
@@ -930,7 +855,7 @@ static const pia6821_interface soundsgood_pia_intf =
 //  machine configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_FRAGMENT(midway_sounds_good)
+static MACHINE_CONFIG_FRAGMENT(midway_sounds_good)
 	MCFG_CPU_ADD("cpu", M68000, SOUNDSGOOD_CLOCK/2)
 	MCFG_CPU_PROGRAM_MAP(soundsgood_map)
 
@@ -1111,7 +1036,7 @@ static const pia6821_interface turbocs_pia_intf =
 //  machine configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_FRAGMENT(midway_turbo_chip_squeak)
+static MACHINE_CONFIG_FRAGMENT(midway_turbo_chip_squeak)
 	MCFG_CPU_ADD("cpu", M6809E, TURBOCS_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(turbocs_map)
 
@@ -1356,7 +1281,7 @@ static const pia6821_interface squawkntalk_pia1_intf =
 //  machine configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_FRAGMENT(midway_squawk_n_talk)
+static MACHINE_CONFIG_FRAGMENT(midway_squawk_n_talk)
 	MCFG_CPU_ADD("cpu", M6802, SQUAWKTALK_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(squawkntalk_map)
 

@@ -1,4 +1,6 @@
 #include "machine/6821pia.h"
+#include "audio/midway.h"
+#include "audio/williams.h"
 
 struct counter_state
 {
@@ -18,12 +20,14 @@ public:
 		m_chip_squeak_deluxe(*this, "csd"),
 		m_sounds_good(*this, "sg"),
 		m_turbo_chip_squeak(*this, "tcs"),
+		m_cvsd_sound(*this, "cvsd"),
 		  m_videoram(*this, "videoram"),
 		  m_spriteram(*this, "spriteram") { }
 
 	optional_device<midway_chip_squeak_deluxe_device> m_chip_squeak_deluxe;
 	optional_device<midway_sounds_good_device> m_sounds_good;
 	optional_device<midway_turbo_chip_squeak_device> m_turbo_chip_squeak;
+	optional_device<williams_cvsd_sound_device> m_cvsd_sound;
 
 	required_shared_ptr<UINT16> m_videoram;
 	required_shared_ptr<UINT16> m_spriteram;

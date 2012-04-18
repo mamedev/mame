@@ -679,8 +679,10 @@ public:
 	void set_base_decrypted(void *base);
 
 	// configure and set entries
-	void configure(int entrynum, void *base);
-	void configure_decrypted(int entrynum, void *base);
+	void configure_entry(int entrynum, void *base);
+	void configure_entries(int startentry, int numentries, void *base, offs_t stride);
+	void configure_decrypted_entry(int entrynum, void *base);
+	void configure_decrypted_entries(int startentry, int numentries, void *base, offs_t stride);
 	void set_entry(int entrynum);
 
 private:
@@ -753,26 +755,7 @@ public:
 	running_machine &machine() const { return m_machine; }
 	address_space *first_space() const { return m_spacelist.first(); }
 	memory_bank *first_bank() const { return m_banklist.first(); }
-
-	// configure the addresses for a bank
-	void configure_bank(const char *tag, int startentry, int numentries, void *base, offs_t stride);
-	void configure_bank(device_t &device, const char *tag, int startentry, int numentries, void *base, offs_t stride);
-
-	// configure the decrypted addresses for a bank
-	void configure_bank_decrypted(const char *tag, int startentry, int numentries, void *base, offs_t stride);
-	void configure_bank_decrypted(device_t &device, const char *tag, int startentry, int numentries, void *base, offs_t stride);
-
-	// select one pre-configured entry to be the new bank base
-	void set_bank(const char *tag, int entrynum);
-	void set_bank(device_t &device, const char *tag, int entrynum);
-
-	// return the currently selected bank
-	int bank(const char *tag);
-	int bank(device_t &device, const char *tag);
-
-	// set the absolute address of a bank base
-	void set_bankptr(const char *tag, void *base) ATTR_NONNULL(3);
-	void set_bankptr(device_t &device, const char *tag, void *base) ATTR_NONNULL(3);
+	memory_bank *bank(const char *tag) const { return m_bankmap.find_hash_only(tag); }
 
 	// get a pointer to a shared memory region by tag
 	memory_share *shared(const char *tag);
@@ -922,19 +905,15 @@ extern const char *const address_space_names[ADDRESS_SPACES];
 
 // configure the addresses for a bank
 void memory_configure_bank(running_machine &machine, const char *tag, int startentry, int numentries, void *base, offs_t stride) ATTR_NONNULL(5);
-void memory_configure_bank(device_t &device, const char *tag, int startentry, int numentries, void *base, offs_t stride) ATTR_NONNULL(5);
 
 // configure the decrypted addresses for a bank
 void memory_configure_bank_decrypted(running_machine &machine, const char *tag, int startentry, int numentries, void *base, offs_t stride) ATTR_NONNULL(5);
-void memory_configure_bank_decrypted(device_t &device, const char *tag, int startentry, int numentries, void *base, offs_t stride) ATTR_NONNULL(5);
 
 // select one pre-configured entry to be the new bank base
 void memory_set_bank(running_machine &machine, const char *tag, int entrynum);
-void memory_set_bank(device_t &device, const char *tag, int entrynum);
 
 // set the absolute address of a bank base
 void memory_set_bankptr(running_machine &machine, const char *tag, void *base) ATTR_NONNULL(3);
-void memory_set_bankptr(device_t &device, const char *tag, void *base) ATTR_NONNULL(3);
 
 
 

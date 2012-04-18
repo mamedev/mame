@@ -174,9 +174,6 @@ MACHINE_RESET( mcr )
 {
 	/* reset cocktail flip */
 	mcr_cocktail_flip = 0;
-
-	/* initialize the sound */
-	mcr_sound_reset(machine);
 }
 
 

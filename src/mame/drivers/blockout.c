@@ -268,7 +268,7 @@ static void blockout_irq_handler(device_t *device, int irq)
 
 static const ym2151_interface ym2151_config =
 {
-	blockout_irq_handler
+	DEVCB_LINE(blockout_irq_handler)
 };
 
 

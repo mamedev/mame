@@ -272,7 +272,7 @@ static READ8_HANDLER(t5182_sharedram_semaphore_main_r)
 
 const ym2151_interface t5182_ym2151_interface =
 {
-	t5182_ym2151_irq_handler
+	DEVCB_LINE(t5182_ym2151_irq_handler)
 };
 
 

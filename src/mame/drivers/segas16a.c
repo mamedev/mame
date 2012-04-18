@@ -1936,8 +1936,8 @@ INPUT_PORTS_END
 
 static const ym2151_interface ym2151_config =
 {
-	NULL,
-	n7751_control_w
+	DEVCB_NULL,
+	DEVCB_HANDLER(n7751_control_w)
 };
 
 

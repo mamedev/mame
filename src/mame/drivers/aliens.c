@@ -206,8 +206,8 @@ static const k007232_interface k007232_config =
 
 static const ym2151_interface ym2151_config =
 {
-	0,
-	aliens_snd_bankswitch_w
+	DEVCB_NULL,
+	DEVCB_HANDLER(aliens_snd_bankswitch_w)
 };
 
 

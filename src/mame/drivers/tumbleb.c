@@ -2219,7 +2219,7 @@ static void semicom_irqhandler( device_t *device, int irq )
 
 static const ym2151_interface semicom_ym2151_interface =
 {
-	semicom_irqhandler
+	DEVCB_LINE(semicom_irqhandler)
 };
 
 static MACHINE_RESET (htchctch)

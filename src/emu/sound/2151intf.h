@@ -8,8 +8,8 @@
 typedef struct _ym2151_interface ym2151_interface;
 struct _ym2151_interface
 {
-	void (*irqhandler)(device_t *device, int irq);
-	write8_device_func portwritehandler;
+	devcb_write_line irqhandler;
+	devcb_write8 portwritehandler;
 };
 
 READ8_DEVICE_HANDLER( ym2151_r );

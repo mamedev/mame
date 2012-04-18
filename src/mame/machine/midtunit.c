@@ -7,8 +7,6 @@
 #include "emu.h"
 #include "cpu/tms34010/tms34010.h"
 #include "cpu/m6809/m6809.h"
-#include "audio/williams.h"
-#include "audio/dcs.h"
 #include "includes/midtunit.h"
 
 
@@ -434,7 +432,6 @@ static void init_tunit_generic(running_machine &machine, int sound)
 	{
 		case SOUND_ADPCM:
 		case SOUND_ADPCM_LARGE:
-			williams_adpcm_init(machine);
 			break;
 
 		case SOUND_DCS:
@@ -466,7 +463,7 @@ DRIVER_INIT( mktunit )
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x1b00000, 0x1b6ffff, read16_delegate(FUNC(midtunit_state::mk_prot_r),state), write16_delegate(FUNC(midtunit_state::mk_prot_w),state));
 
 	/* sound chip protection (hidden RAM) */
-	machine.device("adpcm")->memory().space(AS_PROGRAM)->install_ram(0xfb9c, 0xfbc6);
+	machine.device("adpcm:cpu")->memory().space(AS_PROGRAM)->install_ram(0xfb9c, 0xfbc6);
 }
 
 DRIVER_INIT( mkturbo )
@@ -499,9 +496,9 @@ static void init_nbajam_common(running_machine &machine, int te_protection)
 
 	/* sound chip protection (hidden RAM) */
 	if (!te_protection)
-		machine.device("adpcm")->memory().space(AS_PROGRAM)->install_ram(0xfbaa, 0xfbd4);
+		machine.device("adpcm:cpu")->memory().space(AS_PROGRAM)->install_ram(0xfbaa, 0xfbd4);
 	else
-		machine.device("adpcm")->memory().space(AS_PROGRAM)->install_ram(0xfbec, 0xfc16);
+		machine.device("adpcm:cpu")->memory().space(AS_PROGRAM)->install_ram(0xfbec, 0xfc16);
 }
 
 DRIVER_INIT( nbajam )
@@ -527,8 +524,8 @@ DRIVER_INIT( jdreddp )
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x1b00000, 0x1bfffff, read16_delegate(FUNC(midtunit_state::jdredd_prot_r),state), write16_delegate(FUNC(midtunit_state::jdredd_prot_w),state));
 
 	/* sound chip protection (hidden RAM) */
-	machine.device("adpcm")->memory().space(AS_PROGRAM)->install_read_bank(0xfbcf, 0xfbf9, "bank7");
-	machine.device("adpcm")->memory().space(AS_PROGRAM)->install_write_bank(0xfbcf, 0xfbf9, "bank9");
+	machine.device("adpcm:cpu")->memory().space(AS_PROGRAM)->install_read_bank(0xfbcf, 0xfbf9, "bank7");
+	machine.device("adpcm:cpu")->memory().space(AS_PROGRAM)->install_write_bank(0xfbcf, 0xfbf9, "bank9");
 	memory_set_bankptr(machine, "bank9", auto_alloc_array(machine, UINT8, 0x80));
 
 #if ENABLE_ALL_JDREDD_LEVELS
@@ -574,13 +571,14 @@ DRIVER_INIT( mk2 )
 
 MACHINE_RESET( midtunit )
 {
+	midtunit_state *state = machine.driver_data<midtunit_state>();
 	/* reset sound */
 	switch (chip_type)
 	{
 		case SOUND_ADPCM:
 		case SOUND_ADPCM_LARGE:
-			williams_adpcm_reset_w(machine, 1);
-			williams_adpcm_reset_w(machine, 0);
+			state->m_adpcm_sound->reset_write(1);
+			state->m_adpcm_sound->reset_write(0);
 			break;
 
 		case SOUND_DCS:
@@ -633,13 +631,14 @@ WRITE16_MEMBER(midtunit_state::midtunit_sound_w)
 	}
 
 	/* call through based on the sound type */
+	midtunit_state *state = space.machine().driver_data<midtunit_state>();
 	if (ACCESSING_BITS_0_7 && ACCESSING_BITS_8_15)
 		switch (chip_type)
 		{
 			case SOUND_ADPCM:
 			case SOUND_ADPCM_LARGE:
-				williams_adpcm_reset_w(machine(), ~data & 0x100);
-				williams_adpcm_data_w(machine(), data & 0xff);
+				state->m_adpcm_sound->reset_write(~data & 0x100);
+				state->m_adpcm_sound->write(space, offset, data & 0xff);
 
 				/* the games seem to check for $82 loops, so this should be just barely enough */
 				fake_sound_state = 128;

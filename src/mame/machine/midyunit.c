@@ -7,7 +7,6 @@
 #include "emu.h"
 #include "cpu/tms34010/tms34010.h"
 #include "cpu/m6809/m6809.h"
-#include "audio/williams.h"
 #include "includes/midyunit.h"
 
 
@@ -172,8 +171,8 @@ WRITE16_MEMBER(midyunit_state::term2_sound_w)
 	if (offset == 0)
 		m_term2_analog_select = (data >> 12) & 3;
 
-	williams_adpcm_reset_w(machine(), (~data & 0x100) >> 1);
-	williams_adpcm_data_w(machine(), data);
+	m_adpcm_sound->reset_write((~data & 0x100) >> 1);
+	m_adpcm_sound->write(space, offset, data);
 }
 
 
@@ -298,24 +297,20 @@ static void init_generic(running_machine &machine, int bpp, int sound, int prot_
 	switch (sound)
 	{
 		case SOUND_CVSD_SMALL:
-			williams_cvsd_init(machine);
-			machine.device("cvsdcpu")->memory().space(AS_PROGRAM)->install_write_handler(prot_start, prot_end, write8_delegate(FUNC(midyunit_state::cvsd_protection_w),state));
+			machine.device("cvsd:cpu")->memory().space(AS_PROGRAM)->install_write_handler(prot_start, prot_end, write8_delegate(FUNC(midyunit_state::cvsd_protection_w),state));
 			state->m_cvsd_protection_base = machine.region("cvsdcpu")->base() + 0x10000 + (prot_start - 0x8000);
 			break;
 
 		case SOUND_CVSD:
-			williams_cvsd_init(machine);
-			machine.device("cvsdcpu")->memory().space(AS_PROGRAM)->install_ram(prot_start, prot_end);
+			machine.device("cvsd:cpu")->memory().space(AS_PROGRAM)->install_ram(prot_start, prot_end);
 			break;
 
 		case SOUND_ADPCM:
-			williams_adpcm_init(machine);
-			machine.device("adpcm")->memory().space(AS_PROGRAM)->install_ram(prot_start, prot_end);
+			machine.device("adpcm:cpu")->memory().space(AS_PROGRAM)->install_ram(prot_start, prot_end);
 			break;
 
 		case SOUND_NARC:
-			williams_narc_init(machine);
-			machine.device("narc1cpu")->memory().space(AS_PROGRAM)->install_ram(prot_start, prot_end);
+			machine.device("narcsnd:cpu0")->memory().space(AS_PROGRAM)->install_ram(prot_start, prot_end);
 			break;
 
 		case SOUND_YAWDIM:
@@ -559,19 +554,19 @@ MACHINE_RESET( midyunit )
 	switch (state->m_chip_type)
 	{
 		case SOUND_NARC:
-			williams_narc_reset_w(machine, 1);
-			williams_narc_reset_w(machine, 0);
+			state->m_narc_sound->reset_write(1);
+			state->m_narc_sound->reset_write(0);
 			break;
 
 		case SOUND_CVSD:
 		case SOUND_CVSD_SMALL:
-			williams_cvsd_reset_w(machine, 1);
-			williams_cvsd_reset_w(machine, 0);
+			state->m_cvsd_sound->reset_write(1);
+			state->m_cvsd_sound->reset_write(0);
 			break;
 
 		case SOUND_ADPCM:
-			williams_adpcm_reset_w(machine, 1);
-			williams_adpcm_reset_w(machine, 0);
+			state->m_adpcm_sound->reset_write(1);
+			state->m_adpcm_sound->reset_write(0);
 			break;
 
 		case SOUND_YAWDIM:
@@ -601,18 +596,18 @@ WRITE16_MEMBER(midyunit_state::midyunit_sound_w)
 		switch (m_chip_type)
 		{
 			case SOUND_NARC:
-				williams_narc_data_w(machine(), data);
+				m_narc_sound->write(space, offset, data);
 				break;
 
 			case SOUND_CVSD_SMALL:
 			case SOUND_CVSD:
-				williams_cvsd_reset_w(machine(), (~data & 0x100) >> 8);
-				williams_cvsd_data_w(machine(), (data & 0xff) | ((data & 0x200) >> 1));
+				m_cvsd_sound->reset_write((~data & 0x100) >> 8);
+				m_cvsd_sound->write(space, offset, (data & 0xff) | ((data & 0x200) >> 1));
 				break;
 
 			case SOUND_ADPCM:
-				williams_adpcm_reset_w(machine(), (~data & 0x100) >> 8);
-				williams_adpcm_data_w(machine(), data);
+				m_adpcm_sound->reset_write((~data & 0x100) >> 8);
+				m_adpcm_sound->write(space, offset, data);
 				break;
 
 			case SOUND_YAWDIM:

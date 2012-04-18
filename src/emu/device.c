@@ -203,6 +203,23 @@ const memory_region *device_t::subregion(const char *_tag) const
 
 
 //-------------------------------------------------
+//  subregion - return a pointer to the memory
+//  bank info for a given bank
+//-------------------------------------------------
+
+memory_bank *device_t::subbank(const char *_tag) const
+{
+	// safety first
+	if (this == NULL)
+		return NULL;
+
+	// build a fully-qualified name and look it up
+	astring fullpath;
+	return machine().memory().bank(subtag(fullpath, _tag));
+}
+
+
+//-------------------------------------------------
 //  static_set_clock - set/change the clock on
 //  a device
 //-------------------------------------------------

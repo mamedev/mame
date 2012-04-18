@@ -731,13 +731,13 @@ static WRITE8_DEVICE_HANDLER( sound_bankswitch_w )
 
 static const ym2151_interface ym2151_config =
 {
-	sound_irq,
-	sound_bankswitch_w
+	DEVCB_LINE(sound_irq),
+	DEVCB_HANDLER(sound_bankswitch_w)
 };
 
 static const ym2151_interface ym2151_interface2 =
 {
-	sound_irq2
+	DEVCB_LINE(sound_irq2)
 };
 
 /**********************************************************************************/

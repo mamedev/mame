@@ -2617,7 +2617,6 @@ static void mcr_init(running_machine &machine, int cpuboard, int vidboard, int s
 static DRIVER_INIT( solarfox )
 {
 	mcr_init(machine, 90009, 91399, 90908);
-	mcr_sound_init(machine, MCR_SSIO);
 
 	mcr_state *state = machine.driver_data<mcr_state>();
 	machine.device<midway_ssio_device>("ssio")->set_custom_input(0, 0x1c, read8_delegate(FUNC(mcr_state::solarfox_ip0_r),state));
@@ -2630,7 +2629,6 @@ static DRIVER_INIT( solarfox )
 static DRIVER_INIT( kick )
 {
 	mcr_init(machine, 90009, 91399, 90908);
-	mcr_sound_init(machine, MCR_SSIO);
 
 	mcr_state *state = machine.driver_data<mcr_state>();
 	machine.device<midway_ssio_device>("ssio")->set_custom_input(1, 0xf0, read8_delegate(FUNC(mcr_state::kick_ip1_r),state));
@@ -2642,14 +2640,12 @@ static DRIVER_INIT( kick )
 static DRIVER_INIT( mcr_90010 )
 {
 	mcr_init(machine, 90010, 91399, 90913);
-	mcr_sound_init(machine, MCR_SSIO);
 }
 
 
 static DRIVER_INIT( wacko )
 {
 	mcr_init(machine, 90010, 91399, 90913);
-	mcr_sound_init(machine, MCR_SSIO);
 
 	mcr_state *state = machine.driver_data<mcr_state>();
 	machine.device<midway_ssio_device>("ssio")->set_custom_input(1, 0xff, read8_delegate(FUNC(mcr_state::wacko_ip1_r),state));
@@ -2661,7 +2657,6 @@ static DRIVER_INIT( wacko )
 static DRIVER_INIT( twotiger )
 {
 	mcr_init(machine, 90010, 91399, 90913);
-	mcr_sound_init(machine, MCR_SSIO);
 
 	mcr_state *state = machine.driver_data<mcr_state>();
 	machine.device<midway_ssio_device>("ssio")->set_custom_output(4, 0xff, write8_delegate(FUNC(mcr_state::twotiger_op4_w),state));
@@ -2672,7 +2667,6 @@ static DRIVER_INIT( twotiger )
 static DRIVER_INIT( kroozr )
 {
 	mcr_init(machine, 90010, 91399, 91483);
-	mcr_sound_init(machine, MCR_SSIO);
 
 	mcr_state *state = machine.driver_data<mcr_state>();
 	machine.device<midway_ssio_device>("ssio")->set_custom_input(1, 0x47, read8_delegate(FUNC(mcr_state::kroozr_ip1_r),state));
@@ -2683,7 +2677,6 @@ static DRIVER_INIT( kroozr )
 static DRIVER_INIT( journey )
 {
 	mcr_init(machine, 91475, 91464, 90913);
-	mcr_sound_init(machine, MCR_SSIO);
 
 	mcr_state *state = machine.driver_data<mcr_state>();
 	machine.device<midway_ssio_device>("ssio")->set_custom_output(4, 0x01, write8_delegate(FUNC(mcr_state::journey_op4_w),state));
@@ -2693,14 +2686,12 @@ static DRIVER_INIT( journey )
 static DRIVER_INIT( mcr_91490 )
 {
 	mcr_init(machine, 91490, 91464, 90913);
-	mcr_sound_init(machine, MCR_SSIO);
 }
 
 
 static DRIVER_INIT( dotrone )
 {
 	mcr_init(machine, 91490, 91464, 91657);
-	mcr_sound_init(machine, MCR_SSIO | MCR_SQUAWK_N_TALK);
 
 	mcr_state *state = machine.driver_data<mcr_state>();
 	machine.device<midway_ssio_device>("ssio")->set_custom_output(4, 0xff, write8_delegate(FUNC(mcr_state::dotron_op4_w),state));
@@ -2710,7 +2701,6 @@ static DRIVER_INIT( dotrone )
 static DRIVER_INIT( nflfoot )
 {
 	mcr_init(machine, 91490, 91464, 91657);
-	mcr_sound_init(machine, MCR_SSIO | MCR_SQUAWK_N_TALK);
 
 	mcr_state *state = machine.driver_data<mcr_state>();
 	machine.device<midway_ssio_device>("ssio")->set_custom_input(2, 0x80, read8_delegate(FUNC(mcr_state::nflfoot_ip2_r),state));
@@ -2731,7 +2721,6 @@ static DRIVER_INIT( nflfoot )
 static DRIVER_INIT( demoderb )
 {
 	mcr_init(machine, 91490, 91464, 90913);
-	mcr_sound_init(machine, MCR_SSIO | MCR_TURBO_CHIP_SQUEAK);
 
 	mcr_state *state = machine.driver_data<mcr_state>();
 	machine.device<midway_ssio_device>("ssio")->set_custom_input(1, 0xfc, read8_delegate(FUNC(mcr_state::demoderb_ip1_r),state));

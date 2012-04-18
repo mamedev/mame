@@ -4,14 +4,22 @@
 
 **************************************************************************/
 
+#include "audio/williams.h"
+#include "audio/dcs.h"
+
 class midtunit_state : public driver_device
 {
 public:
 	midtunit_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_nvram(*this, "nvram") { }
+		  m_nvram(*this, "nvram"),
+		  m_cvsd_sound(*this, "cvsd"),
+		  m_adpcm_sound(*this, "adpcm") { }
 
 	required_shared_ptr<UINT16>	m_nvram;
+	optional_device<williams_cvsd_sound_device> m_cvsd_sound;
+	optional_device<williams_adpcm_sound_device> m_adpcm_sound;
+	
 	DECLARE_WRITE16_MEMBER(midtunit_cmos_enable_w);
 	DECLARE_WRITE16_MEMBER(midtunit_cmos_w);
 	DECLARE_READ16_MEMBER(midtunit_cmos_r);

@@ -1452,7 +1452,7 @@ GFXDECODE_END
 
 static const ym2151_interface ym2151_config =
 {
-	megasys1_sound_irq
+	DEVCB_LINE(megasys1_sound_irq)
 };
 
 static MACHINE_CONFIG_START( system_A, megasys1_state )

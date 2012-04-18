@@ -374,7 +374,7 @@ static void dd3_ymirq_handler(device_t *device, int irq)
 
 static const ym2151_interface ym2151_config =
 {
-	dd3_ymirq_handler
+	DEVCB_LINE(dd3_ymirq_handler)
 };
 
 /*******************************************************************************

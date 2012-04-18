@@ -449,7 +449,7 @@ GFXDECODE_END
 
 static const ym2151_interface ym2151_config =
 {
-	ym2151_irq_gen
+	DEVCB_LINE(ym2151_irq_gen)
 };
 
 

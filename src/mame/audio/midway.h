@@ -310,24 +310,6 @@ private:
 };
 
 
-/************ Generic MCR routines ***************/
-
-void mcr_sound_init(running_machine &machine, UINT8 config);
-void mcr_sound_reset(running_machine &machine);
-
-
-
-/************ Sound Configuration ***************/
-
-#define MCR_SSIO				0x01
-#define MCR_CHIP_SQUEAK_DELUXE	0x02
-#define MCR_SOUNDS_GOOD			0x04
-#define MCR_TURBO_CHIP_SQUEAK	0x08
-#define MCR_SQUAWK_N_TALK		0x10
-#define MCR_WILLIAMS_SOUND		0x20
-
-
-
 /************ SSIO input ports ***************/
 
 #define SSIO_INPUT_PORTS(ssio) \

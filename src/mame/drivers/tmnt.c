@@ -2038,7 +2038,7 @@ static void cuebrick_irq_handler( device_t *device, int state )
 
 static const ym2151_interface ym2151_interface_cbj =
 {
-	cuebrick_irq_handler
+	DEVCB_LINE(cuebrick_irq_handler)
 };
 
 static void volume_callback(device_t *device, int v)

@@ -649,7 +649,7 @@ static const ym2203_interface ym2203_config =
 
 static const ym2151_interface whizz_ym2151_interface =
 {
-	irqhandler
+	DEVCB_LINE(irqhandler)
 };
 
 static MACHINE_CONFIG_START( sidearms, sidearms_state )

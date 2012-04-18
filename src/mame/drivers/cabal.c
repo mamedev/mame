@@ -464,7 +464,7 @@ static void irqhandler(device_t *device, int irq)
 
 static const ym2151_interface cabalbl_ym2151_interface =
 {
-	irqhandler
+	DEVCB_LINE(irqhandler)
 };
 
 static const msm5205_interface msm5205_interface_1 =

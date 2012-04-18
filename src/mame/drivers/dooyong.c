@@ -815,7 +815,7 @@ static const ym2203_interface ym2203_interface_2 =
 
 static const ym2151_interface ym2151_config =
 {
-	irqhandler
+	DEVCB_LINE(irqhandler)
 };
 
 /***************************************************************************

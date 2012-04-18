@@ -171,9 +171,6 @@ static void mcr68_common_init(running_machine &machine)
 
 	/* initialize the clock */
 	state->m_m6840_internal_counter_period = attotime::from_hz(machine.device("maincpu")->unscaled_clock() / 10);
-
-	/* initialize the sound */
-	mcr_sound_reset(machine);
 }
 
 

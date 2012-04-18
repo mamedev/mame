@@ -280,7 +280,7 @@ static void sound_irq(device_t *device, int state)
 
 static const ym2151_interface ym2151_config =
 {
-	sound_irq
+	DEVCB_LINE(sound_irq)
 };
 
 static const deco16ic_interface tumblep_deco16ic_tilegen1_intf =

@@ -266,7 +266,7 @@ static void chqflag_ym2151_irq_w( device_t *device, int data )
 
 static const ym2151_interface ym2151_config =
 {
-	chqflag_ym2151_irq_w
+	DEVCB_LINE(chqflag_ym2151_irq_w)
 };
 
 static void volume_callback0( device_t *device, int v )

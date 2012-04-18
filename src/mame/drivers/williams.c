@@ -493,7 +493,6 @@
 #include "sound/hc55516.h"
 #include "machine/6821pia.h"
 #include "machine/ticket.h"
-#include "audio/williams.h"
 #include "includes/williams.h"
 #include "machine/nvram.h"
 
@@ -1694,8 +1693,8 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( joust2, williams2 )
 
 	/* basic machine hardware */
-	MCFG_DEVICE_REMOVE("mono")
-	MCFG_FRAGMENT_ADD(williams_cvsd_sound)
+	MCFG_WILLIAMS_CVSD_SOUND_ADD("cvsd")
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_MACHINE_START(joust2)
 	MCFG_MACHINE_RESET(joust2)
@@ -2678,7 +2677,7 @@ ROM_START( joust2 )
 	ROM_LOAD( "ic08_r1.cpu", 0x0E000, 0x2000, CRC(84517c3c) SHA1(de0b6473953783c091ddcc7aaa89fc1ec3b9d378) )	/* IC08 ROM08 */
 
 	/* sound board */
-	ROM_REGION( 0x90000, "cvsdcpu", 0 )
+	ROM_REGION( 0x90000, "cvsd:cpu", 0 )
 	ROM_LOAD( "u04_r1.snd", 0x10000, 0x8000, CRC(3af6b47d) SHA1(aff19d65a4d9c249dec6a9e04a4066fada0f8fa1) )	/* IC04 ROM23 */
 	ROM_RELOAD(             0x18000, 0x8000 )
 	ROM_RELOAD(             0x20000, 0x8000 )

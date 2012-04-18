@@ -4805,7 +4805,7 @@ static void irq_handler(device_t *device, int irq)
 
 static const ym2151_interface afega_ym2151_intf =
 {
-	irq_handler
+	DEVCB_LINE(irq_handler)
 };
 
 

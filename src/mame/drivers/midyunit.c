@@ -114,7 +114,6 @@ Notes:
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/tms34010/tms34010.h"
-#include "audio/williams.h"
 #include "sound/okim6295.h"
 #include "includes/midyunit.h"
 
@@ -152,19 +151,19 @@ static WRITE8_DEVICE_HANDLER( yawdim_oki_bank_w )
 
 CUSTOM_INPUT_MEMBER(midyunit_state::narc_talkback_strobe_r)
 {
-	return (williams_narc_talkback_r(machine()) >> 8) & 1;
+	return (m_narc_sound->read(*machine().memory().first_space(), 0) >> 8) & 1;
 }
 
 
 CUSTOM_INPUT_MEMBER(midyunit_state::narc_talkback_data_r)
 {
-	return williams_narc_talkback_r(machine()) & 0xff;
+	return m_narc_sound->read(*machine().memory().first_space(), 0) & 0xff;
 }
 
 
 CUSTOM_INPUT_MEMBER(midyunit_state::adpcm_irq_state_r)
 {
-	return williams_adpcm_sound_irq_r(machine()) & 1;
+	return m_adpcm_sound->irq_read() & 1;
 }
 
 
@@ -1018,7 +1017,10 @@ static MACHINE_CONFIG_START( zunit, midyunit_state )
 	MCFG_VIDEO_START(midzunit)
 
 	/* sound hardware */
-	MCFG_FRAGMENT_ADD(williams_narc_sound)
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_WILLIAMS_NARC_SOUND_ADD("narcsnd")
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -1046,13 +1048,17 @@ static MACHINE_CONFIG_START( yunit_core, midyunit_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(STDRES_PIXEL_CLOCK*2, 505, 0, 399, 289, 0, 253)
 	MCFG_SCREEN_UPDATE_STATIC(tms340x0_ind16)
+	
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( yunit_cvsd_4bit_slow, yunit_core )
 
 	/* basic machine hardware */
-	MCFG_FRAGMENT_ADD(williams_cvsd_sound)
+	MCFG_WILLIAMS_CVSD_SOUND_ADD("cvsd")
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	/* video hardware */
 	MCFG_PALETTE_LENGTH(256)
@@ -1065,7 +1071,9 @@ static MACHINE_CONFIG_DERIVED( yunit_cvsd_4bit_fast, yunit_core )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(FAST_MASTER_CLOCK)
-	MCFG_FRAGMENT_ADD(williams_cvsd_sound)
+	
+	MCFG_WILLIAMS_CVSD_SOUND_ADD("cvsd")
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	/* video hardware */
 	MCFG_PALETTE_LENGTH(256)
@@ -1076,7 +1084,8 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( yunit_cvsd_6bit_slow, yunit_core )
 
 	/* basic machine hardware */
-	MCFG_FRAGMENT_ADD(williams_cvsd_sound)
+	MCFG_WILLIAMS_CVSD_SOUND_ADD("cvsd")
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	/* video hardware */
 	MCFG_PALETTE_LENGTH(4096)
@@ -1089,7 +1098,9 @@ static MACHINE_CONFIG_DERIVED( yunit_adpcm_6bit_fast, yunit_core )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(FAST_MASTER_CLOCK)
-	MCFG_FRAGMENT_ADD(williams_adpcm_sound)
+	
+	MCFG_WILLIAMS_ADPCM_SOUND_ADD("adpcm")
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	/* video hardware */
 	MCFG_PALETTE_LENGTH(4096)
@@ -1102,7 +1113,9 @@ static MACHINE_CONFIG_DERIVED( yunit_adpcm_6bit_faster, yunit_core )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(FASTER_MASTER_CLOCK)
-	MCFG_FRAGMENT_ADD(williams_adpcm_sound)
+	
+	MCFG_WILLIAMS_ADPCM_SOUND_ADD("adpcm")
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	/* video hardware */
 	MCFG_PALETTE_LENGTH(4096)
@@ -1122,8 +1135,6 @@ static MACHINE_CONFIG_DERIVED( mkyawdim, yunit_core )
 	MCFG_VIDEO_START(mkyawdim)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-
 	MCFG_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -1137,13 +1148,13 @@ MACHINE_CONFIG_END
  *************************************/
 
 ROM_START( narc )
-	ROM_REGION( 0x90000, "narc1cpu", 0 )    /* sound CPU */
+	ROM_REGION( 0x90000, "narcsnd:cpu0", 0 )    /* sound CPU */
 	ROM_LOAD( "narcrev2.u4", 0x50000, 0x10000, CRC(450a591a) SHA1(bbda8061262738e5866f2707f69483a0a51d2910) )
 	ROM_RELOAD(              0x60000, 0x10000 )
 	ROM_LOAD( "narcrev2.u5", 0x70000, 0x10000, CRC(e551e5e3) SHA1(c8b4f53dbd4c534abb77d4dc07c4d12653b79894) )
 	ROM_RELOAD(              0x80000, 0x10000 )
 
-	ROM_REGION( 0x90000, "narc2cpu", 0 )	/* slave sound CPU */
+	ROM_REGION( 0x90000, "narcsnd:cpu1", 0 )	/* slave sound CPU */
 	ROM_LOAD( "narcrev2.u35", 0x10000, 0x10000, CRC(81295892) SHA1(159664e5ee03c88d6e940e70e87e2150dc5b8b25) )
 	ROM_RELOAD(               0x20000, 0x10000 )
 	ROM_LOAD( "narcrev2.u36", 0x30000, 0x10000, CRC(16cdbb13) SHA1(2dfd961a5d909c1804f4fda34de33ee2664c4bc6) )
@@ -1227,13 +1238,13 @@ ROM_END
 
 
 ROM_START( narc3 )
-	ROM_REGION( 0x90000, "narc1cpu", 0 )	/* sound CPU */
+	ROM_REGION( 0x90000, "narcsnd:cpu0", 0 )	/* sound CPU */
 	ROM_LOAD( "narcrev2.u4", 0x50000, 0x10000, CRC(450a591a) SHA1(bbda8061262738e5866f2707f69483a0a51d2910) )
 	ROM_RELOAD(              0x60000, 0x10000 )
 	ROM_LOAD( "narcrev2.u5", 0x70000, 0x10000, CRC(e551e5e3) SHA1(c8b4f53dbd4c534abb77d4dc07c4d12653b79894) )
 	ROM_RELOAD(              0x80000, 0x10000 )
 
-	ROM_REGION( 0x90000, "narc2cpu", 0 )	/* slave sound CPU */
+	ROM_REGION( 0x90000, "narcsnd:cpu1", 0 )	/* slave sound CPU */
 	ROM_LOAD( "narcrev2.u35", 0x10000, 0x10000, CRC(81295892) SHA1(159664e5ee03c88d6e940e70e87e2150dc5b8b25) )
 	ROM_RELOAD(               0x20000, 0x10000 )
 	ROM_LOAD( "narcrev2.u36", 0x30000, 0x10000, CRC(16cdbb13) SHA1(2dfd961a5d909c1804f4fda34de33ee2664c4bc6) )
@@ -1328,13 +1339,13 @@ ROM_START( narc3 )
 ROM_END
 
 ROM_START( narc2 )
-	ROM_REGION( 0x90000, "narc1cpu", 0 )	/* sound CPU */
+	ROM_REGION( 0x90000, "narcsnd:cpu0", 0 )	/* sound CPU */
 	ROM_LOAD( "narcrev2.u4", 0x50000, 0x10000, CRC(450a591a) SHA1(bbda8061262738e5866f2707f69483a0a51d2910) )
 	ROM_RELOAD(              0x60000, 0x10000 )
 	ROM_LOAD( "narcrev2.u5", 0x70000, 0x10000, CRC(e551e5e3) SHA1(c8b4f53dbd4c534abb77d4dc07c4d12653b79894) )
 	ROM_RELOAD(              0x80000, 0x10000 )
 
-	ROM_REGION( 0x90000, "narc2cpu", 0 )	/* slave sound CPU */
+	ROM_REGION( 0x90000, "narcsnd:cpu1", 0 )	/* slave sound CPU */
 	ROM_LOAD( "narcrev2.u35", 0x10000, 0x10000, CRC(81295892) SHA1(159664e5ee03c88d6e940e70e87e2150dc5b8b25) )
 	ROM_RELOAD(               0x20000, 0x10000 )
 	ROM_LOAD( "narcrev2.u36", 0x30000, 0x10000, CRC(16cdbb13) SHA1(2dfd961a5d909c1804f4fda34de33ee2664c4bc6) )
@@ -1430,7 +1441,7 @@ ROM_END
 
 
 ROM_START( trog )
-	ROM_REGION( 0x90000, "cvsdcpu", 0 )	/* sound CPU */
+	ROM_REGION( 0x90000, "cvsd:cpu", 0 )	/* sound CPU */
 	ROM_LOAD (   "trogu4.bin", 0x10000, 0x10000, CRC(759d0bf4) SHA1(c4c3fa51c43cf7fd241ac1f33d7d220aa9f9edb3) )
 	ROM_RELOAD(                0x20000, 0x10000 )
 	ROM_LOAD (  "trogu19.bin", 0x30000, 0x10000, CRC(960c333d) SHA1(da8ce8dfffffe7a2d60b3f75cc5aa88e5e2be659) )
@@ -1460,7 +1471,7 @@ ROM_END
 
 
 ROM_START( trog4 )
-	ROM_REGION( 0x90000, "cvsdcpu", 0 )	/* sound CPU */
+	ROM_REGION( 0x90000, "cvsd:cpu", 0 )	/* sound CPU */
 	ROM_LOAD (   "trogu4.bin", 0x10000, 0x10000, CRC(759d0bf4) SHA1(c4c3fa51c43cf7fd241ac1f33d7d220aa9f9edb3) )
 	ROM_RELOAD(                0x20000, 0x10000 )
 	ROM_LOAD (  "trogu19.bin", 0x30000, 0x10000, CRC(960c333d) SHA1(da8ce8dfffffe7a2d60b3f75cc5aa88e5e2be659) )
@@ -1490,7 +1501,7 @@ ROM_END
 
 
 ROM_START( trog3 )
-	ROM_REGION( 0x90000, "cvsdcpu", 0 )	/* sound CPU */
+	ROM_REGION( 0x90000, "cvsd:cpu", 0 )	/* sound CPU */
 	ROM_LOAD (   "trogu4.bin", 0x10000, 0x10000, CRC(759d0bf4) SHA1(c4c3fa51c43cf7fd241ac1f33d7d220aa9f9edb3) )
 	ROM_RELOAD(                0x20000, 0x10000 )
 	ROM_LOAD (  "trogu19.bin", 0x30000, 0x10000, CRC(960c333d) SHA1(da8ce8dfffffe7a2d60b3f75cc5aa88e5e2be659) )
@@ -1520,7 +1531,7 @@ ROM_END
 
 
 ROM_START( trogpa6 )
-	ROM_REGION( 0x90000, "cvsdcpu", 0 )	/* sound CPU */
+	ROM_REGION( 0x90000, "cvsd:cpu", 0 )	/* sound CPU */
 	ROM_LOAD (   "trogu4.bin", 0x10000, 0x10000, CRC(759d0bf4) SHA1(c4c3fa51c43cf7fd241ac1f33d7d220aa9f9edb3) )
 	ROM_RELOAD(                0x20000, 0x10000 )
 	ROM_LOAD (  "trogu19.bin", 0x30000, 0x10000, CRC(960c333d) SHA1(da8ce8dfffffe7a2d60b3f75cc5aa88e5e2be659) )
@@ -1550,7 +1561,7 @@ ROM_END
 
 
 ROM_START( trogpa4 )
-	ROM_REGION( 0x90000, "cvsdcpu", 0 )	/* sound CPU */
+	ROM_REGION( 0x90000, "cvsd:cpu", 0 )	/* sound CPU */
 	ROM_LOAD (   "trogu4.bin", 0x10000, 0x10000, CRC(759d0bf4) SHA1(c4c3fa51c43cf7fd241ac1f33d7d220aa9f9edb3) )
 	ROM_RELOAD(                0x20000, 0x10000 )
 	ROM_LOAD (  "trogu19.bin", 0x30000, 0x10000, CRC(960c333d) SHA1(da8ce8dfffffe7a2d60b3f75cc5aa88e5e2be659) )
@@ -1580,7 +1591,7 @@ ROM_END
 
 
 ROM_START( smashtv )
-	ROM_REGION( 0x90000, "cvsdcpu", 0 )	/* sound CPU */
+	ROM_REGION( 0x90000, "cvsd:cpu", 0 )	/* sound CPU */
 	ROM_LOAD (  "sl2.u4", 0x10000, 0x10000, CRC(29d3f6c8) SHA1(8a90cdff54f59ddb7dba521504d880515a59df08) )
 	ROM_RELOAD(           0x20000, 0x10000 )
 	ROM_LOAD ( "sl2.u19", 0x30000, 0x10000, CRC(ac5a402a) SHA1(c476018062126dc3936caa2c328de490737165ec) )
@@ -1608,7 +1619,7 @@ ROM_END
 
 
 ROM_START( smashtv6 )
-	ROM_REGION( 0x90000, "cvsdcpu", 0 )	/* sound CPU */
+	ROM_REGION( 0x90000, "cvsd:cpu", 0 )	/* sound CPU */
 	ROM_LOAD (  "sl2.u4", 0x10000, 0x10000, CRC(29d3f6c8) SHA1(8a90cdff54f59ddb7dba521504d880515a59df08) )
 	ROM_RELOAD(           0x20000, 0x10000 )
 	ROM_LOAD ( "sl2.u19", 0x30000, 0x10000, CRC(ac5a402a) SHA1(c476018062126dc3936caa2c328de490737165ec) )
@@ -1636,7 +1647,7 @@ ROM_END
 
 
 ROM_START( smashtv5 )
-	ROM_REGION( 0x90000, "cvsdcpu", 0 ) /* sound CPU */
+	ROM_REGION( 0x90000, "cvsd:cpu", 0 ) /* sound CPU */
 	ROM_LOAD (  "sl2.u4", 0x10000, 0x10000, CRC(29d3f6c8) SHA1(8a90cdff54f59ddb7dba521504d880515a59df08) )
 	ROM_RELOAD(           0x20000, 0x10000 )
 	ROM_LOAD ( "sl2.u19", 0x30000, 0x10000, CRC(ac5a402a) SHA1(c476018062126dc3936caa2c328de490737165ec) )
@@ -1664,7 +1675,7 @@ ROM_END
 
 
 ROM_START( smashtv4 )
-	ROM_REGION( 0x90000, "cvsdcpu", 0 )	/* sound CPU */
+	ROM_REGION( 0x90000, "cvsd:cpu", 0 )	/* sound CPU */
 	ROM_LOAD (  "sl2.u4", 0x10000, 0x10000, CRC(29d3f6c8) SHA1(8a90cdff54f59ddb7dba521504d880515a59df08) )
 	ROM_RELOAD(           0x20000, 0x10000 )
 	ROM_LOAD ( "sl2.u19", 0x30000, 0x10000, CRC(ac5a402a) SHA1(c476018062126dc3936caa2c328de490737165ec) )
@@ -1692,7 +1703,7 @@ ROM_END
 
 
 ROM_START( smashtv3 )
-	ROM_REGION( 0x90000, "cvsdcpu", 0 )	/* sound CPU */
+	ROM_REGION( 0x90000, "cvsd:cpu", 0 )	/* sound CPU */
 	ROM_LOAD (  "sl2.u4", 0x10000, 0x10000, CRC(29d3f6c8) SHA1(8a90cdff54f59ddb7dba521504d880515a59df08) )
 	ROM_RELOAD(           0x20000, 0x10000 )
 	ROM_LOAD ( "sl2.u19", 0x30000, 0x10000, CRC(ac5a402a) SHA1(c476018062126dc3936caa2c328de490737165ec) )
@@ -1720,7 +1731,7 @@ ROM_END
 
 
 ROM_START( hiimpact )
-	ROM_REGION( 0x90000, "cvsdcpu", 0 )	/* sound CPU */
+	ROM_REGION( 0x90000, "cvsd:cpu", 0 )	/* sound CPU */
 	ROM_LOAD (  "sl1u4.bin", 0x10000, 0x20000, CRC(28effd6a) SHA1(4a839f15e1b453a22fdef7b1801b8cc5cfdf3c29) )
 	ROM_LOAD ( "sl1u19.bin", 0x30000, 0x20000, CRC(0ea22c89) SHA1(6d4579f6b10cac685be01348451b3537a0626034) )
 	ROM_LOAD ( "sl1u20.bin", 0x50000, 0x20000, CRC(4e747ab5) SHA1(82040f40aac7dae577376a742eadaaa9644500c1) )
@@ -1755,7 +1766,7 @@ ROM_END
 
 
 ROM_START( hiimpact4 )
-	ROM_REGION( 0x90000, "cvsdcpu", 0 )	/* sound CPU */
+	ROM_REGION( 0x90000, "cvsd:cpu", 0 )	/* sound CPU */
 	ROM_LOAD (  "sl1u4.bin", 0x10000, 0x20000, CRC(28effd6a) SHA1(4a839f15e1b453a22fdef7b1801b8cc5cfdf3c29) )
 	ROM_LOAD ( "sl1u19.bin", 0x30000, 0x20000, CRC(0ea22c89) SHA1(6d4579f6b10cac685be01348451b3537a0626034) )
 	ROM_LOAD ( "sl1u20.bin", 0x50000, 0x20000, CRC(4e747ab5) SHA1(82040f40aac7dae577376a742eadaaa9644500c1) )
@@ -1790,7 +1801,7 @@ ROM_END
 
 
 ROM_START( hiimpact3 )
-	ROM_REGION( 0x90000, "cvsdcpu", 0 )	/* sound CPU */
+	ROM_REGION( 0x90000, "cvsd:cpu", 0 )	/* sound CPU */
 	ROM_LOAD (  "sl1u4.bin", 0x10000, 0x20000, CRC(28effd6a) SHA1(4a839f15e1b453a22fdef7b1801b8cc5cfdf3c29) )
 	ROM_LOAD ( "sl1u19.bin", 0x30000, 0x20000, CRC(0ea22c89) SHA1(6d4579f6b10cac685be01348451b3537a0626034) )
 	ROM_LOAD ( "sl1u20.bin", 0x50000, 0x20000, CRC(4e747ab5) SHA1(82040f40aac7dae577376a742eadaaa9644500c1) )
@@ -1825,7 +1836,7 @@ ROM_END
 
 
 ROM_START( hiimpact2 )
-	ROM_REGION( 0x90000, "cvsdcpu", 0 )	/* sound CPU */
+	ROM_REGION( 0x90000, "cvsd:cpu", 0 )	/* sound CPU */
 	ROM_LOAD (  "sl1u4.bin", 0x10000, 0x20000, CRC(28effd6a) SHA1(4a839f15e1b453a22fdef7b1801b8cc5cfdf3c29) )
 	ROM_LOAD ( "sl1u19.bin", 0x30000, 0x20000, CRC(0ea22c89) SHA1(6d4579f6b10cac685be01348451b3537a0626034) )
 	ROM_LOAD ( "sl1u20.bin", 0x50000, 0x20000, CRC(4e747ab5) SHA1(82040f40aac7dae577376a742eadaaa9644500c1) )
@@ -1860,7 +1871,7 @@ ROM_END
 
 
 ROM_START( hiimpact1 )
-	ROM_REGION( 0x90000, "cvsdcpu", 0 )	/* sound CPU */
+	ROM_REGION( 0x90000, "cvsd:cpu", 0 )	/* sound CPU */
 	ROM_LOAD (  "sl1u4.bin", 0x10000, 0x20000, CRC(28effd6a) SHA1(4a839f15e1b453a22fdef7b1801b8cc5cfdf3c29) )
 	ROM_LOAD ( "sl1u19.bin", 0x30000, 0x20000, CRC(0ea22c89) SHA1(6d4579f6b10cac685be01348451b3537a0626034) )
 	ROM_LOAD ( "sl1u20.bin", 0x50000, 0x20000, CRC(4e747ab5) SHA1(82040f40aac7dae577376a742eadaaa9644500c1) )
@@ -1895,7 +1906,7 @@ ROM_END
 
 
 ROM_START( hiimpactp )
-	ROM_REGION( 0x90000, "cvsdcpu", 0 )	/* sound CPU */
+	ROM_REGION( 0x90000, "cvsd:cpu", 0 )	/* sound CPU */
 	ROM_LOAD (  "sl1u4.bin", 0x10000, 0x20000, CRC(28effd6a) SHA1(4a839f15e1b453a22fdef7b1801b8cc5cfdf3c29) )
 	ROM_LOAD ( "sl1u19.bin", 0x30000, 0x20000, CRC(0ea22c89) SHA1(6d4579f6b10cac685be01348451b3537a0626034) )
 	ROM_LOAD ( "sl1u20.bin", 0x50000, 0x20000, CRC(4e747ab5) SHA1(82040f40aac7dae577376a742eadaaa9644500c1) )
@@ -1930,7 +1941,7 @@ ROM_END
 
 
 ROM_START( shimpact )
-	ROM_REGION( 0x90000, "cvsdcpu", 0 )	/* sound CPU */
+	ROM_REGION( 0x90000, "cvsd:cpu", 0 )	/* sound CPU */
 	ROM_LOAD (   "shiu4.bin", 0x10000, 0x20000, CRC(1e5a012c) SHA1(4077fc266799a01738b7f88e867535f1fbacd557) )
 	ROM_LOAD (  "shiu19.bin", 0x30000, 0x20000, CRC(10f9684e) SHA1(1fdc5364f87fb65f4f2a438841e0fe847f765aaf) )
 	ROM_LOAD (  "shiu20.bin", 0x50000, 0x20000, CRC(1b4a71c1) SHA1(74b7b4ae76ebe65f1f46b2117970bfefefbb5344) )
@@ -1958,7 +1969,7 @@ ROM_END
 
 
 ROM_START( shimpactp6 )
-	ROM_REGION( 0x90000, "cvsdcpu", 0 )	/* sound CPU */
+	ROM_REGION( 0x90000, "cvsd:cpu", 0 )	/* sound CPU */
 	ROM_LOAD (   "shiu4.bin", 0x10000, 0x20000, CRC(1e5a012c) SHA1(4077fc266799a01738b7f88e867535f1fbacd557) )
 	ROM_LOAD (  "shiu19.bin", 0x30000, 0x20000, CRC(10f9684e) SHA1(1fdc5364f87fb65f4f2a438841e0fe847f765aaf) )
 	ROM_LOAD (  "shiu20.bin", 0x50000, 0x20000, CRC(1b4a71c1) SHA1(74b7b4ae76ebe65f1f46b2117970bfefefbb5344) )
@@ -1986,7 +1997,7 @@ ROM_END
 
 
 ROM_START( shimpactp5 )
-	ROM_REGION( 0x90000, "cvsdcpu", 0 )	/* sound CPU */
+	ROM_REGION( 0x90000, "cvsd:cpu", 0 )	/* sound CPU */
 	ROM_LOAD (   "shiu4.bin", 0x10000, 0x20000, CRC(1e5a012c) SHA1(4077fc266799a01738b7f88e867535f1fbacd557) )
 	ROM_LOAD (  "shiu19.bin", 0x30000, 0x20000, CRC(10f9684e) SHA1(1fdc5364f87fb65f4f2a438841e0fe847f765aaf) )
 	ROM_LOAD (  "shiu20.bin", 0x50000, 0x20000, CRC(1b4a71c1) SHA1(74b7b4ae76ebe65f1f46b2117970bfefefbb5344) )
@@ -2014,7 +2025,7 @@ ROM_END
 
 
 ROM_START( shimpactp4 ) /* You must manualy reset the high score table or game will hang after initial demo screen, it's best to do a "Full Factory Restore" */
-	ROM_REGION( 0x90000, "cvsdcpu", 0 )	/* sound CPU */
+	ROM_REGION( 0x90000, "cvsd:cpu", 0 )	/* sound CPU */
 	ROM_LOAD (   "shiu4.bin", 0x10000, 0x20000, CRC(1e5a012c) SHA1(4077fc266799a01738b7f88e867535f1fbacd557) )
 	ROM_LOAD (  "shiu19.bin", 0x30000, 0x20000, CRC(10f9684e) SHA1(1fdc5364f87fb65f4f2a438841e0fe847f765aaf) )
 	ROM_LOAD (  "shiu20.bin", 0x50000, 0x20000, CRC(1b4a71c1) SHA1(74b7b4ae76ebe65f1f46b2117970bfefefbb5344) )
@@ -2042,7 +2053,7 @@ ROM_END
 
 
 ROM_START( strkforc )
-	ROM_REGION( 0x90000, "cvsdcpu", 0 )	/* sound CPU */
+	ROM_REGION( 0x90000, "cvsd:cpu", 0 )	/* sound CPU */
 	ROM_LOAD (  "sfu4.bin", 0x10000, 0x10000, CRC(8f747312) SHA1(729929c209741e72eb83b407cf95d7709ec1b5ae) )
 	ROM_RELOAD(             0x20000, 0x10000 )
 	ROM_LOAD ( "sfu19.bin", 0x30000, 0x10000, CRC(afb29926) SHA1(ad904c0968a90b8187cc87d6c171fbc021d2f66f) )
@@ -2074,10 +2085,10 @@ ROM_END
 
 
 ROM_START( mkla4 )
-	ROM_REGION( 0x50000, "adpcm", 0 )	/* sound CPU */
+	ROM_REGION( 0x50000, "adpcm:cpu", 0 )	/* sound CPU */
 	ROM_LOAD (  "mks-u3.rom", 0x10000, 0x40000, CRC(c615844c) SHA1(5732f9053a5f73b0cc3b0166d7dc4430829d5bc7) )
 
-	ROM_REGION( 0x200000, "oki", 0 )	/* ADPCM */
+	ROM_REGION( 0x200000, "adpcm:oki", 0 )	/* ADPCM */
 	ROM_LOAD ( "mks-u12.rom", 0x00000, 0x40000, CRC(258bd7f9) SHA1(463890b23f17350fb9b8a85897b0777c45bc2d54) )
 	ROM_RELOAD(               0x40000, 0x40000 )
 	ROM_LOAD ( "mks-u13.rom", 0x80000, 0x40000, CRC(7b7ec3b6) SHA1(6eec1b90d4a4855f34a7ebfbf93f3358d5627db4) )
@@ -2106,10 +2117,10 @@ ROM_END
 
 
 ROM_START( mkla3 )
-	ROM_REGION( 0x50000, "adpcm", 0 )	/* sound CPU */
+	ROM_REGION( 0x50000, "adpcm:cpu", 0 )	/* sound CPU */
 	ROM_LOAD (  "mks-u3.rom", 0x10000, 0x40000, CRC(c615844c) SHA1(5732f9053a5f73b0cc3b0166d7dc4430829d5bc7) )
 
-	ROM_REGION( 0x200000, "oki", 0 )	/* ADPCM */
+	ROM_REGION( 0x200000, "adpcm:oki", 0 )	/* ADPCM */
 	ROM_LOAD ( "mks-u12.rom", 0x00000, 0x40000, CRC(258bd7f9) SHA1(463890b23f17350fb9b8a85897b0777c45bc2d54) )
 	ROM_RELOAD(               0x40000, 0x40000 )
 	ROM_LOAD ( "mks-u13.rom", 0x80000, 0x40000, CRC(7b7ec3b6) SHA1(6eec1b90d4a4855f34a7ebfbf93f3358d5627db4) )
@@ -2138,10 +2149,10 @@ ROM_END
 
 
 ROM_START( mkla2 )
-	ROM_REGION( 0x50000, "adpcm", 0 )	/* sound CPU */
+	ROM_REGION( 0x50000, "adpcm:cpu", 0 )	/* sound CPU */
 	ROM_LOAD (  "mks-u3.rom", 0x10000, 0x40000, CRC(c615844c) SHA1(5732f9053a5f73b0cc3b0166d7dc4430829d5bc7) )
 
-	ROM_REGION( 0x200000, "oki", 0 )	/* ADPCM */
+	ROM_REGION( 0x200000, "adpcm:oki", 0 )	/* ADPCM */
 	ROM_LOAD ( "mks-u12.rom", 0x00000, 0x40000, CRC(258bd7f9) SHA1(463890b23f17350fb9b8a85897b0777c45bc2d54) )
 	ROM_RELOAD(               0x40000, 0x40000 )
 	ROM_LOAD ( "mks-u13.rom", 0x80000, 0x40000, CRC(7b7ec3b6) SHA1(6eec1b90d4a4855f34a7ebfbf93f3358d5627db4) )
@@ -2170,10 +2181,10 @@ ROM_END
 
 
 ROM_START( mkla1 )
-	ROM_REGION( 0x50000, "adpcm", 0 )	/* sound CPU */
+	ROM_REGION( 0x50000, "adpcm:cpu", 0 )	/* sound CPU */
 	ROM_LOAD (  "mks-u3.rom", 0x10000, 0x40000, CRC(c615844c) SHA1(5732f9053a5f73b0cc3b0166d7dc4430829d5bc7) )
 
-	ROM_REGION( 0x200000, "oki", 0 )	/* ADPCM */
+	ROM_REGION( 0x200000, "adpcm:oki", 0 )	/* ADPCM */
 	ROM_LOAD ( "mks-u12.rom", 0x00000, 0x40000, CRC(258bd7f9) SHA1(463890b23f17350fb9b8a85897b0777c45bc2d54) )
 	ROM_RELOAD(               0x40000, 0x40000 )
 	ROM_LOAD ( "mks-u13.rom", 0x80000, 0x40000, CRC(7b7ec3b6) SHA1(6eec1b90d4a4855f34a7ebfbf93f3358d5627db4) )
@@ -2202,10 +2213,10 @@ ROM_END
 
 
 ROM_START( mkprot9 )
-	ROM_REGION( 0x50000, "adpcm", 0 )	/* sound CPU */
+	ROM_REGION( 0x50000, "adpcm:cpu", 0 )	/* sound CPU */
 	ROM_LOAD (  "mks-u3.rom", 0x10000, 0x40000, CRC(c615844c) SHA1(5732f9053a5f73b0cc3b0166d7dc4430829d5bc7) )
 
-	ROM_REGION( 0x200000, "oki", 0 )	/* ADPCM */
+	ROM_REGION( 0x200000, "adpcm:oki", 0 )	/* ADPCM */
 	ROM_LOAD ( "mks-u12.rom", 0x00000, 0x40000, CRC(258bd7f9) SHA1(463890b23f17350fb9b8a85897b0777c45bc2d54) )
 	ROM_RELOAD(               0x40000, 0x40000 )
 	ROM_LOAD ( "mks-u13.rom", 0x80000, 0x40000, CRC(7b7ec3b6) SHA1(6eec1b90d4a4855f34a7ebfbf93f3358d5627db4) )
@@ -2234,10 +2245,10 @@ ROM_END
 
 
 ROM_START( mkprot8 )
-	ROM_REGION( 0x50000, "adpcm", 0 )	/* sound CPU */
+	ROM_REGION( 0x50000, "adpcm:cpu", 0 )	/* sound CPU */
 	ROM_LOAD (  "mks-u3.rom", 0x10000, 0x40000, CRC(c615844c) SHA1(5732f9053a5f73b0cc3b0166d7dc4430829d5bc7) )
 
-	ROM_REGION( 0x200000, "oki", 0 )	/* ADPCM */
+	ROM_REGION( 0x200000, "adpcm:oki", 0 )	/* ADPCM */
 	ROM_LOAD ( "mks-u12.rom", 0x00000, 0x40000, CRC(258bd7f9) SHA1(463890b23f17350fb9b8a85897b0777c45bc2d54) )
 	ROM_RELOAD(               0x40000, 0x40000 )
 	ROM_LOAD ( "mks-u13.rom", 0x80000, 0x40000, CRC(7b7ec3b6) SHA1(6eec1b90d4a4855f34a7ebfbf93f3358d5627db4) )
@@ -2265,10 +2276,10 @@ ROM_START( mkprot8 )
 ROM_END
 
 ROM_START( mkprot4 )
-	ROM_REGION( 0x50000, "adpcm", 0 )	/* sound CPU */
+	ROM_REGION( 0x50000, "adpcm:cpu", 0 )	/* sound CPU */
 	ROM_LOAD (  "mks-u3.rom", 0x10000, 0x40000, CRC(c615844c) SHA1(5732f9053a5f73b0cc3b0166d7dc4430829d5bc7) )
 
-	ROM_REGION( 0x200000, "oki", 0 )	/* ADPCM */
+	ROM_REGION( 0x200000, "adpcm:oki", 0 )	/* ADPCM */
 	ROM_LOAD ( "mks-u12.rom", 0x00000, 0x40000, CRC(258bd7f9) SHA1(463890b23f17350fb9b8a85897b0777c45bc2d54) )
 	ROM_RELOAD(               0x40000, 0x40000 )
 	ROM_LOAD ( "mks-u13.rom", 0x80000, 0x40000, CRC(7b7ec3b6) SHA1(6eec1b90d4a4855f34a7ebfbf93f3358d5627db4) )
@@ -2296,10 +2307,10 @@ ROM_START( mkprot4 )
 ROM_END
 
 ROM_START( mkyturbo )
-	ROM_REGION( 0x50000, "adpcm", 0 )	/* sound CPU */
+	ROM_REGION( 0x50000, "adpcm:cpu", 0 )	/* sound CPU */
 	ROM_LOAD (  "mks-u3.rom", 0x10000, 0x40000, CRC(c615844c) SHA1(5732f9053a5f73b0cc3b0166d7dc4430829d5bc7) )
 
-	ROM_REGION( 0x200000, "oki", 0 )	/* ADPCM */
+	ROM_REGION( 0x200000, "adpcm:oki", 0 )	/* ADPCM */
 	ROM_LOAD ( "mks-u12.rom", 0x00000, 0x40000, CRC(258bd7f9) SHA1(463890b23f17350fb9b8a85897b0777c45bc2d54) )
 	ROM_RELOAD(               0x40000, 0x40000 )
 	ROM_LOAD ( "mks-u13.rom", 0x80000, 0x40000, CRC(7b7ec3b6) SHA1(6eec1b90d4a4855f34a7ebfbf93f3358d5627db4) )
@@ -2328,10 +2339,10 @@ ROM_START( mkyturbo )
 ROM_END
 
 ROM_START( mkyturboe )
-	ROM_REGION( 0x50000, "adpcm", 0 )	/* sound CPU */
+	ROM_REGION( 0x50000, "adpcm:cpu", 0 )	/* sound CPU */
 	ROM_LOAD (  "mks-u3.rom", 0x10000, 0x40000, CRC(c615844c) SHA1(5732f9053a5f73b0cc3b0166d7dc4430829d5bc7) )
 
-	ROM_REGION( 0x200000, "oki", 0 )	/* ADPCM */
+	ROM_REGION( 0x200000, "adpcm:oki", 0 )	/* ADPCM */
 	ROM_LOAD ( "mks-u12.rom", 0x00000, 0x40000, CRC(258bd7f9) SHA1(463890b23f17350fb9b8a85897b0777c45bc2d54) )
 	ROM_RELOAD(               0x40000, 0x40000 )
 	ROM_LOAD ( "mks-u13.rom", 0x80000, 0x40000, CRC(7b7ec3b6) SHA1(6eec1b90d4a4855f34a7ebfbf93f3358d5627db4) )
@@ -2359,10 +2370,10 @@ ROM_START( mkyturboe )
 ROM_END
 
 ROM_START( mknifty )
-	ROM_REGION( 0x50000, "adpcm", 0 )	/* sound CPU */
+	ROM_REGION( 0x50000, "adpcm:cpu", 0 )	/* sound CPU */
 	ROM_LOAD (  "mks-u3.rom", 0x10000, 0x40000, CRC(c615844c) SHA1(5732f9053a5f73b0cc3b0166d7dc4430829d5bc7) )
 
-	ROM_REGION( 0x200000, "oki", 0 )	/* ADPCM */
+	ROM_REGION( 0x200000, "adpcm:oki", 0 )	/* ADPCM */
 	ROM_LOAD ( "mks-u12.rom", 0x00000, 0x40000, CRC(258bd7f9) SHA1(463890b23f17350fb9b8a85897b0777c45bc2d54) )
 	ROM_RELOAD(               0x40000, 0x40000 )
 	ROM_LOAD ( "mks-u13.rom", 0x80000, 0x40000, CRC(7b7ec3b6) SHA1(6eec1b90d4a4855f34a7ebfbf93f3358d5627db4) )
@@ -2390,10 +2401,10 @@ ROM_START( mknifty )
 ROM_END
 
 ROM_START( mknifty666 )
-	ROM_REGION( 0x50000, "adpcm", 0 )	/* sound CPU */
+	ROM_REGION( 0x50000, "adpcm:cpu", 0 )	/* sound CPU */
 	ROM_LOAD (  "mks-u3.rom", 0x10000, 0x40000, CRC(c615844c) SHA1(5732f9053a5f73b0cc3b0166d7dc4430829d5bc7) )
 
-	ROM_REGION( 0x200000, "oki", 0 )	/* ADPCM */
+	ROM_REGION( 0x200000, "adpcm:oki", 0 )	/* ADPCM */
 	ROM_LOAD ( "mks-u12.rom", 0x00000, 0x40000, CRC(258bd7f9) SHA1(463890b23f17350fb9b8a85897b0777c45bc2d54) )
 	ROM_RELOAD(               0x40000, 0x40000 )
 	ROM_LOAD ( "mks-u13.rom", 0x80000, 0x40000, CRC(7b7ec3b6) SHA1(6eec1b90d4a4855f34a7ebfbf93f3358d5627db4) )
@@ -2486,11 +2497,11 @@ ROM_END
 
 
 ROM_START( term2 )
-	ROM_REGION( 0x50000, "adpcm", 0 )	/* sound CPU */
+	ROM_REGION( 0x50000, "adpcm:cpu", 0 )	/* sound CPU */
 	ROM_LOAD (  "t2_snd.3", 0x10000, 0x20000, CRC(73c3f5c4) SHA1(978dd974590e77294dbe9a647aebd3d24af6397f) )
 	ROM_RELOAD (            0x30000, 0x20000 )
 
-	ROM_REGION( 0x200000, "oki", 0 )	/* ADPCM */
+	ROM_REGION( 0x200000, "adpcm:oki", 0 )	/* ADPCM */
 	ROM_LOAD ( "t2_snd.12", 0x00000, 0x40000, CRC(e192a40d) SHA1(1f7a0e282c0c8eb66cbe514128bd104433e53b7a) )
 	ROM_RELOAD(             0x40000, 0x40000 )
 	ROM_LOAD ( "t2_snd.13", 0x80000, 0x40000, CRC(956fa80b) SHA1(02ab504627f4b25a394fa4192bb134138cbf6a4f) )
@@ -2519,11 +2530,11 @@ ROM_END
 
 
 ROM_START( term2la3 )
-	ROM_REGION( 0x50000, "adpcm", 0 )	/* sound CPU */
+	ROM_REGION( 0x50000, "adpcm:cpu", 0 )	/* sound CPU */
 	ROM_LOAD (  "t2_snd.3", 0x10000, 0x20000, CRC(73c3f5c4) SHA1(978dd974590e77294dbe9a647aebd3d24af6397f) )
 	ROM_RELOAD (            0x30000, 0x20000 )
 
-	ROM_REGION( 0x200000, "oki", 0 )	/* ADPCM */
+	ROM_REGION( 0x200000, "adpcm:oki", 0 )	/* ADPCM */
 	ROM_LOAD ( "t2_snd.12", 0x00000, 0x40000, CRC(e192a40d) SHA1(1f7a0e282c0c8eb66cbe514128bd104433e53b7a) )
 	ROM_RELOAD(             0x40000, 0x40000 )
 	ROM_LOAD ( "t2_snd.13", 0x80000, 0x40000, CRC(956fa80b) SHA1(02ab504627f4b25a394fa4192bb134138cbf6a4f) )
@@ -2552,11 +2563,11 @@ ROM_END
 
 
 ROM_START( term2la2 )
-	ROM_REGION( 0x50000, "adpcm", 0 )	/* sound CPU */
+	ROM_REGION( 0x50000, "adpcm:cpu", 0 )	/* sound CPU */
 	ROM_LOAD (  "t2_snd.3", 0x10000, 0x20000, CRC(73c3f5c4) SHA1(978dd974590e77294dbe9a647aebd3d24af6397f) )
 	ROM_RELOAD (            0x30000, 0x20000 )
 
-	ROM_REGION( 0x200000, "oki", 0 )	/* ADPCM */
+	ROM_REGION( 0x200000, "adpcm:oki", 0 )	/* ADPCM */
 	ROM_LOAD ( "t2_snd.12", 0x00000, 0x40000, CRC(e192a40d) SHA1(1f7a0e282c0c8eb66cbe514128bd104433e53b7a) )
 	ROM_RELOAD(             0x40000, 0x40000 )
 	ROM_LOAD ( "t2_snd.13", 0x80000, 0x40000, CRC(956fa80b) SHA1(02ab504627f4b25a394fa4192bb134138cbf6a4f) )
@@ -2585,11 +2596,11 @@ ROM_END
 
 
 ROM_START( term2la1 )
-	ROM_REGION( 0x50000, "adpcm", 0 ) /* sound CPU */
+	ROM_REGION( 0x50000, "adpcm:cpu", 0 ) /* sound CPU */
 	ROM_LOAD ( "t2_snd.3", 0x10000, 0x20000, CRC(73c3f5c4) SHA1(978dd974590e77294dbe9a647aebd3d24af6397f) )
 	ROM_RELOAD ( 0x30000, 0x20000 )
 
-	ROM_REGION( 0x200000, "oki", 0 ) /* ADPCM */
+	ROM_REGION( 0x200000, "adpcm:oki", 0 ) /* ADPCM */
 	ROM_LOAD ( "t2_snd.12", 0x00000, 0x40000, CRC(e192a40d) SHA1(1f7a0e282c0c8eb66cbe514128bd104433e53b7a) )
 	ROM_RELOAD(             0x40000, 0x40000 )
 	ROM_LOAD ( "t2_snd.13", 0x80000, 0x40000, CRC(956fa80b) SHA1(02ab504627f4b25a394fa4192bb134138cbf6a4f) )
@@ -2618,11 +2629,11 @@ ROM_END
 
 
 ROM_START( totcarn )
-	ROM_REGION( 0x50000, "adpcm", 0 )	/* sound CPU */
+	ROM_REGION( 0x50000, "adpcm:cpu", 0 )	/* sound CPU */
 	ROM_LOAD (  "tcu3.bin", 0x10000, 0x20000, CRC(5bdb4665) SHA1(c6b90b914785b8703790957cc4bb4983a332fba6) )
 	ROM_RELOAD (            0x30000, 0x20000 )
 
-	ROM_REGION( 0x200000, "oki", 0 )	/* ADPCM */
+	ROM_REGION( 0x200000, "adpcm:oki", 0 )	/* ADPCM */
 	ROM_LOAD ( "tcu12.bin", 0x00000, 0x40000, CRC(d0000ac7) SHA1(2d476c7727462623feb2f1a23fb797eaeed5ce30) )
 	ROM_RELOAD(             0x40000, 0x40000 )
 	ROM_LOAD ( "tcu13.bin", 0x80000, 0x40000, CRC(e48e6f0c) SHA1(bf7d548b6b1901966f99c815129ea160ef36f024) )
@@ -2651,11 +2662,11 @@ ROM_END
 
 
 ROM_START( totcarnp )
-	ROM_REGION( 0x50000, "adpcm", 0 )	/* sound CPU */
+	ROM_REGION( 0x50000, "adpcm:cpu", 0 )	/* sound CPU */
 	ROM_LOAD (  "tcu3.bin", 0x10000, 0x20000, CRC(5bdb4665) SHA1(c6b90b914785b8703790957cc4bb4983a332fba6) )
 	ROM_RELOAD (            0x30000, 0x20000 )
 
-	ROM_REGION( 0x200000, "oki", 0 )	/* ADPCM */
+	ROM_REGION( 0x200000, "adpcm:oki", 0 )	/* ADPCM */
 	ROM_LOAD ( "tcu12.bin", 0x00000, 0x40000, CRC(d0000ac7) SHA1(2d476c7727462623feb2f1a23fb797eaeed5ce30) )
 	ROM_RELOAD(             0x40000, 0x40000 )
 	ROM_LOAD ( "tcu13.bin", 0x80000, 0x40000, CRC(e48e6f0c) SHA1(bf7d548b6b1901966f99c815129ea160ef36f024) )

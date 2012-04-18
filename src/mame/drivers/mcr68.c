@@ -55,8 +55,6 @@
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "audio/midway.h"
-#include "audio/williams.h"
 #include "machine/nvram.h"
 #include "includes/mcr.h"
 #include "includes/mcr68.h"
@@ -206,8 +204,8 @@ READ16_MEMBER(mcr68_state::archrivl_port_1_r)
 WRITE16_MEMBER(mcr68_state::archrivl_control_w)
 {
 	COMBINE_DATA(&m_control_word);
-	williams_cvsd_reset_w(machine(), ~m_control_word & 0x0400);
-	williams_cvsd_data_w(machine(), m_control_word & 0x3ff);
+	m_cvsd_sound->reset_write(~m_control_word & 0x0400);
+	m_cvsd_sound->write(space, 0, m_control_word & 0x3ff);
 }
 
 
@@ -1056,16 +1054,16 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( archrivl, mcr68 )
 
 	/* basic machine hardware */
-	MCFG_DEVICE_REMOVE("mono")
-	MCFG_FRAGMENT_ADD(williams_cvsd_sound)
+	MCFG_WILLIAMS_CVSD_SOUND_ADD("cvsd")
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( pigskin, mcr68 )
 
 	/* basic machine hardware */
-	MCFG_DEVICE_REMOVE("mono")
-	MCFG_FRAGMENT_ADD(williams_cvsd_sound)
+	MCFG_WILLIAMS_CVSD_SOUND_ADD("cvsd")
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(pigskin_map)
@@ -1075,8 +1073,8 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( trisport, mcr68 )
 
 	/* basic machine hardware */
-	MCFG_DEVICE_REMOVE("mono")
-	MCFG_FRAGMENT_ADD(williams_cvsd_sound)
+	MCFG_WILLIAMS_CVSD_SOUND_ADD("cvsd")
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(trisport_map)
@@ -1354,7 +1352,7 @@ ROM_START( archrivl )
 	ROM_LOAD16_BYTE( "2c-rev2",  0x20000, 0x10000, CRC(cc2893f7) SHA1(44931299cb98e27ac2f11b3922da76895fbfe0a7) )
 	ROM_LOAD16_BYTE( "2b-rev2",  0x20001, 0x10000, CRC(fa977050) SHA1(67c66995da755401162f7e668b97eb42ac769ec0) )
 
-	ROM_REGION( 0x90000, "cvsdcpu", 0 )  /* Audio System board */
+	ROM_REGION( 0x90000, "cvsd:cpu", 0 )  /* Audio System board */
 	ROM_LOAD( "u4.snd",  0x10000, 0x08000, CRC(96b3c652) SHA1(1bb576d0bf6b6b8df24e7b9352a33e97dd8ebdcb) )
 	ROM_RELOAD(          0x18000, 0x08000 )
 	ROM_RELOAD(          0x20000, 0x08000 )
@@ -1401,7 +1399,7 @@ ROM_START( archrivl2 )
 	ROM_LOAD16_BYTE( "archrivl.3",  0x20000, 0x10000, CRC(d6d08ff7) SHA1(bbbd4b5c3218c9bb461b17e536191d40ab39f67c) )
 	ROM_LOAD16_BYTE( "archrivl.1",  0x20001, 0x10000, CRC(92f3a43d) SHA1(45fdcbacd65f5898d54cc2ac95639b7ee2c097e6) )
 
-	ROM_REGION( 0x90000, "cvsdcpu", 0 )  /* Audio System board */
+	ROM_REGION( 0x90000, "cvsd:cpu", 0 )  /* Audio System board */
 	ROM_LOAD( "u4.snd",  0x10000, 0x08000, CRC(96b3c652) SHA1(1bb576d0bf6b6b8df24e7b9352a33e97dd8ebdcb) )
 	ROM_RELOAD(          0x18000, 0x08000 )
 	ROM_RELOAD(          0x20000, 0x08000 )
@@ -1448,7 +1446,7 @@ ROM_START( pigskin ) /* Initial boot screen reports KIT CODE REV 1.1K 8/01/90 */
 	ROM_LOAD16_BYTE( "pigskin-k_la1.a6",  0x20000, 0x10000, CRC(4d8b7e50) SHA1(9e5d0edf1603e11f22d3129a2b8865ebcb5e27f9) )
 	ROM_LOAD16_BYTE( "pigskin-k_la1.b6",  0x20001, 0x10000, CRC(1194f187) SHA1(e7cebe5322a5c8e382b6773939be5bc88492f289) )
 
-	ROM_REGION( 0x90000, "cvsdcpu", 0 )  /* Audio System board */
+	ROM_REGION( 0x90000, "cvsd:cpu", 0 )  /* Audio System board */
 	ROM_LOAD( "pigskin_sl1.u4",  0x10000, 0x10000, CRC(6daf2d37) SHA1(4c8098520fe44e36b01389bcfcfe3ad1d027cbde) )
 	ROM_RELOAD(                  0x20000, 0x10000 )
 	ROM_LOAD( "pigskin_sl1.u19", 0x30000, 0x10000, CRC(56fd16a3) SHA1(b91aabdbd3185355f2b7177fc4d3a86fa110f51d) )
@@ -1475,7 +1473,7 @@ ROM_START( pigskina ) /* Initial boot screen reports REV 2.0 7/06/90 */
 	ROM_LOAD16_BYTE( "pigskin_la2.a6",  0x20000, 0x10000, CRC(2fc91002) SHA1(64d270b78c69d3f4fb36d1233a1632d6ba3d87a5) )
 	ROM_LOAD16_BYTE( "pigskin_la2.b6",  0x20001, 0x10000, CRC(0b93dc66) SHA1(f3b516a1d1e4abd7b0d56243949e9cd7ac79178b) )
 
-	ROM_REGION( 0x90000, "cvsdcpu", 0 )  /* Audio System board */
+	ROM_REGION( 0x90000, "cvsd:cpu", 0 )  /* Audio System board */
 	ROM_LOAD( "pigskin_sl1.u4",  0x10000, 0x10000, CRC(6daf2d37) SHA1(4c8098520fe44e36b01389bcfcfe3ad1d027cbde) )
 	ROM_RELOAD(                  0x20000, 0x10000 )
 	ROM_LOAD( "pigskin_sl1.u19", 0x30000, 0x10000, CRC(56fd16a3) SHA1(b91aabdbd3185355f2b7177fc4d3a86fa110f51d) )
@@ -1502,7 +1500,7 @@ ROM_START( trisport )
 	ROM_LOAD16_BYTE( "la3.a6",  0x20000, 0x10000, CRC(9c6a1398) SHA1(ee115d9207f3a9034b7c9eccd2ff151d9c923c9a) )
 	ROM_LOAD16_BYTE( "la3.b6",  0x20001, 0x10000, CRC(597b564c) SHA1(090da3ec0c86035cc41a9caea182b8a5419c3be9) )
 
-	ROM_REGION( 0x90000, "cvsdcpu", 0 )  /* Audio System board */
+	ROM_REGION( 0x90000, "cvsd:cpu", 0 )  /* Audio System board */
 	ROM_LOAD( "sl1-snd.u4",  0x10000, 0x10000, CRC(0ed8c904) SHA1(21292a001c4c44f87b8782c706e5c346b767cd6b) )
 	ROM_RELOAD(              0x20000, 0x10000 )
 	ROM_LOAD( "sl1-snd.u19", 0x30000, 0x10000, CRC(b57d7d7e) SHA1(483f718f1cc4549baf5696935532d30803254a19) )
@@ -1545,10 +1543,9 @@ ROM_END
  *
  *************************************/
 
-static void mcr68_common_init(running_machine &machine, int sound_board, int clip, int xoffset)
+static void mcr68_common_init(running_machine &machine, int clip, int xoffset)
 {
 	mcr68_state *state = machine.driver_data<mcr68_state>();
-	mcr_sound_init(machine, sound_board);
 
 	state->m_sprite_clip = clip;
 	state->m_sprite_xoffset = xoffset;
@@ -1560,7 +1557,7 @@ static void mcr68_common_init(running_machine &machine, int sound_board, int cli
 static DRIVER_INIT( zwackery )
 {
 	mcr68_state *state = machine.driver_data<mcr68_state>();
-	mcr68_common_init(machine, MCR_CHIP_SQUEAK_DELUXE, 0, 0);
+	mcr68_common_init(machine, 0, 0);
 
 	/* Zwackery doesn't care too much about this value; currently taken from Blasted */
 	state->m_timing_factor = attotime::from_hz(machine.device("maincpu")->unscaled_clock() / 10) * (256 + 16);
@@ -1570,7 +1567,7 @@ static DRIVER_INIT( zwackery )
 static DRIVER_INIT( xenophob )
 {
 	mcr68_state *state = machine.driver_data<mcr68_state>();
-	mcr68_common_init(machine, MCR_SOUNDS_GOOD, 0, -4);
+	mcr68_common_init(machine, 0, -4);
 
 	/* Xenophobe doesn't care too much about this value; currently taken from Blasted */
 	state->m_timing_factor = attotime::from_hz(machine.device("maincpu")->unscaled_clock() / 10) * (256 + 16);
@@ -1583,7 +1580,7 @@ static DRIVER_INIT( xenophob )
 static DRIVER_INIT( spyhunt2 )
 {
 	mcr68_state *state = machine.driver_data<mcr68_state>();
-	mcr68_common_init(machine, MCR_TURBO_CHIP_SQUEAK | MCR_SOUNDS_GOOD, 0, -6);
+	mcr68_common_init(machine, 0, -6);
 
 	/* Spy Hunter 2 doesn't care too much about this value; currently taken from Blasted */
 	state->m_timing_factor = attotime::from_hz(machine.device("maincpu")->unscaled_clock() / 10) * (256 + 16);
@@ -1598,7 +1595,7 @@ static DRIVER_INIT( spyhunt2 )
 static DRIVER_INIT( blasted )
 {
 	mcr68_state *state = machine.driver_data<mcr68_state>();
-	mcr68_common_init(machine, MCR_SOUNDS_GOOD, 0, 0);
+	mcr68_common_init(machine, 0, 0);
 
 	/* Blasted checks the timing of VBLANK relative to the 493 interrupt */
 	/* VBLANK is required to come within 220-256 E clocks (i.e., 2200-2560 CPU clocks) */
@@ -1615,7 +1612,7 @@ static DRIVER_INIT( blasted )
 static DRIVER_INIT( intlaser )
 {
 	mcr68_state *state = machine.driver_data<mcr68_state>();
-	mcr68_common_init(machine, MCR_SOUNDS_GOOD, 0, 0);
+	mcr68_common_init(machine, 0, 0);
 
 	/* Copied from Blasted */
 	state->m_timing_factor = attotime::from_hz(machine.device("maincpu")->unscaled_clock() / 10) * (256 + 16);
@@ -1630,7 +1627,7 @@ static DRIVER_INIT( intlaser )
 static DRIVER_INIT( archrivl )
 {
 	mcr68_state *state = machine.driver_data<mcr68_state>();
-	mcr68_common_init(machine, MCR_WILLIAMS_SOUND, 16, 0);
+	mcr68_common_init(machine, 16, 0);
 
 	/* Arch Rivals doesn't care too much about this value; currently taken from Blasted */
 	state->m_timing_factor = attotime::from_hz(machine.device("maincpu")->unscaled_clock() / 10) * (256 + 16);
@@ -1649,7 +1646,7 @@ static DRIVER_INIT( archrivl )
 static DRIVER_INIT( pigskin )
 {
 	mcr68_state *state = machine.driver_data<mcr68_state>();
-	mcr68_common_init(machine, MCR_WILLIAMS_SOUND, 16, 0);
+	mcr68_common_init(machine, 16, 0);
 
 	/* Pigskin doesn't care too much about this value; currently taken from Tri-Sports */
 	state->m_timing_factor = attotime::from_hz(machine.device("maincpu")->unscaled_clock() / 10) * 115;
@@ -1661,7 +1658,7 @@ static DRIVER_INIT( pigskin )
 static DRIVER_INIT( trisport )
 {
 	mcr68_state *state = machine.driver_data<mcr68_state>();
-	mcr68_common_init(machine, MCR_WILLIAMS_SOUND, 0, 0);
+	mcr68_common_init(machine, 0, 0);
 
 	/* Tri-Sports checks the timing of VBLANK relative to the 493 interrupt */
 	/* VBLANK is required to come within 87-119 E clocks (i.e., 870-1190 CPU clocks) */
