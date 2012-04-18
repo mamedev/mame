@@ -20,8 +20,6 @@
  - tmpdoki isn't a dual screen game, we should remove the dual screen layout from VIDEO_UPDATE and from the MACHINE_DRIVER, also notice that MAME
    doesn't have a macro for removing previously declared screens.
 
- - sound (see rabbit.c for preliminary details, not copied here)
-
  - sprites from one screen are overlapping on the other, probably there's a way to limit them to a single screen
 
  - priority is wrong.

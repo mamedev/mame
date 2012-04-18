@@ -25,7 +25,6 @@ To Do:
 
 - raster effects (rabbit only?, see left side of one of the levels in rabbit)
 - clean up zoom code and make zoom effect more accurate
-- sound (adpcm of some kind)
 - status bar in rabbit is the wrong colour, timing of blitter / interrupts?
 
 Notes:
