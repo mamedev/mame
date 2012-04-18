@@ -296,24 +296,24 @@ void okim6295_device::write_command(UINT8 command)
 			{
 				okim_voice &voice = m_voice[voicenum];
 
-				// determine the start/stop positions
-				offs_t base = m_command * 8;
-
-				offs_t start = m_direct->read_raw_byte(base + 0) << 16;
-				start |= m_direct->read_raw_byte(base + 1) << 8;
-				start |= m_direct->read_raw_byte(base + 2) << 0;
-				start &= 0x3ffff;
-
-				offs_t stop = m_direct->read_raw_byte(base + 3) << 16;
-				stop |= m_direct->read_raw_byte(base + 4) << 8;
-				stop |= m_direct->read_raw_byte(base + 5) << 0;
-				stop &= 0x3ffff;
-
-				// set up the voice to play this sample
-				if (start < stop)
+				if (!voice.m_playing) // fixes Got-cha and Steel Force
 				{
-					if (!voice.m_playing) // fixes Got-cha and Steel Force
+					// determine the start/stop positions
+					offs_t base = m_command * 8;
+
+					offs_t start = m_direct->read_raw_byte(base + 0) << 16;
+					start |= m_direct->read_raw_byte(base + 1) << 8;
+					start |= m_direct->read_raw_byte(base + 2) << 0;
+					start &= 0x3ffff;
+
+					offs_t stop = m_direct->read_raw_byte(base + 3) << 16;
+					stop |= m_direct->read_raw_byte(base + 4) << 8;
+					stop |= m_direct->read_raw_byte(base + 5) << 0;
+					stop &= 0x3ffff;
+
+					if (start < stop)
 					{
+						// set up the voice to play this sample
 						voice.m_playing = true;
 						voice.m_base_offset = start;
 						voice.m_sample = 0;
@@ -323,15 +323,16 @@ void okim6295_device::write_command(UINT8 command)
 						voice.m_adpcm.reset();
 						voice.m_volume = s_volume_table[command & 0x0f];
 					}
-					else
-						logerror("OKIM6295:'%s' requested to play sample %02x on non-stopped voice\n",tag(),m_command);
-				}
 
-				// invalid samples go here
+					// invalid samples go here
+					else
+					{
+						logerror("OKIM6295:'%s' requested to play invalid sample %02x\n",tag(),m_command);
+					}
+				}
 				else
 				{
-					logerror("OKIM6295:'%s' requested to play invalid sample %02x\n",tag(),m_command);
-					voice.m_playing = false;
+					logerror("OKIM6295:'%s' requested to play sample %02x on non-stopped voice\n",tag(),m_command);
 				}
 			}
 
