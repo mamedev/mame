@@ -291,8 +291,7 @@ static ADDRESS_MAP_START( silvmil_sound_map, AS_PROGRAM, 8, silvmil_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM
 	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
-	AM_RANGE(0xc002, 0xc002) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0xc003, 0xc003) AM_DEVREADWRITE("oki", okim6295_device, read, write)
+	AM_RANGE(0xc002, 0xc002) AM_DEVREADWRITE("oki", okim6295_device, read, write) AM_MIRROR(1)
 	AM_RANGE(0xc006, 0xc006) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0xc00f, 0xc00f) AM_WRITENOP // ??
 ADDRESS_MAP_END

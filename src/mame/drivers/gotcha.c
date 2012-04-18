@@ -14,8 +14,6 @@ TODO:
   read from C00F.
 - Sound samples were getting chopped; I fixed this by changing sound/adpcm.c to
   disregard requests to play new samples until the previous one is finished*.
-    - This seems to be happening again now, I guess something else disagreed
-	  with the changed behavior? Maybe AD-65 specific?
 
 Gotcha pcb: 97,7,29 PARA VER 3.0 but it is the same as ppchamp
 
@@ -121,7 +119,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, gotcha_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
-	AM_RANGE(0xc002, 0xc003) AM_DEVWRITE("oki", okim6295_device, write)	// TWO addresses!
+	AM_RANGE(0xc002, 0xc002) AM_DEVREADWRITE("oki", okim6295_device, read, write) AM_MIRROR(1)
 	AM_RANGE(0xc006, 0xc006) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM
 ADDRESS_MAP_END
@@ -401,5 +399,5 @@ ROM_START( ppchamp )
 	ROM_LOAD( "uz11", 0x00000, 0x80000, CRC(3d96274c) SHA1(c7a670af86194c370bf8fb30afbe027ab78a0227) )
 ROM_END
 
-GAME( 1997, gotcha,  0,      gotcha, gotcha, 0, ROT0, "Dongsung", "Got-cha Mini Game Festival", GAME_SUPPORTS_SAVE )
-GAME( 1997, ppchamp, gotcha, gotcha, gotcha, 0, ROT0, "Dongsung", "Pasha Pasha Champ Mini Game Festival (Korea)", GAME_SUPPORTS_SAVE )
+GAME( 1997, gotcha,  0,      gotcha, gotcha, 0, ROT0, "Dongsung / Para", "Got-cha Mini Game Festival", GAME_SUPPORTS_SAVE )
+GAME( 1997, ppchamp, gotcha, gotcha, gotcha, 0, ROT0, "Dongsung / Para", "Pasha Pasha Champ Mini Game Festival (Korea)", GAME_SUPPORTS_SAVE )
