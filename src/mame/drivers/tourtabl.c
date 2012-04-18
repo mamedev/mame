@@ -36,21 +36,21 @@ static WRITE8_DEVICE_HANDLER( tourtabl_led_w )
 }
 
 
-static READ16_HANDLER( tourtabl_read_input_port )
+static READ16_DEVICE_HANDLER( tourtabl_read_input_port )
 {
 	static const char *const tianames[] = { "PADDLE4", "PADDLE3", "PADDLE2", "PADDLE1", "TIA_IN4", "TIA_IN5" };
 
-	return input_port_read(space->machine(), tianames[offset]);
+	return input_port_read(device->machine(), tianames[offset]);
 }
 
-static READ8_HANDLER( tourtabl_get_databus_contents )
+static READ8_DEVICE_HANDLER( tourtabl_get_databus_contents )
 {
 	return offset;
 }
 
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, tourtabl_state )
-	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x0100) AM_READWRITE_LEGACY(tia_r, tia_w)
+	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x0100) AM_DEVREADWRITE("tia_video", tia_video_device, read, write)
 	AM_RANGE(0x0080, 0x00ff) AM_MIRROR(0x0100) AM_RAM
 	AM_RANGE(0x0280, 0x029f) AM_DEVREADWRITE_LEGACY("riot1", riot6532_r, riot6532_w)
 	AM_RANGE(0x0400, 0x047f) AM_RAM
@@ -87,17 +87,10 @@ static const riot6532_interface r6532_interface_1 =
 
 static const struct tia_interface tourtabl_tia_interface =
 {
-	tourtabl_read_input_port,
-	tourtabl_get_databus_contents,
-	NULL
+	DEVCB_HANDLER(tourtabl_read_input_port),
+	DEVCB_HANDLER(tourtabl_get_databus_contents),
+	DEVCB_NULL
 };
-
-
-static MACHINE_START( tourtabl )
-{
-	tia_init( machine, &tourtabl_tia_interface );
-}
-
 
 static INPUT_PORTS_START( tourtabl )
 
@@ -179,20 +172,17 @@ static MACHINE_CONFIG_START( tourtabl, tourtabl_state )
 	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK / 3)	/* actually M6507 */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 
-	MCFG_MACHINE_START(tourtabl)
-
 	MCFG_RIOT6532_ADD("riot1", MASTER_CLOCK / 3, r6532_interface_0)
 	MCFG_RIOT6532_ADD("riot2", MASTER_CLOCK / 3, r6532_interface_1)
 
+	MCFG_TIA_VIDEO_ADD("tia_video", tourtabl_tia_interface)
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS( MASTER_CLOCK, 228, 34, 34 + 160, 262, 46, 46 + 200 )
-	MCFG_SCREEN_UPDATE_STATIC(tia)
+	MCFG_SCREEN_UPDATE_DEVICE("tia_video", tia_video_device, screen_update)
 
 	MCFG_PALETTE_LENGTH(TIA_PALETTE_LENGTH)
 	MCFG_PALETTE_INIT(tia_NTSC)
-
-	MCFG_VIDEO_START(tia)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
