@@ -13915,7 +13915,6 @@ sc4mclbd	//
 sc4mclbe	//
 sc4mdlx		// Monopoly Deluxe (Mazooma)
 sc4mondxg   //
-sc4mowowd   //
 sc4mont		// Montego Pay (Qps)
 sc4monta	//
 sc4montb	//
@@ -13957,9 +13956,9 @@ sc4outlwc	//
 sc4pacmn	// Pac Man (Mazooma)
 sc4pacmna	//
 sc4pacmnb	//
-sc4pacmnc	//
-sc4pacmnd	//
-sc4pacmne	//
+sc4pacqp	//
+sc4pacqpa	//
+sc4pacqpb	//
 sc4paccs	// Pac Man Casino (Mazooma)
 sc4paccsa	//
 sc4paccsb	//
@@ -15095,22 +15094,22 @@ sc4gball	//
 sc4gballa	//
 sc4gballb	//
 sc4gballc	//
-sc4ggame	// Golden Game (Mazooma)
+sc4ggtb	    // Golden Game (Mazooma) Top Box
+sc4ggtba	//
+sc4ggtbb	//
+sc4ggame	// Golden Game
 sc4ggamea	//
 sc4ggameb	//
 sc4ggamec	//
 sc4ggamed	//
-sc4ggamee	//
 sc4ggamef	//
 sc4ggameg	//
-sc4ggameh	//
 sc4ggamei	//
 sc4ggamej	//
 sc4ggamek	//
 sc4ggamel	//
 sc4ggamem	//
 sc4ggamen	//
-sc4ggameo	//
 sc4ggamep	//
 sc4ggameq	//
 sc4ggamer	//
@@ -15145,8 +15144,9 @@ sc4ggdlxd	//
 sc4ggdlxe	//
 sc4ggdlxf	//
 sc4ggdlxg	//
-sc4ggg		// Grand Golden Game (Mazooma)
-sc4ggga		//
+sc4gggtb	// Grand Golden Game (Mazooma)
+sc4gggtba	//
+sc4ggg		//
 sc4gggb		//
 sc4gggc		//
 sc4gggd		//
@@ -15155,7 +15155,6 @@ sc4gggf		//
 sc4gggg		//
 sc4gggh		//
 sc4gggi		//
-sc4gggj		//
 sc4gggk		//
 sc4gggl		//
 sc4gggm		//
@@ -15654,16 +15653,17 @@ sc4dndbem	//
 sc4dndben	//
 sc4dndbc	// Deal Or No Deal Box Clever (Bellfruit)
 sc4dndbca	//
+sc4bwow     // Wheel of Wealth (Bellfruit)
+sc4bwowa	//
 sc4mowow	// Monopoly Wheel Of Wealth (Mazooma)
 sc4mowowa	//
 sc4mowowb	//
 sc4mowowc	//
-sc4mowowe	//
-sc4mowowf	//
-sc4mowowg	//
-sc4mowowh	//
-sc4mowowi	//
-sc4mowowj	//
+sc4mwwtb	//
+sc4mwwtba	//
+sc4mwwtbb	//
+sc4mwwtbc	//
+sc4mwwtbd	//
 sc4nunsm	// Nuns 'n' Roses (Mazooma)
 sc4nunsmb	//
 sc4nunsmc	//

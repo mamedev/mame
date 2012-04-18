@@ -13,7 +13,9 @@ TODO:
 - Unknown sound writes at C00F; also, there's an NMI handler that would
   read from C00F.
 - Sound samples were getting chopped; I fixed this by changing sound/adpcm.c to
-  disregard requests to play new samples until the previous one is finished.
+  disregard requests to play new samples until the previous one is finished*.
+    - This seems to be happening again now, I guess something else disagreed
+	  with the changed behavior? Maybe AD-65 specific?
 
 Gotcha pcb: 97,7,29 PARA VER 3.0 but it is the same as ppchamp
 
@@ -63,6 +65,7 @@ Notes:
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
 #include "includes/gotcha.h"
+#include "video/decospr.h"
 
 
 WRITE16_MEMBER(gotcha_state::gotcha_lamps_w)
@@ -299,6 +302,12 @@ static MACHINE_CONFIG_START( gotcha, gotcha_state )
 	MCFG_PALETTE_LENGTH(768)
 
 	MCFG_VIDEO_START(gotcha)
+
+	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
+	decospr_device::set_gfx_region(*device, 1);
+	decospr_device::set_is_bootleg(*device, true);
+	decospr_device::set_offsets(*device, 5,-1); // aligned to 2nd instruction screen in attract
+
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

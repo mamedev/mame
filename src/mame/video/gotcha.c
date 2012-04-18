@@ -1,5 +1,6 @@
 #include "emu.h"
 #include "includes/gotcha.h"
+#include "video/decospr.h"
 
 /***************************************************************************
 
@@ -100,41 +101,12 @@ WRITE16_MEMBER(gotcha_state::gotcha_scroll_w)
 
 
 
-static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
-{
-	gotcha_state *state = machine.driver_data<gotcha_state>();
-	UINT16 *spriteram = state->m_spriteram;
-	int offs;
-
-	for (offs = 0; offs < state->m_spriteram.bytes() / 2; offs += 4)
-	{
-		int sx, sy, code, color, flipx, flipy, height, y;
-
-		sx = spriteram[offs + 2];
-		sy = spriteram[offs + 0];
-		code = spriteram[offs + 1];
-		color = spriteram[offs + 2] >> 9;
-		height = 1 << ((spriteram[offs + 0] & 0x0600) >> 9);
-		flipx = spriteram[offs + 0] & 0x2000;
-		flipy = spriteram[offs + 0] & 0x4000;
-
-		for (y = 0; y < height; y++)
-		{
-			drawgfx_transpen(bitmap,cliprect,machine.gfx[1],
-					code + (flipy ? height-1 - y : y),
-					color,
-					flipx,flipy,
-					0x140-5 - ((sx + 0x10) & 0x1ff),0x100+1 - ((sy + 0x10 * (height - y)) & 0x1ff),0);
-		}
-	}
-}
-
 
 SCREEN_UPDATE_IND16( gotcha )
 {
 	gotcha_state *state = screen.machine().driver_data<gotcha_state>();
 	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
-	draw_sprites(screen.machine(), bitmap, cliprect);
+	screen.machine().device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, state->m_spriteram, 0x400);
 	return 0;
 }

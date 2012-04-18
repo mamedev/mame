@@ -229,6 +229,39 @@ READ16_MEMBER(sc4_state::sc4_mem_r)
 
 static WRITE8_HANDLER( bfm_sc4_reel4_w );
 
+WRITE8_MEMBER(sc4_state::mux_output_w)
+{
+	int i;
+	int off = offset<<3;
+
+	for (i=0; i<8; i++)
+		output_set_lamp_value(off+i, ((data & (1 << i)) != 0));
+
+
+	output_set_indexed_value("matrix", off+i, ((data & (1 << i)) != 0));
+}
+
+WRITE8_MEMBER(sc4_state::mux_output2_w)
+{
+	int i;
+	int off = offset<<3;
+
+	for (i=0; i<8; i++)
+	{
+		output_set_indexed_value("matrix", off+i, ((data & (1 << i)) != 0));
+	}
+
+
+	if (offset>=20)
+	{
+		offset-=20;
+		// todo, reorder to what our 7segs expect
+		UINT8 bf7segdata = BITSWAP8(data,7,6,5,4,3,2,1,0);
+		output_set_digit_value(offset, bf7segdata);
+
+	}
+
+}
 
 WRITE16_MEMBER(sc4_state::sc4_mem_w)
 {
@@ -260,31 +293,61 @@ WRITE16_MEMBER(sc4_state::sc4_mem_w)
 			else if ((offset>=base2) && (offset<end2))
 			{
 				offset-=base2;
+				int addr = (offset<<1);
 
-				switch (offset << 1)
+				if (addr < 0x0200)
 				{
-					case 0x0330:
-						logerror("%08x meter write %04x\n",pc, data);
-						//m_meterstatus = (m_meterstatus&0xc0) | (data & 0x3f);
-						sec.write_clock_line(~data&0x20);					
-						break;
+					
+					if (mem_mask&0xff00)
+					{
+						logerror("lamp write mem_mask&0xff00 unhandled\n");
+					}
 
-					case 0x1248:
-						ymz280b_w(m_ymz,0, data & 0xff);
-						break;
+					if (mem_mask&0x00ff)
+					{	// lamps
+						mux_output_w(space, (addr & 0x01f0)>>4, data);
+					}
+					
+				}
+				else if ((addr >= 0x1000) && (addr < 0x1200))
+				{
+					if (mem_mask&0xff00)
+					{
+						logerror("lamp write mem_mask&0xff00 unhandled\n");
+					}
 
-					case 0x124a:
-						ymz280b_w(m_ymz,1, data & 0xff);
-						break;
+					if (mem_mask&0x00ff)
+					{	// lamps
+						mux_output2_w(space, (addr & 0x01f0)>>4, data);
+					}
+				}
+				else
+				{
+					switch (addr)
+					{
+						case 0x0330:
+							logerror("%08x meter write %04x\n",pc, data);
+							//m_meterstatus = (m_meterstatus&0xc0) | (data & 0x3f);
+							sec.write_clock_line(~data&0x20);					
+							break;
 
-					case 0x1330:
-						bfm_sc4_reel4_w(&space,0,data&0xf);
-						//m_meterstatus = (m_meterstatus&0x3f) | ((data & 0x30) << 2);
-						sec.write_data_line(~data&0x10);
-						break;
+						case 0x1248:
+							ymz280b_w(m_ymz,0, data & 0xff);
+							break;
 
-					default:
-						logerror("%08x maincpu write access offset %08x data %04x mem_mask %04x cs %d (LAMPS etc.)\n", pc, offset*2, data, mem_mask, cs);
+						case 0x124a:
+							ymz280b_w(m_ymz,1, data & 0xff);
+							break;
+
+						case 0x1330:
+							bfm_sc4_reel4_w(&space,0,data&0xf);
+							//m_meterstatus = (m_meterstatus&0x3f) | ((data & 0x30) << 2);
+							sec.write_data_line(~data&0x10);
+							break;
+
+						default:
+							logerror("%08x maincpu write access offset %08x data %04x mem_mask %04x cs %d (LAMPS etc.)\n", pc, offset*2, data, mem_mask, cs);
+					}
 				}
 			}
 			else
@@ -655,7 +718,7 @@ MACHINE_CONFIG_START( sc4, sc4_state )
 	MCFG_DUART68681_ADD("duart68681", 16000000/4, bfm_sc4_duart68681_config) // ?? Mhz
 
 
-	MCFG_DEFAULT_LAYOUT(layout_awpvid14)
+	MCFG_DEFAULT_LAYOUT(layout_bfm_sc4)
 
 	MCFG_SOUND_ADD("ymz", YMZ280B, 16000000) // ?? Mhz
 	MCFG_SOUND_CONFIG(ymz280b_config)

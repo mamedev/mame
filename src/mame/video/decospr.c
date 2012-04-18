@@ -40,6 +40,8 @@
    (bootleg) nmg5.c
    (bootleg) tumbleb.c
    (bootleg) crospang.c
+   (bootleg) silvmil.c
+   (bootleg) gotcha.c
 
    to convert:
 

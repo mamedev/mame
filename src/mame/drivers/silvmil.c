@@ -4,6 +4,8 @@
   yet another Data East / Tumble Pop derived hardware
   this one seems similar to (but not identical to)
   the crospang.c hardware from F2 system
+  also very close to gotcha.c, which was also a Para
+  board.
 
   todo: refresh rate & audio balance
         verify dipswitches - difficulty & unknown dips
