@@ -1995,9 +1995,9 @@ static DRIVER_INIT( cerberus )
 	leland_state *state = machine.driver_data<leland_state>();
 	/* master CPU bankswitching */
 	state->m_update_master_bank = cerberus_bankswitch;
-	memory_set_bankptr(machine, "bank1", machine.region("master")->base() + 0x2000);
-	memory_set_bankptr(machine, "bank2", machine.region("master")->base() + 0xa000);
-	memory_set_bankptr(machine, "bank3", machine.region("slave")->base() + 0x2000);
+	state->subbank("bank1")->set_base(machine.region("master")->base() + 0x2000);
+	state->subbank("bank2")->set_base(machine.region("master")->base() + 0xa000);
+	state->subbank("bank3")->set_base(machine.region("slave")->base() + 0x2000);
 
 	/* set up the master CPU I/O ports */
 	init_master_ports(machine, 0x40, 0x80);

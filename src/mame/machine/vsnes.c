@@ -182,7 +182,7 @@ static void v_set_videorom_bank( running_machine& machine, int start, int count,
 	/* count determines the size of the area mapped */
 	for (i = 0; i < count; i++)
 	{
-		memory_set_bank(machine, chr_banknames[i + start], vrom_start_bank + i);
+		state->subbank(chr_banknames[i + start])->set_entry(vrom_start_bank + i);
 	}
 }
 
@@ -214,7 +214,7 @@ MACHINE_START( vsnes )
 		for (i = 0; i < 8; i++)
 		{
 			ppu1_space->install_read_bank(0x0400 * i, 0x0400 * i + 0x03ff, chr_banknames[i]);
-			memory_configure_bank(machine, chr_banknames[i], 0, state->m_vrom_banks, state->m_vrom[0], 0x400);
+			state->subbank(chr_banknames[i])->configure_entries(0, state->m_vrom_banks, state->m_vrom[0], 0x400);
 		}
 		v_set_videorom_bank(machine, 0, 8, 0);
 	}
@@ -251,10 +251,10 @@ MACHINE_START( vsdual )
 	machine.device("ppu1")->memory().space(AS_PROGRAM)->install_read_bank(0x0000, 0x1fff, "bank2");
 	// read only!
 	machine.device("ppu2")->memory().space(AS_PROGRAM)->install_read_bank(0x0000, 0x1fff, "bank3");
-	memory_configure_bank(machine, "bank2", 0, state->m_vrom_size[0] / 0x2000, state->m_vrom[0], 0x2000);
-	memory_configure_bank(machine, "bank3", 0, state->m_vrom_size[1] / 0x2000, state->m_vrom[1], 0x2000);
-	memory_set_bank(machine, "bank2", 0);
-	memory_set_bank(machine, "bank3", 0);
+	state->subbank("bank2")->configure_entries(0, state->m_vrom_size[0] / 0x2000, state->m_vrom[0], 0x2000);
+	state->subbank("bank3")->configure_entries(0, state->m_vrom_size[1] / 0x2000, state->m_vrom[1], 0x2000);
+	state->subbank("bank2")->set_entry(0);
+	state->subbank("bank3")->set_entry(0);
 }
 
 /*************************************
@@ -1012,7 +1012,7 @@ WRITE8_MEMBER(vsnes_state::vsdual_vrom_banking)
 {
 	device_t *other_cpu = (&space.device() == machine().device("maincpu")) ? machine().device("sub") : machine().device("maincpu");
 	/* switch vrom */
-	(&space.device() == machine().device("maincpu")) ? memory_set_bank(machine(), "bank2", BIT(data, 2)) : memory_set_bank(machine(), "bank3", BIT(data, 2));
+	(&space.device() == machine().device("maincpu")) ? subbank("bank2")->set_entry(BIT(data, 2)) : subbank("bank3")->set_entry(BIT(data, 2));
 
 	/* bit 1 ( data & 2 ) triggers irq on the other cpu */
 	device_set_input_line(other_cpu, 0, (data & 2) ? CLEAR_LINE : ASSERT_LINE);

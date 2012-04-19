@@ -169,11 +169,11 @@ static void machine_reset(running_machine &machine)
 		state->m_cur_rambank[i] = 0x80;
 		state->m_current_notifier[i] = palette_notifier;
 		state->m_current_base[i] = state->m_palette_ram;
-		memory_set_bankptr(machine, bankname[i], state->m_current_base[i]);
+		state->subbank(bankname[i])->set_base(state->m_current_base[i]);
 	}
 
 	state->m_cur_rombank = state->m_cur_rombank2 = 0;
-	memory_set_bankptr(machine, "bank1", machine.region("maincpu")->base() + 0x10000);
+	state->subbank("bank1")->set_base(machine.region("maincpu")->base() + 0x10000);
 
 	gfx_element_set_source(machine.gfx[2], state->m_rambanks);
 
@@ -377,7 +377,7 @@ WRITE8_MEMBER(taitol_state::rombankswitch_w)
 
 		//logerror("robs %d, %02x (%04x)\n", offset, data, cpu_get_pc(&space.device()));
 		m_cur_rombank = data;
-		memory_set_bankptr(machine(), "bank1", machine().region("maincpu")->base() + 0x10000 + 0x2000 * m_cur_rombank);
+		subbank("bank1")->set_base(machine().region("maincpu")->base() + 0x10000 + 0x2000 * m_cur_rombank);
 	}
 }
 
@@ -397,7 +397,7 @@ WRITE8_MEMBER(taitol_state::rombank2switch_w)
 		//logerror("robs2 %02x (%04x)\n", data, cpu_get_pc(&space.device()));
 
 		m_cur_rombank2 = data;
-		memory_set_bankptr(machine(), "bank6", machine().region("slave")->base() + 0x10000 + 0x4000 * m_cur_rombank2);
+		subbank("bank6")->set_base(machine().region("slave")->base() + 0x10000 + 0x4000 * m_cur_rombank2);
 	}
 }
 
@@ -435,7 +435,7 @@ WRITE8_MEMBER(taitol_state::rambankswitch_w)
 			m_current_notifier[offset] = 0;
 			m_current_base[offset] = m_empty_ram;
 		}
-		memory_set_bankptr(machine(), bankname[offset], m_current_base[offset]);
+		subbank(bankname[offset])->set_base(m_current_base[offset]);
 	}
 }
 
@@ -743,7 +743,7 @@ WRITE8_MEMBER(taitol_state::sound_bankswitch_w)
 	UINT8 *RAM = machine().region("audiocpu")->base();
 	int banknum = (data - 1) & 3;
 
-	memory_set_bankptr (machine(), "bank7", &RAM [0x10000 + (banknum * 0x4000)]);
+	subbank ("bank7")->set_base (&RAM [0x10000 + (banknum * 0x4000)]);
 }
 
 static ADDRESS_MAP_START( raimais_3_map, AS_PROGRAM, 8, taitol_state )
@@ -1788,7 +1788,7 @@ static WRITE8_DEVICE_HANDLER( portA_w )
 
 		state->m_cur_bank = data & 0x03;
 		bankaddress = 0x10000 + (state->m_cur_bank - 1) * 0x4000;
-		memory_set_bankptr(device->machine(), "bank7", &RAM[bankaddress]);
+		state->subbank("bank7")->set_base(&RAM[bankaddress]);
 		//logerror ("YM2203 bank change val=%02x  pc=%04x\n", state->m_cur_bank, cpu_get_pc(&space->device()) );
 	}
 }

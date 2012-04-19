@@ -1395,7 +1395,7 @@ static DRIVER_INIT( liberate )
 		decrypted[A] = (decrypted[A] & 0x7d) | ((decrypted[A] & 0x02) << 6) | ((decrypted[A] & 0x80) >> 6);
 	}
 
-	memory_configure_bank_decrypted(machine, "bank1", 0, 1, decrypted + 0x8000, 0x10);
+	machine.root_device().subbank("bank1")->configure_decrypted_entry(0, decrypted + 0x8000);
 
 	sound_cpu_decrypt(machine);
 }

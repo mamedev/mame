@@ -273,7 +273,7 @@ READ8_MEMBER(cinemat_state::qb3_frame_r)
 
 WRITE8_MEMBER(cinemat_state::qb3_ram_bank_w)
 {
-	memory_set_bank(machine(), "bank1", cpu_get_reg(machine().device("maincpu"), CCPU_P) & 3);
+	subbank("bank1")->set_entry(cpu_get_reg(machine().device("maincpu"), CCPU_P) & 3);
 }
 
 
@@ -1487,7 +1487,7 @@ static DRIVER_INIT( qb3 )
 	machine.device("maincpu")->memory().space(AS_IO)->install_read_handler(0x0f, 0x0f, read8_delegate(FUNC(cinemat_state::qb3_frame_r),state));
 	machine.device("maincpu")->memory().space(AS_IO)->install_write_handler(0x00, 0x00, write8_delegate(FUNC(cinemat_state::qb3_ram_bank_w),state));
 
-	memory_configure_bank(machine, "bank1", 0, 4, state->m_rambase, 0x100*2);
+	state->subbank("bank1")->configure_entries(0, 4, state->m_rambase, 0x100*2);
 }
 
 

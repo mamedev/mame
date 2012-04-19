@@ -583,7 +583,7 @@ WRITE16_MEMBER(atarisy4_state::dsp0_bank_w)
 	}
 
 	data &= 0x3800;
-	memory_set_bankptr(machine(), "dsp0_bank1", &m_shared_ram[0][data]);
+	subbank("dsp0_bank1")->set_base(&m_shared_ram[0][data]);
 	m_dsp_bank[0] = data;
 }
 
@@ -617,7 +617,7 @@ WRITE16_MEMBER(atarisy4_state::dsp1_bank_w)
 	}
 
 	data &= 0x3800;
-	memory_set_bankptr(machine(), "dsp1_bank1", &m_shared_ram[1][data]);
+	subbank("dsp1_bank1")->set_base(&m_shared_ram[1][data]);
 	m_dsp_bank[1] = data;
 }
 
@@ -973,8 +973,8 @@ static DRIVER_INIT( laststar )
 	load_hexfile(main, machine.region("data")->base());
 
 	/* Set up the DSP */
-	memory_set_bankptr(machine, "dsp0_bank0", state->m_shared_ram[0]);
-	memory_set_bankptr(machine, "dsp0_bank1", &state->m_shared_ram[0][0x800]);
+	state->subbank("dsp0_bank0")->set_base(state->m_shared_ram[0]);
+	state->subbank("dsp0_bank1")->set_base(&state->m_shared_ram[0][0x800]);
 	load_ldafile(machine.device("dsp0")->memory().space(AS_PROGRAM), machine.region("dsp")->base());
 }
 
@@ -989,13 +989,13 @@ static DRIVER_INIT( airrace )
 	load_hexfile(machine.device("maincpu")->memory().space(AS_PROGRAM), machine.region("code")->base());
 
 	/* Set up the first DSP */
-	memory_set_bankptr(machine, "dsp0_bank0", state->m_shared_ram[0]);
-	memory_set_bankptr(machine, "dsp0_bank1", &state->m_shared_ram[0][0x800]);
+	state->subbank("dsp0_bank0")->set_base(state->m_shared_ram[0]);
+	state->subbank("dsp0_bank1")->set_base(&state->m_shared_ram[0][0x800]);
 	load_ldafile(machine.device("dsp0")->memory().space(AS_PROGRAM), machine.region("dsp")->base());
 
 	/* Set up the second DSP */
-	memory_set_bankptr(machine, "dsp1_bank0", state->m_shared_ram[1]);
-	memory_set_bankptr(machine, "dsp1_bank1", &state->m_shared_ram[1][0x800]);
+	state->subbank("dsp1_bank0")->set_base(state->m_shared_ram[1]);
+	state->subbank("dsp1_bank1")->set_base(&state->m_shared_ram[1][0x800]);
 	load_ldafile(machine.device("dsp1")->memory().space(AS_PROGRAM), machine.region("dsp")->base());
 }
 

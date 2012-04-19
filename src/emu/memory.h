@@ -900,24 +900,6 @@ extern const char *const address_space_names[ADDRESS_SPACES];
 
 
 //**************************************************************************
-//  FUNCTION PROTOTYPES FOR CORE MEMORY FUNCTIONS
-//**************************************************************************
-
-// configure the addresses for a bank
-void memory_configure_bank(running_machine &machine, const char *tag, int startentry, int numentries, void *base, offs_t stride) ATTR_NONNULL(5);
-
-// configure the decrypted addresses for a bank
-void memory_configure_bank_decrypted(running_machine &machine, const char *tag, int startentry, int numentries, void *base, offs_t stride) ATTR_NONNULL(5);
-
-// select one pre-configured entry to be the new bank base
-void memory_set_bank(running_machine &machine, const char *tag, int entrynum);
-
-// set the absolute address of a bank base
-void memory_set_bankptr(running_machine &machine, const char *tag, void *base) ATTR_NONNULL(3);
-
-
-
-//**************************************************************************
 //  INLINE FUNCTIONS
 //**************************************************************************
 

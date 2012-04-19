@@ -248,7 +248,7 @@ WRITE16_MEMBER(highvdeo_state::tv_vcf_bankselect_w)
 	/* bits 0, 1 select the ROM bank */
 	bankaddress = (data & 0x03) * 0x40000;
 
-	memory_set_bankptr(machine(), "bank1", &ROM[bankaddress]);
+	subbank("bank1")->set_base(&ROM[bankaddress]);
 }
 
 
@@ -383,7 +383,7 @@ WRITE16_MEMBER(highvdeo_state::tv_tcf_bankselect_w)
 	/* bits 0, 1, 2 select the ROM bank */
 	bankaddress = (data & 0x07) * 0x40000;
 
-	memory_set_bankptr(machine(), "bank1", &ROM[bankaddress]);
+	subbank("bank1")->set_base(&ROM[bankaddress]);
 }
 
 static ADDRESS_MAP_START( tv_tcf_map, AS_PROGRAM, 16, highvdeo_state )
@@ -505,7 +505,7 @@ WRITE16_MEMBER(highvdeo_state::brasil_status_w)
 
 	bankaddress = (data & 0x07) * 0x40000;
 
-	memory_set_bankptr(machine(), "bank1", &ROM[bankaddress]);
+	subbank("bank1")->set_base(&ROM[bankaddress]);
 
 //  popmessage("%04x",data);
 }

@@ -96,13 +96,13 @@ WRITE8_MEMBER(asteroid_state::asteroid_bank_switch_w)
 {
 	if (data & 4)
 	{
-		memory_set_bankptr(machine(), "bank1", m_ram2);
-		memory_set_bankptr(machine(), "bank2", m_ram1);
+		subbank("bank1")->set_base(m_ram2);
+		subbank("bank2")->set_base(m_ram1);
 	}
 	else
 	{
-		memory_set_bankptr(machine(), "bank1", m_ram1);
-		memory_set_bankptr(machine(), "bank2", m_ram2);
+		subbank("bank1")->set_base(m_ram1);
+		subbank("bank2")->set_base(m_ram2);
 	}
 
 	set_led_status (machine(), 0, ~data & 0x02);
@@ -114,13 +114,13 @@ WRITE8_MEMBER(asteroid_state::astdelux_bank_switch_w)
 {
 	if (data & 0x80)
 	{
-		memory_set_bankptr(machine(), "bank1", m_ram2);
-		memory_set_bankptr(machine(), "bank2", m_ram1);
+		subbank("bank1")->set_base(m_ram2);
+		subbank("bank2")->set_base(m_ram1);
 	}
 	else
 	{
-		memory_set_bankptr(machine(), "bank1", m_ram1);
-		memory_set_bankptr(machine(), "bank2", m_ram2);
+		subbank("bank1")->set_base(m_ram1);
+		subbank("bank2")->set_base(m_ram2);
 	}
 }
 

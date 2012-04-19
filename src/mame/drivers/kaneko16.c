@@ -814,7 +814,7 @@ static void kaneko16_common_oki_bank_w( running_machine& machine, const char *ba
 
 	if (bankaddr <= (length-bankedsize))
 	{
-		memory_set_bankptr(machine, bankname, samples + bankaddr);
+		machine.root_device().subbank(bankname)->set_base(samples + bankaddr);
 	}
 }
 

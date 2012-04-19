@@ -433,7 +433,7 @@ static DRIVER_INIT( fixeightbl )
 {
 	UINT8 *ROM = machine.region("oki")->base();
 
-	memory_configure_bank(machine, "bank1", 0, 5, &ROM[0x30000], 0x10000);
+	machine.root_device().subbank("bank1")->configure_entries(0, 5, &ROM[0x30000], 0x10000);
 }
 
 
@@ -464,7 +464,7 @@ static DRIVER_INIT( bgaregga )
 	UINT8 *Z80 = machine.region("audiocpu")->base();
 
 	// seems to only use banks 0x0a to 0x0f
-	memory_configure_bank(machine, "bank1", 8, 8, Z80, 0x4000);
+	machine.root_device().subbank("bank1")->configure_entries(8, 8, Z80, 0x4000);
 }
 
 
@@ -473,7 +473,7 @@ static DRIVER_INIT( batrider )
 	toaplan2_state *state = machine.driver_data<toaplan2_state>();
 	UINT8 *Z80 = machine.region("audiocpu")->base();
 
-	memory_configure_bank(machine, "bank1", 0, 16, Z80, 0x4000);
+	state->subbank("bank1")->configure_entries(0, 16, Z80, 0x4000);
 	state->m_sndirq_line = 4;
 }
 
@@ -781,7 +781,7 @@ WRITE16_MEMBER(toaplan2_state::fixeightbl_oki_bankswitch_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		data &= 7;
-		if (data <= 4) memory_set_bank(machine(), "bank1", data);
+		if (data <= 4) subbank("bank1")->set_entry(data);
 	}
 }
 
@@ -840,7 +840,7 @@ READ8_MEMBER(toaplan2_state::fixeight_region_r)
 
 WRITE8_MEMBER(toaplan2_state::raizing_z80_bankswitch_w)
 {
-	memory_set_bank(machine(), "bank1", data & 0x0f);
+	subbank("bank1")->set_entry(data & 0x0f);
 }
 
 

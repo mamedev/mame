@@ -184,8 +184,8 @@ WRITE8_MEMBER(rmhaihai_state::themj_rombank_w)
 	UINT8 *rom = machine().region("maincpu")->base() + 0x10000;
 	int bank = data & 0x03;
 logerror("banksw %d\n",bank);
-	memory_set_bankptr(machine(), "bank1", rom + bank*0x4000);
-	memory_set_bankptr(machine(), "bank2", rom + bank*0x4000 + 0x2000);
+	subbank("bank1")->set_base(rom + bank*0x4000);
+	subbank("bank2")->set_base(rom + bank*0x4000 + 0x2000);
 }
 
 static MACHINE_RESET( themj )

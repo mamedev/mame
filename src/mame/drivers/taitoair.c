@@ -378,7 +378,7 @@ READ16_MEMBER(taitoair_state::stick2_input_r)
 static void reset_sound_region( running_machine &machine )
 {
 	taitoair_state *state = machine.driver_data<taitoair_state>();
-	memory_set_bank(machine, "bank1", state->m_banknum);
+	state->subbank("bank1")->set_entry(state->m_banknum);
 }
 
 WRITE8_MEMBER(taitoair_state::sound_bankswitch_w)
@@ -672,7 +672,7 @@ static MACHINE_START( taitoair )
 	UINT8 *ROM = machine.region("audiocpu")->base();
 	int i;
 
-	memory_configure_bank(machine, "bank1", 0, 4, &ROM[0xc000], 0x4000);
+	state->subbank("bank1")->configure_entries(0, 4, &ROM[0xc000], 0x4000);
 
 	state->m_audiocpu = machine.device("audiocpu");
 	state->m_dsp = machine.device("dsp");

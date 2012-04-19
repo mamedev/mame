@@ -2863,7 +2863,7 @@ static WRITE16_HANDLER( _32x_68k_a15100_w )
 			space->install_rom(0x0880000, 0x08fffff, space->machine().region("gamecart")->base()); // 'fixed' 512kb rom bank
 
 			space->install_read_bank(0x0900000, 0x09fffff, "bank12"); // 'bankable' 1024kb rom bank
-			memory_set_bankptr(space->machine(),  "bank12", space->machine().region("gamecart")->base()+((_32x_68k_a15104_reg&0x3)*0x100000) );
+			space->machine().root_device().subbank("bank12")->set_base(space->machine().region("gamecart")->base()+((_32x_68k_a15104_reg&0x3)*0x100000) );
 
 			space->install_rom(0x0000000, 0x03fffff, space->machine().region("32x_68k_bios")->base());
 
@@ -2949,7 +2949,7 @@ static WRITE16_HANDLER( _32x_68k_a15104_w )
 		_32x_68k_a15104_reg = (_32x_68k_a15104_reg & 0x00ff) | (data & 0xff00);
 	}
 
-	memory_set_bankptr(space->machine(),  "bank12", space->machine().region("gamecart")->base()+((_32x_68k_a15104_reg&0x3)*0x100000) );
+	space->machine().root_device().subbank("bank12")->set_base(space->machine().region("gamecart")->base()+((_32x_68k_a15104_reg&0x3)*0x100000) );
 }
 
 /**********************************************************************************************/
@@ -6005,7 +6005,7 @@ void segacd_init_main_cpu( running_machine& machine )
 	space->unmap_readwrite        (0x020000,0x3fffff);
 
 //  space->install_read_bank(0x0020000, 0x003ffff, "scd_4m_prgbank");
-//  memory_set_bankptr(space->machine(),  "scd_4m_prgbank", segacd_4meg_prgram + segacd_4meg_prgbank * 0x20000 );
+//  space->machine().root_device().subbank("scd_4m_prgbank")->set_base(segacd_4meg_prgram + segacd_4meg_prgbank * 0x20000 );
 	space->install_legacy_read_handler (0x0020000, 0x003ffff, FUNC(scd_4m_prgbank_ram_r) );
 	space->install_legacy_write_handler (0x0020000, 0x003ffff, FUNC(scd_4m_prgbank_ram_w) );
 	segacd_wordram_mapped = 1;
@@ -7173,10 +7173,10 @@ static void svp_init(running_machine &machine)
 	machine.device("svp")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x438, 0x438, FUNC(svp_speedup_r));
 
 	state->m_iram = auto_alloc_array(machine, UINT8, 0x800);
-	memory_set_bankptr(machine,  "bank3", state->m_iram);
+	state->subbank("bank3")->set_base(state->m_iram);
 	/* SVP ROM just shares m68k region.. */
 	ROM = machine.region("maincpu")->base();
-	memory_set_bankptr(machine,  "bank4", ROM + 0x800);
+	state->subbank("bank4")->set_base(ROM + 0x800);
 
 	megadrive_io_read_data_port_ptr	= megadrive_io_read_data_port_svp;
 }
@@ -9856,7 +9856,7 @@ static void megadriv_init_common(running_machine &machine)
 		//printf("GENESIS Sound Z80 cpu found '%s'\n", _genesis_snd_z80_cpu->tag() );
 
 		genz80.z80_prgram = auto_alloc_array(machine, UINT8, 0x2000);
-		memory_set_bankptr(machine,  "bank1", genz80.z80_prgram );
+		machine.root_device().subbank("bank1")->set_base(genz80.z80_prgram );
 	}
 
 	/* Look to see if this system has the 32x Master SH2 */
@@ -10050,7 +10050,7 @@ void megatech_set_megadrive_z80_as_megadrive_z80(running_machine &machine, const
 
 
 	machine.device(tag)->memory().space(AS_PROGRAM)->install_readwrite_bank(0x0000, 0x1fff, "bank1");
-	memory_set_bankptr(machine,  "bank1", genz80.z80_prgram );
+	machine.root_device().subbank("bank1")->set_base(genz80.z80_prgram );
 
 	machine.device(tag)->memory().space(AS_PROGRAM)->install_ram(0x0000, 0x1fff, genz80.z80_prgram);
 

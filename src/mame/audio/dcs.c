@@ -821,7 +821,7 @@ static TIMER_CALLBACK( dcs_reset )
 		/* rev 1: just reset the bank to 0 */
 		case 1:
 			dcs.sounddata_bank = 0;
-			memory_set_bank(machine, "databank", 0);
+			machine.root_device().subbank("databank")->set_entry(0);
 			break;
 
 		/* rev 2: reset the SDRC ASIC */
@@ -960,7 +960,7 @@ void dcs_init(running_machine &machine)
 	dcs.sounddata = dcs.bootrom;
 	dcs.sounddata_words = dcs.bootrom_words;
 	dcs.sounddata_banks = dcs.sounddata_words / 0x1000;
-	memory_configure_bank(machine, "databank", 0, dcs.sounddata_banks, dcs.sounddata, 0x1000*2);
+	machine.root_device().subbank("databank")->configure_entries(0, dcs.sounddata_banks, dcs.sounddata, 0x1000*2);
 
 	/* create the timers */
 	dcs.internal_timer = machine.device<timer_device>("dcs_int_timer");
@@ -1024,7 +1024,7 @@ void dcs2_init(running_machine &machine, int dram_in_mb, offs_t polling_offset)
 	}
 	dcs.sounddata_banks = dcs.sounddata_words / soundbank_words;
 	if (dcs.rev != 2)
-		memory_configure_bank(machine, "databank", 0, dcs.sounddata_banks, dcs.sounddata, soundbank_words*2);
+		machine.root_device().subbank("databank")->configure_entries(0, dcs.sounddata_banks, dcs.sounddata, soundbank_words*2);
 
 	/* allocate memory for the SRAM */
 	dcs.sram = auto_alloc_array(machine, UINT16, 0x8000*4/2);
@@ -1085,7 +1085,7 @@ static WRITE16_HANDLER( dcs_dataram_w )
 static WRITE16_HANDLER( dcs_data_bank_select_w )
 {
 	dcs.sounddata_bank = data & 0x7ff;
-	memory_set_bank(space->machine(), "databank", dcs.sounddata_bank % dcs.sounddata_banks);
+	space->machine().root_device().subbank("databank")->set_entry(dcs.sounddata_bank % dcs.sounddata_banks);
 
 	/* bit 11 = sound board led */
 #if 0
@@ -1112,15 +1112,15 @@ INLINE void sdrc_update_bank_pointers(running_machine &machine)
 		{
 			/* ROM-based; use the memory page to select from ROM */
 			if (SDRC_ROM_MS == 1 && SDRC_ROM_ST != 3)
-				memory_set_bankptr(machine, "rompage", &dcs.sounddata[(SDRC_EPM_PG * pagesize) % dcs.sounddata_words]);
+				machine.root_device().subbank("rompage")->set_base(&dcs.sounddata[(SDRC_EPM_PG * pagesize) % dcs.sounddata_words]);
 		}
 		else
 		{
 			/* RAM-based; use the ROM page to select from ROM, and the memory page to select from RAM */
 			if (SDRC_ROM_MS == 1 && SDRC_ROM_ST != 3)
-				memory_set_bankptr(machine, "rompage", &dcs.bootrom[(SDRC_ROM_PG * 4096 /*pagesize*/) % dcs.bootrom_words]);
+				machine.root_device().subbank("rompage")->set_base(&dcs.bootrom[(SDRC_ROM_PG * 4096 /*pagesize*/) % dcs.bootrom_words]);
 			if (SDRC_DM_ST != 0)
-				memory_set_bankptr(machine, "drampage", &dcs.sounddata[(SDRC_DM_PG * 1024) % dcs.sounddata_words]);
+				machine.root_device().subbank("drampage")->set_base(&dcs.sounddata[(SDRC_DM_PG * 1024) % dcs.sounddata_words]);
 		}
 	}
 }
@@ -1362,7 +1362,7 @@ static WRITE16_HANDLER( dsio_w )
 		/* offset 2 controls RAM pages */
 		case 2:
 			dsio.reg[2] = data;
-			memory_set_bank(space->machine(), "databank", DSIO_DM_PG % dcs.sounddata_banks);
+			space->machine().root_device().subbank("databank")->set_entry(DSIO_DM_PG % dcs.sounddata_banks);
 			break;
 	}
 }
@@ -1429,7 +1429,7 @@ static WRITE16_HANDLER( denver_w )
 		/* offset 2 controls RAM pages */
 		case 2:
 			dsio.reg[2] = data;
-			memory_set_bank(space->machine(), "databank", DENV_DM_PG % dcs.sounddata_bank);
+			space->machine().root_device().subbank("databank")->set_entry(DENV_DM_PG % dcs.sounddata_bank);
 			break;
 
 		/* offset 3 controls FIFO reset */

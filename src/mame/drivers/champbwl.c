@@ -194,7 +194,7 @@ WRITE8_MEMBER(champbwl_state::champbwl_misc_w)
 	coin_lockout_w(machine(), 0, ~data & 8);
 	coin_lockout_w(machine(), 1, ~data & 4);
 
-	memory_set_bank(machine(), "bank1", (data & 0x30) >> 4);
+	subbank("bank1")->set_entry((data & 0x30) >> 4);
 }
 
 static ADDRESS_MAP_START( champbwl_map, AS_PROGRAM, 8, champbwl_state )
@@ -231,7 +231,7 @@ WRITE8_MEMBER(champbwl_state::doraemon_outputs_w)
 	coin_lockout_w(machine(), 0, ~data & 8);	// coin lockout
 	machine().device<ticket_dispenser_device>("hopper")->write(*&space, 0, (data & 0x04) ? 0x00 : 0x80);	// gift out motor
 
-	memory_set_bank(machine(), "bank1", (data & 0x30) >> 4);
+	subbank("bank1")->set_entry((data & 0x30) >> 4);
 
 //  popmessage("%02x", data);
 }
@@ -434,7 +434,7 @@ static MACHINE_START( champbwl )
 
 	state->m_mcu = NULL;
 
-	memory_configure_bank(machine, "bank1", 0, 4, &ROM[0x10000], 0x4000);
+	state->subbank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x4000);
 
 	state->save_item(NAME(state->m_screenflip));
 	state->save_item(NAME(state->m_last_trackball_val));
@@ -531,7 +531,7 @@ static SCREEN_VBLANK( doraemon )
 static MACHINE_START( doraemon )
 {
 	UINT8 *ROM = machine.region("maincpu")->base();
-	memory_configure_bank(machine, "bank1", 0, 4, &ROM[0x10000], 0x4000);
+	machine.root_device().subbank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x4000);
 }
 
 static MACHINE_CONFIG_START( doraemon, tnzs_state )

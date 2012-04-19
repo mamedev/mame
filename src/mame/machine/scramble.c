@@ -111,7 +111,7 @@ static void cavelon_banksw(running_machine &machine)
        to keep the CPU core happy at the boundaries */
 
 	state->m_cavelon_bank = !state->m_cavelon_bank;
-	memory_set_bank(machine, "bank1", state->m_cavelon_bank);
+	state->subbank("bank1")->set_entry(state->m_cavelon_bank);
 }
 
 static READ8_HANDLER( cavelon_banksw_r )
@@ -246,7 +246,7 @@ DRIVER_INIT( mariner )
 	/* extra ROM */
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x5800, 0x67ff, "bank1");
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->unmap_write(0x5800, 0x67ff);
-	memory_set_bankptr(machine, "bank1", machine.region("maincpu")->base() + 0x5800);
+	machine.root_device().subbank("bank1")->set_base(machine.region("maincpu")->base() + 0x5800);
 
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x9008, 0x9008, FUNC(mariner_protection_2_r));
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xb401, 0xb401, FUNC(mariner_protection_1_r));
@@ -332,7 +332,7 @@ DRIVER_INIT( cavelon )
 
 	/* banked ROM */
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x0000, 0x3fff, "bank1");
-	memory_configure_bank(machine, "bank1", 0, 2, &ROM[0x00000], 0x10000);
+	state->subbank("bank1")->configure_entries(0, 2, &ROM[0x00000], 0x10000);
 	cavelon_banksw(machine);
 
 	/* A15 switches memory banks */

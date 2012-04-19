@@ -322,7 +322,7 @@ WRITE8_MEMBER(thunderx_state::scontra_bankswitch_w)
 
 	/* bits 0-3 ROM bank */
 	offs = 0x10000 + (data & 0x0f)*0x2000;
-	memory_set_bankptr(machine(),  "bank1", &RAM[offs] );
+	subbank("bank1")->set_base(&RAM[offs] );
 
 	/* bit 4 select work RAM or palette RAM at 5800-5fff */
 	m_palette_selected = ~data & 0x10;
@@ -626,9 +626,9 @@ static MACHINE_START( thunderx )
 	thunderx_state *state = machine.driver_data<thunderx_state>();
 	UINT8 *ROM = machine.region("maincpu")->base();
 
-	memory_configure_bank(machine, "bank1", 0, 12, &ROM[0x10000], 0x2000);
-	memory_configure_bank(machine, "bank1", 12, 4, &ROM[0x08000], 0x2000);
-	memory_set_bank(machine, "bank1", 0);
+	state->subbank("bank1")->configure_entries(0, 12, &ROM[0x10000], 0x2000);
+	state->subbank("bank1")->configure_entries(12, 4, &ROM[0x08000], 0x2000);
+	state->subbank("bank1")->set_entry(0);
 
 	memset(state->m_pmcram, 0, sizeof(state->m_pmcram));
 
@@ -991,7 +991,7 @@ ROM_END
 static KONAMI_SETLINES_CALLBACK( thunderx_banking )
 {
 	//logerror("thunderx %04x: bank select %02x\n", cpu_get_pc(device->cpu), lines);
-	memory_set_bank(device->machine(),  "bank1", ((lines & 0x0f) ^ 0x08));
+	device->machine().root_device().subbank("bank1")->set_entry(((lines & 0x0f) ^ 0x08));
 }
 
 GAME( 1988, scontra,   0,        scontra,  scontra,  0, ROT90, "Konami", "Super Contra", GAME_SUPPORTS_SAVE )

@@ -340,7 +340,7 @@ static VIDEO_START( pc_cga )
 	cga.videoram = auto_alloc_array(machine, UINT8, 0x4000);
 	cga.is_superimpose = 0;
 
-	memory_set_bankptr(machine,"bank11", cga.videoram);
+	machine.root_device().subbank("bank11")->set_base(cga.videoram);
 }
 
 
@@ -381,7 +381,7 @@ static VIDEO_START( pc_cga32k )
 	cga.videoram = auto_alloc_array(machine, UINT8, 0x8000);
 	cga.is_superimpose = 0;
 
-	memory_set_bankptr(machine,"bank11", cga.videoram);
+	machine.root_device().subbank("bank11")->set_base(cga.videoram);
 }
 
 SCREEN_UPDATE_RGB32( mc6845_cga )
@@ -1485,7 +1485,7 @@ static WRITE8_HANDLER ( pc1512_w )
 		}
 		else
 		{
-			memory_set_bankptr(space->machine(),"bank1", videoram + videoram_offset[0]);
+			space->machine().root_device().subbank("bank1")->set_base(videoram + videoram_offset[0]);
 		}
 		cga.mode_control = data;
 		switch( cga.mode_control & 0x3F )
@@ -1543,7 +1543,7 @@ static WRITE8_HANDLER ( pc1512_w )
 		pc1512.read = data;
 		if ( ( cga.mode_control & 0x12 ) == 0x12 )
 		{
-			memory_set_bankptr(space->machine(),"bank1", videoram + videoram_offset[data & 3]);
+			space->machine().root_device().subbank("bank1")->set_base(videoram + videoram_offset[data & 3]);
 		}
 		break;
 
@@ -1618,7 +1618,7 @@ static VIDEO_START( pc1512 )
 	address_space *io_space = machine.firstcpu->memory().space( AS_IO );
 
 	space->install_read_bank( 0xb8000, 0xbbfff, 0, 0x0C000, "bank1" );
-	memory_set_bankptr(machine, "bank1", cga.videoram + videoram_offset[0]);
+	machine.root_device().subbank("bank1")->set_base(cga.videoram + videoram_offset[0]);
 	space->install_legacy_write_handler( 0xb8000, 0xbbfff, 0, 0x0C000, FUNC(pc1512_videoram16le_w) );
 
 	io_space->install_legacy_read_handler( 0x3d0, 0x3df, FUNC(pc1512_16le_r) );

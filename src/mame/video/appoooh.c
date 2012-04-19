@@ -197,7 +197,7 @@ WRITE8_MEMBER(appoooh_state::appoooh_out_w)
 	{
 		UINT8 *RAM = machine().region("maincpu")->base();
 
-		memory_set_bankptr(machine(), "bank1",&RAM[data&0x40 ? 0x10000 : 0x0a000]);
+		subbank("bank1")->set_base(&RAM[data&0x40 ? 0x10000 : 0x0a000]);
 	}
 
 	/* bit 7 unknown (used) */

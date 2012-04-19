@@ -35,7 +35,7 @@
 static WRITE8_DEVICE_HANDLER( mquake_cia_0_porta_w )
 {
 	/* switch banks as appropriate */
-	memory_set_bank(device->machine(), "bank1", data & 1);
+	device->machine().root_device().subbank("bank1")->set_entry(data & 1);
 
 	/* swap the write handlers between ROM and bank 1 based on the bit */
 	if ((data & 1) == 0)
@@ -444,8 +444,8 @@ static DRIVER_INIT(mquake)
 	amiga_machine_config(machine, &mquake_intf);
 
 	/* set up memory */
-	memory_configure_bank(machine, "bank1", 0, 1, state->m_chip_ram, 0);
-	memory_configure_bank(machine, "bank1", 1, 1, machine.region("user1")->base(), 0);
+	state->subbank("bank1")->configure_entry(0, state->m_chip_ram);
+	state->subbank("bank1")->configure_entry(1, machine.region("user1")->base());
 }
 
 

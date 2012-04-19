@@ -234,7 +234,7 @@ static void sound_nmi( device_t *device )
 
 WRITE8_MEMBER(lethal_state::le_bankswitch_w)
 {
-	memory_set_bank(machine(), "bank1", data);
+	subbank("bank1")->set_entry(data);
 }
 
 READ8_MEMBER(lethal_state::le_4800_r)
@@ -581,8 +581,8 @@ static MACHINE_START( lethalen )
 	lethal_state *state = machine.driver_data<lethal_state>();
 	UINT8 *ROM = machine.region("maincpu")->base();
 
-	memory_configure_bank(machine, "bank1", 0, 0x20, &ROM[0x10000], 0x2000);
-	memory_set_bank(machine, "bank1", 0);
+	state->subbank("bank1")->configure_entries(0, 0x20, &ROM[0x10000], 0x2000);
+	state->subbank("bank1")->set_entry(0);
 
 	state->m_generic_paletteram_8.allocate(0x3800 + 0x02);
 
@@ -604,7 +604,7 @@ static MACHINE_RESET( lethalen )
 	UINT8 *prgrom = (UINT8 *)machine.region("maincpu")->base();
 	int i;
 
-	memory_set_bankptr(machine, "bank2", &prgrom[0x48000]);
+	state->subbank("bank2")->set_base(&prgrom[0x48000]);
 	/* force reset again to read proper reset vector */
 	machine.device("maincpu")->reset();
 

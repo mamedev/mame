@@ -159,10 +159,10 @@ READ8_MEMBER(fromanc2_state::fromanc2_sndcpu_nmi_clr)
 WRITE8_MEMBER(fromanc2_state::fromanc2_subcpu_rombank_w)
 {
 	// Change ROM BANK
-	memory_set_bank(machine(), "bank1", data & 0x03);
+	subbank("bank1")->set_entry(data & 0x03);
 
 	// Change RAM BANK
-	memory_set_bank(machine(), "bank2", (data & 0x0c) >> 2);
+	subbank("bank2")->set_entry((data & 0x0c) >> 2);
 }
 
 
@@ -524,9 +524,9 @@ static MACHINE_START( fromanc2 )
 {
 	fromanc2_state *state = machine.driver_data<fromanc2_state>();
 
-	memory_configure_bank(machine, "bank1", 0, 4, machine.region("sub")->base(), 0x4000);
-	memory_configure_bank(machine, "bank2", 0, 1, machine.region("sub")->base() + 0x08000, 0x4000);
-	memory_configure_bank(machine, "bank2", 1, 3, machine.region("sub")->base() + 0x14000, 0x4000);
+	state->subbank("bank1")->configure_entries(0, 4, machine.region("sub")->base(), 0x4000);
+	state->subbank("bank2")->configure_entry(0, machine.region("sub")->base() + 0x08000);
+	state->subbank("bank2")->configure_entries(1, 3, machine.region("sub")->base() + 0x14000, 0x4000);
 
 	MACHINE_START_CALL(fromanc4);
 

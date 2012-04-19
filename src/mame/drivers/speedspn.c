@@ -85,7 +85,7 @@ WRITE8_MEMBER(speedspn_state::speedspn_banked_rom_change)
 			break;
 	}
 
-	memory_set_bankptr(machine(), "bank1",&rom[addr + 0x8000]);
+	subbank("bank1")->set_base(&rom[addr + 0x8000]);
 }
 
 /*** SOUND RELATED ***********************************************************/

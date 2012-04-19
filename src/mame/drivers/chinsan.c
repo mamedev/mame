@@ -119,7 +119,7 @@ static SCREEN_UPDATE_IND16( chinsan )
 
 WRITE8_MEMBER(chinsan_state::ctrl_w)
 {
-	memory_set_bank(machine(), "bank1", data >> 6);
+	subbank("bank1")->set_entry(data >> 6);
 }
 
 static WRITE8_DEVICE_HANDLER( ym_port_w1 )
@@ -571,7 +571,7 @@ static MACHINE_START( chinsan )
 {
 	chinsan_state *state = machine.driver_data<chinsan_state>();
 
-	memory_configure_bank(machine, "bank1", 0, 4, machine.region("maincpu")->base() + 0x10000, 0x4000);
+	state->subbank("bank1")->configure_entries(0, 4, machine.region("maincpu")->base() + 0x10000, 0x4000);
 
 	state->save_item(NAME(state->m_adpcm_idle));
 	state->save_item(NAME(state->m_port_select));

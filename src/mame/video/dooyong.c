@@ -139,7 +139,7 @@ WRITE8_MEMBER(dooyong_state::pollux_ctrl_w)
 WRITE8_MEMBER(dooyong_state::primella_ctrl_w)
 {
 	/* bits 0-2 select ROM bank */
-	memory_set_bank(machine(), "bank1", data & 0x07);
+	subbank("bank1")->set_entry(data & 0x07);
 
 	/* bit 3 disables tx layer */
 	m_tx_pri = data & 0x08;

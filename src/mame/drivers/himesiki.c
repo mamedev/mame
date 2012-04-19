@@ -91,7 +91,7 @@ A                                                   12.000MHz
 
 WRITE8_MEMBER(himesiki_state::himesiki_rombank_w)
 {
-	memory_set_bank(machine(), "bank1", ((data & 0x08) >> 3));
+	subbank("bank1")->set_entry(((data & 0x08) >> 3));
 
 	if (data & 0xf7)
 		logerror("p06_w %02x\n", data);
@@ -271,7 +271,7 @@ static MACHINE_START( himesiki )
 	himesiki_state *state = machine.driver_data<himesiki_state>();
 	UINT8 *ROM = machine.region("maincpu")->base();
 
-	memory_configure_bank(machine, "bank1", 0, 2, &ROM[0x10000], 0x4000);
+	state->subbank("bank1")->configure_entries(0, 2, &ROM[0x10000], 0x4000);
 
 	state->m_subcpu = machine.device("sub");
 

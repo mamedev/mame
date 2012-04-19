@@ -248,7 +248,7 @@ public:
 
 WRITE8_MEMBER(smsmfg_state::bankswitch_w)
 {
-	memory_set_bank(machine(), "bank1", data);
+	subbank("bank1")->set_entry(data);
 }
 
 /*************************************
@@ -533,7 +533,7 @@ ADDRESS_MAP_END
 static MACHINE_START( sms )
 {
 	smsmfg_state *state = machine.driver_data<smsmfg_state>();
-	memory_configure_bank(machine, "bank1", 0, 16, machine.region("questions")->base(), 0x4000);
+	state->subbank("bank1")->configure_entries(0, 16, machine.region("questions")->base(), 0x4000);
 
 	state_save_register_global(machine, state->m_communication_port_status);
 	state_save_register_global_array(machine, state->m_communication_port);

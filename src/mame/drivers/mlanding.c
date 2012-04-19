@@ -271,7 +271,7 @@ WRITE16_MEMBER(mlanding_state::ml_output_w)
 static WRITE8_DEVICE_HANDLER( sound_bankswitch_w )
 {
 	data=0;
-	memory_set_bankptr(device->machine(),  "bank1", device->machine().region("audiocpu")->base() + ((data) & 0x03) * 0x4000 + 0x10000 );
+	device->machine().root_device().subbank("bank1")->set_base(device->machine().region("audiocpu")->base() + ((data) & 0x03) * 0x4000 + 0x10000 );
 }
 
 static void ml_msm5205_vck(device_t *device)

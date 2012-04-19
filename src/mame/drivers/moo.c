@@ -180,7 +180,7 @@ READ16_MEMBER(moo_state::sound_status_r)
 
 WRITE8_MEMBER(moo_state::sound_bankswitch_w)
 {
-	memory_set_bankptr(machine(), "bank1", machine().region("soundcpu")->base() + 0x10000 + (data&0xf)*0x4000);
+	subbank("bank1")->set_base(machine().region("soundcpu")->base() + 0x10000 + (data&0xf)*0x4000);
 }
 
 

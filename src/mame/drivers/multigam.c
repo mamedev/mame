@@ -196,7 +196,7 @@ static void set_videorom_bank(running_machine& machine, int start, int count, in
 	/* count determines the size of the area mapped in KB */
 	for (i = 0; i < count; i++, offset += 0x400)
 	{
-		memory_set_bankptr(machine, banknames[i + start], machine.region("gfx1")->base() + offset);
+		machine.root_device().subbank(banknames[i + start])->set_base(machine.region("gfx1")->base() + offset);
 	}
 }
 
@@ -209,7 +209,7 @@ static void set_videoram_bank(running_machine& machine, int start, int count, in
 	/* count determines the size of the area mapped in KB */
 	for (i = 0; i < count; i++, offset += 0x400)
 	{
-		memory_set_bankptr(machine, banknames[i + start], state->m_vram + offset);
+		state->subbank(banknames[i + start])->set_base(state->m_vram + offset);
 	}
 }
 
@@ -313,7 +313,7 @@ WRITE8_MEMBER(multigam_state::multigam_switch_prg_rom)
 
 WRITE8_MEMBER(multigam_state::multigam_switch_gfx_rom)
 {
-	memory_set_bankptr(machine(), "bank1", machine().region("gfx1")->base() + (0x2000 * (data & 0x3f)));
+	subbank("bank1")->set_base(machine().region("gfx1")->base() + (0x2000 * (data & 0x3f)));
 	set_mirroring(data & 0x40 ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 	m_game_gfx_bank = data;
 };
@@ -323,7 +323,7 @@ WRITE8_MEMBER(multigam_state::multigam_mapper2_w)
 {
 	if (m_game_gfx_bank & 0x80)
 	{
-		memory_set_bankptr(machine(), "bank1", machine().region("gfx1")->base() + (0x2000 * ((data & 0x3) + (m_game_gfx_bank & 0x3c))));
+		subbank("bank1")->set_base(machine().region("gfx1")->base() + (0x2000 * ((data & 0x3) + (m_game_gfx_bank & 0x3c))));
 	}
 	else
 	{
@@ -511,11 +511,11 @@ WRITE8_MEMBER(multigam_state::multigam3_mmc3_rom_switch_w)
 		case 0x2001: /* enable ram at $6000 */
 			if (data & 0x80)
 			{
-				memory_set_bankptr(machine(), "bank10", m_multigmc_mmc3_6000_ram);
+				subbank("bank10")->set_base(m_multigmc_mmc3_6000_ram);
 			}
 			else
 			{
-				memory_set_bankptr(machine(), "bank10", machine().region("maincpu")->base() + 0x6000);
+				subbank("bank10")->set_base(machine().region("maincpu")->base() + 0x6000);
 			}
 			if (data & 0x40)
 			{
@@ -599,7 +599,7 @@ WRITE8_MEMBER(multigam_state::multigm3_switch_prg_rom)
 	else
 	{
 		space.install_write_handler(0x8000, 0xffff, write8_delegate(FUNC(multigam_state::multigm3_mapper2_w),this) );
-		memory_set_bankptr(machine(), "bank10", machine().region("maincpu")->base() + 0x6000);
+		subbank("bank10")->set_base(machine().region("maincpu")->base() + 0x6000);
 	}
 
 	if (data & 0x80)
@@ -865,7 +865,7 @@ static void supergm3_set_bank(running_machine &machine)
 		// VRAM
 		ppu->memory().space(AS_PROGRAM)->install_read_bank(0x0000, 0x1fff, "bank1");
 		ppu->memory().space(AS_PROGRAM)->install_write_bank(0x0000, 0x1fff, "bank1");
-		memory_set_bankptr(machine, "bank1", state->m_vram);
+		state->subbank("bank1")->set_base(state->m_vram);
 
 		if (state->m_supergm3_chr_bank == 0x40)
 			state->set_mirroring(PPU_MIRROR_VERT);
@@ -890,7 +890,7 @@ static void supergm3_set_bank(running_machine &machine)
 	{
 		// title screen
 		memcpy(mem + 0x8000, mem + 0x18000, 0x8000);
-		memory_set_bankptr(machine, "bank10", mem + 0x6000);
+		state->subbank("bank10")->set_base(mem + 0x6000);
 		ppu->set_scanline_callback(0);
 	}
 	else if ((state->m_supergm3_prg_bank & 0x40) == 0)
@@ -1139,7 +1139,7 @@ static MACHINE_START( multigam )
 
 	machine.device("ppu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x2000, 0x3eff, read8_delegate(FUNC(multigam_state::multigam_nt_r),state), write8_delegate(FUNC(multigam_state::multigam_nt_w),state));
 	machine.device("ppu")->memory().space(AS_PROGRAM)->install_read_bank(0x0000, 0x1fff, "bank1");
-	memory_set_bankptr(machine, "bank1", machine.region("gfx1")->base());
+	state->subbank("bank1")->set_base(machine.region("gfx1")->base());
 }
 
 static MACHINE_START( multigm3 )

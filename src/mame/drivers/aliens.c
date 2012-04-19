@@ -232,8 +232,8 @@ static MACHINE_START( aliens )
 	aliens_state *state = machine.driver_data<aliens_state>();
 	UINT8 *ROM = machine.region("maincpu")->base();
 
-	memory_configure_bank(machine, "bank1", 0, 20, &ROM[0x10000], 0x2000);
-	memory_set_bank(machine, "bank1", 0);
+	state->subbank("bank1")->configure_entries(0, 20, &ROM[0x10000], 0x2000);
+	state->subbank("bank1")->set_entry(0);
 
 	state->m_maincpu = machine.device("maincpu");
 	state->m_audiocpu = machine.device("audiocpu");
@@ -545,7 +545,7 @@ static KONAMI_SETLINES_CALLBACK( aliens_banking )
 		bank -= 4;
 
 	bank += (lines & 0x0f);
-	memory_set_bank(device->machine(), "bank1", bank);
+	device->machine().root_device().subbank("bank1")->set_entry(bank);
 }
 
 GAME( 1990, aliens,   0,      aliens, aliens, 0, ROT0, "Konami", "Aliens (World set 1)", GAME_SUPPORTS_SAVE )

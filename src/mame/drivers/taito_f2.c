@@ -591,7 +591,7 @@ static INTERRUPT_GEN( taitof2_interrupt )
 
 WRITE8_MEMBER(taitof2_state::sound_bankswitch_w)
 {
-	memory_set_bank(machine(), "bank2", (data - 1) & 7);
+	subbank("bank2")->set_entry((data - 1) & 7);
 
 #ifdef MAME_DEBUG
 	if (((data - 1) & 7) > 2)
@@ -3013,7 +3013,7 @@ static MACHINE_START( common )
 static MACHINE_START( f2 )
 {
 	MACHINE_START_CALL(common);
-	memory_configure_bank(machine, "bank2", 0, 8, machine.region("audiocpu")->base() + 0x10000, 0x4000);
+	machine.root_device().subbank("bank2")->configure_entries(0, 8, machine.region("audiocpu")->base() + 0x10000, 0x4000);
 }
 
 static MACHINE_CONFIG_START( taito_f2, taitof2_state )

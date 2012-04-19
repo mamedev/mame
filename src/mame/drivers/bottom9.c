@@ -110,7 +110,7 @@ WRITE8_MEMBER(bottom9_state::bankswitch_w)
 	else
 		bank = ((data & 0x0e) >> 1);
 
-	memory_set_bank(machine(), "bank1", bank);
+	subbank("bank1")->set_entry(bank);
 }
 
 WRITE8_MEMBER(bottom9_state::bottom9_1f90_w)
@@ -324,7 +324,7 @@ static MACHINE_START( bottom9 )
 	bottom9_state *state = machine.driver_data<bottom9_state>();
 	UINT8 *ROM = machine.region("maincpu")->base();
 
-	memory_configure_bank(machine, "bank1", 0, 12, &ROM[0x10000], 0x2000);
+	state->subbank("bank1")->configure_entries(0, 12, &ROM[0x10000], 0x2000);
 
 	state->m_maincpu = machine.device("maincpu");
 	state->m_audiocpu = machine.device("audiocpu");

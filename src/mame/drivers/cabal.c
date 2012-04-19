@@ -851,7 +851,7 @@ static void seibu_sound_bootleg(running_machine &machine,const char *cpu,int len
 	memcpy(decrypt, rom+length, length);
 
 	if (length > 0x10000)
-		memory_configure_bank_decrypted(machine, "bank1", 0, (length - 0x10000) / 0x8000, decrypt + 0x10000, 0x8000);
+		machine.root_device().subbank("bank1")->configure_decrypted_entries(0, (length - 0x10000) / 0x8000, decrypt + 0x10000, 0x8000);
 }
 
 

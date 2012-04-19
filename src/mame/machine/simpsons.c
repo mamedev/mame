@@ -65,7 +65,7 @@ READ8_DEVICE_HANDLER( simpsons_sound_r )
 
 static KONAMI_SETLINES_CALLBACK( simpsons_banking )
 {
-	memory_set_bank(device->machine(), "bank1", lines & 0x3f);
+	device->machine().root_device().subbank("bank1")->set_entry(lines & 0x3f);
 }
 
 static void simpsons_postload(running_machine &machine)
@@ -118,12 +118,12 @@ MACHINE_RESET( simpsons )
 	state->m_video_bank = 0;
 
 	/* init the default banks */
-	memory_configure_bank(machine, "bank1", 0, 64, machine.region("maincpu")->base() + 0x10000, 0x2000);
-	memory_set_bank(machine, "bank1", 0);
+	state->subbank("bank1")->configure_entries(0, 64, machine.region("maincpu")->base() + 0x10000, 0x2000);
+	state->subbank("bank1")->set_entry(0);
 
-	memory_configure_bank(machine, "bank2", 0, 2, machine.region("audiocpu")->base() + 0x10000, 0);
-	memory_configure_bank(machine, "bank2", 2, 6, machine.region("audiocpu")->base() + 0x10000, 0x4000);
-	memory_set_bank(machine, "bank2", 0);
+	state->subbank("bank2")->configure_entries(0, 2, machine.region("audiocpu")->base() + 0x10000, 0);
+	state->subbank("bank2")->configure_entries(2, 6, machine.region("audiocpu")->base() + 0x10000, 0x4000);
+	state->subbank("bank2")->set_entry(0);
 
 	simpsons_video_banking(machine, 0);
 }

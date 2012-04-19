@@ -726,7 +726,7 @@ static DRIVER_INIT( ssf2mdb )
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x400000, 0x5fffff, "bank5");
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->unmap_write(0x400000, 0x5fffff);
 
-	memory_set_bankptr(machine,  "bank5", machine.region( "maincpu" )->base() + 0x400000 );
+	machine.root_device().subbank("bank5")->set_base(machine.region( "maincpu" )->base() + 0x400000 );
 
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x770070, 0x770075, FUNC(ssf2mdb_dsw_r) );
 

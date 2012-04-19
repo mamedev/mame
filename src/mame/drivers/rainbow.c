@@ -397,7 +397,7 @@ ADDRESS_MAP_END
 
 static WRITE8_DEVICE_HANDLER( bankswitch_w )
 {
-	memory_set_bank(device->machine(), "bank1", data & 3);
+	device->machine().root_device().subbank("bank1")->set_entry(data & 3);
 }
 
 READ8_MEMBER(rbisland_state::jumping_latch_r)
@@ -877,7 +877,7 @@ static DRIVER_INIT( rbisland )
 {
 	UINT8 *ROM = machine.region("audiocpu")->base();
 
-	memory_configure_bank(machine, "bank1", 0, 4, &ROM[0xc000], 0x4000);
+	machine.root_device().subbank("bank1")->configure_entries(0, 4, &ROM[0xc000], 0x4000);
 
 	rbisland_cchip_init(machine, 0);
 }
@@ -886,7 +886,7 @@ static DRIVER_INIT( rbislande )
 {
 	UINT8 *ROM = machine.region("audiocpu")->base();
 
-	memory_configure_bank(machine, "bank1", 0, 4, &ROM[0xc000], 0x4000);
+	machine.root_device().subbank("bank1")->configure_entries(0, 4, &ROM[0xc000], 0x4000);
 
 	rbisland_cchip_init(machine, 1);
 }

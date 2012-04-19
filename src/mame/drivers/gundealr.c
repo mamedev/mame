@@ -53,7 +53,7 @@ Runs in interrupt mode 0, the interrupt vectors are 0xcf (RST 08h) and
 
 WRITE8_MEMBER(gundealr_state::yamyam_bankswitch_w)
 {
-	memory_set_bank(machine(), "bank1", data & 0x07);
+	subbank("bank1")->set_entry(data & 0x07);
 }
 
 
@@ -366,7 +366,7 @@ static MACHINE_START( gundealr )
 	gundealr_state *state = machine.driver_data<gundealr_state>();
 	UINT8 *ROM = machine.region("maincpu")->base();
 
-	memory_configure_bank(machine, "bank1", 0, 8, &ROM[0x10000], 0x4000);
+	state->subbank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
 
 	state->save_item(NAME(state->m_flipscreen));
 	state->save_item(NAME(state->m_scroll));

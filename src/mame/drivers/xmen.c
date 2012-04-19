@@ -97,7 +97,7 @@ WRITE16_MEMBER(xmen_state::xmen_18fa00_w)
 static void sound_reset_bank( running_machine &machine )
 {
 	xmen_state *state = machine.driver_data<xmen_state>();
-	memory_set_bank(machine, "bank4", state->m_sound_curbank & 0x07);
+	state->subbank("bank4")->set_entry(state->m_sound_curbank & 0x07);
 }
 
 WRITE8_MEMBER(xmen_state::sound_bankswitch_w)
@@ -297,8 +297,8 @@ static MACHINE_START( xmen )
 	xmen_state *state = machine.driver_data<xmen_state>();
 	UINT8 *ROM = machine.region("audiocpu")->base();
 
-	memory_configure_bank(machine, "bank4", 0, 8, &ROM[0x10000], 0x4000);
-	memory_set_bank(machine, "bank4", 0);
+	state->subbank("bank4")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
+	state->subbank("bank4")->set_entry(0);
 
 	state->m_maincpu = machine.device("maincpu");
 	state->m_audiocpu = machine.device("audiocpu");

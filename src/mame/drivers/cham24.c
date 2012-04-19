@@ -195,7 +195,7 @@ WRITE8_MEMBER(cham24_state::cham24_mapper_w)
 	UINT8* src = machine().region("user1")->base();
 
 	// switch PPU VROM bank
-	memory_set_bankptr(machine(), "bank1", machine().region("gfx1")->base() + (0x2000 * gfx_bank));
+	subbank("bank1")->set_base(machine().region("gfx1")->base() + (0x2000 * gfx_bank));
 
 	// set gfx mirroring
 	cham24_set_mirroring(machine(), gfx_mirroring != 0 ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
@@ -312,7 +312,7 @@ static MACHINE_START( cham24 )
 
 	/* uses 8K swapping, all ROM!*/
 	machine.device("ppu")->memory().space(AS_PROGRAM)->install_read_bank(0x0000, 0x1fff, "bank1");
-	memory_set_bankptr(machine, "bank1", machine.region("gfx1")->base());
+	state->subbank("bank1")->set_base(machine.region("gfx1")->base());
 
 	/* need nametable ram, though. I doubt this uses more than 2k, but it starts up configured for 4 */
 	state->m_nt_ram = auto_alloc_array(machine, UINT8, 0x1000);

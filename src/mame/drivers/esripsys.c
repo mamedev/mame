@@ -109,7 +109,7 @@ WRITE8_MEMBER(esripsys_state::g_status_w)
 	m_g_status = data;
 
 	bankaddress = 0x10000 + (data & 0x03) * 0x10000;
-	memory_set_bankptr(machine(), "bank1", &rom[bankaddress]);
+	subbank("bank1")->set_base(&rom[bankaddress]);
 
 	cputag_set_input_line(machine(), "frame_cpu", M6809_FIRQ_LINE, data & 0x10 ? CLEAR_LINE : ASSERT_LINE);
 	cputag_set_input_line(machine(), "frame_cpu", INPUT_LINE_NMI,  data & 0x80 ? CLEAR_LINE : ASSERT_LINE);
@@ -506,9 +506,9 @@ WRITE8_MEMBER(esripsys_state::s_200f_w)
 		m_u56b = 1;
 
 	/* Speech data resides in the upper 8kB of the ROMs */
-	memory_set_bankptr(machine(), "bank2", &rom[0x0000 + rombank]);
-	memory_set_bankptr(machine(), "bank3", &rom[0x4000 + rombank]);
-	memory_set_bankptr(machine(), "bank4", &rom[0x8000 + rombank]);
+	subbank("bank2")->set_base(&rom[0x0000 + rombank]);
+	subbank("bank3")->set_base(&rom[0x4000 + rombank]);
+	subbank("bank4")->set_base(&rom[0x8000 + rombank]);
 
 	m_s_to_g_latch2 = data;
 }
@@ -653,9 +653,9 @@ static DRIVER_INIT( esripsys )
 
 	machine.device<nvram_device>("nvram")->set_base(state->m_cmos_ram, CMOS_RAM_SIZE);
 
-	memory_set_bankptr(machine, "bank2", &rom[0x0000]);
-	memory_set_bankptr(machine, "bank3", &rom[0x4000]);
-	memory_set_bankptr(machine, "bank4", &rom[0x8000]);
+	state->subbank("bank2")->set_base(&rom[0x0000]);
+	state->subbank("bank3")->set_base(&rom[0x4000]);
+	state->subbank("bank4")->set_base(&rom[0x8000]);
 
 	/* Register stuff for state saving */
 	state_save_register_global_pointer(machine, state->m_fdt_a, FDT_RAM_SIZE);

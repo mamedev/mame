@@ -319,7 +319,7 @@ WRITE32_MEMBER(psikyo4_state::ps4_vidregs_w)
 	if (offset == 2) /* Configure bank for gfx test */
 	{
 		if (ACCESSING_BITS_0_15)	// Bank
-			memory_set_bankptr(machine(), "bank2", machine().region("gfx1")->base() + 0x2000 * (m_vidregs[offset] & 0x1fff)); /* Bank comes from vidregs */
+			subbank("bank2")->set_base(machine().region("gfx1")->base() + 0x2000 * (m_vidregs[offset] & 0x1fff)); /* Bank comes from vidregs */
 	}
 }
 
@@ -971,7 +971,7 @@ static void install_hotgmck_pcm_bank(running_machine &machine)
 static DRIVER_INIT( hotgmck )
 {
 	UINT8 *RAM = machine.region("maincpu")->base();
-	memory_set_bankptr(machine, "bank1", &RAM[0x100000]);
+	machine.root_device().subbank("bank1")->set_base(&RAM[0x100000]);
 	install_hotgmck_pcm_bank(machine);	// Banked PCM ROM
 }
 

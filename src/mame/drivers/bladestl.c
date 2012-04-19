@@ -80,7 +80,7 @@ WRITE8_MEMBER(bladestl_state::bladestl_bankswitch_w)
 	/* bit 4 = relay (???) */
 
 	/* bits 5-6 = bank number */
-	memory_set_bank(machine(), "bank1", (data & 0x60) >> 5);
+	subbank("bank1")->set_entry((data & 0x60) >> 5);
 
 	/* bit 7 = select sprite bank */
 	m_spritebank = (data & 0x80) << 3;
@@ -303,7 +303,7 @@ static MACHINE_START( bladestl )
 	bladestl_state *state = machine.driver_data<bladestl_state>();
 	UINT8 *ROM = machine.region("maincpu")->base();
 
-	memory_configure_bank(machine, "bank1", 0, 4, &ROM[0x10000], 0x2000);
+	state->subbank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x2000);
 
 	state->m_audiocpu = machine.device("audiocpu");
 	state->m_k007342 = machine.device("k007342");

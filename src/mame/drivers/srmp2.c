@@ -365,7 +365,7 @@ WRITE8_MEMBER(srmp2_state::srmp3_rombank_w)
 	if (data & 0x1f) addr = ((0x10000 + (0x2000 * (data & 0x0f))) - 0x8000);
 	else addr = 0x10000;
 
-	memory_set_bankptr(machine(), "bank1", &ROM[addr]);
+	subbank("bank1")->set_base(&ROM[addr]);
 }
 
 /**************************************************************************
@@ -515,7 +515,7 @@ WRITE8_MEMBER(srmp2_state::rmgoldyh_rombank_w)
 	if (data & 0x1f) addr = ((0x10000 + (0x2000 * (data & 0x1f))) - 0x8000);
 	else addr = 0x10000;
 
-	memory_set_bankptr(machine(), "bank1", &ROM[addr]);
+	subbank("bank1")->set_base(&ROM[addr]);
 }
 
 static ADDRESS_MAP_START( rmgoldyh_io_map, AS_IO, 8, srmp2_state )

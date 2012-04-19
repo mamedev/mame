@@ -1053,7 +1053,7 @@ static DRIVER_INIT( luckgrln )
 	#endif
 
 	// ??
-//  memory_set_bankptr(machine, "bank1",&rom[0x010000]);
+//  machine.root_device().subbank("bank1")->set_base(&rom[0x010000]);
 }
 
 

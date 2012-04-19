@@ -1376,7 +1376,7 @@ static WRITE8_DEVICE_HANDLER( upd7759_control_w )
 				bankoffs += (data & 0x07) * 0x04000;
 				break;
 		}
-		memory_set_bankptr(device->machine(), "bank1", device->machine().region("soundcpu")->base() + 0x10000 + (bankoffs % size));
+		state->subbank("bank1")->set_base(device->machine().region("soundcpu")->base() + 0x10000 + (bankoffs % size));
 	}
 }
 
@@ -7061,14 +7061,14 @@ static WRITE16_HANDLER( isgsm_main_bank_change_w )
 	// other values on real hw have strange results, change memory mapping etc??
 	if (data==1)
 	{
-		memory_set_bankptr(space->machine(),ISGSM_MAIN_BANK, space->machine().region("maincpu")->base());
+		space->machine().root_device().subbank(ISGSM_MAIN_BANK)->set_base(space->machine().region("maincpu")->base());
 	}
 }
 
 static MACHINE_START( isgsm )
 {
-	memory_set_bankptr(machine,ISGSM_CART_BANK, machine.region("gamecart_rgn")->base());
-	memory_set_bankptr(machine,ISGSM_MAIN_BANK, machine.region("bios")->base());
+	machine.root_device().subbank(ISGSM_CART_BANK)->set_base(machine.region("gamecart_rgn")->base());
+	machine.root_device().subbank(ISGSM_MAIN_BANK)->set_base(machine.region("bios")->base());
 }
 
 static ADDRESS_MAP_START( isgsm_map, AS_PROGRAM, 16, segas1x_state )
@@ -7219,8 +7219,8 @@ static MACHINE_RESET( isgsm )
 	for (int i = 0; i < 16; i++)
 		segaic16_sprites_set_bank(machine, 0, i, i);
 
-	memory_set_bankptr(machine,ISGSM_CART_BANK, machine.region("gamecart_rgn")->base());
-	memory_set_bankptr(machine,ISGSM_MAIN_BANK, machine.region("bios")->base());
+	machine.root_device().subbank(ISGSM_CART_BANK)->set_base(machine.region("gamecart_rgn")->base());
+	machine.root_device().subbank(ISGSM_MAIN_BANK)->set_base(machine.region("bios")->base());
 	devtag_reset( machine, "maincpu" );
 }
 

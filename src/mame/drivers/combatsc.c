@@ -199,9 +199,9 @@ WRITE8_MEMBER(combatsc_state::combatsc_bankselect_w)
 	}
 
 	if (data & 0x10)
-		memory_set_bank(machine(), "bank1", (data & 0x0e) >> 1);
+		subbank("bank1")->set_entry((data & 0x0e) >> 1);
 	else
-		memory_set_bank(machine(), "bank1", 8 + (data & 1));
+		subbank("bank1")->set_entry(8 + (data & 1));
 }
 
 WRITE8_MEMBER(combatsc_state::combatscb_io_w)
@@ -237,13 +237,13 @@ WRITE8_MEMBER(combatsc_state::combatscb_bankselect_w)
 		m_bank_select = data;
 
 		if (data & 0x10)
-			memory_set_bank(machine(), "bank1", (data & 0x0e) >> 1);
+			subbank("bank1")->set_entry((data & 0x0e) >> 1);
 		else
-			memory_set_bank(machine(), "bank1", 8 + (data & 1));
+			subbank("bank1")->set_entry(8 + (data & 1));
 
 		if (data == 0x1f)
 		{
-			memory_set_bank(machine(), "bank1", 8 + (data & 1));
+			subbank("bank1")->set_entry(8 + (data & 1));
 			space.install_write_handler(0x4000, 0x7fff, write8_delegate(FUNC(combatsc_state::combatscb_io_w),this));
 			space.install_read_handler(0x4400, 0x4403, read8_delegate(FUNC(combatsc_state::combatscb_io_r),this));/* IO RAM & Video Registers */
 		}
@@ -702,7 +702,7 @@ static MACHINE_START( combatsc )
 	state->m_k007121_1 = machine.device("k007121_1");
 	state->m_k007121_2 = machine.device("k007121_2");
 
-	memory_configure_bank(machine, "bank1", 0, 10, machine.region("maincpu")->base() + 0x10000, 0x4000);
+	state->subbank("bank1")->configure_entries(0, 10, machine.region("maincpu")->base() + 0x10000, 0x4000);
 
 	state->save_item(NAME(state->m_priority));
 	state->save_item(NAME(state->m_vreg));

@@ -267,7 +267,7 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(fuuki32_state::fuuki32_sound_bw_w)
 {
-	memory_set_bank(machine(), "bank1", data);
+	subbank("bank1")->set_entry(data);
 }
 
 READ8_MEMBER(fuuki32_state::snd_z80_r)
@@ -552,7 +552,7 @@ static MACHINE_START( fuuki32 )
 	fuuki32_state *state = machine.driver_data<fuuki32_state>();
 	UINT8 *ROM = machine.region("soundcpu")->base();
 
-	memory_configure_bank(machine, "bank1", 0, 0x10, &ROM[0x10000], 0x8000);
+	state->subbank("bank1")->configure_entries(0, 0x10, &ROM[0x10000], 0x8000);
 
 	state->m_maincpu = machine.device("maincpu");
 	state->m_audiocpu = machine.device("soundcpu");

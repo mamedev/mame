@@ -82,9 +82,9 @@ WRITE8_MEMBER(starwars_state::starwars_out_w)
 			break;
 
 		case 4:		/* bank switch */
-			memory_set_bank(machine(), "bank1", (data >> 7) & 1);
+			subbank("bank1")->set_entry((data >> 7) & 1);
 			if (m_is_esb)
-				memory_set_bank(machine(), "bank2", (data >> 7) & 1);
+				subbank("bank2")->set_entry((data >> 7) & 1);
 			break;
 		case 5:		/* reset PRNG */
 			break;

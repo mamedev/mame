@@ -32,7 +32,7 @@ TODO:
 WRITE8_MEMBER(darkmist_state::darkmist_hw_w)
 {
 	m_hw=data;
-	memory_set_bankptr(machine(), "bank1",&machine().region("maincpu")->base()[0x010000+((data&0x80)?0x4000:0)]);
+	subbank("bank1")->set_base(&machine().region("maincpu")->base()[0x010000+((data&0x80)?0x4000:0)]);
 }
 
 static ADDRESS_MAP_START( memmap, AS_PROGRAM, 8, darkmist_state )
@@ -437,7 +437,7 @@ static DRIVER_INIT(darkmist)
 	}
 
 	space->set_decrypted_region(0x0000, 0x7fff, decrypt);
-	memory_set_bankptr(space->machine(), "bank1",&ROM[0x010000]);
+	space->machine().root_device().subbank("bank1")->set_base(&ROM[0x010000]);
 
 	/* adr line swaps */
 	ROM = machine.region("user1")->base();

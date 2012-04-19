@@ -38,7 +38,7 @@ WRITE8_MEMBER(usgames_state::usgames_rombank_w)
 //  logerror ("BANK WRITE? -%02x-\n",data);
 //popmessage("%02x",data);
 
-	memory_set_bankptr(machine(),  "bank1",&RAM[ 0x10000 + 0x4000 * data] );
+	subbank("bank1")->set_base(&RAM[ 0x10000 + 0x4000 * data] );
 }
 
 WRITE8_MEMBER(usgames_state::lamps1_w)

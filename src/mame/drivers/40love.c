@@ -274,7 +274,7 @@ WRITE8_MEMBER(fortyl_state::bank_select_w)
 //      popmessage("WRONG BANK SELECT = %x !!!!\n",data);
 	}
 
-	memory_set_bank(machine(), "bank1", data & 1);
+	subbank("bank1")->set_entry(data & 1);
 }
 
 WRITE8_MEMBER(fortyl_state::pix1_w)
@@ -567,7 +567,7 @@ static DRIVER_INIT( undoukai )
 {
 	fortyl_state *state = machine.driver_data<fortyl_state>();
 	UINT8 *ROM = machine.region("maincpu")->base();
-	memory_configure_bank(machine, "bank1", 0, 2, &ROM[0x10000], 0x2000);
+	state->subbank("bank1")->configure_entries(0, 2, &ROM[0x10000], 0x2000);
 
 	state->m_pix_color[0] = 0x000;
 	state->m_pix_color[1] = 0x1e3;
@@ -579,7 +579,7 @@ static DRIVER_INIT( 40love )
 {
 	fortyl_state *state = machine.driver_data<fortyl_state>();
 	UINT8 *ROM = machine.region("maincpu")->base();
-	memory_configure_bank(machine, "bank1", 0, 2, &ROM[0x10000], 0x2000);
+	state->subbank("bank1")->configure_entries(0, 2, &ROM[0x10000], 0x2000);
 
 	#if 0
 		/* character ROM hack

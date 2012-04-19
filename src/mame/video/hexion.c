@@ -68,7 +68,7 @@ WRITE8_MEMBER(hexion_state::hexion_bankswitch_w)
 	UINT8 *rom = machine().region("maincpu")->base() + 0x10000;
 
 	/* bits 0-3 select ROM bank */
-	memory_set_bankptr(machine(), "bank1",rom + 0x2000 * (data & 0x0f));
+	subbank("bank1")->set_base(rom + 0x2000 * (data & 0x0f));
 
 	/* does bit 6 trigger the 052591? */
 	if (data & 0x40)

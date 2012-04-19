@@ -433,7 +433,7 @@ WRITE8_MEMBER(firefox_state::novram_store_w)
 
 WRITE8_MEMBER(firefox_state::rom_bank_w)
 {
-	memory_set_bank(machine(), "bank1", data & 0x1f);
+	subbank("bank1")->set_entry(data & 0x1f);
 }
 
 WRITE8_MEMBER(firefox_state::main_irq_clear_w)
@@ -481,7 +481,7 @@ static void firq_gen(running_machine &machine, phillips_22vp931_device &laserdis
 static MACHINE_START( firefox )
 {
 	firefox_state *state = machine.driver_data<firefox_state>();
-	memory_configure_bank(machine, "bank1", 0, 32, machine.region("maincpu")->base() + 0x10000, 0x1000);
+	state->subbank("bank1")->configure_entries(0, 32, machine.region("maincpu")->base() + 0x10000, 0x1000);
 	state->m_nvram_1c = machine.device<x2212_device>("nvram_1c");
 	state->m_nvram_1d = machine.device<x2212_device>("nvram_1d");
 

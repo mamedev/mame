@@ -156,7 +156,7 @@ READ16_MEMBER(crshrace_state::extrarom2_r)
 
 WRITE8_MEMBER(crshrace_state::crshrace_sh_bankswitch_w)
 {
-	memory_set_bank(machine(), "bank1", data & 0x03);
+	subbank("bank1")->set_entry(data & 0x03);
 }
 
 WRITE16_MEMBER(crshrace_state::sound_command_w)
@@ -442,7 +442,7 @@ static MACHINE_START( crshrace )
 {
 	crshrace_state *state = machine.driver_data<crshrace_state>();
 
-	memory_configure_bank(machine, "bank1", 0, 4, machine.region("audiocpu")->base() + 0x10000, 0x8000);
+	state->subbank("bank1")->configure_entries(0, 4, machine.region("audiocpu")->base() + 0x10000, 0x8000);
 
 	state->save_item(NAME(state->m_roz_bank));
 	state->save_item(NAME(state->m_gfxctrl));

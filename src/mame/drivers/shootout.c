@@ -43,7 +43,7 @@
 
 WRITE8_MEMBER(shootout_state::shootout_bankswitch_w)
 {
-	memory_set_bank(machine(), "bank1", data & 0x0f);
+	subbank("bank1")->set_entry(data & 0x0f);
 }
 
 WRITE8_MEMBER(shootout_state::sound_cpu_command_w)
@@ -419,13 +419,13 @@ static DRIVER_INIT( shootout )
 	for (A = 0x8000;A < length;A++)
 		decrypt[A-0x8000] = (rom[A] & 0x9f) | ((rom[A] & 0x40) >> 1) | ((rom[A] & 0x20) << 1);
 
-	memory_configure_bank(machine, "bank1", 0, 16, machine.region("maincpu")->base() + 0x10000, 0x4000);
-	memory_configure_bank_decrypted(machine, "bank1", 0, 16, decrypt + 0x8000, 0x4000);
+	machine.root_device().subbank("bank1")->configure_entries(0, 16, machine.region("maincpu")->base() + 0x10000, 0x4000);
+	machine.root_device().subbank("bank1")->configure_decrypted_entries(0, 16, decrypt + 0x8000, 0x4000);
 }
 
 static DRIVER_INIT( shootouj )
 {
-	memory_configure_bank(machine, "bank1", 0, 16, machine.region("maincpu")->base() + 0x10000, 0x4000);
+	machine.root_device().subbank("bank1")->configure_entries(0, 16, machine.region("maincpu")->base() + 0x10000, 0x4000);
 }
 
 

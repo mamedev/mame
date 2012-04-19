@@ -357,7 +357,7 @@ static WRITE8_DEVICE_HANDLER( chanbara_ay_out_1_w )
 
 	state->flip_screen_set(data & 0x02);
 
-	memory_set_bank(device->machine(), "bank1", (data & 0x04) >> 2);
+	state->subbank("bank1")->set_entry((data & 0x04) >> 2);
 
 	//if (data & 0xf8)    printf("chanbara_ay_out_1_w unused bits set %02x\n", data & 0xf8);
 }
@@ -484,7 +484,7 @@ static DRIVER_INIT(chanbara )
 		dst[i + 0x2000] = (src[i + 0x1000] & 0x0f) << 4;
 	}
 
-	memory_configure_bank(machine, "bank1", 0, 2, &bg[0x0000], 0x4000);
+	machine.root_device().subbank("bank1")->configure_entries(0, 2, &bg[0x0000], 0x4000);
 }
 
 GAME( 1985, chanbara, 0,  chanbara, chanbara, chanbara, ROT270, "Data East", "Chanbara", GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL )

@@ -250,9 +250,9 @@ static MACHINE_START( parodius )
 	parodius_state *state = machine.driver_data<parodius_state>();
 	UINT8 *ROM = machine.region("maincpu")->base();
 
-	memory_configure_bank(machine, "bank1", 0, 14, &ROM[0x10000], 0x4000);
-	memory_configure_bank(machine, "bank1", 14, 2, &ROM[0x08000], 0x4000);
-	memory_set_bank(machine, "bank1", 0);
+	state->subbank("bank1")->configure_entries(0, 14, &ROM[0x10000], 0x4000);
+	state->subbank("bank1")->configure_entries(14, 2, &ROM[0x08000], 0x4000);
+	state->subbank("bank1")->set_entry(0);
 
 	state->m_generic_paletteram_8.allocate(0x1000);
 
@@ -407,7 +407,7 @@ static KONAMI_SETLINES_CALLBACK( parodius_banking )
 	if (lines & 0xf0)
 		logerror("%04x: setlines %02x\n", cpu_get_pc(device), lines);
 
-	memory_set_bank(device->machine(),  "bank1", (lines & 0x0f) ^ 0x0f);
+	device->machine().root_device().subbank("bank1")->set_entry((lines & 0x0f) ^ 0x0f);
 }
 
 GAME( 1990, parodius,  0,        parodius, parodius, 0, ROT0, "Konami", "Parodius DA! (World, set 1)", GAME_SUPPORTS_SAVE )

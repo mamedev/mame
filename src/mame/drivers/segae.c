@@ -427,10 +427,10 @@ WRITE8_MEMBER( systeme_state::bank_write )
 {
 	m_f7_bank_value = data;
 
-	memory_set_bankptr(machine(), "vdp1_bank", m_vdp1_vram->base() + ( ( data & 0x80 ) ? 0x4000 : 0 ) );
-	memory_set_bankptr(machine(), "vdp2_bank", m_vdp2_vram->base() + ( ( data & 0x40 ) ? 0x4000 : 0 ) );
+	subbank("vdp1_bank")->set_base(m_vdp1_vram->base() + ( ( data & 0x80 ) ? 0x4000 : 0 ) );
+	subbank("vdp2_bank")->set_base(m_vdp2_vram->base() + ( ( data & 0x40 ) ? 0x4000 : 0 ) );
 
-	memory_set_bank(machine(), "bank1", data & 0x0f);
+	subbank("bank1")->set_entry(data & 0x0f);
 }
 
 
@@ -440,7 +440,7 @@ void systeme_state::driver_start()
 	m_vdp1_vram = machine().region_alloc("vdp1_vram", 2 * 0x4000, 1, ENDIANNESS_LITTLE);
 	m_vdp2_vram = machine().region_alloc("vdp2_vram", 2 * 0x4000, 1, ENDIANNESS_LITTLE);
 
-	memory_configure_bank(machine(), "bank1", 0, 16, machine().region("maincpu")->base() + 0x10000, 0x4000);
+	subbank("bank1")->configure_entries(0, 16, machine().region("maincpu")->base() + 0x10000, 0x4000);
 
 	if ( !strcmp( system().name, "ridleofp" ) )
 	{

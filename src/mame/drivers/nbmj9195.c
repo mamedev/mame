@@ -42,7 +42,7 @@ WRITE8_MEMBER(nbmj9195_state::nbmj9195_soundbank_w)
 {
 	UINT8 *SNDROM = machine().region("audiocpu")->base();
 
-	memory_set_bankptr(machine(), "bank1", &SNDROM[0x08000 + (0x8000 * (data & 0x03))]);
+	subbank("bank1")->set_base(&SNDROM[0x08000 + (0x8000 * (data & 0x03))]);
 }
 
 READ8_MEMBER(nbmj9195_state::nbmj9195_sound_r)

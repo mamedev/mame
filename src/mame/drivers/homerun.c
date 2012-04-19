@@ -195,8 +195,8 @@ static MACHINE_START( homerun )
 	homerun_state *state = machine.driver_data<homerun_state>();
 	UINT8 *ROM = machine.region("maincpu")->base();
 
-	memory_configure_bank(machine, "bank1", 0, 1, &ROM[0x00000], 0x4000);
-	memory_configure_bank(machine, "bank1", 1, 7, &ROM[0x10000], 0x4000);
+	state->subbank("bank1")->configure_entry(0, &ROM[0x00000]);
+	state->subbank("bank1")->configure_entries(1, 7, &ROM[0x10000], 0x4000);
 
 	state->save_item(NAME(state->m_gfx_ctrl));
 	state->save_item(NAME(state->m_gc_up));

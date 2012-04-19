@@ -608,7 +608,7 @@ WRITE16_MEMBER(wgp_state::wgp_adinput_w)
 static void reset_sound_region( running_machine &machine )	/* assumes Z80 sandwiched between the 68Ks */
 {
 	wgp_state *state = machine.driver_data<wgp_state>();
-	memory_set_bank(machine, "bank10", state->m_banknum);
+	state->subbank("bank10")->set_entry(state->m_banknum);
 }
 
 WRITE8_MEMBER(wgp_state::sound_bankswitch_w)
@@ -946,7 +946,7 @@ static MACHINE_START( wgp )
 {
 	wgp_state *state = machine.driver_data<wgp_state>();
 
-	memory_configure_bank(machine, "bank10", 0, 4, machine.region("audiocpu")->base() + 0xc000, 0x4000);
+	state->subbank("bank10")->configure_entries(0, 4, machine.region("audiocpu")->base() + 0xc000, 0x4000);
 
 	state->m_maincpu = machine.device("maincpu");
 	state->m_audiocpu = machine.device("audiocpu");

@@ -37,7 +37,7 @@ WRITE8_MEMBER(pingpong_state::cashquiz_question_bank_low_w)
 		const char *bank = bankname[data & 7];
 		int bankaddr = m_question_addr_high | ((data - 0x60) * 0x100);
 		UINT8 *questions = machine().region("user1")->base() + bankaddr;
-		memory_set_bankptr(machine(), bank,questions);
+		subbank(bank)->set_base(questions);
 
 	}
 }
@@ -598,14 +598,14 @@ static DRIVER_INIT( cashquiz )
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x5700, 0x57ff, "bank8");
 
 	// setup default banks
-	memory_set_bankptr(machine, "bank1", machine.region("user1")->base() + 0x100*0 );
-	memory_set_bankptr(machine, "bank2", machine.region("user1")->base() + 0x100*1 );
-	memory_set_bankptr(machine, "bank3", machine.region("user1")->base() + 0x100*2 );
-	memory_set_bankptr(machine, "bank4", machine.region("user1")->base() + 0x100*3 );
-	memory_set_bankptr(machine, "bank5", machine.region("user1")->base() + 0x100*4 );
-	memory_set_bankptr(machine, "bank6", machine.region("user1")->base() + 0x100*5 );
-	memory_set_bankptr(machine, "bank7", machine.region("user1")->base() + 0x100*6 );
-	memory_set_bankptr(machine, "bank8", machine.region("user1")->base() + 0x100*7 );
+	state->subbank("bank1")->set_base(machine.region("user1")->base() + 0x100*0 );
+	state->subbank("bank2")->set_base(machine.region("user1")->base() + 0x100*1 );
+	state->subbank("bank3")->set_base(machine.region("user1")->base() + 0x100*2 );
+	state->subbank("bank4")->set_base(machine.region("user1")->base() + 0x100*3 );
+	state->subbank("bank5")->set_base(machine.region("user1")->base() + 0x100*4 );
+	state->subbank("bank6")->set_base(machine.region("user1")->base() + 0x100*5 );
+	state->subbank("bank7")->set_base(machine.region("user1")->base() + 0x100*6 );
+	state->subbank("bank8")->set_base(machine.region("user1")->base() + 0x100*7 );
 }
 
 

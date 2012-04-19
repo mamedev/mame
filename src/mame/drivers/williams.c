@@ -534,8 +534,8 @@ void defender_install_io_space(address_space *space)
 	space->install_read_handler     (0xc800, 0xcbff, 0, 0x03e0, read8_delegate(FUNC(williams_state::williams_video_counter_r),state));
 	space->install_readwrite_handler(0xcc00, 0xcc03, 0, 0x03e0, read8_delegate(FUNC(pia6821_device::read), pia_1), write8_delegate(FUNC(pia6821_device::write), pia_1));
 	space->install_readwrite_handler(0xcc04, 0xcc07, 0, 0x03e0, read8_delegate(FUNC(pia6821_device::read), pia_0), write8_delegate(FUNC(pia6821_device::write), pia_0));
-	memory_set_bankptr(space->machine(), "bank3", space->machine().driver_data<williams_state>()->m_nvram);
-	memory_set_bankptr(space->machine(), "bank4", space->machine().driver_data<williams_state>()->m_generic_paletteram_8);
+	state->subbank("bank3")->set_base(space->machine().driver_data<williams_state>()->m_nvram);
+	state->subbank("bank4")->set_base(space->machine().driver_data<williams_state>()->m_generic_paletteram_8);
 }
 
 

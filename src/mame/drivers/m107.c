@@ -83,7 +83,7 @@ WRITE16_MEMBER(m107_state::m107_bankswitch_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		memory_set_bank(machine(), "bank1", (data & 0x06) >> 1);
+		subbank("bank1")->set_entry((data & 0x06) >> 1);
 		if (data & 0xf9)
 			logerror("%05x: bankswitch %04x\n", cpu_get_pc(&space.device()), data);
 	}
@@ -966,7 +966,7 @@ static DRIVER_INIT( firebarr )
 	m107_state *state = machine.driver_data<m107_state>();
 	UINT8 *ROM = machine.region("maincpu")->base();
 
-	memory_set_bankptr(machine, "bank1", &ROM[0xa0000]);
+	state->subbank("bank1")->set_base(&ROM[0xa0000]);
 
 	state->m_irq_vectorbase = 0x20;
 	state->m_spritesystem = 1;
@@ -977,7 +977,7 @@ static DRIVER_INIT( dsoccr94 )
 	m107_state *state = machine.driver_data<m107_state>();
 	UINT8 *ROM = machine.region("maincpu")->base();
 
-	memory_configure_bank(machine, "bank1", 0, 4, &ROM[0x80000], 0x20000);
+	state->subbank("bank1")->configure_entries(0, 4, &ROM[0x80000], 0x20000);
 	machine.device("maincpu")->memory().space(AS_IO)->install_write_handler(0x06, 0x07, write16_delegate(FUNC(m107_state::m107_bankswitch_w),state));
 
 	state->m_irq_vectorbase = 0x80;

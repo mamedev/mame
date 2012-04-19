@@ -145,10 +145,10 @@ static void set_bankptr(running_machine &machine)
 	if (state->m_game_selected == 0)
 	{
 		UINT8 *rom = machine.region("maincpu")->base();
-		memory_set_bankptr(machine, "bank1", rom + 0x08000);
+		state->subbank("bank1")->set_base(rom + 0x08000);
 	}
 	else
-		memory_set_bankptr(machine, "bank1", state->m_ram_48000);
+		state->subbank("bank1")->set_base(state->m_ram_48000);
 }
 
 WRITE8_MEMBER(_20pacgal_state::ram_bank_select_w)

@@ -294,7 +294,7 @@ READ8_MEMBER(sigmab52_state::unk_f700_r)
 
 WRITE8_MEMBER(sigmab52_state::unk_f710_w)
 {
-	memory_set_bankptr(machine(), "bank1" ,&machine().region("maincpu")->base()[0x10000 + ((data&0x80)?0x4000:0x0000)]);
+	subbank("bank1" )->set_base(&machine().region("maincpu")->base()[0x10000 + ((data&0x80)?0x4000:0x0000)]);
 }
 
 READ8_MEMBER(sigmab52_state::unk_f721_r)
@@ -542,11 +542,11 @@ static INTERRUPT_GEN( timer_irq )
 
 static MACHINE_START(jwildb52)
 {
-	memory_set_bankptr(machine, "bank1", &machine.region("maincpu")->base()[0x10000 + 0x0000]);
+	machine.root_device().subbank("bank1")->set_base(&machine.region("maincpu")->base()[0x10000 + 0x0000]);
 
-	memory_set_bankptr(machine, "bank2", &machine.region("maincpu")->base()[0x10000 + 0xf800]);
+	machine.root_device().subbank("bank2")->set_base(&machine.region("maincpu")->base()[0x10000 + 0xf800]);
 
-	memory_set_bankptr(machine, "bank3", &machine.region("maincpu")->base()[0x10000 + 0x8000]);
+	machine.root_device().subbank("bank3")->set_base(&machine.region("maincpu")->base()[0x10000 + 0x8000]);
 
 /*
 

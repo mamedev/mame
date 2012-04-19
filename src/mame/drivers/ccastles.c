@@ -213,7 +213,7 @@ static MACHINE_START( ccastles )
 	machine.primary_screen->configure(320, 256, visarea, HZ_TO_ATTOSECONDS(PIXEL_CLOCK) * VTOTAL * HTOTAL);
 
 	/* configure the ROM banking */
-	memory_configure_bank(machine, "bank1", 0, 2, machine.region("maincpu")->base() + 0xa000, 0x6000);
+	state->subbank("bank1")->configure_entries(0, 2, machine.region("maincpu")->base() + 0xa000, 0x6000);
 
 	/* create a timer for IRQs and set up the first callback */
 	state->m_irq_timer = machine.scheduler().timer_alloc(FUNC(clock_irq));
@@ -265,7 +265,7 @@ WRITE8_MEMBER(ccastles_state::ccounter_w)
 
 WRITE8_MEMBER(ccastles_state::bankswitch_w)
 {
-	memory_set_bank(machine(), "bank1", data & 1);
+	subbank("bank1")->set_entry(data & 1);
 }
 
 

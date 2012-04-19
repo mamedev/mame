@@ -346,7 +346,7 @@ READ8_MEMBER(opwolf_state::z80_input2_r)
 
 static WRITE8_DEVICE_HANDLER( sound_bankswitch_w )
 {
-	memory_set_bank(device->machine(), "bank10", (data - 1) & 0x03);
+	device->machine().root_device().subbank("bank10")->set_entry((data - 1) & 0x03);
 }
 
 /***********************************************************
@@ -989,7 +989,7 @@ static DRIVER_INIT( opwolf )
 	state->m_opwolf_gun_xoffs = 0xec - (rom[0x03ffb0 / 2] & 0xff);
 	state->m_opwolf_gun_yoffs = 0x1c - (rom[0x03ffae / 2] & 0xff);
 
-	memory_configure_bank(machine, "bank10", 0, 4, machine.region("audiocpu")->base() + 0x10000, 0x4000);
+	state->subbank("bank10")->configure_entries(0, 4, machine.region("audiocpu")->base() + 0x10000, 0x4000);
 }
 
 
@@ -1004,7 +1004,7 @@ static DRIVER_INIT( opwolfb )
 	state->m_opwolf_gun_xoffs = -2;
 	state->m_opwolf_gun_yoffs = 17;
 
-	memory_configure_bank(machine, "bank10", 0, 4, machine.region("audiocpu")->base() + 0x10000, 0x4000);
+	state->subbank("bank10")->configure_entries(0, 4, machine.region("audiocpu")->base() + 0x10000, 0x4000);
 }
 
 

@@ -150,7 +150,7 @@ static MACHINE_START( ddragon )
 	ddragon_state *state = machine.driver_data<ddragon_state>();
 
 	/* configure banks */
-	memory_configure_bank(machine, "bank1", 0, 8, machine.region("maincpu")->base() + 0x10000, 0x4000);
+	state->subbank("bank1")->configure_entries(0, 8, machine.region("maincpu")->base() + 0x10000, 0x4000);
 
 	state->m_maincpu = machine.device("maincpu");
 	state->m_sub_cpu = machine.device("sub");
@@ -203,7 +203,7 @@ WRITE8_MEMBER(ddragon_state::ddragon_bankswitch_w)
 	else if (m_dd_sub_cpu_busy == 0)
 		device_set_input_line(m_sub_cpu, m_sprite_irq, (m_sprite_irq == INPUT_LINE_NMI) ? PULSE_LINE : HOLD_LINE);
 
-	memory_set_bank(machine(), "bank1", (data & 0xe0) >> 5);
+	subbank("bank1")->set_entry((data & 0xe0) >> 5);
 }
 
 
@@ -217,7 +217,7 @@ WRITE8_MEMBER(ddragon_state::toffy_bankswitch_w)
 	/* bit 3 unknown */
 
 	/* I don't know ... */
-	memory_set_bank(machine(), "bank1", (data & 0x20) >> 5);
+	subbank("bank1")->set_entry((data & 0x20) >> 5);
 }
 
 
@@ -278,7 +278,7 @@ WRITE8_MEMBER(ddragon_state::darktowr_bankswitch_w)
 	else if (m_dd_sub_cpu_busy == 0)
 		device_set_input_line(m_sub_cpu, m_sprite_irq, (m_sprite_irq == INPUT_LINE_NMI) ? PULSE_LINE : HOLD_LINE);
 
-	memory_set_bank(machine(), "bank1", newbank);
+	subbank("bank1")->set_entry(newbank);
 	if (newbank == 4 && oldbank != 4)
 		space.install_readwrite_handler(0x4000, 0x7fff, read8_delegate(FUNC(ddragon_state::darktowr_mcu_bank_r),this), write8_delegate(FUNC(ddragon_state::darktowr_mcu_bank_w),this));
 	else if (newbank != 4 && oldbank == 4)

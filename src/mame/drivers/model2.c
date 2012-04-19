@@ -356,8 +356,8 @@ static MACHINE_RESET(model2o)
 static MACHINE_RESET(model2_scsp)
 {
 	model2_state *state = machine.driver_data<model2_state>();
-	memory_set_bankptr(machine, "bank4", machine.region("scsp")->base() + 0x200000);
-	memory_set_bankptr(machine, "bank5", machine.region("scsp")->base() + 0x600000);
+	state->subbank("bank4")->set_base(machine.region("scsp")->base() + 0x200000);
+	state->subbank("bank5")->set_base(machine.region("scsp")->base() + 0x600000);
 
 	// copy the 68k vector table into RAM
 	memcpy(state->m_soundram, machine.region("audiocpu")->base() + 0x80000, 16);
@@ -1849,13 +1849,13 @@ WRITE16_MEMBER(model2_state::model2snd_ctrl)
 		UINT8 *snd = machine().region("scsp")->base();
 		if (data & 0x20)
 		{
-			memory_set_bankptr(machine(), "bank4", snd + 0x200000);
-			memory_set_bankptr(machine(), "bank5", snd + 0x600000);
+			subbank("bank4")->set_base(snd + 0x200000);
+			subbank("bank5")->set_base(snd + 0x600000);
 		}
 		else
 		{
-			memory_set_bankptr(machine(), "bank4", snd + 0x800000);
-			memory_set_bankptr(machine(), "bank5", snd + 0xa00000);
+			subbank("bank4")->set_base(snd + 0x800000);
+			subbank("bank5")->set_base(snd + 0xa00000);
 		}
 	}
 }

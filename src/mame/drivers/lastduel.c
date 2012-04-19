@@ -175,7 +175,7 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(lastduel_state::mg_bankswitch_w)
 {
-	memory_set_bank(machine(), "bank1", data & 0x01);
+	subbank("bank1")->set_entry(data & 0x01);
 }
 
 static ADDRESS_MAP_START( madgear_sound_map, AS_PROGRAM, 8, lastduel_state )
@@ -481,7 +481,7 @@ static MACHINE_START( madgear )
 {
 	UINT8 *ROM = machine.region("audiocpu")->base();
 
-	memory_configure_bank(machine, "bank1", 0, 2, &ROM[0x10000], 0x4000);
+	machine.root_device().subbank("bank1")->configure_entries(0, 2, &ROM[0x10000], 0x4000);
 
 	MACHINE_START_CALL(lastduel);
 }

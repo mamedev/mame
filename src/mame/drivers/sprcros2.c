@@ -76,7 +76,7 @@ WRITE8_MEMBER(sprcros2_state::sprcros2_m_port7_w)
 	//-------x nmi enable
 
 	if((m_port7^data)&0x40)
-		memory_set_bankptr(machine(), "bank1",&RAM[0x10000+((data&0x40)<<7)]);
+		subbank("bank1")->set_base(&RAM[0x10000+((data&0x40)<<7)]);
 
 	machine().tilemap().set_flip_all(data&0x02?(TILEMAP_FLIPX|TILEMAP_FLIPY):0 );
 
@@ -94,7 +94,7 @@ WRITE8_MEMBER(sprcros2_state::sprcros2_s_port3_w)
 	//-------x nmi enable
 
 	if((m_s_port3^data)&0x08)
-		memory_set_bankptr(machine(), "bank2",&RAM[0x10000+((data&0x08)<<10)]);
+		subbank("bank2")->set_base(&RAM[0x10000+((data&0x08)<<10)]);
 
 	m_s_port3 = data;
 }

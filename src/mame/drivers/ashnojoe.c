@@ -287,7 +287,7 @@ static WRITE8_DEVICE_HANDLER( ym2203_write_a )
 
 static WRITE8_DEVICE_HANDLER( ym2203_write_b )
 {
-	memory_set_bank(device->machine(), "bank4", data & 0x0f);
+	device->machine().root_device().subbank("bank4")->set_entry(data & 0x0f);
 }
 
 static const ym2203_interface ym2203_config =
@@ -463,9 +463,9 @@ ROM_END
 static DRIVER_INIT( ashnojoe )
 {
 	UINT8 *ROM = machine.region("adpcm")->base();
-	memory_configure_bank(machine, "bank4", 0, 16, &ROM[0x00000], 0x8000);
+	machine.root_device().subbank("bank4")->configure_entries(0, 16, &ROM[0x00000], 0x8000);
 
-	memory_set_bank(machine, "bank4", 0);
+	machine.root_device().subbank("bank4")->set_entry(0);
 }
 
 GAME( 1990, scessjoe, 0,        ashnojoe, ashnojoe, ashnojoe, ROT0, "Wave / Taito Corporation", "Success Joe (World)",   GAME_SUPPORTS_SAVE )

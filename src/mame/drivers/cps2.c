@@ -1217,7 +1217,7 @@ static MACHINE_START( cps2 )
 	state->m_audiocpu = machine.device("audiocpu");
 
 	if (state->m_audiocpu != NULL)	// gigaman2 has no audiocpu
-		memory_configure_bank(machine, "bank1", 0, (QSOUND_SIZE - 0x10000) / 0x4000, machine.region("audiocpu")->base() + 0x10000, 0x4000);
+		state->subbank("bank1")->configure_entries(0, (QSOUND_SIZE - 0x10000) / 0x4000, machine.region("audiocpu")->base() + 0x10000, 0x4000);
 }
 
 

@@ -171,7 +171,7 @@ WRITE8_MEMBER(wardner_state::wardner_ramrom_bank_sw)
 				case 6:  bankaddress = 0x30000; break; /* not used */
 				default: bankaddress = 0x00000; break; /* not used */
 			}
-			memory_set_bankptr(machine(), "bank1",&RAM[bankaddress]);
+			subbank("bank1")->set_base(&RAM[bankaddress]);
 		}
 		else
 		{
@@ -179,10 +179,10 @@ WRITE8_MEMBER(wardner_state::wardner_ramrom_bank_sw)
 			mainspace->install_read_bank(0xa000, 0xadff, "bank4");
 			mainspace->install_read_bank(0xae00, 0xafff, "bank2");
 			mainspace->install_read_bank(0xc000, 0xc7ff, "bank3");
-			memory_set_bankptr(machine(), "bank1", &RAM[0x0000]);
-			memory_set_bankptr(machine(), "bank2", m_rambase_ae00);
-			memory_set_bankptr(machine(), "bank3", m_rambase_c000);
-			memory_set_bankptr(machine(), "bank4", m_generic_paletteram_8);
+			subbank("bank1")->set_base(&RAM[0x0000]);
+			subbank("bank2")->set_base(m_rambase_ae00);
+			subbank("bank3")->set_base(m_rambase_c000);
+			subbank("bank4")->set_base(m_generic_paletteram_8);
 		}
 	}
 }

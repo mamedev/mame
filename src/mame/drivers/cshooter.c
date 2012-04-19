@@ -239,7 +239,7 @@ WRITE8_MEMBER(cshooter_state::cshooter_c700_w)
 
 WRITE8_MEMBER(cshooter_state::bank_w)
 {
-	memory_set_bankptr(machine(), "bank1",&machine().region("user1")->base()[0x4000*((data>>4)&3)]);
+	subbank("bank1")->set_base(&machine().region("user1")->base()[0x4000*((data>>4)&3)]);
 }
 
 
@@ -670,7 +670,7 @@ static DRIVER_INIT( cshooter )
 	rom[0xa2] = 0x00;
 	rom[0xa3] = 0x00;
 	rom[0xa4] = 0x00;
-	memory_set_bankptr(machine, "bank1",&machine.region("user1")->base()[0]);
+	machine.root_device().subbank("bank1")->set_base(&machine.region("user1")->base()[0]);
 }
 
 static DRIVER_INIT( cshootere )
@@ -707,7 +707,7 @@ static DRIVER_INIT( cshootere )
 			rom[A] = BITSWAP8(rom[A],7,6,1,4,3,2,5,0);
 	}
 
-	memory_set_bankptr(machine, "bank1",&machine.region("user1")->base()[0]);
+	machine.root_device().subbank("bank1")->set_base(&machine.region("user1")->base()[0]);
 	seibu_sound_decrypt(machine,"audiocpu",0x2000);
 }
 

@@ -359,10 +359,10 @@ static MACHINE_START( system1 )
 	UINT32 numbanks = (machine.region("maincpu")->bytes() - 0x10000) / 0x4000;
 
 	if (numbanks > 0)
-		memory_configure_bank(machine, "bank1", 0, numbanks, machine.region("maincpu")->base() + 0x10000, 0x4000);
+		state->subbank("bank1")->configure_entries(0, numbanks, machine.region("maincpu")->base() + 0x10000, 0x4000);
 	else
-		memory_configure_bank(machine, "bank1", 0, 1, machine.region("maincpu")->base() + 0x8000, 0);
-	memory_set_bank(machine, "bank1", 0);
+		state->subbank("bank1")->configure_entry(0, machine.region("maincpu")->base() + 0x8000);
+	state->subbank("bank1")->set_entry(0);
 
 	z80_set_cycle_tables(machine.device("maincpu"), cc_op, cc_cb, cc_ed, cc_xy, cc_xycb, cc_ex);
 
@@ -400,14 +400,14 @@ static MACHINE_RESET( system1 )
 static void bank44_custom_w(running_machine &machine, UINT8 data, UINT8 prevdata)
 {
 	/* bank bits are bits 6 and 2 */
-	memory_set_bank(machine, "bank1", ((data & 0x40) >> 5) | ((data & 0x04) >> 2));
+	machine.root_device().subbank("bank1")->set_entry(((data & 0x40) >> 5) | ((data & 0x04) >> 2));
 }
 
 
 static void bank0c_custom_w(running_machine &machine, UINT8 data, UINT8 prevdata)
 {
 	/* bank bits are bits 3 and 2 */
-	memory_set_bank(machine, "bank1", (data & 0x0c) >> 2);
+	machine.root_device().subbank("bank1")->set_entry((data & 0x0c) >> 2);
 }
 
 
@@ -4756,7 +4756,7 @@ static DRIVER_INIT( bootsys2 )
 {
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	space->set_decrypted_region(0x0000, 0x7fff, machine.region("maincpu")->base() + 0x20000);
-	memory_configure_bank_decrypted(machine, "bank1", 0, 4, machine.region("maincpu")->base() + 0x30000, 0x4000);
+	machine.root_device().subbank("bank1")->configure_decrypted_entries(0, 4, machine.region("maincpu")->base() + 0x30000, 0x4000);
 	DRIVER_INIT_CALL(bank0c);
 }
 

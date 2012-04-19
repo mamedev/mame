@@ -42,51 +42,51 @@ static void pk8000_set_bank(running_machine &machine,UINT8 data)
 
 	switch(block1) {
 		case 0:
-				memory_set_bankptr(machine, "bank1", rom + 0x10000);
-				memory_set_bankptr(machine, "bank5", ram);
+				machine.root_device().subbank("bank1")->set_base(rom + 0x10000);
+				machine.root_device().subbank("bank5")->set_base(ram);
 				break;
 		case 1: break;
 		case 2: break;
 		case 3:
-				memory_set_bankptr(machine, "bank1", ram);
-				memory_set_bankptr(machine, "bank5", ram);
+				machine.root_device().subbank("bank1")->set_base(ram);
+				machine.root_device().subbank("bank5")->set_base(ram);
 				break;
 	}
 
 	switch(block2) {
 		case 0:
-				memory_set_bankptr(machine, "bank2", rom + 0x14000);
-				memory_set_bankptr(machine, "bank6", ram + 0x4000);
+				machine.root_device().subbank("bank2")->set_base(rom + 0x14000);
+				machine.root_device().subbank("bank6")->set_base(ram + 0x4000);
 				break;
 		case 1: break;
 		case 2: break;
 		case 3:
-				memory_set_bankptr(machine, "bank2", ram + 0x4000);
-				memory_set_bankptr(machine, "bank6", ram + 0x4000);
+				machine.root_device().subbank("bank2")->set_base(ram + 0x4000);
+				machine.root_device().subbank("bank6")->set_base(ram + 0x4000);
 				break;
 	}
 	switch(block3) {
 		case 0:
-				memory_set_bankptr(machine, "bank3", rom + 0x18000);
-				memory_set_bankptr(machine, "bank7", ram + 0x8000);
+				machine.root_device().subbank("bank3")->set_base(rom + 0x18000);
+				machine.root_device().subbank("bank7")->set_base(ram + 0x8000);
 				break;
 		case 1: break;
 		case 2: break;
 		case 3:
-				memory_set_bankptr(machine, "bank3", ram + 0x8000);
-				memory_set_bankptr(machine, "bank7", ram + 0x8000);
+				machine.root_device().subbank("bank3")->set_base(ram + 0x8000);
+				machine.root_device().subbank("bank7")->set_base(ram + 0x8000);
 				break;
 	}
 	switch(block4) {
 		case 0:
-				memory_set_bankptr(machine, "bank4", rom + 0x1c000);
-				memory_set_bankptr(machine, "bank8", ram + 0xc000);
+				machine.root_device().subbank("bank4")->set_base(rom + 0x1c000);
+				machine.root_device().subbank("bank8")->set_base(ram + 0xc000);
 				break;
 		case 1: break;
 		case 2: break;
 		case 3:
-				memory_set_bankptr(machine, "bank4", ram + 0xc000);
-				memory_set_bankptr(machine, "bank8", ram + 0xc000);
+				machine.root_device().subbank("bank4")->set_base(ram + 0xc000);
+				machine.root_device().subbank("bank8")->set_base(ram + 0xc000);
 				break;
 	}
 }

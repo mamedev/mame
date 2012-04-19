@@ -178,9 +178,9 @@ VIDEO_START( phoenix )
 	state->m_videoram_pg[0] = auto_alloc_array(machine, UINT8, 0x1000);
 	state->m_videoram_pg[1] = auto_alloc_array(machine, UINT8, 0x1000);
 
-	memory_configure_bank(machine, "bank1", 0, 1, state->m_videoram_pg[0], 0);
-	memory_configure_bank(machine, "bank1", 1, 1, state->m_videoram_pg[1], 0);
-	memory_set_bank(machine, "bank1", 0);
+	state->subbank("bank1")->configure_entry(0, state->m_videoram_pg[0]);
+	state->subbank("bank1")->configure_entry(1, state->m_videoram_pg[1]);
+	state->subbank("bank1")->set_entry(0);
 
 	state->m_videoram_pg_index = 0;
 	state->m_palette_bank = 0;
@@ -249,7 +249,7 @@ WRITE8_MEMBER(phoenix_state::phoenix_videoreg_w)
 	{
 		/* set memory bank */
 		m_videoram_pg_index = data & 1;
-		memory_set_bank(machine(), "bank1", m_videoram_pg_index);
+		subbank("bank1")->set_entry(m_videoram_pg_index);
 
 		m_cocktail_mode = m_videoram_pg_index && (input_port_read(machine(), "CAB") & 0x01);
 
@@ -272,7 +272,7 @@ WRITE8_MEMBER(phoenix_state::pleiads_videoreg_w)
 	{
 		/* set memory bank */
 		m_videoram_pg_index = data & 1;
-		memory_set_bank(machine(), "bank1", m_videoram_pg_index);
+		subbank("bank1")->set_entry(m_videoram_pg_index);
 
 		m_cocktail_mode = m_videoram_pg_index && (input_port_read(machine(), "CAB") & 0x01);
 

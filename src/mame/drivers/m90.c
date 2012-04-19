@@ -51,7 +51,7 @@ WRITE16_MEMBER(m90_state::m90_coincounter_w)
 WRITE16_MEMBER(m90_state::quizf1_bankswitch_w)
 {
 	if (ACCESSING_BITS_0_7)
-		memory_set_bank(machine(), "bank1", data & 0xf);
+		subbank("bank1")->set_entry(data & 0xf);
 }
 
 WRITE16_MEMBER(m90_state::dynablsb_sound_command_w)
@@ -1186,7 +1186,7 @@ ROM_END
 static DRIVER_INIT( quizf1 )
 {
 	m90_state *state = machine.driver_data<m90_state>();
-	memory_configure_bank(machine, "bank1", 0, 16, machine.region("user1")->base(), 0x10000);
+	state->subbank("bank1")->configure_entries(0, 16, machine.region("user1")->base(), 0x10000);
 	machine.device("maincpu")->memory().space(AS_IO)->install_write_handler(0x04, 0x05, write16_delegate(FUNC(m90_state::quizf1_bankswitch_w),state));
 }
 

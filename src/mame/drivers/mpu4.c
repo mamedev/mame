@@ -466,9 +466,9 @@ static MACHINE_RESET( mpu4 )
 	{
 		UINT8 *rom = machine.region("maincpu")->base();
 
-		memory_configure_bank(machine, "bank1", 0, 8, &rom[0x01000], 0x10000);
+		state->subbank("bank1")->configure_entries(0, 8, &rom[0x01000], 0x10000);
 
-		memory_set_bank(machine, "bank1", 0);
+		state->subbank("bank1")->set_entry(0);
 		machine.device("maincpu")->reset();
 	}
 }
@@ -522,7 +522,7 @@ WRITE8_MEMBER(mpu4_state::bankswitch_w)
 //  printf("bank %02x\n", data);
 
 	m_pageval = (data & 0x03);
-	memory_set_bank(machine(), "bank1", (m_pageval + (m_pageset ? 4 : 0)) & 0x07);
+	subbank("bank1")->set_entry((m_pageval + (m_pageset ? 4 : 0)) & 0x07);
 }
 
 
@@ -535,7 +535,7 @@ READ8_MEMBER(mpu4_state::bankswitch_r)
 WRITE8_MEMBER(mpu4_state::bankset_w)
 {
 	m_pageval = (data - 2);//writes 2 and 3, to represent 0 and 1 - a hangover from the half page design?
-	memory_set_bank(machine(), "bank1", (m_pageval + (m_pageset ? 4 : 0)) & 0x07);
+	subbank("bank1")->set_entry((m_pageval + (m_pageset ? 4 : 0)) & 0x07);
 }
 
 
@@ -1560,7 +1560,7 @@ static WRITE_LINE_DEVICE_HANDLER( pia_gb_cb2_w )
 	if (mstate->m_bwb_bank)
 	{
 		mstate->m_pageval = state;
-		memory_set_bank(device->machine(), "bank1", (mstate->m_pageval + (mstate->m_pageset ? 4 : 0)) & 0x07);
+		mstate->subbank("bank1")->set_entry((mstate->m_pageval + (mstate->m_pageset ? 4 : 0)) & 0x07);
 	}
 }
 

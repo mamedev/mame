@@ -106,11 +106,11 @@ static void mxtc_config_w(device_t *busdevice, device_t *device, int function, i
 		{
 			if (data & 0x10)		// enable RAM access to region 0xf0000 - 0xfffff
 			{
-				memory_set_bankptr(busdevice->machine(), "bank1", state->m_bios_ram);
+				state->subbank("bank1")->set_base(state->m_bios_ram);
 			}
 			else					// disable RAM access (reads go to BIOS ROM)
 			{
-				memory_set_bankptr(busdevice->machine(), "bank1", busdevice->machine().region("bios")->base() + 0x20000);
+				state->subbank("bank1")->set_base(busdevice->machine().region("bios")->base() + 0x20000);
 			}
 			break;
 		}
@@ -531,7 +531,7 @@ static MACHINE_START( savquest )
 
 static MACHINE_RESET( savquest )
 {
-	memory_set_bankptr(machine, "bank1", machine.region("bios")->base() + 0x20000);
+	machine.root_device().subbank("bank1")->set_base(machine.region("bios")->base() + 0x20000);
 }
 
 

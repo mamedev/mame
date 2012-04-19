@@ -1491,11 +1491,11 @@ static DRIVER_INIT( decocrom )
 	/* convert charram to a banked ROM */
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x6000, 0xafff, "bank1");
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x6000, 0xafff, FUNC(decocass_de0091_w));
-	memory_configure_bank(machine, "bank1", 0, 1, state->m_charram, 0);
-	memory_configure_bank(machine, "bank1", 1, 1, machine.region("user3")->base(), 0);
-	memory_configure_bank_decrypted(machine, "bank1", 0, 1, &state->m_decrypted[0x6000], 0);
-	memory_configure_bank_decrypted(machine, "bank1", 1, 1, state->m_decrypted2, 0);
-	memory_set_bank(machine, "bank1", 0);
+	state->subbank("bank1")->configure_entry(0, state->m_charram);
+	state->subbank("bank1")->configure_entry(1, machine.region("user3")->base());
+	state->subbank("bank1")->configure_decrypted_entry(0, &state->m_decrypted[0x6000]);
+	state->subbank("bank1")->configure_decrypted_entry(1, state->m_decrypted2);
+	state->subbank("bank1")->set_entry(0);
 
 	/* install the bank selector */
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xe900, 0xe900, FUNC(decocass_e900_w));

@@ -733,20 +733,20 @@ MACHINE_CONFIG_END
 
 static DRIVER_INIT(rdx_v33)
 {
-	memory_configure_bank(machine, "bank1", 0, 0x20, machine.region("mainprg")->base(), 0x20000);
+	machine.root_device().subbank("bank1")->configure_entries(0, 0x20, machine.region("mainprg")->base(), 0x20000);
 
 	raiden2_decrypt_sprites(machine);
 
-	memory_set_bank(machine, "bank1", 1);
+	machine.root_device().subbank("bank1")->set_entry(1);
 }
 
 static DRIVER_INIT(nzerotea)
 {
-	memory_configure_bank(machine, "bank1", 0, 2, machine.region("mainprg")->base(), 0x20000);
+	machine.root_device().subbank("bank1")->configure_entries(0, 2, machine.region("mainprg")->base(), 0x20000);
 
 	zeroteam_decrypt_sprites(machine);
 
-	memory_set_bank(machine, "bank1", 1);
+	machine.root_device().subbank("bank1")->set_entry(1);
 
 }
 

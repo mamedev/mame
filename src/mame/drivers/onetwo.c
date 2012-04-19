@@ -120,7 +120,7 @@ WRITE8_MEMBER(onetwo_state::onetwo_fgram_w)
 
 WRITE8_MEMBER(onetwo_state::onetwo_cpubank_w)
 {
-	memory_set_bank(machine(), "bank1", data);
+	subbank("bank1")->set_entry(data);
 }
 
 WRITE8_MEMBER(onetwo_state::onetwo_coin_counters_w)
@@ -350,7 +350,7 @@ static MACHINE_START( onetwo )
 	onetwo_state *state = machine.driver_data<onetwo_state>();
 	UINT8 *ROM = machine.region("maincpu")->base();
 
-	memory_configure_bank(machine, "bank1", 0, 8, &ROM[0x10000], 0x4000);
+	state->subbank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
 
 	state->m_maincpu = machine.device("maincpu");
 	state->m_audiocpu = machine.device("audiocpu");

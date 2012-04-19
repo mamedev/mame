@@ -344,7 +344,7 @@ WRITE8_MEMBER(quizpun2_state::quizpun2_protection_w)
 WRITE8_MEMBER(quizpun2_state::quizpun2_rombank_w)
 {
 	UINT8 *ROM = machine().region("maincpu")->base();
-	memory_set_bankptr(machine(),  "bank1", &ROM[ 0x10000 + 0x2000 * (data & 0x1f) ] );
+	subbank("bank1")->set_base(&ROM[ 0x10000 + 0x2000 * (data & 0x1f) ] );
 }
 
 WRITE8_MEMBER(quizpun2_state::quizpun2_irq_ack)

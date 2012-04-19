@@ -492,9 +492,9 @@ static MACHINE_RESET( strtheat )
     MACHINE_RESET_CALL(dkong);
 
     /* The initial state of the counter is 0x08 */
-    memory_configure_bank(machine, "bank1", 0, 4, &ROM[0x10000], 0x4000);
+    state->subbank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x4000);
     state->m_decrypt_counter = 0x08;
-    memory_set_bank(machine, "bank1", 0);
+    state->subbank("bank1")->set_entry(0);
 }
 
 static MACHINE_RESET( drakton )
@@ -505,9 +505,9 @@ static MACHINE_RESET( drakton )
     MACHINE_RESET_CALL(dkong);
 
     /* The initial state of the counter is 0x09 */
-    memory_configure_bank(machine, "bank1", 0, 4, &ROM[0x10000], 0x4000);
+    state->subbank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x4000);
     state->m_decrypt_counter = 0x09;
-    memory_set_bank(machine, "bank1", 1);
+    state->subbank("bank1")->set_entry(1);
 }
 
 
@@ -627,10 +627,10 @@ READ8_MEMBER(dkong_state::epos_decrypt_rom)
 
     switch(m_decrypt_counter)
     {
-        case 0x08:  memory_set_bank(machine(), "bank1", 0);      break;
-        case 0x09:  memory_set_bank(machine(), "bank1", 1);      break;
-        case 0x0A:  memory_set_bank(machine(), "bank1", 2);      break;
-        case 0x0B:  memory_set_bank(machine(), "bank1", 3);      break;
+        case 0x08:  subbank("bank1")->set_entry(0);      break;
+        case 0x09:  subbank("bank1")->set_entry(1);      break;
+        case 0x0A:  subbank("bank1")->set_entry(2);      break;
+        case 0x0B:  subbank("bank1")->set_entry(3);      break;
         default:
             logerror("Invalid counter = %02X\n",m_decrypt_counter);
             break;
@@ -1618,8 +1618,8 @@ static READ8_DEVICE_HANDLER( braze_eeprom_r )
 
 WRITE8_MEMBER(dkong_state::braze_a15_w)
 {
-	memory_set_bank(machine(), "bank1", data & 0x01);
-	memory_set_bank(machine(), "bank2", data & 0x01);
+	subbank("bank1")->set_entry(data & 0x01);
+	subbank("bank2")->set_entry(data & 0x01);
 }
 
 static WRITE8_DEVICE_HANDLER( braze_eeprom_w )
@@ -3174,10 +3174,10 @@ static DRIVER_INIT( dkongx )
 
 	braze_decrypt_rom(machine, decrypted);
 
-	memory_configure_bank(machine,"bank1", 0, 2, &decrypted[0], 0x8000);
-	memory_set_bank(machine,"bank1", 0);
-	memory_configure_bank(machine,"bank2", 0, 2, &decrypted[0], 0x8000);
-	memory_set_bank(machine,"bank2", 0);
+	state->subbank("bank1")->configure_entries(0, 2, &decrypted[0], 0x8000);
+	state->subbank("bank1")->set_entry(0);
+	state->subbank("bank2")->configure_entries(0, 2, &decrypted[0], 0x8000);
+	state->subbank("bank2")->set_entry(0);
 }
 
 static DRIVER_INIT( dkingjr )

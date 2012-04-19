@@ -61,7 +61,7 @@ READ16_MEMBER(f1gp_state::extrarom2_r)
 
 WRITE8_MEMBER(f1gp_state::f1gp_sh_bankswitch_w)
 {
-	memory_set_bank(machine(), "bank1", data & 0x01);
+	subbank("bank1")->set_entry(data & 0x01);
 }
 
 
@@ -429,7 +429,7 @@ static MACHINE_START( f1gp )
 	f1gp_state *state = machine.driver_data<f1gp_state>();
 	UINT8 *ROM = machine.region("audiocpu")->base();
 
-	memory_configure_bank(machine, "bank1", 0, 2, &ROM[0x10000], 0x8000);
+	state->subbank("bank1")->configure_entries(0, 2, &ROM[0x10000], 0x8000);
 
 	state->m_audiocpu = machine.device("audiocpu");
 	state->m_k053936 = machine.device("k053936");

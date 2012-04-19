@@ -339,7 +339,7 @@ static void mxtc_config_w(device_t *busdevice, device_t *device, int function, i
 			//if (data & 0x10)     // enable RAM access to region 0xf0000 - 0xfffff
 			if ((data & 0x50) | (data & 0xA0))
 			{
-				memory_set_bankptr(busdevice->machine(), "bank1", state->m_bios_ram);
+				state->subbank("bank1")->set_base(state->m_bios_ram);
 			}
 			else				// disable RAM access (reads go to BIOS ROM)
 			{
@@ -352,8 +352,8 @@ static void mxtc_config_w(device_t *busdevice, device_t *device, int function, i
 				}
 				#endif
 
-				//memory_set_bankptr(busdevice->machine(), "bank1", busdevice->machine().region("bios")->base() + 0x10000);
-				memory_set_bankptr(busdevice->machine(), "bank1", busdevice->machine().region("bios")->base());
+				state->subbank("bank1")->set_base(busdevice->machine().region("bios")->base() + 0x10000);
+				state->subbank("bank1")->set_base(busdevice->machine().region("bios")->base());
 			}
 			break;
 		}
@@ -865,8 +865,8 @@ static const struct pit8253_config calchase_pit8254_config =
 
 static MACHINE_RESET(calchase)
 {
-	//memory_set_bankptr(machine, "bank1", machine.region("bios")->base() + 0x10000);
-	memory_set_bankptr(machine, "bank1", machine.region("bios")->base());
+	//machine.root_device().subbank("bank1")->set_base(machine.region("bios")->base() + 0x10000);
+	machine.root_device().subbank("bank1")->set_base(machine.region("bios")->base());
 }
 
 static void set_gate_a20(running_machine &machine, int a20)

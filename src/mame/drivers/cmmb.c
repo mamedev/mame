@@ -141,7 +141,7 @@ READ8_MEMBER(cmmb_state::cmmb_input_r)
         UINT32 bankaddress;
 
         bankaddress = 0x10000 + (0x10000 * (data & 0x03));
-        memory_set_bankptr(space->machine(), "bank1", &ROM[bankaddress]);
+        space->machine().root_device().subbank("bank1")->set_base(&ROM[bankaddress]);
     }
 */
 
@@ -156,7 +156,7 @@ WRITE8_MEMBER(cmmb_state::cmmb_output_w)
 				UINT32 bankaddress;
 
 				bankaddress = 0x1c000 + (0x10000 * (data & 0x03));
-				memory_set_bankptr(machine(), "bank1", &ROM[bankaddress]);
+				subbank("bank1")->set_base(&ROM[bankaddress]);
 			}
 			break;
 		case 0x03:

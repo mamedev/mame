@@ -545,7 +545,7 @@ ADDRESS_MAP_END
 static void reset_sound_region(running_machine &machine)
 {
 	polygonet_state *state = machine.driver_data<polygonet_state>();
-	memory_set_bankptr(machine, "bank2", machine.region("soundcpu")->base() + 0x10000 + state->m_cur_sound_region*0x4000);
+	state->subbank("bank2")->set_base(machine.region("soundcpu")->base() + 0x10000 + state->m_cur_sound_region*0x4000);
 }
 
 WRITE8_MEMBER(polygonet_state::sound_bankswitch_w)

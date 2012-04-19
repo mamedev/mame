@@ -587,7 +587,7 @@ static WRITE16_HANDLER( wwally_custom_io_w )
 
 static WRITE8_HANDLER( soundbank_w )
 {
-	memory_set_bankptr(space->machine(), "bank1", space->machine().region("soundcpu")->base() + 0x10000 + 0x2000 * data);
+	space->machine().root_device().subbank("bank1")->set_base(space->machine().region("soundcpu")->base() + 0x10000 + 0x2000 * data);
 }
 
 

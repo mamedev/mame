@@ -49,7 +49,7 @@ WRITE8_MEMBER(tryout_state::tryout_bankswitch_w)
 	int bankaddress;
 
 	bankaddress = 0x10000 + (data & 0x01) * 0x2000;
-	memory_set_bankptr(machine(), "bank1", &RAM[bankaddress]);
+	subbank("bank1")->set_base(&RAM[bankaddress]);
 }
 
 static ADDRESS_MAP_START( main_cpu, AS_PROGRAM, 8, tryout_state )

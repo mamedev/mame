@@ -236,7 +236,7 @@ WRITE16_MEMBER(tmnt_state::prmrsocr_sound_irq_w)
 
 WRITE8_MEMBER(tmnt_state::prmrsocr_audio_bankswitch_w)
 {
-	memory_set_bank(machine(), "bank1", data & 7);
+	subbank("bank1")->set_entry(data & 7);
 }
 
 
@@ -2605,7 +2605,7 @@ static MACHINE_START( prmrsocr )
 {
 	MACHINE_START_CALL(common);
 	UINT8 *ROM = machine.region("audiocpu")->base();
-	memory_configure_bank(machine, "bank1", 0, 8, &ROM[0x10000], 0x4000);
+	machine.root_device().subbank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
 }
 
 static MACHINE_CONFIG_START( prmrsocr, tmnt_state )

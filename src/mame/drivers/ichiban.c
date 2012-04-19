@@ -106,7 +106,7 @@ void ichibanjyan_state::machine_start()
 {
 	UINT8 *ROM = machine().region("code")->base();
 
-	memory_configure_bank(machine(), "bank1", 0, 4, ROM, 0x8000);
+	subbank("bank1")->configure_entries(0, 4, ROM, 0x8000);
 }
 
 void ichibanjyan_state::machine_reset()

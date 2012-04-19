@@ -599,7 +599,7 @@ WRITE32_MEMBER(hornet_state::comm_rombank_w)
 	int bank = data >> 24;
 	UINT8 *usr3 = machine().region("user3")->base();
 	if (usr3 != NULL)
-		memory_set_bank(machine(), "bank1", bank & 0x7f);
+		subbank("bank1")->set_entry(bank & 0x7f);
 }
 
 READ32_MEMBER(hornet_state::comm0_unk_r)
@@ -897,14 +897,14 @@ static MACHINE_RESET( hornet )
 	UINT8 *usr5 = machine.region("user5")->base();
 	if (usr3 != NULL)
 	{
-		memory_configure_bank(machine, "bank1", 0, machine.region("user3")->bytes() / 0x40000, usr3, 0x40000);
-		memory_set_bank(machine, "bank1", 0);
+		machine.root_device().subbank("bank1")->configure_entries(0, machine.region("user3")->bytes() / 0x40000, usr3, 0x40000);
+		machine.root_device().subbank("bank1")->set_entry(0);
 	}
 
 	cputag_set_input_line(machine, "dsp", INPUT_LINE_RESET, ASSERT_LINE);
 
 	if (usr5)
-		memory_set_bankptr(machine, "bank5", usr5);
+		machine.root_device().subbank("bank5")->set_base(usr5);
 }
 
 static double adc12138_input_callback( device_t *device, UINT8 input )
@@ -1019,14 +1019,14 @@ static MACHINE_RESET( hornet_2board )
 
 	if (usr3 != NULL)
 	{
-		memory_configure_bank(machine, "bank1", 0, machine.region("user3")->bytes() / 0x40000, usr3, 0x40000);
-		memory_set_bank(machine, "bank1", 0);
+		machine.root_device().subbank("bank1")->configure_entries(0, machine.region("user3")->bytes() / 0x40000, usr3, 0x40000);
+		machine.root_device().subbank("bank1")->set_entry(0);
 	}
 	cputag_set_input_line(machine, "dsp", INPUT_LINE_RESET, ASSERT_LINE);
 	cputag_set_input_line(machine, "dsp2", INPUT_LINE_RESET, ASSERT_LINE);
 
 	if (usr5)
-		memory_set_bankptr(machine, "bank5", usr5);
+		machine.root_device().subbank("bank5")->set_base(usr5);
 }
 
 static MACHINE_CONFIG_DERIVED( hornet_2board, hornet )

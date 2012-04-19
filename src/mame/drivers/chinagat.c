@@ -180,12 +180,12 @@ static WRITE8_HANDLER( chinagat_video_ctrl_w )
 
 static WRITE8_HANDLER( chinagat_bankswitch_w )
 {
-	memory_set_bank(space->machine(), "bank1", data & 0x07);	// shall we check (data & 7) < 6 (# of banks)?
+	space->machine().root_device().subbank("bank1")->set_entry(data & 0x07);	// shall we check (data & 7) < 6 (# of banks)?
 }
 
 static WRITE8_HANDLER( chinagat_sub_bankswitch_w )
 {
-	memory_set_bank(space->machine(), "bank4", data & 0x07);	// shall we check (data & 7) < 6 (# of banks)?
+	space->machine().root_device().subbank("bank4")->set_entry(data & 0x07);	// shall we check (data & 7) < 6 (# of banks)?
 }
 
 static READ8_HANDLER( saiyugoub1_mcu_command_r )
@@ -531,7 +531,7 @@ static MACHINE_START( chinagat )
 	state->m_snd_cpu = machine.device("audiocpu");
 
 	/* configure banks */
-	memory_configure_bank(machine, "bank1", 0, 8, machine.region("maincpu")->base() + 0x10000, 0x4000);
+	state->subbank("bank1")->configure_entries(0, 8, machine.region("maincpu")->base() + 0x10000, 0x4000);
 
 	/* register for save states */
 	state->save_item(NAME(state->m_scrollx_hi));
@@ -919,8 +919,8 @@ static DRIVER_INIT( chinagat )
 	state->m_sprite_irq = M6809_IRQ_LINE;
 	state->m_sound_irq = INPUT_LINE_NMI;
 
-	memory_configure_bank(machine, "bank1", 0, 6, &MAIN[0x10000], 0x4000);
-	memory_configure_bank(machine, "bank4", 0, 6, &SUB[0x10000], 0x4000);
+	state->subbank("bank1")->configure_entries(0, 6, &MAIN[0x10000], 0x4000);
+	state->subbank("bank4")->configure_entries(0, 6, &SUB[0x10000], 0x4000);
 }
 
 

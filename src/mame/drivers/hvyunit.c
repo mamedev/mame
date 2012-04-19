@@ -219,7 +219,7 @@ WRITE8_MEMBER(hvyunit_state::master_bankswitch_w)
 	unsigned char *ROM = machine().region("master")->base();
 	int bank = data & 7;
 	ROM = &ROM[0x4000 * bank];
-	memory_set_bankptr(machine(), "bank1", ROM);
+	subbank("bank1")->set_base(ROM);
 }
 
 WRITE8_MEMBER(hvyunit_state::mermaid_data_w)
@@ -280,7 +280,7 @@ WRITE8_MEMBER(hvyunit_state::slave_bankswitch_w)
 	m_port0_data = data;
 	ROM = &ROM[0x4000 * bank];
 
-	memory_set_bankptr(machine(), "bank2", ROM);
+	subbank("bank2")->set_base(ROM);
 }
 
 WRITE8_MEMBER(hvyunit_state::hu_scrollx_w)
@@ -312,7 +312,7 @@ WRITE8_MEMBER(hvyunit_state::sound_bankswitch_w)
 	int bank = data & 0x3;
 	ROM = &ROM[0x4000 * bank];
 
-	memory_set_bankptr(machine(), "bank3", ROM);
+	subbank("bank3")->set_base(ROM);
 }
 
 

@@ -1277,10 +1277,10 @@ static void model3_init(running_machine &machine, int step)
 	state->m_sound_irq_enable = 0;
 	state->m_sound_timer->adjust(attotime::never);
 
-	memory_set_bankptr(machine,  "bank1", machine.region( "user1" )->base() + 0x800000 ); /* banked CROM */
+	state->subbank("bank1")->set_base(machine.region( "user1" )->base() + 0x800000 ); /* banked CROM */
 
-	memory_set_bankptr(machine, "bank4", machine.region("samples")->base() + 0x200000);
-	memory_set_bankptr(machine, "bank5", machine.region("samples")->base() + 0x600000);
+	state->subbank("bank4")->set_base(machine.region("samples")->base() + 0x200000);
+	state->subbank("bank5")->set_base(machine.region("samples")->base() + 0x600000);
 
 	// copy the 68k vector table into RAM
 	memcpy(state->m_soundram, machine.region("audiocpu")->base()+0x80000, 16);
@@ -1589,7 +1589,7 @@ WRITE64_MEMBER(model3_state::model3_sys_w)
 				data >>= 56;
 				data = (~data) & 0x7;
 
-				memory_set_bankptr(machine(),  "bank1", machine().region( "user1" )->base() + 0x800000 + (data * 0x800000)); /* banked CROM */
+				subbank("bank1")->set_base(machine().region( "user1" )->base() + 0x800000 + (data * 0x800000)); /* banked CROM */
 			}
 			if (ACCESSING_BITS_24_31)
 			{
@@ -1845,8 +1845,8 @@ WRITE64_MEMBER(model3_state::daytona2_rombank_w)
 	{
 		data >>= 56;
 		data = (~data) & 0xf;
-		memory_set_bankptr(machine(),  "bank1", machine().region( "user1" )->base() + 0x800000 + (data * 0x800000)); /* banked CROM */
-		memory_set_bankptr(machine(),  "bank2", machine().region( "user1" )->base() + 0x800000 + (data * 0x800000)); /* banked CROM */
+		subbank("bank1")->set_base(machine().region( "user1" )->base() + 0x800000 + (data * 0x800000)); /* banked CROM */
+		subbank("bank2")->set_base(machine().region( "user1" )->base() + 0x800000 + (data * 0x800000)); /* banked CROM */
 	}
 }
 
@@ -5049,13 +5049,13 @@ WRITE16_MEMBER(model3_state::model3snd_ctrl)
 		UINT8 *snd = machine().region("scsp2")->base();
 		if (data & 0x20)
 		{
-			memory_set_bankptr(machine(), "bank4", snd + 0x200000);
-			memory_set_bankptr(machine(), "bank5", snd + 0x600000);
+			subbank("bank4")->set_base(snd + 0x200000);
+			subbank("bank5")->set_base(snd + 0x600000);
 		}
 		else
 		{
-			memory_set_bankptr(machine(), "bank4", snd + 0x800000);
-			memory_set_bankptr(machine(), "bank5", snd + 0xa00000);
+			subbank("bank4")->set_base(snd + 0x800000);
+			subbank("bank5")->set_base(snd + 0xa00000);
 		}
 	}
 }

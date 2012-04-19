@@ -179,8 +179,8 @@ WRITE8_MEMBER(djboy_state::cpu0_bankswitch_w)
 {
 
 	data ^= m_bankxor;
-	memory_set_bank(machine(), "bank1", data);
-	memory_set_bank(machine(), "bank4", 0); /* unsure if/how this area is banked */
+	subbank("bank1")->set_entry(data);
+	subbank("bank4")->set_entry(0); /* unsure if/how this area is banked */
 }
 
 /******************************************************************************/
@@ -202,7 +202,7 @@ WRITE8_MEMBER(djboy_state::cpu1_bankswitch_w)
 	case 0x01:
 	case 0x02:
 	case 0x03:
-		memory_set_bank(machine(), "bank2", (data & 0xf));
+		subbank("bank2")->set_entry((data & 0xf));
 		break;
 
 	/* bs101.6w */
@@ -214,7 +214,7 @@ WRITE8_MEMBER(djboy_state::cpu1_bankswitch_w)
 	case 0x0d:
 	case 0x0e:
 	case 0x0f:
-		memory_set_bank(machine(), "bank2", (data & 0xf) - 4);
+		subbank("bank2")->set_entry((data & 0xf) - 4);
 		break;
 
 	default:
@@ -238,7 +238,7 @@ WRITE8_MEMBER(djboy_state::trigger_nmi_on_sound_cpu2)
 
 WRITE8_MEMBER(djboy_state::cpu2_bankswitch_w)
 {
-	memory_set_bank(machine(), "bank3", data);	// shall we check data<0x07?
+	subbank("bank3")->set_entry(data);	// shall we check data<0x07?
 }
 
 /******************************************************************************/
@@ -526,13 +526,13 @@ static MACHINE_START( djboy )
 	UINT8 *CPU1 = machine.region("cpu1")->base();
 	UINT8 *CPU2 = machine.region("cpu2")->base();
 
-	memory_configure_bank(machine, "bank1", 0, 4,  &MAIN[0x00000], 0x2000);
-	memory_configure_bank(machine, "bank1", 4, 28, &MAIN[0x10000], 0x2000);
-	memory_configure_bank(machine, "bank2", 0, 2,  &CPU1[0x00000], 0x4000);
-	memory_configure_bank(machine, "bank2", 2, 10, &CPU1[0x10000], 0x4000);
-	memory_configure_bank(machine, "bank3", 0, 3,  &CPU2[0x00000], 0x4000);
-	memory_configure_bank(machine, "bank3", 3, 5,  &CPU2[0x10000], 0x4000);
-	memory_configure_bank(machine, "bank4", 0, 1,  &MAIN[0x10000], 0x3000); /* unsure if/how this area is banked */
+	state->subbank("bank1")->configure_entries(0, 4,  &MAIN[0x00000], 0x2000);
+	state->subbank("bank1")->configure_entries(4, 28, &MAIN[0x10000], 0x2000);
+	state->subbank("bank2")->configure_entries(0, 2,  &CPU1[0x00000], 0x4000);
+	state->subbank("bank2")->configure_entries(2, 10, &CPU1[0x10000], 0x4000);
+	state->subbank("bank3")->configure_entries(0, 3,  &CPU2[0x00000], 0x4000);
+	state->subbank("bank3")->configure_entries(3, 5,  &CPU2[0x10000], 0x4000);
+	state->subbank("bank4")->configure_entry(0, &MAIN[0x10000]); /* unsure if/how this area is banked */
 
 	state->m_maincpu = machine.device("maincpu");
 	state->m_cpu1 = machine.device("cpu1");

@@ -48,7 +48,7 @@ WRITE8_MEMBER(ajax_state::ajax_bankswitch_w)
 
 	/* bank # (ROMS N11 and N12) */
 	bank += (data & 0x07);
-	memory_set_bank(machine(), "bank2", bank);
+	subbank("bank2")->set_entry(bank);
 }
 
 /*  ajax_lamps_w:
@@ -191,7 +191,7 @@ WRITE8_MEMBER(ajax_state::ajax_bankswitch_2_w)
 	m_firq_enable = data & 0x10;
 
 	/* bank # (ROMS G16 and I16) */
-	memory_set_bank(machine(), "bank1", data & 0x0f);
+	subbank("bank1")->set_entry(data & 0x0f);
 }
 
 MACHINE_START( ajax )
@@ -200,11 +200,11 @@ MACHINE_START( ajax )
 	UINT8 *MAIN = machine.region("maincpu")->base();
 	UINT8 *SUB  = machine.region("sub")->base();
 
-	memory_configure_bank(machine, "bank1", 0,  9,  &SUB[0x10000], 0x2000);
-	memory_configure_bank(machine, "bank2", 0, 12, &MAIN[0x10000], 0x2000);
+	state->subbank("bank1")->configure_entries(0,  9,  &SUB[0x10000], 0x2000);
+	state->subbank("bank2")->configure_entries(0, 12, &MAIN[0x10000], 0x2000);
 
-	memory_set_bank(machine, "bank1", 0);
-	memory_set_bank(machine, "bank2", 0);
+	state->subbank("bank1")->set_entry(0);
+	state->subbank("bank2")->set_entry(0);
 
 	state->m_maincpu = machine.device("maincpu");
 	state->m_audiocpu = machine.device("audiocpu");

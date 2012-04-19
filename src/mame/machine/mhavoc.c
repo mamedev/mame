@@ -87,9 +87,9 @@ MACHINE_RESET( mhavoc )
 	address_space *space = machine.device("alpha")->memory().space(AS_PROGRAM);
 	state->m_has_gamma_cpu = (machine.device("gamma") != NULL);
 
-	memory_configure_bank(machine, "bank1", 0, 1, state->m_zram0, 0);
-	memory_configure_bank(machine, "bank1", 1, 1, state->m_zram1, 0);
-	memory_configure_bank(machine, "bank2", 0, 4, machine.region("alpha")->base() + 0x10000, 0x2000);
+	state->subbank("bank1")->configure_entry(0, state->m_zram0);
+	state->subbank("bank1")->configure_entry(1, state->m_zram1);
+	state->subbank("bank2")->configure_entries(0, 4, machine.region("alpha")->base() + 0x10000, 0x2000);
 
 	/* reset RAM/ROM banks to 0 */
 	state->mhavoc_ram_banksel_w(*space, 0, 0);
@@ -188,13 +188,13 @@ READ8_MEMBER(mhavoc_state::mhavoc_gamma_r)
 
 WRITE8_MEMBER(mhavoc_state::mhavoc_ram_banksel_w)
 {
-	memory_set_bank(machine(), "bank1", data & 1);
+	subbank("bank1")->set_entry(data & 1);
 }
 
 
 WRITE8_MEMBER(mhavoc_state::mhavoc_rom_banksel_w)
 {
-	memory_set_bank(machine(), "bank2", data & 3);
+	subbank("bank2")->set_entry(data & 3);
 }
 
 

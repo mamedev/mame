@@ -124,7 +124,7 @@ WRITE8_MEMBER(jongkyo_state::bank_select_w)
 	if (offset & 1)
 		m_rom_bank |= mask;
 
-	memory_set_bank(machine(), "bank1", m_rom_bank);
+	subbank("bank1")->set_entry(m_rom_bank);
 }
 
 WRITE8_MEMBER(jongkyo_state::mux_w)

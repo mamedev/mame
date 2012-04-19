@@ -157,8 +157,8 @@ void segaic16_memory_mapper_set_decrypted(running_machine &machine, UINT8 *decry
 		if (region_start >= romsize)
 			continue;
 
-		memory_configure_bank_decrypted(machine, readbank, 0, 1, decrypted + region_start, 0);
-		memory_set_bank(machine, readbank, 0);
+		machine.root_device().subbank(readbank)->configure_decrypted_entry(0, decrypted + region_start);
+		machine.root_device().subbank(readbank)->set_entry(0);
 	}
 }
 
@@ -349,8 +349,8 @@ static void update_memory_mapping(running_machine &machine, struct memory_mapper
 		{
 			if (rgn->base != NULL)
 			{
-				memory_configure_bank(machine, readbank, 0, 1, *rgn->base, 0);
-				memory_set_bank(machine, readbank, 0);
+				machine.root_device().subbank(readbank)->configure_entry(0, *rgn->base);
+				machine.root_device().subbank(readbank)->set_entry(0);
 			}
 			else if (rgn->romoffset != ~0)
 			{
@@ -363,11 +363,11 @@ static void update_memory_mapping(running_machine &machine, struct memory_mapper
 						decrypted = (UINT8 *)fd1089_get_decrypted_base();
 				}
 
-				memory_configure_bank(machine, readbank, 0, 1, chip->cpu->region()->base() + region_start, 0);
+				machine.root_device().subbank(readbank)->configure_entry(0, chip->cpu->region()->base() + region_start);
 				if (decrypted)
-					memory_configure_bank_decrypted(machine, readbank, 0, 1, decrypted + region_start, 0);
+					machine.root_device().subbank(readbank)->configure_decrypted_entry(0, decrypted + region_start);
 
-				memory_set_bank(machine, readbank, 0);
+				machine.root_device().subbank(readbank)->set_entry(0);
 			}
 		}
 

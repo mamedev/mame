@@ -335,13 +335,13 @@ WRITE8_MEMBER(merit_state::casino5_bank_w)
 {
 	if ( data == 0 )
 	{
-		memory_set_bank(machine(), "bank1", 1);
-		memory_set_bank(machine(), "bank2", 1);
+		subbank("bank1")->set_entry(1);
+		subbank("bank2")->set_entry(1);
 	}
 	else if ( data == 0xff )
 	{
-		memory_set_bank(machine(), "bank1", 0);
-		memory_set_bank(machine(), "bank2", 0);
+		subbank("bank1")->set_entry(0);
+		subbank("bank2")->set_entry(0);
 	}
 	else
 	{
@@ -1215,10 +1215,10 @@ void merit_state::dodge_nvram_init(nvram_device &nvram, void *base, size_t size)
 static MACHINE_START(casino5)
 {
 	MACHINE_START_CALL(merit);
-	memory_configure_bank(machine, "bank1", 0, 2, machine.region("maincpu")->base() + 0x2000, 0x2000);
-	memory_configure_bank(machine, "bank2", 0, 2, machine.region("maincpu")->base() + 0x6000, 0x2000);
-	memory_set_bank(machine, "bank1", 0);
-	memory_set_bank(machine, "bank2", 0);
+	machine.root_device().subbank("bank1")->configure_entries(0, 2, machine.region("maincpu")->base() + 0x2000, 0x2000);
+	machine.root_device().subbank("bank2")->configure_entries(0, 2, machine.region("maincpu")->base() + 0x6000, 0x2000);
+	machine.root_device().subbank("bank1")->set_entry(0);
+	machine.root_device().subbank("bank2")->set_entry(0);
 }
 
 static MACHINE_CONFIG_START( pitboss, merit_state )
@@ -2041,7 +2041,7 @@ static DRIVER_INIT( couple )
       dumpers it's just the way it is,a.k.a. it's an "hardware" banking.
       update 20060118 by f205v: now we have 3 dumps from 3 different boards and they
       all behave the same...*/
-	memory_set_bankptr(machine, "bank1",ROM + 0x10000 + (0x2000 * 2));
+	machine.root_device().subbank("bank1")->set_base(ROM + 0x10000 + (0x2000 * 2));
 }
 
 static DRIVER_INIT( dtrvwz5 )

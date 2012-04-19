@@ -206,7 +206,7 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(mcatadv_state::mcatadv_sound_bw_w)
 {
-	memory_set_bank(machine(), "bank1", data);
+	subbank("bank1")->set_entry(data);
 }
 
 
@@ -430,8 +430,8 @@ static MACHINE_START( mcatadv )
 	mcatadv_state *state = machine.driver_data<mcatadv_state>();
 	UINT8 *ROM = machine.region("soundcpu")->base();
 
-	memory_configure_bank(machine, "bank1", 0, 8, &ROM[0x10000], 0x4000);
-	memory_set_bank(machine, "bank1", 1);
+	state->subbank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
+	state->subbank("bank1")->set_entry(1);
 
 	state->m_maincpu = machine.device("maincpu");
 	state->m_soundcpu = machine.device("soundcpu");

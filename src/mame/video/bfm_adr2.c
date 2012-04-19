@@ -188,9 +188,9 @@ VIDEO_RESET( adder2 )
 	{
 		UINT8 *rom = machine.region("adder2")->base();
 
-		memory_configure_bank(machine, "bank2", 0, 4, &rom[0x00000], 0x08000);
+		machine.root_device().subbank("bank2")->configure_entries(0, 4, &rom[0x00000], 0x08000);
 
-		memory_set_bank(machine, "bank2",0&0x03);
+		machine.root_device().subbank("bank2")->set_entry(0&0x03);
 	}
 }
 
@@ -323,7 +323,7 @@ static WRITE8_HANDLER( normal_ram_w )
 
 static WRITE8_HANDLER( adder2_rom_page_w )
 {
-	memory_set_bank(space->machine(), "bank2",data&0x03);
+	space->machine().root_device().subbank("bank2")->set_entry(data&0x03);
 }
 
 ///////////////////////////////////////////////////////////////////////////

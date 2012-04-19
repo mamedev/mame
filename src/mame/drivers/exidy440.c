@@ -308,7 +308,7 @@ void exidy440_bank_select(running_machine &machine, UINT8 bank)
 
 	/* select the bank and update the bank pointer */
 	state->m_bank = bank;
-	memory_set_bankptr(machine, "bank1", &machine.region("maincpu")->base()[0x10000 + state->m_bank * 0x4000]);
+	state->subbank("bank1")->set_base(&machine.region("maincpu")->base()[0x10000 + state->m_bank * 0x4000]);
 }
 
 

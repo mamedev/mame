@@ -16,7 +16,7 @@ WRITE8_MEMBER(bublbobl_state::bublbobl_bankswitch_w)
 {
 
 	/* bits 0-2 select ROM bank */
-	memory_set_bank(machine(), "bank1", (data ^ 4) & 7);
+	subbank("bank1")->set_entry((data ^ 4) & 7);
 
 	/* bit 3 n.c. */
 
@@ -37,7 +37,7 @@ WRITE8_MEMBER(bublbobl_state::bublbobl_bankswitch_w)
 WRITE8_MEMBER(bublbobl_state::tokio_bankswitch_w)
 {
 	/* bits 0-2 select ROM bank */
-	memory_set_bank(machine(), "bank1", data & 7);
+	subbank("bank1")->set_entry(data & 7);
 
 	/* bits 3-7 unknown */
 }

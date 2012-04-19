@@ -193,7 +193,7 @@ TODO!
 
 WRITE8_MEMBER(taitob_state::bankswitch_w)
 {
-	memory_set_bank(machine(), "bank1", (data - 1) & 3);
+	subbank("bank1")->set_entry((data - 1) & 3);
 }
 
 static TIMER_CALLBACK( rsaga2_interrupt2 )
@@ -3707,7 +3707,7 @@ ROM_END
 
 static DRIVER_INIT( taito_b )
 {
-	memory_configure_bank(machine, "bank1", 0, 4, machine.region("audiocpu")->base() + 0x10000, 0x4000);
+	machine.root_device().subbank("bank1")->configure_entries(0, 4, machine.region("audiocpu")->base() + 0x10000, 0x4000);
 }
 
 GAME( 1989, masterw,  0,       masterw,  masterw,  taito_b, ROT270, "Taito Corporation Japan", "Master of Weapon (World)", GAME_SUPPORTS_SAVE )

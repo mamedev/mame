@@ -158,7 +158,7 @@ WRITE8_MEMBER(magtouch_state::magtouch_io_w)
 	switch(offset)
 	{
 		case 6:
-			memory_set_bank(machine(), "rombank", data & 0x7f );
+			subbank("rombank")->set_entry(data & 0x7f );
 			break;
 	}
 }
@@ -201,8 +201,8 @@ static MACHINE_START( magtouch )
 
 	init_pc_common(machine, PCCOMMON_KEYBOARD_AT, magtouch_set_keyb_int);
 
-	memory_configure_bank(machine, "rombank", 0, 0x80, machine.region("game_prg")->base(), 0x8000 );
-	memory_set_bank(machine, "rombank", 0);
+	machine.root_device().subbank("rombank")->configure_entries(0, 0x80, machine.region("game_prg")->base(), 0x8000 );
+	machine.root_device().subbank("rombank")->set_entry(0);
 
 //  microtouch_init(machine, magtouch_microtouch_tx_callback, NULL);
 }

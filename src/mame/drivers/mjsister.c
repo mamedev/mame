@@ -224,7 +224,7 @@ WRITE8_MEMBER(mjsister_state::mjsister_banksel1_w)
 	if (tmp != m_colorbank)
 		m_screen_redraw = 1;
 
-	memory_set_bank(machine(), "bank1", m_rombank0 * 2 + m_rombank1);
+	subbank("bank1")->set_entry(m_rombank0 * 2 + m_rombank1);
 }
 
 WRITE8_MEMBER(mjsister_state::mjsister_banksel2_w)
@@ -242,7 +242,7 @@ WRITE8_MEMBER(mjsister_state::mjsister_banksel2_w)
 			logerror("%04x p31_w:%02x\n", cpu_get_pc(&space.device()), data);
 	}
 
-	memory_set_bank(machine(), "bank1", m_rombank0 * 2 + m_rombank1);
+	subbank("bank1")->set_entry(m_rombank0 * 2 + m_rombank1);
 }
 
 WRITE8_MEMBER(mjsister_state::mjsister_input_sel1_w)
@@ -451,7 +451,7 @@ static MACHINE_START( mjsister )
 	mjsister_state *state = machine.driver_data<mjsister_state>();
 	UINT8 *ROM = machine.region("maincpu")->base();
 
-	memory_configure_bank(machine, "bank1", 0, 4, &ROM[0x10000], 0x8000);
+	machine.root_device().subbank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x8000);
 
 	state->m_maincpu = machine.device("maincpu");
 	state->m_dac = machine.device("dac");

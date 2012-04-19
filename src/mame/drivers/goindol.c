@@ -26,7 +26,7 @@ Notes:
 WRITE8_MEMBER(goindol_state::goindol_bankswitch_w)
 {
 
-	memory_set_bank(machine(), "bank1", data & 0x03);
+	subbank("bank1")->set_entry(data & 0x03);
 
 	if (m_char_bank != ((data & 0x10) >> 4))
 	{
@@ -222,7 +222,7 @@ static MACHINE_START( goindol )
 	goindol_state *state = machine.driver_data<goindol_state>();
 	UINT8 *ROM = machine.region("maincpu")->base();
 
-	memory_configure_bank(machine, "bank1", 0, 4, &ROM[0x10000], 0x4000);
+	state->subbank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x4000);
 
 	state->save_item(NAME(state->m_char_bank));
 	state->save_item(NAME(state->m_prot_toggle));

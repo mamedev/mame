@@ -56,12 +56,12 @@ Note: SW2, SW3 & SW4 not populated
 
 WRITE8_MEMBER(funybubl_state::funybubl_vidram_bank_w)
 {
-	memory_set_bank(machine(), "bank1", data & 1);
+	subbank("bank1")->set_entry(data & 1);
 }
 
 WRITE8_MEMBER(funybubl_state::funybubl_cpurombank_w)
 {
-	memory_set_bank(machine(), "bank2", data & 0x3f);	// should we add a check that (data&0x3f) < #banks?
+	subbank("bank2")->set_entry(data & 0x3f);	// should we add a check that (data&0x3f) < #banks?
 }
 
 
@@ -208,10 +208,10 @@ static MACHINE_START( funybubl )
 
 	state->save_item(NAME(state->m_banked_vram));
 
-	memory_configure_bank(machine, "bank1", 0, 2, &state->m_banked_vram[0x0000], 0x1000);
-	memory_configure_bank(machine, "bank2", 0, 0x10, &ROM[0x10000], 0x4000);
+	state->subbank("bank1")->configure_entries(0, 2, &state->m_banked_vram[0x0000], 0x1000);
+	state->subbank("bank2")->configure_entries(0, 0x10, &ROM[0x10000], 0x4000);
 
-	memory_set_bank(machine, "bank1", 0);
+	state->subbank("bank1")->set_entry(0);
 }
 
 

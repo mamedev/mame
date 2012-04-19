@@ -32,7 +32,7 @@ WRITE8_MEMBER(cbasebal_state::cbasebal_bankswitch_w)
 
 	/* bits 0-4 select ROM bank */
 	//logerror("%04x: bankswitch %02x\n", cpu_get_pc(&space.device()), data);
-	memory_set_bank(machine(), "bank1", data & 0x1f);
+	subbank("bank1")->set_entry(data & 0x1f);
 
 	/* bit 5 used but unknown */
 
@@ -243,7 +243,7 @@ static MACHINE_START( cbasebal )
 {
 	cbasebal_state *state = machine.driver_data<cbasebal_state>();
 
-	memory_configure_bank(machine, "bank1", 0, 32, machine.region("maincpu")->base() + 0x10000, 0x4000);
+	state->subbank("bank1")->configure_entries(0, 32, machine.region("maincpu")->base() + 0x10000, 0x4000);
 
 	state->save_item(NAME(state->m_rambank));
 	state->save_item(NAME(state->m_tilebank));

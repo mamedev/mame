@@ -175,16 +175,16 @@ static INTERRUPT_GEN( ninjakd2_interrupt )
 static MACHINE_RESET( ninjakd2 )
 {
 	/* initialize main Z80 bank */
-	memory_configure_bank(machine, "bank1", 0, 8, machine.region("maincpu")->base() + 0x10000, 0x4000);
-	memory_set_bank(machine, "bank1", 0);
+	machine.root_device().subbank("bank1")->configure_entries(0, 8, machine.region("maincpu")->base() + 0x10000, 0x4000);
+	machine.root_device().subbank("bank1")->set_entry(0);
 }
 
 static void robokid_init_banks(running_machine &machine)
 {
 	/* initialize main Z80 bank */
-	memory_configure_bank(machine, "bank1", 0,  2, machine.region("maincpu")->base(), 0x4000);
-	memory_configure_bank(machine, "bank1", 2, 14, machine.region("maincpu")->base() + 0x10000, 0x4000);
-	memory_set_bank(machine, "bank1", 0);
+	machine.root_device().subbank("bank1")->configure_entries(0,  2, machine.region("maincpu")->base(), 0x4000);
+	machine.root_device().subbank("bank1")->configure_entries(2, 14, machine.region("maincpu")->base() + 0x10000, 0x4000);
+	machine.root_device().subbank("bank1")->set_entry(0);
 }
 
 static MACHINE_RESET( robokid )
@@ -202,12 +202,12 @@ static MACHINE_RESET( omegaf )
 
 WRITE8_MEMBER(ninjakd2_state::ninjakd2_bankselect_w)
 {
-	memory_set_bank(machine(), "bank1", data & 0x7);
+	subbank("bank1")->set_entry(data & 0x7);
 }
 
 WRITE8_MEMBER(ninjakd2_state::robokid_bankselect_w)
 {
-	memory_set_bank(machine(), "bank1", data & 0xf);
+	subbank("bank1")->set_entry(data & 0xf);
 }
 
 

@@ -534,9 +534,9 @@ WRITE32_MEMBER(funkball_state::biu_ctrl_w)
 		for(i=0;i<8;i++)
 		{
 			if (data & 0x1 << i*4)		// enable RAM access to region 0xe0000 - 0xfffff
-				memory_set_bankptr(machine(), banknames[i], m_bios_ram + (0x4000 * i));
+				subbank(banknames[i])->set_base(m_bios_ram + (0x4000 * i));
 			else					// disable RAM access (reads go to BIOS ROM)
-				memory_set_bankptr(machine(), banknames[i], machine().region("bios")->base() + (0x4000 * i));
+				subbank(banknames[i])->set_base(machine().region("bios")->base() + (0x4000 * i));
 		}
 	}
 }
@@ -1118,14 +1118,14 @@ static MACHINE_START( funkball )
 static MACHINE_RESET( funkball )
 {
 	funkball_state *state = machine.driver_data<funkball_state>();
-	memory_set_bankptr(machine, "bios_ext1", machine.region("bios")->base() + 0x00000);
-	memory_set_bankptr(machine, "bios_ext2", machine.region("bios")->base() + 0x04000);
-	memory_set_bankptr(machine, "bios_ext3", machine.region("bios")->base() + 0x08000);
-	memory_set_bankptr(machine, "bios_ext4", machine.region("bios")->base() + 0x0c000);
-	memory_set_bankptr(machine, "bios_bank1", machine.region("bios")->base() + 0x10000);
-	memory_set_bankptr(machine, "bios_bank2", machine.region("bios")->base() + 0x14000);
-	memory_set_bankptr(machine, "bios_bank3", machine.region("bios")->base() + 0x18000);
-	memory_set_bankptr(machine, "bios_bank4", machine.region("bios")->base() + 0x1c000);
+	state->subbank("bios_ext1")->set_base(machine.region("bios")->base() + 0x00000);
+	state->subbank("bios_ext2")->set_base(machine.region("bios")->base() + 0x04000);
+	state->subbank("bios_ext3")->set_base(machine.region("bios")->base() + 0x08000);
+	state->subbank("bios_ext4")->set_base(machine.region("bios")->base() + 0x0c000);
+	state->subbank("bios_bank1")->set_base(machine.region("bios")->base() + 0x10000);
+	state->subbank("bios_bank2")->set_base(machine.region("bios")->base() + 0x14000);
+	state->subbank("bios_bank3")->set_base(machine.region("bios")->base() + 0x18000);
+	state->subbank("bios_bank4")->set_base(machine.region("bios")->base() + 0x1c000);
 	state->m_voodoo_pci_regs.base_addr = 0xff000000;
 }
 

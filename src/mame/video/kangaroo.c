@@ -85,7 +85,7 @@ WRITE8_MEMBER(kangaroo_state::kangaroo_video_control_w)
 			break;
 
 		case 8:	/* bank select */
-			memory_set_bank(machine(), "bank1", (data & 0x05) ? 0 : 1);
+			subbank("bank1")->set_entry((data & 0x05) ? 0 : 1);
 			break;
 	}
 }

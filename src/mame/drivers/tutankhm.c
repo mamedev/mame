@@ -89,7 +89,7 @@ WRITE8_MEMBER(tutankhm_state::irq_enable_w)
 
 WRITE8_MEMBER(tutankhm_state::tutankhm_bankselect_w)
 {
-	memory_set_bank(machine(), "bank1", data & 0x0f);
+	subbank("bank1")->set_entry(data & 0x0f);
 }
 
 
@@ -198,7 +198,7 @@ static MACHINE_START( tutankhm )
 {
 	tutankhm_state *state = machine.driver_data<tutankhm_state>();
 
-	memory_configure_bank(machine, "bank1", 0, 16, machine.region("maincpu")->base() + 0x10000, 0x1000);
+	state->subbank("bank1")->configure_entries(0, 16, machine.region("maincpu")->base() + 0x10000, 0x1000);
 
 	state->m_maincpu = machine.device<cpu_device>("maincpu");
 

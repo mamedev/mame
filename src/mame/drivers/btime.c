@@ -2164,7 +2164,7 @@ static DRIVER_INIT( cookrace )
 	decrypt_C10707_cpu(machine, "maincpu");
 
 	machine.device("audiocpu")->memory().space(AS_PROGRAM)->install_read_bank(0x0200, 0x0fff, "bank10");
-	memory_set_bankptr(machine, "bank10", machine.region("audiocpu")->base() + 0xe200);
+	state->subbank("bank10")->set_base(machine.region("audiocpu")->base() + 0xe200);
 	state->m_audio_nmi_enable_type = AUDIO_ENABLE_DIRECT;
 }
 
@@ -2183,7 +2183,7 @@ static DRIVER_INIT( wtennis )
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xc15f, 0xc15f, read8_delegate(FUNC(btime_state::wtennis_reset_hack_r),state));
 
 	machine.device("audiocpu")->memory().space(AS_PROGRAM)->install_read_bank(0x0200, 0x0fff, "bank10");
-	memory_set_bankptr(machine, "bank10", machine.region("audiocpu")->base() + 0xe200);
+	state->subbank("bank10")->set_base(machine.region("audiocpu")->base() + 0xe200);
 	state->m_audio_nmi_enable_type = AUDIO_ENABLE_AY8910;
 }
 

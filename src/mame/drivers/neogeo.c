@@ -625,7 +625,7 @@ CUSTOM_INPUT_MEMBER(neogeo_state::get_audio_result)
 static void _set_main_cpu_vector_table_source( running_machine &machine )
 {
 	neogeo_state *state = machine.driver_data<neogeo_state>();
-	memory_set_bank(machine, NEOGEO_BANK_VECTORS, state->m_main_cpu_vector_table_source);
+	state->subbank(NEOGEO_BANK_VECTORS)->set_entry(state->m_main_cpu_vector_table_source);
 }
 
 
@@ -641,7 +641,7 @@ static void set_main_cpu_vector_table_source( running_machine &machine, UINT8 da
 static void _set_main_cpu_bank_address( running_machine &machine )
 {
 	neogeo_state *state = machine.driver_data<neogeo_state>();
-	memory_set_bankptr(machine, NEOGEO_BANK_CARTRIDGE, &machine.region("maincpu")->base()[state->m_main_cpu_bank_address]);
+	state->subbank(NEOGEO_BANK_CARTRIDGE)->set_base(&machine.region("maincpu")->base()[state->m_main_cpu_bank_address]);
 }
 
 
@@ -684,8 +684,8 @@ static void main_cpu_banking_init( running_machine &machine )
 	address_space *mainspace = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* create vector banks */
-	memory_configure_bank(machine, NEOGEO_BANK_VECTORS, 0, 1, machine.region("mainbios")->base(), 0);
-	memory_configure_bank(machine, NEOGEO_BANK_VECTORS, 1, 1, machine.region("maincpu")->base(), 0);
+	machine.root_device().subbank(NEOGEO_BANK_VECTORS)->configure_entry(0, machine.region("mainbios")->base());
+	machine.root_device().subbank(NEOGEO_BANK_VECTORS)->configure_entry(1, machine.region("maincpu")->base());
 
 	/* set initial main CPU bank */
 	if (machine.region("maincpu")->bytes() > 0x100000)
@@ -708,7 +708,7 @@ static void set_audio_cpu_banking( running_machine &machine )
 	int region;
 
 	for (region = 0; region < 4; region++)
-		memory_set_bank(machine, NEOGEO_BANK_AUDIO_CPU_CART_BANK + region, state->m_audio_cpu_banks[region]);
+		state->subbank(NEOGEO_BANK_AUDIO_CPU_CART_BANK + region)->set_entry(state->m_audio_cpu_banks[region]);
 }
 
 
@@ -763,7 +763,7 @@ static void _set_audio_cpu_rom_source( address_space *space )
 /*  if (!machine.region("audiobios")->base())   */
 		state->m_audio_cpu_rom_source = 1;
 
-	memory_set_bank(space->machine(), NEOGEO_BANK_AUDIO_CPU_MAIN_BANK, state->m_audio_cpu_rom_source);
+	state->subbank(NEOGEO_BANK_AUDIO_CPU_MAIN_BANK)->set_entry(state->m_audio_cpu_rom_source);
 
 	/* reset CPU if the source changed -- this is a guess */
 	if (state->m_audio_cpu_rom_source != state->m_audio_cpu_rom_source_last)
@@ -796,8 +796,8 @@ static void audio_cpu_banking_init( running_machine &machine )
 
 	/* audio bios/cartridge selection */
 	if (machine.region("audiobios")->base())
-		memory_configure_bank(machine, NEOGEO_BANK_AUDIO_CPU_MAIN_BANK, 0, 1, machine.region("audiobios")->base(), 0);
-	memory_configure_bank(machine, NEOGEO_BANK_AUDIO_CPU_MAIN_BANK, 1, 1, machine.region("audiocpu")->base(), 0);
+		state->subbank(NEOGEO_BANK_AUDIO_CPU_MAIN_BANK)->configure_entry(0, machine.region("audiobios")->base());
+	state->subbank(NEOGEO_BANK_AUDIO_CPU_MAIN_BANK)->configure_entry(1, machine.region("audiocpu")->base());
 
 	/* audio banking */
 	address_mask = machine.region("audiocpu")->bytes() - 0x10000 - 1;
@@ -808,7 +808,7 @@ static void audio_cpu_banking_init( running_machine &machine )
 		for (bank = 0; bank < 0x100; bank++)
 		{
 			UINT32 bank_address = 0x10000 + (((bank << (11 + region)) & 0x3ffff) & address_mask);
-			memory_configure_bank(machine, NEOGEO_BANK_AUDIO_CPU_CART_BANK + region, bank, 1, &rgn[bank_address], 0);
+			state->subbank(NEOGEO_BANK_AUDIO_CPU_CART_BANK + region)->configure_entry(bank, &rgn[bank_address]);
 		}
 	}
 
@@ -990,7 +990,7 @@ static MACHINE_START( neogeo )
 	machine.device<nvram_device>("saveram")->set_base(save_ram, 0x10000);
 
 	/* set the BIOS bank */
-	memory_set_bankptr(machine, NEOGEO_BANK_BIOS, machine.region("mainbios")->base());
+	state->subbank(NEOGEO_BANK_BIOS)->set_base(machine.region("mainbios")->base());
 
 	/* set the initial main CPU bank */
 	main_cpu_banking_init(machine);
@@ -1335,7 +1335,7 @@ DEVICE_IMAGE_LOAD( neo_cartridge )
 
 		// setup cartridge ROM area
 		image.device().machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x000080,0x0fffff,"cart_rom");
-		memory_set_bankptr(image.device().machine(),"cart_rom",&image.device().machine().region("maincpu")->base()[0x80]);
+		image.device().machine().root_device().subbank("cart_rom")->set_base(&image.device().machine().region("maincpu")->base()[0x80]);
 
 		// handle possible protection
 		mvs_install_protection(image);

@@ -361,7 +361,7 @@ WRITE8_MEMBER(psychic5_state::psychic5_bankselect_w)
 	{
 		m_bank_latch = data;
 		bankaddress = 0x10000 + ((data & 3) * 0x4000);
-		memory_set_bankptr(machine(), "bank1",&RAM[bankaddress]);	 /* Select 4 banks of 16k */
+		subbank("bank1")->set_base(&RAM[bankaddress]);	 /* Select 4 banks of 16k */
 	}
 }
 
@@ -374,7 +374,7 @@ WRITE8_MEMBER(psychic5_state::bombsa_bankselect_w)
 	{
 		m_bank_latch = data;
 		bankaddress = 0x10000 + ((data & 7) * 0x4000);
-		memory_set_bankptr(machine(), "bank1", &RAM[bankaddress]);	 /* Select 8 banks of 16k */
+		subbank("bank1")->set_base(&RAM[bankaddress]);	 /* Select 8 banks of 16k */
 	}
 }
 

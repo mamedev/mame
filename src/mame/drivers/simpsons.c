@@ -108,7 +108,7 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(simpsons_state::z80_bankswitch_w)
 {
-	memory_set_bank(machine(), "bank2", data & 7);
+	subbank("bank2")->set_entry(data & 7);
 }
 
 #if 0

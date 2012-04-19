@@ -240,7 +240,7 @@ WRITE8_MEMBER(segald_state::astron_FIX_write)
 WRITE8_MEMBER(segald_state::astron_io_bankswitch_w)
 {
 	logerror("Banking 0x%x\n", data);
-	memory_set_bank(machine(), "bank1", data & 0xff);
+	subbank("bank1")->set_entry(data & 0xff);
 }
 
 
@@ -598,7 +598,7 @@ ROM_END
 static DRIVER_INIT( astron )
 {
 	UINT8 *ROM = machine.region("maincpu")->base();
-	memory_configure_bank(machine, "bank1", 0, 2, &ROM[0x8000], 0x4000);
+	machine.root_device().subbank("bank1")->configure_entries(0, 2, &ROM[0x8000], 0x4000);
 }
 
 

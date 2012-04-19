@@ -154,8 +154,8 @@ WRITE8_MEMBER(missb2_state::missb2_bg_bank_w)
 	// I don't know how this is really connected, bit 1 is always high afaik...
 	bank = ((data & 2) ? 1 : 0) | ((data & 1) ? 4 : 0);
 
-	memory_set_bank(machine(), "bank2", bank);
-	memory_set_bank(machine(), "bank3", bank);
+	subbank("bank2")->set_entry(bank);
+	subbank("bank3")->set_entry(bank);
 }
 
 /* Memory Maps */
@@ -576,11 +576,11 @@ static void configure_banks( running_machine& machine )
 	UINT8 *ROM = machine.region("maincpu")->base();
 	UINT8 *SLAVE = machine.region("slave")->base();
 
-	memory_configure_bank(machine, "bank1", 0, 8, &ROM[0x10000], 0x4000);
+	machine.root_device().subbank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
 
 	/* 2009-11 FP: isn't there a way to configure both at once? */
-	memory_configure_bank(machine, "bank2", 0, 7, &SLAVE[0x8000], 0x1000);
-	memory_configure_bank(machine, "bank3", 0, 7, &SLAVE[0x9000], 0x1000);
+	machine.root_device().subbank("bank2")->configure_entries(0, 7, &SLAVE[0x8000], 0x1000);
+	machine.root_device().subbank("bank3")->configure_entries(0, 7, &SLAVE[0x9000], 0x1000);
 }
 
 static DRIVER_INIT( missb2 )

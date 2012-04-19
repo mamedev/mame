@@ -1355,11 +1355,11 @@ static DRIVER_INIT( cyclwarr )
 
 	dst = machine.region("maincpu")->base();
 	memcpy(state->m_cyclwarr_cpua_ram,dst,8);
-	memory_set_bankptr(machine, "bank1", dst);
+	state->subbank("bank1")->set_base(dst);
 
 	dst = machine.region("sub")->base();
 	memcpy(state->m_cyclwarr_cpub_ram,dst,8);
-	memory_set_bankptr(machine, "bank2", dst);
+	state->subbank("bank2")->set_base(dst);
 
 	// Copy sprite & palette data out of GFX rom area
 	state->m_rom_sprite_lookup1 = machine.region("gfx2")->base();

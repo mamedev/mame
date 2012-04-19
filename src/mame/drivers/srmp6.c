@@ -335,7 +335,7 @@ WRITE16_MEMBER(srmp6_state::video_regs_w)
 		{
 			const UINT8 *rom = machine().region("nile")->base();
 			LOG(("%x\n",data));
-			memory_set_bankptr(machine(), "bank1",(UINT16 *)(rom + (data & 0x0f)*0x200000));
+			subbank("bank1")->set_base((UINT16 *)(rom + (data & 0x0f)*0x200000));
 			break;
 		}
 

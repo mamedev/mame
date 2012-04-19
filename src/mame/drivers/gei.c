@@ -269,68 +269,68 @@ static READ8_DEVICE_HANDLER( portC_r )
 
 WRITE8_MEMBER(gei_state::banksel_main_w)
 {
-	memory_set_bankptr(machine(), "bank1",machine().region("maincpu")->base() + 0x8000);
+	subbank("bank1")->set_base(machine().region("maincpu")->base() + 0x8000);
 }
 WRITE8_MEMBER(gei_state::banksel_1_w)
 {
-	memory_set_bankptr(machine(), "bank1",machine().region("maincpu")->base() + 0x10000);
+	subbank("bank1")->set_base(machine().region("maincpu")->base() + 0x10000);
 }
 WRITE8_MEMBER(gei_state::banksel_2_w)
 {
-	memory_set_bankptr(machine(), "bank1",machine().region("maincpu")->base() + 0x18000);
+	subbank("bank1")->set_base(machine().region("maincpu")->base() + 0x18000);
 }
 WRITE8_MEMBER(gei_state::banksel_3_w)
 {
-	memory_set_bankptr(machine(), "bank1",machine().region("maincpu")->base() + 0x20000);
+	subbank("bank1")->set_base(machine().region("maincpu")->base() + 0x20000);
 }
 WRITE8_MEMBER(gei_state::banksel_4_w)
 {
-	memory_set_bankptr(machine(), "bank1",machine().region("maincpu")->base() + 0x28000);
+	subbank("bank1")->set_base(machine().region("maincpu")->base() + 0x28000);
 }
 WRITE8_MEMBER(gei_state::banksel_5_w)
 {
-	memory_set_bankptr(machine(), "bank1",machine().region("maincpu")->base() + 0x30000);
+	subbank("bank1")->set_base(machine().region("maincpu")->base() + 0x30000);
 }
 
 WRITE8_MEMBER(gei_state::banksel_1_1_w)
 {
-	memory_set_bankptr(machine(), "bank1",machine().region("maincpu")->base() + 0x10000);
+	subbank("bank1")->set_base(machine().region("maincpu")->base() + 0x10000);
 }
 WRITE8_MEMBER(gei_state::banksel_2_1_w)
 {
-	memory_set_bankptr(machine(), "bank1",machine().region("maincpu")->base() + 0x14000);
+	subbank("bank1")->set_base(machine().region("maincpu")->base() + 0x14000);
 }
 WRITE8_MEMBER(gei_state::banksel_3_1_w)
 {
-	memory_set_bankptr(machine(), "bank1",machine().region("maincpu")->base() + 0x18000);
+	subbank("bank1")->set_base(machine().region("maincpu")->base() + 0x18000);
 }
 WRITE8_MEMBER(gei_state::banksel_4_1_w)
 {
-	memory_set_bankptr(machine(), "bank1",machine().region("maincpu")->base() + 0x1c000);
+	subbank("bank1")->set_base(machine().region("maincpu")->base() + 0x1c000);
 }
 WRITE8_MEMBER(gei_state::banksel_5_1_w)
 {
-	memory_set_bankptr(machine(), "bank1",machine().region("maincpu")->base() + 0x20000);
+	subbank("bank1")->set_base(machine().region("maincpu")->base() + 0x20000);
 }
 WRITE8_MEMBER(gei_state::banksel_1_2_w)
 {
-	memory_set_bankptr(machine(), "bank1",machine().region("maincpu")->base() + 0x12000);
+	subbank("bank1")->set_base(machine().region("maincpu")->base() + 0x12000);
 }
 WRITE8_MEMBER(gei_state::banksel_2_2_w)
 {
-	memory_set_bankptr(machine(), "bank1",machine().region("maincpu")->base() + 0x16000);
+	subbank("bank1")->set_base(machine().region("maincpu")->base() + 0x16000);
 }
 WRITE8_MEMBER(gei_state::banksel_3_2_w)
 {
-	memory_set_bankptr(machine(), "bank1",machine().region("maincpu")->base() + 0x1a000);
+	subbank("bank1")->set_base(machine().region("maincpu")->base() + 0x1a000);
 }
 WRITE8_MEMBER(gei_state::banksel_4_2_w)
 {
-	memory_set_bankptr(machine(), "bank1",machine().region("maincpu")->base() + 0x1e000);
+	subbank("bank1")->set_base(machine().region("maincpu")->base() + 0x1e000);
 }
 WRITE8_MEMBER(gei_state::banksel_5_2_w)
 {
-	memory_set_bankptr(machine(), "bank1",machine().region("maincpu")->base() + 0x22000);
+	subbank("bank1")->set_base(machine().region("maincpu")->base() + 0x22000);
 }
 
 WRITE8_MEMBER(gei_state::geimulti_bank_w)
@@ -358,36 +358,36 @@ WRITE8_MEMBER(gei_state::geimulti_bank_w)
 	}
 
 	if (bank != -1)
-		memory_set_bankptr(machine(), "bank1", machine().region("bank")->base() + bank*0x8000);
+		subbank("bank1")->set_base(machine().region("bank")->base() + bank*0x8000);
 }
 
 READ8_MEMBER(gei_state::banksel_1_r)
 {
-	memory_set_bankptr(machine(), "bank1",machine().region("maincpu")->base() + 0x10000);
+	subbank("bank1")->set_base(machine().region("maincpu")->base() + 0x10000);
 	return 0x03;
 };
 
 READ8_MEMBER(gei_state::banksel_2_r)
 {
-	memory_set_bankptr(machine(), "bank1",machine().region("maincpu")->base() + 0x18000);
+	subbank("bank1")->set_base(machine().region("maincpu")->base() + 0x18000);
 	return 0x03;
 }
 
 READ8_MEMBER(gei_state::banksel_3_r)
 {
-	memory_set_bankptr(machine(), "bank1",machine().region("maincpu")->base() + 0x20000);
+	subbank("bank1")->set_base(machine().region("maincpu")->base() + 0x20000);
 	return 0x03;
 }
 
 READ8_MEMBER(gei_state::banksel_4_r)
 {
-	memory_set_bankptr(machine(), "bank1",machine().region("maincpu")->base() + 0x28000);
+	subbank("bank1")->set_base(machine().region("maincpu")->base() + 0x28000);
 	return 0x03;
 }
 
 READ8_MEMBER(gei_state::banksel_5_r)
 {
-	memory_set_bankptr(machine(), "bank1",machine().region("maincpu")->base() + 0x30000);
+	subbank("bank1")->set_base(machine().region("maincpu")->base() + 0x30000);
 	return 0x03;
 }
 
@@ -1873,12 +1873,12 @@ ROM_END
 
 static DRIVER_INIT( setbank )
 {
-	memory_set_bankptr(machine, "bank1",machine.region("maincpu")->base() + 0x2000);
+	machine.root_device().subbank("bank1")->set_base(machine.region("maincpu")->base() + 0x2000);
 }
 
 static DRIVER_INIT( geimulti )
 {
-	memory_set_bankptr(machine, "bank1",machine.region("bank")->base() + 0x0000);
+	machine.root_device().subbank("bank1")->set_base(machine.region("bank")->base() + 0x0000);
 }
 
 GAME( 1982, jokpoker, 0,        gselect,  gselect,  setbank, ROT0, "Greyhound Electronics", "Joker Poker (Version 16.03B)",            GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )

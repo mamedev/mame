@@ -44,14 +44,14 @@ WRITE8_MEMBER(chqflag_state::chqflag_bankswitch_w)
 
 	/* bits 0-4 = ROM bank # (0x00-0x11) */
 	bankaddress = 0x10000 + (data & 0x1f) * 0x4000;
-	memory_set_bankptr(machine(), "bank4", &RAM[bankaddress]);
+	subbank("bank4")->set_base(&RAM[bankaddress]);
 
 	/* bit 5 = memory bank select */
 	if (data & 0x20)
 	{
 		space.install_read_bank(0x1800, 0x1fff, "bank5");
 		space.install_write_handler(0x1800, 0x1fff, write8_delegate(FUNC(driver_device::paletteram_xBBBBBGGGGGRRRRR_byte_be_w),this));
-		memory_set_bankptr(machine(), "bank5", m_generic_paletteram_8);
+		subbank("bank5")->set_base(m_generic_paletteram_8);
 
 		if (m_k051316_readroms)
 			space.install_legacy_readwrite_handler(*m_k051316_1, 0x1000, 0x17ff, FUNC(k051316_rom_r), FUNC(k051316_w));	/* 051316 #1 (ROM test) */
@@ -324,7 +324,7 @@ static MACHINE_START( chqflag )
 	chqflag_state *state = machine.driver_data<chqflag_state>();
 	UINT8 *ROM = machine.region("maincpu")->base();
 
-	memory_configure_bank(machine, "bank1", 0, 4, &ROM[0x10000], 0x2000);
+	state->subbank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x2000);
 
 	state->m_maincpu = machine.device("maincpu");
 	state->m_audiocpu = machine.device("audiocpu");

@@ -115,7 +115,7 @@ ADDRESS_MAP_END
 WRITE8_MEMBER(fuuki16_state::fuuki16_sound_rombank_w)
 {
 	if (data <= 2)
-		memory_set_bank(machine(), "bank1", data);
+		subbank("bank1")->set_entry(data);
 	else
 		logerror("CPU #1 - PC %04X: unknown bank bits: %02X\n", cpu_get_pc(&space.device()), data);
 }
@@ -443,7 +443,7 @@ static MACHINE_START( fuuki16 )
 	fuuki16_state *state = machine.driver_data<fuuki16_state>();
 	UINT8 *ROM = machine.region("audiocpu")->base();
 
-	memory_configure_bank(machine, "bank1", 0, 3, &ROM[0x10000], 0x8000);
+	state->subbank("bank1")->configure_entries(0, 3, &ROM[0x10000], 0x8000);
 
 	state->m_maincpu = machine.device("maincpu");
 	state->m_audiocpu = machine.device("audiocpu");

@@ -137,7 +137,7 @@ WRITE8_MEMBER(arkanoid_state::hexa_d008_w)
 	/* bit 2 - 3 unknown */
 
 	/* bit 4 could be the ROM bank selector for 8000-bfff (not sure) */
-	memory_set_bank(machine(), "bank1", ((data & 0x10) >> 4));
+	subbank("bank1")->set_entry(((data & 0x10) >> 4));
 
 	/* bit 5 = gfx bank */
 	if (m_gfxbank != ((data & 0x20) >> 5))

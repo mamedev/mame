@@ -266,7 +266,7 @@ WRITE_LINE_DEVICE_HANDLER( qix_vsync_changed )
 
 WRITE8_MEMBER(qix_state::zookeep_bankswitch_w)
 {
-	memory_set_bank(machine(), "bank1", (data >> 2) & 1);
+	subbank("bank1")->set_entry((data >> 2) & 1);
 	/* not necessary, but technically correct */
 	qix_palettebank_w(space, offset, data);
 }

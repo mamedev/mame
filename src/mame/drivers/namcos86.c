@@ -190,7 +190,7 @@ WRITE8_MEMBER(namcos86_state::bankswitch1_w)
 	/* with bankswitch1_ext_w() in wndrmomo */
 	if (machine().region("user1")->base()) return;
 
-	memory_set_bankptr(machine(), "bank1",base + ((data & 0x03) * 0x2000));
+	subbank("bank1")->set_base(base + ((data & 0x03) * 0x2000));
 }
 
 WRITE8_MEMBER(namcos86_state::bankswitch1_ext_w)
@@ -199,14 +199,14 @@ WRITE8_MEMBER(namcos86_state::bankswitch1_ext_w)
 
 	if (base == 0) return;
 
-	memory_set_bankptr(machine(), "bank1",base + ((data & 0x1f) * 0x2000));
+	subbank("bank1")->set_base(base + ((data & 0x1f) * 0x2000));
 }
 
 WRITE8_MEMBER(namcos86_state::bankswitch2_w)
 {
 	UINT8 *base = machine().region("cpu2")->base() + 0x10000;
 
-	memory_set_bankptr(machine(), "bank2",base + ((data & 0x03) * 0x2000));
+	subbank("bank2")->set_base(base + ((data & 0x03) * 0x2000));
 }
 
 /* Stubs to pass the correct Dip Switch setup to the MCU */
@@ -326,7 +326,7 @@ static MACHINE_RESET( namco86 )
 {
 	UINT8 *base = machine.region("cpu1")->base() + 0x10000;
 
-	memory_set_bankptr(machine, "bank1",base);
+	machine.root_device().subbank("bank1")->set_base(base);
 }
 
 

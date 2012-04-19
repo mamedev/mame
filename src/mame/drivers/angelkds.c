@@ -140,7 +140,7 @@ Dumped by Chackn
 
 WRITE8_MEMBER(angelkds_state::angelkds_cpu_bank_write)
 {
-	memory_set_bank(machine(), "bank1", data & 0x0f);	// shall we check (data & 0x0f) < # of available banks (8 or 10 resp.)?
+	subbank("bank1")->set_entry(data & 0x0f);	// shall we check (data & 0x0f) < # of available banks (8 or 10 resp.)?
 }
 
 
@@ -745,7 +745,7 @@ ROM_END
 static DRIVER_INIT( angelkds )
 {
 	UINT8 *RAM = machine.region("user1")->base();
-	memory_configure_bank(machine, "bank1", 0, 8, &RAM[0x0000], 0x4000);
+	machine.root_device().subbank("bank1")->configure_entries(0, 8, &RAM[0x0000], 0x4000);
 }
 
 static DRIVER_INIT( spcpostn )
@@ -753,7 +753,7 @@ static DRIVER_INIT( spcpostn )
 	UINT8 *RAM = machine.region("user1")->base();
 
 	sega_317_0005_decode(machine, "maincpu");
-	memory_configure_bank(machine, "bank1", 0, 10, &RAM[0x0000], 0x4000);
+	machine.root_device().subbank("bank1")->configure_entries(0, 10, &RAM[0x0000], 0x4000);
 }
 
 

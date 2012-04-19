@@ -270,13 +270,13 @@ static MACHINE_START( su2000 )
 	state->m_pc_ram = auto_alloc_array_clear(machine, UINT32, PC_RAM_SIZE);
 
 	/* Conventional memory */
-	memory_set_bankptr(machine, "mem_bank", state->m_pc_ram);
+	state->subbank("mem_bank")->set_base(state->m_pc_ram);
 
 	/* HMA */
 	offs_t ram_limit = 0x100000 + PC_RAM_SIZE - 0x0a0000;
 	space->install_read_bank(0x100000, ram_limit - 1, "hma_bank");
 	space->install_write_bank(0x100000, ram_limit - 1, "hma_bank");
-	memory_set_bankptr(machine, "hma_bank", state->m_pc_ram + 0xa0000);
+	state->subbank("hma_bank")->set_base(state->m_pc_ram + 0xa0000);
 
 	device_set_irq_callback(machine.device("maincpu"), pc_irq_callback);
 

@@ -114,7 +114,7 @@ WRITE16_MEMBER(ttchamp_state::pcup_prgbank_w)
     if (ACCESSING_BITS_0_7)
     {
         bank = (data>>4) &0x07;
-        memory_set_bankptr(machine(), "bank2",&ROM1[0x80000*(bank)]);
+        subbank("bank2")->set_base(&ROM1[0x80000*(bank)]);
     }
 }
 #endif
@@ -338,8 +338,8 @@ ROM_END
 static DRIVER_INIT (ttchamp)
 {
 	UINT8 *ROM1 = machine.region("user1")->base();
-	memory_set_bankptr(machine, "bank1",&ROM1[0x120000]);
-	memory_set_bankptr(machine, "bank2",&ROM1[0x180000]);
+	machine.root_device().subbank("bank1")->set_base(&ROM1[0x120000]);
+	machine.root_device().subbank("bank2")->set_base(&ROM1[0x180000]);
 }
 
 GAME( 199?, ttchamp, 0,        ttchamp, ttchamp, ttchamp, ROT0,  "Gamart?", "Table Tennis Champions (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )

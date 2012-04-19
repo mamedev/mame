@@ -81,7 +81,7 @@ WRITE8_MEMBER(chaknpop_state::chaknpop_gfxmode_w)
 		int all_dirty = 0;
 
 		m_gfxmode = data;
-		memory_set_bank(machine(), "bank1", (m_gfxmode & GFX_VRAM_BANK) ? 1 : 0);	/* Select 2 banks of 16k */
+		subbank("bank1")->set_entry((m_gfxmode & GFX_VRAM_BANK) ? 1 : 0);	/* Select 2 banks of 16k */
 
 		if (m_flip_x != (m_gfxmode & GFX_FLIP_X))
 		{
@@ -169,7 +169,7 @@ VIDEO_START( chaknpop )
 	state->save_pointer(NAME(state->m_vram3), 0x2000);
 	state->save_pointer(NAME(state->m_vram4), 0x2000);
 
-	memory_set_bank(machine, "bank1", 0);
+	state->subbank("bank1")->set_entry(0);
 	tx_tilemap_mark_all_dirty(machine);
 
 	machine.save().register_postload(save_prepost_delegate(FUNC(tx_tilemap_mark_all_dirty), &machine));

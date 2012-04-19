@@ -49,7 +49,7 @@ WRITE8_MEMBER(sidearms_state::sidearms_bankswitch_w)
 
 	/* bits 0 and 1 select the ROM bank */
 	bankaddress = 0x10000 + (data & 0x0f) * 0x4000;
-	memory_set_bankptr(machine(), "bank1",&RAM[bankaddress]);
+	subbank("bank1")->set_base(&RAM[bankaddress]);
 }
 
 
@@ -136,7 +136,7 @@ WRITE8_MEMBER(sidearms_state::whizz_bankswitch_w)
 	}
 
 	bankaddress = 0x10000 + bank * 0x4000;
-	memory_set_bankptr(machine(), "bank1",&RAM[bankaddress]);
+	subbank("bank1")->set_base(&RAM[bankaddress]);
 }
 
 static ADDRESS_MAP_START( whizz_map, AS_PROGRAM, 8, sidearms_state )

@@ -738,7 +738,7 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(alpha68k_state::sound_bank_w)
 {
-	memory_set_bank(machine(), "bank7", data);
+	subbank("bank7")->set_entry(data);
 }
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, alpha68k_state )
@@ -1905,7 +1905,7 @@ static MACHINE_START( alpha68k_V )
 	alpha68k_state *state = machine.driver_data<alpha68k_state>();
 	UINT8 *ROM = machine.region("audiocpu")->base();
 
-	memory_configure_bank(machine, "bank7", 0, 32, &ROM[0x10000], 0x4000);
+	state->subbank("bank7")->configure_entries(0, 32, &ROM[0x10000], 0x4000);
 
 	MACHINE_START_CALL(common);
 
@@ -1941,7 +1941,7 @@ static MACHINE_START( alpha68k_II )
 	alpha68k_state *state = machine.driver_data<alpha68k_state>();
 	UINT8 *ROM = machine.region("audiocpu")->base();
 
-	memory_configure_bank(machine, "bank7", 0, 28, &ROM[0x10000], 0x4000);
+	state->subbank("bank7")->configure_entries(0, 28, &ROM[0x10000], 0x4000);
 
 	MACHINE_START_CALL(common);
 
@@ -3222,7 +3222,7 @@ static DRIVER_INIT( btlfieldb )
 static DRIVER_INIT( skysoldr )
 {
 	alpha68k_state *state = machine.driver_data<alpha68k_state>();
-	memory_set_bankptr(machine, "bank8", (machine.region("user1")->base()) + 0x40000);
+	state->subbank("bank8")->set_base((machine.region("user1")->base()) + 0x40000);
 	state->m_invert_controls = 0;
 	state->m_microcontroller_id = 0;
 	state->m_coin_id = 0x22 | (0x22 << 8);
@@ -3241,7 +3241,7 @@ static DRIVER_INIT( goldmedl )
 static DRIVER_INIT( goldmedla )
 {
 	alpha68k_state *state = machine.driver_data<alpha68k_state>();
-	memory_set_bankptr(machine, "bank8", machine.region("maincpu")->base() + 0x20000);
+	state->subbank("bank8")->set_base(machine.region("maincpu")->base() + 0x20000);
 	state->m_invert_controls = 0;
 	state->m_microcontroller_id = 0x8803; //Guess - routine to handle coinage is the same as in 'goldmedl'
 	state->m_coin_id = 0x23 | (0x24 << 8);
@@ -3269,7 +3269,7 @@ static DRIVER_INIT( skyadvntu )
 static DRIVER_INIT( gangwarsu )
 {
 	alpha68k_state *state = machine.driver_data<alpha68k_state>();
-	memory_set_bankptr(machine, "bank8", machine.region("user1")->base());
+	state->subbank("bank8")->set_base(machine.region("user1")->base());
 	state->m_invert_controls = 0;
 	state->m_microcontroller_id = 0x8512;
 	state->m_coin_id = 0x23 | (0x24 << 8);
@@ -3279,7 +3279,7 @@ static DRIVER_INIT( gangwarsu )
 static DRIVER_INIT( gangwars )
 {
 	alpha68k_state *state = machine.driver_data<alpha68k_state>();
-	memory_set_bankptr(machine, "bank8", machine.region("user1")->base());
+	state->subbank("bank8")->set_base(machine.region("user1")->base());
 	state->m_invert_controls = 0;
 	state->m_microcontroller_id = 0x8512;
 	state->m_coin_id = 0x23 | (0x24 << 8);

@@ -154,23 +154,23 @@ WRITE8_MEMBER(galaxold_state::zigzag_sillyprotection_w)
 	if (data)
 	{
 		/* swap ROM 2 and 3! */
-		memory_set_bank(machine(), "bank1", 1);
-		memory_set_bank(machine(), "bank2", 0);
+		subbank("bank1")->set_entry(1);
+		subbank("bank2")->set_entry(0);
 	}
 	else
 	{
-		memory_set_bank(machine(), "bank1", 0);
-		memory_set_bank(machine(), "bank2", 1);
+		subbank("bank1")->set_entry(0);
+		subbank("bank2")->set_entry(1);
 	}
 }
 
 DRIVER_INIT( zigzag )
 {
 	UINT8 *RAM = machine.region("maincpu")->base();
-	memory_configure_bank(machine, "bank1", 0, 2, &RAM[0x2000], 0x1000);
-	memory_configure_bank(machine, "bank2", 0, 2, &RAM[0x2000], 0x1000);
-	memory_set_bank(machine, "bank1", 0);
-	memory_set_bank(machine, "bank2", 1);
+	machine.root_device().subbank("bank1")->configure_entries(0, 2, &RAM[0x2000], 0x1000);
+	machine.root_device().subbank("bank2")->configure_entries(0, 2, &RAM[0x2000], 0x1000);
+	machine.root_device().subbank("bank1")->set_entry(0);
+	machine.root_device().subbank("bank2")->set_entry(1);
 }
 
 
@@ -251,7 +251,7 @@ WRITE8_MEMBER(galaxold_state::_4in1_bank_w)
 {
 	m__4in1_bank = data & 0x03;
 	galaxold_gfxbank_w(space, 0, m__4in1_bank);
-	memory_set_bank(machine(), "bank1", m__4in1_bank);
+	subbank("bank1")->set_entry(m__4in1_bank);
 }
 
 CUSTOM_INPUT_MEMBER(galaxold_state::_4in1_fake_port_r)
@@ -407,7 +407,7 @@ DRIVER_INIT( 4in1 )
 		RAM[i] = RAM[i] ^ (i & 0xff);
 
 	/* games are banked at 0x0000 - 0x3fff */
-	memory_configure_bank(machine, "bank1", 0, 4, &RAM[0x10000], 0x4000);
+	state->subbank("bank1")->configure_entries(0, 4, &RAM[0x10000], 0x4000);
 
 	state->_4in1_bank_w(*space, 0, 0); /* set the initial CPU bank */
 

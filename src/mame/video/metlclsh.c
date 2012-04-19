@@ -28,12 +28,12 @@ WRITE8_MEMBER(metlclsh_state::metlclsh_rambank_w)
 	if (data & 1)
 	{
 		m_write_mask = 0;
-		memory_set_bankptr(machine(), "bank1", m_bgram);
+		subbank("bank1")->set_base(m_bgram);
 	}
 	else
 	{
 		m_write_mask = 1 << (data >> 1);
-		memory_set_bankptr(machine(), "bank1", m_otherram);
+		subbank("bank1")->set_base(m_otherram);
 	}
 }
 

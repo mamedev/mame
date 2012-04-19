@@ -306,9 +306,9 @@ SOUND_RESET( taito_f3_soundsystem_reset )
 	/* Sound cpu program loads to 0xc00000 so we use a bank */
 	UINT16 *ROM = (UINT16 *)machine.region("audiocpu")->base();
 	UINT16 *sound_ram = (UINT16 *)machine.memory().shared("share1")->ptr();
-	memory_set_bankptr(machine, "bank1",&ROM[0x80000]);
-	memory_set_bankptr(machine, "bank2",&ROM[0x90000]);
-	memory_set_bankptr(machine, "bank3",&ROM[0xa0000]);
+	machine.root_device().subbank("bank1")->set_base(&ROM[0x80000]);
+	machine.root_device().subbank("bank2")->set_base(&ROM[0x90000]);
+	machine.root_device().subbank("bank3")->set_base(&ROM[0xa0000]);
 
 	sound_ram[0]=ROM[0x80000]; /* Stack and Reset vectors */
 	sound_ram[1]=ROM[0x80001];

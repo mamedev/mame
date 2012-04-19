@@ -140,7 +140,7 @@ WRITE8_MEMBER(dec8_state::srdarwin_control_w)
 	switch (offset)
 	{
 	case 0: /* Top 3 bits - bank switch, bottom 4 - scroll MSB */
-		memory_set_bank(machine(), "bank1", (data >> 5));
+		subbank("bank1")->set_entry((data >> 5));
 		m_scroll2[0] = data & 0xf;
 		return;
 
@@ -160,7 +160,7 @@ WRITE8_MEMBER(dec8_state::lastmisn_control_w)
         Bit 0x40 - Y scroll MSB
         Bit 0x80 - Hold subcpu reset line high if clear, else low
     */
-	memory_set_bank(machine(), "bank1", data & 0x0f);
+	subbank("bank1")->set_entry(data & 0x0f);
 
 	m_scroll2[0] = (data >> 5) & 1;
 	m_scroll2[2] = (data >> 6) & 1;
@@ -175,7 +175,7 @@ WRITE8_MEMBER(dec8_state::shackled_control_w)
 {
 
 	/* Bottom 4 bits - bank switch, Bits 4 & 5 - Scroll MSBs */
-	memory_set_bank(machine(), "bank1", data & 0x0f);
+	subbank("bank1")->set_entry(data & 0x0f);
 
 	m_scroll2[0] = (data >> 5) & 1;
 	m_scroll2[2] = (data >> 6) & 1;

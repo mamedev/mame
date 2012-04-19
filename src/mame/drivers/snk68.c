@@ -1040,7 +1040,7 @@ ROM_END
 
 static DRIVER_INIT( searchar )
 {
-	memory_set_bankptr(machine, "bank1", machine.region("user1")->base());
+	machine.root_device().subbank("bank1")->set_base(machine.region("user1")->base());
 }
 
 /******************************************************************************/

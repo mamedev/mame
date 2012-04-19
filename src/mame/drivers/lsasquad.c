@@ -155,7 +155,7 @@ Notes:
 WRITE8_MEMBER(lsasquad_state::lsasquad_bankswitch_w)
 {
 	/* bits 0-2 select ROM bank */
-	memory_set_bank(machine(), "bank1", data & 0x07);
+	subbank("bank1")->set_entry(data & 0x07);
 
 	/* bit 3 is zeroed on startup, maybe reset sound CPU */
 
@@ -569,7 +569,7 @@ static MACHINE_START( lsasquad )
 	lsasquad_state *state = machine.driver_data<lsasquad_state>();
 	UINT8 *ROM = machine.region("maincpu")->base();
 
-	memory_configure_bank(machine, "bank1", 0, 8, &ROM[0x10000], 0x2000);
+	state->subbank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x2000);
 
 	state->m_maincpu = machine.device("maincpu");
 	state->m_audiocpu = machine.device("audiocpu");

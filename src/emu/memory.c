@@ -5538,17 +5538,3 @@ void handler_entry_write::write_stub_legacy(address_space &space, offs_t offset,
 {
 	m_legacy_info.handler.space64(m_legacy_info.object.space, offset, data, mask);
 }
-
-
-
-// configure the addresses for a bank
-void memory_configure_bank(running_machine &machine, const char *tag, int startentry, int numentries, void *base, offs_t stride) { machine.root_device().subbank(tag)->configure_entries(startentry, numentries, base, stride); }
-
-// configure the decrypted addresses for a bank
-void memory_configure_bank_decrypted(running_machine &machine, const char *tag, int startentry, int numentries, void *base, offs_t stride) { machine.root_device().subbank(tag)->configure_decrypted_entries(startentry, numentries, base, stride); }
-
-// select one pre-configured entry to be the new bank base
-void memory_set_bank(running_machine &machine, const char *tag, int entrynum) { machine.root_device().subbank(tag)->set_entry(entrynum); }
-
-// set the absolute address of a bank base
-void memory_set_bankptr(running_machine &machine, const char *tag, void *base) { machine.root_device().subbank(tag)->set_base(base); }

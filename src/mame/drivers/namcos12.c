@@ -1159,7 +1159,7 @@ WRITE32_MEMBER(namcos12_state::bankoffset_w)
 		m_n_bankoffset = data;
 	}
 
-	memory_set_bank( machine(), "bank1", m_n_bankoffset );
+	subbank( "bank1" )->set_entry( m_n_bankoffset );
 
 	verboselog( machine(), 1, "bankoffset_w( %08x, %08x, %08x ) %08x\n", offset, data, mem_mask, m_n_bankoffset );
 }
@@ -1321,13 +1321,13 @@ static void system11gun_install( running_machine &machine )
 
 WRITE32_MEMBER(namcos12_state::kcoff_w)
 {
-	memory_set_bankptr( machine(), "bank2", machine().region( "user1" )->base() + 0x20280 );
+	subbank( "bank2" )->set_base( machine().region( "user1" )->base() + 0x20280 );
 }
 
 WRITE32_MEMBER(namcos12_state::kcon_w)
 {
 
-	memory_set_bankptr( machine(), "bank2", m_kcram );
+	subbank( "bank2" )->set_base( m_kcram );
 }
 
 WRITE32_MEMBER(namcos12_state::tektagt_protection_1_w)
@@ -1429,7 +1429,7 @@ static MACHINE_RESET( namcos12 )
 		space->install_write_handler(0x1f018000, 0x1f018003, write32_delegate(FUNC(namcos12_state::kcoff_w),state));
 
 		memset( state->m_kcram, 0, sizeof( state->m_kcram ) );
-		memory_set_bankptr( space->machine(), "bank2", state->m_kcram );
+		state->subbank( "bank2" )->set_base( state->m_kcram );
 	}
 }
 
@@ -1627,7 +1627,7 @@ static DRIVER_INIT( namcos12 )
 
 	psx_driver_init(machine);
 
-	memory_configure_bank(machine, "bank1", 0, machine.region( "user2" )->bytes() / 0x200000, machine.region( "user2" )->base(), 0x200000 );
+	state->subbank("bank1")->configure_entries(0, machine.region( "user2" )->bytes() / 0x200000, machine.region( "user2" )->base(), 0x200000 );
 
 	state->m_s12_porta = 0;
 	state->m_s12_rtcstate = 0;
@@ -1640,7 +1640,7 @@ static DRIVER_INIT( namcos12 )
 	state->m_n_dmaoffset = 0;
 	state->m_n_dmabias = 0;
 	state->m_n_bankoffset = 0;
-	memory_set_bank( machine, "bank1", 0 );
+	state->subbank( "bank1" )->set_entry( 0 );
 
 	state->save_item( NAME(state->m_n_dmaoffset) );
 	state->save_item( NAME(state->m_n_dmabias) );

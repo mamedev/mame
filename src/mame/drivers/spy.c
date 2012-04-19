@@ -161,7 +161,7 @@ WRITE8_MEMBER(spy_state::bankswitch_w)
 	else
 		bank = ((data & 0x0e) >> 1);
 
-	memory_set_bank(machine(), "bank1", bank);
+	subbank("bank1")->set_entry(bank);
 }
 
 static void spy_collision( running_machine &machine )
@@ -500,7 +500,7 @@ static MACHINE_START( spy )
 	spy_state *state = machine.driver_data<spy_state>();
 	UINT8 *ROM = machine.region("maincpu")->base();
 
-	memory_configure_bank(machine, "bank1", 0, 12, &ROM[0x10000], 0x2000);
+	state->subbank("bank1")->configure_entries(0, 12, &ROM[0x10000], 0x2000);
 
 	state->m_generic_paletteram_8.allocate(0x800);
 	memset(state->m_pmcram, 0, sizeof(state->m_pmcram));
