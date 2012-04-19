@@ -45,7 +45,7 @@ WRITE8_MEMBER(fastlane_state::fastlane_bankswitch_w)
 	coin_counter_w(machine(), 1,data & 0x02);
 
 	/* bits 2 & 3 = bank number */
-	subbank("bank1")->set_entry((data & 0x0c) >> 2);
+	membank("bank1")->set_entry((data & 0x0c) >> 2);
 
 	/* bit 4: bank # for the 007232 (chip 2) */
 	k007232_set_bank(m_konami2, 0 + ((data & 0x10) >> 4), 2 + ((data & 0x10) >> 4));
@@ -196,7 +196,7 @@ static MACHINE_START( fastlane )
 	fastlane_state *state = machine.driver_data<fastlane_state>();
 	UINT8 *ROM = machine.region("maincpu")->base();
 
-	state->subbank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x4000);
+	state->membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x4000);
 
 	state->m_konami2 = machine.device("konami2");
 	state->m_k007121 = machine.device("k007121");

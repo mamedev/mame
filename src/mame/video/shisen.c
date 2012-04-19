@@ -18,7 +18,7 @@ WRITE8_MEMBER(shisen_state::sichuan2_bankswitch_w)
 
 	/* bits 0-2 select ROM bank */
 	bankaddress = 0x10000 + (data & 0x07) * 0x4000;
-	subbank("bank1")->set_base(&RAM[bankaddress]);
+	membank("bank1")->set_base(&RAM[bankaddress]);
 
 	/* bits 3-5 select gfx bank */
 	bank = (data & 0x38) >> 3;

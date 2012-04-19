@@ -226,7 +226,7 @@ WRITE8_MEMBER(esd16_state::esd16_sound_rombank_w)
 	int bank = data & 0xf;
 	if (data != bank)	logerror("CPU #1 - PC %04X: unknown bank bits: %02X\n", cpu_get_pc(&space.device()), data);
 	if (bank >= 3)	bank += 1;
-	subbank("bank1")->set_entry(bank);
+	membank("bank1")->set_entry(bank);
 }
 
 static ADDRESS_MAP_START( multchmp_sound_map, AS_PROGRAM, 8, esd16_state )
@@ -520,7 +520,7 @@ static MACHINE_START( esd16 )
 	esd16_state *state = machine.driver_data<esd16_state>();
 	UINT8 *AUDIO = machine.region("audiocpu")->base();
 
-	state->subbank("bank1")->configure_entries(0, 17, &AUDIO[0x0000], 0x4000);
+	state->membank("bank1")->configure_entries(0, 17, &AUDIO[0x0000], 0x4000);
 
 	state->m_audio_cpu = machine.device("audiocpu");
 	state->m_eeprom = machine.device<eeprom_device>("eeprom");

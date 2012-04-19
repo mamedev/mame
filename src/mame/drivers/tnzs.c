@@ -738,7 +738,7 @@ static WRITE8_DEVICE_HANDLER( kabukiz_sound_bank_w )
 {
 	// to avoid the write when the sound chip is initialized
 	if (data != 0xff)
-		device->machine().root_device().subbank("bank3")->set_entry(data & 0x07);
+		device->machine().root_device().membank("bank3")->set_entry(data & 0x07);
 }
 
 static WRITE8_DEVICE_HANDLER( kabukiz_sample_w )
@@ -903,7 +903,7 @@ ADDRESS_MAP_END
 WRITE8_MEMBER(tnzs_state::jpopnics_subbankswitch_w)
 {
 	/* bits 0-1 select ROM bank */
-	subbank("bank2")->set_entry(data & 0x03);
+	membank("bank2")->set_entry(data & 0x03);
 }
 
 static ADDRESS_MAP_START( jpopnics_sub_map, AS_PROGRAM, 8, tnzs_state )

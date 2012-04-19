@@ -347,7 +347,7 @@ WRITE8_MEMBER(sigmab98_state::regs_w)
 			if (data >= 0x18)
 				logerror("%s: unknown rom bank = %02x\n", machine().describe_context(), data);
 			else
-				subbank("rombank")->set_entry(data);
+				membank("rombank")->set_entry(data);
 			break;
 
 		default:
@@ -386,10 +386,10 @@ WRITE8_MEMBER(sigmab98_state::regs2_w)
 			switch (data)
 			{
 				case 0x32:
-					subbank("rambank")->set_entry(0);
+					membank("rambank")->set_entry(0);
 					break;
 				case 0x36:
-					subbank("rambank")->set_entry(1);
+					membank("rambank")->set_entry(1);
 					break;
 				default:
 					logerror("%s: unknown ram bank = %02x\n", machine().describe_context(), data);
@@ -549,9 +549,9 @@ WRITE8_MEMBER(sigmab98_state::animalc_rombank_w)
 			m_rombank = data;
 			switch (data)
 			{
-				case 0x10:	subbank("rombank")->set_base(rom + 0x400 + 0x4000);	break;
-				case 0x14:	subbank("rombank")->set_base(rom + 0x400 + 0x8000);	break;
-				case 0x18:	subbank("rombank")->set_base(rom + 0x400 + 0xc000);	break;
+				case 0x10:	membank("rombank")->set_base(rom + 0x400 + 0x4000);	break;
+				case 0x14:	membank("rombank")->set_base(rom + 0x400 + 0x8000);	break;
+				case 0x18:	membank("rombank")->set_base(rom + 0x400 + 0xc000);	break;
 				default:
 					logerror("%s: unknown rom bank = %02x, reg = %02x\n", machine().describe_context(), data, m_reg);
 			}
@@ -602,9 +602,9 @@ WRITE8_MEMBER(sigmab98_state::animalc_rambank_w)
 					logerror("%s: unknown ram bank = %02x, reg2 = %02x\n", machine().describe_context(), data, m_reg2);
 					return;
 			}
-			subbank("rambank")->set_entry(bank);
+			membank("rambank")->set_entry(bank);
 			if ( (bank == 1) || (bank == 2) || (bank == 3) )
-				subbank("sprbank")->set_entry(bank-1);
+				membank("sprbank")->set_entry(bank-1);
 			break;
 
 		default:
@@ -1018,10 +1018,10 @@ WRITE8_MEMBER(sigmab98_state::itazuram_rombank_w)
 			switch (data)
 			{
 				case 0x11:	// 3800 IS ROM
-					subbank("rombank0")->set_base(rom + 0x4c00);
-					subbank("rombank1")->set_base(rom + 0x5c00);
-					subbank("sprbank0")->set_base(m_spriteram + 0x1000*4);	// scratch
-					subbank("sprbank1")->set_base(m_spriteram + 0x1000*4);	// scratch
+					membank("rombank0")->set_base(rom + 0x4c00);
+					membank("rombank1")->set_base(rom + 0x5c00);
+					membank("sprbank0")->set_base(m_spriteram + 0x1000*4);	// scratch
+					membank("sprbank1")->set_base(m_spriteram + 0x1000*4);	// scratch
 					break;
 
 				default:
@@ -1034,10 +1034,10 @@ WRITE8_MEMBER(sigmab98_state::itazuram_rombank_w)
 			switch (data)
 			{
 				case 0x14:	// 3800 IS ROM
-					subbank("rombank0")->set_base(rom + 0x8000);
-					subbank("rombank1")->set_base(rom + 0x9000);
-					subbank("sprbank0")->set_base(m_spriteram + 0x1000*4);	// scratch
-					subbank("sprbank1")->set_base(m_spriteram + 0x1000*4);	// scratch
+					membank("rombank0")->set_base(rom + 0x8000);
+					membank("rombank1")->set_base(rom + 0x9000);
+					membank("sprbank0")->set_base(m_spriteram + 0x1000*4);	// scratch
+					membank("sprbank1")->set_base(m_spriteram + 0x1000*4);	// scratch
 					break;
 
 				default:
@@ -1050,33 +1050,33 @@ WRITE8_MEMBER(sigmab98_state::itazuram_rombank_w)
 			switch (data)
 			{
 				case 0x0f:	// 3800 IS ROM
-					subbank("rombank0")->set_base(rom + 0x3400);
-					subbank("rombank1")->set_base(rom + 0x4400);
-					subbank("sprbank0")->set_base(m_spriteram + 0x1000*4);	// scratch
-					subbank("sprbank1")->set_base(m_spriteram + 0x1000*4);	// scratch
+					membank("rombank0")->set_base(rom + 0x3400);
+					membank("rombank1")->set_base(rom + 0x4400);
+					membank("sprbank0")->set_base(m_spriteram + 0x1000*4);	// scratch
+					membank("sprbank1")->set_base(m_spriteram + 0x1000*4);	// scratch
 					break;
 
 				case 0x12:	// 3800 IS ROM
-					subbank("rombank0")->set_base(rom + 0x6400);
-					subbank("rombank1")->set_base(rom + 0x7400);
-					subbank("sprbank0")->set_base(m_spriteram + 0x1000*4);	// scratch
-					subbank("sprbank1")->set_base(m_spriteram + 0x1000*4);	// scratch
+					membank("rombank0")->set_base(rom + 0x6400);
+					membank("rombank1")->set_base(rom + 0x7400);
+					membank("sprbank0")->set_base(m_spriteram + 0x1000*4);	// scratch
+					membank("sprbank1")->set_base(m_spriteram + 0x1000*4);	// scratch
 					break;
 
 				// used in test mode:
-//              case 0x5c:  subbank("rombank")->set_base(rom + 0x400 + 0x0000);    break;  // 3800 IS RAM! (8000 bytes)
+//              case 0x5c:  membank("rombank")->set_base(rom + 0x400 + 0x0000);    break;  // 3800 IS RAM! (8000 bytes)
 
 				case 0x5e:	// 3800 IS RAM! (1404 bytes)
-					subbank("rombank0")->set_base(m_spriteram + 0x1000*1);
-					subbank("sprbank0")->set_base(m_spriteram + 0x1000*1);
-					subbank("rombank1")->set_base(m_spriteram + 0x1000*2);
-					subbank("sprbank1")->set_base(m_spriteram + 0x1000*2);
+					membank("rombank0")->set_base(m_spriteram + 0x1000*1);
+					membank("sprbank0")->set_base(m_spriteram + 0x1000*1);
+					membank("rombank1")->set_base(m_spriteram + 0x1000*2);
+					membank("sprbank1")->set_base(m_spriteram + 0x1000*2);
 					break;
 
 				case 0x6c:	// 3800 IS RAM! (1000 bytes) - SPRITERAM
-					subbank("rombank0")->set_base(m_spriteram);
-					subbank("sprbank0")->set_base(m_spriteram);
-//                  subbank("sprbank1")->set_base(m_spriteram + 0x1000*4);    // scratch
+					membank("rombank0")->set_base(m_spriteram);
+					membank("sprbank0")->set_base(m_spriteram);
+//                  membank("sprbank1")->set_base(m_spriteram + 0x1000*4);    // scratch
 					break;
 
 				default:
@@ -1089,10 +1089,10 @@ WRITE8_MEMBER(sigmab98_state::itazuram_rombank_w)
 			switch (data)
 			{
 				case 0x14:	// 3800 IS ROM
-					subbank("rombank0")->set_base(rom + 0x8800);
-					subbank("rombank1")->set_base(rom + 0x9800);
-					subbank("sprbank0")->set_base(m_spriteram + 0x1000*4);	// scratch
-					subbank("sprbank1")->set_base(m_spriteram + 0x1000*4);	// scratch
+					membank("rombank0")->set_base(rom + 0x8800);
+					membank("rombank1")->set_base(rom + 0x9800);
+					membank("sprbank0")->set_base(m_spriteram + 0x1000*4);	// scratch
+					membank("sprbank1")->set_base(m_spriteram + 0x1000*4);	// scratch
 					break;
 
 				default:
@@ -1139,8 +1139,8 @@ WRITE8_MEMBER(sigmab98_state::itazuram_rambank_w)
 			m_rambank = data;
 			switch (data)
 			{
-				case 0x52:	subbank("palbank")->set_base(m_nvram);									break;
-				case 0x64:	subbank("palbank")->set_base(m_generic_paletteram_8);	break;
+				case 0x52:	membank("palbank")->set_base(m_nvram);									break;
+				case 0x64:	membank("palbank")->set_base(m_generic_paletteram_8);	break;
 				default:
 					logerror("%s: unknown ram bank = %02x, reg2 = %02x\n", machine().describe_context(), data, m_reg2);
 					return;
@@ -1915,14 +1915,14 @@ static DRIVER_INIT( gegege )
 	rom[0x8165] = 0x00;
 
 	// ROM banks
-	machine.root_device().subbank("rombank")->configure_entries(0, 0x18, rom + 0x8000, 0x1000);
-	machine.root_device().subbank("rombank")->set_entry(0);
+	machine.root_device().membank("rombank")->configure_entries(0, 0x18, rom + 0x8000, 0x1000);
+	machine.root_device().membank("rombank")->set_entry(0);
 
 	// RAM banks
 	UINT8 *bankedram = auto_alloc_array(machine, UINT8, 0x800 * 2);
 
-	machine.root_device().subbank("rambank")->configure_entries(0, 2, bankedram, 0x800);
-	machine.root_device().subbank("rambank")->set_entry(0);
+	machine.root_device().membank("rambank")->configure_entries(0, 2, bankedram, 0x800);
+	machine.root_device().membank("rambank")->set_entry(0);
 }
 
 
@@ -1964,14 +1964,14 @@ static DRIVER_INIT( pepsiman )
 	rom[0x8165] = 0x00;
 
 	// ROM banks
-	machine.root_device().subbank("rombank")->configure_entries(0, 0x18, rom + 0x8000, 0x1000);
-	machine.root_device().subbank("rombank")->set_entry(0);
+	machine.root_device().membank("rombank")->configure_entries(0, 0x18, rom + 0x8000, 0x1000);
+	machine.root_device().membank("rombank")->set_entry(0);
 
 	// RAM banks
 	UINT8 *bankedram = auto_alloc_array(machine, UINT8, 0x800 * 2);
 
-	machine.root_device().subbank("rambank")->configure_entries(0, 2, bankedram, 0x800);
-	machine.root_device().subbank("rambank")->set_entry(0);
+	machine.root_device().membank("rambank")->configure_entries(0, 2, bankedram, 0x800);
+	machine.root_device().membank("rambank")->set_entry(0);
 }
 
 
@@ -2015,14 +2015,14 @@ static DRIVER_INIT( ucytokyu )
 	rom[0x8165] = 0x00;
 
 	// ROM banks
-	machine.root_device().subbank("rombank")->configure_entries(0, 0x18, rom + 0x8000, 0x1000);
-	machine.root_device().subbank("rombank")->set_entry(0);
+	machine.root_device().membank("rombank")->configure_entries(0, 0x18, rom + 0x8000, 0x1000);
+	machine.root_device().membank("rombank")->set_entry(0);
 
 	// RAM banks
 	UINT8 *bankedram = auto_alloc_array(machine, UINT8, 0x800 * 2);
 
-	machine.root_device().subbank("rambank")->configure_entries(0, 2, bankedram, 0x800);
-	machine.root_device().subbank("rambank")->set_entry(0);
+	machine.root_device().membank("rambank")->configure_entries(0, 2, bankedram, 0x800);
+	machine.root_device().membank("rambank")->set_entry(0);
 }
 
 
@@ -2110,14 +2110,14 @@ static DRIVER_INIT( animalc )
 	sigmab98_state *state = machine.driver_data<sigmab98_state>();
 	// RAM banks
 	UINT8 *bankedram = auto_alloc_array(machine, UINT8, 0x1000 * 5);
-	state->subbank("rambank")->configure_entry(0, state->m_nvram);
-	state->subbank("rambank")->configure_entries(1, 4, bankedram, 0x1000);
-	state->subbank("rambank")->set_entry(0);
+	state->membank("rambank")->configure_entry(0, state->m_nvram);
+	state->membank("rambank")->configure_entries(1, 4, bankedram, 0x1000);
+	state->membank("rambank")->set_entry(0);
 
 	state->m_spriteram.allocate(0x1000 * 5);
 	memset(state->m_spriteram, 0, 0x1000 * 5);
-	state->subbank("sprbank")->configure_entries(0, 5, state->m_spriteram, 0x1000);
-	state->subbank("sprbank")->set_entry(0);
+	state->membank("sprbank")->configure_entries(0, 5, state->m_spriteram, 0x1000);
+	state->membank("sprbank")->set_entry(0);
 
 	state->m_vblank_vector = 0x00; // increment counter
 	state->m_timer0_vector = 0x1c; // read hopper state
@@ -2151,20 +2151,20 @@ static DRIVER_INIT( itazuram )
 	sigmab98_state *state = machine.driver_data<sigmab98_state>();
 	// ROM banks
 	UINT8 *rom = machine.region("maincpu")->base();
-	state->subbank("rombank0")->set_base(rom + 0x3400);
-	state->subbank("rombank1")->set_base(rom + 0x4400);
+	state->membank("rombank0")->set_base(rom + 0x3400);
+	state->membank("rombank1")->set_base(rom + 0x4400);
 	state->m_rombank = 0x0f;
 
 	// RAM banks
 	state->m_generic_paletteram_8.allocate(0x3000);
 	memset(state->m_generic_paletteram_8, 0, 0x3000);
-	state->subbank("palbank")->set_base(state->m_generic_paletteram_8);
+	state->membank("palbank")->set_base(state->m_generic_paletteram_8);
 	state->m_rambank = 0x64;
 
 	state->m_spriteram.allocate(0x1000 * 5);
 	memset(state->m_spriteram, 0, 0x1000 * 5);
-	state->subbank("sprbank0")->set_base(state->m_spriteram + 0x1000*4);	// scratch
-	state->subbank("sprbank1")->set_base(state->m_spriteram + 0x1000*4);	// scratch
+	state->membank("sprbank0")->set_base(state->m_spriteram + 0x1000*4);	// scratch
+	state->membank("sprbank1")->set_base(state->m_spriteram + 0x1000*4);	// scratch
 
 	state->m_vblank_vector = 0x00;
 	state->m_timer0_vector = 0x02;

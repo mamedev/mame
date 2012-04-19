@@ -1308,9 +1308,9 @@ static DRIVER_INIT( kram3 )
 static DRIVER_INIT( zookeep )
 {
 	/* configure the banking */
-	machine.root_device().subbank("bank1")->configure_entry(0, machine.region("videocpu")->base() + 0xa000);
-	machine.root_device().subbank("bank1")->configure_entry(1, machine.region("videocpu")->base() + 0x10000);
-	machine.root_device().subbank("bank1")->set_entry(0);
+	machine.root_device().membank("bank1")->configure_entry(0, machine.region("videocpu")->base() + 0xa000);
+	machine.root_device().membank("bank1")->configure_entry(1, machine.region("videocpu")->base() + 0x10000);
+	machine.root_device().membank("bank1")->set_entry(0);
 }
 
 

@@ -216,8 +216,8 @@ static MACHINE_RESET( common )
 	/* allocate a timer for feeding the autobuffer */
 	state->m_adsp_autobuffer_timer = machine.device<timer_device>("adsp_timer");
 
-	state->subbank("bank1")->configure_entries(0, 256, machine.region("user1")->base(), 0x4000);
-	state->subbank("bank1")->set_entry(0);
+	state->membank("bank1")->configure_entries(0, 256, machine.region("user1")->base(), 0x4000);
+	state->membank("bank1")->set_entry(0);
 
 	/* keep the TMS32031 halted until the code is ready to go */
 	cputag_set_input_line(machine, "tms", INPUT_LINE_RESET, ASSERT_LINE);
@@ -613,7 +613,7 @@ WRITE16_MEMBER(gaelco3d_state::adsp_rombank_w)
 {
 	if (LOG)
 		logerror("adsp_rombank_w(%d) = %04X\n", offset, data);
-	subbank("bank1")->set_entry((offset & 1) * 0x80 + (data & 0x7f));
+	membank("bank1")->set_entry((offset & 1) * 0x80 + (data & 0x7f));
 }
 
 

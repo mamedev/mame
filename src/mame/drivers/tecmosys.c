@@ -326,7 +326,7 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(tecmosys_state::tecmosys_z80_bank_w)
 {
-	subbank("bank1")->set_entry(data);
+	membank("bank1")->set_entry(data);
 }
 
 WRITE8_MEMBER(tecmosys_state::tecmosys_oki_bank_w)
@@ -448,7 +448,7 @@ static const ymf262_interface tecmosys_ymf262_interface =
 static MACHINE_START( tecmosys )
 {
 //  tecmosys_state *state = machine.driver_data<tecmosys_state>();
-	machine.root_device().subbank("bank1")->configure_entries(0, 16, machine.region("audiocpu")->base(), 0x4000);
+	machine.root_device().membank("bank1")->configure_entries(0, 16, machine.region("audiocpu")->base(), 0x4000);
 }
 
 static MACHINE_CONFIG_START( deroon, tecmosys_state )

@@ -58,7 +58,7 @@ static WRITE8_HANDLER( fcrash_snd_bankswitch_w )
 	state->m_msm_1->set_output_gain(0, (data & 0x08) ? 0.0 : 1.0);
 	state->m_msm_2->set_output_gain(0, (data & 0x10) ? 0.0 : 1.0);
 
-	state->subbank("bank1")->set_entry(data & 0x07);
+	state->membank("bank1")->set_entry(data & 0x07);
 }
 
 static void m5205_int1( device_t *device )
@@ -695,7 +695,7 @@ static MACHINE_START( fcrash )
 	cps_state *state = machine.driver_data<cps_state>();
 	UINT8 *ROM = machine.region("soundcpu")->base();
 
-	state->subbank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
+	state->membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
 
 	state->m_maincpu = machine.device("maincpu");
 	state->m_audiocpu = machine.device("soundcpu");

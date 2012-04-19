@@ -44,7 +44,7 @@ WRITE8_MEMBER(compgolf_state::compgolf_ctrl_w)
 	if (m_bank != new_bank)
 	{
 		m_bank = new_bank;
-		subbank("bank1")->set_entry(m_bank);
+		membank("bank1")->set_entry(m_bank);
 	}
 
 	m_scrollx_hi = (data & 1) << 8;
@@ -360,7 +360,7 @@ static void compgolf_expand_bg(running_machine &machine)
 
 static DRIVER_INIT( compgolf )
 {
-	machine.root_device().subbank("bank1")->configure_entries(0, 2, machine.region("user1")->base(), 0x4000);
+	machine.root_device().membank("bank1")->configure_entries(0, 2, machine.region("user1")->base(), 0x4000);
 	compgolf_expand_bg(machine);
 }
 

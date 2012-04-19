@@ -277,7 +277,7 @@ WRITE8_MEMBER(sandscrp_state::sandscrp_bankswitch_w)
 	if (bank < 3)	RAM = &RAM[0x4000 * bank];
 	else			RAM = &RAM[0x4000 * (bank-3) + 0x10000];
 
-	subbank("bank1")->set_base(RAM);
+	membank("bank1")->set_base(RAM);
 }
 
 READ8_MEMBER(sandscrp_state::sandscrp_latchstatus_r)

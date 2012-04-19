@@ -396,7 +396,7 @@ logerror("%04x: bank %02x\n",cpu_get_pc(&space.device()),data);
 	/* bits 6, 4 and 3 used for something input related? */
 
 	address = 0x10000 + (data & 0x07) * 0x8000;
-	subbank("bank1")->set_base(&rom[address]);
+	membank("bank1")->set_base(&rom[address]);
 }
 
 
@@ -404,7 +404,7 @@ WRITE8_MEMBER(royalmah_state::mjapinky_bank_w)
 {
 	UINT8 *ROM = machine().region("maincpu")->base();
 	m_rombank = data;
-	subbank("bank1")->set_base(ROM + 0x10000 + 0x8000 * data);
+	membank("bank1")->set_base(ROM + 0x10000 + 0x8000 * data);
 }
 
 WRITE8_MEMBER(royalmah_state::mjapinky_palbank_w)
@@ -434,7 +434,7 @@ logerror("%04x: bank %02x\n",cpu_get_pc(&space.device()),data);
 
 	address = 0x10000 + data * 0x8000;
 
-	subbank("bank1")->set_base(&rom[address]);
+	membank("bank1")->set_base(&rom[address]);
 }
 
 
@@ -452,7 +452,7 @@ WRITE8_MEMBER(royalmah_state::dynax_bank_w)
 
 	address = 0x10000 + data * 0x8000;
 
-	subbank("bank1")->set_base(&rom[address]);
+	membank("bank1")->set_base(&rom[address]);
 }
 
 READ8_MEMBER(royalmah_state::daisyari_dsw_r)
@@ -478,7 +478,7 @@ WRITE8_MEMBER(royalmah_state::daisyari_bank_w)
 	address = 0x10000 + ((data & 0x30)>>4) * 0x10000 + (data & 0x1) * 0x8000;
 //  printf("%08x %02x\n",address,data);
 
-	subbank("bank1")->set_base(&rom[address]);
+	membank("bank1")->set_base(&rom[address]);
 
 	/* bit 1 used too but unknown purpose. */
 }
@@ -508,7 +508,7 @@ WRITE8_MEMBER(royalmah_state::mjclub_bank_w)
 	address = 0x10000 + data * 0x8000;
 //  printf("%08x\n",address);
 
-	subbank("bank1")->set_base(&rom[address]);
+	membank("bank1")->set_base(&rom[address]);
 
 	/* bit 5 used too but unknown purpose. */
 }
@@ -829,12 +829,12 @@ READ8_MEMBER(royalmah_state::janptr96_dsw_r)
 WRITE8_MEMBER(royalmah_state::janptr96_rombank_w)
 {
 	UINT8 *ROM = machine().region("maincpu")->base();
-	subbank("bank1")->set_base(ROM + 0x10000 + 0x8000 * data);
+	membank("bank1")->set_base(ROM + 0x10000 + 0x8000 * data);
 }
 
 WRITE8_MEMBER(royalmah_state::janptr96_rambank_w)
 {
-	subbank("bank2")->set_base(m_janptr96_nvram + 0x1000 + 0x1000 * data);
+	membank("bank2")->set_base(m_janptr96_nvram + 0x1000 + 0x1000 * data);
 }
 
 READ8_MEMBER(royalmah_state::janptr96_unknown_r)
@@ -1050,7 +1050,7 @@ READ8_MEMBER(royalmah_state::mjtensin_p3_r)
 static void mjtensin_update_rombank(running_machine &machine)
 {
 	royalmah_state *state = machine.driver_data<royalmah_state>();
-	state->subbank("bank1")->set_base(machine.region("maincpu")->base() + 0x10000 + state->m_rombank * 0x8000 );
+	state->membank("bank1")->set_base(machine.region("maincpu")->base() + 0x10000 + state->m_rombank * 0x8000 );
 }
 WRITE8_MEMBER(royalmah_state::mjtensin_p4_w)
 {
@@ -1092,7 +1092,7 @@ ADDRESS_MAP_END
 static void cafetime_update_rombank(running_machine &machine)
 {
 	royalmah_state *state = machine.driver_data<royalmah_state>();
-	state->subbank("bank1")->set_base(machine.region("maincpu")->base() + 0x10000 + state->m_rombank * 0x8000 );
+	state->membank("bank1")->set_base(machine.region("maincpu")->base() + 0x10000 + state->m_rombank * 0x8000 );
 }
 WRITE8_MEMBER(royalmah_state::cafetime_p4_w)
 {
@@ -4710,13 +4710,13 @@ ROM_START( jansoua )
 ROM_END
 
 
-static DRIVER_INIT( ippatsu )	{	machine.root_device().subbank("bank1")->set_base(machine.region("maincpu")->base() + 0x8000 );	}
+static DRIVER_INIT( ippatsu )	{	machine.root_device().membank("bank1")->set_base(machine.region("maincpu")->base() + 0x8000 );	}
 
 static DRIVER_INIT( janptr96 )
 {
 	royalmah_state *state = machine.driver_data<royalmah_state>();
 	state->m_janptr96_nvram = auto_alloc_array(machine, UINT8, 0x1000 * 9);
-	state->subbank("bank3")->set_base(state->m_janptr96_nvram);
+	state->membank("bank3")->set_base(state->m_janptr96_nvram);
 	machine.device<nvram_device>("nvram")->set_base(state->m_janptr96_nvram, 0x1000 * 9);
 }
 

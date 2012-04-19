@@ -1553,7 +1553,7 @@ ROM_END
 static void configure_banks( running_machine& machine )
 {
 	UINT8 *ROM = machine.region("maincpu")->base();
-	machine.root_device().subbank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
+	machine.root_device().membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
 }
 
 static DRIVER_INIT( bublbobl )

@@ -502,7 +502,7 @@ address lines), and then reading it from the 051962.
 1d00     : bits 0 & 1 might enable NMI and FIRQ, not sure
          : bit 2 = IRQ enable
 1d80     : ROM bank selector bits 0-3 = bank 0 bits 4-7 = bank 1
-1e00     : ROM subbank selector for ROM testing
+1e00     : ROM membank selector for ROM testing
 1e80     : bit 0 = flip screen (applies to tilemaps only, not sprites)
          : bit 1 = set by crimfght, mainevt, surpratk, xmen, mia, punkshot, thndrx2, spy
          :         it seems to enable tile flip X, however flip X is handled by the

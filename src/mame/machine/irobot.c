@@ -107,13 +107,13 @@ WRITE8_MEMBER(irobot_state::irobot_out0_w)
 	switch (data & 0x60)
 	{
 		case 0:
-			subbank("bank2")->set_base(&RAM[0x1C000]);
+			membank("bank2")->set_base(&RAM[0x1C000]);
 			break;
 		case 0x20:
-			subbank("bank2")->set_base(&RAM[0x1C800]);
+			membank("bank2")->set_base(&RAM[0x1C800]);
 			break;
 		case 0x40:
-			subbank("bank2")->set_base(&RAM[0x1D000]);
+			membank("bank2")->set_base(&RAM[0x1D000]);
 			break;
 	}
 	m_outx = (data & 0x18) >> 3;
@@ -128,22 +128,22 @@ WRITE8_MEMBER(irobot_state::irobot_rom_banksel_w)
 	switch ((data & 0x0E) >> 1)
 	{
 		case 0:
-			subbank("bank1")->set_base(&RAM[0x10000]);
+			membank("bank1")->set_base(&RAM[0x10000]);
 			break;
 		case 1:
-			subbank("bank1")->set_base(&RAM[0x12000]);
+			membank("bank1")->set_base(&RAM[0x12000]);
 			break;
 		case 2:
-			subbank("bank1")->set_base(&RAM[0x14000]);
+			membank("bank1")->set_base(&RAM[0x14000]);
 			break;
 		case 3:
-			subbank("bank1")->set_base(&RAM[0x16000]);
+			membank("bank1")->set_base(&RAM[0x16000]);
 			break;
 		case 4:
-			subbank("bank1")->set_base(&RAM[0x18000]);
+			membank("bank1")->set_base(&RAM[0x18000]);
 			break;
 		case 5:
-			subbank("bank1")->set_base(&RAM[0x1A000]);
+			membank("bank1")->set_base(&RAM[0x1A000]);
 			break;
 	}
 	set_led_status(machine(), 0,data & 0x10);

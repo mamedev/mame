@@ -153,7 +153,7 @@ WRITE8_MEMBER(malzak_state::port40_w)
 //  Bit 6 is used only in Malzak II, and is set high after checking
 //        the selected version
 //  logerror("S2650 [0x%04x]: port 0x40 write: 0x%02x\n", cpu_get_pc(machine().device("maincpu")), data);
-	subbank("bank1")->set_entry((data & 0x40) >> 6);
+	membank("bank1")->set_entry((data & 0x40) >> 6);
 }
 
 WRITE8_MEMBER(malzak_state::port60_w)
@@ -370,7 +370,7 @@ static MACHINE_START( malzak )
 {
 	malzak_state *state = machine.driver_data<malzak_state>();
 
-	state->subbank("bank1")->configure_entries(0, 2, machine.region("user2")->base(), 0x400);
+	state->membank("bank1")->configure_entries(0, 2, machine.region("user2")->base(), 0x400);
 
 	state->m_s2636_0 = machine.device("s2636_0");
 	state->m_s2636_1 = machine.device("s2636_1");

@@ -68,7 +68,7 @@ WRITE16_MEMBER(aquarium_state::aquarium_sound_w)
 
 WRITE8_MEMBER(aquarium_state::aquarium_z80_bank_w)
 {
-	subbank("bank1")->set_entry(data & 0x07);
+	membank("bank1")->set_entry(data & 0x07);
 }
 
 static UINT8 aquarium_snd_bitswap( UINT8 scrambled_data )
@@ -276,8 +276,8 @@ static DRIVER_INIT( aquarium )
 	}
 
 	/* configure and set up the sound bank */
-	machine.root_device().subbank("bank1")->configure_entries(0, 7, &Z80[0x18000], 0x8000);
-	machine.root_device().subbank("bank1")->set_entry(1);
+	machine.root_device().membank("bank1")->configure_entries(0, 7, &Z80[0x18000], 0x8000);
+	machine.root_device().membank("bank1")->set_entry(1);
 }
 
 

@@ -168,10 +168,10 @@ READ8_HANDLER( acitya_decrypt_rom )
 
 	switch(state->m_counter)
 	{
-		case 0x08:	state->subbank ("bank1")->set_entry (0);		break;
-		case 0x09:	state->subbank ("bank1")->set_entry (1);		break;
-		case 0x0A:	state->subbank ("bank1")->set_entry (2);		break;
-		case 0x0B:	state->subbank ("bank1")->set_entry (3);		break;
+		case 0x08:	state->membank ("bank1")->set_entry (0);		break;
+		case 0x09:	state->membank ("bank1")->set_entry (1);		break;
+		case 0x0A:	state->membank ("bank1")->set_entry (2);		break;
+		case 0x0B:	state->membank ("bank1")->set_entry (3);		break;
 		default:
 			logerror("Invalid counter = %02X\n",state->m_counter);
 			break;
@@ -194,7 +194,7 @@ MACHINE_START( acitya )
 	acitya_decrypt_rom_A(machine);
 	acitya_decrypt_rom_B(machine);
 
-	machine.root_device().subbank("bank1")->configure_entries(0, 4, &RAM[0x10000], 0x4000);
+	machine.root_device().membank("bank1")->configure_entries(0, 4, &RAM[0x10000], 0x4000);
 
 	state_save_register_global(machine, state->m_counter);
 }
@@ -205,5 +205,5 @@ MACHINE_RESET( acitya )
 	pacman_state *state = machine.driver_data<pacman_state>();
 	/* The initial state of the counter is 0x0B */
 	state->m_counter = 0x0B;
-	state->subbank("bank1")->set_entry(3);
+	state->membank("bank1")->set_entry(3);
 }

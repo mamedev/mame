@@ -402,7 +402,7 @@ WRITE8_MEMBER(metro_state::metro_sound_rombank_w)
 	bankaddress = 0x10000-0x4000 + ((data >> 4) & 0x03) * 0x4000;
 	if (bankaddress < 0x10000) bankaddress = 0x0000;
 
-	subbank("bank1")->set_base(&ROM[bankaddress]);
+	membank("bank1")->set_base(&ROM[bankaddress]);
 }
 
 WRITE8_MEMBER(metro_state::daitorid_sound_rombank_w)
@@ -413,7 +413,7 @@ WRITE8_MEMBER(metro_state::daitorid_sound_rombank_w)
 	bankaddress = 0x10000-0x4000 + ((data >> 4) & 0x07) * 0x4000;
 	if (bankaddress < 0x10000) bankaddress = 0x10000;
 
-	subbank("bank1")->set_base(&ROM[bankaddress]);
+	membank("bank1")->set_base(&ROM[bankaddress]);
 }
 
 
@@ -1696,7 +1696,7 @@ WRITE8_MEMBER(metro_state::blzntrnd_sh_bankswitch_w)
 	int bankaddress;
 
 	bankaddress = 0x10000 + (data & 0x03) * 0x4000;
-	subbank("bank1")->set_base(&RAM[bankaddress]);
+	membank("bank1")->set_base(&RAM[bankaddress]);
 }
 
 static void blzntrnd_irqhandler(device_t *device, int irq)

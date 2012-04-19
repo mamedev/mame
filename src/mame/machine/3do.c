@@ -121,7 +121,7 @@ WRITE32_MEMBER(_3do_state::_3do_slow2_w)
 		case 0:		/* Boot ROM writes 03180000 here and then starts reading some things */
 		{
 			/* disable ROM overlay */
-			subbank("bank1")->set_entry(0);
+			membank("bank1")->set_entry(0);
 		}
 		m_slow2.cg_input = m_slow2.cg_input << 1 | ( data & 0x00000001 );
 		m_slow2.cg_w_count ++;

@@ -538,7 +538,7 @@ DRIVER_INIT( kabukiz )
 	UINT8 *SOUND = machine.region("audiocpu")->base();
 	state->m_mcu_type = MCU_NONE_KABUKIZ;
 
-	state->subbank("bank3")->configure_entries(0, 8, &SOUND[0x10000], 0x4000);
+	state->membank("bank3")->configure_entries(0, 8, &SOUND[0x10000], 0x4000);
 }
 
 DRIVER_INIT( insectx )
@@ -659,8 +659,8 @@ static void tnzs_postload(running_machine &machine)
 	tnzs_state *state = machine.driver_data<tnzs_state>();
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
-	state->subbank("bank1")->set_entry(state->m_bank1);
-	state->subbank("bank2")->set_entry(state->m_bank2);
+	state->membank("bank1")->set_entry(state->m_bank1);
+	state->membank("bank2")->set_entry(state->m_bank2);
 
 	if (state->m_bank1 <= 1)
 		space->install_write_bank(0x8000, 0xbfff, "bank1");
@@ -674,11 +674,11 @@ MACHINE_START( tnzs )
 	UINT8 *ROM = machine.region("maincpu")->base();
 	UINT8 *SUB = machine.region("sub")->base();
 
-	state->subbank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
-	state->subbank("bank2")->configure_entries(0, 4, &SUB[0x10000], 0x2000);
+	state->membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
+	state->membank("bank2")->configure_entries(0, 4, &SUB[0x10000], 0x2000);
 
-	state->subbank("bank1")->set_entry(2);
-	state->subbank("bank2")->set_entry(0);
+	state->membank("bank1")->set_entry(2);
+	state->membank("bank2")->set_entry(0);
 
 	state->m_bank1 = 2;
 	state->m_bank2 = 0;
@@ -712,8 +712,8 @@ MACHINE_START( jpopnics )
 	UINT8 *ROM = machine.region("maincpu")->base();
 	UINT8 *SUB = machine.region("sub")->base();
 
-	state->subbank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
-	state->subbank("bank2")->configure_entries(0, 4, &SUB[0x10000], 0x2000);
+	state->membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
+	state->membank("bank2")->configure_entries(0, 4, &SUB[0x10000], 0x2000);
 
 	state->m_subcpu = machine.device("sub");
 	state->m_mcu = NULL;
@@ -742,7 +742,7 @@ WRITE8_MEMBER(tnzs_state::tnzs_bankswitch_w)
 
 	/* bits 0-2 select RAM/ROM bank */
 	m_bank1 = data & 0x07;
-	subbank("bank1")->set_entry(m_bank1);
+	membank("bank1")->set_entry(m_bank1);
 
 	if (m_bank1 <= 1)
 		space.install_write_bank(0x8000, 0xbfff, "bank1");
@@ -798,5 +798,5 @@ WRITE8_MEMBER(tnzs_state::tnzs_bankswitch1_w)
 
 	/* bits 0-1 select ROM bank */
 	m_bank2 = data & 0x03;
-	subbank("bank2")->set_entry(m_bank2);
+	membank("bank2")->set_entry(m_bank2);
 }

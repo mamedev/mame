@@ -98,7 +98,7 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(macs_state::rambank_w)
 {
-	subbank("bank3")->set_base(&m_ram1[0x10000+(data&1)*0x800] );
+	membank("bank3")->set_base(&m_ram1[0x10000+(data&1)*0x800] );
 }
 
 READ8_MEMBER(macs_state::macs_input_r)
@@ -136,7 +136,7 @@ READ8_MEMBER(macs_state::macs_input_r)
 
 WRITE8_MEMBER(macs_state::macs_rom_bank_w)
 {
-	subbank("bank1")->set_base(machine().region("maincpu")->base() + (data* 0x4000) + 0x10000 + macs_cart_slot*0x400000 );
+	membank("bank1")->set_base(machine().region("maincpu")->base() + (data* 0x4000) + 0x10000 + macs_cart_slot*0x400000 );
 
 	m_st0016_rom_bank=data;
 }
@@ -158,14 +158,14 @@ WRITE8_MEMBER(macs_state::macs_output_w)
 		{
 			/* FIXME: dunno if this RAM bank is right, DASM tracking made on the POST screens indicates that there's just one RAM bank,
                       but then MACS2 games locks up. */
-			subbank("bank3")->set_base(&m_ram1[((data&0x20)>>5)*0x1000+0x000] );
+			membank("bank3")->set_base(&m_ram1[((data&0x20)>>5)*0x1000+0x000] );
 
 			macs_cart_slot = (data & 0xc) >> 2;
 
-			subbank("bank4")->set_base(&ROM[macs_cart_slot*0x400000+0x10000] );
+			membank("bank4")->set_base(&ROM[macs_cart_slot*0x400000+0x10000] );
 		}
 
-		subbank("bank2")->set_base(&m_ram1[((data&0x20)>>5)*0x1000+0x800] );
+		membank("bank2")->set_base(&m_ram1[((data&0x20)>>5)*0x1000+0x800] );
 		break;
 		case 2: m_mux_data = data; break;
 
@@ -716,10 +716,10 @@ static MACHINE_RESET(macs)
 		macs_ram1[0x1ff9]=0x07;
 		#endif
 
-		state->subbank("bank1")->set_base(machine.region("maincpu")->base() + 0x10000 );
-		state->subbank("bank2")->set_base(macs_ram1+0x800);
-		state->subbank("bank3")->set_base(macs_ram1+0x10000);
-		state->subbank("bank4")->set_base(machine.region("maincpu")->base() );
+		state->membank("bank1")->set_base(machine.region("maincpu")->base() + 0x10000 );
+		state->membank("bank2")->set_base(macs_ram1+0x800);
+		state->membank("bank3")->set_base(macs_ram1+0x10000);
+		state->membank("bank4")->set_base(machine.region("maincpu")->base() );
 }
 
 static DRIVER_INIT(macs)

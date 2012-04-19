@@ -68,12 +68,12 @@ WRITE8_MEMBER(mjkjidai_state::mjkjidai_ctrl_w)
 	/* bits 6-7 select ROM bank */
 	if (data & 0xc0)
 	{
-		subbank("bank1")->set_base(rom + 0x10000-0x4000 + ((data & 0xc0) << 8));
+		membank("bank1")->set_base(rom + 0x10000-0x4000 + ((data & 0xc0) << 8));
 	}
 	else
 	{
 		/* there is code flowing from 7fff to this bank so they have to be contiguous in memory */
-		subbank("bank1")->set_base(rom + 0x08000);
+		membank("bank1")->set_base(rom + 0x08000);
 	}
 }
 

@@ -55,7 +55,7 @@ WRITE8_MEMBER(paradise_state::paradise_rombank_w)
 		bank %= bank_n;
 	}
 
-	subbank("bank1")->set_entry(bank);
+	membank("bank1")->set_entry(bank);
 }
 
 static WRITE8_DEVICE_HANDLER( paradise_okibank_w )
@@ -632,8 +632,8 @@ static MACHINE_START( paradise )
 	int bank_n = machine.region("maincpu")->bytes() / 0x4000 - 1;
 	UINT8 *ROM = machine.region("maincpu")->base();
 
-	state->subbank("bank1")->configure_entries(0, 3, &ROM[0x00000], 0x4000);
-	state->subbank("bank1")->configure_entries(3, bank_n - 3, &ROM[0x10000], 0x4000);
+	state->membank("bank1")->configure_entries(0, 3, &ROM[0x00000], 0x4000);
+	state->membank("bank1")->configure_entries(3, bank_n - 3, &ROM[0x10000], 0x4000);
 
 	state->save_item(NAME(state->m_palbank));
 	state->save_item(NAME(state->m_priority));

@@ -70,7 +70,7 @@ WRITE8_MEMBER(bigevglf_state::beg_banking_w)
 /* d0-d3 connect to A11-A14 of the ROMs (via ls273 latch)
    d4-d7 select one of ROMs (via ls273(above) and then ls154)
 */
-	subbank("bank1")->set_entry(m_beg_bank & 0xff); /* empty sockets for IC37-IC44 ROMS */
+	membank("bank1")->set_entry(m_beg_bank & 0xff); /* empty sockets for IC37-IC44 ROMS */
 }
 
 static TIMER_CALLBACK( from_sound_latch_callback )
@@ -620,7 +620,7 @@ ROM_END
 static DRIVER_INIT( bigevglf )
 {
 	UINT8 *ROM = machine.region("maincpu")->base();
-	machine.root_device().subbank("bank1")->configure_entries(0, 0xff, &ROM[0x10000], 0x800);
+	machine.root_device().membank("bank1")->configure_entries(0, 0xff, &ROM[0x10000], 0x800);
 }
 
 GAME( 1986, bigevglf,  0,        bigevglf, bigevglf, bigevglf, ROT270, "Taito America Corporation", "Big Event Golf (US)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )

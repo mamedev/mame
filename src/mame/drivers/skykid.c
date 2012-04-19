@@ -69,7 +69,7 @@ WRITE8_MEMBER(skykid_state::skykid_subreset_w)
 
 WRITE8_MEMBER(skykid_state::skykid_bankswitch_w)
 {
-	subbank("bank1")->set_entry(!BIT(offset,11));
+	membank("bank1")->set_entry(!BIT(offset,11));
 }
 
 WRITE8_MEMBER(skykid_state::skykid_irq_1_ctrl_w)
@@ -92,7 +92,7 @@ static MACHINE_START( skykid )
 {
 	skykid_state *state = machine.driver_data<skykid_state>();
 	/* configure the banks */
-	state->subbank("bank1")->configure_entries(0, 2, machine.region("maincpu")->base() + 0x10000, 0x2000);
+	state->membank("bank1")->configure_entries(0, 2, machine.region("maincpu")->base() + 0x10000, 0x2000);
 
 	state_save_register_global(machine, state->m_inputport_selected);
 }

@@ -127,7 +127,7 @@ WRITE16_MEMBER(pasha2_state::pasha2_misc_w)
 					case 0xb000:
 					case 0xc000:
 					case 0xd000:
-						subbank("bank1")->set_base(machine().region("user2")->base() + 0x400 * (bank - 0x8000)); break;
+						membank("bank1")->set_base(machine().region("user2")->base() + 0x400 * (bank - 0x8000)); break;
 				}
 			}
 		}
@@ -476,7 +476,7 @@ static DRIVER_INIT( pasha2 )
 	pasha2_state *state = machine.driver_data<pasha2_state>();
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x95744, 0x95747, read16_delegate(FUNC(pasha2_state::pasha2_speedup_r), state));
 
-	state->subbank("bank1")->set_base(machine.region("user2")->base());
+	state->membank("bank1")->set_base(machine.region("user2")->base());
 }
 
 GAME( 1998, pasha2, 0, pasha2, pasha2, pasha2, ROT0, "Dong Sung", "Pasha Pasha 2", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )

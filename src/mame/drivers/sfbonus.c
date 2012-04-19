@@ -1085,7 +1085,7 @@ WRITE8_MEMBER(sfbonus_state::sfbonus_bank_w)
 
 	bank = data & 7;
 
-	subbank("bank1")->set_base(&ROM[bank * 0x10000]);
+	membank("bank1")->set_base(&ROM[bank * 0x10000]);
 }
 
 
@@ -1216,7 +1216,7 @@ static MACHINE_RESET( sfbonus )
 {
 	UINT8 *ROM = machine.region("maincpu")->base();
 
-	machine.root_device().subbank("bank1")->set_base(&ROM[0]);
+	machine.root_device().membank("bank1")->set_base(&ROM[0]);
 }
 
 static NVRAM_HANDLER( sfbonus )

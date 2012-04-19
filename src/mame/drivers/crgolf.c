@@ -44,7 +44,7 @@
 
 WRITE8_MEMBER(crgolf_state::rom_bank_select_w)
 {
-	subbank("bank1")->set_entry(data & 15);
+	membank("bank1")->set_entry(data & 15);
 }
 
 
@@ -56,8 +56,8 @@ static MACHINE_START( crgolf )
 	state->m_audiocpu = machine.device("audiocpu");
 
 	/* configure the banking */
-	state->subbank("bank1")->configure_entries(0, 16, machine.region("maincpu")->base() + 0x10000, 0x2000);
-	state->subbank("bank1")->set_entry(0);
+	state->membank("bank1")->configure_entries(0, 16, machine.region("maincpu")->base() + 0x10000, 0x2000);
+	state->membank("bank1")->set_entry(0);
 
 	/* register for save states */
 	state->save_item(NAME(state->m_port_select));

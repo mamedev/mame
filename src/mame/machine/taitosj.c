@@ -19,8 +19,8 @@
 MACHINE_START( taitosj )
 {
 	taitosj_state *state = machine.driver_data<taitosj_state>();
-	state->subbank("bank1")->configure_entry(0, machine.region("maincpu")->base() + 0x6000);
-	state->subbank("bank1")->configure_entry(1, machine.region("maincpu")->base() + 0x10000);
+	state->membank("bank1")->configure_entry(0, machine.region("maincpu")->base() + 0x6000);
+	state->membank("bank1")->configure_entry(1, machine.region("maincpu")->base() + 0x10000);
 
 	state->save_item(NAME(state->m_fromz80));
 	state->save_item(NAME(state->m_toz80));
@@ -58,8 +58,8 @@ WRITE8_MEMBER(taitosj_state::taitosj_bankswitch_w)
 {
 	coin_lockout_global_w(machine(), ~data & 1);
 
-	if(data & 0x80) subbank("bank1")->set_entry(1);
-	else subbank("bank1")->set_entry(0);
+	if(data & 0x80) membank("bank1")->set_entry(1);
+	else membank("bank1")->set_entry(0);
 }
 
 

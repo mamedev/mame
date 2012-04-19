@@ -264,7 +264,7 @@ static WRITE8_DEVICE_HANDLER( rom_bank_select_w )
 	//popmessage("%08x %02x",((data & 0x3f) * 0x4000),data);
 
 //  mame_printf_debug("ROM_BANK 0x8000 - %X @%X\n",data,cpu_get_previouspc(&space->device()));
-	state->subbank("bank2")->set_base(region_base + (data&0x3f ) * 0x4000);
+	state->membank("bank2")->set_base(region_base + (data&0x3f ) * 0x4000);
 
 	state->m_msm_nmi_mask = data & 0x40;
 	state->flip_screen_set(data & 0x80);
@@ -275,7 +275,7 @@ WRITE8_MEMBER(suprgolf_state::rom2_bank_select_w)
 	UINT8 *region_base = machine().region("user2")->base();
 //  mame_printf_debug("ROM_BANK 0x4000 - %X @%X\n",data,cpu_get_previouspc(&space.device()));
 
-	subbank("bank1")->set_base(region_base + (data&0x0f) * 0x4000);
+	membank("bank1")->set_base(region_base + (data&0x0f) * 0x4000);
 
 	if(data & 0xf0)
 		printf("Rom bank select 2 with data %02x activated\n",data);

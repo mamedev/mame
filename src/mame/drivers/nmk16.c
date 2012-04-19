@@ -277,7 +277,7 @@ WRITE8_MEMBER(nmk16_state::macross2_sound_bank_w)
 {
 	UINT8 *rom = machine().region("audiocpu")->base() + 0x10000;
 
-	subbank("bank1")->set_base(rom + (data & 0x07) * 0x4000);
+	membank("bank1")->set_base(rom + (data & 0x07) * 0x4000);
 }
 
 WRITE8_MEMBER(nmk16_state::tharrier_oki6295_bankswitch_0_w)
@@ -1067,7 +1067,7 @@ WRITE8_MEMBER(nmk16_state::okibank_w)
 
 WRITE8_MEMBER(nmk16_state::raphero_sound_rombank_w)
 {
-	subbank("bank1")->set_base(machine().region("audiocpu")->base() + 0x10000 + (data & 0x07) * 0x4000);
+	membank("bank1")->set_base(machine().region("audiocpu")->base() + 0x10000 + (data & 0x07) * 0x4000);
 }
 
 static ADDRESS_MAP_START( raphero_sound_mem_map, AS_PROGRAM, 8, nmk16_state )

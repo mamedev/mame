@@ -380,9 +380,9 @@ static void on_scorpion2_reset(running_machine &machine)
 	{
 		UINT8 *rom = machine.region("maincpu")->base();
 
-		state->subbank("bank1")->configure_entries(0, 4, &rom[0x00000], 0x02000);
+		state->membank("bank1")->configure_entries(0, 4, &rom[0x00000], 0x02000);
 
-		state->subbank("bank1")->set_entry(3);
+		state->membank("bank1")->set_entry(3);
 	}
 }
 
@@ -476,7 +476,7 @@ static NVRAM_HANDLER( bfm_sc2 )
 
 WRITE8_MEMBER(bfm_sc2_state::bankswitch_w)
 {
-	subbank("bank1")->set_entry(data & 0x03);
+	membank("bank1")->set_entry(data & 0x03);
 }
 
 ///////////////////////////////////////////////////////////////////////////

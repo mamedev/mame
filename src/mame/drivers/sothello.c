@@ -89,7 +89,7 @@ WRITE8_MEMBER(sothello_state::bank_w)
         case 4: bank=2; break;
         case 8: bank=3; break;
     }
-    subbank("bank1")->set_base(&RAM[bank*0x4000+0x10000]);
+    membank("bank1")->set_base(&RAM[bank*0x4000+0x10000]);
 }
 
 static TIMER_CALLBACK( subcpu_suspend )

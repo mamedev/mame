@@ -169,7 +169,7 @@ static void csplayh5_soundbank_w(running_machine &machine, int data)
 {
 	UINT8 *SNDROM = machine.region("audiocpu")->base();
 
-	machine.root_device().subbank("bank1")->set_base(&SNDROM[0x08000 + (0x8000 * (data & 0x03))]);
+	machine.root_device().membank("bank1")->set_base(&SNDROM[0x08000 + (0x8000 * (data & 0x03))]);
 }
 
 READ8_MEMBER(csplayh5_state::csplayh5_sound_r)

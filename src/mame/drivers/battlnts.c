@@ -40,7 +40,7 @@ WRITE8_MEMBER(battlnts_state::battlnts_sh_irqtrigger_w)
 WRITE8_MEMBER(battlnts_state::battlnts_bankswitch_w)
 {
 	/* bits 6 & 7 = bank number */
-	subbank("bank1")->set_entry((data & 0xc0) >> 6);
+	membank("bank1")->set_entry((data & 0xc0) >> 6);
 
 	/* bits 4 & 5 = coin counters */
 	coin_counter_w(machine(), 0, data & 0x10);
@@ -226,7 +226,7 @@ static MACHINE_START( battlnts )
 	battlnts_state *state = machine.driver_data<battlnts_state>();
 	UINT8 *ROM = machine.region("maincpu")->base();
 
-	state->subbank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x4000);
+	state->membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x4000);
 
 	state->m_audiocpu = machine.device("audiocpu");
 	state->m_k007342 = machine.device("k007342");

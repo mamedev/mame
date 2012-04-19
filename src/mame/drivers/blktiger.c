@@ -54,7 +54,7 @@ WRITE8_MEMBER(blktiger_state::blktiger_to_main_w)
 
 WRITE8_MEMBER(blktiger_state::blktiger_bankswitch_w)
 {
-	subbank("bank1")->set_entry(data & 0x0f);
+	membank("bank1")->set_entry(data & 0x0f);
 }
 
 WRITE8_MEMBER(blktiger_state::blktiger_coinlockout_w)
@@ -283,7 +283,7 @@ static MACHINE_START( blktiger )
 	state->m_mcu = machine.device("mcu");
 
 	/* configure bankswitching */
-	state->subbank("bank1")->configure_entries(0, 16, machine.region("maincpu")->base() + 0x10000, 0x4000);
+	state->membank("bank1")->configure_entries(0, 16, machine.region("maincpu")->base() + 0x10000, 0x4000);
 
 	state->save_item(NAME(state->m_scroll_bank));
 	state->save_item(NAME(state->m_screen_layout));
@@ -301,7 +301,7 @@ static MACHINE_RESET( blktiger )
 	blktiger_state *state = machine.driver_data<blktiger_state>();
 
 	/* configure bankswitching */
-	state->subbank("bank1")->configure_entries(0, 16, machine.region("maincpu")->base() + 0x10000, 0x4000);
+	state->membank("bank1")->configure_entries(0, 16, machine.region("maincpu")->base() + 0x10000, 0x4000);
 
 	state->m_scroll_x[0] = 0;
 	state->m_scroll_x[1] = 0;

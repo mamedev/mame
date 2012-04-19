@@ -49,7 +49,7 @@ Notes:
 WRITE8_MEMBER(nbmj8991_state::nbmj8991_soundbank_w)
 {
 	if (!(data & 0x80)) soundlatch_clear_byte_w(space, 0, 0);
-	subbank("bank1")->set_entry(data & 0x03);
+	membank("bank1")->set_entry(data & 0x03);
 }
 
 WRITE8_MEMBER(nbmj8991_state::nbmj8991_sound_w)
@@ -70,8 +70,8 @@ static MACHINE_RESET( nbmj8991 )
 	device_t *audiocpu = machine.device("audiocpu");
 	if (audiocpu != NULL && audiocpu->type() == Z80)
 	{
-		machine.root_device().subbank("bank1")->configure_entries(0, 4, machine.region("audiocpu")->base() + 0x8000, 0x8000);
-		machine.root_device().subbank("bank1")->set_entry(0);
+		machine.root_device().membank("bank1")->configure_entries(0, 4, machine.region("audiocpu")->base() + 0x8000, 0x8000);
+		machine.root_device().membank("bank1")->set_entry(0);
 	}
 	MACHINE_RESET_CALL(nb1413m3);
 }

@@ -548,7 +548,7 @@ static void machine_init_common(running_machine &machine)
 static MACHINE_START( superqix )
 {
 	/* configure the banks */
-	machine.root_device().subbank("bank1")->configure_entries(0, 4, machine.region("maincpu")->base() + 0x10000, 0x4000);
+	machine.root_device().membank("bank1")->configure_entries(0, 4, machine.region("maincpu")->base() + 0x10000, 0x4000);
 
 	machine_init_common(machine);
 }
@@ -556,7 +556,7 @@ static MACHINE_START( superqix )
 static MACHINE_START( pbillian )
 {
 	/* configure the banks */
-	machine.root_device().subbank("bank1")->configure_entries(0, 2, machine.region("maincpu")->base() + 0x10000, 0x4000);
+	machine.root_device().membank("bank1")->configure_entries(0, 2, machine.region("maincpu")->base() + 0x10000, 0x4000);
 
 	machine_init_common(machine);
 }

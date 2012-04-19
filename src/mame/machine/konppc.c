@@ -118,7 +118,7 @@ void set_cgboard_texture_bank(running_machine &machine, int board, const char *b
 {
 	texture_bank[board] = bank;
 
-	machine.root_device().subbank(bank)->configure_entries(0, 2, rom, 0x800000);
+	machine.root_device().membank(bank)->configure_entries(0, 2, rom, 0x800000);
 }
 
 /*****************************************************************************/
@@ -254,7 +254,7 @@ static void dsp_comm_sharc_w(address_space *space, int board, int offset, UINT32
 				{
 					int offset = (data & 0x08) ? 1 : 0;
 
-					space->machine().root_device().subbank(texture_bank[board])->set_entry(offset);
+					space->machine().root_device().membank(texture_bank[board])->set_entry(offset);
 				}
 			}
 			break;
@@ -268,7 +268,7 @@ static void dsp_comm_sharc_w(address_space *space, int board, int offset, UINT32
 				{
 					int offset = (data & 0x08) ? 1 : 0;
 
-					space->machine().root_device().subbank(texture_bank[board])->set_entry(offset);
+					space->machine().root_device().membank(texture_bank[board])->set_entry(offset);
 				}
 			}
 			break;

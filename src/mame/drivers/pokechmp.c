@@ -57,31 +57,31 @@ WRITE8_MEMBER(pokechmp_state::pokechmp_bank_w)
 
 	if (data == 0x00)
 	{
-		subbank("bank1")->set_base(&RAM[0x10000]);
-		subbank("bank2")->set_base(&RAM[0x12000]);
+		membank("bank1")->set_base(&RAM[0x10000]);
+		membank("bank2")->set_base(&RAM[0x12000]);
 	}
 	if (data == 0x01)
 	{
-		subbank("bank1")->set_base(&RAM[0x14000]);
-		subbank("bank2")->set_base(&RAM[0x16000]);
+		membank("bank1")->set_base(&RAM[0x14000]);
+		membank("bank2")->set_base(&RAM[0x16000]);
 	}
 	if (data == 0x02)
 	{
-		subbank("bank1")->set_base(&RAM[0x20000]);
-		subbank("bank2")->set_base(&RAM[0x22000]);
+		membank("bank1")->set_base(&RAM[0x20000]);
+		membank("bank2")->set_base(&RAM[0x22000]);
 	}
 
 	if (data == 0x03)
 	{
-		subbank("bank1")->set_base(&RAM[0x04000]);
-		subbank("bank2")->set_base(&RAM[0x06000]);
+		membank("bank1")->set_base(&RAM[0x04000]);
+		membank("bank2")->set_base(&RAM[0x06000]);
 	}
 }
 
 #ifdef UNUSED_FUNCTION
 WRITE8_MEMBER(pokechmp_state::pokechmp_sound_bank_w)
 {
-	subbank("bank3")->set_entry((data >> 2) & 1);
+	membank("bank3")->set_entry((data >> 2) & 1);
 }
 #endif
 
@@ -262,7 +262,7 @@ MACHINE_CONFIG_END
 
 static DRIVER_INIT( pokechmp )
 {
-	machine.root_device().subbank("bank3")->configure_entries(0, 2, machine.region("audiocpu")->base() + 0x10000, 0x4000);
+	machine.root_device().membank("bank3")->configure_entries(0, 2, machine.region("audiocpu")->base() + 0x10000, 0x4000);
 }
 
 

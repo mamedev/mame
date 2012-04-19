@@ -141,7 +141,7 @@ WRITE8_MEMBER(_1943_state::c1943_c804_w)
 	coin_counter_w(machine(), 1, data & 0x02);
 
 	/* bits 2, 3 and 4 select the ROM bank */
-	subbank("bank1")->set_entry((data & 0x1c) >> 2);
+	membank("bank1")->set_entry((data & 0x1c) >> 2);
 
 	/* bit 5 resets the sound CPU - we ignore it */
 

@@ -333,7 +333,7 @@ WRITE8_MEMBER(multfish_state::multfish_vid_w)
 
 WRITE8_MEMBER(multfish_state::multfish_bank_w)
 {
-	subbank("bank1")->set_entry(data & 0x0f);
+	membank("bank1")->set_entry(data & 0x0f);
 }
 
 static READ8_DEVICE_HANDLER( multfish_timekeeper_r )
@@ -1009,8 +1009,8 @@ static MACHINE_RESET( multfish )
 {
 	multfish_state *state = machine.driver_data<multfish_state>();
 
-	state->subbank("bank1")->configure_entries(0, 16, machine.region("maincpu")->base(), 0x4000);
-	state->subbank("bank1")->set_entry(0);
+	state->membank("bank1")->configure_entries(0, 16, machine.region("maincpu")->base(), 0x4000);
+	state->membank("bank1")->set_entry(0);
 
 	state->m_disp_enable = 0;
 	state->m_rambk = 0;

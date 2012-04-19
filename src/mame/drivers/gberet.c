@@ -122,7 +122,7 @@ WRITE8_MEMBER(gberet_state::mrgoemon_coin_counter_w)
 	coin_counter_w(machine(), 1, data & 2);
 
 	/* bits 5-7 = ROM bank select */
-	subbank("bank1")->set_entry(((data & 0xe0) >> 5));
+	membank("bank1")->set_entry(((data & 0xe0) >> 5));
 }
 
 WRITE8_MEMBER(gberet_state::gberet_flipscreen_w)
@@ -574,7 +574,7 @@ ROM_END
 static DRIVER_INIT( mrgoemon )
 {
 	UINT8 *ROM = machine.region("maincpu")->base();
-	machine.root_device().subbank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x800);
+	machine.root_device().membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x800);
 }
 
 

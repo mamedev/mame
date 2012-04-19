@@ -193,9 +193,9 @@ static MACHINE_START( surpratk )
 	surpratk_state *state = machine.driver_data<surpratk_state>();
 	UINT8 *ROM = machine.region("maincpu")->base();
 
-	state->subbank("bank1")->configure_entries(0, 28, &ROM[0x10000], 0x2000);
-	state->subbank("bank1")->configure_entries(28, 4, &ROM[0x08000], 0x2000);
-	state->subbank("bank1")->set_entry(0);
+	state->membank("bank1")->configure_entries(0, 28, &ROM[0x10000], 0x2000);
+	state->membank("bank1")->configure_entries(28, 4, &ROM[0x08000], 0x2000);
+	state->membank("bank1")->set_entry(0);
 
 	state->m_generic_paletteram_8.allocate(0x1000);
 
@@ -323,7 +323,7 @@ ROM_END
 static KONAMI_SETLINES_CALLBACK( surpratk_banking )
 {
 	logerror("%04x: setlines %02x\n",cpu_get_pc(device), lines);
-	device->machine().root_device().subbank("bank1")->set_entry(lines & 0x1f);
+	device->machine().root_device().membank("bank1")->set_entry(lines & 0x1f);
 }
 
 

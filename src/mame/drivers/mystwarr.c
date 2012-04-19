@@ -557,7 +557,7 @@ ADDRESS_MAP_END
 static void reset_sound_region(running_machine &machine)
 {
 	mystwarr_state *state = machine.driver_data<mystwarr_state>();
-	state->subbank("bank2")->set_base(machine.region("soundcpu")->base() + 0x10000 + state->m_cur_sound_region*0x4000);
+	state->membank("bank2")->set_base(machine.region("soundcpu")->base() + 0x10000 + state->m_cur_sound_region*0x4000);
 }
 
 WRITE8_MEMBER(mystwarr_state::sound_bankswitch_w)

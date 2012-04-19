@@ -67,14 +67,14 @@ WRITE8_MEMBER(slapfght_state::slapfight_port_08_w)
 {
 	UINT8 *RAM = machine().region("maincpu")->base();
 
-	subbank("bank1")->set_base(&RAM[0x10000]);
+	membank("bank1")->set_base(&RAM[0x10000]);
 }
 
 WRITE8_MEMBER(slapfght_state::slapfight_port_09_w)
 {
 	UINT8 *RAM = machine().region("maincpu")->base();
 
-	subbank("bank1")->set_base(&RAM[0x14000]);
+	membank("bank1")->set_base(&RAM[0x14000]);
 }
 
 

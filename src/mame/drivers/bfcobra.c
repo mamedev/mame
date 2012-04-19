@@ -1023,15 +1023,15 @@ INLINE void z80_bank(running_machine &machine, int num, int data)
 	{
 		UINT32 offset = ((state->m_bank_data[0] >> 1) * 0x20000) + ((0x4000 * data) ^ ((state->m_bank_data[0] & 1) ? 0 : 0x10000));
 
-		state->subbank(bank_names[num - 1])->set_base(machine.region("user1")->base() + offset);
+		state->membank(bank_names[num - 1])->set_base(machine.region("user1")->base() + offset);
 	}
 	else if (data < 0x10)
 	{
-		state->subbank(bank_names[num - 1])->set_base(&state->m_video_ram[(data - 0x08) * 0x4000]);
+		state->membank(bank_names[num - 1])->set_base(&state->m_video_ram[(data - 0x08) * 0x4000]);
 	}
 	else
 	{
-		state->subbank(bank_names[num - 1])->set_base(&state->m_work_ram[(data - 0x10) * 0x4000]);
+		state->membank(bank_names[num - 1])->set_base(&state->m_work_ram[(data - 0x10) * 0x4000]);
 	}
 }
 
@@ -1735,7 +1735,7 @@ static DRIVER_INIT( bfcobra )
 	state->m_bank_data[3] = 0;
 
 	/* Fixed 16kB ROM region */
-	state->subbank("bank4")->set_base(machine.region("user1")->base());
+	state->membank("bank4")->set_base(machine.region("user1")->base());
 
 	/* TODO: Properly sort out the data ACIA */
 	state->m_data_r = 1;

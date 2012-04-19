@@ -146,7 +146,7 @@ WRITE_LINE_MEMBER(williams_cvsd_sound_device::reset_write)
 
 WRITE8_MEMBER(williams_cvsd_sound_device::bank_select_w)
 {
-	subbank("rombank")->set_entry(data & 0x0f);
+	membank("rombank")->set_entry(data & 0x0f);
 }
 
 
@@ -311,9 +311,9 @@ void williams_cvsd_sound_device::device_start()
         //  D3 -> A16
         //
 		offs_t offset = 0x8000 * ((bank >> 2) & 3) + 0x20000 * (bank & 3);
-		subbank("rombank")->configure_entry(bank, &rom[0x10000 + offset]);
+		membank("rombank")->configure_entry(bank, &rom[0x10000 + offset]);
 	}
-	subbank("rombank")->set_entry(0);
+	membank("rombank")->set_entry(0);
 
 	// reset the IRQ state
 	m_pia->ca1_w(1);
@@ -427,7 +427,7 @@ WRITE_LINE_MEMBER(williams_narc_sound_device::reset_write)
 
 WRITE8_MEMBER(williams_narc_sound_device::master_bank_select_w)
 {
-	subbank("masterbank")->set_entry(data & 0x0f);
+	membank("masterbank")->set_entry(data & 0x0f);
 }
 
 
@@ -438,7 +438,7 @@ WRITE8_MEMBER(williams_narc_sound_device::master_bank_select_w)
 
 WRITE8_MEMBER(williams_narc_sound_device::slave_bank_select_w)
 {
-	subbank("slavebank")->set_entry(data & 0x0f);
+	membank("slavebank")->set_entry(data & 0x0f);
 }
 
 
@@ -659,9 +659,9 @@ void williams_narc_sound_device::device_start()
         //  D3 -> A16
         //
 		offs_t offset = 0x8000 * (bank & 1) + 0x10000 * ((bank >> 3) & 1) + 0x20000 * ((bank >> 1) & 3);
-		subbank("masterbank")->configure_entry(bank, &rom[0x10000 + offset]);
+		membank("masterbank")->configure_entry(bank, &rom[0x10000 + offset]);
 	}
-	subbank("masterupper")->set_base(&rom[0x10000 + 0x4000 + 0x8000 + 0x10000 + 0x20000 * 3]);
+	membank("masterupper")->set_base(&rom[0x10000 + 0x4000 + 0x8000 + 0x10000 + 0x20000 * 3]);
 
 	// configure slave CPU banks
 	rom = subregion("cpu1")->base();
@@ -673,9 +673,9 @@ void williams_narc_sound_device::device_start()
         //  D3 -> A16
         //
 		offs_t offset = 0x8000 * (bank & 1) + 0x10000 * ((bank >> 3) & 1) + 0x20000 * ((bank >> 1) & 3);
-		subbank("slavebank")->configure_entry(bank, &rom[0x10000 + offset]);
+		membank("slavebank")->configure_entry(bank, &rom[0x10000 + offset]);
 	}
-	subbank("slaveupper")->set_base(&rom[0x10000 + 0x4000 + 0x8000 + 0x10000 + 0x20000 * 3]);
+	membank("slaveupper")->set_base(&rom[0x10000 + 0x4000 + 0x8000 + 0x10000 + 0x20000 * 3]);
 
 	// register for save states
 	save_item(NAME(m_latch));
@@ -800,7 +800,7 @@ READ_LINE_MEMBER(williams_adpcm_sound_device::irq_read)
 
 WRITE8_MEMBER(williams_adpcm_sound_device::bank_select_w)
 {
-	subbank("rombank")->set_entry(data & 0x07);
+	membank("rombank")->set_entry(data & 0x07);
 }
 
 
@@ -811,7 +811,7 @@ WRITE8_MEMBER(williams_adpcm_sound_device::bank_select_w)
 
 WRITE8_MEMBER(williams_adpcm_sound_device::oki6295_bank_select_w)
 {
-	subbank("okibank")->set_entry(data & 7);
+	membank("okibank")->set_entry(data & 7);
 }
 
 
@@ -930,20 +930,20 @@ void williams_adpcm_sound_device::device_start()
 {
 	// configure banks
 	UINT8 *rom = subregion("cpu")->base();
-	subbank("rombank")->configure_entries(0, 8, &rom[0x10000], 0x8000);
-	subbank("romupper")->set_base(&rom[0x10000 + 0x4000 + 7 * 0x8000]);
+	membank("rombank")->configure_entries(0, 8, &rom[0x10000], 0x8000);
+	membank("romupper")->set_base(&rom[0x10000 + 0x4000 + 7 * 0x8000]);
 
 	// expand ADPCM data
 	rom = subregion("oki")->base();
 	// it is assumed that U12 is loaded @ 0x00000 and U13 is loaded @ 0x40000
-	subbank("okibank")->configure_entry(0, &rom[0x40000]);
-	subbank("okibank")->configure_entry(1, &rom[0x40000]);
-	subbank("okibank")->configure_entry(2, &rom[0x20000]);
-	subbank("okibank")->configure_entry(3, &rom[0x00000]);
-	subbank("okibank")->configure_entry(4, &rom[0xe0000]);
-	subbank("okibank")->configure_entry(5, &rom[0xc0000]);
-	subbank("okibank")->configure_entry(6, &rom[0xa0000]);
-	subbank("okibank")->configure_entry(7, &rom[0x80000]);
+	membank("okibank")->configure_entry(0, &rom[0x40000]);
+	membank("okibank")->configure_entry(1, &rom[0x40000]);
+	membank("okibank")->configure_entry(2, &rom[0x20000]);
+	membank("okibank")->configure_entry(3, &rom[0x00000]);
+	membank("okibank")->configure_entry(4, &rom[0xe0000]);
+	membank("okibank")->configure_entry(5, &rom[0xc0000]);
+	membank("okibank")->configure_entry(6, &rom[0xa0000]);
+	membank("okibank")->configure_entry(7, &rom[0x80000]);
 
 	// register for save states
 	save_item(NAME(m_latch));

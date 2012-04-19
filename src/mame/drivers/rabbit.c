@@ -526,9 +526,9 @@ WRITE32_MEMBER(rabbit_state::rabbit_rombank_w)
 	printf("rabbit rombank %08x\n",data);
 	bank = data & 0x3ff;
 
-	subbank("bank1")->set_base(&dataroms[0x40000*(bank&0x3ff)]);
+	membank("bank1")->set_base(&dataroms[0x40000*(bank&0x3ff)]);
 #else
-	subbank("bank1")->set_base(&dataroms[0]);
+	membank("bank1")->set_base(&dataroms[0]);
 #endif
 
 }

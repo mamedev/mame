@@ -188,7 +188,7 @@ static WRITE8_HANDLER( pipedrm_bankswitch_w )
     */
 
 	/* set the memory bank on the Z80 using the low 3 bits */
-	state->subbank("bank1")->set_entry(data & 0x7);
+	state->membank("bank1")->set_entry(data & 0x7);
 
 	/* map to the fromance gfx register */
 	state->fromance_gfxreg_w(*space, offset, ((data >> 6) & 0x01) | 	/* flipscreen */
@@ -198,7 +198,7 @@ static WRITE8_HANDLER( pipedrm_bankswitch_w )
 
 static WRITE8_HANDLER( sound_bankswitch_w )
 {
-	space->machine().root_device().subbank("bank2")->set_entry(data & 0x01);
+	space->machine().root_device().membank("bank2")->set_entry(data & 0x01);
 }
 
 
@@ -595,12 +595,12 @@ static MACHINE_START( pipedrm )
 	state->m_subcpu = machine.device("sub");
 
 	/* initialize main Z80 bank */
-	state->subbank("bank1")->configure_entries(0, 8, machine.region("maincpu")->base() + 0x10000, 0x2000);
-	state->subbank("bank1")->set_entry(0);
+	state->membank("bank1")->configure_entries(0, 8, machine.region("maincpu")->base() + 0x10000, 0x2000);
+	state->membank("bank1")->set_entry(0);
 
 	/* initialize sound bank */
-	state->subbank("bank2")->configure_entries(0, 2, machine.region("sub")->base() + 0x10000, 0x8000);
-	state->subbank("bank2")->set_entry(0);
+	state->membank("bank2")->configure_entries(0, 2, machine.region("sub")->base() + 0x10000, 0x8000);
+	state->membank("bank2")->set_entry(0);
 
 	/* state save */
 	state->save_item(NAME(state->m_pending_command));

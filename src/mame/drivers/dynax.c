@@ -266,12 +266,12 @@ WRITE8_MEMBER(dynax_state::hanamai_keyboard_w)
 
 WRITE8_MEMBER(dynax_state::dynax_rombank_w)
 {
-	subbank("bank1")->set_entry(data & 0x0f);
+	membank("bank1")->set_entry(data & 0x0f);
 }
 
 WRITE8_MEMBER(dynax_state::jantouki_sound_rombank_w)
 {
-	subbank("bank2")->set_entry(data);
+	membank("bank2")->set_entry(data);
 }
 
 
@@ -281,7 +281,7 @@ WRITE8_MEMBER(dynax_state::hnoridur_rombank_w)
 
 	//logerror("%04x: rom bank = %02x\n", cpu_get_pc(&space.device()), data);
 	if (data < bank_n)
-		subbank("bank1")->set_entry(data);
+		membank("bank1")->set_entry(data);
 	else
 		logerror("rom_bank = %02x (larger than the maximum bank %02x)\n", data, bank_n);
 	m_hnoridur_bank = data;
@@ -753,7 +753,7 @@ WRITE8_MEMBER(dynax_state::yarunara_rombank_w)
 
        //logerror("%04x: rom bank = %02x\n", cpu_get_pc(&space.device()), data);
        if (data < bank_n)
-               subbank("bank1")->set_entry(data);
+               membank("bank1")->set_entry(data);
        else
                logerror("rom_bank = %02x (larger than the maximum bank %02x)\n",data, bank_n);
        m_hnoridur_bank = data;
@@ -969,7 +969,7 @@ READ8_MEMBER(dynax_state::jantouki_blitter_busy_r)
 
 WRITE8_MEMBER(dynax_state::jantouki_rombank_w)
 {
-	subbank("bank1")->set_entry(data & 0x0f);
+	membank("bank1")->set_entry(data & 0x0f);
 	set_led_status(machine(), 0, data & 0x10);	// maybe
 }
 
@@ -1190,7 +1190,7 @@ READ8_MEMBER(dynax_state::htengoku_coin_r)
 WRITE8_MEMBER(dynax_state::htengoku_rombank_w)
 {
 
-	subbank("bank1")->set_entry(data & 0x07);
+	membank("bank1")->set_entry(data & 0x07);
 	m_hnoridur_bank = data;
 }
 
@@ -4240,7 +4240,7 @@ static MACHINE_RESET( dynax )
 static MACHINE_START( hanamai )
 {
 	UINT8 *ROM = machine.region("maincpu")->base();
-	machine.root_device().subbank("bank1")->configure_entries(0, 0x10, &ROM[0x8000], 0x8000);
+	machine.root_device().membank("bank1")->configure_entries(0, 0x10, &ROM[0x8000], 0x8000);
 
 	MACHINE_START_CALL(dynax);
 }
@@ -4250,7 +4250,7 @@ static MACHINE_START( hnoridur )
 	UINT8 *ROM = machine.region("maincpu")->base();
 	int bank_n = (machine.region("maincpu")->bytes() - 0x10000) / 0x8000;
 
-	machine.root_device().subbank("bank1")->configure_entries(0, bank_n, &ROM[0x10000], 0x8000);
+	machine.root_device().membank("bank1")->configure_entries(0, bank_n, &ROM[0x10000], 0x8000);
 
 	MACHINE_START_CALL(dynax);
 }
@@ -4259,7 +4259,7 @@ static MACHINE_START( htengoku )
 {
 	UINT8 *ROM = machine.region("maincpu")->base();
 
-	machine.root_device().subbank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x8000);
+	machine.root_device().membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x8000);
 
 	MACHINE_START_CALL(dynax);
 }
@@ -4633,8 +4633,8 @@ static MACHINE_START( jantouki )
 	UINT8 *MAIN = machine.region("maincpu")->base();
 	UINT8 *SOUND = machine.region("soundcpu")->base();
 
-	state->subbank("bank1")->configure_entries(0, 0x10, &MAIN[0x8000],  0x8000);
-	state->subbank("bank2")->configure_entries(0, 12,   &SOUND[0x8000], 0x8000);
+	state->membank("bank1")->configure_entries(0, 0x10, &MAIN[0x8000],  0x8000);
+	state->membank("bank2")->configure_entries(0, 12,   &SOUND[0x8000], 0x8000);
 
 	state->m_top_scr = machine.device("top");
 	state->m_bot_scr = machine.device("bottom");

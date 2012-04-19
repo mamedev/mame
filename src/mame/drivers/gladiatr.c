@@ -196,7 +196,7 @@ WRITE8_MEMBER(gladiatr_state::gladiatr_bankswitch_w)
 {
 	UINT8 *rom = machine().region("maincpu")->base() + 0x10000;
 
-	subbank("bank1")->set_base(rom + 0x6000 * (data & 0x01));
+	membank("bank1")->set_base(rom + 0x6000 * (data & 0x01));
 }
 
 
@@ -257,7 +257,7 @@ static MACHINE_RESET( gladiator )
 	/* 6809 bank memory set */
 	{
 		UINT8 *rom = machine.region("audiocpu")->base() + 0x10000;
-		machine.root_device().subbank("bank2")->set_base(rom);
+		machine.root_device().membank("bank2")->set_base(rom);
 		machine.device("audiocpu")->reset();
 	}
 }
@@ -282,7 +282,7 @@ static WRITE8_DEVICE_HANDLER( glad_adpcm_w )
 	UINT8 *rom = device->machine().region("audiocpu")->base() + 0x10000;
 
 	/* bit6 = bank offset */
-	device->machine().root_device().subbank("bank2")->set_base(rom + ((data & 0x40) ? 0xc000 : 0));
+	device->machine().root_device().membank("bank2")->set_base(rom + ((data & 0x40) ? 0xc000 : 0));
 
 	msm5205_data_w(device,data);         /* bit0..3  */
 	msm5205_reset_w(device,(data>>5)&1); /* bit 5    */
@@ -988,7 +988,7 @@ static DRIVER_INIT( gladiatr )
 
 	/* make sure bank is valid in cpu-reset */
 	rom = machine.region("audiocpu")->base() + 0x10000;
-	machine.root_device().subbank("bank2")->set_base(rom);
+	machine.root_device().membank("bank2")->set_base(rom);
 }
 
 

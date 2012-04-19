@@ -380,7 +380,7 @@ WRITE32_MEMBER(psikyosh_state::psikyosh_vidregs_w)
 	if (offset == 4) /* Configure bank for gfx test */
 	{
 		if (ACCESSING_BITS_0_15)	// Bank
-			subbank("bank2")->set_entry(m_vidregs[offset] & 0xfff);
+			membank("bank2")->set_entry(m_vidregs[offset] & 0xfff);
 	}
 }
 
@@ -799,7 +799,7 @@ static MACHINE_START( psikyosh )
 
 	state->m_maincpu = machine.device("maincpu");
 
-	state->subbank("bank2")->configure_entries(0, 0x1000, machine.region("gfx1")->base(), 0x20000);
+	state->membank("bank2")->configure_entries(0, 0x1000, machine.region("gfx1")->base(), 0x20000);
 }
 
 
@@ -1219,7 +1219,7 @@ static DRIVER_INIT( s1945ii )
 static DRIVER_INIT( daraku )
 {
 	UINT8 *RAM = machine.region("maincpu")->base();
-	machine.root_device().subbank("bank1")->set_base(&RAM[0x100000]);
+	machine.root_device().membank("bank1")->set_base(&RAM[0x100000]);
 	sh2drc_set_options(machine.device("maincpu"), SH2DRC_FASTEST_OPTIONS);
 }
 
@@ -1231,14 +1231,14 @@ static DRIVER_INIT( sbomberb )
 static DRIVER_INIT( gunbird2 )
 {
 	UINT8 *RAM = machine.region("maincpu")->base();
-	machine.root_device().subbank("bank1")->set_base(&RAM[0x100000]);
+	machine.root_device().membank("bank1")->set_base(&RAM[0x100000]);
 	sh2drc_set_options(machine.device("maincpu"), SH2DRC_FASTEST_OPTIONS);
 }
 
 static DRIVER_INIT( s1945iii )
 {
 	UINT8 *RAM = machine.region("maincpu")->base();
-	machine.root_device().subbank("bank1")->set_base(&RAM[0x100000]);
+	machine.root_device().membank("bank1")->set_base(&RAM[0x100000]);
 	sh2drc_set_options(machine.device("maincpu"), SH2DRC_FASTEST_OPTIONS);
 }
 

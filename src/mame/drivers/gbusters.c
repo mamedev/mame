@@ -270,8 +270,8 @@ static MACHINE_START( gbusters )
 	gbusters_state *state = machine.driver_data<gbusters_state>();
 	UINT8 *ROM = machine.region("maincpu")->base();
 
-	state->subbank("bank1")->configure_entries(0, 16, &ROM[0x10000], 0x2000);
-	state->subbank("bank1")->set_entry(0);
+	state->membank("bank1")->configure_entries(0, 16, &ROM[0x10000], 0x2000);
+	state->membank("bank1")->set_entry(0);
 
 	state->m_generic_paletteram_8.allocate(0x800);
 
@@ -425,7 +425,7 @@ ROM_END
 static KONAMI_SETLINES_CALLBACK( gbusters_banking )
 {
 	/* bits 0-3 ROM bank */
-	device->machine().root_device().subbank("bank1")->set_entry(lines & 0x0f);
+	device->machine().root_device().membank("bank1")->set_entry(lines & 0x0f);
 
 	if (lines & 0xf0)
 	{

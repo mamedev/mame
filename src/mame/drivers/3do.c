@@ -135,14 +135,14 @@ static MACHINE_RESET( 3do )
 
 	state->m_maincpu = downcast<legacy_cpu_device*>( machine.device("maincpu") );
 
-	state->subbank("bank2")->set_base(machine.region("user1")->base());
+	state->membank("bank2")->set_base(machine.region("user1")->base());
 
 	/* configure overlay */
-	state->subbank("bank1")->configure_entry(0, state->m_dram);
-	state->subbank("bank1")->configure_entry(1, machine.region("user1")->base());
+	state->membank("bank1")->configure_entry(0, state->m_dram);
+	state->membank("bank1")->configure_entry(1, machine.region("user1")->base());
 
 	/* start with overlay enabled */
-	state->subbank("bank1")->set_entry(1);
+	state->membank("bank1")->set_entry(1);
 
 	_3do_slow2_init(machine);
 	_3do_madam_init(machine);

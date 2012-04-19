@@ -167,7 +167,7 @@ static MACHINE_RESET( taito_dualscreen );
 static void reset_sound_region( running_machine &machine )
 {
 	warriorb_state *state = machine.driver_data<warriorb_state>();
-	state->subbank("bank10")->set_entry(state->m_banknum);
+	state->membank("bank10")->set_entry(state->m_banknum);
 }
 
 WRITE8_MEMBER(warriorb_state::sound_bankswitch_w)
@@ -542,7 +542,7 @@ static MACHINE_START( warriorb )
 {
 	warriorb_state *state = machine.driver_data<warriorb_state>();
 
-	state->subbank("bank10")->configure_entries(0, 8, machine.region("audiocpu")->base() + 0xc000, 0x4000);
+	state->membank("bank10")->configure_entries(0, 8, machine.region("audiocpu")->base() + 0xc000, 0x4000);
 
 	state->m_maincpu = machine.device("maincpu");
 	state->m_audiocpu = machine.device("audiocpu");

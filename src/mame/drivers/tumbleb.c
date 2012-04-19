@@ -808,7 +808,7 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(tumbleb_state::jumppop_z80_bank_w)
 {
-	subbank("bank1")->set_base(machine().region("audiocpu")->base() + 0x10000 + (0x4000 * data));
+	membank("bank1")->set_base(machine().region("audiocpu")->base() + 0x10000 + (0x4000 * data));
 }
 
 static ADDRESS_MAP_START( jumppop_sound_map, AS_PROGRAM, 8, tumbleb_state )

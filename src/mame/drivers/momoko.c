@@ -49,7 +49,7 @@ Stephh's notes (based on the game Z80 code and some tests) :
 
 WRITE8_MEMBER(momoko_state::momoko_bg_read_bank_w)
 {
-	subbank("bank1")->set_entry(data & 0x1f);
+	membank("bank1")->set_entry(data & 0x1f);
 }
 
 /****************************************************************************/
@@ -230,7 +230,7 @@ static MACHINE_START( momoko )
 	momoko_state *state = machine.driver_data<momoko_state>();
 	UINT8 *BG_MAP = machine.region("user1")->base();
 
-	state->subbank("bank1")->configure_entries(0, 32, &BG_MAP[0x0000], 0x1000);
+	state->membank("bank1")->configure_entries(0, 32, &BG_MAP[0x0000], 0x1000);
 
 	state->save_item(NAME(state->m_fg_scrollx));
 	state->save_item(NAME(state->m_fg_scrolly));

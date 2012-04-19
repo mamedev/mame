@@ -1047,15 +1047,15 @@ WRITE8_MEMBER(cave_state::hotdogst_rombank_w)
 	if (data & ~0x0f)
 		logerror("CPU #1 - PC %04X: Bank %02X\n", cpu_get_pc(&space.device()), data);
 
-	subbank("bank2")->set_entry(data & 0x0f);
+	membank("bank2")->set_entry(data & 0x0f);
 }
 
 WRITE8_MEMBER(cave_state::hotdogst_okibank_w)
 {
 	int bank1 = (data >> 0) & 0x3;
 	int bank2 = (data >> 4) & 0x3;
-	subbank("bank3")->set_entry(bank1);
-	subbank("bank4")->set_entry(bank2);
+	membank("bank3")->set_entry(bank1);
+	membank("bank4")->set_entry(bank2);
 }
 
 static ADDRESS_MAP_START( hotdogst_sound_map, AS_PROGRAM, 8, cave_state )
@@ -1084,7 +1084,7 @@ WRITE8_MEMBER(cave_state::mazinger_rombank_w)
 	if (data & ~0x07)
 		logerror("CPU #1 - PC %04X: Bank %02X\n", cpu_get_pc(&space.device()), data);
 
-	subbank("bank2")->set_entry(data & 0x07);
+	membank("bank2")->set_entry(data & 0x07);
 }
 
 static ADDRESS_MAP_START( mazinger_sound_map, AS_PROGRAM, 8, cave_state )
@@ -1115,23 +1115,23 @@ WRITE8_MEMBER(cave_state::metmqstr_rombank_w)
 	if (data & ~0x0f)
 		logerror("CPU #1 - PC %04X: Bank %02X\n", cpu_get_pc(&space.device()), data);
 
-	subbank("bank1")->set_entry(data & 0x0f);
+	membank("bank1")->set_entry(data & 0x0f);
 }
 
 WRITE8_MEMBER(cave_state::metmqstr_okibank0_w)
 {
 	int bank1 = (data >> 0) & 0x7;
 	int bank2 = (data >> 4) & 0x7;
-	subbank("bank3")->set_entry(bank1);
-	subbank("bank4")->set_entry(bank2);
+	membank("bank3")->set_entry(bank1);
+	membank("bank4")->set_entry(bank2);
 }
 
 WRITE8_MEMBER(cave_state::metmqstr_okibank1_w)
 {
 	int bank1 = (data >> 0) & 0x7;
 	int bank2 = (data >> 4) & 0x7;
-	subbank("bank5")->set_entry(bank1);
-	subbank("bank6")->set_entry(bank2);
+	membank("bank5")->set_entry(bank1);
+	membank("bank6")->set_entry(bank2);
 }
 
 static ADDRESS_MAP_START( metmqstr_sound_map, AS_PROGRAM, 8, cave_state )
@@ -1163,7 +1163,7 @@ WRITE8_MEMBER(cave_state::pwrinst2_rombank_w)
 	if (data & ~0x07)
 		logerror("CPU #1 - PC %04X: Bank %02X\n", cpu_get_pc(&space.device()), data);
 
-	subbank("bank1")->set_entry(data & 0x07);
+	membank("bank1")->set_entry(data & 0x07);
 }
 
 static ADDRESS_MAP_START( pwrinst2_sound_map, AS_PROGRAM, 8, cave_state )
@@ -1205,23 +1205,23 @@ WRITE8_MEMBER(cave_state::sailormn_rombank_w)
 	if (data & ~0x1f)
 		logerror("CPU #1 - PC %04X: Bank %02X\n", cpu_get_pc(&space.device()), data);
 
-	subbank("bank1")->set_entry(data & 0x1f);
+	membank("bank1")->set_entry(data & 0x1f);
 }
 
 WRITE8_MEMBER(cave_state::sailormn_okibank0_w)
 {
 	int bank1 = (data >> 0) & 0xf;
 	int bank2 = (data >> 4) & 0xf;
-	subbank("bank3")->set_entry(bank1);
-	subbank("bank4")->set_entry(bank2);
+	membank("bank3")->set_entry(bank1);
+	membank("bank4")->set_entry(bank2);
 }
 
 WRITE8_MEMBER(cave_state::sailormn_okibank1_w)
 {
 	int bank1 = (data >> 0) & 0xf;
 	int bank2 = (data >> 4) & 0xf;
-	subbank("bank5")->set_entry(bank1);
-	subbank("bank6")->set_entry(bank2);
+	membank("bank5")->set_entry(bank1);
+	membank("bank6")->set_entry(bank2);
 }
 
 static ADDRESS_MAP_START( sailormn_sound_map, AS_PROGRAM, 8, cave_state )
@@ -4449,16 +4449,16 @@ static DRIVER_INIT( agallet )
 	UINT8 *ROM = machine.region("audiocpu")->base();
 	init_cave(machine);
 
-	machine.root_device().subbank("bank1")->configure_entries(0, 0x02, &ROM[0x00000], 0x4000);
-	machine.root_device().subbank("bank1")->configure_entries(2, 0x1e, &ROM[0x10000], 0x4000);
+	machine.root_device().membank("bank1")->configure_entries(0, 0x02, &ROM[0x00000], 0x4000);
+	machine.root_device().membank("bank1")->configure_entries(2, 0x1e, &ROM[0x10000], 0x4000);
 
 	ROM = machine.region("oki1")->base();
-	machine.root_device().subbank("bank3")->configure_entries(0, 0x10, &ROM[0x00000], 0x20000);
-	machine.root_device().subbank("bank4")->configure_entries(0, 0x10, &ROM[0x00000], 0x20000);
+	machine.root_device().membank("bank3")->configure_entries(0, 0x10, &ROM[0x00000], 0x20000);
+	machine.root_device().membank("bank4")->configure_entries(0, 0x10, &ROM[0x00000], 0x20000);
 
 	ROM = machine.region("oki2")->base();
-	machine.root_device().subbank("bank5")->configure_entries(0, 0x10, &ROM[0x00000], 0x20000);
-	machine.root_device().subbank("bank6")->configure_entries(0, 0x10, &ROM[0x00000], 0x20000);
+	machine.root_device().membank("bank5")->configure_entries(0, 0x10, &ROM[0x00000], 0x20000);
+	machine.root_device().membank("bank6")->configure_entries(0, 0x10, &ROM[0x00000], 0x20000);
 
 	sailormn_unpack_tiles(machine, "layer2");
 
@@ -4548,12 +4548,12 @@ static DRIVER_INIT( hotdogst )
 
 	init_cave(machine);
 
-	state->subbank("bank2")->configure_entries(0, 0x2, &ROM[0x00000], 0x4000);
-	state->subbank("bank2")->configure_entries(2, 0xe, &ROM[0x10000], 0x4000);
+	state->membank("bank2")->configure_entries(0, 0x2, &ROM[0x00000], 0x4000);
+	state->membank("bank2")->configure_entries(2, 0xe, &ROM[0x10000], 0x4000);
 
 	ROM = machine.region("oki")->base();
-	state->subbank("bank3")->configure_entries(0, 4, &ROM[0x00000], 0x20000);
-	state->subbank("bank4")->configure_entries(0, 4, &ROM[0x00000], 0x20000);
+	state->membank("bank3")->configure_entries(0, 4, &ROM[0x00000], 0x20000);
+	state->membank("bank4")->configure_entries(0, 4, &ROM[0x00000], 0x20000);
 
 	unpack_sprites(machine);
 	state->m_spritetype[0] = 2;	// Normal sprites with different position handling
@@ -4570,12 +4570,12 @@ static DRIVER_INIT( mazinger )
 
 	init_cave(machine);
 
-	state->subbank("bank2")->configure_entries(0, 2, &ROM[0x00000], 0x4000);
-	state->subbank("bank2")->configure_entries(2, 6, &ROM[0x10000], 0x4000);
+	state->membank("bank2")->configure_entries(0, 2, &ROM[0x00000], 0x4000);
+	state->membank("bank2")->configure_entries(2, 6, &ROM[0x10000], 0x4000);
 
 	ROM = machine.region("oki")->base();
-	state->subbank("bank3")->configure_entries(0, 4, &ROM[0x00000], 0x20000);
-	state->subbank("bank4")->configure_entries(0, 4, &ROM[0x00000], 0x20000);
+	state->membank("bank3")->configure_entries(0, 4, &ROM[0x00000], 0x20000);
+	state->membank("bank4")->configure_entries(0, 4, &ROM[0x00000], 0x20000);
 
 	/* decrypt sprites */
 	buffer = auto_alloc_array(machine, UINT8, len);
@@ -4593,7 +4593,7 @@ static DRIVER_INIT( mazinger )
 	state->m_time_vblank_irq = 2100;
 
 	/* setup extra ROM */
-	state->subbank("bank1")->set_base(machine.region("user1")->base());
+	state->membank("bank1")->set_base(machine.region("user1")->base());
 }
 
 
@@ -4604,16 +4604,16 @@ static DRIVER_INIT( metmqstr )
 
 	init_cave(machine);
 
-	state->subbank("bank1")->configure_entries(0, 0x2, &ROM[0x00000], 0x4000);
-	state->subbank("bank1")->configure_entries(2, 0xe, &ROM[0x10000], 0x4000);
+	state->membank("bank1")->configure_entries(0, 0x2, &ROM[0x00000], 0x4000);
+	state->membank("bank1")->configure_entries(2, 0xe, &ROM[0x10000], 0x4000);
 
 	ROM = machine.region("oki1")->base();
-	state->subbank("bank3")->configure_entries(0, 8, &ROM[0x00000], 0x20000);
-	state->subbank("bank4")->configure_entries(0, 8, &ROM[0x00000], 0x20000);
+	state->membank("bank3")->configure_entries(0, 8, &ROM[0x00000], 0x20000);
+	state->membank("bank4")->configure_entries(0, 8, &ROM[0x00000], 0x20000);
 
 	ROM = machine.region("oki2")->base();
-	state->subbank("bank5")->configure_entries(0, 8, &ROM[0x00000], 0x20000);
-	state->subbank("bank6")->configure_entries(0, 8, &ROM[0x00000], 0x20000);
+	state->membank("bank5")->configure_entries(0, 8, &ROM[0x00000], 0x20000);
+	state->membank("bank6")->configure_entries(0, 8, &ROM[0x00000], 0x20000);
 
 	unpack_sprites(machine);
 	state->m_spritetype[0] = 2;	// Normal sprites with different position handling
@@ -4633,8 +4633,8 @@ static DRIVER_INIT( pwrinst2j )
 
 	init_cave(machine);
 
-	state->subbank("bank1")->configure_entries(0, 3, &ROM[0x00000], 0x4000);
-	state->subbank("bank1")->configure_entries(3, 5, &ROM[0x10000], 0x4000);
+	state->membank("bank1")->configure_entries(0, 3, &ROM[0x00000], 0x4000);
+	state->membank("bank1")->configure_entries(3, 5, &ROM[0x10000], 0x4000);
 
 	buffer = auto_alloc_array(machine, UINT8, len);
 	{
@@ -4681,16 +4681,16 @@ static DRIVER_INIT( sailormn )
 
 	init_cave(machine);
 
-	state->subbank("bank1")->configure_entries(0, 0x02, &ROM[0x00000], 0x4000);
-	state->subbank("bank1")->configure_entries(2, 0x1e, &ROM[0x10000], 0x4000);
+	state->membank("bank1")->configure_entries(0, 0x02, &ROM[0x00000], 0x4000);
+	state->membank("bank1")->configure_entries(2, 0x1e, &ROM[0x10000], 0x4000);
 
 	ROM = machine.region("oki1")->base();
-	state->subbank("bank3")->configure_entries(0, 0x10, &ROM[0x00000], 0x20000);
-	state->subbank("bank4")->configure_entries(0, 0x10, &ROM[0x00000], 0x20000);
+	state->membank("bank3")->configure_entries(0, 0x10, &ROM[0x00000], 0x20000);
+	state->membank("bank4")->configure_entries(0, 0x10, &ROM[0x00000], 0x20000);
 
 	ROM = machine.region("oki2")->base();
-	state->subbank("bank5")->configure_entries(0, 0x10, &ROM[0x00000], 0x20000);
-	state->subbank("bank6")->configure_entries(0, 0x10, &ROM[0x00000], 0x20000);
+	state->membank("bank5")->configure_entries(0, 0x10, &ROM[0x00000], 0x20000);
+	state->membank("bank6")->configure_entries(0, 0x10, &ROM[0x00000], 0x20000);
 
 	/* decrypt sprites */
 	buffer = auto_alloc_array(machine, UINT8, len);

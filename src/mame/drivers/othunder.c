@@ -393,7 +393,7 @@ WRITE16_MEMBER(othunder_state::othunder_lightgun_w)
 static void reset_sound_region( running_machine &machine )
 {
 	othunder_state *state = machine.driver_data<othunder_state>();
-	state->subbank("bank10")->set_entry(state->m_banknum);
+	state->membank("bank10")->set_entry(state->m_banknum);
 }
 
 
@@ -674,7 +674,7 @@ static MACHINE_START( othunder )
 {
 	othunder_state *state = machine.driver_data<othunder_state>();
 
-	state->subbank("bank10")->configure_entries(0, 4, machine.region("audiocpu")->base() + 0xc000, 0x4000);
+	state->membank("bank10")->configure_entries(0, 4, machine.region("audiocpu")->base() + 0xc000, 0x4000);
 
 	state->m_maincpu = machine.device("maincpu");
 	state->m_audiocpu = machine.device("audiocpu");

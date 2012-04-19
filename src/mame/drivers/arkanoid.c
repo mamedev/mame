@@ -1671,7 +1671,7 @@ static DRIVER_INIT( hexa )
 	RAM[0x0126] = 0x00;
 #endif
 
-	machine.root_device().subbank("bank1")->configure_entries(0, 2, &RAM[0x10000], 0x4000);
+	machine.root_device().membank("bank1")->configure_entries(0, 2, &RAM[0x10000], 0x4000);
 }
 
 

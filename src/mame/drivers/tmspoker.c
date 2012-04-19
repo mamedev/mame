@@ -294,7 +294,7 @@ static INTERRUPT_GEN( tmspoker_interrupt )
 static MACHINE_START( tmspoker )
 {
 	UINT8 *ROM = machine.region("maincpu")->base();
-	machine.root_device().subbank("bank1")->configure_entries(0, 2, &ROM[0], 0x1000);
+	machine.root_device().membank("bank1")->configure_entries(0, 2, &ROM[0], 0x1000);
 }
 
 
@@ -304,7 +304,7 @@ static MACHINE_RESET( tmspoker )
 
 	popmessage("ROM Bank: %02X", seldsw);
 
-	machine.root_device().subbank("bank1")->set_entry(seldsw);
+	machine.root_device().membank("bank1")->set_entry(seldsw);
 }
 
 

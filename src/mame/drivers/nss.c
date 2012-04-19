@@ -481,7 +481,7 @@ WRITE8_MEMBER(nss_state::port80_w)
     ---- ---x BIOS bankswitch
     */
 
-	subbank("bank1")->set_entry(data & 1);
+	membank("bank1")->set_entry(data & 1);
 	m_m50458_rom_bank = data & 4;
 }
 
@@ -512,8 +512,8 @@ static MACHINE_START( nss )
 	nss_state *state = machine.driver_data<nss_state>();
 	UINT8 *ROM = machine.region("bios")->base();
 
-	state->subbank("bank1")->configure_entries(0, 2, &ROM[0x10000], 0x8000);
-	state->subbank("bank1")->set_entry(0);
+	state->membank("bank1")->configure_entries(0, 2, &ROM[0x10000], 0x8000);
+	state->membank("bank1")->set_entry(0);
 
 	state->m_m50458_rom_bank = 0;
 

@@ -464,7 +464,7 @@ static WRITE8_DEVICE_HANDLER( upd7759_bank_w ) //*
 
 	upd7759_reset_w(device, data & 0x40);
 	offs = 0x10000 + (data * 0x4000) % size;
-	device->machine().root_device().subbank("bank1")->set_base(device->machine().region("soundcpu")->base() + offs);
+	device->machine().root_device().membank("bank1")->set_base(device->machine().region("soundcpu")->base() + offs);
 }
 
 

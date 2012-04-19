@@ -41,13 +41,13 @@ Memo:
 
 WRITE8_MEMBER(ojankohs_state::ojankohs_rombank_w)
 {
-	subbank("bank1")->set_entry(data & 0x3f);
+	membank("bank1")->set_entry(data & 0x3f);
 }
 
 WRITE8_MEMBER(ojankohs_state::ojankoy_rombank_w)
 {
 
-	subbank("bank1")->set_entry(data & 0x1f);
+	membank("bank1")->set_entry(data & 0x1f);
 
 	m_adpcm_reset = BIT(data, 5);
 	if (!m_adpcm_reset)
@@ -95,7 +95,7 @@ static void ojankohs_adpcm_int( device_t *device )
 WRITE8_MEMBER(ojankohs_state::ojankoc_ctrl_w)
 {
 
-	subbank("bank1")->set_entry(data & 0x0f);
+	membank("bank1")->set_entry(data & 0x0f);
 
 	m_adpcm_reset = BIT(data, 4);
 	msm5205_reset_w(m_msm, !BIT(data, 4));
@@ -810,7 +810,7 @@ static MACHINE_START( ojankohs )
 {
 	UINT8 *ROM = machine.region("maincpu")->base();
 
-	machine.root_device().subbank("bank1")->configure_entries(0, 0x40, &ROM[0x10000], 0x4000);
+	machine.root_device().membank("bank1")->configure_entries(0, 0x40, &ROM[0x10000], 0x4000);
 
 	MACHINE_START_CALL(common);
 }
@@ -819,7 +819,7 @@ static MACHINE_START( ojankoy )
 {
 	UINT8 *ROM = machine.region("maincpu")->base();
 
-	machine.root_device().subbank("bank1")->configure_entries(0, 0x20, &ROM[0x10000], 0x4000);
+	machine.root_device().membank("bank1")->configure_entries(0, 0x20, &ROM[0x10000], 0x4000);
 
 	MACHINE_START_CALL(common);
 }
@@ -828,7 +828,7 @@ static MACHINE_START( ojankoc )
 {
 	UINT8 *ROM = machine.region("user1")->base();
 
-	machine.root_device().subbank("bank1")->configure_entries(0, 0x10, &ROM[0x0000], 0x8000);
+	machine.root_device().membank("bank1")->configure_entries(0, 0x10, &ROM[0x0000], 0x8000);
 
 	MACHINE_START_CALL(common);
 }

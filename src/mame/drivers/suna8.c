@@ -75,7 +75,7 @@ static DRIVER_INIT( hardhead )
 			rom[i] = BITSWAP8(rom[i], 7,6,5,3,4,2,1,0) ^ 0x58;
 	}
 
-	machine.root_device().subbank("bank1")->configure_entries(0, 16, machine.region("maincpu")->base() + 0x10000, 0x4000);
+	machine.root_device().membank("bank1")->configure_entries(0, 16, machine.region("maincpu")->base() + 0x10000, 0x4000);
 }
 
 /* Non encrypted bootleg */
@@ -83,7 +83,7 @@ static DRIVER_INIT( hardhedb )
 {
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	space->set_decrypted_region(0x0000, 0x7fff, machine.region("maincpu")->base() + 0x48000);
-	machine.root_device().subbank("bank1")->configure_entries(0, 16, machine.region("maincpu")->base() + 0x10000, 0x4000);
+	machine.root_device().membank("bank1")->configure_entries(0, 16, machine.region("maincpu")->base() + 0x10000, 0x4000);
 }
 
 /***************************************************************************
@@ -162,8 +162,8 @@ static DRIVER_INIT( brickzn )
 	decrypt[0x24b5] = 0x00;	// HALT -> NOP
 	decrypt[0x2583] = 0x00;	// HALT -> NOP
 
-	machine.root_device().subbank("bank1")->configure_entries(0, 16, machine.region("maincpu")->base() + 0x10000, 0x4000);
-	machine.root_device().subbank("bank1")->configure_decrypted_entries(0, 16, decrypt + 0x10000, 0x4000);
+	machine.root_device().membank("bank1")->configure_entries(0, 16, machine.region("maincpu")->base() + 0x10000, 0x4000);
+	machine.root_device().membank("bank1")->configure_decrypted_entries(0, 16, decrypt + 0x10000, 0x4000);
 }
 
 static DRIVER_INIT( brickzn3 )
@@ -193,8 +193,8 @@ static DRIVER_INIT( brickzn3 )
 	decrypt[0x2487] = 0x00;	// HALT -> NOP
 	decrypt[0x256c] = 0x00;	// HALT -> NOP
 
-	machine.root_device().subbank("bank1")->configure_entries(0, 16, machine.region("maincpu")->base() + 0x10000, 0x4000);
-	machine.root_device().subbank("bank1")->configure_decrypted_entries(0, 16, decrypt + 0x10000, 0x4000);
+	machine.root_device().membank("bank1")->configure_entries(0, 16, machine.region("maincpu")->base() + 0x10000, 0x4000);
+	machine.root_device().membank("bank1")->configure_decrypted_entries(0, 16, decrypt + 0x10000, 0x4000);
 }
 
 
@@ -280,8 +280,8 @@ rom13:  0?, 1y, 2n, 3n      ?,?,?,? (palettes)
 			RAM[i] = BITSWAP8(RAM[i], 5,6,7,4,3,2,1,0) ^ 0x41;
 	}
 
-	machine.root_device().subbank("bank1")->configure_entries(0, 16, machine.region("maincpu")->base() + 0x10000, 0x4000);
-	machine.root_device().subbank("bank2")->configure_entries(0, 2, auto_alloc_array(machine, UINT8, 0x2000 * 2), 0x2000);
+	machine.root_device().membank("bank1")->configure_entries(0, 16, machine.region("maincpu")->base() + 0x10000, 0x4000);
+	machine.root_device().membank("bank2")->configure_entries(0, 2, auto_alloc_array(machine, UINT8, 0x2000 * 2), 0x2000);
 }
 
 
@@ -349,7 +349,7 @@ static DRIVER_INIT( starfigh )
 			RAM[i] = BITSWAP8(RAM[i], 5,6,7,4,3,2,1,0) ^ 0x45;
 	}
 
-	machine.root_device().subbank("bank1")->configure_entries(0, 16, machine.region("maincpu")->base() + 0x10000, 0x4000);
+	machine.root_device().membank("bank1")->configure_entries(0, 16, machine.region("maincpu")->base() + 0x10000, 0x4000);
 }
 
 
@@ -417,7 +417,7 @@ static DRIVER_INIT( sparkman )
 			RAM[i] = BITSWAP8(RAM[i], 5,6,7,4,3,2,1,0) ^ 0x44;
 	}
 
-	machine.root_device().subbank("bank1")->configure_entries(0, 16, machine.region("maincpu")->base() + 0x10000, 0x4000);
+	machine.root_device().membank("bank1")->configure_entries(0, 16, machine.region("maincpu")->base() + 0x10000, 0x4000);
 }
 
 /***************************************************************************
@@ -490,7 +490,7 @@ WRITE8_MEMBER(suna8_state::hardhead_bankswitch_w)
 	int bank = data & 0x0f;
 
 	if (data & ~0xef)	logerror("CPU #0 - PC %04X: unknown bank bits: %02X\n",cpu_get_pc(&space.device()),data);
-	subbank("bank1")->set_entry(bank);
+	membank("bank1")->set_entry(bank);
 }
 
 
@@ -547,7 +547,7 @@ WRITE8_MEMBER(suna8_state::rranger_bankswitch_w)
 
 	if (data & ~0xf7)	logerror("CPU #0 - PC %04X: unknown bank bits: %02X\n",cpu_get_pc(&space.device()),data);
 
-	subbank("bank1")->set_entry(bank);
+	membank("bank1")->set_entry(bank);
 
 	flip_screen_set(data & 0x20);
 	coin_lockout_w ( machine(), 0,	data & 0x40);
@@ -651,7 +651,7 @@ WRITE8_MEMBER(suna8_state::brickzn_rombank_w)
 
 	if (data & ~0x0f)	logerror("CPU #0 - PC %04X: unknown rom bank bits: %02X\n",cpu_get_pc(&space.device()),data);
 
-	subbank("bank1")->set_entry(bank);
+	membank("bank1")->set_entry(bank);
 	m_rombank = data;
 }
 
@@ -727,7 +727,7 @@ WRITE8_MEMBER(suna8_state::hardhea2_rombank_w)
 
 	if (data & ~0x0f)	logerror("CPU #0 - PC %04X: unknown rom bank bits: %02X\n",cpu_get_pc(&space.device()),data);
 
-	subbank("bank1")->set_entry(bank);
+	membank("bank1")->set_entry(bank);
 
 	m_rombank = data;
 }
@@ -745,12 +745,12 @@ WRITE8_MEMBER(suna8_state::hardhea2_spritebank_1_w)
 
 WRITE8_MEMBER(suna8_state::hardhea2_rambank_0_w)
 {
-	subbank("bank2")->set_entry(0);
+	membank("bank2")->set_entry(0);
 }
 
 WRITE8_MEMBER(suna8_state::hardhea2_rambank_1_w)
 {
-	subbank("bank2")->set_entry(1);
+	membank("bank2")->set_entry(1);
 }
 
 
@@ -925,7 +925,7 @@ WRITE8_MEMBER(suna8_state::sparkman_rombank_w)
 
 	//if (data & ~0x0f)     logerror("CPU #0 - PC %04X: unknown rom bank bits: %02X\n",cpu_get_pc(&space.device()),data);
 
-	subbank("bank1")->set_entry(bank);
+	membank("bank1")->set_entry(bank);
 	m_rombank = data;
 }
 
@@ -2355,7 +2355,7 @@ ROM_END
 
 static DRIVER_INIT( suna8 )
 {
-	machine.root_device().subbank("bank1")->configure_entries(0, 16, machine.region("maincpu")->base() + 0x10000, 0x4000);
+	machine.root_device().membank("bank1")->configure_entries(0, 16, machine.region("maincpu")->base() + 0x10000, 0x4000);
 }
 
 /* Working Games */

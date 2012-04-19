@@ -256,7 +256,7 @@ WRITE8_MEMBER(pacland_state::pacland_bankswitch_w)
 	UINT8 *RAM = machine().region("maincpu")->base();
 
 	bankaddress = 0x10000 + ((data & 0x07) << 13);
-	subbank("bank1")->set_base(&RAM[bankaddress]);
+	membank("bank1")->set_base(&RAM[bankaddress]);
 
 //  pbc = data & 0x20;
 

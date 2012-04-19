@@ -127,7 +127,7 @@ WRITE8_MEMBER(superqix_state::pbillian_0410_w)
 	coin_counter_w(machine(), 0,data & 0x02);
 	coin_counter_w(machine(), 1,data & 0x04);
 
-	subbank("bank1")->set_entry((data & 0x08) >> 3);
+	membank("bank1")->set_entry((data & 0x08) >> 3);
 
 	m_nmi_mask = data & 0x10;
 	flip_screen_set(data & 0x20);
@@ -149,7 +149,7 @@ WRITE8_MEMBER(superqix_state::superqix_0410_w)
 	m_nmi_mask = data & 0x08;
 
 	/* bits 4-5 control ROM bank */
-	subbank("bank1")->set_entry((data & 0x30) >> 4);
+	membank("bank1")->set_entry((data & 0x30) >> 4);
 }
 
 

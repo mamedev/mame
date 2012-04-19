@@ -87,7 +87,7 @@ static void upscope_reset(running_machine &machine)
 static WRITE8_DEVICE_HANDLER( upscope_cia_0_porta_w )
 {
 	/* switch banks as appropriate */
-	device->machine().root_device().subbank("bank1")->set_entry(data & 1);
+	device->machine().root_device().membank("bank1")->set_entry(data & 1);
 
 	/* swap the write handlers between ROM and bank 1 based on the bit */
 	if ((data & 1) == 0)
@@ -404,8 +404,8 @@ static DRIVER_INIT( upscope )
 	machine.device<nvram_device>("nvram")->set_base(state->m_nvram, sizeof(state->m_nvram));
 
 	/* set up memory */
-	state->subbank("bank1")->configure_entry(0, state->m_chip_ram);
-	state->subbank("bank1")->configure_entry(1, machine.region("user1")->base());
+	state->membank("bank1")->configure_entry(0, state->m_chip_ram);
+	state->membank("bank1")->configure_entry(1, machine.region("user1")->base());
 }
 
 

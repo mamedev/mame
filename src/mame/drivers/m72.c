@@ -366,7 +366,7 @@ INLINE DRIVER_INIT( m72_8751 )
 	state->m_protection_ram = auto_alloc_array(machine, UINT16, 0x10000/2);
 	program->install_read_bank(0xb0000, 0xbffff, "bank1");
 	program->install_write_handler(0xb0000, 0xb0fff, write16_delegate(FUNC(m72_state::m72_main_mcu_w),state));
-	state->subbank("bank1")->set_base(state->m_protection_ram);
+	state->membank("bank1")->set_base(state->m_protection_ram);
 
 	//io->install_legacy_write_handler(0xc0, 0xc1, FUNC(loht_sample_trigger_w));
 	io->install_write_handler(0xc0, 0xc1, write16_delegate(FUNC(m72_state::m72_main_mcu_sound_w),state));
@@ -740,7 +740,7 @@ static void install_protection_handler(running_machine &machine, const UINT8 *co
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0xb0000, 0xb0fff, "bank1");
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xb0ffa, 0xb0ffb, read16_delegate(FUNC(m72_state::protection_r),state));
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xb0000, 0xb0fff, write16_delegate(FUNC(m72_state::protection_w),state));
-	state->subbank("bank1")->set_base(state->m_protection_ram);
+	state->membank("bank1")->set_base(state->m_protection_ram);
 }
 
 static DRIVER_INIT( bchopper )

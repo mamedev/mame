@@ -566,7 +566,7 @@ static SCREEN_UPDATE_IND16(majorpkr)
 
 WRITE8_MEMBER(majorpkr_state::rom_bank_w)
 {
-	subbank("rom_bank")->set_entry(data & 0x3);
+	membank("rom_bank")->set_entry(data & 0x3);
 }
 
 
@@ -1084,7 +1084,7 @@ ROM_END
 static DRIVER_INIT( majorpkr )
 {
 	UINT8 * ROM = (UINT8 *)machine.region("maincpu")->base();
-	machine.root_device().subbank("rom_bank")->configure_entries(0, 4, &ROM[0x10000], 0x800);
+	machine.root_device().membank("rom_bank")->configure_entries(0, 4, &ROM[0x10000], 0x800);
 }
 
 

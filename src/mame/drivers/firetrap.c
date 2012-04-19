@@ -183,7 +183,7 @@ WRITE8_MEMBER(firetrap_state::firetrap_nmi_disable_w)
 
 WRITE8_MEMBER(firetrap_state::firetrap_bankselect_w)
 {
-	subbank("bank1")->set_entry(data & 0x03);
+	membank("bank1")->set_entry(data & 0x03);
 }
 
 READ8_MEMBER(firetrap_state::firetrap_8751_bootleg_r)
@@ -315,7 +315,7 @@ WRITE8_MEMBER(firetrap_state::firetrap_sound_2400_w)
 
 WRITE8_MEMBER(firetrap_state::firetrap_sound_bankselect_w)
 {
-	subbank("bank2")->set_entry(data & 0x01);
+	membank("bank2")->set_entry(data & 0x01);
 }
 
 static void firetrap_adpcm_int( device_t *device )
@@ -600,8 +600,8 @@ static MACHINE_START( firetrap )
 	state->m_audiocpu = machine.device("audiocpu");
 	state->m_msm = machine.device("msm");
 
-	state->subbank("bank1")->configure_entries(0, 4, &MAIN[0x10000], 0x4000);
-	state->subbank("bank2")->configure_entries(0, 2, &SOUND[0x10000], 0x4000);
+	state->membank("bank1")->configure_entries(0, 4, &MAIN[0x10000], 0x4000);
+	state->membank("bank2")->configure_entries(0, 2, &SOUND[0x10000], 0x4000);
 
 	state->save_item(NAME(state->m_i8751_current_command));
 	state->save_item(NAME(state->m_sound_irq_enable));

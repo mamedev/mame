@@ -133,7 +133,7 @@ WRITE32_MEMBER(taito_f3_state::f3_sound_bankswitch_w)
 
 		/* Banks are 0x20000 bytes each, divide by two to get data16
         pointer rather than byte pointer */
-		subbank("bank2")->set_base(&rom[(idx*0x20000)/2 + 0x80000]);
+		membank("bank2")->set_base(&rom[(idx*0x20000)/2 + 0x80000]);
 
 	} else {
 		logerror("Sound bankswitch in unsupported game\n");

@@ -140,7 +140,7 @@ WRITE8_MEMBER(supertnk_state::supertnk_bankswitch_0_w)
 
 	bank_address = 0x10000 + (m_rom_bank * 0x1000);
 
-	subbank("bank1")->set_base(&machine().region("maincpu")->base()[bank_address]);
+	membank("bank1")->set_base(&machine().region("maincpu")->base()[bank_address]);
 }
 
 
@@ -152,7 +152,7 @@ WRITE8_MEMBER(supertnk_state::supertnk_bankswitch_1_w)
 
 	bank_address = 0x10000 + (m_rom_bank * 0x1000);
 
-	subbank("bank1")->set_base(&machine().region("maincpu")->base()[bank_address]);
+	membank("bank1")->set_base(&machine().region("maincpu")->base()[bank_address]);
 }
 
 

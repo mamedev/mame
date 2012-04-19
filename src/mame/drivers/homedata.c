@@ -355,7 +355,7 @@ WRITE8_MEMBER(homedata_state::reikaids_upd7807_portc_w)
       */
 //  logerror("%04x: port C wr %02x (STATUS %d DATA %d)\n", cpu_get_pc(&space.device()), data, BIT(data, 2), BIT(data, 6));
 
-	subbank("bank2")->set_entry(data & 0x03);
+	membank("bank2")->set_entry(data & 0x03);
 
 	coin_counter_w(machine(), 0, ~data & 0x80);
 
@@ -494,7 +494,7 @@ WRITE8_MEMBER(homedata_state::pteacher_upd7807_portc_w)
 
 	//  logerror("%04x: port C wr %02x\n", cpu_get_pc(&space.device()), data);
 
-	subbank("bank2")->set_entry((data & 0x0c) >> 2);
+	membank("bank2")->set_entry((data & 0x0c) >> 2);
 
 	coin_counter_w(machine(), 0, ~data & 0x80);
 
@@ -513,9 +513,9 @@ WRITE8_MEMBER(homedata_state::bankswitch_w)
 
 	/* last bank is fixed and is #0 for us, other banks start from #1 (hence data+1 below)*/
 	if (data < last_bank)
-		subbank("bank1")->set_entry(data + 1);
+		membank("bank1")->set_entry(data + 1);
 	else
-		subbank("bank1")->set_entry(0);
+		membank("bank1")->set_entry(0);
 }
 
 
@@ -1151,8 +1151,8 @@ static MACHINE_START( reikaids )
 	homedata_state *state = machine.driver_data<homedata_state>();
 	UINT8 *ROM = machine.region("maincpu")->base();
 
-	state->subbank("bank1")->configure_entries(0, 8, &ROM[0xc000], 0x4000);
-	state->subbank("bank2")->configure_entries(0, 4, machine.region("audiocpu")->base(), 0x10000);
+	state->membank("bank1")->configure_entries(0, 8, &ROM[0xc000], 0x4000);
+	state->membank("bank2")->configure_entries(0, 4, machine.region("audiocpu")->base(), 0x10000);
 
 	MACHINE_START_CALL(homedata);
 
@@ -1168,8 +1168,8 @@ static MACHINE_START( pteacher )
 	homedata_state *state = machine.driver_data<homedata_state>();
 	UINT8 *ROM = machine.region("maincpu")->base();
 
-	state->subbank("bank1")->configure_entries(0, 4, &ROM[0xc000], 0x4000);
-	state->subbank("bank2")->configure_entries(0, 4, machine.region("audiocpu")->base(), 0x10000);
+	state->membank("bank1")->configure_entries(0, 4, &ROM[0xc000], 0x4000);
+	state->membank("bank2")->configure_entries(0, 4, machine.region("audiocpu")->base(), 0x10000);
 
 	MACHINE_START_CALL(homedata);
 

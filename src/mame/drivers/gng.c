@@ -30,9 +30,9 @@ Notes:
 WRITE8_MEMBER(gng_state::gng_bankswitch_w)
 {
 	if (data == 4)
-		subbank("bank1")->set_entry(4);
+		membank("bank1")->set_entry(4);
 	else
-		subbank("bank1")->set_entry((data & 0x03));
+		membank("bank1")->set_entry((data & 0x03));
 }
 
 WRITE8_MEMBER(gng_state::gng_coin_counter_w)
@@ -305,8 +305,8 @@ static MACHINE_START( gng )
 	gng_state *state = machine.driver_data<gng_state>();
 
 	UINT8 *rombase = machine.region("maincpu")->base();
-	state->subbank("bank1")->configure_entries(0, 4, &rombase[0x10000], 0x2000);
-	state->subbank("bank1")->configure_entry(4, &rombase[0x4000]);
+	state->membank("bank1")->configure_entries(0, 4, &rombase[0x10000], 0x2000);
+	state->membank("bank1")->configure_entry(4, &rombase[0x4000]);
 
 	state->save_item(NAME(state->m_scrollx));
 	state->save_item(NAME(state->m_scrolly));

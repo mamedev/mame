@@ -116,7 +116,7 @@ WRITE8_MEMBER(drw80pkr_state::prog_w)
 	{
 		m_active_bank = m_active_bank ^ 0x01;
 
-		subbank("bank1")->set_entry(m_active_bank);
+		membank("bank1")->set_entry(m_active_bank);
 	}
 }
 
@@ -405,7 +405,7 @@ GFXDECODE_END
 
 static DRIVER_INIT( drw80pkr )
 {
-	machine.root_device().subbank("bank1")->configure_entries(0, 2, machine.region("maincpu")->base(), 0x1000);
+	machine.root_device().membank("bank1")->configure_entries(0, 2, machine.region("maincpu")->base(), 0x1000);
 }
 
 

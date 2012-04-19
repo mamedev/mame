@@ -129,7 +129,7 @@ WRITE8_MEMBER(quizo_state::port60_w)
 		data=0;
 	}
 	m_port60=data;
-	subbank("bank1")->set_base(&machine().region("user1")->base()[rombankLookup[data]*0x4000] );
+	membank("bank1")->set_base(&machine().region("user1")->base()[rombankLookup[data]*0x4000] );
 }
 
 static ADDRESS_MAP_START( memmap, AS_PROGRAM, 8, quizo_state )

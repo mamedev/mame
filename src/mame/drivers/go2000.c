@@ -76,7 +76,7 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(go2000_state::go2000_pcm_1_bankswitch_w)
 {
-	subbank("bank1")->set_entry(data & 0x07);
+	membank("bank1")->set_entry(data & 0x07);
 }
 
 static ADDRESS_MAP_START( go2000_sound_map, AS_PROGRAM, 8, go2000_state )
@@ -314,9 +314,9 @@ static MACHINE_START( go2000 )
 	int i;
 
 	for (i = 0; i < 8; i++)
-		state->subbank("bank1")->configure_entry(i, &SOUND[0x00400 + i * 0x10000]);
+		state->membank("bank1")->configure_entry(i, &SOUND[0x00400 + i * 0x10000]);
 
-	state->subbank("bank1")->set_entry(0);
+	state->membank("bank1")->set_entry(0);
 
 	state->m_soundcpu = machine.device("soundcpu");
 }

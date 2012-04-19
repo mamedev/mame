@@ -419,7 +419,7 @@ static void meritm_crt250_switch_banks( running_machine &machine )
 	int rombank = (state->m_bank & 0x07) ^ 0x07;
 
 	//logerror( "CRT250: Switching banks: rom = %0x (bank = %x)\n", rombank, state->m_bank );
-	state->subbank("bank1")->set_entry(rombank );
+	state->membank("bank1")->set_entry(rombank );
 };
 
 WRITE8_MEMBER(meritm_state::meritm_crt250_bank_w)
@@ -437,9 +437,9 @@ static void meritm_switch_banks( running_machine &machine )
 			  (state->m_psd_a15 & 0x1);
 
 	//logerror( "Switching banks: rom = %0x (bank = %x), ram = %0x\n", rombank, state->m_bank, rambank);
-	state->subbank("bank1")->set_entry(rombank );
-	state->subbank("bank2")->set_entry(rombank | 0x01);
-	state->subbank("bank3")->set_entry(rambank);
+	state->membank("bank1")->set_entry(rombank );
+	state->membank("bank2")->set_entry(rombank | 0x01);
+	state->membank("bank3")->set_entry(rambank);
 };
 
 WRITE8_MEMBER(meritm_state::meritm_psd_a15_w)
@@ -989,7 +989,7 @@ static MACHINE_START(merit_common)
 static MACHINE_START(meritm_crt250)
 {
 	meritm_state *state = machine.driver_data<meritm_state>();
-	state->subbank("bank1")->configure_entries(0, 8, machine.region("maincpu")->base(), 0x10000);
+	state->membank("bank1")->configure_entries(0, 8, machine.region("maincpu")->base(), 0x10000);
 	state->m_bank = 0xff;
 	meritm_crt250_switch_banks(machine);
 	MACHINE_START_CALL(merit_common);
@@ -1016,9 +1016,9 @@ static MACHINE_START(meritm_crt260)
 	state->m_ram = auto_alloc_array(machine, UINT8,  0x8000 );
 	machine.device<nvram_device>("nvram")->set_base(state->m_ram, 0x8000);
 	memset(state->m_ram, 0x00, 0x8000);
-	state->subbank("bank1")->configure_entries(0, 128, machine.region("maincpu")->base(), 0x8000);
-	state->subbank("bank2")->configure_entries(0, 128, machine.region("maincpu")->base(), 0x8000);
-	state->subbank("bank3")->configure_entries(0, 4, state->m_ram, 0x2000);
+	state->membank("bank1")->configure_entries(0, 128, machine.region("maincpu")->base(), 0x8000);
+	state->membank("bank2")->configure_entries(0, 128, machine.region("maincpu")->base(), 0x8000);
+	state->membank("bank3")->configure_entries(0, 4, state->m_ram, 0x2000);
 	state->m_bank = 0xff;
 	state->m_psd_a15 = 0;
 	meritm_switch_banks(machine);

@@ -376,11 +376,11 @@ static MACHINE_RESET( mschamp )
 	UINT8 *rom = machine.region("maincpu")->base() + 0x10000;
 	int whichbank = input_port_read(machine, "GAME") & 1;
 
-	machine.root_device().subbank("bank1")->configure_entries(0, 2, &rom[0x0000], 0x8000);
-	machine.root_device().subbank("bank2")->configure_entries(0, 2, &rom[0x4000], 0x8000);
+	machine.root_device().membank("bank1")->configure_entries(0, 2, &rom[0x0000], 0x8000);
+	machine.root_device().membank("bank2")->configure_entries(0, 2, &rom[0x4000], 0x8000);
 
-	machine.root_device().subbank("bank1")->set_entry(whichbank);
-	machine.root_device().subbank("bank2")->set_entry(whichbank);
+	machine.root_device().membank("bank1")->set_entry(whichbank);
+	machine.root_device().membank("bank2")->set_entry(whichbank);
 }
 
 
@@ -671,10 +671,10 @@ static INTERRUPT_GEN( s2650_interrupt )
 
 WRITE8_MEMBER(pacman_state::porky_banking_w)
 {
-	subbank("bank1")->set_entry(data & 1);
-	subbank("bank2")->set_entry(data & 1);
-	subbank("bank3")->set_entry(data & 1);
-	subbank("bank4")->set_entry(data & 1);
+	membank("bank1")->set_entry(data & 1);
+	membank("bank2")->set_entry(data & 1);
+	membank("bank3")->set_entry(data & 1);
+	membank("bank4")->set_entry(data & 1);
 }
 
 READ8_MEMBER(pacman_state::drivfrcp_port1_r)
@@ -839,8 +839,8 @@ READ8_MEMBER(pacman_state::pacman_read_nop)
   vias required to lay out the aux PCB.
 */
 
-#define mspacman_enable_decode_latch(m)  m.root_device().subbank("bank1")->set_entry(1)
-#define mspacman_disable_decode_latch(m) m.root_device().subbank("bank1")->set_entry(0)
+#define mspacman_enable_decode_latch(m)  m.root_device().membank("bank1")->set_entry(1)
+#define mspacman_disable_decode_latch(m) m.root_device().membank("bank1")->set_entry(0)
 
 // any access to these ROM addresses disables the decoder, and all you see is the original Pac-Man code
 READ8_MEMBER(pacman_state::mspacman_disable_decode_r_0x0038){ mspacman_disable_decode_latch(machine()); return machine().region("maincpu")->base()[offset+0x0038]; }
@@ -5710,8 +5710,8 @@ static DRIVER_INIT( mspacman )
 	}
 
 	/* initialize the banks */
-	machine.root_device().subbank("bank1")->configure_entries(0, 2, &ROM[0x00000], 0x10000);
-	machine.root_device().subbank("bank1")->set_entry(1);
+	machine.root_device().membank("bank1")->configure_entries(0, 2, &ROM[0x00000], 0x10000);
+	machine.root_device().membank("bank1")->set_entry(1);
 }
 
 static DRIVER_INIT( woodpek )
@@ -5741,10 +5741,10 @@ static DRIVER_INIT( jumpshot )
 static DRIVER_INIT( drivfrcp )
 {
 	UINT8 *ROM = machine.region("maincpu")->base();
-	machine.root_device().subbank("bank1")->set_base(&ROM[0 * 0x2000]);
-	machine.root_device().subbank("bank2")->set_base(&ROM[1 * 0x2000]);
-	machine.root_device().subbank("bank3")->set_base(&ROM[2 * 0x2000]);
-	machine.root_device().subbank("bank4")->set_base(&ROM[3 * 0x2000]);
+	machine.root_device().membank("bank1")->set_base(&ROM[0 * 0x2000]);
+	machine.root_device().membank("bank2")->set_base(&ROM[1 * 0x2000]);
+	machine.root_device().membank("bank3")->set_base(&ROM[2 * 0x2000]);
+	machine.root_device().membank("bank4")->set_base(&ROM[3 * 0x2000]);
 }
 
 static DRIVER_INIT( 8bpm )
@@ -5758,10 +5758,10 @@ static DRIVER_INIT( 8bpm )
 		ROM[i] = BITSWAP8(ROM[i],7,0,5,4,3,2,1,6);
 	}
 
-	machine.root_device().subbank("bank1")->set_base(&ROM[0 * 0x2000]);
-	machine.root_device().subbank("bank2")->set_base(&ROM[1 * 0x2000]);
-	machine.root_device().subbank("bank3")->set_base(&ROM[2 * 0x2000]);
-	machine.root_device().subbank("bank4")->set_base(&ROM[3 * 0x2000]);
+	machine.root_device().membank("bank1")->set_base(&ROM[0 * 0x2000]);
+	machine.root_device().membank("bank2")->set_base(&ROM[1 * 0x2000]);
+	machine.root_device().membank("bank3")->set_base(&ROM[2 * 0x2000]);
+	machine.root_device().membank("bank4")->set_base(&ROM[3 * 0x2000]);
 }
 
 static DRIVER_INIT( porky )
@@ -5775,15 +5775,15 @@ static DRIVER_INIT( porky )
 		ROM[i] = BITSWAP8(ROM[i],7,6,5,0,3,2,1,4);
 	}
 
-	machine.root_device().subbank("bank1")->configure_entries(0, 2, &ROM[0 * 0x2000], 0x8000);
-	machine.root_device().subbank("bank2")->configure_entries(0, 2, &ROM[1 * 0x2000], 0x8000);
-	machine.root_device().subbank("bank3")->configure_entries(0, 2, &ROM[2 * 0x2000], 0x8000);
-	machine.root_device().subbank("bank4")->configure_entries(0, 2, &ROM[3 * 0x2000], 0x8000);
+	machine.root_device().membank("bank1")->configure_entries(0, 2, &ROM[0 * 0x2000], 0x8000);
+	machine.root_device().membank("bank2")->configure_entries(0, 2, &ROM[1 * 0x2000], 0x8000);
+	machine.root_device().membank("bank3")->configure_entries(0, 2, &ROM[2 * 0x2000], 0x8000);
+	machine.root_device().membank("bank4")->configure_entries(0, 2, &ROM[3 * 0x2000], 0x8000);
 
-	machine.root_device().subbank("bank1")->set_entry(0);
-	machine.root_device().subbank("bank2")->set_entry(0);
-	machine.root_device().subbank("bank3")->set_entry(0);
-	machine.root_device().subbank("bank4")->set_entry(0);
+	machine.root_device().membank("bank1")->set_entry(0);
+	machine.root_device().membank("bank2")->set_entry(0);
+	machine.root_device().membank("bank3")->set_entry(0);
+	machine.root_device().membank("bank4")->set_entry(0);
 }
 
 static DRIVER_INIT( rocktrv2 )

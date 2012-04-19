@@ -237,7 +237,7 @@ READ16_MEMBER(xexex_state::sound_status_r)
 static void reset_sound_region(running_machine &machine)
 {
 	xexex_state *state = machine.driver_data<xexex_state>();
-	state->subbank("bank2")->set_entry(state->m_cur_sound_region & 0x07);
+	state->membank("bank2")->set_entry(state->m_cur_sound_region & 0x07);
 }
 
 WRITE8_MEMBER(xexex_state::sound_bankswitch_w)
@@ -458,8 +458,8 @@ static MACHINE_START( xexex )
 	xexex_state *state = machine.driver_data<xexex_state>();
 	UINT8 *ROM = machine.region("audiocpu")->base();
 
-	state->subbank("bank2")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
-	state->subbank("bank2")->set_entry(0);
+	state->membank("bank2")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
+	state->membank("bank2")->set_entry(0);
 
 	state->m_maincpu = machine.device("maincpu");
 	state->m_audiocpu = machine.device("audiocpu");

@@ -114,7 +114,7 @@ WRITE8_MEMBER(spdodgeb_state::spdodgeb_ctrl_w)
 	flip_screen_set(data & 0x01);
 
 	/* bit 1 = ROM bank switch */
-	subbank("bank1")->set_base(rom + 0x10000 + 0x4000 * ((~data & 0x02) >> 1));
+	membank("bank1")->set_base(rom + 0x10000 + 0x4000 * ((~data & 0x02) >> 1));
 
 	/* bit 2 = scroll high bit */
 	m_lastscroll = (m_lastscroll & 0x0ff) | ((data & 0x04) << 6);

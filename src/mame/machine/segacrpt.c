@@ -471,10 +471,10 @@ void toprollr_decode(running_machine &machine, const char *cputag, const char *r
 		rom[A+bankstart] = (src & ~0xa8) | (convtable[2*row+1][col] ^ xorval);
 	}
 
-	machine.root_device().subbank("bank1")->configure_entries(0,3, machine.region(regiontag)->base(),0x6000);
-	machine.root_device().subbank("bank1")->configure_decrypted_entries(0,3,decrypted,0x6000);
+	machine.root_device().membank("bank1")->configure_entries(0,3, machine.region(regiontag)->base(),0x6000);
+	machine.root_device().membank("bank1")->configure_decrypted_entries(0,3,decrypted,0x6000);
 	space->set_decrypted_region(0x0000, 0x5fff, decrypted);
-	space->machine().root_device().subbank("bank1")->set_entry(0);
+	space->machine().root_device().membank("bank1")->set_entry(0);
 }
 
 
@@ -830,10 +830,10 @@ void jongkyo_decode(running_machine &machine, const char *cputag)
 		rom[A] = (src & ~0xa8) | (convtable[2*row+1][col] ^ xorval);
 	}
 
-	machine.root_device().subbank("bank1")->configure_entries(0,8, machine.region(cputag)->base()+0x7000,0x0400);
-	machine.root_device().subbank("bank1")->configure_decrypted_entries(0,8,decrypted+0x7000,0x0400);
+	machine.root_device().membank("bank1")->configure_entries(0,8, machine.region(cputag)->base()+0x7000,0x0400);
+	machine.root_device().membank("bank1")->configure_decrypted_entries(0,8,decrypted+0x7000,0x0400);
 	space->set_decrypted_region(0x0000, 0x6bff, decrypted);
-	machine.root_device().subbank("bank1")->set_entry(0);
+	machine.root_device().membank("bank1")->set_entry(0);
 }
 
 

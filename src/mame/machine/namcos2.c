@@ -712,7 +712,7 @@ WRITE8_HANDLER( namcos2_sound_bankselect_w )
 	UINT8 *RAM=space->machine().region("audiocpu")->base();
 	UINT32 max = (space->machine().region("audiocpu")->bytes() - 0x10000) / 0x4000;
 	int bank = ( data >> 4 ) % max;	/* 991104.CAB */
-	space->machine().root_device().subbank(BANKED_SOUND_ROM)->set_base(&RAM[ 0x10000 + ( 0x4000 * bank ) ] );
+	space->machine().root_device().membank(BANKED_SOUND_ROM)->set_base(&RAM[ 0x10000 + ( 0x4000 * bank ) ] );
 }
 
 /**************************************************************/

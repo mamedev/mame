@@ -162,7 +162,7 @@ static MACHINE_START( jedi )
 	state->m_interrupt_timer->adjust(machine.primary_screen->time_until_pos(32), 32);
 
 	/* configure the banks */
-	state->subbank("bank1")->configure_entries(0, 3, machine.region("maincpu")->base() + 0x10000, 0x4000);
+	state->membank("bank1")->configure_entries(0, 3, machine.region("maincpu")->base() + 0x10000, 0x4000);
 
 	/* set up save state */
 	state->save_item(NAME(state->m_nvram_enabled));
@@ -195,9 +195,9 @@ static MACHINE_RESET( jedi )
 
 WRITE8_MEMBER(jedi_state::rom_banksel_w)
 {
-	if (data & 0x01) subbank("bank1")->set_entry(0);
-	if (data & 0x02) subbank("bank1")->set_entry(1);
-	if (data & 0x04) subbank("bank1")->set_entry(2);
+	if (data & 0x01) membank("bank1")->set_entry(0);
+	if (data & 0x02) membank("bank1")->set_entry(1);
+	if (data & 0x04) membank("bank1")->set_entry(2);
 }
 
 

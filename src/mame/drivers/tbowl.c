@@ -38,7 +38,7 @@ WRITE8_MEMBER(tbowl_state::tbowlb_bankswitch_w)
 
 
 	bankaddress = 0x10000 + ((data & 0xf8) << 8);
-	subbank("bank1")->set_base(&RAM[bankaddress]);
+	membank("bank1")->set_base(&RAM[bankaddress]);
 }
 
 WRITE8_MEMBER(tbowl_state::tbowlc_bankswitch_w)
@@ -50,7 +50,7 @@ WRITE8_MEMBER(tbowl_state::tbowlc_bankswitch_w)
 	bankaddress = 0x10000 + ((data & 0xf8) << 8);
 
 
-	subbank("bank2")->set_base(&RAM[bankaddress]);
+	membank("bank2")->set_base(&RAM[bankaddress]);
 }
 
 /*** Shared Ram Handlers

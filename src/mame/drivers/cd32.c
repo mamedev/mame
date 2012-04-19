@@ -56,7 +56,7 @@ WRITE32_MEMBER(cd32_state::aga_overlay_w)
 		data = (data >> 16) & 1;
 
 		/* switch banks as appropriate */
-		subbank("bank1")->set_entry(data & 1);
+		membank("bank1")->set_entry(data & 1);
 
 		/* swap the write handlers between ROM and bank 1 based on the bit */
 		if ((data & 1) == 0)
@@ -853,8 +853,8 @@ static DRIVER_INIT( cd32 )
 	amiga_machine_config(machine, &cd32_intf);
 
 	/* set up memory */
-	state->subbank("bank1")->configure_entry(0, state->m_chip_ram);
-	state->subbank("bank1")->configure_entry(1, machine.region("user1")->base());
+	state->membank("bank1")->configure_entry(0, state->m_chip_ram);
+	state->membank("bank1")->configure_entry(1, machine.region("user1")->base());
 
 	/* input hack */
 	state->m_input_hack = NULL;
@@ -1472,8 +1472,8 @@ static DRIVER_INIT( odeontw2 )
 	amiga_machine_config(machine, &cd32_intf);
 
 	/* set up memory */
-	state->subbank("bank1")->configure_entry(0, state->m_chip_ram);
-	state->subbank("bank1")->configure_entry(1, machine.region("user1")->base());
+	state->membank("bank1")->configure_entry(0, state->m_chip_ram);
+	state->membank("bank1")->configure_entry(1, machine.region("user1")->base());
 
 	/* input hack */
 	state->m_input_hack = NULL;

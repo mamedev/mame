@@ -466,7 +466,7 @@ WRITE8_MEMBER(dunhuang_state::dunhuang_rombank_w)
 	// ?                data & 0x01
 	// ?                data & 0x02
 
-	subbank("bank1")->set_entry(((data >> 2) & 0x7));
+	membank("bank1")->set_entry(((data >> 2) & 0x7));
 
 	// COIN OUT:        data & 0x20
 	coin_counter_w(machine(), 0,	data & 0x40);
@@ -768,7 +768,7 @@ static MACHINE_START( dunhuang )
 	dunhuang_state *state = machine.driver_data<dunhuang_state>();
 	UINT8 *ROM = machine.region("maincpu")->base();
 
-	state->subbank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x8000);
+	state->membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x8000);
 
 	state->save_item(NAME(state->m_written));
 	state->save_item(NAME(state->m_written2));

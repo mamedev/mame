@@ -241,7 +241,7 @@ static void setbank(running_machine &machine)
 {
 	renegade_state *state = machine.driver_data<renegade_state>();
 	UINT8 *RAM = machine.region("maincpu")->base();
-	state->subbank("bank1")->set_base(&RAM[state->m_bank ? 0x10000 : 0x4000]);
+	state->membank("bank1")->set_base(&RAM[state->m_bank ? 0x10000 : 0x4000]);
 }
 
 static MACHINE_START( renegade )

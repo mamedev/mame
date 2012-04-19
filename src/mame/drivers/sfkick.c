@@ -109,32 +109,32 @@ static void sfkick_remap_banks(running_machine &machine)
 		case 0: /* bios */
 		{
 			UINT8 *mem = machine.region("bios")->base();
-			state->subbank("bank1")->set_base(mem);
-			state->subbank("bank2")->set_base(mem+0x2000);
+			state->membank("bank1")->set_base(mem);
+			state->membank("bank2")->set_base(mem+0x2000);
 		}
 		break;
 
 		case 1: /* ext rom */
 		{
 			UINT8 *mem = machine.region("extrom")->base();
-			state->subbank("bank1")->set_base(mem+0x4000);
-			state->subbank("bank2")->set_base(mem+0x6000);
+			state->membank("bank1")->set_base(mem+0x4000);
+			state->membank("bank2")->set_base(mem+0x6000);
 		}
 		break;
 
 		case 2: /* banked */
 		{
 			UINT8 *mem = machine.region("banked")->base();
-			state->subbank("bank1")->set_base(mem+0x2000*state->m_bank[0]);
-			state->subbank("bank2")->set_base(mem+0x2000*state->m_bank[1]);
+			state->membank("bank1")->set_base(mem+0x2000*state->m_bank[0]);
+			state->membank("bank2")->set_base(mem+0x2000*state->m_bank[1]);
 		}
 		break;
 
 		case 3: /* unknown */
 		{
 			UINT8 *mem = machine.region("banked")->base();
-			state->subbank("bank1")->set_base(mem+0x18000);
-			state->subbank("bank2")->set_base(mem+0x18000);
+			state->membank("bank1")->set_base(mem+0x18000);
+			state->membank("bank2")->set_base(mem+0x18000);
 		}
 		break;
 	}
@@ -145,8 +145,8 @@ static void sfkick_remap_banks(running_machine &machine)
 		case 0: /* bios - upper part */
 		{
 			UINT8 *mem = machine.region("bios")->base();
-			state->subbank("bank3")->set_base(mem+0x4000);
-			state->subbank("bank4")->set_base(mem+0x6000);
+			state->membank("bank3")->set_base(mem+0x4000);
+			state->membank("bank4")->set_base(mem+0x6000);
 		}
 		break;
 
@@ -154,16 +154,16 @@ static void sfkick_remap_banks(running_machine &machine)
 		case 3:
 		{
 			UINT8 *mem = machine.region("banked")->base();
-			state->subbank("bank3")->set_base(mem+0x18000);
-			state->subbank("bank4")->set_base(mem+0x18000);
+			state->membank("bank3")->set_base(mem+0x18000);
+			state->membank("bank4")->set_base(mem+0x18000);
 		}
 		break;
 
 		case 2: /* banked */
 		{
 			UINT8 *mem = machine.region("banked")->base();
-			state->subbank("bank3")->set_base(mem+0x2000*state->m_bank[2]);
-			state->subbank("bank4")->set_base(mem+0x2000*state->m_bank[3]);
+			state->membank("bank3")->set_base(mem+0x2000*state->m_bank[2]);
+			state->membank("bank4")->set_base(mem+0x2000*state->m_bank[3]);
 		}
 		break;
 	}
@@ -174,8 +174,8 @@ static void sfkick_remap_banks(running_machine &machine)
 		case 0: /* cartridge */
 		{
 			UINT8 *mem = machine.region("cartridge")->base();
-			state->subbank("bank5")->set_base(mem+0x4000);
-			state->subbank("bank6")->set_base(mem+0x6000);
+			state->membank("bank5")->set_base(mem+0x4000);
+			state->membank("bank6")->set_base(mem+0x6000);
 		}
 		break;
 
@@ -183,16 +183,16 @@ static void sfkick_remap_banks(running_machine &machine)
 		case 3:
 		{
 			UINT8 *mem = machine.region("banked")->base();
-			state->subbank("bank5")->set_base(mem+0x18000);
-			state->subbank("bank6")->set_base(mem+0x18000);
+			state->membank("bank5")->set_base(mem+0x18000);
+			state->membank("bank6")->set_base(mem+0x18000);
 		}
 		break;
 
 		case 2: /* banked */
 		{
 			UINT8 *mem = machine.region("banked")->base();
-			state->subbank("bank5")->set_base(mem+0x2000*state->m_bank[4]);
-			state->subbank("bank6")->set_base(mem+0x2000*state->m_bank[5]);
+			state->membank("bank5")->set_base(mem+0x2000*state->m_bank[4]);
+			state->membank("bank6")->set_base(mem+0x2000*state->m_bank[5]);
 		}
 		break;
 	}
@@ -204,23 +204,23 @@ static void sfkick_remap_banks(running_machine &machine)
 		case 1:
 		{
 			UINT8 *mem = machine.region("banked")->base();
-			state->subbank("bank7")->set_base(mem+0x18000);
-			state->subbank("bank8")->set_base(mem+0x18000);
+			state->membank("bank7")->set_base(mem+0x18000);
+			state->membank("bank8")->set_base(mem+0x18000);
 		}
 		break;
 
 		case 2: /* banked */
 		{
 			UINT8 *mem = machine.region("banked")->base();
-			state->subbank("bank7")->set_base(mem+0x2000*state->m_bank[6]);
-			state->subbank("bank8")->set_base(mem+0x2000*state->m_bank[7]);
+			state->membank("bank7")->set_base(mem+0x2000*state->m_bank[6]);
+			state->membank("bank8")->set_base(mem+0x2000*state->m_bank[7]);
 		}
 		break;
 
 		case 3: /* RAM */
 		{
-			state->subbank("bank7")->set_base(state->m_main_mem);
-			state->subbank("bank8")->set_base(state->m_main_mem+0x2000);
+			state->membank("bank7")->set_base(state->m_main_mem);
+			state->membank("bank8")->set_base(state->m_main_mem+0x2000);
 		}
 		break;
 	}

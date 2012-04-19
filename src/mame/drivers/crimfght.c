@@ -257,8 +257,8 @@ static MACHINE_START( crimfght )
 	crimfght_state *state = machine.driver_data<crimfght_state>();
 	UINT8 *ROM = machine.region("maincpu")->base();
 
-	state->subbank("bank2")->configure_entries(0, 12, &ROM[0x10000], 0x2000);
-	state->subbank("bank2")->set_entry(0);
+	state->membank("bank2")->configure_entries(0, 12, &ROM[0x10000], 0x2000);
+	state->membank("bank2")->set_entry(0);
 
 	state->m_maincpu = machine.device("maincpu");
 	state->m_audiocpu = machine.device("audiocpu");
@@ -408,7 +408,7 @@ static KONAMI_SETLINES_CALLBACK( crimfght_banking )
 	{
 		device->memory().space(AS_PROGRAM)->install_read_bank(0x0000, 0x03ff, "bank3");
 		device->memory().space(AS_PROGRAM)->install_write_handler(0x0000, 0x03ff, write8_delegate(FUNC(crimfght_state::paletteram_xBBBBBGGGGGRRRRR_byte_be_w), state));
-		state->subbank("bank3")->set_base(state->m_generic_paletteram_8);
+		state->membank("bank3")->set_base(state->m_generic_paletteram_8);
 	}
 	else
 		device->memory().space(AS_PROGRAM)->install_readwrite_bank(0x0000, 0x03ff, "bank1");								/* RAM */
@@ -416,7 +416,7 @@ static KONAMI_SETLINES_CALLBACK( crimfght_banking )
 	/* bit 6 = enable char ROM reading through the video RAM */
 	k052109_set_rmrd_line(state->m_k052109, (lines & 0x40) ? ASSERT_LINE : CLEAR_LINE);
 
-	state->subbank("bank2")->set_entry(lines & 0x0f);
+	state->membank("bank2")->set_entry(lines & 0x0f);
 }
 
 GAME( 1989, crimfght,  0,        crimfght, crimfght, 0, ROT0, "Konami", "Crime Fighters (US 4 players)", GAME_SUPPORTS_SAVE )

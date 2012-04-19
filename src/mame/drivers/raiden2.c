@@ -613,7 +613,7 @@ WRITE16_MEMBER(raiden2_state::cop_cmd_w)
 
 //  case 0x6ca:
 //      logerror("select bank %d %04x\n", (data >> 15) & 1, data);
-//      space.machine().root_device().subbank("bank1")->set_entry((data >> 15) & 1);
+//      space.machine().root_device().membank("bank1")->set_entry((data >> 15) & 1);
 
 
 static void combine32(UINT32 *val, int offset, UINT16 data, UINT16 mem_mask)
@@ -813,7 +813,7 @@ WRITE16_MEMBER(raiden2_state::raidendx_cop_bank_2_w)
 
 		/* probably bit 3 is from 6c9 */
 		/* TODO: this doesn't work! */
-		space.machine().root_device().subbank("mainbank")->set_entry(8 | (cop_bank & 0x7000) >> 12);
+		space.machine().root_device().membank("mainbank")->set_entry(8 | (cop_bank & 0x7000) >> 12);
 	}
 }
 
@@ -1059,7 +1059,7 @@ static MACHINE_RESET(raiden2)
 	sprcpt_init();
 	MACHINE_RESET_CALL(seibu_sound);
 
-	state->subbank("mainbank")->set_entry(1);
+	state->membank("mainbank")->set_entry(1);
 
 	state->prg_bank = 0;
 	//cop_init();
@@ -1072,7 +1072,7 @@ static MACHINE_RESET(raidendx)
 	sprcpt_init();
 	MACHINE_RESET_CALL(seibu_sound);
 
-	state->subbank("mainbank")->set_entry(8);
+	state->membank("mainbank")->set_entry(8);
 
 	state->prg_bank = 0x08;
 
@@ -1088,7 +1088,7 @@ static MACHINE_RESET(zeroteam)
 	sprcpt_init();
 	MACHINE_RESET_CALL(seibu_sound);
 
-	state->subbank("mainbank")->set_entry(1);
+	state->membank("mainbank")->set_entry(1);
 
 	state->prg_bank = 0;
 	//cop_init();
@@ -1103,7 +1103,7 @@ static MACHINE_RESET(xsedae)
 	sprcpt_init();
 	MACHINE_RESET_CALL(seibu_sound);
 
-	state->subbank("mainbank")->set_entry(1);
+	state->membank("mainbank")->set_entry(1);
 
 	//cop_init();
 }
@@ -1122,7 +1122,7 @@ WRITE16_MEMBER(raiden2_state::raiden2_bank_w)
 {
 	if(ACCESSING_BITS_8_15) {
 		logerror("select bank %d %04x\n", (data >> 15) & 1, data);
-		space.machine().root_device().subbank("mainbank")->set_entry(!((data >> 15) & 1));
+		space.machine().root_device().membank("mainbank")->set_entry(!((data >> 15) & 1));
 		prg_bank = ((data >> 15) & 1);
 	}
 }
@@ -2894,25 +2894,25 @@ ROM_END
 
 static DRIVER_INIT (raiden2)
 {
-	machine.root_device().subbank("mainbank")->configure_entries(0, 2, machine.region("mainprg")->base(), 0x20000);
+	machine.root_device().membank("mainbank")->configure_entries(0, 2, machine.region("mainprg")->base(), 0x20000);
 	raiden2_decrypt_sprites(machine);
 }
 
 static DRIVER_INIT (raidendx)
 {
-	machine.root_device().subbank("mainbank")->configure_entries(0, 0x10, machine.region("mainprg")->base(), 0x20000);
+	machine.root_device().membank("mainbank")->configure_entries(0, 0x10, machine.region("mainprg")->base(), 0x20000);
 	raiden2_decrypt_sprites(machine);
 }
 
 static DRIVER_INIT (xsedae)
 {
 	/* doesn't have banking */
-	//machine.root_device().subbank("mainbank")->configure_entries(0, 2, machine.region("mainprg")->base(), 0x20000);
+	//machine.root_device().membank("mainbank")->configure_entries(0, 2, machine.region("mainprg")->base(), 0x20000);
 }
 
 static DRIVER_INIT (zeroteam)
 {
-	machine.root_device().subbank("mainbank")->configure_entries(0, 2, machine.region("mainprg")->base(), 0x20000);
+	machine.root_device().membank("mainbank")->configure_entries(0, 2, machine.region("mainprg")->base(), 0x20000);
 	zeroteam_decrypt_sprites(machine);
 }
 

@@ -128,7 +128,7 @@ static SCREEN_UPDATE_IND16( cultures )
 
 WRITE8_MEMBER(cultures_state::cpu_bankswitch_w)
 {
-	subbank("bank1")->set_entry(data & 0x0f);
+	membank("bank1")->set_entry(data & 0x0f);
 	m_video_bank = ~data & 0x20;
 }
 
@@ -372,7 +372,7 @@ static MACHINE_START( cultures )
 	cultures_state *state = machine.driver_data<cultures_state>();
 	UINT8 *ROM = machine.region("maincpu")->base();
 
-	state->subbank("bank1")->configure_entries(0, 16, &ROM[0x0000], 0x4000);
+	state->membank("bank1")->configure_entries(0, 16, &ROM[0x0000], 0x4000);
 
 	state->save_item(NAME(state->m_paletteram));
 	state->save_item(NAME(state->m_old_bank));

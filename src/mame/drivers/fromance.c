@@ -112,7 +112,7 @@ WRITE8_MEMBER(fromance_state::fromance_busycheck_sub_w)
 
 WRITE8_MEMBER(fromance_state::fromance_rombank_w)
 {
-	subbank("bank1")->set_entry(data);
+	membank("bank1")->set_entry(data);
 }
 
 
@@ -956,7 +956,7 @@ static MACHINE_START( fromance )
 	fromance_state *state = machine.driver_data<fromance_state>();
 	UINT8 *ROM = machine.region("sub")->base();
 
-	state->subbank("bank1")->configure_entries(0, 0x100, &ROM[0x10000], 0x4000);
+	state->membank("bank1")->configure_entries(0, 0x100, &ROM[0x10000], 0x4000);
 
 	state->m_subcpu = machine.device("sub");
 

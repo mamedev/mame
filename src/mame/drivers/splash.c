@@ -140,7 +140,7 @@ READ16_MEMBER(splash_state::roldfrog_bombs_r)
 
 WRITE8_MEMBER(splash_state::sound_bank_w)
 {
-	subbank("sound_bank")->set_entry(data & 0xf);
+	membank("sound_bank")->set_entry(data & 0xf);
 }
 
 
@@ -1017,7 +1017,7 @@ static DRIVER_INIT( roldfrog )
 {
 	splash_state *state = machine.driver_data<splash_state>();
 	UINT8 * ROM = (UINT8 *)machine.region("audiocpu")->base();
-	state->subbank("sound_bank")->configure_entries(0, 16, &ROM[0x10000], 0x8000);
+	state->membank("sound_bank")->configure_entries(0, 16, &ROM[0x10000], 0x8000);
 
 	state->m_bitmap_type = 1;
 	state->m_sprite_attr2_shift = 8;
@@ -1097,7 +1097,7 @@ static DRIVER_INIT( funystrp )
 
 	ROM = (UINT16 *)machine.region("audiocpu")->base();
 
-	state->subbank("sound_bank")->configure_entries(0, 16, &ROM[0x00000], 0x8000);
+	state->membank("sound_bank")->configure_entries(0, 16, &ROM[0x00000], 0x8000);
 
 }
 

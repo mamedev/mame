@@ -16,7 +16,7 @@ XX Mission (c) 1986 UPL
 
 WRITE8_MEMBER(xxmissio_state::xxmissio_bank_sel_w)
 {
-	subbank("bank1")->set_entry(data & 7);
+	membank("bank1")->set_entry(data & 7);
 }
 
 CUSTOM_INPUT_MEMBER(xxmissio_state::xxmissio_status_r)
@@ -79,8 +79,8 @@ static INTERRUPT_GEN( xxmissio_interrupt_s )
 
 static MACHINE_START( xxmissio )
 {
-	machine.root_device().subbank("bank1")->configure_entries(0, 8, machine.region("user1")->base(), 0x4000);
-	machine.root_device().subbank("bank1")->set_entry(0);
+	machine.root_device().membank("bank1")->configure_entries(0, 8, machine.region("user1")->base(), 0x4000);
+	machine.root_device().membank("bank1")->set_entry(0);
 }
 
 /****************************************************************************/

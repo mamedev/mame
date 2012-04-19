@@ -163,7 +163,7 @@ Note: The 'rastsagaa' set's rom numbers were named as RSxx_37 through RSxx_42
 
 static WRITE8_DEVICE_HANDLER( rastan_bankswitch_w )
 {
-	device->machine().root_device().subbank("bank1")->set_entry(data & 3);
+	device->machine().root_device().membank("bank1")->set_entry(data & 3);
 }
 
 
@@ -361,8 +361,8 @@ static MACHINE_START( rastan )
 	rastan_state *state = machine.driver_data<rastan_state>();
 	UINT8 *ROM = machine.region("audiocpu")->base();
 
-	state->subbank("bank1")->configure_entry(0, &ROM[0x00000]);
-	state->subbank("bank1")->configure_entries(1, 3, &ROM[0x10000], 0x4000);
+	state->membank("bank1")->configure_entry(0, &ROM[0x00000]);
+	state->membank("bank1")->configure_entries(1, 3, &ROM[0x10000], 0x4000);
 
 	state->m_maincpu = machine.device("maincpu");
 	state->m_audiocpu = machine.device("audiocpu");

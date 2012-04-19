@@ -423,7 +423,7 @@ static MACHINE_START( mexico86 )
 	mexico86_state *state = machine.driver_data<mexico86_state>();
 	UINT8 *ROM = machine.region("maincpu")->base();
 
-	state->subbank("bank1")->configure_entries(0, 6, &ROM[0x10000], 0x4000);
+	state->membank("bank1")->configure_entries(0, 6, &ROM[0x10000], 0x4000);
 
 	state->m_maincpu = machine.device("maincpu");
 	state->m_audiocpu = machine.device("audiocpu");

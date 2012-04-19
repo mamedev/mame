@@ -249,12 +249,12 @@ static INTERRUPT_GEN( cadash_interrupt )
 
 WRITE8_MEMBER(asuka_state::sound_bankswitch_w)
 {
-	subbank("bank1")->set_entry(data & 0x03);
+	membank("bank1")->set_entry(data & 0x03);
 }
 
 static WRITE8_DEVICE_HANDLER( sound_bankswitch_2151_w )
 {
-	device->machine().root_device().subbank("bank1")->set_entry(data & 0x03);
+	device->machine().root_device().membank("bank1")->set_entry(data & 0x03);
 }
 
 
@@ -842,8 +842,8 @@ static MACHINE_START( asuka )
 	state->m_tc0100scn = machine.device("tc0100scn");
 
 	/* configure the banks */
-	state->subbank("bank1")->configure_entry(0, machine.region("audiocpu")->base());
-	state->subbank("bank1")->configure_entries(1, 3, machine.region("audiocpu")->base() + 0x10000, 0x04000);
+	state->membank("bank1")->configure_entry(0, machine.region("audiocpu")->base());
+	state->membank("bank1")->configure_entries(1, 3, machine.region("audiocpu")->base() + 0x10000, 0x04000);
 
 	state->save_item(NAME(state->m_adpcm_pos));
 	state->save_item(NAME(state->m_adpcm_data));

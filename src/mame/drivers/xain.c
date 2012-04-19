@@ -213,12 +213,12 @@ static TIMER_DEVICE_CALLBACK( xain_scanline )
 WRITE8_MEMBER(xain_state::xainCPUA_bankswitch_w)
 {
 	m_pri = data & 0x7;
-	subbank("bank1")->set_entry((data >> 3) & 1);
+	membank("bank1")->set_entry((data >> 3) & 1);
 }
 
 WRITE8_MEMBER(xain_state::xainCPUB_bankswitch_w)
 {
-	subbank("bank2")->set_entry(data & 1);
+	membank("bank2")->set_entry(data & 1);
 }
 
 WRITE8_MEMBER(xain_state::xain_sound_command_w)
@@ -568,10 +568,10 @@ static const ym2203_interface ym2203_config =
 
 static MACHINE_START( xsleena )
 {
-	machine.root_device().subbank("bank1")->configure_entries(0, 2, machine.region("maincpu")->base() + 0x4000, 0xc000);
-	machine.root_device().subbank("bank2")->configure_entries(0, 2, machine.region("sub")->base()  + 0x4000, 0xc000);
-	machine.root_device().subbank("bank1")->set_entry(0);
-	machine.root_device().subbank("bank2")->set_entry(0);
+	machine.root_device().membank("bank1")->configure_entries(0, 2, machine.region("maincpu")->base() + 0x4000, 0xc000);
+	machine.root_device().membank("bank2")->configure_entries(0, 2, machine.region("sub")->base()  + 0x4000, 0xc000);
+	machine.root_device().membank("bank1")->set_entry(0);
+	machine.root_device().membank("bank2")->set_entry(0);
 }
 
 static MACHINE_CONFIG_START( xsleena, xain_state )

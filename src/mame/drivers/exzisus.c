@@ -55,7 +55,7 @@ WRITE8_MEMBER(exzisus_state::exzisus_cpua_bankswitch_w)
 		m_cpua_bank = data & 0x0f;
 		if (m_cpua_bank >= 2)
 		{
-			subbank("bank2")->set_base(&RAM[ 0x10000 + ( (m_cpua_bank - 2) * 0x4000 ) ] );
+			membank("bank2")->set_base(&RAM[ 0x10000 + ( (m_cpua_bank - 2) * 0x4000 ) ] );
 		}
 	}
 
@@ -71,7 +71,7 @@ WRITE8_MEMBER(exzisus_state::exzisus_cpub_bankswitch_w)
 		m_cpub_bank = data & 0x0f;
 		if (m_cpub_bank >= 2)
 		{
-			subbank("bank1")->set_base(&RAM[ 0x10000 + ( (m_cpub_bank - 2) * 0x4000 ) ] );
+			membank("bank1")->set_base(&RAM[ 0x10000 + ( (m_cpub_bank - 2) * 0x4000 ) ] );
 		}
 	}
 

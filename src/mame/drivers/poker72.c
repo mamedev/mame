@@ -82,12 +82,12 @@ WRITE8_MEMBER(poker72_state::output_w)
 	printf("%02x\n",data);
 
 /*  if((data & 0xc) == 0xc)
-        subbank("bank1")->set_base(&ROM[0x10000]);
+        membank("bank1")->set_base(&ROM[0x10000]);
     else*/
 	if(data & 8)
-		subbank("bank1")->set_base(&ROM[0x08000]);
+		membank("bank1")->set_base(&ROM[0x08000]);
 	else
-		subbank("bank1")->set_base(&ROM[0x00000]);
+		membank("bank1")->set_base(&ROM[0x00000]);
 }
 
 WRITE8_MEMBER(poker72_state::tile_bank_w)
@@ -341,7 +341,7 @@ static MACHINE_RESET( poker72 )
 {
 	UINT8 *ROM = machine.region("maincpu")->base();
 
-	machine.root_device().subbank("bank1")->set_base(&ROM[0]);
+	machine.root_device().membank("bank1")->set_base(&ROM[0]);
 }
 
 static MACHINE_CONFIG_START( poker72, poker72_state )

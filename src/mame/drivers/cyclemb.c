@@ -227,7 +227,7 @@ static SCREEN_UPDATE_IND16( cyclemb )
 
 WRITE8_MEMBER(cyclemb_state::cyclemb_bankswitch_w)
 {
-	subbank("bank1")->set_entry(data & 3);
+	membank("bank1")->set_entry(data & 3);
 }
 
 #if 0
@@ -613,7 +613,7 @@ ROM_END
 
 static DRIVER_INIT( cyclemb )
 {
-	machine.root_device().subbank("bank1")->configure_entries(0, 4, machine.region("maincpu")->base() + 0x10000, 0x1000);
+	machine.root_device().membank("bank1")->configure_entries(0, 4, machine.region("maincpu")->base() + 0x10000, 0x1000);
 }
 
 GAME( 1984, cyclemb,  0,   cyclemb,  cyclemb,  cyclemb, ROT0, "Taito Corporation", "Cycle Mahbou (Japan)", GAME_NOT_WORKING )

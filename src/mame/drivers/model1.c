@@ -664,7 +664,7 @@ WRITE16_MEMBER(model1_state::bank_w)
 	if(ACCESSING_BITS_0_7) {
 		switch(data & 0xf) {
 		case 0x1: // 100000-1fffff data roms banking
-			subbank("bank1")->set_base(machine().region("maincpu")->base() + 0x1000000 + 0x100000*((data >> 4) & 0xf));
+			membank("bank1")->set_base(machine().region("maincpu")->base() + 0x1000000 + 0x100000*((data >> 4) & 0xf));
 			logerror("BANK %x\n", 0x1000000 + 0x100000*((data >> 4) & 0xf));
 			break;
 		case 0x2: // 200000-2fffff data roms banking (unused, all known games have only one bank)
@@ -735,7 +735,7 @@ static TIMER_DEVICE_CALLBACK( model1_interrupt )
 static MACHINE_RESET(model1)
 {
 	model1_state *state = machine.driver_data<model1_state>();
-	state->subbank("bank1")->set_base(machine.region("maincpu")->base() + 0x1000000);
+	state->membank("bank1")->set_base(machine.region("maincpu")->base() + 0x1000000);
 	irq_init(machine);
 	model1_tgp_reset(machine, !strcmp(machine.system().name, "swa") || !strcmp(machine.system().name, "wingwar") || !strcmp(machine.system().name, "wingwaru") || !strcmp(machine.system().name, "wingwarj"));
 	if (!strcmp(machine.system().name, "swa"))
@@ -755,7 +755,7 @@ static MACHINE_RESET(model1)
 static MACHINE_RESET(model1_vr)
 {
 	model1_state *state = machine.driver_data<model1_state>();
-	state->subbank("bank1")->set_base(machine.region("maincpu")->base() + 0x1000000);
+	state->membank("bank1")->set_base(machine.region("maincpu")->base() + 0x1000000);
 	irq_init(machine);
 	model1_vr_tgp_reset(machine);
 	state->m_sound_irq = 3;

@@ -114,8 +114,8 @@ WRITE8_MEMBER(trvmadns_state::trvmadns_banking_w)
 
 		address |= (data & 0x10) ? 0x10000 : 0;
 
-		subbank("bank1")->set_base(&rom[address]);
-		subbank("bank2")->set_base(&rom[address + 0x1000]);
+		membank("bank1")->set_base(&rom[address]);
+		membank("bank2")->set_base(&rom[address + 0x1000]);
 	}
 	else
 	{
@@ -154,7 +154,7 @@ WRITE8_MEMBER(trvmadns_state::trvmadns_banking_w)
 
 //      logerror("add = %X\n",address);
 
-		subbank("bank1")->set_base(&rom[address]);
+		membank("bank1")->set_base(&rom[address]);
 	}
 }
 

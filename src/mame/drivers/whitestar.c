@@ -98,12 +98,12 @@ WRITE8_MEMBER(whitestar_state::switch_w)
 
 WRITE8_MEMBER(whitestar_state::bank_w)
 {
-	subbank("bank1")->set_base(machine().region("user1")->base() + (data & 0x1f) * 0x4000);
+	membank("bank1")->set_base(machine().region("user1")->base() + (data & 0x1f) * 0x4000);
 }
 
 WRITE8_MEMBER(whitestar_state::dmd_bank_w)
 {
-	subbank("dmd_bank1")->set_base(machine().region("dmdcpu")->base() + (data & 0x1f) * 0x4000);
+	membank("dmd_bank1")->set_base(machine().region("dmdcpu")->base() + (data & 0x1f) * 0x4000);
 }
 
 READ8_MEMBER(whitestar_state::dmd_latch_r)
@@ -170,8 +170,8 @@ ADDRESS_MAP_END
 
 static MACHINE_RESET( whitestar )
 {
-	machine.root_device().subbank("bank1")->set_base(machine.region("user1")->base());
-	machine.root_device().subbank("dmd_bank1")->set_base(machine.region("dmdcpu")->base());
+	machine.root_device().membank("bank1")->set_base(machine.region("user1")->base());
+	machine.root_device().membank("dmd_bank1")->set_base(machine.region("dmdcpu")->base());
 }
 
 static DRIVER_INIT( whitestar )

@@ -129,7 +129,7 @@ WRITE8_MEMBER(brkthru_state::brkthru_1800_w)
 	else if (offset == 1)
 	{
 		/* bit 0-2 = ROM bank select */
-		subbank("bank1")->set_entry(data & 0x07);
+		membank("bank1")->set_entry(data & 0x07);
 
 		/* bit 3-5 = background tiles color code */
 		if (((data & 0x38) >> 2) != m_bgbasecolor)

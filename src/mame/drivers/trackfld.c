@@ -211,7 +211,7 @@ WRITE8_MEMBER(trackfld_state::questions_bank_w)
 	{
 		if((data & 1 << i) == 0) // check first bit active low, change ROM bank according to the correlated bit
 		{
-			subbank("bank1")->set_entry(i);
+			membank("bank1")->set_entry(i);
 			return;
 		}
 	}
@@ -1446,10 +1446,10 @@ static DRIVER_INIT( atlantol )
 	space->install_read_bank(0x1380, 0x17ff, "bank11");
 	space->install_read_bank(0x2000, 0x27ff, "bank12");
 	space->install_read_bank(0x4000, 0x5fff, "bank13");
-	state->subbank("bank10")->set_base(&rom[0x0000]);
-	state->subbank("bank11")->set_base(&rom[0x1380]);
-	state->subbank("bank12")->set_base(&rom[0x2000]);
-	state->subbank("bank13")->set_base(&rom[0x4000]);
+	state->membank("bank10")->set_base(&rom[0x0000]);
+	state->membank("bank11")->set_base(&rom[0x1380]);
+	state->membank("bank12")->set_base(&rom[0x2000]);
+	state->membank("bank13")->set_base(&rom[0x4000]);
 }
 
 static DRIVER_INIT( mastkin )
@@ -1488,7 +1488,7 @@ static DRIVER_INIT( wizzquiz )
 	for (i = 0; i < 0x40000; i++)
 		ROM[i] = BITSWAP8(ROM[i],0,1,2,3,4,5,6,7);
 
-	machine.root_device().subbank("bank1")->configure_entries(0, 8, ROM, 0x8000);
+	machine.root_device().membank("bank1")->configure_entries(0, 8, ROM, 0x8000);
 }
 
 

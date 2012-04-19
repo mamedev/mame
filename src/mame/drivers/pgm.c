@@ -3646,7 +3646,7 @@ void pgm_basic_init( running_machine &machine, bool set_bank)
 	pgm_state *state = machine.driver_data<pgm_state>();
 
 	UINT8 *ROM = machine.region("maincpu")->base();
-	if (set_bank) state->subbank("bank1")->set_base(&ROM[0x100000]);
+	if (set_bank) state->membank("bank1")->set_base(&ROM[0x100000]);
 
 	expand_32x32x5bpp(machine);
 	expand_colourdata(machine);

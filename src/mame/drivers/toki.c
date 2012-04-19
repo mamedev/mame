@@ -76,7 +76,7 @@ static WRITE8_DEVICE_HANDLER( toki_adpcm_control_w )
 
 	/* the code writes either 2 or 3 in the bottom two bits */
 	bankaddress = 0x10000 + (data & 0x01) * 0x4000;
-	device->machine().root_device().subbank("bank1")->set_base(&RAM[bankaddress]);
+	device->machine().root_device().membank("bank1")->set_base(&RAM[bankaddress]);
 
 	msm5205_reset_w(device,data & 0x08);
 }

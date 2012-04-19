@@ -443,7 +443,7 @@ bb63           = Square things again
 
 WRITE8_MEMBER(dec8_state::dec8_bank_w)
 {
-	subbank("bank1")->set_entry(data & 0x0f);
+	membank("bank1")->set_entry(data & 0x0f);
 }
 
 /* Used by Ghostbusters, Meikyuu Hunter G & Gondomania */
@@ -457,7 +457,7 @@ WRITE8_MEMBER(dec8_state::ghostb_bank_w)
        Bits 4-7: Bank switch
     */
 
-	subbank("bank1")->set_entry(data >> 4);
+	membank("bank1")->set_entry(data >> 4);
 
 	if ((data&1)==0) device_set_input_line(m_maincpu, M6809_IRQ_LINE, CLEAR_LINE);
 	if (data & 2) m_nmi_enable =1; else m_nmi_enable = 0;
@@ -473,7 +473,7 @@ WRITE8_MEMBER(dec8_state::csilver_control_w)
         Bit 0x40 - Unused.
         Bit 0x80 - Hold subcpu reset line high if clear, else low?  (Not needed anyway)
     */
-	subbank("bank1")->set_entry(data & 0x0f);
+	membank("bank1")->set_entry(data & 0x0f);
 }
 
 WRITE8_MEMBER(dec8_state::dec8_sound_w)
@@ -506,7 +506,7 @@ WRITE8_MEMBER(dec8_state::csilver_adpcm_data_w)
 
 WRITE8_MEMBER(dec8_state::csilver_sound_bank_w)
 {
-	subbank("bank3")->set_entry((data & 0x08) >> 3);
+	membank("bank3")->set_entry((data & 0x08) >> 3);
 }
 
 /******************************************************************************/
@@ -3563,28 +3563,28 @@ static DRIVER_INIT( deco222 )
 static DRIVER_INIT( lastmisn )
 {
 	UINT8 *ROM = machine.region("maincpu")->base();
-	machine.root_device().subbank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x4000);
+	machine.root_device().membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x4000);
 	DRIVER_INIT_CALL( dec8 );
 }
 
 static DRIVER_INIT( shackled )
 {
 	UINT8 *ROM = machine.region("maincpu")->base();
-	machine.root_device().subbank("bank1")->configure_entries(0, 14, &ROM[0x10000], 0x4000);
+	machine.root_device().membank("bank1")->configure_entries(0, 14, &ROM[0x10000], 0x4000);
 	DRIVER_INIT_CALL( dec8 );
 }
 
 static DRIVER_INIT( gondo )
 {
 	UINT8 *ROM = machine.region("maincpu")->base();
-	machine.root_device().subbank("bank1")->configure_entries(0, 12, &ROM[0x10000], 0x4000);
+	machine.root_device().membank("bank1")->configure_entries(0, 12, &ROM[0x10000], 0x4000);
 	DRIVER_INIT_CALL( dec8 );
 }
 
 static DRIVER_INIT( garyoret )
 {
 	UINT8 *ROM = machine.region("maincpu")->base();
-	machine.root_device().subbank("bank1")->configure_entries(0, 16, &ROM[0x10000], 0x4000);
+	machine.root_device().membank("bank1")->configure_entries(0, 16, &ROM[0x10000], 0x4000);
 	DRIVER_INIT_CALL( dec8 );
 }
 
@@ -3596,7 +3596,7 @@ static DRIVER_INIT( ghostb )
 	/* Blank out unused garbage in colour prom to avoid colour overflow */
 	memset(RAM + 0x20, 0, 0xe0);
 
-	machine.root_device().subbank("bank1")->configure_entries(0, 16, &ROM[0x10000], 0x4000);
+	machine.root_device().membank("bank1")->configure_entries(0, 16, &ROM[0x10000], 0x4000);
 	DRIVER_INIT_CALL(deco222);
 }
 
@@ -3608,7 +3608,7 @@ static DRIVER_INIT( meikyuh )
 	/* Blank out unused garbage in colour prom to avoid colour overflow */
 	memset(RAM + 0x20, 0, 0xe0);
 
-	machine.root_device().subbank("bank1")->configure_entries(0, 12, &ROM[0x10000], 0x4000);
+	machine.root_device().membank("bank1")->configure_entries(0, 12, &ROM[0x10000], 0x4000);
 	DRIVER_INIT_CALL( dec8 );
 }
 
@@ -3617,29 +3617,29 @@ static DRIVER_INIT( csilver )
 	UINT8 *ROM = machine.region("maincpu")->base();
 	UINT8 *RAM = machine.region("audiocpu")->base();
 
-	machine.root_device().subbank("bank1")->configure_entries(0, 14, &ROM[0x10000], 0x4000);
-	machine.root_device().subbank("bank3")->configure_entries(0, 2, &RAM[0x10000], 0x4000);
+	machine.root_device().membank("bank1")->configure_entries(0, 14, &ROM[0x10000], 0x4000);
+	machine.root_device().membank("bank3")->configure_entries(0, 2, &RAM[0x10000], 0x4000);
 	DRIVER_INIT_CALL( dec8 );
 }
 
 static DRIVER_INIT( oscar )
 {
 	UINT8 *ROM = machine.region("maincpu")->base();
-	machine.root_device().subbank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x4000);
+	machine.root_device().membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x4000);
 	DRIVER_INIT_CALL( deco222 );
 }
 
 static DRIVER_INIT( srdarwin )
 {
 	UINT8 *ROM = machine.region("maincpu")->base();
-	machine.root_device().subbank("bank1")->configure_entries(0, 6, &ROM[0x10000], 0x4000);
+	machine.root_device().membank("bank1")->configure_entries(0, 6, &ROM[0x10000], 0x4000);
 	DRIVER_INIT_CALL( deco222 );
 }
 
 static DRIVER_INIT( cobracom )
 {
 	UINT8 *ROM = machine.region("maincpu")->base();
-	machine.root_device().subbank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
+	machine.root_device().membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
 	DRIVER_INIT_CALL( dec8 );
 }
 

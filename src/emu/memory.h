@@ -746,6 +746,8 @@ private:
 class memory_manager
 {
 	friend class address_space;
+	friend class address_table;
+	friend class device_t;
 
 public:
 	// construction/destruction
@@ -754,8 +756,6 @@ public:
 	// getters
 	running_machine &machine() const { return m_machine; }
 	address_space *first_space() const { return m_spacelist.first(); }
-	memory_bank *first_bank() const { return m_banklist.first(); }
-	memory_bank *bank(const char *tag) const { return m_bankmap.find_hash_only(tag); }
 
 	// get a pointer to a shared memory region by tag
 	memory_share *shared(const char *tag);
@@ -769,6 +769,8 @@ public:
 
 private:
 	// internal helpers
+	memory_bank *first_bank() const { return m_banklist.first(); }
+	memory_bank *bank(const char *tag) const { return m_bankmap.find_hash_only(tag); }
 	void bank_reattach();
 
 	// internal state
@@ -888,14 +890,6 @@ private:
 // read/write a dword to a 64-bit space
 #define DWORD_XOR_BE(a) 				((a) ^ NATIVE_ENDIAN_VALUE_LE_BE(4,0))
 #define DWORD_XOR_LE(a) 				((a) ^ NATIVE_ENDIAN_VALUE_LE_BE(0,4))
-
-
-
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
-extern const char *const address_space_names[ADDRESS_SPACES];
 
 
 

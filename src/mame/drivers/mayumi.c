@@ -96,7 +96,7 @@ WRITE8_MEMBER(mayumi_state::bank_sel_w)
 {
 	int bank = BIT(data, 7) | (BIT(data, 6) << 1);
 
-	subbank("bank1")->set_entry(bank);
+	membank("bank1")->set_entry(bank);
 
 	m_int_enable = data & 1;
 
@@ -353,8 +353,8 @@ static MACHINE_START( mayumi )
 	mayumi_state *state = machine.driver_data<mayumi_state>();
 	UINT8 *ROM = machine.region("maincpu")->base();
 
-	state->subbank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x4000);
-	state->subbank("bank1")->set_entry(0);
+	state->membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x4000);
+	state->membank("bank1")->set_entry(0);
 
 	state->save_item(NAME(state->m_int_enable));
 	state->save_item(NAME(state->m_input_sel));

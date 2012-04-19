@@ -257,9 +257,9 @@ static void famicombox_bankswitch(running_machine &machine, UINT8 bank)
 		if ( bank == famicombox_banks[i].bank ||
 			 famicombox_banks[i].bank == 0 )
 		{
-			machine.root_device().subbank("cpubank1")->set_base(machine.region(famicombox_banks[i].memory_region)->base() + famicombox_banks[i].bank1_offset);
-			machine.root_device().subbank("cpubank2")->set_base(machine.region(famicombox_banks[i].memory_region)->base() + famicombox_banks[i].bank2_offset);
-			machine.root_device().subbank("ppubank1")->set_base(machine.region(famicombox_banks[i].memory_region)->base() + famicombox_banks[i].ppubank_offset);
+			machine.root_device().membank("cpubank1")->set_base(machine.region(famicombox_banks[i].memory_region)->base() + famicombox_banks[i].bank1_offset);
+			machine.root_device().membank("cpubank2")->set_base(machine.region(famicombox_banks[i].memory_region)->base() + famicombox_banks[i].bank2_offset);
+			machine.root_device().membank("ppubank1")->set_base(machine.region(famicombox_banks[i].memory_region)->base() + famicombox_banks[i].ppubank_offset);
 			break;
 		}
 	}

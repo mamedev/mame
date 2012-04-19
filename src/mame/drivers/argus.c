@@ -180,7 +180,7 @@ WRITE8_MEMBER(argus_state::argus_bankselect_w)
 	int bankaddress;
 
 	bankaddress = 0x10000 + ((data & 7) * 0x4000);
-	subbank("bank1")->set_base(&RAM[bankaddress]);	 /* Select 8 banks of 16k */
+	membank("bank1")->set_base(&RAM[bankaddress]);	 /* Select 8 banks of 16k */
 }
 
 

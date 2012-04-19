@@ -659,10 +659,10 @@ static void galgames_update_rombank(running_machine &machine, UINT32 cart)
 
 	state->m_gfx_offs = 0x200000 * cart;
 
-	if (machine.memory().bank(GALGAMES_BANK_000000_R) == GALGAMES_RAM)
-		state->subbank(GALGAMES_BANK_200000_R)->set_entry(GALGAMES_ROM0 + state->m_galgames_cart);	// rom
+	if (state->membank(GALGAMES_BANK_000000_R)->entry() == GALGAMES_RAM)
+		state->membank(GALGAMES_BANK_200000_R)->set_entry(GALGAMES_ROM0 + state->m_galgames_cart);	// rom
 
-	state->subbank(GALGAMES_BANK_240000_R)->set_entry(GALGAMES_ROM0 + state->m_galgames_cart);	// rom
+	state->membank(GALGAMES_BANK_240000_R)->set_entry(GALGAMES_ROM0 + state->m_galgames_cart);	// rom
 }
 
 WRITE16_MEMBER(tmaster_state::galgames_cart_sel_w)
@@ -712,14 +712,14 @@ WRITE16_MEMBER(tmaster_state::galgames_cart_clock_w)
 		// ROM/RAM banking
 		if ((data & 0xf7) == 0x05)
 		{
-			subbank(GALGAMES_BANK_000000_R)->set_entry(GALGAMES_RAM);	// ram
+			membank(GALGAMES_BANK_000000_R)->set_entry(GALGAMES_RAM);	// ram
 			galgames_update_rombank(machine(), m_galgames_cart);
 			logerror("%06x: romram bank = %04x\n", cpu_get_pc(&space.device()), data);
 		}
 		else
 		{
-			subbank(GALGAMES_BANK_000000_R)->set_entry(GALGAMES_ROM0);	// rom
-			subbank(GALGAMES_BANK_200000_R)->set_entry(GALGAMES_RAM);	// ram
+			membank(GALGAMES_BANK_000000_R)->set_entry(GALGAMES_ROM0);	// rom
+			membank(GALGAMES_BANK_200000_R)->set_entry(GALGAMES_RAM);	// ram
 			logerror("%06x: unknown romram bank = %04x\n", cpu_get_pc(&space.device()), data);
 		}
 	}
@@ -951,13 +951,13 @@ static MACHINE_RESET( galgames )
 	state->m_gfx_offs = 0;
 	state->m_gfx_size = 0x200000;
 
-	state->subbank(GALGAMES_BANK_000000_R)->set_entry(GALGAMES_ROM0);	// rom
-	state->subbank(GALGAMES_BANK_000000_W)->set_entry(GALGAMES_RAM);		// ram
+	state->membank(GALGAMES_BANK_000000_R)->set_entry(GALGAMES_ROM0);	// rom
+	state->membank(GALGAMES_BANK_000000_W)->set_entry(GALGAMES_RAM);		// ram
 
-	state->subbank(GALGAMES_BANK_200000_R)->set_entry(GALGAMES_RAM);		// ram
-	state->subbank(GALGAMES_BANK_200000_W)->set_entry(GALGAMES_RAM);		// ram
+	state->membank(GALGAMES_BANK_200000_R)->set_entry(GALGAMES_RAM);		// ram
+	state->membank(GALGAMES_BANK_200000_W)->set_entry(GALGAMES_RAM);		// ram
 
-	state->subbank(GALGAMES_BANK_240000_R)->set_entry(GALGAMES_ROM0);	// rom
+	state->membank(GALGAMES_BANK_240000_R)->set_entry(GALGAMES_ROM0);	// rom
 
 	galgames_update_rombank(machine, 0);
 
@@ -1840,17 +1840,17 @@ static DRIVER_INIT( galgames )
 	// RAM bank at 0x000000-0x03ffff and 0x200000-0x23ffff
 	// ROM bank at 0x000000-0x1fffff and 0x200000-0x3fffff (bios)
 
-	state->subbank(GALGAMES_BANK_000000_R)->configure_entry(GALGAMES_RAM,  state->m_galgames_ram);
-	state->subbank(GALGAMES_BANK_000000_R)->configure_entry(GALGAMES_ROM0, ROM+0x000000);
+	state->membank(GALGAMES_BANK_000000_R)->configure_entry(GALGAMES_RAM,  state->m_galgames_ram);
+	state->membank(GALGAMES_BANK_000000_R)->configure_entry(GALGAMES_ROM0, ROM+0x000000);
 
-	state->subbank(GALGAMES_BANK_000000_W)->configure_entry(GALGAMES_RAM,  state->m_galgames_ram);
+	state->membank(GALGAMES_BANK_000000_W)->configure_entry(GALGAMES_RAM,  state->m_galgames_ram);
 
-	state->subbank(GALGAMES_BANK_200000_R)->configure_entry(GALGAMES_RAM,  state->m_galgames_ram);
-	state->subbank(GALGAMES_BANK_200000_R)->configure_entry(GALGAMES_ROM0, ROM+0x000000);
+	state->membank(GALGAMES_BANK_200000_R)->configure_entry(GALGAMES_RAM,  state->m_galgames_ram);
+	state->membank(GALGAMES_BANK_200000_R)->configure_entry(GALGAMES_ROM0, ROM+0x000000);
 
-	state->subbank(GALGAMES_BANK_200000_W)->configure_entry(GALGAMES_RAM,  state->m_galgames_ram);
+	state->membank(GALGAMES_BANK_200000_W)->configure_entry(GALGAMES_RAM,  state->m_galgames_ram);
 
-	state->subbank(GALGAMES_BANK_240000_R)->configure_entry(GALGAMES_ROM0, ROM+0x040000);
+	state->membank(GALGAMES_BANK_240000_R)->configure_entry(GALGAMES_ROM0, ROM+0x040000);
 
 	// More ROM banks at 0x200000-0x3fffff (carts)
 
@@ -1861,8 +1861,8 @@ static DRIVER_INIT( galgames )
 		if  (0x200000 * (cart+1) <= machine.region("maincpu")->bytes())
 			CART += 0x200000 * cart;
 
-		state->subbank(GALGAMES_BANK_200000_R)->configure_entry(GALGAMES_ROM0+cart, CART);
-		state->subbank(GALGAMES_BANK_240000_R)->configure_entry(GALGAMES_ROM0+cart, CART+0x040000);
+		state->membank(GALGAMES_BANK_200000_R)->configure_entry(GALGAMES_ROM0+cart, CART);
+		state->membank(GALGAMES_BANK_240000_R)->configure_entry(GALGAMES_ROM0+cart, CART+0x040000);
 	}
 }
 

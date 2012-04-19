@@ -102,7 +102,7 @@ WRITE8_MEMBER(wc90b_state::wc90b_bankswitch_w)
 	UINT8 *ROM = machine().region("maincpu")->base();
 
 	bankaddress = 0x10000 + ((data & 0xf8) << 8);
-	subbank("bank1")->set_base(&ROM[bankaddress]);
+	membank("bank1")->set_base(&ROM[bankaddress]);
 }
 
 WRITE8_MEMBER(wc90b_state::wc90b_bankswitch1_w)
@@ -111,7 +111,7 @@ WRITE8_MEMBER(wc90b_state::wc90b_bankswitch1_w)
 	UINT8 *ROM = machine().region("sub")->base();
 
 	bankaddress = 0x10000 + ((data & 0xf8) << 8);
-	subbank("bank2")->set_base(&ROM[bankaddress]);
+	membank("bank2")->set_base(&ROM[bankaddress]);
 }
 
 WRITE8_MEMBER(wc90b_state::wc90b_sound_command_w)
@@ -127,7 +127,7 @@ static WRITE8_DEVICE_HANDLER( adpcm_control_w )
 
 	/* the code writes either 2 or 3 in the bottom two bits */
 	bankaddress = 0x10000 + (data & 0x01) * 0x4000;
-	device->machine().root_device().subbank("bank3")->set_base(&ROM[bankaddress]);
+	device->machine().root_device().membank("bank3")->set_base(&ROM[bankaddress]);
 
 	msm5205_reset_w(device,data & 0x08);
 }

@@ -99,7 +99,7 @@ static MACHINE_START( sbrkout )
 {
 	sbrkout_state *state = machine.driver_data<sbrkout_state>();
 	UINT8 *videoram = state->m_videoram;
-	state->subbank("bank1")->set_base(&videoram[0x380]);
+	state->membank("bank1")->set_base(&videoram[0x380]);
 	state->m_scanline_timer = machine.scheduler().timer_alloc(FUNC(scanline_callback));
 	state->m_pot_timer = machine.scheduler().timer_alloc(FUNC(pot_trigger_callback));
 

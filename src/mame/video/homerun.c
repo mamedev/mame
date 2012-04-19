@@ -15,7 +15,7 @@ WRITE8_DEVICE_HANDLER(homerun_banking_w)
 	state->m_tilemap->mark_all_dirty();
 
 	data >>= 5;
-	state->subbank("bank1")->set_entry(data & 0x07);
+	state->membank("bank1")->set_entry(data & 0x07);
 }
 
 WRITE8_MEMBER(homerun_state::homerun_videoram_w)

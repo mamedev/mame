@@ -2978,7 +2978,7 @@ WRITE8_MEMBER(seta_state::sub_bankswitch_w)
 	UINT8 *rom = machine().region("sub")->base();
 	int bank = data >> 4;
 
-	subbank("bank1")->set_base(&rom[bank * 0x4000 + 0xc000]);
+	membank("bank1")->set_base(&rom[bank * 0x4000 + 0xc000]);
 }
 
 WRITE8_MEMBER(seta_state::sub_bankswitch_lockout_w)

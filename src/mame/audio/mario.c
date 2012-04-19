@@ -402,7 +402,7 @@ static void set_ea(address_space &space, int ea)
 	//printf("ea: %d\n", ea);
 	//cputag_set_input_line(machine, "audiocpu", MCS48_INPUT_EA, (ea) ? ASSERT_LINE : CLEAR_LINE);
 	if (state->m_eabank != NULL)
-		state->subbank(state->m_eabank)->set_entry(ea);
+		state->membank(state->m_eabank)->set_entry(ea);
 }
 
 /****************************************************************
@@ -426,8 +426,8 @@ static SOUND_START( mario )
 	{
 		state->m_eabank = "bank1";
 		audiocpu->memory().space(AS_PROGRAM)->install_read_bank(0x000, 0x7ff, "bank1");
-		state->subbank("bank1")->configure_entry(0, machine.region("audiocpu")->base());
-	    state->subbank("bank1")->configure_entry(1, machine.region("audiocpu")->base() + 0x1000);
+		state->membank("bank1")->configure_entry(0, machine.region("audiocpu")->base());
+	    state->membank("bank1")->configure_entry(1, machine.region("audiocpu")->base() + 0x1000);
 	}
 
     state->save_item(NAME(state->m_last));

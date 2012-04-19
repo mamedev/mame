@@ -87,7 +87,7 @@ WRITE8_MEMBER(wc90_state::wc90_bankswitch_w)
 
 
 	bankaddress = 0x10000 + ( ( data & 0xf8 ) << 8 );
-	subbank("bank1")->set_base(&RAM[bankaddress] );
+	membank("bank1")->set_base(&RAM[bankaddress] );
 }
 
 WRITE8_MEMBER(wc90_state::wc90_bankswitch1_w)
@@ -97,7 +97,7 @@ WRITE8_MEMBER(wc90_state::wc90_bankswitch1_w)
 
 
 	bankaddress = 0x10000 + ( ( data & 0xf8 ) << 8 );
-	subbank("bank2")->set_base(&RAM[bankaddress] );
+	membank("bank2")->set_base(&RAM[bankaddress] );
 }
 
 WRITE8_MEMBER(wc90_state::wc90_sound_command_w)

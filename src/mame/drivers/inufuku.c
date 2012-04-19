@@ -102,7 +102,7 @@ WRITE8_MEMBER(inufuku_state::pending_command_clear_w)
 
 WRITE8_MEMBER(inufuku_state::inufuku_soundrombank_w)
 {
-	subbank("bank1")->set_entry(data & 0x03);
+	membank("bank1")->set_entry(data & 0x03);
 }
 
 /******************************************************************************
@@ -316,8 +316,8 @@ static MACHINE_START( inufuku )
 	inufuku_state *state = machine.driver_data<inufuku_state>();
 	UINT8 *ROM = machine.region("audiocpu")->base();
 
-	state->subbank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x8000);
-	state->subbank("bank1")->set_entry(0);
+	state->membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x8000);
+	state->membank("bank1")->set_entry(0);
 
 	state->m_audiocpu = machine.device("audiocpu");
 

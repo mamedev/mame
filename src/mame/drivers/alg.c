@@ -225,7 +225,7 @@ static WRITE8_DEVICE_HANDLER( alg_cia_0_porta_w )
 	address_space *space = device->machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* switch banks as appropriate */
-	device->machine().root_device().subbank("bank1")->set_entry(data & 1);
+	device->machine().root_device().membank("bank1")->set_entry(data & 1);
 
 	/* swap the write handlers between ROM and bank 1 based on the bit */
 	if ((data & 1) == 0)
@@ -699,8 +699,8 @@ static void alg_init(running_machine &machine)
 	amiga_machine_config(machine, &alg_intf);
 
 	/* set up memory */
-	state->subbank("bank1")->configure_entry(0, state->m_chip_ram);
-	state->subbank("bank1")->configure_entry(1, machine.region("user1")->base());
+	state->membank("bank1")->configure_entry(0, state->m_chip_ram);
+	state->membank("bank1")->configure_entry(1, machine.region("user1")->base());
 }
 
 

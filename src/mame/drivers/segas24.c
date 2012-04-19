@@ -714,8 +714,8 @@ void segas24_state::reset_bank()
 {
 	if (machine().region("romboard")->base())
 	{
-		subbank("bank1")->set_entry(curbank & 15);
-		subbank("bank2")->set_entry(curbank & 15);
+		membank("bank1")->set_entry(curbank & 15);
+		membank("bank2")->set_entry(curbank & 15);
 	}
 }
 
@@ -1267,8 +1267,8 @@ static MACHINE_START( system24 )
 	UINT8 *usr1 = machine.region("romboard")->base();
 	if (usr1)
 	{
-		state->subbank("bank1")->configure_entries(0, 16, usr1, 0x40000);
-		state->subbank("bank2")->configure_entries(0, 16, usr1, 0x40000);
+		state->membank("bank1")->configure_entries(0, 16, usr1, 0x40000);
+		state->membank("bank2")->configure_entries(0, 16, usr1, 0x40000);
 	}
 
 	state->vtile = machine.device<segas24_tile>("tile");

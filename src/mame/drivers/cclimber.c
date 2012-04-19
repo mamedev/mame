@@ -248,7 +248,7 @@ WRITE8_MEMBER(cclimber_state::toprollr_rombank_w)
 	m_toprollr_rombank |= (data & 1) << offset;
 
 	if (m_toprollr_rombank < 3)
-		subbank("bank1")->set_entry(m_toprollr_rombank);
+		membank("bank1")->set_entry(m_toprollr_rombank);
 }
 
 static MACHINE_RESET( cclimber )

@@ -1985,11 +1985,11 @@ WRITE8_MEMBER(dynax_state::rongrong_select_w)
 //logerror("%04x: rongrong_select_w %02x\n",cpu_get_pc(&space.device()),data);
 
 	/* bits 0-4 = **both** ROM bank **AND** input select */
-	subbank("bank1")->set_entry(data & 0x1f);
+	membank("bank1")->set_entry(data & 0x1f);
 	m_dsw_sel = data;
 
 	/* bits 5-7 = RAM bank */
-	subbank("bank2")->set_entry(((data & 0xe0) >> 5));
+	membank("bank2")->set_entry(((data & 0xe0) >> 5));
 }
 
 
@@ -2083,7 +2083,7 @@ READ8_MEMBER(dynax_state::magic_r)
 
 WRITE8_MEMBER(dynax_state::mmpanic_rombank_w)
 {
-	subbank("bank1")->set_entry(data & 0x7);
+	membank("bank1")->set_entry(data & 0x7);
 	/* Bit 4? */
 }
 
@@ -2244,9 +2244,9 @@ WRITE8_MEMBER(dynax_state::funkyfig_rombank_w)
 
 	m_dsw_sel = data;
 
-	subbank("bank1")->set_entry(data & 0x0f);
+	membank("bank1")->set_entry(data & 0x0f);
 	// bit 4 selects palette ram at 8000?
-	subbank("bank2")->set_entry(((data & 0xe0) >> 5));
+	membank("bank2")->set_entry(((data & 0xe0) >> 5));
 }
 
 READ8_MEMBER(dynax_state::funkyfig_dsw_r)
@@ -2352,8 +2352,8 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(dynax_state::hanakanz_rombank_w)
 {
-	subbank("bank1")->set_entry(data & 0x0f);
-	subbank("bank2")->set_entry(((data & 0xf0) >> 4));
+	membank("bank1")->set_entry(data & 0x0f);
+	membank("bank2")->set_entry(((data & 0xf0) >> 4));
 }
 
 static ADDRESS_MAP_START( hanakanz_map, AS_PROGRAM, 8, dynax_state )
@@ -2699,7 +2699,7 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(dynax_state::mjmyster_rambank_w)
 {
-	subbank("bank2")->set_entry(data & 0x07);
+	membank("bank2")->set_entry(data & 0x07);
 	//logerror("%04x: rambank = %02x\n", cpu_get_pc(&space.device()), data);
 }
 
@@ -2813,7 +2813,7 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(dynax_state::hginga_rombank_w)
 {
-	subbank("bank1")->set_entry(data & 0x7);
+	membank("bank1")->set_entry(data & 0x7);
 	m_hginga_rombank = data;
 }
 
@@ -3158,8 +3158,8 @@ WRITE8_MEMBER(dynax_state::hparadis_select_w)
 	m_dsw_sel = data;
 	m_keyb = 0;
 
-	subbank("bank1")->set_entry(data & 0x07);
-	subbank("bank2")->set_entry(((data & 0xe0) >> 5));
+	membank("bank1")->set_entry(data & 0x07);
+	membank("bank2")->set_entry(((data & 0xe0) >> 5));
 }
 
 
@@ -3383,7 +3383,7 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(dynax_state::mjflove_rombank_w)
 {
-	subbank("bank1")->set_entry(data & 0xf);
+	membank("bank1")->set_entry(data & 0xf);
 }
 
 static WRITE8_DEVICE_HANDLER( mjflove_okibank_w )
@@ -3556,7 +3556,7 @@ WRITE8_MEMBER(dynax_state::sryudens_coincounter_w)
 
 WRITE8_MEMBER(dynax_state::sryudens_rambank_w)
 {
-	subbank("bank2")->set_entry(data & 0x0f);
+	membank("bank2")->set_entry(data & 0x0f);
 	//logerror("%04x: rambank = %02x\n", cpu_get_pc(&space.device()), data);
 }
 
@@ -7614,8 +7614,8 @@ static MACHINE_RESET( ddenlovr )
 static MACHINE_START( rongrong )
 {
 	UINT8 *ROM = machine.region("maincpu")->base();
-	machine.root_device().subbank("bank1")->configure_entries(0, 0x20, &ROM[0x010000], 0x8000);
-	machine.root_device().subbank("bank2")->configure_entries(0, 8,    &ROM[0x110000], 0x1000);
+	machine.root_device().membank("bank1")->configure_entries(0, 0x20, &ROM[0x010000], 0x8000);
+	machine.root_device().membank("bank2")->configure_entries(0, 8,    &ROM[0x110000], 0x1000);
 
 	MACHINE_START_CALL(ddenlovr);
 }
@@ -7623,7 +7623,7 @@ static MACHINE_START( rongrong )
 static MACHINE_START( mmpanic )
 {
 	UINT8 *ROM = machine.region("maincpu")->base();
-	machine.root_device().subbank("bank1")->configure_entries(0, 8,    &ROM[0x10000], 0x8000);
+	machine.root_device().membank("bank1")->configure_entries(0, 8,    &ROM[0x10000], 0x8000);
 
 	MACHINE_START_CALL(ddenlovr);
 }
@@ -7631,8 +7631,8 @@ static MACHINE_START( mmpanic )
 static MACHINE_START( funkyfig )
 {
 	UINT8 *ROM = machine.region("maincpu")->base();
-	machine.root_device().subbank("bank1")->configure_entries(0, 0x10, &ROM[0x10000], 0x8000);
-	machine.root_device().subbank("bank2")->configure_entries(0, 8,    &ROM[0x90000], 0x1000);
+	machine.root_device().membank("bank1")->configure_entries(0, 0x10, &ROM[0x10000], 0x8000);
+	machine.root_device().membank("bank2")->configure_entries(0, 8,    &ROM[0x90000], 0x1000);
 
 	MACHINE_START_CALL(ddenlovr);
 }
@@ -7640,8 +7640,8 @@ static MACHINE_START( funkyfig )
 static MACHINE_START( hanakanz )
 {
 	UINT8 *ROM = machine.region("maincpu")->base();
-	machine.root_device().subbank("bank1")->configure_entries(0, 0x10, &ROM[0x10000], 0x8000);
-	machine.root_device().subbank("bank2")->configure_entries(0, 0x10, &ROM[0x90000], 0x1000);
+	machine.root_device().membank("bank1")->configure_entries(0, 0x10, &ROM[0x10000], 0x8000);
+	machine.root_device().membank("bank2")->configure_entries(0, 0x10, &ROM[0x90000], 0x1000);
 
 	MACHINE_START_CALL(ddenlovr);
 }
@@ -7649,8 +7649,8 @@ static MACHINE_START( hanakanz )
 static MACHINE_START( mjmyster )
 {
 	UINT8 *ROM = machine.region("maincpu")->base();
-	machine.root_device().subbank("bank1")->configure_entries(0, 8,    &ROM[0x10000], 0x8000);
-	machine.root_device().subbank("bank2")->configure_entries(0, 8,    &ROM[0x90000], 0x1000);
+	machine.root_device().membank("bank1")->configure_entries(0, 8,    &ROM[0x10000], 0x8000);
+	machine.root_device().membank("bank2")->configure_entries(0, 8,    &ROM[0x90000], 0x1000);
 
 	MACHINE_START_CALL(ddenlovr);
 }
@@ -7658,8 +7658,8 @@ static MACHINE_START( mjmyster )
 static MACHINE_START( hparadis )
 {
 	UINT8 *ROM = machine.region("maincpu")->base();
-	machine.root_device().subbank("bank1")->configure_entries(0, 8,    &ROM[0x10000], 0x8000);
-	machine.root_device().subbank("bank2")->configure_entries(0, 8,    &ROM[0x50000], 0x1000);
+	machine.root_device().membank("bank1")->configure_entries(0, 8,    &ROM[0x10000], 0x8000);
+	machine.root_device().membank("bank2")->configure_entries(0, 8,    &ROM[0x50000], 0x1000);
 
 	MACHINE_START_CALL(ddenlovr);
 }
@@ -7667,8 +7667,8 @@ static MACHINE_START( hparadis )
 static MACHINE_START( mjflove )
 {
 	UINT8 *ROM = machine.region("maincpu")->base();
-	machine.root_device().subbank("bank1")->configure_entries(0, 0x10, &ROM[0x10000], 0x8000);
-	machine.root_device().subbank("bank2")->configure_entries(0, 8,    &ROM[0x90000], 0x1000);
+	machine.root_device().membank("bank1")->configure_entries(0, 0x10, &ROM[0x10000], 0x8000);
+	machine.root_device().membank("bank2")->configure_entries(0, 8,    &ROM[0x90000], 0x1000);
 
 	MACHINE_START_CALL(ddenlovr);
 }
@@ -7676,8 +7676,8 @@ static MACHINE_START( mjflove )
 static MACHINE_START( sryudens )
 {
 	UINT8 *ROM = machine.region("maincpu")->base();
-	machine.root_device().subbank("bank1")->configure_entries(0, 0x10, &ROM[0x10000], 0x8000);
-	machine.root_device().subbank("bank2")->configure_entries(0, 0x10, &ROM[0x90000], 0x1000);
+	machine.root_device().membank("bank1")->configure_entries(0, 0x10, &ROM[0x10000], 0x8000);
+	machine.root_device().membank("bank2")->configure_entries(0, 0x10, &ROM[0x90000], 0x1000);
 
 	MACHINE_START_CALL(ddenlovr);
 }

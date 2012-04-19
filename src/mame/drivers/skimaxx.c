@@ -144,8 +144,8 @@ static VIDEO_START( skimaxx )
 	state->m_bg_buffer = auto_alloc_array(machine, UINT32, 0x400 * 0x100 * sizeof(UINT16) / sizeof(UINT32) * 2);	// 2 buffers
 	state->m_bg_buffer_back  = state->m_bg_buffer + 0x400 * 0x100 * sizeof(UINT16) / sizeof(UINT32) * 0;
 	state->m_bg_buffer_front = state->m_bg_buffer + 0x400 * 0x100 * sizeof(UINT16) / sizeof(UINT32) * 1;
-	state->subbank("bank1")->configure_entry(0, state->m_bg_buffer_back);
-	state->subbank("bank1")->configure_entry(1, state->m_bg_buffer_front);
+	state->membank("bank1")->configure_entry(0, state->m_bg_buffer_back);
+	state->membank("bank1")->configure_entry(1, state->m_bg_buffer_front);
 }
 
 static SCREEN_UPDATE_IND16( skimaxx )
@@ -265,7 +265,7 @@ WRITE32_MEMBER(skimaxx_state::skimaxx_fpga_ctrl_w)
 		m_bg_buffer_back  = m_bg_buffer + 0x400 * 0x100 * sizeof(UINT16) / sizeof(UINT32) * bank_bg_buffer;
 		m_bg_buffer_front = m_bg_buffer + 0x400 * 0x100 * sizeof(UINT16) / sizeof(UINT32) * (1 - bank_bg_buffer);
 
-		subbank("bank1")->set_entry(bank_bg_buffer);
+		membank("bank1")->set_entry(bank_bg_buffer);
 	}
 }
 

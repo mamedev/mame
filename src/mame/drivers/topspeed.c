@@ -392,7 +392,7 @@ WRITE16_MEMBER(topspeed_state::topspeed_motor_w)
 static void reset_sound_region( running_machine &machine )
 {
 	topspeed_state *state = machine.driver_data<topspeed_state>();
-	state->subbank("bank10")->set_entry(state->m_banknum);
+	state->membank("bank10")->set_entry(state->m_banknum);
 }
 
 static WRITE8_DEVICE_HANDLER( sound_bankswitch_w )	/* assumes Z80 sandwiched between 68Ks */
@@ -646,7 +646,7 @@ static MACHINE_START( topspeed )
 {
 	topspeed_state *state = machine.driver_data<topspeed_state>();
 
-	state->subbank("bank10")->configure_entries(0, 4, machine.region("audiocpu")->base() + 0xc000, 0x4000);
+	state->membank("bank10")->configure_entries(0, 4, machine.region("audiocpu")->base() + 0xc000, 0x4000);
 
 	state->m_maincpu = machine.device("maincpu");
 	state->m_subcpu = machine.device("sub");

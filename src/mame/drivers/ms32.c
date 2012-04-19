@@ -1352,8 +1352,8 @@ READ8_MEMBER(ms32_state::latch_r)
 
 WRITE8_MEMBER(ms32_state::ms32_snd_bank_w)
 {
-	subbank("bank4")->set_entry((data >> 0) & 0x0F);
-	subbank("bank5")->set_entry((data >> 4) & 0x0F);
+	membank("bank4")->set_entry((data >> 0) & 0x0F);
+	membank("bank5")->set_entry((data >> 4) & 0x0F);
 }
 
 WRITE8_MEMBER(ms32_state::to_main_w)
@@ -1381,9 +1381,9 @@ ADDRESS_MAP_END
 
 static MACHINE_RESET( ms32 )
 {
-	machine.root_device().subbank("bank1")->set_base(machine.region("maincpu")->base());
-	machine.root_device().subbank("bank4")->set_entry(0);
-	machine.root_device().subbank("bank5")->set_entry(1);
+	machine.root_device().membank("bank1")->set_base(machine.region("maincpu")->base());
+	machine.root_device().membank("bank4")->set_entry(0);
+	machine.root_device().membank("bank5")->set_entry(1);
 	irq_init(machine);
 }
 
@@ -2202,8 +2202,8 @@ static void configure_banks(running_machine &machine)
 {
 	ms32_state *state = machine.driver_data<ms32_state>();
 	state_save_register_global(machine, state->m_to_main);
-	state->subbank("bank4")->configure_entries(0, 16, machine.region("audiocpu")->base() + 0x14000, 0x4000);
-	state->subbank("bank5")->configure_entries(0, 16, machine.region("audiocpu")->base() + 0x14000, 0x4000);
+	state->membank("bank4")->configure_entries(0, 16, machine.region("audiocpu")->base() + 0x14000, 0x4000);
+	state->membank("bank5")->configure_entries(0, 16, machine.region("audiocpu")->base() + 0x14000, 0x4000);
 }
 
 static DRIVER_INIT( ms32_common )

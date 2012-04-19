@@ -979,7 +979,7 @@ WRITE8_MEMBER(seibuspi_state::z80_bank_w)
 	if ((data & 7) != m_z80_lastbank)
 	{
 		m_z80_lastbank = (data & 7);
-		subbank("bank4")->set_base(m_z80_rom + (0x8000 * m_z80_lastbank));
+		membank("bank4")->set_base(m_z80_rom + (0x8000 * m_z80_lastbank));
 	}
 }
 
@@ -1824,8 +1824,8 @@ static MACHINE_RESET( spi )
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x00000688, 0x0000068b, write32_delegate(FUNC(seibuspi_state::z80_prg_fifo_w),state));
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x0000068c, 0x0000068f, write32_delegate(FUNC(seibuspi_state::z80_enable_w),state));
 
-	state->subbank("bank4")->set_base(state->m_z80_rom);
-	state->subbank("bank5")->set_base(state->m_z80_rom);
+	state->membank("bank4")->set_base(state->m_z80_rom);
+	state->membank("bank5")->set_base(state->m_z80_rom);
 
 	/* If the first value doesn't match, the game shows a checksum error */
 	/* If any of the other values are wrong, the game goes to update mode */
@@ -1899,8 +1899,8 @@ static MACHINE_RESET( sxx2f )
 	seibuspi_state *state = machine.driver_data<seibuspi_state>();
 	UINT8 *rom = machine.region("soundcpu")->base();
 
-	state->subbank("bank4")->set_base(state->m_z80_rom);
-	state->subbank("bank5")->set_base(state->m_z80_rom);
+	state->membank("bank4")->set_base(state->m_z80_rom);
+	state->membank("bank5")->set_base(state->m_z80_rom);
 
 	memcpy(state->m_z80_rom, rom, 0x40000);
 

@@ -324,7 +324,7 @@ WRITE8_MEMBER(welltris_state::welltris_sh_bankswitch_w)
 {
 	UINT8 *rom = machine().region("audiocpu")->base() + 0x10000;
 
-	subbank("bank1")->set_base(rom + (data & 0x03) * 0x8000);
+	membank("bank1")->set_base(rom + (data & 0x03) * 0x8000);
 }
 
 

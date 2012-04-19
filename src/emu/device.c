@@ -207,7 +207,7 @@ const memory_region *device_t::subregion(const char *_tag) const
 //  bank info for a given bank
 //-------------------------------------------------
 
-memory_bank *device_t::subbank(const char *_tag) const
+memory_bank *device_t::membank(const char *_tag) const
 {
 	// safety first
 	if (this == NULL)

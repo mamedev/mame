@@ -34,7 +34,7 @@ static INTERRUPT_GEN( contra_interrupt )
 
 WRITE8_MEMBER(contra_state::contra_bankswitch_w)
 {
-	subbank("bank1")->set_entry(data & 0x0f);
+	membank("bank1")->set_entry(data & 0x0f);
 }
 
 WRITE8_MEMBER(contra_state::contra_sh_irqtrigger_w)
@@ -180,7 +180,7 @@ static MACHINE_START( contra )
 	contra_state *state = machine.driver_data<contra_state>();
 	UINT8 *ROM = machine.region("maincpu")->base();
 
-	state->subbank("bank1")->configure_entries(0, 16, &ROM[0x10000], 0x2000);
+	state->membank("bank1")->configure_entries(0, 16, &ROM[0x10000], 0x2000);
 
 	state->m_audiocpu = machine.device("audiocpu");
 	state->m_k007121_1 = machine.device("k007121_1");

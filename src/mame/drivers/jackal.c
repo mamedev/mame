@@ -124,7 +124,7 @@ WRITE8_MEMBER(jackal_state::jackal_rambank_w)
 
 	m_spritebank = &rgn[((data & 0x08) << 13)];
 	m_rambank = &rgn[((data & 0x10) << 12)];
-	subbank("bank1")->set_entry((data & 0x20) ? 1 : 0);
+	membank("bank1")->set_entry((data & 0x20) ? 1 : 0);
 }
 
 
@@ -330,9 +330,9 @@ static MACHINE_START( jackal )
 	jackal_state *state = machine.driver_data<jackal_state>();
 	UINT8 *ROM = machine.region("master")->base();
 
-	state->subbank("bank1")->configure_entry(0, &ROM[0x04000]);
-	state->subbank("bank1")->configure_entry(1, &ROM[0x14000]);
-	state->subbank("bank1")->set_entry(0);
+	state->membank("bank1")->configure_entry(0, &ROM[0x04000]);
+	state->membank("bank1")->configure_entry(1, &ROM[0x14000]);
+	state->membank("bank1")->set_entry(0);
 
 	state->m_mastercpu = machine.device("master");
 	state->m_slavecpu = machine.device("slave");

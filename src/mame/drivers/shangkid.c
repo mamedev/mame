@@ -58,7 +58,7 @@ Games by Nihon Game/Culture Brain:
 
 WRITE8_MEMBER(shangkid_state::shangkid_maincpu_bank_w)
 {
-	subbank("bank1")->set_entry(data & 1);
+	membank("bank1")->set_entry(data & 1);
 }
 
 WRITE8_MEMBER(shangkid_state::shangkid_bbx_enable_w)
@@ -104,7 +104,7 @@ static WRITE8_DEVICE_HANDLER( shangkid_ay8910_porta_w )
 			cputag_set_input_line(device->machine(), "audiocpu", 0, HOLD_LINE );
 	}
 	else
-		state->subbank("bank2")->set_entry(data ? 0 : 1);
+		state->membank("bank2")->set_entry(data ? 0 : 1);
 }
 
 static WRITE8_DEVICE_HANDLER( ay8910_portb_w )
@@ -134,8 +134,8 @@ static DRIVER_INIT( shangkid )
 	state->m_gfx_type = 1;
 
 	/* set up banking */
-	state->subbank("bank1")->configure_entries(0, 2, machine.region("maincpu")->base() + 0x8000, 0x8000);
-	state->subbank("bank2")->configure_entries(0, 2, machine.region("audiocpu")->base() + 0x0000, 0x10000);
+	state->membank("bank1")->configure_entries(0, 2, machine.region("maincpu")->base() + 0x8000, 0x8000);
+	state->membank("bank2")->configure_entries(0, 2, machine.region("audiocpu")->base() + 0x0000, 0x10000);
 }
 
 /***************************************************************************************/
@@ -149,8 +149,8 @@ static MACHINE_RESET( shangkid )
 {
 	cputag_set_input_line(machine, "bbx", INPUT_LINE_HALT, 1 );
 
-	machine.root_device().subbank("bank1")->set_entry(0);
-	machine.root_device().subbank("bank2")->set_entry(0);
+	machine.root_device().membank("bank1")->set_entry(0);
+	machine.root_device().membank("bank2")->set_entry(0);
 }
 
 /***************************************************************************************/

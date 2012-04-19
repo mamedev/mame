@@ -105,7 +105,7 @@ WRITE8_MEMBER(stfight_state::stfight_bank_w)
 {
 	UINT8   *ROM2 = machine().region("maincpu")->base() + 0x10000;
 
-	subbank("bank1")->set_base(&ROM2[data<<14] );
+	membank("bank1")->set_base(&ROM2[data<<14] );
 }
 
 /*

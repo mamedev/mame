@@ -400,7 +400,7 @@ void mc8123_decrypt_rom(running_machine &machine, const char *cpu, const char *k
 
 	if (bankname != NULL)
 	{
-		machine.root_device().subbank(bankname)->configure_decrypted_entries(0, numbanks, decrypted2, 0x4000);
+		machine.root_device().membank(bankname)->configure_decrypted_entries(0, numbanks, decrypted2, 0x4000);
 
 		for (bank = 0; bank < numbanks; ++bank)
 		{

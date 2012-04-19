@@ -68,7 +68,7 @@ READ8_MEMBER(freekick_state::spinner_r)
 
 WRITE8_MEMBER(freekick_state::pbillrd_bankswitch_w)
 {
-	subbank("bank1")->set_entry(data & 1);
+	membank("bank1")->set_entry(data & 1);
 }
 
 WRITE8_MEMBER(freekick_state::nmi_enable_w)
@@ -599,7 +599,7 @@ static MACHINE_RESET( freekick )
 
 static MACHINE_START( pbillrd )
 {
-	machine.root_device().subbank("bank1")->configure_entries(0, 2, machine.region("maincpu")->base() + 0x10000, 0x4000);
+	machine.root_device().membank("bank1")->configure_entries(0, 2, machine.region("maincpu")->base() + 0x10000, 0x4000);
 
 	MACHINE_START_CALL(freekick);
 }

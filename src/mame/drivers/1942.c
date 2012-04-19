@@ -71,7 +71,7 @@ correctly.
 
 WRITE8_MEMBER(_1942_state::c1942_bankswitch_w)
 {
-	subbank("bank1")->set_entry(data & 0x03);
+	membank("bank1")->set_entry(data & 0x03);
 }
 
 static TIMER_DEVICE_CALLBACK( c1942_scanline )
@@ -506,7 +506,7 @@ ROM_END
 static DRIVER_INIT( 1942 )
 {
 	UINT8 *ROM = machine.region("maincpu")->base();
-	machine.root_device().subbank("bank1")->configure_entries(0, 3, &ROM[0x10000], 0x4000);
+	machine.root_device().membank("bank1")->configure_entries(0, 3, &ROM[0x10000], 0x4000);
 }
 
 

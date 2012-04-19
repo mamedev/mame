@@ -158,11 +158,11 @@ WRITE8_MEMBER(pcat_nit_state::pcat_nit_rombank_w)
 
 		if ( data & 0x80 )
 		{
-			subbank("rombank")->set_entry((data & 0x3f) | 0x40 );
+			membank("rombank")->set_entry((data & 0x3f) | 0x40 );
 		}
 		else
 		{
-			subbank("rombank")->set_entry(data & 0x3f );
+			membank("rombank")->set_entry(data & 0x3f );
 		}
 	}
 	else
@@ -172,7 +172,7 @@ WRITE8_MEMBER(pcat_nit_state::pcat_nit_rombank_w)
 
 		space.install_readwrite_bank(0x000d8000, 0x000d9fff, "nvrambank" );
 
-		subbank("nvrambank")->set_base(m_banked_nvram);
+		membank("nvrambank")->set_base(m_banked_nvram);
 
 	}
 }
@@ -232,8 +232,8 @@ static MACHINE_START( streetg2 )
 
 	init_pc_common(machine, PCCOMMON_KEYBOARD_AT, streetg2_set_keyb_int);
 
-	machine.root_device().subbank("rombank")->configure_entries(0, 0x80, machine.region("game_prg")->base(), 0x8000 );
-	machine.root_device().subbank("rombank")->set_entry(0);
+	machine.root_device().membank("rombank")->configure_entries(0, 0x80, machine.region("game_prg")->base(), 0x8000 );
+	machine.root_device().membank("rombank")->set_entry(0);
 
 	//microtouch_init(machine, pcat_nit_microtouch_tx_callback, NULL);
 }

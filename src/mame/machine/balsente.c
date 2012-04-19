@@ -173,10 +173,10 @@ MACHINE_RESET( balsente )
 
 	/* point the banks to bank 0 */
 	numbanks = (machine.region("maincpu")->bytes() > 0x40000) ? 16 : 8;
-	state->subbank("bank1")->configure_entries(0, numbanks, &machine.region("maincpu")->base()[0x10000], 0x6000);
-	state->subbank("bank2")->configure_entries(0, numbanks, &machine.region("maincpu")->base()[0x12000], 0x6000);
-	state->subbank("bank1")->set_entry(0);
-	state->subbank("bank2")->set_entry(0);
+	state->membank("bank1")->configure_entries(0, numbanks, &machine.region("maincpu")->base()[0x10000], 0x6000);
+	state->membank("bank2")->configure_entries(0, numbanks, &machine.region("maincpu")->base()[0x12000], 0x6000);
+	state->membank("bank1")->set_entry(0);
+	state->membank("bank2")->set_entry(0);
 	machine.device("maincpu")->reset();
 
 	/* start a timer to generate interrupts */
@@ -280,8 +280,8 @@ READ8_MEMBER(balsente_state::balsente_random_num_r)
 WRITE8_MEMBER(balsente_state::balsente_rombank_select_w)
 {
 	/* the bank number comes from bits 4-6 */
-	subbank("bank1")->set_entry((data >> 4) & 7);
-	subbank("bank2")->set_entry((data >> 4) & 7);
+	membank("bank1")->set_entry((data >> 4) & 7);
+	membank("bank2")->set_entry((data >> 4) & 7);
 }
 
 
@@ -296,15 +296,15 @@ WRITE8_MEMBER(balsente_state::balsente_rombank2_select_w)
 	/* when they set the AB bank, it appears as though the CD bank is reset */
 	if (data & 0x20)
 	{
-		subbank("bank1")->set_entry(bank);
-		subbank("bank2")->set_entry(6);
+		membank("bank1")->set_entry(bank);
+		membank("bank2")->set_entry(6);
 	}
 
 	/* set both banks */
 	else
 	{
-		subbank("bank1")->set_entry(bank);
-		subbank("bank2")->set_entry(bank);
+		membank("bank1")->set_entry(bank);
+		membank("bank2")->set_entry(bank);
 	}
 }
 

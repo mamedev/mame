@@ -361,14 +361,14 @@ WRITE8_MEMBER(mazerbla_state::cfb_rom_bank_sel_w)/* mazer blazer */
 {
 	m_gfx_rom_bank = data;
 
-	subbank("bank1")->set_base(machine().region("sub2")->base() + (m_gfx_rom_bank * 0x2000) + 0x10000);
+	membank("bank1")->set_base(machine().region("sub2")->base() + (m_gfx_rom_bank * 0x2000) + 0x10000);
 }
 
 WRITE8_MEMBER(mazerbla_state::cfb_rom_bank_sel_w_gg)/* great guns */
 {
 	m_gfx_rom_bank = data >> 1;
 
-	subbank("bank1")->set_base(machine().region("sub2")->base() + (m_gfx_rom_bank * 0x2000) + 0x10000);
+	membank("bank1")->set_base(machine().region("sub2")->base() + (m_gfx_rom_bank * 0x2000) + 0x10000);
 }
 
 

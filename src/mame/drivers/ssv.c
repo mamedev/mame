@@ -326,7 +326,7 @@ static MACHINE_RESET( ssv )
 	ssv_state *state = machine.driver_data<ssv_state>();
 	state->m_requested_int = 0;
 	device_set_irq_callback(machine.device("maincpu"), ssv_irq_callback);
-	state->subbank("bank1")->set_base(machine.region("user1")->base());
+	state->membank("bank1")->set_base(machine.region("user1")->base());
 }
 
 

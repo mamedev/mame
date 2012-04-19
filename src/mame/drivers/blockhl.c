@@ -191,7 +191,7 @@ static MACHINE_START( blockhl )
 	blockhl_state *state = machine.driver_data<blockhl_state>();
 	UINT8 *ROM = machine.region("maincpu")->base();
 
-	state->subbank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x2000);
+	state->membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x2000);
 
 	state->m_maincpu = machine.device("maincpu");
 	state->m_audiocpu = machine.device("audiocpu");
@@ -318,7 +318,7 @@ static KONAMI_SETLINES_CALLBACK( blockhl_banking )
 
 	/* bits 0-1 = ROM bank */
 	state->m_rombank = lines & 0x03;
-	state->subbank("bank1")->set_entry(state->m_rombank);
+	state->membank("bank1")->set_entry(state->m_rombank);
 
 	/* bits 3/4 = coin counters */
 	coin_counter_w(device->machine(), 0, lines & 0x08);

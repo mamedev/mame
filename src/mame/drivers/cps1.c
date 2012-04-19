@@ -281,7 +281,7 @@ WRITE16_MEMBER(cps_state::forgottn_dial_1_reset_w)
 
 WRITE8_MEMBER(cps_state::cps1_snd_bankswitch_w)
 {
-	subbank("bank1")->set_entry(data & 0x01);
+	membank("bank1")->set_entry(data & 0x01);
 }
 
 static WRITE8_DEVICE_HANDLER( cps1_oki_pin7_w )
@@ -393,7 +393,7 @@ WRITE8_MEMBER(cps_state::qsound_banksw_w)
 		bank = 0;
 	}
 
-	subbank("bank1")->set_entry(bank);
+	membank("bank1")->set_entry(bank);
 }
 
 
@@ -3040,13 +3040,13 @@ static MACHINE_START( common )
 static MACHINE_START( cps1 )
 {
 	MACHINE_START_CALL(common);
-	machine.root_device().subbank("bank1")->configure_entries(0, 2, machine.region("audiocpu")->base() + 0x10000, 0x4000);
+	machine.root_device().membank("bank1")->configure_entries(0, 2, machine.region("audiocpu")->base() + 0x10000, 0x4000);
 }
 
 static MACHINE_START( qsound )
 {
 	MACHINE_START_CALL(common);
-	machine.root_device().subbank("bank1")->configure_entries(0, 6, machine.region("audiocpu")->base() + 0x10000, 0x4000);
+	machine.root_device().membank("bank1")->configure_entries(0, 6, machine.region("audiocpu")->base() + 0x10000, 0x4000);
 }
 
 static MACHINE_CONFIG_START( cps1_10MHz, cps_state )

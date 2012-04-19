@@ -431,7 +431,7 @@ static MACHINE_RESET(skns)
 	else
 		hit.disconnect= 0;
 
-	state->subbank("bank1")->set_base(machine.region("user1")->base());
+	state->membank("bank1")->set_base(machine.region("user1")->base());
 }
 
 

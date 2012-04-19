@@ -150,7 +150,7 @@ static WRITE8_DEVICE_HANDLER( eeprom_serial_w )
 
 WRITE8_MEMBER(mitchell_state::pang_bankswitch_w)
 {
-	subbank("bank1")->set_entry(data & 0x0f);
+	membank("bank1")->set_entry(data & 0x0f);
 }
 
 /*************************************
@@ -2106,13 +2106,13 @@ static void bootleg_decode( running_machine &machine )
 {
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	space->set_decrypted_region(0x0000, 0x7fff, machine.region("maincpu")->base() + 0x50000);
-	machine.root_device().subbank("bank1")->configure_decrypted_entries(0, 16, machine.region("maincpu")->base() + 0x60000, 0x4000);
+	machine.root_device().membank("bank1")->configure_decrypted_entries(0, 16, machine.region("maincpu")->base() + 0x60000, 0x4000);
 }
 
 
 static void configure_banks( running_machine &machine )
 {
-	machine.root_device().subbank("bank1")->configure_entries(0, 16, machine.region("maincpu")->base() + 0x10000, 0x4000);
+	machine.root_device().membank("bank1")->configure_entries(0, 16, machine.region("maincpu")->base() + 0x10000, 0x4000);
 }
 
 

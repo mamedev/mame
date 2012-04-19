@@ -286,9 +286,9 @@ WRITE32_MEMBER(crystal_state::Banksw_w)
 
 	m_Bank = (data >> 1) & 7;
 	if (m_Bank <= 2)
-		subbank("bank1")->set_base(machine().region("user1")->base() + m_Bank * 0x1000000);
+		membank("bank1")->set_base(machine().region("user1")->base() + m_Bank * 0x1000000);
 	else
-		subbank("bank1")->set_base(machine().region("user2")->base());
+		membank("bank1")->set_base(machine().region("user2")->base());
 }
 
 static TIMER_CALLBACK( Timercb )
@@ -567,9 +567,9 @@ static void crystal_banksw_postload(running_machine &machine)
 	crystal_state *state = machine.driver_data<crystal_state>();
 
 	if (state->m_Bank <= 2)
-		state->subbank("bank1")->set_base(machine.region("user1")->base() + state->m_Bank * 0x1000000);
+		state->membank("bank1")->set_base(machine.region("user1")->base() + state->m_Bank * 0x1000000);
 	else
-		state->subbank("bank1")->set_base(machine.region("user2")->base());
+		state->membank("bank1")->set_base(machine.region("user2")->base());
 }
 
 static MACHINE_START( crystal )
@@ -613,7 +613,7 @@ static MACHINE_RESET( crystal )
 	state->m_IntHigh = 0;
 	device_set_irq_callback(machine.device("maincpu"), icallback);
 	state->m_Bank = 0;
-	state->subbank("bank1")->set_base(machine.region("user1")->base() + 0);
+	state->membank("bank1")->set_base(machine.region("user1")->base() + 0);
 	state->m_FlashCmd = 0xff;
 	state->m_OldPort4 = 0;
 

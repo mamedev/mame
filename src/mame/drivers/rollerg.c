@@ -251,9 +251,9 @@ static MACHINE_START( rollerg )
 	rollerg_state *state = machine.driver_data<rollerg_state>();
 	UINT8 *ROM = machine.region("maincpu")->base();
 
-	state->subbank("bank1")->configure_entries(0, 6, &ROM[0x10000], 0x4000);
-	state->subbank("bank1")->configure_entries(6, 2, &ROM[0x10000], 0x4000);
-	state->subbank("bank1")->set_entry(0);
+	state->membank("bank1")->configure_entries(0, 6, &ROM[0x10000], 0x4000);
+	state->membank("bank1")->configure_entries(6, 2, &ROM[0x10000], 0x4000);
+	state->membank("bank1")->set_entry(0);
 
 	state->m_maincpu = machine.device("maincpu");
 	state->m_audiocpu = machine.device("audiocpu");
@@ -372,7 +372,7 @@ ROM_END
 
 static KONAMI_SETLINES_CALLBACK( rollerg_banking )
 {
-	device->machine().root_device().subbank("bank1")->set_entry(lines & 0x07);
+	device->machine().root_device().membank("bank1")->set_entry(lines & 0x07);
 }
 
 

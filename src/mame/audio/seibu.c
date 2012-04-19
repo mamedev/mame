@@ -120,7 +120,7 @@ void seibu_sound_decrypt(running_machine &machine,const char *cpu,int length)
 	}
 
 	if (length > 0x10000)
-		machine.root_device().subbank("bank1")->configure_decrypted_entries(0, (length - 0x10000) / 0x8000, decrypt + 0x10000, 0x8000);
+		machine.root_device().membank("bank1")->configure_decrypted_entries(0, (length - 0x10000) / 0x8000, decrypt + 0x10000, 0x8000);
 }
 
 
@@ -353,10 +353,10 @@ MACHINE_RESET( seibu_sound )
 	update_irq_lines(machine, VECTOR_INIT);
 	if (romlength > 0x10000)
 	{
-		machine.root_device().subbank("bank1")->configure_entries(0, (romlength - 0x10000) / 0x8000, rom + 0x10000, 0x8000);
+		machine.root_device().membank("bank1")->configure_entries(0, (romlength - 0x10000) / 0x8000, rom + 0x10000, 0x8000);
 
 		/* Denjin Makai definitely needs this at start-up, it never writes to the bankswitch */
-		machine.root_device().subbank("bank1")->set_entry(0);
+		machine.root_device().membank("bank1")->set_entry(0);
 	}
 }
 
@@ -367,7 +367,7 @@ static int main2sub_pending,sub2main_pending;
 
 WRITE8_HANDLER( seibu_bank_w )
 {
-	space->machine().root_device().subbank("bank1")->set_entry(data & 1);
+	space->machine().root_device().membank("bank1")->set_entry(data & 1);
 }
 
 WRITE8_HANDLER( seibu_coin_w )

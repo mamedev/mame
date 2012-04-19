@@ -289,8 +289,8 @@ WRITE32_MEMBER(aristmk5_state::sram_banksel_w)
 
          4 pages of 32k for each sram chip.
     */
-    subbank("sram_bank")->set_entry((data & 0xc0) >> 6);
-    subbank("sram_bank_nz")->set_entry((data & 0xc0) >> 6);
+    membank("sram_bank")->set_entry((data & 0xc0) >> 6);
+    membank("sram_bank_nz")->set_entry((data & 0xc0) >> 6);
 }
 
 /* U.S games have no dram emulator enabled */
@@ -364,8 +364,8 @@ static DRIVER_INIT( aristmk5 )
 
 	archimedes_driver_init(machine);
 
-	machine.root_device().subbank("sram_bank")->configure_entries(0, 4,    &SRAM[0],    0x20000);
-	machine.root_device().subbank("sram_bank_nz")->configure_entries(0, 4, &SRAM_NZ[0], 0x20000);
+	machine.root_device().membank("sram_bank")->configure_entries(0, 4,    &SRAM[0],    0x20000);
+	machine.root_device().membank("sram_bank_nz")->configure_entries(0, 4, &SRAM_NZ[0], 0x20000);
 }
 
 

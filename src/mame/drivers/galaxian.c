@@ -1087,7 +1087,7 @@ INPUT_CHANGED_MEMBER(galaxian_state::gmgalax_game_changed)
 	m_gmgalax_selected_game = newval;
 
 	/* select the bank and graphics bank based on it */
-	subbank("bank1")->set_entry(m_gmgalax_selected_game);
+	membank("bank1")->set_entry(m_gmgalax_selected_game);
 	galaxian_gfxbank_w(*space, 0, m_gmgalax_selected_game);
 
 	/* reset the stars */
@@ -1116,8 +1116,8 @@ CUSTOM_INPUT_MEMBER(galaxian_state::gmgalax_port_r)
 
 WRITE8_MEMBER(galaxian_state::zigzag_bankswap_w)
 {
-	subbank("bank1")->set_entry(data & 1);
-	subbank("bank2")->set_entry(~data & 1);
+	membank("bank1")->set_entry(data & 1);
+	membank("bank2")->set_entry(~data & 1);
 }
 
 
@@ -2810,7 +2810,7 @@ static DRIVER_INIT( gmgalax )
 
 	/* ROM is banked */
 	space->install_read_bank(0x0000, 0x3fff, "bank1");
-	machine.root_device().subbank("bank1")->configure_entries(0, 2, machine.region("maincpu")->base() + 0x10000, 0x4000);
+	machine.root_device().membank("bank1")->configure_entries(0, 2, machine.region("maincpu")->base() + 0x10000, 0x4000);
 
 	/* callback when the game select is toggled */
 	state->gmgalax_game_changed(*machine.m_portlist.first()->fieldlist().first(), NULL, 0, 0);
@@ -3026,13 +3026,13 @@ static DRIVER_INIT( zigzag )
 	/* make ROMs 2 & 3 swappable */
 	space->install_read_bank(0x2000, 0x2fff, "bank1");
 	space->install_read_bank(0x3000, 0x3fff, "bank2");
-	state->subbank("bank1")->configure_entries(0, 2, machine.region("maincpu")->base() + 0x2000, 0x1000);
-	state->subbank("bank2")->configure_entries(0, 2, machine.region("maincpu")->base() + 0x2000, 0x1000);
+	state->membank("bank1")->configure_entries(0, 2, machine.region("maincpu")->base() + 0x2000, 0x1000);
+	state->membank("bank2")->configure_entries(0, 2, machine.region("maincpu")->base() + 0x2000, 0x1000);
 
 	/* also re-install the fixed ROM area as a bank in order to inform the memory system that
        the fixed area only extends to 0x1fff */
 	space->install_read_bank(0x0000, 0x1fff, "bank3");
-	state->subbank("bank3")->set_base(machine.region("maincpu")->base() + 0x0000);
+	state->membank("bank3")->set_base(machine.region("maincpu")->base() + 0x0000);
 
 	/* handler for doing the swaps */
 	space->install_write_handler(0x7002, 0x7002, 0, 0x07f8, write8_delegate(FUNC(galaxian_state::zigzag_bankswap_w),state));
@@ -3396,7 +3396,7 @@ static DRIVER_INIT( sfx )
 
 	/* sound board has space for extra ROM */
 	machine.device("audiocpu")->memory().space(AS_PROGRAM)->install_read_bank(0x0000, 0x3fff, "bank1");
-	state->subbank("bank1")->set_base(machine.region("audiocpu")->base());
+	state->membank("bank1")->set_base(machine.region("audiocpu")->base());
 }
 
 
@@ -3502,7 +3502,7 @@ static DRIVER_INIT( scorpion )
 
 	/* extra ROM */
 	space->install_read_bank(0x5800, 0x67ff, "bank1");
-	state->subbank("bank1")->set_base(machine.region("maincpu")->base() + 0x5800);
+	state->membank("bank1")->set_base(machine.region("maincpu")->base() + 0x5800);
 
 	/* no background related */
 //  space->nop_write(0x6803, 0x6803);

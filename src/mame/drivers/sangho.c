@@ -73,13 +73,13 @@ static void pzlestar_map_banks(running_machine &machine)
 		case 0:
 			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x0000, 0x3fff, "bank1");
 			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_bank(0x0000, 0x3fff, "bank5");
-			state->subbank("bank1")->set_base(state->m_ram);
-			state->subbank("bank5")->set_base(state->m_ram);
+			state->membank("bank1")->set_base(state->m_ram);
+			state->membank("bank5")->set_base(state->m_ram);
 			break;
 		case 2:
 			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x0000, 0x3fff, "bank1");
 			machine.device("maincpu")->memory().space(AS_PROGRAM)->unmap_write(0x0000, 0x3fff);
-			state->subbank("bank1")->set_base(machine.region("user1")->base()+ 0x10000);
+			state->membank("bank1")->set_base(machine.region("user1")->base()+ 0x10000);
 			break;
 		case 1:
 		case 3:
@@ -95,18 +95,18 @@ static void pzlestar_map_banks(running_machine &machine)
 		case 0:
 			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x4000, 0x7fff, "bank2");
 			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_bank(0x4000, 0x7fff, "bank6");
-			state->subbank("bank2")->set_base(state->m_ram + 0x4000);
-			state->subbank("bank6")->set_base(state->m_ram + 0x4000);
+			state->membank("bank2")->set_base(state->m_ram + 0x4000);
+			state->membank("bank6")->set_base(state->m_ram + 0x4000);
 			break;
 		case 2:
 			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x4000, 0x7fff, "bank2");
 			machine.device("maincpu")->memory().space(AS_PROGRAM)->unmap_write(0x4000, 0x7fff);
-			state->subbank("bank2")->set_base(machine.region("user1")->base()+ 0x18000);
+			state->membank("bank2")->set_base(machine.region("user1")->base()+ 0x18000);
 			break;
 		case 3:
 			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x4000, 0x7fff, "bank2");
 			machine.device("maincpu")->memory().space(AS_PROGRAM)->unmap_write(0x4000, 0x7fff);
-			state->subbank("bank2")->set_base(machine.region("user1")->base()+ 0x20000 + (state->m_pzlestar_rom_bank*0x8000) + 0x4000);
+			state->membank("bank2")->set_base(machine.region("user1")->base()+ 0x20000 + (state->m_pzlestar_rom_bank*0x8000) + 0x4000);
 			break;
 		case 1:
 			machine.device("maincpu")->memory().space(AS_PROGRAM)->unmap_read(0x4000, 0x7fff);
@@ -121,13 +121,13 @@ static void pzlestar_map_banks(running_machine &machine)
 		case 0:
 			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x8000, 0xbfff, "bank3");
 			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_bank(0x8000, 0xbfff, "bank7");
-			state->subbank("bank3")->set_base(state->m_ram + 0x8000);
-			state->subbank("bank7")->set_base(state->m_ram + 0x8000);
+			state->membank("bank3")->set_base(state->m_ram + 0x8000);
+			state->membank("bank7")->set_base(state->m_ram + 0x8000);
 			break;
 		case 3:
 			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x8000, 0xbfff, "bank3");
 			machine.device("maincpu")->memory().space(AS_PROGRAM)->unmap_write(0x8000, 0xbfff);
-			state->subbank("bank3")->set_base(machine.region("user1")->base()+ 0x20000 + (state->m_pzlestar_rom_bank*0x8000));
+			state->membank("bank3")->set_base(machine.region("user1")->base()+ 0x20000 + (state->m_pzlestar_rom_bank*0x8000));
 			break;
 		case 1:
 		case 2:
@@ -143,8 +143,8 @@ static void pzlestar_map_banks(running_machine &machine)
 		case 0:
 			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0xc000, 0xffff, "bank4");
 			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_bank(0xc000, 0xffff, "bank8");
-			state->subbank("bank4")->set_base(state->m_ram + 0xc000);
-			state->subbank("bank8")->set_base(state->m_ram + 0xc000);
+			state->membank("bank4")->set_base(state->m_ram + 0xc000);
+			state->membank("bank8")->set_base(state->m_ram + 0xc000);
 			break;
 		case 1:
 		case 2:
@@ -191,25 +191,25 @@ static void sexyboom_map_bank(running_machine &machine, int bank)
 		if (banknum & 0x80)
 		{
 			// ram
-			state->subbank(read_bank_name)->set_base(&state->m_ram[(banknum & 0x7f) * 0x4000]);
+			state->membank(read_bank_name)->set_base(&state->m_ram[(banknum & 0x7f) * 0x4000]);
 			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_bank(bank*0x4000, (bank+1)*0x4000 - 1, write_bank_name );
-			state->subbank(write_bank_name)->set_base(&state->m_ram[(banknum & 0x7f) * 0x4000]);
+			state->membank(write_bank_name)->set_base(&state->m_ram[(banknum & 0x7f) * 0x4000]);
 		}
 		else
 		{
 			// rom 0
-			state->subbank(read_bank_name)->set_base(machine.region("user1")->base()+0x4000*banknum);
+			state->membank(read_bank_name)->set_base(machine.region("user1")->base()+0x4000*banknum);
 			machine.device("maincpu")->memory().space(AS_PROGRAM)->unmap_write(bank*0x4000, (bank+1)*0x4000 - 1);
 		}
 	}
 	else if (banktype == 0x82)
 	{
-		state->subbank(read_bank_name)->set_base(machine.region("user1")->base()+0x20000+banknum*0x4000);
+		state->membank(read_bank_name)->set_base(machine.region("user1")->base()+0x20000+banknum*0x4000);
 		machine.device("maincpu")->memory().space(AS_PROGRAM)->unmap_write(bank*0x4000, (bank+1)*0x4000 - 1);
 	}
 	else if (banktype == 0x80)
 	{
-		state->subbank(read_bank_name)->set_base(machine.region("user1")->base()+0x120000+banknum*0x4000);
+		state->membank(read_bank_name)->set_base(machine.region("user1")->base()+0x120000+banknum*0x4000);
 		machine.device("maincpu")->memory().space(AS_PROGRAM)->unmap_write(bank*0x4000, (bank+1)*0x4000 - 1);
 	}
 	else

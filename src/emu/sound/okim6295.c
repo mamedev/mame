@@ -228,7 +228,7 @@ void okim6295_device::set_bank_base(offs_t base, bool bDontUpdateStream)
 	if (m_bank_installed)
 	{
 		m_bank_offs = base;
-		subbank(tag())->set_base(m_region->base() + base);
+		membank(tag())->set_base(m_region->base() + base);
 	}
 }
 

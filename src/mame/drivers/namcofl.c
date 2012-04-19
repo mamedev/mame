@@ -187,13 +187,13 @@ WRITE32_MEMBER(namcofl_state::namcofl_sysreg_w)
 	{
 		if (data == 0)	// RAM at 00000000, ROM at 10000000
 		{
-			subbank("bank1")->set_base(m_workram );
-			subbank("bank2")->set_base(machine().region("maincpu")->base() );
+			membank("bank1")->set_base(m_workram );
+			membank("bank2")->set_base(machine().region("maincpu")->base() );
 		}
 		else		// ROM at 00000000, RAM at 10000000
 		{
-			subbank("bank1")->set_base(machine().region("maincpu")->base() );
-			subbank("bank2")->set_base(m_workram );
+			membank("bank1")->set_base(machine().region("maincpu")->base() );
+			membank("bank2")->set_base(m_workram );
 		}
 	}
 }
@@ -580,8 +580,8 @@ static MACHINE_RESET( namcofl )
 	machine.scheduler().timer_set(machine.primary_screen->time_until_pos(machine.primary_screen->visible_area().max_y + 3), FUNC(network_interrupt_callback));
 	machine.scheduler().timer_set(machine.primary_screen->time_until_pos(machine.primary_screen->visible_area().max_y + 1), FUNC(vblank_interrupt_callback));
 
-	state->subbank("bank1")->set_base(machine.region("maincpu")->base() );
-	state->subbank("bank2")->set_base(state->m_workram );
+	state->membank("bank1")->set_base(machine.region("maincpu")->base() );
+	state->membank("bank2")->set_base(state->m_workram );
 
 	memset(state->m_workram, 0x00, 0x100000);
 }
@@ -811,8 +811,8 @@ static void namcofl_common_init(running_machine &machine)
 	namcofl_state *state = machine.driver_data<namcofl_state>();
 	state->m_workram = auto_alloc_array(machine, UINT32, 0x100000/4);
 
-	state->subbank("bank1")->set_base(machine.region("maincpu")->base() );
-	state->subbank("bank2")->set_base(state->m_workram );
+	state->membank("bank1")->set_base(machine.region("maincpu")->base() );
+	state->membank("bank2")->set_base(state->m_workram );
 }
 
 static DRIVER_INIT(speedrcr)

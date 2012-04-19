@@ -118,7 +118,7 @@ WRITE8_MEMBER(suprslam_state::suprslam_sh_bankswitch_w)
 	int bankaddress;
 
 	bankaddress = 0x10000 + (data & 0x03) * 0x8000;
-	subbank("bank1")->set_base(&RAM[bankaddress]);
+	membank("bank1")->set_base(&RAM[bankaddress]);
 }
 
 /*** MEMORY MAPS *************************************************************/

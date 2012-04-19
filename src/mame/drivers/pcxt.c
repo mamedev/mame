@@ -199,7 +199,7 @@ WRITE8_MEMBER(pcxt_state::disk_iobank_w)
 	if (newbank != m_bank)
 	{
 		m_bank = newbank;
-		subbank("bank1")->set_base(machine().region("game_prg")->base() + 0x10000 * m_bank );
+		membank("bank1")->set_base(machine().region("game_prg")->base() + 0x10000 * m_bank );
 	}
 
 	m_lastvalue = data;

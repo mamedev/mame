@@ -337,7 +337,7 @@ WRITE32_MEMBER(psikyo_state::s1945bl_oki_w)
 		// not at all sure about this, it seems to write 0 too often
 		UINT8 bank = (data & 0x00ff0000) >> 16;
 		if (bank < 4)
-			subbank("okibank")->set_entry(bank);
+			membank("okibank")->set_entry(bank);
 	}
 
 	if (ACCESSING_BITS_8_15)
@@ -403,7 +403,7 @@ WRITE8_MEMBER(psikyo_state::psikyo_clear_nmi_w)
 
 WRITE8_MEMBER(psikyo_state::sngkace_sound_bankswitch_w)
 {
-	subbank("bank1")->set_entry(data & 0x03);
+	membank("bank1")->set_entry(data & 0x03);
 }
 
 static ADDRESS_MAP_START( sngkace_sound_map, AS_PROGRAM, 8, psikyo_state )
@@ -427,7 +427,7 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(psikyo_state::gunbird_sound_bankswitch_w)
 {
-	subbank("bank1")->set_entry((data >> 4) & 0x03);
+	membank("bank1")->set_entry((data >> 4) & 0x03);
 }
 
 static ADDRESS_MAP_START( gunbird_sound_map, AS_PROGRAM, 8, psikyo_state )
@@ -1832,7 +1832,7 @@ static DRIVER_INIT( sngkace )
 	state->m_ka302c_banking = 0; // SH201B doesn't have any gfx banking
 
 	/* setup audiocpu banks */
-	state->subbank("bank1")->configure_entries(0, 4, machine.region("audiocpu")->base() + 0x10000, 0x8000);
+	state->membank("bank1")->configure_entries(0, 4, machine.region("audiocpu")->base() + 0x10000, 0x8000);
 
 	/* Enable other regions */
 #if 0
@@ -1892,7 +1892,7 @@ static DRIVER_INIT( tengai )
 
 	/* setup audiocpu banks */
 	/* The banked rom is seen at 8200-ffff, so the last 0x200 bytes of the rom not reachable. */
-	state->subbank("bank1")->configure_entries(0, 4, machine.region("audiocpu")->base() + 0x10000 + 0x200, 0x8000);
+	state->membank("bank1")->configure_entries(0, 4, machine.region("audiocpu")->base() + 0x10000 + 0x200, 0x8000);
 }
 
 static DRIVER_INIT( gunbird )
@@ -1909,7 +1909,7 @@ static DRIVER_INIT( gunbird )
 
 	/* setup audiocpu banks */
 	/* The banked rom is seen at 8200-ffff, so the last 0x200 bytes of the rom not reachable. */
-	state->subbank("bank1")->configure_entries(0, 4, machine.region("audiocpu")->base() + 0x10000 + 0x200, 0x8000);
+	state->membank("bank1")->configure_entries(0, 4, machine.region("audiocpu")->base() + 0x10000 + 0x200, 0x8000);
 }
 
 
@@ -1933,7 +1933,7 @@ static DRIVER_INIT( s1945 )
 
 	/* setup audiocpu banks */
 	/* The banked rom is seen at 8200-ffff, so the last 0x200 bytes of the rom not reachable. */
-	state->subbank("bank1")->configure_entries(0, 4, machine.region("audiocpu")->base() + 0x10000 + 0x200, 0x8000);
+	state->membank("bank1")->configure_entries(0, 4, machine.region("audiocpu")->base() + 0x10000 + 0x200, 0x8000);
 }
 
 static DRIVER_INIT( s1945a )
@@ -1956,7 +1956,7 @@ static DRIVER_INIT( s1945a )
 
 	/* setup audiocpu banks */
 	/* The banked rom is seen at 8200-ffff, so the last 0x200 bytes of the rom not reachable. */
-	state->subbank("bank1")->configure_entries(0, 4, machine.region("audiocpu")->base() + 0x10000 + 0x200, 0x8000);
+	state->membank("bank1")->configure_entries(0, 4, machine.region("audiocpu")->base() + 0x10000 + 0x200, 0x8000);
 }
 
 static DRIVER_INIT( s1945j )
@@ -1979,7 +1979,7 @@ static DRIVER_INIT( s1945j )
 
 	/* setup audiocpu banks */
 	/* The banked rom is seen at 8200-ffff, so the last 0x200 bytes of the rom not reachable. */
-	state->subbank("bank1")->configure_entries(0, 4, machine.region("audiocpu")->base() + 0x10000 + 0x200, 0x8000);
+	state->membank("bank1")->configure_entries(0, 4, machine.region("audiocpu")->base() + 0x10000 + 0x200, 0x8000);
 }
 
 static DRIVER_INIT( s1945jn )
@@ -1996,7 +1996,7 @@ static DRIVER_INIT( s1945jn )
 
 	/* setup audiocpu banks */
 	/* The banked rom is seen at 8200-ffff, so the last 0x200 bytes of the rom not reachable. */
-	state->subbank("bank1")->configure_entries(0, 4, machine.region("audiocpu")->base() + 0x10000 + 0x200, 0x8000);
+	state->membank("bank1")->configure_entries(0, 4, machine.region("audiocpu")->base() + 0x10000 + 0x200, 0x8000);
 }
 
 static DRIVER_INIT( s1945bl )
@@ -2011,8 +2011,8 @@ static DRIVER_INIT( s1945bl )
 
 	state->m_ka302c_banking = 1;
 
-	state->subbank("okibank")->configure_entries(0, 4, machine.region("oki")->base() + 0x30000, 0x10000);
-	state->subbank("okibank")->set_entry(0);
+	state->membank("okibank")->configure_entries(0, 4, machine.region("oki")->base() + 0x30000, 0x10000);
+	state->membank("okibank")->set_entry(0);
 }
 
 

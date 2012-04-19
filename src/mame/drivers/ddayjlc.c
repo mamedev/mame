@@ -203,7 +203,7 @@ WRITE8_MEMBER(ddayjlc_state::bg2_w)
 	if (m_bgadr > 2)
 		m_bgadr = 0;
 
-	subbank("bank1")->set_entry(m_bgadr);
+	membank("bank1")->set_entry(m_bgadr);
 }
 
 WRITE8_MEMBER(ddayjlc_state::sound_w)
@@ -690,8 +690,8 @@ static DRIVER_INIT( ddayjlc )
 		auto_free(machine, temp);
 	}
 
-	machine.root_device().subbank("bank1")->configure_entries(0, 3, machine.region("user1")->base(), 0x4000);
-	machine.root_device().subbank("bank1")->set_entry(0);
+	machine.root_device().membank("bank1")->configure_entries(0, 3, machine.region("user1")->base(), 0x4000);
+	machine.root_device().membank("bank1")->set_entry(0);
 }
 
 GAME( 1984, ddayjlc,  0,       ddayjlc, ddayjlc, ddayjlc, ROT90, "Jaleco", "D-Day (Jaleco set 1)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )

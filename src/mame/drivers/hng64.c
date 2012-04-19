@@ -1665,8 +1665,8 @@ static MACHINE_RESET(hyperneo)
 
 	/* Sound CPU */
 	UINT8 *RAM = (UINT8*)state->m_soundram;
-	state->subbank("bank1")->set_base(&RAM[0x1e0000]);
-	state->subbank("bank2")->set_base(&RAM[0x001000]); // where..
+	state->membank("bank1")->set_base(&RAM[0x1e0000]);
+	state->membank("bank2")->set_base(&RAM[0x001000]); // where..
 	cputag_set_input_line(machine, "audiocpu", INPUT_LINE_HALT, ASSERT_LINE);
 	cputag_set_input_line(machine, "audiocpu", INPUT_LINE_RESET, ASSERT_LINE);
 

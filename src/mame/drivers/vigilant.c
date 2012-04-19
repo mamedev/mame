@@ -29,7 +29,7 @@ WRITE8_MEMBER(vigilant_state::vigilant_bank_select_w)
 	UINT8 *RAM = machine().region("maincpu")->base();
 
 	bankaddress = 0x10000 + (data & 0x07) * 0x4000;
-	subbank("bank1")->set_base(&RAM[bankaddress]);
+	membank("bank1")->set_base(&RAM[bankaddress]);
 }
 
 /***************************************************************************

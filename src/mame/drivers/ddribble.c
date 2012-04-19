@@ -35,7 +35,7 @@ static INTERRUPT_GEN( ddribble_interrupt_1 )
 
 WRITE8_MEMBER(ddribble_state::ddribble_bankswitch_w)
 {
-	subbank("bank1")->set_entry(data & 0x0f);
+	membank("bank1")->set_entry(data & 0x0f);
 }
 
 
@@ -248,7 +248,7 @@ static MACHINE_START( ddribble )
 {
 	ddribble_state *state = machine.driver_data<ddribble_state>();
 	UINT8 *ROM = machine.region("maincpu")->base();
-	state->subbank("bank1")->configure_entries(0, 5, &ROM[0x10000], 0x2000);
+	state->membank("bank1")->configure_entries(0, 5, &ROM[0x10000], 0x2000);
 
 	state->m_filter1 = machine.device("filter1");
 	state->m_filter2 = machine.device("filter2");

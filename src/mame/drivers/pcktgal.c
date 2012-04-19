@@ -26,16 +26,16 @@ WRITE8_MEMBER(pcktgal_state::pcktgal_bank_w)
 {
 	UINT8 *RAM = machine().region("maincpu")->base();
 
-	if (data & 1) { subbank("bank1")->set_base(&RAM[0x4000]); }
-	else { subbank("bank1")->set_base(&RAM[0x10000]); }
+	if (data & 1) { membank("bank1")->set_base(&RAM[0x4000]); }
+	else { membank("bank1")->set_base(&RAM[0x10000]); }
 
-	if (data & 2) { subbank("bank2")->set_base(&RAM[0x6000]); }
-	else { subbank("bank2")->set_base(&RAM[0x12000]); }
+	if (data & 2) { membank("bank2")->set_base(&RAM[0x6000]); }
+	else { membank("bank2")->set_base(&RAM[0x12000]); }
 }
 
 WRITE8_MEMBER(pcktgal_state::pcktgal_sound_bank_w)
 {
-	subbank("bank3")->set_entry((data >> 2) & 1);
+	membank("bank3")->set_entry((data >> 2) & 1);
 }
 
 WRITE8_MEMBER(pcktgal_state::pcktgal_sound_w)
@@ -421,8 +421,8 @@ static DRIVER_INIT( deco222 )
 	for (A = 0x8000;A < 0x18000;A++)
 		decrypted[A-0x8000] = (rom[A] & 0x9f) | ((rom[A] & 0x20) << 1) | ((rom[A] & 0x40) >> 1);
 
-	machine.root_device().subbank("bank3")->configure_entries(0, 2, machine.region("audiocpu")->base() + 0x10000, 0x4000);
-	machine.root_device().subbank("bank3")->configure_decrypted_entries(0, 2, &decrypted[0x8000], 0x4000);
+	machine.root_device().membank("bank3")->configure_entries(0, 2, machine.region("audiocpu")->base() + 0x10000, 0x4000);
+	machine.root_device().membank("bank3")->configure_decrypted_entries(0, 2, &decrypted[0x8000], 0x4000);
 }
 
 static DRIVER_INIT( graphics )
@@ -431,7 +431,7 @@ static DRIVER_INIT( graphics )
 	int len = machine.region("gfx1")->bytes();
 	int i,j,temp[16];
 
-	machine.root_device().subbank("bank3")->configure_entries(0, 2, machine.region("audiocpu")->base() + 0x10000, 0x4000);
+	machine.root_device().membank("bank3")->configure_entries(0, 2, machine.region("audiocpu")->base() + 0x10000, 0x4000);
 
 	/* Tile graphics roms have some swapped lines, original version only */
 	for (i = 0x00000;i < len;i += 32)

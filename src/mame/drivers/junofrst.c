@@ -190,7 +190,7 @@ WRITE8_MEMBER(junofrst_state::junofrst_blitter_w)
 
 WRITE8_MEMBER(junofrst_state::junofrst_bankselect_w)
 {
-	subbank("bank1")->set_entry(data & 0x0f);
+	membank("bank1")->set_entry(data & 0x0f);
 }
 
 
@@ -529,8 +529,8 @@ static DRIVER_INIT( junofrst )
 {
 	UINT8 *decrypted = konami1_decode(machine, "maincpu");
 
-	machine.root_device().subbank("bank1")->configure_entries(0, 16, machine.region("maincpu")->base() + 0x10000, 0x1000);
-	machine.root_device().subbank("bank1")->configure_decrypted_entries(0, 16, decrypted + 0x10000, 0x1000);
+	machine.root_device().membank("bank1")->configure_entries(0, 16, machine.region("maincpu")->base() + 0x10000, 0x1000);
+	machine.root_device().membank("bank1")->configure_decrypted_entries(0, 16, decrypted + 0x10000, 0x1000);
 }
 
 

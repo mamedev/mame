@@ -67,7 +67,7 @@ static INTERRUPT_GEN( rockrage_interrupt )
 WRITE8_MEMBER(rockrage_state::rockrage_bankswitch_w)
 {
 	/* bits 4-6 = bank number */
-	subbank("bank1")->set_entry((data & 0x70) >> 4);
+	membank("bank1")->set_entry((data & 0x70) >> 4);
 
 	/* bits 0 & 1 = coin counters */
 	coin_counter_w(machine(), 0,data & 0x01);
@@ -239,7 +239,7 @@ static MACHINE_START( rockrage )
 	rockrage_state *state = machine.driver_data<rockrage_state>();
 	UINT8 *ROM = machine.region("maincpu")->base();
 
-	state->subbank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x2000);
+	state->membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x2000);
 
 	state->m_audiocpu = machine.device("audiocpu");
 	state->m_k007342 = machine.device("k007342");

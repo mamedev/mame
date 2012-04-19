@@ -428,7 +428,7 @@ WRITE8_MEMBER(astrocde_state::profpac_banksw_w)
 
 	/* set the main banking */
 	prog_space->install_read_bank(0x4000, 0xbfff, "bank1");
-	subbank("bank1")->set_base(machine().region("user1")->base() + 0x8000 * bank);
+	membank("bank1")->set_base(machine().region("user1")->base() + 0x8000 * bank);
 
 	/* bank 0 reads video RAM in the 4000-7FFF range */
 	if (bank == 0)
@@ -444,7 +444,7 @@ WRITE8_MEMBER(astrocde_state::profpac_banksw_w)
 		if (bank < 0x28)
 		{
 			prog_space->install_read_bank(0x4000, 0x7fff, "bank2");
-			subbank("bank2")->set_base(machine().region("user2")->base() + 0x4000 * bank);
+			membank("bank2")->set_base(machine().region("user2")->base() + 0x4000 * bank);
 		}
 		else
 			prog_space->unmap_read(0x4000, 0x7fff);

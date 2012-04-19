@@ -368,8 +368,8 @@ static MACHINE_START( williams_common )
 {
 	williams_state *state = machine.driver_data<williams_state>();
 	/* configure the memory bank */
-	state->subbank("bank1")->configure_entry(0, state->m_videoram);
-	state->subbank("bank1")->configure_entry(1, machine.region("maincpu")->base() + 0x10000);
+	state->membank("bank1")->configure_entry(0, state->m_videoram);
+	state->membank("bank1")->configure_entry(1, machine.region("maincpu")->base() + 0x10000);
 
 	state_save_register_global(machine, state->m_vram_bank);
 }
@@ -466,8 +466,8 @@ MACHINE_START( williams2 )
 {
 	williams_state *state = machine.driver_data<williams_state>();
 	/* configure memory banks */
-	state->subbank("bank1")->configure_entry(0, state->m_videoram);
-	state->subbank("bank1")->configure_entries(1, 4, machine.region("maincpu")->base() + 0x10000, 0x10000);
+	state->membank("bank1")->configure_entry(0, state->m_videoram);
+	state->membank("bank1")->configure_entries(1, 4, machine.region("maincpu")->base() + 0x10000, 0x10000);
 
 	/* register for save states */
 	state_save_register_global(machine, state->m_vram_bank);
@@ -504,7 +504,7 @@ WRITE8_MEMBER(williams_state::williams_vram_select_w)
 {
 	/* VRAM/ROM banking from bit 0 */
 	m_vram_bank = data & 0x01;
-	subbank("bank1")->set_entry(m_vram_bank);
+	membank("bank1")->set_entry(m_vram_bank);
 
 	/* cocktail flip from bit 1 */
 	m_cocktail = data & 0x02;
@@ -522,8 +522,8 @@ WRITE8_MEMBER(williams_state::williams2_bank_select_w)
 		case 0:
 			space.install_read_bank(0x0000, 0x8fff, "bank1");
 			space.install_write_bank(0x8000, 0x87ff, "bank4");
-			subbank("bank1")->set_entry(0);
-			subbank("bank4")->set_base(&m_videoram[0x8000]);
+			membank("bank1")->set_entry(0);
+			membank("bank4")->set_base(&m_videoram[0x8000]);
 			break;
 
 		/* pages 1 and 2 are ROM */
@@ -531,16 +531,16 @@ WRITE8_MEMBER(williams_state::williams2_bank_select_w)
 		case 2:
 			space.install_read_bank(0x0000, 0x8fff, "bank1");
 			space.install_write_bank(0x8000, 0x87ff, "bank4");
-			subbank("bank1")->set_entry(1 + ((m_vram_bank & 6) >> 1));
-			subbank("bank4")->set_base(&m_videoram[0x8000]);
+			membank("bank1")->set_entry(1 + ((m_vram_bank & 6) >> 1));
+			membank("bank4")->set_base(&m_videoram[0x8000]);
 			break;
 
 		/* page 3 accesses palette RAM; the remaining areas are as if page 1 ROM was selected */
 		case 3:
 			space.install_read_bank(0x8000, 0x87ff, "bank4");
 			space.install_write_handler(0x8000, 0x87ff, write8_delegate(FUNC(williams_state::williams2_paletteram_w),this));
-			subbank("bank1")->set_entry(1 + ((m_vram_bank & 4) >> 1));
-			subbank("bank4")->set_base(m_generic_paletteram_8);
+			membank("bank1")->set_entry(1 + ((m_vram_bank & 4) >> 1));
+			membank("bank4")->set_base(m_generic_paletteram_8);
 			break;
 	}
 }
@@ -772,7 +772,7 @@ MACHINE_START( defender )
 	MACHINE_START_CALL(williams_common);
 
 	/* configure the banking and make sure it is reset to 0 */
-	machine.root_device().subbank("bank1")->configure_entries(0, 9, &machine.region("maincpu")->base()[0x10000], 0x1000);
+	machine.root_device().membank("bank1")->configure_entries(0, 9, &machine.region("maincpu")->base()[0x10000], 0x1000);
 
 	machine.save().register_postload(save_prepost_delegate(FUNC(defender_postload), &machine));
 }
@@ -819,7 +819,7 @@ WRITE8_MEMBER(williams_state::defender_bank_select_w)
 		case 9:
 			space.install_read_bank(0xc000, 0xcfff, "bank1");
 			space.unmap_write(0xc000, 0xcfff);
-			subbank("bank1")->set_entry(m_vram_bank - 1);
+			membank("bank1")->set_entry(m_vram_bank - 1);
 			break;
 
 		/* pages A-F are not connected */
@@ -878,11 +878,11 @@ MACHINE_START( blaster )
 	MACHINE_START_CALL(williams_common);
 
 	/* banking is different for blaster */
-	state->subbank("bank1")->configure_entry(0, state->m_videoram);
-	state->subbank("bank1")->configure_entries(1, 16, machine.region("maincpu")->base() + 0x18000, 0x4000);
+	state->membank("bank1")->configure_entry(0, state->m_videoram);
+	state->membank("bank1")->configure_entries(1, 16, machine.region("maincpu")->base() + 0x18000, 0x4000);
 
-	state->subbank("bank2")->configure_entry(0, state->m_videoram + 0x4000);
-	state->subbank("bank2")->configure_entries(1, 16, machine.region("maincpu")->base() + 0x10000, 0x0000);
+	state->membank("bank2")->configure_entry(0, state->m_videoram + 0x4000);
+	state->membank("bank2")->configure_entries(1, 16, machine.region("maincpu")->base() + 0x10000, 0x0000);
 
 	state_save_register_global(machine, state->m_blaster_bank);
 }
@@ -897,8 +897,8 @@ MACHINE_RESET( blaster )
 INLINE void update_blaster_banking(running_machine &machine)
 {
 	williams_state *state = machine.driver_data<williams_state>();
-	state->subbank("bank1")->set_entry(state->m_vram_bank * (state->m_blaster_bank + 1));
-	state->subbank("bank2")->set_entry(state->m_vram_bank * (state->m_blaster_bank + 1));
+	state->membank("bank1")->set_entry(state->m_vram_bank * (state->m_blaster_bank + 1));
+	state->membank("bank2")->set_entry(state->m_vram_bank * (state->m_blaster_bank + 1));
 }
 
 

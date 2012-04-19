@@ -362,7 +362,7 @@ MACHINE_RESET( leland )
 	state->m_slave_length = machine.region("slave")->bytes();
 	state->m_slave_base = machine.region("slave")->base();
 	if (state->m_slave_length > 0x10000)
-		state->subbank("bank3")->set_base(&state->m_slave_base[0x10000]);
+		state->membank("bank3")->set_base(&state->m_slave_base[0x10000]);
 }
 
 
@@ -408,7 +408,7 @@ MACHINE_RESET( ataxx )
 	state->m_slave_length = machine.region("slave")->bytes();
 	state->m_slave_base = machine.region("slave")->base();
 	if (state->m_slave_length > 0x10000)
-		state->subbank("bank3")->set_base(&state->m_slave_base[0x10000]);
+		state->membank("bank3")->set_base(&state->m_slave_base[0x10000]);
 }
 
 
@@ -494,10 +494,10 @@ void mayhem_bankswitch(running_machine &machine)
 	state->m_battery_ram_enable = ((state->m_sound_port_bank & 0x24) == 0);
 
 	address = (!(state->m_sound_port_bank & 0x04)) ? &state->m_master_base[0x10000] : &state->m_master_base[0x1c000];
-	state->subbank("bank1")->set_base(address);
+	state->membank("bank1")->set_base(address);
 
 	address = state->m_battery_ram_enable ? state->m_battery_ram : &address[0x8000];
-	state->subbank("bank2")->set_base(address);
+	state->membank("bank2")->set_base(address);
 }
 
 
@@ -510,10 +510,10 @@ void dangerz_bankswitch(running_machine &machine)
 	state->m_battery_ram_enable = ((state->m_top_board_bank & 0x80) != 0);
 
 	address = (!(state->m_alternate_bank & 1)) ? &state->m_master_base[0x02000] : &state->m_master_base[0x12000];
-	state->subbank("bank1")->set_base(address);
+	state->membank("bank1")->set_base(address);
 
 	address = state->m_battery_ram_enable ? state->m_battery_ram : &address[0x8000];
-	state->subbank("bank2")->set_base(address);
+	state->membank("bank2")->set_base(address);
 }
 
 
@@ -529,10 +529,10 @@ void basebal2_bankswitch(running_machine &machine)
 		address = (!(state->m_sound_port_bank & 0x04)) ? &state->m_master_base[0x10000] : &state->m_master_base[0x1c000];
 	else
 		address = (!(state->m_top_board_bank & 0x40)) ? &state->m_master_base[0x28000] : &state->m_master_base[0x30000];
-	state->subbank("bank1")->set_base(address);
+	state->membank("bank1")->set_base(address);
 
 	address = state->m_battery_ram_enable ? state->m_battery_ram : &address[0x8000];
-	state->subbank("bank2")->set_base(address);
+	state->membank("bank2")->set_base(address);
 }
 
 
@@ -546,10 +546,10 @@ void redline_bankswitch(running_machine &machine)
 	state->m_battery_ram_enable = ((state->m_alternate_bank & 3) == 1);
 
 	address = &state->m_master_base[bank_list[state->m_alternate_bank & 3]];
-	state->subbank("bank1")->set_base(address);
+	state->membank("bank1")->set_base(address);
 
 	address = state->m_battery_ram_enable ? state->m_battery_ram : &state->m_master_base[0xa000];
-	state->subbank("bank2")->set_base(address);
+	state->membank("bank2")->set_base(address);
 }
 
 
@@ -568,10 +568,10 @@ void viper_bankswitch(running_machine &machine)
 		logerror("%s:Master bank %02X out of range!\n", machine.describe_context(), state->m_alternate_bank & 3);
 		address = &state->m_master_base[bank_list[0]];
 	}
-	state->subbank("bank1")->set_base(address);
+	state->membank("bank1")->set_base(address);
 
 	address = state->m_battery_ram_enable ? state->m_battery_ram : &state->m_master_base[0xa000];
-	state->subbank("bank2")->set_base(address);
+	state->membank("bank2")->set_base(address);
 }
 
 
@@ -590,10 +590,10 @@ void offroad_bankswitch(running_machine &machine)
 		logerror("%s:Master bank %02X out of range!\n", machine.describe_context(), state->m_alternate_bank & 7);
 		address = &state->m_master_base[bank_list[0]];
 	}
-	state->subbank("bank1")->set_base(address);
+	state->membank("bank1")->set_base(address);
 
 	address = state->m_battery_ram_enable ? state->m_battery_ram : &state->m_master_base[0xa000];
-	state->subbank("bank2")->set_base(address);
+	state->membank("bank2")->set_base(address);
 }
 
 
@@ -616,7 +616,7 @@ void ataxx_bankswitch(running_machine &machine)
 		logerror("%s:Master bank %02X out of range!\n", machine.describe_context(), state->m_master_bank & 15);
 		address = &state->m_master_base[bank_list[0]];
 	}
-	state->subbank("bank1")->set_base(address);
+	state->membank("bank1")->set_base(address);
 
 	if (state->m_battery_ram_enable)
 		address = state->m_battery_ram;
@@ -624,7 +624,7 @@ void ataxx_bankswitch(running_machine &machine)
 		address = &state->m_ataxx_qram[(state->m_master_bank & 0xc0) << 8];
 	else
 		address = &state->m_master_base[0xa000];
-	state->subbank("bank2")->set_base(address);
+	state->membank("bank2")->set_base(address);
 
 	state->m_wcol_enable = ((state->m_master_bank & 0x30) == 0x30);
 }
@@ -1349,7 +1349,7 @@ WRITE8_MEMBER(leland_state::leland_slave_small_banksw_w)
 		logerror("%04X:Slave bank %02X out of range!", cpu_get_pc(&space.device()), data & 1);
 		bankaddress = 0x10000;
 	}
-	subbank("bank3")->set_base(&m_slave_base[bankaddress]);
+	membank("bank3")->set_base(&m_slave_base[bankaddress]);
 
 	if (LOG_BANKSWITCHING_S) logerror("%04X:Slave bank = %02X (%05X)\n", cpu_get_pc(&space.device()), data & 1, bankaddress);
 }
@@ -1364,7 +1364,7 @@ WRITE8_MEMBER(leland_state::leland_slave_large_banksw_w)
 		logerror("%04X:Slave bank %02X out of range!", cpu_get_pc(&space.device()), data & 15);
 		bankaddress = 0x10000;
 	}
-	subbank("bank3")->set_base(&m_slave_base[bankaddress]);
+	membank("bank3")->set_base(&m_slave_base[bankaddress]);
 
 	if (LOG_BANKSWITCHING_S) logerror("%04X:Slave bank = %02X (%05X)\n", cpu_get_pc(&space.device()), data & 15, bankaddress);
 }
@@ -1388,7 +1388,7 @@ WRITE8_MEMBER(leland_state::ataxx_slave_banksw_w)
 		logerror("%04X:Slave bank %02X out of range!", cpu_get_pc(&space.device()), data & 0x3f);
 		bankaddress = 0x2000;
 	}
-	subbank("bank3")->set_base(&m_slave_base[bankaddress]);
+	membank("bank3")->set_base(&m_slave_base[bankaddress]);
 
 	if (LOG_BANKSWITCHING_S) logerror("%04X:Slave bank = %02X (%05X)\n", cpu_get_pc(&space.device()), data, bankaddress);
 }

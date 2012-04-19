@@ -39,7 +39,7 @@ WRITE8_MEMBER(srumbler_state::srumbler_bankswitch_w)
 		/* bit 2 of prom1 selects ROM or RAM - not supported */
 
 		sprintf(bankname, "%04x", i*0x1000);
-		subbank(bankname)->set_base(&ROM[bank*0x1000]);
+		membank(bankname)->set_base(&ROM[bank*0x1000]);
 	}
 }
 

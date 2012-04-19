@@ -45,7 +45,7 @@ WRITE8_MEMBER( draco_state::sound_bankswitch_w )
 
 	int bank = BIT(data, 3);
 
-	subbank("bank1")->set_entry(bank);
+	membank("bank1")->set_entry(bank);
 }
 
 WRITE8_MEMBER( draco_state::sound_g_w )
@@ -441,8 +441,8 @@ void cidelsa_state::machine_start()
 void draco_state::machine_start()
 {
 	/* setup COP402 memory banking */
-	subbank("bank1")->configure_entries(0, 2, machine().region(COP402N_TAG)->base(), 0x400);
-	subbank("bank1")->set_entry(0);
+	membank("bank1")->configure_entries(0, 2, machine().region(COP402N_TAG)->base(), 0x400);
+	membank("bank1")->set_entry(0);
 
 	/* register for state saving */
 	save_item(NAME(m_reset));

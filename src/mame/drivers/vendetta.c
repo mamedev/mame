@@ -171,7 +171,7 @@ static void vendetta_video_banking( running_machine &machine, int select )
 		space->install_read_bank(state->m_video_banking_base + 0x2000, state->m_video_banking_base + 0x2fff, "bank4" );
 		space->install_write_handler(state->m_video_banking_base + 0x2000, state->m_video_banking_base + 0x2fff, write8_delegate(FUNC(vendetta_state::paletteram_xBBBBBGGGGGRRRRR_byte_be_w), state) );
 		space->install_legacy_readwrite_handler(*state->m_k053246, state->m_video_banking_base + 0x0000, state->m_video_banking_base + 0x0fff, FUNC(k053247_r), FUNC(k053247_w) );
-		state->subbank("bank4")->set_base(state->m_generic_paletteram_8);
+		state->membank("bank4")->set_base(state->m_generic_paletteram_8);
 	}
 	else
 	{
@@ -461,8 +461,8 @@ static MACHINE_START( vendetta )
 	vendetta_state *state = machine.driver_data<vendetta_state>();
 	UINT8 *ROM = machine.region("maincpu")->base();
 
-	state->subbank("bank1")->configure_entries(0, 28, &ROM[0x10000], 0x2000);
-	state->subbank("bank1")->set_entry(0);
+	state->membank("bank1")->configure_entries(0, 28, &ROM[0x10000], 0x2000);
+	state->membank("bank1")->set_entry(0);
 
 	state->m_generic_paletteram_8.allocate(0x1000);
 
@@ -786,7 +786,7 @@ static KONAMI_SETLINES_CALLBACK( vendetta_banking )
 	if (lines >= 0x1c)
 		logerror("PC = %04x : Unknown bank selected %02x\n", cpu_get_pc(device), lines);
 	else
-		device->machine().root_device().subbank("bank1")->set_entry(lines);
+		device->machine().root_device().membank("bank1")->set_entry(lines);
 }
 
 static DRIVER_INIT( vendetta )

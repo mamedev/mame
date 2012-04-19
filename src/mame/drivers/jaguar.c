@@ -503,17 +503,17 @@ static MACHINE_RESET( cojag )
 		/* graphics banks */
 		if (cojag_is_r3000)
 		{
-			state->subbank("bank1")->configure_entries(0, 2, rom + 0x800000, 0x400000);
-			state->subbank("bank1")->set_entry(0);
+			state->membank("bank1")->configure_entries(0, 2, rom + 0x800000, 0x400000);
+			state->membank("bank1")->set_entry(0);
 		}
-		state->subbank("bank8")->configure_entries(0, 2, rom + 0x800000, 0x400000);
-		state->subbank("bank8")->set_entry(0);
+		state->membank("bank8")->configure_entries(0, 2, rom + 0x800000, 0x400000);
+		state->membank("bank8")->set_entry(0);
 
 		/* sound banks */
-		state->subbank("bank2")->configure_entries(0, 8, rom + 0x000000, 0x200000);
-		state->subbank("bank9")->configure_entries(0, 8, rom + 0x000000, 0x200000);
-		state->subbank("bank2")->set_entry(0);
-		state->subbank("bank9")->set_entry(0);
+		state->membank("bank2")->configure_entries(0, 8, rom + 0x000000, 0x200000);
+		state->membank("bank9")->configure_entries(0, 8, rom + 0x000000, 0x200000);
+		state->membank("bank2")->set_entry(0);
+		state->membank("bank9")->set_entry(0);
 	}
 
 	/* clear any spinuntil stuff */
@@ -721,8 +721,8 @@ WRITE32_MEMBER(cojag_state::misc_control_w)
 	/* adjust banking */
 	if (machine().region("user2")->base())
 	{
-		subbank("bank2")->set_entry((data >> 1) & 7);
-		subbank("bank9")->set_entry((data >> 1) & 7);
+		membank("bank2")->set_entry((data >> 1) & 7);
+		membank("bank9")->set_entry((data >> 1) & 7);
 	}
 
 	COMBINE_DATA(&m_misc_control_data);
@@ -902,8 +902,8 @@ WRITE32_MEMBER(cojag_state::latch_w)
 	if (machine().region("user2")->base())
 	{
 		if (cojag_is_r3000)
-			subbank("bank1")->set_entry(data & 1);
-		subbank("bank8")->set_entry(data & 1);
+			membank("bank1")->set_entry(data & 1);
+		membank("bank8")->set_entry(data & 1);
 	}
 }
 

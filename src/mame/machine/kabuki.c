@@ -175,7 +175,7 @@ static void mitchell_decode(running_machine &machine, int swap_key1,int swap_key
 	for (i = 0; i < numbanks; i++)
 		kabuki_decode(rom+i*0x4000,decrypt+i*0x4000,rom+i*0x4000,0x8000,0x4000, swap_key1,swap_key2,addr_key,xor_key);
 
-	machine.root_device().subbank("bank1")->configure_decrypted_entries(0, numbanks, decrypt, 0x4000);
+	machine.root_device().membank("bank1")->configure_decrypted_entries(0, numbanks, decrypt, 0x4000);
 /*
     {
         FILE *f;
