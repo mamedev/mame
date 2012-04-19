@@ -42,16 +42,16 @@ public:
 		  m_nvram(*this, "nvram"),
 		  m_ram_base(*this, "ram_base"),
 		  m_fastram_base(*this, "fastram_base"),
-		  m_tms32031_control(*this, "tms32031_control"),
+		  m_tms32031_control(*this, "32031_control"),
 		  m_midvplus_misc(*this, "midvplus_misc"),
-		  m_videoram(*this, "videoram"),
+		  m_videoram(*this, "videoram", 32),
 		  m_textureram(*this, "textureram") { }
 
 	optional_shared_ptr<UINT32>	m_nvram;
 	required_shared_ptr<UINT32> m_ram_base;
-	required_shared_ptr<UINT32> m_fastram_base;
+	optional_shared_ptr<UINT32> m_fastram_base;
 	required_shared_ptr<UINT32> m_tms32031_control;
-	required_shared_ptr<UINT32> m_midvplus_misc;
+	optional_shared_ptr<UINT32> m_midvplus_misc;
 	required_shared_ptr<UINT16> m_videoram;
 	required_shared_ptr<UINT32> m_textureram;
 

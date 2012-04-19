@@ -2114,9 +2114,8 @@ static DRIVER_INIT( animalc )
 	memory_configure_bank(machine, "rambank", 1, 4, bankedram, 0x1000);
 	memory_set_bank(machine, "rambank", 0);
 
-	//state->m_spriteram = auto_alloc_array(machine, UINT8, 0x1000 * 5);
-	//memset(state->m_spriteram, 0, 0x1000 * 5);
-	//state->m_spriteram_size = 0x1000;
+	state->m_spriteram.allocate(0x1000 * 5);
+	memset(state->m_spriteram, 0, 0x1000 * 5);
 	memory_configure_bank(machine, "sprbank", 0, 5, state->m_spriteram, 0x1000);
 	memory_set_bank(machine, "sprbank", 0);
 
@@ -2162,9 +2161,8 @@ static DRIVER_INIT( itazuram )
 	memory_set_bankptr(machine, "palbank", state->m_generic_paletteram_8);
 	state->m_rambank = 0x64;
 
-	//state->m_spriteram = auto_alloc_array(machine, UINT8, 0x1000 * 5);
-	//memset(state->m_spriteram, 0, 0x1000 * 5);
-	//state->m_spriteram_size = 0x1000;
+	state->m_spriteram.allocate(0x1000 * 5);
+	memset(state->m_spriteram, 0, 0x1000 * 5);
 	memory_set_bankptr(machine, "sprbank0",  state->m_spriteram + 0x1000*4);	// scratch
 	memory_set_bankptr(machine, "sprbank1",  state->m_spriteram + 0x1000*4);	// scratch
 
@@ -2274,9 +2272,8 @@ static DRIVER_INIT( haekaka )
 	state->m_generic_paletteram_8.allocate(0x200);
 	memset(state->m_generic_paletteram_8, 0, 0x200);
 
-	//state->m_spriteram = auto_alloc_array(machine, UINT8, 0x1000);
-	//memset(state->m_spriteram, 0, 0x1000);
-	//state->m_spriteram_size = 0x1000;
+	state->m_spriteram.allocate(0x1000);
+	memset(state->m_spriteram, 0, 0x1000);
 
 	state->m_rombank = 0x65;
 	state->m_rambank = 0x53;

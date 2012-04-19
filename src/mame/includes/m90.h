@@ -7,7 +7,7 @@ public:
 		m_spriteram(*this, "spriteram"){ }
 
 	required_shared_ptr<UINT16> m_video_data;
-	required_shared_ptr<UINT16> m_spriteram;
+	optional_shared_ptr<UINT16> m_spriteram;
 	UINT16 m_video_control_data[8];
 	tilemap_t *m_pf1_layer;
 	tilemap_t *m_pf2_layer;

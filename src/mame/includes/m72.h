@@ -21,7 +21,7 @@ public:
 	required_shared_ptr<UINT16> m_videoram2;
 	optional_shared_ptr<UINT16> m_majtitle_rowscrollram;
 	optional_shared_ptr<UINT16> m_spriteram2;
-	required_shared_ptr<UINT8> m_soundram;
+	optional_shared_ptr<UINT8> m_soundram;
 
 	UINT16 *m_protection_ram;
 	emu_timer *m_scanline_timer;

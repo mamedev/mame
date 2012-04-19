@@ -53,7 +53,7 @@ static void comad_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, c
 	int offs;
 	int sx=0, sy=0;
 
-	for (offs = 0;offs < state->m_spriteram_size/2;offs += 4)
+	for (offs = 0;offs < state->m_spriteram.bytes()/2;offs += 4)
 	{
 		int code,color,flipx,flipy;
 
@@ -89,7 +89,7 @@ static void draw_fgbitmap(running_machine &machine, bitmap_ind16 &bitmap, const 
 	galpanic_state *state = machine.driver_data<galpanic_state>();
 	int offs;
 
-	for (offs = 0;offs < state->m_fgvideoram_size/2;offs++)
+	for (offs = 0;offs < state->m_fgvideoram.bytes()/2;offs++)
 	{
 		int sx,sy,color;
 

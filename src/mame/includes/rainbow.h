@@ -12,7 +12,7 @@ public:
 		m_spriteram(*this, "spriteram"){ }
 
 	/* memory pointers */
-	required_shared_ptr<UINT16> m_spriteram;
+	optional_shared_ptr<UINT16> m_spriteram;
 //  UINT16 *    paletteram;    // currently this uses generic palette handling
 
 	/* video-related */

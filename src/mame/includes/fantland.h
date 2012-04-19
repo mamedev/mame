@@ -5,8 +5,8 @@ class fantland_state : public driver_device
 public:
 	fantland_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
-		m_spriteram(*this, "spriteram", 16),
-		m_spriteram2(*this, "spriteram2", 16){ }
+		m_spriteram(*this, "spriteram", 0),
+		m_spriteram2(*this, "spriteram2", 0){ }
 
 	/* memory pointers */
 //  UINT8 *    m_spriteram;   // currently directly used in a 16bit map...
@@ -29,8 +29,8 @@ public:
 	device_t *m_msm2;
 	device_t *m_msm3;
 	device_t *m_msm4;
-	required_shared_ptr<UINT8> m_spriteram;
-	required_shared_ptr<UINT8> m_spriteram2;
+	optional_shared_ptr<UINT8> m_spriteram;
+	optional_shared_ptr<UINT8> m_spriteram2;
 	DECLARE_WRITE8_MEMBER(fantland_nmi_enable_w);
 	DECLARE_WRITE16_MEMBER(fantland_nmi_enable_16_w);
 	DECLARE_WRITE8_MEMBER(fantland_soundlatch_w);

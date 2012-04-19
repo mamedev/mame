@@ -10653,8 +10653,8 @@ static DRIVER_INIT( crazyfgt )
 	RAM[0x1078/2] = 0x4e71;
 
 	// fixed priorities?
-	//TODO:FIX
-	//state->m_vregs = auto_alloc_array_clear(machine, UINT16, 3);
+	seta_state *state = machine.driver_data<seta_state>();
+	state->m_vregs.allocate(3);
 
 	DRIVER_INIT_CALL(blandia);
 }
@@ -10669,8 +10669,8 @@ static DRIVER_INIT( inttoote )
 	UINT16 *ROM = (UINT16 *)machine.region( "maincpu" )->base();
 
 	// missing / unused video regs
-	//TODO:FIX
-	//state->m_vregs = auto_alloc_array_clear(machine, UINT16, 3);
+	seta_state *state = machine.driver_data<seta_state>();
+	state->m_vregs.allocate(3);
 
 	// code patches (to be removed...)
 	ROM[0x4de0/2] = 0x4e71;	// hardware test errors
@@ -10685,8 +10685,8 @@ static DRIVER_INIT( inttootea )
 	//UINT16 *ROM = (UINT16 *)machine.region( "maincpu" )->base();
 
 	// missing / unused video regs
-	//TODO:FIX
-	//state->m_vregs = auto_alloc_array_clear(machine, UINT16, 3);
+	seta_state *state = machine.driver_data<seta_state>();
+	state->m_vregs.allocate(3);
 
 	// code patches (to be removed...)
 	//ROM[0x4de0/2] = 0x4e71;   // hardware test errors

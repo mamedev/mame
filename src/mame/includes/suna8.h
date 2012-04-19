@@ -13,9 +13,9 @@ public:
 		m_wram(*this, "wram"){ }
 
 	required_device<cpu_device> m_maincpu;
-	required_shared_ptr<UINT8> m_hardhead_ip;
-	required_shared_ptr<UINT8> m_spriteram;
-	required_shared_ptr<UINT8> m_wram;
+	optional_shared_ptr<UINT8> m_hardhead_ip;
+	optional_shared_ptr<UINT8> m_spriteram;
+	optional_shared_ptr<UINT8> m_wram;
 
 	UINT8 m_rombank;
 	UINT8 m_spritebank;

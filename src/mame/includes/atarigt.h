@@ -17,10 +17,12 @@ class atarigt_state : public atarigen_state
 {
 public:
 	atarigt_state(const machine_config &mconfig, device_type type, const char *tag)
-		: atarigen_state(mconfig, type, tag) { }
+		: atarigen_state(mconfig, type, tag),
+		  m_colorram(*this, "colorram", 32),
+		  m_mo_command(*this, "mo_command") { }
 
 	UINT8			m_is_primrage;
-	UINT16 *		m_colorram;
+	required_shared_ptr<UINT16> m_colorram;
 
 	bitmap_ind16 *		m_pf_bitmap;
 	bitmap_ind16 *		m_an_bitmap;
@@ -34,7 +36,7 @@ public:
 
 	UINT32			m_expanded_mram[MRAM_ENTRIES * 3];
 
-	UINT32 *		m_mo_command;
+	required_shared_ptr<UINT32> m_mo_command;
 
 	void			(*m_protection_w)(address_space *space, offs_t offset, UINT16 data);
 	void			(*m_protection_r)(address_space *space, offs_t offset, UINT16 *data);

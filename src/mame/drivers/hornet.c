@@ -336,7 +336,7 @@ public:
 	UINT8 m_led_reg1;
 	required_shared_ptr<UINT32> m_workram;
 	required_shared_ptr<UINT32> m_sharc_dataram0;
-	required_shared_ptr<UINT32> m_sharc_dataram1;
+	optional_shared_ptr<UINT32> m_sharc_dataram1;
 	UINT8 *m_jvs_sdata;
 	UINT32 m_jvs_sdata_ptr;
 	emu_timer *m_sound_irq_timer;

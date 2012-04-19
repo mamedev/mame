@@ -92,13 +92,13 @@ public:
 	optional_shared_ptr<UINT16> m_spriteram;
 	optional_shared_ptr<UINT16> m_bg15_reg;
 	optional_shared_ptr<UINT16> m_bg15_select;
-	required_shared_ptr<UINT16> m_sprites_regs;
+	optional_shared_ptr<UINT16> m_sprites_regs;
 	optional_shared_ptr_array<UINT16,4> m_vram;
 	optional_shared_ptr_array<UINT16,4> m_vscroll;
-	required_shared_ptr<UINT16> m_layers_0_regs;
+	optional_shared_ptr<UINT16> m_layers_0_regs;
 	optional_shared_ptr<UINT16> m_layers_1_regs;
-	required_shared_ptr<UINT16> m_mcu_ram;
-	required_shared_ptr<UINT16> m_mainram;
+	optional_shared_ptr<UINT16> m_mcu_ram;
+	optional_shared_ptr<UINT16> m_mainram;
 	
 	UINT8 m_nvram_save[128];
 	int m_sprite_type;

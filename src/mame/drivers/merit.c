@@ -72,7 +72,7 @@ public:
 	int m_extra_video_bank_bit;
 	int m_question_address;
 	int m_decryption_key;
-	required_shared_ptr<UINT8> m_backup_ram;
+	optional_shared_ptr<UINT8> m_backup_ram;
 	DECLARE_READ8_MEMBER(questions_r);
 	DECLARE_WRITE8_MEMBER(low_offset_w);
 	DECLARE_WRITE8_MEMBER(med_offset_w);

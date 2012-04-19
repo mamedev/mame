@@ -14,7 +14,7 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_videoram(*this, "videoram"){ }
 
-	required_shared_ptr<UINT8> m_spriteram;
+	optional_shared_ptr<UINT8> m_spriteram;
 	required_shared_ptr<UINT8> m_videoram;
 	UINT8 m_dac;
 	int m_dac_enable;

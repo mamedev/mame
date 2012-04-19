@@ -18,7 +18,7 @@ public:
 	required_shared_ptr<UINT16> m_shared_ram;
 	required_shared_ptr<UINT16> m_spriteram;
 	required_shared_ptr<UINT16> m_videoram;
-	required_shared_ptr<UINT16> m_paletteram;
+	optional_shared_ptr<UINT16> m_paletteram;
 
 	/* video-related */
 	tilemap_t     *m_fix_tilemap;

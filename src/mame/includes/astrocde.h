@@ -22,7 +22,7 @@ public:
 		m_videoram(*this, "videoram"),
 		m_protected_ram(*this, "protected_ram"){ }
 
-	required_shared_ptr<UINT8> m_videoram;
+	optional_shared_ptr<UINT8> m_videoram;
 	UINT8 m_video_config;
 	UINT8 m_sparkle[4];
 	char m_totalword[256];

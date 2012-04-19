@@ -14,8 +14,8 @@ public:
 		m_paletteram(*this, "paletteram"){ }
 
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_colorram;
+	optional_shared_ptr<UINT8> m_videoram;
+	optional_shared_ptr<UINT8> m_colorram;
 	optional_shared_ptr<UINT8> m_paletteram;
 
 	/* video-related */

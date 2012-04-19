@@ -18,7 +18,7 @@ public:
 
 	required_shared_ptr<UINT8> m_bigsprite_videoram;
 	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_column_scroll;
+	optional_shared_ptr<UINT8> m_column_scroll;
 	required_shared_ptr<UINT8> m_spriteram;
 	required_shared_ptr<UINT8> m_bigsprite_control;
 	required_shared_ptr<UINT8> m_colorram;

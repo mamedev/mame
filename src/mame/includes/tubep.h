@@ -14,7 +14,7 @@ public:
 	emu_timer *m_interrupt_timer;
 	int m_curr_scanline;
 	required_shared_ptr<UINT8> m_textram;
-	required_shared_ptr<UINT8> m_backgroundram;
+	optional_shared_ptr<UINT8> m_backgroundram;
 	required_shared_ptr<UINT8> m_sprite_colorsharedram;
 	optional_shared_ptr<UINT8> m_rjammer_backgroundram;
 	UINT8 *m_spritemap;

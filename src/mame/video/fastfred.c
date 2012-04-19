@@ -239,7 +239,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 	fastfred_state *state = machine.driver_data<fastfred_state>();
 	int offs;
 
-	for (offs = state->m_spriteram_size - 4; offs >= 0; offs -= 4)
+	for (offs = state->m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
 	{
 		UINT8 code,sx,sy;
 		int flipx,flipy;

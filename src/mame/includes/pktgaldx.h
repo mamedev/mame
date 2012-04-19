@@ -16,9 +16,9 @@ public:
 		m_pktgaldb_sprites(*this, "pktgaldb_spr"){ }
 
 	/* memory pointers */
-	required_shared_ptr<UINT16> m_pf1_rowscroll;
-	required_shared_ptr<UINT16> m_pf2_rowscroll;
-	required_shared_ptr<UINT16> m_spriteram;
+	optional_shared_ptr<UINT16> m_pf1_rowscroll;
+	optional_shared_ptr<UINT16> m_pf2_rowscroll;
+	optional_shared_ptr<UINT16> m_spriteram;
 //  UINT16 *  paletteram;    // currently this uses generic palette handling (in decocomn.c)
 
 	optional_shared_ptr<UINT16> m_pktgaldb_fgram;

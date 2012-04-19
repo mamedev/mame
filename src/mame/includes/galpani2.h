@@ -5,21 +5,29 @@ class galpani2_state : public kaneko16_state
 public:
 	galpani2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: kaneko16_state(mconfig, type, tag),
+		m_bg8(*this, "bg8"),
+		m_palette(*this, "palette"),
+		m_bg8_scrollx(*this, "bg8_scrollx"),
+		m_bg8_scrolly(*this, "bg8_scrolly"),
+		m_bg15(*this, "bg15"),
+		m_ram(*this, "ram"),
+		m_ram2(*this, "ram2"),
+		m_rombank(*this, "rombank"),
 		m_maincpu(*this,"maincpu"),
 		m_subcpu(*this,"sub")
 		{ }
 
-	UINT16 *m_bg8[2];
-	UINT16 *m_palette[2];
-	UINT16 *m_bg8_scrollx[2];
-	UINT16 *m_bg8_scrolly[2];
-	UINT16 *m_bg15;
+	required_shared_ptr_array<UINT16, 2> m_bg8;
+	optional_shared_ptr_array<UINT16, 2> m_palette;
+	required_shared_ptr_array<UINT16, 2> m_bg8_scrollx;
+	required_shared_ptr_array<UINT16, 2> m_bg8_scrolly;
+	required_shared_ptr<UINT16> m_bg15;
 	UINT16 m_eeprom_word;
-	UINT16 *m_ram;
-	UINT16 *m_ram2;
+	required_shared_ptr<UINT16> m_ram;
+	required_shared_ptr<UINT16> m_ram2;
 	UINT16 m_old_mcu_nmi1;
 	UINT16 m_old_mcu_nmi2;
-	UINT16 *m_rombank;
+	required_shared_ptr<UINT16> m_rombank;
 	bitmap_ind16 *m_bg8_bitmap[2];
 	bitmap_ind16 *m_bg15_bitmap;
 

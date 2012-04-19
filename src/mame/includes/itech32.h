@@ -19,10 +19,10 @@ class itech32_state : public driver_device
 public:
 	itech32_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
-		m_main_ram(*this, "main_ram"),
-		m_nvram(*this, "nvram"),
-		m_video(*this, "video"),
-		m_main_rom(*this, "main_rom"),
+		m_main_ram(*this, "main_ram", 0),
+		m_nvram(*this, "nvram", 0),
+		m_video(*this, "video", 0),
+		m_main_rom(*this, "main_rom", 0),
 		m_drivedge_zbuf_control(*this, "drivedge_zctl"),
 		m_tms1_boot(*this, "tms1_boot"),
 		m_tms1_ram(*this, "tms1_ram"),

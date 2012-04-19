@@ -23,7 +23,7 @@ public:
 	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_videocpu;
-	required_device<cpu_device> m_pia;
+	required_device<pia6821_device> m_pia;
 
 	DECLARE_INPUT_CHANGED_MEMBER(test_switch_press);
 //  UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);

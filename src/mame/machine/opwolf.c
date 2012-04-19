@@ -718,8 +718,7 @@ void opwolf_cchip_init( running_machine &machine )
 {
 	opwolf_state *state = machine.driver_data<opwolf_state>();
 
-	//TODO:FIX
-	//state->m_cchip_ram = auto_alloc_array_clear(machine, UINT8, 0x400 * 8);
+	state->m_cchip_ram.allocate(0x400 * 8);
 
 	state->save_item(NAME(state->m_current_bank));
 	state->save_item(NAME(state->m_current_cmd));
@@ -732,7 +731,6 @@ void opwolf_cchip_init( running_machine &machine )
 	state->save_item(NAME(state->m_cchip_coins));
 	state->save_item(NAME(state->m_cchip_coins_for_credit));
 	state->save_item(NAME(state->m_cchip_credits_for_coin));
-	//state->save_pointer(NAME(state->m_cchip_ram), 0x400 * 8);
 
 	state->m_current_bank = 0;
 	state->m_current_cmd = 0;

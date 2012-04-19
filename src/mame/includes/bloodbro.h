@@ -13,7 +13,7 @@ public:
 	required_shared_ptr<UINT16> m_bgvideoram;
 	required_shared_ptr<UINT16> m_fgvideoram;
 	required_shared_ptr<UINT16> m_txvideoram;
-	required_shared_ptr<UINT16> m_scroll;
+	optional_shared_ptr<UINT16> m_scroll;
 
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;

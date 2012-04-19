@@ -13,8 +13,8 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_butasan_bg1ram(*this, "butasan_bg1ram"){ }
 
-	required_shared_ptr<UINT8> m_bg0_scrollx;
-	required_shared_ptr<UINT8> m_bg0_scrolly;
+	optional_shared_ptr<UINT8> m_bg0_scrollx;
+	optional_shared_ptr<UINT8> m_bg0_scrolly;
 	required_shared_ptr<UINT8> m_bg1_scrollx;
 	required_shared_ptr<UINT8> m_bg1_scrolly;
 	required_shared_ptr<UINT8> m_paletteram;

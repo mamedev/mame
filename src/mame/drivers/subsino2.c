@@ -81,7 +81,7 @@ public:
 		: driver_device(mconfig, type, tag) ,
 		m_outputs16(*this, "outputs16"),
 		m_outputs(*this, "outputs"),
-		m_am188em_regs(*this, "am188eregs"){ }
+		m_am188em_regs(*this, "am188em_regs"){ }
 
 	UINT8 *m_hm86171_colorram;
 	layer_t m_layers[2];
@@ -94,9 +94,9 @@ public:
 	UINT8 m_ss9601_disable;
 	int m_hm86171_offs;
 	UINT8 m_dsw_mask;
-	required_shared_ptr<UINT16> m_outputs16;
+	optional_shared_ptr<UINT16> m_outputs16;
 	optional_shared_ptr<UINT8> m_outputs;
-	optional_shared_ptr<UINT8> m_am188em_regs;
+	required_shared_ptr<UINT8> m_am188em_regs;
 	UINT16 m_bishjan_sel;
 	UINT16 m_bishjan_input;
 	DECLARE_WRITE8_MEMBER(ss9601_byte_lo_w);

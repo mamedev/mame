@@ -8,11 +8,11 @@ public:
 		m_spriteram(*this, "spriteram"){ }
 
 	UINT8 m_ninjakun_io_a002_ctrl;
-	required_shared_ptr<UINT8> m_fg_videoram;
+	optional_shared_ptr<UINT8> m_fg_videoram;
 	required_shared_ptr<UINT8> m_bg_videoram;
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
-	required_shared_ptr<UINT8> m_spriteram;
+	optional_shared_ptr<UINT8> m_spriteram;
 	DECLARE_WRITE8_MEMBER(ninjakun_cpu1_io_A002_w);
 	DECLARE_WRITE8_MEMBER(ninjakun_cpu2_io_A002_w);
 	DECLARE_WRITE8_MEMBER(ninjakun_paletteram_w);

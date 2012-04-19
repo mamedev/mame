@@ -15,11 +15,11 @@ public:
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_bg1videoram;
-	required_shared_ptr<UINT16> m_bg2videoram;
-	required_shared_ptr<UINT16> m_rasterram;
+	optional_shared_ptr<UINT16> m_bg2videoram;
+	optional_shared_ptr<UINT16> m_rasterram;
 	optional_shared_ptr<UINT16> m_bitmapram;
-	required_shared_ptr<UINT16> m_spriteram1;
-	required_shared_ptr<UINT16> m_spriteram2;
+	optional_shared_ptr<UINT16> m_spriteram1;
+	optional_shared_ptr<UINT16> m_spriteram2;
 	required_shared_ptr<UINT16> m_spriteram3;
 	optional_shared_ptr<UINT16> m_tx_tilemap_ram;
 //  UINT16 *  m_paletteram;   // currently this uses generic palette handling

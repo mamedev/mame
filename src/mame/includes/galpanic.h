@@ -4,15 +4,16 @@ class galpanic_state : public kaneko16_state
 {
 public:
 	galpanic_state(const machine_config &mconfig, device_type type, const char *tag)
-		: kaneko16_state(mconfig, type, tag) { }
+		: kaneko16_state(mconfig, type, tag),
+		  m_bgvideoram(*this, "bgvideoram"),
+		  m_fgvideoram(*this, "fgvideoram"),
+		  m_spriteram(*this, "spriteram") { }
 
-	UINT16 *m_bgvideoram;
-	UINT16 *m_fgvideoram;
-	size_t m_fgvideoram_size;
+	required_shared_ptr<UINT16> m_bgvideoram;
+	required_shared_ptr<UINT16> m_fgvideoram;
 	bitmap_ind16 m_bitmap;
 	bitmap_ind16 m_sprites_bitmap;
-	UINT16 *m_spriteram;
-	size_t m_spriteram_size;
+	required_shared_ptr<UINT16> m_spriteram;
 	DECLARE_WRITE16_MEMBER(galpanic_6295_bankswitch_w);
 	DECLARE_WRITE16_MEMBER(galpanica_6295_bankswitch_w);
 	DECLARE_WRITE16_MEMBER(galpanica_misc_w);

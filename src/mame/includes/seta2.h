@@ -5,8 +5,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		  m_maincpu(*this,"maincpu"),
 		  m_nvram(*this, "nvram") ,
-		m_spriteram(*this, "spriteram"),
-		m_vregs(*this, "vregs"),
+		m_spriteram(*this, "spriteram", 0),
+		m_vregs(*this, "vregs", 0),
 		m_coldfire_regs(*this, "coldfire_regs"),
 		m_funcube_outputs(*this, "funcube_outputs"),
 		m_funcube_leds(*this, "funcube_leds"){ }

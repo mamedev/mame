@@ -11,7 +11,7 @@ public:
 	UINT8 m_omegaf_io_protection[3];
 	UINT8 m_omegaf_io_protection_input;
 	int m_omegaf_io_protection_tic;
-	required_shared_ptr<UINT8> m_bg_videoram;
+	optional_shared_ptr<UINT8> m_bg_videoram;
 	required_shared_ptr<UINT8> m_fg_videoram;
 	int m_next_sprite_overdraw_enabled;
 	int (*m_stencil_compare_function) (UINT16 pal);

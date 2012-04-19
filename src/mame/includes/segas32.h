@@ -21,13 +21,13 @@ public:
 		m_z80_shared_ram(*this,"z80_shared_ram"),
 		m_ga2_dpram(*this,"ga2_dpram"),
 		m_system32_workram(*this,"workram"),
-		m_system32_videoram(*this,"videoram"),
-		m_system32_spriteram(*this,"spriteram"),
-		m_system32_paletteram(*this,"paletteram") { }
+		m_system32_videoram(*this,"videoram", 0),
+		m_system32_spriteram(*this,"spriteram", 0),
+		m_system32_paletteram(*this,"paletteram", 0) { }
 
 	required_shared_ptr<UINT8> m_z80_shared_ram;
 	optional_shared_ptr<UINT8> m_ga2_dpram;
-	required_shared_ptr<UINT16> m_system32_workram;
+	optional_shared_ptr<UINT16> m_system32_workram;
 	required_shared_ptr<UINT16> m_system32_videoram;
 	required_shared_ptr<UINT16> m_system32_spriteram;
 

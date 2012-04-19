@@ -19,10 +19,10 @@ public:
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_colorram;
 	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_spriteram2;
+	optional_shared_ptr<UINT8> m_spriteram2;
 	required_shared_ptr<UINT8> m_spriteram;
-	required_shared_ptr<UINT8> m_scrollram;
-	required_shared_ptr<UINT8> m_soundlatch;
+	optional_shared_ptr<UINT8> m_scrollram;
+	optional_shared_ptr<UINT8> m_soundlatch;
 
 	/* video-related */
 	tilemap_t * m_bg_tilemap;

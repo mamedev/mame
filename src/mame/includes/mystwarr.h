@@ -22,7 +22,7 @@ public:
 	int m_roz_rombank;
 	tilemap_t *m_ult_936_tilemap;
 	UINT16 m_clip;
-	required_shared_ptr<UINT16> m_spriteram;
+	optional_shared_ptr<UINT16> m_spriteram;
 
 	required_device<cpu_device> m_maincpu;
 	DECLARE_READ16_MEMBER(eeprom_r);

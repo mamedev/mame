@@ -11,10 +11,10 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_roadram(*this, "roadram"){ }
 
-	required_shared_ptr<UINT16> m_videostatus;
-	required_shared_ptr<UINT16> m_protection_ram;
+	optional_shared_ptr<UINT16> m_videostatus;
+	optional_shared_ptr<UINT16> m_protection_ram;
 	required_shared_ptr<UINT16> m_blitter_regs;
-	required_shared_ptr<UINT16> m_pageram;
+	optional_shared_ptr<UINT16> m_pageram;
 	optional_shared_ptr<UINT16> m_txtram;
 	required_shared_ptr<UINT16> m_spriteram;
 	required_shared_ptr<UINT16> m_roadram;

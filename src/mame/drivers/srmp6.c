@@ -157,7 +157,7 @@ static VIDEO_START(srmp6)
 	srmp6_state *state = machine.driver_data<srmp6_state>();
 
 	state->m_tileram = auto_alloc_array_clear(machine, UINT16, 0x100000*16/2);
-	//state->m_dmaram = auto_alloc_array(machine, UINT16, 0x100/2);
+	state->m_dmaram.allocate(0x100/2);
 	state->m_sprram_old = auto_alloc_array_clear(machine, UINT16, 0x80000/2);
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */

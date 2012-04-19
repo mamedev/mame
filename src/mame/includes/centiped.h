@@ -14,7 +14,7 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_bullsdrt_tiles_bankram(*this, "bullsdrt_bank"){ }
 
-	required_shared_ptr<UINT8> m_rambase;
+	optional_shared_ptr<UINT8> m_rambase;
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_spriteram;
 	optional_shared_ptr<UINT8> m_bullsdrt_tiles_bankram;

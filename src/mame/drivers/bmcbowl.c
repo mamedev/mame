@@ -112,7 +112,7 @@ class bmcbowl_state : public driver_device
 public:
 	bmcbowl_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
-		m_stats_ram(*this, "stats_ram"),
+		m_stats_ram(*this, "stats_ram", 16),
 		m_vid1(*this, "vid1"),
 		m_vid2(*this, "vid2"){ }
 

@@ -44,7 +44,7 @@ public:
 	required_shared_ptr<UINT16> m_pf2_rowscroll;
 	required_shared_ptr<UINT16> m_pf3_rowscroll;
 	required_shared_ptr<UINT16> m_pf4_rowscroll;
-	required_shared_ptr<UINT16> m_ram;
+	optional_shared_ptr<UINT16> m_ram;
 
 	/* misc */
 	int        m_scanline;

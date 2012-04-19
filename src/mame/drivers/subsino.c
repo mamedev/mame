@@ -3555,9 +3555,9 @@ static DRIVER_INIT( stisub )
 	rom[0x957] = 0x18; //patch "losing protection" check
 	state->m_stisub_colorram = auto_alloc_array(machine, UINT8, 256*3);
 
-	//state->m_reel1_scroll = auto_alloc_array(machine, UINT8, 0x40);
-	//state->m_reel2_scroll = auto_alloc_array(machine, UINT8, 0x40);
-	//state->m_reel3_scroll = auto_alloc_array(machine, UINT8, 0x40);
+	state->m_reel1_scroll.allocate(0x40);
+	state->m_reel2_scroll.allocate(0x40);
+	state->m_reel3_scroll.allocate(0x40);
 
 	state->m_reel1_attr = auto_alloc_array(machine, UINT8, 0x200);
 	state->m_reel2_attr = auto_alloc_array(machine, UINT8, 0x200);
@@ -3569,9 +3569,9 @@ static DRIVER_INIT( mtrainnv )
 	subsino_state *state = machine.driver_data<subsino_state>();
 	state->m_stisub_colorram = auto_alloc_array(machine, UINT8, 256*3);
 
-	//state->m_reel1_scroll = auto_alloc_array(machine, UINT8, 0x40);
-	//state->m_reel2_scroll = auto_alloc_array(machine, UINT8, 0x40);
-	//state->m_reel3_scroll = auto_alloc_array(machine, UINT8, 0x40);
+	state->m_reel1_scroll.allocate(0x40);
+	state->m_reel2_scroll.allocate(0x40);
+	state->m_reel3_scroll.allocate(0x40);
 
 	state->m_reel1_attr = auto_alloc_array(machine, UINT8, 0x200);
 	state->m_reel2_attr = auto_alloc_array(machine, UINT8, 0x200);

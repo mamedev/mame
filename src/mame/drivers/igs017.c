@@ -56,9 +56,9 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_input_addr(-1),
 		m_maincpu(*this, "maincpu"),
-		m_spriteram(*this, "spriteram"),
-		m_fg_videoram(*this, "fg_videoram"),
-		m_bg_videoram(*this, "bg_videoram"){ }
+		m_spriteram(*this, "spriteram", 0),
+		m_fg_videoram(*this, "fg_videoram", 0),
+		m_bg_videoram(*this, "bg_videoram", 0){ }
 
 	int m_input_addr;
 	required_device<cpu_device> m_maincpu;

@@ -22,12 +22,12 @@ public:
 		m_roundup_l_ram(*this, "roundup_l_ram"),
 		m_spriteram(*this, "spriteram") { }
 
-	required_shared_ptr<UINT16> m_videoram;
-	required_shared_ptr<UINT16> m_cyclwarr_cpua_ram;
-	required_shared_ptr<UINT16> m_cyclwarr_cpub_ram;
+	optional_shared_ptr<UINT16> m_videoram;
+	optional_shared_ptr<UINT16> m_cyclwarr_cpua_ram;
+	optional_shared_ptr<UINT16> m_cyclwarr_cpub_ram;
 	UINT16 m_bigfight_a20000[8];
 	UINT16 m_bigfight_a60000[2];
-	required_shared_ptr<UINT16> m_apache3_g_ram;
+	optional_shared_ptr<UINT16> m_apache3_g_ram;
 	UINT16 m_bigfight_a40000[2];
 	UINT8 *m_rom_sprite_lookup1;
 	UINT8 *m_rom_sprite_lookup2;
@@ -38,8 +38,8 @@ public:
 	optional_shared_ptr<UINT16> m_roundup5_unknown0;
 	optional_shared_ptr<UINT16> m_roundup5_unknown1;
 	optional_shared_ptr<UINT16> m_roundup5_unknown2;
-	required_shared_ptr<UINT16> m_68k_ram;
-	required_shared_ptr<UINT8> m_apache3_z80_ram;
+	optional_shared_ptr<UINT16> m_68k_ram;
+	optional_shared_ptr<UINT8> m_apache3_z80_ram;
 	UINT16 m_control_word;
 	UINT16 m_apache3_rotate_ctrl[12];
 	required_shared_ptr<UINT16> m_sprite_control_ram;

@@ -18,7 +18,7 @@ public:
 
 	int mask[4*2];
 	required_shared_ptr<UINT16> m_nmk_bgvideoram0;
-	required_shared_ptr<UINT16> m_nmk_txvideoram;
+	optional_shared_ptr<UINT16> m_nmk_txvideoram;
 	required_shared_ptr<UINT16> m_mainram;
 	optional_shared_ptr<UINT16> m_gunnail_scrollram;
 	optional_shared_ptr<UINT8> m_spriteram;	

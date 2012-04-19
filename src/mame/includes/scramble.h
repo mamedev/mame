@@ -5,9 +5,10 @@ class scramble_state : public galaxold_state
 {
 public:
 	scramble_state(const machine_config &mconfig, device_type type, const char *tag)
-		: galaxold_state(mconfig, type, tag) { }
+		: galaxold_state(mconfig, type, tag),
+		  m_soundram(*this, "soundram") { }
 
-	UINT8 *m_soundram;
+	required_shared_ptr<UINT8> m_soundram;
 	UINT8 m_cavelon_bank;
 	UINT8 m_security_2B_counter;
 	UINT8 m_xb;

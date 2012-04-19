@@ -11,7 +11,7 @@ public:
 		m_tmnt2_1c0800(*this, "tmnt2_1c0800"){ }
 
 	/* memory pointers */
-	required_shared_ptr<UINT16> m_spriteram;
+	optional_shared_ptr<UINT16> m_spriteram;
 	optional_shared_ptr<UINT16> m_tmnt2_rom;
 	optional_shared_ptr<UINT16> m_sunset_104000;
 	optional_shared_ptr<UINT16> m_tmnt2_1c0800;

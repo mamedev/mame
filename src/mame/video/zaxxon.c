@@ -165,14 +165,12 @@ VIDEO_START( congo )
 	zaxxon_state *state = machine.driver_data<zaxxon_state>();
 
 	/* allocate our own spriteram since it is not accessible by the main CPU */
-	//TODO:TIX
-	//state->m_spriteram = auto_alloc_array(machine, UINT8, 0x100);
+	state->m_spriteram.allocate(0x100);
 
 	/* register for save states */
 	state->save_item(NAME(state->m_congo_fg_bank));
 	state->save_item(NAME(state->m_congo_color_bank));
 	state->save_item(NAME(state->m_congo_custom));
-	//state->save_pointer(NAME(state->m_spriteram), 0x100);
 
 	video_start_common(machine, congo_get_fg_tile_info);
 }

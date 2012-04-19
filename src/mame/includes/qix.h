@@ -33,13 +33,13 @@ public:
 		m_scanline_latch(*this, "scanline_latch") { }
 
 	/* machine state */
-	required_shared_ptr<UINT8> m_68705_port_out;
-	required_shared_ptr<UINT8> m_68705_ddr;
+	optional_shared_ptr<UINT8> m_68705_port_out;
+	optional_shared_ptr<UINT8> m_68705_ddr;
 	UINT8  m_68705_port_in[3];
 	UINT8  m_coinctrl;
 
 	/* video state */
-	required_shared_ptr<UINT8> m_videoram;
+	optional_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_videoram_address;
 	optional_shared_ptr<UINT8> m_videoram_mask;
 	required_shared_ptr<UINT8> m_paletteram;

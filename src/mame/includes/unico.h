@@ -7,16 +7,16 @@ public:
 		m_scroll(*this, "scroll"),
 		m_vram32(*this, "vram32"),
 		m_scroll32(*this, "scroll32"),
-		m_spriteram(*this, "spriteram"){ }
+		m_spriteram(*this, "spriteram", 0){ }
 
-	required_shared_ptr<UINT16> m_vram;
-	required_shared_ptr<UINT16> m_scroll;
+	optional_shared_ptr<UINT16> m_vram;
+	optional_shared_ptr<UINT16> m_scroll;
 	optional_shared_ptr<UINT32> m_vram32;
 	optional_shared_ptr<UINT32> m_scroll32;
 	tilemap_t *m_tilemap[3];
 	int m_sprites_scrolldx;
 	int m_sprites_scrolldy;
-	required_shared_ptr<UINT16> m_spriteram;
+	optional_shared_ptr<UINT16> m_spriteram;
 	DECLARE_WRITE16_MEMBER(zeropnt_sound_bank_w);
 	DECLARE_READ16_MEMBER(unico_gunx_0_msb_r);
 	DECLARE_READ16_MEMBER(unico_guny_0_msb_r);

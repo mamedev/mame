@@ -18,7 +18,7 @@ public:
 	required_shared_ptr<UINT16> m_colorram1;
 	required_shared_ptr<UINT16> m_colorram2;
 
-	required_shared_ptr<UINT8> m_sharedram;
+	optional_shared_ptr<UINT8> m_sharedram;
 
 	int m_coin_count; /* coin count increments on startup ? , so dont count it */
 	int m_intenable;

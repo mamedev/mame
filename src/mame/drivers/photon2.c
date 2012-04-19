@@ -19,10 +19,10 @@ public:
 	photon2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
-		m_spectrum_video_ram(*this, "spectruvideo_ram"){ }
+		m_spectrum_video_ram(*this, "spectrum_vram"){ }
 
 	required_device<cpu_device> m_maincpu;
-	optional_shared_ptr<UINT8> m_spectrum_video_ram;
+	required_shared_ptr<UINT8> m_spectrum_video_ram;
 	int m_spectrum_frame_number;
 	int m_spectrum_flash_invert;
 	UINT8 m_spectrum_port_fe;

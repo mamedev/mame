@@ -97,7 +97,7 @@ public:
 	optional_device<pioneer_ldv1000_device> m_ldv1000;
 	optional_device<pioneer_pr7820_device> m_pr7820;
 	optional_device<phillips_22vp932_device> m_22vp932;
-	required_shared_ptr<UINT8> m_videoram;
+	optional_shared_ptr<UINT8> m_videoram;
 	UINT8 m_last_misc;
 	UINT8 m_laserdisc_data;
 	DECLARE_WRITE8_MEMBER(misc_w);

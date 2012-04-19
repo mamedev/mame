@@ -38,7 +38,7 @@ public:
 		m_control(*this, "control"){ }
 
 	required_shared_ptr<UINT16> m_vram;
-	required_shared_ptr<UINT16> m_control;
+	optional_shared_ptr<UINT16> m_control;
 	emu_timer *m_setup_gun_timer;
 	int m_beamxadd;
 	int m_beamyadd;
