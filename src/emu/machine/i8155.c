@@ -28,7 +28,7 @@ const device_type I8156 = &device_creator<i8155_device>;
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define LOG 1
+#define LOG 0
 
 enum
 {
