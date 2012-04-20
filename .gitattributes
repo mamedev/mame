@@ -2672,6 +2672,7 @@ src/mame/drivers/metlclsh.c svneol=native#text/plain
 src/mame/drivers/metro.c svneol=native#text/plain
 src/mame/drivers/mexico86.c svneol=native#text/plain
 src/mame/drivers/meyc8080.c svneol=native#text/plain
+src/mame/drivers/meyc8088.c svneol=native#text/plain
 src/mame/drivers/mgolf.c svneol=native#text/plain
 src/mame/drivers/mhavoc.c svneol=native#text/plain
 src/mame/drivers/micro3d.c svneol=native#text/plain
