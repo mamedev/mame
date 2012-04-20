@@ -3090,14 +3090,14 @@ void spu_device::flush_cdda(const unsigned int sector)
 
 void spu_device::dma_read( UINT32 n_address, INT32 n_size )
 {
-	UINT8 *psxram = (UINT8 *)machine().memory().shared("share1")->ptr();
+	UINT8 *psxram = (UINT8 *)machine().root_device().memshare("share1")->ptr();
 
 	start_dma(psxram + n_address, false, n_size*4);
 }
 
 void spu_device::dma_write( UINT32 n_address, INT32 n_size )
 {
-	UINT8 *psxram = (UINT8 *)machine().memory().shared("share1")->ptr();
+	UINT8 *psxram = (UINT8 *)machine().root_device().memshare("share1")->ptr();
 
 //  printf("SPU DMA write from %x, size %x\n", n_address, n_size);
 

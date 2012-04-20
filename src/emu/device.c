@@ -201,7 +201,24 @@ memory_region *device_t::memregion(const char *_tag) const
 
 
 //-------------------------------------------------
-//  memregion - return a pointer to the memory
+//  memshare - return a pointer to the memory share
+//  info for a given share
+//-------------------------------------------------
+
+memory_share *device_t::memshare(const char *_tag) const
+{
+	// safety first
+	if (this == NULL)
+		return NULL;
+
+	// build a fully-qualified name and look it up
+	astring fullpath;
+	return machine().memory().shared(subtag(fullpath, _tag));
+}
+
+
+//-------------------------------------------------
+//  membank - return a pointer to the memory
 //  bank info for a given bank
 //-------------------------------------------------
 
@@ -883,7 +900,7 @@ device_t::finder_base::~finder_base()
 void *device_t::finder_base::find_memory(UINT8 width, size_t &bytes, bool required)
 {
 	// look up the share and return NULL if not found
-	memory_share *share = m_base.machine().memory().shared(m_base, m_tag);
+	memory_share *share = m_base.memshare(m_tag);
 	if (share == NULL)
 		return NULL;
 	

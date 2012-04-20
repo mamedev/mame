@@ -1561,23 +1561,6 @@ void memory_manager::initialize()
 
 
 //-------------------------------------------------
-//  shared - get a pointer to a shared memory
-//  region by tag
-//-------------------------------------------------
-
-memory_share *memory_manager::shared(const char *tag)
-{
-	return shared(machine().root_device(), tag);
-}
-
-memory_share *memory_manager::shared(device_t &device, const char *tag)
-{
-	astring fulltag;
-	return m_sharelist.find(device.subtag(fulltag, tag).cstr());
-}
-
-
-//-------------------------------------------------
 //  dump - dump the internal memory tables to the
 //  given file
 //-------------------------------------------------

@@ -943,8 +943,8 @@ void dcs_init(running_machine &machine)
 	memset(&dcs, 0, sizeof(dcs));
 	dcs.sram = NULL;
 
-	dcs.internal_program_ram = (UINT32 *)machine.memory().shared("dcsint")->ptr();
-	dcs.external_program_ram = (UINT32 *)machine.memory().shared("dcsext")->ptr();
+	dcs.internal_program_ram = (UINT32 *)machine.root_device().memshare("dcsint")->ptr();
+	dcs.external_program_ram = (UINT32 *)machine.root_device().memshare("dcsext")->ptr();
 
 	/* find the DCS CPU and the sound ROMs */
 	dcs.cpu = machine.device<adsp21xx_device>("dcs");
@@ -982,8 +982,8 @@ void dcs2_init(running_machine &machine, int dram_in_mb, offs_t polling_offset)
 	int soundbank_words;
 
 	memset(&dcs, 0, sizeof(dcs));
-	dcs.internal_program_ram = (UINT32 *)machine.memory().shared("dcsint")->ptr();
-	dcs.external_program_ram = (UINT32 *)machine.memory().shared("dcsext")->ptr();
+	dcs.internal_program_ram = (UINT32 *)machine.root_device().memshare("dcsint")->ptr();
+	dcs.external_program_ram = (UINT32 *)machine.root_device().memshare("dcsext")->ptr();
 
 	/* find the DCS CPU and the sound ROMs */
 	dcs.cpu = machine.device<adsp21xx_device>("dcs2");

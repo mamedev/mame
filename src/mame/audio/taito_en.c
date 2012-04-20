@@ -305,7 +305,7 @@ SOUND_RESET( taito_f3_soundsystem_reset )
 {
 	/* Sound cpu program loads to 0xc00000 so we use a bank */
 	UINT16 *ROM = (UINT16 *)machine.root_device().memregion("audiocpu")->base();
-	UINT16 *sound_ram = (UINT16 *)machine.memory().shared("share1")->ptr();
+	UINT16 *sound_ram = (UINT16 *)machine.root_device().memshare("share1")->ptr();
 	machine.root_device().membank("bank1")->set_base(&ROM[0x80000]);
 	machine.root_device().membank("bank2")->set_base(&ROM[0x90000]);
 	machine.root_device().membank("bank3")->set_base(&ROM[0xa0000]);
@@ -319,7 +319,7 @@ SOUND_RESET( taito_f3_soundsystem_reset )
 	machine.device("audiocpu")->reset();
 	//cputag_set_input_line(machine, "audiocpu", INPUT_LINE_RESET, ASSERT_LINE);
 
-	f3_shared_ram = (UINT32 *)machine.memory().shared("f3_shared")->ptr();
+	f3_shared_ram = (UINT32 *)machine.root_device().memshare("f3_shared")->ptr();
 }
 
 static const es5505_interface es5505_taito_f3_config =

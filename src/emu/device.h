@@ -184,6 +184,7 @@ public:
 	astring &subtag(astring &dest, const char *tag) const;
 	astring &siblingtag(astring &dest, const char *tag) const { return (this != NULL && m_owner != NULL) ? m_owner->subtag(dest, tag) : dest.cpy(tag); }
 	memory_region *memregion(const char *tag) const;
+	memory_share *memshare(const char *tag) const;
 	memory_bank *membank(const char *tag) const;
 	device_t *subdevice(const char *tag) const;
 	device_t *siblingdevice(const char *tag) const;

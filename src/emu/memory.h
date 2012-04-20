@@ -816,10 +816,6 @@ public:
 	address_space *first_space() const { return m_spacelist.first(); }
 	memory_region *first_region() const { return m_regionlist.first(); }
 
-	// get a pointer to a shared memory region by tag
-	memory_share *shared(const char *tag);
-	memory_share *shared(device_t &device, const char *tag);
-
 	// dump the internal memory tables to the given file
 	void dump(FILE *file);
 
@@ -835,6 +831,7 @@ private:
 	memory_bank *first_bank() const { return m_banklist.first(); }
 	memory_bank *bank(const char *tag) const { return m_bankmap.find(tag); }
 	memory_region *region(const char *tag) { return m_regionlist.find(tag); }
+	memory_share *shared(const char *tag) { return m_sharelist.find(tag); }
 	void bank_reattach();
 
 	// internal state

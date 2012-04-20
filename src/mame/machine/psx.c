@@ -28,7 +28,7 @@ void psx_driver_init( running_machine &machine )
 {
 	psx_state *p_psx = machine.driver_data<psx_state>();
 
-	memory_share *share = machine.memory().shared("share1");
+	memory_share *share = machine.root_device().memshare("share1");
 	p_psx->m_p_n_psxram = (UINT32 *)share->ptr();
 	p_psx->m_n_psxramsize = share->bytes();
 }

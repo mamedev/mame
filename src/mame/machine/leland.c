@@ -320,7 +320,7 @@ MACHINE_START( leland )
 {
 	leland_state *state = machine.driver_data<leland_state>();
 	/* allocate extra stuff */
-	state->m_battery_ram = reinterpret_cast<UINT8 *>(machine.memory().shared("battery")->ptr());
+	state->m_battery_ram = reinterpret_cast<UINT8 *>(state->memshare("battery")->ptr());
 
 	/* start scanline interrupts going */
 	state->m_master_int_timer = machine.scheduler().timer_alloc(FUNC(leland_interrupt_callback));
@@ -370,7 +370,7 @@ MACHINE_START( ataxx )
 {
 	leland_state *state = machine.driver_data<leland_state>();
 	/* set the odd data banks */
-	state->m_battery_ram = reinterpret_cast<UINT8 *>(machine.memory().shared("battery")->ptr());
+	state->m_battery_ram = reinterpret_cast<UINT8 *>(state->memshare("battery")->ptr());
 	state->m_extra_tram = auto_alloc_array(machine, UINT8, ATAXX_EXTRA_TRAM_SIZE);
 
 	/* start scanline interrupts going */

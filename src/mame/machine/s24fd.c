@@ -156,7 +156,7 @@ void s24_fd1094_driver_init(running_machine &machine)
 {
 	int i;
 
-	s24_fd1094_cpuregion = (UINT16*)machine.memory().shared("share2")->ptr();
+	s24_fd1094_cpuregion = (UINT16*)machine.root_device().memshare("share2")->ptr();
 	s24_fd1094_cpuregionsize = 0x40000;
 	s24_fd1094_key = machine.root_device().memregion("fd1094key")->base();
 
