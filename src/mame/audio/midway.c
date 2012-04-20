@@ -459,8 +459,8 @@ ROM_END
 
 
 //-------------------------------------------------
-//  device_mconfig_additions - return a pointer to
-//  the device's machine fragment
+//  device_rom_region - return a pointer to the
+//  the device's ROM definitions
 //-------------------------------------------------
 
 const rom_entry *midway_ssio_device::device_rom_region() const
