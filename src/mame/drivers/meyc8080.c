@@ -63,18 +63,20 @@
 #include "meybjack.lh"
 
 
-class wldarrow_state : public driver_device
+class meyc8080_state : public driver_device
 {
 public:
-	wldarrow_state(const machine_config &mconfig, device_type type, const char *tag)
+	meyc8080_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
 		m_videoram_0(*this, "vram0"),
 		m_videoram_1(*this, "vram1"),
-		m_videoram_2(*this, "vram2"){ }
+		m_videoram_2(*this, "vram2")
+	{ }
 
 	required_shared_ptr<UINT8> m_videoram_0;
 	required_shared_ptr<UINT8> m_videoram_1;
 	required_shared_ptr<UINT8> m_videoram_2;
+
 	DECLARE_WRITE8_MEMBER(lights_1_w);
 	DECLARE_WRITE8_MEMBER(lights_2_w);
 	DECLARE_WRITE8_MEMBER(counters_w);
@@ -101,9 +103,9 @@ static void get_pens(pen_t *pens)
 }
 
 
-static SCREEN_UPDATE_RGB32( wldarrow )
+static SCREEN_UPDATE_RGB32( meyc8080 )
 {
-	wldarrow_state *state = screen.machine().driver_data<wldarrow_state>();
+	meyc8080_state *state = screen.machine().driver_data<meyc8080_state>();
 	pen_t pens[NUM_PENS];
 	offs_t offs;
 
@@ -153,7 +155,7 @@ static SCREEN_UPDATE_RGB32( wldarrow )
  *
  *************************************/
 
-WRITE8_MEMBER(wldarrow_state::lights_1_w)
+WRITE8_MEMBER(meyc8080_state::lights_1_w)
 {
 /* Wild Arrow lamps
 
@@ -199,7 +201,7 @@ WRITE8_MEMBER(wldarrow_state::lights_1_w)
 }
 
 
-WRITE8_MEMBER(wldarrow_state::lights_2_w)
+WRITE8_MEMBER(meyc8080_state::lights_2_w)
 {
 /* Wild Arrow unknown pulse...
 
@@ -248,7 +250,7 @@ WRITE8_MEMBER(wldarrow_state::lights_2_w)
 }
 
 
-WRITE8_MEMBER(wldarrow_state::counters_w)
+WRITE8_MEMBER(meyc8080_state::counters_w)
 {
 /* Wild Arrow & Draw Poker counters
 
@@ -284,25 +286,25 @@ WRITE8_MEMBER(wldarrow_state::counters_w)
  *
  *************************************/
 
-static WRITE8_DEVICE_HANDLER( wldarrow_dac_1_w )
+static WRITE8_DEVICE_HANDLER( meyc8080_dac_1_w )
 {
 	dac_data_w(device, 0x00);
 }
 
 
-static WRITE8_DEVICE_HANDLER( wldarrow_dac_2_w )
+static WRITE8_DEVICE_HANDLER( meyc8080_dac_2_w )
 {
 	dac_data_w(device, 0x55);
 }
 
 
-static WRITE8_DEVICE_HANDLER( wldarrow_dac_3_w )
+static WRITE8_DEVICE_HANDLER( meyc8080_dac_3_w )
 {
 	dac_data_w(device, 0xaa);
 }
 
 
-static WRITE8_DEVICE_HANDLER( wldarrow_dac_4_w )
+static WRITE8_DEVICE_HANDLER( meyc8080_dac_4_w )
 {
 	dac_data_w(device, 0xff);
 }
@@ -315,7 +317,7 @@ static WRITE8_DEVICE_HANDLER( wldarrow_dac_4_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( wldarrow_map, AS_PROGRAM, 8, wldarrow_state )
+static ADDRESS_MAP_START( meyc8080_map, AS_PROGRAM, 8, meyc8080_state )
 	AM_RANGE(0x0000, 0x37ff) AM_ROM
 	AM_RANGE(0x3800, 0x3800) AM_READ_PORT("IN0")
 	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_SHARE("vram0")
@@ -323,13 +325,13 @@ static ADDRESS_MAP_START( wldarrow_map, AS_PROGRAM, 8, wldarrow_state )
 	AM_RANGE(0x8000, 0x9fff) AM_RAM AM_SHARE("vram2")
 //	AM_RANGE(0xa000, 0xa0ff) AM_RAM		// unknown... filled with 00's at boot time or when entering the service mode.
 	AM_RANGE(0xcd00, 0xcdff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("BITSW") AM_DEVWRITE_LEGACY("dac", wldarrow_dac_1_w)
+	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("BSW") AM_DEVWRITE_LEGACY("dac", meyc8080_dac_1_w)
 	AM_RANGE(0xf004, 0xf004) AM_READ_PORT("IN1") AM_WRITE(lights_1_w)
 	AM_RANGE(0xf006, 0xf006) AM_READ_PORT("IN2") AM_WRITE(lights_2_w)
 	AM_RANGE(0xf008, 0xf008) AM_WRITE(counters_w)
-	AM_RANGE(0xf00f, 0xf00f) AM_DEVWRITE_LEGACY("dac", wldarrow_dac_2_w)
-	AM_RANGE(0xf0f0, 0xf0f0) AM_DEVWRITE_LEGACY("dac", wldarrow_dac_3_w)
-	AM_RANGE(0xf0ff, 0xf0ff) AM_DEVWRITE_LEGACY("dac", wldarrow_dac_4_w)
+	AM_RANGE(0xf00f, 0xf00f) AM_DEVWRITE_LEGACY("dac", meyc8080_dac_2_w)
+	AM_RANGE(0xf0f0, 0xf0f0) AM_DEVWRITE_LEGACY("dac", meyc8080_dac_3_w)
+	AM_RANGE(0xf0ff, 0xf0ff) AM_DEVWRITE_LEGACY("dac", meyc8080_dac_4_w)
 ADDRESS_MAP_END
 
 
@@ -353,29 +355,29 @@ static INPUT_PORTS_START( wldarrow )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("BITSW")
-	PORT_DIPNAME( 0x01, 0x00, "Bit Switch 1" )		PORT_DIPLOCATION("BITSWITCH:1")
+	PORT_START("BSW")
+	PORT_DIPNAME( 0x01, 0x00, "Bit Switch 1" )		PORT_DIPLOCATION("BSW:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, "Bit Switch 2" )		PORT_DIPLOCATION("BITSWITCH:2")
+	PORT_DIPNAME( 0x02, 0x00, "Bit Switch 2" )		PORT_DIPLOCATION("BSW:2")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, "Bit Switch 3" )		PORT_DIPLOCATION("BITSWITCH:3")
+	PORT_DIPNAME( 0x04, 0x00, "Bit Switch 3" )		PORT_DIPLOCATION("BSW:3")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, "Bit Switch 4" )		PORT_DIPLOCATION("BITSWITCH:4")
+	PORT_DIPNAME( 0x08, 0x00, "Bit Switch 4" )		PORT_DIPLOCATION("BSW:4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Coinage ) )	PORT_DIPLOCATION("BITSWITCH:5")
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Coinage ) )	PORT_DIPLOCATION("BSW:5")
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( 1C_5C ) )
-	PORT_DIPNAME( 0x20, 0x00, "Bit Switch 6" )		PORT_DIPLOCATION("BITSWITCH:6")
+	PORT_DIPNAME( 0x20, 0x00, "Bit Switch 6" )		PORT_DIPLOCATION("BSW:6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, "Bit Switch 7" )		PORT_DIPLOCATION("BITSWITCH:7")
+	PORT_DIPNAME( 0x40, 0x00, "Bit Switch 7" )		PORT_DIPLOCATION("BSW:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, "Bit Switch 8" )		PORT_DIPLOCATION("BITSWITCH:8")
+	PORT_DIPNAME( 0x80, 0x00, "Bit Switch 8" )		PORT_DIPLOCATION("BSW:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
@@ -414,29 +416,29 @@ static INPUT_PORTS_START( mdrawpkr )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("BITSW")
-	PORT_DIPNAME( 0x01, 0x00, "Bit Switch 1" )		PORT_DIPLOCATION("BITSWITCH:1")
+	PORT_START("BSW")
+	PORT_DIPNAME( 0x01, 0x00, "Bit Switch 1" )		PORT_DIPLOCATION("BSW:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, "Bit Switch 2" )		PORT_DIPLOCATION("BITSWITCH:2")
+	PORT_DIPNAME( 0x02, 0x00, "Bit Switch 2" )		PORT_DIPLOCATION("BSW:2")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, "Bit Switch 3" )		PORT_DIPLOCATION("BITSWITCH:3")
+	PORT_DIPNAME( 0x04, 0x00, "Bit Switch 3" )		PORT_DIPLOCATION("BSW:3")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, "Bit Switch 4" )		PORT_DIPLOCATION("BITSWITCH:4")
+	PORT_DIPNAME( 0x08, 0x00, "Bit Switch 4" )		PORT_DIPLOCATION("BSW:4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, "Bit Switch 5" )		PORT_DIPLOCATION("BITSWITCH:5")
+	PORT_DIPNAME( 0x10, 0x00, "Bit Switch 5" )		PORT_DIPLOCATION("BSW:5")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, "Bit Switch 6" )		PORT_DIPLOCATION("BITSWITCH:6")
+	PORT_DIPNAME( 0x20, 0x00, "Bit Switch 6" )		PORT_DIPLOCATION("BSW:6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, "Bit Switch 7" )		PORT_DIPLOCATION("BITSWITCH:7")
+	PORT_DIPNAME( 0x40, 0x00, "Bit Switch 7" )		PORT_DIPLOCATION("BSW:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, "Bit Switch 8" )		PORT_DIPLOCATION("BITSWITCH:8")
+	PORT_DIPNAME( 0x80, 0x00, "Bit Switch 8" )		PORT_DIPLOCATION("BSW:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
@@ -475,29 +477,29 @@ static INPUT_PORTS_START( mdrawpkra )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("BITSW")
-	PORT_DIPNAME( 0x01, 0x00, "Bit Switch 1" )		PORT_DIPLOCATION("BITSWITCH:1")
+	PORT_START("BSW")
+	PORT_DIPNAME( 0x01, 0x00, "Bit Switch 1" )		PORT_DIPLOCATION("BSW:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, "Bit Switch 2" )		PORT_DIPLOCATION("BITSWITCH:2")
+	PORT_DIPNAME( 0x02, 0x00, "Bit Switch 2" )		PORT_DIPLOCATION("BSW:2")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, "Bit Switch 3" )		PORT_DIPLOCATION("BITSWITCH:3")
+	PORT_DIPNAME( 0x04, 0x00, "Bit Switch 3" )		PORT_DIPLOCATION("BSW:3")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, "Bit Switch 4" )		PORT_DIPLOCATION("BITSWITCH:4")
+	PORT_DIPNAME( 0x08, 0x00, "Bit Switch 4" )		PORT_DIPLOCATION("BSW:4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, "Bit Switch 5" )		PORT_DIPLOCATION("BITSWITCH:5")
+	PORT_DIPNAME( 0x10, 0x00, "Bit Switch 5" )		PORT_DIPLOCATION("BSW:5")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, "Bit Switch 6" )		PORT_DIPLOCATION("BITSWITCH:6")
+	PORT_DIPNAME( 0x20, 0x00, "Bit Switch 6" )		PORT_DIPLOCATION("BSW:6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, "Bit Switch 7" )		PORT_DIPLOCATION("BITSWITCH:7")
+	PORT_DIPNAME( 0x40, 0x00, "Bit Switch 7" )		PORT_DIPLOCATION("BSW:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, "Bit Switch 8" )		PORT_DIPLOCATION("BITSWITCH:8")
+	PORT_DIPNAME( 0x80, 0x00, "Bit Switch 8" )		PORT_DIPLOCATION("BSW:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
@@ -536,29 +538,29 @@ static INPUT_PORTS_START( unkmeyco )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("BITSW")
-	PORT_DIPNAME( 0x01, 0x00, "Bit Switch 1" )		PORT_DIPLOCATION("BITSWITCH:1")
+	PORT_START("BSW")
+	PORT_DIPNAME( 0x01, 0x00, "Bit Switch 1" )		PORT_DIPLOCATION("BSW:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, "Bit Switch 2" )		PORT_DIPLOCATION("BITSWITCH:2")
+	PORT_DIPNAME( 0x02, 0x00, "Bit Switch 2" )		PORT_DIPLOCATION("BSW:2")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, "Bit Switch 3" )		PORT_DIPLOCATION("BITSWITCH:3")
+	PORT_DIPNAME( 0x04, 0x00, "Bit Switch 3" )		PORT_DIPLOCATION("BSW:3")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, "Bit Switch 4" )		PORT_DIPLOCATION("BITSWITCH:4")
+	PORT_DIPNAME( 0x08, 0x00, "Bit Switch 4" )		PORT_DIPLOCATION("BSW:4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, "Bit Switch 5" )		PORT_DIPLOCATION("BITSWITCH:5")
+	PORT_DIPNAME( 0x10, 0x00, "Bit Switch 5" )		PORT_DIPLOCATION("BSW:5")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, "Bit Switch 6" )		PORT_DIPLOCATION("BITSWITCH:6")
+	PORT_DIPNAME( 0x20, 0x00, "Bit Switch 6" )		PORT_DIPLOCATION("BSW:6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, "Bit Switch 7" )		PORT_DIPLOCATION("BITSWITCH:7")
+	PORT_DIPNAME( 0x40, 0x00, "Bit Switch 7" )		PORT_DIPLOCATION("BSW:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, "Bit Switch 8" )		PORT_DIPLOCATION("BITSWITCH:8")
+	PORT_DIPNAME( 0x80, 0x00, "Bit Switch 8" )		PORT_DIPLOCATION("BSW:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
@@ -593,11 +595,11 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( wldarrow, wldarrow_state )
+static MACHINE_CONFIG_START( meyc8080, meyc8080_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080, XTAL_20MHz / 10) // divider guessed
-	MCFG_CPU_PROGRAM_MAP(wldarrow_map)
+	MCFG_CPU_PROGRAM_MAP(meyc8080_map)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -607,7 +609,7 @@ static MACHINE_CONFIG_START( wldarrow, wldarrow_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 4*8, 32*8-1)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_UPDATE_STATIC(wldarrow)
+	MCFG_SCREEN_UPDATE_STATIC(meyc8080)
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -749,7 +751,7 @@ ROM_END
  *************************************/
 
 /*     YEAR  NAME       PARENT    MACHINE   INPUT      INIT  ROT    COMPANY              FULLNAME                                        FLAGS                                      LAYOUT  */
-GAMEL( 1982, wldarrow,  0,        wldarrow, wldarrow,  0,    ROT0, "Meyco Games, Inc.", "Wild Arrow (Standard V4.8)",                    GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_wldarrow  )
-GAMEL( 1984, mdrawpkr,  0,        wldarrow, mdrawpkr,  0,    ROT0, "Meyco Games, Inc.", "Draw Poker - Joker's Wild (Standard)",          GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_mdrawpkr  ) // year not shown, but it is in mdrawpkra
-GAMEL( 1984, mdrawpkra, mdrawpkr, wldarrow, mdrawpkra, 0,    ROT0, "Meyco Games, Inc.", "Draw Poker - Joker's Wild (02-11)",             GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_mdrawpkr  )
-GAMEL( 1983, unkmeyco,  0,        wldarrow, unkmeyco,  0,    ROT0, "Meyco Games, Inc.", "unknown Meyco blackjack game (Standard 00-05)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_meybjack  )
+GAMEL( 1982, wldarrow,  0,        meyc8080, wldarrow,  0,    ROT0, "Meyco Games, Inc.", "Wild Arrow (Standard V4.8)",                    GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_wldarrow  )
+GAMEL( 1984, mdrawpkr,  0,        meyc8080, mdrawpkr,  0,    ROT0, "Meyco Games, Inc.", "Draw Poker - Joker's Wild (Standard)",          GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_mdrawpkr  ) // year not shown, but it is in mdrawpkra
+GAMEL( 1984, mdrawpkra, mdrawpkr, meyc8080, mdrawpkra, 0,    ROT0, "Meyco Games, Inc.", "Draw Poker - Joker's Wild (02-11)",             GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_mdrawpkr  )
+GAMEL( 1983, unkmeyco,  0,        meyc8080, unkmeyco,  0,    ROT0, "Meyco Games, Inc.", "unknown Meyco blackjack game (Standard 00-05)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_meybjack  )
