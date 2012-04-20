@@ -524,7 +524,7 @@ static MACHINE_START( slapshot )
 {
 	slapshot_state *state = machine.driver_data<slapshot_state>();
 
-	state->membank("bank10")->configure_entries(0, 4, machine.region("audiocpu")->base() + 0xc000, 0x4000);
+	state->membank("bank10")->configure_entries(0, 4, state->memregion("audiocpu")->base() + 0xc000, 0x4000);
 
 	state->m_maincpu = machine.device("maincpu");
 	state->m_audiocpu = machine.device("audiocpu");
@@ -730,8 +730,8 @@ ROM_END
 static DRIVER_INIT( slapshot )
 {
 	UINT32 offset,i;
-	UINT8 *gfx = machine.region("gfx2")->base();
-	int size = machine.region("gfx2")->bytes();
+	UINT8 *gfx = machine.root_device().memregion("gfx2")->base();
+	int size = machine.root_device().memregion("gfx2")->bytes();
 	int data;
 
 	offset = size / 2;

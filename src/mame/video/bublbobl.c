@@ -32,7 +32,7 @@ SCREEN_UPDATE_IND16( bublbobl )
 
 	sx = 0;
 
-	prom = screen.machine().region("proms")->base();
+	prom = state->memregion("proms")->base();
 	for (offs = 0; offs < state->m_objectram.bytes(); offs += 4)
 	{
 		/* skip empty sprites */

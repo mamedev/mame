@@ -548,7 +548,7 @@ static SCREEN_UPDATE_IND16( stisub_reels )
 
 static PALETTE_INIT( subsino_2proms )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i,r,g,b,val;
 	int bit0,bit1,bit2;
 
@@ -575,7 +575,7 @@ static PALETTE_INIT( subsino_2proms )
 
 static PALETTE_INIT( subsino_3proms )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i,r,g,b,val;
 	int bit0,bit1,bit2;
 
@@ -3362,7 +3362,7 @@ ROM_END
 
 static DRIVER_INIT( smoto16 )
 {
-	UINT8 *rom = machine.region( "maincpu" )->base();
+	UINT8 *rom = machine.root_device().memregion( "maincpu" )->base();
 	rom[0x12d0] = 0x20;	// "ERROR 951010"
 }
 
@@ -3512,13 +3512,13 @@ static DRIVER_INIT( sharkpye )
 
 static DRIVER_INIT( smoto20 )
 {
-	UINT8 *rom = machine.region( "maincpu" )->base();
+	UINT8 *rom = machine.root_device().memregion( "maincpu" )->base();
 	rom[0x12e1] = 0x20;	// "ERROR 951010"
 }
 
 static DRIVER_INIT( tisub )
 {
-	UINT8 *rom = machine.region( "maincpu" )->base();
+	UINT8 *rom = machine.root_device().memregion( "maincpu" )->base();
 
 	DRIVER_INIT_CALL(victor5);
 
@@ -3533,7 +3533,7 @@ static DRIVER_INIT( tisub )
 
 static DRIVER_INIT( tisuba )
 {
-	UINT8 *rom = machine.region( "maincpu" )->base();
+	UINT8 *rom = machine.root_device().memregion( "maincpu" )->base();
 
 	DRIVER_INIT_CALL(victor5);
 
@@ -3549,7 +3549,7 @@ static DRIVER_INIT( tisuba )
 static DRIVER_INIT( stisub )
 {
 	subsino_state *state = machine.driver_data<subsino_state>();
-	UINT8 *rom = machine.region( "maincpu" )->base();
+	UINT8 *rom = state->memregion( "maincpu" )->base();
 	rom[0x1005] = 0x1d; //patch protection check
 	rom[0x7ab] = 0x18; //patch "winning protection" check
 	rom[0x957] = 0x18; //patch "losing protection" check

@@ -178,7 +178,7 @@ GFXDECODE_END
 static MACHINE_START( contra )
 {
 	contra_state *state = machine.driver_data<contra_state>();
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = state->memregion("maincpu")->base();
 
 	state->membank("bank1")->configure_entries(0, 16, &ROM[0x10000], 0x2000);
 

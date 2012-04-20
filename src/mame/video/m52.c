@@ -19,7 +19,7 @@
 
 PALETTE_INIT( m52 )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	const UINT8 *char_pal = color_prom + 0x000;
 	const UINT8 *back_pal = color_prom + 0x200;
 	const UINT8 *sprite_pal = color_prom + 0x220;

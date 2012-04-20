@@ -161,7 +161,7 @@ static UINT16 fetch_image_addr( coprocessor_t &thief_coprocessor ){
 WRITE8_MEMBER(thief_state::thief_blit_w){
 	coprocessor_t &thief_coprocessor = m_coprocessor;
 	int i, offs, xoffset, dy;
-	UINT8 *gfx_rom = machine().region( "gfx1" )->base();
+	UINT8 *gfx_rom = memregion( "gfx1" )->base();
 	UINT8 x = thief_coprocessor.param[SCREEN_XPOS];
 	UINT8 y = thief_coprocessor.param[SCREEN_YPOS];
 	UINT8 width = thief_coprocessor.param[BLIT_WIDTH];
@@ -239,7 +239,7 @@ READ8_MEMBER(thief_state::thief_coprocessor_r){
 				return thief_coprocessor.image_ram[addr];
 			}
 			else {
-				UINT8 *gfx_rom = machine().region( "gfx1" )->base();
+				UINT8 *gfx_rom = memregion( "gfx1" )->base();
 				addr -= 0x2000;
 				if( addr<0x6000 ) return gfx_rom[addr];
 			}

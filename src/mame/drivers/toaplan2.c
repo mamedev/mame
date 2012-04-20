@@ -431,7 +431,7 @@ static DRIVER_INIT( fixeight )
 
 static DRIVER_INIT( fixeightbl )
 {
-	UINT8 *ROM = machine.region("oki")->base();
+	UINT8 *ROM = machine.root_device().memregion("oki")->base();
 
 	machine.root_device().membank("bank1")->configure_entries(0, 5, &ROM[0x30000], 0x10000);
 }
@@ -447,7 +447,7 @@ static DRIVER_INIT( vfive )
 
 static DRIVER_INIT( pipibibsbl )
 {
-	UINT16 *ROM = (UINT16 *)(machine.region("maincpu")->base());
+	UINT16 *ROM = (UINT16 *)(machine.root_device().memregion("maincpu")->base());
 
 	for (int i = 0; i < (0x040000/2); i += 4)
 	{
@@ -461,7 +461,7 @@ static DRIVER_INIT( pipibibsbl )
 
 static DRIVER_INIT( bgaregga )
 {
-	UINT8 *Z80 = machine.region("audiocpu")->base();
+	UINT8 *Z80 = machine.root_device().memregion("audiocpu")->base();
 
 	// seems to only use banks 0x0a to 0x0f
 	machine.root_device().membank("bank1")->configure_entries(8, 8, Z80, 0x4000);
@@ -471,7 +471,7 @@ static DRIVER_INIT( bgaregga )
 static DRIVER_INIT( batrider )
 {
 	toaplan2_state *state = machine.driver_data<toaplan2_state>();
-	UINT8 *Z80 = machine.region("audiocpu")->base();
+	UINT8 *Z80 = state->memregion("audiocpu")->base();
 
 	state->membank("bank1")->configure_entries(0, 16, Z80, 0x4000);
 	state->m_sndirq_line = 4;
@@ -909,7 +909,7 @@ WRITE16_MEMBER(toaplan2_state::batrider_z80_busreq_w)
 
 READ16_MEMBER(toaplan2_state::batrider_z80rom_r)
 {
-	UINT8 *Z80 = machine().region("audiocpu")->base();
+	UINT8 *Z80 = memregion("audiocpu")->base();
 
 	return Z80[offset];
 }

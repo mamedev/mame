@@ -273,7 +273,7 @@ WRITE8_MEMBER(neoprint_state::nprsp_bank_w)
 
 READ16_MEMBER(neoprint_state::rom_window_r)
 {
-	UINT16 *rom = (UINT16 *)machine().region("maincpu")->base();
+	UINT16 *rom = (UINT16 *)machine().root_device().memregion("maincpu")->base();
 
 	return rom[offset | 0x80000/2 | m_bank_val*0x40000/2];
 }
@@ -592,7 +592,7 @@ ROM_END
 /* FIXME: get rid of these two, probably something to do with irq3 and camera / printer devices */
 static DRIVER_INIT( npcartv1 )
 {
-	UINT16 *ROM = (UINT16 *)machine.region( "maincpu" )->base();
+	UINT16 *ROM = (UINT16 *)machine.root_device().memregion( "maincpu" )->base();
 
 	ROM[0x1260/2] = 0x4e71;
 
@@ -602,14 +602,14 @@ static DRIVER_INIT( npcartv1 )
 
 static DRIVER_INIT( 98best44 )
 {
-	UINT16 *ROM = (UINT16 *)machine.region( "maincpu" )->base();
+	UINT16 *ROM = (UINT16 *)machine.root_device().memregion( "maincpu" )->base();
 
 	ROM[0x1312/2] = 0x4e71;
 }
 
 static DRIVER_INIT( nprsp )
 {
-	UINT16 *ROM = (UINT16 *)machine.region( "maincpu" )->base();
+	UINT16 *ROM = (UINT16 *)machine.root_device().memregion( "maincpu" )->base();
 
 	ROM[0x13a4/2] = 0x4e71;
 	ROM[0x13bc/2] = 0x4e71;

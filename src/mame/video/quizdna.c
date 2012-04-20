@@ -29,7 +29,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 {
 	quizdna_state *state = machine.driver_data<quizdna_state>();
 	int code,col,x,y;
-	UINT8 *FG = machine.region("user1")->base();
+	UINT8 *FG = state->memregion("user1")->base();
 
 	x = tile_index & 0x1f;
 	y = FG[(tile_index >> 5) & 0x1f] & 0x3f;
@@ -65,7 +65,7 @@ VIDEO_START( quizdna )
 
 WRITE8_MEMBER(quizdna_state::quizdna_bg_ram_w)
 {
-	UINT8 *RAM = machine().region("maincpu")->base();
+	UINT8 *RAM = memregion("maincpu")->base();
 	m_bg_ram[offset] = data;
 	RAM[0x12000+offset] = data;
 
@@ -76,7 +76,7 @@ WRITE8_MEMBER(quizdna_state::quizdna_fg_ram_w)
 {
 	int i;
 	int offs = offset & 0xfff;
-	UINT8 *RAM = machine().region("maincpu")->base();
+	UINT8 *RAM = memregion("maincpu")->base();
 
 	RAM[0x10000+offs] = data;
 	RAM[0x11000+offs] = data; /* mirror */

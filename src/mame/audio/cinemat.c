@@ -1612,7 +1612,7 @@ static MACHINE_RESET( qb3_sound )
 
 	/* this patch prevents the sound ROM from eating itself when command $0A is sent */
 	/* on a cube rotate */
-	machine.region("audiocpu")->base()[0x11dc] = 0x09;
+	state->memregion("audiocpu")->base()[0x11dc] = 0x09;
 }
 
 

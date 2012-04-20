@@ -142,7 +142,7 @@ VIDEO_START( williams )
 VIDEO_START( blaster )
 {
 	williams_state *state = machine.driver_data<williams_state>();
-	blitter_init(machine, state->m_blitter_config, machine.region("proms")->base());
+	blitter_init(machine, state->m_blitter_config, state->memregion("proms")->base());
 	create_palette_lookup(machine);
 	state_save_register(machine);
 }

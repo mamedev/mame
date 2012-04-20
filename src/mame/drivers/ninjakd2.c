@@ -175,15 +175,15 @@ static INTERRUPT_GEN( ninjakd2_interrupt )
 static MACHINE_RESET( ninjakd2 )
 {
 	/* initialize main Z80 bank */
-	machine.root_device().membank("bank1")->configure_entries(0, 8, machine.region("maincpu")->base() + 0x10000, 0x4000);
+	machine.root_device().membank("bank1")->configure_entries(0, 8, machine.root_device().memregion("maincpu")->base() + 0x10000, 0x4000);
 	machine.root_device().membank("bank1")->set_entry(0);
 }
 
 static void robokid_init_banks(running_machine &machine)
 {
 	/* initialize main Z80 bank */
-	machine.root_device().membank("bank1")->configure_entries(0,  2, machine.region("maincpu")->base(), 0x4000);
-	machine.root_device().membank("bank1")->configure_entries(2, 14, machine.region("maincpu")->base() + 0x10000, 0x4000);
+	machine.root_device().membank("bank1")->configure_entries(0,  2, machine.root_device().memregion("maincpu")->base(), 0x4000);
+	machine.root_device().membank("bank1")->configure_entries(2, 14, machine.root_device().memregion("maincpu")->base() + 0x10000, 0x4000);
 	machine.root_device().membank("bank1")->set_entry(0);
 }
 
@@ -228,8 +228,8 @@ static SAMPLES_START( ninjakd2_init_samples )
 {
 	ninjakd2_state *state = device.machine().driver_data<ninjakd2_state>();
 	running_machine &machine = device.machine();
-	const UINT8* const rom = machine.region("pcm")->base();
-	const int length = machine.region("pcm")->bytes();
+	const UINT8* const rom = machine.root_device().memregion("pcm")->base();
+	const int length = state->memregion("pcm")->bytes();
 	INT16* sampledata = auto_alloc_array(machine, INT16, length);
 
 	int i;
@@ -244,12 +244,12 @@ static SAMPLES_START( ninjakd2_init_samples )
 WRITE8_MEMBER(ninjakd2_state::ninjakd2_pcm_play_w)
 {
 	samples_device *samples = machine().device<samples_device>("pcm");
-	const UINT8* const rom = machine().region("pcm")->base();
+	const UINT8* const rom = memregion("pcm")->base();
 
 	// only Ninja Kid II uses this
 	if (rom)
 	{
-		const int length = machine().region("pcm")->bytes();
+		const int length = memregion("pcm")->bytes();
 
 		const int start = data << 8;
 
@@ -1425,9 +1425,9 @@ by one place all the intervening bits.
 
 static void lineswap_gfx_roms(running_machine &machine, const char *region, const int bit)
 {
-	const int length = machine.region(region)->bytes();
+	const int length = machine.root_device().memregion(region)->bytes();
 
-	UINT8* const src = machine.region(region)->base();
+	UINT8* const src = machine.root_device().memregion(region)->base();
 
 	UINT8* const temp = auto_alloc_array(machine, UINT8, length);
 
@@ -1472,7 +1472,7 @@ static DRIVER_INIT( ninjakd2 )
 static DRIVER_INIT( bootleg )
 {
 	address_space *space = machine.device("soundcpu")->memory().space(AS_PROGRAM);
-	space->set_decrypted_region(0x0000, 0x7fff, machine.region("soundcpu")->base() + 0x10000);
+	space->set_decrypted_region(0x0000, 0x7fff, machine.root_device().memregion("soundcpu")->base() + 0x10000);
 
 	gfx_unscramble(machine);
 }

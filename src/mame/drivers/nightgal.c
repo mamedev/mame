@@ -112,7 +112,7 @@ static SCREEN_UPDATE_IND16( nightgal )
 
 static UINT8 nightgal_gfx_nibble( running_machine &machine, int niboffset )
 {
-	UINT8 *blit_rom = machine.region("gfx1")->base();
+	UINT8 *blit_rom = machine.root_device().memregion("gfx1")->base();
 
 	if (niboffset & 1)
 	{
@@ -250,7 +250,7 @@ WRITE8_MEMBER(nightgal_state::sexygal_nsc_true_blitter_w)
 /* guess: use the same resistor values as Crazy Climber (needs checking on the real HW) */
 static PALETTE_INIT( nightgal )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	static const int resistances_rg[3] = { 1000, 470, 220 };
 	static const int resistances_b [2] = { 470, 220 };
 	double weights_rg[3], weights_b[2];
@@ -1226,7 +1226,7 @@ ROM_END
 
 static DRIVER_INIT( royalqn )
 {
-	UINT8 *ROM = machine.region("sub")->base();
+	UINT8 *ROM = machine.root_device().memregion("sub")->base();
 
 	/* patch open bus / protection */
 	ROM[0xc27e] = 0x02;
@@ -1235,7 +1235,7 @@ static DRIVER_INIT( royalqn )
 
 static DRIVER_INIT( ngalsumr )
 {
-	UINT8 *ROM = machine.region("sub")->base();
+	UINT8 *ROM = machine.root_device().memregion("sub")->base();
 
 	/* patch protection */
 	ROM[0xd6ce] = 0x02;

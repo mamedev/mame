@@ -518,7 +518,7 @@ static MACHINE_RESET( taitoh )
 static MACHINE_START( taitoh )
 {
 	taitoh_state *state = machine.driver_data<taitoh_state>();
-	UINT8 *ROM = machine.region("audiocpu")->base();
+	UINT8 *ROM = state->memregion("audiocpu")->base();
 
 	state->membank("bank1")->configure_entries(0, 4, &ROM[0xc000], 0x4000);
 

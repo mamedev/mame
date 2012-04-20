@@ -28,9 +28,9 @@ WRITE8_MEMBER(srumbler_state::srumbler_bankswitch_w)
       that as well to be 100% accurate.
      */
 	int i;
-	UINT8 *ROM = machine().region("user1")->base();
-	UINT8 *prom1 = machine().region("proms")->base() + (data & 0xf0);
-	UINT8 *prom2 = machine().region("proms")->base() + 0x100 + ((data & 0x0f) << 4);
+	UINT8 *ROM = memregion("user1")->base();
+	UINT8 *prom1 = memregion("proms")->base() + (data & 0xf0);
+	UINT8 *prom2 = memregion("proms")->base() + 0x100 + ((data & 0x0f) << 4);
 
 	for (i = 0x05;i < 0x10;i++)
 	{

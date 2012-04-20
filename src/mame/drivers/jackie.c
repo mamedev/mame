@@ -346,7 +346,7 @@ WRITE8_MEMBER(jackie_state::igs_irqack_w)
 
 READ8_MEMBER(jackie_state::expram_r)
 {
-	UINT8 *rom = machine().region("gfx3")->base();
+	UINT8 *rom = memregion("gfx3")->base();
 
 	offset += m_exp_bank * 0x8000;
 //  logerror("PC %06X: %04x = %02x\n",cpu_get_pc(&space.device()),offset,rom[offset]);
@@ -540,7 +540,7 @@ static DRIVER_INIT( jackie )
 {
 
 	int A;
-	UINT8 *rom = machine.region("maincpu")->base();
+	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
 
 	for (A = 0;A < 0xf000;A++)
 	{

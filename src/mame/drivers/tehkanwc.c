@@ -195,7 +195,7 @@ static void tehkanwc_adpcm_int(device_t *device)
 {
 	tehkanwc_state *state = device->machine().driver_data<tehkanwc_state>();
 
-	UINT8 *SAMPLES = device->machine().region("adpcm")->base();
+	UINT8 *SAMPLES = state->memregion("adpcm")->base();
 	int msm_data = SAMPLES[state->m_msm_data_offs & 0x7fff];
 
 	if (state->m_toggle == 0)
@@ -707,7 +707,7 @@ static DRIVER_INIT( teedoff )
         023A: 00          nop
     */
 
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
 
 	ROM[0x0238] = 0x00;
 	ROM[0x0239] = 0x00;

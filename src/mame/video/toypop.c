@@ -20,7 +20,7 @@
 
 PALETTE_INIT( toypop )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	/* allocate the colortable */
 	machine.colortable = colortable_alloc(machine, 256);
 

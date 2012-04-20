@@ -405,7 +405,7 @@ static DRIVER_INIT( upscope )
 
 	/* set up memory */
 	state->membank("bank1")->configure_entry(0, state->m_chip_ram);
-	state->membank("bank1")->configure_entry(1, machine.region("user1")->base());
+	state->membank("bank1")->configure_entry(1, machine.root_device().memregion("user1")->base());
 }
 
 

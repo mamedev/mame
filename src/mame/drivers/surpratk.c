@@ -191,7 +191,7 @@ static const k05324x_interface surpratk_k05324x_intf =
 static MACHINE_START( surpratk )
 {
 	surpratk_state *state = machine.driver_data<surpratk_state>();
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = state->memregion("maincpu")->base();
 
 	state->membank("bank1")->configure_entries(0, 28, &ROM[0x10000], 0x2000);
 	state->membank("bank1")->configure_entries(28, 4, &ROM[0x08000], 0x2000);

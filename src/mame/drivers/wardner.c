@@ -152,7 +152,7 @@ WRITE8_MEMBER(wardner_state::wardner_ramrom_bank_sw)
 		int bankaddress = 0;
 
 		address_space *mainspace;
-		UINT8 *RAM = machine().region("maincpu")->base();
+		UINT8 *RAM = memregion("maincpu")->base();
 
 		mainspace = machine().device("maincpu")->memory().space(AS_PROGRAM);
 		m_wardner_membank = data;

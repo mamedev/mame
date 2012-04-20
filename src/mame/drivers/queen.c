@@ -143,7 +143,7 @@ static void mxtc_config_w(device_t *busdevice, device_t *device, int function, i
 			if (data & 0x10)		// enable RAM access to region 0xf0000 - 0xfffff
 				state->membank("bios_bank")->set_base(state->m_bios_ram);
 			else					// disable RAM access (reads go to BIOS ROM)
-				state->membank("bios_bank")->set_base(busdevice->machine().region("bios")->base() + 0x10000);
+				state->membank("bios_bank")->set_base(state->memregion("bios")->base() + 0x10000);
 			break;
 		}
 		case 0x5a: // PAM1
@@ -151,12 +151,12 @@ static void mxtc_config_w(device_t *busdevice, device_t *device, int function, i
 			if (data & 0x1)
 				state->membank("video_bank1")->set_base(state->m_isa_ram1);
 			else
-				state->membank("video_bank1")->set_base(busdevice->machine().region("video_bios")->base() + 0);
+				state->membank("video_bank1")->set_base(state->memregion("video_bios")->base() + 0);
 
 			if (data & 0x10)
 				state->membank("video_bank2")->set_base(state->m_isa_ram2);
 			else
-				state->membank("video_bank2")->set_base(busdevice->machine().region("video_bios")->base() + 0x4000);
+				state->membank("video_bank2")->set_base(state->memregion("video_bios")->base() + 0x4000);
 
 			break;
 		}
@@ -165,12 +165,12 @@ static void mxtc_config_w(device_t *busdevice, device_t *device, int function, i
 			if (data & 0x1)
 				state->membank("bios_ext1")->set_base(state->m_bios_ext1_ram);
 			else
-				state->membank("bios_ext1")->set_base(busdevice->machine().region("bios")->base() + 0);
+				state->membank("bios_ext1")->set_base(state->memregion("bios")->base() + 0);
 
 			if (data & 0x10)
 				state->membank("bios_ext2")->set_base(state->m_bios_ext2_ram);
 			else
-				state->membank("bios_ext2")->set_base(busdevice->machine().region("bios")->base() + 0x4000);
+				state->membank("bios_ext2")->set_base(state->memregion("bios")->base() + 0x4000);
 
 			break;
 		}
@@ -179,12 +179,12 @@ static void mxtc_config_w(device_t *busdevice, device_t *device, int function, i
 			if (data & 0x1)
 				state->membank("bios_ext3")->set_base(state->m_bios_ext3_ram);
 			else
-				state->membank("bios_ext3")->set_base(busdevice->machine().region("bios")->base() + 0x8000);
+				state->membank("bios_ext3")->set_base(state->memregion("bios")->base() + 0x8000);
 
 			if (data & 0x10)
 				state->membank("bios_ext4")->set_base(state->m_bios_ext4_ram);
 			else
-				state->membank("bios_ext4")->set_base(busdevice->machine().region("bios")->base() + 0xc000);
+				state->membank("bios_ext4")->set_base(state->memregion("bios")->base() + 0xc000);
 
 			break;
 		}
@@ -658,13 +658,13 @@ static MACHINE_START( queen )
 
 static MACHINE_RESET( queen )
 {
-	machine.root_device().membank("bios_bank")->set_base(machine.region("bios")->base() + 0x30000);
-	machine.root_device().membank("bios_ext1")->set_base(machine.region("bios")->base() + 0x20000);
-	machine.root_device().membank("bios_ext2")->set_base(machine.region("bios")->base() + 0x24000);
-	machine.root_device().membank("bios_ext3")->set_base(machine.region("bios")->base() + 0x28000);
-	machine.root_device().membank("bios_ext4")->set_base(machine.region("bios")->base() + 0x2c000);
-	machine.root_device().membank("video_bank1")->set_base(machine.region("video_bios")->base() + 0);
-	machine.root_device().membank("video_bank2")->set_base(machine.region("video_bios")->base() + 0x4000);
+	machine.root_device().membank("bios_bank")->set_base(machine.root_device().memregion("bios")->base() + 0x30000);
+	machine.root_device().membank("bios_ext1")->set_base(machine.root_device().memregion("bios")->base() + 0x20000);
+	machine.root_device().membank("bios_ext2")->set_base(machine.root_device().memregion("bios")->base() + 0x24000);
+	machine.root_device().membank("bios_ext3")->set_base(machine.root_device().memregion("bios")->base() + 0x28000);
+	machine.root_device().membank("bios_ext4")->set_base(machine.root_device().memregion("bios")->base() + 0x2c000);
+	machine.root_device().membank("video_bank1")->set_base(machine.root_device().memregion("video_bios")->base() + 0);
+	machine.root_device().membank("video_bank2")->set_base(machine.root_device().memregion("video_bios")->base() + 0x4000);
 }
 
 

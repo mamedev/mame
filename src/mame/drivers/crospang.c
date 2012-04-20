@@ -562,8 +562,8 @@ ROM_END
 
 static void tumblepb_gfx1_rearrange(running_machine &machine)
 {
-	UINT8 *rom = machine.region("gfx1")->base();
-	int len = machine.region("gfx1")->bytes();
+	UINT8 *rom = machine.root_device().memregion("gfx1")->base();
+	int len = machine.root_device().memregion("gfx1")->bytes();
 	int i;
 
 	/* gfx data is in the wrong order */

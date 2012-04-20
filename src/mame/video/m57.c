@@ -32,7 +32,7 @@
 
 PALETTE_INIT( m57 )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 
 	machine.colortable = colortable_alloc(machine, 32 * 8 + 16);

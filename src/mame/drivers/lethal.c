@@ -579,7 +579,7 @@ static const k054539_interface k054539_config =
 static MACHINE_START( lethalen )
 {
 	lethal_state *state = machine.driver_data<lethal_state>();
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = state->memregion("maincpu")->base();
 
 	state->membank("bank1")->configure_entries(0, 0x20, &ROM[0x10000], 0x2000);
 	state->membank("bank1")->set_entry(0);
@@ -601,7 +601,7 @@ static MACHINE_START( lethalen )
 static MACHINE_RESET( lethalen )
 {
 	lethal_state *state = machine.driver_data<lethal_state>();
-	UINT8 *prgrom = (UINT8 *)machine.region("maincpu")->base();
+	UINT8 *prgrom = (UINT8 *)state->memregion("maincpu")->base();
 	int i;
 
 	state->membank("bank2")->set_base(&prgrom[0x48000]);

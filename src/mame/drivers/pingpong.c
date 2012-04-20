@@ -36,7 +36,7 @@ WRITE8_MEMBER(pingpong_state::cashquiz_question_bank_low_w)
 		static const char * const bankname[] = { "bank1", "bank2", "bank3", "bank4", "bank5", "bank6", "bank7", "bank8" };
 		const char *bank = bankname[data & 7];
 		int bankaddr = m_question_addr_high | ((data - 0x60) * 0x100);
-		UINT8 *questions = machine().region("user1")->base() + bankaddr;
+		UINT8 *questions = memregion("user1")->base() + bankaddr;
 		membank(bank)->set_base(questions);
 
 	}
@@ -559,7 +559,7 @@ ROM_END
 
 static DRIVER_INIT( merlinmm )
 {
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
 	int i;
 
 	/* decrypt program code */
@@ -573,12 +573,12 @@ static DRIVER_INIT( cashquiz )
 	int i;
 
 	/* decrypt program code */
-	ROM = machine.region("maincpu")->base();
+	ROM = machine.root_device().memregion("maincpu")->base();
 	for( i = 0; i < 0x4000; i++ )
 		ROM[i] = BITSWAP8(ROM[i],0,1,2,3,4,5,6,7);
 
 	/* decrypt questions */
-	ROM = machine.region("user1")->base();
+	ROM = machine.root_device().memregion("user1")->base();
 	for( i = 0; i < 0x40000; i++ )
 		ROM[i] = BITSWAP8(ROM[i],0,1,2,3,4,5,6,7);
 
@@ -598,14 +598,14 @@ static DRIVER_INIT( cashquiz )
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x5700, 0x57ff, "bank8");
 
 	// setup default banks
-	state->membank("bank1")->set_base(machine.region("user1")->base() + 0x100*0 );
-	state->membank("bank2")->set_base(machine.region("user1")->base() + 0x100*1 );
-	state->membank("bank3")->set_base(machine.region("user1")->base() + 0x100*2 );
-	state->membank("bank4")->set_base(machine.region("user1")->base() + 0x100*3 );
-	state->membank("bank5")->set_base(machine.region("user1")->base() + 0x100*4 );
-	state->membank("bank6")->set_base(machine.region("user1")->base() + 0x100*5 );
-	state->membank("bank7")->set_base(machine.region("user1")->base() + 0x100*6 );
-	state->membank("bank8")->set_base(machine.region("user1")->base() + 0x100*7 );
+	state->membank("bank1")->set_base(machine.root_device().memregion("user1")->base() + 0x100*0 );
+	state->membank("bank2")->set_base(machine.root_device().memregion("user1")->base() + 0x100*1 );
+	state->membank("bank3")->set_base(machine.root_device().memregion("user1")->base() + 0x100*2 );
+	state->membank("bank4")->set_base(machine.root_device().memregion("user1")->base() + 0x100*3 );
+	state->membank("bank5")->set_base(machine.root_device().memregion("user1")->base() + 0x100*4 );
+	state->membank("bank6")->set_base(machine.root_device().memregion("user1")->base() + 0x100*5 );
+	state->membank("bank7")->set_base(machine.root_device().memregion("user1")->base() + 0x100*6 );
+	state->membank("bank8")->set_base(state->memregion("user1")->base() + 0x100*7 );
 }
 
 

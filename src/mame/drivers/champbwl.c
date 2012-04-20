@@ -430,7 +430,7 @@ static const x1_010_interface champbwl_sound_intf =
 static MACHINE_START( champbwl )
 {
 	champbwl_state *state = machine.driver_data<champbwl_state>();
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = state->memregion("maincpu")->base();
 
 	state->m_mcu = NULL;
 
@@ -530,7 +530,7 @@ static SCREEN_VBLANK( doraemon )
 
 static MACHINE_START( doraemon )
 {
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
 	machine.root_device().membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x4000);
 }
 

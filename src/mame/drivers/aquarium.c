@@ -239,13 +239,13 @@ static const gfx_layout tilelayout =
 
 static DRIVER_INIT( aquarium )
 {
-	UINT8 *Z80 = machine.region("audiocpu")->base();
+	UINT8 *Z80 = machine.root_device().memregion("audiocpu")->base();
 
 	/* The BG tiles are 5bpp, this rearranges the data from
        the roms containing the 1bpp data so we can decode it
        correctly */
-	UINT8 *DAT2 = machine.region("gfx1")->base() + 0x080000;
-	UINT8 *DAT = machine.region("user1")->base();
+	UINT8 *DAT2 = machine.root_device().memregion("gfx1")->base() + 0x080000;
+	UINT8 *DAT = machine.root_device().memregion("user1")->base();
 	int len = 0x0200000;
 
 	for (len = 0; len < 0x020000; len++)
@@ -260,8 +260,8 @@ static DRIVER_INIT( aquarium )
 		DAT2[len * 4 + 2] |= (DAT[len] & 0x01) << 3;
 	}
 
-	DAT2 = machine.region("gfx4")->base() + 0x080000;
-	DAT = machine.region("user2")->base();
+	DAT2 = machine.root_device().memregion("gfx4")->base() + 0x080000;
+	DAT = machine.root_device().memregion("user2")->base();
 
 	for (len = 0; len < 0x020000; len++)
 	{

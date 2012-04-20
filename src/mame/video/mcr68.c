@@ -71,7 +71,7 @@ VIDEO_START( mcr68 )
 VIDEO_START( zwackery )
 {
 	mcr68_state *state = machine.driver_data<mcr68_state>();
-	const UINT8 *colordatabase = (const UINT8 *)machine.region("gfx3")->base();
+	const UINT8 *colordatabase = (const UINT8 *)state->memregion("gfx3")->base();
 	gfx_element *gfx0 = machine.gfx[0];
 	gfx_element *gfx2 = machine.gfx[2];
 	UINT8 *srcdata0, *dest0;

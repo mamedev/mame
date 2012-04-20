@@ -292,7 +292,7 @@ static int internal_pc_cga_video_start(running_machine &machine)
 	memset(&cga, 0, sizeof(cga));
 	cga.update_row = NULL;
 
-	cga.chr_gen = machine.region( "gfx1" )->base() + 0x1000;
+	cga.chr_gen = machine.root_device().memregion( "gfx1" )->base() + 0x1000;
 
 	state_save_register_item(machine, "pccga", NULL, 0, cga.mode_control);
 	state_save_register_item(machine, "pccga", NULL, 0, cga.color_select);
@@ -386,7 +386,7 @@ static VIDEO_START( pc_cga32k )
 
 SCREEN_UPDATE_RGB32( mc6845_cga )
 {
-	UINT8 *gfx = screen.machine().region("gfx1")->base();
+	UINT8 *gfx = screen.machine().root_device().memregion("gfx1")->base();
 	mc6845_device *mc6845 = screen.machine().device<mc6845_device>(CGA_MC6845_NAME);
 	mc6845->screen_update( screen, bitmap, cliprect);
 
@@ -407,12 +407,12 @@ SCREEN_UPDATE_RGB32( mc6845_cga )
 static VIDEO_START( cga_poisk2 )
 {
 	VIDEO_START_CALL(pc_cga);
-	cga.chr_gen = machine.region( "gfx1" )->base() + 0x0000;
+	cga.chr_gen = machine.root_device().memregion( "gfx1" )->base() + 0x0000;
 }
 
 static SCREEN_UPDATE_RGB32( cga_poisk2 )
 {
-	UINT8 *gfx = screen.machine().region("gfx1")->base();
+	UINT8 *gfx = screen.machine().root_device().memregion("gfx1")->base();
 	mc6845_device *mc6845 = screen.machine().device<mc6845_device>(CGA_MC6845_NAME);
 	mc6845->screen_update( screen, bitmap, cliprect);
 
@@ -1103,7 +1103,7 @@ static void pc_cga_plantronics_w(running_machine &machine, int data)
 
 static WRITE8_HANDLER ( char_ram_w )
 {
-	UINT8 *gfx = space->machine().region("gfx1")->base();
+	UINT8 *gfx = space->machine().root_device().memregion("gfx1")->base();
 	logerror("write char ram %04x %02x\n",offset,data);
 	gfx[offset + 0x0000] = data;
 	gfx[offset + 0x0800] = data;
@@ -1116,7 +1116,7 @@ static WRITE32_HANDLER( char_ram_32_w )   { write32le_with_write8_handler(char_r
 
 static READ8_HANDLER ( char_ram_r )
 {
-	UINT8 *gfx = space->machine().region("gfx1")->base();
+	UINT8 *gfx = space->machine().root_device().memregion("gfx1")->base();
 	return gfx[offset];
 }
 
@@ -1629,7 +1629,7 @@ static VIDEO_START( pc1512 )
 
 static SCREEN_UPDATE_RGB32( mc6845_pc1512 )
 {
-	UINT8 *gfx = screen.machine().region("gfx1")->base();
+	UINT8 *gfx = screen.machine().root_device().memregion("gfx1")->base();
 	mc6845_device *mc6845 = screen.machine().device<mc6845_device>(CGA_MC6845_NAME);
 	mc6845->screen_update(screen, bitmap, cliprect);
 

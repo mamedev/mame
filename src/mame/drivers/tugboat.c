@@ -51,7 +51,7 @@ public:
     just four 1k resistors. */
 static PALETTE_INIT( tugboat )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 
 

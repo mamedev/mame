@@ -145,7 +145,7 @@ public:
 
 static PALETTE_INIT( looping )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	static const int resistances[3] = { 1000, 470, 220 };
 	double rweights[3], gweights[3], bweights[2];
 	int i;
@@ -900,8 +900,8 @@ ROM_END
 static DRIVER_INIT( looping )
 {
 	looping_state *state = machine.driver_data<looping_state>();
-	int length = machine.region("maincpu")->bytes();
-	UINT8 *rom = machine.region("maincpu")->base();
+	int length = machine.root_device().memregion("maincpu")->bytes();
+	UINT8 *rom = state->memregion("maincpu")->base();
 	int i;
 
 	state->m_cop_io = auto_alloc_array(machine, UINT8, 0x08);

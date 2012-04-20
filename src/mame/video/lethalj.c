@@ -82,8 +82,8 @@ VIDEO_START( lethalj )
 	state->m_screenram = auto_alloc_array(machine, UINT16, BLITTER_DEST_WIDTH * BLITTER_DEST_HEIGHT);
 
 	/* predetermine blitter info */
-	state->m_blitter_base = (UINT16 *)machine.region("gfx1")->base();
-	state->m_blitter_rows = machine.region("gfx1")->bytes() / (2*BLITTER_SOURCE_WIDTH);
+	state->m_blitter_base = (UINT16 *)machine.root_device().memregion("gfx1")->base();
+	state->m_blitter_rows = state->memregion("gfx1")->bytes() / (2*BLITTER_SOURCE_WIDTH);
 }
 
 

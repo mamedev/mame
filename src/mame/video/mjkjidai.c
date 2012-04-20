@@ -49,7 +49,7 @@ WRITE8_MEMBER(mjkjidai_state::mjkjidai_videoram_w)
 
 WRITE8_MEMBER(mjkjidai_state::mjkjidai_ctrl_w)
 {
-	UINT8 *rom = machine().region("maincpu")->base();
+	UINT8 *rom = memregion("maincpu")->base();
 
 //  logerror("%04x: port c0 = %02x\n",cpu_get_pc(&space.device()),data);
 

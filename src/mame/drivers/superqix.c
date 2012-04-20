@@ -112,8 +112,8 @@ static SAMPLES_START( pbillian_sh_start )
 {
 	superqix_state *state = device.machine().driver_data<superqix_state>();
 	running_machine &machine = device.machine();
-	UINT8 *src = machine.region("samples")->base();
-	int i, len = machine.region("samples")->bytes();
+	UINT8 *src = machine.root_device().memregion("samples")->base();
+	int i, len = state->memregion("samples")->bytes();
 
 	/* convert 8-bit unsigned samples to 8-bit signed */
 	state->m_samplebuf = auto_alloc_array(machine, INT16, len);
@@ -124,8 +124,8 @@ static SAMPLES_START( pbillian_sh_start )
 WRITE8_MEMBER(superqix_state::pbillian_sample_trigger_w)
 {
 	samples_device *samples = machine().device<samples_device>("samples");
-	UINT8 *src = machine().region("samples")->base();
-	int len = machine().region("samples")->bytes();
+	UINT8 *src = memregion("samples")->base();
+	int len = memregion("samples")->bytes();
 	int start,end;
 
 	start = data << 7;
@@ -548,7 +548,7 @@ static void machine_init_common(running_machine &machine)
 static MACHINE_START( superqix )
 {
 	/* configure the banks */
-	machine.root_device().membank("bank1")->configure_entries(0, 4, machine.region("maincpu")->base() + 0x10000, 0x4000);
+	machine.root_device().membank("bank1")->configure_entries(0, 4, machine.root_device().memregion("maincpu")->base() + 0x10000, 0x4000);
 
 	machine_init_common(machine);
 }
@@ -556,7 +556,7 @@ static MACHINE_START( superqix )
 static MACHINE_START( pbillian )
 {
 	/* configure the banks */
-	machine.root_device().membank("bank1")->configure_entries(0, 2, machine.region("maincpu")->base() + 0x10000, 0x4000);
+	machine.root_device().membank("bank1")->configure_entries(0, 2, machine.root_device().memregion("maincpu")->base() + 0x10000, 0x4000);
 
 	machine_init_common(machine);
 }
@@ -1363,8 +1363,8 @@ static DRIVER_INIT( perestro )
 	int i,j;
 
 	/* decrypt program code; the address lines are shuffled around in a non-trivial way */
-	src = machine.region("maincpu")->base();
-	len = machine.region("maincpu")->bytes();
+	src = machine.root_device().memregion("maincpu")->base();
+	len = machine.root_device().memregion("maincpu")->bytes();
 	for (i = 0;i < len;i += 16)
 	{
 		memcpy(temp,&src[i],16);
@@ -1383,8 +1383,8 @@ static DRIVER_INIT( perestro )
 	}
 
 	/* decrypt gfx ROMs; simple bit swap on the address lines */
-	src = machine.region("gfx1")->base();
-	len = machine.region("gfx1")->bytes();
+	src = machine.root_device().memregion("gfx1")->base();
+	len = machine.root_device().memregion("gfx1")->bytes();
 	for (i = 0;i < len;i += 16)
 	{
 		memcpy(temp,&src[i],16);
@@ -1394,8 +1394,8 @@ static DRIVER_INIT( perestro )
 		}
 	}
 
-	src = machine.region("gfx2")->base();
-	len = machine.region("gfx2")->bytes();
+	src = machine.root_device().memregion("gfx2")->base();
+	len = machine.root_device().memregion("gfx2")->bytes();
 	for (i = 0;i < len;i += 16)
 	{
 		memcpy(temp,&src[i],16);
@@ -1405,8 +1405,8 @@ static DRIVER_INIT( perestro )
 		}
 	}
 
-	src = machine.region("gfx3")->base();
-	len = machine.region("gfx3")->bytes();
+	src = machine.root_device().memregion("gfx3")->base();
+	len = machine.root_device().memregion("gfx3")->bytes();
 	for (i = 0;i < len;i += 16)
 	{
 		memcpy(temp,&src[i],16);

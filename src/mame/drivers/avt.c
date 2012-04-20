@@ -531,7 +531,7 @@ static SCREEN_UPDATE_IND16( avt )
 
 static PALETTE_INIT( avt )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 /*  prom bits
     7654 3210
     ---- ---x   Intensity?.

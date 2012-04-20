@@ -471,7 +471,7 @@ A12 <-> A13
 */
 
 	UINT32 i,j,jscr,romoffset;
-	UINT8 *multfish_gfx = machine.region("gfx")->base();
+	UINT8 *multfish_gfx = machine.root_device().memregion("gfx")->base();
 	UINT8 *temprom = auto_alloc_array(machine, UINT8, multfish_ROM_SIZE);
 
 
@@ -543,7 +543,7 @@ INLINE void rom_decodeh(UINT8 *romptr, UINT8 *tmprom, UINT8 xor_data, UINT32 xor
 
 static void lottery_decode(running_machine &machine, UINT8 xor12, UINT8 xor34, UINT8 xor56, UINT8 xor78, UINT32 xor_addr)
 {
-	UINT8 *multfish_gfx = machine.region("gfx")->base();
+	UINT8 *multfish_gfx = machine.root_device().memregion("gfx")->base();
 	UINT8 *temprom = auto_alloc_array(machine, UINT8, multfish_ROM_SIZE);
 
 	/* ROMs decode */
@@ -584,7 +584,7 @@ INLINE void roment_decodeh(UINT8 *romptr, UINT8 *tmprom, UINT8 xor_data, UINT32 
 
 static void ent_decode(running_machine &machine, UINT8 xor12, UINT8 xor34, UINT8 xor56, UINT8 xor78, UINT32 xor_addr)
 {
-	UINT8 *multfish_gfx = machine.region("gfx")->base();
+	UINT8 *multfish_gfx = machine.root_device().memregion("gfx")->base();
 	UINT8 *temprom = auto_alloc_array(machine, UINT8, multfish_ROM_SIZE);
 
 	/* ROMs decode */
@@ -1009,7 +1009,7 @@ static MACHINE_RESET( multfish )
 {
 	multfish_state *state = machine.driver_data<multfish_state>();
 
-	state->membank("bank1")->configure_entries(0, 16, machine.region("maincpu")->base(), 0x4000);
+	state->membank("bank1")->configure_entries(0, 16, state->memregion("maincpu")->base(), 0x4000);
 	state->membank("bank1")->set_entry(0);
 
 	state->m_disp_enable = 0;

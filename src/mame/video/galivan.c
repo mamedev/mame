@@ -54,7 +54,7 @@ background: 0x4000 bytes of ROM:    76543210    tile code low bits
 
 PALETTE_INIT( galivan )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 
 	/* allocate the colortable */
@@ -122,7 +122,7 @@ PALETTE_INIT( galivan )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	UINT8 *BGROM = machine.region("gfx4")->base();
+	UINT8 *BGROM = machine.root_device().memregion("gfx4")->base();
 	int attr = BGROM[tile_index + 0x4000];
 	int code = BGROM[tile_index] | ((attr & 0x03) << 8);
 	SET_TILE_INFO(
@@ -147,7 +147,7 @@ static TILE_GET_INFO( get_tx_tile_info )
 
 static TILE_GET_INFO( ninjemak_get_bg_tile_info )
 {
-	UINT8 *BGROM = machine.region("gfx4")->base();
+	UINT8 *BGROM = machine.root_device().memregion("gfx4")->base();
 	int attr = BGROM[tile_index + 0x4000];
 	int code = BGROM[tile_index] | ((attr & 0x03) << 8);
 	SET_TILE_INFO(
@@ -305,7 +305,7 @@ WRITE8_MEMBER(galivan_state::galivan_scrolly_w)
 static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	galivan_state *state = machine.driver_data<galivan_state>();
-	const UINT8 *spritepalettebank = machine.region("user1")->base();
+	const UINT8 *spritepalettebank = state->memregion("user1")->base();
 	UINT8 *spriteram = state->m_spriteram;
 	int offs;
 

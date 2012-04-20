@@ -273,8 +273,8 @@ WRITE16_MEMBER(metro_state::metro_window_w)
 
 static void expand_gfx1(metro_state &state)
 {
-	UINT8 *base_gfx = state.machine().region("gfx1")->base();
-	UINT32 length = 2 * state.machine().region("gfx1")->bytes();
+	UINT8 *base_gfx = state.machine().root_device().memregion("gfx1")->base();
+	UINT32 length = 2 * state.machine().root_device().memregion("gfx1")->bytes();
 	state.m_expanded_gfx1 = auto_alloc_array(state.machine(), UINT8, length);
 	for (int i = 0; i < length; i += 2)
 	{
@@ -446,8 +446,8 @@ void metro_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const r
 {
 	metro_state *state = machine.driver_data<metro_state>();
 	UINT8 *base_gfx4 = state->m_expanded_gfx1;
-	UINT8 *base_gfx8 = machine.region("gfx1")->base();
-	UINT32 gfx_size = machine.region("gfx1")->bytes();
+	UINT8 *base_gfx8 = machine.root_device().memregion("gfx1")->base();
+	UINT32 gfx_size = state->memregion("gfx1")->bytes();
 	const rectangle &visarea = machine.primary_screen->visible_area();
 
 	int max_x = visarea.max_x + 1;

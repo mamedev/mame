@@ -439,7 +439,7 @@ DIRECT_UPDATE_MEMBER(vcombat_state::vcombat_vid_1_direct_handler)
 static DRIVER_INIT( vcombat )
 {
 	vcombat_state *state = machine.driver_data<vcombat_state>();
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = state->memregion("maincpu")->base();
 
 	/* The two i860s execute out of RAM */
 	address_space *space = machine.device<i860_device>("vid_0")->space(AS_PROGRAM);

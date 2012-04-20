@@ -79,7 +79,7 @@ static WRITE8_DEVICE_HANDLER( sound_control_w )
 
 READ8_MEMBER(_4enraya_state::fenraya_custom_map_r)
 {
-	UINT8 *prom = machine().region("pal_prom")->base();
+	UINT8 *prom = memregion("pal_prom")->base();
 	UINT8 prom_routing = (prom[offset >> 12] & 0xf) ^ 0xf;
 	UINT8 res;
 
@@ -87,13 +87,13 @@ READ8_MEMBER(_4enraya_state::fenraya_custom_map_r)
 
 	if(prom_routing & 1) //ROM5
 	{
-		UINT8 *rom = machine().region("maincpu")->base();
+		UINT8 *rom = memregion("maincpu")->base();
 		res |= rom[offset & 0x7fff];
 	}
 
 	if(prom_routing & 2) //ROM4
 	{
-		UINT8 *rom = machine().region("maincpu")->base();
+		UINT8 *rom = memregion("maincpu")->base();
 		res |= rom[(offset & 0x7fff) | 0x8000];
 	}
 
@@ -112,7 +112,7 @@ READ8_MEMBER(_4enraya_state::fenraya_custom_map_r)
 
 WRITE8_MEMBER(_4enraya_state::fenraya_custom_map_w)
 {
-	UINT8 *prom = machine().region("pal_prom")->base();
+	UINT8 *prom = memregion("pal_prom")->base();
 	UINT8 prom_routing = (prom[offset >> 12] & 0xf) ^ 0xf;
 
 	if(prom_routing & 1) //ROM5
@@ -392,7 +392,7 @@ ROM_END
 static DRIVER_INIT( unkpacg )
 {
 	_4enraya_state *state = machine.driver_data<_4enraya_state>();
-	UINT8 *rom = machine.region("maincpu")->base();
+	UINT8 *rom = state->memregion("maincpu")->base();
 
 	state->m_snd_latch_bit = 2;
 

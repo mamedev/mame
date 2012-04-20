@@ -208,7 +208,7 @@ static SCREEN_UPDATE_RGB32( enigma2 )
 	pen_t pens[NUM_PENS];
 
 	const rectangle &visarea = screen.visible_area();
-	UINT8 *prom = screen.machine().region("proms")->base();
+	UINT8 *prom = state->memregion("proms")->base();
 	UINT8 *color_map_base = state->m_flip_screen ? &prom[0x0400] : &prom[0x0000];
 	UINT8 *star_map_base = (state->m_blink_count & 0x08) ? &prom[0x0c00] : &prom[0x0800];
 
@@ -707,7 +707,7 @@ ROM_END
 static DRIVER_INIT(enigma2)
 {
 	offs_t i;
-	UINT8 *rom = machine.region("audiocpu")->base();
+	UINT8 *rom = machine.root_device().memregion("audiocpu")->base();
 
 	for(i = 0; i < 0x2000; i++)
 	{

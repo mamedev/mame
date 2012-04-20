@@ -304,7 +304,7 @@ static MACHINE_START( gng )
 {
 	gng_state *state = machine.driver_data<gng_state>();
 
-	UINT8 *rombase = machine.region("maincpu")->base();
+	UINT8 *rombase = state->memregion("maincpu")->base();
 	state->membank("bank1")->configure_entries(0, 4, &rombase[0x10000], 0x2000);
 	state->membank("bank1")->configure_entry(4, &rombase[0x4000]);
 

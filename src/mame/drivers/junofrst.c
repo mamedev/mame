@@ -143,7 +143,7 @@ WRITE8_MEMBER(junofrst_state::junofrst_blitter_w)
 	if (offset == 3)
 	{
 		int i;
-		UINT8 *gfx_rom = machine().region("gfx1")->base();
+		UINT8 *gfx_rom = memregion("gfx1")->base();
 
 		offs_t src = ((m_blitterdata[2] << 8) | m_blitterdata[3]) & 0xfffc;
 		offs_t dest = (m_blitterdata[0] << 8) | m_blitterdata[1];
@@ -529,7 +529,7 @@ static DRIVER_INIT( junofrst )
 {
 	UINT8 *decrypted = konami1_decode(machine, "maincpu");
 
-	machine.root_device().membank("bank1")->configure_entries(0, 16, machine.region("maincpu")->base() + 0x10000, 0x1000);
+	machine.root_device().membank("bank1")->configure_entries(0, 16, machine.root_device().memregion("maincpu")->base() + 0x10000, 0x1000);
 	machine.root_device().membank("bank1")->configure_decrypted_entries(0, 16, decrypted + 0x10000, 0x1000);
 }
 

@@ -1380,7 +1380,7 @@ WRITE16_MEMBER(megasys1_state::protection_peekaboo_w)
 
 	if ((m_protection_val & 0x90) == 0x90)
 	{
-		UINT8 *RAM = machine().region("oki1")->base();
+		UINT8 *RAM = memregion("oki1")->base();
 		int new_bank = (m_protection_val & 0x7) % 7;
 
 		if (m_bank != new_bank)
@@ -3587,8 +3587,8 @@ ROM_END
 
 static void rodlandj_gfx_unmangle(running_machine &machine, const char *region)
 {
-	UINT8 *rom = machine.region(region)->base();
-	int size = machine.region(region)->bytes();
+	UINT8 *rom = machine.root_device().memregion(region)->base();
+	int size = machine.root_device().memregion(region)->bytes();
 	UINT8 *buffer;
 	int i;
 
@@ -3619,8 +3619,8 @@ static void rodlandj_gfx_unmangle(running_machine &machine, const char *region)
 
 static void jitsupro_gfx_unmangle(running_machine &machine, const char *region)
 {
-	UINT8 *rom = machine.region(region)->base();
-	int size = machine.region(region)->bytes();
+	UINT8 *rom = machine.root_device().memregion(region)->base();
+	int size = machine.root_device().memregion(region)->bytes();
 	UINT8 *buffer;
 	int i;
 
@@ -3673,7 +3673,7 @@ static void stdragona_gfx_unmangle(running_machine &machine, const char *region)
 static DRIVER_INIT( 64street )
 {
 	megasys1_state *state = machine.driver_data<megasys1_state>();
-//  UINT16 *RAM = (UINT16 *) machine.region("maincpu")->base();
+//  UINT16 *RAM = (UINT16 *) state->memregion("maincpu")->base();
 //  RAM[0x006b8/2] = 0x6004;        // d8001 test
 //  RAM[0x10EDE/2] = 0x6012;        // watchdog
 
@@ -3686,7 +3686,7 @@ static DRIVER_INIT( 64street )
 
 READ16_MEMBER(megasys1_state::megasys1A_mcu_hs_r)
 {
-	UINT16 *ROM  = (UINT16 *) machine().region("maincpu")->base();
+	UINT16 *ROM  = (UINT16 *) memregion("maincpu")->base();
 
 	if(m_mcu_hs && ((m_mcu_hs_ram[8/2] << 6) & 0x3ffc0) == ((offset*2) & 0x3ffc0))
 	{
@@ -3827,7 +3827,7 @@ static DRIVER_INIT( hayaosi1 )
 
 READ16_MEMBER(megasys1_state::iganinju_mcu_hs_r)
 {
-	UINT16 *ROM  = (UINT16 *) machine().region("maincpu")->base();
+	UINT16 *ROM  = (UINT16 *) memregion("maincpu")->base();
 
 	if(m_mcu_hs && ((m_mcu_hs_ram[8/2] << 6) & 0x3ffc0) == ((offset*2) & 0x3ffc0))
 	{
@@ -3867,7 +3867,7 @@ static DRIVER_INIT( iganinju )
 
 	phantasm_rom_decode(machine, "maincpu");
 
-	//RAM  = (UINT16 *) machine.region("maincpu")->base();
+	//RAM  = (UINT16 *) machine.root_device().memregion("maincpu")->base();
 	megasys1_state *state = machine.driver_data<megasys1_state>();
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x00000, 0x3ffff, read16_delegate(FUNC(megasys1_state::iganinju_mcu_hs_r),state));
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x2f000, 0x2f009, write16_delegate(FUNC(megasys1_state::iganinju_mcu_hs_w),state));
@@ -3887,7 +3887,7 @@ static DRIVER_INIT( jitsupro )
 {
 	device_t *oki1 = machine.device("oki1");
 	device_t *oki2 = machine.device("oki2");
-	//UINT16 *RAM  = (UINT16 *) machine.region("maincpu")->base();
+	//UINT16 *RAM  = (UINT16 *) machine.root_device().memregion("maincpu")->base();
 
 	astyanax_rom_decode(machine, "maincpu");		// Code
 
@@ -3955,7 +3955,7 @@ static DRIVER_INIT( soldam )
 
 READ16_MEMBER(megasys1_state::stdragon_mcu_hs_r)
 {
-	UINT16 *ROM  = (UINT16 *) machine().region("maincpu")->base();
+	UINT16 *ROM  = (UINT16 *) memregion("maincpu")->base();
 
 	if(m_mcu_hs && ((m_mcu_hs_ram[8/2] << 6) & 0x3ffc0) == ((offset*2) & 0x3ffc0))
 	{
@@ -4026,7 +4026,7 @@ READ16_MEMBER(megasys1_state::monkelf_input_r)
 static DRIVER_INIT( monkelf )
 {
 	megasys1_state *state = machine.driver_data<megasys1_state>();
-	UINT16 *ROM = (UINT16*)machine.region("maincpu")->base();
+	UINT16 *ROM = (UINT16*)state->memregion("maincpu")->base();
 	ROM[0x00744/2] = 0x4e71; // weird check, 0xe000e R is a port-based trap?
 
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xe0000, 0xe000f, read16_delegate(FUNC(megasys1_state::monkelf_input_r),state));

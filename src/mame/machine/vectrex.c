@@ -67,7 +67,7 @@ static int vectrex_verify_cart(char *data)
 DEVICE_IMAGE_LOAD(vectrex_cart)
 {
 	vectrex_state *state = image.device().machine().driver_data<vectrex_state>();
-	UINT8 *mem = image.device().machine().region("maincpu")->base();
+	UINT8 *mem = state->memregion("maincpu")->base();
 	if (image.software_entry() == NULL)
 	{
 		image.fread( mem, 0x8000);

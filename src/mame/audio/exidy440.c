@@ -175,7 +175,7 @@ static DEVICE_START( exidy440_sound )
 	state->stream = device->machine().sound().stream_alloc(*device, 0, 2, device->clock(), NULL, channel_update);
 
 	/* allocate the sample cache */
-	length = machine.region("cvsd")->bytes() * 16 + MAX_CACHE_ENTRIES * sizeof(sound_cache_entry);
+	length = machine.root_device().memregion("cvsd")->bytes() * 16 + MAX_CACHE_ENTRIES * sizeof(sound_cache_entry);
 	state->sound_cache = (sound_cache_entry *)auto_alloc_array(machine, UINT8, length);
 
 	/* determine the hard end of the cache and reset */
@@ -696,7 +696,7 @@ static INT16 *find_or_add_to_sound_cache(device_t *device, int address, int leng
 		if (current->address == address && current->length == length && current->bits == bits && current->frequency == frequency)
 			return current->data;
 
-	return add_to_sound_cache(device, &device->machine().region("cvsd")->base()[address], address, length, bits, frequency);
+	return add_to_sound_cache(device, &device->machine().root_device().memregion("cvsd")->base()[address], address, length, bits, frequency);
 }
 
 

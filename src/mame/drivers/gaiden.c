@@ -1519,8 +1519,8 @@ static DRIVER_INIT( raiga )
 static void descramble_drgnbowl_gfx(running_machine &machine)
 {
 	int i;
-	UINT8 *ROM = machine.region("maincpu")->base();
-	size_t size = machine.region("maincpu")->bytes();
+	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
+	size_t size = machine.root_device().memregion("maincpu")->bytes();
 	UINT8 *buffer = auto_alloc_array(machine, UINT8, size);
 
 	memcpy(buffer, ROM, size);
@@ -1536,8 +1536,8 @@ static void descramble_drgnbowl_gfx(running_machine &machine)
 
 	auto_free(machine, buffer);
 
-	ROM = machine.region("gfx2")->base();
-	size = machine.region("gfx2")->bytes();
+	ROM = machine.root_device().memregion("gfx2")->base();
+	size = machine.root_device().memregion("gfx2")->bytes();
 	buffer = auto_alloc_array(machine, UINT8, size);
 
 	memcpy(buffer,ROM,size);
@@ -1607,8 +1607,8 @@ static void descramble_mastninj_gfx(running_machine &machine, UINT8* src)
 static DRIVER_INIT(mastninj)
 {
 	// rearrange the graphic roms into a format that MAME can decode
-	descramble_mastninj_gfx(machine, machine.region("gfx2")->base());
-	descramble_mastninj_gfx(machine, machine.region("gfx3")->base());
+	descramble_mastninj_gfx(machine, machine.root_device().memregion("gfx2")->base());
+	descramble_mastninj_gfx(machine, machine.root_device().memregion("gfx3")->base());
 	DRIVER_INIT_CALL(shadoww);
 }
 

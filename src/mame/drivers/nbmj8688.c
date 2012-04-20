@@ -67,8 +67,8 @@ static DRIVER_INIT( otonano )
 
 static DRIVER_INIT( mjcamera )
 {
-	UINT8 *rom = machine.region("voice")->base() + 0x20000;
-	UINT8 *prot = machine.region("user1")->base();
+	UINT8 *rom = machine.root_device().memregion("voice")->base() + 0x20000;
+	UINT8 *prot = machine.root_device().memregion("user1")->base();
 	int i;
 
 	/* this is one possible way to rearrange the protection ROM data to get the
@@ -87,7 +87,7 @@ static DRIVER_INIT( mjcamera )
 static DRIVER_INIT( kanatuen )
 {
 	/* uses the same protection data as mjcamer, but a different check */
-	UINT8 *rom = machine.region("voice")->base() + 0x30000;
+	UINT8 *rom = machine.root_device().memregion("voice")->base() + 0x30000;
 
 	rom[0x0004] = 0x09;
 	rom[0x0103] = 0x0e;
@@ -101,7 +101,7 @@ static DRIVER_INIT( kyuhito )
 {
 #if 1
 	/* uses the same protection data as ????, but a different check */
-	UINT8 *rom = machine.region("maincpu")->base();
+	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
 
 	rom[0x0149] = 0x00;
 	rom[0x014a] = 0x00;
@@ -113,8 +113,8 @@ static DRIVER_INIT( kyuhito )
 
 static DRIVER_INIT( idhimitu )
 {
-	UINT8 *rom = machine.region("voice")->base() + 0x20000;
-	UINT8 *prot = machine.region("user1")->base();
+	UINT8 *rom = machine.root_device().memregion("voice")->base() + 0x20000;
+	UINT8 *prot = machine.root_device().memregion("user1")->base();
 	int i;
 
 	/* this is one possible way to rearrange the protection ROM data to get the
@@ -138,8 +138,8 @@ static DRIVER_INIT( kaguya )
 
 static DRIVER_INIT( kaguya2 )
 {
-	UINT8 *rom = machine.region("voice")->base() + 0x20000;
-	UINT8 *prot = machine.region("user1")->base();
+	UINT8 *rom = machine.root_device().memregion("voice")->base() + 0x20000;
+	UINT8 *prot = machine.root_device().memregion("user1")->base();
 	int i;
 
 	/* this is one possible way to rearrange the protection ROM data to get the

@@ -951,7 +951,7 @@ void screen_device::finalize_burnin()
 	scaledvis.min_y = m_visarea.min_y * m_burnin.height() / m_height;
 	scaledvis.max_y = m_visarea.max_y * m_burnin.height() / m_height;
 
-	// wrap a bitmap around the subregion we care about
+	// wrap a bitmap around the memregion we care about
 	bitmap_argb32 finalmap(scaledvis.width(), scaledvis.height());
 	int srcwidth = m_burnin.width();
 	int srcheight = m_burnin.height();

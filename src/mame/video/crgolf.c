@@ -51,7 +51,7 @@ READ8_MEMBER(crgolf_state::crgolf_videoram_r)
 static void get_pens( running_machine &machine, pen_t *pens )
 {
 	offs_t offs;
-	const UINT8 *prom = machine.region("proms")->base();
+	const UINT8 *prom = machine.root_device().memregion("proms")->base();
 
 	for (offs = 0; offs < NUM_PENS; offs++)
 	{

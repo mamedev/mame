@@ -294,7 +294,7 @@ void laserdisc_device::static_set_overlay(device_t &device, UINT32 width, UINT32
 
 //-------------------------------------------------
 //  static_set_overlay - set the overlay visible
-//  subregion
+//  memregion
 //-------------------------------------------------
 
 void laserdisc_device::static_set_overlay_clip(device_t &device, INT32 minx, INT32 maxx, INT32 miny, INT32 maxy)

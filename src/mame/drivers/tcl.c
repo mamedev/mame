@@ -189,8 +189,8 @@ static DRIVER_INIT(tcl)
 	/* only the first part is decrypted (and verified)*/
 
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	UINT8 *dest = machine.region("maincpu")->base();
-	int len = machine.region("maincpu")->bytes();
+	UINT8 *dest = machine.root_device().memregion("maincpu")->base();
+	int len = machine.root_device().memregion("maincpu")->bytes();
 	UINT8 *src = auto_alloc_array(machine, UINT8, len);
 
 	int i,idx=0;

@@ -50,7 +50,7 @@ VIDEO_START( hexion )
 	state->m_bg_tilemap[1]->set_scrollx(0,-4);
 	state->m_bg_tilemap[1]->set_scrolly(0,4);
 
-	state->m_vram[0] = machine.region("maincpu")->base() + 0x30000;
+	state->m_vram[0] = state->memregion("maincpu")->base() + 0x30000;
 	state->m_vram[1] = state->m_vram[0] + 0x2000;
 	state->m_unkram = state->m_vram[1] + 0x2000;
 }
@@ -65,7 +65,7 @@ VIDEO_START( hexion )
 
 WRITE8_MEMBER(hexion_state::hexion_bankswitch_w)
 {
-	UINT8 *rom = machine().region("maincpu")->base() + 0x10000;
+	UINT8 *rom = memregion("maincpu")->base() + 0x10000;
 
 	/* bits 0-3 select ROM bank */
 	membank("bank1")->set_base(rom + 0x2000 * (data & 0x0f));
@@ -91,7 +91,7 @@ READ8_MEMBER(hexion_state::hexion_bankedram_r)
 {
 	if (m_gfxrom_select && offset < 0x1000)
 	{
-		return machine().region("gfx1")->base()[((m_gfxrom_select & 0x7f) << 12) + offset];
+		return memregion("gfx1")->base()[((m_gfxrom_select & 0x7f) << 12) + offset];
 	}
 	else if (m_bankctrl == 0)
 	{

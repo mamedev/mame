@@ -90,7 +90,7 @@ static void switch_palette(running_machine &machine)
 
 PALETTE_INIT( pacland )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	pacland_state *state = machine.driver_data<pacland_state>();
 	int i;
 
@@ -253,7 +253,7 @@ WRITE8_MEMBER(pacland_state::pacland_scroll1_w)
 WRITE8_MEMBER(pacland_state::pacland_bankswitch_w)
 {
 	int bankaddress;
-	UINT8 *RAM = machine().region("maincpu")->base();
+	UINT8 *RAM = memregion("maincpu")->base();
 
 	bankaddress = 0x10000 + ((data & 0x07) << 13);
 	membank("bank1")->set_base(&RAM[bankaddress]);

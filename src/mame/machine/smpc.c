@@ -189,12 +189,12 @@ static TIMER_CALLBACK( stv_bankswitch_state )
 
 	if(state->m_prev_bankswitch != param)
 	{
-		game_region = machine.region(banknames[param])->base();
+		game_region = machine.root_device().memregion(banknames[param])->base();
 
 		if (game_region)
-			memcpy(machine.region("abus")->base(), game_region, 0x3000000);
+			memcpy(machine.root_device().memregion("abus")->base(), game_region, 0x3000000);
 		else
-			memset(machine.region("abus")->base(), 0x00, 0x3000000);
+			memset(machine.root_device().memregion("abus")->base(), 0x00, 0x3000000);
 
 		state->m_prev_bankswitch = param;
 	}

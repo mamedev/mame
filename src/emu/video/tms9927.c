@@ -274,7 +274,7 @@ static DEVICE_START( tms9927 )
 		/* get the self-load PROM */
 		if (tms->intf->selfload_region != NULL)
 		{
-			tms->selfload = device->machine().region(tms->intf->selfload_region)->base();
+			tms->selfload = device->machine().root_device().memregion(tms->intf->selfload_region)->base();
 			assert(tms->selfload != NULL);
 		}
 	}

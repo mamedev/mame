@@ -224,7 +224,7 @@ static WRITE8_DEVICE_HANDLER( saiyugoub1_adpcm_control_w )
 	ddragon_state *state = device->machine().driver_data<ddragon_state>();
 
 	/* i8748 Port 2 write */
-	UINT8 *saiyugoub1_adpcm_rom = device->machine().region("adpcm")->base();
+	UINT8 *saiyugoub1_adpcm_rom = state->memregion("adpcm")->base();
 
 	if (data & 0x80)	/* Reset m5205 and disable ADPCM ROM outputs */
 	{
@@ -531,7 +531,7 @@ static MACHINE_START( chinagat )
 	state->m_snd_cpu = machine.device("audiocpu");
 
 	/* configure banks */
-	state->membank("bank1")->configure_entries(0, 8, machine.region("maincpu")->base() + 0x10000, 0x4000);
+	state->membank("bank1")->configure_entries(0, 8, state->memregion("maincpu")->base() + 0x10000, 0x4000);
 
 	/* register for save states */
 	state->save_item(NAME(state->m_scrollx_hi));
@@ -912,8 +912,8 @@ ROM_END
 static DRIVER_INIT( chinagat )
 {
 	ddragon_state *state = machine.driver_data<ddragon_state>();
-	UINT8 *MAIN = machine.region("maincpu")->base();
-	UINT8 *SUB = machine.region("sub")->base();
+	UINT8 *MAIN = machine.root_device().memregion("maincpu")->base();
+	UINT8 *SUB = state->memregion("sub")->base();
 
 	state->m_technos_video_hw = 1;
 	state->m_sprite_irq = M6809_IRQ_LINE;

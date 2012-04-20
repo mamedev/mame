@@ -199,7 +199,7 @@ static void svg_basic_init(running_machine &machine)
 
 static void pgm_create_dummy_internal_arm_region(running_machine &machine)
 {
-	UINT16 *temp16 = (UINT16 *)machine.region("prot")->base();
+	UINT16 *temp16 = (UINT16 *)machine.root_device().memregion("prot")->base();
 
 	// fill with RX 14
 	int i;

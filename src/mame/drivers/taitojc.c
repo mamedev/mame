@@ -919,7 +919,7 @@ ADDRESS_MAP_END
 
 READ16_MEMBER(taitojc_state::dsp_rom_r)
 {
-	UINT16 *rom = (UINT16*)machine().region("gfx2")->base();
+	UINT16 *rom = (UINT16*)machine().root_device().memregion("gfx2")->base();
 	UINT16 data = rom[m_dsp_rom_pos++];
 
 	//mame_printf_debug("dsp_rom_r:  %08X, %08X at %08X\n", offset, mem_mask, cpu_get_pc(&space.device()));

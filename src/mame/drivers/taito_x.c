@@ -412,7 +412,7 @@ static void reset_sound_region(running_machine &machine)
 {
 	taitox_state *state = machine.driver_data<taitox_state>();
 
-	state->membank("bank2")->set_base(machine.region("audiocpu")->base() + (state->m_banknum * 0x4000) + 0x10000 );
+	state->membank("bank2")->set_base(state->memregion("audiocpu")->base() + (state->m_banknum * 0x4000) + 0x10000 );
 }
 
 WRITE8_MEMBER(taitox_state::sound_bankswitch_w)

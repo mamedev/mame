@@ -877,8 +877,8 @@ static void namcos11_init_common(running_machine &machine, int n_daughterboard)
 
 	// init banks
 	int bank;
-	UINT32 len = machine.region( "user2" )->bytes();
-	UINT8 *rgn = machine.region( "user2" )->base();
+	UINT32 len = machine.root_device().memregion( "user2" )->bytes();
+	UINT8 *rgn = machine.root_device().memregion( "user2" )->base();
 
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x1f000000, 0x1f0fffff, "bank1" );
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x1f100000, 0x1f1fffff, "bank2" );

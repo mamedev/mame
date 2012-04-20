@@ -331,7 +331,7 @@ READ8_MEMBER(nycaptor_state::nycaptor_generic_control_r)
 WRITE8_MEMBER(nycaptor_state::nycaptor_generic_control_w)
 {
 	m_generic_control_reg = data;
-	membank("bank1")->set_base(machine().region("maincpu")->base() + 0x10000 + ((data&0x08)>>3)*0x4000 );
+	membank("bank1")->set_base(machine().root_device().memregion("maincpu")->base() + 0x10000 + ((data&0x08)>>3)*0x4000 );
 }
 
 static ADDRESS_MAP_START( nycaptor_master_map, AS_PROGRAM, 8, nycaptor_state )
@@ -436,7 +436,7 @@ WRITE8_MEMBER(nycaptor_state::cyclshtg_generic_control_w)
 	int bank = (data >> 2) & 3;
 
 	m_generic_control_reg = data;
-	membank("bank1")->set_base(machine().region("maincpu")->base() + 0x10000 + bank*0x4000 );
+	membank("bank1")->set_base(machine().root_device().memregion("maincpu")->base() + 0x10000 + bank*0x4000 );
 }
 
 
@@ -1354,7 +1354,7 @@ static DRIVER_INIT( bronx )
 {
 	nycaptor_state *state = machine.driver_data<nycaptor_state>();
 	int i;
-	UINT8 *rom = machine.region("maincpu")->base();
+	UINT8 *rom = state->memregion("maincpu")->base();
 
 	for (i = 0; i < 0x20000; i++)
 		rom[i] = BITSWAP8(rom[i], 0, 1, 2, 3, 4, 5, 6, 7);
@@ -1366,7 +1366,7 @@ static DRIVER_INIT( colt )
 {
 	nycaptor_state *state = machine.driver_data<nycaptor_state>();
 	int i;
-	UINT8 *rom = machine.region("maincpu")->base();
+	UINT8 *rom = state->memregion("maincpu")->base();
 
 	for (i = 0; i < 0x20000; i++)
 		rom[i] = BITSWAP8(rom[i], 0, 1, 2, 3, 4, 5, 6, 7);

@@ -400,7 +400,7 @@ static void count_7dig(unsigned long data, UINT8 index)
 
 static PALETTE_INIT( videopkr )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int j;
 
 	for (j = 0; j < machine.total_colors(); j++)
@@ -427,7 +427,7 @@ static PALETTE_INIT( videopkr )
 
 static PALETTE_INIT( babypkr )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int j;
 
 	for (j = 0; j < machine.total_colors(); j++)
@@ -458,7 +458,7 @@ static PALETTE_INIT( babypkr )
 
 static PALETTE_INIT( fortune1 )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int j;
 
 	for (j = 0; j < machine.total_colors(); j++)

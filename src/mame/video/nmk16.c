@@ -638,7 +638,7 @@ int nmk16_bg_sprflip_tx_update(screen_device &screen, bitmap_ind16 &bitmap, cons
 int nmk16_bioshipbg_sprflip_tx_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	nmk16_state *state = screen.machine().driver_data<nmk16_state>();
-	UINT16 *tilerom = (UINT16 *)screen.machine().region("gfx5")->base();
+	UINT16 *tilerom = (UINT16 *)state->memregion("gfx5")->base();
 	int scrollx=-(state->m_bioship_scroll[1] + state->m_bioship_scroll[0]*256);
 	int scrolly=-(state->m_bioship_scroll[3] + state->m_bioship_scroll[2]*256);
 

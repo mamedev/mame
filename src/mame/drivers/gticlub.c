@@ -1165,7 +1165,7 @@ static DRIVER_INIT(gticlub)
 
 	state->m_sharc_dataram_0 = auto_alloc_array(machine, UINT32, 0x100000/4);
 
-	K001005_preprocess_texture_data(machine.region("gfx1")->base(), machine.region("gfx1")->bytes(), 1);
+	K001005_preprocess_texture_data(machine.root_device().memregion("gfx1")->base(), state->memregion("gfx1")->bytes(), 1);
 }
 
 static DRIVER_INIT(hangplt)
@@ -1173,8 +1173,8 @@ static DRIVER_INIT(hangplt)
 	gticlub_state *state = machine.driver_data<gticlub_state>();
 
 	init_konami_cgboard(machine, 2, CGBOARD_TYPE_HANGPLT);
-	set_cgboard_texture_bank(machine, 0, "bank5", machine.region("user5")->base());
-	set_cgboard_texture_bank(machine, 1, "bank6", machine.region("user5")->base());
+	set_cgboard_texture_bank(machine, 0, "bank5", machine.root_device().memregion("user5")->base());
+	set_cgboard_texture_bank(machine, 1, "bank6", state->memregion("user5")->base());
 
 	state->m_sharc_dataram_0 = auto_alloc_array(machine, UINT32, 0x100000/4);
 	state->m_sharc_dataram_1 = auto_alloc_array(machine, UINT32, 0x100000/4);

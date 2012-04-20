@@ -177,7 +177,7 @@ static void appoooh_adpcm_int(device_t *device)
 	{
 		if (state->m_adpcm_data == 0xffffffff)
 		{
-			UINT8 *RAM = device->machine().region("adpcm")->base();
+			UINT8 *RAM = state->memregion("adpcm")->base();
 
 			state->m_adpcm_data = RAM[state->m_adpcm_address++];
 			msm5205_data_w(device, state->m_adpcm_data >> 4);
@@ -604,7 +604,7 @@ static DRIVER_INIT(robowres)
 static DRIVER_INIT(robowresb)
 {
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	space->set_decrypted_region(0x0000, 0x7fff, machine.region("maincpu")->base() + 0x1c000);
+	space->set_decrypted_region(0x0000, 0x7fff, machine.root_device().memregion("maincpu")->base() + 0x1c000);
 }
 
 

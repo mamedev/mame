@@ -219,8 +219,8 @@ WRITE16_MEMBER(igs017_state::spriteram_lsb_w)
 static void expand_sprites(running_machine &machine)
 {
 	igs017_state *state = machine.driver_data<igs017_state>();
-	UINT8 *rom	=	machine.region("sprites")->base();
-	int size	=	machine.region("sprites")->bytes();
+	UINT8 *rom	=	machine.root_device().memregion("sprites")->base();
+	int size	=	state->memregion("sprites")->bytes();
 	int i;
 
 	state->m_sprites_gfx_size	=	size / 2 * 3;
@@ -421,8 +421,8 @@ static SCREEN_UPDATE_IND16( igs017 )
 
 static void decrypt_program_rom(running_machine &machine, int mask, int a7, int a6, int a5, int a4, int a3, int a2, int a1, int a0)
 {
-	int length = machine.region("maincpu")->bytes();
-	UINT8 *rom = machine.region("maincpu")->base();
+	int length = machine.root_device().memregion("maincpu")->bytes();
+	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
 	UINT8 *tmp = auto_alloc_array(machine, UINT8, length);
 	int i;
 
@@ -474,7 +474,7 @@ static void decrypt_program_rom(running_machine &machine, int mask, int a7, int 
 
 static void iqblocka_patch_rom(running_machine &machine)
 {
-	UINT8 *rom = machine.region("maincpu")->base();
+	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
 
 //  rom[0x7b64] = 0xc9;
 
@@ -515,8 +515,8 @@ static DRIVER_INIT( iqblockf )
 
 static void tjsb_decrypt_sprites(running_machine &machine)
 {
-	int length = machine.region("sprites")->bytes();
-	UINT8 *rom = machine.region("sprites")->base();
+	int length = machine.root_device().memregion("sprites")->bytes();
+	UINT8 *rom = machine.root_device().memregion("sprites")->base();
 	UINT8 *tmp = auto_alloc_array(machine, UINT8, length);
 	int i, addr;
 
@@ -551,7 +551,7 @@ static DRIVER_INIT( tjsb )
 static void mgcs_decrypt_program_rom(running_machine &machine)
 {
 	int i;
-	UINT16 *src = (UINT16 *)machine.region("maincpu")->base();
+	UINT16 *src = (UINT16 *)machine.root_device().memregion("maincpu")->base();
 
 	int rom_size = 0x80000;
 
@@ -600,8 +600,8 @@ static void mgcs_decrypt_program_rom(running_machine &machine)
 
 static void mgcs_decrypt_tiles(running_machine &machine)
 {
-	int length = machine.region("tilemaps")->bytes();
-	UINT8 *rom = machine.region("tilemaps")->base();
+	int length = machine.root_device().memregion("tilemaps")->bytes();
+	UINT8 *rom = machine.root_device().memregion("tilemaps")->base();
 	UINT8 *tmp = auto_alloc_array(machine, UINT8, length);
 	int i;
 
@@ -617,8 +617,8 @@ static void mgcs_decrypt_tiles(running_machine &machine)
 
 static void mgcs_flip_sprites(running_machine &machine)
 {
-	int length = machine.region("sprites")->bytes();
-	UINT8 *rom = machine.region("sprites")->base();
+	int length = machine.root_device().memregion("sprites")->bytes();
+	UINT8 *rom = machine.root_device().memregion("sprites")->base();
 	int i;
 
 	for (i = 0;i < length;i+=2)
@@ -638,7 +638,7 @@ static void mgcs_flip_sprites(running_machine &machine)
 
 static void mgcs_patch_rom(running_machine &machine)
 {
-	UINT16 *rom = (UINT16 *)machine.region("maincpu")->base();
+	UINT16 *rom = (UINT16 *)machine.root_device().memregion("maincpu")->base();
 
 	rom[0x4e036/2] = 0x6006;
 
@@ -664,7 +664,7 @@ static DRIVER_INIT( mgcs )
 // decryption is incomplete, the first part of code doesn't seem right.
 static DRIVER_INIT( tarzan )
 {
-	UINT16 *ROM = (UINT16 *)machine.region("maincpu")->base();
+	UINT16 *ROM = (UINT16 *)machine.root_device().memregion("maincpu")->base();
 	int i;
 	int size = 0x40000;
 
@@ -690,7 +690,7 @@ static DRIVER_INIT( tarzan )
 // by iq_132
 static DRIVER_INIT( tarzana )
 {
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
 	int i;
 	int size = 0x80000;
 
@@ -763,7 +763,7 @@ static DRIVER_INIT( starzan )
 {
 	int size = 0x040000;
 
-	UINT8 *data = machine.region("maincpu")->base();
+	UINT8 *data = machine.root_device().memregion("maincpu")->base();
 	UINT8 *code = auto_alloc_array(machine, UINT8, size);
 	memcpy(code, data, size);
 
@@ -781,7 +781,7 @@ static DRIVER_INIT( starzan )
 static DRIVER_INIT( sdmg2 )
 {
 	int i;
-	UINT16 *src = (UINT16 *)machine.region("maincpu")->base();
+	UINT16 *src = (UINT16 *)machine.root_device().memregion("maincpu")->base();
 
 	int rom_size = 0x80000;
 
@@ -838,7 +838,7 @@ static DRIVER_INIT( sdmg2 )
 static DRIVER_INIT( mgdha )
 {
 	int i;
-	UINT16 *src = (UINT16 *)machine.region("maincpu")->base();
+	UINT16 *src = (UINT16 *)machine.root_device().memregion("maincpu")->base();
 
 	int rom_size = 0x80000;
 
@@ -873,7 +873,7 @@ static DRIVER_INIT( mgdh )
 {
 	DRIVER_INIT_CALL( mgdha );
 
-	UINT16 *rom = (UINT16 *)machine.region("maincpu")->base();
+	UINT16 *rom = (UINT16 *)machine.root_device().memregion("maincpu")->base();
 
 	// additional protection
 	rom[0x4ad50/2] = 0x4e71;
@@ -885,7 +885,7 @@ static DRIVER_INIT( mgdh )
 
 static void lhzb2_patch_rom(running_machine &machine)
 {
-	UINT16 *rom = (UINT16 *)machine.region("maincpu")->base();
+	UINT16 *rom = (UINT16 *)machine.root_device().memregion("maincpu")->base();
 
 	// Prot. checks:
 	rom[0x14786/2] = 0x6044;	// 014786: 6744    beq $147cc
@@ -896,8 +896,8 @@ static void lhzb2_patch_rom(running_machine &machine)
 
 static void lhzb2_decrypt_tiles(running_machine &machine)
 {
-	int length = machine.region("tilemaps")->bytes();
-	UINT8 *rom = machine.region("tilemaps")->base();
+	int length = machine.root_device().memregion("tilemaps")->bytes();
+	UINT8 *rom = machine.root_device().memregion("tilemaps")->base();
 	UINT8 *tmp = auto_alloc_array(machine, UINT8, length);
 	int i;
 
@@ -914,8 +914,8 @@ static void lhzb2_decrypt_tiles(running_machine &machine)
 
 static void lhzb2_decrypt_sprites(running_machine &machine)
 {
-	int length = machine.region("sprites")->bytes();
-	UINT8 *rom = machine.region("sprites")->base();
+	int length = machine.root_device().memregion("sprites")->bytes();
+	UINT8 *rom = machine.root_device().memregion("sprites")->base();
 	UINT8 *tmp = auto_alloc_array(machine, UINT8, length);
 	int i, addr;
 
@@ -940,7 +940,7 @@ static void lhzb2_decrypt_sprites(running_machine &machine)
 static DRIVER_INIT( lhzb2 )
 {
 	int i;
-	UINT16 *src = (UINT16 *) (machine.region("maincpu")->base());
+	UINT16 *src = (UINT16 *) (machine.root_device().memregion("maincpu")->base());
 
 	int rom_size = 0x80000;
 
@@ -1033,7 +1033,7 @@ static DRIVER_INIT( lhzb2 )
 
 static void lhzb2a_patch_rom(running_machine &machine)
 {
-	UINT16 *rom = (UINT16 *)machine.region("maincpu")->base();
+	UINT16 *rom = (UINT16 *)machine.root_device().memregion("maincpu")->base();
 
 	// Prot. checks:
 	rom[0x09c52/2] = 0x6026;	// 009C52: 6726    beq $9c7a
@@ -1049,7 +1049,7 @@ static void lhzb2a_patch_rom(running_machine &machine)
 static DRIVER_INIT( lhzb2a )
 {
 	int i;
-	UINT16 *src = (UINT16 *) (machine.region("maincpu")->base());
+	UINT16 *src = (UINT16 *) (machine.root_device().memregion("maincpu")->base());
 
 	int rom_size = 0x80000;
 
@@ -1114,7 +1114,7 @@ static DRIVER_INIT( lhzb2a )
 
 static void slqz2_patch_rom(running_machine &machine)
 {
-	UINT16 *rom = (UINT16 *)machine.region("maincpu")->base();
+	UINT16 *rom = (UINT16 *)machine.root_device().memregion("maincpu")->base();
 
 	// Prot. checks:
 	rom[0x1489c/2] = 0x6044;	// 01489C: 6744    beq $148e2
@@ -1125,8 +1125,8 @@ static void slqz2_patch_rom(running_machine &machine)
 
 static void slqz2_decrypt_tiles(running_machine &machine)
 {
-	int length = machine.region("tilemaps")->bytes();
-	UINT8 *rom = machine.region("tilemaps")->base();
+	int length = machine.root_device().memregion("tilemaps")->bytes();
+	UINT8 *rom = machine.root_device().memregion("tilemaps")->base();
 	UINT8 *tmp = auto_alloc_array(machine, UINT8, length);
 	int i;
 
@@ -1143,7 +1143,7 @@ static void slqz2_decrypt_tiles(running_machine &machine)
 static DRIVER_INIT( slqz2 )
 {
 	int i;
-	UINT16 *src = (UINT16 *) (machine.region("maincpu")->base());
+	UINT16 *src = (UINT16 *) (machine.root_device().memregion("maincpu")->base());
 
 	int rom_size = 0x80000;
 

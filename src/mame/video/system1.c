@@ -291,7 +291,7 @@ WRITE8_DEVICE_HANDLER( system1_videoram_bank_w )
 
 WRITE8_MEMBER(system1_state::system1_paletteram_w)
 {
-	const UINT8 *color_prom = machine().region("palette")->base();
+	const UINT8 *color_prom = memregion("palette")->base();
 	int val,r,g,b;
 
 	/*
@@ -363,8 +363,8 @@ WRITE8_MEMBER(system1_state::system1_paletteram_w)
 static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int xoffset)
 {
 	system1_state *state = machine.driver_data<system1_state>();
-	UINT32 gfxbanks = machine.region("sprites")->bytes() / 0x8000;
-	const UINT8 *gfxbase = machine.region("sprites")->base();
+	UINT32 gfxbanks = machine.root_device().memregion("sprites")->bytes() / 0x8000;
+	const UINT8 *gfxbase = state->memregion("sprites")->base();
 	UINT8 *spriteram = state->m_spriteram;
 	int flipscreen = state->flip_screen();
 	int spritenum;
@@ -493,7 +493,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 static void video_update_common(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind16 &fgpixmap, bitmap_ind16 **bgpixmaps, const int *bgrowscroll, int bgyscroll, int spritexoffs)
 {
 	system1_state *state = screen.machine().driver_data<system1_state>();
-	const UINT8 *lookup = screen.machine().region("proms")->base();
+	const UINT8 *lookup = state->memregion("proms")->base();
 	int x, y;
 
 	/* first clear the sprite bitmap and draw sprites within this area */

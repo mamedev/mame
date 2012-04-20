@@ -404,7 +404,7 @@ ROM_END
 
 static DRIVER_INIT( jailbrek )
 {
-	UINT8 *SPEECH_ROM = machine.region("vlm")->base();
+	UINT8 *SPEECH_ROM = machine.root_device().memregion("vlm")->base();
 	int ind;
 
     /*
@@ -416,7 +416,7 @@ static DRIVER_INIT( jailbrek )
        represents address line A13.)
     */
 
-    if (machine.region("vlm")->bytes() == 0x4000)
+    if (machine.root_device().memregion("vlm")->bytes() == 0x4000)
     {
         for (ind = 0; ind < 0x2000; ++ind)
         {

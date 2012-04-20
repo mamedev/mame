@@ -43,7 +43,7 @@ WRITE16_MEMBER(blmbycar_state::blmbycar_okibank_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		UINT8 *RAM = machine().region("oki")->base();
+		UINT8 *RAM = memregion("oki")->base();
 		memcpy(&RAM[0x30000], &RAM[0x40000 + 0x10000 * (data & 0xf)], 0x10000);
 	}
 }
@@ -521,8 +521,8 @@ ROM_END
 
 static DRIVER_INIT( blmbycar )
 {
-	UINT16 *RAM  = (UINT16 *) machine.region("maincpu")->base();
-	size_t size = machine.region("maincpu")->bytes() / 2;
+	UINT16 *RAM  = (UINT16 *) machine.root_device().memregion("maincpu")->base();
+	size_t size = machine.root_device().memregion("maincpu")->bytes() / 2;
 	int i;
 
 	for (i = 0; i < size; i++)

@@ -130,7 +130,7 @@ public:
 
 static PALETTE_INIT( mirax )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 
 	for (i = 0;i < machine.total_colors();i++)
@@ -535,8 +535,8 @@ ROM_END
 static DRIVER_INIT( mirax )
 {
 	mirax_state *state = machine.driver_data<mirax_state>();
-	UINT8 *DATA = machine.region("data_code")->base();
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *DATA = machine.root_device().memregion("data_code")->base();
+	UINT8 *ROM = state->memregion("maincpu")->base();
 	int i;
 
 	for(i=0x0000;i<0x4000;i++)

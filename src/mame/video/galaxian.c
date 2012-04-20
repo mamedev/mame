@@ -255,7 +255,7 @@ static void bullets_draw(running_machine &machine, bitmap_rgb32 &bitmap, const r
 
 PALETTE_INIT( galaxian )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	galaxian_state *state = machine.driver_data<galaxian_state>();
 	static const int rgb_resistances[3] = { 1000, 470, 220 };
 	double rweights[3], gweights[3], bweights[2];
@@ -294,7 +294,7 @@ PALETTE_INIT( galaxian )
 			2, &rgb_resistances[1], bweights, 470, 0);
 
 	/* decode the palette first */
-	len = machine.region("proms")->bytes();
+	len = machine.root_device().memregion("proms")->bytes();
 	for (i = 0; i < len; i++)
 	{
 		UINT8 bit0, bit1, bit2, r, g, b;
@@ -1077,7 +1077,7 @@ static int flip_and_clip(rectangle &draw, int xstart, int xend, const rectangle 
 void amidar_draw_background(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	galaxian_state *state = machine.driver_data<galaxian_state>();
-	const UINT8 *prom = machine.region("user1")->base();
+	const UINT8 *prom = state->memregion("user1")->base();
 	rectangle draw;
 	int x;
 

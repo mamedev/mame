@@ -101,7 +101,7 @@ VIDEO_START( gradius3 )
 
 READ16_MEMBER(gradius3_state::gradius3_gfxrom_r)
 {
-	UINT8 *gfxdata = machine().region("gfx2")->base();
+	UINT8 *gfxdata = memregion("gfx2")->base();
 
 	return (gfxdata[2 * offset + 1] << 8) | gfxdata[2 * offset];
 }

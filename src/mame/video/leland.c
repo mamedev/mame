@@ -392,9 +392,9 @@ static SCREEN_UPDATE_IND16( leland )
 	leland_state *state = screen.machine().driver_data<leland_state>();
 	int y;
 
-	const UINT8 *bg_prom = screen.machine().region("user1")->base();
-	const UINT8 *bg_gfx = screen.machine().region("gfx1")->base();
-	offs_t bg_gfx_bank_page_size = screen.machine().region("gfx1")->bytes() / 3;
+	const UINT8 *bg_prom = screen.machine().root_device().memregion("user1")->base();
+	const UINT8 *bg_gfx = screen.machine().root_device().memregion("gfx1")->base();
+	offs_t bg_gfx_bank_page_size = state->memregion("gfx1")->bytes() / 3;
 	offs_t char_bank = (((state->m_gfxbank >> 4) & 0x03) * 0x2000) & (bg_gfx_bank_page_size - 1);
 	offs_t prom_bank = ((state->m_gfxbank >> 3) & 0x01) * 0x2000;
 
@@ -461,8 +461,8 @@ static SCREEN_UPDATE_IND16( ataxx )
 	leland_state *state = screen.machine().driver_data<leland_state>();
 	int y;
 
-	const UINT8 *bg_gfx = screen.machine().region("gfx1")->base();
-	offs_t bg_gfx_bank_page_size = screen.machine().region("gfx1")->bytes() / 6;
+	const UINT8 *bg_gfx = screen.machine().root_device().memregion("gfx1")->base();
+	offs_t bg_gfx_bank_page_size = state->memregion("gfx1")->bytes() / 6;
 	offs_t bg_gfx_offs_mask = bg_gfx_bank_page_size - 1;
 
 	/* for each scanline in the visible region */

@@ -872,7 +872,7 @@ ROM_END
 static DRIVER_INIT( colorama )
 {
 	UINT16 *ROM;
-	ROM = (UINT16 *)machine.region("maincpu")->base();
+	ROM = (UINT16 *)machine.root_device().memregion("maincpu")->base();
 
 	// rte in non-irq routines? wtf? patch them to rts...
 	ROM[0x02B476/2] = 0x5470;
@@ -889,7 +889,7 @@ static DRIVER_INIT( colorama )
 static DRIVER_INIT( cmrltv75 )
 {
 	UINT16 *ROM;
-	ROM = (UINT16 *)machine.region("maincpu")->base();
+	ROM = (UINT16 *)machine.root_device().memregion("maincpu")->base();
 
 	// rte in non-irq routines? wtf? patch them to rts...
 	ROM[0x056fd6/2] = 0x5470;

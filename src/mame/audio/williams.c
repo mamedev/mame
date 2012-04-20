@@ -302,7 +302,7 @@ machine_config_constructor williams_cvsd_sound_device::device_mconfig_additions(
 void williams_cvsd_sound_device::device_start()
 {
 	// configure master CPU banks
-	UINT8 *rom = subregion("cpu")->base();
+	UINT8 *rom = memregion("cpu")->base();
 	for (int bank = 0; bank < 16; bank++)
 	{
 		//
@@ -650,7 +650,7 @@ machine_config_constructor williams_narc_sound_device::device_mconfig_additions(
 void williams_narc_sound_device::device_start()
 {
 	// configure master CPU banks
-	UINT8 *rom = subregion("cpu0")->base();
+	UINT8 *rom = memregion("cpu0")->base();
 	for (int bank = 0; bank < 16; bank++)
 	{
 		//
@@ -664,7 +664,7 @@ void williams_narc_sound_device::device_start()
 	membank("masterupper")->set_base(&rom[0x10000 + 0x4000 + 0x8000 + 0x10000 + 0x20000 * 3]);
 
 	// configure slave CPU banks
-	rom = subregion("cpu1")->base();
+	rom = memregion("cpu1")->base();
 	for (int bank = 0; bank < 16; bank++)
 	{
 		//
@@ -929,12 +929,12 @@ machine_config_constructor williams_adpcm_sound_device::device_mconfig_additions
 void williams_adpcm_sound_device::device_start()
 {
 	// configure banks
-	UINT8 *rom = subregion("cpu")->base();
+	UINT8 *rom = memregion("cpu")->base();
 	membank("rombank")->configure_entries(0, 8, &rom[0x10000], 0x8000);
 	membank("romupper")->set_base(&rom[0x10000 + 0x4000 + 7 * 0x8000]);
 
 	// expand ADPCM data
-	rom = subregion("oki")->base();
+	rom = memregion("oki")->base();
 	// it is assumed that U12 is loaded @ 0x00000 and U13 is loaded @ 0x40000
 	membank("okibank")->configure_entry(0, &rom[0x40000]);
 	membank("okibank")->configure_entry(1, &rom[0x40000]);

@@ -7388,7 +7388,7 @@ ROM_END
 
 static DRIVER_INIT( atomiswave )
 {
-	UINT64 *ROM = (UINT64 *)machine.region("awflash")->base();
+	UINT64 *ROM = (UINT64 *)machine.root_device().memregion("awflash")->base();
 
 	// patch out long startup delay
 	ROM[0x98e/8] = (ROM[0x98e/8] & U64(0xffffffffffff)) | (UINT64)0x0009<<48;

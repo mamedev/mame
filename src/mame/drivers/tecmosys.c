@@ -333,7 +333,7 @@ WRITE8_MEMBER(tecmosys_state::tecmosys_oki_bank_w)
 {
 	UINT8 upperbank = (data & 0x30) >> 4;
 	UINT8 lowerbank = (data & 0x03) >> 0;
-	UINT8* region = machine().region("oki")->base();
+	UINT8* region = memregion("oki")->base();
 
 	memcpy( region+0x00000, region+0x80000 + lowerbank * 0x20000, 0x20000  );
 	memcpy( region+0x20000, region+0x80000 + upperbank * 0x20000, 0x20000  );
@@ -448,7 +448,7 @@ static const ymf262_interface tecmosys_ymf262_interface =
 static MACHINE_START( tecmosys )
 {
 //  tecmosys_state *state = machine.driver_data<tecmosys_state>();
-	machine.root_device().membank("bank1")->configure_entries(0, 16, machine.region("audiocpu")->base(), 0x4000);
+	machine.root_device().membank("bank1")->configure_entries(0, 16, machine.root_device().memregion("audiocpu")->base(), 0x4000);
 }
 
 static MACHINE_CONFIG_START( deroon, tecmosys_state )
@@ -631,8 +631,8 @@ ROM_END
 
 static void tecmosys_descramble(running_machine &machine)
 {
-	UINT8 *gfxsrc  = machine.region( "gfx1" )->base();
-	size_t srcsize = machine.region( "gfx1" )->bytes();
+	UINT8 *gfxsrc  = machine.root_device().memregion( "gfx1" )->base();
+	size_t srcsize = machine.root_device().memregion( "gfx1" )->bytes();
 	int i;
 
 	for (i=0; i < srcsize; i+=4)

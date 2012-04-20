@@ -10,8 +10,8 @@
 #include "includes/exedexes.h"
 
 
-#define TileMap(offs) (machine.region("gfx5")->base()[offs])
-#define BackTileMap(offs) (machine.region("gfx5")->base()[offs+0x4000])
+#define TileMap(offs) (machine.root_device().memregion("gfx5")->base()[offs])
+#define BackTileMap(offs) (machine.root_device().memregion("gfx5")->base()[offs+0x4000])
 
 
 /***************************************************************************
@@ -33,7 +33,7 @@
 
 PALETTE_INIT( exedexes )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 
 	/* allocate the colortable */
@@ -129,7 +129,7 @@ WRITE8_MEMBER(exedexes_state::exedexes_gfxctrl_w)
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	UINT8 *tilerom = machine.region("gfx5")->base();
+	UINT8 *tilerom = machine.root_device().memregion("gfx5")->base();
 
 	int attr = tilerom[tile_index];
 	int code = attr & 0x3f;
@@ -141,7 +141,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	int code = machine.region("gfx5")->base()[tile_index];
+	int code = machine.root_device().memregion("gfx5")->base()[tile_index];
 
 	SET_TILE_INFO(2, code, 0, 0);
 }

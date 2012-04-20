@@ -3070,14 +3070,14 @@ static DRIVER_INIT(ss23)
 {
 	namcos23_state *state = machine.driver_data<namcos23_state>();
 	render_t &render = state->m_render;
-	state->m_ptrom  = (const UINT32 *)machine.region("pointrom")->base();
-	state->m_tmlrom = (const UINT16 *)machine.region("textilemapl")->base();
-	state->m_tmhrom = machine.region("textilemaph")->base();
-	state->m_texrom = machine.region("textile")->base();
+	state->m_ptrom  = (const UINT32 *)machine.root_device().memregion("pointrom")->base();
+	state->m_tmlrom = (const UINT16 *)machine.root_device().memregion("textilemapl")->base();
+	state->m_tmhrom = machine.root_device().memregion("textilemaph")->base();
+	state->m_texrom = machine.root_device().memregion("textile")->base();
 
-	state->m_tileid_mask = (machine.region("textilemapl")->bytes()/2 - 1) & ~0xff; // Used for y masking
-	state->m_tile_mask = machine.region("textile")->bytes()/256 - 1;
-	state->m_ptrom_limit = machine.region("pointrom")->bytes()/4;
+	state->m_tileid_mask = (machine.root_device().memregion("textilemapl")->bytes()/2 - 1) & ~0xff; // Used for y masking
+	state->m_tile_mask = machine.root_device().memregion("textile")->bytes()/256 - 1;
+	state->m_ptrom_limit = state->memregion("pointrom")->bytes()/4;
 
 	state->m_mi_rd = state->m_mi_wr = state->m_im_rd = state->m_im_wr = 0;
 	state->m_jvssense = 1;

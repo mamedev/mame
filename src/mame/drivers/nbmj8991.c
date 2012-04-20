@@ -70,7 +70,7 @@ static MACHINE_RESET( nbmj8991 )
 	device_t *audiocpu = machine.device("audiocpu");
 	if (audiocpu != NULL && audiocpu->type() == Z80)
 	{
-		machine.root_device().membank("bank1")->configure_entries(0, 4, machine.region("audiocpu")->base() + 0x8000, 0x8000);
+		machine.root_device().membank("bank1")->configure_entries(0, 4, machine.root_device().memregion("audiocpu")->base() + 0x8000, 0x8000);
 		machine.root_device().membank("bank1")->set_entry(0);
 	}
 	MACHINE_RESET_CALL(nb1413m3);
@@ -108,7 +108,7 @@ static DRIVER_INIT( vanilla )
 
 static DRIVER_INIT( finalbny )
 {
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
 	int i;
 
 	for (i = 0xf800; i < 0x10000; i++) ROM[i] = 0x00;
@@ -134,7 +134,7 @@ static DRIVER_INIT( hyouban )
 static DRIVER_INIT( galkaika )
 {
 #if 1
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
 
 	// Patch to IM2 -> IM1
 	ROM[0x0002] = 0x56;
@@ -145,7 +145,7 @@ static DRIVER_INIT( galkaika )
 static DRIVER_INIT( tokyogal )
 {
 #if 1
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
 
 	// Patch to IM2 -> IM1
 	ROM[0x0002] = 0x56;
@@ -156,7 +156,7 @@ static DRIVER_INIT( tokyogal )
 static DRIVER_INIT( tokimbsj )
 {
 #if 1
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
 
 	// Patch to IM2 -> IM1
 	ROM[0x0002] = 0x56;

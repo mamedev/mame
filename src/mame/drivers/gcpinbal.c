@@ -214,7 +214,7 @@ static void gcp_adpcm_int( device_t *device )
 	}
 	else
 	{
-		UINT8 *ROM = device->machine().region("msm")->base();
+		UINT8 *ROM = device->machine().root_device().memregion("msm")->base();
 
 		state->m_adpcm_data = ((state->m_adpcm_trigger ? (ROM[state->m_adpcm_start] & 0x0f) : (ROM[state->m_adpcm_start] & 0xf0) >> 4));
 		msm5205_data_w(device, state->m_adpcm_data & 0xf);

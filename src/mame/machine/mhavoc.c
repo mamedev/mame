@@ -89,7 +89,7 @@ MACHINE_RESET( mhavoc )
 
 	state->membank("bank1")->configure_entry(0, state->m_zram0);
 	state->membank("bank1")->configure_entry(1, state->m_zram1);
-	state->membank("bank2")->configure_entries(0, 4, machine.region("alpha")->base() + 0x10000, 0x2000);
+	state->membank("bank2")->configure_entries(0, 4, state->memregion("alpha")->base() + 0x10000, 0x2000);
 
 	/* reset RAM/ROM banks to 0 */
 	state->mhavoc_ram_banksel_w(*space, 0, 0);

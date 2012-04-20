@@ -294,7 +294,7 @@ static UINT32 update_screen(screen_device &screen, bitmap_ind16 &bitmap, const r
 	/* non-tile based spriteram (BARE-BONES, looks pretty complex) */
 	if(1)
 	{
-		const UINT8 *blit_ram = screen.machine().region("spr_gfx")->base();
+		const UINT8 *blit_ram = screen.machine().root_device().memregion("spr_gfx")->base();
 		int offs,x,y,z,xsize,ysize,yi,xi,col_bank,fx,zoom;
 		UINT32 spr_offs,spr_offs_helper;
 		int xf,yf,xz,yz;
@@ -426,7 +426,7 @@ static UINT32 update_screen(screen_device &screen, bitmap_ind16 &bitmap, const r
 		if(0) //sprite gfx debug viewer
 		{
 			int x,y,count;
-			const UINT8 *blit_ram = screen.machine().region("spr_gfx")->base();
+			const UINT8 *blit_ram = screen.machine().root_device().memregion("spr_gfx")->base();
 
 			if(screen.machine().input().code_pressed(KEYCODE_Z))
 			state->m_test_x++;
@@ -1014,7 +1014,7 @@ DRIVER_INIT( cybertnk )
     UINT8* road_data;
     int i;
 
-    road_data = machine.region("road_data")->base();
+    road_data = machine.root_device().memregion("road_data")->base();
     for (i=0;i < 0x40000;i++)
     {
         road_data[i] = BITSWAP8(road_data[i],3,2,1,0,7,6,5,4);

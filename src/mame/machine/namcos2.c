@@ -154,7 +154,7 @@ READ16_HANDLER( namcos2_68k_eeprom_r ){
 /* 68000 Shared memory area - Data ROM area                  */
 /*************************************************************/
 READ16_HANDLER( namcos2_68k_data_rom_r ){
-	UINT16 *ROM = (UINT16 *)space->machine().region("user1")->base();
+	UINT16 *ROM = (UINT16 *)space->machine().root_device().memregion("user1")->base();
 	return ROM[offset];
 }
 
@@ -709,8 +709,8 @@ INTERRUPT_GEN( namcos2_68k_gpu_vblank )
 
 WRITE8_HANDLER( namcos2_sound_bankselect_w )
 {
-	UINT8 *RAM=space->machine().region("audiocpu")->base();
-	UINT32 max = (space->machine().region("audiocpu")->bytes() - 0x10000) / 0x4000;
+	UINT8 *RAM=space->machine().root_device().memregion("audiocpu")->base();
+	UINT32 max = (space->machine().root_device().memregion("audiocpu")->bytes() - 0x10000) / 0x4000;
 	int bank = ( data >> 4 ) % max;	/* 991104.CAB */
 	space->machine().root_device().membank(BANKED_SOUND_ROM)->set_base(&RAM[ 0x10000 + ( 0x4000 * bank ) ] );
 }

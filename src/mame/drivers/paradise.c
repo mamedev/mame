@@ -47,7 +47,7 @@ penky: we need to delay the irqs at startup or it won't boot. Either one of
 WRITE8_MEMBER(paradise_state::paradise_rombank_w)
 {
 	int bank = data;
-	int bank_n = machine().region("maincpu")->bytes() / 0x4000 - 1;
+	int bank_n = memregion("maincpu")->bytes() / 0x4000 - 1;
 
 	if (bank >= bank_n)
 	{
@@ -629,8 +629,8 @@ GFXDECODE_END
 static MACHINE_START( paradise )
 {
 	paradise_state *state = machine.driver_data<paradise_state>();
-	int bank_n = machine.region("maincpu")->bytes() / 0x4000 - 1;
-	UINT8 *ROM = machine.region("maincpu")->base();
+	int bank_n = machine.root_device().memregion("maincpu")->bytes() / 0x4000 - 1;
+	UINT8 *ROM = state->memregion("maincpu")->base();
 
 	state->membank("bank1")->configure_entries(0, 3, &ROM[0x00000], 0x4000);
 	state->membank("bank1")->configure_entries(3, bank_n - 3, &ROM[0x10000], 0x4000);

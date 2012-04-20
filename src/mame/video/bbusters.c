@@ -203,7 +203,7 @@ static void bbusters_draw_block(running_machine &machine, bitmap_ind16 &dest,int
 static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const UINT16 *source, int bank, int colval, int colmask)
 {
 	bbusters_state *state = machine.driver_data<bbusters_state>();
-	const UINT8 *scale_table=machine.region("user1")->base();
+	const UINT8 *scale_table=state->memregion("user1")->base();
 	int offs;
 
 	for (offs = 0;offs <0x800 ;offs += 4) {

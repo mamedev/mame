@@ -130,8 +130,8 @@ static void copy_pixel( running_machine &machine, int x, int y, int pen )
 
 WRITE8_MEMBER(hnayayoi_state::dynax_blitter_rev1_start_w)
 {
-	UINT8 *rom = machine().region("gfx1")->base();
-	int romlen = machine().region("gfx1")->bytes();
+	UINT8 *rom = memregion("gfx1")->base();
+	int romlen = memregion("gfx1")->bytes();
 	int sx = m_blit_dest & 0xff;
 	int sy = m_blit_dest >> 8;
 	int x, y;

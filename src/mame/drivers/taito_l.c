@@ -173,7 +173,7 @@ static void machine_reset(running_machine &machine)
 	}
 
 	state->m_cur_rombank = state->m_cur_rombank2 = 0;
-	state->membank("bank1")->set_base(machine.region("maincpu")->base() + 0x10000);
+	state->membank("bank1")->set_base(machine.root_device().memregion("maincpu")->base() + 0x10000);
 
 	gfx_element_set_source(machine.gfx[2], state->m_rambanks);
 
@@ -377,7 +377,7 @@ WRITE8_MEMBER(taitol_state::rombankswitch_w)
 
 		//logerror("robs %d, %02x (%04x)\n", offset, data, cpu_get_pc(&space.device()));
 		m_cur_rombank = data;
-		membank("bank1")->set_base(machine().region("maincpu")->base() + 0x10000 + 0x2000 * m_cur_rombank);
+		membank("bank1")->set_base(machine().root_device().memregion("maincpu")->base() + 0x10000 + 0x2000 * m_cur_rombank);
 	}
 }
 
@@ -397,7 +397,7 @@ WRITE8_MEMBER(taitol_state::rombank2switch_w)
 		//logerror("robs2 %02x (%04x)\n", data, cpu_get_pc(&space.device()));
 
 		m_cur_rombank2 = data;
-		membank("bank6")->set_base(machine().region("slave")->base() + 0x10000 + 0x4000 * m_cur_rombank2);
+		membank("bank6")->set_base(machine().root_device().memregion("slave")->base() + 0x10000 + 0x4000 * m_cur_rombank2);
 	}
 }
 
@@ -596,7 +596,7 @@ static void champwr_msm5205_vck( device_t *device )
 	}
 	else
 	{
-		state->m_adpcm_data = device->machine().region("adpcm")->base()[state->m_adpcm_pos];
+		state->m_adpcm_data = device->machine().root_device().memregion("adpcm")->base()[state->m_adpcm_pos];
 		state->m_adpcm_pos = (state->m_adpcm_pos + 1) & 0x1ffff;
 		msm5205_data_w(device, state->m_adpcm_data >> 4);
 	}
@@ -740,7 +740,7 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(taitol_state::sound_bankswitch_w)
 {
-	UINT8 *RAM = machine().region("audiocpu")->base();
+	UINT8 *RAM = memregion("audiocpu")->base();
 	int banknum = (data - 1) & 3;
 
 	membank ("bank7")->set_base (&RAM [0x10000 + (banknum * 0x4000)]);
@@ -1784,7 +1784,7 @@ static WRITE8_DEVICE_HANDLER( portA_w )
 	if (state->m_cur_bank != (data & 0x03))
 	{
 		int bankaddress;
-		UINT8 *RAM = device->machine().region("audiocpu")->base();
+		UINT8 *RAM = state->memregion("audiocpu")->base();
 
 		state->m_cur_bank = data & 0x03;
 		bankaddress = 0x10000 + (state->m_cur_bank - 1) * 0x4000;
@@ -2722,7 +2722,7 @@ static DRIVER_INIT( plottinga )
 				v |= 1 << (7 - j);
 		tab[i] = v;
 	}
-	p = machine.region("maincpu")->base();
+	p = machine.root_device().memregion("maincpu")->base();
 	for (i = 0; i < 0x20000; i++)
 	{
 		*p = tab[*p];

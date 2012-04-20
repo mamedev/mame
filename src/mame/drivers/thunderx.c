@@ -315,7 +315,7 @@ WRITE8_MEMBER(thunderx_state::thunderx_1f98_w)
 
 WRITE8_MEMBER(thunderx_state::scontra_bankswitch_w)
 {
-	UINT8 *RAM = machine().region("maincpu")->base();
+	UINT8 *RAM = memregion("maincpu")->base();
 	int offs;
 
 //logerror("%04x: bank switch %02x\n",cpu_get_pc(&space.device()),data);
@@ -624,7 +624,7 @@ static MACHINE_START( scontra )
 static MACHINE_START( thunderx )
 {
 	thunderx_state *state = machine.driver_data<thunderx_state>();
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = state->memregion("maincpu")->base();
 
 	state->membank("bank1")->configure_entries(0, 12, &ROM[0x10000], 0x2000);
 	state->membank("bank1")->configure_entries(12, 4, &ROM[0x08000], 0x2000);

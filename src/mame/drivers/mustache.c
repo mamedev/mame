@@ -252,10 +252,10 @@ static DRIVER_INIT( mustache )
 {
 	int i;
 
-	int G1 = machine.region("gfx1")->bytes()/3;
-	int G2 = machine.region("gfx2")->bytes()/2;
-	UINT8 *gfx1 = machine.region("gfx1")->base();
-	UINT8 *gfx2 = machine.region("gfx2")->base();
+	int G1 = machine.root_device().memregion("gfx1")->bytes()/3;
+	int G2 = machine.root_device().memregion("gfx2")->bytes()/2;
+	UINT8 *gfx1 = machine.root_device().memregion("gfx1")->base();
+	UINT8 *gfx2 = machine.root_device().memregion("gfx2")->base();
 	UINT8 *buf=auto_alloc_array(machine, UINT8, G2*2);
 
 	/* BG data lines */

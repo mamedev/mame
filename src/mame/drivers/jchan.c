@@ -394,8 +394,8 @@ static SCREEN_UPDATE_IND16(jchan)
 	state->m_sprite_bitmap_1->fill(0x0000, cliprect);
 	state->m_sprite_bitmap_2->fill(0x0000, cliprect);
 
-	state->m_spritegen1->skns_draw_sprites(screen.machine(), *state->m_sprite_bitmap_1, cliprect, state->m_sprite_ram32_1, 0x4000, screen.machine().region("gfx1")->base(), screen.machine().region ("gfx1")->bytes(), state->m_sprite_regs32_1 );
-	state->m_spritegen2->skns_draw_sprites(screen.machine(), *state->m_sprite_bitmap_2, cliprect, state->m_sprite_ram32_2, 0x4000, screen.machine().region("gfx2")->base(), screen.machine().region ("gfx2")->bytes(), state->m_sprite_regs32_2 );
+	state->m_spritegen1->skns_draw_sprites(screen.machine(), *state->m_sprite_bitmap_1, cliprect, state->m_sprite_ram32_1, 0x4000, screen.machine().root_device().memregion("gfx1")->base(), screen.machine().root_device().memregion ("gfx1")->bytes(), state->m_sprite_regs32_1 );
+	state->m_spritegen2->skns_draw_sprites(screen.machine(), *state->m_sprite_bitmap_2, cliprect, state->m_sprite_ram32_2, 0x4000, screen.machine().root_device().memregion("gfx2")->base(), state->memregion ("gfx2")->bytes(), state->m_sprite_regs32_2 );
 
 	// ignoring priority bits for now - might use alpha too, check 0x8000 of palette writes
 	for (y=0;y<240;y++)

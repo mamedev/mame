@@ -64,7 +64,7 @@ Notes:
 
 WRITE8_MEMBER(sprcros2_state::sprcros2_m_port7_w)
 {
-	UINT8 *RAM = machine().region("master")->base();
+	UINT8 *RAM = memregion("master")->base();
 
 	//76543210
 	//x------- unused
@@ -85,7 +85,7 @@ WRITE8_MEMBER(sprcros2_state::sprcros2_m_port7_w)
 
 WRITE8_MEMBER(sprcros2_state::sprcros2_s_port3_w)
 {
-	UINT8 *RAM = machine().region("slave")->base();
+	UINT8 *RAM = memregion("slave")->base();
 
 	//76543210
 	//xxxx---- unused

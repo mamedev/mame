@@ -14,8 +14,8 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 	//palno = (tile_index - (tile_index / 32 * 16) * 32 * 16) / 32;
 
-	tileno = machine.region("user1")->base()[tile_index];
-	palno = 0x18; //machine.region("user2")->base()[tile_index] >> 3;
+	tileno = machine.root_device().memregion("user1")->base()[tile_index];
+	palno = 0x18; //machine.root_device().memregion("user2")->base()[tile_index] >> 3;
 	SET_TILE_INFO(2, tileno, palno, 0);
 }
 
@@ -39,7 +39,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 PALETTE_INIT( fcombat )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 
 	/* allocate the colortable */

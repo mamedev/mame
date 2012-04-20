@@ -63,8 +63,8 @@ int find_project_string(running_machine &machine, int addrxor, int mode)
 	// search for the title
 	const int strlength = 14;
 	char title_string[] = "PROJECT NUMBER";
-	UINT8 *src = machine.region( "maincpu" )->base();
-	int size = machine.region( "maincpu" )->bytes();
+	UINT8 *src = machine.root_device().memregion( "maincpu" )->base();
+	int size = machine.root_device().memregion( "maincpu" )->bytes();
 
 	int search_start = 0;
 	int search_step = 1;
@@ -194,7 +194,7 @@ INPUT_PORTS_END
 
 DRIVER_INIT( sc4 )
 {
-	UINT8 *src = machine.region( "maincpu" )->base();
+	UINT8 *src = machine.root_device().memregion( "maincpu" )->base();
 	// SC4 identification sequence 0x80 0x00 0xf0 0x7d
 	if (((src[0] == 0x80) && (src[2] == 0xf0)) || ((src[1] == 0x00) && (src[3] == 0x7d)))
 	{
@@ -233,7 +233,7 @@ DRIVER_INIT( sc4mbus )
 {
 	DRIVER_INIT_CALL( sc4 );
 	sc4_state *state = machine.driver_data<sc4_state>();
-	UINT16 *rom = (UINT16 *)machine.region("maincpu")->base();
+	UINT16 *rom = (UINT16 *)state->memregion("maincpu")->base();
 	find_mbus(state, rom);
 }
 

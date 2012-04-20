@@ -417,7 +417,7 @@ static void init_tunit_generic(running_machine &machine, int sound)
 	register_state_saving(machine);
 
 	/* load the graphics ROMs -- quadruples */
-	base = machine.region("gfx1")->base();
+	base = machine.root_device().memregion("gfx1")->base();
 	for (i = 0; i < midtunit_gfx_rom_size; i += 4)
 	{
 		midtunit_gfx_rom[i + 0] = base[0 * gfx_chunk + i / 4];

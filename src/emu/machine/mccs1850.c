@@ -371,9 +371,9 @@ void mccs1850_device::nvram_default()
 {
 	memset(m_ram, 0xff, RAM_SIZE);
 
-	if (machine().region(tag()) != NULL)
+	if (machine().root_device().memregion(tag()) != NULL)
 	{
-		UINT8 *nvram = machine().region(tag())->base();
+		UINT8 *nvram = machine().root_device().memregion(tag())->base();
 
 		// initialize NVRAM
 		memcpy(m_ram, nvram, 0x20);

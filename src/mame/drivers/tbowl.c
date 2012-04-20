@@ -34,7 +34,7 @@ note: check this, its borrowed from tecmo.c / wc90.c at the moment and could wel
 WRITE8_MEMBER(tbowl_state::tbowlb_bankswitch_w)
 {
 	int bankaddress;
-	UINT8 *RAM = machine().region("maincpu")->base();
+	UINT8 *RAM = memregion("maincpu")->base();
 
 
 	bankaddress = 0x10000 + ((data & 0xf8) << 8);
@@ -44,7 +44,7 @@ WRITE8_MEMBER(tbowl_state::tbowlb_bankswitch_w)
 WRITE8_MEMBER(tbowl_state::tbowlc_bankswitch_w)
 {
 	int bankaddress;
-	UINT8 *RAM = machine().region("sub")->base();
+	UINT8 *RAM = memregion("sub")->base();
 
 
 	bankaddress = 0x10000 + ((data & 0xf8) << 8);
@@ -166,7 +166,7 @@ static void tbowl_adpcm_int(device_t *device)
 	tbowl_state *state = device->machine().driver_data<tbowl_state>();
 	int num = (strcmp(device->tag(), ":msm1") == 0) ? 0 : 1;
 	if (state->m_adpcm_pos[num] >= state->m_adpcm_end[num] ||
-				state->m_adpcm_pos[num] >= device->machine().region("adpcm")->bytes()/2)
+				state->m_adpcm_pos[num] >= state->memregion("adpcm")->bytes()/2)
 		msm5205_reset_w(device,1);
 	else if (state->m_adpcm_data[num] != -1)
 	{
@@ -175,7 +175,7 @@ static void tbowl_adpcm_int(device_t *device)
 	}
 	else
 	{
-		UINT8 *ROM = device->machine().region("adpcm")->base() + 0x10000 * num;
+		UINT8 *ROM = device->machine().root_device().memregion("adpcm")->base() + 0x10000 * num;
 
 		state->m_adpcm_data[num] = ROM[state->m_adpcm_pos[num]++];
 		msm5205_data_w(device,state->m_adpcm_data[num] >> 4);

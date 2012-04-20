@@ -201,8 +201,8 @@ static TIMER_CALLBACK( magerror_irq_callback )
 
 READ16_MEMBER(hyprduel_state::hyprduel_bankedrom_r)
 {
-	UINT8 *ROM = machine().region("gfx1")->base();
-	size_t  len = machine().region("gfx1")->bytes();
+	UINT8 *ROM = memregion("gfx1")->base();
+	size_t  len = memregion("gfx1")->bytes();
 
 	offset = offset * 2 + 0x10000 * (*m_rombank);
 
@@ -286,8 +286,8 @@ WRITE16_MEMBER(hyprduel_state::hyprduel_blitter_w)
 
 	if (offset == 0xc / 2)
 	{
-		UINT8 *src = machine().region("gfx1")->base();
-		size_t  src_len = machine().region("gfx1")->bytes();
+		UINT8 *src = memregion("gfx1")->base();
+		size_t  src_len = memregion("gfx1")->bytes();
 
 		UINT32 tmap = (m_blitter_regs[0x00 / 2] << 16) + m_blitter_regs[0x02 / 2];
 		UINT32 src_offs = (m_blitter_regs[0x04 / 2] << 16) + m_blitter_regs[0x06 / 2];

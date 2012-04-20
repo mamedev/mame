@@ -46,7 +46,7 @@ void jumpshot_decode(running_machine &machine)
 
 	/* CPU ROMs */
 
-	RAM = machine.region("maincpu")->base();
+	RAM = machine.root_device().memregion("maincpu")->base();
 	for (i = 0; i < 0x4000; i++)
 	{
 		RAM[i] = decrypt(i,RAM[i]);

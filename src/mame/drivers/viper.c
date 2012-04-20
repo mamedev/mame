@@ -1929,7 +1929,7 @@ static MACHINE_START(viper)
 	/* configure fast RAM regions for DRC */
 	ppcdrc_add_fastram(machine.device("maincpu"), 0x00000000, 0x00ffffff, FALSE, workram);
 
-	ds2430_rom = (UINT8*)machine.region("ds2430")->base();
+	ds2430_rom = (UINT8*)machine.root_device().memregion("ds2430")->base();
 }
 
 static MACHINE_RESET(viper)

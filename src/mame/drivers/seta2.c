@@ -122,8 +122,8 @@ WRITE16_MEMBER(seta2_state::seta2_sound_bank_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		UINT8 *ROM = machine().region( "x1snd" )->base();
-		int banks = (machine().region( "x1snd" )->bytes() - 0x100000) / 0x20000;
+		UINT8 *ROM = memregion( "x1snd" )->base();
+		int banks = (machine().root_device().memregion( "x1snd" )->bytes() - 0x100000) / 0x20000;
 		if (data >= banks)
 		{
 			logerror("CPU #0 PC %06X: invalid sound bank %04X\n",cpu_get_pc(&space.device()),data);
@@ -325,7 +325,7 @@ ADDRESS_MAP_END
 READ16_MEMBER(seta2_state::pzlbowl_protection_r)
 {
 	UINT32 address = (space.read_word(0x20ba16) << 16) | space.read_word(0x20ba18);
-	return machine().region("maincpu")->base()[address - 2];
+	return memregion("maincpu")->base()[address - 2];
 }
 
 READ16_MEMBER(seta2_state::pzlbowl_coins_r)
@@ -2408,8 +2408,8 @@ ROM_END
 
 static DRIVER_INIT( funcube2 )
 {
-	UINT32 *main_cpu = (UINT32 *) machine.region("maincpu")->base();
-	UINT16 *sub_cpu  = (UINT16 *) machine.region("sub")->base();
+	UINT32 *main_cpu = (UINT32 *) machine.root_device().memregion("maincpu")->base();
+	UINT16 *sub_cpu  = (UINT16 *) machine.root_device().memregion("sub")->base();
 
 	main_cpu[0xa5c/4] = 0x4e713e3c;       // PIC protection?
 	main_cpu[0xa74/4] = 0x4e713e3c;
@@ -2421,8 +2421,8 @@ static DRIVER_INIT( funcube2 )
 
 static DRIVER_INIT( funcube3 )
 {
-	UINT32 *main_cpu = (UINT32 *) machine.region("maincpu")->base();
-	UINT16 *sub_cpu  = (UINT16 *) machine.region("sub")->base();
+	UINT32 *main_cpu = (UINT32 *) machine.root_device().memregion("maincpu")->base();
+	UINT16 *sub_cpu  = (UINT16 *) machine.root_device().memregion("sub")->base();
 
 	main_cpu[0x008bc/4] = 0x4a804e71;
 	main_cpu[0x19f0c/4] = 0x4e714e71;

@@ -55,7 +55,7 @@ f80b      ????
 WRITE8_MEMBER(tecmo_state::tecmo_bankswitch_w)
 {
 	int bankaddress;
-	UINT8 *RAM = machine().region("maincpu")->base();
+	UINT8 *RAM = memregion("maincpu")->base();
 
 
 	bankaddress = 0x10000 + ((data & 0xf8) << 8);
@@ -86,7 +86,7 @@ static void tecmo_adpcm_int(device_t *device)
 {
 	tecmo_state *state = device->machine().driver_data<tecmo_state>();
 	if (state->m_adpcm_pos >= state->m_adpcm_end ||
-				state->m_adpcm_pos >= device->machine().region("adpcm")->bytes())
+				state->m_adpcm_pos >= state->memregion("adpcm")->bytes())
 		msm5205_reset_w(device,1);
 	else if (state->m_adpcm_data != -1)
 	{
@@ -95,7 +95,7 @@ static void tecmo_adpcm_int(device_t *device)
 	}
 	else
 	{
-		UINT8 *ROM = device->machine().region("adpcm")->base();
+		UINT8 *ROM = device->machine().root_device().memregion("adpcm")->base();
 
 		state->m_adpcm_data = ROM[state->m_adpcm_pos++];
 		msm5205_data_w(device,state->m_adpcm_data >> 4);

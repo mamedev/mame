@@ -373,7 +373,7 @@ Boards:
 
 static MACHINE_RESET( mschamp )
 {
-	UINT8 *rom = machine.region("maincpu")->base() + 0x10000;
+	UINT8 *rom = machine.root_device().memregion("maincpu")->base() + 0x10000;
 	int whichbank = input_port_read(machine, "GAME") & 1;
 
 	machine.root_device().membank("bank1")->configure_entries(0, 2, &rom[0x0000], 0x8000);
@@ -650,7 +650,7 @@ WRITE8_MEMBER(pacman_state::bigbucks_bank_w)
 READ8_MEMBER(pacman_state::bigbucks_question_r)
 {
 
-	UINT8 *question = machine().region("user1")->base();
+	UINT8 *question = memregion("user1")->base();
 	UINT8 ret;
 
 	ret = question[(m_bigbucks_bank << 16) | (offset ^ 0xffff)];
@@ -754,7 +754,7 @@ WRITE8_MEMBER(pacman_state::rocktrv2_question_bank_w)
 
 READ8_MEMBER(pacman_state::rocktrv2_question_r)
 {
-	UINT8 *question = machine().region("user1")->base();
+	UINT8 *question = memregion("user1")->base();
 
 	return question[offset | (m_rocktrv2_question_bank * 0x8000)];
 }
@@ -843,17 +843,17 @@ READ8_MEMBER(pacman_state::pacman_read_nop)
 #define mspacman_disable_decode_latch(m) m.root_device().membank("bank1")->set_entry(0)
 
 // any access to these ROM addresses disables the decoder, and all you see is the original Pac-Man code
-READ8_MEMBER(pacman_state::mspacman_disable_decode_r_0x0038){ mspacman_disable_decode_latch(machine()); return machine().region("maincpu")->base()[offset+0x0038]; }
-READ8_MEMBER(pacman_state::mspacman_disable_decode_r_0x03b0){ mspacman_disable_decode_latch(machine()); return machine().region("maincpu")->base()[offset+0x03b0]; }
-READ8_MEMBER(pacman_state::mspacman_disable_decode_r_0x1600){ mspacman_disable_decode_latch(machine()); return machine().region("maincpu")->base()[offset+0x1600]; }
-READ8_MEMBER(pacman_state::mspacman_disable_decode_r_0x2120){ mspacman_disable_decode_latch(machine()); return machine().region("maincpu")->base()[offset+0x2120]; }
-READ8_MEMBER(pacman_state::mspacman_disable_decode_r_0x3ff0){ mspacman_disable_decode_latch(machine()); return machine().region("maincpu")->base()[offset+0x3ff0]; }
-READ8_MEMBER(pacman_state::mspacman_disable_decode_r_0x8000){ mspacman_disable_decode_latch(machine()); return machine().region("maincpu")->base()[offset+0x8000]; }
-READ8_MEMBER(pacman_state::mspacman_disable_decode_r_0x97f0){ mspacman_disable_decode_latch(machine()); return machine().region("maincpu")->base()[offset+0x97f0]; }
+READ8_MEMBER(pacman_state::mspacman_disable_decode_r_0x0038){ mspacman_disable_decode_latch(machine()); return memregion("maincpu")->base()[offset+0x0038]; }
+READ8_MEMBER(pacman_state::mspacman_disable_decode_r_0x03b0){ mspacman_disable_decode_latch(machine()); return memregion("maincpu")->base()[offset+0x03b0]; }
+READ8_MEMBER(pacman_state::mspacman_disable_decode_r_0x1600){ mspacman_disable_decode_latch(machine()); return memregion("maincpu")->base()[offset+0x1600]; }
+READ8_MEMBER(pacman_state::mspacman_disable_decode_r_0x2120){ mspacman_disable_decode_latch(machine()); return memregion("maincpu")->base()[offset+0x2120]; }
+READ8_MEMBER(pacman_state::mspacman_disable_decode_r_0x3ff0){ mspacman_disable_decode_latch(machine()); return memregion("maincpu")->base()[offset+0x3ff0]; }
+READ8_MEMBER(pacman_state::mspacman_disable_decode_r_0x8000){ mspacman_disable_decode_latch(machine()); return memregion("maincpu")->base()[offset+0x8000]; }
+READ8_MEMBER(pacman_state::mspacman_disable_decode_r_0x97f0){ mspacman_disable_decode_latch(machine()); return memregion("maincpu")->base()[offset+0x97f0]; }
 WRITE8_MEMBER(pacman_state::mspacman_disable_decode_w){ mspacman_disable_decode_latch(machine()); }
 
 // any access to these ROM addresses enables the decoder, and you'll see the Ms. Pac-Man code
-READ8_MEMBER(pacman_state::mspacman_enable_decode_r_0x3ff8){ mspacman_enable_decode_latch(machine()); return machine().region("maincpu")->base()[offset+0x3ff8+0x10000]; }
+READ8_MEMBER(pacman_state::mspacman_enable_decode_r_0x3ff8){ mspacman_enable_decode_latch(machine()); return memregion("maincpu")->base()[offset+0x3ff8+0x10000]; }
 WRITE8_MEMBER(pacman_state::mspacman_enable_decode_w){ mspacman_enable_decode_latch(machine()); }
 
 
@@ -5466,7 +5466,7 @@ static void maketrax_rom_decode(running_machine &machine)
 {
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 *decrypted = auto_alloc_array(machine, UINT8, 0x4000);
-	UINT8 *rom = machine.region("maincpu")->base();
+	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
 
 	/* patch protection using a copy of the opcodes so ROM checksum */
 	/* tests will not fail */
@@ -5499,7 +5499,7 @@ static void korosuke_rom_decode(running_machine &machine)
 {
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 *decrypted = auto_alloc_array(machine, UINT8, 0x4000);
-	UINT8 *rom = machine.region("maincpu")->base();
+	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
 
 	/* patch protection using a copy of the opcodes so ROM checksum */
 	/* tests will not fail */
@@ -5535,10 +5535,10 @@ static DRIVER_INIT( ponpoko )
 
 	int i, j;
 	UINT8 *RAM, temp;
-	int length = machine.region("gfx1")->bytes()/2;
+	int length = machine.root_device().memregion("gfx1")->bytes()/2;
 
 	/* Characters */
-	RAM = machine.region("gfx1")->base();
+	RAM = machine.root_device().memregion("gfx1")->base();
 	for (i = 0;i < length;i += 0x10)
 	{
 		for (j = 0; j < 8; j++)
@@ -5550,7 +5550,7 @@ static DRIVER_INIT( ponpoko )
 	}
 
 	/* Sprites */
-	RAM = machine.region("gfx1")->base()+length;
+	RAM = machine.root_device().memregion("gfx1")->base()+length;
 	for (i = 0;i < length;i += 0x20)
 	{
 		for (j = 0; j < 8; j++)
@@ -5588,7 +5588,7 @@ static DRIVER_INIT( eyes )
 	/* CPU ROMs */
 
 	/* Data lines D3 and D5 swapped */
-	RAM = machine.region("maincpu")->base();
+	RAM = machine.root_device().memregion("maincpu")->base();
 	for (i = 0; i < 0x4000; i++)
 	{
 		RAM[i] = BITSWAP8(RAM[i],7,6,3,4,5,2,1,0);
@@ -5598,8 +5598,8 @@ static DRIVER_INIT( eyes )
 	/* Graphics ROMs */
 
 	/* Data lines D4 and D6 and address lines A0 and A2 are swapped */
-	RAM = machine.region("gfx1")->base();
-	len = machine.region("gfx1")->bytes();
+	RAM = machine.root_device().memregion("gfx1")->base();
+	len = machine.root_device().memregion("gfx1")->bytes();
 	for (i = 0;i < len;i += 8)
 		eyes_decode(&RAM[i]);
 }
@@ -5672,10 +5672,10 @@ static DRIVER_INIT( mspacman )
 	/* CPU ROMs */
 
 	/* Pac-Man code is in low bank */
-	ROM = machine.region("maincpu")->base();
+	ROM = machine.root_device().memregion("maincpu")->base();
 
 	/* decrypted Ms. Pac-Man code is in high bank */
-	DROM = &machine.region("maincpu")->base()[0x10000];
+	DROM = &machine.root_device().memregion("maincpu")->base()[0x10000];
 
 	/* copy ROMs into decrypted bank */
 	for (i = 0; i < 0x1000; i++)
@@ -5722,8 +5722,8 @@ static DRIVER_INIT( woodpek )
 	/* Graphics ROMs */
 
 	/* Data lines D4 and D6 and address lines A0 and A2 are swapped */
-	RAM = machine.region("gfx1")->base();
-	len = machine.region("gfx1")->bytes();
+	RAM = machine.root_device().memregion("gfx1")->base();
+	len = machine.root_device().memregion("gfx1")->bytes();
 	for (i = 0;i < len;i += 8)
 		eyes_decode(&RAM[i]);
 }
@@ -5740,7 +5740,7 @@ static DRIVER_INIT( jumpshot )
 
 static DRIVER_INIT( drivfrcp )
 {
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
 	machine.root_device().membank("bank1")->set_base(&ROM[0 * 0x2000]);
 	machine.root_device().membank("bank2")->set_base(&ROM[1 * 0x2000]);
 	machine.root_device().membank("bank3")->set_base(&ROM[2 * 0x2000]);
@@ -5749,7 +5749,7 @@ static DRIVER_INIT( drivfrcp )
 
 static DRIVER_INIT( 8bpm )
 {
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
 	int i;
 
 	/* Data lines D0 and D6 swapped */
@@ -5766,7 +5766,7 @@ static DRIVER_INIT( 8bpm )
 
 static DRIVER_INIT( porky )
 {
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
 	int i;
 
 	/* Data lines D0 and D4 swapped */
@@ -5789,7 +5789,7 @@ static DRIVER_INIT( porky )
 static DRIVER_INIT( rocktrv2 )
 {
 	/* hack to pass the rom check for the bad rom */
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
 
 	ROM[0x7ffe] = 0xa7;
 	ROM[0x7fee] = 0x6d;
@@ -5801,7 +5801,7 @@ socket and run through the 74298.  Clock is tied to system clock.  */
 static DRIVER_INIT( mspacmbe )
 {
 	UINT8 temp;
-	UINT8 *RAM = machine.region("maincpu")->base();
+	UINT8 *RAM = machine.root_device().memregion("maincpu")->base();
 	int i;
 
 	/* Address lines A1 and A0 swapped if A2=0 */

@@ -80,7 +80,7 @@ public:
 
 WRITE8_MEMBER(sothello_state::bank_w)
 {
-    UINT8 *RAM = machine().region("maincpu")->base();
+    UINT8 *RAM = memregion("maincpu")->base();
     int bank=0;
     switch(data^0xff)
     {

@@ -1558,8 +1558,8 @@ static DRIVER_INIT( nitrobal )
 
 static DRIVER_INIT( schmeisr )
 {
-	const UINT8 *src = machine.region("gfx2")->base();
-	UINT8 *dst = machine.region("gfx1")->base();
+	const UINT8 *src = machine.root_device().memregion("gfx2")->base();
+	UINT8 *dst = machine.root_device().memregion("gfx1")->base();
 
 	memcpy(dst, src, 0x20000);
 	memcpy(dst + 0x20000, src + 0x80000, 0x20000);

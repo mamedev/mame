@@ -733,7 +733,7 @@ void ymz770_device::device_start()
 		channels[i].decoder = new amm;
 	}
 
-	rom_base = device().machine().region(":ymz770")->base();
+	rom_base = device().machine().root_device().memregion(":ymz770")->base();
 
 	save_item(NAME(cur_reg));
 	for (int i = 0; i < 8; i++)

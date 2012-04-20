@@ -1405,7 +1405,7 @@ static void monsterb_expand_gfx(running_machine &machine, const char *region)
 
 	/* expand the background ROMs; A11/A12 of each ROM is independently controlled via */
 	/* banking */
-	dest = machine.region(region)->base();
+	dest = machine.root_device().memregion(region)->base();
 	temp = auto_alloc_array(machine, UINT8, 0x4000);
 	memcpy(temp, dest, 0x4000);
 

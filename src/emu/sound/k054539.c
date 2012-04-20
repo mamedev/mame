@@ -317,7 +317,7 @@ void k054539_device::init_chip()
 	cur_ptr = 0;
 	memset(ram, 0, 0x4000);
 
-	const memory_region *reg = (rgnoverride != NULL) ? machine().region(rgnoverride) : region();
+	memory_region *reg = (rgnoverride != NULL) ? machine().root_device().memregion(rgnoverride) : region();
 	rom = *reg;
 	rom_size = reg->bytes();
 	rom_mask = 0xffffffffU;

@@ -156,8 +156,8 @@ static void init_wunit_generic(running_machine &machine)
 	register_state_saving(machine);
 
 	/* load the graphics ROMs -- quadruples */
-	midtunit_gfx_rom = base = machine.region("gfx1")->base();
-	len = machine.region("gfx1")->bytes();
+	midtunit_gfx_rom = base = machine.root_device().memregion("gfx1")->base();
+	len = state->memregion("gfx1")->bytes();
 	for (i = 0; i < len / 0x400000; i++)
 	{
 		memcpy(state->m_decode_memory, base, 0x400000);

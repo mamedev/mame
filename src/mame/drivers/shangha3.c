@@ -58,7 +58,7 @@ WRITE16_MEMBER(shangha3_state::shangha3_prot_w)
 
 READ16_MEMBER(shangha3_state::heberpop_gfxrom_r)
 {
-	UINT8 *ROM = machine().region("gfx1")->base();
+	UINT8 *ROM = memregion("gfx1")->base();
 
 	return ROM[2*offset] | (ROM[2*offset+1] << 8);
 }

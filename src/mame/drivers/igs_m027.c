@@ -254,7 +254,7 @@ static void sdwx_gfx_decrypt(running_machine &machine)
 {
 	int i;
 	unsigned rom_size = 0x80000;
-	UINT8 *src = (UINT8 *) (machine.region("gfx1")->base());
+	UINT8 *src = (UINT8 *) (machine.root_device().memregion("gfx1")->base());
 	UINT8 *result_data = auto_alloc_array(machine, UINT8, rom_size);
 
 	for (i=0; i<rom_size; i++)
@@ -758,7 +758,7 @@ ROM_END
 
 static void pgm_create_dummy_internal_arm_region(running_machine &machine)
 {
-	UINT16 *temp16 = (UINT16 *)machine.region("maincpu")->base();
+	UINT16 *temp16 = (UINT16 *)machine.root_device().memregion("maincpu")->base();
 
 	// fill with RX 14
 	int i;
@@ -785,7 +785,7 @@ static void sdwx_decrypt(running_machine &machine)
 {
 
 	int i;
-	UINT16 *src = (UINT16 *) machine.region("user1")->base();
+	UINT16 *src = (UINT16 *) machine.root_device().memregion("user1")->base();
 
 	int rom_size = 0x80000;
 
@@ -831,7 +831,7 @@ static const UINT8 hauntedh_tab[0x100] = {
 static void hauntedh_decrypt(running_machine &machine)
 {
 	int i;
-	UINT16 *src = (UINT16 *) machine.region("user1")->base();
+	UINT16 *src = (UINT16 *) machine.root_device().memregion("user1")->base();
 
 	int rom_size = 0x080000;
 
@@ -876,7 +876,7 @@ static const UINT8 chessc2_tab[0x100] = {
 static void chessc2_decrypt(running_machine &machine)
 {
 	int i;
-	UINT16 *src = (UINT16 *) machine.region("user1")->base();
+	UINT16 *src = (UINT16 *) machine.root_device().memregion("user1")->base();
 
 	int rom_size = 0x80000;
 
@@ -921,7 +921,7 @@ static const UINT8 klxyj_tab[0x100] = {
 static void klxyj_decrypt(running_machine &machine)
 {
 	int i;
-	UINT16 *src = (UINT16 *) machine.region("user1")->base();
+	UINT16 *src = (UINT16 *) machine.root_device().memregion("user1")->base();
 
 	int rom_size = 0x80000;
 
@@ -965,7 +965,7 @@ static const UINT8 big2_tab[0x100] = {
 static void big2_decrypt(running_machine &machine)
 {
 	int i;
-	UINT16 *src = (UINT16 *) machine.region("user1")->base();
+	UINT16 *src = (UINT16 *) machine.root_device().memregion("user1")->base();
 
 	int rom_size = 0x80000;
 
@@ -1009,7 +1009,7 @@ static const UINT8 gonefsh2_tab[0x100] = {
 static void gonefsh2_decrypt(running_machine &machine)
 {
 	int i;
-	UINT16 *src = (UINT16 *) machine.region("user1")->base();
+	UINT16 *src = (UINT16 *) machine.root_device().memregion("user1")->base();
 
 	int rom_size = 0x80000;
 
@@ -1053,7 +1053,7 @@ static const UINT8 sddz_tab[0x100] = {
 static void sddz_decrypt(running_machine &machine)
 {
 	int i;
-	UINT16 *src = (UINT16 *) machine.region("user1")->base();
+	UINT16 *src = (UINT16 *) machine.root_device().memregion("user1")->base();
 
 	int rom_size = 0x80000;
 
@@ -1097,7 +1097,7 @@ static const UINT8 lhzb3_tab[0x100] = {
 static void lhzb3_decrypt(running_machine &machine)
 {
 	int i;
-	UINT16 *src = (UINT16 *) machine.region("user1")->base();
+	UINT16 *src = (UINT16 *) machine.root_device().memregion("user1")->base();
 
 	int rom_size = 0x80000;
 
@@ -1141,7 +1141,7 @@ static const UINT8 mgfx_tab[0x100] = {
 static void mgfx_decrypt(running_machine &machine)
 {
 	int i;
-	UINT16 *src = (UINT16 *) machine.region("user1")->base();
+	UINT16 *src = (UINT16 *) machine.root_device().memregion("user1")->base();
 
 	int rom_size = 0x80000;
 
@@ -1185,7 +1185,7 @@ static const UINT8 lhzb4_tab[0x100] = {
 static void lhzb4_decrypt(running_machine &machine)
 {
 	int i;
-	UINT16 *src = (UINT16 *) machine.region("user1")->base();
+	UINT16 *src = (UINT16 *) machine.root_device().memregion("user1")->base();
 
 	int rom_size = 0x80000;
 

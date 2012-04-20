@@ -37,7 +37,7 @@ HW info :
 static MACHINE_RESET(ssrj)
 {
 	ssrj_state *state = machine.driver_data<ssrj_state>();
-	UINT8 *rom = machine.region("maincpu")->base();
+	UINT8 *rom = state->memregion("maincpu")->base();
 
 	memset(&rom[0xc000], 0 ,0x3fff); /* req for some control types */
 	state->m_oldport = 0x80;

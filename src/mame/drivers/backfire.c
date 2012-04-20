@@ -667,7 +667,7 @@ ROM_END
 
 static void descramble_sound( running_machine &machine )
 {
-	UINT8 *rom = machine.region("ymz")->base();
+	UINT8 *rom = machine.root_device().memregion("ymz")->base();
 	int length = 0x200000; // only the first rom is swapped on backfire!
 	UINT8 *buf1 = auto_alloc_array(machine, UINT8, length);
 	UINT32 x;

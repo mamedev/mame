@@ -492,7 +492,7 @@ static DRIVER_INIT( sshangha )
 #if SSHANGHA_HACK
 	/* This is a hack to allow you to use the extra features
          of the first "Unused" Dip Switch (see notes above). */
-	UINT16 *RAM = (UINT16 *)machine.region("maincpu")->base();
+	UINT16 *RAM = (UINT16 *)machine.root_device().memregion("maincpu")->base();
 	RAM[0x000384/2] = 0x4e71;
 	RAM[0x000386/2] = 0x4e71;
 	RAM[0x000388/2] = 0x4e71;

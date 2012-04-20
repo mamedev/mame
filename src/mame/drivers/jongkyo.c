@@ -430,7 +430,7 @@ INPUT_PORTS_END
 static PALETTE_INIT(jongkyo)
 {
 	int i;
-	UINT8* proms = machine.region("proms")->base();
+	UINT8* proms = machine.root_device().memregion("proms")->base();
 	for (i = 0; i < 0x40; i++)
 	{
 		int data = proms[i];
@@ -550,7 +550,7 @@ ROM_END
 static DRIVER_INIT( jongkyo )
 {
 	int i;
-	UINT8 *rom = machine.region("maincpu")->base();
+	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
 
 	/* first of all, do a simple bitswap */
 	for (i = 0x6000; i < 0x9000; ++i)

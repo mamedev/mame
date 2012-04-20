@@ -120,8 +120,8 @@ static DEVICE_START( nmk112 )
 	}
 	else
 	{
-		nmk112->rom0 = device->machine().region(intf->rgn0)->base();
-		nmk112->size0 = device->machine().region(intf->rgn0)->bytes() - 0x40000;
+		nmk112->rom0 = device->machine().root_device().memregion(intf->rgn0)->base();
+		nmk112->size0 = device->machine().root_device().memregion(intf->rgn0)->bytes() - 0x40000;
 	}
 
 	if (intf->rgn1 == NULL)
@@ -131,8 +131,8 @@ static DEVICE_START( nmk112 )
 	}
 	else
 	{
-		nmk112->rom1 = device->machine().region(intf->rgn1)->base();
-		nmk112->size1 = device->machine().region(intf->rgn1)->bytes() - 0x40000;
+		nmk112->rom1 = device->machine().root_device().memregion(intf->rgn1)->base();
+		nmk112->size1 = device->machine().root_device().memregion(intf->rgn1)->bytes() - 0x40000;
 	}
 
 	nmk112->page_mask = ~intf->disable_page_mask;

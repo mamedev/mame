@@ -322,7 +322,7 @@ static const k051316_interface bottom9_k051316_intf =
 static MACHINE_START( bottom9 )
 {
 	bottom9_state *state = machine.driver_data<bottom9_state>();
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = state->memregion("maincpu")->base();
 
 	state->membank("bank1")->configure_entries(0, 12, &ROM[0x10000], 0x2000);
 

@@ -147,12 +147,12 @@ WRITE8_MEMBER(nbmj8900_state::nbmj8900_romsel_w)
 {
 	m_gfxrom = (data & 0x0f);
 
-	if ((0x20000 * m_gfxrom) > (machine().region("gfx")->bytes() - 1))
+	if ((0x20000 * m_gfxrom) > (machine().root_device().memregion("gfx")->bytes() - 1))
 	{
 #ifdef MAME_DEBUG
 		popmessage("GFXROM BANK OVER!!");
 #endif
-		m_gfxrom &= (machine().region("gfx")->bytes() / 0x20000 - 1);
+		m_gfxrom &= (machine().root_device().memregion("gfx")->bytes() / 0x20000 - 1);
 	}
 }
 
@@ -211,7 +211,7 @@ static TIMER_CALLBACK( blitter_timer_callback )
 static void nbmj8900_gfxdraw(running_machine &machine)
 {
 	nbmj8900_state *state = machine.driver_data<nbmj8900_state>();
-	unsigned char *GFX = machine.region("gfx")->base();
+	unsigned char *GFX = state->memregion("gfx")->base();
 
 	int x, y;
 	int dx1, dx2, dy1, dy2;
@@ -255,12 +255,12 @@ static void nbmj8900_gfxdraw(running_machine &machine)
 	{
 		for (x = startx, ctrx = sizex; ctrx >= 0; x += skipx, ctrx--)
 		{
-			if ((gfxaddr > (machine.region("gfx")->bytes() - 1)))
+			if ((gfxaddr > (machine.root_device().memregion("gfx")->bytes() - 1)))
 			{
 #ifdef MAME_DEBUG
 				popmessage("GFXROM ADDRESS OVER!!");
 #endif
-				gfxaddr &= (machine.region("gfx")->bytes() - 1);
+				gfxaddr &= (machine.root_device().memregion("gfx")->bytes() - 1);
 			}
 
 			color = GFX[gfxaddr++];

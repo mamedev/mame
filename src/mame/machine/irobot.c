@@ -101,7 +101,7 @@ WRITE8_MEMBER(irobot_state::irobot_statwr_w)
 
 WRITE8_MEMBER(irobot_state::irobot_out0_w)
 {
-	UINT8 *RAM = machine().region("maincpu")->base();
+	UINT8 *RAM = memregion("maincpu")->base();
 
 	m_out0 = data;
 	switch (data & 0x60)
@@ -123,7 +123,7 @@ WRITE8_MEMBER(irobot_state::irobot_out0_w)
 
 WRITE8_MEMBER(irobot_state::irobot_rom_banksel_w)
 {
-	UINT8 *RAM = machine().region("maincpu")->base();
+	UINT8 *RAM = memregion("maincpu")->base();
 
 	switch ((data & 0x0E) >> 1)
 	{
@@ -170,7 +170,7 @@ static TIMER_CALLBACK( scanline_callback )
 MACHINE_RESET( irobot )
 {
 	irobot_state *state = machine.driver_data<irobot_state>();
-	UINT8 *MB = machine.region("mathbox")->base();
+	UINT8 *MB = state->memregion("mathbox")->base();
 
 	/* initialize the memory regions */
 	state->m_mbROM		= MB + 0x00000;
@@ -332,7 +332,7 @@ static void irmb_dout(irobot_state *state, const irmb_ops *curop, UINT32 d)
 static void load_oproms(running_machine &machine)
 {
 	irobot_state *state = machine.driver_data<irobot_state>();
-	UINT8 *MB = machine.region("proms")->base() + 0x20;
+	UINT8 *MB = state->memregion("proms")->base() + 0x20;
 	int i;
 
 	/* allocate RAM */

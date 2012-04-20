@@ -95,13 +95,13 @@ static void palette_init_common( running_machine &machine, const UINT8 *color_pr
 
 PALETTE_INIT( ladybug )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	palette_init_common(machine, color_prom, 0x20, 0, 5, 2, 6, 4, 7);
 }
 
 PALETTE_INIT( sraider )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 
 	/* the resistor net may be probably different than Lady Bug */

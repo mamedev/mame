@@ -125,7 +125,7 @@ static void gpworld_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,
 
 	int i;
 
-	UINT8 *GFX = machine.region("gfx2")->base();
+	UINT8 *GFX = state->memregion("gfx2")->base();
 
 	/* Heisted from Daphne which heisted it from MAME */
 	for (i = 0; i < 0x800; i += 8)

@@ -263,8 +263,8 @@ static DRIVER_INIT( nexus3d )
 {
 	nexus3d_state *state = machine.driver_data<nexus3d_state>();
 	// the first part of the flash ROM automatically gets copied to RAM
-	memcpy( state->m_mainram, machine.region("user1")->base(), 4 * 1024);
-	state->m_flash_region = machine.region("user1")->base();
+	memcpy( state->m_mainram, machine.root_device().memregion("user1")->base(), 4 * 1024);
+	state->m_flash_region = state->memregion("user1")->base();
 }
 
 GAME( 2005, acheart,  0, nexus3d, nexus3d, nexus3d, ROT0, "Examu", "Arcana Heart",GAME_IS_SKELETON )

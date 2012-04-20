@@ -430,8 +430,8 @@ INLINE void log_draw_error( int src, int cmd )
 static int blit_draw( running_machine &machine, int src, int sx )
 {
 	dynax_state *state = machine.driver_data<dynax_state>();
-	UINT8 *src_data = machine.region("blitter")->base();
-	int src_len = machine.region("blitter")->bytes();
+	UINT8 *src_data = machine.root_device().memregion("blitter")->base();
+	int src_len = state->memregion("blitter")->bytes();
 	int bit_addr = (src & 0xffffff) * state->m_ddenlovr_blit_rom_bits;	/* convert to bit address */
 	int pen_size, arg_size, cmd;
 	int x;
@@ -1235,8 +1235,8 @@ WRITE16_MEMBER(dynax_state::ddenlovr_blitter_irq_ack_w)
 
 READ8_MEMBER(dynax_state::rongrong_gfxrom_r)
 {
-	UINT8 *rom  = machine().region("blitter")->base();
-	size_t size = machine().region("blitter")->bytes();
+	UINT8 *rom  = memregion("blitter")->base();
+	size_t size = memregion("blitter")->bytes();
 	int address = m_ddenlovr_blit_address;
 
 	if (address >= size)
@@ -1309,7 +1309,7 @@ SCREEN_UPDATE_IND16(ddenlovr)
 
 #if 0
 	static int base = 0x0;
-	const UINT8 *gfx = screen.machine().region("blitter")->base();
+	const UINT8 *gfx = screen.machine().root_device().memregion("blitter")->base();
 	int next;
 	memset(state->m_ddenlovr_pixmap[0], 0, 512 * 512);
 	memset(state->m_ddenlovr_pixmap[1], 0, 512 * 512);
@@ -2407,8 +2407,8 @@ READ8_MEMBER(dynax_state::hanakanz_busy_r)
 
 READ8_MEMBER(dynax_state::hanakanz_gfxrom_r)
 {
-	UINT8 *rom  = machine().region("blitter")->base();
-	size_t size = machine().region("blitter")->bytes();
+	UINT8 *rom  = memregion("blitter")->base();
+	size_t size = memregion("blitter")->bytes();
 	int address = (m_ddenlovr_blit_address & 0xffffff) * 2;
 
 	if (address >= size)
@@ -2585,8 +2585,8 @@ WRITE8_MEMBER(dynax_state::mjchuuka_blitter_w)
 static void mjchuuka_get_romdata(running_machine &machine)
 {
 	dynax_state *state = machine.driver_data<dynax_state>();
-	UINT8 *rom = machine.region("blitter")->base();
-	size_t size = machine.region("blitter")->bytes();
+	UINT8 *rom = machine.root_device().memregion("blitter")->base();
+	size_t size = state->memregion("blitter")->bytes();
 	int address = (state->m_ddenlovr_blit_address & 0xffffff) * 2;
 
 	if (address >= size)
@@ -2820,7 +2820,7 @@ WRITE8_MEMBER(dynax_state::hginga_rombank_w)
 // similar to rongrong
 READ8_MEMBER(dynax_state::hginga_protection_r)
 {
-	UINT8 *rom = machine().region("maincpu")->base();
+	UINT8 *rom = memregion("maincpu")->base();
 
 	if (m_hginga_rombank & 0x10)
 		return hanakanz_rand_r(space, 0);
@@ -3046,7 +3046,7 @@ WRITE8_MEMBER(dynax_state::hgokou_input_w)
 // similar to rongrong
 READ8_MEMBER(dynax_state::hgokou_protection_r)
 {
-	UINT8 *rom = machine().region("maincpu")->base();
+	UINT8 *rom = memregion("maincpu")->base();
 
 	if (m_hginga_rombank == 0)
 		return hanakanz_rand_r(space, 0);
@@ -7613,7 +7613,7 @@ static MACHINE_RESET( ddenlovr )
 
 static MACHINE_START( rongrong )
 {
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
 	machine.root_device().membank("bank1")->configure_entries(0, 0x20, &ROM[0x010000], 0x8000);
 	machine.root_device().membank("bank2")->configure_entries(0, 8,    &ROM[0x110000], 0x1000);
 
@@ -7622,7 +7622,7 @@ static MACHINE_START( rongrong )
 
 static MACHINE_START( mmpanic )
 {
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
 	machine.root_device().membank("bank1")->configure_entries(0, 8,    &ROM[0x10000], 0x8000);
 
 	MACHINE_START_CALL(ddenlovr);
@@ -7630,7 +7630,7 @@ static MACHINE_START( mmpanic )
 
 static MACHINE_START( funkyfig )
 {
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
 	machine.root_device().membank("bank1")->configure_entries(0, 0x10, &ROM[0x10000], 0x8000);
 	machine.root_device().membank("bank2")->configure_entries(0, 8,    &ROM[0x90000], 0x1000);
 
@@ -7639,7 +7639,7 @@ static MACHINE_START( funkyfig )
 
 static MACHINE_START( hanakanz )
 {
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
 	machine.root_device().membank("bank1")->configure_entries(0, 0x10, &ROM[0x10000], 0x8000);
 	machine.root_device().membank("bank2")->configure_entries(0, 0x10, &ROM[0x90000], 0x1000);
 
@@ -7648,7 +7648,7 @@ static MACHINE_START( hanakanz )
 
 static MACHINE_START( mjmyster )
 {
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
 	machine.root_device().membank("bank1")->configure_entries(0, 8,    &ROM[0x10000], 0x8000);
 	machine.root_device().membank("bank2")->configure_entries(0, 8,    &ROM[0x90000], 0x1000);
 
@@ -7657,7 +7657,7 @@ static MACHINE_START( mjmyster )
 
 static MACHINE_START( hparadis )
 {
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
 	machine.root_device().membank("bank1")->configure_entries(0, 8,    &ROM[0x10000], 0x8000);
 	machine.root_device().membank("bank2")->configure_entries(0, 8,    &ROM[0x50000], 0x1000);
 
@@ -7666,7 +7666,7 @@ static MACHINE_START( hparadis )
 
 static MACHINE_START( mjflove )
 {
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
 	machine.root_device().membank("bank1")->configure_entries(0, 0x10, &ROM[0x10000], 0x8000);
 	machine.root_device().membank("bank2")->configure_entries(0, 8,    &ROM[0x90000], 0x1000);
 
@@ -7675,7 +7675,7 @@ static MACHINE_START( mjflove )
 
 static MACHINE_START( sryudens )
 {
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
 	machine.root_device().membank("bank1")->configure_entries(0, 0x10, &ROM[0x10000], 0x8000);
 	machine.root_device().membank("bank2")->configure_entries(0, 0x10, &ROM[0x90000], 0x1000);
 

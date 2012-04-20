@@ -51,7 +51,7 @@ static const UINT8 rombankLookup[]={ 2, 3, 4, 4, 4, 4, 4, 5, 0, 1};
 
 static PALETTE_INIT(quizo)
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 	for (i = 0;i < 16;i++)
 	{
@@ -129,7 +129,7 @@ WRITE8_MEMBER(quizo_state::port60_w)
 		data=0;
 	}
 	m_port60=data;
-	membank("bank1")->set_base(&machine().region("user1")->base()[rombankLookup[data]*0x4000] );
+	membank("bank1")->set_base(&machine().root_device().memregion("user1")->base()[rombankLookup[data]*0x4000] );
 }
 
 static ADDRESS_MAP_START( memmap, AS_PROGRAM, 8, quizo_state )

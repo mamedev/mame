@@ -223,7 +223,7 @@ static DRIVER_INIT( xorworld )
 	/*  patch some strange protection (without this, strange characters appear
         after level 5 and some pieces don't rotate properly some times) */
 
-	UINT16 *rom = (UINT16 *)(machine.region("maincpu")->base() + 0x1390);
+	UINT16 *rom = (UINT16 *)(machine.root_device().memregion("maincpu")->base() + 0x1390);
 
 	PATCH(0x4239); PATCH(0x00ff); PATCH(0xe196);	/* clr.b $ffe196 */
 	PATCH(0x4239); PATCH(0x00ff); PATCH(0xe197);	/* clr.b $ffe197 */

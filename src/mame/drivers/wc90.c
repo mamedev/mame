@@ -83,7 +83,7 @@ voice.ic82     CRC32 abc61f3d   SHA1 c6f123d16a26c4d77c635617dd97bb4b906c463a
 WRITE8_MEMBER(wc90_state::wc90_bankswitch_w)
 {
 	int bankaddress;
-	UINT8 *RAM = machine().region("maincpu")->base();
+	UINT8 *RAM = memregion("maincpu")->base();
 
 
 	bankaddress = 0x10000 + ( ( data & 0xf8 ) << 8 );
@@ -93,7 +93,7 @@ WRITE8_MEMBER(wc90_state::wc90_bankswitch_w)
 WRITE8_MEMBER(wc90_state::wc90_bankswitch1_w)
 {
 	int bankaddress;
-	UINT8 *RAM = machine().region("sub")->base();
+	UINT8 *RAM = memregion("sub")->base();
 
 
 	bankaddress = 0x10000 + ( ( data & 0xf8 ) << 8 );

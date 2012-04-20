@@ -333,7 +333,7 @@ WRITE16_MEMBER(srmp6_state::video_regs_w)
 
 		case 0x5e/2: // bank switch, used by ROM check
 		{
-			const UINT8 *rom = machine().region("nile")->base();
+			const UINT8 *rom = memregion("nile")->base();
 			LOG(("%x\n",data));
 			membank("bank1")->set_base((UINT16 *)(rom + (data & 0x0f)*0x200000));
 			break;
@@ -418,7 +418,7 @@ WRITE16_MEMBER(srmp6_state::srmp6_dma_w)
 	COMBINE_DATA(&dmaram[offset]);
 	if (offset==13 && dmaram[offset]==0x40)
 	{
-		const UINT8 *rom = machine().region("nile")->base();
+		const UINT8 *rom = memregion("nile")->base();
 		UINT32 srctab=2*((((UINT32)dmaram[5])<<16)|dmaram[4]);
 		UINT32 srcdata=2*((((UINT32)dmaram[11])<<16)|dmaram[10]);
 		UINT32 len=4*(((((UINT32)dmaram[7]&3)<<16)|dmaram[6])+1); //??? WRONG!

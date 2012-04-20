@@ -277,7 +277,7 @@ WRITE8_MEMBER(dynax_state::jantouki_sound_rombank_w)
 
 WRITE8_MEMBER(dynax_state::hnoridur_rombank_w)
 {
-	int bank_n = (machine().region("maincpu")->bytes() - 0x10000) / 0x8000;
+	int bank_n = (machine().root_device().memregion("maincpu")->bytes() - 0x10000) / 0x8000;
 
 	//logerror("%04x: rom bank = %02x\n", cpu_get_pc(&space.device()), data);
 	if (data < bank_n)
@@ -314,7 +314,7 @@ WRITE8_MEMBER(dynax_state::hnoridur_palette_w)
 		// hnoridur: R/W RAM
 		case 0x18:
 		{
-			UINT8 *RAM = machine().region("maincpu")->base() + 0x10000 + m_hnoridur_bank * 0x8000;
+			UINT8 *RAM = memregion("maincpu")->base() + 0x10000 + m_hnoridur_bank * 0x8000;
 			RAM[offset] = data;
 			return;
 		}
@@ -749,7 +749,7 @@ READ8_MEMBER(dynax_state::yarunara_input_r)
 
 WRITE8_MEMBER(dynax_state::yarunara_rombank_w)
 {
-       int bank_n = (machine().region("maincpu")->bytes() - 0x10000) / 0x8000;
+       int bank_n = (machine().root_device().memregion("maincpu")->bytes() - 0x10000) / 0x8000;
 
        //logerror("%04x: rom bank = %02x\n", cpu_get_pc(&space.device()), data);
        if (data < bank_n)
@@ -1370,7 +1370,7 @@ WRITE8_MEMBER(dynax_state::tenkai_palette_w)
 static void tenkai_update_rombank( running_machine &machine )
 {
 	dynax_state *state = machine.driver_data<dynax_state>();
-	state->m_romptr = machine.region("maincpu")->base() + 0x10000 + 0x8000 * state->m_rombank;
+	state->m_romptr = state->memregion("maincpu")->base() + 0x10000 + 0x8000 * state->m_rombank;
 //  logerror("rombank = %02x\n", state->m_rombank);
 }
 
@@ -1569,7 +1569,7 @@ static void gekisha_set_rombank( running_machine &machine, UINT8 data )
 {
 	dynax_state *state = machine.driver_data<dynax_state>();
 	state->m_rombank = data;
-	state->m_romptr = machine.region("maincpu")->base() + 0x8000 + state->m_rombank * 0x8000;
+	state->m_romptr = state->memregion("maincpu")->base() + 0x8000 + state->m_rombank * 0x8000;
 }
 
 WRITE8_MEMBER(dynax_state::gekisha_p4_w)
@@ -4239,7 +4239,7 @@ static MACHINE_RESET( dynax )
 
 static MACHINE_START( hanamai )
 {
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
 	machine.root_device().membank("bank1")->configure_entries(0, 0x10, &ROM[0x8000], 0x8000);
 
 	MACHINE_START_CALL(dynax);
@@ -4247,8 +4247,8 @@ static MACHINE_START( hanamai )
 
 static MACHINE_START( hnoridur )
 {
-	UINT8 *ROM = machine.region("maincpu")->base();
-	int bank_n = (machine.region("maincpu")->bytes() - 0x10000) / 0x8000;
+	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
+	int bank_n = (machine.root_device().memregion("maincpu")->bytes() - 0x10000) / 0x8000;
 
 	machine.root_device().membank("bank1")->configure_entries(0, bank_n, &ROM[0x10000], 0x8000);
 
@@ -4257,7 +4257,7 @@ static MACHINE_START( hnoridur )
 
 static MACHINE_START( htengoku )
 {
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
 
 	machine.root_device().membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x8000);
 
@@ -4630,8 +4630,8 @@ static const msm5205_interface jantouki_msm5205_interface =
 static MACHINE_START( jantouki )
 {
 	dynax_state *state = machine.driver_data<dynax_state>();
-	UINT8 *MAIN = machine.region("maincpu")->base();
-	UINT8 *SOUND = machine.region("soundcpu")->base();
+	UINT8 *MAIN = machine.root_device().memregion("maincpu")->base();
+	UINT8 *SOUND = state->memregion("soundcpu")->base();
 
 	state->membank("bank1")->configure_entries(0, 0x10, &MAIN[0x8000],  0x8000);
 	state->membank("bank2")->configure_entries(0, 12,   &SOUND[0x8000], 0x8000);
@@ -5361,7 +5361,7 @@ ROM_END
 static DRIVER_INIT( blktouch )
 {
 	// fearsome encryption ;-)
-	UINT8	*src = (UINT8 *)machine.region("maincpu")->base();
+	UINT8	*src = (UINT8 *)machine.root_device().memregion("maincpu")->base();
 	int i;
 
 	for (i = 0; i < 0x90000; i++)
@@ -5370,7 +5370,7 @@ static DRIVER_INIT( blktouch )
 
 	}
 
-	src = (UINT8 *)machine.region("gfx1")->base();
+	src = (UINT8 *)machine.root_device().memregion("gfx1")->base();
 
 	for (i = 0; i < 0xc0000; i++)
 	{
@@ -5383,8 +5383,8 @@ static DRIVER_INIT( maya )
 {
 	/* Address lines scrambling on 1 z80 rom */
 	int i;
-	UINT8	*gfx = (UINT8 *)machine.region("gfx1")->base();
-	UINT8	*rom = machine.region("maincpu")->base() + 0x28000, *end = rom + 0x10000;
+	UINT8	*gfx = (UINT8 *)machine.root_device().memregion("gfx1")->base();
+	UINT8	*rom = machine.root_device().memregion("maincpu")->base() + 0x28000, *end = rom + 0x10000;
 	for ( ; rom < end; rom += 8)
 	{
 		UINT8 temp[8];
@@ -6101,8 +6101,8 @@ ROM_END
 static DRIVER_INIT( mjelct3 )
 {
 	int i;
-	UINT8	*rom = machine.region("maincpu")->base();
-	size_t  size = machine.region("maincpu")->bytes();
+	UINT8	*rom = machine.root_device().memregion("maincpu")->base();
+	size_t  size = machine.root_device().memregion("maincpu")->bytes();
 	UINT8	*rom1 = auto_alloc_array(machine, UINT8, size);
 
 	memcpy(rom1, rom, size);
@@ -6114,8 +6114,8 @@ static DRIVER_INIT( mjelct3 )
 static DRIVER_INIT( mjelct3a )
 {
 	int i, j;
-	UINT8	*rom = machine.region("maincpu")->base();
-	size_t  size = machine.region("maincpu")->bytes();
+	UINT8	*rom = machine.root_device().memregion("maincpu")->base();
+	size_t  size = machine.root_device().memregion("maincpu")->bytes();
 	UINT8	*rom1 = auto_alloc_array(machine, UINT8, size);
 
 	memcpy(rom1, rom, size);

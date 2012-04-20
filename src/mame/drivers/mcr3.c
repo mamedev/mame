@@ -1388,9 +1388,6 @@ ROM_START( spyhunt )
 
 	ROM_REGION( 0x01000, "gfx3", 0 )
 	ROM_LOAD( "cpu_alph.10g", 0x00000, 0x1000, CRC(936dc87f) SHA1(cdf73bea82481fbc300ec5a1fbbe8d662007c56b) )
-
-	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "82s123.12d",   0x0000, 0x0020, CRC(e1281ee9) SHA1(9ac9b01d24affc0ee9227a4364c4fd8f8290343a) )	/* from shollow, assuming it's the same */
 ROM_END
 
 
@@ -1431,9 +1428,6 @@ ROM_START( spyhuntp )
 
 	ROM_REGION( 0x01000, "gfx3", 0 )
 	ROM_LOAD( "sh_mb_1.bin",  0x00000, 0x0800, CRC(5c74c9f0) SHA1(e42789d14e5510d1dcf4a30f6bd40a40ab46f7f3) )
-
-	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "82s123.12d",   0x0000, 0x0020, CRC(e1281ee9) SHA1(9ac9b01d24affc0ee9227a4364c4fd8f8290343a) )	/* from shollow, assuming it's the same */
 ROM_END
 
 
@@ -1469,9 +1463,6 @@ ROM_START( crater )
 
 	ROM_REGION( 0x01000, "gfx3", 0 )
 	ROM_LOAD( "crcpu.10g",    0x00000, 0x1000, CRC(6fe53c8d) SHA1(ceb04916af42d58f3173e5986756a0db8be11999) )
-
-	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "82s123.12d",   0x0000, 0x0020, CRC(e1281ee9) SHA1(9ac9b01d24affc0ee9227a4364c4fd8f8290343a) )	/* from shollow, assuming it's the same */
 ROM_END
 
 
@@ -1511,9 +1502,6 @@ ROM_START( turbotag )
 
 	ROM_REGION( 0x01000, "gfx3", 0 )
 	ROM_LOAD( "ttan.bin",     0x00000, 0x1000, CRC(aa0b1471) SHA1(e3dd69f1a14926c6b709d6b19d9e90a1f0867465) )
-
-	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "82s123.12d",   0x0000, 0x0020, CRC(e1281ee9) SHA1(9ac9b01d24affc0ee9227a4364c4fd8f8290343a) )	/* from shollow, assuming it's the same */
 ROM_END
 
 

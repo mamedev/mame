@@ -186,7 +186,7 @@ CUSTOM_INPUT_MEMBER(policetr_state::bsmt_status_r)
 
 READ32_MEMBER(policetr_state::bsmt2000_data_r)
 {
-	return machine().region("bsmt")->base()[m_bsmt_data_bank * 0x10000 + m_bsmt_data_offset] << 8;
+	return memregion("bsmt")->base()[m_bsmt_data_bank * 0x10000 + m_bsmt_data_offset] << 8;
 }
 
 

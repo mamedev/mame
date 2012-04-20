@@ -88,7 +88,7 @@ static UINT32 K001006_r(running_machine &machine, int chip, int offset, UINT32 m
 		{
 			case 0x0b:		// CG Board ROM read
 			{
-				UINT16 *rom = (UINT16*)machine.region("gfx1")->base();
+				UINT16 *rom = (UINT16*)machine.root_device().memregion("gfx1")->base();
 				return rom[K001006_addr[chip] / 2] << 16;
 			}
 			case 0x0d:		// Palette RAM read
@@ -239,7 +239,7 @@ void K001005_init(running_machine &machine)
 	int height = machine.primary_screen->height();
 	K001005_zbuffer = auto_bitmap_ind32_alloc(machine, width, height);
 
-	gfxrom = machine.region("gfx1")->base();
+	gfxrom = machine.root_device().memregion("gfx1")->base();
 
 	K001005_bitmap[0] = auto_bitmap_rgb32_alloc(machine, machine.primary_screen->width(), machine.primary_screen->height());
 	K001005_bitmap[1] = auto_bitmap_rgb32_alloc(machine, machine.primary_screen->width(), machine.primary_screen->height());
@@ -1539,7 +1539,7 @@ SCREEN_UPDATE_RGB32( gticlub )
         int index = (debug_tex_page - 1) * 0x40000;
         int pal = debug_tex_palette & 7;
         int tp = (debug_tex_palette >> 3) & 1;
-        UINT8 *rom = machine.region("gfx1")->base();
+        UINT8 *rom = machine.root_device().memregion("gfx1")->base();
 
         for (y=0; y < 384; y++)
         {

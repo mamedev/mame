@@ -220,7 +220,7 @@ static void mxtc_config_w(device_t *busdevice, device_t *device, int function, i
 			}
 			else					// disable RAM access (reads go to BIOS ROM)
 			{
-				state->membank("bank1")->set_base(busdevice->machine().region("bios")->base() + 0x30000);
+				state->membank("bank1")->set_base(busdevice->machine().root_device().memregion("bios")->base() + 0x30000);
 			}
 			break;
 		}
@@ -614,7 +614,7 @@ static MACHINE_START(gamecstl)
 
 static MACHINE_RESET(gamecstl)
 {
-	machine.root_device().membank("bank1")->set_base(machine.region("bios")->base() + 0x30000);
+	machine.root_device().membank("bank1")->set_base(machine.root_device().memregion("bios")->base() + 0x30000);
 
 	device_set_irq_callback(machine.device("maincpu"), irq_callback);
 }

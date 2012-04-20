@@ -19,7 +19,7 @@
 
 PALETTE_INIT( ojankoy )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 	int bit0, bit1, bit2, bit3, bit4, r, g, b;
 

@@ -230,7 +230,7 @@ static const k051960_interface aliens_k051960_intf =
 static MACHINE_START( aliens )
 {
 	aliens_state *state = machine.driver_data<aliens_state>();
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = state->memregion("maincpu")->base();
 
 	state->membank("bank1")->configure_entries(0, 20, &ROM[0x10000], 0x2000);
 	state->membank("bank1")->set_entry(0);

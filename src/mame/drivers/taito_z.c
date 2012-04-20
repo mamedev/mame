@@ -3060,9 +3060,9 @@ static MACHINE_START( bshark )
 
 static MACHINE_START( taitoz )
 {
-	int banks = (machine.region("audiocpu")->bytes() - 0xc000) / 0x4000;
+	int banks = (machine.root_device().memregion("audiocpu")->bytes() - 0xc000) / 0x4000;
 
-	machine.root_device().membank("bank10")->configure_entries(0, banks, machine.region("audiocpu")->base() + 0xc000, 0x4000);
+	machine.root_device().membank("bank10")->configure_entries(0, banks, machine.root_device().memregion("audiocpu")->base() + 0xc000, 0x4000);
 
 	machine.save().register_postload(save_prepost_delegate(FUNC(taitoz_postload), &machine));
 

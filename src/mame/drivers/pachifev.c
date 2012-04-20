@@ -261,7 +261,7 @@ static void pf_adpcm_int(device_t *device)
     }
     else
     {
-        UINT8 *ROM = device->machine().region("adpcm")->base();
+        UINT8 *ROM = device->machine().root_device().memregion("adpcm")->base();
 
         state->m_adpcm_data = ((state->m_trigger ? (ROM[state->m_adpcm_pos] & 0x0f) : (ROM[state->m_adpcm_pos] & 0xf0)>>4) );
         msm5205_data_w(device,state->m_adpcm_data & 0xf);

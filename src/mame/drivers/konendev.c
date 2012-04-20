@@ -161,8 +161,8 @@ ROM_END
 
 DRIVER_INIT( konendev )
 {
-	UINT8 *src = machine.region( "maincpu" )->base();
-	size_t  srcsize = machine.region( "maincpu" )->bytes();
+	UINT8 *src = machine.root_device().memregion( "maincpu" )->base();
+	size_t  srcsize = machine.root_device().memregion( "maincpu" )->bytes();
 	for (int i = 0; i < srcsize; i += 2)
 	{
 		int temp = src[i];

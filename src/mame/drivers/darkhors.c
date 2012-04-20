@@ -962,8 +962,8 @@ ROM_END
 
 static DRIVER_INIT( darkhors )
 {
-	UINT32 *rom    = (UINT32 *) machine.region("maincpu")->base();
-//	UINT8  *eeprom = (UINT8 *)  machine.region("eeprom")->base();
+	UINT32 *rom    = (UINT32 *) machine.root_device().memregion("maincpu")->base();
+//	UINT8  *eeprom = (UINT8 *)  machine.root_device().memregion("eeprom")->base();
 //	int i;
 
 #if 1

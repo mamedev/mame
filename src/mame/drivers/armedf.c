@@ -2085,7 +2085,7 @@ static DRIVER_INIT( legion )
 #if LEGION_HACK
 	/* This is a hack to allow you to use the extra features
          of 3 of the "Unused" Dip Switches (see notes above). */
-	UINT16 *RAM = (UINT16 *)machine.region("maincpu")->base();
+	UINT16 *RAM = (UINT16 *)state->memregion("maincpu")->base();
 	RAM[0x0001d6 / 2] = 0x0001;
 	/* To avoid checksum error */
 	RAM[0x000488 / 2] = 0x4e71;
@@ -2102,7 +2102,7 @@ static DRIVER_INIT( legiono )
 #if LEGION_HACK
 	/* This is a hack to allow you to use the extra features
          of 3 of the "Unused" Dip Switches (see notes above). */
-	UINT16 *RAM = (UINT16 *)machine.region("maincpu")->base();
+	UINT16 *RAM = (UINT16 *)state->memregion("maincpu")->base();
 	RAM[0x0001d6/2] = 0x0001;
 	/* No need to patch the checksum routine (see notes) ! */
 #endif

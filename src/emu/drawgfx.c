@@ -94,7 +94,7 @@ void gfx_init(running_machine &machine)
 	for (curgfx = 0; curgfx < MAX_GFX_ELEMENTS && gfxdecodeinfo[curgfx].gfxlayout != NULL; curgfx++)
 	{
 		const gfx_decode_entry *gfxdecode = &gfxdecodeinfo[curgfx];
-		const memory_region *region = (gfxdecode->memory_region != NULL) ? machine.region(gfxdecode->memory_region) : NULL;
+		memory_region *region = (gfxdecode->memory_region != NULL) ? machine.root_device().memregion(gfxdecode->memory_region) : NULL;
 		UINT32 region_length = (region != NULL) ? (8 * region->bytes()) : 0;
 		const UINT8 *region_base = (region != NULL) ? region->base() : NULL;
 		UINT32 xscale = (gfxdecode->xscale == 0) ? 1 : gfxdecode->xscale;

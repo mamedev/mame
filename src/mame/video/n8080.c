@@ -147,7 +147,7 @@ SCREEN_UPDATE_IND16( spacefev )
 	int y;
 
 	const UINT8* pRAM = state->m_videoram;
-	const UINT8* pPROM = screen.machine().region("proms")->base();
+	const UINT8* pPROM = state->memregion("proms")->base();
 
 	for (y = 0; y < 256; y++)
 	{
@@ -213,7 +213,7 @@ SCREEN_UPDATE_IND16( sheriff )
 	n8080_state *state = screen.machine().driver_data<n8080_state>();
 	UINT8 mask = state->flip_screen() ? 0xff : 0x00;
 
-	const UINT8* pPROM = screen.machine().region("proms")->base();
+	const UINT8* pPROM = state->memregion("proms")->base();
 
 	int x;
 	int y;

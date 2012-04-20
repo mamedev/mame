@@ -481,7 +481,7 @@ static void firq_gen(running_machine &machine, phillips_22vp931_device &laserdis
 static MACHINE_START( firefox )
 {
 	firefox_state *state = machine.driver_data<firefox_state>();
-	state->membank("bank1")->configure_entries(0, 32, machine.region("maincpu")->base() + 0x10000, 0x1000);
+	state->membank("bank1")->configure_entries(0, 32, state->memregion("maincpu")->base() + 0x10000, 0x1000);
 	state->m_nvram_1c = machine.device<x2212_device>("nvram_1c");
 	state->m_nvram_1d = machine.device<x2212_device>("nvram_1d");
 

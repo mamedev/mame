@@ -428,7 +428,7 @@ static const ym2610_interface mcatadv_ym2610_interface =
 static MACHINE_START( mcatadv )
 {
 	mcatadv_state *state = machine.driver_data<mcatadv_state>();
-	UINT8 *ROM = machine.region("soundcpu")->base();
+	UINT8 *ROM = state->memregion("soundcpu")->base();
 
 	state->membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
 	state->membank("bank1")->set_entry(1);

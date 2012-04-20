@@ -186,11 +186,11 @@ device_t::~device_t()
 
 
 //-------------------------------------------------
-//  subregion - return a pointer to the region
+//  memregion - return a pointer to the region
 //  info for a given region
 //-------------------------------------------------
 
-const memory_region *device_t::subregion(const char *_tag) const
+memory_region *device_t::memregion(const char *_tag) const
 {
 	// safety first
 	if (this == NULL)
@@ -198,12 +198,12 @@ const memory_region *device_t::subregion(const char *_tag) const
 
 	// build a fully-qualified name and look it up
 	astring fullpath;
-	return machine().region(subtag(fullpath, _tag));
+	return machine().memory().region(subtag(fullpath, _tag));
 }
 
 
 //-------------------------------------------------
-//  subregion - return a pointer to the memory
+//  memregion - return a pointer to the memory
 //  bank info for a given bank
 //-------------------------------------------------
 
@@ -397,7 +397,7 @@ void device_t::set_machine(running_machine &machine)
 void device_t::start()
 {
 	// populate the machine and the region field
-	m_region = machine().region(tag());
+	m_region = machine().root_device().memregion(tag());
 
 	// find all the registered devices
 	bool allfound = true;

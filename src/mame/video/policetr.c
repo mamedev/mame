@@ -26,10 +26,10 @@ VIDEO_START( policetr )
 {
 	policetr_state *state = machine.driver_data<policetr_state>();
 	/* the source bitmap is in ROM */
-	state->m_srcbitmap = machine.region("gfx1")->base();
+	state->m_srcbitmap = machine.root_device().memregion("gfx1")->base();
 
 	/* compute the height */
-	state->m_srcbitmap_height_mask = (machine.region("gfx1")->bytes() / SRCBITMAP_WIDTH) - 1;
+	state->m_srcbitmap_height_mask = (state->memregion("gfx1")->bytes() / SRCBITMAP_WIDTH) - 1;
 
 	/* the destination bitmap is not directly accessible to the CPU */
 	state->m_dstbitmap = auto_alloc_array(machine, UINT8, DSTBITMAP_WIDTH * DSTBITMAP_HEIGHT);

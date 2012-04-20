@@ -191,7 +191,7 @@ static MACHINE_START( ccastles )
 	rectangle visarea;
 
 	/* initialize globals */
-	state->m_syncprom = machine.region("proms")->base() + 0x000;
+	state->m_syncprom = machine.root_device().memregion("proms")->base() + 0x000;
 
 	/* find the start of VBLANK in the SYNC PROM */
 	for (state->m_vblank_start = 0; state->m_vblank_start < 256; state->m_vblank_start++)
@@ -213,7 +213,7 @@ static MACHINE_START( ccastles )
 	machine.primary_screen->configure(320, 256, visarea, HZ_TO_ATTOSECONDS(PIXEL_CLOCK) * VTOTAL * HTOTAL);
 
 	/* configure the ROM banking */
-	state->membank("bank1")->configure_entries(0, 2, machine.region("maincpu")->base() + 0xa000, 0x6000);
+	state->membank("bank1")->configure_entries(0, 2, state->memregion("maincpu")->base() + 0xa000, 0x6000);
 
 	/* create a timer for IRQs and set up the first callback */
 	state->m_irq_timer = machine.scheduler().timer_alloc(FUNC(clock_irq));

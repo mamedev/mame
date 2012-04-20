@@ -433,7 +433,7 @@ WRITE16_MEMBER( segas24_state::fdc_w )
 				break;
 			case 0x9:
 				logerror("Read multiple [%02x] %d..%d side %d track %d\n", data, fdc_sector, fdc_sector+fdc_data-1, data & 8 ? 1 : 0, fdc_phys_track);
-				fdc_pt = machine().region("floppy")->base() + track_size*(2*fdc_phys_track+(data & 8 ? 1 : 0));
+				fdc_pt = memregion("floppy")->base() + track_size*(2*fdc_phys_track+(data & 8 ? 1 : 0));
 				fdc_span = track_size;
 				fdc_status = 3;
 				fdc_drq = 1;
@@ -441,7 +441,7 @@ WRITE16_MEMBER( segas24_state::fdc_w )
 				break;
 			case 0xb:
 				logerror("Write multiple [%02x] %d..%d side %d track %d\n", data, fdc_sector, fdc_sector+fdc_data-1, data & 8 ? 1 : 0, fdc_phys_track);
-				fdc_pt = machine().region("floppy")->base() + track_size*(2*fdc_phys_track+(data & 8 ? 1 : 0));
+				fdc_pt = memregion("floppy")->base() + track_size*(2*fdc_phys_track+(data & 8 ? 1 : 0));
 				fdc_span = track_size;
 				fdc_status = 3;
 				fdc_drq = 1;
@@ -712,7 +712,7 @@ void segas24_state::reset_control_w(UINT8 data)
 
 void segas24_state::reset_bank()
 {
-	if (machine().region("romboard")->base())
+	if (machine().root_device().memregion("romboard")->base())
 	{
 		membank("bank1")->set_entry(curbank & 15);
 		membank("bank2")->set_entry(curbank & 15);
@@ -1262,9 +1262,9 @@ static MACHINE_START( system24 )
 {
 	segas24_state *state = machine.driver_data<segas24_state>();
 	if (state->track_size)
-		machine.device<nvram_device>("floppy_nvram")->set_base(machine.region("floppy")->base(), 2*state->track_size);
+		machine.device<nvram_device>("floppy_nvram")->set_base(machine.root_device().memregion("floppy")->base(), 2*state->track_size);
 
-	UINT8 *usr1 = machine.region("romboard")->base();
+	UINT8 *usr1 = state->memregion("romboard")->base();
 	if (usr1)
 	{
 		state->membank("bank1")->configure_entries(0, 16, usr1, 0x40000);

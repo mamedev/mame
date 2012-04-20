@@ -110,7 +110,7 @@ INLINE int adjust_xy(segag80v_state *state, int rawx, int rawy, int *outx, int *
 static void sega_generate_vector_list(running_machine &machine)
 {
 	segag80v_state *state = machine.driver_data<segag80v_state>();
-	UINT8 *sintable = machine.region("proms")->base();
+	UINT8 *sintable = state->memregion("proms")->base();
 	double total_time = 1.0 / (double)IRQ_CLOCK;
 	UINT16 symaddr = 0;
 	UINT8 *vectorram = state->m_vectorram;

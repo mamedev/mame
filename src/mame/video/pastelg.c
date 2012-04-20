@@ -21,7 +21,7 @@ static void pastelg_gfxdraw(running_machine &machine);
 ******************************************************************************/
 PALETTE_INIT( pastelg )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 	int bit0, bit1, bit2, bit3, r, g, b;
 
@@ -100,7 +100,7 @@ WRITE8_MEMBER(pastelg_state::threeds_output_w)
 
 READ8_MEMBER(pastelg_state::threeds_rom_readback_r)
 {
-	UINT8 *GFX = machine().region("gfx1")->base();
+	UINT8 *GFX = memregion("gfx1")->base();
 
 	return GFX[(m_blitter_src_addr | (m_gfxrom << 16)) & 0x3ffff];
 }
@@ -108,7 +108,7 @@ READ8_MEMBER(pastelg_state::threeds_rom_readback_r)
 
 WRITE8_MEMBER(pastelg_state::pastelg_romsel_w)
 {
-	int gfxlen = machine().region("gfx1")->bytes();
+	int gfxlen = memregion("gfx1")->bytes();
 	m_gfxrom = ((data & 0xc0) >> 6);
 	m_palbank = ((data & 0x10) >> 4);
 	nb1413m3_sndrombank1_w(&space, 0, data);
@@ -158,7 +158,7 @@ static TIMER_CALLBACK( blitter_timer_callback )
 static void pastelg_gfxdraw(running_machine &machine)
 {
 	pastelg_state *state = machine.driver_data<pastelg_state>();
-	UINT8 *GFX = machine.region("gfx1")->base();
+	UINT8 *GFX = state->memregion("gfx1")->base();
 	int width = machine.primary_screen->width();
 
 	int x, y;
@@ -202,7 +202,7 @@ static void pastelg_gfxdraw(running_machine &machine)
 		incy = -1;
 	}
 
-	gfxlen = machine.region("gfx1")->bytes();
+	gfxlen = machine.root_device().memregion("gfx1")->bytes();
 	gfxaddr = (state->m_gfxrom << 16) + state->m_blitter_src_addr;
 
 	readflag = 0;

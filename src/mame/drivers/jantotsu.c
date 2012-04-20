@@ -200,7 +200,7 @@ WRITE8_MEMBER(jantotsu_state::bankaddr_w)
 
 static PALETTE_INIT( jantotsu )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int	bit0, bit1, bit2, r, g, b;
 	int	i;
 
@@ -300,7 +300,7 @@ static void jan_adpcm_int( device_t *device )
 	}
 	else
 	{
-		UINT8 *ROM = device->machine().region("adpcm")->base();
+		UINT8 *ROM = device->machine().root_device().memregion("adpcm")->base();
 
 		state->m_adpcm_data = ((state->m_adpcm_trigger ? (ROM[state->m_adpcm_pos] & 0x0f) : (ROM[state->m_adpcm_pos] & 0xf0) >> 4));
 		msm5205_data_w(device, state->m_adpcm_data & 0xf);

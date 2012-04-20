@@ -196,8 +196,8 @@ public:
 static PALETTE_INIT( royalmah )
 {
 	offs_t i;
-	const UINT8 *prom = machine.region("proms")->base();
-	int len = machine.region("proms")->bytes();
+	const UINT8 *prom = machine.root_device().memregion("proms")->base();
+	int len = machine.root_device().memregion("proms")->bytes();
 
 	for (i = 0; i < len; i++)
 	{
@@ -231,8 +231,8 @@ static PALETTE_INIT( royalmah )
 static PALETTE_INIT( mjderngr )
 {
 	offs_t i;
-	const UINT8 *prom = machine.region("proms")->base();
-	int len = machine.region("proms")->bytes();
+	const UINT8 *prom = machine.root_device().memregion("proms")->base();
+	int len = machine.root_device().memregion("proms")->bytes();
 
 	for (i = 0; i < len / 2; i++)
 	{
@@ -386,7 +386,7 @@ READ8_MEMBER(royalmah_state::suzume_dsw_r)
 
 WRITE8_MEMBER(royalmah_state::suzume_bank_w)
 {
-	UINT8 *rom = machine().region("maincpu")->base();
+	UINT8 *rom = memregion("maincpu")->base();
 	int address;
 
 	m_suzume_bank = data;
@@ -402,7 +402,7 @@ logerror("%04x: bank %02x\n",cpu_get_pc(&space.device()),data);
 
 WRITE8_MEMBER(royalmah_state::mjapinky_bank_w)
 {
-	UINT8 *ROM = machine().region("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 	m_rombank = data;
 	membank("bank1")->set_base(ROM + 0x10000 + 0x8000 * data);
 }
@@ -418,12 +418,12 @@ WRITE8_MEMBER(royalmah_state::mjapinky_palbank_w)
 READ8_MEMBER(royalmah_state::mjapinky_dsw_r)
 {
 	if (m_rombank == 0x0e)	return input_port_read(machine(), "DSW3");
-	else					return *(machine().region("maincpu")->base() + 0x10000 + 0x8000 * m_rombank);
+	else					return *(machine().root_device().memregion("maincpu")->base() + 0x10000 + 0x8000 * m_rombank);
 }
 
 WRITE8_MEMBER(royalmah_state::tontonb_bank_w)
 {
-	UINT8 *rom = machine().region("maincpu")->base();
+	UINT8 *rom = memregion("maincpu")->base();
 	int address;
 
 logerror("%04x: bank %02x\n",cpu_get_pc(&space.device()),data);
@@ -441,7 +441,7 @@ logerror("%04x: bank %02x\n",cpu_get_pc(&space.device()),data);
 /* bits 5 and 6 seem to affect which Dip Switch to read in 'majs101b' */
 WRITE8_MEMBER(royalmah_state::dynax_bank_w)
 {
-	UINT8 *rom = machine().region("maincpu")->base();
+	UINT8 *rom = memregion("maincpu")->base();
 	int address;
 
 //logerror("%04x: bank %02x\n",cpu_get_pc(&space.device()),data);
@@ -470,7 +470,7 @@ READ8_MEMBER(royalmah_state::daisyari_dsw_r)
 
 WRITE8_MEMBER(royalmah_state::daisyari_bank_w)
 {
-	UINT8 *rom = machine().region("maincpu")->base();
+	UINT8 *rom = memregion("maincpu")->base();
 	int address;
 
 	m_dsw_select = (data & 0xc);
@@ -498,7 +498,7 @@ READ8_MEMBER(royalmah_state::mjclub_dsw_r)
 
 WRITE8_MEMBER(royalmah_state::mjclub_bank_w)
 {
-	UINT8 *rom = machine().region("maincpu")->base();
+	UINT8 *rom = memregion("maincpu")->base();
 	int address;
 
 	m_dsw_select = data & 0xc0;
@@ -727,7 +727,7 @@ WRITE8_MEMBER(royalmah_state::jansou_6402_w)
 
 READ8_MEMBER(royalmah_state::jansou_6403_r)
 {
-	UINT8 *GFXROM = machine().region("gfx1")->base();
+	UINT8 *GFXROM = memregion("gfx1")->base();
 	int d0 = GFXROM[m_gfx_adr];
 	int d1 = GFXROM[m_gfx_adr+1];
 	int c0 = m_jansou_colortable[d1 & 0x0f] & 0x0f;
@@ -828,7 +828,7 @@ READ8_MEMBER(royalmah_state::janptr96_dsw_r)
 
 WRITE8_MEMBER(royalmah_state::janptr96_rombank_w)
 {
-	UINT8 *ROM = machine().region("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 	membank("bank1")->set_base(ROM + 0x10000 + 0x8000 * data);
 }
 
@@ -880,7 +880,7 @@ WRITE8_MEMBER(royalmah_state::mjifb_coin_counter_w)
 READ8_MEMBER(royalmah_state::mjifb_rom_io_r)
 {
 	if (m_mjifb_rom_enable)
-		return ((UINT8*)(machine().region("maincpu")->base() + 0x10000 + m_rombank * 0x4000))[offset];
+		return ((UINT8*)(machine().root_device().memregion("maincpu")->base() + 0x10000 + m_rombank * 0x4000))[offset];
 
 	offset += 0x8000;
 
@@ -989,7 +989,7 @@ ADDRESS_MAP_END
 READ8_MEMBER(royalmah_state::mjdejavu_rom_io_r)
 {
 	if (m_mjifb_rom_enable)
-		return ((UINT8*)(machine().region("maincpu")->base() + 0x10000 + m_rombank * 0x4000))[offset];
+		return ((UINT8*)(machine().root_device().memregion("maincpu")->base() + 0x10000 + m_rombank * 0x4000))[offset];
 
 	offset += 0x8000;
 
@@ -1050,7 +1050,7 @@ READ8_MEMBER(royalmah_state::mjtensin_p3_r)
 static void mjtensin_update_rombank(running_machine &machine)
 {
 	royalmah_state *state = machine.driver_data<royalmah_state>();
-	state->membank("bank1")->set_base(machine.region("maincpu")->base() + 0x10000 + state->m_rombank * 0x8000 );
+	state->membank("bank1")->set_base(state->memregion("maincpu")->base() + 0x10000 + state->m_rombank * 0x8000 );
 }
 WRITE8_MEMBER(royalmah_state::mjtensin_p4_w)
 {
@@ -1092,7 +1092,7 @@ ADDRESS_MAP_END
 static void cafetime_update_rombank(running_machine &machine)
 {
 	royalmah_state *state = machine.driver_data<royalmah_state>();
-	state->membank("bank1")->set_base(machine.region("maincpu")->base() + 0x10000 + state->m_rombank * 0x8000 );
+	state->membank("bank1")->set_base(state->memregion("maincpu")->base() + 0x10000 + state->m_rombank * 0x8000 );
 }
 WRITE8_MEMBER(royalmah_state::cafetime_p4_w)
 {
@@ -1177,7 +1177,7 @@ WRITE8_MEMBER(royalmah_state::mjvegasa_rombank_w)
 READ8_MEMBER(royalmah_state::mjvegasa_rom_io_r)
 {
 	if ((m_rombank & 0x70) != 0x70)
-		return machine().region("maincpu")->base()[0x10000 + m_rombank * 0x8000 + offset];
+		return memregion("maincpu")->base()[0x10000 + m_rombank * 0x8000 + offset];
 
 	offset += 0x8000;
 
@@ -4710,7 +4710,7 @@ ROM_START( jansoua )
 ROM_END
 
 
-static DRIVER_INIT( ippatsu )	{	machine.root_device().membank("bank1")->set_base(machine.region("maincpu")->base() + 0x8000 );	}
+static DRIVER_INIT( ippatsu )	{	machine.root_device().membank("bank1")->set_base(machine.root_device().memregion("maincpu")->base() + 0x8000 );	}
 
 static DRIVER_INIT( janptr96 )
 {

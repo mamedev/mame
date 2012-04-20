@@ -121,7 +121,7 @@ VIDEO_START( namcos1 )
 	namcos1_state *state = machine.driver_data<namcos1_state>();
 	int i;
 
-	state->m_tilemap_maskdata = (UINT8 *)machine.region("gfx1")->base();
+	state->m_tilemap_maskdata = (UINT8 *)state->memregion("gfx1")->base();
 
 	/* allocate videoram */
 	state->m_videoram = auto_alloc_array(machine, UINT8, 0x8000);

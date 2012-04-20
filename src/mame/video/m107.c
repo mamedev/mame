@@ -153,7 +153,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 	m107_state *state = machine.driver_data<m107_state>();
 	UINT16 *spriteram = state->m_buffered_spriteram;
 	int offs;
-	UINT8 *rom = machine.region("user1")->base();
+	UINT8 *rom = state->memregion("user1")->base();
 
 	for (offs = 0;offs < 0x800;offs += 4)
 	{

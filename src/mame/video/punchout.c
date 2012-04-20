@@ -327,7 +327,7 @@ static void punchout_copy_top_palette(running_machine &machine, int bank)
 {
 	punchout_state *state = machine.driver_data<punchout_state>();
 	int i;
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = state->memregion("proms")->base();
 
 	// top monitor palette
 	for (i = 0; i < 0x100; i++)
@@ -347,7 +347,7 @@ static void punchout_copy_bot_palette(running_machine &machine, int bank)
 {
 	punchout_state *state = machine.driver_data<punchout_state>();
 	int i;
-	const UINT8 *color_prom = machine.region("proms")->base() + 0x600;
+	const UINT8 *color_prom = state->memregion("proms")->base() + 0x600;
 
 	// bottom monitor palette
 	for (i = 0; i < 0x100; i++)

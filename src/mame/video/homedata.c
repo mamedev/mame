@@ -41,7 +41,7 @@ static void mrokumei_handleblit( address_space *space, int rom_base )
 	int dest_addr;
 	int base_addr;
 	int opcode, data, num_tiles;
-	UINT8 *pBlitData = space->machine().region("user1")->base() + rom_base;
+	UINT8 *pBlitData = state->memregion("user1")->base() + rom_base;
 
 	dest_param = state->m_blitter_param[(state->m_blitter_param_count - 4) & 3] * 256 +
 		state->m_blitter_param[(state->m_blitter_param_count - 3) & 3];
@@ -127,7 +127,7 @@ static void reikaids_handleblit( address_space *space, int rom_base )
 	int flipx;
 	int source_addr, base_addr;
 	int dest_addr;
-	UINT8 *pBlitData = space->machine().region("user1")->base() + rom_base;
+	UINT8 *pBlitData = state->memregion("user1")->base() + rom_base;
 
 	int opcode, data, num_tiles;
 
@@ -225,7 +225,7 @@ static void pteacher_handleblit( address_space *space, int rom_base )
 	int source_addr;
 	int dest_addr, base_addr;
 	int opcode, data, num_tiles;
-	UINT8 *pBlitData = space->machine().region("user1")->base() + rom_base;
+	UINT8 *pBlitData = state->memregion("user1")->base() + rom_base;
 
 	dest_param = state->m_blitter_param[(state->m_blitter_param_count - 4) & 3] * 256 +
 		state->m_blitter_param[(state->m_blitter_param_count - 3) & 3];
@@ -315,7 +315,7 @@ finish:
 
 PALETTE_INIT( mrokumei )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 
 	/* initialize 555 RGB palette */
@@ -338,7 +338,7 @@ PALETTE_INIT( mrokumei )
 
 PALETTE_INIT( reikaids )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 
 	/* initialize 555 RGB palette */
@@ -361,7 +361,7 @@ PALETTE_INIT( reikaids )
 
 PALETTE_INIT( pteacher )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 
 	/* initialize 555 RGB palette */
@@ -384,7 +384,7 @@ PALETTE_INIT( pteacher )
 
 PALETTE_INIT( mirderby )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 
 	for (i = 0; i < 0x100; i++)
@@ -819,7 +819,7 @@ WRITE8_MEMBER(homedata_state::reikaids_blitter_start_w)
 
 WRITE8_MEMBER(homedata_state::pteacher_blitter_start_w)
 {
-	pteacher_handleblit(&space, (m_blitter_bank >> 5) * 0x10000 & (machine().region("user1")->bytes() - 1));
+	pteacher_handleblit(&space, (m_blitter_bank >> 5) * 0x10000 & (machine().root_device().memregion("user1")->bytes() - 1));
 }
 
 

@@ -700,7 +700,7 @@ static void alg_init(running_machine &machine)
 
 	/* set up memory */
 	state->membank("bank1")->configure_entry(0, state->m_chip_ram);
-	state->membank("bank1")->configure_entry(1, machine.region("user1")->base());
+	state->membank("bank1")->configure_entry(1, machine.root_device().memregion("user1")->base());
 }
 
 
@@ -713,8 +713,8 @@ static void alg_init(running_machine &machine)
 
 static DRIVER_INIT( palr1 )
 {
-	UINT32 length = machine.region("user2")->bytes();
-	UINT8 *rom = machine.region("user2")->base();
+	UINT32 length = machine.root_device().memregion("user2")->bytes();
+	UINT8 *rom = machine.root_device().memregion("user2")->base();
 	UINT8 *original = auto_alloc_array(machine, UINT8, length);
 	UINT32 srcaddr;
 
@@ -733,8 +733,8 @@ static DRIVER_INIT( palr1 )
 
 static DRIVER_INIT( palr3 )
 {
-	UINT32 length = machine.region("user2")->bytes();
-	UINT8 *rom = machine.region("user2")->base();
+	UINT32 length = machine.root_device().memregion("user2")->bytes();
+	UINT8 *rom = machine.root_device().memregion("user2")->base();
 	UINT8 *original = auto_alloc_array(machine, UINT8, length);
 	UINT32 srcaddr;
 
@@ -752,8 +752,8 @@ static DRIVER_INIT( palr3 )
 
 static DRIVER_INIT( palr6 )
 {
-	UINT32 length = machine.region("user2")->bytes();
-	UINT8 *rom = machine.region("user2")->base();
+	UINT32 length = machine.root_device().memregion("user2")->bytes();
+	UINT8 *rom = machine.root_device().memregion("user2")->base();
 	UINT8 *original = auto_alloc_array(machine, UINT8, length);
 	UINT32 srcaddr;
 
@@ -774,7 +774,7 @@ static DRIVER_INIT( palr6 )
 static DRIVER_INIT( aplatoon )
 {
 	/* NOT DONE TODO FIGURE OUT THE RIGHT ORDER!!!! */
-	UINT8 *rom = machine.region("user2")->base();
+	UINT8 *rom = machine.root_device().memregion("user2")->base();
 	UINT8 *decrypted = auto_alloc_array(machine, UINT8, 0x40000);
 	int i;
 

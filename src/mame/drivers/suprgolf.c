@@ -257,7 +257,7 @@ static READ8_DEVICE_HANDLER( rom_bank_select_r )
 static WRITE8_DEVICE_HANDLER( rom_bank_select_w )
 {
 	suprgolf_state *state = device->machine().driver_data<suprgolf_state>();
-	UINT8 *region_base = device->machine().region("user1")->base();
+	UINT8 *region_base = state->memregion("user1")->base();
 
 	state->m_rom_bank = data;
 
@@ -272,7 +272,7 @@ static WRITE8_DEVICE_HANDLER( rom_bank_select_w )
 
 WRITE8_MEMBER(suprgolf_state::rom2_bank_select_w)
 {
-	UINT8 *region_base = machine().region("user2")->base();
+	UINT8 *region_base = memregion("user2")->base();
 //  mame_printf_debug("ROM_BANK 0x4000 - %X @%X\n",data,cpu_get_previouspc(&space.device()));
 
 	membank("bank1")->set_base(region_base + (data&0x0f) * 0x4000);
@@ -638,7 +638,7 @@ ROM_END
 
 static DRIVER_INIT( suprgolf )
 {
-	UINT8 *ROM = machine.region("user2")->base();
+	UINT8 *ROM = machine.root_device().memregion("user2")->base();
 
 	ROM[0x74f4-0x4000] = 0x00;
 	ROM[0x74f5-0x4000] = 0x00;

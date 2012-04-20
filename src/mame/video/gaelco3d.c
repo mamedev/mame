@@ -30,8 +30,8 @@ gaelco3d_renderer::gaelco3d_renderer(gaelco3d_state &state)
 	  m_screenbits(state.machine().primary_screen->width(), state.machine().primary_screen->height()),
 	  m_zbuffer(state.machine().primary_screen->width(), state.machine().primary_screen->height()),
 	  m_polygons(0),
-	  m_texture_size(state.machine().region("gfx1")->bytes()),
-	  m_texmask_size(state.machine().region("gfx2")->bytes() * 8),
+	  m_texture_size(state.machine().root_device().memregion("gfx1")->bytes()),
+	  m_texmask_size(state.machine().root_device().memregion("gfx2")->bytes() * 8),
 	  m_texture(auto_alloc_array(state.machine(), UINT8, m_texture_size)),
 	  m_texmask(auto_alloc_array(state.machine(), UINT8, m_texmask_size))
 {
@@ -39,7 +39,7 @@ gaelco3d_renderer::gaelco3d_renderer(gaelco3d_state &state)
 	state_save_register_global_bitmap(state.machine(), &m_zbuffer);
 
 	/* first expand the pixel data */
-	UINT8 *src = state.machine().region("gfx1")->base();
+	UINT8 *src = state.machine().root_device().memregion("gfx1")->base();
 	UINT8 *dst = m_texture;
 	for (int y = 0; y < m_texture_size/4096; y += 2)
 		for (int x = 0; x < 4096; x += 2)
@@ -51,7 +51,7 @@ gaelco3d_renderer::gaelco3d_renderer(gaelco3d_state &state)
 		}
 
 	/* then expand the mask data */
-	src = state.machine().region("gfx2")->base();
+	src = state.machine().root_device().memregion("gfx2")->base();
 	dst = m_texmask;
 	for (int y = 0; y < m_texmask_size/4096; y++)
 		for (int x = 0; x < 4096; x++)

@@ -1451,7 +1451,7 @@ static DRIVER_INIT( decocass )
 {
 	decocass_state *state = machine.driver_data<decocass_state>();
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	UINT8 *rom = machine.region("maincpu")->base();
+	UINT8 *rom = state->memregion("maincpu")->base();
 	int A;
 
 	/* allocate memory and mark all RAM regions with their decrypted pointers */
@@ -1475,8 +1475,8 @@ static DRIVER_INIT( decocass )
 static DRIVER_INIT( decocrom )
 {
 	decocass_state *state = machine.driver_data<decocass_state>();
-	int romlength = machine.region("user3")->bytes();
-	UINT8 *rom = machine.region("user3")->base();
+	int romlength = machine.root_device().memregion("user3")->bytes();
+	UINT8 *rom = machine.root_device().memregion("user3")->base();
 	int i;
 
 	state->m_decrypted2 = auto_alloc_array(machine, UINT8, romlength);
@@ -1492,7 +1492,7 @@ static DRIVER_INIT( decocrom )
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x6000, 0xafff, "bank1");
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x6000, 0xafff, FUNC(decocass_de0091_w));
 	state->membank("bank1")->configure_entry(0, state->m_charram);
-	state->membank("bank1")->configure_entry(1, machine.region("user3")->base());
+	state->membank("bank1")->configure_entry(1, state->memregion("user3")->base());
 	state->membank("bank1")->configure_decrypted_entry(0, &state->m_decrypted[0x6000]);
 	state->membank("bank1")->configure_decrypted_entry(1, state->m_decrypted2);
 	state->membank("bank1")->set_entry(0);

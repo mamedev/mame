@@ -2112,7 +2112,7 @@ GFXDECODE_END
 
 static PALETTE_INIT( dealem )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i, len;
 	static const int resistances_rg[3] = { 1000, 470, 220 };
 	static const int resistances_b [2] = { 470, 220 };
@@ -2123,7 +2123,7 @@ static PALETTE_INIT( dealem )
 			3,	resistances_rg,	weights_g,	1000,	0,
 			2,	resistances_b,	weights_b,	1000,	0);
 
-	len = machine.region("proms")->bytes();
+	len = machine.root_device().memregion("proms")->bytes();
 	for (i = 0; i < len; i++)
 	{
 		int bit0,bit1,bit2,r,g,b;
@@ -2883,7 +2883,7 @@ static DRIVER_INIT (prizeinv)
 void mpu4vid_char_cheat(running_machine& machine, int address)
 {
 	mpu4_state *state = machine.driver_data<mpu4_state>();
-	UINT8* cheattable = machine.region( "video" )->base()+address;
+	UINT8* cheattable = state->memregion( "video" )->base()+address;
 	state->m_current_chr_table = blank_data;
 	for (int i=0;i<72;i++)
 	{

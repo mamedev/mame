@@ -485,7 +485,7 @@ WRITE32_MEMBER(ssfindo_state::PS7500_IO_w)
 
 READ32_MEMBER(ssfindo_state::io_r)
 {
-	UINT16 *FLASH = (UINT16 *)machine().region("user2")->base(); //16 bit - WORD access
+	UINT16 *FLASH = (UINT16 *)machine().root_device().memregion("user2")->base(); //16 bit - WORD access
 
 	int adr=m_flashAdr*0x200+(m_flashOffset);
 

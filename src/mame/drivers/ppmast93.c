@@ -171,7 +171,7 @@ WRITE8_MEMBER(ppmast93_state::ppmast93_bgram_w)
 
 WRITE8_MEMBER(ppmast93_state::ppmast93_port4_w)
 {
-	UINT8 *rom = machine().region("maincpu")->base();
+	UINT8 *rom = memregion("maincpu")->base();
 	int bank;
 
 	coin_counter_w(machine(), 0, data & 0x08);

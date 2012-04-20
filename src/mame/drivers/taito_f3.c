@@ -121,7 +121,7 @@ WRITE32_MEMBER(taito_f3_state::f3_sound_reset_1_w)
 WRITE32_MEMBER(taito_f3_state::f3_sound_bankswitch_w)
 {
 	if (m_f3_game==KIRAMEKI) {
-		UINT16 *rom = (UINT16 *)machine().region("audiocpu")->base();
+		UINT16 *rom = (UINT16 *)machine().root_device().memregion("audiocpu")->base();
 		UINT32 idx;
 
 		idx = (offset << 1) & 0x1e;
@@ -3666,8 +3666,8 @@ static void tile_decode(running_machine &machine)
 {
 	UINT8 lsb,msb;
 	UINT32 offset,i;
-	UINT8 *gfx = machine.region("gfx2")->base();
-	int size=machine.region("gfx2")->bytes();
+	UINT8 *gfx = machine.root_device().memregion("gfx2")->base();
+	int size=machine.root_device().memregion("gfx2")->bytes();
 	int data;
 
 	/* Setup ROM formats:
@@ -3699,8 +3699,8 @@ static void tile_decode(running_machine &machine)
 		offset+=4;
 	}
 
-	gfx = machine.region("gfx1")->base();
-	size=machine.region("gfx1")->bytes();
+	gfx = machine.root_device().memregion("gfx1")->base();
+	size=machine.root_device().memregion("gfx1")->bytes();
 
 	offset = size/2;
 	for (i = size/2+size/4; i<size; i++)
@@ -3781,7 +3781,7 @@ static DRIVER_INIT( trstaroj )
 static DRIVER_INIT( scfinals )
 {
 	taito_f3_state *state = machine.driver_data<taito_f3_state>();
-	UINT32 *RAM = (UINT32 *)machine.region("maincpu")->base();
+	UINT32 *RAM = (UINT32 *)state->memregion("maincpu")->base();
 
 	/* Doesn't boot without this - eprom related? */
     RAM[0x5af0/4]=0x4e710000|(RAM[0x5af0/4]&0xffff);
@@ -3868,7 +3868,7 @@ WRITE32_MEMBER(taito_f3_state::bubsympb_oki_w)
 	//if (mem_mask==0x000000ff) downcast<okim6295_device *>(device)->write(0,data&0xff);
 	if (ACCESSING_BITS_16_23)
 	{
-		UINT8 *snd = machine().region("oki")->base();
+		UINT8 *snd = memregion("oki")->base();
 		int bank = (data & 0x000f0000) >> 16;
 		// almost certainly wrong
 		memcpy(snd+0x30000, snd+0x80000+0x30000+bank*0x10000, 0x10000);
@@ -3889,7 +3889,7 @@ static DRIVER_INIT( bubsympb )
 	/* expand gfx rom */
 	{
 		int i;
-		UINT8 *gfx = machine.region("gfx2")->base();
+		UINT8 *gfx = state->memregion("gfx2")->base();
 
 		for (i=0x200000;i<0x400000; i+=4)
 		{
@@ -3941,7 +3941,7 @@ static DRIVER_INIT( landmakr )
 static DRIVER_INIT( landmkrp )
 {
 	taito_f3_state *state = machine.driver_data<taito_f3_state>();
-	UINT32 *RAM = (UINT32 *)machine.region("maincpu")->base();
+	UINT32 *RAM = (UINT32 *)state->memregion("maincpu")->base();
 
 	/* For some reason the least significant byte in the last 2 long words of
     ROM is swapped.  As the roms have been verified ok, I assume this is some
@@ -3989,7 +3989,7 @@ static DRIVER_INIT( pbobbl2p )
 	// which eventually causes the game to crash
 	//  -- protection check?? or some kind of checksum fail?
 
-	UINT32 *ROM = (UINT32 *)machine.region("maincpu")->base();
+	UINT32 *ROM = (UINT32 *)state->memregion("maincpu")->base();
 
 	/* protection? */
     ROM[0x40090/4]=0x00004e71|(ROM[0x40090/4]&0xffff0000);

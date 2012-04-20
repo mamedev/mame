@@ -47,7 +47,7 @@ static void draw_obj0( running_machine &machine, bitmap_ind16 &bitmap, int sy )
 	changela_state *state = machine.driver_data<changela_state>();
 	int sx, i;
 
-	UINT8* ROM = machine.region("user1")->base();
+	UINT8* ROM = state->memregion("user1")->base();
 	UINT8* RAM = state->m_spriteram;
 
 	for (sx = 0; sx < 256; sx++)
@@ -110,7 +110,7 @@ static void draw_obj1( running_machine &machine, bitmap_ind16 &bitmap )
 	changela_state *state = machine.driver_data<changela_state>();
 	int sx, sy;
 
-	UINT8* ROM = machine.region("gfx2")->base();
+	UINT8* ROM = state->memregion("gfx2")->base();
 	UINT8* RAM = state->m_videoram;
 
 	UINT8 reg[4] = { 0 }; /* 4x4-bit registers (U58, U59) */
@@ -175,11 +175,11 @@ static void draw_river( running_machine &machine, bitmap_ind16 &bitmap, int sy )
 	changela_state *state = machine.driver_data<changela_state>();
 	int sx, i, j;
 
-	UINT8* ROM = machine.region("user2")->base();
+	UINT8* ROM = machine.root_device().memregion("user2")->base();
 	UINT8* RAM = state->m_memory_devices + 0x800;
-	UINT8* TILE_ROM = machine.region("gfx1")->base();
+	UINT8* TILE_ROM = machine.root_device().memregion("gfx1")->base();
 	UINT8* TILE_RAM = state->m_memory_devices + 0x1000;
-	UINT8* PROM = machine.region("proms")->base();
+	UINT8* PROM = state->memregion("proms")->base();
 
 	int preload = ((sy < 32) ? 1 : 0);
 
@@ -355,14 +355,14 @@ static void draw_tree( running_machine &machine, bitmap_ind16 &bitmap, int sy, i
 	int sx, i, j;
 
 	/* State machine */
-	UINT8* ROM = machine.region("user2")->base();
+	UINT8* ROM = machine.root_device().memregion("user2")->base();
 	UINT8* RAM = state->m_memory_devices + 0x840 + 0x40 * tree_num;
-	UINT8* PROM = machine.region("proms")->base();
+	UINT8* PROM = machine.root_device().memregion("proms")->base();
 
 	/* Tree Data */
 	UINT8* RAM2 = state->m_tree_ram + 0x20 * tree_num;
-	UINT8* TILE_ROM = (tree_num ? (machine.region("user3")->base() + 0x1000) : (machine.region("gfx1")->base() + 0x2000));
-	UINT8* TILE_RAM = (tree_num ? (machine.region("user3")->base()) : (state->m_memory_devices + 0x1800));
+	UINT8* TILE_ROM = (tree_num ? (machine.root_device().memregion("user3")->base() + 0x1000) : (machine.root_device().memregion("gfx1")->base() + 0x2000));
+	UINT8* TILE_RAM = (tree_num ? (state->memregion("user3")->base()) : (state->m_memory_devices + 0x1800));
 
 	int preload = ((sy < 32) ? 1 : 0);
 

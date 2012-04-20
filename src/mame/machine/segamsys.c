@@ -1613,13 +1613,13 @@ static WRITE8_HANDLER( mt_sms_standard_rom_bank_w )
 			//printf("bank ram??\n");
 			break;
 		case 1:
-			memcpy(sms_rom+0x0000, space->machine().region("maincpu")->base()+bank*0x4000, 0x4000);
+			memcpy(sms_rom+0x0000, space->machine().root_device().memregion("maincpu")->base()+bank*0x4000, 0x4000);
 			break;
 		case 2:
-			memcpy(sms_rom+0x4000, space->machine().region("maincpu")->base()+bank*0x4000, 0x4000);
+			memcpy(sms_rom+0x4000, space->machine().root_device().memregion("maincpu")->base()+bank*0x4000, 0x4000);
 			break;
 		case 3:
-			memcpy(sms_rom+0x8000, space->machine().region("maincpu")->base()+bank*0x4000, 0x4000);
+			memcpy(sms_rom+0x8000, space->machine().root_device().memregion("maincpu")->base()+bank*0x4000, 0x4000);
 			break;
 
 	}
@@ -1628,19 +1628,19 @@ static WRITE8_HANDLER( mt_sms_standard_rom_bank_w )
 static WRITE8_HANDLER( codemasters_rom_bank_0000_w )
 {
 	int bank = data&0x1f;
-	memcpy(sms_rom+0x0000, space->machine().region("maincpu")->base()+bank*0x4000, 0x4000);
+	memcpy(sms_rom+0x0000, space->machine().root_device().memregion("maincpu")->base()+bank*0x4000, 0x4000);
 }
 
 static WRITE8_HANDLER( codemasters_rom_bank_4000_w )
 {
 	int bank = data&0x1f;
-	memcpy(sms_rom+0x4000, space->machine().region("maincpu")->base()+bank*0x4000, 0x4000);
+	memcpy(sms_rom+0x4000, space->machine().root_device().memregion("maincpu")->base()+bank*0x4000, 0x4000);
 }
 
 static WRITE8_HANDLER( codemasters_rom_bank_8000_w )
 {
 	int bank = data&0x1f;
-	memcpy(sms_rom+0x8000, space->machine().region("maincpu")->base()+bank*0x4000, 0x4000);
+	memcpy(sms_rom+0x8000, space->machine().root_device().memregion("maincpu")->base()+bank*0x4000, 0x4000);
 }
 
 
@@ -1682,7 +1682,7 @@ void megatech_set_genz80_as_sms_standard_map(running_machine &machine, const cha
 	/* fixed rom bank area */
 	sms_rom = (UINT8 *)machine.device(tag)->memory().space(AS_PROGRAM)->install_rom(0x0000, 0xbfff, NULL);
 
-	memcpy(sms_rom, machine.region("maincpu")->base(), 0xc000);
+	memcpy(sms_rom, machine.root_device().memregion("maincpu")->base(), 0xc000);
 
 	if (mapper == MAPPER_STANDARD )
 	{

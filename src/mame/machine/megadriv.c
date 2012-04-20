@@ -2560,7 +2560,7 @@ static WRITE16_HANDLER( _32x_68k_a15106_w )
 
 			// install the game rom in the normal 0x000000-0x03fffff space used by the genesis - this allows VDP DMA operations to work as they have to be from this area or RAM
 			// it should also UNMAP the banked rom area...
-			space->install_rom(0x0000100, 0x03fffff, space->machine().region("gamecart")->base() + 0x100);
+			space->install_rom(0x0000100, 0x03fffff, space->machine().root_device().memregion("gamecart")->base() + 0x100);
 		}
 		else
 		{
@@ -2568,7 +2568,7 @@ static WRITE16_HANDLER( _32x_68k_a15106_w )
 
 			// this is actually blank / nop area
 			// we should also map the banked area back (we don't currently unmap it tho)
-			space->install_rom(0x0000100, 0x03fffff, space->machine().region("maincpu")->base()+0x100);
+			space->install_rom(0x0000100, 0x03fffff, space->machine().root_device().memregion("maincpu")->base()+0x100);
 		}
 
 		if((a15106_reg & 4) == 0) // clears the FIFO state
@@ -2860,12 +2860,12 @@ static WRITE16_HANDLER( _32x_68k_a15100_w )
 		if (data & 0x01)
 		{
 			_32x_adapter_enabled = 1;
-			space->install_rom(0x0880000, 0x08fffff, space->machine().region("gamecart")->base()); // 'fixed' 512kb rom bank
+			space->install_rom(0x0880000, 0x08fffff, space->machine().root_device().memregion("gamecart")->base()); // 'fixed' 512kb rom bank
 
 			space->install_read_bank(0x0900000, 0x09fffff, "bank12"); // 'bankable' 1024kb rom bank
-			space->machine().root_device().membank("bank12")->set_base(space->machine().region("gamecart")->base()+((_32x_68k_a15104_reg&0x3)*0x100000) );
+			space->machine().root_device().membank("bank12")->set_base(space->machine().root_device().memregion("gamecart")->base()+((_32x_68k_a15104_reg&0x3)*0x100000) );
 
-			space->install_rom(0x0000000, 0x03fffff, space->machine().region("32x_68k_bios")->base());
+			space->install_rom(0x0000000, 0x03fffff, space->machine().root_device().memregion("32x_68k_bios")->base());
 
 			/* VDP area */
 			space->install_legacy_readwrite_handler(0x0a15180, 0x0a1518b, FUNC(_32x_common_vdp_regs_r), FUNC(_32x_common_vdp_regs_w)); // common / shared VDP regs
@@ -2881,7 +2881,7 @@ static WRITE16_HANDLER( _32x_68k_a15100_w )
 		{
 			_32x_adapter_enabled = 0;
 
-			space->install_rom(0x0000000, 0x03fffff, space->machine().region("gamecart")->base());
+			space->install_rom(0x0000000, 0x03fffff, space->machine().root_device().memregion("gamecart")->base());
 			space->machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x000070, 0x000073, FUNC(_32x_68k_hint_vector_r), FUNC(_32x_68k_hint_vector_w)); // h interrupt vector
 		}
 	}
@@ -2949,7 +2949,7 @@ static WRITE16_HANDLER( _32x_68k_a15104_w )
 		_32x_68k_a15104_reg = (_32x_68k_a15104_reg & 0x00ff) | (data & 0xff00);
 	}
 
-	space->machine().root_device().membank("bank12")->set_base(space->machine().region("gamecart")->base()+((_32x_68k_a15104_reg&0x3)*0x100000) );
+	space->machine().root_device().membank("bank12")->set_base(space->machine().root_device().memregion("gamecart")->base()+((_32x_68k_a15104_reg&0x3)*0x100000) );
 }
 
 /**********************************************************************************************/
@@ -6922,7 +6922,7 @@ static UINT32 pm_io(address_space *space, int reg, int write, UINT32 d)
 			int addr = state->m_pmac_read[reg]&0xffff;
 			if      ((mode & 0xfff0) == 0x0800) // ROM, inc 1, verified to be correct
 			{
-				UINT16 *ROM = (UINT16 *) space->machine().region("maincpu")->base();
+				UINT16 *ROM = (UINT16 *) space->machine().root_device().memregion("maincpu")->base();
 				state->m_pmac_read[reg] += 1;
 				d = ROM[addr|((mode&0xf)<<16)];
 			}
@@ -7175,7 +7175,7 @@ static void svp_init(running_machine &machine)
 	state->m_iram = auto_alloc_array(machine, UINT8, 0x800);
 	state->membank("bank3")->set_base(state->m_iram);
 	/* SVP ROM just shares m68k region.. */
-	ROM = machine.region("maincpu")->base();
+	ROM = state->memregion("maincpu")->base();
 	state->membank("bank4")->set_base(ROM + 0x800);
 
 	megadrive_io_read_data_port_ptr	= megadrive_io_read_data_port_svp;
@@ -9933,7 +9933,7 @@ static void megadriv_init_common(running_machine &machine)
           some games specify a single address, (start 200001, end 200001)
           this usually means there is serial eeprom instead */
 		int i;
-		UINT16 *rom = (UINT16*)machine.region("maincpu")->base();
+		UINT16 *rom = (UINT16*)machine.root_device().memregion("maincpu")->base();
 
 		mame_printf_debug("DEBUG:: Header: Backup RAM string (ignore for games without)\n");
 		for (i=0;i<12;i++)
@@ -10093,7 +10093,7 @@ DRIVER_INIT( _32x )
 
 	if (_32x_adapter_enabled == 0)
 	{
-		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_rom(0x0000000, 0x03fffff, machine.region("gamecart")->base());
+		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_rom(0x0000000, 0x03fffff, machine.root_device().memregion("gamecart")->base());
 		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x000070, 0x000073, FUNC(_32x_68k_hint_vector_r), FUNC(_32x_68k_hint_vector_w)); // h interrupt vector
 	};
 

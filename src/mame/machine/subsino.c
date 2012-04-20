@@ -85,7 +85,7 @@ void subsino_decrypt(running_machine& machine, void (*bitswaps)(UINT8 *decrypt, 
 {
 	int i;
 	UINT8 *decrypt = auto_alloc_array(machine, UINT8, 0x10000);
-	UINT8* region = machine.region("maincpu")->base();
+	UINT8* region = machine.root_device().memregion("maincpu")->base();
 
 	for (i=0;i<0x10000;i++)
 	{

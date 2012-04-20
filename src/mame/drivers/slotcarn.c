@@ -112,9 +112,9 @@ static MC6845_UPDATE_ROW( update_row )
 	UINT16 x = 0;
 	int rlen;
 
-	gfx[0] = device->machine().region("gfx1")->base();
-	gfx[1] = device->machine().region("gfx2")->base();
-	rlen = device->machine().region("gfx2")->bytes();
+	gfx[0] = device->machine().root_device().memregion("gfx1")->base();
+	gfx[1] = device->machine().root_device().memregion("gfx2")->base();
+	rlen = state->memregion("gfx2")->bytes();
 
 	//ma = ma ^ 0x7ff;
 	for (cx = 0; cx < x_count; cx++)

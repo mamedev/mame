@@ -140,7 +140,7 @@ WRITE8_MEMBER(supertnk_state::supertnk_bankswitch_0_w)
 
 	bank_address = 0x10000 + (m_rom_bank * 0x1000);
 
-	membank("bank1")->set_base(&machine().region("maincpu")->base()[bank_address]);
+	membank("bank1")->set_base(&machine().root_device().memregion("maincpu")->base()[bank_address]);
 }
 
 
@@ -152,7 +152,7 @@ WRITE8_MEMBER(supertnk_state::supertnk_bankswitch_1_w)
 
 	bank_address = 0x10000 + (m_rom_bank * 0x1000);
 
-	membank("bank1")->set_base(&machine().region("maincpu")->base()[bank_address]);
+	membank("bank1")->set_base(&machine().root_device().memregion("maincpu")->base()[bank_address]);
 }
 
 
@@ -187,7 +187,7 @@ static VIDEO_START( supertnk )
 {
 	supertnk_state *state = machine.driver_data<supertnk_state>();
 	offs_t i;
-	const UINT8 *prom = machine.region("proms")->base();
+	const UINT8 *prom = state->memregion("proms")->base();
 
 	for (i = 0; i < NUM_PENS; i++)
 	{
@@ -490,8 +490,8 @@ static DRIVER_INIT( supertnk )
 {
 	/* decode the TMS9980 ROMs */
 	offs_t offs;
-	UINT8 *rom = machine.region("maincpu")->base();
-	size_t len = machine.region("maincpu")->bytes();
+	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
+	size_t len = machine.root_device().memregion("maincpu")->bytes();
 
 	for (offs = 0; offs < len; offs++)
 	{

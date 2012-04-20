@@ -444,7 +444,7 @@ ROM_END
 
 static DRIVER_INIT( relief )
 {
-	UINT8 *sound_base = machine.region("oki")->base();
+	UINT8 *sound_base = machine.root_device().memregion("oki")->base();
 
 	/* expand the ADPCM data to avoid lots of memcpy's during gameplay */
 	/* the upper 128k is fixed, the lower 128k is bankswitched */

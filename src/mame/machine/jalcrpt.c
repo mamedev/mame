@@ -4,8 +4,8 @@
 
 void phantasm_rom_decode(running_machine &machine, const char *region)
 {
-	UINT16	*RAM	=	(UINT16 *) machine.region(region)->base();
-	int i,		size	=	machine.region(region)->bytes();
+	UINT16	*RAM	=	(UINT16 *) machine.root_device().memregion(region)->base();
+	int i,		size	=	machine.root_device().memregion(region)->bytes();
 	if (size > 0x40000)	size = 0x40000;
 
 	for (i = 0 ; i < size/2 ; i++)
@@ -38,8 +38,8 @@ void phantasm_rom_decode(running_machine &machine, const char *region)
 
 void astyanax_rom_decode(running_machine &machine, const char *region)
 {
-	UINT16	*RAM	=	(UINT16 *) machine.region(region)->base();
-	int i,		size	=	machine.region(region)->bytes();
+	UINT16	*RAM	=	(UINT16 *) machine.root_device().memregion(region)->base();
+	int i,		size	=	machine.root_device().memregion(region)->bytes();
 	if (size > 0x40000)	size = 0x40000;
 
 	for (i = 0 ; i < size/2 ; i++)
@@ -72,8 +72,8 @@ void astyanax_rom_decode(running_machine &machine, const char *region)
 
 void rodland_rom_decode(running_machine &machine, const char *region)
 {
-	UINT16	*RAM	=	(UINT16 *) machine.region(region)->base();
-	int i,		size	=	machine.region(region)->bytes();
+	UINT16	*RAM	=	(UINT16 *) machine.root_device().memregion(region)->base();
+	int i,		size	=	machine.root_device().memregion(region)->bytes();
 	if (size > 0x40000)	size = 0x40000;
 
 	for (i = 0 ; i < size/2 ; i++)
@@ -125,8 +125,8 @@ void ms32_rearrange_sprites(running_machine &machine, const char *region)
 
 	UINT8 *result_data;
 
-	source_data = machine.region       ( region )->base();
-	source_size = machine.region( region )->bytes();
+	source_data = machine.root_device().memregion       ( region )->base();
+	source_size = machine.root_device().memregion( region )->bytes();
 
 	result_data = auto_alloc_array(machine, UINT8, source_size);
 
@@ -150,8 +150,8 @@ void decrypt_ms32_tx(running_machine &machine, int addr_xor,int data_xor, const 
 
 	UINT8 *result_data;
 
-	source_data = machine.region       ( region )->base();
-	source_size = machine.region( region )->bytes();
+	source_data = machine.root_device().memregion       ( region )->base();
+	source_size = machine.root_device().memregion( region )->bytes();
 
 	result_data = auto_alloc_array(machine, UINT8, source_size);
 
@@ -204,8 +204,8 @@ void decrypt_ms32_bg(running_machine &machine, int addr_xor,int data_xor, const 
 
 	UINT8 *result_data;
 
-	source_data = machine.region       ( region )->base();
-	source_size = machine.region( region )->bytes();
+	source_data = machine.root_device().memregion       ( region )->base();
+	source_size = machine.root_device().memregion( region )->bytes();
 
 	result_data = auto_alloc_array(machine, UINT8, source_size);
 

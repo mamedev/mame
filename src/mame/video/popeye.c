@@ -115,7 +115,7 @@ static void convert_color_prom(running_machine &machine,const UINT8 *color_prom)
 
 PALETTE_INIT( popeye )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	popeye_state *state = machine.driver_data<popeye_state>();
 	state->m_invertmask = 0xff;
 
@@ -124,7 +124,7 @@ PALETTE_INIT( popeye )
 
 PALETTE_INIT( popeyebl )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	popeye_state *state = machine.driver_data<popeye_state>();
 	state->m_invertmask = 0x00;
 
@@ -135,7 +135,7 @@ static void set_background_palette(running_machine &machine,int bank)
 {
 	popeye_state *state = machine.driver_data<popeye_state>();
 	int i;
-	UINT8 *color_prom = machine.region("proms")->base() + 16 * bank;
+	UINT8 *color_prom = state->memregion("proms")->base() + 16 * bank;
 
 	for (i = 0;i < 16;i++)
 	{

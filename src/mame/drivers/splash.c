@@ -1016,7 +1016,7 @@ static DRIVER_INIT( splash10 )
 static DRIVER_INIT( roldfrog )
 {
 	splash_state *state = machine.driver_data<splash_state>();
-	UINT8 * ROM = (UINT8 *)machine.region("audiocpu")->base();
+	UINT8 * ROM = (UINT8 *)state->memregion("audiocpu")->base();
 	state->membank("sound_bank")->configure_entries(0, 16, &ROM[0x10000], 0x8000);
 
 	state->m_bitmap_type = 1;
@@ -1026,7 +1026,7 @@ static DRIVER_INIT( roldfrog )
 static DRIVER_INIT( rebus )
 {
 	splash_state *state = machine.driver_data<splash_state>();
-	UINT16 *ROM = (UINT16 *)machine.region("maincpu")->base();
+	UINT16 *ROM = (UINT16 *)state->memregion("maincpu")->base();
 
 	state->m_bitmap_type = 1;
 	state->m_sprite_attr2_shift = 0;
@@ -1056,7 +1056,7 @@ static DRIVER_INIT( rebus )
 static DRIVER_INIT( funystrp )
 {
 	splash_state *state = machine.driver_data<splash_state>();
-	UINT16 *ROM = (UINT16 *)machine.region("maincpu")->base();
+	UINT16 *ROM = (UINT16 *)machine.root_device().memregion("maincpu")->base();
 
 	state->m_bitmap_type = 0;
 	state->m_sprite_attr2_shift = 0;
@@ -1095,7 +1095,7 @@ static DRIVER_INIT( funystrp )
 	ROM[0x11730/2] = 0x7001;
 	ROM[0x11f80/2] = 0x7001;
 
-	ROM = (UINT16 *)machine.region("audiocpu")->base();
+	ROM = (UINT16 *)state->memregion("audiocpu")->base();
 
 	state->membank("sound_bank")->configure_entries(0, 16, &ROM[0x00000], 0x8000);
 

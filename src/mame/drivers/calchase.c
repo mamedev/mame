@@ -352,8 +352,8 @@ static void mxtc_config_w(device_t *busdevice, device_t *device, int function, i
 				}
 				#endif
 
-				state->membank("bank1")->set_base(busdevice->machine().region("bios")->base() + 0x10000);
-				state->membank("bank1")->set_base(busdevice->machine().region("bios")->base());
+				state->membank("bank1")->set_base(busdevice->machine().root_device().memregion("bios")->base() + 0x10000);
+				state->membank("bank1")->set_base(busdevice->machine().root_device().memregion("bios")->base());
 			}
 			break;
 		}
@@ -865,8 +865,8 @@ static const struct pit8253_config calchase_pit8254_config =
 
 static MACHINE_RESET(calchase)
 {
-	//machine.root_device().membank("bank1")->set_base(machine.region("bios")->base() + 0x10000);
-	machine.root_device().membank("bank1")->set_base(machine.region("bios")->base());
+	//machine.root_device().membank("bank1")->set_base(machine.root_device().memregion("bios")->base() + 0x10000);
+	machine.root_device().membank("bank1")->set_base(machine.root_device().memregion("bios")->base());
 }
 
 static void set_gate_a20(running_machine &machine, int a20)

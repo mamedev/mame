@@ -60,7 +60,7 @@ static void mem_map_banks(running_machine &machine)
 		case 0:
 			// BIOS
 			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x0000, 0x3fff, "bank1" );
-			state->membank("bank1")->set_base(machine.region("maincpu")->base());
+			state->membank("bank1")->set_base(state->memregion("maincpu")->base());
 			break;
 
 		default:
@@ -75,16 +75,16 @@ static void mem_map_banks(running_machine &machine)
 			// BIOS
 			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x4000, 0x5fff, "bank21" );
 			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x6000, 0x7fff, "bank22" );
-			state->membank("bank21")->set_base(machine.region("maincpu")->base() + 0x4000);
-			state->membank("bank22")->set_base(machine.region("maincpu")->base() + 0x4000 + 0x2000);
+			state->membank("bank21")->set_base(machine.root_device().memregion("maincpu")->base() + 0x4000);
+			state->membank("bank22")->set_base(machine.root_device().memregion("maincpu")->base() + 0x4000 + 0x2000);
 			break;
 
 		case 1:
 			// game
 			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x4000, 0x5fff, "bank21" );
 			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x6000, 0x7fff, "bank22" );
-			state->membank("bank21")->set_base(machine.region("game")->base() + state->m_mem_banks[0]*0x2000);
-			state->membank("bank22")->set_base(machine.region("game")->base() + state->m_mem_banks[1]*0x2000);
+			state->membank("bank21")->set_base(machine.root_device().memregion("game")->base() + state->m_mem_banks[0]*0x2000);
+			state->membank("bank22")->set_base(machine.root_device().memregion("game")->base() + state->m_mem_banks[1]*0x2000);
 			break;
 
 		default:
@@ -99,8 +99,8 @@ static void mem_map_banks(running_machine &machine)
 			// game
 			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x8000, 0x9fff, "bank31" );
 			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0xa000, 0xbfff, "bank32" );
-			state->membank("bank31")->set_base(machine.region("game")->base() + state->m_mem_banks[2]*0x2000);
-			state->membank("bank32")->set_base(machine.region("game")->base() + state->m_mem_banks[3]*0x2000);
+			state->membank("bank31")->set_base(machine.root_device().memregion("game")->base() + state->m_mem_banks[2]*0x2000);
+			state->membank("bank32")->set_base(machine.root_device().memregion("game")->base() + state->m_mem_banks[3]*0x2000);
 			break;
 
 		default:
@@ -289,8 +289,8 @@ MACHINE_CONFIG_END
 
 static void pengadvb_decrypt(running_machine &machine, const char* region)
 {
-	UINT8 *mem = machine.region(region)->base();
-	int memsize = machine.region(region)->bytes();
+	UINT8 *mem = machine.root_device().memregion(region)->base();
+	int memsize = machine.root_device().memregion(region)->bytes();
 	UINT8 *buf;
 	int i;
 

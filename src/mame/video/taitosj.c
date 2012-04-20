@@ -144,7 +144,7 @@ static void compute_draw_order(running_machine &machine)
 {
 	taitosj_state *state = machine.driver_data<taitosj_state>();
 	int i;
-	UINT8 *color_prom = machine.region("proms")->base();
+	UINT8 *color_prom = state->memregion("proms")->base();
 
 	/* do a simple conversion of the PROM into layer priority order. Note that */
 	/* this is a simplification, which assumes the PROM encodes a sensible priority */
@@ -204,7 +204,7 @@ READ8_MEMBER(taitosj_state::taitosj_gfxrom_r)
 	offs_t offs = m_gfxpointer[0] | (m_gfxpointer[1] << 8);
 
 	if (offs < 0x8000)
-		ret = machine().region("gfx1")->base()[offs];
+		ret = memregion("gfx1")->base()[offs];
 	else
 		ret = 0;
 

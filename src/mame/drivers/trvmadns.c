@@ -98,7 +98,7 @@ WRITE8_MEMBER(trvmadns_state::trvmadns_banking_w)
 	}
 	else if((data & 0xf0) == 0x80 || (data & 0xf0) == 0x90)
 	{
-		rom = machine().region("user2")->base();
+		rom = memregion("user2")->base();
 
 		switch(data & 0xf)
 		{
@@ -126,7 +126,7 @@ WRITE8_MEMBER(trvmadns_state::trvmadns_banking_w)
 				//logerror("port80 = %02X\n",data);
 			}
 
-		rom = machine().region("user1")->base();
+		rom = memregion("user1")->base();
 
 		/*
         7

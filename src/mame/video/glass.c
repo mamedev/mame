@@ -84,7 +84,7 @@ WRITE16_MEMBER(glass_state::glass_blitter_w)
 		/* fill the screen bitmap with the current picture */
 		{
 			int i, j;
-			UINT8 *gfx = (UINT8 *)machine().region("gfx3")->base();
+			UINT8 *gfx = (UINT8 *)machine().root_device().memregion("gfx3")->base();
 
 			gfx = gfx + (m_current_command & 0x07) * 0x10000 + (m_current_command & 0x08) * 0x10000 + 0x140;
 

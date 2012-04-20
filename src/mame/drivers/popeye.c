@@ -620,7 +620,7 @@ static DRIVER_INIT( skyskipr )
 {
 	popeye_state *state = machine.driver_data<popeye_state>();
 	UINT8 *buffer;
-	UINT8 *rom = machine.region("maincpu")->base();
+	UINT8 *rom = state->memregion("maincpu")->base();
 	int len = 0x10000;
 
 	/* decrypt the program ROMs */
@@ -642,7 +642,7 @@ static DRIVER_INIT( popeye )
 {
 	popeye_state *state = machine.driver_data<popeye_state>();
 	UINT8 *buffer;
-	UINT8 *rom = machine.region("maincpu")->base();
+	UINT8 *rom = state->memregion("maincpu")->base();
 	int len = 0x10000;
 
 	/* decrypt the program ROMs */

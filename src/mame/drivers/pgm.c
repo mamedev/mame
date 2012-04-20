@@ -3570,11 +3570,11 @@ ROM_END
 
 static void expand_32x32x5bpp(running_machine &machine)
 {
-	UINT8 *src = machine.region( "tiles" )->base();
+	UINT8 *src = machine.root_device().memregion( "tiles" )->base();
 	gfx_layout glcopy;
 	glcopy = *(&pgm32_charlayout);
 
-	size_t  srcsize = machine.region( "tiles" )->bytes();
+	size_t  srcsize = machine.root_device().memregion( "tiles" )->bytes();
 	int cnt, pix;
 	size_t gfx2_size_needed = ((srcsize/5)*8)+0x1000;
 	UINT8 *dst = auto_alloc_array(machine, UINT8, gfx2_size_needed);
@@ -3613,8 +3613,8 @@ static void expand_32x32x5bpp(running_machine &machine)
 static void expand_colourdata( running_machine &machine )
 {
 	pgm_state *state = machine.driver_data<pgm_state>();
-	UINT8 *src = machine.region( "sprcol" )->base();
-	size_t srcsize = machine.region( "sprcol" )->bytes();
+	UINT8 *src = machine.root_device().memregion( "sprcol" )->base();
+	size_t srcsize = state->memregion( "sprcol" )->bytes();
 	int cnt;
 	size_t needed = srcsize / 2 * 3;
 
@@ -3645,7 +3645,7 @@ void pgm_basic_init( running_machine &machine, bool set_bank)
 {
 	pgm_state *state = machine.driver_data<pgm_state>();
 
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = state->memregion("maincpu")->base();
 	if (set_bank) state->membank("bank1")->set_base(&ROM[0x100000]);
 
 	expand_32x32x5bpp(machine);

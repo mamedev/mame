@@ -409,9 +409,9 @@ ROM_END
 static DRIVER_INIT( shootout )
 {
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	int length = machine.region("maincpu")->bytes();
+	int length = machine.root_device().memregion("maincpu")->bytes();
 	UINT8 *decrypt = auto_alloc_array(machine, UINT8, length - 0x8000);
-	UINT8 *rom = machine.region("maincpu")->base();
+	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
 	int A;
 
 	space->set_decrypted_region(0x8000, 0xffff, decrypt);
@@ -419,13 +419,13 @@ static DRIVER_INIT( shootout )
 	for (A = 0x8000;A < length;A++)
 		decrypt[A-0x8000] = (rom[A] & 0x9f) | ((rom[A] & 0x40) >> 1) | ((rom[A] & 0x20) << 1);
 
-	machine.root_device().membank("bank1")->configure_entries(0, 16, machine.region("maincpu")->base() + 0x10000, 0x4000);
+	machine.root_device().membank("bank1")->configure_entries(0, 16, machine.root_device().memregion("maincpu")->base() + 0x10000, 0x4000);
 	machine.root_device().membank("bank1")->configure_decrypted_entries(0, 16, decrypt + 0x8000, 0x4000);
 }
 
 static DRIVER_INIT( shootouj )
 {
-	machine.root_device().membank("bank1")->configure_entries(0, 16, machine.region("maincpu")->base() + 0x10000, 0x4000);
+	machine.root_device().membank("bank1")->configure_entries(0, 16, machine.root_device().memregion("maincpu")->base() + 0x10000, 0x4000);
 }
 
 

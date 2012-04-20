@@ -370,7 +370,7 @@ static MACHINE_START( malzak )
 {
 	malzak_state *state = machine.driver_data<malzak_state>();
 
-	state->membank("bank1")->configure_entries(0, 2, machine.region("user2")->base(), 0x400);
+	state->membank("bank1")->configure_entries(0, 2, state->memregion("user2")->base(), 0x400);
 
 	state->m_s2636_0 = machine.device("s2636_0");
 	state->m_s2636_1 = machine.device("s2636_1");

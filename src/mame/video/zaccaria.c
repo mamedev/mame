@@ -35,7 +35,7 @@ Here's the hookup from the proms (82s131) to the r-g-b-outputs
 ***************************************************************************/
 PALETTE_INIT( zaccaria )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i, j, k;
 	static const int resistances_rg[] = { 1200, 1000, 820 };
 	static const int resistances_b[]  = { 1000, 820 };

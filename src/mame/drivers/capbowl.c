@@ -499,7 +499,7 @@ ROM_END
 
 static DRIVER_INIT( capbowl )
 {
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
 
 	/* configure ROM banks in 0x0000-0x3fff */
 	machine.root_device().membank("bank1")->configure_entries(0, 6, &ROM[0x10000], 0x4000);

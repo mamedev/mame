@@ -86,7 +86,7 @@ static SCREEN_UPDATE_RGB32( itgambl2 )
 {
 	itgambl2_state *state = screen.machine().driver_data<itgambl2_state>();
 	int x,y,count;
-	const UINT8 *blit_ram = screen.machine().region("gfx1")->base();
+	const UINT8 *blit_ram = state->memregion("gfx1")->base();
 
 	if(screen.machine().input().code_pressed(KEYCODE_Z))
 		state->m_test_x++;

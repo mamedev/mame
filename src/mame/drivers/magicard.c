@@ -693,7 +693,7 @@ INPUT_PORTS_END
 static MACHINE_RESET( magicard )
 {
 	magicard_state *state = machine.driver_data<magicard_state>();
-	UINT16 *src    = (UINT16*)machine.region("maincpu" )->base();
+	UINT16 *src    = (UINT16*)state->memregion("maincpu" )->base();
 	UINT16 *dst    = state->m_magicram;
 	memcpy (dst, src, 0x80000);
 	machine.device("maincpu")->reset();

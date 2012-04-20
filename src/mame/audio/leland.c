@@ -551,7 +551,7 @@ static DEVICE_START( common_sh_start )
 	/* if we have a 2151, install an externally driven DAC stream */
 	if (state->m_has_ym2151)
 	{
-		state->m_ext_base = machine.region("dac")->base();
+		state->m_ext_base = machine.root_device().memregion("dac")->base();
 		state->m_extern_stream = device->machine().sound().stream_alloc(*device, 0, 1, OUTPUT_RATE, NULL, leland_80186_extern_update);
 	}
 

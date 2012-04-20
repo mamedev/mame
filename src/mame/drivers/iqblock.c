@@ -95,7 +95,7 @@ WRITE8_MEMBER(iqblock_state::iqblock_irqack_w)
 
 READ8_MEMBER(iqblock_state::extrarom_r)
 {
-	return machine().region("user1")->base()[offset];
+	return memregion("user1")->base()[offset];
 }
 
 
@@ -431,7 +431,7 @@ ROM_END
 static DRIVER_INIT( iqblock )
 {
 	iqblock_state *state = machine.driver_data<iqblock_state>();
-	UINT8 *rom = machine.region("maincpu")->base();
+	UINT8 *rom = state->memregion("maincpu")->base();
 	int i;
 
 	/* decrypt the program ROM */
@@ -454,7 +454,7 @@ static DRIVER_INIT( iqblock )
 static DRIVER_INIT( grndtour )
 {
 	iqblock_state *state = machine.driver_data<iqblock_state>();
-	UINT8 *rom = machine.region("maincpu")->base();
+	UINT8 *rom = state->memregion("maincpu")->base();
 	int i;
 
 	/* decrypt the program ROM */

@@ -269,7 +269,7 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(sandscrp_state::sandscrp_bankswitch_w)
 {
-	UINT8 *RAM = machine().region("maincpu")->base();
+	UINT8 *RAM = memregion("maincpu")->base();
 	int bank = data & 0x07;
 
 	if ( bank != data )	logerror("CPU #1 - PC %04X: Bank %02X\n",cpu_get_pc(&space.device()),data);

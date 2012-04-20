@@ -462,7 +462,7 @@ ROM_END
 
 static DRIVER_INIT( ashnojoe )
 {
-	UINT8 *ROM = machine.region("adpcm")->base();
+	UINT8 *ROM = machine.root_device().memregion("adpcm")->base();
 	machine.root_device().membank("bank4")->configure_entries(0, 16, &ROM[0x00000], 0x8000);
 
 	machine.root_device().membank("bank4")->set_entry(0);

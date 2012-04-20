@@ -26,7 +26,7 @@ Additional tweaking by Jarek Burczynski
 ***************************************************************************/
 PALETTE_INIT( magmax )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 
 	/* allocate the colortable */
@@ -66,7 +66,7 @@ VIDEO_START( magmax )
 {
 	magmax_state *state = machine.driver_data<magmax_state>();
 	int i,v;
-	UINT8 * prom14D = machine.region("user2")->base();
+	UINT8 * prom14D = state->memregion("user2")->base();
 
 	/* Set up save state */
 	state_save_register_global(machine, state->m_flipscreen);
@@ -101,7 +101,7 @@ SCREEN_UPDATE_IND16( magmax )
 	else
 	{
 		int v;
-		UINT8 * rom18B = screen.machine().region("user1")->base();
+		UINT8 * rom18B = state->memregion("user1")->base();
 		UINT32 scroll_h = (*state->m_scroll_x) & 0x3fff;
 		UINT32 scroll_v = (*state->m_scroll_y) & 0xff;
 

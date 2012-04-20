@@ -9456,8 +9456,8 @@ static DRIVER_INIT( kof2002b )
 	kof2002_decrypt_68k(machine);
 	neo_pcm2_swap(machine, 0);
 	neogeo_cmc50_m1_decrypt(machine);
-	kof2002b_gfx_decrypt(machine, machine.region("sprites")->base(),0x4000000);
-	kof2002b_gfx_decrypt(machine, machine.region("fixed")->base(),0x20000);
+	kof2002b_gfx_decrypt(machine, machine.root_device().memregion("sprites")->base(),0x4000000);
+	kof2002b_gfx_decrypt(machine, machine.root_device().memregion("fixed")->base(),0x20000);
 }
 
 static DRIVER_INIT( kf2k2pls )
@@ -9560,7 +9560,7 @@ static DRIVER_INIT( mslug5 )
 static TIMER_CALLBACK( ms5pcb_bios_timer_callback )
 {
 	int harddip3 = input_port_read(machine, "HARDDIP") & 1;
-	machine.root_device().membank(NEOGEO_BANK_BIOS)->set_base(machine.region("mainbios")->base() + 0x20000 + harddip3 * 0x20000);
+	machine.root_device().membank(NEOGEO_BANK_BIOS)->set_base(machine.root_device().memregion("mainbios")->base() + 0x20000 + harddip3 * 0x20000);
 }
 
 static DRIVER_INIT( ms5pcb )
@@ -9597,7 +9597,7 @@ static DRIVER_INIT( ms5plus )
 static TIMER_CALLBACK( svcpcb_bios_timer_callback )
 {
 	int harddip3 = input_port_read(machine, "HARDDIP") & 1;
-	machine.root_device().membank(NEOGEO_BANK_BIOS)->set_base(machine.region("mainbios")->base() + 0x20000 + harddip3 * 0x20000);
+	machine.root_device().membank(NEOGEO_BANK_BIOS)->set_base(machine.root_device().memregion("mainbios")->base() + 0x20000 + harddip3 * 0x20000);
 }
 
 static DRIVER_INIT( svcpcb )
@@ -9700,7 +9700,7 @@ static DRIVER_INIT( kf2k3pcb )
        incorrect */
 	{
 		int i;
-		UINT8* rom = machine.region("audiocpu")->base();
+		UINT8* rom = state->memregion("audiocpu")->base();
 		for (i = 0; i < 0x90000; i++)
 		{
 			rom[i] = BITSWAP8(rom[i], 5, 6, 1, 4, 3, 0, 7, 2);
@@ -9835,7 +9835,7 @@ static DRIVER_INIT( mvs )
 
 static READ16_HANDLER( sbp_lowerrom_r )
 {
-	UINT16* rom = (UINT16*)space->machine().region("maincpu")->base();
+	UINT16* rom = (UINT16*)space->machine().root_device().memregion("maincpu")->base();
 	UINT16 origdata = rom[(offset+(0x200/2))];
 	UINT16 data =  BITSWAP16(origdata, 11,10,9,8,15,14,13,12,3,2,1,0,7,6,5,4);
 	int realoffset = 0x200+(offset*2);
@@ -9881,7 +9881,7 @@ static DRIVER_INIT(sbp )
 
 	/* the game code clears the text overlay used ingame immediately after writing it.. why? protection? sloppy code that the hw ignores? imperfect emulation? */
 	{
-		UINT16* rom = (UINT16*)machine.region("maincpu")->base();
+		UINT16* rom = (UINT16*)machine.root_device().memregion("maincpu")->base();
 
 		rom[0x2a6f8/2] = 0x4e71;
 		rom[0x2a6fa/2] = 0x4e71;

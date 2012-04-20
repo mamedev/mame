@@ -692,7 +692,7 @@ static DRIVER_INIT( penta )
 	};
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 *decrypt = auto_alloc_array(machine, UINT8, 0x8000);
-	UINT8 *rom = machine.region("maincpu")->base();
+	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
 	int A;
 
 	space->set_decrypted_region(0x0000, 0x7fff, decrypt);

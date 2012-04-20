@@ -60,8 +60,8 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 
 	UINT16 *destline;
 	UINT8 *priline;
-	UINT8 *sprdata = machine.region("gfx1")->base();
-	int sprmask = machine.region("gfx1")->bytes()-1;
+	UINT8 *sprdata = machine.root_device().memregion("gfx1")->base();
+	int sprmask = state->memregion("gfx1")->bytes()-1;
 
 	int xstart, xend, xinc;
 	int ystart, yend, yinc;

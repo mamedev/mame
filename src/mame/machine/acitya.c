@@ -22,7 +22,7 @@ static void acitya_decrypt_rom_8(running_machine &machine)
 	int mem;
 	UINT8 *RAM;
 
-	RAM = machine.region("maincpu")->base();
+	RAM = machine.root_device().memregion("maincpu")->base();
 
 
 	for (mem=0;mem<0x4000;mem++)
@@ -58,7 +58,7 @@ static void acitya_decrypt_rom_9(running_machine &machine)
 	int mem;
 	UINT8 *RAM;
 
-	RAM = machine.region("maincpu")->base();
+	RAM = machine.root_device().memregion("maincpu")->base();
 
 	for (mem=0;mem<0x4000;mem++)
 	{
@@ -91,7 +91,7 @@ static void acitya_decrypt_rom_A(running_machine &machine)
 	int mem;
 	UINT8 *RAM;
 
-	RAM = machine.region("maincpu")->base();
+	RAM = machine.root_device().memregion("maincpu")->base();
 
 	for (mem=0;mem<0x4000;mem++)
 	{
@@ -124,7 +124,7 @@ static void acitya_decrypt_rom_B(running_machine &machine)
 	int mem;
 	UINT8 *RAM;
 
-	RAM = machine.region("maincpu")->base();
+	RAM = machine.root_device().memregion("maincpu")->base();
 
 	for (mem=0;mem<0x4000;mem++)
 	{
@@ -184,7 +184,7 @@ READ8_HANDLER( acitya_decrypt_rom )
 MACHINE_START( acitya )
 {
 	pacman_state *state = machine.driver_data<pacman_state>();
-	UINT8 *RAM = machine.region("maincpu")->base();
+	UINT8 *RAM = machine.root_device().memregion("maincpu")->base();
 
 	/* While the PAL supports up to 16 decryption methods, only four
         are actually used in the PAL.  Therefore, we'll take a little
@@ -194,7 +194,7 @@ MACHINE_START( acitya )
 	acitya_decrypt_rom_A(machine);
 	acitya_decrypt_rom_B(machine);
 
-	machine.root_device().membank("bank1")->configure_entries(0, 4, &RAM[0x10000], 0x4000);
+	state->membank("bank1")->configure_entries(0, 4, &RAM[0x10000], 0x4000);
 
 	state_save_register_global(machine, state->m_counter);
 }

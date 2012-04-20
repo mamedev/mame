@@ -212,7 +212,7 @@ READ8_MEMBER(progolf_state::audio_command_r)
 READ8_MEMBER(progolf_state::progolf_videoram_r)
 {
 	UINT8 *videoram = m_videoram;
-	UINT8 *gfx_rom = machine().region("gfx1")->base();
+	UINT8 *gfx_rom = memregion("gfx1")->base();
 
 	if (offset >= 0x0800)
 	{
@@ -389,7 +389,7 @@ static const mc6845_interface mc6845_intf =
 
 static PALETTE_INIT( progolf )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 
 	for (i = 0;i < machine.total_colors();i++)
@@ -502,7 +502,7 @@ static DRIVER_INIT( progolf )
 {
 	int A;
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	UINT8 *rom = machine.region("maincpu")->base();
+	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
 	UINT8* decrypted = auto_alloc_array(machine, UINT8, 0x10000);
 
 	space->set_decrypted_region(0x0000,0xffff, decrypted);
@@ -516,7 +516,7 @@ static DRIVER_INIT( progolfa )
 {
 	int A;
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	UINT8 *rom = machine.region("maincpu")->base();
+	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
 	UINT8* decrypted = auto_alloc_array(machine, UINT8, 0x10000);
 
 	space->set_decrypted_region(0x0000,0xffff, decrypted);

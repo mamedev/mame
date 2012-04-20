@@ -22,7 +22,7 @@ WRITE16_MEMBER(ohmygod_state::ohmygod_ctrl_w)
 
 	if (ACCESSING_BITS_0_7)
 	{
-		UINT8 *rom = machine().region("oki")->base();
+		UINT8 *rom = memregion("oki")->base();
 
 		/* ADPCM bank switch */
 		if (m_sndbank != ((data >> m_adpcm_bank_shift) & 0x0f))
@@ -306,7 +306,7 @@ static MACHINE_START( ohmygod )
 static MACHINE_RESET( ohmygod )
 {
 	ohmygod_state *state = machine.driver_data<ohmygod_state>();
-	UINT8 *rom = machine.region("oki")->base();
+	UINT8 *rom = state->memregion("oki")->base();
 
 	state->m_sndbank = 0;
 	memcpy(rom + 0x20000, rom + 0x40000 + 0x20000 * state->m_sndbank, 0x20000);

@@ -89,7 +89,7 @@ public:
 /* guess: use the same resistor values as Crazy Climber (needs checking on the real HW) */
 static PALETTE_INIT( jangou )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	static const int resistances_rg[3] = { 1000, 470, 220 };
 	static const int resistances_b [2] = { 470, 220 };
 	double weights_rg[3], weights_b[2];
@@ -168,7 +168,7 @@ w [$17]
 
 static UINT8 jangou_gfx_nibble( running_machine &machine, UINT16 niboffset )
 {
-	const UINT8 *const blit_rom = machine.region("gfx")->base();
+	const UINT8 *const blit_rom = machine.root_device().memregion("gfx")->base();
 
 	if (niboffset & 1)
 		return (blit_rom[(niboffset >> 1) & 0xffff] & 0xf0) >> 4;
@@ -1371,7 +1371,7 @@ static DRIVER_INIT (luckygrl)
 {
 	// this is WRONG
 	int A;
-	UINT8 *ROM = machine.region("cpu0")->base();
+	UINT8 *ROM = machine.root_device().memregion("cpu0")->base();
 
 	unsigned char patn1[32] = {
 		0x00, 0xA0, 0x00, 0xA0, 0x00, 0xA0, 0x00, 0xA0, 0x00, 0xA0, 0x00, 0xA0, 0x00, 0xA0, 0x00, 0xA0,

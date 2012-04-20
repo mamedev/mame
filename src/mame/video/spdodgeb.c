@@ -5,7 +5,7 @@
 
 PALETTE_INIT( spdodgeb )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 
 
@@ -108,7 +108,7 @@ WRITE8_MEMBER(spdodgeb_state::spdodgeb_scrollx_lo_w)
 
 WRITE8_MEMBER(spdodgeb_state::spdodgeb_ctrl_w)
 {
-	UINT8 *rom = machine().region("maincpu")->base();
+	UINT8 *rom = memregion("maincpu")->base();
 
 	/* bit 0 = flip screen */
 	flip_screen_set(data & 0x01);

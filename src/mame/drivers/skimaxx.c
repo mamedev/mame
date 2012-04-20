@@ -138,8 +138,8 @@ READ32_MEMBER(skimaxx_state::skimaxx_blitter_r)
 static VIDEO_START( skimaxx )
 {
 	skimaxx_state *state = machine.driver_data<skimaxx_state>();
-	state->m_blitter_gfx = (UINT16 *) machine.region( "blitter" )->base();
-	state->m_blitter_gfx_len = machine.region( "blitter" )->bytes() / 2;
+	state->m_blitter_gfx = (UINT16 *) machine.root_device().memregion( "blitter" )->base();
+	state->m_blitter_gfx_len = state->memregion( "blitter" )->bytes() / 2;
 
 	state->m_bg_buffer = auto_alloc_array(machine, UINT32, 0x400 * 0x100 * sizeof(UINT16) / sizeof(UINT32) * 2);	// 2 buffers
 	state->m_bg_buffer_back  = state->m_bg_buffer + 0x400 * 0x100 * sizeof(UINT16) / sizeof(UINT32) * 0;

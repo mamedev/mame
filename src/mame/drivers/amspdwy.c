@@ -93,7 +93,7 @@ ADDRESS_MAP_END
 
 READ8_MEMBER(amspdwy_state::amspdwy_port_r)
 {
-	UINT8 *tracks = machine().region("maincpu")->base() + 0x10000;
+	UINT8 *tracks = memregion("maincpu")->base() + 0x10000;
 	return tracks[offset];
 }
 

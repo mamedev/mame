@@ -86,7 +86,7 @@ static void olds_write_reg( running_machine &machine, UINT16 addr, UINT32 val )
 static MACHINE_RESET( olds )
 {
 	pgm_028_025_state *state = machine.driver_data<pgm_028_025_state>();
-	UINT16 *mem16 = (UINT16 *)machine.region("user2")->base();
+	UINT16 *mem16 = (UINT16 *)state->memregion("user2")->base();
 	int i;
 
 	MACHINE_RESET_CALL(pgm);

@@ -47,7 +47,7 @@ static int intensity(int bits)
 
 static PALETTE_INIT( fgoal )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 
 	/* for B/W screens PCB can be jumpered to use lower half of PROM */

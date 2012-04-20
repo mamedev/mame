@@ -267,7 +267,7 @@ static DRIVER_INIT( chsuper2 )
 {
 	chsuper_state *state = machine.driver_data<chsuper_state>();
 	UINT8 *buffer;
-	UINT8 *rom = machine.region("gfx1")->base();
+	UINT8 *rom = state->memregion("gfx1")->base();
 	int i;
 
 	state->m_tilexor = 0x7f00;
@@ -290,7 +290,7 @@ static DRIVER_INIT( chsuper3 )
 {
 	chsuper_state *state = machine.driver_data<chsuper_state>();
 	UINT8 *buffer;
-	UINT8 *rom = machine.region("gfx1")->base();
+	UINT8 *rom = state->memregion("gfx1")->base();
 	int i;
 
 	state->m_tilexor = 0x0e00;
@@ -313,7 +313,7 @@ static DRIVER_INIT( chmpnum )
 {
 	chsuper_state *state = machine.driver_data<chsuper_state>();
 	UINT8 *buffer;
-	UINT8 *rom = machine.region("gfx1")->base();
+	UINT8 *rom = state->memregion("gfx1")->base();
 	int i;
 
 	state->m_tilexor = 0x1800;

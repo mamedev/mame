@@ -109,7 +109,7 @@ READ8_MEMBER(jack_state::striv_question_r)
 	// Read the actual byte from question roms
 	else
 	{
-		UINT8 *ROM = machine().region("user1")->base();
+		UINT8 *ROM = memregion("user1")->base();
 		int real_address;
 
 		real_address = m_question_address | (offset & 0x3f0) | m_remap_address[offset & 0x0f];
@@ -1298,7 +1298,7 @@ static void treahunt_decode( running_machine &machine )
 {
 	int A;
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	UINT8 *rom = machine.region("maincpu")->base();
+	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
 	UINT8 *decrypt = auto_alloc_array(machine, UINT8, 0x4000);
 	int data;
 
@@ -1373,7 +1373,7 @@ static DRIVER_INIT( loverboy )
        code, the protection device is disabled or changes behaviour via
        writes at 0xf000 and 0xf008. -AS
        */
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = state->memregion("maincpu")->base();
 	ROM[0x13] = 0x01;
 	ROM[0x12] = 0x9d;
 
@@ -1384,7 +1384,7 @@ static DRIVER_INIT( loverboy )
 static DRIVER_INIT( striv )
 {
 	jack_state *state = machine.driver_data<jack_state>();
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = state->memregion("maincpu")->base();
 	UINT8 data;
 	int A;
 

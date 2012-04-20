@@ -1857,7 +1857,7 @@ ROM_END
 
 static void unpack_block( running_machine &machine, const char *region, int offset, int size )
 {
-	UINT8 *rom = machine.region(region)->base();
+	UINT8 *rom = machine.root_device().memregion(region)->base();
 	int i;
 
 	for (i = 0; i < size; ++i)

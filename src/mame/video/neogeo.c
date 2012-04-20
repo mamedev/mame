@@ -271,8 +271,8 @@ static void draw_fixed_layer( running_machine &machine, bitmap_rgb32 &bitmap, in
 	neogeo_state *state = machine.driver_data<neogeo_state>();
 	int x;
 
-	UINT8* gfx_base = machine.region(state->m_fixed_layer_source ? "fixed" : "fixedbios")->base();
-	UINT32 addr_mask = machine.region(state->m_fixed_layer_source ? "fixed" : "fixedbios")->bytes() - 1;
+	UINT8* gfx_base = machine.root_device().memregion(state->m_fixed_layer_source ? "fixed" : "fixedbios")->base();
+	UINT32 addr_mask = state->memregion(state->m_fixed_layer_source ? "fixed" : "fixedbios")->bytes() - 1;
 	UINT16 *video_data = &state->m_videoram[0x7000 | (scanline >> 3)];
 	UINT32 *pixel_addr = &bitmap.pix32(scanline, NEOGEO_HBEND);
 
@@ -689,7 +689,7 @@ static void optimize_sprite_data( running_machine &machine )
        power of 2 */
 	state->m_sprite_gfx_address_mask = 0xffffffff;
 
-	len = machine.region("sprites")->bytes();
+	len = state->memregion("sprites")->bytes();
 
 	for (bit = 0x80000000; bit != 0; bit >>= 1)
 	{
@@ -701,7 +701,7 @@ static void optimize_sprite_data( running_machine &machine )
 
 	state->m_sprite_gfx = auto_alloc_array_clear(machine, UINT8, state->m_sprite_gfx_address_mask + 1);
 
-	src = machine.region("sprites")->base();
+	src = machine.root_device().memregion("sprites")->base();
 	dest = state->m_sprite_gfx;
 
 	for (i = 0; i < len; i += 0x80, src += 0x80)
@@ -892,7 +892,7 @@ VIDEO_START( neogeo )
 
 	machine.save().register_postload(save_prepost_delegate(FUNC(regenerate_pens), &machine));
 
-	state->m_region_zoomy = machine.region("zoomy")->base();
+	state->m_region_zoomy = state->memregion("zoomy")->base();
 }
 
 

@@ -838,7 +838,7 @@ static void init_zr107(running_machine &machine)
 	state->m_led_reg0 = state->m_led_reg1 = 0x7f;
 	state->m_ccu_vcth = state->m_ccu_vctl = 0;
 
-	K001005_preprocess_texture_data(machine.region("gfx1")->base(), machine.region("gfx1")->bytes(), 0);
+	K001005_preprocess_texture_data(machine.root_device().memregion("gfx1")->base(), state->memregion("gfx1")->bytes(), 0);
 }
 
 static DRIVER_INIT(zr107)

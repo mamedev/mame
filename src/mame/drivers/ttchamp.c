@@ -109,7 +109,7 @@ WRITE16_MEMBER(ttchamp_state::paloff_w)
 WRITE16_MEMBER(ttchamp_state::pcup_prgbank_w)
 {
     int bank;
-    UINT8 *ROM1 = machine().region("user1")->base();
+    UINT8 *ROM1 = memregion("user1")->base();
 
     if (ACCESSING_BITS_0_7)
     {
@@ -337,7 +337,7 @@ ROM_END
 
 static DRIVER_INIT (ttchamp)
 {
-	UINT8 *ROM1 = machine.region("user1")->base();
+	UINT8 *ROM1 = machine.root_device().memregion("user1")->base();
 	machine.root_device().membank("bank1")->set_base(&ROM1[0x120000]);
 	machine.root_device().membank("bank2")->set_base(&ROM1[0x180000]);
 }

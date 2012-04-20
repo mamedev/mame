@@ -669,7 +669,7 @@ static const tc0140syt_interface airsys_tc0140syt_intf =
 static MACHINE_START( taitoair )
 {
 	taitoair_state *state = machine.driver_data<taitoair_state>();
-	UINT8 *ROM = machine.region("audiocpu")->base();
+	UINT8 *ROM = state->memregion("audiocpu")->base();
 	int i;
 
 	state->membank("bank1")->configure_entries(0, 4, &ROM[0xc000], 0x4000);

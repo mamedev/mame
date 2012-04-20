@@ -175,8 +175,8 @@ VIDEO_START( itech8 )
 	state->m_page_select = 0xc0;
 
 	/* fetch the GROM base */
-	state->m_grom_base = machine.region("grom")->base();
-	state->m_grom_size = machine.region("grom")->bytes();
+	state->m_grom_base = machine.root_device().memregion("grom")->base();
+	state->m_grom_size = state->memregion("grom")->bytes();
 }
 
 

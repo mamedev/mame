@@ -40,7 +40,7 @@ static TIMER_DEVICE_CALLBACK( chqflag_scanline )
 WRITE8_MEMBER(chqflag_state::chqflag_bankswitch_w)
 {
 	int bankaddress;
-	UINT8 *RAM = machine().region("maincpu")->base();
+	UINT8 *RAM = memregion("maincpu")->base();
 
 	/* bits 0-4 = ROM bank # (0x00-0x11) */
 	bankaddress = 0x10000 + (data & 0x1f) * 0x4000;
@@ -322,7 +322,7 @@ static const k051316_interface chqflag_k051316_intf_2 =
 static MACHINE_START( chqflag )
 {
 	chqflag_state *state = machine.driver_data<chqflag_state>();
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = state->memregion("maincpu")->base();
 
 	state->membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x2000);
 

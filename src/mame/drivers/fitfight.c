@@ -1002,7 +1002,7 @@ ROM_END
 
 static DRIVER_INIT( fitfight )
 {
-//  UINT16 *mem16 = (UINT16 *)machine.region("maincpu")->base();
+//  UINT16 *mem16 = (UINT16 *)machine.root_device().memregion("maincpu")->base();
 //  mem16[0x0165B2/2] = 0x4e71; // for now so it boots
 	fitfight_state *state = machine.driver_data<fitfight_state>();
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x700000, 0x700001, read16_delegate(FUNC(fitfight_state::fitfight_700000_r),state));
@@ -1011,7 +1011,7 @@ static DRIVER_INIT( fitfight )
 
 static DRIVER_INIT( histryma )
 {
-//  UINT16 *mem16 = (UINT16 *)machine.region("maincpu")->base();
+//  UINT16 *mem16 = (UINT16 *)machine.root_device().memregion("maincpu")->base();
 //  mem16[0x017FDC/2] = 0x4e71; // for now so it boots
 	fitfight_state *state = machine.driver_data<fitfight_state>();
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x700000, 0x700001, read16_delegate(FUNC(fitfight_state::histryma_700000_r),state));

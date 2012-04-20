@@ -56,7 +56,7 @@ static MACHINE_RESET( midvunit )
 	dcs_reset_w(machine, 1);
 	dcs_reset_w(machine, 0);
 
-	memcpy(state->m_ram_base, machine.region("user1")->base(), 0x20000*4);
+	memcpy(state->m_ram_base, state->memregion("user1")->base(), 0x20000*4);
 	machine.device("maincpu")->reset();
 
 	state->m_timer[0] = machine.device<timer_device>("timer0");
@@ -70,7 +70,7 @@ static MACHINE_RESET( midvplus )
 	dcs_reset_w(machine, 1);
 	dcs_reset_w(machine, 0);
 
-	memcpy(state->m_ram_base, machine.region("user1")->base(), 0x20000*4);
+	memcpy(state->m_ram_base, state->memregion("user1")->base(), 0x20000*4);
 	machine.device("maincpu")->reset();
 
 	state->m_timer[0] = machine.device<timer_device>("timer0");

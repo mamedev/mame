@@ -539,9 +539,9 @@ ROM_END
 static DRIVER_INIT( redclash )
 {
 	int i,j;
-	const UINT8 *src = machine.region("gfx2")->base();
-	UINT8 *dst = machine.region("gfx3")->base();
-	int len = machine.region("gfx3")->bytes();
+	const UINT8 *src = machine.root_device().memregion("gfx2")->base();
+	UINT8 *dst = machine.root_device().memregion("gfx3")->base();
+	int len = machine.root_device().memregion("gfx3")->bytes();
 
 	/* rearrange the sprite graphics */
 	for (i = 0;i < len;i++)

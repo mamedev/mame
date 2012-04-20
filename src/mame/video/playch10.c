@@ -16,7 +16,7 @@ WRITE8_MEMBER(playch10_state::playch10_videoram_w)
 
 PALETTE_INIT( playch10 )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	ppu2c0x_device *ppu = machine.device<ppu2c0x_device>("ppu");
 	int i;
 
@@ -93,7 +93,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 VIDEO_START( playch10 )
 {
 	playch10_state *state = machine.driver_data<playch10_state>();
-	const UINT8 *bios = machine.region("maincpu")->base();
+	const UINT8 *bios = state->memregion("maincpu")->base();
 	state->m_pc10_bios = (bios[3] == 0x2a) ? 1 : 2;
 
 	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows,
@@ -103,7 +103,7 @@ VIDEO_START( playch10 )
 VIDEO_START( playch10_hboard )
 {
 	playch10_state *state = machine.driver_data<playch10_state>();
-	const UINT8 *bios = machine.region("maincpu")->base();
+	const UINT8 *bios = state->memregion("maincpu")->base();
 	state->m_pc10_bios = (bios[3] == 0x2a) ? 1 : 2;
 
 	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows,

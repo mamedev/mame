@@ -92,7 +92,7 @@ static MACHINE_START( skykid )
 {
 	skykid_state *state = machine.driver_data<skykid_state>();
 	/* configure the banks */
-	state->membank("bank1")->configure_entries(0, 2, machine.region("maincpu")->base() + 0x10000, 0x2000);
+	state->membank("bank1")->configure_entries(0, 2, state->memregion("maincpu")->base() + 0x10000, 0x2000);
 
 	state_save_register_global(machine, state->m_inputport_selected);
 }
@@ -638,7 +638,7 @@ static DRIVER_INIT( skykid )
 	int i;
 
 	/* unpack the third sprite ROM */
-	rom = machine.region("gfx3")->base() + 0x4000;
+	rom = machine.root_device().memregion("gfx3")->base() + 0x4000;
 	for (i = 0;i < 0x2000;i++)
 	{
 		rom[i + 0x4000] = rom[i];		// sprite set #1, plane 3

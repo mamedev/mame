@@ -347,7 +347,7 @@ static SCREEN_UPDATE_IND16( drw80pkr )
 
 static PALETTE_INIT( drw80pkr )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int j;
 
 	for (j = 0; j < machine.total_colors(); j++)
@@ -405,7 +405,7 @@ GFXDECODE_END
 
 static DRIVER_INIT( drw80pkr )
 {
-	machine.root_device().membank("bank1")->configure_entries(0, 2, machine.region("maincpu")->base(), 0x1000);
+	machine.root_device().membank("bank1")->configure_entries(0, 2, machine.root_device().memregion("maincpu")->base(), 0x1000);
 }
 
 

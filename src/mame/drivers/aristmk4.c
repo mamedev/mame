@@ -1587,7 +1587,7 @@ static const ppi8255_interface ppi8255_intf1 =
 /* same as Casino Winner HW */
 static PALETTE_INIT( aristmk4 )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 
 	for (i = 0;i < machine.total_colors();i++)
@@ -1614,7 +1614,7 @@ static PALETTE_INIT( aristmk4 )
 static DRIVER_INIT( aristmk4 )
 {
 	aristmk4_state *state = machine.driver_data<aristmk4_state>();
-	state->m_shapeRomPtr = (UINT8 *)machine.region("tile_gfx")->base();
+	state->m_shapeRomPtr = (UINT8 *)state->memregion("tile_gfx")->base();
 	memcpy(state->m_shapeRom,state->m_shapeRomPtr,sizeof(state->m_shapeRom)); // back up
 	state->m_nvram = auto_alloc_array(machine, UINT8, 0x1000);
 }

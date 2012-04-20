@@ -72,7 +72,7 @@ static SCREEN_UPDATE_IND16( missb2 )
 
 	sx = 0;
 
-	prom = screen.machine().region("proms")->base();
+	prom = screen.machine().root_device().memregion("proms")->base();
 	for (offs = 0; offs < state->m_objectram.bytes(); offs += 4)
 	{
 		/* skip empty sprites */
@@ -573,8 +573,8 @@ ROM_END
 
 static void configure_banks( running_machine& machine )
 {
-	UINT8 *ROM = machine.region("maincpu")->base();
-	UINT8 *SLAVE = machine.region("slave")->base();
+	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
+	UINT8 *SLAVE = machine.root_device().memregion("slave")->base();
 
 	machine.root_device().membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
 

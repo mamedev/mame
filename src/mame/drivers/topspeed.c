@@ -412,7 +412,7 @@ static void topspeed_msm5205_vck( device_t *device )
 	}
 	else
 	{
-		state->m_adpcm_data = device->machine().region("adpcm")->base()[state->m_adpcm_pos];
+		state->m_adpcm_data = device->machine().root_device().memregion("adpcm")->base()[state->m_adpcm_pos];
 		state->m_adpcm_pos = (state->m_adpcm_pos + 1) & 0x1ffff;
 		msm5205_data_w(device, state->m_adpcm_data >> 4);
 	}
@@ -646,7 +646,7 @@ static MACHINE_START( topspeed )
 {
 	topspeed_state *state = machine.driver_data<topspeed_state>();
 
-	state->membank("bank10")->configure_entries(0, 4, machine.region("audiocpu")->base() + 0xc000, 0x4000);
+	state->membank("bank10")->configure_entries(0, 4, state->memregion("audiocpu")->base() + 0xc000, 0x4000);
 
 	state->m_maincpu = machine.device("maincpu");
 	state->m_subcpu = machine.device("sub");

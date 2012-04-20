@@ -66,7 +66,7 @@ static rgb_t get_color( int data )
 
 PALETTE_INIT( lasso )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 
 	for (i = 0; i < 0x40; i++)
@@ -76,7 +76,7 @@ PALETTE_INIT( lasso )
 
 PALETTE_INIT( wwjgtin )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 
 	/* allocate the colortable */
@@ -136,7 +136,7 @@ static TILE_GET_INFO( lasso_get_bg_tile_info )
 
 static TILE_GET_INFO( wwjgtin_get_track_tile_info )
 {
-	UINT8 *ROM = machine.region("user1")->base();
+	UINT8 *ROM = machine.root_device().memregion("user1")->base();
 	int code = ROM[tile_index];
 	int color = ROM[tile_index + 0x2000];
 

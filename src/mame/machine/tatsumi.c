@@ -293,7 +293,7 @@ WRITE16_MEMBER(tatsumi_state::cyclwarr_control_w)
 
 READ16_MEMBER(tatsumi_state::tatsumi_v30_68000_r)
 {
-	const UINT16* rom=(UINT16*)machine().region("sub")->base();
+	const UINT16* rom=(UINT16*)machine().root_device().memregion("sub")->base();
 
 logerror("%05X:68000_r(%04X),cw=%04X\n", cpu_get_pc(&space.device()), offset*2, m_control_word);
 	/* Read from 68k RAM */
@@ -302,7 +302,7 @@ logerror("%05X:68000_r(%04X),cw=%04X\n", cpu_get_pc(&space.device()), offset*2, 
 		// hack to make roundup 5 boot
 		if (cpu_get_pc(&space.device())==0xec575)
 		{
-			UINT8 *dst = machine().region("maincpu")->base();
+			UINT8 *dst = memregion("maincpu")->base();
 			dst[BYTE_XOR_LE(0xec57a)]=0x46;
 			dst[BYTE_XOR_LE(0xec57b)]=0x46;
 

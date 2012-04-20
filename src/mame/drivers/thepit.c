@@ -1080,7 +1080,7 @@ READ8_MEMBER(thepit_state::rtriv_question_r)
 	// Read the actual byte from question roms
 	else if((offset & 0xc00) == 0xc00)
 	{
-		UINT8 *ROM = machine().region("user1")->base();
+		UINT8 *ROM = memregion("user1")->base();
 		int real_address;
 
 		real_address = (0x8000 * m_question_rom) | m_question_address | (offset & 0x3f0) | m_remap_address[offset & 0x0f];

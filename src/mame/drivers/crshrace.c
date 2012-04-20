@@ -138,7 +138,7 @@ Dip locations verified with Service Mode.
 
 READ16_MEMBER(crshrace_state::extrarom1_r)
 {
-	UINT8 *rom = machine().region("user1")->base();
+	UINT8 *rom = memregion("user1")->base();
 
 	offset *= 2;
 
@@ -147,7 +147,7 @@ READ16_MEMBER(crshrace_state::extrarom1_r)
 
 READ16_MEMBER(crshrace_state::extrarom2_r)
 {
-	UINT8 *rom = machine().region("user2")->base();
+	UINT8 *rom = memregion("user2")->base();
 
 	offset *= 2;
 
@@ -442,7 +442,7 @@ static MACHINE_START( crshrace )
 {
 	crshrace_state *state = machine.driver_data<crshrace_state>();
 
-	state->membank("bank1")->configure_entries(0, 4, machine.region("audiocpu")->base() + 0x10000, 0x8000);
+	state->membank("bank1")->configure_entries(0, 4, state->memregion("audiocpu")->base() + 0x10000, 0x8000);
 
 	state->save_item(NAME(state->m_roz_bank));
 	state->save_item(NAME(state->m_gfxctrl));
@@ -577,7 +577,7 @@ ROM_END
 void crshrace_patch_code( UINT16 offset )
 {
 	/* A hack which shows 3 player mode in code which is disabled */
-	UINT16 *RAM = (UINT16 *)machine.region("maincpu")->base();
+	UINT16 *RAM = (UINT16 *)machine.root_device().memregion("maincpu")->base();
 	RAM[(offset + 0)/2] = 0x4e71;
 	RAM[(offset + 2)/2] = 0x4e71;
 	RAM[(offset + 4)/2] = 0x4e71;

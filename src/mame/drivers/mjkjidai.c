@@ -74,7 +74,7 @@ static DEVICE_START( mjkjidai_adpcm )
 
 	state->m_playing = 0;
 	state->m_stream = device->machine().sound().stream_alloc(*device, 0, 1, device->clock(), state, mjkjidai_adpcm_callback);
-	state->m_base = machine.region("adpcm")->base();
+	state->m_base = machine.root_device().memregion("adpcm")->base();
 	state->m_adpcm.reset();
 }
 

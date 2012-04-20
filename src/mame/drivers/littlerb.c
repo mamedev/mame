@@ -503,7 +503,7 @@ static TIMER_DEVICE_CALLBACK( littlerb_scanline )
 	if((scanline % 2) == 0)
 	{
 		UINT8 res;
-		UINT8 *sample_rom = timer.machine().region("samples")->base();
+		UINT8 *sample_rom = state->memregion("samples")->base();
 
 		res = sample_rom[state->m_sound_pointer_l|(state->m_sound_index_l<<10)|0x40000];
 		dac_signed_w(state->m_dacl, 0, res);

@@ -170,7 +170,7 @@ WRITE16_MEMBER(galpanic_state::galpanic_6295_bankswitch_w)
 
 	if (ACCESSING_BITS_8_15)
 	{
-		UINT8 *rom = machine().region("oki")->base();
+		UINT8 *rom = memregion("oki")->base();
 
 		memcpy(&rom[0x30000],&rom[0x40000 + ((data >> 8) & 0x0f) * 0x10000],0x10000);
 
@@ -183,7 +183,7 @@ WRITE16_MEMBER(galpanic_state::galpanica_6295_bankswitch_w)
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		UINT8 *rom = machine().region("oki")->base();
+		UINT8 *rom = memregion("oki")->base();
 
 		memcpy(&rom[0x30000],&rom[0x40000 + ((data >> 8) & 0x0f) * 0x10000],0x10000);
 	}

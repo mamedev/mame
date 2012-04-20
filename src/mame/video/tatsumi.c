@@ -973,7 +973,7 @@ static void draw_bg(running_machine &machine, bitmap_rgb32 &dst, tilemap_t *src,
         Each tile (0x4000 of them) has a lookup table in ROM to build an individual 3-bit palette
         from sets of 8 bit palettes!
     */
-	const UINT8* tile_cluts = machine.region("gfx4")->base();
+	const UINT8* tile_cluts = machine.root_device().memregion("gfx4")->base();
 	const bitmap_ind16 &src_bitmap = src->pixmap();
 	int src_y_mask=ysize-1;
 	int src_x_mask=xsize-1;
@@ -1008,7 +1008,7 @@ static void draw_ground(running_machine &machine, bitmap_rgb32 &dst, const recta
 {
 	tatsumi_state *state = machine.driver_data<tatsumi_state>();
 	int x, y;
-	const UINT8 *lut = machine.region("proms")->base();
+	const UINT8 *lut = state->memregion("proms")->base();
 
 	UINT16 gva = 0x180; // TODO
 	UINT8 sky_val = state->m_apache3_rotate_ctrl[1] & 0xff;

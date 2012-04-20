@@ -471,7 +471,7 @@ ROM_END
 
 static DRIVER_INIT( darkseal )
 {
-	UINT8 *RAM = machine.region("maincpu")->base();
+	UINT8 *RAM = machine.root_device().memregion("maincpu")->base();
 	int i;
 
 	for (i=0x00000; i<0x80000; i++)

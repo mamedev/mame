@@ -1523,14 +1523,14 @@ static void hng64_reorder(running_machine &machine, UINT8* gfxregion, size_t gfx
 
 static DRIVER_INIT( hng64_reorder_gfx )
 {
-	hng64_reorder(machine, machine.region("scrtile")->base(), machine.region("scrtile")->bytes());
+	hng64_reorder(machine, machine.root_device().memregion("scrtile")->base(), machine.root_device().memregion("scrtile")->bytes());
 }
 
 #define HACK_REGION
 #ifdef HACK_REGION
 static void hng64_patch_bios_region(running_machine& machine, int region)
 {
-	UINT8 *rom = machine.region("user1")->base();
+	UINT8 *rom = machine.root_device().memregion("user1")->base();
 
 	if ((rom[0x4000]==0xff) && (rom[0x4001] == 0xff))
 	{
@@ -1576,7 +1576,7 @@ static DRIVER_INIT( fatfurwa )
 {
 	hng64_state *state = machine.driver_data<hng64_state>();
 
-	/* FILE* fp = fopen("/tmp/test.bin", "wb"); fwrite(machine.region("verts")->base(), 1, 0x0c00000*2, fp); fclose(fp); */
+	/* FILE* fp = fopen("/tmp/test.bin", "wb"); fwrite(state->memregion("verts")->base(), 1, 0x0c00000*2, fp); fclose(fp); */
 	DRIVER_INIT_CALL(hng64_fght);
 	state->m_mcu_type = FIGHT_MCU;
 }
@@ -1661,7 +1661,7 @@ static MACHINE_RESET(hyperneo)
 {
 	hng64_state *state = machine.driver_data<hng64_state>();
 	int i;
-	const UINT8 *rom = machine.region("user2")->base();
+	const UINT8 *rom = state->memregion("user2")->base();
 
 	/* Sound CPU */
 	UINT8 *RAM = (UINT8*)state->m_soundram;

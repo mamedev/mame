@@ -554,7 +554,7 @@ static WRITE8_HANDLER( key_type3_w )
 
 WRITE8_MEMBER(namcos1_state::namcos1_sound_bankswitch_w)
 {
-	UINT8 *rom = machine().region("audiocpu")->base() + 0xc000;
+	UINT8 *rom = memregion("audiocpu")->base() + 0xc000;
 
 	int bank = (data & 0x70) >> 4;
 	membank("bank17")->set_base(rom + 0x4000 * bank);
@@ -826,7 +826,7 @@ static void namcos1_build_banks(running_machine &machine,read8_space_func key_r,
 
 	/* PRG0-PRG7 */
 	{
-		UINT8 *rom = machine.region("user1")->base();
+		UINT8 *rom = machine.root_device().memregion("user1")->base();
 
 		namcos1_install_bank(state,0x200,0x3ff,0,rom_w,0,rom);
 
@@ -920,7 +920,7 @@ WRITE8_MEMBER(namcos1_state::namcos1_mcu_bankswitch_w)
 	/* bit 0-1 : address line A15-A16 */
 	addr += (data & 3) * 0x8000;
 
-	membank("bank20")->set_base(machine().region("mcu")->base() + addr);
+	membank("bank20")->set_base(machine().root_device().memregion("mcu")->base() + addr);
 }
 
 
@@ -1126,7 +1126,7 @@ DRIVER_INIT( bakutotu )
 		static const UINT8 target[8] = {0x34,0x37,0x35,0x37,0x96,0x00,0x2e,0xed};
 		UINT8 *rombase, *srcptr, *endptr, *scanptr;
 
-		rombase = machine.region("user1")->base();
+		rombase = machine.root_device().memregion("user1")->base();
 		srcptr = rombase + 0x1e000;
 		endptr = srcptr + 0xa000;
 

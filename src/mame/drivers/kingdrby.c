@@ -954,7 +954,7 @@ static const ym2203_interface cowrace_ym2203_interface =
 
 static PALETTE_INIT(kingdrby)
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int	bit0, bit1, bit2 , r, g, b;
 	int	i;
 
@@ -980,8 +980,8 @@ static PALETTE_INIT(kingdrby)
 
 static PALETTE_INIT(kingdrbb)
 {
-	UINT8 *raw_prom = machine.region("raw_prom")->base();
-	UINT8 *prom = machine.region("proms")->base();
+	UINT8 *raw_prom = machine.root_device().memregion("raw_prom")->base();
+	UINT8 *prom = machine.root_device().memregion("proms")->base();
 	int	bit0, bit1, bit2 , r, g, b;
 	int	i;
 

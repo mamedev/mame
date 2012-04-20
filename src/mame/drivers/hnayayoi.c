@@ -674,8 +674,8 @@ ROM_END
 
 static DRIVER_INIT( hnfubuki )
 {
-	UINT8 *rom = machine.region("gfx1")->base();
-	int len = machine.region("gfx1")->bytes();
+	UINT8 *rom = machine.root_device().memregion("gfx1")->base();
+	int len = machine.root_device().memregion("gfx1")->bytes();
 	int i, j;
 
 	/* interestingly, the blitter data has a slight encryption */

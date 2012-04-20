@@ -173,7 +173,7 @@ READ16_MEMBER(sf_state::button2_r)
 
 WRITE8_MEMBER(sf_state::sound2_bank_w)
 {
-	membank("bank1")->set_base(machine().region("audio2")->base() + 0x8000 * (data + 1));
+	membank("bank1")->set_base(machine().root_device().memregion("audio2")->base() + 0x8000 * (data + 1));
 }
 
 

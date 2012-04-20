@@ -126,7 +126,7 @@ static void draw_boxer( running_machine &machine, bitmap_ind16 &bitmap, const re
 
 	for (n = 0; n < 2; n++)
 	{
-		const UINT8* p = machine.region(n == 0 ? "user1" : "user2")->base();
+		const UINT8* p = state->memregion(n == 0 ? "user1" : "user2")->base();
 
 		int i, j;
 

@@ -495,8 +495,8 @@ static void tile_decode(running_machine &machine)
 {
 	UINT8 lsb,msb;
 	UINT32 offset,i;
-	UINT8 *gfx = machine.region("gfx2")->base();
-	int size=machine.region("gfx2")->bytes();
+	UINT8 *gfx = machine.root_device().memregion("gfx2")->base();
+	int size=machine.root_device().memregion("gfx2")->bytes();
 	int data;
 
 	/* Setup ROM formats:
@@ -528,8 +528,8 @@ static void tile_decode(running_machine &machine)
 		offset+=4;
 	}
 
-	gfx = machine.region("gfx1")->base();
-	size=machine.region("gfx1")->bytes();
+	gfx = machine.root_device().memregion("gfx1")->base();
+	size=machine.root_device().memregion("gfx1")->bytes();
 
 	offset = size/2;
 	for (i = size/2+size/4; i<size; i++)

@@ -112,7 +112,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 static TILE_GET_INFO( get_bg_tile_info )
 {
 	tigeroad_state *state = machine.driver_data<tigeroad_state>();
-	UINT8 *tilerom = machine.region("gfx4")->base();
+	UINT8 *tilerom = state->memregion("gfx4")->base();
 
 	int data = tilerom[tile_index];
 	int attr = tilerom[tile_index + 1];

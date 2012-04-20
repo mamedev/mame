@@ -1130,14 +1130,14 @@ static void ym3438_irq_handler(device_t *device, int state)
 WRITE8_MEMBER(segas32_state::sound_bank_lo_w)
 {
 	m_sound_bank = (m_sound_bank & ~0x3f) | (data & 0x3f);
-	membank("bank1")->set_base(machine().region("soundcpu")->base() + 0x100000 + 0x2000 * m_sound_bank);
+	membank("bank1")->set_base(machine().root_device().memregion("soundcpu")->base() + 0x100000 + 0x2000 * m_sound_bank);
 }
 
 
 WRITE8_MEMBER(segas32_state::sound_bank_hi_w)
 {
 	m_sound_bank = (m_sound_bank & 0x3f) | ((data & 0x04) << 4) | ((data & 0x03) << 7);
-	membank("bank1")->set_base(machine().region("soundcpu")->base() + 0x100000 + 0x2000 * m_sound_bank);
+	membank("bank1")->set_base(machine().root_device().memregion("soundcpu")->base() + 0x100000 + 0x2000 * m_sound_bank);
 }
 
 
@@ -4145,7 +4145,7 @@ static DRIVER_INIT( jpark )
 {
 	segas32_state *state = machine.driver_data<segas32_state>();
 	/* Temp. Patch until we emulate the 'Drive Board', thanks to Malice */
-	UINT16 *pROM = (UINT16 *)machine.region("maincpu")->base();
+	UINT16 *pROM = (UINT16 *)state->memregion("maincpu")->base();
 
 	segas32_common_init(machine, read16_delegate(FUNC(segas32_state::analog_custom_io_r),state), write16_delegate(FUNC(segas32_state::analog_custom_io_w),state));
 

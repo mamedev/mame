@@ -68,7 +68,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 {
 	undrfire_state *state = machine.driver_data<undrfire_state>();
 	UINT32 *spriteram32 = state->m_spriteram;
-	UINT16 *spritemap = (UINT16 *)machine.region("user1")->base();
+	UINT16 *spritemap = (UINT16 *)state->memregion("user1")->base();
 	int offs, data, tilenum, color, flipx, flipy;
 	int x, y, priority, dblsize, curx, cury;
 	int sprites_flipscreen = 0;
@@ -212,8 +212,8 @@ static void draw_sprites_cbombers(running_machine &machine, bitmap_ind16 &bitmap
 {
 	undrfire_state *state = machine.driver_data<undrfire_state>();
 	UINT32 *spriteram32 = state->m_spriteram;
-	UINT16 *spritemap = (UINT16 *)machine.region("user1")->base();
-	UINT8 *spritemapHibit = (UINT8 *)machine.region("user2")->base();
+	UINT16 *spritemap = (UINT16 *)machine.root_device().memregion("user1")->base();
+	UINT8 *spritemapHibit = (UINT8 *)state->memregion("user2")->base();
 
 	int offs, data, tilenum, color, flipx, flipy;
 	int x, y, priority, dblsize, curx, cury;

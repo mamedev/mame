@@ -351,7 +351,7 @@ ROM_END
 
 static DRIVER_INIT( madmotor )
 {
-	UINT8 *rom = machine.region("maincpu")->base();
+	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
 	int i;
 
 	for (i = 0x00000;i < 0x80000;i++)

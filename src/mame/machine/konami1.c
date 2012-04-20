@@ -43,8 +43,8 @@ static UINT8 konami1_decodebyte( UINT8 opcode, UINT16 address )
 UINT8 *konami1_decode(running_machine &machine, const char *cpu)
 {
 	address_space *space = machine.device(cpu)->memory().space(AS_PROGRAM);
-	const UINT8 *rom = machine.region(cpu)->base();
-	int size = machine.region(cpu)->bytes();
+	const UINT8 *rom = machine.root_device().memregion(cpu)->base();
+	int size = machine.root_device().memregion(cpu)->bytes();
 	int A;
 
 	UINT8 *decrypted = auto_alloc_array(machine, UINT8, size);

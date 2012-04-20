@@ -268,7 +268,7 @@ static const k051960_interface gbusters_k051960_intf =
 static MACHINE_START( gbusters )
 {
 	gbusters_state *state = machine.driver_data<gbusters_state>();
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = state->memregion("maincpu")->base();
 
 	state->membank("bank1")->configure_entries(0, 16, &ROM[0x10000], 0x2000);
 	state->membank("bank1")->set_entry(0);
@@ -288,7 +288,7 @@ static MACHINE_START( gbusters )
 static MACHINE_RESET( gbusters )
 {
 	gbusters_state *state = machine.driver_data<gbusters_state>();
-	UINT8 *RAM = machine.region("maincpu")->base();
+	UINT8 *RAM = state->memregion("maincpu")->base();
 
 	konami_configure_set_lines(machine.device("maincpu"), gbusters_banking);
 

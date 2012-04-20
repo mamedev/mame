@@ -104,7 +104,7 @@ WRITE32_MEMBER(djmain_state::paletteram32_w)
 static void sndram_set_bank(running_machine &machine)
 {
 	djmain_state *state = machine.driver_data<djmain_state>();
-	state->m_sndram = machine.region("shared")->base() + 0x80000 * state->m_sndram_bank;
+	state->m_sndram = state->memregion("shared")->base() + 0x80000 * state->m_sndram_bank;
 }
 
 WRITE32_MEMBER(djmain_state::sndram_bank_w)
@@ -170,7 +170,7 @@ WRITE32_MEMBER(djmain_state::obj_ctrl_w)
 
 READ32_MEMBER(djmain_state::obj_rom_r)
 {
-	UINT8 *mem8 = machine().region("gfx1")->base();
+	UINT8 *mem8 = memregion("gfx1")->base();
 	int bank = m_obj_regs[0x28/4] >> 16;
 
 	offset += bank * 0x200;
@@ -207,7 +207,7 @@ WRITE32_MEMBER(djmain_state::v_ctrl_w)
 READ32_MEMBER(djmain_state::v_rom_r)
 {
 	device_t *k056832 = machine().device("k056832");
-	UINT8 *mem8 = machine().region("gfx2")->base();
+	UINT8 *mem8 = memregion("gfx2")->base();
 	int bank = k056832_word_r(k056832, 0x34/2, 0xffff);
 
 	offset *= 2;

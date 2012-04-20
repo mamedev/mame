@@ -61,7 +61,7 @@ TODO:
 
 static DRIVER_INIT( gionbana )
 {
-	UINT8 *prot = machine.region("protection")->base();
+	UINT8 *prot = machine.root_device().memregion("protection")->base();
 	int i;
 
 	/* this is one possible way to rearrange the protection ROM data to get the
@@ -85,7 +85,7 @@ static DRIVER_INIT( mgion )
 static DRIVER_INIT( omotesnd )
 {
 #if 0
-	UINT8 *prot = machine.region("protection")->base();
+	UINT8 *prot = machine.root_device().memregion("protection")->base();
 	int i;
 
 	/* this is one possible way to rearrange the protection ROM data to get the
@@ -100,7 +100,7 @@ static DRIVER_INIT( omotesnd )
 #endif
 
 #if 1
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
 
 	// Protection ROM check skip
 	ROM[0x0106] = 0x00;
@@ -135,7 +135,7 @@ static DRIVER_INIT( msjiken )
 
 static DRIVER_INIT( telmahjn )
 {
-	UINT8 *prot = machine.region("protection")->base();
+	UINT8 *prot = machine.root_device().memregion("protection")->base();
 	int i;
 
 	/* this is one possible way to rearrange the protection ROM data to get the
@@ -153,7 +153,7 @@ static DRIVER_INIT( telmahjn )
 
 static DRIVER_INIT( mgmen89 )
 {
-	UINT8 *prot = machine.region("protection")->base();
+	UINT8 *prot = machine.root_device().memregion("protection")->base();
 	int i;
 
 	/* this is one possible way to rearrange the protection ROM data to get the
@@ -171,8 +171,8 @@ static DRIVER_INIT( mgmen89 )
 
 static DRIVER_INIT( mjfocus )
 {
-	UINT8 *prot = machine.region("protection")->base();
-	UINT8 *ram = machine.region("maincpu")->base() + 0xf800;
+	UINT8 *prot = machine.root_device().memregion("protection")->base();
+	UINT8 *ram = machine.root_device().memregion("maincpu")->base() + 0xf800;
 	int i;
 
 	/* need to clear RAM otherwise it doesn't boot... */
@@ -194,7 +194,7 @@ static DRIVER_INIT( mjfocus )
 static DRIVER_INIT( mjfocusm )
 {
 #if 1
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
 
 	// Protection ROM check skip
 	ROM[0x014e] = 0x00;
@@ -206,7 +206,7 @@ static DRIVER_INIT( mjfocusm )
 
 static DRIVER_INIT( scandal )
 {
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
 	int i;
 
 	for (i = 0xf800; i < 0x10000; i++) ROM[i] = 0x00;
@@ -223,10 +223,10 @@ static DRIVER_INIT( mjnanpas )
 {
 	/* they forgot to enable the protection check in this game... */
 #if 0
-	UINT8 *prot = machine.region("protection")->base();
+	UINT8 *prot = machine.root_device().memregion("protection")->base();
 	int i;
 
-	machine.region("maincpu")->base()[0x003d] = 0x01;	// force the protection check to be executed
+	machine.root_device().memregion("maincpu")->base()[0x003d] = 0x01;	// force the protection check to be executed
 
 	/* this is one possible way to rearrange the protection ROM data to get the
        expected 0xfe1a checksum. It's probably completely wrong! But since the
@@ -284,7 +284,7 @@ static DRIVER_INIT( hanaoji )
 
 static DRIVER_INIT( pairsnb )
 {
-	UINT8 *prot = machine.region("protection")->base();
+	UINT8 *prot = machine.root_device().memregion("protection")->base();
 	int i;
 
 	/* this is one possible way to rearrange the protection ROM data to get the
@@ -302,7 +302,7 @@ static DRIVER_INIT( pairsnb )
 
 static DRIVER_INIT( pairsten )
 {
-	UINT8 *prot = machine.region("protection")->base();
+	UINT8 *prot = machine.root_device().memregion("protection")->base();
 	int i;
 
 	/* this is one possible way to rearrange the protection ROM data to get the

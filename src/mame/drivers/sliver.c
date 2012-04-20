@@ -165,7 +165,7 @@ static void blit_gfx(running_machine &machine)
 {
 	sliver_state *state = machine.driver_data<sliver_state>();
 	int tmpptr=0;
-	const UINT8 *rom = machine.region("user1")->base();
+	const UINT8 *rom = state->memregion("user1")->base();
 
 	while (tmpptr < state->m_fptr)
 	{
@@ -239,7 +239,7 @@ static void render_jpeg(running_machine &machine)
 		cinfo.err = jpeg_std_error(&jerr);
 		jpeg_create_decompress(&cinfo);
 
-		jpeg_mem_src(&cinfo, machine.region("user2")->base()+addr, machine.region("user2")->bytes()-addr);
+		jpeg_mem_src(&cinfo, machine.root_device().memregion("user2")->base()+addr, machine.root_device().memregion("user2")->bytes()-addr);
 
 		jpeg_read_header(&cinfo, TRUE);
 		jpeg_start_decompress(&cinfo);
@@ -349,7 +349,7 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(sliver_state::oki_setbank)
 {
-	UINT8 *sound = machine().region("oki")->base();
+	UINT8 *sound = memregion("oki")->base();
 	int bank=(data^0xff)&3; //xor or not ?
 	memcpy(sound+0x20000, sound+0x100000+0x20000*bank, 0x20000);
 }

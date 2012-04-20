@@ -1217,7 +1217,7 @@ static MACHINE_START( cps2 )
 	state->m_audiocpu = machine.device("audiocpu");
 
 	if (state->m_audiocpu != NULL)	// gigaman2 has no audiocpu
-		state->membank("bank1")->configure_entries(0, (QSOUND_SIZE - 0x10000) / 0x4000, machine.region("audiocpu")->base() + 0x10000, 0x4000);
+		state->membank("bank1")->configure_entries(0, (QSOUND_SIZE - 0x10000) / 0x4000, state->memregion("audiocpu")->base() + 0x10000, 0x4000);
 }
 
 
@@ -8164,8 +8164,8 @@ static WRITE16_HANDLER( gigaman2_dummyqsound_w )
 static void gigaman2_gfx_reorder(running_machine &machine)
 {
 	int i;
-	int length = machine.region( "gfx" )->bytes();
-	UINT16 *rom = (UINT16 *)machine.region("gfx")->base();
+	int length = machine.root_device().memregion( "gfx" )->bytes();
+	UINT16 *rom = (UINT16 *)machine.root_device().memregion("gfx")->base();
 	UINT16 *buf = auto_alloc_array(machine, UINT16, length );
 
 	memcpy (buf, rom, length);
@@ -8181,8 +8181,8 @@ static DRIVER_INIT( gigaman2 )
 {
 	cps_state *state = machine.driver_data<cps_state>();
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	UINT16 *rom = (UINT16 *)machine.region("maincpu")->base();
-	int length = machine.region("maincpu")->bytes();
+	UINT16 *rom = (UINT16 *)machine.root_device().memregion("maincpu")->base();
+	int length = state->memregion("maincpu")->bytes();
 
 	gigaman2_gfx_reorder(machine);
 

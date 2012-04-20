@@ -18,7 +18,7 @@
 
 PALETTE_INIT( gunsmoke )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 
 	/* allocate the colortable */
@@ -105,7 +105,7 @@ WRITE8_MEMBER(gunsmoke_state::gunsmoke_d806_w)
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	UINT8 *tilerom = machine.region("gfx4")->base();
+	UINT8 *tilerom = machine.root_device().memregion("gfx4")->base();
 
 	int offs = tile_index * 2;
 	int attr = tilerom[offs + 1];

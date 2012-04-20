@@ -34,7 +34,7 @@ TILE_GET_INFO( get_fg_tile_info )
 static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	terracre_state *state = machine.driver_data<terracre_state>();
-	const UINT8 *spritepalettebank = machine.region("user1")->base();
+	const UINT8 *spritepalettebank = state->memregion("user1")->base();
 	const gfx_element *pGfx = machine.gfx[2];
 	const UINT16 *pSource = state->m_spriteram;
 	int i;
@@ -95,7 +95,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 
 PALETTE_INIT( amazon )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 
 	/* allocate the colortable */

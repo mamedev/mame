@@ -418,8 +418,8 @@ class n64_rdp : public poly_manager<UINT32, rdp_poly_state, 8, 32000>
 			m_tmem = auto_alloc_array(machine(), UINT8, 0x1000);
 			memset(m_tmem, 0, 0x1000);
 
-			UINT8 *normpoint = machine().region("normpoint")->base();
-			UINT8 *normslope = machine().region("normslope")->base();
+			UINT8 *normpoint = machine().root_device().memregion("normpoint")->base();
+			UINT8 *normslope = machine().root_device().memregion("normslope")->base();
 
 			for(INT32 i = 0; i < 64; i++)
 			{

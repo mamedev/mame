@@ -389,7 +389,7 @@ READ8_MEMBER(segas1x_bootleg_state::tturfbl_soundbank_r)
 
 WRITE8_MEMBER(segas1x_bootleg_state::tturfbl_soundbank_w)
 {
-	UINT8 *mem = machine().region("soundcpu")->base();
+	UINT8 *mem = memregion("soundcpu")->base();
 
 	switch(data)
 	{
@@ -460,11 +460,11 @@ ADDRESS_MAP_END
 
 static WRITE8_DEVICE_HANDLER( upd7759_bank_w ) //*
 {
-	int offs, size = device->machine().region("soundcpu")->bytes() - 0x10000;
+	int offs, size = device->machine().root_device().memregion("soundcpu")->bytes() - 0x10000;
 
 	upd7759_reset_w(device, data & 0x40);
 	offs = 0x10000 + (data * 0x4000) % size;
-	device->machine().root_device().membank("bank1")->set_base(device->machine().region("soundcpu")->base() + offs);
+	device->machine().root_device().membank("bank1")->set_base(device->machine().root_device().memregion("soundcpu")->base() + offs);
 }
 
 
@@ -1039,7 +1039,7 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(segas1x_bootleg_state::sys18_soundbank_w)
 {
-	UINT8 *mem = machine().region("soundcpu")->base();
+	UINT8 *mem = memregion("soundcpu")->base();
 	int rom = (data >> 6) & 3;
 	int bank = (data & 0x3f);
 	int mask = m_sound_info[rom * 2 + 0];
@@ -1203,7 +1203,7 @@ READ8_MEMBER(segas1x_bootleg_state::shdancbl_soundbank_r)
 
 WRITE8_MEMBER(segas1x_bootleg_state::shdancbl_bankctrl_w)
 {
-	UINT8 *mem = machine().region("soundcpu")->base();
+	UINT8 *mem = memregion("soundcpu")->base();
 
 	switch (data)
 	{
@@ -3349,8 +3349,8 @@ static DRIVER_INIT( goldnaxeb1 )
 {
 	segas1x_bootleg_state *state = machine.driver_data<segas1x_bootleg_state>();
 	int i;
-	UINT8 *ROM = machine.region("maincpu")->base();
-	UINT8 *KEY = machine.region("decryption")->base();
+	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
+	UINT8 *KEY = state->memregion("decryption")->base();
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 data[0x1000];
 
@@ -3393,7 +3393,7 @@ static DRIVER_INIT( bayrouteb1 )
 	// decrypt
 	DRIVER_INIT_CALL( goldnaxeb1 );
 
-	ROM2 = (UINT16*)machine.region("maincpu")->base();
+	ROM2 = (UINT16*)state->memregion("maincpu")->base();
 	decrypted_region2 = (UINT16*)state->m_decrypted_region;
 
 	// patch interrupt vector
@@ -3408,7 +3408,7 @@ static DRIVER_INIT( bayrouteb1 )
 
 static DRIVER_INIT( bayrouteb2 )
 {
-	UINT8 *mem = machine.region("soundcpu")->base();
+	UINT8 *mem = machine.root_device().memregion("soundcpu")->base();
 
 	memcpy(mem, mem + 0x10000, 0x8000);
 
@@ -3426,7 +3426,7 @@ static DRIVER_INIT( goldnaxeb2 )
 
 static DRIVER_INIT( tturfbl )
 {
-	UINT8 *mem = machine.region("soundcpu")->base();
+	UINT8 *mem = machine.root_device().memregion("soundcpu")->base();
 
 	memcpy(mem, mem + 0x10000, 0x8000);
 
@@ -3462,7 +3462,7 @@ static DRIVER_INIT( fpointbl )
 /* Tetris-based */
 static DRIVER_INIT( beautyb )
 {
-	UINT16*rom = (UINT16*)machine.region( "maincpu" )->base();
+	UINT16*rom = (UINT16*)machine.root_device().memregion( "maincpu" )->base();
 	int x;
 
 	for (x = 0; x < 0x8000; x++)
@@ -3481,7 +3481,7 @@ static DRIVER_INIT( beautyb )
 static DRIVER_INIT( shdancbl )
 {
 	segas1x_bootleg_state *state = machine.driver_data<segas1x_bootleg_state>();
-	UINT8 *mem = machine.region("soundcpu")->base();;
+	UINT8 *mem = state->memregion("soundcpu")->base();;
 
 	/* Copy first 32K of IC45 to Z80 address space */
 	memcpy(mem, mem + 0x10000, 0x8000);
@@ -3496,7 +3496,7 @@ static DRIVER_INIT( shdancbl )
 static DRIVER_INIT( mwalkbl )
 {
 	segas1x_bootleg_state *state = machine.driver_data<segas1x_bootleg_state>();
-	UINT8 *RAM =  machine.region("soundcpu")->base();
+	UINT8 *RAM =  state->memregion("soundcpu")->base();
 	static const int mwalk_sound_info[]  =
 	{
 		0x0f, 0x00000, // ROM #1 = 128K
@@ -3518,7 +3518,7 @@ static DRIVER_INIT( mwalkbl )
 static DRIVER_INIT( astormbl )
 {
 	segas1x_bootleg_state *state = machine.driver_data<segas1x_bootleg_state>();
-	UINT8 *RAM =  machine.region("soundcpu")->base();
+	UINT8 *RAM =  state->memregion("soundcpu")->base();
 	static const int astormbl_sound_info[]  =
 	{
 		0x0f, 0x00000, // ROM #1 = 128K

@@ -420,14 +420,14 @@ INLINE UINT8* blitter_get_addr(running_machine &machine, UINT32 addr)
 	if (addr < 0x10000)
 	{
 		/* Is this region fixed? */
-		return (UINT8*)(machine.region("user1")->base() + addr);
+		return (UINT8*)(state->memregion("user1")->base() + addr);
 	}
 	else if(addr < 0x20000)
 	{
 		addr &= 0xffff;
 		addr += (state->m_bank_data[0] & 1) ? 0x10000 : 0;
 
-		return (UINT8*)(machine.region("user1")->base() + addr + ((state->m_bank_data[0] >> 1) * 0x20000));
+		return (UINT8*)(machine.root_device().memregion("user1")->base() + addr + ((state->m_bank_data[0] >> 1) * 0x20000));
 	}
 	else if (addr >= 0x20000 && addr < 0x40000)
 	{
@@ -1023,7 +1023,7 @@ INLINE void z80_bank(running_machine &machine, int num, int data)
 	{
 		UINT32 offset = ((state->m_bank_data[0] >> 1) * 0x20000) + ((0x4000 * data) ^ ((state->m_bank_data[0] & 1) ? 0 : 0x10000));
 
-		state->membank(bank_names[num - 1])->set_base(machine.region("user1")->base() + offset);
+		state->membank(bank_names[num - 1])->set_base(machine.root_device().memregion("user1")->base() + offset);
 	}
 	else if (data < 0x10)
 	{
@@ -1138,7 +1138,7 @@ READ8_MEMBER(bfcobra_state::fddata_r)
 				}
 
 				fdc.offset = (BPT * fdc.track*2) + (fdc.side ? BPT : 0) + (BPS * (fdc.sector-1)) + fdc.byte_pos++;
-				val = *(machine().region("user2")->base() + fdc.offset);
+				val = *(machine().root_device().memregion("user2")->base() + fdc.offset);
 
 				/* Move on to next sector? */
 				if (fdc.byte_pos == 1024)
@@ -1706,7 +1706,7 @@ static DRIVER_INIT( bfcobra )
 	UINT8 *tmp;
 
 	tmp = auto_alloc_array(machine, UINT8, 0x8000);
-	rom = machine.region("audiocpu")->base() + 0x8000;
+	rom = machine.root_device().memregion("audiocpu")->base() + 0x8000;
 	memcpy(tmp, rom, 0x8000);
 
 	for (i = 0; i < 0x8000; i++)
@@ -1735,7 +1735,7 @@ static DRIVER_INIT( bfcobra )
 	state->m_bank_data[3] = 0;
 
 	/* Fixed 16kB ROM region */
-	state->membank("bank4")->set_base(machine.region("user1")->base());
+	state->membank("bank4")->set_base(machine.root_device().memregion("user1")->base());
 
 	/* TODO: Properly sort out the data ACIA */
 	state->m_data_r = 1;

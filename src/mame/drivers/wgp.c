@@ -946,7 +946,7 @@ static MACHINE_START( wgp )
 {
 	wgp_state *state = machine.driver_data<wgp_state>();
 
-	state->membank("bank10")->configure_entries(0, 4, machine.region("audiocpu")->base() + 0xc000, 0x4000);
+	state->membank("bank10")->configure_entries(0, 4, state->memregion("audiocpu")->base() + 0xc000, 0x4000);
 
 	state->m_maincpu = machine.device("maincpu");
 	state->m_audiocpu = machine.device("audiocpu");
@@ -1262,7 +1262,7 @@ static DRIVER_INIT( wgp )
 #if 0
 	/* Patch for coding error that causes corrupt data in
        sprite tilemapping area from $4083c0-847f */
-	UINT16 *ROM = (UINT16 *)machine.region("maincpu")->base();
+	UINT16 *ROM = (UINT16 *)machine.root_device().memregion("maincpu")->base();
 	ROM[0x25dc / 2] = 0x0602;	// faulty value is 0x0206
 #endif
 }
@@ -1270,7 +1270,7 @@ static DRIVER_INIT( wgp )
 static DRIVER_INIT( wgp2 )
 {
 	/* Code patches to prevent failure in memory checks */
-	UINT16 *ROM = (UINT16 *)machine.region("sub")->base();
+	UINT16 *ROM = (UINT16 *)machine.root_device().memregion("sub")->base();
 	ROM[0x8008 / 2] = 0x0;
 	ROM[0x8010 / 2] = 0x0;
 }

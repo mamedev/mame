@@ -484,7 +484,7 @@ WRITE8_MEMBER(meritm_state::meritm_crt250_questions_bank_w)
 		return;
 	}
 
-	dst = machine().region("maincpu")->base() + 0x70000 + 2;
+	dst = memregion("maincpu")->base() + 0x70000 + 2;
 
 	if (data == 0)
 	{
@@ -513,7 +513,7 @@ WRITE8_MEMBER(meritm_state::meritm_crt250_questions_bank_w)
 			default: logerror( "meritm_crt250_questions_bank_w: unknown data = %02x\n", data ); return;
 		}
 		logerror( "Reading question byte at %06X\n", questions_address | m_questions_loword_address);
-		*dst = machine().region("extra")->base()[questions_address | m_questions_loword_address];
+		*dst = memregion("extra")->base()[questions_address | m_questions_loword_address];
 	}
 };
 
@@ -989,7 +989,7 @@ static MACHINE_START(merit_common)
 static MACHINE_START(meritm_crt250)
 {
 	meritm_state *state = machine.driver_data<meritm_state>();
-	state->membank("bank1")->configure_entries(0, 8, machine.region("maincpu")->base(), 0x10000);
+	state->membank("bank1")->configure_entries(0, 8, state->memregion("maincpu")->base(), 0x10000);
 	state->m_bank = 0xff;
 	meritm_crt250_switch_banks(machine);
 	MACHINE_START_CALL(merit_common);
@@ -1016,8 +1016,8 @@ static MACHINE_START(meritm_crt260)
 	state->m_ram = auto_alloc_array(machine, UINT8,  0x8000 );
 	machine.device<nvram_device>("nvram")->set_base(state->m_ram, 0x8000);
 	memset(state->m_ram, 0x00, 0x8000);
-	state->membank("bank1")->configure_entries(0, 128, machine.region("maincpu")->base(), 0x8000);
-	state->membank("bank2")->configure_entries(0, 128, machine.region("maincpu")->base(), 0x8000);
+	state->membank("bank1")->configure_entries(0, 128, machine.root_device().memregion("maincpu")->base(), 0x8000);
+	state->membank("bank2")->configure_entries(0, 128, state->memregion("maincpu")->base(), 0x8000);
 	state->membank("bank3")->configure_entries(0, 4, state->m_ram, 0x2000);
 	state->m_bank = 0xff;
 	state->m_psd_a15 = 0;

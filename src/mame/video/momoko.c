@@ -71,7 +71,7 @@ static void momoko_draw_bg_pri( running_machine &machine, bitmap_ind16 &bitmap, 
 	int xx, sx, sy, px, py, dot;
 	UINT32 gfxadr;
 	UINT8 d0, d1;
-	UINT8 *BG_GFX = machine.region("gfx2")->base();
+	UINT8 *BG_GFX = machine.root_device().memregion("gfx2")->base();
 
 	for (sy = 0; sy < 8; sy++)
 	{
@@ -107,10 +107,10 @@ SCREEN_UPDATE_IND16( momoko )
 	int x, y, dx, dy, rx, ry, radr, chr, sy, fx, fy, px, py, offs, col, pri, flip ;
 	UINT8 *spriteram = state->m_spriteram;
 
-	UINT8 *BG_MAP     = screen.machine().region("user1")->base();
-	UINT8 *BG_COL_MAP = screen.machine().region("user2")->base();
-	UINT8 *FG_MAP     = screen.machine().region("user3")->base();
-	UINT8 *TEXT_COLOR = screen.machine().region("proms")->base();
+	UINT8 *BG_MAP     = screen.machine().root_device().memregion("user1")->base();
+	UINT8 *BG_COL_MAP = screen.machine().root_device().memregion("user2")->base();
+	UINT8 *FG_MAP     = screen.machine().root_device().memregion("user3")->base();
+	UINT8 *TEXT_COLOR = state->memregion("proms")->base();
 
 
 	flip = state->m_flipscreen ^ (input_port_read(screen.machine(), "FAKE") & 0x01);

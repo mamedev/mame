@@ -313,7 +313,7 @@ CPU68 PCB:
 static INT32
 ReadPointROMData( running_machine &machine, unsigned offset )
 {
-	const INT32 *pPointData = (INT32 *)machine.region( "user2" )->base();
+	const INT32 *pPointData = (INT32 *)machine.root_device().memregion( "user2" )->base();
 	INT32 result = pPointData[offset];
 	return result;
 }
@@ -590,7 +590,7 @@ static int
 InitDSP( running_machine &machine )
 {
 	namcos21_state *state = machine.driver_data<namcos21_state>();
-	UINT16 *pMem = (UINT16 *)machine.region("dspmaster")->base();
+	UINT16 *pMem = (UINT16 *)state->memregion("dspmaster")->base();
 	/**
      * DSP BIOS tests "CPU ID" on startup
      * "JAPAN (C)1990 NAMCO LTD. by H.F "
@@ -1222,7 +1222,7 @@ WRITE16_MEMBER(namcos21_state::winrun_dsp_pointrom_addr_w)
 
 READ16_MEMBER(namcos21_state::winrun_dsp_pointrom_data_r)
 {
-	UINT16 *ptrom = (UINT16 *)machine().region("user2")->base();
+	UINT16 *ptrom = (UINT16 *)machine().root_device().memregion("user2")->base();
 	return ptrom[m_winrun_pointrom_addr++];
 } /* winrun_dsp_pointrom_data_r */
 
@@ -1264,7 +1264,7 @@ ADDRESS_MAP_END
 
 READ16_MEMBER(namcos21_state::gpu_data_r)
 {
-	const UINT16 *pSrc = (UINT16 *)machine().region( "user3" )->base();
+	const UINT16 *pSrc = (UINT16 *)machine().root_device().memregion( "user3" )->base();
 	return pSrc[offset];
 }
 
@@ -1282,7 +1282,7 @@ WRITE16_MEMBER(namcos21_state::winrun_dspbios_w)
 	COMBINE_DATA( &m_winrun_dspbios[offset] );
 	if( offset==0xfff )
 	{
-		UINT16 *mem = (UINT16 *)machine().region("dsp")->base();
+		UINT16 *mem = (UINT16 *)machine().root_device().memregion("dsp")->base();
 		memcpy( mem, m_winrun_dspbios, 0x2000 );
 		m_winrun_dsp_alive = 1;
 	}
@@ -2245,7 +2245,7 @@ static void namcos21_init( running_machine &machine, int game_type )
 	namcos21_state *state = machine.driver_data<namcos21_state>();
 	namcos2_gametype = game_type;
 	state->m_pointram = auto_alloc_array(machine, UINT8, PTRAM_SIZE);
-	state->m_mpDataROM = (UINT16 *)machine.region( "user1" )->base();
+	state->m_mpDataROM = (UINT16 *)state->memregion( "user1" )->base();
 	InitDSP(machine);
 	state->m_mbNeedsKickstart = 20;
 	if( game_type==NAMCOS21_CYBERSLED )
@@ -2257,7 +2257,7 @@ static void namcos21_init( running_machine &machine, int game_type )
 static DRIVER_INIT( winrun )
 {
 	namcos21_state *state = machine.driver_data<namcos21_state>();
-	UINT16 *pMem = (UINT16 *)machine.region("dsp")->base();
+	UINT16 *pMem = (UINT16 *)machine.root_device().memregion("dsp")->base();
 	int pc = 0;
 	pMem[pc++] = 0xff80; /* b */
 	pMem[pc++] = 0;
@@ -2265,7 +2265,7 @@ static DRIVER_INIT( winrun )
 	state->m_winrun_dspcomram = auto_alloc_array(machine, UINT16, 0x1000*2);
 
 	namcos2_gametype = NAMCOS21_WINRUN91;
-	state->m_mpDataROM = (UINT16 *)machine.region( "user1" )->base();
+	state->m_mpDataROM = (UINT16 *)state->memregion( "user1" )->base();
 	state->m_pointram = auto_alloc_array(machine, UINT8, PTRAM_SIZE);
 	state->m_pointram_idx = 0;
 	state->m_mbNeedsKickstart = 0;
@@ -2289,7 +2289,7 @@ static DRIVER_INIT( cybsled )
 
 static DRIVER_INIT( solvalou )
 {
-	UINT16 *mem = (UINT16 *)machine.region("maincpu")->base();
+	UINT16 *mem = (UINT16 *)machine.root_device().memregion("maincpu")->base();
 	mem[0x20ce4/2+1] = 0x0000; // $200128
 	mem[0x20cf4/2+0] = 0x4e71; // 2nd ptr_booting
 	mem[0x20cf4/2+1] = 0x4e71;
@@ -2301,13 +2301,13 @@ static DRIVER_INIT( solvalou )
 static DRIVER_INIT( driveyes )
 {
 	namcos21_state *state = machine.driver_data<namcos21_state>();
-	UINT16 *pMem = (UINT16 *)machine.region("dsp")->base();
+	UINT16 *pMem = (UINT16 *)machine.root_device().memregion("dsp")->base();
 	int pc = 0;
 	pMem[pc++] = 0xff80; /* b */
 	pMem[pc++] = 0;
 	state->m_winrun_dspcomram = auto_alloc_array(machine, UINT16, 0x1000*2);
 	namcos2_gametype = NAMCOS21_DRIVERS_EYES;
-	state->m_mpDataROM = (UINT16 *)machine.region( "user1" )->base();
+	state->m_mpDataROM = (UINT16 *)state->memregion( "user1" )->base();
 	state->m_pointram = auto_alloc_array(machine, UINT8, PTRAM_SIZE);
 	state->m_pointram_idx = 0;
 	state->m_mbNeedsKickstart = 0;

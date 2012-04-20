@@ -567,7 +567,7 @@ static const ym2203_interface ym2203_config =
 static MACHINE_START( lsasquad )
 {
 	lsasquad_state *state = machine.driver_data<lsasquad_state>();
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = state->memregion("maincpu")->base();
 
 	state->membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x2000);
 

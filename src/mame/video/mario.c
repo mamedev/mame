@@ -64,7 +64,7 @@ static const res_net_info mario_net_info_std =
 ***************************************************************************/
 PALETTE_INIT( mario )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	rgb_t	*rgb;
 
 	rgb = compute_res_net_all(machine, color_prom, &mario_decode_info, &mario_net_info);

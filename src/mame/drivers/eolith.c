@@ -1309,7 +1309,7 @@ static DRIVER_INIT( landbrka )
 	//it fails compares with memories:
 	//$4002d338 -> $4002d348 .... $4002d33f -> $4002d34f
 	//related with bits 0x100 - 0x200 read at startup from input(0) ?
-	UINT32 *rombase = (UINT32*)machine.region("maincpu")->base();
+	UINT32 *rombase = (UINT32*)state->memregion("maincpu")->base();
 	rombase[0x14f00/4] = (rombase[0x14f00/4] & 0xffff) | 0x03000000; /* Change BR to NOP */
 
 	state->m_coin_counter_bit = 0x2000;
@@ -1319,7 +1319,7 @@ static DRIVER_INIT( landbrka )
 static DRIVER_INIT( hidctch2 )
 {
 	//it fails compares in memory like in landbrka
-	UINT32 *rombase = (UINT32*)machine.region("maincpu")->base();
+	UINT32 *rombase = (UINT32*)machine.root_device().memregion("maincpu")->base();
 	rombase[0xbcc8/4] = (rombase[0xbcc8/4] & 0xffff) | 0x03000000; /* Change BR to NOP */
 	init_eolith_speedup(machine);
 }

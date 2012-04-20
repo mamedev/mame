@@ -509,7 +509,7 @@ static WRITE8_DEVICE_HANDLER( snd_rom_addr_h_w )
 static READ8_DEVICE_HANDLER( snd_rom_r )
 {
 	freekick_state *state = device->machine().driver_data<freekick_state>();
-	return device->machine().region("user1")->base()[state->m_romaddr & 0x7fff];
+	return state->memregion("user1")->base()[state->m_romaddr & 0x7fff];
 }
 
 static const ppi8255_interface ppi8255_intf[2] =
@@ -599,7 +599,7 @@ static MACHINE_RESET( freekick )
 
 static MACHINE_START( pbillrd )
 {
-	machine.root_device().membank("bank1")->configure_entries(0, 2, machine.region("maincpu")->base() + 0x10000, 0x4000);
+	machine.root_device().membank("bank1")->configure_entries(0, 2, machine.root_device().memregion("maincpu")->base() + 0x10000, 0x4000);
 
 	MACHINE_START_CALL(freekick);
 }
@@ -1100,7 +1100,7 @@ ROM_END
 static DRIVER_INIT(gigasb)
 {
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	space->set_decrypted_region(0x0000, 0xbfff, machine.region("maincpu")->base() + 0x10000);
+	space->set_decrypted_region(0x0000, 0xbfff, machine.root_device().memregion("maincpu")->base() + 0x10000);
 }
 
 

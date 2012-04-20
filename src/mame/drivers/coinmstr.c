@@ -141,7 +141,7 @@ WRITE8_MEMBER(coinmstr_state::quizmstr_attr3_w)
 READ8_MEMBER(coinmstr_state::question_r)
 {
 	int address;
-	UINT8 *questions = machine().region("user1")->base();
+	UINT8 *questions = memregion("user1")->base();
 
 	switch(m_question_adr[2])
 	{
@@ -1225,8 +1225,8 @@ ROM_END
 
 static DRIVER_INIT( coinmstr )
 {
-	UINT8 *rom = machine.region("user1")->base();
-	int length = machine.region("user1")->bytes();
+	UINT8 *rom = machine.root_device().memregion("user1")->base();
+	int length = machine.root_device().memregion("user1")->bytes();
 	UINT8 *buf = auto_alloc_array(machine, UINT8, length);
 	int i;
 

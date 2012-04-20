@@ -269,7 +269,7 @@ static READ8_DEVICE_HANDLER( s3c2410_nand_data_r )
 		break;
 		case NAND_M_READ :
 		{
-			UINT8 *flash = (UINT8 *)device->machine().region( "user1")->base();
+			UINT8 *flash = (UINT8 *)device->machine().root_device().memregion( "user1")->base();
 			if (nand.byte_addr < 0x200)
 			{
 				data = *(flash + nand.page_addr * 0x200 + nand.byte_addr);

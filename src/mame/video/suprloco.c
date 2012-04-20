@@ -30,7 +30,7 @@
 ***************************************************************************/
 PALETTE_INIT( suprloco )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 
 
@@ -203,7 +203,7 @@ static void draw_sprite(running_machine &machine, bitmap_ind16 &bitmap,const rec
 		dy = -1;
 	}
 
-	gfx2 = machine.region("gfx2")->base();
+	gfx2 = machine.root_device().memregion("gfx2")->base();
 	for (row = 0;row < height;row++,adjy+=dy)
 	{
 		int color1,color2,flipx;

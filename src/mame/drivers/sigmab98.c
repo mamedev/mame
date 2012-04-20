@@ -542,7 +542,7 @@ WRITE8_MEMBER(sigmab98_state::animalc_rombank_w)
 		return;
 	}
 
-	UINT8 *rom = machine().region("maincpu")->base();
+	UINT8 *rom = memregion("maincpu")->base();
 	switch ( m_reg )
 	{
 		case 0x0f:
@@ -898,7 +898,7 @@ READ8_MEMBER(sigmab98_state::haekaka_b000_r)
 		case 0x1d:
 		case 0x1e:
 		case 0x1f:
-			return machine().region("maincpu")->base()[offset + 0xb400 + 0x1000 * (m_rombank-0x10)];
+			return memregion("maincpu")->base()[offset + 0xb400 + 0x1000 * (m_rombank-0x10)];
 
 		case 0x65:	// SPRITERAM
 			if (offset < 0x1000)
@@ -1010,7 +1010,7 @@ WRITE8_MEMBER(sigmab98_state::itazuram_rombank_w)
 		return;
 	}
 
-	UINT8 *rom = machine().region("maincpu")->base();
+	UINT8 *rom = memregion("maincpu")->base();
 	switch ( m_reg )
 	{
 		case 0x0d:
@@ -1374,7 +1374,7 @@ READ8_MEMBER(sigmab98_state::tdoboon_c000_r)
 		case 0x1d:
 		case 0x1e:
 		case 0x1f:
-			return machine().region("maincpu")->base()[offset + 0xc400 + 0x1000 * (m_rombank-0x10)];
+			return memregion("maincpu")->base()[offset + 0xc400 + 0x1000 * (m_rombank-0x10)];
 
 		case 0x64:	// SPRITERAM
 			if (offset < 0x1000)
@@ -1897,7 +1897,7 @@ ROM_END
 
 static DRIVER_INIT( gegege )
 {
-	UINT8 *rom = machine.region("maincpu")->base();
+	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
 
 	// Protection?
 	rom[0x0bdd] = 0xc9;
@@ -1946,7 +1946,7 @@ ROM_END
 
 static DRIVER_INIT( pepsiman )
 {
-	UINT8 *rom = machine.region("maincpu")->base();
+	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
 
 	// Protection?
 	rom[0x058a] = 0xc9;
@@ -1997,7 +1997,7 @@ ROM_END
 
 static DRIVER_INIT( ucytokyu )
 {
-	UINT8 *rom = machine.region("maincpu")->base();
+	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
 
 	// Protection?
 	rom[0x0bfa] = 0xc9;
@@ -2150,7 +2150,7 @@ static DRIVER_INIT( itazuram )
 {
 	sigmab98_state *state = machine.driver_data<sigmab98_state>();
 	// ROM banks
-	UINT8 *rom = machine.region("maincpu")->base();
+	UINT8 *rom = state->memregion("maincpu")->base();
 	state->membank("rombank0")->set_base(rom + 0x3400);
 	state->membank("rombank1")->set_base(rom + 0x4400);
 	state->m_rombank = 0x0f;

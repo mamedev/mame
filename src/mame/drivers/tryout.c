@@ -45,7 +45,7 @@ WRITE8_MEMBER(tryout_state::tryout_sound_irq_ack_w)
 
 WRITE8_MEMBER(tryout_state::tryout_bankswitch_w)
 {
-	UINT8 *RAM = machine().region("maincpu")->base();
+	UINT8 *RAM = memregion("maincpu")->base();
 	int bankaddress;
 
 	bankaddress = 0x10000 + (data & 0x01) * 0x2000;

@@ -757,7 +757,7 @@ static MACHINE_START( ninjaw )
 {
 	ninjaw_state *state = machine.driver_data<ninjaw_state>();
 
-	state->membank("bank10")->configure_entries(0, 8, machine.region("audiocpu")->base() + 0xc000, 0x4000);
+	state->membank("bank10")->configure_entries(0, 8, state->memregion("audiocpu")->base() + 0xc000, 0x4000);
 
 	state->m_maincpu = machine.device("maincpu");
 	state->m_audiocpu = machine.device("audiocpu");

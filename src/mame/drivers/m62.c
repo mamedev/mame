@@ -2158,50 +2158,50 @@ ROM_END
 static DRIVER_INIT( battroad )
 {
 	/* configure memory banks */
-	machine.root_device().membank("bank1")->configure_entries(0, 16, machine.region("maincpu")->base() + 0x10000, 0x2000);
+	machine.root_device().membank("bank1")->configure_entries(0, 16, machine.root_device().memregion("maincpu")->base() + 0x10000, 0x2000);
 }
 
 static DRIVER_INIT( ldrun2 )
 {
 	/* configure memory banks */
-	machine.root_device().membank("bank1")->configure_entries(0, 2, machine.region("maincpu")->base() + 0x10000, 0x2000);
+	machine.root_device().membank("bank1")->configure_entries(0, 2, machine.root_device().memregion("maincpu")->base() + 0x10000, 0x2000);
 }
 
 static DRIVER_INIT( ldrun4 )
 {
 	/* configure memory banks */
-	machine.root_device().membank("bank1")->configure_entries(0, 2, machine.region("maincpu")->base() + 0x10000, 0x4000);
+	machine.root_device().membank("bank1")->configure_entries(0, 2, machine.root_device().memregion("maincpu")->base() + 0x10000, 0x4000);
 }
 
 static DRIVER_INIT( kidniki )
 {
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
 
 	/* in Kid Niki, bank 0 has code falling from 7fff to 8000, */
 	/* so I have to copy it there because bank switching wouldn't catch it */
 	memcpy(ROM + 0x08000, ROM + 0x10000, 0x2000);
 
 	/* configure memory banks */
-	machine.root_device().membank("bank1")->configure_entries(0, 16, machine.region("maincpu")->base() + 0x10000, 0x2000);
+	machine.root_device().membank("bank1")->configure_entries(0, 16, machine.root_device().memregion("maincpu")->base() + 0x10000, 0x2000);
 }
 
 static DRIVER_INIT( spelunkr )
 {
 	/* configure memory banks */
-	machine.root_device().membank("bank1")->configure_entries(0, 4, machine.region("maincpu")->base() + 0x10000, 0x2000);
+	machine.root_device().membank("bank1")->configure_entries(0, 4, machine.root_device().memregion("maincpu")->base() + 0x10000, 0x2000);
 }
 
 static DRIVER_INIT( spelunk2 )
 {
 	/* configure memory banks */
-	machine.root_device().membank("bank1")->configure_entries(0,  4, machine.region("maincpu")->base() + 0x20000, 0x1000);
-	machine.root_device().membank("bank2")->configure_entries(0, 16, machine.region("maincpu")->base() + 0x10000, 0x1000);
+	machine.root_device().membank("bank1")->configure_entries(0,  4, machine.root_device().memregion("maincpu")->base() + 0x20000, 0x1000);
+	machine.root_device().membank("bank2")->configure_entries(0, 16, machine.root_device().memregion("maincpu")->base() + 0x10000, 0x1000);
 }
 
 static DRIVER_INIT( youjyudn )
 {
 	/* configure memory banks */
-	machine.root_device().membank("bank1")->configure_entries(0, 2, machine.region("maincpu")->base() + 0x10000, 0x4000);
+	machine.root_device().membank("bank1")->configure_entries(0, 2, machine.root_device().memregion("maincpu")->base() + 0x10000, 0x4000);
 }
 
 GAME( 1984, kungfum,  0,        kungfum,  kungfum,  0,        ROT0,   "Irem", "Kung-Fu Master", GAME_SUPPORTS_SAVE )

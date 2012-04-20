@@ -27,7 +27,7 @@
 
 READ8_MEMBER(liberate_state::deco16_bank_r)
 {
-	const UINT8 *ROM = machine().region("user1")->base();
+	const UINT8 *ROM = memregion("user1")->base();
 
 	/* The tilemap bank can be swapped into main memory */
 	if (m_bank)
@@ -76,7 +76,7 @@ WRITE8_MEMBER(liberate_state::deco16_bank_w)
 
 READ8_MEMBER(liberate_state::prosoccr_bank_r)
 {
-	const UINT8 *ROM = machine().region("user1")->base();
+	const UINT8 *ROM = memregion("user1")->base();
 
 	/* The tilemap bank can be swapped into main memory */
 	if (m_bank)
@@ -105,7 +105,7 @@ READ8_MEMBER(liberate_state::prosoccr_bank_r)
 
 READ8_MEMBER(liberate_state::prosoccr_charram_r)
 {
-	UINT8 *SRC_GFX = machine().region("shared_gfx")->base();
+	UINT8 *SRC_GFX = memregion("shared_gfx")->base();
 
 	if (m_gfx_rom_readback)
 	{
@@ -126,7 +126,7 @@ READ8_MEMBER(liberate_state::prosoccr_charram_r)
 
 WRITE8_MEMBER(liberate_state::prosoccr_charram_w)
 {
-	UINT8 *FG_GFX = machine().region("fg_gfx")->base();
+	UINT8 *FG_GFX = memregion("fg_gfx")->base();
 
 	if (m_bank)
 	{
@@ -182,7 +182,7 @@ WRITE8_MEMBER(liberate_state::prosoccr_io_bank_w)
 
 READ8_MEMBER(liberate_state::prosport_charram_r)
 {
-	UINT8 *FG_GFX = machine().region("progolf_fg_gfx")->base();
+	UINT8 *FG_GFX = memregion("progolf_fg_gfx")->base();
 
 	switch (offset & 0x1800)
 	{
@@ -202,7 +202,7 @@ READ8_MEMBER(liberate_state::prosport_charram_r)
 
 WRITE8_MEMBER(liberate_state::prosport_charram_w)
 {
-	UINT8 *FG_GFX = machine().region("progolf_fg_gfx")->base();
+	UINT8 *FG_GFX = memregion("progolf_fg_gfx")->base();
 
 	switch (offset & 0x1800)
 	{
@@ -1350,7 +1350,7 @@ static void sound_cpu_decrypt(running_machine &machine)
 {
 	address_space *space = machine.device("audiocpu")->memory().space(AS_PROGRAM);
 	UINT8 *decrypted = auto_alloc_array(machine, UINT8, 0x4000);
-	UINT8 *rom = machine.region("audiocpu")->base();
+	UINT8 *rom = machine.root_device().memregion("audiocpu")->base();
 	int i;
 
 	/* Bit swapping on sound cpu - Opcodes only */
@@ -1362,7 +1362,7 @@ static void sound_cpu_decrypt(running_machine &machine)
 
 static DRIVER_INIT( prosport )
 {
-	UINT8 *RAM = machine.region("maincpu")->base();
+	UINT8 *RAM = machine.root_device().memregion("maincpu")->base();
 	int i;
 
 	/* Main cpu has the nibbles swapped */
@@ -1384,7 +1384,7 @@ static DRIVER_INIT( liberate )
 	int A;
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 *decrypted = auto_alloc_array(machine, UINT8, 0x10000);
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
 
 	space->set_decrypted_region(0x0000, 0xffff, decrypted);
 

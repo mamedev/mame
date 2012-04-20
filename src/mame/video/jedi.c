@@ -135,10 +135,10 @@ static void draw_background_and_text(running_machine &machine, jedi_state *state
 	int y;
 	int background_line_buffer[0x200];	/* RAM chip at 2A */
 
-	UINT8 *tx_gfx = machine.region("gfx1")->base();
-	UINT8 *bg_gfx = machine.region("gfx2")->base();
-	UINT8 *prom1 = &machine.region("proms")->base()[0x0000 | ((*state->m_smoothing_table & 0x03) << 8)];
-	UINT8 *prom2 = &machine.region("proms")->base()[0x0800 | ((*state->m_smoothing_table & 0x03) << 8)];
+	UINT8 *tx_gfx = machine.root_device().memregion("gfx1")->base();
+	UINT8 *bg_gfx = machine.root_device().memregion("gfx2")->base();
+	UINT8 *prom1 = &machine.root_device().memregion("proms")->base()[0x0000 | ((*state->m_smoothing_table & 0x03) << 8)];
+	UINT8 *prom2 = &machine.root_device().memregion("proms")->base()[0x0800 | ((*state->m_smoothing_table & 0x03) << 8)];
 	int vscroll = state->m_vscroll;
 	int hscroll = state->m_hscroll;
 	int tx_bank = *state->m_foreground_bank;
@@ -234,7 +234,7 @@ static void draw_sprites(running_machine &machine, jedi_state *state, bitmap_rgb
 {
 	offs_t offs;
 	UINT8 *spriteram = state->m_spriteram;
-	UINT8 *gfx3 = machine.region("gfx3")->base();
+	UINT8 *gfx3 = machine.root_device().memregion("gfx3")->base();
 
 	for (offs = 0x00; offs < 0x30; offs++)
 	{

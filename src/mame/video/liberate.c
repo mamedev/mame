@@ -40,7 +40,7 @@ static TILEMAP_MAPPER( fix_scan )
 static TILE_GET_INFO( get_back_tile_info )
 {
 	liberate_state *state = machine.driver_data<liberate_state>();
-	const UINT8 *RAM = machine.region("user1")->base();
+	const UINT8 *RAM = state->memregion("user1")->base();
 	int tile, bank;
 
 	/* Convert tile index of 512x512 to paged format */
@@ -253,7 +253,7 @@ WRITE8_MEMBER(liberate_state::prosport_paletteram_w)
 
 PALETTE_INIT( liberate )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i, bit0, bit1, bit2, g, r, b;
 
 	for (i = 0;i < 32;i++)

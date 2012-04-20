@@ -980,9 +980,9 @@ This code is overly generic because it is used for several games in ninjakd2.c
 
 static void lineswap_gfx_roms(running_machine &machine, const char *region, const int bit)
 {
-	const int length = machine.region(region)->bytes();
+	const int length = machine.root_device().memregion(region)->bytes();
 
-	UINT8* const src = machine.region(region)->base();
+	UINT8* const src = machine.root_device().memregion(region)->base();
 
 	UINT8* const temp = auto_alloc_array(machine, UINT8, length);
 

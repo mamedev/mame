@@ -441,7 +441,7 @@ static TIMER_CALLBACK( raster_interrupt_callback )
 static MACHINE_START( fuuki16 )
 {
 	fuuki16_state *state = machine.driver_data<fuuki16_state>();
-	UINT8 *ROM = machine.region("audiocpu")->base();
+	UINT8 *ROM = state->memregion("audiocpu")->base();
 
 	state->membank("bank1")->configure_entries(0, 3, &ROM[0x10000], 0x8000);
 

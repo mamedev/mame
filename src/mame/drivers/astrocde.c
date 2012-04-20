@@ -428,14 +428,14 @@ WRITE8_MEMBER(astrocde_state::profpac_banksw_w)
 
 	/* set the main banking */
 	prog_space->install_read_bank(0x4000, 0xbfff, "bank1");
-	membank("bank1")->set_base(machine().region("user1")->base() + 0x8000 * bank);
+	membank("bank1")->set_base(machine().root_device().memregion("user1")->base() + 0x8000 * bank);
 
 	/* bank 0 reads video RAM in the 4000-7FFF range */
 	if (bank == 0)
 		prog_space->install_read_handler(0x4000, 0x7fff, read8_delegate(FUNC(astrocde_state::profpac_videoram_r),this));
 
 	/* if we have a 640k EPROM board, map that on top of the 4000-7FFF range if specified */
-	if ((data & 0x80) && machine().region("user2")->base() != NULL)
+	if ((data & 0x80) && memregion("user2")->base() != NULL)
 	{
 		/* Note: There is a jumper which could change the base offset to 0xa8 instead */
 		bank = data - 0x80;
@@ -444,7 +444,7 @@ WRITE8_MEMBER(astrocde_state::profpac_banksw_w)
 		if (bank < 0x28)
 		{
 			prog_space->install_read_bank(0x4000, 0x7fff, "bank2");
-			membank("bank2")->set_base(machine().region("user2")->base() + 0x4000 * bank);
+			membank("bank2")->set_base(machine().root_device().memregion("user2")->base() + 0x4000 * bank);
 		}
 		else
 			prog_space->unmap_read(0x4000, 0x7fff);

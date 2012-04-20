@@ -310,7 +310,7 @@ static SCREEN_UPDATE_IND16(go2000)
 static MACHINE_START( go2000 )
 {
 	go2000_state *state = machine.driver_data<go2000_state>();
-	UINT8 *SOUND = machine.region("soundcpu")->base();
+	UINT8 *SOUND = state->memregion("soundcpu")->base();
 	int i;
 
 	for (i = 0; i < 8; i++)

@@ -2154,7 +2154,7 @@ struct cdrom_interface saturn_cdrom =
 
 static DEVICE_IMAGE_LOAD( sat_cart )
 {
-	UINT8 *ROM = image.device().machine().region("maincpu")->base()+0x080000;
+	UINT8 *ROM = image.device().machine().root_device().memregion("maincpu")->base()+0x080000;
 	UINT32 length;
 
 	if (image.software_entry() != NULL)
@@ -2359,7 +2359,7 @@ static DEVICE_IMAGE_LOAD( stv_cart )
 	if (image.software_entry() == NULL)
 		return IMAGE_INIT_FAIL;
 
-	UINT8 *ROM = image.device().machine().region(this_cart->region)->base();
+	UINT8 *ROM = image.device().machine().root_device().memregion(this_cart->region)->base();
 	UINT32 length = image.get_software_region_length("rom");
 
 	memcpy(ROM, image.get_software_region("rom"), length);

@@ -298,7 +298,7 @@ ROM_END
 
 static DRIVER_INIT( feversoc )
 {
-	seibuspi_rise11_sprite_decrypt_feversoc(machine.region("gfx1")->base(), 0x200000);
+	seibuspi_rise11_sprite_decrypt_feversoc(machine.root_device().memregion("gfx1")->base(), 0x200000);
 }
 
 GAME( 2004, feversoc,  0,       feversoc,  feversoc,  feversoc, ROT0, "Seibu Kaihatsu", "Fever Soccer", 0 )

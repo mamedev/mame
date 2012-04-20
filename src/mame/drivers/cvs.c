@@ -426,11 +426,11 @@ static int speech_rom_read_bit( device_t *device )
 {
 	cvs_state *state = device->machine().driver_data<cvs_state>();
 	running_machine &machine = device->machine();
-	UINT8 *ROM = machine.region("speechdata")->base();
+	UINT8 *ROM = machine.root_device().memregion("speechdata")->base();
 	int bit;
 
 	/* before reading the bit, clamp the address to the region length */
-	state->m_speech_rom_bit_address = state->m_speech_rom_bit_address & ((machine.region("speechdata")->bytes() * 8) - 1);
+	state->m_speech_rom_bit_address = state->m_speech_rom_bit_address & ((state->memregion("speechdata")->bytes() * 8) - 1);
 	bit = (ROM[state->m_speech_rom_bit_address >> 3] >> (state->m_speech_rom_bit_address & 0x07)) & 0x01;
 
 	/* prepare for next bit */
@@ -1595,7 +1595,7 @@ ROM_END
 
 static DRIVER_INIT( huncholy )
 {
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
 
 	/* patch out protection */
 	ROM[0x0082] = 0xc0;
@@ -1615,7 +1615,7 @@ static DRIVER_INIT( huncholy )
 
 static DRIVER_INIT( hunchbaka )
 {
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
 
 	offs_t offs;
 
@@ -1627,7 +1627,7 @@ static DRIVER_INIT( hunchbaka )
 
 static DRIVER_INIT( superbik )
 {
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
 
 	/* patch out protection */
 	ROM[0x0079] = 0xc0;
@@ -1655,7 +1655,7 @@ static DRIVER_INIT( superbik )
 
 static DRIVER_INIT( hero )
 {
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
 
 	/* patch out protection */
 	ROM[0x0087] = 0xc0;
@@ -1677,7 +1677,7 @@ static DRIVER_INIT( hero )
 
 static DRIVER_INIT( raiders )
 {
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
 
 	offs_t offs;
 

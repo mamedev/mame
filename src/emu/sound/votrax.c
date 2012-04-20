@@ -1167,7 +1167,7 @@ void votrax_sc01_device::device_start()
 	m_master_clock_freq = clock();
 	m_stream = stream_alloc(0, 1, m_master_clock_freq / 16);
 	m_phoneme_timer = timer_alloc();
-	m_rom = subregion("phoneme")->base();
+	m_rom = memregion("phoneme")->base();
 
 	// reset inputs
 	m_inflection = 0;

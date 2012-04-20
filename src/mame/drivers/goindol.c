@@ -220,7 +220,7 @@ GFXDECODE_END
 static MACHINE_START( goindol )
 {
 	goindol_state *state = machine.driver_data<goindol_state>();
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = state->memregion("maincpu")->base();
 
 	state->membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x4000);
 
@@ -383,7 +383,7 @@ ROM_END
 
 static DRIVER_INIT( goindol )
 {
-	UINT8 *rom = machine.region("maincpu")->base();
+	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
 
 
 	/* I hope that's all patches to avoid protection */

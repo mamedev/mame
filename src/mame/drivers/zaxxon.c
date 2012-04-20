@@ -1430,8 +1430,8 @@ static void zaxxonj_decode(running_machine &machine, const char *cputag)
 
 	int A;
 	address_space *space = machine.device(cputag)->memory().space(AS_PROGRAM);
-	UINT8 *rom = machine.region(cputag)->base();
-	int size = machine.region(cputag)->bytes();
+	UINT8 *rom = machine.root_device().memregion(cputag)->base();
+	int size = machine.root_device().memregion(cputag)->bytes();
 	UINT8 *decrypt = auto_alloc_array(machine, UINT8, size);
 
 	space->set_decrypted_region(0x0000, size - 1, decrypt);

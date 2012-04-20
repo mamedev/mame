@@ -115,7 +115,7 @@ WRITE8_MEMBER(capbowl_state::bowlrama_blitter_w)
 
 READ8_MEMBER(capbowl_state::bowlrama_blitter_r)
 {
-	UINT8 data = machine().region("gfx1")->base()[m_blitter_addr];
+	UINT8 data = memregion("gfx1")->base()[m_blitter_addr];
 	UINT8 result = 0;
 
 	switch (offset)

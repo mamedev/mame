@@ -472,7 +472,7 @@ without this the death sequence never ends so the game is unplayable after you
 die once, it would be nice to avoid the hack however
 
 */
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
 
 	ROM[0x05C6] = 0xc3;
 	ROM[0x05C7] = 0x8d;

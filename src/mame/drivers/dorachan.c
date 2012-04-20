@@ -88,7 +88,7 @@ static SCREEN_UPDATE_RGB32( dorachan )
 
 	get_pens(pens);
 
-	color_map_base = screen.machine().region("proms")->base();
+	color_map_base = state->memregion("proms")->base();
 
 	for (offs = 0; offs < state->m_videoram.bytes(); offs++)
 	{

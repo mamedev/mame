@@ -237,7 +237,7 @@ static const k007420_interface rockrage_k007420_intf =
 static MACHINE_START( rockrage )
 {
 	rockrage_state *state = machine.driver_data<rockrage_state>();
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = state->memregion("maincpu")->base();
 
 	state->membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x2000);
 

@@ -401,7 +401,7 @@ DRIVER_INIT(magzun)
 
 	/* Program ROM patches, don't understand how to avoid these two checks ... */
 	{
-		UINT32 *ROM = (UINT32 *)machine.region("game0")->base();
+		UINT32 *ROM = (UINT32 *)state->memregion("game0")->base();
 
 		ROM[0x90054/4] = 0x00e00001; // END error
 
@@ -1098,7 +1098,7 @@ by Sega titles,and this is a Sunsoft game)It's likely to be a left-over...
 
 static DRIVER_INIT( sanjeon )
 {
-	UINT8 *src    = machine.region       ( "game0" )->base();
+	UINT8 *src    = machine.root_device().memregion       ( "game0" )->base();
 	int x;
 
 	for (x=0;x<0x3000000;x++)

@@ -30,7 +30,7 @@
 
 PALETTE_INIT( btime )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 
 
@@ -81,7 +81,7 @@ PALETTE_INIT( btime )
 
 PALETTE_INIT( lnc )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 
 	for (i = 0; i < machine.total_colors(); i++)
@@ -377,7 +377,7 @@ static void draw_background( running_machine &machine, bitmap_ind16 &bitmap, con
 {
 	btime_state *state = machine.driver_data<btime_state>();
 	int i;
-	const UINT8 *gfx = machine.region("bg_map")->base();
+	const UINT8 *gfx = state->memregion("bg_map")->base();
 	int scroll = -(state->m_bnj_scroll2 | ((state->m_bnj_scroll1 & 0x03) << 8));
 
 	// One extra iteration for wrap around

@@ -308,7 +308,7 @@ void exidy440_bank_select(running_machine &machine, UINT8 bank)
 
 	/* select the bank and update the bank pointer */
 	state->m_bank = bank;
-	state->membank("bank1")->set_base(&machine.region("maincpu")->base()[0x10000 + state->m_bank * 0x4000]);
+	state->membank("bank1")->set_base(&machine.root_device().memregion("maincpu")->base()[0x10000 + state->m_bank * 0x4000]);
 }
 
 
@@ -317,7 +317,7 @@ WRITE8_MEMBER(exidy440_state::bankram_w)
 	/* EEROM lives in the upper 8k of bank 15 */
 	if (m_bank == 15 && offset >= 0x2000)
 	{
-		machine().region("maincpu")->base()[0x10000 + 15 * 0x4000 + offset] = data;
+		memregion("maincpu")->base()[0x10000 + 15 * 0x4000 + offset] = data;
 		logerror("W EEROM[%04X] = %02X\n", offset - 0x2000, data);
 	}
 
@@ -445,7 +445,7 @@ static MACHINE_START( exidy440 )
 {
 	exidy440_state *state = machine.driver_data<exidy440_state>();
 	/* the EEROM lives in the uppermost 8k of the top bank */
-	UINT8 *rom = machine.region("maincpu")->base();
+	UINT8 *rom = state->memregion("maincpu")->base();
 
 	state->m_custom = machine.device("custom");
 	machine.device<nvram_device>("nvram")->set_base(&rom[0x10000 + 15 * 0x4000 + 0x2000], 0x2000);

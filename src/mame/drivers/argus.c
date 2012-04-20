@@ -176,7 +176,7 @@ static const ym2203_interface ym2203_config =
 
 WRITE8_MEMBER(argus_state::argus_bankselect_w)
 {
-	UINT8 *RAM = machine().region("maincpu")->base();
+	UINT8 *RAM = memregion("maincpu")->base();
 	int bankaddress;
 
 	bankaddress = 0x10000 + ((data & 7) * 0x4000);

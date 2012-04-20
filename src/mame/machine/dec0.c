@@ -351,7 +351,7 @@ WRITE16_MEMBER(dec0_state::robocop_68000_share_w)
 static void h6280_decrypt(running_machine &machine, const char *cputag)
 {
 	int i;
-	UINT8 *RAM = machine.region(cputag)->base();
+	UINT8 *RAM = machine.root_device().memregion(cputag)->base();
 
 	/* Read each byte, decrypt it */
 	for (i = 0x00000; i < 0x10000; i++)
@@ -360,7 +360,7 @@ static void h6280_decrypt(running_machine &machine, const char *cputag)
 
 DRIVER_INIT( hippodrm )
 {
-	UINT8 *RAM = machine.region("sub")->base();
+	UINT8 *RAM = machine.root_device().memregion("sub")->base();
 	dec0_state *state = machine.driver_data<dec0_state>();
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x180000, 0x180fff, read16_delegate(FUNC(dec0_state::hippodrm_68000_share_r),state), write16_delegate(FUNC(dec0_state::hippodrm_68000_share_w),state));
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xffc800, 0xffcfff, write16_delegate(FUNC(dec0_state::sprite_mirror_w),state));
@@ -376,7 +376,7 @@ DRIVER_INIT( hippodrm )
 
 DRIVER_INIT( slyspy )
 {
-	UINT8 *RAM = machine.region("audiocpu")->base();
+	UINT8 *RAM = machine.root_device().memregion("audiocpu")->base();
 
 	h6280_decrypt(machine, "audiocpu");
 

@@ -517,7 +517,7 @@ ROM_END
 static DRIVER_INIT( commando )
 {
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	UINT8 *rom = machine.region("maincpu")->base();
+	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
 	UINT8 *decrypt = auto_alloc_array(machine, UINT8, 0xc000);
 	int A;
 
@@ -537,7 +537,7 @@ static DRIVER_INIT( commando )
 static DRIVER_INIT( spaceinv )
 {
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	UINT8 *rom = machine.region("maincpu")->base();
+	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
 	UINT8 *decrypt = auto_alloc_array(machine, UINT8, 0xc000);
 	int A;
 

@@ -7,7 +7,7 @@
 #include "emu.h"
 #include "includes/galaxold.h"
 
-#define STARS_COLOR_BASE		(machine.region("proms")->bytes())
+#define STARS_COLOR_BASE		(machine.root_device().memregion("proms")->bytes())
 #define BULLETS_COLOR_BASE		(STARS_COLOR_BASE + 64)
 #define BACKGROUND_COLOR_BASE	(BULLETS_COLOR_BASE + 2)
 
@@ -94,12 +94,12 @@ static void dambustr_draw_background(running_machine &machine, bitmap_ind16 &bit
 ***************************************************************************/
 PALETTE_INIT( galaxold )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i, len;
 
 
 	/* first, the character/sprite palette */
-	len = machine.region("proms")->bytes();
+	len = machine.root_device().memregion("proms")->bytes();
 	for (i = 0;i < len;i++)
 	{
 		int bit0,bit1,bit2,r,g,b;
@@ -169,12 +169,12 @@ PALETTE_INIT( stratgyx )
 
 PALETTE_INIT( rockclim )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i, len;
 
 
 	/* first, the character/sprite palette */
-	len = machine.region("proms")->bytes();
+	len = machine.root_device().memregion("proms")->bytes();
 	for (i = 0;i < len;i++)
 	{
 		int bit0,bit1,bit2,r,g,b;
@@ -218,7 +218,7 @@ PALETTE_INIT( rockclim )
 ***************************************************************************/
 PALETTE_INIT( darkplnt )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 
 
@@ -338,12 +338,12 @@ PALETTE_INIT( mariner )
 /* swapped r/g/b hook-up */
 PALETTE_INIT( dambustr )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int base = BACKGROUND_COLOR_BASE;
 	int i, len;
 
 	/* first, the character/sprite palette */
-	len = machine.region("proms")->bytes();
+	len = machine.root_device().memregion("proms")->bytes();
 
 	for (i = 0;i < len;i++)
 	{
@@ -1043,7 +1043,7 @@ static void mariner_modify_charcode(running_machine &machine, UINT16 *code, UINT
 
 	/* bit 0 of the PROM controls character banking */
 
-	prom = machine.region("user2")->base();
+	prom = machine.root_device().memregion("user2")->base();
 
 	*code |= ((prom[x] & 0x01) << 8);
 }
@@ -1230,7 +1230,7 @@ static void stratgyx_draw_background(running_machine &machine, bitmap_ind16 &bit
                  the green gun if BCG is asserted
        bits 2-7 are unconnected */
 
-	prom = machine.region("user1")->base();
+	prom = state->memregion("user1")->base();
 
 	for (x = 0; x < 32; x++)
 	{
@@ -1305,7 +1305,7 @@ static void mariner_draw_background(running_machine &machine, bitmap_ind16 &bitm
        line (column) of the screen.  The first 0x20 bytes for unflipped,
        and the 2nd 0x20 bytes for flipped screen. */
 
-	prom = machine.region("user1")->base();
+	prom = state->memregion("user1")->base();
 
 	if (state->m_flipscreen_x)
 	{
@@ -1606,7 +1606,7 @@ static void mariner_draw_stars(running_machine &machine, bitmap_ind16 &bitmap, c
 
 	/* bit 2 of the PROM controls star visibility */
 
-	prom = machine.region("user2")->base();
+	prom = machine.root_device().memregion("user2")->base();
 
 	for (offs = 0;offs < STAR_COUNT;offs++)
 	{

@@ -84,7 +84,7 @@ debug_view_memory_source::debug_view_memory_source(const char *name, address_spa
 {
 }
 
-debug_view_memory_source::debug_view_memory_source(const char *name, const memory_region &region)
+debug_view_memory_source::debug_view_memory_source(const char *name, memory_region &region)
 	: debug_view_source(name),
 	  m_space(NULL),
 	  m_memintf(NULL),
@@ -165,7 +165,7 @@ void debug_view_memory::enumerate_sources()
 		}
 
 	// then add all the memory regions
-	for (const memory_region *region = machine().first_region(); region != NULL; region = region->next())
+	for (memory_region *region = machine().memory().first_region(); region != NULL; region = region->next())
 	{
 		name.printf("Region '%s'", region->name());
 		m_source_list.append(*auto_alloc(machine(), debug_view_memory_source(name, *region)));
@@ -707,7 +707,7 @@ void debug_view_memory::write(UINT8 size, offs_t offs, UINT64 data)
 
 // hack for FD1094 editing
 #ifdef FD1094_HACK
-	if (source.m_base == machine().region("user2"))
+	if (source.m_base == machine().root_device().memregion("user2"))
 	{
 		extern void fd1094_regenerate_key(running_machine &machine);
 		fd1094_regenerate_key(machine());

@@ -153,7 +153,7 @@ WRITE8_MEMBER(starwars_state::starwars_adc_select_w)
 void starwars_mproc_init(running_machine &machine)
 {
 	starwars_state *state = machine.driver_data<starwars_state>();
-	UINT8 *src = machine.region("user2")->base();
+	UINT8 *src = state->memregion("user2")->base();
 	int cnt, val;
 
 	state->m_PROM_STR = auto_alloc_array(machine, UINT8, 1024);

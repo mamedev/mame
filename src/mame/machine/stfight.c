@@ -40,7 +40,7 @@ DRIVER_INIT( empcity )
 {
 	stfight_state *state = machine.driver_data<stfight_state>();
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	UINT8 *rom = machine.region("maincpu")->base();
+	UINT8 *rom = state->memregion("maincpu")->base();
 	int A;
 
 	state->m_decrypt = auto_alloc_array(machine, UINT8, 0x8000);
@@ -103,7 +103,7 @@ MACHINE_RESET( stfight )
 // - in fact I don't even know how/where it's switched in!
 WRITE8_MEMBER(stfight_state::stfight_bank_w)
 {
-	UINT8   *ROM2 = machine().region("maincpu")->base() + 0x10000;
+	UINT8   *ROM2 = memregion("maincpu")->base() + 0x10000;
 
 	membank("bank1")->set_base(&ROM2[data<<14] );
 }
@@ -192,7 +192,7 @@ static const int sampleLimits[] =
 void stfight_adpcm_int(device_t *device)
 {
 	stfight_state *state = device->machine().driver_data<stfight_state>();
-	UINT8 *SAMPLES = device->machine().region("adpcm")->base();
+	UINT8 *SAMPLES = state->memregion("adpcm")->base();
 	int adpcm_data = SAMPLES[state->m_adpcm_data_offs & 0x7fff];
 
     // finished playing sample?

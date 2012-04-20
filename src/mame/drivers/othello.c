@@ -100,7 +100,7 @@ static MC6845_UPDATE_ROW( update_row )
 	UINT32 data_address;
 	UINT32 tmp;
 
-	const UINT8 *gfx = device->machine().region("gfx")->base();
+	const UINT8 *gfx = state->memregion("gfx")->base();
 
 	for(cx = 0; cx < x_count; ++cx)
 	{
@@ -283,7 +283,7 @@ static WRITE8_DEVICE_HANDLER( n7751_rom_control_w )
 
 READ8_MEMBER(othello_state::n7751_rom_r)
 {
-	return machine().region("n7751data")->base()[m_sound_addr];
+	return memregion("n7751data")->base()[m_sound_addr];
 }
 
 READ8_MEMBER(othello_state::n7751_command_r)

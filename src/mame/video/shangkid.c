@@ -43,7 +43,7 @@ static TILE_GET_INFO( get_bg_tile_info ){
 	}
 
 	tileinfo.category =
-		(machine.region( "proms" )->base()[0x800+color*4]==2)?1:0;
+		(machine.root_device().memregion( "proms" )->base()[0x800+color*4]==2)?1:0;
 }
 
 VIDEO_START( shangkid )
@@ -201,7 +201,7 @@ SCREEN_UPDATE_IND16( shangkid )
 
 PALETTE_INIT( dynamski )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 
 	/* allocate the colortable */

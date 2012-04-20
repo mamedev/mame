@@ -739,7 +739,7 @@ static DRIVER_INIT(nwktr)
 {
 	nwktr_state *state = machine.driver_data<nwktr_state>();
 	init_konami_cgboard(machine, 1, CGBOARD_TYPE_NWKTR);
-	set_cgboard_texture_bank(machine, 0, "bank5", machine.region("user5")->base());
+	set_cgboard_texture_bank(machine, 0, "bank5", state->memregion("user5")->base());
 
 	state->m_sharc_dataram = auto_alloc_array(machine, UINT32, 0x100000/4);
 	state->m_led_reg0 = state->m_led_reg1 = 0x7f;

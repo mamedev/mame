@@ -1186,7 +1186,7 @@ ROM_END
 static DRIVER_INIT( quizf1 )
 {
 	m90_state *state = machine.driver_data<m90_state>();
-	state->membank("bank1")->configure_entries(0, 16, machine.region("user1")->base(), 0x10000);
+	state->membank("bank1")->configure_entries(0, 16, state->memregion("user1")->base(), 0x10000);
 	machine.device("maincpu")->memory().space(AS_IO)->install_write_handler(0x04, 0x05, write16_delegate(FUNC(m90_state::quizf1_bankswitch_w),state));
 }
 
@@ -1194,7 +1194,7 @@ static DRIVER_INIT( quizf1 )
 
 static DRIVER_INIT( bomblord )
 {
-	UINT16 *ROM = (UINT16 *)(machine.region("maincpu")->base());
+	UINT16 *ROM = (UINT16 *)(machine.root_device().memregion("maincpu")->base());
 
 	for (int i = 0; i < 0x100000 / 2; i += 4)
 	{

@@ -198,7 +198,7 @@ static MACHINE_START( tutankhm )
 {
 	tutankhm_state *state = machine.driver_data<tutankhm_state>();
 
-	state->membank("bank1")->configure_entries(0, 16, machine.region("maincpu")->base() + 0x10000, 0x1000);
+	state->membank("bank1")->configure_entries(0, 16, state->memregion("maincpu")->base() + 0x10000, 0x1000);
 
 	state->m_maincpu = machine.device<cpu_device>("maincpu");
 

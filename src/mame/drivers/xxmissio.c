@@ -79,7 +79,7 @@ static INTERRUPT_GEN( xxmissio_interrupt_s )
 
 static MACHINE_START( xxmissio )
 {
-	machine.root_device().membank("bank1")->configure_entries(0, 8, machine.region("user1")->base(), 0x4000);
+	machine.root_device().membank("bank1")->configure_entries(0, 8, machine.root_device().memregion("user1")->base(), 0x4000);
 	machine.root_device().membank("bank1")->set_entry(0);
 }
 

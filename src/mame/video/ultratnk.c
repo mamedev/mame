@@ -11,7 +11,7 @@ Atari Ultra Tank video emulation
 
 PALETTE_INIT( ultratnk )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	/* allocate the colortable */
 	machine.colortable = colortable_alloc(machine, 4);
 

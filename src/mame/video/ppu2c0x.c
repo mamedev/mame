@@ -410,7 +410,7 @@ void ppu2c0x_device::init_palette_rgb( running_machine &machine, int first_entry
 
 	int R, G, B;
 
-	UINT8 *palette_data = machine.region("palette")->base();
+	UINT8 *palette_data = machine.root_device().memregion("palette")->base();
 
 	/* Loop through the emphasis modes (8 total) */
 	for (color_emphasis = 0; color_emphasis < 8; color_emphasis++)

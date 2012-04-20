@@ -78,7 +78,7 @@ static const res_net_info survival_net_info =
 
 PALETTE_INIT( phoenix )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 	rgb_t	*rgb;
 
@@ -96,7 +96,7 @@ PALETTE_INIT( phoenix )
 
 PALETTE_INIT( survival )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 	rgb_t	*rgb;
 
@@ -114,7 +114,7 @@ PALETTE_INIT( survival )
 
 PALETTE_INIT( pleiads )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 	rgb_t	*rgb;
 
@@ -226,7 +226,7 @@ VIDEO_START( phoenix )
 
 WRITE8_MEMBER(phoenix_state::phoenix_videoram_w)
 {
-	UINT8 *rom = machine().region("maincpu")->base();
+	UINT8 *rom = memregion("maincpu")->base();
 
 	m_videoram_pg[m_videoram_pg_index][offset] = data;
 

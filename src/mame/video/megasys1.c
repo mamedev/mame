@@ -753,7 +753,7 @@ static const struct priority priorities[] =
 
 PALETTE_INIT( megasys1 )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	megasys1_state *state = machine.driver_data<megasys1_state>();
 	int pri_code, offset, i, order;
 

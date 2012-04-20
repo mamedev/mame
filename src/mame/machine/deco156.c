@@ -124,8 +124,8 @@ static void decrypt(UINT32 *src, UINT32 *dst, int length)
 
 void deco156_decrypt(running_machine &machine)
 {
-	UINT32 *rom = (UINT32 *)machine.region("maincpu")->base();
-	int length = machine.region("maincpu")->bytes();
+	UINT32 *rom = (UINT32 *)machine.root_device().memregion("maincpu")->base();
+	int length = machine.root_device().memregion("maincpu")->bytes();
 	UINT32 *buf = auto_alloc_array(machine, UINT32, length/4);
 
 	memcpy(buf, rom, length);

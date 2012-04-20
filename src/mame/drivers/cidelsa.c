@@ -441,7 +441,7 @@ void cidelsa_state::machine_start()
 void draco_state::machine_start()
 {
 	/* setup COP402 memory banking */
-	membank("bank1")->configure_entries(0, 2, machine().region(COP402N_TAG)->base(), 0x400);
+	membank("bank1")->configure_entries(0, 2, memregion(COP402N_TAG)->base(), 0x400);
 	membank("bank1")->set_entry(0);
 
 	/* register for state saving */

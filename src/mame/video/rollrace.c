@@ -22,7 +22,7 @@
 ***************************************************************************/
 PALETTE_INIT( rollrace )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 
 
@@ -103,7 +103,7 @@ SCREEN_UPDATE_IND16( rollrace )
 	int sx, sy;
 	int scroll;
 	int col;
-	const UINT8 *mem = screen.machine().region("user1")->base();
+	const UINT8 *mem = state->memregion("user1")->base();
 
 	/* fill in background colour*/
 	bitmap.fill(state->m_ra_bkgpen, cliprect);

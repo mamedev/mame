@@ -194,7 +194,7 @@ TODO:
 /*Rom bankswitching*/
 WRITE8_MEMBER(gladiatr_state::gladiatr_bankswitch_w)
 {
-	UINT8 *rom = machine().region("maincpu")->base() + 0x10000;
+	UINT8 *rom = memregion("maincpu")->base() + 0x10000;
 
 	membank("bank1")->set_base(rom + 0x6000 * (data & 0x01));
 }
@@ -256,7 +256,7 @@ static MACHINE_RESET( gladiator )
 	TAITO8741_start(&gladiator_8741interface);
 	/* 6809 bank memory set */
 	{
-		UINT8 *rom = machine.region("audiocpu")->base() + 0x10000;
+		UINT8 *rom = machine.root_device().memregion("audiocpu")->base() + 0x10000;
 		machine.root_device().membank("bank2")->set_base(rom);
 		machine.device("audiocpu")->reset();
 	}
@@ -279,7 +279,7 @@ static void gladiator_ym_irq(device_t *device, int irq)
 /*Sound Functions*/
 static WRITE8_DEVICE_HANDLER( glad_adpcm_w )
 {
-	UINT8 *rom = device->machine().region("audiocpu")->base() + 0x10000;
+	UINT8 *rom = device->machine().root_device().memregion("audiocpu")->base() + 0x10000;
 
 	/* bit6 = bank offset */
 	device->machine().root_device().membank("bank2")->set_base(rom + ((data & 0x40) ? 0xc000 : 0));
@@ -956,7 +956,7 @@ static DRIVER_INIT( gladiatr )
 	UINT8 *rom;
 	int i,j;
 
-	rom = machine.region("gfx2")->base();
+	rom = machine.root_device().memregion("gfx2")->base();
 	// unpack 3bpp graphics
 	for (j = 3; j >= 0; j--)
 	{
@@ -970,7 +970,7 @@ static DRIVER_INIT( gladiatr )
 	swap_block(rom + 0x14000, rom + 0x18000, 0x4000);
 
 
-	rom = machine.region("gfx3")->base();
+	rom = machine.root_device().memregion("gfx3")->base();
 	// unpack 3bpp graphics
 	for (j = 5; j >= 0; j--)
 	{
@@ -987,7 +987,7 @@ static DRIVER_INIT( gladiatr )
 	swap_block(rom + 0x24000, rom + 0x28000, 0x4000);
 
 	/* make sure bank is valid in cpu-reset */
-	rom = machine.region("audiocpu")->base() + 0x10000;
+	rom = machine.root_device().memregion("audiocpu")->base() + 0x10000;
 	machine.root_device().membank("bank2")->set_base(rom);
 }
 
@@ -1005,14 +1005,14 @@ static DRIVER_INIT(ppking)
 	UINT8 *rom;
 	int i,j;
 
-	rom = machine.region("gfx2")->base();
+	rom = machine.root_device().memregion("gfx2")->base();
 	// unpack 3bpp graphics
 	for (i = 0; i < 0x2000; i++)
 	{
 		rom[i+0x2000] = rom[i] >> 4;
 	}
 
-	rom = machine.region("gfx3")->base();
+	rom = machine.root_device().memregion("gfx3")->base();
 	// unpack 3bpp graphics
 	for (j = 1; j >= 0; j--)
 	{

@@ -486,7 +486,7 @@ static MACHINE_RESET( ddayjlc )
 
 static PALETTE_INIT( ddayjlc )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i,r,g,b,val;
 	int bit0,bit1,bit2;
 
@@ -675,8 +675,8 @@ static DRIVER_INIT( ddayjlc )
 		UINT8 *src, *dst, *temp;
 		temp = auto_alloc_array(machine, UINT8, 0x10000);
 		src = temp;
-		dst = machine.region("gfx1")->base();
-		length = machine.region("gfx1")->bytes();
+		dst = machine.root_device().memregion("gfx1")->base();
+		length = machine.root_device().memregion("gfx1")->bytes();
 		memcpy(src, dst, length);
 		newadr = 0;
 		oldaddr = 0;
@@ -690,7 +690,7 @@ static DRIVER_INIT( ddayjlc )
 		auto_free(machine, temp);
 	}
 
-	machine.root_device().membank("bank1")->configure_entries(0, 3, machine.region("user1")->base(), 0x4000);
+	machine.root_device().membank("bank1")->configure_entries(0, 3, machine.root_device().memregion("user1")->base(), 0x4000);
 	machine.root_device().membank("bank1")->set_entry(0);
 }
 

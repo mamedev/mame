@@ -1405,8 +1405,8 @@ ROM_END
 static DRIVER_INIT( rabbitpk )
 {
 
-	UINT8 *rom = machine.region("maincpu")->base();
-	int size = machine.region("maincpu")->bytes();
+	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
+	int size = machine.root_device().memregion("maincpu")->bytes();
 	int start = 0;
 	int i;
 
@@ -1457,7 +1457,7 @@ static DRIVER_INIT( piccolop )
 
 */
 
-	UINT8 *rom = machine.region("maincpu")->base();
+	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
 
 	/* NOP'ing the mortal jump... */
 	rom[0x154b] = 0x00;

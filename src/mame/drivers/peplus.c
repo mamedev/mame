@@ -285,7 +285,7 @@ static const mc6845_interface mc6845_intf =
 static void peplus_load_superdata(running_machine &machine, const char *bank_name)
 {
 	peplus_state *state = machine.driver_data<peplus_state>();
-    UINT8 *super_data = machine.region(bank_name)->base();
+    UINT8 *super_data = state->memregion(bank_name)->base();
 
     /* Distribute Superboard Data */
     memcpy(state->m_s3000_ram, &super_data[0x3000], 0x1000);
@@ -700,7 +700,7 @@ static SCREEN_UPDATE_IND16( peplus )
 
 static PALETTE_INIT( peplus )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 /*  prom bits
     7654 3210
     ---- -xxx   red component.

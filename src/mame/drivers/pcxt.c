@@ -109,7 +109,7 @@ static SCREEN_UPDATE_RGB32( tetriskr )
 	pcxt_state *state = screen.machine().driver_data<pcxt_state>();
 	int x,y;
 	int yi;
-	const UINT8 *bg_rom = screen.machine().region("gfx2")->base();
+	const UINT8 *bg_rom = state->memregion("gfx2")->base();
 
 	//popmessage("%04x",m_start_offs);
 
@@ -199,7 +199,7 @@ WRITE8_MEMBER(pcxt_state::disk_iobank_w)
 	if (newbank != m_bank)
 	{
 		m_bank = newbank;
-		membank("bank1")->set_base(machine().region("game_prg")->base() + 0x10000 * m_bank );
+		membank("bank1")->set_base(machine().root_device().memregion("game_prg")->base() + 0x10000 * m_bank );
 	}
 
 	m_lastvalue = data;

@@ -659,7 +659,7 @@ static DRIVER_INIT( aladmdb )
      * Game does a check @ 1afc00 with work RAM fff57c that makes it play like the original console version (i.e. 8 energy hits instead of 2)
      */
 	#if ENERGY_CONSOLE_MODE
-	UINT16 *rom = (UINT16 *)machine.region("maincpu")->base();
+	UINT16 *rom = (UINT16 *)machine.root_device().memregion("maincpu")->base();
 	rom[0x1afc08/2] = 0x6600;
 	#endif
 
@@ -675,7 +675,7 @@ static DRIVER_INIT( aladmdb )
 // after this decode look like intentional changes
 static DRIVER_INIT( mk3mdb )
 {
-	UINT8 *rom = machine.region("maincpu")->base();
+	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
 
 	for (int x = 0x000001; x < 0x100001; x += 2)
 	{
@@ -726,7 +726,7 @@ static DRIVER_INIT( ssf2mdb )
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x400000, 0x5fffff, "bank5");
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->unmap_write(0x400000, 0x5fffff);
 
-	machine.root_device().membank("bank5")->set_base(machine.region( "maincpu" )->base() + 0x400000 );
+	machine.root_device().membank("bank5")->set_base(machine.root_device().memregion( "maincpu" )->base() + 0x400000 );
 
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x770070, 0x770075, FUNC(ssf2mdb_dsw_r) );
 
@@ -736,7 +736,7 @@ static DRIVER_INIT( ssf2mdb )
 
 static DRIVER_INIT( srmdb )
 {
-	UINT8* rom = machine.region("maincpu")->base();
+	UINT8* rom = machine.root_device().memregion("maincpu")->base();
 
 	/* todo, reduce bitswaps to single swap */
 	for (int x = 0x00001; x < 0x40000; x += 2)

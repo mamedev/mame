@@ -327,7 +327,7 @@ static DRIVER_INIT( silkroad )
        verified as correct... problem with the original which the gfx
        hardware didn't care about? */
 
-	UINT8 *src = machine.region("gfx1")->base()+0x1000000;
+	UINT8 *src = machine.root_device().memregion("gfx1")->base()+0x1000000;
 	int len = 0x0200000;
 	UINT8 *buffer;
 

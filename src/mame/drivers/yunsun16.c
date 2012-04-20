@@ -106,7 +106,7 @@ WRITE16_MEMBER(yunsun16_state::yunsun16_sound_bank_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		int bank = data & 3;
-		UINT8 *dst	= machine().region("oki")->base();
+		UINT8 *dst	= memregion("oki")->base();
 		UINT8 *src	= dst + 0x80000 + 0x20000 * bank;
 		memcpy(dst + 0x20000, src, 0x20000);
 	}

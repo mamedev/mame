@@ -139,7 +139,7 @@ VIDEO_START( spinlbrk )
 	/* sprite maps are hardcoded in this game */
 
 	/* enemy sprites use ROM instead of RAM */
-	state->m_spriteram2.set_target(reinterpret_cast<UINT16 *>(machine.region("gfx5")->base()), 0x20000);
+	state->m_spriteram2.set_target(reinterpret_cast<UINT16 *>(state->memregion("gfx5")->base()), 0x20000);
 
 	/* front sprites are direct maps */
 	state->m_spriteram1.set_target(state->m_spriteram2 + state->m_spriteram2.bytes() / 2, 0x4000);
@@ -682,7 +682,7 @@ static void spikes91_draw_sprites( running_machine &machine, bitmap_ind16 &bitma
 	aerofgt_state *state = machine.driver_data<aerofgt_state>();
 	int i;
 	UINT8 *lookup;
-	lookup = machine.region("user1")->base();
+	lookup = state->memregion("user1")->base();
 	state->m_spritepalettebank = 1;
 
 	for (i = state->m_spriteram3.bytes() / 2 - 4; i >= 4; i -= 4)

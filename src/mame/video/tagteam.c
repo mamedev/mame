@@ -34,7 +34,7 @@ static const res_net_decode_info tagteam_decode_info =
 
 PALETTE_INIT( tagteam )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	rgb_t *rgb;
 
 	rgb = compute_res_net_all(machine, color_prom, &tagteam_decode_info, &tagteam_net_info);

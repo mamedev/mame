@@ -55,7 +55,7 @@ Memo:
 
 static void niyanpai_soundbank_w(running_machine &machine, int data)
 {
-	UINT8 *SNDROM = machine.region("audiocpu")->base();
+	UINT8 *SNDROM = machine.root_device().memregion("audiocpu")->base();
 
 	machine.root_device().membank("bank1")->set_base(&SNDROM[0x08000 + (0x8000 * (data & 0x03))]);
 }
@@ -266,7 +266,7 @@ static MACHINE_RESET( niyanpai )
 static DRIVER_INIT( niyanpai )
 {
 	niyanpai_state *state = machine.driver_data<niyanpai_state>();
-	UINT8 *SNDROM = machine.region("audiocpu")->base();
+	UINT8 *SNDROM = state->memregion("audiocpu")->base();
 
 	// sound program patch
 	SNDROM[0x0213] = 0x00;			// DI -> NOP

@@ -154,7 +154,7 @@ PALETTE_INIT( arabian )
 VIDEO_START( arabian )
 {
 	arabian_state *state = machine.driver_data<arabian_state>();
-	UINT8 *gfxbase = machine.region("gfx1")->base();
+	UINT8 *gfxbase = state->memregion("gfx1")->base();
 	int offs;
 
 	/* allocate a common bitmap to use for both planes */

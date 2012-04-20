@@ -1811,8 +1811,8 @@ static DRIVER_INIT( sngkace )
 	psikyo_state *state = machine.driver_data<psikyo_state>();
 
 	{
-		UINT8 *RAM = machine.region("ymsnd")->base();
-		int len = machine.region("ymsnd")->bytes();
+		UINT8 *RAM = machine.root_device().memregion("ymsnd")->base();
+		int len = state->memregion("ymsnd")->bytes();
 		int i;
 
 		/* Bit 6&7 of the samples are swapped. Naughty, naughty... */
@@ -1832,13 +1832,13 @@ static DRIVER_INIT( sngkace )
 	state->m_ka302c_banking = 0; // SH201B doesn't have any gfx banking
 
 	/* setup audiocpu banks */
-	state->membank("bank1")->configure_entries(0, 4, machine.region("audiocpu")->base() + 0x10000, 0x8000);
+	state->membank("bank1")->configure_entries(0, 4, machine.root_device().memregion("audiocpu")->base() + 0x10000, 0x8000);
 
 	/* Enable other regions */
 #if 0
 	if (!strcmp(machine.system().name,"sngkace"))
 	{
-		UINT8 *ROM	=	machine.region("maincpu")->base();
+		UINT8 *ROM	=	machine.root_device().memregion("maincpu")->base();
 		ROM[0x995] = 0x4e;
 		ROM[0x994] = 0x71;
 		ROM[0x997] = 0x4e;
@@ -1892,7 +1892,7 @@ static DRIVER_INIT( tengai )
 
 	/* setup audiocpu banks */
 	/* The banked rom is seen at 8200-ffff, so the last 0x200 bytes of the rom not reachable. */
-	state->membank("bank1")->configure_entries(0, 4, machine.region("audiocpu")->base() + 0x10000 + 0x200, 0x8000);
+	state->membank("bank1")->configure_entries(0, 4, state->memregion("audiocpu")->base() + 0x10000 + 0x200, 0x8000);
 }
 
 static DRIVER_INIT( gunbird )
@@ -1909,7 +1909,7 @@ static DRIVER_INIT( gunbird )
 
 	/* setup audiocpu banks */
 	/* The banked rom is seen at 8200-ffff, so the last 0x200 bytes of the rom not reachable. */
-	state->membank("bank1")->configure_entries(0, 4, machine.region("audiocpu")->base() + 0x10000 + 0x200, 0x8000);
+	state->membank("bank1")->configure_entries(0, 4, state->memregion("audiocpu")->base() + 0x10000 + 0x200, 0x8000);
 }
 
 
@@ -1933,7 +1933,7 @@ static DRIVER_INIT( s1945 )
 
 	/* setup audiocpu banks */
 	/* The banked rom is seen at 8200-ffff, so the last 0x200 bytes of the rom not reachable. */
-	state->membank("bank1")->configure_entries(0, 4, machine.region("audiocpu")->base() + 0x10000 + 0x200, 0x8000);
+	state->membank("bank1")->configure_entries(0, 4, state->memregion("audiocpu")->base() + 0x10000 + 0x200, 0x8000);
 }
 
 static DRIVER_INIT( s1945a )
@@ -1956,7 +1956,7 @@ static DRIVER_INIT( s1945a )
 
 	/* setup audiocpu banks */
 	/* The banked rom is seen at 8200-ffff, so the last 0x200 bytes of the rom not reachable. */
-	state->membank("bank1")->configure_entries(0, 4, machine.region("audiocpu")->base() + 0x10000 + 0x200, 0x8000);
+	state->membank("bank1")->configure_entries(0, 4, state->memregion("audiocpu")->base() + 0x10000 + 0x200, 0x8000);
 }
 
 static DRIVER_INIT( s1945j )
@@ -1979,7 +1979,7 @@ static DRIVER_INIT( s1945j )
 
 	/* setup audiocpu banks */
 	/* The banked rom is seen at 8200-ffff, so the last 0x200 bytes of the rom not reachable. */
-	state->membank("bank1")->configure_entries(0, 4, machine.region("audiocpu")->base() + 0x10000 + 0x200, 0x8000);
+	state->membank("bank1")->configure_entries(0, 4, state->memregion("audiocpu")->base() + 0x10000 + 0x200, 0x8000);
 }
 
 static DRIVER_INIT( s1945jn )
@@ -1996,7 +1996,7 @@ static DRIVER_INIT( s1945jn )
 
 	/* setup audiocpu banks */
 	/* The banked rom is seen at 8200-ffff, so the last 0x200 bytes of the rom not reachable. */
-	state->membank("bank1")->configure_entries(0, 4, machine.region("audiocpu")->base() + 0x10000 + 0x200, 0x8000);
+	state->membank("bank1")->configure_entries(0, 4, state->memregion("audiocpu")->base() + 0x10000 + 0x200, 0x8000);
 }
 
 static DRIVER_INIT( s1945bl )
@@ -2011,7 +2011,7 @@ static DRIVER_INIT( s1945bl )
 
 	state->m_ka302c_banking = 1;
 
-	state->membank("okibank")->configure_entries(0, 4, machine.region("oki")->base() + 0x30000, 0x10000);
+	state->membank("okibank")->configure_entries(0, 4, state->memregion("oki")->base() + 0x30000, 0x10000);
 	state->membank("okibank")->set_entry(0);
 }
 

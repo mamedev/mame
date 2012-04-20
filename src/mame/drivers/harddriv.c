@@ -3924,7 +3924,7 @@ static void init_ds3(running_machine &machine)
 static void init_dsk(running_machine &machine)
 {
 	harddriv_state *state = machine.driver_data<harddriv_state>();
-	UINT8 *usr3 = machine.region("user3")->base();
+	UINT8 *usr3 = state->memregion("user3")->base();
 
 	/* install ASIC61 */
 	state->m_maincpu->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x85c000, 0x85c7ff, FUNC(hd68k_dsk_dsp32_r), FUNC(hd68k_dsk_dsp32_w));
@@ -3958,7 +3958,7 @@ static void init_dsk(running_machine &machine)
 static void init_dsk2(running_machine &machine)
 {
 	harddriv_state *state = machine.driver_data<harddriv_state>();
-	UINT8 *usr3 = machine.region("user3")->base();
+	UINT8 *usr3 = state->memregion("user3")->base();
 
 	/* install ASIC65 */
 	state->m_maincpu->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x824000, 0x824003, FUNC(asic65_data_w));

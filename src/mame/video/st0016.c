@@ -186,8 +186,8 @@ WRITE8_MEMBER(st0016_state::st0016_vregs_w)
 		UINT32 srcadr=(st0016_vregs[0xa0]|(st0016_vregs[0xa1]<<8)|(st0016_vregs[0xa2]<<16))<<1;
 		UINT32 dstadr=(st0016_vregs[0xa3]|(st0016_vregs[0xa4]<<8)|(st0016_vregs[0xa5]<<16))<<1;
 		UINT32 length=((st0016_vregs[0xa6]|(st0016_vregs[0xa7]<<8)|((st0016_vregs[0xa8]&0x1f)<<16))+1)<<1;
-		UINT32 srclen = (machine().region("maincpu")->bytes()-0x10000);
-		UINT8 *mem = machine().region("maincpu")->base();
+		UINT32 srclen = (machine().root_device().memregion("maincpu")->bytes()-0x10000);
+		UINT8 *mem = memregion("maincpu")->base();
 
 		srcadr += macs_cart_slot*0x400000;
 

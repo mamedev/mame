@@ -72,7 +72,7 @@ static int nbmj9195_blitter_r(address_space *space, int offset, int vram)
 {
 	nbmj9195_state *state = space->machine().driver_data<nbmj9195_state>();
 	int ret;
-	UINT8 *GFXROM = space->machine().region("gfx1")->base();
+	UINT8 *GFXROM = state->memregion("gfx1")->base();
 
 	switch (offset)
 	{
@@ -209,7 +209,7 @@ static TIMER_CALLBACK( blitter_timer_callback )
 static void nbmj9195_gfxdraw(running_machine &machine, int vram)
 {
 	nbmj9195_state *state = machine.driver_data<nbmj9195_state>();
-	UINT8 *GFX = machine.region("gfx1")->base();
+	UINT8 *GFX = state->memregion("gfx1")->base();
 	int width = machine.primary_screen->width();
 
 	int x, y;
@@ -256,7 +256,7 @@ static void nbmj9195_gfxdraw(running_machine &machine, int vram)
 		skipy = -1;
 	}
 
-	gfxlen = machine.region("gfx1")->bytes();
+	gfxlen = machine.root_device().memregion("gfx1")->bytes();
 	gfxaddr = ((state->m_blitter_src_addr[vram] + 2) & 0x00ffffff);
 
 	for (y = starty, ctry = sizey; ctry >= 0; y += skipy, ctry--)

@@ -124,8 +124,8 @@ static DEVICE_START( m72_audio )
 {
 	m72_audio_state *state = get_safe_token(device);
 
-	state->samples = device->machine().region("samples")->base();
-	state->samples_size = device->machine().region("samples")->bytes();
+	state->samples = device->machine().root_device().memregion("samples")->base();
+	state->samples_size = device->machine().root_device().memregion("samples")->bytes();
 	state->space = device->machine().device("soundcpu")->memory().space(AS_IO);
 	state->dac = device->machine().device("dac");
 

@@ -178,7 +178,7 @@ static DRIVER_INIT( kingpin )
 	kingpin_state *state = machine.driver_data<kingpin_state>();
 
 	/* Hacks to keep the emu a'runnin */
-	state->m_code_base = machine.region("maincpu")->base();
+	state->m_code_base = state->memregion("maincpu")->base();
 	state->m_code_base[0x17d4] = 0xc3;	/* Maybe sound related? */
 }
 

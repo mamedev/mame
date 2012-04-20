@@ -159,7 +159,7 @@ ADDRESS_MAP_END
 
 READ8_MEMBER(lkage_state::port_fetch_r)
 {
-	return machine().region("user1")->base()[offset];
+	return memregion("user1")->base()[offset];
 }
 
 static ADDRESS_MAP_START( lkage_io_map, AS_IO, 8, lkage_state )

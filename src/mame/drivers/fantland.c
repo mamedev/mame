@@ -368,8 +368,8 @@ static void borntofi_adpcm_int( device_t *device, int voice )
 	if (!state->m_adpcm_playing[voice])
 		return;
 
-	rom = device->machine().region("adpcm")->base();
-	len = device->machine().region("adpcm")->bytes() * 2;
+	rom = device->machine().root_device().memregion("adpcm")->base();
+	len = state->memregion("adpcm")->bytes() * 2;
 
 	start = state->m_adpcm_addr[0][voice] + state->m_adpcm_nibble[voice];
 	stop = state->m_adpcm_addr[1][voice];

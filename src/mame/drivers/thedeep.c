@@ -53,7 +53,7 @@ WRITE8_MEMBER(thedeep_state::thedeep_sound_w)
 static MACHINE_RESET( thedeep )
 {
 	thedeep_state *state = machine.driver_data<thedeep_state>();
-	state->membank("bank1")->set_base(machine.region("maincpu")->base() + 0x10000 + 0 * 0x4000);
+	state->membank("bank1")->set_base(state->memregion("maincpu")->base() + 0x10000 + 0 * 0x4000);
 	state->m_scroll[0] = 0;
 	state->m_scroll[1] = 0;
 	state->m_scroll[2] = 0;
@@ -86,7 +86,7 @@ WRITE8_MEMBER(thedeep_state::thedeep_protection_w)
 			int new_rombank = m_protection_command & 3;
 			if (m_rombank == new_rombank)	break;
 			m_rombank = new_rombank;
-			rom = machine().region("maincpu")->base();
+			rom = memregion("maincpu")->base();
 			membank("bank1")->set_base(rom + 0x10000 + m_rombank * 0x4000);
 			/* there's code which falls through from the fixed ROM to bank #1, I have to */
 			/* copy it there otherwise the CPU bank switching support will not catch it. */
@@ -116,7 +116,7 @@ WRITE8_MEMBER(thedeep_state::thedeep_protection_w)
 // d166-d174:   hl = (hl + 2*a)
 // d175-d181:   hl *= e (e must be non zero)
 // d182-d19a:   hl /= de
-				m_protection_data = machine().region("mcu")->base()[0x185+m_protection_index++];
+				m_protection_data = memregion("mcu")->base()[0x185+m_protection_index++];
 			else
 				m_protection_data = 0xc9;
 
@@ -197,7 +197,7 @@ static void thedeep_maincpu_bankswitch(running_machine &machine,UINT8 bank_trig)
 	if (state->m_rombank == new_rombank)
 		return;
 	state->m_rombank = new_rombank;
-	rom = machine.region("maincpu")->base();
+	rom = state->memregion("maincpu")->base();
 	state->membank("bank1")->set_base(rom + 0x10000 + state->m_rombank * 0x4000);
 	/* there's code which falls through from the fixed ROM to bank #1, I have to */
 	/* copy it there otherwise the CPU bank switching support will not catch it. */

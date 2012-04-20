@@ -1659,7 +1659,7 @@ static int calc3_decompress_table(running_machine& machine, int tabnum, UINT8* d
 	kaneko16_state *state = machine.driver_data<kaneko16_state>();
 	calc3_t &calc3 = state->m_calc3;
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	UINT8* rom = machine.region("cpu1")->base();
+	UINT8* rom = state->memregion("cpu1")->base();
 	UINT8 numregions;
 	UINT16 length;
 	int local_counter=0;
@@ -1970,7 +1970,7 @@ DRIVER_INIT(calc3_scantables)
 {
 	kaneko16_state *state = machine.driver_data<kaneko16_state>();
 	calc3_t &calc3 = state->m_calc3;
-	UINT8* rom = machine.region("cpu1")->base();
+	UINT8* rom = state->memregion("cpu1")->base();
 	UINT8 numregions;
 
 	int x;
@@ -2283,7 +2283,7 @@ static const UINT8 toybox_mcu_decryption_table_alt[0x100] = {
 DRIVER_INIT( decrypt_toybox_rom )
 {
 
-	UINT8 *src = (UINT8 *)machine.region("mcudata" )->base();
+	UINT8 *src = (UINT8 *)machine.root_device().memregion("mcudata" )->base();
 
 	int i;
 
@@ -2310,7 +2310,7 @@ DRIVER_INIT( decrypt_toybox_rom )
 DRIVER_INIT( decrypt_toybox_rom_alt )
 {
 
-	UINT8 *src = (UINT8 *)machine.region("mcudata" )->base();
+	UINT8 *src = (UINT8 *)machine.root_device().memregion("mcudata" )->base();
 
 	int i;
 
@@ -2322,7 +2322,7 @@ DRIVER_INIT( decrypt_toybox_rom_alt )
 
 void toxboy_handle_04_subcommand(running_machine& machine,UINT8 mcu_subcmd, UINT16*mcu_ram)
 {
-	UINT8 *src = (UINT8 *)machine.region("mcudata")->base()+0x10000;
+	UINT8 *src = (UINT8 *)machine.root_device().memregion("mcudata")->base()+0x10000;
 	UINT8* dst = (UINT8 *)mcu_ram;
 
 	int offs = (mcu_subcmd&0x3f)*8;

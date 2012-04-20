@@ -13,7 +13,7 @@ Video hardware driver by Uki
 
 PALETTE_INIT( ikki )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	ikki_state *state = machine.driver_data<ikki_state>();
 	int i;
 
@@ -128,7 +128,7 @@ SCREEN_UPDATE_IND16( ikki )
 {
 	ikki_state *state = screen.machine().driver_data<ikki_state>();
 	offs_t offs;
-	UINT8 *VIDEOATTR = screen.machine().region("user1")->base();
+	UINT8 *VIDEOATTR = state->memregion("user1")->base();
 
 	/* draw bg layer */
 

@@ -31,7 +31,7 @@ Notes:
 
 static void nichibutsu_1414m4_dma(address_space *space,UINT16 src,UINT16 dst,UINT16 size, UINT8 condition,UINT8 *vram)
 {
-	UINT8 * data = (UINT8 *)space->machine().region("blit_data")->base();
+	UINT8 * data = (UINT8 *)space->machine().root_device().memregion("blit_data")->base();
 	int i;
 
 	for(i=0;i<size;i++)
@@ -61,7 +61,7 @@ static void nichibutsu_1414m4_fill(address_space *space,UINT16 dst,UINT8 tile,UI
 
 static void insert_coin_msg(address_space *space,UINT8 *vram)
 {
-	UINT8 * data = (UINT8 *)space->machine().region("blit_data")->base();
+	UINT8 * data = (UINT8 *)space->machine().root_device().memregion("blit_data")->base();
 	int credit_count = (vram[0xf] & 0xff);
 	UINT8 fl_cond = space->machine().primary_screen->frame_number() & 0x10; /* for insert coin "flickering" */
 	UINT16 dst;
@@ -82,7 +82,7 @@ static void insert_coin_msg(address_space *space,UINT8 *vram)
 
 static void credit_msg(address_space *space,UINT8 *vram)
 {
-	UINT8 * data = (UINT8 *)space->machine().region("blit_data")->base();
+	UINT8 * data = (UINT8 *)space->machine().root_device().memregion("blit_data")->base();
 	int credit_count = (vram[0xf] & 0xff);
 	UINT8 fl_cond = space->machine().primary_screen->frame_number() & 0x10; /* for insert coin "flickering" */
 	UINT16 dst;
@@ -112,7 +112,7 @@ static void	kozure_score_msg(address_space *space,UINT16 dst,UINT8 src_base,UINT
 	int i;
 	UINT8 first_digit;
 	UINT8 res;
-	UINT8 * data = (UINT8 *)space->machine().region("blit_data")->base();
+	UINT8 * data = (UINT8 *)space->machine().root_device().memregion("blit_data")->base();
 
 	first_digit = 0;
 
@@ -140,7 +140,7 @@ static void	kozure_score_msg(address_space *space,UINT16 dst,UINT8 src_base,UINT
 
 static void nichibutsu_1414m4_0200(address_space *space, UINT16 mcu_cmd,UINT8 *vram)
 {
-	UINT8 * data = (UINT8 *)space->machine().region("blit_data")->base();
+	UINT8 * data = (UINT8 *)space->machine().root_device().memregion("blit_data")->base();
 	UINT16 dst;
 
 	dst = (data[0x330+((mcu_cmd & 0xf)*2)]<<8)|(data[0x331+((mcu_cmd & 0xf)*2)]&0xff);
@@ -185,7 +185,7 @@ static void nichibutsu_1414m4_0200(address_space *space, UINT16 mcu_cmd,UINT8 *v
 */
 static void nichibutsu_1414m4_0600(address_space *space, UINT8 is2p,UINT8 *vram)
 {
-	UINT8 * data = (UINT8 *)space->machine().region("blit_data")->base();
+	UINT8 * data = (UINT8 *)space->machine().root_device().memregion("blit_data")->base();
 	UINT16 dst;
 	int i;
 
@@ -241,7 +241,7 @@ static void nichibutsu_1414m4_0600(address_space *space, UINT8 is2p,UINT8 *vram)
 
 static void nichibutsu_1414m4_0e00(address_space *space,UINT16 mcu_cmd,UINT8 *vram)
 {
-	UINT8 * data = (UINT8 *)space->machine().region("blit_data")->base();
+	UINT8 * data = (UINT8 *)space->machine().root_device().memregion("blit_data")->base();
 	UINT16 dst;
 
 	dst = ((data[0xdf]<<8)|(data[0xe0]&0xff)) & 0x3fff;

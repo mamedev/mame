@@ -48,7 +48,7 @@ TODO:
 
 WRITE8_MEMBER(exzisus_state::exzisus_cpua_bankswitch_w)
 {
-	UINT8 *RAM = machine().region("cpua")->base();
+	UINT8 *RAM = memregion("cpua")->base();
 
 	if ( (data & 0x0f) != m_cpua_bank )
 	{
@@ -64,7 +64,7 @@ WRITE8_MEMBER(exzisus_state::exzisus_cpua_bankswitch_w)
 
 WRITE8_MEMBER(exzisus_state::exzisus_cpub_bankswitch_w)
 {
-	UINT8 *RAM = machine().region("cpub")->base();
+	UINT8 *RAM = memregion("cpub")->base();
 
 	if ( (data & 0x0f) != m_cpub_bank )
 	{
@@ -117,7 +117,7 @@ WRITE8_MEMBER(exzisus_state::exzisus_cpub_reset_w)
 // the RAM check to work
 static DRIVER_INIT( exzisus )
 {
-	UINT8 *RAM = machine.region("cpua")->base();
+	UINT8 *RAM = machine.root_device().memregion("cpua")->base();
 
 	/* Fix WORK RAM error */
 	RAM[0x67fd] = 0x18;

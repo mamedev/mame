@@ -342,7 +342,7 @@ static void draw_sprites_I( running_machine &machine, bitmap_ind16 &bitmap, cons
 	alpha68k_state *state = machine.driver_data<alpha68k_state>();
 	UINT16 *spriteram = state->m_spriteram;
 	int data, offs, mx, my, tile, color, fy, i;
-	UINT8 *color_prom = machine.region("user1")->base();
+	UINT8 *color_prom = state->memregion("user1")->base();
 	gfx_element *gfx = machine.gfx[0];
 
 	for (offs = 0; offs < 0x400; offs += 0x20)
@@ -383,7 +383,7 @@ SCREEN_UPDATE_IND16( alpha68k_I )
 
 PALETTE_INIT( kyros )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 
 	/* allocate the colortable */
@@ -411,7 +411,7 @@ PALETTE_INIT( kyros )
 
 PALETTE_INIT( paddlem )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 
 	/* allocate the colortable */
@@ -453,7 +453,7 @@ static void kyros_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, 
 	UINT16 *spriteram = state->m_spriteram;
 	int offs, mx, my, color, tile, i, bank, fy, fx;
 	int data;
-	UINT8 *color_prom = machine.region("user1")->base();
+	UINT8 *color_prom = state->memregion("user1")->base();
 
 //AT
 	for (offs = 0; offs < 0x400; offs += 0x20)

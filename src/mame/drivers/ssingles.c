@@ -193,7 +193,7 @@ static MC6845_UPDATE_ROW( ssingles_update_row )
 	UINT32 tile_address;
 	UINT16 cell,palette;
 	UINT8 b0,b1;
-	const UINT8 *gfx = device->machine().region("gfx1")->base();
+	const UINT8 *gfx = state->memregion("gfx1")->base();
 
 	for(cx=0;cx<x_count;++cx)
 	{
@@ -231,7 +231,7 @@ static MC6845_UPDATE_ROW( atamanot_update_row )
 	UINT32 tile_address;
 	UINT16 cell,palette;
 	UINT8 b0,b1;
-	const UINT8 *gfx = device->machine().region("gfx1")->base();
+	const UINT8 *gfx = state->memregion("gfx1")->base();
 
 	for(cx=0;cx<x_count;++cx)
 	{
@@ -293,14 +293,14 @@ static const mc6845_interface atamanot_mc6845_intf =
 
 WRITE8_MEMBER(ssingles_state::ssingles_videoram_w)
 {
-	UINT8 *vram = machine().region("vram")->base();
+	UINT8 *vram = memregion("vram")->base();
 	vram[offset] = data;
 	m_videoram[offset]=data;
 }
 
 WRITE8_MEMBER(ssingles_state::ssingles_colorram_w)
 {
-	UINT8 *cram = machine().region("cram")->base();
+	UINT8 *cram = memregion("cram")->base();
 	cram[offset] = data;
 	m_colorram[offset]=data;
 }

@@ -78,7 +78,7 @@ int cartslot_image_device::load_cartridge(const rom_entry *romrgn, const rom_ent
 	offset = ROM_GETOFFSET(roment);
 	size = ROM_GETLENGTH(roment);
 	flags = ROM_GETFLAGS(roment);
-	ptr = ((UINT8 *) device().machine().region(region)->base()) + offset;
+	ptr = ((UINT8 *) device().machine().root_device().memregion(region)->base()) + offset;
 
 	if (load)
 	{

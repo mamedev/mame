@@ -191,7 +191,7 @@ static WRITE8_DEVICE_HANDLER( kungfur_adpcm2_w )
 static void kfr_adpcm1_int(device_t *device)
 {
 	kungfur_state *state = device->machine().driver_data<kungfur_state>();
-	UINT8 *ROM = device->machine().region("adpcm1")->base();
+	UINT8 *ROM = state->memregion("adpcm1")->base();
 	UINT8 data = ROM[state->m_adpcm_pos[0] & 0x1ffff];
 
 	msm5205_data_w(device, state->m_adpcm_sel[0] ? data & 0xf : data >> 4 & 0xf);
@@ -202,7 +202,7 @@ static void kfr_adpcm1_int(device_t *device)
 static void kfr_adpcm2_int(device_t *device)
 {
 	kungfur_state *state = device->machine().driver_data<kungfur_state>();
-	UINT8 *ROM = device->machine().region("adpcm2")->base();
+	UINT8 *ROM = state->memregion("adpcm2")->base();
 	UINT8 data = ROM[state->m_adpcm_pos[1] & 0x3ffff];
 
 	msm5205_data_w(device, state->m_adpcm_sel[1] ? data & 0xf : data >> 4 & 0xf);

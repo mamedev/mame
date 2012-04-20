@@ -1963,26 +1963,26 @@ void astra_addresslines( UINT16* src, size_t srcsize, int small )
 
 static DRIVER_INIT( astradec )
 {
-	astra_addresslines( (UINT16*)machine.region( "maincpu" )->base(), machine.region( "maincpu" )->bytes(), 0 );
+	astra_addresslines( (UINT16*)machine.root_device().memregion( "maincpu" )->base(), machine.root_device().memregion( "maincpu" )->bytes(), 0 );
 }
 
 
 
 static DRIVER_INIT( astradec_dual )
 {
-	astra_addresslines( (UINT16*)machine.region( "maincpu" )->base(), machine.region( "maincpu" )->bytes(), 0 );
-	astra_addresslines( (UINT16*)machine.region( "slavecpu" )->base(), machine.region( "slavecpu" )->bytes(), 0 );
+	astra_addresslines( (UINT16*)machine.root_device().memregion( "maincpu" )->base(), machine.root_device().memregion( "maincpu" )->bytes(), 0 );
+	astra_addresslines( (UINT16*)machine.root_device().memregion( "slavecpu" )->base(), machine.root_device().memregion( "slavecpu" )->bytes(), 0 );
 }
 
 static DRIVER_INIT( astradec_sml )
 {
-	astra_addresslines( (UINT16*)machine.region( "maincpu" )->base(), machine.region( "maincpu" )->bytes(), 1 );
+	astra_addresslines( (UINT16*)machine.root_device().memregion( "maincpu" )->base(), machine.root_device().memregion( "maincpu" )->bytes(), 1 );
 }
 
 static DRIVER_INIT( astradec_sml_dual )
 {
-	astra_addresslines( (UINT16*)machine.region( "maincpu" )->base(), machine.region( "maincpu" )->bytes(), 1 );
-	astra_addresslines( (UINT16*)machine.region( "slavecpu" )->base(), machine.region( "slavecpu" )->bytes(), 1 );
+	astra_addresslines( (UINT16*)machine.root_device().memregion( "maincpu" )->base(), machine.root_device().memregion( "maincpu" )->bytes(), 1 );
+	astra_addresslines( (UINT16*)machine.root_device().memregion( "slavecpu" )->base(), machine.root_device().memregion( "slavecpu" )->bytes(), 1 );
 }
 
 // Single games?

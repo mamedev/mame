@@ -1049,7 +1049,7 @@ static SCREEN_UPDATE_IND16( goldnpkr )
 
 static PALETTE_INIT( goldnpkr )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 /*  prom bits
     7654 3210
     ---- ---x   red component.
@@ -1093,7 +1093,7 @@ static PALETTE_INIT( goldnpkr )
 
 static PALETTE_INIT( witchcrd )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 /*
     This hardware has a feature called BLUE KILLER.
     Using the original intensity line, the PCB has a bridge
@@ -1141,7 +1141,7 @@ static PALETTE_INIT( witchcrd )
 
 static PALETTE_INIT( wcrdxtnd )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 /*
     Using the original intensity line, the PCB has a bridge
     that allow (as default) turn the background dark blue.
@@ -9368,7 +9368,7 @@ static DRIVER_INIT( royale )
 {
     /* $60bb, NOPing the ORA #$F0 (after read the PIA1 port B */
 
-//  UINT8 *ROM = machine.region("maincpu")->base();
+//  UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
 
 //  ROM[0x60bb] = 0xea;
 //  ROM[0x60bc] = 0xea;
@@ -9398,8 +9398,8 @@ static DRIVER_INIT( flcnw )
 
     /* Attempt to decrypt the MCU program (we're sooo close!) */
 
-	UINT8 *ROM = machine.region("mcu")->base();
-	int size = machine.region("mcu")->bytes();
+	UINT8 *ROM = machine.root_device().memregion("mcu")->base();
+	int size = machine.root_device().memregion("mcu")->bytes();
 	int start = 0x0000;
 	int i;
 
@@ -9417,7 +9417,7 @@ static DRIVER_INIT( vkdlsa )
        after compare with Dallas TK data
     */
 
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
 
 	ROM[0xe097] = 0xea;
 	ROM[0xe098] = 0xea;
@@ -9429,7 +9429,7 @@ static DRIVER_INIT( vkdlsb )
        after compare with Dallas TK data
     */
 
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
 
 	ROM[0xe87b] = 0xea;
 	ROM[0xe87c] = 0xea;
@@ -9441,7 +9441,7 @@ static DRIVER_INIT( vkdlsc )
        after compare with Dallas TK data
     */
 
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
 
 	ROM[0x453a] = 0xea;
 	ROM[0x453b] = 0xea;
@@ -9453,7 +9453,7 @@ static DRIVER_INIT( vkdlsww )
        after compare with Dallas TK data
     */
 
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
 
 	ROM[0xf2c9] = 0xea;
 	ROM[0xf2ca] = 0xea;
@@ -9465,7 +9465,7 @@ static DRIVER_INIT( vkdlswwa )
        after compare with Dallas TK data
     */
 
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
 
 	ROM[0xdf80] = 0xea;
 	ROM[0xdf81] = 0xea;
@@ -9477,7 +9477,7 @@ static DRIVER_INIT( vkdlswwc )
        after compare with Dallas TK data
     */
 
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
 
 	ROM[0xe42f] = 0xea;
 	ROM[0xe430] = 0xea;
@@ -9489,7 +9489,7 @@ static DRIVER_INIT( vkdlswwd )
        after compare with Dallas TK data
     */
 
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
 
 	ROM[0xe442] = 0xea;
 	ROM[0xe443] = 0xea;
@@ -9501,7 +9501,7 @@ static DRIVER_INIT( vkdlswwh )
        after compare with Dallas TK data
     */
 
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
 
 	ROM[0xe4d5] = 0xea;
 	ROM[0xe4d6] = 0xea;
@@ -9513,7 +9513,7 @@ static DRIVER_INIT( vkdlswwl )
        after compare with Dallas TK data
     */
 
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
 
 	ROM[0xe87c] = 0xea;
 	ROM[0xe87d] = 0xea;
@@ -9525,7 +9525,7 @@ static DRIVER_INIT( vkdlswwo )
        after compare with Dallas TK data
     */
 
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
 
 	ROM[0xe7d5] = 0xea;
 	ROM[0xe7d6] = 0xea;
@@ -9537,7 +9537,7 @@ static DRIVER_INIT( vkdlswwp )
        after compare with Dallas TK data
     */
 
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
 
 	ROM[0xe7d9] = 0xea;
 	ROM[0xe7da] = 0xea;
@@ -9549,7 +9549,7 @@ static DRIVER_INIT( vkdlswwr )
        after compare with Dallas TK data
     */
 
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
 
 	ROM[0xe7f7] = 0xea;
 	ROM[0xe7f8] = 0xea;
@@ -9561,7 +9561,7 @@ static DRIVER_INIT( vkdlswws )
        after compare with Dallas TK data
     */
 
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
 
 	ROM[0xe8a5] = 0xea;
 	ROM[0xe8a6] = 0xea;
@@ -9573,7 +9573,7 @@ static DRIVER_INIT( vkdlswwt )
        after compare with Dallas TK data
     */
 
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
 
 	ROM[0xe955] = 0xea;
 	ROM[0xe956] = 0xea;
@@ -9585,7 +9585,7 @@ static DRIVER_INIT( vkdlswwu )
        after compare with Dallas TK data
     */
 
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
 
 	ROM[0xee6b] = 0xea;
 	ROM[0xee6c] = 0xea;
@@ -9597,7 +9597,7 @@ static DRIVER_INIT( vkdlswwv )
        after compare with Dallas TK data
     */
 
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
 
 	ROM[0xf052] = 0xea;
 	ROM[0xf053] = 0xea;
@@ -9729,7 +9729,7 @@ static DRIVER_INIT( wstrike )
        after compare with a string inside the Dallas TK RAM
     */
 
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
 
 	ROM[0xf2e1] = 0xea;
 	ROM[0xf2e2] = 0xea;

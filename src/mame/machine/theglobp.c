@@ -71,7 +71,7 @@ static void theglobp_decrypt_rom_8(running_machine &machine)
 	int mem;
 	UINT8 *RAM;
 
-	RAM = machine.region("maincpu")->base();
+	RAM = machine.root_device().memregion("maincpu")->base();
 
 
 	for (mem=0;mem<0x4000;mem++)
@@ -108,7 +108,7 @@ static void theglobp_decrypt_rom_9(running_machine &machine)
 	int mem;
 	UINT8 *RAM;
 
-	RAM = machine.region("maincpu")->base();
+	RAM = machine.root_device().memregion("maincpu")->base();
 
 	for (mem=0;mem<0x4000;mem++)
 	{
@@ -143,7 +143,7 @@ static void theglobp_decrypt_rom_A(running_machine &machine)
 	int mem;
 	UINT8 *RAM;
 
-	RAM = machine.region("maincpu")->base();
+	RAM = machine.root_device().memregion("maincpu")->base();
 
 	for (mem=0;mem<0x4000;mem++)
 	{
@@ -178,7 +178,7 @@ static void theglobp_decrypt_rom_B(running_machine &machine)
 	int mem;
 	UINT8 *RAM;
 
-	RAM = machine.region("maincpu")->base();
+	RAM = machine.root_device().memregion("maincpu")->base();
 
 	for (mem=0;mem<0x4000;mem++)
 	{
@@ -238,7 +238,7 @@ READ8_HANDLER( theglobp_decrypt_rom )
 MACHINE_START( theglobp )
 {
 	pacman_state *state = machine.driver_data<pacman_state>();
-	UINT8 *RAM = machine.region("maincpu")->base();
+	UINT8 *RAM = state->memregion("maincpu")->base();
 
 	/* While the PAL supports up to 16 decryption methods, only four
         are actually used in the PAL.  Therefore, we'll take a little

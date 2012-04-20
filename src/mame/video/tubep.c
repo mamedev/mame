@@ -133,7 +133,7 @@
 
 PALETTE_INIT( tubep )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	tubep_state *state = machine.driver_data<tubep_state>();
 	int i,r,g,b;
 
@@ -437,7 +437,7 @@ static void draw_sprite(running_machine &machine)
 	tubep_state *state = machine.driver_data<tubep_state>();
 	UINT32	XDOT;
 	UINT32	YDOT;
-	UINT8 * romCxx  = machine.region("user2")->base()+0x00000;
+	UINT8 * romCxx  = state->memregion("user2")->base()+0x00000;
 	UINT8 * romD10  = romCxx+0x10000;
 	UINT8 * romEF13 = romCxx+0x12000;
 	UINT8 * romHI2  = romCxx+0x14000;
@@ -588,8 +588,8 @@ SCREEN_UPDATE_IND16( tubep )
 	pen_t pen_base = 32; //change it later
 
 	UINT32 v;
-	UINT8 *text_gfx_base = screen.machine().region("gfx1")->base();
-	UINT8 *romBxx = screen.machine().region("user1")->base() + 0x2000*state->m_background_romsel;
+	UINT8 *text_gfx_base = screen.machine().root_device().memregion("gfx1")->base();
+	UINT8 *romBxx = state->memregion("user1")->base() + 0x2000*state->m_background_romsel;
 
 	/* logerror(" update: from DISP=%i y_min=%3i y_max=%3i\n", DISP_, cliprect.min_y, cliprect.max_y+1); */
 
@@ -686,7 +686,7 @@ SCREEN_UPDATE_IND16( tubep )
 
 PALETTE_INIT( rjammer )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 
 	static const int resistors_rg[3] = { 1000, 470, 220 };
@@ -743,8 +743,8 @@ SCREEN_UPDATE_IND16( rjammer )
 	int DISP_ = state->m_DISP^1;
 
 	UINT32 v;
-	UINT8 *text_gfx_base = screen.machine().region("gfx1")->base();
-	UINT8 *rom13D  = screen.machine().region("user1")->base();
+	UINT8 *text_gfx_base = screen.machine().root_device().memregion("gfx1")->base();
+	UINT8 *rom13D  = state->memregion("user1")->base();
 	UINT8 *rom11BD = rom13D+0x1000;
 	UINT8 *rom19C  = rom13D+0x5000;
 

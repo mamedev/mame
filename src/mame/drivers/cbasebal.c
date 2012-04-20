@@ -243,7 +243,7 @@ static MACHINE_START( cbasebal )
 {
 	cbasebal_state *state = machine.driver_data<cbasebal_state>();
 
-	state->membank("bank1")->configure_entries(0, 32, machine.region("maincpu")->base() + 0x10000, 0x4000);
+	state->membank("bank1")->configure_entries(0, 32, state->memregion("maincpu")->base() + 0x10000, 0x4000);
 
 	state->save_item(NAME(state->m_rambank));
 	state->save_item(NAME(state->m_tilebank));

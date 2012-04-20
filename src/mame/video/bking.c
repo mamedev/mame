@@ -30,7 +30,7 @@
 
 PALETTE_INIT( bking )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	static const int resistances_rg[3] = { 220, 390, 820 };
 	static const int resistances_b [2] = { 220, 390 };
 	double rweights[3], gweights[3], bweights[2];
@@ -315,7 +315,7 @@ SCREEN_VBLANK( bking )
 
 		if (latch != 0)
 		{
-			const UINT8* MASK = screen.machine().region("user1")->base() + 8 * state->m_hit;
+			const UINT8* MASK = screen.machine().root_device().memregion("user1")->base() + 8 * state->m_hit;
 
 			int x;
 			int y;

@@ -165,7 +165,7 @@ static WRITE8_DEVICE_HANDLER( exerion_portb_w )
 {
 	exerion_state *state = device->machine().driver_data<exerion_state>();
 	/* pull the expected value from the ROM */
-	state->m_porta = device->machine().region("maincpu")->base()[0x5f76];
+	state->m_porta = state->memregion("maincpu")->base()[0x5f76];
 	state->m_portb = data;
 
 	logerror("Port B = %02X\n", data);
@@ -175,7 +175,7 @@ static WRITE8_DEVICE_HANDLER( exerion_portb_w )
 READ8_MEMBER(exerion_state::exerion_protection_r)
 {
 	if (cpu_get_pc(&space.device()) == 0x4143)
-		return machine().region("maincpu")->base()[0x33c0 + (m_main_ram[0xd] << 2) + offset];
+		return memregion("maincpu")->base()[0x33c0 + (m_main_ram[0xd] << 2) + offset];
 	else
 		return m_main_ram[0x8 + offset];
 }
@@ -558,8 +558,8 @@ static DRIVER_INIT( exerion )
 
 	/* make a temporary copy of the character data */
 	src = temp;
-	dst = machine.region("gfx1")->base();
-	length = machine.region("gfx1")->bytes();
+	dst = machine.root_device().memregion("gfx1")->base();
+	length = machine.root_device().memregion("gfx1")->bytes();
 	memcpy(src, dst, length);
 
 	/* decode the characters */
@@ -576,8 +576,8 @@ static DRIVER_INIT( exerion )
 
 	/* make a temporary copy of the sprite data */
 	src = temp;
-	dst = machine.region("gfx2")->base();
-	length = machine.region("gfx2")->bytes();
+	dst = machine.root_device().memregion("gfx2")->base();
+	length = machine.root_device().memregion("gfx2")->bytes();
 	memcpy(src, dst, length);
 
 	/* decode the sprites */
@@ -599,7 +599,7 @@ static DRIVER_INIT( exerion )
 
 static DRIVER_INIT( exerionb )
 {
-	UINT8 *ram = machine.region("maincpu")->base();
+	UINT8 *ram = machine.root_device().memregion("maincpu")->base();
 	int addr;
 
 	/* the program ROMs have data lines D1 and D2 swapped. Decode them. */

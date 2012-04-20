@@ -121,7 +121,7 @@ static TILE_GET_INFO( get_warpspeed_starfield_tile_info )
 	UINT8 code = 0x3f;
 	if ( tile_index & 1 )
 	{
-		code = machine.region("starfield")->base()[tile_index >> 1] & 0x3f;
+		code = machine.root_device().memregion("starfield")->base()[tile_index >> 1] & 0x3f;
 	}
 	SET_TILE_INFO(1, code, 0, 0);
 }

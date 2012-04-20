@@ -166,7 +166,7 @@ static SCREEN_UPDATE_IND16( mjsister )
 static TIMER_CALLBACK( dac_callback )
 {
 	mjsister_state *state = machine.driver_data<mjsister_state>();
-	UINT8 *DACROM = machine.region("samples")->base();
+	UINT8 *DACROM = state->memregion("samples")->base();
 
 	dac_data_w(state->m_dac, DACROM[(state->m_dac_bank * 0x10000 + state->m_dac_adr++) & 0x1ffff]);
 
@@ -449,9 +449,9 @@ static void mjsister_redraw(mjsister_state *state)
 static MACHINE_START( mjsister )
 {
 	mjsister_state *state = machine.driver_data<mjsister_state>();
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
 
-	machine.root_device().membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x8000);
+	state->membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x8000);
 
 	state->m_maincpu = machine.device("maincpu");
 	state->m_dac = machine.device("dac");

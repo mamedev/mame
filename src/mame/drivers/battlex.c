@@ -315,9 +315,9 @@ ROM_END
 
 static DRIVER_INIT( battlex )
 {
-	UINT8 *colormask = machine.region("user1")->base();
-	UINT8 *gfxdata = machine.region("user2")->base();
-	UINT8 *dest = machine.region("gfx1")->base();
+	UINT8 *colormask = machine.root_device().memregion("user1")->base();
+	UINT8 *gfxdata = machine.root_device().memregion("user2")->base();
+	UINT8 *dest = machine.root_device().memregion("gfx1")->base();
 
 	int tile, line, bit;
 

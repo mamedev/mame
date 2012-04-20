@@ -117,7 +117,7 @@ static SCREEN_UPDATE_IND16(hitpoker)
 
 READ8_MEMBER(hitpoker_state::hitpoker_vram_r)
 {
-	UINT8 *ROM = machine().region("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 
 	if(m_pic_data & 0x10)
 		return m_videoram[offset];
@@ -127,7 +127,7 @@ READ8_MEMBER(hitpoker_state::hitpoker_vram_r)
 
 WRITE8_MEMBER(hitpoker_state::hitpoker_vram_w)
 {
-//  UINT8 *ROM = machine().region("maincpu")->base();
+//  UINT8 *ROM = memregion("maincpu")->base();
 
 //  if(m_sys_regs[0x00] & 0x10)
 	m_videoram[offset] = data;
@@ -135,7 +135,7 @@ WRITE8_MEMBER(hitpoker_state::hitpoker_vram_w)
 
 READ8_MEMBER(hitpoker_state::hitpoker_cram_r)
 {
-	UINT8 *ROM = machine().region("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 
 	if(m_pic_data & 0x10)
 		return m_colorram[offset];
@@ -150,7 +150,7 @@ WRITE8_MEMBER(hitpoker_state::hitpoker_cram_w)
 
 READ8_MEMBER(hitpoker_state::hitpoker_paletteram_r)
 {
-	UINT8 *ROM = machine().region("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 
 	if(m_pic_data & 0x10)
 		return m_paletteram[offset];
@@ -517,7 +517,7 @@ MACHINE_CONFIG_END
 
 static DRIVER_INIT(hitpoker)
 {
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
 
 	ROM[0x1220] = 0x01; //patch eeprom write?
 	ROM[0x1221] = 0x01;

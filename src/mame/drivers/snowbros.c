@@ -418,13 +418,13 @@ static void sb3_play_music(running_machine &machine, int data)
 	{
 		case 0x23:
 		case 0x26:
-		snd = machine.region("oki")->base();
+		snd = machine.root_device().memregion("oki")->base();
 		memcpy(snd+0x20000, snd+0x80000+0x00000, 0x20000);
 		state->m_sb3_music_is_playing = 1;
 		break;
 
 		case 0x24:
-		snd = machine.region("oki")->base();
+		snd = machine.root_device().memregion("oki")->base();
 		memcpy(snd+0x20000, snd+0x80000+0x20000, 0x20000);
 		state->m_sb3_music_is_playing = 1;
 		break;
@@ -437,7 +437,7 @@ static void sb3_play_music(running_machine &machine, int data)
 		case 0x2b:
 		case 0x2c:
 		case 0x2d:
-		snd = machine.region("oki")->base();
+		snd = state->memregion("oki")->base();
 		memcpy(snd+0x20000, snd+0x80000+0x40000, 0x20000);
 		state->m_sb3_music_is_playing = 1;
 		break;
@@ -1516,7 +1516,7 @@ static const ym2151_interface ym2151_config =
 static MACHINE_RESET (semiprot)
 {
 	snowbros_state *state = machine.driver_data<snowbros_state>();
-	UINT16 *PROTDATA = (UINT16*)machine.region("user1")->base();
+	UINT16 *PROTDATA = (UINT16*)state->memregion("user1")->base();
 	int i;
 
 	for (i = 0;i < 0x200/2;i++)
@@ -1526,7 +1526,7 @@ static MACHINE_RESET (semiprot)
 static MACHINE_RESET (finalttr)
 {
 	snowbros_state *state = machine.driver_data<snowbros_state>();
-	UINT16 *PROTDATA = (UINT16*)machine.region("user1")->base();
+	UINT16 *PROTDATA = (UINT16*)state->memregion("user1")->base();
 	int i;
 
 	for (i = 0;i < 0x200/2;i++)
@@ -2337,7 +2337,7 @@ READ16_MEMBER(snowbros_state::moremorp_0a_read)
 static DRIVER_INIT( moremorp )
 {
 	//snowbros_state *state = machine.driver_data<snowbros_state>();
-//  UINT16 *PROTDATA = (UINT16*)machine.region("user1")->base();
+//  UINT16 *PROTDATA = (UINT16*)state->memregion("user1")->base();
 //  int i;
 
 //  for (i = 0;i < 0x200/2;i++)
@@ -2352,8 +2352,8 @@ static DRIVER_INIT( moremorp )
 static DRIVER_INIT( cookbib2 )
 {
 	//snowbros_state *state = machine.driver_data<snowbros_state>();
-//  UINT16 *HCROM = (UINT16*)machine.region("maincpu")->base();
-//  UINT16 *PROTDATA = (UINT16*)machine.region("user1")->base();
+//  UINT16 *HCROM = (UINT16*)machine.root_device().memregion("maincpu")->base();
+//  UINT16 *PROTDATA = (UINT16*)state->memregion("user1")->base();
 //  int i;
 //  state->m_hyperpac_ram[0xf000/2] = 0x46fc;
 //  state->m_hyperpac_ram[0xf002/2] = 0x2700;
@@ -2719,8 +2719,8 @@ READ16_MEMBER(snowbros_state::_4in1_02_read)
 static DRIVER_INIT(4in1boot)
 {
 	UINT8 *buffer;
-	UINT8 *src = machine.region("maincpu")->base();
-	int len = machine.region("maincpu")->bytes();
+	UINT8 *src = machine.root_device().memregion("maincpu")->base();
+	int len = machine.root_device().memregion("maincpu")->bytes();
 
 	/* strange order */
 	buffer = auto_alloc_array(machine, UINT8, len);
@@ -2734,8 +2734,8 @@ static DRIVER_INIT(4in1boot)
 		auto_free(machine, buffer);
 	}
 
-	src = machine.region("soundcpu")->base();
-	len = machine.region("soundcpu")->bytes();
+	src = machine.root_device().memregion("soundcpu")->base();
+	len = machine.root_device().memregion("soundcpu")->bytes();
 
 	/* strange order */
 	buffer = auto_alloc_array(machine, UINT8, len);
@@ -2753,8 +2753,8 @@ static DRIVER_INIT(4in1boot)
 static DRIVER_INIT(snowbro3)
 {
 	UINT8 *buffer;
-	UINT8 *src = machine.region("maincpu")->base();
-	int len = machine.region("maincpu")->bytes();
+	UINT8 *src = machine.root_device().memregion("maincpu")->base();
+	int len = machine.root_device().memregion("maincpu")->bytes();
 
 	/* strange order */
 	buffer = auto_alloc_array(machine, UINT8, len);

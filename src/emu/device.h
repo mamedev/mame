@@ -183,13 +183,13 @@ public:
 	device_t *first_subdevice() const { return m_subdevice_list.first(); }
 	astring &subtag(astring &dest, const char *tag) const;
 	astring &siblingtag(astring &dest, const char *tag) const { return (this != NULL && m_owner != NULL) ? m_owner->subtag(dest, tag) : dest.cpy(tag); }
-	const memory_region *subregion(const char *tag) const;
+	memory_region *memregion(const char *tag) const;
 	memory_bank *membank(const char *tag) const;
 	device_t *subdevice(const char *tag) const;
 	device_t *siblingdevice(const char *tag) const;
 	template<class _DeviceClass> inline _DeviceClass *subdevice(const char *tag) const { return downcast<_DeviceClass *>(subdevice(tag)); }
 	template<class _DeviceClass> inline _DeviceClass *siblingdevice(const char *tag) const { return downcast<_DeviceClass *>(siblingdevice(tag)); }
-	const memory_region *region() const { return m_region; }
+	memory_region *region() const { return m_region; }
 
 	// configuration helpers
 	static void static_set_clock(device_t &device, UINT32 clock);
@@ -296,7 +296,7 @@ protected:
 	attoseconds_t			m_attoseconds_per_clock;// period in attoseconds
 
 	device_debug *			m_debug;
-	const memory_region *	m_region;				// our device-local region
+	memory_region *			m_region;				// our device-local region
 	const machine_config &	m_machine_config;		// reference to the machine's configuration
 	const void *			m_static_config;		// static device configuration
 	const input_device_default *m_input_defaults;   // devices input ports default overrides

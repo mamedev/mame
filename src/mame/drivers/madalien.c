@@ -25,7 +25,7 @@ INPUT_CHANGED_MEMBER(madalien_state::coin_inserted)
 
 INLINE UINT8 shift_common(running_machine &machine, UINT8 hi, UINT8 lo)
 {
-	const UINT8 *table = machine.region("user2")->base();
+	const UINT8 *table = machine.root_device().memregion("user2")->base();
 
 	return table[((hi & 0x07) << 8) | lo];
 }

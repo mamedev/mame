@@ -100,7 +100,7 @@ static const res_net_info lockon_pd_net_info =
 
 PALETTE_INIT( lockon )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 
 	for (i = 0; i < 1024; ++i)
@@ -172,7 +172,7 @@ static void scene_draw( running_machine &machine )
 	UINT32 y;
 
 	/* 3bpp characters */
-	const UINT8 *const gfx1 = machine.region("gfx2")->base();
+	const UINT8 *const gfx1 = state->memregion("gfx2")->base();
 	const UINT8 *const gfx2 = gfx1 + 0x10000;
 	const UINT8 *const gfx3 = gfx1 + 0x20000;
 	const UINT8 *const clut = gfx1 + 0x30000;
@@ -308,7 +308,7 @@ static void ground_draw( running_machine &machine )
 	lockon_state *state = machine.driver_data<lockon_state>();
 
 	/* ROM pointers */
-	const UINT8 *const gfx_rom  = machine.region("gfx4")->base();
+	const UINT8 *const gfx_rom  = state->memregion("gfx4")->base();
 	const UINT8 *const lut_rom  = gfx_rom + 0x30000 + ((state->m_ground_ctrl >> 2) & 0x3 ? 0x10000 : 0);
 	const UINT8 *const clut_rom = gfx_rom + 0x50000;
 
@@ -435,10 +435,10 @@ static void objects_draw( running_machine &machine )
 	UINT32 offs;
 	lockon_state *state = machine.driver_data<lockon_state>();
 
-	const UINT8  *const romlut = machine.region("user1")->base();
-	const UINT16 *const chklut = (UINT16*)machine.region("user2")->base();
-	const UINT8  *const gfxrom = machine.region("gfx5")->base();
-	const UINT8  *const sproms = machine.region("proms")->base() + 0x800;
+	const UINT8  *const romlut = state->memregion("user1")->base();
+	const UINT16 *const chklut = (UINT16*)state->memregion("user2")->base();
+	const UINT8  *const gfxrom = state->memregion("gfx5")->base();
+	const UINT8  *const sproms = state->memregion("proms")->base() + 0x800;
 
 	for (offs = 0; offs < state->m_objectram_size; offs += 4)
 	{
@@ -799,7 +799,7 @@ static void rotate_draw( running_machine &machine, bitmap_ind16 &bitmap, const r
 static void hud_draw( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	lockon_state *state = machine.driver_data<lockon_state>();
-	UINT8	*tile_rom = machine.region("gfx3")->base();
+	UINT8	*tile_rom = state->memregion("gfx3")->base();
 	UINT32 offs;
 
 	for (offs = 0x0; offs <= state->m_hudram_size; offs += 2)

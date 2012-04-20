@@ -77,8 +77,8 @@ static void get_sprite_info(running_machine &machine)
 {
 	wecleman_state *state = machine.driver_data<wecleman_state>();
 	const pen_t *base_pal = machine.pens;
-	UINT8 *base_gfx = machine.region("gfx1")->base();
-	int gfx_max     = machine.region("gfx1")->bytes();
+	UINT8 *base_gfx = machine.root_device().memregion("gfx1")->base();
+	int gfx_max     = state->memregion("gfx1")->bytes();
 
 	UINT16 *source = state->m_spriteram;
 

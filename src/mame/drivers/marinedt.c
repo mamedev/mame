@@ -187,7 +187,7 @@ READ8_MEMBER(marinedt_state::marinedt_obj1_x_r)
 	//xxxx---- unknown
 	//----xxxx x pos in tile ram
 
-	UINT8 *RAM = machine().region("maincpu")->base();
+	UINT8 *RAM = memregion("maincpu")->base();
 
 	if (RAM[0x430e])
 		--m_cx;
@@ -445,7 +445,7 @@ GFXDECODE_END
 
 static PALETTE_INIT( marinedt )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i,r,b,g;
 
 	for (i = 0; i < machine.total_colors(); i++)

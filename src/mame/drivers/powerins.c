@@ -48,7 +48,7 @@ WRITE16_MEMBER(powerins_state::powerins_okibank_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		UINT8 *RAM = machine().region("oki1")->base();
+		UINT8 *RAM = memregion("oki1")->base();
 		int new_bank = data & 0x7;
 
 		if (new_bank != m_oki_bank)

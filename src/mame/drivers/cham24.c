@@ -191,11 +191,11 @@ WRITE8_MEMBER(cham24_state::cham24_mapper_w)
 	UINT32 prg_bank_page_size = (offset >> 12) & 0x01;
 	UINT32 gfx_mirroring = (offset >> 13) & 0x01;
 
-	UINT8* dst = machine().region("maincpu")->base();
-	UINT8* src = machine().region("user1")->base();
+	UINT8* dst = memregion("maincpu")->base();
+	UINT8* src = memregion("user1")->base();
 
 	// switch PPU VROM bank
-	membank("bank1")->set_base(machine().region("gfx1")->base() + (0x2000 * gfx_bank));
+	membank("bank1")->set_base(machine().root_device().memregion("gfx1")->base() + (0x2000 * gfx_bank));
 
 	// set gfx mirroring
 	cham24_set_mirroring(machine(), gfx_mirroring != 0 ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
@@ -304,15 +304,15 @@ static MACHINE_START( cham24 )
 {
 	cham24_state *state = machine.driver_data<cham24_state>();
 	/* switch PRG rom */
-	UINT8* dst = machine.region("maincpu")->base();
-	UINT8* src = machine.region("user1")->base();
+	UINT8* dst = machine.root_device().memregion("maincpu")->base();
+	UINT8* src = machine.root_device().memregion("user1")->base();
 
 	memcpy(&dst[0x8000], &src[0x0f8000], 0x4000);
 	memcpy(&dst[0xc000], &src[0x0f8000], 0x4000);
 
 	/* uses 8K swapping, all ROM!*/
 	machine.device("ppu")->memory().space(AS_PROGRAM)->install_read_bank(0x0000, 0x1fff, "bank1");
-	state->membank("bank1")->set_base(machine.region("gfx1")->base());
+	state->membank("bank1")->set_base(state->memregion("gfx1")->base());
 
 	/* need nametable ram, though. I doubt this uses more than 2k, but it starts up configured for 4 */
 	state->m_nt_ram = auto_alloc_array(machine, UINT8, 0x1000);

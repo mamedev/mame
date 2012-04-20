@@ -520,7 +520,7 @@ READ32_MEMBER(rabbit_state::randomrabbits)
 /* rom bank is used when testing roms, not currently hooked up */
 WRITE32_MEMBER(rabbit_state::rabbit_rombank_w)
 {
-	UINT8 *dataroms = machine().region("gfx1")->base();
+	UINT8 *dataroms = memregion("gfx1")->base();
 #if 0
 	int bank;
 	printf("rabbit rombank %08x\n",data);
@@ -546,7 +546,7 @@ static TIMER_CALLBACK( rabbit_blit_done )
 static void rabbit_do_blit(running_machine &machine)
 {
 	rabbit_state *state = machine.driver_data<rabbit_state>();
-	UINT8 *blt_data = machine.region("gfx1")->base();
+	UINT8 *blt_data = state->memregion("gfx1")->base();
 	int blt_source = (state->m_blitterregs[0]&0x000fffff)>>0;
 	int blt_column = (state->m_blitterregs[1]&0x00ff0000)>>16;
 	int blt_line   = (state->m_blitterregs[1]&0x000000ff);

@@ -180,7 +180,7 @@ public:
 
 static PALETTE_INIT( m63 )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 
 	for (i = 0; i < 256; i++)
@@ -432,7 +432,7 @@ READ8_MEMBER(m63_state::snddata_r)
 	switch (m_p2 & 0xf0)
 	{
 		case 0x60:	return soundlatch_byte_r(space, 0); ;
-		case 0x70:	return machine().region("user1")->base()[((m_p1 & 0x1f) << 8) | offset];
+		case 0x70:	return memregion("user1")->base()[((m_p1 & 0x1f) << 8) | offset];
 	}
 	return 0xff;
 }
@@ -696,8 +696,8 @@ static SAMPLES_START( fghtbskt_sh_start )
 {
 	running_machine &machine = device.machine();
 	m63_state *state = machine.driver_data<m63_state>();
-	int i, len = machine.region("samples")->bytes();
-	UINT8 *ROM = machine.region("samples")->base();
+	int i, len = machine.root_device().memregion("samples")->bytes();
+	UINT8 *ROM = state->memregion("samples")->base();
 
 	state->m_samplebuf = auto_alloc_array(machine, INT16, len);
 	state->save_pointer(NAME(state->m_samplebuf), len);

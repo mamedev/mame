@@ -354,7 +354,7 @@ READ8_MEMBER(psychic5_state::psychic5_bankselect_r)
 
 WRITE8_MEMBER(psychic5_state::psychic5_bankselect_w)
 {
-	UINT8 *RAM = machine().region("maincpu")->base();
+	UINT8 *RAM = memregion("maincpu")->base();
 	int bankaddress;
 
 	if (m_bank_latch != data)
@@ -367,7 +367,7 @@ WRITE8_MEMBER(psychic5_state::psychic5_bankselect_w)
 
 WRITE8_MEMBER(psychic5_state::bombsa_bankselect_w)
 {
-	UINT8 *RAM = machine().region("maincpu")->base();
+	UINT8 *RAM = memregion("maincpu")->base();
 	int bankaddress;
 
 	if (m_bank_latch != data)

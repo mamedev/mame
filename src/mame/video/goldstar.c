@@ -408,7 +408,7 @@ SCREEN_UPDATE_IND16( goldstar )
 
 	if (state->m_cm_enable_reg &0x04)
 	{
-		if (screen.machine().region("user1")->base())
+		if (screen.machine().root_device().memregion("user1")->base())
 		{
 			const gfx_element *gfx = screen.machine().gfx[2];
 			int girlyscroll = (INT8)((state->m_cm_girl_scroll & 0xf0));
@@ -451,7 +451,7 @@ SCREEN_UPDATE_IND16( bingowng )
 
 	if (state->m_cm_enable_reg &0x04)
 	{
-		if (screen.machine().region("user1")->base())
+		if (screen.machine().root_device().memregion("user1")->base())
 		{
 			const gfx_element *gfx = screen.machine().gfx[2];
 			int girlyscroll = (INT8)((state->m_cm_girl_scroll & 0xf0));

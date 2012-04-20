@@ -1278,8 +1278,8 @@ static DRIVER_INIT( kram3 )
      ********************************/
 
 	i = 0;
-	//patch = machine.region("user1")->base();
-	rom = machine.region("maincpu")->base();
+	//patch = machine.root_device().memregion("user1")->base();
+	rom = machine.root_device().memregion("maincpu")->base();
 	decrypted = auto_alloc_array(machine, UINT8, 0x6000);
 
 	mainspace->set_decrypted_region(0xa000, 0xffff, decrypted);
@@ -1291,8 +1291,8 @@ static DRIVER_INIT( kram3 )
 	}
 
 	i = 0;
-	//patch = machine.region("user2")->base();
-	rom = machine.region("videocpu")->base();
+	//patch = machine.root_device().memregion("user2")->base();
+	rom = machine.root_device().memregion("videocpu")->base();
 	decrypted = auto_alloc_array(machine, UINT8, 0x6000);
 
 	videospace->set_decrypted_region(0xa000, 0xffff, decrypted);
@@ -1308,8 +1308,8 @@ static DRIVER_INIT( kram3 )
 static DRIVER_INIT( zookeep )
 {
 	/* configure the banking */
-	machine.root_device().membank("bank1")->configure_entry(0, machine.region("videocpu")->base() + 0xa000);
-	machine.root_device().membank("bank1")->configure_entry(1, machine.region("videocpu")->base() + 0x10000);
+	machine.root_device().membank("bank1")->configure_entry(0, machine.root_device().memregion("videocpu")->base() + 0xa000);
+	machine.root_device().membank("bank1")->configure_entry(1, machine.root_device().memregion("videocpu")->base() + 0x10000);
 	machine.root_device().membank("bank1")->set_entry(0);
 }
 

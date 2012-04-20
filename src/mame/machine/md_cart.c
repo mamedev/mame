@@ -194,7 +194,7 @@ static int md_get_pcb_id(const char *pcb)
 static WRITE16_HANDLER( genesis_ssf2_bank_w )
 {
 	md_cons_state *state = space->machine().driver_data<md_cons_state>();
-	UINT8 *ROM = space->machine().region("maincpu")->base();
+	UINT8 *ROM = state->memregion("maincpu")->base();
 
 	if ((state->m_md_cart.ssf2_lastoff != offset) || (state->m_md_cart.ssf2_lastdata != data))
 	{
@@ -325,7 +325,7 @@ static WRITE16_HANDLER( l3alt_bank_w )
 	{
 		case 0:
 		{
-			UINT8 *ROM = space->machine().region("maincpu")->base();
+			UINT8 *ROM = space->machine().root_device().memregion("maincpu")->base();
 			/* printf("%06x data %04x\n",activecpu_get_pc(), data); */
 			memcpy(&ROM[0x000000], &ROM[VIRGIN_COPY_GEN + (data & 0xffff) * 0x8000], 0x8000);
 		}
@@ -355,7 +355,7 @@ static WRITE16_HANDLER( realtec_400000_w )
 	md_cons_state *state = space->machine().driver_data<md_cons_state>();
 	int bankdata = (data >> 9) & 0x7;
 
-	UINT8 *ROM = space->machine().region("maincpu")->base();
+	UINT8 *ROM = state->memregion("maincpu")->base();
 
 	state->m_md_cart.realtec_old_bank_addr = state->m_md_cart.realtec_bank_addr;
 	state->m_md_cart.realtec_bank_addr = (state->m_md_cart.realtec_bank_addr & 0x7) | bankdata << 3;
@@ -368,7 +368,7 @@ static WRITE16_HANDLER( realtec_404000_w )
 {
 	md_cons_state *state = space->machine().driver_data<md_cons_state>();
 	int bankdata = (data >> 8) & 0x3;
-	UINT8 *ROM = space->machine().region("maincpu")->base();
+	UINT8 *ROM = state->memregion("maincpu")->base();
 
 	state->m_md_cart.realtec_old_bank_addr = state->m_md_cart.realtec_bank_addr;
 	state->m_md_cart.realtec_bank_addr = (state->m_md_cart.realtec_bank_addr & 0xf8) | bankdata;
@@ -385,7 +385,7 @@ static WRITE16_HANDLER( realtec_404000_w )
  *************************************/
 static WRITE16_HANDLER( chifi3_bank_w )
 {
-	UINT8 *ROM = space->machine().region("maincpu")->base();
+	UINT8 *ROM = space->machine().root_device().memregion("maincpu")->base();
 
 	if (data == 0xf100) // *hit player
 	{
@@ -489,7 +489,7 @@ static READ16_HANDLER( chifi3_prot_r )
  *************************************/
 static WRITE16_HANDLER( s19in1_bank )
 {
-	UINT8 *ROM = space->machine().region("maincpu")->base();
+	UINT8 *ROM = space->machine().root_device().memregion("maincpu")->base();
 	memcpy(ROM + 0x000000, ROM + 0x400000 + ((offset << 1) * 0x10000), 0x80000);
 }
 
@@ -498,7 +498,7 @@ static WRITE16_HANDLER( s19in1_bank )
  *************************************/
 static WRITE16_HANDLER( kaiju_bank_w )
 {
-	UINT8 *ROM = space->machine().region("maincpu")->base();
+	UINT8 *ROM = space->machine().root_device().memregion("maincpu")->base();
 	memcpy(ROM + 0x000000, ROM + 0x400000 + (data & 0x7f) * 0x8000, 0x8000);
 }
 
@@ -605,7 +605,7 @@ static READ16_HANDLER( kof99_A13000_r )
 static READ16_HANDLER( radica_bank_select )
 {
 	int bank = offset & 0x3f;
-	UINT8 *ROM = space->machine().region("maincpu")->base();
+	UINT8 *ROM = space->machine().root_device().memregion("maincpu")->base();
 	memcpy(ROM, ROM + 0x400000 + (bank * 0x10000), 0x400000);
 	return 0;
 }
@@ -772,7 +772,7 @@ static READ16_HANDLER( topfig_6F5344_r ) // after char select
 
 static WRITE16_HANDLER( topfig_bank_w )
 {
-	UINT8 *ROM = space->machine().region("maincpu")->base();
+	UINT8 *ROM = space->machine().root_device().memregion("maincpu")->base();
 	if (data == 0x002a)
 	{
 		memcpy(ROM + 0x060000, ROM + 0x570000, 0x8000); // == 0x2e*0x8000?!
@@ -819,7 +819,7 @@ static READ16_HANDLER( topfig_645B44_r )
  *************************************/
 static WRITE16_HANDLER( mc_12in1_bank_w )
 {
-	UINT8 *ROM = space->machine().region("maincpu")->base();
+	UINT8 *ROM = space->machine().root_device().memregion("maincpu")->base();
 	logerror("offset %06x", offset << 17);
 	memcpy(ROM + 0x000000, ROM + VIRGIN_COPY_GEN + ((offset & 0x3f) << 17), 0x100000);
 }
@@ -854,7 +854,7 @@ static READ16_HANDLER( genesis_sram_read )
 		return state->m_md_cart.sram[offset];
 	else
 	{
-		ROM = space->machine().region("maincpu")->base();
+		ROM = state->memregion("maincpu")->base();
 		rom_offset = state->m_md_cart.sram_start + (offset << 1);
 
 		return (UINT16) ROM[rom_offset] | (ROM[rom_offset + 1] << 8);
@@ -1018,7 +1018,7 @@ static void setup_megadriv_custom_mappers(running_machine &machine)
 {
 	md_cons_state *state = machine.driver_data<md_cons_state>();
 	UINT32 mirroraddr;
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = state->memregion("maincpu")->base();
 
 	switch (state->m_md_cart.type)
 	{
@@ -1235,7 +1235,7 @@ static void setup_megadriv_custom_mappers(running_machine &machine)
          you need to return 1 @ 0xa13002 and 0???1f @ 0xa1303E (it does word reads).
 
          */
-		UINT16 *ROM16 = (UINT16 *)machine.region("maincpu")->base();
+		UINT16 *ROM16 = (UINT16 *)machine.root_device().memregion("maincpu")->base();
 
 		ROM16[0x0dd19e/2] = 0x47F8;
 		ROM16[0x0dd1a0/2] = 0xFFF0;
@@ -1254,7 +1254,7 @@ static void setup_megadriv_custom_mappers(running_machine &machine)
          002476:6022
 
          */
-		UINT16 *ROM16 = (UINT16 *)machine.region("maincpu")->base();
+		UINT16 *ROM16 = (UINT16 *)machine.root_device().memregion("maincpu")->base();
 
 		ROM16[0x06036/2] = 0xE000;
 		ROM16[0x02540/2] = 0x6026;
@@ -1274,7 +1274,7 @@ static void setup_megadriv_custom_mappers(running_machine &machine)
 		//  ROM[0x01ED0/2] = 0xE000;
 		//  ROM[0x02540/2] = 0xE000;
 
-		UINT16 *ROM16 = (UINT16 *)machine.region("maincpu")->base();
+		UINT16 *ROM16 = (UINT16 *)machine.root_device().memregion("maincpu")->base();
 
 		ROM16[0x06036/2] = 0xE000;
 	}
@@ -1287,7 +1287,7 @@ static void setup_megadriv_sram(device_image_interface &image)
 {
 	running_machine &machine = image.device().machine();
 	md_cons_state *state = machine.driver_data<md_cons_state>();
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = state->memregion("maincpu")->base();
 	megadriv_backupram = NULL;
 	state->m_md_cart.sram = NULL;
 	state->m_md_cart.sram_start = state->m_md_cart.sram_end = 0;
@@ -1546,7 +1546,7 @@ static int megadrive_load_nonlist(device_image_interface &image)
 #endif
 
 	// STEP 1: determine the file type (SMD? MD? BIN?)
-	rawROM = image.device().machine().region("maincpu")->base();
+	rawROM = state->memregion("maincpu")->base();
 	ROM = rawROM /*+ 512 */;
 
 	state->m_md_cart.last_loaded_image_length = -1;
@@ -1881,7 +1881,7 @@ static DEVICE_IMAGE_DISPLAY_INFO(megadriv)
 static int megadrive_load_list(device_image_interface &image)
 {
 	md_cons_state *state = image.device().machine().driver_data<md_cons_state>();
-	UINT8 *ROM = image.device().machine().region("maincpu")->base();
+	UINT8 *ROM = state->memregion("maincpu")->base();
 	UINT32 length = image.get_software_region_length("rom");
 	const char	*pcb_name;
 	memcpy(ROM, image.get_software_region("rom"), length);
@@ -1975,15 +1975,15 @@ static DEVICE_IMAGE_LOAD( _32x_cart )
 
 	/* Copy the cart image in the locations the driver expects */
 	// Notice that, by using pick_integer, we are sure the code works on both LE and BE machines
-	ROM16 = (UINT16 *) image.device().machine().region("gamecart")->base();
+	ROM16 = (UINT16 *) image.device().machine().root_device().memregion("gamecart")->base();
 	for (i = 0; i < length; i += 2)
 		ROM16[i / 2] = pick_integer_be(temp_copy, i, 2);
 
-	ROM32 = (UINT32 *) image.device().machine().region("gamecart_sh2")->base();
+	ROM32 = (UINT32 *) image.device().machine().root_device().memregion("gamecart_sh2")->base();
 	for (i = 0; i < length; i += 4)
 		ROM32[i / 4] = pick_integer_be(temp_copy, i, 4);
 
-	ROM16 = (UINT16 *) image.device().machine().region("maincpu")->base();
+	ROM16 = (UINT16 *) image.device().machine().root_device().memregion("maincpu")->base();
 	for (i = 0x00; i < length; i += 2)
 		ROM16[i / 2] = pick_integer_be(temp_copy, i, 2);
 

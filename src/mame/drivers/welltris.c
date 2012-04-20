@@ -322,7 +322,7 @@ TODO:
 
 WRITE8_MEMBER(welltris_state::welltris_sh_bankswitch_w)
 {
-	UINT8 *rom = machine().region("audiocpu")->base() + 0x10000;
+	UINT8 *rom = memregion("audiocpu")->base() + 0x10000;
 
 	membank("bank1")->set_base(rom + (data & 0x03) * 0x8000);
 }
@@ -689,7 +689,7 @@ static DRIVER_INIT( welltris )
 {
 #if WELLTRIS_4P_HACK
 	/* A Hack which shows 4 player mode in code which is disabled */
-	UINT16 *RAM = (UINT16 *)machine.region("maincpu")->base();
+	UINT16 *RAM = (UINT16 *)machine.root_device().memregion("maincpu")->base();
 	RAM[0xB91C/2] = 0x4e71;
 	RAM[0xB91E/2] = 0x4e71;
 #endif

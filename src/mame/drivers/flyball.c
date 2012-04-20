@@ -389,7 +389,7 @@ static MACHINE_RESET( flyball )
 	int i;
 
 	/* address bits 0 through 8 are inverted */
-	UINT8* ROM = machine.region("maincpu")->base() + 0x2000;
+	UINT8* ROM = state->memregion("maincpu")->base() + 0x2000;
 
 	for (i = 0; i < 0x1000; i++)
 		state->m_rombase[i] = ROM[i ^ 0x1ff];

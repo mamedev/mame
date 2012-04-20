@@ -17,16 +17,16 @@ static SAMPLES_START( cclimber_sh_start )
 {
 	running_machine &machine = device.machine();
 	samplebuf = 0;
-	if (machine.region("samples")->base())
-		samplebuf = auto_alloc_array(machine, INT16, 2 * machine.region("samples")->bytes());
+	if (machine.root_device().memregion("samples")->base())
+		samplebuf = auto_alloc_array(machine, INT16, 2 * machine.root_device().memregion("samples")->bytes());
 }
 
 
 static void cclimber_play_sample(running_machine &machine, int start,int freq,int volume)
 {
 	int len;
-	int romlen = machine.region("samples")->bytes();
-	const UINT8 *rom = machine.region("samples")->base();
+	int romlen = machine.root_device().memregion("samples")->bytes();
+	const UINT8 *rom = machine.root_device().memregion("samples")->base();
 	samples_device *samples = machine.device<samples_device>("samples");
 
 

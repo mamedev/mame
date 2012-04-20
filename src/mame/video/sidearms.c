@@ -143,7 +143,7 @@ static TILEMAP_MAPPER( sidearms_tilemap_scan )
 VIDEO_START( sidearms )
 {
 	sidearms_state *state = machine.driver_data<sidearms_state>();
-	state->m_tilerom = machine.region("gfx4")->base();
+	state->m_tilerom = state->memregion("gfx4")->base();
 
 	if (!state->m_gameid)
 	{
@@ -226,7 +226,7 @@ static void sidearms_draw_starfield( running_machine &machine, bitmap_ind16 &bit
 	_vcount_191 = state->m_vcount_191;
 	_hcount_191 = state->m_hcount_191 & 0xff;
 
-	sf_rom = machine.region("user1")->base();
+	sf_rom = machine.root_device().memregion("user1")->base();
 
 #if 0 // old loop (for reference; easier to read)
 	if (!flipon)

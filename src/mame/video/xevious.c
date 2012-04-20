@@ -26,7 +26,7 @@
 ***************************************************************************/
 PALETTE_INIT( xevious )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 	#define TOTAL_COLORS(gfxn) (machine.gfx[gfxn]->total_colors * machine.gfx[gfxn]->color_granularity)
 
@@ -100,7 +100,7 @@ PALETTE_INIT( xevious )
 
 PALETTE_INIT( battles )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 
 	machine.colortable = colortable_alloc(machine, 128+1);
@@ -320,7 +320,7 @@ READ8_HANDLER( xevious_bb_r )
 {
 	xevious_state *state =  space->machine().driver_data<xevious_state>();
 
-	UINT8 *rom2a = space->machine().region("gfx4")->base();
+	UINT8 *rom2a = state->memregion("gfx4")->base();
 	UINT8 *rom2b = rom2a+0x1000;
 	UINT8 *rom2c = rom2a+0x3000;
 	int adr_2b,adr_2c;

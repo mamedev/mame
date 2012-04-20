@@ -431,7 +431,7 @@ static MACHINE_RESET(skns)
 	else
 		hit.disconnect= 0;
 
-	state->membank("bank1")->set_base(machine.region("user1")->base());
+	state->membank("bank1")->set_base(state->memregion("user1")->base());
 }
 
 
@@ -665,7 +665,7 @@ WRITE32_MEMBER(skns_state::skns_io_w)
 
 WRITE32_MEMBER(skns_state::skns_v3t_w)
 {
-	UINT8 *btiles = machine().region("gfx3")->base();
+	UINT8 *btiles = memregion("gfx3")->base();
 
 	COMBINE_DATA(&m_v3t_ram[offset]);
 

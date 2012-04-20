@@ -157,7 +157,7 @@ WRITE8_MEMBER(vball_state::vball_irq_ack_w)
 */
 WRITE8_MEMBER(vball_state::vb_bankswitch_w)
 {
-	UINT8 *RAM = machine().region("maincpu")->base();
+	UINT8 *RAM = memregion("maincpu")->base();
 	membank("bank1")->set_base(&RAM[0x10000 + (0x4000 * (data & 1))]);
 
 	if (m_gfxset != ((data  & 0x20) ^ 0x20))

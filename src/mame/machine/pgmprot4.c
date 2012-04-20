@@ -107,17 +107,17 @@ static void IGS022_do_dma(running_machine& machine, UINT16 src, UINT16 dst, UINT
         };
         */
 		int x;
-		UINT16 *PROTROM = (UINT16*)machine.region("igs022data")->base();
+		UINT16 *PROTROM = (UINT16*)machine.root_device().memregion("igs022data")->base();
 
 		for (x = 0; x < size; x++)
 		{
-			//UINT16 *RAMDUMP = (UINT16*)space->machine().region("user2")->base();
+			//UINT16 *RAMDUMP = (UINT16*)space->machine().root_device().memregion("user2")->base();
 			//UINT16 dat = RAMDUMP[dst + x];
 
 			UINT16 dat2 = PROTROM[src + x];
 
 			UINT8 extraoffset = param&0xfe; // the lowest bit changed the table addressing in tests, see 'rawDataOdd' table instead.. it's still related to the main one, not identical
-			UINT8* dectable = (UINT8*)machine.region("igs022data")->base();//rawDataEven; // the basic decryption table is at the start of the mcu data rom! at least in killbld
+			UINT8* dectable = (UINT8*)machine.root_device().memregion("igs022data")->base();//rawDataEven; // the basic decryption table is at the start of the mcu data rom! at least in killbld
 			UINT16 extraxor = ((dectable[((x*2)+0+extraoffset)&0xff]) << 8) | (dectable[((x*2)+1+extraoffset)&0xff] << 0);
 
 			dat2 = ((dat2 & 0x00ff)<<8) | ((dat2 & 0xff00)>>8);
@@ -148,7 +148,7 @@ static void IGS022_do_dma(running_machine& machine, UINT16 src, UINT16 dst, UINT
 	{
 		/* mode 5 seems to be a straight copy */
 		int x;
-		UINT16 *PROTROM = (UINT16*)machine.region("igs022data")->base();
+		UINT16 *PROTROM = (UINT16*)machine.root_device().memregion("igs022data")->base();
 		for (x = 0; x < size; x++)
 		{
 			UINT16 dat = PROTROM[src + x];
@@ -161,7 +161,7 @@ static void IGS022_do_dma(running_machine& machine, UINT16 src, UINT16 dst, UINT
 	{
 		/* mode 6 seems to swap bytes and nibbles */
 		int x;
-		UINT16 *PROTROM = (UINT16*)machine.region("igs022data")->base();
+		UINT16 *PROTROM = (UINT16*)machine.root_device().memregion("igs022data")->base();
 		for (x = 0; x < size; x++)
 		{
 			UINT16 dat = PROTROM[src + x];
@@ -194,7 +194,7 @@ static void IGS022_do_dma(running_machine& machine, UINT16 src, UINT16 dst, UINT
 static void IGS022_reset(running_machine& machine)
 {
 	int i;
-	UINT16 *PROTROM = (UINT16*)machine.region("igs022data")->base();
+	UINT16 *PROTROM = (UINT16*)machine.root_device().memregion("igs022data")->base();
 	pgm_022_025_state *state = machine.driver_data<pgm_022_025_state>();
 	UINT16 tmp;
 
@@ -534,7 +534,7 @@ DRIVER_INIT( drgw3 )
 
     {
         int x;
-        UINT16 *RAMDUMP = (UINT16*)machine.region("user2")->base();
+        UINT16 *RAMDUMP = (UINT16*)state->memregion("user2")->base();
         for (x=0;x<(0x4000/2);x++)
         {
             state->m_sharedprotram[x] = RAMDUMP[x];

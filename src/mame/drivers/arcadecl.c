@@ -398,7 +398,7 @@ ROM_END
 
 static DRIVER_INIT( sparkz )
 {
-	memset(machine.region("gfx1")->base(), 0, machine.region("gfx1")->bytes());
+	memset(machine.root_device().memregion("gfx1")->base(), 0, machine.root_device().memregion("gfx1")->bytes());
 }
 
 

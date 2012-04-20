@@ -378,7 +378,7 @@ static void on_scorpion2_reset(running_machine &machine)
 	// init rom bank ////////////////////////////////////////////////////////
 
 	{
-		UINT8 *rom = machine.region("maincpu")->base();
+		UINT8 *rom = machine.root_device().memregion("maincpu")->base();
 
 		state->membank("bank1")->configure_entries(0, 4, &rom[0x00000], 0x02000);
 
@@ -2204,7 +2204,7 @@ static void adder2_common_init(running_machine &machine)
 	bfm_sc2_state *state = machine.driver_data<bfm_sc2_state>();
 	UINT8 *pal;
 
-	pal = machine.region("proms")->base();
+	pal = state->memregion("proms")->base();
 	if ( pal )
 	{
 		memcpy(state->m_key, pal, 8);

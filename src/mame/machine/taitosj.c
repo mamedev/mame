@@ -19,8 +19,8 @@
 MACHINE_START( taitosj )
 {
 	taitosj_state *state = machine.driver_data<taitosj_state>();
-	state->membank("bank1")->configure_entry(0, machine.region("maincpu")->base() + 0x6000);
-	state->membank("bank1")->configure_entry(1, machine.region("maincpu")->base() + 0x10000);
+	state->membank("bank1")->configure_entry(0, machine.root_device().memregion("maincpu")->base() + 0x6000);
+	state->membank("bank1")->configure_entry(1, state->memregion("maincpu")->base() + 0x10000);
 
 	state->save_item(NAME(state->m_fromz80));
 	state->save_item(NAME(state->m_toz80));

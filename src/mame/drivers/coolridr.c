@@ -683,7 +683,7 @@ WRITE32_MEMBER(coolridr_state::sysh1_char_w)
 	COMBINE_DATA(&m_h1_charram[offset]);
 
 	{
-		UINT8 *gfx = machine().region("ram_gfx")->base();
+		UINT8 *gfx = memregion("ram_gfx")->base();
 
 		gfx[offset*4+0] = (m_h1_charram[offset] & 0xff000000) >> 24;
 		gfx[offset*4+1] = (m_h1_charram[offset] & 0x00ff0000) >> 16;

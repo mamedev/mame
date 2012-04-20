@@ -518,7 +518,7 @@ static void display_rom_load_results(rom_load_data *romdata)
 
 static void region_post_process(rom_load_data *romdata, const char *rgntag, bool invert)
 {
-	const memory_region *region = romdata->machine().region(rgntag);
+	memory_region *region = romdata->machine().root_device().memregion(rgntag);
 	UINT8 *base;
 	int i, j;
 
@@ -832,7 +832,7 @@ static void copy_rom_data(rom_load_data *romdata, const rom_entry *romp)
 		fatalerror("Error in RomModule definition: COPY has an invalid length\n");
 
 	/* make sure the source was valid */
-	const memory_region *region = romdata->machine().region(srcrgntag);
+	memory_region *region = romdata->machine().root_device().memregion(srcrgntag);
 	if (region == NULL)
 		fatalerror("Error in RomModule definition: COPY from an invalid region\n");
 
@@ -1328,18 +1328,18 @@ void load_software_part_region(device_t *device, char *swlist, char *swname, rom
 		/* if this is a device region, override with the device width and endianness */
 		endianness_t endianness = ROMREGION_ISBIGENDIAN(region) ? ENDIANNESS_BIG : ENDIANNESS_LITTLE;
 		UINT8 width = ROMREGION_GETWIDTH(region) / 8;
-		const memory_region *memregion = romdata->machine().region(regiontag);
+		memory_region *memregion = romdata->machine().root_device().memregion(regiontag);
 		if (memregion != NULL)
 		{
 			if (romdata->machine().device(regiontag) != NULL)
 				normalize_flags_for_device(romdata->machine(), regiontag, width, endianness);
 
 			/* clear old region (todo: should be moved to an image unload function) */
-			romdata->machine().region_free(memregion->name());
+			romdata->machine().memory().region_free(memregion->name());
 		}
 
 		/* remember the base and length */
-		romdata->region = romdata->machine().region_alloc(regiontag, regionlength, width, endianness);
+		romdata->region = romdata->machine().memory().region_alloc(regiontag, regionlength, width, endianness);
 		LOG(("Allocated %X bytes @ %p\n", romdata->region->bytes(), romdata->region->base()));
 
 		/* clear the region if it's requested */
@@ -1404,7 +1404,7 @@ static void process_region_list(rom_load_data *romdata)
 					normalize_flags_for_device(romdata->machine(), regiontag, width, endianness);
 
 				/* remember the base and length */
-				romdata->region = romdata->machine().region_alloc(regiontag, regionlength, width, endianness);
+				romdata->region = romdata->machine().memory().region_alloc(regiontag, regionlength, width, endianness);
 				LOG(("Allocated %X bytes @ %p\n", romdata->region->bytes(), romdata->region->base()));
 
 				/* clear the region if it's requested */

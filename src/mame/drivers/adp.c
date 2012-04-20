@@ -319,7 +319,7 @@ static MACHINE_START( skattv )
 
 	// hack to handle acrt rom
 	{
-		UINT16 *rom = (UINT16*)machine.region("gfx1")->base();
+		UINT16 *rom = (UINT16*)state->memregion("gfx1")->base();
 		int i;
 
 		device_t *hd63484 = machine.device("hd63484");
@@ -637,7 +637,7 @@ static const ay8910_interface ay8910_config =
 
 READ8_MEMBER(adp_state::h63484_rom_r)
 {
-	UINT8 *rom = machine().region("gfx1")->base();
+	UINT8 *rom = memregion("gfx1")->base();
 
 	return rom[offset];
 }

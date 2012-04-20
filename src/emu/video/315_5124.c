@@ -1616,7 +1616,7 @@ void sega315_5124_device::device_start()
 
 	/* Allocate video RAM */
 	astring tempstring;
-	m_CRAM = machine().region_alloc(subtag(tempstring,"vdp_cram"), SEGA315_5378_CRAM_SIZE, 1, ENDIANNESS_LITTLE);
+	m_CRAM = machine().memory().region_alloc(subtag(tempstring,"vdp_cram"), SEGA315_5378_CRAM_SIZE, 1, ENDIANNESS_LITTLE);
 	m_line_buffer = auto_alloc_array(machine(), int, 256 * 5);
 
 	m_frame_timing = (m_is_pal) ? pal_192 : ntsc_192;

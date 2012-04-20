@@ -12,7 +12,7 @@ WRITE8_MEMBER(shisen_state::sichuan2_bankswitch_w)
 {
 	int bankaddress;
 	int bank;
-	UINT8 *RAM = machine().region("maincpu")->base();
+	UINT8 *RAM = memregion("maincpu")->base();
 
 	if (data & 0xc0) logerror("bank switch %02x\n",data);
 

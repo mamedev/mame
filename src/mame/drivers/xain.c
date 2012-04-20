@@ -568,8 +568,8 @@ static const ym2203_interface ym2203_config =
 
 static MACHINE_START( xsleena )
 {
-	machine.root_device().membank("bank1")->configure_entries(0, 2, machine.region("maincpu")->base() + 0x4000, 0xc000);
-	machine.root_device().membank("bank2")->configure_entries(0, 2, machine.region("sub")->base()  + 0x4000, 0xc000);
+	machine.root_device().membank("bank1")->configure_entries(0, 2, machine.root_device().memregion("maincpu")->base() + 0x4000, 0xc000);
+	machine.root_device().membank("bank2")->configure_entries(0, 2, machine.root_device().memregion("sub")->base()  + 0x4000, 0xc000);
 	machine.root_device().membank("bank1")->set_entry(0);
 	machine.root_device().membank("bank2")->set_entry(0);
 }

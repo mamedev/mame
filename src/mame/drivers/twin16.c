@@ -88,7 +88,7 @@ WRITE16_MEMBER(twin16_state::videoram16_w)
 
 READ16_MEMBER(twin16_state::extra_rom_r)
 {
-	return ((UINT16 *)machine().region("gfx3")->base())[offset];
+	return ((UINT16 *)machine().root_device().memregion("gfx3")->base())[offset];
 }
 
 READ16_MEMBER(twin16_state::twin16_gfx_rom1_r)
@@ -1305,7 +1305,7 @@ static void gfx_untangle( running_machine &machine )
 	int i;
 	UINT16 *temp = auto_alloc_array(machine, UINT16, 0x200000/2);
 
-	state->m_gfx_rom = (UINT16 *)machine.region("gfx2")->base();
+	state->m_gfx_rom = (UINT16 *)state->memregion("gfx2")->base();
 	memcpy( temp, state->m_gfx_rom, 0x200000 );
 
 	for( i=0; i<0x080000; i++ )

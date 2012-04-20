@@ -400,7 +400,7 @@ static SCREEN_UPDATE_RGB32(galpani3)
 
 	state->m_sprite_bitmap_1.fill(0x0000, cliprect);
 
-	state->m_spritegen->skns_draw_sprites(screen.machine(), state->m_sprite_bitmap_1, cliprect, &state->m_spriteram32[0], 0x4000, screen.machine().region("gfx1")->base(), screen.machine().region ("gfx1")->bytes(), state->m_spc_regs );
+	state->m_spritegen->skns_draw_sprites(screen.machine(), state->m_sprite_bitmap_1, cliprect, &state->m_spriteram32[0], 0x4000, screen.machine().root_device().memregion("gfx1")->base(), screen.machine().root_device().memregion ("gfx1")->bytes(), state->m_spc_regs );
 
 	// ignoring priority bits for now..
 	for (y=0;y<240;y++)
@@ -748,7 +748,7 @@ WRITE16_MEMBER(galpani3_state::galpani3_regs1_go_w)
 {
 
 	UINT32 address = m_regs1_address_regs[1]| (m_regs1_address_regs[0]<<16);
-	UINT8* rledata = machine().region("gfx2")->base();
+	UINT8* rledata = memregion("gfx2")->base();
 
 	printf("galpani3_regs1_go_w? %08x\n",address );
 	if ((data==0x2000) || (data==0x3000)) gp3_do_rle(address, m_framebuffer1, rledata);
@@ -766,7 +766,7 @@ WRITE16_MEMBER(galpani3_state::galpani3_regs2_go_w)
 {
 
 	UINT32 address = m_regs2_address_regs[1]| (m_regs2_address_regs[0]<<16);
-	UINT8* rledata = machine().region("gfx2")->base();
+	UINT8* rledata = memregion("gfx2")->base();
 
 	printf("galpani3_regs2_go_w? %08x\n", address );
 
@@ -788,7 +788,7 @@ WRITE16_MEMBER(galpani3_state::galpani3_regs3_go_w)
 {
 
 	UINT32 address =  m_regs3_address_regs[1]| (m_regs3_address_regs[0]<<16);
-	UINT8* rledata = machine().region("gfx2")->base();
+	UINT8* rledata = memregion("gfx2")->base();
 
 	printf("galpani3_regs3_go_w? %08x\n",address );
 

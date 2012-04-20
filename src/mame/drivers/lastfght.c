@@ -148,7 +148,7 @@ static SCREEN_UPDATE_IND16( lastfght )
 #if 1
 	// gfx roms viewer (toggle with enter, use pgup/down to browse)
 	int x, y, count = 0;
-	UINT8 *gfxdata = screen.machine().region("gfx1")->base();
+	UINT8 *gfxdata = screen.machine().root_device().memregion("gfx1")->base();
 	UINT8 data;
 
 	if (screen.machine().input().code_pressed_once(KEYCODE_ENTER))	state->m_view_roms ^= 1;
@@ -156,7 +156,7 @@ static SCREEN_UPDATE_IND16( lastfght )
 	{
 		if (screen.machine().input().code_pressed_once(KEYCODE_PGDN))	state->m_base += 512 * 256;
 		if (screen.machine().input().code_pressed_once(KEYCODE_PGUP))	state->m_base -= 512 * 256;
-		state->m_base %= screen.machine().region("gfx1")->bytes();
+		state->m_base %= state->memregion("gfx1")->bytes();
 
 		count = state->m_base;
 
@@ -330,7 +330,7 @@ WRITE16_MEMBER(lastfght_state::lastfght_blit_w)
 	if (ACCESSING_BITS_8_15)
 	{
 		int x, y, addr;
-		UINT8 *gfxdata = machine().region( "gfx1" )->base();
+		UINT8 *gfxdata = memregion( "gfx1" )->base();
 		bitmap_ind16 &dest = m_bitmap[m_dest];
 
 #if 0
@@ -621,7 +621,7 @@ ROM_END
 
 static DRIVER_INIT(lastfght)
 {
-	UINT16 *rom = (UINT16*)machine.region("maincpu")->base();
+	UINT16 *rom = (UINT16*)machine.root_device().memregion("maincpu")->base();
 
 	// pass initial check (protection ? hw?)
 	rom[0x00354 / 2] = 0x403e;

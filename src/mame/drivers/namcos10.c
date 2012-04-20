@@ -339,7 +339,7 @@ WRITE32_MEMBER(namcos10_state::bank_w)
 
 READ32_MEMBER(namcos10_state::range_r)
 {
-	UINT32 data32 = ((const UINT32 *)(machine().region("user1")->base()))[offset+bank_base];
+	UINT32 data32 = ((const UINT32 *)(machine().root_device().memregion("user1")->base()))[offset+bank_base];
 
 	UINT16 d16;
 	if(ACCESSING_BITS_16_31)
@@ -491,8 +491,8 @@ ADDRESS_MAP_END
 static void memn_driver_init( running_machine &machine )
 {
 	namcos10_state *state = machine.driver_data<namcos10_state>();
-	UINT8 *BIOS = (UINT8 *)machine.region( "user1" )->base();
-	state->nand_base = (UINT8 *)machine.region( "user2" )->base();
+	UINT8 *BIOS = (UINT8 *)machine.root_device().memregion( "user1" )->base();
+	state->nand_base = (UINT8 *)state->memregion( "user2" )->base();
 
 	state->nand_copy( (UINT32 *)( BIOS + 0x0000000 ), 0x08000, 0x001c000 );
 	state->nand_copy( (UINT32 *)( BIOS + 0x0020000 ), 0x24000, 0x03e0000 );
@@ -503,7 +503,7 @@ static void memn_driver_init( running_machine &machine )
 static void decrypt_bios( running_machine &machine, const char *regionName, int start, int b15, int b14, int b13, int b12, int b11, int b10, int b9, int b8,
 	int b7, int b6, int b5, int b4, int b3, int b2, int b1, int b0 )
 {
-	const memory_region *region = machine.region( regionName );
+	memory_region *region = machine.root_device().memregion( regionName );
 	UINT16 *BIOS = (UINT16 *)( region->base() + start );
 	int len = (region->bytes()-start)/2;
 

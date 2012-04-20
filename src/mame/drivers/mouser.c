@@ -295,9 +295,9 @@ static DRIVER_INIT( mouser )
 
 	offs_t i;
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	UINT8 *rom = machine.region("maincpu")->base();
+	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
 	UINT8 *decrypted = auto_alloc_array(machine, UINT8, 0x6000);
-	UINT8 *table = machine.region("user1")->base();
+	UINT8 *table = machine.root_device().memregion("user1")->base();
 
 	space->set_decrypted_region(0x0000, 0x5fff, decrypted);
 

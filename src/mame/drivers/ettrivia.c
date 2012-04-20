@@ -87,7 +87,7 @@ WRITE8_MEMBER(ettrivia_state::ettrivia_control_w)
 
 READ8_MEMBER(ettrivia_state::ettrivia_question_r)
 {
-	UINT8 *QUESTIONS = machine().region("user1")->base();
+	UINT8 *QUESTIONS = memregion("user1")->base();
 	return QUESTIONS[offset + 0x10000 * m_question_bank];
 }
 
@@ -215,7 +215,7 @@ static TILE_GET_INFO( get_tile_info_fg )
 
 static PALETTE_INIT( ettrivia )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	static const int resistances[2] = { 270, 130 };
 	double weights[2];
 	int i;

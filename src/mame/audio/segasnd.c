@@ -155,7 +155,7 @@ static DEVICE_START( speech_sound )
 {
 	speech_state *state = get_safe_speech(device);
 
-	state->speech = device->machine().region("speech")->base();
+	state->speech = device->machine().root_device().memregion("speech")->base();
 }
 
 

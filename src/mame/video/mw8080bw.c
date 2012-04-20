@@ -229,7 +229,7 @@ SCREEN_UPDATE_RGB32( phantom2 )
 
 	UINT16 cloud_counter = state->m_phantom2_cloud_counter;
 
-	UINT8 *cloud_region = screen.machine().region("proms")->base();
+	UINT8 *cloud_region = state->memregion("proms")->base();
 
 	while (1)
 	{

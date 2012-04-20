@@ -338,7 +338,7 @@ static TILE_GET_INFO( get_dmndrby_tile_info )
 static VIDEO_START(dderby)
 {
 	dmndrby_state *state = machine.driver_data<dmndrby_state>();
-	state->m_racetrack_tilemap_rom = machine.region("user1")->base();
+	state->m_racetrack_tilemap_rom = state->memregion("user1")->base();
 	state->m_racetrack_tilemap = tilemap_create(machine,get_dmndrby_tile_info,tilemap_scan_rows,16,16, 16, 512);
 	state->m_racetrack_tilemap->mark_all_dirty();
 
@@ -444,7 +444,7 @@ wouldnt like to say its the most effective way though...
 // copied from elsewhere. surely incorrect
 static PALETTE_INIT( dmnderby )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	static const int resistances_rg[3] = { 1000, 470, 220 };
 	static const int resistances_b [2] = { 470, 220 };
 	double rweights[3], gweights[3], bweights[2];
@@ -486,7 +486,7 @@ static PALETTE_INIT( dmnderby )
 	}
 
 	/* color_prom now points to the beginning of the lookup table */
-	color_prom = machine.region("proms2")->base();
+	color_prom = machine.root_device().memregion("proms2")->base();
 
 	/* normal tiles use colors 0-15 */
 	for (i = 0x000; i < 0x300; i++)

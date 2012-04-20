@@ -142,7 +142,7 @@ WRITE8_MEMBER(fastfred_state::imago_sprites_bank_w)
 
 WRITE8_MEMBER(fastfred_state::imago_sprites_dma_w)
 {
-	UINT8 *rom = (UINT8 *)machine().region("gfx2")->base();
+	UINT8 *rom = (UINT8 *)machine().root_device().memregion("gfx2")->base();
 	UINT8 sprites_data;
 
 	sprites_data = rom[m_imago_sprites_address + 0x2000*0 + m_imago_sprites_bank * 0x1000];

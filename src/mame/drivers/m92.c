@@ -252,14 +252,14 @@ static TIMER_DEVICE_CALLBACK( m92_scanline_interrupt )
 
 READ16_MEMBER(m92_state::m92_eeprom_r)
 {
-	UINT8 *RAM = machine().region("eeprom")->base();
+	UINT8 *RAM = memregion("eeprom")->base();
 //  logerror("%05x: EEPROM RE %04x\n",cpu_get_pc(&space.device()),offset);
 	return RAM[offset] | 0xff00;
 }
 
 WRITE16_MEMBER(m92_state::m92_eeprom_w)
 {
-	UINT8 *RAM = machine().region("eeprom")->base();
+	UINT8 *RAM = memregion("eeprom")->base();
 //  logerror("%05x: EEPROM WR %04x\n",cpu_get_pc(&space.device()),offset);
 	if (ACCESSING_BITS_0_7)
 		RAM[offset] = data;
@@ -2060,7 +2060,7 @@ ROM_END
 static DRIVER_INIT( m92 )
 {
 	m92_state *state = machine.driver_data<m92_state>();
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = state->memregion("maincpu")->base();
 
 	state->membank("bank1")->set_base(&ROM[0xa0000]);
 
@@ -2072,7 +2072,7 @@ static DRIVER_INIT( m92 )
 static DRIVER_INIT( m92_alt )
 {
 	m92_state *state = machine.driver_data<m92_state>();
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = state->memregion("maincpu")->base();
 
 	state->membank("bank1")->set_base(&ROM[0xa0000]);
 
@@ -2093,7 +2093,7 @@ static DRIVER_INIT( lethalth )
 static DRIVER_INIT( m92_bank )
 {
 	m92_state *state = machine.driver_data<m92_state>();
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = state->memregion("maincpu")->base();
 
 	state->membank("bank1")->configure_entries(0, 4, &ROM[0x80000], 0x20000);
 	machine.device("maincpu")->memory().space(AS_IO)->install_write_handler(0x20, 0x21, write16_delegate(FUNC(m92_state::m92_bankswitch_w),state));
@@ -2106,7 +2106,7 @@ static DRIVER_INIT( m92_bank )
 static DRIVER_INIT( majtitl2 )
 {
 	m92_state *state = machine.driver_data<m92_state>();
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = state->memregion("maincpu")->base();
 
 	state->membank("bank1")->configure_entries(0, 4, &ROM[0x80000], 0x20000);
 	machine.device("maincpu")->memory().space(AS_IO)->install_write_handler(0x20, 0x21, write16_delegate(FUNC(m92_state::m92_bankswitch_w),state));
@@ -2122,7 +2122,7 @@ static DRIVER_INIT( majtitl2 )
 static DRIVER_INIT( ppan )
 {
 	m92_state *state = machine.driver_data<m92_state>();
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = state->memregion("maincpu")->base();
 	state->membank("bank1")->set_base(&ROM[0xa0000]);
 
 	state->m_game_kludge = 0;

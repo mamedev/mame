@@ -15,8 +15,8 @@ static TILE_GET_INFO( get_bgtile_info )
 {
 	int code,attr,pal;
 
-	code=machine.region("user1")->base()[tile_index]; /* TTTTTTTT */
-	attr=machine.region("user2")->base()[tile_index]; /* -PPP--TT - FIXED BITS (0xxx00xx) */
+	code=machine.root_device().memregion("user1")->base()[tile_index]; /* TTTTTTTT */
+	attr=machine.root_device().memregion("user2")->base()[tile_index]; /* -PPP--TT - FIXED BITS (0xxx00xx) */
 	code+=(attr&3)<<8;
 	pal=(attr>>4);
 
@@ -31,8 +31,8 @@ static TILE_GET_INFO( get_fgtile_info )
 {
 	int code,attr,pal;
 
-	code=machine.region("user3")->base()[tile_index]; /* TTTTTTTT */
-	attr=machine.region("user4")->base()[tile_index]; /* -PPP--TT - FIXED BITS (0xxx00xx) */
+	code=machine.root_device().memregion("user3")->base()[tile_index]; /* TTTTTTTT */
+	attr=machine.root_device().memregion("user4")->base()[tile_index]; /* -PPP--TT - FIXED BITS (0xxx00xx) */
 	pal=attr>>4;
 
 	code+=(attr&3)<<8;
@@ -71,7 +71,7 @@ static TILE_GET_INFO( get_txttile_info )
 
 PALETTE_INIT(darkmist)
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 
 	/* allocate the colortable */

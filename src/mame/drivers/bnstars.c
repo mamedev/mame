@@ -1487,7 +1487,7 @@ static DRIVER_INIT (bnstars)
 	decrypt_ms32_tx(machine, 0x00020,0x7e, "gfx7");
 	decrypt_ms32_bg(machine, 0x00001,0x9b, "gfx6");
 
-	machine.root_device().membank("bank1")->set_base(machine.region("maincpu")->base());
+	machine.root_device().membank("bank1")->set_base(machine.root_device().memregion("maincpu")->base());
 }
 
 GAME( 1997, bnstars1, 0,        bnstars, bnstars, bnstars, ROT0,   "Jaleco", "Vs. Janshi Brandnew Stars", GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND )

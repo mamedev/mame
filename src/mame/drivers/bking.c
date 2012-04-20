@@ -59,7 +59,7 @@ WRITE8_MEMBER(bking_state::bking3_addr_h_w)
 
 READ8_MEMBER(bking_state::bking3_extrarom_r)
 {
-	UINT8 *rom = machine().region("user2")->base();
+	UINT8 *rom = memregion("user2")->base();
 	return rom[m_addr_h * 256 + m_addr_l];
 }
 

@@ -290,8 +290,8 @@ WRITE16_MEMBER(seta_state::seta_vregs_w)
 
 				if (new_bank != m_samples_bank)
 				{
-					UINT8 *rom = machine().region("x1snd")->base();
-					int samples_len = machine().region("x1snd")->bytes();
+					UINT8 *rom = memregion("x1snd")->base();
+					int samples_len = memregion("x1snd")->bytes();
 					int addr;
 
 					m_samples_bank = new_bank;
@@ -665,7 +665,7 @@ PALETTE_INIT( zingzip )
 // color prom
 PALETTE_INIT( inttoote )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int x;
 	for (x = 0; x < 0x200 ; x++)
 	{
@@ -684,7 +684,7 @@ PALETTE_INIT( setaroul )
 
 PALETTE_INIT( usclssic )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int color, pen;
 	int x;
 

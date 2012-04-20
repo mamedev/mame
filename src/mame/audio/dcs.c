@@ -955,8 +955,8 @@ void dcs_init(running_machine &machine)
 	dcs.dmadac[0] = machine.device<dmadac_sound_device>("dac");
 
 	/* configure boot and sound ROMs */
-	dcs.bootrom = (UINT16 *)machine.region("dcs")->base();
-	dcs.bootrom_words = machine.region("dcs")->bytes() / 2;
+	dcs.bootrom = (UINT16 *)machine.root_device().memregion("dcs")->base();
+	dcs.bootrom_words = machine.root_device().memregion("dcs")->bytes() / 2;
 	dcs.sounddata = dcs.bootrom;
 	dcs.sounddata_words = dcs.bootrom_words;
 	dcs.sounddata_banks = dcs.sounddata_words / 0x1000;
@@ -1008,8 +1008,8 @@ void dcs2_init(running_machine &machine, int dram_in_mb, offs_t polling_offset)
 	dcs.dmadac[1] = machine.device<dmadac_sound_device>("dac2");
 
 	/* always boot from the base of "dcs" */
-	dcs.bootrom = (UINT16 *)machine.region("dcs")->base();
-	dcs.bootrom_words = machine.region("dcs")->bytes() / 2;
+	dcs.bootrom = (UINT16 *)machine.root_device().memregion("dcs")->base();
+	dcs.bootrom_words = machine.root_device().memregion("dcs")->bytes() / 2;
 
 	/* supports both RAM and ROM variants */
 	if (dram_in_mb != 0)

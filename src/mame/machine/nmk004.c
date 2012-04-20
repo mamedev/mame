@@ -175,7 +175,7 @@ static void oki_play_sample(int sample_no)
 
 		if (sample != 0)
 		{
-			UINT8 *rom = NMK004_state.machine().region((chip == 0) ? "oki1" : "oki2")->base();
+			UINT8 *rom = NMK004_state.machine().root_device().memregion((chip == 0) ? "oki1" : "oki2")->base();
 			int bank = (byte2 & 0x0c) >> 2;
 			int vol = (byte2 & 0x70) >> 4;
 
@@ -1033,7 +1033,7 @@ static TIMER_CALLBACK( real_nmk004_init )
 	NMK004_state.oki1device = machine.device<okim6295_device>("oki1");
 	NMK004_state.oki2device = machine.device<okim6295_device>("oki2");
 
-	NMK004_state.rom = machine.region("audiocpu")->base();
+	NMK004_state.rom = machine.root_device().memregion("audiocpu")->base();
 
 	ym2203_control_port_w(NMK004_state.ymdevice, 0, 0x2f);
 

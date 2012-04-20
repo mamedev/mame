@@ -67,7 +67,7 @@ static void answer_bankswitch(running_machine &machine,UINT8 new_bank)
 	deshoros_state *state = machine.driver_data<deshoros_state>();
 	if(state->m_bank!=new_bank)
 	{
-		UINT8 *ROM = machine.region("data")->base();
+		UINT8 *ROM = state->memregion("data")->base();
 		UINT32 bankaddress;
 
 		state->m_bank = new_bank;

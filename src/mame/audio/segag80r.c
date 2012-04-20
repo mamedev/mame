@@ -488,7 +488,7 @@ static WRITE8_DEVICE_HANDLER( sega005_sound_a_w )
 INLINE void sega005_update_sound_data(running_machine &machine)
 {
 	segag80r_state *state = machine.driver_data<segag80r_state>();
-	UINT8 newval = machine.region("005")->base()[state->m_sound_addr];
+	UINT8 newval = state->memregion("005")->base()[state->m_sound_addr];
 	UINT8 diff = newval ^ state->m_sound_data;
 
 	//mame_printf_debug("  [%03X] = %02X\n", state->m_sound_addr, newval);
@@ -589,7 +589,7 @@ DEVICE_GET_INFO( sega005_sound )
 static STREAM_UPDATE( sega005_stream_update )
 {
 	segag80r_state *state = device->machine().driver_data<segag80r_state>();
-	const UINT8 *sound_prom = device->machine().region("proms")->base();
+	const UINT8 *sound_prom = state->memregion("proms")->base();
 	int i;
 
 	/* no implementation yet */
@@ -881,7 +881,7 @@ static WRITE8_DEVICE_HANDLER( monsterb_sound_a_w )
 	tms36xx_note_w(tms, 0, data & 15);
 
 	/* Top four data lines address an 82S123 ROM that enables/disables voices */
-	enable_val = device->machine().region("prom")->base()[(data & 0xF0) >> 4];
+	enable_val = device->machine().root_device().memregion("prom")->base()[(data & 0xF0) >> 4];
 	tms3617_enable_w(tms, enable_val >> 2);
 }
 
@@ -963,7 +963,7 @@ static WRITE8_DEVICE_HANDLER( n7751_rom_control_w )
 		case 3:
 			state->m_sound_addr &= 0xfff;
 			{
-				int numroms = device->machine().region("n7751")->bytes() / 0x1000;
+				int numroms = state->memregion("n7751")->bytes() / 0x1000;
 				if (!(data & 0x01) && numroms >= 1) state->m_sound_addr |= 0x0000;
 				if (!(data & 0x02) && numroms >= 2) state->m_sound_addr |= 0x1000;
 				if (!(data & 0x04) && numroms >= 3) state->m_sound_addr |= 0x2000;
@@ -977,7 +977,7 @@ static WRITE8_DEVICE_HANDLER( n7751_rom_control_w )
 READ8_MEMBER(segag80r_state::n7751_rom_r)
 {
 	/* read from BUS */
-	return machine().region("n7751")->base()[m_sound_addr];
+	return memregion("n7751")->base()[m_sound_addr];
 }
 
 

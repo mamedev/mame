@@ -260,7 +260,7 @@ static DEVICE_START( gaelco )
 		info->banks[j] = intf->banks[j];
 	}
 	info->stream = device->machine().sound().stream_alloc(*device, 0, 2, 8000, info, gaelco_update);
-	info->snd_data = (UINT8 *)device->machine().region(intf->gfxregion)->base();
+	info->snd_data = (UINT8 *)device->machine().root_device().memregion(intf->gfxregion)->base();
 	if (info->snd_data == NULL)
 		info->snd_data = *device->region();
 

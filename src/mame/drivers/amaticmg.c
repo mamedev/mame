@@ -413,7 +413,7 @@ static SCREEN_UPDATE_IND16( amaticmg )
 
 static PALETTE_INIT( amaticmg )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int	bit0, bit1, bit2 , r, g, b;
 	int	i;
 
@@ -440,7 +440,7 @@ static PALETTE_INIT( amaticmg )
 
 static PALETTE_INIT( amaticmg3 )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int	r, g, b;
 	int	i;
 

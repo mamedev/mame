@@ -236,7 +236,7 @@ VIDEO_START( berlwall )
 {
 	kaneko16_state *state = machine.driver_data<kaneko16_state>();
 	int sx, x,y;
-	UINT8 *RAM	=	machine.region("gfx3")->base();
+	UINT8 *RAM	=	state->memregion("gfx3")->base();
 
 	/* Render the hi-color static backgrounds held in the ROMs */
 

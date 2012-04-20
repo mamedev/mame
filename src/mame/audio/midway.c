@@ -231,7 +231,7 @@ void midway_ssio_device::compute_ay8910_modulation()
 	//
 
 	// loop over all possible values of the duty cycle
-	UINT8 *prom = machine().region("proms")->base();
+	UINT8 *prom = memregion("proms")->base();
 	for (int volval = 0; volval < 16; volval++)
 	{
 		// loop over all the clocks until we run out; look up in the PROM
@@ -446,6 +446,27 @@ static MACHINE_CONFIG_FRAGMENT( midway_ssio )
 	MCFG_SOUND_CONFIG(ssio_ay8910_interface_2)
 	MCFG_MIXER_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.33, 1)
 MACHINE_CONFIG_END
+
+
+//-------------------------------------------------
+//  ROM definitions
+//-------------------------------------------------
+
+ROM_START( midway_ssio )
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "82s123.12d",   0x0000, 0x0020, CRC(e1281ee9) SHA1(9ac9b01d24affc0ee9227a4364c4fd8f8290343a) )	/* from shollow, assuming it's the same */
+ROM_END
+
+
+//-------------------------------------------------
+//  device_mconfig_additions - return a pointer to
+//  the device's machine fragment
+//-------------------------------------------------
+
+const rom_entry *midway_ssio_device::device_rom_region() const
+{
+	return ROM_NAME(midway_ssio);
+}
 
 
 //-------------------------------------------------

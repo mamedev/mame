@@ -143,7 +143,7 @@ static TILE_GET_INFO( get_pturn_bg_tile_info )
 {
 	pturn_state *state = machine.driver_data<pturn_state>();
 	int tileno,palno;
-	tileno = machine.region("user1")->base()[tile_index];
+	tileno = state->memregion("user1")->base()[tile_index];
 	palno=state->m_bgpalette;
 	if(palno==1)
 	{

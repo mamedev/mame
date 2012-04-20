@@ -837,7 +837,7 @@ MACHINE_CONFIG_END
 
 static DRIVER_INIT( aleck64 )
 {
-	UINT8 *rom = machine.region("user2")->base();
+	UINT8 *rom = machine.root_device().memregion("user2")->base();
 
 	rom[0x67c] = 0;
 	rom[0x67d] = 0;

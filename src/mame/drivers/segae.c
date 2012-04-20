@@ -437,10 +437,10 @@ WRITE8_MEMBER( systeme_state::bank_write )
 void systeme_state::driver_start()
 {
 	/* Allocate video RAM */
-	m_vdp1_vram = machine().region_alloc("vdp1_vram", 2 * 0x4000, 1, ENDIANNESS_LITTLE);
-	m_vdp2_vram = machine().region_alloc("vdp2_vram", 2 * 0x4000, 1, ENDIANNESS_LITTLE);
+	m_vdp1_vram = machine().memory().region_alloc("vdp1_vram", 2 * 0x4000, 1, ENDIANNESS_LITTLE);
+	m_vdp2_vram = machine().memory().region_alloc("vdp2_vram", 2 * 0x4000, 1, ENDIANNESS_LITTLE);
 
-	membank("bank1")->configure_entries(0, 16, machine().region("maincpu")->base() + 0x10000, 0x4000);
+	membank("bank1")->configure_entries(0, 16, memregion("maincpu")->base() + 0x10000, 0x4000);
 
 	if ( !strcmp( system().name, "ridleofp" ) )
 	{

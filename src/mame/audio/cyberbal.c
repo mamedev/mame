@@ -20,7 +20,7 @@ void cyberbal_sound_reset(running_machine &machine)
 	cyberbal_state *state = machine.driver_data<cyberbal_state>();
 
 	/* reset the sound system */
-	state->m_bank_base = &machine.region("audiocpu")->base()[0x10000];
+	state->m_bank_base = &state->memregion("audiocpu")->base()[0x10000];
 	state->membank("soundbank")->set_base(&state->m_bank_base[0x0000]);
 	state->m_fast_68k_int = state->m_io_68k_int = 0;
 	state->m_sound_data_from_68k = state->m_sound_data_from_6502 = 0;

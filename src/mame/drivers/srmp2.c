@@ -171,7 +171,7 @@ static WRITE16_DEVICE_HANDLER( srmp2_adpcm_code_w )
 */
 
 	srmp2_state *state = device->machine().driver_data<srmp2_state>();
-	UINT8 *ROM = device->machine().region("adpcm")->base();
+	UINT8 *ROM = state->memregion("adpcm")->base();
 
 	state->m_adpcm_sptr = (ROM[((state->m_adpcm_bank * 0x10000) + (data << 2) + 0)] << 8);
 	state->m_adpcm_eptr = (ROM[((state->m_adpcm_bank * 0x10000) + (data << 2) + 1)] << 8);
@@ -195,7 +195,7 @@ static WRITE8_DEVICE_HANDLER( srmp3_adpcm_code_w )
 */
 
 	srmp2_state *state = device->machine().driver_data<srmp2_state>();
-	UINT8 *ROM = device->machine().region("adpcm")->base();
+	UINT8 *ROM = state->memregion("adpcm")->base();
 
 	state->m_adpcm_sptr = (ROM[((state->m_adpcm_bank * 0x10000) + (data << 2) + 0)] << 8);
 	state->m_adpcm_eptr = (ROM[((state->m_adpcm_bank * 0x10000) + (data << 2) + 1)] << 8);
@@ -212,7 +212,7 @@ static WRITE8_DEVICE_HANDLER( srmp3_adpcm_code_w )
 static void srmp2_adpcm_int(device_t *device)
 {
 	srmp2_state *state = device->machine().driver_data<srmp2_state>();
-	UINT8 *ROM = device->machine().region("adpcm")->base();
+	UINT8 *ROM = state->memregion("adpcm")->base();
 
 	if (state->m_adpcm_sptr)
 	{
@@ -357,7 +357,7 @@ WRITE8_MEMBER(srmp2_state::srmp3_rombank_w)
     xxx- ---- : ADPCM ROM bank
 */
 
-	UINT8 *ROM = machine().region("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 	int addr;
 
 	m_adpcm_bank = ((data & 0xe0) >> 5);
@@ -507,7 +507,7 @@ WRITE8_MEMBER(srmp2_state::rmgoldyh_rombank_w)
     xxx- ---- : ADPCM ROM bank
 */
 
-	UINT8 *ROM = machine().region("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 	int addr;
 
 	m_adpcm_bank = ((data & 0xe0) >> 5);

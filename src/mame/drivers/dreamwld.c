@@ -168,7 +168,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	const gfx_element *gfx = machine.gfx[0];
 	UINT32 *source = state->m_spritebuf1;
 	UINT32 *finish = state->m_spritebuf1 + 0x1000 / 4;
-	UINT16 *redirect = (UINT16 *)machine.region("spritelut")->base();
+	UINT16 *redirect = (UINT16 *)state->memregion("spritelut")->base();
 
 	while (source < finish)
 	{
@@ -408,8 +408,8 @@ READ32_MEMBER(dreamwld_state::dreamwld_protdata_r)
 	//printf("protection read %04x\n", count);
 	//count++;
 
-	UINT8 *protdata = machine().region("user1")->base();
-	size_t protsize = machine().region("user1")->bytes();
+	UINT8 *protdata = memregion("user1")->base();
+	size_t protsize = memregion("user1")->bytes();
 	UINT8 dat = protdata[(m_protindex++) % protsize];
 
 	// real hw returns 00 after end of data, I haven't checked if it's possible to overflow the read counter
@@ -421,7 +421,7 @@ READ32_MEMBER(dreamwld_state::dreamwld_protdata_r)
 
 WRITE32_MEMBER(dreamwld_state::dreamwld_6295_0_bank_w)
 {
-	UINT8 *sound = machine().region("oki1")->base();
+	UINT8 *sound = memregion("oki1")->base();
 
 	if (ACCESSING_BITS_0_7)
 		memcpy(sound + 0x30000, sound + 0xb0000 + 0x10000 * (data&0x3), 0x10000);
@@ -431,7 +431,7 @@ WRITE32_MEMBER(dreamwld_state::dreamwld_6295_0_bank_w)
 
 WRITE32_MEMBER(dreamwld_state::dreamwld_6295_1_bank_w)
 {
-	UINT8 *sound = machine().region("oki2")->base();
+	UINT8 *sound = memregion("oki2")->base();
 
 	if (ACCESSING_BITS_0_7)
 		memcpy(sound + 0x30000, sound + 0xb0000 + 0x10000 * (data&0x3), 0x10000);

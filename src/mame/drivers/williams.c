@@ -2730,7 +2730,7 @@ static DRIVER_INIT( defender )
 static DRIVER_INIT( defndjeu )
 {
 	williams_state *state = machine.driver_data<williams_state>();
-	UINT8 *rom = machine.region("maincpu")->base();
+	UINT8 *rom = state->memregion("maincpu")->base();
 	int i;
 
 	CONFIGURE_BLITTER(WILLIAMS_BLITTER_NONE, 0x0000);

@@ -1277,13 +1277,13 @@ static void model3_init(running_machine &machine, int step)
 	state->m_sound_irq_enable = 0;
 	state->m_sound_timer->adjust(attotime::never);
 
-	state->membank("bank1")->set_base(machine.region( "user1" )->base() + 0x800000 ); /* banked CROM */
+	state->membank("bank1")->set_base(machine.root_device().memregion( "user1" )->base() + 0x800000 ); /* banked CROM */
 
-	state->membank("bank4")->set_base(machine.region("samples")->base() + 0x200000);
-	state->membank("bank5")->set_base(machine.region("samples")->base() + 0x600000);
+	state->membank("bank4")->set_base(machine.root_device().memregion("samples")->base() + 0x200000);
+	state->membank("bank5")->set_base(machine.root_device().memregion("samples")->base() + 0x600000);
 
 	// copy the 68k vector table into RAM
-	memcpy(state->m_soundram, machine.region("audiocpu")->base()+0x80000, 16);
+	memcpy(state->m_soundram, state->memregion("audiocpu")->base()+0x80000, 16);
 	machine.device("audiocpu")->reset();
 
 	model3_machine_init(machine, step);	// step 1.5
@@ -1589,7 +1589,7 @@ WRITE64_MEMBER(model3_state::model3_sys_w)
 				data >>= 56;
 				data = (~data) & 0x7;
 
-				membank("bank1")->set_base(machine().region( "user1" )->base() + 0x800000 + (data * 0x800000)); /* banked CROM */
+				membank("bank1")->set_base(machine().root_device().memregion( "user1" )->base() + 0x800000 + (data * 0x800000)); /* banked CROM */
 			}
 			if (ACCESSING_BITS_24_31)
 			{
@@ -1845,8 +1845,8 @@ WRITE64_MEMBER(model3_state::daytona2_rombank_w)
 	{
 		data >>= 56;
 		data = (~data) & 0xf;
-		membank("bank1")->set_base(machine().region( "user1" )->base() + 0x800000 + (data * 0x800000)); /* banked CROM */
-		membank("bank2")->set_base(machine().region( "user1" )->base() + 0x800000 + (data * 0x800000)); /* banked CROM */
+		membank("bank1")->set_base(machine().root_device().memregion( "user1" )->base() + 0x800000 + (data * 0x800000)); /* banked CROM */
+		membank("bank2")->set_base(machine().root_device().memregion( "user1" )->base() + 0x800000 + (data * 0x800000)); /* banked CROM */
 	}
 }
 
@@ -5044,9 +5044,9 @@ ROM_END
 WRITE16_MEMBER(model3_state::model3snd_ctrl)
 {
 	// handle sample banking
-	if (machine().region("scsp2")->bytes() > 0x800000)
+	if (machine().root_device().memregion("scsp2")->bytes() > 0x800000)
 	{
-		UINT8 *snd = machine().region("scsp2")->base();
+		UINT8 *snd = memregion("scsp2")->base();
 		if (data & 0x20)
 		{
 			membank("bank4")->set_base(snd + 0x200000);
@@ -5302,9 +5302,9 @@ static void interleave_vroms(running_machine &machine)
 	model3_state *state = machine.driver_data<model3_state>();
 	int start;
 	int i,j,x;
-	UINT16 *vrom1 = (UINT16*)machine.region("user3")->base();
-	UINT16 *vrom2 = (UINT16*)machine.region("user4")->base();
-	int vrom_length = machine.region("user3")->bytes();
+	UINT16 *vrom1 = (UINT16*)machine.root_device().memregion("user3")->base();
+	UINT16 *vrom2 = (UINT16*)machine.root_device().memregion("user4")->base();
+	int vrom_length = state->memregion("user3")->bytes();
 	UINT16 *vrom;
 
 	state->m_vrom = auto_alloc_array(machine, UINT32, 0x4000000/4);
@@ -5369,7 +5369,7 @@ static DRIVER_INIT( model3_20 )
 static DRIVER_INIT( lostwsga )
 {
 	model3_state *state = machine.driver_data<model3_state>();
-	UINT32 *rom = (UINT32*)machine.region("user1")->base();
+	UINT32 *rom = (UINT32*)state->memregion("user1")->base();
 
 	DRIVER_INIT_CALL(model3_15);
 	/* TODO: there's an M68K device at 0xC0000000 - FF, maybe lightgun controls ? */
@@ -5381,7 +5381,7 @@ static DRIVER_INIT( lostwsga )
 static DRIVER_INIT( scud )
 {
 	model3_state *state = machine.driver_data<model3_state>();
-	UINT32 *rom = (UINT32*)machine.region("user1")->base();
+	UINT32 *rom = (UINT32*)state->memregion("user1")->base();
 
 	DRIVER_INIT_CALL(model3_15);
 	/* TODO: network device at 0xC0000000 - FF */
@@ -5394,7 +5394,7 @@ static DRIVER_INIT( scud )
 static DRIVER_INIT( scudp )
 {
 	model3_state *state = machine.driver_data<model3_state>();
-	UINT32 *rom = (UINT32*)machine.region("user1")->base();
+	UINT32 *rom = (UINT32*)state->memregion("user1")->base();
 
 	DRIVER_INIT_CALL(model3_15);
 	/* TODO: network device at 0xC0000000 - FF */
@@ -5412,7 +5412,7 @@ static DRIVER_INIT( scudp )
 static DRIVER_INIT( lemans24 )
 {
 	model3_state *state = machine.driver_data<model3_state>();
-	UINT32 *rom = (UINT32*)machine.region("user1")->base();
+	UINT32 *rom = (UINT32*)state->memregion("user1")->base();
 	DRIVER_INIT_CALL(model3_15);
 
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xc1000000, 0xc10000ff, read64_delegate(FUNC(model3_state::scsi_r),state), write64_delegate(FUNC(model3_state::scsi_w),state));
@@ -5426,7 +5426,7 @@ static DRIVER_INIT( lemans24 )
 
 static DRIVER_INIT( vf3 )
 {
-	UINT32 *rom = (UINT32*)machine.region("user1")->base();
+	UINT32 *rom = (UINT32*)machine.root_device().memregion("user1")->base();
 
 	DRIVER_INIT_CALL(model3_10);
 
@@ -5440,7 +5440,7 @@ static DRIVER_INIT( vf3 )
 static DRIVER_INIT( vs215 )
 {
 	model3_state *state = machine.driver_data<model3_state>();
-	UINT32 *rom = (UINT32*)machine.region("user1")->base();
+	UINT32 *rom = (UINT32*)state->memregion("user1")->base();
 
 	rom[(0x70dde0^4)/4] = 0x60000000;
 	rom[(0x70e6f0^4)/4] = 0x60000000;
@@ -5461,7 +5461,7 @@ static DRIVER_INIT( vs215 )
 static DRIVER_INIT( vs29815 )
 {
 	model3_state *state = machine.driver_data<model3_state>();
-	UINT32 *rom = (UINT32*)machine.region("user1")->base();
+	UINT32 *rom = (UINT32*)state->memregion("user1")->base();
 
 	rom[(0x6028ec^4)/4] = 0x60000000;
 	rom[(0x60290c^4)/4] = 0x60000000;
@@ -5481,7 +5481,7 @@ static DRIVER_INIT( vs29815 )
 static DRIVER_INIT( bass )
 {
 	model3_state *state = machine.driver_data<model3_state>();
-	UINT32 *rom = (UINT32*)machine.region("user1")->base();
+	UINT32 *rom = (UINT32*)state->memregion("user1")->base();
 
 	rom[(0x7999a8^4)/4] = 0x60000000;
 	rom[(0x7999c8^4)/4] = 0x60000000;
@@ -5513,7 +5513,7 @@ static DRIVER_INIT( getbass )
 
 static DRIVER_INIT( vs2 )
 {
-	UINT32 *rom = (UINT32*)machine.region("user1")->base();
+	UINT32 *rom = (UINT32*)machine.root_device().memregion("user1")->base();
 
 	DRIVER_INIT_CALL(model3_20);
 
@@ -5523,7 +5523,7 @@ static DRIVER_INIT( vs2 )
 
 static DRIVER_INIT( vs298 )
 {
-	UINT32 *rom = (UINT32*)machine.region("user1")->base();
+	UINT32 *rom = (UINT32*)machine.root_device().memregion("user1")->base();
 
 	DRIVER_INIT_CALL(model3_20);
 
@@ -5534,7 +5534,7 @@ static DRIVER_INIT( vs298 )
 
 static DRIVER_INIT( vs2v991 )
 {
-	UINT32 *rom = (UINT32*)machine.region("user1")->base();
+	UINT32 *rom = (UINT32*)machine.root_device().memregion("user1")->base();
 
 	DRIVER_INIT_CALL(model3_20);
 
@@ -5544,7 +5544,7 @@ static DRIVER_INIT( vs2v991 )
 
 static DRIVER_INIT( vs299b )
 {
-	UINT32 *rom = (UINT32*)machine.region("user1")->base();
+	UINT32 *rom = (UINT32*)machine.root_device().memregion("user1")->base();
 
 	DRIVER_INIT_CALL(model3_20);
 
@@ -5554,7 +5554,7 @@ static DRIVER_INIT( vs299b )
 
 static DRIVER_INIT( vs299a )
 {
-	UINT32 *rom = (UINT32*)machine.region("user1")->base();
+	UINT32 *rom = (UINT32*)machine.root_device().memregion("user1")->base();
 
 	DRIVER_INIT_CALL(model3_20);
 
@@ -5564,7 +5564,7 @@ static DRIVER_INIT( vs299a )
 
 static DRIVER_INIT( vs299 )
 {
-	UINT32 *rom = (UINT32*)machine.region("user1")->base();
+	UINT32 *rom = (UINT32*)machine.root_device().memregion("user1")->base();
 
 	DRIVER_INIT_CALL(model3_20);
 
@@ -5575,7 +5575,7 @@ static DRIVER_INIT( vs299 )
 static DRIVER_INIT( harley )
 {
 	model3_state *state = machine.driver_data<model3_state>();
-	UINT32 *rom = (UINT32*)machine.region("user1")->base();
+	UINT32 *rom = (UINT32*)state->memregion("user1")->base();
 	DRIVER_INIT_CALL(model3_20);
 
 	state->m_network_ram = auto_alloc_array_clear(machine, UINT64, 0x10000);
@@ -5591,7 +5591,7 @@ static DRIVER_INIT( harley )
 static DRIVER_INIT( harleyb )
 {
 	model3_state *state = machine.driver_data<model3_state>();
-	//UINT32 *rom = (UINT32*)machine.region("user1")->base();
+	//UINT32 *rom = (UINT32*)state->memregion("user1")->base();
 	DRIVER_INIT_CALL(model3_20);
 
 	state->m_network_ram = auto_alloc_array_clear(machine, UINT64, 0x10000);
@@ -5607,7 +5607,7 @@ static DRIVER_INIT( harleyb )
 
 static DRIVER_INIT( srally2 )
 {
-	UINT32 *rom = (UINT32*)machine.region("user1")->base();
+	UINT32 *rom = (UINT32*)machine.root_device().memregion("user1")->base();
 	DRIVER_INIT_CALL(model3_20);
 
 	rom[(0x7c0c4^4)/4] = 0x60000000;
@@ -5617,7 +5617,7 @@ static DRIVER_INIT( srally2 )
 
 static DRIVER_INIT( swtrilgy )
 {
-	UINT32 *rom = (UINT32*)machine.region("user1")->base();
+	UINT32 *rom = (UINT32*)machine.root_device().memregion("user1")->base();
 	DRIVER_INIT_CALL(model3_20);
 
 	rom[(0xf0e48^4)/4] = 0x60000000;
@@ -5628,7 +5628,7 @@ static DRIVER_INIT( swtrilgy )
 
 static DRIVER_INIT( swtrilga )
 {
-	UINT32 *rom = (UINT32*)machine.region("user1")->base();
+	UINT32 *rom = (UINT32*)machine.root_device().memregion("user1")->base();
 	DRIVER_INIT_CALL(model3_20);
 
 	rom[(0xf6dd0^4)/4] = 0x60000000;
@@ -5636,7 +5636,7 @@ static DRIVER_INIT( swtrilga )
 
 static DRIVER_INIT( von2 )
 {
-	UINT32 *rom = (UINT32*)machine.region("user1")->base();
+	UINT32 *rom = (UINT32*)machine.root_device().memregion("user1")->base();
 	DRIVER_INIT_CALL(model3_20);
 
 	rom[(0x189168^4)/4] = 0x60000000;
@@ -5648,7 +5648,7 @@ static DRIVER_INIT( von2 )
 
 static DRIVER_INIT( dirtdvls )
 {
-	UINT32 *rom = (UINT32*)machine.region("user1")->base();
+	UINT32 *rom = (UINT32*)machine.root_device().memregion("user1")->base();
 	DRIVER_INIT_CALL(model3_20);
 
 	rom[(0x0600a0^4)/4] = 0x60000000;
@@ -5662,7 +5662,7 @@ static DRIVER_INIT( dirtdvls )
 static DRIVER_INIT( daytona2 )
 {
 	model3_state *state = machine.driver_data<model3_state>();
-	UINT32 *rom = (UINT32*)machine.region("user1")->base();
+	UINT32 *rom = (UINT32*)state->memregion("user1")->base();
 	DRIVER_INIT_CALL(model3_20);
 
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xc3800000, 0xc3800007, write64_delegate(FUNC(model3_state::daytona2_rombank_w),state));
@@ -5677,7 +5677,7 @@ static DRIVER_INIT( daytona2 )
 static DRIVER_INIT( dayto2pe )
 {
 	model3_state *state = machine.driver_data<model3_state>();
-	UINT32 *rom = (UINT32*)machine.region("user1")->base();
+	UINT32 *rom = (UINT32*)state->memregion("user1")->base();
 	DRIVER_INIT_CALL(model3_20);
 
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xc3800000, 0xc3800007, write64_delegate(FUNC(model3_state::daytona2_rombank_w),state));
@@ -5692,7 +5692,7 @@ static DRIVER_INIT( dayto2pe )
 
 static DRIVER_INIT( spikeout )
 {
-	UINT32 *rom = (UINT32*)machine.region("user1")->base();
+	UINT32 *rom = (UINT32*)machine.root_device().memregion("user1")->base();
 	DRIVER_INIT_CALL(model3_20);
 
 	rom[(0x6059cc^4)/4] = 0x60000000;
@@ -5701,7 +5701,7 @@ static DRIVER_INIT( spikeout )
 
 static DRIVER_INIT( spikeofe )
 {
-	UINT32 *rom = (UINT32*)machine.region("user1")->base();
+	UINT32 *rom = (UINT32*)machine.root_device().memregion("user1")->base();
 	DRIVER_INIT_CALL(model3_20);
 
 	rom[(0x6059cc^4)/4] = 0x60000000;
@@ -5710,7 +5710,7 @@ static DRIVER_INIT( spikeofe )
 
 static DRIVER_INIT( eca )
 {
-	UINT32 *rom = (UINT32*)machine.region("user1")->base();
+	UINT32 *rom = (UINT32*)machine.root_device().memregion("user1")->base();
 	DRIVER_INIT_CALL(model3_20);
 
 	rom[(0x535580^4)/4] = 0x60000000;
@@ -5720,7 +5720,7 @@ static DRIVER_INIT( eca )
 
 static DRIVER_INIT( skichamp )
 {
-	UINT32 *rom = (UINT32*)machine.region("user1")->base();
+	UINT32 *rom = (UINT32*)machine.root_device().memregion("user1")->base();
 	DRIVER_INIT_CALL(model3_20);
 
 	rom[(0x5263c8^4)/4] = 0x60000000;
@@ -5731,7 +5731,7 @@ static DRIVER_INIT( skichamp )
 
 static DRIVER_INIT( oceanhun )
 {
-	UINT32 *rom = (UINT32*)machine.region("user1")->base();
+	UINT32 *rom = (UINT32*)machine.root_device().memregion("user1")->base();
 	DRIVER_INIT_CALL(model3_20);
 
 	rom[(0x57995c^4)/4] = 0x60000000;   // decrementer

@@ -94,7 +94,7 @@ public:
 
 static PALETTE_INIT( wallc )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 
 	static const int resistances_rg[2] = { 330, 220 };
@@ -259,7 +259,7 @@ static DRIVER_INIT( wallc )
 	UINT8 c;
 	UINT32 i;
 
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
 
 	for (i=0; i<0x2000*2; i++)
 	{
@@ -274,7 +274,7 @@ static DRIVER_INIT( wallca )
 	UINT8 c;
 	UINT32 i;
 
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
 
 	for (i=0; i<0x4000; i++)
 	{

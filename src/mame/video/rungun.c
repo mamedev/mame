@@ -89,7 +89,7 @@ VIDEO_START( rng )
 	assert(gfx_index != MAX_GFX_ELEMENTS);
 
 	// decode the ttl layer's gfx
-	machine.gfx[gfx_index] = gfx_element_alloc(machine, &charlayout, machine.region("gfx3")->base(), machine.total_colors() / 16, 0);
+	machine.gfx[gfx_index] = gfx_element_alloc(machine, &charlayout, state->memregion("gfx3")->base(), machine.total_colors() / 16, 0);
 	state->m_ttl_gfx_index = gfx_index;
 
 	// create the tilemap

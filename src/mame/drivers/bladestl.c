@@ -301,7 +301,7 @@ static const k007420_interface bladestl_k007420_intf =
 static MACHINE_START( bladestl )
 {
 	bladestl_state *state = machine.driver_data<bladestl_state>();
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = state->memregion("maincpu")->base();
 
 	state->membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x2000);
 

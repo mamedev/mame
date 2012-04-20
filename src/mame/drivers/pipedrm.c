@@ -595,11 +595,11 @@ static MACHINE_START( pipedrm )
 	state->m_subcpu = machine.device("sub");
 
 	/* initialize main Z80 bank */
-	state->membank("bank1")->configure_entries(0, 8, machine.region("maincpu")->base() + 0x10000, 0x2000);
+	state->membank("bank1")->configure_entries(0, 8, machine.root_device().memregion("maincpu")->base() + 0x10000, 0x2000);
 	state->membank("bank1")->set_entry(0);
 
 	/* initialize sound bank */
-	state->membank("bank2")->configure_entries(0, 2, machine.region("sub")->base() + 0x10000, 0x8000);
+	state->membank("bank2")->configure_entries(0, 2, state->memregion("sub")->base() + 0x10000, 0x8000);
 	state->membank("bank2")->set_entry(0);
 
 	/* state save */

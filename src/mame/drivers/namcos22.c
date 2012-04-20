@@ -1933,9 +1933,9 @@ static NVRAM_HANDLER( namcos22 )
 		else
 		{
 			memset( state->m_nvmem, 0x00, state->m_nvmem.bytes() );
-			if (machine.region("nvram")->bytes() == state->m_nvmem.bytes())
+			if (machine.root_device().memregion("nvram")->bytes() == state->m_nvmem.bytes())
 			{
-				UINT8* nvram = machine.region("nvram")->base();
+				UINT8* nvram = machine.root_device().memregion("nvram")->base();
 
 				for( i=0; i<state->m_nvmem.bytes()/4; i++ )
 				{
@@ -5538,7 +5538,7 @@ static DRIVER_INIT( airco22 )
 
 static DRIVER_INIT( propcycl )
 {
-   UINT32 *pROM = (UINT32 *)machine.region("maincpu")->base();
+   UINT32 *pROM = (UINT32 *)machine.root_device().memregion("maincpu")->base();
 
 	/* patch out strange routine (uninitialized-eprom related?) */
 	pROM[0x1992C/4] = 0x4E754E75;

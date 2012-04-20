@@ -2072,7 +2072,7 @@ static DRIVER_INIT(bujutsu)
 	{
 		int i;
 		UINT32 sum = 0;
-		UINT32 *rom = (UINT32*)machine.region("user1")->base();
+		UINT32 *rom = (UINT32*)machine.root_device().memregion("user1")->base();
 
 		//rom[(0x02218^4) / 4] = 0x60000000;        // skip connect_grphcpu()...
 
@@ -2095,7 +2095,7 @@ static DRIVER_INIT(bujutsu)
 
 	// rom hacks for sub board...
 	{
-		UINT32 *rom = (UINT32*)machine.region("user2")->base();
+		UINT32 *rom = (UINT32*)machine.root_device().memregion("user2")->base();
 
 		rom[0x62094 / 4] = 0x60000000;			// skip hardcheck()...
 	}
@@ -2106,7 +2106,7 @@ static DRIVER_INIT(bujutsu)
 		int i;
 		UINT32 sum = 0;
 
-		UINT32 *rom = (UINT32*)machine.region("user3")->base();
+		UINT32 *rom = (UINT32*)machine.root_device().memregion("user3")->base();
 
 		rom[(0x022d4^4) / 4] = 0x60000000;		// skip init_raster() for now ...
 

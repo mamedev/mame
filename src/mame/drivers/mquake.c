@@ -87,7 +87,7 @@ static WRITE8_DEVICE_HANDLER( mquake_cia_0_portb_w )
 
 static READ8_HANDLER( es5503_sample_r )
 {
-	UINT8 *rom = space->machine().region("es5503")->base();
+	UINT8 *rom = space->machine().root_device().memregion("es5503")->base();
 	es5503_device *es5503 = space->machine().device<es5503_device>("es5503");
 
 	return rom[offset + (es5503->get_channel_strobe() * 0x10000)];
@@ -445,7 +445,7 @@ static DRIVER_INIT(mquake)
 
 	/* set up memory */
 	state->membank("bank1")->configure_entry(0, state->m_chip_ram);
-	state->membank("bank1")->configure_entry(1, machine.region("user1")->base());
+	state->membank("bank1")->configure_entry(1, machine.root_device().memregion("user1")->base());
 }
 
 

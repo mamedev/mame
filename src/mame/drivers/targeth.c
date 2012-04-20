@@ -51,7 +51,7 @@ static TIMER_DEVICE_CALLBACK(targeth_interrupt )
 
 WRITE16_MEMBER(targeth_state::OKIM6295_bankswitch_w)
 {
-	UINT8 *RAM = machine().region("oki")->base();
+	UINT8 *RAM = memregion("oki")->base();
 
 	if (ACCESSING_BITS_0_7){
 		memcpy(&RAM[0x30000], &RAM[0x40000 + (data & 0x0f)*0x10000], 0x10000);

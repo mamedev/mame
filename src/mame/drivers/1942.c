@@ -505,7 +505,7 @@ ROM_END
 
 static DRIVER_INIT( 1942 )
 {
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
 	machine.root_device().membank("bank1")->configure_entries(0, 3, &ROM[0x10000], 0x4000);
 }
 

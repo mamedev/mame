@@ -386,7 +386,7 @@ DRIVER_INIT( kovshxas )
 static void pgm_decode_kovlsqh2_tiles( running_machine &machine )
 {
 	int i, j;
-	UINT16 *src = (UINT16 *)(machine.region("tiles")->base() + 0x180000);
+	UINT16 *src = (UINT16 *)(machine.root_device().memregion("tiles")->base() + 0x180000);
 	UINT16 *dst = auto_alloc_array(machine, UINT16, 0x800000);
 
 	for (i = 0; i < 0x800000 / 2; i++)
@@ -421,7 +421,7 @@ static void pgm_decode_kovlsqh2_sprites( running_machine &machine, UINT8 *src )
 static void pgm_decode_kovlsqh2_samples( running_machine &machine )
 {
 	int i;
-	UINT8 *src = (UINT8 *)(machine.region("ics")->base() + 0x400000);
+	UINT8 *src = (UINT8 *)(machine.root_device().memregion("ics")->base() + 0x400000);
 
 	for (i = 0; i < 0x400000; i+=2) {
 		src[i + 0x000001] = src[i + 0x400001];
@@ -433,7 +433,7 @@ static void pgm_decode_kovlsqh2_samples( running_machine &machine )
 static void pgm_decode_kovqhsgs_program( running_machine &machine )
 {
 	int i;
-	UINT16 *src = (UINT16 *)(machine.region("maincpu")->base() + 0x100000);
+	UINT16 *src = (UINT16 *)(machine.root_device().memregion("maincpu")->base() + 0x100000);
 	UINT16 *dst = auto_alloc_array(machine, UINT16, 0x400000);
 
 	for (i = 0; i < 0x400000 / 2; i++)
@@ -451,7 +451,7 @@ static void pgm_decode_kovqhsgs_program( running_machine &machine )
 static void pgm_decode_kovqhsgs2_program( running_machine &machine )
 {
 	int i;
-	UINT16 *src = (UINT16 *)(machine.region("maincpu")->base() + 0x100000);
+	UINT16 *src = (UINT16 *)(machine.root_device().memregion("maincpu")->base() + 0x100000);
 	UINT16 *dst = auto_alloc_array(machine, UINT16, 0x400000);
 
 	for (i = 0; i < 0x400000 / 2; i++)
@@ -472,14 +472,14 @@ DRIVER_INIT( kovlsqh2 )
 	pgm_decode_kovqhsgs2_program(machine);
 	pgm_decode_kovlsqh2_tiles(machine);
 
-	pgm_decode_kovlsqh2_sprites(machine, machine.region("sprcol")->base() + 0x0000000);
-	pgm_decode_kovlsqh2_sprites(machine, machine.region("sprcol")->base() + 0x0800000);
-	pgm_decode_kovlsqh2_sprites(machine, machine.region("sprcol")->base() + 0x1000000);
-	pgm_decode_kovlsqh2_sprites(machine, machine.region("sprcol")->base() + 0x1800000);
-	pgm_decode_kovlsqh2_sprites(machine, machine.region("sprcol")->base() + 0x2000000);
-	pgm_decode_kovlsqh2_sprites(machine, machine.region("sprcol")->base() + 0x2800000);
-	pgm_decode_kovlsqh2_sprites(machine, machine.region("sprmask")->base() + 0x0000000);
-	pgm_decode_kovlsqh2_sprites(machine, machine.region("sprmask")->base() + 0x0800000);
+	pgm_decode_kovlsqh2_sprites(machine, machine.root_device().memregion("sprcol")->base() + 0x0000000);
+	pgm_decode_kovlsqh2_sprites(machine, machine.root_device().memregion("sprcol")->base() + 0x0800000);
+	pgm_decode_kovlsqh2_sprites(machine, machine.root_device().memregion("sprcol")->base() + 0x1000000);
+	pgm_decode_kovlsqh2_sprites(machine, machine.root_device().memregion("sprcol")->base() + 0x1800000);
+	pgm_decode_kovlsqh2_sprites(machine, machine.root_device().memregion("sprcol")->base() + 0x2000000);
+	pgm_decode_kovlsqh2_sprites(machine, machine.root_device().memregion("sprcol")->base() + 0x2800000);
+	pgm_decode_kovlsqh2_sprites(machine, machine.root_device().memregion("sprmask")->base() + 0x0000000);
+	pgm_decode_kovlsqh2_sprites(machine, machine.root_device().memregion("sprmask")->base() + 0x0800000);
 
 	pgm_decode_kovlsqh2_samples(machine);
 	pgm_basic_init(machine);
@@ -493,14 +493,14 @@ DRIVER_INIT( kovqhsgs )
 	pgm_decode_kovqhsgs_program(machine);
 	pgm_decode_kovlsqh2_tiles(machine);
 
-	pgm_decode_kovlsqh2_sprites(machine, machine.region("sprcol")->base() + 0x0000000);
-	pgm_decode_kovlsqh2_sprites(machine, machine.region("sprcol")->base() + 0x0800000);
-	pgm_decode_kovlsqh2_sprites(machine, machine.region("sprcol")->base() + 0x1000000);
-	pgm_decode_kovlsqh2_sprites(machine, machine.region("sprcol")->base() + 0x1800000);
-	pgm_decode_kovlsqh2_sprites(machine, machine.region("sprcol")->base() + 0x2000000);
-	pgm_decode_kovlsqh2_sprites(machine, machine.region("sprcol")->base() + 0x2800000);
-	pgm_decode_kovlsqh2_sprites(machine, machine.region("sprmask")->base() + 0x0000000);
-	pgm_decode_kovlsqh2_sprites(machine, machine.region("sprmask")->base() + 0x0800000);
+	pgm_decode_kovlsqh2_sprites(machine, machine.root_device().memregion("sprcol")->base() + 0x0000000);
+	pgm_decode_kovlsqh2_sprites(machine, machine.root_device().memregion("sprcol")->base() + 0x0800000);
+	pgm_decode_kovlsqh2_sprites(machine, machine.root_device().memregion("sprcol")->base() + 0x1000000);
+	pgm_decode_kovlsqh2_sprites(machine, machine.root_device().memregion("sprcol")->base() + 0x1800000);
+	pgm_decode_kovlsqh2_sprites(machine, machine.root_device().memregion("sprcol")->base() + 0x2000000);
+	pgm_decode_kovlsqh2_sprites(machine, machine.root_device().memregion("sprcol")->base() + 0x2800000);
+	pgm_decode_kovlsqh2_sprites(machine, machine.root_device().memregion("sprmask")->base() + 0x0000000);
+	pgm_decode_kovlsqh2_sprites(machine, machine.root_device().memregion("sprmask")->base() + 0x0800000);
 
 	pgm_decode_kovlsqh2_samples(machine);
 	pgm_basic_init(machine);

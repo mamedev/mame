@@ -222,9 +222,9 @@ static TIMER_CALLBACK( megatech_z80_run_state )
 	UINT8* game_region;
 
 	sprintf(tempname, "game%d", param);
-	game_region = machine.region(tempname)->base();
+	game_region = machine.root_device().memregion(tempname)->base();
 
-	memcpy(machine.region("maincpu")->base(), game_region, 0x400000);
+	memcpy(state->memregion("maincpu")->base(), game_region, 0x400000);
 
 	if (!state->m_cart_is_genesis[param])
 	{
@@ -252,7 +252,7 @@ static TIMER_CALLBACK( megatech_z80_stop_state )
 	printf("megatech_select_game %d\n", param+1);
 
 	sprintf(tempname, "game%d", param);
-	game_region = machine.region(tempname)->base();
+	game_region = machine.root_device().memregion(tempname)->base();
 
 	cputag_set_input_line(machine, "maincpu", INPUT_LINE_RESET, ASSERT_LINE);
 	cputag_set_input_line(machine, "genesis_snd_z80", INPUT_LINE_RESET, ASSERT_LINE);
@@ -274,8 +274,8 @@ static TIMER_CALLBACK( megatech_z80_stop_state )
 	else
 	{
 		/* no cart.. */
-		memset(machine.region("mtbios")->base() + 0x8000, 0x00, 0x8000);
-		memset(machine.region("maincpu")->base(), 0x00, 0x400000);
+		memset(machine.root_device().memregion("mtbios")->base() + 0x8000, 0x00, 0x8000);
+		memset(machine.root_device().memregion("maincpu")->base(), 0x00, 0x400000);
 	}
 
 	return;
@@ -436,7 +436,7 @@ static DRIVER_INIT(mt_slot)
 static DRIVER_INIT(mt_crt)
 {
 	mtech_state *state = machine.driver_data<mtech_state>();
-	UINT8* pin = machine.region("sms_pin")->base();
+	UINT8* pin = state->memregion("sms_pin")->base();
 	DRIVER_INIT_CALL(mt_slot);
 
 	state->m_cart_is_genesis[0] = !pin[0] ? 1 : 0;;
@@ -556,7 +556,7 @@ static DEVICE_IMAGE_LOAD( megatech_cart )
 		return IMAGE_INIT_FAIL;
 
 	//printf("load list\n");
-	UINT8 *ROM = image.device().machine().region(this_cart->region)->base();
+	UINT8 *ROM = image.device().machine().root_device().memregion(this_cart->region)->base();
 	//printf("load list2\n");
 	UINT32 length = image.get_software_region_length("rom");
 	memcpy(ROM, image.get_software_region("rom"), length);

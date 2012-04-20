@@ -260,8 +260,8 @@ Screenshots available on my site at http://guru.mameworld.info/oldnews2001.html 
 
 static DRIVER_INIT( puckpkmn )
 {
-	UINT8 *rom = machine.region("maincpu")->base();
-	size_t len = machine.region("maincpu")->bytes();
+	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
+	size_t len = machine.root_device().memregion("maincpu")->bytes();
 	int i;
 
 	for (i = 0; i < len; i++)

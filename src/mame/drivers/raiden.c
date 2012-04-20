@@ -548,7 +548,7 @@ bit-swapping */
 static void common_decrypt(running_machine &machine)
 {
 
-	UINT16 *RAM = (UINT16 *)machine.region("maincpu")->base();
+	UINT16 *RAM = (UINT16 *)machine.root_device().memregion("maincpu")->base();
 	int i;
 
 	for (i = 0; i < 0x20000; i++)
@@ -560,7 +560,7 @@ static void common_decrypt(running_machine &machine)
 		RAM[0xc0000/2 + i] = data;
 	}
 
-	RAM = (UINT16 *)machine.region("sub")->base();
+	RAM = (UINT16 *)machine.root_device().memregion("sub")->base();
 
 	for (i = 0; i < 0x20000; i++)
 	{

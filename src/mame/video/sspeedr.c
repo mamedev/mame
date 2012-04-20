@@ -83,7 +83,7 @@ WRITE8_MEMBER(sspeedr_state::sspeedr_track_ice_w)
 static void draw_track(running_machine &machine, bitmap_ind16 &bitmap)
 {
 	sspeedr_state *state = machine.driver_data<sspeedr_state>();
-	const UINT8* p = machine.region("gfx3")->base();
+	const UINT8* p = state->memregion("gfx3")->base();
 
 	int x;
 	int y;

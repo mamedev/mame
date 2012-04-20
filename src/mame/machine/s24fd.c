@@ -158,7 +158,7 @@ void s24_fd1094_driver_init(running_machine &machine)
 
 	s24_fd1094_cpuregion = (UINT16*)machine.memory().shared("share2")->ptr();
 	s24_fd1094_cpuregionsize = 0x40000;
-	s24_fd1094_key = machine.region("fd1094key")->base();
+	s24_fd1094_key = machine.root_device().memregion("fd1094key")->base();
 
 	/* punt if no key; this allows us to be called even for non-s24_fd1094 games */
 	if (!s24_fd1094_key)

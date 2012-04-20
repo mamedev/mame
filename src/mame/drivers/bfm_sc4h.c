@@ -568,7 +568,7 @@ static NVRAM_HANDLER( bfm_sc4 )
 static MACHINE_START( sc4 )
 {
 	sc4_state *state = machine.driver_data<sc4_state>();
-	state->m_cpuregion = (UINT16*)machine.region( "maincpu" )->base();
+	state->m_cpuregion = (UINT16*)state->memregion( "maincpu" )->base();
 	state->m_mainram = (UINT16*)auto_alloc_array_clear(machine, UINT16, 0x10000);
 	state->m_duart = machine.device("duart68681");
 	state->m_ymz = machine.device("ymz");

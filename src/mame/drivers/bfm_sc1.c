@@ -668,7 +668,7 @@ static MACHINE_RESET( bfm_sc1 )
 
 // init rom bank ////////////////////////////////////////////////////////////////////
 	{
-		UINT8 *rom = machine.region("maincpu")->base();
+		UINT8 *rom = machine.root_device().memregion("maincpu")->base();
 
 		state->membank("bank1")->configure_entries(0, 4, &rom[0x0000], 0x02000);
 		state->membank("bank1")->set_entry(state->m_defaultbank);

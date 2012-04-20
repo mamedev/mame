@@ -60,7 +60,7 @@ Notes:
 #include "cpu/sh4/sh4.h"
 #include "debugger.h"
 
-const memory_region *nandregion;
+memory_region *nandregion;
 int nandcommand[4], nandoffset[4], nandaddressstep, nandaddress[4];
 UINT32 area1_data[4];
 
@@ -326,7 +326,7 @@ static MACHINE_START(atvtrack)
 	address_space *as;
 
 	nandaddressstep = 0;
-	nandregion = machine.region("maincpu");
+	nandregion = machine.root_device().memregion("maincpu");
 	as = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	dst = (UINT8 *)(as->get_write_ptr(0x0c7f0000));
 	src = nandregion->base()+0x10;

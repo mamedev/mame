@@ -456,7 +456,7 @@ static void xexex_postload(running_machine &machine)
 static MACHINE_START( xexex )
 {
 	xexex_state *state = machine.driver_data<xexex_state>();
-	UINT8 *ROM = machine.region("audiocpu")->base();
+	UINT8 *ROM = state->memregion("audiocpu")->base();
 
 	state->membank("bank2")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
 	state->membank("bank2")->set_entry(0);
@@ -684,8 +684,8 @@ static DRIVER_INIT( xexex )
 	if (!strcmp(machine.system().name, "xexex"))
 	{
 		// Invulnerability
-//      *(UINT16 *)(machine.region("maincpu")->base() + 0x648d4) = 0x4a79;
-//      *(UINT16 *)(machine.region("maincpu")->base() + 0x00008) = 0x5500;
+//      *(UINT16 *)(machine.root_device().memregion("maincpu")->base() + 0x648d4) = 0x4a79;
+//      *(UINT16 *)(state->memregion("maincpu")->base() + 0x00008) = 0x5500;
 		state->m_strip_0x1a = 1;
 	}
 }

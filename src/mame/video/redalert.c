@@ -51,7 +51,7 @@ static void get_pens(running_machine &machine, pen_t *pens)
 	double charmap_b_weights[2];
 	double back_r_weight[1];
 	double back_gb_weight[1];
-	const UINT8 *prom = machine.region("proms")->base();
+	const UINT8 *prom = machine.root_device().memregion("proms")->base();
 
 	scaler = compute_resistor_weights(0, 0xff, -1,
 									  1, resistances_bitmap,     bitmap_weight,      470, 0,
@@ -116,7 +116,7 @@ static void get_panther_pens(running_machine &machine, pen_t *pens)
 	double charmap_b_weights[2];
 	double back_r_weight[1];
 	double back_gb_weight[1];
-	const UINT8 *prom = machine.region("proms")->base();
+	const UINT8 *prom = machine.root_device().memregion("proms")->base();
 
 	scaler = compute_resistor_weights(0, 0xff, -1,
 									  1, resistances_bitmap,     bitmap_weight,      470, 0,

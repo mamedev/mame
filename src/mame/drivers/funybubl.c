@@ -202,7 +202,7 @@ GFXDECODE_END
 static MACHINE_START( funybubl )
 {
 	funybubl_state *state = machine.driver_data<funybubl_state>();
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = state->memregion("maincpu")->base();
 
 	state->m_audiocpu = machine.device("audiocpu");
 

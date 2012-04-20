@@ -361,14 +361,14 @@ WRITE8_MEMBER(mazerbla_state::cfb_rom_bank_sel_w)/* mazer blazer */
 {
 	m_gfx_rom_bank = data;
 
-	membank("bank1")->set_base(machine().region("sub2")->base() + (m_gfx_rom_bank * 0x2000) + 0x10000);
+	membank("bank1")->set_base(machine().root_device().memregion("sub2")->base() + (m_gfx_rom_bank * 0x2000) + 0x10000);
 }
 
 WRITE8_MEMBER(mazerbla_state::cfb_rom_bank_sel_w_gg)/* great guns */
 {
 	m_gfx_rom_bank = data >> 1;
 
-	membank("bank1")->set_base(machine().region("sub2")->base() + (m_gfx_rom_bank * 0x2000) + 0x10000);
+	membank("bank1")->set_base(machine().root_device().memregion("sub2")->base() + (m_gfx_rom_bank * 0x2000) + 0x10000);
 }
 
 
@@ -411,7 +411,7 @@ READ8_MEMBER(mazerbla_state::vcu_set_cmd_param_r)
 
 READ8_MEMBER(mazerbla_state::vcu_set_gfx_addr_r)
 {
-	UINT8 * rom = machine().region("sub2")->base() + (m_gfx_rom_bank * 0x2000) + 0x10000;
+	UINT8 * rom = memregion("sub2")->base() + (m_gfx_rom_bank * 0x2000) + 0x10000;
 	int offs;
 	int x, y;
 	int bits = 0;
@@ -557,7 +557,7 @@ READ8_MEMBER(mazerbla_state::vcu_set_gfx_addr_r)
 
 READ8_MEMBER(mazerbla_state::vcu_set_clr_addr_r)
 {
-	UINT8 * rom = machine().region("sub2")->base() + (m_gfx_rom_bank * 0x2000) + 0x10000;
+	UINT8 * rom = memregion("sub2")->base() + (m_gfx_rom_bank * 0x2000) + 0x10000;
 	int offs;
 	int x, y;
 	int bits = 0;
@@ -1713,7 +1713,7 @@ static DRIVER_INIT( mazerbla )
 static DRIVER_INIT( greatgun )
 {
 	mazerbla_state *state = machine.driver_data<mazerbla_state>();
-	UINT8 *rom = machine.region("sub2")->base();
+	UINT8 *rom = state->memregion("sub2")->base();
 
 	state->m_game_id = GREATGUN;
 

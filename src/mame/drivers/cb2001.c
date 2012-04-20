@@ -776,8 +776,8 @@ static PALETTE_INIT(cb2001)
 	{
 		int r,g,b;
 
-		UINT8*proms = machine.region("proms")->base();
-		int length = machine.region("proms")->bytes();
+		UINT8*proms = machine.root_device().memregion("proms")->base();
+		int length = machine.root_device().memregion("proms")->bytes();
 		UINT16 dat;
 
 		dat = (proms[0x000+i] << 8) | proms[0x200+i];

@@ -875,7 +875,7 @@ ROM_END
 
 static DRIVER_INIT( rbisland )
 {
-	UINT8 *ROM = machine.region("audiocpu")->base();
+	UINT8 *ROM = machine.root_device().memregion("audiocpu")->base();
 
 	machine.root_device().membank("bank1")->configure_entries(0, 4, &ROM[0xc000], 0x4000);
 
@@ -884,7 +884,7 @@ static DRIVER_INIT( rbisland )
 
 static DRIVER_INIT( rbislande )
 {
-	UINT8 *ROM = machine.region("audiocpu")->base();
+	UINT8 *ROM = machine.root_device().memregion("audiocpu")->base();
 
 	machine.root_device().membank("bank1")->configure_entries(0, 4, &ROM[0xc000], 0x4000);
 

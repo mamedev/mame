@@ -1415,7 +1415,7 @@ static DEVICE_START( tmsprom )
 
 	tms->rom = *device->region();
 	assert_always(tms->rom != NULL, "Error creating TMSPROM chip: No rom region found");
-	tms->prom = device->machine().region(tms->intf->prom_region)->base();
+	tms->prom = device->machine().root_device().memregion(tms->intf->prom_region)->base();
 	assert_always(tms->rom != NULL, "Error creating TMSPROM chip: No prom region found");
 
 	tms->device = device;

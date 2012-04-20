@@ -844,7 +844,7 @@ static void seibu_sound_bootleg(running_machine &machine,const char *cpu,int len
 {
 	address_space *space = machine.device(cpu)->memory().space(AS_PROGRAM);
 	UINT8 *decrypt = auto_alloc_array(machine, UINT8, length);
-	UINT8 *rom = machine.region(cpu)->base();
+	UINT8 *rom = machine.root_device().memregion(cpu)->base();
 
 	space->set_decrypted_region(0x0000, (length < 0x10000) ? (length - 1) : 0x1fff, decrypt);
 

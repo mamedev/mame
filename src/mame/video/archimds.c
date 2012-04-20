@@ -43,7 +43,7 @@ SCREEN_UPDATE_RGB32( archimds_vidc )
 		int count;
 		int x,y,xi;
 		UINT8 pen;
-		static UINT8 *vram = screen.machine().region("vram")->base();
+		static UINT8 *vram = screen.machine().root_device().memregion("vram")->base();
 
 		count = (0);
 

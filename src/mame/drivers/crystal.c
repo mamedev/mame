@@ -286,9 +286,9 @@ WRITE32_MEMBER(crystal_state::Banksw_w)
 
 	m_Bank = (data >> 1) & 7;
 	if (m_Bank <= 2)
-		membank("bank1")->set_base(machine().region("user1")->base() + m_Bank * 0x1000000);
+		membank("bank1")->set_base(machine().root_device().memregion("user1")->base() + m_Bank * 0x1000000);
 	else
-		membank("bank1")->set_base(machine().region("user2")->base());
+		membank("bank1")->set_base(machine().root_device().memregion("user2")->base());
 }
 
 static TIMER_CALLBACK( Timercb )
@@ -368,7 +368,7 @@ READ32_MEMBER(crystal_state::FlashCmd_r)
 	{
 		if (m_Bank <= 2)
 		{
-			UINT32 *ptr = (UINT32*)(machine().region("user1")->base() + m_Bank * 0x1000000);
+			UINT32 *ptr = (UINT32*)(machine().root_device().memregion("user1")->base() + m_Bank * 0x1000000);
 			return ptr[0];
 		}
 		else
@@ -567,9 +567,9 @@ static void crystal_banksw_postload(running_machine &machine)
 	crystal_state *state = machine.driver_data<crystal_state>();
 
 	if (state->m_Bank <= 2)
-		state->membank("bank1")->set_base(machine.region("user1")->base() + state->m_Bank * 0x1000000);
+		state->membank("bank1")->set_base(machine.root_device().memregion("user1")->base() + state->m_Bank * 0x1000000);
 	else
-		state->membank("bank1")->set_base(machine.region("user2")->base());
+		state->membank("bank1")->set_base(state->memregion("user2")->base());
 }
 
 static MACHINE_START( crystal )
@@ -613,7 +613,7 @@ static MACHINE_RESET( crystal )
 	state->m_IntHigh = 0;
 	device_set_irq_callback(machine.device("maincpu"), icallback);
 	state->m_Bank = 0;
-	state->membank("bank1")->set_base(machine.region("user1")->base() + 0);
+	state->membank("bank1")->set_base(state->memregion("user1")->base() + 0);
 	state->m_FlashCmd = 0xff;
 	state->m_OldPort4 = 0;
 
@@ -960,7 +960,7 @@ ROM_END
 
 static DRIVER_INIT(crysking)
 {
-	UINT16 *Rom = (UINT16*) machine.region("user1")->base();
+	UINT16 *Rom = (UINT16*) machine.root_device().memregion("user1")->base();
 
 	//patch the data feed by the protection
 
@@ -979,7 +979,7 @@ static DRIVER_INIT(crysking)
 
 static DRIVER_INIT(evosocc)
 {
-	UINT16 *Rom = (UINT16*) machine.region("user1")->base();
+	UINT16 *Rom = (UINT16*) machine.root_device().memregion("user1")->base();
 	Rom += 0x1000000 * 2 / 2;
 
 	Rom[WORD_XOR_LE(0x97388E/2)] = 0x90FC;	//PUSH R2..R7
@@ -997,7 +997,7 @@ static DRIVER_INIT(evosocc)
 
 static DRIVER_INIT(topbladv)
 {
-	UINT16 *Rom = (UINT16*) machine.region("user1")->base();
+	UINT16 *Rom = (UINT16*) machine.root_device().memregion("user1")->base();
 
 	Rom[WORD_XOR_LE(0x12d7a/2)] = 0x90FC;	//PUSH R7-R6-R5-R4-R3-R2
 	Rom[WORD_XOR_LE(0x12d7c/2)] = 0x9001;	//PUSH R0
@@ -1015,7 +1015,7 @@ static DRIVER_INIT(topbladv)
 
 static DRIVER_INIT(officeye)
 {
-	UINT16 *Rom = (UINT16*) machine.region("user1")->base();
+	UINT16 *Rom = (UINT16*) machine.root_device().memregion("user1")->base();
 
 	Rom[WORD_XOR_LE(0x9c9e/2)] = 0x901C;	//PUSH R4-R3-R2
 	Rom[WORD_XOR_LE(0x9ca0/2)] = 0x9001;	//PUSH R0

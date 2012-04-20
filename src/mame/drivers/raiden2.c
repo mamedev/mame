@@ -2894,25 +2894,25 @@ ROM_END
 
 static DRIVER_INIT (raiden2)
 {
-	machine.root_device().membank("mainbank")->configure_entries(0, 2, machine.region("mainprg")->base(), 0x20000);
+	machine.root_device().membank("mainbank")->configure_entries(0, 2, machine.root_device().memregion("mainprg")->base(), 0x20000);
 	raiden2_decrypt_sprites(machine);
 }
 
 static DRIVER_INIT (raidendx)
 {
-	machine.root_device().membank("mainbank")->configure_entries(0, 0x10, machine.region("mainprg")->base(), 0x20000);
+	machine.root_device().membank("mainbank")->configure_entries(0, 0x10, machine.root_device().memregion("mainprg")->base(), 0x20000);
 	raiden2_decrypt_sprites(machine);
 }
 
 static DRIVER_INIT (xsedae)
 {
 	/* doesn't have banking */
-	//machine.root_device().membank("mainbank")->configure_entries(0, 2, machine.region("mainprg")->base(), 0x20000);
+	//machine.root_device().membank("mainbank")->configure_entries(0, 2, machine.root_device().memregion("mainprg")->base(), 0x20000);
 }
 
 static DRIVER_INIT (zeroteam)
 {
-	machine.root_device().membank("mainbank")->configure_entries(0, 2, machine.region("mainprg")->base(), 0x20000);
+	machine.root_device().membank("mainbank")->configure_entries(0, 2, machine.root_device().memregion("mainprg")->base(), 0x20000);
 	zeroteam_decrypt_sprites(machine);
 }
 

@@ -353,7 +353,7 @@ priority = 8, then 4, 2 and finally 1).
 static void jalmah_priority_system(running_machine &machine)
 {
 	jalmah_state *state = machine.driver_data<jalmah_state>();
-	UINT8 *pri_rom = machine.region("user1")->base();
+	UINT8 *pri_rom = state->memregion("user1")->base();
 	UINT8 i;
 	UINT8 prinum[0x10];
 
@@ -950,7 +950,7 @@ WRITE16_MEMBER(jalmah_state::jalmah_okirom_w)
 {
 	if(ACCESSING_BITS_0_7)
 	{
-		UINT8 *oki = machine().region("oki")->base();
+		UINT8 *oki = memregion("oki")->base();
 
 		m_oki_rom = data & 1;
 
@@ -967,7 +967,7 @@ WRITE16_MEMBER(jalmah_state::jalmah_okibank_w)
 {
 	if(ACCESSING_BITS_0_7)
 	{
-		UINT8 *oki = machine().region("oki")->base();
+		UINT8 *oki = memregion("oki")->base();
 
 		m_oki_bank = data & 3;
 

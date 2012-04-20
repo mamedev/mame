@@ -1552,7 +1552,7 @@ ROM_END
 
 static void configure_banks( running_machine& machine )
 {
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
 	machine.root_device().membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
 }
 
@@ -1588,7 +1588,7 @@ static DRIVER_INIT( dland )
 {
 	// rearrange gfx to original format
 	int i;
-	UINT8* src = machine.region("gfx1")->base();
+	UINT8* src = machine.root_device().memregion("gfx1")->base();
 	for (i = 0; i < 0x40000; i++)
 		src[i] = BITSWAP8(src[i],7,6,5,4,0,1,2,3);
 

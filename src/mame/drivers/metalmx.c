@@ -770,7 +770,7 @@ MACHINE_CONFIG_END
 
 static DRIVER_INIT( metalmx )
 {
-	UINT8 *adsp_boot = (UINT8*)machine.region("adsp")->base();
+	UINT8 *adsp_boot = (UINT8*)machine.root_device().memregion("adsp")->base();
 	metalmx_state *state = machine.driver_data<metalmx_state>();
 
 	state->m_adsp->load_boot_data(adsp_boot, state->m_adsp_internal_program_ram);

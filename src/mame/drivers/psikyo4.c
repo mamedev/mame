@@ -319,7 +319,7 @@ WRITE32_MEMBER(psikyo4_state::ps4_vidregs_w)
 	if (offset == 2) /* Configure bank for gfx test */
 	{
 		if (ACCESSING_BITS_0_15)	// Bank
-			membank("bank2")->set_base(machine().region("gfx1")->base() + 0x2000 * (m_vidregs[offset] & 0x1fff)); /* Bank comes from vidregs */
+			membank("bank2")->set_base(machine().root_device().memregion("gfx1")->base() + 0x2000 * (m_vidregs[offset] & 0x1fff)); /* Bank comes from vidregs */
 	}
 }
 
@@ -328,8 +328,8 @@ WRITE32_MEMBER(psikyo4_state::ps4_vidregs_w)
 static void set_hotgmck_pcm_bank( running_machine &machine, int n )
 {
 	psikyo4_state *state = machine.driver_data<psikyo4_state>();
-	UINT8 *ymf_pcmbank = machine.region("ymf")->base() + 0x200000;
-	UINT8 *pcm_rom = machine.region("ymfsource")->base();
+	UINT8 *ymf_pcmbank = machine.root_device().memregion("ymf")->base() + 0x200000;
+	UINT8 *pcm_rom = state->memregion("ymfsource")->base();
 
 	memcpy(ymf_pcmbank + n * 0x100000, pcm_rom + PCM_BANK_NO_LEGACY(n) * 0x100000, 0x100000);
 }
@@ -955,8 +955,8 @@ static void hotgmck_pcm_bank_postload(running_machine &machine)
 static void install_hotgmck_pcm_bank(running_machine &machine)
 {
 	psikyo4_state *state = machine.driver_data<psikyo4_state>();
-	UINT8 *ymf_pcm = machine.region("ymf")->base();
-	UINT8 *pcm_rom = machine.region("ymfsource")->base();
+	UINT8 *ymf_pcm = machine.root_device().memregion("ymf")->base();
+	UINT8 *pcm_rom = state->memregion("ymfsource")->base();
 
 	memcpy(ymf_pcm, pcm_rom, 0x200000);
 
@@ -970,7 +970,7 @@ static void install_hotgmck_pcm_bank(running_machine &machine)
 
 static DRIVER_INIT( hotgmck )
 {
-	UINT8 *RAM = machine.region("maincpu")->base();
+	UINT8 *RAM = machine.root_device().memregion("maincpu")->base();
 	machine.root_device().membank("bank1")->set_base(&RAM[0x100000]);
 	install_hotgmck_pcm_bank(machine);	// Banked PCM ROM
 }

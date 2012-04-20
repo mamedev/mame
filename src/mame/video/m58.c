@@ -21,7 +21,7 @@
 
 PALETTE_INIT( yard )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	const UINT8 *char_lopal = color_prom + 0x000;
 	const UINT8 *char_hipal = color_prom + 0x100;
 	const UINT8 *sprite_pal = color_prom + 0x200;

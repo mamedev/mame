@@ -508,7 +508,7 @@ VIDEO_START( spi )
 	for (i = 6000; i < 6016; i++) { state->m_alpha_table[i] = 1; }
 	for (i = 6128; i < 6144; i++) { state->m_alpha_table[i] = 1; }
 
-	region_length = machine.region("gfx2")->bytes();
+	region_length = machine.root_device().memregion("gfx2")->bytes();
 
 	if (region_length <= 0x300000)
 	{

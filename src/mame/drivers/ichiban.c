@@ -104,7 +104,7 @@ GFXDECODE_END
 
 void ichibanjyan_state::machine_start()
 {
-	UINT8 *ROM = machine().region("code")->base();
+	UINT8 *ROM = memregion("code")->base();
 
 	membank("bank1")->configure_entries(0, 4, ROM, 0x8000);
 }

@@ -872,12 +872,12 @@ static DRIVER_INIT( gypsyjug )
 		0x01,0x80, 0x03,0xc0, 0x03,0xc0, 0x01,0x80
 	};
 	int i;
-	UINT8 *gfx2 = machine.region("gfx2")->base();
-	UINT8 *gfx3 = machine.region("gfx3")->base();
-	UINT8 *gfx4 = machine.region("gfx4")->base();
-	UINT8 *gfx5 = machine.region("gfx5")->base();
-	int len3 = machine.region("gfx3")->bytes();
-	int len4 = machine.region("gfx4")->bytes();
+	UINT8 *gfx2 = machine.root_device().memregion("gfx2")->base();
+	UINT8 *gfx3 = machine.root_device().memregion("gfx3")->base();
+	UINT8 *gfx4 = machine.root_device().memregion("gfx4")->base();
+	UINT8 *gfx5 = machine.root_device().memregion("gfx5")->base();
+	int len3 = machine.root_device().memregion("gfx3")->bytes();
+	int len4 = machine.root_device().memregion("gfx4")->bytes();
 
 	memcpy(gfx3,gfx2,len3);
 
@@ -896,8 +896,8 @@ static DRIVER_INIT( minferno )
 	UINT8 *mem;
 
 	/* create an inverted copy of the graphics data */
-	mem = machine.region("gfx1")->base();
-	length = machine.region("gfx1")->bytes();
+	mem = machine.root_device().memregion("gfx1")->base();
+	length = machine.root_device().memregion("gfx1")->bytes();
 	for (i = 0; i < length/2; i++)
 		mem[i] = ~mem[i + length/2];
 }

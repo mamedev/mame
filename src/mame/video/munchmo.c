@@ -4,7 +4,7 @@
 
 PALETTE_INIT( mnchmobl )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 
 	for (i = 0; i < machine.total_colors(); i++)
@@ -82,7 +82,7 @@ static void draw_background( running_machine &machine, bitmap_ind16 &bitmap, con
     the tiles in ROM B2.2B
 */
 	munchmo_state *state = machine.driver_data<munchmo_state>();
-	UINT8 *rom = machine.region("gfx2")->base();
+	UINT8 *rom = state->memregion("gfx2")->base();
 	const gfx_element *gfx = machine.gfx[1];
 	int offs;
 

@@ -212,7 +212,7 @@ void aw_rom_board::decrypt_region()
 	if(!keyregion)
 		return;
 
-	const memory_region *kr = machine().region(keyregion);
+	memory_region *kr = memregion(keyregion);
 	if(!kr)
 		return;
 

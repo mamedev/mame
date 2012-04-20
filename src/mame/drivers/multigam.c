@@ -196,7 +196,7 @@ static void set_videorom_bank(running_machine& machine, int start, int count, in
 	/* count determines the size of the area mapped in KB */
 	for (i = 0; i < count; i++, offset += 0x400)
 	{
-		machine.root_device().membank(banknames[i + start])->set_base(machine.region("gfx1")->base() + offset);
+		machine.root_device().membank(banknames[i + start])->set_base(machine.root_device().memregion("gfx1")->base() + offset);
 	}
 }
 
@@ -293,8 +293,8 @@ CUSTOM_INPUT_MEMBER(multigam_state::multigam_inputs_r)
 WRITE8_MEMBER(multigam_state::multigam_switch_prg_rom)
 {
 	/* switch PRG rom */
-	UINT8* dst = machine().region("maincpu")->base();
-	UINT8* src = machine().region("user1")->base();
+	UINT8* dst = memregion("maincpu")->base();
+	UINT8* src = memregion("user1")->base();
 
 	if (data & 0x80)
 	{
@@ -313,7 +313,7 @@ WRITE8_MEMBER(multigam_state::multigam_switch_prg_rom)
 
 WRITE8_MEMBER(multigam_state::multigam_switch_gfx_rom)
 {
-	membank("bank1")->set_base(machine().region("gfx1")->base() + (0x2000 * (data & 0x3f)));
+	membank("bank1")->set_base(machine().root_device().memregion("gfx1")->base() + (0x2000 * (data & 0x3f)));
 	set_mirroring(data & 0x40 ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 	m_game_gfx_bank = data;
 };
@@ -323,7 +323,7 @@ WRITE8_MEMBER(multigam_state::multigam_mapper2_w)
 {
 	if (m_game_gfx_bank & 0x80)
 	{
-		membank("bank1")->set_base(machine().region("gfx1")->base() + (0x2000 * ((data & 0x3) + (m_game_gfx_bank & 0x3c))));
+		membank("bank1")->set_base(machine().root_device().memregion("gfx1")->base() + (0x2000 * ((data & 0x3) + (m_game_gfx_bank & 0x3c))));
 	}
 	else
 	{
@@ -408,7 +408,7 @@ WRITE8_MEMBER(multigam_state::multigam3_mmc3_rom_switch_w)
 			if (m_multigam3_mmc3_last_bank != (data & 0xc0))
 			{
 				int bank;
-				UINT8 *prg = machine().region("maincpu")->base();
+				UINT8 *prg = memregion("maincpu")->base();
 
 				/* reset the banks */
 				if (m_multigam3_mmc3_command & 0x40)
@@ -461,7 +461,7 @@ WRITE8_MEMBER(multigam_state::multigam3_mmc3_rom_switch_w)
 
 					case 6: /* program banking */
 					{
-						UINT8 *prg = machine().region("maincpu")->base();
+						UINT8 *prg = memregion("maincpu")->base();
 						if (m_multigam3_mmc3_command & 0x40)
 						{
 							/* high bank */
@@ -486,7 +486,7 @@ WRITE8_MEMBER(multigam_state::multigam3_mmc3_rom_switch_w)
 					case 7: /* program banking */
 						{
 							/* mid bank */
-							UINT8 *prg = machine().region("maincpu")->base();
+							UINT8 *prg = memregion("maincpu")->base();
 
 							m_multigam3_mmc3_banks[1] = data & bankmask;
 							bank = m_multigam3_mmc3_banks[1] * 0x2000;
@@ -515,7 +515,7 @@ WRITE8_MEMBER(multigam_state::multigam3_mmc3_rom_switch_w)
 			}
 			else
 			{
-				membank("bank10")->set_base(machine().region("maincpu")->base() + 0x6000);
+				membank("bank10")->set_base(machine().root_device().memregion("maincpu")->base() + 0x6000);
 			}
 			if (data & 0x40)
 			{
@@ -544,7 +544,7 @@ WRITE8_MEMBER(multigam_state::multigam3_mmc3_rom_switch_w)
 static void multigam_init_mmc3(running_machine &machine, UINT8 *prg_base, int prg_size, int chr_bank_base)
 {
 	multigam_state *state = machine.driver_data<multigam_state>();
-	UINT8* dst = machine.region("maincpu")->base();
+	UINT8* dst = state->memregion("maincpu")->base();
 
 	// Tom & Jerry in Super Game III enables 6000 ram, but does not read/write it
 	// however, it expects ROM from 6000 there (code jumps to $6xxx)
@@ -588,8 +588,8 @@ WRITE8_MEMBER(multigam_state::multigm3_switch_gfx_rom)
 WRITE8_MEMBER(multigam_state::multigm3_switch_prg_rom)
 {
 	/* switch PRG rom */
-	UINT8* dst = machine().region("maincpu")->base();
-	UINT8* src = machine().region("user1")->base();
+	UINT8* dst = memregion("maincpu")->base();
+	UINT8* src = memregion("user1")->base();
 
 	if (data == 0xa8)
 	{
@@ -599,7 +599,7 @@ WRITE8_MEMBER(multigam_state::multigm3_switch_prg_rom)
 	else
 	{
 		space.install_write_handler(0x8000, 0xffff, write8_delegate(FUNC(multigam_state::multigm3_mapper2_w),this) );
-		membank("bank10")->set_base(machine().region("maincpu")->base() + 0x6000);
+		membank("bank10")->set_base(machine().root_device().memregion("maincpu")->base() + 0x6000);
 	}
 
 	if (data & 0x80)
@@ -651,7 +651,7 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(multigam_state::multigam3_mapper02_rom_switch_w)
 {
-	UINT8* mem = machine().region("maincpu")->base();
+	UINT8* mem = memregion("maincpu")->base();
 	int bankmask = (m_mapper02_prg_size/0x4000) - 1;
 	memcpy(mem + 0x8000, m_mapper02_prg_base + 0x4000*(data & bankmask), 0x4000);
 }
@@ -660,7 +660,7 @@ static void multigam_init_mapper02(running_machine &machine, UINT8* prg_base, in
 {
 	multigam_state *state = machine.driver_data<multigam_state>();
 	ppu2c0x_device *ppu = machine.device<ppu2c0x_device>("ppu");
-	UINT8* mem = machine.region("maincpu")->base();
+	UINT8* mem = state->memregion("maincpu")->base();
 	memcpy(mem + 0x8000, prg_base + prg_size - 0x8000, 0x8000);
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x8000, 0xffff, write8_delegate(FUNC(multigam_state::multigam3_mapper02_rom_switch_w),state));
 
@@ -780,7 +780,7 @@ WRITE8_MEMBER(multigam_state::mmc1_rom_switch_w)
 			case 3:	/* program banking */
 				{
 					int bank = (m_mmc1_shiftreg & m_mmc1_rom_mask) * 0x4000;
-					UINT8 *prg = machine().region("maincpu")->base();
+					UINT8 *prg = memregion("maincpu")->base();
 
 					if (!m_size16k)
 					{
@@ -813,7 +813,7 @@ WRITE8_MEMBER(multigam_state::mmc1_rom_switch_w)
 static void multigam_init_mmc1(running_machine &machine, UINT8 *prg_base, int prg_size, int chr_bank_base)
 {
 	multigam_state *state = machine.driver_data<multigam_state>();
-	UINT8* dst = machine.region("maincpu")->base();
+	UINT8* dst = state->memregion("maincpu")->base();
 	ppu2c0x_device *ppu = machine.device<ppu2c0x_device>("ppu");
 
 	memcpy(&dst[0x8000], prg_base + (prg_size - 0x8000), 0x8000);
@@ -856,7 +856,7 @@ static void supergm3_set_bank(running_machine &machine)
 {
 	multigam_state *state = machine.driver_data<multigam_state>();
 	ppu2c0x_device *ppu = machine.device<ppu2c0x_device>("ppu");
-	UINT8* mem = machine.region("maincpu")->base();
+	UINT8* mem = state->memregion("maincpu")->base();
 
 	// video bank
 	if (state->m_supergm3_chr_bank == 0x10 ||
@@ -897,14 +897,14 @@ static void supergm3_set_bank(running_machine &machine)
 	{
 		// mapper 02
 		multigam_init_mapper02(machine,
-			machine.region("user1")->base() + (state->m_supergm3_prg_bank & 0x1f)*0x20000,
+			machine.root_device().memregion("user1")->base() + (state->m_supergm3_prg_bank & 0x1f)*0x20000,
 			0x20000);
 	}
 	else if (state->m_supergm3_chr_bank & 0x10)
 	{
 		// MMC3
 		multigam_init_mmc3(machine,
-			machine.region("user1")->base() + (state->m_supergm3_prg_bank & 0x1f)*0x20000,
+			machine.root_device().memregion("user1")->base() + (state->m_supergm3_prg_bank & 0x1f)*0x20000,
 			(state->m_supergm3_prg_bank & 0x20) ? 0x20000 : 0x40000,
 			(state->m_supergm3_chr_bank & 0x0f)*0x80);
 	}
@@ -912,7 +912,7 @@ static void supergm3_set_bank(running_machine &machine)
 	{
 		//MMC1
 		multigam_init_mmc1(machine,
-			machine.region("user1")->base() + (state->m_supergm3_prg_bank & 0x1f)*0x20000,
+			machine.root_device().memregion("user1")->base() + (state->m_supergm3_prg_bank & 0x1f)*0x20000,
 			0x20000,
 			(state->m_supergm3_chr_bank & 0x0f)*0x80/4 );
 	}
@@ -1139,7 +1139,7 @@ static MACHINE_START( multigam )
 
 	machine.device("ppu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x2000, 0x3eff, read8_delegate(FUNC(multigam_state::multigam_nt_r),state), write8_delegate(FUNC(multigam_state::multigam_nt_w),state));
 	machine.device("ppu")->memory().space(AS_PROGRAM)->install_read_bank(0x0000, 0x1fff, "bank1");
-	state->membank("bank1")->set_base(machine.region("gfx1")->base());
+	state->membank("bank1")->set_base(state->memregion("gfx1")->base());
 }
 
 static MACHINE_START( multigm3 )
@@ -1373,8 +1373,8 @@ static DRIVER_INIT(multigm3)
 
 	const UINT8 decode[16]  = { 0x09, 0x08, 0x07, 0x06, 0x05, 0x04, 0x03, 0x02, 0x01, 0x00, 0x0f, 0x0e, 0x0d, 0x0c, 0x0b, 0x0a };
 
-	multigm3_decrypt(machine.region("maincpu")->base(), machine.region("maincpu")->bytes(), decode );
-	multigm3_decrypt(machine.region("user1")->base(), machine.region("user1")->bytes(), decode );
+	multigm3_decrypt(machine.root_device().memregion("maincpu")->base(), machine.root_device().memregion("maincpu")->bytes(), decode );
+	multigm3_decrypt(machine.root_device().memregion("user1")->base(), machine.root_device().memregion("user1")->bytes(), decode );
 
 	state->m_multigmc_mmc3_6000_ram = auto_alloc_array(machine, UINT8, 0x2000);
 
@@ -1391,7 +1391,7 @@ static DRIVER_INIT(multigmt)
 	int i;
 	int addr;
 
-	rom = machine.region("maincpu")->base();
+	rom = machine.root_device().memregion("maincpu")->base();
 	size = 0x8000;
 	memcpy(buf, rom, size);
 	for (i = 0; i < size; i++)
@@ -1401,7 +1401,7 @@ static DRIVER_INIT(multigmt)
 		rom[i] = buf[addr];
 	}
 
-	rom = machine.region("user1")->base();
+	rom = machine.root_device().memregion("user1")->base();
 	size = 0x80000;
 	memcpy(buf, rom, size);
 	for (i = 0; i < size; i++)
@@ -1409,7 +1409,7 @@ static DRIVER_INIT(multigmt)
 		addr = BITSWAP24(i,23,22,21,20,19,18,17,16,15,14,13,8,11,12,10,9,7,6,5,4,3,2,1,0);
 		rom[i] = buf[addr];
 	}
-	rom = machine.region("gfx1")->base();
+	rom = machine.root_device().memregion("gfx1")->base();
 	size = 0x80000;
 	memcpy(buf, rom, size);
 	for (i = 0; i < size; i++)

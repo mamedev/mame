@@ -134,7 +134,7 @@ WRITE8_MEMBER(gunpey_state::gunpey_blitter_w)
 {
 	UINT16 *blit_buffer = m_blit_buffer;
 	UINT16 *blit_ram = m_blit_ram;
-	UINT8 *blit_rom = machine().region("blit_data")->base();
+	UINT8 *blit_rom = memregion("blit_data")->base();
 	int x,y;
 
 	blit_ram[offset] = data;
@@ -307,7 +307,7 @@ INPUT_PORTS_END
 static PALETTE_INIT( gunpey )
 {
 	int i,r,g,b,val;
-	UINT8 *blit_rom = machine.region("blit_data")->base();
+	UINT8 *blit_rom = machine.root_device().memregion("blit_data")->base();
 
 	for (i = 0; i < 512; i+=2)
 	{
@@ -384,7 +384,7 @@ ROM_END
 
 static DRIVER_INIT( gunpey )
 {
-	UINT8 *rom = machine.region("maincpu")->base();
+	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
 
 	/* patch SLOOOOW cycle checks ... */
 	rom[0x848b5] = 0x7e;

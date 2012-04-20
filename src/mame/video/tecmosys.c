@@ -112,7 +112,7 @@ WRITE16_MEMBER(tecmosys_state::bg2_tilemap_lineram_w)
 static void tecmosys_render_sprites_to_bitmap(running_machine &machine, bitmap_rgb32 &bitmap, UINT16 extrax, UINT16 extray )
 {
 	tecmosys_state *state = machine.driver_data<tecmosys_state>();
-	UINT8 *gfxsrc    = machine.region       ( "gfx1" )->base();
+	UINT8 *gfxsrc    = state->memregion       ( "gfx1" )->base();
 	int i;
 
 	/* render sprites (with priority information) to temp bitmap */

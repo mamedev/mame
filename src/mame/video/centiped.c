@@ -290,7 +290,7 @@ WRITE8_MEMBER(centiped_state::centiped_paletteram_w)
 
 PALETTE_INIT( warlords )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 
 	for (i = 0; i < machine.total_colors(); i++)
@@ -415,7 +415,7 @@ WRITE8_MEMBER(centiped_state::mazeinv_paletteram_w)
 	m_generic_paletteram_8[offset] = data;
 
 	/* the value passed in is a look-up index into the color PROM */
-	melliped_mazeinv_set_color(machine(), offset, ~machine().region("proms")->base()[~data & 0x0f]);
+	melliped_mazeinv_set_color(machine(), offset, ~machine().root_device().memregion("proms")->base()[~data & 0x0f]);
 }
 
 

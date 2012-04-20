@@ -371,8 +371,8 @@ static void draw_sprites(running_machine &machine, UINT32 *sprites, const rectan
 	limenko_state *state = machine.driver_data<limenko_state>();
 	int i;
 
-	UINT8 *base_gfx	= machine.region("gfx1")->base();
-	UINT8 *gfx_max	= base_gfx + machine.region("gfx1")->bytes();
+	UINT8 *base_gfx	= machine.root_device().memregion("gfx1")->base();
+	UINT8 *gfx_max	= base_gfx + state->memregion("gfx1")->bytes();
 
 	UINT8 *gfxdata;
 	gfx_element gfx(machine);
@@ -1066,8 +1066,8 @@ static DRIVER_INIT( sb2003 )
 static DRIVER_INIT( spotty )
 {
 	limenko_state *state = machine.driver_data<limenko_state>();
-	UINT8 *dst    = machine.region("gfx1")->base();
-	UINT8 *src    = machine.region("user2")->base();
+	UINT8 *dst    = machine.root_device().memregion("gfx1")->base();
+	UINT8 *src    = state->memregion("user2")->base();
 	int x;
 
 	/* expand 4bpp roms to 8bpp space */

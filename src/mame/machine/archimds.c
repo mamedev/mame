@@ -116,7 +116,7 @@ static TIMER_CALLBACK( vidc_vblank )
 static TIMER_CALLBACK( vidc_video_tick )
 {
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	static UINT8 *vram = machine.region("vram")->base();
+	static UINT8 *vram = machine.root_device().memregion("vram")->base();
 	UINT32 size;
 
 	size = vidc_vidend-vidc_vidstart+0x10;
@@ -289,7 +289,7 @@ READ32_HANDLER(archimedes_memc_logical_r)
 	{
 		UINT32 *rom;
 
-		rom = (UINT32 *)space->machine().region("maincpu")->base();
+		rom = (UINT32 *)space->machine().root_device().memregion("maincpu")->base();
 
 		return rom[offset & 0x1fffff];
 	}
@@ -355,7 +355,7 @@ READ32_HANDLER(aristmk5_drame_memc_logical_r)
 	{
 		UINT32 *rom;
 
-		rom = (UINT32 *)space->machine().region("maincpu")->base();
+		rom = (UINT32 *)space->machine().root_device().memregion("maincpu")->base();
 
 		return rom[offset & 0x1fffff];
 	}
@@ -406,7 +406,7 @@ DIRECT_UPDATE_HANDLER( a310_setopbase )
 	// if the boot ROM is mapped in, do some trickery to make it show up
 	if (memc_latchrom)
 	{
-		direct.explicit_configure(0x000000, 0x1fffff, 0x1fffff, *direct.space().machine().region("maincpu"));
+		direct.explicit_configure(0x000000, 0x1fffff, 0x1fffff, *direct.space().machine().root_device().memregion("maincpu"));
 	}
 	else	// executing from logical memory
 	{

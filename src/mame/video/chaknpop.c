@@ -24,7 +24,7 @@
 
 PALETTE_INIT( chaknpop )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 
 	for (i = 0; i < 1024; i++)
@@ -154,7 +154,7 @@ static TILE_GET_INFO( chaknpop_get_tx_tile_info )
 VIDEO_START( chaknpop )
 {
 	chaknpop_state *state = machine.driver_data<chaknpop_state>();
-	UINT8 *RAM = machine.region("maincpu")->base();
+	UINT8 *RAM = state->memregion("maincpu")->base();
 
 	/*                          info                       offset             type             w   h  col row */
 	state->m_tx_tilemap = tilemap_create(machine, chaknpop_get_tx_tile_info, tilemap_scan_rows,   8,  8, 32, 32);

@@ -228,7 +228,7 @@ static const ym2203_interface ym2203_config =
 static MACHINE_START( momoko )
 {
 	momoko_state *state = machine.driver_data<momoko_state>();
-	UINT8 *BG_MAP = machine.region("user1")->base();
+	UINT8 *BG_MAP = state->memregion("user1")->base();
 
 	state->membank("bank1")->configure_entries(0, 32, &BG_MAP[0x0000], 0x1000);
 

@@ -129,7 +129,7 @@ static WRITE16_DEVICE_HANDLER( aerfboo2_okim6295_banking_w )
 
 WRITE8_MEMBER(aerofgt_state::aerfboot_okim6295_banking_w)
 {
-	UINT8 *oki = machine().region("oki")->base();
+	UINT8 *oki = memregion("oki")->base();
 	/*bit 2 (0x4) setted too?*/
 	if (data & 0x4)
 		memcpy(&oki[0x20000], &oki[((data & 0x3) * 0x20000) + 0x40000], 0x20000);
@@ -1302,7 +1302,7 @@ static MACHINE_START( common )
 
 static MACHINE_START( aerofgt )
 {
-	UINT8 *rom = machine.region("audiocpu")->base();
+	UINT8 *rom = machine.root_device().memregion("audiocpu")->base();
 
 	machine.root_device().membank("bank1")->configure_entries(0, 4, &rom[0x10000], 0x8000);
 

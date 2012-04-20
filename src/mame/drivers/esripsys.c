@@ -104,7 +104,7 @@ READ8_MEMBER(esripsys_state::g_status_r)
 WRITE8_MEMBER(esripsys_state::g_status_w)
 {
 	int bankaddress;
-	UINT8 *rom = machine().region("game_cpu")->base();
+	UINT8 *rom = memregion("game_cpu")->base();
 
 	m_g_status = data;
 
@@ -491,7 +491,7 @@ WRITE8_MEMBER(esripsys_state::s_200e_w)
 
 WRITE8_MEMBER(esripsys_state::s_200f_w)
 {
-	UINT8 *rom = machine().region("sound_data")->base();
+	UINT8 *rom = memregion("sound_data")->base();
 	int rombank = data & 0x20 ? 0x2000 : 0;
 
 	/* Bit 6 -> Reset latch U56A */
@@ -645,7 +645,7 @@ ADDRESS_MAP_END
 static DRIVER_INIT( esripsys )
 {
 	esripsys_state *state = machine.driver_data<esripsys_state>();
-	UINT8 *rom = machine.region("sound_data")->base();
+	UINT8 *rom = state->memregion("sound_data")->base();
 
 	state->m_fdt_a = auto_alloc_array(machine, UINT8, FDT_RAM_SIZE);
 	state->m_fdt_b = auto_alloc_array(machine, UINT8, FDT_RAM_SIZE);

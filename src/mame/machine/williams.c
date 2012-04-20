@@ -369,7 +369,7 @@ static MACHINE_START( williams_common )
 	williams_state *state = machine.driver_data<williams_state>();
 	/* configure the memory bank */
 	state->membank("bank1")->configure_entry(0, state->m_videoram);
-	state->membank("bank1")->configure_entry(1, machine.region("maincpu")->base() + 0x10000);
+	state->membank("bank1")->configure_entry(1, state->memregion("maincpu")->base() + 0x10000);
 
 	state_save_register_global(machine, state->m_vram_bank);
 }
@@ -467,7 +467,7 @@ MACHINE_START( williams2 )
 	williams_state *state = machine.driver_data<williams_state>();
 	/* configure memory banks */
 	state->membank("bank1")->configure_entry(0, state->m_videoram);
-	state->membank("bank1")->configure_entries(1, 4, machine.region("maincpu")->base() + 0x10000, 0x10000);
+	state->membank("bank1")->configure_entries(1, 4, state->memregion("maincpu")->base() + 0x10000, 0x10000);
 
 	/* register for save states */
 	state_save_register_global(machine, state->m_vram_bank);
@@ -772,7 +772,7 @@ MACHINE_START( defender )
 	MACHINE_START_CALL(williams_common);
 
 	/* configure the banking and make sure it is reset to 0 */
-	machine.root_device().membank("bank1")->configure_entries(0, 9, &machine.region("maincpu")->base()[0x10000], 0x1000);
+	machine.root_device().membank("bank1")->configure_entries(0, 9, &machine.root_device().memregion("maincpu")->base()[0x10000], 0x1000);
 
 	machine.save().register_postload(save_prepost_delegate(FUNC(defender_postload), &machine));
 }
@@ -879,10 +879,10 @@ MACHINE_START( blaster )
 
 	/* banking is different for blaster */
 	state->membank("bank1")->configure_entry(0, state->m_videoram);
-	state->membank("bank1")->configure_entries(1, 16, machine.region("maincpu")->base() + 0x18000, 0x4000);
+	state->membank("bank1")->configure_entries(1, 16, machine.root_device().memregion("maincpu")->base() + 0x18000, 0x4000);
 
 	state->membank("bank2")->configure_entry(0, state->m_videoram + 0x4000);
-	state->membank("bank2")->configure_entries(1, 16, machine.region("maincpu")->base() + 0x10000, 0x0000);
+	state->membank("bank2")->configure_entries(1, 16, state->memregion("maincpu")->base() + 0x10000, 0x0000);
 
 	state_save_register_global(machine, state->m_blaster_bank);
 }

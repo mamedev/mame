@@ -199,7 +199,7 @@ static MACHINE_START( cdi )
 static MACHINE_RESET( cdi )
 {
     cdi_state *state = machine.driver_data<cdi_state>();
-    UINT16 *src   = (UINT16*)machine.region("maincpu")->base();
+    UINT16 *src   = (UINT16*)state->memregion("maincpu")->base();
     UINT16 *dst   = state->m_planea;
     //device_t *cdrom_dev = machine.device("cdrom");
     memcpy(dst, src, 0x8);

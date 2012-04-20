@@ -299,8 +299,8 @@ DRIVER_INIT( revx )
 	register_state_saving(machine);
 
 	/* load the graphics ROMs -- quadruples */
-	midtunit_gfx_rom = base = machine.region("gfx1")->base();
-	len = machine.region("gfx1")->bytes();
+	midtunit_gfx_rom = base = machine.root_device().memregion("gfx1")->base();
+	len = state->memregion("gfx1")->bytes();
 	for (i = 0; i < len / 0x200000; i++)
 	{
 		memcpy(state->m_decode_memory, base, 0x200000);

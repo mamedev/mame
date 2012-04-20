@@ -197,8 +197,8 @@ WRITE8_MEMBER(ajax_state::ajax_bankswitch_2_w)
 MACHINE_START( ajax )
 {
 	ajax_state *state = machine.driver_data<ajax_state>();
-	UINT8 *MAIN = machine.region("maincpu")->base();
-	UINT8 *SUB  = machine.region("sub")->base();
+	UINT8 *MAIN = machine.root_device().memregion("maincpu")->base();
+	UINT8 *SUB  = state->memregion("sub")->base();
 
 	state->membank("bank1")->configure_entries(0,  9,  &SUB[0x10000], 0x2000);
 	state->membank("bank2")->configure_entries(0, 12, &MAIN[0x10000], 0x2000);

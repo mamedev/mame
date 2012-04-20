@@ -674,7 +674,7 @@ static MACHINE_START( othunder )
 {
 	othunder_state *state = machine.driver_data<othunder_state>();
 
-	state->membank("bank10")->configure_entries(0, 4, machine.region("audiocpu")->base() + 0xc000, 0x4000);
+	state->membank("bank10")->configure_entries(0, 4, state->memregion("audiocpu")->base() + 0xc000, 0x4000);
 
 	state->m_maincpu = machine.device("maincpu");
 	state->m_audiocpu = machine.device("audiocpu");

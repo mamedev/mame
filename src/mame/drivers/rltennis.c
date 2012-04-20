@@ -162,9 +162,9 @@ static MACHINE_START( rltennis )
 	state->m_screen = machine.device(  "screen");
 	state->m_dac_1 = machine.device("dac1");
 	state->m_dac_2 = machine.device("dac2");
-	state->m_samples_1 = machine.region("samples1")->base();
-	state->m_samples_2 = machine.region("samples2")->base();
-	state->m_gfx =  machine.region("gfx1")->base();
+	state->m_samples_1 = machine.root_device().memregion("samples1")->base();
+	state->m_samples_2 = machine.root_device().memregion("samples2")->base();
+	state->m_gfx =  state->memregion("gfx1")->base();
 	state->m_timer = machine.scheduler().timer_alloc(FUNC(sample_player));
 }
 

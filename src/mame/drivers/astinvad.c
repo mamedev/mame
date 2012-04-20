@@ -159,7 +159,7 @@ static void plot_byte( running_machine &machine, bitmap_rgb32 &bitmap, UINT8 y, 
 static SCREEN_UPDATE_RGB32( astinvad )
 {
 	astinvad_state *state = screen.machine().driver_data<astinvad_state>();
-	const UINT8 *color_prom = screen.machine().region("proms")->base();
+	const UINT8 *color_prom = state->memregion("proms")->base();
 	UINT8 yoffs = state->m_flip_yoffs & state->m_screen_flip;
 	int x, y;
 
@@ -179,7 +179,7 @@ static SCREEN_UPDATE_RGB32( astinvad )
 static SCREEN_UPDATE_RGB32( spaceint )
 {
 	astinvad_state *state = screen.machine().driver_data<astinvad_state>();
-	const UINT8 *color_prom = screen.machine().region("proms")->base();
+	const UINT8 *color_prom = state->memregion("proms")->base();
 	int offs;
 
 	for (offs = 0; offs < state->m_videoram.bytes(); offs++)

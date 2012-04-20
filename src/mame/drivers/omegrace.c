@@ -589,8 +589,8 @@ ROM_END
 
 static DRIVER_INIT( omegrace )
 {
-	int i, len = machine.region("user1")->bytes();
-	UINT8 *prom = machine.region("user1")->base();
+	int i, len = machine.root_device().memregion("user1")->bytes();
+	UINT8 *prom = machine.root_device().memregion("user1")->base();
 
 	/* Omega Race has two pairs of the state PROM output
      * lines swapped before going into the decoder.

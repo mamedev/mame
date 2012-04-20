@@ -149,7 +149,7 @@ static SCREEN_UPDATE_IND16( umipoker )
 
 READ8_MEMBER(umipoker_state::z80_rom_readback_r)
 {
-	UINT8 *ROM = machine().region("audiocpu")->base();
+	UINT8 *ROM = memregion("audiocpu")->base();
 
 	return ROM[offset];
 }

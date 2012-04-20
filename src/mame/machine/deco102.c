@@ -51,8 +51,8 @@ void deco102_decrypt_cpu(running_machine &machine, const char *cputag, int addre
 {
 	int i;
 	address_space *space = machine.device(cputag)->memory().space(AS_PROGRAM);
-	UINT16 *rom = (UINT16 *)machine.region(cputag)->base();
-	int size = machine.region(cputag)->bytes();
+	UINT16 *rom = (UINT16 *)machine.root_device().memregion(cputag)->base();
+	int size = machine.root_device().memregion(cputag)->bytes();
 	UINT16 *opcodes = auto_alloc_array(machine, UINT16, size / 2);
 	UINT16 *buf = auto_alloc_array(machine, UINT16, size / 2);
 

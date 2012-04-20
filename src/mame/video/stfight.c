@@ -32,7 +32,7 @@
 
 PALETTE_INIT( stfight )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 
 	/* allocate the colortable */
@@ -97,7 +97,7 @@ static TILEMAP_MAPPER( fg_scan )
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	UINT8   *fgMap = machine.region("gfx5")->base();
+	UINT8   *fgMap = machine.root_device().memregion("gfx5")->base();
 	int attr,tile_base;
 
 	attr = fgMap[0x8000+tile_index];
@@ -120,7 +120,7 @@ static TILEMAP_MAPPER( bg_scan )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	UINT8   *bgMap = machine.region("gfx6")->base();
+	UINT8   *bgMap = machine.root_device().memregion("gfx6")->base();
 	int attr,tile_bank,tile_base;
 
 	attr = bgMap[0x8000+tile_index];

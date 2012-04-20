@@ -268,7 +268,7 @@ WRITE32_MEMBER(srmp5_state::spr_w)
 READ32_MEMBER(srmp5_state::data_r)
 {
 	UINT32 data;
-	const UINT8 *usr = machine().region("user2")->base();
+	const UINT8 *usr = memregion("user2")->base();
 
 	data=((m_databank>>4)&0xf)*0x100000; //guess
 	data=usr[data+offset*2]+usr[data+offset*2+1]*256;

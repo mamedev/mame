@@ -209,7 +209,7 @@ static void get_sprite_pens(running_machine &machine, pen_t *pens)
 {
 	spacefb_state *state = machine.driver_data<spacefb_state>();
 	static const double fade_weights[] = { 1.0, 1.5, 2.5, 4.0 };
-	const UINT8 *prom = machine.region("proms")->base();
+	const UINT8 *prom = machine.root_device().memregion("proms")->base();
 	int i;
 
 	for (i = 0; i < NUM_SPRITE_PENS; i++)
@@ -251,7 +251,7 @@ static void draw_bullet(running_machine &machine, offs_t offs, pen_t pen, bitmap
 	spacefb_state *state = machine.driver_data<spacefb_state>();
 	UINT8 sy;
 
-	UINT8 *gfx = machine.region("gfx2")->base();
+	UINT8 *gfx = state->memregion("gfx2")->base();
 
 	UINT8 code = state->m_videoram[offs + 0x0200] & 0x3f;
 	UINT8 y = ~state->m_videoram[offs + 0x0100] - 2;
@@ -303,7 +303,7 @@ static void draw_sprite(running_machine &machine, offs_t offs, pen_t *pens, bitm
 	spacefb_state *state = machine.driver_data<spacefb_state>();
 	UINT8 sy;
 
-	UINT8 *gfx = machine.region("gfx1")->base();
+	UINT8 *gfx = state->memregion("gfx1")->base();
 
 	UINT8 code = ~state->m_videoram[offs + 0x0200];
 	UINT8 color_base = (~state->m_videoram[offs + 0x0300] & 0x0f) << 2;

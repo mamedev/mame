@@ -314,7 +314,7 @@ WRITE16_MEMBER(expro02_state::galsnew_6295_bankswitch_w)
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		UINT8 *rom = machine().region("oki")->base();
+		UINT8 *rom = memregion("oki")->base();
 		memcpy(&rom[0x30000],&rom[0x40000 + ((data >> 8) & 0x0f) * 0x10000],0x10000);
 	}
 }
@@ -751,8 +751,8 @@ ROM_END
 
 static DRIVER_INIT(galsnew)
 {
-	UINT32 *src = (UINT32 *)machine.region("gfx3" )->base();
-	UINT32 *dst = (UINT32 *)machine.region("gfx2" )->base();
+	UINT32 *src = (UINT32 *)machine.root_device().memregion("gfx3" )->base();
+	UINT32 *dst = (UINT32 *)machine.root_device().memregion("gfx2" )->base();
 	int x, offset;
 
 

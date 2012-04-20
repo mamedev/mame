@@ -586,8 +586,8 @@ static DRIVER_INIT( badlands )
 	badlands_state *state = machine.driver_data<badlands_state>();
 
 	/* initialize the audio system */
-	state->m_bank_base = &machine.region("audiocpu")->base()[0x03000];
-	state->m_bank_source_data = &machine.region("audiocpu")->base()[0x10000];
+	state->m_bank_base = &machine.root_device().memregion("audiocpu")->base()[0x03000];
+	state->m_bank_source_data = &state->memregion("audiocpu")->base()[0x10000];
 }
 
 

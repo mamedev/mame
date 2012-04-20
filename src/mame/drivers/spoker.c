@@ -575,7 +575,7 @@ MACHINE_CONFIG_END
 static DRIVER_INIT( spk116it )
 {
 	int A;
-	UINT8 *rom = machine.region("maincpu")->base();
+	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
 
 
 	for (A = 0;A < 0x10000;A++)
@@ -682,7 +682,7 @@ ROM_END
 
 static DRIVER_INIT( 3super8 )
 {
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
 	int i;
 
 	/* Decryption is probably done using one macrocell/output on an address decoding pal which we do not have a dump of */
@@ -700,8 +700,8 @@ static DRIVER_INIT( 3super8 )
 
 	/* cheesy hack: take gfx roms from spk116it and rearrange them for this game needs */
 	{
-		UINT8 *src = machine.region("rep_gfx")->base();
-		UINT8 *dst = machine.region("gfx1")->base();
+		UINT8 *src = machine.root_device().memregion("rep_gfx")->base();
+		UINT8 *dst = machine.root_device().memregion("gfx1")->base();
 		UINT8 x;
 
 		for(x=0;x<3;x++)

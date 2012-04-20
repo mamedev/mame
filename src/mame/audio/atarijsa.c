@@ -133,7 +133,7 @@ void atarijsa_init(running_machine &machine, const char *testport, int testmask)
 	test_mask = testmask;
 
 	/* predetermine the bank base */
-	rgn = machine.region("jsa")->base();
+	rgn = machine.root_device().memregion("jsa")->base();
 	bank_base = &rgn[0x03000];
 	bank_source_data = &rgn[0x10000];
 
@@ -161,8 +161,8 @@ void atarijsa_init(running_machine &machine, const char *testport, int testmask)
 		/* the upper 128k is fixed, the lower 128k is bankswitched */
 		for (rgn = 0; rgn < ARRAY_LENGTH(regions); rgn++)
 		{
-			UINT8 *base = machine.region(regions[rgn])->base();
-			if (base != NULL && machine.region(regions[rgn])->bytes() >= 0x80000)
+			UINT8 *base = machine.root_device().memregion(regions[rgn])->base();
+			if (base != NULL && machine.root_device().memregion(regions[rgn])->bytes() >= 0x80000)
 			{
 				const char *bank = (rgn != 2) ? "bank12" : "bank14";
 				const char *bank_plus_1 = (rgn != 2) ? "bank13" : "bank15";

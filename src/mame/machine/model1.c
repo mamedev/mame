@@ -495,7 +495,7 @@ static TGP_FUNCTION( matrix_rotz )
 static TGP_FUNCTION( track_read_quad )
 {
 	model1_state *state = machine.driver_data<model1_state>();
-	const UINT32 *tgp_data = (const UINT32 *)machine.region("user2")->base();
+	const UINT32 *tgp_data = (const UINT32 *)state->memregion("user2")->base();
 	UINT32 a = fifoin_pop(state);
 	int offd;
 
@@ -885,7 +885,7 @@ static TGP_FUNCTION( f47 )
 static TGP_FUNCTION( track_read_info )
 {
 	model1_state *state = machine.driver_data<model1_state>();
-	const UINT32 *tgp_data = (const UINT32 *)machine.region("user2")->base();
+	const UINT32 *tgp_data = (const UINT32 *)state->memregion("user2")->base();
 	UINT16 a = fifoin_pop(state);
 	int offd;
 
@@ -1039,7 +1039,7 @@ static void tri_calc_pq(float ax, float ay, float bx, float by, float cx, float 
 static TGP_FUNCTION( track_lookup )
 {
 	model1_state *state = machine.driver_data<model1_state>();
-	const UINT32 *tgp_data = (const UINT32 *)machine.region("user2")->base();
+	const UINT32 *tgp_data = (const UINT32 *)state->memregion("user2")->base();
 	float a = fifoin_pop_f(state);
 	UINT32 b = fifoin_pop(state);
 	float c = fifoin_pop_f(state);

@@ -100,7 +100,7 @@ READ8_MEMBER(fcombat_state::e300_r)
 	int wx = (m_tx + m_fcombat_sh) / 16;
 	int wy = (m_ty * 2 + m_fcombat_sv) / 16;
 
-	return machine().region("user2")->base()[wx * 32 * 16 + wy];
+	return memregion("user2")->base()[wx * 32 * 16 + wy];
 }
 
 WRITE8_MEMBER(fcombat_state::ee00_w)
@@ -339,8 +339,8 @@ static DRIVER_INIT( fcombat )
 
 	/* make a temporary copy of the character data */
 	src = temp;
-	dst = machine.region("gfx1")->base();
-	length = machine.region("gfx1")->bytes();
+	dst = machine.root_device().memregion("gfx1")->base();
+	length = machine.root_device().memregion("gfx1")->bytes();
 	memcpy(src, dst, length);
 
 	/* decode the characters */
@@ -357,8 +357,8 @@ static DRIVER_INIT( fcombat )
 
 	/* make a temporary copy of the sprite data */
 	src = temp;
-	dst = machine.region("gfx2")->base();
-	length = machine.region("gfx2")->bytes();
+	dst = machine.root_device().memregion("gfx2")->base();
+	length = machine.root_device().memregion("gfx2")->bytes();
 	memcpy(src, dst, length);
 
 	/* decode the sprites */
@@ -378,8 +378,8 @@ static DRIVER_INIT( fcombat )
 
 	/* make a temporary copy of the character data */
 	src = temp;
-	dst = machine.region("gfx3")->base();
-	length = machine.region("gfx3")->bytes();
+	dst = machine.root_device().memregion("gfx3")->base();
+	length = machine.root_device().memregion("gfx3")->bytes();
 	memcpy(src, dst, length);
 
 	/* decode the characters */
@@ -397,8 +397,8 @@ static DRIVER_INIT( fcombat )
 	}
 
 	src = temp;
-	dst = machine.region("user1")->base();
-	length = machine.region("user1")->bytes();
+	dst = machine.root_device().memregion("user1")->base();
+	length = machine.root_device().memregion("user1")->bytes();
 	memcpy(src, dst, length);
 
 	for (oldaddr = 0; oldaddr < 32; oldaddr++)
@@ -409,8 +409,8 @@ static DRIVER_INIT( fcombat )
 
 
 	src = temp;
-	dst = machine.region("user2")->base();
-	length = machine.region("user2")->bytes();
+	dst = machine.root_device().memregion("user2")->base();
+	length = machine.root_device().memregion("user2")->bytes();
 	memcpy(src, dst, length);
 
 	for (oldaddr = 0; oldaddr < 32; oldaddr++)

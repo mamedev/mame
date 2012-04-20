@@ -22,7 +22,7 @@
 
 PALETTE_INIT( appoooh )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 
 	for (i = 0; i < machine.total_colors(); i++)
@@ -61,7 +61,7 @@ PALETTE_INIT( appoooh )
 
 PALETTE_INIT( robowres )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 
 	for (i = 0; i < machine.total_colors(); i++)
@@ -195,7 +195,7 @@ WRITE8_MEMBER(appoooh_state::appoooh_out_w)
 
 	/* bit 6 ROM bank select */
 	{
-		UINT8 *RAM = machine().region("maincpu")->base();
+		UINT8 *RAM = memregion("maincpu")->base();
 
 		membank("bank1")->set_base(&RAM[data&0x40 ? 0x10000 : 0x0a000]);
 	}

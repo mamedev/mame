@@ -490,7 +490,7 @@ READ8_MEMBER( funkball_state::flash_data_r )
 
 	if(m_flash_data_cmd == 0xff)
 	{
-		UINT8 *ROM = machine().region(m_flash_cmd & 0x80 ? "prg_flash" : "data_flash")->base();
+		UINT8 *ROM = memregion(m_flash_cmd & 0x80 ? "prg_flash" : "data_flash")->base();
 
 		return ROM[offset + (m_flash_addr << 16)];
 	}
@@ -536,7 +536,7 @@ WRITE32_MEMBER(funkball_state::biu_ctrl_w)
 			if (data & 0x1 << i*4)		// enable RAM access to region 0xe0000 - 0xfffff
 				membank(banknames[i])->set_base(m_bios_ram + (0x4000 * i));
 			else					// disable RAM access (reads go to BIOS ROM)
-				membank(banknames[i])->set_base(machine().region("bios")->base() + (0x4000 * i));
+				membank(banknames[i])->set_base(machine().root_device().memregion("bios")->base() + (0x4000 * i));
 		}
 	}
 }
@@ -1118,14 +1118,14 @@ static MACHINE_START( funkball )
 static MACHINE_RESET( funkball )
 {
 	funkball_state *state = machine.driver_data<funkball_state>();
-	state->membank("bios_ext1")->set_base(machine.region("bios")->base() + 0x00000);
-	state->membank("bios_ext2")->set_base(machine.region("bios")->base() + 0x04000);
-	state->membank("bios_ext3")->set_base(machine.region("bios")->base() + 0x08000);
-	state->membank("bios_ext4")->set_base(machine.region("bios")->base() + 0x0c000);
-	state->membank("bios_bank1")->set_base(machine.region("bios")->base() + 0x10000);
-	state->membank("bios_bank2")->set_base(machine.region("bios")->base() + 0x14000);
-	state->membank("bios_bank3")->set_base(machine.region("bios")->base() + 0x18000);
-	state->membank("bios_bank4")->set_base(machine.region("bios")->base() + 0x1c000);
+	state->membank("bios_ext1")->set_base(machine.root_device().memregion("bios")->base() + 0x00000);
+	state->membank("bios_ext2")->set_base(machine.root_device().memregion("bios")->base() + 0x04000);
+	state->membank("bios_ext3")->set_base(machine.root_device().memregion("bios")->base() + 0x08000);
+	state->membank("bios_ext4")->set_base(machine.root_device().memregion("bios")->base() + 0x0c000);
+	state->membank("bios_bank1")->set_base(machine.root_device().memregion("bios")->base() + 0x10000);
+	state->membank("bios_bank2")->set_base(machine.root_device().memregion("bios")->base() + 0x14000);
+	state->membank("bios_bank3")->set_base(machine.root_device().memregion("bios")->base() + 0x18000);
+	state->membank("bios_bank4")->set_base(state->memregion("bios")->base() + 0x1c000);
 	state->m_voodoo_pci_regs.base_addr = 0xff000000;
 }
 

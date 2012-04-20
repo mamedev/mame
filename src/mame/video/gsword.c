@@ -11,7 +11,7 @@
 
 static PALETTE_INIT( common )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 
 	/* characters */
@@ -29,7 +29,7 @@ static PALETTE_INIT( common )
 
 PALETTE_INIT( josvolly )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 
 	/* allocate the colortable */
@@ -54,7 +54,7 @@ PALETTE_INIT( josvolly )
 
 PALETTE_INIT( gsword )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 
 	/* allocate the colortable */

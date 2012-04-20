@@ -593,8 +593,8 @@ static INTERRUPT_GEN( firetrap_irq )
 static MACHINE_START( firetrap )
 {
 	firetrap_state *state = machine.driver_data<firetrap_state>();
-	UINT8 *MAIN = machine.region("maincpu")->base();
-	UINT8 *SOUND = machine.region("audiocpu")->base();
+	UINT8 *MAIN = machine.root_device().memregion("maincpu")->base();
+	UINT8 *SOUND = state->memregion("audiocpu")->base();
 
 	state->m_maincpu = machine.device("maincpu");
 	state->m_audiocpu = machine.device("audiocpu");

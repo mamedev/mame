@@ -213,7 +213,7 @@ WRITE8_MEMBER(gstriker_state::gs_sh_pending_command_clear_w)
 
 WRITE8_MEMBER(gstriker_state::gs_sh_bankswitch_w)
 {
-	UINT8 *RAM = machine().region("audiocpu")->base();
+	UINT8 *RAM = memregion("audiocpu")->base();
 	int bankaddress;
 
 	bankaddress = 0x10000 + (data & 0x03) * 0x8000;

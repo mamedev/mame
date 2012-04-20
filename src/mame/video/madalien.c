@@ -16,7 +16,7 @@
 
 static PALETTE_INIT( madalien )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 
 	/* allocate the colortable */
@@ -92,7 +92,7 @@ static TILEMAP_MAPPER( scan_mode3 )
 static TILE_GET_INFO( get_tile_info_BG_1 )
 {
 	madalien_state *state = machine.driver_data<madalien_state>();
-	UINT8 *map = machine.region("user1")->base() + ((*state->m_video_flags & 0x08) << 6);
+	UINT8 *map = state->memregion("user1")->base() + ((*state->m_video_flags & 0x08) << 6);
 
 	SET_TILE_INFO(1, map[tile_index], BIT(*state->m_video_flags, 2) ? 2 : 0, 0);
 }
@@ -101,7 +101,7 @@ static TILE_GET_INFO( get_tile_info_BG_1 )
 static TILE_GET_INFO( get_tile_info_BG_2 )
 {
 	madalien_state *state = machine.driver_data<madalien_state>();
-	UINT8 *map = machine.region("user1")->base() + ((*state->m_video_flags & 0x08) << 6) + 0x80;
+	UINT8 *map = state->memregion("user1")->base() + ((*state->m_video_flags & 0x08) << 6) + 0x80;
 
 	SET_TILE_INFO(1, map[tile_index], BIT(*state->m_video_flags, 2) ? 2 : 0, 0);
 }

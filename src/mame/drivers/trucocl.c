@@ -52,7 +52,7 @@ static TIMER_CALLBACK( dac_irq )
 static WRITE8_DEVICE_HANDLER( audio_dac_w )
 {
 	trucocl_state *state = device->machine().driver_data<trucocl_state>();
-	UINT8 *rom = device->machine().region("maincpu")->base();
+	UINT8 *rom = state->memregion("maincpu")->base();
 	int	dac_address = ( data & 0xf0 ) << 8;
 	int	sel = ( ( (~data) >> 1 ) & 2 ) | ( data & 1 );
 

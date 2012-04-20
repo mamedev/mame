@@ -826,7 +826,7 @@ static DRIVER_INIT( guardian )
 
 	/* it looks like they jsr to $80000 as some kind of protection */
 	/* put an RTS there so we don't die */
-	*(UINT16 *)&machine.region("maincpu")->base()[0x80000] = 0x4E75;
+	*(UINT16 *)&state->memregion("maincpu")->base()[0x80000] = 0x4E75;
 
 	address_space *main = machine.device<m68000_device>("maincpu")->space(AS_PROGRAM);
 	state->m_sloop_base = main->install_readwrite_handler(0x000000, 0x07ffff, read16_delegate(FUNC(atarig42_state::guardians_sloop_data_r),state), write16_delegate(FUNC(atarig42_state::guardians_sloop_data_w),state));

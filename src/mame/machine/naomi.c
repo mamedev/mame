@@ -87,9 +87,9 @@ static UINT8 asciihex_to_dec(UINT8 in)
 static void create_pic_from_retdat(running_machine& machine)
 {
 	{
-		UINT8* hexregion = machine.region("pichex")->base();
-		UINT8* retregion = machine.region("picreturn")->base();
-		UINT8* newregion = machine.region("pic")->base();
+		UINT8* hexregion = machine.root_device().memregion("pichex")->base();
+		UINT8* retregion = machine.root_device().memregion("picreturn")->base();
+		UINT8* newregion = machine.root_device().memregion("pic")->base();
 		int outcount = 0;
 
 		if (hexregion && retregion && newregion)

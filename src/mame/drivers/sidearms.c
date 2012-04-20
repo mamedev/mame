@@ -44,7 +44,7 @@ Notes:
 WRITE8_MEMBER(sidearms_state::sidearms_bankswitch_w)
 {
 	int bankaddress;
-	UINT8 *RAM = machine().region("maincpu")->base();
+	UINT8 *RAM = memregion("maincpu")->base();
 
 
 	/* bits 0 and 1 select the ROM bank */
@@ -124,7 +124,7 @@ ADDRESS_MAP_END
 WRITE8_MEMBER(sidearms_state::whizz_bankswitch_w)
 {
 	int bankaddress;
-	UINT8 *RAM = machine().region("maincpu")->base();
+	UINT8 *RAM = memregion("maincpu")->base();
 	int bank = 0;
 
 	switch (data & 0xC0)

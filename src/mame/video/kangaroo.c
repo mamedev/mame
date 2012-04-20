@@ -101,8 +101,8 @@ WRITE8_MEMBER(kangaroo_state::kangaroo_video_control_w)
 static void blitter_execute( running_machine &machine )
 {
 	kangaroo_state *state = machine.driver_data<kangaroo_state>();
-	UINT32 gfxhalfsize = machine.region("gfx1")->bytes() / 2;
-	const UINT8 *gfxbase = machine.region("gfx1")->base();
+	UINT32 gfxhalfsize = machine.root_device().memregion("gfx1")->bytes() / 2;
+	const UINT8 *gfxbase = state->memregion("gfx1")->base();
 	UINT16 src = state->m_video_control[0] + 256 * state->m_video_control[1];
 	UINT16 dst = state->m_video_control[2] + 256 * state->m_video_control[3];
 	UINT8 height = state->m_video_control[5];

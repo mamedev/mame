@@ -27,7 +27,7 @@
 
 PALETTE_INIT( polepos )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	polepos_state *state = machine.driver_data<polepos_state>();
 	int i, j;
 
@@ -348,7 +348,7 @@ WRITE8_MEMBER(polepos_state::polepos_alpha_w)
 static void draw_road(running_machine &machine, bitmap_ind16 &bitmap)
 {
 	polepos_state *state = machine.driver_data<polepos_state>();
-	const UINT8 *road_control = machine.region("gfx5")->base();
+	const UINT8 *road_control = state->memregion("gfx5")->base();
 	const UINT8 *road_bits1 = road_control + 0x2000;
 	const UINT8 *road_bits2 = road_control + 0x4000;
 	int x, y, i;
@@ -427,7 +427,7 @@ static void zoom_sprite(running_machine &machine, bitmap_ind16 &bitmap,int big,
 {
 	const gfx_element *gfx = machine.gfx[big ? 3 : 2];
 	const UINT8 *gfxdata = gfx_element_get_data(gfx, code % gfx->total_elements);
-	UINT8 *scaling_rom = machine.region("gfx6")->base();
+	UINT8 *scaling_rom = machine.root_device().memregion("gfx6")->base();
 	UINT32 transmask = colortable_get_transpen_mask(machine.colortable, gfx, color, 0x1f);
 	int coloroffs = gfx->color_base + color * gfx->color_granularity;
 	int x,y;

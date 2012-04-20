@@ -36,7 +36,7 @@
 
 PALETTE_INIT( exerion )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	static const int resistances_rg[3] = { 1000, 470, 220 };
 	static const int resistances_b [2] = { 470, 220 };
 	double rweights[3], gweights[3], bweights[2];
@@ -111,7 +111,7 @@ VIDEO_START( exerion )
 	UINT8 *gfx;
 
 	/* get pointers to the mixing and lookup PROMs */
-	state->m_background_mixer = machine.region("proms")->base() + 0x320;
+	state->m_background_mixer = machine.root_device().memregion("proms")->base() + 0x320;
 
 	/* allocate memory for the decoded background graphics */
 	state->m_background_gfx[0] = auto_alloc_array(machine, UINT16, 256 * 256 * 4);
@@ -136,7 +136,7 @@ VIDEO_START( exerion )
      * Where AA,BB,CC,DD are the 2bpp data for the pixel,and a,b,c,d are the OR
      * of these two bits together.
      */
-	gfx = machine.region("gfx3")->base();
+	gfx = state->memregion("gfx3")->base();
 	for (i = 0; i < 4; i++)
 	{
 		int y;

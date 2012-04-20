@@ -386,9 +386,9 @@ GFXDECODE_END
 
 static PALETTE_INIT( sub )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
-	UINT8* lookup = machine.region("proms2")->base();
+	UINT8* lookup = machine.root_device().memregion("proms2")->base();
 
 	/* allocate the colortable */
 	machine.colortable = colortable_alloc(machine, 0x100);

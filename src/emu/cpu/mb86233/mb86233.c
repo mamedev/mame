@@ -119,7 +119,7 @@ static CPU_INIT( mb86233 )
 	{
 		cpustate->fifo_read_cb = _config->fifo_read_cb;
 		cpustate->fifo_write_cb = _config->fifo_write_cb;
-		cpustate->Tables = (UINT32*) device->machine().region(_config->tablergn)->base();
+		cpustate->Tables = (UINT32*) device->machine().root_device().memregion(_config->tablergn)->base();
 	}
 
 	cpustate->RAM = auto_alloc_array(device->machine(), UINT32, 2 * 0x200);		/* 2x 2KB */

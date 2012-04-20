@@ -31,7 +31,7 @@ const device_type PLS100 = &device_creator<pls100_device>;
 inline void pls100_device::parse_fusemap()
 {
 	jed_data jed;
-	jedbin_parse(machine().region(tag())->base(), machine().region(tag())->bytes(), &jed);
+	jedbin_parse(machine().root_device().memregion(tag())->base(), machine().root_device().memregion(tag())->bytes(), &jed);
 	UINT32 fusenum = 0;
 	m_xor = 0;
 
@@ -113,7 +113,7 @@ pls100_device::pls100_device(const machine_config &mconfig, const char *tag, dev
 void pls100_device::device_start()
 {
 	// parse fusemap
-	assert(machine().region(tag()) != NULL);
+	assert(machine().root_device().memregion(tag()) != NULL);
 	parse_fusemap();
 
 	// register for state saving

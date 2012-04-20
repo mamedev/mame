@@ -118,8 +118,8 @@ static MACHINE_RESET( segac2 )
 
 	/* determine how many sound banks */
 	state->m_sound_banks = 0;
-	if (machine.region("upd")->base())
-		state->m_sound_banks = machine.region("upd")->bytes() / 0x20000;
+	if (machine.root_device().memregion("upd")->base())
+		state->m_sound_banks = state->memregion("upd")->bytes() / 0x20000;
 
 	/* reset the protection */
 	state->m_prot_write_buf = 0;
@@ -2088,7 +2088,7 @@ static DRIVER_INIT( ichirj )
 static DRIVER_INIT( ichirjbl )
 {
 	/* when did this actually work? - the protection is patched but the new check fails? */
-	UINT16 *rom = (UINT16 *)machine.region("maincpu")->base();
+	UINT16 *rom = (UINT16 *)machine.root_device().memregion("maincpu")->base();
 	rom[0x390/2] = 0x6600;
 
 	segac2_common_init(machine, NULL);

@@ -464,7 +464,7 @@ static MACHINE_RESET( mpu4 )
 
 	/* init rom bank, some games don't set this, and will assume bank 0,set 0 */
 	{
-		UINT8 *rom = machine.region("maincpu")->base();
+		UINT8 *rom = state->memregion("maincpu")->base();
 
 		state->membank("bank1")->configure_entries(0, 8, &rom[0x01000], 0x10000);
 
@@ -528,7 +528,7 @@ WRITE8_MEMBER(mpu4_state::bankswitch_w)
 
 READ8_MEMBER(mpu4_state::bankswitch_r)
 {
-	return machine().root_device().membank("bank1")->entry();
+	return membank("bank1")->entry();
 }
 
 
@@ -15233,13 +15233,13 @@ void descramble_crystal( UINT8* region, int start, int end, UINT8 extra_xor)
 DRIVER_INIT( crystal )
 {
 	DRIVER_INIT_CALL(m_frkstn);
-	descramble_crystal(machine.region( "maincpu" )->base(), 0x0000, 0x10000, 0x00);
+	descramble_crystal(machine.root_device().memregion( "maincpu" )->base(), 0x0000, 0x10000, 0x00);
 }
 
 DRIVER_INIT( crystali )
 {
 	DRIVER_INIT_CALL(m_frkstn);
-	descramble_crystal(machine.region( "maincpu" )->base(), 0x0000, 0x10000, 0xff); // invert after decrypt?!
+	descramble_crystal(machine.root_device().memregion( "maincpu" )->base(), 0x0000, 0x10000, 0xff); // invert after decrypt?!
 }
 
 

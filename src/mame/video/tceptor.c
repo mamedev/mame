@@ -20,7 +20,7 @@
 
 PALETTE_INIT( tceptor )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	tceptor_state *state = machine.driver_data<tceptor_state>();
 	int i;
 
@@ -243,7 +243,7 @@ static void decode_bg(running_machine &machine, const char * region)
 	};
 
 	int gfx_index = state->m_bg;
-	UINT8 *src = machine.region(region)->base() + 0x8000;
+	UINT8 *src = machine.root_device().memregion(region)->base() + 0x8000;
 	UINT8 *buffer;
 	int len = 0x8000;
 	int i;
@@ -261,7 +261,7 @@ static void decode_bg(running_machine &machine, const char * region)
 	auto_free(machine, buffer);
 
 	/* decode the graphics */
-	machine.gfx[gfx_index] = gfx_element_alloc(machine, &bg_layout, machine.region(region)->base(), 64, 2048);
+	machine.gfx[gfx_index] = gfx_element_alloc(machine, &bg_layout, machine.root_device().memregion(region)->base(), 64, 2048);
 }
 
 static void decode_sprite(running_machine &machine, int gfx_index, const gfx_layout *layout, const void *data)
@@ -291,8 +291,8 @@ static void decode_sprite16(running_machine &machine, const char * region)
 		2*16*16
 	};
 
-	UINT8 *src = machine.region(region)->base();
-	int len = machine.region(region)->bytes();
+	UINT8 *src = machine.root_device().memregion(region)->base();
+	int len = machine.root_device().memregion(region)->bytes();
 	UINT8 *dst;
 	int i, y;
 
@@ -343,8 +343,8 @@ static void decode_sprite32(running_machine &machine, const char * region)
 		2*32*32
 	};
 
-	UINT8 *src = machine.region(region)->base();
-	int len = machine.region(region)->bytes();
+	UINT8 *src = machine.root_device().memregion(region)->base();
+	int len = machine.root_device().memregion(region)->bytes();
 	int total = spr32_layout.total;
 	int size = spr32_layout.charincrement / 8;
 	UINT8 *dst;

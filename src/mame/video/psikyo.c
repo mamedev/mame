@@ -269,8 +269,8 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	static const int pri[] = { 0, 0xfc, 0xff, 0xff };
 	int offs;
 	UINT16 *spritelist = (UINT16 *)(state->m_spritebuf2 + 0x1800 / 4);
-	UINT8 *TILES = machine.region("spritelut")->base();	// Sprites LUT
-	int TILES_LEN = machine.region("spritelut")->bytes();
+	UINT8 *TILES = machine.root_device().memregion("spritelut")->base();	// Sprites LUT
+	int TILES_LEN = machine.root_device().memregion("spritelut")->bytes();
 
 	int width = machine.primary_screen->width();
 	int height = machine.primary_screen->height();
@@ -388,8 +388,8 @@ static void draw_sprites_bootleg( running_machine &machine, bitmap_ind16 &bitmap
 	static const int pri[] = { 0, 0xfc, 0xff, 0xff };
 	int offs;
 	UINT16 *spritelist = (UINT16 *)(state->m_spritebuf2 + 0x1800 / 4);
-	UINT8 *TILES = machine.region("spritelut")->base();	// Sprites LUT
-	int TILES_LEN = machine.region("spritelut")->bytes();
+	UINT8 *TILES = machine.root_device().memregion("spritelut")->base();	// Sprites LUT
+	int TILES_LEN = machine.root_device().memregion("spritelut")->bytes();
 
 	int width = machine.primary_screen->width();
 	int height = machine.primary_screen->height();

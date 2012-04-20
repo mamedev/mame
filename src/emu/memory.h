@@ -740,6 +740,62 @@ private:
 };
 
 
+// ======================> memory_region
+
+// memory region object
+class memory_region
+{
+	DISABLE_COPYING(memory_region);
+
+	friend class memory_manager;
+	friend class simple_list<memory_region>;
+	friend resource_pool_object<memory_region>::~resource_pool_object();
+
+	// construction/destruction
+	memory_region(running_machine &machine, const char *name, UINT32 length, UINT8 width, endianness_t endian);
+
+public:
+	// getters
+	running_machine &machine() const { return m_machine; }
+	memory_region *next() const { return m_next; }
+	UINT8 *base() { return (this != NULL) ? &m_buffer[0] : NULL; }
+	UINT8 *end() { return (this != NULL) ? base() + m_buffer.count() : NULL; }
+	UINT32 bytes() const { return (this != NULL) ? m_buffer.count() : 0; }
+	const char *name() const { return m_name; }
+
+	// flag expansion
+	endianness_t endianness() const { return m_endianness; }
+	UINT8 width() const { return m_width; }
+
+	// data access
+	UINT8 &u8(offs_t offset = 0) { return m_buffer[offset]; }
+	UINT16 &u16(offs_t offset = 0) { return reinterpret_cast<UINT16 *>(base())[offset]; }
+	UINT32 &u32(offs_t offset = 0) { return reinterpret_cast<UINT32 *>(base())[offset]; }
+	UINT64 &u64(offs_t offset = 0) { return reinterpret_cast<UINT64 *>(base())[offset]; }
+
+	// allow passing a region for any common pointer
+	operator void *() { return (this != NULL) ? reinterpret_cast<void *>(base()) : NULL; }
+	operator INT8 *() { return (this != NULL) ? reinterpret_cast<INT8 *>(base()) : NULL; }
+	operator UINT8 *() { return (this != NULL) ? reinterpret_cast<UINT8 *>(base()) : NULL; }
+	operator INT16 *() { return (this != NULL) ? reinterpret_cast<INT16 *>(base()) : NULL; }
+	operator UINT16 *() { return (this != NULL) ? reinterpret_cast<UINT16 *>(base()) : NULL; }
+	operator INT32 *() { return (this != NULL) ? reinterpret_cast<INT32 *>(base()) : NULL; }
+	operator UINT32 *() { return (this != NULL) ? reinterpret_cast<UINT32 *>(base()) : NULL; }
+	operator INT64 *() { return (this != NULL) ? reinterpret_cast<INT64 *>(base()) : NULL; }
+	operator UINT64 *() { return (this != NULL) ? reinterpret_cast<UINT64 *>(base()) : NULL; }
+
+private:
+	// internal data
+	running_machine &		m_machine;
+	memory_region *			m_next;
+	astring					m_name;
+	dynamic_buffer			m_buffer;
+	UINT8					m_width;
+	endianness_t			m_endianness;
+};
+
+
+
 // ======================> memory_manager
 
 // holds internal state for the memory system
@@ -748,14 +804,17 @@ class memory_manager
 	friend class address_space;
 	friend class address_table;
 	friend class device_t;
+	friend class memory_block;
 
 public:
 	// construction/destruction
 	memory_manager(running_machine &machine);
+	void initialize();
 
 	// getters
 	running_machine &machine() const { return m_machine; }
 	address_space *first_space() const { return m_spacelist.first(); }
+	memory_region *first_region() const { return m_regionlist.first(); }
 
 	// get a pointer to a shared memory region by tag
 	memory_share *shared(const char *tag);
@@ -767,10 +826,15 @@ public:
 	// pointers to a bank pointer (internal usage only)
 	UINT8 **bank_pointer_addr(UINT8 index, bool decrypted = false) { return decrypted ? &m_bankd_ptr[index] : &m_bank_ptr[index]; }
 
+	// regions
+	memory_region *region_alloc(const char *name, UINT32 length, UINT8 width, endianness_t endian);
+	void region_free(const char *name);
+
 private:
 	// internal helpers
 	memory_bank *first_bank() const { return m_banklist.first(); }
-	memory_bank *bank(const char *tag) const { return m_bankmap.find_hash_only(tag); }
+	memory_bank *bank(const char *tag) const { return m_bankmap.find(tag); }
+	memory_region *region(const char *tag) { return m_regionlist.find(tag); }
 	void bank_reattach();
 
 	// internal state
@@ -788,6 +852,8 @@ private:
 	UINT8						m_banknext;				// next bank to allocate
 
 	tagged_list<memory_share>	m_sharelist;			// map for share lookups
+
+	tagged_list<memory_region> 	m_regionlist;			// list of memory regions
 };
 
 

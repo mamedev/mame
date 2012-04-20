@@ -378,7 +378,7 @@ ROM_END
 
 static DRIVER_INIT(pip)
 {
-//  UINT16 *rom = (UINT16 *)machine.region("maincpu")->base();
+//  UINT16 *rom = (UINT16 *)machine.root_device().memregion("maincpu")->base();
 //  rom[0x2696/2] = 0x4e71;
 //  rom[0x26a0/2] = 0x4e71;
 	pc_vga_init(machine, vga_setting, NULL);

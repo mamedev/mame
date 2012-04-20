@@ -421,7 +421,7 @@ static void tx1_update_state(running_machine &machine)
 
 	tx1_state *state = machine.driver_data<tx1_state>();
 	math_t &math = state->m_math;
-	const UINT16 *prom = (UINT16*)machine.region("au_data")->base() + (0x8000 >> 1);
+	const UINT16 *prom = (UINT16*)state->memregion("au_data")->base() + (0x8000 >> 1);
 
 	for (;;)
 	{
@@ -479,7 +479,7 @@ static void tx1_update_state(running_machine &machine)
 					data = math.muxlatch;
 				else if (dsel == 1)
 				{
-					UINT16 *romdata = (UINT16*)machine.region("au_data")->base();
+					UINT16 *romdata = (UINT16*)machine.root_device().memregion("au_data")->base();
 					UINT16 addr = get_tx1_datarom_addr(math);
 					data = romdata[addr];
 				}
@@ -656,7 +656,7 @@ READ16_MEMBER(tx1_state::tx1_math_r)
                 TODO make this constant somewhere
                 e.g. math.retval =  math.romptr[ get_tx1_datarom_addr() ];
             */
-			UINT16 *romdata = (UINT16*)machine().region("au_data")->base();
+			UINT16 *romdata = (UINT16*)machine().root_device().memregion("au_data")->base();
 			UINT16 addr = get_tx1_datarom_addr(math);
 			math.retval = romdata[addr];
 		}
@@ -804,7 +804,7 @@ WRITE16_MEMBER(tx1_state::tx1_math_w)
 READ16_MEMBER(tx1_state::tx1_spcs_rom_r)
 {
 	math_t &math = m_math;
-	math.cpulatch = *(UINT16*)((UINT8*)machine().region("math_cpu")->base() + 0xfc000 + 0x1000 + offset*2);
+	math.cpulatch = *(UINT16*)((UINT8*)machine().root_device().memregion("math_cpu")->base() + 0xfc000 + 0x1000 + offset*2);
 
 	if (math.mux == TX1_SEL_ILDEN)
 	{
@@ -984,7 +984,7 @@ static void buggyboy_update_state(running_machine &machine)
 
 	tx1_state *state = machine.driver_data<tx1_state>();
 	math_t &math = state->m_math;
-	const UINT16 *prom = (UINT16*)machine.region("au_data")->base() + (0x8000 >> 1);
+	const UINT16 *prom = (UINT16*)state->memregion("au_data")->base() + (0x8000 >> 1);
 
 	for (;;)
 	{
@@ -1017,7 +1017,7 @@ static void buggyboy_update_state(running_machine &machine)
 
 			if (math.mux == BB_MUX_DPROE)
 			{
-				UINT16 *romdata = (UINT16*)machine.region("au_data")->base();
+				UINT16 *romdata = (UINT16*)machine.root_device().memregion("au_data")->base();
 				UINT16 addr = get_bb_datarom_addr(math);
 				kick_sn74s516(machine, &romdata[addr], ins);
 			}
@@ -1133,7 +1133,7 @@ READ16_MEMBER(tx1_state::buggyboy_math_r)
 	/* /DPROE */
 	else if ((offset & 0xc00) == 0xc00)
 	{
-		UINT16 *romdata = (UINT16*)machine().region("au_data")->base();
+		UINT16 *romdata = (UINT16*)machine().root_device().memregion("au_data")->base();
 		UINT16 addr = get_bb_datarom_addr(math);
 
 		math.retval = romdata[addr];
@@ -1266,7 +1266,7 @@ WRITE16_MEMBER(tx1_state::buggyboy_math_w)
 READ16_MEMBER(tx1_state::buggyboy_spcs_rom_r)
 {
 	math_t &math = m_math;
-	math.cpulatch = *(UINT16*)((UINT8*)machine().region("math_cpu")->base() + 0xfc000 + 0x1000 + offset*2);
+	math.cpulatch = *(UINT16*)((UINT8*)machine().root_device().memregion("math_cpu")->base() + 0xfc000 + 0x1000 + offset*2);
 
 	if (math.mux == BB_MUX_ILDEN)
 	{

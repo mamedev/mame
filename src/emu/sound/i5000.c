@@ -43,8 +43,8 @@ void i5000snd_device::device_start()
 	// create the stream
 	m_stream = machine().sound().stream_alloc(*this, 0, 2, clock() / 0x400, this);
 
-	m_rom_base = (UINT16 *)device().machine().region(":i5000snd")->base();
-	m_rom_mask = device().machine().region(":i5000snd")->bytes() / 2 - 1;
+	m_rom_base = (UINT16 *)device().machine().root_device().memregion(":i5000snd")->base();
+	m_rom_mask = device().machine().root_device().memregion(":i5000snd")->bytes() / 2 - 1;
 }
 
 

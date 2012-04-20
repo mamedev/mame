@@ -273,7 +273,7 @@ static DEVICE_START( atarirle )
 	atarirle_data *mo = get_safe_token(device);
 	running_machine &machine = device->machine();
 	const atarirle_desc *desc = (const atarirle_desc *)device->static_config();
-	const UINT16 *base = (const UINT16 *)machine.region(desc->region)->base();
+	const UINT16 *base = (const UINT16 *)machine.root_device().memregion(desc->region)->base();
 	int i, width, height;
 
 	/* build and allocate the generic tables */
@@ -303,7 +303,7 @@ static DEVICE_START( atarirle )
 	mo->maxcolors     = desc->maxcolors / 16;
 
 	mo->rombase       = base;
-	mo->romlength     = machine.region(desc->region)->bytes();
+	mo->romlength     = machine.root_device().memregion(desc->region)->bytes();
 	mo->objectcount   = count_objects(base, mo->romlength);
 
 	mo->cliprect      = machine.primary_screen->visible_area();

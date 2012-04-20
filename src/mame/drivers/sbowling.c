@@ -75,7 +75,7 @@ public:
 static TILE_GET_INFO( get_sb_tile_info )
 {
 	sbowling_state *state = machine.driver_data<sbowling_state>();
-	UINT8 *rom = machine.region("user1")->base();
+	UINT8 *rom = state->memregion("user1")->base();
 	int tileno = rom[tile_index + state->m_bgmap * 1024];
 
 	SET_TILE_INFO(0, tileno, 0, 0);
@@ -342,7 +342,7 @@ GFXDECODE_END
 
 static PALETTE_INIT( sbowling )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 
 	static const int resistances_rg[3] = { 470, 270, 100 };

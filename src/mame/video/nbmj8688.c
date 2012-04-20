@@ -162,7 +162,7 @@ WRITE8_MEMBER(nbmj8688_state::mjsikaku_scrolly_w)
 
 WRITE8_MEMBER(nbmj8688_state::mjsikaku_romsel_w)
 {
-	int gfxlen = machine().region("gfx1")->bytes();
+	int gfxlen = memregion("gfx1")->bytes();
 	m_mjsikaku_gfxrom = (data & 0x0f);
 
 	if ((m_mjsikaku_gfxrom << 17) > (gfxlen - 1))
@@ -176,7 +176,7 @@ WRITE8_MEMBER(nbmj8688_state::mjsikaku_romsel_w)
 
 WRITE8_MEMBER(nbmj8688_state::secolove_romsel_w)
 {
-	int gfxlen = machine().region("gfx1")->bytes();
+	int gfxlen = memregion("gfx1")->bytes();
 	m_mjsikaku_gfxrom = ((data & 0xc0) >> 4) + (data & 0x03);
 	mjsikaku_gfxflag2_w(space, 0, data);
 
@@ -191,7 +191,7 @@ WRITE8_MEMBER(nbmj8688_state::secolove_romsel_w)
 
 WRITE8_MEMBER(nbmj8688_state::crystalg_romsel_w)
 {
-	int gfxlen = machine().region("gfx1")->bytes();
+	int gfxlen = memregion("gfx1")->bytes();
 	m_mjsikaku_gfxrom = (data & 0x03);
 	mjsikaku_gfxflag2_w(space, 0, data);
 
@@ -206,7 +206,7 @@ WRITE8_MEMBER(nbmj8688_state::crystalg_romsel_w)
 
 WRITE8_MEMBER(nbmj8688_state::seiha_romsel_w)
 {
-	int gfxlen = machine().region("gfx1")->bytes();
+	int gfxlen = memregion("gfx1")->bytes();
 	m_mjsikaku_gfxrom = (data & 0x1f);
 	mjsikaku_gfxflag3_w(space, 0, data);
 
@@ -274,7 +274,7 @@ static TIMER_CALLBACK( blitter_timer_callback )
 static void mbmj8688_gfxdraw(running_machine &machine, int gfxtype)
 {
 	nbmj8688_state *state = machine.driver_data<nbmj8688_state>();
-	UINT8 *GFX = machine.region("gfx1")->base();
+	UINT8 *GFX = state->memregion("gfx1")->base();
 
 	int x, y;
 	int dx1, dx2, dy;
@@ -317,7 +317,7 @@ static void mbmj8688_gfxdraw(running_machine &machine, int gfxtype)
 		skipy = -1;
 	}
 
-	gfxlen = machine.region("gfx1")->bytes();
+	gfxlen = machine.root_device().memregion("gfx1")->bytes();
 	gfxaddr = (state->m_mjsikaku_gfxrom << 17) + (state->m_blitter_src_addr << 1);
 //popmessage("ADDR:%08X DX:%03d DY:%03d SX:%03d SY:%03d", gfxaddr, startx, starty, sizex, sizey);
 //if (state->m_blitter_direction_x|state->m_blitter_direction_y) popmessage("ADDR:%08X FX:%01d FY:%01d", gfxaddr, state->m_blitter_direction_x, state->m_blitter_direction_y);

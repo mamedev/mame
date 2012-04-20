@@ -150,10 +150,6 @@ running_machine::running_machine(const machine_config &_config, osd_interface &o
 	  m_config(_config),
 	  m_system(_config.gamedrv()),
 	  m_osd(osd),
-	  m_regionlist(m_respool),
-	  m_save(*this),
-	  m_scheduler(*this),
-	  m_memory(NULL),
 	  m_cheat(NULL),
 	  m_render(NULL),
 	  m_input(NULL),
@@ -176,7 +172,11 @@ running_machine::running_machine(const machine_config &_config, osd_interface &o
 	  m_saveload_schedule(SLS_NONE),
 	  m_saveload_schedule_time(attotime::zero),
 	  m_saveload_searchpath(NULL),
-	  m_logerror_list(m_respool)
+	  m_logerror_list(m_respool),
+
+	  m_save(*this),
+	  m_memory(*this),
+	  m_scheduler(*this)
 {
 	memset(gfx, 0, sizeof(gfx));
 	memset(&m_base_time, 0, sizeof(m_base_time));
@@ -276,7 +276,7 @@ void running_machine::start()
 	// first load ROMs, then populate memory, and finally initialize CPUs
 	// these operations must proceed in this order
 	rom_init(*this);
-	m_memory = auto_alloc(*this, memory_manager(*this));
+	m_memory.initialize();
 	m_watchdog_timer = m_scheduler.timer_alloc(timer_expired_delegate(FUNC(running_machine::watchdog_fired), this));
 	save().save_item(NAME(m_watchdog_enabled));
 	save().save_item(NAME(m_watchdog_counter));
@@ -602,33 +602,6 @@ void running_machine::resume()
 
 	// call the callbacks
 	call_notifiers(MACHINE_NOTIFY_RESUME);
-}
-
-
-//-------------------------------------------------
-//  region_alloc - allocates memory for a region
-//-------------------------------------------------
-
-memory_region *running_machine::region_alloc(const char *name, UINT32 length, UINT8 width, endianness_t endian)
-{
-mame_printf_verbose("Region '%s' created\n", name);
-    // make sure we don't have a region of the same name; also find the end of the list
-    memory_region *info = m_regionlist.find(name);
-    if (info != NULL)
-		fatalerror("region_alloc called with duplicate region name \"%s\"\n", name);
-
-	// allocate the region
-	return &m_regionlist.append(name, *auto_alloc(*this, memory_region(*this, name, length, width, endian)));
-}
-
-
-//-------------------------------------------------
-//  region_free - releases memory for a region
-//-------------------------------------------------
-
-void running_machine::region_free(const char *name)
-{
-	m_regionlist.remove(name);
 }
 
 
@@ -1055,38 +1028,6 @@ void running_machine::postload_all_devices()
 	device_iterator iter(root_device());
 	for (device_t *device = iter.first(); device != NULL; device = iter.next())
 		device->post_load();
-}
-
-
-
-/***************************************************************************
-    MEMORY REGIONS
-***************************************************************************/
-
-//-------------------------------------------------
-//  memory_region - constructor
-//-------------------------------------------------
-
-memory_region::memory_region(running_machine &machine, const char *name, UINT32 length, UINT8 width, endianness_t endian)
-	: m_machine(machine),
-	  m_next(NULL),
-	  m_name(name),
-	  m_length(length),
-	  m_width(width),
-	  m_endianness(endian)
-{
-	assert(width == 1 || width == 2 || width == 4 || width == 8);
-	m_base.u8 = auto_alloc_array(machine, UINT8, length);
-}
-
-
-//-------------------------------------------------
-//  ~memory_region - destructor
-//-------------------------------------------------
-
-memory_region::~memory_region()
-{
-	auto_free(machine(), m_base.v);
 }
 
 

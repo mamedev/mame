@@ -348,7 +348,7 @@ static const ym3812_interface ym3812_config =
 static MACHINE_START( onetwo )
 {
 	onetwo_state *state = machine.driver_data<onetwo_state>();
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = state->memregion("maincpu")->base();
 
 	state->membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
 

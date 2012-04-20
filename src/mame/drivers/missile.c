@@ -501,7 +501,7 @@ DIRECT_UPDATE_MEMBER(missile_state::missile_direct_handler)
 	/* ROM? */
 	else if (address >= 0x5000)
 	{
-		direct.explicit_configure(0x5000 | offset, 0x7fff | offset, 0x7fff, direct.space().machine().region("maincpu")->base() + 0x5000);
+		direct.explicit_configure(0x5000 | offset, 0x7fff | offset, 0x7fff, direct.space().machine().root_device().memregion("maincpu")->base() + 0x5000);
 		return ~0;
 	}
 
@@ -514,7 +514,7 @@ static MACHINE_START( missile )
 {
 	missile_state *state = machine.driver_data<missile_state>();
 	/* initialize globals */
-	state->m_writeprom = machine.region("proms")->base();
+	state->m_writeprom = state->memregion("proms")->base();
 	state->m_flipscreen = 0;
 
 	/* set up an opcode base handler since we use mapped handlers for RAM */
@@ -786,7 +786,7 @@ READ8_MEMBER(missile_state::missile_r)
 
 	/* ROM */
 	else if (offset >= 0x5000)
-		result = machine().region("maincpu")->base()[offset];
+		result = memregion("maincpu")->base()[offset];
 
 	/* POKEY */
 	else if (offset < 0x4800)
@@ -1199,7 +1199,7 @@ ROM_END
 static DRIVER_INIT( suprmatk )
 {
 	int i;
-	UINT8 *rom = machine.region("maincpu")->base();
+	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
 
 	for (i = 0; i < 0x40; i++)
 	{

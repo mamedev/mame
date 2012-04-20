@@ -165,7 +165,7 @@ static DEVICE_START( renegade_adpcm )
 	renegade_adpcm_state *state = get_safe_token(device);
 	state->m_playing = 0;
 	state->m_stream = device->machine().sound().stream_alloc(*device, 0, 1, device->clock(), state, renegade_adpcm_callback);
-	state->m_base = device->machine().region("adpcm")->base();
+	state->m_base = device->machine().root_device().memregion("adpcm")->base();
 	state->m_adpcm.reset();
 }
 
@@ -240,7 +240,7 @@ static const UINT8 kuniokun_xor_table[0x2a] =
 static void setbank(running_machine &machine)
 {
 	renegade_state *state = machine.driver_data<renegade_state>();
-	UINT8 *RAM = machine.region("maincpu")->base();
+	UINT8 *RAM = state->memregion("maincpu")->base();
 	state->membank("bank1")->set_base(&RAM[state->m_bank ? 0x10000 : 0x4000]);
 }
 

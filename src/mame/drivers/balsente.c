@@ -2079,8 +2079,8 @@ static void expand_roms(running_machine &machine, UINT8 cd_rom_mask)
 
 	UINT8 *temp = auto_alloc_array(machine, UINT8, 0x20000);
 	{
-		UINT8 *rom = machine.region("maincpu")->base();
-		UINT32 len = machine.region("maincpu")->bytes();
+		UINT8 *rom = machine.root_device().memregion("maincpu")->base();
+		UINT32 len = machine.root_device().memregion("maincpu")->bytes();
 		UINT32 base;
 
 		for (base = 0x10000; base < len; base += 0x30000)
@@ -2154,7 +2154,7 @@ static DRIVER_INIT( stocker )  { expand_roms(machine, EXPAND_ALL);  config_shoot
 static DRIVER_INIT( triviag1 ) { expand_roms(machine, EXPAND_ALL);  config_shooter_adc(machine, FALSE, 0 /* noanalog */); }
 static DRIVER_INIT( triviag2 )
 {
-	UINT8 *rom = machine.region("maincpu")->base();
+	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
 	memcpy(&rom[0x20000], &rom[0x28000], 0x4000);
 	memcpy(&rom[0x24000], &rom[0x28000], 0x4000);
 	expand_roms(machine, EXPAND_NONE); config_shooter_adc(machine, FALSE, 0 /* noanalog */);

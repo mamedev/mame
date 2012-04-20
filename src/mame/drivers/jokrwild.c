@@ -553,7 +553,7 @@ static DRIVER_INIT( jokrwild )
 *****************************************************************************/
 {
 	int i, offs;
-	UINT8 *srcp = machine.region( "maincpu" )->base();
+	UINT8 *srcp = machine.root_device().memregion( "maincpu" )->base();
 
 	for (i = 0x8000; i < 0x10000; i++)
 	{

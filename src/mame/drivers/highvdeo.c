@@ -243,7 +243,7 @@ WRITE16_MEMBER(highvdeo_state::tv_vcf_paletteram_w)
 WRITE16_MEMBER(highvdeo_state::tv_vcf_bankselect_w)
 {
 	UINT32 bankaddress;
-	UINT8 *ROM = machine().region("user1")->base();
+	UINT8 *ROM = memregion("user1")->base();
 
 	/* bits 0, 1 select the ROM bank */
 	bankaddress = (data & 0x03) * 0x40000;
@@ -378,7 +378,7 @@ WRITE16_MEMBER(highvdeo_state::tv_tcf_paletteram_w)
 WRITE16_MEMBER(highvdeo_state::tv_tcf_bankselect_w)
 {
 	UINT32 bankaddress;
-	UINT8 *ROM = machine().region("user1")->base();
+	UINT8 *ROM = memregion("user1")->base();
 
 	/* bits 0, 1, 2 select the ROM bank */
 	bankaddress = (data & 0x07) * 0x40000;
@@ -494,7 +494,7 @@ READ16_MEMBER(highvdeo_state::brasil_status_r)
 WRITE16_MEMBER(highvdeo_state::brasil_status_w)
 {
 	UINT32 bankaddress;
-	UINT8 *ROM = machine().region("user1")->base();
+	UINT8 *ROM = memregion("user1")->base();
 
 	switch(data & 3) //data & 7?
 	{

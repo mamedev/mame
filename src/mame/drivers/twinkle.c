@@ -712,14 +712,14 @@ WRITE16_MEMBER(twinkle_state::twinkle_spu_ctrl_w)
 
 READ16_MEMBER(twinkle_state::twinkle_waveram_r)
 {
-	UINT16 *waveram = (UINT16 *)machine().region("rfsnd")->base();
+	UINT16 *waveram = (UINT16 *)machine().root_device().memregion("rfsnd")->base();
 
 	return waveram[offset];
 }
 
 WRITE16_MEMBER(twinkle_state::twinkle_waveram_w)
 {
-	UINT16 *waveram = (UINT16 *)machine().region("rfsnd")->base();
+	UINT16 *waveram = (UINT16 *)machine().root_device().memregion("rfsnd")->base();
 
 	COMBINE_DATA(&waveram[offset]);
 }

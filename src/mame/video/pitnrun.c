@@ -100,7 +100,7 @@ static void pitnrun_spotlights(running_machine &machine)
 {
 	pitnrun_state *state = machine.driver_data<pitnrun_state>();
 	int x,y,i,b,datapix;
-	UINT8 *ROM = machine.region("user1")->base();
+	UINT8 *ROM = state->memregion("user1")->base();
 	for(i=0;i<4;i++)
 	 for(y=0;y<128;y++)
 	  for(x=0;x<16;x++)
@@ -117,7 +117,7 @@ static void pitnrun_spotlights(running_machine &machine)
 
 PALETTE_INIT (pitnrun)
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 	int bit0,bit1,bit2,r,g,b;
 	for (i = 0;i < 32*3; i++)
@@ -219,19 +219,19 @@ SCREEN_UPDATE_IND16( pitnrun )
 #ifdef MAME_DEBUG
 	if (screen.machine().input().code_pressed_once(KEYCODE_Q))
 	{
-		UINT8 *ROM = screen.machine().region("maincpu")->base();
+		UINT8 *ROM = state->memregion("maincpu")->base();
 		ROM[0x84f6]=0; /* lap 0 - normal */
 	}
 
 	if (screen.machine().input().code_pressed_once(KEYCODE_W))
 	{
-		UINT8 *ROM = screen.machine().region("maincpu")->base();
+		UINT8 *ROM = screen.machine().root_device().memregion("maincpu")->base();
 		ROM[0x84f6]=6; /* lap 6 = spotlight */
 	}
 
 	if (screen.machine().input().code_pressed_once(KEYCODE_E))
 	{
-		UINT8 *ROM = screen.machine().region("maincpu")->base();
+		UINT8 *ROM = screen.machine().root_device().memregion("maincpu")->base();
 		ROM[0x84f6]=2; /* lap 3 (trial 2)= lightnings */
 		ROM[0x8102]=1;
 	}

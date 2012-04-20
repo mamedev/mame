@@ -78,9 +78,9 @@ INLINE const sega16sp_interface *get_interface( device_t *device )
 
 void segaic16_sprites_hangon_draw(running_machine &machine, device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 numbanks = machine.region("gfx2")->bytes() / 0x10000;
-	const UINT16 *spritebase = (const UINT16 *)machine.region("gfx2")->base();
-	const UINT8 *zoom = (const UINT8 *)machine.region("proms")->base();
+	UINT8 numbanks = machine.root_device().memregion("gfx2")->bytes() / 0x10000;
+	const UINT16 *spritebase = (const UINT16 *)machine.root_device().memregion("gfx2")->base();
+	const UINT8 *zoom = (const UINT8 *)machine.root_device().memregion("proms")->base();
 	sega16sp_state *sega16sp = get_safe_token(device);
 	UINT16* data = sega16sp->spriteram;
 
@@ -243,9 +243,9 @@ void segaic16_sprites_hangon_draw(running_machine &machine, device_t *device, bi
 
 void segaic16_sprites_sharrier_draw(running_machine &machine, device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 numbanks = machine.region("gfx2")->bytes() / 0x20000;
-	const UINT32 *spritebase = (const UINT32 *)machine.region("gfx2")->base();
-	const UINT8 *zoom = (const UINT8 *)machine.region("proms")->base();
+	UINT8 numbanks = machine.root_device().memregion("gfx2")->bytes() / 0x20000;
+	const UINT32 *spritebase = (const UINT32 *)machine.root_device().memregion("gfx2")->base();
+	const UINT8 *zoom = (const UINT8 *)machine.root_device().memregion("proms")->base();
 	sega16sp_state *sega16sp = get_safe_token(device);
 	UINT16* data = sega16sp->spriteram;
 
@@ -414,8 +414,8 @@ void segaic16_sprites_sharrier_draw(running_machine &machine, device_t *device, 
 
 void segaic16_sprites_16a_draw(running_machine &machine, device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 numbanks = machine.region("gfx2")->bytes() / 0x10000;
-	const UINT16 *spritebase = (const UINT16 *)machine.region("gfx2")->base();
+	UINT8 numbanks = machine.root_device().memregion("gfx2")->bytes() / 0x10000;
+	const UINT16 *spritebase = (const UINT16 *)machine.root_device().memregion("gfx2")->base();
 	sega16sp_state *sega16sp = get_safe_token(device);
 	UINT16* data = sega16sp->spriteram;
 
@@ -580,11 +580,11 @@ void segaic16_sprites_16b_draw(running_machine &machine, device_t *device, bitma
 	sega16sp_state *sega16sp = get_safe_token(device);
 	UINT16* data = sega16sp->spriteram;
 
-	spritebase = (const UINT16 *)machine.region("gfx2")->base();
+	spritebase = (const UINT16 *)machine.root_device().memregion("gfx2")->base();
 	if (!spritebase)
 		return;
 
-	numbanks = machine.region("gfx2")->bytes() / 0x20000;
+	numbanks = machine.root_device().memregion("gfx2")->bytes() / 0x20000;
 
 	/* first scan forward to find the end of the list */
 	for (data = sega16sp->spriteram; data < sega16sp->spriteram + sega16sp->ramsize/2; data += 8)
@@ -741,8 +741,8 @@ void segaic16_sprites_16b_draw(running_machine &machine, device_t *device, bitma
 
 void segaic16_sprites_yboard_16b_draw(running_machine &machine, device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 numbanks = machine.region("gfx2")->bytes() / 0x20000;
-	const UINT16 *spritebase = (const UINT16 *)machine.region("gfx2")->base();
+	UINT8 numbanks = machine.root_device().memregion("gfx2")->bytes() / 0x20000;
+	const UINT16 *spritebase = (const UINT16 *)machine.root_device().memregion("gfx2")->base();
 	sega16sp_state *sega16sp = get_safe_token(device);
 	UINT16* data = sega16sp->spriteram;
 
@@ -919,8 +919,8 @@ void segaic16_sprites_yboard_16b_draw(running_machine &machine, device_t *device
 
 static void segaic16_sprites_xboard_outrun_draw(running_machine &machine, device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect, int type)
 {
-	UINT8 numbanks = machine.region("gfx2")->bytes() / 0x40000;
-	const UINT32 *spritebase = (const UINT32 *)machine.region("gfx2")->base();
+	UINT8 numbanks = machine.root_device().memregion("gfx2")->bytes() / 0x40000;
+	const UINT32 *spritebase = (const UINT32 *)machine.root_device().memregion("gfx2")->base();
 	sega16sp_state *sega16sp = get_safe_token(device);
 	UINT16* data = sega16sp->spriteram;
 
@@ -1090,8 +1090,8 @@ void segaic16_sprites_xboard_draw(running_machine &machine, device_t *device, bi
 
 void segaic16_sprites_yboard_draw(running_machine &machine, device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 numbanks = machine.region("gfx1")->bytes() / 0x80000;
-	const UINT64 *spritebase = (const UINT64 *)machine.region("gfx1")->base();
+	UINT8 numbanks = machine.root_device().memregion("gfx1")->bytes() / 0x80000;
+	const UINT64 *spritebase = (const UINT64 *)machine.root_device().memregion("gfx1")->base();
 	const UINT16 *rotatebase = segaic16_rotate[0].buffer ? segaic16_rotate[0].buffer : segaic16_rotate[0].rotateram;
 	UINT8 visited[0x1000];
 	sega16sp_state *sega16sp = get_safe_token(device);
@@ -1384,8 +1384,8 @@ void segaic16_sprites_yboard_draw(running_machine &machine, device_t *device, bi
 
 void segaic16_sprites_16a_bootleg_wb3bl_draw(running_machine &machine, device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 numbanks = machine.region("gfx2")->bytes() / 0x10000;
-	const UINT16 *spritebase = (const UINT16 *)machine.region("gfx2")->base();
+	UINT8 numbanks = machine.root_device().memregion("gfx2")->bytes() / 0x10000;
+	const UINT16 *spritebase = (const UINT16 *)machine.root_device().memregion("gfx2")->base();
 	sega16sp_state *sega16sp = get_safe_token(device);
 	UINT16* data = sega16sp->spriteram;
 
@@ -1407,8 +1407,8 @@ void segaic16_sprites_16a_bootleg_wb3bl_draw(running_machine &machine, device_t 
 /* 4 player passing shot is different to this.. */
 void segaic16_sprites_16a_bootleg_passhtb_draw(running_machine &machine, device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 numbanks = machine.region("gfx2")->bytes() / 0x10000;
-	const UINT16 *spritebase = (const UINT16 *)machine.region("gfx2")->base();
+	UINT8 numbanks = machine.root_device().memregion("gfx2")->bytes() / 0x10000;
+	const UINT16 *spritebase = (const UINT16 *)machine.root_device().memregion("gfx2")->base();
 	sega16sp_state *sega16sp = get_safe_token(device);
 	UINT16* data = sega16sp->spriteram;
 
@@ -1429,8 +1429,8 @@ void segaic16_sprites_16a_bootleg_passhtb_draw(running_machine &machine, device_
 
 void segaic16_sprites_16a_bootleg_shinobld_draw(running_machine &machine, device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 numbanks = machine.region("gfx2")->bytes() / 0x10000;
-	const UINT16 *spritebase = (const UINT16 *)machine.region("gfx2")->base();
+	UINT8 numbanks = machine.root_device().memregion("gfx2")->bytes() / 0x10000;
+	const UINT16 *spritebase = (const UINT16 *)machine.root_device().memregion("gfx2")->base();
 	sega16sp_state *sega16sp = get_safe_token(device);
 	UINT16* data = sega16sp->spriteram;
 

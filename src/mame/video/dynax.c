@@ -28,7 +28,7 @@
 /* 0 B01234 G01234 R01234 */
 PALETTE_INIT( sprtmtch )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 
 	for (i = 0; i < machine.total_colors(); i++)
@@ -356,8 +356,8 @@ static int blitter_drawgfx( running_machine &machine, int layer, int mask, const
 {
 	dynax_state *state = machine.driver_data<dynax_state>();
 	UINT8 cmd;
-	UINT8 *ROM = machine.region(gfx)->base();
-	size_t ROM_size = machine.region(gfx)->bytes();
+	UINT8 *ROM = machine.root_device().memregion(gfx)->base();
+	size_t ROM_size = state->memregion(gfx)->bytes();
 
 	int sx;
 
@@ -1204,8 +1204,8 @@ static int debug_viewer( running_machine &machine, bitmap_ind16 &bitmap, const r
 	if (toggle)
 	{
 		dynax_state *state = machine.driver_data<dynax_state>();
-		UINT8 *RAM = machine.region( "gfx1" )->base();
-		size_t size = machine.region( "gfx1" )->bytes();
+		UINT8 *RAM = machine.root_device().memregion( "gfx1" )->base();
+		size_t size = state->memregion( "gfx1" )->bytes();
 		static int i = 0, c = 0, r = 0;
 
 		if (machine.input().code_pressed_once(KEYCODE_I))	c = (c - 1) & 0x1f;

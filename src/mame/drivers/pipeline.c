@@ -367,8 +367,8 @@ static const ym2203_interface ym2203_config =
 static PALETTE_INIT(pipeline)
 {
 	int r,g,b,i,c;
-	UINT8 *prom1 = &machine.region("proms")->base()[0x000];
-	UINT8 *prom2 = &machine.region("proms")->base()[0x100];
+	UINT8 *prom1 = &machine.root_device().memregion("proms")->base()[0x000];
+	UINT8 *prom2 = &machine.root_device().memregion("proms")->base()[0x100];
 
 	for(i=0;i<0x100;i++)
 	{

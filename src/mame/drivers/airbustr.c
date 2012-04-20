@@ -571,9 +571,9 @@ static INTERRUPT_GEN( slave_interrupt )
 static MACHINE_START( airbustr )
 {
 	airbustr_state *state = machine.driver_data<airbustr_state>();
-	UINT8 *MASTER = machine.region("master")->base();
-	UINT8 *SLAVE = machine.region("slave")->base();
-	UINT8 *AUDIO = machine.region("audiocpu")->base();
+	UINT8 *MASTER = machine.root_device().memregion("master")->base();
+	UINT8 *SLAVE = machine.root_device().memregion("slave")->base();
+	UINT8 *AUDIO = state->memregion("audiocpu")->base();
 
 	state->membank("bank1")->configure_entries(0, 3, &MASTER[0x00000], 0x4000);
 	state->membank("bank1")->configure_entries(3, 5, &MASTER[0x10000], 0x4000);

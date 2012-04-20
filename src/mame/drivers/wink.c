@@ -411,7 +411,7 @@ ROM_END
 static DRIVER_INIT( wink )
 {
 	UINT32 i;
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
 	UINT8 *buffer = auto_alloc_array(machine, UINT8, 0x8000);
 
 	// protection module reverse engineered by HIGHWAYMAN

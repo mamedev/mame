@@ -27,7 +27,7 @@ MACHINE_RESET( namcond1 )
 {
 	namcond1_state *state = machine.driver_data<namcond1_state>();
 #ifdef MAME_DEBUG
-    /*UINT8   *ROM = machine.region(REGION_CPU1)->base();*/
+    /*UINT8   *ROM = state->memregion(REGION_CPU1)->base();*/
     /*UINT32 debug_trigger_addr;*/
     /*int             i;*/
 

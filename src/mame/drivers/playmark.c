@@ -167,7 +167,7 @@ static WRITE8_DEVICE_HANDLER( playmark_oki_banking_w )
 	{
 		state->m_old_oki_bank = data & 7;
 
-		if (((state->m_old_oki_bank - 1) * 0x40000) < device->machine().region("oki")->bytes())
+		if (((state->m_old_oki_bank - 1) * 0x40000) < state->memregion("oki")->bytes())
 		{
 			downcast<okim6295_device *>(device)->set_bank_base(0x40000 * (state->m_old_oki_bank - 1));
 		}
@@ -1678,8 +1678,8 @@ static UINT8 playmark_asciitohex(UINT8 data)
 static DRIVER_INIT( bigtwin )
 {
 	playmark_state *state = machine.driver_data<playmark_state>();
-	UINT8 *playmark_PICROM_HEX = machine.region("user1")->base();
-	UINT16 *playmark_PICROM = (UINT16 *)machine.region("audiocpu")->base();
+	UINT8 *playmark_PICROM_HEX = machine.root_device().memregion("user1")->base();
+	UINT16 *playmark_PICROM = (UINT16 *)state->memregion("audiocpu")->base();
 	INT32 offs, data;
 	UINT16 src_pos = 0;
 	UINT16 dst_pos = 0;

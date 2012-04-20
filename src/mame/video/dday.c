@@ -50,7 +50,7 @@ static void start_countdown_timer(running_machine &machine)
 
 PALETTE_INIT( dday )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 
 	palette_set_shadow_factor(machine, 1.0 / 8);
@@ -187,7 +187,7 @@ static TILE_GET_INFO( get_sl_tile_info )
 	int code, sl_flipx, flipx;
 	UINT8* sl_map;
 
-	sl_map = &machine.region("user1")->base()[(state->m_sl_image & 0x07) * 0x0200];
+	sl_map = &state->memregion("user1")->base()[(state->m_sl_image & 0x07) * 0x0200];
 
 	flipx = (tile_index >> 4) & 0x01;
 	sl_flipx = (state->m_sl_image >> 3) & 0x01;

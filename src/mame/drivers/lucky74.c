@@ -1130,7 +1130,7 @@ static void lucky74_adpcm_int(device_t *device)
 		if (state->m_adpcm_data == -1)
 		{
 			/* transferring 1st nibble */
-			state->m_adpcm_data = device->machine().region("adpcm")->base()[state->m_adpcm_pos];
+			state->m_adpcm_data = device->machine().root_device().memregion("adpcm")->base()[state->m_adpcm_pos];
 			state->m_adpcm_pos = (state->m_adpcm_pos + 1) & 0xffff;
 			msm5205_data_w(device, state->m_adpcm_data >> 4);
 

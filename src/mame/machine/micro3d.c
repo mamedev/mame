@@ -320,7 +320,7 @@ WRITE32_MEMBER(micro3d_state::micro3d_mac2_w)
 		case 0x08:
 		{
 			int i;
-			const UINT16 *rom = (UINT16*)machine().region("vertex")->base();
+			const UINT16 *rom = (UINT16*)machine().root_device().memregion("vertex")->base();
 
 			for (i = 0; i <= cnt; ++i)
 			{
@@ -359,7 +359,7 @@ WRITE32_MEMBER(micro3d_state::micro3d_mac2_w)
 		case 0x0c:
 		{
 			int i;
-			const UINT16 *rom = (UINT16*)machine().region("vertex")->base();
+			const UINT16 *rom = (UINT16*)machine().root_device().memregion("vertex")->base();
 
 			for (i = 0; i <= cnt; ++i)
 			{
@@ -392,7 +392,7 @@ WRITE32_MEMBER(micro3d_state::micro3d_mac2_w)
 		case 0x0f:
 		{
 			int i;
-			const UINT16 *rom = (UINT16*)machine().region("vertex")->base();
+			const UINT16 *rom = (UINT16*)machine().root_device().memregion("vertex")->base();
 
 			for (i = 0; i <= cnt; ++i, vtx_addr += 4)
 			{

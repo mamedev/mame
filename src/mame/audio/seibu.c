@@ -106,7 +106,7 @@ void seibu_sound_decrypt(running_machine &machine,const char *cpu,int length)
 {
 	address_space *space = machine.device(cpu)->memory().space(AS_PROGRAM);
 	UINT8 *decrypt = auto_alloc_array(machine, UINT8, length);
-	UINT8 *rom = machine.region(cpu)->base();
+	UINT8 *rom = machine.root_device().memregion(cpu)->base();
 	int i;
 
 	space->set_decrypted_region(0x0000, (length < 0x10000) ? (length - 1) : 0x1fff, decrypt);
@@ -190,7 +190,7 @@ static DEVICE_START( seibu_adpcm )
 
 	state->m_playing = 0;
 	state->m_stream = device->machine().sound().stream_alloc(*device, 0, 1, device->clock(), state, seibu_adpcm_callback);
-	state->m_base = machine.region(intf->rom_region)->base();
+	state->m_base = machine.root_device().memregion(intf->rom_region)->base();
 	state->m_adpcm.reset();
 }
 
@@ -217,8 +217,8 @@ DEVICE_GET_INFO( seibu_adpcm )
 
 void seibu_adpcm_decrypt(running_machine &machine, const char *region)
 {
-	UINT8 *ROM = machine.region(region)->base();
-	int len = machine.region(region)->bytes();
+	UINT8 *ROM = machine.root_device().memregion(region)->base();
+	int len = machine.root_device().memregion(region)->bytes();
 	int i;
 
 	for (i = 0; i < len; i++)
@@ -346,8 +346,8 @@ void seibu_ym2203_irqhandler(device_t *device, int linestate)
 
 MACHINE_RESET( seibu_sound )
 {
-	int romlength = machine.region("audiocpu")->bytes();
-	UINT8 *rom = machine.region("audiocpu")->base();
+	int romlength = machine.root_device().memregion("audiocpu")->bytes();
+	UINT8 *rom = machine.root_device().memregion("audiocpu")->base();
 
 	sound_cpu = machine.device("audiocpu");
 	update_irq_lines(machine, VECTOR_INIT);

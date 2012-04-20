@@ -92,7 +92,7 @@ static SCREEN_UPDATE_RGB32( sstrngr2 )
 
 	get_pens(pens);
 
-	color_map_base = &screen.machine().region("proms")->base()[state->m_flip_screen ? 0x0000 : 0x0200];
+	color_map_base = &state->memregion("proms")->base()[state->m_flip_screen ? 0x0000 : 0x0200];
 
 	for (offs = 0; offs < 0x2000; offs++)
 	{

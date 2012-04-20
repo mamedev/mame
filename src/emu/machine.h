@@ -160,64 +160,6 @@ typedef struct _debugcpu_private debugcpu_private;
 typedef struct _generic_machine_private generic_machine_private;
 
 
-// ======================> memory_region
-
-// memory region object; should eventually be renamed memory_region
-class memory_region
-{
-	DISABLE_COPYING(memory_region);
-
-	friend class running_machine;
-	friend class simple_list<memory_region>;
-	friend resource_pool_object<memory_region>::~resource_pool_object();
-
-	// construction/destruction
-	memory_region(running_machine &machine, const char *name, UINT32 length, UINT8 width, endianness_t endian);
-	~memory_region();
-
-public:
-	// getters
-	running_machine &machine() const { return m_machine; }
-	memory_region *next() const { return m_next; }
-	UINT8 *base() const { return (this != NULL) ? m_base.u8 : NULL; }
-	UINT8 *end() const { return (this != NULL) ? m_base.u8 + m_length : NULL; }
-	UINT32 bytes() const { return (this != NULL) ? m_length : 0; }
-	const char *name() const { return m_name; }
-
-	// flag expansion
-	endianness_t endianness() const { return m_endianness; }
-	UINT8 width() const { return m_width; }
-
-	// data access
-	UINT8 &u8(offs_t offset = 0) const { return m_base.u8[offset]; }
-	UINT16 &u16(offs_t offset = 0) const { return m_base.u16[offset]; }
-	UINT32 &u32(offs_t offset = 0) const { return m_base.u32[offset]; }
-	UINT64 &u64(offs_t offset = 0) const { return m_base.u64[offset]; }
-
-	// allow passing a region for any common pointer
-	operator void *() const { return (this != NULL) ? m_base.v : NULL; }
-	operator INT8 *() const { return (this != NULL) ? m_base.i8 : NULL; }
-	operator UINT8 *() const { return (this != NULL) ? m_base.u8 : NULL; }
-	operator INT16 *() const { return (this != NULL) ? m_base.i16 : NULL; }
-	operator UINT16 *() const { return (this != NULL) ? m_base.u16 : NULL; }
-	operator INT32 *() const { return (this != NULL) ? m_base.i32 : NULL; }
-	operator UINT32 *() const { return (this != NULL) ? m_base.u32 : NULL; }
-	operator INT64 *() const { return (this != NULL) ? m_base.i64 : NULL; }
-	operator UINT64 *() const { return (this != NULL) ? m_base.u64 : NULL; }
-
-private:
-	// internal data
-	running_machine &		m_machine;
-	memory_region *			m_next;
-	astring					m_name;
-	generic_ptr				m_base;
-	UINT32					m_length;
-	UINT8					m_width;
-	endianness_t			m_endianness;
-};
-
-
-
 // ======================> system_time
 
 // system time description, both local and UTC
@@ -279,7 +221,7 @@ public:
 	resource_pool &respool() { return m_respool; }
 	device_scheduler &scheduler() { return m_scheduler; }
 	save_manager &save() { return m_save; }
-	memory_manager &memory() { assert(m_memory != NULL); return *m_memory; }
+	memory_manager &memory() { return m_memory; }
 	cheat_manager &cheat() const { assert(m_cheat != NULL); return *m_cheat; }
 	render_manager &render() const { assert(m_render != NULL); return *m_render; }
 	input_manager &input() const { assert(m_input != NULL); return *m_input; }
@@ -302,7 +244,6 @@ public:
 
 	// additional helpers
 	emu_options &options() const { return m_config.options(); }
-	memory_region *first_region() const { return m_regionlist.first(); }
 	attotime time() const { return m_scheduler.time(); }
 	bool scheduled_event_pending() const { return m_exit_pending || m_hard_reset_pending; }
 
@@ -310,7 +251,6 @@ public:
 	inline device_t *device(const char *tag) { return root_device().subdevice(tag); }
 	template<class _DeviceClass> inline _DeviceClass *device(const char *tag) { return downcast<_DeviceClass *>(device(tag)); }
 	inline const input_port_config *port(const char *tag);
-	inline const memory_region *region(const char *tag);
 
 	// configuration helpers
 	device_t &add_dynamic_device(device_t &owner, device_type type, const char *tag, UINT32 clock);
@@ -336,10 +276,6 @@ public:
 	// date & time
 	void base_datetime(system_time &systime);
 	void current_datetime(system_time &systime);
-
-	// regions
-	memory_region *region_alloc(const char *name, UINT32 length, UINT8 width, endianness_t endian);
-	void region_free(const char *name);
 
 	// watchdog control
 	void watchdog_reset();
@@ -404,13 +340,7 @@ private:
 	const game_driver &		m_system;				// reference to the definition of the game machine
 	osd_interface &			m_osd;					// reference to OSD system
 
-	// embedded managers and objects
-	tagged_list<memory_region> m_regionlist;		// list of memory regions
-	save_manager			m_save;					// save manager
-	device_scheduler		m_scheduler;			// scheduler object
-
 	// managers
-	memory_manager *		m_memory;				// internal data from memory.c
 	cheat_manager *			m_cheat;				// internal data from cheat.c
 	render_manager *		m_render;				// internal data from render.c
 	input_manager *			m_input;				// internal data from input.c
@@ -484,6 +414,11 @@ private:
 		logerror_callback			m_func;
 	};
 	simple_list<logerror_callback_item> m_logerror_list;
+
+	// embedded managers and objects
+	save_manager			m_save;					// save manager
+	memory_manager			m_memory;				// memory manager
+	device_scheduler		m_scheduler;			// scheduler object
 };
 
 
@@ -501,17 +436,6 @@ inline const input_port_config *running_machine::port(const char *tag)
 	// otherwise, compute it relative to the root device
 	astring fulltag;
 	return m_portlist.find(root_device().subtag(fulltag, tag).cstr());
-}
-
-inline const memory_region *running_machine::region(const char *tag)
-{
-	// if tag begins with a :, it's absolute
-	if (tag[0] == ':')
-		return m_regionlist.find(tag);
-
-	// otherwise, compute it relative to the root device
-	astring fulltag;
-	return m_regionlist.find(root_device().subtag(fulltag, tag).cstr());
 }
 
 

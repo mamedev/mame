@@ -119,7 +119,7 @@ WRITE16_MEMBER(qdrmfgp_state::gp2_control_w)
 READ16_MEMBER(qdrmfgp_state::v_rom_r)
 {
 	device_t *k056832 = machine().device("k056832");
-	UINT8 *mem8 = machine().region("gfx1")->base();
+	UINT8 *mem8 = memregion("gfx1")->base();
 	int bank = k056832_word_r(k056832, 0x34/2, 0xffff);
 
 	offset += bank * 0x800 * 4;
@@ -650,7 +650,7 @@ static MACHINE_START( qdrmfgp2 )
 static MACHINE_RESET( qdrmfgp )
 {
 	qdrmfgp_state *state = machine.driver_data<qdrmfgp_state>();
-	state->m_sndram = machine.region("konami")->base() + 0x100000;
+	state->m_sndram = state->memregion("konami")->base() + 0x100000;
 
 	/* reset the IDE controller */
 	state->m_gp2_irq_control = 0;

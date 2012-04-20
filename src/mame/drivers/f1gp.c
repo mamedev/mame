@@ -43,7 +43,7 @@ WRITE16_MEMBER(f1gp_state::sharedram_w)
 
 READ16_MEMBER(f1gp_state::extrarom_r)
 {
-	UINT8 *rom = machine().region("user1")->base();
+	UINT8 *rom = memregion("user1")->base();
 
 	offset *= 2;
 
@@ -52,7 +52,7 @@ READ16_MEMBER(f1gp_state::extrarom_r)
 
 READ16_MEMBER(f1gp_state::extrarom2_r)
 {
-	UINT8 *rom = machine().region("user2")->base();
+	UINT8 *rom = memregion("user2")->base();
 
 	offset *= 2;
 
@@ -166,8 +166,8 @@ WRITE16_MEMBER(f1gp_state::f1gpb_misc_w)
     if(old_bank != new_bank && new_bank < 5)
     {
         // oki banking
-        UINT8 *src = machine().region("oki")->base() + 0x40000 + 0x10000 * new_bank;
-        UINT8 *dst = machine().region("oki")->base() + 0x30000;
+        UINT8 *src = memregion("oki")->base() + 0x40000 + 0x10000 * new_bank;
+        UINT8 *dst = memregion("oki")->base() + 0x30000;
         memcpy(dst, src, 0x10000);
 
         old_bank = new_bank;
@@ -427,7 +427,7 @@ static MACHINE_START( f1gpb )
 static MACHINE_START( f1gp )
 {
 	f1gp_state *state = machine.driver_data<f1gp_state>();
-	UINT8 *ROM = machine.region("audiocpu")->base();
+	UINT8 *ROM = state->memregion("audiocpu")->base();
 
 	state->membank("bank1")->configure_entries(0, 2, &ROM[0x10000], 0x8000);
 

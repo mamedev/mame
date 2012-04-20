@@ -33,8 +33,8 @@ public:
 
 static void pk8000_set_bank(running_machine &machine,UINT8 data)
 {
-	UINT8 *rom = machine.region("maincpu")->base();
-	UINT8 *ram = machine.region("maincpu")->base();
+	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
+	UINT8 *ram = machine.root_device().memregion("maincpu")->base();
 	UINT8 block1 = data & 3;
 	UINT8 block2 = (data >> 2) & 3;
 	UINT8 block3 = (data >> 4) & 3;
@@ -199,7 +199,7 @@ static VIDEO_START( photon )
 
 static SCREEN_UPDATE_IND16( photon )
 {
-	return pk8000_video_update(screen, bitmap, cliprect, screen.machine().region("maincpu")->base());
+	return pk8000_video_update(screen, bitmap, cliprect, screen.machine().root_device().memregion("maincpu")->base());
 }
 
 static MACHINE_CONFIG_START( photon, photon_state )

@@ -190,8 +190,8 @@ static DEVICE_START( flower_sound )
 	/* extract globals from the interface */
 	state->m_last_channel = state->m_channel_list + 8;
 
-	state->m_sample_rom = machine.region("sound1")->base();
-	state->m_volume_rom = machine.region("sound2")->base();
+	state->m_sample_rom = machine.root_device().memregion("sound1")->base();
+	state->m_volume_rom = machine.root_device().memregion("sound2")->base();
 
 	/* register for savestates */
 	for (i = 0; i < 8; i++)

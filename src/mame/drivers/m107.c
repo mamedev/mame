@@ -964,7 +964,7 @@ ROM_END
 static DRIVER_INIT( firebarr )
 {
 	m107_state *state = machine.driver_data<m107_state>();
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = state->memregion("maincpu")->base();
 
 	state->membank("bank1")->set_base(&ROM[0xa0000]);
 
@@ -975,7 +975,7 @@ static DRIVER_INIT( firebarr )
 static DRIVER_INIT( dsoccr94 )
 {
 	m107_state *state = machine.driver_data<m107_state>();
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = state->memregion("maincpu")->base();
 
 	state->membank("bank1")->configure_entries(0, 4, &ROM[0x80000], 0x20000);
 	machine.device("maincpu")->memory().space(AS_IO)->install_write_handler(0x06, 0x07, write16_delegate(FUNC(m107_state::m107_bankswitch_w),state));

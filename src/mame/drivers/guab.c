@@ -319,7 +319,7 @@ static TIMER_CALLBACK( fdc_data_callback )
 {
 	guab_state *state = machine.driver_data<guab_state>();
 	struct wd1770 &fdc = state->m_fdc;
-	UINT8* disk = (UINT8*)machine.region("user1")->base();
+	UINT8* disk = (UINT8*)state->memregion("user1")->base();
 	int more_data = 0;
 
 	/*

@@ -43,7 +43,7 @@ WRITE8_MEMBER(bombjack_state::bombjack_flipscreen_w)
 static TILE_GET_INFO( get_bg_tile_info )
 {
 	bombjack_state *state = machine.driver_data<bombjack_state>();
-	UINT8 *tilerom = machine.region("gfx4")->base();
+	UINT8 *tilerom = state->memregion("gfx4")->base();
 
 	int offs = (state->m_background_image & 0x07) * 0x200 + tile_index;
 	int code = (state->m_background_image & 0x10) ? tilerom[offs] : 0;

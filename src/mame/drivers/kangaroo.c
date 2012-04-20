@@ -174,7 +174,7 @@
 
 static MACHINE_START( kangaroo )
 {
-	machine.root_device().membank("bank1")->configure_entries(0, 2, machine.region("gfx1")->base(), 0x2000);
+	machine.root_device().membank("bank1")->configure_entries(0, 2, machine.root_device().memregion("gfx1")->base(), 0x2000);
 }
 
 

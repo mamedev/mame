@@ -1045,7 +1045,7 @@ static MACHINE_START(mediagx)
 static MACHINE_RESET(mediagx)
 {
 	mediagx_state *state = machine.driver_data<mediagx_state>();
-	UINT8 *rom = machine.region("bios")->base();
+	UINT8 *rom = state->memregion("bios")->base();
 
 	device_set_irq_callback(machine.device("maincpu"), irq_callback);
 

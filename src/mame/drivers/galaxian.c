@@ -843,7 +843,7 @@ static void monsterz_set_latch(running_machine &machine)
 {
 	// read from a rom (which one?? "a-3e.k3" from audiocpu ($2700-$2fff) looks very suspicious)
 	galaxian_state *state = machine.driver_data<galaxian_state>();
-	UINT8 *rom = machine.region("audiocpu")->base();
+	UINT8 *rom = state->memregion("audiocpu")->base();
 	state->m_protection_result = rom[0x2000 | (state->m_protection_state & 0x1fff)]; // probably needs a BITSWAP8
 
 	// and an irq on the main z80 afterwards
@@ -2533,7 +2533,7 @@ MACHINE_CONFIG_END
 
 static void decode_mooncrst(running_machine &machine, int length, UINT8 *dest)
 {
-	UINT8 *rom = machine.region("maincpu")->base();
+	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
 	int offs;
 
 	for (offs = 0; offs < length; offs++)
@@ -2595,8 +2595,8 @@ static void decode_checkman(running_machine &machine)
 		{ 0,2,0,2 },
 		{ 1,4,1,4 }
 	};
-	UINT8 *rombase = machine.region("maincpu")->base();
-	UINT32 romlength = machine.region("maincpu")->bytes();
+	UINT8 *rombase = machine.root_device().memregion("maincpu")->base();
+	UINT32 romlength = machine.root_device().memregion("maincpu")->bytes();
 	UINT32 offs;
 
 	for (offs = 0; offs < romlength; offs++)
@@ -2612,8 +2612,8 @@ static void decode_checkman(running_machine &machine)
 
 static void decode_dingoe(running_machine &machine)
 {
-	UINT8 *rombase = machine.region("maincpu")->base();
-	UINT32 romlength = machine.region("maincpu")->bytes();
+	UINT8 *rombase = machine.root_device().memregion("maincpu")->base();
+	UINT32 romlength = machine.root_device().memregion("maincpu")->bytes();
 	UINT32 offs;
 
 	for (offs = 0; offs < romlength; offs++)
@@ -2635,7 +2635,7 @@ static void decode_dingoe(running_machine &machine)
 
 static void decode_frogger_sound(running_machine &machine)
 {
-	UINT8 *rombase = machine.region("audiocpu")->base();
+	UINT8 *rombase = machine.root_device().memregion("audiocpu")->base();
 	UINT32 offs;
 
 	/* the first ROM of the sound CPU has data lines D0 and D1 swapped */
@@ -2646,7 +2646,7 @@ static void decode_frogger_sound(running_machine &machine)
 
 static void decode_frogger_gfx(running_machine &machine)
 {
-	UINT8 *rombase = machine.region("gfx1")->base();
+	UINT8 *rombase = machine.root_device().memregion("gfx1")->base();
 	UINT32 offs;
 
 	/* the 2nd gfx ROM has data lines D0 and D1 swapped */
@@ -2657,8 +2657,8 @@ static void decode_frogger_gfx(running_machine &machine)
 
 static void decode_anteater_gfx(running_machine &machine)
 {
-	UINT32 romlength = machine.region("gfx1")->bytes();
-	UINT8 *rombase = machine.region("gfx1")->base();
+	UINT32 romlength = machine.root_device().memregion("gfx1")->bytes();
+	UINT8 *rombase = machine.root_device().memregion("gfx1")->base();
 	UINT8 *scratch = auto_alloc_array(machine, UINT8, romlength);
 	UINT32 offs;
 
@@ -2677,8 +2677,8 @@ static void decode_anteater_gfx(running_machine &machine)
 
 static void decode_losttomb_gfx(running_machine &machine)
 {
-	UINT32 romlength = machine.region("gfx1")->bytes();
-	UINT8 *rombase = machine.region("gfx1")->base();
+	UINT32 romlength = machine.root_device().memregion("gfx1")->bytes();
+	UINT8 *rombase = machine.root_device().memregion("gfx1")->base();
 	UINT8 *scratch = auto_alloc_array(machine, UINT8, romlength);
 	UINT32 offs;
 
@@ -2702,7 +2702,7 @@ static void decode_superbon(running_machine &machine)
 
 	/* Deryption worked out by hand by Chris Hardy. */
 
-	RAM = machine.region("maincpu")->base();
+	RAM = machine.root_device().memregion("maincpu")->base();
 
 	for (i = 0;i < 0x1000;i++)
 	{
@@ -2810,7 +2810,7 @@ static DRIVER_INIT( gmgalax )
 
 	/* ROM is banked */
 	space->install_read_bank(0x0000, 0x3fff, "bank1");
-	machine.root_device().membank("bank1")->configure_entries(0, 2, machine.region("maincpu")->base() + 0x10000, 0x4000);
+	machine.root_device().membank("bank1")->configure_entries(0, 2, state->memregion("maincpu")->base() + 0x10000, 0x4000);
 
 	/* callback when the game select is toggled */
 	state->gmgalax_game_changed(*machine.m_portlist.first()->fieldlist().first(), NULL, 0, 0);
@@ -2869,7 +2869,7 @@ static DRIVER_INIT( mooncrst )
 	common_init(machine, galaxian_draw_bullet, galaxian_draw_background, mooncrst_extend_tile_info, mooncrst_extend_sprite_info);
 
 	/* decrypt program code */
-	decode_mooncrst(machine, 0x8000, machine.region("maincpu")->base());
+	decode_mooncrst(machine, 0x8000, machine.root_device().memregion("maincpu")->base());
 }
 
 
@@ -2939,15 +2939,15 @@ void tenspot_set_game_bank(running_machine& machine, int bank, int from_game)
 	int x;
 
 	sprintf(tmp,"game_%d_cpu", bank);
-	srcregion = machine.region(tmp)->base();
-	dstregion = machine.region("maincpu")->base();
+	srcregion = machine.root_device().memregion(tmp)->base();
+	dstregion = machine.root_device().memregion("maincpu")->base();
 	memcpy(dstregion, srcregion, 0x4000);
 
 	sprintf(tmp,"game_%d_temp", bank);
-	srcregion = machine.region(tmp)->base();
-	dstregion = machine.region("gfx1")->base();
+	srcregion = machine.root_device().memregion(tmp)->base();
+	dstregion = machine.root_device().memregion("gfx1")->base();
 	memcpy(dstregion, srcregion, 0x2000);
-	dstregion = machine.region("gfx2")->base();
+	dstregion = machine.root_device().memregion("gfx2")->base();
 	memcpy(dstregion, srcregion, 0x2000);
 
 	if (from_game)
@@ -2965,8 +2965,8 @@ void tenspot_set_game_bank(running_machine& machine, int bank, int from_game)
 	}
 
 	sprintf(tmp,"game_%d_prom", bank);
-	srcregion = machine.region(tmp)->base();
-	dstregion = machine.region("proms")->base();
+	srcregion = machine.root_device().memregion(tmp)->base();
+	dstregion = machine.root_device().memregion("proms")->base();
 	memcpy(dstregion, srcregion, 0x20);
 
 	PALETTE_INIT_CALL(galaxian);
@@ -3026,13 +3026,13 @@ static DRIVER_INIT( zigzag )
 	/* make ROMs 2 & 3 swappable */
 	space->install_read_bank(0x2000, 0x2fff, "bank1");
 	space->install_read_bank(0x3000, 0x3fff, "bank2");
-	state->membank("bank1")->configure_entries(0, 2, machine.region("maincpu")->base() + 0x2000, 0x1000);
-	state->membank("bank2")->configure_entries(0, 2, machine.region("maincpu")->base() + 0x2000, 0x1000);
+	state->membank("bank1")->configure_entries(0, 2, machine.root_device().memregion("maincpu")->base() + 0x2000, 0x1000);
+	state->membank("bank2")->configure_entries(0, 2, machine.root_device().memregion("maincpu")->base() + 0x2000, 0x1000);
 
 	/* also re-install the fixed ROM area as a bank in order to inform the memory system that
        the fixed area only extends to 0x1fff */
 	space->install_read_bank(0x0000, 0x1fff, "bank3");
-	state->membank("bank3")->set_base(machine.region("maincpu")->base() + 0x0000);
+	state->membank("bank3")->set_base(state->memregion("maincpu")->base() + 0x0000);
 
 	/* handler for doing the swaps */
 	space->install_write_handler(0x7002, 0x7002, 0, 0x07f8, write8_delegate(FUNC(galaxian_state::zigzag_bankswap_w),state));
@@ -3147,7 +3147,7 @@ static DRIVER_INIT( skybase )
 	space->install_ram(0x8000, 0x87ff);
 
 	/* extend ROM */
-	space->install_rom(0x0000, 0x5fff, machine.region("maincpu")->base());
+	space->install_rom(0x0000, 0x5fff, state->memregion("maincpu")->base());
 }
 
 
@@ -3162,14 +3162,14 @@ static DRIVER_INIT( kong )
 	space->install_ram(0x8000, 0x87ff);
 
 	/* extend ROM */
-	space->install_rom(0x0000, 0x7fff, machine.region("maincpu")->base());
+	space->install_rom(0x0000, 0x7fff, machine.root_device().memregion("maincpu")->base());
 }
 
 
 static void mshuttle_decode(running_machine &machine, const UINT8 convtable[8][16])
 {
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	UINT8 *rom = machine.region("maincpu")->base();
+	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
 	UINT8 *decrypt = auto_alloc_array(machine, UINT8, 0x10000);
 	int A;
 
@@ -3271,8 +3271,8 @@ static DRIVER_INIT( fantastc )
 		3, 7, 7, 7	// ok!
 	};
 
-	UINT8* romdata = machine.region("maincpu")->base();
-	assert(machine.region("maincpu")->bytes() == 0x8000);
+	UINT8* romdata = machine.root_device().memregion("maincpu")->base();
+	assert(machine.root_device().memregion("maincpu")->bytes() == 0x8000);
 	UINT8 buf[0x8000];
 	memcpy(buf, romdata, 0x8000);
 
@@ -3312,7 +3312,7 @@ static DRIVER_INIT( scorpnmc )
 	space->install_write_handler(0xb001, 0xb001, 0, 0x7f8, write8_delegate(FUNC(galaxian_state::irq_enable_w),state));
 
 	/* extra ROM */
-	space->install_rom(0x5000, 0x67ff, machine.region("maincpu")->base() + 0x5000);
+	space->install_rom(0x5000, 0x67ff, state->memregion("maincpu")->base() + 0x5000);
 
 	/* install RAM at $4000-$4800 */
 	space->install_ram(0x4000, 0x47ff);
@@ -3337,7 +3337,7 @@ static DRIVER_INIT( thepitm )
 	space->unmap_write(0xb004, 0xb004, 0, 0x07f8);
 
 	/* extend ROM */
-	space->install_rom(0x0000, 0x47ff, machine.region("maincpu")->base());
+	space->install_rom(0x0000, 0x47ff, state->memregion("maincpu")->base());
 }
 
 /*************************************
@@ -3396,7 +3396,7 @@ static DRIVER_INIT( sfx )
 
 	/* sound board has space for extra ROM */
 	machine.device("audiocpu")->memory().space(AS_PROGRAM)->install_read_bank(0x0000, 0x3fff, "bank1");
-	state->membank("bank1")->set_base(machine.region("audiocpu")->base());
+	state->membank("bank1")->set_base(state->memregion("audiocpu")->base());
 }
 
 
@@ -3502,7 +3502,7 @@ static DRIVER_INIT( scorpion )
 
 	/* extra ROM */
 	space->install_read_bank(0x5800, 0x67ff, "bank1");
-	state->membank("bank1")->set_base(machine.region("maincpu")->base() + 0x5800);
+	state->membank("bank1")->set_base(machine.root_device().memregion("maincpu")->base() + 0x5800);
 
 	/* no background related */
 //  space->nop_write(0x6803, 0x6803);
@@ -3510,7 +3510,7 @@ static DRIVER_INIT( scorpion )
 	machine.device("audiocpu")->memory().space(AS_PROGRAM)->install_read_handler(0x3000, 0x3000, read8_delegate(FUNC(galaxian_state::scorpion_digitalker_intr_r),state));
 /*
 {
-    const UINT8 *rom = machine.region("speech")->base();
+    const UINT8 *rom = state->memregion("speech")->base();
     int i;
 
     for (i = 0; i < 0x2c; i++)

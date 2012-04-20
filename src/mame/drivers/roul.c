@@ -88,7 +88,7 @@ public:
 
 static PALETTE_INIT( roul )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int bit6, bit7, bit0, bit1, r, g, b;
 	int i;
 

@@ -1080,7 +1080,7 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(sfbonus_state::sfbonus_bank_w)
 {
-	UINT8 *ROM = machine().region("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 	UINT8 bank;
 
 	bank = data & 7;
@@ -1214,7 +1214,7 @@ GFXDECODE_END
 
 static MACHINE_RESET( sfbonus )
 {
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
 
 	machine.root_device().membank("bank1")->set_base(&ROM[0]);
 }
@@ -1233,12 +1233,12 @@ static NVRAM_HANDLER( sfbonus )
 		}
 		else
 		{
-			UINT8* defaultram = machine.region("defaults")->base();
+			UINT8* defaultram = machine.root_device().memregion("defaults")->base();
 			memset(state->m_nvram,0x00,state->m_nvram.bytes());
 
 			if (defaultram)
 				if ((defaultram[0x02]==0x00) && (defaultram[0x03]==0x00)) // hack! rom region optional regions get cleared with garbage if no rom is present, this is not good!
-					memcpy(state->m_nvram, machine.region("defaults")->base(), machine.region("defaults")->bytes());
+					memcpy(state->m_nvram, machine.root_device().memregion("defaults")->base(), machine.root_device().memregion("defaults")->bytes());
 		}
 	}
 }
@@ -5733,9 +5733,9 @@ static DRIVER_INIT( sfbonus_common)
 
 	// dummy.rom helper
 	{
-		UINT8 *ROM = machine.region("maincpu")->base();
-		int length = machine.region("maincpu")->bytes();
-		UINT8* ROM2 = machine.region("user1")->base();
+		UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
+		int length = machine.root_device().memregion("maincpu")->bytes();
+		UINT8* ROM2 = state->memregion("user1")->base();
 
 		if (ROM2)
 		{
@@ -5785,9 +5785,9 @@ static void sfbonus_bitswap( running_machine& machine,
 {
 
 	int i;
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
 
-	for(i = 0; i < machine.region("maincpu")->bytes(); i++)
+	for(i = 0; i < machine.root_device().memregion("maincpu")->bytes(); i++)
 	{
 		UINT8 x = ROM[i];
 

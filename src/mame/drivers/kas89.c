@@ -865,8 +865,8 @@ ROM_END
 static DRIVER_INIT(kas89)
 {
 	int i;
-	UINT8 *mem = machine.region("maincpu")->base();
-	int memsize = machine.region("maincpu")->bytes();
+	UINT8 *mem = machine.root_device().memregion("maincpu")->base();
+	int memsize = machine.root_device().memregion("maincpu")->bytes();
 	UINT8 *buf;
 
 	/* Unscrambling data lines */

@@ -82,7 +82,7 @@ WRITE16_MEMBER(fuuki16_state::fuuki16_vram_3_w){ fuuki16_vram_w(&space, offset, 
 #if 0
 PALETTE_INIT( fuuki16 )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int pen;
 
 	/* The game does not initialise the palette at startup. It should

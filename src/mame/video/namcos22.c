@@ -861,7 +861,7 @@ ApplyGamma( running_machine &machine, bitmap_rgb32 &bitmap )
 	}
 	else
 	{ /* system 22 */
-		const UINT8 *rlut = 0x000+(const UINT8 *)machine.region("user1")->base();
+		const UINT8 *rlut = 0x000+(const UINT8 *)machine.root_device().memregion("user1")->base();
 		const UINT8 *glut = 0x100+rlut;
 		const UINT8 *blut = 0x200+rlut;
 		for( y=0; y<bitmap.height(); y++ )
@@ -2741,10 +2741,10 @@ static VIDEO_START( common )
 	for (code = 0; code < machine.gfx[GFX_TEXTURE_TILE]->total_elements; code++)
 		gfx_element_decode(machine.gfx[GFX_TEXTURE_TILE], code);
 
-	Prepare3dTexture(machine, machine.region("textilemap")->base(), machine.gfx[GFX_TEXTURE_TILE]->gfxdata );
+	Prepare3dTexture(machine, machine.root_device().memregion("textilemap")->base(), machine.gfx[GFX_TEXTURE_TILE]->gfxdata );
 	state->m_dirtypal = auto_alloc_array(machine, UINT8, NAMCOS22_PALETTE_SIZE/4);
-	state->m_mPtRomSize = machine.region("pointrom")->bytes()/3;
-	state->m_mpPolyL = machine.region("pointrom")->base();
+	state->m_mPtRomSize = machine.root_device().memregion("pointrom")->bytes()/3;
+	state->m_mpPolyL = state->memregion("pointrom")->base();
 	state->m_mpPolyM = state->m_mpPolyL + state->m_mPtRomSize;
 	state->m_mpPolyH = state->m_mpPolyM + state->m_mPtRomSize;
 

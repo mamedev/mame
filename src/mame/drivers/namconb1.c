@@ -608,7 +608,7 @@ static MACHINE_START(namconb)
 
 static DRIVER_INIT( nebulray )
 {
-	UINT8 *pMem = (UINT8 *)machine.region(NAMCONB1_TILEMASKREGION)->base();
+	UINT8 *pMem = (UINT8 *)machine.root_device().memregion(NAMCONB1_TILEMASKREGION)->base();
 	size_t numBytes = (0xfe7-0xe6f)*8;
 	memset( &pMem[0xe6f*8], 0, numBytes );
 

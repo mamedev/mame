@@ -326,7 +326,7 @@ static MACHINE_RESET( ssv )
 	ssv_state *state = machine.driver_data<ssv_state>();
 	state->m_requested_int = 0;
 	device_set_irq_callback(machine.device("maincpu"), ssv_irq_callback);
-	state->membank("bank1")->set_base(machine.region("user1")->base());
+	state->membank("bank1")->set_base(state->memregion("user1")->base());
 }
 
 
@@ -549,8 +549,8 @@ WRITE16_MEMBER(ssv_state::gdfs_blitram_w)
 			UINT32 dst	=	(gdfs_blitram[0xc4/2] + (gdfs_blitram[0xc6/2] << 16)) << 4;
 			UINT32 len	=	(gdfs_blitram[0xc8/2]) << 4;
 
-			UINT8 *rom	=	machine().region("gfx2")->base();
-			size_t size	=	machine().region("gfx2")->bytes();
+			UINT8 *rom	=	memregion("gfx2")->base();
+			size_t size	=	memregion("gfx2")->bytes();
 
 			if ( (src+len <= size) && (dst+len <= 4 * 0x100000) )
 			{
@@ -962,8 +962,8 @@ ADDRESS_MAP_END
 
 READ16_MEMBER(ssv_state::eaglshot_gfxrom_r)
 {
-	UINT8 *rom	=	machine().region("gfx1")->base();
-	size_t size	=	machine().region("gfx1")->bytes();
+	UINT8 *rom	=	memregion("gfx1")->base();
+	size_t size	=	memregion("gfx1")->bytes();
 
 	offset = offset * 2 + m_gfxrom_select * 0x200000;
 
@@ -2648,9 +2648,9 @@ static void init_hypreac2(running_machine &machine)
 // massages the data from the BPMicro-compatible dump to runnable form
 static void init_st010(running_machine &machine)
 {
-	UINT8 *dspsrc = (UINT8 *)machine.region("st010")->base();
-	UINT32 *dspprg = (UINT32 *)machine.region("dspprg")->base();
-	UINT16 *dspdata = (UINT16 *)machine.region("dspdata")->base();
+	UINT8 *dspsrc = (UINT8 *)machine.root_device().memregion("st010")->base();
+	UINT32 *dspprg = (UINT32 *)machine.root_device().memregion("dspprg")->base();
+	UINT16 *dspdata = (UINT16 *)machine.root_device().memregion("dspdata")->base();
 
 	// copy DSP program
 	for (int i = 0; i < 0x10000; i+= 4)
@@ -2677,7 +2677,7 @@ static DRIVER_INIT( meosism )			{	init_ssv(machine, 0);	}
 static DRIVER_INIT( mslider )			{	init_ssv(machine, 0);	}
 static DRIVER_INIT( ryorioh )			{	init_ssv(machine, 0);	}
 static DRIVER_INIT( srmp4 )			{	init_ssv(machine, 0);
-//  ((UINT16 *)machine.region("user1")->base())[0x2b38/2] = 0x037a;   /* patch to see gal test mode */
+//  ((UINT16 *)machine.root_device().memregion("user1")->base())[0x2b38/2] = 0x037a;   /* patch to see gal test mode */
 }
 static DRIVER_INIT( srmp7 )			{	init_ssv(machine, 0);	}
 static DRIVER_INIT( stmblade )		{	init_ssv(machine, 0); init_st010(machine); }

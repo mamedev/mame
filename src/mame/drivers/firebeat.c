@@ -1956,7 +1956,7 @@ static MACHINE_RESET( firebeat )
 	firebeat_state *state = machine.driver_data<firebeat_state>();
 	void *cd;
 	int i;
-	UINT8 *sound = machine.region("ymz")->base();
+	UINT8 *sound = state->memregion("ymz")->base();
 
 	for (i=0; i < 0x200000; i++)
 	{
@@ -2225,7 +2225,7 @@ static void init_lights(running_machine &machine, write32_space_func out1, const
 static void init_firebeat(running_machine &machine)
 {
 	firebeat_state *state = machine.driver_data<firebeat_state>();
-	UINT8 *rom = machine.region("user2")->base();
+	UINT8 *rom = state->memregion("user2")->base();
 
 	atapi_init(machine);
 

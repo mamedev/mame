@@ -66,7 +66,7 @@ static void drgwld2_common_init(running_machine &machine)
 
 DRIVER_INIT( drgw2 )
 {	/* incomplete? */
-	UINT16 *mem16 = (UINT16 *)machine.region("maincpu")->base();
+	UINT16 *mem16 = (UINT16 *)machine.root_device().memregion("maincpu")->base();
 	drgwld2_common_init(machine);
 	/* These ROM patches are not hacks, the protection device
        overlays the normal ROM code, this has been confirmed on a real PCB
@@ -78,7 +78,7 @@ DRIVER_INIT( drgw2 )
 
 DRIVER_INIT( dw2v100x )
 {
-	UINT16 *mem16 = (UINT16 *)machine.region("maincpu")->base();
+	UINT16 *mem16 = (UINT16 *)machine.root_device().memregion("maincpu")->base();
 	drgwld2_common_init(machine);
 
 	mem16[0x131084 / 2] = 0x4e93;
@@ -88,7 +88,7 @@ DRIVER_INIT( dw2v100x )
 
 DRIVER_INIT( drgw2c )
 {
-	UINT16 *mem16 = (UINT16 *)machine.region("maincpu")->base();
+	UINT16 *mem16 = (UINT16 *)machine.root_device().memregion("maincpu")->base();
 	drgwld2_common_init(machine);
 	/* These ROM patches are not hacks, the protection device
        overlays the normal ROM code, this has been confirmed on a real PCB
@@ -100,7 +100,7 @@ DRIVER_INIT( drgw2c )
 
 DRIVER_INIT( drgw2j )
 {
-	UINT16 *mem16 = (UINT16 *)machine.region("maincpu")->base();
+	UINT16 *mem16 = (UINT16 *)machine.root_device().memregion("maincpu")->base();
 	drgwld2_common_init(machine);
 	/* These ROM patches are not hacks, the protection device
        overlays the normal ROM code, this has been confirmed on a real PCB

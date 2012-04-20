@@ -290,7 +290,7 @@ static void ttmjprd_draw_tilemap(running_machine &machine, bitmap_ind16 &bitmap,
 static SCREEN_UPDATE_IND16( tmmjprd_left )
 {
 	tmmjprd_state *state = screen.machine().driver_data<tmmjprd_state>();
-	UINT8* gfxroms = screen.machine().region("gfx2")->base();
+	UINT8* gfxroms = state->memregion("gfx2")->base();
 
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
@@ -325,7 +325,7 @@ static SCREEN_UPDATE_IND16( tmmjprd_left )
 static SCREEN_UPDATE_IND16( tmmjprd_right )
 {
 	tmmjprd_state *state = screen.machine().driver_data<tmmjprd_state>();
-	UINT8* gfxroms = screen.machine().region("gfx2")->base();
+	UINT8* gfxroms = state->memregion("gfx2")->base();
 
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
@@ -385,7 +385,7 @@ static TIMER_CALLBACK( tmmjprd_blit_done )
 static void tmmjprd_do_blit(running_machine &machine)
 {
 	tmmjprd_state *state = machine.driver_data<tmmjprd_state>();
-	UINT8 *blt_data = machine.region("gfx1")->base();
+	UINT8 *blt_data = state->memregion("gfx1")->base();
 	int blt_source = (tmmjprd_blitterregs[0]&0x000fffff)>>0;
 	int blt_column = (tmmjprd_blitterregs[1]&0x00ff0000)>>16;
 	int blt_line   = (tmmjprd_blitterregs[1]&0x000000ff);

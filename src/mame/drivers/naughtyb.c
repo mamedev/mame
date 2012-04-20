@@ -846,7 +846,7 @@ static DRIVER_INIT( popflame )
 
 READ8_MEMBER(naughtyb_state::trvmstr_questions_r)
 {
-	return machine().region("user1")->base()[m_question_offset];
+	return memregion("user1")->base()[m_question_offset];
 }
 
 WRITE8_MEMBER(naughtyb_state::trvmstr_questions_w)

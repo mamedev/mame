@@ -535,7 +535,7 @@ DRIVER_INIT( tnzsb )
 DRIVER_INIT( kabukiz )
 {
 	tnzs_state *state = machine.driver_data<tnzs_state>();
-	UINT8 *SOUND = machine.region("audiocpu")->base();
+	UINT8 *SOUND = state->memregion("audiocpu")->base();
 	state->m_mcu_type = MCU_NONE_KABUKIZ;
 
 	state->membank("bank3")->configure_entries(0, 8, &SOUND[0x10000], 0x4000);
@@ -671,8 +671,8 @@ static void tnzs_postload(running_machine &machine)
 MACHINE_START( tnzs )
 {
 	tnzs_state *state = machine.driver_data<tnzs_state>();
-	UINT8 *ROM = machine.region("maincpu")->base();
-	UINT8 *SUB = machine.region("sub")->base();
+	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
+	UINT8 *SUB = state->memregion("sub")->base();
 
 	state->membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
 	state->membank("bank2")->configure_entries(0, 4, &SUB[0x10000], 0x2000);
@@ -709,8 +709,8 @@ MACHINE_START( tnzs )
 MACHINE_START( jpopnics )
 {
 	tnzs_state *state = machine.driver_data<tnzs_state>();
-	UINT8 *ROM = machine.region("maincpu")->base();
-	UINT8 *SUB = machine.region("sub")->base();
+	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
+	UINT8 *SUB = state->memregion("sub")->base();
 
 	state->membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
 	state->membank("bank2")->configure_entries(0, 4, &SUB[0x10000], 0x2000);

@@ -219,7 +219,7 @@ static SCREEN_UPDATE_IND16( miniboy7 )
 
 static PALETTE_INIT( miniboy7 )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 /*  FIXME... Can't get the correct palette.
     sometimes RGB bits are inverted, disregarding the 4th bit.
 

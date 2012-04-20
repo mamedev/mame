@@ -1026,7 +1026,7 @@ static DRIVER_INIT( luckgrln )
 {
 	int i;
 	UINT8 x,v;
-	UINT8* rom = machine.region("rom_data")->base();
+	UINT8* rom = machine.root_device().memregion("rom_data")->base();
 
 	for (i=0;i<0x20000;i++)
 	{

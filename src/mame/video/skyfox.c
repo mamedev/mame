@@ -89,7 +89,7 @@ WRITE8_MEMBER(skyfox_state::skyfox_vregs_w)
 
 PALETTE_INIT( skyfox )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 
 	for (i = 0; i < 256; i++)
@@ -240,7 +240,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 static void draw_background(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	skyfox_state *state = machine.driver_data<skyfox_state>();
-	UINT8 *RAM = machine.region("gfx2")->base();
+	UINT8 *RAM = state->memregion("gfx2")->base();
 	int x, y, i;
 
 	/* The foreground stars (sprites) move at twice this speed when

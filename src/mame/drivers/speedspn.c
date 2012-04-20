@@ -65,7 +65,7 @@ WRITE8_MEMBER(speedspn_state::speedspn_banked_rom_change)
 {
 	/* is this weird banking some form of protection? */
 
-	UINT8 *rom = machine().region("maincpu")->base();
+	UINT8 *rom = memregion("maincpu")->base();
 	int addr;
 
 	switch (data)

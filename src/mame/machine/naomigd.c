@@ -394,10 +394,10 @@ void naomi_gdrom_board::device_start()
 
 	UINT64 key;
 
-	const UINT8 *picdata = machine().region(pic_tag)->base();
+	const UINT8 *picdata = memregion(pic_tag)->base();
 
 	if(picdata) {
-		if(machine().region(pic_tag)->bytes() >= 0x4000) {
+		if(machine().root_device().memregion(pic_tag)->bytes() >= 0x4000) {
 			printf("Real PIC binary found\n");
 			for(int i=0;i<7;i++)
 				name[i] = picdata[0x7c0+i*2];

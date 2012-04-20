@@ -639,7 +639,7 @@ static SAMPLES_START( kageki_init_samples )
 	int start, size;
 	int i, n;
 
-	src = machine.region("samples")->base() + 0x0090;
+	src = state->memregion("samples")->base() + 0x0090;
 	for (i = 0; i < MAX_SAMPLES; i++)
 	{
 		start = (src[(i * 2) + 1] * 256) + src[(i * 2)];

@@ -7,7 +7,7 @@
 static void cclimber_decode(running_machine &machine, const UINT8 convtable[8][16])
 {
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	UINT8 *rom = machine.region("maincpu")->base();
+	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
 	UINT8 *decrypt = auto_alloc_array(machine, UINT8, 0x10000);
 	int A;
 
@@ -68,7 +68,7 @@ DRIVER_INIT( cclimberj )
 DRIVER_INIT( ckongb )
 {
 	int A;
-	UINT8 *rom = machine.region("maincpu")->base();
+	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
 
 	for (A = 0x0000;A < 0x6000;A++) /* all the program ROMs are encrypted */
 	{
@@ -79,7 +79,7 @@ DRIVER_INIT( ckongb )
 #if CANNONB_HACK
 static void cannonb_patch(running_machine &machine)
 {
-	UINT8 *rom = machine.region("maincpu")->base();
+	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
 
 	rom[0x2ba0] = 0x21;
 	rom[0x2ba1] = 0xfb;
@@ -91,7 +91,7 @@ static void cannonb_patch(running_machine &machine)
 DRIVER_INIT( cannonb )
 {
 	int A;
-	UINT8 *rom = machine.region("maincpu")->base();
+	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
 
 	for (A = 0x0000;A < 0x1000;A++) /* only first ROM is encrypted */
 	{

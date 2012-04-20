@@ -85,7 +85,7 @@ public:
 
 static PALETTE_INIT( zerotrgt )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 	for (i = 0; i < machine.total_colors(); i++)
 	{
@@ -1144,8 +1144,8 @@ ROM_END
 
 static void zerotrgt_rearrange_gfx( running_machine &machine, int romsize, int romarea )
 {
-	UINT8 *src = machine.region("gfx4")->base();
-	UINT8 *dst = machine.region("gfx3")->base();
+	UINT8 *src = machine.root_device().memregion("gfx4")->base();
+	UINT8 *dst = machine.root_device().memregion("gfx3")->base();
 	int rm;
 	int cnt1;
 
@@ -1164,7 +1164,7 @@ static void zerotrgt_rearrange_gfx( running_machine &machine, int romsize, int r
 #if 0
 static DRIVER_INIT( cntsteer )
 {
-	UINT8 *RAM = machine.region("subcpu")->base();
+	UINT8 *RAM = machine.root_device().memregion("subcpu")->base();
 
 	RAM[0xc2cf] = 0x43; /* Patch out Cpu 1 ram test - it never ends..?! */
 	RAM[0xc2d0] = 0x43;

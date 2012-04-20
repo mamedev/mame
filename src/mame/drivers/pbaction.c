@@ -481,7 +481,7 @@ READ8_MEMBER(pbaction_state::pbactio3_prot_kludge_r)
 static DRIVER_INIT( pbactio3 )
 {
 	int i;
-	UINT8 *rom = machine.region("maincpu")->base();
+	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
 
 	/* first of all, do a simple bitswap */
 	for (i = 0; i < 0xc000; i++)

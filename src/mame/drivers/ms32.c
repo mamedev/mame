@@ -1381,7 +1381,7 @@ ADDRESS_MAP_END
 
 static MACHINE_RESET( ms32 )
 {
-	machine.root_device().membank("bank1")->set_base(machine.region("maincpu")->base());
+	machine.root_device().membank("bank1")->set_base(machine.root_device().memregion("maincpu")->base());
 	machine.root_device().membank("bank4")->set_entry(0);
 	machine.root_device().membank("bank5")->set_entry(1);
 	irq_init(machine);
@@ -2202,8 +2202,8 @@ static void configure_banks(running_machine &machine)
 {
 	ms32_state *state = machine.driver_data<ms32_state>();
 	state_save_register_global(machine, state->m_to_main);
-	state->membank("bank4")->configure_entries(0, 16, machine.region("audiocpu")->base() + 0x14000, 0x4000);
-	state->membank("bank5")->configure_entries(0, 16, machine.region("audiocpu")->base() + 0x14000, 0x4000);
+	state->membank("bank4")->configure_entries(0, 16, machine.root_device().memregion("audiocpu")->base() + 0x14000, 0x4000);
+	state->membank("bank5")->configure_entries(0, 16, state->memregion("audiocpu")->base() + 0x14000, 0x4000);
 }
 
 static DRIVER_INIT( ms32_common )
@@ -2262,7 +2262,7 @@ static DRIVER_INIT (47pie2)
 static DRIVER_INIT (f1superb)
 {
 #if 0 // we shouldn't need this hack, something else is wrong, and the x offsets are never copied either, v70 problems??
-	UINT32 *pROM = (UINT32 *)machine.region("maincpu")->base();
+	UINT32 *pROM = (UINT32 *)machine.root_device().memregion("maincpu")->base();
 	pROM[0x19d04/4]=0x167a021a; // bne->br  : sprite Y offset table is always copied to RAM
 #endif
 	DRIVER_INIT_CALL(ss92046_01);

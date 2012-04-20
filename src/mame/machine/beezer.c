@@ -176,7 +176,7 @@ WRITE8_MEMBER(beezer_state::beezer_bankswitch_w)
 	}
 	else
 	{
-		UINT8 *rom = machine().region("maincpu")->base() + 0x10000;
+		UINT8 *rom = memregion("maincpu")->base() + 0x10000;
 		space.install_ram(0xc000, 0xcfff, rom + (data & 0x07) * 0x2000 + ((data & 0x08) ? 0x1000: 0));
 	}
 }

@@ -44,7 +44,7 @@
 
 PALETTE_INIT( mrdo )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 
 	const int R1 = 150;

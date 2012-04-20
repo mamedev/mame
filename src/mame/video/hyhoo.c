@@ -41,7 +41,7 @@ WRITE8_MEMBER(hyhoo_state::hyhoo_blitter_w)
 
 WRITE8_MEMBER(hyhoo_state::hyhoo_romsel_w)
 {
-	int gfxlen = machine().region("gfx1")->bytes();
+	int gfxlen = memregion("gfx1")->bytes();
 	m_gfxrom = (((data & 0xc0) >> 4) + (data & 0x03));
 	m_highcolorflag = data;
 	nb1413m3_gfxrombank_w(&space, 0, data);
@@ -64,7 +64,7 @@ static TIMER_CALLBACK( blitter_timer_callback )
 static void hyhoo_gfxdraw(running_machine &machine)
 {
 	hyhoo_state *state = machine.driver_data<hyhoo_state>();
-	UINT8 *GFX = machine.region("gfx1")->base();
+	UINT8 *GFX = state->memregion("gfx1")->base();
 
 	int x, y;
 	int dx1, dx2, dy;
@@ -106,7 +106,7 @@ static void hyhoo_gfxdraw(running_machine &machine)
 		skipy = -1;
 	}
 
-	gfxlen = machine.region("gfx1")->bytes();
+	gfxlen = machine.root_device().memregion("gfx1")->bytes();
 	gfxaddr = (state->m_gfxrom << 17) + (state->m_blitter_src_addr << 1);
 
 	for (y = starty, ctry = sizey; ctry >= 0; y += skipy, ctry--)

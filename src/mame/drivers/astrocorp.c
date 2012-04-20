@@ -1008,7 +1008,7 @@ ROM_END
 static DRIVER_INIT( showhand )
 {
 #if 0
-	UINT16 *rom = (UINT16*)machine.region("maincpu")->base();
+	UINT16 *rom = (UINT16*)machine.root_device().memregion("maincpu")->base();
 
 	rom[0x0a1a/2] = 0x6000;	// hopper jam
 
@@ -1024,7 +1024,7 @@ static DRIVER_INIT( showhand )
 static DRIVER_INIT( showhanc )
 {
 #if 0
-	UINT16 *rom = (UINT16*)machine.region("maincpu")->base();
+	UINT16 *rom = (UINT16*)machine.root_device().memregion("maincpu")->base();
 
 	rom[0x14d4/2] = 0x4e71;	// enable full test mode
 	rom[0x14d6/2] = 0x4e71;	// ""

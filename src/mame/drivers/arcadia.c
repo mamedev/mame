@@ -757,7 +757,7 @@ ROM_END
 
 INLINE void generic_decode(running_machine &machine, const char *tag, int bit7, int bit6, int bit5, int bit4, int bit3, int bit2, int bit1, int bit0)
 {
-	UINT16 *rom = (UINT16 *)machine.region(tag)->base();
+	UINT16 *rom = (UINT16 *)machine.root_device().memregion(tag)->base();
 	int i;
 
 	/* only the low byte of ROMs are encrypted in these games */
@@ -766,8 +766,8 @@ INLINE void generic_decode(running_machine &machine, const char *tag, int bit7, 
 
 	#if 0
 	{
-		UINT8 *ROM = machine.region(tag)->base();
-		int size = machine.region(tag)->bytes();
+		UINT8 *ROM = machine.root_device().memregion(tag)->base();
+		int size = machine.root_device().memregion(tag)->bytes();
 
 		FILE *fp;
 		char filename[256];
@@ -809,10 +809,10 @@ static void arcadia_init(running_machine &machine)
 
 	/* set up memory */
 	state->membank("bank1")->configure_entry(0, state->m_chip_ram);
-	state->membank("bank1")->configure_entry(1, machine.region("user1")->base());
+	state->membank("bank1")->configure_entry(1, machine.root_device().memregion("user1")->base());
 
 	/* OnePlay bios is encrypted, TenPlay is not */
-	biosrom = (UINT16 *)machine.region("user2")->base();
+	biosrom = (UINT16 *)machine.root_device().memregion("user2")->base();
 	if (biosrom[0] != 0x4afc)
 		generic_decode(machine, "user2", 6, 1, 0, 2, 3, 4, 5, 7);
 }

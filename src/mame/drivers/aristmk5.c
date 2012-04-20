@@ -359,8 +359,8 @@ INPUT_PORTS_END
 
 static DRIVER_INIT( aristmk5 )
 {
-	UINT8 *SRAM    = machine.region("sram")->base();
-	UINT8 *SRAM_NZ = machine.region("sram")->base();
+	UINT8 *SRAM    = machine.root_device().memregion("sram")->base();
+	UINT8 *SRAM_NZ = machine.root_device().memregion("sram")->base();
 
 	archimedes_driver_init(machine);
 
@@ -392,15 +392,15 @@ static MACHINE_RESET( aristmk5 )
 
 	/* load the roms according to what the operator wants */
 	{
-		UINT8 *ROM = machine.region("maincpu")->base();
-		UINT8 *PRG;// = machine.region("prg_code")->base();
+		UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
+		UINT8 *PRG;// = state->memregion("prg_code")->base();
 		int i;
 		UINT8 op_mode;
 		static const char *const rom_region[] = { "set_chip_4.04", "set_chip_4.4", "clear_chip", "game_prg" };
 
 		op_mode = input_port_read(machine, "ROM_LOAD");
 
-		PRG = machine.region(rom_region[op_mode & 3])->base();
+		PRG = machine.root_device().memregion(rom_region[op_mode & 3])->base();
 
 		if(PRG!=NULL)
 

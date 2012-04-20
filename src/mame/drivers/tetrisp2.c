@@ -117,7 +117,7 @@ READ16_MEMBER(tetrisp2_state::rockn_adpcmbank_r)
 
 WRITE16_MEMBER(tetrisp2_state::rockn_adpcmbank_w)
 {
-	UINT8 *SNDROM = machine().region("ymz")->base();
+	UINT8 *SNDROM = memregion("ymz")->base();
 	int bank;
 
 	m_rockn_adpcmbank = data;
@@ -134,7 +134,7 @@ WRITE16_MEMBER(tetrisp2_state::rockn_adpcmbank_w)
 
 WRITE16_MEMBER(tetrisp2_state::rockn2_adpcmbank_w)
 {
-	UINT8 *SNDROM = machine().region("ymz")->base();
+	UINT8 *SNDROM = memregion("ymz")->base();
 	int bank;
 
 	char banktable[9][3]=
@@ -181,13 +181,13 @@ WRITE16_MEMBER(tetrisp2_state::nndmseal_sound_bank_w)
 
 	if (ACCESSING_BITS_0_7)
 	{
-		UINT8 *rom = machine().region("okisource")->base();
+		UINT8 *rom = memregion("okisource")->base();
 
 		if (data & 0x04)
 		{
 			m_bank_lo = data & 0x03;
 
-			memcpy(machine().region("oki")->base(), rom + (m_bank_lo * 0x80000), 0x20000);
+			memcpy(machine().root_device().memregion("oki")->base(), rom + (m_bank_lo * 0x80000), 0x20000);
 
 //          logerror("PC:%06X sound bank_lo = %02X\n",cpu_get_pc(&space.device()),m_bank_lo);
 		}
@@ -195,7 +195,7 @@ WRITE16_MEMBER(tetrisp2_state::nndmseal_sound_bank_w)
 		{
 			m_bank_hi = data & 0x03;
 
-			memcpy(machine().region("oki")->base() + 0x20000, rom + (m_bank_lo * 0x80000) + (m_bank_hi * 0x20000), 0x20000);
+			memcpy(machine().root_device().memregion("oki")->base() + 0x20000, rom + (m_bank_lo * 0x80000) + (m_bank_hi * 0x20000), 0x20000);
 
 //          logerror("PC:%06X sound bank_hi = %02X\n",cpu_get_pc(&space.device()),m_bank_hi);
 		}

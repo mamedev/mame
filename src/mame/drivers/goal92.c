@@ -291,7 +291,7 @@ GFXDECODE_END
 static MACHINE_START( goal92 )
 {
 	goal92_state *state = machine.driver_data<goal92_state>();
-	UINT8 *ROM = machine.region("audiocpu")->base();
+	UINT8 *ROM = state->memregion("audiocpu")->base();
 
 	state->membank("bank1")->configure_entries(0, 2, &ROM[0x10000], 0x4000);
 

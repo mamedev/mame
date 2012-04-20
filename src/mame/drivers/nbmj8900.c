@@ -45,7 +45,7 @@ TODO:
 static DRIVER_INIT( ohpaipee )
 {
 #if 0
-	UINT8 *prot = machine.region("protdata")->base();
+	UINT8 *prot = machine.root_device().memregion("protdata")->base();
 	int i;
 
 	/* this is one possible way to rearrange the protection ROM data to get the
@@ -59,7 +59,7 @@ static DRIVER_INIT( ohpaipee )
 		prot[i] = BITSWAP8(prot[i],2,7,3,5,0,6,4,1);
 	}
 #else
-	unsigned char *ROM = machine.region("maincpu")->base();
+	unsigned char *ROM = machine.root_device().memregion("maincpu")->base();
 
 	// Protection ROM check skip
 	ROM[0x00e4] = 0x00;
@@ -78,7 +78,7 @@ static DRIVER_INIT( ohpaipee )
 static DRIVER_INIT( togenkyo )
 {
 #if 0
-	UINT8 *prot = machine.region("protdata")->base();
+	UINT8 *prot = machine.root_device().memregion("protdata")->base();
 	int i;
 
 	/* this is one possible way to rearrange the protection ROM data to get the
@@ -91,7 +91,7 @@ static DRIVER_INIT( togenkyo )
 		prot[i] = BITSWAP8(prot[i],2,7,3,5,0,6,4,1);
 	}
 #else
-	unsigned char *ROM = machine.region("maincpu")->base();
+	unsigned char *ROM = machine.root_device().memregion("maincpu")->base();
 
 	// Protection ROM check skip
 	ROM[0x010b] = 0x00;

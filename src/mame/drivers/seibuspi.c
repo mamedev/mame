@@ -995,8 +995,8 @@ READ8_MEMBER(seibuspi_state::z80_coin_r)
 
 READ32_MEMBER(seibuspi_state::soundrom_r)
 {
-	UINT8 *sound = (UINT8*)machine().region("user2")->base();
-	UINT16 *sound16 = (UINT16*)machine().region("user2")->base();
+	UINT8 *sound = (UINT8*)machine().root_device().memregion("user2")->base();
+	UINT16 *sound16 = (UINT16*)machine().root_device().memregion("user2")->base();
 
 	if (mem_mask == 0x000000ff)
 	{
@@ -1812,9 +1812,9 @@ static MACHINE_RESET( spi )
 {
 	seibuspi_state *state = machine.driver_data<seibuspi_state>();
 	int i;
-	UINT8 *sound = machine.region("ymf")->base();
+	UINT8 *sound = machine.root_device().memregion("ymf")->base();
 
-	UINT8 *rombase = machine.region("user1")->base();
+	UINT8 *rombase = state->memregion("user1")->base();
 	UINT8 flash_data = rombase[0x1ffffc];
 
 	cputag_set_input_line(machine, "soundcpu", INPUT_LINE_RESET, ASSERT_LINE );
@@ -1897,7 +1897,7 @@ static MACHINE_START( sxx2f )
 static MACHINE_RESET( sxx2f )
 {
 	seibuspi_state *state = machine.driver_data<seibuspi_state>();
-	UINT8 *rom = machine.region("soundcpu")->base();
+	UINT8 *rom = state->memregion("soundcpu")->base();
 
 	state->membank("bank4")->set_base(state->m_z80_rom);
 	state->membank("bank5")->set_base(state->m_z80_rom);
@@ -2075,9 +2075,9 @@ static void init_spi(running_machine &machine)
 	state->m_flash[0] = machine.device<intel_e28f008sa_device>("flash0");
 	state->m_flash[1] = machine.device<intel_e28f008sa_device>("flash1");
 
-	seibuspi_text_decrypt(machine.region("gfx1")->base());
-	seibuspi_bg_decrypt(machine.region("gfx2")->base(), machine.region("gfx2")->bytes());
-	seibuspi_sprite_decrypt(machine.region("gfx3")->base(), 0x400000);
+	seibuspi_text_decrypt(machine.root_device().memregion("gfx1")->base());
+	seibuspi_bg_decrypt(machine.root_device().memregion("gfx2")->base(), machine.root_device().memregion("gfx2")->bytes());
+	seibuspi_sprite_decrypt(state->memregion("gfx3")->base(), 0x400000);
 }
 
 static DRIVER_INIT( rdft )
@@ -2146,9 +2146,9 @@ static void init_rf2(running_machine &machine)
 	state->m_flash[1] = machine.device<intel_e28f008sa_device>("flash1");
 
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x0282AC, 0x0282AF, read32_delegate(FUNC(seibuspi_state::rf2_speedup_r),state));
-	seibuspi_rise10_text_decrypt(machine.region("gfx1")->base());
-	seibuspi_rise10_bg_decrypt(machine.region("gfx2")->base(), machine.region("gfx2")->bytes());
-	seibuspi_rise10_sprite_decrypt(machine.region("gfx3")->base(), 0x600000);
+	seibuspi_rise10_text_decrypt(machine.root_device().memregion("gfx1")->base());
+	seibuspi_rise10_bg_decrypt(machine.root_device().memregion("gfx2")->base(), machine.root_device().memregion("gfx2")->bytes());
+	seibuspi_rise10_sprite_decrypt(state->memregion("gfx3")->base(), 0x600000);
 
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x560, 0x563, write32_delegate(FUNC(seibuspi_state::sprite_dma_start_w),state));
 }
@@ -2171,9 +2171,9 @@ static void init_rfjet(running_machine &machine)
 	state->m_flash[1] = machine.device<intel_e28f008sa_device>("flash1");
 
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x002894c, 0x002894f, read32_delegate(FUNC(seibuspi_state::rfjet_speedup_r),state));
-	seibuspi_rise11_text_decrypt(machine.region("gfx1")->base());
-	seibuspi_rise11_bg_decrypt(machine.region("gfx2")->base(), machine.region("gfx2")->bytes());
-	seibuspi_rise11_sprite_decrypt_rfjet(machine.region("gfx3")->base(), 0x800000);
+	seibuspi_rise11_text_decrypt(machine.root_device().memregion("gfx1")->base());
+	seibuspi_rise11_bg_decrypt(machine.root_device().memregion("gfx2")->base(), machine.root_device().memregion("gfx2")->bytes());
+	seibuspi_rise11_sprite_decrypt_rfjet(state->memregion("gfx3")->base(), 0x800000);
 
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x560, 0x563, write32_delegate(FUNC(seibuspi_state::sprite_dma_start_w),state));
 }
@@ -2237,11 +2237,11 @@ MACHINE_CONFIG_END
 static DRIVER_INIT( sys386f2 )
 {
 	int i, j;
-	UINT16 *src = (UINT16 *)machine.region("gfx3")->base();
+	UINT16 *src = (UINT16 *)machine.root_device().memregion("gfx3")->base();
 	UINT16 tmp[0x40 / 2], Offset;
 
 	// sprite_reorder() only
-	for(i = 0; i < machine.region("gfx3")->bytes() / 0x40; i++)
+	for(i = 0; i < machine.root_device().memregion("gfx3")->bytes() / 0x40; i++)
 	{
 		memcpy(tmp, src, 0x40);
 

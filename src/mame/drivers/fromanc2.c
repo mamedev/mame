@@ -524,9 +524,9 @@ static MACHINE_START( fromanc2 )
 {
 	fromanc2_state *state = machine.driver_data<fromanc2_state>();
 
-	state->membank("bank1")->configure_entries(0, 4, machine.region("sub")->base(), 0x4000);
-	state->membank("bank2")->configure_entry(0, machine.region("sub")->base() + 0x08000);
-	state->membank("bank2")->configure_entries(1, 3, machine.region("sub")->base() + 0x14000, 0x4000);
+	state->membank("bank1")->configure_entries(0, 4, machine.root_device().memregion("sub")->base(), 0x4000);
+	state->membank("bank2")->configure_entry(0, machine.root_device().memregion("sub")->base() + 0x08000);
+	state->membank("bank2")->configure_entries(1, 3, state->memregion("sub")->base() + 0x14000, 0x4000);
 
 	MACHINE_START_CALL(fromanc4);
 

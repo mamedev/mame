@@ -119,7 +119,7 @@ READ16_MEMBER(vmetal_state::varia_crom_read)
 	/* game reads the cgrom, result is 7772, verified to be correct on the real board */
 
 
-	UINT8 *cgrom = machine().region("gfx1")->base();
+	UINT8 *cgrom = memregion("gfx1")->base();
 	UINT16 retdat;
 
 	offset = offset << 1;
@@ -423,8 +423,8 @@ static TILE_GET_INFO( get_vmetal_mid2tilemap_tile_info )
 static void expand_gfx1(running_machine &machine)
 {
 	metro_state *state = machine.driver_data<metro_state>();
-	UINT8 *base_gfx = machine.region("gfx1")->base();
-	UINT32 length = 2 * machine.region("gfx1")->bytes();
+	UINT8 *base_gfx = machine.root_device().memregion("gfx1")->base();
+	UINT32 length = 2 * state->memregion("gfx1")->bytes();
 	state->m_expanded_gfx1 = auto_alloc_array(machine, UINT8, length);
 	for (int i = 0; i < length; i += 2)
 	{

@@ -228,7 +228,7 @@ static DEVICE_START( zsg2 )
 
 	info->stream = device->machine().sound().stream_alloc(*device, 0, 2, info->sample_rate, info, update_stereo);
 
-	info->bank_samples = device->machine().region(intf->samplergn)->base();
+	info->bank_samples = device->machine().root_device().memregion(intf->samplergn)->base();
 }
 
 /**************************************************************************

@@ -78,7 +78,7 @@ static void spd_adpcm_int(device_t *device)
 	}
 	else
 	{
-		UINT8 *ROM = device->machine().region("adpcm")->base() + 0x10000 * chip;
+		UINT8 *ROM = device->machine().root_device().memregion("adpcm")->base() + 0x10000 * chip;
 
 		state->m_adpcm_data[chip] = ROM[state->m_adpcm_pos[chip]++];
 		msm5205_data_w(device,state->m_adpcm_data[chip] >> 4);

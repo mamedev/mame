@@ -155,7 +155,7 @@ static void set_pens(running_machine &machine)
     0020:   00 f0 f0 f0 b0 b0 00 f0
             00 f0 f0 00 b0 00 f0 f0
 */
-	//const UINT8 *color_prom = machine.region( "proms" )->base();
+	//const UINT8 *color_prom = machine.root_device().memregion( "proms" )->base();
 	tunhunt_state *state = machine.driver_data<tunhunt_state>();
 	int color;
 	int shade;

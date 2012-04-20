@@ -125,7 +125,7 @@ WRITE8_MEMBER(bwing_state::bwing_scrollreg_w)
 	}
 
 	#if BW_DEBUG
-		(machine().region(REGION_CPU1)->base())[0x1b10 + offset] = data;
+		(machine().root_device().memregion(REGION_CPU1)->base())[0x1b10 + offset] = data;
 	#endif
 }
 
@@ -214,7 +214,7 @@ VIDEO_START( bwing )
 
 	fill_srxlat(state->m_srxlat);
 
-	state->m_fgdata = machine.region("gpu")->base();
+	state->m_fgdata = state->memregion("gpu")->base();
 	state->m_bgdata = state->m_fgdata + 0x1000;
 
 	for (i = 0; i < 4; i++)

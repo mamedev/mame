@@ -1520,14 +1520,14 @@ static MACHINE_RESET( cps )
 	if (strcmp(gamename, "sf2rb") == 0)
 	{
 		/* Patch out protection check */
-		UINT16 *rom = (UINT16 *)machine.region("maincpu")->base();
+		UINT16 *rom = (UINT16 *)machine.root_device().memregion("maincpu")->base();
 		rom[0xe5464 / 2] = 0x6012;
 	}
 
 	if (strcmp(gamename, "sf2rb2") == 0)
 	{
 		/* Patch out protection check */
-		UINT16 *rom = (UINT16 *)machine.region("maincpu")->base();
+		UINT16 *rom = (UINT16 *)machine.root_device().memregion("maincpu")->base();
 		rom[0xe5332 / 2] = 0x6014;
 	}
 
@@ -1538,13 +1538,13 @@ static MACHINE_RESET( cps )
            by the cpu core as a 32-bit branch. This branch would make the
            game crash (address error, since it would branch to an odd address)
            if location 180ca6 (outside ROM space) isn't 0. Protection check? */
-		UINT16 *rom = (UINT16 *)machine.region("maincpu")->base();
+		UINT16 *rom = (UINT16 *)machine.root_device().memregion("maincpu")->base();
 		rom[0x11756 / 2] = 0x4e71;
 	}
 	else if (strcmp(gamename, "ghouls") == 0)
 	{
 		/* Patch out self-test... it takes forever */
-		UINT16 *rom = (UINT16 *)machine.region("maincpu")->base();
+		UINT16 *rom = (UINT16 *)machine.root_device().memregion("maincpu")->base();
 		rom[0x61964 / 2] = 0x4ef9;
 		rom[0x61966 / 2] = 0x0000;
 		rom[0x61968 / 2] = 0x0400;
@@ -1716,9 +1716,9 @@ INLINE int cps2_port( running_machine &machine, int offset )
 
 static void cps1_gfx_decode( running_machine &machine )
 {
-	int size = machine.region("gfx")->bytes();
+	int size = machine.root_device().memregion("gfx")->bytes();
 	int i, j, gfxsize;
-	UINT8 *cps1_gfx = machine.region("gfx")->base();
+	UINT8 *cps1_gfx = machine.root_device().memregion("gfx")->base();
 
 	gfxsize = size / 4;
 
@@ -1772,11 +1772,11 @@ static void unshuffle( UINT64 *buf, int len )
 static void cps2_gfx_decode( running_machine &machine )
 {
 	const int banksize = 0x200000;
-	int size = machine.region("gfx")->bytes();
+	int size = machine.root_device().memregion("gfx")->bytes();
 	int i;
 
 	for (i = 0; i < size; i += banksize)
-		unshuffle((UINT64 *)(machine.region("gfx")->base() + i), banksize / 8);
+		unshuffle((UINT64 *)(machine.root_device().memregion("gfx")->base() + i), banksize / 8);
 
 	cps1_gfx_decode(machine);
 }
@@ -2697,7 +2697,7 @@ static void cps1_render_stars( screen_device &screen, bitmap_ind16 &bitmap, cons
 {
 	cps_state *state = screen.machine().driver_data<cps_state>();
 	int offs;
-	UINT8 *stars_rom = screen.machine().region("stars")->base();
+	UINT8 *stars_rom = state->memregion("stars")->base();
 
 	if (!stars_rom && (state->m_stars_enabled[0] || state->m_stars_enabled[1]))
 	{

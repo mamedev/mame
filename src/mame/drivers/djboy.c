@@ -522,9 +522,9 @@ static const kaneko_pandora_interface djboy_pandora_config =
 static MACHINE_START( djboy )
 {
 	djboy_state *state = machine.driver_data<djboy_state>();
-	UINT8 *MAIN = machine.region("maincpu")->base();
-	UINT8 *CPU1 = machine.region("cpu1")->base();
-	UINT8 *CPU2 = machine.region("cpu2")->base();
+	UINT8 *MAIN = machine.root_device().memregion("maincpu")->base();
+	UINT8 *CPU1 = machine.root_device().memregion("cpu1")->base();
+	UINT8 *CPU2 = state->memregion("cpu2")->base();
 
 	state->membank("bank1")->configure_entries(0, 4,  &MAIN[0x00000], 0x2000);
 	state->membank("bank1")->configure_entries(4, 28, &MAIN[0x10000], 0x2000);

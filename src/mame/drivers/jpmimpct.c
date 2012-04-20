@@ -5449,8 +5449,8 @@ DRIVER_INIT( j6fbcrz )
 
 	int i;
 
-	UINT8 *src1 = machine.region( "maincpu" )->base();
-	UINT8 *src2 = machine.region( "encrypted" )->base();
+	UINT8 *src1 = machine.root_device().memregion( "maincpu" )->base();
+	UINT8 *src2 = machine.root_device().memregion( "encrypted" )->base();
 
 	for (i=0;i<0x040000;i++)
 	{

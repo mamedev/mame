@@ -1665,8 +1665,8 @@ static int draw_one_sprite(running_machine &machine, UINT16 *data, int xoffs, in
 	};
 
 	bitmap_ind16 &bitmap = *state->m_layer_data[(!state->m_is_multi32 || !(data[3] & 0x0800)) ? MIXER_LAYER_SPRITES_2 : MIXER_LAYER_MULTISPR_2].bitmap;
-	UINT8 numbanks = machine.region("gfx2")->bytes() / 0x400000;
-	const UINT32 *spritebase = (const UINT32 *)machine.region("gfx2")->base();
+	UINT8 numbanks = machine.root_device().memregion("gfx2")->bytes() / 0x400000;
+	const UINT32 *spritebase = (const UINT32 *)machine.root_device().memregion("gfx2")->base();
 
 	int indirect = data[0] & 0x2000;
 	int indlocal = data[0] & 0x1000;

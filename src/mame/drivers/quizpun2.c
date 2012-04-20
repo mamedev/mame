@@ -249,7 +249,7 @@ READ8_MEMBER(quizpun2_state::quizpun2_protection_r)
 
 		case STATE_EEPROM_R:		// EEPROM read
 		{
-			UINT8 *eeprom = machine().region("eeprom")->base();
+			UINT8 *eeprom = memregion("eeprom")->base();
 			ret = eeprom[prot.addr];
 			break;
 		}
@@ -276,7 +276,7 @@ WRITE8_MEMBER(quizpun2_state::quizpun2_protection_w)
 	{
 		case STATE_EEPROM_W:
 		{
-			UINT8 *eeprom = machine().region("eeprom")->base();
+			UINT8 *eeprom = memregion("eeprom")->base();
 			eeprom[prot.addr] = data;
 			prot.addr++;
 			if ((prot.addr % 8) == 0)
@@ -343,7 +343,7 @@ WRITE8_MEMBER(quizpun2_state::quizpun2_protection_w)
 
 WRITE8_MEMBER(quizpun2_state::quizpun2_rombank_w)
 {
-	UINT8 *ROM = machine().region("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 	membank("bank1")->set_base(&ROM[ 0x10000 + 0x2000 * (data & 0x1f) ] );
 }
 

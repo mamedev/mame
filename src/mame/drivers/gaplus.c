@@ -872,11 +872,11 @@ static DRIVER_INIT( gaplus )
 	UINT8 *rom;
 	int i;
 
-	rom = machine.region("gfx1")->base();
+	rom = machine.root_device().memregion("gfx1")->base();
 	for (i = 0;i < 0x2000;i++)
 		rom[i + 0x2000] = rom[i] >> 4;
 
-	rom = machine.region("gfx2")->base() + 0x6000;
+	rom = machine.root_device().memregion("gfx2")->base() + 0x6000;
 	for (i = 0;i < 0x2000;i++)
 		rom[i + 0x2000] = rom[i] << 4;
 }

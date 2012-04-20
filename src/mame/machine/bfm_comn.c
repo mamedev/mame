@@ -21,7 +21,7 @@ void bfm_decode_mainrom(running_machine &machine, const char *rom_region, UINT8*
 {
 	UINT8 *tmp, *rom;
 
-	rom = machine.region(rom_region)->base();
+	rom = machine.root_device().memregion(rom_region)->base();
 
 	tmp = auto_alloc_array(machine, UINT8, 0x10000);
 	{

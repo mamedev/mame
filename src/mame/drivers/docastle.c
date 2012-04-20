@@ -164,7 +164,7 @@ static void idsoccer_adpcm_int( device_t *device )
 {
 	docastle_state *state = device->machine().driver_data<docastle_state>();
 
-	if (state->m_adpcm_pos >= device->machine().region("adpcm")->bytes())
+	if (state->m_adpcm_pos >= state->memregion("adpcm")->bytes())
 	{
 		state->m_adpcm_idle = 1;
 		msm5205_reset_w(device, 1);
@@ -176,7 +176,7 @@ static void idsoccer_adpcm_int( device_t *device )
 	}
 	else
 	{
-		state->m_adpcm_data = device->machine().region("adpcm")->base()[state->m_adpcm_pos++];
+		state->m_adpcm_data = device->machine().root_device().memregion("adpcm")->base()[state->m_adpcm_pos++];
 		msm5205_data_w(device, state->m_adpcm_data >> 4);
 	}
 }

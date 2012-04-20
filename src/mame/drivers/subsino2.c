@@ -2362,7 +2362,7 @@ ROM_END
 
 static DRIVER_INIT( bishjan )
 {
-	UINT16 *rom = (UINT16*)machine.region("maincpu")->base();
+	UINT16 *rom = (UINT16*)machine.root_device().memregion("maincpu")->base();
 
 	// patch serial protection test (it always enters test mode on boot otherwise)
 	rom[0x042EA/2] = 0x4008;
@@ -2426,7 +2426,7 @@ ROM_END
 
 static DRIVER_INIT( expcard )
 {
-	UINT8 *rom = machine.region("maincpu")->base();
+	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
 
 	// patch protection test (it always enters test mode on boot otherwise)
 	rom[0xed4dc-0xc0000] = 0xeb;
@@ -2524,7 +2524,7 @@ DRIVER_INIT( mtrain )
 	subsino_decrypt(machine, crsbingo_bitswaps, crsbingo_xors, 0x8000);
 
 	// patch serial protection test (it always enters test mode on boot otherwise)
-	UINT8 *rom = machine.region("maincpu")->base();
+	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
 	rom[0x0cec] = 0x18;
 	rom[0xb037] = 0x18;
 
@@ -2578,7 +2578,7 @@ ROM_END
 
 static DRIVER_INIT( saklove )
 {
-	UINT8 *rom = machine.region("maincpu")->base();
+	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
 
 	// patch serial protection test (it always enters test mode on boot otherwise)
 	rom[0x0e029] = 0xeb;
@@ -2638,7 +2638,7 @@ ROM_END
 
 static DRIVER_INIT( xplan )
 {
-	UINT8 *rom = machine.region("maincpu")->base();
+	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
 
 	// patch protection test (it always enters test mode on boot otherwise)
 	rom[0xeded9-0xc0000] = 0xeb;
@@ -2698,7 +2698,7 @@ ROM_END
 
 static DRIVER_INIT( xtrain )
 {
-	UINT8 *rom = machine.region("maincpu")->base();
+	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
 
 	// patch protection test (it always enters test mode on boot otherwise)
 	rom[0xe190f-0xc0000] = 0xeb;
@@ -2743,7 +2743,7 @@ DRIVER_INIT( wtrnymph )
 	subsino_decrypt(machine, victor5_bitswaps, victor5_xors, 0x8000);
 
 	// patch serial protection test (it always enters test mode on boot otherwise)
-	UINT8 *rom = machine.region("maincpu")->base();
+	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
 	rom[0x0d79] = 0x18;
 	rom[0xc1cf] = 0x18;
 	rom[0xc2a9] = 0x18;

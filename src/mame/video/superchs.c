@@ -58,7 +58,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 {
 	superchs_state *state = machine.driver_data<superchs_state>();
 	UINT32 *spriteram32 = state->m_spriteram;
-	UINT16 *spritemap = (UINT16 *)machine.region("user1")->base();
+	UINT16 *spritemap = (UINT16 *)state->memregion("user1")->base();
 	int offs, data, tilenum, color, flipx, flipy;
 	int x, y, priority, dblsize, curx, cury;
 	int sprites_flipscreen = 0;

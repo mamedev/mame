@@ -82,7 +82,7 @@ SCREEN_UPDATE_RGB32( vicdual_bw )
 SCREEN_UPDATE_RGB32( vicdual_color )
 {
 	vicdual_state *state = screen.machine().driver_data<vicdual_state>();
-	UINT8 *color_prom = (UINT8 *)screen.machine().region("proms")->base();
+	UINT8 *color_prom = (UINT8 *)state->memregion("proms")->base();
 	UINT8 x = 0;
 	UINT8 y = cliprect.min_y;
 	UINT8 video_data = 0;

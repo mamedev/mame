@@ -155,7 +155,7 @@ logerror("%04x: keyboard_w %02x\n",cpu_get_pc(&space.device()),data);
 
 READ8_MEMBER(rmhaihai_state::samples_r)
 {
-	return machine().region("adpcm")->base()[offset];
+	return memregion("adpcm")->base()[offset];
 }
 
 static WRITE8_DEVICE_HANDLER( adpcm_w )
@@ -181,7 +181,7 @@ WRITE8_MEMBER(rmhaihai_state::ctrl_w)
 
 WRITE8_MEMBER(rmhaihai_state::themj_rombank_w)
 {
-	UINT8 *rom = machine().region("maincpu")->base() + 0x10000;
+	UINT8 *rom = memregion("maincpu")->base() + 0x10000;
 	int bank = data & 0x03;
 logerror("banksw %d\n",bank);
 	membank("bank1")->set_base(rom + bank*0x4000);
@@ -665,8 +665,8 @@ ROM_END
 
 static DRIVER_INIT( rmhaihai )
 {
-	UINT8 *rom = machine.region("gfx1")->base();
-	int size = machine.region("gfx1")->bytes();
+	UINT8 *rom = machine.root_device().memregion("gfx1")->base();
+	int size = machine.root_device().memregion("gfx1")->bytes();
 	int a,b;
 
 	size /= 2;

@@ -293,7 +293,7 @@ static INTERRUPT_GEN( tmspoker_interrupt )
 
 static MACHINE_START( tmspoker )
 {
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
 	machine.root_device().membank("bank1")->configure_entries(0, 2, &ROM[0], 0x1000);
 }
 
@@ -615,8 +615,8 @@ static DRIVER_INIT( bus )
 {
 	/* decode the TMS9980 ROMs */
 	offs_t offs;
-	UINT8 *rom = machine.region("maincpu")->base();
-	const size_t len = machine.region("maincpu")->bytes();
+	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
+	const size_t len = machine.root_device().memregion("maincpu")->bytes();
 
 	for (offs = 0; offs < len; offs++)
 	{

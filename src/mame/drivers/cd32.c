@@ -854,7 +854,7 @@ static DRIVER_INIT( cd32 )
 
 	/* set up memory */
 	state->membank("bank1")->configure_entry(0, state->m_chip_ram);
-	state->membank("bank1")->configure_entry(1, machine.region("user1")->base());
+	state->membank("bank1")->configure_entry(1, machine.root_device().memregion("user1")->base());
 
 	/* input hack */
 	state->m_input_hack = NULL;
@@ -1473,7 +1473,7 @@ static DRIVER_INIT( odeontw2 )
 
 	/* set up memory */
 	state->membank("bank1")->configure_entry(0, state->m_chip_ram);
-	state->membank("bank1")->configure_entry(1, machine.region("user1")->base());
+	state->membank("bank1")->configure_entry(1, machine.root_device().memregion("user1")->base());
 
 	/* input hack */
 	state->m_input_hack = NULL;

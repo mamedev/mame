@@ -378,9 +378,9 @@ static const namco_51xx_interface namco_51xx_intf =
 
 static READ8_DEVICE_HANDLER( namco_52xx_rom_r )
 {
-	UINT32 length = device->machine().region("52xx")->bytes();
+	UINT32 length = device->machine().root_device().memregion("52xx")->bytes();
 logerror("ROM @ %04X\n", offset);
-	return (offset < length) ? device->machine().region("52xx")->base()[offset] : 0xff;
+	return (offset < length) ? device->machine().root_device().memregion("52xx")->base()[offset] : 0xff;
 }
 
 static READ8_DEVICE_HANDLER( namco_52xx_si_r )

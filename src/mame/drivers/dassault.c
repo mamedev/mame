@@ -830,8 +830,8 @@ ROM_END
 
 static DRIVER_INIT( dassault )
 {
-	const UINT8 *src = machine.region("gfx1")->base();
-	UINT8 *dst = machine.region("gfx2")->base();
+	const UINT8 *src = machine.root_device().memregion("gfx1")->base();
+	UINT8 *dst = machine.root_device().memregion("gfx2")->base();
 	UINT8 *tmp = auto_alloc_array(machine, UINT8, 0x80000);
 
 	/* Playfield 4 also has access to the char graphics, make things easier
@@ -847,8 +847,8 @@ static DRIVER_INIT( dassault )
 
 static DRIVER_INIT( thndzone )
 {
-	const UINT8 *src = machine.region("gfx1")->base();
-	UINT8 *dst = machine.region("gfx2")->base();
+	const UINT8 *src = machine.root_device().memregion("gfx1")->base();
+	UINT8 *dst = machine.root_device().memregion("gfx2")->base();
 	UINT8 *tmp = auto_alloc_array(machine, UINT8, 0x80000);
 
 	/* Playfield 4 also has access to the char graphics, make things easier

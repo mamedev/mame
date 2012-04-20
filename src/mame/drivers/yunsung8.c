@@ -466,8 +466,8 @@ static const msm5205_interface yunsung8_msm5205_interface =
 static MACHINE_START( yunsung8 )
 {
 	yunsung8_state *state = machine.driver_data<yunsung8_state>();
-	UINT8 *MAIN = machine.region("maincpu")->base();
-	UINT8 *AUDIO = machine.region("audiocpu")->base();
+	UINT8 *MAIN = machine.root_device().memregion("maincpu")->base();
+	UINT8 *AUDIO = machine.root_device().memregion("audiocpu")->base();
 
 	state->m_videoram_0 = state->m_videoram + 0x0000;	// Ram is banked
 	state->m_videoram_1 = state->m_videoram + 0x2000;
@@ -475,7 +475,7 @@ static MACHINE_START( yunsung8 )
 	state->membank("bank1")->configure_entries(0, 3, &MAIN[0x00000], 0x4000);
 	state->membank("bank1")->configure_entries(3, 5, &MAIN[0x10000], 0x4000);
 	state->membank("bank2")->configure_entries(0, 3, &AUDIO[0x00000], 0x4000);
-	machine.root_device().membank("bank2")->configure_entries(3, 5, &AUDIO[0x10000], 0x4000);
+	state->membank("bank2")->configure_entries(3, 5, &AUDIO[0x10000], 0x4000);
 
 	state->m_audiocpu = machine.device("audiocpu");
 

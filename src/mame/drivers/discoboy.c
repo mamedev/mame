@@ -199,7 +199,7 @@ static SCREEN_UPDATE_IND16( discoboy )
 #ifdef UNUSED_FUNCTION
 void discoboy_setrombank( running_machine &machine, UINT8 data )
 {
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
 	data &= 0x2f;
 	space->machine().root_device().membank("bank1")->set_base(&ROM[0x6000 + (data * 0x1000)] );
 }
@@ -560,8 +560,8 @@ ROM_END
 static DRIVER_INIT( discoboy )
 {
 	discoboy_state *state = machine.driver_data<discoboy_state>();
-	UINT8 *ROM = machine.region("maincpu")->base();
-	UINT8 *AUDIO = machine.region("audiocpu")->base();
+	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
+	UINT8 *AUDIO = state->memregion("audiocpu")->base();
 
 	memset(state->m_ram_1, 0, sizeof(state->m_ram_1));
 	memset(state->m_ram_2, 0, sizeof(state->m_ram_2));

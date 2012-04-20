@@ -88,7 +88,7 @@ public:
 
 static PALETTE_INIT( chanbara )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i, red, green, blue;
 
 	for (i = 0; i < machine.total_colors(); i++)
@@ -471,9 +471,9 @@ ROM_END
 
 static DRIVER_INIT(chanbara )
 {
-	UINT8	*src = machine.region("gfx4")->base();
-	UINT8	*dst = machine.region("gfx3")->base() + 0x4000;
-	UINT8	*bg = machine.region("user1")->base();
+	UINT8	*src = machine.root_device().memregion("gfx4")->base();
+	UINT8	*dst = machine.root_device().memregion("gfx3")->base() + 0x4000;
+	UINT8	*bg = machine.root_device().memregion("user1")->base();
 
 	int i;
 	for (i = 0; i < 0x1000; i++)

@@ -61,7 +61,7 @@ WRITE16_MEMBER(gaelco_state::bigkarnk_coin_w)
 
 WRITE16_MEMBER(gaelco_state::OKIM6295_bankswitch_w)
 {
-	UINT8 *RAM = machine().region("oki")->base();
+	UINT8 *RAM = memregion("oki")->base();
 
 	if (ACCESSING_BITS_0_7)
 	{

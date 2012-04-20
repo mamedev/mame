@@ -49,7 +49,7 @@ static WRITE16_HANDLER(f3_68000_share_w)
 
 static WRITE16_HANDLER( f3_es5505_bank_w )
 {
-	UINT32 max_banks_this_game=(space->machine().region("ensoniq.0")->bytes()/0x200000)-1;
+	UINT32 max_banks_this_game=(space->machine().root_device().memregion("ensoniq.0")->bytes()/0x200000)-1;
 
 #if 0
 {
@@ -222,7 +222,7 @@ static READ16_HANDLER(es5510_dsp_r)
 
 static WRITE16_HANDLER(es5510_dsp_w)
 {
-	UINT8 *snd_mem = (UINT8 *)space->machine().region("ensoniq.0")->base();
+	UINT8 *snd_mem = (UINT8 *)space->machine().root_device().memregion("ensoniq.0")->base();
 
 //  if (offset>4 && offset!=0x80  && offset!=0xa0  && offset!=0xc0  && offset!=0xe0)
 //      logerror("%06x: DSP write offset %04x %04x\n",cpu_get_pc(&space->device()),offset,data);
@@ -304,7 +304,7 @@ ADDRESS_MAP_END
 SOUND_RESET( taito_f3_soundsystem_reset )
 {
 	/* Sound cpu program loads to 0xc00000 so we use a bank */
-	UINT16 *ROM = (UINT16 *)machine.region("audiocpu")->base();
+	UINT16 *ROM = (UINT16 *)machine.root_device().memregion("audiocpu")->base();
 	UINT16 *sound_ram = (UINT16 *)machine.memory().shared("share1")->ptr();
 	machine.root_device().membank("bank1")->set_base(&ROM[0x80000]);
 	machine.root_device().membank("bank2")->set_base(&ROM[0x90000]);

@@ -275,7 +275,7 @@ WRITE8_MEMBER(galpani2_state::galpani2_coin_lockout_w)
 
 static WRITE8_DEVICE_HANDLER( galpani2_oki1_bank_w )
 {
-	UINT8 *ROM = device->machine().region("oki1")->base();
+	UINT8 *ROM = device->machine().root_device().memregion("oki1")->base();
 	logerror("%s : %s bank %08X\n",device->machine().describe_context(),device->tag(),data);
 	memcpy(ROM + 0x30000, ROM + 0x40000 + 0x10000 * (~data & 0xf), 0x10000);
 }
@@ -349,8 +349,8 @@ ADDRESS_MAP_END
 
 READ16_MEMBER(galpani2_state::galpani2_bankedrom_r)
 {
-	UINT16 *ROM = (UINT16 *) machine().region( "user1" )->base();
-	size_t    len = machine().region( "user1" )->bytes() / 2;
+	UINT16 *ROM = (UINT16 *) memregion( "user1" )->base();
+	size_t    len = memregion( "user1" )->bytes() / 2;
 
 	offset += (0x800000/2) * (*m_rombank & 0x0003);
 

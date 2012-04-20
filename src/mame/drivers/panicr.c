@@ -93,7 +93,7 @@ public:
 
 static PALETTE_INIT( panicr )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 
 	/* allocate the colortable */
@@ -151,8 +151,8 @@ static TILE_GET_INFO( get_bgtile_info )
 {
 	int code,attr;
 
-	code=machine.region("user1")->base()[tile_index];
-	attr=machine.region("user2")->base()[tile_index];
+	code=machine.root_device().memregion("user1")->base()[tile_index];
+	attr=machine.root_device().memregion("user2")->base()[tile_index];
 	code+=((attr&7)<<8);
 	SET_TILE_INFO(
 		1,
@@ -469,8 +469,8 @@ static DRIVER_INIT( panicr )
 	int size;
 	int i;
 
-	rom = machine.region("gfx1")->base();
-	size = machine.region("gfx1")->bytes();
+	rom = machine.root_device().memregion("gfx1")->base();
+	size = machine.root_device().memregion("gfx1")->bytes();
 
 	// text data lines
 	for (i = 0;i < size/2;i++)
@@ -492,8 +492,8 @@ static DRIVER_INIT( panicr )
 	}
 
 
-	rom = machine.region("gfx2")->base();
-	size = machine.region("gfx2")->bytes();
+	rom = machine.root_device().memregion("gfx2")->base();
+	size = machine.root_device().memregion("gfx2")->bytes();
 
 	// tiles data lines
 	for (i = 0;i < size/4;i++)
@@ -519,8 +519,8 @@ static DRIVER_INIT( panicr )
 	}
 
 
-	rom = machine.region("gfx3")->base();
-	size = machine.region("gfx3")->bytes();
+	rom = machine.root_device().memregion("gfx3")->base();
+	size = machine.root_device().memregion("gfx3")->bytes();
 
 	// sprites data lines
 	for (i = 0;i < size/2;i++)
@@ -545,8 +545,8 @@ static DRIVER_INIT( panicr )
 
 	//rearrange  bg tilemaps a bit....
 
-	rom = machine.region("user1")->base();
-	size = machine.region("user1")->bytes();
+	rom = machine.root_device().memregion("user1")->base();
+	size = machine.root_device().memregion("user1")->bytes();
 	memcpy(buf,rom, size);
 
 	{
@@ -558,8 +558,8 @@ static DRIVER_INIT( panicr )
 			}
 	}
 
-	rom = machine.region("user2")->base();
-	size = machine.region("user2")->bytes();
+	rom = machine.root_device().memregion("user2")->base();
+	size = machine.root_device().memregion("user2")->bytes();
 
 	memcpy(buf,rom, size);
 	{

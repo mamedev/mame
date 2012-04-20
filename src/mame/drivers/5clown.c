@@ -537,7 +537,7 @@ static SCREEN_UPDATE_IND16( fclown )
 
 static PALETTE_INIT( fclown )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 /*
     7654 3210
     ---- ---x   RED component.
@@ -1205,7 +1205,7 @@ static DRIVER_INIT( fclown )
     /* Decrypting main program */
 
 	int x;
-	UINT8 *src = machine.region( "maincpu" )->base();
+	UINT8 *src = state->memregion( "maincpu" )->base();
 
 	for (x = 0x0000; x < 0x10000; x++)
 	{
@@ -1215,8 +1215,8 @@ static DRIVER_INIT( fclown )
 
     /* Decrypting GFX by segments */
 
-	UINT8 *gfx1_src = machine.region( "gfx1" )->base();
-	UINT8 *gfx2_src = machine.region( "gfx2" )->base();
+	UINT8 *gfx1_src = machine.root_device().memregion( "gfx1" )->base();
+	UINT8 *gfx2_src = machine.root_device().memregion( "gfx2" )->base();
 
 	for (x = 0x2000; x < 0x3000; x++)
 	{
@@ -1236,7 +1236,7 @@ static DRIVER_INIT( fclown )
 
     /* Decrypting sound samples */
 
-	UINT8 *samples_src = machine.region( "oki6295" )->base();
+	UINT8 *samples_src = machine.root_device().memregion( "oki6295" )->base();
 
 	for (x = 0x0000; x < 0x10000; x++)
 	{

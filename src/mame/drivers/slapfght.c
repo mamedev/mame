@@ -1829,7 +1829,7 @@ static DRIVER_INIT( getstarj )
 static DRIVER_INIT( gtstarb1 )
 {
 	slapfght_state *state = machine.driver_data<slapfght_state>();
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = state->memregion("maincpu")->base();
 
 	state->m_getstar_id = GTSTARB1;
 	getstar_init(machine);

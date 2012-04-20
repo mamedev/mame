@@ -225,13 +225,13 @@ int esripsys_draw(running_machine &machine, int l, int r, int fig, int attr, int
 
 		if (x_flip)
 		{
-			rom_l = machine.region("8bpp_r")->base();
-			rom_r = machine.region("8bpp_l")->base();
+			rom_l = machine.root_device().memregion("8bpp_r")->base();
+			rom_r = state->memregion("8bpp_l")->base();
 		}
 		else
 		{
-			rom_l = machine.region("8bpp_l")->base();
-			rom_r = machine.region("8bpp_r")->base();
+			rom_l = machine.root_device().memregion("8bpp_l")->base();
+			rom_r = machine.root_device().memregion("8bpp_r")->base();
 		}
 
 		for (cnt = 0; cnt <= fig; cnt++)
@@ -294,7 +294,7 @@ int esripsys_draw(running_machine &machine, int l, int r, int fig, int attr, int
 	/* 4bpp case */
 	else
 	{
-		const UINT8* const rom = machine.region("4bpp")->base();
+		const UINT8* const rom = machine.root_device().memregion("4bpp")->base();
 		int ptr = 0;
 		int cnt;
 		UINT32 lpos = l;

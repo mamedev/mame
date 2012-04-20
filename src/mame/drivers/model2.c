@@ -356,11 +356,11 @@ static MACHINE_RESET(model2o)
 static MACHINE_RESET(model2_scsp)
 {
 	model2_state *state = machine.driver_data<model2_state>();
-	state->membank("bank4")->set_base(machine.region("scsp")->base() + 0x200000);
-	state->membank("bank5")->set_base(machine.region("scsp")->base() + 0x600000);
+	state->membank("bank4")->set_base(machine.root_device().memregion("scsp")->base() + 0x200000);
+	state->membank("bank5")->set_base(machine.root_device().memregion("scsp")->base() + 0x600000);
 
 	// copy the 68k vector table into RAM
-	memcpy(state->m_soundram, machine.region("audiocpu")->base() + 0x80000, 16);
+	memcpy(state->m_soundram, state->memregion("audiocpu")->base() + 0x80000, 16);
 	machine.device("audiocpu")->reset();
 	scsp_set_ram_base(machine.device("scsp"), state->m_soundram);
 }
@@ -1153,7 +1153,7 @@ WRITE32_MEMBER(model2_state::model2_prot_w)
 
 READ32_MEMBER(model2_state::maxx_r)
 {
-	UINT32 *ROM = (UINT32 *)machine().region("maincpu")->base();
+	UINT32 *ROM = (UINT32 *)machine().root_device().memregion("maincpu")->base();
 
 	if (offset <= 0x1f/4)
 	{
@@ -1844,9 +1844,9 @@ ADDRESS_MAP_END
 WRITE16_MEMBER(model2_state::model2snd_ctrl)
 {
 	// handle sample banking
-	if (machine().region("scsp")->bytes() > 0x800000)
+	if (machine().root_device().memregion("scsp")->bytes() > 0x800000)
 	{
-		UINT8 *snd = machine().region("scsp")->base();
+		UINT8 *snd = memregion("scsp")->base();
 		if (data & 0x20)
 		{
 			membank("bank4")->set_base(snd + 0x200000);
@@ -5117,7 +5117,7 @@ static DRIVER_INIT( genprot )
 static DRIVER_INIT( pltkids )
 {
 	model2_state *state = machine.driver_data<model2_state>();
-	UINT32 *ROM = (UINT32 *)machine.region("maincpu")->base();
+	UINT32 *ROM = (UINT32 *)state->memregion("maincpu")->base();
 
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x01d80000, 0x01dfffff, read32_delegate(FUNC(model2_state::model2_prot_r),state), write32_delegate(FUNC(model2_state::model2_prot_w),state));
 	state->m_protstate = state->m_protpos = 0;
@@ -5129,7 +5129,7 @@ static DRIVER_INIT( pltkids )
 static DRIVER_INIT( zerogun )
 {
 	model2_state *state = machine.driver_data<model2_state>();
-	UINT32 *ROM = (UINT32 *)machine.region("maincpu")->base();
+	UINT32 *ROM = (UINT32 *)state->memregion("maincpu")->base();
 
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x01d80000, 0x01dfffff, read32_delegate(FUNC(model2_state::model2_prot_r),state), write32_delegate(FUNC(model2_state::model2_prot_w),state));
 	state->m_protstate = state->m_protpos = 0;
@@ -5173,7 +5173,7 @@ WRITE32_MEMBER(model2_state::jaleco_network_w)
 static DRIVER_INIT( sgt24h )
 {
 	model2_state *state = machine.driver_data<model2_state>();
-	UINT32 *ROM = (UINT32 *)machine.region("maincpu")->base();
+	UINT32 *ROM = (UINT32 *)state->memregion("maincpu")->base();
 
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x01d80000, 0x01dfffff, read32_delegate(FUNC(model2_state::model2_prot_r),state), write32_delegate(FUNC(model2_state::model2_prot_w),state));
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x01a10000, 0x01a1ffff, read32_delegate(FUNC(model2_state::jaleco_network_r),state), write32_delegate(FUNC(model2_state::jaleco_network_w),state));
@@ -5196,7 +5196,7 @@ static DRIVER_INIT( overrev )
 static DRIVER_INIT( doa )
 {
 	model2_state *state = machine.driver_data<model2_state>();
-	UINT32 *ROM = (UINT32 *)machine.region("maincpu")->base();
+	UINT32 *ROM = (UINT32 *)state->memregion("maincpu")->base();
 
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x01d80000, 0x01dfffff, read32_delegate(FUNC(model2_state::model2_prot_r),state), write32_delegate(FUNC(model2_state::model2_prot_w),state));
 	state->m_protstate = state->m_protpos = 0;

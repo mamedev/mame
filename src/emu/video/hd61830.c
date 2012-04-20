@@ -478,7 +478,7 @@ void hd61830_device::draw_char(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 					addr = 160*7 + (md - 0xe0) * 11 + cl;
 				}
 
-				data = subregion("hd61830")->u8(addr);
+				data = memregion("hd61830")->u8(addr);
 			}
 
 			int cursor = m_mcr & MODE_CURSOR;

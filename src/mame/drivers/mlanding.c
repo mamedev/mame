@@ -271,7 +271,7 @@ WRITE16_MEMBER(mlanding_state::ml_output_w)
 static WRITE8_DEVICE_HANDLER( sound_bankswitch_w )
 {
 	data=0;
-	device->machine().root_device().membank("bank1")->set_base(device->machine().region("audiocpu")->base() + ((data) & 0x03) * 0x4000 + 0x10000 );
+	device->machine().root_device().membank("bank1")->set_base(device->machine().root_device().memregion("audiocpu")->base() + ((data) & 0x03) * 0x4000 + 0x10000 );
 }
 
 static void ml_msm5205_vck(device_t *device)
@@ -288,7 +288,7 @@ static void ml_msm5205_vck(device_t *device)
 	}
 	else
 	{
-		UINT8 *ROM = device->machine().region("adpcm")->base();
+		UINT8 *ROM = device->machine().root_device().memregion("adpcm")->base();
 
 		state->m_adpcm_data = ((state->m_trigger ? (ROM[state->m_adpcm_pos] & 0x0f) : (ROM[state->m_adpcm_pos] & 0xf0)>>4) );
 		msm5205_data_w(device,state->m_adpcm_data & 0xf);
@@ -846,7 +846,7 @@ ROM_END
 
 static DRIVER_INIT(mlanding)
 {
-//  UINT8 *rom = machine.region("sub")->base();
+//  UINT8 *rom = machine.root_device().memregion("sub")->base();
 //  rom[0x88b]=0x4e;
 //  rom[0x88a]=0x71;
 }

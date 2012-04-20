@@ -453,8 +453,8 @@ READ32_MEMBER(groundfx_state::irq_speedup_r_groundfx)
 static DRIVER_INIT( groundfx )
 {
 	UINT32 offset,i;
-	UINT8 *gfx = machine.region("gfx3")->base();
-	int size=machine.region("gfx3")->bytes();
+	UINT8 *gfx = machine.root_device().memregion("gfx3")->base();
+	int size=machine.root_device().memregion("gfx3")->bytes();
 	int data;
 
 	/* Speedup handlers */

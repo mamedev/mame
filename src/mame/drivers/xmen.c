@@ -295,7 +295,7 @@ INPUT_PORTS_END
 static MACHINE_START( xmen )
 {
 	xmen_state *state = machine.driver_data<xmen_state>();
-	UINT8 *ROM = machine.region("audiocpu")->base();
+	UINT8 *ROM = state->memregion("audiocpu")->base();
 
 	state->membank("bank4")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
 	state->membank("bank4")->set_entry(0);

@@ -135,7 +135,7 @@ WRITE32_MEMBER(polygonet_state::polygonet_eeprom_w)
 READ32_MEMBER(polygonet_state::ttl_rom_r)
 {
 	UINT32 *ROM;
-	ROM = (UINT32 *)machine().region("gfx1")->base();
+	ROM = (UINT32 *)machine().root_device().memregion("gfx1")->base();
 
 	return ROM[offset];
 }
@@ -144,7 +144,7 @@ READ32_MEMBER(polygonet_state::ttl_rom_r)
 READ32_MEMBER(polygonet_state::psac_rom_r)
 {
 	UINT32 *ROM;
-	ROM = (UINT32 *)machine().region("gfx2")->base();
+	ROM = (UINT32 *)machine().root_device().memregion("gfx2")->base();
 
 	return ROM[offset];
 }
@@ -545,7 +545,7 @@ ADDRESS_MAP_END
 static void reset_sound_region(running_machine &machine)
 {
 	polygonet_state *state = machine.driver_data<polygonet_state>();
-	state->membank("bank2")->set_base(machine.region("soundcpu")->base() + 0x10000 + state->m_cur_sound_region*0x4000);
+	state->membank("bank2")->set_base(state->memregion("soundcpu")->base() + 0x10000 + state->m_cur_sound_region*0x4000);
 }
 
 WRITE8_MEMBER(polygonet_state::sound_bankswitch_w)

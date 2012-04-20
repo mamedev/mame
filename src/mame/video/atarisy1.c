@@ -557,8 +557,8 @@ SCREEN_UPDATE_IND16( atarisy1 )
 static void decode_gfx(running_machine &machine, UINT16 *pflookup, UINT16 *molookup)
 {
 	atarisy1_state *state = machine.driver_data<atarisy1_state>();
-	UINT8 *prom1 = &machine.region("proms")->u8(0x000);
-	UINT8 *prom2 = &machine.region("proms")->u8(0x200);
+	UINT8 *prom1 = &machine.root_device().memregion("proms")->u8(0x000);
+	UINT8 *prom2 = &state->memregion("proms")->u8(0x200);
 	int obj, i;
 
 	/* reset the globals */
@@ -649,7 +649,7 @@ static int get_bank(running_machine &machine, UINT8 prom1, UINT8 prom2, int bpp)
 		return state->m_bank_gfx[bpp - 4][bank_index];
 
 	/* if the bank is out of range, call it 0 */
-	const memory_region *tiles = machine.region("tiles");
+	memory_region *tiles = machine.root_device().memregion("tiles");
 	if (0x80000 * (bank_index - 1) >= tiles->bytes())
 		return 0;
 

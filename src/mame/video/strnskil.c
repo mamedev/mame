@@ -14,7 +14,7 @@ Video hardware driver by Uki
 
 PALETTE_INIT( strnskil )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 
 	/* allocate the colortable */
@@ -126,7 +126,7 @@ SCREEN_UPDATE_IND16( strnskil )
 {
 	strnskil_state *state = screen.machine().driver_data<strnskil_state>();
 	int row;
-	const UINT8 *usr1 = screen.machine().region("user1")->base();
+	const UINT8 *usr1 = state->memregion("user1")->base();
 
 	for (row = 0; row < 32; row++)
 	{

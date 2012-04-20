@@ -366,7 +366,7 @@ static const k053252_interface rng_k053252_intf =
 static MACHINE_START( rng )
 {
 	rungun_state *state = machine.driver_data<rungun_state>();
-	UINT8 *ROM = machine.region("soundcpu")->base();
+	UINT8 *ROM = state->memregion("soundcpu")->base();
 
 	state->membank("bank2")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
 

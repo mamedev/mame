@@ -1499,11 +1499,11 @@ static void generate_memdump(running_machine &machine);
 
 
 //**************************************************************************
-//  CORE SYSTEM OPERATIONS
+//  MEMORY MANAGER
 //**************************************************************************
 
 //-------------------------------------------------
-//  memory_init - initialize the memory system
+//  memory_manager - constructor
 //-------------------------------------------------
 
 memory_manager::memory_manager(running_machine &machine)
@@ -1513,9 +1513,17 @@ memory_manager::memory_manager(running_machine &machine)
 {
 	memset(m_bank_ptr, 0, sizeof(m_bank_ptr));
 	memset(m_bankd_ptr, 0, sizeof(m_bankd_ptr));
+}
 
+
+//-------------------------------------------------
+//  initialize - initialize the memory system
+//-------------------------------------------------
+
+void memory_manager::initialize()
+{
 	// loop over devices and spaces within each device
-	memory_interface_iterator iter(machine.root_device());
+	memory_interface_iterator iter(machine().root_device());
 	for (device_memory_interface *memory = iter.first(); memory != NULL; memory = iter.next())
 		for (address_spacenum spacenum = AS_0; spacenum < ADDRESS_SPACES; spacenum++)
 		{
@@ -1542,20 +1550,15 @@ memory_manager::memory_manager(running_machine &machine)
 		space->locate_memory();
 
 	// register a callback to reset banks when reloading state
-	machine.save().register_postload(save_prepost_delegate(FUNC(memory_manager::bank_reattach), this));
+	machine().save().register_postload(save_prepost_delegate(FUNC(memory_manager::bank_reattach), this));
 
 	// dump the final memory configuration
-	generate_memdump(machine);
+	generate_memdump(machine());
 
 	// we are now initialized
 	m_initialized = true;
 }
 
-
-
-//**************************************************************************
-//  MEMORY BANKING
-//**************************************************************************
 
 //-------------------------------------------------
 //  shared - get a pointer to a shared memory
@@ -1600,6 +1603,33 @@ void memory_manager::dump(FILE *file)
 		              "====================================================\n", space->device().tag(), space->name());
 		space->dump_map(file, ROW_WRITE);
 	}
+}
+
+
+//-------------------------------------------------
+//  region_alloc - allocates memory for a region
+//-------------------------------------------------
+
+memory_region *memory_manager::region_alloc(const char *name, UINT32 length, UINT8 width, endianness_t endian)
+{
+mame_printf_verbose("Region '%s' created\n", name);
+    // make sure we don't have a region of the same name; also find the end of the list
+    memory_region *info = m_regionlist.find(name);
+    if (info != NULL)
+		fatalerror("region_alloc called with duplicate region name \"%s\"\n", name);
+
+	// allocate the region
+	return &m_regionlist.append(name, *global_alloc(memory_region(machine(), name, length, width, endian)));
+}
+
+
+//-------------------------------------------------
+//  region_free - releases memory for a region
+//-------------------------------------------------
+
+void memory_manager::region_free(const char *name)
+{
+	m_regionlist.remove(name);
 }
 
 
@@ -1789,7 +1819,7 @@ inline void address_space::adjust_addresses(offs_t &start, offs_t &end, offs_t &
 
 void address_space::prepare_map()
 {
-	const memory_region *devregion = (m_spacenum == AS_0) ? machine().region(m_device.tag()) : NULL;
+	memory_region *devregion = (m_spacenum == AS_0) ? machine().root_device().memregion(m_device.tag()) : NULL;
 	UINT32 devregionsize = (devregion != NULL) ? devregion->bytes() : 0;
 
 	// allocate the address map
@@ -1848,7 +1878,7 @@ void address_space::prepare_map()
 			device().siblingtag(fulltag, entry->m_region);
 
 			// find the region
-			const memory_region *region = machine().region(fulltag);
+			memory_region *region = machine().root_device().memregion(fulltag);
 			if (region == NULL)
 				fatalerror("Error: device '%s' %s space memory map entry %X-%X references non-existant region \"%s\"", m_device.tag(), m_name, entry->m_addrstart, entry->m_addrend, entry->m_region);
 
@@ -1865,7 +1895,7 @@ void address_space::prepare_map()
 			device().siblingtag(fulltag, entry->m_region);
 
 			// set the memory address
-			entry->m_memory = machine().region(fulltag.cstr())->base() + entry->m_rgnoffs;
+			entry->m_memory = machine().root_device().memregion(fulltag.cstr())->base() + entry->m_rgnoffs;
 		}
 	}
 
@@ -2865,7 +2895,7 @@ bool address_space::needs_backing_store(const address_map_entry *entry)
 		return true;
 
 	// if we're reading from RAM or from ROM outside of address space 0 or its region, then yes, we do need backing
-	const memory_region *region = machine().region(m_device.tag());
+	memory_region *region = machine().root_device().memregion(m_device.tag());
 	if (entry->m_read.m_type == AMH_RAM ||
 		(entry->m_read.m_type == AMH_ROM && (m_spacenum != AS_0 || region == NULL || entry->m_addrstart >= region->bytes())))
 		return true;
@@ -4143,8 +4173,8 @@ memory_block::memory_block(address_space &space, offs_t bytestart, offs_t byteen
 	}
 
 	// register for saving, but only if we're not part of a memory region
-	const memory_region *region;
-	for (region = space.machine().first_region(); region != NULL; region = region->next())
+	memory_region *region;
+	for (region = space.machine().memory().first_region(); region != NULL; region = region->next())
 		if (m_data >= region->base() && (m_data + (byteend - bytestart + 1)) < region->end())
 		{
 			VPRINTF(("skipping save of this memory block as it is covered by a memory region\n"));
@@ -4413,6 +4443,27 @@ void memory_bank::configure_decrypted_entries(int startentry, int numentries, vo
 	for (int entrynum = startentry + numentries - 1; entrynum >= startentry; entrynum--)
 		configure_decrypted_entry(entrynum, reinterpret_cast<UINT8 *>(base) + (entrynum - startentry) * stride);
 }
+
+
+//**************************************************************************
+//  MEMORY REGIONS
+//**************************************************************************
+
+//-------------------------------------------------
+//  memory_region - constructor
+//-------------------------------------------------
+
+memory_region::memory_region(running_machine &machine, const char *name, UINT32 length, UINT8 width, endianness_t endian)
+	: m_machine(machine),
+	  m_next(NULL),
+	  m_name(name),
+	  m_buffer(length),
+	  m_width(width),
+	  m_endianness(endian)
+{
+	assert(width == 1 || width == 2 || width == 4 || width == 8);
+}
+
 
 
 //**************************************************************************

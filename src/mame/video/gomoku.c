@@ -20,7 +20,7 @@
 
 PALETTE_INIT( gomoku )
 {
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 	int bit0, bit1, bit2, r, g, b;
 
@@ -106,9 +106,9 @@ WRITE8_MEMBER(gomoku_state::gomoku_bg_dispsw_w)
 VIDEO_START( gomoku )
 {
 	gomoku_state *state = machine.driver_data<gomoku_state>();
-	UINT8 *GOMOKU_BG_X = machine.region( "user1" )->base();
-	UINT8 *GOMOKU_BG_Y = machine.region( "user2" )->base();
-	UINT8 *GOMOKU_BG_D = machine.region( "user3" )->base();
+	UINT8 *GOMOKU_BG_X = machine.root_device().memregion( "user1" )->base();
+	UINT8 *GOMOKU_BG_Y = machine.root_device().memregion( "user2" )->base();
+	UINT8 *GOMOKU_BG_D = state->memregion( "user3" )->base();
 	int x, y;
 	int bgdata;
 	int color;
@@ -149,9 +149,9 @@ VIDEO_START( gomoku )
 SCREEN_UPDATE_IND16( gomoku )
 {
 	gomoku_state *state = screen.machine().driver_data<gomoku_state>();
-	UINT8 *GOMOKU_BG_X = screen.machine().region( "user1" )->base();
-	UINT8 *GOMOKU_BG_Y = screen.machine().region( "user2" )->base();
-	UINT8 *GOMOKU_BG_D = screen.machine().region( "user3" )->base();
+	UINT8 *GOMOKU_BG_X = screen.machine().root_device().memregion( "user1" )->base();
+	UINT8 *GOMOKU_BG_Y = screen.machine().root_device().memregion( "user2" )->base();
+	UINT8 *GOMOKU_BG_D = state->memregion( "user3" )->base();
 	int x, y;
 	int bgram;
 	int bgoffs;

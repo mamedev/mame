@@ -578,7 +578,7 @@ static DRIVER_INIT( splus )
 {
 	splus_state *state = machine.driver_data<splus_state>();
 
-	UINT8 *reel_data = machine.region( "reeldata" )->base();
+	UINT8 *reel_data = state->memregion( "reeldata" )->base();
 
     // Load Reel Data
     memcpy(state->m_reel_ram, &reel_data[0x0000], 0x2000);

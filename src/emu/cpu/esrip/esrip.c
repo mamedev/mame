@@ -256,7 +256,7 @@ static CPU_INIT( esrip )
 	/* Register configuration structure callbacks */
 	cpustate->fdt_r = _config->fdt_r;
 	cpustate->fdt_w = _config->fdt_w;
-	cpustate->lbrm = (UINT8*)device->machine().region(_config->lbrm_prom)->base();
+	cpustate->lbrm = (UINT8*)device->machine().root_device().memregion(_config->lbrm_prom)->base();
 	cpustate->status_in = _config->status_in;
 	cpustate->draw = _config->draw;
 

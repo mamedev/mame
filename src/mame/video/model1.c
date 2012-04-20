@@ -1450,7 +1450,7 @@ VIDEO_START(model1)
 
 	state->m_view = auto_alloc_clear(machine, struct view);
 
-	state->m_poly_rom = (UINT32 *)machine.region("user1")->base();
+	state->m_poly_rom = (UINT32 *)state->memregion("user1")->base();
 	state->m_poly_ram = auto_alloc_array_clear(machine, UINT32, 0x400000);
 	state->m_tgp_ram = auto_alloc_array_clear(machine, UINT16, 0x100000-0x40000);
 	state->m_pointdb = auto_alloc_array_clear(machine, struct point, 1000000*2);

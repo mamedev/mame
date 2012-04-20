@@ -36,7 +36,7 @@ const UINT8 ga2_v25_opcode_table[256] = {
 void decrypt_ga2_protrom(running_machine &machine)
 {
 	int i;
-	UINT8 *rom = machine.region("mcu")->base();
+	UINT8 *rom = machine.root_device().memregion("mcu")->base();
 	UINT8* temp = auto_alloc_array(machine, UINT8, 0x100000);
 
 	// make copy of ROM so original can be overwritten
@@ -113,7 +113,7 @@ WRITE16_MEMBER(segas32_state::sonic_level_load_protection)
 		}
 		else
 		{
-			const UINT8 *ROM = machine().region("maincpu")->base();
+			const UINT8 *ROM = memregion("maincpu")->base();
 			level =  *((ROM + LEVEL_ORDER_ARRAY) + (m_system32_workram[CLEARED_LEVELS / 2] * 2) - 1);
 			level |= *((ROM + LEVEL_ORDER_ARRAY) + (m_system32_workram[CLEARED_LEVELS / 2] * 2) - 2) << 8;
 		}
@@ -163,7 +163,7 @@ WRITE16_MEMBER(segas32_state::brival_protection_w)
 	};
 	char ret[32];
 	int curProtType;
-	UINT8 *ROM = machine().region("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 
 	switch (offset)
 	{
