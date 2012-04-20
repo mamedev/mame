@@ -1,8 +1,8 @@
 /*********************************************************************
 
-    ap2_dsk.c
+	ap2_dsk.c
 
-    Apple II disk images
+	Apple II disk images
 
 *********************************************************************/
 
@@ -511,3 +511,312 @@ LEGACY_FLOPPY_OPTIONS_START( apple2 )
 		SECTOR_LENGTH([256])
 		FIRST_SECTOR_ID([0]))
 LEGACY_FLOPPY_OPTIONS_END
+
+/***************************************************************************
+
+	New implementation
+
+****************************************************************************
+
+	Copyright Olivier Galibert, Lord Nightmare and Balrog
+	All rights reserved.
+
+	Redistribution and use in source and binary forms, with or without
+	modification, are permitted provided that the following conditions are
+	met:
+
+		* Redistributions of source code must retain the above copyright
+		  notice, this list of conditions and the following disclaimer.
+		* Redistributions in binary form must reproduce the above copyright
+		  notice, this list of conditions and the following disclaimer in
+		  the documentation and/or other materials provided with the
+		  distribution.
+		* Neither the name 'MAME' nor the names of its contributors may be
+		  used to endorse or promote products derived from this software
+		  without specific prior written permission.
+
+	THIS SOFTWARE IS PROVIDED BY AARON GILES ''AS IS'' AND ANY EXPRESS OR
+	IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+	WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+	DISCLAIMED. IN NO EVENT SHALL AARON GILES BE LIABLE FOR ANY DIRECT,
+	INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+	(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+	SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+	HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+	STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
+	IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+	POSSIBILITY OF SUCH DAMAGE.
+
+****************************************************************************/
+
+
+a2_16sect_format::a2_16sect_format() : floppy_image_format_t()
+{
+}
+
+const char *a2_16sect_format::name() const
+{
+		return "a2_16sect";
+}
+
+const char *a2_16sect_format::description() const
+{
+		return "Apple II 16-sector dsk image";
+}
+
+const char *a2_16sect_format::extensions() const
+{
+		return "dsk";
+}
+
+bool a2_16sect_format::supports_save() const
+{
+		return true;
+}
+
+int a2_16sect_format::identify(io_generic *io, UINT32 form_factor)
+{
+		int size = io_generic_size(io);
+		int expected_size = 35 * 16 * 256;
+		return size == expected_size;
+}
+
+const floppy_image_format_t::desc_e a2_16sect_format::mac_gcr[] = {
+		{ SECTOR_LOOP_START, 0, -1 },
+		{   RAWBITS, 0xff3fcf, 24 }, { RAWBITS, 0xf3fcff, 24 },
+		{   RAWBITS, 0xff3fcf, 24 }, { RAWBITS, 0xf3fcff, 24 },
+		{   RAWBITS, 0xff3fcf, 24 }, { RAWBITS, 0xf3fcff, 24 },
+		{   RAWBITS, 0xff3fcf, 24 }, { RAWBITS, 0xf3fcff, 24 },
+		{   RAWBITS, 0xff3fcf, 24 }, { RAWBITS, 0xf3fcff, 24 },
+		{   RAWBITS, 0xff3fcf, 24 }, { RAWBITS, 0xf3fcff, 24 },
+		{   RAWBITS, 0xff3fcf, 24 }, { RAWBITS, 0xf3fcff, 24 },
+		{   RAWBITS, 0xff3fcf, 24 }, { RAWBITS, 0xf3fcff, 24 },
+		{   RAWBITS, 0xd5aa96, 24 },
+		{   CRC_MACHEAD_START, 0 },
+		{     TRACK_ID_GCR6 },
+		{     SECTOR_ID_GCR6 },
+		{     TRACK_HEAD_ID_GCR6 },
+		{     SECTOR_INFO_GCR6 },
+		{   CRC_END, 0 },
+		{   CRC, 0 },
+		{   RAWBITS, 0xdeaaff, 24 },
+		{   RAWBITS, 0xff3fcf, 24 }, { RAWBITS, 0xf3fcff, 24 },
+		{   RAWBITS, 0xd5aaad, 24 },
+		{   SECTOR_ID_GCR6 },
+		{   SECTOR_DATA_MAC, -1 },
+		{   RAWBITS, 0xdeaaff, 24 },
+		{   RAWBITS, 0xff, 8 },
+		{ SECTOR_LOOP_END },
+		{ END },
+};
+
+
+bool a2_16sect_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
+{
+
+		UINT8 sector_data[(256)*16];
+		memset(sector_data, 0, sizeof(sector_data));
+
+		desc_s sectors[16];
+		int format = 0;
+		int pos_data = 0;
+
+		int head_count = 1;
+
+		for(int track=0; track < 35; track++) {
+				for(int head=0; head < head_count; head++) {
+						for(int si=0; si<16; si++) {
+								UINT8 *data = sector_data + (256)*si;
+								sectors[si].data = data;
+								sectors[si].size = 256;
+								sectors[si].sector_id = si;
+								sectors[si].sector_info = format;
+								io_generic_read(io, data, pos_data, 256);
+								pos_data += 256;
+						}
+						generate_track(mac_gcr, track, head, sectors, 16, 3104*16, image);
+				}
+		}
+		return true;
+}
+
+UINT8 a2_16sect_format::gb(const UINT8 *buf, int ts, int &pos, int &wrap)
+{
+		UINT8 v = 0;
+		int w1 = wrap;
+		while(wrap != w1+2 && !(v & 0x80)) {
+				v = v << 1 | ((buf[pos >> 3] >> (7-(pos & 7))) & 1);
+				pos++;
+				if(pos == ts) {
+						pos = 0;
+						wrap++;
+				}
+		}
+		return v;
+}
+
+void a2_16sect_format::update_chk(const UINT8 *data, int size, UINT32 &chk)
+{
+}
+
+bool a2_16sect_format::save(io_generic *io, floppy_image *image)
+{
+		int g_tracks, g_heads;
+		int visualgrid[16][35]; // visualizer grid, cleared/initialized below
+#define NOTFOUND 0
+#define ADDRFOUND 1
+#define ADDRGOOD 2
+#define DATAFOUND 4
+#define DATAGOOD 8
+#define DATAPOST 16
+		for (int i = 0; i < 16; i++) {
+			for (int j = 0; j < 35; j++) {
+				visualgrid[i][j] = 0;
+			}
+		}
+		image->get_actual_geometry(g_tracks, g_heads);
+
+		int head = 0;
+
+		int pos_data = 0;
+
+		for(int track=0; track < 70; track+=2) {
+				UINT8 sectdata[(256)*16];
+				memset(sectdata, 0, sizeof(sectdata));
+				int nsect = 16;
+				UINT8 buf[130000]; // originally 13000, multiread dfi disks need larger
+				int ts;
+fprintf(stderr,"DEBUG: a2_16sect_format::save() about to generate bitstream from physical track %d (logical %d)...", track, track/2);
+				generate_bitstream_from_track(track, head, 200000000/(3104*nsect*1), buf, ts, image); // 3104 needs tweaking, *3 is 3x multiread from a dfi disk
+fprintf(stderr,"done.\n");
+				int pos = 0;
+				int wrap = 0;
+				int hb = 0;
+				for(;;) {
+						UINT8 v = gb(buf, ts, pos, wrap);
+						if(v == 0xff)
+								hb = 1;
+						else if(hb == 1 && v == 0xd5)
+								hb = 2;
+						else if(hb == 2 && v == 0xaa)
+								hb = 3;
+						else if(hb == 3 && v == 0x96)
+								hb = 4;
+						else
+								hb = 0;
+
+						if(hb == 4) {
+								UINT8 h[11];
+								for(int i=0; i<11; i++)
+										h[i] = gb(buf, ts, pos, wrap);
+								//UINT8 v2 = gcr6bw_tb[h[2]];
+								UINT8 vl = gcr4_decode(h[0],h[1]);
+								UINT8 tr = gcr4_decode(h[2],h[3]);
+								UINT8 se = gcr4_decode(h[4],h[5]);
+								UINT8 chk = gcr4_decode(h[6],h[7]);
+								UINT32 post = (h[8]<<16)|(h[9]<<8)|h[10];
+								printf("Address Mark:\tVolume %d, Track %d, Sector %2d, Checksum %02X: %s, Postamble %03X: %s\n", vl, tr, se, chk, (chk ^ vl ^ tr ^ se)==0?"OK":"BAD", post, (post&0xFFFF00)==0xDEAA00?"OK":"BAD");
+								if (tr == track/2 && se < nsect) {
+										visualgrid[se][track/2] |= ADDRFOUND;
+										visualgrid[se][track/2] |= (chk ^ vl ^ tr ^ se)==0?ADDRGOOD:0;
+										int opos = pos;
+										int owrap = wrap;
+										hb = 0;
+										for(int i=0; i<20 && hb != 4; i++) {
+												v = gb(buf, ts, pos, wrap);
+												if(v == 0xff)
+														hb = 1;
+												else if(hb == 1 && v == 0xd5)
+														hb = 2;
+												else if(hb == 2 && v == 0xaa)
+														hb = 3;
+												else if(hb == 3 && v == 0xad)
+														hb = 4;
+												else
+														hb = 0;
+										}
+										if(hb == 4) {
+												visualgrid[se][track/2] |= DATAFOUND;
+												UINT8 *dest = sectdata+(256)*se;
+												UINT8 data[0x157];
+												UINT32 dpost = 0;
+												UINT8 c = 0;
+												// first read in sector and decode to 6bit form
+												for(int i=0; i<0x156; i++) {
+														data[i] = gcr6bw_tb[gb(buf, ts, pos, wrap)] ^ c;
+														c = data[i];
+												//	printf("%02x ", c);
+												//	if (((i&0xf)+1)==0x10) printf("\n");
+												}
+												// read the checksum byte
+												data[0x156] = gcr6bw_tb[gb(buf,ts,pos,wrap)];
+												// now read the postamble bytes
+												for(int i=0; i<3; i++) {
+														dpost <<= 8;
+														dpost |= gb(buf, ts, pos, wrap);
+												}
+												// next combine in the upper 2 bits of each byte
+												UINT8 bit_swap[4] = { 0, 2, 1, 3 };
+												for(int i=0; i<0x56; i++)
+														data[i+0x056] = data[i+0x056]<<2 |  bit_swap[data[i]&3];
+												for(int i=0; i<0x56; i++)
+														data[i+0x0ac] = data[i+0x0ac]<<2 |  bit_swap[(data[i]>>2)&3];
+												for(int i=0; i<0x54; i++)
+														data[i+0x102] = data[i+0x102]<<2 |  bit_swap[(data[i]>>4)&3];
+												// now decode it into 256 bytes
+												// but only write it if the bitfield of the track shows datagood is NOT set.
+												// if it is set we don't want to overwrite a guaranteed good read with a bad one
+												if ((visualgrid[se][track/2]&DATAGOOD)==0) {
+													// TODO:
+													// if the current read is good but the postamble isn't, write it in.
+													// if the current read isn't good but the postamble is, its better than nothing.
+													// if the current read isn't good and neither is the postamble but nothing better
+													// has been written before, write it anyway.
+													for(int i=0x56; i<0x156; i++) {
+														UINT8 dv = data[i];
+														*dest++ = dv;
+													}
+												}
+												// do some checking
+												if ((data[0x156] != c) || (dpost&0xFFFF00)!=0xDEAA00) {
+												printf("Data Mark:\tChecksum xpctd %d found %d: %s, Postamble %03X: %s\n", data[0x156], c, (data[0x156]==c)?"OK":"BAD", dpost, (dpost&0xFFFF00)==0xDEAA00?"OK":"BAD");
+												}
+												else visualgrid[se][track/2] |= DATAGOOD;
+										} else {
+												pos = opos;
+												wrap = owrap;
+										}
+								}
+								hb = 0;
+						}
+						if(wrap)
+								break;
+				}
+				for(int i=0; i<nsect; i++) {
+						//if(nsect>0) printf("t%d,", track);
+						UINT8 *data = sectdata + (256)*i;
+						io_generic_write(io, data, pos_data, 256);
+						pos_data += 256;
+				}
+				//printf("\n");
+		}
+		// display a little table of which sectors decoded ok
+		for (int j = 0; j < 35; j++) {
+			printf("T%2d: ",j);
+			for (int i = 0; i < 16; i++) {
+				if (visualgrid[i][j] == NOTFOUND) printf("-NF-");
+				else {
+				if (visualgrid[i][j] & ADDRFOUND) printf("a"); else printf(" ");
+				if (visualgrid[i][j] & ADDRGOOD) printf("A"); else printf(" ");
+				if (visualgrid[i][j] & DATAFOUND) printf("d"); else printf(" ");
+				if (visualgrid[i][j] & DATAGOOD) printf("D"); else printf(" ");
+				}
+				printf(" ");
+			}
+			printf("\n");
+		}
+
+		return true;
+}
+
+const floppy_format_type FLOPPY_A216S_FORMAT = &floppy_image_format_creator<a2_16sect_format>;
