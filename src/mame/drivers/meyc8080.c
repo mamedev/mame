@@ -527,7 +527,7 @@ static INPUT_PORTS_START( mdrawpkra )
 INPUT_PORTS_END
 
 
-static INPUT_PORTS_START( unkmeyco )
+static INPUT_PORTS_START( casbjack )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_VBLANK )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1)
@@ -732,7 +732,7 @@ ROM_START( mdrawpkra )
 	ROM_LOAD( "jk6_02-10.k3", 0x2800, 0x0800, CRC(72aee07f) SHA1(a6d6086f3a6181d5111d05ae779c3f7b363c7f14) )
 ROM_END
 
-ROM_START( unkmeyco )
+ROM_START( casbjack )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_INVERT )
 	ROM_LOAD( "k8", 0x0000, 0x0800, CRC(c6d8a2f7) SHA1(1fcd3ad72a29f832ffaf37edcb74e84e21909496) )
 	ROM_LOAD( "k7", 0x0800, 0x0800, CRC(6e30e5ae) SHA1(980096adefce4d4d97607b22f56f3acf246986ed) )
@@ -750,8 +750,8 @@ ROM_END
  *
  *************************************/
 
-/*     YEAR  NAME       PARENT    MACHINE   INPUT      INIT  ROT    COMPANY              FULLNAME                                        FLAGS                                      LAYOUT  */
-GAMEL( 1982, wldarrow,  0,        meyc8080, wldarrow,  0,    ROT0, "Meyco Games, Inc.", "Wild Arrow (Standard V4.8)",                    GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_wldarrow  )
-GAMEL( 1984, mdrawpkr,  0,        meyc8080, mdrawpkr,  0,    ROT0, "Meyco Games, Inc.", "Draw Poker - Joker's Wild (Standard)",          GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_mdrawpkr  ) // year not shown, but it is in mdrawpkra
-GAMEL( 1984, mdrawpkra, mdrawpkr, meyc8080, mdrawpkra, 0,    ROT0, "Meyco Games, Inc.", "Draw Poker - Joker's Wild (02-11)",             GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_mdrawpkr  )
-GAMEL( 1983, unkmeyco,  0,        meyc8080, unkmeyco,  0,    ROT0, "Meyco Games, Inc.", "unknown Meyco blackjack game (Standard 00-05)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_meybjack  )
+/*     YEAR  NAME       PARENT    MACHINE   INPUT      INIT  ROT    COMPANY              FULLNAME                                    FLAGS                                      LAYOUT  */
+GAMEL( 1982, wldarrow,  0,        meyc8080, wldarrow,  0,    ROT0, "Meyco Games, Inc.", "Wild Arrow (color, Standard V4.8)",         GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_wldarrow  ) // B&W version not dumped yet
+GAMEL( 1984, mdrawpkr,  0,        meyc8080, mdrawpkr,  0,    ROT0, "Meyco Games, Inc.", "Draw Poker - Joker's Wild (Standard)",      GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_mdrawpkr  ) // year not shown, but it is in mdrawpkra
+GAMEL( 1984, mdrawpkra, mdrawpkr, meyc8080, mdrawpkra, 0,    ROT0, "Meyco Games, Inc.", "Draw Poker - Joker's Wild (02-11)",         GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_mdrawpkr  )
+GAMEL( 1983, casbjack,  0,        meyc8080, casbjack,  0,    ROT0, "Meyco Games, Inc.", "Casino Black Jack (color, Standard 00-05)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_meybjack  ) // B&W version not dumped yet
