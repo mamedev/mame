@@ -22648,8 +22648,6 @@ ROM_START( sc_unsrt )
 	// 95008423.bin          sc4goldw   Golden Winner (Bellfruit) (Scorpion 4)
 	// Champion Chips (Bellfruit)
 	ROM_LOAD( "95008558.bin", 0x0000, 0x100000, CRC(6c032de9) SHA1(3aed801f8b6f2d62fffa03054afd8ff1c3ff3ac3) )
-	// Clever Clogs (Mazooma)
-	ROM_LOAD( "95008361.bin", 0x0000, 0x0ff54f, CRC(d1cc7b58) SHA1(32328e0e56bbf65e91e32de8802edce38f0abc65) )
 	// Costa Del Dosh (Bellfruit)
 	ROM_LOAD( "95008420.bin", 0x0000, 0x100000, CRC(cce5f09a) SHA1(8b1f30eb1c48a3e3c6c403f28e97918ddac51033) )
 	// Deal Or No Deal Red Hot (Bellfruit)
@@ -22754,31 +22752,63 @@ GAME( 200?, sc4pstatj	,sc4pstat,	sc4, sc4, sc4, ROT0, "QPS","Paystation (V041) (
 GAME( 200?, sc4pstato	,sc4pstat,	sc4, sc4, sc4, ROT0, "QPS","Paystation (V042) (Qps) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc4pstatq	,sc4pstat,	sc4, sc4, sc4, ROT0, "QPS","Paystation (V042) (Qps) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
 
+const stepper_interface* sc4cvani_reel_configs[6] = 
+{
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	0,
+	&starpoint_interface_200step_reel,
+	0,
+};
+
+static DRIVER_INIT( sc4cvani )
+{
+	sc4_state *state = machine.driver_data<sc4_state>();
+	DRIVER_INIT_CALL( sc4 );
+	state->m_reel_setup = sc4cvani_reel_configs;
+}
 
 // PR2052 CASHLVANIA         VANIASND           CASH'!'VANIA
-GAME( 200?, sc4cvani	,0,			sc4, sc4, sc4, ROT0, "QPS","Cashvania (Qps) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cvania	,sc4cvani,	sc4, sc4, sc4, ROT0, "QPS","Cashvania (Qps) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cvanib	,sc4cvani,	sc4, sc4, sc4, ROT0, "QPS","Cashvania (Qps) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cvanic	,sc4cvani,	sc4, sc4, sc4, ROT0, "QPS","Cashvania (Qps) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cvanid	,sc4cvani,	sc4, sc4, sc4, ROT0, "QPS","Cashvania (Qps) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cvanie	,sc4cvani,	sc4, sc4, sc4, ROT0, "QPS","Cashvania (Qps) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cvanif	,sc4cvani,	sc4, sc4, sc4, ROT0, "QPS","Cashvania (Qps) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cvanig	,sc4cvani,	sc4, sc4, sc4, ROT0, "QPS","Cashvania (Qps) (Scorpion 4) (set 8)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cvanih	,sc4cvani,	sc4, sc4, sc4, ROT0, "QPS","Cashvania (Qps) (Scorpion 4) (set 9)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cvanii	,sc4cvani,	sc4, sc4, sc4, ROT0, "QPS","Cashvania (Qps) (Scorpion 4) (set 10)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cvani	,0,			sc4, sc4, sc4cvani, ROT0, "QPS","Cashvania (Qps) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cvania	,sc4cvani,	sc4, sc4, sc4cvani, ROT0, "QPS","Cashvania (Qps) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cvanib	,sc4cvani,	sc4, sc4, sc4cvani, ROT0, "QPS","Cashvania (Qps) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cvanic	,sc4cvani,	sc4, sc4, sc4cvani, ROT0, "QPS","Cashvania (Qps) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cvanid	,sc4cvani,	sc4, sc4, sc4cvani, ROT0, "QPS","Cashvania (Qps) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cvanie	,sc4cvani,	sc4, sc4, sc4cvani, ROT0, "QPS","Cashvania (Qps) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cvanif	,sc4cvani,	sc4, sc4, sc4cvani, ROT0, "QPS","Cashvania (Qps) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cvanig	,sc4cvani,	sc4, sc4, sc4cvani, ROT0, "QPS","Cashvania (Qps) (Scorpion 4) (set 8)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cvanih	,sc4cvani,	sc4, sc4, sc4cvani, ROT0, "QPS","Cashvania (Qps) (Scorpion 4) (set 9)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cvanii	,sc4cvani,	sc4, sc4, sc4cvani, ROT0, "QPS","Cashvania (Qps) (Scorpion 4) (set 10)", GAME_IS_SKELETON_MECHANICAL )
 
+const stepper_interface* sc4cvclb_reel_configs[6] = 
+{
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	0,
+	&starpoint_interface_200step_reel,
+};
+
+static DRIVER_INIT( sc4cvclb )
+{
+	sc4_state *state = machine.driver_data<sc4_state>();
+	DRIVER_INIT_CALL( sc4 );
+	state->m_reel_setup = sc4cvclb_reel_configs;
+}
 
 // PRXXXX CLUBCASHLVANIA V1.0         CLUBVANIASND         CLUB  CASH!VANIA
-GAME( 200?, sc4cvclb	,0,			sc4, sc4, sc4, ROT0, "QPS","Cashvania Club (V1.0) (Qps) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cvclba	,sc4cvclb,	sc4, sc4, sc4, ROT0, "QPS","Cashvania Club (V1.0) (Qps) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cvclbc	,sc4cvclb,	sc4, sc4, sc4, ROT0, "QPS","Cashvania Club (V1.0) (Qps) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cvclbd	,sc4cvclb,	sc4, sc4, sc4, ROT0, "QPS","Cashvania Club (V1.0) (Qps) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cvclb	,0,			sc4, sc4, sc4cvclb, ROT0, "QPS","Cashvania Club (V1.0) (Qps) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cvclba	,sc4cvclb,	sc4, sc4, sc4cvclb, ROT0, "QPS","Cashvania Club (V1.0) (Qps) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cvclbc	,sc4cvclb,	sc4, sc4, sc4cvclb, ROT0, "QPS","Cashvania Club (V1.0) (Qps) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cvclbd	,sc4cvclb,	sc4, sc4, sc4cvclb, ROT0, "QPS","Cashvania Club (V1.0) (Qps) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
 // PRXXXX CLUBCASHLVANIA V2.0         CLUBVANIASND         CLUB  CASH!VANIA
-GAME( 200?, sc4cvclbb	,sc4cvclb,	sc4, sc4, sc4, ROT0, "QPS","Cashvania Club (V2.0) (Qps) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cvclbe	,sc4cvclb,	sc4, sc4, sc4, ROT0, "QPS","Cashvania Club (V2.0) (Qps) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cvclbb	,sc4cvclb,	sc4, sc4, sc4cvclb, ROT0, "QPS","Cashvania Club (V2.0) (Qps) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cvclbe	,sc4cvclb,	sc4, sc4, sc4cvclb, ROT0, "QPS","Cashvania Club (V2.0) (Qps) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
 // PRXXXX CLUBCASHLVANIA 411         CLUBVANIASND         CLUB  CASH!VANIA
-GAME( 200?, sc4cvclbf	,sc4cvclb,	sc4, sc4, sc4, ROT0, "QPS","Cashvania Club (V411) (Qps) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cvclbg	,sc4cvclb,	sc4, sc4, sc4, ROT0, "QPS","Cashvania Club (V411) (Qps) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cvclbf	,sc4cvclb,	sc4, sc4, sc4cvclb, ROT0, "QPS","Cashvania Club (V411) (Qps) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cvclbg	,sc4cvclb,	sc4, sc4, sc4cvclb, ROT0, "QPS","Cashvania Club (V411) (Qps) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
 
 // PR6912 SOUTH PARK         PR6912 SOUTH PARK SOUNDS11            SOUTH PARK
 GAME( 200?, sc4spark	,0,			sc4, sc4, sc4, ROT0, "BFM","South Park (BFM) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )

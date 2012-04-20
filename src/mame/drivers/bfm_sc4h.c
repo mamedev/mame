@@ -246,21 +246,17 @@ WRITE8_MEMBER(sc4_state::mux_output2_w)
 	int i;
 	int off = offset<<3;
 
+	// some games use this as a matrix port (luckb etc.)
 	for (i=0; i<8; i++)
 	{
 		output_set_indexed_value("matrix", off+i, ((data & (1 << i)) != 0));
 	}
 
-
-	if (offset>=20)
-	{
-		offset-=20;
-		// todo, reorder to what our 7segs expect
-		UINT8 bf7segdata = BITSWAP8(data,7,6,5,4,3,2,1,0);
-		output_set_digit_value(offset, bf7segdata);
-
-	}
-
+	// others drive 7-segs with it..  so rendering it there as well in our debug layouts
+	
+	// todo: reorder properly!
+	UINT8 bf7segdata = BITSWAP8(data,7,6,5,4,3,2,1,0);
+	output_set_digit_value(offset, bf7segdata);
 }
 
 WRITE16_MEMBER(sc4_state::sc4_mem_w)

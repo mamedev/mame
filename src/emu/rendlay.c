@@ -482,6 +482,10 @@ layout_element::layout_element(running_machine &machine, xml_data_node &elemnode
 			m_maxstate = 262143;
 		if (newcomp.m_type == component::CTYPE_DOTMATRIX)
 			m_maxstate = 255;
+		if (newcomp.m_type == component::CTYPE_SIMPLECOUNTER)
+		{
+			m_maxstate = xml_get_attribute_int_with_subst(machine, *compnode, "maxstate", 999);
+		}
 	}
 
 	// determine the scale/offset for normalization
@@ -632,6 +636,13 @@ layout_element::component::component(running_machine &machine, xml_data_node &co
 	else if (strcmp(compnode.name, "dotmatrix") == 0)
 		m_type = CTYPE_DOTMATRIX;
 
+	// simplecounter nodes
+	else if (strcmp(compnode.name, "simplecounter") == 0)
+	{
+		m_type = CTYPE_SIMPLECOUNTER;
+		m_digits = xml_get_attribute_int_with_subst(machine, compnode, "digits", 2);
+	}
+
 	// led7seg nodes
 	else if (strcmp(compnode.name, "led7seg") == 0)
 		m_type = CTYPE_LED7SEG;
@@ -727,6 +738,10 @@ void layout_element::component::draw(running_machine &machine, bitmap_argb32 &de
 
 		case CTYPE_DOTMATRIX:
 			draw_dotmatrix(dest, bounds, state);
+			break;
+
+		case CTYPE_SIMPLECOUNTER:
+			draw_simplecounter(machine, dest, bounds, state);
 			break;
 
 		default:
@@ -840,6 +855,8 @@ void layout_element::component::draw_text(running_machine &machine, bitmap_argb3
 	render_font *font = machine.render().font_alloc("default");
 	float aspect = 1.0f;
 	INT32 width;
+
+
 	while (1)
 	{
 		width = font->string_width(bounds.height(), aspect, m_string);
@@ -847,6 +864,7 @@ void layout_element::component::draw_text(running_machine &machine, bitmap_argb3
 			break;
 		aspect *= 0.9f;
 	}
+
 
 	// get alignment
 	INT32 curx;
@@ -912,6 +930,14 @@ void layout_element::component::draw_text(running_machine &machine, bitmap_argb3
 
 	// free the temporary bitmap and font
 	machine.render().font_free(font);
+}
+
+void layout_element::component::draw_simplecounter(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state)
+{
+	char temp[256];
+	sprintf(temp, "%0*d", m_digits, state);
+	m_string = astring(temp);
+	draw_text(machine, dest, bounds);
 }
 
 

@@ -2233,7 +2233,7 @@ INPUT_PORTS_EXTERN( sc4_base );
 
 #define sc_ccogs_others \
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "clevercogssnd", 0x0000, 0x100000, NO_DUMP ) \
+	ROM_LOAD( "95008361.bin", 0x0000, 0x0ff54f, CRC(d1cc7b58) SHA1(32328e0e56bbf65e91e32de8802edce38f0abc65) )
 
 #define sc_cclas_others \
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \

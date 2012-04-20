@@ -121,6 +121,7 @@ private:
 			CTYPE_LED14SEGSC,
 			CTYPE_LED16SEGSC,
 			CTYPE_DOTMATRIX,
+			CTYPE_SIMPLECOUNTER,
 			CTYPE_MAX
 		};
 
@@ -128,6 +129,7 @@ private:
 		void draw_rect(bitmap_argb32 &dest, const rectangle &bounds);
 		void draw_disk(bitmap_argb32 &dest, const rectangle &bounds);
 		void draw_text(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds);
+		void draw_simplecounter(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state);
 		void load_bitmap();
 		void draw_led7seg(bitmap_argb32 &dest, const rectangle &bounds, int pattern);
 		void draw_led14seg(bitmap_argb32 &dest, const rectangle &bounds, int pattern);
@@ -152,6 +154,7 @@ private:
 		render_bounds		m_bounds;		// bounds of the element
 		render_color		m_color;		// color of the element
 		astring				m_string;		// string for text components
+		int					m_digits;		// number of digits for simple counters
 		int					m_textalign;	// text alignment to box
 		bitmap_argb32		m_bitmap;		// source bitmap for images
 		astring				m_dirname;		// directory name of image file (for lazy loading)
