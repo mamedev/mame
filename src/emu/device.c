@@ -130,7 +130,6 @@ device_t::device_t(const machine_config &mconfig, device_type type, const char *
 		m_tag.cpy((owner->owner() == NULL) ? "" : owner->tag()).cat(":").cat(tag);
 	else
 		m_tag.cpy(":");
-	mame_printf_verbose("device '%s' created\n", this->tag());
 	static_set_clock(*this, clock);
 }
 
@@ -171,7 +170,6 @@ device_t::device_t(const machine_config &mconfig, device_type type, const char *
 		m_tag.cpy((owner->owner() == NULL) ? "" : owner->tag()).cat(":").cat(tag);
 	else
 		m_tag.cpy(":");
-	mame_printf_verbose("device '%s' created\n", this->tag());
 	static_set_clock(*this, clock);
 }
 
@@ -724,10 +722,7 @@ device_t *device_t::subdevice_slow(const char *tag) const
 
 	// if we got a match, add to the fast map
 	if (curdevice != NULL)
-	{
 		m_device_map.add(tag, curdevice);
-		mame_printf_verbose("device '%s' adding mapping for '%s' => '%s'\n", this->tag(), tag, fulltag.cstr());
-	}
 	return curdevice;
 }
 
@@ -887,21 +882,41 @@ device_t::finder_base::~finder_base()
 
 void *device_t::finder_base::find_memory(UINT8 width, size_t &bytes, bool required)
 {
+	// look up the share and return NULL if not found
 	memory_share *share = m_base.machine().memory().shared(m_base, m_tag);
 	if (share == NULL)
-	{
-		if (required)
-			mame_printf_error("Shared ptr '%s' not found\n", m_tag);
 		return NULL;
-	}
+	
+	// check the width and warn if not correct
 	if (width != 0 && share->width() != width)
 	{
-		if (required)
-			mame_printf_warning("Shared ptr '%s' found but is width %d, not %d as requested\n", m_tag, share->width(), width);
+		mame_printf_warning("Shared ptr '%s' found but is width %d, not %d as requested\n", m_tag, share->width(), width);
 		return NULL;
 	}
+	
+	// return results
 	bytes = share->bytes();
 	return share->ptr();
+}
+
+
+//-------------------------------------------------
+//  report_missing - report missing objects and
+//	return true if it's ok
+//-------------------------------------------------
+
+bool device_t::finder_base::report_missing(bool found, const char *objname, bool required)
+{
+	// just pass through in the found case
+	if (found)
+		return true;
+	
+	// otherwise, report
+	if (required)
+		mame_printf_error("Required %s '%s' not found\n", objname, m_tag);
+	else
+		mame_printf_verbose("Optional %s '%s' not found\n", objname, m_tag);
+	return !required;
 }
 
 

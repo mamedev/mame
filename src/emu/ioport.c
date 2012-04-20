@@ -4835,7 +4835,6 @@ input_port_config *ioconfig_alloc_port(ioport_list &portlist, device_t &device, 
 {
 	astring fulltag;
 	device.subtag(fulltag, tag);
-mame_printf_verbose("ioport '%s' created\n", fulltag.cstr());
 	return &portlist.append(fulltag, *global_alloc(input_port_config(device, fulltag)));
 }
 

@@ -230,9 +230,16 @@ public:
 protected:
 	// internal helper classes (defined below)
 	class finder_base;
+	template<class _ObjectClass> class object_finder_base;
 	template<class _DeviceClass, bool _Required> class device_finder;
 	template<class _DeviceClass> class optional_device;
 	template<class _DeviceClass> class required_device;
+	template<bool _Required> class memory_region_finder;
+	class optional_memory_region;
+	class required_memory_region;
+	template<bool _Required> class memory_bank_finder;
+	class optional_memory_bank;
+	class required_memory_bank;
 	template<typename _PointerType, bool _Required> class shared_ptr_finder;
 	template<typename _PointerType> class optional_shared_ptr;
 	template<typename _PointerType> class required_shared_ptr;
@@ -337,6 +344,7 @@ public:
 protected:
 	// helpers
 	void *find_memory(UINT8 width, size_t &bytes, bool required);
+	bool report_missing(bool found, const char *objname, bool required);
 
 	// internal state
 	finder_base *m_next;
@@ -345,46 +353,57 @@ protected:
 };
 
 
+// ======================> object_finder_base
+
+// helper class to find objects of a particular type
+template<class _ObjectClass>
+class device_t::object_finder_base : public device_t::finder_base
+{
+public:
+	// construction/destruction
+	object_finder_base(device_t &base, const char *tag)
+		: finder_base(base, tag),
+		  m_target(NULL) { }
+
+	// operators to make use transparent
+	operator _ObjectClass *() const { return m_target; }
+	_ObjectClass *operator->() const { assert(m_target != NULL); return m_target; }
+
+	// getter for explicit fetching
+	_ObjectClass *target() const { return m_target; }
+
+	// setter for setting the object
+	void set_target(_ObjectClass *target) { m_target = target; }
+
+protected:
+	// internal state
+	_ObjectClass *m_target;
+};
+
+
 // ======================> device_finder
 
 // device finder template
 template<class _DeviceClass, bool _Required>
-class device_t::device_finder : public device_t::finder_base
+class device_t::device_finder : public device_t::object_finder_base<_DeviceClass>
 {
 public:
 	// construction/destruction
 	device_finder(device_t &base, const char *tag)
-		: finder_base(base, tag),
-		  m_target(0) { }
-
-	// operators to make use transparent
-	operator _DeviceClass *() { return m_target; }
-	operator _DeviceClass *() const { return m_target; }
-	_DeviceClass *operator->() { assert(m_target != NULL); return m_target; }
-
-	// getter for explicit fetching
-	_DeviceClass *target() const { return m_target; }
-
-	// setter for setting the object
-	void set_target(_DeviceClass *target) { m_target = target; }
+		: object_finder_base<_DeviceClass>(base, tag) { }
 
 	// finder
 	virtual bool findit()
 	{
-		void mame_printf_warning(const char *format, ...) ATTR_PRINTF(1,2);
-		void mame_printf_error(const char *format, ...) ATTR_PRINTF(1,2);
-		device_t *device = m_base.subdevice(m_tag);
-		if (_Required && device == NULL)
-			mame_printf_error("Unable to find required device '%s'\n", this->m_tag);
-		m_target = dynamic_cast<_DeviceClass *>(device);
-		if (device != NULL && m_target == NULL)
-			mame_printf_warning("Device '%s' found but is of the incorrect type\n", m_tag);
-		return (!_Required || m_target != NULL);
+		device_t *device = this->m_base.subdevice(this->m_tag);
+		this->m_target = dynamic_cast<_DeviceClass *>(device);
+		if (device != NULL && this->m_target == NULL)
+		{
+			void mame_printf_warning(const char *format, ...) ATTR_PRINTF(1,2);
+			mame_printf_warning("Device '%s' found but is of incorrect type\n", this->m_tag);
+		}
+		return this->report_missing(this->m_target != NULL, "device", _Required);
 	}
-
-protected:
-	// internal state
-	_DeviceClass *m_target;
 };
 
 // optional device finder
@@ -404,52 +423,119 @@ public:
 };
 
 
+// ======================> memregion_finder
+
+// device finder template
+template<bool _Required>
+class device_t::memory_region_finder : public device_t::object_finder_base<memory_region>
+{
+public:
+	// construction/destruction
+	memory_region_finder(device_t &base, const char *tag)
+		: object_finder_base(base, tag) { }
+
+	// finder
+	virtual bool findit()
+	{
+		m_target = m_base.memregion(m_tag);
+		return this->report_missing(m_target != NULL, "memory region", _Required);
+	}
+};
+
+// optional device finder
+class device_t::optional_memory_region : public device_t::memory_region_finder<false>
+{
+public:
+	optional_memory_region(device_t &base, const char *tag) : memory_region_finder<false>(base, tag) { }
+};
+
+// required devices are similar but throw an error if they are not found
+class device_t::required_memory_region : public device_t::memory_region_finder<true>
+{
+public:
+	required_memory_region(device_t &base, const char *tag) : memory_region_finder<true>(base, tag) { }
+};
+
+
+// ======================> memory_bank_finder
+
+// device finder template
+template<bool _Required>
+class device_t::memory_bank_finder : public device_t::object_finder_base<memory_bank>
+{
+public:
+	// construction/destruction
+	memory_bank_finder(device_t &base, const char *tag)
+		: object_finder_base(base, tag) { }
+
+	// finder
+	virtual bool findit()
+	{
+		m_target = m_base.membank(m_tag);
+		return this->report_missing(m_target != NULL, "memory bank", _Required);
+	}
+};
+
+// optional device finder
+class device_t::optional_memory_bank : public device_t::memory_bank_finder<false>
+{
+public:
+	optional_memory_bank(device_t &base, const char *tag) : memory_bank_finder<false>(base, tag) { }
+};
+
+// required devices are similar but throw an error if they are not found
+class device_t::required_memory_bank : public device_t::memory_bank_finder<true>
+{
+public:
+	required_memory_bank(device_t &base, const char *tag) : memory_bank_finder<true>(base, tag) { }
+};
+
+
 // ======================> shared_ptr_finder
 
 // shared pointer finder template
 template<typename _PointerType, bool _Required>
-class device_t::shared_ptr_finder : public device_t::finder_base
+class device_t::shared_ptr_finder : public device_t::object_finder_base<_PointerType>
 {
 public:
 	// construction/destruction
 	shared_ptr_finder(device_t &base, const char *tag, UINT8 width = sizeof(_PointerType) * 8)
-		: finder_base(base, tag),
-		  m_target(0),
+		: object_finder_base<_PointerType>(base, tag),
 		  m_bytes(0),
 		  m_allocated(false),
 		  m_width(width) { }
 
-	virtual ~shared_ptr_finder() { if (m_allocated) global_free(m_target); }
+	virtual ~shared_ptr_finder() { if (m_allocated) global_free(this->m_target); }
 
 	// operators to make use transparent
-	operator _PointerType *() const { return m_target; }
-	_PointerType operator[](int index) const { return m_target[index]; }
-	_PointerType &operator[](int index) { return m_target[index]; }
-	_PointerType *operator->() { return m_target; }
+	_PointerType operator[](int index) const { return this->m_target[index]; }
+	_PointerType &operator[](int index) { return this->m_target[index]; }
 
 	// getter for explicit fetching
-	_PointerType *target() const { return m_target; }
 	UINT32 bytes() const { return m_bytes; }
 
 	// setter for setting the object
-	void set_target(_PointerType *target, size_t bytes) { m_target = target; m_bytes = bytes; }
+	void set_target(_PointerType *target, size_t bytes) { this->m_target = target; m_bytes = bytes; }
 
 	// dynamic allocation of a shared pointer
 	void allocate(UINT32 entries)
 	{
 		assert(!m_allocated);
 		m_allocated = true;
-		m_target = global_alloc_array_clear(_PointerType, entries);
+		this->m_target = global_alloc_array_clear(_PointerType, entries);
 		m_bytes = entries * sizeof(_PointerType);
-		m_base.save_pointer(m_target, m_tag, entries);
+		this->m_base.save_pointer(this->m_target, this->m_tag, entries);
 	}
 
 	// finder
-	virtual bool findit() { m_target = reinterpret_cast<_PointerType *>(find_memory(m_width, m_bytes, _Required)); return (!_Required || m_target != NULL); }
+	virtual bool findit()
+	{
+		this->m_target = reinterpret_cast<_PointerType *>(this->find_memory(m_width, m_bytes, _Required)); 
+		return this->report_missing(this->m_target != NULL, "shared pointer", _Required);
+	}
 
 protected:
 	// internal state
-	_PointerType *m_target;
 	size_t m_bytes;
 	bool m_allocated;
 	UINT8 m_width;
