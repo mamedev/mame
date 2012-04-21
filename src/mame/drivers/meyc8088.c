@@ -2,7 +2,8 @@
 
 Meyco 8088 based hardware
 
-significant chips: i8088 CPU, two i8155, ???
+significant chips: i8088 CPU, two i8155, what else???
+It locks up with an interrupt error. How are interrupts generated? The vector is written to $00080, pointing to $fe19f
 
 */
 
@@ -57,19 +58,18 @@ static SCREEN_UPDATE_IND16( meyc8088 )
 ***************************************************************************/
 
 static ADDRESS_MAP_START( meyc8088_map, AS_PROGRAM, 8, meyc8088_state )
-	AM_RANGE(0x00000, 0x003ff) AM_RAM
-	AM_RANGE(0x00400, 0x007ff) AM_RAM
+	AM_RANGE(0x00000, 0x007ff) AM_RAM
 	AM_RANGE(0x70000, 0x77fff) AM_RAM AM_SHARE("vram")
-//	AM_RANGE(0xb0000, 0xb0000) AM_NOP
+	AM_RANGE(0xb0000, 0xb00ff) AM_DEVREADWRITE("i8155_0", i8155_device, memory_r, memory_w)
 	AM_RANGE(0xb0800, 0xb0807) AM_DEVREADWRITE("i8155_0", i8155_device, io_r, io_w)
-//	AM_RANGE(0xb1000, 0xb1000) AM_NOP
+	AM_RANGE(0xb1000, 0xb10ff) AM_DEVREADWRITE("i8155_1", i8155_device, memory_r, memory_w)
 	AM_RANGE(0xb1800, 0xb1807) AM_DEVREADWRITE("i8155_1", i8155_device, io_r, io_w)
-//	AM_RANGE(0xb2000, 0xb2000) AM_NOP
-//	AM_RANGE(0xb3000, 0xb3000) AM_NOP
-//	AM_RANGE(0xb3800, 0xb3800) AM_NOP
-//	AM_RANGE(0xb4000, 0xb4000) AM_NOP
-//	AM_RANGE(0xb5000, 0xb5000) AM_NOP
-	AM_RANGE(0xfa000, 0xfffff) AM_ROM
+//	AM_RANGE(0xb2000, 0xb2000) AM_NOP // ?
+//	AM_RANGE(0xb3000, 0xb3000) AM_RAM // serial device, debug related
+//	AM_RANGE(0xb3800, 0xb3800) AM_RAM // ? writes 00 00 00 40 4A 37
+//	AM_RANGE(0xb4000, 0xb4000) AM_NOP // ?
+//	AM_RANGE(0xb5000, 0xb5000) AM_NOP // ?
+	AM_RANGE(0xf8000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
 
@@ -228,7 +228,7 @@ static MACHINE_CONFIG_START( meyc8088, meyc8088_state )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_SIZE(512,512)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 512-1)
 	MCFG_SCREEN_UPDATE_STATIC(meyc8088)
