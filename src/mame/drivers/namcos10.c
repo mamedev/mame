@@ -725,7 +725,7 @@ ROM_START( gamshara )
 	ROM_REGION32_LE( 0x400000, "user1", 0 ) /* bios */
 	ROM_FILL( 0x0000000, 0x400000, 0x55 )
 
-	ROM_REGION( 0x2100000, "user2", 0 ) /* main prg */
+	ROM_REGION16_LE( 0x2100000, "user2", 0 ) /* main prg */
 	ROM_LOAD( "10021a.8e",    0x0000000, 0x1080000, CRC(6c0361fc) SHA1(7debf1f2e6bed31d59fb224a78a17a94fc573785) )
 	ROM_LOAD( "10021a.8d",    0x1080000, 0x1080000, CRC(73669ff7) SHA1(eb8bbf931f1f8a049208d081d040512a3ffa9c00) )
 ROM_END
@@ -752,7 +752,7 @@ ROM_START( chocovdr )
 	ROM_REGION32_LE( 0x400000, "user1", 0 ) /* bios */
 	ROM_FILL( 0x0000000, 0x400000, 0x55 )
 
-	ROM_REGION( 0x5280000, "user2", 0 ) /* main prg */
+	ROM_REGION16_LE( 0x5280000, "user2", 0 ) /* main prg */
 	ROM_LOAD( "0.8e",         0x0000000, 0x1080000, BAD_DUMP CRC(f265b1b6) SHA1(f327e7bac0bc1bd31aa3362e36233130a6b240ea) )
 	ROM_LOAD( "1.8d",         0x1080000, 0x1080000, CRC(05d01cd2) SHA1(e9947ebea24d618e8b9a69f582ef0b9d97bb4cad) )
 	ROM_LOAD( "2.7e",         0x2100000, 0x1080000, CRC(2e308d20) SHA1(4ff072f0d488b12f77ef7d119822f89b5b5a6712) )
@@ -764,7 +764,7 @@ ROM_START( panikuru )
 	ROM_REGION32_LE( 0x400000, "user1", 0 ) /* bios */
 	ROM_FILL( 0x0000000, 0x400000, 0x55 )
 
-	ROM_REGION( 0x3180000, "user2", 0 ) /* main prg */
+	ROM_REGION16_LE( 0x3180000, "user2", 0 ) /* main prg */
 	ROM_LOAD( "0.8e",         0x0000000, 0x1080000, CRC(3aa66da4) SHA1(3f6ff164981e2c1825766c775442608fbf86d702) )
 	ROM_LOAD( "1.8d",         0x1080000, 0x1080000, CRC(18e5135d) SHA1(a7b1533a1df71be5498718e301d1c9c548551fb4) )
 	ROM_LOAD( "2.7e",         0x2100000, 0x1080000, CRC(cd3b25e0) SHA1(39dfebc59e71b8f1c28e718ee71032620f11440c) )
@@ -774,7 +774,7 @@ ROM_START( nflclsfb )
 	ROM_REGION32_LE( 0x400000, "user1", 0 ) /* bios */
 	ROM_FILL( 0x0000000, 0x400000, 0x55 )
 
-	ROM_REGION( 0x4200000, "user2", 0 ) /* main prg */
+	ROM_REGION16_LE( 0x4200000, "user2", 0 ) /* main prg */
 	ROM_LOAD( "0.8e",         0x0000000, 0x1080000, CRC(b08d4270) SHA1(5f5dc1c2862292a9e597f6a21c0f9db2e5796ded) )
 	ROM_LOAD( "1.8d",         0x1080000, 0x1080000, CRC(d3f519d8) SHA1(60d5f2fafd700e39245bed17e3cc6d608cc2c088) )
 	ROM_LOAD( "2.7e",         0x2100000, 0x1080000, CRC(0c65fdc2) SHA1(fa5d41a7b10ae8f8d312b61cc6d34408123bda97) )
