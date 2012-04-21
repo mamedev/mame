@@ -256,8 +256,7 @@ static ADDRESS_MAP_START( sexyboom_io_map, AS_IO, 8, sangho_state )
 	AM_RANGE( 0xf8, 0xff) AM_WRITE(sexyboom_bank_w )
 ADDRESS_MAP_END
 
-
-static INPUT_PORTS_START( sangho )
+static INPUT_PORTS_START( sexyboom )
     PORT_START("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
     PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
@@ -291,9 +290,32 @@ static INPUT_PORTS_START( sangho )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
 
 	PORT_START("DSW")
-    PORT_DIPNAME( 0x01, 0x01, "DIPS" ) /* coinage etc. */
-    PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW1:8,7") /* Will need verification */
+	PORT_DIPSETTING(    0x03, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Coinage ) )		PORT_DIPLOCATION("SW1:5,4") /* Determined by effect, but matches Puzzle Star's manual listings */
+	PORT_DIPSETTING(    0x08, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x18, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_2C ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW1:3") /* Not shown in manual */
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, "Display Numbers on Tiles" )	PORT_DIPLOCATION("SW1:2") /* As per manual */
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( pzlestar )
+	PORT_START("P1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 ) /* Start buttons don't work for Puzzle Star... not correct? */
     PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
     PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
     PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -303,16 +325,48 @@ static INPUT_PORTS_START( sangho )
     PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
     PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
     PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-    PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
+
+	PORT_START("P2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START2 ) /* Start buttons don't work for Puzzle Star... not correct? */
+    PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
     PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-    PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+    PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
     PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-    PORT_DIPNAME( 0x40, 0x40, "Display Numbers on Tiles" )
-    PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-    PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
+    PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
+
+	PORT_START("DSW")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW1:8,7") /* Will need verification, as other dips don't match manual */
+	PORT_DIPSETTING(    0x03, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coinage ) )		PORT_DIPLOCATION("SW1:6,5") /* Shown as SW1:4 & SW1:5 in manual */
+	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) )		/* Actual effect on game, manual shows 1C / 2C */
+	PORT_DIPSETTING(    0x04, DEF_STR( 2C_1C ) )		/* Actual effect on game, manual shows 3C / 1C */
+	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )		/* Actual effect on game & manual are the same */
+	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )		/* Actual effect on game, manual shows 2C / 1C */
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW1:4") /* Not shown in manual */
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW1:3") /* Not shown in manual */
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, "Display Numbers on Tiles" )	PORT_DIPLOCATION("SW1:2") /* As per manual */
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )		/* Dipswitch 1:1 Not shown in manual */
 INPUT_PORTS_END
 
 
@@ -466,5 +520,5 @@ static DRIVER_INIT(sangho)
 	state->m_ram = auto_alloc_array(machine, UINT8, 0x20000);
 }
 
-GAME( 1991, pzlestar,  0,    pzlestar, sangho, sangho, ROT270, "Sang Ho Soft", "Puzzle Star (Sang Ho Soft)", GAME_NOT_WORKING )
-GAME( 1992, sexyboom,  0,    sexyboom, sangho, sangho, ROT270, "Sang Ho Soft", "Sexy Boom", GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS )
+GAME( 1991, pzlestar,  0,    pzlestar, pzlestar, sangho, ROT270, "Sang Ho Soft", "Puzzle Star (Sang Ho Soft)", GAME_NOT_WORKING )
+GAME( 1992, sexyboom,  0,    sexyboom, sexyboom, sangho, ROT270, "Sang Ho Soft", "Sexy Boom", GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS )
