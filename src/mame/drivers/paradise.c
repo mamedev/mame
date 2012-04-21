@@ -31,6 +31,54 @@ paradise: I'm not sure it's working correctly:
 penky: we need to delay the irqs at startup or it won't boot. Either one of
        ports 0x2003.r or 0x2005.w starts up the irq timer (confirmed via trojan)
 
+Alternate dipswitch settings for Penky as found in scanned Pins & Dip manual:
+
+DIPSW-A
+--------------------------------------------------------------------
+    DipSwitch Title   |  Function  | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 |
+--------------------------------------------------------------------
+                      |   70 Sec   |off|off|                       |
+      Game Time       |   60 Sec   |on |off|                       |
+                      |   50 Sec   |off|on |                       |*
+                      |   40 Sec   |on |on |                       |
+--------------------------------------------------------------------
+     Strip-Tease      |     On     |       |off|                   |*
+                      |     Off    |       |on |                   |
+--------------------------------------------------------------------
+                      |    Easy    |           |off|off|           |
+      Difficulty      |   Normal   |           |on |off|           |*
+                      |    Hard    |           |off|on |           |
+                      | Very Hard  |           |on |on |           |
+--------------------------------------------------------------------
+                      |    99%     |                   |off|off|   |*
+ Minimum Percetage to |    90%     |                   |on |off|   |
+ Complete for Win or  |    80%     |                   |off|on |   |
+majority @ end of time|    70%     |                   |on |on |   |
+--------------------------------------------------------------------
+      Not Used                                                 |off|*
+--------------------------------------------------------------------
+
+DIPSW-B
+--------------------------------------------------------------------
+    DipSwitch Title   |  Function  | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 |
+--------------------------------------------------------------------
+                      | 1cn / 1pl  |off|off|                       |
+        Coinage       | 1cn / 2pl  |on |off|                       |
+                      | 1cn / 3pl  |off|on |                       |*
+                      | 2cn / 3pl  |on |on |                       |
+--------------------------------------------------------------------
+      Not Used                             |off|off|off|           |*
+--------------------------------------------------------------------
+  Competition Mode    | 1Bout 1Win |                   |off|       |*
+                      |3Bouts 2Wins|                   |on |       |
+--------------------------------------------------------------------
+    Demo Sounds       |    Yes     |                   |off|       |*
+                      |     No     |                   |on |       |
+--------------------------------------------------------------------
+       TV Test        |    Game    |                           |off|*
+    (Slide Show)      |    Test    |                           |on |*
+--------------------------------------------------------------------
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -311,21 +359,20 @@ static INPUT_PORTS_START( penky )
 	PORT_DIPSETTING(    0x01, "0:50" )
 	PORT_DIPSETTING(    0x02, "1:00" )
 	PORT_DIPSETTING(    0x03, "1:10" )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW1:3") /* One of these sets/pairs should be diffculty or timer speed */
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW1:4")
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0c, 0x08, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW1:3,4")
+	PORT_DIPSETTING(    0x0c, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Very_Hard ) )
 	PORT_DIPNAME( 0x30, 0x30, "Fill % to Win" )		PORT_DIPLOCATION("SW1:5,6")
 	PORT_DIPSETTING(    0x30, "Majority at Time or 99.9%" )
 	PORT_DIPSETTING(    0x20, "Majority at Time or 90%" )
 	PORT_DIPSETTING(    0x10, "Majority at Time or 85%" )
 	PORT_DIPSETTING(    0x00, "Majority at Time or 80%" )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW1:7")
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW1:7") /* One of these likely disables the nude pics */
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW1:8")
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW1:8") /* One of these likely disables the nude pics */
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
@@ -335,12 +382,8 @@ static INPUT_PORTS_START( penky )
 	PORT_DIPSETTING(    0x01, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW2:3")
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW2:4")
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "SW2:3" )		/* Listed as "Unused" */
+	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "SW2:4" )		/* Listed as "Unused" */
 	PORT_DIPNAME( 0x10, 0x10, "Vs. Matches" )		PORT_DIPLOCATION("SW2:5")
 	PORT_DIPSETTING(    0x00, "2" )
 	PORT_DIPSETTING(    0x10, "3" )
