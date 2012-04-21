@@ -1279,7 +1279,7 @@ void info_xml_creator::output_slots(device_t &device, const char *root_tag)
 				fprintf(m_output, " devname=\"%s\"", xml_normalize_string(dev->shortname()));
 				if (slot->get_default_card(m_drivlist.config(), m_drivlist.options()))
 				{
-					if (slot->get_default_card(m_drivlist.config(), m_drivlist.options()) == intf[i].name)
+					if (strcmp(slot->get_default_card(m_drivlist.config(), m_drivlist.options()),intf[i].name)==0)
 						fprintf(m_output, " default=\"yes\"");
 				}
 				fprintf(m_output, "/>\n");
