@@ -40,13 +40,13 @@ READ8_MEMBER(cchasm_state::cchasm_soundlatch2_r)
 {
 	m_sound_flags &= ~0x80;
 	z80ctc_trg2_w(m_ctc, 0);
-	return soundlatch2_byte_r(*&space, offset);
+	return soundlatch2_byte_r(space, offset);
 }
 
 WRITE8_MEMBER(cchasm_state::cchasm_soundlatch4_w)
 {
 	m_sound_flags |= 0x40;
-	soundlatch4_byte_w(*&space, offset, data);
+	soundlatch4_byte_w(space, offset, data);
 	cputag_set_input_line(machine(), "maincpu", 1, HOLD_LINE);
 }
 
@@ -60,11 +60,11 @@ WRITE16_MEMBER(cchasm_state::cchasm_io_w)
 		switch (offset & 0xf)
 		{
 		case 0:
-			soundlatch_byte_w(*&space, offset, data);
+			soundlatch_byte_w(space, offset, data);
 			break;
 		case 1:
 			m_sound_flags |= 0x80;
-			soundlatch2_byte_w(*&space, offset, data);
+			soundlatch2_byte_w(space, offset, data);
 			z80ctc_trg2_w(m_ctc, 1);
 			cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 			break;
@@ -80,10 +80,10 @@ READ16_MEMBER(cchasm_state::cchasm_io_r)
 	switch (offset & 0xf)
 	{
 	case 0x0:
-		return soundlatch3_byte_r(*&space, offset) << 8;
+		return soundlatch3_byte_r(space, offset) << 8;
 	case 0x1:
 		m_sound_flags &= ~0x40;
-		return soundlatch4_byte_r(*&space,offset) << 8;
+		return soundlatch4_byte_r(space,offset) << 8;
 	case 0x2:
 		return (m_sound_flags| (input_port_read(machine(), "IN3") & 0x07) | 0x08) << 8;
 	case 0x5:

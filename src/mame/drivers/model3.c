@@ -1609,10 +1609,10 @@ READ64_MEMBER(model3_state::model3_rtc_r)
 {
 	UINT64 r = 0;
 	if(ACCESSING_BITS_56_63) {
-		r |= (UINT64)rtc72421_r(*&space, (offset*2)+0, (UINT32)(mem_mask >> 32)) << 32;
+		r |= (UINT64)rtc72421_r(space, (offset*2)+0, (UINT32)(mem_mask >> 32)) << 32;
 	}
 	if(ACCESSING_BITS_24_31) {
-		r |= (UINT64)rtc72421_r(*&space, (offset*2)+1, (UINT32)(mem_mask));
+		r |= (UINT64)rtc72421_r(space, (offset*2)+1, (UINT32)(mem_mask));
 	}
 	return r;
 }
@@ -1620,10 +1620,10 @@ READ64_MEMBER(model3_state::model3_rtc_r)
 WRITE64_MEMBER(model3_state::model3_rtc_w)
 {
 	if(ACCESSING_BITS_56_63) {
-		rtc72421_w(*&space, (offset*2)+0, (UINT32)(data >> 32), (UINT32)(mem_mask >> 32));
+		rtc72421_w(space, (offset*2)+0, (UINT32)(data >> 32), (UINT32)(mem_mask >> 32));
 	}
 	if(ACCESSING_BITS_24_31) {
-		rtc72421_w(*&space, (offset*2)+1, (UINT32)(data), (UINT32)(mem_mask));
+		rtc72421_w(space, (offset*2)+1, (UINT32)(data), (UINT32)(mem_mask));
 	}
 }
 

@@ -325,7 +325,7 @@ static WRITE8_DEVICE_HANDLER( gsword_adpcm_data_w )
 
 WRITE8_MEMBER(gsword_state::adpcm_soundcommand_w)
 {
-	soundlatch_byte_w(*&space, 0, data);
+	soundlatch_byte_w(space, 0, data);
 	cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 

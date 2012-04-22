@@ -1196,7 +1196,7 @@ WRITE8_MEMBER(galaxian_state::kingball_sound1_w)
 WRITE8_MEMBER(galaxian_state::kingball_sound2_w)
 {
 	m_kingball_sound = (m_kingball_sound & ~0x02) | (data << 1);
-	soundlatch_byte_w(*&space, 0, m_kingball_sound | 0xf0);
+	soundlatch_byte_w(space, 0, m_kingball_sound | 0xf0);
 }
 
 
@@ -1272,7 +1272,7 @@ READ8_MEMBER(galaxian_state::jumpbug_protection_r)
 
 WRITE8_MEMBER(galaxian_state::checkman_sound_command_w)
 {
-	soundlatch_byte_w(*&space, 0, data);
+	soundlatch_byte_w(space, 0, data);
 	cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 

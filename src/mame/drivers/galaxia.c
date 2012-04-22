@@ -84,7 +84,7 @@ WRITE8_MEMBER(galaxia_state::galaxia_video_w)
 {
 //  machine().primary_screen->update_partial(machine().primary_screen->vpos());
 	m_bg_tilemap->mark_tile_dirty(offset);
-	cvs_video_or_color_ram_w(*&space, offset, data);
+	cvs_video_or_color_ram_w(space, offset, data);
 }
 
 WRITE8_MEMBER(galaxia_state::galaxia_scroll_w)

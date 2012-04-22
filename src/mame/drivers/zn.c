@@ -699,7 +699,7 @@ static INTERRUPT_GEN( qsound_interrupt )
 
 WRITE32_MEMBER(zn_state::zn_qsound_w)
 {
-	soundlatch_byte_w(*&space, 0, data);
+	soundlatch_byte_w(space, 0, data);
 	cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -1678,7 +1678,7 @@ WRITE32_MEMBER(zn_state::coh1002e_latch_w)
 	if (offset)
 		cputag_set_input_line(machine(), "audiocpu", 2, HOLD_LINE);	// irq 2 on the 68k
 	else
-		soundlatch_byte_w(*&space, 0, data);
+		soundlatch_byte_w(space, 0, data);
 }
 
 static DRIVER_INIT( coh1002e )
@@ -2557,7 +2557,7 @@ READ32_MEMBER(zn_state::cbaj_z80_r)
 
 	ready = m_cbaj_to_r3k;
 	m_cbaj_to_r3k &= ~2;
-	return soundlatch2_byte_r(*&space,0) | ready<<24;
+	return soundlatch2_byte_r(space,0) | ready<<24;
 }
 
 WRITE32_MEMBER(zn_state::cbaj_z80_w)
@@ -2595,7 +2595,7 @@ WRITE8_MEMBER(zn_state::cbaj_z80_latch_w)
 {
 
 	m_cbaj_to_r3k |= 2;
-	soundlatch2_byte_w(*&space, 0, data);
+	soundlatch2_byte_w(space, 0, data);
 }
 
 READ8_MEMBER(zn_state::cbaj_z80_ready_r)

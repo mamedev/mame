@@ -1503,11 +1503,11 @@ WRITE16_MEMBER(seta_state::sub_ctrl_w)
 			break;
 
 		case 4/2:	// not sure
-			if (ACCESSING_BITS_0_7)	soundlatch_byte_w(*&space, 0, data & 0xff);
+			if (ACCESSING_BITS_0_7)	soundlatch_byte_w(space, 0, data & 0xff);
 			break;
 
 		case 6/2:	// not sure
-			if (ACCESSING_BITS_0_7)	soundlatch2_byte_w(*&space, 0, data & 0xff);
+			if (ACCESSING_BITS_0_7)	soundlatch2_byte_w(space, 0, data & 0xff);
 			break;
 	}
 
@@ -1653,7 +1653,7 @@ WRITE16_MEMBER(seta_state::calibr50_soundlatch_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		soundlatch_word_w(*&space, 0, data, mem_mask);
+		soundlatch_word_w(space, 0, data, mem_mask);
 		cputag_set_input_line(machine(), "sub", INPUT_LINE_NMI, PULSE_LINE);
 		device_spin_until_time(&space.device(), attotime::from_usec(50));	// Allow the other cpu to reply
 	}
@@ -2448,7 +2448,7 @@ WRITE16_MEMBER(seta_state::msgundam_vregs_w)
 		case 1:	offset = 2;	break;
 		case 2:	offset = 1;	break;
 	}
-	seta_vregs_w(*&space,offset,data,mem_mask);
+	seta_vregs_w(space,offset,data,mem_mask);
 }
 
 /* Mirror RAM is necessary or startup, to clear Work RAM after the test */
@@ -2738,7 +2738,7 @@ WRITE16_MEMBER(seta_state::utoukond_soundlatch_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		cputag_set_input_line(machine(), "audiocpu", 0, HOLD_LINE);
-		soundlatch_byte_w(*&space, 0, data & 0xff);
+		soundlatch_byte_w(space, 0, data & 0xff);
 	}
 }
 

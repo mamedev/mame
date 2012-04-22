@@ -405,7 +405,7 @@ WRITE16_MEMBER(seta2_state::reelquak_leds_w)
 	}
 	if (ACCESSING_BITS_8_15)
 	{
-		machine().device<ticket_dispenser_device>("ticket")->write(*&space, 0, (data & 0x0100) >> 1);	// ticket dispenser
+		machine().device<ticket_dispenser_device>("ticket")->write(space, 0, (data & 0x0100) >> 1);	// ticket dispenser
 	}
 
 //  popmessage("LED %04X", data);

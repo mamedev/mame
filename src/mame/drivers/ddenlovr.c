@@ -2090,7 +2090,7 @@ WRITE8_MEMBER(dynax_state::mmpanic_rombank_w)
 WRITE8_MEMBER(dynax_state::mmpanic_soundlatch_w)
 {
 
-	soundlatch_byte_w(*&space, 0, data);
+	soundlatch_byte_w(space, 0, data);
 	device_set_input_line(m_soundcpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 

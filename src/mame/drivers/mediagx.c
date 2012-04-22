@@ -461,7 +461,7 @@ WRITE32_MEMBER(mediagx_state::memory_ctrl_w)
 		else if((m_disp_ctrl_reg[DC_GENERAL_CFG] & 0x00f00000) == 0x00000000)
 		{
 			m_pal_index = data;
-			ramdac->index_w( *&space, 0, data );
+			ramdac->index_w( space, 0, data );
 		}
 		else if((m_disp_ctrl_reg[DC_GENERAL_CFG] & 0x00f00000) == 0x00100000)
 		{
@@ -471,7 +471,7 @@ WRITE32_MEMBER(mediagx_state::memory_ctrl_w)
 			{
 				m_pal_index = 0;
 			}
-			ramdac->pal_w( *&space, 0, data );
+			ramdac->pal_w( space, 0, data );
 		}
 	}
 	else

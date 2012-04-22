@@ -310,7 +310,7 @@ WRITE8_MEMBER(ddragon_state::ddragon_interrupt_w)
 			break;
 
 		case 3: /* 380e - SND irq */
-			soundlatch_byte_w(*&space, 0, data);
+			soundlatch_byte_w(space, 0, data);
 			device_set_input_line(m_snd_cpu, m_sound_irq, (m_sound_irq == INPUT_LINE_NMI) ? PULSE_LINE : HOLD_LINE);
 			break;
 

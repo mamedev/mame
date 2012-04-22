@@ -462,32 +462,32 @@ static SOUND_RESET( mario )
 
 READ8_MEMBER(mario_state::mario_sh_p1_r)
 {
-	return I8035_P1_R(*&space);
+	return I8035_P1_R(space);
 }
 
 READ8_MEMBER(mario_state::mario_sh_p2_r)
 {
-	return I8035_P2_R(*&space) & 0xEF; /* Bit 4 connected to GND! */
+	return I8035_P2_R(space) & 0xEF; /* Bit 4 connected to GND! */
 }
 
 READ8_MEMBER(mario_state::mario_sh_t0_r)
 {
-	return I8035_T_R(*&space, 0);
+	return I8035_T_R(space, 0);
 }
 
 READ8_MEMBER(mario_state::mario_sh_t1_r)
 {
-	return I8035_T_R(*&space, 1);
+	return I8035_T_R(space, 1);
 }
 
 READ8_MEMBER(mario_state::mario_sh_tune_r)
 {
 	UINT8 *SND = memregion("audiocpu")->base();
 	UINT16 mask = memregion("audiocpu")->bytes()-1;
-	UINT8 p2 = I8035_P2_R(*&space);
+	UINT8 p2 = I8035_P2_R(space);
 
 	if ((p2 >> 7) & 1)
-		return soundlatch_byte_r(*&space, offset);
+		return soundlatch_byte_r(space, offset);
 	else
 		return (SND[(0x1000 + (p2 & 0x0f) * 256 + offset) & mask]);
 }
@@ -499,13 +499,13 @@ static WRITE8_DEVICE_HANDLER( mario_sh_sound_w )
 
 WRITE8_MEMBER(mario_state::mario_sh_p1_w)
 {
-	I8035_P1_W(*&space, data);
+	I8035_P1_W(space, data);
 }
 
 WRITE8_MEMBER(mario_state::mario_sh_p2_w)
 {
 	mario_state	*state = machine().driver_data<mario_state>();
-	I8035_P2_W(*&space, data);
+	I8035_P2_W(space, data);
 }
 
 /****************************************************************
@@ -528,7 +528,7 @@ WRITE8_MEMBER(mario_state::masao_sh_irqtrigger_w)
 
 WRITE8_MEMBER(mario_state::mario_sh_tuneselect_w)
 {
-	soundlatch_byte_w(*&space, offset, data);
+	soundlatch_byte_w(space, offset, data);
 }
 
 /* Sound 0 and 1 are pulsed !*/
@@ -558,22 +558,22 @@ WRITE8_MEMBER(mario_state::mario_sh3_w)
 				cputag_set_input_line(machine(), "audiocpu",0,CLEAR_LINE);
 			break;
 		case 1: /* get coin */
-			I8035_T_W_AH(*&space, 0,data & 1);
+			I8035_T_W_AH(space, 0,data & 1);
 			break;
 		case 2: /* ice */
-			I8035_T_W_AH(*&space, 1, data & 1);
+			I8035_T_W_AH(space, 1, data & 1);
 			break;
 		case 3: /* crab */
-			I8035_P1_W_AH(*&space, 0, data & 1);
+			I8035_P1_W_AH(space, 0, data & 1);
 			break;
 		case 4: /* turtle */
-			I8035_P1_W_AH(*&space, 1, data & 1);
+			I8035_P1_W_AH(space, 1, data & 1);
 			break;
 		case 5: /* fly */
-			I8035_P1_W_AH(*&space, 2, data & 1);
+			I8035_P1_W_AH(space, 2, data & 1);
 			break;
 		case 6: /* coin */
-			I8035_P1_W_AH(*&space, 3, data & 1);
+			I8035_P1_W_AH(space, 3, data & 1);
 			break;
 		case 7: /* skid */
 			discrete_sound_w(machine().device("discrete"), DS_SOUND7_INP, data & 1);

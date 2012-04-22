@@ -19,7 +19,7 @@ WRITE16_MEMBER(aztarac_state::aztarac_sound_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		data &= 0xff;
-		soundlatch_byte_w(*&space, offset, data);
+		soundlatch_byte_w(space, offset, data);
 		m_sound_status ^= 0x21;
 		if (m_sound_status & 0x20)
 			cputag_set_input_line(machine(), "audiocpu", 0, HOLD_LINE);
@@ -30,7 +30,7 @@ READ8_MEMBER(aztarac_state::aztarac_snd_command_r)
 {
     m_sound_status |= 0x01;
     m_sound_status &= ~0x20;
-    return soundlatch_byte_r(*&space,offset);
+    return soundlatch_byte_r(space,offset);
 }
 
 READ8_MEMBER(aztarac_state::aztarac_snd_status_r)
