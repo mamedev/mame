@@ -2718,8 +2718,14 @@ void ui_menu_select_game::custom_render(void *selectedref, float top, float bott
 			if (!(*s == 0 || *s == '\n'))
 				tempbuf[line].cat(*s);
 
-			if (*s != 0)
+			if (*s == '\n')
+			{
+				line++;
 				s++;
+			} else if (*s != 0)
+				s++;
+			else
+				line++;
 		}
 	}
 
