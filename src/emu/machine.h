@@ -154,7 +154,6 @@ class osd_interface;
 
 typedef struct _palette_private palette_private;
 typedef struct _romload_private romload_private;
-typedef struct _input_port_private input_port_private;
 typedef struct _ui_input_private ui_input_private;
 typedef struct _debugcpu_private debugcpu_private;
 typedef struct _generic_machine_private generic_machine_private;
@@ -222,6 +221,7 @@ public:
 	device_scheduler &scheduler() { return m_scheduler; }
 	save_manager &save() { return m_save; }
 	memory_manager &memory() { return m_memory; }
+	ioport_manager &ioport() { return m_ioport; }
 	cheat_manager &cheat() const { assert(m_cheat != NULL); return *m_cheat; }
 	render_manager &render() const { assert(m_render != NULL); return *m_render; }
 	input_manager &input() const { assert(m_input != NULL); return *m_input; }
@@ -250,7 +250,6 @@ public:
 	// fetch items by name
 	inline device_t *device(const char *tag) { return root_device().subdevice(tag); }
 	template<class _DeviceClass> inline _DeviceClass *device(const char *tag) { return downcast<_DeviceClass *>(device(tag)); }
-	inline const input_port_config *port(const char *tag);
 
 	// configuration helpers
 	device_t &add_dynamic_device(device_t &owner, device_type type, const char *tag, UINT32 clock);
@@ -287,9 +286,6 @@ public:
 	UINT32 rand();
 	const char *describe_context();
 
-	// internals
-	ioport_list				m_portlist;			// points to a list of input port configurations
-
 	// CPU information
 	cpu_device *			firstcpu;			// first CPU
 
@@ -310,7 +306,6 @@ public:
 	// internal core information
 	palette_private *		palette_data;		// internal data from palette.c
 	romload_private *		romload_data;		// internal data from romload.c
-	input_port_private *	input_port_data;	// internal data from inptport.c
 	ui_input_private *		ui_input_data;		// internal data from uiinput.c
 	debugcpu_private *		debugcpu_data;		// internal data from debugcpu.c
 	generic_machine_private *generic_machine_data; // internal data from machine/generic.c
@@ -418,25 +413,9 @@ private:
 	// embedded managers and objects
 	save_manager			m_save;					// save manager
 	memory_manager			m_memory;				// memory manager
+	ioport_manager			m_ioport;				// I/O port manager
 	device_scheduler		m_scheduler;			// scheduler object
 };
-
-
-
-//**************************************************************************
-//  INLINE FUNCTIONS
-//**************************************************************************
-
-inline const input_port_config *running_machine::port(const char *tag)
-{
-	// if tag begins with a :, it's absolute
-	if (tag[0] == ':')
-		return m_portlist.find(tag);
-
-	// otherwise, compute it relative to the root device
-	astring fulltag;
-	return m_portlist.find(root_device().subtag(fulltag, tag).cstr());
-}
 
 
 #endif	/* __MACHINE_H__ */

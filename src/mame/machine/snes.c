@@ -577,7 +577,7 @@ READ8_HANDLER( snes_r_io )
 
 		case 0x4100:		/* NSS Dip-Switches */
 			{
-				const input_port_config *port = space->machine().port("DSW");
+				const input_port_config *port = state->ioport("DSW");
 				if (port != NULL)
 					return input_port_read(space->machine(), "DSW");
 				else

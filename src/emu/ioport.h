@@ -664,7 +664,7 @@ typedef struct _input_field_state input_field_state;
 /* forward declarations */
 class input_port_config;
 class input_field_config;
-
+class emu_timer;
 
 /* template specializations */
 typedef tagged_list<input_port_config> ioport_list;
@@ -889,6 +889,86 @@ struct _inp_header
 	char						version[32];	/* +20: system version string, NULL-terminated */
 };
 
+
+struct digital_joystick_state
+{
+	const input_field_config *	field[4];			/* input field for up, down, left, right respectively */
+	UINT8						inuse;				/* is this joystick used? */
+	UINT8						current;			/* current value */
+	UINT8						current4way;		/* current 4-way value */
+	UINT8						previous;			/* previous value */
+};
+
+#define DIGITAL_JOYSTICKS_PER_PLAYER	3
+
+#define NUM_SIMUL_KEYS	(UCHAR_SHIFT_END - UCHAR_SHIFT_BEGIN + 1)
+struct inputx_code
+{
+	unicode_char ch;
+	const input_field_config * field[NUM_SIMUL_KEYS];
+};
+
+struct key_buffer
+{
+	int begin_pos;
+	int end_pos;
+	unsigned int status_keydown : 1;
+	int size;
+	unicode_char *buffer;
+};
+
+/* private input port state */
+class ioport_manager
+{
+	friend class device_t;
+
+public:
+	// construction/destruction
+	ioport_manager(running_machine &machine);
+	time_t initialize();
+	
+	// getters
+	running_machine &machine() const { return m_machine; }
+	input_port_config *first_port() const { return m_portlist.first(); }
+
+	/* global state */
+	UINT8						safe_to_read;		/* clear at start; set after state is loaded */
+
+	/* types */
+	simple_list<input_type_entry> typelist;		/* list of live type states */
+	input_type_entry *			type_to_entry[__ipt_max][MAX_PLAYERS]; /* map from type/player to type state */
+
+	/* specific special global input states */
+	digital_joystick_state		joystick_info[MAX_PLAYERS][DIGITAL_JOYSTICKS_PER_PLAYER]; /* joystick states */
+
+	/* frame time tracking */
+	attotime					last_frame_time;	/* time of the last frame callback */
+	attoseconds_t				last_delta_nsec;	/* nanoseconds that passed since the previous callback */
+
+	/* playback/record information */
+	emu_file *					record_file;		/* recording file (NULL if not recording) */
+	emu_file *					playback_file;		/* playback file (NULL if not recording) */
+	UINT64						playback_accumulated_speed;/* accumulated speed during playback */
+	UINT32						playback_accumulated_frames;/* accumulated frames during playback */
+
+	/* inputx */
+	inputx_code *codes;
+	key_buffer keybuffer;
+	emu_timer *inputx_timer;
+	int (*queue_chars)(running_machine &machine, const unicode_char *text, size_t text_len);
+	int (*accept_char)(running_machine &machine, unicode_char ch);
+	int (*charqueue_empty)(running_machine &machine);
+	attotime current_rate;
+
+private:
+	input_port_config *port(const char *tag) const { return m_portlist.find(tag); }
+
+	// internals
+	ioport_list				m_portlist;			// points to a list of input port configurations
+
+	// internal state
+	running_machine &		m_machine;
+};
 
 
 /***************************************************************************
@@ -1238,13 +1318,6 @@ ATTR_COLD void INPUT_PORTS_NAME(_name)(device_t &owner, ioport_list &portlist, a
 /***************************************************************************
     FUNCTION PROTOTYPES
 ***************************************************************************/
-
-
-/* ----- core system management ----- */
-
-/* initialize the input ports, processing the given token list */
-time_t input_port_init(running_machine &machine);
-
 
 
 /* ----- port configurations ----- */

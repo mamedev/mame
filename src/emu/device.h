@@ -186,6 +186,7 @@ public:
 	memory_region *memregion(const char *tag) const;
 	memory_share *memshare(const char *tag) const;
 	memory_bank *membank(const char *tag) const;
+	input_port_config *ioport(const char *tag) const;
 	device_t *subdevice(const char *tag) const;
 	device_t *siblingdevice(const char *tag) const;
 	template<class _DeviceClass> inline _DeviceClass *subdevice(const char *tag) const { return downcast<_DeviceClass *>(subdevice(tag)); }
@@ -241,6 +242,9 @@ protected:
 	template<bool _Required> class memory_bank_finder;
 	class optional_memory_bank;
 	class required_memory_bank;
+	template<bool _Required> class ioport_finder;
+	class optional_ioport;
+	class required_ioport;
 	template<typename _PointerType, bool _Required> class shared_ptr_finder;
 	template<typename _PointerType> class optional_shared_ptr;
 	template<typename _PointerType> class required_shared_ptr;
@@ -489,6 +493,40 @@ class device_t::required_memory_bank : public device_t::memory_bank_finder<true>
 {
 public:
 	required_memory_bank(device_t &base, const char *tag) : memory_bank_finder<true>(base, tag) { }
+};
+
+
+// ======================> ioport_finder
+
+// device finder template
+template<bool _Required>
+class device_t::ioport_finder : public device_t::object_finder_base<input_port_config>
+{
+public:
+	// construction/destruction
+	ioport_finder(device_t &base, const char *tag)
+		: object_finder_base(base, tag) { }
+
+	// finder
+	virtual bool findit()
+	{
+		m_target = m_base.ioport(m_tag);
+		return this->report_missing(m_target != NULL, "I/O port", _Required);
+	}
+};
+
+// optional device finder
+class device_t::optional_ioport : public device_t::ioport_finder<false>
+{
+public:
+	optional_ioport(device_t &base, const char *tag) : ioport_finder<false>(base, tag) { }
+};
+
+// required devices are similar but throw an error if they are not found
+class device_t::required_ioport : public device_t::ioport_finder<true>
+{
+public:
+	required_ioport(device_t &base, const char *tag) : ioport_finder<true>(base, tag) { }
 };
 
 

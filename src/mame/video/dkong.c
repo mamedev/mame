@@ -883,7 +883,7 @@ static void check_palette(running_machine &machine)
 	const input_port_config *port;
 	int newset;
 
-	port = machine.port("VIDHW");
+	port = state->ioport("VIDHW");
 	if (port != NULL)
 	{
 		newset = input_port_read_direct(port);

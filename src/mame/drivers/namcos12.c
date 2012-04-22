@@ -1573,7 +1573,7 @@ WRITE8_MEMBER(namcos12_state::s12_mcu_settings_w)
 
 READ8_MEMBER(namcos12_state::s12_mcu_gun_h_r)
 {
-	const input_port_config *port = machine().port("LIGHT0_X");
+	const input_port_config *port = ioport("LIGHT0_X");
 	if( port != NULL )
 	{
 		int rv = input_port_read_direct( port ) << 6;
@@ -1592,7 +1592,7 @@ READ8_MEMBER(namcos12_state::s12_mcu_gun_h_r)
 
 READ8_MEMBER(namcos12_state::s12_mcu_gun_v_r)
 {
-	const input_port_config *port = machine().port("LIGHT0_Y");
+	const input_port_config *port = ioport("LIGHT0_Y");
 	if( port != NULL )
 	{
 		int rv = input_port_read_direct( port ) << 6;

@@ -83,7 +83,7 @@ public:
 const input_port_config *devcb_resolver::resolve_port(const char *tag, device_t &current)
 {
 	astring fullname;
-	const input_port_config *result = current.machine().port(current.siblingtag(fullname, tag));
+	const input_port_config *result = current.ioport(current.siblingtag(fullname, tag));
 	if (result == NULL)
 		throw emu_fatalerror("Unable to find input port '%s' (requested by %s '%s')", fullname.cstr(), current.name(), current.tag());
 	return result;

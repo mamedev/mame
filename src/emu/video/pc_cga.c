@@ -299,7 +299,7 @@ static int internal_pc_cga_video_start(running_machine &machine)
 	state_save_register_item(machine, "pccga", NULL, 0, cga.status);
 	state_save_register_item(machine, "pccga", NULL, 0, cga.plantronics);
 
-	cga.config_input_port = machine.m_portlist.find(":pcvideo_cga_config" );
+	cga.config_input_port = machine.root_device().ioport(":pcvideo_cga_config" );
 
 	return 0;
 }

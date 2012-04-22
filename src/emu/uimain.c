@@ -116,7 +116,7 @@ void ui_menu_main::populate()
 	int has_dips = false;
 	astring menu_text;
 	/* scan the input port array to see what options we need to enable */
-	for (port = machine().m_portlist.first(); port != NULL; port = port->next())
+	for (port = machine().ioport().first_port(); port != NULL; port = port->next())
 		for (field = port->fieldlist().first(); field != NULL; field = field->next())
 		{
 			if (field->type == IPT_DIPSWITCH)
@@ -651,7 +651,7 @@ void ui_menu_input_specific::populate()
 	suborder[SEQ_TYPE_INCREMENT] = 2;
 
 	/* iterate over the input ports and add menu items */
-	for (port = machine().m_portlist.first(); port != NULL; port = port->next())
+	for (port = machine().ioport().first_port(); port != NULL; port = port->next())
 		for (field = port->fieldlist().first(); field != NULL; field = field->next())
 		{
 			const char *name = input_field_name(field);
@@ -1020,7 +1020,7 @@ void ui_menu_settings::populate()
 	diplist_tailptr = &diplist;
 
 	/* loop over input ports and set up the current values */
-	for (port = machine().m_portlist.first(); port != NULL; port = port->next())
+	for (port = machine().ioport().first_port(); port != NULL; port = port->next())
 		for (field = port->fieldlist().first(); field != NULL; field = field->next())
 			if (field->type == type && input_condition_true(machine(), &field->condition, port->owner()))
 			{
@@ -1276,7 +1276,7 @@ void ui_menu_analog::populate()
 	astring text;
 
 	/* loop over input ports and add the items */
-	for (port = machine().m_portlist.first(); port != NULL; port = port->next())
+	for (port = machine().ioport().first_port(); port != NULL; port = port->next())
 		for (field = port->fieldlist().first(); field != NULL; field = field->next())
 			if (input_type_is_analog(field->type) && input_condition_true(machine(), &field->condition, port->owner()))
 			{

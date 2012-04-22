@@ -336,7 +336,7 @@ void at_keyboard_init(running_machine &machine, AT_KEYBOARD_TYPE type)
 	{
 		astring buf;
 		buf.printf("pc_keyboard_%d", i);
-		keyboard.ports[i] = machine.port(buf);
+		keyboard.ports[i] = machine.root_device().ioport(buf);
 	}
 
 	inputx_setup_natural_keyboard(machine,

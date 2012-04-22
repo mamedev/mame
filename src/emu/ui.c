@@ -1668,7 +1668,7 @@ static slider_state *slider_init(running_machine &machine)
 	}
 
 	/* add analog adjusters */
-	for (port = machine.m_portlist.first(); port != NULL; port = port->next())
+	for (port = machine.ioport().first_port(); port != NULL; port = port->next())
 		for (field = port->fieldlist().first(); field != NULL; field = field->next())
 			if (field->type == IPT_ADJUSTER)
 			{
@@ -1774,7 +1774,7 @@ static slider_state *slider_init(running_machine &machine)
 
 #ifdef MAME_DEBUG
 	/* add crosshair adjusters */
-	for (port = machine.m_portlist.first(); port != NULL; port = port->next())
+	for (port = machine.ioport().first_port(); port != NULL; port = port->next())
 		for (field = port->fieldlist().first(); field != NULL; field = field->next())
 			if (field->crossaxis != CROSSHAIR_AXIS_NONE && field->player == 0)
 			{

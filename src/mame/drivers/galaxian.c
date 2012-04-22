@@ -2813,7 +2813,7 @@ static DRIVER_INIT( gmgalax )
 	machine.root_device().membank("bank1")->configure_entries(0, 2, state->memregion("maincpu")->base() + 0x10000, 0x4000);
 
 	/* callback when the game select is toggled */
-	state->gmgalax_game_changed(*machine.m_portlist.first()->fieldlist().first(), NULL, 0, 0);
+	state->gmgalax_game_changed(*machine.ioport().first_port()->fieldlist().first(), NULL, 0, 0);
 	state_save_register_global(machine, state->m_gmgalax_selected_game);
 }
 

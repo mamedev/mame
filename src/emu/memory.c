@@ -2323,8 +2323,7 @@ void address_space::install_readwrite_port(offs_t addrstart, offs_t addrend, off
 	{
 		// find the port
 		astring fulltag;
-		device().siblingtag(fulltag, rtag);
-		const input_port_config *port = machine().port(fulltag);
+		input_port_config *port = machine().root_device().ioport(device().siblingtag(fulltag, rtag));
 		if (port == NULL)
 			throw emu_fatalerror("Attempted to map non-existent port '%s' for read in space %s of device '%s'\n", rtag, m_name, m_device.tag());
 
@@ -2336,8 +2335,7 @@ void address_space::install_readwrite_port(offs_t addrstart, offs_t addrend, off
 	{
 		// find the port
 		astring fulltag;
-		device().siblingtag(fulltag, wtag);
-		const input_port_config *port = machine().port(fulltag);
+		input_port_config *port = machine().root_device().ioport(device().siblingtag(fulltag, wtag));
 		if (port == NULL)
 			fatalerror("Attempted to map non-existent port '%s' for write in space %s of device '%s'\n", wtag, m_name, m_device.tag());
 

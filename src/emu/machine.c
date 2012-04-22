@@ -142,7 +142,6 @@ running_machine::running_machine(const machine_config &_config, osd_interface &o
 	  debug_flags(0),
 	  palette_data(NULL),
 	  romload_data(NULL),
-	  input_port_data(NULL),
 	  ui_input_data(NULL),
 	  debugcpu_data(NULL),
 	  generic_machine_data(NULL),
@@ -176,6 +175,7 @@ running_machine::running_machine(const machine_config &_config, osd_interface &o
 
 	  m_save(*this),
 	  m_memory(*this),
+	  m_ioport(*this),
 	  m_scheduler(*this)
 {
 	memset(gfx, 0, sizeof(gfx));
@@ -263,7 +263,7 @@ void running_machine::start()
 	// initialize the input system and input ports for the game
 	// this must be done before memory_init in order to allow specifying
 	// callbacks based on input port tags
-	time_t newbase = input_port_init(*this);
+	time_t newbase = m_ioport.initialize();
 	if (newbase != 0)
 		m_base_time = newbase;
 
