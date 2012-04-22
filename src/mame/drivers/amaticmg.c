@@ -724,7 +724,9 @@ MACHINE_CONFIG_END
 ************************************/
 
 ROM_START( am_uslot )
-	ROM_REGION( 0x40000, "maincpu", 0 )	/* encrypted program ROM...*/
+	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x20000, "mainprg", 0 )	/* encrypted program ROM...*/
 	ROM_LOAD( "u3.bin",  0x00000, 0x20000, CRC(29bf4a95) SHA1(a73873f7cd1fdf5accc3e79f4619949f261400b8) )
 
 	ROM_REGION( 0x30000, "gfx1", 0 )
@@ -772,7 +774,7 @@ ROM_END
 *       Driver Initialization       *
 ************************************/
 
-static void encf(UINT8 ciphertext, int address, UINT8& plaintext, int& newaddress)
+static void encf(UINT8 ciphertext, int address, UINT8 &plaintext, int &newaddress)
 {
 	int aux = address & 0xfff;
 	aux = aux ^ (aux>>6);
@@ -786,15 +788,8 @@ static void encf(UINT8 ciphertext, int address, UINT8& plaintext, int& newaddres
 	newaddress = (address & ~0xfff) | aux;
 }
 
-static DRIVER_INIT( amaticmg )
+static void decrypt(running_machine &machine, int key1, int key2)
 {
-
-}
-
-static DRIVER_INIT( amaticmg3 )
-{
-	const int key1 = 0x426;
-	const int key2 = 0x55;
 	UINT8 plaintext;
 	int newaddress;
 	
@@ -807,6 +802,16 @@ static DRIVER_INIT( amaticmg3 )
 		encf(src[i], i, plaintext, newaddress);
 		dest[newaddress^key1] = plaintext^key2;
 	}
+}
+
+static DRIVER_INIT( amaticmg )
+{
+	decrypt(machine, 0x4c2, 0xf5);
+}
+
+static DRIVER_INIT( amaticmg3 )
+{
+	decrypt(machine, 0x426, 0x55);
 }
 
 
