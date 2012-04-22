@@ -324,7 +324,7 @@ bool cassette_image_device::call_load()
 	/* reset the position */
 	m_position = 0.0;
 	m_position_time = device().machine().time().as_double();
-	
+
 	/* default channel to 0, speed multiplier to 1 */
 	m_channel = 0;
 	m_speed = 1;

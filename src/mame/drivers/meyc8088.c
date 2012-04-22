@@ -5,7 +5,7 @@
   i8088 CPU @ 5MHz (15MHz XTAL + i8284A clock generator),
   3 x 8KB EPROM (max 4), 3 x 8KB RAM (max 4), 2KB battery RAM,
   2 x i8155, optional i8251A + RS232 for factory debug
-  
+
   driver by MAME team
   also thanks to Darrell Hal Smith, Kevin Mullins
 
@@ -28,10 +28,10 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<UINT8> m_vram;
-	
+
 	UINT8 m_status;
 	UINT8 m_common;
-	
+
 	DECLARE_WRITE8_MEMBER(drive_w);
 	DECLARE_WRITE8_MEMBER(video5_flip_w);
 	DECLARE_READ8_MEMBER(video5_flip_r);
@@ -114,8 +114,8 @@ static ADDRESS_MAP_START( meyc8088_map, AS_PROGRAM, 8, meyc8088_state )
 	AM_RANGE(0xb1000, 0xb10ff) AM_DEVREADWRITE("i8155_1", i8155_device, memory_r, memory_w)
 	AM_RANGE(0xb1800, 0xb1807) AM_DEVREADWRITE("i8155_1", i8155_device, io_r, io_w)
 	AM_RANGE(0xb2000, 0xb2000) AM_WRITE(drive_w)
-//	AM_RANGE(0xb3000, 0xb3000) AM_NOP // 8251A, debug related
-//	AM_RANGE(0xb3800, 0xb3800) AM_NOP // "
+//  AM_RANGE(0xb3000, 0xb3000) AM_NOP // 8251A, debug related
+//  AM_RANGE(0xb3800, 0xb3800) AM_NOP // "
 	AM_RANGE(0xb4000, 0xb4000) AM_READWRITE(screen_flip_r, screen_flip_w)
 	AM_RANGE(0xb5000, 0xb5000) AM_READWRITE(video5_flip_r, video5_flip_w)
 	AM_RANGE(0xf8000, 0xfffff) AM_ROM
@@ -142,10 +142,10 @@ static WRITE8_DEVICE_HANDLER(meyc8088_common_w)
 
 	// d0: /CR2
 	state->m_status = (state->m_status & ~1) | (data & 1);
-	
+
 	// d1: battery on
 	state->m_status = (state->m_status & ~0x10) | (data << 3 & 0x10);
-	
+
 	// d2-d5: /common
 	state->m_common = data >> 2 & 0xf;
 
@@ -168,7 +168,7 @@ static WRITE_LINE_DEVICE_HANDLER(meyc8088_i8155_2_timer_out)
 static READ8_DEVICE_HANDLER(meyc8088_status_r)
 {
 	meyc8088_state *state = device->machine().driver_data<meyc8088_state>();
-	
+
 	// d0: /CR2
 	// d1: screen on
 	// d2: video5

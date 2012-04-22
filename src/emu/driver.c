@@ -278,7 +278,7 @@ void driver_device::device_start()
 		m_callbacks[CB_VIDEO_START]();
 	else
 		video_start();
-	
+
 	// save generic states
 	save_item(NAME(m_flip_screen_x));
 	save_item(NAME(m_flip_screen_y));
@@ -447,7 +447,7 @@ READ32_MEMBER( driver_device::watchdog_reset32_r ) { machine().watchdog_reset();
 //**************************************************************************
 
 //-------------------------------------------------
-//  soundlatch_sync_callback - time-delayed 
+//  soundlatch_sync_callback - time-delayed
 //  callback to set a latch value
 //-------------------------------------------------
 
@@ -486,7 +486,7 @@ WRITE16_MEMBER( driver_device::soundlatch4_word_w ) { machine().scheduler().sync
 //  reading from sound latches
 //-------------------------------------------------
 
-READ8_MEMBER( driver_device::soundlatch_byte_r ) 		{ return m_latched_value[0]; }
+READ8_MEMBER( driver_device::soundlatch_byte_r )		{ return m_latched_value[0]; }
 READ16_MEMBER( driver_device::soundlatch_word_r )   { return m_latched_value[0]; }
 READ8_MEMBER( driver_device::soundlatch2_byte_r )		{ return m_latched_value[1]; }
 READ16_MEMBER( driver_device::soundlatch2_word_r )  { return m_latched_value[1]; }
@@ -591,7 +591,7 @@ void driver_device::flip_screen_x_set(UINT32 on)
 	// normalize to all 1
 	if (on)
 		on = ~0;
-	
+
 	// if something's changed, handle it
 	if (m_flip_screen_x != on)
 	{
@@ -610,7 +610,7 @@ void driver_device::flip_screen_y_set(UINT32 on)
 	// normalize to all 1
 	if (on)
 		on = ~0;
-	
+
 	// if something's changed, handle it
 	if (m_flip_screen_y != on)
 	{

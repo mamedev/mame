@@ -9,7 +9,7 @@ public:
 
 	int mux_port;
 	UINT32 m_st0016_rom_bank;
-	
+
 	required_device<cpu_device> m_maincpu;
 	DECLARE_READ8_MEMBER(mux_r);
 	DECLARE_WRITE8_MEMBER(mux_select_w);

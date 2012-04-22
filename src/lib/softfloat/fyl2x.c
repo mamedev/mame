@@ -161,7 +161,7 @@ static const float128 float128_two =
 static const float128 float128_ln2inv2 =
     packFloat_128(U64(0x400071547652b82f), U64(0xe1777d0ffda0d23a));
 
-#define SQRT2_HALF_SIG 	U64(0xb504f333f9de6484)
+#define SQRT2_HALF_SIG	U64(0xb504f333f9de6484)
 
 extern float128 OddPoly(float128 x, float128 *arr, unsigned n);
 
@@ -277,7 +277,7 @@ static floatx80 fyl2x(floatx80 a, floatx80 b)
 invalid:
 			float_raise(float_flag_invalid);
 			return floatx80_default_nan;
-       	}
+    	}
         else {
             if (bExp == 0) {
                 if (bSig == 0) goto invalid;
@@ -391,7 +391,7 @@ floatx80 fyl2xp1(floatx80 a, floatx80 b)
 invalid:
 			float_raise(float_flag_invalid);
 			return floatx80_default_nan;
-       	}
+    	}
          else {
             if (bExp == 0) {
                 if (bSig == 0) goto invalid;

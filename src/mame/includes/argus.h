@@ -20,9 +20,9 @@ public:
 	required_shared_ptr<UINT8> m_paletteram;
 	optional_shared_ptr<UINT8> m_txram;
 	optional_shared_ptr<UINT8> m_bg1ram;
-	required_shared_ptr<UINT8> m_spriteram;	
+	required_shared_ptr<UINT8> m_spriteram;
 	optional_shared_ptr<UINT8> m_butasan_bg1ram;
-	
+
 	UINT8 *m_dummy_bg0ram;
 	UINT8 *m_butasan_txram;
 	UINT8 *m_butasan_bg0ram;

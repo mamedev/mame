@@ -45,7 +45,7 @@ public:
 		m_shrike_shared(*this, "shrike_shared"){ }
 
 	required_device<timer_device> m_scanline_timer;
-		
+
 	/* global data */
 	UINT8 m_shooter;
 	UINT8 m_shooter_x;
@@ -124,9 +124,9 @@ public:
 	UINT8 *m_sprite_bank[2];
 
 	UINT8 m_palettebank_vis;
-	
+
 	required_shared_ptr<UINT8> m_spriteram;
-	required_shared_ptr<UINT8> m_videoram;	
+	required_shared_ptr<UINT8> m_videoram;
 	optional_shared_ptr<UINT16> m_shrike_io;
 	optional_shared_ptr<UINT16> m_shrike_shared;
 

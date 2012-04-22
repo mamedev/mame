@@ -1089,7 +1089,7 @@ static MACHINE_CONFIG_START( mcrmono, mcr3_state )
 	MCFG_MACHINE_START(mcr)
 	MCFG_MACHINE_RESET(mcr)
 	MCFG_NVRAM_ADD_0FILL("nvram")
-	
+
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 

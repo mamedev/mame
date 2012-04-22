@@ -8,7 +8,7 @@
 #define m68307SER_UISR_UIMR  (0x0b)
 #define m68307SER_UBG1       (0x0d)
 #define m68307SER_UBG2       (0x0f)
-//							 (0x11)
+//                           (0x11)
 //                           (0x13)
 //                           (0x15)
 //                           (0x17)

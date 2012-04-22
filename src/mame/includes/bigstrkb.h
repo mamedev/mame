@@ -21,7 +21,7 @@ public:
 
 	required_shared_ptr<UINT16> m_vidreg1;
 	required_shared_ptr<UINT16> m_vidreg2;
-	
+
 	DECLARE_WRITE16_MEMBER(bsb_videoram_w);
 	DECLARE_WRITE16_MEMBER(bsb_videoram2_w);
 	DECLARE_WRITE16_MEMBER(bsb_videoram3_w);

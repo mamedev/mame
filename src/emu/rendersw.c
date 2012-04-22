@@ -78,7 +78,7 @@ private:
 	static inline UINT32 dest_b(_PixelType pixel) { return (pixel >> _DstShiftB) & (0xff >> _SrcShiftB); }
 
 	// generic conversion with special optimization for destinations in the standard format
-	static inline _PixelType source32_to_dest(rgb_t pixel) 
+	static inline _PixelType source32_to_dest(rgb_t pixel)
 	{
 		if (_SrcShiftR == 0 && _SrcShiftG == 0 && _SrcShiftB == 0 && _DstShiftR == 16 && _DstShiftG == 8 && _DstShiftB == 0)
 			return pixel;
@@ -137,7 +137,7 @@ private:
 	    //  G = clip(( common - 100 * Cb - 208 * Cr + 91776) >> 8)
 	    //  B = clip(( common + 516 * Cb            - 13696) >> 8)
 		//
-	   
+
 	    UINT8 y = ycc;
 	    UINT8 cb = ycc >> 8;
 	    UINT8 cr = ycc >> 16;
@@ -188,7 +188,7 @@ private:
 
 
 	//-------------------------------------------------
-	//  get_texel_palette16a - return a texel from a 
+	//  get_texel_palette16a - return a texel from a
 	//  palettized 16bpp source with alpha
 	//-------------------------------------------------
 
@@ -223,7 +223,7 @@ private:
 
 
 	//-------------------------------------------------
-	//  get_texel_yuy16 - return a texel from a 16bpp 
+	//  get_texel_yuy16 - return a texel from a 16bpp
 	//  YCbCr source (pixel is returned as Cr-Cb-Y)
 	//-------------------------------------------------
 
@@ -285,7 +285,7 @@ private:
 
 
 	//-------------------------------------------------
-	//  get_texel_rgb32 - return a texel from a 32bpp 
+	//  get_texel_rgb32 - return a texel from a 32bpp
 	//  RGB source
 	//-------------------------------------------------
 
@@ -320,7 +320,7 @@ private:
 
 
 	//-------------------------------------------------
-	//  get_texel_argb32 - return a texel from a 32bpp 
+	//  get_texel_argb32 - return a texel from a 32bpp
 	//  ARGB source
 	//-------------------------------------------------
 

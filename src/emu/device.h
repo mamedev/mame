@@ -569,7 +569,7 @@ public:
 	// finder
 	virtual bool findit()
 	{
-		this->m_target = reinterpret_cast<_PointerType *>(this->find_memory(m_width, m_bytes, _Required)); 
+		this->m_target = reinterpret_cast<_PointerType *>(this->find_memory(m_width, m_bytes, _Required));
 		return this->report_missing(this->m_target != NULL, "shared pointer", _Required);
 	}
 
@@ -604,7 +604,7 @@ template<typename _PointerType, int _Count, bool _Required>
 class device_t::shared_ptr_array_finder
 {
 	typedef shared_ptr_finder<_PointerType, _Required> shared_ptr_type;
-	
+
 public:
 	// construction/destruction
 	shared_ptr_array_finder(device_t &base, const char *basetag, UINT8 width = sizeof(_PointerType) * 8)
@@ -612,7 +612,7 @@ public:
 		for (int index = 0; index < _Count; index++)
 			m_array[index] = global_alloc(shared_ptr_type(base, m_tag[index].format("%s.%d", basetag, index), width));
 	}
-	
+
 	virtual ~shared_ptr_array_finder()
 	{
 		for (int index = 0; index < _Count; index++)

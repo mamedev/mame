@@ -41,7 +41,7 @@ public:
 	optional_device<williams_narc_sound_device> m_narc_sound;
 	optional_device<williams_cvsd_sound_device> m_cvsd_sound;
 	optional_device<williams_adpcm_sound_device> m_adpcm_sound;
-	
+
 	UINT16 *m_cmos_ram;
 	UINT32 m_cmos_page;
 	optional_shared_ptr<UINT8> m_gfx_rom;

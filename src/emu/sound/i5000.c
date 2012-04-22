@@ -39,7 +39,7 @@ void i5000snd_device::device_start()
 		vol /= div;
 	}
 	m_lut_volume[0xff] = 0;
-	
+
 	// create the stream
 	m_stream = machine().sound().stream_alloc(*this, 0, 2, clock() / 0x400, this);
 
@@ -52,7 +52,7 @@ void i5000snd_device::device_reset()
 {
 	// stop playing
 	write_reg16(0x43, 0xffff);
-	
+
 	// reset channel regs
 	for (int i = 0; i < 0x40; i++)
 		write_reg16(i, 0);
@@ -77,13 +77,13 @@ bool i5000snd_device::read_sample(int ch)
 			// TODO
 			return false;
 		}
-		
+
 		// cmd 0x0000 = end sample
 		// other values: unused
 		else return false;
-		
+
 	}
-	
+
 	return true;
 }
 
@@ -94,7 +94,7 @@ void i5000snd_device::sound_stream_update(sound_stream &stream, stream_sample_t 
 	{
 		INT32 mix_l = 0;
 		INT32 mix_r = 0;
-		
+
 		// loop over all channels
 		for (int ch = 0; ch < 16; ch++)
 		{
@@ -109,7 +109,7 @@ void i5000snd_device::sound_stream_update(sound_stream &stream, stream_sample_t 
 				continue;
 			}
 			m_channels[ch].freq_timer += m_channels[ch].freq_base;
-			
+
 			int adpcm_data = m_channels[ch].sample >> m_channels[ch].shift_pos;
 			m_channels[ch].shift_pos += m_channels[ch].shift_amount;
 			if (m_channels[ch].shift_pos & 0x10)
@@ -122,15 +122,15 @@ void i5000snd_device::sound_stream_update(sound_stream &stream, stream_sample_t 
 
 				adpcm_data |= (m_channels[ch].sample << (m_channels[ch].shift_amount - m_channels[ch].shift_pos));
 			}
-			
+
 			adpcm_data = m_channels[ch].m_adpcm.clock(adpcm_data & m_channels[ch].shift_mask);
-			
+
 			m_channels[ch].output_r = adpcm_data * m_channels[ch].vol_r / 128;
 			m_channels[ch].output_l = adpcm_data * m_channels[ch].vol_l / 128;
 			mix_r += m_channels[ch].output_r;
 			mix_l += m_channels[ch].output_l;
 		}
-		
+
 		outputs[0][i] = mix_r / 16;
 		outputs[1][i] = mix_l / 16;
 	}
@@ -146,7 +146,7 @@ void i5000snd_device::write_reg16(UINT8 reg, UINT16 data)
 		switch (reg & 3)
 		{
 			// 0, 1: address
-			
+
 			// 2: frequency
 			case 2:
 				m_channels[ch].freq_base = (0x1ff - (data & 0xff)) << (~data >> 8 & 3);
@@ -157,12 +157,12 @@ void i5000snd_device::write_reg16(UINT8 reg, UINT16 data)
 				m_channels[ch].vol_r = m_lut_volume[data & 0xff];
 				m_channels[ch].vol_l = m_lut_volume[data >> 8 & 0xff];
 				break;
-			
+
 			default:
 				break;
 		}
 	}
-	
+
 	// global regs
 	else
 	{
@@ -177,7 +177,7 @@ void i5000snd_device::write_reg16(UINT8 reg, UINT16 data)
 						UINT32 address = m_regs[ch << 2 | 1] << 16 | m_regs[ch << 2];
 						UINT16 start = m_rom_base[(address + 0) & m_rom_mask];
 						UINT16 param = m_rom_base[(address + 1) & m_rom_mask];
-						
+
 						// check sample start ID
 						if (start != 0x7f7f)
 						{
@@ -205,18 +205,18 @@ void i5000snd_device::write_reg16(UINT8 reg, UINT16 data)
 								m_channels[ch].shift_mask = 0xf;
 								break;
 						}
-						
+
 						m_channels[ch].address = (address + 4) & m_rom_mask;
 
 						m_channels[ch].freq_timer = 0;
 						m_channels[ch].shift_pos = 0;
-						
+
 						m_channels[ch].m_adpcm.reset();
 						m_channels[ch].is_playing = read_sample(ch);
 					}
 				}
 				break;
-			
+
 			// channel key off (0 has no effect)
 			case 0x43:
 				for (int ch = 0; ch < 16; ch++)
@@ -237,7 +237,7 @@ void i5000snd_device::write_reg16(UINT8 reg, UINT16 data)
 				break;
 		}
 	}
-	
+
 	m_regs[reg] = data;
 }
 
@@ -256,12 +256,12 @@ READ16_MEMBER( i5000snd_device::read )
 					ret |= (1 << ch);
 			}
 			break;
-		
+
 		default:
 			// 0x41: ?
 			break;
 	}
-	
+
 	return ret;
 }
 

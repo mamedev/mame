@@ -778,7 +778,7 @@ static void encf(UINT8 ciphertext, int address, UINT8 &plaintext, int &newaddres
 {
 	int aux = address & 0xfff;
 	aux = aux ^ (aux>>6);
-	aux = ((aux<<6) | (aux>>6)) & 0xfff; 
+	aux = ((aux<<6) | (aux>>6)) & 0xfff;
 	UINT8 aux2 = BITSWAP8(aux, 9,10,4,1,6,0,7,3);
 	aux2 ^= aux2>>4;
 	aux2 = (aux2<<4) | (aux2>>4);
@@ -792,11 +792,11 @@ static void decrypt(running_machine &machine, int key1, int key2)
 {
 	UINT8 plaintext;
 	int newaddress;
-	
+
 	UINT8 *src = machine.root_device().memregion("mainprg")->base();
 	UINT8 *dest = machine.root_device().memregion("maincpu")->base();
 	int len = machine.root_device().memregion("mainprg")->bytes();
-	
+
 	for (int i = 0; i < len; i++)
 	{
 		encf(src[i], i, plaintext, newaddress);

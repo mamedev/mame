@@ -416,7 +416,7 @@ static INPUT_PORTS_START( ffight2b )
 	PORT_DIPSETTING(    0x02, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x07, DEF_STR( 1C_1C ) )
-//	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )            /* duplicate setting */
+//  PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )            /* duplicate setting */
 	PORT_DIPSETTING(    0x06, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x05, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_4C ) )
@@ -443,7 +443,7 @@ static INPUT_PORTS_START( ffight2b )
 	PORT_DIPUNUSED( 0x20, IP_ACTIVE_LOW )
 	PORT_DIPUNUSED( 0x40, IP_ACTIVE_LOW )
 	PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW )
-	
+
 	PORT_START("COIN")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -459,7 +459,7 @@ static INPUT_PORTS_START( iron )
 	PORT_DIPSETTING(    0x02, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x07, DEF_STR( 1C_1C ) )
-//	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )            /* duplicate setting */
+//  PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )            /* duplicate setting */
 	PORT_DIPSETTING(    0x06, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x05, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_4C ) )
@@ -503,7 +503,7 @@ static INPUT_PORTS_START( denseib )
 	PORT_DIPSETTING(    0x02, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x07, DEF_STR( 1C_1C ) )
-//	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )            /* duplicate setting */
+//  PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )            /* duplicate setting */
 	PORT_DIPSETTING(    0x06, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x05, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_4C ) )
@@ -511,7 +511,7 @@ static INPUT_PORTS_START( denseib )
 	PORT_DIPSETTING(    0x18, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Hard ) )
-//	PORT_DIPSETTING(    0x00, DEF_STR( Hard ) )             /* duplicate setting */
+//  PORT_DIPSETTING(    0x00, DEF_STR( Hard ) )             /* duplicate setting */
 	PORT_DIPUNUSED( 0x20, IP_ACTIVE_LOW )
 	PORT_DIPUNUSED( 0x40, IP_ACTIVE_LOW )
 	PORT_DIPNAME( 0x80, 0x00, "Mode" )
@@ -548,7 +548,7 @@ static INPUT_PORTS_START( sblast2b )
 	PORT_DIPSETTING(    0x02, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x07, DEF_STR( 1C_1C ) )
-//	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )            /* duplicate setting */
+//  PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )            /* duplicate setting */
 	PORT_DIPSETTING(    0x06, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x05, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_4C ) )

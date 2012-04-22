@@ -111,7 +111,7 @@ williams_cvsd_sound_device::williams_cvsd_sound_device(const machine_config &mco
 
 //-------------------------------------------------
 //  write - handle an external write to the input
-//	latch
+//  latch
 //-------------------------------------------------
 
 WRITE16_MEMBER(williams_cvsd_sound_device::write)
@@ -162,7 +162,7 @@ WRITE8_MEMBER(williams_cvsd_sound_device::talkback_w)
 
 
 //-------------------------------------------------
-//  cvsd_digit_clock_clear_w - clear the clock on 
+//  cvsd_digit_clock_clear_w - clear the clock on
 //  the HC55516 and clock the data
 //-------------------------------------------------
 
@@ -185,7 +185,7 @@ WRITE8_MEMBER(williams_cvsd_sound_device::cvsd_clock_set_w)
 
 //-------------------------------------------------
 //  ym2151_irq_w - process IRQ signal changes from
-//	the YM2151
+//  the YM2151
 //-------------------------------------------------
 
 WRITE_LINE_MEMBER(williams_cvsd_sound_device::ym2151_irq_w)
@@ -196,7 +196,7 @@ WRITE_LINE_MEMBER(williams_cvsd_sound_device::ym2151_irq_w)
 
 //-------------------------------------------------
 //  pia_irqa - process IRQ A signal changes from
-//	the 6821
+//  the 6821
 //-------------------------------------------------
 
 WRITE_LINE_MEMBER(williams_cvsd_sound_device::pia_irqa)
@@ -207,7 +207,7 @@ WRITE_LINE_MEMBER(williams_cvsd_sound_device::pia_irqa)
 
 //-------------------------------------------------
 //  pia_irqb - process IRQ B signal changes from
-//	the 6821
+//  the 6821
 //-------------------------------------------------
 
 WRITE_LINE_MEMBER(williams_cvsd_sound_device::pia_irqb)
@@ -375,7 +375,7 @@ williams_narc_sound_device::williams_narc_sound_device(const machine_config &mco
 
 //-------------------------------------------------
 //  read - return the talkback register with the
-//	SYNC bits in bits 8 and 9
+//  SYNC bits in bits 8 and 9
 //-------------------------------------------------
 
 READ16_MEMBER(williams_narc_sound_device::read)
@@ -386,7 +386,7 @@ READ16_MEMBER(williams_narc_sound_device::read)
 
 //-------------------------------------------------
 //  write - handle an external write to the input
-//	latch
+//  latch
 //-------------------------------------------------
 
 WRITE16_MEMBER(williams_narc_sound_device::write)
@@ -444,7 +444,7 @@ WRITE8_MEMBER(williams_narc_sound_device::slave_bank_select_w)
 
 //-------------------------------------------------
 //  command_r - read command written by external
-//	agent
+//  agent
 //-------------------------------------------------
 
 READ8_MEMBER(williams_narc_sound_device::command_r)
@@ -457,7 +457,7 @@ READ8_MEMBER(williams_narc_sound_device::command_r)
 
 //-------------------------------------------------
 //  command2_w - write command from master CPU to
-//	slave CPU
+//  slave CPU
 //-------------------------------------------------
 
 WRITE8_MEMBER(williams_narc_sound_device::command2_w)
@@ -468,7 +468,7 @@ WRITE8_MEMBER(williams_narc_sound_device::command2_w)
 
 //-------------------------------------------------
 //  command2_r - read command written by master
-//	CPU
+//  CPU
 //-------------------------------------------------
 
 READ8_MEMBER(williams_narc_sound_device::command2_r)
@@ -480,7 +480,7 @@ READ8_MEMBER(williams_narc_sound_device::command2_r)
 
 //-------------------------------------------------
 //  master_talkback_w - handle writes to the
-//	talkback latch from the master CPU
+//  talkback latch from the master CPU
 //-------------------------------------------------
 
 WRITE8_MEMBER(williams_narc_sound_device::master_talkback_w)
@@ -492,7 +492,7 @@ WRITE8_MEMBER(williams_narc_sound_device::master_talkback_w)
 
 //-------------------------------------------------
 //  master_sync_w - handle writes to the master
-//	SYNC register
+//  SYNC register
 //-------------------------------------------------
 
 WRITE8_MEMBER(williams_narc_sound_device::master_sync_w)
@@ -505,7 +505,7 @@ WRITE8_MEMBER(williams_narc_sound_device::master_sync_w)
 
 //-------------------------------------------------
 //  slave_talkback_w - handle writes to the
-//	talkback latch from the slave CPU
+//  talkback latch from the slave CPU
 //-------------------------------------------------
 
 WRITE8_MEMBER(williams_narc_sound_device::slave_talkback_w)
@@ -516,7 +516,7 @@ WRITE8_MEMBER(williams_narc_sound_device::slave_talkback_w)
 
 //-------------------------------------------------
 //  slave_sync_w - handle writes to the slave
-//	SYNC register
+//  SYNC register
 //-------------------------------------------------
 
 WRITE8_MEMBER(williams_narc_sound_device::slave_sync_w)
@@ -528,7 +528,7 @@ WRITE8_MEMBER(williams_narc_sound_device::slave_sync_w)
 
 
 //-------------------------------------------------
-//  cvsd_digit_clock_clear_w - clear the clock on 
+//  cvsd_digit_clock_clear_w - clear the clock on
 //  the HC55516 and clock the data
 //-------------------------------------------------
 
@@ -551,7 +551,7 @@ WRITE8_MEMBER(williams_narc_sound_device::cvsd_clock_set_w)
 
 //-------------------------------------------------
 //  ym2151_irq_w - handle line changes on the
-//	YM2151 IRQ line
+//  YM2151 IRQ line
 //-------------------------------------------------
 
 WRITE_LINE_MEMBER(williams_narc_sound_device::ym2151_irq_w)
@@ -720,12 +720,12 @@ void williams_narc_sound_device::device_timer(emu_timer &timer, device_timer_id 
 				m_sound_int_state = 1;
 			}
 			break;
-		
+
 		case TID_SLAVE_COMMAND:
 			m_latch2 = param & 0xff;
 			m_cpu1->set_input_line(M6809_FIRQ_LINE, ASSERT_LINE);
 			break;
-		
+
 		case TID_SYNC_CLEAR:
 			m_audio_sync &= ~param;
 			break;
@@ -754,7 +754,7 @@ williams_adpcm_sound_device::williams_adpcm_sound_device(const machine_config &m
 
 //-------------------------------------------------
 //  write - handle an external write to the input
-//	latch
+//  latch
 //-------------------------------------------------
 
 WRITE16_MEMBER(williams_adpcm_sound_device::write)
@@ -795,7 +795,7 @@ READ_LINE_MEMBER(williams_adpcm_sound_device::irq_read)
 
 //-------------------------------------------------
 //  bank_select_w - select the sound CPU memory
-//	bank
+//  bank
 //-------------------------------------------------
 
 WRITE8_MEMBER(williams_adpcm_sound_device::bank_select_w)
@@ -806,7 +806,7 @@ WRITE8_MEMBER(williams_adpcm_sound_device::bank_select_w)
 
 //-------------------------------------------------
 //  bank_select_w - select the OKI6295 memory
-//	bank
+//  bank
 //-------------------------------------------------
 
 WRITE8_MEMBER(williams_adpcm_sound_device::oki6295_bank_select_w)
@@ -817,7 +817,7 @@ WRITE8_MEMBER(williams_adpcm_sound_device::oki6295_bank_select_w)
 
 //-------------------------------------------------
 //  command_r - read the command from the external
-//	latch
+//  latch
 //-------------------------------------------------
 
 READ8_MEMBER(williams_adpcm_sound_device::command_r)
@@ -983,7 +983,7 @@ void williams_adpcm_sound_device::device_timer(emu_timer &timer, device_timer_id
 				machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
 			}
 			break;
-		
+
 		case TID_IRQ_CLEAR:
 			m_sound_int_state = 0;
 			break;

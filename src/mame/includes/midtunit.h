@@ -19,7 +19,7 @@ public:
 	required_shared_ptr<UINT16>	m_nvram;
 	optional_device<williams_cvsd_sound_device> m_cvsd_sound;
 	optional_device<williams_adpcm_sound_device> m_adpcm_sound;
-	
+
 	DECLARE_WRITE16_MEMBER(midtunit_cmos_enable_w);
 	DECLARE_WRITE16_MEMBER(midtunit_cmos_w);
 	DECLARE_READ16_MEMBER(midtunit_cmos_r);

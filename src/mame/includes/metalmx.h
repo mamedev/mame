@@ -22,7 +22,7 @@ public:
 	required_device<adsp2105_device> m_adsp;
 	required_device<dsp32c_device> m_dsp32c_1;
 	required_device<dsp32c_device> m_dsp32c_2;
-	
+
 	required_shared_ptr<UINT32> m_adsp_internal_program_ram;
 	required_shared_ptr<UINT16> m_gsp_dram;
 	required_shared_ptr<UINT16> m_gsp_vram;

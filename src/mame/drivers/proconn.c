@@ -134,7 +134,7 @@ ADDRESS_MAP_END
 // the mapping of the devices is rather ugly with address bits 8-9 providing the usual address bits 0-1 or 'offset'
 // r0/r1/r2/r3 and w0/w1/w2/w3 might still be in the wrong order at the moment.
 static ADDRESS_MAP_START( proconn_portmap, AS_IO, 8, proconn_state )
-//	ADDRESS_MAP_GLOBAL_MASK(0x3ff)
+//  ADDRESS_MAP_GLOBAL_MASK(0x3ff)
 
 	// sio (vfd should be connected to it?)
 	AM_RANGE(0x00ff, 0x00ff) AM_READWRITE(sio_r0, sio_w0)
@@ -149,13 +149,13 @@ static ADDRESS_MAP_START( proconn_portmap, AS_IO, 8, proconn_state )
 	AM_RANGE(0x03fe, 0x03fe) AM_READWRITE(ctc_r3, ctc_w3)
 
 	// ay (meters connected to it?)
-	AM_RANGE(0x00fd, 0x00fd) AM_READWRITE(ay_r0, ay_w0) 
-	AM_RANGE(0x00fc, 0x00fc) AM_WRITE(ay_w1) 
+	AM_RANGE(0x00fd, 0x00fd) AM_READWRITE(ay_r0, ay_w0)
+	AM_RANGE(0x00fc, 0x00fc) AM_WRITE(ay_w1)
 
 	// ??
 	AM_RANGE(0xfbf9, 0xfbf9) AM_WRITENOP
 	AM_RANGE(0xfff9, 0xfff9) AM_WRITENOP
-	
+
 	// pio5 (lamps?)
 	AM_RANGE(0x00f0, 0x00f0) AM_READWRITE(pio5_r0, pio5_w0)
 	AM_RANGE(0x01f0, 0x01f0) AM_READWRITE(pio5_r1, pio5_w1)
@@ -258,7 +258,7 @@ static Z80CTC_INTERFACE( ctc_intf )
 
 static WRITE8_DEVICE_HANDLER( serial_transmit )
 {
-//	if (offset == 0)
+//  if (offset == 0)
 	{
 		ROC10937_newdata(0, data);
 		ROC10937_draw_16seg(0);

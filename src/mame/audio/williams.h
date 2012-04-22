@@ -114,7 +114,7 @@ private:
 	// internal state
 	UINT8 m_talkback;
 };
-	
+
 
 // ======================> williams_narc_sound_device
 
@@ -218,5 +218,5 @@ private:
 	UINT8 m_talkback;
 	UINT8 m_sound_int_state;
 };
-	
+
 

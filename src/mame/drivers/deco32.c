@@ -3352,7 +3352,7 @@ static DRIVER_INIT( nslasher )
 
 	deco156_decrypt(machine);
 
- 	deco32_state *state = machine.driver_data<deco32_state>();
+	deco32_state *state = machine.driver_data<deco32_state>();
 	state->soundlatch_setclearedvalue(0xff);
 
 	/* The board for Night Slashers is very close to the Fighter's History and

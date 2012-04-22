@@ -254,10 +254,10 @@ int stepper_update(int which, UINT8 pattern)
 		default:
 		logerror("No reel type specified for %x!\n",which);
 		break;
-		
+
 		case STARPOINT_48STEP_REEL : /* STARPOINT RMxxx */
 		case STARPOINT_200STEP_REEL :
-		case GAMESMAN_200STEP_REEL : /* Gamesman GMxxxx */		
+		case GAMESMAN_200STEP_REEL : /* Gamesman GMxxxx */
 		case STARPOINT_144STEP_DICE :/* STARPOINT 1DCU DICE mechanism */
 		//Standard drive table is 2,6,4,5,1,9,8,a
 		//NOTE: This runs through the stator patterns in such a way as to drive the reel forward (downwards from the player's view, clockwise on our rose)
@@ -401,7 +401,7 @@ int stepper_update(int which, UINT8 pattern)
 			break;
 		}
 		break;
-		
+
 		case ECOIN_200STEP_REEL :
 		//While the 48 and 100 step models appear to be reverse driven Starpoint reels, the 200 step model seems bespoke, certainly in terms of wiring.
 		//On a Proconn machine this same pattern is seen but running in reverse

@@ -3,13 +3,13 @@
 Star Trek Voyager (c) 2002 Team Play, Inc. / Game Refuge / Monaco Entertainment
 
 skeleton driver by R. Belmont
- 
+
 Motherboard is FIC AZIIEA with AMD Duron processor of unknown speed
 Chipset: VIA KT133a with VT8363A Northbridge and VT82C686B Southbridge
 Video: Jaton 3DForce2MX-32, based on Nvidia GeForce 2MX chipset w/32 MB of VRAM
- 
-TODO: VIA KT133a chipset support, GeForce 2MX video support, lots of things ;-) 
- 
+
+TODO: VIA KT133a chipset support, GeForce 2MX video support, lots of things ;-)
+
 *************************************************************************************/
 
 #include "emu.h"
@@ -801,16 +801,16 @@ static DRIVER_INIT( voyager )
 
 ROM_START( voyager )
 	ROM_REGION( 0x40000, "bios", 0 )
-    ROM_LOAD( "stv.u23", 0x000000, 0x040000, CRC(0bed28b6) SHA1(8e7f17af65ca9d17c5c7ddedb2313507d0ea8181) ) 
+    ROM_LOAD( "stv.u23", 0x000000, 0x040000, CRC(0bed28b6) SHA1(8e7f17af65ca9d17c5c7ddedb2313507d0ea8181) )
 
-	ROM_REGION( 0x8000, "video_bios", 0 )   // incorrect, 
+	ROM_REGION( 0x8000, "video_bios", 0 )   // incorrect,
 	ROM_LOAD16_BYTE( "trident_tgui9680_bios.bin", 0x0000, 0x4000, CRC(1eebde64) SHA1(67896a854d43a575037613b3506aea6dae5d6a19) )
 	ROM_CONTINUE(                                 0x0001, 0x4000 )
 
 	ROM_REGION( 0x800, "nvram", ROMREGION_ERASE00 )
 
 	DISK_REGION( "drive_0" )
-    DISK_IMAGE_READONLY( "voyager", 0, SHA1(8b94f2420f6abb40148e4ba6eed8819d8e85dbde))     
+    DISK_IMAGE_READONLY( "voyager", 0, SHA1(8b94f2420f6abb40148e4ba6eed8819d8e85dbde))
 ROM_END
 
 GAME( 2002, voyager,  0, voyager, voyager,  voyager, ROT0, "Team Play/Game Refuge/Monaco Entertainment", "Star Trek: Voyager", GAME_NOT_WORKING|GAME_NO_SOUND )

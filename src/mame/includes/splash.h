@@ -16,7 +16,7 @@ public:
 	required_shared_ptr<UINT16> m_spriteram;
 	optional_shared_ptr<UINT16> m_protdata;
 	optional_shared_ptr<UINT16> m_bitmap_mode;
-	
+
 	int m_bitmap_type;
 	int m_sprite_attr2_shift;
 	tilemap_t *m_bg_tilemap[2];
@@ -34,7 +34,7 @@ public:
 	int m_msm_source;
 	int m_snd_interrupt_enable1;
 	int m_snd_interrupt_enable2;
-	
+
 	DECLARE_WRITE16_MEMBER(splash_sh_irqtrigger_w);
 	DECLARE_WRITE16_MEMBER(roldf_sh_irqtrigger_w);
 	DECLARE_WRITE16_MEMBER(splash_coin_w);

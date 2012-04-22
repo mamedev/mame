@@ -926,7 +926,7 @@ public:
 	// construction/destruction
 	ioport_manager(running_machine &machine);
 	time_t initialize();
-	
+
 	// getters
 	running_machine &machine() const { return m_machine; }
 	input_port_config *first_port() const { return m_portlist.first(); }

@@ -20,7 +20,7 @@ class astrafr_state : public driver_device
 public:
 	astrafr_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-	{ 
+	{
 		fgpa_first_read_addr = 0xffff;
 		fgpa_rom_write_addr = 0xffff;
 		fgpa_after_rom_write_addr = 0xffff;
@@ -34,7 +34,7 @@ public:
 	DECLARE_READ8_MEMBER( astra_fgpa_r )
 	{
 		int pc = cpu_get_pc(&space.device());
-		
+
 		if (offset==fgpa_first_read_addr)
 		{
 			return 0xff;
@@ -45,11 +45,11 @@ public:
 			return 0xff;
 		}
 	}
-	
+
 	DECLARE_WRITE8_MEMBER( astra_fgpa_w )
 	{
 		int pc = cpu_get_pc(&space.device());
-		
+
 		if (offset==fgpa_rom_write_addr)
 		{
 			// the games write most of the ROM data to a port
@@ -65,7 +65,7 @@ public:
 	DECLARE_READ8_MEMBER( astra_fgpa_slave_r )
 	{
 		int pc = cpu_get_pc(&space.device());
-		
+
 		if (offset==fgpa_first_read_addr)
 		{
 			return 0xff;
@@ -76,11 +76,11 @@ public:
 			return 0xff;
 		}
 	}
-	
+
 	DECLARE_WRITE8_MEMBER( astra_fgpa_slave_w )
 	{
 		int pc = cpu_get_pc(&space.device());
-		
+
 		if (offset==fgpa_rom_write_addr)
 		{
 			// the games write most of the ROM data to a port
@@ -197,8 +197,8 @@ MACHINE_CONFIG_END
 static MACHINE_START( astra_57 )
 {
 	astrafr_state *state = machine.driver_data<astrafr_state>();
-//	state->fgpa_after_rom_write_addr = 0x20;
-//	state->fgpa_first_read_addr = 0x23;
+//  state->fgpa_after_rom_write_addr = 0x20;
+//  state->fgpa_first_read_addr = 0x23;
 	state->fgpa_rom_write_addr = 0x57;
 }
 
@@ -2133,19 +2133,19 @@ GAME( 200?, as_rtrf,   as_rtr	  , astra_single_2e,    astrafr,    astradec,	ROT0
 GAME( 200?, as_rtrg,   as_rtr	  , astra_single,    astrafr,    astradec,	ROT0,  "Astra", "Ready To Roll (Astra, V200, alt)"		, GAME_IS_SKELETON_MECHANICAL)
 GAME( 200?, as_rtrh,   as_rtr	  , astra_single_2e,    astrafr,    astradec,	ROT0,  "Astra", "Ready To Roll (Astra, V202)"		, GAME_IS_SKELETON_MECHANICAL)
 
-GAME( 200?, as_rab,    0		  , astra_single_2e,    astrafr,    0, 	ROT0,  "Astra", "Ring A Bell (Astra, V105)"		, GAME_IS_SKELETON_MECHANICAL)
+GAME( 200?, as_rab,    0		  , astra_single_2e,    astrafr,    0,	ROT0,  "Astra", "Ring A Bell (Astra, V105)"		, GAME_IS_SKELETON_MECHANICAL)
 GAME( 200?, as_raba,   as_rab	  , astra_single,    astrafr,    0, 	ROT0,  "Astra", "Ring A Bell (Astra, V106)"		, GAME_IS_SKELETON_MECHANICAL)
 GAME( 200?, as_rabb,   as_rab	  , astra_single,    astrafr,    0, 	ROT0,  "Astra", "Ring A Bell (Astra, V107)"		, GAME_IS_SKELETON_MECHANICAL)
 GAME( 200?, as_rabc,   as_rab	  , astra_single,    astrafr,    0, 	ROT0,  "Astra", "Ring A Bell (Astra, V104)"		, GAME_IS_SKELETON_MECHANICAL)
-GAME( 200?, as_rbg,    0		  , astra_single_2e,    astrafr,    0, 	ROT0,  "Astra", "River Boat Gambler (Astra, V304)"		, GAME_IS_SKELETON_MECHANICAL)
+GAME( 200?, as_rbg,    0		  , astra_single_2e,    astrafr,    0,	ROT0,  "Astra", "River Boat Gambler (Astra, V304)"		, GAME_IS_SKELETON_MECHANICAL)
 GAME( 200?, as_rbga,   as_rab	  , astra_single,    astrafr,    0, 	ROT0,  "Astra", "River Boat Gambler (Astra, V303)"		, GAME_IS_SKELETON_MECHANICAL)
 GAME( 200?, as_rbgb,   as_rab	  , astra_single,    astrafr,    0, 	ROT0,  "Astra", "River Boat Gambler (Astra, V104)"		, GAME_IS_SKELETON_MECHANICAL)
 GAME( 200?, as_rbgc,   as_rab	  , astra_single,    astrafr,    0, 	ROT0,  "Astra", "River Boat Gambler (Astra, V102)"		, GAME_IS_SKELETON_MECHANICAL)
 GAME( 200?, as_rbgd,   as_rab	  , astra_single,    astrafr,    0, 	ROT0,  "Astra", "River Boat Gambler (Astra, V101)"		, GAME_IS_SKELETON_MECHANICAL)
 GAME( 200?, as_rbge,   as_rab	  , astra_single,    astrafr,    0, 	ROT0,  "Astra", "River Boat Gambler (Astra, V008)"		, GAME_IS_SKELETON_MECHANICAL)
-GAME( 200?, as_rbglo,    0		  , astrafr_dual_37,    astrafr,    astradec_sml_dual, 	ROT0,  "Lowen", "River Boat Gambler (Lowen, V106)"		, GAME_IS_SKELETON_MECHANICAL)
+GAME( 200?, as_rbglo,    0		  , astrafr_dual_37,    astrafr,    astradec_sml_dual,	ROT0,  "Lowen", "River Boat Gambler (Lowen, V106)"		, GAME_IS_SKELETON_MECHANICAL)
 GAME( 200?, as_rox,    0		  , astra_single,    astrafr,    0, 	ROT0,  "Astra", "Roll X (Astra, V006)"		, GAME_IS_SKELETON_MECHANICAL)
-GAME( 200?, as_csv,    0		  , astra_single_37,    astrafr,    0, 	ROT0,  "Astra", "Slot Slant (?) (Astra, V202)"		, GAME_IS_SKELETON_MECHANICAL)
+GAME( 200?, as_csv,    0		  , astra_single_37,    astrafr,    0,	ROT0,  "Astra", "Slot Slant (?) (Astra, V202)"		, GAME_IS_SKELETON_MECHANICAL)
 GAME( 200?, as_sltcl,    0		  , astra_single,    astrafr,    0, 	ROT0,  "Astra", "Slots Classic (?) (Astra)"		, GAME_IS_SKELETON_MECHANICAL)
 GAME( 200?, as_stp,    0		  , astra_single_2e,    astrafr,    astradec,	ROT0,  "Astra", "Stampede (Astra, V103)"		, GAME_IS_SKELETON_MECHANICAL)
 GAME( 200?, as_stpa,   as_stp	  , astra_single,    astrafr,    astradec,	ROT0,  "Astra", "Stampede (Astra, V102)"		, GAME_IS_SKELETON_MECHANICAL)
@@ -2160,7 +2160,7 @@ GAME( 200?, as_sldd,   as_sld	  , astra_single,    astrafr,    0, 	ROT0,  "Astra
 GAME( 200?, as_slde,   as_sld	  , astra_single,    astrafr,    0, 	ROT0,  "Astra", "Super Little Devil (Astra, V101)"		, GAME_IS_SKELETON_MECHANICAL)
 GAME( 200?, as_tem,   0     	  , astra_single_alt_37,    astrafr,    astradec,	ROT0,  "Astra", "Temptation (Astra, V101)"		, GAME_IS_SKELETON_MECHANICAL)
 GAME( 200?, as_tema,  as_tem	  , astra_single_alt_37,    astrafr,    astradec,	ROT0,  "Astra", "Temptation (Astra, V006)"		, GAME_IS_SKELETON_MECHANICAL)
-GAME( 200?, as_tbl,   0				  , astra_single_2e,    astrafr,    0, 	ROT0,  "Astra", "Triple Bells (Astra, V104)"		, GAME_IS_SKELETON_MECHANICAL)
+GAME( 200?, as_tbl,   0				  , astra_single_2e,    astrafr,    0,	ROT0,  "Astra", "Triple Bells (Astra, V104)"		, GAME_IS_SKELETON_MECHANICAL)
 GAME( 200?, as_tbla,  as_tbl		  , astra_single,    astrafr,    0, 	ROT0,  "Astra", "Triple Bells (Astra, V105)"		, GAME_IS_SKELETON_MECHANICAL)
 GAME( 200?, as_tblb,  as_tbl		  , astra_single,    astrafr,    0, 	ROT0,  "Astra", "Triple Bells (Astra, V106)"		, GAME_IS_SKELETON_MECHANICAL)
 GAME( 200?, as_tblc,  as_tbl		  , astra_single,    astrafr,    0, 	ROT0,  "Astra", "Triple Bells (Astra, V103)"		, GAME_IS_SKELETON_MECHANICAL)
@@ -2171,7 +2171,7 @@ GAME( 200?, as_td,   0  	  , astra_single_2e,    astrafr,    astradec,	ROT0,  "A
 
 GAME( 200?, as_twp,   0     	  , astra_single,    astrafr,    0, 	ROT0,  "Astra", "Twin Pots (Astra, V106)"		, GAME_IS_SKELETON_MECHANICAL)
 GAME( 200?, as_twpa,  as_twp      , astra_single,    astrafr,    0, 	ROT0,  "Astra", "Twin Pots (Astra, V104)"		, GAME_IS_SKELETON_MECHANICAL)
-GAME( 200?, as_vn,    0		  , astrafr_dual_alt_37,    astrafr,    astradec_dual, 	ROT0,  "Astra", "Vegas Nights (Astra, V205)"		, GAME_IS_SKELETON_MECHANICAL)
+GAME( 200?, as_vn,    0		  , astrafr_dual_alt_37,    astrafr,    astradec_dual,	ROT0,  "Astra", "Vegas Nights (Astra, V205)"		, GAME_IS_SKELETON_MECHANICAL)
 GAME( 200?, as_vcv,    0		  , astra_single,    astrafr,    astradec,	ROT0,  "Astra", "Viva Cash Vegas (Astra, V005)"		, GAME_IS_SKELETON_MECHANICAL)
 GAME( 200?, as_vcva,   as_vcv	  , astra_single,    astrafr,    astradec,	ROT0,  "Astra", "Viva Cash Vegas (Astra, V107)"		, GAME_IS_SKELETON_MECHANICAL)
 GAME( 200?, as_vcvb,   as_vcv	  , astra_single,    astrafr,    astradec,	ROT0,  "Astra", "Viva Cash Vegas (Astra, V106)"		, GAME_IS_SKELETON_MECHANICAL)

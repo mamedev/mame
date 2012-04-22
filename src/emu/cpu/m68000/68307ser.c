@@ -36,7 +36,7 @@ READ8_HANDLER( m68307_internal_serial_r )
 				case m68307SER_UMR1_UMR2:
 					logerror("%08x m68307_internal_serial_r %08x (UMR1, UMR2 - UART Mode Register)\n", pc, offset);
 					return space->machine().rand();
-			
+
 				case m68307SER_USR_UCSR:
 					logerror("%08x m68307_internal_serial_r %08x (USR, UCSR - UART Status/Clock Select Register)\n", pc, offset);
 					return space->machine().rand();

@@ -1016,7 +1016,7 @@ GFXDECODE_END
 static MACHINE_START( psikyo )
 {
 	psikyo_state *state = machine.driver_data<psikyo_state>();
-	
+
 	state->m_audiocpu = machine.device("audiocpu");
 
 	state->save_item(NAME(state->m_soundlatch));

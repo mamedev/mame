@@ -261,7 +261,7 @@ WRITE8_MEMBER(meyc8080_state::counters_w)
   ---- -x--   Bet pulse.
   ---- x---   Manual Keyout pulse (only mdrawpkra)
   xxxx ----   Seems unused...
- 
+
 */
 	coin_counter_w(machine(), 0, ~data & 0x01);	/* Coin1 */
 	coin_counter_w(machine(), 1, ~data & 0x04);	/* Bets */
@@ -323,7 +323,7 @@ static ADDRESS_MAP_START( meyc8080_map, AS_PROGRAM, 8, meyc8080_state )
 	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_SHARE("vram0")
 	AM_RANGE(0x6000, 0x7fff) AM_RAM AM_SHARE("vram1")
 	AM_RANGE(0x8000, 0x9fff) AM_RAM AM_SHARE("vram2")
-//	AM_RANGE(0xa000, 0xa0ff) AM_RAM		// unknown... filled with 00's at boot time or when entering the service mode.
+//  AM_RANGE(0xa000, 0xa0ff) AM_RAM     // unknown... filled with 00's at boot time or when entering the service mode.
 	AM_RANGE(0xcd00, 0xcdff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("BSW") AM_DEVWRITE_LEGACY("dac", meyc8080_dac_1_w)
 	AM_RANGE(0xf004, 0xf004) AM_READ_PORT("IN1") AM_WRITE(lights_1_w)

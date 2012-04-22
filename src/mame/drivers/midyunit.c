@@ -1048,7 +1048,7 @@ static MACHINE_CONFIG_START( yunit_core, midyunit_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(STDRES_PIXEL_CLOCK*2, 505, 0, 399, 289, 0, 253)
 	MCFG_SCREEN_UPDATE_STATIC(tms340x0_ind16)
-	
+
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 MACHINE_CONFIG_END
@@ -1071,7 +1071,7 @@ static MACHINE_CONFIG_DERIVED( yunit_cvsd_4bit_fast, yunit_core )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(FAST_MASTER_CLOCK)
-	
+
 	MCFG_WILLIAMS_CVSD_SOUND_ADD("cvsd")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
@@ -1098,7 +1098,7 @@ static MACHINE_CONFIG_DERIVED( yunit_adpcm_6bit_fast, yunit_core )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(FAST_MASTER_CLOCK)
-	
+
 	MCFG_WILLIAMS_ADPCM_SOUND_ADD("adpcm")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
@@ -1113,7 +1113,7 @@ static MACHINE_CONFIG_DERIVED( yunit_adpcm_6bit_faster, yunit_core )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(FASTER_MASTER_CLOCK)
-	
+
 	MCFG_WILLIAMS_ADPCM_SOUND_ADD("adpcm")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 

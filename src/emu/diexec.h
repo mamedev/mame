@@ -295,10 +295,10 @@ protected:
 	// configuration
 	bool					m_disabled;					// disabled from executing?
 	device_interrupt_delegate m_vblank_interrupt;		// for interrupts tied to VBLANK
-	device_interrupt_func 	m_vblank_interrupt_legacy;	// for interrupts tied to VBLANK
+	device_interrupt_func	m_vblank_interrupt_legacy;	// for interrupts tied to VBLANK
 	const char *			m_vblank_interrupt_screen;	// the screen that causes the VBLANK interrupt
 	device_interrupt_delegate m_timed_interrupt;		// for interrupts not tied to VBLANK
-	device_interrupt_func 	m_timed_interrupt_legacy;	// for interrupts not tied to VBLANK
+	device_interrupt_func	m_timed_interrupt_legacy;	// for interrupts not tied to VBLANK
 	attotime				m_timed_interrupt_period;	// period for periodic interrupts
 	bool					m_is_octal;					// to determine if messages/debugger will show octal or hex
 

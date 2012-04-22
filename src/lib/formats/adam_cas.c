@@ -90,7 +90,7 @@ casserr_t coladam_put_block(cassette_image *cass, int channel, double *time_inde
 		header[2] = 0x57;
 		header[9] = 0xe3;
 	}
-		
+
 	for (i = 0; i < 10; i++) // header
 	{
 		err = coladam_put_byte(cass, channel, time_index, header[i], prev_sign);
@@ -120,7 +120,7 @@ casserr_t coladam_put_block(cassette_image *cass, int channel, double *time_inde
 	err = coladam_put_byte(cass, channel, time_index, 0x00, prev_sign);
 	return err;
 }
-	
+
 
 static casserr_t coladam_ddp_load( cassette_image *cass )
 {
@@ -131,9 +131,9 @@ static casserr_t coladam_ddp_load( cassette_image *cass )
 
 	// It would appear that data packs that originally had the type GW data layout and headers work fine when converted to type
 	// HE. Thus we set all tapes to type HE.
-	
+
 	int layout_type = TYPE_HE;
-	
+
 	// Track 0
 	for ( i = 0; i < 2753; i++ ) // leading zero bytes
 	{
@@ -193,10 +193,10 @@ static casserr_t coladam_ddp_load( cassette_image *cass )
 			err = coladam_put_block(cass, 1, &time, &prev_sign, block, buffer, layout_type);
 		}
 	}
-	
+
 	if (err)
 		return err;
-	
+
 	return CASSETTE_ERROR_SUCCESS;
 }
 

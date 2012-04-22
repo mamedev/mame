@@ -427,7 +427,7 @@ public:
 	UINT16 m_aga_sprdatb[8][4];
 	int m_aga_sprite_fetched_words;
 	int m_aga_sprite_dma_used_words[8];
-	
+
 	DECLARE_CUSTOM_INPUT_MEMBER( amiga_joystick_convert );
 };
 

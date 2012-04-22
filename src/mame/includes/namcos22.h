@@ -122,7 +122,7 @@ public:
 	UINT8 *m_dirtypal;
 	bitmap_ind16 *m_mix_bitmap;
 	tilemap_t *m_bgtilemap;
-	
+
 	DECLARE_READ32_MEMBER(namcos22_gamma_r);
 	DECLARE_WRITE32_MEMBER(namcos22_gamma_w);
 	DECLARE_WRITE32_MEMBER(namcos22s_czram_w);

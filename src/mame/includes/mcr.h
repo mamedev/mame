@@ -34,13 +34,13 @@ public:
 	optional_device<z80_device> m_maincpu;
 	optional_shared_ptr<UINT8> m_spriteram;
 	optional_shared_ptr<UINT8> m_videoram;
-	
+
 	optional_device<midway_ssio_device> m_ssio;
 	optional_device<midway_chip_squeak_deluxe_device> m_chip_squeak_deluxe;
 	optional_device<midway_sounds_good_device> m_sounds_good;
 	optional_device<midway_turbo_chip_squeak_device> m_turbo_chip_squeak;
 	optional_device<midway_squawk_n_talk_device> m_squawk_n_talk;
-	
+
 	DECLARE_WRITE8_MEMBER(mcr_control_port_w);
 	DECLARE_WRITE8_MEMBER(mcr_ipu_laserdisk_w);
 	DECLARE_READ8_MEMBER(mcr_ipu_watchdog_r);

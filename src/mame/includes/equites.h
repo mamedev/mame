@@ -21,7 +21,7 @@ public:
 	required_shared_ptr<UINT16> m_spriteram;
 	optional_shared_ptr<UINT16> m_workram;
 	optional_shared_ptr<UINT16> m_spriteram_2;
-	required_shared_ptr<UINT8>  m_mcu_ram;    	// 8bits
+	required_shared_ptr<UINT8>  m_mcu_ram;  	// 8bits
 //  UINT16 *  m_nvram;    // currently this uses generic nvram handling
 
 	/* video-related */

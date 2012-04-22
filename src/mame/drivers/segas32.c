@@ -4048,7 +4048,7 @@ static DRIVER_INIT( arabfgt )
 	segas32_state *state = machine.driver_data<segas32_state>();
 	segas32_common_init(machine, read16_delegate(FUNC(segas32_state::extra_custom_io_r),state), write16_delegate());
 
-	/* install protection handlers */	
+	/* install protection handlers */
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xa00100, 0xa0011f, read16_delegate(FUNC(segas32_state::arf_wakeup_protection_r),state));
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xa00000, 0xa00fff, read16_delegate(FUNC(segas32_state::arabfgt_protection_r),state), write16_delegate(FUNC(segas32_state::arabfgt_protection_w),state));
 }
@@ -4120,7 +4120,7 @@ static DRIVER_INIT( ga2 )
 	segas32_state *state = machine.driver_data<segas32_state>();
 	segas32_common_init(machine, read16_delegate(FUNC(segas32_state::extra_custom_io_r),state), write16_delegate());
 
-	decrypt_ga2_protrom(machine);	
+	decrypt_ga2_protrom(machine);
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xa00000, 0xa00fff, read16_delegate(FUNC(segas32_state::ga2_dpram_r),state), write16_delegate(FUNC(segas32_state::ga2_dpram_w),state));
 }
 

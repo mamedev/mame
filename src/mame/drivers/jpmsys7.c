@@ -29,7 +29,7 @@ static ADDRESS_MAP_START( jpmsys7_map, AS_PROGRAM, 32, jpmsys7_state )
 	AM_RANGE(0x20000018, 0x2000001b) AM_WRITENOP // large data upload like astra/pluto?
 	AM_RANGE(0x50000000, 0x50001fff) AM_RAM
 
-//	AM_RANGE(0xf0000000, 0xf0000fff) AM_RAM
+//  AM_RANGE(0xf0000000, 0xf0000fff) AM_RAM
 
 ADDRESS_MAP_END
 

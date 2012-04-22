@@ -147,7 +147,7 @@ READ_LINE_MEMBER( ticket_dispenser_device::line_r )
 
 
 //-------------------------------------------------
-//  write - write the control line via the active 
+//  write - write the control line via the active
 //  bit
 //-------------------------------------------------
 
@@ -227,7 +227,7 @@ void ticket_dispenser_device::device_timer(emu_timer &timer, device_timer_id id,
 
 	// update LED status (fixme: should map to an output)
 	set_led_status(machine(), 2, (m_status == m_ticketdispensed));
-	
+
 	// if we just dispensed, increment global count
 	if (m_status == m_ticketdispensed)
 	{

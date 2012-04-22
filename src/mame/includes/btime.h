@@ -23,7 +23,7 @@ public:
 	optional_shared_ptr<UINT8> m_zoar_scrollram;
 	optional_shared_ptr<UINT8> m_lnc_charbank;
 	optional_shared_ptr<UINT8> m_deco_charram;
-	optional_shared_ptr<UINT8> m_spriteram;   	// used by disco
+	optional_shared_ptr<UINT8> m_spriteram; 	// used by disco
 //  UINT8 *  m_decrypted;
 	optional_shared_ptr<UINT8> m_audio_rambase;
 

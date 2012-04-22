@@ -17,7 +17,7 @@ public:
 	optional_shared_ptr<UINT8> m_galaga_ram1;
 	optional_shared_ptr<UINT8> m_galaga_ram2;
 	optional_shared_ptr<UINT8> m_galaga_ram3;
-	optional_shared_ptr<UINT8> m_galaga_starcontrol; 	// 6 addresses
+	optional_shared_ptr<UINT8> m_galaga_starcontrol;	// 6 addresses
 	emu_timer *m_cpu3_interrupt_timer;
 	UINT8 m_custom_mod;
 

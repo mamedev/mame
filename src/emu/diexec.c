@@ -532,7 +532,7 @@ void device_execute_interface::interface_pre_start()
 	// bind delegates
 	m_vblank_interrupt.bind_relative_to(device());
 	m_timed_interrupt.bind_relative_to(device());
-//	m_driver_irq.bind_relative_to(device());
+//  m_driver_irq.bind_relative_to(device());
 
 	// fill in the initial states
 	execute_interface_iterator iter(device().machine().root_device());

@@ -35,8 +35,8 @@ READ8_HANDLER( m68307_internal_mbus_r )
 				logerror("%08x m68307_internal_mbus_r %08x (MBSR - M-Bus Status Register)\n", pc, offset);
 				retval = 0;
 				if (mbus->m_busy) retval |= 0x20;
-				if (mbus->m_intpend) retval |= 0x02;			
-				
+				if (mbus->m_intpend) retval |= 0x02;
+
 				return retval;
 
 			case m68307BUS_MBDR:
@@ -75,7 +75,7 @@ WRITE8_HANDLER( m68307_internal_mbus_w )
 
 			case m68307BUS_MBCR:
 				logerror("%08x m68307_internal_mbus_w %08x, %02x (MFCR - M-Bus Control Register)\n", pc, offset,data);
-				
+
 				mbus->m_MFCR = data;
 				if (data & 0x80)
 				{
@@ -83,13 +83,13 @@ WRITE8_HANDLER( m68307_internal_mbus_w )
 					mbus->m_intpend = false;
 				}
 				if (data & 0x20) mbus->m_busy = true;
-				
+
 				break;
 
 			case m68307BUS_MBSR:
 				logerror("%08x m68307_internal_mbus_w %08x, %02x (MBSR - M-Bus Status Register)\n", pc, offset,data);
 				break;
-			
+
 			case m68307BUS_MBDR:
 				logerror("%08x m68307_internal_mbus_w %08x, %02x (MBDR - M-Bus Data I/O Register)\n", pc, offset,data);
 

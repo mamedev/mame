@@ -105,7 +105,7 @@ protected:
 	UINT8 m_motor_sense;
 	UINT8 m_status_sense;
 	attotime m_period;
-	
+
 	// active state
 	UINT8 m_active_bit;
 	UINT8 m_motoron;

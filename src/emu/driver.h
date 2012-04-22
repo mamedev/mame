@@ -154,7 +154,7 @@ public:
 	// construction/destruction
 	driver_device(const machine_config &mconfig, device_type type, const char *tag);
 	virtual ~driver_device();
-	
+
 	// getters
 	const game_driver &system() const { assert(m_system != NULL); return *m_system; }
 
@@ -182,8 +182,8 @@ public:
 	{
 		(downcast<_DriverClass &>(device).*_Function)();
 	}
-	
-	// generic interrupt generators	
+
+	// generic interrupt generators
 	void generic_pulse_irq_line(device_execute_interface &exec, int irqline, int cycles);
 	void generic_pulse_irq_line_and_vector(device_execute_interface &exec, int irqline, int vector, int cycles);
 
@@ -348,7 +348,7 @@ public:
 	// 8-8-8 RGB palette write handlers
 	DECLARE_WRITE16_MEMBER( paletteram_xrgb_word_be_w );
 	DECLARE_WRITE16_MEMBER( paletteram_xbgr_word_be_w );
-	
+
 	// generic input port helpers
 	// custom handler
 	DECLARE_CUSTOM_INPUT_MEMBER( custom_port_read );
@@ -397,7 +397,7 @@ private:
 	// internal state
 	const game_driver *		m_system;					// pointer to the game driver
 	driver_callback_delegate m_callbacks[CB_COUNT];		// start/reset callbacks
-	legacy_callback_func 	m_legacy_callbacks[CB_COUNT]; // legacy start/reset callbacks
+	legacy_callback_func	m_legacy_callbacks[CB_COUNT]; // legacy start/reset callbacks
 
 	// generic audio
 	UINT16					m_latch_clear_value;
@@ -405,8 +405,8 @@ private:
 	UINT8					m_latch_read[4];
 
 	// generic video
-	UINT32 					m_flip_screen_x;
-	UINT32 					m_flip_screen_y;
+	UINT32					m_flip_screen_x;
+	UINT32					m_flip_screen_y;
 };
 
 

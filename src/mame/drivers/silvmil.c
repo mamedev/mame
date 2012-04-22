@@ -30,8 +30,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		  m_bg_videoram(*this, "bg_videoram"),
 		  m_fg_videoram(*this, "fg_videoram"),
-		  m_spriteram(*this, "spriteram")  { 
-	
+		  m_spriteram(*this, "spriteram")  {
+
 
 	}
 
@@ -50,7 +50,7 @@ public:
 	{
 		m_silvmil_tilebank[m_whichbank] = (data>>8) & 0x1f;
 
-	//	printf("%08x tilebank_w %04x (which = %04x)\n",pc, data, m_whichbank);
+	//  printf("%08x tilebank_w %04x (which = %04x)\n",pc, data, m_whichbank);
 		m_fg_layer->mark_all_dirty();
 		m_bg_layer->mark_all_dirty();
 	}
@@ -102,7 +102,7 @@ public:
 
 		}
 	}
-	
+
 
 };
 

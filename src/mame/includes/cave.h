@@ -25,7 +25,7 @@ class cave_state : public driver_device
 {
 public:
 	cave_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag), 
+		: driver_device(mconfig, type, tag),
 		  m_videoregs(*this, "videoregs"),
 		  m_vram(*this, "vram"),
 		  m_vctrl(*this, "vctrl"),

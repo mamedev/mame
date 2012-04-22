@@ -33,10 +33,10 @@ class splus_state : public driver_device
 public:
 	splus_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_cmosl_ram(*this, "cmosl"), 
-		m_cmosh_ram(*this, "cmosh"), 
-		m_program_ram(*this, "program_ram"), 
-		m_reel_ram(*this, "reel_ram"), 
+		m_cmosl_ram(*this, "cmosl"),
+		m_cmosh_ram(*this, "cmosh"),
+		m_program_ram(*this, "program_ram"),
+		m_reel_ram(*this, "reel_ram"),
 		m_io_port(*this, "io_port")
 	{
 		m_sda_dir = 0;

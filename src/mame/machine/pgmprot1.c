@@ -377,7 +377,7 @@ DRIVER_INIT( kovshp )
 DRIVER_INIT( kovshxas )
 {
 	pgm_basic_init(machine);
-//	pgm_kovshp_decrypt(machine);
+//  pgm_kovshp_decrypt(machine);
 	pgm_arm7_type1_latch_init(machine);
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x4f0008, 0x4f0009, FUNC(kovsh_fake_region_r));
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x500000, 0x500005, FUNC(kovshp_asic27a_write_word));

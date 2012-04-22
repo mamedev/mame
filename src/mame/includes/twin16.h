@@ -16,7 +16,7 @@ public:
 	required_shared_ptr<UINT16> m_videoram;
 	optional_shared_ptr<UINT16> m_tile_gfx_ram;
 	optional_shared_ptr<UINT16> m_sprite_gfx_ram;
-	
+
 	UINT16 m_CPUA_register;
 	UINT16 m_CPUB_register;
 	UINT16 m_sound_command;

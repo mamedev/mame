@@ -287,7 +287,7 @@ public:
 	UINT16 m_hCellCount;
 	UINT16 m_vPosition;
 	UINT16 m_hPosition;
-	
+
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
 	required_device<cpu_device> m_soundcpu;

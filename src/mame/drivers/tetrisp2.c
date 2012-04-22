@@ -574,7 +574,7 @@ WRITE16_MEMBER(stepstag_state::stepstag_soundlatch_word_w)
 
 WRITE16_MEMBER(stepstag_state::stepstag_leds_w)
 {
-//	data = COMBINE_DATA()
+//  data = COMBINE_DATA()
 	if (ACCESSING_BITS_0_7)
 	{
 		set_led_status(machine(),  0,	data & 0x0001);	// P2 Front-Left
@@ -594,7 +594,7 @@ WRITE16_MEMBER(stepstag_state::stepstag_leds_w)
 		set_led_status(machine(), 11,	data & 0x2000);	// P1 Back-Right
 	}
 
-//	popmessage("FEET %02x",data);
+//  popmessage("FEET %02x",data);
 }
 
 // Main CPU
@@ -606,18 +606,18 @@ static ADDRESS_MAP_START( stepstag_map, AS_PROGRAM, 16, stepstag_state )
 	AM_RANGE(0x300000, 0x31ffff) AM_RAM															// Palette
 	AM_RANGE(0x400000, 0x403fff) AM_RAM_WRITE(tetrisp2_vram_fg_w) AM_SHARE("vram_fg")			// Foreground
 	AM_RANGE(0x404000, 0x407fff) AM_RAM_WRITE(tetrisp2_vram_bg_w) AM_SHARE("vram_bg")			// Background
-//	AM_RANGE(0x408000, 0x409fff) AM_RAM															// ???
+//  AM_RANGE(0x408000, 0x409fff) AM_RAM                                                         // ???
 	AM_RANGE(0x500000, 0x50ffff) AM_RAM															// Line
 	AM_RANGE(0x600000, 0x60ffff) AM_RAM_WRITE(tetrisp2_vram_rot_w) AM_SHARE("vram_rot")		// Rotation
 	AM_RANGE(0x900000, 0x903fff) AM_READWRITE(tetrisp2_nvram_r, tetrisp2_nvram_w) AM_SHARE("nvram")	// NVRAM
 	AM_RANGE(0x904000, 0x907fff) AM_READWRITE(tetrisp2_nvram_r, tetrisp2_nvram_w)				// NVRAM (mirror)
 
 	AM_RANGE(0xa10000, 0xa10001) AM_READ_PORT("FEET") AM_WRITE(stepstag_leds_w)					// I/O
-//	AM_RANGE(0xa30000, 0xa30001) AM_NOP	// PC?
+//  AM_RANGE(0xa30000, 0xa30001) AM_NOP // PC?
 	AM_RANGE(0xa42000, 0xa42001) AM_READ( unk_a42000_r ) // visual ready flag + ???
 	AM_RANGE(0xa44000, 0xa44001) AM_READNOP		// watchdog
-//	AM_RANGE(0xa48000, 0xa48001) AM_WRITENOP	// PC?
-//	AM_RANGE(0xa4c000, 0xa4c001) AM_WRITENOP	// PC?
+//  AM_RANGE(0xa48000, 0xa48001) AM_WRITENOP    // PC?
+//  AM_RANGE(0xa4c000, 0xa4c001) AM_WRITENOP    // PC?
 	AM_RANGE(0xa50000, 0xa50001) AM_READWRITE( soundlatch_word_r, stepstag_soundlatch_word_w )
 	AM_RANGE(0xa60000, 0xa60003) AM_DEVWRITE8_LEGACY("ymz", ymz280b_w, 0x00ff)					// Sound
 
@@ -652,7 +652,7 @@ static ADDRESS_MAP_START( stepstag_sub_map, AS_PROGRAM, 16, stepstag_state )
 
 	// rgb brightness?
 	AM_RANGE(0x700000, 0x700001) AM_WRITENOP // 0-f
-	AM_RANGE(0x700002, 0x700003) AM_WRITENOP //	0-f
+	AM_RANGE(0x700002, 0x700003) AM_WRITENOP // 0-f
 	AM_RANGE(0x700004, 0x700005) AM_WRITENOP // 0-f
 	AM_RANGE(0x700006, 0x700007) AM_WRITENOP // 0-3f (high bits?)
 
@@ -660,19 +660,19 @@ static ADDRESS_MAP_START( stepstag_sub_map, AS_PROGRAM, 16, stepstag_state )
 	AM_RANGE(0x800000, 0x803fff) AM_RAM AM_SHARE("spriteram")		// Object RAM
 	AM_RANGE(0x800000, 0x87ffff) AM_RAM
 	AM_RANGE(0x880000, 0x880001) AM_WRITENOP // cleared after writing this sprite list
-//	AM_RANGE(0x8c0000, 0x8c0001) AM_WRITENOP // cleared at boot
+//  AM_RANGE(0x8c0000, 0x8c0001) AM_WRITENOP // cleared at boot
 
 	// middle screen sprites
 	AM_RANGE(0x900000, 0x903fff) AM_RAM AM_SHARE("spriteram2")		// Object RAM
 	AM_RANGE(0x900000, 0x97ffff) AM_RAM
 	AM_RANGE(0x980000, 0x980001) AM_WRITENOP // cleared after writing this sprite list
-//	AM_RANGE(0x9c0000, 0x9c0001) AM_WRITENOP // cleared at boot
+//  AM_RANGE(0x9c0000, 0x9c0001) AM_WRITENOP // cleared at boot
 
 	// right screen sprites
 	AM_RANGE(0xa00000, 0xa03fff) AM_RAM AM_SHARE("spriteram3")		// Object RAM
 	AM_RANGE(0xa00000, 0xa7ffff) AM_RAM
 	AM_RANGE(0xa80000, 0xa80001) AM_WRITENOP // cleared after writing this sprite list
-//	AM_RANGE(0xac0000, 0xac0001) AM_WRITENOP // cleared at boot
+//  AM_RANGE(0xac0000, 0xac0001) AM_WRITENOP // cleared at boot
 
 	AM_RANGE(0xb00000, 0xb00001) AM_READWRITE( soundlatch_word_r, soundlatch_word_w )
 
@@ -1117,7 +1117,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( stepstag )
 	PORT_START("BUTTONS") // $be0002.w
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)		// P2 start (middle)
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)		// P2 start (left)		
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)		// P2 start (left)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)		// P2 start (right)
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1125,7 +1125,7 @@ static INPUT_PORTS_START( stepstag )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)		// P1 start (middle)
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)		// P1 start (left)		
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)		// P1 start (left)
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)		// P1 start (right)
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )

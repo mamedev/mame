@@ -42,7 +42,7 @@ public:
 
 	required_shared_ptr<UINT8> m_spriteram;
 	required_shared_ptr<UINT8> m_videoram;
-	
+
 	int m_bullets_base;
 	int m_numspritegens;
 	int m_counter_74ls161[2];

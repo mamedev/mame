@@ -31,7 +31,7 @@ public:
 	required_shared_ptr<UINT32> m_lumaram;
 	optional_shared_ptr<UINT16> m_soundram;
 	optional_shared_ptr<UINT32> m_tgp_program;
-	
+
 	UINT32 m_intreq;
 	UINT32 m_intena;
 	UINT32 m_coproctl;

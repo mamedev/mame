@@ -397,7 +397,7 @@ static ADDRESS_MAP_START( airsys_map, AS_PROGRAM, 16, taitoair_state )
 	AM_RANGE(0x000000, 0x0bffff) AM_ROM
 	AM_RANGE(0x0c0000, 0x0cffff) AM_RAM AM_SHARE("m68000_mainram")
 	AM_RANGE(0x140000, 0x140001) AM_WRITE(system_control_w)	/* Pause the TMS32025 */
-	AM_RANGE(0x180000, 0x187fff) AM_RAM_WRITE(airsys_gradram_w) AM_SHARE("gradram")          		/* "gradiation ram (0/1)" */
+	AM_RANGE(0x180000, 0x187fff) AM_RAM_WRITE(airsys_gradram_w) AM_SHARE("gradram")         		/* "gradiation ram (0/1)" */
 	AM_RANGE(0x188000, 0x189fff) AM_MIRROR(0x2000) AM_RAM_WRITE(airsys_paletteram16_w) AM_SHARE("paletteram")
 	AM_RANGE(0x800000, 0x820fff) AM_DEVREADWRITE_LEGACY("tc0080vco", tc0080vco_word_r, tc0080vco_word_w)	/* tilemaps, sprites */
 	AM_RANGE(0x906000, 0x906007) AM_RAM // DMA?

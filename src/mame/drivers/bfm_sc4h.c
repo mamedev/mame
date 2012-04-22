@@ -23,9 +23,9 @@
     This file contains the hardware emulation, for the supported sets
     see bfm_sc4.c
 
-	---
-	note, if game says 'read meters' simply press CTRL then 'B'
-	I think we're stuck in some king of free play test mode so Start 1 will spin and give you credit
+    ---
+    note, if game says 'read meters' simply press CTRL then 'B'
+    I think we're stuck in some king of free play test mode so Start 1 will spin and give you credit
 
 */
 
@@ -78,7 +78,7 @@ READ16_MEMBER(sc4_state::sc4_mem_r)
 					UINT32 r_A0 = cpu_get_reg(&space.device(), M68K_A0);
 					UINT32 r_A1 = cpu_get_reg(&space.device(), M68K_A1);
 					UINT32 r_D1 = cpu_get_reg(&space.device(), M68K_D1);
-				
+
 					if (r_D1 == 0x7)
 					{
 						bool valid = true;
@@ -108,7 +108,7 @@ READ16_MEMBER(sc4_state::sc4_mem_r)
 
 
 				return m_cpuregion[offset];
-			
+
 			}
 			else
 				logerror("%08x maincpu read access offset %08x mem_mask %04x cs %d\n", pc, offset*2, mem_mask, cs);
@@ -153,7 +153,7 @@ READ16_MEMBER(sc4_state::sc4_mem_r)
 					{
 						case 0x0240:
 							retvalue = 0x00ff;
-							
+
 							if (mem_mask&0xff00)
 							{
 								retvalue |= (sec.read_data_line() << (6+8));
@@ -253,7 +253,7 @@ WRITE8_MEMBER(sc4_state::mux_output2_w)
 	}
 
 	// others drive 7-segs with it..  so rendering it there as well in our debug layouts
-	
+
 	// todo: reorder properly!
 	UINT8 bf7segdata = BITSWAP8(data,7,6,5,4,3,2,1,0);
 	output_set_digit_value(offset, bf7segdata);
@@ -293,7 +293,7 @@ WRITE16_MEMBER(sc4_state::sc4_mem_w)
 
 				if (addr < 0x0200)
 				{
-					
+
 					if (mem_mask&0xff00)
 					{
 						logerror("lamp write mem_mask&0xff00 unhandled\n");
@@ -303,7 +303,7 @@ WRITE16_MEMBER(sc4_state::sc4_mem_w)
 					{	// lamps
 						mux_output_w(space, (addr & 0x01f0)>>4, data);
 					}
-					
+
 				}
 				else if ((addr >= 0x1000) && (addr < 0x1200))
 				{
@@ -324,7 +324,7 @@ WRITE16_MEMBER(sc4_state::sc4_mem_w)
 						case 0x0330:
 							logerror("%08x meter write %04x\n",pc, data);
 							//m_meterstatus = (m_meterstatus&0xc0) | (data & 0x3f);
-							sec.write_clock_line(~data&0x20);					
+							sec.write_clock_line(~data&0x20);
 							break;
 
 						case 0x1248:
@@ -491,7 +491,7 @@ static WRITE8_HANDLER( bfm_sc4_reel4_w )
 
 void bfm_sc4_68307_portb_w(address_space *space, bool dedicated, UINT16 data, UINT16 line_mask)
 {
-//	if (dedicated == false)
+//  if (dedicated == false)
 	{
 		int pc = cpu_get_pc(&space->device());
 		//m68ki_cpu_core *m68k = m68k_get_safe_token(&space->device());
@@ -621,13 +621,13 @@ void bfm_sc4_duart_tx(device_t *device, int channel, UINT8 data)
 UINT8 bfm_sc4_duart_input_r(device_t *device)
 {
 	sc4_state *state = device->machine().driver_data<sc4_state>();
-//	printf("bfm_sc4_duart_input_r\n");
+//  printf("bfm_sc4_duart_input_r\n");
 	return state->m_optic_pattern;
 }
 
 void bfm_sc4_duart_output_w(device_t *device, UINT8 data)
 {
-//	logerror("bfm_sc4_duart_output_w\n");
+//  logerror("bfm_sc4_duart_output_w\n");
 	sc4_state *state = device->machine().driver_data<sc4_state>();
 
 	state->m_reel56_latch = data;

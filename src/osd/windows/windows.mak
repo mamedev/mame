@@ -162,7 +162,7 @@ CPPONLYFLAGS += /wd4371
 
 # disable side effects warning in STL headers
 CPPONLYFLAGS += /wd4548
- 
+
 # disable macro redefinition warning
 CCOMFLAGS += /wd4005
 

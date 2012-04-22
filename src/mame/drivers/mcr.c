@@ -2528,7 +2528,7 @@ static void mcr_init(running_machine &machine, int cpuboard, int vidboard, int s
 
 	state_save_register_global(machine, input_mux);
 	state_save_register_global(machine, last_op4);
-	
+
 	midway_ssio_device *ssio = machine.device<midway_ssio_device>("ssio");
 	if (ssio != NULL)
 	{

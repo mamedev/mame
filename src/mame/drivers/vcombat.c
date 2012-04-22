@@ -117,7 +117,7 @@ public:
 	DECLARE_WRITE64_MEMBER(v1_fb_w);
 	DECLARE_WRITE16_MEMBER(crtc_w);
 	DECLARE_DIRECT_UPDATE_MEMBER(vcombat_vid_0_direct_handler);
-	DECLARE_DIRECT_UPDATE_MEMBER(vcombat_vid_1_direct_handler);	
+	DECLARE_DIRECT_UPDATE_MEMBER(vcombat_vid_1_direct_handler);
 };
 
 static UINT32 update_screen(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int index)

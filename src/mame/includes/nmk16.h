@@ -21,7 +21,7 @@ public:
 	optional_shared_ptr<UINT16> m_nmk_txvideoram;
 	required_shared_ptr<UINT16> m_mainram;
 	optional_shared_ptr<UINT16> m_gunnail_scrollram;
-	optional_shared_ptr<UINT8> m_spriteram;	
+	optional_shared_ptr<UINT8> m_spriteram;
 	optional_shared_ptr<UINT16> m_nmk_fgvideoram;
 	optional_shared_ptr<UINT16> m_gunnail_scrollramy;
 	optional_shared_ptr<UINT16> m_nmk_bgvideoram1;

@@ -287,7 +287,7 @@ int BFM_BD1_newdata(int id, int data)
 			break;
 			case 0x01:	// blank inside window
 			break;
- 
+
 			case 0x02:	// blank outside window
 			break;
 
@@ -415,12 +415,12 @@ int BFM_BD1_newdata(int id, int data)
 				bd1[id].blank_flag = 0;
 			}
 		}
-		else 
+		else
 		{
-			
+
 			if (data > 0x3F)
 			{
-			//	logerror("Undefined character %x \n", data);
+			//  logerror("Undefined character %x \n", data);
 			}
 			change = BD1_setdata(id, BD1charset[data & 0x3F], data);
 		}

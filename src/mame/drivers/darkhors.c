@@ -75,7 +75,7 @@ public:
 		m_jclub2_tileram(*this, "jclub2_tileram"),
 		m_spriteram(*this, "spriteram"),
 		m_maincpu(*this, "maincpu") { }
-	
+
 	virtual void machine_start()
 	{
 		m_generic_paletteram_16.allocate(0x10000);
@@ -963,8 +963,8 @@ ROM_END
 static DRIVER_INIT( darkhors )
 {
 	UINT32 *rom    = (UINT32 *) machine.root_device().memregion("maincpu")->base();
-//	UINT8  *eeprom = (UINT8 *)  machine.root_device().memregion("eeprom")->base();
-//	int i;
+//  UINT8  *eeprom = (UINT8 *)  machine.root_device().memregion("eeprom")->base();
+//  int i;
 
 #if 1
 	// eeprom error patch
@@ -975,9 +975,9 @@ static DRIVER_INIT( darkhors )
 	rom[0x04600/4]	=	0x4e714eb9;
 #endif
 
-//	if (eeprom != NULL)
-//		for (i = 0; i < (1<<7); i++)
-//			eeprom[i] = eeprom[i*2];
+//  if (eeprom != NULL)
+//      for (i = 0; i < (1<<7); i++)
+//          eeprom[i] = eeprom[i*2];
 }
 
 GAME( 199?, jclub2,   0,      jclub2,  darkhors, 0,        ROT0, "Seta", "Jockey Club II (newer hardware)", GAME_NOT_WORKING | GAME_NO_SOUND )

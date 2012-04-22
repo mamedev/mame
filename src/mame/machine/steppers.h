@@ -30,7 +30,7 @@
 #define GAMESMAN_100STEP_REEL   7
 #define GAMESMAN_200STEP_REEL   8
 
-#define PROJECT_48STEP_REEL     9			
+#define PROJECT_48STEP_REEL     9
 
 /*------------- Stepper motor interface structure -----------------*/
 

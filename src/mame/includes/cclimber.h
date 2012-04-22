@@ -28,7 +28,7 @@ public:
 	optional_shared_ptr<UINT8> m_swimmer_background_color;
 	optional_shared_ptr<UINT8> m_toprollr_bg_videoram;
 	optional_shared_ptr<UINT8> m_toprollr_bg_coloram;
-	
+
 	UINT8 m_yamato_p0;
 	UINT8 m_yamato_p1;
 	UINT8 m_toprollr_rombank;

@@ -365,7 +365,7 @@ LIBS += `sdl-config --libs | sed 's/-lSDLmain//'` -lpthread
 DEFS += -DMACOSX_USE_LIBSDL
 endif   # MACOSX_USE_LIBSDL
 
-else   # ifeq ($(TARGETOS),macosx) 
+else   # ifeq ($(TARGETOS),macosx)
 
 DEFS += -DSDLMAME_UNIX
 DEBUGOBJS = $(SDLOBJ)/debugwin.o $(SDLOBJ)/dview.o $(SDLOBJ)/debug-sup.o $(SDLOBJ)/debug-intf.o

@@ -607,7 +607,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( frenzy_map, AS_PROGRAM, 8, berzerk_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_SHARE("videoram") 
+	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0x6000, 0x7fff) AM_RAM_WRITE(magicram_w) AM_SHARE("videoram")
 	AM_RANGE(0x8000, 0x87ff) AM_MIRROR(0x3800) AM_RAM AM_SHARE("colorram")
 	AM_RANGE(0xc000, 0xcfff) AM_ROM

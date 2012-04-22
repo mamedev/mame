@@ -839,16 +839,16 @@ SCREEN_UPDATE_IND16( stepstag_mid )
 // scrambled palettes?
 static inline int mypal(int x)
 {
-//	return pal5bit(x >> 3);
+//  return pal5bit(x >> 3);
 	return pal5bit((x^0xff) >> 3);
-//	return (((x - 0x80) >= 0) ? (x - 0x80) : 0) ^ 0x7f;
-//	return (x - 0x80);
+//  return (((x - 0x80) >= 0) ? (x - 0x80) : 0) ^ 0x7f;
+//  return (x - 0x80);
 }
 
 WRITE16_MEMBER(stepstag_state::stepstag_palette_w)
 {
 	data = COMBINE_DATA(&m_generic_paletteram_16[offset]);
-//	if ((offset & 1) == 0)
+//  if ((offset & 1) == 0)
 		palette_set_color_rgb(machine(),offset/4,
 			mypal(m_generic_paletteram_16[offset/4*4+0] & 0xff),
 			mypal(m_generic_paletteram_16[offset/4*4+1] & 0xff),

@@ -26,7 +26,7 @@ public:
     { }
 
 	required_device<cpu_device> m_maincpu;
-	
+
 // serial vfd
 	bool vfd_old_clock;
 
@@ -40,7 +40,7 @@ static WRITE16_HANDLER(vfd_w)
 
 	int clock = (data & 0x40);
 	int datline = (data & 0x80);
-	
+
 	//Unlike MPU4, this uses positive transitions on both lines, so this may be a similar, but not identical component
 	// if the clock line changes
 	if ( clock != state->vfd_old_clock )

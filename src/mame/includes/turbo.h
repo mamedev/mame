@@ -28,7 +28,7 @@ public:
 	UINT8 *		m_buckrog_bitmap_ram;
 
 	/* machine states */
-	UINT8 		m_i8279_scanlines;
+	UINT8		m_i8279_scanlines;
 
 	/* sound state */
 	UINT8		m_turbo_osel;
@@ -72,7 +72,7 @@ public:
 	UINT8		m_buckrog_command;
 	UINT8		m_buckrog_myship;
 	int m_last_sound_a;
-	
+
 	DECLARE_WRITE8_MEMBER(scanlines_w);
 	DECLARE_WRITE8_MEMBER(digit_w);
 	DECLARE_READ8_MEMBER(turbo_collision_r);

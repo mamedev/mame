@@ -392,7 +392,7 @@ static MACHINE_CONFIG_START( liberatr, liberatr_state )
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(driver_device,irq0_line_hold,4*60)
 
 	MCFG_ER2055_ADD("earom")
-	
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

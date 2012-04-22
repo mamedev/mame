@@ -850,7 +850,7 @@ private:
 
 	tagged_list<memory_share>	m_sharelist;			// map for share lookups
 
-	tagged_list<memory_region> 	m_regionlist;			// list of memory regions
+	tagged_list<memory_region>	m_regionlist;			// list of memory regions
 };
 
 

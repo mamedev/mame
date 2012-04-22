@@ -30,7 +30,7 @@ public:
 	gp9001vdp_device* m_vdp1;
 
 	optional_shared_ptr<UINT8> m_shared_ram; // 8 bit RAM shared between 68K and sound CPU
-	optional_shared_ptr<UINT16> m_shared_ram16;  	// Really 8 bit RAM connected to Z180
+	optional_shared_ptr<UINT16> m_shared_ram16; 	// Really 8 bit RAM connected to Z180
 
 	device_t *m_main_cpu;
 	device_t *m_sub_cpu;

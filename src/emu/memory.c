@@ -4390,7 +4390,7 @@ void memory_bank::configure_entries(int startentry, int numentries, void *base, 
 
 
 //-------------------------------------------------
-//  configure_decrypted_entry - configure a 
+//  configure_decrypted_entry - configure a
 //  decrypted entry
 //-------------------------------------------------
 
@@ -4414,7 +4414,7 @@ void memory_bank::configure_decrypted_entry(int entrynum, void *base)
 
 
 //-------------------------------------------------
-//  configure_decrypted_entries - configure 
+//  configure_decrypted_entries - configure
 //  multiple decrypted entries
 //-------------------------------------------------
 

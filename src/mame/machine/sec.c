@@ -112,10 +112,10 @@ void SEC::Do_Command(void)
 		case SEC_REQUEST_FINGERPRNT: Cmd_Get_Fpr(); break;
 		case SEC_REQUEST_LAST_CMD:   Cmd_Get_Lst(); break;
 		case SEC_REQUEST_COUNT_VAL:  Cmd_Get_Cnt(); break;
-		case SEC_SET_NUM_COUNTERS: 	 Cmd_Set_Ncn(); break;
+		case SEC_SET_NUM_COUNTERS:	 Cmd_Set_Ncn(); break;
 		case SEC_SET_MARKET:		 Cmd_Set_Mrk(); break;
 		case SEC_SET_COUNTER_TXT:	 Cmd_Set_Txt(); break;
-		case SEC_COUNT_INC_SMALL: 	 Cmd_Inc_Sml(); break;
+		case SEC_COUNT_INC_SMALL:	 Cmd_Inc_Sml(); break;
 		case SEC_COUNT_INC_MED:		 Cmd_Inc_Med(); break;
 		case SEC_COUNT_INC_LARGE:    Cmd_Inc_Lrg(); break;
 
@@ -149,7 +149,7 @@ void SEC::Cmd_Get_Err(void)
 	m_reply[3] = 0; // Last Error
 
 	m_reply[4] = CalcByteSum(1);
-	
+
 	m_rxpos = 0;
 	m_rxclk = 0;
 	m_rxlen = 5;
@@ -160,7 +160,7 @@ void SEC::Cmd_Get_Fpr(void)
 	m_reply[0] = SEC_DAT;
 	m_reply[1] = m_last;
 	m_reply[2] = 4;
-	
+
 	// fingerprint
 	m_reply[3] = 0x11;
 	m_reply[4] = 0x01;
@@ -168,7 +168,7 @@ void SEC::Cmd_Get_Fpr(void)
 	m_reply[6] = 0x00;
 
 	m_reply[7] = CalcByteSum(4);
-	
+
 	m_rxpos = 0;
 	m_rxclk = 0;
 	m_rxlen = 8;
@@ -179,7 +179,7 @@ void SEC::Cmd_Get_Lst(void)
 	m_reply[0] = SEC_DAT;
 	m_reply[1] = m_last;
 	m_reply[2] = 4;
-	
+
 	// Last Command (is this really 4 bytes?)
 	m_reply[3] = m_last;
 	m_reply[4] = 0x00;
@@ -187,7 +187,7 @@ void SEC::Cmd_Get_Lst(void)
 	m_reply[6] = 0x00;
 
 	m_reply[7] = CalcByteSum(4);
-	
+
 	m_rxpos = 0;
 	m_rxclk = 0;
 	m_rxlen = 8;
@@ -205,7 +205,7 @@ void SEC::Cmd_Get_Ver(void)
 	m_reply[5] = 'E';
 
 	m_reply[6] = CalcByteSum(3);
-	
+
 	m_rxpos = 0;
 	m_rxclk = 0;
 	m_rxlen = 7;
@@ -215,8 +215,8 @@ void SEC::Cmd_Get_Cnt(void)
 {
 	char temp[10];
 
-	sprintf(temp,"%07d0", m_counters[m_request[3]]); 
-			
+	sprintf(temp,"%07d0", m_counters[m_request[3]]);
+
 	m_reply[0] = SEC_DAT;
 	m_reply[1] = m_last;
 	m_reply[2] = 4;
@@ -227,7 +227,7 @@ void SEC::Cmd_Get_Cnt(void)
 	m_reply[6] = ((temp[6] - 0x30) << 4) + (temp[7] - 0x30);
 
 	m_reply[7] = CalcByteSum(4);
-	
+
 	m_rxpos = 0;
 	m_rxclk = 0;
 	m_rxlen = 8;
@@ -242,7 +242,7 @@ void SEC::Cmd_Get_Sta(void)
 	m_reply[3] = 0x20; // Status
 
 	m_reply[4] = CalcByteSum(1);
-	
+
 	m_rxpos = 0;
 	m_rxclk = 0;
 	m_rxlen = 5;
@@ -257,7 +257,7 @@ void SEC::Cmd_Get_Mrk(void)
 	m_reply[3] = m_market;
 
 	m_reply[4] = CalcByteSum(1);
-	
+
 	m_rxpos = 0;
 	m_rxclk = 0;
 	m_rxlen = 5;
@@ -278,7 +278,7 @@ void SEC::Cmd_Set_Ncn(void)
 
 void SEC::Cmd_Set_Mrk(void)
 {
-	m_market = m_request[3];   
+	m_market = m_request[3];
 
 	m_reply[0] = SEC_ACK;
 	m_reply[1] = m_last;

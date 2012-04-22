@@ -165,7 +165,7 @@ static VIDEO_START(gal3)
 {
 	gal3_state *state = machine.driver_data<gal3_state>();
 	state->m_generic_paletteram_16.allocate(0x10000);
- 
+
 	namco_obj_init(machine,
 		0,		/* gfx bank */
 		0xf,	/* reverse palette mapping */

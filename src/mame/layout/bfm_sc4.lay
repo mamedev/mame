@@ -31,7 +31,7 @@
       <color red="1.0" green="0.3" blue="0.0" />
     </led7seg>
   </element>
-  
+
 	<view name="AWP Simulated Video (No Artwork)">
 		<backdrop name="vfd0" element="vfd0" state="0">
 			<bounds x="210" y="200" width="9" height="17"/>
@@ -99,10 +99,10 @@
 		<backdrop name="reel6" element="Steppers" state="0">
 			<bounds x="310" y="360" width="50" height="50"/>
 		</backdrop>
-    
-    
-    
-    
+
+
+
+
 		<backdrop name="lamp0" element="matrixlamp" state="0">
 			<bounds x="0" y="0" width="7" height="7"/>
 		</backdrop>
@@ -996,8 +996,8 @@
     <backdrop name="matrix39" element="matrixlamp" state="0">
       <bounds y="28" x="196" width="3" height="3"/>
     </backdrop>
-   
-    
+
+
     <backdrop name="matrix40" element="matrixlamp" state="0">
       <bounds y="0" x="202" width="3" height="3"/>
     </backdrop>
@@ -1118,8 +1118,8 @@
     <backdrop name="matrix79" element="matrixlamp" state="0">
       <bounds y="28" x="218" width="3" height="3"/>
     </backdrop>
-    
-    
+
+
     <backdrop name="matrix80" element="matrixlamp" state="0">
       <bounds y="0" x="224" width="3" height="3"/>
     </backdrop>
@@ -1240,8 +1240,8 @@
     <backdrop name="matrix119" element="matrixlamp" state="0">
       <bounds y="28" x="240" width="3" height="3"/>
     </backdrop>
-    
-    
+
+
     <backdrop name="matrix120" element="matrixlamp" state="0">
       <bounds y="0" x="246" width="3" height="3"/>
     </backdrop>
@@ -1362,8 +1362,8 @@
     <backdrop name="matrix159" element="matrixlamp" state="0">
       <bounds y="28" x="262" width="3" height="3"/>
     </backdrop>
-    
-    <!-- the rest of the elements tend to be used for 7-segs 
+
+    <!-- the rest of the elements tend to be used for 7-segs
          so render them as both -->
     <backdrop name="matrix160" element="matrixlamp" state="0">
       <bounds y="0" x="280" width="3" height="3"/>
@@ -1678,7 +1678,7 @@
     <backdrop name="digit7" element="digit" state="0">
       <bounds x="250" y="64" width="9" height="19"/>
     </backdrop>
-   
+
     <backdrop name="digit8" element="digit" state="0">
       <bounds x="180" y="84" width="9" height="19"/>
     </backdrop>

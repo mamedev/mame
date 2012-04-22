@@ -361,7 +361,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bestbest_pcm_1_iomap, AS_IO, 8, suna16_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ (soundlatch2_byte_r 	)	// From The Sound Z80
+	AM_RANGE(0x00, 0x00) AM_READ (soundlatch2_byte_r	)	// From The Sound Z80
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0x02) AM_DEVWRITE_LEGACY("dac1", bssoccer_DAC_w)	// 2 x DAC
 	AM_RANGE(0x01, 0x01) AM_MIRROR(0x02) AM_DEVWRITE_LEGACY("dac2", bssoccer_DAC_w)	// 2 x DAC
 ADDRESS_MAP_END

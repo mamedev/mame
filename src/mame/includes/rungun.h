@@ -11,7 +11,7 @@ public:
 		: driver_device(mconfig, type, tag) ,
 		m_sysreg(*this, "sysreg"),
 		m_936_videoram(*this, "936_videoram"){ }
-	
+
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_sysreg;
 	required_shared_ptr<UINT16> m_936_videoram;

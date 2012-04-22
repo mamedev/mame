@@ -30,7 +30,7 @@ public:
 	UINT8 vfd_ser_value;
 	int vfd_ser_count;
 
-	const stepper_interface **m_reel_setup; 
+	const stepper_interface **m_reel_setup;
 	int m_reel_changed;
 	int m_reels;
 	int m_reel12_latch;

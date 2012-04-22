@@ -104,7 +104,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(reset_write);
 	DECLARE_READ8_MEMBER(ioport_read);
 	DECLARE_WRITE8_MEMBER(ioport_write);
-	
+
 	// configuration
 	void set_custom_input(int which, UINT8 mask, read8_delegate handler);
 	void set_custom_output(int which, UINT8 mask, write8_delegate handler);

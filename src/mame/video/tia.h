@@ -31,7 +31,7 @@ struct player_gfx {
 #define MCFG_TIA_VIDEO_ADD(_tag, _config) \
 	MCFG_DEVICE_ADD(_tag, TIA_VIDEO, 0) \
 	MCFG_DEVICE_CONFIG(_config)
-	
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -39,7 +39,7 @@ struct player_gfx {
 
 // ======================> tia_interface
 
-	
+
 struct tia_interface {
 	devcb_read16	m_read_input_port_cb;
 	devcb_read8		m_databus_contents_cb;
@@ -112,13 +112,13 @@ private:
 	devcb_resolved_read16	m_read_input_port_func;
 	devcb_resolved_read8	m_databus_contents_func;
 	devcb_resolved_write16	m_vsync_callback_func;
-	
+
 	struct player_gfx p0gfx;
 	struct player_gfx p1gfx;
-	
+
 	UINT64 frame_cycles;
 	UINT64 paddle_cycles;
-	
+
 	int horzP0;
 	int horzP1;
 	int horzM0;
@@ -137,12 +137,12 @@ private:
 	int skipclipP1;
 	int skipM0delay;
 	int skipM1delay;
-	
+
 	int current_bitmap;
-	
+
 	int prev_x;
 	int prev_y;
-	
+
 	UINT8 VSYNC;
 	UINT8 VBLANK;
 	UINT8 COLUP0;
@@ -182,11 +182,11 @@ private:
 	UINT8 PF2;
 	UINT8 INPT4;
 	UINT8 INPT5;
-	
+
 	UINT8 prevGRP0;
 	UINT8 prevGRP1;
 	UINT8 prevENABL;
-	
+
 	int HMOVE_started;
 	int HMOVE_started_previous;
 	UINT8 HMP0_latch;
@@ -196,11 +196,11 @@ private:
 	UINT8 HMBL_latch;
 	UINT8 REFLECT;		/* Should playfield be reflected or not */
 	UINT8 NUSIZx_changed;
-	
+
 	bitmap_ind16 *helper[3];
-	
+
 	UINT16 screen_height;
-	
+
 };
 
 

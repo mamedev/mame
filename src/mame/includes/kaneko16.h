@@ -99,7 +99,7 @@ public:
 	optional_shared_ptr<UINT16> m_layers_1_regs;
 	optional_shared_ptr<UINT16> m_mcu_ram;
 	optional_shared_ptr<UINT16> m_mainram;
-	
+
 	UINT8 m_nvram_save[128];
 	int m_sprite_type;
 	int m_sprite_fliptype;
@@ -110,7 +110,7 @@ public:
 	struct tempsprite *m_first_sprite;
 	kaneko16_priority_t m_priority;
 	optional_shared_ptr<UINT16> m_galsnew_bg_pixram;
-	optional_shared_ptr<UINT16> m_galsnew_fg_pixram;	
+	optional_shared_ptr<UINT16> m_galsnew_fg_pixram;
 	calc1_hit_t m_hit;
 	calc3_hit_t m_hit3;
 	calc3_t m_calc3;

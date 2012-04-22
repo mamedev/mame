@@ -107,7 +107,7 @@ READ8_MEMBER(midway_ssio_device::read)
 
 //-------------------------------------------------
 //  write - handle an external write to one of the
-//	input latches
+//  input latches
 //-------------------------------------------------
 
 WRITE8_MEMBER(midway_ssio_device::write)
@@ -128,7 +128,7 @@ WRITE_LINE_MEMBER(midway_ssio_device::reset_write)
 		device_reset();
 		m_cpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	}
-	
+
 	// going low resets and reactivates the CPU
 	else
 		m_cpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
@@ -167,7 +167,7 @@ WRITE8_MEMBER(midway_ssio_device::ioport_write)
 
 //-------------------------------------------------
 //  set_custom_input - configure a custom port
-//	reader
+//  reader
 //-------------------------------------------------
 
 void midway_ssio_device::set_custom_input(int which, UINT8 mask, read8_delegate handler)
@@ -179,7 +179,7 @@ void midway_ssio_device::set_custom_input(int which, UINT8 mask, read8_delegate 
 
 //-------------------------------------------------
 //  set_custom_output - configure a custom port
-//	writer
+//  writer
 //-------------------------------------------------
 
 void midway_ssio_device::set_custom_output(int which, UINT8 mask, write8_delegate handler)
@@ -191,8 +191,8 @@ void midway_ssio_device::set_custom_output(int which, UINT8 mask, write8_delegat
 
 //-------------------------------------------------
 //  compute_ay8910_modulation - precompute
-//	volume modulation tables based on the duty
-//	cycle described by the PROMs
+//  volume modulation tables based on the duty
+//  cycle described by the PROMs
 //-------------------------------------------------
 
 void midway_ssio_device::compute_ay8910_modulation()
@@ -201,7 +201,7 @@ void midway_ssio_device::compute_ay8910_modulation()
 	// AY-8910 modulation:
 	//
 	// Starts with a 16MHz oscillator
-	//	/2 via 7474 flip-flip @ F11
+	//  /2 via 7474 flip-flip @ F11
 	//
 	// This signal clocks the binary counter @ E11 which
 	// cascades into the decade counter @ D11. This combo
@@ -258,7 +258,7 @@ void midway_ssio_device::compute_ay8910_modulation()
 
 //-------------------------------------------------
 //  clock_14024 - periodic timer to clock the
-//	7-bit async counter at C12
+//  7-bit async counter at C12
 //-------------------------------------------------
 
 INTERRUPT_GEN_MEMBER(midway_ssio_device::clock_14024)
@@ -367,7 +367,7 @@ WRITE8_MEMBER(midway_ssio_device::portb1_w)
 
 //-------------------------------------------------
 //  update_volumes - update the volumes of each
-//	AY-8910 channel based on modulation and mute
+//  AY-8910 channel based on modulation and mute
 //-------------------------------------------------
 
 void midway_ssio_device::update_volumes()
@@ -488,7 +488,7 @@ machine_config_constructor midway_ssio_device::device_mconfig_additions() const
 ioport_constructor midway_ssio_device::device_input_ports() const
 {
 	return NULL;
-//	return INPUT_PORTS_NAME( midway_ssio );
+//  return INPUT_PORTS_NAME( midway_ssio );
 }
 
 
@@ -564,7 +564,7 @@ READ8_MEMBER(midway_chip_squeak_deluxe_device::read)
 
 //-------------------------------------------------
 //  write - handle an external write to the input
-//	latch
+//  latch
 //-------------------------------------------------
 
 WRITE8_MEMBER(midway_chip_squeak_deluxe_device::write)
@@ -779,7 +779,7 @@ READ8_MEMBER(midway_sounds_good_device::read)
 
 //-------------------------------------------------
 //  write - handle an external write to the input
-//	latch
+//  latch
 //-------------------------------------------------
 
 WRITE8_MEMBER(midway_sounds_good_device::write)
@@ -966,7 +966,7 @@ READ8_MEMBER(midway_turbo_chip_squeak_device::read)
 
 //-------------------------------------------------
 //  write - handle an external write to the input
-//	latch
+//  latch
 //-------------------------------------------------
 
 WRITE8_MEMBER(midway_turbo_chip_squeak_device::write)
@@ -1137,7 +1137,7 @@ midway_squawk_n_talk_device::midway_squawk_n_talk_device(const machine_config &m
 
 //-------------------------------------------------
 //  write - handle an external write to the input
-//	latch
+//  latch
 //-------------------------------------------------
 
 WRITE8_MEMBER(midway_squawk_n_talk_device::write)

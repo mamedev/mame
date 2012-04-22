@@ -10,7 +10,7 @@ public:
 	required_shared_ptr<UINT16> m_spriteram;
 	required_shared_ptr<UINT16> m_amazon_videoram;
 	required_shared_ptr<UINT16> m_videoram;
-	
+
 	const UINT16 *m_mpProtData;
 	UINT8 m_mAmazonProtCmd;
 	UINT8 m_mAmazonProtReg[6];

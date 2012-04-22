@@ -64,21 +64,21 @@ static I8255_INTERFACE (ppi8255_intf_d)
 static WRITE8_DEVICE_HANDLER( ppi8255_intf_e_write_a )
 {
 	// writes the 'PYRAMID' string from RAM (copied from ROM) here...
-	// along with port 40/41/42 accesses 
+	// along with port 40/41/42 accesses
 	// also error messages? (well it looks like it should, but code is strange and skips them) I guess it's a debug port or the vfd?
 	// watch ram around e3e0
 
 	// Pyramid - Writes PYRAMID V6, and 10MS INIT ERROR
 	// Labyrinth - Same behavior as Pyramid
 	// Secret Castle - Same behavior as Pyramid
-	
+
 	// Sphinx - Writes "No % Key"  -- depends on port 0x51, writes "SPHINX  V- 1" if it's happy with that .. after that you get COIN TAMPER,  a count down with COINS TRIM and a reboot
 	// Pennies from Heaven - same behavior as Sphinx
 	static int count = 0;
 
 	if ((data>=0x20) && (data<0x5b))
 	{
-		if (count%80 == 0) printf("\n");		
+		if (count%80 == 0) printf("\n");
 
 		printf("%c", data);
 		count++;
@@ -87,12 +87,12 @@ static WRITE8_DEVICE_HANDLER( ppi8255_intf_e_write_a )
 
 static WRITE8_DEVICE_HANDLER( ppi8255_intf_e_write_b )
 {
-//	printf("\nwrite b %02x\n", data);
+//  printf("\nwrite b %02x\n", data);
 }
 
 static WRITE8_DEVICE_HANDLER( ppi8255_intf_e_write_c )
 {
-//	printf("\nwrite c %02x\n", data);
+//  printf("\nwrite c %02x\n", data);
 
 }
 

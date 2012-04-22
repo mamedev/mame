@@ -12,9 +12,9 @@
     emulation see bfm_sc4h.c
 
 
-	note: default Jackpot keys are set to whatever value the game
-	      mentions it should be using with none present, many
-		  games accept multiple keys
+    note: default Jackpot keys are set to whatever value the game
+          mentions it should be using with none present, many
+          games accept multiple keys
 
 */
 
@@ -31,10 +31,10 @@ bool compare_mbus(UINT16* rom)
 
 		if (rom[3] != 0x6612)
 			return false;
-		
+
 		if (rom[7] != 0x0c81)
 			return false;
-		
+
 		if (rom[10] != 0x66ea)
 			return false;
 	}
@@ -172,7 +172,7 @@ int find_project_string(running_machine &machine, int addrxor, int mode)
 }
 
 /* default reels */
-const stepper_interface* default_reel_configs[6] = 
+const stepper_interface* default_reel_configs[6] =
 {
 	&starpoint_interface_48step,
 	&starpoint_interface_48step,
@@ -222,7 +222,7 @@ DRIVER_INIT( sc4 )
 	if (!found)
 		printf("No suitable string found\n");
 
-	
+
 	sc4_state *state = machine.driver_data<sc4_state>();
 
 	state->m_reel_setup = default_reel_configs;
@@ -22752,7 +22752,7 @@ GAME( 200?, sc4pstatj	,sc4pstat,	sc4, sc4, sc4, ROT0, "QPS","Paystation (V041) (
 GAME( 200?, sc4pstato	,sc4pstat,	sc4, sc4, sc4, ROT0, "QPS","Paystation (V042) (Qps) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc4pstatq	,sc4pstat,	sc4, sc4, sc4, ROT0, "QPS","Paystation (V042) (Qps) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
 
-const stepper_interface* sc4cvani_reel_configs[6] = 
+const stepper_interface* sc4cvani_reel_configs[6] =
 {
 	&starpoint_interface_48step,
 	&starpoint_interface_48step,
@@ -22781,7 +22781,7 @@ GAME( 200?, sc4cvanig	,sc4cvani,	sc4, sc4, sc4cvani, ROT0, "QPS","Cashvania (Qps
 GAME( 200?, sc4cvanih	,sc4cvani,	sc4, sc4, sc4cvani, ROT0, "QPS","Cashvania (Qps) (Scorpion 4) (set 9)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc4cvanii	,sc4cvani,	sc4, sc4, sc4cvani, ROT0, "QPS","Cashvania (Qps) (Scorpion 4) (set 10)", GAME_IS_SKELETON_MECHANICAL )
 
-const stepper_interface* sc4cvclb_reel_configs[6] = 
+const stepper_interface* sc4cvclb_reel_configs[6] =
 {
 	&starpoint_interface_48step,
 	&starpoint_interface_48step,
@@ -22893,7 +22893,7 @@ GAME( 200?, sc4blued	,sc4blue,	sc4, sc4, sc4, ROT0, "Mazooma","Blue Rinse (Mazoo
 GAME( 200?, sc4bluee	,sc4blue,	sc4, sc4, sc4, ROT0, "Mazooma","Blue Rinse (Mazooma) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
 
 
-const stepper_interface* sc4bonbx_reel_configs[6] = 
+const stepper_interface* sc4bonbx_reel_configs[6] =
 {
 	&starpoint_interface_200step_reel,
 	&starpoint_interface_200step_reel,
@@ -24088,7 +24088,7 @@ GAME( 200?, sc4luck7c	,sc4luck7,	sc4, sc4, sc4, ROT0, "Mazooma","Lucky 7s (Mazoo
 // PR2085  LUCKY SEVENS         LUCKY SEVENS  ARCADE  LUCKY SOUNDS         LUCKY SEVENS
 GAME( 200?, sc4luck7d	,sc4luck7,	sc4, sc4, sc4, ROT0, "Mazooma","Lucky 7s (Mazooma) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
 
-const stepper_interface* sc4luckb_reel_configs[6] = 
+const stepper_interface* sc4luckb_reel_configs[6] =
 {
 	&starpoint_interface_48step,
 	&starpoint_interface_48step,
@@ -24425,7 +24425,7 @@ GAME( 200?, sc4party	,0,			sc4, sc4, sc4, ROT0, "Nova","Party Time (German) (Nov
 //  PR1205 PAY TIME         95004224 PAYTIME PR7156             PAY TIME
 GAME( 200?, sc4paytm	,0,			sc4, sc4, sc4, ROT0, "BFM","Pay Time (Bellfruit) (Scorpion 4)", GAME_IS_SKELETON_MECHANICAL ) // Not English
 
-const stepper_interface* sc4pgold_reel_configs[6] = 
+const stepper_interface* sc4pgold_reel_configs[6] =
 {
 	&starpoint_interface_48step,
 	&starpoint_interface_48step,
@@ -24734,7 +24734,7 @@ GAME( 200?, sc4rbankb	,sc4rbank,	sc4, sc4, sc4, ROT0, "BFM","Royle Banker (Bellf
 GAME( 200?, sc4rbankc	,sc4rbank,	sc4, sc4, sc4, ROT0, "BFM","Royle Banker (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
 
 
-const stepper_interface* sc4royle_reel_configs[6] = 
+const stepper_interface* sc4royle_reel_configs[6] =
 {
 	&starpoint_interface_48step,
 	&starpoint_interface_48step,
@@ -25557,7 +25557,7 @@ GAME( 200?, sc4bobg		,sc4bob,	sc4, sc4, sc4, ROT0, "Mazooma","Bobby Dazzler (Maz
 GAME( 200?, sc4bobh		,sc4bob,	sc4, sc4, sc4, ROT0, "Mazooma","Bobby Dazzler (Mazooma) (Scorpion 4) (set 9)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc4bobi		,sc4bob,	sc4, sc4, sc4, ROT0, "Mazooma","Bobby Dazzler (Mazooma) (Scorpion 4) (set 10)", GAME_IS_SKELETON_MECHANICAL )
 
-const stepper_interface* sc4bull_reel_configs[6] = 
+const stepper_interface* sc4bull_reel_configs[6] =
 {
 	&starpoint_interface_48step,
 	&starpoint_interface_48step,
@@ -25741,7 +25741,7 @@ GAME( 200?, sc4czfrc	,sc4czfr,	sc4, sc4, sc4, ROT0, "BFM","Crazy Fruits (PR6813)
 GAME( 200?, sc4crnjw	,0,			sc4, sc4, sc4, ROT0, "BFM","Crown Jewels (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc4crnjwa	,sc4crnjw,	sc4, sc4, sc4, ROT0, "BFM","Crown Jewels (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
 
-const stepper_interface* sc4dnd_reel_configs[6] = 
+const stepper_interface* sc4dnd_reel_configs[6] =
 {
 	&starpoint_interface_48step,
 	&starpoint_interface_48step,
@@ -25790,7 +25790,7 @@ GAME( 200?, sc4dndo		,sc4dnd,	sc4, sc4dnd35, sc4dnd, ROT0, "BFM","Deal Or No Dea
 GAME( 200?, sc4dndk		,sc4dnd,	sc4, sc4dnd35, sc4dnd, ROT0, "BFM","Deal Or No Deal (Bellfruit) (Scorpion 4) (DONL428, set 1)", GAME_IS_SKELETON_MECHANICAL )// DONL 428
 GAME( 200?, sc4dndm		,sc4dnd,	sc4, sc4dnd35, sc4dnd, ROT0, "BFM","Deal Or No Deal (Bellfruit) (Scorpion 4) (DONL428, set 2)", GAME_IS_SKELETON_MECHANICAL )// DONL 428
 
-const stepper_interface* sc4dndcs_reel_configs[6] = 
+const stepper_interface* sc4dndcs_reel_configs[6] =
 {
 	&starpoint_interface_48step,
 	&starpoint_interface_48step,
@@ -25820,7 +25820,7 @@ GAME( 200?, sc4dndcsb	,sc4dndcs,	sc4, sc4dndcs5, sc4dndcs, ROT0, "BFM","Deal Or 
 GAME( 200?, sc4dndcsa	,sc4dndcs,	sc4, sc4dndcs5, sc4dndcs, ROT0, "BFM","Deal Or No Deal Classic (Bellfruit) (Scorpion 4) (CLDD212, set 1)", GAME_IS_SKELETON_MECHANICAL ) // CLDD 212
 GAME( 200?, sc4dndcsc	,sc4dndcs,	sc4, sc4dndcs5, sc4dndcs, ROT0, "BFM","Deal Or No Deal Classic (Bellfruit) (Scorpion 4) (CLDD212, set 2)", GAME_IS_SKELETON_MECHANICAL ) // CLDD 212
 
-const stepper_interface* sc4dndbb_reel_configs[6] = 
+const stepper_interface* sc4dndbb_reel_configs[6] =
 {
 	&starpoint_interface_48step,
 	&starpoint_interface_48step,
@@ -25864,7 +25864,7 @@ GAME( 200?, sc4dndbbh	,sc4dndbb,	sc4, sc4dndbb70, sc4dndbb, ROT0, "BFM","Deal Or
 GAME( 200?, sc4dndbbf	,sc4dndbb,	sc4, sc4dndbb70, sc4dndbb, ROT0, "BFM","Deal Or No Deal Break The Bank (Bellfruit) (Scorpion 4) (CRBE572, set 1)", GAME_IS_SKELETON_MECHANICAL ) // CRBE 572
 GAME( 200?, sc4dndbbi	,sc4dndbb,	sc4, sc4dndbb70, sc4dndbb, ROT0, "BFM","Deal Or No Deal Break The Bank (Bellfruit) (Scorpion 4) (CRBE572, set 2)", GAME_IS_SKELETON_MECHANICAL )// CRBE 572
 
-const stepper_interface* sc4dndcl_reel_configs[6] = 
+const stepper_interface* sc4dndcl_reel_configs[6] =
 {
 	&starpoint_interface_48step,
 	&starpoint_interface_48step,
@@ -25898,14 +25898,14 @@ INPUT_PORTS_END
 // PR1949 CLUB DEAL OR NO DEAL         DEAL OR NO DEAL CLUB  PR1949 DEAL O N D SOUNDS11
 GAME( 200?, sc4dndclc	,sc4dndcl,	sc4, sc4,         sc4dndcl, ROT0, "BFM","Deal Or No Deal Club (Bellfruit) (Scorpion 4) (DNDL181, set 1)", GAME_IS_SKELETON_MECHANICAL ) // DNDL 181 CLUB $500 (no key req?)
 GAME( 200?, sc4dndclg	,sc4dndcl,	sc4, sc4,         sc4dndcl, ROT0, "BFM","Deal Or No Deal Club (Bellfruit) (Scorpion 4) (DNDL181, set 2)", GAME_IS_SKELETON_MECHANICAL ) // DNDL 181 CLUB $500 (no key req?)
-GAME( 200?, sc4dndcla	,sc4dndcl,	sc4, sc4dndcl500, sc4dndcl, ROT0, "BFM","Deal Or No Deal Club (Bellfruit) (Scorpion 4) (DNDL212, set 1)", GAME_IS_SKELETON_MECHANICAL ) // DNDL 212 CLUB £500
-GAME( 200?, sc4dndcle	,sc4dndcl,	sc4, sc4dndcl500, sc4dndcl, ROT0, "BFM","Deal Or No Deal Club (Bellfruit) (Scorpion 4) (DNDL212, set 2)", GAME_IS_SKELETON_MECHANICAL ) // DNDL 212 CLUB £500
-GAME( 200?, sc4dndcl	,0,			sc4, sc4dndcl250, sc4dndcl, ROT0, "BFM","Deal Or No Deal Club (Bellfruit) (Scorpion 4) (DNDL313, set 1)", GAME_IS_SKELETON_MECHANICAL ) // DNDL 313 CLUB £250
-GAME( 200?, sc4dndcld	,sc4dndcl,	sc4, sc4dndcl250, sc4dndcl, ROT0, "BFM","Deal Or No Deal Club (Bellfruit) (Scorpion 4) (DNDL313, set 2)", GAME_IS_SKELETON_MECHANICAL ) // DNDL 313 CLUB £250
-GAME( 200?, sc4dndclb	,sc4dndcl,	sc4, sc4dndcl250, sc4dndcl, ROT0, "BFM","Deal Or No Deal Club (Bellfruit) (Scorpion 4) (DNDL391, set 1)", GAME_IS_SKELETON_MECHANICAL ) // DNDL 391 CLUB £250
-GAME( 200?, sc4dndclf	,sc4dndcl,	sc4, sc4dndcl250, sc4dndcl, ROT0, "BFM","Deal Or No Deal Club (Bellfruit) (Scorpion 4) (DNDL391, set 2)", GAME_IS_SKELETON_MECHANICAL ) // DNDL 391 CLUB £250
+GAME( 200?, sc4dndcla	,sc4dndcl,	sc4, sc4dndcl500, sc4dndcl, ROT0, "BFM","Deal Or No Deal Club (Bellfruit) (Scorpion 4) (DNDL212, set 1)", GAME_IS_SKELETON_MECHANICAL ) // DNDL 212 CLUB ?500
+GAME( 200?, sc4dndcle	,sc4dndcl,	sc4, sc4dndcl500, sc4dndcl, ROT0, "BFM","Deal Or No Deal Club (Bellfruit) (Scorpion 4) (DNDL212, set 2)", GAME_IS_SKELETON_MECHANICAL ) // DNDL 212 CLUB ?500
+GAME( 200?, sc4dndcl	,0,			sc4, sc4dndcl250, sc4dndcl, ROT0, "BFM","Deal Or No Deal Club (Bellfruit) (Scorpion 4) (DNDL313, set 1)", GAME_IS_SKELETON_MECHANICAL ) // DNDL 313 CLUB ?250
+GAME( 200?, sc4dndcld	,sc4dndcl,	sc4, sc4dndcl250, sc4dndcl, ROT0, "BFM","Deal Or No Deal Club (Bellfruit) (Scorpion 4) (DNDL313, set 2)", GAME_IS_SKELETON_MECHANICAL ) // DNDL 313 CLUB ?250
+GAME( 200?, sc4dndclb	,sc4dndcl,	sc4, sc4dndcl250, sc4dndcl, ROT0, "BFM","Deal Or No Deal Club (Bellfruit) (Scorpion 4) (DNDL391, set 1)", GAME_IS_SKELETON_MECHANICAL ) // DNDL 391 CLUB ?250
+GAME( 200?, sc4dndclf	,sc4dndcl,	sc4, sc4dndcl250, sc4dndcl, ROT0, "BFM","Deal Or No Deal Club (Bellfruit) (Scorpion 4) (DNDL391, set 2)", GAME_IS_SKELETON_MECHANICAL ) // DNDL 391 CLUB ?250
 
-const stepper_interface* sc4dnddd_reel_configs[6] = 
+const stepper_interface* sc4dnddd_reel_configs[6] =
 {
 	&starpoint_interface_48step,
 	&starpoint_interface_48step,
@@ -25947,7 +25947,7 @@ GAME( 200?, sc4dndddf	,sc4dnddd,	sc4, sc4dnddd70, sc4dnddd, ROT0, "BFM","Deal Or
 GAME( 200?, sc4dndddc	,sc4dnddd,	sc4, sc4dnddd70, sc4dnddd, ROT0, "BFM","Deal Or No Deal Double Deal Or No Deal (Bellfruit) (Scorpion 4) (DDNO573, set 1)", GAME_IS_SKELETON_MECHANICAL ) // DDNO 573
 GAME( 200?, sc4dndddg	,sc4dnddd,	sc4, sc4dnddd70, sc4dnddd, ROT0, "BFM","Deal Or No Deal Double Deal Or No Deal (Bellfruit) (Scorpion 4) (DDNO573, set 2)", GAME_IS_SKELETON_MECHANICAL ) // DDNO 573
 
-const stepper_interface* sc4dndhf_reel_configs[6] = 
+const stepper_interface* sc4dndhf_reel_configs[6] =
 {
 	&starpoint_interface_48step,
 	&starpoint_interface_48step,
@@ -25990,7 +25990,7 @@ GAME( 200?, sc4dndhfd	,sc4dndhf,	sc4, sc4dndhf35, sc4dndhf, ROT0, "BFM","Deal Or
 GAME( 200?, sc4dndhfc	,sc4dndhf,	sc4, sc4dndhf70, sc4dndhf, ROT0, "BFM","Deal Or No Deal Hall Of Fame (Bellfruit) (Scorpion 4) (DNHA571, set 1)", GAME_IS_SKELETON_MECHANICAL ) // DNHA 571
 GAME( 200?, sc4dndhfe	,sc4dndhf,	sc4, sc4dndhf70, sc4dndhf, ROT0, "BFM","Deal Or No Deal Hall Of Fame (Bellfruit) (Scorpion 4) (DNHA571, set 2)", GAME_IS_SKELETON_MECHANICAL ) // DNHA 571
 
-const stepper_interface* sc4dndys_reel_configs[6] = 
+const stepper_interface* sc4dndys_reel_configs[6] =
 {
 	&starpoint_interface_48step,
 	&starpoint_interface_48step,
@@ -26028,7 +26028,7 @@ GAME( 200?, sc4dndys	,0,			sc4, sc4dndys70, sc4dndys, ROT0, "BFM","Deal Or No De
 GAME( 200?, sc4dndysb	,sc4dndys,	sc4, sc4dndys70, sc4dndys, ROT0, "BFM","Deal Or No Deal It's Your Show (Bellfruit) (Scorpion 4) (DOBO571, set 2)", GAME_IS_SKELETON_MECHANICAL ) // DOBO 571
 GAME( 200?, sc4dndysa	,sc4dndys,	sc4, sc4dndys35, sc4dndys, ROT0, "BFM","Deal Or No Deal It's Your Show (Bellfruit) (Scorpion 4) (DOBO474)",        GAME_IS_SKELETON_MECHANICAL ) // DOBO 474
 
-const stepper_interface* sc4dndlp_reel_configs[6] = 
+const stepper_interface* sc4dndlp_reel_configs[6] =
 {
 	&starpoint_interface_48step,
 	&starpoint_interface_48step,
@@ -26062,7 +26062,7 @@ GAME( 200?, sc4dndlpd	,sc4dndlp,	sc4, sc4dndlp70, sc4dndlp, ROT0, "BFM","Deal Or
 GAME( 200?, sc4dndlpb	,sc4dndlp,	sc4, sc4dndlp70, sc4dndlp, ROT0, "BFM","Deal Or No Deal Let's Play Deal Or No Deal (Bellfruit) (Scorpion 4) (LPDN573, set 1)", GAME_IS_SKELETON_MECHANICAL )// LPDN 573
 GAME( 200?, sc4dndlpe	,sc4dndlp,	sc4, sc4dndlp70, sc4dndlp, ROT0, "BFM","Deal Or No Deal Let's Play Deal Or No Deal (Bellfruit) (Scorpion 4) (LPDN573, set 2)", GAME_IS_SKELETON_MECHANICAL )// LPDN 573
 
-const stepper_interface* sc4dndra_reel_configs[6] = 
+const stepper_interface* sc4dndra_reel_configs[6] =
 {
 	&starpoint_interface_48step,
 	&starpoint_interface_48step,
@@ -26101,7 +26101,7 @@ GAME( 200?, sc4dndrad	,sc4dndra,	sc4, sc4dndra35, sc4dndra, ROT0, "BFM","Deal Or
 GAME( 200?, sc4dndrac	,sc4dndra,	sc4, sc4dndra70, sc4dndra, ROT0, "BFM","Deal Or No Deal Red Alert (Bellfruit) (Scorpion 4) (REDT572, set 1)", GAME_IS_SKELETON_MECHANICAL ) // REDT 572
 GAME( 200?, sc4dndrae	,sc4dndra,	sc4, sc4dndra70, sc4dndra, ROT0, "BFM","Deal Or No Deal Red Alert (Bellfruit) (Scorpion 4) (REDT572, set 2)", GAME_IS_SKELETON_MECHANICAL ) // REDT 572
 
-const stepper_interface* sc4dndbd_reel_configs[6] = 
+const stepper_interface* sc4dndbd_reel_configs[6] =
 {
 	&starpoint_interface_48step,
 	&starpoint_interface_48step,
@@ -26141,7 +26141,7 @@ GAME( 200?, sc4dndbdd	,sc4dndbd,	sc4, sc4dndbd35, sc4dndbd, ROT0, "BFM","Deal Or
 GAME( 200?, sc4dndbdc	,sc4dndbd,	sc4, sc4dndbd70, sc4dndbd, ROT0, "BFM","Deal Or No Deal The Big Deal (Bellfruit) (Scorpion 4) (BGDA571, set 1)", GAME_IS_SKELETON_MECHANICAL ) // BGDA 571
 GAME( 200?, sc4dndbde	,sc4dndbd,	sc4, sc4dndbd70, sc4dndbd, ROT0, "BFM","Deal Or No Deal The Big Deal (Bellfruit) (Scorpion 4) (BGDA571, set 2)", GAME_IS_SKELETON_MECHANICAL ) // BGDA 571
 
-const stepper_interface* sc4dndbr_reel_configs[6] = 
+const stepper_interface* sc4dndbr_reel_configs[6] =
 {
 	&starpoint_interface_48step,
 	&starpoint_interface_48step,
@@ -26183,7 +26183,7 @@ GAME( 200?, sc4dndbrf	,sc4dndbr,	sc4, sc4dndbr35, sc4dndbr, ROT0, "BFM","Deal Or
 GAME( 200?, sc4dndbre	,sc4dndbr,	sc4, sc4dndbr70, sc4dndbr, ROT0, "BFM","Deal Or No Deal The Big Reds (Bellfruit) (Scorpion 4) (BIGD571, set 1)", GAME_IS_SKELETON_MECHANICAL ) // BIGD 571
 GAME( 200?, sc4dndbrg	,sc4dndbr,	sc4, sc4dndbr70, sc4dndbr, ROT0, "BFM","Deal Or No Deal The Big Reds (Bellfruit) (Scorpion 4) (BIGD571, set 2)", GAME_IS_SKELETON_MECHANICAL ) // BIGD 571
 
-const stepper_interface* sc4dndcc_reel_configs[6] = 
+const stepper_interface* sc4dndcc_reel_configs[6] =
 {
 	&starpoint_interface_48step,
 	&starpoint_interface_48step,
@@ -26224,7 +26224,7 @@ GAME( 200?, sc4dndcce	,sc4dndcc,	sc4, sc4dndcc35, sc4dndcc, ROT0, "BFM","Deal Or
 GAME( 200?, sc4dndccd	,sc4dndcc,	sc4, sc4dndcc70, sc4dndcc, ROT0, "BFM","Deal Or No Deal The Crazy Chair (Bellfruit) (Scorpion 4) (CRZR571, set 1)", GAME_IS_SKELETON_MECHANICAL ) // CRZR 571
 GAME( 200?, sc4dndccf	,sc4dndcc,	sc4, sc4dndcc70, sc4dndcc, ROT0, "BFM","Deal Or No Deal The Crazy Chair (Bellfruit) (Scorpion 4) (CRZR571, set 2)", GAME_IS_SKELETON_MECHANICAL ) // CRZR 571
 
-const stepper_interface* sc4dnddw_reel_configs[6] = 
+const stepper_interface* sc4dnddw_reel_configs[6] =
 {
 	&starpoint_interface_48step,
 	&starpoint_interface_48step,
@@ -26265,7 +26265,7 @@ GAME( 200?, sc4dnddwf	,sc4dnddw,	sc4, sc4dnddw35, sc4dnddw, ROT0, "BFM","Deal Or
 GAME( 200?, sc4dnddwe	,sc4dnddw,	sc4, sc4dnddw70, sc4dnddw, ROT0, "BFM","Deal Or No Deal The Deal Wheel (Bellfruit) (Scorpion 4) (DOFN572, set 1)", GAME_IS_SKELETON_MECHANICAL ) // DOFN 572
 GAME( 200?, sc4dnddwg	,sc4dnddw,	sc4, sc4dnddw70, sc4dnddw, ROT0, "BFM","Deal Or No Deal The Deal Wheel (Bellfruit) (Scorpion 4) (DOFN572, set 2)", GAME_IS_SKELETON_MECHANICAL ) // DOFN 572
 
-const stepper_interface* sc4dnddf_reel_configs[6] = 
+const stepper_interface* sc4dnddf_reel_configs[6] =
 {
 	&starpoint_interface_48step,
 	&starpoint_interface_48step,
@@ -26304,7 +26304,7 @@ GAME( 200?, sc4dnddfd	,sc4dnddf,	sc4, sc4dnddf35, sc4dnddf, ROT0, "BFM","Deal Or
 GAME( 200?, sc4dnddfc	,sc4dnddf,	sc4, sc4dnddf70, sc4dnddf, ROT0, "BFM","Deal Or No Deal The Dream Factory (Bellfruit) (Scorpion 4) (TDFC571, set 1)", GAME_IS_SKELETON_MECHANICAL ) // TDFC 571
 GAME( 200?, sc4dnddfe	,sc4dnddf,	sc4, sc4dnddf70, sc4dnddf, ROT0, "BFM","Deal Or No Deal The Dream Factory (Bellfruit) (Scorpion 4) (TDFC571, set 2)", GAME_IS_SKELETON_MECHANICAL ) // TDFC 571
 
-const stepper_interface* sc4dndpg_reel_configs[6] = 
+const stepper_interface* sc4dndpg_reel_configs[6] =
 {
 	&starpoint_interface_48step,
 	&starpoint_interface_48step,
@@ -26344,7 +26344,7 @@ GAME( 200?, sc4dndpgd	,sc4dndpg,	sc4, sc4dndpg70, sc4dndpg, ROT0, "BFM","Deal Or
 GAME( 200?, sc4dndpgb	,sc4dndpg,	sc4, sc4dndpg70, sc4dndpg, ROT0, "BFM","Deal Or No Deal The Perfect Game (Bellfruit) (Scorpion 4) (TPBG572, set 1)", GAME_IS_SKELETON_MECHANICAL ) // TPGB 572
 GAME( 200?, sc4dndpge	,sc4dndpg,	sc4, sc4dndpg70, sc4dndpg, ROT0, "BFM","Deal Or No Deal The Perfect Game (Bellfruit) (Scorpion 4) (TPGB572, set 2)", GAME_IS_SKELETON_MECHANICAL ) // TPGB 572
 
-const stepper_interface* sc4dndtp_reel_configs[6] = 
+const stepper_interface* sc4dndtp_reel_configs[6] =
 {
 	&starpoint_interface_48step,
 	&starpoint_interface_48step,
@@ -26385,7 +26385,7 @@ GAME( 200?, sc4dndtpj	,sc4dndtp,	sc4, sc4dndtp35, sc4dndtp, ROT0, "BFM","Deal Or
 GAME( 200?, sc4dndtpk	,sc4dndtp,	sc4, sc4dndtp35, sc4dndtp, ROT0, "BFM","Deal Or No Deal The Power 5 (Bellfruit) (Scorpion 4) (TPRV41A, set 2)", GAME_IS_SKELETON_MECHANICAL )// TPRV 41A
 
 
-const stepper_interface* sc4dndww_reel_configs[6] = 
+const stepper_interface* sc4dndww_reel_configs[6] =
 {
 	&starpoint_interface_48step,
 	&starpoint_interface_48step,
@@ -26418,7 +26418,7 @@ GAME( 200?, sc4dndwwe	,sc4dndww,	sc4, sc4dndww35, sc4dndww, ROT0, "BFM","Deal Or
 GAME( 200?, sc4dndwwc	,sc4dndww,	sc4, sc4dndww35, sc4dndww, ROT0, "BFM","Deal Or No Deal The Walk Of Wealth (Bellfruit) (Scorpion 4) (TWOH415, set 1)", GAME_IS_SKELETON_MECHANICAL ) // TWOH 415
 GAME( 200?, sc4dndwwd	,sc4dndww,	sc4, sc4dndww35, sc4dndww, ROT0, "BFM","Deal Or No Deal The Walk Of Wealth (Bellfruit) (Scorpion 4) (TWOH415, set 2)", GAME_IS_SKELETON_MECHANICAL ) // TWOH 415
 
-const stepper_interface* sc4dndcw_reel_configs[6] = 
+const stepper_interface* sc4dndcw_reel_configs[6] =
 {
 	&starpoint_interface_48step,
 	&starpoint_interface_48step,
@@ -26449,7 +26449,7 @@ GAME( 200?, sc4dndcwb	,sc4dndcw,	sc4, sc4dndcw5, sc4dndcw, ROT0, "BFM","Deal Or 
 GAME( 200?, sc4dndcwa	,sc4dndcw,	sc4, sc4dndcw5, sc4dndcw, ROT0, "BFM","Deal Or No Deal The Walk Of Wealth Classic (Bellfruit) (Scorpion 4) (CWOH272, set 1)", GAME_IS_SKELETON_MECHANICAL ) // CWOH 272
 GAME( 200?, sc4dndcwc	,sc4dndcw,	sc4, sc4dndcw5, sc4dndcw, ROT0, "BFM","Deal Or No Deal The Walk Of Wealth Classic (Bellfruit) (Scorpion 4) (CWOH272, set 2)", GAME_IS_SKELETON_MECHANICAL ) // CWOH 272
 
-const stepper_interface* sc4dndtr_reel_configs[6] = 
+const stepper_interface* sc4dndtr_reel_configs[6] =
 {
 	&starpoint_interface_48step,
 	&starpoint_interface_48step,
@@ -26478,7 +26478,7 @@ INPUT_PORTS_END
 GAME( 200?, sc4dndtr	,0,			sc4, sc4dndtr70, sc4dndtr, ROT0, "BFM","Deal Or No Deal Think Red (Bellfruit) (Scorpion 4) (THRE571, set 1)", GAME_IS_SKELETON_MECHANICAL ) // THRE 571
 GAME( 200?, sc4dndtra	,sc4dndtr,	sc4, sc4dndtr70, sc4dndtr, ROT0, "BFM","Deal Or No Deal Think Red (Bellfruit) (Scorpion 4) (THRE571, set 2)", GAME_IS_SKELETON_MECHANICAL ) // THRE 571
 
-const stepper_interface* sc4dndwb_reel_configs[6] = 
+const stepper_interface* sc4dndwb_reel_configs[6] =
 {
 	&starpoint_interface_48step,
 	&starpoint_interface_48step,
@@ -26512,7 +26512,7 @@ GAME( 200?, sc4dndwbe	,sc4dndwb,	sc4, sc4dndwb35, sc4dndwb, ROT0, "BFM","Deal Or
 GAME( 200?, sc4dndwbf	,sc4dndwb,	sc4, sc4dndwb35, sc4dndwb, ROT0, "BFM","Deal Or No Deal What's In Your Box (Bellfruit) (Scorpion 4) (WIYX419, set 1)", GAME_IS_SKELETON_MECHANICAL ) // WIYX 419
 GAME( 200?, sc4dndwbg	,sc4dndwb,	sc4, sc4dndwb35, sc4dndwb, ROT0, "BFM","Deal Or No Deal What's In Your Box (Bellfruit) (Scorpion 4) (WIYX419, set 2)", GAME_IS_SKELETON_MECHANICAL ) // WIYX 419
 
-const stepper_interface* sc4dndbe_reel_configs[6] = 
+const stepper_interface* sc4dndbe_reel_configs[6] =
 {
 	&starpoint_interface_48step,
 	&starpoint_interface_48step,
@@ -26559,7 +26559,7 @@ GAME( 200?, sc4dndbej	,sc4dndbe,	sc4, sc4dndbe35, sc4dndbe, ROT0, "BFM","Deal Or
 GAME( 200?, sc4dndbem	,sc4dndbe,	sc4, sc4dndbe35, sc4dndbe, ROT0, "BFM","Deal Or No Deal Beat The Banker (Bellfruit) (Scorpion 4) (DBTK426, set 1)", GAME_IS_SKELETON_MECHANICAL ) // DBTK 426
 GAME( 200?, sc4dndben	,sc4dndbe,	sc4, sc4dndbe35, sc4dndbe, ROT0, "BFM","Deal Or No Deal Beat The Banker (Bellfruit) (Scorpion 4) (DBTK426, set 2)", GAME_IS_SKELETON_MECHANICAL ) // DBTK 426
 
-const stepper_interface* sc4dndbc_reel_configs[6] = 
+const stepper_interface* sc4dndbc_reel_configs[6] =
 {
 	&starpoint_interface_48step,
 	&starpoint_interface_48step,
@@ -26653,7 +26653,7 @@ GAME( 200?, sc4evole	,sc4evol,	sc4, sc4, sc4, ROT0, "Qps","Evolution (Qps) (Scor
 GAME( 200?, sc4evolf	,sc4evol,	sc4, sc4, sc4, ROT0, "Qps","Evolution (Qps) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc4evolg	,sc4evol,	sc4, sc4, sc4, ROT0, "Qps","Evolution (Qps) (Scorpion 4) (set 8)", GAME_IS_SKELETON_MECHANICAL )
 
-const stepper_interface* sc4fguy_reel_configs[6] = 
+const stepper_interface* sc4fguy_reel_configs[6] =
 {
 	&starpoint_interface_48step,
 	&starpoint_interface_48step,
@@ -26712,7 +26712,7 @@ GAME( 200?, sc4glade	,sc4glad,	sc4, sc4, sc4, ROT0, "Mazooma","Gladiator (Mazoom
 GAME( 200?, sc4gladf	,sc4glad,	sc4, sc4, sc4, ROT0, "Mazooma","Gladiator (Mazooma) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc4gladg	,sc4glad,	sc4, sc4, sc4, ROT0, "Mazooma","Gladiator (Mazooma) (Scorpion 4) (set 8)", GAME_IS_SKELETON_MECHANICAL )
 
-const stepper_interface* sc4gd_reel_configs[6] = 
+const stepper_interface* sc4gd_reel_configs[6] =
 {
 	&starpoint_interface_48step,
 	&starpoint_interface_48step,
@@ -26743,7 +26743,7 @@ GAME( 200?, sc4gdg		,sc4gd,		sc4, sc4, sc4gd, ROT0, "BFM","Gold Digger (Bellfrui
 GAME( 200?, sc4gdmz		,0,			sc4, sc4, sc4, ROT0, "Mazooma","Gold Diggers? / Golden X Game (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc4gdmza	,sc4gdmz,	sc4, sc4, sc4, ROT0, "Mazooma","Gold Diggers? / Golden X Game (Mazooma) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
 
-const stepper_interface* sc4gdclb_reel_configs[6] = 
+const stepper_interface* sc4gdclb_reel_configs[6] =
 {
 	&starpoint_interface_48step,
 	&starpoint_interface_48step,
@@ -26775,7 +26775,7 @@ GAME( 200?, sc4gdclbi	,sc4gdclb,	sc4, sc4, sc4gdclb, ROT0, "BFM","Gold Digger Cl
 GAME( 200?, sc4gdclbj	,sc4gdclb,	sc4, sc4, sc4gdclb, ROT0, "BFM","Gold Digger Club (Bellfruit) (Scorpion 4) (set 11)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc4gdclbk	,sc4gdclb,	sc4, sc4, sc4gdclb, ROT0, "BFM","Gold Digger Club (Bellfruit) (Scorpion 4) (set 12)", GAME_IS_SKELETON_MECHANICAL )
 
-const stepper_interface* sc4gbcas_reel_configs[6] = 
+const stepper_interface* sc4gbcas_reel_configs[6] =
 {
 	&starpoint_interface_48step,
 	&starpoint_interface_48step,
@@ -26800,7 +26800,7 @@ GAME( 200?, sc4gbcasb	,sc4gbcas,	sc4, sc4, sc4gbcas, ROT0, "BFM","Golden Balls C
 GAME( 200?, sc4gbcasc	,sc4gbcas,	sc4, sc4, sc4gbcas, ROT0, "BFM","Golden Balls Casino (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
 
 
-const stepper_interface* sc4gball_reel_configs[6] = 
+const stepper_interface* sc4gball_reel_configs[6] =
 {
 	&starpoint_interface_48step,
 	&starpoint_interface_48step,
@@ -26824,7 +26824,7 @@ GAME( 200?, sc4gballa	,sc4gball,	sc4, sc4, sc4gball, ROT0, "BFM","Golden Balls (
 GAME( 200?, sc4gballb	,sc4gball,	sc4, sc4, sc4gball, ROT0, "BFM","Golden Balls (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc4gballc	,sc4gball,	sc4, sc4, sc4gball, ROT0, "BFM","Golden Balls (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
 
-const stepper_interface* sc4gunp_reel_configs[6] = 
+const stepper_interface* sc4gunp_reel_configs[6] =
 {
 	&starpoint_interface_48step,
 	&starpoint_interface_48step,
@@ -26851,7 +26851,7 @@ GAME( 200?, sc4gunpe	,sc4gunp,	sc4, sc4, sc4gunp, ROT0, "BFM","Gunpowder Slot (B
 GAME( 200?, sc4gunpf	,sc4gunp,	sc4, sc4, sc4gunp, ROT0, "BFM","Gunpowder Slot (Bellfruit) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc4gunpg	,sc4gunp,	sc4, sc4, sc4gunp, ROT0, "BFM","Gunpowder Slot (Bellfruit) (Scorpion 4) (set 8)", GAME_IS_SKELETON_MECHANICAL )
 
-const stepper_interface* sc4hapnt_reel_configs[6] = 
+const stepper_interface* sc4hapnt_reel_configs[6] =
 {
 	&starpoint_interface_48step,
 	&starpoint_interface_48step,
@@ -26876,7 +26876,7 @@ GAME( 200?, sc4hapntc	,sc4hapnt,	sc4, sc4, sc4hapnt, ROT0, "BFM","Happy Notes (B
 GAME( 200?, sc4hapntd	,sc4hapnt,	sc4, sc4, sc4hapnt, ROT0, "BFM","Happy Notes (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc4hapnte	,sc4hapnt,	sc4, sc4, sc4hapnt, ROT0, "BFM","Happy Notes (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
 
-const stepper_interface* sc4hntcs_reel_configs[6] = 
+const stepper_interface* sc4hntcs_reel_configs[6] =
 {
 	&starpoint_interface_48step,
 	&starpoint_interface_48step,
@@ -26938,7 +26938,7 @@ GAME( 200?, sc4hellbh	,sc4hellb,	sc4, sc4, sc4mbus, ROT0, "BFM","Hells Bells (PR
 GAME( 200?, sc4hellbi	,sc4hellb,	sc4, sc4, sc4mbus, ROT0, "BFM","Hells Bells (PR1419) (Bellfruit) (Scorpion 4) (set 9)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc4hellbj	,sc4hellb,	sc4, sc4, sc4mbus, ROT0, "BFM","Hells Bells (PR1419) (Bellfruit) (Scorpion 4) (set 10)", GAME_IS_SKELETON_MECHANICAL )
 
-const stepper_interface* sc4hill_reel_configs[6] = 
+const stepper_interface* sc4hill_reel_configs[6] =
 {
 	&starpoint_interface_48step,
 	&starpoint_interface_48step,
@@ -27562,14 +27562,14 @@ GAME( 200?, sc4mowowa	,sc4mowow,	sc4, sc4, sc4, ROT0, "Mazooma","Monopoly Wheel 
 GAME( 200?, sc4mowowb	,sc4mowow,	sc4, sc4, sc4, ROT0, "Mazooma","Monopoly Wheel Of Wealth (Mazooma) (PR2118) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL ) // ^^
 GAME( 200?, sc4mowowc	,sc4mowow,	sc4, sc4, sc4, ROT0, "Mazooma","Monopoly Wheel Of Wealth (Mazooma) (PR2118) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL ) // ^^
 
-GAME( 200?, sc4mwwtb	,0,      	sc4, sc4, sc4, ROT0, "Mazooma","Monopoly Wheel Of Wealth (Mazooma) (PR2389, Top Box) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL ) // PR2389  WHEEL OF WEALTH         WOWT SOUNDS         WHEEL OF WEAL
+GAME( 200?, sc4mwwtb	,0,     	sc4, sc4, sc4, ROT0, "Mazooma","Monopoly Wheel Of Wealth (Mazooma) (PR2389, Top Box) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL ) // PR2389  WHEEL OF WEALTH         WOWT SOUNDS         WHEEL OF WEAL
 GAME( 200?, sc4mwwtba	,sc4mwwtb,	sc4, sc4, sc4, ROT0, "Mazooma","Monopoly Wheel Of Wealth (Mazooma) (PR2389, Top Box) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL ) // ^^
 GAME( 200?, sc4mwwtbb	,sc4mwwtb,	sc4, sc4, sc4, ROT0, "Mazooma","Monopoly Wheel Of Wealth (Mazooma) (PR2389, Top Box) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL ) // ^^
 GAME( 200?, sc4mwwtbc	,sc4mwwtb,	sc4, sc4, sc4, ROT0, "Mazooma","Monopoly Wheel Of Wealth (Mazooma) (PR2389, Top Box) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )// ^^
 GAME( 200?, sc4mwwtbd	,sc4mwwtb,	sc4, sc4, sc4, ROT0, "Mazooma","Monopoly Wheel Of Wealth (Mazooma) (PR2389, Top Box) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )// ^^
 
 
-const stepper_interface* sc4bwow_reel_configs[6] = 
+const stepper_interface* sc4bwow_reel_configs[6] =
 {
 	&starpoint_interface_48step,
 	&starpoint_interface_48step,
@@ -27625,7 +27625,7 @@ GAME( 200?, sc4ggtb	    ,0,			sc4, sc4, sc4, ROT0, "Mazooma","Golden Game (Mazoo
 GAME( 200?, sc4ggtba	,sc4ggtb,	sc4, sc4, sc4, ROT0, "Mazooma","Golden Game (Mazooma) (PR2056, Top Box) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL ) // ^^
 GAME( 200?, sc4ggtbb	,sc4ggtb,	sc4, sc4, sc4, ROT0, "Mazooma","Golden Game (Mazooma) (PR2056, Top Box) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )// ^^
 
-const stepper_interface* sc4ggame_reel_configs[6] = 
+const stepper_interface* sc4ggame_reel_configs[6] =
 {
 	&starpoint_interface_200step_reel,
 	&starpoint_interface_200step_reel,
@@ -27651,7 +27651,7 @@ static DRIVER_INIT( sc4ggame )
 
 // 25GBP sets
 // PR2056  GOLDEN X         GOLDEN GAME ARCADE  BARX SOUNDS         GOLDEN X
-GAME( 200?, sc4ggame	,0,	        sc4, sc4, sc4ggamem, ROT0, "Mazooma","Golden Game (Mazooma) (PR2056, newer?) (Scorpion 4) (GLDX, 25GBP, set 1)", GAME_IS_SKELETON_MECHANICAL ) 
+GAME( 200?, sc4ggame	,0,	        sc4, sc4, sc4ggamem, ROT0, "Mazooma","Golden Game (Mazooma) (PR2056, newer?) (Scorpion 4) (GLDX, 25GBP, set 1)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc4ggamei	,sc4ggame,	sc4, sc4, sc4ggamem, ROT0, "Mazooma","Golden Game (Mazooma) (PR2056, newer?) (Scorpion 4) (GLDX, 25GBP, set 2)", GAME_IS_SKELETON_MECHANICAL )// ^^
 GAME( 200?, sc4ggamep	,sc4ggame,	sc4, sc4, sc4ggamem, ROT0, "Mazooma","Golden Game (Mazooma) (PR2056, newer?) (Scorpion 4) (GLDX, 25GBP, set 3)", GAME_IS_SKELETON_MECHANICAL )// ^^
 GAME( 200?, sc4ggameq	,sc4ggame,	sc4, sc4, sc4ggamem, ROT0, "Mazooma","Golden Game (Mazooma) (PR2056, newer?) (Scorpion 4) (GLDX, 25GBP, set 4)", GAME_IS_SKELETON_MECHANICAL )// ^^
@@ -27676,7 +27676,7 @@ GAME( 200?, sc4ggame1	,sc4ggame,	sc4, sc4, sc4ggamem, ROT0, "Mazooma","Golden Ga
 GAME( 200?, sc4ggame2	,sc4ggame,	sc4, sc4, sc4ggamem, ROT0, "Mazooma","Golden Game (Mazooma) (PR2056, newer?) (Scorpion 4) (set 8)", GAME_IS_SKELETON_MECHANICAL )// ^^
 // 25GBP, no 41 check
 // PR2056  GOLDEN X         BARX SOUNDS         GOLDEN X
-GAME( 200?, sc4ggamea	,sc4ggame,	sc4, sc4, sc4ggame,  ROT0, "Mazooma","Golden Game (Mazooma) (PR2056) (Scorpion 4) (GLDX, 25GBP, set 1)", GAME_IS_SKELETON_MECHANICAL ) 
+GAME( 200?, sc4ggamea	,sc4ggame,	sc4, sc4, sc4ggame,  ROT0, "Mazooma","Golden Game (Mazooma) (PR2056) (Scorpion 4) (GLDX, 25GBP, set 1)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc4ggameb	,sc4ggame,	sc4, sc4, sc4ggame,  ROT0, "Mazooma","Golden Game (Mazooma) (PR2056) (Scorpion 4) (GLDX, 25GBP, set 2)", GAME_IS_SKELETON_MECHANICAL ) // ^^
 GAME( 200?, sc4ggamec	,sc4ggame,	sc4, sc4, sc4ggame,  ROT0, "Mazooma","Golden Game (Mazooma) (PR2056) (Scorpion 4) (GLDX, 25GBP, set 3)", GAME_IS_SKELETON_MECHANICAL ) // ^^
 GAME( 200?, sc4ggamed	,sc4ggame,	sc4, sc4, sc4ggame,  ROT0, "Mazooma","Golden Game (Mazooma) (PR2056) (Scorpion 4) (GLDX, 25GBP, set 4)", GAME_IS_SKELETON_MECHANICAL ) // ^^
@@ -27711,7 +27711,7 @@ GAME( 200?, sc4ggdlxe	,sc4ggdlx,	sc4, sc4, sc4ggame, ROT0, "Mazooma","Golden Gam
 GAME( 200?, sc4ggdlxf	,sc4ggdlx,	sc4, sc4, sc4ggame, ROT0, "Mazooma","Golden Game Deluxe (Mazooma) (PR2201) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc4ggdlxg	,sc4ggdlx,	sc4, sc4, sc4ggame, ROT0, "Mazooma","Golden Game Deluxe (Mazooma) (PR2201) (Scorpion 4) (set 8)", GAME_IS_SKELETON_MECHANICAL )// ^^
 
-const stepper_interface* sc4gggtb_reel_configs[6] = 
+const stepper_interface* sc4gggtb_reel_configs[6] =
 {
 	&starpoint_interface_48step,
 	&starpoint_interface_48step,
@@ -27733,7 +27733,7 @@ GAME( 200?, sc4gggtb		,0,			sc4, sc4, sc4gggtb, ROT0, "Mazooma","Grand Golden Ga
 GAME( 200?, sc4gggtba		,sc4ggg,	sc4, sc4, sc4gggtb, ROT0, "Mazooma","Grand Golden Game (Mazooma) (PR2056, Top Box) (Scorpion 4) (GGGT, set 2)", GAME_IS_SKELETON_MECHANICAL )// ^^
 
 
-const stepper_interface* sc4ggg_reel_configs[6] = 
+const stepper_interface* sc4ggg_reel_configs[6] =
 {
 	&starpoint_interface_200step_reel,
 	&starpoint_interface_200step_reel,
