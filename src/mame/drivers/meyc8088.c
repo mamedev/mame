@@ -4,7 +4,10 @@
 
   i8088 CPU @ 5MHz (15MHz XTAL + i8284A clock generator),
   3 x 8KB EPROM (max 4), 3 x 8KB RAM (max 4), 2KB battery RAM,
-  2 x i8155, optional i8251A for factory debug
+  2 x i8155, optional i8251A + RS232 for factory debug
+  
+  driver by MAME team
+  also thanks to Darrell Hal Smith, Kevin Mullins
 
 
 ****************************************************************/
@@ -29,6 +32,7 @@ public:
 	UINT8 m_status;
 	UINT8 m_common;
 	
+	DECLARE_WRITE8_MEMBER(drive_w);
 	DECLARE_WRITE8_MEMBER(video5_flip_w);
 	DECLARE_READ8_MEMBER(video5_flip_r);
 	DECLARE_WRITE8_MEMBER(screen_flip_w);
@@ -69,6 +73,14 @@ static SCREEN_UPDATE_IND16( meyc8088 )
 
 ***************************************************************************/
 
+WRITE8_MEMBER(meyc8088_state::drive_w)
+{
+	m_status &= ~0x20;
+
+	// d0-d3: DC counter drivers
+	// d4-d7: AC motor drivers
+}
+
 // switch screen on/off on $b4000 access
 READ8_MEMBER(meyc8088_state::screen_flip_r)
 {
@@ -101,9 +113,9 @@ static ADDRESS_MAP_START( meyc8088_map, AS_PROGRAM, 8, meyc8088_state )
 	AM_RANGE(0xb0800, 0xb0807) AM_DEVREADWRITE("i8155_2", i8155_device, io_r, io_w)
 	AM_RANGE(0xb1000, 0xb10ff) AM_DEVREADWRITE("i8155_1", i8155_device, memory_r, memory_w)
 	AM_RANGE(0xb1800, 0xb1807) AM_DEVREADWRITE("i8155_1", i8155_device, io_r, io_w)
-//	AM_RANGE(0xb2000, 0xb2000) AM_NOP // drive motor?
-//	AM_RANGE(0xb3000, 0xb3000) AM_RAM // 8251A, debug related
-//	AM_RANGE(0xb3800, 0xb3800) AM_RAM // "
+	AM_RANGE(0xb2000, 0xb2000) AM_WRITE(drive_w)
+//	AM_RANGE(0xb3000, 0xb3000) AM_NOP // 8251A, debug related
+//	AM_RANGE(0xb3800, 0xb3800) AM_NOP // "
 	AM_RANGE(0xb4000, 0xb4000) AM_READWRITE(screen_flip_r, screen_flip_w)
 	AM_RANGE(0xb5000, 0xb5000) AM_READWRITE(video5_flip_r, video5_flip_w)
 	AM_RANGE(0xf8000, 0xfffff) AM_ROM
@@ -132,6 +144,7 @@ static WRITE8_DEVICE_HANDLER(meyc8088_common_w)
 	state->m_status = (state->m_status & ~1) | (data & 1);
 	
 	// d1: battery on
+	state->m_status = (state->m_status & ~0x10) | (data << 3 & 0x10);
 	
 	// d2-d5: /common
 	state->m_common = data >> 2 & 0xf;
@@ -162,7 +175,7 @@ static READ8_DEVICE_HANDLER(meyc8088_status_r)
 	// d3: N/C
 	// d4: battery ok
 	// d5: /drive on
-	return (state->m_status & 7) | 0x38;
+	return (state->m_status & 7) | 0x18;
 }
 
 static const i8155_interface i8155_intf[2] =
