@@ -10,12 +10,17 @@
   also thanks to Darrell Hal Smith, Kevin Mullins
 
 
+  TODO:
+  - fix vblank failure
+  - inputs
+
 ****************************************************************/
 
 #include "emu.h"
 #include "cpu/i86/i86.h"
 #include "machine/i8155.h"
 #include "sound/dac.h"
+#include "machine/nvram.h"
 
 class meyc8088_state : public driver_device
 {
@@ -125,19 +130,47 @@ WRITE8_MEMBER(meyc8088_state::video5_flip_w)
 
 
 static ADDRESS_MAP_START( meyc8088_map, AS_PROGRAM, 8, meyc8088_state )
-	AM_RANGE(0x00000, 0x007ff) AM_RAM
+	AM_RANGE(0x00000, 0x007ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x70000, 0x77fff) AM_RAM AM_SHARE("vram")
 	AM_RANGE(0xb0000, 0xb00ff) AM_DEVREADWRITE("i8155_2", i8155_device, memory_r, memory_w)
 	AM_RANGE(0xb0800, 0xb0807) AM_DEVREADWRITE("i8155_2", i8155_device, io_r, io_w)
 	AM_RANGE(0xb1000, 0xb10ff) AM_DEVREADWRITE("i8155_1", i8155_device, memory_r, memory_w)
 	AM_RANGE(0xb1800, 0xb1807) AM_DEVREADWRITE("i8155_1", i8155_device, io_r, io_w)
 	AM_RANGE(0xb2000, 0xb2000) AM_WRITE(drive_w)
-//  AM_RANGE(0xb3000, 0xb3000) AM_NOP // i8251A data (debug related, unpopulated on sold boards)
-//  AM_RANGE(0xb3800, 0xb3800) AM_NOP // "
+	AM_RANGE(0xb3000, 0xb3000) AM_NOP // i8251A data (debug related, unpopulated on sold boards)
+	AM_RANGE(0xb3800, 0xb3800) AM_NOP // "
 	AM_RANGE(0xb4000, 0xb4000) AM_READWRITE(screen_flip_r, screen_flip_w)
 	AM_RANGE(0xb5000, 0xb5000) AM_READWRITE(video5_flip_r, video5_flip_w)
 	AM_RANGE(0xf8000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
+
+
+static READ8_DEVICE_HANDLER(meyc8088_input_r)
+{
+	meyc8088_state *state = device->machine().driver_data<meyc8088_state>();
+	UINT8 ret = 0xff;
+
+	// multiplexed switch inputs
+	if (~state->m_common & 1) ret &= input_port_read_safe(device->machine(), "C0", 0); // bit switches
+	if (~state->m_common & 2) ret &= input_port_read_safe(device->machine(), "C1", 0); // control switches
+	if (~state->m_common & 4) ret &= input_port_read_safe(device->machine(), "C2", 0); // light switches
+	if (~state->m_common & 8) ret &= input_port_read_safe(device->machine(), "C3", 0); // light switches
+
+	return ret;
+}
+
+static READ8_DEVICE_HANDLER(meyc8088_status_r)
+{
+	meyc8088_state *state = device->machine().driver_data<meyc8088_state>();
+
+	// d0: /CR2
+	// d1: screen on
+	// d2: video5
+	// d3: N/C
+	// d4: battery ok
+	// d5: /drive on
+	return (state->m_status & 7) | 0x18;
+}
 
 
 static WRITE8_DEVICE_HANDLER(meyc8088_lights1_w)
@@ -166,10 +199,7 @@ static WRITE8_DEVICE_HANDLER(meyc8088_common_w)
 
 	// d2-d5: /common
 	state->m_common = data >> 2 & 0xf;
-
-	logerror("i8155 Port C: %02X\n", data);
 }
-
 
 static WRITE_LINE_DEVICE_HANDLER(meyc8088_sound_out)
 {
@@ -177,26 +207,13 @@ static WRITE_LINE_DEVICE_HANDLER(meyc8088_sound_out)
 }
 
 
-static READ8_DEVICE_HANDLER(meyc8088_status_r)
-{
-	meyc8088_state *state = device->machine().driver_data<meyc8088_state>();
-
-	// d0: /CR2
-	// d1: screen on
-	// d2: video5
-	// d3: N/C
-	// d4: battery ok
-	// d5: /drive on
-	return (state->m_status & 7) | 0x18;
-}
-
 static const i8155_interface i8155_intf[2] =
 {
 	{
 		// all ports set to input
-		DEVCB_INPUT_PORT("IN0"),
+		DEVCB_HANDLER(meyc8088_input_r),
 		DEVCB_NULL,
-		DEVCB_INPUT_PORT("IN1"),
+		DEVCB_INPUT_PORT("SW"), // filtered switch inputs
 		DEVCB_NULL,
 		DEVCB_HANDLER(meyc8088_status_r),
 		DEVCB_NULL,
@@ -222,79 +239,131 @@ static const i8155_interface i8155_intf[2] =
 ***************************************************************************/
 
 static INPUT_PORTS_START( gldarrow )
-	PORT_START("IN0")
-	PORT_DIPNAME( 0x01, 0x01, "IN0 1" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "IN0 2" )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "IN0 3" )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "IN0 4" )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "IN0 5" )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "IN0 6" )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "IN0 7" )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "IN0 8" )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("IN1")
+	PORT_START("SW")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_VBLANK )
-	PORT_DIPNAME( 0x02, 0x02, "IN1 2" )
+	PORT_DIPNAME( 0x02, 0x02, "SW 2" )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "IN1 3" )
+	PORT_DIPNAME( 0x04, 0x04, "SW 3" )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "IN1 4" )
+	PORT_DIPNAME( 0x08, 0x08, "SW 4" )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "IN1 5" )
+	PORT_DIPNAME( 0x10, 0x10, "SW 5" )
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "IN1 6" )
+	PORT_DIPNAME( 0x20, 0x20, "SW 6" )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "IN1 7" )
+	PORT_DIPNAME( 0x40, 0x40, "SW 7" )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "IN1 8" )
+	PORT_DIPNAME( 0x80, 0x80, "SW 8" )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("IN2")
-	PORT_DIPNAME( 0x01, 0x01, "IN2 1" )
+	PORT_START("C0")
+	PORT_DIPNAME( 0x01, 0x00, "Bit Switch 1" )		PORT_DIPLOCATION("BSW:1")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, "Bit Switch 2" )		PORT_DIPLOCATION("BSW:2")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x00, "Bit Switch 3" )		PORT_DIPLOCATION("BSW:3")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x00, "Bit Switch 4" )		PORT_DIPLOCATION("BSW:4")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x00, "Bit Switch 5" )		PORT_DIPLOCATION("BSW:5")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, "Bit Switch 6" )		PORT_DIPLOCATION("BSW:6")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, "Bit Switch 7" )		PORT_DIPLOCATION("BSW:7")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, "Bit Switch 8" )		PORT_DIPLOCATION("BSW:8")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+
+	PORT_START("C1")
+	PORT_DIPNAME( 0x01, 0x01, "C1 1" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "IN2 2" )
+	PORT_DIPNAME( 0x02, 0x02, "C1 2" )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "IN2 3" )
+	PORT_DIPNAME( 0x04, 0x04, "C1 3" )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "IN2 4" )
+	PORT_DIPNAME( 0x08, 0x08, "C1 4" )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "IN2 5" )
+	PORT_DIPNAME( 0x10, 0x10, "C1 5" )
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "IN2 6" )
+	PORT_DIPNAME( 0x20, 0x20, "C1 6" )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "IN2 7" )
+	PORT_DIPNAME( 0x40, 0x40, "C1 7" )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "IN2 8" )
+	PORT_DIPNAME( 0x80, 0x80, "C1 8" )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("C2")
+	PORT_DIPNAME( 0x01, 0x01, "C2 1" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "C2 2" )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "C2 3" )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "C2 4" )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "C2 5" )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "C2 6" )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "C2 7" )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "C2 8" )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("C3")
+	PORT_DIPNAME( 0x01, 0x01, "C3 1" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "C3 2" )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "C3 3" )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "C3 4" )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "C3 5" )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "C3 6" )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "C3 7" )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "C3 8" )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -314,6 +383,8 @@ static MACHINE_CONFIG_START( meyc8088, meyc8088_state )
 
 	MCFG_I8155_ADD("i8155_1", XTAL_15MHz / (3*2*1), i8155_intf[0])
 	MCFG_I8155_ADD("i8155_2", XTAL_15MHz / (3*2*32), i8155_intf[1])
+
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -342,4 +413,4 @@ ROM_START( gldarrow )
 ROM_END
 
 
-GAME( 1984, gldarrow, 0,        meyc8088, gldarrow, 0, ROT0,  "Meyco Games, Inc.", "Golden Arrow", GAME_NOT_WORKING )
+GAME( 1984, gldarrow, 0,        meyc8088, gldarrow, 0, ROT0,  "Meyco Games, Inc.", "Golden Arrow", GAME_NOT_WORKING | GAME_WRONG_COLORS )
