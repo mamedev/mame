@@ -310,7 +310,7 @@ static INPUT_PORTS_START( sexyboom )
 	PORT_DIPNAME( 0x40, 0x00, "Display Numbers on Tiles" )	PORT_DIPLOCATION("SW1:2") /* As per manual */
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_BIT( 0x80, , IPT_COIN1 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 INPUT_PORTS_END
 
 
