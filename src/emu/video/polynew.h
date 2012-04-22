@@ -1112,10 +1112,10 @@ int poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::zclip_if_less(i
 			const vertex_t &v1 = v[(vertnum == 0) ? (numverts - 1) : (vertnum - 1)];
 			const vertex_t &v2 = v[vertnum];
 			_BaseType frac = (clipval - v1.p[0]) / (v2.p[0] - v1.p[0]);
-			nextout.x = v1.x + frac * (v2.x - v1.x);
-			nextout.y = v1.y + frac * (v2.y - v1.y);
+			nextout->x = v1.x + frac * (v2.x - v1.x);
+			nextout->y = v1.y + frac * (v2.y - v1.y);
 			for (int paramnum = 0; paramnum < paramcount; paramnum++)
-				nextout.p[paramnum] = v1.p[paramnum] + frac * (v2.p[paramnum] - v1.p[paramnum]);
+				nextout->p[paramnum] = v1.p[paramnum] + frac * (v2.p[paramnum] - v1.p[paramnum]);
 			nextout++;
 		}
 
