@@ -23,6 +23,8 @@ static int nycaptor_spot( running_machine &machine )
 		return state->m_sharedram[0x299] ? state->m_sharedram[0x298] : 0;
 	else
 		return 0;
+
+    return 0;
 }
 
 WRITE8_MEMBER(nycaptor_state::nycaptor_spriteram_w)
@@ -263,7 +265,7 @@ SCREEN_UPDATE_IND16( nycaptor )
 		draw_sprites(screen.machine(), bitmap, cliprect, 7);
 	}
 	else
-	#endif
+#endif
 	switch (nycaptor_spot(screen.machine()) & 3)
 	{
 	case 0:
