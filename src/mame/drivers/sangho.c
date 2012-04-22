@@ -34,6 +34,8 @@ is a YM2413 compatible chip.
 
 *** the custom chip with the warning appears to control banking etc.
 
+Sexy Boom's DSW setting verfied via Z80 code by stephh
+
 */
 
 #include "emu.h"
@@ -290,26 +292,25 @@ static INPUT_PORTS_START( sexyboom )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW1:8,7") /* Will need verification */
-	PORT_DIPSETTING(    0x03, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
+	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW1:8,7,6")
+	PORT_DIPSETTING(    0x03, DEF_STR( Easiest ) )
+	PORT_DIPSETTING(    0x05, "Easiest (duplicate)" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x02, "Easy (duplicate)" )
+	PORT_DIPSETTING(    0x07, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x06, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Harder ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW1:6")
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Coinage ) )		PORT_DIPLOCATION("SW1:5,4") /* Determined by effect, but matches Puzzle Star's manual listings */
 	PORT_DIPSETTING(    0x08, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x18, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW1:3") /* Not shown in manual */
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPUNUSED_DIPLOC( 0x20, IP_ACTIVE_LOW, "SW1:3" )	/* Not shown in manual */
 	PORT_DIPNAME( 0x40, 0x00, "Display Numbers on Tiles" )	PORT_DIPLOCATION("SW1:2") /* As per manual */
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x80, , IPT_COIN1 )
 INPUT_PORTS_END
 
 
