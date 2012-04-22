@@ -437,7 +437,7 @@ class device_t::memory_region_finder : public device_t::object_finder_base<memor
 public:
 	// construction/destruction
 	memory_region_finder(device_t &base, const char *tag)
-		: object_finder_base(base, tag) { }
+		: object_finder_base<memory_region>(base, tag) { }
 
 	// finder
 	virtual bool findit()
@@ -471,7 +471,7 @@ class device_t::memory_bank_finder : public device_t::object_finder_base<memory_
 public:
 	// construction/destruction
 	memory_bank_finder(device_t &base, const char *tag)
-		: object_finder_base(base, tag) { }
+		: object_finder_base<memory_bank>(base, tag) { }
 
 	// finder
 	virtual bool findit()
@@ -505,7 +505,7 @@ class device_t::ioport_finder : public device_t::object_finder_base<input_port_c
 public:
 	// construction/destruction
 	ioport_finder(device_t &base, const char *tag)
-		: object_finder_base(base, tag) { }
+		: object_finder_base<input_port_config>(base, tag) { }
 
 	// finder
 	virtual bool findit()
