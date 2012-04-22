@@ -34,7 +34,7 @@ is a YM2413 compatible chip.
 
 *** the custom chip with the warning appears to control banking etc.
 
-Sexy Boom's DSW setting verfied via Z80 code by stephh
+Sexy Boom's DSW setting verified via Z80 code by stephh
 
 */
 
