@@ -49,21 +49,39 @@ public:
 static SCREEN_UPDATE_IND16( meyc8088 )
 {
 	meyc8088_state *state = screen.machine().driver_data<meyc8088_state>();
+	UINT8 v[5];
+	v[4] = state->m_status << 2 & 0x10; // video5: color prom d4
 
-	for (int y = 0; y < 512; y++)
+	if (~state->m_status & 2)
 	{
-		for (int x = 0; x < 64; x++)
-		{
-			UINT8 data = state->m_vram[y*64+x];
-			for (int i = 0; i < 8; i++)
-			{
-				bitmap.pix16(y, x << 3 | i) = (data << i & 0x80) ? 1 : 0;
-			}
+		// screen off
+		bitmap.fill(v[4]);
+		return 0;
+	}
 
-		}
+	for (offs_t offs = 0x800; offs < 0x4000; offs+=2)
+	{
+		UINT8 y = (offs-0x800) >> 6;
+		UINT8 x = (offs-0x800) << 2;
+
+		v[0] = state->m_vram[offs|0x0000]; // video1: color prom d0
+		v[1] = state->m_vram[offs|0x0001]; // video2: color prom d1
+		v[2] = state->m_vram[offs|0x4000]; // video3: color prom d2
+		v[3] = state->m_vram[offs|0x4001]; // video4: color prom d3
+
+		for (int i = 0; i < 8; i++)
+			bitmap.pix16(y, x | i) = ((v[0] << i) >> 7 & 1) | ((v[1] << i) >> 6 & 2) | ((v[2] << i) >> 5 & 4) | ((v[3] << i) >> 4 & 8) | v[4];
 	}
 
 	return 0;
+}
+
+static SCREEN_VBLANK( meyc8088 )
+{
+	meyc8088_state *state = screen.machine().driver_data<meyc8088_state>();
+
+	// INTR on LC255 (pulses at start and end of vblank), INTA hardwired to $20
+	generic_pulse_irq_line_and_vector(state->m_maincpu, 0, 0x20, 1);
 }
 
 
@@ -114,7 +132,7 @@ static ADDRESS_MAP_START( meyc8088_map, AS_PROGRAM, 8, meyc8088_state )
 	AM_RANGE(0xb1000, 0xb10ff) AM_DEVREADWRITE("i8155_1", i8155_device, memory_r, memory_w)
 	AM_RANGE(0xb1800, 0xb1807) AM_DEVREADWRITE("i8155_1", i8155_device, io_r, io_w)
 	AM_RANGE(0xb2000, 0xb2000) AM_WRITE(drive_w)
-//  AM_RANGE(0xb3000, 0xb3000) AM_NOP // 8251A, debug related
+//  AM_RANGE(0xb3000, 0xb3000) AM_NOP // i8251A data (debug related, unpopulated on sold boards)
 //  AM_RANGE(0xb3800, 0xb3800) AM_NOP // "
 	AM_RANGE(0xb4000, 0xb4000) AM_READWRITE(screen_flip_r, screen_flip_w)
 	AM_RANGE(0xb5000, 0xb5000) AM_READWRITE(video5_flip_r, video5_flip_w)
@@ -152,16 +170,10 @@ static WRITE8_DEVICE_HANDLER(meyc8088_common_w)
 	logerror("i8155 Port C: %02X\n", data);
 }
 
-static WRITE_LINE_DEVICE_HANDLER(meyc8088_i8155_1_timer_out)
-{
-	// clock 8251A
-	//logerror("Timer 1 out %d\n", state);
-}
 
-static WRITE_LINE_DEVICE_HANDLER(meyc8088_i8155_2_timer_out)
+static WRITE_LINE_DEVICE_HANDLER(meyc8088_sound_out)
 {
-	// sound dac
-	//logerror("Timer 2 out %d\n", state);
+	dac_signed_w(device->machine().device("dac"), 0, state ? 0x7f : 0);
 }
 
 
@@ -188,7 +200,7 @@ static const i8155_interface i8155_intf[2] =
 		DEVCB_NULL,
 		DEVCB_HANDLER(meyc8088_status_r),
 		DEVCB_NULL,
-		DEVCB_LINE(meyc8088_i8155_1_timer_out)
+		DEVCB_NULL // i8251A trigger txc/rxc (debug related, unpopulated on sold boards)
 	},
 	{
 		// all ports set to output
@@ -198,7 +210,7 @@ static const i8155_interface i8155_intf[2] =
 		DEVCB_HANDLER(meyc8088_lights1_w),
 		DEVCB_NULL,
 		DEVCB_HANDLER(meyc8088_common_w),
-		DEVCB_LINE(meyc8088_i8155_2_timer_out)
+		DEVCB_LINE(meyc8088_sound_out)
 	}
 };
 
@@ -294,32 +306,28 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-static INTERRUPT_GEN( meyc8088_irq )
-{
-	// INTR on LC255, INTA hardwired to $20
-	device_set_input_line_and_vector(device, 0, HOLD_LINE, 0x20);
-}
-
 static MACHINE_CONFIG_START( meyc8088, meyc8088_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8088, XTAL_15MHz / 3)
 	MCFG_CPU_PROGRAM_MAP(meyc8088_map)
-	MCFG_CPU_VBLANK_INT("screen", meyc8088_irq)
 
-	MCFG_I8155_ADD("i8155_1", XTAL_15MHz / 3, i8155_intf[0])
-	MCFG_I8155_ADD("i8155_2", XTAL_15MHz / 3, i8155_intf[1])
+	MCFG_I8155_ADD("i8155_1", XTAL_15MHz / (3*2*1), i8155_intf[0])
+	MCFG_I8155_ADD("i8155_2", XTAL_15MHz / (3*2*32), i8155_intf[1])
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_SIZE(512,512)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 512-1)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_15MHz/3, 320, 0, 256, 261, 0, 224)
 	MCFG_SCREEN_UPDATE_STATIC(meyc8088)
+	MCFG_SCREEN_VBLANK_STATIC(meyc8088)
 
-	MCFG_PALETTE_LENGTH(8)
+	MCFG_PALETTE_LENGTH(32)
 
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
 
@@ -334,4 +342,4 @@ ROM_START( gldarrow )
 ROM_END
 
 
-GAME( 1984, gldarrow, 0,        meyc8088, gldarrow, 0, ROT0,  "Meyco Games, Inc.", "Golden Arrow", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 1984, gldarrow, 0,        meyc8088, gldarrow, 0, ROT0,  "Meyco Games, Inc.", "Golden Arrow", GAME_NOT_WORKING )
