@@ -384,17 +384,25 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "video/mc6845.h"
-#include "machine/8255ppi.h"
+#include "machine/i8255.h"
 #include "sound/3812intf.h"
 #include "sound/dac.h"
+#include "video/mc6845.h"
 
 
 class amaticmg_state : public driver_device
 {
 public:
 	amaticmg_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_attr(*this, "attr"),
+		m_vram(*this, "vram")
+		{ }
 
+	required_shared_ptr<UINT8> m_attr;
+	required_shared_ptr<UINT8> m_vram;
+
+	DECLARE_WRITE8_MEMBER(rombank_w);
 };
 
 
@@ -408,6 +416,27 @@ static VIDEO_START( amaticmg )
 
 static SCREEN_UPDATE_IND16( amaticmg )
 {
+	amaticmg_state *state = screen.machine().driver_data<amaticmg_state>();
+	const gfx_element *gfx = screen.machine().gfx[0];
+	int y,x;
+	int count = 0;
+
+	for (y=0;y<32;y++)
+	{
+		for (x=0;x<96;x++)
+		{
+			UINT16 tile = state->m_vram[count];
+			UINT8 color;
+
+			/* TODO: both of these looks so out of place ... */
+			tile += ((state->m_attr[count]&0x0f)<<8) | 0x1000;
+			color = (state->m_attr[count]&0xf0)>>3;
+
+			drawgfx_opaque(bitmap,cliprect,gfx,tile,color,0,0,x*4,y*8);
+			count++;
+		}
+	}
+
 	return 0;
 }
 
@@ -422,15 +451,15 @@ static PALETTE_INIT( amaticmg )
 		bit0 = 0;
 		bit1 = (color_prom[0] >> 6) & 0x01;
 		bit2 = (color_prom[0] >> 7) & 0x01;
-		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		bit0 = (color_prom[0] >> 3) & 0x01;
-		bit1 = (color_prom[0] >> 4) & 0x01;
-		bit2 = (color_prom[0] >> 5) & 0x01;
 		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 		bit0 = (color_prom[0] >> 0) & 0x01;
 		bit1 = (color_prom[0] >> 1) & 0x01;
 		bit2 = (color_prom[0] >> 2) & 0x01;
 		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = (color_prom[0] >> 3) & 0x01;
+		bit1 = (color_prom[0] >> 4) & 0x01;
+		bit2 = (color_prom[0] >> 5) & 0x01;
+		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
 		palette_set_color(machine, i, MAKE_RGB(r, g, b));
 		color_prom++;
@@ -459,27 +488,32 @@ static PALETTE_INIT( amaticmg3 )
 *       Read/Write Handlers         *
 ************************************/
 
-
+WRITE8_MEMBER( amaticmg_state::rombank_w )
+{
+	membank("bank1")->set_entry(data & 0xf);
+}
 
 /************************************
 *      Memory Map Information       *
 ************************************/
 
 static ADDRESS_MAP_START( amaticmg_map, AS_PROGRAM, 8, amaticmg_state )
-	AM_RANGE(0x00000, 0x3ffff) AM_ROM
-//  AM_RANGE(0x0000, 0x0000) AM_RAM // AM_SHARE("nvram")
-//  AM_RANGE(0x0000, 0x0000) AM_DEVWRITE_LEGACY("crtc", mc6845_address_w)
-//  AM_RANGE(0x0000, 0x0000) AM_DEVREADWRITE_LEGACY("crtc", mc6845_register_r, mc6845_register_w)
-//  AM_RANGE(0x0000, 0x0000) AM_RAM_WRITE_LEGACY(amaticmg_videoram_w) AM_BASE_LEGACY(&amaticmg_videoram)
-//  AM_RANGE(0x0000, 0x0000) AM_RAM_WRITE_LEGACY(amaticmg_colorram_w) AM_BASE_LEGACY(&amaticmg_colorram)
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0x9fff) AM_RAM // AM_SHARE("nvram")
+	AM_RANGE(0xa000, 0xafff) AM_RAM AM_SHARE("vram")
+	AM_RANGE(0xb000, 0xbfff) AM_RAM AM_SHARE("attr")
+	AM_RANGE(0xc000, 0xffff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( amaticmg_portmap, AS_IO, 8, amaticmg_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-//  AM_RANGE(0x00, 0x00) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w)
-//  AM_RANGE(0x00, 0x00) AM_DEVREADWRITE_LEGACY("ppi8255_1", ppi8255_r, ppi8255_w)
+	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
+	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
+	AM_RANGE(0x40, 0x41) AM_DEVWRITE_LEGACY("ymsnd", ym3812_w)
+	AM_RANGE(0x60, 0x60) AM_DEVWRITE("crtc", mc6845_device, address_w)
+	AM_RANGE(0x61, 0x61) AM_DEVWRITE("crtc", mc6845_device, register_w)
+	AM_RANGE(0xc0, 0xc0) AM_WRITE(rombank_w)
 //  AM_RANGE(0x00, 0x00) AM_DEVREADWRITE_LEGACY("ppi8255_2", ppi8255_r, ppi8255_w)
-//  AM_RANGE(0x00, 0x00) AM_DEVWRITE_LEGACY("ymsnd", ym3812_w)
 //  AM_RANGE(0x00, 0x00) AM_DEVWRITE_LEGACY("dac1", dac_signed_w)
 //  AM_RANGE(0x00, 0x00) AM_DEVWRITE_LEGACY("dac2", dac_signed_w)
 
@@ -575,8 +609,8 @@ static const gfx_layout charlayout_4bpp =
 	4,8,
 	RGN_FRAC(1,2),
 	4,
-	{ RGN_FRAC(0,2) + 0, RGN_FRAC(0,2) + 4, RGN_FRAC(1,2) + 0, RGN_FRAC(1,2) + 4 }, //TODO: rom order is unknown
-	{ 3, 2, 1, 0 },	/* tiles are x-flipped */
+	{ RGN_FRAC(0,2), RGN_FRAC(0,2) + 4, RGN_FRAC(1,2), RGN_FRAC(1,2) + 4 },
+	{ 3, 2, 1, 0 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
 	8*4*2
 };
@@ -609,62 +643,68 @@ GFXDECODE_END
 *          Sound Interface          *
 ************************************/
 
-//static const ym3812_interface ym3812_config =
-//{
-//  sound_irq
-//};
+static const ym3812_interface ym3812_config =
+{
+	0
+};
 
 
 /************************************
 *          CRTC Interface           *
 ************************************/
 
-//static const mc6845_interface mc6845_intf =
-//{
-//  "screen",   /* screen we are acting on */
-//  8,          /* number of pixels per video memory address */
-//  NULL,       /* before pixel update callback */
-//  NULL,       /* row update callback */
-//  NULL,       /* after pixel update callback */
-//  DEVCB_NULL, /* callback for display state changes */
-//  DEVCB_NULL, /* callback for cursor state changes */
-//  DEVCB_NULL, /* HSYNC callback */
-//  DEVCB_NULL, /* VSYNC callback */
-//  NULL        /* update address callback */
-//};
+static const mc6845_interface mc6845_intf =
+{
+	"screen",   /* screen we are acting on */
+	4,          /* number of pixels per video memory address */
+	NULL,       /* before pixel update callback */
+	NULL,       /* row update callback */
+	NULL,       /* after pixel update callback */
+	DEVCB_NULL, /* callback for display state changes */
+	DEVCB_NULL, /* callback for cursor state changes */
+	DEVCB_NULL, /* HSYNC callback */
+	DEVCB_NULL, /* VSYNC callback */
+	NULL        /* update address callback */
+};
 
 
 /************************************
 *      PPI 8255 (x3) Interface      *
 ************************************/
 
-//static const ppi8255_interface ppi8255_intf[3] =
-//{
-//  {   /* (00-00) Mode X - Port X set as input */
-//      DEVCB_NULL,                     /* Port A read */
-//      DEVCB_NULL,                     /* Port B read */
-//      DEVCB_NULL,                     /* Port C read */
-//      DEVCB_NULL,                     /* Port A write */
-//      DEVCB_NULL,                     /* Port B write */
-//      DEVCB_NULL,                     /* Port C write */
-//  },
-//  {   /* (00-00) Mode X - Port X set as input */
-//      DEVCB_NULL,                     /* Port A read */
-//      DEVCB_NULL,                     /* Port B read */
-//      DEVCB_NULL,                     /* Port C read */
-//      DEVCB_NULL,                     /* Port A write */
-//      DEVCB_NULL,                     /* Port B write */
-//      DEVCB_NULL,                     /* Port C write */
-//  },
-//  {   /* (00-00) Mode X - Port X set as input */
-//      DEVCB_NULL,                     /* Port A read */
-//      DEVCB_NULL,                     /* Port B read */
-//      DEVCB_NULL,                     /* Port C read */
-//      DEVCB_NULL,                     /* Port A write */
-//      DEVCB_NULL,                     /* Port B write */
-//      DEVCB_NULL,                     /* Port C write */
-//  }
-//};
+static I8255A_INTERFACE( ppi8255_intf_0 )
+{
+	DEVCB_INPUT_PORT("IN0"),		/* Port A read */
+	DEVCB_NULL,						/* Port A write */
+	DEVCB_INPUT_PORT("IN1"),		/* Port B read */
+	DEVCB_NULL,						/* Port B write */
+	DEVCB_INPUT_PORT("IN2"),		/* Port C read */
+	DEVCB_NULL						/* Port C write */
+};
+
+static I8255A_INTERFACE( ppi8255_intf_1 )
+{
+	DEVCB_NULL,		/* Port A read */
+	DEVCB_NULL,						/* Port A write */
+	DEVCB_INPUT_PORT("SW1"),		/* Port B read */
+	DEVCB_NULL,						/* Port B write */
+	DEVCB_NULL,		/* Port C read */
+	DEVCB_NULL						/* Port C write */
+};
+
+static MACHINE_START( amaticmg )
+{
+	UINT8 *rombank = machine.root_device().memregion("maincpu")->base();
+
+	machine.root_device().membank("bank1")->configure_entries(0, 7, &rombank[0x8000], 0x4000);
+}
+
+static MACHINE_RESET( amaticmg )
+{
+	amaticmg_state *state = machine.driver_data<amaticmg_state>();
+
+	state->membank("bank1")->set_entry(0);
+}
 
 /************************************
 *          Machine Drivers          *
@@ -675,13 +715,13 @@ static MACHINE_CONFIG_START( amaticmg, amaticmg_state )
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)		/* WRONG! */
 	MCFG_CPU_PROGRAM_MAP(amaticmg_map)
 	MCFG_CPU_IO_MAP(amaticmg_portmap)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse) // no NMI mask?
 
 //  MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* 3x 8255 */
-//  MCFG_PPI8255_ADD( "ppi8255_0", ppi8255_intf[0] )
-//  MCFG_PPI8255_ADD( "ppi8255_1", ppi8255_intf[1] )
+	MCFG_I8255A_ADD( "ppi8255_0", ppi8255_intf_0 )
+	MCFG_I8255A_ADD( "ppi8255_1", ppi8255_intf_1 )
 //  MCFG_PPI8255_ADD( "ppi8255_2", ppi8255_intf[2] )
 
 	/* video hardware */
@@ -692,7 +732,7 @@ static MACHINE_CONFIG_START( amaticmg, amaticmg_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_STATIC(amaticmg)
 
-//  MCFG_MC6845_ADD("crtc", MC6845, CRTC_CLOCK, mc6845_intf)
+	MCFG_MC6845_ADD("crtc", MC6845, CRTC_CLOCK, mc6845_intf)
 
 	MCFG_GFXDECODE(amaticmg)
 
@@ -700,12 +740,15 @@ static MACHINE_CONFIG_START( amaticmg, amaticmg_state )
 	MCFG_PALETTE_LENGTH(0x200)
 	MCFG_VIDEO_START(amaticmg)
 
-	/* sound hardware */
-//  MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_MACHINE_START(amaticmg)
+	MCFG_MACHINE_RESET(amaticmg)
 
-//  MCFG_SOUND_ADD("ymsnd", YM3812, SND_CLOCK)
-//  MCFG_SOUND_CONFIG(ym3812_config)
-//  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_SOUND_ADD("ymsnd", YM3812, SND_CLOCK)
+	MCFG_SOUND_CONFIG(ym3812_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 //  MCFG_SOUND_ADD("dac", DAC, 0)   /* Y3014B */
 //  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
@@ -729,9 +772,9 @@ ROM_START( am_uslot )
 	ROM_REGION( 0x20000, "mainprg", 0 )	/* encrypted program ROM...*/
 	ROM_LOAD( "u3.bin",  0x00000, 0x20000, CRC(29bf4a95) SHA1(a73873f7cd1fdf5accc3e79f4619949f261400b8) )
 
-	ROM_REGION( 0x30000, "gfx1", 0 )
-	ROM_LOAD( "u9.bin",  0x00000, 0x10000, CRC(823a736a) SHA1(a5227e3080367736aac1198d9dbb55efc4114624) )
-	ROM_LOAD( "u10.bin", 0x10000, 0x10000, CRC(6a811c81) SHA1(af01cd9b1ce6aca92df71febb05fe216b18cf42a) )
+	ROM_REGION( 0x20000, "gfx1", 0 )
+	ROM_LOAD( "u9.bin",  0x10000, 0x10000, CRC(823a736a) SHA1(a5227e3080367736aac1198d9dbb55efc4114624) )
+	ROM_LOAD( "u10.bin", 0x00000, 0x10000, CRC(6a811c81) SHA1(af01cd9b1ce6aca92df71febb05fe216b18cf42a) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "n82s147a.bin", 0x0000, 0x0200, CRC(dfeabd11) SHA1(21e8bbcf4aba5e4d672e5585890baf8c5bc77c98) )
@@ -819,7 +862,7 @@ static DRIVER_INIT( amaticmg3 )
 *           Game Drivers            *
 ************************************/
 
-/*    YEAR  NAME      PARENT  MACHINE   INPUT     INIT      ROT    COMPANY                FULLNAME                     FLAGS  */
-GAME( 1996, am_uslot, 0,      amaticmg, amaticmg, amaticmg, ROT0, "Amatic Trading GmbH", "Amatic Unknown Slots Game",  GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_UNEMULATED_PROTECTION | GAME_NO_SOUND | GAME_NOT_WORKING )
+/*    YEAR  NAME      PARENT  MACHINE    INPUT     INIT       ROT    COMPANY                FULLNAME                     FLAGS  */
+GAME( 1996, am_uslot, 0,      amaticmg,  amaticmg, amaticmg,  ROT90, "Amatic Trading GmbH", "Amatic Unknown Slots Game",  GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_UNEMULATED_PROTECTION | GAME_NO_SOUND | GAME_NOT_WORKING )
 GAME( 2000, am_mg24,  0,      amaticmg3, amaticmg, amaticmg3, ROT0, "Amatic Trading GmbH", "Multi Game I (V.Ger 2.4)",   GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_UNEMULATED_PROTECTION | GAME_NO_SOUND | GAME_NOT_WORKING )
 GAME( 2000, am_mg3,   0,      amaticmg3, amaticmg, amaticmg3, ROT0, "Amatic Trading GmbH", "Multi Game III (V.Ger 3.5)", GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_UNEMULATED_PROTECTION | GAME_NO_SOUND | GAME_NOT_WORKING )
