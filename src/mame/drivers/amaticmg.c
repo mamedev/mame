@@ -362,6 +362,7 @@
 
   *** TO DO ***
 
+  - am_uslot: video garbage at first boot (doesn't happen if you soft-reset), btanb?
   - Decrypt the program ROMs.
   - Identify the CPU type.
   - Memory map.
@@ -428,8 +429,8 @@ static SCREEN_UPDATE_IND16( amaticmg )
 			UINT16 tile = state->m_vram[count];
 			UINT8 color;
 
-			/* TODO: both of these looks so out of place ... */
-			tile += ((state->m_attr[count]&0x0f)<<8) | 0x1000;
+			tile += ((state->m_attr[count]&0x0f)<<8);
+			/* TODO: this looks so out of place ... */
 			color = (state->m_attr[count]&0xf0)>>3;
 
 			drawgfx_opaque(bitmap,cliprect,gfx,tile,color,0,0,x*4,y*8);
@@ -772,9 +773,11 @@ ROM_START( am_uslot )
 	ROM_REGION( 0x20000, "mainprg", 0 )	/* encrypted program ROM...*/
 	ROM_LOAD( "u3.bin",  0x00000, 0x20000, CRC(29bf4a95) SHA1(a73873f7cd1fdf5accc3e79f4619949f261400b8) )
 
-	ROM_REGION( 0x20000, "gfx1", 0 )
-	ROM_LOAD( "u9.bin",  0x10000, 0x10000, CRC(823a736a) SHA1(a5227e3080367736aac1198d9dbb55efc4114624) )
-	ROM_LOAD( "u10.bin", 0x00000, 0x10000, CRC(6a811c81) SHA1(af01cd9b1ce6aca92df71febb05fe216b18cf42a) )
+	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_LOAD( "u10.bin", 0x00000, 0x08000, CRC(6a811c81) SHA1(af01cd9b1ce6aca92df71febb05fe216b18cf42a) )
+	ROM_CONTINUE(        0x00000, 0x08000 )
+	ROM_LOAD( "u9.bin",  0x08000, 0x08000, CRC(823a736a) SHA1(a5227e3080367736aac1198d9dbb55efc4114624) )
+	ROM_CONTINUE(        0x08000, 0x08000 )
 
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "n82s147a.bin", 0x0000, 0x0200, CRC(dfeabd11) SHA1(21e8bbcf4aba5e4d672e5585890baf8c5bc77c98) )
