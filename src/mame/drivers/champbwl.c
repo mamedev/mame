@@ -229,7 +229,7 @@ WRITE8_MEMBER(champbwl_state::doraemon_outputs_w)
 	coin_counter_w(machine(), 1, data & 2);	// gift out counter
 
 	coin_lockout_w(machine(), 0, ~data & 8);	// coin lockout
-	machine().device<ticket_dispenser_device>("hopper")->write(*&space, 0, (data & 0x04) ? 0x00 : 0x80);	// gift out motor
+	machine().device<ticket_dispenser_device>("hopper")->write(space, 0, (data & 0x04) ? 0x00 : 0x80);	// gift out motor
 
 	membank("bank1")->set_entry((data & 0x30) >> 4);
 

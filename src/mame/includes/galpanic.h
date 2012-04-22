@@ -13,7 +13,7 @@ public:
 	required_shared_ptr<UINT16> m_fgvideoram;
 	bitmap_ind16 m_bitmap;
 	bitmap_ind16 m_sprites_bitmap;
-	required_shared_ptr<UINT16> m_spriteram;
+	optional_shared_ptr<UINT16> m_spriteram;
 	DECLARE_WRITE16_MEMBER(galpanic_6295_bankswitch_w);
 	DECLARE_WRITE16_MEMBER(galpanica_6295_bankswitch_w);
 	DECLARE_WRITE16_MEMBER(galpanica_misc_w);

@@ -15,9 +15,9 @@ public:
 		m_paletteram(*this, "paletteram"){ }
 
 	/* memory pointers */
-	required_shared_ptr<UINT16> m_shared_ram;
+	optional_shared_ptr<UINT16> m_shared_ram;
 	required_shared_ptr<UINT16> m_spriteram;
-	required_shared_ptr<UINT16> m_videoram;
+	optional_shared_ptr<UINT16> m_videoram;
 	optional_shared_ptr<UINT16> m_paletteram;
 
 	/* video-related */
