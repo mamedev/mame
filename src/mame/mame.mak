@@ -1904,6 +1904,8 @@ $(DRIVERS)/8080bw.o:	$(LAYOUT)/invrvnge.lh \
 
 $(DRIVERS)/acefruit.o:	$(LAYOUT)/sidewndr.lh
 
+$(DRIVERS)/amaticmg.o:	$(LAYOUT)/suprstar.lh
+
 $(DRIVERS)/ampoker2.o:	$(LAYOUT)/ampoker2.lh \
 			$(LAYOUT)/sigmapkr.lh \
 

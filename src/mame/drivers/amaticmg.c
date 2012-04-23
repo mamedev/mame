@@ -1,14 +1,11 @@
 /**********************************************************************************
 
-
-  AMATIC - MULTI GAME SYSTEM
-  --------------------------
-
-  Preliminary driver by Roberto Fresca.
-
+  AMA-8000-1 / AMA-8000-2 Multi Game System.
+  Amatic Trading GmbH.
 
   Encrypted gambling hardware based on a custom CPU.
 
+  Driver by Roberto Fresca & Angelo Salese.
 
 ***********************************************************************************
 
@@ -17,7 +14,7 @@
   --------------
 
   ------------------------------------------------
-    Board #1 (unknown slots game)
+    Board #1 (Super Stars) AMA-8000-1
   ------------------------------------------------
 
   1x 40-pin custom CPU labeled:
@@ -58,7 +55,7 @@
 
 
   ------------------------------------------------
-     Multi-Game I v2.4
+     Multi-Game I v2.4 (AMA-8000-2)
   ------------------------------------------------
 
   1x 40-pin custom CPU labeled:
@@ -185,7 +182,7 @@
 
 
   ------------------------------------------------
-     Multi-Game III v3.5
+     Multi-Game III v3.5 (AMA-8000-2)
   ------------------------------------------------
 
   1x 40-pin custom CPU labeled:
@@ -229,10 +226,25 @@
 ***********************************************************************************
 
 
-    Memory Map
-    ----------
+  Memory Map
+  ----------
 
-    $00000 - $FFFFF   Still unknown...
+  0000-7FFF   ROM Space.
+  8000-9FFF   NVRAM.
+  A000-AFFF   Video RAM.
+  B000-BFFF   RAM.
+  C000-FFFF   ROM Banking
+
+  I/O
+
+  00-03       PPI 8255 0
+  20-23       PPI 8255 1
+  40-41       YM3812 Sound device.
+  60-60       MC6845 CRTC Address.
+  61-61       MC6845 CRTC Register.
+  80-80       unknown (W)
+  C0-C0       ROM Bank selector.
+  E6-E6       NMI Mask.
 
 
 ***********************************************************************************
@@ -350,6 +362,17 @@
 ***********************************************************************************
 
 
+  [2012/04/23]
+
+  - A lot of work on AMA-8000-1 machine and gfx.
+  - Identified the slots game as Super Stars.
+  - Changed am_uslot to suprstar.
+  - Reworked inputs from the scratch.
+  - Added support for outputs: lamps & counters.
+  - Added a button-lamps layout.
+  - Promoted the game to working state.
+  - Added technical notes.
+
   [2009/09/11]
 
   - Initial release.
@@ -363,11 +386,7 @@
   *** TO DO ***
 
   - am_uslot: video garbage at first boot (doesn't happen if you soft-reset), btanb?
-  - Decrypt the program ROMs.
-  - Identify the CPU type.
-  - Memory map.
   - Hook the remaining GFX bitplanes.
-  - CRTC
   - Proper inputs.
   - Color decode routines.
   - Sound support.
@@ -388,7 +407,8 @@
 #include "machine/i8255.h"
 #include "sound/3812intf.h"
 #include "sound/dac.h"
-#include "video/mc6845.h"
+
+#include "suprstar.lh"
 
 
 class amaticmg_state : public driver_device
@@ -405,6 +425,7 @@ public:
 
 	DECLARE_WRITE8_MEMBER(rombank_w);
 	DECLARE_WRITE8_MEMBER(nmi_mask_w);
+	DECLARE_WRITE8_MEMBER(unk80_w);
 
 	UINT8 m_nmi_mask;
 };
@@ -527,6 +548,58 @@ WRITE8_MEMBER( amaticmg_state::nmi_mask_w )
 	m_nmi_mask = (data & 1) ^ 1;
 }
 
+static WRITE8_DEVICE_HANDLER(out_a_w)
+{
+/*  LAMPS A:
+
+    7654 3210
+    ---- ---x  
+    ---- --x-  
+    ---- -x--  
+    ---- x---  START
+    ---x ----  BET?
+    --x- ----  HOLD3
+    -x-- ----  HOLD4
+    x--- ----  
+*/
+
+	output_set_lamp_value(0, (data >> 3) & 1);	/* START */
+	output_set_lamp_value(1, (data >> 4) & 1);	/* BET? */
+	output_set_lamp_value(2, (data >> 5) & 1);	/* HOLD3 */
+	output_set_lamp_value(3, (data >> 6) & 1);	/* HOLD4 */
+
+	logerror("port A: %2X\n", data);
+}
+
+static WRITE8_DEVICE_HANDLER(out_c_w)
+{
+/*  LAMPS B:
+
+    7654 3210
+    ---- ---x  
+    ---- --x-  HOLD1
+    ---- -x--  Coin Counter
+    ---- x---  
+    ---x ----  HOLD2
+    --x- ----  
+    -x-- ----  CANCEL
+    x--- ----  
+*/
+	output_set_lamp_value(4, (data >> 1) & 1);	/* HOLD1 */
+	output_set_lamp_value(5, (data >> 4) & 1);	/* HOLD2 */
+	output_set_lamp_value(6, (data >> 6) & 1);	/* CANCEL */
+
+//	coin_counter_w(machine(), 0, data & 0x04);	/* Coin In */
+
+	logerror("port C: %2X\n", data);
+}
+
+WRITE8_MEMBER( amaticmg_state::unk80_w )
+{
+//	dac_data_w(machine().device("dac"), data & 0x01);		/* Sound DAC */
+}
+
+
 
 /************************************
 *      Memory Map Information       *
@@ -547,6 +620,7 @@ static ADDRESS_MAP_START( amaticmg_portmap, AS_IO, 8, amaticmg_state )
 	AM_RANGE(0x40, 0x41) AM_DEVWRITE_LEGACY("ymsnd", ym3812_w)
 	AM_RANGE(0x60, 0x60) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0x61, 0x61) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
+	AM_RANGE(0x80, 0x80) AM_WRITE(unk80_w)
 	AM_RANGE(0xc0, 0xc0) AM_WRITE(rombank_w)
 //  AM_RANGE(0x00, 0x00) AM_DEVREADWRITE_LEGACY("ppi8255_2", ppi8255_r, ppi8255_w)
 //  AM_RANGE(0x00, 0x00) AM_DEVWRITE_LEGACY("dac1", dac_signed_w)
@@ -581,118 +655,70 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( amaticmg )
 	PORT_START("IN0")
-	PORT_DIPNAME( 0x01, 0x01, "IN0")
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )          PORT_NAME("Coin 1 (Muenze 1)") PORT_IMPULSE(3)
 
 	PORT_START("IN1")
-	PORT_DIPNAME( 0x01, 0x01, "IN1")
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE2 )       PORT_NAME("Service B (Dienst B") PORT_CODE(KEYCODE_8) PORT_TOGGLE
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )          PORT_NAME("Coin 2 (Muenze 2)") PORT_IMPULSE(3)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )  PORT_CODE(KEYCODE_W)           // 'Ausgegeben 0 - Hopper Leer' (spent 0 - hopper empty)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )	PORT_NAME("Hold 3 (Halten 3)")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )	PORT_NAME("Hold 2 (Halten 2)")
 
 	PORT_START("IN2")
-	PORT_DIPNAME( 0x01, 0x01, "IN2")
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )			PORT_NAME("Start")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_CANCEL )	PORT_NAME("Clear / Take (Loeschen)")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )	PORT_NAME("Hold 1 (Halten 1)")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )       PORT_NAME("Service A (Dienst A") PORT_CODE(KEYCODE_7) PORT_TOGGLE
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_BET )     PORT_NAME("Bet (Setzen) / Half Take")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE3 )       PORT_NAME("Service C (Dienst C") PORT_CODE(KEYCODE_9) PORT_TOGGLE
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE )        PORT_NAME("Service (MAster)") PORT_CODE(KEYCODE_0)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )	PORT_NAME("Hold 4 (Halten 4)")
 
 	PORT_START("IN3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("3-1") PORT_CODE(KEYCODE_Z)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("3-2") PORT_CODE(KEYCODE_X)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("3-3") PORT_CODE(KEYCODE_C)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("3-4") PORT_CODE(KEYCODE_V)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("3-5") PORT_CODE(KEYCODE_B)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("3-6") PORT_CODE(KEYCODE_N)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("3-7") PORT_CODE(KEYCODE_M)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("3-8") PORT_CODE(KEYCODE_L)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("SW1")
-	PORT_DIPNAME( 0x01, 0x01, "SW1")
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x01, 0x01, "DIP1")					PORT_DIPLOCATION("DIP:1")
+	PORT_DIPSETTING(    0x01, "Off (Aus)" )
+	PORT_DIPSETTING(    0x00, "On (Ein)" )
+	PORT_DIPNAME( 0x02, 0x02, "DIP2")					PORT_DIPLOCATION("DIP:2")
+	PORT_DIPSETTING(    0x02, "Off (Aus)" )
+	PORT_DIPSETTING(    0x00, "On (Ein)" )
+	PORT_DIPNAME( 0x04, 0x04, "Coin 1 (Muenzen 1)" )	PORT_DIPLOCATION("DIP:3")
+	PORT_DIPSETTING(    0x04, "10" )
+	PORT_DIPSETTING(    0x00, "5" )
+	PORT_DIPNAME( 0x08, 0x08, "Coin 2 (Muenzen 2)" )	PORT_DIPLOCATION("DIP:4")
+	PORT_DIPSETTING(    0x08, "100" )
+	PORT_DIPSETTING(    0x00, "5" )
+	PORT_DIPNAME( 0x10, 0x10, "Jackpot")				PORT_DIPLOCATION("DIP:5")
+	PORT_DIPSETTING(    0x10, "Jackpot KZB")
+	PORT_DIPSETTING(    0x00, "Jackpot LZB")
+	PORT_DIPNAME( 0x20, 0x20, "Fruechtebonus" )			PORT_DIPLOCATION("DIP:6")
+	PORT_DIPSETTING(    0x20, "Fruechtebonus Bleibt" )
+	PORT_DIPSETTING(    0x00, "Fruechtebonus Clear" )
+	PORT_DIPNAME( 0x40, 0x40, "DIP7")					PORT_DIPLOCATION("DIP:7")
+	PORT_DIPSETTING(    0x40, "Off (Aus)" )
+	PORT_DIPSETTING(    0x00, "On (Ein)" )
+	PORT_DIPNAME( 0x80, 0x80, "BH") 					PORT_DIPLOCATION("DIP:8")
+	PORT_DIPSETTING(    0x80, "BH Dreifach")
+	PORT_DIPSETTING(    0x00, "BH Normal")
 INPUT_PORTS_END
 
 
@@ -780,12 +806,12 @@ static I8255A_INTERFACE( ppi8255_intf_0 )
 
 static I8255A_INTERFACE( ppi8255_intf_1 )
 {
-	DEVCB_NULL,		/* Port A read */
-	DEVCB_NULL,						/* Port A write */
+	DEVCB_NULL,						/* Port A read */
+	DEVCB_HANDLER(out_a_w),			/* Port A write */
 	DEVCB_INPUT_PORT("SW1"),		/* Port B read */
 	DEVCB_NULL,						/* Port B write */
-	DEVCB_NULL,		/* Port C read */
-	DEVCB_NULL						/* Port C write */
+	DEVCB_NULL,						/* Port C read */
+	DEVCB_HANDLER(out_c_w)			/* Port C write */
 };
 
 static MACHINE_START( amaticmg )
@@ -847,10 +873,11 @@ static MACHINE_CONFIG_START( amaticmg, amaticmg_state )
 	MCFG_SOUND_CONFIG(ym3812_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-//  MCFG_SOUND_ADD("dac", DAC, 0)   /* Y3014B */
-//  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+//	MCFG_SOUND_ADD("dac", DAC, 0)   /* Y3014B */
+//	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 MACHINE_CONFIG_END
+
 
 static INTERRUPT_GEN( amaticmg3_irq )
 {
@@ -859,6 +886,7 @@ static INTERRUPT_GEN( amaticmg3_irq )
 	if(state->m_nmi_mask)
 		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
+
 
 static MACHINE_CONFIG_DERIVED( amaticmg3, amaticmg )
 
@@ -874,11 +902,12 @@ static MACHINE_CONFIG_DERIVED( amaticmg3, amaticmg )
 	MCFG_PALETTE_LENGTH(0x10000)
 MACHINE_CONFIG_END
 
+
 /************************************
 *             Rom Load              *
 ************************************/
 
-ROM_START( am_uslot )
+ROM_START( suprstar )
 	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASE00 )
 
 	ROM_REGION( 0x20000, "mainprg", 0 )	/* encrypted program ROM...*/
@@ -976,7 +1005,7 @@ static DRIVER_INIT( amaticmg3 )
 *           Game Drivers            *
 ************************************/
 
-/*    YEAR  NAME      PARENT  MACHINE    INPUT     INIT       ROT    COMPANY                FULLNAME                     FLAGS  */
-GAME( 1996, am_uslot, 0,      amaticmg,  amaticmg, amaticmg,  ROT90, "Amatic Trading GmbH", "Amatic Unknown Slots Game",  GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_UNEMULATED_PROTECTION | GAME_NO_SOUND | GAME_NOT_WORKING )
-GAME( 2000, am_mg24,  0,      amaticmg3, amaticmg, amaticmg3, ROT0, "Amatic Trading GmbH", "Multi Game I (V.Ger 2.4)",   GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_UNEMULATED_PROTECTION | GAME_NO_SOUND | GAME_NOT_WORKING )
-GAME( 2000, am_mg3,   0,      amaticmg3, amaticmg, amaticmg3, ROT0, "Amatic Trading GmbH", "Multi Game III (V.Ger 3.5)", GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_UNEMULATED_PROTECTION | GAME_NO_SOUND | GAME_NOT_WORKING )
+/*     YEAR  NAME      PARENT  MACHINE    INPUT     INIT       ROT     COMPANY                FULLNAME                     FLAGS                                                                                                        LAYOUT */
+GAMEL( 1996, suprstar, 0,      amaticmg,  amaticmg, amaticmg,  ROT90, "Amatic Trading GmbH", "Super Stars",                GAME_IMPERFECT_SOUND,                                                                                        layout_suprstar )
+GAME(  2000, am_mg24,  0,      amaticmg3, amaticmg, amaticmg3, ROT0,  "Amatic Trading GmbH", "Multi Game I (V.Ger 2.4)",   GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_UNEMULATED_PROTECTION | GAME_NO_SOUND | GAME_NOT_WORKING )
+GAME(  2000, am_mg3,   0,      amaticmg3, amaticmg, amaticmg3, ROT0,  "Amatic Trading GmbH", "Multi Game III (V.Ger 3.5)", GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_UNEMULATED_PROTECTION | GAME_NO_SOUND | GAME_NOT_WORKING )
