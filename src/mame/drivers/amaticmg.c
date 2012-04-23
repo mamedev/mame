@@ -553,14 +553,14 @@ static WRITE8_DEVICE_HANDLER(out_a_w)
 /*  LAMPS A:
 
     7654 3210
-    ---- ---x  
-    ---- --x-  
-    ---- -x--  
+    ---- ---x
+    ---- --x-
+    ---- -x--
     ---- x---  START
     ---x ----  BET?
     --x- ----  HOLD3
     -x-- ----  HOLD4
-    x--- ----  
+    x--- ----
 */
 
 	output_set_lamp_value(0, (data >> 3) & 1);	/* START */
@@ -576,14 +576,14 @@ static WRITE8_DEVICE_HANDLER(out_c_w)
 /*  LAMPS B:
 
     7654 3210
-    ---- ---x  
+    ---- ---x
     ---- --x-  HOLD1
     ---- -x--  Coin Counter
-    ---- x---  
+    ---- x---
     ---x ----  HOLD2
-    --x- ----  
+    --x- ----
     -x-- ----  CANCEL
-    x--- ----  
+    x--- ----
 */
 	output_set_lamp_value(4, (data >> 1) & 1);	/* HOLD1 */
 	output_set_lamp_value(5, (data >> 4) & 1);	/* HOLD2 */
@@ -742,7 +742,7 @@ static const gfx_layout charlayout_6bpp =
 	4,8,
 	RGN_FRAC(1,3),
 	6,
-	{ RGN_FRAC(0,3) + 0, RGN_FRAC(0,3) + 4, RGN_FRAC(1,3) + 0, RGN_FRAC(1,3) + 4,RGN_FRAC(2,3) + 0, RGN_FRAC(2,3) + 4, }, //TODO: rom order is unknown
+	{ RGN_FRAC(0,3) + 0, RGN_FRAC(0,3) + 4, RGN_FRAC(1,3) + 0, RGN_FRAC(1,3) + 4,RGN_FRAC(2,3) + 0, RGN_FRAC(2,3) + 4, },
 	{ 3, 2, 1, 0 },	/* tiles are x-flipped */
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
 	8*4*2
@@ -758,7 +758,7 @@ static GFXDECODE_START( amaticmg )
 GFXDECODE_END
 
 static GFXDECODE_START( amaticmg3 )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout_6bpp, 0, 0x20 )
+	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout_6bpp, 0, 0x10000/0x40 )
 GFXDECODE_END
 
 /************************************
@@ -931,9 +931,9 @@ ROM_START( am_mg24 )
 	ROM_LOAD( "mgi_vger_3.9-i-8201.i6.bin", 0x00000, 0x40000, CRC(9ce159f7) SHA1(101c277d579a69cb03f879288b2cecf838cf1741) )
 
 	ROM_REGION( 0x180000, "gfx1", 0 )
-	ROM_LOAD( "multi_2.4_zg1.i17.bin", 0x000000, 0x80000, CRC(4a60a718) SHA1(626991abee768da58e87c7cdfc4fcbae86c6ea2a) )
+	ROM_LOAD( "multi_2.4_zg1.i17.bin", 0x100000, 0x80000, CRC(4a60a718) SHA1(626991abee768da58e87c7cdfc4fcbae86c6ea2a) )
 	ROM_LOAD( "multi_2.4_zg2.i18.bin", 0x080000, 0x80000, CRC(b504e1b8) SHA1(ffa17a2c212eb2fffb89b131868e69430cb41203) )
-	ROM_LOAD( "multi_2.4_zg3.i33.bin", 0x100000, 0x80000, CRC(9b66bb4d) SHA1(64035d2028a9b68164c87475a1ec9754453ad572) )
+	ROM_LOAD( "multi_2.4_zg3.i33.bin", 0x000000, 0x80000, CRC(9b66bb4d) SHA1(64035d2028a9b68164c87475a1ec9754453ad572) )
 
 	ROM_REGION( 0x20000/*0x0400*/, "proms", 0 )
 	ROM_LOAD( "n82s147a_1.bin", 0x0000, 0x0200, NO_DUMP )
@@ -947,9 +947,9 @@ ROM_START( am_mg3 )
 	ROM_LOAD( "mg_iii_vger_3.5-i-8205.bin", 0x00000, 0x40000, CRC(21d64029) SHA1(d5c3fde02833a96dd7a43481a489bfc4a5c9609d) )
 
 	ROM_REGION( 0x180000, "gfx1", 0 )
-	ROM_LOAD( "mg_iii_51_zg1.bin", 0x000000, 0x80000, CRC(84f86874) SHA1(c483a50df6a9a71ddfdf8530a894135f9b852b89) )
+	ROM_LOAD( "mg_iii_51_zg1.bin", 0x100000, 0x80000, CRC(84f86874) SHA1(c483a50df6a9a71ddfdf8530a894135f9b852b89) )
 	ROM_LOAD( "mg_iii_51_zg2.bin", 0x080000, 0x80000, CRC(4425e535) SHA1(726c322c5d0b391b82e49dd1797ebf0abfa4a65a) )
-	ROM_LOAD( "mg_iii_51_zg3.bin", 0x100000, 0x80000, CRC(36d4c0fa) SHA1(20352dbbb2ce2233be0f4f694ddf49b8f5d6a64f) )
+	ROM_LOAD( "mg_iii_51_zg3.bin", 0x000000, 0x80000, CRC(36d4c0fa) SHA1(20352dbbb2ce2233be0f4f694ddf49b8f5d6a64f) )
 
 	ROM_REGION( 0x20000, "proms", 0 )
 	ROM_LOAD( "v.bin", 0x00000, 0x20000, CRC(524767e2) SHA1(03a108494f42365c820fdfbcba9496bda86f3081) )
