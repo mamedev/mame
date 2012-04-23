@@ -15,13 +15,58 @@
 		</rect>
 	</element>
   <element name="Steppers" defstate="0">
-    <simplecounter maxstate="999" digits="2">
+    <simplecounter maxstate="999" digits="3">
       <color red="1.0" green="1.0" blue="1.0" />
-      <bounds x="0" y="0.1" width="1" height="1" />
+      <bounds x="0" y="0" width="1" height="1" />
     </simplecounter>
   </element>
 
-	<element name="vfd0">
+  <!-- a stateoffset of 682 will shift us by 1 step on a 96 step reel (0x10000/96) which seems a good default alignment for 96 step / 16 symbol reels -->
+  <element name="SteppersReel1" defstate="0">
+    <reel stateoffset="682" symbollist="Fruit1,Fruit2,Fruit3,Fruit4,Fruit5,Fruit6,Fruit7,Fruit8,Fruit9,Fruit10,Fruit11,Fruit12,Fruit13,Fruit14,Fruit15,Fruit16">
+      <color red="1.0" green="1.0" blue="1.0" />
+      <bounds x="0" y="0" width="1" height="1" />
+    </reel>
+  </element>
+
+  <element name="SteppersReel2" defstate="0">
+    <reel stateoffset="682" symbollist="Fruit1,Fruit2,Fruit3,Fruit4,Fruit5,Fruit6,Fruit7,Fruit8,Fruit9,Fruit10,Fruit11,Fruit12,Fruit13,Fruit14,Fruit15,Fruit16">
+      "<color red="1.0" green="1.0" blue="1.0" />
+      <bounds x="0" y="0" width="1" height="1" />
+    </reel>
+  </element>
+
+  <element name="SteppersReel3" defstate="0">
+    <reel stateoffset="682" symbollist="Fruit1,Fruit2,Fruit3,Fruit4,Fruit5,Fruit6,Fruit7,Fruit8,Fruit9,Fruit10,Fruit11,Fruit12,Fruit13,Fruit14,Fruit15,Fruit16">
+      <color red="1.0" green="1.0" blue="1.0" />
+      <bounds x="0" y="0" width="1" height="1" />
+    </reel>
+  </element>
+
+  <element name="SteppersReel4" defstate="0">
+    <reel stateoffset="682" symbollist="Fruit1,Fruit2,Fruit3,Fruit4,Fruit5,Fruit6,Fruit7,Fruit8,Fruit9,Fruit10,Fruit11,Fruit12,Fruit13,Fruit14,Fruit15,Fruit16">
+      <color red="1.0" green="1.0" blue="1.0" />
+      <bounds x="0" y="0" width="1" height="1" />
+    </reel>
+  </element>
+
+  <element name="SteppersReel5" defstate="0">
+    <reel symbollist="Example1,Example2,Example3,Example4,Example5,Example6,Example7,Example8,Example9,Example10,Example11,Example12">
+      <color red="1.0" green="1.0" blue="1.0" />
+      <bounds x="0" y="0" width="1" height="1" />
+    </reel>
+  </element>
+
+  <element name="SteppersReel6" defstate="0">
+    <reel symbollist="Example1,Example2,Example3,Example4,Example5,Example6,Example7,Example8,Example9,Example10,Example11,Example12">
+      <color red="1.0" green="1.0" blue="1.0" />
+      <bounds x="0" y="0" width="1" height="1" />
+    </reel>
+  </element>
+
+
+
+  <element name="vfd0">
 	  <led14segsc>
 			  <color red="0" green="0.6" blue="1.0" />
 	  </led14segsc>
@@ -81,29 +126,53 @@
 		<backdrop name="vfd15" element="vfd0" state="0">
 			<bounds x="345" y="200" width="9" height="17"/>
 		</backdrop>
-		<backdrop name="reel1" element="Steppers" state="0">
-			<bounds x="210" y="300" width="50" height="50"/>
+		
+    
+    <backdrop name="reel1" element="Steppers" state="0">
+			<bounds x="250" y="350" width="10" height="5"/>
 		</backdrop>
 		<backdrop name="reel2" element="Steppers" state="0">
-			<bounds x="260" y="300" width="50" height="50"/>
+			<bounds x="300" y="350" width="10" height="5"/>
 		</backdrop>
 		<backdrop name="reel3" element="Steppers" state="0">
-			<bounds x="310" y="300" width="50" height="50"/>
+			<bounds x="350" y="350" width="10" height="5"/>
 		</backdrop>
+        
 		<backdrop name="reel4" element="Steppers" state="0">
-			<bounds x="210" y="360" width="50" height="50"/>
+			<bounds x="250" y="410" width="10" height="5"/>
 		</backdrop>
 		<backdrop name="reel5" element="Steppers" state="0">
-			<bounds x="260" y="360" width="50" height="50"/>
+			<bounds x="300" y="410" width="10" height="5"/>
 		</backdrop>
 		<backdrop name="reel6" element="Steppers" state="0">
-			<bounds x="310" y="360" width="50" height="50"/>
+			<bounds x="350" y="410" width="10" height="5"/>
 		</backdrop>
 
 
+    <backdrop name="sreel1" element="SteppersReel1" state="0">
+      <bounds x="210" y="300" width="50" height="50"/>
+    </backdrop>
+    <backdrop name="sreel2" element="SteppersReel2" state="0">
+      <bounds x="260" y="300" width="50" height="50"/>
+    </backdrop>
+    <backdrop name="sreel3" element="SteppersReel3" state="0">
+      <bounds x="310" y="300" width="50" height="50"/>
+    </backdrop>
+
+    <backdrop name="sreel4" element="SteppersReel4" state="0">
+      <bounds x="210" y="360" width="50" height="50"/>
+    </backdrop>
+    <backdrop name="sreel5" element="SteppersReel5" state="0">
+      <bounds x="260" y="360" width="50" height="50"/>
+    </backdrop>
+    <backdrop name="sreel6" element="SteppersReel6" state="0">
+      <bounds x="310" y="360" width="50" height="50"/>
+    </backdrop>
 
 
-		<backdrop name="lamp0" element="matrixlamp" state="0">
+    
+
+    <backdrop name="lamp0" element="matrixlamp" state="0">
 			<bounds x="0" y="0" width="7" height="7"/>
 		</backdrop>
 		<backdrop name="lamp1" element="matrixlamp" state="0">

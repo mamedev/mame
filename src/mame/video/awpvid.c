@@ -1,32 +1,13 @@
 /*************************************************************************************
 
     AWP Hardware video simulation system
+	originally written for AGEMAME by J.Wallace
 
-    A.G.E Code Copyright J. Wallace and the AGEMAME Development Team.
-    Visit http://www.mameworld.net/agemame/ for more information.
+    M.A.M.E Core Copyright Nicola Salmoria and the MAME Team.
 
-    M.A.M.E Core Copyright Nicola Salmoria and the MAME Team,
-    used under license from http://mamedev.org
-
-**************************************************************************************
-
-   NOTE: Fading lamp system currently only recognises three lamp states:
-
-   0=off, 1, 2= fully on
-
-   Based on evidence, newer techs may need more states, but we can give them their own
-   handlers at some stage in the distant future.
-
-   Instructions:
-   In order to set up displays (dot matrices, etc) we normally set up the unique
-   displays first, and then add the remainder in order.
-
-   The priorities (in descending order) are:
-
-   Full video screens
-   Dot matrix displays
-   Other, as yet unknown devices
-
+	This is a primitive handler for generating reels with multiple symbols visible
+	hanging off steppers.c .
+	
 **************************************************************************************/
 
 #include "emu.h"
@@ -93,27 +74,30 @@ void awp_draw_reel(int rno)
 	}
 	else
 	{
-		reelpos[rno] = stepper_get_position(rno)%(stepper_get_max(rno)-1);
+		reelpos[rno] = stepper_get_position(rno);
+
+		/* legacy symbol support */
 		for ( m = 0; m < (rsymbols-1); m++ )
 		{
 			{
 				sprintf(rga,"reel%da%d", x, m);
-				output_set_value(rga,(reelpos[rno] + rsteps * m)%stepper_get_max(rno));
+				output_set_value(rga,(reelpos[rno] + (rsteps * m) + stepper_get_max(rno)) % stepper_get_max(rno));
 			}
 
 			{
-				if ((reelpos[rno] - rsteps * m) < 0)
-				{
-					sprintf(rgb,"reel%db%d", x, m);
-					output_set_value(rgb,(reelpos[rno] - (rsteps * m - stepper_get_max(rno))));
-				}
-				else
-				{
-					sprintf(rgb,"reel%db%d", x, m);
-					output_set_value(rgb,(reelpos[rno] - rsteps * m));
-				}
+				sprintf(rgb,"reel%db%d", x, m);
+				output_set_value(rgb,(reelpos[rno] - (rsteps * m) + stepper_get_max(rno)) % stepper_get_max(rno));
 			}
 		}
+
 		output_set_value(rg,(reelpos[rno]));
+
+		sprintf(rg,"sreel%d", x); // out new scrolling reels are called 'sreel' 
+		// normalize the value
+		int sreelpos = (reelpos[rno] * 0x10000) / stepper_get_max(rno);
+		
+		output_set_value(rg,sreelpos);
+
+
 	}
 }

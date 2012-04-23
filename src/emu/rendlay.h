@@ -122,6 +122,7 @@ private:
 			CTYPE_LED16SEGSC,
 			CTYPE_DOTMATRIX,
 			CTYPE_SIMPLECOUNTER,
+			CTYPE_REEL,
 			CTYPE_MAX
 		};
 
@@ -130,6 +131,7 @@ private:
 		void draw_disk(bitmap_argb32 &dest, const rectangle &bounds);
 		void draw_text(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds);
 		void draw_simplecounter(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state);
+		void draw_reel(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state);
 		void load_bitmap();
 		void draw_led7seg(bitmap_argb32 &dest, const rectangle &bounds, int pattern);
 		void draw_led14seg(bitmap_argb32 &dest, const rectangle &bounds, int pattern);
@@ -162,6 +164,15 @@ private:
 		astring				m_imagefile;	// name of the image file (for lazy loading)
 		astring				m_alphafile;	// name of the alpha file (for lazy loading)
 		bool				m_hasalpha;		// is there any alpha component present?
+
+		#define MAX_STOPS 256
+		// stuff for fruit machine reels
+		int					m_numstops;
+		astring				m_stopnames[MAX_STOPS];
+		int					m_stateoffset;
+		int					m_reelreversed;
+		int					m_numsymbolsvisible;
+
 	};
 
 	// a texture encapsulates a texture for a given element in a given state
