@@ -613,31 +613,32 @@ const floppy_image_format_t::desc_e a2_16sect_format::mac_gcr[] = {
 
 bool a2_16sect_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 {
+/*      TODO: rewrite me properly
+        UINT8 sector_data[(256)*16];
+        memset(sector_data, 0, sizeof(sector_data));
 
-		UINT8 sector_data[(256)*16];
-		memset(sector_data, 0, sizeof(sector_data));
+        desc_s sectors[16];
+        int format = 0;
+        int pos_data = 0;
 
-		desc_s sectors[16];
-		int format = 0;
-		int pos_data = 0;
+        int head_count = 1;
 
-		int head_count = 1;
-
-		for(int track=0; track < 35; track++) {
-				for(int head=0; head < head_count; head++) {
-						for(int si=0; si<16; si++) {
-								UINT8 *data = sector_data + (256)*si;
-								sectors[si].data = data;
-								sectors[si].size = 256;
-								sectors[si].sector_id = si;
-								sectors[si].sector_info = format;
-								io_generic_read(io, data, pos_data, 256);
-								pos_data += 256;
-						}
-						generate_track(mac_gcr, track, head, sectors, 16, 3104*16, image);
-				}
-		}
-		return true;
+        for(int track=0; track < 35; track++) {
+                for(int head=0; head < head_count; head++) {
+                        for(int si=0; si<16; si++) {
+                                UINT8 *data = sector_data + (256)*si;
+                                sectors[si].data = data;
+                                sectors[si].size = 256;
+                                sectors[si].sector_id = si;
+                                sectors[si].sector_info = format;
+                                io_generic_read(io, data, pos_data, 256);
+                                pos_data += 256;
+                        }
+                        generate_track(mac_gcr, track, head, sectors, 16, 3104*16, image);
+                }
+        }
+        return true;*/
+		return false; // I hope that throws an error...
 }
 
 UINT8 a2_16sect_format::gb(const UINT8 *buf, int ts, int &pos, int &wrap)
@@ -664,10 +665,15 @@ bool a2_16sect_format::save(io_generic *io, floppy_image *image)
 		int g_tracks, g_heads;
 		int visualgrid[16][35]; // visualizer grid, cleared/initialized below
 #define NOTFOUND 0
+// address mark was found
 #define ADDRFOUND 1
+// address checksum is good
 #define ADDRGOOD 2
+// data mark was found (requires addrfound and sane values)
 #define DATAFOUND 4
+// data checksum is good
 #define DATAGOOD 8
+// data postamble is good
 #define DATAPOST 16
 		for (int i = 0; i < 16; i++) {
 			for (int j = 0; j < 35; j++) {
@@ -686,12 +692,14 @@ bool a2_16sect_format::save(io_generic *io, floppy_image *image)
 				int nsect = 16;
 				UINT8 buf[130000]; // originally 13000, multiread dfi disks need larger
 				int ts;
-fprintf(stderr,"DEBUG: a2_16sect_format::save() about to generate bitstream from physical track %d (logical %d)...", track, track/2);
-				generate_bitstream_from_track(track, head, 200000000/(3104*nsect*1), buf, ts, image); // 3104 needs tweaking, *3 is 3x multiread from a dfi disk
-fprintf(stderr,"done.\n");
+//fprintf(stderr,"DEBUG: a2_16sect_format::save() about to generate bitstream from physical track %d (logical %d)...", track, track/2);
+				//~332 samples per cell, times 3+8+3 (14) for address mark, 24 for sync, 3+343+3 (349) for data mark, 24 for sync is around 743, near 776 expected
+				generate_bitstream_from_track(track, head, 200000000/(3104*nsect*3), buf, ts, image); // 3104 needs tweaking, *3 is 3x multiread from a dfi disk
+//fprintf(stderr,"done.\n");
 				int pos = 0;
 				int wrap = 0;
 				int hb = 0;
+				int dosver = 0; // apple dos version; 0 = >=3.3, 1 = <3.3
 				for(;;) {
 						UINT8 v = gb(buf, ts, pos, wrap);
 						if(v == 0xff)
@@ -700,8 +708,10 @@ fprintf(stderr,"done.\n");
 								hb = 2;
 						else if(hb == 2 && v == 0xaa)
 								hb = 3;
-						else if(hb == 3 && v == 0x96)
+						else if(hb == 3 && ((v == 0x96) || (v == 0xab))) { // 0x96 = dos 3.3/16sec, 0xab = dos 3.21 and below/13sec
 								hb = 4;
+								if (v == 0xab) dosver = 1;
+								}
 						else
 								hb = 0;
 
@@ -735,9 +745,13 @@ fprintf(stderr,"done.\n");
 												else
 														hb = 0;
 										}
-										if(hb == 4) {
+										if((hb == 4)&&(dosver == 0)) {
 												visualgrid[se][track/2] |= DATAFOUND;
-												UINT8 *dest = sectdata+(256)*se;
+												int prodos_translate[16] = {
+												0x00, 0x08, 0x01, 0x09, 0x02, 0x0A, 0x03, 0x0B,
+												0x04, 0x0C, 0x05, 0x0D, 0x06, 0x0E, 0x07, 0x0F
+												};
+												UINT8 *dest = sectdata+(256)*prodos_translate[se];
 												UINT8 data[0x157];
 												UINT32 dpost = 0;
 												UINT8 c = 0;
@@ -766,22 +780,40 @@ fprintf(stderr,"done.\n");
 												// now decode it into 256 bytes
 												// but only write it if the bitfield of the track shows datagood is NOT set.
 												// if it is set we don't want to overwrite a guaranteed good read with a bad one
-												if ((visualgrid[se][track/2]&DATAGOOD)==0) {
-													// TODO:
-													// if the current read is good but the postamble isn't, write it in.
-													// if the current read isn't good but the postamble is, its better than nothing.
+												// if past read had a bad checksum or bad postamble...
+#ifndef USE_OLD_BEST_SECTOR_PRIORITY
+												if (((visualgrid[se][track/2]&DATAGOOD)==0)||((visualgrid[se][track/2]&DATAPOST)==0)) {
+													// if the current read is good, and postamble is good, write it in, no matter what.
+													// if the current read is good and the current postamble is bad, write it in unless the postamble was good before
+													// if the current read is bad and the current postamble is good and the previous read had neither good, write it in
 													// if the current read isn't good and neither is the postamble but nothing better
 													// has been written before, write it anyway.
-													for(int i=0x56; i<0x156; i++) {
-														UINT8 dv = data[i];
-														*dest++ = dv;
+													if ( ((data[0x156] == c) && (dpost&0xFFFF00)==0xDEAA00) ||
+													(((data[0x156] == c) && (dpost&0xFFFF00)!=0xDEAA00) && ((visualgrid[se][track/2]&DATAPOST)==0)) ||
+													(((data[0x156] != c) && (dpost&0xFFFF00)==0xDEAA00) && (((visualgrid[se][track/2]&DATAGOOD)==0)&&(visualgrid[se][track/2]&DATAPOST)==0)) ||
+													(((data[0x156] != c) && (dpost&0xFFFF00)!=0xDEAA00) && (((visualgrid[se][track/2]&DATAGOOD)==0)&&(visualgrid[se][track/2]&DATAPOST)==0))
+													) {
+														for(int i=0x56; i<0x156; i++) {
+															UINT8 dv = data[i];
+															*dest++ = dv;
+														}
 													}
 												}
-												// do some checking
-												if ((data[0x156] != c) || (dpost&0xFFFF00)!=0xDEAA00) {
-												printf("Data Mark:\tChecksum xpctd %d found %d: %s, Postamble %03X: %s\n", data[0x156], c, (data[0x156]==c)?"OK":"BAD", dpost, (dpost&0xFFFF00)==0xDEAA00?"OK":"BAD");
+#else
+												if ((visualgrid[se][track/2]&DATAGOOD)==0) {
+														for(int i=0x56; i<0x156; i++) {
+															UINT8 dv = data[i];
+															*dest++ = dv;
+														}
 												}
-												else visualgrid[se][track/2] |= DATAGOOD;
+#endif
+												// do some checking
+												if ((data[0x156] != c) || (dpost&0xFFFF00)!=0xDEAA00)
+													fprintf(stderr,"Data Mark:\tChecksum xpctd %d found %d: %s, Postamble %03X: %s\n", data[0x156], c, (data[0x156]==c)?"OK":"BAD", dpost, (dpost&0xFFFF00)==0xDEAA00?"OK":"BAD");
+												if (data[0x156] == c) visualgrid[se][track/2] |= DATAGOOD;
+												if ((dpost&0xFFFF00)==0xDEAA00) visualgrid[se][track/2] |= DATAPOST;
+										} else if ((hb == 4)&&(dosver == 1)) {
+											fprintf(stderr,"ERROR: We don't handle dos sectors below 3.3 yet!\n");
 										} else {
 												pos = opos;
 												wrap = owrap;
@@ -804,14 +836,14 @@ fprintf(stderr,"done.\n");
 		for (int j = 0; j < 35; j++) {
 			printf("T%2d: ",j);
 			for (int i = 0; i < 16; i++) {
-				if (visualgrid[i][j] == NOTFOUND) printf("-NF-");
+				if (visualgrid[i][j] == NOTFOUND) printf("-NF- ");
 				else {
 				if (visualgrid[i][j] & ADDRFOUND) printf("a"); else printf(" ");
 				if (visualgrid[i][j] & ADDRGOOD) printf("A"); else printf(" ");
 				if (visualgrid[i][j] & DATAFOUND) printf("d"); else printf(" ");
 				if (visualgrid[i][j] & DATAGOOD) printf("D"); else printf(" ");
+				if (visualgrid[i][j] & DATAPOST) printf("."); else printf(" ");
 				}
-				printf(" ");
 			}
 			printf("\n");
 		}
