@@ -1162,7 +1162,7 @@ UINT32 floppy_image_format_t::bitn_r(const UINT32 *buffer, int offset, int count
 {
 	UINT32 r = 0;
 	for(int i=0; i<count; i++)
-		r = (r << 1) | bit_r(buffer, offset+i);
+		r = (r << 1) | (UINT32) bit_r(buffer, offset+i);
 	return r;
 }
 

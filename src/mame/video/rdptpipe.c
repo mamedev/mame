@@ -1372,7 +1372,7 @@ UINT32 N64TexturePipeT::Fetch(INT32 s, INT32 t, INT32 tilenum, const rdp_poly_st
 	tbase += tile[tilenum].tmem;
 	UINT32 tpal	= tile[tilenum].palette;
 
-	UINT32 index = (tformat << 4) | (tsize << 2) | (object.OtherModes.en_tlut << 1) | object.OtherModes.tlut_type;
+	UINT32 index = (tformat << 4) | (tsize << 2) | ((UINT32) object.OtherModes.en_tlut << 1) | (UINT32) object.OtherModes.tlut_type;
 
 	return ((this)->*(TexelFetch[index]))(s, t, tbase, tpal, userdata);
 }

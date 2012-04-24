@@ -1,3 +1,4 @@
+#include <float.h>
 #include "emu.h"
 #include "cpu/sharc/sharc.h"
 #include "machine/konppc.h"
@@ -564,7 +565,7 @@ static void draw_scanline_2d(void *dest, INT32 scanline, const poly_extent *exte
 		if (color & 0xff000000)
 		{
 			fb[x] = color;
-			zb[x] = 0x7fffffff;		// FIXME
+			zb[x] = FLT_MAX;		// FIXME
 		}
 	}
 }
@@ -609,7 +610,7 @@ static void draw_scanline_2d_tex(void *dest, INT32 scanline, const poly_extent *
 		if (color & 0xff000000)
 		{
 			fb[x] = color;
-			zb[x] = 0x7fffffff;		// FIXME
+			zb[x] = FLT_MAX;		// FIXME
 		}
 
 		u += du;

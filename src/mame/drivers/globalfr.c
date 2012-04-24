@@ -38,7 +38,7 @@ static WRITE16_HANDLER(vfd_w)
 {
 	globalfr_state *state = space->machine().driver_data<globalfr_state>();
 
-	int clock = (data & 0x40);
+	bool clock = (data & 0x40) != 0;
 	int datline = (data & 0x80);
 
 	//Unlike MPU4, this uses positive transitions on both lines, so this may be a similar, but not identical component

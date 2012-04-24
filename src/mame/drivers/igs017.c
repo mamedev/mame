@@ -1854,8 +1854,8 @@ READ16_MEMBER(igs017_state::lhzb2a_magic_r)
 	{
 		case 0x03:
 		{
-			UINT8 a = BITSWAP8(m_prot[0], 9,9,1,9,2,5,4,7);	// 9 means 0 value
-			UINT8 b = BITSWAP8(m_prot[1], 5,2,9,7,9,9,9,9);
+			UINT8 a = BITSWAP8((UINT16)m_prot[0], 9,9,1,9,2,5,4,7);	// 9 means 0 value
+			UINT8 b = BITSWAP8((UINT16)m_prot[1], 5,2,9,7,9,9,9,9);
 			return a | b;
 		}
 

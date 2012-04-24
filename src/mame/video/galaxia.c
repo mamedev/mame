@@ -210,7 +210,7 @@ SCREEN_UPDATE_IND16( astrowar )
 		{
 			// NOTE: similar to zac2650.c, the sprite chip runs at a different frequency than the background generator
 			// the exact timing ratio is unknown, so we'll have to do with guesswork
-			float s_ratio = 256.0 / 196.0;
+			float s_ratio = 256.0f / 196.0f;
 
 			float sx = x * s_ratio;
 			if ((int)(sx + 0.5) > cliprect.max_x)

@@ -535,7 +535,7 @@ void pasti_format::map_sectors_in_track(wd_obs &obs, wd_sect_info *sect_infos)
 			int hpos = (i+3) % tsize;
 			int j;
 			bool synced = false;
-			int bcount, tend;
+			int bcount=0, tend=0;
 			int best_bcount=0, best_j=0;
 			for(j=0; j != obs.sector_count; j++) {
 				match_mfm_data(obs, hpos, obs.sectors[j].id, 6, hbyte, bcount, tend, synced);
