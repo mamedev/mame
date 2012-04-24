@@ -829,7 +829,7 @@ public:
 private:
 	// internal helpers
 	memory_bank *first_bank() const { return m_banklist.first(); }
-	memory_bank *bank(const char *tag) const { return m_bankmap.find(tag); }
+	memory_bank *bank(const char *tag) const { return m_banklist.find(tag); }
 	memory_region *region(const char *tag) { return m_regionlist.find(tag); }
 	memory_share *shared(const char *tag) { return m_sharelist.find(tag); }
 	void bank_reattach();
@@ -844,8 +844,7 @@ private:
 	simple_list<address_space>	m_spacelist;			// list of address spaces
 	simple_list<memory_block>	m_blocklist;			// head of the list of memory blocks
 
-	simple_list<memory_bank>	m_banklist;				// data gathered for each bank
-	tagmap_t<memory_bank *>		m_bankmap;				// map for fast bank lookups
+	tagged_list<memory_bank>	m_banklist;				// data gathered for each bank
 	UINT8						m_banknext;				// next bank to allocate
 
 	tagged_list<memory_share>	m_sharelist;			// map for share lookups

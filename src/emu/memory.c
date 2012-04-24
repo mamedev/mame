@@ -2930,13 +2930,12 @@ memory_bank &address_space::bank_find_or_allocate(const char *tag, offs_t addrst
 				throw emu_fatalerror("Unable to allocate bank for RAM/ROM area %X-%X\n", bytestart, byteend);
 		}
 
-		// allocate the bank
+		// if no tag, create a unique one
 		membank = global_alloc(memory_bank(*this, banknum, bytestart, byteend, tag));
-		manager().m_banklist.append(*membank);
-
-		// for named banks, add to the map and register for save states
-		if (tag != NULL)
-			manager().m_bankmap.add_unique_hash(tag, membank, false);
+		astring temptag;
+		if (tag == NULL)
+			tag = temptag.format("anon_%p", membank);
+		manager().m_banklist.append(tag, *membank);
 	}
 
 	// add a reference for this space
