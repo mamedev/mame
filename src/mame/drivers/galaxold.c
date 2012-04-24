@@ -3000,6 +3000,42 @@ ROM_START( drivfrcb )
 	ROM_LOAD( "bot.clr",      0x0020, 0x0020, CRC(0f0782af) SHA1(32c0dd09ead5c70cee2657e9cb8cb9fcf54c5a6a) )
 ROM_END
 
+ROM_START( drivfrct )
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "03.bin",       0x2800, 0x0400, CRC(9ab604cb) SHA1(772a5c0d93377f5bd7fc1f5e4050d44321a1bb8d) )
+	ROM_CONTINUE(			  0x2c00, 0x0400 )
+	ROM_CONTINUE(			  0x0000, 0x0400 )
+	ROM_CONTINUE(			  0x0400, 0x0400 )
+	ROM_CONTINUE(			  0x0800, 0x0400 )
+	ROM_CONTINUE(			  0x0c00, 0x0400 )
+	ROM_CONTINUE(			  0x2000, 0x0400 )
+	ROM_CONTINUE(			  0x2400, 0x0400 )
+	ROM_CONTINUE(			  0x6800, 0x0400 )
+	ROM_CONTINUE(			  0x6c00, 0x0400 )
+	ROM_CONTINUE(			  0x4000, 0x0400 )
+	ROM_CONTINUE(			  0x4400, 0x0400 )
+	ROM_CONTINUE(			  0x4800, 0x0400 )
+	ROM_CONTINUE(			  0x4c00, 0x0400 )
+	ROM_CONTINUE(			  0x6000, 0x0400 )
+	ROM_CONTINUE(			  0x6400, 0x0400 )
+
+	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_LOAD( "01.bin",       0x1000, 0x1000, CRC(300a6750) SHA1(0760eb852706ef72c61e889309ee94edc49a13dc) )
+	ROM_CONTINUE(			  0x0000, 0x1000 )
+	ROM_LOAD( "02.bin",       0x3000, 0x1000, CRC(f04e14c4) SHA1(f628da48ad19c86000c56345fd96d415992bf9a9) )
+	ROM_CONTINUE(			  0x2000, 0x1000 )
+
+	/* piggy-backed colour proms */
+	ROM_REGION( 0x0040, "proms", 0 )
+	ROM_LOAD( "tbp18s030.02", 0x0000, 0x0020, CRC(3110ddae) SHA1(53b2e1cc07915592f6c868131ec296c63a407f04) )
+	ROM_LOAD( "tbp18s030.01", 0x0020, 0x0020, CRC(0f0782af) SHA1(32c0dd09ead5c70cee2657e9cb8cb9fcf54c5a6a) )
+
+	/* proms inside epoxy block with cpu */
+	ROM_REGION( 0x0300, "user1", 0 )
+	ROM_LOAD( "tbp24s10.bin", 0x0000, 0x0100, CRC(8c0d886d) SHA1(03bb942861a639f30797fcb22f048f7908404955) )
+	ROM_LOAD( "tbp28s42.bin", 0x0100, 0x0200, CRC(9b8f310a) SHA1(8e17cc1adf441aec56d98d0809e1359d5175e8ed) )
+ROM_END
+
 ROM_START( racknrol )
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "horz_p.bin",   0x0000, 0x1000, CRC(32ca5b43) SHA1(f3e7662f947dcdd80f6eae4f002d2fe64a825aff) )
@@ -3096,7 +3132,8 @@ GAME( 1983, harem,    0,        harem,    harem,    0,        ROT90,  "I.G.R.", 
 /* S2650 games */
 GAME( 1983, hunchbkg, hunchbak,	hunchbkg, hunchbkg, 0,        ROT90,  "Century Electronics", "Hunchback (Galaxian hardware)", GAME_SUPPORTS_SAVE )
 GAME( 1984, drivfrcg, drivfrcp, drivfrcg, drivfrcg, 0,        ROT90,  "Shinkai Inc. (Magic Eletronics USA license)", "Driving Force (Galaxian conversion)", GAME_SUPPORTS_SAVE )
-GAME( 1985, drivfrcb, drivfrcp, drivfrcg, drivfrcg, 0,        ROT90,  "bootleg", "Driving Force (Galaxian conversion bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1984, drivfrct, drivfrcp, drivfrcg, drivfrcg, 0,        ROT90,  "bootleg (EMT Germany)", "Top Racer (bootleg of Driving Force)", GAME_SUPPORTS_SAVE ) // Video Klein PCB
+GAME( 1985, drivfrcb, drivfrcp, drivfrcg, drivfrcg, 0,        ROT90,  "bootleg (Elsys Software)", "Driving Force (Galaxian conversion bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1986, racknrol, 0,        racknrol, racknrol, 0,	      ROT0,   "Senko Industries (Status license from Shinkai Inc.)", "Rack + Roll", GAME_SUPPORTS_SAVE )
 GAME( 1986, hexpool,  racknrol, racknrol, racknrol, 0,	      ROT90,  "Senko Industries (Shinkai Inc. license)", "Hex Pool (Shinkai)", GAME_SUPPORTS_SAVE ) // still has Senko logo in gfx rom
 GAME( 1985, hexpoola, racknrol, hexpoola, racknrol, 0,	      ROT90,  "Senko Industries", "Hex Pool (Senko)", GAME_SUPPORTS_SAVE )
