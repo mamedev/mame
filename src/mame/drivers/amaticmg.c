@@ -7,8 +7,8 @@
 
   Driver by Roberto Fresca & Angelo Salese.
 
-***********************************************************************************
 
+***********************************************************************************
 
   Hardware Notes
   --------------
@@ -372,6 +372,10 @@
   - Added a button-lamps layout.
   - Promoted the game to working state.
   - Added technical notes.
+  - Renamed amaticmg3 to amaticmg2 since is the AMA-8000-2 system.
+  - Found the hopper motor signal. Mapped the hopper pay pulse to
+     key 'Q'. Now is possible to payout manually, avoiding the hang
+     for hopper empty or timeout.
 
   [2009/09/11]
 
@@ -385,11 +389,11 @@
 
   *** TO DO ***
 
-  - am_uslot: video garbage at first boot (doesn't happen if you soft-reset), btanb?
+  - Super Stars: video garbage at first boot (doesn't happen if you soft-reset), btanb?
   - Hook the remaining GFX bitplanes.
-  - Proper inputs.
   - Color decode routines.
-  - Sound support.
+  - Remaining sound devices.
+  - Hopper as device... ;)
 
 
 ***********************************************************************************/
@@ -465,7 +469,7 @@ static SCREEN_UPDATE_IND16( amaticmg )
 	return 0;
 }
 
-static SCREEN_UPDATE_IND16( amaticmg3 )
+static SCREEN_UPDATE_IND16( amaticmg2 )
 {
 	amaticmg_state *state = screen.machine().driver_data<amaticmg_state>();
 	const gfx_element *gfx = screen.machine().gfx[0];
@@ -517,7 +521,7 @@ static PALETTE_INIT( amaticmg )
 }
 
 
-static PALETTE_INIT( amaticmg3 )
+static PALETTE_INIT( amaticmg2 )
 {
 	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int	r, g, b;
@@ -553,18 +557,15 @@ static WRITE8_DEVICE_HANDLER(out_a_w)
 /*  LAMPS A:
 
     7654 3210
-    ---- ---x
-    ---- --x-
-    ---- -x--
+    x--- -xxx  (unknown)
     ---- x---  START
-    ---x ----  BET?
+    ---x ----  BET
     --x- ----  HOLD3
     -x-- ----  HOLD4
-    x--- ----
 */
 
 	output_set_lamp_value(0, (data >> 3) & 1);	/* START */
-	output_set_lamp_value(1, (data >> 4) & 1);	/* BET? */
+	output_set_lamp_value(1, (data >> 4) & 1);	/* BET */
 	output_set_lamp_value(2, (data >> 5) & 1);	/* HOLD3 */
 	output_set_lamp_value(3, (data >> 6) & 1);	/* HOLD4 */
 
@@ -576,20 +577,20 @@ static WRITE8_DEVICE_HANDLER(out_c_w)
 /*  LAMPS B:
 
     7654 3210
-    ---- ---x
+    ---- ---x  Coin Out counter
     ---- --x-  HOLD1
-    ---- -x--  Coin Counter
-    ---- x---
+    ---- -x--  Coin In counter
     ---x ----  HOLD2
-    --x- ----
     -x-- ----  CANCEL
-    x--- ----
+    x--- ----  Hopper motor
+    --x- x---  (unknown)
 */
 	output_set_lamp_value(4, (data >> 1) & 1);	/* HOLD1 */
 	output_set_lamp_value(5, (data >> 4) & 1);	/* HOLD2 */
 	output_set_lamp_value(6, (data >> 6) & 1);	/* CANCEL */
 
 //	coin_counter_w(machine(), 0, data & 0x04);	/* Coin In */
+//	coin_counter_w(machine(), 1, data & 0x01);	/* Coin Out */
 
 	logerror("port C: %2X\n", data);
 }
@@ -628,7 +629,7 @@ static ADDRESS_MAP_START( amaticmg_portmap, AS_IO, 8, amaticmg_state )
 
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( amaticmg3_portmap, AS_IO, 8, amaticmg_state )
+static ADDRESS_MAP_START( amaticmg2_portmap, AS_IO, 8, amaticmg_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 //	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
@@ -667,8 +668,8 @@ static INPUT_PORTS_START( amaticmg )
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE2 )       PORT_NAME("Service B (Dienst B") PORT_CODE(KEYCODE_8) PORT_TOGGLE
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )          PORT_NAME("Coin 2 (Muenze 2)") PORT_IMPULSE(3)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )          PORT_NAME("Coin 2 (Muenze 2)")   PORT_IMPULSE(3)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER )          PORT_NAME("Hopper Payout pulse") PORT_IMPULSE(3)      PORT_CODE(KEYCODE_Q)	// Hopper paying pulse
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )  PORT_CODE(KEYCODE_W)           // 'Ausgegeben 0 - Hopper Leer' (spent 0 - hopper empty)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )	PORT_NAME("Hold 3 (Halten 3)")
@@ -681,7 +682,7 @@ static INPUT_PORTS_START( amaticmg )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )       PORT_NAME("Service A (Dienst A") PORT_CODE(KEYCODE_7) PORT_TOGGLE
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_BET )     PORT_NAME("Bet (Setzen) / Half Take")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE3 )       PORT_NAME("Service C (Dienst C") PORT_CODE(KEYCODE_9) PORT_TOGGLE
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE )        PORT_NAME("Service (MAster)") PORT_CODE(KEYCODE_0)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE )        PORT_NAME("Service (Master)")    PORT_CODE(KEYCODE_0)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )	PORT_NAME("Hold 4 (Halten 4)")
 
 	PORT_START("IN3")
@@ -757,7 +758,7 @@ static GFXDECODE_START( amaticmg )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout_4bpp, 0, 0x20 )
 GFXDECODE_END
 
-static GFXDECODE_START( amaticmg3 )
+static GFXDECODE_START( amaticmg2 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout_6bpp, 0, 0x10000/0x40 )
 GFXDECODE_END
 
@@ -879,7 +880,7 @@ static MACHINE_CONFIG_START( amaticmg, amaticmg_state )
 MACHINE_CONFIG_END
 
 
-static INTERRUPT_GEN( amaticmg3_irq )
+static INTERRUPT_GEN( amaticmg2_irq )
 {
 	amaticmg_state *state = device->machine().driver_data<amaticmg_state>();
 
@@ -888,17 +889,17 @@ static INTERRUPT_GEN( amaticmg3_irq )
 }
 
 
-static MACHINE_CONFIG_DERIVED( amaticmg3, amaticmg )
+static MACHINE_CONFIG_DERIVED( amaticmg2, amaticmg )
 
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(amaticmg3_portmap)
-	MCFG_CPU_VBLANK_INT("screen", amaticmg3_irq)
+	MCFG_CPU_IO_MAP(amaticmg2_portmap)
+	MCFG_CPU_VBLANK_INT("screen", amaticmg2_irq)
 
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_STATIC(amaticmg3)
+	MCFG_SCREEN_UPDATE_STATIC(amaticmg2)
 
-	MCFG_GFXDECODE(amaticmg3)
-	MCFG_PALETTE_INIT(amaticmg3)
+	MCFG_GFXDECODE(amaticmg2)
+	MCFG_PALETTE_INIT(amaticmg2)
 	MCFG_PALETTE_LENGTH(0x10000)
 MACHINE_CONFIG_END
 
@@ -990,12 +991,12 @@ static void decrypt(running_machine &machine, int key1, int key2)
 	}
 }
 
-static DRIVER_INIT( amaticmg )
+static DRIVER_INIT( ama8000_1_x )
 {
 	decrypt(machine, 0x4c2, 0xf5);
 }
 
-static DRIVER_INIT( amaticmg3 )
+static DRIVER_INIT( ama8000_2_i )
 {
 	decrypt(machine, 0x426, 0x55);
 }
@@ -1005,7 +1006,7 @@ static DRIVER_INIT( amaticmg3 )
 *           Game Drivers            *
 ************************************/
 
-/*     YEAR  NAME      PARENT  MACHINE    INPUT     INIT       ROT     COMPANY                FULLNAME                     FLAGS                                                                                                        LAYOUT */
-GAMEL( 1996, suprstar, 0,      amaticmg,  amaticmg, amaticmg,  ROT90, "Amatic Trading GmbH", "Super Stars",                GAME_IMPERFECT_SOUND,                                                                                        layout_suprstar )
-GAME(  2000, am_mg24,  0,      amaticmg3, amaticmg, amaticmg3, ROT0,  "Amatic Trading GmbH", "Multi Game I (V.Ger 2.4)",   GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_UNEMULATED_PROTECTION | GAME_NO_SOUND | GAME_NOT_WORKING )
-GAME(  2000, am_mg3,   0,      amaticmg3, amaticmg, amaticmg3, ROT0,  "Amatic Trading GmbH", "Multi Game III (V.Ger 3.5)", GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_UNEMULATED_PROTECTION | GAME_NO_SOUND | GAME_NOT_WORKING )
+/*     YEAR  NAME      PARENT  MACHINE    INPUT     INIT         ROT     COMPANY                FULLNAME                     FLAGS                                                                                                        LAYOUT */
+GAMEL( 1996, suprstar, 0,      amaticmg,  amaticmg, ama8000_1_x, ROT90, "Amatic Trading GmbH", "Super Stars",                GAME_IMPERFECT_SOUND,                                                                                        layout_suprstar )
+GAME(  2000, am_mg24,  0,      amaticmg2, amaticmg, ama8000_2_i, ROT0,  "Amatic Trading GmbH", "Multi Game I (V.Ger 2.4)",   GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_UNEMULATED_PROTECTION | GAME_NO_SOUND | GAME_NOT_WORKING )
+GAME(  2000, am_mg3,   0,      amaticmg2, amaticmg, ama8000_2_i, ROT0,  "Amatic Trading GmbH", "Multi Game III (V.Ger 3.5)", GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_UNEMULATED_PROTECTION | GAME_NO_SOUND | GAME_NOT_WORKING )
