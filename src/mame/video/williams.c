@@ -352,13 +352,19 @@ WRITE8_MEMBER(williams_state::williams2_fg_select_w)
 
 READ8_MEMBER(williams_state::williams_video_counter_r)
 {
-	return machine().primary_screen->vpos() & 0xfc;
+	if (machine().primary_screen->vpos() < 0x100)
+		return machine().primary_screen->vpos() & 0xfc;
+	else
+		return 0xfc;
 }
 
 
 READ8_MEMBER(williams_state::williams2_video_counter_r)
 {
-	return machine().primary_screen->vpos();
+	if (machine().primary_screen->vpos() < 0x100)
+		return machine().primary_screen->vpos() & 0xfc;
+	else
+		return 0xfc;
 }
 
 
