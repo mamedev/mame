@@ -60,7 +60,7 @@ private:
 	// internal helpers
 	static inline bool is_opaque(float alpha) { return (alpha >= (_NoDestRead ? 0.5f : 1.0f)); }
 	static inline bool is_transparent(float alpha) { return (alpha < (_NoDestRead ? 0.5f : 0.0001f)); }
-	static inline rgb_t apply_intensity(rgb_t color, int intensity) { return MAKE_RGB((RGB_RED(color) * intensity) >> 8, (RGB_GREEN(color) * intensity) >> 8, (RGB_BLUE(color) * intensity) >> 8); }
+	static inline rgb_t apply_intensity(int intensity, rgb_t color) { return MAKE_RGB((RGB_RED(color) * intensity) >> 8, (RGB_GREEN(color) * intensity) >> 8, (RGB_BLUE(color) * intensity) >> 8); }
 	static inline float round_nearest(float f) { return floor(f + 0.5f); }
 
 	// destination pixels are written based on the values of the template parameters
