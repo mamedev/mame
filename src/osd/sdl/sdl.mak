@@ -447,7 +447,7 @@ LDFLAGS += -static-libgcc
 TEST_GCC = $(shell gcc --version)
 ifeq ($(findstring 4.4,$(TEST_GCC)),)
 	#if we use new tools
-	LDFLAGS += -static-libstdc++
+	LDFLAGS += -static -static-libstdc++
 endif
 LIBS += -lSDL.dll
 LIBS += -luser32 -lgdi32 -lddraw -ldsound -ldxguid -lwinmm -ladvapi32 -lcomctl32 -lshlwapi
