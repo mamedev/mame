@@ -236,7 +236,7 @@ WRITE8_MEMBER( mc6845_device::register_w )
 	/* display message if the Mode Control register is not zero */
 	if ((m_register_address_latch == 0x08) && (m_mode_control != 0))
 		if (!m_supports_transparent)
-			popmessage("Mode Control %02X is not supported!!!", m_mode_control);
+			logerror("M6845: Mode Control %02X is not supported!!!", m_mode_control);
 
 	recompute_parameters(false);
 }
@@ -747,7 +747,7 @@ UINT32 mc6845_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 			m_end_update(this, bitmap, cliprect, param);
 	}
 	else
-		popmessage("Invalid MC6845 screen parameters - display disabled!!!");
+		logerror("M6845: Invalid screen parameters - display disabled!!!");
 	return 0;
 }
 
