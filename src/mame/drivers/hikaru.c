@@ -319,6 +319,67 @@ Notes:
 
 */
 
+/*
+    New hardware notes from Stefano Teso:
+ 
+  - The master SH-4 port A: the bit layout for this thing is (MSB left)
+
+    xxxx xxii iiee eexM
+
+    x = unused
+    i = IRQ causes (active low)
+    e = Mainboard EEPROM (active low)
+    M = connected to the slave SH-4 NMI pin; writing a specific bit
+    pattern here (3 ones, 3 zeros, 7 ones) sends an NMI to the slave
+
+    Bit 1 of the slave port A is used for master-slave communication as
+    well, but I have yet to figure out how. It doesn't seem to be needed
+    for emulation at this point though. Master-slave communication seems
+    to work okay after emulating the M bit here.
+
+  - There's an additional indirect-DMA-like device on the GPU at
+    150000(0C,10,14). The table indicating where the data is, how long it
+    is, and how to operate on it, is located at the bottom of GPU command
+    RAM (14xxxxxx), defaulting at 143FC000 (whose bus address, specified
+    by 1500000C is 483FC000.) It is used for (my guess) on-the-fly texture
+    format conversion. Upon termination, it raises a GPU IRQ. It looks
+    like airtrix first uploads the data to be converted somewhere using
+    the memory controller's DMA, then instructs the GPU indirect DMA thing
+    to read it and perform the conversion.
+
+  - GPU IRQs: it looks like the GPU IRQs are as follows:
+
+    15000088:
+
+    bit 0: the GPU indirect-DMA-like device is done
+    bit 1: vblank (or hblank)
+    bit 2: the GPU at 15xxxxxx is done and needs feeding (means that
+    commands are uploaded to CMDRAM and registers fiddled with, see bit 2
+    below.)
+    bit 8: any bit of 1A000018 is set
+
+    1A000018:
+
+    bit 1: vblank (or hblank)
+    bit 2: GPU at 1Axxxxxx is done and needs feeding (same as bit 2
+    above; note that both IRQs must be raised -- not necessarily at the
+    same time -- for the whole "let's upload data to the GPU" routine to
+    be performed.)
+
+    My gut feeling tells me that there are two different GPUs: one
+    processes the command stream and does the rendering on even frames,
+    the other does the same for odd frames. Registers 1500007x may specify
+    where the command stream start is (the initial GPU PC) and possibly
+    the location of two distinct stack pointers (the GPU supports
+    subroutines, after all.)
+
+  - the serial device at 0080000(A|C) is not an EEPROM; it's likely some
+    weird device that is used to query the heirarchy of the attached
+    input/output devices. Probably the naomi has something similar, I
+    haven't looked into it yet. 
+ 
+*/
+
 #include "emu.h"
 #include "cpu/sh4/sh4.h"
 
