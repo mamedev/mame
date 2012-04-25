@@ -470,7 +470,7 @@ ROM_START( quizard )
     ROM_LOAD( "slave.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
 
     DISK_REGION( "cdrom" )
-    DISK_IMAGE_READONLY( "quizrd32", 0, SHA1(31e9fa2169aa44d799c37170b238134ab738e1a1) )
+    DISK_IMAGE_READONLY( "quizrd32", 0, BAD_DUMP SHA1(31e9fa2169aa44d799c37170b238134ab738e1a1) )
 ROM_END
 
 ROM_START( quizrd22 )
@@ -484,7 +484,7 @@ ROM_START( quizrd22 )
     ROM_LOAD( "slave.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
 
     DISK_REGION( "cdrom" )
-    DISK_IMAGE_READONLY( "quizrd22", 0, SHA1(03c8fdcf27ead6e221691111e8c679b551099543) )
+    DISK_IMAGE_READONLY( "quizrd22", 0, BAD_DUMP SHA1(03c8fdcf27ead6e221691111e8c679b551099543) )
 ROM_END
 
 ROM_START( quizrd17 )
@@ -498,7 +498,7 @@ ROM_START( quizrd17 )
     ROM_LOAD( "slave.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
 
     DISK_REGION( "cdrom" )
-    DISK_IMAGE_READONLY( "quizrd17", 0, SHA1(4bd698f076505b4e17be978481bce027eb47123b) )
+    DISK_IMAGE_READONLY( "quizrd17", 0, BAD_DUMP SHA1(4bd698f076505b4e17be978481bce027eb47123b) )
 ROM_END
 
 ROM_START( quizrd12 ) /* CD-ROM printed 01/95 */
@@ -512,7 +512,7 @@ ROM_START( quizrd12 ) /* CD-ROM printed 01/95 */
     ROM_LOAD( "slave.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
 
     DISK_REGION( "cdrom" )
-    DISK_IMAGE_READONLY( "quizrd12", 0, SHA1(6e41683b96b74e903040842aeb18437ad7813c82) )
+    DISK_IMAGE_READONLY( "quizrd12", 0, BAD_DUMP SHA1(6e41683b96b74e903040842aeb18437ad7813c82) )
 ROM_END
 
 ROM_START( quizrd18 ) /* CD-ROM printed ??/?? */
@@ -526,7 +526,7 @@ ROM_START( quizrd18 ) /* CD-ROM printed ??/?? */
     ROM_LOAD( "slave.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
 
     DISK_REGION( "cdrom" )
-    DISK_IMAGE_READONLY( "quizrd18", 0, SHA1(ede873b22957f2a707bbd3039e962ef2ca5aedbd) )
+    DISK_IMAGE_READONLY( "quizrd18", 0, BAD_DUMP SHA1(ede873b22957f2a707bbd3039e962ef2ca5aedbd) )
 ROM_END
 
 ROM_START( quizrd23 ) /* CD-ROM printed ??/?? */
@@ -540,7 +540,7 @@ ROM_START( quizrd23 ) /* CD-ROM printed ??/?? */
     ROM_LOAD( "slave.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
 
     DISK_REGION( "cdrom" )
-    DISK_IMAGE_READONLY( "quizrd23", 0, SHA1(cd909d9a54275d6f2d36e03e83eea996e781b4d3) )
+    DISK_IMAGE_READONLY( "quizrd23", 0, BAD_DUMP SHA1(cd909d9a54275d6f2d36e03e83eea996e781b4d3) )
 ROM_END
 
 ROM_START( quizrd34 ) /* CD-ROM printed ??/?? */
@@ -554,7 +554,7 @@ ROM_START( quizrd34 ) /* CD-ROM printed ??/?? */
     ROM_LOAD( "slave.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
 
     DISK_REGION( "cdrom" )
-    DISK_IMAGE_READONLY( "quizrd34", 0, SHA1(37ad49b72b5175afbb87141d57bc8604347fe032) )
+    DISK_IMAGE_READONLY( "quizrd34", 0, BAD_DUMP SHA1(37ad49b72b5175afbb87141d57bc8604347fe032) )
 ROM_END
 
 ROM_START( quizrr42 ) /* CD-ROM printed 09/98 */
@@ -568,7 +568,7 @@ ROM_START( quizrr42 ) /* CD-ROM printed 09/98 */
     ROM_LOAD( "slave.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
 
     DISK_REGION( "cdrom" )
-    DISK_IMAGE_READONLY( "quizrr42", 0, SHA1(a5d5c8950b4650b8753f9119dc7f1ccaa2aa5442) )
+    DISK_IMAGE_READONLY( "quizrr42", 0, BAD_DUMP SHA1(a5d5c8950b4650b8753f9119dc7f1ccaa2aa5442) )
 ROM_END
 
 ROM_START( quizrr41 )
@@ -582,7 +582,7 @@ ROM_START( quizrr41 )
     ROM_LOAD( "slave.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
 
     DISK_REGION( "cdrom" )
-    DISK_IMAGE_READONLY( "quizrr41", 0, SHA1(2c0484c6545aac8e00b318328c6edce6f5dde43d) )
+    DISK_IMAGE_READONLY( "quizrr41", 0, BAD_DUMP SHA1(2c0484c6545aac8e00b318328c6edce6f5dde43d) )
 ROM_END
 
 ROM_START( quizrr40 ) /* CD-ROM printed 07/97 */
@@ -596,7 +596,7 @@ ROM_START( quizrr40 ) /* CD-ROM printed 07/97 */
     ROM_LOAD( "slave.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
 
     DISK_REGION( "cdrom" )
-    DISK_IMAGE_READONLY( "quizrr40", 0, SHA1(288cc37a994e4f1cbd47aa8c92342879c6fc0b87) )
+    DISK_IMAGE_READONLY( "quizrr40", 0, BAD_DUMP SHA1(288cc37a994e4f1cbd47aa8c92342879c6fc0b87) )
 ROM_END
 
 
