@@ -138,8 +138,6 @@ MACHINE_RESET( nb1413m3 )
 	nb1413m3_inputport = 0xff;
 	nb1413m3_outcoin_flag = 1;
 
-	nb1413m3_74ls193_counter = 0;
-
 	machine.scheduler().synchronize(FUNC(nb1413m3_timer_callback));
 }
 
