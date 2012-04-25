@@ -24,6 +24,17 @@
 static KONAMI_SETLINES_CALLBACK( crimfght_banking );
 
 
+static TIMER_DEVICE_CALLBACK( crimfght_scanline )
+{
+	crimfght_state *state = timer.machine().driver_data<crimfght_state>();
+	int scanline = param;
+
+	if(scanline == 240 && k051960_is_irq_enabled(state->m_k051960)) // vblank irq
+		cputag_set_input_line(timer.machine(), "maincpu", KONAMI_IRQ_LINE, HOLD_LINE);
+	else if(((scanline % 32) == 0) && (k051960_is_nmi_enabled(state->m_k051960))) // timer irq
+		cputag_set_input_line(timer.machine(), "maincpu", INPUT_LINE_NMI, PULSE_LINE);
+}
+
 WRITE8_MEMBER(crimfght_state::crimfght_coin_w)
 {
 	coin_counter_w(machine(), 0, data & 1);
@@ -33,7 +44,7 @@ WRITE8_MEMBER(crimfght_state::crimfght_coin_w)
 WRITE8_MEMBER(crimfght_state::crimfght_sh_irqtrigger_w)
 {
 	soundlatch_byte_w(space, offset, data);
-	device_set_input_line_and_vector(m_audiocpu, 0, HOLD_LINE, 0xff);
+	device_set_input_line(m_audiocpu, 0, HOLD_LINE);
 }
 
 static WRITE8_DEVICE_HANDLER( crimfght_snd_bankswitch_w )
@@ -78,8 +89,8 @@ WRITE8_MEMBER(crimfght_state::k052109_051960_w)
 /********************************************/
 
 static ADDRESS_MAP_START( crimfght_map, AS_PROGRAM, 8, crimfght_state )
-	AM_RANGE(0x0000, 0x03ff) AM_RAMBANK("bank1")					/* banked RAM */
-	AM_RANGE(0x0400, 0x1fff) AM_RAM												/* RAM */
+	AM_RANGE(0x0000, 0x03ff) AM_RAMBANK("bank1")						/* banked RAM */
+	AM_RANGE(0x0400, 0x1fff) AM_RAM								/* RAM */
 	AM_RANGE(0x3f80, 0x3f80) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x3f81, 0x3f81) AM_READ_PORT("P1")
 	AM_RANGE(0x3f82, 0x3f82) AM_READ_PORT("P2")
@@ -89,17 +100,17 @@ static ADDRESS_MAP_START( crimfght_map, AS_PROGRAM, 8, crimfght_state )
 	AM_RANGE(0x3f86, 0x3f86) AM_READ_PORT("P4")
 	AM_RANGE(0x3f87, 0x3f87) AM_READ_PORT("DSW1")
 	AM_RANGE(0x3f88, 0x3f88) AM_READ(watchdog_reset_r) AM_WRITE(crimfght_coin_w)	/* watchdog reset */
-	AM_RANGE(0x3f8c, 0x3f8c) AM_WRITE(crimfght_sh_irqtrigger_w)	/* cause interrupt on audio CPU? */
+	AM_RANGE(0x3f8c, 0x3f8c) AM_WRITE(crimfght_sh_irqtrigger_w)				/* cause interrupt on audio CPU? */
 	AM_RANGE(0x2000, 0x5fff) AM_READWRITE(k052109_051960_r, k052109_051960_w)	/* video RAM + sprite RAM */
 	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank2")						/* banked ROM */
-	AM_RANGE(0x8000, 0xffff) AM_ROM												/* ROM */
+	AM_RANGE(0x8000, 0xffff) AM_ROM								/* ROM */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( crimfght_sound_map, AS_PROGRAM, 8, crimfght_state )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM												/* ROM 821l01.h4 */
-	AM_RANGE(0x8000, 0x87ff) AM_RAM												/* RAM */
-	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)			/* YM2151 */
-	AM_RANGE(0xc000, 0xc000) AM_READ(soundlatch_byte_r)								/* soundlatch_byte_r */
+	AM_RANGE(0x0000, 0x7fff) AM_ROM									/* ROM 821l01.h4 */
+	AM_RANGE(0x8000, 0x87ff) AM_RAM									/* RAM */
+	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)		/* YM2151 */
+	AM_RANGE(0xc000, 0xc000) AM_READ(soundlatch_byte_r)						/* soundlatch_byte_r */
 	AM_RANGE(0xe000, 0xe00d) AM_DEVREADWRITE_LEGACY("k007232", k007232_r, k007232_w)	/* 007232 registers */
 ADDRESS_MAP_END
 
@@ -275,12 +286,14 @@ static MACHINE_RESET( crimfght )
 static MACHINE_CONFIG_START( crimfght, crimfght_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", KONAMI, 3000000)		/* ? */
+	MCFG_CPU_ADD("maincpu", KONAMI,XTAL_24MHz/8)		/* 052001 (verified on pcb) */
 	MCFG_CPU_PROGRAM_MAP(crimfght_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", crimfght_scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 3579545)	/* verified with PCB */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz) 	/* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(crimfght_sound_map)
+
+	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
 	MCFG_MACHINE_START(crimfght)
 	MCFG_MACHINE_RESET(crimfght)
@@ -289,7 +302,7 @@ static MACHINE_CONFIG_START( crimfght, crimfght_state )
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(54)	/* adjusted - compared with PCB speed */
+	MCFG_SCREEN_REFRESH_RATE(59.17)				/* verified on pcb */
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(13*8, (64-13)*8-1, 2*8, 30*8-1 )
@@ -305,12 +318,12 @@ static MACHINE_CONFIG_START( crimfght, crimfght_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymsnd", YM2151, 3579545)	/* verified with PCB */
+	MCFG_SOUND_ADD("ymsnd", YM2151, XTAL_3_579545MHz) 	/* verified on pcb */
 	MCFG_SOUND_CONFIG(ym2151_config)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_SOUND_ADD("k007232", K007232, 3579545)
+	MCFG_SOUND_ADD("k007232", K007232, XTAL_3_579545MHz) 	/* verified on pcb */
 	MCFG_SOUND_CONFIG(k007232_config)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.20)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.20)

@@ -19,12 +19,15 @@ Preliminary driver by:
 /* prototypes */
 static KONAMI_SETLINES_CALLBACK( aliens_banking );
 
-static INTERRUPT_GEN( aliens_interrupt )
+static TIMER_DEVICE_CALLBACK( aliens_scanline )
 {
-	aliens_state *state = device->machine().driver_data<aliens_state>();
+	aliens_state *state = timer.machine().driver_data<aliens_state>();
+	int scanline = param;
 
-	if (k051960_is_irq_enabled(state->m_k051960))
-		device_set_input_line(device, KONAMI_IRQ_LINE, HOLD_LINE);
+	if(scanline == 240 && k051960_is_irq_enabled(state->m_k051960)) // vblank irq
+		cputag_set_input_line(timer.machine(), "maincpu", KONAMI_IRQ_LINE, HOLD_LINE);
+	else if(((scanline % 32) == 0) && (k051960_is_nmi_enabled(state->m_k051960))) // timer irq
+		cputag_set_input_line(timer.machine(), "maincpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 READ8_MEMBER(aliens_state::bankedram_r)
@@ -70,7 +73,7 @@ WRITE8_MEMBER(aliens_state::aliens_sh_irqtrigger_w)
 {
 
 	soundlatch_byte_w(space, offset, data);
-	device_set_input_line_and_vector(m_audiocpu, 0, HOLD_LINE, 0xff);
+	device_set_input_line(m_audiocpu, 0, HOLD_LINE);
 }
 
 static WRITE8_DEVICE_HANDLER( aliens_snd_bankswitch_w )
@@ -117,23 +120,23 @@ WRITE8_MEMBER(aliens_state::k052109_051960_w)
 static ADDRESS_MAP_START( aliens_map, AS_PROGRAM, 8, aliens_state )
 	AM_RANGE(0x0000, 0x03ff) AM_READWRITE(bankedram_r, bankedram_w) AM_SHARE("ram")		/* palette + work RAM */
 	AM_RANGE(0x0400, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("bank1")												/* banked ROM */
+	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("bank1")								/* banked ROM */
 	AM_RANGE(0x5f80, 0x5f80) AM_READ_PORT("DSW3")
 	AM_RANGE(0x5f81, 0x5f81) AM_READ_PORT("P1")
 	AM_RANGE(0x5f82, 0x5f82) AM_READ_PORT("P2")
 	AM_RANGE(0x5f83, 0x5f83) AM_READ_PORT("DSW2")
 	AM_RANGE(0x5f84, 0x5f84) AM_READ_PORT("DSW1")
 	AM_RANGE(0x5f88, 0x5f88) AM_READ(watchdog_reset_r) AM_WRITE(aliens_coin_counter_w)		/* coin counters */
-	AM_RANGE(0x5f8c, 0x5f8c) AM_WRITE(aliens_sh_irqtrigger_w)							/* cause interrupt on audio CPU */
+	AM_RANGE(0x5f8c, 0x5f8c) AM_WRITE(aliens_sh_irqtrigger_w)						/* cause interrupt on audio CPU */
 	AM_RANGE(0x4000, 0x7fff) AM_READWRITE(k052109_051960_r, k052109_051960_w)
-	AM_RANGE(0x8000, 0xffff) AM_ROM														/* ROM e24_j02.bin */
+	AM_RANGE(0x8000, 0xffff) AM_ROM										/* ROM e24_j02.bin */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( aliens_sound_map, AS_PROGRAM, 8, aliens_state )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM								/* ROM g04_b03.bin */
-	AM_RANGE(0x8000, 0x87ff) AM_RAM								/* RAM */
+	AM_RANGE(0x0000, 0x7fff) AM_ROM										/* ROM g04_b03.bin */
+	AM_RANGE(0x8000, 0x87ff) AM_RAM										/* RAM */
 	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
-	AM_RANGE(0xc000, 0xc000) AM_READ(soundlatch_byte_r)				/* soundlatch_byte_r */
+	AM_RANGE(0xc000, 0xc000) AM_READ(soundlatch_byte_r)							/* soundlatch_byte_r */
 	AM_RANGE(0xe000, 0xe00d) AM_DEVREADWRITE_LEGACY("k007232", k007232_r, k007232_w)
 ADDRESS_MAP_END
 
@@ -257,14 +260,14 @@ static MACHINE_CONFIG_START( aliens, aliens_state )
 
 	/* basic machine hardware */
 
-	/* external clock should be 12MHz probably, CPU internal divider and precise cycle timings */
-	/* are unknown though. 3MHz is too low, sprites flicker in the pseudo-3D levels */
-	MCFG_CPU_ADD("maincpu", KONAMI, 6000000)		/* ? */
+	MCFG_CPU_ADD("maincpu", KONAMI,XTAL_24MHz/8)		/* 052001 (verified on pcb) */
 	MCFG_CPU_PROGRAM_MAP(aliens_map)
-	MCFG_CPU_VBLANK_INT("screen", aliens_interrupt)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", aliens_scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 3579545)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz) 	/* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(aliens_sound_map)
+
+	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
 	MCFG_MACHINE_START(aliens)
 	MCFG_MACHINE_RESET(aliens)
@@ -273,7 +276,7 @@ static MACHINE_CONFIG_START( aliens, aliens_state )
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_REFRESH_RATE(59.17)				/* verified on pcb */
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(14*8, (64-14)*8-1, 2*8, 30*8-1 )
@@ -289,12 +292,12 @@ static MACHINE_CONFIG_START( aliens, aliens_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2151, 3579545)
+	MCFG_SOUND_ADD("ymsnd", YM2151, XTAL_3_579545MHz) 	/* verified on pcb */
 	MCFG_SOUND_CONFIG(ym2151_config)
 	MCFG_SOUND_ROUTE(0, "mono", 0.60)
 	MCFG_SOUND_ROUTE(1, "mono", 0.60)
 
-	MCFG_SOUND_ADD("k007232", K007232, 3579545)
+	MCFG_SOUND_ADD("k007232", K007232, XTAL_3_579545MHz) 	/* verified on pcb */
 	MCFG_SOUND_CONFIG(k007232_config)
 	MCFG_SOUND_ROUTE(0, "mono", 0.20)
 	MCFG_SOUND_ROUTE(1, "mono", 0.20)
