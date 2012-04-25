@@ -14,6 +14,22 @@
 			<color red="0.0" green="1.0" blue="0.0" />
 		</rect>
 	</element>
+
+  <element name="reellamp">
+    <rect state ="0">
+      <bounds x="0" y="0" width="7" height="7" />
+      <color red="0.1" green="0.1" blue="0.1" />
+    </rect>
+    <rect state ="1">
+      <bounds x="0" y="0" width="7" height="7" />
+      <color red="0.6" green="0.6" blue="0.6" />
+    </rect>
+    <rect state ="2">
+      <bounds x="0" y="0" width="7" height="7" />
+      <color red="0.6" green="0.6" blue="0.6" />
+    </rect>
+  </element>  
+  
   <element name="Steppers" defstate="0">
     <simplecounter maxstate="999" digits="3">
       <color red="1.0" green="1.0" blue="1.0" />
@@ -21,9 +37,11 @@
     </simplecounter>
   </element>
 
+
+
   <!-- a stateoffset of 682 will shift us by 1 step on a 96 step reel (0x10000/96) which seems a good default alignment for 96 step / 16 symbol reels -->
   <element name="SteppersReel1" defstate="0">
-    <reel stateoffset="682" symbollist="Fruit1,Fruit2,Fruit3,Fruit4,Fruit5,Fruit6,Fruit7,Fruit8,Fruit9,Fruit10,Fruit11,Fruit12,Fruit13,Fruit14,Fruit15,Fruit16">
+    <reel stateoffset="682" symbollist="Fruit1:image11.png,Fruit2:image12.png,Fruit3:image13.png,Fruit4:image14.png,Fruit5:image15.png,Fruit6:image16.png,Fruit7:image17.png,Fruit8:image18.png,Fruit9:image19.png,Fruit10:image110.png,Fruit11:image111.png,Fruit12:image112.png,Fruit13:image113.png,Fruit14:image114.png,Fruit15:image115.png,Fruit16:image116.png">
       <color red="1.0" green="1.0" blue="1.0" />
       <bounds x="0" y="0" width="1" height="1" />
     </reel>
@@ -148,6 +166,46 @@
 			<bounds x="350" y="410" width="10" height="5"/>
 		</backdrop>
 
+    <!-- these are typically the reel lamps, so duplicate them here -->
+    <backdrop name="lamp32" element="reellamp" state="0">
+      <bounds x="210" y="300" width="50" height="17"/>
+    </backdrop>
+    <backdrop name="lamp33" element="reellamp" state="0">
+      <bounds x="210" y="317" width="50" height="17"/>
+    </backdrop>
+    <backdrop name="lamp34" element="reellamp" state="0">
+      <bounds x="210" y="333" width="50" height="17"/>
+    </backdrop>
+
+    <backdrop name="lamp35" element="reellamp" state="0">
+      <bounds x="260" y="300" width="50" height="17"/>
+    </backdrop>
+    <backdrop name="lamp36" element="reellamp" state="0">
+      <bounds x="260" y="317" width="50" height="17"/>
+    </backdrop>
+    <backdrop name="lamp37" element="reellamp" state="0">
+      <bounds x="260" y="333" width="50" height="17"/>
+    </backdrop>
+
+    <backdrop name="lamp48" element="reellamp" state="0">
+      <bounds x="310" y="300" width="50" height="17"/>
+    </backdrop>
+    <backdrop name="lamp49" element="reellamp" state="0">
+      <bounds x="310" y="317" width="50" height="17"/>
+    </backdrop>
+    <backdrop name="lamp50" element="reellamp" state="0">
+      <bounds x="310" y="333" width="50" height="17"/>
+    </backdrop>
+
+    <backdrop name="lamp51" element="reellamp" state="0">
+      <bounds x="210" y="360" width="50" height="17"/>
+    </backdrop>
+    <backdrop name="lamp52" element="reellamp" state="0">
+      <bounds x="210" y="377" width="50" height="17"/>
+    </backdrop>
+    <backdrop name="lamp53" element="reellamp" state="0">
+      <bounds x="210" y="393" width="50" height="17"/>
+    </backdrop>
 
     <backdrop name="sreel1" element="SteppersReel1" state="0">
       <bounds x="210" y="300" width="50" height="50"/>

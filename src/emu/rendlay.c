@@ -609,10 +609,16 @@ layout_element::texture::~texture()
 layout_element::component::component(running_machine &machine, xml_data_node &compnode, const char *dirname)
 	: m_next(NULL),
 	  m_type(CTYPE_INVALID),
-	  m_state(0),
-	  m_file(NULL),
-	  m_hasalpha(false)
+	  m_state(0)
 {
+	for (int i=0;i<MAX_BITMAPS;i++)
+	{
+		m_hasalpha[i] = false;
+		m_file[i] = NULL;
+	}
+
+
+
 	// fetch common data
 	m_state = xml_get_attribute_int_with_subst(machine, compnode, "state", -1);
 	parse_bounds(machine, xml_get_sibling(compnode.child, "bounds"), m_bounds);
@@ -623,9 +629,9 @@ layout_element::component::component(running_machine &machine, xml_data_node &co
 	{
 		m_type = CTYPE_IMAGE;
 		m_dirname = dirname;
-		m_imagefile = xml_get_attribute_string_with_subst(machine, compnode, "file", "");
-		m_alphafile = xml_get_attribute_string_with_subst(machine, compnode, "alphafile", "");
-		m_file = global_alloc(emu_file(machine.options().art_path(), OPEN_FLAG_READ));
+		m_imagefile[0] = xml_get_attribute_string_with_subst(machine, compnode, "file", "");
+		m_alphafile[0] = xml_get_attribute_string_with_subst(machine, compnode, "alphafile", "");
+		m_file[0] = global_alloc(emu_file(machine.options().art_path(), OPEN_FLAG_READ));
 	}
 
 	// text nodes
@@ -666,6 +672,30 @@ layout_element::component::component(running_machine &machine, xml_data_node &co
 			location=symbollist.find(0,",");
 		}
 		m_stopnames[m_numstops++] = symbollist;
+
+		// careful, dirname is NULL if we're coming from internal layout, and our string assignment doesn't like that
+		if (dirname != NULL)
+			m_dirname = dirname;
+
+		for (int i=0;i<m_numstops;i++)
+		{
+			location=m_stopnames[i].find(0,":");
+			if (location!=-1)
+			{
+				m_imagefile[i] = m_stopnames[i];
+				m_stopnames[i].substr(0, location);
+				m_imagefile[i].substr(location+1, m_imagefile[i].len()-(location-1));
+				
+				//m_alphafile[i] = 
+				m_file[i] = global_alloc(emu_file(machine.options().art_path(), OPEN_FLAG_READ));
+			}
+			else
+			{
+				//m_imagefile[i] = 0;
+				//m_alphafile[i] = 0;
+				m_file[i] = 0;
+			}
+		}
 
 		m_stateoffset = xml_get_attribute_int_with_subst(machine, compnode, "stateoffset", 0);
 		m_numsymbolsvisible = xml_get_attribute_int_with_subst(machine, compnode, "numsymbolsvisible", 3);
@@ -711,7 +741,10 @@ layout_element::component::component(running_machine &machine, xml_data_node &co
 
 layout_element::component::~component()
 {
-	global_free(m_file);
+	for (int i=0;i<MAX_BITMAPS;i++)
+	{
+		global_free(m_file[i]);
+	}
 }
 
 
@@ -724,11 +757,11 @@ void layout_element::component::draw(running_machine &machine, bitmap_argb32 &de
 	switch (m_type)
 	{
 		case CTYPE_IMAGE:
-			if (!m_bitmap.valid())
+			if (!m_bitmap[0].valid())
 				load_bitmap();
 			{
 				bitmap_argb32 destsub(dest, bounds);
-				render_resample_argb_bitmap_hq(destsub, m_bitmap, m_color);
+				render_resample_argb_bitmap_hq(destsub, m_bitmap[0], m_color);
 			}
 			break;
 
@@ -773,6 +806,7 @@ void layout_element::component::draw(running_machine &machine, bitmap_argb32 &de
 			break;
 
 		case CTYPE_REEL:
+
 			draw_reel(machine, dest, bounds, state);
 			break;
 
@@ -975,6 +1009,8 @@ void layout_element::component::draw_simplecounter(running_machine &machine, bit
 /* state is a normalized value between 0 and 65536 so that we don't need to worry about how many motor steps here or in the .lay, only the number of symbols */
 void layout_element::component::draw_reel(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state)
 {
+
+
 	const int max_state_used = 0x10000;
 
 	// shift the reels a bit based on this param, allows fine tuning
@@ -1033,52 +1069,94 @@ void layout_element::component::draw_reel(running_machine &machine, bitmap_argb3
 			INT32 curx;
 			curx = bounds.min_x + (bounds.width() - width) / 2;
 
+			if (m_file[fruit])
+				if (!m_bitmap[fruit].valid())
+					load_reel_bitmap(fruit);
 
-			// allocate a temporary bitmap
-			bitmap_argb32 tempbitmap(dest.width(), dest.height());
-
-			// loop over characters
-			for (const char *s = m_stopnames[fruit]; *s != 0; s++)
+			if (m_file[fruit]) // render gfx
 			{
-				// get the font bitmap
-				rectangle chbounds;
-				font->get_scaled_bitmap_and_bounds(tempbitmap, ourheight/num_shown, aspect, *s, chbounds);
-
-				// copy the data into the target
-				for (int y = 0; y < chbounds.height(); y++)
+				bitmap_argb32 tempbitmap2(dest.width(), ourheight/num_shown);
+				
+				if (m_bitmap[fruit].valid())
 				{
-					int effy = basey + y;
+					render_resample_argb_bitmap_hq(tempbitmap2, m_bitmap[fruit], m_color);
 
-					if (effy >= bounds.min_y && effy <= bounds.max_y)
+					for (int y = 0; y < ourheight/num_shown; y++)
 					{
-						UINT32 *src = &tempbitmap.pix32(y);
-						UINT32 *d = &dest.pix32(effy);
-						for (int x = 0; x < chbounds.width(); x++)
-						{
-							int effx = curx + x + chbounds.min_x;
-							if (effx >= bounds.min_x && effx <= bounds.max_x)
-							{
+						int effy = basey + y;
 
-								UINT32 spix = RGB_ALPHA(src[x]);
-								if (spix != 0)
+						if (effy >= bounds.min_y && effy <= bounds.max_y)
+						{
+							UINT32 *src = &tempbitmap2.pix32(y);
+							UINT32 *d = &dest.pix32(effy);
+							for (int x = 0; x < dest.width(); x++)
+							{
+								int effx = x;
+								if (effx >= bounds.min_x && effx <= bounds.max_x)
 								{
-									UINT32 dpix = d[effx];
-									UINT32 ta = (a * (spix + 1)) >> 8;
-									UINT32 tr = (r * ta + RGB_RED(dpix) * (0x100 - ta)) >> 8;
-									UINT32 tg = (g * ta + RGB_GREEN(dpix) * (0x100 - ta)) >> 8;
-									UINT32 tb = (b * ta + RGB_BLUE(dpix) * (0x100 - ta)) >> 8;
-									d[effx] = MAKE_ARGB(0xff, tr, tg, tb);
+
+									UINT32 spix = RGB_ALPHA(src[x]);
+									if (spix != 0)
+									{
+										d[effx] = src[x];
+									}
+								}
+							}
+						}
+								
+					}
+				}
+			}
+			else // render text (fallback)
+			{
+				// allocate a temporary bitmap
+				bitmap_argb32 tempbitmap(dest.width(), dest.height());
+	
+				// loop over characters
+				for (const char *s = m_stopnames[fruit]; *s != 0; s++)
+				{
+					// get the font bitmap
+					rectangle chbounds;
+					font->get_scaled_bitmap_and_bounds(tempbitmap, ourheight/num_shown, aspect, *s, chbounds);
+
+					// copy the data into the target
+					for (int y = 0; y < chbounds.height(); y++)
+					{
+						int effy = basey + y;
+
+						if (effy >= bounds.min_y && effy <= bounds.max_y)
+						{
+							UINT32 *src = &tempbitmap.pix32(y);
+							UINT32 *d = &dest.pix32(effy);
+							for (int x = 0; x < chbounds.width(); x++)
+							{
+								int effx = curx + x + chbounds.min_x;
+								if (effx >= bounds.min_x && effx <= bounds.max_x)
+								{
+
+									UINT32 spix = RGB_ALPHA(src[x]);
+									if (spix != 0)
+									{
+										UINT32 dpix = d[effx];
+										UINT32 ta = (a * (spix + 1)) >> 8;
+										UINT32 tr = (r * ta + RGB_RED(dpix) * (0x100 - ta)) >> 8;
+										UINT32 tg = (g * ta + RGB_GREEN(dpix) * (0x100 - ta)) >> 8;
+										UINT32 tb = (b * ta + RGB_BLUE(dpix) * (0x100 - ta)) >> 8;
+										d[effx] = MAKE_ARGB(0xff, tr, tg, tb);
+									}
 								}
 							}
 						}
 					}
-				}
 
-				// advance in the X direction
-				curx += font->char_width(ourheight/num_shown, aspect, *s);
+					// advance in the X direction
+					curx += font->char_width(ourheight/num_shown, aspect, *s);
+
+				}
 
 			}
 		}
+
 		curry += ourheight/num_shown;
 	}
 
@@ -1097,30 +1175,53 @@ void layout_element::component::draw_reel(running_machine &machine, bitmap_argb3
 void layout_element::component::load_bitmap()
 {
 	// load the basic bitmap
-	assert(m_file != NULL);
-	m_hasalpha = render_load_png(m_bitmap, *m_file, m_dirname, m_imagefile);
+	assert(m_file[0] != NULL);
+	m_hasalpha[0] = render_load_png(m_bitmap[0], *m_file[0], m_dirname, m_imagefile[0]);
 
 	// load the alpha bitmap if specified
-	if (m_bitmap.valid() && m_alphafile)
-		render_load_png(m_bitmap, *m_file, m_dirname, m_alphafile, true);
+	if (m_bitmap[0].valid() && m_alphafile[0])
+		render_load_png(m_bitmap[0], *m_file[0], m_dirname, m_alphafile[0], true);
 
 	// if we can't load the bitmap, allocate a dummy one and report an error
-	if (!m_bitmap.valid())
+	if (!m_bitmap[0].valid())
 	{
 		// draw some stripes in the bitmap
-		m_bitmap.allocate(100, 100);
-		m_bitmap.fill(0);
+		m_bitmap[0].allocate(100, 100);
+		m_bitmap[0].fill(0);
 		for (int step = 0; step < 100; step += 25)
 			for (int line = 0; line < 100; line++)
-				m_bitmap.pix32((step + line) % 100, line % 100) = MAKE_ARGB(0xff,0xff,0xff,0xff);
+				m_bitmap[0].pix32((step + line) % 100, line % 100) = MAKE_ARGB(0xff,0xff,0xff,0xff);
 
 		// log an error
-		if (!m_alphafile)
-			mame_printf_warning("Unable to load component bitmap '%s'", m_imagefile.cstr());
+		if (!m_alphafile[0])
+			mame_printf_warning("Unable to load component bitmap '%s'", m_imagefile[0].cstr());
 		else
-			mame_printf_warning("Unable to load component bitmap '%s'/'%s'", m_imagefile.cstr(), m_alphafile.cstr());
+			mame_printf_warning("Unable to load component bitmap '%s'/'%s'", m_imagefile[0].cstr(), m_alphafile[0].cstr());
 	}
 }
+
+
+void layout_element::component::load_reel_bitmap(int number)
+{
+
+	// load the basic bitmap
+	assert(m_file != NULL);
+	/*m_hasalpha[number] = */ render_load_png(m_bitmap[number], *m_file[number], m_dirname, m_imagefile[number]);
+
+	// load the alpha bitmap if specified
+	//if (m_bitmap[number].valid() && m_alphafile[number])
+	//	render_load_png(m_bitmap[number], *m_file[number], m_dirname, m_alphafile[number], true);
+
+	// if we can't load the bitmap just use text rendering
+	if (!m_bitmap[number].valid())
+	{
+		// fallback to text rendering
+		global_free(m_file[number]);
+		m_file[number] = NULL;
+	}
+
+}
+
 
 
 //-------------------------------------------------
