@@ -17,7 +17,7 @@
 
 static UINT8 steps[MAX_STEPPERS];
 static UINT8 symbols[MAX_STEPPERS];
-static UINT8 reelpos[MAX_STEPPERS];
+static UINT16 reelpos[MAX_STEPPERS];
 
 void awp_reel_setup(void)
 {
@@ -74,9 +74,7 @@ void awp_draw_reel(int rno)
 	}
 	else
 	{
-		reelpos[rno] = stepper_get_position(rno);
-
-		/* legacy symbol support */
+		/* legacy symbol support - should be possible to remove this once the layouts depending on it are converted to scrolling type */
 		for ( m = 0; m < (rsymbols-1); m++ )
 		{
 			{
@@ -92,12 +90,14 @@ void awp_draw_reel(int rno)
 
 		output_set_value(rg,(reelpos[rno]));
 
-		sprintf(rg,"sreel%d", x); // out new scrolling reels are called 'sreel' 
-		// normalize the value
-		int sreelpos = (reelpos[rno] * 0x10000) / stepper_get_max(rno);
-		
-		output_set_value(rg,sreelpos);
-
-
+		// if the reel isn't configured don't do this, otherwise you'll get DIV0
+		if (stepper_get_max(rno))
+		{
+			sprintf(rg,"sreel%d", x); // our new scrolling reels are called 'sreel' 
+			// normalize the value
+			int sreelpos = (reelpos[rno] * 0x10000) / stepper_get_max(rno);
+			
+			output_set_value(rg,sreelpos);
+		}
 	}
 }
