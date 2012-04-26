@@ -457,7 +457,7 @@ ROM_START( circus )
 	ROM_LOAD( "9012.14d",	0x0000, 0x0200, CRC(2fde3930) SHA1(a21e2d342f16a39a07edf4bea8d698a52216ecba) )
 ROM_END
 
-ROM_START( circusse )
+ROM_START( springbd )
 	ROM_REGION( 0x10000, "maincpu", 0 ) // code
 	ROM_LOAD( "93448.1a",	0x1000, 0x0200, CRC(44d65ccd) SHA1(0eb2515444486a4656a4accec555501e75b39a74) )
 	ROM_LOAD( "93448.2a",	0x1200, 0x0200, CRC(b8acdbc5) SHA1(634bb11089f7a57a316b6829954cc4da4523f267) )
@@ -591,7 +591,7 @@ static DRIVER_INIT( ripcord )
 
 
 GAMEL(1977, circus,   0,      circus,   circus,   circus,   ROT0, "Exidy / Taito", "Circus / Acrobat TV", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND, layout_circus )
-GAMEL(1977, circusse, circus, circus,   circus,   circus,   ROT0, "bootleg (Sub-Electro)", "Circus (Sub-Electro bootleg)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND, layout_circus ) // looks like a text hack, but we've seen 2 identical copies so it's worth supporting
+GAMEL(1977, springbd, circus, circus,   circus,   circus,   ROT0, "bootleg (Sub-Electro)", "Springboard (bootleg of Circus)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND, layout_circus ) // looks like a text hack, but we've seen 2 identical copies so it's worth supporting
 GAME( 1977, robotbwl, 0,      robotbwl, robotbwl, robotbwl, ROT0, "Exidy", "Robot Bowl", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
 GAMEL(1979, crash,    0,      crash,    crash,    crash,    ROT0, "Exidy", "Crash", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND, layout_crash )
 GAMEL(1979, smash,    crash,  crash,    crash,    crash,    ROT0, "bootleg", "Smash (Crash bootleg)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND, layout_crash ) // looks like a text hack, but it also had a different bezel
