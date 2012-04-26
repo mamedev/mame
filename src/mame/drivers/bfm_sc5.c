@@ -13598,8 +13598,8 @@ GAME( 200?, sc5nmareb	,sc5nmare,	sc5, sc5, sc5, ROT0, "BFM","A Nightmare On Elm 
 GAME( 200?, sc5nmarec	,sc5nmare,	sc5, sc5, sc5, ROT0, "BFM","A Nightmare On Elm Street (Bellfruit) (Scorpion 5) (set 4)", GAME_IS_SKELETON_MECHANICAL )
 
 // PR1612 PICK OF THE PACK         PR1612 PICK OF THE PACK SOUNDS11  PICK OF THE PACK  S.SITE
-GAME( 200?, sc5potp		,0,			sc5, sc5, sc5, ROT0, "BFM","Pick Of The Pack (Bellfruit) (Scorpion 5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc5potpa	,sc5potp,	sc5, sc5, sc5, ROT0, "BFM","Pick Of The Pack (Bellfruit) (Scorpion 5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 2005, sc5potp		,0,			sc5, sc5, sc5, ROT0, "BFM","Pick Of The Pack (Bellfruit) (Scorpion 5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 2005, sc5potpa	,sc5potp,	sc5, sc5, sc5, ROT0, "BFM","Pick Of The Pack (Bellfruit) (Scorpion 5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
 
 // PR2562 PINK PANTHER         PINK SOUNDS         PINK PANTHER
 GAME( 200?, sc5pp		,0,			sc5, sc5, sc5, ROT0, "Mazooma","Pink Panther (Mazooma) (Scorpion 5) (set 1)", GAME_IS_SKELETON_MECHANICAL )

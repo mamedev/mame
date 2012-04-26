@@ -6102,7 +6102,7 @@ GAME( 199?, m5codft		,0,			mpu5, mpu5, 0, ROT0, "Barcrest","The Codfather (Barcr
 GAME( 199?, m5cos		,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Costa Del Cash Casino (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 199?, m5cosclb	,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Costa Del Cash Club (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 199?, m5crzkni	,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Crazy Crazy Knights (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5doshpk	,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Do$h & Pecks (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5doshpk	,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Do$h 'n' Pecks (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 199?, m5draclb	,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Ooh Aah Dracula Club (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 199?, m5ewn		,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Each Way Nudge (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 199?, m5elim		,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Eliminator (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
