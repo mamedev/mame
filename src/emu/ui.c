@@ -1656,10 +1656,7 @@ static slider_state *slider_init(running_machine &machine)
 	for (item = 0; machine.sound().indexed_mixer_input(item, info); item++)
 	{
 		INT32 maxval = 2000;
-		INT32 defval = info.stream->initial_input_gain(info.inputnum) * 1000.0f + 0.5f;
-
-		if (defval > 1000)
-			maxval = 2 * defval;
+		INT32 defval = 1000;
 
 		info.stream->input_name(info.inputnum, string);
 		string.cat(" Volume");
@@ -1818,13 +1815,13 @@ static INT32 slider_mixervol(running_machine &machine, void *arg, astring *strin
 		return 0;
 	if (newval != SLIDER_NOCHANGE)
 	{
-		INT32 curval = floor(info.stream->input_gain(info.inputnum) * 1000.0f + 0.5f);
+		INT32 curval = floor(info.stream->user_gain(info.inputnum) * 1000.0f + 0.5f);
 		if (newval > curval && (newval - curval) <= 4) newval += 4; // round up on increment
-		info.stream->set_input_gain(info.inputnum, (float)newval * 0.001f);
+		info.stream->set_user_gain(info.inputnum, (float)newval * 0.001f);
 	}
 	if (string != NULL)
-		string->printf("%4.2f", info.stream->input_gain(info.inputnum));
-	return floor(info.stream->input_gain(info.inputnum) * 1000.0f + 0.5f);
+		string->printf("%4.2f", info.stream->user_gain(info.inputnum));
+	return floor(info.stream->user_gain(info.inputnum) * 1000.0f + 0.5f);
 }
 
 

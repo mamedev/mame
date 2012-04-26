@@ -198,6 +198,20 @@ sound_stream *device_sound_interface::output_to_stream_output(int outputnum, int
 
 
 //-------------------------------------------------
+//  set_input_gain - set the gain on the given
+//  input index of the device
+//-------------------------------------------------
+
+void device_sound_interface::set_input_gain(int inputnum, float gain)
+{
+	int stream_inputnum;
+	sound_stream *stream = input_to_stream_input(inputnum, stream_inputnum);
+	if (stream != NULL)
+		stream->set_input_gain(stream_inputnum, gain);
+}
+
+
+//-------------------------------------------------
 //  set_output_gain - set the gain on the given
 //  output index of the device
 //-------------------------------------------------
@@ -221,6 +235,23 @@ void device_sound_interface::set_output_gain(int outputnum, float gain)
 		if (stream != NULL)
 			stream->set_output_gain(stream_outputnum, gain);
 	}
+}
+
+
+//-------------------------------------------------
+//  inputnum_from_device - return the input number
+//	that is connected to the given device's output
+//-------------------------------------------------
+
+int device_sound_interface::inputnum_from_device(device_t &source_device, int outputnum) const
+{
+	int overall = 0;
+	for (sound_stream *stream = m_device.machine().sound().first_stream(); stream != NULL; stream = stream->next())
+		if (&stream->device() == &device())
+			for (int inputnum = 0; inputnum < stream->input_count(); inputnum++, overall++)
+				if (stream->input_source_device(inputnum) == &source_device && stream->input_source_outputnum(inputnum) == outputnum)
+					return overall;
+	return -1;
 }
 
 

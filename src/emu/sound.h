@@ -87,10 +87,11 @@ class sound_stream
 	public:
 		// construction/destruction
 		stream_output();
+		stream_output &operator=(const stream_output &rhs) { assert(false); return *this; }
 
 		// internal state
 		sound_stream *		m_stream;				// owning stream
-		stream_sample_t *	m_buffer;				// output buffer
+		dynamic_array<stream_sample_t> m_buffer;	// output buffer
 		int					m_dependents;			// number of dependents
 		INT16				m_gain;					// gain to apply to the output
 	};
@@ -101,15 +102,14 @@ class sound_stream
 	public:
 		// construction/destruction
 		stream_input();
+		stream_input &operator=(const stream_input &rhs) { assert(false); return *this; }
 
 		// internal state
 		stream_output *		m_source;				// pointer to the sound_output for this source
-		stream_sample_t *	m_resample;				// buffer for resampling to the stream's sample rate
-		UINT32				m_bufsize;				// size of output buffer, in samples
-		UINT32				m_bufalloc;				// allocated size of output buffer, in samples
+		dynamic_array<stream_sample_t> m_resample;	// buffer for resampling to the stream's sample rate
 		attoseconds_t		m_latency_attoseconds;	// latency between this stream and the input stream
 		INT16				m_gain;					// gain to apply to this input
-		INT16				m_initial_gain;			// initial gain supplied at creation
+		INT16				m_user_gain;			// user-controlled gain to apply to this input
 	};
 
 	// constants
@@ -128,11 +128,13 @@ public:
 	int sample_rate() const { return (m_new_sample_rate != 0) ? m_new_sample_rate : m_sample_rate; }
 	attotime sample_time() const;
 	attotime sample_period() const { return attotime(0, m_attoseconds_per_sample); }
-	int input_count() const { return m_inputs; }
-	int output_count() const { return m_outputs; }
-	float input_gain(int inputnum) const;
-	float initial_input_gain(int inputnum) const;
+	int input_count() const { return m_input.count(); }
+	int output_count() const { return m_output.count(); }
 	const char *input_name(int inputnum, astring &string) const;
+	device_t *input_source_device(int inputnum) const;
+	int input_source_outputnum(int inputnum) const;
+	float user_gain(int inputnum) const;
+	float input_gain(int inputnum) const;
 	float output_gain(int outputnum) const;
 
 	// operations
@@ -142,6 +144,7 @@ public:
 
 	// timing
 	void set_sample_rate(int sample_rate);
+	void set_user_gain(int inputnum, float gain);
 	void set_input_gain(int inputnum, float gain);
 	void set_output_gain(int outputnum, float gain);
 
@@ -172,17 +175,15 @@ private:
 	INT32				m_max_samples_per_update;// maximum samples per update
 
 	// input information
-	int					m_inputs;				// number of inputs
-	stream_input *		m_input;				// list of streams we directly depend upon
-	stream_sample_t **	m_input_array;			// array of inputs for passing to the callback
+	dynamic_array<stream_input> m_input;		// list of streams we directly depend upon
+	dynamic_array<stream_sample_t *> m_input_array;	// array of inputs for passing to the callback
 
 	// resample buffer information
 	UINT32				m_resample_bufalloc;	// allocated size of each resample buffer
 
 	// output information
-	int					m_outputs;				// number of outputs
-	stream_output *		m_output;				// list of streams which directly depend upon us
-	stream_sample_t **	m_output_array;			// array of outputs for passing to the callback
+	dynamic_array<stream_output> m_output;		// list of streams which directly depend upon us
+	dynamic_array<stream_sample_t *> m_output_array; // array of outputs for passing to the callback
 
 	// output buffer information
 	UINT32				m_output_bufalloc;		// allocated size of each output buffer
@@ -247,17 +248,16 @@ private:
 	void config_load(int config_type, xml_data_node *parentnode);
 	void config_save(int config_type, xml_data_node *parentnode);
 
-	static TIMER_CALLBACK( update_static ) { reinterpret_cast<sound_manager *>(ptr)->update(); }
-	void update();
+	void update(void *ptr = NULL, INT32 param = 0);
 
 	// internal state
 	running_machine &	m_machine;				// reference to our machine
 	emu_timer *			m_update_timer;			// timer to drive periodic updates
 
 	UINT32				m_finalmix_leftover;
-	INT16 *				m_finalmix;
-	INT32 *				m_leftmix;
-	INT32 *				m_rightmix;
+	dynamic_array<INT16> m_finalmix;
+	dynamic_array<INT32> m_leftmix;
+	dynamic_array<INT32> m_rightmix;
 
 	UINT8				m_muted;
 	int 				m_attenuation;

@@ -68,8 +68,8 @@ public:
 	// operators
 	operator _ElementType *() { return &m_array[0]; }
 	operator const _ElementType *() const { return &m_array[0]; }
-	_ElementType operator[](int index) const { assert(index < m_count); return m_array[index]; }
 	_ElementType &operator[](int index) { assert(index < m_count); return m_array[index]; }
+	const _ElementType &operator[](int index) const { assert(index < m_count); return m_array[index]; }
 
 	// simple getters
 	int count() const { return m_count; }
