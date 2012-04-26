@@ -138,7 +138,7 @@ public:
 	UINT16        m_pgm_arm_type1_highlatch_68k_w;
 	UINT16        m_pgm_arm_type1_lowlatch_68k_w;
 	UINT32        m_pgm_arm_type1_counter;
-	required_shared_ptr<UINT32> m_arm7_shareram;
+	optional_shared_ptr<UINT32> m_arm7_shareram;
 
 	cpu_device *m_prot;
 };
