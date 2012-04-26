@@ -57,7 +57,6 @@ public:
 
 	required_shared_ptr<UINT8> m_spriteram;
 	required_shared_ptr<UINT8> m_videoram;
-	size_t	m_spriteram_size;
 	tilemap_t *m_bg_tilemap;
 	int m_monitor;
 
