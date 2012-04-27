@@ -20,8 +20,9 @@
 #include "emu.h"
 #include "cpu/i86/i86.h"
 #include "machine/i8155.h"
-#include "sound/dac.h"
 #include "machine/nvram.h"
+#include "sound/dac.h"
+#include "video/resnet.h"
 
 class meyc8088_state : public driver_device
 {
@@ -51,6 +52,56 @@ public:
   Video
 
 ***************************************************************************/
+
+/***************************************************************************
+
+  Convert the color PROMs into a more useable format.
+
+  The palette PROM is connected to the RGB output this way:
+  (even and uneven pins were switched around in the schematics)
+
+  bit 7 -- N/C
+        -- 820 ohm resistor  -- GREEN
+        --                   -- GREEN
+        -- 820 ohm resistor  -- BLUE
+        --                   -- BLUE
+        -- 820 ohm resistor  -- RED
+        --                   -- RED
+  bit 0 -- N/C
+
+  plus 330 ohm pullup resistors on all lines
+
+***************************************************************************/
+
+static const res_net_decode_info meyc8088_decode_info =
+{
+	1,		// there may be two proms needed to construct color
+	0, 31,	// start/end
+	//  R,   G,   B,
+	{   0,   0,   0, },		// offsets
+	{   1,   5,   3, },		// shifts
+	{0x03,0x03,0x03, }	    // masks
+};
+
+static const res_net_info meyc8088_net_info =
+{
+	RES_NET_VCC_5V | RES_NET_VBIAS_5V | RES_NET_VIN_OPEN_COL,
+	{
+		{ RES_NET_AMP_NONE, 330, 0, 2, { 1, 820 } },
+		{ RES_NET_AMP_NONE, 330, 0, 2, { 1, 820 } },
+		{ RES_NET_AMP_NONE, 330, 0, 2, { 1, 820 } }
+	}
+};
+
+PALETTE_INIT( meyc8088 )
+{
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	rgb_t *rgb;
+
+	rgb = compute_res_net_all(machine, color_prom, &meyc8088_decode_info, &meyc8088_net_info);
+	palette_set_colors(machine, 0, rgb, 32);
+	auto_free(machine, rgb);
+}
 
 static SCREEN_UPDATE_IND16( meyc8088 )
 {
@@ -315,6 +366,7 @@ static MACHINE_CONFIG_START( meyc8088, meyc8088_state )
 	MCFG_SCREEN_VBLANK_STATIC(meyc8088)
 
 	MCFG_PALETTE_LENGTH(32)
+	MCFG_PALETTE_INIT(meyc8088)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -335,4 +387,4 @@ ROM_START( gldarrow )
 ROM_END
 
 
-GAME( 1984, gldarrow, 0,        meyc8088, gldarrow, 0, ROT0,  "Meyco Games, Inc.", "Golden Arrow (Standard G8-03)", GAME_NOT_WORKING | GAME_WRONG_COLORS )
+GAME( 1984, gldarrow, 0,        meyc8088, gldarrow, 0, ROT0,  "Meyco Games, Inc.", "Golden Arrow (Standard G8-03)", GAME_NOT_WORKING )
