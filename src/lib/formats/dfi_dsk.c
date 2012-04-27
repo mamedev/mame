@@ -47,6 +47,7 @@
 #define NUMBER_OF_MULTIREADS 3
 // threshholds for brickwall windowing
 //define MIN_CLOCKS 65
+// number_please apple2 wants 40 min
 #define MIN_CLOCKS 40
 //define MAX_CLOCKS 260
 #define MAX_CLOCKS 270
@@ -88,7 +89,7 @@ int dfi_format::identify(io_generic *io, UINT32 form_factor)
 {
 	char sign[4];
 	io_generic_read(io, sign, 0, 4);
-	if (memcmp(sign, "DFER", 4))
+	if (memcmp(sign, "DFER", 4)==0)
 		fatalerror("Old type Discferret image detected; the mess Discferret decoder will not handle this properly, bailing out!\n");
 	return memcmp(sign, "DFE2", 4) ? 0 : 100;
 }
@@ -132,24 +133,27 @@ bool dfi_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 
 		int index_time = 0; // what point the last index happened
 		int index_count = 0; // number of index pulses per track
-		int index_polarity = 0; // current polarity of index
+		//int index_polarity = 1; // current polarity of index, starts high
 		int total_time = 0; // total sampled time per track
 		for(int i=0; i<tsize; i++) {
 			UINT8 v = data[i];
-			if (v == 0xFF) { fprintf(stderr,"DFI stream contained a 0xFF at t%d, position%d, THIS SHOULD NEVER HAPPEN!\n", track, i); exit(1); }
+			if (v == 0xFF) { fprintf(stderr,"DFI stream contained a 0xFF at t%d, position%d, THIS SHOULD NEVER HAPPEN! Bailing out!\n", track, i); exit(1); }
 			if((v & 0x7f) == 0x7f)
 				total_time += 0x7f;
-			else {
-				if((v & 0x80)==0) total_time += v & 0x7f;
-				if(v & 0x80) {
-					index_time = total_time;
-					if (onerev_time == 0) onerev_time = total_time;
-					//index_polarity ^= 1;
-					//index_count =+ index_polarity;
-					index_count++;
-				}
-			}
+			else if(v & 0x80) {
+				total_time += v & 0x7f;
+				index_time = total_time;
+				//index_polarity ^= 1;
+				//fprintf(stderr,"index state changed to %d at time=%d\n", index_polarity, total_time);
+				//fprintf(stderr,"index rising edge seen at time=%d\n", total_time);
+				if (onerev_time == 0) onerev_time = total_time;
+				index_count += 1;//index_polarity;
+			} else // (v & 0x80) == 0
+				total_time += v & 0x7f;
 		}
+		
+		// its possible on single read images for there to be no index pulse during the image at all!
+		if (onerev_time == 0) onerev_time = total_time;
 
 		if(!track && !head)
 			fprintf(stderr, "%02d:%d tt=%10d it=%10d\n", track, head, total_time, index_time);
@@ -194,21 +198,21 @@ bool dfi_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 			time_buckets[i] = 0;
 #endif
 		index_count = 0;
-		index_polarity = 0;
+		//index_polarity = 0;
 		UINT32 mg = floppy_image::MG_A;
 		UINT32 *buf = image->get_buffer(track, head);
 		int tpos = 0;
 		buf[tpos++] = mg;
 		for(int i=0; i<tsize; i++) {
 			UINT8 v = data[i];
-			if((v & 0x7f) == 0x7f) {// 0x7F or 0xFF: no transition, but a carry
-				cur_time += 0x7f; // should this be done if v&80 is also set?
-				if(v & 0x80) { // 0xFF an index, note the index (TODO: actually do this!) and do not add number
-					index_polarity ^= 1;
-					index_count += index_polarity;
-					//if (index_count == NUMBER_OF_MULTIREADS) break;
+			if((v & 0x7f) == 0x7f) // 0x7F : no transition, but a carry (FF is a board-on-fire error and is checked for above)
+				cur_time += 0x7f;
+			else if(v & 0x80) { // 0x80 set, note the index (TODO: actually do this!) and add number to count
+				cur_time += v & 0x7f;
+				//index_polarity ^= 1;
+				index_count += 1;//index_polarity;
+				//if (index_count == NUMBER_OF_MULTIREADS) break;
 				}
-			}
 			else if((v & 0x80) == 0) { // 0x00-0x7E: not an index or carry, add the number and store transition
 				cur_time += v & 0x7f;
 				int trans_time = cur_time - prev_time;
@@ -219,23 +223,24 @@ bool dfi_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 				// TODO for 4/22/2012: ACTUALLY DO THIS RESCALING STEP
 				// filter out spurious crap
 				//if (trans_time <= MIN_THRESH) fprintf(stderr, "DFI: Throwing out short transition of length %d\n", trans_time);
-				//if ((prev_time == 0) || ((trans_time > MIN_THRESH))) {
+				// the normal case: write the transition at the appropriate time
 				if ((prev_time == 0) || ((trans_time > MIN_THRESH) && (trans_time <= MAX_THRESH))) {
 					mg = mg == floppy_image::MG_A ? floppy_image::MG_B : floppy_image::MG_A;
 					buf[tpos++] = mg | UINT32((200000000ULL*cur_time)/index_time);
 					prev_time = cur_time;
 				}
-				if (trans_time > MAX_THRESH) { // we probably missed a transition
+				// the long case: we probably missed a transition, stuff an extra guessed one in there to see if it helps
+				if (trans_time > MAX_THRESH) {
 					mg = mg == floppy_image::MG_A ? floppy_image::MG_B : floppy_image::MG_A;
 					if (((track%2)==0)&&(head==0)) fprintf(stderr,"missed transition, total time for transition is %d\n",trans_time);
-					buf[tpos++] = mg | UINT32((200000000ULL*(cur_time-(trans_time/2)))/index_time); // generate imaginary transition at half period
+					//buf[tpos++] = mg | UINT32((200000000ULL*(cur_time-(trans_time/2)))/index_time); // generate imaginary transition at half period
+					buf[tpos++] = mg | UINT32((200000000ULL*(cur_time-((trans_time*2)/3)))/index_time);
+					mg = mg == floppy_image::MG_A ? floppy_image::MG_B : floppy_image::MG_A;
+					buf[tpos++] = mg | UINT32((200000000ULL*(cur_time-(trans_time/3)))/index_time);
+					mg = mg == floppy_image::MG_A ? floppy_image::MG_B : floppy_image::MG_A;
 					buf[tpos++] = mg | UINT32(200000000ULL*cur_time/index_time); // generate transition now
 					prev_time = cur_time;
 					}
-			} else if(v & 0x80) { // 0x80-0xFF an index, note the index (TODO: actually do this!) and do not add number
-				index_polarity ^= 1;
-				index_count += index_polarity;
-				if (index_count == NUMBER_OF_MULTIREADS) break;
 			}
 		}
 #ifdef TRACK_HISTOGRAM

@@ -664,6 +664,15 @@ bool a2_16sect_format::save(io_generic *io, floppy_image *image)
 {
 		int g_tracks, g_heads;
 		int visualgrid[16][35]; // visualizer grid, cleared/initialized below
+// lenient addr check: if unset, only accept an addr mark if the checksum was good
+// if set, accept an addr mark if the track and sector values are both sane
+#undef LENIENT_ADDR_CHECK
+// if set, use the old, not as robust logic for choosing which copy of a decoded sector to write
+// to the resulting image if the sector has a bad checksum and/or postamble
+#undef USE_OLD_BEST_SECTOR_PRIORITY
+// select a sector order for resulting file: 0 = logical, 1 = dos3.3, 2 = prodos
+#define SECTOR_ORDER 1
+// nothing found
 #define NOTFOUND 0
 // address mark was found
 #define ADDRFOUND 1
@@ -726,9 +735,15 @@ bool a2_16sect_format::save(io_generic *io, floppy_image *image)
 								UINT8 chk = gcr4_decode(h[6],h[7]);
 								UINT32 post = (h[8]<<16)|(h[9]<<8)|h[10];
 								printf("Address Mark:\tVolume %d, Track %d, Sector %2d, Checksum %02X: %s, Postamble %03X: %s\n", vl, tr, se, chk, (chk ^ vl ^ tr ^ se)==0?"OK":"BAD", post, (post&0xFFFF00)==0xDEAA00?"OK":"BAD");
+								// sanity check
 								if (tr == track/2 && se < nsect) {
-										visualgrid[se][track/2] |= ADDRFOUND;
-										visualgrid[se][track/2] |= (chk ^ vl ^ tr ^ se)==0?ADDRGOOD:0;
+								visualgrid[se][track/2] |= ADDRFOUND;
+								visualgrid[se][track/2] |= ((chk ^ vl ^ tr ^ se)==0)?ADDRGOOD:0;
+#ifdef LENIENT_ADDR_CHECK
+									if ((visualgrid[se][track/2] & ADDRFOUND) == ADDRFOUND) {
+#else
+									if ((visualgrid[se][track/2] & ADDRGOOD) == ADDRGOOD) {
+#endif
 										int opos = pos;
 										int owrap = wrap;
 										hb = 0;
@@ -747,11 +762,22 @@ bool a2_16sect_format::save(io_generic *io, floppy_image *image)
 										}
 										if((hb == 4)&&(dosver == 0)) {
 												visualgrid[se][track/2] |= DATAFOUND;
-												int prodos_translate[16] = {
+												int sector_translate[16] = {
+#if SECTOR_ORDER == 0
+												// logical order (0-15)
+												0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
+												0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F
+#elif SECTOR_ORDER == 1
+												// DOS order (*.do)
+												0x00, 0x07, 0x0E, 0x06, 0x0D, 0x05, 0x0C, 0x04,
+												0x0B, 0x03, 0x0A, 0x02, 0x09, 0x01, 0x08, 0x0F
+#elif SECTOR_ORDER == 2
+												// prodos order (*.po)
 												0x00, 0x08, 0x01, 0x09, 0x02, 0x0A, 0x03, 0x0B,
 												0x04, 0x0C, 0x05, 0x0D, 0x06, 0x0E, 0x07, 0x0F
+#endif
 												};
-												UINT8 *dest = sectdata+(256)*prodos_translate[se];
+												UINT8 *dest = sectdata+(256)*sector_translate[se];
 												UINT8 data[0x157];
 												UINT32 dpost = 0;
 												UINT8 c = 0;
@@ -818,6 +844,7 @@ bool a2_16sect_format::save(io_generic *io, floppy_image *image)
 												pos = opos;
 												wrap = owrap;
 										}
+									}
 								}
 								hb = 0;
 						}

@@ -36,6 +36,37 @@ enum
 	FM_ERASEAMD4,	// part 4 of AMD erase sequence
 	FM_BYTEPROGRAM,
 	FM_BANKSELECT,
+	FM_WRITEPAGEATMEL
+};
+
+
+enum
+{
+	MFG_ALLIANCE = 0x52,
+	MFG_AMD = 0x01,
+	MFG_AMIC = 0x37,
+	MFG_ATMEL = 0x1f,
+	MFG_BRIGHT = 0xad,
+	MFG_CATALYST = 0x31,
+	MFG_EON = 0x1c,
+	MFG_FUJITSU = 0x04,
+	MFG_GIGADEVICE = 0xc8,
+	MFG_HYUNDAI = 0xad,
+	MFG_INTEL = 0x89,
+	MFG_ISSI = 0xd5,
+	MFG_MACRONIX = 0xc2,
+	MFG_PANASONIC = 0x32,
+	MFG_PMC = 0x9d,
+	MFG_SANYO = 0x62,
+	MFG_SHARP = 0xb0,
+	MFG_SPANSION = 0x01,
+	MFG_SST = 0xbf,
+	MFG_ST = 0x20,
+	MFG_SYNCMOS = 0x40,
+	MFG_TI = 0x97,
+	MFG_TI_OLD = 0x01,
+	MFG_WINBOND_NEX = 0xef,
+	MFG_WINBOND = 0xda
 };
 
 
@@ -130,28 +161,29 @@ intelfsh_device::intelfsh_device(const machine_config &mconfig, device_type type
 	case FLASH_SHARP_LH28F016S:
 		m_bits = 8;
 		m_size = 0x200000;
-		m_maker_id = 0x89;
+		m_maker_id = MFG_INTEL;
 		m_device_id = 0xaa;
 		map = ADDRESS_MAP_NAME( memory_map8_16Mb );
 		break;
 	case FLASH_ATMEL_29C010:
 		m_bits = 8;
 		m_size = 0x20000;
-		m_maker_id = 0x1f;
+		m_page_size = 0x80;
+		m_maker_id = MFG_ATMEL;
 		m_device_id = 0xd5;
 		map = ADDRESS_MAP_NAME( memory_map8_1Mb );
 		break;
 	case FLASH_AMD_29F040:
 		m_bits = 8;
 		m_size = 0x80000;
-		m_maker_id = 0x01;
+		m_maker_id = MFG_AMD;
 		m_device_id = 0xa4;
 		map = ADDRESS_MAP_NAME( memory_map8_4Mb );
 		break;
 	case FLASH_AMD_29F080:
 		m_bits = 8;
 		m_size = 0x100000;
-		m_maker_id = 0x01;
+		m_maker_id = MFG_AMD;
 		m_device_id = 0xd5;
 		map = ADDRESS_MAP_NAME( memory_map8_8Mb );
 		break;
@@ -159,56 +191,56 @@ intelfsh_device::intelfsh_device(const machine_config &mconfig, device_type type
 	case FLASH_INTEL_E28F400:
 		m_bits = 16;
 		m_size = 0x80000;
-		m_maker_id = 0xb0;
+		m_maker_id = MFG_SHARP;
 		m_device_id = 0xed;
 		map = ADDRESS_MAP_NAME( memory_map16_4Mb );
 		break;
 	case FLASH_FUJITSU_29F016A:
 		m_bits = 8;
 		m_size = 0x200000;
-		m_maker_id = 0x04;
+		m_maker_id = MFG_FUJITSU;
 		m_device_id = 0xad;
 		map = ADDRESS_MAP_NAME( memory_map8_16Mb );
 		break;
 	case FLASH_FUJITSU_29DL16X:
 		m_bits = 8;
 		m_size = 0x200000;
-		m_maker_id = 0x04;
+		m_maker_id = MFG_FUJITSU;
 		m_device_id = 0x35;
 		map = ADDRESS_MAP_NAME( memory_map8_16Mb );
 		break;
 	case FLASH_INTEL_E28F008SA:
 		m_bits = 8;
 		m_size = 0x100000;
-		m_maker_id = 0x89;
+		m_maker_id = MFG_INTEL;
 		m_device_id = 0xa2;
 		map = ADDRESS_MAP_NAME( memory_map8_8Mb );
 		break;
 	case FLASH_INTEL_TE28F160:
 		m_bits = 16;
 		m_size = 0x200000;
-		m_maker_id = 0xb0;
+		m_maker_id = MFG_SHARP;
 		m_device_id = 0xd0;
 		map = ADDRESS_MAP_NAME( memory_map16_16Mb );
 		break;
 	case FLASH_SHARP_UNK128MBIT:
 		m_bits = 16;
 		m_size = 0x800000;
-		m_maker_id = 0xb0;
+		m_maker_id = MFG_SHARP;
 		m_device_id = 0xb0;
 		map = ADDRESS_MAP_NAME( memory_map16_64Mb );
 		break;
 	case FLASH_MACRONIX_29L001MC:
 		m_bits = 8;
 		m_size = 0x20000;
-		m_maker_id = 0xc2;
+		m_maker_id = MFG_MACRONIX;
 		m_device_id = 0x51;
 		map = ADDRESS_MAP_NAME( memory_map8_1Mb );
 		break;
 	case FLASH_PANASONIC_MN63F805MNP:
 		m_bits = 8;
 		m_size = 0x10000;
-		m_maker_id = 0x32;
+		m_maker_id = MFG_PANASONIC;
 		m_device_id = 0x1b;
 		m_sector_is_4k = true;
 		map = ADDRESS_MAP_NAME( memory_map8_512Kb );
@@ -216,7 +248,7 @@ intelfsh_device::intelfsh_device(const machine_config &mconfig, device_type type
 	case FLASH_SANYO_LE26FV10N1TS:
 		m_bits = 8;
 		m_size = 0x20000;
-		m_maker_id = 0x62;
+		m_maker_id = MFG_SANYO;
 		m_device_id = 0x13;
 		m_sector_is_4k = true;
 		map = ADDRESS_MAP_NAME( memory_map8_1Mb );
@@ -492,7 +524,7 @@ UINT32 intelfsh_device::read_full(UINT32 address)
 		break;
 	}
 
-//  logerror( "intelflash_read( %d, %08x ) %08x\n", chip, address, data );
+	//logerror( "intelflash_read( %08x ) %08x\n", address, data );
 
 	return data;
 }
@@ -505,7 +537,7 @@ UINT32 intelfsh_device::read_full(UINT32 address)
 
 void intelfsh_device::write_full(UINT32 address, UINT32 data)
 {
-//  logerror( "intelflash_write( %d, %08x, %08x )\n", chip, address, data );
+	//logerror( "intelflash_write( %u : %08x, %08x )\n", m_flash_mode, address, data );
 
 	address += m_bank << 16;
 
@@ -610,7 +642,15 @@ void intelfsh_device::write_full(UINT32 address, UINT32 data)
 		}
 		else if( ( address & 0xffff ) == 0x5555 && ( data & 0xff ) == 0xa0 )
 		{
-			m_flash_mode = FM_BYTEPROGRAM;
+			if (m_type == FLASH_ATMEL_29C010)
+			{
+				m_flash_mode = FM_WRITEPAGEATMEL;
+				m_byte_count = 0;
+			}
+			else
+			{
+				m_flash_mode = FM_BYTEPROGRAM;
+			}
 		}
 		else if( ( address & 0xfff ) == 0xaaa && ( data & 0xff ) == 0xa0 )
 		{
@@ -769,6 +809,31 @@ void intelfsh_device::write_full(UINT32 address, UINT32 data)
 		}
 		m_status = 0x80;
 		m_flash_mode = FM_READSTATUS;
+		break;
+	case FM_WRITEPAGEATMEL:
+		switch( m_bits )
+		{
+		case 8:
+			{
+				m_addrspace[0]->write_byte(address, data);
+			}
+			break;
+		case 16:
+			{
+				m_addrspace[0]->write_word(address * 2, data);
+			}
+			break;
+		default:
+			logerror( "FM_WRITEPAGEATMEL not supported when m_bits == %d\n", m_bits );
+			break;
+		}
+
+		m_byte_count++;
+
+		if (m_byte_count == m_page_size)
+		{
+			m_flash_mode = FM_NORMAL;			
+		}
 		break;
 	case FM_CLEARPART1:
 		if( ( data & 0xff ) == 0xd0 )

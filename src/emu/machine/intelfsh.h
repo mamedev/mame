@@ -122,6 +122,7 @@ protected:
 	UINT8					m_device_id;
 	UINT8					m_maker_id;
 	bool					m_sector_is_4k;
+	UINT8 					m_page_size;
 
 	// internal state
 	UINT8					m_status;
@@ -130,6 +131,7 @@ protected:
 	bool					m_flash_master_lock;
 	emu_timer *				m_timer;
 	INT32					m_bank;
+	UINT8					m_byte_count;
 };
 
 
