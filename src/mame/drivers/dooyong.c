@@ -1282,9 +1282,46 @@ ROM_START( gulfstrm )
 	ROM_LOAD16_BYTE( "11.n9",        0x00001, 0x10000, CRC(7dfe4a9c) SHA1(40982b5b266e4a928544ab5ec330080935588c57) )
 ROM_END
 
+ROM_START( gulfstrma )
+	ROM_REGION( 0x30000, "maincpu", 0 )	/* 64k for code + 128k for banks */
+	ROM_LOAD( "1.bin",       0x00000, 0x20000, CRC(d04fb06b) SHA1(bdf09ab692f90e3dea815605998f75b6478c8047) )
+	ROM_RELOAD(              0x10000, 0x20000 )				/* banked at 0x8000-0xbfff */
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* sound */
+	ROM_LOAD( "3.c5",         0x00000, 0x10000, CRC(c029b015) SHA1(86f8d4f6560cb99e25e8e8baf72dde743a7b9c4c) )
+
+	ROM_REGION( 0x8000, "gfx1", 0 )	/* chars */
+	ROM_LOAD( "2.s4",         0x0000, 0x8000, CRC(c2d65a25) SHA1(a198b42c0737b253aca5bab6fb58ab561ccc1d5c) )	/* empty */
+	ROM_CONTINUE(             0x0000, 0x8000 )
+
+	ROM_REGION( 0x80000, "gfx2", 0 )	/* sprites */
+	ROM_LOAD16_BYTE( "14.b1",        0x00000, 0x20000, CRC(67bdf73d) SHA1(3e357448b6f255fdec731f143afa3d3149523ed2) )
+	ROM_LOAD16_BYTE( "16.c1",        0x00001, 0x20000, CRC(7770a76f) SHA1(4f9f5245f59008b26ed60e636285ea85271744e7) )
+	ROM_LOAD16_BYTE( "15.b1",        0x40000, 0x20000, CRC(84803f7e) SHA1(74b694c0d20c5b016b9d7258b0296229972151d5) )
+	ROM_LOAD16_BYTE( "17.e1",        0x40001, 0x20000, CRC(94706500) SHA1(8f4a6f7ce20b1b50577271601c2c2632b5a2292c) )
+
+	ROM_REGION( 0x80000, "gfx3", 0 )	/* tiles */
+	ROM_LOAD16_BYTE( "4.d8",         0x00000, 0x20000, CRC(858fdbb6) SHA1(4c317ab6069a8509287d3df88cf4272f512a40a3) )
+	ROM_LOAD16_BYTE( "5.b9",         0x00001, 0x20000, CRC(c0a552e8) SHA1(31dcb14eb8815c609b0bf4d5f1ea17b26ab18aec) )
+	ROM_LOAD16_BYTE( "6.d8",         0x40000, 0x20000, CRC(20eedda3) SHA1(8c8b1284e07f5380037f8431f2649aa99fd47542) )
+	ROM_LOAD16_BYTE( "7.d9",         0x40001, 0x20000, CRC(294f8c40) SHA1(b7afb87510ab52682151ff2b13029427487589ec) )
+
+	ROM_REGION( 0x40000, "gfx4", 0 )	/* tiles */
+	ROM_LOAD16_BYTE( "12.bin",       0x00000, 0x20000, CRC(3e3d3b57) SHA1(398a6cac7144ba7bacaa36c593bcb4b3c051eb0f) )
+	ROM_LOAD16_BYTE( "13.bin",       0x00001, 0x20000, CRC(66fcce80) SHA1(6ab2b7cd49447d374cde40b98db0a6209dcad461) )
+
+	ROM_REGION( 0x20000, "gfx5", 0 )	/* background tilemaps */
+	ROM_LOAD16_BYTE( "8.e8",         0x00000, 0x10000, CRC(8d7f4693) SHA1(a7c8573d9e54c8230decc3e88f76ae729d77b096) )
+	ROM_LOAD16_BYTE( "9.e9",         0x00001, 0x10000, CRC(34d440c4) SHA1(74b0e15e75f62106177234b6ea54a5d312628802) )
+
+	ROM_REGION( 0x20000, "gfx6", 0 )	/* fg tilemaps */
+	ROM_LOAD16_BYTE( "10.bin",       0x00000, 0x10000, CRC(08149140) SHA1(ff0094883ca0fc81bae991d6ea62d0064d6f7c47) )
+	ROM_LOAD16_BYTE( "11.bin",       0x00001, 0x10000, CRC(2ed7545b) SHA1(6a70743bbb03ef694310f2b5531f384209db62a1) )
+ROM_END
+
 ROM_START( gulfstrmm )
 	ROM_REGION( 0x30000, "maincpu", 0 )	/* 64k for code + 128k for banks */
-	ROM_LOAD( "18.1",         0x00000, 0x20000, CRC(d38e2667) SHA1(3690d708c7be85871d6bb32a774d711a30782126) )
+	ROM_LOAD( "18.l4",        0x00000, 0x20000, CRC(d38e2667) SHA1(3690d708c7be85871d6bb32a774d711a30782126) )
 	ROM_RELOAD(               0x10000, 0x20000 )				/* banked at 0x8000-0xbfff */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )	/* sound */
@@ -1902,7 +1939,8 @@ ROM_END
 
 GAME( 1990, lastday,  0,        lastday,  lastday,  0, ROT270, "Dooyong",  "The Last Day (set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1990, lastdaya, lastday,  lastday,  lastday,  0, ROT270, "Dooyong",  "The Last Day (set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1991, gulfstrm, 0,        gulfstrm, gulfstrm, 0, ROT270, "Dooyong",  "Gulf Storm",            GAME_SUPPORTS_SAVE )
+GAME( 1991, gulfstrm, 0,        gulfstrm, gulfstrm, 0, ROT270, "Dooyong",  "Gulf Storm (set 1)",   GAME_SUPPORTS_SAVE )
+GAME( 1991, gulfstrma,gulfstrm, gulfstrm, gulfstrm, 0, ROT270, "Dooyong",  "Gulf Storm (set 2)",   GAME_SUPPORTS_SAVE )
 GAME( 1991, gulfstrmm,gulfstrm, gulfstrm, gulfstrm, 0, ROT270, "Dooyong (Media Shoji license)", "Gulf Storm (Media Shoji)",  GAME_SUPPORTS_SAVE )
 GAME( 1991, pollux,   0,        pollux,   pollux,   0, ROT270, "Dooyong",  "Pollux (set 1)",       GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 GAME( 1991, polluxa,  pollux,   pollux,   pollux,   0, ROT270, "Dooyong",  "Pollux (set 2)",       GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
