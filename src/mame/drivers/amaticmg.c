@@ -362,6 +362,11 @@
 ***********************************************************************************
 
 
+  [2012/04/27]
+
+  - Reworked the decryption function.
+  - Added Multi Game III (V.Ger 3.64).
+
   [2012/04/23]
 
   - A lot of work on AMA-8000-1 machine and gfx.
@@ -635,8 +640,8 @@ static ADDRESS_MAP_START( amaticmg2_portmap, AS_IO, 8, amaticmg_state )
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
 	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
 	AM_RANGE(0x40, 0x41) AM_DEVWRITE_LEGACY("ymsnd", ym3812_w)
-	AM_RANGE(0x60, 0x60) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0x61, 0x61) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
+	AM_RANGE(0x60, 0x60) AM_DEVWRITE("crtc", mc6845_device, address_w)					// 0e for mg_iii_vger_3.64_v_8309
+	AM_RANGE(0x61, 0x61) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)	// 0f for mg_iii_vger_3.64_v_8309
 	AM_RANGE(0xc0, 0xc0) AM_WRITE(rombank_w)
 	AM_RANGE(0xe6, 0xe6) AM_WRITE(nmi_mask_w)
 ADDRESS_MAP_END
@@ -956,6 +961,21 @@ ROM_START( am_mg3 )
 	ROM_LOAD( "v.bin", 0x00000, 0x20000, CRC(524767e2) SHA1(03a108494f42365c820fdfbcba9496bda86f3081) )
 ROM_END
 
+ROM_START( am_mg3a )
+	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x40000, "mainprg", 0 )	/* encrypted program ROM...*/
+	ROM_LOAD( "mg_iii_vger_3.64_v_8309.i16", 0x00000, 0x40000, CRC(c54f97c4) SHA1(d5ce91be7332ada304d18d07706e3b98ac0fa74b) )
+
+	ROM_REGION( 0x180000, "gfx1", 0 )
+	ROM_LOAD( "mg_iii_51_zg1.i17", 0x100000, 0x80000, CRC(84f86874) SHA1(c483a50df6a9a71ddfdf8530a894135f9b852b89) )
+	ROM_LOAD( "mg_iii_51_zg2.i18", 0x080000, 0x80000, CRC(4425e535) SHA1(726c322c5d0b391b82e49dd1797ebf0abfa4a65a) )
+	ROM_LOAD( "mg_iii_51_zg3.i19", 0x000000, 0x80000, CRC(36d4c0fa) SHA1(20352dbbb2ce2233be0f4f694ddf49b8f5d6a64f) )
+
+	ROM_REGION( 0x20000, "proms", 0 )
+	ROM_LOAD( "iv.i35", 0x00000, 0x20000, CRC(82af7296) SHA1(1a07d6481e0f8fd785be9f1b737182d7e0b84605) )
+ROM_END
+
 
 /************************************
 *       Driver Initialization       *
@@ -987,18 +1007,23 @@ static void decrypt(running_machine &machine, int key1, int key2)
 	for (int i = 0; i < len; i++)
 	{
 		encf(src[i], i, plaintext, newaddress);
-		dest[newaddress^key1] = plaintext^key2;
+		dest[newaddress^(key1^(key1>>6))] = plaintext^key2;
 	}
 }
 
 static DRIVER_INIT( ama8000_1_x )
 {
-	decrypt(machine, 0x4c2, 0xf5);
+	decrypt(machine, 0x4d1, 0xf5);
 }
 
 static DRIVER_INIT( ama8000_2_i )
 {
-	decrypt(machine, 0x426, 0x55);
+	decrypt(machine, 0x436, 0x55);
+}
+
+static DRIVER_INIT( ama8000_2_v )
+{
+	decrypt(machine, 0x703, 0xaf);
 }
 
 
@@ -1006,7 +1031,8 @@ static DRIVER_INIT( ama8000_2_i )
 *           Game Drivers            *
 ************************************/
 
-/*     YEAR  NAME      PARENT  MACHINE    INPUT     INIT         ROT     COMPANY                FULLNAME                     FLAGS                                                                                                        LAYOUT */
-GAMEL( 1996, suprstar, 0,      amaticmg,  amaticmg, ama8000_1_x, ROT90, "Amatic Trading GmbH", "Super Stars",                GAME_IMPERFECT_SOUND,                                                                                        layout_suprstar )
-GAME(  2000, am_mg24,  0,      amaticmg2, amaticmg, ama8000_2_i, ROT0,  "Amatic Trading GmbH", "Multi Game I (V.Ger 2.4)",   GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_UNEMULATED_PROTECTION | GAME_NO_SOUND | GAME_NOT_WORKING )
-GAME(  2000, am_mg3,   0,      amaticmg2, amaticmg, ama8000_2_i, ROT0,  "Amatic Trading GmbH", "Multi Game III (V.Ger 3.5)", GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_UNEMULATED_PROTECTION | GAME_NO_SOUND | GAME_NOT_WORKING )
+/*     YEAR  NAME      PARENT  MACHINE    INPUT     INIT         ROT     COMPANY                FULLNAME                      FLAGS                                                                                                        LAYOUT */
+GAMEL( 1996, suprstar, 0,      amaticmg,  amaticmg, ama8000_1_x, ROT90, "Amatic Trading GmbH", "Super Stars",                 GAME_IMPERFECT_SOUND,                                                                                        layout_suprstar )
+GAME(  2000, am_mg24,  0,      amaticmg2, amaticmg, ama8000_2_i, ROT0,  "Amatic Trading GmbH", "Multi Game I (V.Ger 2.4)",    GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_UNEMULATED_PROTECTION | GAME_NO_SOUND | GAME_NOT_WORKING )
+GAME(  2000, am_mg3,   0,      amaticmg2, amaticmg, ama8000_2_i, ROT0,  "Amatic Trading GmbH", "Multi Game III (V.Ger 3.5)",  GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_UNEMULATED_PROTECTION | GAME_NO_SOUND | GAME_NOT_WORKING )
+GAME(  2000, am_mg3a,  0,      amaticmg2, amaticmg, ama8000_2_v, ROT0,  "Amatic Trading GmbH", "Multi Game III (V.Ger 3.64)", GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_UNEMULATED_PROTECTION | GAME_NO_SOUND | GAME_NOT_WORKING )
