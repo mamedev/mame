@@ -1,6 +1,6 @@
 /**********************************************************************
 
-    E05-16 Real Time Clock emulation
+    Microelectronic-Marin E050-16 Real Time Clock emulation
 
     Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
@@ -25,70 +25,6 @@ enum
 	STATE_ADDRESS = 0,
 	STATE_DATA
 };
-
-
-// registers
-enum
-{
-	SECOND = 0,
-	MINUTE,
-	HOUR,
-	DAY,
-	MONTH,
-	DAY_OF_WEEK,
-	YEAR,
-	ALL
-};
-
-
-//**************************************************************************
-//  INLINE HELPERS
-//**************************************************************************
-
-//-------------------------------------------------
-//  advance_seconds -
-//-------------------------------------------------
-
-inline void e0516_device::advance_seconds()
-{
-	m_register[SECOND]++;
-
-	if (m_register[SECOND] == 60)
-	{
-		m_register[SECOND] = 0;
-		m_register[MINUTE]++;
-	}
-
-	if (m_register[MINUTE] == 60)
-	{
-		m_register[MINUTE] = 0;
-		m_register[HOUR]++;
-	}
-
-	if (m_register[HOUR] == 24)
-	{
-		m_register[HOUR] = 0;
-		m_register[DAY]++;
-		m_register[DAY_OF_WEEK]++;
-	}
-
-	if (m_register[DAY_OF_WEEK] == 8)
-	{
-		m_register[DAY_OF_WEEK] = 1;
-	}
-
-	if (m_register[DAY] == 32)
-	{
-		m_register[DAY] = 1;
-		m_register[MONTH]++;
-	}
-
-	if (m_register[MONTH] == 13)
-	{
-		m_register[MONTH] = 1;
-		m_register[YEAR]++;
-	}
-}
 
 
 
@@ -129,16 +65,16 @@ void e0516_device::device_start()
 	save_item(NAME(m_state));
 	save_item(NAME(m_bits));
 	save_item(NAME(m_dio));
-	save_item(NAME(m_register));
 }
 
 
 //-------------------------------------------------
-//  device_start - device-specific reset
+//  device_reset - device-specific reset
 //-------------------------------------------------
 
 void e0516_device::device_reset()
 {
+	set_current_time(machine());
 }
 
 
@@ -153,28 +89,13 @@ void e0516_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 
 
 //-------------------------------------------------
-//  rtc_set_time - called to initialize the RTC to
-//  a known state
-//-------------------------------------------------
-
-void e0516_device::rtc_set_time(int year, int month, int day, int day_of_week, int hour, int minute, int second)
-{
-	m_register[YEAR] = year;
-	m_register[MONTH] = month;
-	m_register[DAY] = day;
-	m_register[DAY_OF_WEEK] = day_of_week + 1;
-	m_register[HOUR] = hour;
-	m_register[MINUTE] = minute;
-	m_register[SECOND] = second;
-}
-
-
-//-------------------------------------------------
 //  cs_w - chip select input
 //-------------------------------------------------
 
 WRITE_LINE_MEMBER( e0516_device::cs_w )
 {
+	if (LOG) logerror("E05-16 '%s' CS %u\n", tag(), state);
+
 	m_cs = state;
 
 	if (m_cs)
@@ -193,6 +114,8 @@ WRITE_LINE_MEMBER( e0516_device::cs_w )
 
 WRITE_LINE_MEMBER( e0516_device::clk_w )
 {
+	if (LOG) logerror("E05-16 '%s' CLK %u\n", tag(), state);
+
 	m_clk = state;
 
 	if (m_cs || m_clk) return;
@@ -215,7 +138,7 @@ WRITE_LINE_MEMBER( e0516_device::clk_w )
 			if (BIT(m_reg_latch, 0))
 			{
 				// load register value to data latch
-				m_data_latch = m_register[m_reg_latch >> 1];
+				m_data_latch = convert_to_bcd(get_clock_register(m_reg_latch >> 1));
 			}
 		}
 	}
@@ -247,7 +170,7 @@ WRITE_LINE_MEMBER( e0516_device::clk_w )
 			if (!BIT(m_reg_latch, 0))
 			{
 				// write latched data to register
-				m_register[m_reg_latch >> 1] = m_data_latch;
+				set_clock_register(m_reg_latch >> 1, bcd_to_integer(m_data_latch));
 			}
 		}
 	}
@@ -260,6 +183,8 @@ WRITE_LINE_MEMBER( e0516_device::clk_w )
 
 WRITE_LINE_MEMBER( e0516_device::dio_w )
 {
+	if (LOG) logerror("E05-16 '%s' DIO %u\n", tag(), state);
+
 	m_dio = state;
 }
 

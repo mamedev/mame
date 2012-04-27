@@ -145,111 +145,6 @@ inline void rp5c01_device::write_counter(int counter, int value)
 
 
 //-------------------------------------------------
-//  advance_seconds -
-//-------------------------------------------------
-
-inline void rp5c01_device::advance_seconds()
-{
-	int seconds = read_counter(REGISTER_1_SECOND);
-
-	seconds++;
-
-	if (seconds > 59)
-	{
-		seconds = 0;
-
-		advance_minutes();
-	}
-
-	write_counter(REGISTER_1_SECOND, seconds);
-}
-
-
-//-------------------------------------------------
-//  advance_minutes -
-//-------------------------------------------------
-
-inline void rp5c01_device::advance_minutes()
-{
-	int minutes = read_counter(REGISTER_1_MINUTE);
-	int hours = read_counter(REGISTER_1_HOUR);
-	int days = read_counter(REGISTER_1_DAY);
-	int month = read_counter(REGISTER_1_MONTH);
-	int year = read_counter(REGISTER_1_YEAR);
-	int day_of_week = m_reg[MODE00][REGISTER_DAY_OF_THE_WEEK];
-
-	minutes++;
-
-	if (minutes > 59)
-	{
-		minutes = 0;
-		hours++;
-	}
-
-	if (hours > 23)
-	{
-		hours = 0;
-		days++;
-		day_of_week++;
-	}
-
-	if (day_of_week > 6)
-	{
-		day_of_week++;
-	}
-
-	if (days > DAYS_PER_MONTH[month - 1])
-	{
-		days = 1;
-		month++;
-	}
-
-	if (month > 12)
-	{
-		month = 1;
-		year++;
-		m_reg[MODE01][REGISTER_LEAP_YEAR]++;
-		m_reg[MODE01][REGISTER_LEAP_YEAR] &= 0x03;
-	}
-
-	if (year > 99)
-	{
-		year = 0;
-	}
-
-	write_counter(REGISTER_1_MINUTE, minutes);
-	write_counter(REGISTER_1_HOUR, hours);
-	write_counter(REGISTER_1_DAY, days);
-	write_counter(REGISTER_1_MONTH, month);
-	write_counter(REGISTER_1_YEAR, year);
-	m_reg[MODE00][REGISTER_DAY_OF_THE_WEEK] = day_of_week;
-
-	check_alarm();
-	set_alarm_line();
-}
-
-
-//-------------------------------------------------
-//  adjust_seconds -
-//-------------------------------------------------
-
-inline void rp5c01_device::adjust_seconds()
-{
-	int seconds = read_counter(REGISTER_1_SECOND);
-
-	if (seconds < 30)
-	{
-		write_counter(REGISTER_1_SECOND, 0);
-	}
-	else
-	{
-		write_counter(REGISTER_1_SECOND, 0);
-		advance_minutes();
-	}
-}
-
-
-//-------------------------------------------------
 //  check_alarm -
 //-------------------------------------------------
 
@@ -339,6 +234,16 @@ void rp5c01_device::device_start()
 
 
 //-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void rp5c01_device::device_reset()
+{
+	set_current_time(machine());
+}
+
+
+//-------------------------------------------------
 //  device_timer - handler timer events
 //-------------------------------------------------
 
@@ -365,12 +270,12 @@ void rp5c01_device::device_timer(emu_timer &timer, device_timer_id id, int param
 
 
 //-------------------------------------------------
-//  rtc_set_time - called to initialize the RTC to
-//  a known state
+//  rtc_clock_updated - 
 //-------------------------------------------------
 
-void rp5c01_device::rtc_set_time(int year, int month, int day, int day_of_week, int hour, int minute, int second)
+void rp5c01_device::rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second)
 {
+	m_reg[MODE01][REGISTER_LEAP_YEAR] = year % 4;
 	write_counter(REGISTER_1_YEAR, year);
 	write_counter(REGISTER_1_MONTH, month);
 	write_counter(REGISTER_1_DAY, day);
@@ -378,6 +283,9 @@ void rp5c01_device::rtc_set_time(int year, int month, int day, int day_of_week, 
 	write_counter(REGISTER_1_HOUR, hour);
 	write_counter(REGISTER_1_MINUTE, minute);
 	write_counter(REGISTER_1_SECOND, second);
+
+	check_alarm();
+	set_alarm_line();
 }
 
 
@@ -510,6 +418,9 @@ WRITE8_MEMBER( rp5c01_device::write )
 		case MODE00:
 		case MODE01:
 			m_reg[mode][offset & 0x0f] = data & REGISTER_WRITE_MASK[mode][offset & 0x0f];
+
+			set_time(false, read_counter(REGISTER_1_YEAR), read_counter(REGISTER_1_MONTH), read_counter(REGISTER_1_DAY), m_reg[MODE00][REGISTER_DAY_OF_THE_WEEK],
+				read_counter(REGISTER_1_HOUR), read_counter(REGISTER_1_MINUTE), read_counter(REGISTER_1_SECOND)); 
 			break;
 
 		case BLOCK10:

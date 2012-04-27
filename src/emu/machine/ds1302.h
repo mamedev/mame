@@ -1,8 +1,16 @@
 /**********************************************************************
 
-    DALLAS DS1302
+    Dallas DS1302 Trickle-Charge Timekeeping Chip emulation
 
-    RTC + BACKUP RAM
+    Copyright MESS Team.
+    Visit http://mamedev.org for licensing and usage restrictions.
+
+**********************************************************************
+                            _____   _____
+                  Vcc2   1 |*    \_/     | 8   Vcc1
+                    X1   2 |             | 7   SCLK
+                    X2   3 |             | 6   I/O
+                   GND   4 |_____________| 5   CE
 
 **********************************************************************/
 
@@ -15,46 +23,69 @@
 
 
 
-/***************************************************************************
-    DEVICE CONFIGURATION MACROS
-***************************************************************************/
+//**************************************************************************
+//  INTERFACE CONFIGURATION MACROS
+//**************************************************************************
 
-#define MCFG_DS1302_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, DS1302, 0)
+#define MCFG_DS1302_ADD(_tag, _clock) \
+	MCFG_DEVICE_ADD(_tag, DS1302, _clock)
 
 
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
 
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
 
 // ======================> ds1302_device
 
-class ds1302_device :  public device_t
+class ds1302_device :  public device_t,
+                       public device_rtc_interface,
+                       public device_nvram_interface
 {
 public:
     // construction/destruction
     ds1302_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	void ds1302_dat_w(UINT32 offset, UINT8 data);
-	void ds1302_clk_w(UINT32 offset, UINT8 data);
-	UINT8 ds1302_read(UINT32 offset);
+    DECLARE_WRITE_LINE_MEMBER( ce_w );
+    DECLARE_WRITE_LINE_MEMBER( sclk_w );
+    DECLARE_WRITE_LINE_MEMBER( io_w );
+    DECLARE_READ_LINE_MEMBER( io_r );
 
 protected:
     // device-level overrides
     virtual void device_start();
     virtual void device_reset();
-    virtual void device_post_load() { }
-    virtual void device_clock_changed() { }
+    virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+
+    // device_nvram_interface overrides
+    virtual void nvram_default();
+    virtual void nvram_read(emu_file &file);
+    virtual void nvram_write(emu_file &file);
+
+    // device_rtc_interface overrides
+    virtual void rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second);
+    virtual bool rtc_feature_leap_year() { return true; }
 
 private:
+    void load_shift_register();
+    void input_bit();
+    void output_bit();
 
-	UINT32 m_shift_in;
-	UINT8  m_shift_out;
-	UINT8  m_icount;
-	UINT8  m_last_clk;
-	UINT8  m_last_cmd;
-	UINT8  m_sram[0x20];
+    int m_ce;
+    int m_clk;
+    int m_io;
+    int m_state;
+    int m_bits;
+    UINT8 m_cmd;
+    UINT8 m_data;
+    int m_addr;
+
+    UINT8 m_reg[9];
+    UINT8 m_user[9];
+	UINT8 m_ram[0x20];
+
+    // timers
+    emu_timer *m_clock_timer;
 };
 
 
@@ -63,13 +94,4 @@ extern const device_type DS1302;
 
 
 
-/***************************************************************************
-    PROTOTYPES
-***************************************************************************/
-
-extern WRITE8_DEVICE_HANDLER( ds1302_dat_w );
-extern WRITE8_DEVICE_HANDLER( ds1302_clk_w );
-extern READ8_DEVICE_HANDLER( ds1302_read );
-
-
-#endif /* __DS1302_H__ */
+#endif

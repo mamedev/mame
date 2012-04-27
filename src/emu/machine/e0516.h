@@ -1,6 +1,6 @@
 /**********************************************************************
 
-    E05-16 Real Time Clock emulation
+    Microelectronic-Marin E050-16 Real Time Clock emulation
 
     Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
@@ -40,7 +40,6 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-
 // ======================> e0516_device
 
 class e0516_device :  public device_t,
@@ -61,13 +60,7 @@ protected:
     virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
-	// device_rtc_interface overrides
-	virtual void rtc_set_time(int year, int month, int day, int day_of_week, int hour, int minute, int second);
-	virtual bool rtc_is_year_2000_compliant() { return false; }
-
 private:
-	inline void advance_seconds();
-
 	int m_cs;						// chip select
 	int m_clk;						// clock
 	int m_data_latch;				// data latch
@@ -76,8 +69,6 @@ private:
 	int m_state;					// state
 	int m_bits;						// number of bits transferred
 	int m_dio;						// data pin
-
-	UINT8 m_register[8];			// registers
 
 	// timers
 	emu_timer *m_timer;

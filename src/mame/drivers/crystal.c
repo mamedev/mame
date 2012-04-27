@@ -161,7 +161,7 @@ public:
 	UINT8     m_OldPort4;
 
 	device_t *m_maincpu;
-	device_t *m_ds1302;
+	ds1302_device *m_ds1302;
 	device_t *m_vr0video;
 	DECLARE_READ32_MEMBER(FlipCount_r);
 	DECLARE_WRITE32_MEMBER(FlipCount_w);
@@ -400,13 +400,11 @@ WRITE32_MEMBER(crystal_state::PIO_w)
 	UINT32 CLK = data & 0x02000000;
 	UINT32 DAT = data & 0x10000000;
 
-	if (!RST)
-		m_ds1302->reset();
+	m_ds1302->ce_w(RST ? 1 : 0);
+	m_ds1302->io_w(DAT ? 1 : 0);
+	m_ds1302->sclk_w(CLK ? 1 : 0);
 
-	ds1302_dat_w(m_ds1302, 0, DAT ? 1 : 0);
-	ds1302_clk_w(m_ds1302, 0, CLK ? 1 : 0);
-
-	if (ds1302_read(m_ds1302, 0))
+	if (m_ds1302->io_r())
 		space.write_dword(0x01802008, space.read_dword(0x01802008) | 0x10000000);
 	else
 		space.write_dword(0x01802008, space.read_dword(0x01802008) & (~0x10000000));
@@ -578,7 +576,7 @@ static MACHINE_START( crystal )
 	int i;
 
 	state->m_maincpu = machine.device("maincpu");
-	state->m_ds1302 = machine.device("rtc");
+	state->m_ds1302 = machine.device<ds1302_device>("rtc");
 	state->m_vr0video = machine.device("vr0");
 
 	device_set_irq_callback(machine.device("maincpu"), icallback);
@@ -859,7 +857,7 @@ static MACHINE_CONFIG_START( crystal, crystal_state )
 	MCFG_PALETTE_INIT(RRRRR_GGGGGG_BBBBB)
 	MCFG_PALETTE_LENGTH(65536)
 
-	MCFG_DS1302_ADD("rtc")
+	MCFG_DS1302_ADD("rtc", XTAL_32_768kHz)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 

@@ -59,7 +59,6 @@ struct upd1990a_interface
 };
 
 
-
 // ======================> upd1990a_device
 
 class upd1990a_device :	public device_t,
@@ -89,14 +88,9 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 	// device_rtc_interface overrides
-	virtual void rtc_set_time(int year, int month, int day, int day_of_week, int hour, int minute, int second);
-	virtual bool rtc_is_year_2000_compliant() { return false; }
+	virtual void rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second);
 
 private:
-	inline UINT8 convert_to_bcd(int val);
-	inline int bcd_to_integer(UINT8 val);
-	inline void advance_seconds();
-
 	static const device_timer_id TIMER_CLOCK = 0;
 	static const device_timer_id TIMER_TP = 1;
 	static const device_timer_id TIMER_DATA_OUT = 2;

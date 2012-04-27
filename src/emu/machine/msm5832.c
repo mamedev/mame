@@ -53,10 +53,6 @@ enum
 };
 
 
-// days per month
-static const int DAYS_PER_MONTH[12] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
-
-
 
 //**************************************************************************
 //  INLINE HELPERS
@@ -80,86 +76,6 @@ inline void msm5832_device::write_counter(int counter, int value)
 {
 	m_reg[counter] = value % 10;
 	m_reg[counter + 1] = value / 10;
-}
-
-
-//-------------------------------------------------
-//  advance_seconds -
-//-------------------------------------------------
-
-inline void msm5832_device::advance_seconds()
-{
-	int seconds = read_counter(REGISTER_S1);
-
-	seconds++;
-
-	if (seconds > 59)
-	{
-		seconds = 0;
-
-		advance_minutes();
-	}
-
-	write_counter(REGISTER_S1, seconds);
-}
-
-
-//-------------------------------------------------
-//  advance_minutes -
-//-------------------------------------------------
-
-inline void msm5832_device::advance_minutes()
-{
-	int minutes = read_counter(REGISTER_MI1);
-	int hours = read_counter(REGISTER_H1);
-	int days = read_counter(REGISTER_D1);
-	int month = read_counter(REGISTER_MO1);
-	int year = read_counter(REGISTER_Y1);
-	int day_of_week = m_reg[REGISTER_W];
-
-	minutes++;
-
-	if (minutes > 59)
-	{
-		minutes = 0;
-		hours++;
-	}
-
-	if (hours > 23)
-	{
-		hours = 0;
-		days++;
-		day_of_week++;
-	}
-
-	if (day_of_week > 6)
-	{
-		day_of_week++;
-	}
-
-	if (days > DAYS_PER_MONTH[month - 1])
-	{
-		days = 1;
-		month++;
-	}
-
-	if (month > 12)
-	{
-		month = 1;
-		year++;
-	}
-
-	if (year > 99)
-	{
-		year = 0;
-	}
-
-	write_counter(REGISTER_MI1, minutes);
-	write_counter(REGISTER_H1, hours);
-	write_counter(REGISTER_D1, days);
-	write_counter(REGISTER_MO1, month);
-	write_counter(REGISTER_Y1, year);
-	m_reg[REGISTER_W] = day_of_week;
 }
 
 
@@ -207,6 +123,16 @@ void msm5832_device::device_start()
 
 
 //-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void msm5832_device::device_reset()
+{
+	set_current_time(machine());
+}
+
+
+//-------------------------------------------------
 //  device_timer - handler timer events
 //-------------------------------------------------
 
@@ -225,11 +151,10 @@ void msm5832_device::device_timer(emu_timer &timer, device_timer_id id, int para
 
 
 //-------------------------------------------------
-//  rtc_set_time - called to initialize the RTC to
-//  a known state
+//  rtc_clock_updated - 
 //-------------------------------------------------
 
-void msm5832_device::rtc_set_time(int year, int month, int day, int day_of_week, int hour, int minute, int second)
+void msm5832_device::rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second)
 {
 	write_counter(REGISTER_Y1, year);
 	write_counter(REGISTER_MO1, month);
@@ -278,6 +203,9 @@ WRITE8_MEMBER( msm5832_device::data_w )
 	if (m_cs && m_write)
 	{
 		m_reg[m_address] = data & 0x0f;
+
+		set_time(false, read_counter(REGISTER_Y1), read_counter(REGISTER_MO1), read_counter(REGISTER_D1), m_reg[REGISTER_W],
+			read_counter(REGISTER_H1), read_counter(REGISTER_MI1), read_counter(REGISTER_S1));
 	}
 }
 
@@ -304,17 +232,7 @@ WRITE_LINE_MEMBER( msm5832_device::adj_w )
 
 	if (state)
 	{
-		int seconds = read_counter(REGISTER_S1);
-
-		if (seconds < 30)
-		{
-			write_counter(REGISTER_S1, 0);
-		}
-		else
-		{
-			write_counter(REGISTER_S1, 0);
-			advance_minutes();
-		}
+		adjust_seconds();
 	}
 }
 

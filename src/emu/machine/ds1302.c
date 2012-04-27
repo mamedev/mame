@@ -1,43 +1,65 @@
-/************************************************************
+/**********************************************************************
 
-    DALLAS DS1302
+    Dallas DS1302 Trickle-Charge Timekeeping Chip emulation
 
-    RTC + BACKUP RAM
+    Copyright MESS Team.
+    Visit http://mamedev.org for licensing and usage restrictions.
 
+**********************************************************************/
 
+/*
 
-    Emulation by ElSemi
+	TODO:
 
+	- 12 hour format
+	- synchronize user buffers on falling edge of CE after write
 
-    Missing Features:
-      - Burst Mode
-      - Clock programming (useless)
+*/
 
-
-
-    2009-05 Converted to be a device
-
-************************************************************/
-
-
-#include "emu.h"
 #include "ds1302.h"
-#include "devhelpr.h"
 
 
-/***************************************************************************
-    INLINE FUNCTIONS
-***************************************************************************/
 
-INLINE UINT8 convert_to_bcd(int val)
+//**************************************************************************
+//  MACROS / CONSTANTS
+//**************************************************************************
+
+#define LOG 0
+
+
+#define RAM_SIZE	0x1f	// 31 bytes
+
+
+enum
 {
-	return ((val / 10) << 4) | (val % 10);
-}
+	STATE_COMMAND,
+	STATE_INPUT,
+	STATE_OUTPUT
+};
+
+enum
+{
+	REGISTER_SECONDS = 0,
+	REGISTER_MINUTES,
+	REGISTER_HOUR,
+	REGISTER_DATE,
+	REGISTER_MONTH,
+	REGISTER_DAY,
+	REGISTER_YEAR,
+	REGISTER_CONTROL,
+	REGISTER_TRICKLE
+};
 
 
-/***************************************************************************
-    IMPLEMENTATION
-***************************************************************************/
+#define COMMAND_READ	(m_cmd & 0x01)
+#define COMMAND_RAM		(m_cmd & 0x40)
+#define COMMAND_VALID	(m_cmd & 0x80)
+#define COMMAND_BURST	(((m_cmd >> 1) & 0x1f) == 0x1f)
+#define CLOCK_HALT		(m_reg[REGISTER_SECONDS] & 0x80)
+#define WRITE_PROTECT	(m_reg[REGISTER_CONTROL] & 0x80)
+#define BURST_END		(COMMAND_RAM ? 0x1f : 0x09)
+
+
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -46,15 +68,18 @@ INLINE UINT8 convert_to_bcd(int val)
 // device type definition
 const device_type DS1302 = &device_creator<ds1302_device>;
 
+
 //-------------------------------------------------
 //  ds1302_device - constructor
 //-------------------------------------------------
 
 ds1302_device::ds1302_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, DS1302, "Dallas DS1302 RTC", tag, owner, clock)
+    : device_t(mconfig, DS1302, "Dallas DS1302", tag, owner, clock),
+	  device_rtc_interface(mconfig, *this),
+	  device_nvram_interface(mconfig, *this)
 {
-
 }
+
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -62,12 +87,24 @@ ds1302_device::ds1302_device(const machine_config &mconfig, const char *tag, dev
 
 void ds1302_device::device_start()
 {
-	save_item(NAME(m_shift_in));
-	save_item(NAME(m_shift_out));
-	save_item(NAME(m_icount));
-	save_item(NAME(m_last_clk));
-	save_item(NAME(m_last_cmd));
-	save_item(NAME(m_sram));
+	// allocate timers
+	m_clock_timer = timer_alloc();
+	m_clock_timer->adjust(attotime::from_hz(clock() / 32768), 0, attotime::from_hz(clock() / 32768));
+
+	for (int i = 0; i < 9; i++)
+		m_reg[i] = 0;
+
+	// state saving
+	save_item(NAME(m_ce));
+	save_item(NAME(m_clk));
+	save_item(NAME(m_io));
+	save_item(NAME(m_state));
+	save_item(NAME(m_bits));
+	save_item(NAME(m_cmd));
+	save_item(NAME(m_data));
+	save_item(NAME(m_addr));
+	save_item(NAME(m_reg));
+	save_item(NAME(m_user));
 }
 
 
@@ -77,139 +114,300 @@ void ds1302_device::device_start()
 
 void ds1302_device::device_reset()
 {
-	m_shift_in  = 0;
-	m_shift_out = 0;
-	m_icount    = 0;
-	m_last_clk  = 0;
-	m_last_cmd  = 0;
+	set_current_time(machine());
+	
+	m_clk = 0;
+	m_ce = 0;
+	m_state = STATE_COMMAND;
+	m_bits = 0;	
 }
 
 
-/*-------------------------------------------------
-    ds1302_dat_w
--------------------------------------------------*/
+//-------------------------------------------------
+//  device_timer - handler timer events
+//-------------------------------------------------
 
-WRITE8_DEVICE_HANDLER_TRAMPOLINE(ds1302, ds1302_dat_w)
+void ds1302_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	if (data)
+	if (!CLOCK_HALT)
 	{
-		m_shift_in |= (1 << m_icount);
+		advance_seconds();
+	}
+}
+
+
+//-------------------------------------------------
+//  nvram_default - called to initialize NVRAM to
+//  its default state
+//-------------------------------------------------
+
+void ds1302_device::nvram_default()
+{
+	memset(m_ram, 0, RAM_SIZE);
+}
+
+
+//-------------------------------------------------
+//  nvram_read - called to read NVRAM from the
+//  .nv file
+//-------------------------------------------------
+
+void ds1302_device::nvram_read(emu_file &file)
+{
+	file.read(m_ram, RAM_SIZE);
+}
+
+
+//-------------------------------------------------
+//  nvram_write - called to write NVRAM to the
+//  .nv file
+//-------------------------------------------------
+
+void ds1302_device::nvram_write(emu_file &file)
+{
+	file.write(m_ram, RAM_SIZE);
+}
+
+
+//-------------------------------------------------
+//  rtc_clock_updated - 
+//-------------------------------------------------
+
+void ds1302_device::rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second)
+{
+	m_reg[REGISTER_YEAR] = convert_to_bcd(year);
+	m_reg[REGISTER_DAY] = day_of_week;
+	m_reg[REGISTER_MONTH] = convert_to_bcd(month);
+	m_reg[REGISTER_DATE] = convert_to_bcd(day);
+	m_reg[REGISTER_HOUR] = convert_to_bcd(hour);
+	m_reg[REGISTER_MINUTES] = convert_to_bcd(minute);
+	m_reg[REGISTER_SECONDS] = (m_reg[REGISTER_SECONDS] & 0x80) | convert_to_bcd(second);
+}
+
+
+//-------------------------------------------------
+//  ce_w - chip enable write
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER( ds1302_device::ce_w )
+{
+	if (LOG) logerror("DS1302 '%s' CE: %u\n", tag(), state);
+
+	if (!state && m_ce)
+	{
+		// synchronize user buffers
+		for (int i = 0; i < 9; i++)
+		{
+			m_user[i] = m_reg[i];
+		}
+	}
+	else if (state && !m_ce)
+	{
+		// terminate data transfer
+		m_state = STATE_COMMAND;
+		m_bits = 0;
+	}
+
+	m_ce = state;
+}
+
+
+//-------------------------------------------------
+//  load_shift_register -
+//-------------------------------------------------
+
+void ds1302_device::load_shift_register()
+{
+	if (COMMAND_READ)
+	{
+		if (COMMAND_RAM)
+		{
+			m_data = m_ram[m_addr];
+
+			if (LOG) logerror("DS1302 '%s' Read RAM %u:%02x\n", tag(), m_addr, m_data);
+		}
+		else
+		{
+			m_data = m_user[m_addr];
+
+			if (LOG) logerror("DS1302 '%s' Read Clock %u:%02x\n", tag(), m_addr, m_data);
+		}						
 	}
 	else
 	{
-		m_shift_in &= ~(1 << m_icount);
+		if (COMMAND_RAM)
+		{
+			if (LOG) logerror("DS1302 '%s' Write RAM %u:%02x\n", tag(), m_addr, m_data);
+
+			m_ram[m_addr] = m_data;
+		}
+		else if (m_addr < 9)
+		{
+			if (LOG) logerror("DS1302 '%s' Write Clock %u:%02x\n", tag(), m_addr, m_data);
+
+			m_reg[m_addr] = m_data;
+		}		
 	}
 }
 
 
-/*-------------------------------------------------
-    ds1302_clk_w
--------------------------------------------------*/
+//-------------------------------------------------
+//  input_bit -
+//-------------------------------------------------
 
-WRITE8_DEVICE_HANDLER_TRAMPOLINE(ds1302, ds1302_clk_w)
+void ds1302_device::input_bit()
 {
-	if (data != m_last_clk)
+	switch (m_state)
 	{
-		if (data)	//Rising, shift in command
+	case STATE_COMMAND:
+		m_cmd >>= 1;
+		m_cmd |= (m_io << 7);
+		m_bits++;
+
+		if (m_bits == 8)
 		{
-			m_icount++;
-			if(m_icount == 8)	//Command start
+			if (LOG) logerror("DS1302 '%s' Command: %02x\n", tag(), m_cmd);
+
+			m_bits = 0;
+			m_addr = (m_cmd >> 1) & 0x1f;
+
+			if (COMMAND_VALID)
 			{
-				system_time systime;
-				machine().base_datetime(systime);
-
-				switch(m_shift_in)
+				if (COMMAND_BURST)
 				{
-					case 0x81:	//Sec
-						m_shift_out = convert_to_bcd(systime.local_time.second);
-						break;
-
-					case 0x83:	//Min
-						m_shift_out = convert_to_bcd(systime.local_time.minute);
-						break;
-
-					case 0x85:	//Hour
-						m_shift_out = convert_to_bcd(systime.local_time.hour);
-						break;
-
-					case 0x87:	//Day
-						m_shift_out = convert_to_bcd(systime.local_time.mday);
-						break;
-
-					case 0x89:	//Month
-						m_shift_out = convert_to_bcd(systime.local_time.month + 1);
-						break;
-
-					case 0x8b:	//weekday
-						m_shift_out = convert_to_bcd(systime.local_time.weekday);
-						break;
-
-					case 0x8d:	//Year
-						m_shift_out = convert_to_bcd(systime.local_time.year % 100);
-						break;
-
-					default:
-						m_shift_out = 0x0;
+					m_addr = 0;
 				}
 
-				if(m_shift_in > 0xc0)
+				if (COMMAND_READ)
 				{
-					m_shift_out = m_sram[(m_shift_in >> 1) & 0x1f];
+					load_shift_register();
+
+					m_state = STATE_OUTPUT;
 				}
-				m_last_cmd = m_shift_in & 0xff;
-				m_icount++;
+				else
+				{
+					m_state = STATE_INPUT;
+				}
 			}
-
-			if(m_icount == 17 && !(m_last_cmd & 1))
+			else
 			{
-				UINT8 val = (m_shift_in >> 9) & 0xff;
-
-				switch(m_last_cmd)
-				{
-					case 0x80:	//Sec
-						break;
-
-					case 0x82:	//Min
-						break;
-
-					case 0x84:	//Hour
-						break;
-
-					case 0x86:	//Day
-						break;
-
-					case 0x88:	//Month
-						break;
-
-					case 0x8a:	//weekday
-						break;
-
-					case 0x8c:	//Year
-						break;
-
-					default:
-						m_shift_out = 0x0;
-				}
-
-				if(m_last_cmd > 0xc0)
-				{
-					m_sram[(m_last_cmd >> 1) & 0x1f] = val;
-				}
-
-
-
+				m_state = STATE_COMMAND;
 			}
 		}
+		break;
+
+	case STATE_INPUT:
+		m_data >>= 1;
+		m_data |= (m_io << 7);
+		m_bits++;
+
+		if (m_bits == 8)
+		{
+			if (LOG) logerror("DS1302 '%s' Data: %02x\n", tag(), m_data);
+
+			m_bits = 0;
+
+			if (!WRITE_PROTECT)
+			{
+				load_shift_register();
+			}
+
+			if (COMMAND_BURST)
+			{
+				m_addr++;
+
+				if (m_addr == BURST_END)
+				{
+					m_state = STATE_COMMAND;
+				}
+			}
+			else
+			{
+				m_state = STATE_COMMAND;
+			}
+		}
+		break;
 	}
-	m_last_clk = data;
 }
 
 
-/*-------------------------------------------------
-    ds1302_read
--------------------------------------------------*/
+//-------------------------------------------------
+//  output_bit -
+//-------------------------------------------------
 
-READ8_DEVICE_HANDLER_TRAMPOLINE(ds1302, ds1302_read)
+void ds1302_device::output_bit()
 {
-	return (m_shift_out & (1 << (m_icount - 9))) ? 1 : 0;
+	if (m_state != STATE_OUTPUT) return;
+
+	m_io = BIT(m_data, 0);
+	m_data >>= 1;
+	m_bits++;
+
+	if (m_bits == 8)
+	{
+		m_bits = 0;
+
+		if (COMMAND_BURST)
+		{
+			m_addr++;
+
+			if (m_addr == BURST_END)
+			{
+				m_state = STATE_COMMAND;
+			}
+			else
+			{
+				load_shift_register();
+			}
+		}
+		else
+		{
+			m_state = STATE_COMMAND;
+		}
+	}
+}
+
+
+//-------------------------------------------------
+//  sclk_w - serial clock write
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER( ds1302_device::sclk_w )
+{
+	if (LOG) logerror("DS1302 '%s' CLK: %u\n", tag(), state);
+
+	if (!m_ce) return;
+
+	if (!m_clk && state) // rising edge
+	{
+		input_bit();
+	}
+	else if (m_clk && !state) // falling edge
+	{
+		output_bit();
+	}
+
+	m_clk = state;
+}
+
+
+//-------------------------------------------------
+//  io_w - I/O write
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER( ds1302_device::io_w )
+{
+	if (LOG) logerror("DS1302 '%s' I/O: %u\n", tag(), state);
+
+	m_io = state;
+}
+
+
+//-------------------------------------------------
+//  io_r - I/O read
+//-------------------------------------------------
+
+READ_LINE_MEMBER( ds1302_device::io_r )
+{
+	return m_io;
 }

@@ -97,6 +97,7 @@ device_centronics_peripheral_interface::device_centronics_peripheral_interface(c
 	m_fault = FALSE;
 	m_busy = TRUE;
 	m_strobe = TRUE;
+	m_ack = FALSE;
 	m_data = 0x00;
 }
 

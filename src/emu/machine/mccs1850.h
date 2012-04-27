@@ -65,10 +65,6 @@ protected:
     virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
-	// device_rtc_interface overrides
-	virtual void rtc_set_time(int year, int month, int day, int day_of_week, int hour, int minute, int second);
-	virtual bool rtc_is_year_2000_compliant() { return false; }
-
 	// device_nvram_interface overrides
 	virtual void nvram_default();
 	virtual void nvram_read(emu_file &file);

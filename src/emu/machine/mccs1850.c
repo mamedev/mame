@@ -353,16 +353,6 @@ void mccs1850_device::device_timer(emu_timer &timer, device_timer_id id, int par
 
 
 //-------------------------------------------------
-//  rtc_set_time - called to initialize the RTC to
-//  a known state
-//-------------------------------------------------
-
-void mccs1850_device::rtc_set_time(int year, int month, int day, int day_of_week, int hour, int minute, int second)
-{
-}
-
-
-//-------------------------------------------------
 //  nvram_default - called to initialize NVRAM to
 //  its default state
 //-------------------------------------------------

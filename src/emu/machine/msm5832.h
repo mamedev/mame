@@ -66,19 +66,17 @@ public:
 protected:
     // device-level overrides
     virtual void device_start();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+    virtual void device_reset();
+   	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 	// device_rtc_interface overrides
-	virtual void rtc_set_time(int year, int month, int day, int day_of_week, int hour, int minute, int second);
-	virtual bool rtc_is_year_2000_compliant() { return false; }
+	virtual void rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second);
 
 private:
 	static const device_timer_id TIMER_CLOCK = 0;
 
 	inline int read_counter(int counter);
 	inline void write_counter(int counter, int value);
-	inline void advance_seconds();
-	inline void advance_minutes();
 
 	UINT8 m_reg[13];			// registers
 

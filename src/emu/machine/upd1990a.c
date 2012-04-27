@@ -45,91 +45,6 @@ enum
 
 
 //**************************************************************************
-//  INLINE HELPERS
-//**************************************************************************
-
-//-------------------------------------------------
-//  convert_to_bcd -
-//-------------------------------------------------
-
-inline UINT8 upd1990a_device::convert_to_bcd(int val)
-{
-	return ((val / 10) << 4) | (val % 10);
-}
-
-
-//-------------------------------------------------
-//  bcd_to_integer -
-//-------------------------------------------------
-
-inline int upd1990a_device::bcd_to_integer(UINT8 val)
-{
-	return (((val & 0xf0) >> 4) * 10) + (val & 0x0f);
-}
-
-
-//-------------------------------------------------
-//  advance_seconds -
-//-------------------------------------------------
-
-inline void upd1990a_device::advance_seconds()
-{
-	static const int days_per_month[] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
-
-	int seconds = bcd_to_integer(m_time_counter[0]);
-	int minutes = bcd_to_integer(m_time_counter[1]);
-	int hours = bcd_to_integer(m_time_counter[2]);
-	int days = bcd_to_integer(m_time_counter[3]);
-	int day_of_week = m_time_counter[4] & 0x0f;
-	int month = (m_time_counter[4] & 0xf0) >> 4;
-
-	seconds++;
-
-	if (seconds > 59)
-	{
-		seconds = 0;
-		minutes++;
-	}
-
-	if (minutes > 59)
-	{
-		minutes = 0;
-		hours++;
-	}
-
-	if (hours > 23)
-	{
-		hours = 0;
-		days++;
-		day_of_week++;
-	}
-
-	if (day_of_week > 6)
-	{
-		day_of_week++;
-	}
-
-	if (days > days_per_month[month - 1])
-	{
-		days = 1;
-		month++;
-	}
-
-	if (month > 12)
-	{
-		month = 1;
-	}
-
-	m_time_counter[0] = convert_to_bcd(seconds);
-	m_time_counter[1] = convert_to_bcd(minutes);
-	m_time_counter[2] = convert_to_bcd(hours);
-	m_time_counter[3] = convert_to_bcd(days);
-	m_time_counter[4] = (month << 4) | day_of_week;
-}
-
-
-
-//**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
 
@@ -139,7 +54,8 @@ inline void upd1990a_device::advance_seconds()
 
 upd1990a_device::upd1990a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
     : device_t(mconfig, UPD1990A, "uPD1990A", tag, owner, clock),
-      device_rtc_interface(mconfig, *this)
+      device_rtc_interface(mconfig, *this),
+      m_data_out(0)
 {
 }
 
@@ -203,17 +119,7 @@ void upd1990a_device::device_start()
 
 void upd1990a_device::device_reset()
 {
-	system_time curtime, *systime = &curtime;
-
-	machine().current_datetime(curtime);
-
-	// HACK: load time counter from system time
-	m_time_counter[0] = convert_to_bcd(systime->local_time.second);
-	m_time_counter[1] = convert_to_bcd(systime->local_time.minute);
-	m_time_counter[2] = convert_to_bcd(systime->local_time.hour);
-	m_time_counter[3] = convert_to_bcd(systime->local_time.mday);
-	m_time_counter[4] = systime->local_time.weekday;
-	m_time_counter[4] |= (systime->local_time.month + 1) << 4;
+	set_current_time(machine());
 }
 
 
@@ -249,11 +155,10 @@ void upd1990a_device::device_timer(emu_timer &timer, device_timer_id id, int par
 
 
 //-------------------------------------------------
-//  rtc_set_time - called to initialize the RTC to
-//  a known state
+//  rtc_clock_updated -
 //-------------------------------------------------
 
-void upd1990a_device::rtc_set_time(int year, int month, int day, int day_of_week, int hour, int minute, int second)
+void upd1990a_device::rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second)
 {
 	m_time_counter[0] = convert_to_bcd(second);
 	m_time_counter[1] = convert_to_bcd(minute);
@@ -352,6 +257,8 @@ WRITE_LINE_MEMBER( upd1990a_device::stb_w )
 			for (int i = 0; i < 5; i++)
 			{
 				m_time_counter[i] = m_shift_reg[i];
+
+				set_time(false, 0, m_time_counter[4] >> 4, m_time_counter[4] & 0x0f, m_time_counter[3], m_time_counter[2], m_time_counter[1], m_time_counter[0]);
 			}
 
 			/* 32 Hz time pulse */
