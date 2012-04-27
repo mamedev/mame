@@ -331,7 +331,7 @@ ROM_START( gldarrow )
 	ROM_LOAD( "1.12h",   0x0fe000, 0x002000, CRC(71bd0e39) SHA1(15345f5726cd33ecb1b2da05f2852b6cc3ac7747) )
 
 	ROM_REGION( 0x20, "proms", 0 )
-	ROM_LOAD( "prom.2c", 0x00, 0x20, NO_DUMP ) // M3-7602-5 color prom
+	ROM_LOAD( "prom.2c", 0x00, 0x20, CRC(2839bb14) SHA1(c9acdb3ae00c2f9344aedaf77c0f4e860a3184fc) ) // M3-7602-5 color prom
 ROM_END
 
 
