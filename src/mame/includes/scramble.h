@@ -8,7 +8,7 @@ public:
 		: galaxold_state(mconfig, type, tag),
 		  m_soundram(*this, "soundram") { }
 
-	required_shared_ptr<UINT8> m_soundram;
+	optional_shared_ptr<UINT8> m_soundram;
 	UINT8 m_cavelon_bank;
 	UINT8 m_security_2B_counter;
 	UINT8 m_xb;
