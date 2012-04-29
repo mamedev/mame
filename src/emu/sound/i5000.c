@@ -45,6 +45,29 @@ void i5000snd_device::device_start()
 
 	m_rom_base = (UINT16 *)device().machine().root_device().memregion(":i5000snd")->base();
 	m_rom_mask = device().machine().root_device().memregion(":i5000snd")->bytes() / 2 - 1;
+	
+	// register for savestates
+	for (int ch = 0; ch < 16; ch++)
+	{
+		save_item(NAME(m_channels[ch].is_playing), ch);
+		save_item(NAME(m_channels[ch].m_adpcm.m_signal), ch);
+		save_item(NAME(m_channels[ch].m_adpcm.m_step), ch);
+
+        save_item(NAME(m_channels[ch].address), ch);
+        save_item(NAME(m_channels[ch].freq_timer), ch);
+        save_item(NAME(m_channels[ch].freq_base), ch);
+        save_item(NAME(m_channels[ch].freq_min), ch);
+        save_item(NAME(m_channels[ch].sample), ch);
+        save_item(NAME(m_channels[ch].shift_pos), ch);
+        save_item(NAME(m_channels[ch].shift_amount), ch);
+        save_item(NAME(m_channels[ch].shift_mask), ch);
+        save_item(NAME(m_channels[ch].vol_r), ch);
+        save_item(NAME(m_channels[ch].vol_l), ch);
+        save_item(NAME(m_channels[ch].output_r), ch);
+        save_item(NAME(m_channels[ch].output_l), ch);
+	}
+	
+	save_item(NAME(m_regs));
 }
 
 
