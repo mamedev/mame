@@ -20,6 +20,10 @@
 #define NEOGEO_VBLANK_RELOAD_HPOS               (0x11f)
 
 #define NEOGEO_BANK_AUDIO_CPU_CART_BANK         "audio_cart"
+#define NEOGEO_BANK_AUDIO_CPU_CART_BANK0        "audio_cart0"
+#define NEOGEO_BANK_AUDIO_CPU_CART_BANK1        "audio_cart1"
+#define NEOGEO_BANK_AUDIO_CPU_CART_BANK2        "audio_cart2"
+#define NEOGEO_BANK_AUDIO_CPU_CART_BANK3        "audio_cart3"
 /* do not use 2, 3 and 4 */
 #define NEOGEO_BANK_CARTRIDGE                   "cartridge"
 #define NEOGEO_BANK_BIOS                        "bios"
