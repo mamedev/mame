@@ -10,9 +10,15 @@
   also thanks to Darrell Hal Smith, Kevin Mullins
 
 
+  To initialize battery RAM, go into Meter Read mode (F1 -> 9),
+  and then press the Meter Reset button.
+
+  If a game is not turned off properly, eg. exiting MAME
+  in mid-game, it may run faulty on the next boot.
+  Enable the Night Switch to prevent this.
+
+
   TODO:
-  - fix vblank failure
-    * dox note: to boot it in debugger, set bp ff5ec, and then ip=f5fe
   - coincounters/hopper
 
 ****************************************************************/
@@ -30,11 +36,13 @@ public:
 	meyc8088_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
 		m_maincpu(*this,"maincpu"),
-		m_vram(*this, "vram")
+		m_vram(*this, "vram"),
+		m_heartbeat(*this, "heartbeat")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<UINT8> m_vram;
+	required_device<timer_device> m_heartbeat;
 
 	UINT8 m_status;
 	UINT8 m_common;
@@ -148,9 +156,17 @@ static SCREEN_VBLANK( meyc8088 )
 
 ***************************************************************************/
 
+TIMER_DEVICE_CALLBACK( heartbeat_callback )
+{
+	meyc8088_state *state = timer.machine().driver_data<meyc8088_state>();
+	state->m_status |= 0x20;
+}
+
 WRITE8_MEMBER(meyc8088_state::drive_w)
 {
+	// drivers go into high-impedance state ~100ms after write (LS374 /OC)
 	m_status &= ~0x20;
+	m_heartbeat->adjust(attotime::from_msec(100));
 
 	// d0-d3: DC counter drivers
 	// d4-d7: AC motor drivers
@@ -221,7 +237,7 @@ static READ8_DEVICE_HANDLER(meyc8088_status_r)
 	// d3: N/C
 	// d4: battery ok
 	// d5: /drive on
-	return (state->m_status & 7) | 0x18;
+	return (state->m_status & 0x27) | 0x18;
 }
 
 
@@ -351,13 +367,15 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( meyc8088, meyc8088_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8088, XTAL_15MHz / 3)
+	MCFG_CPU_ADD("maincpu", I8088, (XTAL_15MHz / 3) * 0.95) // NOTE: underclocked to prevent errors on diagnostics, MAME i8088 cycle timing is probably inaccurate
 	MCFG_CPU_PROGRAM_MAP(meyc8088_map)
 
 	MCFG_I8155_ADD("i8155_1", XTAL_15MHz / (3*1), i8155_intf[0])
 	MCFG_I8155_ADD("i8155_2", XTAL_15MHz / (3*32), i8155_intf[1])
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
+
+	MCFG_TIMER_ADD("heartbeat", heartbeat_callback)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -387,4 +405,4 @@ ROM_START( gldarrow )
 ROM_END
 
 
-GAME( 1984, gldarrow, 0,        meyc8088, gldarrow, 0, ROT0,  "Meyco Games, Inc.", "Golden Arrow (Standard G8-03)", GAME_NOT_WORKING )
+GAME( 1984, gldarrow, 0,        meyc8088, gldarrow, 0, ROT0,  "Meyco Games, Inc.", "Golden Arrow (Standard G8-03)", 0 )
