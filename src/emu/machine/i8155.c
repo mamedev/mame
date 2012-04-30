@@ -386,7 +386,7 @@ READ8_MEMBER( i8155_device::io_r )
 {
 	UINT8 data = 0;
 
-	switch (offset & 0x03)
+	switch (offset & 0x07)
 	{
 	case REGISTER_STATUS:
 		data = m_status;
@@ -405,6 +405,14 @@ READ8_MEMBER( i8155_device::io_r )
 
 	case REGISTER_PORT_C:
 		data = read_port(PORT_C);
+		break;
+
+	case REGISTER_TIMER_LOW:
+		data = m_counter & 0xff;
+		break;
+
+	case REGISTER_TIMER_HIGH:
+		data = (m_counter >> 8 & 0x3f) | get_timer_mode();
 		break;
 	}
 
@@ -477,7 +485,7 @@ void i8155_device::register_w(int offset, UINT8 data)
 			else
 			{
 				// load mode and CNT length and start immediately after loading (if timer is not running)
-				m_counter = m_count_length;
+				m_counter = m_count_length & 0x3fff;
 				m_timer->adjust(attotime::zero, 0, attotime::from_hz(clock()));
 			}
 			break;
