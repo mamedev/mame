@@ -2228,6 +2228,7 @@ src/mame/drivers/cham24.c svneol=native#text/plain
 src/mame/drivers/champbas.c svneol=native#text/plain
 src/mame/drivers/champbwl.c svneol=native#text/plain
 src/mame/drivers/chanbara.c svneol=native#text/plain
+src/mame/drivers/chance32.c svneol=native#text/plain
 src/mame/drivers/changela.c svneol=native#text/plain
 src/mame/drivers/cheekyms.c svneol=native#text/plain
 src/mame/drivers/chihiro.c svneol=native#text/plain
