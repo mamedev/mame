@@ -1305,75 +1305,126 @@ ROM_START( ixion )
 	ROM_LOAD( "1941a.u72",       0x0100, 0x0100, CRC(a5d0d97e) SHA1(2677508b44f9b7a6c6ee56e49a7b88073e80debe) )
 ROM_END
 
+/*
+Extra notes about Congo Bongo:
 
-ROM_START( congo )
-	ROM_REGION( 0x8000, "maincpu", 0 )
-	ROM_LOAD( "congo1.u35",   0x0000, 0x2000, CRC(09355b5b) SHA1(0085ac7eb0035a88cb54cdd3dd6b2643141d39db) )
-	ROM_LOAD( "congo2.u34",   0x2000, 0x2000, CRC(1c5e30ae) SHA1(7cc5420e0e7a2793a671b938c121ae4079f5b1b8) )
-	ROM_LOAD( "congo3.u33",   0x4000, 0x2000, CRC(5ee1132c) SHA1(26294cd69ee43dfd29fc3642e8c04552dcdbaa49) )
-	ROM_LOAD( "congo4.u32",   0x6000, 0x2000, CRC(5332b9bf) SHA1(8440cc6f92918b3b467a5a0b86c9defeb0a7db0e) )
+There is known to be a version of Congo Bongo with official Sega "EPR" numbers. Sega game ID number for this set is 834-5197
 
-	ROM_REGION( 0x2000, "audiocpu", 0 )
-	ROM_LOAD( "congo17.u11",  0x0000, 0x2000, CRC(5024e673) SHA1(6f846146a4e29bcdfd5bd1bc5f1211d344cd5afa) )
+3 board stack with 834-5181 stickered as 834-5207 with standard 834-5167 video board & 834-5168 sound board.
+EPR-5309A.rom1 @ U35
+EPR-5310A.rom2 @ U34
+EPR-5311A.rom3 @ U33
+EPR-5312A.rom4 @ U32
 
-	ROM_REGION( 0x1000, "gfx_tx", 0 )
-	ROM_LOAD( "congo5.u76",   0x00000, 0x1000, CRC(7bf6ba2b) SHA1(3a2bd21b0e0e55cbd737c7b075492b5e8f944150) )
+Uses the MR018 BPROM @ U68
 
-	ROM_REGION( 0x6000, "gfx_bg", 0 )
-	ROM_LOAD( "congo8.u93",   0x00000, 0x2000, CRC(db99a619) SHA1(499029197d26f9aea3ac15d66b5738ce7dea1f6c) )
-	ROM_LOAD( "congo9.u94",   0x02000, 0x2000, CRC(93e2309e) SHA1(bd8a74332cac0cf85f319c1f35d04a4781c9d655) )
-	ROM_LOAD( "congo10.u95",  0x04000, 0x2000, CRC(f27a9407) SHA1(d41c90c89ae28c92bf0c57927357d9b68ed7e0ef) )
+Oddly, it seems most Congo Bongo board sets (2 & 3 board stacks) have all hand written labels. At least all the PCB
+photos I could Google as well as those included in a recent redump of both board set types.  And YES it's actually
+"CONGO BONGO REV C ROM 2A" this is verified in several PCB photos.
 
-	ROM_REGION( 0xc000, "gfx_spr", 0 )
-	ROM_LOAD( "congo12.u78",  0x00000, 0x2000, CRC(15e3377a) SHA1(04a7fbfd58924359fae0ba76ed152f325f07beae) )
-	ROM_LOAD( "congo13.u79",  0x02000, 0x2000, CRC(1d1321c8) SHA1(d12e156a24db105c5f941b7ef79f32181b616710) )
-	ROM_LOAD( "congo11.u77",  0x04000, 0x2000, CRC(73e2709f) SHA1(14919facf08f6983c3a9baad031239a1b57c8202) )
-	ROM_LOAD( "congo14.u104", 0x06000, 0x2000, CRC(bf9169fe) SHA1(303d68e38e9a47464f14dc5be6bff1be01b88bb6) )
-	ROM_LOAD( "congo16.u106", 0x08000, 0x2000, CRC(cb6d5775) SHA1(b1f8ead6e6f8ad995baaeb7f8554d41ed2296fff) )
-	ROM_LOAD( "congo15.u105", 0x0a000, 0x2000, CRC(7b15a7a4) SHA1(b1c05e60a1442e4dd56d197be8b768bcbf45e2d9) )
+*/
 
-	ROM_REGION( 0x4000, "tilemap_dat", 0 )
-	ROM_LOAD( "congo6.u57",   0x0000, 0x2000, CRC(d637f02b) SHA1(29127149924c5bfdeb9456d7df2a5a5d14098794) )
-	ROM_LOAD( "congo7.u58",   0x2000, 0x2000, CRC(80927943) SHA1(4683520c241d209c6cabeaead9b363f046c30f70) )
+ROM_START( congo ) /* 2 board stack, Sega game ID number for this set is 834-5180 */
+	ROM_REGION( 0x8000, "maincpu", 0 ) /* Located on 834-5181 PCB,  AKA Tip Top-CONTR II */
+	ROM_LOAD( "congo_rev_c_rom1.u21",   0x0000, 0x2000, CRC(09355b5b) SHA1(0085ac7eb0035a88cb54cdd3dd6b2643141d39db) ) /* SUM16 written on label 044A */
+	ROM_LOAD( "congo_rev_c_rom2a.u22",  0x2000, 0x2000, CRC(1c5e30ae) SHA1(7cc5420e0e7a2793a671b938c121ae4079f5b1b8) ) /* SUM16 written on label DD4D */
+	ROM_LOAD( "congo_rev_c_rom3.u23",   0x4000, 0x2000, CRC(5ee1132c) SHA1(26294cd69ee43dfd29fc3642e8c04552dcdbaa49) ) /* SUM16 written on label C932 */
+	ROM_LOAD( "congo_rev_c_rom4.u24",   0x6000, 0x2000, CRC(5332b9bf) SHA1(8440cc6f92918b3b467a5a0b86c9defeb0a7db0e) ) /* SUM16 written on label 5128 */
 
-	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "congo.u68",    0x0000, 0x100, CRC(b788d8ae) SHA1(9765180f3087140c75e5953409df841787558160) )
+	ROM_REGION( 0x2000, "audiocpu", 0 ) /* Located on 834-5181 PCB,  AKA Tip Top-CONTR II */
+	ROM_LOAD( "tip_top_rom_17.u19",  0x0000, 0x2000, CRC(5024e673) SHA1(6f846146a4e29bcdfd5bd1bc5f1211d344cd5afa) )
+
+	ROM_REGION( 0x1000, "gfx_tx", 0 ) /* Located on 834-5181 PCB,  AKA Tip Top-CONTR II */
+	ROM_LOAD( "tip_top_rom_5.u76",   0x00000, 0x1000, CRC(7bf6ba2b) SHA1(3a2bd21b0e0e55cbd737c7b075492b5e8f944150) )
+
+	ROM_REGION( 0x6000, "gfx_bg", 0 ) /* Located on 834-5167 PCB, AKA Tip Tip-VIDEO */
+	ROM_LOAD( "tip_top_rom_8.u93",   0x00000, 0x2000, CRC(db99a619) SHA1(499029197d26f9aea3ac15d66b5738ce7dea1f6c) )
+	ROM_LOAD( "tip_top_rom_9.u94",   0x02000, 0x2000, CRC(93e2309e) SHA1(bd8a74332cac0cf85f319c1f35d04a4781c9d655) )
+	ROM_LOAD( "tip_top_rom_10.u95",  0x04000, 0x2000, CRC(f27a9407) SHA1(d41c90c89ae28c92bf0c57927357d9b68ed7e0ef) )
+
+	ROM_REGION( 0xc000, "gfx_spr", 0 ) /* Located on 834-5167 PCB, AKA Tip Tip-VIDEO */
+	ROM_LOAD( "tip_top_rom_12.u78",  0x00000, 0x2000, CRC(15e3377a) SHA1(04a7fbfd58924359fae0ba76ed152f325f07beae) )
+	ROM_LOAD( "tip_top_rom_13.u79",  0x02000, 0x2000, CRC(1d1321c8) SHA1(d12e156a24db105c5f941b7ef79f32181b616710) )
+	ROM_LOAD( "tip_top_rom_11.u77",  0x04000, 0x2000, CRC(73e2709f) SHA1(14919facf08f6983c3a9baad031239a1b57c8202) )
+	ROM_LOAD( "tip_top_rom_14.u104", 0x06000, 0x2000, CRC(bf9169fe) SHA1(303d68e38e9a47464f14dc5be6bff1be01b88bb6) )
+	ROM_LOAD( "tip_top_rom_16.u106", 0x08000, 0x2000, CRC(cb6d5775) SHA1(b1f8ead6e6f8ad995baaeb7f8554d41ed2296fff) )
+	ROM_LOAD( "tip_top_rom_15.u105", 0x0a000, 0x2000, CRC(7b15a7a4) SHA1(b1c05e60a1442e4dd56d197be8b768bcbf45e2d9) )
+
+	ROM_REGION( 0x4000, "tilemap_dat", 0 ) /* Located on 834-5167 PCB, AKA Tip Tip-VIDEO */
+	ROM_LOAD( "tip_top_rom_6.u57",   0x0000, 0x2000, CRC(d637f02b) SHA1(29127149924c5bfdeb9456d7df2a5a5d14098794) )
+	ROM_LOAD( "tip_top_rom_7.u58",   0x2000, 0x2000, CRC(80927943) SHA1(4683520c241d209c6cabeaead9b363f046c30f70) )
+
+	ROM_REGION( 0x0200, "proms", 0 ) /* Located on 834-5181 PCB,  AKA Tip Top-CONTR II */
+	ROM_LOAD( "mr019.u87",    0x0000, 0x100, CRC(b788d8ae) SHA1(9765180f3087140c75e5953409df841787558160) ) /* BPROM type is a TBP28L22 per the schematics */
 	ROM_RELOAD(               0x0100, 0x100 )
 ROM_END
 
-ROM_START( tiptop )
-	ROM_REGION( 0x8000, "maincpu", 0 )
+ROM_START( congoa ) /* 3 board stack, Sega game ID number for this set is 834-5156 */
+	ROM_REGION( 0x8000, "maincpu", 0 ) /* Located on 834-5166 PCB  AKA Tip Top-CONTR */
+	ROM_LOAD( "congo_rev_c_rom1.u35",   0x0000, 0x2000, CRC(09355b5b) SHA1(0085ac7eb0035a88cb54cdd3dd6b2643141d39db) ) /* SUM16 written on label 044A */
+	ROM_LOAD( "congo_rev_c_rom2a.u34",  0x2000, 0x2000, CRC(1c5e30ae) SHA1(7cc5420e0e7a2793a671b938c121ae4079f5b1b8) ) /* SUM16 written on label DD4D */
+	ROM_LOAD( "congo_rev_c_rom3.u33",   0x4000, 0x2000, CRC(5ee1132c) SHA1(26294cd69ee43dfd29fc3642e8c04552dcdbaa49) ) /* SUM16 written on label C932 */
+	ROM_LOAD( "congo_rev_c_rom4.u32",   0x6000, 0x2000, CRC(5332b9bf) SHA1(8440cc6f92918b3b467a5a0b86c9defeb0a7db0e) ) /* SUM16 written on label 5128 */
+
+	ROM_REGION( 0x2000, "audiocpu", 0 ) /* Located on 834-5168 PCB  AKA Tip Top-SOUND */
+	ROM_LOAD( "tip_top_rom_17.u11",  0x0000, 0x2000, CRC(5024e673) SHA1(6f846146a4e29bcdfd5bd1bc5f1211d344cd5afa) )
+
+	ROM_REGION( 0x1000, "gfx_tx", 0 ) /* Located on 834-5166 PCB  AKA Tip Top-CONTR */
+	ROM_LOAD( "tip_top_rom_5.u76",   0x00000, 0x1000, CRC(7bf6ba2b) SHA1(3a2bd21b0e0e55cbd737c7b075492b5e8f944150) )
+
+	ROM_REGION( 0x6000, "gfx_bg", 0 ) /* Located on 834-5167 PCB, AKA Tip Tip-VIDEO */
+	ROM_LOAD( "tip_top_rom_8.u93",   0x00000, 0x2000, CRC(db99a619) SHA1(499029197d26f9aea3ac15d66b5738ce7dea1f6c) )
+	ROM_LOAD( "tip_top_rom_9.u94",   0x02000, 0x2000, CRC(93e2309e) SHA1(bd8a74332cac0cf85f319c1f35d04a4781c9d655) )
+	ROM_LOAD( "tip_top_rom_10.u95",  0x04000, 0x2000, CRC(f27a9407) SHA1(d41c90c89ae28c92bf0c57927357d9b68ed7e0ef) )
+
+	ROM_REGION( 0xc000, "gfx_spr", 0 ) /* Located on 834-5167 PCB, AKA Tip Tip-VIDEO */
+	ROM_LOAD( "tip_top_rom_12.u78",  0x00000, 0x2000, CRC(15e3377a) SHA1(04a7fbfd58924359fae0ba76ed152f325f07beae) )
+	ROM_LOAD( "tip_top_rom_13.u79",  0x02000, 0x2000, CRC(1d1321c8) SHA1(d12e156a24db105c5f941b7ef79f32181b616710) )
+	ROM_LOAD( "tip_top_rom_11.u77",  0x04000, 0x2000, CRC(73e2709f) SHA1(14919facf08f6983c3a9baad031239a1b57c8202) )
+	ROM_LOAD( "tip_top_rom_14.u104", 0x06000, 0x2000, CRC(bf9169fe) SHA1(303d68e38e9a47464f14dc5be6bff1be01b88bb6) )
+	ROM_LOAD( "tip_top_rom_16.u106", 0x08000, 0x2000, CRC(cb6d5775) SHA1(b1f8ead6e6f8ad995baaeb7f8554d41ed2296fff) )
+	ROM_LOAD( "tip_top_rom_15.u105", 0x0a000, 0x2000, CRC(7b15a7a4) SHA1(b1c05e60a1442e4dd56d197be8b768bcbf45e2d9) )
+
+	ROM_REGION( 0x4000, "tilemap_dat", 0 ) /* Located on 834-5167 PCB, Tip Tip-VIDEO */
+	ROM_LOAD( "tip_top_rom_6.u57",   0x0000, 0x2000, CRC(d637f02b) SHA1(29127149924c5bfdeb9456d7df2a5a5d14098794) )
+	ROM_LOAD( "tip_top_rom_7.u58",   0x2000, 0x2000, CRC(80927943) SHA1(4683520c241d209c6cabeaead9b363f046c30f70) )
+
+	ROM_REGION( 0x0200, "proms", 0 ) /* Located on 834-5166 PCB  AKA Tip Top-CONTR */
+	ROM_LOAD( "mr018.u68",    0x0000, 0x200, CRC(56b9f1ba) SHA1(32ae743087f7c2dfba6818df8e9d665d8d9a3ee7) ) /* dumped as TBP28S42, first 256 bytes match MR019 then 0xFF filled */
+ROM_END
+
+ROM_START( tiptop ) /* 3 board stack */
+	ROM_REGION( 0x8000, "maincpu", 0 ) /* Located on 834-5166 PCB  AKA Tip Top-CONTR */
 	ROM_LOAD( "tiptop1.u35",  0x0000, 0x2000, CRC(e19dc77b) SHA1(d3782dd55701e0f5cd426ad2771c1bd0264c366a) )
 	ROM_LOAD( "tiptop2.u34",  0x2000, 0x2000, CRC(3fcd3b6e) SHA1(2898807ee36fca7fbc06616c9a070604beb782b9) )
 	ROM_LOAD( "tiptop3.u33",  0x4000, 0x2000, CRC(1c94250b) SHA1(cb70a91d07b0a9c61a093f1b5d37f2e69d1345c1) )
 	ROM_LOAD( "tiptop4.u32",  0x6000, 0x2000, CRC(577b501b) SHA1(5cad98a60a5241ba9467aa03fcd94c7490e6dbbb) )
 
-	ROM_REGION( 0x2000, "audiocpu", 0 )
-	ROM_LOAD( "congo17.u11",  0x0000, 0x2000, CRC(5024e673) SHA1(6f846146a4e29bcdfd5bd1bc5f1211d344cd5afa) )
+	ROM_REGION( 0x2000, "audiocpu", 0 ) /* Located on 834-5168 PCB  AKA Tip Top-SOUND */
+	ROM_LOAD( "tip_top_rom_17.u11",  0x0000, 0x2000, CRC(5024e673) SHA1(6f846146a4e29bcdfd5bd1bc5f1211d344cd5afa) )
 
-	ROM_REGION( 0x1000, "gfx_tx", 0 )
-	ROM_LOAD( "congo5.u76",   0x00000, 0x1000, CRC(7bf6ba2b) SHA1(3a2bd21b0e0e55cbd737c7b075492b5e8f944150) )
+	ROM_REGION( 0x1000, "gfx_tx", 0 ) /* Located on 834-5166 PCB  AKA Tip Top-CONTR */
+	ROM_LOAD( "tip_top_rom_5.u76",   0x00000, 0x1000, CRC(7bf6ba2b) SHA1(3a2bd21b0e0e55cbd737c7b075492b5e8f944150) )
 
-	ROM_REGION( 0x6000, "gfx_bg", 0 )
-	ROM_LOAD( "congo8.u93",   0x00000, 0x2000, CRC(db99a619) SHA1(499029197d26f9aea3ac15d66b5738ce7dea1f6c) )
-	ROM_LOAD( "congo9.u94",   0x02000, 0x2000, CRC(93e2309e) SHA1(bd8a74332cac0cf85f319c1f35d04a4781c9d655) )
-	ROM_LOAD( "congo10.u95",  0x04000, 0x2000, CRC(f27a9407) SHA1(d41c90c89ae28c92bf0c57927357d9b68ed7e0ef) )
+	ROM_REGION( 0x6000, "gfx_bg", 0 ) /* Located on 834-5167 PCB, AKA Tip Tip-VIDEO */
+	ROM_LOAD( "tip_top_rom_8.u93",   0x00000, 0x2000, CRC(db99a619) SHA1(499029197d26f9aea3ac15d66b5738ce7dea1f6c) )
+	ROM_LOAD( "tip_top_rom_9.u94",   0x02000, 0x2000, CRC(93e2309e) SHA1(bd8a74332cac0cf85f319c1f35d04a4781c9d655) )
+	ROM_LOAD( "tip_top_rom_10.u95",  0x04000, 0x2000, CRC(f27a9407) SHA1(d41c90c89ae28c92bf0c57927357d9b68ed7e0ef) )
 
-	ROM_REGION( 0xc000, "gfx_spr", 0 )
-	ROM_LOAD( "congo12.u78",  0x00000, 0x2000, CRC(15e3377a) SHA1(04a7fbfd58924359fae0ba76ed152f325f07beae) )
-	ROM_LOAD( "congo13.u79",  0x02000, 0x2000, CRC(1d1321c8) SHA1(d12e156a24db105c5f941b7ef79f32181b616710) )
-	ROM_LOAD( "congo11.u77",  0x04000, 0x2000, CRC(73e2709f) SHA1(14919facf08f6983c3a9baad031239a1b57c8202) )
-	ROM_LOAD( "congo14.u104", 0x06000, 0x2000, CRC(bf9169fe) SHA1(303d68e38e9a47464f14dc5be6bff1be01b88bb6) )
-	ROM_LOAD( "congo16.u106", 0x08000, 0x2000, CRC(cb6d5775) SHA1(b1f8ead6e6f8ad995baaeb7f8554d41ed2296fff) )
-	ROM_LOAD( "congo15.u105", 0x0a000, 0x2000, CRC(7b15a7a4) SHA1(b1c05e60a1442e4dd56d197be8b768bcbf45e2d9) )
+	ROM_REGION( 0xc000, "gfx_spr", 0 ) /* Located on 834-5167 PCB, AKA Tip Tip-VIDEO */
+	ROM_LOAD( "tip_top_rom_12.u78",  0x00000, 0x2000, CRC(15e3377a) SHA1(04a7fbfd58924359fae0ba76ed152f325f07beae) )
+	ROM_LOAD( "tip_top_rom_13.u79",  0x02000, 0x2000, CRC(1d1321c8) SHA1(d12e156a24db105c5f941b7ef79f32181b616710) )
+	ROM_LOAD( "tip_top_rom_11.u77",  0x04000, 0x2000, CRC(73e2709f) SHA1(14919facf08f6983c3a9baad031239a1b57c8202) )
+	ROM_LOAD( "tip_top_rom_14.u104", 0x06000, 0x2000, CRC(bf9169fe) SHA1(303d68e38e9a47464f14dc5be6bff1be01b88bb6) )
+	ROM_LOAD( "tip_top_rom_16.u106", 0x08000, 0x2000, CRC(cb6d5775) SHA1(b1f8ead6e6f8ad995baaeb7f8554d41ed2296fff) )
+	ROM_LOAD( "tip_top_rom_15.u105", 0x0a000, 0x2000, CRC(7b15a7a4) SHA1(b1c05e60a1442e4dd56d197be8b768bcbf45e2d9) )
 
-	ROM_REGION( 0x4000, "tilemap_dat", 0 )
-	ROM_LOAD( "congo6.u57",   0x0000, 0x2000, CRC(d637f02b) SHA1(29127149924c5bfdeb9456d7df2a5a5d14098794) )
-	ROM_LOAD( "congo7.u58",   0x2000, 0x2000, CRC(80927943) SHA1(4683520c241d209c6cabeaead9b363f046c30f70) )
+	ROM_REGION( 0x4000, "tilemap_dat", 0 ) /* Located on 834-5167 PCB, AKA Tip Tip-VIDEO */
+	ROM_LOAD( "tip_top_rom_6.u57",   0x0000, 0x2000, CRC(d637f02b) SHA1(29127149924c5bfdeb9456d7df2a5a5d14098794) )
+	ROM_LOAD( "tip_top_rom_7.u58",   0x2000, 0x2000, CRC(80927943) SHA1(4683520c241d209c6cabeaead9b363f046c30f70) )
 
-	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "congo.u68",    0x0000, 0x100, CRC(b788d8ae) SHA1(9765180f3087140c75e5953409df841787558160) )
-	ROM_RELOAD(               0x0100, 0x100 )
+	ROM_REGION( 0x0200, "proms", 0 ) /* Located on 834-5166 PCB  AKA Tip Top-CONTR */
+	ROM_LOAD( "mr018.u68",    0x0000, 0x200, CRC(56b9f1ba) SHA1(32ae743087f7c2dfba6818df8e9d665d8d9a3ee7) ) /* dumped as TBP28S42, first 256 bytes match MR019 then 0xFF filled */
 ROM_END
 
 
@@ -1532,11 +1583,11 @@ static DRIVER_INIT( ixion )
  *************************************/
 
 /* these games run on standard Zaxxon hardware */
-GAME( 1982, zaxxon,   0,      zaxxon,   zaxxon,   0,        ROT90,  "Sega",    "Zaxxon (set 1)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1982, zaxxon,   0,      zaxxon,   zaxxon,   0,        ROT90,  "Sega",    "Zaxxon (set 1)",  GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1982, zaxxon2,  zaxxon, zaxxon,   zaxxon,   0,        ROT90,  "Sega",    "Zaxxon (set 2)",  GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1982, zaxxon3,  zaxxon, zaxxon,   zaxxon,   0,        ROT90,  "Sega",    "Zaxxon (set 3)",  GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1982, zaxxonj,  zaxxon, zaxxon,   zaxxon,   zaxxonj,  ROT90,  "Sega",    "Zaxxon (Japan)",  GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1982, zaxxonb,  zaxxon, zaxxon,   zaxxon,   zaxxonj,  ROT90,  "bootleg", "Jackson",  GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1982, zaxxonb,  zaxxon, zaxxon,   zaxxon,   zaxxonj,  ROT90,  "bootleg", "Jackson",         GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 
 /* standard Zaxxon hardware but extra sound board plugged into 8255 PPI socket and encrypted cpu */
 GAME( 1982, szaxxon,  0,      zaxxon,   szaxxon,  szaxxon,  ROT90,  "Sega",    "Super Zaxxon (315-5013)",  GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
@@ -1551,5 +1602,6 @@ GAME( 1983, ixion,    0,      razmataz, ixion,    ixion,    ROT270, "Sega",    "
 
 /* these games run on a slightly newer Zaxxon hardware with more ROM space and a */
 /* custom sprite DMA chip */
-GAME( 1983, congo,    0,      congo,    congo,    0,        ROT90,  "Sega",    "Congo Bongo", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1983, tiptop,   congo,  congo,    congo,    0,        ROT90,  "Sega",    "Tip Top", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1983, congo,    0,      congo,    congo,    0,        ROT90,  "Sega",    "Congo Bongo (2 board stack)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1983, congoa,   congo,  congo,    congo,    0,        ROT90,  "Sega",    "Congo Bongo (3 board stack)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1983, tiptop,   congo,  congo,    congo,    0,        ROT90,  "Sega",    "Tip Top (3 board stack)",     GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
