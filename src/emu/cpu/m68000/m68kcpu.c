@@ -1318,6 +1318,10 @@ void m68k_memory_interface::init16(address_space &space)
 	write32 = m68k_write32_delegate(FUNC(address_space::write_dword), &space);
 }
 
+/* todo: is it possible to calculate the address map based on CS when they change
+   and install handlers?  Going through this logic for every memory access is
+   very slow */
+
 int m68307_calc_cs(m68ki_cpu_core *m68k, offs_t address)
 {
 	m68307_sim* sim = m68k->m68307SIM;
@@ -1332,6 +1336,32 @@ int m68307_calc_cs(m68ki_cpu_core *m68k, offs_t address)
 	}
 	return 0;
 }
+
+/* see note above */
+
+int m68340_calc_cs(m68ki_cpu_core *m68k, offs_t address)
+{
+	m68340_sim* sim = m68k->m68340SIM;
+
+	if ( !(sim->m_ba[0] & 1) ) return 1;
+
+	for (int i=0;i<4;i++)
+	{
+		if (sim->m_ba[i] & 1)
+		{
+			int mask = ((sim->m_am[i]&0xffffff00) | 0xff);
+			int base = sim->m_ba[i] & 0xffffff00;
+			int fcmask = (sim->m_am[i] & 0xf0);
+			int fcbase = (sim->m_ba[i] & 0xf0) & ~(sim->m_am[i] & 0xf0);
+			int fc = m68k->mmu_tmp_fc;
+
+			if ((address & ~mask) == base && ((fc << 4) & ~fcmask ) == fcbase ) return i+1;
+		}
+	}
+
+	return 0;
+}
+
 
 
 
@@ -1816,6 +1846,15 @@ UINT16 m68307_get_cs(device_t *device, offs_t address)
 	m68ki_cpu_core *m68k = m68k_get_safe_token(device);
 
 	m68k->m68307_currentcs = m68307_calc_cs(m68k, address);
+
+	return m68k->m68307_currentcs;
+}
+
+UINT16 m68340_get_cs(device_t *device, offs_t address)
+{
+	m68ki_cpu_core *m68k = m68k_get_safe_token(device);
+
+	m68k->m68307_currentcs = m68340_calc_cs(m68k, address);
 
 	return m68k->m68307_currentcs;
 }

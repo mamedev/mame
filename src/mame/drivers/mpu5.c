@@ -45,6 +45,11 @@ public:
 		: driver_device(mconfig, type, tag),
 		  m_maincpu(*this, "maincpu")
 	{ }
+	UINT32* m_cpuregion;
+	UINT32* m_mainram;
+
+	DECLARE_READ32_MEMBER(mpu5_mem_r);
+	DECLARE_WRITE32_MEMBER(mpu5_mem_w);
 
 protected:
 
@@ -53,16 +58,71 @@ protected:
 };
 
 
+READ32_MEMBER(mpu5_state::mpu5_mem_r)
+{
+	int pc = cpu_get_pc(&space.device());
+	int cs = m68340_get_cs(m_maincpu, offset * 4);
+
+	switch ( cs )
+	{
+		case 1:
+			return m_cpuregion[offset];
+
+		case 4:
+			offset &=0x3fff;
+			return (m_mainram[offset]);
+
+		default:
+			logerror("%08x maincpu read access offset %08x mem_mask %08x cs %d\n", pc, offset*4, mem_mask, cs);
+
+	}
+
+	return 0x0000;
+}
+
+WRITE32_MEMBER(mpu5_state::mpu5_mem_w)
+{
+	int pc = cpu_get_pc(&space.device());
+	int cs = m68340_get_cs(m_maincpu, offset * 4);
+
+	switch ( cs )
+	{
+		case 4:
+			offset &=0x3fff;
+			COMBINE_DATA(&m_mainram[offset]);
+			break;
+
+
+
+		default:
+			logerror("%08x maincpu write access offset %08x data %08x mem_mask %08x cs %d\n", pc, offset*4, data, mem_mask, cs);
+
+	}
+
+}
+
 static ADDRESS_MAP_START( mpu5_map, AS_PROGRAM, 32, mpu5_state )
-	AM_RANGE(0x000000, 0x2fffff) AM_ROM
+	AM_RANGE(0x00000000, 0xffffffff) AM_READWRITE(mpu5_mem_r, mpu5_mem_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START(  mpu5 )
 INPUT_PORTS_END
 
+
+static MACHINE_START( mpu5 )
+{
+	mpu5_state *state = machine.driver_data<mpu5_state>();
+	state->m_cpuregion = (UINT32*)state->memregion( "maincpu" )->base();
+	state->m_mainram = (UINT32*)auto_alloc_array_clear(machine, UINT32, 0x10000);
+
+}
+
+
 static MACHINE_CONFIG_START( mpu5, mpu5_state )
 	MCFG_CPU_ADD("maincpu", M68340, 16000000)	 // ?
 	MCFG_CPU_PROGRAM_MAP(mpu5_map)
+
+	MCFG_MACHINE_START( mpu5 )
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	/* unknown sound */

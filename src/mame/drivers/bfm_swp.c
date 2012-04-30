@@ -1,15 +1,5 @@
-/* Bellfruit SWP (Skill With Prizes) Video hardware */
-
-/*
-    This is 'Cobra 3' ?
-    is that an expansion board for Scorpion 4, or somehow related?
-    The CPU is the same (68340)
-
-    Radio Times is probably the only *COMPLETE* dump here, as it
-    includes the CD.  Other games probably have CDs or HDDs too.
-
-    Telly Addicts has a HDD dump (I'm assuming it's the same
-    platform) but no sound roms.
+/* Bellfruit SWP (Skill With Prizes) Video hardware 
+    aka Cobra 3
 
 */
 
@@ -128,19 +118,80 @@ class bfm_swp_state : public driver_device
 {
 public:
 	bfm_swp_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_maincpu(*this, "maincpu")
+	{ }
+
+	UINT32* m_cpuregion;
+	UINT32* m_mainram;
+
+	DECLARE_READ32_MEMBER(bfm_swp_mem_r);
+	DECLARE_WRITE32_MEMBER(bfm_swp_mem_w);
+
 
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 	{
 		return 0;
 	}
+
+protected:
+
+	// devices
+	required_device<cpu_device> m_maincpu;
+
 };
 
 
 
+
+READ32_MEMBER(bfm_swp_state::bfm_swp_mem_r)
+{
+	int pc = cpu_get_pc(&space.device());
+	int cs = m68340_get_cs(m_maincpu, offset * 4);
+
+	switch ( cs )
+	{
+		case 1:
+			if (offset<0x100000/4) return m_cpuregion[offset];
+
+		case 2:
+			offset&=0x3fff;
+			return m_mainram[offset];
+
+		default:
+			logerror("%08x maincpu read access offset %08x mem_mask %08x cs %d\n", pc, offset*4, mem_mask, cs);
+
+	}
+
+	return 0x0000;
+}
+
+WRITE32_MEMBER(bfm_swp_state::bfm_swp_mem_w)
+{
+	int pc = cpu_get_pc(&space.device());
+	int cs = m68340_get_cs(m_maincpu, offset * 4);
+
+	switch ( cs )
+	{
+		default:
+			logerror("%08x maincpu write access offset %08x data %08x mem_mask %08x cs %d\n", pc, offset*4, data, mem_mask, cs);
+
+		case 2:
+			offset&=0x3fff;
+			COMBINE_DATA(&m_mainram[offset]);
+			break;
+
+
+	}
+
+}
+
+
+
+
 static ADDRESS_MAP_START( bfm_swp_map, AS_PROGRAM, 32, bfm_swp_state )
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0xb00000, 0xb03fff) AM_RAM
+	AM_RANGE(0x00000000, 0x000fffff) AM_ROM
+	AM_RANGE(0x00000000, 0xffffffff) AM_READWRITE(bfm_swp_mem_r, bfm_swp_mem_w)
 ADDRESS_MAP_END
 
 
@@ -148,11 +199,22 @@ static INPUT_PORTS_START( bfm_swp )
 INPUT_PORTS_END
 
 
+static MACHINE_START( bfm_swp )
+{
+	bfm_swp_state *state = machine.driver_data<bfm_swp_state>();
+	state->m_cpuregion = (UINT32*)state->memregion( "maincpu" )->base();
+	state->m_mainram = (UINT32*)auto_alloc_array_clear(machine, UINT32, 0x10000);
+
+}
+
+
 static MACHINE_CONFIG_START( bfm_swp, bfm_swp_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68020,16000000) /* 68340 */
+	MCFG_CPU_ADD("maincpu", M68340, 16000000)
 	MCFG_CPU_PROGRAM_MAP(bfm_swp_map)
+
+	MCFG_MACHINE_START( bfm_swp )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -232,8 +294,8 @@ ROM_START( c3_totp )
 	ROM_LOAD( "totpsnd.lhs", 0x000000, 0x080000, CRC(56a73136) SHA1(10656ede18de9432a8a728cc59d000b5b1bf0150) )
 	ROM_LOAD( "totpsnd.rhs", 0x080000, 0x080000, CRC(28d156ab) SHA1(ebf5c4e008015b9b56b3aa5228c05b8e298daa80) )
 
-	DISK_REGION( "scsi" ) // CD or HDD
-	DISK_IMAGE_READONLY( "cd or hdd", 0, NO_DUMP )
+	DISK_REGION( "scsi" ) // uses a CD, only one we've seen has been damaged to a point where not all data could be read tho
+	DISK_IMAGE_READONLY( "cd", 0, NO_DUMP )
 ROM_END
 
 ROM_START( c3_ppays )

@@ -19,12 +19,32 @@ class astrafr_state : public driver_device
 {
 public:
 	astrafr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
+		: driver_device(mconfig, type, tag),
+		  m_maincpu(*this, "maincpu"),
+		  m_slavecpu(*this, "slavecpu")
+
 	{
 		fgpa_first_read_addr = 0xffff;
 		fgpa_rom_write_addr = 0xffff;
 		fgpa_after_rom_write_addr = 0xffff;
 	}
+
+	UINT32* m_cpuregion;
+	int  m_cpuregion_size;
+	UINT32* m_mainram;
+
+	UINT32* m_slavecpuregion;
+	int  m_slavecpuregion_size;
+	UINT32* m_slaveram;
+
+
+
+	DECLARE_READ32_MEMBER(astrafr_mem_r);
+	DECLARE_WRITE32_MEMBER(astrafr_mem_w);
+
+	DECLARE_READ32_MEMBER(astrafr_slave_mem_r);
+	DECLARE_WRITE32_MEMBER(astrafr_slave_mem_w);
+
 
 	// ports move above from game to game..
 	UINT16 fgpa_rom_write_addr;
@@ -91,47 +111,165 @@ public:
 			logerror("%08x astra_fgpa_slave_w offset %02x %02x\n", pc, offset, data);
 		}
 	}
+	
+	// devices
+	required_device<cpu_device> m_maincpu;
+	optional_device<cpu_device> m_slavecpu;
 
 };
 
 
-static ADDRESS_MAP_START( astrafr_master_map, AS_PROGRAM, 32, astrafr_state )
-	AM_RANGE(0x000000, 0x1fffff) AM_ROM
-	AM_RANGE(0x800000, 0x8000ff) AM_READWRITE8(astra_fgpa_r, astra_fgpa_w, 0xffffffff)
-	AM_RANGE(0x400000, 0x40ffff) AM_RAM // as_partyd set
-ADDRESS_MAP_END
 
-// probably identical, afaik they're linked units..
-static ADDRESS_MAP_START( astrafr_slave_map, AS_PROGRAM, 32, astrafr_state )
-	AM_RANGE(0x000000, 0x1fffff) AM_ROM
-	AM_RANGE(0x800000, 0x8000ff) AM_READWRITE8(astra_fgpa_slave_r, astra_fgpa_slave_w, 0xffffffff)
-	AM_RANGE(0x400000, 0x40ffff) AM_RAM // as_partyd set
+READ32_MEMBER(astrafr_state::astrafr_mem_r)
+{
+	int pc = cpu_get_pc(&space.device());
+	int cs = m68340_get_cs(m_maincpu, offset * 4);
+
+	switch ( cs )
+	{
+		case 1:
+			if (offset<m_cpuregion_size)
+				return m_cpuregion[offset];
+			else
+				return 0x0000;
+
+		case 2:
+			offset &= 0x3fff;
+			return m_mainram[offset];
+
+		default:
+			logerror("%08x maincpu read access offset %08x mem_mask %08x cs %d\n", pc, offset*4, mem_mask, cs);
+
+	}
+
+	return 0x0000;
+}
+
+
+
+WRITE32_MEMBER(astrafr_state::astrafr_mem_w)
+{
+	int pc = cpu_get_pc(&space.device());
+	int address = offset * 4;
+	int cs = m68340_get_cs(m_maincpu, address);
+
+
+	switch ( cs )
+	{
+		case 0: // some sets end up writng the FGPA data with CS0, I guess the CS logic is wrong??
+		case 3:
+			address &= 0xfffff;
+
+			if (mem_mask&0xff000000) astra_fgpa_w(space, address+0, data >> 24);
+			if (mem_mask&0x00ff0000) astra_fgpa_w(space, address+1, data >> 16);
+			if (mem_mask&0x0000ff00) astra_fgpa_w(space, address+2, data >> 8);
+			if (mem_mask&0x000000ff) astra_fgpa_w(space, address+3, data >> 0);
+			break;
+
+		case 2:
+			offset &= 0x3fff;
+			COMBINE_DATA(&m_mainram[offset]);
+			break;
+
+		default:
+			logerror("%08x maincpu write access offset %08x data %08x mem_mask %08x cs %d\n", pc, address, data, mem_mask, cs);
+
+	}
+}
+
+READ32_MEMBER(astrafr_state::astrafr_slave_mem_r)
+{
+	int pc = cpu_get_pc(&space.device());
+	int cs = m68340_get_cs(m_slavecpu, offset * 4);
+
+	switch ( cs )
+	{
+		case 1:
+			if (offset<m_slavecpuregion_size)
+				return m_slavecpuregion[offset];
+			else
+				return 0x0000;
+
+		case 2:
+			offset &= 0x3fff;
+			return m_slaveram[offset];
+
+		default:
+			logerror("%08x slavecpu read access offset %08x mem_mask %08x cs %d\n", pc, offset*4, mem_mask, cs);
+
+	}
+
+	return 0x0000;
+}
+
+WRITE32_MEMBER(astrafr_state::astrafr_slave_mem_w)
+{
+	int pc = cpu_get_pc(&space.device());
+	int address = offset * 4;
+	int cs = m68340_get_cs(m_slavecpu, address);
+
+
+	switch ( cs )
+	{
+		case 0: // some sets end up writng the FGPA data with CS0, I guess the CS logic is wrong??
+		case 3:
+			address &= 0xfffff;
+
+			if (mem_mask&0xff000000) astra_fgpa_slave_w(space, address+0, data >> 24);
+			if (mem_mask&0x00ff0000) astra_fgpa_slave_w(space, address+1, data >> 16);
+			if (mem_mask&0x0000ff00) astra_fgpa_slave_w(space, address+2, data >> 8);
+			if (mem_mask&0x000000ff) astra_fgpa_slave_w(space, address+3, data >> 0);
+			break;
+
+		case 2:
+			offset &= 0x3fff;
+			COMBINE_DATA(&m_slaveram[offset]);
+			break;
+
+		default:
+			logerror("%08x slavecpu write access offset %08x data %08x mem_mask %08x cs %d\n", pc, address, data, mem_mask, cs);
+
+	}
+}
+
+
+
+static ADDRESS_MAP_START( astrafr_master_map, AS_PROGRAM, 32, astrafr_state )
+	AM_RANGE(0x000000, 0xffffffff) AM_READWRITE(astrafr_mem_r, astrafr_mem_w)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( astrafr_master_alt_map, AS_PROGRAM, 32, astrafr_state )
-	AM_RANGE(0x0000000, 0x01fffff) AM_ROM
-	AM_RANGE(0x1000000, 0x1009fff) AM_RAM // ?
-	AM_RANGE(0x2000000, 0x20000ff) AM_READWRITE8(astra_fgpa_r, astra_fgpa_w, 0xffffffff)
+	AM_RANGE(0x000000, 0xffffffff) AM_READWRITE(astrafr_mem_r, astrafr_mem_w)
 ADDRESS_MAP_END
-
-
-
 
 static ADDRESS_MAP_START( astra_map, AS_PROGRAM, 32, astrafr_state )
-	AM_RANGE(0x000000, 0x1fffff) AM_ROM
-	AM_RANGE(0x800000, 0x8000ff) AM_READWRITE8(astra_fgpa_r, astra_fgpa_w, 0xffffffff)
-	AM_RANGE(0x400000, 0x40ffff) AM_RAM // as_partyd set
+	AM_RANGE(0x000000, 0xffffffff) AM_READWRITE(astrafr_mem_r, astrafr_mem_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( astra_alt_map, AS_PROGRAM, 32, astrafr_state )
-	AM_RANGE(0x0000000, 0x01fffff) AM_ROM
-	AM_RANGE(0x1000000, 0x1009fff) AM_RAM // ?
-	AM_RANGE(0x2000000, 0x20000ff) AM_READWRITE8(astra_fgpa_r, astra_fgpa_w, 0xffffffff)
+// probably identical, afaik they're linked units..
+static ADDRESS_MAP_START( astrafr_slave_map, AS_PROGRAM, 32, astrafr_state )
+	AM_RANGE(0x000000, 0xffffffff) AM_READWRITE(astrafr_slave_mem_r, astrafr_slave_mem_w)
 ADDRESS_MAP_END
+
 
 static INPUT_PORTS_START( astrafr )
 INPUT_PORTS_END
+
+static MACHINE_START( astra_common )
+{
+	astrafr_state *state = machine.driver_data<astrafr_state>();
+
+	state->m_cpuregion = (UINT32*)state->memregion( "maincpu" )->base();
+	state->m_cpuregion_size = state->memregion( "maincpu" )->bytes()/4;
+	state->m_mainram = (UINT32*)auto_alloc_array_clear(machine, UINT32, 0x10000);
+
+	state->m_slavecpuregion = (UINT32*)state->memregion( "slavecpu" )->base();
+	state->m_slavecpuregion_size = state->memregion( "slavecpu" )->bytes()/4;
+	state->m_slaveram = (UINT32*)auto_alloc_array_clear(machine, UINT32, 0x10000);
+
+
+}
 
 /* the FPGA area read/write addresses move around ... */
 static MACHINE_START( astra_37 )
@@ -140,6 +278,7 @@ static MACHINE_START( astra_37 )
 	state->fgpa_after_rom_write_addr = 0x30;
 	state->fgpa_first_read_addr = 0x33;
 	state->fgpa_rom_write_addr = 0x37;
+	MACHINE_START_CALL(astra_common);
 }
 
 static MACHINE_START( astra_2e )
@@ -148,6 +287,7 @@ static MACHINE_START( astra_2e )
 	state->fgpa_after_rom_write_addr = 0x20;
 	state->fgpa_first_read_addr = 0x23;
 	state->fgpa_rom_write_addr = 0x2e;
+	MACHINE_START_CALL(astra_common);
 }
 
 
@@ -157,6 +297,8 @@ static MACHINE_CONFIG_START( astrafr_dual, astrafr_state )
 
 	MCFG_CPU_ADD("slavecpu", M68340, 16000000)
 	MCFG_CPU_PROGRAM_MAP(astrafr_slave_map)
+
+	MCFG_MACHINE_START( astra_common )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( astrafr_dual_2e, astrafr_dual )
@@ -184,6 +326,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( astra_single, astrafr_state )
 	MCFG_CPU_ADD("maincpu", M68340, 16000000)
 	MCFG_CPU_PROGRAM_MAP(astra_map)
+	MCFG_MACHINE_START( astra_common )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( astra_single_37, astra_single )
@@ -200,12 +343,14 @@ static MACHINE_START( astra_57 )
 //  state->fgpa_after_rom_write_addr = 0x20;
 //  state->fgpa_first_read_addr = 0x23;
 	state->fgpa_rom_write_addr = 0x57;
+	MACHINE_START_CALL(astra_common);
 }
 
 
 static MACHINE_CONFIG_START( astra_single_alt, astrafr_state )
 	MCFG_CPU_ADD("maincpu", M68340, 16000000)
-	MCFG_CPU_PROGRAM_MAP(astra_alt_map)
+	MCFG_CPU_PROGRAM_MAP(astra_map)
+	MCFG_MACHINE_START( astra_common )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( astra_single_alt_57, astra_single_alt )
@@ -2169,7 +2314,7 @@ GAME( 200?, as_tble,  as_tbl		  , astra_single,    astrafr,    0, 	ROT0,  "Astra
 GAME( 200?, as_tblf,  as_tbl		  , astra_single,    astrafr,    0, 	ROT0,  "Astra", "Triple Bells (Astra, V301)"		, GAME_IS_SKELETON_MECHANICAL)
 GAME( 200?, as_td,   0  	  , astra_single_2e,    astrafr,    astradec,	ROT0,  "Astra", "Twin Dragons (Astra, V103)"		, GAME_IS_SKELETON_MECHANICAL)
 
-GAME( 200?, as_twp,   0     	  , astra_single,    astrafr,    0, 	ROT0,  "Astra", "Twin Pots (Astra, V106)"		, GAME_IS_SKELETON_MECHANICAL)
+GAME( 200?, as_twp,   0     	  , astra_single_2e,    astrafr,    0, 	ROT0,  "Astra", "Twin Pots (Astra, V106)"		, GAME_IS_SKELETON_MECHANICAL)
 GAME( 200?, as_twpa,  as_twp      , astra_single,    astrafr,    0, 	ROT0,  "Astra", "Twin Pots (Astra, V104)"		, GAME_IS_SKELETON_MECHANICAL)
 GAME( 200?, as_vn,    0		  , astrafr_dual_alt_37,    astrafr,    astradec_dual,	ROT0,  "Astra", "Vegas Nights (Astra, V205)"		, GAME_IS_SKELETON_MECHANICAL)
 GAME( 200?, as_vcv,    0		  , astra_single,    astrafr,    astradec,	ROT0,  "Astra", "Viva Cash Vegas (Astra, V005)"		, GAME_IS_SKELETON_MECHANICAL)

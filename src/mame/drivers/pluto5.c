@@ -28,6 +28,8 @@
   ---------------------------------------------------------------------
 
   Pluto 5 Technical Notes....
+   (why is this information here? it seems to be c+p straight from a tech manual
+    and is completely unneccessary)
 
 
   * Clocks...
@@ -180,21 +182,77 @@ class pluto5_state : public driver_device
 {
 public:
 	pluto5_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_maincpu(*this, "maincpu")
+	{ }
+
+	UINT32* m_cpuregion;
+	UINT32* m_mainram;
+
+	DECLARE_READ32_MEMBER(pluto5_mem_r);
+	DECLARE_WRITE32_MEMBER(pluto5_mem_w);
+
+protected:
+
+	// devices
+	required_device<cpu_device> m_maincpu;
 
 };
 
+READ32_MEMBER(pluto5_state::pluto5_mem_r)
+{
+	int pc = cpu_get_pc(&space.device());
+	int cs = m68340_get_cs(m_maincpu, offset * 4);
+
+	switch ( cs )
+	{
+		case 1:
+			return m_cpuregion[offset];
+
+		default:
+			logerror("%08x maincpu read access offset %08x mem_mask %08x cs %d\n", pc, offset*4, mem_mask, cs);
+
+	}
+
+	return 0x0000;
+}
+
+WRITE32_MEMBER(pluto5_state::pluto5_mem_w)
+{
+	int pc = cpu_get_pc(&space.device());
+	int cs = m68340_get_cs(m_maincpu, offset * 4);
+
+	switch ( cs )
+	{
+		default:
+			logerror("%08x maincpu write access offset %08x data %08x mem_mask %08x cs %d\n", pc, offset*4, data, mem_mask, cs);
+
+	}
+
+}
+
 
 static ADDRESS_MAP_START( pluto5_map, AS_PROGRAM, 32, pluto5_state )
-	AM_RANGE(0x000000, 0x2fffff) AM_ROM
+	AM_RANGE(0x00000000, 0xffffffff) AM_READWRITE(pluto5_mem_r, pluto5_mem_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START(  pluto5 )
 INPUT_PORTS_END
 
+static MACHINE_START( pluto5 )
+{
+	pluto5_state *state = machine.driver_data<pluto5_state>();
+	state->m_cpuregion = (UINT32*)state->memregion( "maincpu" )->base();
+	state->m_mainram = (UINT32*)auto_alloc_array_clear(machine, UINT32, 0x10000);
+
+}
+
 static MACHINE_CONFIG_START( pluto5, pluto5_state )
 	MCFG_CPU_ADD("maincpu", M68340, 16000000)
 	MCFG_CPU_PROGRAM_MAP(pluto5_map)
+
+	MCFG_MACHINE_START( pluto5 )
+
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	/* unknown sound */

@@ -58,6 +58,55 @@ UINT8 read_input_matrix(running_machine &machine, int row)
 	return value;
 }
 
+READ16_MEMBER(sc4_state::sc4_cs1_r)
+{
+	int pc = cpu_get_pc(&space.device());
+
+	if (offset<0x100000/2)
+	{
+		// allow some sets to boot, should probably return this data on Mbus once we figure out what it is
+		if ((pc == m_chk41addr) && (offset == m_chk41addr>>1))
+		{
+			UINT32 r_A0 = cpu_get_reg(&space.device(), M68K_A0);
+			UINT32 r_A1 = cpu_get_reg(&space.device(), M68K_A1);
+			UINT32 r_D1 = cpu_get_reg(&space.device(), M68K_D1);
+
+			if (r_D1 == 0x7)
+			{
+				bool valid = true;
+				for (int i=0;i<8;i++)
+				{
+					UINT8 code = space.read_byte(r_A0+i);
+					if (code != 0xff) // assume our mbus code just returns 0xff for now..
+						valid = false;
+				}
+
+				if (valid && m_dochk41)
+				{
+					m_dochk41 = false;
+					// the value is actually random.. probably based on other reads
+					// making this a comparison?
+					printf("Ident code? ");
+					for (int i=0;i<8;i++)
+					{
+						UINT8 code = space.read_byte(r_A1+i);
+						printf("%02x",code);
+						space.write_byte(r_A0+i, code);
+					}
+					printf("\n");
+				}
+			}
+		}
+
+
+		return m_cpuregion[offset];
+	}
+	else
+		logerror("%08x maincpu read access offset %08x mem_mask %04x cs %d\n", pc, offset*2, mem_mask, 1);
+
+	return 0x0000;
+}
+
 READ16_MEMBER(sc4_state::sc4_mem_r)
 {
 	int pc = cpu_get_pc(&space.device());
@@ -70,49 +119,9 @@ READ16_MEMBER(sc4_state::sc4_mem_r)
 	switch ( cs )
 	{
 		case 1:
-			if (offset<0x100000/2)
-			{
-				// allow some sets to boot, should probably return this data on Mbus once we figure out what it is
-				if ((pc == m_chk41addr) && (offset == m_chk41addr>>1))
-				{
-					UINT32 r_A0 = cpu_get_reg(&space.device(), M68K_A0);
-					UINT32 r_A1 = cpu_get_reg(&space.device(), M68K_A1);
-					UINT32 r_D1 = cpu_get_reg(&space.device(), M68K_D1);
-
-					if (r_D1 == 0x7)
-					{
-						bool valid = true;
-						for (int i=0;i<8;i++)
-						{
-							UINT8 code = space.read_byte(r_A0+i);
-							if (code != 0xff) // assume our mbus code just returns 0xff for now..
-								valid = false;
-						}
-
-						if (valid && m_dochk41)
-						{
-							m_dochk41 = false;
-							// the value is actually random.. probably based on other reads
-							// making this a comparison?
-							printf("Ident code? ");
-							for (int i=0;i<8;i++)
-							{
-								UINT8 code = space.read_byte(r_A1+i);
-								printf("%02x",code);
-								space.write_byte(r_A0+i, code);
-							}
-							printf("\n");
-						}
-					}
-				}
+			return sc4_cs1_r(space,offset,mem_mask);
 
 
-				return m_cpuregion[offset];
-
-			}
-			else
-				logerror("%08x maincpu read access offset %08x mem_mask %04x cs %d\n", pc, offset*2, mem_mask, cs);
-			break;
 
 		case 2:
 			base = 0x800000/2;
@@ -378,11 +387,57 @@ WRITE16_MEMBER(sc4_state::sc4_mem_w)
 }
 
 static ADDRESS_MAP_START( sc4_map, AS_PROGRAM, 16, sc4_state )
+	AM_RANGE(0x0000000, 0x0fffff) AM_READ(sc4_cs1_r) // technically we should be going through the cs handler, but this is always set to ROM, and assuming that is a lot faster
 	AM_RANGE(0x0000000, 0xffffff) AM_READWRITE(sc4_mem_r, sc4_mem_w)
 ADDRESS_MAP_END
 
+
+
+
+READ32_MEMBER(sc4_adder4_state::adder4_mem_r)
+{
+	int pc = cpu_get_pc(&space.device());
+	int cs = m68340_get_cs(m_adder4cpu, offset * 4);
+
+	switch ( cs )
+	{
+		case 1:
+			return m_adder4cpuregion[offset];
+
+		case 2:
+			offset &=0x3fff;
+			return m_adder4ram[offset];
+
+		default:
+			logerror("%08x adder4cpu read access offset %08x mem_mask %08x cs %d\n", pc, offset*4, mem_mask, cs);
+
+	}
+
+	return 0x0000;
+}
+
+WRITE32_MEMBER(sc4_adder4_state::adder4_mem_w)
+{
+	int pc = cpu_get_pc(&space.device());
+	int cs = m68340_get_cs(m_adder4cpu, offset * 4);
+
+	switch ( cs )
+	{
+		default:
+			logerror("%08x adder4cpu write access offset %08x data %08x mem_mask %08x cs %d\n", pc, offset*4, data, mem_mask, cs);
+
+		case 2:
+			offset &=0x3fff;
+			COMBINE_DATA(&m_adder4ram[offset]);
+			break;
+
+
+	}
+
+}
+
 static ADDRESS_MAP_START( sc4_adder4_map, AS_PROGRAM, 32, sc4_adder4_state )
-	AM_RANGE(0x000000, 0x2fffff) AM_ROM
+	AM_RANGE(0x00000000, 0xffffffff) AM_READWRITE(adder4_mem_r, adder4_mem_w)
 ADDRESS_MAP_END
 
 
@@ -722,9 +777,20 @@ MACHINE_CONFIG_START( sc4, sc4_state )
 MACHINE_CONFIG_END
 
 
+
+static MACHINE_START( adder4 )
+{
+	sc4_adder4_state *state = machine.driver_data<sc4_adder4_state>();
+	state->m_adder4cpuregion = (UINT32*)state->memregion( "adder4" )->base();
+	state->m_adder4ram = (UINT32*)auto_alloc_array_clear(machine, UINT32, 0x10000);
+	MACHINE_START_CALL(sc4);
+}
+
 MACHINE_CONFIG_DERIVED_CLASS( sc4_adder4, sc4, sc4_adder4_state )
 	MCFG_CPU_ADD("adder4", M68340, 25175000)	 // 68340 (CPU32 core)
 	MCFG_CPU_PROGRAM_MAP(sc4_adder4_map)
+
+	MCFG_MACHINE_START( adder4 )
 MACHINE_CONFIG_END
 
 

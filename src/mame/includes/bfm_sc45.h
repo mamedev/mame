@@ -51,6 +51,8 @@ public:
 
 	DECLARE_READ16_MEMBER(sc4_mem_r);
 	DECLARE_WRITE16_MEMBER(sc4_mem_w);
+
+	DECLARE_READ16_MEMBER(sc4_cs1_r);
 };
 
 class sc4_adder4_state : public sc4_state
@@ -60,6 +62,13 @@ public:
 		: sc4_state(mconfig, type, tag),
 		  m_adder4cpu(*this, "adder4")
 	{ }
+	
+	UINT32* m_adder4cpuregion;
+	UINT32* m_adder4ram;
+
+	DECLARE_READ32_MEMBER(adder4_mem_r);
+	DECLARE_WRITE32_MEMBER(adder4_mem_w);
+
 
 	// devices
 	required_device<cpu_device> m_adder4cpu;
