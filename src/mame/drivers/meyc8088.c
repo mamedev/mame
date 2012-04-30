@@ -30,6 +30,9 @@
 #include "sound/dac.h"
 #include "video/resnet.h"
 
+#include "gldarrow.lh"
+
+
 class meyc8088_state : public driver_device
 {
 public:
@@ -245,14 +248,14 @@ static WRITE8_DEVICE_HANDLER(meyc8088_lights1_w)
 {
 	// lite 1-8
 	for (int i = 0; i < 8; i++)
-		output_set_lamp_value(i, data >> i & 1);
+		output_set_lamp_value(i, ~data >> i & 1);
 }
 
 static WRITE8_DEVICE_HANDLER(meyc8088_lights2_w)
 {
 	// lite 9-16
 	for (int i = 0; i < 8; i++)
-		output_set_lamp_value(i + 8, data >> i & 1);
+		output_set_lamp_value(i + 8, ~data >> i & 1);
 }
 
 static WRITE8_DEVICE_HANDLER(meyc8088_common_w)
@@ -405,4 +408,4 @@ ROM_START( gldarrow )
 ROM_END
 
 
-GAME( 1984, gldarrow, 0,        meyc8088, gldarrow, 0, ROT0,  "Meyco Games, Inc.", "Golden Arrow (Standard G8-03)", 0 )
+GAMEL(1984, gldarrow, 0,        meyc8088, gldarrow, 0, ROT0,  "Meyco Games, Inc.", "Golden Arrow (Standard G8-03)", 0, layout_gldarrow )

@@ -2072,6 +2072,8 @@ $(DRIVERS)/meyc8080.o:	$(LAYOUT)/wldarrow.lh \
 			$(LAYOUT)/mdrawpkr.lh \
 			$(LAYOUT)/meybjack.lh
 
+$(DRIVERS)/meyc8088.o:	$(LAYOUT)/gldarrow.lh
+
 $(DRIVERS)/midzeus.o:	$(LAYOUT)/crusnexo.lh
 
 $(DRIVERS)/mil4000.o:	$(LAYOUT)/mil4000.lh

@@ -4030,6 +4030,7 @@ src/mame/layout/fortecrd.lay svneol=native#text/plain
 src/mame/layout/galaxi.lay -text svneol=native#plain/text
 src/mame/layout/gamball.lay svneol=native#text/plain
 src/mame/layout/geebee.lay svneol=native#text/plain
+src/mame/layout/gldarrow.lay svneol=native#text/plain
 src/mame/layout/gldncrwn.lay svneol=native#text/plain
 src/mame/layout/gldnpkr.lay svneol=native#text/plain
 src/mame/layout/globalfr.lay svneol=native#text/plain

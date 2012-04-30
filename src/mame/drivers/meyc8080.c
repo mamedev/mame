@@ -380,11 +380,11 @@ static INPUT_PORTS_START( wldarrow )
 	PORT_SERVICE_DIPLOC( 0x80, IP_ACTIVE_HIGH, "BSW:8" )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_CODE(KEYCODE_C) PORT_NAME("Stop Reel 3")	/* Skill Stop only? */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_CODE(KEYCODE_X) PORT_NAME("Stop Reel 2")	/* Skill Stop only? */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_CODE(KEYCODE_Z) PORT_NAME("Stop Reel 1")	/* Skill Stop only? */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CODE(KEYCODE_M) PORT_NAME("Start")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CODE(KEYCODE_N) PORT_NAME("Bet")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SLOT_STOP3 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SLOT_STOP2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SLOT_STOP1 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Meter Reset")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Meter Read")
 	PORT_DIPNAME( 0x80, 0x80, "Night Switch" ) PORT_CODE(KEYCODE_F1) PORT_TOGGLE
@@ -742,8 +742,8 @@ ROM_END
  *
  *************************************/
 
-/*     YEAR  NAME       PARENT    MACHINE   INPUT      INIT  ROT    COMPANY              FULLNAME                                    FLAGS                                      LAYOUT  */
-GAMEL( 1982, wldarrow,  0,        meyc8080, wldarrow,  0,    ROT0, "Meyco Games, Inc.", "Wild Arrow (color, Standard V4.8)",         GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_wldarrow  ) // B&W version not dumped yet
-GAMEL( 1984, mdrawpkr,  0,        meyc8080, mdrawpkr,  0,    ROT0, "Meyco Games, Inc.", "Draw Poker - Joker's Wild (Standard)",      GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_mdrawpkr  ) // year not shown, but it is in mdrawpkra
-GAMEL( 1984, mdrawpkra, mdrawpkr, meyc8080, mdrawpkra, 0,    ROT0, "Meyco Games, Inc.", "Draw Poker - Joker's Wild (02-11)",         GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_mdrawpkr  )
-GAMEL( 1983, casbjack,  0,        meyc8080, casbjack,  0,    ROT0, "Meyco Games, Inc.", "Casino Black Jack (color, Standard 00-05)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_meybjack  ) // B&W version not dumped yet
+/*    YEAR  NAME       PARENT    MACHINE   INPUT      INIT  ROT    COMPANY              FULLNAME                                    FLAGS                                      LAYOUT  */
+GAMEL(1982, wldarrow,  0,        meyc8080, wldarrow,  0,    ROT0, "Meyco Games, Inc.", "Wild Arrow (color, Standard V4.8)",         GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_wldarrow ) // B&W version not dumped yet
+GAMEL(1984, mdrawpkr,  0,        meyc8080, mdrawpkr,  0,    ROT0, "Meyco Games, Inc.", "Draw Poker - Joker's Wild (Standard)",      GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_mdrawpkr ) // year not shown, but it is in mdrawpkra
+GAMEL(1984, mdrawpkra, mdrawpkr, meyc8080, mdrawpkra, 0,    ROT0, "Meyco Games, Inc.", "Draw Poker - Joker's Wild (02-11)",         GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_mdrawpkr )
+GAMEL(1983, casbjack,  0,        meyc8080, casbjack,  0,    ROT0, "Meyco Games, Inc.", "Casino Black Jack (color, Standard 00-05)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_meybjack ) // B&W version not dumped yet
