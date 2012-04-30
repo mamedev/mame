@@ -30,14 +30,6 @@ Notes:
 #include "includes/nbmj9195.h"
 
 
-#define SIGNED_DAC	0		// 0:unsigned DAC, 1:signed DAC
-#if SIGNED_DAC
-#define DAC_WRITE	dac_signed_w
-#else
-#define DAC_WRITE	dac_w
-#endif
-
-
 WRITE8_MEMBER(nbmj9195_state::nbmj9195_soundbank_w)
 {
 	UINT8 *SNDROM = memregion("audiocpu")->base();
@@ -341,10 +333,10 @@ WRITE8_MEMBER(nbmj9195_state::tmpz84c011_pio_w)
 				nbmj9195_soundbank_w(space, 0, data);
 				break;
 			case 6:			/* PB_1 */
-				DAC_WRITE(machine().device("dac2"), 0, data);
+				dac_w(machine().device("dac2"), 0, data);
 				break;
 			case 7:			/* PC_1 */
-				DAC_WRITE(machine().device("dac1"), 0, data);
+				dac_w(machine().device("dac1"), 0, data);
 				break;
 			case 8:			/* PD_1 */
 				break;
@@ -379,10 +371,10 @@ WRITE8_MEMBER(nbmj9195_state::tmpz84c011_pio_w)
 				nbmj9195_soundbank_w(space, 0, data);
 				break;
 			case 6:			/* PB_1 */
-				DAC_WRITE(machine().device("dac2"), 0, data);
+				dac_w(machine().device("dac1"), 0, data);
 				break;
 			case 7:			/* PC_1 */
-				DAC_WRITE(machine().device("dac1"), 0, data);
+				dac_w(machine().device("dac2"), 0, data);
 				break;
 			case 8:			/* PD_1 */
 				break;
@@ -669,6 +661,7 @@ static DRIVER_INIT( nbmj9195 )
 
 	// initialize sound rom bank
 	state->nbmj9195_soundbank_w(*space, 0, 0);
+	logerror("DRIVER_INIT( nbmj9195 )\n");
 }
 
 static ADDRESS_MAP_START( tmpz84c011_regs, AS_IO, 8, nbmj9195_state )
@@ -739,7 +732,6 @@ static ADDRESS_MAP_START( mjuraden_io_map, AS_IO, 8, nbmj9195_state )
 	AM_RANGE(0xb6, 0xb6) AM_WRITE(nbmj9195_inputportsel_w)
 ADDRESS_MAP_END
 
-
 static ADDRESS_MAP_START( koinomp_io_map, AS_IO, 8, nbmj9195_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_IMPORT_FROM( tmpz84c011_regs )
@@ -758,7 +750,6 @@ static ADDRESS_MAP_START( koinomp_io_map, AS_IO, 8, nbmj9195_state )
 	AM_RANGE(0xc6, 0xc6) AM_WRITE(nbmj9195_inputportsel_w)
 	AM_RANGE(0xcf, 0xcf) AM_WRITENOP
 ADDRESS_MAP_END
-
 
 static ADDRESS_MAP_START( patimono_io_map, AS_IO, 8, nbmj9195_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
@@ -846,7 +837,6 @@ static ADDRESS_MAP_START( mjlaman_io_map, AS_IO, 8, nbmj9195_state )
 	AM_RANGE(0xf0, 0xff) AM_WRITE(nbmj9195_clut_1_w)
 ADDRESS_MAP_END
 
-
 static ADDRESS_MAP_START( mkeibaou_io_map, AS_IO, 8, nbmj9195_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_IMPORT_FROM( tmpz84c011_regs )
@@ -864,7 +854,6 @@ static ADDRESS_MAP_START( mkeibaou_io_map, AS_IO, 8, nbmj9195_state )
 	AM_RANGE(0xdc, 0xdc) AM_WRITENOP
 	AM_RANGE(0xde, 0xde) AM_WRITE(nbmj9195_inputportsel_w)
 ADDRESS_MAP_END
-
 
 static ADDRESS_MAP_START( pachiten_io_map, AS_IO, 8, nbmj9195_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
@@ -919,7 +908,6 @@ static ADDRESS_MAP_START( sailorwr_io_map, AS_IO, 8, nbmj9195_state )
 	AM_RANGE(0xfc, 0xfc) AM_WRITENOP
 	AM_RANGE(0xfe, 0xfe) AM_WRITE(nbmj9195_inputportsel_w)
 ADDRESS_MAP_END
-
 
 static ADDRESS_MAP_START( psailor1_io_map, AS_IO, 8, nbmj9195_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
@@ -991,6 +979,24 @@ static ADDRESS_MAP_START( yosimoto_io_map, AS_IO, 8, nbmj9195_state )
 	AM_RANGE(0xc0, 0xc1) AM_READ(nbmj9195_blitter_1_r)
 	AM_RANGE(0xc0, 0xcf) AM_WRITE(nbmj9195_blitter_1_w)
 	AM_RANGE(0xd0, 0xdf) AM_WRITE(nbmj9195_clut_1_w)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( yosimotm_io_map, AS_IO, 8, nbmj9195_state )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_IMPORT_FROM( tmpz84c011_regs )
+
+	AM_RANGE(0x60, 0x61) AM_READ(nbmj9195_blitter_0_r)
+	AM_RANGE(0x60, 0x6f) AM_WRITE(nbmj9195_blitter_0_w)
+	AM_RANGE(0x70, 0x7f) AM_WRITE(nbmj9195_clut_0_w)
+
+	AM_RANGE(0x80, 0x81) AM_READ(nbmj9195_blitter_1_r)
+	AM_RANGE(0x80, 0x8f) AM_WRITE(nbmj9195_blitter_1_w)
+	AM_RANGE(0x90, 0x9f) AM_WRITE(nbmj9195_clut_1_w)
+
+	AM_RANGE(0xf0, 0xf0) AM_WRITE(nbmj9195_inputportsel_w)
+	AM_RANGE(0xfc, 0xfc) AM_WRITE(nbmj9195_sound_w)
+	AM_RANGE(0xf4, 0xf4) AM_NOP
+	AM_RANGE(0xf8, 0xf8) AM_NOP
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( jituroku_io_map, AS_IO, 8, nbmj9195_state )
@@ -2415,7 +2421,7 @@ static INPUT_PORTS_START( yosimoto )
 	PORT_DIPNAME( 0x40, 0x00, "Voices" )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Flip_Screen ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
@@ -2457,6 +2463,75 @@ static INPUT_PORTS_START( yosimoto )
 	PORT_INCLUDE( nbmjcontrols )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( yosimotm )
+
+	// I don't have manual for this game.
+
+	PORT_START("DSWA")
+	PORT_DIPNAME( 0x01, 0x01, "DIPSW 1-1" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "DIPSW 1-2" )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "DIPSW 1-3" )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "DIPSW 1-4" )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "DIPSW 1-5" )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "DIPSW 1-6" )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "Character Display Test" )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "Graphic ROM Test" )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSWB")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Flip_Screen ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "Character Display Test" )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "Score Pool" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "DIPSW 2-4" )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "DIPSW 2-5" )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "DIPSW 2-6" )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "DIPSW 2-7" )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "DIPSW 2-8" )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("SYSTEM")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )			// COIN OUT
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )		// MEMORY RESET
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 )		// ANALYZER
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Credit Clear") PORT_CODE(KEYCODE_4) // CREDIT CLEAR
+	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )					// TEST
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )			// COIN1
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )			// COIN2
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )		// SERVICE
+
+	PORT_INCLUDE( nbmjcontrols )
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( jituroku )
 
 	// I don't have manual for this game.
@@ -2474,7 +2549,7 @@ static INPUT_PORTS_START( jituroku )
 	PORT_DIPNAME( 0x08, 0x08, "DIPSW 1-4" )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Flip_Screen ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x20, 0x20, "DIPSW 1-6" )
@@ -3102,10 +3177,10 @@ static MACHINE_CONFIG_START( NBMJDRV1, nbmj9195_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 
 	MCFG_SOUND_ADD("dac1", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_SOUND_ADD("dac2", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 
@@ -3278,6 +3353,16 @@ static MACHINE_CONFIG_DERIVED( yosimoto, NBMJDRV1 )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(yosimoto_io_map)
+MACHINE_CONFIG_END
+
+
+static MACHINE_CONFIG_DERIVED( yosimotm, NBMJDRV1 )
+
+	/* basic machine hardware */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_IO_MAP(yosimotm_io_map)
+
+	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 
 
@@ -3706,6 +3791,22 @@ ROM_START( yosimoto )
 	ROM_LOAD( "8.9h",  0x280000, 0x80000, CRC(dbad97fc) SHA1(ead04086ffec53ede90e3ebcf150018a91bb8457) )
 ROM_END
 
+ROM_START( yosimotm )
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* main program */
+	ROM_LOAD( "1.7c",  0x00000,  0x10000, CRC(d156b07d) SHA1(8dcf2d8ac60920dc7ea286d4b91399ed2db05a3b) )
+
+	ROM_REGION( 0x20000, "audiocpu", 0 ) /* sound program */
+	ROM_LOAD( "2.12e", 0x00000,  0x20000, CRC(e2d84085) SHA1(890b4d4a02030253837b67e8232293dce30d7ca2) )
+
+	ROM_REGION( 0x300000, "gfx1", 0 ) /* gfx */
+	ROM_LOAD( "3.3h",  0x000000, 0x80000, CRC(f421c6c8) SHA1(f9d68f542cbf379a7c41b47704b19e1aec69f237) )
+	ROM_LOAD( "4.5h",  0x080000, 0x80000, CRC(a9b17359) SHA1(84cb71ab32e069c8ff8cffff7badb3a823d3abfd) )
+	ROM_LOAD( "5.5h",  0x100000, 0x80000, CRC(927517b7) SHA1(de4fcc4e87bc1a31834ffb2312b8cee167ec16b5) )
+	ROM_LOAD( "6.6h",  0x180000, 0x80000, CRC(31b0b9de) SHA1(b68c2028859b6804fe66a500f6afc375c1634bcd) )
+	ROM_LOAD( "7.7h",  0x200000, 0x80000, CRC(a7249937) SHA1(81d4adfb4bebe1e94fbbe70b7346c97f582f07a8) )
+	ROM_LOAD( "8.8h",  0x280000, 0x80000, CRC(a3cd2458) SHA1(a82b011a880f0d47362d2e70b9d77db85d83e6ed) )
+ROM_END
+
 ROM_START( ngpgal )
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* main program */
 	ROM_LOAD( "ngpg_01.bin", 0x00000,  0x10000, CRC(c766378b) SHA1(b221908eb14ebf5c87ae896c3c27d261b26b5146) )
@@ -3943,8 +4044,9 @@ GAME( 1993, sailorws, 0,        sailorws, sailorws, nbmj9195, ROT0,   "Nichibuts
 GAME( 1993, sailorwa, sailorws, sailorws, sailorws, nbmj9195, ROT0,   "Nichibutsu", "Mahjong Sailor Wars (Japan set 2)", 0 )
 GAME( 1993, sailorwr, sailorws, sailorwr, sailorwr, nbmj9195, ROT0,   "Nichibutsu", "Mahjong Sailor Wars-R [BET] (Japan)", 0 )
 GAME( 1993, wcatcher, 0,        otatidai, wcatcher, nbmj9195, ROT0,   "Nichibutsu", "Mahjong Wakuwaku Catcher (Japan)", 0 )
-GAME( 1993, jituroku, 0,        jituroku, jituroku, nbmj9195, ROT180, "Windom", "Jitsuroku Maru-chi Mahjong (Japan)", 0 )
-GAME( 1994, yosimoto, 0,        yosimoto, yosimoto, nbmj9195, ROT180, "Nichibutsu / Yoshimoto Kougyou", "Mahjong Yoshimoto Gekijou (Japan)", 0 )
+GAME( 1993, jituroku, 0,        jituroku, jituroku, nbmj9195, ROT0,   "Windom", "Jitsuroku Maru-chi Mahjong (Japan)", 0 )
+GAME( 1994, yosimoto, 0,        yosimoto, yosimoto, nbmj9195, ROT0,   "Nichibutsu / Yoshimoto Kougyou", "Mahjong Yoshimoto Gekijou (Japan)", 0 )
+GAME( 1994, yosimotm, yosimoto, yosimotm, yosimotm, nbmj9195, ROT0,   "Nichibutsu / Yoshimoto Kougyou", "Mahjong Yoshimoto Gekijou [BET] (Japan)", 0 )
 GAME( 1994, psailor1, 0,        psailor1, psailor1, nbmj9195, ROT0,   "Sphinx", "Bishoujo Janshi Pretty Sailor 18-kin (Japan)", 0 )
 GAME( 1994, psailor2, 0,        psailor2, psailor2, nbmj9195, ROT0,   "Sphinx", "Bishoujo Janshi Pretty Sailor 2 (Japan)", 0 )
 GAME( 1995, otatidai, 0,        otatidai, otatidai, nbmj9195, ROT0,   "Sphinx", "Disco Mahjong Otachidai no Okite (Japan)", 0 )

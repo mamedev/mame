@@ -32,16 +32,6 @@ TODO:
 #include "includes/nbmj8900.h"
 
 
-#define SIGNED_DAC	0		// 0:unsigned DAC, 1:signed DAC
-#if SIGNED_DAC
-#define DAC_WRITE	dac_signed_w
-#else
-#define DAC_WRITE	dac_w
-#endif
-
-
-
-
 static DRIVER_INIT( ohpaipee )
 {
 #if 0
@@ -71,8 +61,6 @@ static DRIVER_INIT( ohpaipee )
 #endif
 
 	nb1413m3_type = NB1413M3_OHPAIPEE;
-
-//  init_nb1413m3(machine);
 }
 
 static DRIVER_INIT( togenkyo )
@@ -103,8 +91,6 @@ static DRIVER_INIT( togenkyo )
 #endif
 
 	nb1413m3_type = NB1413M3_TOGENKYO;
-
-//S init_nb1413m3(machine);
 }
 
 
@@ -139,7 +125,7 @@ static ADDRESS_MAP_START( ohpaipee_io_map, AS_IO, 8, nbmj8900_state )
 	AM_RANGE(0xa0, 0xa0) AM_READWRITE_LEGACY(nb1413m3_inputport1_r,nb1413m3_inputportsel_w)
 	AM_RANGE(0xb0, 0xb0) AM_READWRITE_LEGACY(nb1413m3_inputport2_r,nb1413m3_sndrombank1_w)
 	AM_RANGE(0xc0, 0xc0) AM_READ_LEGACY(nb1413m3_inputport3_r)
-	AM_RANGE(0xd0, 0xd0) AM_DEVWRITE_LEGACY("dac", DAC_WRITE)
+	AM_RANGE(0xd0, 0xd0) AM_DEVWRITE_LEGACY("dac", dac_w)
 	AM_RANGE(0xe0, 0xe0) AM_WRITE(nbmj8900_vramsel_w)
 	AM_RANGE(0xf0, 0xf0) AM_READ_LEGACY(nb1413m3_dipsw1_r)
 	AM_RANGE(0xf1, 0xf1) AM_READWRITE_LEGACY(nb1413m3_dipsw2_r, nb1413m3_outcoin_w)
@@ -341,12 +327,11 @@ static MACHINE_CONFIG_START( ohpaipee, nbmj8900_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM3812, 2500000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 
 	MCFG_SOUND_ADD("dac", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.85)
 MACHINE_CONFIG_END
-
 
 static MACHINE_CONFIG_DERIVED( togenkyo, ohpaipee )
 
@@ -354,7 +339,6 @@ static MACHINE_CONFIG_DERIVED( togenkyo, ohpaipee )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(togenkyo_map)
 MACHINE_CONFIG_END
-
 
 
 ROM_START( ohpaipee )

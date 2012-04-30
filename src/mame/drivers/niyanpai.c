@@ -14,6 +14,9 @@
     Mahjong Housoukyoku Honbanchuu
     (c)199? Nihon Bussan Co.,Ltd.
 
+    Zoku Mahjong Housoukyoku Honbanchuu
+    (c)199? Nihon Bussan Co.,Ltd.
+
     Driver by Takahiro Nogi <nogi@kt.rim.or.jp> 2000/12/23 -
 
 ******************************************************************************/
@@ -43,14 +46,6 @@ Memo:
 #include "cpu/z80/z80daisy.h"
 #include "machine/nvram.h"
 #include "includes/niyanpai.h"
-
-
-#define SIGNED_DAC	0		// 0:unsigned DAC, 1:signed DAC
-#if SIGNED_DAC
-#define DAC_WRITE	dac_signed_w
-#else
-#define DAC_WRITE	dac_w
-#endif
 
 
 static void niyanpai_soundbank_w(running_machine &machine, int data)
@@ -117,10 +112,10 @@ WRITE8_MEMBER(niyanpai_state::tmpz84c011_pio_w)
 			niyanpai_soundbank_w(machine(), data & 0x03);
 			break;
 		case 1:			/* PB_0 */
-			DAC_WRITE(machine().device("dac2"), 0, data);
+			dac_w(machine().device("dac1"), 0, data);
 			break;
 		case 2:			/* PC_0 */
-			DAC_WRITE(machine().device("dac1"), 0, data);
+			dac_w(machine().device("dac2"), 0, data);
 			break;
 		case 3:			/* PD_0 */
 			break;
@@ -424,6 +419,45 @@ static ADDRESS_MAP_START( mhhonban_map, AS_PROGRAM, 16, niyanpai_state )
 
 	AM_RANGE(0x0a8000, 0x0a87ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x0bf000, 0x0bffff) AM_RAM
+
+	AM_RANGE(0x200000, 0x200001) AM_WRITE(niyanpai_sound_w)
+
+	AM_RANGE(0x200200, 0x200201) AM_WRITE(musobana_inputport_w)	// inputport select
+	AM_RANGE(0x240000, 0x240009) AM_WRITENOP			// unknown
+	AM_RANGE(0x240200, 0x2403ff) AM_WRITENOP			// unknown
+
+	AM_RANGE(0x240400, 0x240403) AM_READ(niyanpai_blitter_0_r)
+	AM_RANGE(0x240400, 0x24041f) AM_WRITE(niyanpai_blitter_0_w)
+	AM_RANGE(0x240420, 0x24043f) AM_WRITE(niyanpai_clut_0_w)
+
+	AM_RANGE(0x240600, 0x240603) AM_READ(niyanpai_blitter_1_r)
+	AM_RANGE(0x240600, 0x24061f) AM_WRITE(niyanpai_blitter_1_w)
+	AM_RANGE(0x240620, 0x24063f) AM_WRITE(niyanpai_clut_1_w)
+
+	AM_RANGE(0x240800, 0x240803) AM_READ(niyanpai_blitter_2_r)
+	AM_RANGE(0x240800, 0x24081f) AM_WRITE(niyanpai_blitter_2_w)
+	AM_RANGE(0x240820, 0x24083f) AM_WRITE(niyanpai_clut_2_w)
+
+	AM_RANGE(0x240a00, 0x240a01) AM_WRITE(niyanpai_clutsel_0_w)
+	AM_RANGE(0x240c00, 0x240c01) AM_WRITE(niyanpai_clutsel_1_w)
+	AM_RANGE(0x240e00, 0x240e01) AM_WRITE(niyanpai_clutsel_2_w)
+
+	AM_RANGE(0x280000, 0x280001) AM_READ(niyanpai_dipsw_r)
+	AM_RANGE(0x280200, 0x280201) AM_READ(musobana_inputport_0_r)
+	AM_RANGE(0x280400, 0x280401) AM_READ_PORT("SYSTEM")
+
+	AM_IMPORT_FROM( tmp68301_regs )
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( zokumahj_map, AS_PROGRAM, 16, niyanpai_state )
+	AM_RANGE(0x000000, 0x03ffff) AM_ROM
+	AM_RANGE(0x0ff000, 0x0fffff) AM_RAM
+
+	AM_RANGE(0x0e0000, 0x0e08ff) AM_READWRITE(niyanpai_palette_r,niyanpai_palette_w)
+	AM_RANGE(0x0e0900, 0x0e11ff) AM_RAM				// palette work ram?
+
+	AM_RANGE(0x0a8000, 0x0a87ff) AM_RAM AM_SHARE("nvram")
+	AM_RANGE(0x0c0000, 0x0cffff) AM_RAM
 
 	AM_RANGE(0x200000, 0x200001) AM_WRITE(niyanpai_sound_w)
 
@@ -774,9 +808,75 @@ static INPUT_PORTS_START( mhhonban )	// I don't have manual for this game.
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Coinage ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_2C ) )
 	PORT_DIPNAME( 0x10, 0x00, "DIPSW 1-5" )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Flip_Screen ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "DIPSW 1-7" )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "DIPSW 1-8" )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSWB")
+	PORT_DIPNAME( 0x01, 0x01, "DIPSW 2-1" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "DIPSW 2-2" )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "DIPSW 2-3" )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "DIPSW 2-4" )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "DIPSW 2-5" )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "DIPSW 2-6" )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "DIPSW 2-7" )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "Option Test" )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("SYSTEM")
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN1 )			// COIN1
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_COIN2 )			// COIN2
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_START3 )			// CREDIT CLEAR
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_SERVICE3 )			// MEMORY RESET
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_SERVICE2 )			// ANALYZER
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, niyanpai_state,musobana_outcoin_flag_r, NULL)	// OUT COIN
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_SERVICE( 0x8000, IP_ACTIVE_LOW )					// TEST
+
+	PORT_INCLUDE( nbmjctrl_16 )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( zokumahj )	// I don't have manual for this game.
+	PORT_START("DSWA")
+	PORT_DIPNAME( 0x01, 0x01, "DIPSW 1-1" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "DIPSW 1-2" )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "DIPSW 1-3" )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_2C ) )
+	PORT_DIPNAME( 0x10, 0x10, "DIPSW 1-5" )
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Flip_Screen ) )
@@ -866,7 +966,7 @@ static MACHINE_CONFIG_START( niyanpai, niyanpai_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_STATIC(niyanpai)
 
-	MCFG_PALETTE_LENGTH(768)
+	MCFG_PALETTE_LENGTH(256*3)
 
 	MCFG_VIDEO_START(niyanpai)
 
@@ -874,10 +974,10 @@ static MACHINE_CONFIG_START( niyanpai, niyanpai_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM3812, 4000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MCFG_SOUND_ADD("dac1", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
 	MCFG_SOUND_ADD("dac2", DAC, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
@@ -895,6 +995,13 @@ static MACHINE_CONFIG_DERIVED( mhhonban, niyanpai )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(mhhonban_map)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( zokumahj, niyanpai )
+
+	/* basic machine hardware */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(zokumahj_map)
 MACHINE_CONFIG_END
 
 
@@ -974,8 +1081,26 @@ ROM_START( mhhonban )
 	ROM_LOAD( "u107.bin",  0x280000, 0x80000, CRC(efc85912) SHA1(b9d523fd5f9ce879e2ed6916c89940be1d738a1c) )
 ROM_END
 
+ROM_START( zokumahj )
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* TMP68301 main program */
+	ROM_LOAD16_BYTE( "1.bin", 0x00000, 0x20000, CRC(53ca34a9) SHA1(5a1e2660442665efd529ec6c98ffc994c6103419) )
+	ROM_LOAD16_BYTE( "2.bin", 0x00001, 0x20000, CRC(474f9303) SHA1(4b03e3b6b6ee864dfcce3978f19bf329e39b3fe7) )
 
-GAME( 1996, niyanpai, 0, niyanpai, niyanpai, niyanpai, ROT0, "Nichibutsu", "Niyanpai (Japan)", 0 )
-GAME( 1995, musobana, 0, musobana, musobana, niyanpai, ROT0, "Nichibutsu / Yubis", "Musoubana (Japan)", 0 )
-GAME( 1994, 4psimasy, 0, musobana, 4psimasy, niyanpai, ROT0, "Sphinx / AV Japan", "Mahjong 4P Simasyo (Japan)", 0 )
-GAME( 199?, mhhonban, 0, mhhonban, mhhonban, niyanpai, ROT0, "Nichibutsu?", "Mahjong Housoukyoku Honbanchuu (Japan)", 0 )
+	ROM_REGION( 0x20000, "audiocpu", 0 ) /* TMPZ84C011 sound program */
+	ROM_LOAD( "3.bin",  0x000000, 0x20000, CRC(48407507) SHA1(afd24d16d487fd2b6548d967e2f1ae122e2633a2) )
+
+	ROM_REGION( 0x300000, "gfx1", 0 ) /* gfx */
+	ROM_LOAD( "4.bin",  0x000000, 0x80000, CRC(2b3e88b4) SHA1(d49a81f1bc6ac5b56df36caf7ee7188a917d947f) )
+	ROM_LOAD( "5.bin",  0x080000, 0x80000, CRC(cfe9477a) SHA1(9d08f5b1d638cef7d8dc97bdd9d98627f9af1ef9) )
+	ROM_LOAD( "6.bin",  0x100000, 0x80000, CRC(2d62df76) SHA1(83fe8e0a853c0137e7c77ecde762617c082774e5) )
+	ROM_LOAD( "7.bin",  0x180000, 0x80000, CRC(75922e76) SHA1(4ad23e241a1a223e0fcd4fd26bd695b1a68c258a) )
+	ROM_LOAD( "8.bin",  0x200000, 0x80000, CRC(22b3befa) SHA1(e44635e021962ce29b4e129ae394c794038aef39) )
+	ROM_LOAD( "9.bin",  0x280000, 0x80000, CRC(f72d83af) SHA1(4b897b40765084fd9483065fd0eb0e29cbcfa5ac) )
+ROM_END
+
+
+GAME( 1996, niyanpai, 0,        niyanpai, niyanpai, niyanpai, ROT0, "Nichibutsu", "Niyanpai (Japan)", 0 )
+GAME( 1995, musobana, 0,        musobana, musobana, niyanpai, ROT0, "Nichibutsu / Yubis", "Musoubana (Japan)", 0 )
+GAME( 1994, 4psimasy, 0,        musobana, 4psimasy, niyanpai, ROT0, "Sphinx / AV Japan", "Mahjong 4P Simasyo (Japan)", 0 )
+GAME( 199?, mhhonban, 0,        mhhonban, mhhonban, niyanpai, ROT0, "Nichibutsu?", "Mahjong Housoukyoku Honbanchuu (Japan)", 0 )
+GAME( 199?, zokumahj, mhhonban, zokumahj, zokumahj, niyanpai, ROT0, "Nichibutsu?", "Zoku Mahjong Housoukyoku (Japan)", 0 )

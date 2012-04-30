@@ -42,14 +42,6 @@ TODO:
 #include "machine/nvram.h"
 
 
-#define SIGNED_DAC	0		// 0:unsigned DAC, 1:signed DAC
-#if SIGNED_DAC
-#define DAC_WRITE	dac_signed_w
-#else
-#define DAC_WRITE	dac_w
-#endif
-
-
 static DRIVER_INIT( mjsikaku )
 {
 	nb1413m3_type = NB1413M3_MJSIKAKU;
@@ -316,7 +308,7 @@ static ADDRESS_MAP_START( secolove_io_map, AS_IO, 8, nbmj8688_state )
 	AM_RANGE(0xb0, 0xb0) AM_READWRITE_LEGACY(nb1413m3_inputport2_r,nb1413m3_sndrombank1_w)
 	AM_RANGE(0xc0, 0xcf) AM_WRITE(nbmj8688_clut_w)
 	AM_RANGE(0xd0, 0xd0) AM_READ(ff_r)	// irq ack? watchdog?
-	AM_RANGE(0xd0, 0xd0) AM_DEVWRITE_LEGACY("dac", DAC_WRITE)
+	AM_RANGE(0xd0, 0xd0) AM_DEVWRITE_LEGACY("dac", dac_w)
 	AM_RANGE(0xe0, 0xe0) AM_WRITE(secolove_romsel_w)
 //  AM_RANGE(0xf0, 0xf0) AM_READ_LEGACY(nb1413m3_dipsw1_r)
 //  AM_RANGE(0xf1, 0xf1) AM_READ_LEGACY(nb1413m3_dipsw2_r)
@@ -341,7 +333,7 @@ static ADDRESS_MAP_START( barline_io_map, AS_IO, 8, nbmj8688_state )
 	AM_RANGE(0xb0, 0xb0) AM_READ_LEGACY(nb1413m3_inputport2_r) AM_WRITE(barline_output_w)
 	AM_RANGE(0xc0, 0xcf) AM_WRITE(nbmj8688_clut_w)
 	AM_RANGE(0xd0, 0xd0) AM_READ(ff_r)	// irq ack? watchdog?
-//  AM_RANGE(0xd0, 0xd0) AM_DEVWRITE_LEGACY("dac", DAC_WRITE) //not used
+//  AM_RANGE(0xd0, 0xd0) AM_DEVWRITE_LEGACY("dac", dac_w) //not used
 	AM_RANGE(0xe0, 0xe0) AM_WRITE(secolove_romsel_w)
 	AM_RANGE(0xf0, 0xf0) AM_READ_LEGACY(nb1413m3_dipsw1_r) AM_WRITE(mjsikaku_scrolly_w)
 	AM_RANGE(0xf1, 0xf1) AM_READ_LEGACY(nb1413m3_dipsw2_r)
@@ -359,7 +351,7 @@ static ADDRESS_MAP_START( crystalg_io_map, AS_IO, 8, nbmj8688_state )
 	AM_RANGE(0xb0, 0xb0) AM_READWRITE_LEGACY(nb1413m3_inputport2_r,nb1413m3_sndrombank1_w)
 	AM_RANGE(0xc0, 0xcf) AM_WRITE(nbmj8688_clut_w)
 	AM_RANGE(0xd0, 0xd0) AM_READ(ff_r)	// irq ack? watchdog?
-	AM_RANGE(0xd0, 0xd0) AM_DEVWRITE_LEGACY("dac", DAC_WRITE)
+	AM_RANGE(0xd0, 0xd0) AM_DEVWRITE_LEGACY("dac", dac_w)
 	AM_RANGE(0xe0, 0xe0) AM_WRITE(crystalg_romsel_w)
 //  AM_RANGE(0xf0, 0xf0) AM_READ_LEGACY(nb1413m3_dipsw1_r)
 //  AM_RANGE(0xf0, 0xf0) AM_WRITENOP
@@ -379,7 +371,7 @@ static ADDRESS_MAP_START( otonano_io_map, AS_IO, 8, nbmj8688_state )
 	AM_RANGE(0xa0, 0xa0) AM_READWRITE_LEGACY(nb1413m3_inputport1_r,nb1413m3_inputportsel_w)
 	AM_RANGE(0xb0, 0xb0) AM_READWRITE_LEGACY(nb1413m3_inputport2_r,nb1413m3_sndrombank1_w)
 	AM_RANGE(0xd0, 0xd0) AM_READ(ff_r)	// irq ack? watchdog?
-	AM_RANGE(0xd0, 0xd0) AM_DEVWRITE_LEGACY("dac", DAC_WRITE)
+	AM_RANGE(0xd0, 0xd0) AM_DEVWRITE_LEGACY("dac", dac_w)
 	AM_RANGE(0xe0, 0xe0) AM_WRITE(mjsikaku_gfxflag2_w)
 	AM_RANGE(0xf0, 0xf0) AM_READ_LEGACY(nb1413m3_dipsw1_r) AM_WRITE(mjsikaku_scrolly_w)
 	AM_RANGE(0xf1, 0xf1) AM_READ_LEGACY(nb1413m3_dipsw2_r)
@@ -399,7 +391,7 @@ static ADDRESS_MAP_START( kaguya_io_map, AS_IO, 8, nbmj8688_state )
 	AM_RANGE(0xa0, 0xa0) AM_READWRITE_LEGACY(nb1413m3_inputport1_r,nb1413m3_inputportsel_w)
 	AM_RANGE(0xb0, 0xb0) AM_READWRITE_LEGACY(nb1413m3_inputport2_r,nb1413m3_sndrombank1_w)
 	AM_RANGE(0xd0, 0xd0) AM_READ(ff_r)	// irq ack? watchdog?
-	AM_RANGE(0xd0, 0xd0) AM_DEVWRITE_LEGACY("dac", DAC_WRITE)
+	AM_RANGE(0xd0, 0xd0) AM_DEVWRITE_LEGACY("dac", dac_w)
 	AM_RANGE(0xe0, 0xe0) AM_WRITE(mjsikaku_gfxflag2_w)
     AM_RANGE(0xf0, 0xf0) AM_READ_LEGACY(nb1413m3_dipsw1_r) AM_WRITE(mjsikaku_scrolly_w)
 	AM_RANGE(0xf1, 0xf1) AM_READ_LEGACY(nb1413m3_dipsw2_r)
@@ -420,7 +412,7 @@ static ADDRESS_MAP_START( iemoto_io_map, AS_IO, 8, nbmj8688_state )
 	AM_RANGE(0xa0, 0xa0) AM_READWRITE_LEGACY(nb1413m3_inputport1_r,nb1413m3_inputportsel_w)
 	AM_RANGE(0xb0, 0xb0) AM_READWRITE_LEGACY(nb1413m3_inputport2_r,nb1413m3_sndrombank1_w)
 	AM_RANGE(0xd0, 0xd0) AM_READ(ff_r)	// irq ack? watchdog?
-	AM_RANGE(0xd0, 0xd0) AM_DEVWRITE_LEGACY("dac", DAC_WRITE)
+	AM_RANGE(0xd0, 0xd0) AM_DEVWRITE_LEGACY("dac", dac_w)
 	AM_RANGE(0xe0, 0xe0) AM_WRITE(mjsikaku_gfxflag2_w)
 //  AM_RANGE(0xf0, 0xf0) AM_READ_LEGACY(nb1413m3_dipsw1_r)
 //  AM_RANGE(0xf1, 0xf1) AM_READ_LEGACY(nb1413m3_dipsw2_r)
@@ -442,7 +434,7 @@ static ADDRESS_MAP_START( seiha_io_map, AS_IO, 8, nbmj8688_state )
 	AM_RANGE(0xa0, 0xa0) AM_READWRITE_LEGACY(nb1413m3_inputport1_r,nb1413m3_inputportsel_w)
 	AM_RANGE(0xb0, 0xb0) AM_READWRITE_LEGACY(nb1413m3_inputport2_r,nb1413m3_sndrombank1_w)
 	AM_RANGE(0xd0, 0xd0) AM_READ(ff_r)	// irq ack? watchdog?
-	AM_RANGE(0xd0, 0xd0) AM_DEVWRITE_LEGACY("dac", DAC_WRITE)
+	AM_RANGE(0xd0, 0xd0) AM_DEVWRITE_LEGACY("dac", dac_w)
 	AM_RANGE(0xe0, 0xe0) AM_WRITE(mjsikaku_gfxflag2_w)
 //  AM_RANGE(0xf0, 0xf0) AM_READ_LEGACY(nb1413m3_dipsw1_r)
 //  AM_RANGE(0xf1, 0xf1) AM_READ_LEGACY(nb1413m3_dipsw2_r)
@@ -462,7 +454,7 @@ static ADDRESS_MAP_START( mjgaiden_io_map, AS_IO, 8, nbmj8688_state )
 	AM_RANGE(0xa0, 0xa0) AM_READWRITE_LEGACY(nb1413m3_inputport1_r,nb1413m3_inputportsel_w)
 	AM_RANGE(0xb0, 0xb0) AM_READWRITE_LEGACY(nb1413m3_inputport2_r,nb1413m3_sndrombank1_w)
 	AM_RANGE(0xd0, 0xd0) AM_READ(ff_r)	// irq ack? watchdog?
-	AM_RANGE(0xd0, 0xd0) AM_DEVWRITE_LEGACY("dac", DAC_WRITE)
+	AM_RANGE(0xd0, 0xd0) AM_DEVWRITE_LEGACY("dac", dac_w)
 	AM_RANGE(0xe0, 0xe0) AM_WRITE(mjsikaku_gfxflag2_w)
 //  AM_RANGE(0xf0, 0xf0) AM_READ_LEGACY(nb1413m3_dipsw1_r)
 //  AM_RANGE(0xf1, 0xf1) AM_READ_LEGACY(nb1413m3_dipsw2_r)
@@ -487,7 +479,7 @@ static ADDRESS_MAP_START( p16bit_LCD_io_map, AS_IO, 8, nbmj8688_state )
 	AM_RANGE(0xb0, 0xb0) AM_READWRITE_LEGACY(nb1413m3_inputport2_r,nb1413m3_sndrombank1_w)
 	AM_RANGE(0xc0, 0xcf) AM_WRITE(nbmj8688_clut_w)
 	AM_RANGE(0xd0, 0xd0) AM_READ(ff_r)	// irq ack? watchdog?
-	AM_RANGE(0xd0, 0xd0) AM_DEVWRITE_LEGACY("dac", DAC_WRITE)
+	AM_RANGE(0xd0, 0xd0) AM_DEVWRITE_LEGACY("dac", dac_w)
 	AM_RANGE(0xe0, 0xe0) AM_WRITE(secolove_romsel_w)
 //  AM_RANGE(0xf0, 0xf0) AM_READ_LEGACY(nb1413m3_dipsw1_r)
 //  AM_RANGE(0xf1, 0xf1) AM_READ_LEGACY(nb1413m3_dipsw2_r)
@@ -508,7 +500,7 @@ static ADDRESS_MAP_START( mjsikaku_io_map, AS_IO, 8, nbmj8688_state )
 	AM_RANGE(0xa0, 0xa0) AM_READWRITE_LEGACY(nb1413m3_inputport1_r,nb1413m3_inputportsel_w)
 	AM_RANGE(0xb0, 0xb0) AM_READWRITE_LEGACY(nb1413m3_inputport2_r,nb1413m3_sndrombank1_w)
 	AM_RANGE(0xd0, 0xd0) AM_READ(ff_r)	// irq ack? watchdog?
-	AM_RANGE(0xd0, 0xd0) AM_DEVWRITE_LEGACY("dac", DAC_WRITE)
+	AM_RANGE(0xd0, 0xd0) AM_DEVWRITE_LEGACY("dac", dac_w)
 	AM_RANGE(0xe0, 0xe0) AM_WRITE(mjsikaku_gfxflag2_w)
 	AM_RANGE(0xf0, 0xf0) AM_READ_LEGACY(nb1413m3_dipsw1_r)
 	AM_RANGE(0xf1, 0xf1) AM_READ_LEGACY(nb1413m3_dipsw2_r)
@@ -530,7 +522,7 @@ static ADDRESS_MAP_START( mmsikaku_io_map, AS_IO, 8, nbmj8688_state )
 	AM_RANGE(0xa0, 0xa0) AM_READWRITE_LEGACY(nb1413m3_inputport1_r,nb1413m3_inputportsel_w)
 	AM_RANGE(0xb0, 0xb0) AM_READWRITE_LEGACY(nb1413m3_inputport2_r,nb1413m3_sndrombank1_w)
 	AM_RANGE(0xd0, 0xd0) AM_READ(ff_r)	// irq ack? watchdog?
-	AM_RANGE(0xd0, 0xd0) AM_DEVWRITE_LEGACY("dac", DAC_WRITE)
+	AM_RANGE(0xd0, 0xd0) AM_DEVWRITE_LEGACY("dac", dac_w)
 	AM_RANGE(0xe0, 0xe0) AM_WRITE(mjsikaku_gfxflag2_w)
 //  AM_RANGE(0xf0, 0xf0) AM_READ_LEGACY(nb1413m3_dipsw1_r)
 //  AM_RANGE(0xf1, 0xf1) AM_READ_LEGACY(nb1413m3_dipsw2_r)
@@ -1344,7 +1336,6 @@ static INPUT_PORTS_START( barline )
 	PORT_START("KEY9")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
-
 
 static INPUT_PORTS_START( citylove )
 	PORT_START("DSWA")
@@ -2915,7 +2906,6 @@ static const ay8910_interface ay8910_config =
 };
 
 
-
 static MACHINE_CONFIG_START( NBMJDRV_4096, nbmj8688_state )
 
 	/* basic machine hardware */
@@ -2946,9 +2936,8 @@ static MACHINE_CONFIG_START( NBMJDRV_4096, nbmj8688_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
 
 	MCFG_SOUND_ADD("dac", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
-
 
 static MACHINE_CONFIG_DERIVED( NBMJDRV_256, NBMJDRV_4096 )
 
@@ -2960,7 +2949,6 @@ static MACHINE_CONFIG_DERIVED( NBMJDRV_256, NBMJDRV_4096 )
 	MCFG_PALETTE_INIT(mbmj8688_8bit)
 	MCFG_VIDEO_START(mbmj8688_8bit)
 MACHINE_CONFIG_END
-
 
 static MACHINE_CONFIG_DERIVED( NBMJDRV_65536, NBMJDRV_4096 )
 
@@ -2974,7 +2962,6 @@ static MACHINE_CONFIG_DERIVED( NBMJDRV_65536, NBMJDRV_4096 )
 	MCFG_VIDEO_START(mbmj8688_hybrid_16bit)
 MACHINE_CONFIG_END
 
-
 // --------------------------------------------------------------------------------
 
 static MACHINE_CONFIG_DERIVED( crystalg, NBMJDRV_256 )
@@ -2985,7 +2972,6 @@ static MACHINE_CONFIG_DERIVED( crystalg, NBMJDRV_256 )
 	MCFG_CPU_IO_MAP(crystalg_io_map)
 MACHINE_CONFIG_END
 
-
 static MACHINE_CONFIG_DERIVED( apparel, NBMJDRV_256 )
 
 	/* basic machine hardware */
@@ -2993,7 +2979,6 @@ static MACHINE_CONFIG_DERIVED( apparel, NBMJDRV_256 )
 	MCFG_CPU_PROGRAM_MAP(secolove_map)
 	MCFG_CPU_IO_MAP(secolove_io_map)
 MACHINE_CONFIG_END
-
 
 static MACHINE_CONFIG_DERIVED( mbmj_h12bit, NBMJDRV_4096 )
 
@@ -3014,7 +2999,7 @@ static MACHINE_CONFIG_DERIVED( barline, mbmj_h12bit )
 	MCFG_CPU_IO_MAP(barline_io_map)
 
 	MCFG_SOUND_REPLACE("psg", YM3812, 20000000/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
 
 	MCFG_DEVICE_REMOVE("dac")
 MACHINE_CONFIG_END
@@ -3029,7 +3014,6 @@ static MACHINE_CONFIG_DERIVED( mbmj_p16bit, NBMJDRV_65536 )
 	/* video hardware */
 	MCFG_VIDEO_START(mbmj8688_pure_16bit)
 MACHINE_CONFIG_END
-
 
 static MACHINE_CONFIG_START( mbmj_p16bit_LCD, nbmj8688_state )
 
@@ -3079,9 +3063,8 @@ static MACHINE_CONFIG_START( mbmj_p16bit_LCD, nbmj8688_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
 
 	MCFG_SOUND_ADD("dac", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
-
 
 static MACHINE_CONFIG_DERIVED( seiha, NBMJDRV_65536 )
 
@@ -3108,7 +3091,6 @@ static MACHINE_CONFIG_DERIVED( iemoto, NBMJDRV_65536 )
 	MCFG_CPU_IO_MAP(iemoto_io_map)
 MACHINE_CONFIG_END
 
-
 static MACHINE_CONFIG_DERIVED( ojousan, NBMJDRV_65536 )
 
 	/* basic machine hardware */
@@ -3125,7 +3107,6 @@ static MACHINE_CONFIG_DERIVED( mbmj_p12bit, NBMJDRV_4096 )
 	MCFG_CPU_IO_MAP(kaguya_io_map)
 MACHINE_CONFIG_END
 
-
 static MACHINE_CONFIG_DERIVED( mjsikaku, NBMJDRV_4096 )
 
 	/* basic machine hardware */
@@ -3138,7 +3119,6 @@ static MACHINE_CONFIG_DERIVED( mjsikaku, NBMJDRV_4096 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_CONFIG_END
 
-
 static MACHINE_CONFIG_DERIVED( mmsikaku, NBMJDRV_4096 )
 
 	/* basic machine hardware */
@@ -3147,15 +3127,12 @@ static MACHINE_CONFIG_DERIVED( mmsikaku, NBMJDRV_4096 )
 	MCFG_CPU_IO_MAP(mmsikaku_io_map)
 MACHINE_CONFIG_END
 
-
 static MACHINE_CONFIG_DERIVED( otonano, mjsikaku )
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(otonano_io_map)
 MACHINE_CONFIG_END
-
-
 
 
 ROM_START( crystalg )
@@ -3454,14 +3431,14 @@ ROM_START( mjgaiden )
 
 	/*TODO: check if the w labeled roms are correctly mapped.*/
     ROM_REGION( 0x400000, "gfx1", 0 ) /* gfx */
-    ROM_LOAD( "se1507.6a",0x000000, 0x80000, CRC(f1e9555e) SHA1(a34ffcff2b2d6ba40a8a453b89970d636515a8ad) ) // seiha/se1507.6a
+    ROM_LOAD( "se1507.6a",0x000000, 0x80000, CRC(f1e9555e) SHA1(a34ffcff2b2d6ba40a8a453b89970d636515a8ad) )	// seiha/se1507.6a
     ROM_LOAD( "w19.1a",   0x080000, 0x40000, CRC(788cd3ca) SHA1(955a520e122aaee30e080d0a784556b69ba3de36) )
     ROM_LOAD( "w20.2a",   0x0c0000, 0x40000, CRC(a3175a8f) SHA1(8214fdefa1186dd96bc55a30b64a24a486750f05) )
     ROM_LOAD( "w21.3a",   0x100000, 0x40000, CRC(da46163e) SHA1(c6e5f59fe813915f94d81ff28526614c943b7082) )
-    ROM_LOAD( "6.2a",     0x180000, 0x10000, CRC(9fefe2ca) SHA1(7b638a739640e9d311ee15c0e7b4f3f2dfdd3589) ) // seiha/seiha06.8a
-    ROM_LOAD( "7.3a",     0x190000, 0x10000, CRC(a7d438ec) SHA1(5d145bab0ffc76fd77582ea5495ca4496210d41a) )            // seiha/seiha07.9a
+    ROM_LOAD( "6.2a",     0x180000, 0x10000, CRC(9fefe2ca) SHA1(7b638a739640e9d311ee15c0e7b4f3f2dfdd3589) )	// seiha/seiha06.8a
+    ROM_LOAD( "7.3a",     0x190000, 0x10000, CRC(a7d438ec) SHA1(5d145bab0ffc76fd77582ea5495ca4496210d41a) )	// seiha/seiha07.9a
     ROM_LOAD( "8.4a",     0x1a0000, 0x10000, CRC(e8e61e48) SHA1(e1d0e64b39bad3e294b061fb6f02ece2f2ee4bca) )
-    ROM_LOAD( "9.2b",     0x1b0000, 0x10000, CRC(541f6e9f) SHA1(946a9c9cc8e6985098af4dd035f80ecc50e800ec) )            // seiha/seiha05.1i
+    ROM_LOAD( "9.2b",     0x1b0000, 0x10000, CRC(541f6e9f) SHA1(946a9c9cc8e6985098af4dd035f80ecc50e800ec) )	// seiha/seiha05.1i
     ROM_LOAD( "10.3b",    0x1c0000, 0x10000, CRC(a4144f78) SHA1(316ebe91aa604f1d4a0f1942df9d87de487c977a) )
     ROM_LOAD( "w22.4a",   0x200000, 0x40000, CRC(ea2b78b3) SHA1(38ec10a29f32cbb6b270fa10ade815cf3e0a54c2) )
     ROM_LOAD( "w23.5a",   0x240000, 0x40000, CRC(0263ff75) SHA1(16a18dfaf732ab94dec70fd8e955d6179525115c) )
@@ -4035,6 +4012,7 @@ ROM_START( barline )
 	ROM_LOAD( "16061.k7", 0x000, 0x104, CRC(d25ccac8) SHA1(cfad5a4cd9609ac2461314d77a5e0cecd326c63b) )
 ROM_END
 
+
 /* 8-bit palette */
 GAME( 1986, crystalg, 0,        crystalg,        crystalg, crystalg, ROT0, "Nichibutsu", "Crystal Gal (Japan 860512)", 0 )
 GAME( 1986, crystal2, 0,        crystalg,        crystal2, crystal2, ROT0, "Nichibutsu", "Crystal Gal 2 (Japan 860620)", 0 )
@@ -4085,12 +4063,3 @@ GAME( 1988, mjsikakd, mjsikaku, mjsikaku,        mjsikaku, mjsikaku, ROT0, "Nich
 GAME( 1988, mmsikaku, mjsikaku, mmsikaku,        mmsikaku, mmsikaku, ROT0, "Nichibutsu", "Mahjong Shikaku [BET] (Japan 880929)", 0 )
 GAME( 1988, otonano,  0,        otonano,         otonano,  otonano,  ROT0, "Apple", "Otona no Mahjong (Japan 880628)", 0 )
 GAME( 1988, mjcamera, 0,        otonano,         mjcamera, mjcamera, ROT0, "Miki Syouji", "Mahjong Camera Kozou (set 1) (Japan 881109)", 0 )
-
-
-/*
-
-iemotom     outcoin check
-ojousanm    outcoin check
-ryuuha      outcoin check
-
-*/
