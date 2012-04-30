@@ -11,7 +11,7 @@
 
 
   To initialize battery RAM, go into Meter Read mode (F1 -> 9),
-  and then press the Meter Reset button.
+  and then press the Meter Read/Reset buttons (9 + 0).
 
   If a game is not turned off properly, eg. exiting MAME
   in mid-game, it may run faulty on the next boot.
