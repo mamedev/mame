@@ -21,7 +21,6 @@ OBJDIRS += \
 	$(LIBOBJ)/softfloat \
 	$(LIBOBJ)/libjpeg \
 	$(LIBOBJ)/libflac \
-	$(LIBOBJ)/libflacpp \
 	$(LIBOBJ)/lib7z \
 
 
@@ -302,7 +301,7 @@ else    # ifeq ($(TARGETOS),macosx)
 ARCHFLAGS = -DWORDS_BIGENDIAN=0
 endif   # ifeq ($(TARGETOS),macosx)
 
-FLACOPTS=-DFLAC__NO_ASM -DHAVE_INTTYPES_H -DHAVE_ICONV -DHAVE_LANGINFO_CODESET -DHAVE_SOCKLEN_T -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 $(ARCHFLAGS)
+FLACOPTS=-DFLAC__NO_ASM -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -DHAVE_CONFIG_H=0 -DFLAC__HAS_OGG=0 -Wno-unused-function $(ARCHFLAGS)
 
 LIBFLACOBJS = \
 	$(LIBOBJ)/libflac/bitmath.o \
@@ -325,7 +324,7 @@ $(OBJ)/libflac.a: $(LIBFLACOBJS)
 
 $(LIBOBJ)/libflac/%.o: $(LIBSRC)/libflac/libflac/%.c | $(OSPREBUILD)
 	@echo Compiling $<...
-	$(CC) $(CDEFS) $(FLACOPTS) $(CONLYFLAGS) -I$(LIBSRC)/libflac/include -c $< -o $@
+	$(CC) $(CDEFS) $(CONLYFLAGS) $(CCOMFLAGS) $(FLACOPTS) -I$(LIBSRC)/libflac/include -c $< -o $@
 
 
 
@@ -359,4 +358,4 @@ $(OBJ)/lib7z.a: $(LIB7ZOBJS)
 
 $(LIBOBJ)/lib7z/%.o: $(LIBSRC)/lib7z/%.c | $(OSPREBUILD)
 	@echo Compiling $<...
-	$(CC) $(CDEFS) $(7ZOPTS) $(CONLYFLAGS) -I$(LIBSRC)/lib7z/ -c $< -o $@
+	$(CC) $(CDEFS) $(7ZOPTS) $(CCOMFLAGS) $(CONLYFLAGS) -I$(LIBSRC)/lib7z/ -c $< -o $@

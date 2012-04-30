@@ -146,6 +146,7 @@ cdrom_file *cdrom_open(const char *inputfile)
 	if (err != CHDERR_NONE)
 	{
 		fprintf(stderr, "Error reading input file: %s\n", chd_file::error_string(err));
+		delete file;
 		return NULL;
 	}
 
@@ -160,6 +161,7 @@ cdrom_file *cdrom_open(const char *inputfile)
 		if (filerr != FILERR_NONE)
 		{
 			fprintf(stderr, "Unable to open file: %s\n", file->track_info.track[i].fname.cstr());
+			cdrom_close(file);
 			return NULL;
 		}
 	}
@@ -215,7 +217,7 @@ cdrom_file *cdrom_open(chd_file *chd)
 		return NULL;
 
 	/* allocate memory for the CD-ROM file */
-	file = (cdrom_file *)malloc(sizeof(cdrom_file));
+	file = new cdrom_file();
 	if (file == NULL)
 		return NULL;
 
@@ -226,7 +228,7 @@ cdrom_file *cdrom_open(chd_file *chd)
 	err = cdrom_parse_metadata(chd, &file->cdtoc);
 	if (err != CHDERR_NONE)
 	{
-		delete(file);
+		delete file;
 		return NULL;
 	}
 
@@ -281,7 +283,7 @@ void cdrom_close(cdrom_file *file)
 		}
 	}
 
-	delete(file);
+	delete file;
 }
 
 

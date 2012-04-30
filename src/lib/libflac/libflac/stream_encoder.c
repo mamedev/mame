@@ -39,9 +39,13 @@
 #include <string.h> /* for memcpy() */
 #include <sys/types.h> /* for off_t */
 #if defined _MSC_VER || defined __BORLANDC__ || defined __MINGW32__
-#if _MSC_VER <= 1600 || defined __BORLANDC__ /* @@@ [2G limit] */
+#if (!defined(_MSC_VER) || _MSC_VER <= 1600) || defined __BORLANDC__ /* @@@ [2G limit] */
+#ifndef fseeko
 #define fseeko fseek
+#endif
+#ifndef ftello
 #define ftello ftell
+#endif
 #endif
 #endif
 #include "flac/assert.h"
