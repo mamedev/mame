@@ -164,6 +164,8 @@ public:
 	const rom_entry *rom_region() const { return device_rom_region(); }
 	machine_config_constructor machine_config_additions() const { return device_mconfig_additions(); }
 	ioport_constructor input_ports() const { return device_input_ports(); }
+	UINT8 default_bios() const { return m_default_bios; }
+	UINT8 system_bios() const { return m_system_bios; }
 
 	// interface helpers
 	template<class _DeviceClass> bool interface(_DeviceClass *&intf) { intf = dynamic_cast<_DeviceClass *>(this); return (intf != NULL); }
@@ -229,6 +231,8 @@ public:
 	// debugging
 	device_debug *debug() const { return m_debug; }
 
+	void set_default_bios(UINT8 bios) { m_default_bios = bios; }
+	void set_system_bios(UINT8 bios) { m_system_bios = bios; }
 protected:
 	// internal helper classes (defined below)
 	class finder_base;
@@ -313,6 +317,8 @@ protected:
 	const void *			m_static_config;		// static device configuration
 	const input_device_default *m_input_defaults;   // devices input ports default overrides
 
+	UINT8					m_system_bios;			// the system BIOS we wish to load
+	UINT8					m_default_bios;			// the default system BIOS
 private:
 	// private helpers
 	device_t *add_subdevice(device_type type, const char *tag, UINT32 clock);

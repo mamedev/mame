@@ -63,8 +63,6 @@ struct _romload_private
 	running_machine &machine() const { assert(m_machine != NULL); return *m_machine; }
 
 	running_machine *m_machine;			/* machine object where needed */
-	int				system_bios;		/* the system BIOS we wish to load */
-	int				default_bios;		/* the default system BIOS */
 
 	int				warnings;			/* warning count during processing */
 	int				knownbad;			/* BAD_DUMP/NO_DUMP count during processing */
@@ -292,10 +290,9 @@ static void determine_bios_rom(rom_load_data *romdata)
 	int default_no = 1;
 	int bios_count = 0;
 
-	romdata->system_bios = 0;
 
 	device_t &rootdevice = romdata->machine().config().root_device();
-
+	rootdevice.set_system_bios(0);
 	/* first determine the default BIOS name */
 	for (rom = rootdevice.rom_region(); !ROMENTRY_ISEND(rom); rom++)
 		if (ROMENTRY_ISDEFAULT_BIOS(rom))
@@ -312,14 +309,14 @@ static void determine_bios_rom(rom_load_data *romdata)
 			/* Allow '-bios n' to still be used */
 			sprintf(bios_number, "%d", bios_flags - 1);
 			if (mame_stricmp(bios_number, specbios) == 0 || mame_stricmp(biosname, specbios) == 0)
-				romdata->system_bios = bios_flags;
+				rootdevice.set_system_bios(bios_flags);
 			if (defaultname != NULL && mame_stricmp(biosname, defaultname) == 0)
 				default_no = bios_flags;
 			bios_count++;
 		}
 
 	/* if none found, use the default */
-	if (romdata->system_bios == 0 && bios_count > 0)
+	if (rootdevice.system_bios() == 0 && bios_count > 0)
 	{
 		/* if we got neither an empty string nor 'default' then warn the user */
 		if (specbios[0] != 0 && strcmp(specbios, "default") != 0 && romdata != NULL)
@@ -329,10 +326,10 @@ static void determine_bios_rom(rom_load_data *romdata)
 		}
 
 		/* set to default */
-		romdata->system_bios = default_no;
+		rootdevice.set_system_bios(default_no);
 	}
-	romdata->default_bios = default_no;
-	LOG(("Using System BIOS: %d\n", romdata->system_bios));
+	rootdevice.set_default_bios(default_no);
+	LOG(("Using System BIOS: %d\n", rootdevice.system_bios()));
 }
 
 
@@ -354,7 +351,7 @@ static void count_roms(rom_load_data *romdata)
 	for (device_t *device = deviter.first(); device != NULL; device = deviter.next())
 		for (region = rom_first_region(*device); region != NULL; region = rom_next_region(region))
 			for (rom = rom_first_file(region); rom != NULL; rom = rom_next_file(rom))
-				if (ROM_GETBIOSFLAGS(rom) == 0 || ROM_GETBIOSFLAGS(rom) == romdata->system_bios)
+				if (ROM_GETBIOSFLAGS(rom) == 0 || ROM_GETBIOSFLAGS(rom) == romdata->machine().config().root_device().system_bios())
 				{
 					romdata->romstotal++;
 					romdata->romstotalsize += rom_file_size(rom);
@@ -880,7 +877,7 @@ static void process_rom_entries(rom_load_data *romdata, const char *regiontag, c
 		/* handle files */
 		else if (ROMENTRY_ISFILE(romp))
 		{
-			int irrelevantbios = (ROM_GETBIOSFLAGS(romp) != 0 && ROM_GETBIOSFLAGS(romp) != romdata->system_bios);
+			int irrelevantbios = (ROM_GETBIOSFLAGS(romp) != 0 && ROM_GETBIOSFLAGS(romp) != romdata->machine().config().root_device().system_bios());
 			const rom_entry *baserom = romp;
 			int explength = 0;
 
@@ -1503,21 +1500,3 @@ int rom_load_knownbad(running_machine &machine)
 	return machine.romload_data->knownbad;
 }
 
-
-/*-------------------------------------------------
-    rom_system_bios - return id of selected bios
--------------------------------------------------*/
-
-int rom_system_bios(running_machine &machine)
-{
-	return machine.romload_data->system_bios;
-}
-
-/*-------------------------------------------------
-    rom_default_bios - return id of default bios
--------------------------------------------------*/
-
-int rom_default_bios(running_machine &machine)
-{
-	return machine.romload_data->default_bios;
-}

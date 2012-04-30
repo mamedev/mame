@@ -114,6 +114,7 @@ void ui_menu_main::populate()
 	int has_configs = false;
 	int has_analog = false;
 	int has_dips = false;
+	int has_bioses = false;
 	astring menu_text;
 	/* scan the input port array to see what options we need to enable */
 	for (port = machine().ioport().first_port(); port != NULL; port = port->next())
@@ -126,6 +127,11 @@ void ui_menu_main::populate()
 			if (input_type_is_analog(field->type))
 				has_analog = true;
 		}
+	device_iterator deviter(machine().root_device());
+	for (device_t *device = deviter.first(); device != NULL; device = deviter.next())
+		if (device->rom_region())
+			for (const rom_entry *rom = device->rom_region(); !ROMENTRY_ISEND(rom); rom++) 
+				if (ROMENTRY_ISSYSTEM_BIOS(rom)) { has_bioses= true; break; }
 
 	/* add input menu items */
 	item_append("Input (general)", NULL, 0, (void *)INPUT_GROUPS);
@@ -167,6 +173,9 @@ void ui_menu_main::populate()
 		if (bititer.first() != NULL)
 			item_append("Bitbanger Control", NULL, 0, (void *)MESS_MENU_BITBANGER_CONTROL);
 	}
+
+	if (has_bioses)
+		item_append("Bios Selection", NULL, 0, (void *)BIOS_SELECTION);
 
 	slot_interface_iterator slotiter(machine().root_device());
 	if (slotiter.first() != NULL)
@@ -307,6 +316,10 @@ void ui_menu_main::handle()
 			ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_select_game(machine(), container, 0)));
 			break;
 
+		case BIOS_SELECTION:
+			ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_bios_selection(machine(), container)));
+			break;
+			
 		default:
 			fatalerror("ui_menu_main::handle - unknown reference");
 		}
@@ -459,6 +472,76 @@ void ui_menu_slot_devices::handle()
 			device_slot_interface *slot = (device_slot_interface *)menu_event->itemref;
 			const char *val = (menu_event->iptkey == IPT_UI_LEFT) ? slot_get_prev(slot) : slot_get_next(slot);
 			set_slot_device(slot,val);
+			reset(UI_MENU_RESET_REMEMBER_REF);
+		}
+	} else if (menu_event != NULL && menu_event->iptkey == IPT_UI_SELECT) {
+		machine().schedule_hard_reset();
+	}
+}
+
+/*-------------------------------------------------
+    ui_menu_bios_selection - populates the main
+    bios selection menu
+-------------------------------------------------*/
+
+ui_menu_bios_selection::ui_menu_bios_selection(running_machine &machine, render_container *container) : ui_menu(machine, container)
+{
+}
+
+void ui_menu_bios_selection::populate()
+{
+	/* cycle through all devices for this system */
+	device_iterator deviter(machine().root_device());
+	for (device_t *device = deviter.first(); device != NULL; device = deviter.next())
+	{
+		if (device->rom_region()) {
+			const char *val = "default";
+			for (const rom_entry *rom = device->rom_region(); !ROMENTRY_ISEND(rom); rom++) 
+			{
+				if (ROMENTRY_ISSYSTEM_BIOS(rom) && ROM_GETBIOSFLAGS(rom)==device->system_bios())
+				{
+					val = ROM_GETHASHDATA(rom);
+				}
+			}
+			item_append(strcmp(device->tag(),":")==0 ? "driver" : device->tag()+1, val, MENU_FLAG_LEFT_ARROW | MENU_FLAG_RIGHT_ARROW, (void *)device);
+		}
+	}
+
+	item_append(MENU_SEPARATOR_ITEM, NULL, 0, NULL);
+	item_append("Reset",  NULL, 0, NULL);
+}
+
+ui_menu_bios_selection::~ui_menu_bios_selection()
+{
+}
+
+/*-------------------------------------------------
+    ui_menu_bios_selection - menu that
+-------------------------------------------------*/
+
+void ui_menu_bios_selection::handle()
+{
+	/* process the menu */
+	const ui_menu_event *menu_event = process(0);
+
+	if (menu_event != NULL && menu_event->itemref != NULL)
+	{
+		if (menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT) {
+			device_t *dev = (device_t *)menu_event->itemref;
+			int cnt = 0;
+			for (const rom_entry *rom = dev->rom_region(); !ROMENTRY_ISEND(rom); rom++) 
+			{
+				if (ROMENTRY_ISSYSTEM_BIOS(rom)) cnt ++;
+			}
+			int val = dev->system_bios() + ((menu_event->iptkey == IPT_UI_LEFT) ? -1 : +1);
+			if (val<1) val=cnt;
+			if (val>cnt) val=1;
+			dev->set_system_bios(val);
+			if (strcmp(dev->tag(),":")==0) {
+				astring error;
+				machine().options().set_value("bios", val-1, OPTION_PRIORITY_CMDLINE, error);
+				assert(!error);
+			}
 			reset(UI_MENU_RESET_REMEMBER_REF);
 		}
 	} else if (menu_event != NULL && menu_event->iptkey == IPT_UI_SELECT) {

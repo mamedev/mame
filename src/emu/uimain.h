@@ -47,6 +47,7 @@ private:
 		CHEAT,
 		MEMORY_CARD,
 		SELECT_GAME,
+		BIOS_SELECTION,
 	};
 };
 
@@ -364,6 +365,15 @@ private:
 	void build_driver_list();
 };
 
+class ui_menu_bios_selection : public ui_menu {
+public:
+	ui_menu_bios_selection(running_machine &machine, render_container *container);
+	virtual ~ui_menu_bios_selection();
+	virtual void populate();
+	virtual void handle();
+
+private:
+};
 /* force game select menu */
 void ui_menu_force_game_select(running_machine &machine, render_container *container);
 
