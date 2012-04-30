@@ -467,8 +467,8 @@ ROM_START( spacefba )
 	ROM_LOAD( "tst-v-a.5k",      0x0000, 0x0800, CRC(236e1ff7) SHA1(575b8ed9ab054a864207e0fde3ae93cdcafbebf2) )
 	ROM_LOAD( "tst-v-a.6k",      0x0800, 0x0800, CRC(bf901a4e) SHA1(71207ad1ca60aa617dbbc3cd2e4e42520b7c8513) )
 
-	ROM_REGION( 0x0200, "gfx2", 0 )  /* bullets */
-	ROM_LOAD( "mb7052-a.4i",     0x0000, 0x0200, CRC(0f8c1400) SHA1(d532d8a753a27d60eb1947c8344a2eb6a92e8430) ) // lower half is crc 528e8533, what's the upper half for?! bullet color maybe?
+	ROM_REGION( 0x0100, "gfx2", 0 )  /* bullets */
+	ROM_LOAD( "mb7052-a.4i",     0x0000, 0x0100, CRC(528e8533) SHA1(8e41eee1016c98a4f08acbd902daf8e32aa9d9ab) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "mb7051-a.3n",     0x0000, 0x0020, CRC(465d07af) SHA1(25e246f7674c25d05e5f6e68db88c15aaa10cee1) )
