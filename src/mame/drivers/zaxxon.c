@@ -1318,9 +1318,9 @@ EPR-5312A.rom4 @ U32
 
 Uses the MR018 BPROM @ U68
 
-Oddly, it seems most Congo Bongo board sets (2 & 3 board stacks) have all hand written labels. At least all the PCB
-photos I could Google as well as those included in a recent redump of both board set types.  And YES it's actually
-"CONGO BONGO REV C ROM 2A" this is verified in several PCB photos.
+Oddly, it seems most Congo Bongo board sets (2 & 3 board stacks) have hand written labels for the program roms. At least
+all the PCB photos I found via Google as well as those included in a recent redump of both board set types.  And YES it's
+actually "CONGO BONGO REV C ROM 2A" this is verified in several PCB photos.
 
 */
 
