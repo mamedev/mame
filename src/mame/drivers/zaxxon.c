@@ -1602,6 +1602,6 @@ GAME( 1983, ixion,    0,      razmataz, ixion,    ixion,    ROT270, "Sega",    "
 
 /* these games run on a slightly newer Zaxxon hardware with more ROM space and a */
 /* custom sprite DMA chip */
-GAME( 1983, congo,    0,      congo,    congo,    0,        ROT90,  "Sega",    "Congo Bongo (2 board stack)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1983, congoa,   congo,  congo,    congo,    0,        ROT90,  "Sega",    "Congo Bongo (3 board stack)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1983, congo,    0,      congo,    congo,    0,        ROT90,  "Sega",    "Congo Bongo (Rev C, 2 board stack)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1983, congoa,   congo,  congo,    congo,    0,        ROT90,  "Sega",    "Congo Bongo (Rev C, 3 board stack)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1983, tiptop,   congo,  congo,    congo,    0,        ROT90,  "Sega",    "Tip Top (3 board stack)",     GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
