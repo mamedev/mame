@@ -335,11 +335,12 @@ static void modrm_to_EA(i386_state *cpustate,UINT8 mod_rm, UINT32* out_ea, UINT8
 	}
 }
 
-static UINT32 GetNonTranslatedEA(i386_state *cpustate,UINT8 modrm)
+static UINT32 GetNonTranslatedEA(i386_state *cpustate,UINT8 modrm,UINT8 *seg)
 {
 	UINT8 segment;
 	UINT32 ea;
 	modrm_to_EA(cpustate, modrm, &ea, &segment );
+	if(seg) *seg = segment;
 	return ea;
 }
 

@@ -341,10 +341,11 @@ static void I386OP(bt_rm32_r32)(i386_state *cpustate)		// Opcode 0x0f a3
 
 		CYCLES(cpustate,CYCLES_BT_REG_REG);
 	} else {
-		UINT32 ea = GetEA(cpustate,modrm,0);
+		UINT8 segment;
+		UINT32 ea = GetNonTranslatedEA(cpustate,modrm,&segment);
 		UINT32 bit = LOAD_REG32(modrm);
 		ea += 4*(bit/32);
-		ea = (cpustate->address_size)?ea:(ea&0xffff);
+		ea = i386_translate(cpustate,segment,(cpustate->address_size)?ea:(ea&0xffff),0);
 		bit %= 32;
 		UINT32 dst = READ32(cpustate,ea);
 
@@ -373,10 +374,11 @@ static void I386OP(btc_rm32_r32)(i386_state *cpustate)		// Opcode 0x0f bb
 		STORE_RM32(modrm, dst);
 		CYCLES(cpustate,CYCLES_BTC_REG_REG);
 	} else {
-		UINT32 ea = GetEA(cpustate,modrm,1);
+		UINT8 segment;
+		UINT32 ea = GetNonTranslatedEA(cpustate,modrm,&segment);
 		UINT32 bit = LOAD_REG32(modrm);
 		ea += 4*(bit/32);
-		ea = (cpustate->address_size)?ea:(ea&0xffff);
+		ea = i386_translate(cpustate,segment,(cpustate->address_size)?ea:(ea&0xffff),1);
 		bit %= 32;
 		UINT32 dst = READ32(cpustate,ea);
 
@@ -407,10 +409,11 @@ static void I386OP(btr_rm32_r32)(i386_state *cpustate)		// Opcode 0x0f b3
 		STORE_RM32(modrm, dst);
 		CYCLES(cpustate,CYCLES_BTR_REG_REG);
 	} else {
-		UINT32 ea = GetEA(cpustate,modrm,1);
+		UINT8 segment;
+		UINT32 ea = GetNonTranslatedEA(cpustate,modrm,&segment);
 		UINT32 bit = LOAD_REG32(modrm);
 		ea += 4*(bit/32);
-		ea = (cpustate->address_size)?ea:(ea&0xffff);
+		ea = i386_translate(cpustate,segment,(cpustate->address_size)?ea:(ea&0xffff),1);
 		bit %= 32;
 		UINT32 dst = READ32(cpustate,ea);
 
@@ -441,10 +444,11 @@ static void I386OP(bts_rm32_r32)(i386_state *cpustate)		// Opcode 0x0f ab
 		STORE_RM32(modrm, dst);
 		CYCLES(cpustate,CYCLES_BTS_REG_REG);
 	} else {
-		UINT32 ea = GetEA(cpustate,modrm,1);
+		UINT8 segment;
+		UINT32 ea = GetNonTranslatedEA(cpustate,modrm,&segment);
 		UINT32 bit = LOAD_REG32(modrm);
 		ea += 4*(bit/32);
-		ea = (cpustate->address_size)?ea:(ea&0xffff);
+		ea = i386_translate(cpustate,segment,(cpustate->address_size)?ea:(ea&0xffff),1);
 		bit %= 32;
 		UINT32 dst = READ32(cpustate,ea);
 
@@ -1002,7 +1006,7 @@ static void I386OP(jmp_abs32)(i386_state *cpustate)			// Opcode 0xea
 static void I386OP(lea32)(i386_state *cpustate)				// Opcode 0x8d
 {
 	UINT8 modrm = FETCH(cpustate);
-	UINT32 ea = GetNonTranslatedEA(cpustate,modrm);
+	UINT32 ea = GetNonTranslatedEA(cpustate,modrm,NULL);
 	if (!cpustate->address_size)
 	{
 		ea &= 0xffff;
