@@ -159,36 +159,19 @@ inline UINT8 i8155_device::read_port(int port)
 {
 	UINT8 data = 0;
 
-	switch (port)
+	switch (get_port_mode(port))
 	{
-	case PORT_A:
-	case PORT_B:
-		switch (get_port_mode(port))
-		{
-		case PORT_MODE_INPUT:
-			data = m_in_port_func[port](0);
-			break;
-
-		case PORT_MODE_OUTPUT:
-			data = m_output[port];
-			break;
-		}
+	case PORT_MODE_INPUT:
+		data = m_in_port_func[port](0);
 		break;
 
-	case PORT_C:
-		switch (get_port_mode(PORT_C))
-		{
-		case PORT_MODE_INPUT:
-			data = m_in_port_func[port](0) & 0x3f;
-			break;
+	case PORT_MODE_OUTPUT:
+		data = m_output[port];
+		break;
 
-		case PORT_MODE_OUTPUT:
-			data = m_output[port] & 0x3f;
-			break;
-
-		default:
-			logerror("8155 '%s' Unsupported Port C mode!\n", tag());
-		}
+	default:
+		// strobed mode not implemented yet
+		logerror("8155 '%s' Unsupported Port C mode!\n", tag());
 		break;
 	}
 
@@ -404,7 +387,7 @@ READ8_MEMBER( i8155_device::io_r )
 		break;
 
 	case REGISTER_PORT_C:
-		data = read_port(PORT_C);
+		data = read_port(PORT_C) | 0xc0;
 		break;
 
 	case REGISTER_TIMER_LOW:
@@ -501,7 +484,7 @@ void i8155_device::register_w(int offset, UINT8 data)
 		break;
 
 	case REGISTER_PORT_C:
-		write_port(PORT_C, data);
+		write_port(PORT_C, data & 0x3f);
 		break;
 
 	case REGISTER_TIMER_LOW:
