@@ -461,17 +461,17 @@ ROM_START( spacefba )
 	ROM_LOAD( "tst-c-a.5n",      0x3800, 0x0800, CRC(1a798fbf) SHA1(65ff2fe91c2037378314c4a68b2bd21fd167c64a) )
 
 	ROM_REGION( 0x1000, "audiocpu", 0 )
-    ROM_LOAD( "ic20.snd",    0x0000, 0x0400, BAD_DUMP CRC(1c8670b3) SHA1(609124caa11498fc6a6bdf6cdbb8003bbc249dd8) ) // not dumped from this board yet, rom taken from parent
+    ROM_LOAD( "tst-e-20.bin",    0x0000, 0x0400, CRC(f7a59492) SHA1(22bdc02c72086c38acd9d9675da54ce6ba3f80a3) )
 
 	ROM_REGION( 0x1000, "gfx1", 0 )  /* sprites */
 	ROM_LOAD( "tst-v-a.5k",      0x0000, 0x0800, CRC(236e1ff7) SHA1(575b8ed9ab054a864207e0fde3ae93cdcafbebf2) )
 	ROM_LOAD( "tst-v-a.6k",      0x0800, 0x0800, CRC(bf901a4e) SHA1(71207ad1ca60aa617dbbc3cd2e4e42520b7c8513) )
 
-	ROM_REGION( 0x0100, "gfx2", 0 )  /* bullets */
-	ROM_LOAD( "4i.vid",      0x0000, 0x0100, BAD_DUMP CRC(528e8533) SHA1(8e41eee1016c98a4f08acbd902daf8e32aa9d9ab) ) // not dumped from this board yet, rom taken from parent
+	ROM_REGION( 0x0200, "gfx2", 0 )  /* bullets */
+	ROM_LOAD( "mb7052-a.4i",     0x0000, 0x0200, CRC(0f8c1400) SHA1(d532d8a753a27d60eb1947c8344a2eb6a92e8430) ) // lower half is crc 528e8533, what's the upper half for?! bullet color maybe?
 
 	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "mb7051.3n",   0x0000, 0x0020, BAD_DUMP CRC(465d07af) SHA1(25e246f7674c25d05e5f6e68db88c15aaa10cee1) ) // not dumped from this board yet, rom taken from parent
+	ROM_LOAD( "mb7051-a.3n",     0x0000, 0x0020, CRC(465d07af) SHA1(25e246f7674c25d05e5f6e68db88c15aaa10cee1) )
 ROM_END
 
 
