@@ -712,6 +712,8 @@ WRITE16_MEMBER( driver_device::paletteram_xRRRRRGGGGGBBBBB_word_w ) { palette_16
 WRITE32_MEMBER( driver_device::paletteram_xRRRRRGGGGGBBBBB_dword_be_w ) { palette_16bit_dword_be_w<5,5,5, 10,5,0>(space, offset, data, mem_mask); }
 WRITE32_MEMBER( driver_device::paletteram_xRRRRRGGGGGBBBBB_dword_le_w ) { palette_16bit_dword_le_w<5,5,5, 10,5,0>(space, offset, data, mem_mask); }
 
+WRITE8_MEMBER( driver_device::paletteram_xGGGGGRRRRRBBBBB_byte_le_w ) { palette_16bit_byte_le_w<5,5,5, 5,10,0>(space, offset, data, mem_mask); }
+
 WRITE16_MEMBER( driver_device::paletteram_xGGGGGRRRRRBBBBB_word_w ) { palette_16bit_word_w<5,5,5, 5,10,0>(space, offset, data, mem_mask); }
 WRITE16_MEMBER( driver_device::paletteram_xGGGGGBBBBBRRRRR_word_w ) { palette_16bit_word_w<5,5,5, 0,10,5>(space, offset, data, mem_mask); }
 WRITE16_MEMBER( driver_device::paletteram_RRRRRGGGGGBBBBBx_word_w ) { palette_16bit_word_w<5,5,5, 11,6,1>(space, offset, data, mem_mask); }

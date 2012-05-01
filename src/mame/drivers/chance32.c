@@ -56,7 +56,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 	SET_TILE_INFO(
 			1,
 			code & 0x0fff,
-			6,
+			0,
 			0);
 }
 
@@ -79,9 +79,7 @@ VIDEO_START( chance32 )
 	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 16, 8, 35, 29);
 	state->m_fg_tilemap->set_transparent_pen(0);
 
-
 	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 16, 8, 35, 29);
-
 
 	state->m_fg_tilemap->set_flip(TILE_FLIPX|TILE_FLIPY);
 	state->m_bg_tilemap->set_flip(TILE_FLIPX|TILE_FLIPY);
@@ -103,7 +101,7 @@ static ADDRESS_MAP_START( chance32_map, AS_PROGRAM, 8, chance32_state )
 	AM_RANGE(0x0000, 0xcfff) AM_ROM
 	AM_RANGE(0xd800, 0xdfff) AM_RAM
 
-	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_byte_le_w) AM_SHARE("paletteram") // probably wrong component order
+	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(paletteram_xGGGGGRRRRRBBBBB_byte_le_w) AM_SHARE("paletteram")
 
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(chance32_fgram_w) AM_SHARE("fgram")
 	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(chance32_bgram_w) AM_SHARE("bgram")
@@ -132,8 +130,8 @@ static const gfx_layout tiles8x8_layout =
 };
 
 static GFXDECODE_START( chance32 )
-	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0, tiles8x8_layout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 8 )
+	GFXDECODE_ENTRY( "gfx2", 0, tiles8x8_layout, 0, 8 )
 GFXDECODE_END
 
 
