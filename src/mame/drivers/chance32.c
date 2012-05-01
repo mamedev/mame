@@ -53,22 +53,24 @@ static TILE_GET_INFO( get_fg_tile_info )
 {
 	chance32_state *state = machine.driver_data<chance32_state>();
 	int code = (state->m_fgram[tile_index * 2 + 1] << 8) | state->m_fgram[tile_index * 2];
+	int flip = (~code >> 12)&1;
 	SET_TILE_INFO(
 			1,
 			code & 0x0fff,
-			0,
-			0);
+			code >> 13,
+			TILE_FLIPYX(flip<<1)|flip);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
 	chance32_state *state = machine.driver_data<chance32_state>();
 	int code = (state->m_bgram[tile_index * 2 +1] << 8) | state->m_bgram[tile_index * 2];
+	int flip = (~code >> 12)&1;
 	SET_TILE_INFO(
 			0,
 			code & 0x0fff,
-			6,
-			0);
+			code >> 13,
+			TILE_FLIPYX(flip<<1|flip));
 }
 
 
