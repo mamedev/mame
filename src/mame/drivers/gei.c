@@ -1695,49 +1695,51 @@ ROM_START( gtsers11 )
 	/* Missing "General Facts" */
 ROM_END
 
-ROM_START( gt103a1 )
-	ROM_REGION( 0x38000, "maincpu", 0 )
-	ROM_LOAD( "prog1_versiona",  0x00000, 0x4000, CRC(537d6566) SHA1(282a33e4a9fc54d34094393c00026bf31ccd6ab5) )
-	ROM_LOAD( "new_science_2",   0x10000, 0x8000, CRC(3bd80fb8) SHA1(9a196595bc5dc6ed5ee5853786839ed4847fa436) ) /* Questions from an unknown set, will be corrected when verified */
-	ROM_LOAD( "nfl_football",    0x18000, 0x8000, CRC(d676b7cd) SHA1(d652d2441adb500f7af526d110d0335ea453d75b) ) /* These questions are likely mix-n-match do to opperator swaps   */
-	ROM_LOAD( "rock_music",      0x20000, 0x8000, CRC(7f11733a) SHA1(d4d0dee75518edf986cb1241ade45ccb4840f088) ) /* Currently unverified are Series 12, 13 & 14 */
-	ROM_LOAD( "war_and_peace",   0x28000, 0x8000, CRC(bc709383) SHA1(2fba4c80773abea7bbd826c39378b821cddaa255) )
-	ROM_LOAD( "entertainment",   0x30000, 0x8000, CRC(07068c9f) SHA1(1aedc78d071281ec8b08488cd82655d41a77cf6b) )
-ROM_END
-
-ROM_START( gt103a2 )
+ROM_START( gtsers12 )
 	ROM_REGION( 0x38000, "maincpu", 0 )
 	ROM_LOAD( "prog1_versionc",  0x00000, 0x4000, CRC(340246a4) SHA1(d655e1cf2b1e87a05e87ff6af4b794e6d54a2a52) )
-	ROM_LOAD( "vices",           0x10000, 0x8000, CRC(e6069955) SHA1(68f7453f21a4ce1be912141bbe947fbd81d918a3) ) /* Questions from an unknown set, will be corrected when verified */
-	ROM_LOAD( "cops_&_robbers",  0x18000, 0x8000, CRC(8b367c33) SHA1(013468157bf469c9cf138809fdc45b3ba60a423b) ) /* These questions are likely mix-n-match do to opperator swaps   */
-	ROM_LOAD( "famous_couples",  0x20000, 0x8000, CRC(e0618218) SHA1(ff64fcd6dec83a2271b63c3ae64dc932a3954ec5) ) /* Currently unverified are Series 12, 13 & 14 */
+	ROM_LOAD( "new_science_2",   0x10000, 0x8000, CRC(3bd80fb8) SHA1(9a196595bc5dc6ed5ee5853786839ed4847fa436) )
+	ROM_LOAD( "adult_sex_4",     0x18000, 0x8000, CRC(36a75071) SHA1(f08d31f241e1dc9b94b940cd2872a692f6f8475b) )
+	ROM_LOAD( "cops_&_robbers",  0x20000, 0x8000, CRC(8b367c33) SHA1(013468157bf469c9cf138809fdc45b3ba60a423b) )
 	ROM_LOAD( "famous_quotes",   0x28000, 0x8000, CRC(0a27d8ae) SHA1(427e6ae25e47da7f7f7c3e92a37e330d711da90c) )
+	ROM_LOAD( "vices",           0x30000, 0x8000, CRC(e6069955) SHA1(68f7453f21a4ce1be912141bbe947fbd81d918a3) )
 ROM_END
 
-ROM_START( gt103a3 )
+ROM_START( gtsers14 )
 	ROM_REGION( 0x38000, "maincpu", 0 )
-	ROM_LOAD( "t_3a-8_1.bin",    0x00000, 0x4000, CRC(02aef306) SHA1(1ffc10c79a55d41ea36bcaab13cb3f02cb3f9712) )
-	ROM_LOAD( "rock-n-roll_alt", 0x10000, 0x8000, CRC(8eb83052) SHA1(93e3c1ae6c2048fb44ecafe1013b6a96da38fa84) ) /* Questions from an unknown set, will be corrected when verified */
-	ROM_LOAD( "history-geog",    0x18000, 0x8000, CRC(c9a70fc3) SHA1(4021e5d702844416e8c798ed0a57c9ecd20b1d4b) ) /* These questions are likely mix-n-match do to opperator swaps   */
-	ROM_LOAD( "the_sixties",     0x20000, 0x8000, CRC(8cfa854e) SHA1(81428c12f99841db1c61b471ac8d00f0c411883b) ) /* Currently unverified are Series 12, 13 & 14 */
-	ROM_LOAD( "tv_comedies",     0x28000, 0x8000, CRC(992ae38e) SHA1(312780d651a85a1c433f587ff2ede579456d3fd9) )
+	ROM_LOAD( "prog1_versionc",  0x00000, 0x4000, CRC(340246a4) SHA1(d655e1cf2b1e87a05e87ff6af4b794e6d54a2a52) )
+	ROM_LOAD( "famous_couples",  0x10000, 0x8000, CRC(e0618218) SHA1(ff64fcd6dec83a2271b63c3ae64dc932a3954ec5) )
+	ROM_LOAD( "war_and_peace",   0x18000, 0x8000, CRC(bc709383) SHA1(2fba4c80773abea7bbd826c39378b821cddaa255) )
+	ROM_LOAD( "tv_comedies",     0x20000, 0x8000, CRC(992ae38e) SHA1(312780d651a85a1c433f587ff2ede579456d3fd9) )
+	ROM_LOAD( "the_sixties",     0x28000, 0x8000, CRC(8cfa854e) SHA1(81428c12f99841db1c61b471ac8d00f0c411883b) )
+	/* Missing "New Sports" */
+ROM_END
+
+ROM_START( gt103a1 ) /* Need to verify these are actually Series 13 */
+	ROM_REGION( 0x38000, "maincpu", 0 )
+	ROM_LOAD( "prog1_versiona",  0x00000, 0x4000, CRC(537d6566) SHA1(282a33e4a9fc54d34094393c00026bf31ccd6ab5) ) /* Currently unverified Series 13 */
+	ROM_LOAD( "history-geog",    0x10000, 0x8000, CRC(c9a70fc3) SHA1(4021e5d702844416e8c798ed0a57c9ecd20b1d4b) )
+	ROM_LOAD( "nfl_football",    0x18000, 0x8000, CRC(d676b7cd) SHA1(d652d2441adb500f7af526d110d0335ea453d75b) )
+	ROM_LOAD( "rock_music",      0x20000, 0x8000, CRC(7f11733a) SHA1(d4d0dee75518edf986cb1241ade45ccb4840f088) )
+	ROM_LOAD( "rock-n-roll_alt", 0x28000, 0x8000, CRC(8eb83052) SHA1(93e3c1ae6c2048fb44ecafe1013b6a96da38fa84) )
+	ROM_LOAD( "entertainment",   0x30000, 0x8000, CRC(07068c9f) SHA1(1aedc78d071281ec8b08488cd82655d41a77cf6b) )
 ROM_END
 
 ROM_START( gt103aa )
 	ROM_REGION( 0x38000, "maincpu", 0 )
 	ROM_LOAD( "t_3a-8_1.bin",      0x00000, 0x4000, CRC(02aef306) SHA1(1ffc10c79a55d41ea36bcaab13cb3f02cb3f9712) )
-	ROM_LOAD( "entertainment_alt", 0x10000, 0x8000, CRC(9a6628b9) SHA1(c0cb7e974329d4d5b91f107296d21a674e35a51b) ) /* Questions from an unknown set, will be corrected when verified */
-	ROM_LOAD( "general_alt",       0x18000, 0x8000, CRC(df34f7f9) SHA1(329d123eea711d5135dc02dd7b89b220ce8ddd28) ) /* These questions are likely mix-n-match do to opperator swaps   */
-	ROM_LOAD( "science_alt",       0x20000, 0x8000, CRC(9eaebd18) SHA1(3a4d787cb006dbb23ce346577cb1bb5e543ba52c) ) /* Currently unverified are Series 12, 13 & 14 */
+	ROM_LOAD( "entertainment_alt", 0x10000, 0x8000, CRC(9a6628b9) SHA1(c0cb7e974329d4d5b91f107296d21a674e35a51b) )
+	ROM_LOAD( "general_alt",       0x18000, 0x8000, CRC(df34f7f9) SHA1(329d123eea711d5135dc02dd7b89b220ce8ddd28) )
+	ROM_LOAD( "science_alt",       0x20000, 0x8000, CRC(9eaebd18) SHA1(3a4d787cb006dbb23ce346577cb1bb5e543ba52c) )
 	ROM_LOAD( "science_alt2",      0x28000, 0x8000, CRC(ac93d348) SHA1(55550ba6b5daffdf9653854075ad4f8398a5e621) )
 	ROM_LOAD( "sports_alt2",       0x30000, 0x8000, CRC(40207845) SHA1(2dddb9685dcefabfde07057a639aa9d08da2329e) )
 ROM_END
 
 ROM_START( gt103asx )
 	ROM_REGION( 0x38000, "maincpu", 0 )
-	ROM_LOAD( "t_3a-8_1.bin",    0x00000, 0x4000, CRC(02aef306) SHA1(1ffc10c79a55d41ea36bcaab13cb3f02cb3f9712) )
-	ROM_LOAD( "adult_sex_2",     0x10000, 0x8000, CRC(0d683f21) SHA1(f47ce3c31c4c5ed02247fa280303e6ae760315df) )
-	ROM_LOAD( "adult_sex_2_alt", 0x18000, 0x8000, CRC(8c0eacc8) SHA1(ddaa25548d161394b41c65a2db57a9fcf793062b) )
+	ROM_LOAD( "t_3a-8_1.bin",    0x00000, 0x4000, CRC(02aef306) SHA1(1ffc10c79a55d41ea36bcaab13cb3f02cb3f9712) ) /* Not sure there was ever a specific Adult set  */
+	ROM_LOAD( "adult_sex_2",     0x10000, 0x8000, CRC(0d683f21) SHA1(f47ce3c31c4c5ed02247fa280303e6ae760315df) ) /* These are likely just the collection of adult */
+	ROM_LOAD( "adult_sex_2_alt", 0x18000, 0x8000, CRC(8c0eacc8) SHA1(ddaa25548d161394b41c65a2db57a9fcf793062b) ) /* from all the series combined here. */
 	ROM_LOAD( "adult_sex_3_alt", 0x20000, 0x8000, CRC(63cbd1d6) SHA1(8dcd5546dc8688d6b8404d5cf63d8a59acc9bf4c) )
 	ROM_LOAD( "adult_sex_4",     0x28000, 0x8000, CRC(36a75071) SHA1(f08d31f241e1dc9b94b940cd2872a692f6f8475b) )
 	ROM_LOAD( "adult_sex_5",     0x30000, 0x8000, CRC(fdbc3729) SHA1(7cb7cec4439ddc39de2f7f62c25623cfb869f493) )
@@ -1909,9 +1911,9 @@ GAME( 1984, gtsers8,  0,        findout,  gt103a,   0,       ROT0, "Greyhound El
 GAME( 1984, gtsers9,  gtsers8,  findout,  gt103a,   0,       ROT0, "Greyhound Electronics", "Trivia (Questions Series 9)",             GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1984, gtsers10, gtsers8,  findout,  gt103a,   0,       ROT0, "Greyhound Electronics", "Trivia (Questions Series 10)",            GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1984, gtsers11, gtsers8,  findout,  gt103a,   0,       ROT0, "Greyhound Electronics", "Trivia (Questions Series 11)",            GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1984, gtsers12, gtsers8,  findout,  gt103a,   0,       ROT0, "Greyhound Electronics", "Trivia (Questions Series 12)",            GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1984, gtsers14, gtsers8,  findout,  gt103a,   0,       ROT0, "Greyhound Electronics", "Trivia (Questions Series 14)",            GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1984, gt103a1,  gtsers8,  findout,  gt103a,   0,       ROT0, "Greyhound Electronics", "Trivia (Version 1.03a) (alt 1)",          GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1984, gt103a2,  gtsers8,  findout,  gt103a,   0,       ROT0, "Greyhound Electronics", "Trivia (Version 1.03a) (alt 2)",          GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1984, gt103a3,  gtsers8,  findout,  gt103a,   0,       ROT0, "Greyhound Electronics", "Trivia (Version 1.03a) (alt 3)",          GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1984, gt103aa,  gtsers8,  findout,  gt103a,   0,       ROT0, "Greyhound Electronics", "Trivia (Version 1.03a Alt questions)",    GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1984, gt103asx, gtsers8,  findout,  gt103a,   0,       ROT0, "Greyhound Electronics", "Trivia (Version 1.03a Sex questions)",    GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 
