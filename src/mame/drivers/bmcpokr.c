@@ -48,16 +48,30 @@ class bmcpokr_state : public driver_device
 public:
 	bmcpokr_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this,"maincpu")
+		m_maincpu(*this,"maincpu"),
+		m_videoram(*this, "videoram")
 		{ }
 
+	DECLARE_READ16_MEMBER( bmcpokr_unk_r )
+	{
+		return space.machine().rand();
+	}
+
 	required_device<cpu_device> m_maincpu;
+	required_shared_ptr<UINT16> m_videoram;
 };
 
 
 
 static ADDRESS_MAP_START( bmcpokr_mem, AS_PROGRAM, 16, bmcpokr_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
+	AM_RANGE(0x210000, 0x21ffff) AM_RAM
+
+	AM_RANGE(0x2c0000, 0x2dffff) AM_RAM AM_SHARE("videoram")
+
+	AM_RANGE(0x2FF800, 0x2FFFFF) AM_RAM
+	AM_RANGE(0x34001A, 0x34001B) AM_READ(bmcpokr_unk_r)
+
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( bmcpokr )
@@ -185,6 +199,24 @@ GFXDECODE_END
 
 SCREEN_UPDATE_IND16( bmcpokr )
 {
+	bmcpokr_state *state = screen.machine().driver_data<bmcpokr_state>();
+	const gfx_element *gfx = screen.machine().gfx[0];
+
+	int count = 0;
+	for (int y=0;y<32;y++)
+	{
+		for (int x=0;x<64;x++)
+		{
+			UINT16 data = state->m_videoram[count];
+			count++;
+			
+			drawgfx_opaque(bitmap,cliprect,gfx,data,0,0,0,x*8,y*8);
+
+		}
+	}
+
+
+
 	return 0;
 }
 
@@ -197,7 +229,7 @@ VIDEO_START(bmcpokr)
 static MACHINE_CONFIG_START( bmcpokr, bmcpokr_state )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_42MHz/4)
 	MCFG_CPU_PROGRAM_MAP(bmcpokr_mem)
-	//MCFG_CPU_VBLANK_INT("screen",irq3_line_hold)
+	MCFG_CPU_VBLANK_INT("screen",irq3_line_hold)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
