@@ -608,11 +608,7 @@ ROM_END
 
 /*
 
-  Meyco Games, unknown PCB, 1981
-
-  NOTE TO WHOEVER IS MAME DEVELOPER FOR THIS DRIVER:  This is obviously part of a multiple board set.
-  The other PCB board(s) were unfound.  If/when the game is identified,
-  could you please let me know what it is?
+  Meyco Games, 1981
 
   Dumper notes:
 
@@ -646,7 +642,7 @@ ROM_END
     |------------------------------------------------------------------------------|
 
   * = 8 pin connector
-  & = 50 pin connector (assuming to other half of PCB)
+  & = 50 pin connector (meant for edge connector or to another pcb?)
 
 */
 
