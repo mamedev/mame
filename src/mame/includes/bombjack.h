@@ -17,8 +17,6 @@ public:
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_colorram;
 	required_shared_ptr<UINT8> m_spriteram;
-//  UINT8 *     m_paletteram;  // currently this uses generic palette handling
-	size_t		m_spriteram_size;
 
 	/* video-related */
 	tilemap_t	*m_fg_tilemap;
