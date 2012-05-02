@@ -17,10 +17,6 @@ public:
 	required_shared_ptr<UINT8> m_videoram3;
 	required_shared_ptr<UINT8> m_videoram2;
 
-	size_t      m_videoram_size;
-	size_t      m_spriteram_size;
-	size_t      m_spriteram2_size;
-
 	/* video-related */
 	bitmap_ind16    *m_tmp_bitmap1;
 	bitmap_ind16    *m_tmp_bitmap2;
