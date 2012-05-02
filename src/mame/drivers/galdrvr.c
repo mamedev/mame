@@ -4203,6 +4203,27 @@ ROM_START( mooncrstuk )
 	ROM_LOAD( "mmi6331.6l", 0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) ) /* Compatible with 82s123 prom */
 ROM_END
 
+ROM_START( mooncrstuku )
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "smc1f",        0x0000, 0x0800, CRC(389ca0d6) SHA1(51cf6d190a0ebf23b70c2bcf1ccaa4705e29cd09) )
+	ROM_LOAD( "smc2f",        0x0800, 0x0800, CRC(410ab430) SHA1(d89abff6ac4afbf69377a1d63043d629a634aab7) )
+	ROM_LOAD( "smc3f",        0x1000, 0x0800, CRC(a6b4144b) SHA1(2b27ad54d716286c0dc9476d47df182ae01bcfd7) )
+	ROM_LOAD( "smc4f",        0x1800, 0x0800, CRC(4cc046fe) SHA1(465eaacd50967d768babadd09ab9cad35380f6bf) )
+	ROM_LOAD( "smc5f",     	  0x2000, 0x0800, CRC(06d378a6) SHA1(99dbe9fc7f95f8fdce86eb5c32bd1ca1bea0ca3c) )
+	ROM_LOAD( "smc6f",        0x2800, 0x0800, CRC(6e84a927) SHA1(82e8e825d157c3c947a3a222bca059a735169c7d) )
+	ROM_LOAD( "smc7f",        0x3000, 0x0800, CRC(b45af1e8) SHA1(d7020774707234acdaef5c655f667d5ee9e54a13) )
+	ROM_LOAD( "smc8f_uk",     0x3800, 0x0800, CRC(b968b2ff) SHA1(40105423f48d2260e85597c3c1e4d8fe947db793) )
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "mcs_b",        0x0000, 0x0800, CRC(fb0f1f81) SHA1(38a6679a8b69bc1870a0e67e692131c42f9535c8) )
+	ROM_LOAD( "mcs_d",        0x0800, 0x0800, CRC(13932a15) SHA1(b8885c555c6ad7021be55c6925a0a0872c1b6abd) )
+	ROM_LOAD( "mcs_a",        0x1000, 0x0800, CRC(631ebb5a) SHA1(5bc9493afa76c55858b8c8849524cbc77dc838fc) )
+	ROM_LOAD( "mcs_c",        0x1800, 0x0800, CRC(24cfd145) SHA1(08c6599db170dd6ee364c44f70a0f5c0f881b6ef) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "mmi6331.6l", 0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) ) /* Compatible with 82s123 prom */
+ROM_END
+
 ROM_START( mooncrstu )
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "smc1f",        0x0000, 0x0800, CRC(389ca0d6) SHA1(51cf6d190a0ebf23b70c2bcf1ccaa4705e29cd09) )
@@ -6421,11 +6442,12 @@ GAME( 1981, gmgalax,  0,        gmgalax,  gmgalax,  gmgalax,  ROT90,  "bootleg",
  *************************************/
 
 /* based on Galaxian, but with altered address map for more ROM */
-GAME( 1980, mooncrst,  0,        mooncrst, mooncrst, mooncrst, ROT90,  "Nichibutsu", "Moon Cresta (Nichibutsu)", GAME_SUPPORTS_SAVE )
-GAME( 1980, mooncrstuk,mooncrst, mooncrst, mooncrst, mooncrst, ROT90,  "Nichibutsu UK", "Moon Cresta (Nichibutsu UK)", GAME_SUPPORTS_SAVE )
-GAME( 1980, mooncrstu, mooncrst, mooncrst, mooncrst, mooncrsu, ROT90,  "Nichibutsu USA", "Moon Cresta (Nichibutsu USA, unencrypted)", GAME_SUPPORTS_SAVE )
-GAME( 1980, mooncrsto, mooncrst, mooncrst, mooncrsa, mooncrst, ROT90,  "Nichibutsu", "Moon Cresta (Nichibutsu, old rev)", GAME_SUPPORTS_SAVE )
-GAME( 1980, mooncrstg, mooncrst, mooncrst, mooncrsg, mooncrsu, ROT90,  "Nichibutsu (Gremlin license)", "Moon Cresta (Gremlin)", GAME_SUPPORTS_SAVE )
+GAME( 1980, mooncrst,   0,        mooncrst, mooncrst, mooncrst, ROT90,  "Nichibutsu", "Moon Cresta (Nichibutsu)", GAME_SUPPORTS_SAVE )
+GAME( 1980, mooncrstuk, mooncrst, mooncrst, mooncrst, mooncrst, ROT90,  "Nichibutsu UK", "Moon Cresta (Nichibutsu UK)", GAME_SUPPORTS_SAVE )
+GAME( 1980, mooncrstuku,mooncrst, mooncrst, mooncrst, mooncrsu, ROT90,  "Nichibutsu UK", "Moon Cresta (Nichibutsu UK, unencrypted)", GAME_SUPPORTS_SAVE )
+GAME( 1980, mooncrstu,  mooncrst, mooncrst, mooncrst, mooncrsu, ROT90,  "Nichibutsu USA", "Moon Cresta (Nichibutsu USA, unencrypted)", GAME_SUPPORTS_SAVE )
+GAME( 1980, mooncrsto,  mooncrst, mooncrst, mooncrsa, mooncrst, ROT90,  "Nichibutsu", "Moon Cresta (Nichibutsu, old rev)", GAME_SUPPORTS_SAVE )
+GAME( 1980, mooncrstg,  mooncrst, mooncrst, mooncrsg, mooncrsu, ROT90,  "Nichibutsu (Gremlin license)", "Moon Cresta (Gremlin)", GAME_SUPPORTS_SAVE )
 
 /* straight Moon Cresta ripoffs on basic mooncrst hardware */
 GAME( 1980, mooncrsb, mooncrst, mooncrst, mooncrsa, mooncrsu, ROT90,  "bootleg", "Moon Cresta (bootleg set 1)", GAME_SUPPORTS_SAVE )
