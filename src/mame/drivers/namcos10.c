@@ -352,9 +352,12 @@ READ32_MEMBER(namcos10_state::range_r)
     */
 
 	UINT16 dd16 = d16 ^ key;
+	
+	key = d16;
 
 	key =
-		((    BIT(d16,  3) ^ (BIT(cnt, 0) & !BIT(cnt, 2))) << 15) |
+		//((    BIT(d16,  3) ^ (BIT(cnt, 0) & !BIT(cnt, 2))) << 15) |
+		((1 ^ BIT(key,  3) ^  BIT(d16, 0))                 << 15) |
 		((1 ^ BIT(key, 13) ^  BIT(cnt, 0))                 << 14) |
 		((1 ^ BIT(key, 11) ^  BIT(d16, 5) ^  BIT(d16, 2))  << 13) |
 		((    BIT(key,  9) ^  BIT(cnt, 3))                 << 12) |
@@ -369,7 +372,8 @@ READ32_MEMBER(namcos10_state::range_r)
 		((1 ^ BIT(key,  8) ^ (BIT(cnt, 7) |  BIT(d16, 3))) <<  3) |
 		((    BIT(key, 14) ^ (BIT(cnt, 1) |  BIT(d16, 7))) <<  2) |
 		((1 ^ BIT(key, 12) ^ (BIT(cnt, 7) &  BIT(d16, 7))) <<  1) |
-		((                   (BIT(cnt, 0) |  BIT(cnt, 2))) <<  0);
+		//((                   (BIT(cnt, 0) |  BIT(cnt, 2))) <<  0);
+		((1 ^ BIT(key,  0) ^ BIT(cnt, 2))                  <<  0);
 
 	cnt++;
 
