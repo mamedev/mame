@@ -440,7 +440,7 @@ static void objects_draw( running_machine &machine )
 	const UINT8  *const gfxrom = state->memregion("gfx5")->base();
 	const UINT8  *const sproms = state->memregion("proms")->base() + 0x800;
 
-	for (offs = 0; offs < state->m_objectram_size; offs += 4)
+	for (offs = 0; offs < state->m_object_ram.bytes(); offs += 4)
 	{
 		UINT32 y;
 		UINT32 xpos;
@@ -802,7 +802,7 @@ static void hud_draw( running_machine &machine, bitmap_ind16 &bitmap, const rect
 	UINT8	*tile_rom = state->memregion("gfx3")->base();
 	UINT32 offs;
 
-	for (offs = 0x0; offs <= state->m_hudram_size; offs += 2)
+	for (offs = 0x0; offs <= state->m_hud_ram.bytes(); offs += 2)
 	{
 		UINT32 y;
 		UINT32 y_pos;
