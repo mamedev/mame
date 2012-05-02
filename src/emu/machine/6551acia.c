@@ -94,7 +94,7 @@ static TIMER_CALLBACK(acia_6551_timer_callback)
 void acia6551_device::device_start()
 {
 	/* transmit data reg is empty */
-	m_status_register |= (1<<4);
+	m_status_register = (1<<4);
 	m_timer = machine().scheduler().timer_alloc(FUNC(acia_6551_timer_callback), (void *) this);
 
 	transmit_register_reset();
