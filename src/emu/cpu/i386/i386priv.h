@@ -240,7 +240,6 @@ struct _i386_state
 
 	UINT8 performed_intersegment_jump;
 	UINT8 delayed_interrupt_enable;
-	UINT8 old_tf;
 
 	UINT32 cr[5];		// Control registers
 	UINT32 dr[8];		// Debug registers
@@ -419,18 +418,19 @@ INLINE int translate_address(i386_state *cpustate, int rwn, UINT32 *address, UIN
 	UINT32 offset = a & 0xfff;
 	UINT32 page_entry;
 	UINT32 ret = 1;
+	bool user = (cpustate->CPL == 3);
 	*error = 0;
 
 	// TODO: cr0 wp bit, 486 and higher
 	UINT32 page_dir = cpustate->program->read_dword(pdbr + directory * 4);
-	if(page_dir & 1)
+	if((page_dir & 1) && ((page_dir & 4) || !user))
 	{
 		if (!(cpustate->cr[4] & 0x10))
 		{
 			page_entry = cpustate->program->read_dword((page_dir & 0xfffff000) + (table * 4));
 			if(!(page_entry & 1))
 				ret = 0;
-			else if(!(page_entry & 2) && cpustate->CPL && (rwn == 1))
+			else if((!(page_entry & 2) && user && (rwn == 1)) || (!(page_entry & 4) && user))
 			{
 				*error = 1;
 				ret = 0;
@@ -450,7 +450,7 @@ INLINE int translate_address(i386_state *cpustate, int rwn, UINT32 *address, UIN
 		{
 			if (page_dir & 0x80)
 			{
-				if(!(page_dir & 2) && cpustate->CPL && (rwn == 1))
+				if(!(page_dir & 2) && user && (rwn == 1))
 				{
 					*error = 1;
 					ret = 0;
@@ -469,7 +469,7 @@ INLINE int translate_address(i386_state *cpustate, int rwn, UINT32 *address, UIN
 				page_entry = cpustate->program->read_dword((page_dir & 0xfffff000) + (table * 4));
 				if(!(page_entry & 1))
 					ret = 0;
-				else if(!(page_entry & 2) && cpustate->CPL && (rwn == 1))
+				else if((!(page_entry & 2) && user && (rwn == 1)) || (!(page_entry & 4) && user))
 				{
 					*error = 1;
 					ret = 0;
@@ -488,11 +488,15 @@ INLINE int translate_address(i386_state *cpustate, int rwn, UINT32 *address, UIN
 		}
 	}
 	else
+	{
+		if(page_dir & 1)
+			*error = 1;
 		ret = 0;
+	}
 	if(!ret)
 	{
 		if(rwn != -1)
-			*error |= ((rwn & 1)<<1) | ((cpustate->CPL==3)?1<<2:0);
+			*error |= ((rwn & 1)<<1) | (user<<2);
 		return 0;
 	}
 	return 1;
@@ -670,6 +674,16 @@ INLINE UINT64 READ64(i386_state *cpustate,UINT32 ea)
 				(((UINT64) cpustate->program->read_dword( address+4 )) << 32);
 	}
 	return value;
+}
+
+INLINE void WRITE_TEST(i386_state *cpustate,UINT32 ea)
+{
+	UINT32 address = ea, error;
+	if (cpustate->cr[0] & 0x80000000)		// page translation enabled
+	{
+		if(!translate_address(cpustate,1,&address,&error))
+			PF_THROW(error);
+	}
 }
 
 INLINE void WRITE8(i386_state *cpustate,UINT32 ea, UINT8 value)

@@ -52,9 +52,14 @@ static UINT32 i386_load_protected_mode_segment(i386_state *cpustate, I386_SREG *
 	entry = seg->selector & ~0x7;
 	if (limit == 0 || entry + 7 > limit)
 		return 0;
+	
+	int cpl = cpustate->CPL;
+	cpustate->CPL = 0;
 
 	v1 = READ32(cpustate, base + entry );
 	v2 = READ32(cpustate, base + entry + 4 );
+
+	cpustate->CPL = cpl;
 
 	seg->flags = (v2 >> 8) & 0xf0ff;
 	seg->base = (v2 & 0xff000000) | ((v2 & 0xff) << 16) | ((v1 >> 16) & 0xffff);
@@ -88,8 +93,13 @@ static void i386_load_call_gate(i386_state* cpustate, I386_CALL_GATE *gate)
 	if (limit == 0 || entry + 7 > limit)
 		return;
 
+	int cpl = cpustate->CPL;
+	cpustate->CPL = 0;
+
 	v1 = READ32(cpustate, base + entry );
 	v2 = READ32(cpustate, base + entry + 4 );
+
+	cpustate->CPL = cpl;
 
 	/* Note that for task gates, offset and dword_count are not used */
 	gate->selector = (v1 >> 16) & 0xffff;
@@ -129,35 +139,39 @@ static void i386_load_segment_descriptor(i386_state *cpustate, int segment )
 /* Retrieves the stack selector located in the current TSS */
 static UINT32 i386_get_stack_segment(i386_state* cpustate, UINT8 privilege)
 {
+	UINT32 ret;
 	if(privilege >= 3)
 		return 0;
 
-	return READ32(cpustate,(cpustate->task.base+8) + (8*privilege));
-}
+	int cpl = cpustate->CPL;
+	cpustate->CPL = 0;
 
-static UINT16 i286_get_stack_segment(i386_state* cpustate, UINT8 privilege)
-{
-	if(privilege >= 3)
-		return 0;
+	if(cpustate->task.flags & 8)
+		ret = READ32(cpustate,(cpustate->task.base+8) + (8*privilege));
+	else
+		ret = READ16(cpustate,(cpustate->task.base+4) + (4*privilege));
 
-	return READ16(cpustate,(cpustate->task.base+4) + (4*privilege));
+	cpustate->CPL = cpl;
+	return ret;
 }
 
 /* Retrieves the stack pointer located in the current TSS */
 static UINT32 i386_get_stack_ptr(i386_state* cpustate, UINT8 privilege)
 {
+	UINT32 ret;
 	if(privilege >= 3)
 		return 0;
 
-	return READ32(cpustate,(cpustate->task.base+4) + (8*privilege));
-}
+	int cpl = cpustate->CPL;
+	cpustate->CPL = 0;
 
-static UINT16 i286_get_stack_ptr(i386_state* cpustate, UINT8 privilege)
-{
-	if(privilege >= 3)
-		return 0;
+	if(cpustate->task.flags & 8)
+		ret = READ32(cpustate,(cpustate->task.base+4) + (8*privilege));
+	else
+		ret = READ16(cpustate,(cpustate->task.base+2) + (4*privilege));
 
-	return READ16(cpustate,(cpustate->task.base+2) + (4*privilege));
+	cpustate->CPL = cpl;
+	return ret;
 }
 
 static UINT32 get_flags(i386_state *cpustate)
@@ -596,8 +610,10 @@ static void i386_trap(i386_state *cpustate,int irq, int irq_gate, int trap_level
 		UINT8 CPL = cpustate->CPL, DPL = 0; //, RPL = 0;
 
 		/* 32-bit */
+		cpustate->CPL = 0;
 		v1 = READ32(cpustate, cpustate->idtr.base + entry );
 		v2 = READ32(cpustate, cpustate->idtr.base + entry + 4 );
+		cpustate->CPL = CPL;
 		offset = (v2 & 0xffff0000) | (v1 & 0xffff);
 		segment = (v1 >> 16) & 0xffff;
 		type = (v2>>8) & 0x1F;
@@ -661,6 +677,7 @@ static void i386_trap(i386_state *cpustate,int irq, int irq_gate, int trap_level
 			/* Get privilege level 0 stack pointer from TSS */
 			cpustate->sreg[SS].selector = i386_get_stack_segment(cpustate,0);
 			REG32(ESP) = i386_get_stack_ptr(cpustate,0);
+			cpustate->CPL = segment & 0x03;
 			i386_load_segment_descriptor(cpustate,SS);
 			PUSH32(cpustate,cpustate->sreg[GS].selector & 0xffff);
 			PUSH32(cpustate,cpustate->sreg[FS].selector & 0xffff);
@@ -686,7 +703,6 @@ static void i386_trap(i386_state *cpustate,int irq, int irq_gate, int trap_level
 			cpustate->sreg[CS].selector = segment;
 			cpustate->eip = offset;
 			// CPL set to CS RPL?
-			cpustate->CPL = segment & 0x03;
 
 			i386_load_segment_descriptor(cpustate,CS);
 			CHANGE_PC(cpustate,cpustate->eip);
@@ -702,25 +718,25 @@ static void i386_trap(i386_state *cpustate,int irq, int irq_gate, int trap_level
 			if(segment & 0x04)
 			{
 				logerror("IRQ: Task gate: TSS is not in the GDT.\n");
-				FAULT_EXP(FAULT_TS,segment & ~0x07);
+				FAULT_EXP(FAULT_TS,segment & ~0x03);
 			}
 			else
 			{
 				if(segment > cpustate->gdtr.limit)
 				{
 					logerror("IRQ: Task gate: TSS is past GDT limit.\n");
-					FAULT_EXP(FAULT_TS,segment & ~0x07);
+					FAULT_EXP(FAULT_TS,segment & ~0x03);
 				}
 			}
 			if((desc.flags & 0x000f) != 0x09 && (desc.flags & 0x000f) != 0x01)
 			{
 				logerror("IRQ: Task gate: TSS is not an available TSS.\n");
-				FAULT_EXP(FAULT_TS,segment & ~0x07);
+				FAULT_EXP(FAULT_TS,segment & ~0x03);
 			}
 			if((desc.flags & 0x0080) == 0)
 			{
 				logerror("IRQ: Task gate: TSS is not present.\n");
-				FAULT_EXP(FAULT_NP,segment & ~0x07);
+				FAULT_EXP(FAULT_NP,segment & ~0x03);
 			}
 			if(!(irq == 3 || irq == 4 || irq == 9 || irq_gate == 1))
 				cpustate->eip = cpustate->prev_eip;
@@ -750,7 +766,7 @@ static void i386_trap(i386_state *cpustate,int irq, int irq_gate, int trap_level
 				if((segment & ~0x07) > cpustate->ldtr.limit)
 				{
 					logerror("IRQ: Gate segment is past LDT limit.\n");
-					FAULT_EXP(FAULT_GP,(segment & 0x07)+cpustate->ext)
+					FAULT_EXP(FAULT_GP,(segment & 0x03)+cpustate->ext)
 				}
 			}
 			else
@@ -758,18 +774,18 @@ static void i386_trap(i386_state *cpustate,int irq, int irq_gate, int trap_level
 				if((segment & ~0x07) > cpustate->gdtr.limit)
 				{
 					logerror("IRQ: Gate segment is past GDT limit.\n");
-					FAULT_EXP(FAULT_GP,(segment & 0x07)+cpustate->ext)
+					FAULT_EXP(FAULT_GP,(segment & 0x03)+cpustate->ext)
 				}
 			}
 			if((desc.flags & 0x0018) != 0x18)
 			{
 				logerror("IRQ: Gate descriptor is not a code segment.\n");
-				FAULT_EXP(FAULT_GP,(segment & 0x07)+cpustate->ext)
+				FAULT_EXP(FAULT_GP,(segment & 0x03)+cpustate->ext)
 			}
 			if((desc.flags & 0x0080) == 0)
 			{
 				logerror("IRQ: Gate segment is not present.\n");
-				FAULT_EXP(FAULT_NP,(segment & 0x07)+cpustate->ext)
+				FAULT_EXP(FAULT_NP,(segment & 0x03)+cpustate->ext)
 			}
 			if((desc.flags & 0x0004) == 0 && (DPL < CPL))
 			{
@@ -779,17 +795,14 @@ static void i386_trap(i386_state *cpustate,int irq, int irq_gate, int trap_level
 
 				/* Check new stack segment in TSS */
 				memset(&stack, 0, sizeof(stack));
-				if(flags & 0x0008)
-					stack.selector = i386_get_stack_segment(cpustate,DPL);
-				else
-					stack.selector = i286_get_stack_segment(cpustate,DPL);
+				stack.selector = i386_get_stack_segment(cpustate,DPL);
 				i386_load_protected_mode_segment(cpustate,&stack,NULL);
 				oldSS = cpustate->sreg[SS].selector;
 				if(flags & 0x0008)
 					oldESP = REG32(ESP);
 				else
 					oldESP = REG16(SP);
-				if((stack.selector & ~0x07) == 0)
+				if((stack.selector & ~0x03) == 0)
 				{
 					logerror("IRQ: New stack selector is null.\n");
 					FAULT_EXP(FAULT_GP,cpustate->ext)
@@ -799,7 +812,7 @@ static void i386_trap(i386_state *cpustate,int irq, int irq_gate, int trap_level
 					if((stack.selector & ~0x07) > cpustate->ldtr.base)
 					{
 						logerror("IRQ: New stack selector is past LDT limit.\n");
-						FAULT_EXP(FAULT_TS,(stack.selector & ~0x07)+cpustate->ext)
+						FAULT_EXP(FAULT_TS,(stack.selector & ~0x03)+cpustate->ext)
 					}
 				}
 				else
@@ -807,32 +820,32 @@ static void i386_trap(i386_state *cpustate,int irq, int irq_gate, int trap_level
 					if((stack.selector & ~0x07) > cpustate->gdtr.base)
 					{
 						logerror("IRQ: New stack selector is past GDT limit.\n");
-						FAULT_EXP(FAULT_TS,(stack.selector & ~0x07)+cpustate->ext)
+						FAULT_EXP(FAULT_TS,(stack.selector & ~0x03)+cpustate->ext)
 					}
 				}
 				if((stack.selector & 0x03) != DPL)
 				{
 					logerror("IRQ: New stack selector RPL is not equal to code segment DPL.\n");
-					FAULT_EXP(FAULT_TS,(stack.selector & ~0x07)+cpustate->ext)
+					FAULT_EXP(FAULT_TS,(stack.selector & ~0x03)+cpustate->ext)
 				}
 				if(((stack.flags >> 5) & 0x03) != DPL)
 				{
 					logerror("IRQ: New stack segment DPL is not equal to code segment DPL.\n");
-					FAULT_EXP(FAULT_TS,(stack.selector & ~0x07)+cpustate->ext)
+					FAULT_EXP(FAULT_TS,(stack.selector & ~0x03)+cpustate->ext)
 				}
 				if(((stack.flags & 0x0018) != 0x10) && (stack.flags & 0x0002) != 0)
 				{
 					logerror("IRQ: New stack segment is not a writable data segment.\n");
-					FAULT_EXP(FAULT_TS,(stack.selector & ~0x07)+cpustate->ext) // #TS(stack selector + EXT)
+					FAULT_EXP(FAULT_TS,(stack.selector & ~0x03)+cpustate->ext) // #TS(stack selector + EXT)
 				}
 				if((stack.flags & 0x0080) == 0)
 				{
 					logerror("IRQ: New stack segment is not present.\n");
-					FAULT_EXP(FAULT_SS,(stack.selector & ~0x07)+cpustate->ext) // #TS(stack selector + EXT)
+					FAULT_EXP(FAULT_SS,(stack.selector & ~0x03)+cpustate->ext) // #TS(stack selector + EXT)
 				}
+				newESP = i386_get_stack_ptr(cpustate,DPL);
 				if(type & 0x08) // 32-bit gate
 				{
-					newESP = i386_get_stack_ptr(cpustate,DPL);
 					if(newESP < 20)
 					{
 						logerror("IRQ: New stack has no space for return addresses.\n");
@@ -841,7 +854,7 @@ static void i386_trap(i386_state *cpustate,int irq, int irq_gate, int trap_level
 				}
 				else // 16-bit gate
 				{
-					newESP = i286_get_stack_ptr(cpustate,DPL);
+					newESP &= 0xffff;
 					if(newESP < 10)
 					{
 						logerror("IRQ: New stack has no space for return addresses.\n");
@@ -853,13 +866,17 @@ static void i386_trap(i386_state *cpustate,int irq, int irq_gate, int trap_level
 					logerror("IRQ: New EIP is past code segment limit.\n");
 					FAULT_EXP(FAULT_GP,0)
 				}
+				/* change CPL before accessing the stack */
+				cpustate->CPL = DPL;
+				/* check for page fault at new stack TODO: check if stack frame crosses page boundary */
+				WRITE_TEST(cpustate, stack.base+newESP-1);
 				/* Load new stack segment descriptor */
 				cpustate->sreg[SS].selector = stack.selector;
 				i386_load_segment_descriptor(cpustate,SS);
 				if(flags & 0x0008)
 					REG32(ESP) = i386_get_stack_ptr(cpustate,DPL);
 				else
-					REG16(SP) = i286_get_stack_ptr(cpustate,DPL);
+					REG16(SP) = i386_get_stack_ptr(cpustate,DPL);
 				if(type & 0x08)
 				{
 					// 32-bit gate
@@ -872,7 +889,6 @@ static void i386_trap(i386_state *cpustate,int irq, int irq_gate, int trap_level
 					PUSH16(cpustate,oldSS);
 					PUSH16(cpustate,oldESP);
 				}
-				cpustate->CPL = DPL;
 				SetRPL = 1;
 			}
 			else
@@ -951,6 +967,8 @@ static void i386_trap_with_error(i386_state *cpustate,int irq, int irq_gate, int
 		{
 			UINT32 entry = irq * 8;
 			UINT32 v2,type;
+			int cpl = cpustate->CPL;
+			cpustate->CPL = 0;
 			v2 = READ32(cpustate, cpustate->idtr.base + entry + 4 );
 			type = (v2>>8) & 0x1F;
 			if(type == 5)
@@ -959,6 +977,7 @@ static void i386_trap_with_error(i386_state *cpustate,int irq, int irq_gate, int
 				v2 = READ32(cpustate, cpustate->gdtr.base + ((v2 >> 16) & 0xfff8) + 4);
 				type = (v2>>8) & 0x1F;
 			}
+			cpustate->CPL = cpl;
 			if(type >= 9)
 				PUSH32(cpustate,error);
 			else
@@ -1136,6 +1155,7 @@ static void i386_task_switch(i386_state *cpustate, UINT16 selector, UINT8 nested
 	cpustate->cr[0] |= 0x08;
 
 	/* Load incoming task state from the new task's TSS */
+	cpustate->CPL = 0;
 	tss = cpustate->task.base;
 	cpustate->ldtr.segment = READ32(cpustate,tss+0x60) & 0xffff;
 	seg.selector = cpustate->ldtr.segment;
@@ -1351,19 +1371,17 @@ static void i386_protected_mode_jump(i386_state *cpustate, UINT16 seg, UINT32 of
 				}
 				if(call_gate.selector & 0x04)
 				{
-					/* check GDT limit */
-					if((call_gate.selector & ~0x07) > cpustate->gdtr.limit)
+					if((call_gate.selector & ~0x07) > cpustate->ldtr.limit)
 					{
-						logerror("JMP: Call Gate: Gate Selector is past GDT segment limit\n");
+						logerror("JMP: Call Gate: Gate Selector is past LDT segment limit\n");
 						FAULT(FAULT_GP,call_gate.selector & 0xfffc)
 					}
 				}
 				else
 				{
-					/* check LDT limit */
-					if((call_gate.selector & ~0x07) > cpustate->ldtr.limit)
+					if((call_gate.selector & ~0x07) > cpustate->gdtr.limit)
 					{
-						logerror("JMP: Call Gate: Gate Selector is past LDT segment limit\n");
+						logerror("JMP: Call Gate: Gate Selector is past GDT segment limit\n");
 						FAULT(FAULT_GP,call_gate.selector & 0xfffc)
 					}
 				}
@@ -1638,7 +1656,7 @@ static void i386_protected_mode_call(i386_state *cpustate, UINT16 seg, UINT32 of
 					FAULT(FAULT_NP,desc.selector & ~0x03)  // #GP(selector)
 				}
 				desc.selector = gate.selector;
-				if((gate.selector & ~0x07) == 0)
+				if((gate.selector & ~0x03) == 0)
 				{
 					logerror("CALL: Call gate: Segment is null.\n");
 					FAULT(FAULT_GP,0)  // #GP(0)
@@ -1684,12 +1702,9 @@ static void i386_protected_mode_call(i386_state *cpustate, UINT16 seg, UINT32 of
 					/* more privilege */
 					/* Check new SS segment for privilege level from TSS */
 					memset(&stack, 0, sizeof(stack));
-					if(operand32 != 0)
-						stack.selector = i386_get_stack_segment(cpustate,DPL);
-					else
-						stack.selector = i286_get_stack_segment(cpustate,DPL);
+					stack.selector = i386_get_stack_segment(cpustate,DPL);
 					i386_load_protected_mode_segment(cpustate,&stack,NULL);
-					if((stack.selector & ~0x07) == 0)
+					if((stack.selector & ~0x03) == 0)
 					{
 						logerror("CALL: Call gate: TSS selector is null\n");
 						FAULT(FAULT_TS,0)  // #TS(0)
@@ -1730,9 +1745,9 @@ static void i386_protected_mode_call(i386_state *cpustate, UINT16 seg, UINT32 of
 						logerror("CALL: Call gate: Stack segment is not present\n");
 						FAULT(FAULT_SS,stack.selector)  // #SS(SS selector)
 					}
+					UINT32 newESP = i386_get_stack_ptr(cpustate,DPL);
 					if(operand32 != 0)
 					{
-						UINT32 newESP = i386_get_stack_ptr(cpustate,DPL);
 						if(newESP < ((gate.dword_count & 0x1f) + 16))
 						{
 							logerror("CALL: Call gate: New stack has no room for 32-bit return address and parameters.\n");
@@ -1746,7 +1761,7 @@ static void i386_protected_mode_call(i386_state *cpustate, UINT16 seg, UINT32 of
 					}
 					else
 					{
-						UINT32 newESP = i286_get_stack_ptr(cpustate,DPL) & 0x0000ffff;
+						newESP &= 0x0000ffff;
 						if(newESP < ((gate.dword_count & 0x1f) + 8))
 						{
 							logerror("CALL: Call gate: New stack has no room for 16-bit return address and parameters.\n");
@@ -1761,23 +1776,25 @@ static void i386_protected_mode_call(i386_state *cpustate, UINT16 seg, UINT32 of
 					selector = gate.selector;
 					offset = gate.offset;
 
+					cpustate->CPL = (stack.flags >> 5) & 0x03;
+					/* check for page fault at new stack TODO: check if stack frame crosses page boundary */
+					WRITE_TEST(cpustate, stack.base+newESP-1);
 					/* switch to new stack */
 					oldSS = cpustate->sreg[SS].selector;
+					cpustate->sreg[SS].selector = i386_get_stack_segment(cpustate,gate.selector & 0x03);
 					if(operand32 != 0)
 					{
 						oldESP = REG32(ESP);
-						cpustate->sreg[SS].selector = i386_get_stack_segment(cpustate,gate.selector & 0x03);
 					}
 					else
 					{
 						oldESP = REG16(SP);
-						cpustate->sreg[SS].selector = i286_get_stack_segment(cpustate,gate.selector & 0x03);
 					}
 					i386_load_segment_descriptor(cpustate, SS );
 					if(operand32 != 0)
 						REG32(ESP) = i386_get_stack_ptr(cpustate,gate.selector & 0x03);
 					else
-						REG16(SP) = i286_get_stack_ptr(cpustate,gate.selector & 0x03) & 0x0000ffff;
+						REG16(SP) = i386_get_stack_ptr(cpustate,gate.selector & 0x03) & 0x0000ffff;
 
 					if(operand32 != 0)
 					{
@@ -1796,10 +1813,13 @@ static void i386_protected_mode_call(i386_state *cpustate, UINT16 seg, UINT32 of
 					/* copy parameters from old stack to new stack */
 					for(x=(gate.dword_count & 0x1f)-1;x>=0;x--)
 					{
-						UINT32 addr = temp.base + oldESP + (x*2);
-						PUSH16(cpustate,READ16(cpustate,addr));
+						UINT32 addr = oldESP + (operand32?(x*4):(x*2));
+						addr = temp.base + (temp.d?addr:(addr&0xffff));
+						if(operand32)
+							PUSH32(cpustate,READ32(cpustate,addr));
+						else
+							PUSH16(cpustate,READ16(cpustate,addr));
 					}
-					cpustate->CPL = (stack.flags >> 5) & 0x03;
 					SetRPL = 1;
 				}
 				else
@@ -1842,17 +1862,17 @@ static void i386_protected_mode_call(i386_state *cpustate, UINT16 seg, UINT32 of
 				if(DPL < CPL)
 				{
 					logerror("CALL: Task Gate: Gate DPL is less than CPL.\n");
-					FAULT(FAULT_TS,selector & ~0x07) // #TS(selector)
+					FAULT(FAULT_TS,selector & ~0x03) // #TS(selector)
 				}
 				if(DPL < RPL)
 				{
 					logerror("CALL: Task Gate: Gate DPL is less than RPL.\n");
-					FAULT(FAULT_TS,selector & ~0x07) // #TS(selector)
+					FAULT(FAULT_TS,selector & ~0x03) // #TS(selector)
 				}
 				if(gate.ar & 0x0080)
 				{
 					logerror("CALL: Task Gate: Gate is not present.\n");
-					FAULT(FAULT_NP,selector & ~0x07) // #NP(selector)
+					FAULT(FAULT_NP,selector & ~0x03) // #NP(selector)
 				}
 				/* Check the TSS that the task gate points to */
 				desc.selector = gate.selector;
@@ -1860,25 +1880,25 @@ static void i386_protected_mode_call(i386_state *cpustate, UINT16 seg, UINT32 of
 				if(gate.selector & 0x04)
 				{
 					logerror("CALL: Task Gate: TSS is not global.\n");
-					FAULT(FAULT_TS,gate.selector & ~0x07) // #TS(selector)
+					FAULT(FAULT_TS,gate.selector & ~0x03) // #TS(selector)
 				}
 				else
 				{
 					if((gate.selector & ~0x07) > cpustate->gdtr.limit)
 					{
 						logerror("CALL: Task Gate: TSS is past GDT limit.\n");
-						FAULT(FAULT_TS,gate.selector & ~0x07) // #TS(selector)
+						FAULT(FAULT_TS,gate.selector & ~0x03) // #TS(selector)
 					}
 				}
 				if(desc.flags & 0x0002)
 				{
 					logerror("CALL: Task Gate: TSS is busy.\n");
-					FAULT(FAULT_TS,gate.selector & ~0x07) // #TS(selector)
+					FAULT(FAULT_TS,gate.selector & ~0x03) // #TS(selector)
 				}
 				if(desc.flags & 0x0080)
 				{
 					logerror("CALL: Task Gate: TSS is not present.\n");
-					FAULT(FAULT_NP,gate.selector & ~0x07) // #TS(selector)
+					FAULT(FAULT_NP,gate.selector & ~0x03) // #TS(selector)
 				}
 				if(desc.flags & 0x08)
 					i386_task_switch(cpustate,desc.selector,1);  // with nesting
@@ -1981,17 +2001,17 @@ static void i386_protected_mode_retf(i386_state* cpustate, UINT8 count, UINT8 op
 		}
 		if(desc.flags & 0x0004)
 		{
-			if(DPL > CPL)
+			if(DPL > RPL)
 			{
-				logerror("RETF: Conforming code segment DPL is greater than CPL.\n");
+				logerror("RETF: Conforming code segment DPL is greater than CS RPL.\n");
 				FAULT(FAULT_GP,newCS & ~0x03)
 			}
 		}
 		else
 		{
-			if(DPL != CPL)
+			if(DPL != RPL)
 			{
-				logerror("RETF: Non-conforming code segment DPL does not equal CPL.\n");
+				logerror("RETF: Non-conforming code segment DPL does not equal CS RPL.\n");
 				FAULT(FAULT_GP,newCS & ~0x03)
 			}
 		}
@@ -2061,7 +2081,7 @@ static void i386_protected_mode_retf(i386_state* cpustate, UINT8 count, UINT8 op
 			if((newCS & ~0x07) >= cpustate->ldtr.limit)
 			{
 				logerror("RETF: CS segment selector is past LDT limit.\n");
-				FAULT(FAULT_GP,newCS & ~0x07)
+				FAULT(FAULT_GP,newCS & ~0x03)
 			}
 		}
 		else
@@ -2069,20 +2089,20 @@ static void i386_protected_mode_retf(i386_state* cpustate, UINT8 count, UINT8 op
 			if((newCS & ~0x07) >= cpustate->gdtr.limit)
 			{
 				logerror("RETF: CS segment selector is past GDT limit.\n");
-				FAULT(FAULT_GP,newCS & ~0x07)
+				FAULT(FAULT_GP,newCS & ~0x03)
 			}
 		}
 		if((desc.flags & 0x0018) != 0x0018)
 		{
 			logerror("RETF: CS segment is not a code segment.\n");
-			FAULT(FAULT_GP,newCS & ~0x07)
+			FAULT(FAULT_GP,newCS & ~0x03)
 		}
 		if(desc.flags & 0x0004)
 		{
 			if(DPL > RPL)
 			{
 				logerror("RETF: Conforming CS segment DPL is greater than return selector RPL.\n");
-				FAULT(FAULT_GP,newCS & ~0x07)
+				FAULT(FAULT_GP,newCS & ~0x03)
 			}
 		}
 		else
@@ -2090,13 +2110,13 @@ static void i386_protected_mode_retf(i386_state* cpustate, UINT8 count, UINT8 op
 			if(DPL != RPL)
 			{
 				logerror("RETF: Non-conforming CS segment DPL is not equal to return selector RPL.\n");
-				FAULT(FAULT_GP,newCS & ~0x07)
+				FAULT(FAULT_GP,newCS & ~0x03)
 			}
 		}
 		if((desc.flags & 0x0080) == 0)
 		{
 			logerror("RETF: CS segment is not present.\n");
-			FAULT(FAULT_NP,newCS & ~0x07)
+			FAULT(FAULT_NP,newCS & ~0x03)
 		}
 		if(newEIP > desc.limit)
 		{
@@ -2131,7 +2151,7 @@ static void i386_protected_mode_retf(i386_state* cpustate, UINT8 count, UINT8 op
 			if((newSS & ~0x07) > cpustate->ldtr.limit)
 			{
 				logerror("RETF (%08x): SS segment selector is past LDT limit.\n",cpustate->pc);
-				FAULT(FAULT_GP,newSS & ~0x07)
+				FAULT(FAULT_GP,newSS & ~0x03)
 			}
 		}
 		else
@@ -2139,28 +2159,28 @@ static void i386_protected_mode_retf(i386_state* cpustate, UINT8 count, UINT8 op
 			if((newSS & ~0x07) > cpustate->gdtr.limit)
 			{
 				logerror("RETF (%08x): SS segment selector is past GDT limit.\n",cpustate->pc);
-				FAULT(FAULT_GP,newSS & ~0x07)
+				FAULT(FAULT_GP,newSS & ~0x03)
 			}
 		}
 		if((newSS & 0x03) != RPL)
 		{
 			logerror("RETF: SS segment RPL is not equal to CS segment RPL.\n");
-			FAULT(FAULT_GP,newSS & ~0x07)
+			FAULT(FAULT_GP,newSS & ~0x03)
 		}
 		if((desc.flags & 0x0018) != 0x0010 || (desc.flags & 0x0002) == 0)
 		{
 			logerror("RETF: SS segment is not a writable data segment.\n");
-			FAULT(FAULT_GP,newSS & ~0x07)
+			FAULT(FAULT_GP,newSS & ~0x03)
 		}
 		if(((desc.flags >> 5) & 0x03) != RPL)
 		{
 			logerror("RETF: SS DPL is not equal to CS segment RPL.\n");
-			FAULT(FAULT_GP,newSS & ~0x07)
+			FAULT(FAULT_GP,newSS & ~0x03)
 		}
 		if((desc.flags & 0x0080) == 0)
 		{
 			logerror("RETF: SS segment is not present.\n");
-			FAULT(FAULT_GP,newSS & ~0x07)
+			FAULT(FAULT_GP,newSS & ~0x03)
 		}
 		cpustate->CPL = newCS & 0x03;
 
@@ -2249,12 +2269,12 @@ static void i386_protected_mode_iret(i386_state* cpustate, int operand32)
 		if(task & 0x04)
 		{
 			logerror("IRET: Task return: Back-linked TSS is not in GDT.\n");
-			FAULT(FAULT_TS,task & ~0x07)
+			FAULT(FAULT_TS,task & ~0x03)
 		}
 		if((task & ~0x07) >= cpustate->gdtr.limit)
 		{
 			logerror("IRET: Task return: Back-linked TSS is not in GDT.\n");
-			FAULT(FAULT_TS,task & ~0x07)
+			FAULT(FAULT_TS,task & ~0x03)
 		}
 		memset(&desc, 0, sizeof(desc));
 		desc.selector = task;
@@ -2262,12 +2282,12 @@ static void i386_protected_mode_iret(i386_state* cpustate, int operand32)
 		if((desc.flags & 0x001f) != 0x000b)
 		{
 			logerror("IRET (%08x): Task return: Back-linked TSS is not a busy TSS.\n",cpustate->pc);
-			FAULT(FAULT_TS,task & ~0x07)
+			FAULT(FAULT_TS,task & ~0x03)
 		}
 		if((desc.flags & 0x0080) == 0)
 		{
 			logerror("IRET: Task return: Back-linked TSS is not present.\n");
-			FAULT(FAULT_NP,task & ~0x07)
+			FAULT(FAULT_NP,task & ~0x03)
 		}
 		if(desc.flags & 0x08)
 			i386_task_switch(cpustate,desc.selector,0);
@@ -2462,7 +2482,7 @@ static void i386_protected_mode_iret(i386_state* cpustate, int operand32)
 			if(RPL < CPL)
 			{
 				logerror("IRET (%08x): Return CS RPL is less than CPL.\n",cpustate->pc);
-				FAULT(FAULT_GP,newCS & ~0x07)
+				FAULT(FAULT_GP,newCS & ~0x03)
 			}
 			if(RPL == CPL)
 			{
@@ -2495,7 +2515,7 @@ static void i386_protected_mode_iret(i386_state* cpustate, int operand32)
 					if((newCS & ~0x07) >= cpustate->ldtr.limit)
 					{
 						logerror("IRET: Return CS selector (%04x) is past LDT limit.\n",newCS);
-						FAULT(FAULT_GP,newCS & ~0x07)
+						FAULT(FAULT_GP,newCS & ~0x03)
 					}
 				}
 				else
@@ -2503,7 +2523,7 @@ static void i386_protected_mode_iret(i386_state* cpustate, int operand32)
 					if((newCS & ~0x07) >= cpustate->gdtr.limit)
 					{
 						logerror("IRET: Return CS selector is past GDT limit.\n");
-						FAULT(FAULT_GP,newCS & ~0x07)
+						FAULT(FAULT_GP,newCS & ~0x03)
 					}
 				}
 				memset(&desc, 0, sizeof(desc));
@@ -2518,24 +2538,24 @@ static void i386_protected_mode_iret(i386_state* cpustate, int operand32)
 				}
 				if(desc.flags & 0x0004)
 				{
-					if(DPL > CPL)
+					if(DPL > RPL)
 					{
-						logerror("IRET: Conforming return CS DPL is greater than CPL.\n");
-						FAULT(FAULT_GP,newCS & ~0x07)
+						logerror("IRET: Conforming return CS DPL is greater than CS RPL.\n");
+						FAULT(FAULT_GP,newCS & ~0x03)
 					}
 				}
 				else
 				{
-					if(DPL != CPL)
+					if(DPL != RPL)
 					{
-						logerror("IRET: Non-conforming return CS DPL is not equal to CPL.\n");
-						FAULT(FAULT_GP,newCS & ~0x07)
+						logerror("IRET: Non-conforming return CS DPL is not equal to CS RPL.\n");
+						FAULT(FAULT_GP,newCS & ~0x03)
 					}
 				}
 				if((desc.flags & 0x0080) == 0)
 				{
 					logerror("IRET: Return CS segment is not present.\n");
-					FAULT(FAULT_NP,newCS & ~0x07)
+					FAULT(FAULT_NP,newCS & ~0x03)
 				}
 				if(newEIP > desc.limit)
 				{
@@ -2601,7 +2621,7 @@ static void i386_protected_mode_iret(i386_state* cpustate, int operand32)
 					if((newCS & ~0x07) >= cpustate->ldtr.limit)
 					{
 						logerror("IRET: Return CS selector is past LDT limit.\n");
-						FAULT(FAULT_GP,newCS & ~0x07);
+						FAULT(FAULT_GP,newCS & ~0x03);
 					}
 				}
 				else
@@ -2609,20 +2629,20 @@ static void i386_protected_mode_iret(i386_state* cpustate, int operand32)
 					if((newCS & ~0x07) >= cpustate->gdtr.limit)
 					{
 						logerror("IRET: Return CS selector is past GDT limit.\n");
-						FAULT(FAULT_GP,newCS & ~0x07);
+						FAULT(FAULT_GP,newCS & ~0x03);
 					}
 				}
 				if((desc.flags & 0x0018) != 0x0018)
 				{
 					logerror("IRET: Return CS segment is not a code segment.\n");
-					FAULT(FAULT_GP,newCS & ~0x07)
+					FAULT(FAULT_GP,newCS & ~0x03)
 				}
 				if(desc.flags & 0x0004)
 				{
-					if(DPL <= CPL)
+					if(DPL > RPL)
 					{
-						logerror("IRET: Conforming return CS DPL is not greater than CPL.\n");
-						FAULT(FAULT_GP,newCS & ~0x07)
+						logerror("IRET: Conforming return CS DPL is greater than CS RPL.\n");
+						FAULT(FAULT_GP,newCS & ~0x03)
 					}
 				}
 				else
@@ -2630,13 +2650,13 @@ static void i386_protected_mode_iret(i386_state* cpustate, int operand32)
 					if(DPL != RPL)
 					{
 						logerror("IRET: Non-conforming return CS DPL does not equal CS RPL.\n");
-						FAULT(FAULT_GP,newCS & ~0x07)
+						FAULT(FAULT_GP,newCS & ~0x03)
 					}
 				}
 				if((desc.flags & 0x0080) == 0)
 				{
 					logerror("IRET: Return CS segment is not present.\n");
-					FAULT(FAULT_NP,newCS & ~0x07)
+					FAULT(FAULT_NP,newCS & ~0x03)
 				}
 
 				/* Check SS selector and descriptor */
@@ -2664,7 +2684,7 @@ static void i386_protected_mode_iret(i386_state* cpustate, int operand32)
 					if((newSS & ~0x07) >= cpustate->ldtr.limit)
 					{
 						logerror("IRET: Return SS selector is past LDT limit.\n");
-						FAULT(FAULT_GP,newSS & ~0x07);
+						FAULT(FAULT_GP,newSS & ~0x03);
 					}
 				}
 				else
@@ -2672,33 +2692,33 @@ static void i386_protected_mode_iret(i386_state* cpustate, int operand32)
 					if((newSS & ~0x07) >= cpustate->gdtr.limit)
 					{
 						logerror("IRET: Return SS selector is past GDT limit.\n");
-						FAULT(FAULT_GP,newSS & ~0x07);
+						FAULT(FAULT_GP,newSS & ~0x03);
 					}
 				}
 				if((newSS & 0x03) != RPL)
 				{
 					logerror("IRET: Return SS RPL is not equal to return CS RPL.\n");
-					FAULT(FAULT_GP,newSS & ~0x07)
+					FAULT(FAULT_GP,newSS & ~0x03)
 				}
 				if((stack.flags & 0x0018) != 0x0010)
 				{
 					logerror("IRET: Return SS segment is not a data segment.\n");
-					FAULT(FAULT_GP,newSS & ~0x07)
+					FAULT(FAULT_GP,newSS & ~0x03)
 				}
 				if((stack.flags & 0x0002) == 0)
 				{
 					logerror("IRET: Return SS segment is not writable.\n");
-					FAULT(FAULT_GP,newSS & ~0x07)
+					FAULT(FAULT_GP,newSS & ~0x03)
 				}
 				if(DPL != RPL)
 				{
 					logerror("IRET: Return SS DPL does not equal SS RPL.\n");
-					FAULT(FAULT_GP,newSS & ~0x07)
+					FAULT(FAULT_GP,newSS & ~0x03)
 				}
 				if((stack.flags & 0x0080) == 0)
 				{
 					logerror("IRET: Return SS segment is not present.\n");
-					FAULT(FAULT_NP,newSS & ~0x07)
+					FAULT(FAULT_NP,newSS & ~0x03)
 				}
 				if(newEIP > desc.limit)
 				{
@@ -3127,7 +3147,7 @@ static CPU_EXECUTE( i386 )
 		cpustate->address_prefix = 0;
 
 		cpustate->ext = 1;
-		cpustate->old_tf = cpustate->TF;
+		int old_tf = cpustate->TF;
 
 		cpustate->segment_prefix = 0;
 		cpustate->prev_eip = cpustate->eip;
@@ -3142,7 +3162,7 @@ static CPU_EXECUTE( i386 )
 		try
 		{
 			I386OP(decode_opcode)(cpustate);
-			if(cpustate->TF && cpustate->old_tf)
+			if(cpustate->TF && old_tf)
 			{
 				cpustate->prev_eip = cpustate->eip;
 				cpustate->ext = 1;
