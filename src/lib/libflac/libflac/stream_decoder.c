@@ -1464,6 +1464,7 @@ FLAC__bool read_metadata_(FLAC__StreamDecoder *decoder)
 		block.is_last = is_last;
 		block.type = (FLAC__MetadataType)type;
 		block.length = length;
+		memset(&block.data, 0, sizeof(block.data));
 
 		if(type == FLAC__METADATA_TYPE_APPLICATION) {
 			if(!FLAC__bitreader_read_byte_block_aligned_no_crc(decoder->private_->input, block.data.application.id, FLAC__STREAM_METADATA_APPLICATION_ID_LEN/8))
