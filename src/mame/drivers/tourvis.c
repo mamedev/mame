@@ -18,7 +18,7 @@
     Power League IV
     Final Match Tennis
     Formation Soccer
-    Super Volleay Ball
+    Super Volley ball
     Rastan Saga II
     Dungeon Explorer
     Legendary Axe
@@ -503,7 +503,7 @@ ROM_END
 
 ROM_START(tvsvball)
 	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD( "tourv_supervalleyball.bin", 0x00000, 0x100000, CRC(8a32a1ca) SHA1(80144fb4035415eb9b2c67d78d55757ed0d641a1) )
+	ROM_LOAD( "tourv_supervolleyball.bin", 0x00000, 0x100000, CRC(8a32a1ca) SHA1(80144fb4035415eb9b2c67d78d55757ed0d641a1) )
 
 	TOURVISION_BIOS
 ROM_END
@@ -520,6 +520,6 @@ GAME( 1989, tvusapb,  tourvis, tourvision, tourvision, tourvision, ROT0, "bootle
 GAME( 1989, tvdunexp, tourvis, tourvision, tourvision, tourvision, ROT0, "bootleg (Tourvision) / Hudson / Atlus", "Dungeon Explorer (Tourvision PCE bootleg)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
 GAME( 1990, tvthbld,  tourvis, tourvision, tourvision, tourvision, ROT0, "bootleg (Tourvision) / Sega / NEC Avenue", "Thunder Blade (Tourvision PCE bootleg)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
 GAME( 1990, tvrs2,    tourvis, tourvision, tourvision, tourvision, ROT0, "bootleg (Tourvision) / Taito", "Rastan Saga II (Tourvision PCE bootleg)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
-GAME( 1990, tvsvball, tourvis, tourvision, tourvision, tourvision, ROT0, "bootleg (Tourvision) / Video System", "Super Volleyball (Tourvision PCE bootleg)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+GAME( 1990, tvsvball, tourvis, tourvision, tourvision, tourvision, ROT0, "bootleg (Tourvision) / Video System", "Super Volley ball (Tourvision PCE bootleg)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
 GAME( 1991, tvpwlg4,  tourvis, tourvision, tourvision, tourvision, ROT0, "bootleg (Tourvision) / Hudson", "Power League IV (Tourvision PCE bootleg)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
 GAME( 1991, tvsci,    tourvis, tourvision, tourvision, tourvision, ROT0, "bootleg (Tourvision) / Taito", "Special Criminal Investigation (Tourvision PCE bootleg)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
