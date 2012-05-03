@@ -71,6 +71,11 @@ DEVICE_IMAGE_LOAD(vectrex_cart)
 	if (image.software_entry() == NULL)
 	{
 		image.fread( mem, 0x8000);
+		if (image.length() > 0x8000)
+		{
+			image.fread( mem+0x10000, 0x8000);
+			state->m_64k_cart = 1;
+		}
 	} else {
 		int size = image.get_software_region_length("rom");
 		memcpy(mem, image.get_software_region("rom"), size);
@@ -81,6 +86,10 @@ DEVICE_IMAGE_LOAD(vectrex_cart)
 	{
 		logerror("Invalid image!\n");
 		return IMAGE_INIT_FAIL;
+	}
+
+	if (memcmp(mem + 0x06,"SRAM",4)) {
+		image.device().machine().device("maincpu")->memory().space(AS_PROGRAM)->unmap_write(0x0000, 0x7fff);
 	}
 
 	/* If VIA T2 starts, reset refresh timer.
@@ -352,6 +361,7 @@ DRIVER_INIT(vectrex)
 	vectrex_state *state = machine.driver_data<vectrex_state>();
 	int i;
 
+	state->m_64k_cart = 0;
 	state->m_imager_angles = unknown_game_angles;
 	state->m_beam_color = RGB_WHITE;
 	for (i=0; i<ARRAY_LENGTH(state->m_imager_colors); i++)

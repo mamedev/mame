@@ -26,6 +26,7 @@ public:
 		m_gce_vectorram(*this, "gce_vectorram"){ }
 
 	required_shared_ptr<UINT8> m_gce_vectorram;
+	int m_64k_cart;
 	int m_imager_status;
 	UINT32 m_beam_color;
 	unsigned char m_via_out[2];

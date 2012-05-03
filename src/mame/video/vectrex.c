@@ -386,6 +386,14 @@ static WRITE8_DEVICE_HANDLER(v_via_pb_w)
 		}
 	}
 
+	/* Cartridge bank-switching */
+	if (state->m_64k_cart && ((data ^ state->m_via_out[PORTB]) & 0x40))
+	{
+		device_t &root_device = device->machine().root_device();
+
+		root_device.membank("bank1")->set_base(root_device.memregion("maincpu")->base() + ((data & 0x40) ? 0x10000 : 0x0000));
+	}
+
 	/* Sound */
 	if (data & 0x10)
 	{
