@@ -274,7 +274,7 @@ static TIMER_CALLBACK( pokey_pot_trigger );
 	/* is this a filtering channel (3/4) and is the filter active? */	\
 	if( chip->AUDCTL & ((CH1_FILTER|CH2_FILTER) & (0x10 >> ch)) )		\
     {                                                                   \
-		if( chip->output[ch-2] )										\
+		if( ch >= 2 && chip->output[ch-2] )								\
         {                                                               \
 			chip->output[ch-2] = 0;										\
 			if( chip->audible[ch] )										\
@@ -318,7 +318,7 @@ static TIMER_CALLBACK( pokey_pot_trigger );
 	/* is this a filtering channel (3/4) and is the filter active? */	\
 	if( chip->AUDCTL & ((CH1_FILTER|CH2_FILTER) & (0x10 >> ch)) )		\
     {                                                                   \
-		if( chip->output[ch-2] )										\
+		if( ch >= 2 && chip->output[ch-2] )								\
         {                                                               \
 			chip->output[ch-2] = 0;										\
 			sum -= chip->volume[ch-2];									\

@@ -449,7 +449,7 @@ static void I386OP(jg_rel8)(i386_state *cpustate)			// Opcode 0x7f
 static void I386OP(jge_rel8)(i386_state *cpustate)			// Opcode 0x7d
 {
 	INT8 disp = FETCH(cpustate);
-	if( (cpustate->SF == cpustate->OF) ) {
+	if(cpustate->SF == cpustate->OF) {
 		NEAR_BRANCH(cpustate,disp);
 		CYCLES(cpustate,CYCLES_JCC_DISP8);		/* TODO: Timing = 7 + m */
 	} else {
@@ -1411,7 +1411,7 @@ static void I386OP(setge_rm8)(i386_state *cpustate)			// Opcode 0x0f 9d
 {
 	UINT8 modrm = FETCH(cpustate);
 	UINT8 value = 0;
-	if( (cpustate->SF == cpustate->OF) ) {
+	if(cpustate->SF == cpustate->OF) {
 		value = 1;
 	}
 	if( modrm >= 0xc0 ) {

@@ -240,11 +240,12 @@ void eeprom_device::nvram_default()
 
 	/* handle hard-coded data from the driver */
 	if (m_default_data.u8 != NULL)
-		for (offs_t offs = 0; offs < m_default_data_size; offs++)
+		for (offs_t offs = 0; offs < m_default_data_size; offs++) {
 			if (m_data_bits == 8)
 				m_addrspace[0]->write_byte(offs, m_default_data.u8[offs]);
 			else
 				m_addrspace[0]->write_word(offs * 2, m_default_data.u16[offs]);
+		}
 
 	/* populate from a memory region if present */
 	if (m_region != NULL)

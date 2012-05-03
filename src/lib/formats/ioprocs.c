@@ -106,11 +106,6 @@ void io_generic_write(struct io_generic *generic, const void *buffer, UINT64 off
 	size_t bytes_to_write;
 	UINT64 size;
 
-	if (offset > 0x29c50)
-	{
-		offset = offset;
-	}
-
 	size = io_generic_size(generic);
 
 	if (size < offset)

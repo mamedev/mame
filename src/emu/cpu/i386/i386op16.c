@@ -881,7 +881,7 @@ static void I386OP(jg_rel16)(i386_state *cpustate)			// Opcode 0x0f 8f
 static void I386OP(jge_rel16)(i386_state *cpustate)			// Opcode 0x0f 8d
 {
 	INT16 disp = FETCH16(cpustate);
-	if( (cpustate->SF == cpustate->OF) ) {
+	if(cpustate->SF == cpustate->OF) {
 		if (cpustate->sreg[CS].d)
 		{
 			cpustate->eip += disp;

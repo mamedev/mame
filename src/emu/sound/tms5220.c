@@ -988,7 +988,7 @@ static void tms5220_process(tms5220_state *tms, INT16 *buffer, unsigned int size
 #endif
 
 			/* if TS is now 0, ramp the energy down to 0. Is this really correct to hardware? */
-			if ( (tms->talk_status == 0))
+			if (tms->talk_status == 0)
 			{
 #ifdef DEBUG_GENERATION
 				fprintf(stderr,"Talk status is 0, forcing target energy to 0\n");

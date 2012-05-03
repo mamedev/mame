@@ -125,7 +125,7 @@ FLOPPY_IDENTIFY( apridisk_identify )
 	floppy_image_read(floppy, &header, 0, sizeof(header));
 
 	/* look for the magic string */
-	if (memcmp(header, apr_magic, sizeof(apr_magic)) == 0)
+	if (memcmp(header, apr_magic, sizeof(*apr_magic)) == 0)
 		*vote = 100;
 	else
 		*vote = 0;

@@ -914,7 +914,7 @@ static floperr_t coco_dmk_seek_sector_in_track(floppy_image_legacy *floppy, int 
 			else
 			{
 				/* check IDAM integrity and check for matching sector */
-				if ((sector == dmk_idam_sector(&track_data[idam_offset]))
+				if (sector == dmk_idam_sector(&track_data[idam_offset])
 /*                  && (track == dmk_idam_track(&track_data[idam_offset]))  */
 /*                  && (head == dmk_idam_side(&track_data[idam_offset]))    */
 					)

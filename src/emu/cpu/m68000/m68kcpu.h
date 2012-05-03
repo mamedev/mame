@@ -1580,7 +1580,7 @@ INLINE void m68ki_stack_frame_buserr(m68ki_cpu_core *m68k, UINT32 sr)
 /* Format 8 stack frame (68010).
  * 68010 only.  This is the 29 word bus/address error frame.
  */
-void m68ki_stack_frame_1000(m68ki_cpu_core *m68k, UINT32 pc, UINT32 sr, UINT32 vector)
+INLINE void m68ki_stack_frame_1000(m68ki_cpu_core *m68k, UINT32 pc, UINT32 sr, UINT32 vector)
 {
 	/* VERSION
      * NUMBER
@@ -1634,7 +1634,7 @@ void m68ki_stack_frame_1000(m68ki_cpu_core *m68k, UINT32 pc, UINT32 sr, UINT32 v
  * if the error happens at an instruction boundary.
  * PC stacked is address of next instruction.
  */
-void m68ki_stack_frame_1010(m68ki_cpu_core *m68k, UINT32 sr, UINT32 vector, UINT32 pc, UINT32 fault_address)
+INLINE void m68ki_stack_frame_1010(m68ki_cpu_core *m68k, UINT32 sr, UINT32 vector, UINT32 pc, UINT32 fault_address)
 {
 	int orig_rw = m68k->mmu_tmp_buserror_rw;	// this gets splatted by the following pushes, so save it now
 	int orig_fc = m68k->mmu_tmp_buserror_fc;
@@ -1686,7 +1686,7 @@ void m68ki_stack_frame_1010(m68ki_cpu_core *m68k, UINT32 sr, UINT32 vector, UINT
  * if the error happens during instruction execution.
  * PC stacked is address of instruction in progress.
  */
-void m68ki_stack_frame_1011(m68ki_cpu_core *m68k, UINT32 sr, UINT32 vector, UINT32 pc, UINT32 fault_address)
+INLINE void m68ki_stack_frame_1011(m68ki_cpu_core *m68k, UINT32 sr, UINT32 vector, UINT32 pc, UINT32 fault_address)
 {
 	int orig_rw = m68k->mmu_tmp_buserror_rw;	// this gets splatted by the following pushes, so save it now
 	int orig_fc = m68k->mmu_tmp_buserror_fc;
@@ -1760,7 +1760,7 @@ void m68ki_stack_frame_1011(m68ki_cpu_core *m68k, UINT32 sr, UINT32 vector, UINT
  * This is used by the 68040 for bus fault and mmu trap
  * 30 words
  */
-void m68ki_stack_frame_0111(m68ki_cpu_core *m68k, UINT32 sr, UINT32 vector, UINT32 pc, UINT32 fault_address, bool in_mmu)
+INLINE void m68ki_stack_frame_0111(m68ki_cpu_core *m68k, UINT32 sr, UINT32 vector, UINT32 pc, UINT32 fault_address, bool in_mmu)
 {
 	int orig_rw = m68k->mmu_tmp_buserror_rw;	// this gets splatted by the following pushes, so save it now
 	int orig_fc = m68k->mmu_tmp_buserror_fc;
@@ -1955,7 +1955,7 @@ INLINE void m68ki_exception_address_error(m68ki_cpu_core *m68k)
 
 
 /* Service an interrupt request and start exception processing */
-void m68ki_exception_interrupt(m68ki_cpu_core *m68k, UINT32 int_level)
+INLINE void m68ki_exception_interrupt(m68ki_cpu_core *m68k, UINT32 int_level)
 {
 	UINT32 vector;
 	UINT32 sr;

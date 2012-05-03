@@ -820,7 +820,7 @@ static void I386OP(jg_rel32)(i386_state *cpustate)			// Opcode 0x0f 8f
 static void I386OP(jge_rel32)(i386_state *cpustate)			// Opcode 0x0f 8d
 {
 	INT32 disp = FETCH32(cpustate);
-	if( (cpustate->SF == cpustate->OF) ) {
+	if(cpustate->SF == cpustate->OF) {
 		cpustate->eip += disp;
 		CHANGE_PC(cpustate,cpustate->eip);
 		CYCLES(cpustate,CYCLES_JCC_FULL_DISP);		/* TODO: Timing = 7 + m */

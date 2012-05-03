@@ -48,7 +48,7 @@
 // threshholds for brickwall windowing
 //define MIN_CLOCKS 65
 // number_please apple2 wants 40 min
-#define MIN_CLOCKS 40
+#define MIN_CLOCKS 60
 //define MAX_CLOCKS 260
 #define MAX_CLOCKS 270
 #define MIN_THRESH (MIN_CLOCKS*(clock_rate/25000000))
@@ -233,10 +233,13 @@ bool dfi_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 				if (trans_time > MAX_THRESH) {
 					mg = mg == floppy_image::MG_A ? floppy_image::MG_B : floppy_image::MG_A;
 					if (((track%2)==0)&&(head==0)) fprintf(stderr,"missed transition, total time for transition is %d\n",trans_time);
-					//buf[tpos++] = mg | UINT32((200000000ULL*(cur_time-(trans_time/2)))/index_time); // generate imaginary transition at half period
+#ifndef FAKETRANS_ONE
+					buf[tpos++] = mg | UINT32((200000000ULL*(cur_time-(trans_time/2)))/index_time); // generate imaginary transition at half period
+#else
 					buf[tpos++] = mg | UINT32((200000000ULL*(cur_time-((trans_time*2)/3)))/index_time);
 					mg = mg == floppy_image::MG_A ? floppy_image::MG_B : floppy_image::MG_A;
 					buf[tpos++] = mg | UINT32((200000000ULL*(cur_time-(trans_time/3)))/index_time);
+#endif
 					mg = mg == floppy_image::MG_A ? floppy_image::MG_B : floppy_image::MG_A;
 					buf[tpos++] = mg | UINT32(200000000ULL*cur_time/index_time); // generate transition now
 					prev_time = cur_time;

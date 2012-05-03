@@ -52,7 +52,6 @@
 
 void *SZipAlloc(void *p, size_t size)
 {
-	p = p;
 	if (size == 0)
 		return 0;
 
@@ -61,7 +60,6 @@ void *SZipAlloc(void *p, size_t size)
 
 void SZipFree(void *p, void *address)
 {
-	p = p;
 	free(address);
 }
 
