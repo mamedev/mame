@@ -247,7 +247,7 @@ LDFLAGS += -static-libgcc
 TEST_GCC = $(shell gcc --version)
 ifeq ($(findstring 4.4,$(TEST_GCC)),)
 	#if we use new tools
-	LDFLAGS += -static -static-libstdc++
+	LDFLAGS += -static-libstdc++
 endif
 
 # add the windows libraries
