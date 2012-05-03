@@ -1154,11 +1154,6 @@ static void sc1_common_init(running_machine &machine, int reels, int decrypt, in
 		stepper_config(machine, i, &starpoint_interface_48step);
 	}
 	if (decrypt) bfm_decode_mainrom(machine,"maincpu", state->m_codec_data);	// decode main rom
-	if (reels)
-	{
-		awp_reel_setup();
-	}
-
 
 	state->m_defaultbank = defaultbank;
 

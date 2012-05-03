@@ -2635,7 +2635,6 @@ static void mpu4_config_common_reels(running_machine &machine,int reels)
 	{
 		stepper_config(machine, n, &barcrest_reel_interface);
 	}
-	awp_reel_setup();
 }
 
 MACHINE_START( mod2     )
@@ -2775,7 +2774,6 @@ static DRIVER_INIT (m_oldtmr)
 	stepper_config(machine, 4, &barcrest_opto1_interface);
 	stepper_config(machine, 5, &barcrest_opto1_interface);
 
-	awp_reel_setup();
 	state->m_current_chr_table = oldtmr_data;
 }
 

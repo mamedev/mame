@@ -382,7 +382,6 @@ static MACHINE_START( bfm_sys85 )
 
 	ROC10937_init(0,MSC1937,1);//?
 
-	awp_reel_setup();
 }
 
 // memory map for bellfruit system85 board ////////////////////////////////

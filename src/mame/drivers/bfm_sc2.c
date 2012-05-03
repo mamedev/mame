@@ -3753,10 +3753,6 @@ static void sc2awp_common_init(running_machine &machine,int reels, int decrypt)
 	{
 		stepper_config(machine, n, &starpoint_interface_48step);
 	}
-	if (reels)
-	{
-		awp_reel_setup();
-	}
 }
 
 static DRIVER_INIT (bbrkfst)

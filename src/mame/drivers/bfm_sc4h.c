@@ -639,10 +639,6 @@ static MACHINE_START( sc4 )
 	{
 		 if (state->m_reel_setup[n]) stepper_config(machine, n, state->m_reel_setup[n]);
 	}
-	if (reels)
-	{
-		awp_reel_setup();
-	}
 }
 
 
