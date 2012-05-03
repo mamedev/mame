@@ -352,8 +352,8 @@ static TIMER_CALLBACK(assert_lp_cb)
 
 static void handle_lightpen( device_t *device )
 {
-    int x_val = input_port_read_safe(device->machine(), "TOUCH_X",0x00);
-    int y_val = input_port_read_safe(device->machine(), "TOUCH_Y",0x00);
+    int x_val = device->machine().root_device().ioport("TOUCH_X")->read_safe(0x00);
+    int y_val = device->machine().root_device().ioport("TOUCH_Y")->read_safe(0x00);
     const rectangle &vis_area = device->machine().primary_screen->visible_area();
     int xt, yt;
 
@@ -576,7 +576,7 @@ static READ8_DEVICE_HANDLER( peplus_input_bank_a_r )
 		sda = i2cmem_sda_read(device);
 	}
 
-	if ((input_port_read_safe(device->machine(), "SENSOR",0x00) & 0x01) == 0x01 && state->m_coin_state == 0) {
+	if ((state->ioport("SENSOR")->read_safe(0x00) & 0x01) == 0x01 && state->m_coin_state == 0) {
 		state->m_coin_state = 1; // Start Coin Cycle
 		state->m_last_cycles = device->machine().firstcpu->total_cycles();
 	} else {
@@ -615,7 +615,7 @@ static READ8_DEVICE_HANDLER( peplus_input_bank_a_r )
 		door_wait = 12345;
 
 	if (curr_cycles - state->m_last_door > door_wait) {
-		if ((input_port_read_safe(device->machine(), "DOOR",0xff) & 0x01) == 0x01) {
+		if ((state->ioport("DOOR")->read_safe(0xff) & 0x01) == 0x01) {
 			state->m_door_open = (!state->m_door_open & 0x01);
 		} else {
 			state->m_door_open = 1;
@@ -818,7 +818,7 @@ ADDRESS_MAP_END
 CUSTOM_INPUT_MEMBER(peplus_state::peplus_input_r)
 {
 	UINT8 inp_ret = 0x00;
-	UINT8 inp_read = input_port_read(machine(), (const char *)param);
+	UINT8 inp_read = ioport((const char *)param)->read();
 
 	if (inp_read & 0x01) inp_ret = 0x01;
 	if (inp_read & 0x02) inp_ret = 0x02;
@@ -1035,7 +1035,7 @@ static MACHINE_RESET( peplus )
 	state->m_autohold_addr = 0x5e7e; // AutoHold Address
 
 	if (state->m_autohold_addr)
-		state->m_program_ram[state->m_autohold_addr] = input_port_read_safe(machine, "AUTOHOLD",0x00) & 0x01;
+		state->m_program_ram[state->m_autohold_addr] = state->ioport("AUTOHOLD")->read_safe(0x00) & 0x01;
 #endif
 }
 

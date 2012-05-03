@@ -382,12 +382,12 @@ READ16_MEMBER(lastfght_state::lastfght_c00002_r)
 {
 	// high byte:
 	// mask 0x1c: from sound?
-	return (machine().rand() & 0x1c00) | input_port_read(machine(), "IN0");
+	return (machine().rand() & 0x1c00) | ioport("IN0")->read();
 }
 
 READ16_MEMBER(lastfght_state::lastfght_c00004_r)
 {
-	return input_port_read(machine(), "IN1");
+	return ioport("IN1")->read();
 }
 
 READ16_MEMBER(lastfght_state::lastfght_c00006_r)
@@ -395,7 +395,7 @@ READ16_MEMBER(lastfght_state::lastfght_c00006_r)
 	// low byte:
 	// bit 7 = protection?
 	// bit 5 = blitter?
-	return input_port_read(machine(), "IN2");
+	return ioport("IN2")->read();
 }
 
 WRITE16_MEMBER(lastfght_state::lastfght_c00006_w)

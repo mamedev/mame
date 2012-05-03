@@ -406,10 +406,10 @@ READ16_MEMBER(coolpool_state::amerdart_trackball_r)
 
 	m_result = (m_lastresult | 0x00ff);
 
-	m_newx[1] = input_port_read(machine(), "XAXIS1");	/* Trackball 1  Left - Right */
-	m_newy[1] = input_port_read(machine(), "YAXIS1");	/* Trackball 1   Up  - Down  */
-	m_newx[2] = input_port_read(machine(), "XAXIS2");	/* Trackball 2  Left - Right */
-	m_newy[2] = input_port_read(machine(), "YAXIS2");	/* Trackball 2   Up  - Down  */
+	m_newx[1] = ioport("XAXIS1")->read();	/* Trackball 1  Left - Right */
+	m_newy[1] = ioport("YAXIS1")->read();	/* Trackball 1   Up  - Down  */
+	m_newx[2] = ioport("XAXIS2")->read();	/* Trackball 2  Left - Right */
+	m_newy[2] = ioport("YAXIS2")->read();	/* Trackball 2   Up  - Down  */
 
 	m_dx[1] = (INT8)(m_newx[1] - m_oldx[1]);
 	m_dy[1] = (INT8)(m_newy[1] - m_oldy[1]);
@@ -572,9 +572,9 @@ static WRITE16_DEVICE_HANDLER( dsp_dac_w )
 READ16_MEMBER(coolpool_state::coolpool_input_r)
 {
 
-	m_result = (input_port_read(machine(), "IN1") & 0x00ff) | (m_lastresult & 0xff00);
-	m_newx[1] = input_port_read(machine(), "XAXIS");
-	m_newy[1] = input_port_read(machine(), "YAXIS");
+	m_result = (ioport("IN1")->read() & 0x00ff) | (m_lastresult & 0xff00);
+	m_newx[1] = ioport("XAXIS")->read();
+	m_newy[1] = ioport("YAXIS")->read();
 	m_dx[1] = (INT8)(m_newx[1] - m_oldx[1]);
 	m_dy[1] = (INT8)(m_newy[1] - m_oldy[1]);
 

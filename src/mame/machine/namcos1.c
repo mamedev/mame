@@ -1282,9 +1282,9 @@ static READ8_HANDLER( quester_paddle_r )
 		int ret;
 
 		if (!qnum)
-			ret = (input_port_read(space->machine(), "CONTROL0")&0x90) | qstrobe | (input_port_read(space->machine(), "PADDLE0")&0x0f);
+			ret = (space->machine().root_device().ioport("CONTROL0")->read()&0x90) | qstrobe | (space->machine().root_device().ioport("PADDLE0")->read()&0x0f);
 		else
-			ret = (input_port_read(space->machine(), "CONTROL0")&0x90) | qstrobe | (input_port_read(space->machine(), "PADDLE1")&0x0f);
+			ret = (space->machine().root_device().ioport("CONTROL0")->read()&0x90) | qstrobe | (space->machine().root_device().ioport("PADDLE1")->read()&0x0f);
 
 		qstrobe ^= 0x40;
 
@@ -1295,9 +1295,9 @@ static READ8_HANDLER( quester_paddle_r )
 		int ret;
 
 		if (!qnum)
-			ret = (input_port_read(space->machine(), "CONTROL1")&0x90) | qnum | (input_port_read(space->machine(), "PADDLE0")>>4);
+			ret = (space->machine().root_device().ioport("CONTROL1")->read()&0x90) | qnum | (space->machine().root_device().ioport("PADDLE0")->read()>>4);
 		else
-			ret = (input_port_read(space->machine(), "CONTROL1")&0x90) | qnum | (input_port_read(space->machine(), "PADDLE1")>>4);
+			ret = (space->machine().root_device().ioport("CONTROL1")->read()&0x90) | qnum | (space->machine().root_device().ioport("PADDLE1")->read()>>4);
 
 		if (!qstrobe) qnum ^= 0x20;
 
@@ -1327,7 +1327,7 @@ static READ8_HANDLER( berabohm_buttons_r )
 	{
 		int inp = input_count;
 
-		if (inp == 4) res = input_port_read(space->machine(), "CONTROL0");
+		if (inp == 4) res = space->machine().root_device().ioport("CONTROL0")->read();
 		else
 		{
 			char portname[40];
@@ -1336,7 +1336,7 @@ static READ8_HANDLER( berabohm_buttons_r )
 			static int counter[4];
 
 			sprintf(portname,"IN%d",inp);	/* IN0-IN3 */
-			res = input_port_read(space->machine(), portname);
+			res = space->machine().root_device().ioport(portname)->read();
 			if (res & 0x80)
 			{
 				if (counter[inp] >= 0)
@@ -1360,7 +1360,7 @@ static READ8_HANDLER( berabohm_buttons_r )
 				counter[inp] = -1;
 #else
 			sprintf(portname,"IN%d",inp);	/* IN0-IN3 */
-			res = input_port_read(space->machine(), portname);
+			res = space->machine().root_device().ioport(portname)->read();
 			if (res & 1) res = 0x7f;		/* weak */
 			else if (res & 2) res = 0x48;	/* medium */
 			else if (res & 4) res = 0x40;	/* strong */
@@ -1371,7 +1371,7 @@ static READ8_HANDLER( berabohm_buttons_r )
 	}
 	else
 	{
-		res = input_port_read(space->machine(), "CONTROL1") & 0x8f;
+		res = space->machine().root_device().ioport("CONTROL1")->read() & 0x8f;
 
 		/* the strobe cannot happen too often, otherwise the MCU will waste too
            much time reading the inputs and won't have enough cycles to play two
@@ -1413,13 +1413,13 @@ static READ8_HANDLER( faceoff_inputs_r )
 
 	if (offset == 0)
 	{
-		res = (input_port_read(space->machine(), "CONTROL0") & 0x80) | stored_input[0];
+		res = (space->machine().root_device().ioport("CONTROL0")->read() & 0x80) | stored_input[0];
 
 		return res;
 	}
 	else
 	{
-		res = input_port_read(space->machine(), "CONTROL1") & 0x80;
+		res = space->machine().root_device().ioport("CONTROL1")->read() & 0x80;
 
 		/* the strobe cannot happen too often, otherwise the MCU will waste too
            much time reading the inputs and won't have enough cycles to play two
@@ -1434,17 +1434,17 @@ static READ8_HANDLER( faceoff_inputs_r )
 			switch (input_count)
 			{
 				case 0:
-					stored_input[0] = input_port_read(space->machine(), "IN0") & 0x1f;
-					stored_input[1] = (input_port_read(space->machine(), "IN3") & 0x07) << 3;
+					stored_input[0] = space->machine().root_device().ioport("IN0")->read() & 0x1f;
+					stored_input[1] = (space->machine().root_device().ioport("IN3")->read() & 0x07) << 3;
 					break;
 
 				case 3:
-					stored_input[0] = input_port_read(space->machine(), "IN2") & 0x1f;
+					stored_input[0] = space->machine().root_device().ioport("IN2")->read() & 0x1f;
 					break;
 
 				case 4:
-					stored_input[0] = input_port_read(space->machine(), "IN1") & 0x1f;
-					stored_input[1] = input_port_read(space->machine(), "IN3") & 0x18;
+					stored_input[0] = space->machine().root_device().ioport("IN1")->read() & 0x1f;
+					stored_input[1] = space->machine().root_device().ioport("IN3")->read() & 0x18;
 					break;
 
 				default:

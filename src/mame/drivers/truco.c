@@ -395,7 +395,7 @@ static INTERRUPT_GEN( truco_interrupt )
 	truco_state *state = device->machine().driver_data<truco_state>();
 	/* coinup */
 
-	if ( input_port_read(device->machine(),  "COIN") & 1 )
+	if ( state->ioport("COIN")->read() & 1 )
 	{
 		if ( state->m_trigger == 0 )
 		{

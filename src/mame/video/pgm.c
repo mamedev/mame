@@ -620,7 +620,7 @@ VIDEO_START( pgm )
 	pgm_state *state = machine.driver_data<pgm_state>();
 	int i;
 
-	state->m_bdata = machine.root_device().memregion("sprmask")->base();
+	state->m_bdata = state->memregion("sprmask")->base();
 	state->m_bdatasize = state->memregion("sprmask")->bytes() - 1;
 	state->m_aoffset = 0;
 	state->m_boffset = 0;

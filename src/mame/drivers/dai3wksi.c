@@ -150,7 +150,7 @@ static SCREEN_UPDATE_RGB32( dai3wksi )
 		}
 		else
 		{
-			if (input_port_read(screen.machine(), "IN2") & 0x03)
+			if (state->ioport("IN2")->read() & 0x03)
 				color = vr_prom2[value];
 			else
 				color = vr_prom1[value];

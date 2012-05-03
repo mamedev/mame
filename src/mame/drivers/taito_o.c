@@ -53,8 +53,8 @@ READ16_MEMBER(taitoo_state::io_r)
 
 	switch(offset)
 	{
-		case 0: retval = input_port_read(machine(), "IN0") & (clear_hack ? 0xf7ff : 0xffff); break;
-		case 1: retval = input_port_read(machine(), "IN1") & (clear_hack ? 0xfff7 : 0xffff); break;
+		case 0: retval = ioport("IN0")->read() & (clear_hack ? 0xf7ff : 0xffff); break;
+		case 1: retval = ioport("IN1")->read() & (clear_hack ? 0xfff7 : 0xffff); break;
 		default: logerror("IO R %x %x = %x @ %x\n", offset, mem_mask, retval, cpu_get_pc(&space.device()));
 	}
 	return retval;

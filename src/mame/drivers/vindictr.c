@@ -65,7 +65,7 @@ static MACHINE_RESET( vindictr )
 
 READ16_MEMBER(vindictr_state::port1_r)
 {
-	int result = input_port_read(machine(), "260010");
+	int result = ioport("260010")->read();
 	if (m_sound_to_cpu_ready) result ^= 0x0004;
 	if (m_cpu_to_sound_ready) result ^= 0x0008;
 	result ^= 0x0010;
@@ -124,7 +124,7 @@ static INPUT_PORTS_START( vindictr )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_DOWN ) PORT_2WAY PORT_PLAYER(1)
 
 	PORT_START("260010")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_VBLANK )
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_SERVICE( 0x0002, IP_ACTIVE_LOW )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED )

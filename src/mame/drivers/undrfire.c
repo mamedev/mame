@@ -262,12 +262,12 @@ READ32_MEMBER(undrfire_state::undrfire_input_r)
 	{
 		case 0x00:
 		{
-			return input_port_read(machine(), "INPUTS");
+			return ioport("INPUTS")->read();
 		}
 
 		case 0x01:
 		{
-			return input_port_read(machine(), "SYSTEM") | (m_coin_word << 16);
+			return ioport("SYSTEM")->read() | (m_coin_word << 16);
 		}
 	}
 
@@ -376,8 +376,8 @@ READ32_MEMBER(undrfire_state::undrfire_lightgun_r)
 
 		case 0x00:	/* P1 */
 		{
-			x = input_port_read(machine(), "GUNX1") << 6;
-			y = input_port_read(machine(), "GUNY1") << 6;
+			x = ioport("GUNX1")->read() << 6;
+			y = ioport("GUNY1")->read() << 6;
 
 			return ((x << 24) &0xff000000) | ((x << 8) &0xff0000)
 				 | ((y << 8) &0xff00) | ((y >> 8) &0xff) ;
@@ -385,8 +385,8 @@ READ32_MEMBER(undrfire_state::undrfire_lightgun_r)
 
 		case 0x01:	/* P2 */
 		{
-			x = input_port_read(machine(), "GUNX2") << 6;
-			y = input_port_read(machine(), "GUNY2") << 6;
+			x = ioport("GUNX2")->read() << 6;
+			y = ioport("GUNY2")->read() << 6;
 
 			return ((x << 24) &0xff000000) | ((x << 8) &0xff0000)
 				 | ((y << 8) &0xff00) | ((y >> 8) &0xff) ;
@@ -457,7 +457,7 @@ WRITE32_MEMBER(undrfire_state::cbombers_cpua_ctrl_w)
 
 READ32_MEMBER(undrfire_state::cbombers_adc_r)
 {
-	return (input_port_read(machine(), "STEER") << 24);
+	return (ioport("STEER")->read() << 24);
 }
 
 WRITE32_MEMBER(undrfire_state::cbombers_adc_w)

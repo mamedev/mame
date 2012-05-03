@@ -78,7 +78,7 @@ READ32_MEMBER(ultrsprt_state::eeprom_r)
 	UINT32 r = 0;
 
 	if (ACCESSING_BITS_24_31)
-		r |= input_port_read(machine(), "SERVICE");
+		r |= ioport("SERVICE")->read();
 
 	return r;
 }
@@ -86,13 +86,13 @@ READ32_MEMBER(ultrsprt_state::eeprom_r)
 WRITE32_MEMBER(ultrsprt_state::eeprom_w)
 {
 	if (ACCESSING_BITS_24_31)
-		input_port_write(machine(), "EEPROMOUT", data, 0xffffffff);
+		ioport("EEPROMOUT")->write(data, 0xffffffff);
 }
 
 CUSTOM_INPUT_MEMBER(ultrsprt_state::analog_ctrl_r)
 {
 	const char *tag = (const char *)param;
-	return input_port_read(machine(), tag) & 0xfff;
+	return ioport(tag)->read() & 0xfff;
 }
 
 WRITE32_MEMBER(ultrsprt_state::int_ack_w)

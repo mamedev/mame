@@ -125,7 +125,7 @@ DEVICE_IMAGE_LOAD(vectrex_cart)
 void vectrex_configuration(running_machine &machine)
 {
 	vectrex_state *state = machine.driver_data<vectrex_state>();
-	unsigned char cport = input_port_read(machine, "3DCONF");
+	unsigned char cport = state->ioport("3DCONF")->read();
 
 	/* Vectrex 'dipswitch' configuration */
 
@@ -202,7 +202,7 @@ void vectrex_configuration(running_machine &machine)
 		state->m_beam_color = RGB_WHITE;
 		state->m_imager_colors[0] = state->m_imager_colors[1] = state->m_imager_colors[2] = state->m_imager_colors[3] = state->m_imager_colors[4] = state->m_imager_colors[5] = RGB_WHITE;
 	}
-	state->m_lightpen_port = input_port_read(machine, "LPENCONF") & 0x03;
+	state->m_lightpen_port = machine.root_device().ioport("LPENCONF")->read() & 0x03;
 }
 
 
@@ -224,7 +224,7 @@ READ8_DEVICE_HANDLER(vectrex_via_pb_r)
 	int pot;
 	static const char *const ctrlnames[] = { "CONTR1X", "CONTR1Y", "CONTR2X", "CONTR2Y" };
 
-	pot = input_port_read(device->machine(), ctrlnames[(state->m_via_out[PORTB] & 0x6) >> 1]) - 0x80;
+	pot = device->machine().root_device().ioport(ctrlnames[(state->m_via_out[PORTB] & 0x6) >> 1])->read() - 0x80;
 
 	if (pot > (signed char)state->m_via_out[PORTA])
 		state->m_via_out[PORTB] |= 0x20;
@@ -253,7 +253,7 @@ READ8_DEVICE_HANDLER(vectrex_via_pa_r)
 READ8_DEVICE_HANDLER(vectrex_s1_via_pb_r)
 {
 	vectrex_state *state = device->machine().driver_data<vectrex_state>();
-	return (state->m_via_out[PORTB] & ~0x40) | (input_port_read(device->machine(), "COIN") & 0x40);
+	return (state->m_via_out[PORTB] & ~0x40) | (state->ioport("COIN")->read() & 0x40);
 }
 
 

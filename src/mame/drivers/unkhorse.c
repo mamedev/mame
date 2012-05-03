@@ -95,9 +95,9 @@ static READ8_DEVICE_HANDLER(horse_input_r)
 
 	switch (state->m_output >> 6 & 3)
 	{
-		case 0: return input_port_read(device->machine(), "IN0");
-		case 1: return input_port_read(device->machine(), "IN1");
-		case 2: return input_port_read(device->machine(), "IN2");
+		case 0: return state->ioport("IN0")->read();
+		case 1: return state->ioport("IN1")->read();
+		case 2: return state->ioport("IN2")->read();
 		default: break;
 	}
 

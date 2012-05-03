@@ -649,7 +649,7 @@ static SCREEN_UPDATE_IND16( aoh )
 CUSTOM_INPUT_MEMBER(vamphalf_state::boonggab_photo_sensors_r)
 {
 	static const UINT16 photo_sensors_table[8] = { 0x07, 0x06, 0x05, 0x04, 0x03, 0x02, 0x01, 0x00 };
-	UINT8 res = input_port_read(machine(), "PHOTO_SENSORS");
+	UINT8 res = ioport("PHOTO_SENSORS")->read();
 
 	switch(res)
 	{

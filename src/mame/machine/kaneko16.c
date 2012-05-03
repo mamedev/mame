@@ -2059,7 +2059,7 @@ void calc3_mcu_run(running_machine &machine)
 
 	if ( calc3.mcu_status != (1|2|4|8) )	return;
 
-	if (calc3.dsw_addr) space->write_byte(calc3.dsw_addr+0x200000, ( ~input_port_read(machine, "DSW1"))&0xff); // // DSW // dsw actually updates in realtime - mcu reads+writes it every frame
+	if (calc3.dsw_addr) space->write_byte(calc3.dsw_addr+0x200000, ( ~state->ioport("DSW1")->read())&0xff); // // DSW // dsw actually updates in realtime - mcu reads+writes it every frame
 
 
 	//calc3.mcu_status = 0;
@@ -2100,7 +2100,7 @@ void calc3_mcu_run(running_machine &machine)
 			printf("Calc 3 Init Command - %04x ROM Checksum Address\n",  calc3.checksumaddress);
 			printf("Calc 3 Init Command - %08x Data Write Address\n",  calc3.writeaddress);
 #endif
-	//      space->write_byte(calc3.dsw_addr+0x200000, ( ~input_port_read(machine, "DSW1"))&0xff); // // DSW // dsw actually updates in realtime - mcu reads+writes it every frame
+	//      space->write_byte(calc3.dsw_addr+0x200000, ( ~state->ioport("DSW1")->read())&0xff); // // DSW // dsw actually updates in realtime - mcu reads+writes it every frame
 
 			state->m_mcu_ram[calc3.checksumaddress / 2] = calc3.mcu_crc;				// MCU Rom Checksum!
 
@@ -2406,7 +2406,7 @@ void bloodwar_mcu_run(running_machine &machine)
 
 		case 0x03:	// DSW
 		{
-			kaneko16_mcu_ram[mcu_offset] = input_port_read(machine, "DSW1");
+			kaneko16_mcu_ram[mcu_offset] = machine.root_device().ioport("DSW1")->read();
 			logerror("%s : MCU executed command: %04X %04X (read DSW)\n", machine.describe_context(), mcu_command, mcu_offset*2);
 		}
 		break;
@@ -2464,7 +2464,7 @@ void bonkadv_mcu_run(running_machine &machine)
 
 		case 0x03:	// DSW
 		{
-			kaneko16_mcu_ram[mcu_offset] = input_port_read(machine, "DSW1");
+			kaneko16_mcu_ram[mcu_offset] = machine.root_device().ioport("DSW1")->read();
 			logerror("%s : MCU executed command: %04X %04X (read DSW)\n", machine.describe_context(), mcu_command, mcu_offset*2);
 		}
 		break;
@@ -2537,7 +2537,7 @@ void gtmr_mcu_run(running_machine &machine)
 
 		case 0x03:	// DSW
 		{
-			kaneko16_mcu_ram[mcu_offset] = input_port_read(machine, "DSW1");
+			kaneko16_mcu_ram[mcu_offset] = machine.root_device().ioport("DSW1")->read();
 		}
 		break;
 

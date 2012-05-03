@@ -202,7 +202,7 @@ READ8_MEMBER(mie_device::read_78xx)
 READ8_MEMBER(mie_device::gpio_r)
 {
 	if(gpiodir & (1 << offset))
-		return gpio_name[offset] ? input_port_read(machine(), gpio_name[offset]) : 0xff;
+		return gpio_name[offset] ? ioport(gpio_name[offset])->read() : 0xff;
 	else
 		return gpio_val[offset];
 }
@@ -211,7 +211,7 @@ WRITE8_MEMBER(mie_device::gpio_w)
 {
 	gpio_val[offset] = data;
 	if(!(gpiodir & (1 << offset)) && gpio_name[offset])
-		input_port_write(machine(), gpio_name[offset], data, 0xff);
+		ioport(gpio_name[offset])->write(data, 0xff);
 }
 
 READ8_MEMBER(mie_device::gpiodir_r)

@@ -474,18 +474,14 @@ endif
 # add the optimization flag
 CCOMFLAGS += -O$(OPTIMIZE)
 
-# if we are optimizing, include optimization options
-# and make all errors into warnings
-ifneq ($(OPTIMIZE),0)
-ifneq ($(TARGETOS),os2)
+# add the error warning flag
 ifndef NOWERROR
-CCOMFLAGS += -Werror -fno-strict-aliasing $(ARCHOPTS)
-else
-CCOMFLAGS += -fno-strict-aliasing $(ARCHOPTS)
+CCOMFLAGS += -Werror
 endif
-else
+
+# if we are optimizing, include optimization options
+ifneq ($(OPTIMIZE),0)
 CCOMFLAGS += -fno-strict-aliasing $(ARCHOPTS)
-endif
 endif
 
 # add a basic set of warnings

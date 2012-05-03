@@ -288,17 +288,17 @@ READ32_MEMBER(srmp5_state::srmp5_inputs_r)
 	switch (m_input_select)
 	{
 	case 0x01:
-		ret = input_port_read(machine(), "IN0");
+		ret = ioport("IN0")->read();
 		break;
 	case 0x02:
-		ret = input_port_read(machine(), "IN1");
+		ret = ioport("IN1")->read();
 		break;
 	case 0x04:
-		ret = input_port_read(machine(), "IN2");
+		ret = ioport("IN2")->read();
 		break;
 	case 0x00:
 	case 0x08:
-		ret = input_port_read(machine(), "IN3");
+		ret = ioport("IN3")->read();
 		break;
 	}
 	return ret;

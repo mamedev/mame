@@ -639,8 +639,8 @@ READ32_MEMBER(hng64_state::fight_io_r)
 	switch (offset*4)
 	{
 		case 0x000: return 0x00000400;
-		case 0x004: return input_port_read(machine(), "SYSTEM");
-		case 0x008: return input_port_read(machine(), "P1_P2");
+		case 0x004: return ioport("SYSTEM")->read();
+		case 0x008: return ioport("P1_P2")->read();
 		case 0x600: return m_no_machine_error_code;
 	}
 
@@ -668,8 +668,8 @@ READ32_MEMBER(hng64_state::samsho_io_r)
 			else
 				return 0x000;
 		}
-		case 0x004: return input_port_read(machine(), "SYSTEM");
-		case 0x008: return input_port_read(machine(), "P1_P2");
+		case 0x004: return ioport("SYSTEM")->read();
+		case 0x008: return ioport("P1_P2")->read();
 		case 0x600: return m_no_machine_error_code;
 	}
 
@@ -696,26 +696,26 @@ READ32_MEMBER(hng64_state::shoot_io_r)
 		case 0x010:
 		{
 			/* Quick kludge for use the input test items */
-			if(input_port_read(machine(), "D_IN") & 0x01000000)
+			if(ioport("D_IN")->read() & 0x01000000)
 				m_p1_trig = machine().rand() & 0x01000000;
 
-			return (input_port_read(machine(), "D_IN") & ~0x01000000) | (m_p1_trig);
+			return (ioport("D_IN")->read() & ~0x01000000) | (m_p1_trig);
 		}
 		case 0x018:
 		{
 			UINT8 p1_x, p1_y, p2_x, p2_y;
-			p1_x = input_port_read(machine(), "LIGHT_P1_X") & 0xff;
-			p1_y = input_port_read(machine(), "LIGHT_P1_Y") & 0xff;
-			p2_x = input_port_read(machine(), "LIGHT_P2_X") & 0xff;
-			p2_y = input_port_read(machine(), "LIGHT_P2_Y") & 0xff;
+			p1_x = ioport("LIGHT_P1_X")->read() & 0xff;
+			p1_y = ioport("LIGHT_P1_Y")->read() & 0xff;
+			p2_x = ioport("LIGHT_P2_X")->read() & 0xff;
+			p2_y = ioport("LIGHT_P2_Y")->read() & 0xff;
 
 			return p1_x<<24 | p1_y<<16 | p2_x<<8 | p2_y;
 		}
 		case 0x01c:
 		{
 			UINT8 p3_x, p3_y;
-			p3_x = input_port_read(machine(), "LIGHT_P3_X") & 0xff;
-			p3_y = input_port_read(machine(), "LIGHT_P3_Y") & 0xff;
+			p3_x = ioport("LIGHT_P3_X")->read() & 0xff;
+			p3_y = ioport("LIGHT_P3_Y")->read() & 0xff;
 
 			return p3_x<<24 | p3_y<<16 | p3_x<<8 | p3_y; //FIXME: see what's the right bank here when the trigger works
 		}
@@ -741,8 +741,8 @@ READ32_MEMBER(hng64_state::racing_io_r)
 			else
 				return 0x000;
 		}
-		case 0x004: return input_port_read(machine(), "SYSTEM");
-		case 0x008: return input_port_read(machine(), "P1_P2");
+		case 0x004: return ioport("SYSTEM")->read();
+		case 0x008: return ioport("P1_P2")->read();
 		case 0x600: return m_no_machine_error_code;
 	}
 
@@ -929,7 +929,7 @@ READ32_MEMBER(hng64_state::tcram_r)
 
 	//printf("Q1 R : %.8x %.8x\n", offset, hng64_tcram[offset]);
 	if(offset == 0x12)
-		return input_port_read(machine(), "VBLANK");
+		return ioport("VBLANK")->read();
 
 	return m_tcram[offset];
 }
@@ -1269,7 +1269,7 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( hng64 )
 	PORT_START("VBLANK")
-	PORT_BIT( 0xffffffff, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0xffffffff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("IPT_TEST")
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -1345,7 +1345,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( bbust2 )
 	PORT_START("VBLANK")
-	PORT_BIT( 0xffffffff, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0xffffffff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("D_IN")
 	PORT_BIT( 0x000000ff, IP_ACTIVE_HIGH, IPT_UNUSED )

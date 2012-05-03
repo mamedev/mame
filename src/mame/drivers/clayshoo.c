@@ -54,7 +54,7 @@ static UINT8 difficulty_input_port_r( running_machine &machine, int bit )
 	UINT8 ret = 0;
 
 	/* read fake port and remap the buttons to 2 bits */
-	UINT8	raw = input_port_read(machine, "FAKE");
+	UINT8	raw = machine.root_device().ioport("FAKE")->read();
 
 	if (raw & (1 << (bit + 1)))
 		ret = 0x03;		/* expert */
@@ -74,11 +74,11 @@ static READ8_DEVICE_HANDLER( input_port_r )
 
 	switch (state->m_input_port_select)
 	{
-	case 0x01:	ret = input_port_read(device->machine(), "IN0"); break;
-	case 0x02:	ret = input_port_read(device->machine(), "IN1"); break;
-	case 0x04:	ret = (input_port_read(device->machine(), "IN2") & 0xf0) | difficulty_input_port_r(device->machine(), 0) |
+	case 0x01:	ret = state->ioport("IN0")->read(); break;
+	case 0x02:	ret = state->ioport("IN1")->read(); break;
+	case 0x04:	ret = (state->ioport("IN2")->read() & 0xf0) | difficulty_input_port_r(device->machine(), 0) |
 					  (difficulty_input_port_r(device->machine(), 3) << 2); break;
-	case 0x08:	ret = input_port_read(device->machine(), "IN3"); break;
+	case 0x08:	ret = state->ioport("IN3")->read(); break;
 	case 0x10:
 	case 0x20:	break;	/* these two are not really used */
 	default: logerror("Unexpected port read: %02X\n", state->m_input_port_select);
@@ -118,8 +118,8 @@ WRITE8_MEMBER(clayshoo_state::analog_reset_w)
 
 	m_analog_port_val = 0xff;
 
-	m_analog_timer_1->adjust(compute_duration(&space.device(), input_port_read(machine(), "AN1")), 0x02);
-	m_analog_timer_2->adjust(compute_duration(&space.device(), input_port_read(machine(), "AN2")), 0x01);
+	m_analog_timer_1->adjust(compute_duration(&space.device(), ioport("AN1")->read()), 0x02);
+	m_analog_timer_2->adjust(compute_duration(&space.device(), ioport("AN2")->read()), 0x01);
 }
 
 

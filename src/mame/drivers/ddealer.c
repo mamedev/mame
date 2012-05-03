@@ -309,7 +309,7 @@ static TIMER_DEVICE_CALLBACK( ddealer_mcu_sim )
 
 	/*coin/credit simulation*/
 	/*$fe002 is used,might be for multiple coins for one credit settings.*/
-	state->m_coin_input = (~(input_port_read(timer.machine(), "IN0")));
+	state->m_coin_input = (~(timer.machine().root_device().ioport("IN0")->read()));
 
 	if (state->m_coin_input & 0x01)//coin 1
 	{

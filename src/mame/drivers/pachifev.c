@@ -311,10 +311,10 @@ static INTERRUPT_GEN( pachifev_vblank_irq )
 		address_space *ramspace = device->memory().space(AS_PROGRAM);
 		UINT8 player = 0;
 
-		if ((ramspace->read_byte(0xe00f) == 0x01) && ((input_port_read(device->machine(), "DSW1") & 0x08) == 0x00))
+		if ((ramspace->read_byte(0xe00f) == 0x01) && ((state->ioport("DSW1")->read() & 0x08) == 0x00))
 			player = 1;
 
-        int current_power=input_port_read(device->machine(), inname[player]) & 0x3f;
+        int current_power=state->ioport(inname[player])->read() & 0x3f;
         if(current_power != state->m_previous_power)
         {
             popmessage    ("%d%%", (current_power * 100) / 0x3f);

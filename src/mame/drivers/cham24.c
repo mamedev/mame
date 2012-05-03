@@ -173,8 +173,8 @@ WRITE8_MEMBER(cham24_state::cham24_IN0_w)
 	m_in_0_shift = 0;
 	m_in_1_shift = 0;
 
-	m_in_0 = input_port_read(machine(), "P1");
-	m_in_1 = input_port_read(machine(), "P2");
+	m_in_0 = ioport("P1")->read();
+	m_in_1 = ioport("P2")->read();
 
 }
 
@@ -304,8 +304,8 @@ static MACHINE_START( cham24 )
 {
 	cham24_state *state = machine.driver_data<cham24_state>();
 	/* switch PRG rom */
-	UINT8* dst = machine.root_device().memregion("maincpu")->base();
-	UINT8* src = machine.root_device().memregion("user1")->base();
+	UINT8* dst = state->memregion("maincpu")->base();
+	UINT8* src = state->memregion("user1")->base();
 
 	memcpy(&dst[0x8000], &src[0x0f8000], 0x4000);
 	memcpy(&dst[0xc000], &src[0x0f8000], 0x4000);

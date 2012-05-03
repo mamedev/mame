@@ -46,7 +46,7 @@ CUSTOM_INPUT_MEMBER(taito_f3_state::f3_analog_r)
 	const char *tag = (const char *)param;
 	UINT32 ipt = 0;
 
-	ipt = ((input_port_read(machine(), tag) & 0xf)<<12) | ((input_port_read(machine(), tag) & 0xff0)>>4);
+	ipt = ((ioport(tag)->read() & 0xf)<<12) | ((ioport(tag)->read() & 0xff0)>>4);
 
 	return ipt;
 }
@@ -62,7 +62,7 @@ READ32_MEMBER(taito_f3_state::f3_control_r)
 	static const char *const iptnames[] = { "IN0", "IN1", "AN0", "AN1", "IN2", "IN3" };
 
 	if (offset < 6)
-		return input_port_read(machine(), iptnames[offset]);
+		return ioport(iptnames[offset])->read();
 
 	logerror("CPU #0 PC %06x: warning - read unmapped control address %06x\n", cpu_get_pc(&space.device()), offset);
 	return 0xffffffff;
@@ -90,7 +90,7 @@ WRITE32_MEMBER(taito_f3_state::f3_control_w)
 		case 0x04: /* Eeprom */
 			if (ACCESSING_BITS_0_7)
 			{
-				input_port_write(machine(), "EEPROMOUT", data, 0xff);
+				ioport("EEPROMOUT")->write(data, 0xff);
 			}
 			return;
 

@@ -163,7 +163,7 @@ READ8_MEMBER(marinedt_state::marinedt_port1_r)
 	//might need to be reversed for cocktail stuff
 
 	/* x/y multiplexed */
-	return input_port_read(machine(), ((m_pf & 0x08) >> 3) ? "TRACKY" : "TRACKX");
+	return ioport(((m_pf & 0x08) >> 3) ? "TRACKY" : "TRACKX")->read();
 }
 
 READ8_MEMBER(marinedt_state::marinedt_coll_r)

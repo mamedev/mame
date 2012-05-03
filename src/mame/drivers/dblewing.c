@@ -145,11 +145,11 @@ READ16_MEMBER(dblewing_state::dblewing_prot_r)
 		case 0x330: return 0; // controls bonuses such as shoot type,bombs etc.
 		case 0x1d4: return m_70c_data;  //controls restart points
 
-		case 0x0ac: return (input_port_read(machine(), "DSW") & 0x40) << 4;//flip screen
+		case 0x0ac: return (ioport("DSW")->read() & 0x40) << 4;//flip screen
 		case 0x4b0: return m_608_data;//coinage
 		case 0x068:
 		{
-			switch (input_port_read(machine(), "DSW") & 0x0300) //I don't know how to relationate this...
+			switch (ioport("DSW")->read() & 0x0300) //I don't know how to relationate this...
 			{
 				case 0x0000: return 0x000;//0
 				case 0x0100: return 0x060;//3
@@ -159,12 +159,12 @@ READ16_MEMBER(dblewing_state::dblewing_prot_r)
 		}
 		case 0x094: return m_104_data;// p1 inputs select screen  OK
 		case 0x24c: return m_008_data;//read DSW (mirror for coinage/territory)
-		case 0x298: return input_port_read(machine(), "SYSTEM");//vblank
-		case 0x476: return input_port_read(machine(), "SYSTEM");//mirror for coins
-		case 0x506: return input_port_read(machine(), "DSW");
+		case 0x298: return ioport("SYSTEM")->read();//vblank
+		case 0x476: return ioport("SYSTEM")->read();//mirror for coins
+		case 0x506: return ioport("DSW")->read();
 		case 0x5d8: return m_406_data;
-		case 0x2b4: return input_port_read(machine(), "P1_P2");
-		case 0x1a8: return (input_port_read(machine(), "DSW") & 0x4000) >> 12;//allow continue
+		case 0x2b4: return ioport("P1_P2")->read();
+		case 0x1a8: return (ioport("DSW")->read() & 0x4000) >> 12;//allow continue
 		case 0x3ec: return m_70c_data; //score entry
 		case 0x246: return m_580_data; // these three controls "perfect bonus" I suppose...
 		case 0x52e: return m_580_data;
@@ -424,7 +424,7 @@ static INPUT_PORTS_START( dblewing )
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("DSW")
 	 /* 16bit - These values are for Dip Switch #1 */

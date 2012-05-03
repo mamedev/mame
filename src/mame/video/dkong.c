@@ -880,13 +880,13 @@ static TIMER_CALLBACK( scanline_callback )
 static void check_palette(running_machine &machine)
 {
 	dkong_state *state = machine.driver_data<dkong_state>();
-	const input_port_config *port;
+	ioport_port *port;
 	int newset;
 
 	port = state->ioport("VIDHW");
 	if (port != NULL)
 	{
-		newset = input_port_read_direct(port);
+		newset = port->read();
 		if (newset != state->m_vidhw)
 		{
 			state->m_vidhw = newset;
@@ -937,8 +937,8 @@ VIDEO_START( dkong )
 	{
 		case HARDWARE_TRS02:
 			machine.primary_screen->register_screen_bitmap(state->m_bg_bits);
-			state->m_gfx3 = machine.root_device().memregion("gfx3")->base();
-			state->m_gfx3_len = machine.root_device().memregion("gfx3")->bytes();
+			state->m_gfx3 = state->memregion("gfx3")->base();
+			state->m_gfx3_len = state->memregion("gfx3")->bytes();
 		    /* fall through */
 		case HARDWARE_TKG04:
 		case HARDWARE_TKG02:
@@ -950,8 +950,8 @@ VIDEO_START( dkong )
 			state->m_bg_tilemap->set_scrolldx(0, 128);
 
 			machine.primary_screen->register_screen_bitmap(state->m_bg_bits);
-			state->m_gfx4 = machine.root_device().memregion("gfx4")->base();
-			state->m_gfx3 = machine.root_device().memregion("gfx3")->base();
+			state->m_gfx4 = state->memregion("gfx4")->base();
+			state->m_gfx3 = state->memregion("gfx3")->base();
 			state->m_gfx3_len = state->memregion("gfx3")->bytes();
 
 			break;

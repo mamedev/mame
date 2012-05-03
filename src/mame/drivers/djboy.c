@@ -347,9 +347,9 @@ READ8_MEMBER(djboy_state::beast_p2_r)
 
 	switch ((m_beast_p0 >> 2) & 3)
 	{
-		case 0: return input_port_read(machine(), "IN1");
-		case 1: return input_port_read(machine(), "IN2");
-		case 2: return input_port_read(machine(), "IN0");
+		case 0: return ioport("IN1")->read();
+		case 1: return ioport("IN2")->read();
+		case 2: return ioport("IN0")->read();
 		default: return 0xff;
 	}
 }
@@ -363,8 +363,8 @@ READ8_MEMBER(djboy_state::beast_p3_r)
 {
 
 	UINT8 dsw = 0;
-	UINT8 dsw1 = ~input_port_read(machine(), "DSW1");
-	UINT8 dsw2 = ~input_port_read(machine(), "DSW2");
+	UINT8 dsw1 = ~ioport("DSW1")->read();
+	UINT8 dsw2 = ~ioport("DSW2")->read();
 
 	switch ((m_beast_p0 >> 5) & 3)
 	{
@@ -522,8 +522,8 @@ static const kaneko_pandora_interface djboy_pandora_config =
 static MACHINE_START( djboy )
 {
 	djboy_state *state = machine.driver_data<djboy_state>();
-	UINT8 *MAIN = machine.root_device().memregion("maincpu")->base();
-	UINT8 *CPU1 = machine.root_device().memregion("cpu1")->base();
+	UINT8 *MAIN = state->memregion("maincpu")->base();
+	UINT8 *CPU1 = state->memregion("cpu1")->base();
 	UINT8 *CPU2 = state->memregion("cpu2")->base();
 
 	state->membank("bank1")->configure_entries(0, 4,  &MAIN[0x00000], 0x2000);

@@ -67,7 +67,7 @@ static void mcu_simulate( running_machine &machine )
 		int i;
 		int coin_curr;
 
-		coin_curr = ~input_port_read(machine, "IN0") & 1;
+		coin_curr = ~machine.root_device().ioport("IN0")->read() & 1;
 		if (coin_curr && !state->m_coin_last && state->m_protection_ram[0x01] < 9)
 		{
 			state->m_protection_ram[0x01]++;	// increase credits counter
@@ -77,8 +77,8 @@ static void mcu_simulate( running_machine &machine )
 
 		state->m_protection_ram[0x04] = 0x3c;	// coin inputs
 
-		state->m_protection_ram[0x02] = BITSWAP8(input_port_read(machine, "IN1"), 7,6,5,4,2,3,1,0);	// player 1
-		state->m_protection_ram[0x03] = BITSWAP8(input_port_read(machine, "IN2"), 7,6,5,4,2,3,1,0);	// player 2
+		state->m_protection_ram[0x02] = BITSWAP8(machine.root_device().ioport("IN1")->read(), 7,6,5,4,2,3,1,0);	// player 1
+		state->m_protection_ram[0x03] = BITSWAP8(machine.root_device().ioport("IN2")->read(), 7,6,5,4,2,3,1,0);	// player 2
 
 		if (state->m_protection_ram[0x19] == 0xaa)	// player 2 active
 			state->m_protection_ram[0x1b] = state->m_protection_ram[0x03];
@@ -293,7 +293,7 @@ WRITE8_MEMBER(mexico86_state::mexico86_68705_port_b_w)
 			else
 			{
 				//logerror("%04x: 68705 read input port %04x\n", cpu_get_pc(&space.device()), m_address);
-				m_latch = input_port_read(machine(), (m_address & 1) ? "IN2" : "IN1");
+				m_latch = ioport((m_address & 1) ? "IN2" : "IN1")->read();
 			}
 		}
 		else    /* write */

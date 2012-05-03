@@ -397,7 +397,7 @@ READ32_MEMBER(taitojc_state::jc_control_r)
 		{
 			if (ACCESSING_BITS_24_31)
 			{
-				r |= ((input_port_read(machine(), "COINS") & 0x2) << 2) << 24;
+				r |= ((ioport("COINS")->read() & 0x2) << 2) << 24;
 			}
 			return r;
 		}
@@ -405,7 +405,7 @@ READ32_MEMBER(taitojc_state::jc_control_r)
 		{
 			if (ACCESSING_BITS_24_31)
 			{
-				r |= input_port_read(machine(), "COINS") << 24;
+				r |= ioport("COINS")->read() << 24;
 			}
 			return r;
 		}
@@ -413,7 +413,7 @@ READ32_MEMBER(taitojc_state::jc_control_r)
 		{
 			if (ACCESSING_BITS_24_31)
 			{
-				r |= input_port_read(machine(), "START") << 24;
+				r |= ioport("START")->read() << 24;
 			}
 			return r;
 		}
@@ -421,7 +421,7 @@ READ32_MEMBER(taitojc_state::jc_control_r)
 		{
 			if (ACCESSING_BITS_24_31)
 			{
-				r |= input_port_read(machine(), "UNUSED") << 24;
+				r |= ioport("UNUSED")->read() << 24;
 			}
 			return r;
 		}
@@ -437,7 +437,7 @@ READ32_MEMBER(taitojc_state::jc_control_r)
 		{
 			if (ACCESSING_BITS_24_31)
 			{
-				r |= input_port_read(machine(), "BUTTONS") << 24;
+				r |= ioport("BUTTONS")->read() << 24;
 			}
 			return r;
 		}
@@ -471,7 +471,7 @@ WRITE32_MEMBER(taitojc_state::jc_control_w)
 		{
 			if (ACCESSING_BITS_24_31)
 			{
-				input_port_write(machine(), "EEPROMOUT", data >> 24, 0xff);
+				ioport("EEPROMOUT")->write(data >> 24, 0xff);
 			}
 			else
 				popmessage("jc_control_w: %08X, %08X, %08X\n", data, offset, mem_mask);
@@ -828,9 +828,9 @@ WRITE32_MEMBER(taitojc_state::jc_meters_w)
 	else if(offset == 1 && ACCESSING_BITS_16_31)
 		m_brake_meter = taitojc_brake_table[(data >> 16) & 0xff];
 
-	if(input_port_read_safe(machine(), "METER", 0))
+	if(ioport("METER")->read_safe(0))
 	{
-		UINT8 mascon_lv = (input_port_read(machine(), "MASCON") & 0x70) >> 4;
+		UINT8 mascon_lv = (ioport("MASCON")->read() & 0x70) >> 4;
 
 		popmessage("%d %.02f km/h %.02f MPa",mascon_lv,m_speed_meter,m_brake_meter/10);
 	}
@@ -898,7 +898,7 @@ READ8_MEMBER(taitojc_state::hc11_analog_r)
 	static const char *const portnames[] = { "ANALOG1", "ANALOG2", "ANALOG3", "ANALOG4",
 										"ANALOG5", "ANALOG6", "ANALOG7", "ANALOG8" };
 
-	return input_port_read_safe(machine(), portnames[offset], 0);
+	return ioport(portnames[offset])->read_safe(0);
 }
 
 
@@ -1166,7 +1166,7 @@ INPUT_PORTS_END
 CUSTOM_INPUT_MEMBER(taitojc_state::mascon_state_r)
 {
 	static const UINT8 mascon_table[6] = { 0x01, 0x10, 0x02, 0x20, 0x04, 0x40 };
-	UINT8 res = input_port_read(machine(), "MASCON");
+	UINT8 res = ioport("MASCON")->read();
 	int i;
 
 	//popmessage("%02x",res);

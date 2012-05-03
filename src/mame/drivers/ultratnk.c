@@ -26,7 +26,7 @@ CUSTOM_INPUT_MEMBER(ultratnk_state::get_collision)
 
 CUSTOM_INPUT_MEMBER(ultratnk_state::get_joystick)
 {
-	UINT8 joy = input_port_read(machine(), (const char *)param) & 3;
+	UINT8 joy = ioport((const char *)param)->read() & 3;
 
 	if (joy == 1)
 	{
@@ -50,9 +50,9 @@ static TIMER_CALLBACK( nmi_callback	)
 
 	/* NMI and watchdog are disabled during service mode */
 
-	machine.watchdog_enable(input_port_read(machine, "IN0") & 0x40);
+	machine.watchdog_enable(machine.root_device().ioport("IN0")->read() & 0x40);
 
-	if (input_port_read(machine, "IN0") & 0x40)
+	if (machine.root_device().ioport("IN0")->read() & 0x40)
 		cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
 
 	machine.scheduler().timer_set(machine.primary_screen->time_until_pos(scanline), FUNC(nmi_callback), scanline);
@@ -74,21 +74,21 @@ READ8_MEMBER(ultratnk_state::ultratnk_wram_r)
 
 READ8_MEMBER(ultratnk_state::ultratnk_analog_r)
 {
-	return (input_port_read(machine(), "ANALOG") << (~offset & 7)) & 0x80;
+	return (ioport("ANALOG")->read() << (~offset & 7)) & 0x80;
 }
 READ8_MEMBER(ultratnk_state::ultratnk_coin_r)
 {
-	return (input_port_read(machine(), "COIN") << (~offset & 7)) & 0x80;
+	return (ioport("COIN")->read() << (~offset & 7)) & 0x80;
 }
 READ8_MEMBER(ultratnk_state::ultratnk_collision_r)
 {
-	return (input_port_read(machine(), "COLLISION") << (~offset & 7)) & 0x80;
+	return (ioport("COLLISION")->read() << (~offset & 7)) & 0x80;
 }
 
 
 READ8_MEMBER(ultratnk_state::ultratnk_options_r)
 {
-	return (input_port_read(machine(), "DIP") >> (2 * (offset & 3))) & 3;
+	return (ioport("DIP")->read() >> (2 * (offset & 3))) & 3;
 }
 
 
@@ -181,7 +181,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( ultratnk )
 	PORT_START("IN0")
 	PORT_SERVICE( 0x40, IP_ACTIVE_LOW )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_VBLANK )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("IN1")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Option 1") PORT_TOGGLE

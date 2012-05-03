@@ -152,10 +152,10 @@ WRITE8_HANDLER( decocass_quadrature_decoder_reset_w )
 	decocass_state *state = space->machine().driver_data<decocass_state>();
 
 	/* just latch the analog controls here */
-	state->m_quadrature_decoder[0] = input_port_read(space->machine(), "AN0");
-	state->m_quadrature_decoder[1] = input_port_read(space->machine(), "AN1");
-	state->m_quadrature_decoder[2] = input_port_read(space->machine(), "AN2");
-	state->m_quadrature_decoder[3] = input_port_read(space->machine(), "AN3");
+	state->m_quadrature_decoder[0] = state->ioport("AN0")->read();
+	state->m_quadrature_decoder[1] = state->ioport("AN1")->read();
+	state->m_quadrature_decoder[2] = state->ioport("AN2")->read();
+	state->m_quadrature_decoder[3] = state->ioport("AN3")->read();
 }
 
 WRITE8_HANDLER( decocass_adc_w )
@@ -181,7 +181,7 @@ READ8_HANDLER( decocass_input_r )
 	switch (offset & 7)
 	{
 	case 0: case 1: case 2:
-		data = input_port_read(space->machine(), portnames[offset & 7]);
+		data = space->machine().root_device().ioport(portnames[offset & 7])->read();
 		break;
 	case 3: case 4: case 5: case 6:
 		data = state->m_quadrature_decoder[(offset & 7) - 3];

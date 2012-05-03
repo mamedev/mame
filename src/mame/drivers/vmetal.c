@@ -164,14 +164,14 @@ WRITE16_MEMBER(vmetal_state::vmetal_mid2tileram_w)
 }
 
 
-READ16_MEMBER(vmetal_state::varia_dips_bit8_r){ return ((input_port_read(machine(), "DSW2") & 0x80) << 0) | ((input_port_read(machine(), "DSW1") & 0x80) >> 1); }
-READ16_MEMBER(vmetal_state::varia_dips_bit7_r){ return ((input_port_read(machine(), "DSW2") & 0x40) << 1) | ((input_port_read(machine(), "DSW1") & 0x40) >> 0); }
-READ16_MEMBER(vmetal_state::varia_dips_bit6_r){ return ((input_port_read(machine(), "DSW2") & 0x20) << 2) | ((input_port_read(machine(), "DSW1") & 0x20) << 1); }
-READ16_MEMBER(vmetal_state::varia_dips_bit5_r){ return ((input_port_read(machine(), "DSW2") & 0x10) << 3) | ((input_port_read(machine(), "DSW1") & 0x10) << 2); }
-READ16_MEMBER(vmetal_state::varia_dips_bit4_r){ return ((input_port_read(machine(), "DSW2") & 0x08) << 4) | ((input_port_read(machine(), "DSW1") & 0x08) << 3); }
-READ16_MEMBER(vmetal_state::varia_dips_bit3_r){ return ((input_port_read(machine(), "DSW2") & 0x04) << 5) | ((input_port_read(machine(), "DSW1") & 0x04) << 4); }
-READ16_MEMBER(vmetal_state::varia_dips_bit2_r){ return ((input_port_read(machine(), "DSW2") & 0x02) << 6) | ((input_port_read(machine(), "DSW1") & 0x02) << 5); }
-READ16_MEMBER(vmetal_state::varia_dips_bit1_r){ return ((input_port_read(machine(), "DSW2") & 0x01) << 7) | ((input_port_read(machine(), "DSW1") & 0x01) << 6); }
+READ16_MEMBER(vmetal_state::varia_dips_bit8_r){ return ((ioport("DSW2")->read() & 0x80) << 0) | ((ioport("DSW1")->read() & 0x80) >> 1); }
+READ16_MEMBER(vmetal_state::varia_dips_bit7_r){ return ((ioport("DSW2")->read() & 0x40) << 1) | ((ioport("DSW1")->read() & 0x40) >> 0); }
+READ16_MEMBER(vmetal_state::varia_dips_bit6_r){ return ((ioport("DSW2")->read() & 0x20) << 2) | ((ioport("DSW1")->read() & 0x20) << 1); }
+READ16_MEMBER(vmetal_state::varia_dips_bit5_r){ return ((ioport("DSW2")->read() & 0x10) << 3) | ((ioport("DSW1")->read() & 0x10) << 2); }
+READ16_MEMBER(vmetal_state::varia_dips_bit4_r){ return ((ioport("DSW2")->read() & 0x08) << 4) | ((ioport("DSW1")->read() & 0x08) << 3); }
+READ16_MEMBER(vmetal_state::varia_dips_bit3_r){ return ((ioport("DSW2")->read() & 0x04) << 5) | ((ioport("DSW1")->read() & 0x04) << 4); }
+READ16_MEMBER(vmetal_state::varia_dips_bit2_r){ return ((ioport("DSW2")->read() & 0x02) << 6) | ((ioport("DSW1")->read() & 0x02) << 5); }
+READ16_MEMBER(vmetal_state::varia_dips_bit1_r){ return ((ioport("DSW2")->read() & 0x01) << 7) | ((ioport("DSW1")->read() & 0x01) << 6); }
 
 static WRITE8_DEVICE_HANDLER( vmetal_control_w )
 {
@@ -423,7 +423,7 @@ static TILE_GET_INFO( get_vmetal_mid2tilemap_tile_info )
 static void expand_gfx1(running_machine &machine)
 {
 	metro_state *state = machine.driver_data<metro_state>();
-	UINT8 *base_gfx = machine.root_device().memregion("gfx1")->base();
+	UINT8 *base_gfx = state->memregion("gfx1")->base();
 	UINT32 length = 2 * state->memregion("gfx1")->bytes();
 	state->m_expanded_gfx1 = auto_alloc_array(machine, UINT8, length);
 	for (int i = 0; i < length; i += 2)

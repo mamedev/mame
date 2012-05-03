@@ -91,11 +91,11 @@ static READ8_DEVICE_HANDLER( ppi_port_b_r )
 	sfkick_state *state = device->machine().driver_data<sfkick_state>();
 	switch(state->m_input_mux&0x0f)
 	{
-		case 0: return input_port_read(device->machine(), "IN0");
-		case 1: return input_port_read(device->machine(), "IN1");
-		case 2: return BITSWAP8(input_port_read(device->machine(), "DIAL"),4,5,6,7,3,2,1,0);
-		case 3: return input_port_read(device->machine(), "DSW2");
-		case 4: return input_port_read(device->machine(), "DSW1");
+		case 0: return state->ioport("IN0")->read();
+		case 1: return state->ioport("IN1")->read();
+		case 2: return BITSWAP8(state->ioport("DIAL")->read(),4,5,6,7,3,2,1,0);
+		case 3: return state->ioport("DSW2")->read();
+		case 4: return state->ioport("DSW1")->read();
 	}
 	return 0xff;
 }

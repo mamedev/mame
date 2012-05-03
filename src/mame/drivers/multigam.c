@@ -263,11 +263,11 @@ WRITE8_MEMBER(multigam_state::multigam_IN0_w)
 	m_in_0_shift = 0;
 	m_in_1_shift = 0;
 
-	m_in_0 = input_port_read(machine(), "P1");
-	m_in_1 = input_port_read(machine(), "P2");
+	m_in_0 = ioport("P1")->read();
+	m_in_1 = ioport("P2")->read();
 
 	m_in_dsw_shift = 0;
-	m_in_dsw = input_port_read_safe(machine(), "DSW", 0);
+	m_in_dsw = ioport("DSW")->read_safe(0);
 }
 
 READ8_MEMBER(multigam_state::multigam_IN1_r)

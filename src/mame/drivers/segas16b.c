@@ -1168,11 +1168,11 @@ static READ16_HANDLER( standard_io_r )
 		case 0x1000/2:
 		{
 			static const char *const sysports[] = { "SERVICE", "P1", "UNUSED", "P2" };
-			return input_port_read(space->machine(), sysports[offset & 3]);
+			return space->machine().root_device().ioport(sysports[offset & 3])->read();
 		}
 
 		case 0x2000/2:
-			return input_port_read(space->machine(), (offset & 1) ? "DSW1" : "DSW2");
+			return space->machine().root_device().ioport((offset & 1) ? "DSW1" : "DSW2")->read();
 	}
 	logerror("%06X:standard_io_r - unknown read access to address %04X\n", cpu_get_pc(&space->device()), offset * 2);
 	return segaic16_open_bus_r(space, 0, mem_mask);
@@ -1450,7 +1450,7 @@ static void altbeast_common_i8751_sim(running_machine &machine, offs_t soundoffs
 	}
 
 	/* read inputs */
-	workram[inputoffs] = ~input_port_read(machine, "SERVICE") << 8;
+	workram[inputoffs] = ~machine.root_device().ioport("SERVICE")->read() << 8;
 }
 
 static void altbeasj_i8751_sim(running_machine &machine)
@@ -1534,8 +1534,8 @@ static void goldnaxe_i8751_sim(running_machine &machine)
 	}
 
 	/* read inputs */
-	workram[0x2cd0/2] = (input_port_read(machine, "P1") << 8) | input_port_read(machine, "P2");
-	workram[0x2c96/2] = input_port_read(machine, "SERVICE") << 8;
+	workram[0x2cd0/2] = (state->ioport("P1")->read() << 8) | state->ioport("P2")->read();
+	workram[0x2c96/2] = machine.root_device().ioport("SERVICE")->read() << 8;
 }
 
 
@@ -1557,9 +1557,9 @@ static void tturf_i8751_sim(running_machine &machine)
 	}
 
 	/* read inputs */
-	workram[0x01e6/2] = input_port_read(machine, "SERVICE") << 8;
-	workram[0x01e8/2] = input_port_read(machine, "P1") << 8;
-	workram[0x01ea/2] = input_port_read(machine, "P2") << 8;
+	workram[0x01e6/2] = machine.root_device().ioport("SERVICE")->read() << 8;
+	workram[0x01e8/2] = machine.root_device().ioport("P1")->read() << 8;
+	workram[0x01ea/2] = machine.root_device().ioport("P2")->read() << 8;
 }
 
 
@@ -1591,34 +1591,35 @@ static void wb3_i8751_sim(running_machine &machine)
 
 static READ16_HANDLER( aceattac_custom_io_r )
 {
+	segas1x_state *state = space->machine().driver_data<segas1x_state>();
 	switch (offset & (0x3000/2))
 	{
 		case 0x1000/2:
 			switch (offset & 3)
 			{
 				case 0x01:
-					return input_port_read(space->machine(), "P1");
+					return state->ioport("P1")->read();
 
 				case 0x02:
-					return input_port_read(space->machine(), "DIAL1") | (input_port_read(space->machine(), "DIAL2") << 4);
+					return state->ioport("DIAL1")->read() | (state->ioport("DIAL2")->read() << 4);
 					// low nibble: Sega 56pin Edge "16"-"19" // rotary switch 10positions 4bit-binary-pinout
 					// high nibble: Sega 56pin Edge "T"-"W"  // ditto
 
 				case 0x03:
-					return input_port_read(space->machine(), "P2");
+					return state->ioport("P2")->read();
 			}
 			break;
 		case 0x3000/2:
 			switch (offset & 3)
 			{
-				case 0:	return input_port_read(space->machine(), "HANDX1");
-				case 1:	return input_port_read(space->machine(), "TRACKX1");
-				case 2:	return input_port_read(space->machine(), "TRACKY1");
-				case 3:	return input_port_read(space->machine(), "HANDY1");
-				case 4:	return input_port_read(space->machine(), "HANDX2");
-				case 5:	return input_port_read(space->machine(), "TRACKX2");
-				case 6:	return input_port_read(space->machine(), "TRACKY2");
-				case 7:	return input_port_read(space->machine(), "HANDY2");
+				case 0:	return state->ioport("HANDX1")->read();
+				case 1:	return state->ioport("TRACKX1")->read();
+				case 2:	return state->ioport("TRACKY1")->read();
+				case 3:	return state->ioport("HANDY1")->read();
+				case 4:	return state->ioport("HANDX2")->read();
+				case 5:	return state->ioport("TRACKX2")->read();
+				case 6:	return state->ioport("TRACKY2")->read();
+				case 7:	return state->ioport("HANDY2")->read();
 			}
 			break;
 	}
@@ -1656,19 +1657,20 @@ static WRITE16_HANDLER( atomicp_sound_w )
 
 static READ16_HANDLER( dunkshot_custom_io_r )
 {
+	segas1x_state *state = space->machine().driver_data<segas1x_state>();
 	switch (offset & (0x3000/2))
 	{
 		case 0x3000/2:
 			switch ((offset/2) & 7)
 			{
-				case 0:	return (input_port_read(space->machine(), "ANALOGX1") << 4) >> (8 * (offset & 1));
-				case 1:	return (input_port_read(space->machine(), "ANALOGY1") << 4) >> (8 * (offset & 1));
-				case 2:	return (input_port_read(space->machine(), "ANALOGX2") << 4) >> (8 * (offset & 1));
-				case 3:	return (input_port_read(space->machine(), "ANALOGY2") << 4) >> (8 * (offset & 1));
-				case 4:	return (input_port_read(space->machine(), "ANALOGX3") << 4) >> (8 * (offset & 1));
-				case 5:	return (input_port_read(space->machine(), "ANALOGY3") << 4) >> (8 * (offset & 1));
-				case 6:	return (input_port_read(space->machine(), "ANALOGX4") << 4) >> (8 * (offset & 1));
-				case 7:	return (input_port_read(space->machine(), "ANALOGY4") << 4) >> (8 * (offset & 1));
+				case 0:	return (state->ioport("ANALOGX1")->read() << 4) >> (8 * (offset & 1));
+				case 1:	return (state->ioport("ANALOGY1")->read() << 4) >> (8 * (offset & 1));
+				case 2:	return (state->ioport("ANALOGX2")->read() << 4) >> (8 * (offset & 1));
+				case 3:	return (state->ioport("ANALOGY2")->read() << 4) >> (8 * (offset & 1));
+				case 4:	return (state->ioport("ANALOGX3")->read() << 4) >> (8 * (offset & 1));
+				case 5:	return (state->ioport("ANALOGY3")->read() << 4) >> (8 * (offset & 1));
+				case 6:	return (state->ioport("ANALOGX4")->read() << 4) >> (8 * (offset & 1));
+				case 7:	return (state->ioport("ANALOGY4")->read() << 4) >> (8 * (offset & 1));
 			}
 			break;
 	}
@@ -1714,7 +1716,7 @@ static WRITE16_HANDLER( hwchamp_custom_io_w )
 			switch (offset & 0x30/2)
 			{
 				case 0x20/2:
-					state->m_hwc_input_value = input_port_read_safe(space->machine(), portname[offset & 3], 0xff);
+					state->m_hwc_input_value = state->ioport(portname[offset & 3])->read_safe(0xff);
 					break;
 
 				case 0x30/2:
@@ -1741,15 +1743,16 @@ static WRITE16_HANDLER( hwchamp_custom_io_w )
 
 static READ16_HANDLER( passshtj_custom_io_r )
 {
+	segas1x_state *state = space->machine().driver_data<segas1x_state>();
 	switch (offset & (0x3000/2))
 	{
 		case 0x3000/2:
 			switch (offset & 3)
 			{
-				case 0:	return input_port_read(space->machine(), "P1");
-				case 1:	return input_port_read(space->machine(), "P2");
-				case 2:	return input_port_read(space->machine(), "P3");
-				case 3:	return input_port_read(space->machine(), "P4");
+				case 0:	return state->ioport("P1")->read();
+				case 1:	return state->ioport("P2")->read();
+				case 2:	return state->ioport("P3")->read();
+				case 3:	return state->ioport("P4")->read();
 			}
 			break;
 	}
@@ -1766,15 +1769,16 @@ static READ16_HANDLER( passshtj_custom_io_r )
 
 static READ16_HANDLER( sdi_custom_io_r )
 {
+	segas1x_state *state = space->machine().driver_data<segas1x_state>();
 	switch (offset & (0x3000/2))
 	{
 		case 0x3000/2:
 			switch ((offset/2) & 3)
 			{
-				case 0:	return input_port_read(space->machine(), "ANALOGX1");
-				case 1:	return input_port_read(space->machine(), "ANALOGY1");
-				case 2:	return input_port_read(space->machine(), "ANALOGX2");
-				case 3:	return input_port_read(space->machine(), "ANALOGY2");
+				case 0:	return state->ioport("ANALOGX1")->read();
+				case 1:	return state->ioport("ANALOGY1")->read();
+				case 2:	return state->ioport("ANALOGX2")->read();
+				case 3:	return state->ioport("ANALOGY2")->read();
 			}
 			break;
 	}
@@ -1800,12 +1804,12 @@ static READ16_HANDLER( sjryuko_custom_io_r )
 			switch (offset & 3)
 			{
 				case 1:
-					if (input_port_read_safe(space->machine(), portname[state->m_mj_input_num], 0xff) != 0xff)
+					if (state->ioport(portname[state->m_mj_input_num])->read_safe(0xff) != 0xff)
 						return 0xff & ~(1 << state->m_mj_input_num);
 					return 0xff;
 
 				case 2:
-					return input_port_read_safe(space->machine(), portname[state->m_mj_input_num], 0xff);
+					return state->ioport(portname[state->m_mj_input_num])->read_safe(0xff);
 			}
 			break;
 	}

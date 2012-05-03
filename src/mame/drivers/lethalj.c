@@ -161,7 +161,7 @@ Pin #11(+) | | R               |
 
 CUSTOM_INPUT_MEMBER(lethalj_state::cclownz_paddle)
 {
-	int value = input_port_read(machine(), "PADDLE");
+	int value = ioport("PADDLE")->read();
 	return ((value << 4) & 0xf00) | (value & 0x00f);
 }
 

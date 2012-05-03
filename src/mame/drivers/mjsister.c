@@ -266,7 +266,7 @@ READ8_MEMBER(mjsister_state::mjsister_keys_r)
 	for (i = 0; i < 6; i++)
 	{
 		if (BIT(p, i))
-			ret |= input_port_read(machine(), keynames[i]);
+			ret |= ioport(keynames[i])->read();
 	}
 
 	return ret;
@@ -449,7 +449,7 @@ static void mjsister_redraw(mjsister_state *state)
 static MACHINE_START( mjsister )
 {
 	mjsister_state *state = machine.driver_data<mjsister_state>();
-	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
+	UINT8 *ROM = state->memregion("maincpu")->base();
 
 	state->membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x8000);
 

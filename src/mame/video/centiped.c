@@ -462,7 +462,7 @@ SCREEN_UPDATE_IND16( warlords )
 {
 	centiped_state *state = screen.machine().driver_data<centiped_state>();
 	UINT8 *spriteram = state->m_spriteram;
-	int upright_mode = input_port_read(screen.machine(), "IN0") & 0x80;
+	int upright_mode = screen.machine().root_device().ioport("IN0")->read() & 0x80;
 	int offs;
 
 	/* if the cocktail/upright switch flipped, force refresh */

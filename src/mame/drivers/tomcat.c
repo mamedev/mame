@@ -89,8 +89,8 @@ READ16_MEMBER(tomcat_state::tomcat_adcread_r)
 {
 	switch( m_control_num )
 	{
-	case 0: return input_port_read(machine(), "STICKY");
-	case 1: return input_port_read(machine(), "STICKX");
+	case 0: return ioport("STICKY")->read();
+	case 1: return ioport("STICKX")->read();
 	default: return 0x7f7f;
 	}
 }
@@ -99,7 +99,7 @@ READ16_MEMBER(tomcat_state::tomcat_inputs_r)
 {
 	UINT16 result = 0;
 	if (ACCESSING_BITS_8_15)
-		result |= input_port_read(machine(), "IN0") << 8;
+		result |= ioport("IN0")->read() << 8;
 
 	return result;
 }

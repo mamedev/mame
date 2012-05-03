@@ -487,13 +487,13 @@ WRITE8_MEMBER(taitol_state::control2_w)
 static READ8_DEVICE_HANDLER( portA_r )
 {
 	taitol_state *state = device->machine().driver_data<taitol_state>();
-	return input_port_read(device->machine(), (state->m_extport == 0) ? state->m_porte0_tag : state->m_porte1_tag);
+	return state->ioport((state->m_extport == 0) ? state->m_porte0_tag : state->m_porte1_tag)->read();
 }
 
 static READ8_DEVICE_HANDLER( portB_r )
 {
 	taitol_state *state = device->machine().driver_data<taitol_state>();
-	return input_port_read(device->machine(), (state->m_extport == 0) ? state->m_portf0_tag : state->m_portf1_tag);
+	return state->ioport((state->m_extport == 0) ? state->m_portf0_tag : state->m_portf1_tag)->read();
 }
 
 static READ8_DEVICE_HANDLER( extport_select_and_ym2203_r )
@@ -551,15 +551,15 @@ READ8_MEMBER(taitol_state::mux_r)
 	switch (m_mux_ctrl)
 	{
 	case 0:
-		return input_port_read(machine(), "DSWA");
+		return ioport("DSWA")->read();
 	case 1:
-		return input_port_read(machine(), "DSWB");
+		return ioport("DSWB")->read();
 	case 2:
-		return input_port_read(machine(), "IN0");
+		return ioport("IN0")->read();
 	case 3:
-		return input_port_read(machine(), "IN1");
+		return ioport("IN1")->read();
 	case 7:
-		return input_port_read(machine(), "IN2");
+		return ioport("IN2")->read();
 	default:
 		logerror("Mux read from unknown port %d (%04x)\n", m_mux_ctrl, cpu_get_pc(&space.device()));
 		return 0xff;
@@ -636,7 +636,7 @@ READ8_MEMBER(taitol_state::horshoes_tracky_reset_r)
 {
 
 	/* reset the trackball counter */
-	m_tracky = input_port_read(machine(), "AN0");
+	m_tracky = ioport("AN0")->read();
 	return 0;
 }
 
@@ -644,28 +644,28 @@ READ8_MEMBER(taitol_state::horshoes_trackx_reset_r)
 {
 
 	/* reset the trackball counter */
-	m_trackx = input_port_read(machine(), "AN1");
+	m_trackx = ioport("AN1")->read();
 	return 0;
 }
 
 READ8_MEMBER(taitol_state::horshoes_tracky_lo_r)
 {
-	return (input_port_read(machine(), "AN0") - m_tracky) & 0xff;
+	return (ioport("AN0")->read() - m_tracky) & 0xff;
 }
 
 READ8_MEMBER(taitol_state::horshoes_tracky_hi_r)
 {
-	return (input_port_read(machine(), "AN0") - m_tracky) >> 8;
+	return (ioport("AN0")->read() - m_tracky) >> 8;
 }
 
 READ8_MEMBER(taitol_state::horshoes_trackx_lo_r)
 {
-	return (input_port_read(machine(), "AN1") - m_trackx) & 0xff;
+	return (ioport("AN1")->read() - m_trackx) & 0xff;
 }
 
 READ8_MEMBER(taitol_state::horshoes_trackx_hi_r)
 {
-	return (input_port_read(machine(), "AN1") - m_trackx) >> 8;
+	return (ioport("AN1")->read() - m_trackx) >> 8;
 }
 
 
@@ -1532,23 +1532,23 @@ static INPUT_PORTS_START( plgirls2 )
 	PORT_DIPSETTING(    0x08, "Mode A" )
 	PORT_DIPSETTING(    0x00, "Mode B" )
 	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) )		PORT_DIPLOCATION("SW1:5,6")
-	PORT_DIPSETTING(    0x10, DEF_STR( 2C_1C ) ) PORT_CONDITION("DSWA", 0x08, PORTCOND_EQUALS, 0x08)
-	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) ) PORT_CONDITION("DSWA", 0x08, PORTCOND_EQUALS, 0x08)
-	PORT_DIPSETTING(    0x00, DEF_STR( 2C_3C ) ) PORT_CONDITION("DSWA", 0x08, PORTCOND_EQUALS, 0x08)
-	PORT_DIPSETTING(    0x20, DEF_STR( 1C_2C ) ) PORT_CONDITION("DSWA", 0x08, PORTCOND_EQUALS, 0x08)
-	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) ) PORT_CONDITION("DSWA", 0x08, PORTCOND_EQUALS, 0x00)
-	PORT_DIPSETTING(    0x10, DEF_STR( 3C_1C ) ) PORT_CONDITION("DSWA", 0x08, PORTCOND_EQUALS, 0x00)
-	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) ) PORT_CONDITION("DSWA", 0x08, PORTCOND_EQUALS, 0x00)
-	PORT_DIPSETTING(    0x20, DEF_STR( 1C_4C ) ) PORT_CONDITION("DSWA", 0x08, PORTCOND_EQUALS, 0x00)
+	PORT_DIPSETTING(    0x10, DEF_STR( 2C_1C ) ) PORT_CONDITION("DSWA", 0x08, EQUALS, 0x08)
+	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) ) PORT_CONDITION("DSWA", 0x08, EQUALS, 0x08)
+	PORT_DIPSETTING(    0x00, DEF_STR( 2C_3C ) ) PORT_CONDITION("DSWA", 0x08, EQUALS, 0x08)
+	PORT_DIPSETTING(    0x20, DEF_STR( 1C_2C ) ) PORT_CONDITION("DSWA", 0x08, EQUALS, 0x08)
+	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) ) PORT_CONDITION("DSWA", 0x08, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x10, DEF_STR( 3C_1C ) ) PORT_CONDITION("DSWA", 0x08, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) ) PORT_CONDITION("DSWA", 0x08, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x20, DEF_STR( 1C_4C ) ) PORT_CONDITION("DSWA", 0x08, EQUALS, 0x00)
 	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Coin_B ) )		PORT_DIPLOCATION("SW1:7,8")
-	PORT_DIPSETTING(    0x40, DEF_STR( 2C_1C ) ) PORT_CONDITION("DSWA", 0x08, PORTCOND_EQUALS, 0x08)
-	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_1C ) ) PORT_CONDITION("DSWA", 0x08, PORTCOND_EQUALS, 0x08)
-	PORT_DIPSETTING(    0x00, DEF_STR( 2C_3C ) ) PORT_CONDITION("DSWA", 0x08, PORTCOND_EQUALS, 0x08)
-	PORT_DIPSETTING(    0x80, DEF_STR( 1C_2C ) ) PORT_CONDITION("DSWA", 0x08, PORTCOND_EQUALS, 0x08)
-	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) ) PORT_CONDITION("DSWA", 0x08, PORTCOND_EQUALS, 0x00)
-	PORT_DIPSETTING(    0x40, DEF_STR( 3C_1C ) ) PORT_CONDITION("DSWA", 0x08, PORTCOND_EQUALS, 0x00)
-	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_1C ) ) PORT_CONDITION("DSWA", 0x08, PORTCOND_EQUALS, 0x00)
-	PORT_DIPSETTING(    0x80, DEF_STR( 1C_4C ) ) PORT_CONDITION("DSWA", 0x08, PORTCOND_EQUALS, 0x00)
+	PORT_DIPSETTING(    0x40, DEF_STR( 2C_1C ) ) PORT_CONDITION("DSWA", 0x08, EQUALS, 0x08)
+	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_1C ) ) PORT_CONDITION("DSWA", 0x08, EQUALS, 0x08)
+	PORT_DIPSETTING(    0x00, DEF_STR( 2C_3C ) ) PORT_CONDITION("DSWA", 0x08, EQUALS, 0x08)
+	PORT_DIPSETTING(    0x80, DEF_STR( 1C_2C ) ) PORT_CONDITION("DSWA", 0x08, EQUALS, 0x08)
+	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) ) PORT_CONDITION("DSWA", 0x08, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x40, DEF_STR( 3C_1C ) ) PORT_CONDITION("DSWA", 0x08, EQUALS, 0x00)
+	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_1C ) ) PORT_CONDITION("DSWA", 0x08, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x80, DEF_STR( 1C_4C ) ) PORT_CONDITION("DSWA", 0x08, EQUALS, 0x00)
 
 	PORT_START("DSWB")
 	TAITO_DIFFICULTY_LOC(SW2)				/* Difficulty controls the number of hits requiered to destroy enemies */

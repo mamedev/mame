@@ -435,8 +435,8 @@ static SCREEN_UPDATE_IND16( exidy440 )
 	{
 		int i;
 
-		int beamx = ((input_port_read(screen.machine(), "AN0") & 0xff) * (HBSTART - HBEND)) >> 8;
-		int beamy = ((input_port_read(screen.machine(), "AN1") & 0xff) * (VBSTART - VBEND)) >> 8;
+		int beamx = ((screen.machine().root_device().ioport("AN0")->read() & 0xff) * (HBSTART - HBEND)) >> 8;
+		int beamy = ((screen.machine().root_device().ioport("AN1")->read() & 0xff) * (VBSTART - VBEND)) >> 8;
 
 		/* The timing of this FIRQ is very important. The games look for an FIRQ
             and then wait about 650 cycles, clear the old FIRQ, and wait a

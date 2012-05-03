@@ -393,10 +393,10 @@ READ32_MEMBER(ssfindo_state::PS7500_IO_r)
 
 			if( m_iocr_hack)
 			{
-				return (input_port_read(machine(), "PS7500") & 0x80) | 0x34 | (machine().rand()&3); //eeprom read ?
+				return (ioport("PS7500")->read() & 0x80) | 0x34 | (machine().rand()&3); //eeprom read ?
 			}
 
-			return (input_port_read(machine(), "PS7500") & 0x80) | 0x37;
+			return (ioport("PS7500")->read() & 0x80) | 0x37;
 
 		case VIDCR:
 			return (m_PS7500_IO[offset] | 0x50) & 0xfffffff0;
@@ -613,7 +613,7 @@ static MACHINE_RESET( ssfindo )
 
 static INPUT_PORTS_START( ssfindo )
 	PORT_START("PS7500")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("IN0")
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNUSED	)				// IPT_START2 ??
@@ -663,7 +663,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( ppcar )
 	PORT_START("PS7500")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("IN0")
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN1	)
@@ -680,7 +680,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( tetfight )
 	PORT_START("PS7500")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x01, 0x01, "DSW 0" )

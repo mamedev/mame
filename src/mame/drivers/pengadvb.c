@@ -178,7 +178,7 @@ INPUT_PORTS_END
 
 static READ8_DEVICE_HANDLER( pengadvb_psg_port_a_r )
 {
-	return input_port_read(device->machine(), "IN0");
+	return device->machine().root_device().ioport("IN0")->read();
 }
 
 static const ay8910_interface pengadvb_ay8910_interface =
@@ -212,7 +212,7 @@ static READ8_DEVICE_HANDLER( pengadvb_ppi_port_b_r )
 	i8255_device *ppi = device->machine().device<i8255_device>("ppi8255");
 	address_space *space = device->machine().firstcpu->memory().space(AS_PROGRAM);
 	if ((ppi->read(*space, 2) & 0x0f) == 0)
-		return input_port_read(device->machine(), "IN1");
+		return device->machine().root_device().ioport("IN1")->read();
 
 	return 0xff;
 }

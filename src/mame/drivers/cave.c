@@ -859,7 +859,7 @@ ADDRESS_MAP_END
 READ16_MEMBER(cave_state::sailormn_input0_r)
 {
 //  watchdog_reset16_r(0, 0);    // written too rarely for mame.
-	return input_port_read(machine(), "IN0");
+	return ioport("IN0")->read();
 }
 
 static ADDRESS_MAP_START( sailormn_map, AS_PROGRAM, 16, cave_state )
@@ -1361,14 +1361,14 @@ static INPUT_PORTS_START( gaia )
 	PORT_DIPSETTING(      0x0200, "4" )
 	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Bonus_Life ) )		PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0400, "150k/300k" ) PORT_CONDITION("DSW", 0xe000, PORTCOND_EQUALS, 0xc000)
-	PORT_DIPSETTING(      0x0400, "150k/350k" ) PORT_CONDITION("DSW", 0xe000, PORTCOND_EQUALS, 0xa000)
-	PORT_DIPSETTING(      0x0400, "150k/350k" ) PORT_CONDITION("DSW", 0xe000, PORTCOND_EQUALS, 0xe000)
-	PORT_DIPSETTING(      0x0400, "150k/400k" ) PORT_CONDITION("DSW", 0xe000, PORTCOND_EQUALS, 0x6000)
-	PORT_DIPSETTING(      0x0400, "150k/400k" ) PORT_CONDITION("DSW", 0xe000, PORTCOND_EQUALS, 0x8000)
-	PORT_DIPSETTING(      0x0400, "150k/400k" ) PORT_CONDITION("DSW", 0xe000, PORTCOND_EQUALS, 0x2000)
-	PORT_DIPSETTING(      0x0400, "200k/500k" ) PORT_CONDITION("DSW", 0xe000, PORTCOND_EQUALS, 0x4000)
-	PORT_DIPSETTING(      0x0400, "200k/500k" ) PORT_CONDITION("DSW", 0xe000, PORTCOND_EQUALS, 0x0000)
+	PORT_DIPSETTING(      0x0400, "150k/300k" ) PORT_CONDITION("DSW", 0xe000, EQUALS, 0xc000)
+	PORT_DIPSETTING(      0x0400, "150k/350k" ) PORT_CONDITION("DSW", 0xe000, EQUALS, 0xa000)
+	PORT_DIPSETTING(      0x0400, "150k/350k" ) PORT_CONDITION("DSW", 0xe000, EQUALS, 0xe000)
+	PORT_DIPSETTING(      0x0400, "150k/400k" ) PORT_CONDITION("DSW", 0xe000, EQUALS, 0x6000)
+	PORT_DIPSETTING(      0x0400, "150k/400k" ) PORT_CONDITION("DSW", 0xe000, EQUALS, 0x8000)
+	PORT_DIPSETTING(      0x0400, "150k/400k" ) PORT_CONDITION("DSW", 0xe000, EQUALS, 0x2000)
+	PORT_DIPSETTING(      0x0400, "200k/500k" ) PORT_CONDITION("DSW", 0xe000, EQUALS, 0x4000)
+	PORT_DIPSETTING(      0x0400, "200k/500k" ) PORT_CONDITION("DSW", 0xe000, EQUALS, 0x0000)
 	PORT_DIPNAME( 0x1800, 0x1800, "Damage" )					PORT_DIPLOCATION("SW2:4,5")
 	PORT_DIPSETTING(      0x1800, "+0" )
 	PORT_DIPSETTING(      0x1000, "+1" )
@@ -1394,10 +1394,10 @@ static INPUT_PORTS_START( theroes )
 	PORT_DIPSETTING(      0x0004, DEF_STR( Chinese ) )
 	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Bonus_Life ) )		PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0400, "150k/300k" ) PORT_CONDITION("DSW", 0xc000, PORTCOND_EQUALS, 0x8000)
-	PORT_DIPSETTING(      0x0400, "150k/350k" ) PORT_CONDITION("DSW", 0xc000, PORTCOND_EQUALS, 0xc000)
-	PORT_DIPSETTING(      0x0400, "150k/400k" ) PORT_CONDITION("DSW", 0xc000, PORTCOND_EQUALS, 0x4000)
-	PORT_DIPSETTING(      0x0400, "200k/500k" ) PORT_CONDITION("DSW", 0xc000, PORTCOND_EQUALS, 0x0000)
+	PORT_DIPSETTING(      0x0400, "150k/300k" ) PORT_CONDITION("DSW", 0xc000, EQUALS, 0x8000)
+	PORT_DIPSETTING(      0x0400, "150k/350k" ) PORT_CONDITION("DSW", 0xc000, EQUALS, 0xc000)
+	PORT_DIPSETTING(      0x0400, "150k/400k" ) PORT_CONDITION("DSW", 0xc000, EQUALS, 0x4000)
+	PORT_DIPSETTING(      0x0400, "200k/500k" ) PORT_CONDITION("DSW", 0xc000, EQUALS, 0x0000)
 	PORT_DIPUNKNOWN_DIPLOC( 0x2000, 0x2000, "SW2:6" )
 	PORT_DIPNAME( 0xc000, 0xc000, DEF_STR( Difficulty ) )		PORT_DIPLOCATION("SW2:7,8")
 	PORT_DIPSETTING(      0x8000, DEF_STR( Very_Easy ) )
@@ -4544,7 +4544,7 @@ static DRIVER_INIT( guwange )
 static DRIVER_INIT( hotdogst )
 {
 	cave_state *state = machine.driver_data<cave_state>();
-	UINT8 *ROM = machine.root_device().memregion("audiocpu")->base();
+	UINT8 *ROM = state->memregion("audiocpu")->base();
 
 	init_cave(machine);
 
@@ -4563,10 +4563,10 @@ static DRIVER_INIT( hotdogst )
 static DRIVER_INIT( mazinger )
 {
 	cave_state *state = machine.driver_data<cave_state>();
-	UINT8 *ROM = machine.root_device().memregion("audiocpu")->base();
+	UINT8 *ROM = state->memregion("audiocpu")->base();
 	UINT8 *buffer;
-	UINT8 *src = machine.root_device().memregion("sprites")->base();
-	int len = machine.root_device().memregion("sprites")->bytes();
+	UINT8 *src = state->memregion("sprites")->base();
+	int len = state->memregion("sprites")->bytes();
 
 	init_cave(machine);
 
@@ -4600,14 +4600,14 @@ static DRIVER_INIT( mazinger )
 static DRIVER_INIT( metmqstr )
 {
 	cave_state *state = machine.driver_data<cave_state>();
-	UINT8 *ROM = machine.root_device().memregion("audiocpu")->base();
+	UINT8 *ROM = state->memregion("audiocpu")->base();
 
 	init_cave(machine);
 
 	state->membank("bank1")->configure_entries(0, 0x2, &ROM[0x00000], 0x4000);
 	state->membank("bank1")->configure_entries(2, 0xe, &ROM[0x10000], 0x4000);
 
-	ROM = machine.root_device().memregion("oki1")->base();
+	ROM = state->memregion("oki1")->base();
 	state->membank("bank3")->configure_entries(0, 8, &ROM[0x00000], 0x20000);
 	state->membank("bank4")->configure_entries(0, 8, &ROM[0x00000], 0x20000);
 
@@ -4625,9 +4625,9 @@ static DRIVER_INIT( metmqstr )
 static DRIVER_INIT( pwrinst2j )
 {
 	cave_state *state = machine.driver_data<cave_state>();
-	UINT8 *ROM = machine.root_device().memregion("audiocpu")->base();
+	UINT8 *ROM = state->memregion("audiocpu")->base();
 	UINT8 *buffer;
-	UINT8 *src = machine.root_device().memregion("sprites")->base();
+	UINT8 *src = state->memregion("sprites")->base();
 	int len = state->memregion("sprites")->bytes();
 	int i, j;
 
@@ -4674,17 +4674,17 @@ static DRIVER_INIT( pwrinst2 )
 static DRIVER_INIT( sailormn )
 {
 	cave_state *state = machine.driver_data<cave_state>();
-	UINT8 *ROM = machine.root_device().memregion("audiocpu")->base();
+	UINT8 *ROM = state->memregion("audiocpu")->base();
 	UINT8 *buffer;
-	UINT8 *src = machine.root_device().memregion("sprites")->base();
-	int len = machine.root_device().memregion("sprites")->bytes();
+	UINT8 *src = state->memregion("sprites")->base();
+	int len = state->memregion("sprites")->bytes();
 
 	init_cave(machine);
 
 	state->membank("bank1")->configure_entries(0, 0x02, &ROM[0x00000], 0x4000);
 	state->membank("bank1")->configure_entries(2, 0x1e, &ROM[0x10000], 0x4000);
 
-	ROM = machine.root_device().memregion("oki1")->base();
+	ROM = state->memregion("oki1")->base();
 	state->membank("bank3")->configure_entries(0, 0x10, &ROM[0x00000], 0x20000);
 	state->membank("bank4")->configure_entries(0, 0x10, &ROM[0x00000], 0x20000);
 

@@ -180,19 +180,19 @@ READ16_MEMBER(darius_state::darius_ioc_r)
 			return (tc0140syt_comm_r(m_tc0140syt, 0) & 0xff);	/* sound interface read */
 
 		case 0x04:
-			return input_port_read(machine(), "P1");
+			return ioport("P1")->read();
 
 		case 0x05:
-			return input_port_read(machine(), "P2");
+			return ioport("P2")->read();
 
 		case 0x06:
-			return input_port_read(machine(), "SYSTEM");
+			return ioport("SYSTEM")->read();
 
 		case 0x07:
 			return m_coin_word;	/* bits 3&4 coin lockouts, must return zero */
 
 		case 0x08:
-			return input_port_read(machine(), "DSW");
+			return ioport("DSW")->read();
 	}
 
 logerror("CPU #0 PC %06x: warning - read unmapped ioc offset %06x\n",cpu_get_pc(&space.device()),offset);
@@ -842,7 +842,7 @@ static MACHINE_START( darius )
 {
 	darius_state *state = machine.driver_data<darius_state>();
 
-	state->membank("bank1")->configure_entries(0, 4, machine.root_device().memregion("audiocpu")->base() + 0x10000, 0x8000);
+	state->membank("bank1")->configure_entries(0, 4, state->memregion("audiocpu")->base() + 0x10000, 0x8000);
 	state->membank("bank1")->configure_entry(4, state->memregion("audiocpu")->base());
 	state->membank("bank1")->set_entry(4);
 

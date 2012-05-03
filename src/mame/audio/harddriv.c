@@ -144,7 +144,7 @@ READ16_MEMBER(harddriv_state::hdsnd68k_status_r)
 //            D13 = Test Switch
 //            D12 = 5220 Ready Flag (0=Ready)
 	logerror("%06X:hdsnd68k_status_r(%04X)\n", cpu_get_previouspc(&space.device()), offset);
-	return (m_mainflag << 15) | (m_soundflag << 14) | 0x2000 | 0;//((input_port_read(machine(), "IN0") & 0x0020) << 8) | 0;
+	return (m_mainflag << 15) | (m_soundflag << 14) | 0x2000 | 0;//((ioport("IN0")->read() & 0x0020) << 8) | 0;
 }
 
 

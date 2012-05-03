@@ -109,7 +109,7 @@ static INPUT_PORTS_START( redclash )
 	/* Note that there are TWO VBlank inputs, one is active low, the other active */
 	/* high. There are probably other differencies in the hardware, but emulating */
 	/* them this way is enough to get the game running. */
-	PORT_BIT( 0xc0, 0x40, IPT_VBLANK )
+	PORT_BIT( 0xc0, 0x40, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x03, 0x03, "Difficulty?" )
@@ -202,7 +202,7 @@ static INPUT_PORTS_START( zerohour )
 	/* Note that there are TWO VBlank inputs, one is active low, the other active */
 	/* high. There are probably other differencies in the hardware, but emulating */
 	/* them this way is enough to get the game running. */
-	PORT_BIT( 0xc0, 0x40, IPT_VBLANK )
+	PORT_BIT( 0xc0, 0x40, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("DSW1")
 	PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "SW1:8" )	/* Switches 6-8 are not used */

@@ -58,10 +58,10 @@ READ8_MEMBER(bsktball_state::bsktball_in0_r)
 	int p2_vert;
 	int temp;
 
-	p1_horiz = input_port_read(machine(), "TRACK0_X");
-	p1_vert  = input_port_read(machine(), "TRACK0_Y");
-	p2_horiz = input_port_read(machine(), "TRACK1_X");
-	p2_vert  = input_port_read(machine(), "TRACK1_Y");
+	p1_horiz = ioport("TRACK0_X")->read();
+	p1_vert  = ioport("TRACK0_Y")->read();
+	p2_horiz = ioport("TRACK1_X")->read();
+	p2_vert  = ioport("TRACK1_Y")->read();
 
 	/* Set direction bits */
 
@@ -146,7 +146,7 @@ READ8_MEMBER(bsktball_state::bsktball_in0_r)
 	}
 	else
 	{
-		temp = input_port_read(machine(), "IN0") & 0x0f;
+		temp = ioport("IN0")->read() & 0x0f;
 
 		return (temp | m_dir0 | m_dir1 | m_dir2 | m_dir3);
 	}

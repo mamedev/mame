@@ -419,7 +419,7 @@ static TIMER_CALLBACK( amiga_irq_proc )
 
 CUSTOM_INPUT_MEMBER( amiga_state::amiga_joystick_convert )
 {
-	UINT8 bits = input_port_read(machine(), (const char *)param);
+	UINT8 bits = ioport((const char *)param)->read();
 	int up = (bits >> 0) & 1;
 	int down = (bits >> 1) & 1;
 	int left = (bits >> 2) & 1;
@@ -1180,21 +1180,21 @@ READ16_HANDLER( amiga_custom_r )
 		case REG_JOY0DAT:
 			if (state->m_intf->joy0dat_r != NULL)
 				return (*state->m_intf->joy0dat_r)(space->machine());
-			return input_port_read_safe(space->machine(), "JOY0DAT", 0xffff);
+			return state->ioport("JOY0DAT")->read_safe(0xffff);
 
 		case REG_JOY1DAT:
 			if (state->m_intf->joy1dat_r != NULL)
 				return (*state->m_intf->joy1dat_r)(space->machine());
-			return input_port_read_safe(space->machine(), "JOY1DAT", 0xffff);
+			return state->ioport("JOY1DAT")->read_safe(0xffff);
 
 		case REG_POTGOR:
-			return input_port_read_safe(space->machine(), "POTGO", 0x5500);
+			return state->ioport("POTGO")->read_safe(0x5500);
 
 		case REG_POT0DAT:
-			return input_port_read_safe(space->machine(), "POT0DAT", 0x0000);
+			return state->ioport("POT0DAT")->read_safe(0x0000);
 
 		case REG_POT1DAT:
-			return input_port_read_safe(space->machine(), "POT1DAT", 0x0000);
+			return state->ioport("POT1DAT")->read_safe(0x0000);
 
 		case REG_DSKBYTR:
 			return space->machine().device<amiga_fdc>("fdc")->dskbytr_r();

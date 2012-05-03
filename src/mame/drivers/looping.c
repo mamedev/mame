@@ -900,7 +900,7 @@ ROM_END
 static DRIVER_INIT( looping )
 {
 	looping_state *state = machine.driver_data<looping_state>();
-	int length = machine.root_device().memregion("maincpu")->bytes();
+	int length = state->memregion("maincpu")->bytes();
 	UINT8 *rom = state->memregion("maincpu")->base();
 	int i;
 

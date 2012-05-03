@@ -228,7 +228,7 @@ static SAMPLES_START( ninjakd2_init_samples )
 {
 	ninjakd2_state *state = device.machine().driver_data<ninjakd2_state>();
 	running_machine &machine = device.machine();
-	const UINT8* const rom = machine.root_device().memregion("pcm")->base();
+	const UINT8* const rom = state->memregion("pcm")->base();
 	const int length = state->memregion("pcm")->bytes();
 	INT16* sampledata = auto_alloc_array(machine, INT16, length);
 
@@ -350,8 +350,8 @@ READ8_MEMBER(ninjakd2_state::omegaf_io_protection_r)
 		case 1:	// dip switches
 			switch (offset)
 			{
-				case 0: result = input_port_read(machine(), "DIPSW1"); break;
-				case 1: result = input_port_read(machine(), "DIPSW2"); break;
+				case 0: result = ioport("DIPSW1")->read(); break;
+				case 1: result = ioport("DIPSW2")->read(); break;
 				case 2: result = 0x02;                         break;
 			}
 			break;
@@ -359,8 +359,8 @@ READ8_MEMBER(ninjakd2_state::omegaf_io_protection_r)
 		case 2:	// player inputs
 			switch (offset)
 			{
-				case 0: result = input_port_read(machine(), "PAD1"); break;
-				case 1: result = input_port_read(machine(), "PAD2"); break;
+				case 0: result = ioport("PAD1")->read(); break;
+				case 1: result = ioport("PAD2")->read(); break;
 				case 2: result = 0x01;                       break;
 			}
 			break;
@@ -615,31 +615,31 @@ static INPUT_PORTS_START( ninjakd2 )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
 	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW2:5,4")
-	PORT_DIPSETTING(    0x00, "2 Coins/1 Credit, 6/4" )       PORT_CONDITION("DIPSW2", 0x04, PORTCOND_NOTEQUALS, 0x00)
-	PORT_DIPSETTING(    0x18, "1 Coin/1 Credit, 3/4" )        PORT_CONDITION("DIPSW2", 0x04, PORTCOND_NOTEQUALS, 0x00)
-	PORT_DIPSETTING(    0x10, "1 Coin/2 Credits, 2/6, 3/10" ) PORT_CONDITION("DIPSW2", 0x04, PORTCOND_NOTEQUALS, 0x00)
-	PORT_DIPSETTING(    0x08, "1 Coin/3 Credits, 3/12" )      PORT_CONDITION("DIPSW2", 0x04, PORTCOND_NOTEQUALS, 0x00)
-	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )              PORT_CONDITION("DIPSW2", 0x04, PORTCOND_EQUALS, 0x00)
-	PORT_DIPSETTING(    0x18, DEF_STR( 1C_1C ) )              PORT_CONDITION("DIPSW2", 0x04, PORTCOND_EQUALS, 0x00)
-	PORT_DIPSETTING(    0x10, DEF_STR( 1C_2C ) )              PORT_CONDITION("DIPSW2", 0x04, PORTCOND_EQUALS, 0x00)
-	PORT_DIPSETTING(    0x08, DEF_STR( 1C_3C ) )              PORT_CONDITION("DIPSW2", 0x04, PORTCOND_EQUALS, 0x00)
+	PORT_DIPSETTING(    0x00, "2 Coins/1 Credit, 6/4" )       PORT_CONDITION("DIPSW2", 0x04, NOTEQUALS, 0x00)
+	PORT_DIPSETTING(    0x18, "1 Coin/1 Credit, 3/4" )        PORT_CONDITION("DIPSW2", 0x04, NOTEQUALS, 0x00)
+	PORT_DIPSETTING(    0x10, "1 Coin/2 Credits, 2/6, 3/10" ) PORT_CONDITION("DIPSW2", 0x04, NOTEQUALS, 0x00)
+	PORT_DIPSETTING(    0x08, "1 Coin/3 Credits, 3/12" )      PORT_CONDITION("DIPSW2", 0x04, NOTEQUALS, 0x00)
+	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )              PORT_CONDITION("DIPSW2", 0x04, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x18, DEF_STR( 1C_1C ) )              PORT_CONDITION("DIPSW2", 0x04, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x10, DEF_STR( 1C_2C ) )              PORT_CONDITION("DIPSW2", 0x04, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x08, DEF_STR( 1C_3C ) )              PORT_CONDITION("DIPSW2", 0x04, EQUALS, 0x00)
 	PORT_DIPNAME( 0xe0, 0xe0, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW2:3,2,1")
-	PORT_DIPSETTING(    0x00, "5 Coins/1 Credit, 15/4" )      PORT_CONDITION("DIPSW2", 0x04, PORTCOND_NOTEQUALS, 0x00)
-	PORT_DIPSETTING(    0x20, "4 Coins/1 Credit, 12/4" )      PORT_CONDITION("DIPSW2", 0x04, PORTCOND_NOTEQUALS, 0x00)
-	PORT_DIPSETTING(    0x40, "3 Coins/1 Credit, 9/4" )       PORT_CONDITION("DIPSW2", 0x04, PORTCOND_NOTEQUALS, 0x00)
-	PORT_DIPSETTING(    0x60, "2 Coins/1 Credit, 6/4" )       PORT_CONDITION("DIPSW2", 0x04, PORTCOND_NOTEQUALS, 0x00)
-	PORT_DIPSETTING(    0xe0, "1 Coin/1 Credit, 3/4" )        PORT_CONDITION("DIPSW2", 0x04, PORTCOND_NOTEQUALS, 0x00)
-	PORT_DIPSETTING(    0xc0, "1 Coin/2 Credits, 2/6, 3/10" ) PORT_CONDITION("DIPSW2", 0x04, PORTCOND_NOTEQUALS, 0x00)
-	PORT_DIPSETTING(    0xa0, "1 Coin/3 Credits, 3/12" )      PORT_CONDITION("DIPSW2", 0x04, PORTCOND_NOTEQUALS, 0x00)
-	PORT_DIPSETTING(    0x80, DEF_STR( 1C_4C ) )              PORT_CONDITION("DIPSW2", 0x04, PORTCOND_NOTEQUALS, 0x00)
-	PORT_DIPSETTING(    0x00, DEF_STR( 5C_1C ) )              PORT_CONDITION("DIPSW2", 0x04, PORTCOND_EQUALS, 0x00)
-	PORT_DIPSETTING(    0x20, DEF_STR( 4C_1C ) )              PORT_CONDITION("DIPSW2", 0x04, PORTCOND_EQUALS, 0x00)
-	PORT_DIPSETTING(    0x40, DEF_STR( 3C_1C ) )              PORT_CONDITION("DIPSW2", 0x04, PORTCOND_EQUALS, 0x00)
-	PORT_DIPSETTING(    0x60, DEF_STR( 2C_1C ) )              PORT_CONDITION("DIPSW2", 0x04, PORTCOND_EQUALS, 0x00)
-	PORT_DIPSETTING(    0xe0, DEF_STR( 1C_1C ) )              PORT_CONDITION("DIPSW2", 0x04, PORTCOND_EQUALS, 0x00)
-	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_2C ) )              PORT_CONDITION("DIPSW2", 0x04, PORTCOND_EQUALS, 0x00)
-	PORT_DIPSETTING(    0xa0, DEF_STR( 1C_3C ) )              PORT_CONDITION("DIPSW2", 0x04, PORTCOND_EQUALS, 0x00)
-	PORT_DIPSETTING(    0x80, DEF_STR( 1C_4C ) )              PORT_CONDITION("DIPSW2", 0x04, PORTCOND_EQUALS, 0x00)
+	PORT_DIPSETTING(    0x00, "5 Coins/1 Credit, 15/4" )      PORT_CONDITION("DIPSW2", 0x04, NOTEQUALS, 0x00)
+	PORT_DIPSETTING(    0x20, "4 Coins/1 Credit, 12/4" )      PORT_CONDITION("DIPSW2", 0x04, NOTEQUALS, 0x00)
+	PORT_DIPSETTING(    0x40, "3 Coins/1 Credit, 9/4" )       PORT_CONDITION("DIPSW2", 0x04, NOTEQUALS, 0x00)
+	PORT_DIPSETTING(    0x60, "2 Coins/1 Credit, 6/4" )       PORT_CONDITION("DIPSW2", 0x04, NOTEQUALS, 0x00)
+	PORT_DIPSETTING(    0xe0, "1 Coin/1 Credit, 3/4" )        PORT_CONDITION("DIPSW2", 0x04, NOTEQUALS, 0x00)
+	PORT_DIPSETTING(    0xc0, "1 Coin/2 Credits, 2/6, 3/10" ) PORT_CONDITION("DIPSW2", 0x04, NOTEQUALS, 0x00)
+	PORT_DIPSETTING(    0xa0, "1 Coin/3 Credits, 3/12" )      PORT_CONDITION("DIPSW2", 0x04, NOTEQUALS, 0x00)
+	PORT_DIPSETTING(    0x80, DEF_STR( 1C_4C ) )              PORT_CONDITION("DIPSW2", 0x04, NOTEQUALS, 0x00)
+	PORT_DIPSETTING(    0x00, DEF_STR( 5C_1C ) )              PORT_CONDITION("DIPSW2", 0x04, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x20, DEF_STR( 4C_1C ) )              PORT_CONDITION("DIPSW2", 0x04, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x40, DEF_STR( 3C_1C ) )              PORT_CONDITION("DIPSW2", 0x04, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x60, DEF_STR( 2C_1C ) )              PORT_CONDITION("DIPSW2", 0x04, EQUALS, 0x00)
+	PORT_DIPSETTING(    0xe0, DEF_STR( 1C_1C ) )              PORT_CONDITION("DIPSW2", 0x04, EQUALS, 0x00)
+	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_2C ) )              PORT_CONDITION("DIPSW2", 0x04, EQUALS, 0x00)
+	PORT_DIPSETTING(    0xa0, DEF_STR( 1C_3C ) )              PORT_CONDITION("DIPSW2", 0x04, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x80, DEF_STR( 1C_4C ) )              PORT_CONDITION("DIPSW2", 0x04, EQUALS, 0x00)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( rdaction )

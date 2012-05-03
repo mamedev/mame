@@ -227,7 +227,7 @@ static MACHINE_RESET( tail2nos )
 	tail2nos_state *state = machine.driver_data<tail2nos_state>();
 
 	/* point to the extra ROMs */
-	state->membank("bank1")->set_base(machine.root_device().memregion("user1")->base());
+	state->membank("bank1")->set_base(state->memregion("user1")->base());
 	state->membank("bank2")->set_base(state->memregion("user2")->base());
 
 	state->m_charbank = 0;

@@ -754,7 +754,7 @@ static void sio_dip_handler( running_machine &machine, int n_data )
 	{
 		if( state->m_b_lastclock )
 		{
-			int bit = ( ( input_port_read(machine, "DSW") >> state->m_n_dip_bit ) & 1 );
+			int bit = ( ( state->ioport("DSW")->read() >> state->m_n_dip_bit ) & 1 );
 			psx_sio_input( machine, 0, PSX_SIO_IN_DATA, bit * PSX_SIO_IN_DATA );
 			state->m_n_dip_bit++;
 			state->m_n_dip_bit &= 7;
@@ -866,14 +866,14 @@ READ32_MEMBER(taitogn_state::gnet_mahjong_panel_r)
 
 	switch(m_mux_data)
 	{
-		case 0x04: return input_port_read(machine(), "KEY0");
-		case 0x08: return input_port_read(machine(), "KEY1");
-		case 0x40: return input_port_read(machine(), "KEY2");
-		case 0x80: return input_port_read(machine(), "KEY3");
+		case 0x04: return ioport("KEY0")->read();
+		case 0x08: return ioport("KEY1")->read();
+		case 0x40: return ioport("KEY2")->read();
+		case 0x80: return ioport("KEY3")->read();
 	}
 
 	/* mux disabled */
-	return input_port_read(machine(), "P4");
+	return ioport("P4")->read();
 }
 
 // Init and reset

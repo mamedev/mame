@@ -77,7 +77,7 @@ READ8_MEMBER(laserbat_state::laserbat_input_r)
 {
 	static const char *const portnames[] = { "IN0", "IN1", "IN2", "IN3" };
 
-	return input_port_read(machine(), portnames[m_input_mux]);
+	return ioport(portnames[m_input_mux])->read();
 }
 
 WRITE8_MEMBER(laserbat_state::laserbat_cnteff_w)
@@ -283,7 +283,7 @@ static INPUT_PORTS_START( laserbat )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
 
 	PORT_START("SENSE")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( lazarian )
@@ -361,7 +361,7 @@ static INPUT_PORTS_START( lazarian )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
 
 	PORT_START("SENSE")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( catnmous )
@@ -444,7 +444,7 @@ static INPUT_PORTS_START( catnmous )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("SENSE")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 INPUT_PORTS_END
 
 static const gfx_layout charlayout =

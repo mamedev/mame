@@ -66,7 +66,7 @@ static MACHINE_RESET( xybots )
 
 READ16_MEMBER(xybots_state::special_port1_r)
 {
-	int result = input_port_read(machine(), "FFE200");
+	int result = ioport("FFE200")->read();
 
 	if (m_cpu_to_sound_ready) result ^= 0x0200;
 	result ^= m_h256 ^= 0x0400;
@@ -135,7 +135,7 @@ static INPUT_PORTS_START( xybots )
 	PORT_SERVICE( 0x0100, IP_ACTIVE_LOW )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNUSED )	/* /AUDBUSY */
 	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_UNUSED )	/* 256H */
-	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_VBLANK )	/* VBLANK */
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")	/* VBLANK */
 	PORT_BIT( 0xf000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_INCLUDE( atarijsa_i )		/* audio port */

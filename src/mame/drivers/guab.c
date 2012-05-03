@@ -579,7 +579,7 @@ READ16_MEMBER(guab_state::io_r)
 		case 0x01:
 		case 0x02:
 		{
-			return input_port_read(machine(), portnames[offset]);
+			return ioport(portnames[offset])->read();
 		}
 		case 0x30:
 		{

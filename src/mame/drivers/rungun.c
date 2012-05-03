@@ -72,20 +72,20 @@ READ16_MEMBER(rungun_state::rng_sysregs_r)
 	switch (offset)
 	{
 		case 0x00/2:
-			if (input_port_read(machine(), "DSW") & 0x20)
-				return (input_port_read(machine(), "P1") | input_port_read(machine(), "P3") << 8);
+			if (ioport("DSW")->read() & 0x20)
+				return (ioport("P1")->read() | ioport("P3")->read() << 8);
 			else
 			{
-				data = input_port_read(machine(), "P1") & input_port_read(machine(), "P3");
+				data = ioport("P1")->read() & ioport("P3")->read();
 				return (data << 8 | data);
 			}
 
 		case 0x02/2:
-			if (input_port_read(machine(), "DSW") & 0x20)
-				return (input_port_read(machine(), "P2") | input_port_read(machine(), "P4") << 8);
+			if (ioport("DSW")->read() & 0x20)
+				return (ioport("P2")->read() | ioport("P4")->read() << 8);
 			else
 			{
-				data = input_port_read(machine(), "P2") & input_port_read(machine(), "P4");
+				data = ioport("P2")->read() & ioport("P4")->read();
 				return (data << 8 | data);
 			}
 
@@ -95,12 +95,12 @@ READ16_MEMBER(rungun_state::rng_sysregs_r)
                 bit8 : freeze
                 bit9 : joysticks layout(auto detect???)
             */
-			return input_port_read(machine(), "SYSTEM");
+			return ioport("SYSTEM")->read();
 
 		case 0x06/2:
 			if (ACCESSING_BITS_0_7)
 			{
-				data = input_port_read(machine(), "DSW");
+				data = ioport("DSW")->read();
 			}
 			return ((m_sysreg[0x06 / 2] & 0xff00) | data);
 	}
@@ -125,7 +125,7 @@ WRITE16_MEMBER(rungun_state::rng_sysregs_w)
                 bit10 : IRQ5 ACK
             */
 			if (ACCESSING_BITS_0_7)
-				input_port_write(machine(), "EEPROMOUT", data, 0xff);
+				ioport("EEPROMOUT")->write(data, 0xff);
 
 			if (!(data & 0x40))
 				device_set_input_line(m_maincpu, M68K_IRQ_5, CLEAR_LINE);

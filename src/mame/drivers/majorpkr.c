@@ -655,10 +655,10 @@ READ8_MEMBER(majorpkr_state::mux_port_r)
 
 	switch( (m_mux_data & 0xf0) )		/* 00-10-20-30-0F-1F-2F-3F */
 	{
-		case 0x00: return input_port_read(machine(), "DSW1");	/* confirmed */
-		case 0x10: return input_port_read(machine(), "DSW2");	/* confirmed */
-		case 0x20: return input_port_read(machine(), "DSW3");	/* confirmed */
-		case 0x30: return input_port_read(machine(), "DSW4");	/* confirmed */
+		case 0x00: return ioport("DSW1")->read();	/* confirmed */
+		case 0x10: return ioport("DSW2")->read();	/* confirmed */
+		case 0x20: return ioport("DSW3")->read();	/* confirmed */
+		case 0x30: return ioport("DSW4")->read();	/* confirmed */
 	}
 
 	return 0xff;
@@ -669,11 +669,11 @@ READ8_MEMBER(majorpkr_state::mux_port2_r)
 
 	if ((m_mux_data & 0x0f) == 4)
 	{
-		return input_port_read(machine(), "IN0-1");
+		return ioport("IN0-1")->read();
 	}
 	else
 	{
-		return input_port_read(machine(), "IN0-0");
+		return ioport("IN0-0")->read();
 	}
 }
 

@@ -1643,7 +1643,7 @@ static DRIVER_INIT( paddle2 )
 static DRIVER_INIT( tetrsark )
 {
 	arkanoid_state *state = machine.driver_data<arkanoid_state>();
-	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
+	UINT8 *ROM = state->memregion("maincpu")->base();
 	int x;
 
 	for (x = 0; x < 0x8000; x++)

@@ -179,9 +179,9 @@ CUSTOM_INPUT_MEMBER(acefruit_state::sidewndr_payout_r)
 	switch (bit_mask)
 	{
 		case 0x01:
-			return ((input_port_read(machine(), "PAYOUT") & bit_mask) >> 0);
+			return ((ioport("PAYOUT")->read() & bit_mask) >> 0);
 		case 0x02:
-			return ((input_port_read(machine(), "PAYOUT") & bit_mask) >> 1);
+			return ((ioport("PAYOUT")->read() & bit_mask) >> 1);
 		default:
 			logerror("sidewndr_payout_r : invalid %02X bit_mask\n",bit_mask);
 			return 0;
@@ -195,13 +195,13 @@ CUSTOM_INPUT_MEMBER(acefruit_state::starspnr_coinage_r)
 	switch (bit_mask)
 	{
 		case 0x01:
-			return ((input_port_read(machine(), "COINAGE") & bit_mask) >> 0);
+			return ((ioport("COINAGE")->read() & bit_mask) >> 0);
 		case 0x02:
-			return ((input_port_read(machine(), "COINAGE") & bit_mask) >> 1);
+			return ((ioport("COINAGE")->read() & bit_mask) >> 1);
 		case 0x04:
-			return ((input_port_read(machine(), "COINAGE") & bit_mask) >> 2);
+			return ((ioport("COINAGE")->read() & bit_mask) >> 2);
 		case 0x08:
-			return ((input_port_read(machine(), "COINAGE") & bit_mask) >> 3);
+			return ((ioport("COINAGE")->read() & bit_mask) >> 3);
 		default:
 			logerror("starspnr_coinage_r : invalid %02X bit_mask\n",bit_mask);
 			return 0;
@@ -215,11 +215,11 @@ CUSTOM_INPUT_MEMBER(acefruit_state::starspnr_payout_r)
 	switch (bit_mask)
 	{
 		case 0x01:
-			return ((input_port_read(machine(), "PAYOUT") & bit_mask) >> 0);
+			return ((ioport("PAYOUT")->read() & bit_mask) >> 0);
 		case 0x02:
-			return ((input_port_read(machine(), "PAYOUT") & bit_mask) >> 1);
+			return ((ioport("PAYOUT")->read() & bit_mask) >> 1);
 		case 0x04:
-			return ((input_port_read(machine(), "PAYOUT") & bit_mask) >> 2);
+			return ((ioport("PAYOUT")->read() & bit_mask) >> 2);
 		default:
 			logerror("starspnr_payout_r : invalid %02X bit_mask\n",bit_mask);
 			return 0;
@@ -316,7 +316,7 @@ static INPUT_PORTS_START( sidewndr )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME( "Stop Nudge/Nudge Up or Down" )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME( "Gamble" )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )              /* "Cash in" */
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_VBLANK ) /* active low or high?? */
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen") /* active low or high?? */
 	PORT_BIT( 0xd8, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN1")	// 1
@@ -437,7 +437,7 @@ static INPUT_PORTS_START( starspnr )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
 	/* tested at 0xef77 after IN5 bit 1 and before IN2 bit 2 - after coins are tested - table at 0xefa5 (3 bytes) */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_VBLANK ) /* active low or high?? */
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen") /* active low or high?? */
 
 	PORT_START("IN1")	// 1
 	/* tested at 0xe77c - call from 0x012c */

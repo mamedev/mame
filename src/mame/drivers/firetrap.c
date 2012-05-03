@@ -192,7 +192,7 @@ READ8_MEMBER(firetrap_state::firetrap_8751_bootleg_r)
 	/* the following only works in the bootleg version, which doesn't have an */
 	/* 8751 - the real thing is much more complicated than that. */
 	UINT8 coin = 0;
-	UINT8 port = input_port_read(machine(), "IN2") & 0x70;
+	UINT8 port = ioport("IN2")->read() & 0x70;
 
 	if (cpu_get_pc(&space.device()) == 0x1188)
 		return ~m_coin_command_pending;
@@ -454,7 +454,7 @@ static INPUT_PORTS_START( firetrap )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("DSW0")	/* DSW0 */
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) )		PORT_DIPLOCATION("SW1:1,2,3")
@@ -593,7 +593,7 @@ static INTERRUPT_GEN( firetrap_irq )
 static MACHINE_START( firetrap )
 {
 	firetrap_state *state = machine.driver_data<firetrap_state>();
-	UINT8 *MAIN = machine.root_device().memregion("maincpu")->base();
+	UINT8 *MAIN = state->memregion("maincpu")->base();
 	UINT8 *SOUND = state->memregion("audiocpu")->base();
 
 	state->m_maincpu = machine.device("maincpu");

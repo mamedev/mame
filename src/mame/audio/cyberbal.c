@@ -37,8 +37,8 @@ void cyberbal_sound_reset(running_machine &machine)
 
 READ8_MEMBER(cyberbal_state::cyberbal_special_port3_r)
 {
-	int temp = input_port_read(machine(), "JSAII");
-	if (!(input_port_read(machine(), "IN0") & 0x8000)) temp ^= 0x80;
+	int temp = ioport("JSAII")->read();
+	if (!(ioport("IN0")->read() & 0x8000)) temp ^= 0x80;
 	if (m_cpu_to_sound_ready) temp ^= 0x40;
 	if (m_sound_to_cpu_ready) temp ^= 0x20;
 	return temp;

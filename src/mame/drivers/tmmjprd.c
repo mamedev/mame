@@ -515,15 +515,15 @@ static WRITE32_DEVICE_HANDLER( tmmjprd_eeprom_write )
 READ32_MEMBER(tmmjprd_state::tmmjprd_mux_r)
 {
 
-	m_system_in = input_port_read(machine(), "SYSTEM");
+	m_system_in = ioport("SYSTEM")->read();
 
 	switch(m_mux_data)
 	{
-		case 0x01: return (m_system_in & 0xff) | (input_port_read(machine(), "PL1_1")<<8) | (input_port_read(machine(), "PL2_1")<<16) | 0xff000000;
-		case 0x02: return (m_system_in & 0xff) | (input_port_read(machine(), "PL1_2")<<8) | (input_port_read(machine(), "PL2_2")<<16) | 0xff000000;
-		case 0x04: return (m_system_in & 0xff) | (input_port_read(machine(), "PL1_3")<<8) | (input_port_read(machine(), "PL2_3")<<16) | 0xff000000;
-		case 0x08: return (m_system_in & 0xff) | (input_port_read(machine(), "PL1_4")<<8) | (input_port_read(machine(), "PL2_4")<<16) | 0xff000000;
-		case 0x10: return (m_system_in & 0xff) | (input_port_read(machine(), "PL1_5")<<8) | (input_port_read(machine(), "PL2_5")<<16) | 0xff000000;
+		case 0x01: return (m_system_in & 0xff) | (ioport("PL1_1")->read()<<8) | (ioport("PL2_1")->read()<<16) | 0xff000000;
+		case 0x02: return (m_system_in & 0xff) | (ioport("PL1_2")->read()<<8) | (ioport("PL2_2")->read()<<16) | 0xff000000;
+		case 0x04: return (m_system_in & 0xff) | (ioport("PL1_3")->read()<<8) | (ioport("PL2_3")->read()<<16) | 0xff000000;
+		case 0x08: return (m_system_in & 0xff) | (ioport("PL1_4")->read()<<8) | (ioport("PL2_4")->read()<<16) | 0xff000000;
+		case 0x10: return (m_system_in & 0xff) | (ioport("PL1_5")->read()<<8) | (ioport("PL2_5")->read()<<16) | 0xff000000;
 	}
 
 	return (m_system_in & 0xff) | 0xffffff00;

@@ -174,8 +174,8 @@ WRITE32_MEMBER(gunbustr_state::motor_control_w)
 
 READ32_MEMBER(gunbustr_state::gunbustr_gun_r)
 {
-	return ( input_port_read(machine(), "LIGHT0_X") << 24) | (input_port_read(machine(), "LIGHT0_Y") << 16) |
-		 ( input_port_read(machine(), "LIGHT1_X") << 8)  |  input_port_read(machine(), "LIGHT1_Y");
+	return ( ioport("LIGHT0_X")->read() << 24) | (ioport("LIGHT0_Y")->read() << 16) |
+			( ioport("LIGHT1_X")->read() << 8)  |  ioport("LIGHT1_Y")->read();
 }
 
 WRITE32_MEMBER(gunbustr_state::gunbustr_gun_w)

@@ -144,41 +144,41 @@ WRITE8_MEMBER(jongkyo_state::jongkyo_coin_counter_w)
 static READ8_DEVICE_HANDLER( input_1p_r )
 {
 	jongkyo_state *state = device->machine().driver_data<jongkyo_state>();
-	UINT8 cr_clear = input_port_read(device->machine(), "CR_CLEAR");
+	UINT8 cr_clear = state->ioport("CR_CLEAR")->read();
 
 	switch (state->m_mux_data)
 	{
-		case 0x01: return input_port_read(device->machine(), "PL1_1") | cr_clear;
-		case 0x02: return input_port_read(device->machine(), "PL1_2") | cr_clear;
-		case 0x04: return input_port_read(device->machine(), "PL1_3") | cr_clear;
-		case 0x08: return input_port_read(device->machine(), "PL1_4") | cr_clear;
-		case 0x10: return input_port_read(device->machine(), "PL1_5") | cr_clear;
-		case 0x20: return input_port_read(device->machine(), "PL1_6") | cr_clear;
+		case 0x01: return state->ioport("PL1_1")->read() | cr_clear;
+		case 0x02: return state->ioport("PL1_2")->read() | cr_clear;
+		case 0x04: return state->ioport("PL1_3")->read() | cr_clear;
+		case 0x08: return state->ioport("PL1_4")->read() | cr_clear;
+		case 0x10: return state->ioport("PL1_5")->read() | cr_clear;
+		case 0x20: return state->ioport("PL1_6")->read() | cr_clear;
 	}
 	//  printf("%04x\n", state->m_mux_data);
 
-	return (input_port_read(device->machine(), "PL1_1") & input_port_read(device->machine(), "PL1_2") & input_port_read(device->machine(), "PL1_3") &
-	       input_port_read(device->machine(), "PL1_4") & input_port_read(device->machine(), "PL1_5") & input_port_read(device->machine(), "PL1_6")) | cr_clear;
+	return (state->ioport("PL1_1")->read() & state->ioport("PL1_2")->read() & state->ioport("PL1_3")->read() &
+	       state->ioport("PL1_4")->read() & state->ioport("PL1_5")->read() & state->ioport("PL1_6")->read()) | cr_clear;
 }
 
 static READ8_DEVICE_HANDLER( input_2p_r )
 {
 	jongkyo_state *state = device->machine().driver_data<jongkyo_state>();
-	UINT8 coin_port = input_port_read(device->machine(), "COINS");
+	UINT8 coin_port = state->ioport("COINS")->read();
 
 	switch (state->m_mux_data)
 	{
-		case 0x01: return input_port_read(device->machine(), "PL2_1") | coin_port;
-		case 0x02: return input_port_read(device->machine(), "PL2_2") | coin_port;
-		case 0x04: return input_port_read(device->machine(), "PL2_3") | coin_port;
-		case 0x08: return input_port_read(device->machine(), "PL2_4") | coin_port;
-		case 0x10: return input_port_read(device->machine(), "PL2_5") | coin_port;
-		case 0x20: return input_port_read(device->machine(), "PL2_6") | coin_port;
+		case 0x01: return state->ioport("PL2_1")->read() | coin_port;
+		case 0x02: return state->ioport("PL2_2")->read() | coin_port;
+		case 0x04: return state->ioport("PL2_3")->read() | coin_port;
+		case 0x08: return state->ioport("PL2_4")->read() | coin_port;
+		case 0x10: return state->ioport("PL2_5")->read() | coin_port;
+		case 0x20: return state->ioport("PL2_6")->read() | coin_port;
 	}
 	//  printf("%04x\n", state->m_mux_data);
 
-	return (input_port_read(device->machine(), "PL2_1") & input_port_read(device->machine(), "PL2_2") & input_port_read(device->machine(), "PL2_3") &
-	       input_port_read(device->machine(), "PL2_4") & input_port_read(device->machine(), "PL2_5") & input_port_read(device->machine(), "PL2_6")) | coin_port;
+	return (state->ioport("PL2_1")->read() & state->ioport("PL2_2")->read() & state->ioport("PL2_3")->read() &
+	       state->ioport("PL2_4")->read() & state->ioport("PL2_5")->read() & state->ioport("PL2_6")->read()) | coin_port;
 }
 
 WRITE8_MEMBER(jongkyo_state::videoram2_w)

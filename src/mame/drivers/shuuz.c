@@ -100,8 +100,8 @@ READ16_MEMBER(shuuz_state::leta_r)
 	/* when reading the even ports, do a real analog port update */
 	if (which == 0)
 	{
-		int dx = (INT8)input_port_read(machine(), "TRACKX");
-		int dy = (INT8)input_port_read(machine(), "TRACKY");
+		int dx = (INT8)ioport("TRACKX")->read();
+		int dy = (INT8)ioport("TRACKY")->read();
 
 		m_cur[0] = dx + dy;
 		m_cur[1] = dx - dy;
@@ -121,7 +121,7 @@ READ16_MEMBER(shuuz_state::leta_r)
 
 READ16_MEMBER(shuuz_state::special_port0_r)
 {
-	int result = input_port_read(machine(), "SYSTEM");
+	int result = ioport("SYSTEM")->read();
 
 	if ((result & 0x0800) && atarigen_get_hblank(*machine().primary_screen))
 		result &= ~0x0800;
@@ -171,7 +171,7 @@ static INPUT_PORTS_START( shuuz )
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x07fc, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_VBLANK )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0xf000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("BUTTONS")
@@ -198,7 +198,7 @@ static INPUT_PORTS_START( shuuz2 )
 	PORT_BIT( 0x00fc, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Step Debug SW") PORT_CODE(KEYCODE_S)
 	PORT_BIT( 0x0600, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_VBLANK )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Playfield Debug SW") PORT_CODE(KEYCODE_Y)
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Reset Debug SW") PORT_CODE(KEYCODE_E)
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Crosshair Debug SW") PORT_CODE(KEYCODE_C)

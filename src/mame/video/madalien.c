@@ -253,7 +253,7 @@ WRITE8_MEMBER(madalien_state::madalien_charram_w)
 static SCREEN_UPDATE_IND16( madalien )
 {
 	madalien_state *state = screen.machine().driver_data<madalien_state>();
-	int flip = BIT(input_port_read(screen.machine(), "DSW"), 6) && BIT(*state->m_video_control, 0);
+	int flip = BIT(screen.machine().root_device().ioport("DSW")->read(), 6) && BIT(*state->m_video_control, 0);
 
 	// bits #0 and #1 define scrolling mode
 	//

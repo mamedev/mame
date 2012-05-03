@@ -304,13 +304,13 @@ WRITE16_MEMBER(opwolf_state::cchip_w)
 READ16_MEMBER(opwolf_state::opwolf_in_r)
 {
 	static const char *const inname[2] = { "IN0", "IN1" };
-	return input_port_read(machine(), inname[offset]);
+	return ioport(inname[offset])->read();
 }
 
 READ16_MEMBER(opwolf_state::opwolf_dsw_r)
 {
 	static const char *const dswname[2] = { "DSWA", "DSWB" };
-	return input_port_read(machine(), dswname[offset]);
+	return ioport(dswname[offset])->read();
 }
 
 READ16_MEMBER(opwolf_state::opwolf_lightgun_r)
@@ -320,10 +320,10 @@ READ16_MEMBER(opwolf_state::opwolf_lightgun_r)
 	switch (offset)
 	{
 		case 0x00:	/* P1X - Have to remap 8 bit input value, into 0-319 visible range */
-			scaled = (input_port_read(machine(), P1X_PORT_TAG) * 320 ) / 256;
+			scaled = (ioport(P1X_PORT_TAG)->read() * 320 ) / 256;
 			return (scaled + 0x15 + m_opwolf_gun_xoffs);
 		case 0x01:	/* P1Y */
-			return (input_port_read(machine(), P1Y_PORT_TAG) - 0x24 + m_opwolf_gun_yoffs);
+			return (ioport(P1Y_PORT_TAG)->read() - 0x24 + m_opwolf_gun_yoffs);
 	}
 
 	return 0xff;
@@ -331,12 +331,12 @@ READ16_MEMBER(opwolf_state::opwolf_lightgun_r)
 
 READ8_MEMBER(opwolf_state::z80_input1_r)
 {
-	return input_port_read(machine(), "IN0");	/* irrelevant mirror ? */
+	return ioport("IN0")->read();	/* irrelevant mirror ? */
 }
 
 READ8_MEMBER(opwolf_state::z80_input2_r)
 {
-	return input_port_read(machine(), "IN0");	/* needed for coins */
+	return ioport("IN0")->read();	/* needed for coins */
 }
 
 
@@ -979,7 +979,7 @@ ROM_END
 static DRIVER_INIT( opwolf )
 {
 	opwolf_state *state = machine.driver_data<opwolf_state>();
-	UINT16* rom = (UINT16*)machine.root_device().memregion("maincpu")->base();
+	UINT16* rom = (UINT16*)state->memregion("maincpu")->base();
 
 	state->m_opwolf_region = rom[0x03fffe / 2] & 0xff;
 
@@ -996,7 +996,7 @@ static DRIVER_INIT( opwolf )
 static DRIVER_INIT( opwolfb )
 {
 	opwolf_state *state = machine.driver_data<opwolf_state>();
-	UINT16* rom = (UINT16*)machine.root_device().memregion("maincpu")->base();
+	UINT16* rom = (UINT16*)state->memregion("maincpu")->base();
 
 	state->m_opwolf_region = rom[0x03fffe / 2] & 0xff;
 

@@ -203,37 +203,37 @@ ADDRESS_MAP_END
 
 READ16_MEMBER(segas1x_bootleg_state::passht4b_service_r)
 {
-	UINT16 val = input_port_read(machine(), "SERVICE");
+	UINT16 val = ioport("SERVICE")->read();
 
-	if(!(input_port_read(machine(), "P1") & 0x40)) val &= 0xef;
-	if(!(input_port_read(machine(), "P2") & 0x40)) val &= 0xdf;
-	if(!(input_port_read(machine(), "P3") & 0x40)) val &= 0xbf;
-	if(!(input_port_read(machine(), "P4") & 0x40)) val &= 0x7f;
+	if(!(ioport("P1")->read() & 0x40)) val &= 0xef;
+	if(!(ioport("P2")->read() & 0x40)) val &= 0xdf;
+	if(!(ioport("P3")->read() & 0x40)) val &= 0xbf;
+	if(!(ioport("P4")->read() & 0x40)) val &= 0x7f;
 
-	m_passht4b_io3_val = (input_port_read(machine(), "P1") << 4) | (input_port_read(machine(), "P3") & 0xf);
-	m_passht4b_io2_val = (input_port_read(machine(), "P2") << 4) | (input_port_read(machine(), "P4") & 0xf);
+	m_passht4b_io3_val = (ioport("P1")->read() << 4) | (ioport("P3")->read() & 0xf);
+	m_passht4b_io2_val = (ioport("P2")->read() << 4) | (ioport("P4")->read() & 0xf);
 
 	m_passht4b_io1_val = 0xff;
 
 	// player 1 buttons
-	if(!(input_port_read(machine(), "P1") & 0x10)) m_passht4b_io1_val &= 0xfe;
-	if(!(input_port_read(machine(), "P1") & 0x20)) m_passht4b_io1_val &= 0xfd;
-	if(!(input_port_read(machine(), "P1") & 0x80)) m_passht4b_io1_val &= 0xfc;
+	if(!(ioport("P1")->read() & 0x10)) m_passht4b_io1_val &= 0xfe;
+	if(!(ioport("P1")->read() & 0x20)) m_passht4b_io1_val &= 0xfd;
+	if(!(ioport("P1")->read() & 0x80)) m_passht4b_io1_val &= 0xfc;
 
 	// player 2 buttons
-	if(!(input_port_read(machine(), "P2") & 0x10)) m_passht4b_io1_val &= 0xfb;
-	if(!(input_port_read(machine(), "P2") & 0x20)) m_passht4b_io1_val &= 0xf7;
-	if(!(input_port_read(machine(), "P2") & 0x80)) m_passht4b_io1_val &= 0xf3;
+	if(!(ioport("P2")->read() & 0x10)) m_passht4b_io1_val &= 0xfb;
+	if(!(ioport("P2")->read() & 0x20)) m_passht4b_io1_val &= 0xf7;
+	if(!(ioport("P2")->read() & 0x80)) m_passht4b_io1_val &= 0xf3;
 
 	// player 3 buttons
-	if(!(input_port_read(machine(), "P3") & 0x10)) m_passht4b_io1_val &= 0xef;
-	if(!(input_port_read(machine(), "P3") & 0x20)) m_passht4b_io1_val &= 0xdf;
-	if(!(input_port_read(machine(), "P3") & 0x80)) m_passht4b_io1_val &= 0xcf;
+	if(!(ioport("P3")->read() & 0x10)) m_passht4b_io1_val &= 0xef;
+	if(!(ioport("P3")->read() & 0x20)) m_passht4b_io1_val &= 0xdf;
+	if(!(ioport("P3")->read() & 0x80)) m_passht4b_io1_val &= 0xcf;
 
 	// player 4 buttons
-	if(!(input_port_read(machine(), "P4") & 0x10)) m_passht4b_io1_val &= 0xbf;
-	if(!(input_port_read(machine(), "P4") & 0x20)) m_passht4b_io1_val &= 0x7f;
-	if(!(input_port_read(machine(), "P4") & 0x80)) m_passht4b_io1_val &= 0x3f;
+	if(!(ioport("P4")->read() & 0x10)) m_passht4b_io1_val &= 0xbf;
+	if(!(ioport("P4")->read() & 0x20)) m_passht4b_io1_val &= 0x7f;
+	if(!(ioport("P4")->read() & 0x80)) m_passht4b_io1_val &= 0x3f;
 
 	return val;
 }
@@ -1892,7 +1892,7 @@ static INPUT_PORTS_START( mwalkbl )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE4 )
 
 	PORT_MODIFY("COINAGE")
-	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coin_B ) )		PORT_DIPLOCATION("SW1:5,6,7,8") PORT_CONDITION("DSW1",0x20,PORTCOND_EQUALS,0x20)
+	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coin_B ) )		PORT_DIPLOCATION("SW1:5,6,7,8") PORT_CONDITION("DSW1",0x20,EQUALS,0x20)
 	PORT_DIPSETTING(    0x70, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x90, DEF_STR( 2C_1C ) )
@@ -3349,7 +3349,7 @@ static DRIVER_INIT( goldnaxeb1 )
 {
 	segas1x_bootleg_state *state = machine.driver_data<segas1x_bootleg_state>();
 	int i;
-	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
+	UINT8 *ROM = state->memregion("maincpu")->base();
 	UINT8 *KEY = state->memregion("decryption")->base();
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 data[0x1000];

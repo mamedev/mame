@@ -299,25 +299,25 @@ READ16_MEMBER(cischeat_state::bigrun_vregs_r)
 {
 	switch (offset)
 	{
-		case 0x0000/2 : return input_port_read(machine(), "IN1");	// Coins
-		case 0x0002/2 : return input_port_read(machine(), "IN2");	// Buttons
-		case 0x0004/2 : return input_port_read(machine(), "IN3");	// Motor Limit Switches
-		case 0x0006/2 : return input_port_read(machine(), "IN4");	// DSW 1 & 2
+		case 0x0000/2 : return ioport("IN1")->read();	// Coins
+		case 0x0002/2 : return ioport("IN2")->read();	// Buttons
+		case 0x0004/2 : return ioport("IN3")->read();	// Motor Limit Switches
+		case 0x0006/2 : return ioport("IN4")->read();	// DSW 1 & 2
 
 		case 0x0008/2 :	return soundlatch2_word_r(space,0,0xffff);	// From sound cpu
 
 		case 0x0010/2 :
 			switch (m_ip_select & 0x3)
 			{
-				case 0 : return input_port_read(machine(), "IN6");		// Driving Wheel
+				case 0 : return ioport("IN6")->read();		// Driving Wheel
 				case 1 : return 0xffff;					// Cockpit: Up / Down Position
 				case 2 : return 0xffff;					// Cockpit: Left / Right Position?
-				case 3 : return input_port_read(machine(), "PEDAL");	// Accelerator (Pedal)
+				case 3 : return ioport("PEDAL")->read();	// Accelerator (Pedal)
 				default: return 0xffff;
 			}
 
 
-		case 0x2200/2 : return input_port_read(machine(), "IN5");	// DSW 3 (4 bits)
+		case 0x2200/2 : return ioport("IN5")->read();	// DSW 3 (4 bits)
 
 		default:	SHOW_READ_ERROR("vreg %04X read!",offset*2);
 					return m_vregs[offset];
@@ -395,21 +395,21 @@ READ16_MEMBER(cischeat_state::cischeat_vregs_r)
 {
 	switch (offset)
 	{
-		case 0x0000/2 : return input_port_read(machine(), "IN1");	// Coins
-		case 0x0002/2 : return input_port_read(machine(), "IN2");	// Buttons
-		case 0x0004/2 : return input_port_read(machine(), "IN3");	// Motor Limit Switches
-		case 0x0006/2 : return input_port_read(machine(), "IN4");	// DSW 1 & 2
+		case 0x0000/2 : return ioport("IN1")->read();	// Coins
+		case 0x0002/2 : return ioport("IN2")->read();	// Buttons
+		case 0x0004/2 : return ioport("IN3")->read();	// Motor Limit Switches
+		case 0x0006/2 : return ioport("IN4")->read();	// DSW 1 & 2
 
 		case 0x0010/2 :
 			switch (m_ip_select & 0x3)
 			{
-				case 0 : return input_port_read(machine(), "IN6");	// Driving Wheel
+				case 0 : return ioport("IN6")->read();	// Driving Wheel
 				case 1 : return ~0;					// Cockpit: Up / Down Position?
 				case 2 : return ~0;					// Cockpit: Left / Right Position?
 				default: return ~0;
 			}
 
-		case 0x2200/2 : return input_port_read(machine(), "IN5");	// DSW 3 (4 bits)
+		case 0x2200/2 : return ioport("IN5")->read();	// DSW 3 (4 bits)
 		case 0x2300/2 : return soundlatch2_byte_r(space,0);	// From sound cpu
 
 		default:	SHOW_READ_ERROR("vreg %04X read!",offset*2);
@@ -488,20 +488,20 @@ READ16_MEMBER(cischeat_state::f1gpstar_vregs_r)
 {
 	switch (offset)
 	{
-		case 0x0000/2 :	return input_port_read(machine(), "IN1");	// DSW 1 & 2
+		case 0x0000/2 :	return ioport("IN1")->read();	// DSW 1 & 2
 
 //      case 0x0002/2 : return 0xFFFF;
 
-		case 0x0004/2 :	return input_port_read(machine(), "IN2");	// Buttons
+		case 0x0004/2 :	return ioport("IN2")->read();	// Buttons
 
-		case 0x0006/2 :	return input_port_read(machine(), "IN3");	// ? Read at boot only
+		case 0x0006/2 :	return ioport("IN3")->read();	// ? Read at boot only
 
 		case 0x0008/2 :	return soundlatch2_byte_r(space,0);		// From sound cpu
 
-		case 0x000c/2 :	return input_port_read(machine(), "IN4");	// DSW 3
+		case 0x000c/2 :	return ioport("IN4")->read();	// DSW 3
 
 		case 0x0010/2 :	// Accel + Driving Wheel
-			return (input_port_read(machine(), "PEDAL") & 0xff) + ((input_port_read(machine(), "IN5") & 0xff)<<8);
+			return (ioport("PEDAL")->read() & 0xff) + ((ioport("IN5")->read() & 0xff)<<8);
 
 		default:		SHOW_READ_ERROR("vreg %04X read!",offset*2);
 						return m_vregs[offset];
@@ -534,14 +534,14 @@ READ16_MEMBER(cischeat_state::wildplt_vregs_r)
 
 	switch (offset)
 	{
-		case 0x0000/2 :	return input_port_read(machine(), "IN0"); // DSW 1 & 2
+		case 0x0000/2 :	return ioport("IN0")->read(); // DSW 1 & 2
 
-		case 0x0004/2 :	return input_port_read(machine(), "IN1"); // Buttons
+		case 0x0004/2 :	return ioport("IN1")->read(); // Buttons
 
 		case 0x0008/2 :	return soundlatch2_byte_r(space,0); // From sound cpu
 
 		case 0x0010/2 :	// X, Y
-			return input_port_read(machine(), "IN2") | (input_port_read(machine(), "IN3")<<8);
+			return ioport("IN2")->read() | (ioport("IN3")->read()<<8);
 
 		case 0x0018/2 :
 			return (m_f1gpstr2_ioready[0]&1) ? 0xff : 0xf0;

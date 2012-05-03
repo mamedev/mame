@@ -74,7 +74,7 @@ WRITE16_MEMBER(gijoe_state::control2_w)
 		/* bit 3  (unknown: coin) */
 		/* bit 5  is enable irq 6 */
 		/* bit 7  (unknown: enable irq 5?) */
-		input_port_write(machine(), "EEPROMOUT", data, 0xff);
+		ioport("EEPROMOUT")->write(data, 0xff);
 
 		m_cur_control2 = data;
 

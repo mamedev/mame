@@ -58,10 +58,10 @@ READ16_MEMBER(fromanc2_state::fromanc2_keymatrix_r)
 
 	switch (m_portselect)
 	{
-	case 0x01:	ret = input_port_read(machine(), "KEY0"); break;
-	case 0x02:	ret = input_port_read(machine(), "KEY1"); break;
-	case 0x04:	ret = input_port_read(machine(), "KEY2"); break;
-	case 0x08:	ret = input_port_read(machine(), "KEY3"); break;
+	case 0x01:	ret = ioport("KEY0")->read(); break;
+	case 0x02:	ret = ioport("KEY1")->read(); break;
+	case 0x04:	ret = ioport("KEY2")->read(); break;
+	case 0x08:	ret = ioport("KEY3")->read(); break;
 	default:	ret = 0xffff;
 			logerror("PC:%08X unknown %02X\n", cpu_get_pc(&space.device()), m_portselect);
 			break;
@@ -88,7 +88,7 @@ CUSTOM_INPUT_MEMBER(fromanc2_state::subcpu_nmi_r)
 WRITE16_MEMBER(fromanc2_state::fromanc2_eeprom_w)
 {
 	if (ACCESSING_BITS_8_15)
-		input_port_write(machine(), "EEPROMOUT", data, 0xffff);
+		ioport("EEPROMOUT")->write(data, 0xffff);
 }
 
 WRITE16_MEMBER(fromanc2_state::fromancr_eeprom_w)
@@ -96,14 +96,14 @@ WRITE16_MEMBER(fromanc2_state::fromancr_eeprom_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		fromancr_gfxbank_w(machine(), data & 0xfff8);
-		input_port_write(machine(), "EEPROMOUT", data, 0xff);
+		ioport("EEPROMOUT")->write(data, 0xff);
 	}
 }
 
 WRITE16_MEMBER(fromanc2_state::fromanc4_eeprom_w)
 {
 	if (ACCESSING_BITS_0_7)
-		input_port_write(machine(), "EEPROMOUT", data, 0xff);
+		ioport("EEPROMOUT")->write(data, 0xff);
 }
 
 WRITE16_MEMBER(fromanc2_state::fromanc2_subcpu_w)
@@ -524,8 +524,8 @@ static MACHINE_START( fromanc2 )
 {
 	fromanc2_state *state = machine.driver_data<fromanc2_state>();
 
-	state->membank("bank1")->configure_entries(0, 4, machine.root_device().memregion("sub")->base(), 0x4000);
-	state->membank("bank2")->configure_entry(0, machine.root_device().memregion("sub")->base() + 0x08000);
+	state->membank("bank1")->configure_entries(0, 4, state->memregion("sub")->base(), 0x4000);
+	state->membank("bank2")->configure_entry(0, state->memregion("sub")->base() + 0x08000);
 	state->membank("bank2")->configure_entries(1, 3, state->memregion("sub")->base() + 0x14000, 0x4000);
 
 	MACHINE_START_CALL(fromanc4);

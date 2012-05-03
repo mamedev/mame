@@ -82,13 +82,13 @@ READ16_MEMBER(gcpinbal_state::ioc_r)
 	switch (offset)
 	{
 		case 0x80/2:
-			return input_port_read(machine(), "DSW");
+			return ioport("DSW")->read();
 
 		case 0x84/2:
-			return input_port_read(machine(), "IN0");
+			return ioport("IN0")->read();
 
 		case 0x86/2:
-			return input_port_read(machine(), "IN1");
+			return ioport("IN1")->read();
 
 		case 0x50:
 		case 0x51:

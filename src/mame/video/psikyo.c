@@ -533,7 +533,7 @@ SCREEN_UPDATE_IND16( psikyo )
 
 	tilemap_t *tmptilemap0, *tmptilemap1;
 
-	state->flip_screen_set(~input_port_read(screen.machine(), "DSW") & 0x00010000);		// hardwired to a DSW bit
+	state->flip_screen_set(~screen.machine().root_device().ioport("DSW")->read() & 0x00010000);		// hardwired to a DSW bit
 
 	/* Layers enable (not quite right) */
 
@@ -707,7 +707,7 @@ SCREEN_UPDATE_IND16( psikyo_bootleg )
 
 	tilemap_t *tmptilemap0, *tmptilemap1;
 
-	state->flip_screen_set(~input_port_read(screen.machine(), "DSW") & 0x00010000);		// hardwired to a DSW bit
+	state->flip_screen_set(~screen.machine().root_device().ioport("DSW")->read() & 0x00010000);		// hardwired to a DSW bit
 
 	/* Layers enable (not quite right) */
 

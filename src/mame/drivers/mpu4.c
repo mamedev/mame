@@ -910,7 +910,7 @@ static READ8_DEVICE_HANDLER( pia_ic5_porta_r )
 	}
 	LOG(("%s: IC5 PIA Read of Port A (AUX1)\n",device->machine().describe_context()));
 
-	return input_port_read(device->machine(), "AUX1")|state->m_aux1_input;
+	return device->machine().root_device().ioport("AUX1")->read()|state->m_aux1_input;
 }
 
 static WRITE8_DEVICE_HANDLER( pia_ic5_porta_w )
@@ -1099,7 +1099,7 @@ READ8_DEVICE_HANDLER( pia_ic5_portb_r )
 	coin_lockout_w(device->machine(), 1, (pia_ic5->b_output() & 0x02) );
 	coin_lockout_w(device->machine(), 2, (pia_ic5->b_output() & 0x04) );
 	coin_lockout_w(device->machine(), 3, (pia_ic5->b_output() & 0x08) );
-	return input_port_read(device->machine(), "AUX2") | state->m_aux2_input;
+	return device->machine().root_device().ioport("AUX2")->read() | state->m_aux2_input;
 }
 
 
@@ -1415,8 +1415,8 @@ static READ8_DEVICE_HANDLER( pia_ic8_porta_r )
 /* The orange inputs are polled twice as often as the black ones, for reasons of efficiency.
    This is achieved via connecting every input line to an AND gate, thus allowing two strobes
    to represent each orange input bank (strobes are active low). */
-	pia_ic5->cb1_w(input_port_read(device->machine(), "AUX2") & 0x80);
-	return input_port_read(device->machine(), portnames[state->m_input_strobe]);
+	pia_ic5->cb1_w(device->machine().root_device().ioport("AUX2")->read() & 0x80);
+	return device->machine().root_device().ioport(portnames[state->m_input_strobe])->read();
 }
 
 

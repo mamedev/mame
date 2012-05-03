@@ -629,7 +629,7 @@ VIDEO_START( lastday )
 {
 	dooyong_state *state = machine.driver_data<dooyong_state>();
 	/* Configure tilemap callbacks */
-	state->m_bg_tilerom = machine.root_device().memregion("gfx5")->base();
+	state->m_bg_tilerom = state->memregion("gfx5")->base();
 	state->m_fg_tilerom = state->memregion("gfx6")->base();
 	state->m_bg_tilerom2 = NULL;
 	state->m_fg_tilerom2 = NULL;
@@ -669,7 +669,7 @@ VIDEO_START( gulfstrm )
 {
 	dooyong_state *state = machine.driver_data<dooyong_state>();
 	/* Configure tilemap callbacks */
-	state->m_bg_tilerom = machine.root_device().memregion("gfx5")->base();
+	state->m_bg_tilerom = state->memregion("gfx5")->base();
 	state->m_fg_tilerom = state->memregion("gfx6")->base();
 	state->m_bg_tilerom2 = NULL;
 	state->m_fg_tilerom2 = NULL;
@@ -708,7 +708,7 @@ VIDEO_START( pollux )
 {
 	dooyong_state *state = machine.driver_data<dooyong_state>();
 	/* Configure tilemap callbacks */
-	state->m_bg_tilerom = machine.root_device().memregion("gfx5")->base();
+	state->m_bg_tilerom = state->memregion("gfx5")->base();
 	state->m_fg_tilerom = state->memregion("gfx6")->base();
 	state->m_bg_tilerom2 = NULL;
 	state->m_fg_tilerom2 = NULL;
@@ -744,8 +744,8 @@ VIDEO_START( bluehawk )
 {
 	dooyong_state *state = machine.driver_data<dooyong_state>();
 	/* Configure tilemap callbacks */
-	state->m_bg_tilerom = machine.root_device().memregion("gfx3")->base() + 0x78000;
-	state->m_fg_tilerom = machine.root_device().memregion("gfx4")->base() + 0x78000;
+	state->m_bg_tilerom = state->memregion("gfx3")->base() + 0x78000;
+	state->m_fg_tilerom = state->memregion("gfx4")->base() + 0x78000;
 	state->m_fg2_tilerom = state->memregion("gfx5")->base() + 0x38000;
 	state->m_bg_tilerom2 = NULL;
 	state->m_fg_tilerom2 = NULL;
@@ -785,7 +785,7 @@ VIDEO_START( flytiger )
 {
 	dooyong_state *state = machine.driver_data<dooyong_state>();
 	/* Configure tilemap callbacks */
-	state->m_bg_tilerom = machine.root_device().memregion("gfx3")->base() + 0x78000;
+	state->m_bg_tilerom = state->memregion("gfx3")->base() + 0x78000;
 	state->m_fg_tilerom = state->memregion("gfx4")->base() + 0x78000;
 	state->m_bg_tilerom2 = NULL;
 	state->m_fg_tilerom2 = NULL;
@@ -821,8 +821,8 @@ VIDEO_START( primella )
 {
 	dooyong_state *state = machine.driver_data<dooyong_state>();
 	/* Configure tilemap callbacks */
-	state->m_bg_tilerom = machine.root_device().memregion("gfx2")->base() + machine.root_device().memregion("gfx2")->bytes() - 0x8000;
-	state->m_fg_tilerom = machine.root_device().memregion("gfx3")->base() + state->memregion("gfx3")->bytes() - 0x8000;
+	state->m_bg_tilerom = state->memregion("gfx2")->base() + state->memregion("gfx2")->bytes() - 0x8000;
+	state->m_fg_tilerom = state->memregion("gfx3")->base() + state->memregion("gfx3")->bytes() - 0x8000;
 	state->m_bg_tilerom2 = NULL;
 	state->m_fg_tilerom2 = NULL;
 	state->m_bg_gfx = 1;
@@ -856,13 +856,13 @@ VIDEO_START( rshark )
 {
 	dooyong_state *state = machine.driver_data<dooyong_state>();
 	/* Configure tilemap callbacks */
-	state->m_bg_tilerom = machine.root_device().memregion("gfx5")->base();
-	state->m_bg2_tilerom = machine.root_device().memregion("gfx4")->base();
-	state->m_fg_tilerom = machine.root_device().memregion("gfx3")->base();
-	state->m_fg2_tilerom = machine.root_device().memregion("gfx2")->base();
-	state->m_bg_tilerom2 = machine.root_device().memregion("gfx6")->base() + 0x60000;
-	state->m_bg2_tilerom2 = machine.root_device().memregion("gfx6")->base() + 0x40000;
-	state->m_fg_tilerom2 = machine.root_device().memregion("gfx6")->base() + 0x20000;
+	state->m_bg_tilerom = state->memregion("gfx5")->base();
+	state->m_bg2_tilerom = state->memregion("gfx4")->base();
+	state->m_fg_tilerom = state->memregion("gfx3")->base();
+	state->m_fg2_tilerom = state->memregion("gfx2")->base();
+	state->m_bg_tilerom2 = state->memregion("gfx6")->base() + 0x60000;
+	state->m_bg2_tilerom2 = state->memregion("gfx6")->base() + 0x40000;
+	state->m_fg_tilerom2 = state->memregion("gfx6")->base() + 0x20000;
 	state->m_fg2_tilerom2 = state->memregion("gfx6")->base() + 0x00000;
 	state->m_bg_gfx = 4;
 	state->m_bg2_gfx = 3;

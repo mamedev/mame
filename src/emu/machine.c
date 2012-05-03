@@ -284,9 +284,6 @@ void running_machine::start()
 	// allocate the gfx elements prior to device initialization
 	gfx_init(*this);
 
-	// initialize natural keyboard support
-	inputx_init(*this);
-
 	// initialize image devices
 	image_init(*this);
 	m_tilemap = auto_alloc(*this, tilemap_manager(*this));

@@ -83,16 +83,16 @@ static int dial_compute_value(running_machine &machine, int new_val, int indx)
 
 READ8_MEMBER(leland_state::cerberus_dial_1_r)
 {
-	int original = input_port_read(machine(), "IN0");
-	int modified = dial_compute_value(machine(), input_port_read(machine(), "AN0"), 0);
+	int original = ioport("IN0")->read();
+	int modified = dial_compute_value(machine(), ioport("AN0")->read(), 0);
 	return (original & 0xc0) | ((modified & 0x80) >> 2) | (modified & 0x1f);
 }
 
 
 READ8_MEMBER(leland_state::cerberus_dial_2_r)
 {
-	int original = input_port_read(machine(), "IN0");
-	int modified = dial_compute_value(machine(), input_port_read(machine(), "AN1"), 1);
+	int original = ioport("IN0")->read();
+	int modified = dial_compute_value(machine(), ioport("AN1")->read(), 1);
 	return (original & 0xc0) | ((modified & 0x80) >> 2) | (modified & 0x1f);
 }
 
@@ -136,8 +136,8 @@ WRITE8_MEMBER(leland_state::alleymas_joystick_kludge)
 static void update_dangerz_xy(running_machine &machine)
 {
 	leland_state *state = machine.driver_data<leland_state>();
-	UINT8 newy = input_port_read(machine, "AN0");
-	UINT8 newx = input_port_read(machine, "AN1");
+	UINT8 newy = state->ioport("AN0")->read();
+	UINT8 newx = state->ioport("AN1")->read();
 	int deltay = newy - state->m_dial_last_input[0];
 	int deltax = newx - state->m_dial_last_input[1];
 
@@ -190,27 +190,27 @@ static const UINT8 redline_pedal_value[8] = { 0xf0, 0xe0, 0xc0, 0xd0, 0x90, 0xb0
 
 READ8_MEMBER(leland_state::redline_pedal_1_r)
 {
-	int pedal = input_port_read(machine(), "IN0");
+	int pedal = ioport("IN0")->read();
 	return redline_pedal_value[pedal >> 5] | 0x0f;
 }
 
 
 READ8_MEMBER(leland_state::redline_pedal_2_r)
 {
-	int pedal = input_port_read(machine(), "IN2");
+	int pedal = ioport("IN2")->read();
 	return redline_pedal_value[pedal >> 5] | 0x0f;
 }
 
 
 READ8_MEMBER(leland_state::redline_wheel_1_r)
 {
-	return dial_compute_value(machine(), input_port_read(machine(), "AN0"), 0);
+	return dial_compute_value(machine(), ioport("AN0")->read(), 0);
 }
 
 
 READ8_MEMBER(leland_state::redline_wheel_2_r)
 {
-	return dial_compute_value(machine(), input_port_read(machine(), "AN1"), 1);
+	return dial_compute_value(machine(), ioport("AN1")->read(), 1);
 }
 
 
@@ -223,19 +223,19 @@ READ8_MEMBER(leland_state::redline_wheel_2_r)
 
 READ8_MEMBER(leland_state::offroad_wheel_1_r)
 {
-	return dial_compute_value(machine(), input_port_read(machine(), "AN3"), 0);
+	return dial_compute_value(machine(), ioport("AN3")->read(), 0);
 }
 
 
 READ8_MEMBER(leland_state::offroad_wheel_2_r)
 {
-	return dial_compute_value(machine(), input_port_read(machine(), "AN4"), 1);
+	return dial_compute_value(machine(), ioport("AN4")->read(), 1);
 }
 
 
 READ8_MEMBER(leland_state::offroad_wheel_3_r)
 {
-	return dial_compute_value(machine(), input_port_read(machine(), "AN5"), 2);
+	return dial_compute_value(machine(), ioport("AN5")->read(), 2);
 }
 
 
@@ -250,7 +250,7 @@ READ8_MEMBER(leland_state::ataxx_trackball_r)
 {
 	static const char *const tracknames[] = { "AN0", "AN1", "AN2", "AN3" };
 
-	return dial_compute_value(machine(), input_port_read(machine(), tracknames[offset]), offset);
+	return dial_compute_value(machine(), ioport(tracknames[offset])->read(), offset);
 }
 
 
@@ -265,7 +265,7 @@ READ8_MEMBER(leland_state::indyheat_wheel_r)
 {
 	static const char *const tracknames[] = { "AN0", "AN1", "AN2" };
 
-	return dial_compute_value(machine(), input_port_read(machine(), tracknames[offset]), offset);
+	return dial_compute_value(machine(), ioport(tracknames[offset])->read(), offset);
 }
 
 
@@ -297,7 +297,7 @@ WRITE8_MEMBER(leland_state::indyheat_analog_w)
 	switch (offset)
 	{
 		case 3:
-			m_analog_result = input_port_read(machine(), tracknames[data]);
+			m_analog_result = ioport(tracknames[data])->read();
 			break;
 
 		case 0:
@@ -354,12 +354,12 @@ MACHINE_RESET( leland )
 	state->m_alternate_bank = 0;
 
 	/* initialize the master banks */
-	state->m_master_length = machine.root_device().memregion("master")->bytes();
-	state->m_master_base = machine.root_device().memregion("master")->base();
+	state->m_master_length = state->memregion("master")->bytes();
+	state->m_master_base = state->memregion("master")->base();
 	(*state->m_update_master_bank)(machine);
 
 	/* initialize the slave banks */
-	state->m_slave_length = machine.root_device().memregion("slave")->bytes();
+	state->m_slave_length = state->memregion("slave")->bytes();
 	state->m_slave_base = state->memregion("slave")->base();
 	if (state->m_slave_length > 0x10000)
 		state->membank("bank3")->set_base(&state->m_slave_base[0x10000]);
@@ -385,8 +385,8 @@ MACHINE_RESET( ataxx )
 	state->m_master_int_timer->adjust(machine.primary_screen->time_until_pos(8), 8);
 
 	/* initialize the XROM */
-	state->m_xrom_length = machine.root_device().memregion("user1")->bytes();
-	state->m_xrom_base = machine.root_device().memregion("user1")->base();
+	state->m_xrom_length = state->memregion("user1")->bytes();
+	state->m_xrom_base = state->memregion("user1")->base();
 	state->m_xrom1_addr = 0;
 	state->m_xrom2_addr = 0;
 
@@ -400,12 +400,12 @@ MACHINE_RESET( ataxx )
 	state->m_master_bank = 0;
 
 	/* initialize the master banks */
-	state->m_master_length = machine.root_device().memregion("master")->bytes();
-	state->m_master_base = machine.root_device().memregion("master")->base();
+	state->m_master_length = state->memregion("master")->bytes();
+	state->m_master_base = state->memregion("master")->base();
 	ataxx_bankswitch(machine);
 
 	/* initialize the slave banks */
-	state->m_slave_length = machine.root_device().memregion("slave")->bytes();
+	state->m_slave_length = state->memregion("slave")->bytes();
 	state->m_slave_base = state->memregion("slave")->base();
 	if (state->m_slave_length > 0x10000)
 		state->membank("bank3")->set_base(&state->m_slave_base[0x10000]);
@@ -452,7 +452,7 @@ static TIMER_CALLBACK( ataxx_interrupt_callback )
 INTERRUPT_GEN( leland_master_interrupt )
 {
 	/* check for coins here */
-	if ((input_port_read(device->machine(), "IN1") & 0x0e) != 0x0e)
+	if ((device->machine().root_device().ioport("IN1")->read() & 0x0e) != 0x0e)
 		device_set_input_line(device, INPUT_LINE_NMI, ASSERT_LINE);
 }
 
@@ -824,7 +824,7 @@ void ataxx_init_eeprom(running_machine &machine, const UINT16 *data)
 
 READ8_DEVICE_HANDLER( ataxx_eeprom_r )
 {
-	int port = input_port_read(device->machine(), "IN2");
+	int port = device->machine().root_device().ioport("IN2")->read();
 	if (LOG_EEPROM) logerror("%s:EE read\n", device->machine().describe_context());
 	return port;
 }
@@ -1060,7 +1060,7 @@ WRITE8_MEMBER(leland_state::leland_master_analog_key_w)
 			break;
 
 		case 0x01:	/* FE = analog port select/bankswitch */
-			m_analog_result = input_port_read(machine(), portnames[data & 15]);
+			m_analog_result = ioport(portnames[data & 15])->read();
 
 			/* update top board banking for some games */
 			if (LOG_BANKSWITCHING_M)
@@ -1091,11 +1091,11 @@ READ8_MEMBER(leland_state::leland_master_input_r)
 	switch (offset)
 	{
 		case 0x00:	/* /GIN0 */
-			result = input_port_read(machine(), "IN0");
+			result = ioport("IN0")->read();
 			break;
 
 		case 0x01:	/* /GIN1 */
-			result = input_port_read(machine(), "IN1");
+			result = ioport("IN1")->read();
 			if (cpu_get_reg(machine().device("slave"), Z80_HALT))
 				result ^= 0x01;
 			break;
@@ -1111,11 +1111,11 @@ READ8_MEMBER(leland_state::leland_master_input_r)
 			break;
 
 		case 0x10:	/* /GIN0 */
-			result = input_port_read(machine(), "IN2");
+			result = ioport("IN2")->read();
 			break;
 
 		case 0x11:	/* /GIN1 */
-			result = input_port_read(machine(), "IN3");
+			result = ioport("IN3")->read();
 			if (LOG_EEPROM) logerror("%04X:EE read\n", cpu_get_pc(&space.device()));
 			break;
 
@@ -1173,11 +1173,11 @@ READ8_MEMBER(leland_state::ataxx_master_input_r)
 	switch (offset)
 	{
 		case 0x06:	/* /GIN0 */
-			result = input_port_read(machine(), "IN0");
+			result = ioport("IN0")->read();
 			break;
 
 		case 0x07:	/* /SLVBLK */
-			result = input_port_read(machine(), "IN1");
+			result = ioport("IN1")->read();
 			if (cpu_get_reg(machine().device("slave"), Z80_HALT))
 				result ^= 0x01;
 			break;

@@ -206,10 +206,10 @@ ROM_END
                                 BANG
   ============================================================================*/
 
-READ16_MEMBER(gaelco2_state::p1_gun_x){return (input_port_read(machine(), "LIGHT0_X") * 320 / 0x100) + 1;}
-READ16_MEMBER(gaelco2_state::p1_gun_y){return (input_port_read(machine(), "LIGHT0_Y") * 240 / 0x100) - 4;}
-READ16_MEMBER(gaelco2_state::p2_gun_x){return (input_port_read(machine(), "LIGHT1_X") * 320 / 0x100) + 1;}
-READ16_MEMBER(gaelco2_state::p2_gun_y){return (input_port_read(machine(), "LIGHT1_Y") * 240 / 0x100) - 4;}
+READ16_MEMBER(gaelco2_state::p1_gun_x){return (ioport("LIGHT0_X")->read() * 320 / 0x100) + 1;}
+READ16_MEMBER(gaelco2_state::p1_gun_y){return (ioport("LIGHT0_Y")->read() * 240 / 0x100) - 4;}
+READ16_MEMBER(gaelco2_state::p2_gun_x){return (ioport("LIGHT1_X")->read() * 320 / 0x100) + 1;}
+READ16_MEMBER(gaelco2_state::p2_gun_y){return (ioport("LIGHT1_Y")->read() * 240 / 0x100) - 4;}
 
 static ADDRESS_MAP_START( bang_map, AS_PROGRAM, 16, gaelco2_state )
     AM_RANGE(0x000000, 0x0fffff) AM_ROM																			/* ROM */

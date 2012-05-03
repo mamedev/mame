@@ -407,11 +407,11 @@ READ16_MEMBER(karnov_state::karnov_control_r)
 	switch (offset << 1)
 	{
 		case 0:
-			return input_port_read(machine(), "P1_P2");
+			return ioport("P1_P2")->read();
 		case 2: /* Start buttons & VBL */
-			return input_port_read(machine(), "SYSTEM");
+			return ioport("SYSTEM")->read();
 		case 4:
-			return input_port_read(machine(), "DSW");
+			return ioport("DSW")->read();
 		case 6: /* i8751 return values */
 			return m_i8751_return;
 	}
@@ -481,7 +481,7 @@ static INPUT_PORTS_START( common )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 INPUT_PORTS_END
 
 
@@ -728,7 +728,7 @@ GFXDECODE_END
 static INTERRUPT_GEN( karnov_interrupt )
 {
 	karnov_state *state = device->machine().driver_data<karnov_state>();
-	UINT8 port = input_port_read(device->machine(), "FAKE");
+	UINT8 port = state->ioport("FAKE")->read();
 
 	/* Coin input to the i8751 generates an interrupt to the main cpu */
 	if (port == state->m_coin_mask)

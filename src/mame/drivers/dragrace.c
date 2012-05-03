@@ -18,7 +18,7 @@ static TIMER_DEVICE_CALLBACK( dragrace_frame_callback )
 
 	for (i = 0; i < 2; i++)
 	{
-		switch (input_port_read(timer.machine(), portnames[i]))
+		switch (timer.machine().root_device().ioport(portnames[i])->read())
 		{
 		case 0x01: state->m_gear[i] = 1; break;
 		case 0x02: state->m_gear[i] = 2; break;
@@ -29,7 +29,7 @@ static TIMER_DEVICE_CALLBACK( dragrace_frame_callback )
 	}
 
 	/* watchdog is disabled during service mode */
-	timer.machine().watchdog_enable(input_port_read(timer.machine(), "IN0") & 0x20);
+	timer.machine().watchdog_enable(timer.machine().root_device().ioport("IN0")->read() & 0x20);
 }
 
 
@@ -112,7 +112,7 @@ WRITE8_MEMBER(dragrace_state::dragrace_misc_clear_w)
 
 READ8_MEMBER(dragrace_state::dragrace_input_r)
 {
-	int val = input_port_read(machine(), "IN2");
+	int val = ioport("IN2")->read();
 	static const char *const portnames[] = { "IN0", "IN1" };
 
 	UINT8 maskA = 1 << (offset % 8);
@@ -122,7 +122,7 @@ READ8_MEMBER(dragrace_state::dragrace_input_r)
 
 	for (i = 0; i < 2; i++)
 	{
-		int in = input_port_read(machine(), portnames[i]);
+		int in = ioport(portnames[i])->read();
 
 		if (m_gear[i] != 0)
 			in &= ~(1 << m_gear[i]);
@@ -145,7 +145,7 @@ READ8_MEMBER(dragrace_state::dragrace_steering_r)
 
 	for (i = 0; i < 2; i++)
 	{
-		int dial = input_port_read(machine(), dialnames[i]);
+		int dial = ioport(dialnames[i])->read();
 
 		bitA[i] = ((dial + 1) / 2) & 1;
 		bitB[i] = ((dial + 0) / 2) & 1;

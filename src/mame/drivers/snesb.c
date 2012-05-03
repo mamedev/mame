@@ -212,17 +212,17 @@ READ8_MEMBER(snesb_state::sb2b_7xxx_r)
 /* Generic read handlers for Dip Switches and coins inputs */
 READ8_MEMBER(snesb_state::snesb_dsw1_r)
 {
-	return input_port_read(machine(), "DSW1");
+	return ioport("DSW1")->read();
 }
 
 READ8_MEMBER(snesb_state::snesb_dsw2_r)
 {
-	return input_port_read(machine(), "DSW2");
+	return ioport("DSW2")->read();
 }
 
 READ8_MEMBER(snesb_state::snesb_coin_r)
 {
-	return input_port_read(machine(), "COIN");
+	return ioport("COIN")->read();
 }
 
 

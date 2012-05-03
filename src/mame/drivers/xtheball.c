@@ -191,7 +191,7 @@ WRITE16_MEMBER(xtheball_state::bit_controls_w)
 
 READ16_MEMBER(xtheball_state::analogx_r)
 {
-	return (input_port_read(machine(), "ANALOGX") << 8) | 0x00ff;
+	return (ioport("ANALOGX")->read() << 8) | 0x00ff;
 }
 
 
@@ -199,7 +199,7 @@ READ16_MEMBER(xtheball_state::analogy_watchdog_r)
 {
 	/* doubles as a watchdog address */
 	watchdog_reset_w(space,0,0);
-	return (input_port_read(machine(), "ANALOGY") << 8) | 0x00ff;
+	return (ioport("ANALOGY")->read() << 8) | 0x00ff;
 }
 
 

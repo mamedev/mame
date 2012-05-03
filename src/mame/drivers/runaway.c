@@ -50,11 +50,11 @@ READ8_MEMBER(runaway_state::runaway_input_r)
 {
 	UINT8 val = 0;
 
-	if (input_port_read(machine(), "3000D7") & (1 << offset))
+	if (ioport("3000D7")->read() & (1 << offset))
 	{
 		val |= 0x80;
 	}
-	if (input_port_read(machine(), "3000D6") & (1 << offset))
+	if (ioport("3000D6")->read() & (1 << offset))
 	{
 		val |= 0x40;
 	}
@@ -65,7 +65,7 @@ READ8_MEMBER(runaway_state::runaway_input_r)
 
 static READ8_DEVICE_HANDLER( runaway_pot_r )
 {
-	return (input_port_read(device->machine(), "7000") << (7 - offset)) & 0x80;
+	return (device->machine().root_device().ioport("7000")->read() << (7 - offset)) & 0x80;
 }
 
 
@@ -107,7 +107,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( qwak )
 	PORT_START("3000D7")	/* 3000 D7 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -159,7 +159,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( runaway )
 	PORT_START("3000D7") /* 3000 D7 */
 	PORT_BIT ( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT ( 0x02, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT ( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT ( 0x04, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_BIT ( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )

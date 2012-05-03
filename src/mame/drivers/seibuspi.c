@@ -917,7 +917,7 @@ READ32_MEMBER(seibuspi_state::spi_controls1_r)
 {
 	if( ACCESSING_BITS_0_7 )
 	{
-		return input_port_read(machine(), "INPUTS");
+		return ioport("INPUTS")->read();
 	}
 	return 0xffffffff;
 }
@@ -926,7 +926,7 @@ READ32_MEMBER(seibuspi_state::spi_controls2_r)
 {
 	if( ACCESSING_BITS_0_7 )
 	{
-		return input_port_read(machine(), "SYSTEM");
+		return ioport("SYSTEM")->read();
 	}
 	return 0xffffffff;
 }
@@ -936,17 +936,17 @@ CUSTOM_INPUT_MEMBER(seibuspi_state::ejsakura_keyboard_r)
 	switch(m_ejsakura_input_port)
 	{
 		case 0x01:
-			return input_port_read(machine(), "INPUT01");
+			return ioport("INPUT01")->read();
 		case 0x02:
-			return input_port_read(machine(), "INPUT02");
+			return ioport("INPUT02")->read();
 		case 0x04:
-			return input_port_read(machine(), "INPUT04");
+			return ioport("INPUT04")->read();
 		case 0x08:
-			return input_port_read(machine(), "INPUT08");
+			return ioport("INPUT08")->read();
 		case 0x10:
-			return input_port_read(machine(), "INPUT10");
+			return ioport("INPUT10")->read();
 		default:
-			return input_port_read(machine(), "SYSTEM");
+			return ioport("SYSTEM")->read();
 	}
 	return 0xffffffff;
 }
@@ -985,12 +985,12 @@ WRITE8_MEMBER(seibuspi_state::z80_bank_w)
 
 READ8_MEMBER(seibuspi_state::z80_jp1_r)
 {
-	return input_port_read(machine(), "JP1");
+	return ioport("JP1")->read();
 }
 
 READ8_MEMBER(seibuspi_state::z80_coin_r)
 {
-	return input_port_read(machine(), "COIN");
+	return ioport("COIN")->read();
 }
 
 READ32_MEMBER(seibuspi_state::soundrom_r)
@@ -1289,7 +1289,7 @@ INPUT_PORTS_END
 CUSTOM_INPUT_MEMBER(seibuspi_state::ejanhs_encode)
 {
 	static const UINT8 encoding[] = { 0x02, 0x10, 0x03, 0x18, 0x04, 0x20, 0x05, 0x28, 0x06, 0x30, 0x07 };
-	input_port_value state = input_port_read(machine(), (const char *)param);
+	ioport_value state = ioport((const char *)param)->read();
 	int bit;
 
 	for (bit = 0; bit < ARRAY_LENGTH(encoding); bit++)
@@ -1812,7 +1812,7 @@ static MACHINE_RESET( spi )
 {
 	seibuspi_state *state = machine.driver_data<seibuspi_state>();
 	int i;
-	UINT8 *sound = machine.root_device().memregion("ymf")->base();
+	UINT8 *sound = state->memregion("ymf")->base();
 
 	UINT8 *rombase = state->memregion("user1")->base();
 	UINT8 flash_data = rombase[0x1ffffc];
@@ -2057,7 +2057,7 @@ READ32_MEMBER(seibuspi_state::rfjet_speedup_r)
 		device_spin_until_interrupt(&space.device()); // idle
 		// Hack to enter test mode
 		r = m_spimainram[(0x002894c-0x800)/4] & (~0x400);
-		return r | (((input_port_read(machine(), "SYSTEM") ^ 0xff)<<8) & 0x400);
+		return r | (((ioport("SYSTEM")->read() ^ 0xff)<<8) & 0x400);
 	}
 
 	/* rfjetj */
@@ -2075,8 +2075,8 @@ static void init_spi(running_machine &machine)
 	state->m_flash[0] = machine.device<intel_e28f008sa_device>("flash0");
 	state->m_flash[1] = machine.device<intel_e28f008sa_device>("flash1");
 
-	seibuspi_text_decrypt(machine.root_device().memregion("gfx1")->base());
-	seibuspi_bg_decrypt(machine.root_device().memregion("gfx2")->base(), machine.root_device().memregion("gfx2")->bytes());
+	seibuspi_text_decrypt(state->memregion("gfx1")->base());
+	seibuspi_bg_decrypt(state->memregion("gfx2")->base(), state->memregion("gfx2")->bytes());
 	seibuspi_sprite_decrypt(state->memregion("gfx3")->base(), 0x400000);
 }
 
@@ -2146,8 +2146,8 @@ static void init_rf2(running_machine &machine)
 	state->m_flash[1] = machine.device<intel_e28f008sa_device>("flash1");
 
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x0282AC, 0x0282AF, read32_delegate(FUNC(seibuspi_state::rf2_speedup_r),state));
-	seibuspi_rise10_text_decrypt(machine.root_device().memregion("gfx1")->base());
-	seibuspi_rise10_bg_decrypt(machine.root_device().memregion("gfx2")->base(), machine.root_device().memregion("gfx2")->bytes());
+	seibuspi_rise10_text_decrypt(state->memregion("gfx1")->base());
+	seibuspi_rise10_bg_decrypt(state->memregion("gfx2")->base(), state->memregion("gfx2")->bytes());
 	seibuspi_rise10_sprite_decrypt(state->memregion("gfx3")->base(), 0x600000);
 
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x560, 0x563, write32_delegate(FUNC(seibuspi_state::sprite_dma_start_w),state));
@@ -2171,8 +2171,8 @@ static void init_rfjet(running_machine &machine)
 	state->m_flash[1] = machine.device<intel_e28f008sa_device>("flash1");
 
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x002894c, 0x002894f, read32_delegate(FUNC(seibuspi_state::rfjet_speedup_r),state));
-	seibuspi_rise11_text_decrypt(machine.root_device().memregion("gfx1")->base());
-	seibuspi_rise11_bg_decrypt(machine.root_device().memregion("gfx2")->base(), machine.root_device().memregion("gfx2")->bytes());
+	seibuspi_rise11_text_decrypt(state->memregion("gfx1")->base());
+	seibuspi_rise11_bg_decrypt(state->memregion("gfx2")->base(), state->memregion("gfx2")->bytes());
 	seibuspi_rise11_sprite_decrypt_rfjet(state->memregion("gfx3")->base(), 0x800000);
 
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x560, 0x563, write32_delegate(FUNC(seibuspi_state::sprite_dma_start_w),state));

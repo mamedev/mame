@@ -369,7 +369,7 @@ static void argus_write_dummy_rams(running_machine &machine, int dramoffs, int v
 	int voffs;
 	int offs;
 
-	UINT8 *VROM1 = machine.root_device().memregion("user1")->base();		/* "ag_15.bin" */
+	UINT8 *VROM1 = state->memregion("user1")->base();		/* "ag_15.bin" */
 	UINT8 *VROM2 = state->memregion("user2")->base();		/* "ag_16.bin" */
 
 	/* offset in pattern data */

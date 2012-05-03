@@ -73,7 +73,7 @@ CUSTOM_INPUT_MEMBER(crbaloon_state::pc3092_r)
 
 	/* enable coin & start input? Wild guess!!! */
 	if (m_pc3092_data[1] & 0x02)
-		ret = input_port_read(machine(), "PC3092");
+		ret = ioport("PC3092")->read();
 	else
 		ret = 0x00;
 
@@ -143,7 +143,7 @@ READ8_MEMBER(crbaloon_state::pc3259_r)
 
 	if (LOG_PC3259) logerror("%04X:  read PC3259 #%d = 0x%02x\n", cpu_get_pc(&space.device()), reg, ret);
 
-	return ret | (input_port_read(machine(), "DSW1") & 0xf0);
+	return ret | (ioport("DSW1")->read() & 0xf0);
 }
 
 

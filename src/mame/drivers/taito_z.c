@@ -1046,7 +1046,7 @@ WRITE16_MEMBER(taitoz_state::spacegun_output_bypass_w)
             x0000000    (unused)                  */
 
 			COMBINE_DATA(&m_eep_latch);
-			input_port_write(machine(), "EEPROMOUT", data, 0xff);
+			ioport("EEPROMOUT")->write(data, 0xff);
 			break;
 
 		default:
@@ -1065,12 +1065,12 @@ READ8_MEMBER(taitoz_state::contcirc_input_bypass_r)
 
 	UINT8 port = tc0220ioc_port_r(m_tc0220ioc, 0);	/* read port number */
 	int steer = 0;
-	int fake = input_port_read(machine(), "FAKE");
+	int fake = ioport("FAKE")->read();
 
 	if (!(fake & 0x10))	/* Analogue steer (the real control method) */
 	{
 		/* center around zero and reduce span to 0xc0 */
-		steer = ((input_port_read(machine(), "STEER") - 0x80) * 0xc0) / 0x100;
+		steer = ((ioport("STEER")->read() - 0x80) * 0xc0) / 0x100;
 
 	}
 	else	/* Digital steer */
@@ -1105,12 +1105,12 @@ READ8_MEMBER(taitoz_state::chasehq_input_bypass_r)
 
 	UINT8 port = tc0220ioc_port_r(m_tc0220ioc, 0);	/* read port number */
 	int steer = 0;
-	int fake = input_port_read(machine(), "FAKE");
+	int fake = ioport("FAKE")->read();
 
 	if (!(fake & 0x10))	/* Analogue steer (the real control method) */
 	{
 		/* center around zero */
-		steer = input_port_read(machine(), "STEER") - 0x80;
+		steer = ioport("STEER")->read() - 0x80;
 	}
 	else	/* Digital steer */
 	{
@@ -1127,16 +1127,16 @@ READ8_MEMBER(taitoz_state::chasehq_input_bypass_r)
 	switch (port)
 	{
 		case 0x08:
-			return input_port_read(machine(), "UNK1");
+			return ioport("UNK1")->read();
 
 		case 0x09:
-			return input_port_read(machine(), "UNK2");
+			return ioport("UNK2")->read();
 
 		case 0x0a:
-			return input_port_read(machine(), "UNK3");
+			return ioport("UNK3")->read();
 
 		case 0x0b:
-			return input_port_read(machine(), "UNK4");
+			return ioport("UNK4")->read();
 
 		case 0x0c:
 			return steer & 0xff;
@@ -1155,16 +1155,16 @@ READ16_MEMBER(taitoz_state::bshark_stick_r)
 	switch (offset)
 	{
 		case 0x00:
-			return input_port_read(machine(), "STICKX");
+			return ioport("STICKX")->read();
 
 		case 0x01:
-			return input_port_read(machine(), "X_ADJUST");
+			return ioport("X_ADJUST")->read();
 
 		case 0x02:
-			return input_port_read(machine(), "STICKY");
+			return ioport("STICKY")->read();
 
 		case 0x03:
-			return input_port_read(machine(), "Y_ADJUST");
+			return ioport("Y_ADJUST")->read();
 	}
 
 	logerror("CPU #0 PC %06x: warning - read unmapped stick offset %06x\n", cpu_get_pc(&space.device()), offset);
@@ -1178,16 +1178,16 @@ READ16_MEMBER(taitoz_state::nightstr_stick_r)
 	switch (offset)
 	{
 		case 0x00:
-			return input_port_read(machine(), "STICKX");
+			return ioport("STICKX")->read();
 
 		case 0x01:
-			return input_port_read(machine(), "STICKY");
+			return ioport("STICKY")->read();
 
 		case 0x02:
-			return input_port_read(machine(), "X_ADJUST");
+			return ioport("X_ADJUST")->read();
 
 		case 0x03:
-			return input_port_read(machine(), "Y_ADJUST");
+			return ioport("Y_ADJUST")->read();
 	}
 
 	logerror("CPU #0 PC %06x: warning - read unmapped stick offset %06x\n", cpu_get_pc(&space.device()), offset);
@@ -1210,12 +1210,12 @@ WRITE16_MEMBER(taitoz_state::bshark_stick_w)
 READ16_MEMBER(taitoz_state::sci_steer_input_r)
 {
 	int steer = 0;
-	int fake = input_port_read(machine(), "FAKE");
+	int fake = ioport("FAKE")->read();
 
 	if (!(fake & 0x10))	/* Analogue steer (the real control method) */
 	{
 		/* center around zero and reduce span to 0xc0 */
-		steer = ((input_port_read(machine(), "STEER") - 0x80) * 0xc0) / 0x100;
+		steer = ((ioport("STEER")->read() - 0x80) * 0xc0) / 0x100;
 	}
 	else	/* Digital steer */
 	{
@@ -1262,16 +1262,16 @@ READ16_MEMBER(taitoz_state::spacegun_lightgun_r)
 	switch (offset)
 	{
 		case 0x00:
-			return input_port_read(machine(), "STICKX1");
+			return ioport("STICKX1")->read();
 
 		case 0x01:
-			return input_port_read(machine(), "STICKY1");
+			return ioport("STICKY1")->read();
 
 		case 0x02:
-			return input_port_read(machine(), "STICKX2");
+			return ioport("STICKX2")->read();
 
 		case 0x03:
-			return input_port_read(machine(), "STICKY2");
+			return ioport("STICKY2")->read();
 	}
 
 	return 0x00;
@@ -1300,12 +1300,12 @@ WRITE16_MEMBER(taitoz_state::spacegun_gun_output_w)
 READ16_MEMBER(taitoz_state::dblaxle_steer_input_r)
 {
 	int steer = 0;
-	int fake = input_port_read(machine(), "FAKE");
+	int fake = ioport("FAKE")->read();
 
 	if (!(fake & 0x10))	/* Analogue steer (the real control method) */
 	{
 		/* center around zero and reduce span to 0x80 */
-		steer = ((input_port_read(machine(), "STEER") - 0x80) * 0x80) / 0x100;
+		steer = ((ioport("STEER")->read() - 0x80) * 0x80) / 0x100;
 	}
 	else	/* Digital steer */
 	{

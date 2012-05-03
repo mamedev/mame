@@ -172,8 +172,8 @@ static MACHINE_RESET( firetrk )
 
 READ8_MEMBER(firetrk_state::firetrk_dip_r)
 {
-	UINT8 val0 = input_port_read(machine(), "DIP_0");
-	UINT8 val1 = input_port_read(machine(), "DIP_1");
+	UINT8 val0 = ioport("DIP_0")->read();
+	UINT8 val1 = ioport("DIP_1")->read();
 
 	if (val1 & (1 << (2 * offset + 0))) val0 |= 1;
 	if (val1 & (1 << (2 * offset + 1))) val0 |= 2;
@@ -184,8 +184,8 @@ READ8_MEMBER(firetrk_state::firetrk_dip_r)
 
 READ8_MEMBER(firetrk_state::montecar_dip_r)
 {
-	UINT8 val0 = input_port_read(machine(), "DIP_0");
-	UINT8 val1 = input_port_read(machine(), "DIP_1");
+	UINT8 val0 = ioport("DIP_0")->read();
+	UINT8 val1 = ioport("DIP_1")->read();
 
 	if (val1 & (1 << (3 - offset))) val0 |= 1;
 	if (val1 & (1 << (7 - offset))) val0 |= 2;
@@ -247,7 +247,7 @@ READ8_MEMBER(firetrk_state::firetrk_input_r)
 	/* update steering wheels */
 	for (i = 0; i < 2; i++)
 	{
-		UINT32 new_dial = input_port_read_safe(machine(), (i ? "STEER_2" : "STEER_1"), 0);
+		UINT32 new_dial = ioport((i ? "STEER_2" : "STEER_1"))->read_safe(0);
 		INT32 delta = new_dial - m_dial[i];
 
 		if (delta != 0)
@@ -259,9 +259,9 @@ READ8_MEMBER(firetrk_state::firetrk_input_r)
 		}
 	}
 
-	return ((input_port_read_safe(machine(), "BIT_0", 0) & (1 << offset)) ? 0x01 : 0) |
-		   ((input_port_read_safe(machine(), "BIT_6", 0) & (1 << offset)) ? 0x40 : 0) |
-		   ((input_port_read_safe(machine(), "BIT_7", 0) & (1 << offset)) ? 0x80 : 0);
+	return ((ioport("BIT_0")->read_safe(0) & (1 << offset)) ? 0x01 : 0) |
+		   ((ioport("BIT_6")->read_safe(0) & (1 << offset)) ? 0x40 : 0) |
+		   ((ioport("BIT_7")->read_safe(0) & (1 << offset)) ? 0x80 : 0);
 }
 
 
@@ -447,7 +447,7 @@ static INPUT_PORTS_START( firetrk )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START3 ) PORT_NAME("Both Players Start")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Track Select") PORT_CODE(KEYCODE_SPACE) PORT_PLAYER(1)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_VBLANK )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Cabinet ))
 	PORT_DIPSETTING(    0x00, "Smokey Joe (1 Player)" )
 	PORT_DIPSETTING(    0x40, "Fire Truck (2 Players)" )
@@ -579,7 +579,7 @@ static INPUT_PORTS_START( montecar )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, firetrk_state,gear_r, (void *)2)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("Track Select") PORT_CODE(KEYCODE_SPACE)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Gas")
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, firetrk_state,steer_dir_r, (void *)0)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, firetrk_state,skid_r, (void *)1)
 

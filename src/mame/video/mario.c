@@ -209,7 +209,7 @@ SCREEN_UPDATE_IND16( mario )
 	mario_state	*state = screen.machine().driver_data<mario_state>();
 	int t;
 
-	t = input_port_read(screen.machine(), "MONITOR");
+	t = screen.machine().root_device().ioport("MONITOR")->read();
 	if (t != state->m_monitor)
 	{
 		state->m_monitor = t;

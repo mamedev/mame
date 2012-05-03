@@ -531,7 +531,7 @@ READ16_MEMBER(cybertnk_state::io_r)
 	switch( offset )
 	{
 		case 2/2:
-			return input_port_read(machine(), "DSW1");
+			return ioport("DSW1")->read();
 
 		// 0x00110007 is controller device select
 		// 0x001100D5 is controller data
@@ -540,15 +540,15 @@ READ16_MEMBER(cybertnk_state::io_r)
 			switch( (m_io_ram[6/2]) & 0xff )
 			{
 				case 0:
-					m_io_ram[0xd4/2] = input_port_read(machine(), "TRAVERSE");
+					m_io_ram[0xd4/2] = ioport("TRAVERSE")->read();
 					break;
 
 				case 0x20:
-					m_io_ram[0xd4/2] = input_port_read(machine(), "ELEVATE");
+					m_io_ram[0xd4/2] = ioport("ELEVATE")->read();
 					break;
 
 				case 0x40:
-					m_io_ram[0xd4/2] = input_port_read(machine(), "ACCEL");
+					m_io_ram[0xd4/2] = ioport("ACCEL")->read();
 					break;
 
 				case 0x42:
@@ -560,7 +560,7 @@ READ16_MEMBER(cybertnk_state::io_r)
 					break;
 
 				case 0x60:
-					m_io_ram[0xd4/2] = input_port_read(machine(), "HANDLE");
+					m_io_ram[0xd4/2] = ioport("HANDLE")->read();
 					break;
 
 				//default:
@@ -569,13 +569,13 @@ READ16_MEMBER(cybertnk_state::io_r)
 			return 0;
 
 		case 6/2:
-			return input_port_read(machine(), "IN0"); // high half
+			return ioport("IN0")->read(); // high half
 
 		case 8/2:
-			return input_port_read(machine(), "IN0"); // low half
+			return ioport("IN0")->read(); // low half
 
 		case 0xa/2:
-			return input_port_read(machine(), "DSW2");
+			return ioport("DSW2")->read();
 
 		case 0xd4/2:
 			return m_io_ram[offset]; // controller data

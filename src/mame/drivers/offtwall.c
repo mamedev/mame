@@ -91,7 +91,7 @@ WRITE16_MEMBER(offtwall_state::offtwall_atarivc_w)
 
 READ16_MEMBER(offtwall_state::special_port3_r)
 {
-	int result = input_port_read(machine(), "260010");
+	int result = ioport("260010")->read();
 	if (m_cpu_to_sound_ready) result ^= 0x0020;
 	return result;
 }
@@ -346,7 +346,7 @@ static INPUT_PORTS_START( offtwall )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNUSED )	/* tested before writing to 260040 */
 	PORT_SERVICE( 0x0040, IP_ACTIVE_LOW )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_VBLANK )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("260012")

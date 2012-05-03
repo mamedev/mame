@@ -239,8 +239,8 @@ INLINE void get_crosshair_xy(running_machine &machine, int player, int *x, int *
 	int width = visarea.width();
 	int height = visarea.height();
 	/* only 2 lightguns are connected */
-	*x = visarea.min_x + (((input_port_read(machine, player ? "FAKE2_X" : "FAKE1_X") & 0xff) * width) >> 8);
-	*y = visarea.min_y + (((input_port_read(machine, player ? "FAKE2_Y" : "FAKE1_Y") & 0xff) * height) >> 8);
+	*x = visarea.min_x + (((machine.root_device().ioport(player ? "FAKE2_X" : "FAKE1_X")->read() & 0xff) * width) >> 8);
+	*y = visarea.min_y + (((machine.root_device().ioport(player ? "FAKE2_Y" : "FAKE1_Y")->read() & 0xff) * height) >> 8);
 }
 
 
@@ -805,7 +805,7 @@ READ32_HANDLER( cojag_gun_input_r )
 			return (beamy << 16) | (beamx ^ 0x1ff);
 
 		case 2:
-			return input_port_read(space->machine(), "IN3");
+			return space->machine().root_device().ioport("IN3")->read();
 	}
 	return 0;
 }

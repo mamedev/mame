@@ -105,7 +105,7 @@ READ16_MEMBER(midtunit_state::midtunit_input_r)
 {
 	static const char *const portnames[] = { "IN0", "IN1", "IN2", "DSW" };
 
-	return input_port_read(machine(), portnames[offset]);
+	return ioport(portnames[offset])->read();
 }
 
 

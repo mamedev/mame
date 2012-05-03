@@ -41,7 +41,7 @@ static void update_interrupts(running_machine &machine)
 static void scanline_update(screen_device &screen, int scanline)
 {
 	/* generate 32V signals */
-	if ((scanline & 32) == 0 && !(input_port_read(screen.machine(), "P1") & 0x800))
+	if ((scanline & 32) == 0 && !(screen.machine().root_device().ioport("P1")->read() & 0x800))
 		atarigen_scanline_int_gen(screen.machine().device("maincpu"));
 }
 
@@ -115,7 +115,7 @@ static INPUT_PORTS_START( klax )
 	PORT_BIT( 0x00fc, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0600, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)

@@ -556,16 +556,16 @@ READ16_MEMBER(bigfghtr_state::sharedram_r)
 				break;
 
 			case 0x642/2:
-				return (input_port_read(machine(), "DSW0") & 0xffff) ^ 0xffff;
+				return (ioport("DSW0")->read() & 0xffff) ^ 0xffff;
 
 			case 0x644/2:
-				return (input_port_read(machine(), "DSW1") & 0xffff) ^ 0xffff;
+				return (ioport("DSW1")->read() & 0xffff) ^ 0xffff;
 
 			case 0x646/2:
-				return (input_port_read(machine(), "P1") & 0xffff) ^ 0xffff;
+				return (ioport("P1")->read() & 0xffff) ^ 0xffff;
 
 			case 0x648/2:
-				return (input_port_read(machine(), "P2") & 0xffff) ^ 0xffff;
+				return (ioport("P2")->read() & 0xffff) ^ 0xffff;
 		}
 	}
 
@@ -581,16 +581,16 @@ READ16_MEMBER(bigfghtr_state::sharedram_r)
 				}
 				break;
 			case 0x642/2:
-				return (input_port_read(machine(), "DSW0") & 0xffff) ^ 0xffff;
+				return (ioport("DSW0")->read() & 0xffff) ^ 0xffff;
 
 			case 0x644/2:
-				return (input_port_read(machine(), "DSW1") & 0xffff) ^ 0xffff;
+				return (ioport("DSW1")->read() & 0xffff) ^ 0xffff;
 
 			case 0x646/2:
-				return (input_port_read(machine(), "P1") & 0xffff) ^ 0xffff;
+				return (ioport("P1")->read() & 0xffff) ^ 0xffff;
 
 			case 0x648/2:
-				return (input_port_read(machine(), "P2") & 0xffff) ^ 0xffff;
+				return (ioport("P2")->read() & 0xffff) ^ 0xffff;
 
 			/*
             protection controls where the program code should jump to.

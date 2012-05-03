@@ -37,19 +37,19 @@ READ8_MEMBER(skykid_state::inputport_r)
 	switch (m_inputport_selected)
 	{
 		case 0x00:	/* DSW B (bits 0-4) */
-			return (input_port_read(machine(), "DSWB") & 0xf8) >> 3;
+			return (ioport("DSWB")->read() & 0xf8) >> 3;
 		case 0x01:	/* DSW B (bits 5-7), DSW A (bits 0-1) */
-			return ((input_port_read(machine(), "DSWB") & 0x07) << 2) | ((input_port_read(machine(), "DSWA") & 0xc0) >> 6);
+			return ((ioport("DSWB")->read() & 0x07) << 2) | ((ioport("DSWA")->read() & 0xc0) >> 6);
 		case 0x02:	/* DSW A (bits 2-6) */
-			return (input_port_read(machine(), "DSWA") & 0x3e) >> 1;
+			return (ioport("DSWA")->read() & 0x3e) >> 1;
 		case 0x03:	/* DSW A (bit 7), DSW C (bits 0-3) */
-			return ((input_port_read(machine(), "DSWA") & 0x01) << 4) | (input_port_read(machine(), "BUTTON2") & 0x0f);
+			return ((ioport("DSWA")->read() & 0x01) << 4) | (ioport("BUTTON2")->read() & 0x0f);
 		case 0x04:	/* coins, start */
-			return input_port_read(machine(), "SYSTEM");
+			return ioport("SYSTEM")->read();
 		case 0x05:	/* 2P controls */
-			return input_port_read(machine(), "P2");
+			return ioport("P2")->read();
 		case 0x06:	/* 1P controls */
-			return input_port_read(machine(), "P1");
+			return ioport("P1")->read();
 		default:
 			return 0xff;
 	}

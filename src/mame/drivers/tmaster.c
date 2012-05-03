@@ -517,7 +517,7 @@ READ16_MEMBER(tmaster_state::tmaster_blitter_r)
 
 READ16_MEMBER(tmaster_state::tmaster_coins_r)
 {
-	return input_port_read(machine(), "COIN")|(machine().rand()&0x0800);
+	return ioport("COIN")->read()|(machine().rand()&0x0800);
 }
 
 static ADDRESS_MAP_START( tmaster_map, AS_PROGRAM, 16, tmaster_state )
@@ -1834,7 +1834,7 @@ Protection starts:
 static DRIVER_INIT( galgames )
 {
 	tmaster_state *state = machine.driver_data<tmaster_state>();
-	UINT8 *ROM	=	machine.root_device().memregion("maincpu")->base();
+	UINT8 *ROM	=	state->memregion("maincpu")->base();
 	int cart;
 
 	// RAM bank at 0x000000-0x03ffff and 0x200000-0x23ffff
@@ -1856,7 +1856,7 @@ static DRIVER_INIT( galgames )
 
 	for (cart = 1; cart <= 4; cart++)
 	{
-		UINT8 *CART = machine.root_device().memregion("maincpu")->base();
+		UINT8 *CART = state->memregion("maincpu")->base();
 
 		if  (0x200000 * (cart+1) <= state->memregion("maincpu")->bytes())
 			CART += 0x200000 * cart;

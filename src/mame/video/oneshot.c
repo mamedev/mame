@@ -69,8 +69,8 @@ static void draw_crosshairs( running_machine &machine, bitmap_ind16 &bitmap, con
 	//int xpos,ypos;
 
 	/* get gun raw coordinates (player 1) */
-	state->m_gun_x_p1 = (input_port_read(machine, "LIGHT0_X") & 0xff) * 320 / 256;
-	state->m_gun_y_p1 = (input_port_read(machine, "LIGHT0_Y") & 0xff) * 240 / 256;
+	state->m_gun_x_p1 = (state->ioport("LIGHT0_X")->read() & 0xff) * 320 / 256;
+	state->m_gun_y_p1 = (state->ioport("LIGHT0_Y")->read() & 0xff) * 240 / 256;
 
 	/* compute the coordinates for drawing (from routine at 0x009ab0) */
 	//xpos = state->m_gun_x_p1;
@@ -84,8 +84,8 @@ static void draw_crosshairs( running_machine &machine, bitmap_ind16 &bitmap, con
 
 
 	/* get gun raw coordinates (player 2) */
-	state->m_gun_x_p2 = (input_port_read(machine, "LIGHT1_X") & 0xff) * 320 / 256;
-	state->m_gun_y_p2 = (input_port_read(machine, "LIGHT1_Y") & 0xff) * 240 / 256;
+	state->m_gun_x_p2 = (state->ioport("LIGHT1_X")->read() & 0xff) * 320 / 256;
+	state->m_gun_y_p2 = (state->ioport("LIGHT1_Y")->read() & 0xff) * 240 / 256;
 
 	/* compute the coordinates for drawing (from routine at 0x009b6e) */
 	//xpos = state->m_gun_x_p2;

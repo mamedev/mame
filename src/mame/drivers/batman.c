@@ -89,7 +89,7 @@ WRITE16_MEMBER(batman_state::batman_atarivc_w)
 
 READ16_MEMBER(batman_state::special_port2_r)
 {
-	int result = input_port_read(machine(), "260010");
+	int result = ioport("260010")->read();
 	if (m_sound_to_cpu_ready) result ^= 0x0010;
 	if (m_cpu_to_sound_ready) result ^= 0x0020;
 	return result;
@@ -180,7 +180,7 @@ static INPUT_PORTS_START( batman )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNUSED )	/* Input buffer full (@260030) */
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNUSED )	/* Output buffer full (@260040) */
 	PORT_SERVICE( 0x0040, IP_ACTIVE_LOW )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_VBLANK )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_INCLUDE( atarijsa_iii )		/* audio board port */
 INPUT_PORTS_END

@@ -276,32 +276,32 @@ READ8_MEMBER(esripsys_state::g_iobus_r)
 			return m_cmos_ram[(m_cmos_ram_a10_3 << 3) | (m_cmos_ram_a2_0 & 3)];
 		case 8:
 		{
-			int keypad = input_port_read(machine(), "KEYPAD_B") | m_keypad_status;
+			int keypad = ioport("KEYPAD_B")->read() | m_keypad_status;
 			m_keypad_status = 0;
 			m_io_firq_status = 0;
 			return keypad;
 		}
 		case 9:
 		{
-			return input_port_read(machine(), "KEYPAD_A");
+			return ioport("KEYPAD_A")->read();
 		}
 		case 0xa:
 		{
-			int coins =  m_coin_latch | (input_port_read(machine(), "COINS") & 0x30);
+			int coins =  m_coin_latch | (ioport("COINS")->read() & 0x30);
 			m_coin_latch = 0;
 			m_io_firq_status = 0;
 			return coins;
 		}
 		case 0x10:
-			return input_port_read(machine(), "IO_1");
+			return ioport("IO_1")->read();
 		case 0x11:
-			return input_port_read(machine(), "JOYSTICK_X");
+			return ioport("JOYSTICK_X")->read();
 		case 0x12:
-			return input_port_read(machine(), "JOYSTICK_Y");
+			return ioport("JOYSTICK_Y")->read();
 		case 0x16:
 			return m_io_firq_status;
 		case 0x18:
-			return input_port_read(machine(), "IO_2");
+			return ioport("IO_2")->read();
 			/* Unused I/O */
 		case 0x19:
 		case 0x1a:
@@ -417,7 +417,7 @@ INPUT_CHANGED_MEMBER(esripsys_state::coin_interrupt)
 	if (newval == 1)
 	{
 		m_io_firq_status |= 2;
-		m_coin_latch = input_port_read(machine(), "COINS") << 2;
+		m_coin_latch = ioport("COINS")->read() << 2;
 		cputag_set_input_line(machine(), "game_cpu", M6809_FIRQ_LINE, HOLD_LINE);
 	}
 }

@@ -82,8 +82,8 @@ void microtouch_device::send_format_decimal_packet(int x, int y)
 
 void microtouch_device::send_touch_packet()
 {
-	int tx = input_port_read(*this, "TOUCH_X");
-	int ty = input_port_read(*this, "TOUCH_Y");
+	int tx = ioport("TOUCH_X")->read();
+	int ty = ioport("TOUCH_Y")->read();
 
 	if ( m_out_touch_cb == NULL ||
 		 m_out_touch_cb( &tx, &ty ) != 0 )
@@ -127,7 +127,7 @@ void microtouch_device::device_timer(emu_timer &timer, device_timer_id id, int p
 	}
 
 	// send format tablet packet
-	if ( input_port_read(*this, "TOUCH") & 0x01 )
+	if ( ioport("TOUCH")->read() & 0x01 )
 	{
 		send_touch_packet();
 	}

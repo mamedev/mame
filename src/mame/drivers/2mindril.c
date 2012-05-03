@@ -73,10 +73,10 @@ READ16_MEMBER(_2mindril_state::drill_io_r)
 
 	switch(offset)
 	{
-		case 0x0/2: return input_port_read(machine(), "DSW");
+		case 0x0/2: return ioport("DSW")->read();
 		case 0x2/2:
 		{
-			int arm_pwr = input_port_read(machine(), "IN0");//throw
+			int arm_pwr = ioport("IN0")->read();//throw
 			//popmessage("PC=%08x %02x",cpu_get_pc(&space.device()),arm_pwr);
 
 			if(arm_pwr > 0xe0) return ~0x1800;
@@ -86,7 +86,7 @@ READ16_MEMBER(_2mindril_state::drill_io_r)
 			else return ~0x0000;
 		}
 		case 0x4/2: return (m_defender_sensor) | (m_shutter_sensor);
-		case 0xe/2: return input_port_read(machine(), "IN2");//coins
+		case 0xe/2: return ioport("IN2")->read();//coins
 //      default:  printf("PC=%08x [%04x] -> %04x R\n", cpu_get_pc(&space.device()), offset * 2, m_iodata[offset]);
 	}
 

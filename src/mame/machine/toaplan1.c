@@ -187,7 +187,7 @@ READ16_MEMBER(toaplan1_state::samesame_port_6_word_r)
 {
 	/* Bit 0x80 is secondary CPU (HD647180) ready signal */
 	logerror("PC:%04x Warning !!! IO reading from $14000a\n",cpu_get_previouspc(&space.device()));
-	return (0x80 | input_port_read(machine(), "TJUMP")) & 0xff;
+	return (0x80 | ioport("TJUMP")->read()) & 0xff;
 }
 
 READ16_MEMBER(toaplan1_state::vimana_system_port_r)
@@ -203,9 +203,9 @@ READ16_MEMBER(toaplan1_state::vimana_system_port_r)
 	int data, p, r, d, slot, reg, dsw;
 
 	slot = -1;
-	d = input_port_read(machine(), "DSWA");
-	r = input_port_read(machine(), "TJUMP");
-	p = input_port_read(machine(), "SYSTEM");
+	d = ioport("DSWA")->read();
+	r = ioport("TJUMP")->read();
+	p = ioport("SYSTEM")->read();
 	m_vimana_latch ^= p;
 	data = (m_vimana_latch & p);
 

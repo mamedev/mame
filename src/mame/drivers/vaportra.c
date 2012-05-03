@@ -34,11 +34,11 @@ READ16_MEMBER(vaportra_state::vaportra_control_r)
 	switch (offset << 1)
 	{
 		case 4:
-			return input_port_read(machine(), "DSW");
+			return ioport("DSW")->read();
 		case 2:
-			return input_port_read(machine(), "COINS");
+			return ioport("COINS")->read();
 		case 0:
-			return input_port_read(machine(), "PLAYERS");
+			return ioport("PLAYERS")->read();
 	}
 
 	logerror("Unknown control read at %d\n",offset);
@@ -112,7 +112,7 @@ static INPUT_PORTS_START( vaportra )
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN3 )
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )

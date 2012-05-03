@@ -52,7 +52,7 @@ VIDEO_START( f1gp )
 
 	state->m_fg_tilemap->set_transparent_pen(0xff);
 
-	state->m_zoomdata = (UINT16 *)machine.root_device().memregion("gfx4")->base();
+	state->m_zoomdata = (UINT16 *)state->memregion("gfx4")->base();
 	gfx_element_set_source(machine.gfx[3], (UINT8 *)state->m_zoomdata);
 
 //  state->save_pointer(NAME(state->m_zoomdata), state->memregion("gfx4")->bytes());
@@ -68,7 +68,7 @@ VIDEO_START( f1gpb )
 
 	state->m_fg_tilemap->set_transparent_pen(0xff);
 
-	state->m_zoomdata = (UINT16 *)machine.root_device().memregion("gfx4")->base();
+	state->m_zoomdata = (UINT16 *)state->memregion("gfx4")->base();
 	gfx_element_set_source(machine.gfx[3], (UINT8 *)state->m_zoomdata);
 
 //  state->save_pointer(NAME(state->m_zoomdata), state->memregion("gfx4")->bytes());

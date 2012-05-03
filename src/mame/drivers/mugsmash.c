@@ -154,16 +154,16 @@ READ16_MEMBER(mugsmash_state::mugsmash_input_ports_r)
 	switch (offset)
 	{
 		case 0 :
-			data = (input_port_read(machine(), "P1") & 0xff) | ((input_port_read(machine(), "DSW1") & 0xc0) << 6) | ((input_port_read(machine(), "IN0") & 0x03) << 8);
+			data = (ioport("P1")->read() & 0xff) | ((ioport("DSW1")->read() & 0xc0) << 6) | ((ioport("IN0")->read() & 0x03) << 8);
 			break;
 		case 1 :
-			data = (input_port_read(machine(), "P2") & 0xff) | ((input_port_read(machine(), "DSW1") & 0x3f) << 8);
+			data = (ioport("P2")->read() & 0xff) | ((ioport("DSW1")->read() & 0x3f) << 8);
 			break;
 		case 2 :
-			data = ((input_port_read(machine(), "DSW2") & 0x3f) << 8);
+			data = ((ioport("DSW2")->read() & 0x3f) << 8);
 			break;
 		case 3 :
-			data = ((input_port_read(machine(), "DSW2") & 0xc0) << 2);
+			data = ((ioport("DSW2")->read() & 0xc0) << 2);
 			break;
 	}
 

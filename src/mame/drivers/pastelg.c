@@ -82,11 +82,11 @@ READ8_MEMBER(pastelg_state::threeds_inputport1_r)
 {
 	switch(m_mux_data)
 	{
-		case 0x01: return input_port_read(machine(),"KEY0_PL1");
-		case 0x02: return input_port_read(machine(),"KEY1_PL1");
-		case 0x04: return input_port_read(machine(),"KEY2_PL1");
-		case 0x08: return input_port_read(machine(),"KEY3_PL1");
-		case 0x10: return input_port_read(machine(),"KEY4_PL1");
+		case 0x01: return ioport("KEY0_PL1")->read();
+		case 0x02: return ioport("KEY1_PL1")->read();
+		case 0x04: return ioport("KEY2_PL1")->read();
+		case 0x08: return ioport("KEY3_PL1")->read();
+		case 0x10: return ioport("KEY4_PL1")->read();
 	}
 
 	return 0xff;
@@ -96,11 +96,11 @@ READ8_MEMBER(pastelg_state::threeds_inputport2_r)
 {
 	switch(m_mux_data)
 	{
-		case 0x01: return input_port_read(machine(),"KEY0_PL2");
-		case 0x02: return input_port_read(machine(),"KEY1_PL2");
-		case 0x04: return input_port_read(machine(),"KEY2_PL2");
-		case 0x08: return input_port_read(machine(),"KEY3_PL2");
-		case 0x10: return input_port_read(machine(),"KEY4_PL2");
+		case 0x01: return ioport("KEY0_PL2")->read();
+		case 0x02: return ioport("KEY1_PL2")->read();
+		case 0x04: return ioport("KEY2_PL2")->read();
+		case 0x08: return ioport("KEY3_PL2")->read();
+		case 0x10: return ioport("KEY4_PL2")->read();
 	}
 
 	return 0xff;

@@ -501,7 +501,7 @@ WRITE8_MEMBER(cntsteer_state::cntsteer_main_irq_w)
 READ8_MEMBER(cntsteer_state::cntsteer_adx_r)
 {
 	UINT8 res = 0, adx_val;
-	adx_val = input_port_read(machine(), "AN_STEERING");
+	adx_val = ioport("AN_STEERING")->read();
 
 	if (adx_val >= 0x70 && adx_val <= 0x90)
 		res = 0xff;
@@ -643,7 +643,7 @@ static INPUT_PORTS_START( zerotrgt )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x60, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
@@ -716,7 +716,7 @@ static INPUT_PORTS_START( cntsteer )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("DSW0")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW1:1,2")

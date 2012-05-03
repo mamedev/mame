@@ -25,7 +25,7 @@ static WRITE8_DEVICE_HANDLER(videopin_out2_w);
 static void update_plunger(running_machine &machine)
 {
 	videopin_state *state = machine.driver_data<videopin_state>();
-	UINT8 val = input_port_read(machine, "IN2");
+	UINT8 val = state->ioport("IN2")->read();
 
 	if (state->m_prev != val)
 	{
@@ -94,7 +94,7 @@ READ8_MEMBER(videopin_state::videopin_misc_r)
 	// signals received. This results in the MPU displaying the
 	// ball being shot onto the playfield at a certain speed.
 
-	UINT8 val = input_port_read(machine(), "IN1");
+	UINT8 val = ioport("IN1")->read();
 
 	if (plunger >= 0.000 && plunger <= 0.001)
 	{
@@ -258,7 +258,7 @@ static INPUT_PORTS_START( videopin )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Nudge") PORT_CODE(KEYCODE_SPACE)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("IN2")
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Ball Shooter") PORT_CODE(KEYCODE_DOWN)

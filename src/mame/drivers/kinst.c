@@ -338,7 +338,7 @@ READ32_MEMBER(kinst_state::kinst_control_r)
 	switch (offset)
 	{
 		case 2:		/* $90 -- sound return */
-			result = input_port_read(machine(), portnames[offset]);
+			result = ioport(portnames[offset])->read();
 			result &= ~0x0002;
 			if (dcs_control_r(machine()) & 0x800)
 				result |= 0x0002;
@@ -347,11 +347,11 @@ READ32_MEMBER(kinst_state::kinst_control_r)
 		case 0:		/* $80 */
 		case 1:		/* $88 */
 		case 3:		/* $98 */
-			result = input_port_read(machine(), portnames[offset]);
+			result = ioport(portnames[offset])->read();
 			break;
 
 		case 4:		/* $a0 */
-			result = input_port_read(machine(), portnames[offset]);
+			result = ioport(portnames[offset])->read();
 			if (cpu_get_pc(&space.device()) == 0x802d428)
 				device_spin_until_interrupt(&space.device());
 			break;

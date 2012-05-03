@@ -103,7 +103,7 @@ static INPUT_PORTS_START( simpl156 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE_NO_TOGGLE( 0x0008, IP_ACTIVE_LOW )
-	PORT_BIT( 0x00f0, IP_ACTIVE_HIGH, IPT_VBLANK ) // all bits? check..
+	PORT_BIT( 0x00f0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen") // all bits? check..
 	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_SPECIAL ) // eeprom?..
 
 
@@ -130,7 +130,7 @@ INPUT_PORTS_END
 READ32_MEMBER(simpl156_state::simpl156_inputs_read)
 {
 	int eep = m_eeprom->read_bit();
-	UINT32 returndata = input_port_read(machine(), "IN0") ^ 0xffff0000;
+	UINT32 returndata = ioport("IN0")->read() ^ 0xffff0000;
 
 	returndata ^= ((eep << 8));
 	return returndata;
@@ -161,7 +161,7 @@ READ32_MEMBER(simpl156_state::simpl156_system_r)
 {
 	UINT32 returndata;
 
-	returndata = input_port_read(machine(), "IN1");
+	returndata = ioport("IN1")->read();
 
 	return returndata;
 }

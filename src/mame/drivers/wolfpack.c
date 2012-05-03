@@ -33,7 +33,7 @@ static MACHINE_RESET( wolfpack )
 CUSTOM_INPUT_MEMBER(wolfpack_state::wolfpack_dial_r)
 {
 	int bit = (FPTR)param;
-	return ((input_port_read(machine(), "DIAL") + bit) / 2) & 0x01;
+	return ((ioport("DIAL")->read() + bit) / 2) & 0x01;
 }
 
 

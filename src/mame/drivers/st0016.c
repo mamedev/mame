@@ -45,18 +45,18 @@ READ8_MEMBER(st0016_state::mux_r)
         xxxx - input port #2
     xxxx     - dip switches (2x8 bits) (multiplexed)
 */
-	int retval = input_port_read(machine(), "SYSTEM") & 0x0f;
+	int retval = ioport("SYSTEM")->read() & 0x0f;
 
 	switch(mux_port & 0x30)
 	{
-		case 0x00: retval |= ((input_port_read(machine(), "DSW1") & 1) << 4) | ((input_port_read(machine(), "DSW1") & 0x10) << 1)
-								| ((input_port_read(machine(), "DSW2") & 1) << 6) | ((input_port_read(machine(), "DSW2") & 0x10) <<3); break;
-		case 0x10: retval |= ((input_port_read(machine(), "DSW1") & 2) << 3) | ((input_port_read(machine(), "DSW1") & 0x20)   )
-								| ((input_port_read(machine(), "DSW2") & 2) << 5) | ((input_port_read(machine(), "DSW2") & 0x20) <<2); break;
-		case 0x20: retval |= ((input_port_read(machine(), "DSW1") & 4) << 2) | ((input_port_read(machine(), "DSW1") & 0x40) >> 1)
-								| ((input_port_read(machine(), "DSW2") & 4) << 4) | ((input_port_read(machine(), "DSW2") & 0x40) <<1); break;
-		case 0x30: retval |= ((input_port_read(machine(), "DSW1") & 8) << 1) | ((input_port_read(machine(), "DSW1") & 0x80) >> 2)
-								| ((input_port_read(machine(), "DSW2") & 8) << 3) | ((input_port_read(machine(), "DSW2") & 0x80)    ); break;
+		case 0x00: retval |= ((ioport("DSW1")->read() & 1) << 4) | ((ioport("DSW1")->read() & 0x10) << 1)
+								| ((ioport("DSW2")->read() & 1) << 6) | ((ioport("DSW2")->read() & 0x10) <<3); break;
+		case 0x10: retval |= ((ioport("DSW1")->read() & 2) << 3) | ((ioport("DSW1")->read() & 0x20)   )
+								| ((ioport("DSW2")->read() & 2) << 5) | ((ioport("DSW2")->read() & 0x20) <<2); break;
+		case 0x20: retval |= ((ioport("DSW1")->read() & 4) << 2) | ((ioport("DSW1")->read() & 0x40) >> 1)
+								| ((ioport("DSW2")->read() & 4) << 4) | ((ioport("DSW2")->read() & 0x40) <<1); break;
+		case 0x30: retval |= ((ioport("DSW1")->read() & 8) << 1) | ((ioport("DSW1")->read() & 0x80) >> 2)
+								| ((ioport("DSW2")->read() & 8) << 3) | ((ioport("DSW2")->read() & 0x80)    ); break;
 	}
 
 	return retval;

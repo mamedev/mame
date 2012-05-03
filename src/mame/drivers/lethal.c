@@ -174,8 +174,8 @@ maybe some sprite placement issues
 static const char *const gunnames[] = { "LIGHT0_X", "LIGHT0_Y", "LIGHT1_X", "LIGHT1_Y" };
 
 /* a = 1, 2 = player # */
-#define GUNX( a ) (( ( input_port_read(machine(), gunnames[2 * (a - 1)]) * 287 ) / 0xff ) + 16)
-#define GUNY( a ) (( ( input_port_read(machine(), gunnames[2 * (a - 1) + 1]) * 223 ) / 0xff ) + 10)
+#define GUNX( a ) (( ( ioport(gunnames[2 * (a - 1)])->read() * 287 ) / 0xff ) + 16)
+#define GUNY( a ) (( ( ioport(gunnames[2 * (a - 1) + 1])->read() * 223 ) / 0xff ) + 10)
 
 static const eeprom_interface eeprom_intf =
 {
@@ -200,7 +200,7 @@ WRITE8_MEMBER(lethal_state::control2_w)
 
 	m_cur_control2 = data;
 
-	input_port_write(machine(), "EEPROMOUT", m_cur_control2, 0xff);
+	ioport("EEPROMOUT")->write(m_cur_control2, 0xff);
 }
 
 static INTERRUPT_GEN(lethalen_interrupt)

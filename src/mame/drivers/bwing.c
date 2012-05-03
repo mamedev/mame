@@ -67,11 +67,11 @@ WRITE8_MEMBER(bwing_state::bwp3_nmiack_w)
 READ8_MEMBER(bwing_state::bwp1_io_r)
 {
 
-	if (offset == 0) return(input_port_read(machine(), "DSW0"));
-	if (offset == 1) return(input_port_read(machine(), "DSW1"));
-	if (offset == 2) return(input_port_read(machine(), "IN0"));
-	if (offset == 3) return(input_port_read(machine(), "IN1"));
-	if (offset == 4) return(input_port_read(machine(), "IN2"));
+	if (offset == 0) return(ioport("DSW0")->read());
+	if (offset == 1) return(ioport("DSW1")->read());
+	if (offset == 2) return(ioport("IN0")->read());
+	if (offset == 3) return(ioport("IN1")->read());
+	if (offset == 4) return(ioport("IN2")->read());
 
 	return((m_bwp123_membase[0])[0x1b00 + offset]);
 }
@@ -279,13 +279,13 @@ static INPUT_PORTS_START( bwing )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("IN3")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_TILT ) PORT_CHANGED_MEMBER(DEVICE_SELF, bwing_state,tilt_pressed,0)
 
 	PORT_START("VBLANK")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("EXTRA") // a matter of taste
 	PORT_DIPNAME( 0x07, 0x00, "RGB" )
@@ -586,8 +586,8 @@ static DRIVER_INIT( bwing )
 {
 	bwing_state *state = machine.driver_data<bwing_state>();
 
-	state->m_bwp123_membase[0] = machine.root_device().memregion("maincpu")->base();
-	state->m_bwp123_membase[1] = machine.root_device().memregion("sub")->base();
+	state->m_bwp123_membase[0] = state->memregion("maincpu")->base();
+	state->m_bwp123_membase[1] = state->memregion("sub")->base();
 	state->m_bwp123_membase[2] = state->memregion("audiocpu")->base();
 
 	fix_bwp3(machine);

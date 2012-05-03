@@ -248,8 +248,8 @@ WRITE16_MEMBER(gaelco2_state::wrally2_adc_cs)
 	{
 		if (!(data & 0xff))
 		{
-			m_analog_ports[0] = input_port_read_safe(machine(), "ANALOG0", 0);
-			m_analog_ports[1] = input_port_read_safe(machine(), "ANALOG1", 0);
+			m_analog_ports[0] = ioport("ANALOG0")->read_safe(0);
+			m_analog_ports[1] = ioport("ANALOG1")->read_safe(0);
 		}
 	}
 	else

@@ -58,12 +58,12 @@ READ8_MEMBER(saturn_state::stv_ioga_r)
 
 	switch(offset)
 	{
-		case 0x01: res = input_port_read(machine(), "PORTA"); break; // P1
-		case 0x03: res = input_port_read(machine(), "PORTB"); break; // P2
-		case 0x05: res = input_port_read(machine(), "PORTC"); break; // SYSTEM
+		case 0x01: res = ioport("PORTA")->read(); break; // P1
+		case 0x03: res = ioport("PORTB")->read(); break; // P2
+		case 0x05: res = ioport("PORTC")->read(); break; // SYSTEM
 		case 0x07: res = m_system_output | 0xf0; break; // port D, read-backs value written
-		case 0x09: res = input_port_read(machine(), "PORTE"); break; // P3
-		case 0x0b: res = input_port_read(machine(), "PORTF"); break; // P4
+		case 0x09: res = ioport("PORTE")->read(); break; // P3
+		case 0x0b: res = ioport("PORTF")->read(); break; // P4
 		case 0x1b: res = 0; break; // Serial COM READ status
 	}
 
@@ -101,9 +101,9 @@ READ8_MEMBER(saturn_state::critcrsh_ioga_r)
 	{
 		case 0x01:
 		case 0x03:
-			res = input_port_read(machine(), lgnames[offset >> 1]);
+			res = ioport(lgnames[offset >> 1])->read();
 			res = BITSWAP8(res, 2, 3, 0, 1, 6, 7, 5, 4) & 0xf3;
-			res |= (input_port_read(machine(), "PORTC") & 0x10) ? 0x0 : 0x4; // x/y hit latch actually
+			res |= (ioport("PORTC")->read() & 0x10) ? 0x0 : 0x4; // x/y hit latch actually
 			break;
 		default: res = stv_ioga_r(space,offset); break;
 	}
@@ -169,7 +169,7 @@ READ8_MEMBER(saturn_state::stvmp_ioga_r)
 				for(i=0;i<5;i++)
 				{
 					if(m_mux_data & 1 << i)
-						res = input_port_read(machine(), mpnames[offset >> 1][i]);
+						res = ioport(mpnames[offset >> 1][i])->read();
 				}
 			}
 			break;

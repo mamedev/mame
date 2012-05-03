@@ -281,7 +281,7 @@ static READ16_HANDLER( aladmdb_r )
 	md_boot_state *state = space->machine().driver_data<md_boot_state>();
 	if (cpu_get_pc(&space->device())==0x1b2a56)
 	{
-		state->m_aladmdb_mcu_port = input_port_read(space->machine(), "MCU");
+		state->m_aladmdb_mcu_port = state->ioport("MCU")->read();
 
 		if (state->m_aladmdb_mcu_port & 0x100)
 			return ((state->m_aladmdb_mcu_port & 0x0f) | 0x100); // coin inserted, calculate the number of coins
@@ -289,7 +289,7 @@ static READ16_HANDLER( aladmdb_r )
 			return (0x100); //MCU status, needed if you fall into a pitfall
 	}
 	if (cpu_get_pc(&space->device())==0x1b2a72) return 0x0000;
-	if (cpu_get_pc(&space->device())==0x1b2d24) return (input_port_read(space->machine(), "MCU") & 0x00f0) | 0x1200;    // difficulty
+	if (cpu_get_pc(&space->device())==0x1b2d24) return (space->machine().root_device().ioport("MCU")->read() & 0x00f0) | 0x1200;    // difficulty
 	if (cpu_get_pc(&space->device())==0x1b2d4e) return 0x0000;
 
 	logerror("aladbl_r : %06x\n",cpu_get_pc(&space->device()));
@@ -300,19 +300,19 @@ static READ16_HANDLER( aladmdb_r )
 static READ16_HANDLER( mk3mdb_dsw_r )
 {
 	static const char *const dswname[3] = { "DSWA", "DSWB", "DSWC" };
-	return input_port_read(space->machine(), dswname[offset]);
+	return space->machine().root_device().ioport(dswname[offset])->read();
 }
 
 static READ16_HANDLER( ssf2mdb_dsw_r )
 {
 	static const char *const dswname[3] = { "DSWA", "DSWB", "DSWC" };
-	return input_port_read(space->machine(), dswname[offset]);
+	return space->machine().root_device().ioport(dswname[offset])->read();
 }
 
 static READ16_HANDLER( srmdb_dsw_r )
 {
 	static const char *const dswname[3] = { "DSWA", "DSWB", "DSWC" };
-	return input_port_read(space->machine(), dswname[offset]);
+	return space->machine().root_device().ioport(dswname[offset])->read();
 }
 
 static READ16_HANDLER( topshoot_200051_r )

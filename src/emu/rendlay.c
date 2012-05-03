@@ -2208,9 +2208,13 @@ int layout_view::item::state() const
 	// if configured to an input, fetch the input value
 	else if (m_input_tag[0] != 0)
 	{
-		const input_field_config *field = input_field_by_tag_and_mask(m_element->machine(), m_input_tag, m_input_mask);
-		if (field != NULL)
-			state = ((input_port_read_safe(m_element->machine(), m_input_tag, 0) ^ field->defvalue) & m_input_mask) ? 1 : 0;
+		ioport_port *port = m_element->machine().root_device().ioport(m_input_tag);
+		if (port != NULL)
+		{
+			ioport_field *field = port->field(m_input_mask);
+			if (field != NULL)
+				state = ((port->read() ^ field->defvalue()) & m_input_mask) ? 1 : 0;
+		}
 	}
 	return state;
 }

@@ -1277,10 +1277,10 @@ static void model3_init(running_machine &machine, int step)
 	state->m_sound_irq_enable = 0;
 	state->m_sound_timer->adjust(attotime::never);
 
-	state->membank("bank1")->set_base(machine.root_device().memregion( "user1" )->base() + 0x800000 ); /* banked CROM */
+	state->membank("bank1")->set_base(state->memregion( "user1" )->base() + 0x800000 ); /* banked CROM */
 
-	state->membank("bank4")->set_base(machine.root_device().memregion("samples")->base() + 0x200000);
-	state->membank("bank5")->set_base(machine.root_device().memregion("samples")->base() + 0x600000);
+	state->membank("bank4")->set_base(state->memregion("samples")->base() + 0x200000);
+	state->membank("bank5")->set_base(state->memregion("samples")->base() + 0x600000);
 
 	// copy the 68k vector table into RAM
 	memcpy(state->m_soundram, state->memregion("audiocpu")->base()+0x80000, 16);
@@ -1337,11 +1337,11 @@ READ64_MEMBER(model3_state::model3_ctrl_r)
 			{
 				if(m_controls_bank & 0x1)
 				{
-					return (input_port_read(machine(), "IN1")) << 24;
+					return (ioport("IN1")->read()) << 24;
 				}
 				else
 				{
-					return (input_port_read(machine(), "IN0")) << 24;
+					return (ioport("IN0")->read()) << 24;
 				}
 			}
 			break;
@@ -1349,11 +1349,11 @@ READ64_MEMBER(model3_state::model3_ctrl_r)
 		case 1:
 			if (ACCESSING_BITS_56_63)
 			{
-				return (UINT64)input_port_read(machine(), "IN2") << 56;
+				return (UINT64)ioport("IN2")->read() << 56;
 			}
 			else if (ACCESSING_BITS_24_31)
 			{
-				return input_port_read(machine(), "IN3") << 24;
+				return ioport("IN3")->read() << 24;
 			}
 			break;
 
@@ -1388,7 +1388,7 @@ READ64_MEMBER(model3_state::model3_ctrl_r)
 			if (ACCESSING_BITS_24_31)		/* ADC Data read */
 			{
 				static const char *const adcnames[] = { "AN0", "AN1", "AN2", "AN3", "AN4", "AN5", "AN6", "AN7" };
-				UINT8 adc_data = input_port_read_safe(machine(), adcnames[m_adc_channel], 0);
+				UINT8 adc_data = ioport(adcnames[m_adc_channel])->read_safe(0);
 				m_adc_channel++;
 				m_adc_channel &= 0x7;
 				return (UINT64)adc_data << 24;
@@ -1441,32 +1441,32 @@ WRITE64_MEMBER(model3_state::model3_ctrl_w)
 						switch(m_lightgun_reg_sel)		/* read lightrun register */
 						{
 							case 0:		/* player 1 gun X-position, lower 8-bits */
-								m_serial_fifo2 = input_port_read(machine(), "LIGHT0_Y") & 0xff;
+								m_serial_fifo2 = ioport("LIGHT0_Y")->read() & 0xff;
 								break;
 							case 1:		/* player 1 gun X-position, upper 2-bits */
-								m_serial_fifo2 = (input_port_read(machine(), "LIGHT0_Y") >> 8) & 0x3;
+								m_serial_fifo2 = (ioport("LIGHT0_Y")->read() >> 8) & 0x3;
 								break;
 							case 2:		/* player 1 gun Y-position, lower 8-bits */
-								m_serial_fifo2 = input_port_read(machine(), "LIGHT0_X") & 0xff;
+								m_serial_fifo2 = ioport("LIGHT0_X")->read() & 0xff;
 								break;
 							case 3:		/* player 1 gun Y-position, upper 2-bits */
-								m_serial_fifo2 = (input_port_read(machine(), "LIGHT0_X") >> 8) & 0x3;
+								m_serial_fifo2 = (ioport("LIGHT0_X")->read() >> 8) & 0x3;
 								break;
 							case 4:		/* player 2 gun X-position, lower 8-bits */
-								m_serial_fifo2 = input_port_read(machine(), "LIGHT1_Y") & 0xff;
+								m_serial_fifo2 = ioport("LIGHT1_Y")->read() & 0xff;
 								break;
 							case 5:		/* player 2 gun X-position, upper 2-bits */
-								m_serial_fifo2 = (input_port_read(machine(), "LIGHT1_Y") >> 8) & 0x3;
+								m_serial_fifo2 = (ioport("LIGHT1_Y")->read() >> 8) & 0x3;
 								break;
 							case 6:		/* player 2 gun Y-position, lower 8-bits */
-								m_serial_fifo2 = input_port_read(machine(), "LIGHT1_X") & 0xff;
+								m_serial_fifo2 = ioport("LIGHT1_X")->read() & 0xff;
 								break;
 							case 7:		/* player 2 gun Y-position, upper 2-bits */
-								m_serial_fifo2 = (input_port_read(machine(), "LIGHT1_X") >> 8) & 0x3;
+								m_serial_fifo2 = (ioport("LIGHT1_X")->read() >> 8) & 0x3;
 								break;
 							case 8:		/* gun offscreen (bit set = gun offscreen, bit clear = gun on screen) */
 								m_serial_fifo2 = 0;	/* bit 0 = player 1, bit 1 = player 2 */
-								if(input_port_read(machine(), "OFFSCREEN") & 0x1) {
+								if(ioport("OFFSCREEN")->read() & 0x1) {
 									m_serial_fifo2 |= 0x01;
 								}
 								break;
@@ -5302,8 +5302,8 @@ static void interleave_vroms(running_machine &machine)
 	model3_state *state = machine.driver_data<model3_state>();
 	int start;
 	int i,j,x;
-	UINT16 *vrom1 = (UINT16*)machine.root_device().memregion("user3")->base();
-	UINT16 *vrom2 = (UINT16*)machine.root_device().memregion("user4")->base();
+	UINT16 *vrom1 = (UINT16*)state->memregion("user3")->base();
+	UINT16 *vrom2 = (UINT16*)state->memregion("user4")->base();
 	int vrom_length = state->memregion("user3")->bytes();
 	UINT16 *vrom;
 

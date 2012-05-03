@@ -257,7 +257,7 @@ static SCREEN_UPDATE_IND16( mystston )
 {
 	mystston_state *state = screen.machine().driver_data<mystston_state>();
 
-	int flip = (*state->m_video_control & 0x80) ^ ((input_port_read(screen.machine(), "DSW1") & 0x20) << 2);
+	int flip = (*state->m_video_control & 0x80) ^ ((screen.machine().root_device().ioport("DSW1")->read() & 0x20) << 2);
 
 	set_palette(screen.machine(), state);
 

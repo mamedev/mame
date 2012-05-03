@@ -177,16 +177,16 @@ static READ32_DEVICE_HANDLER( backfire_eeprom_r )
 	/* some kind of screen indicator?  checked by backfirea set before it will boot */
 	int backfire_screen = device->machine().rand() & 1;
 	eeprom_device *eeprom = downcast<eeprom_device *>(device);
-	return ((eeprom->read_bit() << 24) | input_port_read(device->machine(), "IN0")
-			| ((input_port_read(device->machine(), "IN2") & 0xbf) << 16)
-			| ((input_port_read(device->machine(), "IN3") & 0x40) << 16)) ^ (backfire_screen << 26) ;
+	return ((eeprom->read_bit() << 24) | device->machine().root_device().ioport("IN0")->read()
+			| ((device->machine().root_device().ioport("IN2")->read() & 0xbf) << 16)
+			| ((device->machine().root_device().ioport("IN3")->read() & 0x40) << 16)) ^ (backfire_screen << 26) ;
 }
 
 READ32_MEMBER(backfire_state::backfire_control2_r)
 {
 
 //  logerror("%08x:Read eprom %08x (%08x)\n", cpu_get_pc(&space.device()), offset << 1, mem_mask);
-	return (m_eeprom->read_bit() << 24) | input_port_read(machine(), "IN1") | (input_port_read(machine(), "IN1") << 16);
+	return (m_eeprom->read_bit() << 24) | ioport("IN1")->read() | (ioport("IN1")->read() << 16);
 }
 
 #ifdef UNUSED_FUNCTION
@@ -194,7 +194,7 @@ READ32_MEMBER(backfire_state::backfire_control3_r)
 {
 
 //  logerror("%08x:Read eprom %08x (%08x)\n", cpu_get_pc(&space.device()), offset << 1, mem_mask);
-	return (m_eeprom->read_bit() << 24) | input_port_read(machine(), "IN2") | (input_port_read(machine(), "IN2") << 16);
+	return (m_eeprom->read_bit() << 24) | ioport("IN2")->read() | (ioport("IN2")->read() << 16);
 }
 #endif
 
@@ -233,7 +233,7 @@ WRITE32_MEMBER(backfire_state::backfire_pf4_rowscroll_w){ data &= 0x0000ffff; me
 #ifdef UNUSED_FUNCTION
 READ32_MEMBER(backfire_state::backfire_unknown_wheel_r)
 {
-	return input_port_read(machine(), "PADDLE0");
+	return ioport("PADDLE0")->read();
 }
 
 READ32_MEMBER(backfire_state::backfire_wheel1_r)
@@ -339,7 +339,7 @@ static INPUT_PORTS_START( backfire )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE_NO_TOGGLE( 0x0008, IP_ACTIVE_LOW )
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNUSED ) /* 'soundmask' */
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -354,7 +354,7 @@ static INPUT_PORTS_START( backfire )
 
 	PORT_START("IN3")
 	PORT_BIT( 0x003f, IP_ACTIVE_LOW, IPT_UNUSED ) /* all other bits like low IN2 */
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("PADDLE0")

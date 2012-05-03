@@ -32,7 +32,7 @@ INPUT_CHANGED_MEMBER(cchasm_state::cchasm_set_coin_flag )
 
 READ8_MEMBER(cchasm_state::cchasm_coin_sound_r)
 {
-	UINT8 coin = (input_port_read(machine(), "IN3") >> 4) & 0x7;
+	UINT8 coin = (ioport("IN3")->read() >> 4) & 0x7;
 	return m_sound_flags | (m_coin_flag << 3) | coin;
 }
 
@@ -85,11 +85,11 @@ READ16_MEMBER(cchasm_state::cchasm_io_r)
 		m_sound_flags &= ~0x40;
 		return soundlatch4_byte_r(space,offset) << 8;
 	case 0x2:
-		return (m_sound_flags| (input_port_read(machine(), "IN3") & 0x07) | 0x08) << 8;
+		return (m_sound_flags| (ioport("IN3")->read() & 0x07) | 0x08) << 8;
 	case 0x5:
-		return input_port_read(machine(), "IN2") << 8;
+		return ioport("IN2")->read() << 8;
 	case 0x8:
-		return input_port_read(machine(), "IN1") << 8;
+		return ioport("IN1")->read() << 8;
 	default:
 		return 0xff << 8;
 	}

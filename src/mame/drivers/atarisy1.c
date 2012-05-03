@@ -268,15 +268,15 @@ READ16_MEMBER(atarisy1_state::joystick_r)
 
 	/* digital joystick type */
 	if (m_joystick_type == 1)
-		newval = (input_port_read(machine(), "IN0") & (0x80 >> offset)) ? 0xf0 : 0x00;
+		newval = (ioport("IN0")->read() & (0x80 >> offset)) ? 0xf0 : 0x00;
 
 	/* Hall-effect analog joystick */
 	else if (m_joystick_type == 2)
-		newval = input_port_read(machine(), portnames[offset & 1]);
+		newval = ioport(portnames[offset & 1])->read();
 
 	/* Road Blasters gas pedal */
 	else if (m_joystick_type == 3)
-		newval = input_port_read(machine(), "IN1");
+		newval = ioport("IN1")->read();
 
 	/* the A4 bit enables/disables joystick IRQs */
 	m_joystick_int_enable = ((offset >> 3) & 1) ^ 1;
@@ -321,13 +321,13 @@ READ16_MEMBER(atarisy1_state::trakball_r)
 
 			if (player == 0)
 			{
-				posx = (INT8)input_port_read(machine(), "IN0");
-				posy = (INT8)input_port_read(machine(), "IN1");
+				posx = (INT8)ioport("IN0")->read();
+				posy = (INT8)ioport("IN1")->read();
 			}
 			else
 			{
-				posx = (INT8)input_port_read(machine(), "IN2");
-				posy = (INT8)input_port_read(machine(), "IN3");
+				posx = (INT8)ioport("IN2")->read();
+				posy = (INT8)ioport("IN3")->read();
 			}
 
 			m_cur[player][0] = posx + posy;
@@ -339,7 +339,7 @@ READ16_MEMBER(atarisy1_state::trakball_r)
 
 	/* Road Blasters steering wheel */
 	else if (m_trackball_type == 2)
-		result = input_port_read(machine(), "IN0");
+		result = ioport("IN0")->read();
 
 	return result;
 }
@@ -354,7 +354,7 @@ READ16_MEMBER(atarisy1_state::trakball_r)
 
 READ16_MEMBER(atarisy1_state::port4_r)
 {
-	int temp = input_port_read(machine(), "F60000");
+	int temp = ioport("F60000")->read();
 	if (m_cpu_to_sound_ready) temp ^= 0x0080;
 	return temp;
 }
@@ -369,11 +369,11 @@ READ16_MEMBER(atarisy1_state::port4_r)
 
 READ8_MEMBER(atarisy1_state::switch_6502_r)
 {
-	int temp = input_port_read(machine(), "1820");
+	int temp = ioport("1820")->read();
 
 	if (m_cpu_to_sound_ready) temp ^= 0x08;
 	if (m_sound_to_cpu_ready) temp ^= 0x10;
-	if (!(input_port_read(machine(), "F60000") & 0x0040)) temp ^= 0x80;
+	if (!(ioport("F60000")->read() & 0x0040)) temp ^= 0x80;
 
 	return temp;
 }
@@ -534,7 +534,7 @@ static INPUT_PORTS_START( marble )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_VBLANK )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_SERVICE( 0x0040, IP_ACTIVE_LOW )
 	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL )
@@ -573,7 +573,7 @@ static INPUT_PORTS_START( peterpak )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_START2 ) PORT_NAME("Right Throw/P2 Start")
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Jump")
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_VBLANK )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_SERVICE( 0x0040, IP_ACTIVE_LOW )
 	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL )
@@ -612,7 +612,7 @@ static INPUT_PORTS_START( indytemp )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_START2 ) PORT_NAME("Right Whip/P2 Start")
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* freeze? */
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_VBLANK )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_SERVICE( 0x0040, IP_ACTIVE_LOW )
 	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL )
@@ -659,7 +659,7 @@ static INPUT_PORTS_START( roadrunn )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_START2 ) PORT_NAME("Right Hop/P2 Start")
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Unused Button 1")
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Unused Button 2")
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_VBLANK )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_SERVICE( 0x0040, IP_ACTIVE_LOW )
 	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL )
@@ -694,7 +694,7 @@ static INPUT_PORTS_START( roadblst )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Lasers")
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_VBLANK )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_SERVICE( 0x0040, IP_ACTIVE_LOW )
 	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL )

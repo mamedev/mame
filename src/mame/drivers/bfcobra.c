@@ -914,7 +914,7 @@ READ8_MEMBER(bfcobra_state::chipset_r)
 		}
 		case 0x22:
 		{
-			val = 0x40 | input_port_read(machine(), "JOYSTICK");
+			val = 0x40 | ioport("JOYSTICK")->read();
 			break;
 		}
 		default:
@@ -1433,7 +1433,7 @@ WRITE8_MEMBER(bfcobra_state::latch_w)
 
 				/* Clock is low */
 				if (!(data & 0x08))
-					m_mux_input = input_port_read(machine(), port[input_strobe]);
+					m_mux_input = ioport(port[input_strobe])->read();
 			}
 			break;
 		}

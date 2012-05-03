@@ -15,18 +15,18 @@ driver by Nicola Salmoria
 
 READ8_MEMBER(shisen_state::sichuan2_dsw1_r)
 {
-	int ret = input_port_read(machine(), "DSW1");
+	int ret = ioport("DSW1")->read();
 
 	/* Based on the coin mode fill in the upper bits */
-	if (input_port_read(machine(), "DSW2") & 0x04)
+	if (ioport("DSW2")->read() & 0x04)
 	{
 		/* Mode 1 */
-		ret	|= (input_port_read(machine(), "DSW1") << 4);
+		ret	|= (ioport("DSW1")->read() << 4);
 	}
 	else
 	{
 		/* Mode 2 */
-		ret	|= (input_port_read(machine(), "DSW1") & 0xf0);
+		ret	|= (ioport("DSW1")->read() & 0xf0);
 	}
 
 	return ret;
@@ -117,7 +117,7 @@ static INPUT_PORTS_START( shisen )
 	PORT_DIPSETTING(    0x08, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coinage ) ) PORT_CONDITION("DSW2",0x04,PORTCOND_EQUALS,0x04) PORT_DIPLOCATION("SW1:5,6,7,8")
+	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coinage ) ) PORT_CONDITION("DSW2",0x04,EQUALS,0x04) PORT_DIPLOCATION("SW1:5,6,7,8")
 	PORT_DIPSETTING(    0xa0, DEF_STR( 6C_1C ) )
 	PORT_DIPSETTING(    0xb0, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0xc0, DEF_STR( 4C_1C ) )
@@ -134,12 +134,12 @@ static INPUT_PORTS_START( shisen )
 	PORT_DIPSETTING(    0x60, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0x50, DEF_STR( 1C_6C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) ) PORT_CONDITION("DSW2",0x04,PORTCOND_NOTEQUALS,0x04) PORT_DIPLOCATION("SW1:5,6")
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) ) PORT_CONDITION("DSW2",0x04,NOTEQUALS,0x04) PORT_DIPLOCATION("SW1:5,6")
 	PORT_DIPSETTING(    0x00, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) )
-	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Coin_B ) ) PORT_CONDITION("DSW2",0x04,PORTCOND_NOTEQUALS,0x04) PORT_DIPLOCATION("SW1:7,8")
+	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Coin_B ) ) PORT_CONDITION("DSW2",0x04,NOTEQUALS,0x04) PORT_DIPLOCATION("SW1:7,8")
 	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( 1C_5C ) )

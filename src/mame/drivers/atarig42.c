@@ -72,7 +72,7 @@ static MACHINE_RESET( atarig42 )
 
 READ16_MEMBER(atarig42_state::special_port2_r)
 {
-	int temp = input_port_read(machine(), "IN2");
+	int temp = ioport("IN2")->read();
 	if (m_cpu_to_sound_ready) temp ^= 0x0020;
 	if (m_sound_to_cpu_ready) temp ^= 0x0010;
 	temp ^= 0x0008;		/* A2D.EOC always high for now */
@@ -84,7 +84,7 @@ WRITE16_MEMBER(atarig42_state::a2d_select_w)
 {
 	static const char *const portnames[] = { "A2D0", "A2D1" };
 
-	m_analog_data = input_port_read(machine(), portnames[offset != 0]);
+	m_analog_data = ioport(portnames[offset != 0])->read();
 }
 
 
@@ -386,7 +386,7 @@ static INPUT_PORTS_START( roadriot )
 	PORT_START("IN2")		/* e00010 */
 	PORT_BIT( 0x003f, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_SERVICE( 0x0040, IP_ACTIVE_LOW )
-	PORT_BIT(  0x0080, IP_ACTIVE_LOW, IPT_VBLANK )
+	PORT_BIT(  0x0080, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_INCLUDE( atarijsa_iii )		/* audio board port */
@@ -437,7 +437,7 @@ static INPUT_PORTS_START( guardian )
 	PORT_START("IN2")		/* e00010 */
 	PORT_BIT( 0x003f, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_SERVICE( 0x0040, IP_ACTIVE_LOW )
-	PORT_BIT(  0x0080, IP_ACTIVE_LOW, IPT_VBLANK )
+	PORT_BIT(  0x0080, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_INCLUDE( atarijsa_iii )		/* audio board port */

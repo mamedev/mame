@@ -204,9 +204,9 @@ READ8_MEMBER(irobot_state::irobot_control_r)
 {
 
 	if (m_control_num == 0)
-		return input_port_read(machine(), "AN0");
+		return ioport("AN0")->read();
 	else if (m_control_num == 1)
-		return input_port_read(machine(), "AN1");
+		return ioport("AN1")->read();
 	return 0;
 
 }

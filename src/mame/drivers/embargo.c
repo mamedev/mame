@@ -72,7 +72,7 @@ static SCREEN_UPDATE_RGB32( embargo )
 
 READ8_MEMBER(embargo_state::input_port_bit_r)
 {
-	return (input_port_read(machine(), "IN1") << (7 - m_input_select)) & 0x80;
+	return (ioport("IN1")->read() << (7 - m_input_select)) & 0x80;
 }
 
 
@@ -97,14 +97,14 @@ READ8_MEMBER(embargo_state::dial_r)
 
 	if (m_dial_enable_1 && !m_dial_enable_2)
 	{
-		lo = input_port_read(machine(), "DIAL0");
-		hi = input_port_read(machine(), "DIAL1");
+		lo = ioport("DIAL0")->read();
+		hi = ioport("DIAL1")->read();
 	}
 
 	if (m_dial_enable_2 && !m_dial_enable_1)
 	{
-		lo = input_port_read(machine(), "DIAL2");
-		hi = input_port_read(machine(), "DIAL3");
+		lo = ioport("DIAL2")->read();
+		hi = ioport("DIAL3")->read();
 	}
 
 	lo = 12 * lo / 256;

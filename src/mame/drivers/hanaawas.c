@@ -38,13 +38,13 @@ READ8_MEMBER(hanaawas_state::hanaawas_input_port_0_r)
 	switch (m_mux)
 	{
 	case 1: /* start buttons */
-		buttons = input_port_read(machine(), "START");
+		buttons = ioport("START")->read();
 		break;
 	case 2: /* player 1 buttons */
-		buttons = input_port_read(machine(), "P1");
+		buttons = ioport("P1")->read();
 		break;
 	case 4: /* player 2 buttons */
-		buttons = input_port_read(machine(), "P2");
+		buttons = ioport("P2")->read();
 		break;
 	}
 
@@ -60,7 +60,7 @@ READ8_MEMBER(hanaawas_state::hanaawas_input_port_0_r)
 		}
 	}
 
-	return (input_port_read(machine(), "IN0") & 0xf0) | ordinal;
+	return (ioport("IN0")->read() & 0xf0) | ordinal;
 }
 
 WRITE8_MEMBER(hanaawas_state::hanaawas_inputs_mux_w)

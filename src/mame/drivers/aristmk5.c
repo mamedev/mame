@@ -392,13 +392,13 @@ static MACHINE_RESET( aristmk5 )
 
 	/* load the roms according to what the operator wants */
 	{
-		UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
+		UINT8 *ROM = state->memregion("maincpu")->base();
 		UINT8 *PRG;// = state->memregion("prg_code")->base();
 		int i;
 		UINT8 op_mode;
 		static const char *const rom_region[] = { "set_chip_4.04", "set_chip_4.4", "clear_chip", "game_prg" };
 
-		op_mode = input_port_read(machine, "ROM_LOAD");
+		op_mode = machine.root_device().ioport("ROM_LOAD")->read();
 
 		PRG = machine.root_device().memregion(rom_region[op_mode & 3])->base();
 

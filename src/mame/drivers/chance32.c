@@ -132,7 +132,7 @@ READ8_MEMBER(chance32_state::mux_r)
 	for(i=0;i<4;i++)
 	{
 		if(mux_data & 1 << i)
-			res |= input_port_read(machine(),muxnames[i]);
+			res |= ioport(muxnames[i])->read();
 	}
 
 	return res;

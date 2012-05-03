@@ -131,22 +131,22 @@ static UINT8 fix_input1(UINT8 in1, UINT8 in2)
 
 READ8_MEMBER(tceptor_state::dsw0_r)
 {
-	return fix_input0(input_port_read(machine(), "DSW1"), input_port_read(machine(), "DSW2"));
+	return fix_input0(ioport("DSW1")->read(), ioport("DSW2")->read());
 }
 
 READ8_MEMBER(tceptor_state::dsw1_r)
 {
-	return fix_input1(input_port_read(machine(), "DSW1"), input_port_read(machine(), "DSW2"));
+	return fix_input1(ioport("DSW1")->read(), ioport("DSW2")->read());
 }
 
 READ8_MEMBER(tceptor_state::input0_r)
 {
-	return fix_input0(input_port_read(machine(), "BUTTONS"), input_port_read(machine(), "SERVICE"));
+	return fix_input0(ioport("BUTTONS")->read(), ioport("SERVICE")->read());
 }
 
 READ8_MEMBER(tceptor_state::input1_r)
 {
-	return fix_input1(input_port_read(machine(), "BUTTONS"), input_port_read(machine(), "SERVICE"));
+	return fix_input1(ioport("BUTTONS")->read(), ioport("SERVICE")->read());
 }
 
 READ8_MEMBER(tceptor_state::readFF)

@@ -295,7 +295,7 @@ READ8_MEMBER(zr107_state::sysreg_r)
 		case 2:	/* I/O port 2 */
 		case 3:	/* System Port 0 */
 		case 4:	/* System Port 1 */
-			r = input_port_read(machine(), portnames[offset]);
+			r = ioport(portnames[offset])->read();
 			break;
 
 		case 5:	/* Parallel data port */
@@ -331,7 +331,7 @@ WRITE8_MEMBER(zr107_state::sysreg_w)
                 0x02 = EEPCLK
                 0x01 = EEPDI
             */
-			input_port_write(machine(), "EEPROMOUT", data & 0x07, 0xff);
+			ioport("EEPROMOUT")->write(data & 0x07, 0xff);
 			cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
 			mame_printf_debug("System register 0 = %02X\n", data);
 			break;
@@ -352,7 +352,7 @@ WRITE8_MEMBER(zr107_state::sysreg_w)
 			if (data & 0x40)	/* CG Board 0 IRQ Ack */
 				cputag_set_input_line(machine(), "maincpu", INPUT_LINE_IRQ0, CLEAR_LINE);
 			set_cgboard_id((data >> 4) & 3);
-			input_port_write(machine(), "OUT4", data, 0xff);
+			ioport("OUT4")->write(data, 0xff);
 			mame_printf_debug("System register 1 = %02X\n", data);
 			break;
 
@@ -647,11 +647,11 @@ static double adc0838_callback( device_t *device, UINT8 input )
 	switch (input)
 	{
 	case ADC083X_CH0:
-		return (double)(5 * input_port_read(device->machine(), "ANALOG1")) / 255.0;
+		return (double)(5 * device->machine().root_device().ioport("ANALOG1")->read()) / 255.0;
 	case ADC083X_CH1:
-		return (double)(5 * input_port_read(device->machine(), "ANALOG2")) / 255.0;
+		return (double)(5 * device->machine().root_device().ioport("ANALOG2")->read()) / 255.0;
 	case ADC083X_CH2:
-		return (double)(5 * input_port_read(device->machine(), "ANALOG3")) / 255.0;
+		return (double)(5 * device->machine().root_device().ioport("ANALOG3")->read()) / 255.0;
 	case ADC083X_CH3:
 		return 0;
 	case ADC083X_COM:
@@ -838,7 +838,7 @@ static void init_zr107(running_machine &machine)
 	state->m_led_reg0 = state->m_led_reg1 = 0x7f;
 	state->m_ccu_vcth = state->m_ccu_vctl = 0;
 
-	K001005_preprocess_texture_data(machine.root_device().memregion("gfx1")->base(), state->memregion("gfx1")->bytes(), 0);
+	K001005_preprocess_texture_data(state->memregion("gfx1")->base(), state->memregion("gfx1")->bytes(), 0);
 }
 
 static DRIVER_INIT(zr107)

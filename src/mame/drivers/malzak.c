@@ -82,7 +82,7 @@ READ8_MEMBER(malzak_state::s2636_portA_r)
 	// POT switch position, read from port A of the first S2636
 	// Not sure of the correct values to return, but these should
 	// do based on the game code.
-	switch (input_port_read(machine(), "POT"))
+	switch (ioport("POT")->read())
 	{
 		case 0:  // Normal play
 			return 0xf0;
@@ -210,7 +210,7 @@ static INPUT_PORTS_START( malzak )
 	/* No POT switch on Malzak as far as I know */
 
 	PORT_START("SENSE")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 INPUT_PORTS_END
 
@@ -237,7 +237,7 @@ static INPUT_PORTS_START( malzak2 )
 	PORT_DIPSETTING( 0x03, "4" )  // Change settings
 
 	PORT_START("SENSE")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 INPUT_PORTS_END
 

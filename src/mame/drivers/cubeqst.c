@@ -329,7 +329,7 @@ WRITE16_MEMBER(cubeqst_state::io_w)
 
 READ16_MEMBER(cubeqst_state::io_r)
 {
-	UINT16 port_data = input_port_read(machine(), "IO");
+	UINT16 port_data = ioport("IO")->read();
 
 	/*
          Certain bits depend on Q7 of the IO latch:
@@ -350,7 +350,7 @@ READ16_MEMBER(cubeqst_state::io_r)
 /* Trackball ('CHOP') */
 READ16_MEMBER(cubeqst_state::chop_r)
 {
-	return (input_port_read(machine(), "TRACK_X") << 8) | input_port_read(machine(), "TRACK_Y");
+	return (ioport("TRACK_X")->read() << 8) | ioport("TRACK_Y")->read();
 }
 
 

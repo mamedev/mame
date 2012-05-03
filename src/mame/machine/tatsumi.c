@@ -108,12 +108,12 @@ READ8_MEMBER(tatsumi_state::apache3_adc_r)
 {
 	switch (m_apache3_adc)
 	{
-		case 0: return input_port_read(machine(), "STICK_X");
-		case 1: return input_port_read(machine(), "STICK_Y");
+		case 0: return ioport("STICK_X")->read();
+		case 1: return ioport("STICK_Y")->read();
 		case 2: return 0; // VSP1
 		case 3: return 0;
-		case 4: return (UINT8)((255./100) * (100 - input_port_read(machine(), "VR1")));
-		case 5: return input_port_read(machine(), "THROTTLE");
+		case 4: return (UINT8)((255./100) * (100 - ioport("VR1")->read()));
+		case 5: return ioport("THROTTLE")->read();
 		case 6: return 0; // RPSNC
 		case 7: return 0; // LPSNC
 	}

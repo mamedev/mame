@@ -109,7 +109,7 @@
 
 static INTERRUPT_GEN( redalert_vblank_interrupt )
 {
-	if( input_port_read(device->machine(), "COIN") )
+	if( device->machine().root_device().ioport("COIN")->read() )
 		/* the service coin as conntected to the CPU's RDY pin as well */
 		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 
@@ -136,12 +136,12 @@ READ8_MEMBER(redalert_state::panther_interrupt_clear_r)
 {
 	cputag_set_input_line(machine(), "maincpu", M6502_IRQ_LINE, CLEAR_LINE);
 
-	return input_port_read(machine(), "STICK0");
+	return ioport("STICK0")->read();
 }
 
 READ8_MEMBER(redalert_state::panther_unk_r)
 {
-	return ((machine().rand() & 0x01) | (input_port_read(machine(), "C020") & 0xfe));
+	return ((machine().rand() & 0x01) | (ioport("C020")->read() & 0xfe));
 }
 
 /*************************************

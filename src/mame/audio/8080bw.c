@@ -865,7 +865,7 @@ WRITE8_MEMBER(_8080bw_state::schaser_sh_port_2_w)
 	m_schaser_background_disable = (data >> 3) & 0x01;
 	m_schaser_background_select = (data >> 4) & 0x01;
 
-	m_c8080bw_flip_screen = (data & 0x20) && (input_port_read(machine(), CABINET_PORT_TAG) & 0x01);
+	m_c8080bw_flip_screen = (data & 0x20) && (ioport(CABINET_PORT_TAG)->read() & 0x01);
 
 	m_port_2_last_extra = data;
 }
@@ -1032,7 +1032,7 @@ WRITE8_MEMBER(_8080bw_state::lupin3_sh_port_2_w)
 
 	m_color_map = data & 0x40;
 
-	m_c8080bw_flip_screen = (data & 0x20) && (input_port_read(machine(), "IN2") & 0x04);
+	m_c8080bw_flip_screen = (data & 0x20) && (ioport("IN2")->read() & 0x04);
 
 	m_port_2_last_extra = data;
 }

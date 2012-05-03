@@ -116,7 +116,7 @@ CUSTOM_INPUT_MEMBER(arkanoid_state::arkanoid_input_mux)
 {
 	const char *tag1 = (const char *)param;
 	const char *tag2 = tag1 + strlen(tag1) + 1;
-	return input_port_read(machine(), (m_paddle_select == 0) ? tag1 : tag2);
+	return ioport((m_paddle_select == 0) ? tag1 : tag2)->read();
 }
 
 /*
@@ -575,7 +575,7 @@ READ8_MEMBER(arkanoid_state::arkanoid_bootleg_d008_r)
 {
 	UINT8 arkanoid_bootleg_d008_bit[8];
 	UINT8 arkanoid_bootleg_d008_val;
-	UINT8 arkanoid_paddle_value = input_port_read(machine(), "MUX");
+	UINT8 arkanoid_paddle_value = ioport("MUX")->read();
 	int b;
 
 	arkanoid_bootleg_d008_bit[4] = arkanoid_bootleg_d008_bit[6] = arkanoid_bootleg_d008_bit[7] = 0;  /* untested bits */

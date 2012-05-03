@@ -133,7 +133,7 @@ static const UINT16 mHoreKidProtData[] =
 
 READ16_MEMBER(terracre_state::horekid_IN2_r)
 {
-	int data = input_port_read(machine(), "IN2");
+	int data = ioport("IN2")->read();
 
 	if (!(data & 0x40))		// FAKE button 3 for "Debug Mode"
 	{

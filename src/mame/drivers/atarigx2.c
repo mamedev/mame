@@ -67,7 +67,7 @@ static MACHINE_RESET( atarigx2 )
 
 READ32_MEMBER(atarigx2_state::special_port2_r)
 {
-	int temp = input_port_read(machine(), "SERVICE");
+	int temp = ioport("SERVICE")->read();
 	if (m_cpu_to_sound_ready) temp ^= 0x0020;
 	if (m_sound_to_cpu_ready) temp ^= 0x0010;
 	temp ^= 0x0008;		/* A2D.EOC always high for now */
@@ -77,7 +77,7 @@ READ32_MEMBER(atarigx2_state::special_port2_r)
 
 READ32_MEMBER(atarigx2_state::special_port3_r)
 {
-	int temp = input_port_read(machine(), "SPECIAL");
+	int temp = ioport("SPECIAL")->read();
 	return (temp << 16) | temp;
 }
 
@@ -89,9 +89,9 @@ READ32_MEMBER(atarigx2_state::a2d_data_r)
 	switch (offset)
 	{
 		case 0:
-			return (input_port_read(machine(), "A2D0") << 24) | (input_port_read(machine(), "A2D1") << 8);
+			return (ioport("A2D1")->read() << 8);
 		case 1:
-			return (input_port_read(machine(), "A2D2") << 24) | (input_port_read(machine(), "A2D3") << 8);
+			return (ioport("A2D3")->read() << 8);
 	}
 
 	return 0;
@@ -1205,7 +1205,7 @@ static INPUT_PORTS_START( spclords )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_SPECIAL )	/* /AUDIRQ */
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_SPECIAL )	/* /AUDFULL */
 	PORT_SERVICE( 0x0040, IP_ACTIVE_LOW )
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("SPECIAL")     /* 68.STATUS (A2=1) */
@@ -1253,7 +1253,7 @@ static INPUT_PORTS_START( motofren )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_SPECIAL )	/* /AUDIRQ */
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_SPECIAL )	/* /AUDFULL */
 	PORT_SERVICE( 0x0040, IP_ACTIVE_LOW )
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("SPECIAL")		/* 68.STATUS (A2=1) */
@@ -1301,7 +1301,7 @@ static INPUT_PORTS_START( rrreveng )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_SPECIAL )	/* /AUDIRQ */
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_SPECIAL )	/* /AUDFULL */
 	PORT_SERVICE( 0x0040, IP_ACTIVE_LOW )
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("SPECIAL")		/* 68.STATUS (A2=1) */

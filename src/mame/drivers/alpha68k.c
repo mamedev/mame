@@ -233,40 +233,40 @@ WRITE16_MEMBER(alpha68k_state::alpha_microcontroller_w)
 
 READ16_MEMBER(alpha68k_state::kyros_dip_r)
 {
-	return input_port_read(machine(), "IN1") << 8;
+	return ioport("IN1")->read() << 8;
 }
 
 READ16_MEMBER(alpha68k_state::control_1_r)
 {
 
 	if (m_invert_controls)
-		return ~(input_port_read(machine(), "IN0") + (input_port_read(machine(), "IN1") << 8));
+		return ~(ioport("IN0")->read() + (ioport("IN1")->read() << 8));
 
-	return (input_port_read(machine(), "IN0") + (input_port_read(machine(), "IN1") << 8));
+	return (ioport("IN1")->read() << 8);
 }
 
 READ16_MEMBER(alpha68k_state::control_2_r)
 {
 
 	if (m_invert_controls)
-		return ~(input_port_read(machine(), "IN3") + ((~(1 << input_port_read(machine(), "IN5"))) << 8));
+		return ~(ioport("IN3")->read() + ((~(1 << ioport("IN5")->read())) << 8));
 
-	return input_port_read(machine(), "IN3") + /* Low byte of CN1 */
-		((~(1 << input_port_read(machine(), "IN5"))) << 8);
+	return ioport("IN3")->read() + /* Low byte of CN1 */
+		((~(1 << ioport("IN5")->read())) << 8);
 }
 
 READ16_MEMBER(alpha68k_state::control_2_V_r)
 {
-	return input_port_read(machine(), "IN3");
+	return ioport("IN3")->read();
 }
 
 READ16_MEMBER(alpha68k_state::control_3_r)
 {
 
 	if (m_invert_controls)
-		return ~(((~(1 << input_port_read(machine(), "IN6"))) << 8) & 0xff00);
+		return ~(((~(1 << ioport("IN6")->read())) << 8) & 0xff00);
 
-	return ((~(1 << input_port_read(machine(), "IN6"))) << 8) & 0xff00;
+	return ((~(1 << ioport("IN6")->read())) << 8) & 0xff00;
 }
 
 /* High 4 bits of CN1 & CN2 */
@@ -274,20 +274,20 @@ READ16_MEMBER(alpha68k_state::control_4_r)
 {
 
 	if (m_invert_controls)
-		return ~((((~(1 << input_port_read(machine(), "IN6"))) << 4) & 0xf000)
-		 + (((~(1 << input_port_read(machine(), "IN5")))) & 0x0f00));
+		return ~((((~(1 << ioport("IN6")->read())) << 4) & 0xf000)
+		 + (((~(1 << ioport("IN5")->read()))) & 0x0f00));
 
-	return (((~(1 << input_port_read(machine(), "IN6"))) << 4) & 0xf000)
-		 + (((~(1 << input_port_read(machine(), "IN5")))) & 0x0f00);
+	return (((~(1 << ioport("IN6")->read())) << 4) & 0xf000)
+		 + (((~(1 << ioport("IN5")->read()))) & 0x0f00);
 }
 
 READ16_MEMBER(alpha68k_state::jongbou_inputs_r)
 {
-	UINT8 inp1 = input_port_read(machine(), "IN3");
-	UINT8 inp2 = input_port_read(machine(), "IN4");
+	UINT8 inp1 = ioport("IN3")->read();
+	UINT8 inp2 = ioport("IN4")->read();
 	inp1 = ((inp1 & 0x01) << 3) + ((inp1 & 0x02) << 1) + ((inp1 & 0x04) >> 1) + ((inp1 & 0x08) >> 3);
 	inp2 = ((inp2 & 0x01) << 3) + ((inp2 & 0x02) << 1) + ((inp2 & 0x04) >> 1) + ((inp2 & 0x08) >> 3);
-	return input_port_read(machine(), "IN0") | inp1 | inp2 << 4;
+	return ioport("IN0")->read() | inp1 | inp2 << 4;
 }
 
 
@@ -353,15 +353,15 @@ READ16_MEMBER(alpha68k_state::kyros_alpha_trigger_r)
 		return 0;
 	case 0x29: /* Query microcontroller for coin insert */
 		m_trigstate++;
-		if ((input_port_read(machine(), "IN2") & 0x3) == 3)
+		if ((ioport("IN2")->read() & 0x3) == 3)
 			m_latch = 0;
-		if ((input_port_read(machine(), "IN2") & 0x1) == 0 && !m_latch)
+		if ((ioport("IN2")->read() & 0x1) == 0 && !m_latch)
 		{
 			m_shared_ram[0x29] = (source & 0xff00) | (m_coin_id & 0xff);	// coinA
 			m_shared_ram[0x22] = (source & 0xff00) | 0x0;
 			m_latch = 1;
 
-			m_coinvalue = (~input_port_read(machine(), "IN1") >> 1) & 7;
+			m_coinvalue = (~ioport("IN1")->read() >> 1) & 7;
 			m_deposits1++;
 			if (m_deposits1 == coinage1[m_coinvalue][0])
 			{
@@ -371,13 +371,13 @@ READ16_MEMBER(alpha68k_state::kyros_alpha_trigger_r)
 			else
 				m_credits = 0;
 		}
-		else if ((input_port_read(machine(), "IN2") & 0x2) == 0 && !m_latch)
+		else if ((ioport("IN2")->read() & 0x2) == 0 && !m_latch)
 		{
 			m_shared_ram[0x29] = (source & 0xff00) | (m_coin_id >> 8);	// coinB
 			m_shared_ram[0x22] = (source & 0xff00) | 0x0;
 			m_latch = 1;
 
-			m_coinvalue = (~input_port_read(machine(), "IN1") >>1 ) & 7;
+			m_coinvalue = (~ioport("IN1")->read() >>1 ) & 7;
 			m_deposits2++;
 			if (m_deposits2 == coinage2[m_coinvalue][0])
 			{
@@ -430,7 +430,7 @@ READ16_MEMBER(alpha68k_state::alpha_II_trigger_r)
 	switch (offset)
 	{
 		case 0: /* Dipswitch 2 */
-			m_shared_ram[0] = (source & 0xff00) | input_port_read(machine(), "IN4");
+			m_shared_ram[0] = (source & 0xff00) | ioport("IN4")->read();
 			return 0;
 
 		case 0x22: /* Coin value */
@@ -438,9 +438,9 @@ READ16_MEMBER(alpha68k_state::alpha_II_trigger_r)
 			return 0;
 
 		case 0x29: /* Query microcontroller for coin insert */
-			if ((input_port_read(machine(), "IN2") & 0x3) == 3)
+			if ((ioport("IN2")->read() & 0x3) == 3)
 				m_latch = 0;
-			if ((input_port_read(machine(), "IN2") & 0x1) == 0 && !m_latch)
+			if ((ioport("IN2")->read() & 0x1) == 0 && !m_latch)
 			{
 				m_shared_ram[0x29] = (source & 0xff00) | (m_coin_id & 0xff);	// coinA
 				m_shared_ram[0x22] = (source & 0xff00) | 0x0;
@@ -449,9 +449,9 @@ READ16_MEMBER(alpha68k_state::alpha_II_trigger_r)
 				if ((m_coin_id & 0xff) == 0x22)
 				{
 					if (m_game_id == ALPHA68K_BTLFIELDB)
-						m_coinvalue = (input_port_read(machine(), "IN4") >> 0) & 7;
+						m_coinvalue = (ioport("IN4")->read() >> 0) & 7;
 					else
-						m_coinvalue = (~input_port_read(machine(), "IN4") >> 0) & 7;
+						m_coinvalue = (~ioport("IN4")->read() >> 0) & 7;
 
 					m_deposits1++;
 					if (m_deposits1 == coinage1[m_coinvalue][0])
@@ -463,7 +463,7 @@ READ16_MEMBER(alpha68k_state::alpha_II_trigger_r)
 						m_credits = 0;
 				}
 			}
-			else if ((input_port_read(machine(), "IN2") & 0x2) == 0 && !m_latch)
+			else if ((ioport("IN2")->read() & 0x2) == 0 && !m_latch)
 			{
 				m_shared_ram[0x29] = (source & 0xff00) | (m_coin_id >> 8);	// coinB
 				m_shared_ram[0x22] = (source & 0xff00) | 0x0;
@@ -472,9 +472,9 @@ READ16_MEMBER(alpha68k_state::alpha_II_trigger_r)
 				if ((m_coin_id >> 8) == 0x22)
 				{
 					if (m_game_id == ALPHA68K_BTLFIELDB)
-						m_coinvalue = (input_port_read(machine(), "IN4") >> 0) & 7;
+						m_coinvalue = (ioport("IN4")->read() >> 0) & 7;
 					else
-						m_coinvalue = (~input_port_read(machine(), "IN4") >> 0) & 7;
+						m_coinvalue = (~ioport("IN4")->read() >> 0) & 7;
 
 					m_deposits2++;
 					if (m_deposits2 == coinage2[m_coinvalue][0])
@@ -524,15 +524,15 @@ READ16_MEMBER(alpha68k_state::alpha_V_trigger_r)
 	switch (offset)
 	{
 		case 0: /* Dipswitch 1 */
-			m_shared_ram[0] = (source & 0xff00) | input_port_read(machine(), "IN4");
+			m_shared_ram[0] = (source & 0xff00) | ioport("IN4")->read();
 			return 0;
 		case 0x22: /* Coin value */
 			m_shared_ram[0x22] = (source & 0xff00) | (m_credits & 0x00ff);
 			return 0;
 		case 0x29: /* Query microcontroller for coin insert */
-			if ((input_port_read(machine(), "IN2") & 0x3) == 3)
+			if ((ioport("IN2")->read() & 0x3) == 3)
 				m_latch = 0;
-			if ((input_port_read(machine(), "IN2") & 0x1) == 0 && !m_latch)
+			if ((ioport("IN2")->read() & 0x1) == 0 && !m_latch)
 			{
 				m_shared_ram[0x29] = (source & 0xff00) | (m_coin_id & 0xff);	// coinA
 				m_shared_ram[0x22] = (source & 0xff00) | 0x0;
@@ -540,7 +540,7 @@ READ16_MEMBER(alpha68k_state::alpha_V_trigger_r)
 
 				if ((m_coin_id & 0xff) == 0x22)
 				{
-					m_coinvalue = (~input_port_read(machine(), "IN4") >> 1) & 7;
+					m_coinvalue = (~ioport("IN4")->read() >> 1) & 7;
 					m_deposits1++;
 					if (m_deposits1 == coinage1[m_coinvalue][0])
 					{
@@ -551,7 +551,7 @@ READ16_MEMBER(alpha68k_state::alpha_V_trigger_r)
 						m_credits = 0;
 				}
 			}
-			else if ((input_port_read(machine(), "IN2") & 0x2) == 0 && !m_latch)
+			else if ((ioport("IN2")->read() & 0x2) == 0 && !m_latch)
 			{
 				m_shared_ram[0x29] = (source & 0xff00) | (m_coin_id>>8);	// coinB
 				m_shared_ram[0x22] = (source & 0xff00) | 0x0;
@@ -559,7 +559,7 @@ READ16_MEMBER(alpha68k_state::alpha_V_trigger_r)
 
 				if ((m_coin_id >> 8) == 0x22)
 				{
-					m_coinvalue = (~input_port_read(machine(), "IN4") >> 1) & 7;
+					m_coinvalue = (~ioport("IN4")->read() >> 1) & 7;
 					m_deposits2++;
 					if (m_deposits2 == coinage2[m_coinvalue][0])
 					{
@@ -585,12 +585,12 @@ READ16_MEMBER(alpha68k_state::alpha_V_trigger_r)
 			break;
 
 		case 0x1f00: /* Dipswitch 1 */
-			m_shared_ram[0x1f00] = (source & 0xff00) | input_port_read(machine(), "IN4");
+			m_shared_ram[0x1f00] = (source & 0xff00) | ioport("IN4")->read();
 			return 0;
 		case 0x1f29: /* Query microcontroller for coin insert */
-			if ((input_port_read(machine(), "IN2") & 0x3) == 3)
+			if ((ioport("IN2")->read() & 0x3) == 3)
 				m_latch = 0;
-			if ((input_port_read(machine(), "IN2") & 0x1) == 0 && !m_latch)
+			if ((ioport("IN2")->read() & 0x1) == 0 && !m_latch)
 			{
 				m_shared_ram[0x1f29] = (source & 0xff00) | (m_coin_id & 0xff);	// coinA
 				m_shared_ram[0x1f22] = (source & 0xff00) | 0x0;
@@ -598,7 +598,7 @@ READ16_MEMBER(alpha68k_state::alpha_V_trigger_r)
 
 				if ((m_coin_id & 0xff) == 0x22)
 				{
-					m_coinvalue = (~input_port_read(machine(), "IN4") >> 1) & 7;
+					m_coinvalue = (~ioport("IN4")->read() >> 1) & 7;
 					m_deposits1++;
 					if (m_deposits1 == coinage1[m_coinvalue][0])
 					{
@@ -609,7 +609,7 @@ READ16_MEMBER(alpha68k_state::alpha_V_trigger_r)
 						m_credits = 0;
 				}
 			}
-			else if ((input_port_read(machine(), "IN2") & 0x2) == 0 && !m_latch)
+			else if ((ioport("IN2")->read() & 0x2) == 0 && !m_latch)
 			{
 				m_shared_ram[0x1f29] = (source & 0xff00) | (m_coin_id >> 8);	// coinB
 				m_shared_ram[0x1f22] = (source & 0xff00) | 0x0;
@@ -617,7 +617,7 @@ READ16_MEMBER(alpha68k_state::alpha_V_trigger_r)
 
 				if ((m_coin_id >> 8) == 0x22)
 				{
-					m_coinvalue = (~input_port_read(machine(), "IN4") >> 1) & 7;
+					m_coinvalue = (~ioport("IN4")->read() >> 1) & 7;
 					m_deposits2++;
 					if (m_deposits2 == coinage2[m_coinvalue][0])
 					{
@@ -638,7 +638,7 @@ READ16_MEMBER(alpha68k_state::alpha_V_trigger_r)
                the microcontroller supplies it (it does for all the other games,
                but usually to 0x0 in RAM) when 0x21 is read (code at 0x009332) */
 			source = m_shared_ram[0x0163];
-			m_shared_ram[0x0163] = (source & 0x00ff) | (input_port_read(machine(), "IN4") << 8);
+			m_shared_ram[0x0163] = (source & 0x00ff) | (ioport("IN4")->read() << 8);
 
 			return 0;
 		case 0x1ffe:  /* Custom ID check */
@@ -1568,10 +1568,10 @@ static INPUT_PORTS_START( tnextspc )
 	PORT_DIPSETTING(    0x03, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Demo_Sounds ) )		PORT_DIPLOCATION("SW2:3") PORT_CONDITION("DSW2",0x08,PORTCOND_EQUALS,0x08)
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Demo_Sounds ) )		PORT_DIPLOCATION("SW2:3") PORT_CONDITION("DSW2",0x08,EQUALS,0x08)
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "Game Mode" )				PORT_DIPLOCATION("SW2:3") PORT_CONDITION("DSW2",0x08,PORTCOND_EQUALS,0x00)
+	PORT_DIPNAME( 0x04, 0x04, "Game Mode" )				PORT_DIPLOCATION("SW2:3") PORT_CONDITION("DSW2",0x08,EQUALS,0x00)
 	PORT_DIPSETTING(    0x00, "Freeze" )
 	PORT_DIPSETTING(    0x04, "Infinite Lives (Cheat)")
 	PORT_DIPNAME( 0x08, 0x08, "SW2:3 Demo Sound/Game Mode" )	PORT_DIPLOCATION("SW2:4")

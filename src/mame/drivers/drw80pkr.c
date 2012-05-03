@@ -284,7 +284,7 @@ READ8_MEMBER(drw80pkr_state::drw80pkr_io_r)
 		{
 
 			// TODO: Get Input Port Values
-			kbdin = ((input_port_read(machine(), "IN1") & 0xaf ) << 8) + input_port_read(machine(), "IN0");
+			kbdin = ((ioport("IN1")->read() & 0xaf ) << 8) + ioport("IN0")->read();
 
 			switch (kbdin)
 			{

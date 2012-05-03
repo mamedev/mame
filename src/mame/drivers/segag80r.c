@@ -214,10 +214,10 @@ READ8_MEMBER(segag80r_state::mangled_ports_r)
 	/* read as two bits from each of 4 ports. For this reason, the input   */
 	/* ports have been organized logically, and are demangled at runtime.  */
 	/* 4 input ports each provide 8 bits of information. */
-	UINT8 d7d6 = input_port_read(machine(), "D7D6");
-	UINT8 d5d4 = input_port_read(machine(), "D5D4");
-	UINT8 d3d2 = input_port_read(machine(), "D3D2");
-	UINT8 d1d0 = input_port_read(machine(), "D1D0");
+	UINT8 d7d6 = ioport("D7D6")->read();
+	UINT8 d5d4 = ioport("D5D4")->read();
+	UINT8 d3d2 = ioport("D3D2")->read();
+	UINT8 d1d0 = ioport("D1D0")->read();
 	int shift = offset & 3;
 	return demangle(d7d6 >> shift, d5d4 >> shift, d3d2 >> shift, d1d0 >> shift);
 }
@@ -229,17 +229,17 @@ READ8_MEMBER(segag80r_state::spaceod_mangled_ports_r)
 	/* versus cocktail cabinets; we fix this here. The input ports are */
 	/* coded for cocktail mode; for upright mode, we manually shuffle the */
 	/* bits around. */
-	UINT8 d7d6 = input_port_read(machine(), "D7D6");
-	UINT8 d5d4 = input_port_read(machine(), "D5D4");
-	UINT8 d3d2 = input_port_read(machine(), "D3D2");
-	UINT8 d1d0 = input_port_read(machine(), "D1D0");
+	UINT8 d7d6 = ioport("D7D6")->read();
+	UINT8 d5d4 = ioport("D5D4")->read();
+	UINT8 d3d2 = ioport("D3D2")->read();
+	UINT8 d1d0 = ioport("D1D0")->read();
 	int shift = offset & 3;
 
 	/* tweak bits for the upright case */
 	UINT8 upright = d3d2 & 0x04;
 	if (upright)
 	{
-		UINT8 fc = input_port_read(machine(), "FC");
+		UINT8 fc = ioport("FC")->read();
 		d7d6 |= 0x60;
 		d5d4 = (d5d4 & ~0x1c) |
 				((~fc & 0x20) >> 3) | /* IPT_BUTTON2 */
@@ -253,8 +253,8 @@ READ8_MEMBER(segag80r_state::spaceod_mangled_ports_r)
 
 READ8_MEMBER(segag80r_state::spaceod_port_fc_r)
 {
-	UINT8 upright = input_port_read(machine(), "D3D2") & 0x04;
-	UINT8 fc = input_port_read(machine(), "FC");
+	UINT8 upright = ioport("D3D2")->read() & 0x04;
+	UINT8 fc = ioport("FC")->read();
 
 	/* tweak bits for the upright case */
 	if (upright)

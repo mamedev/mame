@@ -26,7 +26,7 @@ VIDEO_START( policetr )
 {
 	policetr_state *state = machine.driver_data<policetr_state>();
 	/* the source bitmap is in ROM */
-	state->m_srcbitmap = machine.root_device().memregion("gfx1")->base();
+	state->m_srcbitmap = state->memregion("gfx1")->base();
 
 	/* compute the height */
 	state->m_srcbitmap_height_mask = (state->memregion("gfx1")->bytes() / SRCBITMAP_WIDTH) - 1;
@@ -267,25 +267,25 @@ READ32_MEMBER(policetr_state::policetr_video_r)
 	{
 		/* latch 0x00 is player 1's gun X coordinate */
 		case 0x00:
-			inputval = ((input_port_read(machine(), "GUNX1") & 0xff) * width) >> 8;
+			inputval = ((ioport("GUNX1")->read() & 0xff) * width) >> 8;
 			inputval += 0x50;
 			return (inputval << 20) | 0x20000000;
 
 		/* latch 0x01 is player 1's gun Y coordinate */
 		case 0x01:
-			inputval = ((input_port_read(machine(), "GUNY1") & 0xff) * height) >> 8;
+			inputval = ((ioport("GUNY1")->read() & 0xff) * height) >> 8;
 			inputval += 0x17;
 			return (inputval << 20);
 
 		/* latch 0x02 is player 2's gun X coordinate */
 		case 0x02:
-			inputval = ((input_port_read(machine(), "GUNX2") & 0xff) * width) >> 8;
+			inputval = ((ioport("GUNX2")->read() & 0xff) * width) >> 8;
 			inputval += 0x50;
 			return (inputval << 20) | 0x20000000;
 
 		/* latch 0x03 is player 2's gun Y coordinate */
 		case 0x03:
-			inputval = ((input_port_read(machine(), "GUNY2") & 0xff) * height) >> 8;
+			inputval = ((ioport("GUNY2")->read() & 0xff) * height) >> 8;
 			inputval += 0x17;
 			return (inputval << 20);
 

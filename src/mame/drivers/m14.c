@@ -162,7 +162,7 @@ WRITE8_MEMBER(m14_state::m14_cram_w)
 READ8_MEMBER(m14_state::m14_rng_r)
 {
 	/* graphic artifacts happens if this doesn't return random values. */
-	return (machine().rand() & 0x0f) | 0xf0; /* | (input_port_read(machine(), "IN1") & 0x80)*/;
+	return (machine().rand() & 0x0f) | 0xf0; /* | (ioport("IN1")->read() & 0x80)*/;
 }
 
 /* Here routes the hopper & the inputs */
@@ -175,7 +175,7 @@ READ8_MEMBER(m14_state::input_buttons_r)
 		return 0; //0x43 status bits
 	}
 	else
-		return input_port_read(machine(), "IN0");
+		return ioport("IN0")->read();
 }
 
 #if 0

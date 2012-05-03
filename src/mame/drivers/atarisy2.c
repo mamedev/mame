@@ -360,7 +360,7 @@ static void bankselect_postload(running_machine &machine)
 
 READ16_MEMBER(atarisy2_state::switch_r)
 {
-	int result = input_port_read(machine(), "1800") | (input_port_read(machine(), "1801") << 8);
+	int result = ioport("1800")->read() | (ioport("1801")->read() << 8);
 
 	if (m_cpu_to_sound_ready) result ^= 0x20;
 	if (m_sound_to_cpu_ready) result ^= 0x10;
@@ -371,13 +371,13 @@ READ16_MEMBER(atarisy2_state::switch_r)
 
 READ8_MEMBER(atarisy2_state::switch_6502_r)
 {
-	int result = input_port_read(machine(), "1840");
+	int result = ioport("1840")->read();
 
 	if (m_cpu_to_sound_ready) result |= 0x01;
 	if (m_sound_to_cpu_ready) result |= 0x02;
 	if ((m_has_tms5220) && (tms5220_readyq_r(machine().device("tms")) == 0))
 		result &= ~0x04;
-	if (!(input_port_read(machine(), "1801") & 0x80)) result |= 0x10;
+	if (!(ioport("1801")->read() & 0x80)) result |= 0x10;
 
 	return result;
 }
@@ -412,9 +412,9 @@ READ16_MEMBER(atarisy2_state::adc_r)
 	static const char *const adcnames[] = { "ADC0", "ADC1", "ADC2", "ADC3" };
 
 	if (m_which_adc < m_pedal_count)
-		return ~input_port_read(machine(), adcnames[m_which_adc]);
+		return ~ioport(adcnames[m_which_adc])->read();
 
-	return input_port_read(machine(), adcnames[m_which_adc]) | 0xff00;
+	return ioport(adcnames[m_which_adc])->read() | 0xff00;
 }
 
 
@@ -424,7 +424,7 @@ READ8_MEMBER(atarisy2_state::leta_r)
 
     if (offset <= 1 && m_pedal_count == -1)   /* 720 */
 	{
-		switch (input_port_read(machine(), "SELECT"))
+		switch (ioport("SELECT")->read())
 		{
 			case 0:	/* Real */
 				break;
@@ -432,8 +432,8 @@ READ8_MEMBER(atarisy2_state::leta_r)
 			case 1:	/* Fake Joystick */
 			/* special thanks to MAME Analog+ for the mapping code */
 			{
-				int analogx = input_port_read(machine(), "FAKE_JOY_X") - 128;
-				int analogy = input_port_read(machine(), "FAKE_JOY_Y") - 128;
+				int analogx = ioport("FAKE_JOY_X")->read() - 128;
+				int analogy = ioport("FAKE_JOY_Y")->read() - 128;
 				double angle;
 
 				/* if the joystick is centered, leave the rest of this alone */
@@ -472,7 +472,7 @@ READ8_MEMBER(atarisy2_state::leta_r)
 			{
 				INT32  diff;
 				UINT32 temp;
-				UINT32 rotate_count = input_port_read(machine(), "FAKE_SPINNER") & 0xffff;
+				UINT32 rotate_count = ioport("FAKE_SPINNER")->read() & 0xffff;
 				/* rotate_count behaves the same as the real LEAT1 Rotate encoder
                  * we use it to generate the LETA0 Center encoder count
                  */
@@ -550,7 +550,7 @@ READ8_MEMBER(atarisy2_state::leta_r)
 				return 0xff;
 		}
 	}
-	return input_port_read(machine(), letanames[offset]);
+	return ioport(letanames[offset])->read();
 }
 
 
@@ -962,25 +962,25 @@ static INPUT_PORTS_START( 720 )
 	/* Center disc */
 	/* X1, X2 LETA inputs */
 	PORT_MODIFY("LETA0")	/* not direct mapped */
-	PORT_BIT( 0xff, 0x00, IPT_DIAL_V ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_NAME("Center") PORT_CONDITION("SELECT",0x03,PORTCOND_EQUALS,0x00)
+	PORT_BIT( 0xff, 0x00, IPT_DIAL_V ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_NAME("Center") PORT_CONDITION("SELECT",0x03,EQUALS,0x00)
 
 	/* Rotate disc */
 	/* Y1, Y2 LETA inputs */
 	/* The disc has 72 teeth which are read by the hardware at 2x */
 	/* Computer hardware reads at 4x, so we set the sensitivity to 50% */
 	PORT_MODIFY("LETA1")	/* not direct mapped */
-	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_FULL_TURN_COUNT(144) PORT_NAME("Rotate") PORT_CONDITION("SELECT",0x03,PORTCOND_EQUALS,0x00)
+	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_FULL_TURN_COUNT(144) PORT_NAME("Rotate") PORT_CONDITION("SELECT",0x03,EQUALS,0x00)
 
 	PORT_START("FAKE_JOY_X")	/* not direct mapped */
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_CONDITION("SELECT",0x03,PORTCOND_EQUALS,0x01)
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_CONDITION("SELECT",0x03,EQUALS,0x01)
 
 	PORT_START("FAKE_JOY_Y")	/* not direct mapped */
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_REVERSE PORT_CONDITION("SELECT",0x03,PORTCOND_EQUALS,0x01)
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_REVERSE PORT_CONDITION("SELECT",0x03,EQUALS,0x01)
 
 	/* Let's assume we are using a 1200 count spinner.  We scale to get a 144 count.
      * 144/1200 = 0.12 = 12% */
 	PORT_START("FAKE_SPINNER")	/* not direct mapped */
-	PORT_BIT( 0xffff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(12) PORT_KEYDELTA(10) PORT_CONDITION("SELECT",0x03,PORTCOND_EQUALS,0x02)
+	PORT_BIT( 0xffff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(12) PORT_KEYDELTA(10) PORT_CONDITION("SELECT",0x03,EQUALS,0x02)
 
 	PORT_START("SELECT")
     PORT_CONFNAME( 0x03, 0x02, "Controller Type" )

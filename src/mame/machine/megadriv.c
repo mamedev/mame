@@ -1788,14 +1788,14 @@ static UINT8 megadrive_io_read_data_port_6button(running_machine &machine, int p
 		{
 			/* here we read B, C & the additional buttons */
 			retdata = (megadrive_io_data_regs[portnum] & helper) |
-						(((input_port_read_safe(machine, pad3names[portnum], 0) & 0x30) |
-							(input_port_read_safe(machine, pad6names[portnum], 0) & 0x0f)) & ~helper);
+						(((machine.root_device().ioport(pad3names[portnum])->read_safe(0) & 0x30) |
+							(machine.root_device().ioport(pad6names[portnum])->read_safe(0) & 0x0f)) & ~helper);
 		}
 		else
 		{
 			/* here we read B, C & the directional buttons */
 			retdata = (megadrive_io_data_regs[portnum] & helper) |
-						((input_port_read_safe(machine, pad3names[portnum], 0) & 0x3f) & ~helper);
+						((machine.root_device().ioport(pad3names[portnum])->read_safe(0) & 0x3f) & ~helper);
 		}
 	}
 	else
@@ -1804,20 +1804,20 @@ static UINT8 megadrive_io_read_data_port_6button(running_machine &machine, int p
 		{
 			/* here we read ((Start & A) >> 2) | 0x00 */
 			retdata = (megadrive_io_data_regs[portnum] & helper) |
-						(((input_port_read_safe(machine, pad3names[portnum], 0) & 0xc0) >> 2) & ~helper);
+						(((machine.root_device().ioport(pad3names[portnum])->read_safe(0) & 0xc0) >> 2) & ~helper);
 		}
 		else if (io_stage[portnum]==2)
 		{
 			/* here we read ((Start & A) >> 2) | 0x0f */
 			retdata = (megadrive_io_data_regs[portnum] & helper) |
-						((((input_port_read_safe(machine, pad3names[portnum], 0) & 0xc0) >> 2) | 0x0f) & ~helper);
+						((((machine.root_device().ioport(pad3names[portnum])->read_safe(0) & 0xc0) >> 2) | 0x0f) & ~helper);
 		}
 		else
 		{
 			/* here we read ((Start & A) >> 2) | Up and Down */
 			retdata = (megadrive_io_data_regs[portnum] & helper) |
-						((((input_port_read_safe(machine, pad3names[portnum], 0) & 0xc0) >> 2) |
-							(input_port_read_safe(machine, pad3names[portnum], 0) & 0x03)) & ~helper);
+						((((machine.root_device().ioport(pad3names[portnum])->read_safe(0) & 0xc0) >> 2) |
+							(machine.root_device().ioport(pad3names[portnum])->read_safe(0) & 0x03)) & ~helper);
 		}
 	}
 
@@ -1837,14 +1837,14 @@ static UINT8 megadrive_io_read_data_port_3button(running_machine &machine, int p
 	{
 		/* here we read B, C & the directional buttons */
 		retdata = (megadrive_io_data_regs[portnum] & helper) |
-					(((input_port_read_safe(machine, pad3names[portnum], 0) & 0x3f) | 0x40) & ~helper);
+					(((machine.root_device().ioport(pad3names[portnum])->read_safe(0) & 0x3f) | 0x40) & ~helper);
 	}
 	else
 	{
 		/* here we read ((Start & A) >> 2) | Up and Down */
 		retdata = (megadrive_io_data_regs[portnum] & helper) |
-					((((input_port_read_safe(machine, pad3names[portnum], 0) & 0xc0) >> 2) |
-						(input_port_read_safe(machine, pad3names[portnum], 0) & 0x03) | 0x40) & ~helper);
+					((((machine.root_device().ioport(pad3names[portnum])->read_safe(0) & 0xc0) >> 2) |
+						(machine.root_device().ioport(pad3names[portnum])->read_safe(0) & 0x03) | 0x40) & ~helper);
 	}
 
 	return retdata;
@@ -1858,18 +1858,18 @@ UINT8 megatech_bios_port_cc_dc_r(running_machine &machine, int offset, int ctrl)
 	if (ctrl == 0x55)
 	{
 			/* A keys */
-			retdata = ((input_port_read(machine, "PAD1") & 0x40) >> 2) |
-				((input_port_read(machine, "PAD2") & 0x40) >> 4) | 0xeb;
+			retdata = ((machine.root_device().ioport("PAD1")->read() & 0x40) >> 2) |
+				((machine.root_device().ioport("PAD2")->read() & 0x40) >> 4) | 0xeb;
 	}
 	else
 	{
 		if (offset == 0)
 		{
-			retdata = (input_port_read(machine, "PAD1") & 0x3f) | ((input_port_read(machine, "PAD2") & 0x03) << 6);
+			retdata = (machine.root_device().ioport("PAD1")->read() & 0x3f) | ((machine.root_device().ioport("PAD2")->read() & 0x03) << 6);
 		}
 		else
 		{
-			retdata = ((input_port_read(machine, "PAD2") & 0x3c) >> 2) | 0xf0;
+			retdata = ((machine.root_device().ioport("PAD2")->read() & 0x3c) >> 2) | 0xf0;
 		}
 
 	}
@@ -7133,7 +7133,7 @@ ADDRESS_MAP_END
 /* emulate testmode plug */
 static UINT8 megadrive_io_read_data_port_svp(running_machine &machine, int portnum)
 {
-	if (portnum == 0 && input_port_read_safe(machine, "MEMORY_TEST", 0x00))
+	if (portnum == 0 && machine.root_device().ioport("MEMORY_TEST")->read_safe(0x00))
 	{
 		return (megadrive_io_data_regs[0] & 0xc0);
 	}
@@ -9277,7 +9277,7 @@ MACHINE_RESET( megadriv )
 	/* default state of z80 = reset, with bus */
 	mame_printf_debug("Resetting Megadrive / Genesis\n");
 
-	switch (input_port_read_safe(machine, "REGION", 0xff))
+	switch (machine.root_device().ioport("REGION")->read_safe(0xff))
 	{
 
 		case 1: // US
@@ -9414,7 +9414,7 @@ SCREEN_VBLANK(megadriv)
 		megadrive_imode_odd_frame^=1;
 //      cputag_set_input_line(machine, "genesis_snd_z80", 0, CLEAR_LINE); // if the z80 interrupt hasn't happened by now, clear it..
 
-		if (input_port_read_safe(screen.machine(), "RESET", 0x00) & 0x01)
+		if (screen.machine().root_device().ioport("RESET")->read_safe(0x00) & 0x01)
 			cputag_set_input_line(screen.machine(), "maincpu", INPUT_LINE_RESET, PULSE_LINE);
 
 /*

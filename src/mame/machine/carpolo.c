@@ -217,7 +217,7 @@ INTERRUPT_GEN( carpolo_timer_interrupt )
 
 
 	/* check the coins here as well - they drive the clock of the flip-flops */
-	port_value = input_port_read(device->machine(), "IN0");
+	port_value = state->ioport("IN0")->read();
 
 	state->m_ttl7474_2s_1->clock_w((port_value & 0x01) >> 0);
 	state->m_ttl7474_2s_2->clock_w((port_value & 0x02) >> 1);
@@ -240,7 +240,7 @@ INTERRUPT_GEN( carpolo_timer_interrupt )
 			case 3:	movement_flip_flop = state->m_ttl7474_1a_1;	dir_flip_flop = state->m_ttl7474_1a_2;	break;
 		}
 
-		port_value = input_port_read(device->machine(), portnames[player]);
+		port_value = device->machine().root_device().ioport(portnames[player])->read();
 
 		if (port_value != state->m_last_wheel_value[player])
 		{
@@ -258,7 +258,7 @@ INTERRUPT_GEN( carpolo_timer_interrupt )
 
 
 	/* finally read the accelerator pedals */
-	port_value = input_port_read(device->machine(), "PEDALS");
+	port_value = device->machine().root_device().ioport("PEDALS")->read();
 
 	for (player = 0; player < 4; player++)
 	{
@@ -422,7 +422,7 @@ static READ8_DEVICE_HANDLER( pia_1_port_a_r )
 		  (state->m_ttl7474_1c_2->output_r() ? 0x02 : 0x00) |
 		  (state->m_ttl7474_1d_2->output_r() ? 0x04 : 0x00) |
 		  (state->m_ttl7474_1f_2->output_r() ? 0x08 : 0x00) |
-		  (input_port_read(device->machine(), "IN2") & 0xf0);
+		  (state->ioport("IN2")->read() & 0xf0);
 
 	return ret;
 }

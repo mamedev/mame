@@ -114,7 +114,7 @@ READ16_MEMBER(midyunit_state::midyunit_input_r)
 {
 	static const char *const portnames[] = { "IN0", "IN1", "IN2", "DSW", "UNK0", "UNK1" };
 
-	return input_port_read(machine(), portnames[offset]);
+	return ioport(portnames[offset])->read();
 }
 
 
@@ -130,15 +130,15 @@ READ16_MEMBER(midyunit_state::term2_input_r)
 	static const char *const portnames[] = { "IN0", "IN1", NULL, "DSW", "UNK0", "UNK1" };
 
 	if (offset != 2)
-		return input_port_read(machine(), portnames[offset]);
+		return ioport(portnames[offset])->read();
 
 	switch (m_term2_analog_select)
 	{
 		default:
-		case 0:  return input_port_read(machine(), "STICK0_X");
-		case 1:  return input_port_read(machine(), "STICK0_Y");
-		case 2:  return input_port_read(machine(), "STICK1_X");
-		case 3:  return input_port_read(machine(), "STICK1_Y");
+		case 0:  return ioport("STICK0_X")->read();
+		case 1:  return ioport("STICK0_Y")->read();
+		case 2:  return ioport("STICK1_X")->read();
+		case 3:  return ioport("STICK1_Y")->read();
 	}
 }
 

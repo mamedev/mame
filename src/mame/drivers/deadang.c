@@ -47,11 +47,11 @@ Dip locations and factory settings verified with US manual
 
 READ16_MEMBER(deadang_state::ghunter_trackball_low_r)
 {
-	return (input_port_read(machine(), "TRACKX") & 0xff) | ((input_port_read(machine(), "TRACKY") & 0xff) << 8);
+	return (ioport("TRACKX")->read() & 0xff) | ((ioport("TRACKY")->read() & 0xff) << 8);
 }
 READ16_MEMBER(deadang_state::ghunter_trackball_high_r)
 {
-	return ((input_port_read(machine(), "TRACKX") & 0x0f00) >> 4) | (input_port_read(machine(), "TRACKY") & 0x0f00);
+	return ((ioport("TRACKX")->read() & 0x0f00) >> 4) | (ioport("TRACKY")->read() & 0x0f00);
 }
 
 /* Memory Maps */

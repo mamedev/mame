@@ -706,7 +706,7 @@ static WRITE16_HANDLER( cps2_eeprom_port_w )
 		/* bit 7 - */
 
 		/* EEPROM */
-		input_port_write(space->machine(), "EEPROMOUT", data, 0xffff);
+		state->ioport("EEPROMOUT")->write(data, 0xffff);
 	}
 
 	if (ACCESSING_BITS_0_7)
@@ -798,9 +798,9 @@ static READ16_HANDLER( joy_or_paddle_r )
 	cps_state *state = space->machine().driver_data<cps_state>();
 
 	if (state->m_readpaddle != 0)
-		return (input_port_read(space->machine(), "IN0"));
+		return (state->ioport("IN0")->read());
 	else
-		return (input_port_read(space->machine(), "PADDLE1") & 0xff) | (input_port_read(space->machine(), "PADDLE2") << 8);
+		return (state->ioport("PADDLE1")->read() & 0xff) | (state->ioport("PADDLE2")->read() << 8);
 }
 
 
@@ -8181,7 +8181,7 @@ static DRIVER_INIT( gigaman2 )
 {
 	cps_state *state = machine.driver_data<cps_state>();
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	UINT16 *rom = (UINT16 *)machine.root_device().memregion("maincpu")->base();
+	UINT16 *rom = (UINT16 *)state->memregion("maincpu")->base();
 	int length = state->memregion("maincpu")->bytes();
 
 	gigaman2_gfx_reorder(machine);

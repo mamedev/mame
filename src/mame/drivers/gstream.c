@@ -185,7 +185,7 @@ CUSTOM_INPUT_MEMBER(gstream_state::gstream_mirror_service_r)
 	int result;
 
 	/* PORT_SERVICE_NO_TOGGLE */
-	result = (input_port_read(machine(), "IN0") & 0x8000) >> 15;
+	result = (ioport("IN0")->read() & 0x8000) >> 15;
 
 	return ~result;
 }
@@ -195,15 +195,15 @@ CUSTOM_INPUT_MEMBER(gstream_state::gstream_mirror_r)
 	int result;
 
 	/* IPT_COIN1 */
-	result  = ((input_port_read(machine(), "IN0") & 0x200) >>  9) << 0;
+	result  = ((ioport("IN0")->read() & 0x200) >>  9) << 0;
 	/* IPT_COIN2 */
-	result |= ((input_port_read(machine(), "IN1") & 0x200) >>  9) << 1;
+	result |= ((ioport("IN1")->read() & 0x200) >>  9) << 1;
 	/* IPT_START1 */
-	result |= ((input_port_read(machine(), "IN0") & 0x400) >> 10) << 2;
+	result |= ((ioport("IN0")->read() & 0x400) >> 10) << 2;
 	/* IPT_START2 */
-	result |= ((input_port_read(machine(), "IN1") & 0x400) >> 10) << 3;
+	result |= ((ioport("IN1")->read() & 0x400) >> 10) << 3;
 	/* PORT_SERVICE_NO_TOGGLE */
-	result |= ((input_port_read(machine(), "IN0") & 0x8000) >> 15) << 6;
+	result |= ((ioport("IN0")->read() & 0x8000) >> 15) << 6;
 
 	return ~result;
 }

@@ -157,9 +157,9 @@ READ8_MEMBER(tapatune_state::controls_r)
 {
 	switch( m_controls_mux )
 	{
-		case 0x07: return input_port_read(machine(), "DSW1");
-		case 0x08: return input_port_read(machine(), "DSW2");
-		case 0x09: return input_port_read(machine(), "IN0");
+		case 0x07: return ioport("DSW1")->read();
+		case 0x08: return ioport("DSW2")->read();
+		case 0x09: return ioport("IN0")->read();
 		default: return 0xff;
 	}
 }

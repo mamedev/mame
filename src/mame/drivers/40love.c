@@ -578,7 +578,7 @@ static DRIVER_INIT( undoukai )
 static DRIVER_INIT( 40love )
 {
 	fortyl_state *state = machine.driver_data<fortyl_state>();
-	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
+	UINT8 *ROM = state->memregion("maincpu")->base();
 	state->membank("bank1")->configure_entries(0, 2, &ROM[0x10000], 0x2000);
 
 	#if 0

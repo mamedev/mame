@@ -48,7 +48,7 @@ SCREEN_UPDATE_IND16( fgoal )
 
 	/* draw color overlay foreground and background */
 
-	if (state->m_fgoal_player == 1 && (input_port_read(screen.machine(), "IN1") & 0x40))
+	if (state->m_fgoal_player == 1 && (screen.machine().root_device().ioport("IN1")->read() & 0x40))
 	{
 		drawgfxzoom_opaque(state->m_fgbitmap, cliprect, screen.machine().gfx[0],
 			0, (state->m_fgoal_player << 2) | state->m_current_color,

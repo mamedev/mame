@@ -2257,7 +2257,7 @@ static void namcos21_init( running_machine &machine, int game_type )
 static DRIVER_INIT( winrun )
 {
 	namcos21_state *state = machine.driver_data<namcos21_state>();
-	UINT16 *pMem = (UINT16 *)machine.root_device().memregion("dsp")->base();
+	UINT16 *pMem = (UINT16 *)state->memregion("dsp")->base();
 	int pc = 0;
 	pMem[pc++] = 0xff80; /* b */
 	pMem[pc++] = 0;
@@ -2301,7 +2301,7 @@ static DRIVER_INIT( solvalou )
 static DRIVER_INIT( driveyes )
 {
 	namcos21_state *state = machine.driver_data<namcos21_state>();
-	UINT16 *pMem = (UINT16 *)machine.root_device().memregion("dsp")->base();
+	UINT16 *pMem = (UINT16 *)state->memregion("dsp")->base();
 	int pc = 0;
 	pMem[pc++] = 0xff80; /* b */
 	pMem[pc++] = 0;

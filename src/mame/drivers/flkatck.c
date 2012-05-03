@@ -47,13 +47,13 @@ READ8_MEMBER(flkatck_state::flkatck_ls138_r)
 	{
 		case 0x00:
 			if (offset & 0x02)
-				data = input_port_read(machine(), (offset & 0x01) ? "COIN" : "DSW3");
+				data = ioport((offset & 0x01) ? "COIN" : "DSW3")->read();
 			else
-				data = input_port_read(machine(), (offset & 0x01) ? "P2" : "P1");
+				data = ioport((offset & 0x01) ? "P2" : "P1")->read();
 			break;
 		case 0x01:
 			if (offset & 0x02)
-				data = input_port_read(machine(), (offset & 0x01) ? "DSW1" : "DSW2");
+				data = ioport((offset & 0x01) ? "DSW1" : "DSW2")->read();
 			break;
 	}
 

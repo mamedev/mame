@@ -881,16 +881,16 @@ READ8_MEMBER(namcona1_state::port7_r)
 	switch (m_mcu_port6 & 0xe0)
 	{
 		case 0x40:
-			return input_port_read(machine(), "P1");
+			return ioport("P1")->read();
 
 		case 0x60:
-			return input_port_read(machine(), "P2");
+			return ioport("P2")->read();
 
 		case 0x20:
-			return input_port_read(machine(), "DSW");
+			return ioport("DSW")->read();
 
 		case 0x00:
-			return input_port_read(machine(), "P4");
+			return ioport("P4")->read();
 	}
 
 	return 0xff;
@@ -940,7 +940,7 @@ static MACHINE_RESET( namcona1_mcu )
 READ8_MEMBER(namcona1_state::portana_r)
 {
 	static const UINT8 bitnum[8] = { 0x40, 0x20, 0x10, 0x01, 0x02, 0x04, 0x08, 0x80 };
-	UINT8 port = input_port_read(machine(), "P3");
+	UINT8 port = ioport("P3")->read();
 
 	return (port & bitnum[offset>>1]) ? 0xff : 0x00;
 }

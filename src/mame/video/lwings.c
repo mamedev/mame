@@ -63,7 +63,7 @@ static TILE_GET_INFO( get_bg2_tile_info )
 {
 	lwings_state *state = machine.driver_data<lwings_state>();
 	int code, color;
-	UINT8 *rom = machine.root_device().memregion("gfx5")->base();
+	UINT8 *rom = state->memregion("gfx5")->base();
 	int mask = state->memregion("gfx5")->bytes() - 1;
 
 	tile_index = (tile_index + state->m_bg2_image * 0x20) & mask;

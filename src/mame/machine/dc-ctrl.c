@@ -72,14 +72,14 @@ void dc_controller_device::fixed_status(UINT32 *dest)
 {
 	dest[0] = 0x20000000; // Controller
 	dest[1] =
-		(input_port_exists(machine(), port_tag[2]) ? 0x010000 : 0) |
-		(input_port_exists(machine(), port_tag[3]) ? 0x020000 : 0) |
-		(input_port_exists(machine(), port_tag[4]) ? 0x040000 : 0) |
-		(input_port_exists(machine(), port_tag[5]) ? 0x080000 : 0) |
-		(input_port_exists(machine(), port_tag[6]) ? 0x100000 : 0) |
-		(input_port_exists(machine(), port_tag[7]) ? 0x200000 : 0) |
-		(input_port_active_safe(machine(), port_tag[0], 0) << 8) |
-		input_port_active_safe(machine(), port_tag[1], 0); // 1st function - controller
+		((machine().root_device().ioport(port_tag[2]) != NULL) ? 0x010000 : 0) |
+		((machine().root_device().ioport(port_tag[3]) != NULL) ? 0x020000 : 0) |
+		((machine().root_device().ioport(port_tag[4]) != NULL) ? 0x040000 : 0) |
+		((machine().root_device().ioport(port_tag[5]) != NULL) ? 0x080000 : 0) |
+		((machine().root_device().ioport(port_tag[6]) != NULL) ? 0x100000 : 0) |
+		((machine().root_device().ioport(port_tag[7]) != NULL) ? 0x200000 : 0) |
+		(machine().root_device().ioport(port_tag[0])->active_safe(0) << 8) |
+		machine().root_device().ioport(port_tag[1])->active_safe(0); // 1st function - controller
 	dest[2] = 0; // No 2nd function
 	dest[3] = 0; // No 3rd function
 	dest[4] = 0x00ff; // Every region, no expansion
@@ -97,14 +97,14 @@ void dc_controller_device::read(UINT32 *dest)
 {
 	dest[0] = 0x21000000; // Controller
 	dest[1] =
-		input_port_read_safe(machine(), port_tag[0], 0xff) |
-		(input_port_read_safe(machine(), port_tag[1], 0xff) << 8) |
-		(input_port_read_safe(machine(), port_tag[2], 0x00) << 16) |
-		(input_port_read_safe(machine(), port_tag[3], 0x00) << 24);
+		ioport(port_tag[0])->read_safe(0xff) |
+		(ioport(port_tag[1])->read_safe(0xff) << 8) |
+		(ioport(port_tag[2])->read_safe(0x00) << 16) |
+		(ioport(port_tag[3])->read_safe(0x00) << 24);
 	dest[2] =
-		input_port_read_safe(machine(), port_tag[4], 0x80) |
-		(input_port_read_safe(machine(), port_tag[5], 0x80) << 8) |
-		(input_port_read_safe(machine(), port_tag[6], 0x80) << 16) |
-		(input_port_read_safe(machine(), port_tag[7], 0x80) << 24);
+		ioport(port_tag[4])->read_safe(0x80) |
+		(ioport(port_tag[5])->read_safe(0x80) << 8) |
+		(ioport(port_tag[6])->read_safe(0x80) << 16) |
+		(ioport(port_tag[7])->read_safe(0x80) << 24);
 }
 

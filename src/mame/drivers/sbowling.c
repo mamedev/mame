@@ -216,9 +216,9 @@ READ8_MEMBER(sbowling_state::controls_r)
 {
 
 	if (m_sbw_system & 2)
-		return input_port_read(machine(), "TRACKY");
+		return ioport("TRACKY")->read();
 	else
-		return input_port_read(machine(), "TRACKX");
+		return ioport("TRACKX")->read();
 }
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, sbowling_state )

@@ -207,8 +207,8 @@ WRITE8_MEMBER(famibox_state::famibox_IN0_w)
 	m_in_0_shift = 0;
 	m_in_1_shift = 0;
 
-	m_in_0 = input_port_read(machine(), "P1");
-	m_in_1 = input_port_read(machine(), "P2");
+	m_in_0 = ioport("P1")->read();
+	m_in_1 = ioport("P2")->read();
 }
 
 READ8_MEMBER(famibox_state::famibox_IN1_r)
@@ -312,9 +312,9 @@ READ8_MEMBER(famibox_state::famibox_system_r)
 				return ret;
 			}
 		case 2:
-			return input_port_read(machine(), "DSW");
+			return ioport("DSW")->read();
 		case 3:
-			return input_port_read(machine(), "KEYSWITCH");
+			return ioport("KEYSWITCH")->read();
 		case 7:
 			return 0x02;
 		default:

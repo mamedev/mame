@@ -690,7 +690,7 @@ static INPUT_PORTS_START( ddragon )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, ddragon_state,sub_cpu_busy, NULL)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -2023,25 +2023,25 @@ static DRIVER_INIT( toffy )
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x3808, 0x3808, write8_delegate(FUNC(ddragon_state::toffy_bankswitch_w),state));
 
 	/* the program rom has a simple bitswap encryption */
-	rom = machine.root_device().memregion("maincpu")->base();
-	length = machine.root_device().memregion("maincpu")->bytes();
+	rom = state->memregion("maincpu")->base();
+	length = state->memregion("maincpu")->bytes();
 	for (i = 0; i < length; i++)
 		rom[i] = BITSWAP8(rom[i], 6,7,5,4,3,2,1,0);
 
 	/* and the fg gfx ... */
-	rom = machine.root_device().memregion("gfx1")->base();
-	length = machine.root_device().memregion("gfx1")->bytes();
+	rom = state->memregion("gfx1")->base();
+	length = state->memregion("gfx1")->bytes();
 	for (i = 0; i < length; i++)
 		rom[i] = BITSWAP8(rom[i], 7,6,5,3,4,2,1,0);
 
 	/* and the sprites gfx */
-	rom = machine.root_device().memregion("gfx2")->base();
-	length = machine.root_device().memregion("gfx2")->bytes();
+	rom = state->memregion("gfx2")->base();
+	length = state->memregion("gfx2")->bytes();
 	for (i = 0; i < length; i++)
 		rom[i] = BITSWAP8(rom[i], 7,6,5,4,3,2,0,1);
 
 	/* and the bg gfx */
-	rom = machine.root_device().memregion("gfx3")->base();
+	rom = state->memregion("gfx3")->base();
 	length = state->memregion("gfx3")->bytes();
 	for (i = 0; i < length / 2; i++)
 	{
@@ -2058,7 +2058,7 @@ static DRIVER_INIT( ddragon6809 )
 	int i;
 	UINT8 *dst,*src;
 
-	src = machine.root_device().memregion("chars")->base();
+	src = state->memregion("chars")->base();
 	dst = state->memregion("gfx1")->base();
 
 	for (i = 0; i < 0x8000; i++)

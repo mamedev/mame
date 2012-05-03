@@ -73,7 +73,7 @@ static TIMER_CALLBACK( interrupt_callback )
 {
 	fgoal_state *state = machine.driver_data<fgoal_state>();
 	int scanline;
-	int coin = (input_port_read(machine, "IN1") & 2);
+	int coin = (state->ioport("IN1")->read() & 2);
 
 	device_set_input_line(state->m_maincpu, 0, ASSERT_LINE);
 
@@ -100,7 +100,7 @@ static unsigned video_ram_address( running_machine &machine )
 
 READ8_MEMBER(fgoal_state::fgoal_analog_r)
 {
-	return input_port_read(machine(), m_fgoal_player ? "PADDLE1" : "PADDLE0"); /* PCB can be jumpered to use a single dial */
+	return ioport(m_fgoal_player ? "PADDLE1" : "PADDLE0")->read(); /* PCB can be jumpered to use a single dial */
 }
 
 

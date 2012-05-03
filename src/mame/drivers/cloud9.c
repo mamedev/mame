@@ -230,7 +230,7 @@ WRITE8_MEMBER(cloud9_state::cloud9_coin_counter_w)
 
 READ8_MEMBER(cloud9_state::leta_r)
 {
-	return input_port_read(machine(), offset ? "TRACKX" : "TRACKY");
+	return ioport(offset ? "TRACKX" : "TRACKY")->read();
 }
 
 

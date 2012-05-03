@@ -436,10 +436,10 @@ READ16_MEMBER(volfied_state::volfied_cchip_ram_r)
 	{
 		switch (offset)
 		{
-		case 0x03: return input_port_read(machine(), "F00007");    /* STARTn + SERVICE1 */
-		case 0x04: return input_port_read(machine(), "F00009");    /* COINn */
-		case 0x05: return input_port_read(machine(), "F0000B");    /* Player controls + TILT */
-		case 0x06: return input_port_read(machine(), "F0000D");    /* Player controls (cocktail) */
+		case 0x03: return ioport("F00007")->read();    /* STARTn + SERVICE1 */
+		case 0x04: return ioport("F00009")->read();    /* COINn */
+		case 0x05: return ioport("F0000B")->read();    /* Player controls + TILT */
+		case 0x06: return ioport("F0000D")->read();    /* Player controls (cocktail) */
 		case 0x08: return m_cc_port;
 		}
 	}

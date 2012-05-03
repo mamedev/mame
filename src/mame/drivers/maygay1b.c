@@ -202,7 +202,7 @@ READ8_MEMBER(maygay1b_state::m1_8279_r)
 			/* read sensor RAM */
 			case 0x40:
 				addr = chip->command & 0x07;
-				result = input_port_read(machine(),"SW1");
+				result = ioport("SW1")->read();
 				/* handle autoincrement */
 				if (chip->command & 0x10)
 					chip->command = (chip->command & 0xf0) | ((addr + 1) & 0x0f);
@@ -229,7 +229,7 @@ READ8_MEMBER(maygay1b_state::m1_8279_r)
 	{
 		if ( chip->read_sensor )
 		{
-			result = input_port_read(machine(),portnames[chip->sense_address]);
+			result = ioport(portnames[chip->sense_address])->read();
 //          break
 		}
 		if ( chip->sense_auto_inc )
@@ -377,7 +377,7 @@ READ8_MEMBER(maygay1b_state::m1_8279_2_r)
 		{
 			/* read sensor RAM */
 			case 0x40:
-				//result = ~input_port_read(machine,"DSW1");  /* DSW 1 - inverted! */
+				//result = ~ioport("DSW1")->read();  /* DSW 1 - inverted! */
 				break;
 
 			/* read display RAM */

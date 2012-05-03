@@ -76,7 +76,7 @@ static MACHINE_RESET( eprom )
 
 READ16_MEMBER(eprom_state::special_port1_r)
 {
-	int result = input_port_read(machine(), "260010");
+	int result = ioport("260010")->read();
 
 	if (m_sound_to_cpu_ready) result ^= 0x0004;
 	if (m_cpu_to_sound_ready) result ^= 0x0008;
@@ -89,7 +89,7 @@ READ16_MEMBER(eprom_state::special_port1_r)
 READ16_MEMBER(eprom_state::adc_r)
 {
 	static const char *const adcnames[] = { "ADC0", "ADC1", "ADC2", "ADC3" };
-	int result = input_port_read(machine(), adcnames[m_last_offset & 3]);
+	int result = ioport(adcnames[m_last_offset & 3])->read();
 
 	m_last_offset = offset;
 	return result;
@@ -245,7 +245,7 @@ static INPUT_PORTS_START( eprom )
 	PORT_BIT( 0xf000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("260010")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_VBLANK )
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_SERVICE( 0x0002, IP_ACTIVE_LOW )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNUSED )	/* Input buffer full (@260030) */
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED ) /* Output buffer full (@360030) */
@@ -290,7 +290,7 @@ static INPUT_PORTS_START( klaxp )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
 
 	PORT_START("260010")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_VBLANK )
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_SERVICE( 0x0002, IP_ACTIVE_LOW )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNUSED )	/* Input buffer full (@260030) */
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED ) /* Output buffer full (@360030) */
@@ -319,7 +319,7 @@ static INPUT_PORTS_START( guts )
 	PORT_BIT( 0xf000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("260010")		/* 260010 */
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_VBLANK )
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_SERVICE( 0x0002, IP_ACTIVE_LOW )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNUSED )	/* Input buffer full (@260030) */
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED ) /* Output buffer full (@360030) */

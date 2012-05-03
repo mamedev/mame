@@ -540,7 +540,7 @@ UINT16 igs011_state::igs_dips_r(int NUM)
 
 	for (i = 0; i < NUM; i++)
 		if ((~m_igs_dips_sel) & (1 << i) )
-			ret = input_port_read(machine(), dipnames[i]);
+			ret = ioport(dipnames[i])->read();
 	/* 0x0100 is blitter busy */
 	return	(ret & 0xff) | 0x0000;
 }
@@ -1373,9 +1373,9 @@ READ16_MEMBER(igs011_state::drgnwrld_igs003_r)
 {
 	switch(m_igs003_reg[0])
 	{
-		case 0x00:	return input_port_read(machine(), "IN0");
-		case 0x01:	return input_port_read(machine(), "IN1");
-		case 0x02:	return input_port_read(machine(), "IN2");
+		case 0x00:	return ioport("IN0")->read();
+		case 0x01:	return ioport("IN1")->read();
+		case 0x02:	return ioport("IN2")->read();
 
 		case 0x20:	return 0x49;
 		case 0x21:	return 0x47;
@@ -1431,11 +1431,11 @@ READ16_MEMBER(igs011_state::lhb_inputs_r)
 		case 0:		return m_igs_input_sel;
 
 		case 1:
-			if (~m_igs_input_sel & 0x01)	return input_port_read(machine(), "KEY0");
-			if (~m_igs_input_sel & 0x02)	return input_port_read(machine(), "KEY1");
-			if (~m_igs_input_sel & 0x04)	return input_port_read(machine(), "KEY2");
-			if (~m_igs_input_sel & 0x08)	return input_port_read(machine(), "KEY3");
-			if (~m_igs_input_sel & 0x10)	return input_port_read(machine(), "KEY4");
+			if (~m_igs_input_sel & 0x01)	return ioport("KEY0")->read();
+			if (~m_igs_input_sel & 0x02)	return ioport("KEY1")->read();
+			if (~m_igs_input_sel & 0x04)	return ioport("KEY2")->read();
+			if (~m_igs_input_sel & 0x08)	return ioport("KEY3")->read();
+			if (~m_igs_input_sel & 0x10)	return ioport("KEY4")->read();
 
 			logerror("%06x: warning, reading with igs_input_sel = %02x\n", cpu_get_pc(&space.device()), m_igs_input_sel);
 			break;
@@ -1494,11 +1494,11 @@ READ16_MEMBER(igs011_state::lhb2_igs003_r)
 	switch(m_igs003_reg[0])
 	{
 		case 0x01:
-			if (~m_igs_input_sel & 0x01)	return input_port_read(machine(), "KEY0");
-			if (~m_igs_input_sel & 0x02)	return input_port_read(machine(), "KEY1");
-			if (~m_igs_input_sel & 0x04)	return input_port_read(machine(), "KEY2");
-			if (~m_igs_input_sel & 0x08)	return input_port_read(machine(), "KEY3");
-			if (~m_igs_input_sel & 0x10)	return input_port_read(machine(), "KEY4");
+			if (~m_igs_input_sel & 0x01)	return ioport("KEY0")->read();
+			if (~m_igs_input_sel & 0x02)	return ioport("KEY1")->read();
+			if (~m_igs_input_sel & 0x04)	return ioport("KEY2")->read();
+			if (~m_igs_input_sel & 0x08)	return ioport("KEY3")->read();
+			if (~m_igs_input_sel & 0x10)	return ioport("KEY4")->read();
 			/* fall through */
 		default:
 			logerror("%06x: warning, reading with igs003_reg = %02x\n", cpu_get_pc(&space.device()), m_igs003_reg[0]);
@@ -1573,7 +1573,7 @@ READ16_MEMBER(igs011_state::wlcc_igs003_r)
 {
 	switch(m_igs003_reg[0])
 	{
-		case 0x00:	return input_port_read(machine(), "IN0");
+		case 0x00:	return ioport("IN0")->read();
 
 		case 0x20:	return 0x49;
 		case 0x21:	return 0x47;
@@ -1639,14 +1639,14 @@ READ16_MEMBER(igs011_state::xymg_igs003_r)
 {
 	switch(m_igs003_reg[0])
 	{
-		case 0x00:	return input_port_read(machine(), "COIN");
+		case 0x00:	return ioport("COIN")->read();
 
 		case 0x02:
-			if (~m_igs_input_sel & 0x01)	return input_port_read(machine(), "KEY0");
-			if (~m_igs_input_sel & 0x02)	return input_port_read(machine(), "KEY1");
-			if (~m_igs_input_sel & 0x04)	return input_port_read(machine(), "KEY2");
-			if (~m_igs_input_sel & 0x08)	return input_port_read(machine(), "KEY3");
-			if (~m_igs_input_sel & 0x10)	return input_port_read(machine(), "KEY4");
+			if (~m_igs_input_sel & 0x01)	return ioport("KEY0")->read();
+			if (~m_igs_input_sel & 0x02)	return ioport("KEY1")->read();
+			if (~m_igs_input_sel & 0x04)	return ioport("KEY2")->read();
+			if (~m_igs_input_sel & 0x08)	return ioport("KEY3")->read();
+			if (~m_igs_input_sel & 0x10)	return ioport("KEY4")->read();
 			/* fall through */
 
 		case 0x20:	return 0x49;
@@ -1711,8 +1711,8 @@ READ16_MEMBER(igs011_state::vbowl_igs003_r)
 {
 	switch(m_igs003_reg[0])
 	{
-		case 0x00:	return input_port_read(machine(), "IN0");
-		case 0x01:	return input_port_read(machine(), "IN1");
+		case 0x00:	return ioport("IN0")->read();
+		case 0x01:	return ioport("IN1")->read();
 
 //      case 0x03:
 //          return 0xff;    // parametric bitswaps?
@@ -2408,7 +2408,7 @@ static SCREEN_VBLANK( vbowl )
 	{
 		igs011_state *state = screen.machine().driver_data<igs011_state>();
 		state->m_vbowl_trackball[0] = state->m_vbowl_trackball[1];
-		state->m_vbowl_trackball[1] = (input_port_read(screen.machine(), "AN1") << 8) | input_port_read(screen.machine(), "AN0");
+		state->m_vbowl_trackball[1] = (state->ioport("AN1")->read() << 8) | state->ioport("AN0")->read();
 	}
 }
 

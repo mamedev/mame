@@ -180,7 +180,7 @@ static READ16_HANDLER( hangon_io_r )
 		case 0x1000/2: /* Input ports and DIP switches */
 		{
 			static const char *const sysports[] = { "SERVICE", "COINAGE", "DSW", "UNKNOWN" };
-			return input_port_read(space->machine(), sysports[offset & 3]);
+			return space->machine().root_device().ioport(sysports[offset & 3])->read();
 		}
 
 		case 0x3000/2: /* PPI @ 4C */
@@ -189,7 +189,7 @@ static READ16_HANDLER( hangon_io_r )
 		case 0x3020/2: /* ADC0804 data output */
 		{
 			static const char *const adcports[] = { "ADC0", "ADC1", "ADC2", "ADC3" };
-			return input_port_read_safe(space->machine(), adcports[state->m_adc_select], 0);
+			return state->ioport(adcports[state->m_adc_select])->read_safe(0);
 		}
 	}
 
@@ -235,7 +235,7 @@ static READ16_HANDLER( sharrier_io_r )
 		case 0x0010/2: /* Input ports and DIP switches */
 		{
 			static const char *const sysports[] = { "SERVICE", "UNKNOWN", "COINAGE", "DSW" };
-			return input_port_read(space->machine(), sysports[offset & 3]);
+			return space->machine().root_device().ioport(sysports[offset & 3])->read();
 		}
 
 		case 0x0020/2: /* PPI @ 4C */
@@ -245,7 +245,7 @@ static READ16_HANDLER( sharrier_io_r )
 		case 0x0030/2: /* ADC0804 data output */
 		{
 			static const char *const adcports[] = { "ADC0", "ADC1", "ADC2", "ADC3" };
-			return input_port_read_safe(space->machine(), adcports[state->m_adc_select], 0);
+			return state->ioport(adcports[state->m_adc_select])->read_safe(0);
 		}
 	}
 
@@ -393,7 +393,7 @@ static INTERRUPT_GEN( i8751_main_cpu_vblank )
 
 static void sharrier_i8751_sim(running_machine &machine)
 {
-	workram[0x492/2] = (input_port_read(machine, "ADC0") << 8) | input_port_read(machine, "ADC1");
+	workram[0x492/2] = (machine.root_device().ioport("ADC0")->read() << 8) | machine.root_device().ioport("ADC1")->read();
 }
 
 

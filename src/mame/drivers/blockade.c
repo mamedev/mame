@@ -63,7 +63,7 @@ static INTERRUPT_GEN( blockade_interrupt )
 	blockade_state *state = device->machine().driver_data<blockade_state>();
 	device_resume(device, SUSPEND_ANY_REASON);
 
-	if ((input_port_read(device->machine(), "IN0") & 0x80) == 0)
+	if ((state->ioport("IN0")->read() & 0x80) == 0)
 	{
 		state->m_just_been_reset = 1;
 		device_set_input_line(device, INPUT_LINE_RESET, PULSE_LINE);
@@ -79,7 +79,7 @@ static INTERRUPT_GEN( blockade_interrupt )
 READ8_MEMBER(blockade_state::blockade_input_port_0_r)
 {
 	/* coin latch is bit 7 */
-	UINT8 temp = (input_port_read(machine(), "IN0") & 0x7f);
+	UINT8 temp = (ioport("IN0")->read() & 0x7f);
 
 	return (m_coin_latch << 7) | temp;
 }
@@ -183,7 +183,7 @@ static INPUT_PORTS_START( blockade )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN3")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_VBLANK )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x7f, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
@@ -226,7 +226,7 @@ static INPUT_PORTS_START( comotion )
 
 	PORT_START("IN3")
 	PORT_BIT( 0x7f, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_VBLANK )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( blasto )
@@ -271,7 +271,7 @@ static INPUT_PORTS_START( blasto )
 
 	PORT_START("IN3")
 	PORT_BIT( 0x7f, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_VBLANK )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( hustle )
@@ -315,7 +315,7 @@ static INPUT_PORTS_START( hustle )
 
 	PORT_START("IN3")
 	PORT_BIT( 0x7f, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_VBLANK )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( mineswpr )
@@ -357,7 +357,7 @@ static INPUT_PORTS_START( mineswpr )
 
 	PORT_START("IN3")
 	PORT_BIT( 0x7f, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_VBLANK )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( mineswpr4 )
@@ -399,7 +399,7 @@ static INPUT_PORTS_START( mineswpr4 )
 
 	PORT_START("IN3")
 	PORT_BIT( 0x7f, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_VBLANK )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 INPUT_PORTS_END
 
 

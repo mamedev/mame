@@ -244,7 +244,7 @@ static MACHINE_START( redbaron )
 
 static INTERRUPT_GEN( bzone_interrupt )
 {
-	if (input_port_read(device->machine(), "IN0") & 0x10)
+	if (device->machine().root_device().ioport("IN0")->read() & 0x10)
 		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -278,7 +278,7 @@ WRITE8_MEMBER(bzone_state::bzone_coin_counter_w)
 static READ8_DEVICE_HANDLER( redbaron_joy_r )
 {
 	bzone_state *state = device->machine().driver_data<bzone_state>();
-	return input_port_read(device->machine(), state->m_rb_input_select ? "FAKE1" : "FAKE2");
+	return state->ioport(state->m_rb_input_select ? "FAKE1" : "FAKE2")->read();
 }
 
 static WRITE8_DEVICE_HANDLER( redbaron_joysound_w )
@@ -789,7 +789,7 @@ WRITE8_MEMBER(bzone_state::analog_select_w)
 	static const char *const analog_port[] = { "AN0", "AN1", "AN2" };
 
 	if (offset <= 2)
-		m_analog_data = input_port_read(machine(), analog_port[offset]);
+		m_analog_data = ioport(analog_port[offset])->read();
 }
 
 

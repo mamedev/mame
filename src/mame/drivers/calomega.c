@@ -660,7 +660,7 @@
 static WRITE_LINE_DEVICE_HANDLER( tx_rx_clk )
 {
 	int trx_clk;
-	UINT8 dsw2 = input_port_read(device->machine(), "SW2");
+	UINT8 dsw2 = device->machine().root_device().ioport("SW2")->read();
 	trx_clk = UART_CLOCK * dsw2 / 128;
 	acia6850_device *acia = downcast<acia6850_device *>(device);
 	acia->set_rx_clock(trx_clk);
@@ -673,13 +673,13 @@ static READ8_DEVICE_HANDLER( s903_mux_port_r )
 	calomega_state *state = device->machine().driver_data<calomega_state>();
 	switch( state->m_s903_mux_data & 0xf0 )	/* bits 4-7 */
 	{
-		case 0x10: return input_port_read(device->machine(), "IN0-0");
-		case 0x20: return input_port_read(device->machine(), "IN0-1");
-		case 0x40: return input_port_read(device->machine(), "IN0-2");
-		case 0x80: return input_port_read(device->machine(), "IN0-3");
+		case 0x10: return state->ioport("IN0-0")->read();
+		case 0x20: return state->ioport("IN0-1")->read();
+		case 0x40: return state->ioport("IN0-2")->read();
+		case 0x80: return state->ioport("IN0-3")->read();
 	}
 
-	return input_port_read(device->machine(), "FRQ");	/* bit7 used for 50/60 Hz selector */
+	return device->machine().root_device().ioport("FRQ")->read();	/* bit7 used for 50/60 Hz selector */
 }
 
 static WRITE8_DEVICE_HANDLER( s903_mux_w )
@@ -695,13 +695,13 @@ static READ8_DEVICE_HANDLER( s905_mux_port_r )
 	calomega_state *state = device->machine().driver_data<calomega_state>();
 	switch( state->m_s905_mux_data & 0x0f )	/* bits 0-3 */
 	{
-		case 0x01: return input_port_read(device->machine(), "IN0-0");
-		case 0x02: return input_port_read(device->machine(), "IN0-1");
-		case 0x04: return input_port_read(device->machine(), "IN0-2");
-		case 0x08: return input_port_read(device->machine(), "IN0-3");
+		case 0x01: return state->ioport("IN0-0")->read();
+		case 0x02: return state->ioport("IN0-1")->read();
+		case 0x04: return state->ioport("IN0-2")->read();
+		case 0x08: return state->ioport("IN0-3")->read();
 	}
 
-	return input_port_read(device->machine(), "FRQ");	/* bit6 used for 50/60 Hz selector */
+	return device->machine().root_device().ioport("FRQ")->read();	/* bit6 used for 50/60 Hz selector */
 }
 
 static WRITE8_DEVICE_HANDLER( s905_mux_w )
@@ -717,7 +717,7 @@ static READ8_DEVICE_HANDLER( pia0_ain_r )
 {
 	/* Valid input port. Each polled value is stored at $0538 */
 	logerror("PIA0: Port A in\n");
-	return input_port_read(device->machine(), "IN0");
+	return device->machine().root_device().ioport("IN0")->read();
 }
 
 static READ8_DEVICE_HANDLER( pia0_bin_r )

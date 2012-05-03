@@ -116,7 +116,7 @@ MCU simulation TODO:
 			//6-down
 			//7-leftdwn
 
-			UINT8 val= (input_port_read(machine(), "IN1") >> 2) & 0x0f;
+			UINT8 val= (ioport("IN1")->read() >> 2) & 0x0f;
 			/* bit0 = left
                bit1 = right
                bit2 = down

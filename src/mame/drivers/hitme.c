@@ -72,7 +72,7 @@ static SCREEN_UPDATE_IND16( hitme )
 {
 	hitme_state *state = screen.machine().driver_data<hitme_state>();
 	/* the card width resistor comes from an input port, scaled to the range 0-25 kOhms */
-	double width_resist = input_port_read(screen.machine(), "WIDTH") * 25000 / 100;
+	double width_resist = screen.machine().root_device().ioport("WIDTH")->read() * 25000 / 100;
 	/* this triggers a oneshot for the following length of time */
 	double width_duration = 0.45 * 1000e-12 * width_resist;
 	/* the dot clock runs at the standard horizontal frequency * 320+16 clocks per scanline */
@@ -136,7 +136,7 @@ static UINT8 read_port_and_t0( running_machine &machine, int port )
 	hitme_state *state = machine.driver_data<hitme_state>();
 	static const char *const portnames[] = { "IN0", "IN1", "IN2", "IN3" };
 
-	UINT8 val = input_port_read(machine, portnames[port]);
+	UINT8 val = machine.root_device().ioport(portnames[port])->read();
 	if (machine.time() > state->m_timeout_time)
 		val ^= 0x80;
 	return val;
@@ -192,7 +192,7 @@ static WRITE8_DEVICE_HANDLER( output_port_0_w )
         system's equivalent computation, or else we will hang notes.
     */
 	hitme_state *state = device->machine().driver_data<hitme_state>();
-	UINT8 raw_game_speed = input_port_read(device->machine(), "R3");
+	UINT8 raw_game_speed = state->ioport("R3")->read();
 	double resistance = raw_game_speed * 25000 / 100;
 	attotime duration = attotime(0, ATTOSECONDS_PER_SECOND * 0.45 * 6.8e-6 * resistance * (data + 1));
 	state->m_timeout_time = device->machine().time() + duration;

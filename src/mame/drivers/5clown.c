@@ -591,10 +591,10 @@ static READ8_DEVICE_HANDLER( mux_port_r )
 	_5clown_state *state = device->machine().driver_data<_5clown_state>();
 	switch( state->m_mux_data & 0xf0 )		/* bits 4-7 */
 	{
-		case 0x10: return input_port_read(device->machine(), "IN0-0");
-		case 0x20: return input_port_read(device->machine(), "IN0-1");
-		case 0x40: return input_port_read(device->machine(), "IN0-2");
-		case 0x80: return input_port_read(device->machine(), "IN0-3");
+		case 0x10: return state->ioport("IN0-0")->read();
+		case 0x20: return state->ioport("IN0-1")->read();
+		case 0x40: return state->ioport("IN0-2")->read();
+		case 0x80: return state->ioport("IN0-3")->read();
 	}
 
 	return 0xff;

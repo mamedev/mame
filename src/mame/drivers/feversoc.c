@@ -138,7 +138,7 @@ READ32_MEMBER(feversoc_state::in0_r)
 {
 
 	m_x^=0x40; //vblank? eeprom read bit?
-	return (input_port_read(machine(), "IN0") | m_x) | (input_port_read(machine(), "IN1")<<16);
+	return (ioport("IN1")->read()<<16);
 }
 
 WRITE32_MEMBER(feversoc_state::output_w)

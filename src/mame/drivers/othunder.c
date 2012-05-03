@@ -372,7 +372,7 @@ READ16_MEMBER(othunder_state::othunder_tc0220ioc_r)
 READ16_MEMBER(othunder_state::othunder_lightgun_r)
 {
 	static const char *const portname[4] = { P1X_PORT_TAG, P1Y_PORT_TAG, P2X_PORT_TAG, P2Y_PORT_TAG };
-	return input_port_read(machine(), portname[offset]);
+	return ioport(portname[offset])->read();
 }
 
 WRITE16_MEMBER(othunder_state::othunder_lightgun_w)

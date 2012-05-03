@@ -84,7 +84,7 @@ WRITE16_MEMBER(cabal_state::track_reset_w)
 	static const char *const track_names[] = { "IN0", "IN1", "IN2", "IN3" };
 
 	for (i = 0; i < 4; i++)
-		m_last[i] = input_port_read(machine(), track_names[i]);
+		m_last[i] = ioport(track_names[i])->read();
 }
 
 READ16_MEMBER(cabal_state::track_r)
@@ -93,10 +93,10 @@ READ16_MEMBER(cabal_state::track_r)
 	switch (offset)
 	{
 		default:
-		case 0:	return (( input_port_read(machine(), "IN0") - m_last[0]) & 0x00ff)		 | (((input_port_read(machine(), "IN2") - m_last[2]) & 0x00ff) << 8);	/* X lo */
-		case 1:	return (((input_port_read(machine(), "IN0") - m_last[0]) & 0xff00) >> 8) | (( input_port_read(machine(), "IN2") - m_last[2]) & 0xff00);			/* X hi */
-		case 2:	return (( input_port_read(machine(), "IN1") - m_last[1]) & 0x00ff)		 | (((input_port_read(machine(), "IN3") - m_last[3]) & 0x00ff) << 8);	/* Y lo */
-		case 3:	return (((input_port_read(machine(), "IN1") - m_last[1]) & 0xff00) >> 8) | (( input_port_read(machine(), "IN3") - m_last[3]) & 0xff00);			/* Y hi */
+		case 0: return (( ioport("IN0")->read() - m_last[0]) & 0x00ff)           | (((ioport("IN2")->read() - m_last[2]) & 0x00ff) << 8);       /* X lo */
+		case 1: return (((ioport("IN0")->read() - m_last[0]) & 0xff00) >> 8) | (( ioport("IN2")->read() - m_last[2]) & 0xff00);                 /* X hi */
+		case 2: return (( ioport("IN1")->read() - m_last[1]) & 0x00ff)           | (((ioport("IN3")->read() - m_last[3]) & 0x00ff) << 8);       /* Y lo */
+		case 3: return (((ioport("IN1")->read() - m_last[1]) & 0xff00) >> 8) | (( ioport("IN3")->read() - m_last[3]) & 0xff00);                 /* Y hi */
 	}
 }
 
@@ -246,7 +246,7 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( common )
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x000f, 0x000f, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1:1,2,3,4") PORT_CONDITION("DSW", 0x0010, PORTCOND_NOTEQUALS, 0x00)
+	PORT_DIPNAME( 0x000f, 0x000f, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1:1,2,3,4") PORT_CONDITION("DSW", 0x0010, NOTEQUALS, 0x00)
 	PORT_DIPSETTING(      0x000a, DEF_STR( 6C_1C ) )
 	PORT_DIPSETTING(      0x000b, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(      0x000c, DEF_STR( 4C_1C ) )
@@ -263,12 +263,12 @@ static INPUT_PORTS_START( common )
 	PORT_DIPSETTING(      0x0006, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(      0x0005, DEF_STR( 1C_6C ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Coin_A )) PORT_DIPLOCATION("SW1:1,2") PORT_CONDITION("DSW", 0x0010, PORTCOND_EQUALS, 0x00)
+	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Coin_A )) PORT_DIPLOCATION("SW1:1,2") PORT_CONDITION("DSW", 0x0010, EQUALS, 0x00)
 	PORT_DIPSETTING(      0x0000, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(      0x0002, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(      0x0003, DEF_STR( 1C_1C ) )
-	PORT_DIPNAME( 0x000c, 0x000c, DEF_STR( Coin_B )) PORT_DIPLOCATION("SW1:3,4") PORT_CONDITION("DSW", 0x0010, PORTCOND_EQUALS, 0x00)
+	PORT_DIPNAME( 0x000c, 0x000c, DEF_STR( Coin_B )) PORT_DIPLOCATION("SW1:3,4") PORT_CONDITION("DSW", 0x0010, EQUALS, 0x00)
 	PORT_DIPSETTING(      0x000c, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(      0x0008, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(      0x0004, DEF_STR( 1C_5C ) )

@@ -93,10 +93,10 @@ READ8_MEMBER(namco_30test_state::namco_30test_mux_r)
 
 	switch(m_mux_data)
 	{
-		case 0x01: res = input_port_read(machine(), "IN0"); break;
-		case 0x02: res = input_port_read(machine(), "IN1"); break;
-		case 0x04: res = input_port_read(machine(), "IN2"); break;
-		case 0x08: res = input_port_read(machine(), "IN3"); break;
+		case 0x01: res = ioport("IN0")->read(); break;
+		case 0x02: res = ioport("IN1")->read(); break;
+		case 0x04: res = ioport("IN2")->read(); break;
+		case 0x08: res = ioport("IN3")->read(); break;
 	}
 
 	return res;

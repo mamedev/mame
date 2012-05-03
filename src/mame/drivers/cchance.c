@@ -65,7 +65,7 @@ WRITE8_MEMBER(cchance_state::output_0_w)
 READ8_MEMBER(cchance_state::input_1_r)
 {
 
-	return (m_hop_io) | (m_bell_io) | (input_port_read(machine(), "SP") & 0xff);
+	return (m_hop_io) | (m_bell_io) | (ioport("SP")->read() & 0xff);
 }
 
 WRITE8_MEMBER(cchance_state::output_1_w)

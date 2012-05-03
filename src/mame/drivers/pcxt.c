@@ -146,8 +146,8 @@ static SCREEN_UPDATE_RGB32( tetriskr )
 READ8_MEMBER(pcxt_state::disk_iobank_r)
 {
 	//printf("Read Prototyping card [%02x] @ PC=%05x\n",offset,cpu_get_pc(&space.device()));
-	//if(offset == 0) return input_port_read(machine(), "DSW");
-	if(offset == 1) return input_port_read(machine(), "IN1");
+	//if(offset == 0) return ioport("DSW")->read();
+	if(offset == 1) return ioport("IN1")->read();
 
 	return m_disk_data[offset];
 }

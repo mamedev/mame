@@ -181,7 +181,7 @@ READ8_MEMBER(lsasquad_state::lsasquad_mcu_r)
 
 READ8_MEMBER(lsasquad_state::lsasquad_mcu_status_r)
 {
-	int res = input_port_read(machine(), "MCU");
+	int res = ioport("MCU")->read();
 
 	/* bit 0 = when 1, mcu is ready to receive data from main cpu */
 	/* bit 1 = when 0, mcu has sent data to the main cpu */
@@ -196,7 +196,7 @@ READ8_MEMBER(lsasquad_state::lsasquad_mcu_status_r)
 
 READ8_MEMBER(lsasquad_state::daikaiju_mcu_status_r)
 {
-	int res = input_port_read(machine(), "MCU");
+	int res = ioport("MCU")->read();
 
 	/* bit 0 = when 1, mcu is ready to receive data from main cpu */
 	/* bit 1 = when 0, mcu has sent data to the main cpu */

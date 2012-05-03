@@ -381,10 +381,10 @@ READ8_MEMBER(firefox_state::adc_r)
 {
 	if( m_control_num == 0 )
 	{
-		return input_port_read( machine(), "PITCH" );
+		return ioport( "PITCH" )->read();
 	}
 
-	return input_port_read( machine(), "YAW" );
+	return ioport( "YAW" )->read();
 }
 
 WRITE8_MEMBER(firefox_state::adc_select_w)
@@ -579,7 +579,7 @@ static INPUT_PORTS_START( firefox )
 	PORT_START("rdin1")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, firefox_state,mainflag_r, NULL)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, firefox_state,soundflag_r, NULL)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )

@@ -134,7 +134,7 @@ static DRIVER_INIT( shangkid )
 	state->m_gfx_type = 1;
 
 	/* set up banking */
-	state->membank("bank1")->configure_entries(0, 2, machine.root_device().memregion("maincpu")->base() + 0x8000, 0x8000);
+	state->membank("bank1")->configure_entries(0, 2, state->memregion("maincpu")->base() + 0x8000, 0x8000);
 	state->membank("bank2")->configure_entries(0, 2, state->memregion("audiocpu")->base() + 0x0000, 0x10000);
 }
 

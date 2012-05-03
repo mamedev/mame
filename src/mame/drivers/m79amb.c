@@ -114,16 +114,16 @@ static SCREEN_UPDATE_RGB32( ramtek )
 
 READ8_MEMBER(m79amb_state::gray5bit_controller0_r)
 {
-	UINT8 port_data = input_port_read(machine(), "8004");
-	UINT8 gun_pos = input_port_read(machine(), "GUN1");
+	UINT8 port_data = ioport("8004")->read();
+	UINT8 gun_pos = ioport("GUN1")->read();
 
 	return (port_data & 0xe0) | m_lut_gun1[gun_pos];
 }
 
 READ8_MEMBER(m79amb_state::gray5bit_controller1_r)
 {
-	UINT8 port_data = input_port_read(machine(), "8005");
-	UINT8 gun_pos = input_port_read(machine(), "GUN2");
+	UINT8 port_data = ioport("8005")->read();
+	UINT8 gun_pos = ioport("GUN2")->read();
 
 	return (port_data & 0xe0) | m_lut_gun2[gun_pos];
 }
@@ -171,7 +171,7 @@ static INPUT_PORTS_START( m79amb )
 	PORT_DIPSETTING(    0xc0, DEF_STR( Free_Play ))
 
 	PORT_START("8002")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_VBLANK )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_TILT )

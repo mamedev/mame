@@ -51,7 +51,7 @@ WRITE16_MEMBER(eolith16_state::eeprom_w)
 	m_vbuffer = (data & 0x80) >> 7;
 	coin_counter_w(machine(), 0, data & 1);
 
-	input_port_write(machine(), "EEPROMOUT", data, 0xff);
+	ioport("EEPROMOUT")->write(data, 0xff);
 
 	//data & 0x100 and data & 0x004 always set
 }
@@ -59,7 +59,7 @@ WRITE16_MEMBER(eolith16_state::eeprom_w)
 READ16_MEMBER(eolith16_state::eolith16_custom_r)
 {
 	eolith_speedup_read(&space);
-	return input_port_read(machine(), "SPECIAL");
+	return ioport("SPECIAL")->read();
 }
 
 

@@ -92,11 +92,11 @@ READ16_MEMBER(csplayh5_state::csplayh5_mux_r)
 {
 	switch(m_mux_data)
 	{
-		case 0x01: return input_port_read(machine(), "KEY0");
-		case 0x02: return input_port_read(machine(), "KEY1");
-		case 0x04: return input_port_read(machine(), "KEY2");
-		case 0x08: return input_port_read(machine(), "KEY3");
-		case 0x10: return input_port_read(machine(), "KEY4");
+		case 0x01: return ioport("KEY0")->read();
+		case 0x02: return ioport("KEY1")->read();
+		case 0x04: return ioport("KEY2")->read();
+		case 0x08: return ioport("KEY3")->read();
+		case 0x10: return ioport("KEY4")->read();
 	}
 
 	return 0xffff;

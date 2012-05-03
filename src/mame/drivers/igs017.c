@@ -219,7 +219,7 @@ WRITE16_MEMBER(igs017_state::spriteram_lsb_w)
 static void expand_sprites(running_machine &machine)
 {
 	igs017_state *state = machine.driver_data<igs017_state>();
-	UINT8 *rom	=	machine.root_device().memregion("sprites")->base();
+	UINT8 *rom	=	state->memregion("sprites")->base();
 	int size	=	state->memregion("sprites")->bytes();
 	int i;
 
@@ -1259,9 +1259,9 @@ READ8_MEMBER(igs017_state::input_r)
 {
 	switch (m_input_select)
 	{
-		case 0x00:	return input_port_read(machine(), "PLAYER1");
-		case 0x01:	return input_port_read(machine(), "PLAYER2");
-		case 0x02:	return input_port_read(machine(), "COINS");
+		case 0x00:	return ioport("PLAYER1")->read();
+		case 0x01:	return ioport("PLAYER2")->read();
+		case 0x02:	return ioport("COINS")->read();
 
 		case 0x03:	return 01;
 
@@ -1377,11 +1377,11 @@ READ16_MEMBER(igs017_state::mgcs_magic_r)
 static READ8_DEVICE_HANDLER( mgcs_keys_r )
 {
 	igs017_state *state = device->machine().driver_data<igs017_state>();
-	if (~state->m_input_select & 0x08)	return input_port_read(device->machine(), "KEY0");
-	if (~state->m_input_select & 0x10)	return input_port_read(device->machine(), "KEY1");
-	if (~state->m_input_select & 0x20)	return input_port_read(device->machine(), "KEY2");
-	if (~state->m_input_select & 0x40)	return input_port_read(device->machine(), "KEY3");
-	if (~state->m_input_select & 0x80)	return input_port_read(device->machine(), "KEY4");
+	if (~state->m_input_select & 0x08)	return state->ioport("KEY0")->read();
+	if (~state->m_input_select & 0x10)	return state->ioport("KEY1")->read();
+	if (~state->m_input_select & 0x20)	return state->ioport("KEY2")->read();
+	if (~state->m_input_select & 0x40)	return state->ioport("KEY3")->read();
+	if (~state->m_input_select & 0x80)	return state->ioport("KEY4")->read();
 
 	logerror("%s: warning, reading key with input_select = %02x\n", device->machine().describe_context(), state->m_input_select);
 	return 0xff;
@@ -1449,13 +1449,13 @@ WRITE16_MEMBER(igs017_state::sdmg2_paletteram_w)
 
 READ8_MEMBER(igs017_state::sdmg2_keys_r)
 {
-	if (~m_input_select & 0x01)	return input_port_read(machine(), "KEY0");
-	if (~m_input_select & 0x02)	return input_port_read(machine(), "KEY1");
-	if (~m_input_select & 0x04)	return input_port_read(machine(), "KEY2");
-	if (~m_input_select & 0x08)	return input_port_read(machine(), "KEY3");
-	if (~m_input_select & 0x10)	return input_port_read(machine(), "KEY4");
+	if (~m_input_select & 0x01)	return ioport("KEY0")->read();
+	if (~m_input_select & 0x02)	return ioport("KEY1")->read();
+	if (~m_input_select & 0x04)	return ioport("KEY2")->read();
+	if (~m_input_select & 0x08)	return ioport("KEY3")->read();
+	if (~m_input_select & 0x10)	return ioport("KEY4")->read();
 
-	if (m_input_select == 0x1f)	return input_port_read(machine(), "KEY0");	// in joystick mode
+	if (m_input_select == 0x1f)	return ioport("KEY0")->read();	// in joystick mode
 
 	logerror("%s: warning, reading key with input_select = %02x\n", machine().describe_context(), m_input_select);
 	return 0xff;
@@ -1502,7 +1502,7 @@ READ16_MEMBER(igs017_state::sdmg2_magic_r)
 		case 0x00:
 		{
 			UINT16 hopper_bit = (m_hopper && ((machine().primary_screen->frame_number()/10)&1)) ? 0x0000 : 0x0001;
-			return input_port_read(machine(), "COINS") | hopper_bit;
+			return ioport("COINS")->read() | hopper_bit;
 		}
 
 		case 0x02:
@@ -1538,13 +1538,13 @@ ADDRESS_MAP_END
 
 READ8_MEMBER(igs017_state::mgdh_keys_r)
 {
-	if (~m_input_select & 0x04)	return input_port_read(machine(), "KEY0");
-	if (~m_input_select & 0x08)	return input_port_read(machine(), "KEY1");
-	if (~m_input_select & 0x10)	return input_port_read(machine(), "KEY2");
-	if (~m_input_select & 0x20)	return input_port_read(machine(), "KEY3");
-	if (~m_input_select & 0x40)	return input_port_read(machine(), "KEY4");
+	if (~m_input_select & 0x04)	return ioport("KEY0")->read();
+	if (~m_input_select & 0x08)	return ioport("KEY1")->read();
+	if (~m_input_select & 0x10)	return ioport("KEY2")->read();
+	if (~m_input_select & 0x20)	return ioport("KEY3")->read();
+	if (~m_input_select & 0x40)	return ioport("KEY4")->read();
 
-	if ((m_input_select & 0xfc) == 0xfc)	return input_port_read(machine(), "DSW1");
+	if ((m_input_select & 0xfc) == 0xfc)	return ioport("DSW1")->read();
 
 	logerror("%s: warning, reading key with input_select = %02x\n", machine().describe_context(), m_input_select);
 	return 0xff;
@@ -1616,15 +1616,15 @@ READ16_MEMBER(igs017_state::mgdha_magic_r)
 			return mgdh_keys_r(space, 0);
 
 		case 0x01:
-			return input_port_read(machine(), "BUTTONS");
+			return ioport("BUTTONS")->read();
 
 		case 0x02:
-			return BITSWAP8(input_port_read(machine(), "DSW2"), 0,1,2,3,4,5,6,7);
+			return BITSWAP8(ioport("DSW2")->read(), 0,1,2,3,4,5,6,7);
 
 		case 0x03:
 		{
 			UINT16 hopper_bit = (m_hopper && ((machine().primary_screen->frame_number()/10)&1)) ? 0x0000 : 0x0001;
-			return input_port_read(machine(), "COINS") | hopper_bit;
+			return ioport("COINS")->read() | hopper_bit;
 		}
 
 		default:
@@ -1702,13 +1702,13 @@ READ8_MEMBER(igs017_state::tjsb_input_r)
 {
 	switch (m_input_select)
 	{
-		case 0x00:	return input_port_read(machine(), "PLAYER1");
-		case 0x01:	return input_port_read(machine(), "PLAYER2");
-		case 0x02:	return input_port_read(machine(), "COINS");
+		case 0x00:	return ioport("PLAYER1")->read();
+		case 0x01:	return ioport("PLAYER2")->read();
+		case 0x02:	return ioport("COINS")->read();
 		case 0x03:
 		{
 			UINT8 hopper_bit = (m_hopper && ((machine().primary_screen->frame_number()/10)&1)) ? 0x00 : 0x20;
-			return input_port_read(machine(), "HOPPER") | hopper_bit;
+			return ioport("HOPPER")->read() | hopper_bit;
 		}
 
 		default:
@@ -1794,11 +1794,11 @@ READ16_MEMBER(igs017_state::lhzb2_magic_r)
 	{
 		case 0x01:
 		{
-			if (~m_input_select & 0x01)	return input_port_read(machine(), "KEY0");
-			if (~m_input_select & 0x02)	return input_port_read(machine(), "KEY1");
-			if (~m_input_select & 0x04)	return input_port_read(machine(), "KEY2");
-			if (~m_input_select & 0x08)	return input_port_read(machine(), "KEY3");
-			if (~m_input_select & 0x10)	return input_port_read(machine(), "KEY4");
+			if (~m_input_select & 0x01)	return ioport("KEY0")->read();
+			if (~m_input_select & 0x02)	return ioport("KEY1")->read();
+			if (~m_input_select & 0x04)	return ioport("KEY2")->read();
+			if (~m_input_select & 0x08)	return ioport("KEY3")->read();
+			if (~m_input_select & 0x10)	return ioport("KEY4")->read();
 
 			logerror("%s: warning, reading key with input_select = %02x\n", machine().describe_context(), m_input_select);
 			return 0xffff;
@@ -1885,11 +1885,11 @@ READ16_MEMBER(igs017_state::lhzb2a_input_r)
 	{
 		case 0x00:	// Keys
 		{
-			if (~m_input_select & 0x01)	return input_port_read(machine(), "KEY0") << 8;
-			if (~m_input_select & 0x02)	return input_port_read(machine(), "KEY1") << 8;
-			if (~m_input_select & 0x04)	return input_port_read(machine(), "KEY2") << 8;
-			if (~m_input_select & 0x08)	return input_port_read(machine(), "KEY3") << 8;
-			if (~m_input_select & 0x10)	return input_port_read(machine(), "KEY4") << 8;
+			if (~m_input_select & 0x01)	return ioport("KEY0")->read() << 8;
+			if (~m_input_select & 0x02)	return ioport("KEY1")->read() << 8;
+			if (~m_input_select & 0x04)	return ioport("KEY2")->read() << 8;
+			if (~m_input_select & 0x08)	return ioport("KEY3")->read() << 8;
+			if (~m_input_select & 0x10)	return ioport("KEY4")->read() << 8;
 
 			logerror("%s: warning, reading key with input_select = %02x\n", machine().describe_context(), m_input_select);
 			return 0xffff;
@@ -1898,11 +1898,11 @@ READ16_MEMBER(igs017_state::lhzb2a_input_r)
 		case 0x02:
 		{
 			UINT16 hopper_bit = (m_hopper && ((machine().primary_screen->frame_number()/10)&1)) ? 0x0000 : 0x0002;
-			return (input_port_read(machine(), "DSW1") << 8) | input_port_read(machine(), "COINS") | hopper_bit;
+			return (ioport("DSW1")->read() << 8) | ioport("COINS")->read() | hopper_bit;
 		}
 
 		case 0x04:
-			return input_port_read(machine(), "DSW2");
+			return ioport("DSW2")->read();
 	}
 
 	return 0xffff;
@@ -2011,11 +2011,11 @@ READ16_MEMBER(igs017_state::slqz2_magic_r)
 	switch(m_igs_magic[0])
 	{
 		case 0x00:
-			return input_port_read(machine(), "PLAYER2");
+			return ioport("PLAYER2")->read();
 		case 0x01:
-			return input_port_read(machine(), "PLAYER1");
+			return ioport("PLAYER1")->read();
 		case 0x02:
-			return input_port_read(machine(), "BUTTONS");
+			return ioport("BUTTONS")->read();
 
 		default:
 			logerror("%s: warning, reading with igs_magic = %02x\n", machine().describe_context(), m_igs_magic[0]);
@@ -2559,31 +2559,31 @@ static INPUT_PORTS_START( sdmg2 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_OTHER     ) PORT_NAME("Pay Out") PORT_CODE(KEYCODE_O)
 
 	// Keyboard mode:
-	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_SERVICE3  )	PORT_CONDITION("DSW2",0x40,PORTCOND_EQUALS,0x40)	// shown in test mode
+	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_SERVICE3  )	PORT_CONDITION("DSW2",0x40,EQUALS,0x40)	// shown in test mode
 	// Joystick mode:
-	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_BUTTON3   )	PORT_CONDITION("DSW2",0x40,PORTCOND_EQUALS,0x00)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_BUTTON3   )	PORT_CONDITION("DSW2",0x40,EQUALS,0x00)
 
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN   )
 
 	PORT_START("KEY0")
 	// Keyboard mode:
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A         ) PORT_CONDITION("DSW2",0x40,PORTCOND_EQUALS,0x40)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_E         ) PORT_CONDITION("DSW2",0x40,PORTCOND_EQUALS,0x40)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_I         ) PORT_CONDITION("DSW2",0x40,PORTCOND_EQUALS,0x40)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_M         ) PORT_CONDITION("DSW2",0x40,PORTCOND_EQUALS,0x40)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_KAN       ) PORT_CONDITION("DSW2",0x40,PORTCOND_EQUALS,0x40)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1            ) PORT_CONDITION("DSW2",0x40,PORTCOND_EQUALS,0x40)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN           ) PORT_CONDITION("DSW2",0x40,PORTCOND_EQUALS,0x40)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN           ) PORT_CONDITION("DSW2",0x40,PORTCOND_EQUALS,0x40)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A         ) PORT_CONDITION("DSW2",0x40,EQUALS,0x40)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_E         ) PORT_CONDITION("DSW2",0x40,EQUALS,0x40)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_I         ) PORT_CONDITION("DSW2",0x40,EQUALS,0x40)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_M         ) PORT_CONDITION("DSW2",0x40,EQUALS,0x40)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_KAN       ) PORT_CONDITION("DSW2",0x40,EQUALS,0x40)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1            ) PORT_CONDITION("DSW2",0x40,EQUALS,0x40)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN           ) PORT_CONDITION("DSW2",0x40,EQUALS,0x40)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN           ) PORT_CONDITION("DSW2",0x40,EQUALS,0x40)
 	// Joystick mode:
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1            ) PORT_CONDITION("DSW2",0x40,PORTCOND_EQUALS,0x00)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP       ) PORT_CONDITION("DSW2",0x40,PORTCOND_EQUALS,0x00)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN     ) PORT_CONDITION("DSW2",0x40,PORTCOND_EQUALS,0x00)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT     ) PORT_CONDITION("DSW2",0x40,PORTCOND_EQUALS,0x00)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT    ) PORT_CONDITION("DSW2",0x40,PORTCOND_EQUALS,0x00)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1           ) PORT_CONDITION("DSW2",0x40,PORTCOND_EQUALS,0x00)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2           ) PORT_CONDITION("DSW2",0x40,PORTCOND_EQUALS,0x00)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN           ) PORT_CONDITION("DSW2",0x40,PORTCOND_EQUALS,0x00)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1            ) PORT_CONDITION("DSW2",0x40,EQUALS,0x00)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP       ) PORT_CONDITION("DSW2",0x40,EQUALS,0x00)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN     ) PORT_CONDITION("DSW2",0x40,EQUALS,0x00)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT     ) PORT_CONDITION("DSW2",0x40,EQUALS,0x00)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT    ) PORT_CONDITION("DSW2",0x40,EQUALS,0x00)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1           ) PORT_CONDITION("DSW2",0x40,EQUALS,0x00)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2           ) PORT_CONDITION("DSW2",0x40,EQUALS,0x00)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN           ) PORT_CONDITION("DSW2",0x40,EQUALS,0x00)
 
 	PORT_START("KEY1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_B )
@@ -2690,23 +2690,23 @@ static INPUT_PORTS_START( mgdh )
 
 	PORT_START("KEY0")
 	// Keyboard mode:
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A         ) PORT_CONDITION("DSW2",0x02,PORTCOND_EQUALS,0x02)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_E         ) PORT_CONDITION("DSW2",0x02,PORTCOND_EQUALS,0x02)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_I         ) PORT_CONDITION("DSW2",0x02,PORTCOND_EQUALS,0x02)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_M         ) PORT_CONDITION("DSW2",0x02,PORTCOND_EQUALS,0x02)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_KAN       ) PORT_CONDITION("DSW2",0x02,PORTCOND_EQUALS,0x02)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1            ) PORT_CONDITION("DSW2",0x02,PORTCOND_EQUALS,0x02)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN           ) PORT_CONDITION("DSW2",0x02,PORTCOND_EQUALS,0x02)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN           ) PORT_CONDITION("DSW2",0x02,PORTCOND_EQUALS,0x02)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A         ) PORT_CONDITION("DSW2",0x02,EQUALS,0x02)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_E         ) PORT_CONDITION("DSW2",0x02,EQUALS,0x02)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_I         ) PORT_CONDITION("DSW2",0x02,EQUALS,0x02)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_M         ) PORT_CONDITION("DSW2",0x02,EQUALS,0x02)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_KAN       ) PORT_CONDITION("DSW2",0x02,EQUALS,0x02)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1            ) PORT_CONDITION("DSW2",0x02,EQUALS,0x02)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN           ) PORT_CONDITION("DSW2",0x02,EQUALS,0x02)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN           ) PORT_CONDITION("DSW2",0x02,EQUALS,0x02)
 	// Joystick mode:
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1            ) PORT_CONDITION("DSW2",0x02,PORTCOND_EQUALS,0x00)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP       ) PORT_CONDITION("DSW2",0x02,PORTCOND_EQUALS,0x00)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN     ) PORT_CONDITION("DSW2",0x02,PORTCOND_EQUALS,0x00)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT     ) PORT_CONDITION("DSW2",0x02,PORTCOND_EQUALS,0x00)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT    ) PORT_CONDITION("DSW2",0x02,PORTCOND_EQUALS,0x00)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1           ) PORT_CONDITION("DSW2",0x02,PORTCOND_EQUALS,0x00)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN           ) PORT_CONDITION("DSW2",0x02,PORTCOND_EQUALS,0x00)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN           ) PORT_CONDITION("DSW2",0x02,PORTCOND_EQUALS,0x00)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1            ) PORT_CONDITION("DSW2",0x02,EQUALS,0x00)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP       ) PORT_CONDITION("DSW2",0x02,EQUALS,0x00)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN     ) PORT_CONDITION("DSW2",0x02,EQUALS,0x00)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT     ) PORT_CONDITION("DSW2",0x02,EQUALS,0x00)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT    ) PORT_CONDITION("DSW2",0x02,EQUALS,0x00)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1           ) PORT_CONDITION("DSW2",0x02,EQUALS,0x00)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN           ) PORT_CONDITION("DSW2",0x02,EQUALS,0x00)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN           ) PORT_CONDITION("DSW2",0x02,EQUALS,0x00)
 
 	PORT_START("KEY1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_B )

@@ -110,7 +110,7 @@ static READ8_DEVICE_HANDLER( io_port_r )
 	static const char *const portnames[] = { "IN0", "IN1", "IN2", "IN3", "DSW0", "DSW1" };
 	gameplan_state *state = device->machine().driver_data<gameplan_state>();
 
-	return input_port_read(device->machine(), portnames[state->m_current_port]);
+	return state->ioport(portnames[state->m_current_port])->read();
 }
 
 

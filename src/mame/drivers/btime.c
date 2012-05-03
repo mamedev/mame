@@ -223,7 +223,7 @@ static void btime_decrypt( address_space *space )
 	/* however if the previous instruction was JSR (which caused a write to */
 	/* the stack), fetch the address of the next instruction. */
 	addr1 = cpu_get_previouspc(&space->device());
-	src1 = (addr1 < 0x9000) ? state->m_rambase : space->machine().root_device().memregion("maincpu")->base();
+	src1 = (addr1 < 0x9000) ? state->m_rambase : state->memregion("maincpu")->base();
 	if (decrypted[addr1] == 0x20)	/* JSR $xxxx */
 		addr = src1[addr1 + 1] + 256 * src1[addr1 + 2];
 
@@ -550,7 +550,7 @@ READ8_MEMBER(btime_state::audio_command_r)
 
 READ8_MEMBER(btime_state::zoar_dsw1_read)
 {
-	return (!machine().primary_screen->vblank() << 7) | (input_port_read(machine(), "DSW1") & 0x7f);
+	return (!machine().primary_screen->vblank() << 7) | (ioport("DSW1")->read() & 0x7f);
 }
 
 static INPUT_PORTS_START( btime )
@@ -611,7 +611,7 @@ static INPUT_PORTS_START( btime )
 //  PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("15D:8")
 //  PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 //  PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK  )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM  ) PORT_VBLANK("screen")
 
 	PORT_START("DSW2")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Lives ) ) PORT_DIPLOCATION("14D:1")
@@ -684,7 +684,7 @@ static INPUT_PORTS_START( cookrace )
 	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Cocktail ) )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK  )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM  ) PORT_VBLANK("screen")
 
 	PORT_START("DSW2")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Lives ) )
@@ -833,7 +833,7 @@ static INPUT_PORTS_START( lnc )
 //  PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW1:8")
 //  PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 //  PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK  )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM  ) PORT_VBLANK("screen")
 
 	PORT_START("DSW2")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:1")
@@ -896,7 +896,7 @@ static INPUT_PORTS_START( wtennis )
 	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Cocktail ) )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK  )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM  ) PORT_VBLANK("screen")
 
 	PORT_START("DSW2")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Lives ) )
@@ -972,7 +972,7 @@ static INPUT_PORTS_START( mmonkey )
 //  PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) )
 //  PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 //  PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK  )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM  ) PORT_VBLANK("screen")
 
 	PORT_START("DSW2")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Lives ) )
@@ -1050,7 +1050,7 @@ static INPUT_PORTS_START( bnj )
 //  PORT_DIPNAME( 0x80, 0x00, "Control Panel" ) PORT_DIPLOCATION("8D:8")
 //  PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 //  PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK  )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM  ) PORT_VBLANK("screen")
 
 	PORT_START("DSW2")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Lives ) ) PORT_DIPLOCATION("7D:1")
@@ -1141,7 +1141,7 @@ static INPUT_PORTS_START( disco )
 
 	PORT_START("VBLANK")
 	PORT_BIT( 0x7f, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( sdtennis )
@@ -1193,7 +1193,7 @@ static INPUT_PORTS_START( sdtennis )
 	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Cocktail ) )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK  )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM  ) PORT_VBLANK("screen")
 
 	PORT_START("DSW2")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Lives ) )

@@ -227,7 +227,7 @@ static MACHINE_START( formatz )
 {
 	aeroboto_state *state = machine.driver_data<aeroboto_state>();
 
-	state->m_stars_rom = machine.root_device().memregion("gfx2")->base();
+	state->m_stars_rom = state->memregion("gfx2")->base();
 	state->m_stars_length = state->memregion("gfx2")->bytes();
 
 	state->save_item(NAME(state->m_disable_irq));

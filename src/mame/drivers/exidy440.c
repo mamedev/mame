@@ -282,7 +282,7 @@ CUSTOM_INPUT_MEMBER(exidy440_state::firq_vblank_r)
 CUSTOM_INPUT_MEMBER(exidy440_state::hitnmiss_button1_r)
 {
 	/* button 1 shows up in two bits */
-	UINT32 button1 = input_port_read(machine(), "HITNMISS_BUTTON1");
+	UINT32 button1 = ioport("HITNMISS_BUTTON1")->read();
 	return (button1 << 1) | button1;
 }
 
@@ -336,7 +336,7 @@ READ8_MEMBER(exidy440_state::exidy440_input_port_3_r)
 {
 	/* I/O1 accesses clear the CIRQ flip/flop */
 	cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
-	return input_port_read(machine(), "IN3");
+	return ioport("IN3")->read();
 }
 
 
@@ -424,7 +424,7 @@ READ8_MEMBER(exidy440_state::claypign_protection_r)
 
 READ8_MEMBER(exidy440_state::topsecex_input_port_5_r)
 {
-	return (input_port_read(machine(), "AN1") & 1) ? 0x01 : 0x02;
+	return (ioport("AN1")->read() & 1) ? 0x01 : 0x02;
 }
 
 

@@ -459,7 +459,7 @@ static READ16_DEVICE_HANDLER( gdfs_eeprom_r )
 	static const char *const gunnames[] = { "GUNX1", "GUNY1", "GUNX2", "GUNY2" };
 
 	eeprom_device *eeprom = downcast<eeprom_device *>(device);
-	return (((state->m_gdfs_lightgun_select & 1) ? 0 : 0xff) ^ input_port_read(device->machine(), gunnames[state->m_gdfs_lightgun_select])) | (eeprom->read_bit() << 8);
+	return (((state->m_gdfs_lightgun_select & 1) ? 0 : 0xff) ^ device->machine().root_device().ioport(gunnames[state->m_gdfs_lightgun_select])->read()) | (eeprom->read_bit() << 8);
 }
 
 static WRITE16_DEVICE_HANDLER( gdfs_eeprom_w )
@@ -608,10 +608,10 @@ READ16_MEMBER(ssv_state::hypreact_input_r)
 {
 	UINT16 input_sel = *m_input_sel;
 
-	if (input_sel & 0x0001)	return input_port_read(machine(), "KEY0");
-	if (input_sel & 0x0002)	return input_port_read(machine(), "KEY1");
-	if (input_sel & 0x0004)	return input_port_read(machine(), "KEY2");
-	if (input_sel & 0x0008)	return input_port_read(machine(), "KEY3");
+	if (input_sel & 0x0001)	return ioport("KEY0")->read();
+	if (input_sel & 0x0002)	return ioport("KEY1")->read();
+	if (input_sel & 0x0004)	return ioport("KEY2")->read();
+	if (input_sel & 0x0008)	return ioport("KEY3")->read();
 	logerror("CPU #0 PC %06X: unknown input read: %04X\n",cpu_get_pc(&space.device()),input_sel);
 	return 0xffff;
 }
@@ -733,10 +733,10 @@ READ16_MEMBER(ssv_state::srmp4_input_r)
 {
 	UINT16 input_sel = *m_input_sel;
 
-	if (input_sel & 0x0002)	return input_port_read(machine(), "KEY0");
-	if (input_sel & 0x0004)	return input_port_read(machine(), "KEY1");
-	if (input_sel & 0x0008)	return input_port_read(machine(), "KEY2");
-	if (input_sel & 0x0010)	return input_port_read(machine(), "KEY3");
+	if (input_sel & 0x0002)	return ioport("KEY0")->read();
+	if (input_sel & 0x0004)	return ioport("KEY1")->read();
+	if (input_sel & 0x0008)	return ioport("KEY2")->read();
+	if (input_sel & 0x0010)	return ioport("KEY3")->read();
 	logerror("CPU #0 PC %06X: unknown input read: %04X\n",cpu_get_pc(&space.device()),input_sel);
 	return 0xffff;
 }
@@ -781,10 +781,10 @@ READ16_MEMBER(ssv_state::srmp7_input_r)
 {
 	UINT16 input_sel = *m_input_sel;
 
-	if (input_sel & 0x0002)	return input_port_read(machine(), "KEY0");
-	if (input_sel & 0x0004)	return input_port_read(machine(), "KEY1");
-	if (input_sel & 0x0008)	return input_port_read(machine(), "KEY2");
-	if (input_sel & 0x0010)	return input_port_read(machine(), "KEY3");
+	if (input_sel & 0x0002)	return ioport("KEY0")->read();
+	if (input_sel & 0x0004)	return ioport("KEY1")->read();
+	if (input_sel & 0x0008)	return ioport("KEY2")->read();
+	if (input_sel & 0x0010)	return ioport("KEY3")->read();
 	logerror("CPU #0 PC %06X: unknown input read: %04X\n",cpu_get_pc(&space.device()),input_sel);
 	return 0xffff;
 }
@@ -827,7 +827,7 @@ ADDRESS_MAP_END
 
 READ16_MEMBER(ssv_state::sxyreact_ballswitch_r)
 {
-	return input_port_read_safe(machine(), "SERVICE", 0);
+	return ioport("SERVICE")->read_safe(0);
 }
 
 READ16_MEMBER(ssv_state::sxyreact_dial_r)
@@ -843,7 +843,7 @@ WRITE16_MEMBER(ssv_state::sxyreact_dial_w)
 	{
 
 		if (data & 0x20)
-			m_sxyreact_serial = input_port_read_safe(machine(), "PADDLE", 0) & 0xff;
+			m_sxyreact_serial = ioport("PADDLE")->read_safe(0) & 0xff;
 
 		if ( (m_sxyreact_dial & 0x40) && !(data & 0x40) )	// $40 -> $00
 			m_sxyreact_serial <<= 1;						// shift 1 bit
@@ -986,11 +986,11 @@ READ16_MEMBER(ssv_state::eaglshot_trackball_r)
 
 	switch(m_trackball_select)
 	{
-		case 0x60:	return (input_port_read(machine(), "TRACKX") >> 8) & 0xff;
-		case 0x40:	return (input_port_read(machine(), "TRACKX") >> 0) & 0xff;
+		case 0x60:	return (ioport("TRACKX")->read() >> 8) & 0xff;
+		case 0x40:	return (ioport("TRACKX")->read() >> 0) & 0xff;
 
-		case 0x70:	return (input_port_read(machine(), "TRACKY") >> 8) & 0xff;
-		case 0x50:	return (input_port_read(machine(), "TRACKY") >> 0) & 0xff;
+		case 0x70:	return (ioport("TRACKY")->read() >> 8) & 0xff;
+		case 0x50:	return (ioport("TRACKY")->read() >> 0) & 0xff;
 	}
 	return 0;
 }

@@ -290,19 +290,19 @@ READ8_MEMBER(kas89_state::mux_r)
 {
 	switch(m_mux_data)
 	{
-		case 0x01: return input_port_read(machine(), "PL1");
-		case 0x02: return input_port_read(machine(), "PL2");
-		case 0x04: return input_port_read(machine(), "PL3");
-		case 0x08: return input_port_read(machine(), "PL4");
-		case 0x10: return input_port_read(machine(), "PL5");
-		case 0x20: return input_port_read(machine(), "PL6");
+		case 0x01: return ioport("PL1")->read();
+		case 0x02: return ioport("PL2")->read();
+		case 0x04: return ioport("PL3")->read();
+		case 0x08: return ioport("PL4")->read();
+		case 0x10: return ioport("PL5")->read();
+		case 0x20: return ioport("PL6")->read();
 		case 0x40:
 		{
-			output_set_lamp_value(37, 1 - ((input_port_read(machine(), "SVC") >> 5) & 1));	/* Operator Key LAMP */
-			return input_port_read(machine(), "SVC");
+			output_set_lamp_value(37, 1 - ((ioport("SVC")->read() >> 5) & 1));	/* Operator Key LAMP */
+			return ioport("SVC")->read();
 		}
-		case 0x80: return input_port_read(machine(), "DSW");	/* Polled at $162a through NMI routine */
-		case 0x3f: return input_port_read(machine(), "UNK");
+		case 0x80: return ioport("DSW")->read();	/* Polled at $162a through NMI routine */
+		case 0x3f: return ioport("UNK")->read();
 	}
 
 	logerror("Mux_data %02X\n", m_mux_data);

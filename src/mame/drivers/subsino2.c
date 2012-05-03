@@ -786,10 +786,10 @@ WRITE8_MEMBER(subsino2_state::dsw_mask_w)
 
 READ8_MEMBER(subsino2_state::dsw_r)
 {
-	return	( (input_port_read(machine(), "DSW1") & m_dsw_mask) ? 0x01 : 0 ) |
-			( (input_port_read(machine(), "DSW2") & m_dsw_mask) ? 0x02 : 0 ) |
-			( (input_port_read(machine(), "DSW3") & m_dsw_mask) ? 0x04 : 0 ) |
-			( (input_port_read(machine(), "DSW4") & m_dsw_mask) ? 0x08 : 0 ) ;
+	return	( (ioport("DSW1")->read() & m_dsw_mask) ? 0x01 : 0 ) |
+			( (ioport("DSW2")->read() & m_dsw_mask) ? 0x02 : 0 ) |
+			( (ioport("DSW3")->read() & m_dsw_mask) ? 0x04 : 0 ) |
+			( (ioport("DSW4")->read() & m_dsw_mask) ? 0x08 : 0 ) ;
 }
 
 
@@ -915,10 +915,10 @@ READ16_MEMBER(subsino2_state::bishjan_input_r)
 
 	for (i = 0; i < 5; i++)
 		if (m_bishjan_input & (1 << i))
-			res = input_port_read(machine(), port[i]);
+			res = ioport(port[i])->read();
 
 	return	(res << 8) |									// high byte
-			input_port_read(machine(), "SYSTEM") |		// low byte
+			ioport("SYSTEM")->read() |		// low byte
 			(machine().device<ticket_dispenser_device>("hopper")->read(space, 0) ? 0x00 : 0x04)	// bit 2: hopper sensor
 	;
 }

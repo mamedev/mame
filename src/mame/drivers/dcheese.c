@@ -129,7 +129,7 @@ WRITE16_MEMBER(dcheese_state::eeprom_control_w)
 	/* bits $0080-$0010 are probably lamps */
 	if (ACCESSING_BITS_0_7)
 	{
-		input_port_write(machine(), "EEPROMOUT", data, 0xff);
+		ioport("EEPROMOUT")->write(data, 0xff);
 		machine().device<ticket_dispenser_device>("ticket")->write(space, 0, (data & 1) << 7);
 	}
 }

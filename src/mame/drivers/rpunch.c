@@ -146,7 +146,7 @@ static MACHINE_RESET( rpunch )
 
 CUSTOM_INPUT_MEMBER(rpunch_state::hi_bits_r)
 {
-	return input_port_read(machine(), "SERVICE");
+	return ioport("SERVICE")->read();
 }
 
 

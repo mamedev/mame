@@ -81,9 +81,9 @@ READ8_MEMBER(deshoros_state::io_r)
 	switch(offset)
 	{
 		case 0x00: return 0xff; //printer read
-		case 0x03: return input_port_read(machine(), "KEY0" );
-		case 0x04: return input_port_read(machine(), "KEY1" );
-		case 0x05: return input_port_read(machine(), "SYSTEM" );
+		case 0x03: return ioport("KEY0" )->read();
+		case 0x04: return ioport("KEY1" )->read();
+		case 0x05: return ioport("SYSTEM" )->read();
 		case 0x0a: return m_io_ram[offset]; //"buzzer" 0 read
 		case 0x0b: return m_io_ram[offset]; //"buzzer" 1 read
 	}

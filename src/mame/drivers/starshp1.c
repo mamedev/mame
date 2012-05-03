@@ -16,7 +16,7 @@ Atari Starship 1 driver
 
 static INTERRUPT_GEN( starshp1_interrupt )
 {
-	if ((input_port_read(device->machine(), "SYSTEM") & 0x90) != 0x90)
+	if ((device->machine().root_device().ioport("SYSTEM")->read() & 0x90) != 0x90)
 		generic_pulse_irq_line(device, 0, 1);
 }
 
@@ -71,16 +71,16 @@ CUSTOM_INPUT_MEMBER(starshp1_state::starshp1_analog_r)
 	switch (m_analog_in_select)
 	{
 	case 0:
-		val = input_port_read(machine(), "STICKY");
+		val = ioport("STICKY")->read();
 		break;
 	case 1:
-		val = input_port_read(machine(), "STICKX");
+		val = ioport("STICKX")->read();
 		break;
 	case 2:
 		val = 0x20; /* DAC feedback, not used */
 		break;
 	case 3:
-		val = input_port_read(machine(), "PLAYTIME");
+		val = ioport("PLAYTIME")->read();
 		break;
 	}
 
@@ -202,7 +202,7 @@ static INPUT_PORTS_START( starshp1 )
 	PORT_START("VBLANK")
 	PORT_BIT( 0x3f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, starshp1_state,starshp1_analog_r, NULL)	/* analog in */
 	PORT_SERVICE( 0x40, IP_ACTIVE_LOW )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("COINAGE")
 	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, starshp1_state,collision_latch_r, NULL)	/* collision latch */

@@ -580,9 +580,9 @@ static ADDRESS_MAP_START( scramblb_map, AS_PROGRAM, 8, galaxold_state )
 ADDRESS_MAP_END
 
 READ8_MEMBER(galaxold_state::scramb2_protection_r){ return 0x25; }
-READ8_MEMBER(galaxold_state::scramb2_port0_r){ return (input_port_read(machine(), "IN0") >> offset) & 0x1; }
-READ8_MEMBER(galaxold_state::scramb2_port1_r){ return (input_port_read(machine(), "IN1") >> offset) & 0x1; }
-READ8_MEMBER(galaxold_state::scramb2_port2_r){ return (input_port_read(machine(), "IN2") >> offset) & 0x1; }
+READ8_MEMBER(galaxold_state::scramb2_port0_r){ return (ioport("IN0")->read() >> offset) & 0x1; }
+READ8_MEMBER(galaxold_state::scramb2_port1_r){ return (ioport("IN1")->read() >> offset) & 0x1; }
+READ8_MEMBER(galaxold_state::scramb2_port2_r){ return (ioport("IN2")->read() >> offset) & 0x1; }
 
 static ADDRESS_MAP_START( scramb2_map, AS_PROGRAM, 8, galaxold_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
@@ -923,9 +923,9 @@ CUSTOM_INPUT_MEMBER(galaxold_state::vpool_lives_r)
 	switch (bit_mask)
 	{
 		case 0x40:  /* vpool : IN1 (0xa800) bit 6 */
-			return ((input_port_read(machine(), "LIVES") & bit_mask) >> 6);
+			return ((ioport("LIVES")->read() & bit_mask) >> 6);
 		case 0x01:  /* vpool : DSW (0xb000) bit 0 */
-			return ((input_port_read(machine(), "LIVES") & bit_mask) >> 0);
+			return ((ioport("LIVES")->read() & bit_mask) >> 0);
 
 		default:
 			logerror("vpool_lives_r : invalid %02X bit_mask\n",bit_mask);
@@ -1070,14 +1070,14 @@ CUSTOM_INPUT_MEMBER(galaxold_state::ckongg_coinage_r)
 	switch (bit_mask)
 	{
 		case 0x0c:  /* ckongg  : DSW (0xc800) bits 2 and 3 */
-			return ((input_port_read(machine(), "COINAGE") & bit_mask) >> 2);
+			return ((ioport("COINAGE")->read() & bit_mask) >> 2);
 		case 0x40:  /* ckongg  : IN1 (0xc400) bit 6 */
-			return ((input_port_read(machine(), "COINAGE") & bit_mask) >> 6);
+			return ((ioport("COINAGE")->read() & bit_mask) >> 6);
 
 		case 0xc0:  /* ckongmc : IN1 (0xa800) bits 6 and 7 */
-			return ((input_port_read(machine(), "COINAGE") & bit_mask) >> 6);
+			return ((ioport("COINAGE")->read() & bit_mask) >> 6);
 		case 0x01:  /* ckongmc : DSW (0xb000) bit 0 */
-			return ((input_port_read(machine(), "COINAGE") & bit_mask) >> 0);
+			return ((ioport("COINAGE")->read() & bit_mask) >> 0);
 
 		default:
 			logerror("ckongg_coinage_r : invalid %02X bit_mask\n",bit_mask);
@@ -1438,9 +1438,9 @@ CUSTOM_INPUT_MEMBER(galaxold_state::dkongjrm_coinage_r)
 	switch (bit_mask)
 	{
 		case 0xc0:  /* dkongjrm : IN1 (0xa8??) bits 6 and 7 */
-			return ((input_port_read(machine(), "COINAGE") & bit_mask) >> 6);
+			return ((ioport("COINAGE")->read() & bit_mask) >> 6);
 		case 0x01:  /* dkongjrm : DSW (0xb0??) bit 0 */
-			return ((input_port_read(machine(), "COINAGE") & bit_mask) >> 0);
+			return ((ioport("COINAGE")->read() & bit_mask) >> 0);
 
 		default:
 			logerror("dkongjrm_coinage_r : invalid %02X bit_mask\n",bit_mask);
@@ -1869,7 +1869,7 @@ static INPUT_PORTS_START( drivfrcg )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_START("SENSE")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 INPUT_PORTS_END
 
 
@@ -1933,7 +1933,7 @@ static INPUT_PORTS_START( racknrol )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_START("SENSE")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_VBLANK )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 INPUT_PORTS_END
 
 
@@ -1997,7 +1997,7 @@ static INPUT_PORTS_START( trvchlng )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_START("SENSE")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_VBLANK )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 INPUT_PORTS_END
 
 

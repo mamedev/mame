@@ -177,7 +177,7 @@ static const int lordgun_gun_x_table[] =
 
 static const char *const gunnames[] = { "LIGHT0_X", "LIGHT1_X", "LIGHT0_Y", "LIGHT1_Y" };
 
-float lordgun_crosshair_mapper(const input_field_config *field, float linear_value)
+float lordgun_crosshair_mapper(ioport_field *field, float linear_value)
 {
 	int x = linear_value - 0x3c;
 
@@ -190,15 +190,15 @@ float lordgun_crosshair_mapper(const input_field_config *field, float linear_val
 static void lorddgun_calc_gun_scr(running_machine &machine, int i)
 {
 	lordgun_state *state = machine.driver_data<lordgun_state>();
-//  popmessage("%03x, %02x", input_port_read(machine, "LIGHT0_X"), input_port_read(machine, "LIGHT0_Y"));
+//  popmessage("%03x, %02x", machine, "LIGHT0_X"), state->ioport("LIGHT0_Y")->read());
 
-	int x = input_port_read(machine, gunnames[i]) - 0x3c;
+	int x = state->ioport(gunnames[i])->read() - 0x3c;
 
 	if ( (x < 0) || (x > sizeof(lordgun_gun_x_table)/sizeof(lordgun_gun_x_table[0])) )
 		x = 0;
 
 	state->m_gun[i].scr_x = lordgun_gun_x_table[x];
-	state->m_gun[i].scr_y = input_port_read(machine, gunnames[i+2]);
+	state->m_gun[i].scr_y = state->ioport(gunnames[i+2])->read();
 }
 
 void lordgun_update_gun(running_machine &machine, int i)
@@ -206,8 +206,8 @@ void lordgun_update_gun(running_machine &machine, int i)
 	lordgun_state *state = machine.driver_data<lordgun_state>();
 	const rectangle &visarea = machine.primary_screen->visible_area();
 
-	state->m_gun[i].hw_x = input_port_read(machine, gunnames[i]);
-	state->m_gun[i].hw_y = input_port_read(machine, gunnames[i+2]);
+	state->m_gun[i].hw_x = state->ioport(gunnames[i])->read();
+	state->m_gun[i].hw_y = state->ioport(gunnames[i+2])->read();
 
 	lorddgun_calc_gun_scr(machine, i);
 

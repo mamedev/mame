@@ -373,7 +373,7 @@ static void devzone_draw_grid( running_machine &machine, bitmap_ind16 &bitmap, c
 {
 	cosmic_state *state = machine.driver_data<cosmic_state>();
 	UINT8 y;
-	UINT8 *horz_PROM = machine.root_device().memregion("user2")->base();
+	UINT8 *horz_PROM = state->memregion("user2")->base();
 	UINT8 *vert_PROM = state->memregion("user3")->base();
 	offs_t horz_addr = 0;
 

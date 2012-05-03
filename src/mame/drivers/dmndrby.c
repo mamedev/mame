@@ -91,14 +91,14 @@ READ8_MEMBER(dmndrby_state::input_r)
 {
 	switch(offset & 7)
 	{
-		case 0: return input_port_read(machine(), "IN0");
-		case 1: return input_port_read(machine(), "IN1");
-		case 2: return input_port_read(machine(), "IN2");
-		case 3: return input_port_read(machine(), "IN3");
-		case 4: return input_port_read(machine(), "IN4");
-		case 5: return input_port_read(machine(), "IN5");
-		case 6: return input_port_read(machine(), "IN6");
-		case 7: return input_port_read(machine(), "IN7");
+		case 0: return ioport("IN0")->read();
+		case 1: return ioport("IN1")->read();
+		case 2: return ioport("IN2")->read();
+		case 3: return ioport("IN3")->read();
+		case 4: return ioport("IN4")->read();
+		case 5: return ioport("IN5")->read();
+		case 6: return ioport("IN6")->read();
+		case 7: return ioport("IN7")->read();
 	}
 
 	return 0xff;
@@ -209,14 +209,14 @@ static INPUT_PORTS_START( dderby )
 	PORT_DIPSETTING(    0x04, "480p (cash + tokens)" )
 	PORT_DIPSETTING(    0x00, "600p (cash + tokens)" )
 	PORT_DIPNAME( 0x30, 0x00, "Percentage Payout" )
-	PORT_DIPSETTING(    0x00, "76%" )	PORT_CONDITION("DSW1", 0xc0, PORTCOND_LESSTHAN, 0x80)
-	PORT_DIPSETTING(    0x10, "80%" )	PORT_CONDITION("DSW1", 0xc0, PORTCOND_LESSTHAN, 0x80)
-	PORT_DIPSETTING(    0x20, "86%" )	PORT_CONDITION("DSW1", 0xc0, PORTCOND_LESSTHAN, 0x80)
-	PORT_DIPSETTING(    0x30, "88%" )	PORT_CONDITION("DSW1", 0xc0, PORTCOND_LESSTHAN, 0x80)
-	PORT_DIPSETTING(    0x00, "78%" )	PORT_CONDITION("DSW1", 0xc0, PORTCOND_NOTLESSTHAN, 0x80)
-	PORT_DIPSETTING(    0x10, "82%" )	PORT_CONDITION("DSW1", 0xc0, PORTCOND_NOTLESSTHAN, 0x80)
-	PORT_DIPSETTING(    0x20, "86%" )	PORT_CONDITION("DSW1", 0xc0, PORTCOND_NOTLESSTHAN, 0x80)
-	PORT_DIPSETTING(    0x30, "90%" )	PORT_CONDITION("DSW1", 0xc0, PORTCOND_NOTLESSTHAN, 0x80)
+	PORT_DIPSETTING(    0x00, "76%" )	PORT_CONDITION("DSW1", 0xc0, LESSTHAN, 0x80)
+	PORT_DIPSETTING(    0x10, "80%" )	PORT_CONDITION("DSW1", 0xc0, LESSTHAN, 0x80)
+	PORT_DIPSETTING(    0x20, "86%" )	PORT_CONDITION("DSW1", 0xc0, LESSTHAN, 0x80)
+	PORT_DIPSETTING(    0x30, "88%" )	PORT_CONDITION("DSW1", 0xc0, LESSTHAN, 0x80)
+	PORT_DIPSETTING(    0x00, "78%" )	PORT_CONDITION("DSW1", 0xc0, NOTLESSTHAN, 0x80)
+	PORT_DIPSETTING(    0x10, "82%" )	PORT_CONDITION("DSW1", 0xc0, NOTLESSTHAN, 0x80)
+	PORT_DIPSETTING(    0x20, "86%" )	PORT_CONDITION("DSW1", 0xc0, NOTLESSTHAN, 0x80)
+	PORT_DIPSETTING(    0x30, "90%" )	PORT_CONDITION("DSW1", 0xc0, NOTLESSTHAN, 0x80)
 	PORT_DIPNAME( 0xc0, 0x80, "Price Per Game" )
 	PORT_DIPSETTING(    0x00, "2p" )
 	PORT_DIPSETTING(    0x40, "5p" )

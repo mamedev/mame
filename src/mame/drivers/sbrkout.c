@@ -142,7 +142,7 @@ static TIMER_CALLBACK( scanline_callback )
 	/* on the VBLANK, read the pot and schedule an interrupt time for it */
 	if (scanline == machine.primary_screen->visible_area().max_y + 1)
 	{
-		UINT8 potvalue = input_port_read(machine, "PADDLE");
+		UINT8 potvalue = state->ioport("PADDLE")->read();
 		state->m_pot_timer->adjust(machine.primary_screen->time_until_pos(56 + (potvalue / 2), (potvalue % 2) * 128));
 	}
 
@@ -173,25 +173,25 @@ READ8_MEMBER(sbrkout_state::switches_r)
 
 	/* DIP switches are selected by ADR0+ADR1 if ADR3 == 0 */
 	if ((offset & 0x0b) == 0x00)
-		result &= (input_port_read(machine(), "DIPS") << 6) | 0x3f;
+		result &= (ioport("DIPS")->read() << 6) | 0x3f;
 	if ((offset & 0x0b) == 0x01)
-		result &= (input_port_read(machine(), "DIPS") << 4) | 0x3f;
+		result &= (ioport("DIPS")->read() << 4) | 0x3f;
 	if ((offset & 0x0b) == 0x02)
-		result &= (input_port_read(machine(), "DIPS") << 0) | 0x3f;
+		result &= (ioport("DIPS")->read() << 0) | 0x3f;
 	if ((offset & 0x0b) == 0x03)
-		result &= (input_port_read(machine(), "DIPS") << 2) | 0x3f;
+		result &= (ioport("DIPS")->read() << 2) | 0x3f;
 
 	/* other switches are selected by ADR0+ADR1+ADR2 if ADR4 == 0 */
 	if ((offset & 0x17) == 0x00)
-		result &= (input_port_read(machine(), "SELECT") << 7) | 0x7f;
+		result &= (ioport("SELECT")->read() << 7) | 0x7f;
 	if ((offset & 0x17) == 0x04)
 		result &= ((m_pot_trigger[0] & ~m_pot_mask[0]) << 7) | 0x7f;
 	if ((offset & 0x17) == 0x05)
 		result &= ((m_pot_trigger[1] & ~m_pot_mask[1]) << 7) | 0x7f;
 	if ((offset & 0x17) == 0x06)
-		result &= input_port_read(machine(), "SERVE");
+		result &= ioport("SERVE")->read();
 	if ((offset & 0x17) == 0x07)
-		result &= (input_port_read(machine(), "SELECT") << 6) | 0x7f;
+		result &= (ioport("SELECT")->read() << 6) | 0x7f;
 
 	return result;
 }
@@ -398,29 +398,29 @@ static INPUT_PORTS_START( sbrkout )
 	PORT_DIPSETTING(	0x00, DEF_STR( Free_Play ) )
 	PORT_DIPNAME( 0x70, 0x00, "Extended Play" )
 	/* Progressive */
-	PORT_DIPSETTING(	0x10, "200" )	PORT_CONDITION("SELECT",0x03,PORTCOND_EQUALS,0x00)
-	PORT_DIPSETTING(	0x20, "400" )	PORT_CONDITION("SELECT",0x03,PORTCOND_EQUALS,0x00)
-	PORT_DIPSETTING(	0x30, "600" )	PORT_CONDITION("SELECT",0x03,PORTCOND_EQUALS,0x00)
-	PORT_DIPSETTING(	0x40, "900" )	PORT_CONDITION("SELECT",0x03,PORTCOND_EQUALS,0x00)
-	PORT_DIPSETTING(	0x50, "1200" )	PORT_CONDITION("SELECT",0x03,PORTCOND_EQUALS,0x00)
-	PORT_DIPSETTING(	0x60, "1600" )	PORT_CONDITION("SELECT",0x03,PORTCOND_EQUALS,0x00)
-	PORT_DIPSETTING(	0x70, "2000" )	PORT_CONDITION("SELECT",0x03,PORTCOND_EQUALS,0x00)
+	PORT_DIPSETTING(	0x10, "200" )	PORT_CONDITION("SELECT",0x03,EQUALS,0x00)
+	PORT_DIPSETTING(	0x20, "400" )	PORT_CONDITION("SELECT",0x03,EQUALS,0x00)
+	PORT_DIPSETTING(	0x30, "600" )	PORT_CONDITION("SELECT",0x03,EQUALS,0x00)
+	PORT_DIPSETTING(	0x40, "900" )	PORT_CONDITION("SELECT",0x03,EQUALS,0x00)
+	PORT_DIPSETTING(	0x50, "1200" )	PORT_CONDITION("SELECT",0x03,EQUALS,0x00)
+	PORT_DIPSETTING(	0x60, "1600" )	PORT_CONDITION("SELECT",0x03,EQUALS,0x00)
+	PORT_DIPSETTING(	0x70, "2000" )	PORT_CONDITION("SELECT",0x03,EQUALS,0x00)
 	/* Double */
-	PORT_DIPSETTING(	0x10, "200" )	PORT_CONDITION("SELECT",0x03,PORTCOND_EQUALS,0x02)
-	PORT_DIPSETTING(	0x20, "400" )	PORT_CONDITION("SELECT",0x03,PORTCOND_EQUALS,0x02)
-	PORT_DIPSETTING(	0x30, "600" )	PORT_CONDITION("SELECT",0x03,PORTCOND_EQUALS,0x02)
-	PORT_DIPSETTING(	0x40, "800" )	PORT_CONDITION("SELECT",0x03,PORTCOND_EQUALS,0x02)
-	PORT_DIPSETTING(	0x50, "1000" )	PORT_CONDITION("SELECT",0x03,PORTCOND_EQUALS,0x02)
-	PORT_DIPSETTING(	0x60, "1200" )	PORT_CONDITION("SELECT",0x03,PORTCOND_EQUALS,0x02)
-	PORT_DIPSETTING(	0x70, "1500" )	PORT_CONDITION("SELECT",0x03,PORTCOND_EQUALS,0x02)
+	PORT_DIPSETTING(	0x10, "200" )	PORT_CONDITION("SELECT",0x03,EQUALS,0x02)
+	PORT_DIPSETTING(	0x20, "400" )	PORT_CONDITION("SELECT",0x03,EQUALS,0x02)
+	PORT_DIPSETTING(	0x30, "600" )	PORT_CONDITION("SELECT",0x03,EQUALS,0x02)
+	PORT_DIPSETTING(	0x40, "800" )	PORT_CONDITION("SELECT",0x03,EQUALS,0x02)
+	PORT_DIPSETTING(	0x50, "1000" )	PORT_CONDITION("SELECT",0x03,EQUALS,0x02)
+	PORT_DIPSETTING(	0x60, "1200" )	PORT_CONDITION("SELECT",0x03,EQUALS,0x02)
+	PORT_DIPSETTING(	0x70, "1500" )	PORT_CONDITION("SELECT",0x03,EQUALS,0x02)
 	/* Cavity */
-	PORT_DIPSETTING(	0x10, "200" )	PORT_CONDITION("SELECT",0x03,PORTCOND_EQUALS,0x01)
-	PORT_DIPSETTING(	0x20, "300" )	PORT_CONDITION("SELECT",0x03,PORTCOND_EQUALS,0x01)
-	PORT_DIPSETTING(	0x30, "400" )	PORT_CONDITION("SELECT",0x03,PORTCOND_EQUALS,0x01)
-	PORT_DIPSETTING(	0x40, "700" )	PORT_CONDITION("SELECT",0x03,PORTCOND_EQUALS,0x01)
-	PORT_DIPSETTING(	0x50, "900" )	PORT_CONDITION("SELECT",0x03,PORTCOND_EQUALS,0x01)
-	PORT_DIPSETTING(	0x60, "1100" )	PORT_CONDITION("SELECT",0x03,PORTCOND_EQUALS,0x01)
-	PORT_DIPSETTING(	0x70, "1400" )	PORT_CONDITION("SELECT",0x03,PORTCOND_EQUALS,0x01)
+	PORT_DIPSETTING(	0x10, "200" )	PORT_CONDITION("SELECT",0x03,EQUALS,0x01)
+	PORT_DIPSETTING(	0x20, "300" )	PORT_CONDITION("SELECT",0x03,EQUALS,0x01)
+	PORT_DIPSETTING(	0x30, "400" )	PORT_CONDITION("SELECT",0x03,EQUALS,0x01)
+	PORT_DIPSETTING(	0x40, "700" )	PORT_CONDITION("SELECT",0x03,EQUALS,0x01)
+	PORT_DIPSETTING(	0x50, "900" )	PORT_CONDITION("SELECT",0x03,EQUALS,0x01)
+	PORT_DIPSETTING(	0x60, "1100" )	PORT_CONDITION("SELECT",0x03,EQUALS,0x01)
+	PORT_DIPSETTING(	0x70, "1400" )	PORT_CONDITION("SELECT",0x03,EQUALS,0x01)
 	PORT_DIPSETTING(	0x00, DEF_STR( None ) )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Lives ) )
 	PORT_DIPSETTING(	0x80, "3" )

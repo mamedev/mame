@@ -336,42 +336,42 @@ static INTERRUPT_GEN( realpunc_interrupt )//2
 
 READ16_MEMBER(taitob_state::tracky1_hi_r)
 {
-	return input_port_read(machine(), "TRACKX1");
+	return ioport("TRACKX1")->read();
 }
 
 READ16_MEMBER(taitob_state::tracky1_lo_r)
 {
-	return (input_port_read(machine(), "TRACKX1") & 0xff) << 8;
+	return (ioport("TRACKX1")->read() & 0xff) << 8;
 }
 
 READ16_MEMBER(taitob_state::trackx1_hi_r)
 {
-	return input_port_read(machine(), "TRACKY1");
+	return ioport("TRACKY1")->read();
 }
 
 READ16_MEMBER(taitob_state::trackx1_lo_r)
 {
-	return (input_port_read(machine(), "TRACKY1") & 0xff) << 8;
+	return (ioport("TRACKY1")->read() & 0xff) << 8;
 }
 
 READ16_MEMBER(taitob_state::tracky2_hi_r)
 {
-	return input_port_read(machine(), "TRACKX2");
+	return ioport("TRACKX2")->read();
 }
 
 READ16_MEMBER(taitob_state::tracky2_lo_r)
 {
-	return (input_port_read(machine(), "TRACKX2") & 0xff) << 8;
+	return (ioport("TRACKX2")->read() & 0xff) << 8;
 }
 
 READ16_MEMBER(taitob_state::trackx2_hi_r)
 {
-	return input_port_read(machine(), "TRACKY2");
+	return ioport("TRACKY2")->read();
 }
 
 READ16_MEMBER(taitob_state::trackx2_lo_r)
 {
-	return (input_port_read(machine(), "TRACKY2") & 0xff) << 8;
+	return (ioport("TRACKY2")->read() & 0xff) << 8;
 }
 
 
@@ -438,7 +438,7 @@ WRITE16_MEMBER(taitob_state::eeprom_w)
 		/* bit 7 - set all the time (Chip Select?) */
 
 		/* EEPROM */
-		input_port_write(machine(), "EEPROMOUT", data, 0xff);
+		ioport("EEPROMOUT")->write(data, 0xff);
 	}
 }
 
@@ -475,7 +475,7 @@ READ16_MEMBER(taitob_state::pbobble_input_bypass_r)
 	switch (offset)
 	{
 		case 0x01:
-			return input_port_read(machine(), "COIN") << 8;
+			return ioport("COIN")->read() << 8;
 
 		default:
 			return tc0640fio_r(m_tc0640fio, offset) << 8;

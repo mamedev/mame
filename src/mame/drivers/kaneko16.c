@@ -343,7 +343,7 @@ WRITE16_MEMBER(kaneko16_state::kaneko16_eeprom_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		input_port_write(machine(), "EEPROMOUT", data, 0xff);
+		ioport("EEPROMOUT")->write(data, 0xff);
 	}
 
 	if (ACCESSING_BITS_8_15)
@@ -612,12 +612,12 @@ ADDRESS_MAP_END
 READ16_MEMBER(kaneko16_state::gtmr_wheel_r)
 {
 	// check 'Controls' dip switch
-	switch (input_port_read(machine(), "DSW1") & 0x1000)
+	switch (ioport("DSW1")->read() & 0x1000)
 	{
 		case 0x0000:	// 'Both Sides' = 270deg Wheel
-			return	(input_port_read(machine(), "WHEEL0"));
+			return	(ioport("WHEEL0")->read());
 		case 0x1000:	// '1P Side' = 360' Wheel
-			return	(input_port_read(machine(), "WHEEL1"));
+			return	(ioport("WHEEL1")->read());
 		default:
 			return	(0);
 	}
@@ -700,14 +700,14 @@ ADDRESS_MAP_END
 
 READ16_MEMBER(kaneko16_state::gtmr2_wheel_r)
 {
-	switch (input_port_read(machine(), "DSW1") & 0x1800)
+	switch (ioport("DSW1")->read() & 0x1800)
 	{
 		case 0x0000:	// 270' A. Wheel
-			return	(input_port_read(machine(), "WHEEL0"));
+			return	(ioport("WHEEL0")->read());
 		case 0x1000:	// 270' D. Wheel
-			return	(input_port_read(machine(), "WHEEL1") << 8);
+			return	(ioport("WHEEL1")->read() << 8);
 		case 0x0800:	// 360' Wheel
-			return	(input_port_read(machine(), "WHEEL2") << 8);
+			return	(ioport("WHEEL2")->read() << 8);
 		default:
 			logerror("gtmr2_wheel_r : read at %06x with joystick\n", cpu_get_pc(&space.device()));
 			return	(~0);
@@ -716,7 +716,7 @@ READ16_MEMBER(kaneko16_state::gtmr2_wheel_r)
 
 READ16_MEMBER(kaneko16_state::gtmr2_IN1_r)
 {
-	return	(input_port_read(machine(), "P2") & (input_port_read(machine(), "FAKE") | ~0x7100));
+	return  (ioport("P2")->read() & (ioport("FAKE")->read() | ~0x7100));
 }
 
 static ADDRESS_MAP_START( gtmr2_map, AS_PROGRAM, 16, kaneko16_state )
@@ -1362,10 +1362,10 @@ static INPUT_PORTS_START( gtmr )
 	PORT_DIPSETTING(      0x0800, DEF_STR( Joystick ) )
 	PORT_DIPSETTING(      0x0000, "Wheel" )
 	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Controls ) ) PORT_DIPLOCATION("SW1:5")
-	PORT_DIPSETTING(      0x1000, "1P Side" )			PORT_CONDITION("DSW1",0x0800,PORTCOND_NOTEQUALS,0x00)
-	PORT_DIPSETTING(      0x0000, "Both Sides" )		PORT_CONDITION("DSW1",0x0800,PORTCOND_NOTEQUALS,0x00)
-	PORT_DIPSETTING(      0x1000, "360 degree wheel" )	PORT_CONDITION("DSW1",0x0800,PORTCOND_EQUALS,0x00)
-	PORT_DIPSETTING(      0x0000, "270 degree wheel" )	PORT_CONDITION("DSW1",0x0800,PORTCOND_EQUALS,0x00)
+	PORT_DIPSETTING(      0x1000, "1P Side" )			PORT_CONDITION("DSW1",0x0800,NOTEQUALS,0x00)
+	PORT_DIPSETTING(      0x0000, "Both Sides" )		PORT_CONDITION("DSW1",0x0800,NOTEQUALS,0x00)
+	PORT_DIPSETTING(      0x1000, "360 degree wheel" )	PORT_CONDITION("DSW1",0x0800,EQUALS,0x00)
+	PORT_DIPSETTING(      0x0000, "270 degree wheel" )	PORT_CONDITION("DSW1",0x0800,EQUALS,0x00)
 	PORT_DIPNAME( 0x2000, 0x2000, "Use Brake" ) PORT_DIPLOCATION("SW1:6") /* Valid only when joystick is used */
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x2000, DEF_STR( On ) )

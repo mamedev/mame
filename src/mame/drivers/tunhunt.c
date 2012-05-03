@@ -88,38 +88,38 @@ WRITE8_MEMBER(tunhunt_state::tunhunt_control_w)
 
 READ8_MEMBER(tunhunt_state::tunhunt_button_r)
 {
-	int data = input_port_read(machine(), "IN0");
+	int data = ioport("IN0")->read();
 	return ((data>>offset)&1)?0x00:0x80;
 }
 
 
 static READ8_DEVICE_HANDLER( dsw2_0r )
 {
-	return (input_port_read(device->machine(), "DSW")&0x0100)?0x80:0x00;
+	return (device->machine().root_device().ioport("DSW")->read()&0x0100)?0x80:0x00;
 }
 
 
 static READ8_DEVICE_HANDLER( dsw2_1r )
 {
-	return (input_port_read(device->machine(), "DSW")&0x0200)?0x80:0x00;
+	return (device->machine().root_device().ioport("DSW")->read()&0x0200)?0x80:0x00;
 }
 
 
 static READ8_DEVICE_HANDLER( dsw2_2r )
 {
-	return (input_port_read(device->machine(), "DSW")&0x0400)?0x80:0x00;
+	return (device->machine().root_device().ioport("DSW")->read()&0x0400)?0x80:0x00;
 }
 
 
 static READ8_DEVICE_HANDLER( dsw2_3r )
 {
-	return (input_port_read(device->machine(), "DSW")&0x0800)?0x80:0x00;
+	return (device->machine().root_device().ioport("DSW")->read()&0x0800)?0x80:0x00;
 }
 
 
 static READ8_DEVICE_HANDLER( dsw2_4r )
 {
-	return (input_port_read(device->machine(), "DSW")&0x1000)?0x80:0x00;
+	return (device->machine().root_device().ioport("DSW")->read()&0x1000)?0x80:0x00;
 }
 
 
@@ -171,7 +171,7 @@ static INPUT_PORTS_START( tunhunt )
 	PORT_BIT ( 0x10, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT ( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 )
 	PORT_BIT ( 0x40, IP_ACTIVE_HIGH, IPT_START1 )
-	PORT_BIT ( 0x80, IP_ACTIVE_LOW, IPT_VBLANK )
+	PORT_BIT ( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("IN1")
 	PORT_BIT( 0xff, 0x00, IPT_AD_STICK_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(4)

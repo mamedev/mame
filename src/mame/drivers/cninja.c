@@ -131,11 +131,11 @@ READ16_MEMBER(cninja_state::robocop2_prot_r)
 	switch (offset << 1)
 	{
 		case 0x41a: /* Player 1 & 2 input ports */
-			return input_port_read(machine(), "IN0");
+			return ioport("IN0")->read();
 		case 0x320: /* Coins */
-			return input_port_read(machine(), "IN1");
+			return ioport("IN1")->read();
 		case 0x4e6: /* Dip switches */
-			return input_port_read(machine(), "DSW");
+			return ioport("DSW")->read();
 		case 0x504: /* PC: 6b6.  b4, 2c, 36 written before read */
 			logerror("Protection PC %06x: warning - read unmapped memory address %04x\n", cpu_get_pc(&space.device()), offset);
 			return 0x84;
@@ -386,7 +386,7 @@ static INPUT_PORTS_START( edrandy )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("DSW")
 	DATAEAST_COINAGE
@@ -440,7 +440,7 @@ static INPUT_PORTS_START( cninja )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("DSW")	/* Dip switch bank 1 */
 
@@ -509,7 +509,7 @@ static INPUT_PORTS_START( robocop2 )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("DSW")	/* Dip switch bank 1 */
 
@@ -577,7 +577,7 @@ static INPUT_PORTS_START( mutantf )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("DSW")	/* Dip switch bank 1 */
 

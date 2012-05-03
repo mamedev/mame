@@ -72,7 +72,7 @@ INPUT_PORTS_END
 static READ8_DEVICE_HANDLER(forte2_ay8910_read_input)
 {
 	forte2_state *state = device->machine().driver_data<forte2_state>();
-	return input_port_read(device->machine(), "IN0") | (state->m_input_mask&0x3f);
+	return state->ioport("IN0")->read() | (state->m_input_mask&0x3f);
 }
 
 static WRITE8_DEVICE_HANDLER( forte2_ay8910_set_input_mask )

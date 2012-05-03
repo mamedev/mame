@@ -124,12 +124,12 @@ READ8_MEMBER(mjkjidai_state::keyboard_r)
 	{
 		if (~m_keyb & (1 << i))
 		{
-			res = input_port_read(machine(), keynames[i]) & 0x3f;
+			res = ioport(keynames[i])->read() & 0x3f;
 			break;
 		}
 	}
 
-	res |= (input_port_read(machine(), "IN3") & 0xc0);
+	res |= (ioport("IN3")->read() & 0xc0);
 
 	if (m_nvram_init_count)
 	{

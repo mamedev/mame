@@ -251,7 +251,7 @@ WRITE8_MEMBER(phoenix_state::phoenix_videoreg_w)
 		m_videoram_pg_index = data & 1;
 		membank("bank1")->set_entry(m_videoram_pg_index);
 
-		m_cocktail_mode = m_videoram_pg_index && (input_port_read(machine(), "CAB") & 0x01);
+		m_cocktail_mode = m_videoram_pg_index && (ioport("CAB")->read() & 0x01);
 
 		machine().tilemap().set_flip_all(m_cocktail_mode ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
 		machine().tilemap().mark_all_dirty();
@@ -274,7 +274,7 @@ WRITE8_MEMBER(phoenix_state::pleiads_videoreg_w)
 		m_videoram_pg_index = data & 1;
 		membank("bank1")->set_entry(m_videoram_pg_index);
 
-		m_cocktail_mode = m_videoram_pg_index && (input_port_read(machine(), "CAB") & 0x01);
+		m_cocktail_mode = m_videoram_pg_index && (ioport("CAB")->read() & 0x01);
 
 		machine().tilemap().set_flip_all(m_cocktail_mode ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
 		machine().tilemap().mark_all_dirty();
@@ -310,9 +310,9 @@ WRITE8_MEMBER(phoenix_state::phoenix_scroll_w)
 CUSTOM_INPUT_MEMBER(phoenix_state::player_input_r)
 {
 	if (m_cocktail_mode)
-		return (input_port_read(machine(), "CTRL") & 0xf0) >> 4;
+		return (ioport("CTRL")->read() & 0xf0) >> 4;
 	else
-		return (input_port_read(machine(), "CTRL") & 0x0f) >> 0;
+		return (ioport("CTRL")->read() & 0x0f) >> 0;
 }
 
 CUSTOM_INPUT_MEMBER(phoenix_state::pleiads_protection_r)
@@ -365,7 +365,7 @@ CUSTOM_INPUT_MEMBER(phoenix_state::pleiads_protection_r)
 #define REMAP_JS(js) ((ret & 0xf) | ( (js & 0xf)  << 4))
 READ8_MEMBER(phoenix_state::survival_input_port_0_r)
 {
-	UINT8 ret = ~input_port_read(machine(), "IN0");
+	UINT8 ret = ~ioport("IN0")->read();
 
 	if( m_survival_input_readc++ == 2 )
 	{

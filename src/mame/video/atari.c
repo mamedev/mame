@@ -774,7 +774,7 @@ SCREEN_UPDATE_IND16( atari )
 
 	copybitmap(bitmap, *antic.bitmap, 0, 0, 0, 0, cliprect);
 
-	new_tv_artifacts = input_port_read_safe(screen.machine(), "artifacts", 0);
+	new_tv_artifacts = screen.machine().root_device().ioport("artifacts")->read_safe(0);
 	if( tv_artifacts != new_tv_artifacts )
 	{
 		tv_artifacts = new_tv_artifacts;
@@ -1501,7 +1501,7 @@ static void generic_atari_interrupt(running_machine &machine, void (*handle_keyb
 
     if( antic.scanline == VBL_START )
     {
-		button_port = input_port_read_safe(machine, "djoy_b", 0);
+		button_port = machine.root_device().ioport("djoy_b")->read_safe(0);
 
 		/* specify buttons relevant to this Atari variant */
 		for (i = 0; i < button_count; i++)

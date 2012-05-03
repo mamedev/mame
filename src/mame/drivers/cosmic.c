@@ -315,12 +315,12 @@ READ8_MEMBER(cosmic_state::cosmica_pixel_clock_r)
 READ8_MEMBER(cosmic_state::cosmicg_port_0_r)
 {
 	/* The top four address lines from the CRTC are bits 0-3 */
-	return (input_port_read(machine(), "IN0") & 0xf0) | ((machine().primary_screen->vpos() & 0xf0) >> 4);
+	return (ioport("IN0")->read() & 0xf0) | ((machine().primary_screen->vpos() & 0xf0) >> 4);
 }
 
 READ8_MEMBER(cosmic_state::magspot_coinage_dip_r)
 {
-	return (input_port_read_safe(machine(), "DSW", 0) & (1 << (7 - offset))) ? 0 : 1;
+	return (ioport("DSW")->read_safe(0) & (1 << (7 - offset))) ? 0 : 1;
 }
 
 
@@ -328,8 +328,8 @@ READ8_MEMBER(cosmic_state::magspot_coinage_dip_r)
 
 READ8_MEMBER(cosmic_state::nomnlnd_port_0_1_r)
 {
-	int control = input_port_read(machine(), offset ? "IN1" : "IN0");
-	int fire = input_port_read(machine(), "IN3");
+	int control = ioport(offset ? "IN1" : "IN0")->read();
+	int fire = ioport("IN3")->read();
 
 	/* If firing - stop tank */
 	if ((fire & 0xc0) == 0) return 0xff;
@@ -630,7 +630,7 @@ static INPUT_PORTS_START( magspot )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
 
 	PORT_START("IN3")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x1e, IP_ACTIVE_LOW, IPT_UNUSED )		/* always HI */
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SPECIAL )	/* reads what was written to 4808.  Probably not used?? */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
@@ -715,7 +715,7 @@ static INPUT_PORTS_START( devzone )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
 
 	PORT_START("IN3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_VBLANK )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x3e, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
@@ -811,7 +811,7 @@ static INPUT_PORTS_START( nomnlnd )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
 
 	PORT_START("IN3")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x1e, IP_ACTIVE_LOW, IPT_UNUSED )		/* always HI */
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SPECIAL )	/* reads what was written to 4808.  Probably not used?? */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
@@ -1512,7 +1512,7 @@ static DRIVER_INIT( cosmicg )
 	cosmic_state *state = machine.driver_data<cosmic_state>();
 	offs_t offs, len;
 	UINT8 *rom;
-	len = machine.root_device().memregion("maincpu")->bytes();
+	len = state->memregion("maincpu")->bytes();
 	rom = state->memregion("maincpu")->base();
 	for (offs = 0; offs < len; offs++)
 	{

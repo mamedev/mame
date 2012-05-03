@@ -95,12 +95,12 @@ WRITE8_MEMBER(wink_state::wink_coin_counter_w)
 
 READ8_MEMBER(wink_state::analog_port_r)
 {
-	return input_port_read(machine(), /* player_mux ? "DIAL2" : */ "DIAL1");
+	return ioport(/* player_mux ? "DIAL2" : */ "DIAL1")->read();
 }
 
 READ8_MEMBER(wink_state::player_inputs_r)
 {
-	return input_port_read(machine(), /* player_mux ? "INPUTS2" : */ "INPUTS1");
+	return ioport(/* player_mux ? "INPUTS2" : */ "INPUTS1")->read();
 }
 
 WRITE8_MEMBER(wink_state::sound_irq_w)

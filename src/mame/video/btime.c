@@ -264,7 +264,7 @@ WRITE8_MEMBER(btime_state::bnj_video_control_w)
 	/* For now we just check 0x40 in DSW1, and ignore the write if we */
 	/* are in upright controls mode. */
 
-	if (input_port_read(machine(), "DSW1") & 0x40) /* cocktail mode */
+	if (ioport("DSW1")->read() & 0x40) /* cocktail mode */
 		btime_video_control_w(space, offset, data);
 }
 
@@ -278,7 +278,7 @@ WRITE8_MEMBER(btime_state::zoar_video_control_w)
 
 	m_btime_palette = (data & 0x30) >> 3;
 
-	if (input_port_read(machine(), "DSW1") & 0x40) /* cocktail mode */
+	if (ioport("DSW1")->read() & 0x40) /* cocktail mode */
 		flip_screen_set(data & 0x80);
 }
 
@@ -286,7 +286,7 @@ WRITE8_MEMBER(btime_state::disco_video_control_w)
 {
 	m_btime_palette = (data >> 2) & 0x03;
 
-	if (!(input_port_read(machine(), "DSW1") & 0x40)) /* cocktail mode */
+	if (!(ioport("DSW1")->read() & 0x40)) /* cocktail mode */
 		flip_screen_set(data & 0x01);
 }
 

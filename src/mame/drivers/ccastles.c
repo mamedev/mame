@@ -191,7 +191,7 @@ static MACHINE_START( ccastles )
 	rectangle visarea;
 
 	/* initialize globals */
-	state->m_syncprom = machine.root_device().memregion("proms")->base() + 0x000;
+	state->m_syncprom = state->memregion("proms")->base() + 0x000;
 
 	/* find the start of VBLANK in the SYNC PROM */
 	for (state->m_vblank_start = 0; state->m_vblank_start < 256; state->m_vblank_start++)
@@ -273,7 +273,7 @@ READ8_MEMBER(ccastles_state::leta_r)
 {
 	static const char *const letanames[] = { "LETA0", "LETA1", "LETA2", "LETA3" };
 
-	return input_port_read(machine(), letanames[offset]);
+	return ioport(letanames[offset])->read();
 }
 
 

@@ -663,7 +663,7 @@ static void cps3_decrypt_bios(running_machine &machine)
 {
 	cps3_state *state = machine.driver_data<cps3_state>();
 	int i;
-	UINT32 *coderegion = (UINT32*)machine.root_device().memregion("user1")->base();
+	UINT32 *coderegion = (UINT32*)state->memregion("user1")->base();
 
 	state->m_decrypted_bios = (UINT32*)state->memregion("user1")->base();
 
@@ -701,7 +701,7 @@ static void init_common(running_machine &machine, UINT32 key1, UINT32 key2, int 
 	state->m_altEncryption = altEncryption;
 
 	// cache pointers to regions
-	state->m_user4region = machine.root_device().memregion("user4")->base();
+	state->m_user4region = state->memregion("user4")->base();
 	state->m_user5region = state->memregion("user5")->base();
 
 	if (!state->m_user4region) state->m_user4region = auto_alloc_array(machine, UINT8, USER4REGION_LENGTH);

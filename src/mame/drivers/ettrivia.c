@@ -290,7 +290,7 @@ static const ay8910_interface ay8912_interface_3 =
 
 static INTERRUPT_GEN( ettrivia_interrupt )
 {
-	if( input_port_read(device->machine(), "COIN") & 0x01 )
+	if( device->machine().root_device().ioport("COIN")->read() & 0x01 )
 		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 	else
 		device_set_input_line(device, 0, HOLD_LINE);

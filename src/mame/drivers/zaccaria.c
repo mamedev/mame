@@ -75,7 +75,7 @@ READ8_MEMBER(zaccaria_state::zaccaria_dsw_r)
 {
 	static const char *const dswnames[] = { "IN0", "DSW0", "DSW1" };
 
-	return input_port_read(machine(), dswnames[m_dsw]);
+	return ioport(dswnames[m_dsw])->read();
 }
 
 
@@ -228,7 +228,7 @@ READ8_MEMBER(zaccaria_state::zaccaria_prot2_r)
 	switch (offset)
 	{
 		case 0:
-			return input_port_read(machine(), "COINS");   /* bits 4 and 5 must be 0 in Jack Rabbit */
+			return ioport("COINS")->read();   /* bits 4 and 5 must be 0 in Jack Rabbit */
 
 		case 2:
 			return 0x10;    /* Jack Rabbit */

@@ -54,11 +54,11 @@ READ8_MEMBER(liberate_state::deco16_bank_r)
 
 READ8_MEMBER(liberate_state::deco16_io_r)
 {
-	if (offset == 0) return input_port_read(machine(), "IN1"); /* Player 1 controls */
-	if (offset == 1) return input_port_read(machine(), "IN2"); /* Player 2 controls */
-	if (offset == 2) return input_port_read(machine(), "IN3"); /* Vblank, coins */
-	if (offset == 3) return input_port_read(machine(), "DSW1"); /* Dip 1 */
-	if (offset == 4) return input_port_read(machine(), "DSW2"); /* Dip 2 */
+	if (offset == 0) return ioport("IN1")->read(); /* Player 1 controls */
+	if (offset == 1) return ioport("IN2")->read(); /* Player 2 controls */
+	if (offset == 2) return ioport("IN3")->read(); /* Vblank, coins */
+	if (offset == 3) return ioport("DSW1")->read(); /* Dip 1 */
+	if (offset == 4) return ioport("DSW2")->read(); /* Dip 2 */
 
 	logerror("%04x:  Read input %d\n", cpu_get_pc(&space.device()), offset);
 	return 0xff;
@@ -338,7 +338,7 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( generic_input )
 	PORT_START("IN0")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
@@ -358,7 +358,7 @@ static INPUT_PORTS_START( generic_input )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("IN3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -489,7 +489,7 @@ static INPUT_PORTS_START( yellowcb )
 	PORT_INCLUDE( kamikcab )
 
 	PORT_MODIFY("IN0")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0xfb, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 INPUT_PORTS_END
 
@@ -575,7 +575,7 @@ static INPUT_PORTS_START( liberatb )
 
 	PORT_MODIFY("IN0")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_TILT )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0xf9, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
 	PORT_MODIFY("DSW1")
@@ -763,7 +763,7 @@ GFXDECODE_END
 static INTERRUPT_GEN( deco16_interrupt )
 {
 	liberate_state *state = device->machine().driver_data<liberate_state>();
-	int p = ~input_port_read(device->machine(), "IN3");
+	int p = ~state->ioport("IN3")->read();
 	if ((p & 0x43) && !state->m_latch)
 	{
 		device_set_input_line(device, DECO16_IRQ_LINE, ASSERT_LINE);

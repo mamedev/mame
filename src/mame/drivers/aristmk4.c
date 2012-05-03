@@ -321,7 +321,7 @@ INLINE void uBackgroundColour(running_machine &machine)
     There are 4 possible combinations for colour select via SW7, colours vary based on software installed.
     */
 
-	switch(input_port_read(machine, "SW7"))
+	switch(state->ioport("SW7")->read())
 	{
 	case 0x00:
 		// restore defaults
@@ -380,12 +380,12 @@ static SCREEN_UPDATE_IND16(aristmk4)
 READ8_MEMBER(aristmk4_state::ldsw)
 {
 
-	int U3_p2_ret= input_port_read(machine(), "5002");
+	int U3_p2_ret= ioport("5002")->read();
 	if(U3_p2_ret & 0x1)
 	{
 	return 0;
 	}
-	return m_cgdrsw = input_port_read(machine(), "5005");
+	return m_cgdrsw = ioport("5005")->read();
 }
 
 READ8_MEMBER(aristmk4_state::cgdrr)
@@ -420,8 +420,8 @@ WRITE8_MEMBER(aristmk4_state::u3_p0)
 READ8_MEMBER(aristmk4_state::u3_p2)
 {
 
-	int u3_p2_ret= input_port_read(machine(), "5002");
-	int u3_p3_ret= input_port_read(machine(), "5003");
+	int u3_p2_ret= ioport("5002")->read();
+	int u3_p3_ret= ioport("5003")->read();
 
 	output_set_lamp_value(19, (u3_p2_ret >> 4) & 1); //auditkey light
 	output_set_lamp_value(20, (u3_p3_ret >> 2) & 1); //jackpotkey light
@@ -434,7 +434,7 @@ READ8_MEMBER(aristmk4_state::u3_p2)
 
 	if (m_inscrd==0)
 	{
-		m_inscrd=input_port_read(machine(), "insertcoin");
+		m_inscrd=ioport("insertcoin")->read();
 	}
 
 	if (m_inscrd==1)
@@ -446,7 +446,7 @@ READ8_MEMBER(aristmk4_state::u3_p2)
 READ8_MEMBER(aristmk4_state::u3_p3)
 {
 
-    int u3_p3_ret= input_port_read(machine(), "5003");
+    int u3_p3_ret= ioport("5003")->read();
 
     if ((m_printer_motor)==1) // Printer Motor Off
 
@@ -474,7 +474,7 @@ READ8_MEMBER(aristmk4_state::bv_p0)
 	switch(m_insnote)
 	{
 	case 0x01:
-		bv_p0_ret=input_port_read(machine(), "NS")+0x81; //check note selector
+		bv_p0_ret=ioport("NS")->read()+0x81; //check note selector
 		m_insnote++;
 		break;
 	case 0x02:
@@ -496,7 +496,7 @@ READ8_MEMBER(aristmk4_state::bv_p1)
 	int bv_p1_ret=0x00;
 
 	if (m_insnote==0)
-		m_insnote=input_port_read(machine(), "insertnote");
+		m_insnote=ioport("insertnote")->read();
 
 	if (m_insnote==1)
 			bv_p1_ret=0x08;
@@ -645,7 +645,7 @@ static READ8_DEVICE_HANDLER(via_b_r)
 {
 	aristmk4_state *state = device->machine().driver_data<aristmk4_state>();
 
-	int ret=input_port_read(device->machine(), "via_port_b");
+	int ret=state->ioport("via_port_b")->read();
 
 // Not expecting to read anything from port B on the AY8910's ( controls BC1, BC2 and BDIR )
 // However there are extra 4 bits not going to the AY8910's on the schematics, which get read from here.
@@ -1561,12 +1561,12 @@ static const mc6845_interface mc6845_intf =
 
 static READ8_DEVICE_HANDLER(pa1_r)
 {
-	return (input_port_read(device->machine(), "SW3") << 4) + input_port_read(device->machine(), "SW4");
+	return (device->machine().root_device().ioport("SW3")->read() << 4) + device->machine().root_device().ioport("SW4")->read();
 }
 
 static READ8_DEVICE_HANDLER(pb1_r)
 {
-	return (input_port_read(device->machine(), "SW5") << 4) + input_port_read(device->machine(), "SW6");
+	return (device->machine().root_device().ioport("SW5")->read() << 4) + device->machine().root_device().ioport("SW6")->read();
 }
 
 static READ8_DEVICE_HANDLER(pc1_r)
@@ -1630,7 +1630,7 @@ static MACHINE_START( aristmk4 )
 static MACHINE_RESET( aristmk4 )
 {
 	/* mark 4 has a link on the motherboard to switch between 1.5MHz and 3MHz clock speed */
-	switch(input_port_read(machine, "LK13"))  // CPU speed control... 3mhz or 1.5MHz
+	switch(machine.root_device().ioport("LK13")->read())  // CPU speed control... 3mhz or 1.5MHz
 	{
 	case 0x00:
 		machine.device("maincpu")->set_unscaled_clock(MAIN_CLOCK/4);  // 3 MHz
@@ -1659,7 +1659,7 @@ static TIMER_DEVICE_CALLBACK( aristmk4_pf )
     Note: The use of 1 Hz in the timer is to avoid unintentional triggering the NMI ( ie.. hold down L for at least 1 second )
     */
 
-	if(input_port_read(timer.machine(), "powerfail")) // send NMI signal if L pressed
+	if(timer.machine().root_device().ioport("powerfail")->read()) // send NMI signal if L pressed
 	{
 	cputag_set_input_line( timer.machine(), "maincpu", INPUT_LINE_NMI, ASSERT_LINE );
 	}

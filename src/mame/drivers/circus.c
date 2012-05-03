@@ -54,7 +54,7 @@ READ8_MEMBER(circus_state::circus_paddle_r)
 {
 	// also clears irq
 	cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
-	return input_port_read(machine(), "PADDLE");
+	return ioport("PADDLE")->read();
 }
 
 static ADDRESS_MAP_START( circus_map, AS_PROGRAM, 8, circus_state )
@@ -96,7 +96,7 @@ static INPUT_PORTS_START( circus )
 	PORT_DIPSETTING(	0x00, "Single Line" )
 	PORT_DIPSETTING(	0x20, "Super Bonus" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x00, "14A:1" ) /* Not mentioned in the manual */
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_VBLANK )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("PADDLE")
 	PORT_BIT( 0xff, 115, IPT_PADDLE ) PORT_MINMAX(64,167) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_CENTERDELTA(0)
@@ -130,7 +130,7 @@ static INPUT_PORTS_START( robotbwl )
 	PORT_DIPSETTING(	0x20, "5 seconds" )
 	PORT_DIPSETTING(	0x40, "7 seconds" )
 	PORT_DIPSETTING(	0x60, "9 seconds" )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("PADDLE")
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED)
@@ -164,7 +164,7 @@ static INPUT_PORTS_START( crash )
 	PORT_DIPSETTING(	0x10, "Credit Awarded" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x00, "14A:2" ) /* Not mentioned in the manual */
 	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x00, "14A:1" ) /* Not mentioned in the manual */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("PADDLE")
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED)
@@ -204,7 +204,7 @@ static INPUT_PORTS_START( ripcord )
 	PORT_DIPSETTING(	0x00, "No Award" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x00, "14A:2" ) /* Not mentioned in the manual */
 	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x00, "14A:1" ) /* Not mentioned in the manual */
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_VBLANK )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("PADDLE")
 	PORT_BIT( 0xff, 115, IPT_PADDLE ) PORT_MINMAX(64,167) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) PORT_REVERSE

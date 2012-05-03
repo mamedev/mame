@@ -663,13 +663,13 @@ static READ16_HANDLER( outrun_custom_io_r )
 		case 0x10/2:
 		{
 			static const char *const sysports[] = { "SERVICE", "UNKNOWN", "COINAGE", "DSW" };
-			return input_port_read(space->machine(), sysports[offset & 3]);
+			return space->machine().root_device().ioport(sysports[offset & 3])->read();
 		}
 
 		case 0x30/2:
 		{
 			static const char *const ports[] = { "ADC0", "ADC1", "ADC2", "ADC3", "ADC4", "ADC5", "ADC6", "ADC7" };
-			return input_port_read_safe(space->machine(), ports[state->m_adc_select], 0x0010);
+			return state->ioport(ports[state->m_adc_select])->read_safe(0x0010);
 		}
 
 		case 0x60/2:
@@ -733,13 +733,13 @@ static READ16_HANDLER( shangon_custom_io_r )
 		case 0x1006/2:
 		{
 			static const char *const sysports[] = { "SERVICE", "UNKNOWN", "COINAGE", "DSW" };
-			return input_port_read(space->machine(), sysports[offset & 3]);
+			return space->machine().root_device().ioport(sysports[offset & 3])->read();
 		}
 
 		case 0x3020/2:
 		{
 			static const char *const ports[] = { "ADC0", "ADC1", "ADC2", "ADC3" };
-			return input_port_read_safe(space->machine(), ports[state->m_adc_select], 0x0010);
+			return state->ioport(ports[state->m_adc_select])->read_safe(0x0010);
 		}
 	}
 	logerror("%06X:misc_io_r - unknown read access to address %04X\n", cpu_get_pc(&space->device()), offset * 2);

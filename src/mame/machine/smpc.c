@@ -345,7 +345,7 @@ static void smpc_digital_pad(running_machine &machine, UINT8 pad_num, UINT8 offs
 	static const char *const padnames[] = { "JOY1", "JOY2" };
 	UINT16 pad_data;
 
-	pad_data = input_port_read(machine, padnames[pad_num]);
+	pad_data = machine.root_device().ioport(padnames[pad_num])->read();
 	state->m_smpc.OREG[0+pad_num*offset] = 0xf1;
 	state->m_smpc.OREG[1+pad_num*offset] = 0x02;
 	state->m_smpc.OREG[2+pad_num*offset] = pad_data>>8;
@@ -360,16 +360,16 @@ static void smpc_analog_pad(running_machine &machine, UINT8 pad_num, UINT8 offse
 											   { "AN_X2", "AN_Y2", "AN_Z2" }};
 	UINT16 pad_data;
 
-	pad_data = input_port_read(machine, padnames[pad_num]);
+	pad_data = machine.root_device().ioport(padnames[pad_num])->read();
 	state->m_smpc.OREG[0+pad_num*offset] = 0xf1;
 	state->m_smpc.OREG[1+pad_num*offset] = id;
 	state->m_smpc.OREG[2+pad_num*offset] = pad_data>>8;
 	state->m_smpc.OREG[3+pad_num*offset] = pad_data & 0xff;
-	state->m_smpc.OREG[4+pad_num*offset] = input_port_read(machine, annames[pad_num][0]);
+	state->m_smpc.OREG[4+pad_num*offset] = machine.root_device().ioport(annames[pad_num][0])->read();
 	if(id == 0x15)
 	{
-		state->m_smpc.OREG[5+pad_num*offset] = input_port_read(machine, annames[pad_num][1]);
-		state->m_smpc.OREG[6+pad_num*offset] = input_port_read(machine, annames[pad_num][2]);
+		state->m_smpc.OREG[5+pad_num*offset] = machine.root_device().ioport(annames[pad_num][1])->read();
+		state->m_smpc.OREG[6+pad_num*offset] = machine.root_device().ioport(annames[pad_num][2])->read();
 	}
 }
 
@@ -380,19 +380,19 @@ static void smpc_keyboard(running_machine &machine, UINT8 pad_num, UINT8 offset)
 
 	game_key = 0xffff;
 
-	game_key ^= ((input_port_read(machine, "KEYS_1") & 0x80) << 8); // right
-	game_key ^= ((input_port_read(machine, "KEYS_1") & 0x40) << 8); // left
-	game_key ^= ((input_port_read(machine, "KEYS_1") & 0x20) << 8); // down
-	game_key ^= ((input_port_read(machine, "KEYS_1") & 0x10) << 8); // up
-	game_key ^= ((input_port_read(machine, "KEYF") & 0x80) << 4); // ESC -> START
-	game_key ^= ((input_port_read(machine, "KEY3") & 0x04) << 8); // Z / A trigger
-	game_key ^= ((input_port_read(machine, "KEY4") & 0x02) << 8); // C / C trigger
-	game_key ^= ((input_port_read(machine, "KEY6") & 0x04) << 6); // X / B trigger
-	game_key ^= ((input_port_read(machine, "KEY2") & 0x20) << 2); // Q / R trigger
-	game_key ^= ((input_port_read(machine, "KEY3") & 0x10) << 2); // A / X trigger
-	game_key ^= ((input_port_read(machine, "KEY3") & 0x08) << 2); // S / Y trigger
-	game_key ^= ((input_port_read(machine, "KEY4") & 0x08) << 1); // D / Z trigger
-	game_key ^= ((input_port_read(machine, "KEY4") & 0x10) >> 1); // E / L trigger
+	game_key ^= ((state->ioport("KEYS_1")->read() & 0x80) << 8); // right
+	game_key ^= ((state->ioport("KEYS_1")->read() & 0x40) << 8); // left
+	game_key ^= ((state->ioport("KEYS_1")->read() & 0x20) << 8); // down
+	game_key ^= ((state->ioport("KEYS_1")->read() & 0x10) << 8); // up
+	game_key ^= ((state->ioport("KEYF")->read() & 0x80) << 4); // ESC -> START
+	game_key ^= ((state->ioport("KEY3")->read() & 0x04) << 8); // Z / A trigger
+	game_key ^= ((state->ioport("KEY4")->read() & 0x02) << 8); // C / C trigger
+	game_key ^= ((state->ioport("KEY6")->read() & 0x04) << 6); // X / B trigger
+	game_key ^= ((state->ioport("KEY2")->read() & 0x20) << 2); // Q / R trigger
+	game_key ^= ((state->ioport("KEY3")->read() & 0x10) << 2); // A / X trigger
+	game_key ^= ((state->ioport("KEY3")->read() & 0x08) << 2); // S / Y trigger
+	game_key ^= ((state->ioport("KEY4")->read() & 0x08) << 1); // D / Z trigger
+	game_key ^= ((state->ioport("KEY4")->read() & 0x10) >> 1); // E / L trigger
 
 	state->m_smpc.OREG[0+pad_num*offset] = 0xf1;
 	state->m_smpc.OREG[1+pad_num*offset] = 0x34;
@@ -420,9 +420,9 @@ static void smpc_mouse(running_machine &machine, UINT8 pad_num, UINT8 offset, UI
 	UINT8 mouse_ctrl;
 	INT16 mouse_x, mouse_y;
 
-	mouse_ctrl = input_port_read(machine, mousenames[pad_num][0]);
-	mouse_x = input_port_read(machine, mousenames[pad_num][1]);
-	mouse_y = input_port_read(machine, mousenames[pad_num][2]);
+	mouse_ctrl = machine.root_device().ioport(mousenames[pad_num][0])->read();
+	mouse_x = machine.root_device().ioport(mousenames[pad_num][1])->read();
+	mouse_y = machine.root_device().ioport(mousenames[pad_num][2])->read();
 
 	if(mouse_x < 0)
 		mouse_ctrl |= 0x10;
@@ -450,7 +450,7 @@ static void smpc_md_pad(running_machine &machine, UINT8 pad_num, UINT8 offset, U
 	static const char *const padnames[] = { "MD_JOY1", "MD_JOY2" };
 	UINT16 pad_data;
 
-	pad_data = input_port_read(machine, padnames[pad_num]);
+	pad_data = machine.root_device().ioport(padnames[pad_num])->read();
 	state->m_smpc.OREG[0+pad_num*offset] = 0xf1;
 	state->m_smpc.OREG[1+pad_num*offset] = id;
 	state->m_smpc.OREG[2+pad_num*offset] = pad_data>>8;
@@ -475,8 +475,8 @@ static TIMER_CALLBACK( intback_peripheral )
 
 //  if (LOG_SMPC) logerror("SMPC: providing PAD data for intback, pad %d\n", intback_stage-2);
 
-	read_id[0] = (input_port_read(machine, "INPUT_TYPE")) & 0x0f;
-	read_id[1] = (input_port_read(machine, "INPUT_TYPE")) >> 4;
+	read_id[0] = (machine.root_device().ioport("INPUT_TYPE")->read()) & 0x0f;
+	read_id[1] = (machine.root_device().ioport("INPUT_TYPE")->read()) >> 4;
 
 	/* doesn't work? */
 	//pad_num = state->m_smpc.intback_stage - 1;
@@ -744,7 +744,7 @@ READ8_HANDLER( stv_SMPC_r )
 		return_data = state->m_smpc.SF;
 
 	if (offset == 0x75)//PDR1 read
-		return_data = input_port_read(space->machine(), "DSW1");
+		return_data = state->ioport("DSW1")->read();
 
 	if (offset == 0x77)//PDR2 read
 		return_data = (0xfe | space->machine().device<eeprom_device>("eeprom")->read_bit());
@@ -866,7 +866,7 @@ READ8_HANDLER( saturn_SMPC_r )
 			const int shift_bit[4] = { 4, 12, 8, 0 };
 			const char *const padnames[] = { "JOY1", "JOY2" };
 
-			if(input_port_read(space->machine(), "INPUT_TYPE") && !(space->debugger_access()))
+			if(space->machine().root_device().ioport("INPUT_TYPE")->read() && !(space->debugger_access()))
 			{
 				popmessage("Warning: read with SH-2 direct mode with a non-pad device");
 				return 0;
@@ -879,7 +879,7 @@ READ8_HANDLER( saturn_SMPC_r )
 
 			if (LOG_SMPC) logerror("SMPC: SH-2 direct mode, returning data for phase %d\n", hshake);
 
-			return_data = 0x80 | 0x10 | ((input_port_read(space->machine(), padnames[offset == 0x77])>>shift_bit[hshake]) & 0xf);
+			return_data = 0x80 | 0x10 | ((space->machine().root_device().ioport(padnames[offset == 0x77])->read()>>shift_bit[hshake]) & 0xf);
 		}
 	}
 

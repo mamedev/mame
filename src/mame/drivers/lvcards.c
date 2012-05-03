@@ -130,7 +130,7 @@ WRITE8_MEMBER(lvcards_state::control_port_2a_w)
 
 READ8_MEMBER(lvcards_state::payout_r)
 {
-	m_result = input_port_read(machine(), "IN2");
+	m_result = ioport("IN2")->read();
 
 	if (m_payout)
 	{

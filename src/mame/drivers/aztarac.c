@@ -63,8 +63,8 @@ READ16_MEMBER(aztarac_state::nvram_r)
 
 READ16_MEMBER(aztarac_state::joystick_r)
 {
-    return (((input_port_read(machine(), "STICKZ") - 0xf) << 8) |
-            ((input_port_read(machine(), "STICKY") - 0xf) & 0xff));
+    return (((ioport("STICKZ")->read() - 0xf) << 8) |
+            ((ioport("STICKY")->read() - 0xf) & 0xff));
 }
 
 

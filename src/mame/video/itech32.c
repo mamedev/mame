@@ -184,7 +184,7 @@ VIDEO_START( itech32 )
 		state->m_videoplane[0][i] = state->m_videoplane[1][i] = 0xff;
 
 	/* fetch the GROM base */
-	state->m_grom_base = machine.root_device().memregion("gfx1")->base();
+	state->m_grom_base = state->memregion("gfx1")->base();
 	state->m_grom_size = state->memregion("gfx1")->bytes();
 	state->m_grom_bank = 0;
 	state->m_grom_bank_mask = state->m_grom_size >> 24;

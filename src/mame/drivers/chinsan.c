@@ -173,22 +173,22 @@ READ8_MEMBER(chinsan_state::chinsan_input_port_0_r)
 		/* i doubt these are both really the same.. */
 		case 0x40:
 		case 0x4f:
-			return input_port_read(machine(), "MAHJONG_P2_1");
+			return ioport("MAHJONG_P2_1")->read();
 
 		case 0x53:
-			return input_port_read(machine(), "MAHJONG_P2_2");
+			return ioport("MAHJONG_P2_2")->read();
 
 		case 0x57:
-			return input_port_read(machine(), "MAHJONG_P2_3");
+			return ioport("MAHJONG_P2_3")->read();
 
 		case 0x5b:
-			return input_port_read(machine(), "MAHJONG_P2_4");
+			return ioport("MAHJONG_P2_4")->read();
 
 		case 0x5d:
-			return input_port_read(machine(), "MAHJONG_P2_5");
+			return ioport("MAHJONG_P2_5")->read();
 
 		case 0x5e:
-			return input_port_read(machine(), "MAHJONG_P2_6");
+			return ioport("MAHJONG_P2_6")->read();
 	}
 
 	printf("chinsan_input_port_0_r unk_r %02x\n", m_port_select);
@@ -203,22 +203,22 @@ READ8_MEMBER(chinsan_state::chinsan_input_port_1_r)
 		/* i doubt these are both really the same.. */
 		case 0x40:
 		case 0x4f:
-			return input_port_read(machine(), "MAHJONG_P1_1");
+			return ioport("MAHJONG_P1_1")->read();
 
 		case 0x53:
-			return input_port_read(machine(), "MAHJONG_P1_2");
+			return ioport("MAHJONG_P1_2")->read();
 
 		case 0x57:
-			return input_port_read(machine(), "MAHJONG_P1_3");
+			return ioport("MAHJONG_P1_3")->read();
 
 		case 0x5b:
-			return input_port_read(machine(), "MAHJONG_P1_4");
+			return ioport("MAHJONG_P1_4")->read();
 
 		case 0x5d:
-			return input_port_read(machine(), "MAHJONG_P1_5");
+			return ioport("MAHJONG_P1_5")->read();
 
 		case 0x5e:
-			return input_port_read(machine(), "MAHJONG_P1_6");
+			return ioport("MAHJONG_P1_6")->read();
 	}
 
 	printf("chinsan_input_port_1_r unk_r %02x\n", m_port_select);

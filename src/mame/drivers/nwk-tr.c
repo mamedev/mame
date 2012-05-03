@@ -296,15 +296,15 @@ READ32_MEMBER(nwktr_state::sysreg_r)
 	{
 		if (ACCESSING_BITS_24_31)
 		{
-			r |= input_port_read(machine(), "IN0") << 24;
+			r |= ioport("IN0")->read() << 24;
 		}
 		if (ACCESSING_BITS_16_23)
 		{
-			r |= input_port_read(machine(), "IN1") << 16;
+			r |= ioport("IN1")->read() << 16;
 		}
 		if (ACCESSING_BITS_8_15)
 		{
-			r |= input_port_read(machine(), "IN2") << 8;
+			r |= ioport("IN2")->read() << 8;
 		}
 		if (ACCESSING_BITS_0_7)
 		{
@@ -315,7 +315,7 @@ READ32_MEMBER(nwktr_state::sysreg_r)
 	{
 		if (ACCESSING_BITS_24_31)
 		{
-			r |= input_port_read(machine(), "DSW") << 24;
+			r |= ioport("DSW")->read() << 24;
 		}
 	}
 	return r;
@@ -625,11 +625,11 @@ static double adc12138_input_callback( device_t *device, UINT8 input )
 	int value = 0;
 	switch (input)
 	{
-		case 0:		value = input_port_read(device->machine(), "ANALOG1") - 0x800; break;
-		case 1:		value = input_port_read(device->machine(), "ANALOG2"); break;
-		case 2:		value = input_port_read(device->machine(), "ANALOG3"); break;
-		case 3:		value = input_port_read(device->machine(), "ANALOG4"); break;
-		case 4:		value = input_port_read(device->machine(), "ANALOG5"); break;
+		case 0:		value = device->machine().root_device().ioport("ANALOG1")->read() - 0x800; break;
+		case 1:		value = device->machine().root_device().ioport("ANALOG2")->read(); break;
+		case 2:		value = device->machine().root_device().ioport("ANALOG3")->read(); break;
+		case 3:		value = device->machine().root_device().ioport("ANALOG4")->read(); break;
+		case 4:		value = device->machine().root_device().ioport("ANALOG5")->read(); break;
 	}
 
 	return (double)(value) / 2047.0;

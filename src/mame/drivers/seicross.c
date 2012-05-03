@@ -85,7 +85,7 @@ static READ8_DEVICE_HANDLER( friskyt_portB_r )
 {
 	seicross_state *state = device->machine().driver_data<seicross_state>();
 
-	return (state->m_portb & 0x9f) | (input_port_read_safe(device->machine(), "DEBUG", 0) & 0x60);
+	return (state->m_portb & 0x9f) | (state->ioport("DEBUG")->read_safe(0) & 0x60);
 }
 
 static WRITE8_DEVICE_HANDLER( friskyt_portB_w )

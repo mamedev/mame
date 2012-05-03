@@ -208,9 +208,9 @@ static READ8_DEVICE_HANDLER( aliencha_dip_r )
 	lordgun_state *state = device->machine().driver_data<lordgun_state>();
 	switch (state->m_aliencha_dip_sel & 0x70)
 	{
-		case 0x30:	return input_port_read(device->machine(), "DIP1");
-		case 0x60:	return input_port_read(device->machine(), "DIP2");
-		case 0x50:	return input_port_read(device->machine(), "DIP3");
+		case 0x30:	return state->ioport("DIP1")->read();
+		case 0x60:	return state->ioport("DIP2")->read();
+		case 0x50:	return state->ioport("DIP3")->read();
 
 		default:
 			logerror("%s: dip_r with unknown dip_sel = %02X\n",device->machine().describe_context(),state->m_aliencha_dip_sel);

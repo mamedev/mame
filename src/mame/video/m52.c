@@ -276,7 +276,7 @@ WRITE8_MEMBER(m52_state::m52_bgcontrol_w)
 WRITE8_MEMBER(m52_state::m52_flipscreen_w)
 {
 	/* screen flip is handled both by software and hardware */
-	flip_screen_set((data & 0x01) ^ (~input_port_read(machine(), "DSW2") & 0x01));
+	flip_screen_set((data & 0x01) ^ (~ioport("DSW2")->read() & 0x01));
 
 	coin_counter_w(machine(), 0, data & 0x02);
 	coin_counter_w(machine(), 1, data & 0x20);

@@ -199,7 +199,7 @@ static INPUT_PORTS_START( xxmissio )
 
 	PORT_START("STATUS")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, xxmissio_state,xxmissio_status_r, (void *)0x01)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_VBLANK )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, xxmissio_state,xxmissio_status_r, (void *)0x04)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, xxmissio_state,xxmissio_status_r, (void *)0x08)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, xxmissio_state,xxmissio_status_r, (void *)0x10)

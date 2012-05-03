@@ -214,15 +214,15 @@ READ8_MEMBER(namcos86_state::dsw0_r)
 {
 	int rhi, rlo;
 
-	rhi  = ( input_port_read(machine(), "DSWA") & 0x01 ) << 4;
-	rhi |= ( input_port_read(machine(), "DSWA") & 0x04 ) << 3;
-	rhi |= ( input_port_read(machine(), "DSWA") & 0x10 ) << 2;
-	rhi |= ( input_port_read(machine(), "DSWA") & 0x40 ) << 1;
+	rhi  = ( ioport("DSWA")->read() & 0x01 ) << 4;
+	rhi |= ( ioport("DSWA")->read() & 0x04 ) << 3;
+	rhi |= ( ioport("DSWA")->read() & 0x10 ) << 2;
+	rhi |= ( ioport("DSWA")->read() & 0x40 ) << 1;
 
-	rlo  = ( input_port_read(machine(), "DSWB") & 0x01 );
-	rlo |= ( input_port_read(machine(), "DSWB") & 0x04 ) >> 1;
-	rlo |= ( input_port_read(machine(), "DSWB") & 0x10 ) >> 2;
-	rlo |= ( input_port_read(machine(), "DSWB") & 0x40 ) >> 3;
+	rlo  = ( ioport("DSWB")->read() & 0x01 );
+	rlo |= ( ioport("DSWB")->read() & 0x04 ) >> 1;
+	rlo |= ( ioport("DSWB")->read() & 0x10 ) >> 2;
+	rlo |= ( ioport("DSWB")->read() & 0x40 ) >> 3;
 
 	return rhi | rlo;
 }
@@ -231,15 +231,15 @@ READ8_MEMBER(namcos86_state::dsw1_r)
 {
 	int rhi, rlo;
 
-	rhi  = ( input_port_read(machine(), "DSWA") & 0x02 ) << 3;
-	rhi |= ( input_port_read(machine(), "DSWA") & 0x08 ) << 2;
-	rhi |= ( input_port_read(machine(), "DSWA") & 0x20 ) << 1;
-	rhi |= ( input_port_read(machine(), "DSWA") & 0x80 );
+	rhi  = ( ioport("DSWA")->read() & 0x02 ) << 3;
+	rhi |= ( ioport("DSWA")->read() & 0x08 ) << 2;
+	rhi |= ( ioport("DSWA")->read() & 0x20 ) << 1;
+	rhi |= ( ioport("DSWA")->read() & 0x80 );
 
-	rlo  = ( input_port_read(machine(), "DSWB") & 0x02 ) >> 1;
-	rlo |= ( input_port_read(machine(), "DSWB") & 0x08 ) >> 2;
-	rlo |= ( input_port_read(machine(), "DSWB") & 0x20 ) >> 3;
-	rlo |= ( input_port_read(machine(), "DSWB") & 0x80 ) >> 4;
+	rlo  = ( ioport("DSWB")->read() & 0x02 ) >> 1;
+	rlo |= ( ioport("DSWB")->read() & 0x08 ) >> 2;
+	rlo |= ( ioport("DSWB")->read() & 0x20 ) >> 3;
+	rlo |= ( ioport("DSWB")->read() & 0x80 ) >> 4;
 
 	return rhi | rlo;
 }

@@ -119,7 +119,7 @@ READ16_MEMBER(vertigo_state::vertigo_io_convert)
 	if (offset > 2)
 		m_adc_result = 0;
 	else
-		m_adc_result = input_port_read(machine(), adcnames[offset]);
+		m_adc_result = ioport(adcnames[offset])->read();
 
 	update_irq_encoder(machine(), INPUT_LINE_IRQ2, ASSERT_LINE);
 	return 0;
@@ -136,14 +136,14 @@ READ16_MEMBER(vertigo_state::vertigo_io_adc)
 READ16_MEMBER(vertigo_state::vertigo_coin_r)
 {
 	update_irq_encoder(machine(), INPUT_LINE_IRQ6, CLEAR_LINE);
-	return (input_port_read(machine(), "COIN"));
+	return (ioport("COIN")->read());
 }
 
 
 INTERRUPT_GEN( vertigo_interrupt )
 {
 	/* Coin inputs cause IRQ6 */
-	if ((input_port_read(device->machine(), "COIN") & 0x7) < 0x7)
+	if ((device->machine().root_device().ioport("COIN")->read() & 0x7) < 0x7)
 		update_irq_encoder(device->machine(), INPUT_LINE_IRQ6, ASSERT_LINE);
 }
 

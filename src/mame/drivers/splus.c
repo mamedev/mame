@@ -395,7 +395,7 @@ READ8_MEMBER(splus_state::splus_serial_r)
 			break;
 		case 0x01: // Bank 10
             // Test for Coin-In
-	        if ((input_port_read_safe(machine(),"SENSOR",0x00) & 0x01) == 0x01 && m_coin_state == 0) {
+	        if ((ioport("SENSOR")->read_safe(0x00) & 0x01) == 0x01 && m_coin_state == 0) {
 		        m_coin_state = 1; // Start Coin Cycle
 		        m_last_cycles = machine().firstcpu->total_cycles();
 #if DEBUG_OUTPUT
@@ -438,7 +438,7 @@ READ8_MEMBER(splus_state::splus_serial_r)
 	        }
 
             // Determine Door Optics
-            if ((input_port_read_safe(machine(),"I10",0x08) & 0x08) == 0x08)
+            if ((ioport("I10")->read_safe(0x08) & 0x08) == 0x08)
                 door_optics = 0x08;
             else
                 door_optics = (((m_bank20 >> 4) & 1) << 3); // Use Door Optics Transmitter
@@ -483,22 +483,22 @@ READ8_MEMBER(splus_state::splus_serial_r)
             val = val | door_optics; // Door Optics Receiver
             val = val | coin_out; // Hopper Coin OutR
             val = val | 0x00; // Hopper Full
-            val = val | (input_port_read_safe(machine(),"I10",0x40) & 0x40); // Handle/Spin Button
-            val = val | (input_port_read_safe(machine(),"I10",0x80) & 0x80); // Jackpot Reset Key
+            val = val | (ioport("I10")->read_safe(0x40) & 0x40); // Handle/Spin Button
+            val = val | (ioport("I10")->read_safe(0x80) & 0x80); // Jackpot Reset Key
 			break;
 		case 0x02: // Bank 20
-            val = val | (input_port_read_safe(machine(),"I20",0x01) & 0x01); // Bet One Credit
-            val = val | (input_port_read_safe(machine(),"I20",0x02) & 0x02); // Play Max Credits
-            val = val | (input_port_read_safe(machine(),"I20",0x04) & 0x04); // Cash Out
-            val = val | (input_port_read_safe(machine(),"I20",0x08) & 0x08); // Change Request
+            val = val | (ioport("I20")->read_safe(0x01) & 0x01); // Bet One Credit
+            val = val | (ioport("I20")->read_safe(0x02) & 0x02); // Play Max Credits
+            val = val | (ioport("I20")->read_safe(0x04) & 0x04); // Cash Out
+            val = val | (ioport("I20")->read_safe(0x08) & 0x08); // Change Request
             val = val | 0x00; // Reel Mechanism
-            val = val | (input_port_read_safe(machine(),"I20",0x20) & 0x20); // Self Test Button
+            val = val | (ioport("I20")->read_safe(0x20) & 0x20); // Self Test Button
             val = val | 0x40; // Card Cage
             val = val | 0x80; // Bill Acceptor
 			break;
 		case 0x04: // Bank 30
             // Reserved
-            val = val | (input_port_read_safe(machine(),"I30",0x02) & 0x02); // Drop Door
+            val = val | (ioport("I30")->read_safe(0x02) & 0x02); // Drop Door
             // Jackpot to Credit Key
             // Reserved
             // Reserved

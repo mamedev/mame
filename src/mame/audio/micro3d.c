@@ -407,7 +407,7 @@ READ8_MEMBER(micro3d_state::micro3d_sound_io_r)
 
 	switch (offset)
 	{
-		case 0x01:	return (m_sound_port_latch[offset] & 0x7f) | input_port_read(machine(), "SOUND_SW");
+		case 0x01:	return (m_sound_port_latch[offset] & 0x7f) | ioport("SOUND_SW")->read();
 		case 0x03:	return (m_sound_port_latch[offset] & 0xf7) | (upd7759_busy_r(machine().device("upd7759")) ? 0x08 : 0);
 		default:	return 0;
 	}

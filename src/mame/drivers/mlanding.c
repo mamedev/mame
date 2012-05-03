@@ -250,7 +250,7 @@ READ16_MEMBER(mlanding_state::io1_r)//240006
     */
 // multiplexed? or just overriden?
 
-	int retval = (m_dma_active << 15) | (input_port_read(machine(), "DSW") & 0x7fff);
+	int retval = (m_dma_active << 15) | (ioport("DSW")->read() & 0x7fff);
 	return retval;
 }
 
@@ -365,17 +365,17 @@ WRITE8_MEMBER(mlanding_state::ml_sound_to_main_w)
 
 READ16_MEMBER(mlanding_state::ml_analog1_lsb_r)
 {
-	return input_port_read(machine(), "STICKX") & 0xff;
+	return ioport("STICKX")->read() & 0xff;
 }
 
 READ16_MEMBER(mlanding_state::ml_analog2_lsb_r)
 {
-	return input_port_read(machine(), "STICKY") & 0xff;
+	return ioport("STICKY")->read() & 0xff;
 }
 
 READ16_MEMBER(mlanding_state::ml_analog3_lsb_r)
 {
-	return (input_port_read(machine(), "STICKZ") & 0xff);
+	return (ioport("STICKZ")->read() & 0xff);
 }
 
 /*
@@ -401,7 +401,7 @@ READ16_MEMBER(mlanding_state::ml_analog3_lsb_r)
 /* high bits of analog inputs + "limiters"/ADC converters. */
 READ16_MEMBER(mlanding_state::ml_analog1_msb_r)
 {
-	return ((input_port_read(machine(), "STICKY") & 0xf00)>>8) | (input_port_read(machine(), "IN2") & 0xf0);
+	return ((ioport("STICKY")->read() & 0xf00)>>8) | (ioport("IN2")->read() & 0xf0);
 }
 
 READ16_MEMBER(mlanding_state::ml_analog2_msb_r)
@@ -409,8 +409,8 @@ READ16_MEMBER(mlanding_state::ml_analog2_msb_r)
 	UINT8 res;
 	UINT16 y_adc,x_adc;
 
-	y_adc = input_port_read(machine(), "STICKY");
-	x_adc = input_port_read(machine(), "STICKZ");
+	y_adc = ioport("STICKY")->read();
+	x_adc = ioport("STICKZ")->read();
 
 	res = 0;
 
@@ -426,7 +426,7 @@ READ16_MEMBER(mlanding_state::ml_analog2_msb_r)
 
 //  popmessage("%04x %04x",x_adc,y_adc);
 
-	return ((input_port_read(machine(), "STICKZ") & 0xf00)>>8) | res;
+	return ((ioport("STICKZ")->read() & 0xf00)>>8) | res;
 }
 
 READ16_MEMBER(mlanding_state::ml_analog3_msb_r)
@@ -434,8 +434,8 @@ READ16_MEMBER(mlanding_state::ml_analog3_msb_r)
 	UINT8 z_adc,res;
 	UINT16 x_adc;
 
-	z_adc = input_port_read(machine(), "STICKX");
-	x_adc = input_port_read(machine(), "STICKZ");
+	z_adc = ioport("STICKX")->read();
+	x_adc = ioport("STICKZ")->read();
 
 	res = 0;
 
@@ -449,7 +449,7 @@ READ16_MEMBER(mlanding_state::ml_analog3_msb_r)
 	if(x_adc & 0x800 || x_adc == 0)
 		res|= 0x10;
 
-	return ((input_port_read(machine(), "STICKX") & 0xf00)>>8) | res;
+	return ((ioport("STICKX")->read() & 0xf00)>>8) | res;
 }
 
 WRITE16_MEMBER(mlanding_state::ml_nmi_to_sound_w)

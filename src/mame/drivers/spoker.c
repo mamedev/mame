@@ -201,11 +201,11 @@ READ8_MEMBER(spoker_state::spoker_magic_r)
 	switch(m_igs_magic[0])
 	{
 		case 0x00:
-			if ( !(m_igs_magic[1] & 0x01) )	return input_port_read(machine(), "DSW1");
-			if ( !(m_igs_magic[1] & 0x02) )	return input_port_read(machine(), "DSW2");
-			if ( !(m_igs_magic[1] & 0x04) )	return input_port_read(machine(), "DSW3");
-			if ( !(m_igs_magic[1] & 0x08) )	return input_port_read(machine(), "DSW4");
-			if ( !(m_igs_magic[1] & 0x10) )	return input_port_read(machine(), "DSW5");
+			if ( !(m_igs_magic[1] & 0x01) )	return ioport("DSW1")->read();
+			if ( !(m_igs_magic[1] & 0x02) )	return ioport("DSW2")->read();
+			if ( !(m_igs_magic[1] & 0x04) )	return ioport("DSW3")->read();
+			if ( !(m_igs_magic[1] & 0x08) )	return ioport("DSW4")->read();
+			if ( !(m_igs_magic[1] & 0x10) )	return ioport("DSW5")->read();
 			logerror("%06x: warning, reading dsw with igs_magic[1] = %02x\n", cpu_get_pc(&space.device()), m_igs_magic[1]);
 			break;
 

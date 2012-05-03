@@ -113,18 +113,18 @@ READ8_MEMBER(ojankohs_state::ojankohs_keymatrix_r)
 
 	switch (m_portselect)
 	{
-		case 0x01:	ret = input_port_read(machine(), "KEY0");	break;
-		case 0x02:	ret = input_port_read(machine(), "KEY1"); break;
-		case 0x04:	ret = input_port_read(machine(), "KEY2"); break;
-		case 0x08:	ret = input_port_read(machine(), "KEY3"); break;
-		case 0x10:	ret = input_port_read(machine(), "KEY4"); break;
+		case 0x01:	ret = ioport("KEY0")->read();	break;
+		case 0x02:	ret = ioport("KEY1")->read(); break;
+		case 0x04:	ret = ioport("KEY2")->read(); break;
+		case 0x08:	ret = ioport("KEY3")->read(); break;
+		case 0x10:	ret = ioport("KEY4")->read(); break;
 		case 0x20:	ret = 0xff; break;
 		case 0x3f:	ret = 0xff;
-					ret &= input_port_read(machine(), "KEY0");
-					ret &= input_port_read(machine(), "KEY1");
-					ret &= input_port_read(machine(), "KEY2");
-					ret &= input_port_read(machine(), "KEY3");
-					ret &= input_port_read(machine(), "KEY4");
+					ret &= ioport("KEY0")->read();
+					ret &= ioport("KEY1")->read();
+					ret &= ioport("KEY2")->read();
+					ret &= ioport("KEY3")->read();
+					ret &= ioport("KEY4")->read();
 					break;
 		default:	ret = 0xff;
 					logerror("PC:%04X unknown %02X\n", cpu_get_pc(&space.device()), m_portselect);
@@ -147,38 +147,40 @@ READ8_MEMBER(ojankohs_state::ojankoc_keymatrix_r)
 	for (i = 0; i < 5; i++)
 	{
 		if (!BIT(m_portselect, i))
-			ret |= input_port_read(machine(), keynames[offset][i]);
+			ret |= ioport(keynames[offset][i])->read();
 	}
 
-	return (ret & 0x3f) | (input_port_read(machine(), offset ? "IN1" : "IN0") & 0xc0);
+	return (ret & 0x3f) | (ioport(offset ? "IN1" : "IN0")->read() & 0xc0);
 }
 
 static READ8_DEVICE_HANDLER( ojankohs_ay8910_0_r )
 {
 	// DIPSW 1
-	return (((input_port_read(device->machine(), "DSW1") & 0x01) << 7) | ((input_port_read(device->machine(), "DSW1") & 0x02) << 5) |
-	        ((input_port_read(device->machine(), "DSW1") & 0x04) << 3) | ((input_port_read(device->machine(), "DSW1") & 0x08) << 1) |
-	        ((input_port_read(device->machine(), "DSW1") & 0x10) >> 1) | ((input_port_read(device->machine(), "DSW1") & 0x20) >> 3) |
-	        ((input_port_read(device->machine(), "DSW1") & 0x40) >> 5) | ((input_port_read(device->machine(), "DSW1") & 0x80) >> 7));
+	device_t &root = device->machine().root_device();
+	return (((root.ioport("DSW1")->read() & 0x01) << 7) | ((root.ioport("DSW1")->read() & 0x02) << 5) |
+	        ((root.ioport("DSW1")->read() & 0x04) << 3) | ((root.ioport("DSW1")->read() & 0x08) << 1) |
+	        ((root.ioport("DSW1")->read() & 0x10) >> 1) | ((root.ioport("DSW1")->read() & 0x20) >> 3) |
+	        ((root.ioport("DSW1")->read() & 0x40) >> 5) | ((root.ioport("DSW1")->read() & 0x80) >> 7));
 }
 
 static READ8_DEVICE_HANDLER( ojankohs_ay8910_1_r )
 {
 	// DIPSW 1
-	return (((input_port_read(device->machine(), "DSW2") & 0x01) << 7) | ((input_port_read(device->machine(), "DSW2") & 0x02) << 5) |
-	        ((input_port_read(device->machine(), "DSW2") & 0x04) << 3) | ((input_port_read(device->machine(), "DSW2") & 0x08) << 1) |
-	        ((input_port_read(device->machine(), "DSW2") & 0x10) >> 1) | ((input_port_read(device->machine(), "DSW2") & 0x20) >> 3) |
-	        ((input_port_read(device->machine(), "DSW2") & 0x40) >> 5) | ((input_port_read(device->machine(), "DSW2") & 0x80) >> 7));
+	device_t &root = device->machine().root_device();
+	return (((root.ioport("DSW2")->read() & 0x01) << 7) | ((root.ioport("DSW2")->read() & 0x02) << 5) |
+	        ((root.ioport("DSW2")->read() & 0x04) << 3) | ((root.ioport("DSW2")->read() & 0x08) << 1) |
+	        ((root.ioport("DSW2")->read() & 0x10) >> 1) | ((root.ioport("DSW2")->read() & 0x20) >> 3) |
+	        ((root.ioport("DSW2")->read() & 0x40) >> 5) | ((root.ioport("DSW2")->read() & 0x80) >> 7));
 }
 
 READ8_MEMBER(ojankohs_state::ccasino_dipsw3_r)
 {
-	return (input_port_read(machine(), "DSW3") ^ 0xff);		// DIPSW 3
+	return (ioport("DSW3")->read() ^ 0xff);		// DIPSW 3
 }
 
 READ8_MEMBER(ojankohs_state::ccasino_dipsw4_r)
 {
-	return (input_port_read(machine(), "DSW4") ^ 0xff);		// DIPSW 4
+	return (ioport("DSW4")->read() ^ 0xff);		// DIPSW 4
 }
 
 WRITE8_MEMBER(ojankohs_state::ojankoy_coinctr_w)

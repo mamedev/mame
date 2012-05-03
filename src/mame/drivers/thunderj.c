@@ -70,7 +70,7 @@ static MACHINE_RESET( thunderj )
 
 READ16_MEMBER(thunderj_state::special_port2_r)
 {
-	int result = input_port_read(machine(), "260012");
+	int result = ioport("260012")->read();
 
 	if (m_sound_to_cpu_ready) result ^= 0x0004;
 	if (m_cpu_to_sound_ready) result ^= 0x0008;
@@ -219,7 +219,7 @@ static INPUT_PORTS_START( thunderj )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
 
 	PORT_START("260012")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_VBLANK )
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_SERVICE( 0x0002, IP_ACTIVE_LOW )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNUSED )	/* Input buffer full (@260030) */
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED )	/* Output buffer full (@360030) */

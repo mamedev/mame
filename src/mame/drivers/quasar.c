@@ -72,10 +72,10 @@ READ8_MEMBER(quasar_state::quasar_IO_r)
 
 	switch (m_io_page)
 	{
-	case 0:  ans = input_port_read(machine(), "IN0"); break;
-	case 1:  ans = input_port_read(machine(), "IN1"); break;
-	case 2:  ans = input_port_read(machine(), "DSW0"); break;
-	case 3:  ans = input_port_read(machine(), "DSW1"); break;
+	case 0:  ans = ioport("IN0")->read(); break;
+	case 1:  ans = ioport("IN1")->read(); break;
+	case 2:  ans = ioport("DSW0")->read(); break;
+	case 3:  ans = ioport("DSW1")->read(); break;
 	}
 
 	return ans;
@@ -99,7 +99,7 @@ WRITE8_MEMBER(quasar_state::quasar_sh_command_w)
 
 READ8_MEMBER(quasar_state::quasar_sh_command_r)
 {
-	return soundlatch_byte_r(space, 0) + (input_port_read(machine(), "DSW2") & 0x30);
+	return soundlatch_byte_r(space, 0) + (ioport("DSW2")->read() & 0x30);
 }
 
 READ8_MEMBER(quasar_state::audio_t1_r)
@@ -220,7 +220,7 @@ static INPUT_PORTS_START( quasar )
 	PORT_DIPSETTING(    0x00, "Wrap Around" )
 
 	PORT_START("SENSE")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("DSW2")
 #if 0

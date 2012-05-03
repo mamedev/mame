@@ -125,11 +125,11 @@ READ8_MEMBER(starwars_state::starwars_adc_r)
 {
 	/* pitch */
 	if (m_control_num == kPitch)
-		return input_port_read(machine(), "STICKY");
+		return ioport("STICKY")->read();
 
 	/* yaw */
 	else if (m_control_num == kYaw)
-		return input_port_read(machine(), "STICKX");
+		return ioport("STICKX")->read();
 
 	/* default to unused thrust */
 	else

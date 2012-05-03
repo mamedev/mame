@@ -736,28 +736,28 @@ WRITE8_HANDLER( namcos2_mcu_analog_ctrl_w )
 		switch((data>>2) & 0x07)
 		{
 		case 0:
-			namcos2_mcu_analog_data=input_port_read(space->machine(), "AN0");
+			namcos2_mcu_analog_data=space->machine().root_device().ioport("AN0")->read();
 			break;
 		case 1:
-			namcos2_mcu_analog_data=input_port_read(space->machine(), "AN1");
+			namcos2_mcu_analog_data=space->machine().root_device().ioport("AN1")->read();
 			break;
 		case 2:
-			namcos2_mcu_analog_data=input_port_read(space->machine(), "AN2");
+			namcos2_mcu_analog_data=space->machine().root_device().ioport("AN2")->read();
 			break;
 		case 3:
-			namcos2_mcu_analog_data=input_port_read(space->machine(), "AN3");
+			namcos2_mcu_analog_data=space->machine().root_device().ioport("AN3")->read();
 			break;
 		case 4:
-			namcos2_mcu_analog_data=input_port_read(space->machine(), "AN4");
+			namcos2_mcu_analog_data=space->machine().root_device().ioport("AN4")->read();
 			break;
 		case 5:
-			namcos2_mcu_analog_data=input_port_read(space->machine(), "AN5");
+			namcos2_mcu_analog_data=space->machine().root_device().ioport("AN5")->read();
 			break;
 		case 6:
-			namcos2_mcu_analog_data=input_port_read(space->machine(), "AN6");
+			namcos2_mcu_analog_data=space->machine().root_device().ioport("AN6")->read();
 			break;
 		case 7:
-			namcos2_mcu_analog_data=input_port_read(space->machine(), "AN7");
+			namcos2_mcu_analog_data=space->machine().root_device().ioport("AN7")->read();
 			break;
 		default:
 			output_set_value("anunk",data);
@@ -815,14 +815,14 @@ READ8_HANDLER( namcos2_mcu_port_d_r )
 	int data = 0;
 
 	/* Read/convert the bits one at a time */
-	if(input_port_read(space->machine(), "AN0") > threshold) data |= 0x01;
-	if(input_port_read(space->machine(), "AN1") > threshold) data |= 0x02;
-	if(input_port_read(space->machine(), "AN2") > threshold) data |= 0x04;
-	if(input_port_read(space->machine(), "AN3") > threshold) data |= 0x08;
-	if(input_port_read(space->machine(), "AN4") > threshold) data |= 0x10;
-	if(input_port_read(space->machine(), "AN5") > threshold) data |= 0x20;
-	if(input_port_read(space->machine(), "AN6") > threshold) data |= 0x40;
-	if(input_port_read(space->machine(), "AN7") > threshold) data |= 0x80;
+	if(space->machine().root_device().ioport("AN0")->read() > threshold) data |= 0x01;
+	if(space->machine().root_device().ioport("AN1")->read() > threshold) data |= 0x02;
+	if(space->machine().root_device().ioport("AN2")->read() > threshold) data |= 0x04;
+	if(space->machine().root_device().ioport("AN3")->read() > threshold) data |= 0x08;
+	if(space->machine().root_device().ioport("AN4")->read() > threshold) data |= 0x10;
+	if(space->machine().root_device().ioport("AN5")->read() > threshold) data |= 0x20;
+	if(space->machine().root_device().ioport("AN6")->read() > threshold) data |= 0x40;
+	if(space->machine().root_device().ioport("AN7")->read() > threshold) data |= 0x80;
 
 	/* Return the result */
 	return data;
@@ -830,18 +830,18 @@ READ8_HANDLER( namcos2_mcu_port_d_r )
 
 READ8_HANDLER( namcos2_input_port_0_r )
 {
-	int data = input_port_read(space->machine(), "MCUB");
+	int data = space->machine().root_device().ioport("MCUB")->read();
 	return data;
 }
 
 READ8_HANDLER( namcos2_input_port_10_r )
 {
-	int data = input_port_read(space->machine(), "MCUH");
+	int data = space->machine().root_device().ioport("MCUH")->read();
 	return data;
 }
 
 READ8_HANDLER( namcos2_input_port_12_r )
 {
-	int data = input_port_read(space->machine(), "MCUDI0");
+	int data = space->machine().root_device().ioport("MCUDI0")->read();
 	return data;
 }

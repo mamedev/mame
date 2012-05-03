@@ -183,7 +183,7 @@ typedef struct at_keyboard
 	int scan_code_set;
 	int last_code;
 
-	const input_port_config *ports[8];
+	ioport_port *ports[8];
 } at_keyboard;
 
 static at_keyboard keyboard;
@@ -306,8 +306,8 @@ static void at_keyboard_queue_insert(UINT8 data);
 
 static int at_keyboard_queue_size(void);
 static int at_keyboard_queue_chars(running_machine &machine, const unicode_char *text, size_t text_len);
-static int at_keyboard_accept_char(running_machine &machine, unicode_char ch);
-static int at_keyboard_charqueue_empty(running_machine &machine);
+static bool at_keyboard_accept_char(running_machine &machine, unicode_char ch);
+static bool at_keyboard_charqueue_empty(running_machine &machine);
 
 
 
@@ -339,10 +339,10 @@ void at_keyboard_init(running_machine &machine, AT_KEYBOARD_TYPE type)
 		keyboard.ports[i] = machine.root_device().ioport(buf);
 	}
 
-	inputx_setup_natural_keyboard(machine,
-		at_keyboard_queue_chars,
-		at_keyboard_accept_char,
-		at_keyboard_charqueue_empty);
+	machine.ioport().natkeyboard().configure(
+		ioport_queue_chars_delegate(FUNC(at_keyboard_queue_chars), &machine),
+		ioport_accept_char_delegate(FUNC(at_keyboard_accept_char), &machine),
+		ioport_charqueue_empty_delegate(FUNC(at_keyboard_charqueue_empty), &machine));
 }
 
 
@@ -499,7 +499,7 @@ static UINT32 at_keyboard_readport(int port)
 {
 	UINT32 result = 0;
 	if (keyboard.ports[port] != NULL)
-		result = input_port_read_direct(keyboard.ports[port]);
+		result = keyboard.ports[port]->read();
 	return result;
 }
 
@@ -1237,14 +1237,14 @@ INPUT_PORTS_END
   Inputx stuff
 ***************************************************************************/
 
-static int at_keyboard_accept_char(running_machine &machine, unicode_char ch)
+static bool at_keyboard_accept_char(running_machine &machine, unicode_char ch)
 {
 	return unicode_char_to_at_keycode(ch) != 0;
 }
 
 
 
-static int at_keyboard_charqueue_empty(running_machine &machine)
+static bool at_keyboard_charqueue_empty(running_machine &machine)
 {
 	return at_keyboard_queue_size() == 0;
 }

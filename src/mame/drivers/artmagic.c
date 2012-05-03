@@ -152,7 +152,7 @@ READ16_MEMBER(artmagic_state::ultennis_hack_r)
 		update_irq_state(machine());
 		machine().scheduler().timer_set(attotime::from_usec(1), FUNC(irq_off));
 	}
-	return input_port_read(machine(), "300000");
+	return ioport("300000")->read();
 }
 
 

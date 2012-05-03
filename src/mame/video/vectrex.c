@@ -435,12 +435,12 @@ static WRITE8_DEVICE_HANDLER(v_via_cb2_w)
 		/* Check lightpen */
 		if (state->m_lightpen_port != 0)
 		{
-			state->m_lightpen_down = input_port_read(device->machine(), "LPENCONF") & 0x10;
+			state->m_lightpen_down = state->ioport("LPENCONF")->read() & 0x10;
 
 			if (state->m_lightpen_down)
 			{
-				state->m_pen_x = input_port_read(device->machine(), "LPENX") * (state->m_x_max / 0xff);
-				state->m_pen_y = input_port_read(device->machine(), "LPENY") * (state->m_y_max / 0xff);
+				state->m_pen_x = state->ioport("LPENX")->read() * (state->m_x_max / 0xff);
+				state->m_pen_y = state->ioport("LPENY")->read() * (state->m_y_max / 0xff);
 
 				dx = abs(state->m_pen_x - state->m_x_int);
 				dy = abs(state->m_pen_y - state->m_y_int);

@@ -798,21 +798,21 @@ READ8_MEMBER(missile_state::missile_r)
 		if (m_ctrld)	/* trackball */
 		{
 			if (!m_flipscreen)
-			    result = ((input_port_read(machine(), "TRACK0_Y") << 4) & 0xf0) | (input_port_read(machine(), "TRACK0_X") & 0x0f);
+				result = ((ioport("TRACK0_Y")->read() << 4) & 0xf0) | (ioport("TRACK0_X")->read() & 0x0f);
 			else
-			    result = ((input_port_read(machine(), "TRACK1_Y") << 4) & 0xf0) | (input_port_read(machine(), "TRACK1_X") & 0x0f);
+				result = ((ioport("TRACK1_Y")->read() << 4) & 0xf0) | (ioport("TRACK1_X")->read() & 0x0f);
 		}
 		else	/* buttons */
-			result = input_port_read(machine(), "IN0");
+			result = ioport("IN0")->read();
 	}
 
 	/* IN1 */
 	else if (offset < 0x4a00)
-		result = input_port_read(machine(), "IN1");
+		result = ioport("IN1")->read();
 
 	/* IN2 */
 	else if (offset < 0x4b00)
-		result = input_port_read(machine(), "R10");
+		result = ioport("R10")->read();
 
 	/* anything else */
 	else

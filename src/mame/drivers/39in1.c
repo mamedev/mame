@@ -1377,7 +1377,7 @@ READ32_MEMBER(_39in1_state::cpld_r)
 	}
 	else if (cpu_get_pc(&space.device()) == 0xe3af4)
 	{
-		return input_port_read(machine(), "MCUIPT");
+		return ioport("MCUIPT")->read();
 	}
 	else
 	{

@@ -342,7 +342,7 @@ WRITE8_MEMBER(ssingles_state::c001_w)
 CUSTOM_INPUT_MEMBER(ssingles_state::controls_r)
 {
 	int data = 7;
-	switch(input_port_read(machine(), "EXTRA"))		//multiplexed
+	switch(ioport("EXTRA")->read())		//multiplexed
 	{
 		case 0x01: data = 1; break;
 		case 0x02: data = 2; break;

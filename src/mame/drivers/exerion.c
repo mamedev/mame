@@ -133,7 +133,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
 CUSTOM_INPUT_MEMBER(exerion_state::exerion_controls_r)
 {
 	static const char *const inname[2] = { "P1", "P2" };
-	return input_port_read(machine(), inname[m_cocktail_flip]) & 0x3f;
+	return ioport(inname[m_cocktail_flip])->read() & 0x3f;
 }
 
 
@@ -261,7 +261,7 @@ static INPUT_PORTS_START( exerion )
 	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
 
 	PORT_START("DSW1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_DIPNAME( 0x0e, 0x00, DEF_STR( Coinage ) )          /* see notes */
 	PORT_DIPSETTING(    0x0e, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0x0a, DEF_STR( 4C_1C ) )

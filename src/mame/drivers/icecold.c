@@ -207,11 +207,11 @@ READ8_MEMBER( icecold_state::kbd_r )
 	{
 		case 0:
 			// override the ball gate switch
-			return input_port_read(machine(), "X0") & ~(m_ball_gate_sw<<2);
+			return ioport("X0")->read() & ~(m_ball_gate_sw<<2);
 		case 1:
-			return input_port_read(machine(), "X1");
+			return ioport("X1")->read();
 		case 2:
-			return input_port_read(machine(), "X2");
+			return ioport("X2")->read();
 		default:
 			return 0xff;
 	}

@@ -68,11 +68,11 @@ static READ8_DEVICE_HANDLER( input_mux0_r )
 
 	/* low value in the given bit selects */
 	if (!(state->m_input_mux & 0x01))
-		return input_port_read(device->machine(), "MUX0");
+		return state->ioport("MUX0")->read();
 	else if (!(state->m_input_mux & 0x02))
-		return input_port_read(device->machine(), "MUX1");
+		return state->ioport("MUX1")->read();
 	else if (!(state->m_input_mux & 0x04))
-		return input_port_read(device->machine(), "MUX2");
+		return state->ioport("MUX2")->read();
 	return 0xff;
 }
 

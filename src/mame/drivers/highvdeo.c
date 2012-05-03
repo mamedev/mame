@@ -194,17 +194,17 @@ static SCREEN_UPDATE_RGB32(brasil)
 
 READ16_MEMBER(highvdeo_state::read1_r)
 {
-	return input_port_read(machine(), "IN0");
+	return ioport("IN0")->read();
 }
 
 READ16_MEMBER(highvdeo_state::read2_r)
 {
-	return input_port_read(machine(), "IN1");
+	return ioport("IN1")->read();
 }
 
 READ16_MEMBER(highvdeo_state::read3_r)
 {
-	return input_port_read(machine(), "IN2");
+	return ioport("IN2")->read();
 }
 
 WRITE16_MEMBER(highvdeo_state::tv_vcf_paletteram_w)
@@ -322,7 +322,7 @@ READ16_MEMBER(highvdeo_state::tv_ncf_read2_r)
 	// machine resets itself.
 	resetpulse ^= 0x40;
 
-	return (input_port_read(machine(), "IN1") & 0xbf) | resetpulse;
+	return (ioport("IN1")->read() & 0xbf) | resetpulse;
 }
 
 static WRITE16_DEVICE_HANDLER( tv_ncf_oki6376_w )

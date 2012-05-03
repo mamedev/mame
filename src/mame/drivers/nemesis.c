@@ -198,8 +198,8 @@ READ16_MEMBER(nemesis_state::konamigt_input_word_r)
     bit 12-15: accel
 */
 
-	int data = input_port_read(machine(), "IN3");
-	int data2 = input_port_read(machine(), "PADDLE");
+	int data = ioport("IN3")->read();
+	int data2 = ioport("PADDLE")->read();
 
 	int ret=0x0000;
 
@@ -228,10 +228,10 @@ READ16_MEMBER(nemesis_state::selected_ip_word_r)
 
 	switch (m_selected_ip & 0xf)
 	{												// From WEC Le Mans Schems:
-		case 0xc:  return input_port_read(machine(), "ACCEL");	// Accel - Schems: Accelevr
-		case 0:    return input_port_read(machine(), "ACCEL");
-		case 0xd:  return input_port_read(machine(), "WHEEL");	// Wheel - Schems: Handlevr
-		case 1:    return input_port_read(machine(), "WHEEL");
+		case 0xc:  return ioport("ACCEL")->read();	// Accel - Schems: Accelevr
+		case 0:    return ioport("ACCEL")->read();
+		case 0xd:  return ioport("WHEEL")->read();	// Wheel - Schems: Handlevr
+		case 1:    return ioport("WHEEL")->read();
 
 		default: return ~0;
 	}
@@ -1281,8 +1281,8 @@ static INPUT_PORTS_START( hcrash )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_CONDITION("DSW1", 0x03, PORTCOND_EQUALS, 0x02)		// only in WEC Le Mans 24 cabinets
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_CONDITION("DSW1", 0x03, PORTCOND_NOTEQUALS, 0x02)	// player 2?
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_CONDITION("DSW1", 0x03, EQUALS, 0x02)		// only in WEC Le Mans 24 cabinets
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_CONDITION("DSW1", 0x03, NOTEQUALS, 0x02)	// player 2?
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON3 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL )	// must be 0 otherwise game freezes when using WEC Le Mans 24 cabinet
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -1329,8 +1329,8 @@ static INPUT_PORTS_START( hcrash )
 	PORT_BIT( 0x7f, 0x40, IPT_PADDLE ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10)
 
 	PORT_START("IN3")
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_CONDITION("DSW1", 0x03, PORTCOND_EQUALS, 0x01)		// only in Konami GT cabinet with brake
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_CONDITION("DSW1", 0x03, PORTCOND_NOTEQUALS, 0x01)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_CONDITION("DSW1", 0x03, EQUALS, 0x01)		// only in Konami GT cabinet with brake
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_CONDITION("DSW1", 0x03, NOTEQUALS, 0x01)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON1 )
 //  PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON4 )
 

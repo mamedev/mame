@@ -475,7 +475,7 @@ INPUT_PORTS_END
 CUSTOM_INPUT_MEMBER(scramble_state::ckongs_coinage_r)
 {
 	int bit_mask = (FPTR)param;
-	return (input_port_read(machine(), "FAKE") & bit_mask) ? 0x01 : 0x00;
+	return (ioport("FAKE")->read() & bit_mask) ? 0x01 : 0x00;
 }
 
 
@@ -816,7 +816,7 @@ static INPUT_PORTS_START( hunchbks )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* protection check? */
 
     PORT_START("SENSE")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( hncholms )
@@ -860,7 +860,7 @@ static INPUT_PORTS_START( hncholms )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* protection check? */
 
     PORT_START("SENSE")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( cavelon )

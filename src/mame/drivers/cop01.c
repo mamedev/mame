@@ -98,7 +98,7 @@ READ8_MEMBER(cop01_state::cop01_sound_command_r)
 CUSTOM_INPUT_MEMBER(cop01_state::mightguy_area_r)
 {
 	int bit_mask = (FPTR)param;
-	return (input_port_read(machine(), "FAKE") & bit_mask) ? 0x01 : 0x00;
+	return (ioport("FAKE")->read() & bit_mask) ? 0x01 : 0x00;
 }
 
 WRITE8_MEMBER(cop01_state::cop01_irq_ack_w)

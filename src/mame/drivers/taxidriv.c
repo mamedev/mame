@@ -69,7 +69,7 @@ static READ8_DEVICE_HANDLER( p1b_r )
 static READ8_DEVICE_HANDLER( p1c_r )
 {
 	taxidriv_state *state = device->machine().driver_data<taxidriv_state>();
-	return (state->m_s2 << 7) | (state->m_s4 << 6) | ((input_port_read(device->machine(), "SERVCOIN") & 1) << 4);
+	return (state->m_s2 << 7) | (state->m_s4 << 6) | ((state->ioport("SERVCOIN")->read() & 1) << 4);
 }
 
 static WRITE8_DEVICE_HANDLER( p1a_w )

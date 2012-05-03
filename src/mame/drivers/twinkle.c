@@ -504,27 +504,27 @@ READ32_MEMBER(twinkle_state::twinkle_io_r)
 		switch( m_io_offset )
 		{
 			case 0x07:
-				data |= input_port_read( machine(), "IN0" );
+				data |= ioport( "IN0" )->read();
 				break;
 
 			case 0x0f:
-				data |= input_port_read( machine(), "IN1" );
+				data |= ioport( "IN1" )->read();
 				break;
 
 			case 0x17:
-				data |= input_port_read( machine(), "IN2" );
+				data |= ioport( "IN2" )->read();
 				break;
 
 			case 0x1f:
-				data |= input_port_read( machine(), "IN3" );
+				data |= ioport( "IN3" )->read();
 				break;
 
 			case 0x27:
-				data |= input_port_read( machine(), "IN4" );
+				data |= ioport( "IN4" )->read();
 				break;
 
 			case 0x2f:
-				data |= input_port_read( machine(), "IN5" );
+				data |= ioport( "IN5" )->read();
 				break;
 
 			default:

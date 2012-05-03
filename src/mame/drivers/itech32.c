@@ -474,8 +474,8 @@ CUSTOM_INPUT_MEMBER(itech32_state::special_port_r)
 
 READ16_MEMBER(itech32_state::trackball_r)
 {
-	int lower = input_port_read(machine(), "TRACKX1");
-	int upper = input_port_read(machine(), "TRACKY1");
+	int lower = ioport("TRACKX1")->read();
+	int upper = ioport("TRACKY1")->read();
 
 	return (lower & 15) | ((upper & 15) << 4);
 }
@@ -483,8 +483,8 @@ READ16_MEMBER(itech32_state::trackball_r)
 
 READ32_MEMBER(itech32_state::trackball32_8bit_r)
 {
-	int lower = input_port_read(machine(), "TRACKX1");
-	int upper = input_port_read(machine(), "TRACKY1");
+	int lower = ioport("TRACKX1")->read();
+	int upper = ioport("TRACKY1")->read();
 
 	return (lower & 255) | ((upper & 255) << 8);
 }
@@ -499,8 +499,8 @@ READ32_MEMBER(itech32_state::trackball32_4bit_p1_r)
 		int upper, lower;
 		int dx, dy;
 
-		int curx = input_port_read(machine(), "TRACKX1");
-		int cury = input_port_read(machine(), "TRACKY1");
+		int curx = ioport("TRACKX1")->read();
+		int cury = ioport("TRACKY1")->read();
 
 		dx = curx - m_p1_effx;
 		if (dx < -0x80) dx += 0x100;
@@ -535,8 +535,8 @@ READ32_MEMBER(itech32_state::trackball32_4bit_p2_r)
 		int upper, lower;
 		int dx, dy;
 
-		int curx = input_port_read(machine(), "TRACKX2");
-		int cury = input_port_read(machine(), "TRACKY2");
+		int curx = ioport("TRACKX2")->read();
+		int cury = ioport("TRACKY2")->read();
 
 		dx = curx - m_p2_effx;
 		if (dx < -0x80) dx += 0x100;
@@ -571,7 +571,7 @@ READ32_MEMBER(itech32_state::trackball32_4bit_combined_r)
 
 READ32_MEMBER(itech32_state::drivedge_steering_r)
 {
-	int val = input_port_read(machine(), "STEER") * 2 - 0x100;
+	int val = ioport("STEER")->read() * 2 - 0x100;
 	if (val < 0) val = 0x100 | (-val);
 	return val << 16;
 }
@@ -579,7 +579,7 @@ READ32_MEMBER(itech32_state::drivedge_steering_r)
 
 READ32_MEMBER(itech32_state::drivedge_gas_r)
 {
-	int val = input_port_read(machine(), "GAS");
+	int val = ioport("GAS")->read();
 	return val << 16;
 }
 
@@ -1115,7 +1115,7 @@ static INPUT_PORTS_START( timekill )
 	PORT_START("DIPS")		/* 58000 */
 	PORT_SERVICE_NO_TOGGLE( 0x0001, IP_ACTIVE_LOW )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_VBLANK )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, itech32_state,special_port_r, NULL)
 	PORT_DIPNAME( 0x0010, 0x0000, "Video Sync" )	 PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(      0x0000, "-" )
@@ -1160,7 +1160,7 @@ static INPUT_PORTS_START( itech32_base_16bit )
 	PORT_START("DIPS")	/* 280000 */
 	PORT_SERVICE_NO_TOGGLE( 0x0001, IP_ACTIVE_LOW )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_VBLANK )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, itech32_state,special_port_r, NULL)
 	PORT_DIPNAME( 0x0010, 0x0000, "Video Sync" )	 PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(      0x0000, "-" )
@@ -1278,7 +1278,7 @@ static INPUT_PORTS_START( drivedge )
 	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x01000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02000000, IP_ACTIVE_LOW, IPT_COIN3 )
-	PORT_BIT( 0x04000000, IP_ACTIVE_LOW, IPT_VBLANK )
+	PORT_BIT( 0x04000000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x08000000, IP_ACTIVE_LOW, IPT_SPECIAL )
 	PORT_DIPNAME( 0x70000000, 0x00000000, "Network Number" ) PORT_DIPLOCATION("SW1:4,3,2")
 	PORT_DIPSETTING(          0x00000000, "1" )
@@ -1363,7 +1363,7 @@ static INPUT_PORTS_START( itech32_base_32bit )
 	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_SERVICE_NO_TOGGLE( 0x00010000, IP_ACTIVE_LOW )
 	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_VBLANK )
+	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, itech32_state,special_port_r, NULL)
 	PORT_DIPNAME( 0x00100000, 0x00000000, "Video Sync" )	 PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(          0x00000000, "-" )

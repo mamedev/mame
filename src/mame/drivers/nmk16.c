@@ -257,7 +257,7 @@ READ16_MEMBER(nmk16_state::tharrier_mcu_r)
 		return res << 8;
 	}
 	else
-		return ~input_port_read(machine(), "IN1");
+		return ~ioport("IN1")->read();
 }
 
 WRITE16_MEMBER(nmk16_state::macross2_sound_reset_w)
@@ -750,8 +750,8 @@ static void mcu_run(running_machine &machine, UINT8 dsw_setting)
 	/*needed because of the uncompatibility of the dsw settings.*/
 	if(dsw_setting) // Thunder Dragon
 	{
-		dsw[0] = (input_port_read(machine, "DSW2") & 0x7);
-		dsw[1] = (input_port_read(machine, "DSW2") & 0x38) >> 3;
+		dsw[0] = (machine.root_device().ioport("DSW2")->read() & 0x7);
+		dsw[1] = (machine.root_device().ioport("DSW2")->read() & 0x38) >> 3;
 		for(i=0;i<2;i++)
 		{
 			switch(dsw[i] & 7)
@@ -769,8 +769,8 @@ static void mcu_run(running_machine &machine, UINT8 dsw_setting)
 	}
 	else // Hacha Mecha Fighter
 	{
-		dsw[0] = (input_port_read(machine, "DSW1") & 0x0700) >> 8;
-		dsw[1] = (input_port_read(machine, "DSW1") & 0x3800) >> 11;
+		dsw[0] = (machine.root_device().ioport("DSW1")->read() & 0x0700) >> 8;
+		dsw[1] = (machine.root_device().ioport("DSW1")->read() & 0x3800) >> 11;
 		for(i=0;i<2;i++)
 		{
 			switch(dsw[i] & 7)
@@ -788,7 +788,7 @@ static void mcu_run(running_machine &machine, UINT8 dsw_setting)
 	}
 
 	/*read the coin port*/
-	coin_input = (~(input_port_read(machine, "IN0")));
+	coin_input = (~(machine.root_device().ioport("IN0")->read()));
 
 	if(coin_input & 0x01)//coin 1
 	{

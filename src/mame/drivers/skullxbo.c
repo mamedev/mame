@@ -97,7 +97,7 @@ static MACHINE_RESET( skullxbo )
 
 READ16_MEMBER(skullxbo_state::special_port1_r)
 {
-	int temp = input_port_read(machine(), "FF5802");
+	int temp = ioport("FF5802")->read();
 	if (m_cpu_to_sound_ready) temp ^= 0x0040;
 	if (atarigen_get_hblank(*machine().primary_screen)) temp ^= 0x0010;
 	return temp;
@@ -179,7 +179,7 @@ static INPUT_PORTS_START( skullxbo )
 	PORT_START("FF5802")
 	PORT_BIT( 0x000f, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_UNUSED )	/* HBLANK */
-	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )	/* /AUDBUSY */
 	PORT_SERVICE( 0x0080, IP_ACTIVE_LOW )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)

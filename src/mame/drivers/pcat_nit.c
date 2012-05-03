@@ -195,7 +195,7 @@ READ8_MEMBER(pcat_nit_state::pcat_nit_io_r)
 		case 0: /* 278 */
 			return 0xff;
 		case 1: /* 279 */
-			return input_port_read(machine(), "IN0");
+			return ioport("IN0")->read();
 		case 7: /* 27f dips */
 			return 0xff;
 		default:

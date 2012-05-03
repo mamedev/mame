@@ -199,12 +199,12 @@ static READ32_HANDLER( aleck_dips_r )
 	switch( offset )
 	{
 		case 0:
-			return (input_port_read(space->machine(), "IN0"));	/* mtetrisc has regular inputs here */
+			return (space->machine().root_device().ioport("IN0")->read());	/* mtetrisc has regular inputs here */
 		case 1:
-			return (input_port_read(space->machine(), "IN1"));
+			return (space->machine().root_device().ioport("IN1")->read());
 		case 2:
 		{
-			UINT32 val = input_port_read(space->machine(), "INMJ");
+			UINT32 val = space->machine().root_device().ioport("INMJ")->read();
 
 			switch( dip_read_offset >> 8 & 0xff )
 			{

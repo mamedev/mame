@@ -49,7 +49,7 @@ READ8_MEMBER(hnayayoi_state::keyboard_0_r)
 	for (i = 0; i < 5; i++)
 	{
 		if (~m_keyb & (1 << i))
-			res &= input_port_read(machine(), keynames[i]);
+			res &= ioport(keynames[i])->read();
 	}
 
 	return res;

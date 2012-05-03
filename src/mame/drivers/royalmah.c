@@ -326,13 +326,13 @@ WRITE8_MEMBER(royalmah_state::input_port_select_w)
 static READ8_DEVICE_HANDLER( royalmah_player_1_port_r )
 {
 	royalmah_state *state = device->machine().driver_data<royalmah_state>();
-	int ret = (input_port_read(device->machine(), "KEY0") & 0xc0) | 0x3f;
+	int ret = (state->ioport("KEY0")->read() & 0xc0) | 0x3f;
 
-	if ((state->m_input_port_select & 0x01) == 0)  ret &= input_port_read(device->machine(), "KEY0");
-	if ((state->m_input_port_select & 0x02) == 0)  ret &= input_port_read(device->machine(), "KEY1");
-	if ((state->m_input_port_select & 0x04) == 0)  ret &= input_port_read(device->machine(), "KEY2");
-	if ((state->m_input_port_select & 0x08) == 0)  ret &= input_port_read(device->machine(), "KEY3");
-	if ((state->m_input_port_select & 0x10) == 0)  ret &= input_port_read(device->machine(), "KEY4");
+	if ((state->m_input_port_select & 0x01) == 0)  ret &= state->ioport("KEY0")->read();
+	if ((state->m_input_port_select & 0x02) == 0)  ret &= state->ioport("KEY1")->read();
+	if ((state->m_input_port_select & 0x04) == 0)  ret &= state->ioport("KEY2")->read();
+	if ((state->m_input_port_select & 0x08) == 0)  ret &= state->ioport("KEY3")->read();
+	if ((state->m_input_port_select & 0x10) == 0)  ret &= state->ioport("KEY4")->read();
 
 	return ret;
 }
@@ -340,13 +340,13 @@ static READ8_DEVICE_HANDLER( royalmah_player_1_port_r )
 static READ8_DEVICE_HANDLER( royalmah_player_2_port_r )
 {
 	royalmah_state *state = device->machine().driver_data<royalmah_state>();
-	int ret = (input_port_read(device->machine(), "KEY5") & 0xc0) | 0x3f;
+	int ret = (state->ioport("KEY5")->read() & 0xc0) | 0x3f;
 
-	if ((state->m_input_port_select & 0x01) == 0)  ret &= input_port_read(device->machine(), "KEY5");
-	if ((state->m_input_port_select & 0x02) == 0)  ret &= input_port_read(device->machine(), "KEY6");
-	if ((state->m_input_port_select & 0x04) == 0)  ret &= input_port_read(device->machine(), "KEY7");
-	if ((state->m_input_port_select & 0x08) == 0)  ret &= input_port_read(device->machine(), "KEY8");
-	if ((state->m_input_port_select & 0x10) == 0)  ret &= input_port_read(device->machine(), "KEY9");
+	if ((state->m_input_port_select & 0x01) == 0)  ret &= state->ioport("KEY5")->read();
+	if ((state->m_input_port_select & 0x02) == 0)  ret &= state->ioport("KEY6")->read();
+	if ((state->m_input_port_select & 0x04) == 0)  ret &= state->ioport("KEY7")->read();
+	if ((state->m_input_port_select & 0x08) == 0)  ret &= state->ioport("KEY8")->read();
+	if ((state->m_input_port_select & 0x10) == 0)  ret &= state->ioport("KEY9")->read();
 
 	return ret;
 }
@@ -357,9 +357,9 @@ READ8_MEMBER(royalmah_state::majs101b_dsw_r)
 {
 	switch (m_dsw_select)
 	{
-		case 0x00: return input_port_read(machine(), "DSW3");	/* DSW3 */
-		case 0x20: return input_port_read(machine(), "DSW4");	/* DSW4 */
-		case 0x40: return input_port_read(machine(), "DSW2");	/* DSW2 */
+		case 0x00: return ioport("DSW3")->read();	/* DSW3 */
+		case 0x20: return ioport("DSW4")->read();	/* DSW4 */
+		case 0x40: return ioport("DSW2")->read();	/* DSW2 */
 	}
 	return 0;
 }
@@ -376,9 +376,9 @@ READ8_MEMBER(royalmah_state::suzume_dsw_r)
 	{
 		switch (m_suzume_bank)
 		{
-			case 0x08: return input_port_read(machine(), "DSW4");	/* DSW4 */
-			case 0x10: return input_port_read(machine(), "DSW3");	/* DSW3 */
-			case 0x18: return input_port_read(machine(), "DSW2");	/* DSW2 */
+			case 0x08: return ioport("DSW4")->read();	/* DSW4 */
+			case 0x10: return ioport("DSW3")->read();	/* DSW3 */
+			case 0x18: return ioport("DSW2")->read();	/* DSW2 */
 		}
 		return 0;
 	}
@@ -417,7 +417,7 @@ WRITE8_MEMBER(royalmah_state::mjapinky_palbank_w)
 
 READ8_MEMBER(royalmah_state::mjapinky_dsw_r)
 {
-	if (m_rombank == 0x0e)	return input_port_read(machine(), "DSW3");
+	if (m_rombank == 0x0e)	return ioport("DSW3")->read();
 	else					return *(machine().root_device().memregion("maincpu")->base() + 0x10000 + 0x8000 * m_rombank);
 }
 
@@ -459,10 +459,10 @@ READ8_MEMBER(royalmah_state::daisyari_dsw_r)
 {
 	switch (m_dsw_select)
 	{
-		case 0x00: return input_port_read(machine(), "DSW4");
-		case 0x04: return input_port_read(machine(), "DSW1");
-		case 0x08: return input_port_read(machine(), "DSW2");
-		case 0x0c: return input_port_read(machine(), "DSW3");
+		case 0x00: return ioport("DSW4")->read();
+		case 0x04: return ioport("DSW1")->read();
+		case 0x08: return ioport("DSW2")->read();
+		case 0x0c: return ioport("DSW3")->read();
 	}
 
 	return 0;
@@ -487,10 +487,10 @@ READ8_MEMBER(royalmah_state::mjclub_dsw_r)
 {
 	switch (m_dsw_select)
 	{
-//      case 0x00: return input_port_read(machine(), "DSW4");
-		case 0x40: return input_port_read(machine(), "DSW2");
-		case 0x80: return input_port_read(machine(), "DSW3");
-		case 0xc0: return input_port_read(machine(), "DSW4");
+//      case 0x00: return ioport("DSW4")->read();
+		case 0x40: return ioport("DSW2")->read();
+		case 0x80: return ioport("DSW3")->read();
+		case 0xc0: return ioport("DSW4")->read();
 	}
 
 	return 0;
@@ -694,9 +694,9 @@ READ8_MEMBER(royalmah_state::jansou_dsw_r)
 {
 	switch (m_dsw_select & 7)
 	{
-		case 1: return input_port_read(machine(), "DSW1");
-		case 2: return input_port_read(machine(), "DSW2");
-		case 4: return input_port_read(machine(), "DSW3");
+		case 1: return ioport("DSW1")->read();
+		case 2: return ioport("DSW2")->read();
+		case 4: return ioport("DSW3")->read();
 	}
 
 	return 0xff;
@@ -818,11 +818,11 @@ READ8_MEMBER(royalmah_state::janptr96_dswsel_r)
 
 READ8_MEMBER(royalmah_state::janptr96_dsw_r)
 {
-	if (~m_dsw_select & 0x01) return input_port_read(machine(), "DSW4");
-	if (~m_dsw_select & 0x02) return input_port_read(machine(), "DSW3");
-	if (~m_dsw_select & 0x04) return input_port_read(machine(), "DSW2");
-	if (~m_dsw_select & 0x08) return input_port_read(machine(), "DSW1");
-	if (~m_dsw_select & 0x10) return input_port_read(machine(), "DSWTOP");
+	if (~m_dsw_select & 0x01) return ioport("DSW4")->read();
+	if (~m_dsw_select & 0x02) return ioport("DSW3")->read();
+	if (~m_dsw_select & 0x04) return ioport("DSW2")->read();
+	if (~m_dsw_select & 0x08) return ioport("DSW1")->read();
+	if (~m_dsw_select & 0x10) return ioport("DSWTOP")->read();
 	return 0xff;
 }
 
@@ -886,10 +886,10 @@ READ8_MEMBER(royalmah_state::mjifb_rom_io_r)
 
 	switch(offset)
 	{
-		case 0x8000:	return input_port_read(machine(), "DSW4");		// dsw 4
-		case 0x8200:	return input_port_read(machine(), "DSW3");		// dsw 3
+		case 0x8000:	return ioport("DSW4")->read();		// dsw 4
+		case 0x8200:	return ioport("DSW3")->read();		// dsw 3
 		case 0x9001:	return ay8910_r(machine().device("aysnd"), 0);	// inputs
-		case 0x9011:	return input_port_read(machine(), "SYSTEM");
+		case 0x9011:	return ioport("SYSTEM")->read();
 	}
 
 	logerror("%04X: unmapped input read at %04X\n", cpu_get_pc(&space.device()), offset);
@@ -940,19 +940,19 @@ ADDRESS_MAP_END
 
 READ8_MEMBER(royalmah_state::mjifb_p3_r)
 {
-	return input_port_read(machine(), "PORT3_5") >> 6;
+	return ioport("PORT3_5")->read() >> 6;
 }
 READ8_MEMBER(royalmah_state::mjifb_p5_r)
 {
-	return input_port_read(machine(), "PORT3_5");
+	return ioport("PORT3_5")->read();
 }
 READ8_MEMBER(royalmah_state::mjifb_p6_r)
 {
-	return input_port_read(machine(), "PORT6_7");
+	return ioport("PORT6_7")->read();
 }
 READ8_MEMBER(royalmah_state::mjifb_p7_r)
 {
-	return input_port_read(machine(), "PORT6_7") >> 4;
+	return ioport("PORT6_7")->read() >> 4;
 }
 READ8_MEMBER(royalmah_state::mjifb_p8_r)
 {
@@ -995,10 +995,10 @@ READ8_MEMBER(royalmah_state::mjdejavu_rom_io_r)
 
 	switch(offset)
 	{
-		case 0x8000:	return input_port_read(machine(), "DSW2");		// dsw 2
-		case 0x8001:	return input_port_read(machine(), "DSW1");		// dsw 1
+		case 0x8000:	return ioport("DSW2")->read();		// dsw 2
+		case 0x8001:	return ioport("DSW1")->read();		// dsw 1
 		case 0x9001:	return ay8910_r(machine().device("aysnd"), 0);	// inputs
-		case 0x9011:	return input_port_read(machine(), "SYSTEM");
+		case 0x9011:	return ioport("SYSTEM")->read();
 	}
 
 	logerror("%04X: unmapped input read at %04X\n", cpu_get_pc(&space.device()), offset);
@@ -1113,11 +1113,11 @@ READ8_MEMBER(royalmah_state::cafetime_dsw_r)
 {
 	switch( m_dsw_select )
 	{
-		case 0x00: return input_port_read(machine(), "DSW1");
-		case 0x01: return input_port_read(machine(), "DSW2");
-		case 0x02: return input_port_read(machine(), "DSW3");
-		case 0x03: return input_port_read(machine(), "DSW4");
-		case 0x04: return input_port_read(machine(), "DSWTOP");
+		case 0x00: return ioport("DSW1")->read();
+		case 0x01: return ioport("DSW2")->read();
+		case 0x02: return ioport("DSW3")->read();
+		case 0x03: return ioport("DSW4")->read();
+		case 0x04: return ioport("DSWTOP")->read();
 	}
 	logerror("%04X: unmapped dsw read %02X\n", cpu_get_pc(&space.device()), m_dsw_select);
 	return 0xff;
@@ -1891,14 +1891,14 @@ static INPUT_PORTS_START( mjclub )
 	PORT_DIPSETTING(    0x02, "B" )
 	PORT_DIPSETTING(    0x01, "C" )
 	PORT_DIPSETTING(    0x03, "D" )
-	PORT_DIPUNUSED_DIPLOC( 0x0c, 0x08, "SW2:3,4" ) PORT_CONDITION("DSW3", 0x03, PORTCOND_EQUALS, 0x00)
-	PORT_DIPUNUSED_DIPLOC( 0x0c, 0x08, "SW2:3,4" ) PORT_CONDITION("DSW3", 0x03, PORTCOND_EQUALS, 0x02)
-	PORT_DIPNAME( 0x0c, 0x08, "Bonus Rate (3renchan bonus)" )	PORT_DIPLOCATION("SW2:3,4")	PORT_CONDITION("DSW3", 0x03, PORTCOND_EQUALS, 0x01)
+	PORT_DIPUNUSED_DIPLOC( 0x0c, 0x08, "SW2:3,4" ) PORT_CONDITION("DSW3", 0x03, EQUALS, 0x00)
+	PORT_DIPUNUSED_DIPLOC( 0x0c, 0x08, "SW2:3,4" ) PORT_CONDITION("DSW3", 0x03, EQUALS, 0x02)
+	PORT_DIPNAME( 0x0c, 0x08, "Bonus Rate (3renchan bonus)" )	PORT_DIPLOCATION("SW2:3,4")	PORT_CONDITION("DSW3", 0x03, EQUALS, 0x01)
 	PORT_DIPSETTING(    0x00, "A (1 2 2 3 pts.)" )
 	PORT_DIPSETTING(    0x04, "B (1 2 2 5 pts.)" )
 	PORT_DIPSETTING(    0x08, "C (1 2 3 6 pts.)" )
 	PORT_DIPSETTING(    0x0c, "D (1 2 6 10 pts.)" )
-	PORT_DIPNAME( 0x0c, 0x08, "Bonus Rate (5renchan bonus)" )	PORT_DIPLOCATION("SW2:3,4")	PORT_CONDITION("DSW3", 0x03, PORTCOND_EQUALS, 0x03)
+	PORT_DIPNAME( 0x0c, 0x08, "Bonus Rate (5renchan bonus)" )	PORT_DIPLOCATION("SW2:3,4")	PORT_CONDITION("DSW3", 0x03, EQUALS, 0x03)
 	PORT_DIPSETTING(    0x00, "A (5 pts.)" )
 	PORT_DIPSETTING(    0x04, "B (10 pts.)" )
 	PORT_DIPSETTING(    0x08, "C (15 pts.)" )

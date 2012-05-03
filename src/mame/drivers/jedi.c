@@ -214,8 +214,8 @@ READ8_MEMBER(jedi_state::a2d_data_r)
 
 	switch (m_a2d_select)
 	{
-		case 0: ret = input_port_read(machine(), "STICKY"); break;
-		case 2: ret = input_port_read(machine(), "STICKX"); break;
+		case 0: ret = ioport("STICKY")->read(); break;
+		case 2: ret = ioport("STICKX")->read(); break;
 	}
 
 	return ret;
@@ -321,7 +321,7 @@ static INPUT_PORTS_START( jedi )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_TILT )
 	PORT_BIT( 0x18, IP_ACTIVE_LOW,  IPT_UNUSED )
 	PORT_BIT( 0x60, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF,jedi_state,jedi_audio_comm_stat_r, NULL)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("STICKY")	/* analog Y */
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10)

@@ -81,7 +81,7 @@ VIDEO_START( aeroboto )
 
 READ8_MEMBER(aeroboto_state::aeroboto_in0_r)
 {
-	return input_port_read(machine(), flip_screen() ? "P2" : "P1");
+	return ioport(flip_screen() ? "P2" : "P1")->read();
 }
 
 WRITE8_MEMBER(aeroboto_state::aeroboto_3000_w)

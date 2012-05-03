@@ -29,7 +29,7 @@ static void plot_pattern( running_machine &machine, bitmap_ind16 &bitmap, int x,
 	int xbit, ybit, size;
 
 	size = 2;
-	if (input_port_read(machine, "DSW") & 0x40)
+	if (machine.root_device().ioport("DSW")->read() & 0x40)
 	{
 		size = 4;
 	}
@@ -55,7 +55,7 @@ SCREEN_UPDATE_IND16( lazercmd )
 	lazercmd_state *state = screen.machine().driver_data<lazercmd_state>();
 	int i, x, y;
 
-	int video_inverted = input_port_read(screen.machine(), "DSW") & 0x20;
+	int video_inverted = screen.machine().root_device().ioport("DSW")->read() & 0x20;
 
 	/* The first row of characters are invisible */
 	for (i = 0; i < (VERT_RES - 1) * HORZ_RES; i++)

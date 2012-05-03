@@ -182,7 +182,7 @@ static READ32_DEVICE_HANDLER( ps4_eeprom_r )
 {
 	if (ACCESSING_BITS_16_31)
 	{
-		return input_port_read(device->machine(), "JP4");
+		return device->machine().root_device().ioport("JP4")->read();
 	}
 
 //  logerror("Unk EEPROM read mask %x\n", mem_mask);
@@ -197,7 +197,7 @@ static INTERRUPT_GEN(psikyosh_interrupt)
 
 CUSTOM_INPUT_MEMBER(psikyo4_state::system_port_r)
 {
-	return input_port_read(machine(), "SYSTEM");
+	return ioport("SYSTEM")->read();
 }
 
 CUSTOM_INPUT_MEMBER(psikyo4_state::mahjong_ctrl_r)/* used by hotgmck/hgkairak */
@@ -206,10 +206,10 @@ CUSTOM_INPUT_MEMBER(psikyo4_state::mahjong_ctrl_r)/* used by hotgmck/hgkairak */
 	int sel = (m_io_select[0] & 0x0000ff00) >> 8;
 	int ret = 0xff;
 
-	if (sel & 1) ret &= input_port_read(machine(), player ? "KEY4" : "KEY0" );
-	if (sel & 2) ret &= input_port_read(machine(), player ? "KEY5" : "KEY1" );
-	if (sel & 4) ret &= input_port_read(machine(), player ? "KEY6" : "KEY2" );
-	if (sel & 8) ret &= input_port_read(machine(), player ? "KEY7" : "KEY3" );
+	if (sel & 1) ret &= ioport(player ? "KEY4" : "KEY0" )->read();
+	if (sel & 2) ret &= ioport(player ? "KEY5" : "KEY1" )->read();
+	if (sel & 4) ret &= ioport(player ? "KEY6" : "KEY2" )->read();
+	if (sel & 8) ret &= ioport(player ? "KEY7" : "KEY3" )->read();
 
 	return ret;
 }
@@ -328,7 +328,7 @@ WRITE32_MEMBER(psikyo4_state::ps4_vidregs_w)
 static void set_hotgmck_pcm_bank( running_machine &machine, int n )
 {
 	psikyo4_state *state = machine.driver_data<psikyo4_state>();
-	UINT8 *ymf_pcmbank = machine.root_device().memregion("ymf")->base() + 0x200000;
+	UINT8 *ymf_pcmbank = state->memregion("ymf")->base() + 0x200000;
 	UINT8 *pcm_rom = state->memregion("ymfsource")->base();
 
 	memcpy(ymf_pcmbank + n * 0x100000, pcm_rom + PCM_BANK_NO_LEGACY(n) * 0x100000, 0x100000);
@@ -955,7 +955,7 @@ static void hotgmck_pcm_bank_postload(running_machine &machine)
 static void install_hotgmck_pcm_bank(running_machine &machine)
 {
 	psikyo4_state *state = machine.driver_data<psikyo4_state>();
-	UINT8 *ymf_pcm = machine.root_device().memregion("ymf")->base();
+	UINT8 *ymf_pcm = state->memregion("ymf")->base();
 	UINT8 *pcm_rom = state->memregion("ymfsource")->base();
 
 	memcpy(ymf_pcm, pcm_rom, 0x200000);

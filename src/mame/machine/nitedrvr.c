@@ -21,7 +21,7 @@ change in-between can affect the direction you move.
 static int nitedrvr_steering( running_machine &machine )
 {
 	nitedrvr_state *state = machine.driver_data<nitedrvr_state>();
-	int this_val = input_port_read(machine, "STEER");
+	int this_val = state->ioport("STEER")->read();
 	int delta = this_val - state->m_last_steering_val;
 
 	state->m_last_steering_val = this_val;
@@ -98,7 +98,7 @@ Fill in the steering and gear bits in a special way.
 
 READ8_MEMBER(nitedrvr_state::nitedrvr_in0_r)
 {
-	int gear = input_port_read(machine(), "GEARS");
+	int gear = ioport("GEARS")->read();
 
 	if (gear & 0x10)				m_gear = 1;
 	else if (gear & 0x20)			m_gear = 2;
@@ -108,9 +108,9 @@ READ8_MEMBER(nitedrvr_state::nitedrvr_in0_r)
 	switch (offset & 0x03)
 	{
 		case 0x00:						/* No remapping necessary */
-			return input_port_read(machine(), "DSW0");
+			return ioport("DSW0")->read();
 		case 0x01:						/* No remapping necessary */
-			return input_port_read(machine(), "DSW1");
+			return ioport("DSW1")->read();
 		case 0x02:						/* Remap our gear shift */
 			if (m_gear == 1)
 				return 0xe0;
@@ -121,7 +121,7 @@ READ8_MEMBER(nitedrvr_state::nitedrvr_in0_r)
 			else
 				return 0x70;
 		case 0x03:						/* Remap our steering */
-			return (input_port_read(machine(), "DSW2") | nitedrvr_steering(machine()));
+			return (ioport("DSW2")->read() | nitedrvr_steering(machine()));
 		default:
 			return 0xff;
 	}
@@ -161,7 +161,7 @@ Fill in the track difficulty switch and special signal in a special way.
 
 READ8_MEMBER(nitedrvr_state::nitedrvr_in1_r)
 {
-	int port = input_port_read(machine(), "IN0");
+	int port = ioport("IN0")->read();
 
 	m_ac_line = (m_ac_line + 1) % 3;
 

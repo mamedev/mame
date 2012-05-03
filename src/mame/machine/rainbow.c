@@ -761,10 +761,10 @@ static TIMER_CALLBACK( cchip_timer )
 	coin_counter_w(machine, 1, state->m_CRAM[0][8] & 0x20);
 	coin_counter_w(machine, 0, state->m_CRAM[0][8] & 0x10);
 
-	state->m_CRAM[0][3] = input_port_read(machine, "800007");    /* STARTn + SERVICE1 */
-	state->m_CRAM[0][4] = input_port_read(machine, "800009");    /* COINn */
-	state->m_CRAM[0][5] = input_port_read(machine, "80000B");    /* Player controls + TILT */
-	state->m_CRAM[0][6] = input_port_read(machine, "80000D");    /* Player controls (cocktail) */
+	state->m_CRAM[0][3] = machine.root_device().ioport("800007")->read();    /* STARTn + SERVICE1 */
+	state->m_CRAM[0][4] = machine.root_device().ioport("800009")->read();    /* COINn */
+	state->m_CRAM[0][5] = machine.root_device().ioport("80000B")->read();    /* Player controls + TILT */
+	state->m_CRAM[0][6] = machine.root_device().ioport("80000D")->read();    /* Player controls (cocktail) */
 }
 
 /*************************************

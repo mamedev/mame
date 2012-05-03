@@ -1180,7 +1180,7 @@ SCREEN_VBLANK(sms)
 		end_of_frame(screen.machine(), md_sms_vdp);
 
 		// the SMS has a 'RESET' button on the machine, it generates an NMI
-		if (input_port_read_safe(screen.machine(),"PAUSE",0x00))
+		if (screen.machine().root_device().ioport("PAUSE")->read_safe(0x00))
 			cputag_set_input_line(screen.machine(), "maincpu", INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
@@ -1464,7 +1464,7 @@ DRIVER_INIT( sms )
 
 static UINT8 ioport_gg00_r(running_machine& machine)
 {
-	UINT8 GG_START_BUTTON = input_port_read_safe(machine,"GGSTART",0x00);
+	UINT8 GG_START_BUTTON = machine.root_device().ioport("GGSTART")->read_safe(0x00);
 
 	return (GG_START_BUTTON << 7) |
 		   (0               << 6) |
@@ -1567,7 +1567,7 @@ READ8_HANDLER (megatech_sms_ioport_dc_r)
 	running_machine &machine = space->machine();
 	/* 2009-05 FP: would it be worth to give separate inputs to SMS? SMS has only 2 keys A,B (which are B,C on megadrive) */
 	/* bit 4: TL-A; bit 5: TR-A */
-	return (input_port_read(machine, "PAD1") & 0x3f) | ((input_port_read(machine, "PAD2") & 0x03) << 6);
+	return (machine.root_device().ioport("PAD1")->read() & 0x3f) | ((machine.root_device().ioport("PAD2")->read() & 0x03) << 6);
 }
 
 READ8_HANDLER (megatech_sms_ioport_dd_r)
@@ -1575,7 +1575,7 @@ READ8_HANDLER (megatech_sms_ioport_dd_r)
 	running_machine &machine = space->machine();
 	/* 2009-05 FP: would it be worth to give separate inputs to SMS? SMS has only 2 keys A,B (which are B,C on megadrive) */
 	/* bit 2: TL-B; bit 3: TR-B; bit 4: RESET; bit 5: unused; bit 6: TH-A; bit 7: TH-B*/
-	return ((input_port_read(machine, "PAD2") & 0x3c) >> 2) | 0x10;
+	return ((machine.root_device().ioport("PAD2")->read() & 0x3c) >> 2) | 0x10;
 }
 
 

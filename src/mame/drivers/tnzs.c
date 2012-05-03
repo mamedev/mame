@@ -680,8 +680,8 @@ static READ8_DEVICE_HANDLER( kageki_csport_r )
 	tnzs_state *state = device->machine().driver_data<tnzs_state>();
 	int dsw, dsw1, dsw2;
 
-	dsw1 = input_port_read(device->machine(), "DSWA");
-	dsw2 = input_port_read(device->machine(), "DSWB");
+	dsw1 = state->ioport("DSWA")->read();
+	dsw2 = state->ioport("DSWB")->read();
 
 	switch (state->m_kageki_csport_sel)
 	{

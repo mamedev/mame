@@ -57,7 +57,7 @@ READ8_HANDLER ( pce_joystick_r )
 	}
 	else
 	{
-		data = input_port_read(space->machine(), "JOY");
+		data = space->machine().root_device().ioport("JOY")->read();
 	}
 	if(joystick_data_select) data >>= 4;
 	ret = (data & 0x0F) | pce.io_port_options;

@@ -698,7 +698,7 @@ xxxx ---- MCU program revision
 
 
 #define MCU_READ(tag, _bit_, _offset_, _retval_) \
-if((0xffff - input_port_read(machine, tag)) & _bit_) { jm_shared_ram[_offset_] = _retval_; }
+if((0xffff - machine.root_device().ioport(tag)->read()) & _bit_) { jm_shared_ram[_offset_] = _retval_; }
 
 /*Funky "DMA" / protection thing*/
 /*---- -x-- "DMA" execute.*/
@@ -749,12 +749,12 @@ static void daireika_mcu_run(running_machine &machine)
 
 	if(state->m_test_mode)	//service_mode
 	{
-		jm_shared_ram[0x000/2] = input_port_read(machine, "KEY0");
-		jm_shared_ram[0x002/2] = input_port_read(machine, "KEY1");
-		jm_shared_ram[0x004/2] = input_port_read(machine, "KEY2");
-		jm_shared_ram[0x006/2] = input_port_read(machine, "KEY3");
-		jm_shared_ram[0x008/2] = input_port_read(machine, "KEY4");
-		jm_shared_ram[0x00a/2] = input_port_read(machine, "KEY5");
+		jm_shared_ram[0x000/2] = machine.root_device().ioport("KEY0")->read();
+		jm_shared_ram[0x002/2] = machine.root_device().ioport("KEY1")->read();
+		jm_shared_ram[0x004/2] = machine.root_device().ioport("KEY2")->read();
+		jm_shared_ram[0x006/2] = machine.root_device().ioport("KEY3")->read();
+		jm_shared_ram[0x008/2] = machine.root_device().ioport("KEY4")->read();
+		jm_shared_ram[0x00a/2] = machine.root_device().ioport("KEY5")->read();
 	}
 	else
 	{
@@ -793,12 +793,12 @@ static void mjzoomin_mcu_run(running_machine &machine)
 
 	if(state->m_test_mode)	//service_mode
 	{
-		jm_shared_ram[0x000/2] = input_port_read(machine, "KEY0");
-		jm_shared_ram[0x002/2] = input_port_read(machine, "KEY1");
-		jm_shared_ram[0x004/2] = input_port_read(machine, "KEY2");
-		jm_shared_ram[0x006/2] = input_port_read(machine, "KEY3");
-		jm_shared_ram[0x008/2] = input_port_read(machine, "KEY4");
-		jm_shared_ram[0x00a/2] = input_port_read(machine, "KEY5");
+		jm_shared_ram[0x000/2] = state->ioport("KEY0")->read();
+		jm_shared_ram[0x002/2] = state->ioport("KEY1")->read();
+		jm_shared_ram[0x004/2] = state->ioport("KEY2")->read();
+		jm_shared_ram[0x006/2] = state->ioport("KEY3")->read();
+		jm_shared_ram[0x008/2] = state->ioport("KEY4")->read();
+		jm_shared_ram[0x00a/2] = state->ioport("KEY5")->read();
 	}
 	else
 	{
@@ -838,12 +838,12 @@ static void urashima_mcu_run(running_machine &machine)
 
 	if(state->m_test_mode)	//service_mode
 	{
-		jm_shared_ram[0x300/2] = input_port_read(machine, "KEY0");
-		jm_shared_ram[0x302/2] = input_port_read(machine, "KEY1");
-		jm_shared_ram[0x304/2] = input_port_read(machine, "KEY2");
-		jm_shared_ram[0x306/2] = input_port_read(machine, "KEY3");
-		jm_shared_ram[0x308/2] = input_port_read(machine, "KEY4");
-		jm_shared_ram[0x30a/2] = input_port_read(machine, "KEY5");
+		jm_shared_ram[0x300/2] = state->ioport("KEY0")->read();
+		jm_shared_ram[0x302/2] = state->ioport("KEY1")->read();
+		jm_shared_ram[0x304/2] = state->ioport("KEY2")->read();
+		jm_shared_ram[0x306/2] = state->ioport("KEY3")->read();
+		jm_shared_ram[0x308/2] = state->ioport("KEY4")->read();
+		jm_shared_ram[0x30a/2] = state->ioport("KEY5")->read();
 	}
 	else
 	{
@@ -882,9 +882,9 @@ static void second_mcu_run(running_machine &machine)
 	UINT16 *jm_shared_ram = state->m_jm_shared_ram;
 	if(state->m_test_mode)	//service_mode
 	{
-		jm_shared_ram[0x200/2] = input_port_read(machine, "KEY0");
-		jm_shared_ram[0x202/2] = input_port_read(machine, "KEY1");
-		jm_shared_ram[0x204/2] = input_port_read(machine, "KEY2");
+		jm_shared_ram[0x200/2] = state->ioport("KEY0")->read();
+		jm_shared_ram[0x202/2] = state->ioport("KEY1")->read();
+		jm_shared_ram[0x204/2] = state->ioport("KEY2")->read();
 	}
 	else
 	{
@@ -1378,15 +1378,15 @@ static MACHINE_RESET ( jalmah )
 	{
 		case MJZOOMIN_MCU:
 		case DAIREIKA_MCU:
-			state->m_test_mode = (~(input_port_read(machine, "SYSTEM")) & 0x0008) ? (1) : (0);
+			state->m_test_mode = (~(state->ioport("SYSTEM")->read()) & 0x0008) ? (1) : (0);
 			break;
 		case URASHIMA_MCU:
-			state->m_test_mode = ((~(input_port_read(machine, "SYSTEM")) & 0x0008) || (~(input_port_read(machine, "DSW")) & 0x8000)) ? (1) : (0);
+			state->m_test_mode = ((~(state->ioport("SYSTEM")->read()) & 0x0008) || (~(state->ioport("DSW")->read()) & 0x8000)) ? (1) : (0);
 			break;
 		case KAKUMEI_MCU:
 		case KAKUMEI2_MCU:
 		case SUCHIPI_MCU:
-			state->m_test_mode = (~(input_port_read(machine, "DSW")) & 0x0004) ? (1) : (0);
+			state->m_test_mode = (~(state->ioport("DSW")->read()) & 0x0004) ? (1) : (0);
 			break;
 	}
 }

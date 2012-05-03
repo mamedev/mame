@@ -261,12 +261,12 @@ READ8_MEMBER(cvs_state::cvs_input_r)
 	/* the lower 4 (or 3?) bits select the port to read */
 	switch (offset & 0x0f)	/* might be 0x07 */
 	{
-	case 0x00:  ret = input_port_read(machine(), "IN0"); break;
-	case 0x02:  ret = input_port_read(machine(), "IN1"); break;
-	case 0x03:  ret = input_port_read(machine(), "IN2"); break;
-	case 0x04:  ret = input_port_read(machine(), "IN3"); break;
-	case 0x06:  ret = input_port_read(machine(), "DSW3"); break;
-	case 0x07:  ret = input_port_read(machine(), "DSW2"); break;
+	case 0x00:  ret = ioport("IN0")->read(); break;
+	case 0x02:  ret = ioport("IN1")->read(); break;
+	case 0x03:  ret = ioport("IN2")->read(); break;
+	case 0x04:  ret = ioport("IN3")->read(); break;
+	case 0x06:  ret = ioport("DSW3")->read(); break;
+	case 0x07:  ret = ioport("DSW2")->read(); break;
 	default:    logerror("%04x : CVS: Reading unmapped input port 0x%02x\n", cpu_get_pc(&space.device()), offset & 0x0f); break;
 	}
 
@@ -425,8 +425,7 @@ static WRITE8_DEVICE_HANDLER( cvs_tms5110_pdc_w )
 static int speech_rom_read_bit( device_t *device )
 {
 	cvs_state *state = device->machine().driver_data<cvs_state>();
-	running_machine &machine = device->machine();
-	UINT8 *ROM = machine.root_device().memregion("speechdata")->base();
+	UINT8 *ROM = state->memregion("speechdata")->base();
 	int bit;
 
 	/* before reading the bit, clamp the address to the region length */
@@ -612,7 +611,7 @@ static INPUT_PORTS_START( cvs )
 	PORT_DIPUNUSED( 0x20, IP_ACTIVE_HIGH )                  /* can't tell if it's ACTIVE_HIGH or ACTIVE_LOW */
 
 	PORT_START("SENSE")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( cvs_registration )

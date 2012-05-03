@@ -81,8 +81,8 @@ static void move_motor(running_machine &machine, stactics_state *state)
 	 /* monitor motor under joystick control */
     if (*state->m_motor_on & 0x01)
     {
-		int ip3 = input_port_read(machine, "IN3");
-		int ip4 = input_port_read(machine, "FAKE");
+		int ip3 = machine.root_device().ioport("IN3")->read();
+		int ip4 = machine.root_device().ioport("FAKE")->read();
 
 		/* up */
 		if (((ip4 & 0x01) == 0) && (state->m_vert_pos > -128))

@@ -247,9 +247,9 @@ READ8_MEMBER(gpworld_state::ldp_read)
 READ8_MEMBER(gpworld_state::pedal_in)
 {
 	if (m_brake_gas)
-		return	input_port_read(machine(), "INACCEL");
+		return	ioport("INACCEL")->read();
 
-	return	input_port_read(machine(), "INBRAKE");
+	return	ioport("INBRAKE")->read();
 
 }
 

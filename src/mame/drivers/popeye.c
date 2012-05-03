@@ -407,8 +407,8 @@ static READ8_DEVICE_HANDLER( popeye_portA_r )
 	int res;
 
 
-	res = input_port_read(device->machine(), "DSW0");
-	res |= (input_port_read(device->machine(), "DSW1") << (7-state->m_dswbit)) & 0x80;
+	res = state->ioport("DSW0")->read();
+	res |= (state->ioport("DSW1")->read() << (7-state->m_dswbit)) & 0x80;
 
 	return res;
 }

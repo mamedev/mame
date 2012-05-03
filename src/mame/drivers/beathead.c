@@ -256,7 +256,7 @@ WRITE32_MEMBER( beathead_state::eeprom_enable_w )
 
 READ32_MEMBER( beathead_state::input_2_r )
 {
-	int result = input_port_read(machine(), "IN2");
+	int result = ioport("IN2")->read();
 	if (m_sound_to_cpu_ready) result ^= 0x10;
 	if (m_cpu_to_sound_ready) result ^= 0x20;
 	return result;

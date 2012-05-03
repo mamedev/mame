@@ -62,7 +62,7 @@ WRITE16_MEMBER(blmbycar_state::blmbycar_pot_wheel_reset_w)
 {
 
 	if (ACCESSING_BITS_0_7)
-		m_pot_wheel = ~input_port_read(machine(), "WHEEL") & 0xff;
+		m_pot_wheel = ~ioport("WHEEL")->read() & 0xff;
 }
 
 WRITE16_MEMBER(blmbycar_state::blmbycar_pot_wheel_shift_w)
@@ -86,7 +86,7 @@ READ16_MEMBER(blmbycar_state::blmbycar_pot_wheel_r)
 
 READ16_MEMBER(blmbycar_state::blmbycar_opt_wheel_r)
 {
-	return (~input_port_read(machine(), "WHEEL") & 0xff) << 8;
+	return (~ioport("WHEEL")->read() & 0xff) << 8;
 }
 
 

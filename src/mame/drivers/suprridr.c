@@ -230,9 +230,9 @@ CUSTOM_INPUT_MEMBER(suprridr_state::suprridr_control_r)
 
 	/* screen flip multiplexes controls */
 	if (suprridr_is_screen_flipped(machine()))
-		ret = input_port_read(machine(), SUPRRIDR_P2_CONTROL_PORT_TAG);
+		ret = ioport(SUPRRIDR_P2_CONTROL_PORT_TAG)->read();
 	else
-		ret = input_port_read(machine(), SUPRRIDR_P1_CONTROL_PORT_TAG);
+		ret = ioport(SUPRRIDR_P1_CONTROL_PORT_TAG)->read();
 
 	return ret;
 }

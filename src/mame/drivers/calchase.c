@@ -493,28 +493,28 @@ WRITE32_MEMBER(calchase_state::bios_ram_w)
 
 READ16_MEMBER(calchase_state::calchase_iocard1_r)
 {
-	return input_port_read(machine(), "IOCARD1");
+	return ioport("IOCARD1")->read();
 }
 
 READ16_MEMBER(calchase_state::calchase_iocard2_r)
 {
-	return input_port_read(machine(), "IOCARD2");
+	return ioport("IOCARD2")->read();
 }
 
 READ16_MEMBER(calchase_state::calchase_iocard3_r)
 {
-	return input_port_read(machine(), "IOCARD3");
+	return ioport("IOCARD3")->read();
 }
 
 /* These two controls wheel pot or whatever this game uses ... */
 READ16_MEMBER(calchase_state::calchase_iocard4_r)
 {
-	return input_port_read(machine(), "IOCARD4");
+	return ioport("IOCARD4")->read();
 }
 
 READ16_MEMBER(calchase_state::calchase_iocard5_r)
 {
-	return input_port_read(machine(), "IOCARD5");
+	return ioport("IOCARD5")->read();
 }
 
 
@@ -677,7 +677,7 @@ static INPUT_PORTS_START( calchase )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN ) // returns back to MS-DOS (likely to be unmapped and actually used as a lame protection check)
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_START("IOCARD3")
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_VBLANK )
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0xdfff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IOCARD4")

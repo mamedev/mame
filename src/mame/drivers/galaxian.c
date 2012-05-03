@@ -452,7 +452,7 @@ static INTERRUPT_GEN( fakechange_interrupt_gen )
 	galaxian_state *state = device->machine().driver_data<galaxian_state>();
 	interrupt_gen(device);
 
-	if (input_port_read_safe(device->machine(), "FAKE_SELECT", 0x00))
+	if (state->ioport("FAKE_SELECT")->read_safe(0x00))
 	{
 		state->m_tenspot_current_game++;
 		state->m_tenspot_current_game%=10;
@@ -1103,7 +1103,7 @@ CUSTOM_INPUT_MEMBER(galaxian_state::gmgalax_port_r)
 	const char *portname = (const char *)param;
 	if (m_gmgalax_selected_game != 0)
 		portname += strlen(portname) + 1;
-	return input_port_read(machine(), portname);
+	return ioport(portname)->read();
 }
 
 
@@ -1154,7 +1154,7 @@ WRITE8_MEMBER(galaxian_state::zigzag_ay8910_w)
 
 CUSTOM_INPUT_MEMBER(galaxian_state::azurian_port_r)
 {
-	return (input_port_read(machine(), "FAKE") >> (FPTR)param) & 1;
+	return (ioport("FAKE")->read() >> (FPTR)param) & 1;
 }
 
 
@@ -1168,7 +1168,7 @@ CUSTOM_INPUT_MEMBER(galaxian_state::azurian_port_r)
 CUSTOM_INPUT_MEMBER(galaxian_state::kingball_muxbit_r)
 {
 	/* multiplex the service mode switch with a speech DIP switch */
-	return (input_port_read(machine(), "FAKE") >> m_kingball_speech_dip) & 1;
+	return (ioport("FAKE")->read() >> m_kingball_speech_dip) & 1;
 }
 
 
@@ -2810,10 +2810,10 @@ static DRIVER_INIT( gmgalax )
 
 	/* ROM is banked */
 	space->install_read_bank(0x0000, 0x3fff, "bank1");
-	machine.root_device().membank("bank1")->configure_entries(0, 2, state->memregion("maincpu")->base() + 0x10000, 0x4000);
+	state->membank("bank1")->configure_entries(0, 2, state->memregion("maincpu")->base() + 0x10000, 0x4000);
 
 	/* callback when the game select is toggled */
-	state->gmgalax_game_changed(*machine.ioport().first_port()->fieldlist().first(), NULL, 0, 0);
+	state->gmgalax_game_changed(*machine.ioport().first_port()->first_field(), NULL, 0, 0);
 	state_save_register_global(machine, state->m_gmgalax_selected_game);
 }
 
@@ -2927,7 +2927,7 @@ READ8_MEMBER(galaxian_state::tenspot_dsw_read)
 {
 	char tmp[64];
 	sprintf(tmp,"IN2_GAME%d", m_tenspot_current_game);
-	return input_port_read_safe(machine(), tmp, 0x00);
+	return ioport(tmp)->read_safe(0x00);
 }
 
 
@@ -3026,8 +3026,8 @@ static DRIVER_INIT( zigzag )
 	/* make ROMs 2 & 3 swappable */
 	space->install_read_bank(0x2000, 0x2fff, "bank1");
 	space->install_read_bank(0x3000, 0x3fff, "bank2");
-	state->membank("bank1")->configure_entries(0, 2, machine.root_device().memregion("maincpu")->base() + 0x2000, 0x1000);
-	state->membank("bank2")->configure_entries(0, 2, machine.root_device().memregion("maincpu")->base() + 0x2000, 0x1000);
+	state->membank("bank1")->configure_entries(0, 2, state->memregion("maincpu")->base() + 0x2000, 0x1000);
+	state->membank("bank2")->configure_entries(0, 2, state->memregion("maincpu")->base() + 0x2000, 0x1000);
 
 	/* also re-install the fixed ROM area as a bank in order to inform the memory system that
        the fixed area only extends to 0x1fff */
@@ -3502,7 +3502,7 @@ static DRIVER_INIT( scorpion )
 
 	/* extra ROM */
 	space->install_read_bank(0x5800, 0x67ff, "bank1");
-	state->membank("bank1")->set_base(machine.root_device().memregion("maincpu")->base() + 0x5800);
+	state->membank("bank1")->set_base(state->memregion("maincpu")->base() + 0x5800);
 
 	/* no background related */
 //  space->nop_write(0x6803, 0x6803);

@@ -112,7 +112,7 @@ READ32_MEMBER(eolith_state::eolith_custom_r)
     */
 	eolith_speedup_read(&space);
 
-	return (input_port_read(machine(), "IN0") & ~0x300) | (machine().rand() & 0x300);
+	return (ioport("IN0")->read() & ~0x300) | (machine().rand() & 0x300);
 }
 
 WRITE32_MEMBER(eolith_state::systemcontrol_w)
@@ -121,7 +121,7 @@ WRITE32_MEMBER(eolith_state::systemcontrol_w)
 	coin_counter_w(machine(), 0, data & m_coin_counter_bit);
 	set_led_status(machine(), 0, data & 1);
 
-	input_port_write(machine(), "EEPROMOUT", data, 0xff);
+	ioport("EEPROMOUT")->write(data, 0xff);
 
 	// bit 0x100 and 0x040 ?
 }
@@ -129,8 +129,8 @@ WRITE32_MEMBER(eolith_state::systemcontrol_w)
 READ32_MEMBER(eolith_state::hidctch3_pen1_r)
 {
 	//320 x 240
-	int xpos = input_port_read(machine(), "PEN_X_P1");
-	int ypos = input_port_read(machine(), "PEN_Y_P1");
+	int xpos = ioport("PEN_X_P1")->read();
+	int ypos = ioport("PEN_Y_P1")->read();
 
 	return xpos + (ypos*168*2);
 }
@@ -138,8 +138,8 @@ READ32_MEMBER(eolith_state::hidctch3_pen1_r)
 READ32_MEMBER(eolith_state::hidctch3_pen2_r)
 {
 	//320 x 240
-	int xpos = input_port_read(machine(), "PEN_X_P2");
-	int ypos = input_port_read(machine(), "PEN_Y_P2");
+	int xpos = ioport("PEN_X_P2")->read();
+	int ypos = ioport("PEN_Y_P2")->read();
 
 	return xpos + (ypos*168*2);
 }

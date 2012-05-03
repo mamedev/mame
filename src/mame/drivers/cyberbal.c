@@ -103,7 +103,7 @@ static MACHINE_RESET( cyberbal2p )
 
 READ16_MEMBER(cyberbal_state::special_port0_r)
 {
-	int temp = input_port_read(machine(), "IN0");
+	int temp = ioport("IN0")->read();
 	if (m_cpu_to_sound_ready) temp ^= 0x0080;
 	return temp;
 }
@@ -111,7 +111,7 @@ READ16_MEMBER(cyberbal_state::special_port0_r)
 
 READ16_MEMBER(cyberbal_state::special_port2_r)
 {
-	int temp = input_port_read(machine(), "IN2");
+	int temp = ioport("IN2")->read();
 	if (m_cpu_to_sound_ready) temp ^= 0x2000;
 	return temp;
 }
@@ -306,7 +306,7 @@ static INPUT_PORTS_START( cyberbal )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_VBLANK )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("IN2")		/* fake port for screen switching */
 	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -346,7 +346,7 @@ static INPUT_PORTS_START( cyberbal2p )
 	PORT_START("IN2")		/* fc4000 */
 	PORT_BIT( 0x1fff, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_SERVICE( 0x8000, IP_ACTIVE_LOW )
 
 	PORT_INCLUDE( atarijsa_ii )		/* audio board port */

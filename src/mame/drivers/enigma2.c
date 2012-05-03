@@ -365,7 +365,7 @@ READ8_MEMBER(enigma2_state::dip_switch_r)
 		if (m_protection_data != 0xff)
 			ret = m_protection_data ^ 0x88;
 		else
-			ret = input_port_read(machine(), "DSW");
+			ret = ioport("DSW")->read();
 		break;
 
 	case 0x02:
@@ -413,22 +413,22 @@ static WRITE8_DEVICE_HANDLER( protection_data_w )
 
 WRITE8_MEMBER(enigma2_state::enigma2_flip_screen_w)
 {
-	m_flip_screen = ((data >> 5) & 0x01) && ((input_port_read(machine(), "DSW") & 0x20) == 0x20);
+	m_flip_screen = ((data >> 5) & 0x01) && ((ioport("DSW")->read() & 0x20) == 0x20);
 }
 
 
 CUSTOM_INPUT_MEMBER(enigma2_state::p1_controls_r)
 {
-	return input_port_read(machine(), "P1CONTROLS");
+	return ioport("P1CONTROLS")->read();
 }
 
 
 CUSTOM_INPUT_MEMBER(enigma2_state::p2_controls_r)
 {
 	if (m_flip_screen)
-		return input_port_read(machine(), "P2CONTROLS");
+		return ioport("P2CONTROLS")->read();
 	else
-		return input_port_read(machine(), "P1CONTROLS");
+		return ioport("P1CONTROLS")->read();
 }
 
 

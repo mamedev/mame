@@ -285,20 +285,20 @@ static READ8_DEVICE_HANDLER( pedal_extra_bits_r )
 {
 	UINT8 p1_sht_sw,p2_sht_sw;
 
-	p1_sht_sw = (input_port_read(device->machine(), "P1_RELEASE") & 0x80)>>7;
-	p2_sht_sw = (input_port_read(device->machine(), "P2_RELEASE") & 0x80)>>6;
+	p1_sht_sw = (device->machine().root_device().ioport("P1_RELEASE")->read() & 0x80)>>7;
+	p2_sht_sw = (device->machine().root_device().ioport("P2_RELEASE")->read() & 0x80)>>6;
 
 	return p1_sht_sw | p2_sht_sw;
 }
 
 static READ8_DEVICE_HANDLER( p1_r )
 {
-	return (input_port_read(device->machine(), "P1") & 0xf0) | ((input_port_read(device->machine(), "P1_ANALOG") & 0xf));
+	return (device->machine().root_device().ioport("P1")->read() & 0xf0) | ((device->machine().root_device().ioport("P1_ANALOG")->read() & 0xf));
 }
 
 static READ8_DEVICE_HANDLER( p2_r )
 {
-	return (input_port_read(device->machine(), "P2") & 0xf0) | ((input_port_read(device->machine(), "P2_ANALOG") & 0xf));
+	return (device->machine().root_device().ioport("P2")->read() & 0xf0) | ((device->machine().root_device().ioport("P2_ANALOG")->read() & 0xf));
 }
 
 static ADDRESS_MAP_START( suprgolf_map, AS_PROGRAM, 8, suprgolf_state )

@@ -1488,7 +1488,7 @@ static SCREEN_UPDATE_IND16( halleys )
 		bitmap.fill(state->m_bgcolor, cliprect);
 
 #ifdef MAME_DEBUG
-	if (input_port_read(screen.machine(), "DEBUG")) copy_scroll_xp(bitmap, state->m_render_layer[3], *state->m_scrollx0, *state->m_scrolly0); // not used???
+	if (screen.machine().root_device().ioport("DEBUG")->read()) copy_scroll_xp(bitmap, state->m_render_layer[3], *state->m_scrollx0, *state->m_scrolly0); // not used???
 #endif
 
 	copy_scroll_xp(bitmap, state->m_render_layer[2], *state->m_scrollx1, *state->m_scrolly1);
@@ -1628,8 +1628,8 @@ READ8_MEMBER(halleys_state::coin_lockout_r)
 	//   0x8599 : 'benberob'
 	//   0x83e2 : 'halleys', 'halleysc', 'halleycj'
 	//   0x83df : 'halley87'
-	int inp = input_port_read(machine(), "IN0");
-	int result = ((input_port_read(machine(), "DSW4")) & 0x20) >> 5;
+	int inp = ioport("IN0")->read();
+	int result = ((ioport("DSW4")->read()) & 0x20) >> 5;
 
 	if (inp & 0x80) result |= 0x02;
 	if (inp & 0x40) result |= 0x04;
@@ -1642,7 +1642,7 @@ READ8_MEMBER(halleys_state::io_mirror_r)
 {
 	static const char *const portnames[] = { "IN0", "IN1", "IN2", "IN3" };
 
-	return input_port_read(machine(), portnames[offset]);
+	return ioport(portnames[offset])->read();
 }
 
 

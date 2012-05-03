@@ -229,13 +229,13 @@ READ32_MEMBER(djmain_state::v_rom_r)
 READ8_MEMBER(djmain_state::inp1_r)
 {
 	static const char *const portnames[] = { "DSW3", "BTN3", "BTN2", "BTN1" };
-	return input_port_read(machine(), portnames[ offset & 0x03 ]);
+	return ioport(portnames[ offset & 0x03 ])->read();
 }
 
 READ8_MEMBER(djmain_state::inp2_r)
 {
 	static const char *const portnames[] = { "DSW1", "DSW2", "UNK2", "UNK1" };
-	return input_port_read(machine(), portnames[ offset & 0x03 ]);
+	return ioport(portnames[ offset & 0x03 ])->read();
 }
 
 READ32_MEMBER(djmain_state::turntable_r)
@@ -248,7 +248,7 @@ READ32_MEMBER(djmain_state::turntable_r)
 		UINT8 pos;
 		int delta;
 
-		pos = input_port_read_safe(machine(), ttnames[m_turntable_select], 0);
+		pos = ioport(ttnames[m_turntable_select])->read_safe(0);
 		delta = pos - m_turntable_last_pos[m_turntable_select];
 		if (delta < -128)
 			delta += 256;
@@ -660,11 +660,11 @@ INPUT_PORTS_END
 
 #ifdef PRIORITY_EASINESS_TO_PLAY
 	#define BEATMANIA_DSW3_STAGES_OLD \
-		PORT_DIPNAME( 0x1c, 0x1c, "Normal Mode Stages" ) PORT_CONDITION("DSW3", 0x20, PORTCOND_EQUALS, 0x20) PORT_DIPLOCATION("SW3:4,3,2") \
+		PORT_DIPNAME( 0x1c, 0x1c, "Normal Mode Stages" ) PORT_CONDITION("DSW3", 0x20, EQUALS, 0x20) PORT_DIPLOCATION("SW3:4,3,2") \
 		PORT_DIPSETTING(    0x10, "3 Stages" ) \
 		PORT_DIPSETTING(    0x00, "4 Stages" ) \
 		PORT_DIPSETTING(    0x08, "5 Stages" ) \
-		PORT_DIPNAME( 0x1c, 0x1c, "Event Mode Stages" ) PORT_CONDITION("DSW3", 0x20, PORTCOND_NOTEQUALS, 0x20) PORT_DIPLOCATION("SW3:4,3,2") \
+		PORT_DIPNAME( 0x1c, 0x1c, "Event Mode Stages" ) PORT_CONDITION("DSW3", 0x20, NOTEQUALS, 0x20) PORT_DIPLOCATION("SW3:4,3,2") \
 		PORT_DIPSETTING(    0x0c, "1 Stage" ) \
 		PORT_DIPSETTING(    0x14, "2 Stages" ) \
 		PORT_DIPSETTING(    0x10, "3 Stages" ) \
@@ -672,7 +672,7 @@ INPUT_PORTS_END
 		PORT_DIPSETTING(    0x08, "5 Stages" )
 #else
 	#define BEATMANIA_DSW3_STAGES_OLD \
-		PORT_DIPNAME( 0x1c, 0x1c, "Normal Mode Stages" ) PORT_CONDITION("DSW3", 0x20, PORTCOND_EQUALS, 0x20) PORT_DIPLOCATION("SW3:4,3,2") \
+		PORT_DIPNAME( 0x1c, 0x1c, "Normal Mode Stages" ) PORT_CONDITION("DSW3", 0x20, EQUALS, 0x20) PORT_DIPLOCATION("SW3:4,3,2") \
 		PORT_DIPSETTING(    0x10, "3 Stages" ) \
 		  PORT_DIPSETTING(  0x1c, "4 Stages" ) /* duplicated setting */ \
 		  PORT_DIPSETTING(  0x0c, "4 Stages" ) /* duplicated setting */ \
@@ -681,7 +681,7 @@ INPUT_PORTS_END
 		  PORT_DIPSETTING(  0x18, "4 Stages" ) /* duplicated setting */ \
 		PORT_DIPSETTING(    0x00, "4 Stages" ) \
 		PORT_DIPSETTING(    0x08, "5 Stages" ) \
-		PORT_DIPNAME( 0x1c, 0x1c, "Event Mode Stages" ) PORT_CONDITION("DSW3", 0x20, PORTCOND_NOTEQUALS, 0x20) PORT_DIPLOCATION("SW3:4,3,2") \
+		PORT_DIPNAME( 0x1c, 0x1c, "Event Mode Stages" ) PORT_CONDITION("DSW3", 0x20, NOTEQUALS, 0x20) PORT_DIPLOCATION("SW3:4,3,2") \
 		PORT_DIPSETTING(    0x0c, "1 Stage" ) \
 		PORT_DIPSETTING(    0x14, "2 Stages" ) \
 		PORT_DIPSETTING(    0x10, "3 Stages" ) \
@@ -694,11 +694,11 @@ INPUT_PORTS_END
 
 #ifdef PRIORITY_EASINESS_TO_PLAY
 	#define BEATMANIA_DSW3_STAGES_MIDDLE( str ) \
-		PORT_DIPNAME( 0x1c, 0x1c, str ) PORT_CONDITION("DSW3", 0x20, PORTCOND_EQUALS, 0x20) PORT_DIPLOCATION("SW3:4,3,2") \
+		PORT_DIPNAME( 0x1c, 0x1c, str ) PORT_CONDITION("DSW3", 0x20, EQUALS, 0x20) PORT_DIPLOCATION("SW3:4,3,2") \
 		PORT_DIPSETTING(    0x10, "3 / 3 Stages" ) \
 		PORT_DIPSETTING(    0x00, "4 / 4 Stages" ) \
 		PORT_DIPSETTING(    0x08, "5 / 5 Stages" ) \
-		PORT_DIPNAME( 0x1c, 0x1c, "Event Mode Stages" ) PORT_CONDITION("DSW3", 0x20, PORTCOND_NOTEQUALS, 0x20) PORT_DIPLOCATION("SW3:4,3,2") \
+		PORT_DIPNAME( 0x1c, 0x1c, "Event Mode Stages" ) PORT_CONDITION("DSW3", 0x20, NOTEQUALS, 0x20) PORT_DIPLOCATION("SW3:4,3,2") \
 		PORT_DIPSETTING(    0x0c, "1 Stage" ) \
 		PORT_DIPSETTING(    0x14, "2 Stages" ) \
 		PORT_DIPSETTING(    0x10, "3 Stages" ) \
@@ -706,7 +706,7 @@ INPUT_PORTS_END
 		PORT_DIPSETTING(    0x08, "5 Stages" )
 #else
 	#define BEATMANIA_DSW3_STAGES_MIDDLE( str ) \
-		PORT_DIPNAME( 0x1c, 0x1c, str ) PORT_CONDITION("DSW3", 0x20, PORTCOND_EQUALS, 0x20) PORT_DIPLOCATION("SW3:4,3,2") \
+		PORT_DIPNAME( 0x1c, 0x1c, str ) PORT_CONDITION("DSW3", 0x20, EQUALS, 0x20) PORT_DIPLOCATION("SW3:4,3,2") \
 		PORT_DIPSETTING(    0x10, "3 / 3 Stages" ) \
 		  PORT_DIPSETTING(  0x1c, "4 / 4 Stages" ) /* duplicated setting */ \
 		  PORT_DIPSETTING(  0x0c, "4 / 4 Stages" ) /* duplicated setting */ \
@@ -715,7 +715,7 @@ INPUT_PORTS_END
 		  PORT_DIPSETTING(  0x18, "4 / 4 Stages" ) /* duplicated setting */ \
 		PORT_DIPSETTING(    0x00, "4 / 4 Stages" ) \
 		PORT_DIPSETTING(    0x08, "5 / 5 Stages" ) \
-		PORT_DIPNAME( 0x1c, 0x1c, "Event Mode Stages" ) PORT_CONDITION("DSW3", 0x20, PORTCOND_NOTEQUALS, 0x20) PORT_DIPLOCATION("SW3:4,3,2") \
+		PORT_DIPNAME( 0x1c, 0x1c, "Event Mode Stages" ) PORT_CONDITION("DSW3", 0x20, NOTEQUALS, 0x20) PORT_DIPLOCATION("SW3:4,3,2") \
 		PORT_DIPSETTING(    0x0c, "1 Stage" ) \
 		PORT_DIPSETTING(    0x14, "2 Stages" ) \
 		PORT_DIPSETTING(    0x10, "3 Stages" ) \
@@ -728,11 +728,11 @@ INPUT_PORTS_END
 
 #ifdef PRIORITY_EASINESS_TO_PLAY
 	#define BEATMANIA_DSW3_STAGES_NEW( str ) \
-		PORT_DIPNAME( 0x1c, 0x1c, str ) PORT_CONDITION("DSW3", 0x20, PORTCOND_EQUALS, 0x20) PORT_DIPLOCATION("SW3:4,3,2") \
+		PORT_DIPNAME( 0x1c, 0x1c, str ) PORT_CONDITION("DSW3", 0x20, EQUALS, 0x20) PORT_DIPLOCATION("SW3:4,3,2") \
 		PORT_DIPSETTING(    0x10, "3 / 2 Stages" ) \
 		PORT_DIPSETTING(    0x00, "4 / 3 Stages" ) \
 		PORT_DIPSETTING(    0x08, "5 / 3 Stages" ) \
-		PORT_DIPNAME( 0x1c, 0x1c, "Event Mode Stages" ) PORT_CONDITION("DSW3", 0x20, PORTCOND_NOTEQUALS, 0x20) PORT_DIPLOCATION("SW3:4,3,2") \
+		PORT_DIPNAME( 0x1c, 0x1c, "Event Mode Stages" ) PORT_CONDITION("DSW3", 0x20, NOTEQUALS, 0x20) PORT_DIPLOCATION("SW3:4,3,2") \
 		PORT_DIPSETTING(    0x0c, "1 Stage" ) \
 		PORT_DIPSETTING(    0x14, "2 Stages" ) \
 		PORT_DIPSETTING(    0x10, "3 Stages" ) \
@@ -740,7 +740,7 @@ INPUT_PORTS_END
 		PORT_DIPSETTING(    0x08, "5 Stages" )
 #else
 	#define BEATMANIA_DSW3_STAGES_NEW( str ) \
-		PORT_DIPNAME( 0x1c, 0x1c, str ) PORT_CONDITION("DSW3", 0x20, PORTCOND_EQUALS, 0x20) PORT_DIPLOCATION("SW3:4,3,2") \
+		PORT_DIPNAME( 0x1c, 0x1c, str ) PORT_CONDITION("DSW3", 0x20, EQUALS, 0x20) PORT_DIPLOCATION("SW3:4,3,2") \
 		PORT_DIPSETTING(    0x10, "3 / 2 Stages" ) \
 		  PORT_DIPSETTING(  0x1c, "4 / 3 Stages" ) /* duplicated setting */ \
 		  PORT_DIPSETTING(  0x0c, "4 / 3 Stages" ) /* duplicated setting */ \
@@ -749,7 +749,7 @@ INPUT_PORTS_END
 		  PORT_DIPSETTING(  0x18, "4 / 3 Stages" ) /* duplicated setting */ \
 		PORT_DIPSETTING(    0x00, "4 / 3 Stages" ) \
 		PORT_DIPSETTING(    0x08, "5 / 3 Stages" ) \
-		PORT_DIPNAME( 0x1c, 0x1c, "Event Mode Stages" ) PORT_CONDITION("DSW3", 0x20, PORTCOND_NOTEQUALS, 0x20) PORT_DIPLOCATION("SW3:4,3,2") \
+		PORT_DIPNAME( 0x1c, 0x1c, "Event Mode Stages" ) PORT_CONDITION("DSW3", 0x20, NOTEQUALS, 0x20) PORT_DIPLOCATION("SW3:4,3,2") \
 		PORT_DIPSETTING(    0x0c, "1 Stage" ) \
 		PORT_DIPSETTING(    0x14, "2 Stages" ) \
 		PORT_DIPSETTING(    0x10, "3 Stages" ) \
@@ -853,10 +853,10 @@ INPUT_PORTS_END
 		PORT_START("DSW3") \
 		PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED ) /* bit 7,6 don't exist */ \
 		BEATMANIA_DSW3_EVENTMODE /* SW3:1 */ \
-		PORT_DIPNAME( 0x1c, 0x1c, str ) PORT_CONDITION("DSW3", 0x20, PORTCOND_EQUALS, 0x20) PORT_DIPLOCATION("SW3:4,3,2") \
+		PORT_DIPNAME( 0x1c, 0x1c, str ) PORT_CONDITION("DSW3", 0x20, EQUALS, 0x20) PORT_DIPLOCATION("SW3:4,3,2") \
 		PORT_DIPSETTING(    0x1c, "3 / 3 Stages" ) \
 		PORT_DIPSETTING(    0x10, "4 / 4 Stages" ) \
-		PORT_DIPNAME( 0x1c, 0x1c, "Event Mode Stages" ) PORT_CONDITION("DSW3", 0x20, PORTCOND_NOTEQUALS, 0x20) PORT_DIPLOCATION("SW3:4,3,2") \
+		PORT_DIPNAME( 0x1c, 0x1c, "Event Mode Stages" ) PORT_CONDITION("DSW3", 0x20, NOTEQUALS, 0x20) PORT_DIPLOCATION("SW3:4,3,2") \
 		PORT_DIPSETTING(    0x0c, "1 Stage" ) \
 		PORT_DIPSETTING(    0x14, "2 Stages" ) \
 		PORT_DIPSETTING(    0x10, "3 Stages" ) \
@@ -869,7 +869,7 @@ INPUT_PORTS_END
 		PORT_START("DSW3") \
 		PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED ) /* bit 7,6 don't exist */ \
 		BEATMANIA_DSW3_EVENTMODE /* SW3:1 */ \
-		PORT_DIPNAME( 0x1c, 0x1c, str ) PORT_CONDITION("DSW3", 0x20, PORTCOND_EQUALS, 0x20) PORT_DIPLOCATION("SW3:4,3,2") \
+		PORT_DIPNAME( 0x1c, 0x1c, str ) PORT_CONDITION("DSW3", 0x20, EQUALS, 0x20) PORT_DIPLOCATION("SW3:4,3,2") \
 		PORT_DIPSETTING(    0x1c, "3 / 3 Stages" ) \
 		  PORT_DIPSETTING(  0x0c, "3 / 3 Stages" ) /* duplicated setting */ \
 		  PORT_DIPSETTING(  0x14, "3 / 3 Stages" ) /* duplicated setting */ \
@@ -878,7 +878,7 @@ INPUT_PORTS_END
 		  PORT_DIPSETTING(  0x08, "3 / 3 Stages" ) /* duplicated setting */ \
 		  PORT_DIPSETTING(  0x00, "3 / 3 Stages" ) /* duplicated setting */ \
 		PORT_DIPSETTING(    0x10, "4 / 4 Stages" ) \
-		PORT_DIPNAME( 0x1c, 0x1c, "Event Mode Stages" ) PORT_CONDITION("DSW3", 0x20, PORTCOND_NOTEQUALS, 0x20) PORT_DIPLOCATION("SW3:4,3,2") \
+		PORT_DIPNAME( 0x1c, 0x1c, "Event Mode Stages" ) PORT_CONDITION("DSW3", 0x20, NOTEQUALS, 0x20) PORT_DIPLOCATION("SW3:4,3,2") \
 		PORT_DIPSETTING(    0x0c, "1 Stage" ) \
 		PORT_DIPSETTING(    0x14, "2 Stages" ) \
 		PORT_DIPSETTING(    0x10, "3 Stages" ) \
@@ -914,21 +914,21 @@ static INPUT_PORTS_START( bm2ndmix )
 	/* "Free Hidden Songs" 3-3=On 3-6=On */
 	PORT_MODIFY("DSW3")
 	BEATMANIA_DSW3_EVENTMODE /* SW3:1 */
-	PORT_DIPNAME( 0x10, 0x10, "Unused (Used if Event Mode)" ) PORT_CONDITION("DSW3", 0x20, PORTCOND_EQUALS, 0x20) PORT_DIPLOCATION("SW3:2")
+	PORT_DIPNAME( 0x10, 0x10, "Unused (Used if Event Mode)" ) PORT_CONDITION("DSW3", 0x20, EQUALS, 0x20) PORT_DIPLOCATION("SW3:2")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "Free Hidden Songs (step1of2)" ) PORT_CONDITION("DSW3", 0x20, PORTCOND_EQUALS, 0x20) PORT_DIPLOCATION("SW3:3")
+	PORT_DIPNAME( 0x08, 0x08, "Free Hidden Songs (step1of2)" ) PORT_CONDITION("DSW3", 0x20, EQUALS, 0x20) PORT_DIPLOCATION("SW3:3")
 	PORT_DIPSETTING(    0x08, "No (Off)" )
 	PORT_DIPSETTING(    0x00, "Yes (On)" )
-	PORT_DIPNAME( 0x18, 0x18, "Event Mode Stages" ) PORT_CONDITION("DSW3", 0x20, PORTCOND_NOTEQUALS, 0x20) PORT_DIPLOCATION("SW3:3,2")
+	PORT_DIPNAME( 0x18, 0x18, "Event Mode Stages" ) PORT_CONDITION("DSW3", 0x20, NOTEQUALS, 0x20) PORT_DIPLOCATION("SW3:3,2")
 	PORT_DIPSETTING(    0x18, "1 Stage" )
 	PORT_DIPSETTING(    0x08, "2 Stages" )
 	PORT_DIPSETTING(    0x10, "3 Stages" )
 	PORT_DIPSETTING(    0x00, "4 Stages" )
-	PORT_DIPNAME( 0x01, 0x01, "Free Hidden Songs (step2of2)" ) PORT_CONDITION("DSW3", 0x20, PORTCOND_EQUALS, 0x20) PORT_DIPLOCATION("SW3:6")
+	PORT_DIPNAME( 0x01, 0x01, "Free Hidden Songs (step2of2)" ) PORT_CONDITION("DSW3", 0x20, EQUALS, 0x20) PORT_DIPLOCATION("SW3:6")
 	PORT_DIPSETTING(    0x01, "No (Off)" )
 	PORT_DIPSETTING(    0x00, "Yes (On)" )
-	PORT_DIPNAME( 0x01, 0x01, "Unused (Used if not Event Mode)" ) PORT_CONDITION("DSW3", 0x20, PORTCOND_NOTEQUALS, 0x20) PORT_DIPLOCATION("SW3:6")
+	PORT_DIPNAME( 0x01, 0x01, "Unused (Used if not Event Mode)" ) PORT_CONDITION("DSW3", 0x20, NOTEQUALS, 0x20) PORT_DIPLOCATION("SW3:6")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	/* "Free Hidden Songs" 3-3=On 3-6=On */

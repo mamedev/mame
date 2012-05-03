@@ -640,13 +640,13 @@ READ16_MEMBER(model1_state::io_r)
 	static const char *const inputnames[] = { "IN0", "IN1", "IN2" };
 
 	if(offset < 0x8)
-		return input_port_read_safe(machine(), analognames[offset], 0x00);
+		return ioport(analognames[offset])->read_safe(0x00);
 
 	if(offset < 0x10)
 	{
 		offset -= 0x8;
 		if(offset < 3)
-			return input_port_read(machine(), inputnames[offset]);
+			return ioport(inputnames[offset])->read();
 		return 0xff;
 	}
 

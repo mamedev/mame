@@ -232,7 +232,7 @@ SCREEN_UPDATE_RGB32( cinemat )
 
 SCREEN_UPDATE_RGB32( spacewar )
 {
-	int sw_option = input_port_read(screen.machine(), "INPUTS");
+	int sw_option = screen.machine().root_device().ioport("INPUTS")->read();
 
 	SCREEN_UPDATE32_CALL(cinemat);
 

@@ -72,7 +72,7 @@ WRITE8_MEMBER(nbmj9195_state::nbmj9195_inputportsel_w)
 static int nbmj9195_dipsw_r(running_machine &machine)
 {
 	nbmj9195_state *state = machine.driver_data<nbmj9195_state>();
-	return ((((input_port_read(machine, "DSWA") & 0xff) | ((input_port_read(machine, "DSWB") & 0xff) << 8)) >> state->m_dipswbitsel) & 0x01);
+	return (((state->ioport("DSWA")->read() & 0xff) | ((state->ioport("DSWB")->read() & 0xff) << 8)) >> state->m_dipswbitsel) & 0x01;
 }
 
 static void nbmj9195_dipswbitsel_w(address_space *space, int data)
@@ -104,19 +104,19 @@ static void mscoutm_inputportsel_w(address_space *space, int data)
 READ8_MEMBER(nbmj9195_state::mscoutm_dipsw_0_r)
 {
 	// DIPSW A
-	return (((input_port_read(machine(), "DSWA") & 0x01) << 7) | ((input_port_read(machine(), "DSWA") & 0x02) << 5) |
-	        ((input_port_read(machine(), "DSWA") & 0x04) << 3) | ((input_port_read(machine(), "DSWA") & 0x08) << 1) |
-	        ((input_port_read(machine(), "DSWA") & 0x10) >> 1) | ((input_port_read(machine(), "DSWA") & 0x20) >> 3) |
-	        ((input_port_read(machine(), "DSWA") & 0x40) >> 5) | ((input_port_read(machine(), "DSWA") & 0x80) >> 7));
+	return (((ioport("DSWA")->read() & 0x01) << 7) | ((ioport("DSWA")->read() & 0x02) << 5) |
+	        ((ioport("DSWA")->read() & 0x04) << 3) | ((ioport("DSWA")->read() & 0x08) << 1) |
+	        ((ioport("DSWA")->read() & 0x10) >> 1) | ((ioport("DSWA")->read() & 0x20) >> 3) |
+	        ((ioport("DSWA")->read() & 0x40) >> 5) | ((ioport("DSWA")->read() & 0x80) >> 7));
 }
 
 READ8_MEMBER(nbmj9195_state::mscoutm_dipsw_1_r)
 {
 	// DIPSW B
-	return (((input_port_read(machine(), "DSWB") & 0x01) << 7) | ((input_port_read(machine(), "DSWB") & 0x02) << 5) |
-	        ((input_port_read(machine(), "DSWB") & 0x04) << 3) | ((input_port_read(machine(), "DSWB") & 0x08) << 1) |
-	        ((input_port_read(machine(), "DSWB") & 0x10) >> 1) | ((input_port_read(machine(), "DSWB") & 0x20) >> 3) |
-	        ((input_port_read(machine(), "DSWB") & 0x40) >> 5) | ((input_port_read(machine(), "DSWB") & 0x80) >> 7));
+	return (((ioport("DSWB")->read() & 0x01) << 7) | ((ioport("DSWB")->read() & 0x02) << 5) |
+	        ((ioport("DSWB")->read() & 0x04) << 3) | ((ioport("DSWB")->read() & 0x08) << 1) |
+	        ((ioport("DSWB")->read() & 0x10) >> 1) | ((ioport("DSWB")->read() & 0x20) >> 3) |
+	        ((ioport("DSWB")->read() & 0x40) >> 5) | ((ioport("DSWB")->read() & 0x80) >> 7));
 }
 
 
@@ -136,30 +136,30 @@ READ8_MEMBER(nbmj9195_state::tmpz84c011_pio_r)
 		{
 			case 0:			/* PA_0 */
 				// COIN IN, ETC...
-				portdata = input_port_read(machine(), "SYSTEM");
+				portdata = ioport("SYSTEM")->read();
 				break;
 			case 1:			/* PB_0 */
 				// PLAYER1 KEY, DIPSW A/B
 				switch (m_mscoutm_inputport)
 				{
 					case 0x01:
-						portdata = input_port_read(machine(), "KEY0");
+						portdata = ioport("KEY0")->read();
 						break;
 					case 0x02:
-						portdata = input_port_read(machine(), "KEY1");
+						portdata = ioport("KEY1")->read();
 						break;
 					case 0x04:
-						portdata = input_port_read(machine(), "KEY2");
+						portdata = ioport("KEY2")->read();
 						break;
 					case 0x08:
-						portdata = input_port_read(machine(), "KEY3");
+						portdata = ioport("KEY3")->read();
 						break;
 					case 0x10:
-						portdata = input_port_read(machine(), "KEY4");
+						portdata = ioport("KEY4")->read();
 						break;
 					default:
-						portdata = (input_port_read(machine(), "KEY0") & input_port_read(machine(), "KEY1") & input_port_read(machine(), "KEY2")
-									& input_port_read(machine(), "KEY3") & input_port_read(machine(), "KEY4"));
+						portdata = (ioport("KEY0")->read() & ioport("KEY1")->read() & ioport("KEY2")->read()
+									& ioport("KEY3")->read() & ioport("KEY4")->read());
 						break;
 				}
 				break;
@@ -168,23 +168,23 @@ READ8_MEMBER(nbmj9195_state::tmpz84c011_pio_r)
 				switch (m_mscoutm_inputport)
 				{
 					case 0x01:
-						portdata = input_port_read(machine(), "KEY5");
+						portdata = ioport("KEY5")->read();
 						break;
 					case 0x02:
-						portdata = input_port_read(machine(), "KEY6");
+						portdata = ioport("KEY6")->read();
 						break;
 					case 0x04:
-						portdata = input_port_read(machine(), "KEY7");
+						portdata = ioport("KEY7")->read();
 						break;
 					case 0x08:
-						portdata = input_port_read(machine(), "KEY8");
+						portdata = ioport("KEY8")->read();
 						break;
 					case 0x10:
-						portdata = input_port_read(machine(), "KEY9");
+						portdata = ioport("KEY9")->read();
 						break;
 					default:
-						portdata = (input_port_read(machine(), "KEY5") & input_port_read(machine(), "KEY6") & input_port_read(machine(), "KEY7")
-									& input_port_read(machine(), "KEY8") & input_port_read(machine(), "KEY9"));
+						portdata = (ioport("KEY5")->read() & ioport("KEY6")->read() & ioport("KEY7")->read()
+									& ioport("KEY8")->read() & ioport("KEY9")->read());
 						break;
 				}
 				break;
@@ -223,29 +223,29 @@ READ8_MEMBER(nbmj9195_state::tmpz84c011_pio_r)
 		{
 			case 0:			/* PA_0 */
 				// COIN IN, ETC...
-				portdata = ((input_port_read(machine(), "SYSTEM") & 0xfe) | m_outcoin_flag);
+				portdata = ((ioport("SYSTEM")->read() & 0xfe) | m_outcoin_flag);
 				break;
 			case 1:			/* PB_0 */
 				// PLAYER1 KEY, DIPSW A/B
 				switch (m_inputport)
 				{
 					case 0x01:
-						portdata = input_port_read(machine(), "KEY0");
+						portdata = ioport("KEY0")->read();
 						break;
 					case 0x02:
-						portdata = input_port_read(machine(), "KEY1");
+						portdata = ioport("KEY1")->read();
 						break;
 					case 0x04:
-						portdata = input_port_read(machine(), "KEY2");
+						portdata = ioport("KEY2")->read();
 						break;
 					case 0x08:
-						portdata = input_port_read(machine(), "KEY3");
+						portdata = ioport("KEY3")->read();
 						break;
 					case 0x10:
-						portdata = ((input_port_read(machine(), "KEY4") & 0x7f) | (nbmj9195_dipsw_r(machine()) << 7));
+						portdata = ((ioport("KEY4")->read() & 0x7f) | (nbmj9195_dipsw_r(machine()) << 7));
 						break;
 					default:
-						portdata = (input_port_read(machine(), "KEY0") & input_port_read(machine(), "KEY1") & input_port_read(machine(), "KEY2") & input_port_read(machine(), "KEY3") & (input_port_read(machine(), "KEY4") & 0x7f));
+						portdata = (ioport("KEY0")->read() & ioport("KEY1")->read() & ioport("KEY2")->read() & ioport("KEY3")->read() & (ioport("KEY4")->read() & 0x7f));
 						break;
 				}
 				break;
@@ -254,22 +254,22 @@ READ8_MEMBER(nbmj9195_state::tmpz84c011_pio_r)
 				switch (m_inputport)
 				{
 					case 0x01:
-						portdata = input_port_read(machine(), "KEY5");
+						portdata = ioport("KEY5")->read();
 						break;
 					case 0x02:
-						portdata = input_port_read(machine(), "KEY6");
+						portdata = ioport("KEY6")->read();
 						break;
 					case 0x04:
-						portdata = input_port_read(machine(), "KEY7");
+						portdata = ioport("KEY7")->read();
 						break;
 					case 0x08:
-						portdata = input_port_read(machine(), "KEY8");
+						portdata = ioport("KEY8")->read();
 						break;
 					case 0x10:
-						portdata = input_port_read(machine(), "KEY9") & 0x7f;
+						portdata = ioport("KEY9")->read() & 0x7f;
 						break;
 					default:
-						portdata = (input_port_read(machine(), "KEY5") & input_port_read(machine(), "KEY6") & input_port_read(machine(), "KEY7") & input_port_read(machine(), "KEY8") & (input_port_read(machine(), "KEY9") & 0x7f));
+						portdata = (ioport("KEY5")->read() & ioport("KEY6")->read() & ioport("KEY7")->read() & ioport("KEY8")->read() & (ioport("KEY9")->read() & 0x7f));
 						break;
 				}
 				break;

@@ -52,7 +52,7 @@ WRITE8_MEMBER(changela_state::changela_68705_ddr_a_w)
 
 READ8_MEMBER(changela_state::changela_68705_port_b_r)
 {
-	return (m_port_b_out & m_ddr_b) | (input_port_read(machine(), "MCU") & ~m_ddr_b);
+	return (m_port_b_out & m_ddr_b) | (ioport("MCU")->read() & ~m_ddr_b);
 }
 
 WRITE8_MEMBER(changela_state::changela_68705_port_b_w)
@@ -122,7 +122,7 @@ READ8_MEMBER(changela_state::changela_25_r)
 
 READ8_MEMBER(changela_state::changela_30_r)
 {
-	return input_port_read(machine(), "WHEEL") & 0x0f;	//wheel control (clocked input) signal on bits 3,2,1,0
+	return ioport("WHEEL")->read() & 0x0f;	//wheel control (clocked input) signal on bits 3,2,1,0
 }
 
 READ8_MEMBER(changela_state::changela_31_r)
@@ -130,7 +130,7 @@ READ8_MEMBER(changela_state::changela_31_r)
 	/* If the new value is less than the old value, and it did not wrap around,
        or if the new value is greater than the old value, and it did wrap around,
        then we are moving LEFT. */
-	UINT8 curr_value = input_port_read(machine(), "WHEEL");
+	UINT8 curr_value = ioport("WHEEL")->read();
 
 	if ((curr_value < m_prev_value_31 && (m_prev_value_31 - curr_value) < 0x80)
 	||  (curr_value > m_prev_value_31 && (curr_value - m_prev_value_31) > 0x80))
@@ -147,7 +147,7 @@ READ8_MEMBER(changela_state::changela_31_r)
 
 READ8_MEMBER(changela_state::changela_2c_r)
 {
-	int val = input_port_read(machine(), "IN0");
+	int val = ioport("IN0")->read();
 
 	val = (val & 0x30) | ((val & 1) << 7) | (((val & 1) ^ 1) << 6);
 
@@ -164,7 +164,7 @@ READ8_MEMBER(changela_state::changela_2d_r)
 		v8 = 1;
 
 	/* Gas pedal is made up of 2 switches, 1 active low, 1 active high */
-	switch (input_port_read(machine(), "IN1") & 0x03)
+	switch (ioport("IN1")->read() & 0x03)
 	{
 		case 0x02:
 			gas = 0x80;
@@ -177,7 +177,7 @@ READ8_MEMBER(changela_state::changela_2d_r)
 			break;
 	}
 
-	return (input_port_read(machine(), "IN1") & 0x20) | gas | (v8 << 4);
+	return (ioport("IN1")->read() & 0x20) | gas | (v8 << 4);
 }
 
 WRITE8_MEMBER(changela_state::mcu_pc_0_w)

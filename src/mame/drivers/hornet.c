@@ -471,7 +471,7 @@ READ8_MEMBER(hornet_state::sysreg_r)
 		case 0:	/* I/O port 0 */
 		case 1:	/* I/O port 1 */
 		case 2:	/* I/O port 2 */
-			r = input_port_read(machine(), portnames[offset]);
+			r = ioport(portnames[offset])->read();
 			break;
 
 		case 3:	/* I/O port 3 */
@@ -489,7 +489,7 @@ READ8_MEMBER(hornet_state::sysreg_r)
 			break;
 
 		case 4:	/* I/O port 4 - DIP switches */
-			r = input_port_read(machine(), "DSW");
+			r = ioport("DSW")->read();
 			break;
 	}
 	return r;
@@ -524,7 +524,7 @@ WRITE8_MEMBER(hornet_state::sysreg_w)
                 0x02 = LAMP1
                 0x01 = LAMP0
             */
-			input_port_write(machine(), "EEPROMOUT", data, 0xff);
+			ioport("EEPROMOUT")->write(data, 0xff);
 			mame_printf_debug("System register 0 = %02X\n", data);
 			break;
 
@@ -1255,7 +1255,7 @@ static DRIVER_INIT(hornet_2board)
 {
 	hornet_state *state = machine.driver_data<hornet_state>();
 	init_konami_cgboard(machine, 2, CGBOARD_TYPE_HORNET);
-	set_cgboard_texture_bank(machine, 0, "bank5", machine.root_device().memregion("user5")->base());
+	set_cgboard_texture_bank(machine, 0, "bank5", state->memregion("user5")->base());
 	set_cgboard_texture_bank(machine, 1, "bank6", state->memregion("user5")->base());
 
 	state->m_led_reg0 = state->m_led_reg1 = 0x7f;

@@ -267,7 +267,7 @@ WRITE8_MEMBER(kingdrby_state::sc0_attr_w)
 static READ8_DEVICE_HANDLER( hopper_io_r )
 {
 	kingdrby_state *state = device->machine().driver_data<kingdrby_state>();
-	return (input_port_read(device->machine(),"HPIO") & 0x3f) | state->m_p1_hopper | state->m_p2_hopper;
+	return (state->ioport("HPIO")->read() & 0x3f) | state->m_p1_hopper | state->m_p2_hopper;
 }
 
 static WRITE8_DEVICE_HANDLER( hopper_io_w )
@@ -300,9 +300,9 @@ static READ8_DEVICE_HANDLER( input_mux_r )
 {
 	kingdrby_state *state = device->machine().driver_data<kingdrby_state>();
 	if(state->m_mux_data & 0x80)
-		return input_port_read(device->machine(),"MUX0");
+		return state->ioport("MUX0")->read();
 	else
-		return input_port_read(device->machine(),"MUX1");
+		return state->ioport("MUX1")->read();
 }
 
 static READ8_DEVICE_HANDLER( key_matrix_r )
@@ -310,8 +310,8 @@ static READ8_DEVICE_HANDLER( key_matrix_r )
 	UINT16 p1_val,p2_val;
 	UINT8 p1_res,p2_res;
 
-	p1_val = input_port_read(device->machine(),"KEY_1P");
-	p2_val = input_port_read(device->machine(),"KEY_2P");
+	p1_val = device->machine().root_device().ioport("KEY_1P")->read();
+	p2_val = device->machine().root_device().ioport("KEY_2P")->read();
 
 	p1_res = 0;
 	p2_res = 0;
@@ -556,7 +556,7 @@ static INPUT_PORTS_START( kingdrby )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL ) //2p hopper i/o
 
 	PORT_START("IN1")	// ppi0 (5001)
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_VBLANK ) //?
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen") //?
 	PORT_DIPNAME( 0x02, 0x02, "IN1" )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -739,7 +739,7 @@ static INPUT_PORTS_START( kingdrbb )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("IN1")	// ppi0 (5001)
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_VBLANK ) //?
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen") //?
 	PORT_DIPNAME( 0x02, 0x02, "IN1" )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )

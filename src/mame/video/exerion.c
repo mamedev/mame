@@ -111,7 +111,7 @@ VIDEO_START( exerion )
 	UINT8 *gfx;
 
 	/* get pointers to the mixing and lookup PROMs */
-	state->m_background_mixer = machine.root_device().memregion("proms")->base() + 0x320;
+	state->m_background_mixer = state->memregion("proms")->base() + 0x320;
 
 	/* allocate memory for the decoded background graphics */
 	state->m_background_gfx[0] = auto_alloc_array(machine, UINT16, 256 * 256 * 4);

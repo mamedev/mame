@@ -1705,7 +1705,7 @@ WRITE16_MEMBER(namcos23_state::s23_ctl_w)
 
 	case 2: case 3:
 		// These may be coming from another CPU, in particular the I/O one
-		m_ctl_inp_buffer[offset-2] = input_port_read(machine(), offset == 2 ? "P1" : "P2");
+		m_ctl_inp_buffer[offset-2] = ioport(offset == 2 ? "P1" : "P2")->read();
 		break;
 	case 5:
 		if(m_ctl_vbl_active) {
@@ -1728,7 +1728,7 @@ READ16_MEMBER(namcos23_state::s23_ctl_r)
 {
 	switch(offset) {
 		// 0100 set freezes gorgon (polygon fifo flag)
-	case 1: return 0x0000 | input_port_read(machine(), "DSW");
+	case 1: return 0x0000 | ioport("DSW")->read();
 	case 2: case 3: {
 		UINT16 res = m_ctl_inp_buffer[offset-2] & 0x800 ? 0xffff : 0x0000;
 		m_ctl_inp_buffer[offset-2] = (m_ctl_inp_buffer[offset-2] << 1) | 1;
@@ -2992,8 +2992,8 @@ WRITE8_MEMBER(namcos23_state::s23_iob_p4_w)
 
 READ8_MEMBER(namcos23_state::s23_gun_r)
 {
-	UINT16 xpos = input_port_read_safe(machine(), "LIGHTX", 0) * 640 / 0xff + 0x80;
-	UINT16 ypos = input_port_read_safe(machine(), "LIGHTY", 0) * 240 / 0xff + 0x20;
+	UINT16 xpos = ioport("LIGHTX")->read_safe(0) * 640 / 0xff + 0x80;
+	UINT16 ypos = ioport("LIGHTY")->read_safe(0) * 240 / 0xff + 0x20;
 
 	// note: will need angle adjustments for accurate aiming at screen sides
 	switch(offset)
@@ -3070,13 +3070,13 @@ static DRIVER_INIT(ss23)
 {
 	namcos23_state *state = machine.driver_data<namcos23_state>();
 	render_t &render = state->m_render;
-	state->m_ptrom  = (const UINT32 *)machine.root_device().memregion("pointrom")->base();
-	state->m_tmlrom = (const UINT16 *)machine.root_device().memregion("textilemapl")->base();
-	state->m_tmhrom = machine.root_device().memregion("textilemaph")->base();
-	state->m_texrom = machine.root_device().memregion("textile")->base();
+	state->m_ptrom  = (const UINT32 *)state->memregion("pointrom")->base();
+	state->m_tmlrom = (const UINT16 *)state->memregion("textilemapl")->base();
+	state->m_tmhrom = state->memregion("textilemaph")->base();
+	state->m_texrom = state->memregion("textile")->base();
 
-	state->m_tileid_mask = (machine.root_device().memregion("textilemapl")->bytes()/2 - 1) & ~0xff; // Used for y masking
-	state->m_tile_mask = machine.root_device().memregion("textile")->bytes()/256 - 1;
+	state->m_tileid_mask = (state->memregion("textilemapl")->bytes()/2 - 1) & ~0xff; // Used for y masking
+	state->m_tile_mask = state->memregion("textile")->bytes()/256 - 1;
 	state->m_ptrom_limit = state->memregion("pointrom")->bytes()/4;
 
 	state->m_mi_rd = state->m_mi_wr = state->m_im_rd = state->m_im_wr = 0;

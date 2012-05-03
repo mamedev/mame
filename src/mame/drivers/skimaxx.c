@@ -138,7 +138,7 @@ READ32_MEMBER(skimaxx_state::skimaxx_blitter_r)
 static VIDEO_START( skimaxx )
 {
 	skimaxx_state *state = machine.driver_data<skimaxx_state>();
-	state->m_blitter_gfx = (UINT16 *) machine.root_device().memregion( "blitter" )->base();
+	state->m_blitter_gfx = (UINT16 *) state->memregion( "blitter" )->base();
 	state->m_blitter_gfx_len = state->memregion( "blitter" )->bytes() / 2;
 
 	state->m_bg_buffer = auto_alloc_array(machine, UINT32, 0x400 * 0x100 * sizeof(UINT16) / sizeof(UINT32) * 2);	// 2 buffers
@@ -150,7 +150,7 @@ static VIDEO_START( skimaxx )
 
 static SCREEN_UPDATE_IND16( skimaxx )
 {
-//  popmessage("%02x %02x", input_port_read(screen.machine(), "X"), input_port_read(screen.machine(), "Y") );
+//  popmessage("%02x %02x", state->ioport("X")->read(), state->ioport("Y")->read() );
 
 	SCREEN_UPDATE16_CALL(tms340x0_ind16);
 
@@ -308,7 +308,7 @@ WRITE32_MEMBER(skimaxx_state::skimaxx_sub_ctrl_w)
 */
 READ32_MEMBER(skimaxx_state::skimaxx_analog_r)
 {
-	return BITSWAP8(input_port_read(machine(), offset ? "Y" : "X"), 0,1,2,3,4,5,6,7);
+	return BITSWAP8(ioport(offset ? "Y" : "X")->read(), 0,1,2,3,4,5,6,7);
 }
 
 /*************************************

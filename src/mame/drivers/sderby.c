@@ -77,7 +77,7 @@ READ16_MEMBER(sderby_state::sderby_input_r)
 	switch (offset)
 	{
 		case 0x00 >> 1:
-			return input_port_read(machine(), "IN0");
+			return ioport("IN0")->read();
 		case 0x02 >> 1:
 			return 0xffff;			// to avoid game to reset (needs more work)
 	}
@@ -92,11 +92,11 @@ READ16_MEMBER(sderby_state::roulette_input_r)
 	switch (offset)
 	{
 		case 0x00 >> 1:
-			return input_port_read(machine(), "IN0");
+			return ioport("IN0")->read();
 		case 0x02 >> 1:
-			return input_port_read(machine(), "IN1");
+			return ioport("IN1")->read();
 		case 0x04 >> 1:
-			return input_port_read(machine(), "IN2");
+			return ioport("IN2")->read();
 	}
 
 	return 0xffff;
@@ -421,7 +421,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( pmroulet )
 	PORT_START("IN0")
 	PORT_BIT( 0x000f, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_VBLANK ) /* it must be toggled to boot anyway */
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen") /* it must be toggled to boot anyway */
 	PORT_SERVICE_NO_TOGGLE(0x0020, IP_ACTIVE_LOW)
 	PORT_BIT( 0x00c0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0f00, IP_ACTIVE_LOW, IPT_UNKNOWN )

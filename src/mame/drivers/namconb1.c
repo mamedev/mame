@@ -813,10 +813,10 @@ READ32_MEMBER(namconb1_state::gunbulet_gun_r)
 
 	switch( offset )
 	{
-	case 0: case 1: result = (UINT8)(0x0f + input_port_read(machine(), "LIGHT1_Y") * 224/255); break; /* Y (p2) */
-	case 2: case 3: result = (UINT8)(0x26 + input_port_read(machine(), "LIGHT1_X") * 288/314); break; /* X (p2) */
-	case 4: case 5: result = (UINT8)(0x0f + input_port_read(machine(), "LIGHT0_Y") * 224/255); break; /* Y (p1) */
-	case 6: case 7: result = (UINT8)(0x26 + input_port_read(machine(), "LIGHT0_X") * 288/314); break; /* X (p1) */
+	case 0: case 1: result = (UINT8)(0x0f + ioport("LIGHT1_Y")->read() * 224/255); break; /* Y (p2) */
+	case 2: case 3: result = (UINT8)(0x26 + ioport("LIGHT1_X")->read() * 288/314); break; /* X (p2) */
+	case 4: case 5: result = (UINT8)(0x0f + ioport("LIGHT0_Y")->read() * 224/255); break; /* Y (p1) */
+	case 6: case 7: result = (UINT8)(0x26 + ioport("LIGHT0_X")->read() * 288/314); break; /* X (p1) */
 	}
 	return result<<24;
 } /* gunbulet_gun_r */
@@ -932,16 +932,16 @@ READ8_MEMBER(namconb1_state::port7_r)
 	switch (m_nbx_port6 & 0xf0)
 	{
 		case 0x00:
-			return input_port_read_safe(machine(), "P4", 0xff);
+			return ioport("P4")->read_safe(0xff);
 
 		case 0x20:
-			return input_port_read(machine(), "MISC");
+			return ioport("MISC")->read();
 
 		case 0x40:
-			return input_port_read(machine(), "P1");
+			return ioport("P1")->read();
 
 		case 0x60:
-			return input_port_read(machine(), "P2");
+			return ioport("P2")->read();
 
 		default:
 			break;
@@ -955,42 +955,42 @@ READ8_MEMBER(namconb1_state::port7_r)
 // register full scale, so it works...
 READ8_MEMBER(namconb1_state::dac7_r)// bit 7
 {
-	return input_port_read_safe(machine(), "P3", 0xff)&0x80;
+	return ioport("P3")->read_safe(0xff)&0x80;
 }
 
 READ8_MEMBER(namconb1_state::dac6_r)// bit 3
 {
-	return (input_port_read_safe(machine(), "P3", 0xff)<<1)&0x80;
+	return (ioport("P3")->read_safe(0xff)<<1)&0x80;
 }
 
 READ8_MEMBER(namconb1_state::dac5_r)// bit 2
 {
-	return (input_port_read_safe(machine(), "P3", 0xff)<<2)&0x80;
+	return (ioport("P3")->read_safe(0xff)<<2)&0x80;
 }
 
 READ8_MEMBER(namconb1_state::dac4_r)// bit 1
 {
-	return (input_port_read_safe(machine(), "P3", 0xff)<<3)&0x80;
+	return (ioport("P3")->read_safe(0xff)<<3)&0x80;
 }
 
 READ8_MEMBER(namconb1_state::dac3_r)// bit 0
 {
-	return (input_port_read_safe(machine(), "P3", 0xff)<<4)&0x80;
+	return (ioport("P3")->read_safe(0xff)<<4)&0x80;
 }
 
 READ8_MEMBER(namconb1_state::dac2_r)// bit 4
 {
-	return (input_port_read_safe(machine(), "P3", 0xff)<<5)&0x80;
+	return (ioport("P3")->read_safe(0xff)<<5)&0x80;
 }
 
 READ8_MEMBER(namconb1_state::dac1_r)// bit 5
 {
-	return (input_port_read_safe(machine(), "P3", 0xff)<<6)&0x80;
+	return (ioport("P3")->read_safe(0xff)<<6)&0x80;
 }
 
 READ8_MEMBER(namconb1_state::dac0_r)// bit 6
 {
-	return (input_port_read_safe(machine(), "P3", 0xff)<<7)&0x80;
+	return (ioport("P3")->read_safe(0xff)<<7)&0x80;
 }
 
 static ADDRESS_MAP_START( namcoc75_io, AS_IO, 8, namconb1_state )

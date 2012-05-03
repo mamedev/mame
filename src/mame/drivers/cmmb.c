@@ -125,10 +125,10 @@ READ8_MEMBER(cmmb_state::cmmb_input_r)
 	//printf("%02x R\n",offset);
 	switch(offset)
 	{
-		case 0x00: return input_port_read(machine(), "IN2");
+		case 0x00: return ioport("IN2")->read();
 		case 0x03: return 4; //eeprom?
-		case 0x0e: return input_port_read(machine(), "IN0");
-		case 0x0f: return input_port_read(machine(), "IN1");
+		case 0x0e: return ioport("IN0")->read();
+		case 0x0f: return ioport("IN1")->read();
 	}
 
 	return 0xff;

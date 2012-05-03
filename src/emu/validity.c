@@ -71,7 +71,7 @@ UINT8 your_ptr64_flag_is_wrong[(int)(5 - sizeof(void *))];
 
 inline const char *validity_checker::ioport_string_from_index(UINT32 index)
 {
-	return input_port_string_from_token((const char *)(FPTR)index);
+	return ioport_configurer::string_from_token((const char *)(FPTR)index);
 }
 
 
@@ -808,38 +808,38 @@ void validity_checker::validate_gfx()
 //  analog input field
 //-------------------------------------------------
 
-void validity_checker::validate_analog_input_field(input_field_config &field)
+void validity_checker::validate_analog_input_field(ioport_field &field)
 {
 	// analog ports must have a valid sensitivity
-	if (field.sensitivity == 0)
+	if (field.sensitivity() == 0)
 		mame_printf_error("Analog port with zero sensitivity\n");
 
 	// check that the default falls in the bitmask range
-	if (field.defvalue & ~field.mask)
-		mame_printf_error("Analog port with a default value (%X) out of the bitmask range (%X)\n", field.defvalue, field.mask);
+	if (field.defvalue() & ~field.mask())
+		mame_printf_error("Analog port with a default value (%X) out of the bitmask range (%X)\n", field.defvalue(), field.mask());
 
 	// tests for positional devices
-	if (field.type == IPT_POSITIONAL || field.type == IPT_POSITIONAL_V)
+	if (field.type() == IPT_POSITIONAL || field.type() == IPT_POSITIONAL_V)
 	{
 		int shift;
-		for (shift = 0; shift <= 31 && (~field.mask & (1 << shift)) != 0; shift++) ;
+		for (shift = 0; shift <= 31 && (~field.mask() & (1 << shift)) != 0; shift++) ;
 
 		// convert the positional max value to be in the bitmask for testing
-		INT32 analog_max = field.max;
+		INT32 analog_max = field.maxval();
 		analog_max = (analog_max - 1) << shift;
 
 		// positional port size must fit in bits used
-		if ((field.mask >> shift) + 1 < field.max)
+		if ((field.mask() >> shift) + 1 < field.maxval())
 			mame_printf_error("Analog port with a positional port size bigger then the mask size\n");
 	}
 
 	// tests for absolute devices
-	else if (field.type >= __ipt_analog_absolute_start && field.type <= __ipt_analog_absolute_end)
+	else if (field.type() > IPT_ANALOG_ABSOLUTE_FIRST && field.type() < IPT_ANALOG_ABSOLUTE_LAST)
 	{
 		// adjust for signed values
-		INT32 default_value = field.defvalue;
-		INT32 analog_min = field.min;
-		INT32 analog_max = field.max;
+		INT32 default_value = field.defvalue();
+		INT32 analog_min = field.minval();
+		INT32 analog_max = field.maxval();
 		if (analog_min > analog_max)
 		{
 			analog_min = -analog_min;
@@ -849,19 +849,19 @@ void validity_checker::validate_analog_input_field(input_field_config &field)
 
 		// check that the default falls in the MINMAX range
 		if (default_value < analog_min || default_value > analog_max)
-			mame_printf_error("Analog port with a default value (%X) out of PORT_MINMAX range (%X-%X)\n", field.defvalue, field.min, field.max);
+			mame_printf_error("Analog port with a default value (%X) out of PORT_MINMAX range (%X-%X)\n", field.defvalue(), field.minval(), field.maxval());
 
 		// check that the MINMAX falls in the bitmask range
 		// we use the unadjusted min for testing
-		if (field.min & ~field.mask || analog_max & ~field.mask)
-			mame_printf_error("Analog port with a PORT_MINMAX (%X-%X) value out of the bitmask range (%X)\n", field.min, field.max, field.mask);
+		if (field.minval() & ~field.mask() || analog_max & ~field.mask())
+			mame_printf_error("Analog port with a PORT_MINMAX (%X-%X) value out of the bitmask range (%X)\n", field.minval(), field.maxval(), field.mask());
 
 		// absolute analog ports do not use PORT_RESET
-		if (field.flags & ANALOG_FLAG_RESET)
+		if (field.analog_reset())
 			mame_printf_error("Absolute analog port using PORT_RESET\n");
 
 		// absolute analog ports do not use PORT_WRAPS
-		if (field.flags & ANALOG_FLAG_WRAPS)
+		if (field.analog_wraps())
 			mame_printf_error("Absolute analog port using PORT_WRAPS\n");
 	}
 
@@ -869,16 +869,16 @@ void validity_checker::validate_analog_input_field(input_field_config &field)
 	else
 	{
 		// relative devices do not use PORT_MINMAX
-		if (field.min != 0 || field.max != field.mask)
+		if (field.minval() != 0 || field.maxval() != field.mask())
 			mame_printf_error("Relative port using PORT_MINMAX\n");
 
 		// relative devices do not use a default value
 		// the counter is at 0 on power up
-		if (field.defvalue != 0)
+		if (field.defvalue() != 0)
 			mame_printf_error("Relative port using non-0 default value\n");
 
 		// relative analog ports do not use PORT_WRAPS
-		if (field.flags & ANALOG_FLAG_WRAPS)
+		if (field.analog_wraps())
 			mame_printf_error("Absolute analog port using PORT_WRAPS\n");
 	}
 }
@@ -889,7 +889,7 @@ void validity_checker::validate_analog_input_field(input_field_config &field)
 //  setting
 //-------------------------------------------------
 
-void validity_checker::validate_dip_settings(input_field_config &field)
+void validity_checker::validate_dip_settings(ioport_field &field)
 {
 	const char *demo_sounds = ioport_string_from_index(INPUT_STRING_Demo_Sounds);
 	const char *flipscreen = ioport_string_from_index(INPUT_STRING_Flip_Screen);
@@ -897,46 +897,46 @@ void validity_checker::validate_dip_settings(input_field_config &field)
 	bool coin_error = false;
 
 	// iterate through the settings
-	for (const input_setting_config *setting = field.settinglist().first(); setting != NULL; setting = setting->next())
+	for (ioport_setting *setting = field.first_setting(); setting != NULL; setting = setting->next())
 	{
 		// note any coinage strings
-		int strindex = get_defstr_index(setting->name);
+		int strindex = get_defstr_index(setting->name());
 		if (strindex >= __input_string_coinage_start && strindex <= __input_string_coinage_end)
 			coin_list[strindex - __input_string_coinage_start] = 1;
 
 		// make sure demo sounds default to on
-		if (field.name == demo_sounds && strindex == INPUT_STRING_On && field.defvalue != setting->value)
+		if (field.name() == demo_sounds && strindex == INPUT_STRING_On && field.defvalue() != setting->value())
 			mame_printf_error("Demo Sounds must default to On\n");
 
 		// check for bad demo sounds options
-		if (field.name == demo_sounds && (strindex == INPUT_STRING_Yes || strindex == INPUT_STRING_No))
-			mame_printf_error("Demo Sounds option must be Off/On, not %s\n", setting->name);
+		if (field.name() == demo_sounds && (strindex == INPUT_STRING_Yes || strindex == INPUT_STRING_No))
+			mame_printf_error("Demo Sounds option must be Off/On, not %s\n", setting->name());
 
 		// check for bad flip screen options
-		if (field.name == flipscreen && (strindex == INPUT_STRING_Yes || strindex == INPUT_STRING_No))
-			mame_printf_error("Flip Screen option must be Off/On, not %s\n", setting->name);
+		if (field.name() == flipscreen && (strindex == INPUT_STRING_Yes || strindex == INPUT_STRING_No))
+			mame_printf_error("Flip Screen option must be Off/On, not %s\n", setting->name());
 
 		// if we have a neighbor, compare ourselves to him
 		if (setting->next() != NULL)
 		{
 			// check for inverted off/on dispswitch order
-			int next_strindex = get_defstr_index(setting->next()->name, true);
+			int next_strindex = get_defstr_index(setting->next()->name(), true);
 			if (strindex == INPUT_STRING_On && next_strindex == INPUT_STRING_Off)
-				mame_printf_error("%s option must have Off/On options in the order: Off, On\n", field.name);
+				mame_printf_error("%s option must have Off/On options in the order: Off, On\n", field.name());
 
 			// check for inverted yes/no dispswitch order
 			else if (strindex == INPUT_STRING_Yes && next_strindex == INPUT_STRING_No)
-				mame_printf_error("%s option must have Yes/No options in the order: No, Yes\n", field.name);
+				mame_printf_error("%s option must have Yes/No options in the order: No, Yes\n", field.name());
 
 			// check for inverted upright/cocktail dispswitch order
 			else if (strindex == INPUT_STRING_Cocktail && next_strindex == INPUT_STRING_Upright)
-				mame_printf_error("%s option must have Upright/Cocktail options in the order: Upright, Cocktail\n", field.name);
+				mame_printf_error("%s option must have Upright/Cocktail options in the order: Upright, Cocktail\n", field.name());
 
 			// check for proper coin ordering
 			else if (strindex >= __input_string_coinage_start && strindex <= __input_string_coinage_end && next_strindex >= __input_string_coinage_start && next_strindex <= __input_string_coinage_end &&
-					 strindex >= next_strindex && memcmp(&setting->condition, &setting->next()->condition, sizeof(setting->condition)) == 0)
+					 strindex >= next_strindex && setting->condition() == setting->next()->condition())
 			{
-				mame_printf_error("%s option has unsorted coinage %s > %s\n", field.name, setting->name, setting->next()->name);
+				mame_printf_error("%s option has unsorted coinage %s > %s\n", field.name(), setting->name(), setting->next()->name());
 				coin_error = true;
 			}
 		}
@@ -958,15 +958,15 @@ void validity_checker::validate_dip_settings(input_field_config &field)
 //  stored within an ioport field or setting
 //-------------------------------------------------
 
-void validity_checker::validate_condition(input_condition &condition, device_t &device, int_map &port_map)
+void validity_checker::validate_condition(ioport_condition &condition, device_t &device, int_map &port_map)
 {
 	// resolve the tag
 	astring porttag;
-	device.subtag(porttag, condition.tag);
+	device.subtag(porttag, condition.tag());
 
 	// then find a matching port
 	if (port_map.find(porttag) == 0)
-		mame_printf_error("Condition referencing non-existent ioport tag '%s'\n", condition.tag);
+		mame_printf_error("Condition referencing non-existent ioport tag '%s'\n", condition.tag());
 }
 
 
@@ -992,38 +992,38 @@ void validity_checker::validate_inputs()
 		// allocate the input ports
 		ioport_list portlist;
 		astring errorbuf;
-		input_port_list_init(*device, portlist, errorbuf);
+		portlist.append(*device, errorbuf);
 
 		// report any errors during construction
 		if (errorbuf)
 			mame_printf_error("I/O port error during construction:\n%s\n", errorbuf.cstr());
 
 		// do a first pass over ports to add their names and find duplicates
-		for (input_port_config *port = portlist.first(); port != NULL; port = port->next())
+		for (ioport_port *port = portlist.first(); port != NULL; port = port->next())
 			if (port_map.add(port->tag(), 1, false) == TMERR_DUPLICATE)
 				mame_printf_error("Multiple I/O ports with the same tag '%s' defined\n", port->tag());
 
 		// iterate over ports
-		for (input_port_config *port = portlist.first(); port != NULL; port = port->next())
+		for (ioport_port *port = portlist.first(); port != NULL; port = port->next())
 		{
 			m_current_ioport = port->tag();
 
 			// iterate through the fields on this port
-			for (input_field_config *field = port->fieldlist().first(); field != NULL; field = field->next())
+			for (ioport_field *field = port->first_field(); field != NULL; field = field->next())
 			{
 				// verify analog inputs
-				if (input_type_is_analog(field->type))
+				if (field->is_analog())
 					validate_analog_input_field(*field);
 
 				// look for invalid (0) types which should be mapped to IPT_OTHER
-				if (field->type == IPT_INVALID)
+				if (field->type() == IPT_INVALID)
 					mame_printf_error("Field has an invalid type (0); use IPT_OTHER instead\n");
 
 				// verify dip switches
-				if (field->type == IPT_DIPSWITCH)
+				if (field->type() == IPT_DIPSWITCH)
 				{
 					// dip switch fields must have a name
-					if (field->name == NULL)
+					if (field->name() == NULL)
 						mame_printf_error("DIP switch has a NULL name\n");
 
 					// verify the settings list
@@ -1031,32 +1031,33 @@ void validity_checker::validate_inputs()
 				}
 
 				// verify names
-				if (field->name != NULL)
+				const char *name = field->specific_name();
+				if (name != NULL)
 				{
 					// check for empty string
-					if (field->name[0] == 0)
+					if (name[0] == 0)
 						mame_printf_error("Field name is an empty string\n");
 
 					// check for trailing spaces
-					if (field->name[0] != 0 && field->name[strlen(field->name) - 1] == ' ')
-						mame_printf_error("Field '%s' has trailing spaces\n", field->name);
+					if (name[0] != 0 && name[strlen(name) - 1] == ' ')
+						mame_printf_error("Field '%s' has trailing spaces\n", name);
 
 					// check for invalid UTF-8
-					if (!utf8_is_valid_string(field->name))
-						mame_printf_error("Field '%s' has invalid characters\n", field->name);
+					if (!utf8_is_valid_string(name))
+						mame_printf_error("Field '%s' has invalid characters\n", name);
 
 					// look up the string and print an error if default strings are not used
-					/*strindex =get_defstr_index(defstr_map, field->name, driver, &error);*/
+					/*strindex =get_defstr_index(defstr_map, name, driver, &error);*/
 				}
 
 				// verify conditions on the field
-				if (field->condition.tag != NULL)
-					validate_condition(field->condition, *device, port_map);
+				if (!field->condition().none())
+					validate_condition(field->condition(), *device, port_map);
 
 				// verify conditions on the settings
-				for (input_setting_config *setting = field->settinglist().first(); setting != NULL; setting = setting->next())
-					if (setting->condition.tag != NULL)
-						validate_condition(setting->condition, *device, port_map);
+				for (ioport_setting *setting = field->first_setting(); setting != NULL; setting = setting->next())
+					if (!setting->condition().none())
+						validate_condition(setting->condition(), *device, port_map);
 			}
 
 			// done with this port

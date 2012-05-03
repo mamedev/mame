@@ -727,15 +727,15 @@ static READ32_HANDLER(input_r)
 
 	if (ACCESSING_BITS_24_31)
 	{
-		r |= (input_port_read(space->machine(), "IN0") & 0xff) << 24;
+		r |= (space->machine().root_device().ioport("IN0")->read() & 0xff) << 24;
 	}
 	if (ACCESSING_BITS_8_15)
 	{
-		r |= (input_port_read(space->machine(), "IN1") & 0xff) << 8;
+		r |= (space->machine().root_device().ioport("IN1")->read() & 0xff) << 8;
 	}
 	if (ACCESSING_BITS_0_7)
 	{
-		r |= (input_port_read(space->machine(), "IN2") & 0xff);
+		r |= (space->machine().root_device().ioport("IN2")->read() & 0xff);
 	}
 
 	return r;
@@ -745,11 +745,11 @@ static READ32_HANDLER( sensor_r )
 {
 	if (offset == 0)
 	{
-		return input_port_read(space->machine(), "SENSOR1") | 0x01000100;
+		return space->machine().root_device().ioport("SENSOR1")->read() | 0x01000100;
 	}
 	else
 	{
-		return input_port_read(space->machine(), "SENSOR2") | 0x01000100;
+		return space->machine().root_device().ioport("SENSOR2")->read() | 0x01000100;
 	}
 }
 
@@ -1365,11 +1365,11 @@ static READ32_HANDLER( keyboard_wheel_r )
 {
 	if (offset == 0)		// Keyboard Wheel (P1)
 	{
-		return input_port_read(space->machine(), "WHEEL_P1") << 24;
+		return space->machine().root_device().ioport("WHEEL_P1")->read() << 24;
 	}
 	else if (offset == 2)	// Keyboard Wheel (P2)
 	{
-		return input_port_read(space->machine(), "WHEEL_P2") << 24;
+		return space->machine().root_device().ioport("WHEEL_P2")->read() << 24;
 	}
 
 	return 0;
@@ -1459,7 +1459,7 @@ static TIMER_CALLBACK( keyboard_timer_callback )
 
 	for (keyboard=0; keyboard < 2; keyboard++)
 	{
-		UINT32 kbstate = input_port_read(machine, keynames[keyboard]);
+		UINT32 kbstate = machine.root_device().ioport(keynames[keyboard])->read();
 		int uart_channel = kb_uart_channel[keyboard];
 
 		if (kbstate != state->m_keyboard_state[keyboard])

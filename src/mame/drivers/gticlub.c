@@ -343,7 +343,7 @@ READ8_MEMBER(gticlub_state::sysreg_r)
 		case 0:
 		case 1:
 		case 3:
-			return input_port_read(machine(), portnames[offset]);
+			return ioport(portnames[offset])->read();
 
 		case 2:
 			return adc1038_sars_read(adc1038) << 7;
@@ -727,10 +727,10 @@ static int adc1038_input_callback( device_t *device, int input )
 	int value = 0;
 	switch (input)
 	{
-	case 0: value = input_port_read(device->machine(), "AN0"); break;
-	case 1: value = input_port_read(device->machine(), "AN1"); break;
-	case 2: value = input_port_read(device->machine(), "AN2"); break;
-	case 3: value = input_port_read(device->machine(), "AN3"); break;
+	case 0: value = device->machine().root_device().ioport("AN0")->read(); break;
+	case 1: value = device->machine().root_device().ioport("AN1")->read(); break;
+	case 2: value = device->machine().root_device().ioport("AN2")->read(); break;
+	case 3: value = device->machine().root_device().ioport("AN3")->read(); break;
 	case 4: value = 0x000; break;
 	case 5: value = 0x000; break;
 	case 6: value = 0x000; break;
@@ -1165,7 +1165,7 @@ static DRIVER_INIT(gticlub)
 
 	state->m_sharc_dataram_0 = auto_alloc_array(machine, UINT32, 0x100000/4);
 
-	K001005_preprocess_texture_data(machine.root_device().memregion("gfx1")->base(), state->memregion("gfx1")->bytes(), 1);
+	K001005_preprocess_texture_data(state->memregion("gfx1")->base(), state->memregion("gfx1")->bytes(), 1);
 }
 
 static DRIVER_INIT(hangplt)
@@ -1173,7 +1173,7 @@ static DRIVER_INIT(hangplt)
 	gticlub_state *state = machine.driver_data<gticlub_state>();
 
 	init_konami_cgboard(machine, 2, CGBOARD_TYPE_HANGPLT);
-	set_cgboard_texture_bank(machine, 0, "bank5", machine.root_device().memregion("user5")->base());
+	set_cgboard_texture_bank(machine, 0, "bank5", state->memregion("user5")->base());
 	set_cgboard_texture_bank(machine, 1, "bank6", state->memregion("user5")->base());
 
 	state->m_sharc_dataram_0 = auto_alloc_array(machine, UINT32, 0x100000/4);

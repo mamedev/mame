@@ -535,7 +535,7 @@ ROM_END
 static DRIVER_INIT( mirax )
 {
 	mirax_state *state = machine.driver_data<mirax_state>();
-	UINT8 *DATA = machine.root_device().memregion("data_code")->base();
+	UINT8 *DATA = state->memregion("data_code")->base();
 	UINT8 *ROM = state->memregion("maincpu")->base();
 	int i;
 

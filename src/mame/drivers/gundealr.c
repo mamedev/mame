@@ -498,9 +498,9 @@ static TIMER_DEVICE_CALLBACK( yamyam_mcu_sim )
 			break;
 	}
 
-	state->m_rambase[0x004] = input_port_read(timer.machine(), "IN2");
-	state->m_rambase[0x005] = input_port_read(timer.machine(), "IN1");
-	state->m_rambase[0x006] = input_port_read(timer.machine(), "IN0");
+	state->m_rambase[0x004] = timer.machine().root_device().ioport("IN2")->read();
+	state->m_rambase[0x005] = timer.machine().root_device().ioport("IN1")->read();
+	state->m_rambase[0x006] = timer.machine().root_device().ioport("IN0")->read();
 }
 
 static MACHINE_CONFIG_DERIVED( yamyam, gundealr )

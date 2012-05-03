@@ -935,7 +935,7 @@ static astring &warnings_string(running_machine &machine, astring &string)
 			string.cat(" have not been correctly dumped.\n");
 		}
 		/* add one line per warning flag */
-		if (input_machine_has_keyboard(machine))
+		if (machine.ioport().has_keyboard())
 			string.cat("The keyboard emulation may not be 100% accurate.\n");
 		if (machine.system().flags & GAME_IMPERFECT_COLORS)
 			string.cat("The colors aren't 100% accurate.\n");
@@ -1213,7 +1213,7 @@ static void process_natural_keyboard(running_machine &machine)
 	{
 		/* if this was a UI_EVENT_CHAR event, post it */
 		if (event.event_type == UI_EVENT_CHAR)
-			inputx_postc(machine, event.ch);
+			machine.ioport().natkeyboard().post(event.ch);
 	}
 
 	/* process natural keyboard keys that don't get UI_EVENT_CHARs */
@@ -1236,7 +1236,7 @@ static void process_natural_keyboard(running_machine &machine)
 			*key_down_ptr |= key_down_mask;
 
 			/* post the key */
-			inputx_postc(machine, UCHAR_MAMEKEY_BEGIN + code.item_id());
+			machine.ioport().natkeyboard().post(UCHAR_MAMEKEY_BEGIN + code.item_id());
 		}
 		else if (!pressed && (*key_down_ptr & key_down_mask))
 		{
@@ -1259,7 +1259,7 @@ void ui_paste(running_machine &machine)
 	if (text != NULL)
 	{
 		/* post the text */
-		inputx_post_utf8(machine, text);
+		machine.ioport().natkeyboard().post_utf8(text);
 
 		/* free the string */
 		osd_free(text);
@@ -1317,10 +1317,10 @@ static UINT32 handler_ingame(running_machine &machine, render_container *contain
 	}
 
 	/* determine if we should disable the rest of the UI */
-	int ui_disabled = (input_machine_has_keyboard(machine) && !machine.ui_active());
+	int ui_disabled = (machine.ioport().has_keyboard() && !machine.ui_active());
 
 	/* is ScrLk UI toggling applicable here? */
-	if (input_machine_has_keyboard(machine))
+	if (machine.ioport().has_keyboard())
 	{
 		/* are we toggling the UI with ScrLk? */
 		if (ui_input_pressed(machine, IPT_UI_TOGGLE_UI))
@@ -1488,7 +1488,7 @@ static UINT32 handler_ingame(running_machine &machine, render_container *contain
 		machine.video().set_throttled(!machine.video().throttled());
 
 	/* check for fast forward */
-	if (input_type_pressed(machine, IPT_UI_FAST_FORWARD, 0))
+	if (machine.ioport().type_pressed(IPT_UI_FAST_FORWARD))
 	{
 		machine.video().set_fastforward(true);
 		ui_show_fps_temp(0.5);
@@ -1640,8 +1640,8 @@ static slider_state *slider_alloc(running_machine &machine, const char *title, I
 
 static slider_state *slider_init(running_machine &machine)
 {
-	input_field_config *field;
-	input_port_config *port;
+	ioport_field *field;
+	ioport_port *port;
 	slider_state *listhead = NULL;
 	slider_state **tailptr = &listhead;
 	astring string;
@@ -1666,11 +1666,11 @@ static slider_state *slider_init(running_machine &machine)
 
 	/* add analog adjusters */
 	for (port = machine.ioport().first_port(); port != NULL; port = port->next())
-		for (field = port->fieldlist().first(); field != NULL; field = field->next())
-			if (field->type == IPT_ADJUSTER)
+		for (field = port->first_field(); field != NULL; field = field->next())
+			if (field->type() == IPT_ADJUSTER)
 			{
 				void *param = (void *)field;
-				*tailptr = slider_alloc(machine, field->name, 0, field->defvalue, 100, 1, slider_adjuster, param);
+				*tailptr = slider_alloc(machine, field->name(), 0, field->defvalue(), 100, 1, slider_adjuster, param);
 				tailptr = &(*tailptr)->next;
 			}
 
@@ -1772,14 +1772,14 @@ static slider_state *slider_init(running_machine &machine)
 #ifdef MAME_DEBUG
 	/* add crosshair adjusters */
 	for (port = machine.ioport().first_port(); port != NULL; port = port->next())
-		for (field = port->fieldlist().first(); field != NULL; field = field->next())
-			if (field->crossaxis != CROSSHAIR_AXIS_NONE && field->player == 0)
+		for (field = port->first_field(); field != NULL; field = field->next())
+			if (field->crosshair_axis() != CROSSHAIR_AXIS_NONE && field->player() == 0)
 			{
 				void *param = (void *)field;
-				string.printf("Crosshair Scale %s", (field->crossaxis == CROSSHAIR_AXIS_X) ? "X" : "Y");
+				string.printf("Crosshair Scale %s", (field->crosshair_axis() == CROSSHAIR_AXIS_X) ? "X" : "Y");
 				*tailptr = slider_alloc(machine, string, -3000, 1000, 3000, 100, slider_crossscale, param);
 				tailptr = &(*tailptr)->next;
-				string.printf("Crosshair Offset %s", (field->crossaxis == CROSSHAIR_AXIS_X) ? "X" : "Y");
+				string.printf("Crosshair Offset %s", (field->crosshair_axis() == CROSSHAIR_AXIS_X) ? "X" : "Y");
 				*tailptr = slider_alloc(machine, string, -3000, 0, 3000, 100, slider_crossoffset, param);
 				tailptr = &(*tailptr)->next;
 			}
@@ -1832,14 +1832,14 @@ static INT32 slider_mixervol(running_machine &machine, void *arg, astring *strin
 
 static INT32 slider_adjuster(running_machine &machine, void *arg, astring *string, INT32 newval)
 {
-	const input_field_config *field = (const input_field_config *)arg;
-	input_field_user_settings settings;
+	ioport_field *field = (ioport_field *)arg;
+	ioport_field::user_settings settings;
 
-	input_field_get_user_settings(field, &settings);
+	field->get_user_settings(settings);
 	if (newval != SLIDER_NOCHANGE)
 	{
 		settings.value = newval;
-		input_field_set_user_settings(field, &settings);
+		field->set_user_settings(settings);
 	}
 	if (string != NULL)
 		string->printf("%d%%", settings.value);
@@ -2185,13 +2185,13 @@ static char *slider_get_screen_desc(screen_device &screen)
 #ifdef MAME_DEBUG
 static INT32 slider_crossscale(running_machine &machine, void *arg, astring *string, INT32 newval)
 {
-	input_field_config *field = (input_field_config *)arg;
+	ioport_field *field = (ioport_field *)arg;
 
 	if (newval != SLIDER_NOCHANGE)
-		field->crossscale = (float)newval * 0.001f;
+		field->set_crosshair_scale(float(newval) * 0.001);
 	if (string != NULL)
-		string->printf("%s %s %1.3f", "Crosshair Scale", (field->crossaxis == CROSSHAIR_AXIS_X) ? "X" : "Y", (float)newval * 0.001f);
-	return floor(field->crossscale * 1000.0f + 0.5f);
+		string->printf("%s %s %1.3f", "Crosshair Scale", (field->crosshair_axis() == CROSSHAIR_AXIS_X) ? "X" : "Y", float(newval) * 0.001f);
+	return floor(field->crosshair_scale() * 1000.0f + 0.5f);
 }
 #endif
 
@@ -2204,13 +2204,13 @@ static INT32 slider_crossscale(running_machine &machine, void *arg, astring *str
 #ifdef MAME_DEBUG
 static INT32 slider_crossoffset(running_machine &machine, void *arg, astring *string, INT32 newval)
 {
-	input_field_config *field = (input_field_config *)arg;
+	ioport_field *field = (ioport_field *)arg;
 
 	if (newval != SLIDER_NOCHANGE)
-		field->crossoffset = (float)newval * 0.001f;
+		field->set_crosshair_offset(float(newval) * 0.001f);
 	if (string != NULL)
-		string->printf("%s %s %1.3f", "Crosshair Offset", (field->crossaxis == CROSSHAIR_AXIS_X) ? "X" : "Y", (float)newval * 0.001f);
-	return field->crossoffset;
+		string->printf("%s %s %1.3f", "Crosshair Offset", (field->crosshair_axis() == CROSSHAIR_AXIS_X) ? "X" : "Y", float(newval) * 0.001f);
+	return field->crosshair_offset();
 }
 #endif
 

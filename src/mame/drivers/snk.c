@@ -741,7 +741,7 @@ CUSTOM_INPUT_MEMBER(snk_state::gwar_rotary)
 {
 	static const char *const ports[] = { "P1ROT", "P2ROT" };
 	int which = (int)(FPTR)param;
-	int value = input_port_read(machine(), ports[which]);
+	int value = ioport(ports[which])->read();
 
 	if ((m_last_value[which] == 0x5 && value == 0x6) || (m_last_value[which] == 0x6 && value == 0x5))
 	{
@@ -756,7 +756,7 @@ CUSTOM_INPUT_MEMBER(snk_state::gwar_rotary)
 
 CUSTOM_INPUT_MEMBER(snk_state::gwarb_rotary)
 {
-	if (input_port_read(machine(), "JOYSTICK_MODE") == 1)
+	if (ioport("JOYSTICK_MODE")->read() == 1)
 	{
 		return gwar_rotary(field, param);
 	}
@@ -805,13 +805,13 @@ WRITE8_MEMBER(snk_state::countryc_trackball_w)
 CUSTOM_INPUT_MEMBER(snk_state::countryc_trackball_x)
 {
 
-	return input_port_read(machine(), m_countryc_trackball ? "TRACKBALLX2" : "TRACKBALLX1");
+	return ioport(m_countryc_trackball ? "TRACKBALLX2" : "TRACKBALLX1")->read();
 }
 
 CUSTOM_INPUT_MEMBER(snk_state::countryc_trackball_y)
 {
 
-	return input_port_read(machine(), m_countryc_trackball ? "TRACKBALLY2" : "TRACKBALLY1");
+	return ioport(m_countryc_trackball ? "TRACKBALLY2" : "TRACKBALLY1")->read();
 }
 
 
@@ -824,14 +824,14 @@ CUSTOM_INPUT_MEMBER(snk_state::snk_bonus_r)
 	switch (bit_mask)
 	{
 		case 0x01:  /* older games : "Occurrence" Dip Switch (DSW2:1) */
-			return ((input_port_read(machine(), "BONUS") & bit_mask) >> 0);
+			return ((ioport("BONUS")->read() & bit_mask) >> 0);
 		case 0xc0:  /* older games : "Bonus Life" Dip Switches (DSW1:7,8) */
-			return ((input_port_read(machine(), "BONUS") & bit_mask) >> 6);
+			return ((ioport("BONUS")->read() & bit_mask) >> 6);
 
 		case 0x04:  /* later games : "Occurrence" Dip Switch (DSW1:3) */
-			return ((input_port_read(machine(), "BONUS") & bit_mask) >> 2);
+			return ((ioport("BONUS")->read() & bit_mask) >> 2);
 		case 0x30:  /* later games : "Bonus Life" Dip Switches (DSW2:5,6) */
-			return ((input_port_read(machine(), "BONUS") & bit_mask) >> 4);
+			return ((ioport("BONUS")->read() & bit_mask) >> 4);
 
 		default:
 			logerror("snk_bonus_r : invalid %02X bit_mask\n",bit_mask);
@@ -2388,12 +2388,12 @@ static INPUT_PORTS_START( fitegolf )
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Cabinet ) )          PORT_DIPLOCATION("DSW1:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Upright ) )          /* Dual Controls */
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x08, 0x00, "Gameplay" )        PORT_CONDITION("DSW1", 0x01, PORTCOND_EQUALS, 0x01) PORT_DIPLOCATION("DSW1:4")    /* code at 0x011e */
-	PORT_DIPSETTING(    0x00, "Basic Player" )    PORT_CONDITION("DSW1", 0x01, PORTCOND_EQUALS, 0x01)
-	PORT_DIPSETTING(    0x08, "Avid Golfer" )     PORT_CONDITION("DSW1", 0x01, PORTCOND_EQUALS, 0x01)
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unused ) ) PORT_CONDITION("DSW1", 0x01, PORTCOND_EQUALS, 0x00) PORT_DIPLOCATION("DSW1:4")
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )    PORT_CONDITION("DSW1", 0x01, PORTCOND_EQUALS, 0x00)
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )     PORT_CONDITION("DSW1", 0x01, PORTCOND_EQUALS, 0x00)
+	PORT_DIPNAME( 0x08, 0x00, "Gameplay" )        PORT_CONDITION("DSW1", 0x01, EQUALS, 0x01) PORT_DIPLOCATION("DSW1:4")    /* code at 0x011e */
+	PORT_DIPSETTING(    0x00, "Basic Player" )    PORT_CONDITION("DSW1", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(    0x08, "Avid Golfer" )     PORT_CONDITION("DSW1", 0x01, EQUALS, 0x01)
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unused ) ) PORT_CONDITION("DSW1", 0x01, EQUALS, 0x00) PORT_DIPLOCATION("DSW1:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )    PORT_CONDITION("DSW1", 0x01, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )     PORT_CONDITION("DSW1", 0x01, EQUALS, 0x00)
 	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) )           PORT_DIPLOCATION("DSW1:5,6")
 	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( 3C_1C ) )

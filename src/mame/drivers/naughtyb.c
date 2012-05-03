@@ -112,14 +112,14 @@ TODO:
 
 READ8_MEMBER(naughtyb_state::in0_port_r)
 {
-	int in0 = input_port_read(machine(), "IN0");
+	int in0 = ioport("IN0")->read();
 
 	if ( m_cocktail )
 	{
 		// cabinet == cocktail -AND- handling player 2
 
 		in0 = ( in0 & 0x03 ) |				// start buttons
-			  ( input_port_read(machine(), "IN0_COCKTAIL") & 0xFC );	// cocktail inputs
+			  ( ioport("IN0_COCKTAIL")->read() & 0xFC );	// cocktail inputs
 	}
 
 	return in0;
@@ -129,8 +129,8 @@ READ8_MEMBER(naughtyb_state::dsw0_port_r)
 {
 	// vblank replaces the cabinet dip
 
-	return ( ( input_port_read(machine(), "DSW0") & 0x7F ) |		// dsw0
-			 ( input_port_read(machine(), "FAKE") & 0x80 ) );		// vblank
+	return ( ( ioport("DSW0")->read() & 0x7F ) |		// dsw0
+			 ( ioport("FAKE")->read() & 0x80 ) );		// vblank
 }
 
 /* Pop Flamer
@@ -331,7 +331,7 @@ static INPUT_PORTS_START( naughtyb )
 	PORT_START( "FAKE" )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, naughtyb_state,coin_inserted, 0)
 	// when reading DSW0, bit 7 doesn't read cabinet, but vblank
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_VBLANK )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( trvmstr )
@@ -379,7 +379,7 @@ static INPUT_PORTS_START( trvmstr )
 	PORT_START( "FAKE" )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, naughtyb_state,coin_inserted, 0)
 	// when reading DSW0, bit 7 doesn't read cabinet, but vblank
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_VBLANK )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 INPUT_PORTS_END
 
 

@@ -120,7 +120,7 @@ INPUT_CHANGED_MEMBER(astrof_state::service_coin_inserted)
 
 CUSTOM_INPUT_MEMBER(astrof_state::astrof_p1_controls_r)
 {
-	return input_port_read(machine(), "P1");
+	return ioport("P1")->read();
 }
 
 
@@ -131,10 +131,10 @@ CUSTOM_INPUT_MEMBER(astrof_state::astrof_p2_controls_r)
 	/* on an upright cabinet, a single set of controls
        is connected to both sets of pins on the edge
        connector */
-	if (input_port_read(machine(), "CAB"))
-		ret = input_port_read(machine(), "P2");
+	if (ioport("CAB")->read())
+		ret = ioport("P2")->read();
 	else
-		ret = input_port_read(machine(), "P1");
+		ret = ioport("P1")->read();
 
 	return ret;
 }
@@ -149,9 +149,9 @@ CUSTOM_INPUT_MEMBER(astrof_state::tomahawk_controls_r)
          (not verified on pcb) */
 
 	if (m_flipscreen)
-		ret = input_port_read(machine(), "P2");
+		ret = ioport("P2")->read();
 	else
-		ret = input_port_read(machine(), "P1");
+		ret = ioport("P1")->read();
 
 	return ret;
 }
@@ -204,7 +204,7 @@ static void astrof_get_pens( running_machine &machine, pen_t *pens )
 	astrof_state *state = machine.driver_data<astrof_state>();
 	offs_t i;
 	UINT8 bank = (state->m_astrof_palette_bank ? 0x10 : 0x00);
-	UINT8 config = input_port_read_safe(machine, "FAKE", 0x00);
+	UINT8 config = state->ioport("FAKE")->read_safe(0x00);
 	UINT8 *prom = state->memregion("proms")->base();
 
 	/* a common wire hack to the pcb causes the prom halves to be inverted */
@@ -240,7 +240,7 @@ static void tomahawk_get_pens( running_machine &machine, pen_t *pens )
 {
 	offs_t i;
 	UINT8 *prom = machine.root_device().memregion("proms")->base();
-	UINT8 config = input_port_read_safe(machine, "FAKE", 0x00);
+	UINT8 config = machine.root_device().ioport("FAKE")->read_safe(0x00);
 
 	for (i = 0; i < TOMAHAWK_NUM_PENS; i++)
 	{
@@ -295,7 +295,7 @@ WRITE8_MEMBER(astrof_state::tomahawk_videoram_w)
 WRITE8_MEMBER(astrof_state::video_control_1_w)
 {
 
-	m_flipscreen = ((data >> 0) & 0x01) & input_port_read(machine(), "CAB");
+	m_flipscreen = ((data >> 0) & 0x01) & ioport("CAB")->read();
 
 	/* this ties to the CLR pin of the shift registers */
 	m_screen_off = (data & 0x02) ? TRUE : FALSE;
@@ -690,7 +690,7 @@ static INPUT_PORTS_START( astrof )
 	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Difficulty ) )       PORT_DIPLOCATION("SW:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Hard ) )
-	PORT_BIT ( 0x80, IP_ACTIVE_LOW, IPT_VBLANK )
+	PORT_BIT ( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("CAB")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) )          PORT_DIPLOCATION("SW:8")
@@ -745,7 +745,7 @@ static INPUT_PORTS_START( abattle )
 	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Difficulty ) )       PORT_DIPLOCATION("SW:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Hard ) )
-	PORT_BIT ( 0x80, IP_ACTIVE_LOW, IPT_VBLANK )
+	PORT_BIT ( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("CAB")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) )          PORT_DIPLOCATION("SW:8")
@@ -797,7 +797,7 @@ static INPUT_PORTS_START( spfghmk2 )
 	PORT_DIPSETTING(    0x20, "2500" )
 	PORT_DIPSETTING(    0x30, "3000" )
 	PORT_DIPUNUSED_DIPLOC( 0x40, 0x00, "SW:7" )
-	PORT_BIT ( 0x80, IP_ACTIVE_LOW, IPT_VBLANK )
+	PORT_BIT ( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("CAB")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) )          PORT_DIPLOCATION("SW:8")
@@ -852,7 +852,7 @@ static INPUT_PORTS_START( spfghmk22 )
 	PORT_DIPNAME( 0x40, 0x00, "Kill Saucer after Invaders" ) PORT_DIPLOCATION("SW:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Yes ) )              /* if saucer lands, game is over */
-	PORT_BIT ( 0x80, IP_ACTIVE_LOW, IPT_VBLANK )
+	PORT_BIT ( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("CAB")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) )          PORT_DIPLOCATION("SW:8")
@@ -911,7 +911,7 @@ static INPUT_PORTS_START( tomahawk )
 	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Difficulty ) )       PORT_DIPLOCATION("SW:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Hard ) )
-	PORT_BIT ( 0x80, IP_ACTIVE_LOW, IPT_VBLANK )
+	PORT_BIT ( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("CAB")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) )          PORT_DIPLOCATION("SW:8")

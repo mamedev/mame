@@ -90,7 +90,7 @@ WRITE16_MEMBER(toobin_state::interrupt_scan_w)
 
 READ16_MEMBER(toobin_state::special_port1_r)
 {
-	int result = input_port_read(machine(), "FF9000");
+	int result = ioport("FF9000")->read();
 	if (atarigen_get_hblank(*machine().primary_screen)) result ^= 0x8000;
 	if (m_cpu_to_sound_ready) result ^= 0x2000;
 	return result;
@@ -158,7 +158,7 @@ static INPUT_PORTS_START( toobin )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_SERVICE( 0x1000, IP_ACTIVE_LOW )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_VBLANK )
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_INCLUDE( atarijsa_i )		/* audio port */

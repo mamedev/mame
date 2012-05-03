@@ -257,7 +257,7 @@ READ8_MEMBER(homedata_state::mrokumei_keyboard_r)
 		{
 			if (m_keyb & (1 << i))
 			{
-				res = input_port_read(machine(), keynames[i]) & 0x3f;
+				res = ioport(keynames[i])->read() & 0x3f;
 				break;
 			}
 		}
@@ -370,7 +370,7 @@ WRITE8_MEMBER(homedata_state::reikaids_upd7807_portc_w)
 
 READ8_MEMBER(homedata_state::reikaids_io_r)
 {
-	int res = input_port_read(machine(), "IN2");	// bit 4 = coin, bit 5 = service
+	int res = ioport("IN2")->read();	// bit 4 = coin, bit 5 = service
 
 	res |= BIT(m_upd7807_portc, 2) * 0x01;		// bit 0 = upd7807 status
 	res |= BIT(m_upd7807_portc, 6) * 0x02;		// bit 1 = upd7807 data
@@ -438,7 +438,7 @@ READ8_MEMBER(homedata_state::pteacher_io_r)
 READ8_MEMBER(homedata_state::pteacher_keyboard_r)
 {
 	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5" };
-	int dips = input_port_read(machine(), "DSW");
+	int dips = ioport("DSW")->read();
 
 	//  logerror("%04x: keyboard_r with port A = %02x\n",cpu_get_pc(&space.device()),upd7807_porta);
 
@@ -446,7 +446,7 @@ READ8_MEMBER(homedata_state::pteacher_keyboard_r)
 	{
 		/* player 1 + dip switches */
 		int row = (m_upd7807_porta & 0x07);
-		return input_port_read(machine(), keynames[row]) | (((dips >> row) & 1) << 5);	// 0-5
+		return ioport(keynames[row])->read() | (((dips >> row) & 1) << 5);	// 0-5
 	}
 	if (m_upd7807_porta & 0x08)
 	{
@@ -1149,7 +1149,7 @@ static MACHINE_START( homedata )
 static MACHINE_START( reikaids )
 {
 	homedata_state *state = machine.driver_data<homedata_state>();
-	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
+	UINT8 *ROM = state->memregion("maincpu")->base();
 
 	state->membank("bank1")->configure_entries(0, 8, &ROM[0xc000], 0x4000);
 	state->membank("bank2")->configure_entries(0, 4, state->memregion("audiocpu")->base(), 0x10000);
@@ -1166,7 +1166,7 @@ static MACHINE_START( reikaids )
 static MACHINE_START( pteacher )
 {
 	homedata_state *state = machine.driver_data<homedata_state>();
-	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
+	UINT8 *ROM = state->memregion("maincpu")->base();
 
 	state->membank("bank1")->configure_entries(0, 4, &ROM[0xc000], 0x4000);
 	state->membank("bank2")->configure_entries(0, 4, state->memregion("audiocpu")->base(), 0x10000);

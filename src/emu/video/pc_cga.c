@@ -138,10 +138,10 @@ INPUT_PORTS_START( pcvideo_pc1512 )
 INPUT_PORTS_END
 
 /* Dipswitch for font selection */
-#define CGA_FONT        (input_port_read_direct(cga.config_input_port)&3)
+#define CGA_FONT        (cga.config_input_port->read()&3)
 
 /* Dipswitch for monitor selection */
-#define CGA_MONITOR     (input_port_read_direct(cga.config_input_port)&0x1C)
+#define CGA_MONITOR     (cga.config_input_port->read()&0x1C)
 #define CGA_MONITOR_RGB         0x00    /* Colour RGB */
 #define CGA_MONITOR_MONO        0x04    /* Greyscale RGB */
 #define CGA_MONITOR_COMPOSITE   0x08    /* Colour composite */
@@ -150,7 +150,7 @@ INPUT_PORTS_END
 
 
 /* Dipswitch for chipset selection */
-#define CGA_CHIPSET     (input_port_read_direct(cga.config_input_port)&0xE0)
+#define CGA_CHIPSET     (cga.config_input_port->read()&0xE0)
 #define CGA_CHIPSET_IBM         0x00    /* Original IBM CGA */
 #define CGA_CHIPSET_PC1512      0x20    /* PC1512 CGA subset */
 #define CGA_CHIPSET_PC200       0x40    /* PC200 in CGA mode */
@@ -242,7 +242,7 @@ static struct
 
 	UINT8	*chr_gen;
 
-	const input_port_config *config_input_port;
+	ioport_port *config_input_port;
 
 	mc6845_update_row_func	update_row;
 	UINT8	palette_lut_2bpp[4];

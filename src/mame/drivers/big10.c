@@ -119,9 +119,9 @@ READ8_MEMBER(big10_state::mux_r)
 {
 	switch(m_mux_data)
 	{
-		case 1: return input_port_read(machine(), "IN1");
-		case 2: return input_port_read(machine(), "IN2");
-		case 4: return input_port_read(machine(), "IN3");
+		case 1: return ioport("IN1")->read();
+		case 2: return ioport("IN2")->read();
+		case 4: return ioport("IN3")->read();
 	}
 
 	return m_mux_data;

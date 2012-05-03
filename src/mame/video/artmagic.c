@@ -41,7 +41,7 @@ INLINE UINT16 *address_to_vram(artmagic_state *state, offs_t *address)
 VIDEO_START( artmagic )
 {
 	artmagic_state *state = machine.driver_data<artmagic_state>();
-	state->m_blitter_base = (UINT16 *)machine.root_device().memregion("gfx1")->base();
+	state->m_blitter_base = (UINT16 *)state->memregion("gfx1")->base();
 	state->m_blitter_mask = state->memregion("gfx1")->bytes()/2 - 1;
 
 	state_save_register_global_array(machine, state->m_xor);

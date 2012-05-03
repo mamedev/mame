@@ -529,8 +529,8 @@ static TIMER_CALLBACK( cchip_timer )
 	opwolf_state *state = machine.driver_data<opwolf_state>();
 
 	// Update input ports, these are used by both the 68k directly and by the c-chip
-	state->m_cchip_ram[0x4] = input_port_read(machine, "IN0");
-	state->m_cchip_ram[0x5] = input_port_read(machine, "IN1");
+	state->m_cchip_ram[0x4] = state->ioport("IN0")->read();
+	state->m_cchip_ram[0x5] = state->ioport("IN1")->read();
 
 	// Coin slots
 	if (state->m_cchip_ram[0x4] != state->m_cchip_last_04)

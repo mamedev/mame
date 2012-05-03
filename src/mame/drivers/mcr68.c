@@ -69,8 +69,8 @@
 
 READ8_DEVICE_HANDLER( zwackery_port_2_r )
 {
-	int result = input_port_read(device->machine(), "IN2");
-	int wheel = input_port_read(device->machine(), "IN5");
+	int result = device->machine().root_device().ioport("IN2")->read();
+	int wheel = device->machine().root_device().ioport("IN5")->read();
 
 	return result | ((wheel >> 2) & 0x3e);
 }
@@ -131,9 +131,9 @@ WRITE16_MEMBER(mcr68_state::blasted_control_w)
 READ16_MEMBER(mcr68_state::spyhunt2_port_0_r)
 {
 	static const char *const portnames[] = { "AN1", "AN2", "AN3", "AN4" };
-	int result = input_port_read(machine(), "IN0");
+	int result = ioport("IN0")->read();
 	int which = (m_control_word >> 3) & 3;
-	int analog = input_port_read(machine(), portnames[which]);
+	int analog = ioport(portnames[which])->read();
 
 	return result | ((m_sounds_good->read(space, 0) & 1) << 5) | (analog << 8);
 }
@@ -141,7 +141,7 @@ READ16_MEMBER(mcr68_state::spyhunt2_port_0_r)
 
 READ16_MEMBER(mcr68_state::spyhunt2_port_1_r)
 {
-	int result = input_port_read(machine(), "IN1");
+	int result = ioport("IN1")->read();
 	return result | ((m_turbo_chip_squeak->read(space, 0) & 1) << 7);
 }
 
@@ -194,10 +194,10 @@ static const UINT8 translate49[7] = { 0x7, 0x3, 0x1, 0x0, 0xc, 0xe, 0xf };
 
 READ16_MEMBER(mcr68_state::archrivl_port_1_r)
 {
-	return (translate49[input_port_read(machine(), "49WAYY2") >> 4] << 12) |
-			(translate49[input_port_read(machine(), "49WAYX2") >> 4] << 8) |
-			(translate49[input_port_read(machine(), "49WAYY1") >> 4] << 4) |
-			(translate49[input_port_read(machine(), "49WAYX1") >> 4] << 0);
+	return (translate49[ioport("49WAYY2")->read() >> 4] << 12) |
+			(translate49[ioport("49WAYX2")->read() >> 4] << 8) |
+			(translate49[ioport("49WAYY1")->read() >> 4] << 4) |
+			(translate49[ioport("49WAYX1")->read() >> 4] << 0);
 }
 
 
@@ -256,18 +256,18 @@ READ16_MEMBER(mcr68_state::pigskin_protection_r)
 READ16_MEMBER(mcr68_state::pigskin_port_1_r)
 {
 	/* see archrivl_port_1_r for 49-way joystick description */
-	return input_port_read(machine(), "IN1") |
-			(translate49[input_port_read(machine(), "49WAYX1") >> 4] << 12) |
-			(translate49[input_port_read(machine(), "49WAYY1") >> 4] << 8);
+	return ioport("IN1")->read() |
+			(translate49[ioport("49WAYX1")->read() >> 4] << 12) |
+			(translate49[ioport("49WAYY1")->read() >> 4] << 8);
 }
 
 
 READ16_MEMBER(mcr68_state::pigskin_port_2_r)
 {
 	/* see archrivl_port_1_r for 49-way joystick description */
-	return input_port_read(machine(), "DSW") |
-			(translate49[input_port_read(machine(), "49WAYX2") >> 4] << 12) |
-			(translate49[input_port_read(machine(), "49WAYY2") >> 4] << 8);
+	return ioport("DSW")->read() |
+			(translate49[ioport("49WAYX2")->read() >> 4] << 12) |
+			(translate49[ioport("49WAYY2")->read() >> 4] << 8);
 }
 
 
@@ -280,9 +280,9 @@ READ16_MEMBER(mcr68_state::pigskin_port_2_r)
 
 READ16_MEMBER(mcr68_state::trisport_port_1_r)
 {
-	int xaxis = (INT8)input_port_read(machine(), "AN1");
-	int yaxis = (INT8)input_port_read(machine(), "AN2");
-	int result = input_port_read(machine(), "IN1");
+	int xaxis = (INT8)ioport("AN1")->read();
+	int yaxis = (INT8)ioport("AN2")->read();
+	int result = ioport("IN1")->read();
 
 	result |= (xaxis & 0x3c) << 6;
 	result |= (yaxis & 0x3c) << 10;

@@ -165,7 +165,7 @@ static READ8_DEVICE_HANDLER( input_r )
 
 	if (!state->m_inputcnt)
 	{
-		int key = input_port_read(device->machine(), "IN1");
+		int key = state->ioport("IN1")->read();
 		int keyval = 0; //we must return 0 (0x2 in 2nd read) to clear 4 bit at $6600 and allow next read
 
 		if (key)
@@ -202,7 +202,7 @@ static WRITE8_DEVICE_HANDLER( unknown_w )
 READ8_MEMBER(koikoi_state::io_r)
 {
 	if (!offset)
-		return input_port_read(machine(), "IN0") ^ m_ioram[4]; //coin
+		return ioport("IN0")->read() ^ m_ioram[4]; //coin
 
 	return 0;
 }

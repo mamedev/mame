@@ -104,8 +104,8 @@ READ8_MEMBER(attckufo_state::attckufo_io_r)
 {
 	switch(offset)
 	{
-		case 0: return input_port_read(machine(), "DSW");
-		case 2: return input_port_read(machine(), "INPUT");
+		case 0: return ioport("DSW")->read();
+		case 2: return ioport("INPUT")->read();
 	}
 	return 0xff;
 }

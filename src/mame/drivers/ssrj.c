@@ -45,7 +45,7 @@ static MACHINE_RESET(ssrj)
 
 READ8_MEMBER(ssrj_state::ssrj_wheel_r)
 {
-	int port = input_port_read(machine(), "IN1") - 0x80;
+	int port = ioport("IN1")->read() - 0x80;
 	int retval = port - m_oldport;
 
 	m_oldport = port;

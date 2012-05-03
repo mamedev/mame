@@ -55,7 +55,7 @@ WRITE8_DEVICE_HANDLER(discrete_sound_w)
 
 DISCRETE_STEP(dss_adjustment)
 {
-	INT32  rawportval = input_port_read_direct(m_port);
+	INT32  rawportval = m_port->read();
 
 	/* only recompute if the value changed from last time */
 	if (UNEXPECTED(rawportval != m_lastpval))

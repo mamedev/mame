@@ -235,11 +235,11 @@ READ8_MEMBER(dynax_state::hanamai_keyboard_0_r)
 	int res = 0x3f;
 
 	/* the game reads all rows at once (keyb = 0) to check if a key is pressed */
-	if (!BIT(m_keyb, 0)) res &= input_port_read(machine(), "KEY0");
-	if (!BIT(m_keyb, 1)) res &= input_port_read(machine(), "KEY1");
-	if (!BIT(m_keyb, 2)) res &= input_port_read(machine(), "KEY2");
-	if (!BIT(m_keyb, 3)) res &= input_port_read(machine(), "KEY3");
-	if (!BIT(m_keyb, 4)) res &= input_port_read(machine(), "KEY4");
+	if (!BIT(m_keyb, 0)) res &= ioport("KEY0")->read();
+	if (!BIT(m_keyb, 1)) res &= ioport("KEY1")->read();
+	if (!BIT(m_keyb, 2)) res &= ioport("KEY2")->read();
+	if (!BIT(m_keyb, 3)) res &= ioport("KEY3")->read();
+	if (!BIT(m_keyb, 4)) res &= ioport("KEY4")->read();
 
 	return res;
 }
@@ -249,11 +249,11 @@ READ8_MEMBER(dynax_state::hanamai_keyboard_1_r)
 	int res = 0x3f;
 
 	/* the game reads all rows at once (keyb = 0) to check if a key is pressed */
-	if (!BIT(m_keyb, 0)) res &= input_port_read(machine(), "KEY5");
-	if (!BIT(m_keyb, 1)) res &= input_port_read(machine(), "KEY6");
-	if (!BIT(m_keyb, 2)) res &= input_port_read(machine(), "KEY7");
-	if (!BIT(m_keyb, 3)) res &= input_port_read(machine(), "KEY8");
-	if (!BIT(m_keyb, 4)) res &= input_port_read(machine(), "KEY9");
+	if (!BIT(m_keyb, 0)) res &= ioport("KEY5")->read();
+	if (!BIT(m_keyb, 1)) res &= ioport("KEY6")->read();
+	if (!BIT(m_keyb, 2)) res &= ioport("KEY7")->read();
+	if (!BIT(m_keyb, 3)) res &= ioport("KEY8")->read();
+	if (!BIT(m_keyb, 4)) res &= ioport("KEY9")->read();
 
 	return res;
 }
@@ -621,7 +621,7 @@ READ8_MEMBER(dynax_state::hjingi_keyboard_0_r)
 
 READ8_MEMBER(dynax_state::hjingi_keyboard_1_r)
 {
-	return hanamai_keyboard_1_r(space, 0) | input_port_read(machine(), "BET");
+	return hanamai_keyboard_1_r(space, 0) | ioport("BET")->read();
 }
 
 static ADDRESS_MAP_START( hjingi_mem_map, AS_PROGRAM, 8, dynax_state )
@@ -715,7 +715,7 @@ READ8_MEMBER(dynax_state::yarunara_input_r)
 			switch (m_input_sel)
 			{
 			case 0x00:
-				return input_port_read(machine(), "COINS");	// coins
+				return ioport("COINS")->read();	// coins
 
 			case 0x02:
 				return 0xff;	// bit 7 must be 1. Bit 2?
@@ -732,12 +732,12 @@ READ8_MEMBER(dynax_state::yarunara_input_r)
 			// player 2
 			case 0x01:	//quiztvqq
 			case 0x81:
-				return input_port_read(machine(), keynames1[m_keyb++]);
+				return ioport(keynames1[m_keyb++])->read();
 
 			// player 1
 			case 0x02:	//quiztvqq
 			case 0x82:
-				return input_port_read(machine(), keynames0[m_keyb++]);
+				return ioport(keynames0[m_keyb++])->read();
 
 			default:
 				return 0xff;
@@ -1050,7 +1050,7 @@ ADDRESS_MAP_END
 
 READ8_MEMBER(dynax_state::mjelctrn_keyboard_1_r)
 {
-	return (hanamai_keyboard_1_r(space, 0) & 0x3f) | (input_port_read(machine(), "FAKE") ? 0x40 : 0);
+	return (hanamai_keyboard_1_r(space, 0) & 0x3f) | (ioport("FAKE")->read() ? 0x40 : 0);
 }
 
 READ8_MEMBER(dynax_state::mjelctrn_dsw_r)
@@ -1058,7 +1058,7 @@ READ8_MEMBER(dynax_state::mjelctrn_dsw_r)
 	int dsw = (m_keyb & 0xc0) >> 6;
 	static const char *const dswnames[] = { "DSW0", "DSW1", "DSW3", "DSW4" };
 
-	return input_port_read(machine(), dswnames[dsw]);
+	return ioport(dswnames[dsw])->read();
 }
 
 WRITE8_MEMBER(dynax_state::mjelctrn_blitter_ack_w)
@@ -1124,11 +1124,11 @@ static WRITE8_DEVICE_HANDLER( htengoku_dsw_w )
 static READ8_DEVICE_HANDLER( htengoku_dsw_r )
 {
 	dynax_state *state = device->machine().driver_data<dynax_state>();
-	if (!BIT(state->m_dsw_sel, 0))	return input_port_read(device->machine(), "DSW0");
-	if (!BIT(state->m_dsw_sel, 1))	return input_port_read(device->machine(), "DSW1");
-	if (!BIT(state->m_dsw_sel, 2))	return input_port_read(device->machine(), "DSW2");
-	if (!BIT(state->m_dsw_sel, 3))	return input_port_read(device->machine(), "DSW3");
-	if (!BIT(state->m_dsw_sel, 4))	return input_port_read(device->machine(), "DSW4");
+	if (!BIT(state->m_dsw_sel, 0))	return state->ioport("DSW0")->read();
+	if (!BIT(state->m_dsw_sel, 1))	return state->ioport("DSW1")->read();
+	if (!BIT(state->m_dsw_sel, 2))	return state->ioport("DSW2")->read();
+	if (!BIT(state->m_dsw_sel, 3))	return state->ioport("DSW3")->read();
+	if (!BIT(state->m_dsw_sel, 4))	return state->ioport("DSW4")->read();
 	logerror("%s: warning, unknown bits read, dsw_sel = %02x\n", device->machine().describe_context(), state->m_dsw_sel);
 
 	return 0xff;
@@ -1165,8 +1165,8 @@ READ8_MEMBER(dynax_state::htengoku_input_r)
 
 	switch (m_input_sel)
 	{
-		case 0x81:	return input_port_read(machine(), keynames1[m_keyb++]);
-		case 0x82:	return input_port_read(machine(), keynames0[m_keyb++]);
+		case 0x81:	return ioport(keynames1[m_keyb++])->read();
+		case 0x82:	return ioport(keynames0[m_keyb++])->read();
 		case 0x0d:	return 0xff;	// unused
 	}
 	logerror("%04x: input_r with select = %02x\n", cpu_get_pc(&space.device()), m_input_sel);
@@ -1178,7 +1178,7 @@ READ8_MEMBER(dynax_state::htengoku_coin_r)
 
 	switch (m_input_sel)
 	{
-		case 0x00:	return input_port_read(machine(), "COINS");
+		case 0x00:	return ioport("COINS")->read();
 		case 0x01:	return 0xff;	//?
 		case 0x02:	return 0xbf | ((m_hopper && !(machine().primary_screen->frame_number() % 10)) ? 0 : (1 << 6));	// bit 7 = blitter busy, bit 6 = hopper
 		case 0x03:	return m_coins;
@@ -1290,7 +1290,7 @@ READ8_MEMBER(dynax_state::tenkai_ip_r)
 			switch (m_input_sel)
 			{
 				case 0x00:
-					return input_port_read(machine(), "COINS");	// coins
+					return ioport("COINS")->read();	// coins
 
 				default:
 					logerror("%04x: unmapped ip_sel=%02x read from offs %x\n", cpu_get_pc(&space.device()), m_input_sel, offset);
@@ -1309,13 +1309,13 @@ READ8_MEMBER(dynax_state::tenkai_ip_r)
 				case 0x81:
 					if (m_keyb >= 5)
 						logerror("%04x: unmapped keyb=%02x read\n", cpu_get_pc(&space.device()), m_keyb);
-					return 0xff;//input_port_read(machine(), keynames1[m_keyb++]);
+					return 0xff;//ioport(keynames1[m_keyb++])->read();
 
 				// player 1
 				case 0x82:
 					if (m_keyb >= 5)
 						logerror("%04x: unmapped keyb=%02x read\n", cpu_get_pc(&space.device()), m_keyb);
-					return input_port_read(machine(), keynames0[m_keyb++]);
+					return ioport(keynames0[m_keyb++])->read();
 
 				default:
 					logerror("%04x: unmapped ip_sel=%02x read from offs %x\n", cpu_get_pc(&space.device()), m_input_sel, offset);
@@ -1337,11 +1337,11 @@ static READ8_DEVICE_HANDLER( tenkai_dsw_r )
 {
 	dynax_state *state = device->machine().driver_data<dynax_state>();
 
-	if (!BIT(state->m_dsw_sel, 0)) return input_port_read(device->machine(), "DSW0");
-	if (!BIT(state->m_dsw_sel, 1)) return input_port_read(device->machine(), "DSW1");
-	if (!BIT(state->m_dsw_sel, 2)) return input_port_read(device->machine(), "DSW2");
-	if (!BIT(state->m_dsw_sel, 3)) return input_port_read(device->machine(), "DSW3");
-	if (!BIT(state->m_dsw_sel, 4)) return input_port_read(device->machine(), "DSW4");
+	if (!BIT(state->m_dsw_sel, 0)) return state->ioport("DSW0")->read();
+	if (!BIT(state->m_dsw_sel, 1)) return state->ioport("DSW1")->read();
+	if (!BIT(state->m_dsw_sel, 2)) return state->ioport("DSW2")->read();
+	if (!BIT(state->m_dsw_sel, 3)) return state->ioport("DSW3")->read();
+	if (!BIT(state->m_dsw_sel, 4)) return state->ioport("DSW4")->read();
 	logerror("%s: unmapped dsw %02x read\n", device->machine().describe_context(), state->m_dsw_sel);
 
 	return 0xff;
@@ -1533,11 +1533,11 @@ READ8_MEMBER(dynax_state::gekisha_keyboard_0_r)
 {
 	int res = 0x3f;
 
-	if (!BIT(m_keyb, 0)) res &= input_port_read(machine(), "KEY0");
-	if (!BIT(m_keyb, 1)) res &= input_port_read(machine(), "KEY1");
-	if (!BIT(m_keyb, 2)) res &= input_port_read(machine(), "KEY2");
-	if (!BIT(m_keyb, 3)) res &= input_port_read(machine(), "KEY3");
-	if (!BIT(m_keyb, 4)) res &= input_port_read(machine(), "KEY4");
+	if (!BIT(m_keyb, 0)) res &= ioport("KEY0")->read();
+	if (!BIT(m_keyb, 1)) res &= ioport("KEY1")->read();
+	if (!BIT(m_keyb, 2)) res &= ioport("KEY2")->read();
+	if (!BIT(m_keyb, 3)) res &= ioport("KEY3")->read();
+	if (!BIT(m_keyb, 4)) res &= ioport("KEY4")->read();
 
 	return res;
 }
@@ -1545,14 +1545,14 @@ READ8_MEMBER(dynax_state::gekisha_keyboard_1_r)
 {
 	int res = 0x3f;
 
-	if (!BIT(m_keyb, 0)) res &= input_port_read(machine(), "KEY5");
-	if (!BIT(m_keyb, 1)) res &= input_port_read(machine(), "KEY6");
-	if (!BIT(m_keyb, 2)) res &= input_port_read(machine(), "KEY7");
-	if (!BIT(m_keyb, 3)) res &= input_port_read(machine(), "KEY8");
-	if (!BIT(m_keyb, 4)) res &= input_port_read(machine(), "KEY9");
+	if (!BIT(m_keyb, 0)) res &= ioport("KEY5")->read();
+	if (!BIT(m_keyb, 1)) res &= ioport("KEY6")->read();
+	if (!BIT(m_keyb, 2)) res &= ioport("KEY7")->read();
+	if (!BIT(m_keyb, 3)) res &= ioport("KEY8")->read();
+	if (!BIT(m_keyb, 4)) res &= ioport("KEY9")->read();
 
 	// bit 6
-	res |= input_port_read(machine(), "BET");
+	res |= ioport("BET")->read();
 
 	// bit 7 = blitter busy
 
@@ -1586,13 +1586,13 @@ READ8_MEMBER(dynax_state::gekisha_8000_r)
 
 	switch (offset + 0x8000)
 	{
-		case 0x8061:	return input_port_read(machine(), "COINS");
+		case 0x8061:	return ioport("COINS")->read();
 		case 0x8062:	return gekisha_keyboard_1_r(space, 0);
 		case 0x8063:	return gekisha_keyboard_0_r(space, 0);
-		case 0x8064:	return input_port_read(machine(), "DSW1");
-		case 0x8065:	return input_port_read(machine(), "DSW3");
-		case 0x8066:	return input_port_read(machine(), "DSW4");
-		case 0x8067:	return input_port_read(machine(), "DSW2");
+		case 0x8064:	return ioport("DSW1")->read();
+		case 0x8065:	return ioport("DSW3")->read();
+		case 0x8066:	return ioport("DSW4")->read();
+		case 0x8067:	return ioport("DSW2")->read();
 	}
 
 	logerror("%04x: unmapped offset %04X read with rombank=%02X\n",cpu_get_pc(&space.device()), offset, m_rombank);
@@ -4630,7 +4630,7 @@ static const msm5205_interface jantouki_msm5205_interface =
 static MACHINE_START( jantouki )
 {
 	dynax_state *state = machine.driver_data<dynax_state>();
-	UINT8 *MAIN = machine.root_device().memregion("maincpu")->base();
+	UINT8 *MAIN = state->memregion("maincpu")->base();
 	UINT8 *SOUND = state->memregion("soundcpu")->base();
 
 	state->membank("bank1")->configure_entries(0, 0x10, &MAIN[0x8000],  0x8000);

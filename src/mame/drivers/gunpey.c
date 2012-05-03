@@ -120,11 +120,11 @@ READ8_MEMBER(gunpey_state::gunpey_inputs_r)
 {
 	switch(offset+0x7f40)
 	{
-		case 0x7f40: return input_port_read(machine(), "DSW1");
-		case 0x7f41: return input_port_read(machine(), "DSW2");
-		case 0x7f42: return input_port_read(machine(), "P1");
-		case 0x7f43: return input_port_read(machine(), "P2");
-		case 0x7f44: return input_port_read(machine(), "SYSTEM");
+		case 0x7f40: return ioport("DSW1")->read();
+		case 0x7f41: return ioport("DSW2")->read();
+		case 0x7f42: return ioport("P1")->read();
+		case 0x7f43: return ioport("P2")->read();
+		case 0x7f44: return ioport("SYSTEM")->read();
 	}
 
 	return 0xff;

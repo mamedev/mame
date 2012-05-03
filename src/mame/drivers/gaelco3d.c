@@ -449,10 +449,10 @@ WRITE16_MEMBER(gaelco3d_state::analog_port_latch_w)
 	{
 		if (!(data & 0xff))
 		{
-			m_analog_ports[0] = input_port_read_safe(machine(), "ANALOG0", 0);
-			m_analog_ports[1] = input_port_read_safe(machine(), "ANALOG1", 0);
-			m_analog_ports[2] = input_port_read_safe(machine(), "ANALOG2", 0);
-			m_analog_ports[3] = input_port_read_safe(machine(), "ANALOG3", 0);
+			m_analog_ports[0] = ioport("ANALOG0")->read_safe(0);
+			m_analog_ports[1] = ioport("ANALOG1")->read_safe(0);
+			m_analog_ports[2] = ioport("ANALOG2")->read_safe(0);
+			m_analog_ports[3] = ioport("ANALOG3")->read_safe(0);
 		}
 	}
 	else

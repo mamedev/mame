@@ -721,7 +721,7 @@ WRITE8_MEMBER(sigmab98_state::sammymdl_hopper_w)
 
 READ8_MEMBER(sigmab98_state::sammymdl_coin_hopper_r)
 {
-	UINT8 ret = input_port_read(machine(), "COIN");
+	UINT8 ret = ioport("COIN")->read();
 
 //  if ( !machine().device<ticket_dispenser_device>("hopper")->read(0) )
 //      ret &= ~0x01;
@@ -1499,7 +1499,7 @@ static INPUT_PORTS_START( gegege )
 
 	PORT_START("EEPROM")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL )	// protection? checks. Must be 0
-	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_VBLANK  )	// protection? checks. Must be 0
+	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_CUSTOM  ) PORT_VBLANK("screen")	// protection? checks. Must be 0
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_UNKNOWN )
@@ -1537,7 +1537,7 @@ static INPUT_PORTS_START( pepsiman )
 
 	PORT_START("EEPROM")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL )	// protection? checks. Must be 0
-	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_VBLANK  )	// protection? checks. Must be 0
+	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_CUSTOM  ) PORT_VBLANK("screen")	// protection? checks. Must be 0
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_UNKNOWN )
@@ -1575,7 +1575,7 @@ static INPUT_PORTS_START( ucytokyu )
 
 	PORT_START("EEPROM")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL )	// protection? checks. Must be 0
-	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_VBLANK  )	// protection? checks. Must be 0
+	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_CUSTOM  ) PORT_VBLANK("screen")	// protection? checks. Must be 0
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_UNKNOWN )

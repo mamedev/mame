@@ -466,7 +466,7 @@ WRITE16_MEMBER(tmnt_state::ssriders_eeprom_w)
 		/* bit 0 is data */
 		/* bit 1 is cs (active low) */
 		/* bit 2 is clock (active high) */
-		input_port_write(machine(), "EEPROMOUT", data, 0xff);
+		ioport("EEPROMOUT")->write(data, 0xff);
 
 		/* bits 3-4 control palette dimming */
 		/* 4 = DIMPOL = when set, negate SHAD */

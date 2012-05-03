@@ -379,7 +379,7 @@ static READ8_DEVICE_HANDLER( dial_input_p1_r )
 	bagman_state *state = device->machine().driver_data<bagman_state>();
 	UINT8 dial_val;
 
-	dial_val = input_port_read(device->machine(), "DIAL_P1");
+	dial_val = state->ioport("DIAL_P1")->read();
 
 	if(state->m_p1_res != 0x60)
 		state->m_p1_res = 0x60;
@@ -392,7 +392,7 @@ static READ8_DEVICE_HANDLER( dial_input_p1_r )
 
 	state->m_p1_old_val = dial_val;
 
-	return (input_port_read(device->machine(), "P1") & 0x9f) | (state->m_p1_res);
+	return (state->ioport("P1")->read() & 0x9f) | (state->m_p1_res);
 }
 
 static READ8_DEVICE_HANDLER( dial_input_p2_r )
@@ -400,7 +400,7 @@ static READ8_DEVICE_HANDLER( dial_input_p2_r )
 	bagman_state *state = device->machine().driver_data<bagman_state>();
 	UINT8 dial_val;
 
-	dial_val = input_port_read(device->machine(), "DIAL_P2");
+	dial_val = state->ioport("DIAL_P2")->read();
 
 	if(state->m_p2_res != 0x60)
 		state->m_p2_res = 0x60;
@@ -413,7 +413,7 @@ static READ8_DEVICE_HANDLER( dial_input_p2_r )
 
 	state->m_p2_old_val = dial_val;
 
-	return (input_port_read(device->machine(), "P2") & 0x9f) | (state->m_p2_res);
+	return (state->ioport("P2")->read() & 0x9f) | (state->m_p2_res);
 }
 
 static const ay8910_interface ay8910_dial_config =

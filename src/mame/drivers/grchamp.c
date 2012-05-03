@@ -79,7 +79,7 @@
 static MACHINE_RESET( grchamp )
 {
 	/* if the coin system is 1 way, lock Coin B (Page 40) */
-	coin_lockout_w(machine, 1, (input_port_read(machine, "DSWB") & 0x10) ? 1 : 0);
+	coin_lockout_w(machine, 1, (machine.root_device().ioport("DSWB")->read() & 0x10) ? 1 : 0);
 }
 
 

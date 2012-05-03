@@ -2679,7 +2679,7 @@ SCREEN_UPDATE_RGB32(dc)
 		pvr_drawframebuffer(screen.machine(),bitmap,cliprect);
 
 	// update this here so we only do string lookup once per frame
-	state->debug_dip_status = input_port_read(screen.machine(), "MAMEDEBUG");
+	state->debug_dip_status = screen.machine().root_device().ioport("MAMEDEBUG")->read();
 
 	return 0;
 }

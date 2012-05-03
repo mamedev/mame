@@ -43,7 +43,7 @@ static void handle_coins(running_machine &machine, int coin)
 
 	if (coin & 1)	// Coin 2 !
 	{
-		tmp = (input_port_read(machine, "DSW") & 0xc0) >> 6;
+		tmp = (state->ioport("DSW")->read() & 0xc0) >> 6;
 		state->m_coins++;
 		if (state->m_coins >= coinage_table[tmp][0])
 		{
@@ -56,7 +56,7 @@ static void handle_coins(running_machine &machine, int coin)
 
 	if (coin & 2)	// Coin 1 !
 	{
-		tmp = (input_port_read(machine, "DSW") & 0x30) >> 4;
+		tmp = (machine.root_device().ioport("DSW")->read() & 0x30) >> 4;
 		state->m_coins++;
 		if (state->m_coins >= coinage_table[tmp][0])
 		{
@@ -89,12 +89,12 @@ READ8_MEMBER(xyonix_state::xyonix_io_r)
 		switch (m_e0_data)
 		{
 			case 0x81 :
-				return input_port_read(machine(), "P1") & 0x7f;
+				return ioport("P1")->read() & 0x7f;
 			case 0x82 :
-				return input_port_read(machine(), "P2") & 0x7f;
+				return ioport("P2")->read() & 0x7f;
 			case 0x91:
 				/* check coin inputs */
-				coin = ((input_port_read(machine(), "P1") & 0x80) >> 7) | ((input_port_read(machine(), "P2") & 0x80) >> 6);
+				coin = ((ioport("P1")->read() & 0x80) >> 7) | ((ioport("P2")->read() & 0x80) >> 6);
 				if (coin ^ m_prev_coin && coin != 3)
 				{
 					if (m_credits < 9) handle_coins(machine(), coin);
@@ -102,7 +102,7 @@ READ8_MEMBER(xyonix_state::xyonix_io_r)
 				m_prev_coin = coin;
 				return m_credits;
 			case 0x92:
-				return ((input_port_read(machine(), "P1") & 0x80) >> 7) | ((input_port_read(machine(), "P2") & 0x80) >> 6);
+				return ((ioport("P1")->read() & 0x80) >> 7) | ((ioport("P2")->read() & 0x80) >> 6);
 			case 0xe0:	/* reset? */
 				m_coins = 0;
 				m_credits = 0;
@@ -111,9 +111,9 @@ READ8_MEMBER(xyonix_state::xyonix_io_r)
 				m_credits--;
 				return 0xff;
 			case 0xfe:	/* Dip Switches 1 to 4 */
-				return input_port_read(machine(), "DSW") & 0x0f;
+				return ioport("DSW")->read() & 0x0f;
 			case 0xff:	/* Dip Switches 5 to 8 */
-				return input_port_read(machine(), "DSW") >> 4;
+				return ioport("DSW")->read() >> 4;
 		}
 	}
 

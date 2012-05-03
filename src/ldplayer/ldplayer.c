@@ -97,7 +97,7 @@ protected:
 
 	// internal state
 	astring m_filename;
-	input_port_value m_last_controls;
+	ioport_value m_last_controls;
 	bool m_playing;
 	required_device<laserdisc_device> m_laserdisc;
 };
@@ -217,7 +217,7 @@ chd_file *ldplayer_state::get_disc()
 
 void ldplayer_state::process_commands()
 {
-	input_port_value controls = input_port_read(machine(), "controls");
+	ioport_value controls = machine().root_device().ioport("controls")->read();
 	int number;
 
 	// step backwards

@@ -145,10 +145,10 @@ static TIMER_CALLBACK( flyball_quarter_callback	)
 
 	memset(potsense, 0, sizeof potsense);
 
-	potsense[input_port_read(machine, "STICK1_Y")] |= 1;
-	potsense[input_port_read(machine, "STICK1_X")] |= 2;
-	potsense[input_port_read(machine, "STICK0_Y")] |= 4;
-	potsense[input_port_read(machine, "STICK0_X")] |= 8;
+	potsense[state->ioport("STICK1_Y")->read()] |= 1;
+	potsense[state->ioport("STICK1_X")->read()] |= 2;
+	potsense[state->ioport("STICK0_Y")->read()] |= 4;
+	potsense[state->ioport("STICK0_X")->read()] |= 8;
 
 	for (i = 0; i < 64; i++)
 		if (potsense[i] != 0)
@@ -173,7 +173,7 @@ static TIMER_CALLBACK( flyball_quarter_callback	)
 /* two physical buttons (start game and stop runner) share the same port bit */
 READ8_MEMBER(flyball_state::flyball_input_r)
 {
-	return input_port_read(machine(), "IN0") & input_port_read(machine(), "IN1");
+	return ioport("IN1")->read();
 }
 
 READ8_MEMBER(flyball_state::flyball_scanline_r)

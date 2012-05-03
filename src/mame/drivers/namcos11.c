@@ -696,16 +696,16 @@ READ32_MEMBER(namcos11_state::lightgun_r)
 	switch( offset )
 	{
 	case 0:
-		data = input_port_read( machine(), "GUN1X" );
+		data = ioport( "GUN1X" )->read();
 		break;
 	case 1:
-		data = ( input_port_read( machine(), "GUN1Y" ) ) | ( ( input_port_read( machine(), "GUN1Y" ) + 1 ) << 16 );
+		data = ( ioport( "GUN1Y" )->read() ) | ( ( ioport( "GUN1Y" )->read() + 1 ) << 16 );
 		break;
 	case 2:
-		data = input_port_read( machine(), "GUN2X" );
+		data = ioport( "GUN2X" )->read();
 		break;
 	case 3:
-		data = ( input_port_read( machine(), "GUN2Y" ) ) | ( ( input_port_read( machine(), "GUN2Y" ) + 1 ) << 16 );
+		data = ( ioport( "GUN2Y" )->read() ) | ( ( ioport( "GUN2Y" )->read() + 1 ) << 16 );
 		break;
 	}
 	verboselog( machine(), 2, "lightgun_r( %08x, %08x ) %08x\n", offset, mem_mask, data );
@@ -750,16 +750,16 @@ READ16_MEMBER(namcos11_state::c76_inputs_r)
 	switch (offset)
 	{
 		case 0:
-			return input_port_read(machine(), "PLAYER4");
+			return ioport("PLAYER4")->read();
 
 		case 1:
-			return input_port_read(machine(), "SWITCH");
+			return ioport("SWITCH")->read();
 
 		case 2:
-			return input_port_read(machine(), "PLAYER1");
+			return ioport("PLAYER1")->read();
 
 		case 3:
-			return input_port_read(machine(), "PLAYER2");
+			return ioport("PLAYER2")->read();
 	}
 
 	return 0xff;
@@ -779,52 +779,52 @@ ADDRESS_MAP_END
 
 READ8_MEMBER(namcos11_state::dac7_r)// bit 7
 {
-	return input_port_read_safe(machine(), "PLAYER3", 0xff)&0x80;
+	return ioport("PLAYER3")->read_safe(0xff)&0x80;
 }
 
 READ8_MEMBER(namcos11_state::dac6_r)// bit 3
 {
-	return (input_port_read_safe(machine(), "PLAYER3", 0xff)<<4)&0x80;
+	return (ioport("PLAYER3")->read_safe(0xff)<<4)&0x80;
 }
 
 READ8_MEMBER(namcos11_state::dac5_r)// bit 2
 {
-	return (input_port_read_safe(machine(), "PLAYER3", 0xff)<<5)&0x80;
+	return (ioport("PLAYER3")->read_safe(0xff)<<5)&0x80;
 }
 
 READ8_MEMBER(namcos11_state::dac4_r)// bit 1
 {
-	return (input_port_read_safe(machine(), "PLAYER3", 0xff)<<6)&0x80;
+	return (ioport("PLAYER3")->read_safe(0xff)<<6)&0x80;
 }
 
 READ8_MEMBER(namcos11_state::dac3_r)// bit 0
 {
-	return (input_port_read_safe(machine(), "PLAYER3", 0xff)<<7)&0x80;
+	return (ioport("PLAYER3")->read_safe(0xff)<<7)&0x80;
 }
 
 READ8_MEMBER(namcos11_state::dac2_r)// bit 4
 {
-	return (input_port_read_safe(machine(), "PLAYER3", 0xff)<<3)&0x80;
+	return (ioport("PLAYER3")->read_safe(0xff)<<3)&0x80;
 }
 
 READ8_MEMBER(namcos11_state::dac1_r)// bit 5
 {
-	return (input_port_read_safe(machine(), "PLAYER3", 0xff)<<2)&0x80;
+	return (ioport("PLAYER3")->read_safe(0xff)<<2)&0x80;
 }
 
 READ8_MEMBER(namcos11_state::dac0_r)// bit 6
 {
-	return (input_port_read_safe(machine(), "PLAYER3", 0xff)<<1)&0x80;
+	return (ioport("PLAYER3")->read_safe(0xff)<<1)&0x80;
 }
 
 READ8_MEMBER(namcos11_state::pocketrc_gas_r)
 {
-	return input_port_read(machine(), "GAS");
+	return ioport("GAS")->read();
 }
 
 READ8_MEMBER(namcos11_state::pocketrc_steer_r)
 {
-	return input_port_read(machine(), "STEERING");
+	return ioport("STEERING")->read();
 }
 
 ADDRESS_MAP_START( c76_io_map, AS_IO, 8, namcos11_state )

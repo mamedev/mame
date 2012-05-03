@@ -630,11 +630,11 @@ READ8_MEMBER(bfm_sc2_state::mux_input_r)
 		t1 = m_input_override[offset];	// strobe 0-7 data 0-4
 		t2 = m_input_override[offset+idx];	// strobe 8-B data 0-4
 
-		t1 = (m_sc2_Inputs[offset]   & t1) | ( ( input_port_read(machine(), port[offset])   & ~t1) & 0x1F);
+		t1 = (m_sc2_Inputs[offset]   & t1) | ( ( ioport(port[offset])->read()   & ~t1) & 0x1F);
 		if (idx == 8)
-			t2 = (m_sc2_Inputs[offset+8] & t2) | ( ( input_port_read(machine(), port[offset+8]) & ~t2) << 5);
+			t2 = (m_sc2_Inputs[offset+8] & t2) | ( ( ioport(port[offset+8])->read() & ~t2) << 5);
 		else
-			t2 =  (m_sc2_Inputs[offset+4] & t2) | ( ( ( input_port_read(machine(), port[offset+4]) & ~t2) << 2) & 0x60);
+			t2 =  (m_sc2_Inputs[offset+4] & t2) | ( ( ( ioport(port[offset+4])->read() & ~t2) << 2) & 0x60);
 
 		m_sc2_Inputs[offset]   = (m_sc2_Inputs[offset]   & ~0x1F) | t1;
 		m_sc2_Inputs[offset+idx] = (m_sc2_Inputs[offset+idx] & ~0x60) | t2;
@@ -857,7 +857,7 @@ WRITE8_MEMBER(bfm_sc2_state::coininhib_w)
 
 READ8_MEMBER(bfm_sc2_state::coin_input_r)
 {
-	return input_port_read(machine(), "COINS");
+	return ioport("COINS")->read();
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -1696,10 +1696,10 @@ static INPUT_PORTS_START( gldncrwn )
 
 	PORT_MODIFY("STROBE11")
 	PORT_DIPNAME( 0x01, 0x00, "Credits required:" )PORT_DIPLOCATION("DIL:!12")
-	PORT_DIPSETTING(    0x00, "4 credits per game")PORT_CONDITION("STROBE10",0x10,PORTCOND_EQUALS,0x00)
-	PORT_DIPSETTING(    0x01, "2 credits per game")PORT_CONDITION("STROBE10",0x10,PORTCOND_EQUALS,0x00)
-	PORT_DIPSETTING(    0x00, "1 credit  per round")PORT_CONDITION("STROBE10",0x10,PORTCOND_EQUALS,0x10)
-	PORT_DIPSETTING(    0x01, "4 credits per round")PORT_CONDITION("STROBE10",0x10,PORTCOND_EQUALS,0x10)
+	PORT_DIPSETTING(    0x00, "4 credits per game")PORT_CONDITION("STROBE10",0x10,EQUALS,0x00)
+	PORT_DIPSETTING(    0x01, "2 credits per game")PORT_CONDITION("STROBE10",0x10,EQUALS,0x00)
+	PORT_DIPSETTING(    0x00, "1 credit  per round")PORT_CONDITION("STROBE10",0x10,EQUALS,0x10)
+	PORT_DIPSETTING(    0x01, "4 credits per round")PORT_CONDITION("STROBE10",0x10,EQUALS,0x10)
 	PORT_DIPNAME( 0x02, 0x00, "Attract Mode" )PORT_DIPLOCATION("DIL:!13")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On  ) )

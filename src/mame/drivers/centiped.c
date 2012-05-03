@@ -528,10 +528,10 @@ INLINE int read_trackball(running_machine &machine, int idx, int switch_port)
 
 	/* if we're to read the dipswitches behind the trackball data, do it now */
 	if (state->m_dsw_select)
-		return (input_port_read(machine, portnames[switch_port]) & 0x7f) | state->m_sign[idx];
+		return (machine.root_device().ioport(portnames[switch_port])->read() & 0x7f) | state->m_sign[idx];
 
 	/* get the new position and adjust the result */
-	newpos = input_port_read(machine, tracknames[idx]);
+	newpos = machine.root_device().ioport(tracknames[idx])->read();
 	if (newpos != state->m_oldpos[idx])
 	{
 		state->m_sign[idx] = (newpos - state->m_oldpos[idx]) & 0x80;
@@ -539,7 +539,7 @@ INLINE int read_trackball(running_machine &machine, int idx, int switch_port)
 	}
 
 	/* blend with the bits from the switch port */
-	return (input_port_read(machine, portnames[switch_port]) & 0x70) | (state->m_oldpos[idx] & 0x0f) | state->m_sign[idx];
+	return (machine.root_device().ioport(portnames[switch_port])->read() & 0x70) | (state->m_oldpos[idx] & 0x0f) | state->m_sign[idx];
 }
 
 
@@ -562,7 +562,7 @@ READ8_MEMBER(centiped_state::milliped_IN1_r)
 
 READ8_MEMBER(centiped_state::milliped_IN2_r)
 {
-	UINT8 data = input_port_read(machine(), "IN2");
+	UINT8 data = ioport("IN2")->read();
 
 	/* MSH - 15 Feb, 2007
      * The P2 X Joystick inputs are not properly handled in
@@ -573,7 +573,7 @@ READ8_MEMBER(centiped_state::milliped_IN2_r)
      */
 	if (0 != m_control_select) {
 		/* Bottom 4 bits is our joystick inputs */
-		UINT8 joy2data = input_port_read(machine(), "IN3") & 0x0f;
+		UINT8 joy2data = ioport("IN3")->read() & 0x0f;
 		data = data & 0xf0; /* Keep the top 4 bits */
 		data |= (joy2data & 0x0a) >> 1; /* flip left and up */
 		data |= (joy2data & 0x05) << 1; /* flip right and down */
@@ -599,7 +599,7 @@ READ8_MEMBER(centiped_state::mazeinv_input_r)
 {
 	static const char *const sticknames[] = { "STICK0", "STICK1", "STICK2", "STICK3" };
 
-	return input_port_read(machine(), sticknames[m_control_select]);
+	return ioport(sticknames[m_control_select])->read();
 }
 
 
@@ -879,7 +879,7 @@ static INPUT_PORTS_START( centiped )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Cocktail ) )
 	PORT_SERVICE( 0x20, IP_ACTIVE_LOW )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* trackball sign bit */
 
 	PORT_START("IN1")
@@ -1115,7 +1115,7 @@ static INPUT_PORTS_START( milliped )
 	PORT_DIPSETTING(   0x0c, "0 1x 2x 3x" )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL )		/* trackball sign bit */
 
 	PORT_START("IN1")	/* $2001 */ /* see port 7 for y trackball */
@@ -1224,7 +1224,7 @@ static INPUT_PORTS_START( warlords )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
 	PORT_SERVICE( 0x20, IP_ACTIVE_LOW )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x80, "Upright (overlay)" )
 	PORT_DIPSETTING(    0x00, "Cocktail (no overlay)" )
@@ -1307,7 +1307,7 @@ static INPUT_PORTS_START( mazeinv )
 	PORT_DIPNAME( 0x40, 0x00, "Minimum credits" )		PORT_DIPLOCATION("SW0:!7")
 	PORT_DIPSETTING(    0x00, "1" )
 	PORT_DIPSETTING(    0x40, "2" )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("IN1")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1396,7 +1396,7 @@ static INPUT_PORTS_START( bullsdrt )
 	PORT_START("IN0")
 	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* trackball data */
 	PORT_BIT( 0x30, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* trackball sign bit */
 
 	PORT_START("IN1")

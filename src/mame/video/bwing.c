@@ -150,7 +150,7 @@ WRITE8_MEMBER(bwing_state::bwing_paletteram_w)
 	g = ((g << 5) + (g << 2) + (g >> 1));
 	b = ((b << 5) + (b << 2) + (b >> 1));
 
-	if ((i = input_port_read(machine(), "EXTRA")) < 4)
+	if ((i = ioport("EXTRA")->read()) < 4)
 	{
 		r = (float)r * rgb[i][0];
 		g = (float)g * rgb[i][1];

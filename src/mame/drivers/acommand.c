@@ -321,7 +321,7 @@ READ16_MEMBER(acommand_state::ac_devices_r)
                 ---- ---- ---- --x- (Activate Test)
                 ---- ---- ---- ---x (Advance through Tests)
             */
-			return input_port_read(machine(), "IN0");
+			return ioport("IN0")->read();
 		case 0x0014/2:
 		case 0x0016/2:
 			return machine().device<okim6295_device>("oki1")->read(space,0);
@@ -392,7 +392,7 @@ READ16_MEMBER(acommand_state::ac_devices_r)
                 xxxx xxxx ---- ---- DIPSW4
                 ---- ---- xxxx xxxx DIPSW3
             */
-			return input_port_read(machine(), "IN1");
+			return ioport("IN1")->read();
 	}
 	return m_ac_devram[offset];
 }

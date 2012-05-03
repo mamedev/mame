@@ -83,7 +83,7 @@ SCREEN_UPDATE_IND16( canyon )
 	draw_bombs(screen.machine(), bitmap, cliprect);
 
 	/* watchdog is disabled during service mode */
-	screen.machine().watchdog_enable(!(input_port_read(screen.machine(), "IN2") & 0x10));
+	screen.machine().watchdog_enable(!(screen.machine().root_device().ioport("IN2")->read() & 0x10));
 
 	return 0;
 }

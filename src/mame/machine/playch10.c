@@ -46,7 +46,7 @@ MACHINE_RESET( pc10 )
 MACHINE_START( pc10 )
 {
 	playch10_state *state = machine.driver_data<playch10_state>();
-	state->m_vrom = machine.root_device().memregion("gfx2")->base();
+	state->m_vrom = state->memregion("gfx2")->base();
 
 	/* allocate 4K of nametable ram here */
 	/* move to individual boards as documentation of actual boards allows */
@@ -214,8 +214,8 @@ WRITE8_MEMBER(playch10_state::pc10_in0_w)
 		return;
 
 	/* load up the latches */
-	m_input_latch[0] = input_port_read(machine(), "P1");
-	m_input_latch[1] = input_port_read(machine(), "P2");
+	m_input_latch[0] = ioport("P1")->read();
+	m_input_latch[1] = ioport("P2")->read();
 
 	/* apply any masking from the BIOS */
 	if (m_cntrl_mask)
@@ -250,9 +250,9 @@ READ8_MEMBER(playch10_state::pc10_in1_r)
 	if (m_pc10_gun_controller)
 	{
 		ppu2c0x_device *ppu = machine().device<ppu2c0x_device>("ppu");
-		int trigger = input_port_read(machine(), "P1");
-		int x = input_port_read(machine(), "GUNX");
-		int y = input_port_read(machine(), "GUNY");
+		int trigger = ioport("P1")->read();
+		int x = ioport("GUNX")->read();
+		int y = ioport("GUNY")->read();
 		UINT32 pix, color_base;
 
 		/* no sprite hit (yet) */

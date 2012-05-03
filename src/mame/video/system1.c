@@ -363,7 +363,7 @@ WRITE8_MEMBER(system1_state::system1_paletteram_w)
 static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int xoffset)
 {
 	system1_state *state = machine.driver_data<system1_state>();
-	UINT32 gfxbanks = machine.root_device().memregion("sprites")->bytes() / 0x8000;
+	UINT32 gfxbanks = state->memregion("sprites")->bytes() / 0x8000;
 	const UINT8 *gfxbase = state->memregion("sprites")->base();
 	UINT8 *spriteram = state->m_spriteram;
 	int flipscreen = state->flip_screen();

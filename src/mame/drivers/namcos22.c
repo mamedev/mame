@@ -1183,9 +1183,9 @@ nthbyte( const UINT32 *pSource, int offs )
 static void
 ReadAnalogDrivingPorts( running_machine &machine, UINT16 *gas, UINT16 *brake, UINT16 *steer )
 {
-	*gas   = input_port_read(machine, "GAS");
-	*brake = input_port_read(machine, "BRAKE");
-	*steer = input_port_read(machine, "STEER");
+	*gas   = machine.root_device().ioport("GAS")->read();
+	*brake = machine.root_device().ioport("BRAKE")->read();
+	*steer = machine.root_device().ioport("STEER")->read();
 }
 
 /* TODO: REMOVE (THIS IS HANDLED BY "SUBCPU") */
@@ -1193,9 +1193,9 @@ static UINT16
 AnalogAsDigital( running_machine &machine )
 {
 	namcos22_state *state = machine.driver_data<namcos22_state>();
-	UINT16 inputs = input_port_read_safe(machine, "INPUTS", 0);
-	UINT16 gas    = input_port_read_safe(machine, "GAS", 0);
-	UINT16 steer  = input_port_read_safe(machine, "STEER", 0);
+	UINT16 inputs = state->ioport("INPUTS")->read_safe(0);
+	UINT16 gas    = state->ioport("GAS")->read_safe(0);
+	UINT16 steer  = state->ioport("STEER")->read_safe(0);
 	UINT16 result = 0xffff;
 
 	switch( state->m_gametype )
@@ -1248,7 +1248,7 @@ HandleCoinage(running_machine &machine, int slots, int address_is_odd)
 	UINT16 *share16 = (UINT16 *)state->m_shareram.target();
 	UINT32 coin_state;
 
-	coin_state = input_port_read(machine, "INPUTS") & 0x1200;
+	coin_state = state->ioport("INPUTS")->read() & 0x1200;
 
 	if (!(coin_state & 0x1000) && (state->m_old_coin_state & 0x1000))
 	{
@@ -1277,7 +1277,7 @@ HandleDrivingIO( running_machine &machine )
 	namcos22_state *state = machine.driver_data<namcos22_state>();
 	if( nthbyte(state->m_system_controller, 0x18) != 0 )
 	{
-		UINT16 flags = input_port_read(machine, "INPUTS");
+		UINT16 flags = state->ioport("INPUTS")->read();
 		UINT16 gas, brake, steer, coinram_address_is_odd = 0;
 		ReadAnalogDrivingPorts( machine, &gas, &brake, &steer );
 
@@ -1335,12 +1335,12 @@ HandleCyberCommandoIO( running_machine &machine )
 	namcos22_state *state = machine.driver_data<namcos22_state>();
 	if( nthbyte(state->m_system_controller, 0x18) != 0 )
 	{
-		UINT16 flags = input_port_read(machine, "INPUTS");
+		UINT16 flags = state->ioport("INPUTS")->read();
 
-		UINT16 volume0 = input_port_read(machine, "STICKY1") * 0x10;
-		UINT16 volume1 = input_port_read(machine, "STICKY2") * 0x10;
-		UINT16 volume2 = input_port_read(machine, "STICKX1") * 0x10;
-		UINT16 volume3 = input_port_read(machine, "STICKX2") * 0x10;
+		UINT16 volume0 = state->ioport("STICKY1")->read() * 0x10;
+		UINT16 volume1 = state->ioport("STICKY2")->read() * 0x10;
+		UINT16 volume2 = state->ioport("STICKX1")->read() * 0x10;
+		UINT16 volume3 = state->ioport("STICKX2")->read() * 0x10;
 
 		state->m_shareram[0x030/4] = (flags<<16) | volume0;
 		state->m_shareram[0x034/4] = (volume1<<16) | volume2;
@@ -2421,7 +2421,7 @@ WRITE32_MEMBER(namcos22_state::namcos22_portbit_w)
 
 READ32_MEMBER(namcos22_state::namcos22_dipswitch_r)
 {
-	return input_port_read(machine(), "DSW0")<<16;
+	return ioport("DSW0")->read()<<16;
 }
 
 READ32_MEMBER(namcos22_state::namcos22_mcuram_r)
@@ -2436,8 +2436,8 @@ WRITE32_MEMBER(namcos22_state::namcos22_mcuram_w)
 
 READ32_MEMBER(namcos22_state::namcos22_gun_r)
 {
-	int xpos = input_port_read_safe(machine(), "LIGHTX", 0) * 640 / 0xff;
-	int ypos = input_port_read_safe(machine(), "LIGHTY", 0) * 240 / 0xff + 0x10;
+	int xpos = ioport("LIGHTX")->read_safe(0) * 640 / 0xff;
+	int ypos = ioport("LIGHTY")->read_safe(0) * 240 / 0xff + 0x10;
 	switch( offset )
 	{
 	case 0: /* 430000 */
@@ -2626,9 +2626,9 @@ READ8_MEMBER(namcos22_state::mcu_port5_r)
 {
 
 	if (m_p4 & 8)
-		return input_port_read_safe(machine(), "MCUP5A", 0xff);
+		return ioport("MCUP5A")->read_safe(0xff);
 	else
-		return input_port_read_safe(machine(), "MCUP5B", 0xff);
+		return ioport("MCUP5B")->read_safe(0xff);
 }
 
 WRITE8_MEMBER(namcos22_state::mcu_port6_w)
@@ -2666,9 +2666,9 @@ READ8_MEMBER(namcos22_state::propcycle_mcu_adc_r)
 	// H+L = horizontal, 1 H+L = vertical
 	UINT16 ddx, ddy;
 
-	ddx = input_port_read(machine(), "STICKX");
+	ddx = ioport("STICKX")->read();
 	if (ddx > 0) ddx -= 1;
-	ddy = input_port_read(machine(), "STICKY");
+	ddy = ioport("STICKY")->read();
 	if (ddy > 0) ddy -= 1;
 
 	ddx <<= 2;
@@ -2685,7 +2685,7 @@ READ8_MEMBER(namcos22_state::propcycle_mcu_adc_r)
 			// and timer A3 is configured by the MCU program to cause an interrupt each time
 			// it's clocked.  by counting the number of interrupts in a frame, we can determine
 			// how fast the user is pedaling.
-			if( input_port_read(machine(), "JOY") & 0x10 )
+			if( ioport("JOY")->read() & 0x10 )
 			{
 				int i;
 				for (i = 0; i < 16; i++)
@@ -2739,8 +2739,8 @@ WRITE8_MEMBER(namcos22_state::alpine_mcu_port5_w)
 READ8_MEMBER(namcos22_state::alpineracer_mcu_adc_r)
 {
 	// 0 H+L = swing, 1 H+L = edge
-	UINT16 swing = input_port_read(machine(), "SWING")<<2;
-	UINT16 edge  = input_port_read(machine(), "EDGE" )<<2;
+	UINT16 swing = ioport("SWING")->read()<<2;
+	UINT16 edge  = ioport("EDGE" )->read()<<2;
 
 	switch (offset)
 	{
@@ -2833,9 +2833,9 @@ READ8_MEMBER(namcos22_state::aquajet_mcu_adc_r)
 {
 	UINT16 gas, steer, ddy;
 
-	gas   = input_port_read(machine(), "GAS") ^ 0x7f;
-	steer = input_port_read(machine(), "STEER") ^ 0xff;
-	ddy = input_port_read(machine(), "STICKY");
+	gas   = ioport("GAS")->read() ^ 0x7f;
+	steer = ioport("STEER")->read() ^ 0xff;
+	ddy = ioport("STICKY")->read();
 	if (ddy > 0) ddy -= 1;
 
 	gas <<= 2;
@@ -2877,9 +2877,9 @@ READ8_MEMBER(namcos22_state::airco22_mcu_adc_r)
 {
 	UINT16 pedal, x, y;
 
-	pedal = input_port_read(machine(), "PEDAL")<<2;
-	x = input_port_read(machine(), "STICKX")<<2;
-	y = input_port_read(machine(), "STICKY")<<2;
+	pedal = ioport("PEDAL")->read()<<2;
+	x = ioport("STICKX")->read()<<2;
+	y = ioport("STICKY")->read()<<2;
 
 
 	switch (offset)

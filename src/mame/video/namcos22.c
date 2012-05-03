@@ -2741,9 +2741,9 @@ static VIDEO_START( common )
 	for (code = 0; code < machine.gfx[GFX_TEXTURE_TILE]->total_elements; code++)
 		gfx_element_decode(machine.gfx[GFX_TEXTURE_TILE], code);
 
-	Prepare3dTexture(machine, machine.root_device().memregion("textilemap")->base(), machine.gfx[GFX_TEXTURE_TILE]->gfxdata );
+	Prepare3dTexture(machine, state->memregion("textilemap")->base(), machine.gfx[GFX_TEXTURE_TILE]->gfxdata );
 	state->m_dirtypal = auto_alloc_array(machine, UINT8, NAMCOS22_PALETTE_SIZE/4);
-	state->m_mPtRomSize = machine.root_device().memregion("pointrom")->bytes()/3;
+	state->m_mPtRomSize = state->memregion("pointrom")->bytes()/3;
 	state->m_mpPolyL = state->memregion("pointrom")->base();
 	state->m_mpPolyM = state->m_mpPolyL + state->m_mPtRomSize;
 	state->m_mpPolyH = state->m_mpPolyM + state->m_mPtRomSize;

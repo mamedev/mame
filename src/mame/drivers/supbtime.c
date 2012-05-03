@@ -36,11 +36,11 @@ READ16_MEMBER(supbtime_state::supbtime_controls_r)
 	switch (offset << 1)
 	{
 		case 0:
-			return input_port_read(machine(), "INPUTS");
+			return ioport("INPUTS")->read();
 		case 2:
-			return input_port_read(machine(), "DSW");
+			return ioport("DSW")->read();
 		case 8:
-			return input_port_read(machine(), "COIN");
+			return ioport("COIN")->read();
 		case 10: /* ?  Not used for anything */
 		case 12:
 			return 0;
@@ -131,7 +131,7 @@ static INPUT_PORTS_START( supbtime )
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN3 )
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -209,7 +209,7 @@ static INPUT_PORTS_START( chinatwn )
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN3 )
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )

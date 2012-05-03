@@ -300,7 +300,7 @@ READ8_MEMBER(thayers_state::cop_si_r)
 
 			sprintf(port, "R%d", m_keylatch);
 
-			data = BIT(input_port_read(machine(), port), m_rx_bit - 5);
+			data = BIT(ioport(port)->read(), m_rx_bit - 5);
 
 			return data;
 		}
@@ -359,7 +359,7 @@ WRITE8_MEMBER(thayers_state::control2_w)
 
 READ8_MEMBER(thayers_state::dsw_b_r)
 {
-	return (input_port_read(machine(), "COIN") & 0xf0) | (input_port_read(machine(), "DSWB") & 0x0f);
+	return (ioport("COIN")->read() & 0xf0) | (ioport("DSWB")->read() & 0x0f);
 }
 
 READ8_MEMBER(thayers_state::laserdsc_data_r)
@@ -764,7 +764,7 @@ static MACHINE_RESET( thayers )
 	state->m_cart_present = 0;
 	state->m_pr7820_enter = 0;
 
-//  newtype = (input_port_read(machine, "DSWB") & 0x18) ? LASERDISC_TYPE_PIONEER_LDV1000 : LASERDISC_TYPE_PIONEER_PR7820;
+//  newtype = (state->ioport("DSWB")->read() & 0x18) ? LASERDISC_TYPE_PIONEER_LDV1000 : LASERDISC_TYPE_PIONEER_PR7820;
 //  laserdisc_set_type(state->m_laserdisc, newtype);
 }
 

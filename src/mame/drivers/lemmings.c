@@ -36,10 +36,10 @@ READ16_MEMBER(lemmings_state::lemmings_trackball_r)
 {
 	switch (offset)
 	{
-	case 0: return input_port_read(machine(), "AN0");
-	case 1: return input_port_read(machine(), "AN1");
-	case 4: return input_port_read(machine(), "AN2");
-	case 5: return input_port_read(machine(), "AN3");
+	case 0: return ioport("AN0")->read();
+	case 1: return ioport("AN1")->read();
+	case 4: return ioport("AN2")->read();
+	case 5: return ioport("AN3")->read();
 	}
 	return 0;
 }
@@ -50,13 +50,13 @@ READ16_MEMBER(lemmings_state::lemmings_prot_r)
 	switch (offset << 1)
 	{
 		case 0x41a:
-			return input_port_read(machine(), "BUTTONS");
+			return ioport("BUTTONS")->read();
 
 		case 0x320:
-			return input_port_read(machine(), "SYSTEM");
+			return ioport("SYSTEM")->read();
 
 		case 0x4e6:
-			return input_port_read(machine(), "DSW");
+			return ioport("DSW")->read();
 	}
 
 	return 0;
@@ -143,7 +143,7 @@ static INPUT_PORTS_START( lemmings )
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_SERVICE_NO_TOGGLE(0x0004, IP_ACTIVE_LOW)
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )

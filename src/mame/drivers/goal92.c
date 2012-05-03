@@ -29,15 +29,15 @@ READ16_MEMBER(goal92_state::goal92_inputs_r)
 	switch(offset)
 	{
 		case 0:
-			return input_port_read(machine(), "DSW1");
+			return ioport("DSW1")->read();
 		case 1:
-			return input_port_read(machine(), "IN1");
+			return ioport("IN1")->read();
 		case 2:
-			return input_port_read(machine(), "IN2");
+			return ioport("IN2")->read();
 		case 3:
-			return input_port_read(machine(), "IN3");
+			return ioport("IN3")->read();
 		case 7:
-			return input_port_read(machine(), "DSW2");
+			return ioport("DSW2")->read();
 
 		default:
 			logerror("reading unhandled goal92 inputs %04X %04X @ PC = %04X\n", offset, mem_mask,cpu_get_pc(&space.device()));

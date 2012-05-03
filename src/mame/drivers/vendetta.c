@@ -134,7 +134,7 @@ WRITE8_MEMBER(vendetta_state::vendetta_eeprom_w)
 		return;
 
 	/* EEPROM */
-	input_port_write(machine(), "EEPROMOUT", data, 0xff);
+	ioport("EEPROMOUT")->write(data, 0xff);
 
 	m_irq_enabled = (data >> 6) & 1;
 
@@ -322,7 +322,7 @@ static INPUT_PORTS_START( vendet4p )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* EEPROM ready */
 	PORT_SERVICE_NO_TOGGLE(0x04, IP_ACTIVE_LOW)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_VBLANK ) /* not really vblank, object related. Its timed, otherwise sprites flicker */
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen") /* not really vblank, object related. Its timed, otherwise sprites flicker */
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START( "EEPROMOUT" )
@@ -378,7 +378,7 @@ static INPUT_PORTS_START( esckids )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* EEPROM ready */
 	PORT_SERVICE_NO_TOGGLE(0x04, IP_ACTIVE_LOW)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_VBLANK ) /* not really vblank, object related. Its timed, otherwise sprites flicker */
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen") /* not really vblank, object related. Its timed, otherwise sprites flicker */
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START( "EEPROMOUT" )

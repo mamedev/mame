@@ -845,7 +845,7 @@ READ16_MEMBER(m72_state::poundfor_trackball_r)
 
 		for (i = 0;i < 4;i++)
 		{
-			curr = input_port_read(machine(), axisnames[i]);
+			curr = ioport(axisnames[i])->read();
 			m_diff[i] = (curr - m_prev[i]);
 			m_prev[i] = curr;
 		}
@@ -857,7 +857,7 @@ READ16_MEMBER(m72_state::poundfor_trackball_r)
 		case 0:
 			return (m_diff[0] & 0xff) | ((m_diff[2] & 0xff) << 8);
 		case 1:
-			return ((m_diff[0] >> 8) & 0x1f) | (m_diff[2] & 0x1f00) | (input_port_read(machine(), "IN0") & 0xe0e0);
+			return ((m_diff[0] >> 8) & 0x1f) | (m_diff[2] & 0x1f00) | (ioport("IN0")->read() & 0xe0e0);
 		case 2:
 			return (m_diff[1] & 0xff) | ((m_diff[3] & 0xff) << 8);
 		case 3:
@@ -1122,7 +1122,7 @@ static ADDRESS_MAP_START( mcu_io_map, AS_IO, 8, m72_state )
 ADDRESS_MAP_END
 
 #define COIN_MODE_1 \
-	PORT_DIPNAME( 0x00f0, 0x00f0, DEF_STR( Coinage ) ) PORT_CONDITION("DSW", 0x0400, PORTCOND_NOTEQUALS, 0x0000) PORT_DIPLOCATION("SW1:5,6,7,8") \
+	PORT_DIPNAME( 0x00f0, 0x00f0, DEF_STR( Coinage ) ) PORT_CONDITION("DSW", 0x0400, NOTEQUALS, 0x0000) PORT_DIPLOCATION("SW1:5,6,7,8") \
 	PORT_DIPSETTING(      0x00a0, DEF_STR( 6C_1C ) ) \
 	PORT_DIPSETTING(      0x00b0, DEF_STR( 5C_1C ) ) \
 	PORT_DIPSETTING(      0x00c0, DEF_STR( 4C_1C ) ) \
@@ -1141,12 +1141,12 @@ ADDRESS_MAP_END
 	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )
 
 #define COIN_MODE_2_A \
-	PORT_DIPNAME( 0x0030, 0x0030, DEF_STR( Coin_A ) ) PORT_CONDITION("DSW", 0x0400, PORTCOND_EQUALS, 0x0000) PORT_DIPLOCATION("SW1:5,6") \
+	PORT_DIPNAME( 0x0030, 0x0030, DEF_STR( Coin_A ) ) PORT_CONDITION("DSW", 0x0400, EQUALS, 0x0000) PORT_DIPLOCATION("SW1:5,6") \
 	PORT_DIPSETTING(      0x0000, DEF_STR( 5C_1C ) ) \
 	PORT_DIPSETTING(      0x0010, DEF_STR( 3C_1C ) ) \
 	PORT_DIPSETTING(      0x0020, DEF_STR( 2C_1C ) ) \
 	PORT_DIPSETTING(      0x0030, DEF_STR( 1C_1C ) ) \
-	PORT_DIPNAME( 0x00c0, 0x00c0, DEF_STR( Coin_B ) ) PORT_CONDITION("DSW", 0x0400, PORTCOND_EQUALS, 0x0000) PORT_DIPLOCATION("SW1:7,8") \
+	PORT_DIPNAME( 0x00c0, 0x00c0, DEF_STR( Coin_B ) ) PORT_CONDITION("DSW", 0x0400, EQUALS, 0x0000) PORT_DIPLOCATION("SW1:7,8") \
 	PORT_DIPSETTING(      0x00c0, DEF_STR( 1C_2C ) ) \
 	PORT_DIPSETTING(      0x0080, DEF_STR( 1C_3C ) ) \
 	PORT_DIPSETTING(      0x0040, DEF_STR( 1C_5C ) ) \
@@ -1426,10 +1426,10 @@ static INPUT_PORTS_START( xmultipl )
 	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0200, 0x0000, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW2:2")
-	PORT_DIPSETTING(      0x0000, "Upright (single)" )		PORT_CONDITION("DSW", 0x1000, PORTCOND_NOTEQUALS, 0x0000)
-	PORT_DIPSETTING(      0x0200, DEF_STR( Cocktail ) )		PORT_CONDITION("DSW", 0x1000, PORTCOND_NOTEQUALS, 0x0000)
-	PORT_DIPSETTING(      0x0000, "Upright (double) On" )	PORT_CONDITION("DSW", 0x1000, PORTCOND_EQUALS, 0x0000)
-	PORT_DIPSETTING(      0x0200, "Upright (double) Off" )	PORT_CONDITION("DSW", 0x1000, PORTCOND_EQUALS, 0x0000)
+	PORT_DIPSETTING(      0x0000, "Upright (single)" )		PORT_CONDITION("DSW", 0x1000, NOTEQUALS, 0x0000)
+	PORT_DIPSETTING(      0x0200, DEF_STR( Cocktail ) )		PORT_CONDITION("DSW", 0x1000, NOTEQUALS, 0x0000)
+	PORT_DIPSETTING(      0x0000, "Upright (double) On" )	PORT_CONDITION("DSW", 0x1000, EQUALS, 0x0000)
+	PORT_DIPSETTING(      0x0200, "Upright (double) Off" )	PORT_CONDITION("DSW", 0x1000, EQUALS, 0x0000)
 	PORT_DIPNAME( 0x0400, 0x0400, "Coin Mode" ) PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(      0x0400, "Mode 1" )
 	PORT_DIPSETTING(      0x0000, "Mode 2" )
@@ -1621,7 +1621,7 @@ static INPUT_PORTS_START( poundfor )
 	PORT_DIPSETTING(      0x0800, "Mode 1" )
 	PORT_DIPSETTING(      0x0000, "Mode 2" )
 	/* Coin Mode 1 */
-	PORT_DIPNAME( 0xf000, 0xf000, DEF_STR( Coinage ) ) PORT_CONDITION("DSW", 0x0800, PORTCOND_NOTEQUALS, 0x0000) PORT_DIPLOCATION("SW2:5,6,7,8")
+	PORT_DIPNAME( 0xf000, 0xf000, DEF_STR( Coinage ) ) PORT_CONDITION("DSW", 0x0800, NOTEQUALS, 0x0000) PORT_DIPLOCATION("SW2:5,6,7,8")
 	PORT_DIPSETTING(      0xa000, DEF_STR( 6C_1C ) )
 	PORT_DIPSETTING(      0xb000, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(      0xc000, DEF_STR( 4C_1C ) )
@@ -1683,7 +1683,7 @@ static INPUT_PORTS_START( airduel )
 	PORT_DIPSETTING(      0x0800, "Mode 1" )
 	PORT_DIPSETTING(      0x0000, "Mode 2" )
 	/* Coin Mode 1 */
-	PORT_DIPNAME( 0xf000, 0xf000, DEF_STR( Coinage ) ) PORT_CONDITION("DSW", 0x0800, PORTCOND_NOTEQUALS, 0x0000) PORT_DIPLOCATION("SW2:5,6,7,8")
+	PORT_DIPNAME( 0xf000, 0xf000, DEF_STR( Coinage ) ) PORT_CONDITION("DSW", 0x0800, NOTEQUALS, 0x0000) PORT_DIPLOCATION("SW2:5,6,7,8")
 	PORT_DIPSETTING(      0xa000, DEF_STR( 6C_1C ) )
 	PORT_DIPSETTING(      0xb000, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(      0xc000, DEF_STR( 4C_1C ) )

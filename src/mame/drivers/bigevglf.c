@@ -196,14 +196,14 @@ READ8_MEMBER(bigevglf_state::beg_trackball_x_r)
 {
 	static const char *const portx_name[2] = { "P1X", "P2X" };
 
-	return input_port_read(machine(), portx_name[m_port_select]);
+	return ioport(portx_name[m_port_select])->read();
 }
 
 READ8_MEMBER(bigevglf_state::beg_trackball_y_r)
 {
 	static const char *const porty_name[2] = { "P1Y", "P2Y" };
 
-	return input_port_read(machine(), porty_name[m_port_select]);
+	return ioport(porty_name[m_port_select])->read();
 }
 
 WRITE8_MEMBER(bigevglf_state::beg_port08_w)
@@ -336,7 +336,7 @@ READ8_MEMBER(bigevglf_state::sub_cpu_mcu_coin_port_r)
 
     */
 	m_mcu_coin_bit5 ^= 0x20;
-	return bigevglf_mcu_status_r(space, 0) | (input_port_read(machine(), "PORT04") & 3) | m_mcu_coin_bit5;	/* bit 0 and bit 1 - coin inputs */
+	return bigevglf_mcu_status_r(space, 0) | (ioport("PORT04")->read() & 3) | m_mcu_coin_bit5;	/* bit 0 and bit 1 - coin inputs */
 }
 
 static ADDRESS_MAP_START( bigevglf_sub_portmap, AS_IO, 8, bigevglf_state )

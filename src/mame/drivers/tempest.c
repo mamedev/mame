@@ -334,14 +334,12 @@ WRITE8_MEMBER(tempest_state::wdclr_w)
 
 CUSTOM_INPUT_MEMBER(tempest_state::tempest_knob_r)
 {
-	return input_port_read(machine(), (m_player_select == 0) ?
-										TEMPEST_KNOB_P1_TAG : TEMPEST_KNOB_P2_TAG);
+	return ioport((m_player_select == 0) ? TEMPEST_KNOB_P1_TAG : TEMPEST_KNOB_P2_TAG)->read();
 }
 
 CUSTOM_INPUT_MEMBER(tempest_state::tempest_buttons_r)
 {
-	return input_port_read(machine(), (m_player_select == 0) ?
-										TEMPEST_BUTTONS_P1_TAG : TEMPEST_BUTTONS_P2_TAG);
+	return ioport((m_player_select == 0) ? TEMPEST_BUTTONS_P1_TAG : TEMPEST_BUTTONS_P2_TAG)->read();
 }
 
 
@@ -354,13 +352,13 @@ CUSTOM_INPUT_MEMBER(tempest_state::clock_r)
 
 static READ8_DEVICE_HANDLER( input_port_1_bit_r )
 {
-	return (input_port_read(device->machine(), "IN1/DSW0") & (1 << offset)) ? 0 : 228;
+	return (device->machine().root_device().ioport("IN1/DSW0")->read() & (1 << offset)) ? 0 : 228;
 }
 
 
 static READ8_DEVICE_HANDLER( input_port_2_bit_r )
 {
-	return (input_port_read(device->machine(), "IN2") & (1 << offset)) ? 0 : 228;
+	return (device->machine().root_device().ioport("IN2")->read() & (1 << offset)) ? 0 : 228;
 }
 
 

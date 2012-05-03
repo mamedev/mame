@@ -63,7 +63,7 @@ UINT8 devcb_resolved_write16::s_null;
 class devcb_resolver
 {
 public:
-	static const input_port_config *resolve_port(const char *tag, device_t &current);
+	static ioport_port *resolve_port(const char *tag, device_t &current);
 	static device_t *resolve_device(int index, const char *tag, device_t &current);
 	static device_execute_interface *resolve_execute_interface(const char *tag, device_t &current);
 	static address_space *resolve_space(int index, const char *tag, device_t &current);
@@ -80,10 +80,10 @@ public:
 //  based on the provided tag
 //-------------------------------------------------
 
-const input_port_config *devcb_resolver::resolve_port(const char *tag, device_t &current)
+ioport_port *devcb_resolver::resolve_port(const char *tag, device_t &current)
 {
 	astring fullname;
-	const input_port_config *result = current.ioport(current.siblingtag(fullname, tag));
+	ioport_port *result = current.ioport(current.siblingtag(fullname, tag));
 	if (result == NULL)
 		throw emu_fatalerror("Unable to find input port '%s' (requested by %s '%s')", fullname.cstr(), current.name(), current.tag());
 	return result;
@@ -221,7 +221,7 @@ void devcb_resolved_read_line::resolve(const devcb_read_line &desc, device_t &de
 
 int devcb_resolved_read_line::from_port()
 {
-	return (input_port_read_direct(m_object.port) & 1) ? ASSERT_LINE : CLEAR_LINE;
+	return (m_object.port->read() & 1) ? ASSERT_LINE : CLEAR_LINE;
 }
 
 
@@ -325,7 +325,7 @@ void devcb_resolved_write_line::to_null(int state)
 
 void devcb_resolved_write_line::to_port(int state)
 {
-	input_port_write_direct(m_object.port, state, 0xffffffff);
+	m_object.port->write(state, 0xffffffff);
 }
 
 
@@ -419,7 +419,7 @@ void devcb_resolved_read8::resolve(const devcb_read8 &desc, device_t &device)
 
 UINT8 devcb_resolved_read8::from_port(offs_t offset)
 {
-	return input_port_read_direct(m_object.port);
+	return m_object.port->read();
 }
 
 
@@ -522,7 +522,7 @@ void devcb_resolved_write8::to_null(offs_t offset, UINT8 data)
 
 void devcb_resolved_write8::to_port(offs_t offset, UINT8 data)
 {
-	input_port_write_direct(m_object.port, data, 0xff);
+	m_object.port->write(data, 0xff);
 }
 
 
@@ -616,7 +616,7 @@ void devcb_resolved_read16::resolve(const devcb_read16 &desc, device_t &device)
 
 UINT16 devcb_resolved_read16::from_port(offs_t offset, UINT16 mask)
 {
-	return input_port_read_direct(m_object.port);
+	return m_object.port->read();
 }
 
 
@@ -719,7 +719,7 @@ void devcb_resolved_write16::to_null(offs_t offset, UINT16 data, UINT16 mask)
 
 void devcb_resolved_write16::to_port(offs_t offset, UINT16 data, UINT16 mask)
 {
-	input_port_write_direct(m_object.port, data, mask);
+	m_object.port->write(data, mask);
 }
 
 

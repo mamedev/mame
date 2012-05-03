@@ -334,7 +334,7 @@ static READ16_HANDLER( killbld_igs025_prot_r )
 			}
 			else
 			{
-				UINT32 protvalue = 0x89911400 | input_port_read(space->machine(), "Region");
+				UINT32 protvalue = 0x89911400 | space->machine().root_device().ioport("Region")->read();
 				ret = (protvalue >> (8 * (state->m_kb_ptr - 1))) & 0xff;
 			}
 
@@ -514,7 +514,7 @@ static READ16_HANDLER( drgw3_igs025_prot_r )
 		else if(state->m_kb_cmd==5)
 		{
 			UINT32 protvalue;
-			protvalue = 0x60000|input_port_read(space->machine(), "Region");
+			protvalue = 0x60000|space->machine().root_device().ioport("Region")->read();
 			res=(protvalue>>(8*(ptr-1)))&0xff;
 
 

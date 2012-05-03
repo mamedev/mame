@@ -194,8 +194,8 @@ READ16_MEMBER(slapshot_state::slapshot_service_input_r)
 	switch (offset)
 	{
 		case 0x03:
-			return ((input_port_read(machine(), "SYSTEM") & 0xef) |
-				  (input_port_read(machine(), "SERVICE") & 0x10))  << 8;	/* IN3 + service switch */
+			return ((ioport("SYSTEM")->read() & 0xef) |
+				  (ioport("SERVICE")->read() & 0x10))  << 8;	/* IN3 + service switch */
 
 		default:
 			return tc0640fio_r(m_tc0640fio, offset) << 8;
@@ -207,7 +207,7 @@ READ16_MEMBER(slapshot_state::opwolf3_adc_r)
 {
 	static const char *const adcnames[] = { "GUN1X", "GUN1Y", "GUN2X", "GUN2Y" };
 
-	return input_port_read(machine(), adcnames[offset]) << 8;
+	return ioport(adcnames[offset])->read() << 8;
 }
 
 WRITE16_MEMBER(slapshot_state::opwolf3_adc_req_w)

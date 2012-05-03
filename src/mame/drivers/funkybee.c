@@ -80,7 +80,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
 READ8_MEMBER(funkybee_state::funkybee_input_port_0_r)
 {
 	watchdog_reset_r(space, 0);
-	return input_port_read(machine(), "IN0");
+	return ioport("IN0")->read();
 }
 
 WRITE8_MEMBER(funkybee_state::funkybee_coin_counter_w)

@@ -81,7 +81,7 @@ static PALETTE_INIT( copsnrob )
 
 READ8_MEMBER(copsnrob_state::copsnrob_misc_r)
 {
-	return input_port_read(machine(), "IN0") & 0x80;
+	return ioport("IN0")->read() & 0x80;
 }
 
 WRITE8_MEMBER(copsnrob_state::copsnrob_misc2_w)
@@ -133,11 +133,11 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static const input_port_value gun_table[] = {0x3f, 0x5f, 0x6f, 0x77, 0x7b, 0x7d, 0x7e};
+static const ioport_value gun_table[] = {0x3f, 0x5f, 0x6f, 0x77, 0x7b, 0x7d, 0x7e};
 
 static INPUT_PORTS_START( copsnrob )
 	PORT_START("IN0")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_VBLANK )
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("IN1")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )

@@ -165,19 +165,19 @@ READ8_MEMBER(spool99_state::spool99_io_r)
 	{
 		switch(offset+0xaf00)
 		{
-			case 0xafd8: return input_port_read(machine(),"COIN1");
+			case 0xafd8: return ioport("COIN1")->read();
 //          case 0xafd9: return 1;
-			case 0xafda: return input_port_read(machine(),"COIN2");
+			case 0xafda: return ioport("COIN2")->read();
 			case 0xafdb: return 1;
-			case 0xafdc: return input_port_read(machine(),"SERVICE1");//attract mode
-			case 0xafdd: return input_port_read(machine(),"HOLD3");
-			case 0xafde: return input_port_read(machine(),"HOLD4");
-			case 0xafdf: return input_port_read(machine(),"HOLD2");
-			case 0xafe0: return input_port_read(machine(),"HOLD1");
-			case 0xafe1: return input_port_read(machine(),"HOLD5");
-			case 0xafe2: return input_port_read(machine(),"START");
-			case 0xafe3: return input_port_read(machine(),"BET");//system 2
-			case 0xafe4: return input_port_read(machine(),"SERVICE2");//attract mode
+			case 0xafdc: return ioport("SERVICE1")->read();//attract mode
+			case 0xafdd: return ioport("HOLD3")->read();
+			case 0xafde: return ioport("HOLD4")->read();
+			case 0xafdf: return ioport("HOLD2")->read();
+			case 0xafe0: return ioport("HOLD1")->read();
+			case 0xafe1: return ioport("HOLD5")->read();
+			case 0xafe2: return ioport("START")->read();
+			case 0xafe3: return ioport("BET")->read();//system 2
+			case 0xafe4: return ioport("SERVICE2")->read();//attract mode
 //          case 0xafe5: return 1;
 //          case 0xafe6: return 1;
 			case 0xafe7: return machine().device<eeprom_device>("eeprom")->read_bit();
@@ -235,18 +235,18 @@ READ8_MEMBER(spool99_state::vcarn_io_r)
 	{
 		switch(offset+0xa700)
 		{
-			case 0xa720: return input_port_read(machine(),"SERVICE1");//attract mode
-			case 0xa722: return input_port_read(machine(),"COIN1");
-			case 0xa723: return input_port_read(machine(),"COIN2");
-			case 0xa724: return input_port_read(machine(),"SERVICE2");//attract mode
-			case 0xa725: return input_port_read(machine(),"HOLD3");
-			case 0xa726: return input_port_read(machine(),"HOLD4");
-			case 0xa727: return input_port_read(machine(),"HOLD2");
+			case 0xa720: return ioport("SERVICE1")->read();//attract mode
+			case 0xa722: return ioport("COIN1")->read();
+			case 0xa723: return ioport("COIN2")->read();
+			case 0xa724: return ioport("SERVICE2")->read();//attract mode
+			case 0xa725: return ioport("HOLD3")->read();
+			case 0xa726: return ioport("HOLD4")->read();
+			case 0xa727: return ioport("HOLD2")->read();
 			case 0xa780: return machine().device<okim6295_device>("oki")->read(space,0);
-			case 0xa7a0: return input_port_read(machine(),"HOLD1");
-			case 0xa7a1: return input_port_read(machine(),"HOLD5");
-			case 0xa7a2: return input_port_read(machine(),"START");
-			case 0xa7a3: return input_port_read(machine(),"BET");//system 2
+			case 0xa7a0: return ioport("HOLD1")->read();
+			case 0xa7a1: return ioport("HOLD5")->read();
+			case 0xa7a2: return ioport("START")->read();
+			case 0xa7a3: return ioport("BET")->read();//system 2
 
 			case 0xa7a7: return machine().device<eeprom_device>("eeprom")->read_bit();
 

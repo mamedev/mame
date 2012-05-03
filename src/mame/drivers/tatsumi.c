@@ -188,13 +188,13 @@ WRITE16_MEMBER(tatsumi_state::bigfight_a60000_w)
 READ16_MEMBER(tatsumi_state::cyclwarr_input_r)
 {
 	static const char *const port[] = { "SERVICE", "P1", "P2", "DSW3" };
-	return input_port_read(machine(), port[offset]);
+	return ioport(port[offset])->read();
 }
 
 READ16_MEMBER(tatsumi_state::cyclwarr_input2_r)
 {
 	static const char *const port2[] = { "DSW1", "DSW2", "P3", "P4" };
-	return input_port_read(machine(), port2[offset]);
+	return ioport(port2[offset])->read();
 }
 
 WRITE16_MEMBER(tatsumi_state::cyclwarr_sound_w)
@@ -1284,8 +1284,8 @@ ROM_END
 static DRIVER_INIT( apache3 )
 {
 	tatsumi_state *state = machine.driver_data<tatsumi_state>();
-	UINT8 *dst = machine.root_device().memregion("gfx1")->base();
-	UINT8 *src1 = machine.root_device().memregion("gfx2")->base();
+	UINT8 *dst = state->memregion("gfx1")->base();
+	UINT8 *src1 = state->memregion("gfx2")->base();
 	UINT8 *src2 = state->memregion("gfx3")->base();
 	int i;
 
@@ -1312,8 +1312,8 @@ static DRIVER_INIT( apache3 )
 static DRIVER_INIT( roundup5 )
 {
 	tatsumi_state *state = machine.driver_data<tatsumi_state>();
-	UINT8 *dst = machine.root_device().memregion("gfx1")->base();
-	UINT8 *src1 = machine.root_device().memregion("gfx2")->base();
+	UINT8 *dst = state->memregion("gfx1")->base();
+	UINT8 *src1 = state->memregion("gfx2")->base();
 	UINT8 *src2 = state->memregion("gfx3")->base();
 	int i;
 
@@ -1338,10 +1338,10 @@ static DRIVER_INIT( roundup5 )
 static DRIVER_INIT( cyclwarr )
 {
 	tatsumi_state *state = machine.driver_data<tatsumi_state>();
-	UINT8 *dst = machine.root_device().memregion("gfx1")->base();
-	UINT8 *src1 = machine.root_device().memregion("gfx2")->base();
-	int len1 = machine.root_device().memregion("gfx2")->bytes();
-	UINT8 *src2 = machine.root_device().memregion("gfx3")->base();
+	UINT8 *dst = state->memregion("gfx1")->base();
+	UINT8 *src1 = state->memregion("gfx2")->base();
+	int len1 = state->memregion("gfx2")->bytes();
+	UINT8 *src2 = state->memregion("gfx3")->base();
 	int len2 = state->memregion("gfx3")->bytes();
 	int i;
 	for (i=0; i<len1; i+=32) {

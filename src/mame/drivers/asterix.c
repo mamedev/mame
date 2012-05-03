@@ -46,7 +46,7 @@ WRITE16_MEMBER(asterix_state::control2_w)
 		/* bit 0 is data */
 		/* bit 1 is cs (active low) */
 		/* bit 2 is clock (active high) */
-		input_port_write(machine(), "EEPROMOUT", data, 0xff);
+		ioport("EEPROMOUT")->write(data, 0xff);
 
 		/* bit 5 is select tile bank */
 		k056832_set_tile_bank(m_k056832, (data & 0x20) >> 5);

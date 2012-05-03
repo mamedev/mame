@@ -425,8 +425,8 @@ static INPUT_PORTS_START( asurabld )
 	PORT_DIPSETTING(      0x2000, "2C Start / 1C Continue" )
 //  PORT_DIPSETTING(      0x7000, "Error!!" )               // Causes graphics issues - Service Mode shows "Error"
 //  PORT_DIPSETTING(      0x1000, DEF_STR( 2C_1C ) )        // Duplicate 2C_1C
-	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_1C ) )		PORT_CONDITION("DSW2",0x0f00,PORTCOND_NOTEQUALS,0x0000)
-	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )		PORT_CONDITION("DSW2",0x0f00,PORTCOND_EQUALS,0x0000)	// Set both for Free Play
+	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_1C ) )		PORT_CONDITION("DSW2",0x0f00,NOTEQUALS,0x0000)
+	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )		PORT_CONDITION("DSW2",0x0f00,EQUALS,0x0000)	// Set both for Free Play
 	PORT_DIPNAME( 0x0f00, 0x0f00, DEF_STR( Coin_B ) )		PORT_DIPLOCATION("SW4:5,6,7,8") /* Service Mode Shows Player 1 */
 	PORT_DIPSETTING(      0x0800, DEF_STR( 8C_1C ) )
 	PORT_DIPSETTING(      0x0900, DEF_STR( 7C_1C ) )
@@ -443,8 +443,8 @@ static INPUT_PORTS_START( asurabld )
 	PORT_DIPSETTING(      0x0200, "2C Start / 1C Continue" )
 //  PORT_DIPSETTING(      0x0700, "Error!!" )               // Causes graphics issues - Service Mode shows "Error"
 //  PORT_DIPSETTING(      0x0100, DEF_STR( 2C_1C ) )        // Duplicate 2C_1C
-	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_1C ) )		PORT_CONDITION("DSW2",0xf000,PORTCOND_NOTEQUALS,0x0000)
-	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )		PORT_CONDITION("DSW2",0xf000,PORTCOND_EQUALS,0x0000)	// Set both for Free Play
+	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_1C ) )		PORT_CONDITION("DSW2",0xf000,NOTEQUALS,0x0000)
+	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )		PORT_CONDITION("DSW2",0xf000,EQUALS,0x0000)	// Set both for Free Play
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( asurabus )

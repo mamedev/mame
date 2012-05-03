@@ -174,9 +174,9 @@ CUSTOM_INPUT_MEMBER(peyper_state::wolfman_replay_hs_r)
 	switch (bit_mask)
 	{
 		case 0x03:
-			return ((input_port_read(machine(), "REPLAY") & bit_mask) >> 0);
+			return ((ioport("REPLAY")->read() & bit_mask) >> 0);
 		case 0x40:
-			return ((input_port_read(machine(), "REPLAY") & bit_mask) >> 6);
+			return ((ioport("REPLAY")->read() & bit_mask) >> 6);
 		default:
 			logerror("wolfman_replay_hs_r : invalid %02X bit_mask\n",bit_mask);
 			return 0;

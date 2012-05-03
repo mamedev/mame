@@ -92,7 +92,7 @@ WRITE16_MEMBER(atarig1_state::mo_command_w)
 
 READ16_MEMBER(atarig1_state::special_port0_r)
 {
-	int temp = input_port_read(machine(), "IN0");
+	int temp = ioport("IN0")->read();
 	if (m_cpu_to_sound_ready) temp ^= 0x1000;
 	temp ^= 0x2000;		/* A2DOK always high for now */
 	return temp;
@@ -111,11 +111,11 @@ READ16_MEMBER(atarig1_state::a2d_data_r)
 
 	/* Pit Fighter has no A2D, just another input port */
 	if (m_is_pitfight)
-		return input_port_read(machine(), "ADC0");
+		return ioport("ADC0")->read();
 
 	/* otherwise, assume it's hydra */
 	if (m_which_input < 3)
-		return input_port_read(machine(), adcnames[m_which_input]) << 8;
+		return ioport(adcnames[m_which_input])->read() << 8;
 
 	return 0;
 }
@@ -247,7 +247,7 @@ static INPUT_PORTS_START( hydra )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_SERVICE( 0x4000, IP_ACTIVE_LOW )
-	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("ADC0")		/* ADC 0 @ fc8000 */
 	PORT_BIT( 0x00ff, 0x0080, IPT_AD_STICK_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10)
@@ -279,7 +279,7 @@ static INPUT_PORTS_START( pitfight )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_SERVICE( 0x4000, IP_ACTIVE_LOW )
-	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("ADC0")		/* fc8000 */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(3)
@@ -324,7 +324,7 @@ static INPUT_PORTS_START( pitfightj )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_SERVICE( 0x4000, IP_ACTIVE_LOW )
-	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("ADC0")      /* fc8000 */
 	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNKNOWN )

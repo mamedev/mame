@@ -387,7 +387,7 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( chinagat )
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN3 )
@@ -912,7 +912,7 @@ ROM_END
 static DRIVER_INIT( chinagat )
 {
 	ddragon_state *state = machine.driver_data<ddragon_state>();
-	UINT8 *MAIN = machine.root_device().memregion("maincpu")->base();
+	UINT8 *MAIN = state->memregion("maincpu")->base();
 	UINT8 *SUB = state->memregion("sub")->base();
 
 	state->m_technos_video_hw = 1;

@@ -1428,7 +1428,7 @@ static WRITE32_HANDLER( analog_port_w )
 
 	if (data < 8 || data > 15)
 		logerror("%08X:Unexpected analog port select = %08X\n", cpu_get_pc(&space->device()), data);
-	state->m_pending_analog_read = input_port_read_safe(space->machine(), portnames[data & 7], 0);
+	state->m_pending_analog_read = state->ioport(portnames[data & 7])->read_safe(0);
 }
 
 

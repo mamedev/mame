@@ -59,7 +59,7 @@ WRITE8_MEMBER(blktiger_state::blktiger_bankswitch_w)
 
 WRITE8_MEMBER(blktiger_state::blktiger_coinlockout_w)
 {
-	if (input_port_read(machine(), "COIN_LOCKOUT") & 0x01)
+	if (ioport("COIN_LOCKOUT")->read() & 0x01)
 	{
 		coin_lockout_w(machine(), 0,~data & 0x01);
 		coin_lockout_w(machine(), 1,~data & 0x02);

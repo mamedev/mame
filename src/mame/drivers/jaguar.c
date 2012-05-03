@@ -555,7 +555,7 @@ static MACHINE_RESET( jaguar )
 	joystick_data = 0xffffffff;
 	eeprom_bit_count = 0;
 	blitter_status = 1;
-	if ((using_cart) && (input_port_read(machine, "CONFIG") & 2))
+	if ((using_cart) && (machine.root_device().ioport("CONFIG")->read() & 2))
 	{
 		cart_base[0x102] = 1;
 		using_cart = 0;
@@ -825,13 +825,13 @@ READ32_MEMBER(cojag_state::joystick_r)
 	{
 		if ((joystick_data & (0x10000 << i)) == 0)
 		{
-			joystick_result &= input_port_read(machine(), keynames[0][i]);
-			joybuts_result &= input_port_read(machine(), keynames[1][i]);
+			joystick_result &= ioport(keynames[0][i])->read();
+			joybuts_result &= ioport(keynames[1][i])->read();
 		}
 	}
 
 	joystick_result |= machine().device<eeprom_device>("eeprom")->read_bit();
-	joybuts_result |= (input_port_read(machine(), "CONFIG") & 0x10);
+	joybuts_result |= (ioport("CONFIG")->read() & 0x10);
 
 	return (joystick_result << 16) | joybuts_result;
 }

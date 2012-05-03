@@ -404,7 +404,7 @@ static TIMER_CALLBACK( equites_nmi_callback )
 static TIMER_CALLBACK( equites_frq_adjuster_callback )
 {
 	equites_state *state = machine.driver_data<equites_state>();
-	UINT8 frq = input_port_read(machine, FRQ_ADJUSTER_TAG);
+	UINT8 frq = state->ioport(FRQ_ADJUSTER_TAG)->read();
 
 	msm5232_set_clock(state->m_msm, MSM5232_MIN_CLOCK + frq * (MSM5232_MAX_CLOCK - MSM5232_MIN_CLOCK) / 100);
 //popmessage("8155: C %02x A %02x  AY: A %02x B %02x Unk:%x", state->m_eq8155_port_c, state->m_eq8155_port_a, state->m_ay_port_a, state->m_ay_port_b, state->m_eq_cymbal_ctrl & 15);
@@ -647,7 +647,7 @@ WRITE8_MEMBER(equites_state::equites_8155_w)
 #if HVOLTAGE_DEBUG
 READ16_MEMBER(equites_state::hvoltage_debug_r)
 {
-	return(input_port_read(machine(), "FAKE"));
+	return(ioport("FAKE")->read());
 }
 #endif
 

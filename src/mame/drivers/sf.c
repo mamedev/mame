@@ -162,12 +162,12 @@ static const int scale[8] = { 0x00, 0x40, 0xe0, 0xfe, 0xfe, 0xfe, 0xfe, 0xfe };
 
 READ16_MEMBER(sf_state::button1_r)
 {
-	return (scale[input_port_read(machine(), "IN3")] << 8) | scale[input_port_read(machine(), "IN1")];
+	return (scale[ioport("IN3")->read()] << 8) | scale[ioport("IN1")->read()];
 }
 
 READ16_MEMBER(sf_state::button2_r)
 {
-	return (scale[input_port_read(machine(), "IN4")] << 8) | scale[input_port_read(machine(), "IN2")];
+	return (scale[ioport("IN4")->read()] << 8) | scale[ioport("IN2")->read()];
 }
 
 

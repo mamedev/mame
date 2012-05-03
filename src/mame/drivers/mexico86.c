@@ -452,7 +452,7 @@ static MACHINE_RESET( mexico86 )
 
 	/*TODO: check the PCB and see how the halt / reset lines are connected. */
 	if (machine.device("sub") != NULL)
-		cputag_set_input_line(machine, "sub", INPUT_LINE_RESET, (input_port_read(machine, "DSW1") & 0x80) ? ASSERT_LINE : CLEAR_LINE);
+		cputag_set_input_line(machine, "sub", INPUT_LINE_RESET, (state->ioport("DSW1")->read() & 0x80) ? ASSERT_LINE : CLEAR_LINE);
 
 	state->m_port_a_in = 0;
 	state->m_port_a_out = 0;

@@ -221,7 +221,7 @@ WRITE8_MEMBER(beaminv_state::controller_select_w)
 
 READ8_MEMBER(beaminv_state::controller_r)
 {
-	return input_port_read(machine(), (m_controller_select == 1) ? P1_CONTROL_PORT_TAG : P2_CONTROL_PORT_TAG);
+	return ioport((m_controller_select == 1) ? P1_CONTROL_PORT_TAG : P2_CONTROL_PORT_TAG)->read();
 }
 
 

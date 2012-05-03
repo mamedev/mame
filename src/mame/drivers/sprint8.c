@@ -32,7 +32,7 @@ static TIMER_DEVICE_CALLBACK( input_callback )
 
 	for (i = 0; i < 8; i++)
 	{
-		UINT8 val = input_port_read(timer.machine(), dialnames[i]) >> 4;
+		UINT8 val = timer.machine().root_device().ioport(dialnames[i])->read() >> 4;
 
 		signed char delta = (val - state->m_dial[i]) & 15;
 
@@ -69,7 +69,7 @@ READ8_MEMBER(sprint8_state::sprint8_collision_r)
 READ8_MEMBER(sprint8_state::sprint8_input_r)
 {
 	static const char *const portnames[] = { "P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8" };
-	UINT8 val = input_port_read(machine(), portnames[offset]);
+	UINT8 val = ioport(portnames[offset])->read();
 
 	if (m_steer_dir[offset])
 	{
@@ -255,7 +255,7 @@ static INPUT_PORTS_START( sprint8 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Track Select") PORT_CODE(KEYCODE_SPACE)
 
 	PORT_START("VBLANK")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_VBLANK )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	/* this is actually a variable resistor */
 	PORT_START("R132")
@@ -383,7 +383,7 @@ static INPUT_PORTS_START( sprint8p )
 	PORT_DIPSETTING(    0x01, "Tag" )
 
 	PORT_START("VBLANK")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_VBLANK )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	/* this is actually a variable resistor */
 	PORT_START("R132")

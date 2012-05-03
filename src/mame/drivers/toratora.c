@@ -148,14 +148,14 @@ static INTERRUPT_GEN( toratora_timer )
 	if (state->m_timer & 0x100)
 		popmessage("watchdog!");
 
-	if (state->m_last != (input_port_read(device->machine(), "INPUT") & 0x0f))
+	if (state->m_last != (state->ioport("INPUT")->read() & 0x0f))
 	{
-		state->m_last = input_port_read(device->machine(), "INPUT") & 0x0f;
+		state->m_last = state->ioport("INPUT")->read() & 0x0f;
 		generic_pulse_irq_line(device, 0, 1);
 	}
-	state->m_pia_u1->set_a_input(input_port_read(device->machine(), "INPUT") & 0x0f, 0);
-	state->m_pia_u1->ca1_w(input_port_read(device->machine(), "INPUT") & 0x10);
-	state->m_pia_u1->ca2_w(input_port_read(device->machine(), "INPUT") & 0x20);
+	state->m_pia_u1->set_a_input(device->machine().root_device().ioport("INPUT")->read() & 0x0f, 0);
+	state->m_pia_u1->ca1_w(device->machine().root_device().ioport("INPUT")->read() & 0x10);
+	state->m_pia_u1->ca2_w(device->machine().root_device().ioport("INPUT")->read() & 0x20);
 }
 
 READ8_MEMBER(toratora_state::timer_r)

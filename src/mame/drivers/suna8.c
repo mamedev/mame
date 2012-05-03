@@ -470,10 +470,10 @@ READ8_MEMBER(suna8_state::hardhead_ip_r)
 
 	switch (*m_hardhead_ip)
 	{
-		case 0:	return input_port_read(machine(), "P1");
-		case 1:	return input_port_read(machine(), "P2");
-		case 2:	return input_port_read(machine(), "DSW1");
-		case 3:	return input_port_read(machine(), "DSW2");
+		case 0:	return ioport("P1")->read();
+		case 1:	return ioport("P2")->read();
+		case 2:	return ioport("DSW1")->read();
+		case 3:	return ioport("DSW2")->read();
 		default:
 			logerror("CPU #0 - PC %04X: Unknown IP read: %02X\n", cpu_get_pc(&space.device()), *m_hardhead_ip);
 			return 0xff;
@@ -1329,7 +1329,7 @@ static INPUT_PORTS_START( hardhea2 )
 	PORT_BIT(  0x08, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT(  0x10, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT(  0x20, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT(  0x40, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT(  0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT(  0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
 INPUT_PORTS_END

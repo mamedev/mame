@@ -47,7 +47,7 @@ READ8_MEMBER(wiping_state::ports_r)
 
 	res = 0;
 	for (i = 0; i < 8; i++)
-		res |= ((input_port_read(machine(), portnames[i]) >> offset) & 1) << i;
+		res |= ((ioport(portnames[i])->read() >> offset) & 1) << i;
 
 	return res;
 }

@@ -258,7 +258,7 @@ READ8_MEMBER(mpoker_state::mixport_r)
     If you change the status *every* read, the HW stucks.
 */
 
-	m_mixdata = (input_port_read(machine(), "SW2") & 0xfd) | (machine().rand() & 0x02);
+	m_mixdata = (ioport("SW2")->read() & 0xfd) | (machine().rand() & 0x02);
 
 	return m_mixdata;
 }

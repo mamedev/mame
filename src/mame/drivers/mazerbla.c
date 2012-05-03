@@ -889,7 +889,7 @@ READ8_MEMBER(mazerbla_state::zpu_inputs_r)
 
 	UINT8 ret = 0;
 
-	ret = input_port_read(machine(), strobenames[m_bcd_7445]);
+	ret = ioport(strobenames[m_bcd_7445])->read();
 
 	return ret;
 }

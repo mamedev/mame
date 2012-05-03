@@ -93,9 +93,9 @@ private:
 	void validate_roms();
 	void validate_display();
 	void validate_gfx();
-	void validate_analog_input_field(input_field_config &field);
-	void validate_dip_settings(input_field_config &field);
-	void validate_condition(input_condition &condition, device_t &device, int_map &port_map);
+	void validate_analog_input_field(ioport_field &field);
+	void validate_dip_settings(ioport_field &field);
+	void validate_condition(ioport_condition &condition, device_t &device, int_map &port_map);
 	void validate_inputs();
 	void validate_devices();
 

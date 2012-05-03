@@ -544,17 +544,17 @@ static INPUT_PORTS_START( wilytowr )
 	PORT_DIPSETTING(    0x04, "x1.2" )
 	PORT_DIPSETTING(    0x08, "x1.4" )
 	PORT_DIPSETTING(    0x0c, "x1.6" )
-	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Coin_A ) )		PORT_DIPLOCATION("SW1:!5,!6") PORT_CONDITION("DSW1",0x04,PORTCOND_EQUALS,0x04) /* coin mode 2 */
+	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Coin_A ) )		PORT_DIPLOCATION("SW1:!5,!6") PORT_CONDITION("DSW1",0x04,EQUALS,0x04) /* coin mode 2 */
 	PORT_DIPSETTING(    0x20, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x30, DEF_STR( Free_Play ) )	/* Not documented */
-	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Coin_B ) )		PORT_DIPLOCATION("SW1:!7,!8") PORT_CONDITION("DSW1",0x04,PORTCOND_EQUALS,0x04) /* coin mode 2 */
+	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Coin_B ) )		PORT_DIPLOCATION("SW1:!7,!8") PORT_CONDITION("DSW1",0x04,EQUALS,0x04) /* coin mode 2 */
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_6C ) )
-	PORT_DIPNAME( 0xf0, 0x00, DEF_STR( Coinage ) )		PORT_DIPLOCATION("SW1:!5,!6,!7,!8") PORT_CONDITION("DSW1",0x04,PORTCOND_EQUALS,0x00) /* coin mode 1 */
+	PORT_DIPNAME( 0xf0, 0x00, DEF_STR( Coinage ) )		PORT_DIPLOCATION("SW1:!5,!6,!7,!8") PORT_CONDITION("DSW1",0x04,EQUALS,0x00) /* coin mode 1 */
 	PORT_DIPSETTING(    0x60, DEF_STR( 7C_1C ) )
 	PORT_DIPSETTING(    0x50, DEF_STR( 6C_1C ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( 5C_1C ) )
@@ -696,7 +696,7 @@ static SAMPLES_START( fghtbskt_sh_start )
 {
 	running_machine &machine = device.machine();
 	m63_state *state = machine.driver_data<m63_state>();
-	int i, len = machine.root_device().memregion("samples")->bytes();
+	int i, len = state->memregion("samples")->bytes();
 	UINT8 *ROM = state->memregion("samples")->base();
 
 	state->m_samplebuf = auto_alloc_array(machine, INT16, len);

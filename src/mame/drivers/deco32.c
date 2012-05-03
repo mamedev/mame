@@ -358,9 +358,9 @@ READ32_MEMBER(deco32_state::captaven_prot_r)
 {
 	/* Protection/IO chip 75, same as Lemmings & Robocop 2 */
 	switch (offset<<2) {
-	case 0x0a0: return input_port_read(machine(), "IN0"); /* Player 1 & 2 controls */
-	case 0x158: return input_port_read(machine(), "IN1"); /* Player 3 & 4 controls */
-	case 0xed4: return input_port_read(machine(), "IN2"); /* Misc */
+	case 0x0a0: return ioport("IN0")->read(); /* Player 1 & 2 controls */
+	case 0x158: return ioport("IN1")->read(); /* Player 3 & 4 controls */
+	case 0xed4: return ioport("IN2")->read(); /* Misc */
 	}
 
 	logerror("%08x: Unmapped protection read %04x\n",cpu_get_pc(&space.device()),offset<<2);
@@ -370,14 +370,14 @@ READ32_MEMBER(deco32_state::captaven_prot_r)
 READ32_MEMBER(deco32_state::captaven_soundcpu_r)
 {
 	/* Top byte - top bit low == sound cpu busy, bottom word is dips */
-	return 0xffff0000 | input_port_read(machine(), "DSW");
+	return 0xffff0000 | ioport("DSW")->read();
 }
 
 READ32_MEMBER(deco32_state::fghthist_control_r)
 {
 	switch (offset) {
-	case 0: return 0xffff0000 | input_port_read(machine(), "IN0");
-	case 1: return 0xffff0000 | input_port_read(machine(), "IN1"); //check top bits??
+	case 0: return 0xffff0000 | ioport("IN0")->read();
+	case 1: return 0xffff0000 | ioport("IN1")->read(); //check top bits??
 	case 2: return 0xfffffffe | machine().device<eeprom_device>("eeprom")->read_bit();
 	}
 
@@ -405,7 +405,7 @@ WRITE32_MEMBER(deco32_state::fghthist_eeprom_w)
 READ32_MEMBER(deco32_state::dragngun_service_r)
 {
 //  logerror("%08x:Read service\n",cpu_get_pc(&space.device()));
-	return input_port_read(machine(), "IN2");
+	return ioport("IN2")->read();
 }
 
 READ32_MEMBER(deco32_state::lockload_gun_mirror_r)
@@ -413,8 +413,8 @@ READ32_MEMBER(deco32_state::lockload_gun_mirror_r)
 //logerror("%08x:Read gun %d\n",cpu_get_pc(&space.device()),offset);
 //return ((machine().rand()%0xffff)<<16) | machine().rand()%0xffff;
 	if (offset) /* Mirror of player 1 and player 2 fire buttons */
-		return input_port_read(machine(), "IN4") | ((machine().rand()%0xff)<<16);
-	return input_port_read(machine(), "IN3") | input_port_read(machine(), "LIGHT0_X") | (input_port_read(machine(), "LIGHT0_X")<<16) | (input_port_read(machine(), "LIGHT0_X")<<24); //((machine().rand()%0xff)<<16);
+		return ioport("IN4")->read() | ((machine().rand()%0xff)<<16);
+	return ioport("IN3")->read() | ioport("LIGHT0_X")->read() | (ioport("LIGHT0_X")->read()<<16) | (ioport("LIGHT0_X")->read()<<24); //((machine().rand()%0xff)<<16);
 }
 
 READ32_MEMBER(deco32_state::dragngun_prot_r)
@@ -427,9 +427,9 @@ READ32_MEMBER(deco32_state::dragngun_prot_r)
 //definitely vblank in locked load
 
 	switch (offset<<1) {
-	case 0x140/2: return 0xffff0000 | input_port_read(machine(), "IN0"); /* IN0 */
-	case 0xadc/2: return 0xffff0000 | input_port_read(machine(), "IN1") | m_strobe; /* IN1 */
-	case 0x6a0/2: return 0xffff0000 | input_port_read(machine(), "DSW"); /* IN2 (Dip switch) */
+	case 0x140/2: return 0xffff0000 | ioport("IN0")->read(); /* IN0 */
+	case 0xadc/2: return 0xffff0000 | ioport("IN1")->read() | m_strobe; /* IN1 */
+	case 0x6a0/2: return 0xffff0000 | ioport("DSW")->read(); /* IN2 (Dip switch) */
 	}
 	return 0xffffffff;
 }
@@ -439,10 +439,10 @@ READ32_MEMBER(dragngun_state::dragngun_lightgun_r)
 {
 	/* Ports 0-3 are read, but seem unused */
 	switch (m_dragngun_lightgun_port) {
-	case 4: return input_port_read(machine(), "LIGHT0_X");
-	case 5: return input_port_read(machine(), "LIGHT1_X");
-	case 6: return input_port_read(machine(), "LIGHT0_Y");
-	case 7: return input_port_read(machine(), "LIGHT1_Y");
+	case 4: return ioport("LIGHT0_X")->read();
+	case 5: return ioport("LIGHT1_X")->read();
+	case 6: return ioport("LIGHT0_Y")->read();
+	case 7: return ioport("LIGHT1_Y")->read();
 	}
 
 //  logerror("Illegal lightgun port %d read \n",m_dragngun_lightgun_port);
@@ -479,8 +479,8 @@ static WRITE32_DEVICE_HANDLER( dragngun_eeprom_w )
 READ32_MEMBER(deco32_state::tattass_prot_r)
 {
 	switch (offset<<1) {
-	case 0x280: return input_port_read(machine(), "IN0") << 16;
-	case 0x4c4: return input_port_read(machine(), "IN1") << 16;
+	case 0x280: return ioport("IN0")->read() << 16;
+	case 0x4c4: return ioport("IN1")->read() << 16;
 	case 0x35a: return m_tattass_eprom_bit << 16;
 	}
 
@@ -637,8 +637,8 @@ READ32_MEMBER(deco32_state::nslasher_prot_r)
 {
 
 	switch (offset<<1) {
-	case 0x280: return input_port_read(machine(), "IN0") << 16| 0xffff; /* IN0 */
-	case 0x4c4: return input_port_read(machine(), "IN1") << 16| 0xffff; /* IN1 */
+	case 0x280: return ioport("IN0")->read() << 16| 0xffff; /* IN0 */
+	case 0x4c4: return ioport("IN1")->read() << 16| 0xffff; /* IN1 */
 	case 0x35a: return (machine().device<eeprom_device>("eeprom")->read_bit()<< 16) | 0xffff; // Debug switch in low word??
 	}
 
@@ -1208,7 +1208,7 @@ static INPUT_PORTS_START( fghthist )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE_NO_TOGGLE( 0x0008, IP_ACTIVE_LOW )
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1287,7 +1287,7 @@ static INPUT_PORTS_START( dragngun )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
 	PORT_START("IN2")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_VBLANK )
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_SERVICE( 0x0004, IP_ACTIVE_LOW )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN ) //check  //test BUTTON F2
@@ -1363,7 +1363,7 @@ static INPUT_PORTS_START( lockload )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
 	PORT_START("IN2")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_VBLANK ) //IPT_VBLANK )
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen") //IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_SERVICE( 0x0004, IP_ACTIVE_LOW )
 	PORT_BIT( 0x00f8, IP_ACTIVE_LOW, IPT_UNUSED ) //check  //test BUTTON F2
@@ -1413,7 +1413,7 @@ static INPUT_PORTS_START( tattass )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE_NO_TOGGLE( 0x0008, IP_ACTIVE_LOW )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_VBLANK )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNUSED ) /* 'soundmask' */
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1451,7 +1451,7 @@ static INPUT_PORTS_START( nslasher )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE_NO_TOGGLE( 0x0008, IP_ACTIVE_LOW )
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNUSED ) /* 'soundmask' */
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )

@@ -252,7 +252,7 @@ static READ16_HANDLER( io_chip_r )
 				return state->m_misc_io_data[offset];
 
 			/* otherwise, return an input port */
-			return input_port_read(space->machine(), portnames[offset]);
+			return space->machine().root_device().ioport(portnames[offset])->read();
 
 		/* 'SEGA' protection */
 		case 0x10/2:
@@ -359,7 +359,7 @@ static READ16_HANDLER( misc_io_r )
 
 		/* video control latch */
 		case 0x2000/2:
-			return input_port_read(space->machine(), portnames[offset & 1]);
+			return space->machine().root_device().ioport(portnames[offset & 1])->read();
 	}
 	if (state->m_custom_io_r)
 		return state->m_custom_io_r(space, offset, mem_mask);
@@ -450,13 +450,13 @@ static READ16_HANDLER( ddcrew_custom_io_r )
 	switch (offset)
 	{
 		case 0x3020/2:
-			return input_port_read(space->machine(), "P3");
+			return space->machine().root_device().ioport("P3")->read();
 
 		case 0x3022/2:
-			return input_port_read(space->machine(), "P4");
+			return space->machine().root_device().ioport("P4")->read();
 
 		case 0x3024/2:
-			return input_port_read(space->machine(), "P34START");
+			return space->machine().root_device().ioport("P34START")->read();
 	}
 	return segaic16_open_bus_r(space, 0, mem_mask);
 }
@@ -494,19 +494,19 @@ static WRITE16_HANDLER( lghost_custom_io_w )
 	switch (offset)
 	{
 		case 0x3010/2:
-			state->m_lghost_value = 255 - input_port_read(space->machine(), "GUNY1");
+			state->m_lghost_value = 255 - state->ioport("GUNY1")->read();
 			break;
 
 		case 0x3012/2:
-			state->m_lghost_value = input_port_read(space->machine(), "GUNX1");
+			state->m_lghost_value = state->ioport("GUNX1")->read();
 			break;
 
 		case 0x3014/2:
-			state->m_lghost_value = 255 - input_port_read(space->machine(), state->m_lghost_select ? "GUNY3" : "GUNY2");
+			state->m_lghost_value = 255 - state->ioport(state->m_lghost_select ? "GUNY3" : "GUNY2")->read();
 			break;
 
 		case 0x3016/2:
-			state->m_lghost_value = input_port_read(space->machine(), state->m_lghost_select ? "GUNX3" : "GUNX2");
+			state->m_lghost_value = state->ioport(state->m_lghost_select ? "GUNX3" : "GUNX2")->read();
 			break;
 
 		case 0x3020/2:
@@ -530,22 +530,22 @@ static READ16_HANDLER( wwally_custom_io_r )
 	switch (offset)
 	{
 		case 0x3000/2:
-			return (input_port_read(space->machine(), "TRACKX1") - state->m_wwally_last_x[0]) & 0xff;
+			return (state->ioport("TRACKX1")->read() - state->m_wwally_last_x[0]) & 0xff;
 
 		case 0x3004/2:
-			return (input_port_read(space->machine(), "TRACKY1") - state->m_wwally_last_y[0]) & 0xff;
+			return (state->ioport("TRACKY1")->read() - state->m_wwally_last_y[0]) & 0xff;
 
 		case 0x3008/2:
-			return (input_port_read(space->machine(), "TRACKX2") - state->m_wwally_last_x[1]) & 0xff;
+			return (state->ioport("TRACKX2")->read() - state->m_wwally_last_x[1]) & 0xff;
 
 		case 0x300c/2:
-			return (input_port_read(space->machine(), "TRACKY2") - state->m_wwally_last_y[1]) & 0xff;
+			return (state->ioport("TRACKY2")->read() - state->m_wwally_last_y[1]) & 0xff;
 
 		case 0x3010/2:
-			return (input_port_read(space->machine(), "TRACKX3") - state->m_wwally_last_x[2]) & 0xff;
+			return (state->ioport("TRACKX3")->read() - state->m_wwally_last_x[2]) & 0xff;
 
 		case 0x3014/2:
-			return (input_port_read(space->machine(), "TRACKY3") - state->m_wwally_last_y[2]) & 0xff;
+			return (state->ioport("TRACKY3")->read() - state->m_wwally_last_y[2]) & 0xff;
 	}
 	return segaic16_open_bus_r(space, 0, mem_mask);
 }
@@ -559,20 +559,20 @@ static WRITE16_HANDLER( wwally_custom_io_w )
 	{
 		case 0x3000/2:
 		case 0x3004/2:
-			state->m_wwally_last_x[0] = input_port_read(space->machine(), "TRACKX1");
-			state->m_wwally_last_y[0] = input_port_read(space->machine(), "TRACKY1");
+			state->m_wwally_last_x[0] = state->ioport("TRACKX1")->read();
+			state->m_wwally_last_y[0] = state->ioport("TRACKY1")->read();
 			break;
 
 		case 0x3008/2:
 		case 0x300c/2:
-			state->m_wwally_last_x[1] = input_port_read(space->machine(), "TRACKX2");
-			state->m_wwally_last_y[1] = input_port_read(space->machine(), "TRACKY2");
+			state->m_wwally_last_x[1] = state->ioport("TRACKX2")->read();
+			state->m_wwally_last_y[1] = state->ioport("TRACKY2")->read();
 			break;
 
 		case 0x3010/2:
 		case 0x3014/2:
-			state->m_wwally_last_x[2] = input_port_read(space->machine(), "TRACKX3");
-			state->m_wwally_last_y[2] = input_port_read(space->machine(), "TRACKY3");
+			state->m_wwally_last_x[2] = state->ioport("TRACKX3")->read();
+			state->m_wwally_last_y[2] = state->ioport("TRACKY3")->read();
 			break;
 	}
 }

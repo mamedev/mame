@@ -613,7 +613,7 @@ static UINT16 common_io_chip_r(address_space *space, int which, offs_t offset, U
 				return state->m_misc_io_data[which][offset];
 
 			/* otherwise, return an input port */
-			return input_port_read_safe(space->machine(), portnames[which][offset], 0xffff);
+			return state->ioport(portnames[which][offset])->read_safe(0xffff);
 
 		/* 'SEGA' protection */
 		case 0x10/2:
@@ -885,7 +885,7 @@ WRITE16_MEMBER(segas32_state::analog_custom_io_w)
 		case 0x12/2:
 		case 0x14/2:
 		case 0x16/2:
-			m_analog_value[offset & 3] = input_port_read_safe(machine(), names[offset & 3], 0);
+			m_analog_value[offset & 3] = ioport(names[offset & 3])->read_safe(0);
 			return;
 	}
 	logerror("%06X:unknown analog_custom_io_w(%X) = %04X & %04X\n", cpu_get_pc(&space.device()), offset*2, data, mem_mask);
@@ -901,7 +901,7 @@ READ16_MEMBER(segas32_state::extra_custom_io_r)
 		case 0x22/2:
 		case 0x24/2:
 		case 0x26/2:
-			return input_port_read_safe(machine(), names[offset & 3], 0xffff);
+			return ioport(names[offset & 3])->read_safe(0xffff);
 	}
 
 	logerror("%06X:unknown extra_custom_io_r(%X) & %04X\n", cpu_get_pc(&space.device()), offset*2, mem_mask);
@@ -918,7 +918,7 @@ WRITE16_MEMBER(segas32_state::orunners_custom_io_w)
 		case 0x12/2:
 		case 0x14/2:
 		case 0x16/2:
-			m_analog_value[offset & 3] = input_port_read_safe(machine(), names[m_analog_bank * 4 + (offset & 3)], 0);
+			m_analog_value[offset & 3] = ioport(names[m_analog_bank * 4 + (offset & 3)])->read_safe(0);
 			return;
 
 		case 0x20/2:
@@ -941,7 +941,7 @@ READ16_MEMBER(segas32_state::sonic_custom_io_r)
 		case 0x0c/2:
 		case 0x10/2:
 		case 0x14/2:
-			return (UINT8)(input_port_read(machine(), names[offset/2]) - m_sonic_last[offset/2]);
+			return (UINT8)(ioport(names[offset/2])->read() - m_sonic_last[offset/2]);
 	}
 
 	logerror("%06X:unknown sonic_custom_io_r(%X) & %04X\n", cpu_get_pc(&space.device()), offset*2, mem_mask);
@@ -958,8 +958,8 @@ WRITE16_MEMBER(segas32_state::sonic_custom_io_w)
 		case 0x00/2:
 		case 0x08/2:
 		case 0x10/2:
-			m_sonic_last[offset/2 + 0] = input_port_read(machine(), names[offset/2 + 0]);
-			m_sonic_last[offset/2 + 1] = input_port_read(machine(), names[offset/2 + 1]);
+			m_sonic_last[offset/2 + 0] = ioport(names[offset/2 + 0])->read();
+			m_sonic_last[offset/2 + 1] = ioport(names[offset/2 + 1])->read();
 			return;
 	}
 

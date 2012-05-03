@@ -257,7 +257,7 @@ WRITE16_MEMBER(jpmsys5_state::rombank_w)
 READ16_MEMBER(jpmsys5_state::coins_r)
 {
 	if (offset == 2)
-		return input_port_read(machine(), "COINS") << 8;
+		return ioport("COINS")->read() << 8;
 	else
 		return 0xffff;
 }
@@ -280,7 +280,7 @@ WRITE16_MEMBER(jpmsys5_state::mux_w)
 READ16_MEMBER(jpmsys5_state::mux_r)
 {
 	if (offset == 0x81/2)
-		return input_port_read(machine(), "DSW");
+		return ioport("DSW")->read();
 
 	return 0xffff;
 }
@@ -410,8 +410,8 @@ INPUT_CHANGED_MEMBER(jpmsys5_state::touchscreen_press)
 
 		/* Each touch screen packet is 3 bytes */
 		m_touch_data[0] = 0x2a;
-		m_touch_data[1] = 0x7 - (input_port_read(machine(), "TOUCH_Y") >> 5) + 0x30;
-		m_touch_data[2] = (input_port_read(machine(), "TOUCH_X") >> 5) + 0x30;
+		m_touch_data[1] = 0x7 - (ioport("TOUCH_Y")->read() >> 5) + 0x30;
+		m_touch_data[2] = (ioport("TOUCH_X")->read() >> 5) + 0x30;
 
 		/* Start sending the data to the 68000 serially */
 		m_touch_data_count = 0;

@@ -61,7 +61,7 @@ READ8_MEMBER(fcombat_state::fcombat_protection_r)
 READ8_MEMBER(fcombat_state::fcombat_port01_r)
 {
 	/* the cocktail flip bit muxes between ports 0 and 1 */
-	return m_cocktail_flip ? input_port_read(machine(), "IN1") : input_port_read(machine(), "IN0");
+	return ioport(m_cocktail_flip ? "IN1" : "IN0")->read();
 }
 
 
@@ -194,7 +194,7 @@ static INPUT_PORTS_START( fcombat )
 	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
 
 	PORT_START("DSW1")      /* dip switches/VBLANK (0xe200) */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )		// related to vblank
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( On ) )

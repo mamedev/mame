@@ -117,7 +117,7 @@ WRITE8_MEMBER(naughtyb_state::naughtyb_videoreg_w)
 	pleiads_sound_control_c_w(machine().device("cust"),offset,data);
 
 	m_cocktail =
-		( ( input_port_read(machine(), "DSW0") & 0x80 ) &&	// cabinet == cocktail
+		( ( ioport("DSW0")->read() & 0x80 ) &&	// cabinet == cocktail
 		  ( data & 0x01 ) );				// handling player 2
 	m_palreg  = (data >> 1) & 0x03;			// palette sel is bit 1 & 2
 	m_bankreg = (data >> 2) & 0x01;			// banksel is just bit 2
@@ -129,7 +129,7 @@ WRITE8_MEMBER(naughtyb_state::popflame_videoreg_w)
 	pleiads_sound_control_c_w(machine().device("cust"),offset,data);
 
 	m_cocktail =
-		( ( input_port_read(machine(), "DSW0") & 0x80 ) &&	// cabinet == cocktail
+		( ( ioport("DSW0")->read() & 0x80 ) &&	// cabinet == cocktail
 		  ( data & 0x01 ) );				// handling player 2
 	m_palreg  = (data >> 1) & 0x03;			// palette sel is bit 1 & 2
 	m_bankreg = (data >> 3) & 0x01;			// banksel is just bit 3

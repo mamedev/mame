@@ -1115,7 +1115,7 @@ static void mcd212_mix_lines(mcd212_regs_t *mcd212, UINT8 *plane_a_r, UINT8 *pla
 {
     running_machine &machine = mcd212->machine();
     int x = 0;
-    UINT8 debug_mode = input_port_read(machine, "DEBUG");
+    UINT8 debug_mode = machine.root_device().ioport("DEBUG")->read();
     UINT8 global_plane_a_disable = debug_mode & 1;
     UINT8 global_plane_b_disable = debug_mode & 2;
     UINT8 debug_backdrop_enable = debug_mode & 4;

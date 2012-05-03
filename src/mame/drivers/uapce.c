@@ -173,7 +173,7 @@ READ8_MEMBER(uapce_state::jamma_if_read_dsw)
 {
 	UINT8 dsw_val;
 
-	dsw_val = input_port_read(machine(),  "DSW" );
+	dsw_val = ioport("DSW" )->read();
 
 	if ( BIT( offset, 7 ) == 0 )
 	{
@@ -216,11 +216,11 @@ static UINT8 jamma_if_read_joystick( running_machine &machine )
 	uapce_state *state = machine.driver_data<uapce_state>();
 	if ( state->m_jamma_if_control_latch & 0x10 )
 	{
-		return input_port_read(machine,  "JOY" );
+		return state->ioport("JOY" )->read();
 	}
 	else
 	{
-		return input_port_read(machine,  "JOY" ) | 0x08;
+		return machine.root_device().ioport("JOY" )->read() | 0x08;
 	}
 }
 

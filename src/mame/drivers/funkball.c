@@ -555,7 +555,7 @@ READ8_MEMBER( funkball_state::test_r )
 	static const char *const portnames[] = { "IN0", "IN1", "IN2", "IN3", "IN4", "IN5", "IN6", "IN7",
 	                                         "IN8", "IN9", "INA", "INB", "INC", "IND", "INE", "INF",};
 
-	return input_port_read(machine(), portnames[offset]);
+	return ioport(portnames[offset])->read();
 }
 
 static ADDRESS_MAP_START(funkball_map, AS_PROGRAM, 32, funkball_state)
@@ -1118,13 +1118,13 @@ static MACHINE_START( funkball )
 static MACHINE_RESET( funkball )
 {
 	funkball_state *state = machine.driver_data<funkball_state>();
-	state->membank("bios_ext1")->set_base(machine.root_device().memregion("bios")->base() + 0x00000);
-	state->membank("bios_ext2")->set_base(machine.root_device().memregion("bios")->base() + 0x04000);
-	state->membank("bios_ext3")->set_base(machine.root_device().memregion("bios")->base() + 0x08000);
-	state->membank("bios_ext4")->set_base(machine.root_device().memregion("bios")->base() + 0x0c000);
-	state->membank("bios_bank1")->set_base(machine.root_device().memregion("bios")->base() + 0x10000);
-	state->membank("bios_bank2")->set_base(machine.root_device().memregion("bios")->base() + 0x14000);
-	state->membank("bios_bank3")->set_base(machine.root_device().memregion("bios")->base() + 0x18000);
+	state->membank("bios_ext1")->set_base(state->memregion("bios")->base() + 0x00000);
+	state->membank("bios_ext2")->set_base(state->memregion("bios")->base() + 0x04000);
+	state->membank("bios_ext3")->set_base(state->memregion("bios")->base() + 0x08000);
+	state->membank("bios_ext4")->set_base(state->memregion("bios")->base() + 0x0c000);
+	state->membank("bios_bank1")->set_base(state->memregion("bios")->base() + 0x10000);
+	state->membank("bios_bank2")->set_base(state->memregion("bios")->base() + 0x14000);
+	state->membank("bios_bank3")->set_base(state->memregion("bios")->base() + 0x18000);
 	state->membank("bios_bank4")->set_base(state->memregion("bios")->base() + 0x1c000);
 	state->m_voodoo_pci_regs.base_addr = 0xff000000;
 }

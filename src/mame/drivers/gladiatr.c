@@ -202,14 +202,14 @@ WRITE8_MEMBER(gladiatr_state::gladiatr_bankswitch_w)
 
 static READ8_HANDLER( gladiator_dsw1_r )
 {
-	int orig = input_port_read(space->machine(), "DSW1")^0xff;
+	int orig = space->machine().root_device().ioport("DSW1")->read()^0xff;
 
 	return BITSWAP8(orig, 0,1,2,3,4,5,6,7);
 }
 
 static READ8_HANDLER( gladiator_dsw2_r )
 {
-	int orig = input_port_read(space->machine(), "DSW2")^0xff;
+	int orig = space->machine().root_device().ioport("DSW2")->read()^0xff;
 
 	return BITSWAP8(orig, 2,3,4,5,6,7,1,0);
 }
@@ -218,15 +218,15 @@ static READ8_HANDLER( gladiator_controls_r )
 {
 	int coins = 0;
 
-	if( input_port_read(space->machine(), "COINS") & 0xc0 ) coins = 0x80;
+	if( space->machine().root_device().ioport("COINS")->read() & 0xc0 ) coins = 0x80;
 	switch(offset)
 	{
 	case 0x01: /* start button , coins */
-		return input_port_read(space->machine(), "IN0") | coins;
+		return space->machine().root_device().ioport("IN0")->read() | coins;
 	case 0x02: /* Player 1 Controller , coins */
-		return input_port_read(space->machine(), "IN1") | coins;
+		return space->machine().root_device().ioport("IN1")->read() | coins;
 	case 0x04: /* Player 2 Controller , coins */
-		return input_port_read(space->machine(), "IN2") | coins;
+		return space->machine().root_device().ioport("IN2")->read() | coins;
 	}
 	/* unknown */
 	return 0;
@@ -237,7 +237,7 @@ static READ8_HANDLER( gladiator_button3_r )
 	switch(offset)
 	{
 	case 0x01: /* button 3 */
-		return input_port_read(space->machine(), "IN3");
+		return space->machine().root_device().ioport("IN3")->read();
 	}
 	/* unknown */
 	return 0;

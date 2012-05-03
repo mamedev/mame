@@ -71,7 +71,7 @@ READ8_MEMBER(tankbatt_state::tankbatt_in0_r)
 {
 	int val;
 
-	val = input_port_read(machine(), "P1");
+	val = ioport("P1")->read();
 	return ((val << (7 - offset)) & 0x80);
 }
 
@@ -79,7 +79,7 @@ READ8_MEMBER(tankbatt_state::tankbatt_in1_r)
 {
 	int val;
 
-	val = input_port_read(machine(), "P2");
+	val = ioport("P2")->read();
 	return ((val << (7 - offset)) & 0x80);
 }
 
@@ -87,7 +87,7 @@ READ8_MEMBER(tankbatt_state::tankbatt_dsw_r)
 {
 	int val;
 
-	val = input_port_read(machine(), "DSW");
+	val = ioport("DSW")->read();
 	return ((val << (7 - offset)) & 0x80);
 }
 

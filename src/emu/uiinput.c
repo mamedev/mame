@@ -37,8 +37,8 @@ enum
 struct _ui_input_private
 {
 	/* pressed states; retrieved with ui_input_pressed() */
-	osd_ticks_t					next_repeat[__ipt_max];
-	UINT8						seqpressed[__ipt_max];
+	osd_ticks_t					next_repeat[IPT_COUNT];
+	UINT8						seqpressed[IPT_COUNT];
 
 	/* mouse position/info */
 	render_target *				current_mouse_target;
@@ -97,12 +97,11 @@ void ui_input_init(running_machine &machine)
 void ui_input_frame_update(running_machine &machine)
 {
 	ui_input_private *uidata = machine.ui_input_data;
-	int code;
 
 	/* update the state of all the UI keys */
-	for (code = __ipt_ui_start; code <= __ipt_ui_end; code++)
+	for (ioport_type code = ioport_type(IPT_UI_FIRST + 1); code < IPT_UI_LAST; code++)
 	{
-		int pressed = machine.input().seq_pressed(input_type_seq(machine, code, 0, SEQ_TYPE_STANDARD));
+		bool pressed = machine.ioport().type_pressed(code);
 		if (!pressed || uidata->seqpressed[code] != SEQ_PRESSED_RESET)
 			uidata->seqpressed[code] = pressed;
 	}
@@ -199,7 +198,7 @@ void ui_input_reset(running_machine &machine)
 
 	uidata->events_start = 0;
 	uidata->events_end = 0;
-	for (code = __ipt_ui_start; code <= __ipt_ui_end; code++)
+	for (code = IPT_UI_FIRST + 1; code < IPT_UI_LAST; code++)
 	{
 		uidata->seqpressed[code] = SEQ_PRESSED_RESET;
 		uidata->next_repeat[code] = 0;

@@ -559,8 +559,8 @@ SCREEN_UPDATE_RGB32( slikshot )
 	SCREEN_UPDATE32_CALL(itech8_2page);
 
 	/* add the current X,Y positions to the list */
-	state->m_xbuffer[state->m_ybuffer_next % YBUFFER_COUNT] = input_port_read_safe(screen.machine(), "FAKEX", 0);
-	state->m_ybuffer[state->m_ybuffer_next % YBUFFER_COUNT] = input_port_read_safe(screen.machine(), "FAKEY", 0);
+	state->m_xbuffer[state->m_ybuffer_next % YBUFFER_COUNT] = state->ioport("FAKEX")->read_safe(0);
+	state->m_ybuffer[state->m_ybuffer_next % YBUFFER_COUNT] = state->ioport("FAKEY")->read_safe(0);
 	state->m_ybuffer_next++;
 
 	/* determine where to draw the starting point */

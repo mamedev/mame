@@ -221,11 +221,11 @@ void crosshair_init(running_machine &machine)
 	global.auto_time = CROSSHAIR_VISIBILITY_AUTOTIME_DEFAULT;
 
 	/* determine who needs crosshairs */
-	for (input_port_config *port = machine.ioport().first_port(); port != NULL; port = port->next())
-		for (input_field_config *field = port->fieldlist().first(); field != NULL; field = field->next())
-			if (field->crossaxis != CROSSHAIR_AXIS_NONE)
+	for (ioport_port *port = machine.ioport().first_port(); port != NULL; port = port->next())
+		for (ioport_field *field = port->first_field(); field != NULL; field = field->next())
+			if (field->crosshair_axis() != CROSSHAIR_AXIS_NONE)
 			{
-				int player = field->player;
+				int player = field->player();
 
 				assert(player < MAX_PLAYERS);
 
@@ -347,7 +347,7 @@ static void animate(running_machine &machine, screen_device &device, bool vblank
 	{
 		/* read all the lightgun values */
 		if (global.used[player])
-			input_port_get_crosshair_position(device.machine(), player, &global.x[player], &global.y[player]);
+			device.machine().ioport().crosshair_position(player, global.x[player], global.y[player]);
 
 		/* auto visibility */
 		if (global.mode[player] == CROSSHAIR_VISIBILITY_AUTO)

@@ -91,7 +91,7 @@ static SCREEN_UPDATE_IND16( mgolf )
 static void update_plunger( running_machine &machine )
 {
 	mgolf_state *state = machine.driver_data<mgolf_state>();
-	UINT8 val = input_port_read(machine, "BUTTON");
+	UINT8 val = state->ioport("BUTTON")->read();
 
 	if (state->m_prev != val)
 	{
@@ -143,13 +143,13 @@ READ8_MEMBER(mgolf_state::mgolf_wram_r)
 
 READ8_MEMBER(mgolf_state::mgolf_dial_r)
 {
-	UINT8 val = input_port_read(machine(), "41");
+	UINT8 val = ioport("41")->read();
 
-	if ((input_port_read(machine(), "DIAL") + 0x00) & 0x20)
+	if ((ioport("DIAL")->read() + 0x00) & 0x20)
 	{
 		val |= 0x01;
 	}
-	if ((input_port_read(machine(), "DIAL") + 0x10) & 0x20)
+	if ((ioport("DIAL")->read() + 0x10) & 0x20)
 	{
 		val |= 0x02;
 	}
@@ -162,7 +162,7 @@ READ8_MEMBER(mgolf_state::mgolf_misc_r)
 {
 	double plunger = calc_plunger_pos(machine()); /* see Video Pinball */
 
-	UINT8 val = input_port_read(machine(), "61");
+	UINT8 val = ioport("61")->read();
 
 	if (plunger >= 0.000 && plunger <= 0.001)
 	{
@@ -232,7 +232,7 @@ static INPUT_PORTS_START( mgolf )
 	PORT_BIT ( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) /* DIAL A */
 	PORT_BIT ( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) /* DIAL B */
 	PORT_BIT ( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT ( 0x08, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT ( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("60")
 	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )

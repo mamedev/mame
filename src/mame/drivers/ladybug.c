@@ -203,7 +203,7 @@ INPUT_CHANGED_MEMBER(ladybug_state::coin2_inserted)
 
 CUSTOM_INPUT_MEMBER(ladybug_state::ladybug_p1_control_r)
 {
-	return input_port_read(machine(), LADYBUG_P1_CONTROL_PORT_TAG);
+	return ioport(LADYBUG_P1_CONTROL_PORT_TAG)->read();
 }
 
 CUSTOM_INPUT_MEMBER(ladybug_state::ladybug_p2_control_r)
@@ -211,10 +211,10 @@ CUSTOM_INPUT_MEMBER(ladybug_state::ladybug_p2_control_r)
 	UINT32 ret;
 
 	/* upright cabinet only uses a single set of controls */
-	if (input_port_read(machine(), "DSW0") & 0x20)
-		ret = input_port_read(machine(), LADYBUG_P2_CONTROL_PORT_TAG);
+	if (ioport("DSW0")->read() & 0x20)
+		ret = ioport(LADYBUG_P2_CONTROL_PORT_TAG)->read();
 	else
-		ret = input_port_read(machine(), LADYBUG_P1_CONTROL_PORT_TAG);
+		ret = ioport(LADYBUG_P1_CONTROL_PORT_TAG)->read();
 
 	return ret;
 }
@@ -234,7 +234,7 @@ static INPUT_PORTS_START( ladybug )
 	/* Note that there are TWO VBlank inputs, one is active low, the other active */
 	/* high. There are probably other differencies in the hardware, but emulating */
 	/* them this way is enough to get the game running. */
-	PORT_BIT( 0xc0, 0x40, IPT_VBLANK )
+	PORT_BIT( 0xc0, 0x40, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("IN2")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -331,7 +331,7 @@ static INPUT_PORTS_START( snapjack )
 	/* Note that there are TWO VBlank inputs, one is active low, the other active */
 	/* high. There are probably other differencies in the hardware, but emulating */
 	/* them this way is enough to get the game running. */
-	PORT_BIT( 0xc0, 0x40, IPT_VBLANK )
+	PORT_BIT( 0xc0, 0x40, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("IN2")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -416,7 +416,7 @@ static INPUT_PORTS_START( cavenger )
 	/* Note that there are TWO VBlank inputs, one is active low, the other active */
 	/* high. There are probably other differencies in the hardware, but emulating */
 	/* them this way is enough to get the game running. */
-	PORT_BIT( 0xc0, 0x40, IPT_VBLANK )
+	PORT_BIT( 0xc0, 0x40, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 )
@@ -499,7 +499,7 @@ static INPUT_PORTS_START( dorodon )
 	/* Note that there are TWO VBlank inputs, one is active low, the other active */
 	/* high. There are probably other differencies in the hardware, but emulating */
 	/* them this way is enough to get the game running. */
-	PORT_BIT( 0xc0, 0x40, IPT_VBLANK )
+	PORT_BIT( 0xc0, 0x40, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("IN2")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )

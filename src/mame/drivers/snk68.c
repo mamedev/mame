@@ -63,35 +63,35 @@ WRITE8_MEMBER(snk68_state::sound_status_w)
 
 READ16_MEMBER(snk68_state::control_1_r)
 {
-	return (input_port_read(machine(), "P1") + (input_port_read(machine(), "P2") << 8));
+	return (ioport("P1")->read() + (ioport("P2")->read() << 8));
 }
 
 READ16_MEMBER(snk68_state::control_2_r)
 {
-	return input_port_read(machine(), "SYSTEM");
+	return ioport("SYSTEM")->read();
 }
 
 READ16_MEMBER(snk68_state::rotary_1_r)
 {
-	return (( ~(1 << input_port_read(machine(), "ROT1")) )<<8)&0xff00;
+	return (( ~(1 << ioport("ROT1")->read()) )<<8)&0xff00;
 }
 
 READ16_MEMBER(snk68_state::rotary_2_r)
 {
-	return (( ~(1 << input_port_read(machine(), "ROT2")) )<<8)&0xff00;
+	return (( ~(1 << ioport("ROT2")->read()) )<<8)&0xff00;
 }
 
 READ16_MEMBER(snk68_state::rotary_lsb_r)
 {
-	return ((( ~(1 << input_port_read(machine(), "ROT2"))  ) <<4)&0xf000)
-		 + ((( ~(1 << input_port_read(machine(), "ROT1"))  )    )&0x0f00);
+	return ((( ~(1 << ioport("ROT2")->read())  ) <<4)&0xf000)
+		 + ((( ~(1 << ioport("ROT1")->read())  )    )&0x0f00);
 }
 
 READ16_MEMBER(snk68_state::protcontrols_r)
 {
 	static const char *const portnames[] = { "P1", "P2", "SYSTEM" };
 
-	return input_port_read(machine(), portnames[offset]) ^ m_invert_controls;
+	return ioport(portnames[offset])->read() ^ m_invert_controls;
 }
 
 WRITE16_MEMBER(snk68_state::protection_w)

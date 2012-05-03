@@ -341,19 +341,19 @@ READ16_MEMBER(taitoair_state::stick_input_r)
 	switch( offset )
 	{
 		case 0x00:	/* "counter 1" lo */
-			return input_port_read(machine(), STICK1_PORT_TAG);
+			return ioport(STICK1_PORT_TAG)->read();
 
 		case 0x01:	/* "counter 2" lo */
-			return input_port_read(machine(), STICK2_PORT_TAG);
+			return ioport(STICK2_PORT_TAG)->read();
 
 		case 0x02:	/* "counter 1" hi */
-			if(input_port_read(machine(), STICK1_PORT_TAG) & 0x80)
+			if(ioport(STICK1_PORT_TAG)->read() & 0x80)
 				return 0xff;
 
 			return 0;
 
 		case 0x03:	/* "counter 2" hi */
-			return (input_port_read(machine(), STICK2_PORT_TAG) & 0xff00) >> 8;
+			return (ioport(STICK2_PORT_TAG)->read() & 0xff00) >> 8;
 	}
 
 	return 0;
@@ -364,10 +364,10 @@ READ16_MEMBER(taitoair_state::stick2_input_r)
 	switch( offset )
 	{
 		case 0x00:	/* "counter 3" lo */
-			return input_port_read(machine(), STICK3_PORT_TAG);
+			return ioport(STICK3_PORT_TAG)->read();
 
 		case 0x02:	/* "counter 3" hi */
-			return (input_port_read(machine(), STICK3_PORT_TAG) & 0xff00) >> 8;
+			return (ioport(STICK3_PORT_TAG)->read() & 0xff00) >> 8;
 	}
 
 	return 0;

@@ -40,7 +40,7 @@ static READ16_DEVICE_HANDLER( tourtabl_read_input_port )
 {
 	static const char *const tianames[] = { "PADDLE4", "PADDLE3", "PADDLE2", "PADDLE1", "TIA_IN4", "TIA_IN5" };
 
-	return input_port_read(device->machine(), tianames[offset]);
+	return device->machine().root_device().ioport(tianames[offset])->read();
 }
 
 static READ8_DEVICE_HANDLER( tourtabl_get_databus_contents )

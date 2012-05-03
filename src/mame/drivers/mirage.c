@@ -111,11 +111,11 @@ READ16_MEMBER(miragemi_state::mirage_input_r)
 {
 	switch (m_mux_data & 0x1f)
 	{
-		case 0x01: return input_port_read(machine(), "KEY0");
-		case 0x02: return input_port_read(machine(), "KEY1");
-		case 0x04: return input_port_read(machine(), "KEY2");
-		case 0x08: return input_port_read(machine(), "KEY3");
-		case 0x10: return input_port_read(machine(), "KEY4");
+		case 0x01: return ioport("KEY0")->read();
+		case 0x02: return ioport("KEY1")->read();
+		case 0x04: return ioport("KEY2")->read();
+		case 0x08: return ioport("KEY3")->read();
+		case 0x10: return ioport("KEY4")->read();
 	}
 
 	return 0xffff;
@@ -166,7 +166,7 @@ static INPUT_PORTS_START( mirage )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_SERVICE( 0x0008, IP_ACTIVE_LOW )
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Flip_Screen ) )
 	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )

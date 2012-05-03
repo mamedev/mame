@@ -532,7 +532,7 @@ static INPUT_PORTS_START( voyager )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN ) // returns back to MS-DOS (likely to be unmapped and actually used as a lame protection check)
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_START("IOCARD3")
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_VBLANK )
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0xdfff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IOCARD4")

@@ -356,7 +356,7 @@ static int blitter_drawgfx( running_machine &machine, int layer, int mask, const
 {
 	dynax_state *state = machine.driver_data<dynax_state>();
 	UINT8 cmd;
-	UINT8 *ROM = machine.root_device().memregion(gfx)->base();
+	UINT8 *ROM = state->memregion(gfx)->base();
 	size_t ROM_size = state->memregion(gfx)->bytes();
 
 	int sx;
@@ -1204,7 +1204,7 @@ static int debug_viewer( running_machine &machine, bitmap_ind16 &bitmap, const r
 	if (toggle)
 	{
 		dynax_state *state = machine.driver_data<dynax_state>();
-		UINT8 *RAM = machine.root_device().memregion( "gfx1" )->base();
+		UINT8 *RAM = state->memregion( "gfx1" )->base();
 		size_t size = state->memregion( "gfx1" )->bytes();
 		static int i = 0, c = 0, r = 0;
 

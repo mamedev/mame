@@ -335,7 +335,7 @@ void windows_osd_interface::wait_for_debugger(device_t &device, bool firststop)
 
 static int debugwin_seq_pressed(running_machine &machine)
 {
-	const input_seq &seq = input_type_seq(machine, IPT_UI_DEBUG_BREAK, 0, SEQ_TYPE_STANDARD);
+	const input_seq &seq = machine.ioport().type_seq(IPT_UI_DEBUG_BREAK);
 	int result = FALSE;
 	int invert = FALSE;
 	int first = TRUE;

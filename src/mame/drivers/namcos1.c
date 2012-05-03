@@ -369,7 +369,7 @@ WRITE8_MEMBER(namcos1_state::firq_ack_w)
 
 READ8_MEMBER(namcos1_state::dsw_r)
 {
-	int ret = input_port_read(machine(), "DIPSW");
+	int ret = ioport("DIPSW")->read();
 	if (!(offset & 2)) ret >>= 4;
 	return 0xf0 | ret;
 }

@@ -82,7 +82,7 @@ SCREEN_UPDATE_IND16( orbit )
 {
 	orbit_state *state = screen.machine().driver_data<orbit_state>();
 
-	state->m_flip_screen = input_port_read(screen.machine(), "DSW2") & 8;
+	state->m_flip_screen = screen.machine().root_device().ioport("DSW2")->read() & 8;
 
 	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 

@@ -38,8 +38,8 @@ WRITE8_MEMBER(vsnes_state::vsnes_in0_w)
 	if (data & 1)
 	{
 		/* load up the latches */
-		m_input_latch[0] = input_port_read(machine(), "IN0");
-		m_input_latch[1] = input_port_read(machine(), "IN1");
+		m_input_latch[0] = ioport("IN0")->read();
+		m_input_latch[1] = ioport("IN1")->read();
 	}
 }
 
@@ -50,8 +50,8 @@ READ8_MEMBER(vsnes_state::gun_in0_r)
 	/* shift */
 	m_input_latch[0] >>= 1;
 
-	ret |= input_port_read(machine(), "COINS");				/* merge coins, etc */
-	ret |= (input_port_read(machine(), "DSW0") & 3) << 3;		/* merge 2 dipswitches */
+	ret |= ioport("COINS")->read();				/* merge coins, etc */
+	ret |= (ioport("DSW0")->read() & 3) << 3;		/* merge 2 dipswitches */
 
 /* The gun games expect a 1 returned on every 5th read after sound_fix is reset*/
 /* Info Supplied by Ben Parnell <xodnizel@home.com> of FCE Ultra fame */
@@ -75,8 +75,8 @@ READ8_MEMBER(vsnes_state::vsnes_in0_r)
 	/* shift */
 	m_input_latch[0] >>= 1;
 
-	ret |= input_port_read(machine(), "COINS");				/* merge coins, etc */
-	ret |= (input_port_read(machine(), "DSW0") & 3) << 3;		/* merge 2 dipswitches */
+	ret |= ioport("COINS")->read();				/* merge coins, etc */
+	ret |= (ioport("DSW0")->read() & 3) << 3;		/* merge 2 dipswitches */
 
 	return ret;
 
@@ -86,7 +86,7 @@ READ8_MEMBER(vsnes_state::vsnes_in1_r)
 {
 	int ret = (m_input_latch[1]) & 1;
 
-	ret |= input_port_read(machine(), "DSW0") & ~3;			/* merge the rest of the dipswitches */
+	ret |= ioport("DSW0")->read() & ~3;			/* merge the rest of the dipswitches */
 
 	/* shift */
 	m_input_latch[1] >>= 1;
@@ -100,8 +100,8 @@ WRITE8_MEMBER(vsnes_state::vsnes_in0_1_w)
 	if (data & 1)
 	{
 		/* load up the latches */
-		m_input_latch[2] = input_port_read(machine(), "IN2");
-		m_input_latch[3] = input_port_read(machine(), "IN3");
+		m_input_latch[2] = ioport("IN2")->read();
+		m_input_latch[3] = ioport("IN3")->read();
 	}
 }
 
@@ -112,8 +112,8 @@ READ8_MEMBER(vsnes_state::vsnes_in0_1_r)
 	/* shift */
 	m_input_latch[2] >>= 1;
 
-	ret |= input_port_read(machine(), "COINS2");				/* merge coins, etc */
-	ret |= (input_port_read(machine(), "DSW1") & 3) << 3;		/* merge 2 dipswitches */
+	ret |= ioport("COINS2")->read();				/* merge coins, etc */
+	ret |= (ioport("DSW1")->read() & 3) << 3;		/* merge 2 dipswitches */
 	return ret;
 }
 
@@ -121,7 +121,7 @@ READ8_MEMBER(vsnes_state::vsnes_in1_1_r)
 {
 	int ret = (m_input_latch[3]) & 1;
 
-	ret |= input_port_read(machine(), "DSW1") & ~3;			/* merge the rest of the dipswitches */
+	ret |= ioport("DSW1")->read() & ~3;			/* merge the rest of the dipswitches */
 
 	/* shift */
 	m_input_latch[3] >>= 1;
@@ -202,7 +202,7 @@ MACHINE_START( vsnes )
 
 	ppu1_space->install_readwrite_handler(0x2000, 0x3eff, read8_delegate(FUNC(vsnes_state::vsnes_nt0_r),state), write8_delegate(FUNC(vsnes_state::vsnes_nt0_w),state));
 
-	state->m_vrom[0] = machine.root_device().memregion("gfx1")->base();
+	state->m_vrom[0] = state->memregion("gfx1")->base();
 	state->m_vrom_size[0] = state->memregion("gfx1")->bytes();
 	state->m_vrom_banks = state->m_vrom_size[0] / 0x400;
 
@@ -227,9 +227,9 @@ MACHINE_START( vsnes )
 MACHINE_START( vsdual )
 {
 	vsnes_state *state = machine.driver_data<vsnes_state>();
-	state->m_vrom[0] = machine.root_device().memregion("gfx1")->base();
-	state->m_vrom[1] = machine.root_device().memregion("gfx2")->base();
-	state->m_vrom_size[0] = machine.root_device().memregion("gfx1")->bytes();
+	state->m_vrom[0] = state->memregion("gfx1")->base();
+	state->m_vrom[1] = state->memregion("gfx2")->base();
+	state->m_vrom_size[0] = state->memregion("gfx1")->bytes();
 	state->m_vrom_size[1] = state->memregion("gfx2")->bytes();
 
 	/* establish nametable ram */
@@ -365,11 +365,11 @@ WRITE8_MEMBER(vsnes_state::gun_in0_w)
 	{
 
 		/* load up the latches */
-		m_input_latch[0] = input_port_read(machine(), "IN0");
+		m_input_latch[0] = ioport("IN0")->read();
 
 		/* do the gun thing */
-		int x = input_port_read(machine(), "GUNX");
-		int y = input_port_read(machine(), "GUNY");
+		int x = ioport("GUNX")->read();
+		int y = ioport("GUNY")->read();
 		UINT32 pix, color_base;
 
 		/* get the pixel at the gun position */
@@ -385,7 +385,7 @@ WRITE8_MEMBER(vsnes_state::gun_in0_w)
 			m_input_latch[0] |= 0x40;
 		}
 
-		m_input_latch[1] = input_port_read(machine(), "IN1");
+		m_input_latch[1] = ioport("IN1")->read();
 	}
 
     if ((m_zapstore & 1) && (!(data & 1)))
@@ -773,7 +773,7 @@ WRITE8_MEMBER(vsnes_state::mapper4_w)
 DRIVER_INIT( MMC3 )
 {
 	vsnes_state *state = machine.driver_data<vsnes_state>();
-	UINT8 *prg = machine.root_device().memregion("maincpu")->base();
+	UINT8 *prg = state->memregion("maincpu")->base();
 	state->m_IRQ_enable = state->m_IRQ_count = state->m_IRQ_count_latch = 0;
 	int MMC3_prg_chunks = (state->memregion("maincpu")->bytes() - 0x10000) / 0x4000;
 

@@ -338,7 +338,7 @@ static READ32_DEVICE_HANDLER( psh_eeprom_r )
 {
 	if (ACCESSING_BITS_24_31)
 	{
-		return input_port_read(device->machine(), "JP4");
+		return device->machine().root_device().ioport("JP4")->read();
 	}
 
 	logerror("Unk EEPROM read mask %x\n", mem_mask);
@@ -437,8 +437,8 @@ P1KEY11  29|30  P2KEY11
     GND  55|56  GND
 */
 
-	UINT32 controls = input_port_read(machine(), "CONTROLLER");
-	UINT32 value = input_port_read(machine(), "INPUTS");
+	UINT32 controls = ioport("CONTROLLER")->read();
+	UINT32 value = ioport("INPUTS")->read();
 
 	if(controls) {
 		// Clearly has ghosting, game will only recognise one key depressed at once, and keyboard can only represent keys with distinct rows and columns
@@ -483,7 +483,7 @@ P1KEY11  29|30  P2KEY11
 			KEY11 | KEY6, // Ron
 			KEY1 | KEY3   // Start
 		}; // generic Mahjong keyboard encoder, corresponds to ordering in input port
-		UINT32 keys = input_port_read(machine(), "MAHJONG");
+		UINT32 keys = ioport("MAHJONG")->read();
 		UINT32 which_key = 0x1;
 		int count = 0;
 

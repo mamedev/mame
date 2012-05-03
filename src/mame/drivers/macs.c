@@ -110,23 +110,23 @@ READ8_MEMBER(macs_state::macs_input_r)
 			/*It's bit-wise*/
 			switch(m_mux_data&0x0f)
 			{
-				case 0x00: return input_port_read(machine(), "IN0");
-				case 0x01: return input_port_read(machine(), "IN1");
-				case 0x02: return input_port_read(machine(), "IN2");
-				case 0x04: return input_port_read(machine(), "IN3");
-				case 0x08: return input_port_read(machine(), "IN4");
+				case 0x00: return ioport("IN0")->read();
+				case 0x01: return ioport("IN1")->read();
+				case 0x02: return ioport("IN2")->read();
+				case 0x04: return ioport("IN3")->read();
+				case 0x08: return ioport("IN4")->read();
 				default:
 				logerror("Unmapped mahjong panel mux data %02x\n",m_mux_data);
 				return 0xff;
 			}
 		}
-		case 1: return input_port_read(machine(), "SYS0");
-		case 2: return input_port_read(machine(), "DSW0");
-		case 3: return input_port_read(machine(), "DSW1");
-		case 4: return input_port_read(machine(), "DSW2");
-		case 5: return input_port_read(machine(), "DSW3");
-		case 6: return input_port_read(machine(), "DSW4");
-		case 7: return input_port_read(machine(), "SYS1");
+		case 1: return ioport("SYS0")->read();
+		case 2: return ioport("DSW0")->read();
+		case 3: return ioport("DSW1")->read();
+		case 4: return ioport("DSW2")->read();
+		case 5: return ioport("DSW3")->read();
+		case 6: return ioport("DSW4")->read();
+		case 7: return ioport("SYS1")->read();
 		default:	popmessage("Unmapped I/O read at PC = %06x offset = %02x",cpu_get_pc(&space.device()),offset+0xc0);
 	}
 
@@ -676,10 +676,10 @@ static MACHINE_RESET(macs)
         730E: ED B0         ldir
         ...
 */
-		memcpy(macs_ram1 + 0x0e9f, machine.root_device().memregion("user1")->base()+0x7327, 0xc7);
-		memcpy(macs_ram1 + 0x1e9f, machine.root_device().memregion("user1")->base()+0x7327, 0xc7);
+		memcpy(macs_ram1 + 0x0e9f, state->memregion("user1")->base()+0x7327, 0xc7);
+		memcpy(macs_ram1 + 0x1e9f, state->memregion("user1")->base()+0x7327, 0xc7);
 
-		memcpy(macs_ram1 + 0x0800, machine.root_device().memregion("user1")->base()+0x73fa, 0x507);
+		memcpy(macs_ram1 + 0x0800, state->memregion("user1")->base()+0x73fa, 0x507);
 		memcpy(macs_ram1 + 0x1800, state->memregion("user1")->base()+0x73fa, 0x507);
 
 #define MAKEJMP(n,m)	macs_ram2[(n) - 0xe800 + 0]=0xc3;\

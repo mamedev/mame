@@ -218,7 +218,7 @@ static WRITE8_DEVICE_HANDLER( upscope_cia_1_porta_w )
 		if (data & 4)
 		{
 			if (LOG_IO) logerror("Internal register (%d) read\n", state->m_nvram_address_latch);
-			state->m_nvram_data_latch = (state->m_nvram_address_latch == 0) ? input_port_read(device->machine(), "IO0") : 0xff;
+			state->m_nvram_data_latch = (state->m_nvram_address_latch == 0) ? device->machine().root_device().ioport("IO0")->read() : 0xff;
 		}
 
 		/* if SEL == 0, we read NVRAM */

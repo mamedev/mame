@@ -183,19 +183,19 @@ CUSTOM_INPUT_MEMBER(ms32_state::mahjong_ctrl_r)
 	switch (m_mahjong_input_select[0])
 	{
 		case 0x01:
-			mj_input = input_port_read(machine(), "MJ0");
+			mj_input = ioport("MJ0")->read();
 			break;
 		case 0x02:
-			mj_input = input_port_read(machine(), "MJ1");
+			mj_input = ioport("MJ1")->read();
 			break;
 		case 0x04:
-			mj_input = input_port_read(machine(), "MJ2");
+			mj_input = ioport("MJ2")->read();
 			break;
 		case 0x08:
-			mj_input = input_port_read(machine(), "MJ3");
+			mj_input = ioport("MJ3")->read();
 			break;
 		case 0x10:
-			mj_input = input_port_read(machine(), "MJ4");
+			mj_input = ioport("MJ4")->read();
 			break;
 		default:
 			mj_input = 0;
@@ -209,10 +209,10 @@ CUSTOM_INPUT_MEMBER(ms32_state::mahjong_ctrl_r)
 READ32_MEMBER(ms32_state::ms32_read_inputs3)
 {
 	int a,b,c,d;
-	a = input_port_read(machine(), "AN2?"); // unused?
-	b = input_port_read(machine(), "AN2?"); // unused?
-	c = input_port_read(machine(), "AN1");
-	d = (input_port_read(machine(), "AN0") - 0xb0) & 0xff;
+	a = ioport("AN2?")->read(); // unused?
+	b = ioport("AN2?")->read(); // unused?
+	c = ioport("AN1")->read();
+	d = (ioport("AN0")->read() - 0xb0) & 0xff;
 	return a << 24 | b << 16 | c << 8 | d << 0;
 }
 
@@ -2202,7 +2202,7 @@ static void configure_banks(running_machine &machine)
 {
 	ms32_state *state = machine.driver_data<ms32_state>();
 	state_save_register_global(machine, state->m_to_main);
-	state->membank("bank4")->configure_entries(0, 16, machine.root_device().memregion("audiocpu")->base() + 0x14000, 0x4000);
+	state->membank("bank4")->configure_entries(0, 16, state->memregion("audiocpu")->base() + 0x14000, 0x4000);
 	state->membank("bank5")->configure_entries(0, 16, state->memregion("audiocpu")->base() + 0x14000, 0x4000);
 }
 

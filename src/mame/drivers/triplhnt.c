@@ -76,7 +76,7 @@ static void triplhnt_update_misc(running_machine &machine, int offset)
 	discrete_sound_w(discrete, TRIPLHNT_LAMP_EN, state->m_misc_flags & 0x02);	// Lamp is used to reset noise
 	discrete_sound_w(discrete, TRIPLHNT_BEAR_EN, state->m_misc_flags & 0x80);	// bear
 
-	is_witch_hunt = input_port_read(machine, "0C09") == 0x40;
+	is_witch_hunt = machine.root_device().ioport("0C09")->read() == 0x40;
 	bit = ~state->m_misc_flags & 0x40;
 
 	/* if we're not playing the sample yet, start it */
@@ -108,21 +108,21 @@ READ8_MEMBER(triplhnt_state::triplhnt_cmos_r)
 READ8_MEMBER(triplhnt_state::triplhnt_input_port_4_r)
 {
 	watchdog_reset_w(space, 0, 0);
-	return input_port_read(machine(), "0C0B");
+	return ioport("0C0B")->read();
 }
 
 
 READ8_MEMBER(triplhnt_state::triplhnt_misc_r)
 {
 	triplhnt_update_misc(machine(), offset);
-	return input_port_read(machine(), "VBLANK") | m_hit_code;
+	return ioport("VBLANK")->read() | m_hit_code;
 }
 
 
 READ8_MEMBER(triplhnt_state::triplhnt_da_latch_r)
 {
-	int cross_x = input_port_read(machine(), "STICKX");
-	int cross_y = input_port_read(machine(), "STICKY");
+	int cross_x = ioport("STICKX")->read();
+	int cross_y = ioport("STICKY")->read();
 
 	m_da_latch = offset;
 
@@ -196,7 +196,7 @@ static INPUT_PORTS_START( triplhnt )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
 
 	PORT_START("VBLANK")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("STICKX")
 	PORT_BIT( 0xfc, 0x80, IPT_AD_STICK_X ) PORT_MINMAX(0x00,0xfc)  PORT_CROSSHAIR(X, 62.0/64, 1.0/64, 0) PORT_SENSITIVITY(25) PORT_KEYDELTA(15)

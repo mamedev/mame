@@ -85,7 +85,7 @@ Address          Dir Data     Description
 
 READ8_MEMBER(jackal_state::topgunbl_rotary_r)
 {
-	return (1 << input_port_read_safe(machine(), offset ? "DIAL1" : "DIAL0", 0x00)) ^ 0xff;
+	return (1 << ioport(offset ? "DIAL1" : "DIAL0")->read_safe(0x00)) ^ 0xff;
 }
 
 WRITE8_MEMBER(jackal_state::jackal_flipscreen_w)

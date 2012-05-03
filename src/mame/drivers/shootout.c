@@ -171,7 +171,7 @@ static INPUT_PORTS_START( shootout )
 	PORT_DIPSETTING(	0x10, DEF_STR( Hard ) )
 	PORT_DIPSETTING(	0x00, DEF_STR( Very_Hard ) )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SPECIAL ) /* this is set when either coin is inserted */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( shootouj )

@@ -210,11 +210,11 @@ READ8_MEMBER(thepit_state::thepit_input_port_0_r)
        horizontal flip switch. (This is how the real PCB does it) */
 	if (m_flip_screen_x)
 	{
-		return input_port_read(machine(), "IN2");
+		return ioport("IN2")->read();
 	}
 	else
 	{
-		return input_port_read(machine(), "IN0");
+		return ioport("IN0")->read();
 	}
 }
 

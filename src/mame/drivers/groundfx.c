@@ -146,7 +146,7 @@ WRITE32_MEMBER(groundfx_state::groundfx_input_w)
 
 			if (ACCESSING_BITS_0_7)
 			{
-				input_port_write(machine(), "EEPROMOUT", data, 0xff);
+				ioport("EEPROMOUT")->write(data, 0xff);
 			}
 
 			break;
@@ -166,7 +166,7 @@ WRITE32_MEMBER(groundfx_state::groundfx_input_w)
 
 READ32_MEMBER(groundfx_state::groundfx_adc_r)
 {
-	return (input_port_read(machine(), "AN0") << 8) | input_port_read(machine(), "AN1");
+	return (ioport("AN0")->read() << 8) | ioport("AN1")->read();
 }
 
 WRITE32_MEMBER(groundfx_state::groundfx_adc_w)

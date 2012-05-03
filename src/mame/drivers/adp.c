@@ -287,7 +287,7 @@ WRITE8_MEMBER( adp_state::microtouch_tx )
 
 static UINT8 duart_input( device_t *device )
 {
-	return input_port_read(device->machine(), "DSW1");
+	return device->machine().root_device().ioport("DSW1")->read();
 }
 
 static const microtouch_interface adb_microtouch_config =
@@ -386,22 +386,22 @@ READ16_MEMBER(adp_state::test_r)
 
 	switch (m_mux_data)
 	{
-		case 0x00: value = input_port_read(machine(), "x0"); break;
-		case 0x01: value = input_port_read(machine(), "x1"); break;
-		case 0x02: value = input_port_read(machine(), "x2"); break;
-		case 0x03: value = input_port_read(machine(), "1P_UP"); break;
-		case 0x04: value = input_port_read(machine(), "1P_B1"); break;
-		case 0x05: value = input_port_read(machine(), "x5"); break;
-		case 0x06: value = input_port_read(machine(), "1P_RIGHT"); break;
-		case 0x07: value = input_port_read(machine(), "1P_DOWN"); break;
-		case 0x08: value = input_port_read(machine(), "1P_LEFT"); break;
-		case 0x09: value = input_port_read(machine(), "x9"); break;
-		case 0x0a: value = input_port_read(machine(), "x10"); break;
-		case 0x0b: value = input_port_read(machine(), "x11"); break;
-		case 0x0c: value = input_port_read(machine(), "x12"); break;
-		case 0x0d: value = input_port_read(machine(), "x13"); break;
-		case 0x0e: value = input_port_read(machine(), "1P_START"); break;
-		case 0x0f: value = input_port_read(machine(), "1P_COIN"); break;
+		case 0x00: value = ioport("x0")->read(); break;
+		case 0x01: value = ioport("x1")->read(); break;
+		case 0x02: value = ioport("x2")->read(); break;
+		case 0x03: value = ioport("1P_UP")->read(); break;
+		case 0x04: value = ioport("1P_B1")->read(); break;
+		case 0x05: value = ioport("x5")->read(); break;
+		case 0x06: value = ioport("1P_RIGHT")->read(); break;
+		case 0x07: value = ioport("1P_DOWN")->read(); break;
+		case 0x08: value = ioport("1P_LEFT")->read(); break;
+		case 0x09: value = ioport("x9")->read(); break;
+		case 0x0a: value = ioport("x10")->read(); break;
+		case 0x0b: value = ioport("x11")->read(); break;
+		case 0x0c: value = ioport("x12")->read(); break;
+		case 0x0d: value = ioport("x13")->read(); break;
+		case 0x0e: value = ioport("1P_START")->read(); break;
+		case 0x0f: value = ioport("1P_COIN")->read(); break;
 	}
 
 	m_mux_data++;

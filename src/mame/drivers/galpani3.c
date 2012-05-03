@@ -529,7 +529,7 @@ static void galpani3_mcu_run(running_machine &machine)
 	{
 		case 0x03:	// DSW
 		{
-			state->m_mcu_ram[mcu_offset] = input_port_read(machine, "DSW");
+			state->m_mcu_ram[mcu_offset] = state->ioport("DSW")->read();
 			logerror("%s : MCU executed command: %04X %04X (read DSW)\n", machine.describe_context(), mcu_command, mcu_offset*2);
 		}
 		break;

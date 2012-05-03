@@ -273,7 +273,7 @@ void pgm_arm7_type1_latch_init( running_machine &machine )
 static READ16_HANDLER( kovsh_fake_region_r )
 {
 	pgm_arm_type1_state *state = space->machine().driver_data<pgm_arm_type1_state>();
-	int regionhack = input_port_read(space->machine(), "RegionHack");
+	int regionhack = state->ioport("RegionHack")->read();
 	if (regionhack != 0xff) return regionhack;
 
 	offset = 0x4;
@@ -1388,7 +1388,7 @@ static WRITE16_HANDLER( pgm_arm7_type1_sim_w )
 static READ16_HANDLER( pgm_arm7_type1_sim_protram_r )
 {
 	if (offset == 4)
-		return input_port_read(space->machine(), "Region");
+		return space->machine().root_device().ioport("Region")->read();
 
 	return 0x0000;
 }
@@ -1398,7 +1398,7 @@ static READ16_HANDLER( pstars_arm7_type1_sim_protram_r )
 	pgm_arm_type1_state *state = space->machine().driver_data<pgm_arm_type1_state>();
 
 	if (offset == 4)		//region
-		return input_port_read(space->machine(), "Region");
+		return state->ioport("Region")->read();
 	else if (offset >= 0x10)  //timer
 	{
 		logerror("PSTARS ACCESS COUNTER %6X\n", state->m_extra_ram[offset - 0x10]);

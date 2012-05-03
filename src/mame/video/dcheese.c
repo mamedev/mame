@@ -168,7 +168,7 @@ static void do_blit( running_machine &machine )
 	INT32 dxdy = (INT32)(((state->m_blitter_xparam[6] & 0x0fff) | ((state->m_blitter_xparam[7] & 0x0fff) << 12)) << 12) >> 12;
 	INT32 dydx = (INT32)(((state->m_blitter_yparam[4] & 0x0fff) | ((state->m_blitter_yparam[5] & 0x0fff) << 12)) << 12) >> 12;
 	INT32 dydy = (INT32)(((state->m_blitter_yparam[6] & 0x0fff) | ((state->m_blitter_yparam[7] & 0x0fff) << 12)) << 12) >> 12;
-	UINT8 *src = machine.root_device().memregion("gfx1")->base();
+	UINT8 *src = state->memregion("gfx1")->base();
 	UINT32 pagemask = (state->memregion("gfx1")->bytes() - 1) / 0x40000;
 	int xstart = state->m_blitter_xparam[14];
 	int xend = state->m_blitter_xparam[15] + 1;
@@ -307,9 +307,9 @@ READ16_MEMBER(dcheese_state::madmax_blitter_vidparam_r)
 {
 	/* analog inputs seem to be hooked up here -- might not actually map to blitter */
 	if (offset == 0x02/2)
-		return input_port_read(machine(), "2a0002");
+		return ioport("2a0002")->read();
 	if (offset == 0x0e/2)
-		return input_port_read(machine(), "2a000e");
+		return ioport("2a000e")->read();
 
 	/* early code polls on this bit, wants it to be 0 */
 	if (offset == 0x36/2)

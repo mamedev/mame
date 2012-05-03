@@ -577,9 +577,9 @@ READ8_HANDLER( snes_r_io )
 
 		case 0x4100:		/* NSS Dip-Switches */
 			{
-				const input_port_config *port = state->ioport("DSW");
+				ioport_port *port = state->ioport("DSW");
 				if (port != NULL)
-					return input_port_read(space->machine(), "DSW");
+					return space->machine().root_device().ioport("DSW")->read();
 				else
 					return snes_open_bus_r(space, 0);
 			}
@@ -1644,8 +1644,8 @@ static void nss_io_read( running_machine &machine )
 
 	for (port = 0; port < 2; port++)
 	{
-		state->m_data1[port] = input_port_read(machine, portnames[port][0]) | (input_port_read(machine, portnames[port][1]) << 8);
-		state->m_data2[port] = input_port_read(machine, portnames[port][2]) | (input_port_read(machine, portnames[port][3]) << 8);
+		state->m_data1[port] = state->ioport(portnames[port][0])->read() | (state->ioport(portnames[port][1])->read() << 8);
+		state->m_data2[port] = state->ioport(portnames[port][2])->read() | (state->ioport(portnames[port][3])->read() << 8);
 
 		// avoid sending signals that could crash games
 		// if left, no right
@@ -1998,7 +1998,7 @@ DRIVER_INIT( snes )
 	UINT16 total_blocks, read_blocks;
 	UINT8 *rom;
 
-	rom = machine.root_device().memregion("user3")->base();
+	rom = state->memregion("user3")->base();
 	snes_ram = auto_alloc_array_clear(machine, UINT8, 0x1400000);
 
 	/* all NSS games seem to use MODE 20 */
@@ -2064,7 +2064,7 @@ DRIVER_INIT( snes_hirom )
 	UINT16 total_blocks, read_blocks;
 	UINT8  *rom;
 
-	rom = machine.root_device().memregion("user3")->base();
+	rom = state->memregion("user3")->base();
 	snes_ram = auto_alloc_array(machine, UINT8, 0x1400000);
 	memset(snes_ram, 0, 0x1400000);
 

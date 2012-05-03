@@ -6,7 +6,7 @@ WRITE8_MEMBER(blockade_state::blockade_videoram_w)
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 
-	if (input_port_read(machine(), "IN3") & 0x80)
+	if (ioport("IN3")->read() & 0x80)
 	{
 		logerror("blockade_videoram_w: scanline %d\n", machine().primary_screen->vpos());
 		device_spin_until_interrupt(&space.device());

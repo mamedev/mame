@@ -126,7 +126,7 @@ READ16_MEMBER(midwunit_state::midwunit_io_r)
 		case 1:
 		case 2:
 		case 3:
-			return input_port_read(machine(), portnames[offset]);
+			return ioport(portnames[offset])->read();
 
 		case 4:
 			return (midway_serial_pic_status_r() << 12) | midwunit_sound_state_r(space,0,0xffff);
@@ -156,7 +156,7 @@ static void init_wunit_generic(running_machine &machine)
 	register_state_saving(machine);
 
 	/* load the graphics ROMs -- quadruples */
-	midtunit_gfx_rom = base = machine.root_device().memregion("gfx1")->base();
+	midtunit_gfx_rom = base = state->memregion("gfx1")->base();
 	len = state->memregion("gfx1")->bytes();
 	for (i = 0; i < len / 0x400000; i++)
 	{

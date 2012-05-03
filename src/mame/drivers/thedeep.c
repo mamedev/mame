@@ -250,9 +250,9 @@ READ8_MEMBER(thedeep_state::thedeep_p0_r)
 {
 	UINT8 coin_mux;
 
-	coin_mux = ((input_port_read(machine(),"COINS") & 0x0e) == 0x0e); // bit 0 is hard-wired to ALL three coin latches
+	coin_mux = ((ioport("COINS")->read() & 0x0e) == 0x0e); // bit 0 is hard-wired to ALL three coin latches
 
-	return (input_port_read(machine(),"COINS") & 0xfe) | (coin_mux & 1);
+	return (ioport("COINS")->read() & 0xfe) | (coin_mux & 1);
 }
 
 static ADDRESS_MAP_START( mcu_io_map, AS_IO, 8, thedeep_state )
@@ -416,7 +416,7 @@ static TIMER_DEVICE_CALLBACK( thedeep_interrupt )
 	{
 		if (state->m_protection_command != 0x59)
 		{
-			int coins = input_port_read(timer.machine(), "MCU");
+			int coins = timer.machine().root_device().ioport("MCU")->read();
 			if		(coins & 1)	state->m_protection_data = 1;
 			else if	(coins & 2)	state->m_protection_data = 2;
 			else if	(coins & 4)	state->m_protection_data = 3;

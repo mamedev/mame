@@ -102,11 +102,11 @@ READ8_MEMBER(starfire_state::starfire_input_r)
 {
 	switch (offset & 15)
 	{
-		case 0:	return input_port_read(machine(), "DSW");
-		case 1:	return input_port_read(machine(), "SYSTEM");	/* Note: need to loopback sounds lengths on that one */
-		case 5: return input_port_read(machine(), "STICKZ");
-		case 6:	return input_port_read(machine(), "STICKX");
-		case 7:	return input_port_read(machine(), "STICKY");
+		case 0:	return ioport("DSW")->read();
+		case 1:	return ioport("SYSTEM")->read();	/* Note: need to loopback sounds lengths on that one */
+		case 5: return ioport("STICKZ")->read();
+		case 6:	return ioport("STICKX")->read();
+		case 7:	return ioport("STICKY")->read();
 		default: return 0xff;
 	}
 }
@@ -130,10 +130,10 @@ READ8_MEMBER(starfire_state::fireone_input_r)
 
 	switch (offset & 15)
 	{
-		case 0:	return input_port_read(machine(), "DSW");
-		case 1:	return input_port_read(machine(), "SYSTEM");
+		case 0:	return ioport("DSW")->read();
+		case 1:	return ioport("SYSTEM")->read();
 		case 2:
-			temp = m_fireone_select ? input_port_read(machine(), "P1") : input_port_read(machine(), "P2");
+			temp = m_fireone_select ? ioport("P1")->read() : ioport("P2")->read();
 			temp = (temp & 0xc0) | fireone_paddle_map[temp & 0x3f];
 			return temp;
 		default: return 0xff;

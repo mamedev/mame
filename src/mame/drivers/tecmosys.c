@@ -447,8 +447,8 @@ static const ymf262_interface tecmosys_ymf262_interface =
 
 static MACHINE_START( tecmosys )
 {
-//  tecmosys_state *state = machine.driver_data<tecmosys_state>();
-	machine.root_device().membank("bank1")->configure_entries(0, 16, machine.root_device().memregion("audiocpu")->base(), 0x4000);
+	tecmosys_state *state = machine.driver_data<tecmosys_state>();
+	state->membank("bank1")->configure_entries(0, 16, state->memregion("audiocpu")->base(), 0x4000);
 }
 
 static MACHINE_CONFIG_START( deroon, tecmosys_state )

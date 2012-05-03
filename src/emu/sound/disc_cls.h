@@ -149,7 +149,7 @@ public:
 	void step(void);
 	void reset(void);
 private:
-	const input_port_config *m_port;
+	ioport_port *m_port;
 	INT32					m_lastpval;
 	INT32					m_pmin;
 	double					m_pscale;

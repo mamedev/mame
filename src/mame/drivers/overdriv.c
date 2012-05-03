@@ -70,7 +70,7 @@ WRITE16_MEMBER(overdriv_state::eeprom_w)
 		/* bit 0 is data */
 		/* bit 1 is clock (active high) */
 		/* bit 2 is cs (active low) */
-		input_port_write(machine(), "EEPROMOUT", data, 0xff);
+		ioport("EEPROMOUT")->write(data, 0xff);
 	}
 }
 

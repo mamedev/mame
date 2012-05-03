@@ -111,16 +111,16 @@ static WRITE8_DEVICE_HANDLER( b_via_0_pa_w )
 		switch (data & 0x03)
 		{
 		case 0:
-			state->m_pbus = input_port_read(device->machine(), "IN0");
+			state->m_pbus = state->ioport("IN0")->read();
 			break;
 		case 1:
-			state->m_pbus = input_port_read(device->machine(), "IN1") | (input_port_read(device->machine(), "IN2") << 4);
+			state->m_pbus = state->ioport("IN1")->read() | (state->ioport("IN2")->read() << 4);
 			break;
 		case 2:
-			state->m_pbus = input_port_read(device->machine(), "DSWB");
+			state->m_pbus = state->ioport("DSWB")->read();
 			break;
 		case 3:
-			state->m_pbus = input_port_read(device->machine(), "DSWA"); // Technically DSWA isn't populated on the board and is pulled to 0xFF with resistor pack, but there IS a DSWA port in the driver so we may as well use it.
+			state->m_pbus = state->ioport("DSWA")->read(); // Technically DSWA isn't populated on the board and is pulled to 0xFF with resistor pack, but there IS a DSWA port in the driver so we may as well use it.
 			break;
 		}
 	}

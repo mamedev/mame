@@ -96,28 +96,28 @@ WRITE8_MEMBER(dec8_state::i8751_reset_w)
 
 READ8_MEMBER(dec8_state::gondo_player_1_r)
 {
-	int val = 1 << input_port_read(machine(), "AN0");
+	int val = 1 << ioport("AN0")->read();
 
 	switch (offset)
 	{
 		case 0: /* Rotary low byte */
 			return ~(val & 0xff);
 		case 1: /* Joystick = bottom 4 bits, rotary = top 4 */
-			return ((~val >> 4) & 0xf0) | (input_port_read(machine(), "IN0") & 0xf);
+			return ((~val >> 4) & 0xf0) | (ioport("IN0")->read() & 0xf);
 	}
 	return 0xff;
 }
 
 READ8_MEMBER(dec8_state::gondo_player_2_r)
 {
-	int val = 1 << input_port_read(machine(), "AN1");
+	int val = 1 << ioport("AN1")->read();
 
 	switch (offset)
 	{
 		case 0: /* Rotary low byte */
 			return ~(val & 0xff);
 		case 1: /* Joystick = bottom 4 bits, rotary = top 4 */
-			return ((~val >> 4) & 0xf0) | (input_port_read(machine(), "IN1") & 0xf);
+			return ((~val >> 4) & 0xf0) | (ioport("IN1")->read() & 0xf);
 	}
 	return 0xff;
 }
@@ -183,8 +183,8 @@ WRITE8_MEMBER(dec8_state::lastmisn_i8751_w)
 	}
 
 	/* Coins are controlled by the i8751 */
-	if ((input_port_read(machine(), "IN2") & 3) == 3) m_latch = 1;
-	if ((input_port_read(machine(), "IN2") & 1) != 1 && m_latch)
+	if ((ioport("IN2")->read() & 3) == 3) m_latch = 1;
+	if ((ioport("IN2")->read() & 1) != 1 && m_latch)
 	{
 		m_coin1++;
 		m_latch = 0;
@@ -196,7 +196,7 @@ WRITE8_MEMBER(dec8_state::lastmisn_i8751_w)
 			m_credits+=m_cred1;
 		}
 	}
-	if ((input_port_read(machine(), "IN2") & 2) != 2 && m_latch)
+	if ((ioport("IN2")->read() & 2) != 2 && m_latch)
 	{
 		m_coin2++;
 		m_latch = 0;
@@ -246,9 +246,9 @@ WRITE8_MEMBER(dec8_state::shackled_i8751_w)
 	}
 
 	/* Coins are controlled by the i8751 */
-	if (/*(input_port_read(machine(), "IN2") & 3) == 3*/!m_latch) { m_latch = 1; m_coin1 = m_coin2 = 0; }
-	if ((input_port_read(machine(), "IN2") & 1) != 1 && m_latch)  { m_coin1 = 1; m_latch = 0; }
-	if ((input_port_read(machine(), "IN2") & 2) != 2 && m_latch)  { m_coin2 = 1; m_latch = 0; }
+	if (/*(ioport("IN2")->read() & 3) == 3*/!m_latch) { m_latch = 1; m_coin1 = m_coin2 = 0; }
+	if ((ioport("IN2")->read() & 1) != 1 && m_latch)  { m_coin1 = 1; m_latch = 0; }
+	if ((ioport("IN2")->read() & 2) != 2 && m_latch)  { m_coin2 = 1; m_latch = 0; }
 
 	if (m_i8751_value == 0x0102) m_i8751_return = 0;    /* ??? */
 	if (m_i8751_value == 0x0101) m_i8751_return = 0;    /* ??? */
@@ -284,8 +284,8 @@ WRITE8_MEMBER(dec8_state::csilver_i8751_w)
 	}
 
 	/* Coins are controlled by the i8751 */
-	if ((input_port_read(machine(), "IN2") & 3) == 3) m_latch = 1;
-	if ((input_port_read(machine(), "IN2") & 1) != 1 && m_latch)
+	if ((ioport("IN2")->read() & 3) == 3) m_latch = 1;
+	if ((ioport("IN2")->read() & 1) != 1 && m_latch)
 	{
 		m_coin1++;
 		m_latch = 0;
@@ -297,7 +297,7 @@ WRITE8_MEMBER(dec8_state::csilver_i8751_w)
 			m_credits+=m_cred1;
 		}
 	}
-	if ((input_port_read(machine(), "IN2") & 2) != 2 && m_latch)
+	if ((ioport("IN2")->read() & 2) != 2 && m_latch)
 	{
 		m_coin2++;
 		m_latch = 0;
@@ -351,8 +351,8 @@ WRITE8_MEMBER(dec8_state::srdarwin_i8751_w)
 	}
 
 	/* Coins are controlled by the i8751 */
-	if ((input_port_read(machine(), "I8751") & 3) == 3) m_latch = 1;
-	if ((input_port_read(machine(), "I8751") & 1) != 1 && m_latch)
+	if ((ioport("I8751")->read() & 3) == 3) m_latch = 1;
+	if ((ioport("I8751")->read() & 1) != 1 && m_latch)
 	{
 		m_coin1++;
 		m_latch = 0;
@@ -362,7 +362,7 @@ WRITE8_MEMBER(dec8_state::srdarwin_i8751_w)
 			m_credits+=m_cred1;
 		}
 	}
-	if ((input_port_read(machine(), "I8751") & 2) != 2 && m_latch)
+	if ((ioport("I8751")->read() & 2) != 2 && m_latch)
 	{
 		m_coin2++;
 		m_latch = 0;
@@ -934,7 +934,7 @@ READ8_MEMBER(dec8_state::dec8_mcu_from_main_r)
 		case 2:
 			return 0xff;
 		case 3:
-			return input_port_read(machine(), "I8751");
+			return ioport("I8751")->read();
 	}
 
 	return 0xff; //compile safe.
@@ -1005,7 +1005,7 @@ static INPUT_PORTS_START( lastmisn )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("DSW0")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )
@@ -1095,7 +1095,7 @@ static INPUT_PORTS_START( shackled )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("DSW0")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )
@@ -1189,7 +1189,7 @@ static INPUT_PORTS_START( gondo )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("I8751")	/* hooked up on the i8751 */
 	/* Low 4 bits not connected on schematics */
@@ -1260,7 +1260,7 @@ static INPUT_PORTS_START( garyoret )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)  /* shoot */
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)  /* bomb */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("I8751")	/* hooked up on the (fake) i8751 */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 )
@@ -1344,7 +1344,7 @@ static INPUT_PORTS_START( ghostb )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_DIPUNUSED( 0x10, IP_ACTIVE_LOW )
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
@@ -1473,7 +1473,7 @@ static INPUT_PORTS_START( csilver )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("DSW0")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )
@@ -1560,7 +1560,7 @@ static INPUT_PORTS_START( oscar )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("DSW0")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )           /* table at 0xf8e3 (4 * 2 bytes : coins then credits) */
@@ -1649,7 +1649,7 @@ static INPUT_PORTS_START( srdarwin )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("I8751") /* Fake port for i8751 */
@@ -1743,7 +1743,7 @@ static INPUT_PORTS_START( cobracom )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_VBLANK )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("DSW0")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )           /* code at 0x88b7 in 'cobracom', 0x890e in 'cobracomj' */
@@ -1966,8 +1966,8 @@ static INTERRUPT_GEN( gondo_interrupt )
 static INTERRUPT_GEN( oscar_interrupt )
 {
 	dec8_state *state = device->machine().driver_data<dec8_state>();
-	if ((input_port_read(device->machine(), "IN2") & 0x7) == 0x7) state->m_latch = 1;
-	if (state->m_latch && (input_port_read(device->machine(), "IN2") & 0x7) != 0x7)
+	if ((state->ioport("IN2")->read() & 0x7) == 0x7) state->m_latch = 1;
+	if (state->m_latch && (state->ioport("IN2")->read() & 0x7) != 0x7)
 	{
 		state->m_latch = 0;
 		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);

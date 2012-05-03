@@ -55,7 +55,7 @@ public:
 /*----------- defined in video/lordgun.c -----------*/
 
 
-float lordgun_crosshair_mapper(const input_field_config *field, float linear_value);
+float lordgun_crosshair_mapper(const ioport_field *field, float linear_value);
 void lordgun_update_gun(running_machine &machine, int i);
 
 VIDEO_START( lordgun );

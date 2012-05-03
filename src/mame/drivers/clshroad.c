@@ -31,10 +31,10 @@ static MACHINE_RESET( clshroad )
 
 READ8_MEMBER(clshroad_state::clshroad_input_r)
 {
-	return	((~input_port_read(machine(), "P1") & (1 << offset)) ? 1 : 0) |
-			((~input_port_read(machine(), "P2") & (1 << offset)) ? 2 : 0) |
-			((~input_port_read(machine(), "DSW1") & (1 << offset)) ? 4 : 0) |
-			((~input_port_read(machine(), "DSW2") & (1 << offset)) ? 8 : 0) ;
+	return	((~ioport("P1")->read() & (1 << offset)) ? 1 : 0) |
+			((~ioport("P2")->read() & (1 << offset)) ? 2 : 0) |
+			((~ioport("DSW1")->read() & (1 << offset)) ? 4 : 0) |
+			((~ioport("DSW2")->read() & (1 << offset)) ? 8 : 0) ;
 }
 
 

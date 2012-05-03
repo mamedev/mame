@@ -185,7 +185,7 @@ READ8_MEMBER(bublbobl_state::bublbobl_mcu_port1_r)
 {
 
 	//logerror("%04x: 6801U4 port 1 read\n", cpu_get_pc(&space.device()));
-	m_port1_in = input_port_read(machine(), "IN0");
+	m_port1_in = ioport("IN0")->read();
 	return (m_port1_out & m_ddr1) | (m_port1_in & ~m_ddr1);
 }
 
@@ -236,7 +236,7 @@ WRITE8_MEMBER(bublbobl_state::bublbobl_mcu_port2_w)
 		{
 			// read
 			if ((address & 0x0800) == 0x0000)
-				m_port3_in = input_port_read(machine(), portnames[address & 3]);
+				m_port3_in = ioport(portnames[address & 3])->read();
 			else if ((address & 0x0c00) == 0x0c00)
 				m_port3_in = m_mcu_sharedram[address & 0x03ff];
 			// logerror("reading %02x from shared RAM %04x\n", m_port3_in, address);
@@ -448,7 +448,7 @@ WRITE8_MEMBER(bublbobl_state::bublbobl_68705_port_b_w)
 			if ((m_address & 0x0800) == 0x0000)
 			{
 				//logerror("%04x: 68705 read input port %02x\n", cpu_get_pc(&space.device()), m_address);
-				m_latch = input_port_read(machine(), portnames[m_address & 3]);
+				m_latch = ioport(portnames[m_address & 3])->read();
 			}
 			else if ((m_address & 0x0c00) == 0x0c00)
 			{

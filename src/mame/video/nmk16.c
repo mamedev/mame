@@ -979,8 +979,8 @@ static void video_update(running_machine &machine, bitmap_ind16 &bitmap, const r
 	if (dsw_flipscreen)
 	{
 
-		state->flip_screen_x_set(~input_port_read(machine, "DSW1") & 0x0100);
-		state->flip_screen_y_set(~input_port_read(machine, "DSW1") & 0x0200);
+		state->flip_screen_x_set(~state->ioport("DSW1")->read() & 0x0100);
+		state->flip_screen_y_set(~state->ioport("DSW1")->read() & 0x0200);
 	}
 
 

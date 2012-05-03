@@ -41,7 +41,7 @@ WRITE8_MEMBER(zac2650_state::zac_s2636_w)
 
 READ8_MEMBER(zac2650_state::tinvader_port_0_r)
 {
-	return input_port_read(machine(), "1E80") - m_CollisionBackground;
+	return ioport("1E80")->read() - m_CollisionBackground;
 }
 
 /*****************************************/

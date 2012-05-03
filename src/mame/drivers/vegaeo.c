@@ -93,7 +93,7 @@ WRITE32_MEMBER(vegaeo_state::vega_misc_w)
 READ32_MEMBER(vegaeo_state::vegaeo_custom_read)
 {
 	eolith_speedup_read(&space);
-	return input_port_read(machine(), "SYSTEM");
+	return ioport("SYSTEM")->read();
 }
 
 static ADDRESS_MAP_START( vega_map, AS_PROGRAM, 32, vegaeo_state )

@@ -41,7 +41,7 @@ static TIMER_CALLBACK( counter_fired_callback );
 
 static READ8_DEVICE_HANDLER( zwackery_port_1_r )
 {
-	UINT8 ret = input_port_read(device->machine(), "IN1");
+	UINT8 ret = device->machine().root_device().ioport("IN1")->read();
 
 	downcast<pia6821_device *>(device)->set_port_a_z_mask(ret);
 
@@ -51,7 +51,7 @@ static READ8_DEVICE_HANDLER( zwackery_port_1_r )
 
 static READ8_DEVICE_HANDLER( zwackery_port_3_r )
 {
-	UINT8 ret = input_port_read(device->machine(), "IN3");
+	UINT8 ret = device->machine().root_device().ioport("IN3")->read();
 
 	downcast<pia6821_device *>(device)->set_port_a_z_mask(ret);
 

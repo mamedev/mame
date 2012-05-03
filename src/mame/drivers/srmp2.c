@@ -261,7 +261,7 @@ static UINT8 iox_key_matrix_calc(running_machine &machine,UINT8 p_side)
 
 		for (t = 0 ; t < 8 ; t ++)
 		{
-			if (!(input_port_read(machine, keynames[j+p_side]) & ( 1 << t )))
+			if (!(machine.root_device().ioport(keynames[j+p_side])->read() & ( 1 << t )))
 			{
 				return (i + t) | (p_side ? 0x20 : 0x00);
 			}
@@ -313,7 +313,7 @@ READ8_MEMBER(srmp2_state::iox_mux_r)
 		return iox_key_matrix_calc(machine(),(iox.mux == 2) ? 0 : 4);
 	}
 
-	return input_port_read(machine(),"SERVICE") & 0xff;
+	return ioport("SERVICE")->read() & 0xff;
 }
 
 READ8_MEMBER(srmp2_state::iox_status_r)

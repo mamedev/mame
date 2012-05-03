@@ -298,7 +298,7 @@ WRITE8_MEMBER(igspoker_state::custom_io_w)
 
 	switch (data)
 	{
-		case 0x00: m_protection_res = input_port_read(machine(), "BUTTONS1"); break;
+		case 0x00: m_protection_res = ioport("BUTTONS1")->read(); break;
 		// CSK227
 		case 0x20: m_protection_res = 0x49; break;
 		case 0x21: m_protection_res = 0x47; break;

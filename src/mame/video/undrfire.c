@@ -212,7 +212,7 @@ static void draw_sprites_cbombers(running_machine &machine, bitmap_ind16 &bitmap
 {
 	undrfire_state *state = machine.driver_data<undrfire_state>();
 	UINT32 *spriteram32 = state->m_spriteram;
-	UINT16 *spritemap = (UINT16 *)machine.root_device().memregion("user1")->base();
+	UINT16 *spritemap = (UINT16 *)state->memregion("user1")->base();
 	UINT8 *spritemapHibit = (UINT8 *)state->memregion("user2")->base();
 
 	int offs, data, tilenum, color, flipx, flipy;
@@ -468,7 +468,7 @@ SCREEN_UPDATE_IND16( undrfire )
 	/* See if we should draw artificial gun targets */
 	/* (not yet implemented...) */
 
-	if (input_port_read(screen.machine(), "FAKE") & 0x1)	/* Fake DSW */
+	if (screen.machine().root_device().ioport("FAKE")->read() & 0x1)	/* Fake DSW */
 	{
 		popmessage("Gunsights on");
 	}

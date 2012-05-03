@@ -62,7 +62,7 @@ INLINE void latch_condition(running_machine &machine, int collision)
 {
 	exidy_state *state = machine.driver_data<exidy_state>();
 	collision ^= state->m_collision_invert;
-	state->m_int_condition = (input_port_read(machine, "INTSOURCE") & ~0x1c) | (collision & state->m_collision_mask);
+	state->m_int_condition = (state->ioport("INTSOURCE")->read() & ~0x1c) | (collision & state->m_collision_mask);
 }
 
 

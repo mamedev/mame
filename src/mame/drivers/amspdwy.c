@@ -38,7 +38,7 @@ static UINT8 amspdwy_wheel_r( running_machine &machine, int index )
 {
 	amspdwy_state *state = machine.driver_data<amspdwy_state>();
 	static const char *const portnames[] = { "WHEEL1", "WHEEL2", "AN1", "AN2" };
-	UINT8 wheel = input_port_read(machine, portnames[2 + index]);
+	UINT8 wheel = machine.root_device().ioport(portnames[2 + index])->read();
 	if (wheel != state->m_wheel_old[index])
 	{
 		wheel = (wheel & 0x7fff) - (wheel & 0x8000);
@@ -49,7 +49,7 @@ static UINT8 amspdwy_wheel_r( running_machine &machine, int index )
 
 	state->m_wheel_old[index] = wheel;
 	}
-	return state->m_wheel_return[index] | input_port_read(machine, portnames[index]);
+	return state->m_wheel_return[index] | machine.root_device().ioport(portnames[index])->read();
 }
 
 READ8_MEMBER(amspdwy_state::amspdwy_wheel_0_r)
@@ -64,7 +64,7 @@ READ8_MEMBER(amspdwy_state::amspdwy_wheel_1_r)
 
 static READ8_DEVICE_HANDLER( amspdwy_sound_r )
 {
-	return (ym2151_status_port_r(device, 0) & ~ 0x30) | input_port_read(device->machine(), "IN0");
+	return (ym2151_status_port_r(device, 0) & ~ 0x30) | device->machine().root_device().ioport("IN0")->read();
 }
 
 WRITE8_MEMBER(amspdwy_state::amspdwy_sound_w)

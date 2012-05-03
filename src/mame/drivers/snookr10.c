@@ -390,7 +390,7 @@ READ8_MEMBER(snookr10_state::dsw_port_1_r)
     BIT 7 = Complement of DS1, bit 7
    ---------------------------------
 */
-return input_port_read(machine(), "SW1");
+return ioport("SW1")->read();
 }
 
 

@@ -275,13 +275,13 @@ static INTERRUPT_GEN( update_pia_1 )
 	/* update the different PIA pins from the input ports */
 
 	/* CA1 - copy of PA1 (COIN1) */
-	pia1->ca1_w(input_port_read(device->machine(), "IN0") & 0x02);
+	pia1->ca1_w(device->machine().root_device().ioport("IN0")->read() & 0x02);
 
 	/* CA2 - copy of PA0 (SERVICE1) */
-	pia1->ca2_w(input_port_read(device->machine(), "IN0") & 0x01);
+	pia1->ca2_w(device->machine().root_device().ioport("IN0")->read() & 0x01);
 
 	/* CB1 - (crosshatch) */
-	pia1->cb1_w(input_port_read(device->machine(), "XHATCH"));
+	pia1->cb1_w(device->machine().root_device().ioport("XHATCH")->read());
 
 	/* CB2 - NOT CONNECTED */
 }

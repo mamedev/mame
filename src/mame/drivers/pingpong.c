@@ -598,13 +598,13 @@ static DRIVER_INIT( cashquiz )
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x5700, 0x57ff, "bank8");
 
 	// setup default banks
-	state->membank("bank1")->set_base(machine.root_device().memregion("user1")->base() + 0x100*0 );
-	state->membank("bank2")->set_base(machine.root_device().memregion("user1")->base() + 0x100*1 );
-	state->membank("bank3")->set_base(machine.root_device().memregion("user1")->base() + 0x100*2 );
-	state->membank("bank4")->set_base(machine.root_device().memregion("user1")->base() + 0x100*3 );
-	state->membank("bank5")->set_base(machine.root_device().memregion("user1")->base() + 0x100*4 );
-	state->membank("bank6")->set_base(machine.root_device().memregion("user1")->base() + 0x100*5 );
-	state->membank("bank7")->set_base(machine.root_device().memregion("user1")->base() + 0x100*6 );
+	state->membank("bank1")->set_base(state->memregion("user1")->base() + 0x100*0 );
+	state->membank("bank2")->set_base(state->memregion("user1")->base() + 0x100*1 );
+	state->membank("bank3")->set_base(state->memregion("user1")->base() + 0x100*2 );
+	state->membank("bank4")->set_base(state->memregion("user1")->base() + 0x100*3 );
+	state->membank("bank5")->set_base(state->memregion("user1")->base() + 0x100*4 );
+	state->membank("bank6")->set_base(state->memregion("user1")->base() + 0x100*5 );
+	state->membank("bank7")->set_base(state->memregion("user1")->base() + 0x100*6 );
 	state->membank("bank8")->set_base(state->memregion("user1")->base() + 0x100*7 );
 }
 

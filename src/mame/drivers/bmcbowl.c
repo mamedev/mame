@@ -230,7 +230,7 @@ WRITE16_MEMBER(bmcbowl_state::scroll_w)
 
 static READ8_DEVICE_HANDLER(via_b_in)
 {
-	return input_port_read(device->machine(), "IN3");
+	return device->machine().root_device().ioport("IN3")->read();
 }
 
 
@@ -444,7 +444,7 @@ static INPUT_PORTS_START( bmcbowl )
 	PORT_START("IN3")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(1)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_VBLANK )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 INPUT_PORTS_END
 
@@ -453,8 +453,8 @@ static READ8_DEVICE_HANDLER(dips1_r)
 	bmcbowl_state *state = device->machine().driver_data<bmcbowl_state>();
 	switch(state->m_bmc_input)
 	{
-			case 0x00:	return  input_port_read(device->machine(), "IN1");
-			case 0x40:	return  input_port_read(device->machine(), "IN2");
+			case 0x00:	return  state->ioport("IN1")->read();
+			case 0x40:	return  state->ioport("IN2")->read();
 	}
 	logerror("%s:unknown input - %X\n",device->machine().describe_context(),state->m_bmc_input);
 	return 0xff;

@@ -1726,7 +1726,7 @@ static READ64_HANDLER( aw_modem_r )
 
 	if (reg == 0x280/4)
 	{
-		UINT32 coins = input_port_read(space->machine(), "COINS");
+		UINT32 coins = space->machine().root_device().ioport("COINS")->read();
 
 		if (coins & 0x01)
 		{

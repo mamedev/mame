@@ -41,7 +41,7 @@ CUSTOM_INPUT_MEMBER(qdrmfgp_state::inputs_r)
 {
 	const char *tag1 = (const char *)param;
 	const char *tag2 = tag1 + strlen(tag1) + 1;
-	return input_port_read(machine(), (m_control & 0x0080) ? tag1 : tag2);
+	return ioport((m_control & 0x0080) ? tag1 : tag2)->read();
 }
 
 CUSTOM_INPUT_MEMBER(qdrmfgp_state::battery_sensor_r)

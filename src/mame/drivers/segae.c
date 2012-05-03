@@ -487,10 +487,10 @@ READ8_MEMBER( systeme_state::hangonjr_port_f8_read )
 	temp = 0;
 
 	if (m_port_fa_last == 0x08)  /* 0000 1000 */ /* Angle */
-		temp = input_port_read(machine(), "IN2");
+		temp = ioport("IN2")->read();
 
 	if (m_port_fa_last == 0x09)  /* 0000 1001 */ /* Accel */
-		temp = input_port_read(machine(), "IN3");
+		temp = ioport("IN3")->read();
 
 	return temp;
 }
@@ -524,13 +524,13 @@ WRITE8_MEMBER( systeme_state::ridleofp_port_fa_write )
 
 	if (data & 1)
 	{
-		int curr = input_port_read(machine(), "IN2");
+		int curr = ioport("IN2")->read();
 		m_diff1 = ((curr - m_last1) & 0x0fff) | (curr & 0xf000);
 		m_last1 = curr;
 	}
 	if (data & 2)
 	{
-		int curr = input_port_read(machine(), "IN3") & 0x0fff;
+		int curr = ioport("IN3")->read() & 0x0fff;
 		m_diff2 = ((curr - m_last2) & 0x0fff) | (curr & 0xf000);
 		m_last2 = curr;
 	}

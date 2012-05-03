@@ -374,7 +374,7 @@ Boards:
 static MACHINE_RESET( mschamp )
 {
 	UINT8 *rom = machine.root_device().memregion("maincpu")->base() + 0x10000;
-	int whichbank = input_port_read(machine, "GAME") & 1;
+	int whichbank = machine.root_device().ioport("GAME")->read() & 1;
 
 	machine.root_device().membank("bank1")->configure_entries(0, 2, &rom[0x0000], 0x8000);
 	machine.root_device().membank("bank2")->configure_entries(0, 2, &rom[0x4000], 0x8000);
@@ -541,7 +541,7 @@ READ8_MEMBER(pacman_state::alibaba_mystery_2_r)
 
 READ8_MEMBER(pacman_state::maketrax_special_port2_r)
 {
-	int data = input_port_read(machine(), "DSW1");
+	int data = ioport("DSW1")->read();
 	int pc = cpu_get_previouspc(&space.device());
 
 	if ((pc == 0x1973) || (pc == 0x2389)) return data | 0x40;
@@ -584,7 +584,7 @@ READ8_MEMBER(pacman_state::maketrax_special_port3_r)
 
 READ8_MEMBER(pacman_state::korosuke_special_port2_r)
 {
-	int data = input_port_read(machine(), "DSW1");
+	int data = ioport("DSW1")->read();
 	int pc = cpu_get_previouspc(&space.device());
 
 	if ((pc == 0x196e) || (pc == 0x2387)) return data | 0x40;
@@ -2806,7 +2806,7 @@ static INPUT_PORTS_START( drivfrcp )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_START("Sense")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_VBLANK )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 INPUT_PORTS_END
 
 
@@ -2858,7 +2858,7 @@ static INPUT_PORTS_START( 8bpm )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_START("Sense")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_VBLANK )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 INPUT_PORTS_END
 
 
@@ -2910,7 +2910,7 @@ static INPUT_PORTS_START( porky )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_START("Sense")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_VBLANK )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 INPUT_PORTS_END
 
 

@@ -145,15 +145,15 @@ static READ8_DEVICE_HANDLER( tugboat_input_r )
 {
 	tugboat_state *state = device->machine().driver_data<tugboat_state>();
 	if (~state->m_ctrl & 0x80)
-		return input_port_read(device->machine(), "IN0");
+		return state->ioport("IN0")->read();
 	else if (~state->m_ctrl & 0x40)
-		return input_port_read(device->machine(), "IN1");
+		return state->ioport("IN1")->read();
 	else if (~state->m_ctrl & 0x20)
-		return input_port_read(device->machine(), "IN2");
+		return state->ioport("IN2")->read();
 	else if (~state->m_ctrl & 0x10)
-		return input_port_read(device->machine(), "IN3");
+		return state->ioport("IN3")->read();
 	else
-		return input_port_read(device->machine(), "IN4");
+		return state->ioport("IN4")->read();
 }
 
 static READ8_DEVICE_HANDLER( tugboat_ctrl_r )

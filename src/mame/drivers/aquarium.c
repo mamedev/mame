@@ -46,7 +46,7 @@ READ16_MEMBER(aquarium_state::aquarium_coins_r)
 {
 
 	int data;
-	data = (input_port_read(machine(), "SYSTEM") & 0x7fff);
+	data = (ioport("SYSTEM")->read() & 0x7fff);
 	data |= m_aquarium_snd_ack;
 	m_aquarium_snd_ack = 0;
 

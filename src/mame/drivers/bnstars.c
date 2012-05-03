@@ -1246,28 +1246,28 @@ READ32_MEMBER(bnstars_state::bnstars1_r)
 			return 0xffffffff;
 
 		case 0x0000:
-			return input_port_read(machine(), "IN0");
+			return ioport("IN0")->read();
 
 		case 0x0080:
-			return input_port_read(machine(), "IN1");
+			return ioport("IN1")->read();
 
 		case 0x2000:
-			return input_port_read(machine(), "IN2");
+			return ioport("IN2")->read();
 
 		case 0x2080:
-			return input_port_read(machine(), "IN3");
+			return ioport("IN3")->read();
 
 	}
 }
 
 READ32_MEMBER(bnstars_state::bnstars2_r)
 {
-	return input_port_read(machine(), "IN4");
+	return ioport("IN4")->read();
 }
 
 READ32_MEMBER(bnstars_state::bnstars3_r)
 {
-	return input_port_read(machine(), "IN5");
+	return ioport("IN5")->read();
 }
 
 WRITE32_MEMBER(bnstars_state::bnstars1_mahjong_select_w)

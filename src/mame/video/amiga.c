@@ -147,7 +147,7 @@ UINT32 amiga_gethvpos(screen_device &screen)
 {
 	amiga_state *state = screen.machine().driver_data<amiga_state>();
 	UINT32 hvpos = (state->m_last_scanline << 8) | (screen.hpos() >> 2);
-	UINT32 latchedpos = input_port_read_safe(screen.machine(), "HVPOS", 0);
+	UINT32 latchedpos = state->ioport("HVPOS")->read_safe(0);
 
 	/* if there's no latched position, or if we are in the active display area */
 	/* but before the latching point, return the live HV position */

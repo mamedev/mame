@@ -337,9 +337,9 @@ READ8_MEMBER(mcr_state::solarfox_ip0_r)
 	/* game in cocktail mode, they don't work at all. So we fake-mux   */
 	/* the controls through player 1's ports */
 	if (mcr_cocktail_flip)
-		return input_port_read(machine(), "ssio:IP0") | 0x08;
+		return ioport("ssio:IP0")->read() | 0x08;
 	else
-		return ((input_port_read(machine(), "ssio:IP0") & ~0x14) | 0x08) | ((input_port_read(machine(), "ssio:IP0") & 0x08) >> 1) | ((input_port_read(machine(), "ssio:IP2") & 0x01) << 4);
+		return ((ioport("ssio:IP2")->read() & 0x01) << 4);
 }
 
 
@@ -347,9 +347,9 @@ READ8_MEMBER(mcr_state::solarfox_ip1_r)
 {
 	/*  same deal as above */
 	if (mcr_cocktail_flip)
-		return input_port_read(machine(), "ssio:IP1") | 0xf0;
+		return ioport("ssio:IP1")->read() | 0xf0;
 	else
-		return (input_port_read(machine(), "ssio:IP1") >> 4) | 0xf0;
+		return (ioport("ssio:IP1")->read() >> 4) | 0xf0;
 }
 
 
@@ -362,7 +362,7 @@ READ8_MEMBER(mcr_state::solarfox_ip1_r)
 
 READ8_MEMBER(mcr_state::kick_ip1_r)
 {
-	return (input_port_read(machine(), "DIAL2") << 4) & 0xf0;
+	return (ioport("DIAL2")->read() << 4) & 0xf0;
 }
 
 
@@ -382,18 +382,18 @@ WRITE8_MEMBER(mcr_state::wacko_op4_w)
 READ8_MEMBER(mcr_state::wacko_ip1_r)
 {
 	if (!input_mux)
-		return input_port_read(machine(), "ssio:IP1");
+		return ioport("ssio:IP1")->read();
 	else
-		return input_port_read(machine(), "ssio:IP1.ALT");
+		return ioport("ssio:IP1.ALT")->read();
 }
 
 
 READ8_MEMBER(mcr_state::wacko_ip2_r)
 {
 	if (!input_mux)
-		return input_port_read(machine(), "ssio:IP2");
+		return ioport("ssio:IP2")->read();
 	else
-		return input_port_read(machine(), "ssio:IP2.ALT");
+		return ioport("ssio:IP2.ALT")->read();
 }
 
 
@@ -406,7 +406,7 @@ READ8_MEMBER(mcr_state::wacko_ip2_r)
 
 READ8_MEMBER(mcr_state::kroozr_ip1_r)
 {
-	int dial = input_port_read(machine(), "DIAL");
+	int dial = ioport("DIAL")->read();
 	return ((dial & 0x80) >> 1) | ((dial & 0x70) >> 4);
 }
 
@@ -629,15 +629,15 @@ WRITE8_MEMBER(mcr_state::nflfoot_op4_w)
 
 READ8_MEMBER(mcr_state::demoderb_ip1_r)
 {
-	return input_port_read(machine(), "ssio:IP1") |
-		(input_port_read(machine(), input_mux ? "ssio:IP1.ALT2" : "ssio:IP1.ALT1") << 2);
+	return ioport("ssio:IP1")->read() |
+		(ioport(input_mux ? "ssio:IP1.ALT2" : "ssio:IP1.ALT1")->read() << 2);
 }
 
 
 READ8_MEMBER(mcr_state::demoderb_ip2_r)
 {
-	return input_port_read(machine(), "ssio:IP2") |
-		(input_port_read(machine(), input_mux ? "ssio:IP2.ALT2" : "ssio:IP2.ALT1") << 2);
+	return ioport("ssio:IP2")->read() |
+		(ioport(input_mux ? "ssio:IP2.ALT2" : "ssio:IP2.ALT1")->read() << 2);
 }
 
 

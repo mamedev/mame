@@ -143,15 +143,15 @@ WRITE8_MEMBER(mcr3_state::mcrmono_control_port_w)
 
 READ8_MEMBER(mcr3_state::demoderm_ip1_r)
 {
-	return input_port_read(machine(), "MONO.IP1") |
-		(input_port_read(machine(), m_input_mux ? "MONO.IP1.ALT2" : "MONO.IP1.ALT1") << 2);
+	return ioport("MONO.IP1")->read() |
+		(ioport(m_input_mux ? "MONO.IP1.ALT2" : "MONO.IP1.ALT1")->read() << 2);
 }
 
 
 READ8_MEMBER(mcr3_state::demoderm_ip2_r)
 {
-	return input_port_read(machine(), "MONO.IP2") |
-		(input_port_read(machine(), m_input_mux ? "MONO.IP2.ALT2" : "MONO.IP2.ALT1") << 2);
+	return ioport("MONO.IP2")->read() |
+		(ioport(m_input_mux ? "MONO.IP2.ALT2" : "MONO.IP2.ALT1")->read() << 2);
 }
 
 
@@ -182,8 +182,8 @@ READ8_MEMBER(mcr3_state::maxrpm_ip1_r)
 READ8_MEMBER(mcr3_state::maxrpm_ip2_r)
 {
 	static const UINT8 shift_bits[5] = { 0x00, 0x05, 0x06, 0x01, 0x02 };
-	UINT8 start = input_port_read(machine(), "MONO.IP0");
-	UINT8 shift = input_port_read(machine(), "SHIFT");
+	UINT8 start = ioport("MONO.IP0")->read();
+	UINT8 shift = ioport("SHIFT")->read();
 
 	/* reset on a start */
 	if (!(start & 0x08))
@@ -256,7 +256,7 @@ WRITE8_MEMBER(mcr3_state::maxrpm_op6_w)
 
 	/* when the read is toggled is when the ADC value is latched */
 	if (!(data & 0x80))
-		m_latched_input = input_port_read(machine(), inputs[m_maxrpm_adc_select]);
+		m_latched_input = ioport(inputs[m_maxrpm_adc_select])->read();
 
 	/* when both the write and the enable are low, it's a write to the ADC0844 */
 	/* unfortunately the behavior below doesn't match up with the inputs on the */
@@ -278,7 +278,7 @@ WRITE8_MEMBER(mcr3_state::maxrpm_op6_w)
 
 READ8_MEMBER(mcr3_state::rampage_ip4_r)
 {
-	return input_port_read(machine(), "MONO.IP4") | (m_sounds_good->read(space,0) << 7);
+	return ioport("MONO.IP4")->read() | (m_sounds_good->read(space,0) << 7);
 }
 
 
@@ -301,7 +301,7 @@ WRITE8_MEMBER(mcr3_state::rampage_op6_w)
 
 READ8_MEMBER(mcr3_state::powerdrv_ip2_r)
 {
-	return input_port_read(machine(), "MONO.IP2") | (m_sounds_good->read(space, 0) << 7);
+	return ioport("MONO.IP2")->read() | (m_sounds_good->read(space, 0) << 7);
 }
 
 
@@ -345,9 +345,9 @@ WRITE8_MEMBER(mcr3_state::powerdrv_op6_w)
 
 READ8_MEMBER(mcr3_state::stargrds_ip0_r)
 {
-	UINT8 result = input_port_read(machine(), "MONO.IP0");
+	UINT8 result = ioport("MONO.IP0")->read();
 	if (m_input_mux)
-		result = (result & ~0x0a) | (input_port_read(machine(), "MONO.IP0.ALT") & 0x0a);
+		result = (result & ~0x0a) | (ioport("MONO.IP0.ALT")->read() & 0x0a);
 	return (result & ~0x10) | ((m_sounds_good->read(space, 0) << 4) & 0x10);
 }
 
@@ -388,14 +388,14 @@ WRITE8_MEMBER(mcr3_state::stargrds_op6_w)
 
 READ8_MEMBER(mcr3_state::spyhunt_ip1_r)
 {
-	return input_port_read(machine(), "ssio:IP1") | (m_chip_squeak_deluxe->read(space, 0) << 5);
+	return ioport("ssio:IP1")->read() | (m_chip_squeak_deluxe->read(space, 0) << 5);
 }
 
 
 READ8_MEMBER(mcr3_state::spyhunt_ip2_r)
 {
 	/* multiplexed steering wheel/gas pedal */
-	return input_port_read(machine(), m_input_mux ? "ssio:IP2.ALT" : "ssio:IP2");
+	return ioport(m_input_mux ? "ssio:IP2.ALT" : "ssio:IP2")->read();
 }
 
 
@@ -447,9 +447,9 @@ READ8_MEMBER(mcr3_state::turbotag_ip2_r)
 {
 	/* multiplexed steering wheel/gas pedal */
 	if (m_input_mux)
-		return input_port_read(machine(), "ssio:IP2.ALT");
+		return ioport("ssio:IP2.ALT")->read();
 
-	return input_port_read(machine(), "ssio:IP2") + 5 * (machine().primary_screen->frame_number() & 1);
+	return ioport("ssio:IP2")->read() + 5 * (machine().primary_screen->frame_number() & 1);
 }
 
 

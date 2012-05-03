@@ -129,7 +129,7 @@ static INTERRUPT_GEN( coin_interrupt )
 {
 	polyplay_state *state = device->machine().driver_data<polyplay_state>();
 
-	if (input_port_read(device->machine(), "INPUT") & 0x80)
+	if (state->ioport("INPUT")->read() & 0x80)
 		state->m_last = 0;
 	else
 	{

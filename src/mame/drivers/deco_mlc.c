@@ -110,7 +110,7 @@
 READ32_MEMBER(deco_mlc_state::test2_r)
 {
 //  if (offset==0)
-//      return input_port_read(machine(), "IN0"); //0xffffffff;
+//      return ioport("IN0")->read(); //0xffffffff;
 //   logerror("%08x:  Test2_r %d\n",cpu_get_pc(&space.device()),offset);
 	return machine().rand(); //0xffffffff;
 }

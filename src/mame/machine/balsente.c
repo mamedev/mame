@@ -62,8 +62,8 @@ TIMER_DEVICE_CALLBACK( balsente_interrupt_timer )
 		/* we latch the beam values on the first interrupt after VBLANK */
 		if (param == 64)
 		{
-			state->m_shooter_x = input_port_read(timer.machine(), "FAKEX");
-			state->m_shooter_y = input_port_read(timer.machine(), "FAKEY");
+			state->m_shooter_x = timer.machine().root_device().ioport("FAKEX")->read();
+			state->m_shooter_y = timer.machine().root_device().ioport("FAKEY")->read();
 		}
 
 		/* which bits get returned depends on which scanline we're at */
@@ -172,8 +172,8 @@ MACHINE_RESET( balsente )
 	memset(state->m_noise_position, 0, sizeof(state->m_noise_position));
 
 	/* point the banks to bank 0 */
-	numbanks = (machine.root_device().memregion("maincpu")->bytes() > 0x40000) ? 16 : 8;
-	state->membank("bank1")->configure_entries(0, numbanks, &machine.root_device().memregion("maincpu")->base()[0x10000], 0x6000);
+	numbanks = (state->memregion("maincpu")->bytes() > 0x40000) ? 16 : 8;
+	state->membank("bank1")->configure_entries(0, numbanks, &state->memregion("maincpu")->base()[0x10000], 0x6000);
 	state->membank("bank2")->configure_entries(0, numbanks, &state->memregion("maincpu")->base()[0x12000], 0x6000);
 	state->membank("bank1")->set_entry(0);
 	state->membank("bank2")->set_entry(0);
@@ -569,7 +569,7 @@ INTERRUPT_GEN( balsente_update_analog_inputs )
 	/* ports are read once a frame, just at varying intervals. To get around this, we */
 	/* read all the analog inputs at VBLANK time and just return the cached values. */
 	for (i = 0; i < 4; i++)
-		state->m_analog_input_data[i] = input_port_read(device->machine(), analog[i]);
+		state->m_analog_input_data[i] = device->machine().root_device().ioport(analog[i])->read();
 }
 
 
@@ -1140,9 +1140,9 @@ static void update_grudge_steering(running_machine &machine)
 	INT8 diff[3];
 
 	/* read the current steering values */
-	wheel[0] = input_port_read(machine, "AN0");
-	wheel[1] = input_port_read(machine, "AN1");
-	wheel[2] = input_port_read(machine, "AN2");
+	wheel[0] = state->ioport("AN0")->read();
+	wheel[1] = state->ioport("AN1")->read();
+	wheel[2] = state->ioport("AN2")->read();
 
 	/* diff the values */
 	diff[0] = wheel[0] - state->m_grudge_last_steering[0];

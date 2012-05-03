@@ -416,7 +416,7 @@ static SOUND_START( mario )
 	mario_state	*state = machine.driver_data<mario_state>();
 	device_t *audiocpu = machine.device("audiocpu");
 #if USE_8039
-	UINT8 *SND = machine.root_device().memregion("audiocpu")->base();
+	UINT8 *SND = state->memregion("audiocpu")->base();
 
 	SND[0x1001] = 0x01;
 #endif
@@ -426,7 +426,7 @@ static SOUND_START( mario )
 	{
 		state->m_eabank = "bank1";
 		audiocpu->memory().space(AS_PROGRAM)->install_read_bank(0x000, 0x7ff, "bank1");
-		state->membank("bank1")->configure_entry(0, machine.root_device().memregion("audiocpu")->base());
+		state->membank("bank1")->configure_entry(0, state->memregion("audiocpu")->base());
 	    state->membank("bank1")->configure_entry(1, state->memregion("audiocpu")->base() + 0x1000);
 	}
 

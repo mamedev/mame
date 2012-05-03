@@ -490,7 +490,7 @@ static I8279_INTERFACE( turbo_i8279_intf )
 READ8_MEMBER(turbo_state::turbo_collision_r)
 {
 	machine().primary_screen->update_partial(machine().primary_screen->vpos());
-	return input_port_read(machine(), "DSW3") | (m_turbo_collision & 15);
+	return ioport("DSW3")->read() | (m_turbo_collision & 15);
 }
 
 
@@ -504,13 +504,13 @@ WRITE8_MEMBER(turbo_state::turbo_collision_clear_w)
 static READ8_DEVICE_HANDLER( turbo_analog_r )
 {
 	turbo_state *state = device->machine().driver_data<turbo_state>();
-	return input_port_read(device->machine(), "DIAL") - state->m_turbo_last_analog;
+	return state->ioport("DIAL")->read() - state->m_turbo_last_analog;
 }
 
 
 WRITE8_MEMBER(turbo_state::turbo_analog_reset_w)
 {
-	m_turbo_last_analog = input_port_read(machine(), "DIAL");
+	m_turbo_last_analog = ioport("DIAL")->read();
 }
 
 
@@ -548,8 +548,8 @@ READ8_MEMBER(turbo_state::buckrog_cpu2_command_r)
 
 READ8_MEMBER(turbo_state::buckrog_port_2_r)
 {
-	int inp1 = input_port_read(machine(), "DSW1");
-	int inp2 = input_port_read(machine(), "DSW2");
+	int inp1 = ioport("DSW1")->read();
+	int inp2 = ioport("DSW2")->read();
 
 	return  (((inp2 >> 6) & 1) << 7) |
 			(((inp2 >> 4) & 1) << 6) |
@@ -564,8 +564,8 @@ READ8_MEMBER(turbo_state::buckrog_port_2_r)
 
 READ8_MEMBER(turbo_state::buckrog_port_3_r)
 {
-	int inp1 = input_port_read(machine(), "DSW1");
-	int inp2 = input_port_read(machine(), "DSW2");
+	int inp1 = ioport("DSW1")->read();
+	int inp2 = ioport("DSW2")->read();
 
 	return  (((inp2 >> 7) & 1) << 7) |
 			(((inp2 >> 5) & 1) << 6) |

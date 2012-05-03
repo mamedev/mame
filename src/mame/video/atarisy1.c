@@ -557,7 +557,7 @@ SCREEN_UPDATE_IND16( atarisy1 )
 static void decode_gfx(running_machine &machine, UINT16 *pflookup, UINT16 *molookup)
 {
 	atarisy1_state *state = machine.driver_data<atarisy1_state>();
-	UINT8 *prom1 = &machine.root_device().memregion("proms")->u8(0x000);
+	UINT8 *prom1 = &state->memregion("proms")->u8(0x000);
 	UINT8 *prom2 = &state->memregion("proms")->u8(0x200);
 	int obj, i;
 

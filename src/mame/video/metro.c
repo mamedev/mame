@@ -446,7 +446,7 @@ void metro_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const r
 {
 	metro_state *state = machine.driver_data<metro_state>();
 	UINT8 *base_gfx4 = state->m_expanded_gfx1;
-	UINT8 *base_gfx8 = machine.root_device().memregion("gfx1")->base();
+	UINT8 *base_gfx8 = state->memregion("gfx1")->base();
 	UINT32 gfx_size = state->memregion("gfx1")->bytes();
 	const rectangle &visarea = machine.primary_screen->visible_area();
 

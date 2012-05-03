@@ -36,11 +36,11 @@ static PALETTE_INIT( skyraid )
 
 READ8_MEMBER(skyraid_state::skyraid_port_0_r)
 {
-	UINT8 val = input_port_read(machine(), "LANGUAGE");
+	UINT8 val = ioport("LANGUAGE")->read();
 
-	if (input_port_read(machine(), "STICKY") > m_analog_range)
+	if (ioport("STICKY")->read() > m_analog_range)
 		val |= 0x40;
-	if (input_port_read(machine(), "STICKX") > m_analog_range)
+	if (ioport("STICKX")->read() > m_analog_range)
 		val |= 0x80;
 
 	return val;

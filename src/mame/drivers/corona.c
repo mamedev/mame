@@ -515,12 +515,12 @@ READ8_MEMBER(corona_state::mux_port_r)
 {
 	switch( m_input_selector )
 	{
-		case 0x01: return input_port_read(machine(), "IN0-1");
-		case 0x02: return input_port_read(machine(), "IN0-2");
-		case 0x04: return input_port_read(machine(), "IN0-3");
-		case 0x08: return input_port_read(machine(), "IN0-4");
-		case 0x10: return input_port_read(machine(), "IN0-5");
-		case 0x20: return input_port_read(machine(), "IN0-6");
+		case 0x01: return ioport("IN0-1")->read();
+		case 0x02: return ioport("IN0-2")->read();
+		case 0x04: return ioport("IN0-3")->read();
+		case 0x08: return ioport("IN0-4")->read();
+		case 0x10: return ioport("IN0-5")->read();
+		case 0x20: return ioport("IN0-6")->read();
 	}
 
 	return 0xff;

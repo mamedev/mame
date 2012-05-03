@@ -52,8 +52,8 @@ SCREEN_UPDATE_IND16( opwolf )
 
 	pc090oj_draw_sprites(state->m_pc090oj, bitmap, cliprect, 1);
 
-//  if (input_port_read(machine, "P1X"))
-//  popmessage("%d %d", input_port_read(machine, "P1X"), input_port_read(machine, "P1Y"));
+//  if (state->ioport("P1X")->read())
+//  popmessage("%d %d", machine, "P1X"), state->ioport("P1Y")->read());
 
 	return 0;
 }

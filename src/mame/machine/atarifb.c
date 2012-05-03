@@ -154,7 +154,7 @@ READ8_MEMBER(atarifb_state::atarifb_in0_r)
 			  (m_sign_x_2 >> 6) |
 			  (m_sign_y_1 >> 5) |
 			  (m_sign_x_1 >> 4) |
-			  input_port_read(machine(), "IN0");
+			  ioport("IN0")->read();
 		return val;
 	}
 	else
@@ -162,14 +162,14 @@ READ8_MEMBER(atarifb_state::atarifb_in0_r)
 		int new_x, new_y;
 
 		/* Read player 1 trackball */
-		new_x = input_port_read(machine(), "IN3");
+		new_x = ioport("IN3")->read();
 		if (new_x != m_counter_x_in0)
 		{
 			m_sign_x_1 = (new_x - m_counter_x_in0) & 0x80;
 			m_counter_x_in0 = new_x;
 		}
 
-		new_y = input_port_read(machine(), "IN2");
+		new_y = ioport("IN2")->read();
 		if (new_y != m_counter_y_in0)
 		{
 			m_sign_y_1 = (new_y - m_counter_y_in0) & 0x80;
@@ -186,21 +186,21 @@ READ8_MEMBER(atarifb_state::atarifb_in2_r)
 
 	if ((m_CTRLD & 0x20) == 0x00)
 	{
-		return input_port_read(machine(), "IN1");
+		return ioport("IN1")->read();
 	}
 	else
 	{
 		int new_x, new_y;
 
 		/* Read player 2 trackball */
-		new_x = input_port_read(machine(), "IN5");
+		new_x = ioport("IN5")->read();
 		if (new_x != m_counter_x_in2)
 		{
 			m_sign_x_2 = (new_x - m_counter_x_in2) & 0x80;
 			m_counter_x_in2 = new_x;
 		}
 
-		new_y = input_port_read(machine(), "IN4");
+		new_y = ioport("IN4")->read();
 		if (new_y != m_counter_y_in2)
 		{
 			m_sign_y_2 = (new_y - m_counter_y_in2) & 0x80;
@@ -235,14 +235,14 @@ READ8_MEMBER(atarifb_state::atarifb4_in0_r)
 		int new_x, new_y;
 
 		/* Read player 1 trackball */
-		new_x = input_port_read(machine(), "IN3");
+		new_x = ioport("IN3")->read();
 		if (new_x != m_counter_x_in0)
 		{
 			m_sign_x_1 = (new_x - m_counter_x_in0) & 0x80;
 			m_counter_x_in0 = new_x;
 		}
 
-		new_y = input_port_read(machine(), "IN2");
+		new_y = ioport("IN2")->read();
 		if (new_y != m_counter_y_in0)
 		{
 			m_sign_y_1 = (new_y - m_counter_y_in0) & 0x80;
@@ -257,14 +257,14 @@ READ8_MEMBER(atarifb_state::atarifb4_in0_r)
 		int new_x, new_y;
 
 		/* Read player 2 trackball */
-		new_x = input_port_read(machine(), "IN5");
+		new_x = ioport("IN5")->read();
 		if (new_x != m_counter_x_in0b)
 		{
 			m_sign_x_2 = (new_x - m_counter_x_in0b) & 0x80;
 			m_counter_x_in0b = new_x;
 		}
 
-		new_y = input_port_read(machine(), "IN4");
+		new_y = ioport("IN4")->read();
 		if (new_y != m_counter_y_in0b)
 		{
 			m_sign_y_2 = (new_y - m_counter_y_in0b) & 0x80;
@@ -283,7 +283,7 @@ READ8_MEMBER(atarifb_state::atarifb4_in2_r)
 
 	if ((m_CTRLD & 0x40) == 0x00)
 	{
-		return input_port_read(machine(), "IN1");
+		return ioport("IN1")->read();
 	}
 	else if ((m_CTRLD & 0x60) == 0x60)
 	/* LD1 and LD2 both high, return Team 2 right player (player 3) */
@@ -291,14 +291,14 @@ READ8_MEMBER(atarifb_state::atarifb4_in2_r)
 		int new_x, new_y;
 
 		/* Read player 3 trackball */
-		new_x = input_port_read(machine(), "IN7");
+		new_x = ioport("IN7")->read();
 		if (new_x != m_counter_x_in2)
 		{
 			m_sign_x_3 = (new_x - m_counter_x_in2) & 0x80;
 			m_counter_x_in2 = new_x;
 		}
 
-		new_y = input_port_read(machine(), "IN6");
+		new_y = ioport("IN6")->read();
 		if (new_y != m_counter_y_in2)
 		{
 			m_sign_y_3 = (new_y - m_counter_y_in2) & 0x80;
@@ -313,14 +313,14 @@ READ8_MEMBER(atarifb_state::atarifb4_in2_r)
 		int new_x, new_y;
 
 		/* Read player 4 trackball */
-		new_x = input_port_read(machine(), "IN9");
+		new_x = ioport("IN9")->read();
 		if (new_x != m_counter_x_in2b)
 		{
 			m_sign_x_4 = (new_x - m_counter_x_in2b) & 0x80;
 			m_counter_x_in2b = new_x;
 		}
 
-		new_y = input_port_read(machine(), "IN8");
+		new_y = ioport("IN8")->read();
 		if (new_y != m_counter_y_in2b)
 		{
 			m_sign_y_4 = (new_y - m_counter_y_in2b) & 0x80;

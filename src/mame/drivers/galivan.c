@@ -1085,7 +1085,7 @@ static DRIVER_INIT( youmab )
 	galivan_state *state = machine.driver_data<galivan_state>();
 	machine.device("maincpu")->memory().space(AS_IO)->install_write_handler(0x82, 0x82, write8_delegate(FUNC(galivan_state::youmab_extra_bank_w),state)); // banks rom at 0x8000? writes 0xff and 0x00 before executing code there
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x0000, 0x7fff, "bank3");
-	state->membank("bank3")->set_base(machine.root_device().memregion("maincpu")->base());
+	state->membank("bank3")->set_base(state->memregion("maincpu")->base());
 
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x8000, 0xbfff, "bank2");
 	state->membank("bank2")->configure_entries(0, 2, state->memregion("user2")->base(), 0x4000);

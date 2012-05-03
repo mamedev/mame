@@ -48,11 +48,11 @@ UINT8 read_input_matrix(running_machine &machine, int row)
 
 	if (row<4)
 	{
-		value = (input_port_read_safe(machine, portnames[row], 0x00) & 0x1f) + ((input_port_read_safe(machine, portnames[row+8], 0x00) & 0x07) << 5);
+		value = (machine.root_device().ioport(portnames[row])->read_safe(0x00) & 0x1f) + ((machine.root_device().ioport(portnames[row+8])->read_safe(0x00) & 0x07) << 5);
 	}
 	else
 	{
-		value = (input_port_read_safe(machine, portnames[row], 0x00) & 0x1f) + ((input_port_read_safe(machine, portnames[row+4], 0x00) & 0x18) << 2);
+		value = (machine.root_device().ioport(portnames[row])->read_safe(0x00) & 0x1f) + ((machine.root_device().ioport(portnames[row+4])->read_safe(0x00) & 0x18) << 2);
 	}
 
 	return value;

@@ -120,9 +120,9 @@ bool sega_837_13551::switches(UINT8 *&buf, UINT8 count_players, UINT8 bytes_per_
 	if(count_players > 2 || bytes_per_switch > 2)
 		return false;
 
-	*buf++ = input_port_read_safe(machine(), port_tag[0], 0);
+	*buf++ = ioport(port_tag[0])->read_safe(0);
 	for(int i=0; i<count_players; i++) {
-		UINT32 val = input_port_read_safe(machine(), port_tag[1+i], 0);
+		UINT32 val = ioport(port_tag[1+i])->read_safe(0);
 		for(int j=0; j<bytes_per_switch; j++)
 			*buf++ = val >> ((1-j) << 3);
 	}
@@ -135,7 +135,7 @@ bool sega_837_13551::analogs(UINT8 *&buf, UINT8 count)
 	if(count > 8)
 		return false;
 	for(int i=0; i<count; i++) {
-		UINT16 val = input_port_read_safe(machine(), port_tag[3+i], 0x8000);
+		UINT16 val = ioport(port_tag[3+i])->read_safe(0x8000);
 		*buf++ = val >> 8;
 		*buf++ = val;
 	}
@@ -148,7 +148,7 @@ bool sega_837_13551::swoutputs(UINT8 count, const UINT8 *vals)
 		return false;
 	jvs_outputs = vals[0] & 0x3f;
 	logerror("837-13551: output %02x\n", jvs_outputs);
-	input_port_write_safe(machine(), port_tag[11], jvs_outputs, 0x3f);
+	machine().root_device().ioport(port_tag[11])->write_safe(jvs_outputs, 0x3f);
 	return true;
 }
 

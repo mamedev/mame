@@ -346,13 +346,13 @@ static READ8_DEVICE_HANDLER( pia_ic3_porta_r )
 		case 2:
 		case 3:
 		{
-			data = (input_port_read(device->machine(), portnames[state->m_input_strobe])<<2);
+			data = (device->machine().root_device().ioport(portnames[state->m_input_strobe])->read()<<2);
 			break;
 		}
 		case 4://DIL1
 		case 6://DIL2
 		{
-			swizzle = (input_port_read(device->machine(), portnames[state->m_input_strobe]));
+			swizzle = (device->machine().root_device().ioport(portnames[state->m_input_strobe])->read());
 			data = (((swizzle & 0x01) << 7) + ((swizzle & 0x02) << 5) + ((swizzle & 0x04) << 3)
 					+ ((swizzle & 0x08) << 1) +((swizzle & 0x10) >> 1) + ((swizzle & 0x20) >> 3));
 			break;
@@ -360,7 +360,7 @@ static READ8_DEVICE_HANDLER( pia_ic3_porta_r )
 		case 5://DIL1
 		case 7://DIL2
 		{
-			swizzle = (input_port_read(device->machine(), portnames[state->m_input_strobe]));
+			swizzle = (device->machine().root_device().ioport(portnames[state->m_input_strobe])->read());
 			data = (((swizzle & 0x80) >> 1) + ((swizzle & 0x40) << 1));
 			break;
 		}
@@ -600,14 +600,14 @@ static const pia6821_interface pia_ic5_intf =
 static READ8_DEVICE_HANDLER( pia_ic6_porta_r )
 {
 	mpu3_state *state = device->machine().driver_data<mpu3_state>();
-	return (input_port_read(device->machine(), "AUX1"))|state->m_aux1_input;
+	return (state->ioport("AUX1")->read())|state->m_aux1_input;
 }
 
 
 static READ8_DEVICE_HANDLER( pia_ic6_portb_r )
 {
 	mpu3_state *state = device->machine().driver_data<mpu3_state>();
-	return (input_port_read(device->machine(), "AUX2"))|state->m_aux2_input;
+	return (state->ioport("AUX2")->read())|state->m_aux2_input;
 }
 
 static WRITE8_DEVICE_HANDLER( pia_ic6_porta_w )

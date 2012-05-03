@@ -356,8 +356,8 @@ static MACHINE_RESET(model2o)
 static MACHINE_RESET(model2_scsp)
 {
 	model2_state *state = machine.driver_data<model2_state>();
-	state->membank("bank4")->set_base(machine.root_device().memregion("scsp")->base() + 0x200000);
-	state->membank("bank5")->set_base(machine.root_device().memregion("scsp")->base() + 0x600000);
+	state->membank("bank4")->set_base(state->memregion("scsp")->base() + 0x200000);
+	state->membank("bank5")->set_base(state->memregion("scsp")->base() + 0x600000);
 
 	// copy the 68k vector table into RAM
 	memcpy(state->m_soundram, state->memregion("audiocpu")->base() + 0x80000, 16);
@@ -454,7 +454,7 @@ READ32_MEMBER(model2_state::videoctl_r)
 
 CUSTOM_INPUT_MEMBER(model2_state::_1c00000_r)
 {
-	UINT32 ret = input_port_read(machine(), "IN0");
+	UINT32 ret = ioport("IN0")->read();
 
 	if(m_ctrlmode == 0)
 	{
@@ -473,7 +473,7 @@ CUSTOM_INPUT_MEMBER(model2_state::_1c0001c_r)
 	if(m_analog_channel < 4)
 	{
 		static const char *const ports[] = { "ANA0", "ANA1", "ANA2", "ANA3" };
-		iptval = input_port_read_safe(machine(), ports[m_analog_channel], 0);
+		iptval = ioport(ports[m_analog_channel])->read_safe(0);
 		++m_analog_channel;
 	}
 	return iptval;

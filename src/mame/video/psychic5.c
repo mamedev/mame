@@ -110,11 +110,11 @@ READ8_MEMBER(psychic5_state::psychic5_paged_ram_r)
 	{
 		switch (offset)
 		{
-			case 0x00: return input_port_read(machine(), "SYSTEM");
-			case 0x01: return input_port_read(machine(), "P1");
-			case 0x02: return input_port_read(machine(), "P2");
-			case 0x03: return input_port_read(machine(), "DSW1");
-			case 0x04: return input_port_read(machine(), "DSW2");
+			case 0x00: return ioport("SYSTEM")->read();
+			case 0x01: return ioport("P1")->read();
+			case 0x02: return ioport("P2")->read();
+			case 0x03: return ioport("DSW1")->read();
+			case 0x04: return ioport("DSW2")->read();
 		}
 	}
 

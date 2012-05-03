@@ -59,7 +59,7 @@ MACHINE_START( harddriv )
 	atarigen_init(machine);
 
 	/* predetermine memory regions */
-	state->m_sim_memory = (UINT16 *)machine.root_device().memregion("user1")->base();
+	state->m_sim_memory = (UINT16 *)state->memregion("user1")->base();
 	state->m_sim_memory_size = state->memregion("user1")->bytes() / 2;
 	state->m_adsp_pgm_memory_word = (UINT16 *)(reinterpret_cast<UINT8 *>(state->m_adsp_pgm_memory.target()) + 1);
 }
@@ -238,7 +238,7 @@ READ16_HANDLER( hd68k_port0_r )
             .....
         0x8000 = SW1 #1
     */
-	int temp = input_port_read(space->machine(), "IN0");
+	int temp = space->machine().root_device().ioport("IN0")->read();
 	if (atarigen_get_hblank(*space->machine().primary_screen)) temp ^= 0x0002;
 	temp ^= 0x0018;		/* both EOCs always high for now */
 	return temp;
@@ -248,7 +248,7 @@ READ16_HANDLER( hd68k_port0_r )
 READ16_HANDLER( hdc68k_port1_r )
 {
 	harddriv_state *state = space->machine().driver_data<harddriv_state>();
-	UINT16 result = input_port_read(space->machine(), "a80000");
+	UINT16 result = state->ioport("a80000")->read();
 	UINT16 diff = result ^ state->m_hdc68k_last_port1;
 
 	/* if a new shifter position is selected, use it */
@@ -277,7 +277,7 @@ READ16_HANDLER( hdc68k_port1_r )
 READ16_HANDLER( hda68k_port1_r )
 {
 	harddriv_state *state = space->machine().driver_data<harddriv_state>();
-	UINT16 result = input_port_read(space->machine(), "a80000");
+	UINT16 result = state->ioport("a80000")->read();
 
 	/* merge in the wheel edge latch bit */
 	if (state->m_hdc68k_wheel_edge)
@@ -292,7 +292,7 @@ READ16_HANDLER( hdc68k_wheel_r )
 	harddriv_state *state = space->machine().driver_data<harddriv_state>();
 
 	/* grab the new wheel value and upconvert to 12 bits */
-	UINT16 new_wheel = input_port_read(space->machine(), "12BADC0") << 4;
+	UINT16 new_wheel = state->ioport("12BADC0")->read() << 4;
 
 	/* hack to display the wheel position */
 	if (space->machine().input().code_pressed(KEYCODE_LSHIFT))
@@ -350,14 +350,14 @@ WRITE16_HANDLER( hd68k_adc_control_w )
 	if (state->m_adc_control & 0x08)
 	{
 		state->m_adc8_select = state->m_adc_control & 0x07;
-		state->m_adc8_data = input_port_read(space->machine(), adc8names[state->m_adc8_select]);
+		state->m_adc8_data = state->ioport(adc8names[state->m_adc8_select])->read();
 	}
 
 	/* handle a write to the 12-bit ADC address select */
 	if (state->m_adc_control & 0x40)
 	{
 		state->m_adc12_select = (state->m_adc_control >> 4) & 0x03;
-		state->m_adc12_data = input_port_read(space->machine(), adc12names[state->m_adc12_select]) << 4;
+		state->m_adc12_data = space->machine().root_device().ioport(adc12names[state->m_adc12_select])->read() << 4;
 	}
 
 	/* bit 7 selects which byte of the 12 bit data to read */

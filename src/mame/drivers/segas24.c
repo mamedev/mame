@@ -515,19 +515,19 @@ UINT8 segas24_state::hotrod_io_r(UINT8 port)
 	switch(port)
 	{
 	case 0:
-		return input_port_read(machine(), "P1");
+		return ioport("P1")->read();
 	case 1:
-		return input_port_read(machine(), "P2");
+		return ioport("P2")->read();
 	case 2:
-		return input_port_read_safe(machine(), "P3", 0xff);
+		return ioport("P3")->read_safe(0xff);
 	case 3:
 		return 0xff;
 	case 4:
-		return input_port_read(machine(), "SERVICE");
+		return ioport("SERVICE")->read();
 	case 5: // Dip switches
-		return input_port_read(machine(), "COINAGE");
+		return ioport("COINAGE")->read();
 	case 6:
-		return input_port_read(machine(), "DSW");
+		return ioport("DSW")->read();
 	case 7: // DAC
 		return 0xff;
 	}
@@ -541,20 +541,20 @@ UINT8 segas24_state::dcclub_io_r(UINT8 port)
 	case 0:
 	{
 		static const UINT8 pos[16] = { 0, 1, 3, 2, 6, 4, 12, 8, 9 };
-		return (input_port_read(machine(), "P1") & 0xf) | ((~pos[input_port_read(machine(), "PADDLE")>>4]<<4) & 0xf0);
+		return (ioport("P1")->read() & 0xf) | ((~pos[ioport("PADDLE")->read()>>4]<<4) & 0xf0);
 	}
 	case 1:
-		return input_port_read(machine(), "P2");
+		return ioport("P2")->read();
 	case 2:
 		return 0xff;
 	case 3:
 		return 0xff;
 	case 4:
-		return input_port_read(machine(), "SERVICE");
+		return ioport("SERVICE")->read();
 	case 5: // Dip switches
-		return input_port_read(machine(), "COINAGE");
+		return ioport("COINAGE")->read();
 	case 6:
-		return input_port_read(machine(), "DSW");
+		return ioport("DSW")->read();
 	case 7: // DAC
 		return 0xff;
 	}
@@ -573,15 +573,15 @@ UINT8 segas24_state::mahmajn_io_r(UINT8 port)
 	case 1:
 		return 0xff;
 	case 2:
-		return input_port_read(machine(), keynames[cur_input_line]);
+		return ioport(keynames[cur_input_line])->read();
 	case 3:
 		return 0xff;
 	case 4:
-		return input_port_read(machine(), "SERVICE");
+		return ioport("SERVICE")->read();
 	case 5: // Dip switches
-		return input_port_read(machine(), "COINAGE");
+		return ioport("COINAGE")->read();
 	case 6:
-		return input_port_read(machine(), "DSW");
+		return ioport("DSW")->read();
 	case 7: // DAC
 		return 0xff;
 	}
@@ -626,7 +626,7 @@ WRITE16_MEMBER( segas24_state::hotrod3_ctrl_w )
 	if(ACCESSING_BITS_0_7)
 	{
 		data &= 3;
-		hotrod_ctrl_cur = input_port_read_safe(machine(), portnames[data], 0);
+		hotrod_ctrl_cur = ioport(portnames[data])->read_safe(0);
 	}
 }
 
@@ -638,21 +638,21 @@ READ16_MEMBER( segas24_state::hotrod3_ctrl_r )
 		{
 			// Steering dials
 			case 0:
-				return input_port_read_safe(machine(), "DIAL1", 0) & 0xff;
+				return ioport("DIAL1")->read_safe(0) & 0xff;
 			case 1:
-				return input_port_read_safe(machine(), "DIAL1", 0) >> 8;
+				return ioport("DIAL1")->read_safe(0) >> 8;
 			case 2:
-				return input_port_read_safe(machine(), "DIAL2", 0) & 0xff;
+				return ioport("DIAL2")->read_safe(0) & 0xff;
 			case 3:
-				return input_port_read_safe(machine(), "DIAL2", 0) >> 8;
+				return ioport("DIAL2")->read_safe(0) >> 8;
 			case 4:
-				return input_port_read_safe(machine(), "DIAL3", 0) & 0xff;
+				return ioport("DIAL3")->read_safe(0) & 0xff;
 			case 5:
-				return input_port_read_safe(machine(), "DIAL3", 0) >> 8;
+				return ioport("DIAL3")->read_safe(0) >> 8;
 			case 6:
-				return input_port_read_safe(machine(), "DIAL4", 0) & 0xff;
+				return ioport("DIAL4")->read_safe(0) & 0xff;
 			case 7:
-				return input_port_read_safe(machine(), "DIAL4", 0) >> 8;
+				return ioport("DIAL4")->read_safe(0) >> 8;
 
 			case 8:
 			{
@@ -1262,7 +1262,7 @@ static MACHINE_START( system24 )
 {
 	segas24_state *state = machine.driver_data<segas24_state>();
 	if (state->track_size)
-		machine.device<nvram_device>("floppy_nvram")->set_base(machine.root_device().memregion("floppy")->base(), 2*state->track_size);
+		machine.device<nvram_device>("floppy_nvram")->set_base(state->memregion("floppy")->base(), 2*state->track_size);
 
 	UINT8 *usr1 = state->memregion("romboard")->base();
 	if (usr1)
@@ -1771,19 +1771,19 @@ static INPUT_PORTS_START( qrouka )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(3)
 
 	PORT_START("SERVICE")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN4 ) PORT_CONDITION("DSW",0x08,PORTCOND_EQUALS,0x00)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_CONDITION("DSW",0x08,PORTCOND_EQUALS,0x00)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN4 ) PORT_CONDITION("DSW",0x08,EQUALS,0x00)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_CONDITION("DSW",0x08,EQUALS,0x00)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_CONDITION("DSW",0x08,PORTCOND_EQUALS,0x00)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CONDITION("DSW",0x08,PORTCOND_EQUALS,0x00)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_CONDITION("DSW",0x08,EQUALS,0x00)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CONDITION("DSW",0x08,EQUALS,0x00)
 	/* alt coin mode */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CONDITION("DSW",0x08,PORTCOND_EQUALS,0x08)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_CONDITION("DSW",0x08,PORTCOND_EQUALS,0x08)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("DSW",0x08,PORTCOND_EQUALS,0x08)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("DSW",0x08,PORTCOND_EQUALS,0x08)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CONDITION("DSW",0x08,EQUALS,0x08)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_CONDITION("DSW",0x08,EQUALS,0x08)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("DSW",0x08,EQUALS,0x08)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("DSW",0x08,EQUALS,0x08)
 
 
 	PORT_INCLUDE( system24_DSW )

@@ -121,7 +121,7 @@ protected:
 	void populate_and_sort(struct input_item_data *itemlist);
 	virtual void update_input(struct input_item_data *seqchangeditem) = 0;
 	void toggle_none_default(input_seq &selected_seq, input_seq &original_seq, const input_seq &selected_defseq);
-	const input_seq &get_field_default_seq(input_field_config *field, input_seq_type seqtype);
+	const input_seq &get_field_default_seq(ioport_field *field, input_seq_type seqtype);
 
 protected:
 	const void *		pollingref;
@@ -212,7 +212,7 @@ private:
 
 	/* internal analog menu item data */
 	struct analog_item_data {
-		input_field_config *field;
+		ioport_field *field;
 		int					type;
 		int					min, max;
 		int					cur;

@@ -17,7 +17,7 @@ WRITE8_MEMBER(simpsons_state::simpsons_eeprom_w)
 	if (data == 0xff)
 		return;
 
-	input_port_write(machine(), "EEPROMOUT", data, 0xff);
+	ioport("EEPROMOUT")->write(data, 0xff);
 
 	m_video_bank = data & 0x03;
 	simpsons_video_banking(machine(), m_video_bank);

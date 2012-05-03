@@ -74,19 +74,19 @@ public:
 
 READ16_MEMBER(quantum_state::trackball_r)
 {
-	return (input_port_read(machine(), "TRACKY") << 4) | input_port_read(machine(), "TRACKX");
+	return (ioport("TRACKY")->read() << 4) | ioport("TRACKX")->read();
 }
 
 
 static READ8_DEVICE_HANDLER( input_1_r )
 {
-	return (input_port_read(device->machine(), "DSW0") << (7 - (offset - POT0_C))) & 0x80;
+	return (device->machine().root_device().ioport("DSW0")->read() << (7 - (offset - POT0_C))) & 0x80;
 }
 
 
 static READ8_DEVICE_HANDLER( input_2_r )
 {
-	return (input_port_read(device->machine(), "DSW1") << (7 - (offset - POT0_C))) & 0x80;
+	return (device->machine().root_device().ioport("DSW1")->read() << (7 - (offset - POT0_C))) & 0x80;
 }
 
 

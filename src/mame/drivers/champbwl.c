@@ -175,8 +175,8 @@ public:
 READ8_MEMBER(champbwl_state::trackball_r)
 {
 	UINT8 ret;
-	UINT8 port4 = input_port_read(machine(), "FAKEX");
-	UINT8 port5 = input_port_read(machine(), "FAKEY");
+	UINT8 port4 = ioport("FAKEX")->read();
+	UINT8 port5 = ioport("FAKEY")->read();
 
 	ret = (((port4 - m_last_trackball_val[0]) & 0x0f)<<4) | ((port5 - m_last_trackball_val[1]) & 0x0f);
 

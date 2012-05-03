@@ -251,10 +251,10 @@ WRITE8_MEMBER(m10_state::m10_ctrl_w)
 	/* I have NO IDEA if this is correct or not */
 	m_bottomline = ~data & 0x20;
 
-	if (input_port_read(machine(), "CAB") & 0x01)
+	if (ioport("CAB")->read() & 0x01)
 		m_flip = ~data & 0x10;
 
-	if (!(input_port_read(machine(), "CAB") & 0x02))
+	if (!(ioport("CAB")->read() & 0x02))
 		machine().sound().system_mute(data & 0x80);
 
 	/* sound command in lower 4 bytes */
@@ -326,10 +326,10 @@ WRITE8_MEMBER(m10_state::m11_ctrl_w)
 
 	m_bottomline = ~data & 0x20;
 
-	if (input_port_read(machine(), "CAB") & 0x01)
+	if (ioport("CAB")->read() & 0x01)
 		m_flip = ~data & 0x10;
 
-	if (!(input_port_read(machine(), "CAB") & 0x02))
+	if (!(ioport("CAB")->read() & 0x02))
 		machine().sound().system_mute(data & 0x80);
 }
 
@@ -355,9 +355,9 @@ WRITE8_MEMBER(m10_state::m15_ctrl_w)
 	if (data & 0xf0)
 		popmessage("M15 ctrl: %02x",data);
 #endif
-	if (input_port_read(machine(), "CAB") & 0x01)
+	if (ioport("CAB")->read() & 0x01)
 		m_flip = ~data & 0x04;
-	if (!(input_port_read(machine(), "CAB") & 0x02))
+	if (!(ioport("CAB")->read() & 0x02))
 		machine().sound().system_mute(data & 0x08);
 }
 

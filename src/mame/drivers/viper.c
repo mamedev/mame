@@ -1604,12 +1604,12 @@ READ64_MEMBER(viper_state::unk1_r)
 	}
 	if (ACCESSING_BITS_32_39)
 	{
-		UINT64 reg = input_port_read(machine(), "IN0");
+		UINT64 reg = ioport("IN0")->read();
 		r |= reg << 32;
 	}
 	if (ACCESSING_BITS_24_31)
 	{
-		UINT64 reg = input_port_read(machine(), "IN1");
+		UINT64 reg = ioport("IN1")->read();
 		r |= reg << 24;
 	}
 	if (ACCESSING_BITS_16_23)

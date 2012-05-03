@@ -300,7 +300,7 @@ static MACHINE_START( tmspoker )
 
 static MACHINE_RESET( tmspoker )
 {
-	UINT8 seldsw = (input_port_read(machine, "SELDSW") );
+	UINT8 seldsw = (machine.root_device().ioport("SELDSW")->read() );
 
 	popmessage("ROM Bank: %02X", seldsw);
 

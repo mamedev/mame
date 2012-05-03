@@ -25,13 +25,13 @@ READ16_MEMBER(stadhero_state::stadhero_control_r)
 	switch (offset<<1)
 	{
 		case 0:
-			return input_port_read(machine(), "INPUTS");
+			return ioport("INPUTS")->read();
 
 		case 2:
-			return input_port_read(machine(), "COIN");
+			return ioport("COIN")->read();
 
 		case 4:
-			return input_port_read(machine(), "DSW");
+			return ioport("DSW")->read();
 	}
 
 	logerror("CPU #0 PC %06x: warning - read unmapped memory address %06x\n",cpu_get_pc(&space.device()),0x30c000+offset);
@@ -150,7 +150,7 @@ static INPUT_PORTS_START( stadhero )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 INPUT_PORTS_END
 
 /******************************************************************************/

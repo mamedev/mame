@@ -144,7 +144,7 @@ READ8_MEMBER(midway_ssio_device::ioport_read)
 {
 	static const char *const port[] = { "IP0", "IP1", "IP2", "IP3", "IP4" };
 	astring tempstr;
-	UINT8 result = input_port_read_safe(machine(), subtag(tempstr, port[offset]), 0xff);
+	UINT8 result = ioport(port[offset])->read_safe(0xff);
 	if (!m_custom_input[offset].isnull())
 		result = (result & ~m_custom_input_mask[offset]) |
 		         (m_custom_input[offset](space, offset, 0xff) & m_custom_input_mask[offset]);

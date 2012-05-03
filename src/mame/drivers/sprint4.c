@@ -50,17 +50,17 @@ static TIMER_CALLBACK( nmi_callback	)
 
 	UINT8 wheel[4] =
 	{
-		input_port_read(machine, "WHEEL1"),
-		input_port_read(machine, "WHEEL2"),
-		input_port_read(machine, "WHEEL3"),
-		input_port_read(machine, "WHEEL4")
+		state->ioport("WHEEL1")->read(),
+		state->ioport("WHEEL2")->read(),
+		state->ioport("WHEEL3")->read(),
+		state->ioport("WHEEL4")->read()
 	};
 	UINT8 lever[4] =
 	{
-		input_port_read(machine, "LEVER1"),
-		input_port_read(machine, "LEVER2"),
-		input_port_read(machine, "LEVER3"),
-		input_port_read(machine, "LEVER4")
+		machine.root_device().ioport("LEVER1")->read(),
+		machine.root_device().ioport("LEVER2")->read(),
+		machine.root_device().ioport("LEVER3")->read(),
+		machine.root_device().ioport("LEVER4")->read()
 	};
 
 	int i;
@@ -99,9 +99,9 @@ static TIMER_CALLBACK( nmi_callback	)
 
 	/* NMI and watchdog are disabled during service mode */
 
-	machine.watchdog_enable(input_port_read(machine, "IN0") & 0x40);
+	machine.watchdog_enable(machine.root_device().ioport("IN0")->read() & 0x40);
 
-	if (input_port_read(machine, "IN0") & 0x40)
+	if (machine.root_device().ioport("IN0")->read() & 0x40)
 		cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
 
 	machine.scheduler().timer_set(machine.primary_screen->time_until_pos(scanline), FUNC(nmi_callback), scanline);
@@ -134,21 +134,21 @@ READ8_MEMBER(sprint4_state::sprint4_wram_r)
 
 READ8_MEMBER(sprint4_state::sprint4_analog_r)
 {
-	return (input_port_read(machine(), "ANALOG") << (~offset & 7)) & 0x80;
+	return (ioport("ANALOG")->read() << (~offset & 7)) & 0x80;
 }
 READ8_MEMBER(sprint4_state::sprint4_coin_r)
 {
-	return (input_port_read(machine(), "COIN") << (~offset & 7)) & 0x80;
+	return (ioport("COIN")->read() << (~offset & 7)) & 0x80;
 }
 READ8_MEMBER(sprint4_state::sprint4_collision_r)
 {
-	return (input_port_read(machine(), "COLLISION") << (~offset & 7)) & 0x80;
+	return (ioport("COLLISION")->read() << (~offset & 7)) & 0x80;
 }
 
 
 READ8_MEMBER(sprint4_state::sprint4_options_r)
 {
-	return (input_port_read(machine(), "DIP") >> (2 * (offset & 3))) & 3;
+	return (ioport("DIP")->read() >> (2 * (offset & 3))) & 3;
 }
 
 
@@ -259,7 +259,7 @@ static INPUT_PORTS_START( sprint4 )
 
 	PORT_START("IN0")
 	PORT_SERVICE( 0x40, IP_ACTIVE_LOW )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_VBLANK )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("IN1")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Track Select") PORT_CODE(KEYCODE_SPACE)

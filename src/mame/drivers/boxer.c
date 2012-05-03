@@ -81,12 +81,12 @@ static TIMER_CALLBACK( periodic_callback )
 
 		memset(mask, 0, sizeof mask);
 
-		mask[input_port_read(machine, "STICK0_X")] |= 0x01;
-		mask[input_port_read(machine, "STICK0_Y")] |= 0x02;
-		mask[input_port_read(machine, "PADDLE0")]  |= 0x04;
-		mask[input_port_read(machine, "STICK1_X")] |= 0x08;
-		mask[input_port_read(machine, "STICK1_Y")] |= 0x10;
-		mask[input_port_read(machine, "PADDLE1")]  |= 0x20;
+		mask[state->ioport("STICK0_X")->read()] |= 0x01;
+		mask[state->ioport("STICK0_Y")->read()] |= 0x02;
+		mask[state->ioport("PADDLE0")->read()]  |= 0x04;
+		mask[state->ioport("STICK1_X")->read()] |= 0x08;
+		mask[state->ioport("STICK1_Y")->read()] |= 0x10;
+		mask[state->ioport("PADDLE1")->read()]  |= 0x20;
 
 		for (i = 1; i < 256; i++)
 			if (mask[i] != 0)
@@ -203,9 +203,9 @@ static SCREEN_UPDATE_IND16( boxer )
 
 READ8_MEMBER(boxer_state::boxer_input_r)
 {
-	UINT8 val = input_port_read(machine(), "IN0");
+	UINT8 val = ioport("IN0")->read();
 
-	if (input_port_read(machine(), "IN3") < machine().primary_screen->vpos())
+	if (ioport("IN3")->read() < machine().primary_screen->vpos())
 		val |= 0x02;
 
 	return (val << ((offset & 7) ^ 7)) & 0x80;
@@ -227,11 +227,11 @@ READ8_MEMBER(boxer_state::boxer_misc_r)
 		break;
 
 	case 2:
-		val = input_port_read(machine(), "IN1");
+		val = ioport("IN1")->read();
 		break;
 
 	case 3:
-		val = input_port_read(machine(), "IN2");
+		val = ioport("IN2")->read();
 		break;
 	}
 

@@ -3613,7 +3613,7 @@ static void expand_32x32x5bpp(running_machine &machine)
 static void expand_colourdata( running_machine &machine )
 {
 	pgm_state *state = machine.driver_data<pgm_state>();
-	UINT8 *src = machine.root_device().memregion( "sprcol" )->base();
+	UINT8 *src = state->memregion( "sprcol" )->base();
 	size_t srcsize = state->memregion( "sprcol" )->bytes();
 	int cnt;
 	size_t needed = srcsize / 2 * 3;

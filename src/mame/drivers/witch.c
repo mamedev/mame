@@ -345,10 +345,10 @@ READ8_MEMBER(witch_state::read_a00x)
 	switch(offset)
 	{
 		case 0x02: return m_reg_a002;
-		case 0x04: return input_port_read(machine(), "A004");
-		case 0x05: return input_port_read(machine(), "A005");
-		case 0x0c: return input_port_read(machine(), "SERVICE");	// stats / reset
-		case 0x0e: return input_port_read(machine(), "A00E");		// coin/reset
+		case 0x04: return ioport("A004")->read();
+		case 0x05: return ioport("A005")->read();
+		case 0x0c: return ioport("SERVICE")->read();	// stats / reset
+		case 0x0e: return ioport("A00E")->read();		// coin/reset
 	}
 
 	if(offset == 0x00) //muxed with A002?
@@ -356,11 +356,11 @@ READ8_MEMBER(witch_state::read_a00x)
 		switch(m_reg_a002 & 0x3f)
 		{
 		case 0x3b:
-			return input_port_read(machine(), "UNK");	//bet10 / pay out
+			return ioport("UNK")->read();	//bet10 / pay out
 		case 0x3e:
-			return input_port_read(machine(), "INPUTS");	//TODO : trace f564
+			return ioport("INPUTS")->read();	//TODO : trace f564
 		case 0x3d:
-			return input_port_read(machine(), "A005");
+			return ioport("A005")->read();
 		default:
 			logerror("A000 read with mux=0x%02x\n", m_reg_a002 & 0x3f);
 		}

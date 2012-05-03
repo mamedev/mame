@@ -129,19 +129,19 @@ READ8_MEMBER(baraduke_state::inputport_r)
 	switch (m_inputport_selected)
 	{
 		case 0x00:	/* DSW A (bits 0-4) */
-			return (input_port_read(machine(), "DSWA") & 0xf8) >> 3;
+			return (ioport("DSWA")->read() & 0xf8) >> 3;
 		case 0x01:	/* DSW A (bits 5-7), DSW B (bits 0-1) */
-			return ((input_port_read(machine(), "DSWA") & 0x07) << 2) | ((input_port_read(machine(), "DSWB") & 0xc0) >> 6);
+			return ((ioport("DSWA")->read() & 0x07) << 2) | ((ioport("DSWB")->read() & 0xc0) >> 6);
 		case 0x02:	/* DSW B (bits 2-6) */
-			return (input_port_read(machine(), "DSWB") & 0x3e) >> 1;
+			return (ioport("DSWB")->read() & 0x3e) >> 1;
 		case 0x03:	/* DSW B (bit 7), DSW C (bits 0-3) */
-			return ((input_port_read(machine(), "DSWB") & 0x01) << 4) | (input_port_read(machine(), "EDGE") & 0x0f);
+			return ((ioport("DSWB")->read() & 0x01) << 4) | (ioport("EDGE")->read() & 0x0f);
 		case 0x04:	/* coins, start */
-			return input_port_read(machine(), "IN0");
+			return ioport("IN0")->read();
 		case 0x05:	/* 2P controls */
-			return input_port_read(machine(), "IN2");
+			return ioport("IN2")->read();
 		case 0x06:	/* 1P controls */
-			return input_port_read(machine(), "IN1");
+			return ioport("IN1")->read();
 		default:
 			return 0xff;
 	}

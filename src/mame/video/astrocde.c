@@ -481,51 +481,51 @@ READ8_MEMBER(astrocde_state::astrocade_data_chip_register_r)
 			break;
 
 		case 0x10:	/* player 1 handle */
-			result = input_port_read_safe(machine(), "P1HANDLE", 0xff);
+			result = ioport("P1HANDLE")->read_safe(0xff);
 			break;
 
 		case 0x11:	/* player 2 handle */
-			result = input_port_read_safe(machine(), "P2HANDLE", 0xff);
+			result = ioport("P2HANDLE")->read_safe(0xff);
 			break;
 
 		case 0x12:	/* player 3 handle */
-			result = input_port_read_safe(machine(), "P3HANDLE", 0xff);
+			result = ioport("P3HANDLE")->read_safe(0xff);
 			break;
 
 		case 0x13:	/* player 4 handle */
-			result = input_port_read_safe(machine(), "P4HANDLE", 0xff);
+			result = ioport("P4HANDLE")->read_safe(0xff);
 			break;
 
 		case 0x14:	/* keypad column 0 */
-			result = input_port_read_safe(machine(), "KEYPAD0", 0xff);
+			result = ioport("KEYPAD0")->read_safe(0xff);
 			break;
 
 		case 0x15:	/* keypad column 1 */
-			result = input_port_read_safe(machine(), "KEYPAD1", 0xff);
+			result = ioport("KEYPAD1")->read_safe(0xff);
 			break;
 
 		case 0x16:	/* keypad column 2 */
-			result = input_port_read_safe(machine(), "KEYPAD2", 0xff);
+			result = ioport("KEYPAD2")->read_safe(0xff);
 			break;
 
 		case 0x17:	/* keypad column 3 */
-			result = input_port_read_safe(machine(), "KEYPAD3", 0xff);
+			result = ioport("KEYPAD3")->read_safe(0xff);
 			break;
 
 		case 0x1c:	/* player 1 knob */
-			result = input_port_read_safe(machine(), "P1_KNOB", 0xff);
+			result = ioport("P1_KNOB")->read_safe(0xff);
 			break;
 
 		case 0x1d:	/* player 2 knob */
-			result = input_port_read_safe(machine(), "P2_KNOB", 0xff);
+			result = ioport("P2_KNOB")->read_safe(0xff);
 			break;
 
 		case 0x1e:	/* player 3 knob */
-			result = input_port_read_safe(machine(), "P3_KNOB", 0xff);
+			result = ioport("P3_KNOB")->read_safe(0xff);
 			break;
 
 		case 0x1f:	/* player 4 knob */
-			result = input_port_read_safe(machine(), "P4_KNOB", 0xff);
+			result = ioport("P4_KNOB")->read_safe(0xff);
 			break;
 	}
 

@@ -120,7 +120,7 @@ READ8_MEMBER(mitchell_state::pang_port5_r)
         otherwise music doesn't work.
     */
 
-	return (input_port_read(machine(), "SYS0") & 0xfe) | (m_irq_source & 1);
+	return (ioport("SYS0")->read() & 0xfe) | (m_irq_source & 1);
 }
 
 static WRITE8_DEVICE_HANDLER( eeprom_cs_w )
@@ -166,7 +166,7 @@ READ8_MEMBER(mitchell_state::block_input_r)
 
 	if (m_dial_selected)
 	{
-		int delta = (input_port_read(machine(), dialnames[offset]) - m_dial[offset]) & 0xff;
+		int delta = (ioport(dialnames[offset])->read() - m_dial[offset]) & 0xff;
 
 		if (delta & 0x80)
 		{
@@ -194,7 +194,7 @@ READ8_MEMBER(mitchell_state::block_input_r)
 	}
 	else
 	{
-		int res = input_port_read(machine(), portnames[offset]) & 0xf7;
+		int res = ioport(portnames[offset])->read() & 0xf7;
 
 		if (m_dir[offset])
 			res |= 0x08;
@@ -209,8 +209,8 @@ WRITE8_MEMBER(mitchell_state::block_dial_control_w)
 	if (data == 0x08)
 	{
 		/* reset the dial counters */
-		m_dial[0] = input_port_read(machine(), "DIAL1");
-		m_dial[1] = input_port_read(machine(), "DIAL2");
+		m_dial[0] = ioport("DIAL1")->read();
+		m_dial[1] = ioport("DIAL2")->read();
 	}
 	else if (data == 0x80)
 		m_dial_selected = 0;
@@ -231,7 +231,7 @@ READ8_MEMBER(mitchell_state::mahjong_input_r)
 	for (i = 0; i < 5; i++)
 	{
 		if (m_keymatrix & (0x80 >> i))
-			return input_port_read(machine(), keynames[offset][i]);
+			return ioport(keynames[offset][i])->read();
 	}
 
 	return 0xff;
@@ -251,21 +251,21 @@ READ8_MEMBER(mitchell_state::input_r)
 	{
 		case 0:
 		default:
-			return input_port_read(machine(), portnames[offset]);
+			return ioport(portnames[offset])->read();
 		case 1:		/* Mahjong games */
 			if (offset)
 				return mahjong_input_r(space, offset - 1);
 			else
-				return input_port_read(machine(), "IN0");
+				return ioport("IN0")->read();
 			break;
 		case 2:		/* Block Block - dial control */
 			if (offset)
 				return block_input_r(space, offset - 1);
 			else
-				return input_port_read(machine(), "IN0");
+				return ioport("IN0")->read();
 			break;
 		case 3:		/* Super Pang - simulate START 1 press to initialize EEPROM */
-			return input_port_read(machine(), portnames[offset]);
+			return ioport(portnames[offset])->read();
 	}
 }
 
@@ -420,7 +420,7 @@ static INPUT_PORTS_START( mj_common )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* USED - handled in port5_r */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* unused? */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_VBLANK )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* unused? */
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)
 
@@ -670,7 +670,7 @@ static INPUT_PORTS_START( pang )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* USED - handled in port5_r */
 	PORT_SERVICE_NO_TOGGLE( 0x02, IP_ACTIVE_LOW )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* unused? */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_VBLANK )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* unused? */
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)
 
@@ -721,7 +721,7 @@ static INPUT_PORTS_START( mstworld )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* unused? */
 	PORT_SERVICE_NO_TOGGLE( 0x02, IP_ACTIVE_LOW )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* unused? */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_VBLANK )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* unused? */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* unused? */
 
@@ -837,7 +837,7 @@ static INPUT_PORTS_START( qtono1 )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* USED - handled in port5_r */
 	PORT_SERVICE_NO_TOGGLE( 0x02, IP_ACTIVE_LOW )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* unused? */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_VBLANK )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* unused? */
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)
 
@@ -877,7 +877,7 @@ static INPUT_PORTS_START( block )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* USED - handled in port5_r */
 	PORT_SERVICE_NO_TOGGLE( 0x02, IP_ACTIVE_LOW )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* unused? */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_VBLANK )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* unused? */
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)
 
@@ -919,7 +919,7 @@ static INPUT_PORTS_START( blockjoy )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* USED - handled in port5_r */
 	PORT_SERVICE_NO_TOGGLE( 0x02, IP_ACTIVE_LOW )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* unused? */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_VBLANK )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* unused? */
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)
 

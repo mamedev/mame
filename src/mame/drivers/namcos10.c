@@ -495,7 +495,7 @@ ADDRESS_MAP_END
 static void memn_driver_init( running_machine &machine )
 {
 	namcos10_state *state = machine.driver_data<namcos10_state>();
-	UINT8 *BIOS = (UINT8 *)machine.root_device().memregion( "user1" )->base();
+	UINT8 *BIOS = (UINT8 *)state->memregion( "user1" )->base();
 	state->nand_base = (UINT8 *)state->memregion( "user2" )->base();
 
 	state->nand_copy( (UINT32 *)( BIOS + 0x0000000 ), 0x08000, 0x001c000 );

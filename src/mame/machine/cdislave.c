@@ -79,9 +79,9 @@ void cdislave_device::prepare_readback(attotime delay, UINT8 channel, UINT8 coun
 
 void cdislave_device::perform_mouse_update()
 {
-    UINT16 x = input_port_read(machine(), "MOUSEX");
-    UINT16 y = input_port_read(machine(), "MOUSEY");
-    UINT8 buttons = input_port_read(machine(), "MOUSEBTN");
+    UINT16 x = ioport("MOUSEX")->read();
+    UINT16 y = ioport("MOUSEY")->read();
+    UINT8 buttons = ioport("MOUSEBTN")->read();
 
     UINT16 old_mouse_x = m_real_mouse_x;
     UINT16 old_mouse_y = m_real_mouse_y;

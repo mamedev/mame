@@ -115,14 +115,14 @@ READ8_MEMBER(ajax_state::ajax_ls138_f10_r)
 			data = machine().rand();
 			break;
 		case 0x04:	/* 2P inputs */
-			data = input_port_read(machine(), "P2");
+			data = ioport("P2")->read();
 			break;
 		case 0x06:	/* 1P inputs + DIPSW #1 & #2 */
 			index = offset & 0x01;
-			data = input_port_read(machine(), (offset & 0x02) ? portnames[2 + index] : portnames[index]);
+			data = ioport((offset & 0x02) ? portnames[2 + index] : portnames[index])->read();
 			break;
 		case 0x07:	/* DIPSW #3 */
-			data = input_port_read(machine(), "DSW3");
+			data = ioport("DSW3")->read();
 			break;
 
 		default:
@@ -197,7 +197,7 @@ WRITE8_MEMBER(ajax_state::ajax_bankswitch_2_w)
 MACHINE_START( ajax )
 {
 	ajax_state *state = machine.driver_data<ajax_state>();
-	UINT8 *MAIN = machine.root_device().memregion("maincpu")->base();
+	UINT8 *MAIN = state->memregion("maincpu")->base();
 	UINT8 *SUB  = state->memregion("sub")->base();
 
 	state->membank("bank1")->configure_entries(0,  9,  &SUB[0x10000], 0x2000);

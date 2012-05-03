@@ -32,7 +32,7 @@ READ8_MEMBER(gomoku_state::input_port_r)
 
 	res = 0;
 	for (i = 0; i < 8; i++)
-		res |= ((input_port_read_safe(machine(), portnames[i], 0xff) >> offset) & 1) << i;
+		res |= ((ioport(portnames[i])->read_safe(0xff) >> offset) & 1) << i;
 
 	return res;
 }

@@ -238,12 +238,12 @@ READ8_MEMBER(jantotsu_state::jantotsu_mux_r)
 	UINT8 i,res;
 
 	//  printf("%02x\n", m_mux_data);
-	res = input_port_read(machine(), "COINS");
+	res = ioport("COINS")->read();
 
 	for(i=0;i<8;i++)
 	{
 		if((~m_mux_data) & (1 << i))
-			res |= input_port_read(machine(), portnames[i]);
+			res |= ioport(portnames[i])->read();
 	}
 
 	return res;
@@ -260,7 +260,7 @@ WRITE8_MEMBER(jantotsu_state::jantotsu_mux_w)
   a side-by-side test (to know if the background colors really works) to be sure. */
 READ8_MEMBER(jantotsu_state::jantotsu_dsw2_r)
 {
-	return (input_port_read(machine(), "DSW2") & 0x3f) | 0x80;
+	return (ioport("DSW2")->read() & 0x3f) | 0x80;
 }
 
 static WRITE8_DEVICE_HANDLER( jan_adpcm_w )
@@ -490,7 +490,7 @@ static MACHINE_RESET( jantotsu )
 	jantotsu_state *state = machine.driver_data<jantotsu_state>();
 
 	/*Load hard-wired background color.*/
-	state->m_col_bank = (input_port_read(machine, "DSW2") & 0xc0) >> 3;
+	state->m_col_bank = (state->ioport("DSW2")->read() & 0xc0) >> 3;
 
 	state->m_vram_bank = 0;
 	state->m_mux_data = 0;

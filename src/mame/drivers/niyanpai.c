@@ -278,15 +278,15 @@ READ16_MEMBER(niyanpai_state::niyanpai_dipsw_r)
 {
 	UINT8 dipsw_a, dipsw_b;
 
-	dipsw_a = (((input_port_read(machine(), "DSWA") & 0x01) << 7) | ((input_port_read(machine(), "DSWA") & 0x02) << 5) |
-			   ((input_port_read(machine(), "DSWA") & 0x04) << 3) | ((input_port_read(machine(), "DSWA") & 0x08) << 1) |
-			   ((input_port_read(machine(), "DSWA") & 0x10) >> 1) | ((input_port_read(machine(), "DSWA") & 0x20) >> 3) |
-			   ((input_port_read(machine(), "DSWA") & 0x40) >> 5) | ((input_port_read(machine(), "DSWA") & 0x80) >> 7));
+	dipsw_a = (((ioport("DSWA")->read() & 0x01) << 7) | ((ioport("DSWA")->read() & 0x02) << 5) |
+			   ((ioport("DSWA")->read() & 0x04) << 3) | ((ioport("DSWA")->read() & 0x08) << 1) |
+			   ((ioport("DSWA")->read() & 0x10) >> 1) | ((ioport("DSWA")->read() & 0x20) >> 3) |
+			   ((ioport("DSWA")->read() & 0x40) >> 5) | ((ioport("DSWA")->read() & 0x80) >> 7));
 
-	dipsw_b = (((input_port_read(machine(), "DSWB") & 0x01) << 7) | ((input_port_read(machine(), "DSWB") & 0x02) << 5) |
-			   ((input_port_read(machine(), "DSWB") & 0x04) << 3) | ((input_port_read(machine(), "DSWB") & 0x08) << 1) |
-			   ((input_port_read(machine(), "DSWB") & 0x10) >> 1) | ((input_port_read(machine(), "DSWB") & 0x20) >> 3) |
-			   ((input_port_read(machine(), "DSWB") & 0x40) >> 5) | ((input_port_read(machine(), "DSWB") & 0x80) >> 7));
+	dipsw_b = (((ioport("DSWB")->read() & 0x01) << 7) | ((ioport("DSWB")->read() & 0x02) << 5) |
+			   ((ioport("DSWB")->read() & 0x04) << 3) | ((ioport("DSWB")->read() & 0x08) << 1) |
+			   ((ioport("DSWB")->read() & 0x10) >> 1) | ((ioport("DSWB")->read() & 0x20) >> 3) |
+			   ((ioport("DSWB")->read() & 0x40) >> 5) | ((ioport("DSWB")->read() & 0x80) >> 7));
 
 	return ((dipsw_a << 8) | dipsw_b);
 }
@@ -297,13 +297,13 @@ READ16_MEMBER(niyanpai_state::musobana_inputport_0_r)
 
 	switch ((m_musobana_inputport ^ 0xff00) >> 8)
 	{
-		case 0x01:	portdata = input_port_read(machine(), "KEY0"); break;
-		case 0x02:	portdata = input_port_read(machine(), "KEY1"); break;
-		case 0x04:	portdata = input_port_read(machine(), "KEY2"); break;
-		case 0x08:	portdata = input_port_read(machine(), "KEY3"); break;
-		case 0x10:	portdata = input_port_read(machine(), "KEY4"); break;
-		default:	portdata = input_port_read(machine(), "KEY0") & input_port_read(machine(), "KEY1") & input_port_read(machine(), "KEY2")
-								& input_port_read(machine(), "KEY3") & input_port_read(machine(), "KEY4"); break;
+		case 0x01:	portdata = ioport("KEY0")->read(); break;
+		case 0x02:	portdata = ioport("KEY1")->read(); break;
+		case 0x04:	portdata = ioport("KEY2")->read(); break;
+		case 0x08:	portdata = ioport("KEY3")->read(); break;
+		case 0x10:	portdata = ioport("KEY4")->read(); break;
+		default:	portdata = ioport("KEY0")->read() & ioport("KEY1")->read() & ioport("KEY2")->read()
+								& ioport("KEY3")->read() & ioport("KEY4")->read(); break;
 	}
 
 	return (portdata);

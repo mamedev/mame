@@ -63,7 +63,7 @@ WRITE8_MEMBER(freekick_state::spinner_select_w)
 
 READ8_MEMBER(freekick_state::spinner_r)
 {
-	return input_port_read(machine(), m_spinner ? "IN3" : "IN2");
+	return ioport(m_spinner ? "IN3" : "IN2")->read();
 }
 
 WRITE8_MEMBER(freekick_state::pbillrd_bankswitch_w)

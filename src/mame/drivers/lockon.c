@@ -332,10 +332,10 @@ READ8_MEMBER(lockon_state::adc_r)
 {
 	switch (offset)
 	{
-		case 0:  return input_port_read(machine(), "ADC_BANK");
-		case 1:  return input_port_read(machine(), "ADC_PITCH");
-		case 2:  return input_port_read(machine(), "ADC_MISSILE");
-		case 3:  return input_port_read(machine(), "ADC_HOVER");
+		case 0:  return ioport("ADC_BANK")->read();
+		case 1:  return ioport("ADC_PITCH")->read();
+		case 2:  return ioport("ADC_MISSILE")->read();
+		case 3:  return ioport("ADC_HOVER")->read();
 		default: return 0;
 	}
 }

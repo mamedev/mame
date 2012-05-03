@@ -545,7 +545,7 @@ SCREEN_UPDATE_IND16( m92 )
 
 	/* Flipscreen appears hardwired to the dipswitch - strange */
 	m92_state *state = screen.machine().driver_data<m92_state>();
-	if (input_port_read(screen.machine(), "DSW") & 0x100)
+	if (screen.machine().root_device().ioport("DSW")->read() & 0x100)
 		state->flip_screen_set(0);
 	else
 		state->flip_screen_set(1);
@@ -563,7 +563,7 @@ SCREEN_UPDATE_IND16( ppan )
 
 	/* Flipscreen appears hardwired to the dipswitch - strange */
 	m92_state *state = screen.machine().driver_data<m92_state>();
-	if (input_port_read(screen.machine(), "DSW") & 0x100)
+	if (screen.machine().root_device().ioport("DSW")->read() & 0x100)
 		state->flip_screen_set(0);
 	else
 		state->flip_screen_set(1);

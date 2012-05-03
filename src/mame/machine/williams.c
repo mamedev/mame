@@ -622,7 +622,7 @@ CUSTOM_INPUT_MEMBER(williams_state::williams_mux_r)
 	if (m_port_select != 0)
 		tag += strlen(tag) + 1;
 
-	return input_port_read(machine(), tag);
+	return ioport(tag)->read();
 }
 
 /*
@@ -653,7 +653,7 @@ CUSTOM_INPUT_MEMBER(williams_state::williams_mux_r)
 READ8_DEVICE_HANDLER( williams_49way_port_0_r )
 {
 	static const UINT8 translate49[7] = { 0x0, 0x4, 0x6, 0x7, 0xb, 0x9, 0x8 };
-	return (translate49[input_port_read(device->machine(), "49WAYX") >> 4] << 4) | translate49[input_port_read(device->machine(), "49WAYY") >> 4];
+	return (translate49[device->machine().root_device().ioport("49WAYX")->read() >> 4] << 4) | translate49[device->machine().root_device().ioport("49WAYY")->read() >> 4];
 }
 
 
@@ -663,7 +663,7 @@ READ8_DEVICE_HANDLER( williams_input_port_49way_0_5_r )
 	if (state->m_port_select)
 		return williams_49way_port_0_r(device, 0);
 	else
-		return input_port_read(device->machine(), "IN3");
+		return state->ioport("IN3")->read();
 }
 
 
@@ -879,7 +879,7 @@ MACHINE_START( blaster )
 
 	/* banking is different for blaster */
 	state->membank("bank1")->configure_entry(0, state->m_videoram);
-	state->membank("bank1")->configure_entries(1, 16, machine.root_device().memregion("maincpu")->base() + 0x18000, 0x4000);
+	state->membank("bank1")->configure_entries(1, 16, state->memregion("maincpu")->base() + 0x18000, 0x4000);
 
 	state->membank("bank2")->configure_entry(0, state->m_videoram + 0x4000);
 	state->membank("bank2")->configure_entries(1, 16, state->memregion("maincpu")->base() + 0x10000, 0x0000);
@@ -946,7 +946,7 @@ static WRITE8_DEVICE_HANDLER( lottofun_coin_lock_w )
 static READ8_DEVICE_HANDLER( tshoot_input_port_0_3_r )
 {
 	/* merge in the gun inputs with the standard data */
-	int data = input_port_read(device->machine(), "IN0");
+	int data = device->machine().root_device().ioport("IN0")->read();
 	int gun = (data & 0x3f) ^ ((data & 0x3f) >> 1);
 	return (data & 0xc0) | gun;
 

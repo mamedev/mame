@@ -59,7 +59,7 @@ READ32_MEMBER(kongambl_state::eeprom_r)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		UINT32 rv = input_port_read(machine(), "SYSTEM") & ~0x1;
+		UINT32 rv = ioport("SYSTEM")->read() & ~0x1;
 
 		return rv;	// bit 0 freezes the game if 1
 	}
@@ -71,7 +71,7 @@ WRITE32_MEMBER(kongambl_state::eeprom_w)
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		input_port_write(machine(), "EEPROMOUT", (data>>8)&0xf, 0xff);
+		ioport("EEPROMOUT")->write((data>>8)&0xf, 0xff);
 	}
 }
 

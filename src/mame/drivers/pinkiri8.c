@@ -450,11 +450,11 @@ READ8_MEMBER(pinkiri8_state::mux_p2_r)
 {
 	switch(m_mux_data)
 	{
-		case 0x01: return input_port_read(machine(), "PL2_01");
-		case 0x02: return input_port_read(machine(), "PL2_02");
-		case 0x04: return input_port_read(machine(), "PL2_03");
-		case 0x08: return input_port_read(machine(), "PL2_04");
-		case 0x10: return input_port_read(machine(), "PL2_05");
+		case 0x01: return ioport("PL2_01")->read();
+		case 0x02: return ioport("PL2_02")->read();
+		case 0x04: return ioport("PL2_03")->read();
+		case 0x08: return ioport("PL2_04")->read();
+		case 0x10: return ioport("PL2_05")->read();
 	}
 
 	return 0xff;
@@ -464,11 +464,11 @@ READ8_MEMBER(pinkiri8_state::mux_p1_r)
 {
 	switch(m_mux_data)
 	{
-		case 0x01: return input_port_read(machine(), "PL1_01");
-		case 0x02: return input_port_read(machine(), "PL1_02");
-		case 0x04: return input_port_read(machine(), "PL1_03");
-		case 0x08: return input_port_read(machine(), "PL1_04");
-		case 0x10: return input_port_read(machine(), "PL1_05");
+		case 0x01: return ioport("PL1_01")->read();
+		case 0x02: return ioport("PL1_02")->read();
+		case 0x04: return ioport("PL1_03")->read();
+		case 0x08: return ioport("PL1_04")->read();
+		case 0x10: return ioport("PL1_05")->read();
 	}
 
 	return 0xff;

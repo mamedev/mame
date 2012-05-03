@@ -120,8 +120,8 @@ READ8_MEMBER(chqflag_state::analog_read_r)
 {
 	switch (m_analog_ctrl & 0x03)
 	{
-		case 0x00: return (m_accel = input_port_read(machine(), "IN3"));	/* accelerator */
-		case 0x01: return (m_wheel = input_port_read(machine(), "IN4"));	/* steering */
+		case 0x00: return (m_accel = ioport("IN3")->read());	/* accelerator */
+		case 0x01: return (m_wheel = ioport("IN4")->read());	/* steering */
 		case 0x02: return m_accel;						/* accelerator (previous?) */
 		case 0x03: return m_wheel;						/* steering (previous?) */
 	}

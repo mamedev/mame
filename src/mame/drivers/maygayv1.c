@@ -532,7 +532,7 @@ READ16_MEMBER(maygayv1_state::maygay_8279_r)
 			case 0x40:
 				addr = i8279.command & 0x07;
 
-				result = input_port_read(machine(), portnames[addr]);
+				result = ioport(portnames[addr])->read();
 
 				/* handle autoincrement */
 				if (i8279.command & 0x10)
@@ -730,7 +730,7 @@ READ8_MEMBER(maygayv1_state::mcu_r)
 		case 1:
 		{
 			if ( !BIT(m_p3, 4) )
-				return (input_port_read(machine(), "REEL"));	// Reels???
+				return (ioport("REEL")->read());	// Reels???
 			else
 				return 0;
 		}

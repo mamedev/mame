@@ -298,11 +298,11 @@ static READ16_HANDLER( standard_io_r )
 		case 0x1000/2:
 		{
 			static const char *const sysports[] = { "SERVICE", "P1", "UNUSED", "P2" };
-			return input_port_read(space->machine(), sysports[offset & 3]);
+			return state->ioport(sysports[offset & 3])->read();
 		}
 
 		case 0x2000/2:
-			return input_port_read(space->machine(), (offset & 1) ? "DSW2" : "DSW1");
+			return state->ioport((offset & 1) ? "DSW2" : "DSW1")->read();
 	}
 	logerror("%06X:standard_io_r - unknown read access to address %04X\n", cpu_get_pc(&space->device()), offset * 2);
 	return 0xffff;
@@ -634,16 +634,16 @@ static READ16_HANDLER( aceattaa_custom_io_r )
 				{
 					switch (state->m_video_control & 0xf)
 					{
-						case 0x00: return input_port_read(space->machine(), "P1"); // "HANDX1"
-						case 0x04: return input_port_read(space->machine(), "TRACKX1");
-						case 0x08: return input_port_read(space->machine(), "TRACKY1");
-						case 0x0c: return input_port_read(space->machine(), "HANDY1");
+						case 0x00: return state->ioport("P1")->read(); // "HANDX1"
+						case 0x04: return state->ioport("TRACKX1")->read();
+						case 0x08: return state->ioport("TRACKY1")->read();
+						case 0x0c: return state->ioport("HANDY1")->read();
 					}
 					break;
 				}
 
 				case 0x02:
-					return input_port_read(space->machine(), "DIAL1") | (input_port_read(space->machine(), "DIAL2") << 4);
+					return state->ioport("DIAL1")->read() | (state->ioport("DIAL2")->read() << 4);
 					// low nibble: Sega 56pin Edge "16"-"19" // rotary switch 10positions 4bit-binary-pinout
 					// high nibble: Sega 56pin Edge "T"-"W"  // ditto
 
@@ -651,10 +651,10 @@ static READ16_HANDLER( aceattaa_custom_io_r )
 				{
 					switch (state->m_video_control & 0xf)
 					{
-						case 0x00: return input_port_read(space->machine(), "P2"); // "HANDX2"
-						case 0x04: return input_port_read(space->machine(), "TRACKX2");
-						case 0x08: return input_port_read(space->machine(), "TRACKY2");
-						case 0x0c: return input_port_read(space->machine(), "HANDY2");
+						case 0x00: return state->ioport("P2")->read(); // "HANDX2"
+						case 0x04: return state->ioport("TRACKX2")->read();
+						case 0x08: return state->ioport("TRACKY2")->read();
+						case 0x0c: return state->ioport("HANDY2")->read();
 					}
 					break;
 				}
@@ -686,9 +686,9 @@ static READ16_HANDLER( mjleague_custom_io_r )
 				/* upper bit of the trackball controls */
 				case 0:
 				{
-					UINT8 buttons = input_port_read(space->machine(), "SERVICE");
-					UINT8 analog1 = input_port_read(space->machine(), (state->m_video_control & 4) ? "ANALOGY1" : "ANALOGX1");
-					UINT8 analog2 = input_port_read(space->machine(), (state->m_video_control & 4) ? "ANALOGY2" : "ANALOGX2");
+					UINT8 buttons = state->ioport("SERVICE")->read();
+					UINT8 analog1 = state->ioport((state->m_video_control & 4) ? "ANALOGY1" : "ANALOGX1")->read();
+					UINT8 analog2 = state->ioport((state->m_video_control & 4) ? "ANALOGY2" : "ANALOGX2")->read();
 					buttons |= (analog1 & 0x80) >> 1;
 					buttons |= (analog2 & 0x80);
 					return buttons;
@@ -698,8 +698,8 @@ static READ16_HANDLER( mjleague_custom_io_r )
 				/* player 1 select switch mapped to bit 7 */
 				case 1:
 				{
-					UINT8 buttons = input_port_read(space->machine(), "BUTTONS1");
-					UINT8 analog = input_port_read(space->machine(), (state->m_video_control & 4) ? "ANALOGY1" : "ANALOGX1");
+					UINT8 buttons = state->ioport("BUTTONS1")->read();
+					UINT8 analog = state->ioport((state->m_video_control & 4) ? "ANALOGY1" : "ANALOGX1")->read();
 					return (buttons & 0x80) | (analog & 0x7f);
 				}
 
@@ -707,11 +707,11 @@ static READ16_HANDLER( mjleague_custom_io_r )
 				case 2:
 				{
 					if (state->m_video_control & 4)
-						return (input_port_read(space->machine(), "ANALOGZ1") >> 4) | (input_port_read(space->machine(), "ANALOGZ2") & 0xf0);
+						return (state->ioport("ANALOGZ1")->read() >> 4) | (state->ioport("ANALOGZ2")->read() & 0xf0);
 					else
 					{
-						UINT8 buttons1 = input_port_read(space->machine(), "BUTTONS1");
-						UINT8 buttons2 = input_port_read(space->machine(), "BUTTONS2");
+						UINT8 buttons1 = state->ioport("BUTTONS1")->read();
+						UINT8 buttons2 = state->ioport("BUTTONS2")->read();
 
 						if (!(buttons1 & 0x01))
 							state->m_last_buttons1 = 0;
@@ -739,8 +739,8 @@ static READ16_HANDLER( mjleague_custom_io_r )
 				/* player 2 select switch mapped to bit 7 */
 				case 3:
 				{
-					UINT8 buttons = input_port_read(space->machine(), "BUTTONS2");
-					UINT8 analog = input_port_read(space->machine(), (state->m_video_control & 4) ? "ANALOGY2" : "ANALOGX2");
+					UINT8 buttons = state->ioport("BUTTONS2")->read();
+					UINT8 analog = state->ioport((state->m_video_control & 4) ? "ANALOGY2" : "ANALOGX2")->read();
 					return (buttons & 0x80) | (analog & 0x7f);
 				}
 			}
@@ -773,10 +773,10 @@ static READ16_HANDLER( passsht16a_custom_io_r )
 				case 1:
 					switch ((state->m_read_port++) & 3)
 					{
-						case 0: return input_port_read(space->machine(), "P1");
-						case 1: return input_port_read(space->machine(), "P2");
-						case 2: return input_port_read(space->machine(), "P3");
-						case 3: return input_port_read(space->machine(), "P4");
+						case 0: return state->ioport("P1")->read();
+						case 1: return state->ioport("P2")->read();
+						case 2: return state->ioport("P3")->read();
+						case 3: return state->ioport("P4")->read();
 					}
 
 					break;
@@ -803,8 +803,8 @@ static READ16_HANDLER( sdi_custom_io_r )
 		case 0x1000/2:
 			switch (offset & 3)
 			{
-				case 1:	return input_port_read(space->machine(), (state->m_video_control & 4) ? "ANALOGY1" : "ANALOGX1");
-				case 3:	return input_port_read(space->machine(), (state->m_video_control & 4) ? "ANALOGY2" : "ANALOGX2");
+				case 1:	return state->ioport((state->m_video_control & 4) ? "ANALOGY1" : "ANALOGX1")->read();
+				case 3:	return state->ioport((state->m_video_control & 4) ? "ANALOGY2" : "ANALOGX2")->read();
 			}
 			break;
 	}
@@ -830,12 +830,12 @@ static READ16_HANDLER( sjryuko_custom_io_r )
 			switch (offset & 3)
 			{
 				case 1:
-					if (input_port_read_safe(space->machine(), portname[state->m_mj_input_num], 0xff) != 0xff)
+					if (state->ioport(portname[state->m_mj_input_num])->read_safe(0xff) != 0xff)
 						return 0xff & ~(1 << state->m_mj_input_num);
 					return 0xff;
 
 				case 2:
-					return input_port_read_safe(space->machine(), portname[state->m_mj_input_num], 0xff);
+					return state->ioport(portname[state->m_mj_input_num])->read_safe(0xff);
 			}
 			break;
 	}
@@ -973,9 +973,9 @@ static READ8_HANDLER( mcu_io_r )
 			return maincpu_byte_r(space->machine(), 0x840001 ^ offset);
 
 		case 5:
-			return space->machine().root_device().memregion("maincpu")->base()[0x00000 + offset];
+			return state->memregion("maincpu")->base()[0x00000 + offset];
 		case 6:
-			return space->machine().root_device().memregion("maincpu")->base()[0x10000 + offset];
+			return state->memregion("maincpu")->base()[0x10000 + offset];
 		case 7:
 			return state->memregion("maincpu")->base()[0x20000 + offset];
 

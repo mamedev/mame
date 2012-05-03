@@ -108,32 +108,32 @@ READ8_MEMBER(tehkanwc_state::tehkanwc_track_0_r)
 {
 	int joy;
 
-	joy = input_port_read(machine(), "FAKE") >> (2 * offset);
+	joy = ioport("FAKE")->read() >> (2 * offset);
 	if (joy & 1) return -63;
 	if (joy & 2) return 63;
-	return input_port_read(machine(), offset ? "P1Y" : "P1X") - m_track0[offset];
+	return ioport(offset ? "P1Y" : "P1X")->read() - m_track0[offset];
 }
 
 READ8_MEMBER(tehkanwc_state::tehkanwc_track_1_r)
 {
 	int joy;
 
-	joy = input_port_read(machine(), "FAKE") >> (4 + 2 * offset);
+	joy = ioport("FAKE")->read() >> (4 + 2 * offset);
 	if (joy & 1) return -63;
 	if (joy & 2) return 63;
-	return input_port_read(machine(), offset ? "P2Y" : "P2X") - m_track1[offset];
+	return ioport(offset ? "P2Y" : "P2X")->read() - m_track1[offset];
 }
 
 WRITE8_MEMBER(tehkanwc_state::tehkanwc_track_0_reset_w)
 {
 	/* reset the trackball counters */
-	m_track0[offset] = input_port_read(machine(), offset ? "P1Y" : "P1X") + data;
+	m_track0[offset] = ioport(offset ? "P1Y" : "P1X")->read() + data;
 }
 
 WRITE8_MEMBER(tehkanwc_state::tehkanwc_track_1_reset_w)
 {
 	/* reset the trackball counters */
-	m_track1[offset] = input_port_read(machine(), offset ? "P2Y" : "P2X") + data;
+	m_track1[offset] = ioport(offset ? "P2Y" : "P2X")->read() + data;
 }
 
 

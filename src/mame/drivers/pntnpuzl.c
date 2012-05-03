@@ -170,7 +170,7 @@ static READ16_DEVICE_HANDLER( pntnpuzl_eeprom_r )
 	pntnpuzl_state *state = device->machine().driver_data<pntnpuzl_state>();
 	/* bit 11 is EEPROM data */
 	eeprom_device *eeprom = downcast<eeprom_device *>(device);
-	return (state->m_eeprom & 0xf4ff) | (eeprom->read_bit()<<11) | (input_port_read(device->machine(), "IN1") & 0x0300);
+	return (state->m_eeprom & 0xf4ff) | (eeprom->read_bit()<<11) | (state->ioport("IN1")->read() & 0x0300);
 }
 
 static WRITE16_DEVICE_HANDLER( pntnpuzl_eeprom_w )
@@ -241,11 +241,11 @@ READ16_MEMBER(pntnpuzl_state::pntnpuzl_280014_r)
 
 	if (m_serial_out == 0x11)
 	{
-		if (input_port_read(machine(), "IN0") & 0x10)
+		if (ioport("IN0")->read() & 0x10)
 		{
 			m_touchscr[0] = 0x1b;
-			m_touchscr[2] = BITSWAP8(input_port_read(machine(), "TOUCHX"),0,1,2,3,4,5,6,7);
-			m_touchscr[4] = BITSWAP8(input_port_read(machine(), "TOUCHY"),0,1,2,3,4,5,6,7);
+			m_touchscr[2] = BITSWAP8(ioport("TOUCHX")->read(),0,1,2,3,4,5,6,7);
+			m_touchscr[4] = BITSWAP8(ioport("TOUCHY")->read(),0,1,2,3,4,5,6,7);
 		}
 		else
 			m_touchscr[0] = 0;
@@ -325,7 +325,7 @@ INPUT_CHANGED_MEMBER(pntnpuzl_state::coin_inserted)
 
 static INPUT_PORTS_START( pntnpuzl )
 	PORT_START("IN0")	/* fake inputs */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, pntnpuzl_state,coin_inserted, 1) PORT_IMPULSE(1)
 	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_HIGH )PORT_CHANGED_MEMBER(DEVICE_SELF, pntnpuzl_state,coin_inserted, 2) PORT_IMPULSE(1)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, pntnpuzl_state,coin_inserted, 4) PORT_IMPULSE(1)

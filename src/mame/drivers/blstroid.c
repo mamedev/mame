@@ -74,7 +74,7 @@ static MACHINE_RESET( blstroid )
 READ16_MEMBER(blstroid_state::inputs_r)
 {
 	static const char *const iptnames[] = { "IN0", "IN1" };
-	int temp = input_port_read(machine(), iptnames[offset & 1]);
+	int temp = ioport(iptnames[offset & 1])->read();
 
 	if (m_cpu_to_sound_ready) temp ^= 0x0040;
 	if (atarigen_get_hblank(*machine().primary_screen)) temp ^= 0x0010;
@@ -135,7 +135,7 @@ static INPUT_PORTS_START( blstroid )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_SPECIAL )
-	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_SERVICE( 0x0080, IP_ACTIVE_LOW )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -146,7 +146,7 @@ static INPUT_PORTS_START( blstroid )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_SPECIAL )
-	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )

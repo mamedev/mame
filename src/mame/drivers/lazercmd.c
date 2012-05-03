@@ -290,7 +290,7 @@ WRITE8_MEMBER(lazercmd_state::lazercmd_data_port_w)
 /* triggered by REDD,r opcode */
 READ8_MEMBER(lazercmd_state::lazercmd_data_port_r)
 {
-	UINT8 data = input_port_read(machine(), "DSW") & 0x0f;
+	UINT8 data = ioport("DSW")->read() & 0x0f;
 	return data;
 }
 
@@ -370,16 +370,16 @@ READ8_MEMBER(lazercmd_state::lazercmd_hardware_r)
 	switch (offset)
 	{
 		case 0: 			   /* player 1 joysticks */
-			data = input_port_read(machine(), "IN0");
+			data = ioport("IN0")->read();
 			break;
 		case 1: 			   /* player 2 joysticks */
-			data = input_port_read(machine(), "IN1");
+			data = ioport("IN1")->read();
 			break;
 		case 2: 			   /* player 1 + 2 buttons */
-			data = input_port_read(machine(), "IN3");
+			data = ioport("IN3")->read();
 			break;
 		case 3: 			   /* coin slot + start buttons */
-			data = input_port_read(machine(), "IN2");
+			data = ioport("IN2")->read();
 			break;
 		case 4: 			   /* vertical scan counter */
 			data = ((m_timer_count & 0x10) >> 1) | ((m_timer_count & 0x20) >> 3)

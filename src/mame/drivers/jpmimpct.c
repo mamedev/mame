@@ -250,7 +250,7 @@ READ16_MEMBER(jpmimpct_state::duart_1_r)
 		}
 		case 0xd:
 		{
-			val = input_port_read(machine(), "TEST/DEMO");
+			val = ioport("TEST/DEMO")->read();
 			break;
 		}
 		case 0xe:
@@ -366,11 +366,11 @@ READ16_MEMBER(jpmimpct_state::duart_2_r)
 		{
 			if (m_touch_cnt == 0)
 			{
-				if ( input_port_read(machine(), "TOUCH") & 0x1 )
+				if ( ioport("TOUCH")->read() & 0x1 )
 				{
 					m_touch_data[0] = 0x2a;
-					m_touch_data[1] = 0x7 - (input_port_read(machine(), "TOUCH_Y") >> 5) + 0x30;
-					m_touch_data[2] = (input_port_read(machine(), "TOUCH_X") >> 5) + 0x30;
+					m_touch_data[1] = 0x7 - (ioport("TOUCH_Y")->read() >> 5) + 0x30;
+					m_touch_data[2] = (ioport("TOUCH_X")->read() >> 5) + 0x30;
 
 					/* Return RXRDY */
 					return 0x1;
@@ -434,22 +434,22 @@ READ16_MEMBER(jpmimpct_state::inputs1_r)
 	{
 		case 0:
 		{
-			val = input_port_read(machine(), "DSW");
+			val = ioport("DSW")->read();
 			break;
 		}
 		case 2:
 		{
-			val = input_port_read(machine(), "SW2");
+			val = ioport("SW2")->read();
 			break;
 		}
 		case 4:
 		{
-			val = input_port_read(machine(), "SW1");
+			val = ioport("SW1")->read();
 			break;
 		}
 		case 9:
 		{
-			val = input_port_read(machine(), "COINS");
+			val = ioport("COINS")->read();
 			break;
 		}
 	}
@@ -1038,47 +1038,47 @@ READ16_MEMBER(jpmimpct_state::inputs1awp_r)
 		{
 			case 0:
 			{
-				val = input_port_read(machine(), "DSW");
+				val = ioport("DSW")->read();
 				break;
 			}
 			case 1:
 			{
-				val = input_port_read(machine(), "PERCENT");
+				val = ioport("PERCENT")->read();
 				break;
 			}
 			case 2:
 			{
-				val = input_port_read(machine(), "KEYS");
+				val = ioport("KEYS")->read();
 				break;
 			}
 			case 3:
 			{
-				val = input_port_read(machine(), "SW2");
+				val = ioport("SW2")->read();
 				break;
 			}
 			case 4:
 			{
-				val = input_port_read(machine(), "SW1");
+				val = ioport("SW1")->read();
 				break;
 			}
 			case 5:
 			{
-				val = (input_port_read(machine(), "SW3") );
+				val = (ioport("SW3")->read() );
 				break;
 			}
 			case 6:
 			{
-				val = (input_port_read(machine(), "SW4") );
+				val = (ioport("SW4")->read() );
 				break;
 			}
 			case 7://5
 			{
-				val = (input_port_read(machine(), "SW5") );
+				val = (ioport("SW5")->read() );
 				break;
 			}
 			case 9:
 			{
-				val = input_port_read(machine(), "COINS");
+				val = ioport("COINS")->read();
 				break;
 			}
 		}

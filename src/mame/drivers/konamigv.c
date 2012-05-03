@@ -503,7 +503,7 @@ READ32_MEMBER(konamigv_state::trackball_r)
 
 		for( axis = 0; axis < 2; axis++ )
 		{
-			value = input_port_read(machine(), axisnames[axis]);
+			value = ioport(axisnames[axis])->read();
 			diff = value - m_trackball_prev[ axis ];
 			m_trackball_prev[ axis ] = value;
 			m_trackball_data[ axis ] = ( ( diff & 0xf00 ) << 16 ) | ( ( diff & 0xff ) << 8 );
@@ -595,7 +595,7 @@ READ32_MEMBER(konamigv_state::btc_trackball_r)
 
 		for( axis = 0; axis < 4; axis++ )
 		{
-			value = input_port_read(machine(), axisnames[axis]);
+			value = ioport(axisnames[axis])->read();
 			diff = value - m_btc_trackball_prev[ axis ];
 			m_btc_trackball_prev[ axis ] = value;
 			m_btc_trackball_data[ axis ] = ( ( diff & 0xf00 ) << 16 ) | ( ( diff & 0xff ) << 8 );

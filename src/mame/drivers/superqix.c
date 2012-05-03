@@ -112,7 +112,7 @@ static SAMPLES_START( pbillian_sh_start )
 {
 	superqix_state *state = device.machine().driver_data<superqix_state>();
 	running_machine &machine = device.machine();
-	UINT8 *src = machine.root_device().memregion("samples")->base();
+	UINT8 *src = state->memregion("samples")->base();
 	int i, len = state->memregion("samples")->bytes();
 
 	/* convert 8-bit unsigned samples to 8-bit signed */
@@ -174,7 +174,7 @@ static READ8_DEVICE_HANDLER( in4_mcu_r )
 {
 	superqix_state *state = device->machine().driver_data<superqix_state>();
 //  logerror("%04x: in4_mcu_r\n",cpu_get_pc(&space->device()));
-	return input_port_read(device->machine(), "P2") | (state->m_from_mcu_pending << 6) | (state->m_from_z80_pending << 7);
+	return state->ioport("P2")->read() | (state->m_from_mcu_pending << 6) | (state->m_from_z80_pending << 7);
 }
 
 static READ8_DEVICE_HANDLER( sqix_from_mcu_r )
@@ -255,11 +255,11 @@ READ8_MEMBER(superqix_state::bootleg_mcu_p3_r)
 {
 	if ((m_port1 & 0x10) == 0)
 	{
-		return input_port_read(machine(), "DSW1");
+		return ioport("DSW1")->read();
 	}
 	else if ((m_port1 & 0x20) == 0)
 	{
-		return input_port_read(machine(), "SYSTEM") | (m_from_mcu_pending << 6) | (m_from_z80_pending << 7);
+		return ioport("SYSTEM")->read() | (m_from_mcu_pending << 6) | (m_from_z80_pending << 7);
 	}
 	else if ((m_port1 & 0x40) == 0)
 	{
@@ -272,7 +272,7 @@ READ8_MEMBER(superqix_state::bootleg_mcu_p3_r)
 
 READ8_MEMBER(superqix_state::sqixu_mcu_p0_r)
 {
-	return input_port_read(machine(), "SYSTEM") | (m_from_mcu_pending << 6) | (m_from_z80_pending << 7);
+	return ioport("SYSTEM")->read() | (m_from_mcu_pending << 6) | (m_from_z80_pending << 7);
 }
 
 WRITE8_MEMBER(superqix_state::sqixu_mcu_p2_w)
@@ -325,7 +325,7 @@ READ8_MEMBER(superqix_state::nmi_ack_r)
 
 static READ8_DEVICE_HANDLER( bootleg_in0_r )
 {
-	return BITSWAP8(input_port_read(device->machine(), "DSW1"), 0,1,2,3,4,5,6,7);
+	return BITSWAP8(device->machine().root_device().ioport("DSW1")->read(), 0,1,2,3,4,5,6,7);
 }
 
 WRITE8_MEMBER(superqix_state::bootleg_flipscreen_w)
@@ -352,7 +352,7 @@ static int read_dial(running_machine &machine, int player)
 	int newpos;
 
 	/* get the new position and adjust the result */
-	newpos = input_port_read(machine, player ? "DIAL2" : "DIAL1");
+	newpos = state->ioport(player ? "DIAL2" : "DIAL1")->read();
 	if (newpos != state->m_oldpos[player])
 	{
 		state->m_sign[player] = ((newpos - state->m_oldpos[player]) & 0x80) >> 7;
@@ -429,11 +429,11 @@ WRITE8_MEMBER(superqix_state::hotsmash_68705_portC_w)
 		switch (data & 0x07)
 		{
 			case 0x0:	// dsw A
-				m_portA_in = input_port_read(machine(), "DSW1");
+				m_portA_in = ioport("DSW1")->read();
 				break;
 
 			case 0x1:	// dsw B
-				m_portA_in = input_port_read(machine(), "DSW2");
+				m_portA_in = ioport("DSW2")->read();
 				break;
 
 			case 0x2:
@@ -478,7 +478,7 @@ static READ8_DEVICE_HANDLER(hotsmash_ay_port_a_r)
 {
 	superqix_state *state = device->machine().driver_data<superqix_state>();
 //  logerror("%04x: ay_port_a_r and mcu_pending is %d\n",cpu_get_pc(&space->device()),state->m_from_mcu_pending);
-	return input_port_read(device->machine(), "SYSTEM") | ((state->m_from_mcu_pending^1) << 7);
+	return state->ioport("SYSTEM")->read() | ((state->m_from_mcu_pending^1) << 7);
 }
 
 /**************************************************************************
@@ -499,15 +499,15 @@ READ8_MEMBER(superqix_state::pbillian_from_mcu_r)
 	{
 		case 0x01:
 		{
-			UINT8 p = input_port_read(machine(), m_curr_player ? "PLUNGER2" : "PLUNGER1") & 0xbf;
+			UINT8 p = ioport(m_curr_player ? "PLUNGER2" : "PLUNGER1")->read() & 0xbf;
 			if ((p & 0x3f) == 0) p |= 0x40;
 			return p;
 		}
 
-		case 0x02: return input_port_read(machine(), m_curr_player ? "DIAL2" : "DIAL1");
+		case 0x02: return ioport(m_curr_player ? "DIAL2" : "DIAL1")->read();
 
-		case 0x04: return input_port_read(machine(), "DSW1");
-		case 0x08: return input_port_read(machine(), "DSW2");
+		case 0x04: return ioport("DSW1")->read();
+		case 0x08: return ioport("DSW2")->read();
 
 		case 0x80: m_curr_player = 0; return 0;
 		case 0x81: m_curr_player = 1; return 0;
@@ -521,7 +521,7 @@ static READ8_DEVICE_HANDLER(pbillian_ay_port_a_r)
 {
 //  logerror("%04x: ay_port_a_r\n",cpu_get_pc(&space->device()));
 	/* bits 76------  MCU status bits */
-	return (device->machine().rand() & 0xc0) | input_port_read(device->machine(), "BUTTONS");
+	return (device->machine().rand() & 0xc0) | device->machine().root_device().ioport("BUTTONS")->read();
 }
 
 
@@ -867,7 +867,7 @@ static INPUT_PORTS_START( superqix )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_VBLANK )	/* ??? */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")	/* ??? */
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 
 	PORT_START("P2")

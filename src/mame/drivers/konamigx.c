@@ -463,7 +463,7 @@ WRITE32_MEMBER(konamigx_state::eeprom_w)
           bit 0: eeprom data
         */
 
-		input_port_write(machine(), "EEPROMOUT", odata, 0xff);
+		ioport("EEPROMOUT")->write(odata, 0xff);
 
 		konamigx_wrport1_0 = odata;
 	}
@@ -874,9 +874,9 @@ static double adc0834_callback( device_t *device, UINT8 input )
 	switch (input)
 	{
 	case ADC083X_CH0:
-		return (double)(5 * input_port_read(device->machine(), "AN0")) / 255.0; // steer
+		return (double)(5 * device->machine().root_device().ioport("AN0")->read()) / 255.0; // steer
 	case ADC083X_CH1:
-		return (double)(5 * input_port_read(device->machine(), "AN1")) / 255.0; // gas
+		return (double)(5 * device->machine().root_device().ioport("AN1")->read()) / 255.0; // gas
 	case ADC083X_VREF:
 		return 5;
 	}
@@ -890,16 +890,16 @@ static const adc083x_interface konamigx_adc_interface = {
 
 READ32_MEMBER(konamigx_state::le2_gun_H_r)
 {
-	int p1x = input_port_read(machine(), "LIGHT0_X")*290/0xff+20;
-	int p2x = input_port_read(machine(), "LIGHT1_X")*290/0xff+20;
+	int p1x = ioport("LIGHT0_X")->read()*290/0xff+20;
+	int p2x = ioport("LIGHT1_X")->read()*290/0xff+20;
 
 	return (p1x<<16)|p2x;
 }
 
 READ32_MEMBER(konamigx_state::le2_gun_V_r)
 {
-	int p1y = input_port_read(machine(), "LIGHT0_Y")*224/0xff;
-	int p2y = input_port_read(machine(), "LIGHT1_Y")*224/0xff;
+	int p1y = ioport("LIGHT0_Y")->read()*224/0xff;
+	int p2y = ioport("LIGHT1_Y")->read()*224/0xff;
 
 	// make "off the bottom" reload too
 	if (p1y >= 0xdf) p1y = 0;

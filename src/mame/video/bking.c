@@ -194,12 +194,12 @@ WRITE8_MEMBER(bking_state::bking_playfield_w)
 
 READ8_MEMBER(bking_state::bking_input_port_5_r)
 {
-	return input_port_read(machine(), m_controller ? "TRACK1_X" : "TRACK0_X");
+	return ioport(m_controller ? "TRACK1_X" : "TRACK0_X")->read();
 }
 
 READ8_MEMBER(bking_state::bking_input_port_6_r)
 {
-	return input_port_read(machine(), m_controller ? "TRACK1_Y" : "TRACK0_Y");
+	return ioport(m_controller ? "TRACK1_Y" : "TRACK0_Y")->read();
 }
 
 READ8_MEMBER(bking_state::bking_pos_r)

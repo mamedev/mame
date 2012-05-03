@@ -1296,16 +1296,16 @@ READ32_MEMBER(namcos12_state::system11gun_r)
 	switch( offset )
 	{
 	case 0:
-		data = input_port_read(machine(), "LIGHT0_X");
+		data = ioport("LIGHT0_X")->read();
 		break;
 	case 1:
-		data = ( input_port_read(machine(), "LIGHT0_Y") ) | ( ( input_port_read(machine(), "LIGHT0_Y") + 1 ) << 16 );
+		data = ( ioport("LIGHT0_Y")->read() ) | ( ( ioport("LIGHT0_Y")->read() + 1 ) << 16 );
 		break;
 	case 2:
-		data = input_port_read(machine(), "LIGHT1_X");
+		data = ioport("LIGHT1_X")->read();
 		break;
 	case 3:
-		data = ( input_port_read(machine(), "LIGHT1_Y") ) | ( ( input_port_read(machine(), "LIGHT1_Y") + 1 ) << 16 );
+		data = ( ioport("LIGHT1_Y")->read() ) | ( ( ioport("LIGHT1_Y")->read() + 1 ) << 16 );
 		break;
 	}
 	verboselog( machine(), 2, "system11gun_r( %08x, %08x ) %08x\n", offset, mem_mask, data );
@@ -1573,10 +1573,10 @@ WRITE8_MEMBER(namcos12_state::s12_mcu_settings_w)
 
 READ8_MEMBER(namcos12_state::s12_mcu_gun_h_r)
 {
-	const input_port_config *port = ioport("LIGHT0_X");
+	ioport_port *port = ioport("LIGHT0_X");
 	if( port != NULL )
 	{
-		int rv = input_port_read_direct( port ) << 6;
+		int rv = port->read() << 6;
 
 		if( ( offset & 1 ) != 0 )
 		{
@@ -1592,10 +1592,10 @@ READ8_MEMBER(namcos12_state::s12_mcu_gun_h_r)
 
 READ8_MEMBER(namcos12_state::s12_mcu_gun_v_r)
 {
-	const input_port_config *port = ioport("LIGHT0_Y");
+	ioport_port *port = ioport("LIGHT0_Y");
 	if( port != NULL )
 	{
-		int rv = input_port_read_direct( port ) << 6;
+		int rv = port->read() << 6;
 
 		if( ( offset & 1 ) != 0 )
 		{
@@ -1627,7 +1627,7 @@ static DRIVER_INIT( namcos12 )
 
 	psx_driver_init(machine);
 
-	state->membank("bank1")->configure_entries(0, machine.root_device().memregion( "user2" )->bytes() / 0x200000, state->memregion( "user2" )->base(), 0x200000 );
+	state->membank("bank1")->configure_entries(0, state->memregion( "user2" )->bytes() / 0x200000, state->memregion( "user2" )->base(), 0x200000 );
 
 	state->m_s12_porta = 0;
 	state->m_s12_rtcstate = 0;

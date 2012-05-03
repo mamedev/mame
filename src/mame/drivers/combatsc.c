@@ -158,7 +158,7 @@ READ8_MEMBER(combatsc_state::combatscb_io_r)
 {
 	static const char *const portnames[] = { "IN0", "IN1", "DSW1", "DSW2" };
 
-	return input_port_read(machine(), portnames[offset]);
+	return ioport(portnames[offset])->read();
 }
 
 WRITE8_MEMBER(combatsc_state::combatscb_priority_w)
@@ -279,7 +279,7 @@ READ8_MEMBER(combatsc_state::trackball_r)
 		{
 			UINT8 curr;
 
-			curr = input_port_read_safe(machine(), tracknames[i], 0xff);
+			curr = ioport(tracknames[i])->read_safe(0xff);
 
 			dir[i] = curr - m_pos[i];
 			m_sign[i] = dir[i] & 0x80;
@@ -690,7 +690,7 @@ static const ym2203_interface ym2203_bootleg_config =
 static MACHINE_START( combatsc )
 {
 	combatsc_state *state = machine.driver_data<combatsc_state>();
-	UINT8 *MEM = machine.root_device().memregion("maincpu")->base() + 0x38000;
+	UINT8 *MEM = state->memregion("maincpu")->base() + 0x38000;
 
 	state->m_io_ram  = MEM + 0x0000;
 	state->m_page[0] = MEM + 0x4000;

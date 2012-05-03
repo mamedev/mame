@@ -54,7 +54,7 @@ WRITE16_MEMBER(xmen_state::eeprom_w)
 		/* bit 3 is clock (active high) */
 		/* bit 4 is cs (active low) */
 		/* bit 5 is enabled in IRQ3, disabled in IRQ5 (sprite DMA start?) */
-		input_port_write(machine(), "EEPROMOUT", data, 0xff);
+		ioport("EEPROMOUT")->write(data, 0xff);
 	}
 	if (ACCESSING_BITS_8_15)
 	{

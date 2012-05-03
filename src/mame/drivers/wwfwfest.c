@@ -177,13 +177,13 @@ WRITE16_MEMBER(wwfwfest_state::wwfwfest_soundwrite)
 CUSTOM_INPUT_MEMBER(wwfwfest_state::dsw_3f_r)
 {
 	const char *tag = (const char *)param;
-	return input_port_read(machine(), tag) & 0x3f;
+	return ioport(tag)->read() & 0x3f;
 }
 
 CUSTOM_INPUT_MEMBER(wwfwfest_state::dsw_c0_r)
 {
 	const char *tag = (const char *)param;
-	return (input_port_read(machine(), tag) & 0xc0) >> 6;
+	return (ioport(tag)->read() & 0xc0) >> 6;
 }
 
 
@@ -237,7 +237,7 @@ static INPUT_PORTS_START( wwfwfest )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START4 )
 	PORT_BIT( 0x0300, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, wwfwfest_state,dsw_c0_r, "DSW1")
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_VBLANK )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )

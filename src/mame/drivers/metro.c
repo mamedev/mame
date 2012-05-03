@@ -839,9 +839,9 @@ ADDRESS_MAP_END
 /* Really weird way of mapping 3 DSWs */
 READ16_MEMBER(metro_state::balcube_dsw_r)
 {
-	UINT16 dsw1 = input_port_read(machine(), "DSW0") >> 0;
-	UINT16 dsw2 = input_port_read(machine(), "DSW0") >> 8;
-	UINT16 dsw3 = input_port_read(machine(), "IN2");
+	UINT16 dsw1 = ioport("DSW0")->read() >> 0;
+	UINT16 dsw2 = ioport("DSW0")->read() >> 8;
+	UINT16 dsw3 = ioport("IN2")->read();
 
 	switch (offset * 2)
 	{
@@ -1293,11 +1293,11 @@ READ16_MEMBER(metro_state::gakusai_input_r)
 {
 	UINT16 input_sel = (*m_input_sel) ^ 0x3e;
 	// Bit 0 ??
-	if (input_sel & 0x0002)	return input_port_read(machine(), "KEY0");
-	if (input_sel & 0x0004)	return input_port_read(machine(), "KEY1");
-	if (input_sel & 0x0008)	return input_port_read(machine(), "KEY2");
-	if (input_sel & 0x0010)	return input_port_read(machine(), "KEY3");
-	if (input_sel & 0x0020)	return input_port_read(machine(), "KEY4");
+	if (input_sel & 0x0002)	return ioport("KEY0")->read();
+	if (input_sel & 0x0004)	return ioport("KEY1")->read();
+	if (input_sel & 0x0008)	return ioport("KEY2")->read();
+	if (input_sel & 0x0010)	return ioport("KEY3")->read();
+	if (input_sel & 0x0020)	return ioport("KEY4")->read();
 	return 0xffff;
 }
 
@@ -5995,7 +5995,7 @@ static DRIVER_INIT( balcube )
 {
 	metro_state *state = machine.driver_data<metro_state>();
 
-	const size_t len = machine.root_device().memregion("gfx1")->bytes();
+	const size_t len = state->memregion("gfx1")->bytes();
 	UINT8 *src       = state->memregion("gfx1")->base();
 	UINT8 *end       = src + len;
 

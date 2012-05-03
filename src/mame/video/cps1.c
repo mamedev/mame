@@ -1619,10 +1619,10 @@ READ16_MEMBER(cps_state::cps1_cps_b_r)
 				m_cps_b_regs[m_game_config->mult_factor2 / 2]) >> 16;
 
 	if (offset == m_game_config->in2_addr / 2)	/* Extra input ports (on C-board) */
-		return input_port_read(machine(), "IN2");
+		return ioport("IN2")->read();
 
 	if (offset == m_game_config->in3_addr / 2)	/* Player 4 controls (on C-board) ("Captain Commando") */
-		return input_port_read(machine(), "IN3");
+		return ioport("IN3")->read();
 
 	if (m_cps_version == 2)
 	{

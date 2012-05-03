@@ -287,7 +287,7 @@ static READ16_HANDLER( io_chip_r )
 				return state->m_misc_io_data[offset];
 
 			/* otherwise, return an input port */
-			return input_port_read(space->machine(), portnames[offset]);
+			return space->machine().root_device().ioport(portnames[offset])->read();
 
 		/* 'SEGA' protection */
 		case 0x10/2:
@@ -403,7 +403,7 @@ static WRITE16_HANDLER( analog_w )
 	segas1x_state *state = space->machine().driver_data<segas1x_state>();
 	static const char *const ports[] = { "ADC0", "ADC1", "ADC2", "ADC3", "ADC4", "ADC5", "ADC6" };
 	int selected = ((offset & 3) == 3) ? (3 + (state->m_misc_io_data[0x08/2] & 3)) : (offset & 3);
-	int value = input_port_read_safe(space->machine(), ports[selected], 0xff);
+	int value = state->ioport(ports[selected])->read_safe(0xff);
 
 	state->m_analog_data[offset & 3] = value;
 }

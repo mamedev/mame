@@ -51,11 +51,11 @@ READ8_MEMBER(battlera_state::control_data_r)
 {
 	switch (m_control_port_select)
 	{
-		case 0xfe: return input_port_read(machine(), "IN0"); /* Player 1 */
-		case 0xfd: return input_port_read(machine(), "IN1"); /* Player 2 */
-		case 0xfb: return input_port_read(machine(), "IN2"); /* Coins */
-		case 0xf7: return input_port_read(machine(), "DSW2"); /* Dip 2 */
-		case 0xef: return input_port_read(machine(), "DSW1"); /* Dip 1 */
+		case 0xfe: return ioport("IN0")->read(); /* Player 1 */
+		case 0xfd: return ioport("IN1")->read(); /* Player 2 */
+		case 0xfb: return ioport("IN2")->read(); /* Coins */
+		case 0xf7: return ioport("DSW2")->read(); /* Dip 2 */
+		case 0xef: return ioport("DSW1")->read(); /* Dip 1 */
 	}
 
     return 0xff;

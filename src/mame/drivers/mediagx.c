@@ -572,21 +572,21 @@ READ32_MEMBER(mediagx_state::parallel_port_r)
 
 	if (ACCESSING_BITS_8_15)
 	{
-		UINT8 nibble = m_parallel_latched;//(input_port_read_safe(machine(), m_portnames[m_parallel_pointer / 3], 0) >> (4 * (m_parallel_pointer % 3))) & 15;
+		UINT8 nibble = m_parallel_latched;//(ioport(m_portnames[m_parallel_pointer / 3])->read_safe(0) >> (4 * (m_parallel_pointer % 3))) & 15;
 		r |= ((~nibble & 0x08) << 12) | ((nibble & 0x07) << 11);
 		logerror("%08X:parallel_port_r()\n", cpu_get_pc(&space.device()));
 #if 0
 		if (m_controls_data == 0x18)
 		{
-			r |= input_port_read(machine(), "IN0") << 8;
+			r |= ioport("IN0")->read() << 8;
 		}
 		else if (m_controls_data == 0x60)
 		{
-			r |= input_port_read(machine(), "IN1") << 8;
+			r |= ioport("IN1")->read() << 8;
 		}
 		else if (m_controls_data == 0xff || m_controls_data == 0x50)
 		{
-			r |= input_port_read(machine(), "IN2") << 8;
+			r |= ioport("IN2")->read() << 8;
 		}
 
 		//r |= m_control_read << 8;
@@ -625,7 +625,7 @@ WRITE32_MEMBER(mediagx_state::parallel_port_w)
 
 		logerror("%08X:", cpu_get_pc(&space.device()));
 
-		m_parallel_latched = (input_port_read_safe(machine(), portnames[m_parallel_pointer / 3], 0) >> (4 * (m_parallel_pointer % 3))) & 15;
+		m_parallel_latched = (ioport(portnames[m_parallel_pointer / 3])->read_safe(0) >> (4 * (m_parallel_pointer % 3))) & 15;
 		//parallel_pointer++;
 		//logerror("[%02X] Advance pointer to %d\n", data, parallel_pointer);
 		switch (data & 0xfc)

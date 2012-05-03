@@ -109,7 +109,7 @@ READ32_MEMBER(superchs_state::superchs_input_r)
 	switch (offset)
 	{
 		case 0x00:
-			return input_port_read(machine(), "INPUTS");
+			return ioport("INPUTS")->read();
 
 		case 0x01:
 			return m_coin_word<<16;
@@ -169,12 +169,12 @@ WRITE32_MEMBER(superchs_state::superchs_input_w)
 
 READ32_MEMBER(superchs_state::superchs_stick_r)
 {
-	int fake = input_port_read(machine(), "FAKE");
+	int fake = ioport("FAKE")->read();
 	int accel;
 
 	if (!(fake &0x10))	/* Analogue steer (the real control method) */
 	{
-		m_steer = input_port_read(machine(), "WHEEL");
+		m_steer = ioport("WHEEL")->read();
 	}
 	else	/* Digital steer, with smoothing - speed depends on how often stick_r is called */
 	{
@@ -199,13 +199,13 @@ READ32_MEMBER(superchs_state::superchs_stick_r)
 	}
 
 	/* Accelerator is an analogue input but the game treats it as digital (on/off) */
-	if (input_port_read(machine(),  "FAKE") & 0x1)	/* pressing B1 */
+	if (ioport("FAKE")->read() & 0x1)	/* pressing B1 */
 		accel = 0x0;
 	else
 		accel = 0xff;
 
 	/* Todo: Verify brake - and figure out other input */
-	return (m_steer << 24) | (accel << 16) | (input_port_read(machine(), "SOUND") << 8) | input_port_read(machine(), "UNKNOWN");
+	return (m_steer << 24) | (accel << 16) | (ioport("SOUND")->read() << 8) | ioport("UNKNOWN")->read();
 }
 
 WRITE32_MEMBER(superchs_state::superchs_stick_w)

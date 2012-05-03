@@ -356,10 +356,10 @@ static const UINT8 cc_ex[0x100] = {
 static MACHINE_START( system1 )
 {
 	system1_state *state = machine.driver_data<system1_state>();
-	UINT32 numbanks = (machine.root_device().memregion("maincpu")->bytes() - 0x10000) / 0x4000;
+	UINT32 numbanks = (state->memregion("maincpu")->bytes() - 0x10000) / 0x4000;
 
 	if (numbanks > 0)
-		state->membank("bank1")->configure_entries(0, numbanks, machine.root_device().memregion("maincpu")->base() + 0x10000, 0x4000);
+		state->membank("bank1")->configure_entries(0, numbanks, state->memregion("maincpu")->base() + 0x10000, 0x4000);
 	else
 		state->membank("bank1")->configure_entry(0, state->memregion("maincpu")->base() + 0x8000);
 	state->membank("bank1")->set_entry(0);
@@ -442,7 +442,7 @@ WRITE8_MEMBER(system1_state::videomode_w)
 CUSTOM_INPUT_MEMBER(system1_state::dakkochn_mux_data_r)
 {
 	static const char *const ports[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5", "KEY6" };
-	return input_port_read(machine(), ports[m_dakkochn_mux_data]);
+	return ioport(ports[m_dakkochn_mux_data])->read();
 }
 
 

@@ -290,9 +290,9 @@ CUSTOM_INPUT_MEMBER(taitosj_state::kikstart_gear_r)
 		port_tag = "GEARP2";
 
 	/* gear MUST be 1, 2 or 3 */
-	if (input_port_read(machine(), port_tag) & 0x01) m_kikstart_gears[player] = 0x02;
-	if (input_port_read(machine(), port_tag) & 0x02) m_kikstart_gears[player] = 0x03;
-	if (input_port_read(machine(), port_tag) & 0x04) m_kikstart_gears[player] = 0x01;
+	if (ioport(port_tag)->read() & 0x01) m_kikstart_gears[player] = 0x02;
+	if (ioport(port_tag)->read() & 0x02) m_kikstart_gears[player] = 0x03;
+	if (ioport(port_tag)->read() & 0x04) m_kikstart_gears[player] = 0x01;
 
 	return m_kikstart_gears[player];
 }

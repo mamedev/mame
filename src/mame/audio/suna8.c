@@ -52,7 +52,7 @@ SAMPLES_START( suna8_sh_start )
 {
 	suna8_state *state = device.machine().driver_data<suna8_state>();
 	running_machine &machine = device.machine();
-	int i, len = machine.root_device().memregion("samples")->bytes();
+	int i, len = state->memregion("samples")->bytes();
 	UINT8 *ROM = state->memregion("samples")->base();
 
 	state->m_samplebuf = auto_alloc_array(machine, INT16, len);

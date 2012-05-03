@@ -124,9 +124,9 @@ READ32_MEMBER(psikyo_state::sngkace_input_r)
 {
 	switch (offset)
 	{
-		case 0x0:	return input_port_read(machine(), "P1_P2");
-		case 0x1:	return input_port_read(machine(), "DSW");
-		case 0x2:	return input_port_read(machine(), "COIN");
+		case 0x0:	return ioport("P1_P2")->read();
+		case 0x1:	return ioport("DSW")->read();
+		case 0x2:	return ioport("COIN")->read();
 		default:	logerror("PC %06X - Read input %02X !\n", cpu_get_pc(&space.device()), offset * 2);
 				return 0;
 	}
@@ -136,8 +136,8 @@ READ32_MEMBER(psikyo_state::gunbird_input_r)
 {
 	switch (offset)
 	{
-		case 0x0:	return input_port_read(machine(), "P1_P2");
-		case 0x1:	return input_port_read(machine(), "DSW");
+		case 0x0:	return ioport("P1_P2")->read();
+		case 0x1:	return ioport("DSW")->read();
 		default:	logerror("PC %06X - Read input %02X !\n", cpu_get_pc(&space.device()), offset * 2);
 				return 0;
 	}
@@ -288,8 +288,8 @@ READ32_MEMBER(psikyo_state::s1945_input_r)
 {
 	switch (offset)
 	{
-		case 0x0:	return input_port_read(machine(), "P1_P2");
-		case 0x1:	return (input_port_read(machine(), "DSW") & 0xffff000f) | s1945_mcu_r(space, offset - 1, mem_mask);
+		case 0x0:	return ioport("P1_P2")->read();
+		case 0x1:	return (ioport("DSW")->read() & 0xffff000f) | s1945_mcu_r(space, offset - 1, mem_mask);
 		case 0x2:	return s1945_mcu_r(space, offset - 1, mem_mask);
 		default:	logerror("PC %06X - Read input %02X !\n", cpu_get_pc(&space.device()), offset * 2);
 					return 0;
@@ -543,7 +543,7 @@ static INPUT_PORTS_START( samuraia )
 	PORT_INCLUDE(psikyo_common)
 
 	PORT_START("COIN")
-	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_VBLANK  )	// vblank
+	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_CUSTOM  ) PORT_VBLANK("screen")	// vblank
 	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_UNKNOWN )	// unused?
 	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -670,7 +670,7 @@ static INPUT_PORTS_START( btlkroad )
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_VBLANK  )	// vblank   ACTIVE_HIGH fixes slowdowns, but is it right?
+	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_CUSTOM  ) PORT_VBLANK("screen")	// vblank   ACTIVE_HIGH fixes slowdowns, but is it right?
 	// This DSW is used for debugging the game
 	PORT_DIPNAME( 0x00000100, 0x00000100, "Unknown 3-0" )	// tested!
 	PORT_DIPSETTING(          0x00000100, DEF_STR( Off ) )
@@ -756,7 +756,7 @@ static INPUT_PORTS_START( gunbird )
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_VBLANK  )	// vblank
+	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_CUSTOM  ) PORT_VBLANK("screen")	// vblank
 	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_UNKNOWN )	// tested!
@@ -826,7 +826,7 @@ static INPUT_PORTS_START( s1945 )
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_VBLANK  )	// vblank
+	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_CUSTOM  ) PORT_VBLANK("screen")	// vblank
 	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_UNKNOWN )	// tested!
@@ -898,7 +898,7 @@ static INPUT_PORTS_START( s1945bl )
 
 	// I need to invert the Vblank on this to avoid excessive slowdown
 	PORT_MODIFY("DSW")		/* c00004 -> c00007 */
-	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_VBLANK  )	// vblank
+	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_CUSTOM  ) PORT_VBLANK("screen")	// vblank
 INPUT_PORTS_END
 
 
@@ -942,7 +942,7 @@ static INPUT_PORTS_START( tengai )
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_VBLANK  )	// vblank
+	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_CUSTOM  ) PORT_VBLANK("screen")	// vblank
 	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_UNKNOWN )	// tested!
@@ -1811,7 +1811,7 @@ static DRIVER_INIT( sngkace )
 	psikyo_state *state = machine.driver_data<psikyo_state>();
 
 	{
-		UINT8 *RAM = machine.root_device().memregion("ymsnd")->base();
+		UINT8 *RAM = state->memregion("ymsnd")->base();
 		int len = state->memregion("ymsnd")->bytes();
 		int i;
 

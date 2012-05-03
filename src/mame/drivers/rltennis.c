@@ -72,7 +72,7 @@ player - when there's nothing to play - first, empty 2k of ROMs are selected.
 READ16_MEMBER(rltennis_state::rlt_io_r)
 {
 
-	return (input_port_read(machine(), "P1" )&0x1fff) | (m_unk_counter<<13); /* top 3 bits controls smaple address update */
+	return (ioport("P1" )->read()&0x1fff) | (m_unk_counter<<13); /* top 3 bits controls smaple address update */
 }
 
 WRITE16_MEMBER(rltennis_state::rlt_snd1_w)
@@ -162,8 +162,8 @@ static MACHINE_START( rltennis )
 	state->m_screen = machine.device(  "screen");
 	state->m_dac_1 = machine.device("dac1");
 	state->m_dac_2 = machine.device("dac2");
-	state->m_samples_1 = machine.root_device().memregion("samples1")->base();
-	state->m_samples_2 = machine.root_device().memregion("samples2")->base();
+	state->m_samples_1 = state->memregion("samples1")->base();
+	state->m_samples_2 = state->memregion("samples2")->base();
 	state->m_gfx =  state->memregion("gfx1")->base();
 	state->m_timer = machine.scheduler().timer_alloc(FUNC(sample_player));
 }

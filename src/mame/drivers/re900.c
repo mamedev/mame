@@ -108,7 +108,7 @@ public:
 
 static READ8_DEVICE_HANDLER (re_psg_portA_r)
 {
-	if ((input_port_read(device->machine(), "IN0") & 0x01) == 0)
+	if ((device->machine().root_device().ioport("IN0")->read() & 0x01) == 0)
 	{
 		output_set_lamp_value(0,1);		// Operator Key ON
 	}
@@ -118,7 +118,7 @@ static READ8_DEVICE_HANDLER (re_psg_portA_r)
 		output_set_lamp_value(0,0);		// Operator Key OFF
 	}
 
-	return input_port_read(device->machine(), "IN0");
+	return device->machine().root_device().ioport("IN0")->read();
 }
 
 static READ8_DEVICE_HANDLER (re_psg_portB_r)
@@ -130,7 +130,7 @@ static READ8_DEVICE_HANDLER (re_psg_portB_r)
 
 	output_set_lamp_value(state->m_player,1);
 
-	if (input_port_read(device->machine(), "IN_S"))
+	if (state->ioport("IN_S")->read())
 	{
 		if (!state->m_stat_a)
 		{
@@ -161,12 +161,12 @@ static READ8_DEVICE_HANDLER (re_psg_portB_r)
 	/* "INA": Unified port to share the player Keys among all players - Key In & Key Out have their own buttons on keyboard. */
 	switch( state->m_mux_data )
 	{
-		case 0x01: retval = (input_port_read(device->machine(), "IN6") | 0x80 ) - (( state->m_player == 6 ) ? (input_port_read(device->machine(), "INA") | 0x80 ) ^ 0xff: 0x00 ); break; /* Player 6 */
-		case 0x02: retval = (input_port_read(device->machine(), "IN5") | 0x80 ) - (( state->m_player == 5 ) ? (input_port_read(device->machine(), "INA") | 0x80 ) ^ 0xff: 0x00 ); break; /* Player 5 */
-		case 0x04: retval = (input_port_read(device->machine(), "IN4") | 0x80 ) - (( state->m_player == 4 ) ? (input_port_read(device->machine(), "INA") | 0x80 ) ^ 0xff: 0x00 ); break; /* Player 4 */
-		case 0x08: retval = (input_port_read(device->machine(), "IN3") | 0x80 ) - (( state->m_player == 3 ) ? (input_port_read(device->machine(), "INA") | 0x80 ) ^ 0xff: 0x00 ); break; /* Player 3 */
-		case 0x10: retval = (input_port_read(device->machine(), "IN2") | 0x80 ) - (( state->m_player == 2 ) ? (input_port_read(device->machine(), "INA") | 0x80 ) ^ 0xff: 0x00 ); break; /* Player 2 */
-		case 0x20: retval = (input_port_read(device->machine(), "IN1") | 0x80 ) - (( state->m_player == 1 ) ? (input_port_read(device->machine(), "INA") | 0x80 ) ^ 0xff: 0x00 ); break; /* Player 1 */
+		case 0x01: retval = (state->ioport("IN6")->read() | 0x80 ) - (( state->m_player == 6 ) ? (state->ioport("INA")->read() | 0x80 ) ^ 0xff: 0x00 ); break; /* Player 6 */
+		case 0x02: retval = (state->ioport("IN5")->read() | 0x80 ) - (( state->m_player == 5 ) ? (state->ioport("INA")->read() | 0x80 ) ^ 0xff: 0x00 ); break; /* Player 5 */
+		case 0x04: retval = (state->ioport("IN4")->read() | 0x80 ) - (( state->m_player == 4 ) ? (state->ioport("INA")->read() | 0x80 ) ^ 0xff: 0x00 ); break; /* Player 4 */
+		case 0x08: retval = (state->ioport("IN3")->read() | 0x80 ) - (( state->m_player == 3 ) ? (state->ioport("INA")->read() | 0x80 ) ^ 0xff: 0x00 ); break; /* Player 3 */
+		case 0x10: retval = (state->ioport("IN2")->read() | 0x80 ) - (( state->m_player == 2 ) ? (state->ioport("INA")->read() | 0x80 ) ^ 0xff: 0x00 ); break; /* Player 2 */
+		case 0x20: retval = (state->ioport("IN1")->read() | 0x80 ) - (( state->m_player == 1 ) ? (state->ioport("INA")->read() | 0x80 ) ^ 0xff: 0x00 ); break; /* Player 1 */
 	}
 
 	return retval;

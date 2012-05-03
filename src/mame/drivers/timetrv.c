@@ -59,13 +59,13 @@ static SCREEN_UPDATE_IND16( timetrv )
 
 READ8_MEMBER(timetrv_state::test1_r)
 {
-	return input_port_read(machine(), "IN0");//machine().rand();
+	return ioport("IN0")->read();//machine().rand();
 }
 
 READ8_MEMBER(timetrv_state::test2_r)
 {
 	/*bit 7,eeprom read bit*/
-	return (input_port_read(machine(), "IN1") & 0x7f);//machine().rand();
+	return (ioport("IN1")->read() & 0x7f);//machine().rand();
 }
 
 

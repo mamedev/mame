@@ -84,17 +84,17 @@ READ16_MEMBER(cbuster_state::twocrude_control_r)
 	switch (offset << 1)
 	{
 		case 0: /* Player 1 & Player 2 joysticks & fire buttons */
-			return input_port_read(machine(), "P1_P2");
+			return ioport("P1_P2")->read();
 
 		case 2: /* Dip Switches */
-			return input_port_read(machine(), "DSW");
+			return ioport("DSW")->read();
 
 		case 4: /* Protection */
 			logerror("%04x : protection control read at 30c000 %d\n", cpu_get_pc(&space.device()), offset);
 			return m_prot;
 
 		case 6: /* Credits, VBL in byte 7 */
-			return input_port_read(machine(), "COINS");
+			return ioport("COINS")->read();
 	}
 
 	return ~0;
@@ -164,7 +164,7 @@ static INPUT_PORTS_START( twocrude )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )

@@ -114,9 +114,9 @@ READ8_MEMBER(rmhaihai_state::keyboard_r)
 
 			for (i = 0; i < 31; i++)
 			{
-				if (input_port_read(machine(), keynames[i/16]) & (1 << (i & 15))) return i+1;
+				if (ioport(keynames[i/16])->read() & (1 << (i & 15))) return i+1;
 			}
-			if (input_port_read(machine(), "KEY1") & 0x8000) return 0x80;	// coin
+			if (ioport("KEY1")->read() & 0x8000) return 0x80;	// coin
 			return 0;
 		}
 		case 0x5c7b:	// rmhaihai, rmhaisei, rmhaijin

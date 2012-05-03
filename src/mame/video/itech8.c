@@ -175,7 +175,7 @@ VIDEO_START( itech8 )
 	state->m_page_select = 0xc0;
 
 	/* fetch the GROM base */
-	state->m_grom_base = machine.root_device().memregion("grom")->base();
+	state->m_grom_base = state->memregion("grom")->base();
 	state->m_grom_size = state->memregion("grom")->bytes();
 }
 
@@ -461,7 +461,7 @@ READ8_MEMBER(itech8_state::itech8_blitter_r)
 
 	/* a read from offsets 12-15 return input port values */
 	if (offset >= 12 && offset <= 15)
-		result = input_port_read_safe(machine(), portnames[offset - 12], 0x00);
+		result = ioport(portnames[offset - 12])->read_safe(0x00);
 
 	return result;
 }

@@ -306,17 +306,17 @@ static INPUT_PORTS_START( liblrabl )
 	PORT_DIPSETTING(    0x1c, "40k 120k 200k 400k 600k 1m" )
 	PORT_DIPSETTING(    0x0c, "40k 140k 250k 400k 700k 1m" )
 	// bonus scores for 1, 2 or 3 lives
-	PORT_DIPSETTING(    0x14, "50k 150k 300k 500k 700k 1m" ) PORT_CONDITION("DSW1", 0x03, PORTCOND_NOTEQUALS, 0x01)
-	PORT_DIPSETTING(    0x04, "40k 120k and every 120k" )    PORT_CONDITION("DSW1", 0x03, PORTCOND_NOTEQUALS, 0x01)
-	PORT_DIPSETTING(    0x18, "40k 150k and every 150k" )    PORT_CONDITION("DSW1", 0x03, PORTCOND_NOTEQUALS, 0x01)
-	PORT_DIPSETTING(    0x08, "50k 150k 300k" )              PORT_CONDITION("DSW1", 0x03, PORTCOND_NOTEQUALS, 0x01)
-	PORT_DIPSETTING(    0x10, "40k 120k 200k" )              PORT_CONDITION("DSW1", 0x03, PORTCOND_NOTEQUALS, 0x01)
+	PORT_DIPSETTING(    0x14, "50k 150k 300k 500k 700k 1m" ) PORT_CONDITION("DSW1", 0x03, NOTEQUALS, 0x01)
+	PORT_DIPSETTING(    0x04, "40k 120k and every 120k" )    PORT_CONDITION("DSW1", 0x03, NOTEQUALS, 0x01)
+	PORT_DIPSETTING(    0x18, "40k 150k and every 150k" )    PORT_CONDITION("DSW1", 0x03, NOTEQUALS, 0x01)
+	PORT_DIPSETTING(    0x08, "50k 150k 300k" )              PORT_CONDITION("DSW1", 0x03, NOTEQUALS, 0x01)
+	PORT_DIPSETTING(    0x10, "40k 120k 200k" )              PORT_CONDITION("DSW1", 0x03, NOTEQUALS, 0x01)
 	// bonus scores for 5 lives
-	PORT_DIPSETTING(    0x14, "40k 120k" )                   PORT_CONDITION("DSW1", 0x03, PORTCOND_EQUALS, 0x01)
-	PORT_DIPSETTING(    0x04, "50k 150k" )                   PORT_CONDITION("DSW1", 0x03, PORTCOND_EQUALS, 0x01)
-	PORT_DIPSETTING(    0x18, "50k 150k and every 150k" )    PORT_CONDITION("DSW1", 0x03, PORTCOND_EQUALS, 0x01)
-	PORT_DIPSETTING(    0x08, "60k 200k and every 200k" )    PORT_CONDITION("DSW1", 0x03, PORTCOND_EQUALS, 0x01)
-	PORT_DIPSETTING(    0x10, "50k" )                        PORT_CONDITION("DSW1", 0x03, PORTCOND_EQUALS, 0x01)
+	PORT_DIPSETTING(    0x14, "40k 120k" )                   PORT_CONDITION("DSW1", 0x03, EQUALS, 0x01)
+	PORT_DIPSETTING(    0x04, "50k 150k" )                   PORT_CONDITION("DSW1", 0x03, EQUALS, 0x01)
+	PORT_DIPSETTING(    0x18, "50k 150k and every 150k" )    PORT_CONDITION("DSW1", 0x03, EQUALS, 0x01)
+	PORT_DIPSETTING(    0x08, "60k 200k and every 200k" )    PORT_CONDITION("DSW1", 0x03, EQUALS, 0x01)
+	PORT_DIPSETTING(    0x10, "50k" )                        PORT_CONDITION("DSW1", 0x03, EQUALS, 0x01)
 	// bonus scores for common
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
 	PORT_DIPNAME( 0xe0, 0xe0, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SWA:3,2,1")
@@ -493,10 +493,10 @@ static const namco_interface namco_config =
 
 ***************************************************************************/
 
-static READ8_DEVICE_HANDLER( dipA_l )	{ return input_port_read(device->machine(), "DSW1"); }				// dips A
-static READ8_DEVICE_HANDLER( dipA_h )	{ return input_port_read(device->machine(), "DSW1") >> 4; }			// dips A
-static READ8_DEVICE_HANDLER( dipB_l )	{ return input_port_read(device->machine(), "DSW2"); }				// dips B
-static READ8_DEVICE_HANDLER( dipB_h )	{ return input_port_read(device->machine(), "DSW2") >> 4; }			// dips B
+static READ8_DEVICE_HANDLER( dipA_l )	{ return device->machine().root_device().ioport("DSW1")->read(); }				// dips A
+static READ8_DEVICE_HANDLER( dipA_h )	{ return device->machine().root_device().ioport("DSW1")->read() >> 4; }			// dips A
+static READ8_DEVICE_HANDLER( dipB_l )	{ return device->machine().root_device().ioport("DSW2")->read(); }				// dips B
+static READ8_DEVICE_HANDLER( dipB_h )	{ return device->machine().root_device().ioport("DSW2")->read() >> 4; }			// dips B
 
 static WRITE8_DEVICE_HANDLER( out_coin0 )
 {

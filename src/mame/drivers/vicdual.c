@@ -170,7 +170,7 @@ CUSTOM_INPUT_MEMBER(vicdual_state::vicdual_get_timer_value)
 
 int vicdual_is_cabinet_color(running_machine &machine)
 {
-	return (input_port_read(machine, COLOR_BW_PORT_TAG) == 0);
+	return (machine.root_device().ioport(COLOR_BW_PORT_TAG)->read() == 0);
 }
 
 
@@ -233,8 +233,8 @@ READ8_MEMBER(vicdual_state::depthch_io_r)
 {
 	UINT8 ret = 0;
 
-	if (offset & 0x01)  ret = input_port_read(machine(), "IN0");
-	if (offset & 0x08)  ret = input_port_read(machine(), "IN1");
+	if (offset & 0x01)  ret = ioport("IN0")->read();
+	if (offset & 0x08)  ret = ioport("IN1")->read();
 
 	return ret;
 }
@@ -315,8 +315,8 @@ READ8_MEMBER(vicdual_state::safari_io_r)
 {
 	UINT8 ret = 0;
 
-	if (offset & 0x01)  ret = input_port_read(machine(), "IN0");
-	if (offset & 0x08)  ret = input_port_read(machine(), "IN1");
+	if (offset & 0x01)  ret = ioport("IN0")->read();
+	if (offset & 0x08)  ret = ioport("IN1")->read();
 
 	return ret;
 }
@@ -399,8 +399,8 @@ READ8_MEMBER(vicdual_state::frogs_io_r)
 {
 	UINT8 ret = 0;
 
-	if (offset & 0x01)  ret = input_port_read(machine(), "IN0");
-	if (offset & 0x08)  ret = input_port_read(machine(), "IN1");
+	if (offset & 0x01)  ret = ioport("IN0")->read();
+	if (offset & 0x08)  ret = ioport("IN1")->read();
 
 	return ret;
 }
@@ -507,8 +507,8 @@ READ8_MEMBER(vicdual_state::headon_io_r)
 {
 	UINT8 ret = 0;
 
-	if (offset & 0x01)  ret = input_port_read(machine(), "IN0");
-	if (offset & 0x08)  ret = input_port_read(machine(), "IN1");
+	if (offset & 0x01)  ret = ioport("IN0")->read();
+	if (offset & 0x08)  ret = ioport("IN1")->read();
 
 	return ret;
 }
@@ -518,9 +518,9 @@ READ8_MEMBER(vicdual_state::sspaceat_io_r)
 {
 	UINT8 ret = 0;
 
-	if (offset & 0x01)  ret = input_port_read(machine(), "IN0");
-	if (offset & 0x04)  ret = input_port_read(machine(), "IN1");
-	if (offset & 0x08)  ret = input_port_read(machine(), "IN2");
+	if (offset & 0x01)  ret = ioport("IN0")->read();
+	if (offset & 0x04)  ret = ioport("IN1")->read();
+	if (offset & 0x08)  ret = ioport("IN2")->read();
 
 	return ret;
 }
@@ -717,10 +717,10 @@ READ8_MEMBER(vicdual_state::headon2_io_r)
 {
 	UINT8 ret = 0;
 
-	if (offset & 0x01)  ret = input_port_read(machine(), "IN0");
+	if (offset & 0x01)  ret = ioport("IN0")->read();
 	if (offset & 0x02)  /* schematics show this as in input port, but never read from */
-	if (offset & 0x04)  ret = input_port_read(machine(), "IN1");
-	if (offset & 0x08)  ret = input_port_read(machine(), "IN2");
+	if (offset & 0x04)  ret = ioport("IN1")->read();
+	if (offset & 0x08)  ret = ioport("IN2")->read();
 	if (offset & 0x12)  logerror("********* Read from port %x\n", offset);
 
 	return ret;
@@ -1628,7 +1628,7 @@ INPUT_PORTS_END
 CUSTOM_INPUT_MEMBER(vicdual_state::brdrline_lives)
 {
 	int bit_mask = (FPTR)param;
-	return (input_port_read(machine(), "FAKE_LIVES") & bit_mask) ? 0x00 : 0x01;
+	return (ioport("FAKE_LIVES")->read() & bit_mask) ? 0x00 : 0x01;
 }
 
 static INPUT_PORTS_START( brdrline )
@@ -2167,8 +2167,8 @@ READ8_MEMBER(vicdual_state::nsub_io_r)
 {
 	UINT8 ret = 0;
 
-	if (offset & 0x01)  ret = input_port_read(machine(), "IN0");
-	if (offset & 0x08)  ret = input_port_read(machine(), "IN1");
+	if (offset & 0x01)  ret = ioport("IN0")->read();
+	if (offset & 0x08)  ret = ioport("IN1")->read();
 
 	return ret;
 }
@@ -2262,9 +2262,9 @@ READ8_MEMBER(vicdual_state::invinco_io_r)
 {
 	UINT8 ret = 0;
 
-	if (offset & 0x01)  ret = input_port_read(machine(), "IN0");
-	if (offset & 0x02)  ret = input_port_read(machine(), "IN1");
-	if (offset & 0x08)  ret = input_port_read(machine(), "IN2");
+	if (offset & 0x01)  ret = ioport("IN0")->read();
+	if (offset & 0x02)  ret = ioport("IN1")->read();
+	if (offset & 0x08)  ret = ioport("IN2")->read();
 
 	return ret;
 }

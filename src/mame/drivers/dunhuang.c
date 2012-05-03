@@ -432,7 +432,7 @@ WRITE8_MEMBER(dunhuang_state::dunhuang_input_w)
 
 READ8_MEMBER(dunhuang_state::dunhuang_service_r)
 {
-	return input_port_read(machine(), "SERVICE")
+	return ioport("SERVICE")->read()
 	 | ((m_hopper && !(machine().primary_screen->frame_number() % 10)) ? 0x00 : 0x08)	// bit 3: hopper sensor
 	 | 0x80																// bit 7 low -> tiles block transferrer busy
 	;
@@ -441,21 +441,21 @@ READ8_MEMBER(dunhuang_state::dunhuang_service_r)
 static READ8_DEVICE_HANDLER( dunhuang_dsw_r )
 {
 	dunhuang_state *state = device->machine().driver_data<dunhuang_state>();
-	if (!(state->m_input & 0x01))	return input_port_read(device->machine(), "DSW1");
-	if (!(state->m_input & 0x02))	return input_port_read(device->machine(), "DSW2");
-	if (!(state->m_input & 0x04))	return input_port_read(device->machine(), "DSW3");
-	if (!(state->m_input & 0x08))	return input_port_read(device->machine(), "DSW4");
-	if (!(state->m_input & 0x10))	return input_port_read(device->machine(), "DSW5");
+	if (!(state->m_input & 0x01))	return state->ioport("DSW1")->read();
+	if (!(state->m_input & 0x02))	return state->ioport("DSW2")->read();
+	if (!(state->m_input & 0x04))	return state->ioport("DSW3")->read();
+	if (!(state->m_input & 0x08))	return state->ioport("DSW4")->read();
+	if (!(state->m_input & 0x10))	return state->ioport("DSW5")->read();
 	logerror("%s: warning, unknown dsw bits read, input = %02x\n", device->machine().describe_context(), state->m_input);
 	return 0xff;
 }
 READ8_MEMBER(dunhuang_state::dunhuang_input_r)
 {
-	if (!(m_input & 0x01))	return input_port_read(machine(), "IN0");
-	if (!(m_input & 0x02))	return input_port_read(machine(), "IN1");
-	if (!(m_input & 0x04))	return input_port_read(machine(), "IN2");
-	if (!(m_input & 0x08))	return input_port_read(machine(), "IN3");
-	if (!(m_input & 0x10))	return input_port_read(machine(), "IN4");
+	if (!(m_input & 0x01))	return ioport("IN0")->read();
+	if (!(m_input & 0x02))	return ioport("IN1")->read();
+	if (!(m_input & 0x04))	return ioport("IN2")->read();
+	if (!(m_input & 0x08))	return ioport("IN3")->read();
+	if (!(m_input & 0x10))	return ioport("IN4")->read();
 	logerror("%s: warning, unknown input bits read, input = %02x\n", machine().describe_context(), m_input);
 	return 0xff;
 }

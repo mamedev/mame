@@ -225,7 +225,7 @@ int esripsys_draw(running_machine &machine, int l, int r, int fig, int attr, int
 
 		if (x_flip)
 		{
-			rom_l = machine.root_device().memregion("8bpp_r")->base();
+			rom_l = state->memregion("8bpp_r")->base();
 			rom_r = state->memregion("8bpp_l")->base();
 		}
 		else

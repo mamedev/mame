@@ -687,7 +687,7 @@ ADDRESS_MAP_END
 
 READ16_MEMBER(atarisy4_state::analog_r)
 {
-	return (input_port_read(machine(), "STICKX") << 8) | input_port_read(machine(), "STICKY");
+	return (ioport("STICKX")->read() << 8) | ioport("STICKY")->read();
 }
 
 static INPUT_PORTS_START( atarisy4 )
@@ -969,8 +969,8 @@ static DRIVER_INIT( laststar )
 	state->m_shared_ram[0] = auto_alloc_array_clear(machine, UINT16, 0x2000);
 
 	/* Populate the 68000 address space with data from the HEX files */
-	load_hexfile(main, machine.root_device().memregion("code")->base());
-	load_hexfile(main, machine.root_device().memregion("data")->base());
+	load_hexfile(main, state->memregion("code")->base());
+	load_hexfile(main, state->memregion("data")->base());
 
 	/* Set up the DSP */
 	state->membank("dsp0_bank0")->set_base(state->m_shared_ram[0]);
@@ -986,12 +986,12 @@ static DRIVER_INIT( airrace )
 	state->m_shared_ram[1] = auto_alloc_array_clear(machine, UINT16, 0x4000);
 
 	/* Populate RAM with data from the HEX files */
-	load_hexfile(machine.device("maincpu")->memory().space(AS_PROGRAM), machine.root_device().memregion("code")->base());
+	load_hexfile(machine.device("maincpu")->memory().space(AS_PROGRAM), state->memregion("code")->base());
 
 	/* Set up the first DSP */
 	state->membank("dsp0_bank0")->set_base(state->m_shared_ram[0]);
 	state->membank("dsp0_bank1")->set_base(&state->m_shared_ram[0][0x800]);
-	load_ldafile(machine.device("dsp0")->memory().space(AS_PROGRAM), machine.root_device().memregion("dsp")->base());
+	load_ldafile(machine.device("dsp0")->memory().space(AS_PROGRAM), state->memregion("dsp")->base());
 
 	/* Set up the second DSP */
 	state->membank("dsp1_bank0")->set_base(state->m_shared_ram[1]);

@@ -90,13 +90,13 @@ READ8_MEMBER(crgolf_state::switch_input_r)
 {
 	static const char *const portnames[] = { "IN0", "IN1", "P1", "P2", "DSW", "UNUSED0", "UNUSED1" };
 
-	return input_port_read(machine(), portnames[m_port_select]);
+	return ioport(portnames[m_port_select])->read();
 }
 
 
 READ8_MEMBER(crgolf_state::analog_input_r)
 {
-	return ((input_port_read(machine(), "STICK0") >> 4) | (input_port_read(machine(), "STICK1") & 0xf0)) ^ 0x88;
+	return ((ioport("STICK1")->read() & 0xf0)) ^ 0x88;
 }
 
 

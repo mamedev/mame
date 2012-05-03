@@ -180,7 +180,7 @@ READ8_MEMBER(gridlee_state::analog_port_r)
 	static const char *const portnames[] = { "TRACK0_Y", "TRACK0_X", "TRACK1_Y", "TRACK1_X" };
 
 	/* first read the new trackball value and compute the signed delta */
-	newval = input_port_read(machine(), portnames[offset + 2 * m_cocktail_flip]);
+	newval = ioport(portnames[offset + 2 * m_cocktail_flip])->read();
 	delta = (int)newval - (int)m_last_analog_input[offset];
 
 	/* handle the case where we wrap around from 0x00 to 0xff, or vice versa */
@@ -390,7 +390,7 @@ static INPUT_PORTS_START( gridlee )
 	PORT_BIT( 0x1f, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_SERVICE( 0x20, IP_ACTIVE_LOW )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 INPUT_PORTS_END
 
 

@@ -189,7 +189,7 @@ READ16_MEMBER(foodf_state::analog_r)
 {
 	static const char *const portnames[] = { "STICK0_X", "STICK1_X", "STICK0_Y", "STICK1_Y" };
 
-	return input_port_read(machine(), portnames[m_whichport]);
+	return ioport(portnames[m_whichport])->read();
 }
 
 
@@ -326,7 +326,7 @@ GFXDECODE_END
 
 static READ8_DEVICE_HANDLER( pot_r )
 {
-	return (input_port_read(device->machine(), "DSW") >> offset) << 7;
+	return (device->machine().root_device().ioport("DSW")->read() >> offset) << 7;
 }
 
 static const pokey_interface pokey_config =

@@ -254,8 +254,8 @@ SCREEN_UPDATE_IND16( sheriff )
 SCREEN_UPDATE_IND16( helifire )
 {
 	n8080_state *state = screen.machine().driver_data<n8080_state>();
-	int SUN_BRIGHTNESS = input_port_read(screen.machine(), "POT0");
-	int SEA_BRIGHTNESS = input_port_read(screen.machine(), "POT1");
+	int SUN_BRIGHTNESS = screen.machine().root_device().ioport("POT0")->read();
+	int SEA_BRIGHTNESS = screen.machine().root_device().ioport("POT1")->read();
 
 	static const int wave[8] = { 0, 1, 2, 2, 2, 1, 0, 0 };
 

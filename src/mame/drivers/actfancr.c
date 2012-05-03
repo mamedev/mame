@@ -43,11 +43,11 @@ READ8_MEMBER(actfancr_state::triothep_control_r)
 {
 	switch (m_trio_control_select)
 	{
-		case 0: return input_port_read(machine(), "P1");
-		case 1: return input_port_read(machine(), "P2");
-		case 2: return input_port_read(machine(), "DSW1");
-		case 3: return input_port_read(machine(), "DSW2");
-		case 4: return input_port_read(machine(), "SYSTEM");	/* VBL */
+		case 0: return ioport("P1")->read();
+		case 1: return ioport("P2")->read();
+		case 2: return ioport("DSW1")->read();
+		case 3: return ioport("DSW2")->read();
+		case 4: return ioport("SYSTEM")->read();	/* VBL */
 	}
 
 	return 0xff;
@@ -154,7 +154,7 @@ static INPUT_PORTS_START( actfancr )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )		PORT_DIPLOCATION("SW1:1,2")

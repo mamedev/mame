@@ -371,9 +371,9 @@ READ16_MEMBER(wecleman_state::selected_ip_r)
 {
 	switch ( (m_selected_ip >> 5) & 3 )
 	{																	// From WEC Le Mans Schems:
-		case 0:  return input_port_read(machine(), "ACCEL");		// Accel - Schems: Accelevr
+		case 0:  return ioport("ACCEL")->read();		// Accel - Schems: Accelevr
 		case 1:  return ~0;												// ????? - Schems: Not Used
-		case 2:  return input_port_read(machine(), "STEER");		// Wheel - Schems: Handlevr
+		case 2:  return ioport("STEER")->read();		// Wheel - Schems: Handlevr
 		case 3:  return ~0;												// Table - Schems: Turnvr
 
 		default: return ~0;
@@ -1251,7 +1251,7 @@ static DRIVER_INIT( wecleman )
 	wecleman_state *state = machine.driver_data<wecleman_state>();
 	int i, len;
 	UINT8 *RAM;
-//  UINT16 *RAM1 = (UINT16 *) machine.root_device().memregion("maincpu")->base();   /* Main CPU patches */
+//  UINT16 *RAM1 = (UINT16 *) state->memregion("maincpu")->base();   /* Main CPU patches */
 //  RAM1[0x08c2/2] = 0x601e;    // faster self test
 
 	/* Decode GFX Roms - Compensate for the address lines scrambling */
@@ -1261,7 +1261,7 @@ static DRIVER_INIT( wecleman )
         I hope you'll appreciate this effort!  */
 
 	/* let's swap even and odd *pixels* of the sprites */
-	RAM = machine.root_device().memregion("gfx1")->base();
+	RAM = state->memregion("gfx1")->base();
 	len = state->memregion("gfx1")->bytes();
 	for (i = 0; i < len; i ++)
 	{
@@ -1393,7 +1393,7 @@ static void hotchase_sprite_decode( running_machine &machine, int num16_banks, i
 static DRIVER_INIT( hotchase )
 {
 	wecleman_state *state = machine.driver_data<wecleman_state>();
-//  UINT16 *RAM1 = (UINT16) machine.root_device().memregion("maincpu")->base(); /* Main CPU patches */
+//  UINT16 *RAM1 = (UINT16) state->memregion("maincpu")->base(); /* Main CPU patches */
 //  RAM[0x1140/2] = 0x0015; RAM[0x195c/2] = 0x601A; // faster self test
 
 	UINT8 *RAM;
@@ -1401,7 +1401,7 @@ static DRIVER_INIT( hotchase )
 	/* Decode GFX Roms */
 
 	/* Let's swap even and odd bytes of the sprites gfx roms */
-	RAM = machine.root_device().memregion("gfx1")->base();
+	RAM = state->memregion("gfx1")->base();
 
 	/* Now we can unpack each nibble of the sprites into a pixel (one byte) */
 	hotchase_sprite_decode(machine,3,0x80000*2);	// num banks, bank len

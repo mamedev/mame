@@ -472,7 +472,7 @@ static TIMER_DEVICE_CALLBACK ( imolagp_nmi_cb )
 	imolagp_state *state = timer.machine().driver_data<imolagp_state>();
 
 	{
-		int newsteer = input_port_read(timer.machine(), "2802") & 0xf;
+		int newsteer = timer.machine().root_device().ioport("2802")->read() & 0xf;
 		if (newsteer != state->m_oldsteer)
 		{
 			if (state->m_steerlatch == 0)

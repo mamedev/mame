@@ -204,7 +204,7 @@ static SCREEN_UPDATE_IND16( statriv2 )
 static INTERRUPT_GEN( statriv2_interrupt )
 {
 	statriv2_state *state = device->machine().driver_data<statriv2_state>();
-	UINT8 new_coin = input_port_read(device->machine(), "COIN");
+	UINT8 new_coin = state->ioport("COIN")->read();
 
 	/* check the coin inputs once per frame */
 	state->m_latched_coin |= new_coin & (new_coin ^ state->m_last_coin);

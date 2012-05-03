@@ -184,7 +184,7 @@ READ8_HANDLER( acitya_decrypt_rom )
 MACHINE_START( acitya )
 {
 	pacman_state *state = machine.driver_data<pacman_state>();
-	UINT8 *RAM = machine.root_device().memregion("maincpu")->base();
+	UINT8 *RAM = state->memregion("maincpu")->base();
 
 	/* While the PAL supports up to 16 decryption methods, only four
         are actually used in the PAL.  Therefore, we'll take a little

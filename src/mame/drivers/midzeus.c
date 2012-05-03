@@ -425,7 +425,7 @@ CUSTOM_INPUT_MEMBER(midzeus_state::custom_49way_r)
 	static const UINT8 translate49[7] = { 0x8, 0xc, 0xe, 0xf, 0x3, 0x1, 0x0 };
 	const char *namex = (const char *)param;
 	const char *namey = namex + strlen(namex) + 1;
-	return (translate49[input_port_read(machine(), namey) >> 4] << 4) | translate49[input_port_read(machine(), namex) >> 4];
+	return (translate49[ioport(namey)->read() >> 4] << 4) | translate49[ioport(namex)->read() >> 4];
 }
 
 
@@ -438,7 +438,7 @@ WRITE32_MEMBER(midzeus_state::keypad_select_w)
 
 CUSTOM_INPUT_MEMBER(midzeus_state::keypad_r)
 {
-	UINT32 bits = input_port_read(machine(), (const char *)param);
+	UINT32 bits = ioport((const char *)param)->read();
 	UINT8 select = keypad_select;
 	while ((select & 1) != 0)
 	{
@@ -461,7 +461,7 @@ READ32_MEMBER(midzeus_state::analog_r)
 	static const char * const tags[] = { "ANALOG0", "ANALOG1", "ANALOG2", "ANALOG3" };
 	if (offset < 8 || offset > 11)
 		logerror("%06X:analog_r(%X)\n", cpu_get_pc(&space.device()), offset);
-	return input_port_read(machine(), tags[offset & 3]);
+	return ioport(tags[offset & 3])->read();
 }
 
 
@@ -527,8 +527,8 @@ WRITE32_MEMBER(midzeus_state::invasn_gun_w)
 				{ "GUNX1", "GUNY1" },
 				{ "GUNX2", "GUNY2" }
 			};
-			gun_x[player] = input_port_read(machine(), names[player][0]) * visarea.width() / 255 + visarea.min_x + BEAM_XOFFS;
-			gun_y[player] = input_port_read(machine(), names[player][1]) * visarea.height() / 255 + visarea.min_y;
+			gun_x[player] = ioport(names[player][0])->read() * visarea.width() / 255 + visarea.min_x + BEAM_XOFFS;
+			gun_y[player] = ioport(names[player][1])->read() * visarea.height() / 255 + visarea.min_y;
 			gun_timer[player]->adjust(machine().primary_screen->time_until_pos(MAX(0, gun_y[player] - BEAM_DY), MAX(0, gun_x[player] - BEAM_DX)), player);
 		}
 	}

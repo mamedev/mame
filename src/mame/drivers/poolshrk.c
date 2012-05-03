@@ -72,10 +72,10 @@ WRITE8_MEMBER(poolshrk_state::poolshrk_watchdog_w)
 READ8_MEMBER(poolshrk_state::poolshrk_input_r)
 {
 	static const char *const portnames[] = { "IN0", "IN1", "IN2", "IN3" };
-	UINT8 val = input_port_read(machine(), portnames[offset & 3]);
+	UINT8 val = ioport(portnames[offset & 3])->read();
 
-	int x = input_port_read(machine(), (offset & 1) ? "AN1" : "AN0");
-	int y = input_port_read(machine(), (offset & 1) ? "AN3" : "AN2");
+	int x = ioport((offset & 1) ? "AN1" : "AN0")->read();
+	int y = ioport((offset & 1) ? "AN3" : "AN2")->read();
 
 	if (x >= m_da_latch) val |= 8;
 	if (y >= m_da_latch) val |= 4;

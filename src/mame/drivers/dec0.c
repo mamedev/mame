@@ -337,13 +337,13 @@ READ16_MEMBER(dec0_state::slyspy_controls_r)
 	switch (offset<<1)
 	{
 		case 0: /* Dip Switches */
-			return input_port_read(machine(), "DSW");
+			return ioport("DSW")->read();
 
 		case 2: /* Player 1 & Player 2 joysticks & fire buttons */
-			return input_port_read(machine(), "INPUTS");
+			return ioport("INPUTS")->read();
 
 		case 4: /* Credits */
-			return input_port_read(machine(), "SYSTEM");
+			return ioport("SYSTEM")->read();
 	}
 
 	logerror("Unknown control read at 30c000 %d\n", offset);
@@ -693,7 +693,7 @@ static INPUT_PORTS_START( dec0 )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( dec1 )
@@ -719,7 +719,7 @@ static INPUT_PORTS_START( dec1 )
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -977,7 +977,7 @@ static INPUT_PORTS_START( hippodrm )
 	PORT_DIPUNUSED_DIPLOC( 0x8000, IP_ACTIVE_LOW, "SW2:8" )	// Always OFF
 
 	PORT_START("VBLANK")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( ffantasy )
@@ -1121,7 +1121,7 @@ static INPUT_PORTS_START( bouldash )
 	PORT_INCLUDE( dec1 )
 
 	PORT_MODIFY("SYSTEM")
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_VBLANK )		/* extremely slow palette fades with ACTIVE_HIGH */
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")		/* extremely slow palette fades with ACTIVE_HIGH */
 
 	PORT_START("DSW")
 	/* Different Coinage. Just a few combinations from manual, the rest was figured out */

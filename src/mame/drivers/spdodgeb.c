@@ -98,8 +98,8 @@ static void mcu63705_update_inputs(running_machine &machine)
 	{
 		int curr[2][2];
 
-		curr[p][0] = input_port_read(machine, p ? "P2" : "P1") & 0x01;
-		curr[p][1] = input_port_read(machine, p ? "P2" : "P1") & 0x02;
+		curr[p][0] = state->ioport(p ? "P2" : "P1")->read() & 0x01;
+		curr[p][1] = state->ioport(p ? "P2" : "P1")->read() & 0x02;
 
 		for (j = 0;j <= 1;j++)
 		{
@@ -133,7 +133,7 @@ static void mcu63705_update_inputs(running_machine &machine)
 	{
 		int curr[2];
 
-		curr[p] = input_port_read(machine, p ? "P2" : "P1") & 0x30;
+		curr[p] = machine.root_device().ioport(p ? "P2" : "P1")->read() & 0x30;
 
 		if (state->m_jumped[p]) buttons[p] = 0;	/* jump only momentarily flips the buttons */
 		else buttons[p] = curr[p];
@@ -144,8 +144,8 @@ static void mcu63705_update_inputs(running_machine &machine)
 		state->m_prev[p] = curr[p];
 	}
 
-	state->m_inputs[0] = input_port_read(machine, "P1") & 0xcf;
-	state->m_inputs[1] = input_port_read(machine, "P2") & 0x0f;
+	state->m_inputs[0] = machine.root_device().ioport("P1")->read() & 0xcf;
+	state->m_inputs[1] = machine.root_device().ioport("P2")->read() & 0x0f;
 	state->m_inputs[2] = state->m_running[0] | buttons[0];
 	state->m_inputs[3] = state->m_running[1] | buttons[1];
 }
@@ -166,7 +166,7 @@ static void mcu63705_update_inputs(running_machine &machine)
 
 	for (p=0; p<=1; p++)
 	{
-		curr_port[p] = input_port_read(machine, p ? "P2" : "P1");
+		curr_port[p] = state->ioport(p ? "P2" : "P1")->read();
 		curr_dash[p] = 0;
 
 		if (curr_port[p] & R)
@@ -221,7 +221,7 @@ READ8_MEMBER(spdodgeb_state::mcu63701_r)
 		case 1: return m_inputs[1];
 		case 2: return m_inputs[2];
 		case 3: return m_inputs[3];
-		case 4: return input_port_read(machine(), "IN1");
+		case 4: return ioport("IN1")->read();
 	}
 }
 
@@ -235,7 +235,7 @@ WRITE8_MEMBER(spdodgeb_state::mcu63701_w)
 
 READ8_MEMBER(spdodgeb_state::port_0_r)
 {
-	int port = input_port_read(machine(), "IN0");
+	int port = ioport("IN0")->read();
 
 	m_toggle^=0x02;	/* mcu63701_busy flag */
 
@@ -272,7 +272,7 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( spdodgeb )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* mcu63701_busy flag */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )

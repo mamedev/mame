@@ -233,10 +233,10 @@ READ8_MEMBER(segag80v_state::mangled_ports_r)
 	/* read as two bits from each of 4 ports. For this reason, the input   */
 	/* ports have been organized logically, and are demangled at runtime.  */
 	/* 4 input ports each provide 8 bits of information. */
-	UINT8 d7d6 = input_port_read(machine(), "D7D6");
-	UINT8 d5d4 = input_port_read(machine(), "D5D4");
-	UINT8 d3d2 = input_port_read(machine(), "D3D2");
-	UINT8 d1d0 = input_port_read(machine(), "D1D0");
+	UINT8 d7d6 = ioport("D7D6")->read();
+	UINT8 d5d4 = ioport("D5D4")->read();
+	UINT8 d3d2 = ioport("D3D2")->read();
+	UINT8 d1d0 = ioport("D1D0")->read();
 	int shift = offset & 3;
 	return demangle(d7d6 >> shift, d5d4 >> shift, d3d2 >> shift, d1d0 >> shift);
 }
@@ -260,7 +260,7 @@ READ8_MEMBER(segag80v_state::spinner_input_r)
 	INT8 delta;
 
 	if (m_spinner_select & 1)
-		return input_port_read(machine(), "FC");
+		return ioport("FC")->read();
 
 /*
  * The values returned are always increasing.  That is, regardless of whether
@@ -270,7 +270,7 @@ READ8_MEMBER(segag80v_state::spinner_input_r)
  */
 
 	/* I'm sure this can be further simplified ;-) BW */
-	delta = input_port_read(machine(), "SPINNER");
+	delta = ioport("SPINNER")->read();
 	if (delta != 0)
 	{
 		m_spinner_sign = (delta >> 7) & 1;
@@ -289,7 +289,7 @@ READ8_MEMBER(segag80v_state::spinner_input_r)
 
 CUSTOM_INPUT_MEMBER(segag80v_state::elim4_joint_coin_r)
 {
-	return (input_port_read(machine(), "COINS") & 0xf) != 0xf;
+	return (ioport("COINS")->read() & 0xf) != 0xf;
 }
 
 
@@ -305,11 +305,11 @@ READ8_MEMBER(segag80v_state::elim4_input_r)
 		{
 			case 6:
 				/* player 3 & 4 controls */
-				result = input_port_read(machine(), "FC");
+				result = ioport("FC")->read();
 				break;
 			case 7:
 				/* the 4 coin inputs */
-				result = input_port_read(machine(), "COINS");
+				result = ioport("COINS")->read();
 				break;
 		}
 	}

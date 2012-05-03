@@ -147,7 +147,7 @@ READ8_MEMBER(magtouch_state::magtouch_io_r)
 	switch(offset)
 	{
 		case 1:
-			return input_port_read(machine(), "IN0");
+			return ioport("IN0")->read();
 		default:
 			return 0;
 	}

@@ -105,28 +105,28 @@ static void tecmo_adpcm_int(device_t *device)
 /* the 8-bit dipswitches are split across addresses */
 READ8_MEMBER(tecmo_state::tecmo_dswa_l_r)
 {
-	UINT8 port = input_port_read(machine(), "DSWA");
+	UINT8 port = ioport("DSWA")->read();
 	port &= 0x0f;
 	return port;
 }
 
 READ8_MEMBER(tecmo_state::tecmo_dswa_h_r)
 {
-	UINT8 port = input_port_read(machine(), "DSWA");
+	UINT8 port = ioport("DSWA")->read();
 	port &= 0xf0;
 	return port>>4;
 }
 
 READ8_MEMBER(tecmo_state::tecmo_dswb_l_r)
 {
-	UINT8 port = input_port_read(machine(), "DSWB");
+	UINT8 port = ioport("DSWB")->read();
 	port &= 0x0f;
 	return port;
 }
 
 READ8_MEMBER(tecmo_state::tecmo_dswb_h_r)
 {
-	UINT8 port = input_port_read(machine(), "DSWB");
+	UINT8 port = ioport("DSWB")->read();
 	port &= 0xf0;
 	return port>>4;
 }

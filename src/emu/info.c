@@ -267,7 +267,7 @@ void info_xml_creator::output_one()
 	astring errors;
 	device_iterator iter(config.root_device());
 	for (device_t *device = iter.first(); device != NULL; device = iter.next())
-		input_port_list_init(*device, portlist, errors);
+		portlist.append(*device, errors);
 
 	// print the header and the game name
 	fprintf(m_output, "\t<%s",emulator_info::get_xml_top());
@@ -352,11 +352,11 @@ void info_xml_creator::output_one_device(device_t &device, const char *devtag)
 	astring errors;
 	device_iterator iptiter(device);
 	for (device_t *dev = iptiter.first(); dev != NULL; dev = iptiter.next())
-		input_port_list_init(*dev, portlist, errors);
+		portlist.append(*dev, errors);
 	// check if the device adds player inputs (other than dsw and configs) to the system
-	for (input_port_config *port = portlist.first(); port != NULL; port = port->next())
-		for (input_field_config *field = port->fieldlist().first(); field != NULL; field = field->next())
-			if (field->type >= IPT_START1 && field->type < __ipt_ui_start)
+	for (ioport_port *port = portlist.first(); port != NULL; port = port->next())
+		for (ioport_field *field = port->first_field(); field != NULL; field = field->next())
+			if (field->type() >= IPT_START1 && field->type() < IPT_UI_FIRST)
 			{
 				has_input = TRUE;
 				break;
@@ -830,33 +830,33 @@ void info_xml_creator::output_input(const ioport_list &portlist)
 	bool gambling = false;
 
 	// iterate over the ports
-	for (input_port_config *port = portlist.first(); port != NULL; port = port->next())
-		for (input_field_config *field = port->fieldlist().first(); field != NULL; field = field->next())
+	for (ioport_port *port = portlist.first(); port != NULL; port = port->next())
+		for (ioport_field *field = port->first_field(); field != NULL; field = field->next())
 		{
 			int analogtype = -1;
 
 			// track the highest player number
-			if (nplayer < field->player + 1)
-				nplayer = field->player + 1;
+			if (nplayer < field->player() + 1)
+				nplayer = field->player() + 1;
 
 			// switch off of the type
-			switch (field->type)
+			switch (field->type())
 			{
 				// map which joystick directions are present
-				case IPT_JOYSTICK_UP:			joytype[0] |= DIR_UP | ((field->way == 4) ? DIR_4WAY : 0);		break;
-				case IPT_JOYSTICK_DOWN:			joytype[0] |= DIR_DOWN | ((field->way == 4) ? DIR_4WAY : 0);	break;
-				case IPT_JOYSTICK_LEFT:			joytype[0] |= DIR_LEFT | ((field->way == 4) ? DIR_4WAY : 0);	break;
-				case IPT_JOYSTICK_RIGHT:		joytype[0] |= DIR_RIGHT | ((field->way == 4) ? DIR_4WAY : 0);	break;
+				case IPT_JOYSTICK_UP:			joytype[0] |= DIR_UP | ((field->way() == 4) ? DIR_4WAY : 0);		break;
+				case IPT_JOYSTICK_DOWN:			joytype[0] |= DIR_DOWN | ((field->way() == 4) ? DIR_4WAY : 0);	break;
+				case IPT_JOYSTICK_LEFT:			joytype[0] |= DIR_LEFT | ((field->way() == 4) ? DIR_4WAY : 0);	break;
+				case IPT_JOYSTICK_RIGHT:		joytype[0] |= DIR_RIGHT | ((field->way() == 4) ? DIR_4WAY : 0);	break;
 
-				case IPT_JOYSTICKLEFT_UP:		joytype[1] |= DIR_UP | ((field->way == 4) ? DIR_4WAY : 0);		break;
-				case IPT_JOYSTICKLEFT_DOWN:		joytype[1] |= DIR_DOWN | ((field->way == 4) ? DIR_4WAY : 0);	break;
-				case IPT_JOYSTICKLEFT_LEFT:		joytype[1] |= DIR_LEFT | ((field->way == 4) ? DIR_4WAY : 0);	break;
-				case IPT_JOYSTICKLEFT_RIGHT:	joytype[1] |= DIR_RIGHT | ((field->way == 4) ? DIR_4WAY : 0);	break;
+				case IPT_JOYSTICKLEFT_UP:		joytype[1] |= DIR_UP | ((field->way() == 4) ? DIR_4WAY : 0);		break;
+				case IPT_JOYSTICKLEFT_DOWN:		joytype[1] |= DIR_DOWN | ((field->way() == 4) ? DIR_4WAY : 0);	break;
+				case IPT_JOYSTICKLEFT_LEFT:		joytype[1] |= DIR_LEFT | ((field->way() == 4) ? DIR_4WAY : 0);	break;
+				case IPT_JOYSTICKLEFT_RIGHT:	joytype[1] |= DIR_RIGHT | ((field->way() == 4) ? DIR_4WAY : 0);	break;
 
-				case IPT_JOYSTICKRIGHT_UP:		joytype[2] |= DIR_UP | ((field->way == 4) ? DIR_4WAY : 0);		break;
-				case IPT_JOYSTICKRIGHT_DOWN:	joytype[2] |= DIR_DOWN | ((field->way == 4) ? DIR_4WAY : 0);	break;
-				case IPT_JOYSTICKRIGHT_LEFT:	joytype[2] |= DIR_LEFT | ((field->way == 4) ? DIR_4WAY : 0);	break;
-				case IPT_JOYSTICKRIGHT_RIGHT:	joytype[2] |= DIR_RIGHT | ((field->way == 4) ? DIR_4WAY : 0);	break;
+				case IPT_JOYSTICKRIGHT_UP:		joytype[2] |= DIR_UP | ((field->way() == 4) ? DIR_4WAY : 0);		break;
+				case IPT_JOYSTICKRIGHT_DOWN:	joytype[2] |= DIR_DOWN | ((field->way() == 4) ? DIR_4WAY : 0);	break;
+				case IPT_JOYSTICKRIGHT_LEFT:	joytype[2] |= DIR_LEFT | ((field->way() == 4) ? DIR_4WAY : 0);	break;
+				case IPT_JOYSTICKRIGHT_RIGHT:	joytype[2] |= DIR_RIGHT | ((field->way() == 4) ? DIR_4WAY : 0);	break;
 
 				// mark as an analog input, and get analog stats after switch
 				case IPT_AD_STICK_X:
@@ -918,7 +918,7 @@ void info_xml_creator::output_input(const ioport_list &portlist)
 				case IPT_BUTTON14:
 				case IPT_BUTTON15:
 				case IPT_BUTTON16:
-					nbutton = MAX(nbutton, field->type - IPT_BUTTON1 + 1);
+					nbutton = MAX(nbutton, field->type() - IPT_BUTTON1 + 1);
 					break;
 
 				// track maximum coin index
@@ -930,7 +930,7 @@ void info_xml_creator::output_input(const ioport_list &portlist)
 				case IPT_COIN6:
 				case IPT_COIN7:
 				case IPT_COIN8:
-					ncoin = MAX(ncoin, field->type - IPT_COIN1 + 1);
+					ncoin = MAX(ncoin, field->type() - IPT_COIN1 + 1);
 					break;
 
 				// track presence of these guys
@@ -952,11 +952,11 @@ void info_xml_creator::output_input(const ioport_list &portlist)
 					break;
 
 				default:
-					if (field->type >= __ipt_mahjong_start && field->type <= __ipt_mahjong_end)
+					if (field->type() > IPT_MAHJONG_FIRST && field->type() < IPT_MAHJONG_LAST)
 						mahjong = true;
-					else if (field->type >= __ipt_hanafuda_start && field->type <= __ipt_hanafuda_end)
+					else if (field->type() > IPT_HANAFUDA_FIRST && field->type() < IPT_HANAFUDA_LAST)
 						hanafuda = true;
-					else if (field->type >= __ipt_gambling_start && field->type <= __ipt_gambling_end)
+					else if (field->type() > IPT_GAMBLING_FIRST && field->type() < IPT_GAMBLING_LAST)
 						gambling = true;
 					break;
 			}
@@ -964,15 +964,15 @@ void info_xml_creator::output_input(const ioport_list &portlist)
 			// get the analog stats
 			if (analogtype != -1)
 			{
-				if (field->min != 0)
-					control_info[analogtype].min = field->min;
-				if (field->max != 0)
-					control_info[analogtype].max = field->max;
-				if (field->sensitivity != 0)
-					control_info[analogtype].sensitivity = field->sensitivity;
-				if (field->delta != 0)
-					control_info[analogtype].keydelta = field->delta;
-				if ((field->flags & ANALOG_FLAG_REVERSE) != 0)
+				if (field->minval() != 0)
+					control_info[analogtype].min = field->minval();
+				if (field->maxval() != 0)
+					control_info[analogtype].max = field->maxval();
+				if (field->sensitivity() != 0)
+					control_info[analogtype].sensitivity = field->sensitivity();
+				if (field->delta() != 0)
+					control_info[analogtype].keydelta = field->delta();
+				if (field->analog_reverse() != 0)
 					control_info[analogtype].reverse = true;
 			}
 		}
@@ -1080,25 +1080,25 @@ void info_xml_creator::output_input(const ioport_list &portlist)
 void info_xml_creator::output_switches(const ioport_list &portlist, const char *root_tag, int type, const char *outertag, const char *innertag)
 {
 	// iterate looking for DIP switches
-	for (input_port_config *port = portlist.first(); port != NULL; port = port->next())
-		for (input_field_config *field = port->fieldlist().first(); field != NULL; field = field->next())
-			if (field->type == type)
+	for (ioport_port *port = portlist.first(); port != NULL; port = port->next())
+		for (ioport_field *field = port->first_field(); field != NULL; field = field->next())
+			if (field->type() == type)
 			{
-				astring newtag(field->port().tag()), oldtag(":");
+				astring newtag(port->tag()), oldtag(":");
 				newtag.substr(newtag.find(oldtag.cat(root_tag)) + oldtag.len());
 
 				// output the switch name information
-				fprintf(m_output, "\t\t<%s name=\"%s\"", outertag, xml_normalize_string(input_field_name(field)));
+				fprintf(m_output, "\t\t<%s name=\"%s\"", outertag, xml_normalize_string(field->name()));
 				fprintf(m_output, " tag=\"%s\"", xml_normalize_string(newtag));
-				fprintf(m_output, " mask=\"%u\"", field->mask);
+				fprintf(m_output, " mask=\"%u\"", field->mask());
 				fprintf(m_output, ">\n");
 
 				// loop over settings
-				for (input_setting_config *setting = field->settinglist().first(); setting != NULL; setting = setting->next())
+				for (ioport_setting *setting = field->first_setting(); setting != NULL; setting = setting->next())
 				{
-					fprintf(m_output, "\t\t\t<%s name=\"%s\"", innertag, xml_normalize_string(setting->name));
-					fprintf(m_output, " value=\"%u\"", setting->value);
-					if (setting->value == field->defvalue)
+					fprintf(m_output, "\t\t\t<%s name=\"%s\"", innertag, xml_normalize_string(setting->name()));
+					fprintf(m_output, " value=\"%u\"", setting->value());
+					if (setting->value() == field->defvalue())
 						fprintf(m_output, " default=\"yes\"");
 					fprintf(m_output, "/>\n");
 				}
@@ -1117,10 +1117,10 @@ void info_xml_creator::output_switches(const ioport_list &portlist, const char *
 void info_xml_creator::output_adjusters(const ioport_list &portlist)
 {
 	// iterate looking for Adjusters
-	for (input_port_config *port = portlist.first(); port != NULL; port = port->next())
-		for (input_field_config *field = port->fieldlist().first(); field != NULL; field = field->next())
-			if (field->type == IPT_ADJUSTER)
-				fprintf(m_output, "\t\t<adjuster name=\"%s\" default=\"%d\"/>\n", xml_normalize_string(input_field_name(field)), field->defvalue);
+	for (ioport_port *port = portlist.first(); port != NULL; port = port->next())
+		for (ioport_field *field = port->first_field(); field != NULL; field = field->next())
+			if (field->type() == IPT_ADJUSTER)
+				fprintf(m_output, "\t\t<adjuster name=\"%s\" default=\"%d\"/>\n", xml_normalize_string(field->name()), field->defvalue());
 }
 
 

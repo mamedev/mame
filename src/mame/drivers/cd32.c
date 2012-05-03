@@ -223,7 +223,7 @@ static UINT16 handle_joystick_potgor(running_machine &machine, UINT16 potgor)
 		/* shift at 1 == return one, >1 = return button states */
 		if (state->m_cd32_shifter[i] == 0)
 			potgor &= ~p9dat; /* shift at zero == return zero */
-		if (state->m_cd32_shifter[i] >= 2 && (input_port_read(machine, player_portname[i]) & (1 << (state->m_cd32_shifter[i] - 2))))
+		if (state->m_cd32_shifter[i] >= 2 && (state->ioport(player_portname[i])->read() & (1 << (state->m_cd32_shifter[i] - 2))))
 			potgor &= ~p9dat;
 	}
 	return potgor;

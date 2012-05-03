@@ -199,17 +199,17 @@ WRITE16_MEMBER(vcombat_state::main_video_write)
 
 READ16_MEMBER(vcombat_state::control_1_r)
 {
-	return (input_port_read(machine(), "IN0") << 8);
+	return (ioport("IN0")->read() << 8);
 }
 
 READ16_MEMBER(vcombat_state::control_2_r)
 {
-	return (input_port_read(machine(), "IN1") << 8);
+	return (ioport("IN1")->read() << 8);
 }
 
 READ16_MEMBER(vcombat_state::control_3_r)
 {
-	return (input_port_read(machine(), "IN2") << 8);
+	return (ioport("IN2")->read() << 8);
 }
 
 static void wiggle_i860_common(device_t *device, UINT16 data)

@@ -101,7 +101,7 @@ static UINT16 exterm_trackball_port_r(address_space *space, int which, UINT16 me
 	UINT16 port;
 
 	/* Read the fake input port */
-	UINT8 trackball_pos = input_port_read(space->machine(), which ? "DIAL1" : "DIAL0");
+	UINT8 trackball_pos = state->ioport(which ? "DIAL1" : "DIAL0")->read();
 
 	/* Calculate the change from the last position. */
 	UINT8 trackball_diff = state->m_trackball_old[which] - trackball_pos;
@@ -117,7 +117,7 @@ static UINT16 exterm_trackball_port_r(address_space *space, int which, UINT16 me
 	state->m_aimpos[which] = (state->m_aimpos[which] + trackball_diff) & 0x3f;
 
 	/* Combine it with the standard input bits */
-	port = which ? input_port_read(space->machine(), "P2") : input_port_read(space->machine(), "P1");
+	port = state->ioport(which ? "P2" : "P1")->read();
 
 	return (port & 0xc0ff) | (state->m_aimpos[which] << 8);
 }

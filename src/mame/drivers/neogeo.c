@@ -391,7 +391,7 @@ CUSTOM_INPUT_MEMBER(neogeo_state::multiplexed_controller_r)
 			{ "IN0-0", "IN0-1" }, { "IN1-0", "IN1-1" }
 		};
 
-	return input_port_read_safe(machine(), cntrl[port][m_controller_select & 0x01], 0x00);
+	return ioport(cntrl[port][m_controller_select & 0x01])->read_safe(0x00);
 }
 
 #if 1 // this needs to be added dynamically somehow
@@ -410,10 +410,10 @@ cpu #0 (PC=00C18C40): unmapped memory word write to 00380000 = 0000 & 00FF
 	{
 	default:
 	case 0x00: ret = 0x0000; break; /* nothing? */
-	case 0x09: ret = input_port_read(machine(), "MAHJONG1"); break;
-	case 0x12: ret = input_port_read(machine(), "MAHJONG2"); break;
-	case 0x1b: ret = input_port_read(machine(), "MAHJONG3"); break; /* player 1 normal inputs? */
-	case 0x24: ret = input_port_read(machine(), "MAHJONG4"); break;
+	case 0x09: ret = ioport("MAHJONG1")->read(); break;
+	case 0x12: ret = ioport("MAHJONG2")->read(); break;
+	case 0x1b: ret = ioport("MAHJONG3")->read(); break; /* player 1 normal inputs? */
+	case 0x24: ret = ioport("MAHJONG4")->read(); break;
 	}
 
 	return ret;
@@ -800,12 +800,12 @@ static void audio_cpu_banking_init( running_machine &machine )
 	UINT32 address_mask;
 
 	/* audio bios/cartridge selection */
-	if (machine.root_device().memregion("audiobios")->base())
-		state->membank(NEOGEO_BANK_AUDIO_CPU_MAIN_BANK)->configure_entry(0, machine.root_device().memregion("audiobios")->base());
-	state->membank(NEOGEO_BANK_AUDIO_CPU_MAIN_BANK)->configure_entry(1, machine.root_device().memregion("audiocpu")->base());
+	if (state->memregion("audiobios")->base())
+		state->membank(NEOGEO_BANK_AUDIO_CPU_MAIN_BANK)->configure_entry(0, state->memregion("audiobios")->base());
+	state->membank(NEOGEO_BANK_AUDIO_CPU_MAIN_BANK)->configure_entry(1, state->memregion("audiocpu")->base());
 
 	/* audio banking */
-	address_mask = machine.root_device().memregion("audiocpu")->bytes() - 0x10000 - 1;
+	address_mask = state->memregion("audiocpu")->bytes() - 0x10000 - 1;
 
 	rgn = state->memregion("audiocpu")->base();
 	for (region = 0; region < 4; region++)

@@ -451,7 +451,7 @@ static READ16_HANDLER( adc_r )
 	int which = (state->m_iochip_regs[0][2] >> 2) & 7;
 
 	/* on the write, latch the selected input port and stash the value */
-	int value = input_port_read_safe(space->machine(), ports[which], 0x0010);
+	int value = state->ioport(ports[which])->read_safe(0x0010);
 
 	/* reverse some port values */
 	if (state->m_adc_reverse[which])
@@ -512,11 +512,11 @@ static READ16_HANDLER( iochip_0_r )
                 D6: /INTR of ADC0804
                 D5-D0: CN C pin 24-19 (switch state 0= open, 1= closed)
             */
-			return iochip_r(space->machine(), 0, 0, input_port_read(space->machine(), "IO0PORTA"));
+			return iochip_r(space->machine(), 0, 0, space->machine().root_device().ioport("IO0PORTA")->read());
 
 		case 1:
 			/* I/O port: CN C pins 17,15,13,11,9,7,5,3 */
-			return iochip_r(space->machine(), 0, 1, input_port_read(space->machine(), "IO0PORTB"));
+			return iochip_r(space->machine(), 0, 1, space->machine().root_device().ioport("IO0PORTB")->read());
 
 		case 2:
 			/* Output port */
@@ -588,19 +588,19 @@ static READ16_HANDLER( iochip_1_r )
 	{
 		case 0:
 			/* Input port: switches, CN D pin A1-8 (switch state 1= open, 0= closed) */
-			return iochip_r(space->machine(), 1, 0, input_port_read(space->machine(), "IO1PORTA"));
+			return iochip_r(space->machine(), 1, 0, space->machine().root_device().ioport("IO1PORTA")->read());
 
 		case 1:
 			/* Input port: switches, CN D pin A9-16 (switch state 1= open, 0= closed) */
-			return iochip_r(space->machine(), 1, 1, input_port_read(space->machine(), "IO1PORTB"));
+			return iochip_r(space->machine(), 1, 1, space->machine().root_device().ioport("IO1PORTB")->read());
 
 		case 2:
 			/* Input port: DIP switches (1= off, 0= on) */
-			return iochip_r(space->machine(), 1, 2, input_port_read(space->machine(), "IO1PORTC"));
+			return iochip_r(space->machine(), 1, 2, space->machine().root_device().ioport("IO1PORTC")->read());
 
 		case 3:
 			/* Input port: DIP switches (1= off, 0= on) */
-			return iochip_r(space->machine(), 1, 3, input_port_read(space->machine(), "IO1PORTD"));
+			return iochip_r(space->machine(), 1, 3, space->machine().root_device().ioport("IO1PORTD")->read());
 
 		case 4:
 			/* Unused */

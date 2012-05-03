@@ -99,7 +99,7 @@ static void cage_irq_callback(running_machine &machine, int reason)
 
 READ32_MEMBER(atarigt_state::special_port2_r)
 {
-	int temp = input_port_read(machine(), "SERVICE");
+	int temp = ioport("SERVICE")->read();
 	temp ^= 0x0001;		/* /A2DRDY always high for now */
 	temp ^= 0x0008;		/* A2D.EOC always high for now */
 	return (temp << 16) | temp;
@@ -108,7 +108,7 @@ READ32_MEMBER(atarigt_state::special_port2_r)
 
 READ32_MEMBER(atarigt_state::special_port3_r)
 {
-	int temp = input_port_read(machine(), "COIN");
+	int temp = ioport("COIN")->read();
 	if (m_video_int_state) temp ^= 0x0001;
 	if (m_scanline_int_state) temp ^= 0x0002;
 	return (temp << 16) | temp;
@@ -118,7 +118,7 @@ READ32_MEMBER(atarigt_state::special_port3_r)
 #if (HACK_TMEK_CONTROLS)
 INLINE void compute_fake_pots(int *pots)
 {
-	int fake = input_port_read(machine, "FAKE");
+	int fake = machine.root_device().ioport("FAKE")->read();
 
 	pots[0] = pots[1] = pots[2] = pots[3] = 0x80;
 
@@ -155,7 +155,7 @@ READ32_MEMBER(atarigt_state::analog_port0_r)
 	compute_fake_pots(pots);
 	return (pots[0] << 24) | (pots[3] << 8);
 #else
-	return (input_port_read(machine(), "AN1") << 24) | (input_port_read(machine(), "AN2") << 8);
+	return (ioport("AN2")->read() << 8);
 #endif
 }
 
@@ -167,7 +167,7 @@ READ32_MEMBER(atarigt_state::analog_port1_r)
 	compute_fake_pots(pots);
 	return (pots[2] << 24) | (pots[1] << 8);
 #else
-	return (input_port_read(machine(), "AN3") << 24) | (input_port_read(machine(), "AN4") << 8);
+	return (ioport("AN4")->read() << 8);
 #endif
 }
 
@@ -658,7 +658,7 @@ static INPUT_PORTS_START( common )
 	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* A2D.EOC */
 	PORT_BIT( 0x0030, IP_ACTIVE_LOW, IPT_UNUSED )	/* NC */
 	PORT_SERVICE( 0x0040, IP_ACTIVE_LOW )			/* SELFTEST */
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_VBLANK )	/* VBLANK */
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")	/* VBLANK */
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("COIN")			/* 68.STATUS (A2=1) */

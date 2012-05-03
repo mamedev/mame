@@ -271,7 +271,7 @@ static void draw_fixed_layer( running_machine &machine, bitmap_rgb32 &bitmap, in
 	neogeo_state *state = machine.driver_data<neogeo_state>();
 	int x;
 
-	UINT8* gfx_base = machine.root_device().memregion(state->m_fixed_layer_source ? "fixed" : "fixedbios")->base();
+	UINT8* gfx_base = state->memregion(state->m_fixed_layer_source ? "fixed" : "fixedbios")->base();
 	UINT32 addr_mask = state->memregion(state->m_fixed_layer_source ? "fixed" : "fixedbios")->bytes() - 1;
 	UINT16 *video_data = &state->m_videoram[0x7000 | (scanline >> 3)];
 	UINT32 *pixel_addr = &bitmap.pix32(scanline, NEOGEO_HBEND);

@@ -198,8 +198,8 @@ READ8_MEMBER(pacland_state::pacland_input_r)
 	int shift = 4 * (offset & 1);
 	int port = offset & 2;
 	static const char *const portnames[] = { "DSWA", "DSWB", "IN0", "IN1" };
-	int r = (input_port_read(machine(), portnames[port]) << shift) & 0xf0;
-	r |= (input_port_read(machine(), portnames[port+1]) >> (4 - shift)) & 0x0f;
+	int r = (ioport(portnames[port])->read() << shift) & 0xf0;
+	r |= (ioport(portnames[port+1])->read() >> (4 - shift)) & 0x0f;
 
 	return r;
 }

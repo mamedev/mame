@@ -561,11 +561,11 @@ READ8_MEMBER(magicfly_state::mux_port_r)
 {
 	switch( m_input_selector )
 	{
-		case 0x01: return input_port_read(machine(), "IN0-0");
-		case 0x02: return input_port_read(machine(), "IN0-1");
-		case 0x04: return input_port_read(machine(), "IN0-2");
-		case 0x08: return input_port_read(machine(), "IN0-3");
-		case 0x00: return input_port_read(machine(), "DSW0");
+		case 0x01: return ioport("IN0-0")->read();
+		case 0x02: return ioport("IN0-1")->read();
+		case 0x04: return ioport("IN0-2")->read();
+		case 0x08: return ioport("IN0-3")->read();
+		case 0x00: return ioport("DSW0")->read();
 	}
 	return 0xff;
 }

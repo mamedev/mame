@@ -233,7 +233,7 @@ READ8_MEMBER(nycaptor_state::nycaptor_b_r)
 
 READ8_MEMBER(nycaptor_state::nycaptor_by_r)
 {
-	int port = input_port_read(machine(), "LIGHTY");
+	int port = ioport("LIGHTY")->read();
 
 	if (m_gametype == 1)
 		port = 255 - port;
@@ -243,7 +243,7 @@ READ8_MEMBER(nycaptor_state::nycaptor_by_r)
 
 READ8_MEMBER(nycaptor_state::nycaptor_bx_r)
 {
-	return (input_port_read(machine(), "LIGHTX") + 0x27) | 1;
+	return (ioport("LIGHTX")->read() + 0x27) | 1;
 }
 
 

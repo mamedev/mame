@@ -16,7 +16,7 @@ Dip locations added from dip listing at crazykong.com
 
 READ8_MEMBER(citycon_state::citycon_in_r)
 {
-	return input_port_read(machine(), flip_screen() ? "P2" : "P1");
+	return ioport(flip_screen() ? "P2" : "P1")->read();
 }
 
 READ8_MEMBER(citycon_state::citycon_irq_ack_r)

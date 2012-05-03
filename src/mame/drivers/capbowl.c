@@ -107,7 +107,7 @@
 
 static INTERRUPT_GEN( capbowl_interrupt )
 {
-	if (input_port_read(device->machine(), "SERVICE") & 1)						/* get status of the F2 key */
+	if (device->machine().root_device().ioport("SERVICE")->read() & 1)						/* get status of the F2 key */
 		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);	/* trigger self test */
 }
 
@@ -152,13 +152,13 @@ WRITE8_MEMBER(capbowl_state::capbowl_rom_select_w)
 
 READ8_MEMBER(capbowl_state::track_0_r)
 {
-	return (input_port_read(machine(), "IN0") & 0xf0) | ((input_port_read(machine(), "TRACKY") - m_last_trackball_val[0]) & 0x0f);
+	return (ioport("IN0")->read() & 0xf0) | ((ioport("TRACKY")->read() - m_last_trackball_val[0]) & 0x0f);
 }
 
 
 READ8_MEMBER(capbowl_state::track_1_r)
 {
-	return (input_port_read(machine(), "IN1") & 0xf0) | ((input_port_read(machine(), "TRACKX") - m_last_trackball_val[1]) & 0x0f);
+	return (ioport("IN1")->read() & 0xf0) | ((ioport("TRACKX")->read() - m_last_trackball_val[1]) & 0x0f);
 }
 
 
@@ -166,8 +166,8 @@ WRITE8_MEMBER(capbowl_state::track_reset_w)
 {
 
 	/* reset the trackball counters */
-	m_last_trackball_val[0] = input_port_read(machine(), "TRACKY");
-	m_last_trackball_val[1] = input_port_read(machine(), "TRACKX");
+	m_last_trackball_val[0] = ioport("TRACKY")->read();
+	m_last_trackball_val[1] = ioport("TRACKX")->read();
 
 	watchdog_reset_w(space, offset, data);
 }

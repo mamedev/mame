@@ -20,7 +20,7 @@ READ8_MEMBER(kopunch_state::kopunch_in_r)
 	if (offset == 0)
 		return machine().rand();
 	else
-		return (machine().rand() & 0x07) | input_port_read(machine(), "SYSTEM");
+		return (machine().rand() & 0x07) | ioport("SYSTEM")->read();
 }
 
 WRITE8_MEMBER(kopunch_state::kopunch_lamp_w)

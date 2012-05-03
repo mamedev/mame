@@ -44,11 +44,11 @@ READ32_MEMBER(ertictac_state::ertictac_podule_r)
 
 	switch(offset)
 	{
-		case 0x04/4: return input_port_read(machine(), "DSW1") & 0xff;
-		case 0x08/4: return input_port_read(machine(), "DSW2") & 0xff;
-		case 0x10/4: return input_port_read(machine(), "SYSTEM") & 0xff;
-		case 0x14/4: return input_port_read(machine(), "P2") & 0xff;
-		case 0x18/4: return input_port_read(machine(), "P1") & 0xff;
+		case 0x04/4: return ioport("DSW1")->read() & 0xff;
+		case 0x08/4: return ioport("DSW2")->read() & 0xff;
+		case 0x10/4: return ioport("SYSTEM")->read() & 0xff;
+		case 0x14/4: return ioport("P2")->read() & 0xff;
+		case 0x18/4: return ioport("P1")->read() & 0xff;
 	}
 
 	return 0;
@@ -167,22 +167,22 @@ static INPUT_PORTS_START( poizone )
 	PORT_DIPSETTING(    0x01, "Manual" )
 	PORT_DIPSETTING(    0x00, "Automatic" )
 	PORT_DIPNAME( 0x1A, 0x00, "Setting 2" )  PORT_DIPLOCATION("DSW2:3,4,5")
-	PORT_DIPSETTING(    0x00, "Extremely Easy - 2:00")	PORT_CONDITION("DSW2", 0x01, PORTCOND_EQUALS, 0x00)
-	PORT_DIPSETTING(    0x02, "Very Easy - 1:30")	PORT_CONDITION("DSW2", 0x01, PORTCOND_EQUALS, 0x00)
-	PORT_DIPSETTING(    0x08, "Easy - 2:00")	PORT_CONDITION("DSW2", 0x01, PORTCOND_EQUALS, 0x00)
-	PORT_DIPSETTING(    0x0A, "Normal 1 - 1:30")	PORT_CONDITION("DSW2", 0x01, PORTCOND_EQUALS, 0x00)
-	PORT_DIPSETTING(    0x10, "Normal 2 - 1:45")	PORT_CONDITION("DSW2", 0x01, PORTCOND_EQUALS, 0x00)
-	PORT_DIPSETTING(    0x12, "Difficult - 2:00")	PORT_CONDITION("DSW2", 0x01, PORTCOND_EQUALS, 0x00)
-	PORT_DIPSETTING(    0x18, "Very Difficult - 2:00")	PORT_CONDITION("DSW2", 0x01, PORTCOND_EQUALS, 0x00)
-	PORT_DIPSETTING(    0x1A, "Extremely Difficult - 1:30")	PORT_CONDITION("DSW2", 0x01, PORTCOND_EQUALS, 0x00)
-	PORT_DIPSETTING(    0x00, "Clear 20% - 1:00")	PORT_CONDITION("DSW2", 0x01, PORTCOND_EQUALS, 0x01)
-	PORT_DIPSETTING(    0x02, "Clear 30% - 1:00")	PORT_CONDITION("DSW2", 0x01, PORTCOND_EQUALS, 0x01)
-	PORT_DIPSETTING(    0x08, "Clear 40% - 1:00")	PORT_CONDITION("DSW2", 0x01, PORTCOND_EQUALS, 0x01)
-	PORT_DIPSETTING(    0x0A, "Clear 50% - 1:00")	PORT_CONDITION("DSW2", 0x01, PORTCOND_EQUALS, 0x01)
-	PORT_DIPSETTING(    0x10, "Clear 60% - 1:00")	PORT_CONDITION("DSW2", 0x01, PORTCOND_EQUALS, 0x01)
-	PORT_DIPSETTING(    0x12, "Clear 70% - 1:00")	PORT_CONDITION("DSW2", 0x01, PORTCOND_EQUALS, 0x01)
-	PORT_DIPSETTING(    0x18, "Clear 80% - 1:00")	PORT_CONDITION("DSW2", 0x01, PORTCOND_EQUALS, 0x01)
-	PORT_DIPSETTING(    0x1A, "Clear 90% - 1:00")	PORT_CONDITION("DSW2", 0x01, PORTCOND_EQUALS, 0x01)
+	PORT_DIPSETTING(    0x00, "Extremely Easy - 2:00")	PORT_CONDITION("DSW2", 0x01, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x02, "Very Easy - 1:30")	PORT_CONDITION("DSW2", 0x01, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x08, "Easy - 2:00")	PORT_CONDITION("DSW2", 0x01, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x0A, "Normal 1 - 1:30")	PORT_CONDITION("DSW2", 0x01, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x10, "Normal 2 - 1:45")	PORT_CONDITION("DSW2", 0x01, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x12, "Difficult - 2:00")	PORT_CONDITION("DSW2", 0x01, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x18, "Very Difficult - 2:00")	PORT_CONDITION("DSW2", 0x01, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x1A, "Extremely Difficult - 1:30")	PORT_CONDITION("DSW2", 0x01, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x00, "Clear 20% - 1:00")	PORT_CONDITION("DSW2", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(    0x02, "Clear 30% - 1:00")	PORT_CONDITION("DSW2", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(    0x08, "Clear 40% - 1:00")	PORT_CONDITION("DSW2", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(    0x0A, "Clear 50% - 1:00")	PORT_CONDITION("DSW2", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(    0x10, "Clear 60% - 1:00")	PORT_CONDITION("DSW2", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(    0x12, "Clear 70% - 1:00")	PORT_CONDITION("DSW2", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(    0x18, "Clear 80% - 1:00")	PORT_CONDITION("DSW2", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(    0x1A, "Clear 90% - 1:00")	PORT_CONDITION("DSW2", 0x01, EQUALS, 0x01)
 	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "DSW2:1" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "DSW2:6" )
 INPUT_PORTS_END

@@ -274,9 +274,9 @@ READ8_MEMBER(bwidow_state::spacduel_IN3_r)
 	int res2;
 	int res3;
 
-	res1 = input_port_read(machine(), "IN3");
-	res2 = input_port_read(machine(), "IN4");
-	res3 = input_port_read_safe(machine(), "DSW2", 0);
+	res1 = ioport("IN3")->read();
+	res2 = ioport("IN4")->read();
+	res3 = ioport("DSW2")->read_safe(0);
 	res = 0x00;
 
 	switch (offset & 0x07)

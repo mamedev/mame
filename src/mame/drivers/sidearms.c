@@ -63,7 +63,7 @@ READ8_MEMBER(sidearms_state::turtship_ports_r)
 
 	res = 0;
 	for (i = 0;i < 8;i++)
-		res |= ((input_port_read_safe(machine(), portnames[i], 0) >> offset) & 1) << i;
+		res |= ((ioport(portnames[i])->read_safe(0) >> offset) & 1) << i;
 
 	return res;
 }
@@ -260,7 +260,7 @@ static INPUT_PORTS_START( sidearms )
 
 	PORT_START("DSW2")
 	PORT_BIT( 0x7f, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_VBLANK )     /* not sure, but likely */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")     /* not sure, but likely */
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( turtship )
@@ -534,7 +534,7 @@ static INPUT_PORTS_START( whizz )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH,IPT_VBLANK )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH,IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )

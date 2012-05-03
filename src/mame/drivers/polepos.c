@@ -267,7 +267,7 @@ READ16_MEMBER(polepos_state::polepos2_ic25_r)
 
 READ8_MEMBER(polepos_state::polepos_adc_r)
 {
-	return input_port_read(machine(), m_adc_input ? "ACCEL" : "BRAKE");
+	return ioport(m_adc_input ? "ACCEL" : "BRAKE")->read();
 }
 
 READ8_MEMBER(polepos_state::polepos_ready_r)
@@ -340,8 +340,8 @@ WRITE16_MEMBER(polepos_state::polepos_z8002_nvi_enable_w)
 }
 
 
-CUSTOM_INPUT_MEMBER(polepos_state::high_port_r){ return input_port_read(field.machine(), (const char *)param) >> 4; }
-CUSTOM_INPUT_MEMBER(polepos_state::low_port_r){ return input_port_read(field.machine(), (const char *)param) & 0x0f; }
+CUSTOM_INPUT_MEMBER(polepos_state::high_port_r){ return field.machine().root_device().ioport((const char *)param)->read() >> 4; }
+CUSTOM_INPUT_MEMBER(polepos_state::low_port_r){ return field.machine().root_device().ioport((const char *)param)->read() & 0x0f; }
 CUSTOM_INPUT_MEMBER(polepos_state::auto_start_r)
 {
 	return m_auto_start_mask;
@@ -409,7 +409,7 @@ static READ8_DEVICE_HANDLER( steering_changed_r )
 {
 	polepos_state *state = device->machine().driver_data<polepos_state>();
 	/* read the current steering value and update our delta */
-	UINT8 steer_new = input_port_read(device->machine(), "STEER");
+	UINT8 steer_new = state->ioport("STEER")->read();
 	state->m_steer_accum += (INT8)(steer_new - state->m_steer_last) * 2;
 	state->m_steer_last = steer_new;
 

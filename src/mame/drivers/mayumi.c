@@ -124,7 +124,7 @@ READ8_MEMBER(mayumi_state::key_matrix_r)
 	for (i = 0; i < 5; i++)
 	{
 		if (BIT(p, i))
-			ret &= input_port_read(machine(), keynames[offset][i]);
+			ret &= ioport(keynames[offset][i])->read();
 	}
 
 	return ret;

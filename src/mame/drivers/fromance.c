@@ -180,15 +180,15 @@ READ8_MEMBER(fromance_state::fromance_keymatrix_r)
 	int ret = 0xff;
 
 	if (m_portselect & 0x01)
-		ret &= input_port_read(machine(), "KEY1");
+		ret &= ioport("KEY1")->read();
 	if (m_portselect & 0x02)
-		ret &= input_port_read(machine(), "KEY2");
+		ret &= ioport("KEY2")->read();
 	if (m_portselect & 0x04)
-		ret &= input_port_read(machine(), "KEY3");
+		ret &= ioport("KEY3")->read();
 	if (m_portselect & 0x08)
-		ret &= input_port_read(machine(), "KEY4");
+		ret &= ioport("KEY4")->read();
 	if (m_portselect & 0x10)
-		ret &= input_port_read(machine(), "KEY5");
+		ret &= ioport("KEY5")->read();
 
 	return ret;
 }

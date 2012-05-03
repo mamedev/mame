@@ -269,7 +269,7 @@ READ16_MEMBER(bbusters_state::control_3_r)
 {
 	static const char *const port[] = { "GUNX1", "GUNY1", "GUNX2", "GUNY2", "GUNX3", "GUNY3" };
 
-	UINT16 retdata = input_port_read(machine(), port[m_gun_select]);
+	UINT16 retdata = ioport(port[m_gun_select])->read();
 
 	retdata >>=1; // by lowering the precision of the gun reading hardware the game seems to work better
 
@@ -309,8 +309,8 @@ READ16_MEMBER(bbusters_state::mechatt_gun_r)
 {
 	int x, y;
 
-	x = input_port_read(machine(), offset ? "GUNX2" : "GUNX1");
-	y = input_port_read(machine(), offset ? "GUNY2" : "GUNY1");
+	x = ioport(offset ? "GUNX2" : "GUNX1")->read();
+	y = ioport(offset ? "GUNY2" : "GUNY1")->read();
 
 	/* Todo - does the hardware really clamp like this? */
 	x += 0x18;

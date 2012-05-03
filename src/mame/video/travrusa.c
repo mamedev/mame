@@ -276,7 +276,7 @@ WRITE8_MEMBER(travrusa_state::travrusa_scroll_x_high_w)
 WRITE8_MEMBER(travrusa_state::travrusa_flipscreen_w)
 {
 	/* screen flip is handled both by software and hardware */
-	data ^= ~input_port_read(machine(), "DSW2") & 1;
+	data ^= ~ioport("DSW2")->read() & 1;
 
 	flip_screen_set(data & 1);
 

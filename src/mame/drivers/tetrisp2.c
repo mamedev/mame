@@ -212,7 +212,7 @@ WRITE16_MEMBER(tetrisp2_state::nndmseal_sound_bank_w)
 
 READ16_MEMBER(tetrisp2_state::tetrisp2_ip_1_word_r)
 {
-	return	( input_port_read(machine(), "SYSTEM") &  0xfcff ) |
+	return	( ioport("SYSTEM")->read() &  0xfcff ) |
 			(           machine().rand() & ~0xfcff ) |
 			(      1 << (8 + (machine().rand()&1)) );
 }
@@ -540,7 +540,7 @@ ADDRESS_MAP_END
 READ16_MEMBER(stepstag_state::stepstag_coins_r)
 {
 	// bits 8 & 9?
-	return	( input_port_read(machine(), "COINS") &  0xfcff ) |
+	return	( ioport("COINS")->read() &  0xfcff ) |
 			(                 machine().rand()  & ~0xfcff ) |
 			(      1 << (8 + (machine().rand()&1)) );
 }

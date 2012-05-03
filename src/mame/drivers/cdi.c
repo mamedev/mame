@@ -87,35 +87,35 @@ INPUT_CHANGED_MEMBER(cdi_state::mcu_input)
 	switch((FPTR)param)
 	{
 		case 0x39:
-			if(input_port_read(machine(), "INPUT1") & 0x01) send = true;
+			if(ioport("INPUT1")->read() & 0x01) send = true;
 			break;
 		case 0x37:
-			if(input_port_read(machine(), "INPUT1") & 0x02) send = true;
+			if(ioport("INPUT1")->read() & 0x02) send = true;
 			break;
 		case 0x31:
-			if(input_port_read(machine(), "INPUT1") & 0x04) send = true;
+			if(ioport("INPUT1")->read() & 0x04) send = true;
 			break;
 		case 0x32:
-			if(input_port_read(machine(), "INPUT1") & 0x08) send = true;
+			if(ioport("INPUT1")->read() & 0x08) send = true;
 			break;
 		case 0x33:
-			if(input_port_read(machine(), "INPUT1") & 0x10) send = true;
+			if(ioport("INPUT1")->read() & 0x10) send = true;
 			break;
 
 		case 0x30:
-			if(input_port_read(machine(), "INPUT2") & 0x01) send = true;
+			if(ioport("INPUT2")->read() & 0x01) send = true;
 			break;
 		case 0x38:
-			if(input_port_read(machine(), "INPUT2") & 0x02) send = true;
+			if(ioport("INPUT2")->read() & 0x02) send = true;
 			break;
 		case 0x34:
-			if(input_port_read(machine(), "INPUT2") & 0x04) send = true;
+			if(ioport("INPUT2")->read() & 0x04) send = true;
 			break;
 		case 0x35:
-			if(input_port_read(machine(), "INPUT2") & 0x08) send = true;
+			if(ioport("INPUT2")->read() & 0x08) send = true;
 			break;
 		case 0x36:
-			if(input_port_read(machine(), "INPUT2") & 0x10) send = true;
+			if(ioport("INPUT2")->read() & 0x10) send = true;
 			break;
 	}
 

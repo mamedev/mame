@@ -89,7 +89,7 @@ static MACHINE_RESET( midvplus )
 
 READ32_MEMBER(midvunit_state::port0_r)
 {
-	UINT16 val = input_port_read(machine(), "IN0");
+	UINT16 val = ioport("IN0")->read();
 	UINT16 diff = val ^ m_last_port0;
 
 	/* make sure the shift controls are mutually exclusive */
@@ -143,7 +143,7 @@ WRITE32_MEMBER(midvunit_state::midvunit_adc_w)
 		int which = (data >> m_adc_shift) - 4;
 		if (which < 0 || which > 2)
 			logerror("adc_w: unexpected which = %02X\n", which + 4);
-		m_adc_data = input_port_read_safe(machine(), adcnames[which], 0);
+		m_adc_data = ioport(adcnames[which])->read_safe(0);
 		machine().scheduler().timer_set(attotime::from_msec(1), FUNC(adc_ready));
 	}
 	else
@@ -296,7 +296,7 @@ WRITE32_MEMBER(midvunit_state::tms32031_control_w)
 READ32_MEMBER(midvunit_state::crusnwld_serial_status_r)
 {
 	int status = midway_serial_pic_status_r();
-	return (input_port_read(machine(), "991030") & 0x7fff7fff) | (status << 31) | (status << 15);
+	return (ioport("991030")->read() & 0x7fff7fff) | (status << 31) | (status << 15);
 }
 
 
@@ -359,7 +359,7 @@ WRITE32_MEMBER(midvunit_state::bit_reset_w)
 READ32_MEMBER(midvunit_state::offroadc_serial_status_r)
 {
 	int status = midway_serial_pic2_status_r(&space);
-	return (input_port_read(machine(), "991030")  & 0x7fff7fff) | (status << 31) | (status << 15);
+	return (ioport("991030")->read()  & 0x7fff7fff) | (status << 31) | (status << 15);
 }
 
 

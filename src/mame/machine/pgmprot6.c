@@ -120,7 +120,7 @@ static READ16_HANDLER( olds_r )
 			res = state->m_olds_cmd3;
 		else if (state->m_kb_cmd == 5)
 		{
-			UINT32 protvalue = 0x900000 | input_port_read(space->machine(), "Region"); // region from protection device.
+			UINT32 protvalue = 0x900000 | state->ioport("Region")->read(); // region from protection device.
 			res = (protvalue >> (8 * (state->m_kb_ptr - 1))) & 0xff; // includes region 1 = taiwan , 2 = china, 3 = japan (title = orlegend special), 4 = korea, 5 = hongkong, 6 = world
 
 		}

@@ -214,7 +214,7 @@ CUSTOM_INPUT_MEMBER(mhavoc_state::mhavoc_bit67_r)
 {
 	const char *tag1 = (const char *)param;
 	const char *tag2 = tag1 + strlen(tag1) + 1;
-	return input_port_read(machine(), m_player_1 ? tag2 : tag1) & 0x03;
+	return ioport(m_player_1 ? tag2 : tag1)->read() & 0x03;
 }
 
 CUSTOM_INPUT_MEMBER(mhavoc_state::gamma_rcvd_r)

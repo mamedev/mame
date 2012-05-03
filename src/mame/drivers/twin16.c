@@ -176,13 +176,13 @@ READ16_MEMBER(twin16_state::twin16_input_r)
 {
 	switch( offset )
 	{
-		case 0x00: return input_port_read(machine(), "SYSTEM");
-		case 0x01: return input_port_read(machine(), "P1");
-		case 0x02: return input_port_read(machine(), "P2");
-		case 0x03: return input_port_read(machine(), "P3");
-		case 0x08: return input_port_read(machine(), "DSW2");
-		case 0x09: return input_port_read(machine(), "DSW1");
-		case 0x0c: return input_port_read(machine(), "DSW3");
+		case 0x00: return ioport("SYSTEM")->read();
+		case 0x01: return ioport("P1")->read();
+		case 0x02: return ioport("P2")->read();
+		case 0x03: return ioport("P3")->read();
+		case 0x08: return ioport("DSW2")->read();
+		case 0x09: return ioport("DSW1")->read();
+		case 0x0c: return ioport("DSW3")->read();
 		default: break;
 	}
 	return 0;

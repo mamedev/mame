@@ -113,7 +113,7 @@ SCREEN_UPDATE_IND16( momoko )
 	UINT8 *TEXT_COLOR = state->memregion("proms")->base();
 
 
-	flip = state->m_flipscreen ^ (input_port_read(screen.machine(), "FAKE") & 0x01);
+	flip = state->m_flipscreen ^ (screen.machine().root_device().ioport("FAKE")->read() & 0x01);
 
 	/* draw BG layer */
 	dx = (7 - state->m_bg_scrollx[0]) & 7;

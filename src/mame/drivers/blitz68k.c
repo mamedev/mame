@@ -1156,12 +1156,12 @@ WRITE16_MEMBER(blitz68k_state::hermit_leds2_w)
 READ16_MEMBER(blitz68k_state::hermit_track_r)
 {
 #ifdef MAME_DEBUG
-//  popmessage("track %02x %02x", input_port_read(machine(), "TRACK_X"), input_port_read(machine(), "TRACK_Y"));
+//  popmessage("track %02x %02x", ioport("TRACK_Y")->read());
 #endif
 
 	return
-		((0xf - ((input_port_read(machine(), "TRACK_Y") + 0x7) & 0xf)) << 12) |
-		((0xf - ((input_port_read(machine(), "TRACK_X") + 0x7) & 0xf)) << 8)  ;
+		((0xf - ((ioport("TRACK_Y")->read() + 0x7) & 0xf)) << 12) |
+		((0xf - ((ioport("TRACK_X")->read() + 0x7) & 0xf)) << 8)  ;
 }
 
 static ADDRESS_MAP_START( hermit_map, AS_PROGRAM, 16, blitz68k_state )
@@ -1737,14 +1737,14 @@ static TIMER_DEVICE_CALLBACK( steaser_mcu_sim )
 //  for(i=0;i<8;i+=2)
 //      state->m_nvram[((0x8a0)+i)/2] = 0;
 	/*finally, read the inputs*/
-	state->m_nvram[0x89e/2] = input_port_read(timer.machine(), "MENU") & 0xffff;
-	state->m_nvram[0x8a0/2] = input_port_read(timer.machine(), "STAT") & 0xffff;
-	state->m_nvram[0x8a2/2] = input_port_read(timer.machine(), "BET_DEAL") & 0xffff;
-	state->m_nvram[0x8a4/2] = input_port_read(timer.machine(), "TAKE_DOUBLE") & 0xffff;
-	state->m_nvram[0x8a6/2] = input_port_read(timer.machine(), "SMALL_BIG") & 0xffff;
-	state->m_nvram[0x8a8/2] = input_port_read(timer.machine(), "CANCEL_HOLD1") & 0xffff;
-	state->m_nvram[0x8aa/2] = input_port_read(timer.machine(), "HOLD2_HOLD3") & 0xffff;
-	state->m_nvram[0x8ac/2] = input_port_read(timer.machine(), "HOLD4_HOLD5") & 0xffff;
+	state->m_nvram[0x89e/2] = timer.machine().root_device().ioport("MENU")->read() & 0xffff;
+	state->m_nvram[0x8a0/2] = timer.machine().root_device().ioport("STAT")->read() & 0xffff;
+	state->m_nvram[0x8a2/2] = timer.machine().root_device().ioport("BET_DEAL")->read() & 0xffff;
+	state->m_nvram[0x8a4/2] = timer.machine().root_device().ioport("TAKE_DOUBLE")->read() & 0xffff;
+	state->m_nvram[0x8a6/2] = timer.machine().root_device().ioport("SMALL_BIG")->read() & 0xffff;
+	state->m_nvram[0x8a8/2] = timer.machine().root_device().ioport("CANCEL_HOLD1")->read() & 0xffff;
+	state->m_nvram[0x8aa/2] = timer.machine().root_device().ioport("HOLD2_HOLD3")->read() & 0xffff;
+	state->m_nvram[0x8ac/2] = timer.machine().root_device().ioport("HOLD4_HOLD5")->read() & 0xffff;
 }
 
 

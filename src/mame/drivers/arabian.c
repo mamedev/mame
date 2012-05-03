@@ -145,7 +145,7 @@ READ8_MEMBER(arabian_state::mcu_portk_r)
 		{
 			if (~sel & (1 << i))
 			{
-				val = input_port_read(machine(), comnames[i]);
+				val = ioport(comnames[i])->read();
 				break;
 			}
 		}

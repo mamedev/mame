@@ -579,7 +579,7 @@ READ8_MEMBER(dkong_state::dkong_in2_r)
 	UINT8 mcustatus = latch8_bit4_q_r(m_dev_vp2, 0);
 	UINT8 r;
 
-	r = (input_port_read(machine(), "IN2") & 0xBF) | (mcustatus << 6);
+	r = (ioport("IN2")->read() & 0xBF) | (mcustatus << 6);
 	coin_counter_w(machine(), offset, r >> 7);
 	if (r & 0x10)
 		r = (r & ~0x10) | 0x80; /* service ==> coin */
@@ -592,7 +592,7 @@ READ8_MEMBER(dkong_state::dkongjr_in2_r)
 
     UINT8 r;
 
-    r = (input_port_read(machine(), "IN2") & 0xBF) | 0x40;
+    r = (ioport("IN2")->read() & 0xBF) | 0x40;
     coin_counter_w(machine(), offset, r >> 7);
     if (r & 0x10)
         r = (r & ~0x10) | 0x80; /* service ==> coin */
@@ -724,30 +724,30 @@ WRITE8_MEMBER(dkong_state::dkong3_2a03_reset_w)
 
 READ8_MEMBER(dkong_state::strtheat_inputport_0_r)
 {
-    if(input_port_read(machine(), "DSW0") & 0x40)
+    if(ioport("DSW0")->read() & 0x40)
     {
         /* Joystick inputs */
-        return input_port_read(machine(), "IN0");
+        return ioport("IN0")->read();
     }
     else
     {
         /* Steering Wheel inputs */
-        return (input_port_read(machine(), "IN0") & ~3) | (input_port_read(machine(), "IN4") & 3);
+        return (ioport("IN4")->read() & 3);
     }
 }
 
 
 READ8_MEMBER(dkong_state::strtheat_inputport_1_r)
 {
-    if(input_port_read(machine(), "DSW0") & 0x40)
+    if(ioport("DSW0")->read() & 0x40)
     {
         /* Joystick inputs */
-        return input_port_read(machine(), "IN1");
+        return ioport("IN1")->read();
     }
     else
     {
         /* Steering Wheel inputs */
-        return (input_port_read(machine(), "IN1") & ~3) | (input_port_read(machine(), "IN5") & 3);
+        return (ioport("IN5")->read() & 3);
     }
 }
 
@@ -1196,7 +1196,7 @@ static INPUT_PORTS_START( hunchbkd )
     PORT_DIPSETTING(    0x0c, "80000" )
 
     PORT_START("SENSE") /* Sense */
-    PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
+    PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 
     PORT_INCLUDE( dkong_config )
 INPUT_PORTS_END
@@ -1240,7 +1240,7 @@ static INPUT_PORTS_START( shootgal )
     PORT_SERVICE( 0x80, IP_ACTIVE_HIGH )
 
     PORT_START("SENSE") /* Sense */
-    PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
+    PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 
     PORT_INCLUDE( dkong_config )
 INPUT_PORTS_END
@@ -1273,7 +1273,7 @@ static INPUT_PORTS_START( sbdk )
     PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x00, "SW1:!4" )
 
     PORT_START("SENSE") /* Sense */
-    PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
+    PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 
     PORT_INCLUDE( dkong_config )
 INPUT_PORTS_END
@@ -1292,7 +1292,7 @@ static INPUT_PORTS_START( herbiedk )
     PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x00, "SW1:!4" )
 
     PORT_START("SENSE") /* Sense */
-    PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_VBLANK )
+    PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 
     PORT_INCLUDE( dkong_config )
 INPUT_PORTS_END
@@ -1326,7 +1326,7 @@ static INPUT_PORTS_START( herodk )
     PORT_DIPSETTING(    0x0c, "3" )
 
     PORT_START("SENSE") /* Sense */
-    PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
+    PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 
     PORT_INCLUDE( dkong_config )
 INPUT_PORTS_END
@@ -1424,7 +1424,7 @@ static INPUT_PORTS_START( spclforc )
     PORT_DIPSETTING(    0xc0, DEF_STR( 1C_4C ) )
 
     PORT_START("SENSE") /* Sense */
-    PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_VBLANK )
+    PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 
     PORT_INCLUDE( dkong_config )
 INPUT_PORTS_END
@@ -1457,7 +1457,7 @@ static INPUT_PORTS_START( 8ballact )
     PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW1:!8" )
 
     PORT_START("SENSE") /* Sense */
-    PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_VBLANK )
+    PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 
     PORT_INCLUDE( dkong_config )
 INPUT_PORTS_END

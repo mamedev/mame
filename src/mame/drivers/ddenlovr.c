@@ -430,7 +430,7 @@ INLINE void log_draw_error( int src, int cmd )
 static int blit_draw( running_machine &machine, int src, int sx )
 {
 	dynax_state *state = machine.driver_data<dynax_state>();
-	UINT8 *src_data = machine.root_device().memregion("blitter")->base();
+	UINT8 *src_data = state->memregion("blitter")->base();
 	int src_len = state->memregion("blitter")->bytes();
 	int bit_addr = (src & 0xffffff) * state->m_ddenlovr_blit_rom_bits;	/* convert to bit address */
 	int pen_size, arg_size, cmd;
@@ -1597,9 +1597,9 @@ READ8_MEMBER(dynax_state::rongrong_input2_r)
 	/* 0 and 1 are read from offset 1, 2 from offset 0... */
 	switch (m_input_sel)
 	{
-		case 0x00:	return input_port_read(machine(), "P1");
-		case 0x01:	return input_port_read(machine(), "P2");
-		case 0x02:	return input_port_read(machine(), "SYSTEM");
+		case 0x00:	return ioport("P1")->read();
+		case 0x01:	return ioport("P2")->read();
+		case 0x02:	return ioport("SYSTEM")->read();
 	}
 	return 0xff;
 }
@@ -1609,9 +1609,9 @@ static READ8_DEVICE_HANDLER( quiz365_input_r )
 {
 	dynax_state *state = device->machine().driver_data<dynax_state>();
 
-	if (!BIT(state->m_dsw_sel, 0))	return input_port_read(device->machine(), "DSW1");
-	if (!BIT(state->m_dsw_sel, 1))	return input_port_read(device->machine(), "DSW2");
-	if (!BIT(state->m_dsw_sel, 2))	return input_port_read(device->machine(), "DSW3");
+	if (!BIT(state->m_dsw_sel, 0))	return state->ioport("DSW1")->read();
+	if (!BIT(state->m_dsw_sel, 1))	return state->ioport("DSW2")->read();
+	if (!BIT(state->m_dsw_sel, 2))	return state->ioport("DSW3")->read();
 	if (!BIT(state->m_dsw_sel, 3))	return 0xff;//device->machine().rand();
 	if (!BIT(state->m_dsw_sel, 4))	return 0xff;//device->machine().rand();
 	return 0xff;
@@ -1624,9 +1624,9 @@ READ16_MEMBER(dynax_state::quiz365_input2_r)
 	/* 0 and 1 are read from offset 1, 2 from offset 0... */
 	switch (m_input_sel)
 	{
-		case 0x10:	return input_port_read(machine(), "P1");
-		case 0x11:	return input_port_read(machine(), "P2");
-		case 0x12:	return input_port_read(machine(), "SYSTEM");
+		case 0x10:	return ioport("P1")->read();
+		case 0x11:	return ioport("P2")->read();
+		case 0x12:	return ioport("SYSTEM")->read();
 	}
 	return 0xff;
 }
@@ -1728,9 +1728,9 @@ ADDRESS_MAP_END
 READ16_MEMBER(dynax_state::ddenlovj_dsw_r)
 {
 	UINT16 dsw = 0;
-	if ((~*m_dsw_sel16) & 0x01)	dsw |= input_port_read(machine(), "DSW1");
-	if ((~*m_dsw_sel16) & 0x02)	dsw |= input_port_read(machine(), "DSW2");
-	if ((~*m_dsw_sel16) & 0x04)	dsw |= input_port_read(machine(), "DSW3");
+	if ((~*m_dsw_sel16) & 0x01)	dsw |= ioport("DSW1")->read();
+	if ((~*m_dsw_sel16) & 0x02)	dsw |= ioport("DSW2")->read();
+	if ((~*m_dsw_sel16) & 0x04)	dsw |= ioport("DSW3")->read();
 	return dsw;
 }
 
@@ -1888,9 +1888,9 @@ CUSTOM_INPUT_MEMBER(dynax_state::nettoqc_special_r)
 READ16_MEMBER(dynax_state::nettoqc_input_r)
 {
 
-	if (!BIT(m_dsw_sel, 0))	return input_port_read(machine(), "DSW1");
-	if (!BIT(m_dsw_sel, 1))	return input_port_read(machine(), "DSW2");
-	if (!BIT(m_dsw_sel, 2))	return input_port_read(machine(), "DSW3");
+	if (!BIT(m_dsw_sel, 0))	return ioport("DSW1")->read();
+	if (!BIT(m_dsw_sel, 1))	return ioport("DSW2")->read();
+	if (!BIT(m_dsw_sel, 2))	return ioport("DSW3")->read();
 	return 0xffff;
 }
 
@@ -1971,11 +1971,11 @@ ADDRESS_MAP_END
 READ8_MEMBER(dynax_state::rongrong_input_r)
 {
 
-	if (!BIT(m_dsw_sel, 0))	return input_port_read(machine(), "DSW1");
-	if (!BIT(m_dsw_sel, 1))	return input_port_read(machine(), "DSW2");
+	if (!BIT(m_dsw_sel, 0))	return ioport("DSW1")->read();
+	if (!BIT(m_dsw_sel, 1))	return ioport("DSW2")->read();
 	if (!BIT(m_dsw_sel, 2))	return 0xff;//machine().rand();
 	if (!BIT(m_dsw_sel, 3))	return 0xff;//machine().rand();
-	if (!BIT(m_dsw_sel, 4))	return input_port_read(machine(), "DSW3");
+	if (!BIT(m_dsw_sel, 4))	return ioport("DSW3")->read();
 	return 0xff;
 }
 
@@ -2252,9 +2252,9 @@ WRITE8_MEMBER(dynax_state::funkyfig_rombank_w)
 READ8_MEMBER(dynax_state::funkyfig_dsw_r)
 {
 
-	if (!BIT(m_dsw_sel, 0))  return input_port_read(machine(), "DSW1");
-	if (!BIT(m_dsw_sel, 1))  return input_port_read(machine(), "DSW2");
-	if (!BIT(m_dsw_sel, 2))  return input_port_read(machine(), "DSW3");
+	if (!BIT(m_dsw_sel, 0))  return ioport("DSW1")->read();
+	if (!BIT(m_dsw_sel, 1))  return ioport("DSW2")->read();
+	if (!BIT(m_dsw_sel, 2))  return ioport("DSW3")->read();
 	logerror("%06x: warning, unknown bits read, ddenlovr_select = %02x\n", cpu_get_pc(&space.device()), m_dsw_sel);
 	return 0xff;
 }
@@ -2264,7 +2264,7 @@ READ8_MEMBER(dynax_state::funkyfig_coin_r)
 
 	switch (m_input_sel)
 	{
-		case 0x22:	return input_port_read(machine(), "IN2");
+		case 0x22:	return ioport("IN2")->read();
 		case 0x23:	return m_funkyfig_lockout;
 	}
 	logerror("%06x: warning, unknown bits read, ddenlovr_select2 = %02x\n", cpu_get_pc(&space.device()), m_input_sel);
@@ -2276,8 +2276,8 @@ READ8_MEMBER(dynax_state::funkyfig_key_r)
 
 	switch (m_input_sel)
 	{
-		case 0x20:	return input_port_read(machine(), "IN0");
-		case 0x21:	return input_port_read(machine(), "IN1");
+		case 0x20:	return ioport("IN0")->read();
+		case 0x21:	return ioport("IN1")->read();
 	}
 	logerror("%06x: warning, unknown bits read, ddenlovr_select2 = %02x\n", cpu_get_pc(&space.device()), m_input_sel);
 	return 0xff;
@@ -2379,24 +2379,24 @@ READ8_MEMBER(dynax_state::hanakanz_keyb_r)
 
 	UINT8 val = 0xff;
 
-	if      (!BIT(m_keyb, 0))   val = input_port_read(machine(), offset ? "KEY5" : "KEY0");
-	else if (!BIT(m_keyb, 1))   val = input_port_read(machine(), offset ? "KEY6" : "KEY1");
-	else if (!BIT(m_keyb, 2))   val = input_port_read(machine(), offset ? "KEY7" : "KEY2");
-	else if (!BIT(m_keyb, 3))   val = input_port_read(machine(), offset ? "KEY8" : "KEY3");
-	else if (!BIT(m_keyb, 4))   val = input_port_read(machine(), offset ? "KEY9" : "KEY4");
+	if      (!BIT(m_keyb, 0))   val = ioport(offset ? "KEY5" : "KEY0")->read();
+	else if (!BIT(m_keyb, 1))   val = ioport(offset ? "KEY6" : "KEY1")->read();
+	else if (!BIT(m_keyb, 2))   val = ioport(offset ? "KEY7" : "KEY2")->read();
+	else if (!BIT(m_keyb, 3))   val = ioport(offset ? "KEY8" : "KEY3")->read();
+	else if (!BIT(m_keyb, 4))   val = ioport(offset ? "KEY9" : "KEY4")->read();
 
-	val |= input_port_read(machine(), offset ? "HOPPER" : "BET");
+	val |= ioport(offset ? "HOPPER" : "BET")->read();
 	return val;
 }
 
 READ8_MEMBER(dynax_state::hanakanz_dsw_r)
 {
 
-	if (!BIT(m_dsw_sel, 0))   return input_port_read(machine(), "DSW1");
-	if (!BIT(m_dsw_sel, 1))   return input_port_read(machine(), "DSW2");
-	if (!BIT(m_dsw_sel, 2))   return input_port_read(machine(), "DSW3");
-	if (!BIT(m_dsw_sel, 3))   return input_port_read(machine(), "DSW4");
-	if (!BIT(m_dsw_sel, 4))   return input_port_read(machine(), "DSW5");
+	if (!BIT(m_dsw_sel, 0))   return ioport("DSW1")->read();
+	if (!BIT(m_dsw_sel, 1))   return ioport("DSW2")->read();
+	if (!BIT(m_dsw_sel, 2))   return ioport("DSW3")->read();
+	if (!BIT(m_dsw_sel, 3))   return ioport("DSW4")->read();
+	if (!BIT(m_dsw_sel, 4))   return ioport("DSW5")->read();
 	return 0xff;
 }
 
@@ -2562,13 +2562,13 @@ READ8_MEMBER(dynax_state::mjchuuka_keyb_r)
 {
 	UINT8 val = 0xff;
 
-	if      (!BIT(m_keyb, 0))   val = input_port_read(machine(), offset ? "KEY5" : "KEY0");
-	else if (!BIT(m_keyb, 1))   val = input_port_read(machine(), offset ? "KEY6" : "KEY1");
-	else if (!BIT(m_keyb, 2))   val = input_port_read(machine(), offset ? "KEY7" : "KEY2");
-	else if (!BIT(m_keyb, 3))   val = input_port_read(machine(), offset ? "KEY8" : "KEY3");
-	else if (!BIT(m_keyb, 4))   val = input_port_read(machine(), offset ? "KEY9" : "KEY4");
+	if      (!BIT(m_keyb, 0))   val = ioport(offset ? "KEY5" : "KEY0")->read();
+	else if (!BIT(m_keyb, 1))   val = ioport(offset ? "KEY6" : "KEY1")->read();
+	else if (!BIT(m_keyb, 2))   val = ioport(offset ? "KEY7" : "KEY2")->read();
+	else if (!BIT(m_keyb, 3))   val = ioport(offset ? "KEY8" : "KEY3")->read();
+	else if (!BIT(m_keyb, 4))   val = ioport(offset ? "KEY9" : "KEY4")->read();
 
-	val |= input_port_read(machine(), offset ? "HOPPER" : "BET");
+	val |= ioport(offset ? "HOPPER" : "BET")->read();
 
 	if (offset)
 		val |= 0x80;	// blitter busy
@@ -2585,7 +2585,7 @@ WRITE8_MEMBER(dynax_state::mjchuuka_blitter_w)
 static void mjchuuka_get_romdata(running_machine &machine)
 {
 	dynax_state *state = machine.driver_data<dynax_state>();
-	UINT8 *rom = machine.root_device().memregion("blitter")->base();
+	UINT8 *rom = state->memregion("blitter")->base();
 	size_t size = state->memregion("blitter")->bytes();
 	int address = (state->m_ddenlovr_blit_address & 0xffffff) * 2;
 
@@ -2716,7 +2716,7 @@ READ8_MEMBER(dynax_state::mjmyster_coins_r)
 
 	switch (m_input_sel)
 	{
-		case 0x00:	return input_port_read(machine(), "SYSTEM");
+		case 0x00:	return ioport("SYSTEM")->read();
 		case 0x01:	return 0xff;
 		case 0x02:	return 0xff;	// bit 7 = 0 -> blitter busy, + hopper switch
 		case 0x03:	return 0xff;
@@ -2731,11 +2731,11 @@ READ8_MEMBER(dynax_state::mjmyster_keyb_r)
 {
 	UINT8 ret = 0xff;
 
-	if      (BIT(m_keyb, 0))   ret = input_port_read(machine(), "KEY0");
-	else if (BIT(m_keyb, 1))   ret = input_port_read(machine(), "KEY1");
-	else if (BIT(m_keyb, 2))   ret = input_port_read(machine(), "KEY2");
-	else if (BIT(m_keyb, 3))   ret = input_port_read(machine(), "KEY3");
-	else if (BIT(m_keyb, 4))   ret = input_port_read(machine(), "KEY4");
+	if      (BIT(m_keyb, 0))   ret = ioport("KEY0")->read();
+	else if (BIT(m_keyb, 1))   ret = ioport("KEY1")->read();
+	else if (BIT(m_keyb, 2))   ret = ioport("KEY2")->read();
+	else if (BIT(m_keyb, 3))   ret = ioport("KEY3")->read();
+	else if (BIT(m_keyb, 4))   ret = ioport("KEY4")->read();
 	else	logerror("%06x: warning, unknown bits read, keyb = %02x\n", cpu_get_pc(&space.device()), m_keyb);
 
 	m_keyb <<= 1;
@@ -2746,11 +2746,11 @@ READ8_MEMBER(dynax_state::mjmyster_keyb_r)
 READ8_MEMBER(dynax_state::mjmyster_dsw_r)
 {
 
-	if (!BIT(m_dsw_sel, 0))   return input_port_read(machine(), "DSW4");
-	if (!BIT(m_dsw_sel, 1))   return input_port_read(machine(), "DSW3");
-	if (!BIT(m_dsw_sel, 2))   return input_port_read(machine(), "DSW2");
-	if (!BIT(m_dsw_sel, 3))   return input_port_read(machine(), "DSW1");
-	if (!BIT(m_dsw_sel, 4))   return input_port_read(machine(), "DSW5");
+	if (!BIT(m_dsw_sel, 0))   return ioport("DSW4")->read();
+	if (!BIT(m_dsw_sel, 1))   return ioport("DSW3")->read();
+	if (!BIT(m_dsw_sel, 2))   return ioport("DSW2")->read();
+	if (!BIT(m_dsw_sel, 3))   return ioport("DSW1")->read();
+	if (!BIT(m_dsw_sel, 4))   return ioport("DSW5")->read();
 	logerror("%06x: warning, unknown bits read, ddenlovr_select = %02x\n", cpu_get_pc(&space.device()), m_dsw_sel);
 	return 0xff;
 }
@@ -2841,11 +2841,11 @@ static READ8_DEVICE_HANDLER( hginga_dsw_r )
 {
 	dynax_state *state = device->machine().driver_data<dynax_state>();
 
-	if (!BIT(state->m_dsw_sel, 0))   return input_port_read(device->machine(), "DSW4");
-	if (!BIT(state->m_dsw_sel, 1))   return input_port_read(device->machine(), "DSW3");
-	if (!BIT(state->m_dsw_sel, 2))   return input_port_read(device->machine(), "DSW2");
-	if (!BIT(state->m_dsw_sel, 3))   return input_port_read(device->machine(), "DSW1");
-	if (!BIT(state->m_dsw_sel, 4))   return input_port_read(device->machine(), "DSW5");
+	if (!BIT(state->m_dsw_sel, 0))   return state->ioport("DSW4")->read();
+	if (!BIT(state->m_dsw_sel, 1))   return state->ioport("DSW3")->read();
+	if (!BIT(state->m_dsw_sel, 2))   return state->ioport("DSW2")->read();
+	if (!BIT(state->m_dsw_sel, 3))   return state->ioport("DSW1")->read();
+	if (!BIT(state->m_dsw_sel, 4))   return state->ioport("DSW5")->read();
 
 	logerror("%s: warning, unknown bits read, ddenlovr_select = %02x\n", device->machine().describe_context(), state->m_dsw_sel);
 	return 0xff;
@@ -2862,8 +2862,8 @@ READ8_MEMBER(dynax_state::hginga_coins_r)
 
 	switch (m_input_sel)
 	{
-		case 0x20:	return input_port_read(machine(), "SYSTEM");
-		case 0x21:	return input_port_read(machine(), "BET");
+		case 0x20:	return ioport("SYSTEM")->read();
+		case 0x21:	return ioport("BET")->read();
 		case 0x22:	return 0x7f;	// bit 7 = blitter busy, bit 6 = hopper
 		case 0x23:	return m_coins;
 	}
@@ -2912,11 +2912,11 @@ READ8_MEMBER(dynax_state::hginga_input_r)
 
 		// player 1
 		case 0xa1:
-			return input_port_read(machine(), keynames0[m_keyb++]);
+			return ioport(keynames0[m_keyb++])->read();
 
 		// player 2
 		case 0xa2:
-			return input_port_read(machine(), keynames1[m_keyb++]);
+			return ioport(keynames1[m_keyb++])->read();
 	}
 	logerror("%04x: input_r with select = %02x\n", cpu_get_pc(&space.device()), m_input_sel);
 	return 0xff;
@@ -2988,11 +2988,11 @@ static UINT8 hgokou_player_r( address_space *space, int player )
 	dynax_state *state = space->machine().driver_data<dynax_state>();
 	UINT8 hopper_bit = ((state->m_hopper && !(space->machine().primary_screen->frame_number() % 10)) ? 0 : (1 << 6));
 
-	if (!BIT(state->m_input_sel, 0))   return input_port_read(space->machine(), player ? "KEY5" : "KEY0") | hopper_bit;
-	if (!BIT(state->m_input_sel, 1))   return input_port_read(space->machine(), player ? "KEY6" : "KEY1") | hopper_bit;
-	if (!BIT(state->m_input_sel, 2))   return input_port_read(space->machine(), player ? "KEY7" : "KEY2") | hopper_bit;
-	if (!BIT(state->m_input_sel, 3))   return input_port_read(space->machine(), player ? "KEY8" : "KEY3") | hopper_bit;
-	if (!BIT(state->m_input_sel, 4))   return input_port_read(space->machine(), player ? "KEY9" : "KEY4") | hopper_bit;
+	if (!BIT(state->m_input_sel, 0))   return state->ioport(player ? "KEY5" : "KEY0")->read() | hopper_bit;
+	if (!BIT(state->m_input_sel, 1))   return state->ioport(player ? "KEY6" : "KEY1")->read() | hopper_bit;
+	if (!BIT(state->m_input_sel, 2))   return state->ioport(player ? "KEY7" : "KEY2")->read() | hopper_bit;
+	if (!BIT(state->m_input_sel, 3))   return state->ioport(player ? "KEY8" : "KEY3")->read() | hopper_bit;
+	if (!BIT(state->m_input_sel, 4))   return state->ioport(player ? "KEY9" : "KEY4")->read() | hopper_bit;
 
 	return 0x7f;	// bit 7 = blitter busy, bit 6 = hopper
 }
@@ -3007,7 +3007,7 @@ READ8_MEMBER(dynax_state::hgokou_input_r)
 
 	switch (m_dsw_sel)
 	{
-		case 0x20:	return input_port_read(machine(), "SYSTEM");
+		case 0x20:	return ioport("SYSTEM")->read();
 		case 0x21:	return hgokou_player_r(&space, 1);
 		case 0x22:	return hgokou_player_r(&space, 0);
 		case 0x23:	return m_coins;
@@ -3170,12 +3170,12 @@ READ8_MEMBER(dynax_state::hparadis_input_r)
 
 	switch (m_input_sel)
 	{
-		case 0x00:	return input_port_read(machine(), "P1");
-		case 0x01:	return input_port_read(machine(), "P2");
-		case 0x02:	return input_port_read(machine(), "SYSTEM");
+		case 0x00:	return ioport("P1")->read();
+		case 0x01:	return ioport("P2")->read();
+		case 0x02:	return ioport("SYSTEM")->read();
 		case 0x0d:	return 0x00;
-		case 0x80:	return input_port_read(machine(), keynames0[m_keyb++]);	// P1 (Keys)
-		case 0x81:	return input_port_read(machine(), keynames1[m_keyb++]);	// P2 (Keys)
+		case 0x80:	return ioport(keynames0[m_keyb++])->read();	// P1 (Keys)
+		case 0x81:	return ioport(keynames1[m_keyb++])->read();	// P2 (Keys)
 	}
 	logerror("%06x: warning, unknown bits read, input_sel = %02x\n", cpu_get_pc(&space.device()), m_input_sel);
 	return 0xff;
@@ -3184,11 +3184,11 @@ READ8_MEMBER(dynax_state::hparadis_input_r)
 READ8_MEMBER(dynax_state::hparadis_dsw_r)
 {
 
-	if (!BIT(m_dsw_sel, 0))	return input_port_read(machine(), "DSW1");
-	if (!BIT(m_dsw_sel, 1))	return input_port_read(machine(), "DSW2");
+	if (!BIT(m_dsw_sel, 0))	return ioport("DSW1")->read();
+	if (!BIT(m_dsw_sel, 1))	return ioport("DSW2")->read();
 	if (!BIT(m_dsw_sel, 2))	return 0xff;
 	if (!BIT(m_dsw_sel, 3))	return 0xff;
-	if (!BIT(m_dsw_sel, 4))	return input_port_read(machine(), "DSW3");
+	if (!BIT(m_dsw_sel, 4))	return ioport("DSW3")->read();
 	return 0xff;
 }
 
@@ -3246,7 +3246,7 @@ READ8_MEMBER(dynax_state::mjmywrld_coins_r)
 
 	switch (m_input_sel)
 	{
-		case 0x80:	return input_port_read(machine(), "SYSTEM");
+		case 0x80:	return ioport("SYSTEM")->read();
 		case 0x81:	return 0x00;
 		case 0x82:	return 0xff;	// bit 7 = 0 -> blitter busy, + hopper switch
 		case 0x83:	return 0x00;
@@ -3316,8 +3316,8 @@ READ16_MEMBER(dynax_state::akamaru_dsw_r)
 {
 	UINT16 dsw = 0;
 
-	if (m_dsw_sel16[1] == 0xff)	dsw |= input_port_read(machine(), "DSW1");
-	if (m_dsw_sel16[0] == 0xff)	dsw |= input_port_read(machine(), "DSW2");
+	if (m_dsw_sel16[1] == 0xff)	dsw |= ioport("DSW1")->read();
+	if (m_dsw_sel16[0] == 0xff)	dsw |= ioport("DSW2")->read();
 	return dsw;
 }
 
@@ -3402,11 +3402,11 @@ READ8_MEMBER(dynax_state::mjflove_keyb_r)
 {
 	UINT8 val = 0xff;
 
-	if      (!BIT(m_keyb, 0))   val = input_port_read(machine(), offset ? "KEY5" : "KEY0");
-	else if (!BIT(m_keyb, 1))   val = input_port_read(machine(), offset ? "KEY6" : "KEY1");
-	else if (!BIT(m_keyb, 2))   val = input_port_read(machine(), offset ? "KEY7" : "KEY2");
-	else if (!BIT(m_keyb, 3))   val = input_port_read(machine(), offset ? "KEY8" : "KEY3");
-	else if (!BIT(m_keyb, 4))   val = input_port_read(machine(), offset ? "KEY9" : "KEY4");
+	if      (!BIT(m_keyb, 0))   val = ioport(offset ? "KEY5" : "KEY0")->read();
+	else if (!BIT(m_keyb, 1))   val = ioport(offset ? "KEY6" : "KEY1")->read();
+	else if (!BIT(m_keyb, 2))   val = ioport(offset ? "KEY7" : "KEY2")->read();
+	else if (!BIT(m_keyb, 3))   val = ioport(offset ? "KEY8" : "KEY3")->read();
+	else if (!BIT(m_keyb, 4))   val = ioport(offset ? "KEY9" : "KEY4")->read();
 
 	return val;
 }
@@ -3524,13 +3524,13 @@ READ8_MEMBER(dynax_state::sryudens_keyb_r)
 {
 	UINT8 val = 0x3f;
 
-	if      (!BIT(m_keyb, 0))   val = input_port_read(machine(), offset ? "KEY5" : "KEY0");
-	else if (!BIT(m_keyb, 1))   val = input_port_read(machine(), offset ? "KEY6" : "KEY1");
-	else if (!BIT(m_keyb, 2))   val = input_port_read(machine(), offset ? "KEY7" : "KEY2");
-	else if (!BIT(m_keyb, 3))   val = input_port_read(machine(), offset ? "KEY8" : "KEY3");
-	else if (!BIT(m_keyb, 4))   val = input_port_read(machine(), offset ? "KEY9" : "KEY4");
+	if      (!BIT(m_keyb, 0))   val = ioport(offset ? "KEY5" : "KEY0")->read();
+	else if (!BIT(m_keyb, 1))   val = ioport(offset ? "KEY6" : "KEY1")->read();
+	else if (!BIT(m_keyb, 2))   val = ioport(offset ? "KEY7" : "KEY2")->read();
+	else if (!BIT(m_keyb, 3))   val = ioport(offset ? "KEY8" : "KEY3")->read();
+	else if (!BIT(m_keyb, 4))   val = ioport(offset ? "KEY9" : "KEY4")->read();
 
-	val |= input_port_read(machine(), offset ? "HOPPER" : "BET");
+	val |= ioport(offset ? "HOPPER" : "BET")->read();
 	if (offset)
 		val &= 0x7f;	// bit 7 = blitter busy
 	return val;
@@ -3600,13 +3600,13 @@ READ8_MEMBER(dynax_state::daimyojn_keyb1_r)
 {
 	UINT8 val = 0x3f;
 
-	if      (!BIT(m_keyb, 0))  val = input_port_read(machine(), "KEY0");
-	else if (!BIT(m_keyb, 1))  val = input_port_read(machine(), "KEY1");
-	else if (!BIT(m_keyb, 2))  val = input_port_read(machine(), "KEY2");
-	else if (!BIT(m_keyb, 3))  val = input_port_read(machine(), "KEY3");
-	else if (!BIT(m_keyb, 4))  val = input_port_read(machine(), "KEY4");
+	if      (!BIT(m_keyb, 0))  val = ioport("KEY0")->read();
+	else if (!BIT(m_keyb, 1))  val = ioport("KEY1")->read();
+	else if (!BIT(m_keyb, 2))  val = ioport("KEY2")->read();
+	else if (!BIT(m_keyb, 3))  val = ioport("KEY3")->read();
+	else if (!BIT(m_keyb, 4))  val = ioport("KEY4")->read();
 
-	val |= input_port_read(machine(), "BET");
+	val |= ioport("BET")->read();
 	return val;
 }
 
@@ -3614,13 +3614,13 @@ READ8_MEMBER(dynax_state::daimyojn_keyb2_r)
 {
 	UINT8 val = 0x3f;
 
-	if      (!BIT(m_keyb, 0))  val = input_port_read(machine(), "KEY5");
-	else if (!BIT(m_keyb, 1))  val = input_port_read(machine(), "KEY6");
-	else if (!BIT(m_keyb, 2))  val = input_port_read(machine(), "KEY7");
-	else if (!BIT(m_keyb, 3))  val = input_port_read(machine(), "KEY8");
-	else if (!BIT(m_keyb, 4))  val = input_port_read(machine(), "KEY9");
+	if      (!BIT(m_keyb, 0))  val = ioport("KEY5")->read();
+	else if (!BIT(m_keyb, 1))  val = ioport("KEY6")->read();
+	else if (!BIT(m_keyb, 2))  val = ioport("KEY7")->read();
+	else if (!BIT(m_keyb, 3))  val = ioport("KEY8")->read();
+	else if (!BIT(m_keyb, 4))  val = ioport("KEY9")->read();
 
-	val |= input_port_read(machine(), "HOPPER");
+	val |= ioport("HOPPER")->read();
 	return val;
 }
 

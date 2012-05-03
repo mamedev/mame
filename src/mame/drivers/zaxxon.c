@@ -356,7 +356,7 @@ CUSTOM_INPUT_MEMBER(zaxxon_state::razmataz_dial_r)
 	int num = (FPTR)param;
 	int delta, res;
 
-	delta = input_port_read(machine(), dialname[num]);
+	delta = ioport(dialname[num])->read();
 
 	if (delta < 0x80)
 	{

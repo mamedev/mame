@@ -80,12 +80,12 @@ READ16_MEMBER(sengokmj_state::mahjong_panel_r)
 {
 	switch(m_sengokumj_mux_data)
 	{
-		case 0x0100: return input_port_read(machine(), "KEY0");
-		case 0x0200: return input_port_read(machine(), "KEY1");
-		case 0x0400: return input_port_read(machine(), "KEY2");
-		case 0x0800: return input_port_read(machine(), "KEY3");
-		case 0x1000: return input_port_read(machine(), "KEY4");
-		case 0x2000: return input_port_read(machine(), "UNUSED");
+		case 0x0100: return ioport("KEY0")->read();
+		case 0x0200: return ioport("KEY1")->read();
+		case 0x0400: return ioport("KEY2")->read();
+		case 0x0800: return ioport("KEY3")->read();
+		case 0x1000: return ioport("KEY4")->read();
+		case 0x2000: return ioport("UNUSED")->read();
 	}
 
 	return 0xffff;
@@ -111,7 +111,7 @@ WRITE16_MEMBER(sengokmj_state::sengokmj_out_w)
 
 READ16_MEMBER(sengokmj_state::sengokmj_system_r)
 {
-	return (input_port_read(machine(), "SYSTEM") & 0xffbf) | m_hopper_io;
+	return (ioport("SYSTEM")->read() & 0xffbf) | m_hopper_io;
 }
 
 static ADDRESS_MAP_START( sengokmj_map, AS_PROGRAM, 16, sengokmj_state )

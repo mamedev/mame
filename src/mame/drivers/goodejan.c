@@ -88,11 +88,11 @@ READ16_MEMBER(goodejan_state::mahjong_panel_r)
 
 	switch(m_mux_data)
 	{
-		case 1:    ret = input_port_read(machine(), "KEY0"); break;
-		case 2:    ret = input_port_read(machine(), "KEY1"); break;
-		case 4:    ret = input_port_read(machine(), "KEY2"); break;
-		case 8:    ret = input_port_read(machine(), "KEY3"); break;
-		case 0x10: ret = input_port_read(machine(), "KEY4"); break;
+		case 1:    ret = ioport("KEY0")->read(); break;
+		case 2:    ret = ioport("KEY1")->read(); break;
+		case 4:    ret = ioport("KEY2")->read(); break;
+		case 8:    ret = ioport("KEY3")->read(); break;
+		case 0x10: ret = ioport("KEY4")->read(); break;
 	}
 
 	return ret;

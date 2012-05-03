@@ -61,8 +61,8 @@ static int get_lightgun_pos(screen_device &screen, int player, int *x, int *y)
 {
 	const rectangle &visarea = screen.visible_area();
 
-	int xpos = input_port_read_safe(screen.machine(), (player == 0) ? "GUN1X" : "GUN2X", 0xffffffff);
-	int ypos = input_port_read_safe(screen.machine(), (player == 0) ? "GUN1Y" : "GUN2Y", 0xffffffff);
+	int xpos = screen.machine().root_device().ioport((player == 0) ? "GUN1X" : "GUN2X")->read_safe(0xffffffff);
+	int ypos = screen.machine().root_device().ioport((player == 0) ? "GUN1Y" : "GUN2Y")->read_safe(0xffffffff);
 
 	if (xpos == -1 || ypos == -1)
 		return FALSE;
@@ -201,7 +201,7 @@ CUSTOM_INPUT_MEMBER(alg_state::lightgun_trigger_r)
 {
 
 	/* read the trigger control based on the input select */
-	return (input_port_read(machine(), "TRIGGERS") >> m_input_select) & 1;
+	return (ioport("TRIGGERS")->read() >> m_input_select) & 1;
 }
 
 
@@ -209,7 +209,7 @@ CUSTOM_INPUT_MEMBER(alg_state::lightgun_holster_r)
 {
 
 	/* read the holster control based on the input select */
-	return (input_port_read(machine(), "TRIGGERS") >> (2 + m_input_select)) & 1;
+	return (ioport("TRIGGERS")->read() >> (2 + m_input_select)) & 1;
 }
 
 
@@ -240,7 +240,7 @@ static WRITE8_DEVICE_HANDLER( alg_cia_0_porta_w )
 
 static READ8_DEVICE_HANDLER( alg_cia_0_porta_r )
 {
-	return input_port_read(device->machine(), "FIRE") | 0x3f;
+	return device->machine().root_device().ioport("FIRE")->read() | 0x3f;
 }
 
 

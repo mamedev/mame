@@ -130,7 +130,7 @@ static int video_update_stratvox_ttmahjng(running_machine &machine, bitmap_rgb32
 	route16_state *state = machine.driver_data<route16_state>();
 	offs_t offs;
 
-	UINT8 *color_prom1 = &machine.root_device().memregion("proms")->base()[0x000];
+	UINT8 *color_prom1 = &state->memregion("proms")->base()[0x000];
 	UINT8 *color_prom2 = &state->memregion("proms")->base()[0x100];
 
 	for (offs = 0; offs < state->m_videoram1.bytes(); offs++)

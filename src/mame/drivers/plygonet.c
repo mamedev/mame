@@ -110,8 +110,8 @@ static READ32_DEVICE_HANDLER( polygonet_eeprom_r )
 	}
 	else
 	{
-		UINT8 lowInputBits = input_port_read(device->machine(), "IN1");
-		UINT8 highInputBits = input_port_read(device->machine(), "IN0");
+		UINT8 lowInputBits = device->machine().root_device().ioport("IN1")->read();
+		UINT8 highInputBits = device->machine().root_device().ioport("IN0")->read();
 		return ((highInputBits << 24) | (lowInputBits << 16));
 	}
 
@@ -124,7 +124,7 @@ WRITE32_MEMBER(polygonet_state::polygonet_eeprom_w)
 {
 	if (ACCESSING_BITS_24_31)
 	{
-		input_port_write(machine(), "EEPROMOUT", data, 0xffffffff);
+		ioport("EEPROMOUT")->write(data, 0xffffffff);
 		return;
 	}
 

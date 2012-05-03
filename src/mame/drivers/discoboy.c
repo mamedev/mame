@@ -560,7 +560,7 @@ ROM_END
 static DRIVER_INIT( discoboy )
 {
 	discoboy_state *state = machine.driver_data<discoboy_state>();
-	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
+	UINT8 *ROM = state->memregion("maincpu")->base();
 	UINT8 *AUDIO = state->memregion("audiocpu")->base();
 
 	memset(state->m_ram_1, 0, sizeof(state->m_ram_1));

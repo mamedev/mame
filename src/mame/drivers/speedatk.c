@@ -94,7 +94,7 @@ static UINT8 iox_key_matrix_calc(running_machine &machine, UINT8 p_side)
 
 		for (t = 0 ; t < 8 ; t ++)
 		{
-			if (!(input_port_read(machine, keynames[j+p_side]) & ( 1 << t )))
+			if (!(machine.root_device().ioport(keynames[j+p_side])->read() & ( 1 << t )))
 			{
 				return (i + t) | (p_side ? 0x20 : 0x00);
 			}
@@ -113,7 +113,7 @@ READ8_MEMBER(speedatk_state::key_matrix_r)
 		return 0x80;
 	}
 
-	if((input_port_read(machine(),"COINS") & 1) || (input_port_read(machine(),"COINS") & 2))
+	if((ioport("COINS")->read() & 1) || (ioport("COINS")->read() & 2))
 	{
 		m_coin_impulse = m_coin_settings;
 		m_coin_impulse--;

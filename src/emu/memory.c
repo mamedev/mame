@@ -397,7 +397,7 @@ public:
 	void set_legacy_func(device_t &device, read64_device_func func, const char *name, UINT64 mask = 0);
 
 	// configure I/O port access
-	void set_ioport(const input_port_config &ioport);
+	void set_ioport(ioport_port &ioport);
 
 	// read via the underlying delegates
 	UINT8 read8(address_space &space, offs_t offset, UINT8 mask) const { return m_read.r8(space, offset, mask); }
@@ -419,7 +419,7 @@ private:
 
 	// stubs for reading I/O ports
 	template<typename _UintType>
-	_UintType read_stub_ioport(address_space &space, offs_t offset, _UintType mask) { return input_port_read_direct(m_ioport); }
+	_UintType read_stub_ioport(address_space &space, offs_t offset, _UintType mask) { return m_ioport->read(); }
 
 	// internal helper
 	virtual void remove_subunit(int entry);
@@ -427,7 +427,7 @@ private:
 	// internal state
 	access_handler				m_read;
 	access_handler				m_subread[8];
-	const input_port_config *	m_ioport;
+	ioport_port *	m_ioport;
 
 	bool m_sub_is_legacy[8];
 	legacy_info m_legacy_info;
@@ -504,7 +504,7 @@ public:
 	void set_legacy_func(device_t &device, write64_device_func func, const char *name, UINT64 mask = 0);
 
 	// configure I/O port access
-	void set_ioport(const input_port_config &ioport);
+	void set_ioport(ioport_port &ioport);
 
 	// write via the underlying delegates
 	void write8(address_space &space, offs_t offset, UINT8 data, UINT8 mask) const { m_write.w8(space, offset, data, mask); }
@@ -526,7 +526,7 @@ private:
 
 	// stubs for writing I/O ports
 	template<typename _UintType>
-	void write_stub_ioport(address_space &space, offs_t offset, _UintType data, _UintType mask) { input_port_write_direct(m_ioport, data, mask); }
+	void write_stub_ioport(address_space &space, offs_t offset, _UintType data, _UintType mask) { m_ioport->write(data, mask); }
 
 	// internal helper
 	virtual void remove_subunit(int entry);
@@ -534,7 +534,7 @@ private:
 	// internal state
 	access_handler				m_write;
 	access_handler				m_subwrite[8];
-	const input_port_config *	m_ioport;
+	ioport_port *	m_ioport;
 
 	bool m_sub_is_legacy[8];
 	legacy_info m_legacy_info;
@@ -571,7 +571,7 @@ public:
 	}
 
 	// forward I/O port access configuration
-	void set_ioport(const input_port_config &ioport) const {
+	void set_ioport(ioport_port &ioport) const {
 		for (typename std::list<_HandlerEntry *>::const_iterator i = handlers.begin(); i != handlers.end(); i++)
 			(*i)->set_ioport(ioport);
 	}
@@ -2323,7 +2323,7 @@ void address_space::install_readwrite_port(offs_t addrstart, offs_t addrend, off
 	{
 		// find the port
 		astring fulltag;
-		input_port_config *port = machine().root_device().ioport(device().siblingtag(fulltag, rtag));
+		ioport_port *port = machine().root_device().ioport(device().siblingtag(fulltag, rtag));
 		if (port == NULL)
 			throw emu_fatalerror("Attempted to map non-existent port '%s' for read in space %s of device '%s'\n", rtag, m_name, m_device.tag());
 
@@ -2335,7 +2335,7 @@ void address_space::install_readwrite_port(offs_t addrstart, offs_t addrend, off
 	{
 		// find the port
 		astring fulltag;
-		input_port_config *port = machine().root_device().ioport(device().siblingtag(fulltag, wtag));
+		ioport_port *port = machine().root_device().ioport(device().siblingtag(fulltag, wtag));
 		if (port == NULL)
 			fatalerror("Attempted to map non-existent port '%s' for write in space %s of device '%s'\n", wtag, m_name, m_device.tag());
 
@@ -4958,7 +4958,7 @@ void handler_entry_read::set_legacy_func(device_t &device, read64_device_func fu
 //  of the appropriate size
 //-------------------------------------------------
 
-void handler_entry_read::set_ioport(const input_port_config &ioport)
+void handler_entry_read::set_ioport(ioport_port &ioport)
 {
 	m_ioport = &ioport;
 	if (m_datawidth == 8)
@@ -5413,7 +5413,7 @@ void handler_entry_write::set_legacy_func(device_t &device, write64_device_func 
 //  of the appropriate size
 //-------------------------------------------------
 
-void handler_entry_write::set_ioport(const input_port_config &ioport)
+void handler_entry_write::set_ioport(ioport_port &ioport)
 {
 	m_ioport = &ioport;
 	if (m_datawidth == 8)

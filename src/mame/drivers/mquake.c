@@ -107,7 +107,7 @@ static WRITE16_HANDLER( output_w )
 static READ16_HANDLER( coin_chip_r )
 {
 	if (offset == 1)
-		return input_port_read(space->machine(), "COINCHIP");
+		return space->machine().root_device().ioport("COINCHIP")->read();
 	logerror("%06x:coin_chip_r(%02x) & %04x\n", cpu_get_pc(&space->device()), offset, mem_mask);
 	return 0xffff;
 }

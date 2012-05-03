@@ -203,7 +203,7 @@ void devcb_stub16(device_t *device, offs_t offset, UINT16 data, UINT16 mask)
 // resolving a devcb may produce one of the following object types
 union devcb_resolved_objects
 {
-	const input_port_config *	port;
+	ioport_port *	port;
 	address_space *				space;
 	device_t *					device;
 	device_execute_interface *	execute;

@@ -493,7 +493,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 {
 	videopkr_state *state = machine.driver_data<videopkr_state>();
 	int offs = tile_index;
-	int attr = state->m_color_ram[offs] + input_port_read(machine, "IN2"); /* Color Switch Action */
+	int attr = state->m_color_ram[offs] + state->ioport("IN2")->read(); /* Color Switch Action */
 	int code = state->m_video_ram[offs];
 	int color = attr;
 	SET_TILE_INFO(0, code, color, 0);
@@ -536,9 +536,9 @@ READ8_MEMBER(videopkr_state::videopkr_io_r)
 	{
 		case 0xef:	/* inputs are multiplexed through a diode matrix */
 		{
-			hf = ((input_port_read(machine(), "IN1") & 0x10 ) >> 4) & 1;			/* Hopper full detection */
-			co = 0x10 * ((input_port_read(machine(), "IN1") & 0x20 ) >> 5);		/* Coin Out detection */
-			kbdin = ((input_port_read(machine(), "IN1") & 0xaf ) << 8) + input_port_read(machine(), "IN0");
+			hf = ((ioport("IN1")->read() & 0x10 ) >> 4) & 1;			/* Hopper full detection */
+			co = 0x10 * ((ioport("IN1")->read() & 0x20 ) >> 5);		/* Coin Out detection */
+			kbdin = ((ioport("IN1")->read() & 0xaf ) << 8) + ioport("IN0")->read();
 
 			switch (kbdin)
 			{

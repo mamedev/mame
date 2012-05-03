@@ -352,7 +352,7 @@ static WRITE8_DEVICE_HANDLER( astinvad_sound2_w )
 	if (bits_gone_hi & 0x08) state->m_samples->start(5, SND_FLEET4);
 	if (bits_gone_hi & 0x10) state->m_samples->start(4, SND_UFOHIT);
 
-	state->m_screen_flip = (input_port_read(device->machine(), "CABINET") & data & 0x20) ? 0xff : 0x00;
+	state->m_screen_flip = (state->ioport("CABINET")->read() & data & 0x20) ? 0xff : 0x00;
 }
 
 
@@ -383,7 +383,7 @@ WRITE8_MEMBER(astinvad_state::spaceint_sound2_w)
 
 	if (bits_gone_hi & 0x04) m_samples->start(3, SND_INVADERHIT);
 
-	m_screen_flip = (input_port_read(machine(), "CABINET") & data & 0x80) ? 0xff : 0x00;
+	m_screen_flip = (ioport("CABINET")->read() & data & 0x80) ? 0xff : 0x00;
 }
 
 
@@ -460,7 +460,7 @@ static INPUT_PORTS_START( kamikaze )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_COCKTAIL
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("CABINET")

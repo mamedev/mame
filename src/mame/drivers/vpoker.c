@@ -158,7 +158,7 @@ static SCREEN_UPDATE_IND16( vpoker )
 READ8_MEMBER(vpoker_state::blitter_r)
 {
 	if(offset == 6)
-		return input_port_read(machine(), "IN0");
+		return ioport("IN0")->read();
 
 	return 0;
 }

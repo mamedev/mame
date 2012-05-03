@@ -222,10 +222,10 @@ static READ8_DEVICE_HANDLER(meyc8088_input_r)
 	UINT8 ret = 0xff;
 
 	// multiplexed switch inputs
-	if (~state->m_common & 1) ret &= input_port_read_safe(device->machine(), "C0", 0); // bit switches
-	if (~state->m_common & 2) ret &= input_port_read_safe(device->machine(), "C1", 0); // control switches
-	if (~state->m_common & 4) ret &= input_port_read_safe(device->machine(), "C2", 0); // light switches
-	if (~state->m_common & 8) ret &= input_port_read_safe(device->machine(), "C3", 0); // light switches
+	if (~state->m_common & 1) ret &= state->ioport("C0")->read_safe(0); // bit switches
+	if (~state->m_common & 2) ret &= state->ioport("C1")->read_safe(0); // control switches
+	if (~state->m_common & 4) ret &= state->ioport("C2")->read_safe(0); // light switches
+	if (~state->m_common & 8) ret &= state->ioport("C3")->read_safe(0); // light switches
 
 	return ret;
 }
@@ -311,7 +311,7 @@ static const i8155_interface i8155_intf[2] =
 
 static INPUT_PORTS_START( gldarrow )
 	PORT_START("SW")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(1) // coin4
 	PORT_BIT( 0x78, IP_ACTIVE_LOW, IPT_UNUSED )

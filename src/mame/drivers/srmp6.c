@@ -311,14 +311,14 @@ READ16_MEMBER(srmp6_state::srmp6_inputs_r)
 {
 
 	if (offset == 0)			// DSW
-		return input_port_read(machine(), "DSW");
+		return ioport("DSW")->read();
 
 	switch (m_input_select)	// inputs
 	{
-		case 1<<0: return input_port_read(machine(), "KEY0");
-		case 1<<1: return input_port_read(machine(), "KEY1");
-		case 1<<2: return input_port_read(machine(), "KEY2");
-		case 1<<3: return input_port_read(machine(), "KEY3");
+		case 1<<0: return ioport("KEY0")->read();
+		case 1<<1: return ioport("KEY1")->read();
+		case 1<<2: return ioport("KEY2")->read();
+		case 1<<3: return ioport("KEY3")->read();
 	}
 
 	return 0;

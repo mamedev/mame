@@ -410,7 +410,7 @@ READ8_MEMBER(qix_state::qix_68705_portB_r)
 
 	UINT8 ddr = m_68705_ddr[1];
 	UINT8 out = m_68705_port_out[1];
-	UINT8 in = (input_port_read(machine(), "COIN") & 0x0f) | ((input_port_read(machine(), "COIN") & 0x80) >> 3);
+	UINT8 in = (ioport("COIN")->read() & 0x0f) | ((ioport("COIN")->read() & 0x80) >> 3);
 	return (out & ddr) | (in & ~ddr);
 }
 
@@ -420,7 +420,7 @@ READ8_MEMBER(qix_state::qix_68705_portC_r)
 
 	UINT8 ddr = m_68705_ddr[2];
 	UINT8 out = m_68705_port_out[2];
-	UINT8 in = (m_coinctrl & 0x08) | ((input_port_read(machine(), "COIN") & 0x70) >> 4);
+	UINT8 in = (m_coinctrl & 0x08) | ((ioport("COIN")->read() & 0x70) >> 4);
 	return (out & ddr) | (in & ~ddr);
 }
 
@@ -534,7 +534,7 @@ static READ8_DEVICE_HANDLER( slither_trak_lr_r )
 {
 	qix_state *state = device->machine().driver_data<qix_state>();
 
-	return input_port_read(device->machine(), state->m_flip ? "AN3" : "AN1");
+	return state->ioport(state->m_flip ? "AN3" : "AN1")->read();
 }
 
 
@@ -542,5 +542,5 @@ static READ8_DEVICE_HANDLER( slither_trak_ud_r )
 {
 	qix_state *state = device->machine().driver_data<qix_state>();
 
-	return input_port_read(device->machine(), state->m_flip ? "AN2" : "AN0");
+	return state->ioport(state->m_flip ? "AN2" : "AN0")->read();
 }

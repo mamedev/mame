@@ -597,7 +597,7 @@ READ32_MEMBER(ksys573_state::mb89371_r)
 READ32_MEMBER(ksys573_state::jamma_r)
 {
 	int security_cart_number = m_security_cart_number;
-	UINT32 data = input_port_read(machine(), "IN1");
+	UINT32 data = ioport("IN1")->read();
 	data |= 0x000000c0;
 
 	ds2401_device *ds2401 = machine().device<ds2401_device>(security_cart_number ? "game_id" : "install_id");
@@ -1233,7 +1233,7 @@ WRITE32_MEMBER(ksys573_state::security_w)
 		}
 	}
 
-	input_port_write_safe( machine(), "OUT1", data, mem_mask );
+	machine().root_device().ioport("OUT1")->write_safe( data, mem_mask );
 }
 
 READ32_MEMBER(ksys573_state::security_r)
@@ -1366,8 +1366,8 @@ static void *atapi_get_device(running_machine &machine)
 static void update_mode( running_machine &machine )
 {
 	ksys573_state *state = machine.driver_data<ksys573_state>();
-	int cart = input_port_read(machine, "CART");
-	int cd = input_port_read( machine, "CD" );
+	int cart = state->ioport("CART")->read();
+	int cd = state->ioport( "CD" )->read();
 	SCSIInstance *new_cdrom;
 
 	if( state->machine().device<device_secure_serial_flash>("game_eeprom") )
@@ -1489,8 +1489,8 @@ READ32_MEMBER(ksys573_state::ge765pwbba_r)
 	switch (offset)
 	{
 	case 0x26:
-		upd4701_y_add(upd4701, 0, input_port_read_safe(machine(), "uPD4701_y", 0), 0xffff);
-		upd4701_switches_set(upd4701, 0, input_port_read_safe(machine(), "uPD4701_switches", 0));
+		upd4701_y_add(upd4701, 0, ioport("uPD4701_y")->read_safe(0), 0xffff);
+		upd4701_switches_set(upd4701, 0, ioport("uPD4701_switches")->read_safe(0));
 
 		upd4701_cs_w(upd4701, 0, 0);
 		upd4701_xy_w(upd4701, 0, 1);
@@ -1758,7 +1758,7 @@ static void gn845pwbb_clk_w( running_machine &machine, int offset, int data )
 CUSTOM_INPUT_MEMBER(ksys573_state::gn845pwbb_read)
 {
 
-	return input_port_read(machine(), "STAGE") & m_stage_mask;
+	return ioport("STAGE")->read() & m_stage_mask;
 }
 
 static void gn845pwbb_output_callback( running_machine &machine, int offset, int data )
@@ -2717,7 +2717,7 @@ static double punchmania_inputs_callback( device_t *device, UINT8 input )
 {
 	ksys573_state *state = device->machine().driver_data<ksys573_state>();
 	double *pad_position = state->m_pad_position;
-	int pads = input_port_read(device->machine(), "PADS");
+	int pads = state->ioport("PADS")->read();
 	for( int i = 0; i < 6; i++ )
 	{
 		if( ( pads & ( 1 << i ) ) != 0 )
@@ -3004,15 +3004,15 @@ READ32_MEMBER(ksys573_state::gunmania_r)
 	switch( offset )
 	{
 	case 0x20:
-		data = input_port_read( machine(), "GUNX" ) | ds2401->read() << 7;
+		data = ioport( "GUNX" )->read() | ds2401->read() << 7;
 		break;
 
 	case 0x22:
-		data = input_port_read( machine(), "GUNY" ) | input_port_read( machine(), "SENSOR" );
+		data = ioport( "SENSOR" )->read();
 		break;
 
 	case 0x34:
-		data = input_port_read( machine(), "ENCODER" );
+		data = ioport( "ENCODER" )->read();
 		popmessage( "encoder %04x", data );
 		break;
 	}
@@ -3035,13 +3035,13 @@ static double analogue_inputs_callback( device_t *device, UINT8 input )
 	switch (input)
 	{
 	case ADC083X_CH0:
-		return (double)( 5 * input_port_read_safe( device->machine(), "analog0", 0 ) ) / 255.0;
+		return (double)( 5 * device->machine().root_device().ioport( "analog0" )->read_safe( 0 ) ) / 255.0;
 	case ADC083X_CH1:
-		return (double)( 5 * input_port_read_safe( device->machine(), "analog1", 0 ) ) / 255.0;
+		return (double)( 5 * device->machine().root_device().ioport( "analog1" )->read_safe( 0 ) ) / 255.0;
 	case ADC083X_CH2:
-		return (double)( 5 * input_port_read_safe( device->machine(), "analog2", 0 ) ) / 255.0;
+		return (double)( 5 * device->machine().root_device().ioport( "analog2" )->read_safe( 0 ) ) / 255.0;
 	case ADC083X_CH3:
-		return (double)( 5 * input_port_read_safe( device->machine(), "analog3", 0 ) ) / 255.0;
+		return (double)( 5 * device->machine().root_device().ioport( "analog3" )->read_safe( 0 ) ) / 255.0;
 	case ADC083X_AGND:
 		return 0;
 	case ADC083X_VREF:

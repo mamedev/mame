@@ -1290,7 +1290,7 @@ static DRIVER_INIT(dwarfd)
 	UINT8 *src, *dst;
 
 	/* expand gfx roms */
-	src = machine.root_device().memregion("gfx1")->base();
+	src = state->memregion("gfx1")->base();
 	dst = state->memregion("gfx2")->base();
 
 	for (i = 0; i < 0x4000; i++)

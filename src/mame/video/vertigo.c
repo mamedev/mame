@@ -159,7 +159,7 @@ void vertigo_vproc_reset(running_machine &machine)
 	int i;
 	UINT64 *mcode;
 
-	state->m_vectorrom = (UINT16 *)machine.root_device().memregion("user1")->base();
+	state->m_vectorrom = (UINT16 *)state->memregion("user1")->base();
 	mcode = (UINT64 *)state->memregion("proms")->base();
 
 	/* Decode microcode */

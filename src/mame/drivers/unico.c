@@ -104,7 +104,7 @@ WRITE16_MEMBER(unico_state::zeropnt_sound_bank_w)
 /* Light Gun - need to wiggle the input slightly otherwise fire doesn't work */
 READ16_MEMBER(unico_state::unico_gunx_0_msb_r)
 {
-	int x=input_port_read(machine(), "X0");
+	int x=ioport("X0")->read();
 
 	x=x*384/256; /* On screen pixel X */
 	if (x<0x160) x=0x30 + (x*0xd0/0x15f);
@@ -115,7 +115,7 @@ READ16_MEMBER(unico_state::unico_gunx_0_msb_r)
 
 READ16_MEMBER(unico_state::unico_guny_0_msb_r)
 {
-	int y=input_port_read(machine(), "Y0");
+	int y=ioport("Y0")->read();
 
 	y=0x18+((y*0xe0)/0xff);
 
@@ -124,7 +124,7 @@ READ16_MEMBER(unico_state::unico_guny_0_msb_r)
 
 READ16_MEMBER(unico_state::unico_gunx_1_msb_r)
 {
-	int x=input_port_read(machine(), "X1");
+	int x=ioport("X1")->read();
 
 	x=x*384/256; /* On screen pixel X */
 	if (x<0x160) x=0x30 + (x*0xd0/0x15f);
@@ -135,7 +135,7 @@ READ16_MEMBER(unico_state::unico_gunx_1_msb_r)
 
 READ16_MEMBER(unico_state::unico_guny_1_msb_r)
 {
-	int y=input_port_read(machine(), "Y1");
+	int y=ioport("Y1")->read();
 
 	y=0x18+((y*0xe0)/0xff);
 

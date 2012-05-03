@@ -256,7 +256,7 @@ WRITE8_MEMBER(astrocde_state::seawolf2_sound_2_w)// Port 41
 CUSTOM_INPUT_MEMBER(astrocde_state::ebases_trackball_r)
 {
 	static const char *const names[] = { "TRACKX2", "TRACKY2", "TRACKX1", "TRACKY1" };
-	return input_port_read(machine(), names[m_input_select]);
+	return ioport(names[m_input_select])->read();
 }
 
 
@@ -283,7 +283,7 @@ READ8_MEMBER(astrocde_state::spacezap_io_r)
 {
 	coin_counter_w(machine(), 0, (offset >> 8) & 1);
 	coin_counter_w(machine(), 1, (offset >> 9) & 1);
-	return input_port_read_safe(machine(), "P3HANDLE", 0xff);
+	return ioport("P3HANDLE")->read_safe(0xff);
 }
 
 
@@ -482,7 +482,7 @@ READ8_MEMBER(astrocde_state::demndrgn_io_r)
 CUSTOM_INPUT_MEMBER(astrocde_state::demndragn_joystick_r)
 {
 	static const char *const names[] = { "MOVEX", "MOVEY" };
-	return input_port_read(machine(), names[m_input_select]);
+	return ioport(names[m_input_select])->read();
 }
 
 

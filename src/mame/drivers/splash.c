@@ -1056,7 +1056,7 @@ static DRIVER_INIT( rebus )
 static DRIVER_INIT( funystrp )
 {
 	splash_state *state = machine.driver_data<splash_state>();
-	UINT16 *ROM = (UINT16 *)machine.root_device().memregion("maincpu")->base();
+	UINT16 *ROM = (UINT16 *)state->memregion("maincpu")->base();
 
 	state->m_bitmap_type = 0;
 	state->m_sprite_attr2_shift = 0;

@@ -63,7 +63,7 @@ READ16_MEMBER(mystwarr_state::eeprom_r)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		return input_port_read(machine(), "IN1");
+		return ioport("IN1")->read();
 	}
 
 //  logerror("msb access to eeprom port\n");
@@ -75,7 +75,7 @@ WRITE16_MEMBER(mystwarr_state::mweeprom_w)
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		input_port_write(machine(), "EEPROMOUT", data, 0xffff);
+		ioport("EEPROMOUT")->write(data, 0xffff);
 	}
 
 //  logerror("unknown LSB write %x to eeprom\n", data);
@@ -86,17 +86,17 @@ READ16_MEMBER(mystwarr_state::dddeeprom_r)
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		return input_port_read(machine(), "IN1") << 8;
+		return ioport("IN1")->read() << 8;
 	}
 
-	return input_port_read(machine(), "P2");
+	return ioport("P2")->read();
 }
 
 WRITE16_MEMBER(mystwarr_state::mmeeprom_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		input_port_write(machine(), "EEPROMOUT", data, 0xff);
+		ioport("EEPROMOUT")->write(data, 0xff);
 	}
 }
 

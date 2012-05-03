@@ -1016,7 +1016,7 @@ static MACHINE_START(meritm_crt260)
 	state->m_ram = auto_alloc_array(machine, UINT8,  0x8000 );
 	machine.device<nvram_device>("nvram")->set_base(state->m_ram, 0x8000);
 	memset(state->m_ram, 0x00, 0x8000);
-	state->membank("bank1")->configure_entries(0, 128, machine.root_device().memregion("maincpu")->base(), 0x8000);
+	state->membank("bank1")->configure_entries(0, 128, state->memregion("maincpu")->base(), 0x8000);
 	state->membank("bank2")->configure_entries(0, 128, state->memregion("maincpu")->base(), 0x8000);
 	state->membank("bank3")->configure_entries(0, 4, state->m_ram, 0x2000);
 	state->m_bank = 0xff;

@@ -41,7 +41,7 @@ NOTE: An eBay auction of the PCB shows "1996.9.16 PROMAT" on the JAMMA+ adapter 
 
 READ16_MEMBER(oneshot_state::oneshot_in0_word_r)
 {
-	int data = input_port_read(machine(), "DSW1");
+	int data = ioport("DSW1")->read();
 
 	switch (data & 0x0c)
 	{

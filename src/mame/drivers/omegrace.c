@@ -297,7 +297,7 @@ static const UINT8 spinnerTable[64] =
 
 READ8_MEMBER(omegrace_state::omegrace_spinner1_r)
 {
-	return (spinnerTable[input_port_read(machine(), "SPIN0") & 0x3f]);
+	return (spinnerTable[ioport("SPIN0")->read() & 0x3f]);
 }
 
 

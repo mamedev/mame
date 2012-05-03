@@ -82,7 +82,7 @@ WRITE16_MEMBER(moo_state::control2_w)
 
 	COMBINE_DATA(&m_cur_control2);
 
-	input_port_write(machine(), "EEPROMOUT", m_cur_control2, 0xff);
+	ioport("EEPROMOUT")->write(m_cur_control2, 0xff);
 
 	if (data & 0x100)
 		k053246_set_objcha_line(m_k053246, ASSERT_LINE);

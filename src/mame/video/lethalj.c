@@ -27,8 +27,8 @@ INLINE void get_crosshair_xy(running_machine &machine, int player, int *x, int *
 	int width = visarea.width();
 	int height = visarea.height();
 
-	*x = ((input_port_read_safe(machine, gunnames[player * 2], 0x00) & 0xff) * width) / 255;
-	*y = ((input_port_read_safe(machine, gunnames[1 + player * 2], 0x00) & 0xff) * height) / 255;
+	*x = ((machine.root_device().ioport(gunnames[player * 2])->read_safe(0x00) & 0xff) * width) / 255;
+	*y = ((machine.root_device().ioport(gunnames[1 + player * 2])->read_safe(0x00) & 0xff) * height) / 255;
 }
 
 
@@ -82,7 +82,7 @@ VIDEO_START( lethalj )
 	state->m_screenram = auto_alloc_array(machine, UINT16, BLITTER_DEST_WIDTH * BLITTER_DEST_HEIGHT);
 
 	/* predetermine blitter info */
-	state->m_blitter_base = (UINT16 *)machine.root_device().memregion("gfx1")->base();
+	state->m_blitter_base = (UINT16 *)state->memregion("gfx1")->base();
 	state->m_blitter_rows = state->memregion("gfx1")->bytes() / (2*BLITTER_SOURCE_WIDTH);
 }
 

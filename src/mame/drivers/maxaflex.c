@@ -75,7 +75,7 @@ public:
 
 READ8_MEMBER(maxaflex_state::mcu_portA_r)
 {
-	m_portA_in = input_port_read(machine(), "dsw") | (input_port_read(machine(), "coin") << 4) | (input_port_read(machine(), "console") << 5);
+	m_portA_in = ioport("dsw")->read() | (ioport("coin")->read() << 4) | (ioport("console")->read() << 5);
 	return (m_portA_in & ~m_ddrA) | (m_portA_out & m_ddrA);
 }
 
@@ -371,12 +371,12 @@ static const pokey_interface pokey_config = {
 
 READ8_DEVICE_HANDLER(maxaflex_atari_pia_pa_r)
 {
-	return atari_input_disabled(device->machine()) ? 0xFF : input_port_read_safe(device->machine(), "djoy_0_1", 0);
+	return atari_input_disabled(device->machine()) ? 0xFF : device->machine().root_device().ioport("djoy_0_1")->read_safe(0);
 }
 
 READ8_DEVICE_HANDLER(maxaflex_atari_pia_pb_r)
 {
-	return atari_input_disabled(device->machine()) ? 0xFF : input_port_read_safe(device->machine(), "djoy_2_3", 0);
+	return atari_input_disabled(device->machine()) ? 0xFF : device->machine().root_device().ioport("djoy_2_3")->read_safe(0);
 }
 
 

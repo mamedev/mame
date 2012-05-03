@@ -79,14 +79,14 @@ MACHINE_RESET( cinemat )
 
 READ8_MEMBER(cinemat_state::inputs_r)
 {
-	return (input_port_read(machine(), "INPUTS") >> offset) & 1;
+	return (ioport("INPUTS")->read() >> offset) & 1;
 }
 
 
 READ8_MEMBER(cinemat_state::switches_r)
 {
 	static const UINT8 switch_shuffle[8] = { 2,5,4,3,0,1,6,7 };
-	return (input_port_read(machine(), "SWITCHES") >> switch_shuffle[offset]) & 1;
+	return (ioport("SWITCHES")->read() >> switch_shuffle[offset]) & 1;
 }
 
 
@@ -149,7 +149,7 @@ static UINT8 joystick_read(device_t *device)
 	else
 	{
 		int xval = (INT16)(cpu_get_reg(device, CCPU_X) << 4) >> 4;
-		return (input_port_read_safe(device->machine(), state->m_mux_select ? "ANALOGX" : "ANALOGY", 0) - xval) < 0x800;
+		return (state->ioport(state->m_mux_select ? "ANALOGX" : "ANALOGY")->read_safe(0) - xval) < 0x800;
 	}
 }
 
@@ -167,7 +167,7 @@ READ8_MEMBER(cinemat_state::speedfrk_wheel_r)
 	int delta_wheel;
 
     /* the shift register is cleared once per 'frame' */
-    delta_wheel = (INT8)input_port_read(machine(), "WHEEL") / 8;
+    delta_wheel = (INT8)ioport("WHEEL")->read() / 8;
     if (delta_wheel > 3)
         delta_wheel = 3;
     else if (delta_wheel < -3)
@@ -179,14 +179,14 @@ READ8_MEMBER(cinemat_state::speedfrk_wheel_r)
 
 READ8_MEMBER(cinemat_state::speedfrk_gear_r)
 {
-	int gearval = input_port_read(machine(), "GEAR");
+	int gearval = ioport("GEAR")->read();
 
 	/* check the fake gear input port and determine the bit settings for the gear */
 	if ((gearval & 0x0f) != 0x0f)
         m_gear = gearval & 0x0f;
 
 	/* add the start key into the mix -- note that it overlaps 4th gear */
-	if (!(input_port_read(machine(), "INPUTS") & 0x80))
+	if (!(ioport("INPUTS")->read() & 0x80))
         m_gear &= ~0x08;
 
 	return (m_gear >> offset) & 1;
@@ -232,9 +232,9 @@ READ8_MEMBER(cinemat_state::sundance_inputs_r)
 {
 	/* handle special keys first */
 	if (sundance_port_map[offset].portname)
-		return (input_port_read(machine(), sundance_port_map[offset].portname) & sundance_port_map[offset].bitmask) ? 0 : 1;
+		return (ioport(sundance_port_map[offset].portname)->read() & sundance_port_map[offset].bitmask) ? 0 : 1;
 	else
-		return (input_port_read(machine(), "INPUTS") >> offset) & 1;
+		return (ioport("INPUTS")->read() >> offset) & 1;
 }
 
 
@@ -247,7 +247,7 @@ READ8_MEMBER(cinemat_state::sundance_inputs_r)
 
 READ8_MEMBER(cinemat_state::boxingb_dial_r)
 {
-	int value = input_port_read(machine(), "DIAL");
+	int value = ioport("DIAL")->read();
 	if (!m_mux_select) offset += 4;
 	return (value >> offset) & 1;
 }

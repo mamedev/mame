@@ -146,7 +146,7 @@ static TIMER_CALLBACK( destroyr_frame_callback )
 	state->m_potsense[1] = 0;
 
 	/* PCB supports two dials, but cab has only got one */
-	machine.scheduler().timer_set(machine.primary_screen->time_until_pos(input_port_read(machine, "PADDLE")), FUNC(destroyr_dial_callback));
+	machine.scheduler().timer_set(machine.primary_screen->time_until_pos(state->ioport("PADDLE")->read()), FUNC(destroyr_dial_callback));
 	machine.scheduler().timer_set(machine.primary_screen->time_until_pos(0), FUNC(destroyr_frame_callback));
 }
 
@@ -237,12 +237,12 @@ READ8_MEMBER(destroyr_state::destroyr_input_r)
 
 	if (offset & 1)
 	{
-		return input_port_read(machine(), "IN1");
+		return ioport("IN1")->read();
 	}
 
 	else
 	{
-		UINT8 ret = input_port_read(machine(), "IN0");
+		UINT8 ret = ioport("IN0")->read();
 
 		if (m_potsense[0] && m_potmask[0])
 			ret |= 4;
@@ -297,7 +297,7 @@ static INPUT_PORTS_START( destroyr )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("IN2")
 	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW:4,3")

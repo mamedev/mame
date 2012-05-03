@@ -19,13 +19,13 @@ READ16_MEMBER(dec0_state::dec0_controls_r)
 	switch (offset<<1)
 	{
 		case 0: /* Player 1 & 2 joystick & buttons */
-			return input_port_read(machine(), "INPUTS");
+			return ioport("INPUTS")->read();
 
 		case 2: /* Credits, start buttons */
-			return input_port_read(machine(), "SYSTEM");
+			return ioport("SYSTEM")->read();
 
 		case 4: /* Byte 4: Dipswitch bank 2, Byte 5: Dipswitch Bank 1 */
-			return input_port_read(machine(), "DSW");
+			return ioport("DSW")->read();
 
 		case 8: /* Intel 8751 mc, Bad Dudes & Heavy Barrel only */
 			//logerror("CPU #0 PC %06x: warning - read i8751 %06x - %04x\n", cpu_get_pc(&space.device()), 0x30c000+offset, m_i8751_return);
@@ -43,10 +43,10 @@ READ16_MEMBER(dec0_state::dec0_rotary_r)
 	switch (offset<<1)
 	{
 		case 0: /* Player 1 rotary */
-			return ~(1 << input_port_read(machine(), "AN0"));
+			return ~(1 << ioport("AN0")->read());
 
 		case 8: /* Player 2 rotary */
-			return ~(1 << input_port_read(machine(), "AN1"));
+			return ~(1 << ioport("AN1")->read());
 
 		default:
 			logerror("Unknown rotary read at 300000 %02x\n", offset);
@@ -62,19 +62,19 @@ READ16_MEMBER(dec0_state::midres_controls_r)
 	switch (offset<<1)
 	{
 		case 0: /* Player 1 Joystick + start, Player 2 Joystick + start */
-			return input_port_read(machine(), "INPUTS");
+			return ioport("INPUTS")->read();
 
 		case 2: /* Dipswitches */
-			return input_port_read(machine(), "DSW");
+			return ioport("DSW")->read();
 
 		case 4: /* Player 1 rotary */
-			return ~(1 << input_port_read(machine(), "AN0"));
+			return ~(1 << ioport("AN0")->read());
 
 		case 6: /* Player 2 rotary */
-			return ~(1 << input_port_read(machine(), "AN1"));
+			return ~(1 << ioport("AN1")->read());
 
 		case 8: /* Credits, start buttons */
-			return input_port_read(machine(), "SYSTEM");
+			return ioport("SYSTEM")->read();
 
 		case 12:
 			return 0;	/* ?? watchdog ?? */

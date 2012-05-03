@@ -313,8 +313,8 @@ READ32_MEMBER(darkhors_state::darkhors_input_sel_r)
 	int bit_p2 = mask_to_bit((m_input_sel & 0xff000000) >> 24);
 	static const char *const portnames[] = { "IN0", "IN1", "IN2", "IN3", "IN4", "IN5", "IN6", "IN7" };
 
-	return	(input_port_read(machine(), portnames[bit_p1]) & 0x00ffffff) |
-			(input_port_read(machine(), portnames[bit_p2]) & 0xff000000) ;
+	return	(ioport(portnames[bit_p1])->read() & 0x00ffffff) |
+			(ioport(portnames[bit_p2])->read() & 0xff000000) ;
 }
 
 WRITE32_MEMBER(darkhors_state::darkhors_unk1_w)

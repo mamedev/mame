@@ -134,19 +134,19 @@ READ16_MEMBER(dassault_state::dassault_control_r)
 	switch (offset << 1)
 	{
 		case 0: /* Player 1 & Player 2 joysticks & fire buttons */
-			return input_port_read(machine(), "P1_P2");
+			return ioport("P1_P2")->read();
 
 		case 2: /* Player 3 & Player 4 joysticks & fire buttons */
-			return input_port_read(machine(), "P3_P4");
+			return ioport("P3_P4")->read();
 
 		case 4: /* Dip 1 (stored at 0x3f8035) */
-			return input_port_read(machine(), "DSW1");
+			return ioport("DSW1")->read();
 
 		case 6: /* Dip 2 (stored at 0x3f8034) */
-			return input_port_read(machine(), "DSW2");
+			return ioport("DSW2")->read();
 
 		case 8: /* VBL, Credits */
-			return input_port_read(machine(), "SYSTEM");
+			return ioport("SYSTEM")->read();
 	}
 
 	return 0xffff;
@@ -161,7 +161,7 @@ WRITE16_MEMBER(dassault_state::dassault_control_w)
 
 READ16_MEMBER(dassault_state::dassault_sub_control_r)
 {
-	return input_port_read(machine(), "VBLANK1");
+	return ioport("VBLANK1")->read();
 }
 
 WRITE16_MEMBER(dassault_state::dassault_sound_w)
@@ -302,7 +302,7 @@ static INPUT_PORTS_START( common )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_COIN4 )
 
 	PORT_START("VBLANK1") /* Cpu 1 vblank */
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( thndzone )
@@ -312,7 +312,7 @@ static INPUT_PORTS_START( thndzone )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )			// Adds 4 credits/coins !
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -369,7 +369,7 @@ static INPUT_PORTS_START( dassault )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW1:1,2,3")
@@ -427,7 +427,7 @@ static INPUT_PORTS_START( dassault4 )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1:1,2,3")

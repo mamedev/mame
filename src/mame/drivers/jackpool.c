@@ -97,20 +97,20 @@ READ16_MEMBER(jackpool_state::jackpool_io_r)
 {
 	switch(offset*2)
 	{
-		case 0x00: return input_port_read(machine(),"COIN1");
-		case 0x04: return input_port_read(machine(),"UNK1");
-		case 0x06: return input_port_read(machine(),"UNK2");
-		case 0x08: return input_port_read(machine(),"SERVICE1");
-		case 0x0a: return input_port_read(machine(),"SERVICE2");//probably not a button, remote?
-		case 0x0c: return input_port_read(machine(),"PAYOUT");
-		case 0x0e: return input_port_read(machine(),"START2");
-		case 0x10: return input_port_read(machine(),"HOLD3");
-		case 0x12: return input_port_read(machine(),"HOLD4");
-		case 0x14: return input_port_read(machine(),"HOLD2");
-		case 0x16: return input_port_read(machine(),"HOLD1");
-		case 0x18: return input_port_read(machine(),"HOLD5");
-		case 0x1a: return input_port_read(machine(),"START1");
-		case 0x1c: return input_port_read(machine(),"BET");
+		case 0x00: return ioport("COIN1")->read();
+		case 0x04: return ioport("UNK1")->read();
+		case 0x06: return ioport("UNK2")->read();
+		case 0x08: return ioport("SERVICE1")->read();
+		case 0x0a: return ioport("SERVICE2")->read();//probably not a button, remote?
+		case 0x0c: return ioport("PAYOUT")->read();
+		case 0x0e: return ioport("START2")->read();
+		case 0x10: return ioport("HOLD3")->read();
+		case 0x12: return ioport("HOLD4")->read();
+		case 0x14: return ioport("HOLD2")->read();
+		case 0x16: return ioport("HOLD1")->read();
+		case 0x18: return ioport("HOLD5")->read();
+		case 0x1a: return ioport("START1")->read();
+		case 0x1c: return ioport("BET")->read();
 		case 0x1e: return 0xff; //ticket motor
 		case 0x20: return 0xff; //hopper motor
     	case 0x2c: return machine().device<eeprom_device>("eeprom")->read_bit();

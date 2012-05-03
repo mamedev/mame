@@ -5733,8 +5733,8 @@ static DRIVER_INIT( sfbonus_common)
 
 	// dummy.rom helper
 	{
-		UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
-		int length = machine.root_device().memregion("maincpu")->bytes();
+		UINT8 *ROM = state->memregion("maincpu")->base();
+		int length = state->memregion("maincpu")->bytes();
 		UINT8* ROM2 = state->memregion("user1")->base();
 
 		if (ROM2)

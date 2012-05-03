@@ -205,7 +205,7 @@ static INTERRUPT_GEN( timer_irq )
 	{
 		state->m_irq_status = 0x01 |0x02; //0xff;
 
-	    state->m_sc1_Inputs[2] = input_port_read(device->machine(),"STROBE0");
+	    state->m_sc1_Inputs[2] = state->ioport("STROBE0")->read();
 
 		generic_pulse_irq_line(device->machine().device("maincpu"), M6809_IRQ_LINE, 1);
 	}
@@ -320,7 +320,7 @@ READ8_MEMBER(bfm_sc1_state::mmtr_r)
 
 READ8_MEMBER(bfm_sc1_state::dipcoin_r)
 {
-	return input_port_read(machine(),"STROBE0") & 0x1F;
+	return ioport("STROBE0")->read() & 0x1F;
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -444,7 +444,7 @@ WRITE8_MEMBER(bfm_sc1_state::mux1latch_w)
 
 		if ( !(data & 0x08) )
 		{
-			m_sc1_Inputs[ input_strobe ] = input_port_read(machine(),portnames[input_strobe]);
+			m_sc1_Inputs[ input_strobe ] = ioport(portnames[input_strobe])->read();
 
 			m_mux1_input = m_sc1_Inputs[ input_strobe ];
 		}

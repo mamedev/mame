@@ -183,7 +183,7 @@ static void parse_control2( running_machine &machine )
 	/* bit 5  is enable irq 6 */
 	/* bit 6  is enable irq 5 */
 	/* bit 11 is watchdog */
-	input_port_write(machine, "EEPROMOUT", state->m_cur_control2, 0xff);
+	state->ioport("EEPROMOUT")->write(state->m_cur_control2, 0xff);
 
 	/* bit 8 = enable sprite ROM reading */
 	k053246_set_objcha_line(state->m_k053246, (state->m_cur_control2 & 0x0100) ? ASSERT_LINE : CLEAR_LINE);
@@ -684,7 +684,7 @@ static DRIVER_INIT( xexex )
 	if (!strcmp(machine.system().name, "xexex"))
 	{
 		// Invulnerability
-//      *(UINT16 *)(machine.root_device().memregion("maincpu")->base() + 0x648d4) = 0x4a79;
+//      *(UINT16 *)(state->memregion("maincpu")->base() + 0x648d4) = 0x4a79;
 //      *(UINT16 *)(state->memregion("maincpu")->base() + 0x00008) = 0x5500;
 		state->m_strip_0x1a = 1;
 	}

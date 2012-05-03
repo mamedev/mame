@@ -324,25 +324,25 @@ READ16_MEMBER(taitof2_state::ninjak_input_r)
 	switch (offset)
 	{
 		case 0x00:
-			return (input_port_read(machine(), "DSWA") << 8);
+			return (ioport("DSWA")->read() << 8);
 
 		case 0x01:
-			return (input_port_read(machine(), "DSWB") << 8);
+			return (ioport("DSWB")->read() << 8);
 
 		case 0x02:
-			return (input_port_read(machine(), "IN0") << 8);
+			return (ioport("IN0")->read() << 8);
 
 		case 0x03:
-			return (input_port_read(machine(), "IN1") << 8);
+			return (ioport("IN1")->read() << 8);
 
 		case 0x04:
-			return (input_port_read(machine(), "IN3") << 8);
+			return (ioport("IN3")->read() << 8);
 
 		case 0x05:
-			return (input_port_read(machine(), "IN4") << 8);
+			return (ioport("IN4")->read() << 8);
 
 		case 0x06:
-			return (input_port_read(machine(), "IN2") << 8);
+			return (ioport("IN2")->read() << 8);
 
 //      case 0x07:
 //          return (coin_word & mem_mask);
@@ -360,13 +360,13 @@ READ16_MEMBER(taitof2_state::cameltry_paddle_r)
 	switch (offset)
 	{
 		case 0x00:
-			curr = input_port_read(machine(), "PADDLE1");
+			curr = ioport("PADDLE1")->read();
 			res = curr - m_last[0];
 			m_last[0] = curr;
 			return res;
 
 		case 0x02:
-			curr = input_port_read(machine(), "PADDLE2");
+			curr = ioport("PADDLE2")->read();
 			res = curr - m_last[1];
 			m_last[1] = curr;
 			return res;
@@ -383,12 +383,12 @@ READ16_MEMBER(taitof2_state::mjnquest_dsw_r)
 	{
 		case 0x00:
 		{
-			return (input_port_read(machine(), "IN5") << 8) + input_port_read(machine(), "DSWA");	/* DSW A + coin */
+			return (ioport("IN5")->read() << 8) + ioport("DSWA")->read();	/* DSW A + coin */
 		}
 
 		case 0x01:
 		{
-			return (input_port_read(machine(), "IN6") << 8) + input_port_read(machine(), "DSWB");	/* DSW B + coin */
+			return (ioport("IN6")->read() << 8) + ioport("DSWB")->read();	/* DSW B + coin */
 		}
 	}
 
@@ -402,19 +402,19 @@ READ16_MEMBER(taitof2_state::mjnquest_input_r)
 	switch (m_mjnquest_input)
 	{
 		case 0x01:
-			  return input_port_read(machine(), "IN0");
+			  return ioport("IN0")->read();
 
 		 case 0x02:
-			  return input_port_read(machine(), "IN1");
+			  return ioport("IN1")->read();
 
 		 case 0x04:
-			  return input_port_read(machine(), "IN2");
+			  return ioport("IN2")->read();
 
 		 case 0x08:
-			  return input_port_read(machine(), "IN3");
+			  return ioport("IN3")->read();
 
 		 case 0x10:
-			  return input_port_read(machine(), "IN4");
+			  return ioport("IN4")->read();
 
 	}
 
@@ -2461,43 +2461,43 @@ static INPUT_PORTS_START( qcrayon2 )
 
 	PORT_START("IN0")
 	/* Joystick Control */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_8WAY PORT_PLAYER(1) PORT_CONDITION("DSWB",0x80,PORTCOND_EQUALS,0x80)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_8WAY PORT_PLAYER(1) PORT_CONDITION("DSWB",0x80,PORTCOND_EQUALS,0x80)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_8WAY PORT_PLAYER(1) PORT_CONDITION("DSWB",0x80,PORTCOND_EQUALS,0x80)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1) PORT_CONDITION("DSWB",0x80,PORTCOND_EQUALS,0x80)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)                  PORT_CONDITION("DSWB",0x80,PORTCOND_EQUALS,0x80)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )                                 PORT_CONDITION("DSWB",0x80,PORTCOND_EQUALS,0x80)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )                                 PORT_CONDITION("DSWB",0x80,PORTCOND_EQUALS,0x80)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )                                  PORT_CONDITION("DSWB",0x80,PORTCOND_EQUALS,0x80)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_8WAY PORT_PLAYER(1) PORT_CONDITION("DSWB",0x80,EQUALS,0x80)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_8WAY PORT_PLAYER(1) PORT_CONDITION("DSWB",0x80,EQUALS,0x80)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_8WAY PORT_PLAYER(1) PORT_CONDITION("DSWB",0x80,EQUALS,0x80)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1) PORT_CONDITION("DSWB",0x80,EQUALS,0x80)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)                  PORT_CONDITION("DSWB",0x80,EQUALS,0x80)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )                                 PORT_CONDITION("DSWB",0x80,EQUALS,0x80)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )                                 PORT_CONDITION("DSWB",0x80,EQUALS,0x80)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )                                  PORT_CONDITION("DSWB",0x80,EQUALS,0x80)
 	/* 4 Buttons Control */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)                  PORT_CONDITION("DSWB",0x80,PORTCOND_EQUALS,0x00)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)                  PORT_CONDITION("DSWB",0x80,PORTCOND_EQUALS,0x00)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)                  PORT_CONDITION("DSWB",0x80,PORTCOND_EQUALS,0x00)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)                  PORT_CONDITION("DSWB",0x80,PORTCOND_EQUALS,0x00)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )                                  PORT_CONDITION("DSWB",0x80,PORTCOND_EQUALS,0x00)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )                                 PORT_CONDITION("DSWB",0x80,PORTCOND_EQUALS,0x00)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )                                 PORT_CONDITION("DSWB",0x80,PORTCOND_EQUALS,0x00)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )                                 PORT_CONDITION("DSWB",0x80,PORTCOND_EQUALS,0x00)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)                  PORT_CONDITION("DSWB",0x80,EQUALS,0x00)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)                  PORT_CONDITION("DSWB",0x80,EQUALS,0x00)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)                  PORT_CONDITION("DSWB",0x80,EQUALS,0x00)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)                  PORT_CONDITION("DSWB",0x80,EQUALS,0x00)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )                                  PORT_CONDITION("DSWB",0x80,EQUALS,0x00)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )                                 PORT_CONDITION("DSWB",0x80,EQUALS,0x00)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )                                 PORT_CONDITION("DSWB",0x80,EQUALS,0x00)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )                                 PORT_CONDITION("DSWB",0x80,EQUALS,0x00)
 
 	PORT_START("IN1")
 	/* Joystick Control */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_8WAY PORT_PLAYER(2) PORT_CONDITION("DSWB",0x80,PORTCOND_EQUALS,0x80)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_8WAY PORT_PLAYER(2) PORT_CONDITION("DSWB",0x80,PORTCOND_EQUALS,0x80)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_8WAY PORT_PLAYER(2) PORT_CONDITION("DSWB",0x80,PORTCOND_EQUALS,0x80)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2) PORT_CONDITION("DSWB",0x80,PORTCOND_EQUALS,0x80)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)                  PORT_CONDITION("DSWB",0x80,PORTCOND_EQUALS,0x80)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )                                 PORT_CONDITION("DSWB",0x80,PORTCOND_EQUALS,0x80)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )                                 PORT_CONDITION("DSWB",0x80,PORTCOND_EQUALS,0x80)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )                                  PORT_CONDITION("DSWB",0x80,PORTCOND_EQUALS,0x80)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_8WAY PORT_PLAYER(2) PORT_CONDITION("DSWB",0x80,EQUALS,0x80)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_8WAY PORT_PLAYER(2) PORT_CONDITION("DSWB",0x80,EQUALS,0x80)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_8WAY PORT_PLAYER(2) PORT_CONDITION("DSWB",0x80,EQUALS,0x80)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2) PORT_CONDITION("DSWB",0x80,EQUALS,0x80)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)                  PORT_CONDITION("DSWB",0x80,EQUALS,0x80)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )                                 PORT_CONDITION("DSWB",0x80,EQUALS,0x80)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )                                 PORT_CONDITION("DSWB",0x80,EQUALS,0x80)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )                                  PORT_CONDITION("DSWB",0x80,EQUALS,0x80)
 	/* 4 Buttons Control */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)                  PORT_CONDITION("DSWB",0x80,PORTCOND_EQUALS,0x00)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)                  PORT_CONDITION("DSWB",0x80,PORTCOND_EQUALS,0x00)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)                  PORT_CONDITION("DSWB",0x80,PORTCOND_EQUALS,0x00)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)                  PORT_CONDITION("DSWB",0x80,PORTCOND_EQUALS,0x00)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START2 )                                  PORT_CONDITION("DSWB",0x80,PORTCOND_EQUALS,0x00)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )                                 PORT_CONDITION("DSWB",0x80,PORTCOND_EQUALS,0x00)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )                                 PORT_CONDITION("DSWB",0x80,PORTCOND_EQUALS,0x00)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )                                 PORT_CONDITION("DSWB",0x80,PORTCOND_EQUALS,0x00)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)                  PORT_CONDITION("DSWB",0x80,EQUALS,0x00)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)                  PORT_CONDITION("DSWB",0x80,EQUALS,0x00)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)                  PORT_CONDITION("DSWB",0x80,EQUALS,0x00)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)                  PORT_CONDITION("DSWB",0x80,EQUALS,0x00)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START2 )                                  PORT_CONDITION("DSWB",0x80,EQUALS,0x00)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )                                 PORT_CONDITION("DSWB",0x80,EQUALS,0x00)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )                                 PORT_CONDITION("DSWB",0x80,EQUALS,0x00)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )                                 PORT_CONDITION("DSWB",0x80,EQUALS,0x00)
 
 	PORT_START("IN2")
 	TAITO_F2_SYSTEM_INPUT
@@ -5310,7 +5310,7 @@ static DRIVER_INIT( cameltry )
 static DRIVER_INIT( mjnquest )
 {
 	taitof2_state *state = machine.driver_data<taitof2_state>();
-	int i, len = machine.root_device().memregion("gfx2")->bytes();
+	int i, len = state->memregion("gfx2")->bytes();
 	UINT8 *gfx = state->memregion("gfx2")->base();
 
 	/* the bytes in each longword are in reversed order, put them in the

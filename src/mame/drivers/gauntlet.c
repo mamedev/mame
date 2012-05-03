@@ -187,7 +187,7 @@ static MACHINE_RESET( gauntlet )
 
 READ16_MEMBER(gauntlet_state::port4_r)
 {
-	int temp = input_port_read(machine(), "803008");
+	int temp = ioport("803008")->read();
 	if (m_cpu_to_sound_ready) temp ^= 0x0020;
 	if (m_sound_to_cpu_ready) temp ^= 0x0010;
 	return temp;
@@ -240,7 +240,7 @@ READ8_MEMBER(gauntlet_state::switch_6502_r)
 	if (m_cpu_to_sound_ready) temp ^= 0x80;
 	if (m_sound_to_cpu_ready) temp ^= 0x40;
 	if (!tms5220_readyq_r(machine().device("tms"))) temp ^= 0x20;
-	if (!(input_port_read(machine(), "803008") & 0x0008)) temp ^= 0x10;
+	if (!(ioport("803008")->read() & 0x0008)) temp ^= 0x10;
 
 	return temp;
 }
@@ -408,7 +408,7 @@ static INPUT_PORTS_START( gauntlet )
 	PORT_BIT( 0x0007, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_SERVICE( 0x0008, IP_ACTIVE_LOW )
 	PORT_BIT( 0x0030, IP_ACTIVE_HIGH, IPT_SPECIAL )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW,  IPT_VBLANK )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW,  IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0xff80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("COIN")	/* 1020 (sound) */
@@ -455,7 +455,7 @@ static INPUT_PORTS_START( vindctr2 )
 	PORT_BIT( 0x0007, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_SERVICE( 0x0008, IP_ACTIVE_LOW )
 	PORT_BIT( 0x0030, IP_ACTIVE_HIGH, IPT_SPECIAL )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW,  IPT_VBLANK )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW,  IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0xff80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("COIN")	/* 1020 (sound) */

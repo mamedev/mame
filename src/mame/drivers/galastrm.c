@@ -150,9 +150,9 @@ READ32_MEMBER(galastrm_state::galastrm_adstick_ctrl_r)
 	if (offset == 0x00)
 	{
 		if (ACCESSING_BITS_24_31)
-			return input_port_read(machine(), "STICKX") << 24;
+			return ioport("STICKX")->read() << 24;
 		if (ACCESSING_BITS_16_23)
-			return input_port_read(machine(), "STICKY") << 16;
+			return ioport("STICKY")->read() << 16;
 	}
 	return 0;
 }

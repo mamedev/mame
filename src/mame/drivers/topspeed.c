@@ -324,8 +324,8 @@ READ8_MEMBER(topspeed_state::topspeed_input_bypass_r)
 {
 	UINT8 port = tc0220ioc_port_r(m_tc0220ioc, 0);	/* read port number */
 	int steer = 0;
-	int analogue_steer = input_port_read_safe(machine(), STEER_PORT_TAG, 0x00);
-	int fake = input_port_read_safe(machine(), FAKE_PORT_TAG, 0x00);
+	int analogue_steer = ioport(STEER_PORT_TAG)->read_safe(0x00);
+	int fake = ioport(FAKE_PORT_TAG)->read_safe(0x00);
 
 	if (!(fake & 0x10))	/* Analogue steer (the real control method) */
 	{

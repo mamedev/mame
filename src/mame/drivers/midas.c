@@ -299,10 +299,10 @@ ADDRESS_MAP_END
 
 READ16_MEMBER(midas_state::hammer_sensor_r)
 {
-	if (input_port_read(machine(), "HAMMER") & 0x80)
+	if (ioport("HAMMER")->read() & 0x80)
 		return 0xffff;
 
-	return (input_port_read(machine(), "SENSORY") << 8) | input_port_read(machine(), "SENSORX");
+	return (ioport("SENSORY")->read() << 8) | ioport("SENSORX")->read();
 }
 
 WRITE16_MEMBER(midas_state::hammer_coin_w)

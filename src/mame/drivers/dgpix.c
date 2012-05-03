@@ -195,7 +195,7 @@ READ32_MEMBER(dgpix_state::vblank_r)
 {
 	/* burn a bunch of cycles because this is polled frequently during busy loops */
 	device_eat_cycles(&space.device(), 100);
-	return input_port_read(machine(), "VBLANK");
+	return ioport("VBLANK")->read();
 }
 
 static ADDRESS_MAP_START( cpu_map, AS_PROGRAM, 32, dgpix_state )
@@ -250,7 +250,7 @@ static NVRAM_HANDLER( flashroms )
 
 static INPUT_PORTS_START( dgpix )
 	PORT_START("VBLANK")
-	PORT_BIT( 0x00000003, IP_ACTIVE_LOW, IPT_VBLANK ) //value 2 is used by fmaniac3
+	PORT_BIT( 0x00000003, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen") //value 2 is used by fmaniac3
 	PORT_BIT( 0xfffffffc, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("INPUTS")

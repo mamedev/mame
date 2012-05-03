@@ -144,7 +144,7 @@ static const UINT16 konamigq_def_eeprom[64] =
 
 WRITE32_MEMBER(konamigq_state::eeprom_w)
 {
-	input_port_write(machine(), "EEPROMOUT", data & 0x07, 0xff);
+	ioport("EEPROMOUT")->write(data & 0x07, 0xff);
 	cputag_set_input_line(machine(), "soundcpu", INPUT_LINE_RESET, ( data & 0x40 ) ? CLEAR_LINE : ASSERT_LINE );
 }
 

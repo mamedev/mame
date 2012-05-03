@@ -153,7 +153,7 @@ reg: 0->1 (main->2nd) /     : (1->0) 2nd->main :
 static int gsword_coins_in(void)
 {
 	/* emulate 8741 coin slot */
-	if (input_port_read(machine, "IN4") & 0xc0)
+	if (machine.root_device().ioport("IN4")->read() & 0xc0)
 	{
 		logerror("Coin In\n");
 		return 0x80;
@@ -191,11 +191,11 @@ static READ8_HANDLER( gsword_8741_2_r )
 	switch (offset)
 	{
 	case 0x01: /* start button , coins */
-		return input_port_read(space->machine(), "IN0");
+		return space->machine().root_device().ioport("IN0")->read();
 	case 0x02: /* Player 1 Controller */
-		return input_port_read(space->machine(), "IN1");
+		return space->machine().root_device().ioport("IN1")->read();
 	case 0x04: /* Player 2 Controller */
-		return input_port_read(space->machine(), "IN3");
+		return space->machine().root_device().ioport("IN3")->read();
 //  default:
 //      logerror("8741-2 unknown read %d PC=%04x\n",offset,cpu_get_pc(&space->device()));
 	}
@@ -208,11 +208,11 @@ static READ8_HANDLER( gsword_8741_3_r )
 	switch (offset)
 	{
 	case 0x01: /* start button  */
-		return input_port_read(space->machine(), "IN2");
+		return space->machine().root_device().ioport("IN2")->read();
 	case 0x02: /* Player 1 Controller? */
-		return input_port_read(space->machine(), "IN1");
+		return space->machine().root_device().ioport("IN1")->read();
 	case 0x04: /* Player 2 Controller? */
-		return input_port_read(space->machine(), "IN3");
+		return space->machine().root_device().ioport("IN3")->read();
 	}
 	/* unknown */
 //  logerror("8741-3 unknown read %d PC=%04x\n",offset,cpu_get_pc(&space->device()));

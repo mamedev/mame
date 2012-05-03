@@ -160,9 +160,9 @@ READ8_MEMBER(angelkds_state::angelkds_input_r)
 	static const char *const portnames[] = { "I81", "I82" };
 	static const char *const fakenames[] = { "FAKE1", "FAKE2" };
 
-	fake = input_port_read(machine(), fakenames[offset]);
+	fake = ioport(fakenames[offset])->read();
 
-	return ((fake & 0x01) ? fake  : input_port_read(machine(), portnames[offset]));
+	return ((fake & 0x01) ? fake  : ioport(portnames[offset])->read());
 }
 
 #else
@@ -171,7 +171,7 @@ READ8_MEMBER(angelkds_state::angelkds_input_r)
 {
 	static const char *const portnames[] = { "I81", "I82" };
 
-	return input_port_read(machine(), portnames[offset]);
+	return ioport(portnames[offset])->read();
 }
 
 #endif

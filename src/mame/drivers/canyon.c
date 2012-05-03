@@ -67,10 +67,10 @@ READ8_MEMBER(canyon_state::canyon_switches_r)
 {
 	UINT8 val = 0;
 
-	if ((input_port_read(machine(), "IN2") >> (offset & 7)) & 1)
+	if ((ioport("IN2")->read() >> (offset & 7)) & 1)
 		val |= 0x80;
 
-	if ((input_port_read(machine(), "IN1") >> (offset & 3)) & 1)
+	if ((ioport("IN1")->read() >> (offset & 3)) & 1)
 		val |= 0x01;
 
 	return val;
@@ -79,7 +79,7 @@ READ8_MEMBER(canyon_state::canyon_switches_r)
 
 READ8_MEMBER(canyon_state::canyon_options_r)
 {
-	return (input_port_read(machine(), "DSW") >> (2 * (~offset & 3))) & 3;
+	return (ioport("DSW")->read() >> (2 * (~offset & 3))) & 3;
 }
 
 
@@ -160,7 +160,7 @@ static INPUT_PORTS_START( canyon )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_SERVICE( 0x10, IP_ACTIVE_HIGH )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_VBLANK )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_NAME("Hiscore Reset") PORT_CODE(KEYCODE_H)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_TILT ) /* SLAM */
 

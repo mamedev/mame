@@ -26,7 +26,7 @@ subs_interrupt
 INTERRUPT_GEN( subs_interrupt )
 {
 	/* only do NMI interrupt if not in TEST mode */
-	if ((input_port_read(device->machine(), "IN1") & 0x40)==0x40)
+	if ((device->machine().root_device().ioport("IN1")->read() & 0x40)==0x40)
 		device_set_input_line(device,INPUT_LINE_NMI,PULSE_LINE);
 }
 
@@ -43,7 +43,7 @@ static int subs_steering_1(running_machine &machine)
 	int this_val;
 	int delta;
 
-	this_val=input_port_read(machine, "DIAL2");
+	this_val=state->ioport("DIAL2")->read();
 
 	delta=this_val-state->m_last_val_1;
 	state->m_last_val_1=this_val;
@@ -72,7 +72,7 @@ static int subs_steering_2(running_machine &machine)
 	int this_val;
 	int delta;
 
-	this_val=input_port_read(machine, "DIAL1");
+	this_val=state->ioport("DIAL1")->read();
 
 	delta=this_val-state->m_last_val_2;
 	state->m_last_val_2=this_val;
@@ -109,7 +109,7 @@ subs_control_r
 ***************************************************************************/
 READ8_MEMBER(subs_state::subs_control_r)
 {
-	int inport = input_port_read(machine(), "IN0");
+	int inport = ioport("IN0")->read();
 
 	switch (offset & 0x07)
 	{
@@ -131,7 +131,7 @@ subs_coin_r
 ***************************************************************************/
 READ8_MEMBER(subs_state::subs_coin_r)
 {
-	int inport = input_port_read(machine(), "IN1");
+	int inport = ioport("IN1")->read();
 
 	switch (offset & 0x07)
 	{
@@ -153,7 +153,7 @@ subs_options_r
 ***************************************************************************/
 READ8_MEMBER(subs_state::subs_options_r)
 {
-	int opts = input_port_read(machine(), "DSW");
+	int opts = ioport("DSW")->read();
 
 	switch (offset & 0x03)
 	{

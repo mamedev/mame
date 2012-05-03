@@ -305,7 +305,7 @@ static void register_savestate( running_machine &machine )
 WRITE8_MEMBER(m62_state::m62_flipscreen_w)
 {
 	/* screen flip is handled both by software and hardware */
-	data ^= ~input_port_read(machine(), "DSW2") & 1;
+	data ^= ~ioport("DSW2")->read() & 1;
 
 	m_flipscreen = data & 0x01;
 	if (m_flipscreen)

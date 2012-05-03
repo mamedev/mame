@@ -95,7 +95,7 @@ class validity_checker;
 struct rom_entry;
 class machine_config;
 class emu_timer;
-typedef struct _input_device_default input_device_default;
+struct input_device_default;
 
 
 
@@ -188,7 +188,7 @@ public:
 	memory_region *memregion(const char *tag) const;
 	memory_share *memshare(const char *tag) const;
 	memory_bank *membank(const char *tag) const;
-	input_port_config *ioport(const char *tag) const;
+	ioport_port *ioport(const char *tag) const;
 	device_t *subdevice(const char *tag) const;
 	device_t *siblingdevice(const char *tag) const;
 	template<class _DeviceClass> inline _DeviceClass *subdevice(const char *tag) const { return downcast<_DeviceClass *>(subdevice(tag)); }
@@ -506,12 +506,12 @@ public:
 
 // device finder template
 template<bool _Required>
-class device_t::ioport_finder : public device_t::object_finder_base<input_port_config>
+class device_t::ioport_finder : public device_t::object_finder_base<ioport_port>
 {
 public:
 	// construction/destruction
 	ioport_finder(device_t &base, const char *tag)
-		: object_finder_base<input_port_config>(base, tag) { }
+		: object_finder_base<ioport_port>(base, tag) { }
 
 	// finder
 	virtual bool findit()
@@ -924,36 +924,6 @@ private:
 	// internal state
 	device_iterator 	m_iterator;
 	_InterfaceClass *	m_current;
-};
-
-
-// ======================> device_delegate
-
-// device_delegate is a delegate that wraps with a device tag and can be easily
-// late bound without replicating logic everywhere
-template<typename _Signature>
-class device_delegate : public delegate<_Signature>
-{
-	typedef delegate<_Signature> basetype;
-
-public:
-	// provide same set of constructors as the base class, with additional device name
-	// parameter
-	device_delegate() : basetype(), m_device_name(NULL) { }
-	device_delegate(const basetype &src) : basetype(src), m_device_name(src.m_device_name) { }
-	device_delegate(const basetype &src, delegate_late_bind &object) : basetype(src, object), m_device_name(src.m_device_name) { }
-	template<class _FunctionClass> device_delegate(typename basetype::template traits<_FunctionClass>::member_func_type funcptr, const char *name, const char *devname) : basetype(funcptr, name, (_FunctionClass *)0), m_device_name(devname) { }
-	template<class _FunctionClass> device_delegate(typename basetype::template traits<_FunctionClass>::member_func_type funcptr, const char *name, const char *devname, _FunctionClass *object) : basetype(funcptr, name, (_FunctionClass *)0), m_device_name(devname) { }
-	device_delegate(typename basetype::template traits<device_t>::static_func_type funcptr, const char *name) : basetype(funcptr, name, (device_t *)0), m_device_name(NULL) { }
-	device_delegate(typename basetype::template traits<device_t>::static_ref_func_type funcptr, const char *name) : basetype(funcptr, name, (device_t *)0), m_device_name(NULL) { }
-	device_delegate &operator=(const basetype &src) { *static_cast<basetype *>(this) = src; m_device_name = src.m_device_name; return *this; }
-
-	// perform the binding
-	void bind_relative_to(device_t &search_root);
-
-private:
-	// internal state
-	const char *m_device_name;
 };
 
 

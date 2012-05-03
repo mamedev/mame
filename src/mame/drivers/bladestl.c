@@ -59,7 +59,7 @@ READ8_MEMBER(bladestl_state::trackball_r)
 	static const char *const port[] = { "TRACKBALL_P1_1", "TRACKBALL_P1_2", "TRACKBALL_P2_1", "TRACKBALL_P1_2" };
 	int curr, delta;
 
-	curr = input_port_read(machine(), port[offset]);
+	curr = ioport(port[offset])->read();
 	delta = (curr - m_last_track[offset]) & 0xff;
 	m_last_track[offset] = curr;
 

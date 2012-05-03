@@ -342,7 +342,7 @@ static void sio_dip_handler( running_machine &machine, int n_data )
 	{
 		if( state->m_b_lastclock )
 		{
-			int bit = ( ( input_port_read(machine, "DSW") >> state->m_n_dip_bit ) & 1 );
+			int bit = ( ( state->ioport("DSW")->read() >> state->m_n_dip_bit ) & 1 );
 			verboselog( machine, 2, "read dip %02x -> %02x\n", n_data, bit * PSX_SIO_IN_DATA );
 			psx_sio_input( machine, 0, PSX_SIO_IN_DATA, bit * PSX_SIO_IN_DATA );
 			state->m_n_dip_bit++;
@@ -2094,13 +2094,13 @@ void jdredd_vblank(zn_state *state, screen_device &screen, bool vblank_state)
 
 		if( state->m_jdredd_gun_mux == 0 )
 		{
-			x = input_port_read(state->machine(), "GUN1X");
-			y = input_port_read(state->machine(), "GUN1Y");
+			x = state->machine().root_device().ioport("GUN1X")->read();
+			y = state->machine().root_device().ioport("GUN1Y")->read();
 		}
 		else
 		{
-			x = input_port_read(state->machine(), "GUN2X");
-			y = input_port_read(state->machine(), "GUN2Y");
+			x = state->machine().root_device().ioport("GUN2X")->read();
+			y = state->machine().root_device().ioport("GUN2Y")->read();
 		}
 
 		if( x > 0x393 && x < 0xcb2 &&

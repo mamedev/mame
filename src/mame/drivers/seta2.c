@@ -220,11 +220,11 @@ READ16_MEMBER(seta2_state::mj4simai_p1_r)
 
 	switch (m_keyboard_row)
 	{
-		case 0x01: return input_port_read(machine(), "P1_KEY0");
-		case 0x02: return input_port_read(machine(), "P1_KEY1");
-		case 0x04: return input_port_read(machine(), "P1_KEY2");
-		case 0x08: return input_port_read(machine(), "P1_KEY3");
-		case 0x10: return input_port_read(machine(), "P1_KEY4");
+		case 0x01: return ioport("P1_KEY0")->read();
+		case 0x02: return ioport("P1_KEY1")->read();
+		case 0x04: return ioport("P1_KEY2")->read();
+		case 0x08: return ioport("P1_KEY3")->read();
+		case 0x10: return ioport("P1_KEY4")->read();
 		default:   logerror("p1_r with keyboard_row = %02x\n", m_keyboard_row); return 0xffff;
 	}
 }
@@ -234,11 +234,11 @@ READ16_MEMBER(seta2_state::mj4simai_p2_r)
 
 	switch (m_keyboard_row)
 	{
-		case 0x01: return input_port_read(machine(), "P2_KEY0");
-		case 0x02: return input_port_read(machine(), "P2_KEY1");
-		case 0x04: return input_port_read(machine(), "P2_KEY2");
-		case 0x08: return input_port_read(machine(), "P2_KEY3");
-		case 0x10: return input_port_read(machine(), "P2_KEY4");
+		case 0x01: return ioport("P2_KEY0")->read();
+		case 0x02: return ioport("P2_KEY1")->read();
+		case 0x04: return ioport("P2_KEY2")->read();
+		case 0x08: return ioport("P2_KEY3")->read();
+		case 0x10: return ioport("P2_KEY4")->read();
 		default:   logerror("p2_r with keyboard_row = %02x\n", m_keyboard_row); return 0xffff;
 	}
 }
@@ -330,7 +330,7 @@ READ16_MEMBER(seta2_state::pzlbowl_protection_r)
 
 READ16_MEMBER(seta2_state::pzlbowl_coins_r)
 {
-	return input_port_read(machine(), "SYSTEM") | (machine().rand() & 0x80 );
+	return ioport("SYSTEM")->read() | (machine().rand() & 0x80 );
 }
 
 WRITE16_MEMBER(seta2_state::pzlbowl_coin_counter_w)
@@ -567,7 +567,7 @@ READ32_MEMBER(seta2_state::coldfire_regs_r)
 			return machine().rand();
 
 		case CF_PPDAT:
-			return input_port_read(machine(), "BATTERY") << 16;
+			return ioport("BATTERY")->read() << 16;
 	}
 
 	return m_coldfire_regs[offset];
@@ -575,7 +575,7 @@ READ32_MEMBER(seta2_state::coldfire_regs_r)
 
 READ32_MEMBER(seta2_state::funcube_debug_r)
 {
-	UINT32 ret = input_port_read(machine(),"DEBUG");
+	UINT32 ret = ioport("DEBUG")->read();
 
 	// This bits let you move the crosshair in the inputs / touch panel test with a joystick
 	if (!(machine().primary_screen->frame_number() % 3))
@@ -638,7 +638,7 @@ ADDRESS_MAP_END
 
 READ8_MEMBER(seta2_state::funcube_coins_r)
 {
-	UINT8 ret = input_port_read(machine(),"SWITCH");
+	UINT8 ret = ioport("SWITCH")->read();
 	UINT8 coin_bit0 = 1;	// active low
 	UINT8 coin_bit1 = 1;
 
@@ -2153,14 +2153,14 @@ static INTERRUPT_GEN( funcube_sub_timer_irq )
 	}
 	else
 	{
-		UINT8 press   = input_port_read(device->machine(),"TOUCH_PRESS");
+		UINT8 press   = device->machine().root_device().ioport("TOUCH_PRESS")->read();
 		UINT8 release = state->m_funcube_press && !press;
 
 		if ( press || release )
 		{
 			state->m_funcube_serial_fifo[0] = press ? 0xfe : 0xfd;
-			state->m_funcube_serial_fifo[1] = input_port_read(device->machine(),"TOUCH_X");
-			state->m_funcube_serial_fifo[2] = input_port_read(device->machine(),"TOUCH_Y");
+			state->m_funcube_serial_fifo[1] = device->machine().root_device().ioport("TOUCH_X")->read();
+			state->m_funcube_serial_fifo[2] = device->machine().root_device().ioport("TOUCH_Y")->read();
 			state->m_funcube_serial_fifo[3] = 0xff;
 			state->m_funcube_serial_count = 4;
 		}

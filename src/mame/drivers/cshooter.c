@@ -226,7 +226,7 @@ READ8_MEMBER(cshooter_state::cshooter_coin_r)
 	/* Even reads must return 0xff - Odd reads must return the contents of input port 5.
        Code at 0x5061 is executed once during P.O.S.T. where there is one read.
        Code at 0x50b4 is then executed each frame (not sure) where there are 2 reads. */
-	return ( (m_counter++ & 1) ? 0xff : input_port_read(machine(), "COIN") );
+	return ( (m_counter++ & 1) ? 0xff : ioport("COIN")->read() );
 }
 
 WRITE8_MEMBER(cshooter_state::cshooter_c500_w)

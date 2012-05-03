@@ -177,7 +177,7 @@ WRITE16_MEMBER(astrocorp_state::astrocorp_eeprom_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		input_port_write(machine(), "EEPROMOUT", data, 0xff);
+		ioport("EEPROMOUT")->write(data, 0xff);
 	}
 }
 

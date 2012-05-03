@@ -50,7 +50,7 @@ static DRIVER_INIT( dominos )
 static int service_mode(running_machine &machine)
 {
 	sprint2_state *state = machine.driver_data<sprint2_state>();
-	UINT8 v = input_port_read(machine, "INB");
+	UINT8 v = state->ioport("INB")->read();
 
 	if (GAME_IS_SPRINT1)
 	{
@@ -82,7 +82,7 @@ static INTERRUPT_GEN( sprint2 )
 
 		for (i = 0; i < 2; i++)
 		{
-			signed char delta = input_port_read(device->machine(), i ? "DIAL_P2" : "DIAL_P1") - state->m_dial[i];
+			signed char delta = state->ioport(i ? "DIAL_P2" : "DIAL_P1")->read() - state->m_dial[i];
 
 			if (delta < 0)
 			{
@@ -95,7 +95,7 @@ static INTERRUPT_GEN( sprint2 )
 
 			state->m_dial[i] += delta;
 
-			switch (input_port_read(device->machine(), i ? "GEAR_P2" : "GEAR_P1") & 15)
+			switch (device->machine().root_device().ioport(i ? "GEAR_P2" : "GEAR_P1")->read() & 15)
 			{
 			case 1: state->m_gear[i] = 1; break;
 			case 2: state->m_gear[i] = 2; break;
@@ -126,13 +126,13 @@ READ8_MEMBER(sprint2_state::sprint2_wram_r)
 
 READ8_MEMBER(sprint2_state::sprint2_dip_r)
 {
-	return (input_port_read(machine(), "DSW") << (2 * ((offset & 3) ^ 3))) & 0xc0;
+	return (ioport("DSW")->read() << (2 * ((offset & 3) ^ 3))) & 0xc0;
 }
 
 
 READ8_MEMBER(sprint2_state::sprint2_input_A_r)
 {
-	UINT8 val = input_port_read(machine(), "INA");
+	UINT8 val = ioport("INA")->read();
 
 	if (m_game == 2)// (GAME_IS_SPRINT2)
 	{
@@ -150,7 +150,7 @@ READ8_MEMBER(sprint2_state::sprint2_input_A_r)
 
 READ8_MEMBER(sprint2_state::sprint2_input_B_r)
 {
-	UINT8 val = input_port_read(machine(), "INB");
+	UINT8 val = ioport("INB")->read();
 
 	if (m_game == 1) // (GAME_IS_SPRINT1)
 	{

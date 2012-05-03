@@ -237,11 +237,11 @@ READ16_MEMBER(megasys1_state::ip_select_r)
 
 	switch (i)
 	{
-			case 0 :	return input_port_read(machine(), "SYSTEM");
-			case 1 :	return input_port_read(machine(), "P1");
-			case 2 :	return input_port_read(machine(), "P2");
-			case 3 :	return input_port_read(machine(), "DSW1");
-			case 4 :	return input_port_read(machine(), "DSW2");
+			case 0 :	return ioport("SYSTEM")->read();
+			case 1 :	return ioport("P1")->read();
+			case 2 :	return ioport("P2")->read();
+			case 3 :	return ioport("DSW1")->read();
+			case 4 :	return ioport("DSW2")->read();
 			default	 :	return 0x0006;
 	}
 }
@@ -1367,8 +1367,8 @@ READ16_MEMBER(megasys1_state::protection_peekaboo_r)
 	switch (m_protection_val)
 	{
 		case 0x02:	return 0x03;
-		case 0x51:	return input_port_read(machine(), "P1");
-		case 0x52:	return input_port_read(machine(), "P2");
+		case 0x51:	return ioport("P1")->read();
+		case 0x52:	return ioport("P2")->read();
 		default:	return m_protection_val;
 	}
 }
@@ -3801,7 +3801,7 @@ READ16_MEMBER(megasys1_state::edfbl_input_r)
 		case 0x04/2:
 		case 0x06/2:
 		case 0x08/2:
-		case 0x0a/2: res = input_port_read(machine(), in_names[offset-1]); break;
+		case 0x0a/2: res = ioport(in_names[offset-1])->read(); break;
 	}
 
 	return res;
@@ -4017,7 +4017,7 @@ READ16_MEMBER(megasys1_state::monkelf_input_r)
 		case 0x04/2:
 		case 0x06/2:
 		case 0x08/2:
-		case 0x0a/2: res = input_port_read(machine(), in_names[offset-1]); break;
+		case 0x0a/2: res = ioport(in_names[offset-1])->read(); break;
 	}
 
 	return res;

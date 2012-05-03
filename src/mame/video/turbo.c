@@ -341,8 +341,8 @@ static void turbo_prepare_sprites(running_machine &machine, turbo_state *state, 
                     VR1 = 310 Ohm
                     VR2 = 910 Ohm
             */
-			info->step[level] = sprite_xscale(xscale, 1.0e3 * input_port_read(machine, "VR1") / 100.0, 1.0e3 * input_port_read(machine, "VR2") / 100.0, 100e-12);
-		}
+			info->step[level] = sprite_xscale(xscale, 1.0e3 * machine.root_device().ioport("VR1")->read() / 100.0, 1.0e3 * machine.root_device().ioport("VR2")->read() / 100.0, 100e-12);
+ 		}
 	}
 }
 

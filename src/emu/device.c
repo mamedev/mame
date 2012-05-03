@@ -239,7 +239,7 @@ memory_bank *device_t::membank(const char *_tag) const
 //  object for a given port name
 //-------------------------------------------------
 
-input_port_config *device_t::ioport(const char *tag) const
+ioport_port *device_t::ioport(const char *tag) const
 {
 	// safety first
 	if (this == NULL)

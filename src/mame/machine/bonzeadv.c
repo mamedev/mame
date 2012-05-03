@@ -446,10 +446,10 @@ READ16_HANDLER( bonzeadv_cchip_ram_r )
 	{
 		switch (offset)
 		{
-		case 0x03: return input_port_read(space->machine(), "800007");    /* STARTn + SERVICE1 */
-		case 0x04: return input_port_read(space->machine(), "800009");    /* COINn */
-		case 0x05: return input_port_read(space->machine(), "80000B");    /* Player controls + TILT */
-		case 0x06: return input_port_read(space->machine(), "80000D");    /* Player controls (cocktail) */
+		case 0x03: return state->ioport("800007")->read();    /* STARTn + SERVICE1 */
+		case 0x04: return state->ioport("800009")->read();    /* COINn */
+		case 0x05: return state->ioport("80000B")->read();    /* Player controls + TILT */
+		case 0x06: return state->ioport("80000D")->read();    /* Player controls (cocktail) */
 		case 0x08: return state->m_cc_port;
 		}
 

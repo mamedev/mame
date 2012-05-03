@@ -2713,7 +2713,7 @@ VIDEO_START(model2)
 	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(model2_exit), &machine));
 
 	/* initialize the hardware rasterizer */
-	model2_3d_init( machine, (UINT16*)machine.root_device().memregion("user3")->base() );
+	model2_3d_init( machine, (UINT16*)state->memregion("user3")->base() );
 
 	/* initialize the geometry engine */
 	geo_init( machine, (UINT32*)state->memregion("user2")->base() );

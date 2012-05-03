@@ -434,7 +434,7 @@ READ16_MEMBER(tmnt_state::blswhstl_coin_r)
 
 	/* bit 3 is service button */
 	/* bit 6 is ??? VBLANK? OBJMPX? */
-	res = input_port_read(machine(), "COINS");
+	res = ioport("COINS")->read();
 
 	m_toggle ^= 0x40;
 	return res ^ m_toggle;
@@ -448,7 +448,7 @@ READ16_MEMBER(tmnt_state::ssriders_eeprom_r)
 	/* bit 1 is EEPROM ready */
 	/* bit 2 is VBLANK (???) */
 	/* bit 7 is service button */
-	res = input_port_read(machine(), "EEPROM");
+	res = ioport("EEPROM")->read();
 
 	m_toggle ^= 0x04;
 	return res ^ m_toggle;
@@ -462,7 +462,7 @@ READ16_MEMBER(tmnt_state::sunsetbl_eeprom_r)
 	/* bit 1 is EEPROM ready */
 	/* bit 2 is VBLANK (???) */
 	/* bit 3 is service button */
-	res = input_port_read(machine(), "EEPROM");
+	res = ioport("EEPROM")->read();
 
 	m_toggle ^= 0x04;
 	return res ^ m_toggle;
@@ -475,7 +475,7 @@ WRITE16_MEMBER(tmnt_state::blswhstl_eeprom_w)
 		/* bit 0 is data */
 		/* bit 1 is cs (active low) */
 		/* bit 2 is clock (active high) */
-		input_port_write(machine(), "EEPROMOUT", data, 0xff);
+		ioport("EEPROMOUT")->write(data, 0xff);
 	}
 }
 
@@ -498,7 +498,7 @@ READ16_MEMBER(tmnt_state::thndrx2_eeprom_r)
 	/* bit 1 is EEPROM ready */
 	/* bit 3 is VBLANK (???) */
 	/* bit 7 is service button */
-	res = input_port_read(machine(), "P2/EEPROM");
+	res = ioport("P2/EEPROM")->read();
 	m_toggle ^= 0x0800;
 	return (res ^ m_toggle);
 }
@@ -511,7 +511,7 @@ WRITE16_MEMBER(tmnt_state::thndrx2_eeprom_w)
 		/* bit 0 is data */
 		/* bit 1 is cs (active low) */
 		/* bit 2 is clock (active high) */
-		input_port_write(machine(), "EEPROMOUT", data, 0xff);
+		ioport("EEPROMOUT")->write(data, 0xff);
 
 		/* bit 5 triggers IRQ on sound cpu */
 		if (m_last == 0 && (data & 0x20) != 0)
@@ -535,7 +535,7 @@ WRITE16_MEMBER(tmnt_state::prmrsocr_eeprom_w)
 		/* bit 8 is data */
 		/* bit 9 is cs (active low) */
 		/* bit 10 is clock (active high) */
-		input_port_write(machine(), "EEPROMOUT", data, 0xffff);
+		ioport("EEPROMOUT")->write(data, 0xffff);
 	}
 }
 
@@ -1790,7 +1790,7 @@ static INPUT_PORTS_START( ssriders )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL )	/* EEPROM status? - always 1 */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* ?? TMNT2: OBJMPX */
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_VBLANK )	/* ?? TMNT2: NVBLK */
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")	/* ?? TMNT2: NVBLK */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* ?? TMNT2: IPL0 */
 	PORT_BIT( 0x60, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* unused? */
 	PORT_SERVICE_NO_TOGGLE( 0x80, IP_ACTIVE_LOW )
@@ -1828,7 +1828,7 @@ static INPUT_PORTS_START( ssridr4p )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL )	/* EEPROM status? - always 1 */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* ?? TMNT2: OBJMPX */
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_VBLANK )	/* ?? TMNT2: NVBLK */
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")	/* ?? TMNT2: NVBLK */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* ?? TMNT2: IPL0 */
 	PORT_BIT( 0x60, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* unused? */
 	PORT_SERVICE_NO_TOGGLE( 0x80, IP_ACTIVE_LOW )
@@ -1868,7 +1868,7 @@ static INPUT_PORTS_START( ssrid4ps )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL )	/* EEPROM status? - always 1 */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* ?? TMNT2: OBJMPX */
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_VBLANK )	/* ?? TMNT2: NVBLK */
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")	/* ?? TMNT2: NVBLK */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* ?? TMNT2: IPL0 */
 	PORT_BIT( 0x60, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* unused? */
 	PORT_SERVICE_NO_TOGGLE( 0x80, IP_ACTIVE_LOW )
@@ -1957,7 +1957,7 @@ static INPUT_PORTS_START( qgakumon )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL )	/* EEPROM status? - always 1 */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* ?? TMNT2: OBJMPX */
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_VBLANK )	/* ?? TMNT2: NVBLK (needs to be ACTIVE_HIGH to avoid problems) */
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")	/* ?? TMNT2: NVBLK (needs to be ACTIVE_HIGH to avoid problems) */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* ?? TMNT2: IPL0 */
 	PORT_BIT( 0x60, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* unused? */
 	PORT_SERVICE_NO_TOGGLE( 0x80, IP_ACTIVE_LOW )

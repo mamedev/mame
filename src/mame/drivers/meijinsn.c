@@ -112,7 +112,7 @@ READ16_MEMBER(meijinsn_state::alpha_mcu_r)
 	switch (offset)
 	{
 		case 0: /* Dipswitch 2 */
-			m_shared_ram[0] = (source & 0xff00) | input_port_read(machine(), "DSW");
+			m_shared_ram[0] = (source & 0xff00) | ioport("DSW")->read();
 			return 0;
 
 		case 0x22: /* Coin value */
@@ -123,16 +123,16 @@ READ16_MEMBER(meijinsn_state::alpha_mcu_r)
 
 			m_credits = 0;
 
-			if ((input_port_read(machine(), "COINS") & 0x3) == 3)
+			if ((ioport("COINS")->read() & 0x3) == 3)
 				m_mcu_latch = 0;
 
-			if ((input_port_read(machine(), "COINS") & 0x1) == 0 && !m_mcu_latch)
+			if ((ioport("COINS")->read() & 0x1) == 0 && !m_mcu_latch)
 			{
 				m_shared_ram[0x29] = (source & 0xff00) | 0x22;	// coinA
 				m_shared_ram[0x22] = (source & 0xff00) | 0x00;
 				m_mcu_latch = 1;
 
-				m_coinvalue = (~input_port_read(machine(), "DSW")>>3) & 1;
+				m_coinvalue = (~ioport("DSW")->read()>>3) & 1;
 
 				m_deposits1++;
 				if (m_deposits1 == coinage1[m_coinvalue][0])
@@ -143,13 +143,13 @@ READ16_MEMBER(meijinsn_state::alpha_mcu_r)
 				else
 					m_credits = 0;
 			}
-			else if ((input_port_read(machine(), "COINS") & 0x2) == 0 && !m_mcu_latch)
+			else if ((ioport("COINS")->read() & 0x2) == 0 && !m_mcu_latch)
 			{
 				m_shared_ram[0x29] = (source & 0xff00) | 0x22;	// coinA
 				m_shared_ram[0x22] = (source & 0xff00) | 0x00;
 				m_mcu_latch = 1;
 
-				m_coinvalue = (~input_port_read(machine(), "DSW") >> 3) & 1;
+				m_coinvalue = (~ioport("DSW")->read() >> 3) & 1;
 
 				m_deposits2++;
 				if (m_deposits2 == coinage2[m_coinvalue][0])

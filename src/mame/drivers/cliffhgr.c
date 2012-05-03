@@ -134,7 +134,7 @@ READ8_MEMBER(cliffhgr_state::cliff_port_r)
 
 
 	if (m_port_bank < 7)
-		return input_port_read(machine(),  banknames[m_port_bank]);
+		return ioport(banknames[m_port_bank])->read();
 
 	/* output is pulled up for non-mapped ports */
 	return 0xff;
@@ -555,8 +555,8 @@ static INPUT_PORTS_START( goaltogo )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x02, "Single Coin Continue" )	PORT_DIPLOCATION("E11:2")
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) ) PORT_CONDITION("BANK1",0x01,PORTCOND_EQUALS,0x00)
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) ) PORT_CONDITION("BANK1",0x01,PORTCOND_EQUALS,0x00)
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) ) PORT_CONDITION("BANK1",0x01,EQUALS,0x00)
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) ) PORT_CONDITION("BANK1",0x01,EQUALS,0x00)
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Allow_Continue ) )	PORT_DIPLOCATION("E11:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )

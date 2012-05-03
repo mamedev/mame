@@ -29,11 +29,11 @@ READ16_MEMBER(prehisle_state::prehisle_control16_r)
 
 	switch (offset)
 	{
-	case 0x08: return input_port_read(machine(), "P2");						// Player 2
-	case 0x10: return input_port_read(machine(), "COIN");						// Coins, Tilt, Service
-	case 0x20: return input_port_read(machine(), "P1") ^ m_invert_controls;		// Player 1
-	case 0x21: return input_port_read(machine(), "DSW0");						// DIPs
-	case 0x22: return input_port_read(machine(), "DSW1");						// DIPs + VBLANK
+	case 0x08: return ioport("P2")->read();						// Player 2
+	case 0x10: return ioport("COIN")->read();						// Coins, Tilt, Service
+	case 0x20: return ioport("P1")->read() ^ m_invert_controls;		// Player 1
+	case 0x21: return ioport("DSW0")->read();						// DIPs
+	case 0x22: return ioport("DSW1")->read();						// DIPs + VBLANK
 	default: return 0;
 	}
 }

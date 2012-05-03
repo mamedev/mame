@@ -259,7 +259,7 @@ CUSTOM_INPUT_MEMBER(galaxold_state::_4in1_fake_port_r)
 	static const char *const portnames[] = { "FAKE1", "FAKE2", "FAKE3", "FAKE4" };
 	int bit_mask = (FPTR)param;
 
-	return (input_port_read(machine(), portnames[m__4in1_bank]) & bit_mask) ? 0x01 : 0x00;
+	return (ioport(portnames[m__4in1_bank])->read() & bit_mask) ? 0x01 : 0x00;
 }
 
 #ifdef UNUSED_FUNCTION
@@ -399,7 +399,7 @@ DRIVER_INIT( 4in1 )
 {
 	galaxold_state *state = machine.driver_data<galaxold_state>();
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	offs_t i, len = machine.root_device().memregion("maincpu")->bytes();
+	offs_t i, len = state->memregion("maincpu")->bytes();
 	UINT8 *RAM = state->memregion("maincpu")->base();
 
 	/* Decrypt Program Roms */

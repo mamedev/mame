@@ -192,7 +192,7 @@ static void scanline_update(screen_device &screen, int scanline)
 	/* sound IRQ is on 32V */
 	if (scanline & 32)
 		atarigen_6502_irq_ack_r(space, 0);
-	else if (!(input_port_read(screen.machine(), "FE4000") & 0x40))
+	else if (!(screen.machine().root_device().ioport("FE4000")->read() & 0x40))
 		atarigen_6502_irq_gen(screen.machine().device("audiocpu"));
 }
 
@@ -232,7 +232,7 @@ static MACHINE_RESET( badlands )
 static INTERRUPT_GEN( vblank_int )
 {
 	badlands_state *state = device->machine().driver_data<badlands_state>();
-	int pedal_state = input_port_read(device->machine(), "PEDALS");
+	int pedal_state = state->ioport("PEDALS")->read();
 	int i;
 
 	/* update the pedals once per frame */
@@ -306,8 +306,8 @@ READ8_MEMBER(badlands_state::audio_io_r)
                 0x02 = coin 2
                 0x01 = coin 1
             */
-			result = input_port_read(machine(), "AUDIO");
-			if (!(input_port_read(machine(), "FE4000") & 0x0080)) result ^= 0x90;
+			result = ioport("AUDIO")->read();
+			if (!(ioport("FE4000")->read() & 0x0080)) result ^= 0x90;
 			if (m_cpu_to_sound_ready) result ^= 0x40;
 			if (m_sound_to_cpu_ready) result ^= 0x20;
 			result ^= 0x10;
@@ -426,7 +426,7 @@ static INPUT_PORTS_START( badlands )
 	PORT_BIT( 0x000f, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_SERVICE( 0x0080, IP_ACTIVE_LOW )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
@@ -586,7 +586,7 @@ static DRIVER_INIT( badlands )
 	badlands_state *state = machine.driver_data<badlands_state>();
 
 	/* initialize the audio system */
-	state->m_bank_base = &machine.root_device().memregion("audiocpu")->base()[0x03000];
+	state->m_bank_base = &state->memregion("audiocpu")->base()[0x03000];
 	state->m_bank_source_data = &state->memregion("audiocpu")->base()[0x10000];
 }
 
@@ -688,7 +688,7 @@ static void scanline_update_bootleg(screen_device &screen, int scanline)
 	/* sound IRQ is on 32V */
 //  if (scanline & 32)
 //      atarigen_6502_irq_ack_r(screen.machine(), 0);
-//  else if (!(input_port_read(machine, "FE4000") & 0x40))
+//  else if (!(machine.root_device().ioport("FE4000")->read() & 0x40))
 //      atarigen_6502_irq_gen(screen.machine().device("audiocpu"));
 }
 

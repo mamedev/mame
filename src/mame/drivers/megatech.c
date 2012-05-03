@@ -222,7 +222,7 @@ static TIMER_CALLBACK( megatech_z80_run_state )
 	UINT8* game_region;
 
 	sprintf(tempname, "game%d", param);
-	game_region = machine.root_device().memregion(tempname)->base();
+	game_region = state->memregion(tempname)->base();
 
 	memcpy(state->memregion("maincpu")->base(), game_region, 0x400000);
 

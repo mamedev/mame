@@ -118,7 +118,7 @@ static MACHINE_RESET( segac2 )
 
 	/* determine how many sound banks */
 	state->m_sound_banks = 0;
-	if (machine.root_device().memregion("upd")->base())
+	if (state->memregion("upd")->base())
 		state->m_sound_banks = state->memregion("upd")->bytes() / 0x20000;
 
 	/* reset the protection */
@@ -326,8 +326,8 @@ static READ16_HANDLER( io_chip_r )
 
 			/* otherwise, return an input port */
 			if (offset == 0x04/2 && state->m_sound_banks)
-				return (input_port_read(space->machine(), portnames[offset]) & 0xbf) | (upd7759_busy_r(space->machine().device("upd")) << 6);
-			return input_port_read(space->machine(), portnames[offset]);
+				return (space->machine().root_device().ioport(portnames[offset])->read() & 0xbf) | (upd7759_busy_r(space->machine().device("upd")) << 6);
+			return space->machine().root_device().ioport(portnames[offset])->read();
 
 		/* 'SEGA' protection */
 		case 0x10/2:

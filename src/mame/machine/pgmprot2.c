@@ -182,7 +182,7 @@ static WRITE32_HANDLER( kov2_arm_region_w )
 {
 	pgm_arm_type2_state *state = space->machine().driver_data<pgm_arm_type2_state>();
 	int pc = cpu_get_pc(&space->device());
-	int regionhack = input_port_read(space->machine(), "RegionHack");
+	int regionhack = state->ioport("RegionHack")->read();
 	if (pc==0x190 && regionhack != 0xff) data = (data & 0xffff0000) | (regionhack << 0);
 	COMBINE_DATA(&state->m_arm7_shareram[0x138/4]);
 }
@@ -235,7 +235,7 @@ static WRITE32_HANDLER( martmast_arm_region_w )
 {
 	pgm_arm_type2_state *state = space->machine().driver_data<pgm_arm_type2_state>();
 	int pc = cpu_get_pc(&space->device());
-	int regionhack = input_port_read(space->machine(), "RegionHack");
+	int regionhack = state->ioport("RegionHack")->read();
 	if (pc==0x170 && regionhack != 0xff) data = (data & 0xffff0000) | (regionhack << 0);
 	COMBINE_DATA(&state->m_arm7_shareram[0x138/4]);
 }
@@ -256,7 +256,7 @@ static WRITE32_HANDLER( ddp2_arm_region_w )
 {
 	pgm_arm_type2_state *state = space->machine().driver_data<pgm_arm_type2_state>();
 	int pc = cpu_get_pc(&space->device());
-	int regionhack = input_port_read(space->machine(), "RegionHack");
+	int regionhack = state->ioport("RegionHack")->read();
 	if (pc==0x0174 && regionhack != 0xff) data = (data & 0x0000ffff) | (regionhack << 16);
 	COMBINE_DATA(&state->m_arm7_shareram[0x0]);
 }
@@ -312,8 +312,8 @@ DRIVER_INIT( ddp2 )
 
 DRIVER_INIT( dw2001 )
 {
-	//pgm_arm_type2_state *state = machine.driver_data<pgm_arm_type2_state>();
-	UINT16 *mem16 = (UINT16 *)machine.root_device().memregion("maincpu")->base();
+	pgm_arm_type2_state *state = machine.driver_data<pgm_arm_type2_state>();
+	UINT16 *mem16 = (UINT16 *)state->memregion("maincpu")->base();
 
 	pgm_basic_init(machine);
 	kov2_latch_init(machine);
@@ -330,7 +330,7 @@ DRIVER_INIT( dw2001 )
 	mem16[0x11eb04 / 2] = 0x4e71;
 
 	/* patch ARM area with fake code */
-	UINT16 *temp16 = (UINT16 *)machine.root_device().memregion("prot")->base();
+	UINT16 *temp16 = (UINT16 *)state->memregion("prot")->base();
 	temp16[(0x0000)/2] = 0xd088;
 	temp16[(0x0002)/2] = 0xe59f;
 	temp16[(0x0004)/2] = 0x0680;
@@ -346,8 +346,8 @@ DRIVER_INIT( dw2001 )
 
 DRIVER_INIT( dwpc )
 {
-	//pgm_arm_type2_state *state = machine.driver_data<pgm_arm_type2_state>();
-	UINT16 *mem16 = (UINT16 *)machine.root_device().memregion("maincpu")->base();
+	pgm_arm_type2_state *state = machine.driver_data<pgm_arm_type2_state>();
+	UINT16 *mem16 = (UINT16 *)state->memregion("maincpu")->base();
 
 	pgm_basic_init(machine);
 	kov2_latch_init(machine);
@@ -365,7 +365,7 @@ DRIVER_INIT( dwpc )
 
 
 	/* patch ARM area with fake code */
-	UINT16 *temp16 = (UINT16 *)machine.root_device().memregion("prot")->base();
+	UINT16 *temp16 = (UINT16 *)state->memregion("prot")->base();
 	temp16[(0x0000)/2] = 0xd088;
 	temp16[(0x0002)/2] = 0xe59f;
 	temp16[(0x0004)/2] = 0x0680;

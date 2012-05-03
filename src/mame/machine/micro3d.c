@@ -488,16 +488,16 @@ WRITE32_MEMBER(micro3d_state::micro3d_mac2_w)
 
 READ16_MEMBER(micro3d_state::micro3d_encoder_h_r)
 {
-	UINT16 x_encoder = input_port_read_safe(machine(), "JOYSTICK_X", 0);
-	UINT16 y_encoder = input_port_read_safe(machine(), "JOYSTICK_Y", 0);
+	UINT16 x_encoder = ioport("JOYSTICK_X")->read_safe(0);
+	UINT16 y_encoder = ioport("JOYSTICK_Y")->read_safe(0);
 
 	return (y_encoder & 0xf00) | ((x_encoder & 0xf00) >> 8);
 }
 
 READ16_MEMBER(micro3d_state::micro3d_encoder_l_r)
 {
-	UINT16 x_encoder = input_port_read_safe(machine(), "JOYSTICK_X", 0);
-	UINT16 y_encoder = input_port_read_safe(machine(), "JOYSTICK_Y", 0);
+	UINT16 x_encoder = ioport("JOYSTICK_X")->read_safe(0);
+	UINT16 y_encoder = ioport("JOYSTICK_Y")->read_safe(0);
 
 	return ((y_encoder & 0xff) << 8) | (x_encoder & 0xff);
 }
@@ -508,9 +508,9 @@ static TIMER_CALLBACK( adc_done_callback )
 
 	switch (param)
 	{
-		case 0: state->m_adc_val = input_port_read_safe(machine, "THROTTLE", 0);
+		case 0: state->m_adc_val = state->ioport("THROTTLE")->read_safe(0);
 				break;
-		case 1: state->m_adc_val = (UINT8)((255.0/100.0) * input_port_read(machine, "VOLUME") + 0.5);
+		case 1: state->m_adc_val = (UINT8)((255.0/100.0) * state->ioport("VOLUME")->read() + 0.5);
 				break;
 		case 2: break;
 		case 3: break;

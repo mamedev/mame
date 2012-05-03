@@ -126,7 +126,7 @@ READ16_MEMBER(midxunit_state::midxunit_io_r)
 		case 1:
 		case 2:
 		case 3:
-			return input_port_read(machine(), portnames[offset]);
+			return ioport(portnames[offset])->read();
 
 		default:
 			logerror("%08X:Unknown I/O read from %d\n", cpu_get_pc(&space.device()), offset);
@@ -140,7 +140,7 @@ READ16_MEMBER(midxunit_state::midxunit_analog_r)
 {
 	static const char *const portnames[] = { "AN0", "AN1", "AN2", "AN3", "AN4", "AN5" };
 
-	return input_port_read(machine(), portnames[m_analog_port]);
+	return ioport(portnames[m_analog_port])->read();
 }
 
 
@@ -299,7 +299,7 @@ DRIVER_INIT( revx )
 	register_state_saving(machine);
 
 	/* load the graphics ROMs -- quadruples */
-	midtunit_gfx_rom = base = machine.root_device().memregion("gfx1")->base();
+	midtunit_gfx_rom = base = state->memregion("gfx1")->base();
 	len = state->memregion("gfx1")->bytes();
 	for (i = 0; i < len / 0x200000; i++)
 	{

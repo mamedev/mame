@@ -295,22 +295,22 @@ CUSTOM_INPUT_MEMBER(gottlieb_state::analog_delta_r)
 	const char *string = (const char *)param;
 	int which = string[0] - '0';
 
-	return input_port_read(machine(), &string[1]) - m_track[which];
+	return ioport(&string[1])->read() - m_track[which];
 }
 
 
 WRITE8_MEMBER(gottlieb_state::gottlieb_analog_reset_w)
 {
 	/* reset the trackball counters */
-	m_track[0] = input_port_read_safe(machine(), "TRACKX", 0);
-	m_track[1] = input_port_read_safe(machine(), "TRACKY", 0);
+	m_track[0] = ioport("TRACKX")->read_safe(0);
+	m_track[1] = ioport("TRACKY")->read_safe(0);
 }
 
 
 CUSTOM_INPUT_MEMBER(gottlieb_state::stooges_joystick_r)
 {
 	static const char *const joyport[] = { "P2JOY", "P3JOY", "P1JOY", NULL };
-	return (joyport[m_joystick_select & 3] != NULL) ? input_port_read(machine(), joyport[m_joystick_select & 3]) : 0xff;
+	return (joyport[m_joystick_select & 3] != NULL) ? ioport(joyport[m_joystick_select & 3])->read() : 0xff;
 }
 
 
@@ -1235,17 +1235,17 @@ static INPUT_PORTS_START( curvebal )
 	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( French ) )
 	PORT_DIPNAME( 0xc2, 0x00, DEF_STR( Coinage ) )			PORT_DIPLOCATION("DSW:!6,!7,!8")
-	PORT_DIPSETTING(    0x42, "A 3/1 B 1/2" )	PORT_CONDITION("DSW",0x20,PORTCOND_EQUALS,0x20)
-	PORT_DIPSETTING(    0x42, "A 4/1 B 1/1" )	PORT_CONDITION("DSW",0x20,PORTCOND_EQUALS,0x00)
-	PORT_DIPSETTING(    0x82, "A 1/5 B 1/2" )	PORT_CONDITION("DSW",0x20,PORTCOND_EQUALS,0x20)
-	PORT_DIPSETTING(    0x82, "A 3/1 B 1/1" )	PORT_CONDITION("DSW",0x20,PORTCOND_EQUALS,0x00)
-	PORT_DIPSETTING(    0x02, "A 2/1 B 2/3" )	PORT_CONDITION("DSW",0x20,PORTCOND_EQUALS,0x20)
-	PORT_DIPSETTING(    0x02, "A 2/1 B 1/1" )	PORT_CONDITION("DSW",0x20,PORTCOND_EQUALS,0x00)
+	PORT_DIPSETTING(    0x42, "A 3/1 B 1/2" )	PORT_CONDITION("DSW",0x20,EQUALS,0x20)
+	PORT_DIPSETTING(    0x42, "A 4/1 B 1/1" )	PORT_CONDITION("DSW",0x20,EQUALS,0x00)
+	PORT_DIPSETTING(    0x82, "A 1/5 B 1/2" )	PORT_CONDITION("DSW",0x20,EQUALS,0x20)
+	PORT_DIPSETTING(    0x82, "A 3/1 B 1/1" )	PORT_CONDITION("DSW",0x20,EQUALS,0x00)
+	PORT_DIPSETTING(    0x02, "A 2/1 B 2/3" )	PORT_CONDITION("DSW",0x20,EQUALS,0x20)
+	PORT_DIPSETTING(    0x02, "A 2/1 B 1/1" )	PORT_CONDITION("DSW",0x20,EQUALS,0x00)
 	PORT_DIPSETTING(    0xc0, "A 2/1 B 2/1" )
-	PORT_DIPSETTING(    0x80, "A 1/1 B 1/2" )	PORT_CONDITION("DSW",0x20,PORTCOND_EQUALS,0x20)
-	PORT_DIPSETTING(    0x80, "A 2/1 B 1/2" )	PORT_CONDITION("DSW",0x20,PORTCOND_EQUALS,0x00)
-	PORT_DIPSETTING(    0x40, "A 1/1 B 1/3" )	PORT_CONDITION("DSW",0x20,PORTCOND_EQUALS,0x20)
-	PORT_DIPSETTING(    0x40, "A 2/1 B 1/3" )	PORT_CONDITION("DSW",0x20,PORTCOND_EQUALS,0x00)
+	PORT_DIPSETTING(    0x80, "A 1/1 B 1/2" )	PORT_CONDITION("DSW",0x20,EQUALS,0x20)
+	PORT_DIPSETTING(    0x80, "A 2/1 B 1/2" )	PORT_CONDITION("DSW",0x20,EQUALS,0x00)
+	PORT_DIPSETTING(    0x40, "A 1/1 B 1/3" )	PORT_CONDITION("DSW",0x20,EQUALS,0x20)
+	PORT_DIPSETTING(    0x40, "A 2/1 B 1/3" )	PORT_CONDITION("DSW",0x20,EQUALS,0x00)
 	PORT_DIPSETTING(    0x00, "A 1/1 B 1/1" )
 	PORT_DIPSETTING(    0xc2, DEF_STR( Free_Play ) )
 

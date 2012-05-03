@@ -1435,7 +1435,7 @@ WRITE32_MEMBER(seattle_state::analog_port_w)
 
 	if (data < 8 || data > 15)
 		logerror("%08X:Unexpected analog port select = %08X\n", cpu_get_pc(&space.device()), data);
-	m_pending_analog_read = input_port_read(machine(), portnames[data & 7]);
+	m_pending_analog_read = ioport(portnames[data & 7])->read();
 }
 
 
@@ -1453,39 +1453,39 @@ READ32_MEMBER(seattle_state::carnevil_gun_r)
 	switch (offset)
 	{
 		case 0:		/* low 8 bits of X */
-			result = (input_port_read(machine(), "LIGHT0_X") << 4) & 0xff;
+			result = (ioport("LIGHT0_X")->read() << 4) & 0xff;
 			break;
 
 		case 1:		/* upper 4 bits of X */
-			result = (input_port_read(machine(), "LIGHT0_X") >> 4) & 0x0f;
-			result |= (input_port_read(machine(), "FAKE") & 0x03) << 4;
+			result = (ioport("LIGHT0_X")->read() >> 4) & 0x0f;
+			result |= (ioport("FAKE")->read() & 0x03) << 4;
 			result |= 0x40;
 			break;
 
 		case 2:		/* low 8 bits of Y */
-			result = (input_port_read(machine(), "LIGHT0_Y") << 2) & 0xff;
+			result = (ioport("LIGHT0_Y")->read() << 2) & 0xff;
 			break;
 
 		case 3:		/* upper 4 bits of Y */
-			result = (input_port_read(machine(), "LIGHT0_Y") >> 6) & 0x03;
+			result = (ioport("LIGHT0_Y")->read() >> 6) & 0x03;
 			break;
 
 		case 4:		/* low 8 bits of X */
-			result = (input_port_read(machine(), "LIGHT1_X") << 4) & 0xff;
+			result = (ioport("LIGHT1_X")->read() << 4) & 0xff;
 			break;
 
 		case 5:		/* upper 4 bits of X */
-			result = (input_port_read(machine(), "LIGHT1_X") >> 4) & 0x0f;
-			result |= (input_port_read(machine(), "FAKE") & 0x30);
+			result = (ioport("LIGHT1_X")->read() >> 4) & 0x0f;
+			result |= (ioport("FAKE")->read() & 0x30);
 			result |= 0x40;
 			break;
 
 		case 6:		/* low 8 bits of Y */
-			result = (input_port_read(machine(), "LIGHT1_Y") << 2) & 0xff;
+			result = (ioport("LIGHT1_Y")->read() << 2) & 0xff;
 			break;
 
 		case 7:		/* upper 4 bits of Y */
-			result = (input_port_read(machine(), "LIGHT1_Y") >> 6) & 0x03;
+			result = (ioport("LIGHT1_Y")->read() >> 6) & 0x03;
 			break;
 	}
 	return result;

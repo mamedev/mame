@@ -381,7 +381,7 @@ INPUT_PORTS_END
 
 READ16_MEMBER(tx1_state::dipswitches_r)
 {
-	return (input_port_read(machine(), "DSW") & 0xfffe) | m_ts;
+	return (ioport("DSW")->read() & 0xfffe) | m_ts;
 }
 
 /*
@@ -417,8 +417,8 @@ static WRITE8_DEVICE_HANDLER( bb_coin_cnt_w )
 
 WRITE8_MEMBER(tx1_state::tx1_ppi_latch_w)
 {
-	m_ppi_latch_a = ((input_port_read(machine(), "AN_BRAKE") & 0xf) << 4) | (input_port_read(machine(), "AN_ACCELERATOR") & 0xf);
-	m_ppi_latch_b = input_port_read(machine(), "AN_STEERING");
+	m_ppi_latch_a = ((ioport("AN_BRAKE")->read() & 0xf) << 4) | (ioport("AN_ACCELERATOR")->read() & 0xf);
+	m_ppi_latch_b = ioport("AN_STEERING")->read();
 }
 
 static READ8_DEVICE_HANDLER( tx1_ppi_porta_r )
@@ -430,7 +430,7 @@ static READ8_DEVICE_HANDLER( tx1_ppi_porta_r )
 static READ8_DEVICE_HANDLER( tx1_ppi_portb_r )
 {
 	tx1_state *state = device->machine().driver_data<tx1_state>();
-	return input_port_read(device->machine(), "PPI_PORTD") | state->m_ppi_latch_b;
+	return state->ioport("PPI_PORTD")->read() | state->m_ppi_latch_b;
 }
 
 
@@ -446,17 +446,17 @@ static UINT8 bit_reverse8(UINT8 val)
 READ8_MEMBER(tx1_state::bb_analog_r)
 {
 	if (offset == 0)
-		return bit_reverse8(((input_port_read(machine(), "AN_ACCELERATOR") & 0xf) << 4) | input_port_read(machine(), "AN_STEERING"));
+		return bit_reverse8(((ioport("AN_ACCELERATOR")->read() & 0xf) << 4) | ioport("AN_STEERING")->read());
 	else
-		return bit_reverse8((input_port_read(machine(), "AN_BRAKE") & 0xf) << 4);
+		return bit_reverse8((ioport("AN_BRAKE")->read() & 0xf) << 4);
 }
 
 READ8_MEMBER(tx1_state::bbjr_analog_r)
 {
 	if (offset == 0)
-		return ((input_port_read(machine(), "AN_ACCELERATOR") & 0xf) << 4) | input_port_read(machine(), "AN_STEERING");
+		return ((ioport("AN_ACCELERATOR")->read() & 0xf) << 4) | ioport("AN_STEERING")->read();
 	else
-		return (input_port_read(machine(), "AN_BRAKE") & 0xf) << 4;
+		return (ioport("AN_BRAKE")->read() & 0xf) << 4;
 }
 
 

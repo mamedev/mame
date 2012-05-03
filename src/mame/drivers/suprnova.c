@@ -458,7 +458,7 @@ static TIMER_DEVICE_CALLBACK(skns_irq)
 CUSTOM_INPUT_MEMBER(skns_state::paddle_r)
 {
 	const char *tag = (const char *)param;
-	return input_port_read(machine(), tag);
+	return ioport(tag)->read();
 }
 
 static INPUT_PORTS_START( skns )		/* 3 buttons, 2 players */

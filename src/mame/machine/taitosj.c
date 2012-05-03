@@ -19,7 +19,7 @@
 MACHINE_START( taitosj )
 {
 	taitosj_state *state = machine.driver_data<taitosj_state>();
-	state->membank("bank1")->configure_entry(0, machine.root_device().memregion("maincpu")->base() + 0x6000);
+	state->membank("bank1")->configure_entry(0, state->memregion("maincpu")->base() + 0x6000);
 	state->membank("bank1")->configure_entry(1, state->memregion("maincpu")->base() + 0x10000);
 
 	state->save_item(NAME(state->m_fromz80));
@@ -308,5 +308,5 @@ WRITE8_MEMBER(taitosj_state::alpinea_bankswitch_w)
 
 READ8_MEMBER(taitosj_state::alpine_port_2_r)
 {
-	return input_port_read(machine(), "IN2") | m_protection_value;
+	return ioport("IN2")->read() | m_protection_value;
 }

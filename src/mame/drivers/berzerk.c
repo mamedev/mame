@@ -426,7 +426,7 @@ static void get_pens(running_machine &machine, pen_t *pens)
 	int color;
 	double color_weights[2];
 
-	if (input_port_read(machine, MONITOR_TYPE_PORT_TAG) == 0)
+	if (machine.root_device().ioport(MONITOR_TYPE_PORT_TAG)->read() == 0)
 		compute_resistor_weights(0, 0xff, -1.0,
 								 2, resistances_wg, color_weights, 0, 270,
 								 2, resistances_wg, color_weights, 0, 270,
@@ -903,9 +903,9 @@ READ8_MEMBER(berzerk_state::moonwarp_p1_r)
 	// one difference is it lacks the strobe input (does it?), which if not active causes
 	// the dial input to go open bus. This is used in moon war 2 to switch between player 1
 	// and player 2 dials, which share a single port. moonwarp uses separate ports for the dials.
-	signed char dialread = input_port_read(machine(),"P1_DIAL");
+	signed char dialread = ioport("P1_DIAL")->read();
 	UINT8 ret;
-	UINT8 buttons = (input_port_read(machine(),"P1")&0xe0);
+	UINT8 buttons = (ioport("P1")->read()&0xe0);
 	if (dialread < 0) m_p1_direction = 0;
 	else if (dialread > 0) m_p1_direction = 0x10;
 	m_p1_counter_74ls161 += abs(dialread);
@@ -918,9 +918,9 @@ READ8_MEMBER(berzerk_state::moonwarp_p1_r)
 READ8_MEMBER(berzerk_state::moonwarp_p2_r)
 {
 	// same as above, but for player 2 in cocktail mode
-	signed char dialread = input_port_read(machine(),"P2_DIAL");
+	signed char dialread = ioport("P2_DIAL")->read();
 	UINT8 ret;
-	UINT8 buttons = (input_port_read(machine(),"P2")&0xe0);
+	UINT8 buttons = (ioport("P2")->read()&0xe0);
 	if (dialread < 0) m_p2_direction = 0;
 	else if (dialread > 0) m_p2_direction = 0x10;
 	m_p2_counter_74ls161 += abs(dialread);

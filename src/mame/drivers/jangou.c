@@ -277,20 +277,20 @@ static READ8_DEVICE_HANDLER( input_mux_r )
 	jangou_state *state = device->machine().driver_data<jangou_state>();
 	switch(state->m_mux_data)
 	{
-		case 0x01: return input_port_read(device->machine(), "PL1_1");
-		case 0x02: return input_port_read(device->machine(), "PL1_2");
-		case 0x04: return input_port_read(device->machine(), "PL2_1");
-		case 0x08: return input_port_read(device->machine(), "PL2_2");
-		case 0x10: return input_port_read(device->machine(), "PL1_3");
-		case 0x20: return input_port_read(device->machine(), "PL2_3");
+		case 0x01: return state->ioport("PL1_1")->read();
+		case 0x02: return state->ioport("PL1_2")->read();
+		case 0x04: return state->ioport("PL2_1")->read();
+		case 0x08: return state->ioport("PL2_2")->read();
+		case 0x10: return state->ioport("PL1_3")->read();
+		case 0x20: return state->ioport("PL2_3")->read();
 	}
 
-	return input_port_read(device->machine(), "IN_NOMUX");
+	return device->machine().root_device().ioport("IN_NOMUX")->read();
 }
 
 static READ8_DEVICE_HANDLER( input_system_r )
 {
-	return input_port_read(device->machine(), "SYSTEM");
+	return device->machine().root_device().ioport("SYSTEM")->read();
 }
 
 
@@ -595,7 +595,7 @@ static INPUT_PORTS_START( jangou )
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_VBLANK ) // guess
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen") // guess
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) // blitter busy flag
 INPUT_PORTS_END
 
@@ -656,7 +656,7 @@ static INPUT_PORTS_START( macha )
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_VBLANK ) // guess
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen") // guess
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) // blitter busy flag
 INPUT_PORTS_END
 
@@ -782,7 +782,7 @@ static INPUT_PORTS_START( jngolady )
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) //blitter busy flag
 INPUT_PORTS_END
 

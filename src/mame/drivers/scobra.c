@@ -268,7 +268,7 @@ ADDRESS_MAP_END
 CUSTOM_INPUT_MEMBER(scobra_state::stratgyx_coinage_r)
 {
 	int bit_mask = (FPTR)param;
-	return (input_port_read(machine(), "IN4") & bit_mask) ? 0x01 : 0x00;
+	return (ioport("IN4")->read() & bit_mask) ? 0x01 : 0x00;
 }
 
 

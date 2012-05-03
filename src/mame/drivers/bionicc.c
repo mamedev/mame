@@ -87,13 +87,13 @@ READ16_MEMBER(bionicc_state::hacked_controls_r)
 WRITE16_MEMBER(bionicc_state::bionicc_mpu_trigger_w)
 {
 
-	data = input_port_read(machine(), "SYSTEM") >> 12;
+	data = ioport("SYSTEM")->read() >> 12;
 	m_inp[0] = data ^ 0x0f;
 
-	data = input_port_read(machine(), "P2");
+	data = ioport("P2")->read();
 	m_inp[1] = data ^ 0xff;
 
-	data = input_port_read(machine(), "P1");
+	data = ioport("P1")->read();
 	m_inp[2] = data ^ 0xff;
 }
 
