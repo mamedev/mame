@@ -4874,15 +4874,16 @@ static MACHINE_CONFIG_DERIVED( grdnstrm, stagger1 )
 	MCFG_SCREEN_UPDATE_STATIC(firehawk)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( grdnstrmk, stagger1 )
+static MACHINE_CONFIG_DERIVED( grdnstrmk, stagger1 ) /* Side by side with PCB, the music seems too fast as well */
 
 	/* basic machine hardware */
 
 	/* video hardware */
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_REFRESH_RATE(57) /* Side by side with PCB, MAME is too fast at 56 */
 	MCFG_GFXDECODE(grdnstrm)
 	MCFG_VIDEO_START(grdnstrm)
 MACHINE_CONFIG_END
-
 
 static MACHINE_CONFIG_DERIVED( popspops, grdnstrm )
 
@@ -6665,6 +6666,28 @@ ROM_START( grdnstrmk )
 	ROM_LOAD( "afega1.u95", 0x00000, 0x40000, CRC(e911ce33) SHA1(a29c4dea98a22235122303325c63c15fadd3431d) )
 ROM_END
 
+ROM_START( redfoxwp2 )
+	ROM_REGION( 0x80000, "maincpu", 0 )		/* 68000 Code */
+	ROM_LOAD16_BYTE( "u112", 0x000000, 0x040000, CRC(3f31600b) SHA1(6c56e36178effb60ec27dfcd205393e2cfac4ed6) ) /* No label */
+	ROM_LOAD16_BYTE( "u107", 0x000001, 0x040000, CRC(daa44ab4) SHA1(7edaf8c7383dd31250478aeebc3247c525c75fef) ) /* No label */
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )		/* Z80 Code */
+	ROM_LOAD( "u92", 0x00000, 0x10000, CRC(864b55c2) SHA1(43475b05e35549ad301c3d4a25d4f4f0bcbe3f2c) ) /* Winbond W27E512-12 with no label */
+
+	ROM_REGION( 0x200000, "gfx1", 0 )	/* Sprites, 16x16x4 */
+	ROM_LOAD( "afega_af1-sp.uc13", 0x000000, 0x200000, CRC(7d4d4985) SHA1(15c6c1aecd3f12050c1db2376f929f1a26a1d1cf) ) /* MASK ROM (read as 27C160) */
+
+	ROM_REGION( 0x400000, "gfx2", 0 )	/* Layer 0, 16x16x8 */
+	ROM_LOAD( "afega_af1-b2.uc8", 0x000000, 0x200000, CRC(d68588c2) SHA1(c5f397d74a6ecfd2e375082f82e37c5a330fba62) ) /* MASK ROM (read as 27C160) */
+	ROM_LOAD( "afega_af1-b1.uc3", 0x200000, 0x200000, CRC(f8b200a8) SHA1(a6c43dd57b752d87138d7125b47dc0df83df8987) ) /* MASK ROM (read as 27C160) */
+
+	ROM_REGION( 0x10000, "gfx3", 0 )	/* Layer 1, 8x8x4 */
+	ROM_LOAD( "u4",  0x00000, 0x10000, CRC(19239401) SHA1(7876335dd97418bd9130dc894a517f3ceca20135) ) /* Winbond W27E512-12 with no label */
+
+	ROM_REGION( 0x40000, "oki1", 0 )	/* Samples */
+	ROM_LOAD( "afega1.u95", 0x00000, 0x40000, CRC(e911ce33) SHA1(a29c4dea98a22235122303325c63c15fadd3431d) )
+ROM_END
+
 /***************************************************************************
 
 Pop's Pop's by Afega (1999)
@@ -7186,6 +7209,7 @@ GAME( 1997, redhawke, stagger1, stagger1, stagger1, 0,        ROT270, "Afega (Ex
 GAME( 1997, redhawkb, stagger1, redhawkb, redhawkb, 0,        ROT0,   "bootleg",                           "Red Hawk (bootleg)", 0 )
 GAME( 1998, grdnstrm, 0,        grdnstrm, grdnstrm, 0,        ORIENTATION_FLIP_Y, "Afega (Apples Industries license)", "Guardian Storm", 0 )
 GAME( 1998, grdnstrmk,grdnstrm, grdnstrmk,grdnstrk, grdnstrm, ROT270, "Afega",                             "Sen Jin - Guardian Storm (Korea)", 0 )
+GAME( 1998, redfoxwp2,grdnstrm, grdnstrmk,grdnstrk, grdnstrm, ROT270, "Afega",                             "Red Fox War Planes II (China)", 0 )
 GAME( 1998, bubl2000, 0,        popspops, bubl2000, bubl2000, ROT0,   "Tuning",                            "Bubble 2000", 0 ) // on a tuning board (bootleg?)
 GAME( 1998, hotbubl,  bubl2000, popspops, bubl2000, bubl2000, ROT0,   "Pandora",                           "Hot Bubble" , 0 ) // on an afega board ..
 GAME( 1999, popspops, 0,        popspops, popspops, grdnstrm, ROT0,   "Afega",                             "Pop's Pop's", 0 )
