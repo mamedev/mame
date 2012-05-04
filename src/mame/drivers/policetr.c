@@ -25,6 +25,7 @@ Graphic Roms:  G10     - Graphics rom v1.0 (in diagnostics mode it's called "Art
   Sound Roms:  S12     - Sound rom v1.2
 
 Noted differences in versions of SharpShooter:
+ Added a "Welcome to Sharpshooter" start-up screen showing rom versions for v1.9
  Initial High Score names are changed between v1.1 and v1.2
   Circus of Mystery:
     The ballon challenge has been rewritten for v1.7
@@ -588,7 +589,32 @@ Note: If you set the dipswitch to service mode and reset the game within Mame. A
 ROM_END
 
 
-ROM_START( sshooter ) /* Rev 0.5B PCB , unknown program rom date */
+ROM_START( sshooter ) /* Rev 0.5B PCB , Added a "Welcome" start-up screen which shows "This is Version C191012" */
+	ROM_REGION( 0x800000, "gfx1", ROMREGION_ERASE00 ) /* Graphics v1.0 */
+	ROM_LOAD16_BYTE( "ss-u121.bin", 0x000000, 0x100000, CRC(22e27dd6) SHA1(cb9e8c450352bb116a9c0407cc8ce6d8ae9d9881) ) // 1:1
+	ROM_LOAD16_BYTE( "ss-u120.bin", 0x000001, 0x100000, CRC(30173b1b) SHA1(366464444ce208391ca350f1639403f0c2217330) ) // 1:2
+	ROM_LOAD16_BYTE( "ss-u125.bin", 0x200000, 0x100000, CRC(79e8520a) SHA1(682e5c7954f96db65a137f05cde67c310b85b526) ) // 2:1
+	ROM_LOAD16_BYTE( "ss-u124.bin", 0x200001, 0x100000, CRC(8e805970) SHA1(bfc9940ed6425f136d768170275279c590da7003) ) // 2:2
+	ROM_LOAD16_BYTE( "ss-u123.bin", 0x400000, 0x100000, CRC(d045bb62) SHA1(839209ff6a8e5db63a51a3494a6c973e0068a3c6) ) // 3:1
+	ROM_LOAD16_BYTE( "ss-u122.bin", 0x400001, 0x100000, CRC(163cc133) SHA1(a5e84b5060fd32362aa097d0194ce72e8a90357c) ) // 3:2
+	ROM_LOAD16_BYTE( "ss-u127.bin", 0x600000, 0x100000, CRC(76a7a591) SHA1(9fd7cce21b01f388966a3e8388ba95820ac10bfd) ) // 4:1
+	ROM_LOAD16_BYTE( "ss-u126.bin", 0x600001, 0x100000, CRC(ab1b9d60) SHA1(ff51a71443f7774d3abf96c2eb8ef6a54d73dd8e) ) // 4:2
+
+	ROM_REGION32_BE( 0x100000, "user1", 0 )
+	ROM_LOAD32_BYTE( "ss-u113.v19", 0x00000, 0x40000, CRC(de536a90) SHA1(76f0e0e2457d91b3c1bd2b3501591646a18db348) ) // 1:1
+	ROM_LOAD32_BYTE( "ss-u112.v19", 0x00001, 0x40000, CRC(2e4e1837) SHA1(b4088269e1e7a3913d2841eb24f53b1c413cd0cc) ) // 1:2
+	ROM_LOAD32_BYTE( "ss-u111.v19", 0x00002, 0x40000, CRC(485d03e8) SHA1(ebdf166b2354b318e6bfb68e0fb5647381b9c405) ) // 1:3
+	ROM_LOAD32_BYTE( "ss-u110.v19", 0x00003, 0x40000, CRC(df6a0a45) SHA1(a73a9dcdc669c6e61a5983f3b2a2721fe1b35f34) ) // 1:4
+
+	ROM_REGION( 0x1000000, "bsmt", 0 ) /* Sound v1.2 */
+	ROM_LOAD( "ss-u160.bin", 0x000000, 0x100000, CRC(1c603d42) SHA1(880992871be52129684052d542946de0cc32ba9a) ) // 1:1
+	ROM_RELOAD(              0x3f8000, 0x100000 )
+	ROM_LOAD( "ss-u162.bin", 0x100000, 0x100000, CRC(40ef448a) SHA1(c96f7b169be2576e9f3783af84c07259efefb812) ) // 2:1
+	ROM_RELOAD(              0x4f8000, 0x100000 )
+ROM_END
+
+
+ROM_START( sshooter17 ) /* Rev 0.5B PCB , unknown program rom date */
 	ROM_REGION( 0x800000, "gfx1", ROMREGION_ERASE00 ) /* Graphics v1.0 */
 	ROM_LOAD16_BYTE( "ss-u121.bin", 0x000000, 0x100000, CRC(22e27dd6) SHA1(cb9e8c450352bb116a9c0407cc8ce6d8ae9d9881) ) // 1:1
 	ROM_LOAD16_BYTE( "ss-u120.bin", 0x000001, 0x100000, CRC(30173b1b) SHA1(366464444ce208391ca350f1639403f0c2217330) ) // 1:2
@@ -714,6 +740,7 @@ GAME( 1996, policetr10,  policetr, policetr, polict10, policetr, ROT0, "P&P Mark
 GAME( 1996, policetr13a, policetr, sshooter, policetr, plctr13b, ROT0, "P&P Marketing", "Police Trainer (Rev 1.3B Newer)", 0 )
 GAME( 1996, policetr13b, policetr, sshooter, policetr, plctr13b, ROT0, "P&P Marketing", "Police Trainer (Rev 1.3B)", 0 )
 
-GAME( 1998, sshooter,    0,        sshooter, policetr, sshooter, ROT0, "P&P Marketing", "Sharpshooter (Rev 1.7)", 0 )
+GAME( 1998, sshooter,    0,        sshooter, policetr, sshooter, ROT0, "P&P Marketing", "Sharpshooter (Rev 1.9)", 0 )
+GAME( 1998, sshooter17,  sshooter, sshooter, policetr, sshooter, ROT0, "P&P Marketing", "Sharpshooter (Rev 1.7)", 0 )
 GAME( 1998, sshooter12,  sshooter, sshooter, sshoot11, sshoot12, ROT0, "P&P Marketing", "Sharpshooter (Rev 1.2)", 0 )
 GAME( 1998, sshooter11,  sshooter, sshooter, sshoot11, sshoot12, ROT0, "P&P Marketing", "Sharpshooter (Rev 1.1)", 0 )
