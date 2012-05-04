@@ -28,23 +28,14 @@ public:
 	required_device<pia6821_device> m_videopia;
 
 	DECLARE_READ8_MEMBER(m6803_port2_r);
+	DECLARE_WRITE8_MEMBER(m6803_port2_w);
 
 	DECLARE_INPUT_CHANGED_MEMBER(video_test);
 	DECLARE_INPUT_CHANGED_MEMBER(sound_test);
-//  UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-
-protected:
-
-	// driver_device overrides
-	virtual void machine_reset();
+	
+	UINT8 m_sound_port2;
 };
 
-#if 0
-UINT32 by133_state::screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect )
-{
-	return 0;
-}
-#endif
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, by133_state )
 	AM_RANGE(0x0000, 0xffff) AM_NOP
@@ -67,9 +58,12 @@ ADDRESS_MAP_END
 
 READ8_MEMBER(by133_state::m6803_port2_r)
 {
-	// TODO: port 2 to /reset pin (see schematics)
-	UINT8 d0 = m_videopia->cb2_output() ? 1 : 0;
-	return (m_videopia->b_output() << 1 & 0x1e) | d0;
+	machine().scheduler().synchronize();
+	return m_sound_port2;
+}
+
+WRITE8_MEMBER(by133_state::m6803_port2_w)
+{
 }
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, by133_state )
@@ -78,7 +72,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_portmap, AS_IO, 8, by133_state )
 	AM_RANGE(M6801_PORT1, M6801_PORT1) AM_DEVWRITE_LEGACY("dac", dac_w)
-	AM_RANGE(M6801_PORT2, M6801_PORT2) AM_READ(m6803_port2_r)
+	AM_RANGE(M6801_PORT2, M6801_PORT2) AM_READWRITE(m6803_port2_r, m6803_port2_w)
 ADDRESS_MAP_END
 
 
@@ -101,13 +95,6 @@ static INPUT_PORTS_START( by133 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Sound Test") PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, by133_state, sound_test, 0)
 INPUT_PORTS_END
 
-void by133_state::machine_reset()
-{
-}
-
-static DRIVER_INIT( by133 )
-{
-}
 
 static WRITE_LINE_DEVICE_HANDLER(vdp_interrupt)
 {
@@ -129,14 +116,23 @@ static WRITE_LINE_DEVICE_HANDLER(by133_firq)
 
 static WRITE_LINE_DEVICE_HANDLER(by133_cb2)
 {
-	// to M6803 port 2 d0
-	by133_state *drv_state = device->machine().driver_data<by133_state>();
-	device_set_input_line(drv_state->m_audiocpu, M6801_TIN_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+	// to M6803 port 2 d0?
+//	by133_state *drv_state = device->machine().driver_data<by133_state>();
+//	device_set_input_line(drv_state->m_audiocpu, M6801_TIN_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static READ8_DEVICE_HANDLER(by133_portb_r)
 {
 	return 0;
+}
+
+static WRITE8_DEVICE_HANDLER(by133_portb_w)
+{
+	by133_state *state = device->machine().driver_data<by133_state>();
+	device->machine().scheduler().synchronize();
+	
+	// d0-d3 to m6803 d1-d4
+	state->m_sound_port2 = data << 1 & 0x1f;
 }
 
 static const pia6821_interface videopia_intf =
@@ -148,13 +144,19 @@ static const pia6821_interface videopia_intf =
 	DEVCB_NULL,		/* line CA2 in */
 	DEVCB_NULL,		/* line CB2 in */
 	DEVCB_NULL,		/* port A out */
-	DEVCB_NULL,		/* port B out */
+	DEVCB_HANDLER(by133_portb_w),		/* port B out */
 	DEVCB_NULL,		/* line CA2 out */
 	DEVCB_LINE(by133_cb2),		/* line CB2 out */
 	DEVCB_LINE(by133_firq),		/* IRQA */
 	DEVCB_LINE(by133_firq)		/* IRQB */
 };
 
+
+static MACHINE_RESET( by133 )
+{
+	by133_state *state = machine.driver_data<by133_state>();
+	state->m_sound_port2 = 2; // forced to 010 on /reset
+}
 
 static MACHINE_CONFIG_START( by133, by133_state )
 	/* basic machine hardware */
@@ -170,6 +172,8 @@ static MACHINE_CONFIG_START( by133, by133_state )
 	MCFG_CPU_IO_MAP(sound_portmap)
 
 	MCFG_PIA6821_ADD("videopia", videopia_intf)
+
+	MCFG_MACHINE_RESET(by133)
 
 	/* video hardware */
 	MCFG_TMS9928A_ADD( "tms9928a", TMS9928A, byvid_tms9928a_interface )
@@ -246,6 +250,6 @@ ROM_START(granny)
 ROM_END
 
 
-GAME( 1982, babypac,  0,        by133,  by133,  by133,  ROT90, "Bally",    "Baby Pac-Man (set 1)",     GAME_IS_SKELETON_MECHANICAL)
-GAME( 1982, babypac2, babypac,  by133,  by133,  by133,  ROT90, "Bally",    "Baby Pac-Man (set 2)",     GAME_IS_SKELETON_MECHANICAL)
-GAME( 1984, granny,   0,        by133,  by133,  by133,  ROT0,  "Bally",    "Granny and the Gators",    GAME_IS_SKELETON_MECHANICAL)
+GAME( 1982, babypac,  0,        by133,  by133,  0,  ROT90, "Bally",    "Baby Pac-Man (set 1)",     GAME_IS_SKELETON_MECHANICAL)
+GAME( 1982, babypac2, babypac,  by133,  by133,  0,  ROT90, "Bally",    "Baby Pac-Man (set 2)",     GAME_IS_SKELETON_MECHANICAL)
+GAME( 1984, granny,   0,        by133,  by133,  0,  ROT0,  "Bally",    "Granny and the Gators",    GAME_IS_SKELETON_MECHANICAL)
