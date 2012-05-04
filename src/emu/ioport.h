@@ -1258,12 +1258,14 @@ public:
 	ioport_value frame_interpolate(ioport_value oldval, ioport_value newval);
 	ioport_type token_to_input_type(const char *string, int &player) const;
 	const char *input_type_to_token(astring &string, ioport_type type, int player);
-	void frame_update();
 
 private:
 	// internal helpers
 	void init_port_types();
 	void init_autoselect_devices(int type1, int type2, int type3, const char *option, const char *ananame);
+
+	void frame_update_callback();
+	void frame_update();
 
 	ioport_port *port(const char *tag) const { return m_portlist.find(tag); }
 	void exit();

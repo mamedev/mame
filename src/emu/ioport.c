@@ -2596,7 +2596,7 @@ time_t ioport_manager::initialize()
 {
 	// add an exit callback and a frame callback
 	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(ioport_manager::exit), this));
-	machine().add_notifier(MACHINE_NOTIFY_FRAME, machine_notify_delegate(FUNC(ioport_manager::frame_update), this));
+	machine().add_notifier(MACHINE_NOTIFY_FRAME, machine_notify_delegate(FUNC(ioport_manager::frame_update_callback), this));
 
 	// initialize the default port info from the OSD
 	init_port_types();
@@ -2939,16 +2939,24 @@ digital_joystick &ioport_manager::digjoystick(int player, int number)
 
 
 //-------------------------------------------------
-//  frame_update - core logic for per-frame input
-//  port updating
+//  frame_update - callback for once/frame updating
+//-------------------------------------------------
+
+void ioport_manager::frame_update_callback()
+{
+	// if we're paused, don't do anything
+	if (!machine().paused())
+		frame_update();
+}
+
+
+//-------------------------------------------------
+//  frame_update_internal - core logic for 
+//	per-frame input port updating
 //-------------------------------------------------
 
 void ioport_manager::frame_update()
 {
-	// if we're paused, don't do anything
-	if (machine().paused())
-		return;
-
 g_profiler.start(PROFILER_INPUT);
 
 	// record/playback information about the current frame
