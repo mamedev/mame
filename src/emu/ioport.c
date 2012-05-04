@@ -1692,25 +1692,46 @@ const char *ioport_field::name() const
 
 
 //-------------------------------------------------
-//  seq - return the input sequence for the given 
-//  input field
+//  seq - return the live input sequence for the 
+//  given input field
 //-------------------------------------------------
 
 const input_seq &ioport_field::seq(input_seq_type seqtype) const
+{
+	// if no live state, return default
+	if (m_live == NULL)
+		return defseq(seqtype);
+
+	// if the field is disabled, return no key
+	if (m_flags & FIELD_FLAG_UNUSED)
+		return input_seq::empty_seq;
+
+	// if the sequence is the special default code, return the expanded default value
+	if (m_live->seq[seqtype].is_default())
+		return machine().ioport().type_seq(m_type, m_player, seqtype);
+
+	// otherwise, return the sequence as-is
+	return m_live->seq[seqtype];
+}
+
+
+//-------------------------------------------------
+//  defseq - return the default input sequence for 
+//  the given input field
+//-------------------------------------------------
+
+const input_seq &ioport_field::defseq(input_seq_type seqtype) const
 {
 	// if the field is disabled, return no key
 	if (m_flags & FIELD_FLAG_UNUSED)
 		return input_seq::empty_seq;
 
-	// select either the live or config state depending on whether we have live state
-	const input_seq &portseq = (m_live == NULL) ? m_seq[seqtype] : m_live->seq[seqtype];
-
-	// if the portseq is the special default code, return the expanded default value
-	if (portseq.is_default())
+	// if the sequence is the special default code, return the expanded default value
+	if (m_seq[seqtype].is_default())
 		return machine().ioport().type_seq(m_type, m_player, seqtype);
 
 	// otherwise, return the sequence as-is
-	return portseq;
+	return m_seq[seqtype];
 }
 
 
@@ -1817,7 +1838,7 @@ void ioport_field::get_user_settings(user_settings &settings)
 
 	// copy the basics
 	for (input_seq_type seqtype = SEQ_TYPE_STANDARD; seqtype < SEQ_TYPE_TOTAL; seqtype++)
-		settings.seq[seqtype] = m_live->seq[seqtype];
+		settings.seq[seqtype] = seq(seqtype);
 
 	// if there's a list of settings or we're an adjuster, copy the current value
 	if (first_setting() != NULL || m_type == IPT_ADJUSTER)
@@ -2279,7 +2300,7 @@ ioport_field_live::ioport_field_live(ioport_field &field, analog_field *analog)
 {
 	// fill in the basic values
 	for (input_seq_type seqtype = SEQ_TYPE_STANDARD; seqtype < SEQ_TYPE_TOTAL; seqtype++)
-		seq[seqtype] = field.seq(seqtype);
+		seq[seqtype] = field.defseq(seqtype);
 
 	// if this is a digital joystick field, make a note of it
 	if (field.is_digital_joystick())
@@ -3326,10 +3347,10 @@ void ioport_manager::save_game_inputs(xml_data_node *parentnode)
 				// determine if we changed
 				bool changed = false;
 				for (input_seq_type seqtype = SEQ_TYPE_STANDARD; seqtype < SEQ_TYPE_TOTAL; seqtype++)
-					changed |= (field->live().seq[seqtype] != field->seq(seqtype));
+					changed |= (field->seq(seqtype) != field->defseq(seqtype));
 
 				// non-analog changes
-				if (field->live().analog == NULL)
+				if (!field->is_analog())
 					changed |= ((field->live().value & field->mask()) != (field->defvalue() & field->mask()));
 
 				// analog changes
@@ -3357,11 +3378,11 @@ void ioport_manager::save_game_inputs(xml_data_node *parentnode)
 
 						// add sequences if changed
 						for (input_seq_type seqtype = SEQ_TYPE_STANDARD; seqtype < SEQ_TYPE_TOTAL; seqtype++)
-							if (field->live().seq[seqtype] != field->seq(seqtype))
-								save_sequence(portnode, seqtype, field->type(), field->live().seq[seqtype]);
+							if (field->seq(seqtype) != field->defseq(seqtype))
+								save_sequence(portnode, seqtype, field->type(), field->seq(seqtype));
 
 						// write out non-analog changes
-						if (field->live().analog == NULL)
+						if (!field->is_analog())
 						{
 							if ((field->live().value & field->mask()) != (field->defvalue() & field->mask()))
 								xml_set_attribute_int(portnode, "value", field->live().value & field->mask());
