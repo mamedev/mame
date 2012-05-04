@@ -2154,7 +2154,6 @@ src/mame/drivers/bgt.c svneol=native#text/plain
 src/mame/drivers/big10.c svneol=native#text/plain
 src/mame/drivers/bigevglf.c svneol=native#text/plain
 src/mame/drivers/bigstrkb.c svneol=native#text/plain
-src/mame/drivers/bikkuric.c svneol=native#text/plain
 src/mame/drivers/bingo.c svneol=native#text/plain
 src/mame/drivers/bingoc.c svneol=native#text/plain
 src/mame/drivers/bingor.c svneol=native#text/plain
