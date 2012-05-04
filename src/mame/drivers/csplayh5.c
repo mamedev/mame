@@ -9,6 +9,7 @@
     - fix h8 CPU core bugs, it trips various unhandled opcodes
     - Implement DVD routing and YUV decoding;
     - game timings seem busted, could be due of missing DVD hook-up
+    - csplayh8: inputs doesn't work at all, slower than the others too
 
 ***************************************************************************/
 
@@ -668,7 +669,7 @@ MACHINE_CONFIG_END
 
 ***************************************************************************/
 
-void general_init(running_machine &machine, int patchaddress)
+void general_init(running_machine &machine, int patchaddress, int patchvalue)
 {
 	UINT16 *MAINROM = (UINT16 *)machine.root_device().memregion("maincpu")->base();
 	UINT8 *SNDROM = machine.root_device().memregion("audiocpu")->base();
@@ -677,21 +678,46 @@ void general_init(running_machine &machine, int patchaddress)
 	csplayh5_soundbank_w(machine, 0);
 
 	/* patch DVD comms check */
-	MAINROM[patchaddress] = 0x6018;
+	MAINROM[patchaddress] = patchvalue;
 
 	/* patch sound program */
 	SNDROM[0x0213] = 0x00;			// DI -> NOP
 
 }
 
-static DRIVER_INIT( junai )    { general_init(machine, 0x679c/2); }
-static DRIVER_INIT( mjmania )  { general_init(machine, 0x6b96/2); }
-static DRIVER_INIT( junai2 )   { general_init(machine, 0x6588/2); }
-static DRIVER_INIT( csplayh5 ) { general_init(machine, 0x4cb4/2); }
-static DRIVER_INIT( bikiniko ) { general_init(machine, 0x585c/2); }
-static DRIVER_INIT( thenanpa ) { general_init(machine, 0x69ec/2); }
-static DRIVER_INIT( csplayh7 ) { general_init(machine, 0x7a20/2); }
-static DRIVER_INIT( fuudol )   { general_init(machine, 0x9166/2); }
+static DRIVER_INIT( csplayh8 ) { general_init(machine, 0x6880/2,0x6020); }
+
+static DRIVER_INIT( junai )    { general_init(machine, 0x679c/2,0x6018); }
+static DRIVER_INIT( mjmania )  { general_init(machine, 0x6b96/2,0x6018); }
+static DRIVER_INIT( junai2 )   { general_init(machine, 0x6588/2,0x6018); }
+static DRIVER_INIT( csplayh5 ) { general_init(machine, 0x4cb4/2,0x6018); }
+static DRIVER_INIT( bikiniko ) { general_init(machine, 0x585c/2,0x6018); }
+static DRIVER_INIT( thenanpa ) { general_init(machine, 0x69ec/2,0x6018); }
+static DRIVER_INIT( csplayh7 ) { general_init(machine, 0x7a20/2,0x6018); }
+static DRIVER_INIT( fuudol )   { general_init(machine, 0x9166/2,0x6018); }
+
+/* TODO: correct rom labels*/
+ROM_START( csplayh8 )
+	ROM_REGION( 0x40000, "maincpu", 0 ) // tmp68301 prg
+	ROM_LOAD16_BYTE( "3.bin", 0x000000, 0x020000, CRC(86ac0289) SHA1(7ae3047fc7ea22705cc5b04d0ec6c792c429e8ee) )
+	ROM_LOAD16_BYTE( "2.bin", 0x000001, 0x020000, CRC(1f056e64) SHA1(7c5fb318abcd87313ef739dec191af9bcf284f24) )
+
+	ROM_REGION( 0x20000, "subcpu", 0 ) // h8, dvd player
+	ROM_LOAD16_WORD_SWAP( "u2",   0x00000, 0x20000, NO_DUMP )
+
+	ROM_REGION( 0x20000, "audiocpu", 0 ) // z80
+	ROM_LOAD( "1.bin", 0x000000, 0x020000, CRC(8296d67f) SHA1(20eb944a2bd27980e1aaf60ca544059e84129760) )
+
+	ROM_REGION( 0x400000, "blit_gfx", ROMREGION_ERASEFF ) // blitter based gfxs
+    ROM_LOAD16_BYTE( "4.bin", 0x000000, 0x080000, CRC(2e63ee15) SHA1(78fefbc277234458212cded997d393bd8b82cf76) )
+    ROM_LOAD16_BYTE( "8.bin", 0x000001, 0x080000, CRC(a8567f1b) SHA1(2a854ef8b1988ad097bbcbeddc4b275ad738e1e1) )
+
+	DISK_REGION( "dvd" )
+	DISK_IMAGE( "csplayh8", 0, SHA1(d6514882c2626e62c5079df9ac68ecb70fc33209) )
+
+	ROM_REGION( 0x1000, "gal", ROMREGION_ERASE00 )
+	ROM_LOAD( "gal16v8b.ic8", 0x000000, 0x0008c1, NO_DUMP )
+ROM_END
 
 ROM_START( junai )
 	ROM_REGION( 0x40000, "maincpu", 0 ) // tmp68301 prg
@@ -865,6 +891,9 @@ ROM_START( fuudol )
 	ROM_LOAD( "gal16v8b.ic8", 0x000000, 0x0008c1, CRC(30719630) SHA1(a8c7b6d0304c38691775c5af6c32fbeeefd9f9fa) )
 ROM_END
 
+// 1995
+GAME( 1995, csplayh8,   0,   csplayh5,  csplayh5,  csplayh8,         ROT0, "Sphinx/AV Japan/Astro System Japan",   "Mahjong Hanafuda Cosplay Tengoku 8 (Japan)", GAME_NOT_WORKING )
+
 // 1998
 // 01 : Mahjong Gal-pri - World Gal-con Grandprix : Nichibutsu/Just&Just
 // 02 : Sengoku Mahjong Kurenai Otome-tai : Nichibutsu/Just&Just
@@ -876,7 +905,7 @@ ROM_END
 
 // 1999
 /* 07 */ GAME( 1999, mjmania,   0,   csplayh5,  csplayh5,  mjmania,     	ROT0, "Sphinx/Just&Just", "Mahjong Mania - Kairakukan e Youkoso (Japan)", GAME_NOT_WORKING )
-// 08 : Renai Mahjong Idol Gakuen : Nichibutsu/eic
+///* 08 */ GAME( 1995, renaimj,   0,   csplayh5,  csplayh5,  renaimj,         ROT0, "Nichibutsu/eic",   "Renai Mahjong Idol Gakuen (Japan)", GAME_NOT_WORKING )
 /* 09 */ GAME( 1999, bikiniko,  0,   csplayh5,  csplayh5,  bikiniko,		ROT0, "Nichibutsu/eic",   "BiKiNikko - Okinawa de Ippai Shichaimashita (Japan)", GAME_NOT_WORKING )
 // 10 : Mahjong Hanafuda Cosplay Tengoku 6 - Junai hen : Nichibutsu/eic
 /* 11 */ GAME( 1999, thenanpa,  0,   csplayh5,  csplayh5,  thenanpa,        ROT0, "Nichibutsu/Love Factory/eic", "The Nanpa (Japan)", GAME_NOT_WORKING )
