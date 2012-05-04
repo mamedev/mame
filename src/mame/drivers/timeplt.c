@@ -819,7 +819,7 @@ ROM_START( bikkuric )
 	ROM_LOAD( "5.l3",         0x00000, 0x02000, CRC(bc438531) SHA1(e19badc417b0538010cf535d3f733acc54b0cd96) )
 
 	ROM_REGION( 0x8000, "gfx1", ROMREGION_ERASE00 )
-	ROM_LOAD( "3.d4",         0x00000, 0x08000, BAD_DUMP CRC(74e8a64b) SHA1(b2542e1f6f4b54d8f7aec8f673cedcf5bff5e429) ) // must be half size, 1st and 2nd identical
+	ROM_LOAD( "3.d4",         0x00000, 0x08000, CRC(74e8a64b) SHA1(b2542e1f6f4b54d8f7aec8f673cedcf5bff5e429) ) // 1st and 2nd identical, confirmed to be like this
 
 	ROM_REGION( 0x2000, "gfx2", ROMREGION_ERASE00 )
 	ROM_LOAD( "4.h8",         0x00000, 0x02000, CRC(d303942d) SHA1(688d43e6dbe505d44fc41fdde74858a02910080d) )
