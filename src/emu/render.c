@@ -1455,7 +1455,7 @@ render_primitive_list &render_target::get_primitives()
 bool render_target::map_point_container(INT32 target_x, INT32 target_y, render_container &container, float &container_x, float &container_y)
 {
 	const char *input_tag;
-	UINT32 input_mask;
+	ioport_value input_mask;
 	return map_point_internal(target_x, target_y, &container, container_x, container_y, input_tag, input_mask);
 }
 
@@ -1466,7 +1466,7 @@ bool render_target::map_point_container(INT32 target_x, INT32 target_y, render_c
 //  container, if possible
 //-------------------------------------------------
 
-bool render_target::map_point_input(INT32 target_x, INT32 target_y, const char *&input_tag, UINT32 &input_mask, float &input_x, float &input_y)
+bool render_target::map_point_input(INT32 target_x, INT32 target_y, const char *&input_tag, ioport_value &input_mask, float &input_x, float &input_y)
 {
 	return map_point_internal(target_x, target_y, NULL, input_x, input_y, input_tag, input_mask);
 }
@@ -1918,7 +1918,7 @@ void render_target::add_element_primitives(render_primitive_list &list, const ob
 //  mapping points
 //-------------------------------------------------
 
-bool render_target::map_point_internal(INT32 target_x, INT32 target_y, render_container *container, float &mapped_x, float &mapped_y, const char *&mapped_input_tag, UINT32 &mapped_input_mask)
+bool render_target::map_point_internal(INT32 target_x, INT32 target_y, render_container *container, float &mapped_x, float &mapped_y, const char *&mapped_input_tag, ioport_value &mapped_input_mask)
 {
 	// default to point not mapped
 	mapped_x = -1.0;

@@ -94,7 +94,7 @@ static ADDRESS_MAP_START( mw18w_portmap, AS_IO, 8, mw18w_state )
 	AM_RANGE(0x07, 0x07) AM_WRITE(mw18w_irq0_clear_w)
 ADDRESS_MAP_END
 
-static const UINT32 mw18w_controller_table[] =
+static const ioport_value mw18w_controller_table[] =
 {
 	// same encoder as sspeedr
 	0x3f, 0x3e, 0x3c, 0x3d, 0x39, 0x38, 0x3a, 0x3b,

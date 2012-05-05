@@ -179,18 +179,18 @@ public:
 	INT32 delta() const { return m_delta; }
 	INT32 centerdelta() const { return m_centerdelta; }
 
-	// helpers
-	ioport_value apply_min_max(ioport_value value) const;
-	ioport_value apply_settings(ioport_value value) const;
-	ioport_value apply_sensitivity(ioport_value value) const;
-	ioport_value apply_inverse_sensitivity(ioport_value value) const;
-
 	// readers
 	void read(ioport_value &value);
 	float crosshair_read();
 	void frame_update(running_machine &machine);
 	
 private:
+	// helpers
+	INT32 apply_min_max(INT32 value) const;
+	INT32 apply_settings(INT32 value) const;
+	INT32 apply_sensitivity(INT32 value) const;
+	INT32 apply_inverse_sensitivity(INT32 value) const;
+
 	// internal state
 	analog_field *		m_next;					// link to the next analog state for this port
 	ioport_field &		m_field;				// pointer to the input field referenced
@@ -316,7 +316,7 @@ struct char_info
 //	from a numerator and a denominator
 //-------------------------------------------------
 
-inline INT32 compute_scale(INT32 num, INT32 den)
+inline INT64 compute_scale(INT32 num, INT32 den)
 {
 	return (INT64(num) << 24) / den;
 }
@@ -327,7 +327,7 @@ inline INT32 compute_scale(INT32 num, INT32 den)
 //  an 8.24 scale value
 //-------------------------------------------------
 
-inline INT32 recip_scale(INT32 scale)
+inline INT64 recip_scale(INT64 scale)
 {
 	return (INT64(1) << 48) / scale;
 }
@@ -338,7 +338,7 @@ inline INT32 recip_scale(INT32 scale)
 //	a 32-bit value
 //-------------------------------------------------
 
-inline INT32 apply_scale(INT32 value, INT32 scale)
+inline INT32 apply_scale(INT32 value, INT64 scale)
 {
 	return (INT64(value) * scale) >> 24;
 }
@@ -3035,7 +3035,7 @@ g_profiler.stop();
 //  values based on the time between frames
 //-------------------------------------------------
 
-ioport_value ioport_manager::frame_interpolate(ioport_value oldval, ioport_value newval)
+INT32 ioport_manager::frame_interpolate(INT32 oldval, INT32 newval)
 {
 	// if no last delta, just use new value
 	if (m_last_delta_nsec == 0)
@@ -4170,7 +4170,7 @@ analog_field::analog_field(ioport_field &field)
 //  the appropriate min/max for the analog control
 //-------------------------------------------------
 
-inline ioport_value analog_field::apply_min_max(ioport_value value) const
+inline INT32 analog_field::apply_min_max(INT32 value) const
 {
 	// take the analog minimum and maximum values and apply the inverse of the
 	// sensitivity so that we can clamp against them before applying sensitivity
@@ -4206,7 +4206,7 @@ inline ioport_value analog_field::apply_min_max(ioport_value value) const
 //	adjustment for a current value
 //-------------------------------------------------
 
-inline ioport_value analog_field::apply_sensitivity(ioport_value value) const
+inline INT32 analog_field::apply_sensitivity(INT32 value) const
 {
 	return INT32((INT64(value) * m_sensitivity) / 100.0 + 0.5);
 }
@@ -4217,7 +4217,7 @@ inline ioport_value analog_field::apply_sensitivity(ioport_value value) const
 //	sensitivity adjustment for a current value
 //-------------------------------------------------
 
-inline ioport_value analog_field::apply_inverse_sensitivity(ioport_value value) const
+inline INT32 analog_field::apply_inverse_sensitivity(INT32 value) const
 {
 	return INT32((INT64(value) * 100) / m_sensitivity);
 }
@@ -4228,7 +4228,7 @@ inline ioport_value analog_field::apply_inverse_sensitivity(ioport_value value) 
 //  analog input
 //-------------------------------------------------
 
-ioport_value analog_field::apply_settings(ioport_value value) const
+INT32 analog_field::apply_settings(INT32 value) const
 {
 	// apply the min/max and then the sensitivity
 	value = apply_min_max(value);

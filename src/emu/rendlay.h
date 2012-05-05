@@ -232,7 +232,7 @@ public:
 		int orientation() const { return m_orientation; }
 		render_container *screen_container(running_machine &machine) const { return (m_screen != NULL) ? &m_screen->container() : NULL; }
 		bool has_input() const { return bool(m_input_tag); }
-		const char *input_tag_and_mask(UINT32 &mask) const { mask = m_input_mask; return m_input_tag; }
+		const char *input_tag_and_mask(ioport_value &mask) const { mask = m_input_mask; return m_input_tag; }
 
 		// fetch state based on configured source
 		int state() const;
@@ -243,7 +243,7 @@ public:
 		layout_element *	m_element;			// pointer to the associated element (non-screens only)
 		astring				m_output_name;		// name of this item
 		astring				m_input_tag;		// input tag of this item
-		UINT32				m_input_mask;		// input mask of this item
+		ioport_value		m_input_mask;		// input mask of this item
 		screen_device *		m_screen;			// pointer to screen
 		int					m_orientation;		// orientation of this item
 		render_bounds		m_bounds;			// bounds of the item

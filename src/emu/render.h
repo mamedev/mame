@@ -663,7 +663,7 @@ public:
 
 	// hit testing
 	bool map_point_container(INT32 target_x, INT32 target_y, render_container &container, float &container_x, float &container_y);
-	bool map_point_input(INT32 target_x, INT32 target_y, const char *&input_tag, UINT32 &input_mask, float &input_x, float &input_y);
+	bool map_point_input(INT32 target_x, INT32 target_y, const char *&input_tag, ioport_value &input_mask, float &input_x, float &input_y);
 
 	// reference tracking
 	void invalidate_all(void *refptr);
@@ -680,7 +680,7 @@ private:
 	bool load_layout_file(const char *dirname, const char *filename);
 	void add_container_primitives(render_primitive_list &list, const object_transform &xform, render_container &container, int blendmode);
 	void add_element_primitives(render_primitive_list &list, const object_transform &xform, layout_element &element, int state, int blendmode);
-	bool map_point_internal(INT32 target_x, INT32 target_y, render_container *container, float &mapped_x, float &mapped_y, const char *&mapped_input_tag, UINT32 &mapped_input_mask);
+	bool map_point_internal(INT32 target_x, INT32 target_y, render_container *container, float &mapped_x, float &mapped_y, const char *&mapped_input_tag, ioport_value &mapped_input_mask);
 
 	// config callbacks
 	void config_load(xml_data_node &targetnode);

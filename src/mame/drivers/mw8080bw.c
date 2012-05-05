@@ -336,7 +336,7 @@ ADDRESS_MAP_END
 
 
 /* the 30 position encoder is verified */
-static const UINT32 seawolf_controller_table[30] =
+static const ioport_value seawolf_controller_table[30] =
 {
 	0x1e, 0x1c, 0x1d, 0x19, 0x18, 0x1a, 0x1b, 0x13,
 	0x12, 0x10, 0x11, 0x15, 0x14, 0x16, 0x17, 0x07,
@@ -444,7 +444,7 @@ static ADDRESS_MAP_START( gunfight_io_map, AS_IO, 8, mw8080bw_state )
 ADDRESS_MAP_END
 
 
-static const UINT32 gunfight_controller_table[7] =
+static const ioport_value gunfight_controller_table[7] =
 {
 	0x06, 0x02, 0x00, 0x04, 0x05, 0x01, 0x03
 };
@@ -1000,7 +1000,7 @@ static ADDRESS_MAP_START( boothill_io_map, AS_IO, 8, mw8080bw_state )
 ADDRESS_MAP_END
 
 
-static const UINT32 boothill_controller_table[7] =
+static const ioport_value boothill_controller_table[7] =
 {
 	0x00, 0x04, 0x06, 0x07, 0x03, 0x01, 0x05
 };
@@ -2049,7 +2049,7 @@ static ADDRESS_MAP_START( dogpatch_io_map, AS_IO, 8, mw8080bw_state )
 ADDRESS_MAP_END
 
 
-static const UINT32 dogpatch_controller_table[7] =
+static const ioport_value dogpatch_controller_table[7] =
 {
 	0x07, 0x06, 0x04, 0x05, 0x01, 0x00, 0x02
 };
@@ -2207,7 +2207,7 @@ static ADDRESS_MAP_START( spcenctr_io_map, AS_IO, 8, mw8080bw_state )
 ADDRESS_MAP_END
 
 
-static const UINT32 spcenctr_controller_table[] =
+static const ioport_value spcenctr_controller_table[] =
 {
 	0x3f, 0x3e, 0x3c, 0x3d, 0x39, 0x38, 0x3a, 0x3b,
 	0x33, 0x32, 0x30, 0x31, 0x35, 0x34, 0x36, 0x37,
