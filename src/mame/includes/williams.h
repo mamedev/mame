@@ -13,7 +13,7 @@ class williams_state : public driver_device
 public:
 	williams_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_cvsd_sound(*this, "cvsd"),
+		  m_cvsd_sound(*this, "cvsd_sound"),
 		  m_nvram(*this, "nvram") ,
 		m_videoram(*this, "videoram"),
 		m_blaster_palette_0(*this, "blaster_pal0"),
