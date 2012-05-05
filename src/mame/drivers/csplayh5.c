@@ -685,7 +685,7 @@ void general_init(running_machine &machine, int patchaddress, int patchvalue)
 
 }
 
-static DRIVER_INIT( csplayh8 ) { general_init(machine, 0x6880/2,0x6020); }
+static DRIVER_INIT( csplayh1 ) { general_init(machine, 0x6880/2,0x6020); }
 
 static DRIVER_INIT( junai )    { general_init(machine, 0x679c/2,0x6018); }
 static DRIVER_INIT( mjmania )  { general_init(machine, 0x6b96/2,0x6018); }
@@ -697,7 +697,7 @@ static DRIVER_INIT( csplayh7 ) { general_init(machine, 0x7a20/2,0x6018); }
 static DRIVER_INIT( fuudol )   { general_init(machine, 0x9166/2,0x6018); }
 
 /* TODO: correct rom labels*/
-ROM_START( csplayh8 )
+ROM_START( csplayh1 )
 	ROM_REGION( 0x40000, "maincpu", 0 ) // tmp68301 prg
 	ROM_LOAD16_BYTE( "3.bin", 0x000000, 0x020000, CRC(86ac0289) SHA1(7ae3047fc7ea22705cc5b04d0ec6c792c429e8ee) )
 	ROM_LOAD16_BYTE( "2.bin", 0x000001, 0x020000, CRC(1f056e64) SHA1(7c5fb318abcd87313ef739dec191af9bcf284f24) )
@@ -892,7 +892,7 @@ ROM_START( fuudol )
 ROM_END
 
 // 1995
-GAME( 1995, csplayh8,   0,   csplayh5,  csplayh5,  csplayh8,         ROT0, "Sphinx/AV Japan/Astro System Japan",   "Mahjong Hanafuda Cosplay Tengoku 8 (Japan)", GAME_NOT_WORKING )
+GAME( 1995, csplayh1,   0,   csplayh5,  csplayh5,  csplayh1,                ROT0, "Sphinx/AV Japan/Astro System Japan",   "Super CD Dai8dan Mahjong Hanafuda Cosplay Tengoku (Japan)", GAME_NOT_WORKING )
 
 // 1998
 // 01 : Mahjong Gal-pri - World Gal-con Grandprix : Nichibutsu/Just&Just
