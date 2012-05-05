@@ -394,7 +394,7 @@ void naomi_gdrom_board::device_start()
 
 	UINT64 key;
 
-	const UINT8 *picdata = memregion(pic_tag)->base();
+	const UINT8 *picdata = machine().root_device().memregion(pic_tag)->base();
 
 	if(picdata) {
 		if(machine().root_device().memregion(pic_tag)->bytes() >= 0x4000) {

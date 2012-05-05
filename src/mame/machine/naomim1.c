@@ -31,7 +31,7 @@ void naomi_m1_board::device_start()
 {
 	naomi_board::device_start();
 
-	const UINT8 *key_data = memregion(key_tag)->base();
+	const UINT8 *key_data = machine().root_device().memregion(key_tag)->base();
 	key = (key_data[0] << 24) | (key_data[1] << 16) | (key_data[2] << 8) | key_data[3];
 	buffer = auto_alloc_array(machine(), UINT8, BUFFER_SIZE);
 
