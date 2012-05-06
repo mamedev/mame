@@ -110,7 +110,7 @@ public:
 
 	int m_protcount;
 
-	// batlemp protection
+	// jzth protection
 	DECLARE_WRITE16_MEMBER( bl_710000_w )
 	{
 		int pc = cpu_get_pc(&space.device());
@@ -163,9 +163,6 @@ public:
 
 		*/
 		m_protcount++;
-
-
-
 	}
 
 
