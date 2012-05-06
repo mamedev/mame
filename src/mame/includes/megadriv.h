@@ -103,10 +103,86 @@ class md_boot_state : public md_base_state
 {
 public:
 	md_boot_state(const machine_config &mconfig, device_type type, const char *tag)
-	: md_base_state(mconfig, type, tag) { }
+	: md_base_state(mconfig, type, tag) { m_protcount = 0;}
 
 	// bootleg specific
 	int m_aladmdb_mcu_port;
+
+	int m_protcount;
+
+	// batlemp protection
+	DECLARE_WRITE16_MEMBER( bl_710000_w )
+	{
+		int pc = cpu_get_pc(&space.device());
+
+		logerror("%06x writing to bl_710000_w %04x %04x\n", pc, data, mem_mask);
+
+		// protection value is read from  0x710000 after a series of writes.. and stored at ff0007
+		// startup
+		/*
+		059ce0 writing to bl_710000_w ff08 ffff
+		059d04 writing to bl_710000_w 000a ffff
+		059d04 writing to bl_710000_w 000b ffff
+		059d04 writing to bl_710000_w 000c ffff
+		059d04 writing to bl_710000_w 000f ffff
+		059d1c writing to bl_710000_w ff09 ffff
+		059d2a reading from bl_710000_r  (wants 0xe)
+		059ce0 writing to bl_710000_w ff08 ffff
+		059d04 writing to bl_710000_w 000a ffff
+		059d04 writing to bl_710000_w 000b ffff
+		059d04 writing to bl_710000_w 000c ffff
+		059d04 writing to bl_710000_w 000f ffff
+		059d1c writing to bl_710000_w ff09 ffff
+		059d2a reading from bl_710000_r  (wants 0xe)
+		*/
+		// before lv stage 3
+		/*
+		059ce0 writing to bl_710000_w 0008 ffff
+		059d04 writing to bl_710000_w 000b ffff
+		059d04 writing to bl_710000_w 000f ffff
+		059d1c writing to bl_710000_w ff09 ffff
+		059d2a reading from bl_710000_r  (wants 0x4)
+		*/
+		// start level 3
+		/*
+		059ce0 writing to bl_710000_w ff08 ffff
+		059d04 writing to bl_710000_w 000b ffff
+		059d04 writing to bl_710000_w 000c ffff
+		059d04 writing to bl_710000_w 000e ffff
+		059d1c writing to bl_710000_w ff09 ffff
+		059d2a reading from bl_710000_r  (wants 0x5)
+
+		// after end sequence
+		059ce0 writing to bl_710000_w 0008 ffff
+		059d04 writing to bl_710000_w 000a ffff
+		059d04 writing to bl_710000_w 000b ffff
+		059d04 writing to bl_710000_w 000c ffff
+		059d04 writing to bl_710000_w 000f ffff
+		059d1c writing to bl_710000_w ff09 ffff
+		059d2a reading from bl_710000_r  (wants 0xe)
+
+		*/
+		m_protcount++;
+
+
+
+	}
+
+
+	DECLARE_READ16_MEMBER( bl_710000_r )
+	{
+		UINT16 ret;
+		int pc = cpu_get_pc(&space.device());
+		logerror("%06x reading from bl_710000_r\n", pc);
+
+		if (m_protcount==6) { ret = 0xe; }
+		else if (m_protcount==5) { ret = 0x5; }
+		else if (m_protcount==4) { ret = 0x4; }
+		else ret = 0xf;
+
+		m_protcount = 0;
+		return ret;
+	}
 };
 
 class segac2_state : public md_base_state

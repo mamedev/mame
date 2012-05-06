@@ -247,13 +247,16 @@ static ADDRESS_MAP_START( batlemp_map, AS_PROGRAM, 16, md_boot_state )
 	AM_RANGE(0xa04000, 0xa04003) AM_DEVREADWRITE8_LEGACY("ymsnd", megadriv_68k_YM2612_read, megadriv_68k_YM2612_write, 0xffff)
 	AM_RANGE(0xc00000, 0xc0001f) AM_READWRITE_LEGACY(megadriv_vdp_r, megadriv_vdp_w)
 	
-	AM_RANGE(0x000000, 0x00001f) AM_WRITE_LEGACY(megadriv_vdp_w) // vdp writes mirrored at 0, or is there some unhandled protection??
 
 	AM_RANGE(0xe00000, 0xe0ffff) AM_RAM AM_MIRROR(0x1f0000) AM_BASE_LEGACY(&megadrive_ram)
 
 	AM_RANGE(0xa00000, 0xa00551) AM_NOP
 
 	AM_RANGE(0xA11100, 0xA11101) AM_NOP
+
+	AM_RANGE(0x710000, 0x710001) AM_READWRITE(bl_710000_r,bl_710000_w) // protection, will erase the VDP address causing writes to 0 unless this returns 0xe
+
+
 
 
 ADDRESS_MAP_END
@@ -477,4 +480,4 @@ ROM_END
 /* Genie Hardware (uses Genesis VDP) also has 'Sun Mixing Co' put into tile ram */
 GAME( 2000, puckpkmn, 0,        puckpkmn,  puckpkmn, puckpkmn, ROT0, "Genie",                  "Puckman Pockimon (set 1)", 0 )
 GAME( 2000, puckpkmna,puckpkmn, puckpkmna, puckpkmn, puckpkmn, ROT0, "IBS",                    "Puckman Pockimon (set 2)", 0 )
-GAME( 2000, batlemp,  0,        batlemp,   batlemp,  puckpkmn, ROT0, "<unknown>",              "Battle Emporer", GAME_IMPERFECT_SOUND )
+GAME( 2000, batlemp,  0,        batlemp,   batlemp,  puckpkmn, ROT0, "<unknown>",              "Jue Zhan Tian Huang/Battle Emporer", GAME_IMPERFECT_SOUND )
