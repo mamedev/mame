@@ -515,7 +515,7 @@ static DRIVER_INIT(tourvision)
 }
 
 GAME( 19??, tourvis,  0,       tourvision, tourvision, tourvision, ROT0, "bootleg (Tourvision)", "Tourvision PCE bootleg", GAME_IS_BIOS_ROOT | GAME_NOT_WORKING )
-GAME( 1988, tvlegaxe, tourvis, tourvision, tourvision, tourvision, ROT0, "bootleg (Tourvision) / Victor Musical Industries, Inc.", " Makyo Densetsu - The Legenary Axe (Tourvision PCE bootleg)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+GAME( 1988, tvlegaxe, tourvis, tourvision, tourvision, tourvision, ROT0, "bootleg (Tourvision) / Victor Musical Industries, Inc.", "Makyo Densetsu - The Legenary Axe (Tourvision PCE bootleg)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
 GAME( 1989, tvusapb,  tourvis, tourvision, tourvision, tourvision, ROT0, "bootleg (Tourvision) / Aicom", "USA Pro Basketball (Tourvision PCE bootleg)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
 GAME( 1989, tvdunexp, tourvis, tourvision, tourvision, tourvision, ROT0, "bootleg (Tourvision) / Hudson / Atlus", "Dungeon Explorer (Tourvision PCE bootleg)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
 GAME( 1990, tvthbld,  tourvis, tourvision, tourvision, tourvision, ROT0, "bootleg (Tourvision) / Sega / NEC Avenue", "Thunder Blade (Tourvision PCE bootleg)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
