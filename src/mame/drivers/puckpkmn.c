@@ -285,7 +285,7 @@ static MACHINE_CONFIG_START( puckpkmn, md_boot_state )
 
 	MCFG_DEVICE_REMOVE("genesis_snd_z80")
 
-	MCFG_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", XTAL_4MHz / 4, OKIM6295_PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker",0.25)
 MACHINE_CONFIG_END
