@@ -1053,6 +1053,7 @@ public:
 	const char *specific_name() const { return m_name; }
 	const input_seq &seq(input_seq_type seqtype = SEQ_TYPE_STANDARD) const;
 	const input_seq &defseq(input_seq_type seqtype = SEQ_TYPE_STANDARD) const;
+	const input_seq &defseq_unresolved(input_seq_type seqtype = SEQ_TYPE_STANDARD) const { return m_seq[seqtype]; }
 	bool has_dynamic_read() const { return !m_read.isnull(); }
 	bool has_dynamic_write() const { return !m_write.isnull(); }
 	

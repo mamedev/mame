@@ -1687,7 +1687,7 @@ const char *ioport_field::name() const
 		return m_name;
 
 	// otherwise, return the name associated with the type
-	return machine().ioport().type_name(m_type, m_player);
+	return manager().type_name(m_type, m_player);
 }
 
 
@@ -1703,12 +1703,12 @@ const input_seq &ioport_field::seq(input_seq_type seqtype) const
 		return defseq(seqtype);
 
 	// if the field is disabled, return no key
-	if (m_flags & FIELD_FLAG_UNUSED)
+	if (unused())
 		return input_seq::empty_seq;
 
 	// if the sequence is the special default code, return the expanded default value
 	if (m_live->seq[seqtype].is_default())
-		return machine().ioport().type_seq(m_type, m_player, seqtype);
+		return manager().type_seq(m_type, m_player, seqtype);
 
 	// otherwise, return the sequence as-is
 	return m_live->seq[seqtype];
@@ -1723,12 +1723,12 @@ const input_seq &ioport_field::seq(input_seq_type seqtype) const
 const input_seq &ioport_field::defseq(input_seq_type seqtype) const
 {
 	// if the field is disabled, return no key
-	if (m_flags & FIELD_FLAG_UNUSED)
+	if (unused())
 		return input_seq::empty_seq;
 
 	// if the sequence is the special default code, return the expanded default value
 	if (m_seq[seqtype].is_default())
-		return machine().ioport().type_seq(m_type, m_player, seqtype);
+		return manager().type_seq(m_type, m_player, seqtype);
 
 	// otherwise, return the sequence as-is
 	return m_seq[seqtype];
@@ -2300,7 +2300,7 @@ ioport_field_live::ioport_field_live(ioport_field &field, analog_field *analog)
 {
 	// fill in the basic values
 	for (input_seq_type seqtype = SEQ_TYPE_STANDARD; seqtype < SEQ_TYPE_TOTAL; seqtype++)
-		seq[seqtype] = field.defseq(seqtype);
+		seq[seqtype] = field.defseq_unresolved(seqtype);
 
 	// if this is a digital joystick field, make a note of it
 	if (field.is_digital_joystick())
@@ -3340,7 +3340,7 @@ void ioport_manager::save_default_inputs(xml_data_node *parentnode)
 void ioport_manager::save_game_inputs(xml_data_node *parentnode)
 {
 	// iterate over ports
-	for (ioport_port *port = machine().ioport().first_port(); port != NULL; port = port->next())
+	for (ioport_port *port = first_port(); port != NULL; port = port->next())
 		for (ioport_field *field = port->first_field(); field != NULL; field = field->next())
 			if (save_this_input_field_type(field->type()))
 			{

@@ -763,7 +763,7 @@ void ui_menu_input_specific::populate()
 					if(pollingitem && pollingref == field && pollingseq == seqtype)
 						pollingitem = item;
 					item->seq = field->seq(seqtype);
-					item->defseq = &get_field_default_seq(field, seqtype);
+					item->defseq = &field->defseq(seqtype);
 					item->sortorder = sortorder + suborder[seqtype];
 					item->type = field->is_analog() ? (INPUT_TYPE_ANALOG + seqtype) : INPUT_TYPE_DIGITAL;
 					item->name = name;
@@ -813,19 +813,6 @@ void ui_menu_input::toggle_none_default(input_seq &selected_seq, input_seq &orig
 	/* otherwise, toggle to "none" */
 	else
 		selected_seq.reset();
-}
-
-/*-------------------------------------------------
-    get_field_default_seq - return a pointer
-    to the default sequence for the given field
--------------------------------------------------*/
-
-const input_seq &ui_menu_input::get_field_default_seq(ioport_field *field, input_seq_type seqtype)
-{
-	if (field->seq(seqtype).is_default())
-		return field->machine().ioport().type_seq(field->type(), field->player(), seqtype);
-	else
-		return field->seq(seqtype);
 }
 
 void ui_menu_input::handle()
