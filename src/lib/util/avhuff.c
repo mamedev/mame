@@ -675,7 +675,9 @@ avhuff_error avhuff_decoder::decode_data(const UINT8 *source, UINT32 complength,
 	if (complength < 10 + 2 * channels)
 		return AVHERR_INVALID_DATA;
 	UINT32 totalsize = 10 + 2 * channels;
-	totalsize += (source[8] << 8) | source[9];
+	UINT32 treesize = (source[8] << 8) | source[9];
+	if (treesize != 0xffff)
+		totalsize += treesize;
 	for (int chnum = 0; chnum < channels; chnum++)
 		totalsize += (source[10 + 2 * chnum] << 8) | source[11 + 2 * chnum];
 	if (totalsize >= complength)
