@@ -98,9 +98,8 @@ WRITE8_MEMBER(brkthru_state::brkthru_soundlatch_w)
 
 INPUT_CHANGED_MEMBER(brkthru_state::coin_inserted)
 {
-
 	/* coin insertion causes an IRQ */
-	if(oldval)
+	if(newval)
 		device_set_input_line(m_maincpu, 0, ASSERT_LINE);
 }
 
