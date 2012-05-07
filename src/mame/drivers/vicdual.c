@@ -89,7 +89,7 @@ CUSTOM_INPUT_MEMBER(vicdual_state::vicdual_read_coin_status)
 
 INPUT_CHANGED_MEMBER(vicdual_state::coin_changed)
 {
-	if (newval && !oldval)
+	if (newval)
 	{
 		/* increment the coin counter */
 		coin_counter_w(machine(), 0, 1);
