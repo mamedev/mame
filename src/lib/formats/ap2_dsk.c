@@ -1229,12 +1229,13 @@ bool a2_rwts18_format::save(io_generic *io, floppy_image *image)
 				//~332 samples per cell, times 3+8+3 (14) for address mark, 24 for sync, 3+343+3 (349) for data mark, 24 for sync is around 743, near 776 expected
 				generate_bitstream_from_track(track, head, 200000000/((3004*nsect*6)/2), buf, ts, image); // 3104 needs tweaking
 //fprintf(stderr,"done.\n");
+				int oldpos = 0; // DEBUG
 				int pos = 0;
 				int wrap = 0;
 				int hb = 0;
 				for(;;) {
 						UINT8 v = gb(buf, ts, pos, wrap);
-						if(v == 0xff)
+						if((v == 0xff) || (v == 0x9a)) // note 0x9a varies per title! this is an LFSR? generated value intended to throw off copiers, and only appears after the track splice (before sector 5)
 								hb = 1;
 						else if(hb == 1 && v == 0xd5)
 								hb = 2;
@@ -1244,14 +1245,18 @@ bool a2_rwts18_format::save(io_generic *io, floppy_image *image)
 								hb = 0;
 
 						if(hb == 3) {
-								UINT8 h[11];
+								printf("AM at offset: %d, relative: %d\n", pos, pos-oldpos);
+								oldpos=pos;
+								UINT8 h[7];
+								// grab exactly 7 bytes: should be Track, Sector, Checksum, AA, FF and FF and the Br0derbund Title ID
 								for(int i=0; i<7; i++)
 										h[i] = gb(buf, ts, pos, wrap);
 								UINT8 tr = gcr6bw_tb[h[0]];
 								UINT8 se = gcr6bw_tb[h[1]];
 								UINT8 chk = gcr6bw_tb[h[2]];
 								UINT32 post = (h[3]<<16)|(h[4]<<8)|h[5];
-								printf("RWTS18 AM:\t Track %d, Sector %2d, Checksum %02X: %s, Postamble %03X: %s\n", tr, se, chk, (chk ^ tr ^ se)==0?"OK":"BAD", post, post==0xAAFFFF?"OK":"BAD");
+								UINT8 bbundid = h[6];
+								printf("RWTS18 AM:\t Track %d, Sector %2d, Checksum %02X: %s, Postamble %03X: %s, BBUNDID %02x\n", tr, se, chk, (chk ^ tr ^ se)==0?"OK":"BAD", post, post==0xAAFFFF?"OK":"BAD", bbundid);
 								// sanity check
 								if (tr == track/2 && se < nsect) {
 								visualgrid[se][track/2] |= ADDRFOUND;
@@ -1264,80 +1269,124 @@ bool a2_rwts18_format::save(io_generic *io, floppy_image *image)
 										//int opos = pos;
 										//int owrap = wrap;
 										// RWTS18 doesn't have a true data mark, its part of the address header
-										// The next byte however is unique per title
-										v = gb(buf, ts, pos, wrap);
-										printf("Data mark header per-title byte = 0x%2x\n", v);
-
 										visualgrid[se][track/2] |= DATAFOUND;
-										//UINT8 *dest = sectdata+(768)*se;
+										UINT8 *dest = sectdata+(256)*se;
 										UINT8 data[0x401];
 										UINT32 dpost = 0;
 										UINT8 c = 0;
-										// first read in the ENTIRE sector and decode to 6bit form
+										//dest = sectdata+(768)*se;
+										// now read in the sector and decode to 6bit form
 										for(int i=0; i<0x400; i++) {
-												data[i] = gcr6bw_tb[gb(buf, ts, pos, wrap)] ^ c;
-												c = data[i];
-										  printf("%02x ", c);
-										  if (((i&0xf)+1)==0x10) printf("\n");
+											data[i] = gcr6bw_tb[gb(buf, ts, pos, wrap)] ;//^ c;
+											c ^= data[i];
+											/*if (((i&0x3)+1)==0x04) {
+                                                printf("%c", ((((data[i-3]&0x30)<<2)|((data[i-2]&0x3F)>>0))&0x3F)+0x40);
+                                                printf("%c", ((((data[i-3]&0x0C)<<4)|((data[i-1]&0x3F)>>0))&0x3F)+0x40);
+                                                printf("%c", ((((data[i-3]&0x03)<<6)|((data[i-0]&0x3F)>>0))&0x3F)+0x40);
+                                                *dest++ = ((data[i-3]&0x30)<<2)|((data[i-2]&0x3F)>>0);
+                                                *dest++ = ((data[i-3]&0x0C)<<4)|((data[i-1]&0x3F)>>0);
+                                                *dest++ = ((data[i-3]&0x03)<<6)|((data[i-0]&0x3F)>>0);
+                                            }*/
+										//  printf("%02x ", data[i]);
+										//  if (((i&0xf)+1)==0x10) printf("\n");
 										}
-										// read the checksum byte
+										// read the checksum byte (checksum is calced by xoring all data together)
 										data[0x400] = gcr6bw_tb[gb(buf,ts,pos,wrap)];
-										// now read the postamble byte
-										for(int i=0; i<1; i++) {
+										// now read the postamble bytes
+										for(int i=0; i<4; i++) {
 												dpost <<= 8;
 												dpost |= gb(buf, ts, pos, wrap);
 										}
-										printf("Data Postamble was 0x%02x\n", dpost);
-										/*
-                                        // next combine in the upper 2 bits of each byte
-                                        UINT8 bit_swap[4] = { 0, 2, 1, 3 };
-                                        for(int i=0; i<0x56; i++)
-                                                data[i+0x056] = data[i+0x056]<<2 |  bit_swap[data[i]&3];
-                                        for(int i=0; i<0x56; i++)
-                                                data[i+0x0ac] = data[i+0x0ac]<<2 |  bit_swap[(data[i]>>2)&3];
-                                        for(int i=0; i<0x54; i++)
-                                                data[i+0x102] = data[i+0x102]<<2 |  bit_swap[(data[i]>>4)&3];
-                                        // now decode it into 256 bytes
-                                        // but only write it if the bitfield of the track shows datagood is NOT set.
-                                        // if it is set we don't want to overwrite a guaranteed good read with a bad one
-                                        // if past read had a bad checksum or bad postamble...
-#ifndef USE_OLD_BEST_SECTOR_PRIORITY
-                                        if (((visualgrid[se][track/2]&DATAGOOD)==0)||((visualgrid[se][track/2]&DATAPOST)==0)) {
-                                            // if the current read is good, and postamble is good, write it in, no matter what.
-                                            // if the current read is good and the current postamble is bad, write it in unless the postamble was good before
-                                            // if the current read is bad and the current postamble is good and the previous read had neither good, write it in
-                                            // if the current read isn't good and neither is the postamble but nothing better
-                                            // has been written before, write it anyway.
-                                            if ( ((data[0x156] == c) && (dpost&0xFFFF00)==0xDEAA00) ||
-                                            (((data[0x156] == c) && (dpost&0xFFFF00)!=0xDEAA00) && ((visualgrid[se][track/2]&DATAPOST)==0)) ||
-                                            (((data[0x156] != c) && (dpost&0xFFFF00)==0xDEAA00) && (((visualgrid[se][track/2]&DATAGOOD)==0)&&(visualgrid[se][track/2]&DATAPOST)==0)) ||
-                                            (((data[0x156] != c) && (dpost&0xFFFF00)!=0xDEAA00) && (((visualgrid[se][track/2]&DATAGOOD)==0)&&(visualgrid[se][track/2]&DATAPOST)==0))
-                                            ) {
-                                                for(int i=0x56; i<0x156; i++) {
-                                                    UINT8 dv = data[i];
-                                                    *dest++ = dv;
-                                                }
+
+										/*if (se == 0) // dump some debug data to help find the lfsr before sector 5
+                                        {
+                                            printf("Data Postamble was 0x%08x\n", dpost);
+                                            for(int i=0; i<0x400; i++) {
+                                                data[i] = gcr6bw_tb[gb(buf, ts, pos, wrap)] ;//^ c;
+                                                c ^= data[i];
+                                          printf("%02x ", data[i]);
+                                          if (((i&0xf)+1)==0x10) printf("\n");
                                             }
-                                        }
-#else
-                                        if ((visualgrid[se][track/2]&DATAGOOD)==0) {
-                                                for(int i=0x56; i<0x156; i++) {
-                                                    UINT8 dv = data[i];
-                                                    *dest++ = dv;
-                                                }
-                                        }
-#endif
-                                        // do some checking
-                                        if ((data[0x156] != c) || (dpost&0xFFFF00)!=0xDEAA00)
-                                            fprintf(stderr,"Data Mark:\tChecksum xpctd %d found %d: %s, Postamble %03X: %s\n", data[0x156], c, (data[0x156]==c)?"OK":"BAD", dpost, (dpost&0xFFFF00)==0xDEAA00?"OK":"BAD");
-                                        if (data[0x156] == c) visualgrid[se][track/2] |= DATAGOOD;
-                                        if ((dpost&0xFFFF00)==0xDEAA00) visualgrid[se][track/2] |= DATAPOST;
-                                        } else if ((hb == 4)&&(dosver == 1)) {
-                                            fprintf(stderr,"ERROR: We don't handle dos sectors below 3.3 yet!\n");
-                                        } else {
-                                                pos = opos;
-                                                wrap = owrap;
                                         }*/
+
+										// only write it if the bitfield of the track shows datagood is NOT set.
+										// if it is set we don't want to overwrite a guaranteed good read with a bad one
+										// if past read had a bad checksum or bad postamble...
+#ifndef USE_OLD_BEST_SECTOR_PRIORITY
+										if (((visualgrid[se][track/2]&DATAGOOD)==0)||((visualgrid[se][track/2]&DATAPOST)==0)) {
+											// if the current read is good, and postamble is good, write it in, no matter what.
+											// if the current read is good and the current postamble is bad, write it in unless the postamble was good before
+											// if the current read is bad and the current postamble is good and the previous read had neither good, write it in
+											// if the current read isn't good and neither is the postamble but nothing better
+											// has been written before, write it anyway.
+											if ( ((data[0x400] == c) && (dpost&0xFF000000)==0xD4000000) ||
+											(((data[0x400] == c) && (dpost&0xFF000000)!=0xD4000000) && ((visualgrid[se][track/2]&DATAPOST)==0)) ||
+											(((data[0x400] != c) && (dpost&0xFF000000)==0xD4000000) && (((visualgrid[se][track/2]&DATAGOOD)==0)&&(visualgrid[se][track/2]&DATAPOST)==0)) ||
+											(((data[0x400] != c) && (dpost&0xFF000000)!=0xD4000000) && (((visualgrid[se][track/2]&DATAGOOD)==0)&&(visualgrid[se][track/2]&DATAPOST)==0))
+											) {
+												// next combine adjacent data bytes to form the 3 constituent sectors
+												// format is 0x00AaBbCc 0x00aaaaaa 0x00bbbbbb 0x00cccccc 0x00AaBbCc ... etc
+												// aa is sector 0, bb is sector 6, cc is sector 12
+												// first sector:
+												dest = sectdata+(256)*se;
+												for(int i=0; i<0x100; i++) {
+														data[(4*i)+1] |= (data[4*i]&0x30)<<2;
+														//printf("%c", (data[4*i]&0x3F)+0x40);
+														//if (((i&0xf)+1)==0x10) printf("\n");
+														UINT8 dv = data[(4*i)+1];
+														*dest++ = dv;
+														}
+												// second sector:
+												dest = sectdata+(256)*(se+6);
+												for(int i=0; i<0x100; i++) {
+														data[(4*i)+2] |= (data[4*i]&0x0c)<<4;
+														UINT8 dv = data[(4*i)+2];
+														*dest++ = dv;
+														}
+												// third sector:
+												dest = sectdata+(256)*(se+12);
+												for(int i=0; i<0x100; i++) {
+														data[(4*i)+3] |= (data[4*i]&0x03)<<6;
+														UINT8 dv = data[(4*i)+3];
+														*dest++ = dv;
+														}
+													}
+										}
+#else
+										if ((visualgrid[se][track/2]&DATAGOOD)==0) {
+											// next combine adjacent data bytes to form the 3 constituent sectors
+											// format is 0x00AaBbCc 0x00aaaaaa 0x00bbbbbb 0x00cccccc 0x00AaBbCc ... etc
+											// aa is sector 0, bb is sector 6, cc is sector 12
+											// first sector:
+											dest = sectdata+(256)*se;
+											for(int i=0; i<0x100; i++) {
+													data[(4*i)+1] |= (data[4*i]&0x30)<<2;
+													//printf("%c", (data[4*i]&0x3F)+0x40);
+													//if (((i&0xf)+1)==0x10) printf("\n");
+													UINT8 dv = data[(4*i)+1];
+													*dest++ = dv;
+													}
+											// second sector:
+											dest = sectdata+(256)*(se+6);
+											for(int i=0; i<0x100; i++) {
+													data[(4*i)+2] |= (data[4*i]&0x0c)<<4;
+													UINT8 dv = data[(4*i)+2];
+													*dest++ = dv;
+													}
+											// third sector:
+											dest = sectdata+(256)*(se+12);
+											for(int i=0; i<0x100; i++) {
+													data[(4*i)+3] |= (data[4*i]&0x03)<<6;
+													UINT8 dv = data[(4*i)+3];
+													*dest++ = dv;
+													}
+										}
+#endif
+										// do some checking
+										if ((data[0x400] != c) || (dpost&0xFF000000)!=0xD4000000)
+											fprintf(stderr,"Data Mark:\tChecksum xpctd %d found %d: %s, Postamble %03X: %s\n", data[0x400], c, (data[0x400]==c)?"OK":"BAD", dpost, (dpost&0xFF000000)==0xD4000000?"OK":"BAD");
+										if (data[0x400] == c) visualgrid[se][track/2] |= DATAGOOD;
+										if ((dpost&0xFF000000)==0xD4000000) visualgrid[se][track/2] |= DATAPOST;
 									}
 								}
 								hb = 0;
@@ -1357,7 +1406,7 @@ bool a2_rwts18_format::save(io_generic *io, floppy_image *image)
 		int total_good = 0;
 		for (int j = 0; j < 35; j++) {
 			printf("T%2d: ",j);
-			for (int i = 0; i < 16; i++) {
+			for (int i = 0; i < (j==0?16:6); i++) {
 				if (visualgrid[i][j] == NOTFOUND) printf("-NF- ");
 				else {
 				if (visualgrid[i][j] & ADDRFOUND) printf("a"); else printf(" ");
