@@ -240,7 +240,7 @@ void device_sound_interface::set_output_gain(int outputnum, float gain)
 
 //-------------------------------------------------
 //  inputnum_from_device - return the input number
-//	that is connected to the given device's output
+//  that is connected to the given device's output
 //-------------------------------------------------
 
 int device_sound_interface::inputnum_from_device(device_t &source_device, int outputnum) const

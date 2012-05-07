@@ -321,7 +321,7 @@ Notes:
 
 /*
     New hardware notes from Stefano Teso:
- 
+
   - The master SH-4 port A: the bit layout for this thing is (MSB left)
 
     xxxx xxii iiee eexM
@@ -376,8 +376,8 @@ Notes:
   - the serial device at 0080000(A|C) is not an EEPROM; it's likely some
     weird device that is used to query the heirarchy of the attached
     input/output devices. Probably the naomi has something similar, I
-    haven't looked into it yet. 
- 
+    haven't looked into it yet.
+
 */
 
 #include "emu.h"

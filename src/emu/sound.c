@@ -144,7 +144,7 @@ attotime sound_stream::sample_time() const
 
 
 //-------------------------------------------------
-//  user_gain - return the user-controllable gain 
+//  user_gain - return the user-controllable gain
 //  on a given stream's input
 //-------------------------------------------------
 
@@ -217,7 +217,7 @@ const char *sound_stream::input_name(int inputnum, astring &string) const
 
 
 //-------------------------------------------------
-//  input_source_device - return the device 
+//  input_source_device - return the device
 //  attached as a given input's source
 //-------------------------------------------------
 
@@ -229,7 +229,7 @@ device_t *sound_stream::input_source_device(int inputnum) const
 
 
 //-------------------------------------------------
-//  input_source_device - return the output number 
+//  input_source_device - return the output number
 //  attached as a given input's source
 //-------------------------------------------------
 

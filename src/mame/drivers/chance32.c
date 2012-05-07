@@ -148,11 +148,11 @@ static ADDRESS_MAP_START( chance32_portmap, AS_IO, 8, chance32_state )
 	AM_RANGE(0x23, 0x23) AM_READ_PORT("DSW3")
 	AM_RANGE(0x24, 0x24) AM_READ_PORT("DSW4")
 	AM_RANGE(0x25, 0x25) AM_READ(mux_r)
-//	AM_RANGE(0x26, 0x26) AM_READ_PORT("UNK") // vblank?
+//  AM_RANGE(0x26, 0x26) AM_READ_PORT("UNK") // vblank?
 	AM_RANGE(0x30, 0x30) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0x31, 0x31) AM_DEVWRITE("crtc", mc6845_device, register_w)
 	AM_RANGE(0x50, 0x50) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-//	AM_RANGE(0x60, 0x60) AM_WRITENOP // lamps
+//  AM_RANGE(0x60, 0x60) AM_WRITENOP // lamps
 
 ADDRESS_MAP_END
 

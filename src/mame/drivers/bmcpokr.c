@@ -209,7 +209,7 @@ SCREEN_UPDATE_IND16( bmcpokr )
 		{
 			UINT16 data = state->m_videoram[count];
 			count++;
-			
+
 			drawgfx_opaque(bitmap,cliprect,gfx,data,0,0,0,x*8,y*8);
 
 		}

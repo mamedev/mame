@@ -594,15 +594,15 @@ static WRITE8_DEVICE_HANDLER(out_c_w)
 	output_set_lamp_value(5, (data >> 4) & 1);	/* HOLD2 */
 	output_set_lamp_value(6, (data >> 6) & 1);	/* CANCEL */
 
-//	coin_counter_w(machine(), 0, data & 0x04);	/* Coin In */
-//	coin_counter_w(machine(), 1, data & 0x01);	/* Coin Out */
+//  coin_counter_w(machine(), 0, data & 0x04);  /* Coin In */
+//  coin_counter_w(machine(), 1, data & 0x01);  /* Coin Out */
 
 	logerror("port C: %2X\n", data);
 }
 
 WRITE8_MEMBER( amaticmg_state::unk80_w )
 {
-//	dac_data_w(machine().device("dac"), data & 0x01);		/* Sound DAC */
+//  dac_data_w(machine().device("dac"), data & 0x01);       /* Sound DAC */
 }
 
 
@@ -636,7 +636,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( amaticmg2_portmap, AS_IO, 8, amaticmg_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-//	ADDRESS_MAP_UNMAP_HIGH
+//  ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
 	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
 	AM_RANGE(0x40, 0x41) AM_DEVWRITE_LEGACY("ymsnd", ym3812_w)
@@ -879,8 +879,8 @@ static MACHINE_CONFIG_START( amaticmg, amaticmg_state )
 	MCFG_SOUND_CONFIG(ym3812_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-//	MCFG_SOUND_ADD("dac", DAC, 0)   /* Y3014B */
-//	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+//  MCFG_SOUND_ADD("dac", DAC, 0)   /* Y3014B */
+//  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 MACHINE_CONFIG_END
 

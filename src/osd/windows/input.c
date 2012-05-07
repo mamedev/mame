@@ -792,7 +792,7 @@ void windows_osd_interface::customize_input_type_list(simple_list<input_type_ent
 				entry->configure_osd("RENDER_AVI", "Record Rendered Video");
 				entry->defseq(SEQ_TYPE_STANDARD).set(KEYCODE_LALT, KEYCODE_F11);
 				break;
-			
+
 			// leave everything else alone
 			default:
 				break;

@@ -1100,7 +1100,7 @@ bool a2_rwts18_format::save(io_generic *io, floppy_image *image)
 						visualgrid[se][0] |= ADDRFOUND;
 						visualgrid[se][0] |= ((chk ^ vl ^ tr ^ se)==0)?ADDRGOOD:0;
 #ifdef LENIENT_ADDR_CHECK
-//							if ((visualgrid[se][0] & ADDRFOUND) == ADDRFOUND) {
+//                          if ((visualgrid[se][0] & ADDRFOUND) == ADDRFOUND) {
 #else
 							if ((visualgrid[se][0] & ADDRGOOD) == ADDRGOOD) {
 #endif
@@ -1217,7 +1217,7 @@ bool a2_rwts18_format::save(io_generic *io, floppy_image *image)
 				io_generic_write(io, data, pos_data, 256);
 				pos_data += 256;
 		}
-		
+
 		// for the rest of the tracks
 		for(int track=2; track < 70; track+=2) {
 				UINT8 sectdata[(768)*6];
@@ -1257,7 +1257,7 @@ bool a2_rwts18_format::save(io_generic *io, floppy_image *image)
 								visualgrid[se][track/2] |= ADDRFOUND;
 								visualgrid[se][track/2] |= ((chk ^ tr ^ se)==0)?ADDRGOOD:0;
 #ifdef LENIENT_ADDR_CHECK
-//									if ((visualgrid[se][track/2] & ADDRFOUND) == ADDRFOUND) {
+//                                  if ((visualgrid[se][track/2] & ADDRFOUND) == ADDRFOUND) {
 #else
 									if ((visualgrid[se][track/2] & ADDRGOOD) == ADDRGOOD) {
 #endif
@@ -1267,7 +1267,7 @@ bool a2_rwts18_format::save(io_generic *io, floppy_image *image)
 										// The next byte however is unique per title
 										v = gb(buf, ts, pos, wrap);
 										printf("Data mark header per-title byte = 0x%2x\n", v);
-										
+
 										visualgrid[se][track/2] |= DATAFOUND;
 										//UINT8 *dest = sectdata+(768)*se;
 										UINT8 data[0x401];
@@ -1289,55 +1289,55 @@ bool a2_rwts18_format::save(io_generic *io, floppy_image *image)
 										}
 										printf("Data Postamble was 0x%02x\n", dpost);
 										/*
-										// next combine in the upper 2 bits of each byte
-										UINT8 bit_swap[4] = { 0, 2, 1, 3 };
-										for(int i=0; i<0x56; i++)
-												data[i+0x056] = data[i+0x056]<<2 |  bit_swap[data[i]&3];
-										for(int i=0; i<0x56; i++)
-												data[i+0x0ac] = data[i+0x0ac]<<2 |  bit_swap[(data[i]>>2)&3];
-										for(int i=0; i<0x54; i++)
-												data[i+0x102] = data[i+0x102]<<2 |  bit_swap[(data[i]>>4)&3];
-										// now decode it into 256 bytes
-										// but only write it if the bitfield of the track shows datagood is NOT set.
-										// if it is set we don't want to overwrite a guaranteed good read with a bad one
-										// if past read had a bad checksum or bad postamble...
+                                        // next combine in the upper 2 bits of each byte
+                                        UINT8 bit_swap[4] = { 0, 2, 1, 3 };
+                                        for(int i=0; i<0x56; i++)
+                                                data[i+0x056] = data[i+0x056]<<2 |  bit_swap[data[i]&3];
+                                        for(int i=0; i<0x56; i++)
+                                                data[i+0x0ac] = data[i+0x0ac]<<2 |  bit_swap[(data[i]>>2)&3];
+                                        for(int i=0; i<0x54; i++)
+                                                data[i+0x102] = data[i+0x102]<<2 |  bit_swap[(data[i]>>4)&3];
+                                        // now decode it into 256 bytes
+                                        // but only write it if the bitfield of the track shows datagood is NOT set.
+                                        // if it is set we don't want to overwrite a guaranteed good read with a bad one
+                                        // if past read had a bad checksum or bad postamble...
 #ifndef USE_OLD_BEST_SECTOR_PRIORITY
-										if (((visualgrid[se][track/2]&DATAGOOD)==0)||((visualgrid[se][track/2]&DATAPOST)==0)) {
-											// if the current read is good, and postamble is good, write it in, no matter what.
-											// if the current read is good and the current postamble is bad, write it in unless the postamble was good before
-											// if the current read is bad and the current postamble is good and the previous read had neither good, write it in
-											// if the current read isn't good and neither is the postamble but nothing better
-											// has been written before, write it anyway.
-											if ( ((data[0x156] == c) && (dpost&0xFFFF00)==0xDEAA00) ||
-											(((data[0x156] == c) && (dpost&0xFFFF00)!=0xDEAA00) && ((visualgrid[se][track/2]&DATAPOST)==0)) ||
-											(((data[0x156] != c) && (dpost&0xFFFF00)==0xDEAA00) && (((visualgrid[se][track/2]&DATAGOOD)==0)&&(visualgrid[se][track/2]&DATAPOST)==0)) ||
-											(((data[0x156] != c) && (dpost&0xFFFF00)!=0xDEAA00) && (((visualgrid[se][track/2]&DATAGOOD)==0)&&(visualgrid[se][track/2]&DATAPOST)==0))
-											) {
-												for(int i=0x56; i<0x156; i++) {
-													UINT8 dv = data[i];
-													*dest++ = dv;
-												}
-											}
-										}
+                                        if (((visualgrid[se][track/2]&DATAGOOD)==0)||((visualgrid[se][track/2]&DATAPOST)==0)) {
+                                            // if the current read is good, and postamble is good, write it in, no matter what.
+                                            // if the current read is good and the current postamble is bad, write it in unless the postamble was good before
+                                            // if the current read is bad and the current postamble is good and the previous read had neither good, write it in
+                                            // if the current read isn't good and neither is the postamble but nothing better
+                                            // has been written before, write it anyway.
+                                            if ( ((data[0x156] == c) && (dpost&0xFFFF00)==0xDEAA00) ||
+                                            (((data[0x156] == c) && (dpost&0xFFFF00)!=0xDEAA00) && ((visualgrid[se][track/2]&DATAPOST)==0)) ||
+                                            (((data[0x156] != c) && (dpost&0xFFFF00)==0xDEAA00) && (((visualgrid[se][track/2]&DATAGOOD)==0)&&(visualgrid[se][track/2]&DATAPOST)==0)) ||
+                                            (((data[0x156] != c) && (dpost&0xFFFF00)!=0xDEAA00) && (((visualgrid[se][track/2]&DATAGOOD)==0)&&(visualgrid[se][track/2]&DATAPOST)==0))
+                                            ) {
+                                                for(int i=0x56; i<0x156; i++) {
+                                                    UINT8 dv = data[i];
+                                                    *dest++ = dv;
+                                                }
+                                            }
+                                        }
 #else
-										if ((visualgrid[se][track/2]&DATAGOOD)==0) {
-												for(int i=0x56; i<0x156; i++) {
-													UINT8 dv = data[i];
-													*dest++ = dv;
-												}
-										}
+                                        if ((visualgrid[se][track/2]&DATAGOOD)==0) {
+                                                for(int i=0x56; i<0x156; i++) {
+                                                    UINT8 dv = data[i];
+                                                    *dest++ = dv;
+                                                }
+                                        }
 #endif
-										// do some checking
-										if ((data[0x156] != c) || (dpost&0xFFFF00)!=0xDEAA00)
-											fprintf(stderr,"Data Mark:\tChecksum xpctd %d found %d: %s, Postamble %03X: %s\n", data[0x156], c, (data[0x156]==c)?"OK":"BAD", dpost, (dpost&0xFFFF00)==0xDEAA00?"OK":"BAD");
-										if (data[0x156] == c) visualgrid[se][track/2] |= DATAGOOD;
-										if ((dpost&0xFFFF00)==0xDEAA00) visualgrid[se][track/2] |= DATAPOST;
-										} else if ((hb == 4)&&(dosver == 1)) {
-											fprintf(stderr,"ERROR: We don't handle dos sectors below 3.3 yet!\n");
-										} else {
-												pos = opos;
-												wrap = owrap;
-										}*/
+                                        // do some checking
+                                        if ((data[0x156] != c) || (dpost&0xFFFF00)!=0xDEAA00)
+                                            fprintf(stderr,"Data Mark:\tChecksum xpctd %d found %d: %s, Postamble %03X: %s\n", data[0x156], c, (data[0x156]==c)?"OK":"BAD", dpost, (dpost&0xFFFF00)==0xDEAA00?"OK":"BAD");
+                                        if (data[0x156] == c) visualgrid[se][track/2] |= DATAGOOD;
+                                        if ((dpost&0xFFFF00)==0xDEAA00) visualgrid[se][track/2] |= DATAPOST;
+                                        } else if ((hb == 4)&&(dosver == 1)) {
+                                            fprintf(stderr,"ERROR: We don't handle dos sectors below 3.3 yet!\n");
+                                        } else {
+                                                pos = opos;
+                                                wrap = owrap;
+                                        }*/
 									}
 								}
 								hb = 0;

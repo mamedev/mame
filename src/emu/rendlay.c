@@ -664,8 +664,8 @@ layout_element::component::component(running_machine &machine, xml_data_node &co
 		m_numstops = 0;
 		location=symbollist.find(0,",");
 		while (location!=-1)
-		{	
-			m_stopnames[m_numstops] = symbollist;	
+		{
+			m_stopnames[m_numstops] = symbollist;
 			m_stopnames[m_numstops].substr(0, location);
 			symbollist.substr(location+1, symbollist.len()-(location-1));
 			m_numstops++;
@@ -685,8 +685,8 @@ layout_element::component::component(running_machine &machine, xml_data_node &co
 				m_imagefile[i] = m_stopnames[i];
 				m_stopnames[i].substr(0, location);
 				m_imagefile[i].substr(location+1, m_imagefile[i].len()-(location-1));
-				
-				//m_alphafile[i] = 
+
+				//m_alphafile[i] =
 				m_file[i] = global_alloc(emu_file(machine.options().art_path(), OPEN_FLAG_READ));
 			}
 			else
@@ -1045,7 +1045,7 @@ void layout_element::component::draw_reel(running_machine &machine, bitmap_argb3
 		{
 			basey = bounds.min_y - ((use_state)*(ourheight/num_shown)/(max_state_used/m_numstops)) + curry;
 		}
-				
+
 		// wrap around...
 		if (basey < bounds.min_y)
 			basey += ((max_state_used)*(ourheight/num_shown)/(max_state_used/m_numstops));
@@ -1065,7 +1065,7 @@ void layout_element::component::draw_reel(running_machine &machine, bitmap_argb3
 					break;
 				aspect *= 0.9f;
 			}
-	
+
 			INT32 curx;
 			curx = bounds.min_x + (bounds.width() - width) / 2;
 
@@ -1076,7 +1076,7 @@ void layout_element::component::draw_reel(running_machine &machine, bitmap_argb3
 			if (m_file[fruit]) // render gfx
 			{
 				bitmap_argb32 tempbitmap2(dest.width(), ourheight/num_shown);
-				
+
 				if (m_bitmap[fruit].valid())
 				{
 					render_resample_argb_bitmap_hq(tempbitmap2, m_bitmap[fruit], m_color);
@@ -1103,7 +1103,7 @@ void layout_element::component::draw_reel(running_machine &machine, bitmap_argb3
 								}
 							}
 						}
-								
+
 					}
 				}
 			}
@@ -1111,7 +1111,7 @@ void layout_element::component::draw_reel(running_machine &machine, bitmap_argb3
 			{
 				// allocate a temporary bitmap
 				bitmap_argb32 tempbitmap(dest.width(), dest.height());
-	
+
 				// loop over characters
 				for (const char *s = m_stopnames[fruit]; *s != 0; s++)
 				{
@@ -1210,7 +1210,7 @@ void layout_element::component::load_reel_bitmap(int number)
 
 	// load the alpha bitmap if specified
 	//if (m_bitmap[number].valid() && m_alphafile[number])
-	//	render_load_png(m_bitmap[number], *m_file[number], m_dirname, m_alphafile[number], true);
+	//  render_load_png(m_bitmap[number], *m_file[number], m_dirname, m_alphafile[number], true);
 
 	// if we can't load the bitmap just use text rendering
 	if (!m_bitmap[number].valid())

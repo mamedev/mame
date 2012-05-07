@@ -318,12 +318,12 @@ static MACHINE_CONFIG_START( crimfght, crimfght_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymsnd", YM2151, XTAL_3_579545MHz) 	/* verified on pcb */
+	MCFG_SOUND_ADD("ymsnd", YM2151, XTAL_3_579545MHz)	/* verified on pcb */
 	MCFG_SOUND_CONFIG(ym2151_config)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_SOUND_ADD("k007232", K007232, XTAL_3_579545MHz) 	/* verified on pcb */
+	MCFG_SOUND_ADD("k007232", K007232, XTAL_3_579545MHz)	/* verified on pcb */
 	MCFG_SOUND_CONFIG(k007232_config)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.20)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.20)

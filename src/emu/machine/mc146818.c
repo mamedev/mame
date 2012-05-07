@@ -300,7 +300,7 @@ void mc146818_device::device_timer(emu_timer &timer, device_timer_id id, int par
 
 
 //-------------------------------------------------
-//  rtc_clock_updated - 
+//  rtc_clock_updated -
 //-------------------------------------------------
 
 void mc146818_device::rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second)

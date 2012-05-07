@@ -151,7 +151,7 @@ bool dfi_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 			} else // (v & 0x80) == 0
 				total_time += v & 0x7f;
 		}
-		
+
 		// its possible on single read images for there to be no index pulse during the image at all!
 		if (onerev_time == 0) onerev_time = total_time;
 

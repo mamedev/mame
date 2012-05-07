@@ -19,7 +19,7 @@
 			<color red="0" green="0.6" blue="1.0" />
 	</led14segsc>
 	</element>
-	
+
 	<element name="Steppers" defstate="0">
     	<simplecounter maxstate="999" digits="3">
 		<color red="1.0" green="1.0" blue="1.0" />

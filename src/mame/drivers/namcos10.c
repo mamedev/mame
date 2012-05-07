@@ -352,7 +352,7 @@ READ32_MEMBER(namcos10_state::range_r)
     */
 
 	UINT16 dd16 = d16 ^ key;
-	
+
 	key = d16;
 
 	key =

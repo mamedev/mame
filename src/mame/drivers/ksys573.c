@@ -348,23 +348,23 @@ G: gun mania only, drives air soft gun (this game uses real BB bullet)
   CN3         - Connector joining this PCB to the MAIN PCB
   HYC24855    - ?
   RCA-L/R     - RCA connectors for left/right audio output
- 
+
   Drummania 10th Mix Multisession
   -------------------------------
-  
+
   This box is used with multi-session System 573 games.
-  
+
   Main board is standard GX700 PCB with CDROM (Drummania 10th Mix Multisession)
   and Digital I/O Board GX894-PWB(B)A
   BIOS is on a small plug-in daughterboard.
   Daughterboard contains one EPROM, one PAL22V10, 2 logic chips and a PIC16F84.
   The dumps provided are the EPROM dumped separately and a dump of the 'board'
   with it plugged in (reading may be affected by the PIC)
-  
-  
+
+
   PCB Layout of External Multisession Box
   ---------------------------------------
-  
+
   GXA25-PWB(A)(C)2000 KONAMI
   |--------------------------------------------------------------------------|
   |CN9  ADM232  LS273        PC16552          PC16552         XC9536(1)  CN13|
@@ -407,7 +407,7 @@ G: gun mania only, drives air soft gun (this game uses real BB bullet)
           TC9446F      - Toshiba TC9446F-016 Audio Digital Processor for Decode of Dolby Digital (AC-3) MPEG2 Audio
           CN16-CN19    - Connector for sub board (3 of them are present). One board connects via a thin cable from
                          CN1 to the main board to a connector on the security board labelled 'AMP BOX'.
-  
+
   Sub Board Layout
   ----------------
 
@@ -421,7 +421,7 @@ G: gun mania only, drives air soft gun (this game uses real BB bullet)
   |ZUS1R50505        6379A          |
   |                          LM358  |
   |---------------------------------|
-          
+
   */
 
 #include "emu.h"

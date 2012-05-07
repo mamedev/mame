@@ -292,12 +292,12 @@ static MACHINE_CONFIG_START( aliens, aliens_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2151, XTAL_3_579545MHz) 	/* verified on pcb */
+	MCFG_SOUND_ADD("ymsnd", YM2151, XTAL_3_579545MHz)	/* verified on pcb */
 	MCFG_SOUND_CONFIG(ym2151_config)
 	MCFG_SOUND_ROUTE(0, "mono", 0.60)
 	MCFG_SOUND_ROUTE(1, "mono", 0.60)
 
-	MCFG_SOUND_ADD("k007232", K007232, XTAL_3_579545MHz) 	/* verified on pcb */
+	MCFG_SOUND_ADD("k007232", K007232, XTAL_3_579545MHz)	/* verified on pcb */
 	MCFG_SOUND_CONFIG(k007232_config)
 	MCFG_SOUND_ROUTE(0, "mono", 0.20)
 	MCFG_SOUND_ROUTE(1, "mono", 0.20)

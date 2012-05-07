@@ -32,7 +32,7 @@ public:
 
 	DECLARE_INPUT_CHANGED_MEMBER(video_test);
 	DECLARE_INPUT_CHANGED_MEMBER(sound_test);
-	
+
 	UINT8 m_sound_port2;
 };
 
@@ -117,8 +117,8 @@ static WRITE_LINE_DEVICE_HANDLER(by133_firq)
 static WRITE_LINE_DEVICE_HANDLER(by133_cb2)
 {
 	// to M6803 port 2 d0?
-//	by133_state *drv_state = device->machine().driver_data<by133_state>();
-//	device_set_input_line(drv_state->m_audiocpu, M6801_TIN_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+//  by133_state *drv_state = device->machine().driver_data<by133_state>();
+//  device_set_input_line(drv_state->m_audiocpu, M6801_TIN_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static READ8_DEVICE_HANDLER(by133_portb_r)
@@ -130,7 +130,7 @@ static WRITE8_DEVICE_HANDLER(by133_portb_w)
 {
 	by133_state *state = device->machine().driver_data<by133_state>();
 	device->machine().scheduler().synchronize();
-	
+
 	// d0-d3 to m6803 d1-d4
 	state->m_sound_port2 = data << 1 & 0x1f;
 }

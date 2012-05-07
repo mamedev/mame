@@ -62,7 +62,7 @@ public:
 		: sc4_state(mconfig, type, tag),
 		  m_adder4cpu(*this, "adder4")
 	{ }
-	
+
 	UINT32* m_adder4cpuregion;
 	UINT32* m_adder4ram;
 
@@ -3121,7 +3121,7 @@ INPUT_PORTS_EXTERN( sc4_base );
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
     ROM_LOAD( "95008666.bin", 0x000000, 0x100000, CRC(6dcb4a96) SHA1(844dc67bacb7136a3c0f897a69ac5bcacaa4968a) ) \
     ROM_LOAD( "95008667.bin", 0x100000, 0x100000, CRC(5243784c) SHA1(771248de9fa3446ad6fe1bd35b240ad6ae23f008) ) \
-  
+
 
 
 

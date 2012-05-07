@@ -832,7 +832,7 @@ void intelfsh_device::write_full(UINT32 address, UINT32 data)
 
 		if (m_byte_count == m_page_size)
 		{
-			m_flash_mode = FM_NORMAL;			
+			m_flash_mode = FM_NORMAL;
 		}
 		break;
 	case FM_CLEARPART1:

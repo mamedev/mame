@@ -1,4 +1,4 @@
-/* Bellfruit SWP (Skill With Prizes) Video hardware 
+/* Bellfruit SWP (Skill With Prizes) Video hardware
     aka Cobra 3
 
 */

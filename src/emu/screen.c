@@ -783,7 +783,7 @@ void screen_device::register_screen_bitmap(bitmap_t &bitmap)
 
 //-------------------------------------------------
 //  vblank_port_read - custom port handler to
-//	return a VBLANK state
+//  return a VBLANK state
 //-------------------------------------------------
 
 int screen_device::vblank_port_read()

@@ -52,7 +52,7 @@ static UINT32 i386_load_protected_mode_segment(i386_state *cpustate, I386_SREG *
 	entry = seg->selector & ~0x7;
 	if (limit == 0 || entry + 7 > limit)
 		return 0;
-	
+
 	int cpl = cpustate->CPL;
 	cpustate->CPL = 0;
 

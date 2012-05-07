@@ -28,8 +28,8 @@
       <bounds x="0" y="0" width="7" height="7" />
       <color red="0.6" green="0.6" blue="0.6" />
     </rect>
-  </element>  
-  
+  </element>
+
   <element name="Steppers" defstate="0">
     <simplecounter maxstate="999" digits="3">
       <color red="1.0" green="1.0" blue="1.0" />
@@ -144,8 +144,8 @@
 		<backdrop name="vfd15" element="vfd0" state="0">
 			<bounds x="345" y="200" width="9" height="17"/>
 		</backdrop>
-		
-    
+
+
     <backdrop name="reel1" element="Steppers" state="0">
 			<bounds x="250" y="350" width="10" height="5"/>
 		</backdrop>
@@ -155,7 +155,7 @@
 		<backdrop name="reel3" element="Steppers" state="0">
 			<bounds x="350" y="350" width="10" height="5"/>
 		</backdrop>
-        
+
 		<backdrop name="reel4" element="Steppers" state="0">
 			<bounds x="250" y="410" width="10" height="5"/>
 		</backdrop>
@@ -228,7 +228,7 @@
     </backdrop>
 
 
-    
+
 
     <backdrop name="lamp0" element="matrixlamp" state="0">
 			<bounds x="0" y="0" width="7" height="7"/>

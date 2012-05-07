@@ -291,7 +291,7 @@ void rp5c15_device::device_timer(emu_timer &timer, device_timer_id id, int param
 
 
 //-------------------------------------------------
-//  rtc_clock_updated - 
+//  rtc_clock_updated -
 //-------------------------------------------------
 
 void rp5c15_device::rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second)
@@ -395,7 +395,7 @@ WRITE8_MEMBER( rp5c15_device::write )
 			m_reg[mode][offset & 0x0f] = data & REGISTER_WRITE_MASK[mode][offset & 0x0f];
 
 			set_time(false, read_counter(REGISTER_1_YEAR), read_counter(REGISTER_1_MONTH), read_counter(REGISTER_1_DAY), m_reg[MODE00][REGISTER_DAY_OF_THE_WEEK],
-				read_counter(REGISTER_1_HOUR), read_counter(REGISTER_1_MINUTE), read_counter(REGISTER_1_SECOND)); 
+				read_counter(REGISTER_1_HOUR), read_counter(REGISTER_1_MINUTE), read_counter(REGISTER_1_SECOND));
 			break;
 
 		case MODE01:

@@ -194,7 +194,7 @@ enum ioport_type
 		IPT_JOYSTICKLEFT_DOWN,
 		IPT_JOYSTICKLEFT_LEFT,
 		IPT_JOYSTICKLEFT_RIGHT,
-	
+
 	IPT_DIGITAL_JOYSTICK_LAST,
 
 	// action buttons
@@ -217,7 +217,7 @@ enum ioport_type
 
 	// mahjong inputs
 	IPT_MAHJONG_FIRST,
-	
+
 		IPT_MAHJONG_A,
 		IPT_MAHJONG_B,
 		IPT_MAHJONG_C,
@@ -247,7 +247,7 @@ enum ioport_type
 		IPT_MAHJONG_FLIP_FLOP,
 		IPT_MAHJONG_BIG,
 		IPT_MAHJONG_SMALL,
-	
+
 	IPT_MAHJONG_LAST,
 
 	// hanafuda inputs
@@ -263,7 +263,7 @@ enum ioport_type
 		IPT_HANAFUDA_H,
 		IPT_HANAFUDA_YES,
 		IPT_HANAFUDA_NO,
-	
+
 	IPT_HANAFUDA_LAST,
 
 	// gambling inputs
@@ -325,7 +325,7 @@ enum ioport_type
 
 	// analog inputs
 	IPT_ANALOG_FIRST,
-	
+
 		IPT_ANALOG_ABSOLUTE_FIRST,
 
 			IPT_AD_STICK_X,		// absolute // autocenter
@@ -340,7 +340,7 @@ enum ioport_type
 			IPT_LIGHTGUN_Y,		// absolute
 			IPT_POSITIONAL,		// absolute // autocenter if not wraps
 			IPT_POSITIONAL_V,	// absolute // autocenter if not wraps
-		
+
 		IPT_ANALOG_ABSOLUTE_LAST,
 
 		IPT_DIAL,			// relative
@@ -349,7 +349,7 @@ enum ioport_type
 		IPT_TRACKBALL_Y,	// relative
 		IPT_MOUSE_X,		// relative
 		IPT_MOUSE_Y,		// relative
-	
+
 	IPT_ANALOG_LAST,
 
 	// analog adjuster support
@@ -414,7 +414,7 @@ enum ioport_type
 		IPT_OSD_14,
 		IPT_OSD_15,
 		IPT_OSD_16,
-	
+
 	IPT_UI_LAST,
 
 	// other meaning not mapped to standard defaults
@@ -750,10 +750,10 @@ public:
 	const char *name() const { return m_name; }
 	input_seq &defseq(input_seq_type seqtype = SEQ_TYPE_STANDARD) { return m_defseq[seqtype]; }
 	const input_seq &seq(input_seq_type seqtype = SEQ_TYPE_STANDARD) const { return m_seq[seqtype]; }
-	
+
 	// setters
 	void configure_osd(const char *token, const char *name);
-	
+
 private:
 	// internal state
 	input_type_entry *	m_next;				// next description in the list
@@ -785,7 +785,7 @@ public:
 		JOYDIR_RIGHT,
 		JOYDIR_COUNT
 	};
-	
+
 	// bit constants
 	static const UINT8 UP_BIT = 1 << JOYDIR_UP;
 	static const UINT8 DOWN_BIT = 1 << JOYDIR_DOWN;
@@ -794,20 +794,20 @@ public:
 
 	// construction/destruction
 	digital_joystick(int player, int number);
-	
+
 	// getters
 	digital_joystick *next() const { return m_next; }
 	int player() const { return m_player; }
 	int number() const { return m_number; }
 	UINT8 current() const { return m_current; }
 	UINT8 current4way() const { return m_current4way; }
-	
+
 	// configuration
 	direction_t set_axis(ioport_field &field);
 
 	// updates
 	void frame_update();
-	
+
 private:
 	// internal state
 	digital_joystick *	m_next;					// next joystick in the list
@@ -831,7 +831,7 @@ class natural_keyboard
 public:
 	// construction/destruction
 	natural_keyboard(running_machine &machine);
-	
+
 	// getters and queries
 	running_machine &machine() const { return m_machine; }
 	bool empty() const { return (m_bufbegin == m_bufend); }
@@ -855,7 +855,7 @@ private:
 	// internal keyboard code information
 	struct keycode_map_entry
 	{
-		unicode_char 	ch;
+		unicode_char	ch;
 		ioport_field *	field[UCHAR_SHIFT_END + 1 - UCHAR_SHIFT_BEGIN];
 	};
 
@@ -881,7 +881,7 @@ private:
 	bool					m_status_keydown;		// current keydown status
 	bool					m_last_cr;				// was the last char a CR?
 	emu_timer *				m_timer;				// timer for posting characters
-	attotime 				m_current_rate;			// current rate for posting
+	attotime				m_current_rate;			// current rate for posting
 	ioport_queue_chars_delegate m_queue_chars;		// queue characters callback
 	ioport_accept_char_delegate m_accept_char;		// accept character callback
 	ioport_charqueue_empty_delegate m_charqueue_empty; // character queue empty callback
@@ -913,7 +913,7 @@ public:
 
 	// getters
 	const char *tag() const { return m_tag; }
-	
+
 	// operators
 	bool operator==(const ioport_condition &rhs) const { return (m_mask == rhs.m_mask && m_value == rhs.m_value && m_condition == rhs.m_condition && strcmp(m_tag, rhs.m_tag) == 0); }
 	bool eval(device_t &device) const;
@@ -949,7 +949,7 @@ class ioport_setting
 public:
 	// construction/destruction
 	ioport_setting(ioport_field &field, ioport_value value, const char *name);
-	
+
 	// getters
 	ioport_setting *next() const { return m_next; }
 	ioport_field &field() const { return m_field; }
@@ -983,7 +983,7 @@ class ioport_diplocation
 public:
 	// construction/destruction
 	ioport_diplocation(const char *name, UINT8 swnum, bool invert);
-	
+
 	// getters
 	ioport_diplocation *next() const { return m_next; }
 	const char *name() const { return m_name; }
@@ -1039,14 +1039,14 @@ public:
 	ioport_type type() const { return m_type; }
 	UINT8 player() const { return m_player; }
 
-	bool unused() const { return ((m_flags & FIELD_FLAG_UNUSED) != 0); } 
-	bool cocktail() const { return ((m_flags & FIELD_FLAG_COCKTAIL) != 0); } 
-	bool toggle() const { return ((m_flags & FIELD_FLAG_TOGGLE) != 0); } 
-	bool rotated() const { return ((m_flags & FIELD_FLAG_ROTATED) != 0); } 
-	bool analog_reverse() const { return ((m_flags & ANALOG_FLAG_REVERSE) != 0); } 
-	bool analog_reset() const { return ((m_flags & ANALOG_FLAG_RESET) != 0); } 
-	bool analog_wraps() const { return ((m_flags & ANALOG_FLAG_WRAPS) != 0); } 
-	bool analog_invert() const { return ((m_flags & ANALOG_FLAG_INVERT) != 0); } 
+	bool unused() const { return ((m_flags & FIELD_FLAG_UNUSED) != 0); }
+	bool cocktail() const { return ((m_flags & FIELD_FLAG_COCKTAIL) != 0); }
+	bool toggle() const { return ((m_flags & FIELD_FLAG_TOGGLE) != 0); }
+	bool rotated() const { return ((m_flags & FIELD_FLAG_ROTATED) != 0); }
+	bool analog_reverse() const { return ((m_flags & ANALOG_FLAG_REVERSE) != 0); }
+	bool analog_reset() const { return ((m_flags & ANALOG_FLAG_RESET) != 0); }
+	bool analog_wraps() const { return ((m_flags & ANALOG_FLAG_WRAPS) != 0); }
+	bool analog_invert() const { return ((m_flags & ANALOG_FLAG_INVERT) != 0); }
 
 	UINT8 impulse() const { return m_impulse; }
 	const char *name() const;
@@ -1056,7 +1056,7 @@ public:
 	const input_seq &defseq_unresolved(input_seq_type seqtype = SEQ_TYPE_STANDARD) const { return m_seq[seqtype]; }
 	bool has_dynamic_read() const { return !m_read.isnull(); }
 	bool has_dynamic_write() const { return !m_write.isnull(); }
-	
+
 	ioport_value minval() const { return m_min; }
 	ioport_value maxval() const { return m_max; }
 	INT32 sensitivity() const { return m_sensitivity; }
@@ -1067,11 +1067,11 @@ public:
 	double crosshair_offset() const { return m_crosshair_offset; }
 	UINT16 full_turn_count() const { return m_full_turn_count; }
 	const ioport_value *remap_table() const { return m_remap_table; }
-	
+
 	UINT8 way() const { return m_way; }
 	unicode_char keyboard_code(int which) const;
 	ioport_field_live &live() const { assert(m_live != NULL); return *m_live; }
-	
+
 	// setters
 	void set_crosshair_scale(double scale) { m_crosshair_scale = scale; }
 	void set_crosshair_offset(double offset) { m_crosshair_offset = offset; }
@@ -1115,7 +1115,7 @@ private:
 	ioport_field_live *			m_live;				// live state of field (NULL if not live)
 	int							m_modcount;			// modification count
 	simple_list<ioport_setting> m_settinglist;		// list of input_setting_configs
-	simple_list<ioport_diplocation> m_diploclist; 	// list of locations for various bits
+	simple_list<ioport_diplocation> m_diploclist;	// list of locations for various bits
 
 	// generally-applicable data
 	ioport_value				m_mask;				// mask of bits belonging to the field
@@ -1194,7 +1194,7 @@ public:
 	ioport_value active() const { return m_active; }
 	ioport_value active_safe(ioport_value defval) const { return (this == NULL) ? defval : active(); }
 	ioport_port_live &live() const { assert(m_live != NULL); return *m_live; }
-	
+
 	// read/write to the port
 	ioport_value read();
 	ioport_value read_safe(ioport_value defval) { return (this == NULL) ? defval : read(); }
@@ -1213,7 +1213,7 @@ private:
 	// internal state
 	ioport_port *				m_next;			// pointer to next port
 	device_t &					m_device;		// associated device
-	simple_list<ioport_field> 	m_fieldlist;	// list of ioport_fields
+	simple_list<ioport_field>	m_fieldlist;	// list of ioport_fields
 	astring						m_tag;			// copy of this port's tag
 	int							m_modcount;		// modification count
 	ioport_value				m_active;		// mask of active bits in the port
@@ -1378,7 +1378,7 @@ private:
 	device_t &			m_owner;
 	ioport_list &		m_portlist;
 	astring &			m_errorbuf;
-	
+
 	ioport_port *		m_curport;
 	ioport_field *		m_curfield;
 	ioport_setting *	m_cursetting;

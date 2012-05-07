@@ -120,48 +120,48 @@ public:
 		// protection value is read from  0x710000 after a series of writes.. and stored at ff0007
 		// startup
 		/*
-		059ce0 writing to bl_710000_w ff08 ffff
-		059d04 writing to bl_710000_w 000a ffff
-		059d04 writing to bl_710000_w 000b ffff
-		059d04 writing to bl_710000_w 000c ffff
-		059d04 writing to bl_710000_w 000f ffff
-		059d1c writing to bl_710000_w ff09 ffff
-		059d2a reading from bl_710000_r  (wants 0xe)
-		059ce0 writing to bl_710000_w ff08 ffff
-		059d04 writing to bl_710000_w 000a ffff
-		059d04 writing to bl_710000_w 000b ffff
-		059d04 writing to bl_710000_w 000c ffff
-		059d04 writing to bl_710000_w 000f ffff
-		059d1c writing to bl_710000_w ff09 ffff
-		059d2a reading from bl_710000_r  (wants 0xe)
-		*/
+        059ce0 writing to bl_710000_w ff08 ffff
+        059d04 writing to bl_710000_w 000a ffff
+        059d04 writing to bl_710000_w 000b ffff
+        059d04 writing to bl_710000_w 000c ffff
+        059d04 writing to bl_710000_w 000f ffff
+        059d1c writing to bl_710000_w ff09 ffff
+        059d2a reading from bl_710000_r  (wants 0xe)
+        059ce0 writing to bl_710000_w ff08 ffff
+        059d04 writing to bl_710000_w 000a ffff
+        059d04 writing to bl_710000_w 000b ffff
+        059d04 writing to bl_710000_w 000c ffff
+        059d04 writing to bl_710000_w 000f ffff
+        059d1c writing to bl_710000_w ff09 ffff
+        059d2a reading from bl_710000_r  (wants 0xe)
+        */
 		// before lv stage 3
 		/*
-		059ce0 writing to bl_710000_w 0008 ffff
-		059d04 writing to bl_710000_w 000b ffff
-		059d04 writing to bl_710000_w 000f ffff
-		059d1c writing to bl_710000_w ff09 ffff
-		059d2a reading from bl_710000_r  (wants 0x4)
-		*/
+        059ce0 writing to bl_710000_w 0008 ffff
+        059d04 writing to bl_710000_w 000b ffff
+        059d04 writing to bl_710000_w 000f ffff
+        059d1c writing to bl_710000_w ff09 ffff
+        059d2a reading from bl_710000_r  (wants 0x4)
+        */
 		// start level 3
 		/*
-		059ce0 writing to bl_710000_w ff08 ffff
-		059d04 writing to bl_710000_w 000b ffff
-		059d04 writing to bl_710000_w 000c ffff
-		059d04 writing to bl_710000_w 000e ffff
-		059d1c writing to bl_710000_w ff09 ffff
-		059d2a reading from bl_710000_r  (wants 0x5)
+        059ce0 writing to bl_710000_w ff08 ffff
+        059d04 writing to bl_710000_w 000b ffff
+        059d04 writing to bl_710000_w 000c ffff
+        059d04 writing to bl_710000_w 000e ffff
+        059d1c writing to bl_710000_w ff09 ffff
+        059d2a reading from bl_710000_r  (wants 0x5)
 
-		// after end sequence
-		059ce0 writing to bl_710000_w 0008 ffff
-		059d04 writing to bl_710000_w 000a ffff
-		059d04 writing to bl_710000_w 000b ffff
-		059d04 writing to bl_710000_w 000c ffff
-		059d04 writing to bl_710000_w 000f ffff
-		059d1c writing to bl_710000_w ff09 ffff
-		059d2a reading from bl_710000_r  (wants 0xe)
+        // after end sequence
+        059ce0 writing to bl_710000_w 0008 ffff
+        059d04 writing to bl_710000_w 000a ffff
+        059d04 writing to bl_710000_w 000b ffff
+        059d04 writing to bl_710000_w 000c ffff
+        059d04 writing to bl_710000_w 000f ffff
+        059d1c writing to bl_710000_w ff09 ffff
+        059d2a reading from bl_710000_r  (wants 0xe)
 
-		*/
+        */
 		m_protcount++;
 	}
 

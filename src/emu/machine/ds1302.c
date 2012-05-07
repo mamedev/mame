@@ -9,10 +9,10 @@
 
 /*
 
-	TODO:
+    TODO:
 
-	- 12 hour format
-	- synchronize user buffers on falling edge of CE after write
+    - 12 hour format
+    - synchronize user buffers on falling edge of CE after write
 
 */
 
@@ -115,11 +115,11 @@ void ds1302_device::device_start()
 void ds1302_device::device_reset()
 {
 	set_current_time(machine());
-	
+
 	m_clk = 0;
 	m_ce = 0;
 	m_state = STATE_COMMAND;
-	m_bits = 0;	
+	m_bits = 0;
 }
 
 
@@ -170,7 +170,7 @@ void ds1302_device::nvram_write(emu_file &file)
 
 
 //-------------------------------------------------
-//  rtc_clock_updated - 
+//  rtc_clock_updated -
 //-------------------------------------------------
 
 void ds1302_device::rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second)
@@ -231,7 +231,7 @@ void ds1302_device::load_shift_register()
 			m_data = m_user[m_addr];
 
 			if (LOG) logerror("DS1302 '%s' Read Clock %u:%02x\n", tag(), m_addr, m_data);
-		}						
+		}
 	}
 	else
 	{
@@ -246,7 +246,7 @@ void ds1302_device::load_shift_register()
 			if (LOG) logerror("DS1302 '%s' Write Clock %u:%02x\n", tag(), m_addr, m_data);
 
 			m_reg[m_addr] = m_data;
-		}		
+		}
 	}
 }
 

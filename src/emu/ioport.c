@@ -165,11 +165,11 @@ class analog_field
 	friend class simple_list<analog_field>;
 	friend class ioport_manager;
 	friend void ioport_field::set_user_settings(const ioport_field::user_settings &settings);
-	
+
 public:
 	// construction/destruction
 	analog_field(ioport_field &field);
-	
+
 	// getters
 	analog_field *next() const { return m_next; }
 	ioport_manager &manager() const { return m_field.manager(); }
@@ -183,7 +183,7 @@ public:
 	void read(ioport_value &value);
 	float crosshair_read();
 	void frame_update(running_machine &machine);
-	
+
 private:
 	// helpers
 	INT32 apply_min_max(INT32 value) const;
@@ -239,19 +239,19 @@ private:
 class dynamic_field
 {
 	friend class simple_list<dynamic_field>;
-	
+
 public:
 	// construction/destruction
 	dynamic_field(ioport_field &field);
-	
+
 	// getters
 	dynamic_field *next() const { return m_next; }
 	ioport_field &field() const { return m_field; }
-	
+
 	// read/write
 	void read(ioport_value &result);
 	void write(ioport_value newval);
-	
+
 private:
 	// internal state
 	dynamic_field *			m_next;				// linked list of info for this port
@@ -284,7 +284,7 @@ struct ioport_port_live
 {
 	// construction/destruction
 	ioport_port_live(ioport_port &port);
-	
+
 	// public state
 	simple_list<analog_field> analoglist;		// list of analog port info
 	simple_list<dynamic_field> readlist;		// list of dynamic read fields
@@ -313,7 +313,7 @@ struct char_info
 
 //-------------------------------------------------
 //  compute_scale -- compute an 8.24 scale value
-//	from a numerator and a denominator
+//  from a numerator and a denominator
 //-------------------------------------------------
 
 inline INT64 compute_scale(INT32 num, INT32 den)
@@ -335,7 +335,7 @@ inline INT64 recip_scale(INT64 scale)
 
 //-------------------------------------------------
 //  apply_scale -- apply an 8.24 scale value to
-//	a 32-bit value
+//  a 32-bit value
 //-------------------------------------------------
 
 inline INT32 apply_scale(INT32 value, INT64 scale)
@@ -858,7 +858,7 @@ input_type_entry::input_type_entry(ioport_type type, ioport_group group, int pla
 
 //-------------------------------------------------
 //  configure_osd - set the token and name of an
-//	OSD entry
+//  OSD entry
 //-------------------------------------------------
 
 void input_type_entry::configure_osd(const char *token, const char *name)
@@ -889,7 +889,7 @@ digital_joystick::digital_joystick(int player, int number)
 
 
 //-------------------------------------------------
-//  set_axis - configure a single axis of a 
+//  set_axis - configure a single axis of a
 //  digital joystick
 //-------------------------------------------------
 
@@ -902,8 +902,8 @@ digital_joystick::direction_t digital_joystick::set_axis(ioport_field &field)
 
 
 //-------------------------------------------------
-//  frame_update - update the state of digital 
-//  joysticks prior to accumulating the results 
+//  frame_update - update the state of digital
+//  joysticks prior to accumulating the results
 //  in a port
 //-------------------------------------------------
 
@@ -1054,7 +1054,7 @@ void natural_keyboard::post(unicode_char ch)
 	if (can_post_directly(ch))
 		internal_post(ch);
 
-	// can we post this key with an alternate representation? 
+	// can we post this key with an alternate representation?
 	else if (can_post_alternate(ch))
 	{
 		const char_info *info = char_info::find(ch);
@@ -1077,7 +1077,7 @@ void natural_keyboard::post(const unicode_char *text, size_t length, attotime ra
 {
 	// set the fixed rate
 	m_current_rate = rate;
-	
+
 	// 0 length means strlen
 	if (length == 0)
 		for (const unicode_char *scan = text; *scan != 0; scan++)
@@ -1101,8 +1101,8 @@ void natural_keyboard::post_utf8(const char *text, size_t length, attotime rate)
 {
 	// set the fixed rate
 	m_current_rate = rate;
-	
-	// 0-length means strlen	
+
+	// 0-length means strlen
 	if (length == 0)
 		length = strlen(text);
 
@@ -1117,7 +1117,7 @@ void natural_keyboard::post_utf8(const char *text, size_t length, attotime rate)
 			count = 1;
 			uc = INVALID_CHAR;
 		}
-		
+
 		// append to the buffer
 		post(uc);
 		text += count;
@@ -1170,8 +1170,8 @@ void natural_keyboard::post_coded(const char *text, size_t length, attotime rate
 
 	// set the fixed rate
 	m_current_rate = rate;
-	
-	// 0-length means strlen	
+
+	// 0-length means strlen
 	if (length == 0)
 		length = strlen(text);
 
@@ -1282,7 +1282,7 @@ bool natural_keyboard::can_post_alternate(unicode_char ch)
 	const char_info *info = char_info::find(ch);
 	if (info == NULL)
 		return false;
-	
+
 	const char *altstring = info->alternate;
 	if (altstring == NULL)
 		return false;
@@ -1303,7 +1303,7 @@ bool natural_keyboard::can_post_alternate(unicode_char ch)
 
 //-------------------------------------------------
 //  choose_delay - determine the delay between
-//	posting keyboard events
+//  posting keyboard events
 //-------------------------------------------------
 
 attotime natural_keyboard::choose_delay(unicode_char ch)
@@ -1316,7 +1316,7 @@ attotime natural_keyboard::choose_delay(unicode_char ch)
 	if (!m_queue_chars.isnull())
 		return attotime::from_msec(10);
 
-	// otherwise, default to constant delay with a longer delay on CR	
+	// otherwise, default to constant delay with a longer delay on CR
 	return attotime::from_msec((ch == '\r') ? 200 : 50);
 }
 
@@ -1344,7 +1344,7 @@ void natural_keyboard::internal_post(unicode_char ch)
 
 //-------------------------------------------------
 //  timer - timer callback to keep things flowing
-//	when posting a string of characters
+//  when posting a string of characters
 //-------------------------------------------------
 
 void natural_keyboard::timer(void *ptr, int param)
@@ -1375,8 +1375,8 @@ void natural_keyboard::timer(void *ptr, int param)
 
 
 //-------------------------------------------------
-//  unicode_to_string - obtain a string 
-//  representation of a given code; used for 
+//  unicode_to_string - obtain a string
+//  representation of a given code; used for
 //  logging and debugging
 //-------------------------------------------------
 
@@ -1429,7 +1429,7 @@ const natural_keyboard::keycode_map_entry *natural_keyboard::find_code(unicode_c
 
 //-------------------------------------------------
 //  frame_update - once per frame update of the
-//	natural keyboard state
+//  natural keyboard state
 //-------------------------------------------------
 
 void natural_keyboard::frame_update(ioport_port &port, ioport_value &digital)
@@ -1674,7 +1674,7 @@ ioport_field::~ioport_field()
 
 
 //-------------------------------------------------
-//  name - return the field name for a given input 
+//  name - return the field name for a given input
 //  field
 //-------------------------------------------------
 
@@ -1692,7 +1692,7 @@ const char *ioport_field::name() const
 
 
 //-------------------------------------------------
-//  seq - return the live input sequence for the 
+//  seq - return the live input sequence for the
 //  given input field
 //-------------------------------------------------
 
@@ -1716,7 +1716,7 @@ const input_seq &ioport_field::seq(input_seq_type seqtype) const
 
 
 //-------------------------------------------------
-//  defseq - return the default input sequence for 
+//  defseq - return the default input sequence for
 //  the given input field
 //-------------------------------------------------
 
@@ -1737,7 +1737,7 @@ const input_seq &ioport_field::defseq(input_seq_type seqtype) const
 
 //-------------------------------------------------
 //  type_class - return the type class for this
-//	field
+//  field
 //-------------------------------------------------
 
 ioport_type_class ioport_field::type_class() const
@@ -1811,7 +1811,7 @@ ioport_type_class ioport_field::type_class() const
 
 
 //-------------------------------------------------
-//  keyboard_code - accesses a particular keyboard 
+//  keyboard_code - accesses a particular keyboard
 //  code
 //-------------------------------------------------
 
@@ -1827,7 +1827,7 @@ unicode_char ioport_field::keyboard_code(int which) const
 
 
 //-------------------------------------------------
-//  get_user_settings - return the current 
+//  get_user_settings - return the current
 //  settings for the given input field
 //-------------------------------------------------
 
@@ -1888,7 +1888,7 @@ void ioport_field::set_user_settings(const user_settings &settings)
 
 
 //-------------------------------------------------
-//  setting_name - return the expanded setting 
+//  setting_name - return the expanded setting
 //  name for a field
 //-------------------------------------------------
 
@@ -1908,7 +1908,7 @@ const char *ioport_field::setting_name() const
 
 
 //-------------------------------------------------
-//  has_previous_setting - return true if the 
+//  has_previous_setting - return true if the
 //  given field has a "previous" setting
 //-------------------------------------------------
 
@@ -1927,7 +1927,7 @@ bool ioport_field::has_previous_setting() const
 
 
 //-------------------------------------------------
-//  select_previous_setting - select the previous 
+//  select_previous_setting - select the previous
 //  item for a DIP switch or configuration field
 //-------------------------------------------------
 
@@ -1966,7 +1966,7 @@ void ioport_field::select_previous_setting()
 
 
 //-------------------------------------------------
-//  has_next_setting - return true if the given 
+//  has_next_setting - return true if the given
 //  field has a "next" setting
 //-------------------------------------------------
 
@@ -1991,7 +1991,7 @@ bool ioport_field::has_next_setting() const
 
 
 //-------------------------------------------------
-//  select_next_setting - select the next item for 
+//  select_next_setting - select the next item for
 //  a DIP switch or configuration field
 //-------------------------------------------------
 
@@ -2027,7 +2027,7 @@ void ioport_field::select_next_setting()
 
 
 //-------------------------------------------------
-//  frame_update_digital - get the state of a 
+//  frame_update_digital - get the state of a
 //  digital field
 //-------------------------------------------------
 
@@ -2043,7 +2043,7 @@ void ioport_field::frame_update(ioport_value &result, bool mouse_down)
 		m_live->analog->frame_update(machine());
 		return;
 	}
-	
+
 	// if UI is active, ignore digital inputs
 	if (ui_is_menu_active())
 		return;
@@ -2136,7 +2136,7 @@ void ioport_field::frame_update(ioport_value &result, bool mouse_down)
 
 //-------------------------------------------------
 //  crosshair_position - compute the crosshair
-//	position
+//  position
 //-------------------------------------------------
 
 void ioport_field::crosshair_position(float &x, float &y, bool &gotx, bool &goty)
@@ -2364,7 +2364,7 @@ ioport_port::~ioport_port()
 
 //-------------------------------------------------
 //  machine - return a reference to the running
-//	machine
+//  machine
 //-------------------------------------------------
 
 running_machine &ioport_port::machine() const
@@ -2374,7 +2374,7 @@ running_machine &ioport_port::machine() const
 
 
 //-------------------------------------------------
-//  manager - return a reference to the 
+//  manager - return a reference to the
 //  ioport_manager on the running machine
 //-------------------------------------------------
 
@@ -2465,7 +2465,7 @@ void ioport_port::frame_update(ioport_field *mouse_field)
 
 //-------------------------------------------------
 //  collapse_fields - remove any fields that are
-//	wholly overlapped by other fields
+//  wholly overlapped by other fields
 //-------------------------------------------------
 
 void ioport_port::collapse_fields(astring &errorbuf)
@@ -2483,7 +2483,7 @@ void ioport_port::collapse_fields(astring &errorbuf)
 			lastmodcount = field->modcount();
 			maskbits = 0;
 		}
-		
+
 		// reinsert this field
 		ioport_field *current = field;
 		field = field->next();
@@ -2494,7 +2494,7 @@ void ioport_port::collapse_fields(astring &errorbuf)
 
 //-------------------------------------------------
 //  insert_field - insert a new field, checking
-//	for errors
+//  for errors
 //-------------------------------------------------
 
 void ioport_port::insert_field(ioport_field &newfield, ioport_value &disallowedbits, astring &errorbuf)
@@ -2512,7 +2512,7 @@ void ioport_port::insert_field(ioport_field &newfield, ioport_value &disallowedb
 	for (ioport_field *field = first_field(); field != NULL; field = nextfield)
 	{
 		nextfield = field->next();
-		if ((field->mask() & newfield.mask()) != 0 && 
+		if ((field->mask() & newfield.mask()) != 0 &&
 			(newfield.condition().none() || field->condition().none() || field->condition() == newfield.condition()))
 		{
 			// reduce the mask of the field we found
@@ -2569,15 +2569,15 @@ ioport_port_live::ioport_port_live(ioport_port &port)
 		analog_field *analog = NULL;
 		if (field->is_analog())
 			analog = &analoglist.append(*global_alloc(analog_field(*field)));
-		
+
 		// allocate a dynamic field for reading
 		if (field->has_dynamic_read())
 			readlist.append(*global_alloc(dynamic_field(*field)));
-			
+
 		// allocate a dynamic field for writing
 		if (field->has_dynamic_write())
 			writelist.append(*global_alloc(dynamic_field(*field)));
-		
+
 		// let the field initialize its live state
 		field->init_live_state(analog);
 	}
@@ -2610,7 +2610,7 @@ ioport_manager::ioport_manager(running_machine &machine)
 
 //-------------------------------------------------
 //  initialize - walk the configured ports and
-//	create live state information
+//  create live state information
 //-------------------------------------------------
 
 time_t ioport_manager::initialize()
@@ -2748,7 +2748,7 @@ void ioport_manager::init_autoselect_devices(int type1, int type2, int type3, co
 
 
 //-------------------------------------------------
-//  exit - exit callback to ensure we clean up 
+//  exit - exit callback to ensure we clean up
 //  and close our files
 //-------------------------------------------------
 
@@ -2761,7 +2761,7 @@ void ioport_manager::exit()
 
 
 //-------------------------------------------------
-//  type_name - return the name for the given 
+//  type_name - return the name for the given
 //  type/player
 //-------------------------------------------------
 
@@ -2778,7 +2778,7 @@ const char *ioport_manager::type_name(ioport_type type, UINT8 player)
 
 
 //-------------------------------------------------
-//  type_group - return the group for the given 
+//  type_group - return the group for the given
 //  type/player
 //-------------------------------------------------
 
@@ -2794,7 +2794,7 @@ ioport_group ioport_manager::type_group(ioport_type type, int player)
 
 
 //-------------------------------------------------
-//  type_seq - return the input sequence for the 
+//  type_seq - return the input sequence for the
 //  given type/player
 //-------------------------------------------------
 
@@ -2814,7 +2814,7 @@ const input_seq &ioport_manager::type_seq(ioport_type type, int player, input_se
 
 
 //-------------------------------------------------
-//  set_type_seq - change the input sequence for 
+//  set_type_seq - change the input sequence for
 //  the given type/player
 //-------------------------------------------------
 
@@ -2827,7 +2827,7 @@ void ioport_manager::set_type_seq(ioport_type type, int player, input_seq_type s
 
 
 //-------------------------------------------------
-//  type_pressed - return true if the sequence for 
+//  type_pressed - return true if the sequence for
 //  the given input type/player is pressed
 //-------------------------------------------------
 
@@ -2853,7 +2853,7 @@ bool ioport_manager::type_class_present(ioport_type_class inputclass)
 
 
 //-------------------------------------------------
-//  has_keyboard - determine if there is a 
+//  has_keyboard - determine if there is a
 //  keyboard present in the control list
 //-------------------------------------------------
 
@@ -2876,7 +2876,7 @@ bool ioport_manager::has_keyboard() const
 }
 
 //-------------------------------------------------
-//  count_players - counts the number of active 
+//  count_players - counts the number of active
 //  players
 //-------------------------------------------------
 
@@ -2893,7 +2893,7 @@ int ioport_manager::count_players() const
 
 
 //-------------------------------------------------
-//  crosshair_position - return the extracted 
+//  crosshair_position - return the extracted
 //  crosshair values for the given player
 //-------------------------------------------------
 
@@ -2917,7 +2917,7 @@ bool ioport_manager::crosshair_position(int player, float &x, float &y)
 
 
 //-------------------------------------------------
-//  update_defaults - force an update to the input 
+//  update_defaults - force an update to the input
 //  port values based on current conditions
 //-------------------------------------------------
 
@@ -2953,7 +2953,7 @@ digital_joystick &ioport_manager::digjoystick(int player, int number)
 	for (digital_joystick *joystick = m_joystick_list.first(); joystick != NULL; joystick = joystick->next())
 		if (joystick->player() == player && joystick->number() == number)
 			return *joystick;
-	
+
 	// create a new one
 	return m_joystick_list.append(*global_alloc(digital_joystick(player, number)));
 }
@@ -2972,8 +2972,8 @@ void ioport_manager::frame_update_callback()
 
 
 //-------------------------------------------------
-//  frame_update_internal - core logic for 
-//	per-frame input port updating
+//  frame_update_internal - core logic for
+//  per-frame input port updating
 //-------------------------------------------------
 
 void ioport_manager::frame_update()
@@ -3031,7 +3031,7 @@ g_profiler.stop();
 
 
 //-------------------------------------------------
-//  frame_interpolate - interpolate between two 
+//  frame_interpolate - interpolate between two
 //  values based on the time between frames
 //-------------------------------------------------
 
@@ -3230,7 +3230,7 @@ bool ioport_manager::load_game_config(xml_data_node *portnode, int type, int pla
 //**************************************************************************
 
 //-------------------------------------------------
-//  save_config - config callback for saving input 
+//  save_config - config callback for saving input
 //  port configuration
 //-------------------------------------------------
 
@@ -3270,7 +3270,7 @@ void ioport_manager::save_sequence(xml_data_node *parentnode, input_seq_type typ
 
 
 //-------------------------------------------------
-//  save_this_input_field_type - determine if the 
+//  save_this_input_field_type - determine if the
 //  given port type is worth saving
 //-------------------------------------------------
 
@@ -3283,7 +3283,7 @@ bool ioport_manager::save_this_input_field_type(ioport_type type)
 		case IPT_PORT:
 		case IPT_UNKNOWN:
 			return false;
-		
+
 		default:
 			break;
 	}
@@ -3603,7 +3603,7 @@ void ioport_manager::record_init()
 	if (filename[0] == 0)
 		return;
 
-	// open the record file 
+	// open the record file
 	file_error filerr = m_record_file.open(filename);
 	assert_always(filerr == FILERR_NONE, "Failed to open file for recording");
 
@@ -3765,7 +3765,7 @@ void ioport_configurer::port_alloc(const char *tag)
 	// create the full tag
 	astring fulltag;
 	m_owner.subtag(fulltag, tag);
-	
+
 	// add it to the list, and reset current field/setting
 	m_curport = &m_portlist.append(fulltag, *global_alloc(ioport_port(m_owner, fulltag)));
 	m_curfield = NULL;
@@ -3788,7 +3788,7 @@ void ioport_configurer::port_modify(const char *tag)
 	m_curport = m_portlist.find(fulltag.cstr());
 	if (m_curport == NULL)
 		throw emu_fatalerror("Requested to modify nonexistent port '%s'", fulltag.cstr());
-	
+
 	// bump the modification count, and reset current field/setting
 	m_curport->m_modcount++;
 	m_curfield = NULL;
@@ -3858,7 +3858,7 @@ void ioport_configurer::setting_alloc(ioport_value value, const char *name)
 
 //-------------------------------------------------
 //  set_condition - set the condition for either
-//	the current setting or field
+//  the current setting or field
 //-------------------------------------------------
 
 void ioport_configurer::set_condition(ioport_condition::condition_t condition, const char *tag, ioport_value mask, ioport_value value)
@@ -3883,7 +3883,7 @@ void ioport_configurer::onoff_alloc(const char *name, ioport_value defval, iopor
 		field_set_toggle();
 		m_curfield->m_seq[SEQ_TYPE_STANDARD].set(KEYCODE_F2);
 	}
-	
+
 	// expand the diplocation
 	if (diplocation != NULL)
 		field_set_diplocation(diplocation);
@@ -3943,7 +3943,7 @@ dynamic_field::dynamic_field(ioport_field &field)
 
 //-------------------------------------------------
 //  read - read the updated value and merge it
-//	into the target
+//  into the target
 //-------------------------------------------------
 
 void dynamic_field::read(ioport_value &result)
@@ -3951,11 +3951,11 @@ void dynamic_field::read(ioport_value &result)
 	// skip if not enabled
 	if (!m_field.enabled())
 		return;
-	
+
 	// call the callback to read a new value
 	ioport_value newval = m_field.m_read(m_field, m_field.m_read_param);
 	m_oldval = newval;
-	
+
 	// merge in the bits (don't invert yet, as all digitals are inverted together)
 	result = (result & ~m_field.mask()) | ((newval << m_shift) & m_field.mask());
 }
@@ -3963,7 +3963,7 @@ void dynamic_field::read(ioport_value &result)
 
 //-------------------------------------------------
 //  write - track a change to a value and call
-//	the write callback if there's something new
+//  the write callback if there's something new
 //-------------------------------------------------
 
 void dynamic_field::write(ioport_value newval)
@@ -4166,7 +4166,7 @@ analog_field::analog_field(ioport_field &field)
 
 
 //-------------------------------------------------
-//  apply_min_max - clamp the given input value to 
+//  apply_min_max - clamp the given input value to
 //  the appropriate min/max for the analog control
 //-------------------------------------------------
 
@@ -4203,7 +4203,7 @@ inline INT32 analog_field::apply_min_max(INT32 value) const
 
 //-------------------------------------------------
 //  apply_sensitivity - apply a sensitivity
-//	adjustment for a current value
+//  adjustment for a current value
 //-------------------------------------------------
 
 inline INT32 analog_field::apply_sensitivity(INT32 value) const
@@ -4213,8 +4213,8 @@ inline INT32 analog_field::apply_sensitivity(INT32 value) const
 
 
 //-------------------------------------------------
-//  apply_inverse_sensitivity - reverse-apply the 
-//	sensitivity adjustment for a current value
+//  apply_inverse_sensitivity - reverse-apply the
+//  sensitivity adjustment for a current value
 //-------------------------------------------------
 
 inline INT32 analog_field::apply_inverse_sensitivity(INT32 value) const
@@ -4224,7 +4224,7 @@ inline INT32 analog_field::apply_inverse_sensitivity(INT32 value) const
 
 
 //-------------------------------------------------
-//  apply_settings - return the value of an 
+//  apply_settings - return the value of an
 //  analog input
 //-------------------------------------------------
 
@@ -4254,7 +4254,7 @@ INT32 analog_field::apply_settings(INT32 value) const
 
 
 //-------------------------------------------------
-//  frame_update - update the internals of a 
+//  frame_update - update the internals of a
 //  single analog field periodically
 //-------------------------------------------------
 
@@ -4396,7 +4396,7 @@ void analog_field::frame_update(running_machine &machine)
 
 //-------------------------------------------------
 //  read - read the current value and insert into
-//	the provided ioport_value
+//  the provided ioport_value
 //-------------------------------------------------
 
 void analog_field::read(ioport_value &result)
@@ -4430,7 +4430,7 @@ void analog_field::read(ioport_value &result)
 
 //-------------------------------------------------
 //  crosshair_read - read a value for crosshairs,
-//	scaled between 0 and 1
+//  scaled between 0 and 1
 //-------------------------------------------------
 
 float analog_field::crosshair_read()
@@ -4512,33 +4512,33 @@ input_seq_type ioport_manager::token_to_seq_type(const char *string)
 /*
 int validate_natural_keyboard_statics(void)
 {
-	int i;
-	int error = FALSE;
-	unicode_char last_char = 0;
-	const char_info *ci;
+    int i;
+    int error = FALSE;
+    unicode_char last_char = 0;
+    const char_info *ci;
 
-	// check to make sure that charinfo is in order
-	for (i = 0; i < ARRAY_LENGTH(charinfo); i++)
-	{
-		if (last_char >= charinfo[i].ch)
-		{
-			mame_printf_error("inputx: charinfo is out of order; 0x%08x should be higher than 0x%08x\n", charinfo[i].ch, last_char);
-			error = TRUE;
-		}
-		last_char = charinfo[i].ch;
-	}
+    // check to make sure that charinfo is in order
+    for (i = 0; i < ARRAY_LENGTH(charinfo); i++)
+    {
+        if (last_char >= charinfo[i].ch)
+        {
+            mame_printf_error("inputx: charinfo is out of order; 0x%08x should be higher than 0x%08x\n", charinfo[i].ch, last_char);
+            error = TRUE;
+        }
+        last_char = charinfo[i].ch;
+    }
 
-	// check to make sure that I can look up everything on alternate_charmap
-	for (i = 0; i < ARRAY_LENGTH(charinfo); i++)
-	{
-		ci = char_info::find(charinfo[i].ch);
-		if (ci != &charinfo[i])
-		{
-			mame_printf_error("ioport: expected char_info::find(0x%08x) to work properly\n", charinfo[i].ch);
-			error = TRUE;
-		}
-	}
-	return error;
+    // check to make sure that I can look up everything on alternate_charmap
+    for (i = 0; i < ARRAY_LENGTH(charinfo); i++)
+    {
+        ci = char_info::find(charinfo[i].ch);
+        if (ci != &charinfo[i])
+        {
+            mame_printf_error("ioport: expected char_info::find(0x%08x) to work properly\n", charinfo[i].ch);
+            error = TRUE;
+        }
+    }
+    return error;
 }
 */
 

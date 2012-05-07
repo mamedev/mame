@@ -111,7 +111,7 @@ public:
 			logerror("%08x astra_fgpa_slave_w offset %02x %02x\n", pc, offset, data);
 		}
 	}
-	
+
 	// devices
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_slavecpu;
@@ -2314,7 +2314,7 @@ GAME( 200?, as_tble,  as_tbl		  , astra_single,    astrafr,    0, 	ROT0,  "Astra
 GAME( 200?, as_tblf,  as_tbl		  , astra_single,    astrafr,    0, 	ROT0,  "Astra", "Triple Bells (Astra, V301)"		, GAME_IS_SKELETON_MECHANICAL)
 GAME( 200?, as_td,   0  	  , astra_single_2e,    astrafr,    astradec,	ROT0,  "Astra", "Twin Dragons (Astra, V103)"		, GAME_IS_SKELETON_MECHANICAL)
 
-GAME( 200?, as_twp,   0     	  , astra_single_2e,    astrafr,    0, 	ROT0,  "Astra", "Twin Pots (Astra, V106)"		, GAME_IS_SKELETON_MECHANICAL)
+GAME( 200?, as_twp,   0     	  , astra_single_2e,    astrafr,    0,	ROT0,  "Astra", "Twin Pots (Astra, V106)"		, GAME_IS_SKELETON_MECHANICAL)
 GAME( 200?, as_twpa,  as_twp      , astra_single,    astrafr,    0, 	ROT0,  "Astra", "Twin Pots (Astra, V104)"		, GAME_IS_SKELETON_MECHANICAL)
 GAME( 200?, as_vn,    0		  , astrafr_dual_alt_37,    astrafr,    astradec_dual,	ROT0,  "Astra", "Vegas Nights (Astra, V205)"		, GAME_IS_SKELETON_MECHANICAL)
 GAME( 200?, as_vcv,    0		  , astra_single,    astrafr,    astradec,	ROT0,  "Astra", "Viva Cash Vegas (Astra, V005)"		, GAME_IS_SKELETON_MECHANICAL)

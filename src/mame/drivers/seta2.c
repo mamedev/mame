@@ -687,8 +687,8 @@ READ8_MEMBER(seta2_state::funcube_serial_r)
 static void funcube_debug_outputs(running_machine &machine)
 {
 #ifdef MAME_DEBUG
-//	seta2_state *state = machine.driver_data<seta2_state>();
-//	popmessage("LED: %02x OUT: %02x", (int)*state->m_funcube_leds, (int)*state->m_funcube_outputs);
+//  seta2_state *state = machine.driver_data<seta2_state>();
+//  popmessage("LED: %02x OUT: %02x", (int)*state->m_funcube_leds, (int)*state->m_funcube_outputs);
 #endif
 }
 

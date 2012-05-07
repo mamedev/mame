@@ -23954,7 +23954,7 @@ GAME( 200?, sc4duckqa	,sc4duckq,	sc4, sc4, sc4, ROT0, "Qps","Ducks Of Hazzard (Q
 
 
 // PR1326 CASINO EASY STREAK         PR1326 EASY STREAK SOUNDS11  (actually expects PR1326_CAS_EASY_STREAK_SOUNDS11 ? )
-GAME( 200?, sc4eascs	,0,       	sc4, sc4, sc4, ROT0, "BFM","Easy Streak Casino (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4eascs	,0,     	sc4, sc4, sc4, ROT0, "BFM","Easy Streak Casino (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc4eascsa	,sc4eascs,	sc4, sc4, sc4, ROT0, "BFM","Easy Streak Casino (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc4eascsb	,sc4eascs,	sc4, sc4, sc4, ROT0, "BFM","Easy Streak Casino (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc4eascsc	,sc4eascs,	sc4, sc4, sc4, ROT0, "BFM","Easy Streak Casino (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )

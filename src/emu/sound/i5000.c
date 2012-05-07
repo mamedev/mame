@@ -45,7 +45,7 @@ void i5000snd_device::device_start()
 
 	m_rom_base = (UINT16 *)device().machine().root_device().memregion(":i5000snd")->base();
 	m_rom_mask = device().machine().root_device().memregion(":i5000snd")->bytes() / 2 - 1;
-	
+
 	// register for savestates
 	for (int ch = 0; ch < 16; ch++)
 	{
@@ -66,7 +66,7 @@ void i5000snd_device::device_start()
         save_item(NAME(m_channels[ch].output_r), ch);
         save_item(NAME(m_channels[ch].output_l), ch);
 	}
-	
+
 	save_item(NAME(m_regs));
 }
 
