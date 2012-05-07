@@ -69,7 +69,8 @@ enum iodevice_t
     IO_MEMCARD,     /* 13 - Memory card */
     IO_CDROM,       /* 14 - optical CD-ROM disc */
 	IO_MAGTAPE,     /* 15 - Magentic tape */
-    IO_COUNT        /* 16 - Total Number of IO_devices for searching */
+	IO_ROM,			/* 16 - Individual ROM image - the Amstrad CPC has a few applications that were sold on 16kB ROMs */
+    IO_COUNT        /* 17 - Total Number of IO_devices for searching */
 };
 
 enum image_error_t

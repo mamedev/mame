@@ -50,6 +50,7 @@
 //**************************************************************************
 const image_device_type_info device_image_interface::m_device_info_array[] =
 	{
+		{ IO_UNKNOWN,	"unknown",		"unkn" },
 		{ IO_CARTSLOT,	"cartridge",	"cart" }, /*  0 */
 		{ IO_FLOPPY,	"floppydisk",	"flop" }, /*  1 */
 		{ IO_HARDDISK,	"harddisk",		"hard" }, /*  2 */
@@ -65,6 +66,7 @@ const image_device_type_info device_image_interface::m_device_info_array[] =
 		{ IO_MEMCARD,	"memcard",		"memc" }, /* 12 */
 		{ IO_CDROM,     "cdrom",        "cdrm" }, /* 13 */
 		{ IO_MAGTAPE,	"magtape",		"magt" }, /* 14 */
+		{ IO_ROM,		"romimage",		"rom"  }, /* 15 */
 	};
 
 
