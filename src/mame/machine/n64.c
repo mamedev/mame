@@ -1781,9 +1781,9 @@ int n64_periphs::pif_channel_handle_command(int channel, int slength, UINT8 *sda
 				case 1: //p2 inputs
 				{
 					//printf("Read p%d inputs\n", channel + 1);
-                    buttons = ioport(portnames[(channel*3) + 0])->read();
-                    x = ioport(portnames[(channel*3) + 1])->read() - 128;
-                    y = ioport(portnames[(channel*3) + 2])->read() - 128;
+                    buttons = machine().root_device().ioport(portnames[(channel*3) + 0])->read();
+                    x = machine().root_device().ioport(portnames[(channel*3) + 1])->read() - 128;
+                    y = machine().root_device().ioport(portnames[(channel*3) + 2])->read() - 128;
 
 					rdata[0] = (buttons >> 8) & 0xff;
 					rdata[1] = (buttons >> 0) & 0xff;
