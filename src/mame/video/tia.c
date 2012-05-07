@@ -1919,5 +1919,7 @@ void tia_video_device::device_reset()
 		p1gfx.size[i] = 1;
 	}
 
+	current_bitmap = 0;
+
 	NUSIZx_changed = 0;
 }
