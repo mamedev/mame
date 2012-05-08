@@ -47,6 +47,9 @@ public:
 	int m_gboard_4screen;
 	int m_gboard_last_bank;
 	int m_gboard_command;
+	int m_IRQ_count;
+	UINT8 m_IRQ_count_latch;
+	int m_IRQ_enable;
 	int m_pc10_bios;
 	tilemap_t *m_bg_tilemap;
 	DECLARE_WRITE8_MEMBER(up8w_w);

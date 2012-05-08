@@ -843,23 +843,27 @@ DRIVER_INIT( pcfboard_2 )
 static void gboard_scanline_cb( device_t *device, int scanline, int vblank, int blanked )
 {
 	playch10_state *state = device->machine().driver_data<playch10_state>();
-	if (!vblank && !blanked)
+
+	if (scanline < PPU_BOTTOM_VISIBLE_SCANLINE)
 	{
-		if (--state->m_gboard_scanline_counter == -1)
+		int priorCount = state->m_IRQ_count;
+		if (state->m_IRQ_count == 0)
+			state->m_IRQ_count = state->m_IRQ_count_latch;
+		else
+			state->m_IRQ_count--;
+
+		if (state->m_IRQ_enable && !blanked && (state->m_IRQ_count == 0) && priorCount) // according to blargg the latter should be present as well, but it breaks Rampart and Joe & Mac US: they probably use the alt irq!
 		{
-			state->m_gboard_scanline_counter = state->m_gboard_scanline_latch;
-			generic_pulse_irq_line(device->machine().device("cart"), 0, 1);
+			device_set_input_line(device->machine().device("cart"), 0, HOLD_LINE);
 		}
 	}
 }
 
 WRITE8_MEMBER(playch10_state::gboard_rom_switch_w)
 {
-	ppu2c0x_device *ppu = machine().device<ppu2c0x_device>("ppu");
-
 	/* basically, a MMC3 mapper from the nes */
 
-	switch (offset & 0x7001)
+	switch (offset & 0x6001)
 	{
 		case 0x0000:
 			m_gboard_command = data;
@@ -971,19 +975,19 @@ WRITE8_MEMBER(playch10_state::gboard_rom_switch_w)
 		break;
 
 		case 0x4000: /* scanline counter */
-			m_gboard_scanline_counter = data;
+			m_IRQ_count_latch = data;
 		break;
 
 		case 0x4001: /* scanline latch */
-			m_gboard_scanline_latch = data;
+			m_IRQ_count = 0;
 		break;
 
 		case 0x6000: /* disable irqs */
-			ppu->set_scanline_callback(0);
+			m_IRQ_enable = 0;
 		break;
 
 		case 0x6001: /* enable irqs */
-			ppu->set_scanline_callback(gboard_scanline_cb);
+			m_IRQ_enable = 1;
 		break;
 	}
 }
@@ -991,6 +995,7 @@ WRITE8_MEMBER(playch10_state::gboard_rom_switch_w)
 DRIVER_INIT( pcgboard )
 {
 	playch10_state *state = machine.driver_data<playch10_state>();
+	ppu2c0x_device *ppu = machine.device<ppu2c0x_device>("ppu");
 	UINT8 *prg = state->memregion("cart")->base();
 	state->m_vram = NULL;
 
@@ -1010,9 +1015,13 @@ DRIVER_INIT( pcgboard )
 	state->m_gboard_scanline_counter = 0;
 	state->m_gboard_scanline_latch = 0;
 	state->m_gboard_4screen = 0;
+	state->m_IRQ_enable = 0;
+	state->m_IRQ_count = state->m_IRQ_count_latch = 0;
 
 	/* common init */
 	DRIVER_INIT_CALL(playch10);
+
+	ppu->set_scanline_callback(gboard_scanline_cb);
 }
 
 DRIVER_INIT( pcgboard_type2 )
