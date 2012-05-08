@@ -5116,24 +5116,22 @@
     <part name="cart" interface="neo_cart">
       <!-- MVS ONLY RELEASE -->
       <dataarea name="maincpu" size="0x200000">
-        <rom loadflag="load16_word_swap" name="213-p1.p1" offset="0x100000" size="0x100000" crc="e397d798" sha1="10f459111db4bab7aaa63ca47e83304a84300812" />
+        <rom loadflag="load16_word_swap" name="213-p1.p1" offset="0x100000" size="0x100000" crc="e397d798" sha1="10f459111db4bab7aaa63ca47e83304a84300812" />        <!-- mask rom TC5316200 -->
         <rom size="0x100000" offset="0x000000" loadflag="continue" />
       </dataarea>
       <dataarea name="fixed" size="0x040000">
-        <rom offset="0x000000" size="0x020000" name="213-s1.s1" crc="b76b61bc" sha1="5fdb407d16ab9e33c4f26ee09ff70891ae1d2bd0" />        <!-- TC531000 -->
+        <rom offset="0x000000" size="0x020000" name="213-s1.s1" crc="b76b61bc" sha1="5fdb407d16ab9e33c4f26ee09ff70891ae1d2bd0" />        <!-- mask rom TC531000 -->
       </dataarea>
       <dataarea name="audiocpu" size="0x020000">
-        <rom offset="0x000000" size="0x020000" name="213-m1.m1" crc="200045f1" sha1="7a6cd1c8d4447ea260d7ff4520c676b8d685f2e4" />
+        <rom offset="0x000000" size="0x020000" name="213-m1.m1" crc="200045f1" sha1="7a6cd1c8d4447ea260d7ff4520c676b8d685f2e4" />        <!-- mask rom TC531001 -->
       </dataarea>
       <dataarea name="ymsnd" size="0x400000">
-        <rom name="213-v1.v1" offset="0x000000" size="0x200000" crc="a421c076" sha1="129f05c1a28a6493442f47a79c2d3577a1a43ef5" />
-        <rom name="213-v2.v2" offset="0x200000" size="0x200000" crc="233c7dd9" sha1="be7f980aa83831b6605aaaf4ec904180bb96c935" />
+        <rom name="213-v1.v1" offset="0x000000" size="0x200000" crc="a421c076" sha1="129f05c1a28a6493442f47a79c2d3577a1a43ef5" />        <!-- mask rom TC5332204 -->
+        <rom name="213-v2.v2" offset="0x200000" size="0x200000" crc="233c7dd9" sha1="be7f980aa83831b6605aaaf4ec904180bb96c935" />        <!-- mask rom TC5316200 -->
       </dataarea>
       <dataarea name="sprites" size="0x800000">
-        <rom loadflag="load16_byte" name="213-c1.c1" offset="0x000000" size="0x400000" crc="3edc8bd3" sha1="71dcba9afd3b08ebfa13294644dcb365c2740780" />
-        <!-- Plane 0,1 -->
-        <rom loadflag="load16_byte" name="213-c2.c2" offset="0x000001" size="0x400000" crc="46ae5f16" sha1="a01310632734e776e889af6a531063cb1661c33a" />
-        <!-- Plane 2,3 -->
+        <rom loadflag="load16_byte" name="213-c1.c1" offset="0x000000" size="0x400000" crc="3edc8bd3" sha1="71dcba9afd3b08ebfa13294644dcb365c2740780" />        <!-- Plane 0,1 -->        <!-- mask rom TC5332205 -->
+        <rom loadflag="load16_byte" name="213-c2.c2" offset="0x000001" size="0x400000" crc="46ae5f16" sha1="a01310632734e776e889af6a531063cb1661c33a" />        <!-- Plane 2,3 -->        <!-- mask rom TC5332205 -->
       </dataarea>
     </part>
   </software>
@@ -5720,24 +5718,24 @@
     <sharedfeat name="aescompatible" value="yes" />
     <part name="cart" interface="neo_cart">
       <dataarea name="maincpu" size="0x200000">
-        <rom loadflag="load16_word_swap" name="224-p1.p1" offset="0x100000" size="0x100000" crc="7697e445" sha1="5b55ca120f77a931d40719b14e0bfc8cac1d628c" />
+        <rom loadflag="load16_word_swap" name="224-p1.p1" offset="0x100000" size="0x100000" crc="7697e445" sha1="5b55ca120f77a931d40719b14e0bfc8cac1d628c" />        <!-- mask rom TC5316200 -->
         <rom size="0x100000" offset="0x000000" loadflag="continue" />
       </dataarea>
       <dataarea name="fixed" size="0x040000">
-        <rom offset="0x000000" size="0x020000" name="224-s1.s1" crc="eeed5758" sha1="24e48f396716e145b692468762cf595fb7267873" />
+        <rom offset="0x000000" size="0x020000" name="224-s1.s1" crc="eeed5758" sha1="24e48f396716e145b692468762cf595fb7267873" />        <!-- mask rom TC531000 -->
       </dataarea>
       <dataarea name="audiocpu" size="0x020000">
-        <rom offset="0x000000" size="0x020000" name="224-m1.m1" crc="364d6f96" sha1="779b95a6476089b71f48c8368d9043ee1dba9032" />
+        <rom offset="0x000000" size="0x020000" name="224-m1.m1" crc="364d6f96" sha1="779b95a6476089b71f48c8368d9043ee1dba9032" />        <!-- mask rom TC531001 -->
       </dataarea>
       <dataarea name="ymsnd" size="0x600000">
-        <rom name="224-v1.v1" offset="0x000000" size="0x400000" crc="ff57f088" sha1="1641989b8aac899dbd68aa2332bcdf9b90b33564" />
-        <rom name="224-v2.v2" offset="0x400000" size="0x200000" crc="7ad26599" sha1="822030037b7664795bf3d64e1452d0aecc22497e" />
+        <rom name="224-v1.v1" offset="0x000000" size="0x400000" crc="ff57f088" sha1="1641989b8aac899dbd68aa2332bcdf9b90b33564" />        <!-- mask rom TC5332204 -->
+        <rom name="224-v2.v2" offset="0x400000" size="0x200000" crc="7ad26599" sha1="822030037b7664795bf3d64e1452d0aecc22497e" />        <!-- mask rom TC5316200 -->
       </dataarea>
       <dataarea name="sprites" size="0xa00000">
-        <rom loadflag="load16_byte" name="224-c1.c1" offset="0x000000" size="0x400000" crc="f7da64ab" sha1="587a10ed9235c9046a3523fe80feba07764fac9b" />        <!-- Plane 0,1 -->
-        <rom loadflag="load16_byte" name="224-c2.c2" offset="0x000001" size="0x400000" crc="4c09bbfb" sha1="e781aafba3bdefb7ed152826f4c3eb441735331c" />        <!-- Plane 2,3 -->
-        <rom loadflag="load16_byte" name="224-c3.c3" offset="0x800000" size="0x100000" crc="c59e4129" sha1="93f02d1b4fbb152a9d336494fbff0d7642921de5" />        <!-- Plane 0,1 -->
-        <rom loadflag="load16_byte" name="224-c4.c4" offset="0x800001" size="0x100000" crc="b5532e53" sha1="7d896c25ba97f6e5d43c13d4df4ba72964a976ed" />        <!-- Plane 2,3 -->
+        <rom loadflag="load16_byte" name="224-c1.c1" offset="0x000000" size="0x400000" crc="f7da64ab" sha1="587a10ed9235c9046a3523fe80feba07764fac9b" />        <!-- Plane 0,1 -->        <!-- mask rom TC5332205 -->
+        <rom loadflag="load16_byte" name="224-c2.c2" offset="0x000001" size="0x400000" crc="4c09bbfb" sha1="e781aafba3bdefb7ed152826f4c3eb441735331c" />        <!-- Plane 2,3 -->        <!-- mask rom TC5332205 -->
+        <rom loadflag="load16_byte" name="224-c3.c3" offset="0x800000" size="0x100000" crc="c59e4129" sha1="93f02d1b4fbb152a9d336494fbff0d7642921de5" />        <!-- Plane 0,1 -->        <!-- mask rom TC538200 -->
+        <rom loadflag="load16_byte" name="224-c4.c4" offset="0x800001" size="0x100000" crc="b5532e53" sha1="7d896c25ba97f6e5d43c13d4df4ba72964a976ed" />        <!-- Plane 2,3 -->        <!-- mask rom TC538200 -->
       </dataarea>
     </part>
   </software>
@@ -6242,14 +6240,14 @@
         <rom offset="0x000000" size="0x010000" name="235-s1.s1" status="baddump" crc="5a68d91e" sha1="a8c58eb68fd7e6e2d9d1153a9da514430437f342" />
       </dataarea>
       <dataarea name="audiocpu" size="0x020000">
-        <rom offset="0x000000" size="0x020000" name="202-m1.m1" crc="9c0291ea" sha1="3fa67c62acba79be6b3a98cc1601e45569fa11ae" />
+        <rom offset="0x000000" size="0x020000" name="202-m1.m1" crc="9c0291ea" sha1="3fa67c62acba79be6b3a98cc1601e45569fa11ae" />        <!-- TC531001 -->
       </dataarea>
       <dataarea name="ymsnd" size="0x80000">
-        <rom name="202-v1.v1" offset="0x000000" size="0x080000" crc="debeb8fb" sha1="49a3d3578c087f1a0050168571ef8d1b08c5dc05" />
+        <rom name="202-v1.v1" offset="0x000000" size="0x080000" crc="debeb8fb" sha1="49a3d3578c087f1a0050168571ef8d1b08c5dc05" />        <!-- TC534200 -->
       </dataarea>
       <dataarea name="sprites" size="0x200000">
-        <rom loadflag="load16_byte" name="202-c1.c1" offset="0x000000" size="0x100000" crc="cc0095ef" sha1="3d86f455e6db10a2449b775dc386f1826ba3b62e" />        <!-- Plane 0,1 -->
-        <rom loadflag="load16_byte" name="202-c2.c2" offset="0x000001" size="0x100000" crc="42371307" sha1="df794f989e2883634bf7ffeea48d6bc3854529af" />        <!-- Plane 2,3 -->
+        <rom loadflag="load16_byte" name="202-c1.c1" offset="0x000000" size="0x100000" crc="cc0095ef" sha1="3d86f455e6db10a2449b775dc386f1826ba3b62e" />        <!-- Plane 0,1 -->        <!-- TC538200 -->
+        <rom loadflag="load16_byte" name="202-c2.c2" offset="0x000001" size="0x100000" crc="42371307" sha1="df794f989e2883634bf7ffeea48d6bc3854529af" />        <!-- Plane 2,3 -->        <!-- TC538200 -->
       </dataarea>
     </part>
   </software>
@@ -7035,10 +7033,11 @@
  . NGM-2500
  NEO-MVS PROGEOP / NEO-MVS CHA512Y
  . NGH-2500
+ NEO-AEG PROGEOP (1999.4.2) / NEO-AEG CHA512Y
 ***************************************-->
 
   <software name="mslugx">
-    <description>Metal Slug X - Super Vehicle-001</description>
+    <description>Metal Slug X - Super Vehicle-001 (NGM-2500)(NGH-2500) (</description>
     <year>1999</year>
     <publisher>SNK</publisher>
     <sharedfeat name="mvsrelease" value="yes" />
@@ -7348,7 +7347,7 @@
  . NGM-2530
  NEO-MVS PROGLBA (NEO-SMA) (LBA-SUB) / NEO-MVS CHAFIO (1999.6.14) (NEO-CMC 7042)
  . NGH-2530
- NEO-AES PROGLBA (NEO-SMA) / NEO-AEG CHAFIO (1999.8.10) (NEO-CMC 7042)
+ NEO-AEG PROGLBA (NEO-SMA) / NEO-AEG CHAFIO (1999.8.10) (NEO-CMC 7042)
 ***************************************-->
 
   <software name="garou">
@@ -8641,6 +8640,7 @@
       <!-- MVS VERSION -->
       <feature name="crypt" value="samsh5sp_prot" />
       <dataarea name="maincpu" size="0x800000">
+        <!-- Uncensored -->
         <rom loadflag="load16_word_swap" name="272-p1.p1" offset="0x000000" size="0x400000" crc="fb7a6bba" sha1="f68c527208d8a55ca44b0caaa8ab66b3a0ffdfe5" />
         <rom loadflag="load16_word_swap" name="272-p2.sp2" offset="0x400000" size="0x400000" crc="63492ea6" sha1="6ba946acb62c63ed61a42fe72b7fff3828883bcc" />
       </dataarea>
@@ -8672,7 +8672,7 @@
   </software>
 
   <software name="samsh5sph" cloneof="samsh5sp">
-    <description>Samurai Shodown V Special / Samurai Spirits Zero Special (NGH-2720) (1st release, censored)</description>
+    <description>Samurai Shodown V Special / Samurai Spirits Zero Special (NGH-2720) (2nd release, less censored)</description>
     <year>2004</year>
     <publisher>Yuki Enterprise / SNK Playmore</publisher>
     <sharedfeat name="mvsrelease" value="no" />
@@ -8681,11 +8681,13 @@
     <sharedfeat name="aescompatible" value="yes" />
     <part name="cart" interface="neo_cart">
       <!-- Encrypted Set -->
-      <!-- AES VERSION -->
+      <!-- AES VERSION, 2nd bugfix release -->
       <feature name="crypt" value="samsh5sp_prot" />
       <dataarea name="maincpu" size="0x800000">
-        <rom loadflag="load16_word_swap" name="272-p1c.p1" offset="0x000000" size="0x400000" crc="9291794d" sha1="66588ff9b00ffad6508b03423548984e28a3209d" />
-        <rom loadflag="load16_word_swap" name="272-p2c.sp2" offset="0x400000" size="0x400000" crc="fa1a7dd8" sha1="62443dad76d6c1e18f515d7d4ef8e1295a4b7f1d" />
+        <!-- Less censored -->
+        <rom loadflag="load16_word_swap" name="272-p1ca.p1" offset="0x000000" size="0x400000" crc="c30a08dd" sha1="66864954017c841d7ca8490112c3aa7a71a4da70" />
+        <rom loadflag="load16_word_swap" name="272-p2ca.sp2" offset="0x400000" size="0x400000" crc="bd64a518" sha1="aa259a168930f106377d680db444535411b3bce0" />
+        <!-- Correct chip labels unknown -->
       </dataarea>
       <dataarea name="fixed" size="0x20000">
         <!-- The Encrypted Boards do _not_ have an s1 rom, data for it comes from the Cx ROMs -->
@@ -8714,8 +8716,8 @@
     </part>
   </software>
 
-  <software name="samsh5spn" cloneof="samsh5sp">
-    <description>Samurai Shodown V Special / Samurai Spirits Zero Special (NGH-2720) (2nd release, less censored)</description>
+  <software name="samsh5spho" cloneof="samsh5sp">
+    <description>Samurai Shodown V Special / Samurai Spirits Zero Special (NGH-2720) (1st release, censored)</description>
     <year>2004</year>
     <publisher>Yuki Enterprise / SNK Playmore</publisher>
     <sharedfeat name="mvsrelease" value="no" />
@@ -8724,12 +8726,12 @@
     <sharedfeat name="aescompatible" value="yes" />
     <part name="cart" interface="neo_cart">
       <!-- Encrypted Set -->
-      <!-- AES VERSION, 2nd bugfix release -->
+      <!-- AES VERSION -->
       <feature name="crypt" value="samsh5sp_prot" />
       <dataarea name="maincpu" size="0x800000">
-        <rom loadflag="load16_word_swap" name="272-p1ca.p1" offset="0x000000" size="0x400000" crc="c30a08dd" sha1="66864954017c841d7ca8490112c3aa7a71a4da70" />
-        <rom loadflag="load16_word_swap" name="272-p2ca.sp2" offset="0x400000" size="0x400000" crc="bd64a518" sha1="aa259a168930f106377d680db444535411b3bce0" />
-        <!-- Correct chip labels unknown -->
+        <!-- Censored -->
+        <rom loadflag="load16_word_swap" name="272-p1c.p1" offset="0x000000" size="0x400000" crc="9291794d" sha1="66588ff9b00ffad6508b03423548984e28a3209d" />
+        <rom loadflag="load16_word_swap" name="272-p2c.sp2" offset="0x400000" size="0x400000" crc="fa1a7dd8" sha1="62443dad76d6c1e18f515d7d4ef8e1295a4b7f1d" />
       </dataarea>
       <dataarea name="fixed" size="0x20000">
         <!-- The Encrypted Boards do _not_ have an s1 rom, data for it comes from the Cx ROMs -->
