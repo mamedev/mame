@@ -4,8 +4,9 @@ tecmo.c
 
 driver by Nicola Salmoria
 
-TODO:
-- missing drums in backfirt (uses a Y3014?);
+Notes:
+- btanb: missing drums in backfirt, there isn't any ADPCM / rom that makes
+  that to happen (code still tries to writes on that, but it's just nop'ed);
 
 Silkworm memory map (preliminary)
 
@@ -1159,4 +1160,4 @@ GAME( 1986, rygarj,    rygar,    rygar,    rygar,    rygar,    ROT0,  "Tecmo", "
 GAME( 1987, gemini,    0,        gemini,   gemini,   gemini,   ROT90, "Tecmo", "Gemini Wing (Japan)", 0 ) /* Japan regional warning screen */
 GAME( 1988, silkworm,  0,        silkworm, silkworm, silkworm, ROT0,  "Tecmo", "Silk Worm (World)", 0 )   /* No regional "Warning, if you are playing ..." screen */
 GAME( 1988, silkwormj, silkworm, silkworm, silkworm, silkworm, ROT0,  "Tecmo", "Silk Worm (Japan)", 0 )   /* Japan regional warning screen */
-GAME( 1988, backfirt,  0,        gemini,   backfirt, backfirt, ROT0,  "Tecmo", "Back Fire (Tecmo, bootleg)", GAME_IMPERFECT_SOUND )
+GAME( 1988, backfirt,  0,        gemini,   backfirt, backfirt, ROT0,  "Tecmo", "Back Fire (Tecmo, bootleg)", 0 )
