@@ -1915,10 +1915,6 @@ static MACHINE_CONFIG_DERIVED( champwr, fhawk )
 	/* sound hardware */
 	MCFG_SOUND_MODIFY("ymsnd")
 	MCFG_SOUND_CONFIG(ym2203_interface_champwr)
-	MCFG_SOUND_ROUTE(0, "mono", 0.20)
-	MCFG_SOUND_ROUTE(1, "mono", 0.20)
-	MCFG_SOUND_ROUTE(2, "mono", 0.20)
-	MCFG_SOUND_ROUTE(3, "mono", 0.80)
 
 	MCFG_SOUND_ADD("msm", MSM5205, XTAL_384kHz)
 	MCFG_SOUND_CONFIG(msm5205_config)

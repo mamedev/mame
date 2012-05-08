@@ -2495,7 +2495,8 @@ static MACHINE_CONFIG_DERIVED( anteater, scobra )
 
 	/* quiet down the sounds */
 	MCFG_SOUND_MODIFY("konami")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.1)
+	MCFG_SOUND_ROUTES_RESET()
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
 

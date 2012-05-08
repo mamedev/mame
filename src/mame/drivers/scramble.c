@@ -1373,10 +1373,12 @@ static MACHINE_CONFIG_DERIVED( hotshock, scramble )
 	MCFG_VIDEO_START(pisces)
 
 	MCFG_SOUND_MODIFY("8910.1")
+	MCFG_SOUND_ROUTES_RESET()
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 
 	MCFG_SOUND_MODIFY("8910.2")
 	MCFG_SOUND_CONFIG(hotshock_ay8910_interface_2)
+	MCFG_SOUND_ROUTES_RESET()
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 MACHINE_CONFIG_END
 
@@ -1418,6 +1420,7 @@ static MACHINE_CONFIG_DERIVED( triplep, scramble )
 	MCFG_SOUND_MODIFY("8910.1")
 	MCFG_SOUND_CLOCK(18432000/12) // triple punch/knock out ay clock is 1.535MHz, derived from main cpu xtal; verified on hardware
 	MCFG_SOUND_CONFIG(triplep_ay8910_interface)
+	MCFG_SOUND_ROUTES_RESET()
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_DEVICE_REMOVE("8910.2")

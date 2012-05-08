@@ -1880,10 +1880,6 @@ static MACHINE_CONFIG_DERIVED( kabukiz, tnzsb )
 
 	MCFG_SOUND_MODIFY("ymsnd")
 	MCFG_SOUND_CONFIG(kabukiz_ym2203_interface)
-	MCFG_SOUND_ROUTE(0, "mono", 1.0)
-	MCFG_SOUND_ROUTE(1, "mono", 1.0)
-	MCFG_SOUND_ROUTE(2, "mono", 1.0)
-	MCFG_SOUND_ROUTE(3, "mono", 2.0)
 
 	MCFG_SOUND_ADD("dac", DAC, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

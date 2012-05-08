@@ -441,6 +441,7 @@ static MACHINE_CONFIG_DERIVED( magjoker, galaxi )
 	MCFG_SOUND_MODIFY("oki")
 
 	/* ADPCM samples are recorded with extremely low volume */
+	MCFG_SOUND_ROUTES_RESET()
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 4.0)
 MACHINE_CONFIG_END
 

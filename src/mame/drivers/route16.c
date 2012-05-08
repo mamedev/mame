@@ -644,7 +644,6 @@ static MACHINE_CONFIG_DERIVED( stratvox, route16 )
 	/* sound hardware */
 	MCFG_SOUND_MODIFY("ay8910")
 	MCFG_SOUND_CONFIG(stratvox_ay8910_interface)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_SOUND_ADD("snsnd", SN76477, 0)
 	MCFG_SOUND_CONFIG(sn76477_intf)
