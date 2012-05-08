@@ -1236,7 +1236,10 @@ void natural_keyboard::build_codes(ioport_manager &manager)
 						{
 							keycode_map_entry newcode;
 							if (curshift == 0)
+                            {
 								newcode.field[0] = field;
+                                newcode.field[1] = 0;
+                            }
 							else
 							{
 								newcode.field[0] = shift[curshift - 1];
