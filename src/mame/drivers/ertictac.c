@@ -221,7 +221,7 @@ static const i2cmem_interface i2cmem_interface =
 
 static MACHINE_CONFIG_START( ertictac, ertictac_state )
 
-	MCFG_CPU_ADD("maincpu", ARM, XTAL_24MHz/3) /* guess, 12MHz 8MHz or 6MHz, what's the correct devider 2, 3 or 4? */
+	MCFG_CPU_ADD("maincpu", ARM, XTAL_24MHz/3) /* guess, 12MHz 8MHz or 6MHz, what's the correct divider 2, 3 or 4? */
 	MCFG_CPU_PROGRAM_MAP(ertictac_map)
 	MCFG_CPU_PERIODIC_INT(ertictac_podule_irq,60) // FIXME: timing of this
 
