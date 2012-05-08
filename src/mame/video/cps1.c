@@ -58,7 +58,7 @@ Final Fight (USA 900112)                                         89624B-3   S224
 Final Fight (USA 900613)                                         89624B-3   S224B            IOB1  88622-C-5    CPS-B-05  DL-0411-10006  None
 Final Fight (Japan)                                              ?          S222B            ?     ?            CPS-B-04  DL-0411-10005
 Final Fight (Japan 900112)                                       89625B-1   S222B            LWIO  88622-C-5    CPS-B-01  DL-0411-10001  None
-Final Fight (Japan 900305)                                       ?          S222B            ?     ?            CPS-B-02  DL-0411-10002
+Final Fight (Japan 900305)                                       88622B-3   S222B            LWIO  88622-C-5    CPS-B-02  DL-0411-10002  None
 
 1941: Counter Attack (World)                               1990  89624B-?   YI24B            ?     ?            CPS-B-05  DL-0411-10006
 1941: Counter Attack (World 900227)                              89624B-3   YI24B            IOB1  88622-C-5    CPS-B-05  DL-0411-10006  None
