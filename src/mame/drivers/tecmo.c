@@ -4,6 +4,8 @@ tecmo.c
 
 driver by Nicola Salmoria
 
+TODO:
+- missing drums in backfirt (uses a Y3014?);
 
 Silkworm memory map (preliminary)
 
@@ -65,7 +67,12 @@ WRITE8_MEMBER(tecmo_state::tecmo_bankswitch_w)
 WRITE8_MEMBER(tecmo_state::tecmo_sound_command_w)
 {
 	soundlatch_byte_w(space, offset, data);
-	cputag_set_input_line(machine(), "soundcpu",INPUT_LINE_NMI,PULSE_LINE);
+	cputag_set_input_line(machine(), "soundcpu",INPUT_LINE_NMI,ASSERT_LINE);
+}
+
+WRITE8_MEMBER(tecmo_state::tecmo_nmi_ack_w)
+{
+	cputag_set_input_line(machine(), "soundcpu",INPUT_LINE_NMI,CLEAR_LINE);
 }
 
 static WRITE8_DEVICE_HANDLER( tecmo_adpcm_start_w )
@@ -74,14 +81,17 @@ static WRITE8_DEVICE_HANDLER( tecmo_adpcm_start_w )
 	state->m_adpcm_pos = data << 8;
 	msm5205_reset_w(device, 0);
 }
+
 WRITE8_MEMBER(tecmo_state::tecmo_adpcm_end_w)
 {
 	m_adpcm_end = (data + 1) << 8;
 }
+
 static WRITE8_DEVICE_HANDLER( tecmo_adpcm_vol_w )
 {
 	msm5205_set_volume(device,(data & 0x0f) * 100 / 15);
 }
+
 static void tecmo_adpcm_int(device_t *device)
 {
 	tecmo_state *state = device->machine().driver_data<tecmo_state>();
@@ -147,10 +157,10 @@ static ADDRESS_MAP_START( rygar_map, AS_PROGRAM, 8, tecmo_state )
 	AM_RANGE(0xf803, 0xf803) AM_READ_PORT("BUTTONS2")
 	AM_RANGE(0xf804, 0xf804) AM_READ_PORT("SYS_0")
 	AM_RANGE(0xf805, 0xf805) AM_READ_PORT("SYS_1")
-	AM_RANGE(0xf806, 0xf806) AM_READ(tecmo_dswa_l_r )
-	AM_RANGE(0xf807, 0xf807) AM_READ(tecmo_dswa_h_r )
-	AM_RANGE(0xf808, 0xf808) AM_READ(tecmo_dswb_l_r )
-	AM_RANGE(0xf809, 0xf809) AM_READ(tecmo_dswb_h_r )
+	AM_RANGE(0xf806, 0xf806) AM_READ(tecmo_dswa_l_r)
+	AM_RANGE(0xf807, 0xf807) AM_READ(tecmo_dswa_h_r)
+	AM_RANGE(0xf808, 0xf808) AM_READ(tecmo_dswb_l_r)
+	AM_RANGE(0xf809, 0xf809) AM_READ(tecmo_dswb_h_r)
 	AM_RANGE(0xf80f, 0xf80f) AM_READ_PORT("SYS_2")
 	AM_RANGE(0xf800, 0xf802) AM_WRITE(tecmo_fgscroll_w)
 	AM_RANGE(0xf803, 0xf805) AM_WRITE(tecmo_bgscroll_w)
@@ -175,10 +185,10 @@ static ADDRESS_MAP_START( gemini_map, AS_PROGRAM, 8, tecmo_state )
 	AM_RANGE(0xf803, 0xf803) AM_READ_PORT("BUTTONS2")
 	AM_RANGE(0xf804, 0xf804) AM_READ_PORT("SYS_0")
 	AM_RANGE(0xf805, 0xf805) AM_READ_PORT("SYS_1")
-	AM_RANGE(0xf806, 0xf806) AM_READ(tecmo_dswa_l_r )
-	AM_RANGE(0xf807, 0xf807) AM_READ(tecmo_dswa_h_r )
-	AM_RANGE(0xf808, 0xf808) AM_READ(tecmo_dswb_l_r )
-	AM_RANGE(0xf809, 0xf809) AM_READ(tecmo_dswb_h_r )
+	AM_RANGE(0xf806, 0xf806) AM_READ(tecmo_dswa_l_r)
+	AM_RANGE(0xf807, 0xf807) AM_READ(tecmo_dswa_h_r)
+	AM_RANGE(0xf808, 0xf808) AM_READ(tecmo_dswb_l_r)
+	AM_RANGE(0xf809, 0xf809) AM_READ(tecmo_dswb_h_r)
 	AM_RANGE(0xf80f, 0xf80f) AM_READ_PORT("SYS_2")
 	AM_RANGE(0xf800, 0xf802) AM_WRITE(tecmo_fgscroll_w)
 	AM_RANGE(0xf803, 0xf805) AM_WRITE(tecmo_bgscroll_w)
@@ -203,10 +213,10 @@ static ADDRESS_MAP_START( silkworm_map, AS_PROGRAM, 8, tecmo_state )
 	AM_RANGE(0xf803, 0xf803) AM_READ_PORT("BUTTONS2")
 	AM_RANGE(0xf804, 0xf804) AM_READ_PORT("SYS_0")
 	AM_RANGE(0xf805, 0xf805) AM_READ_PORT("SYS_1")
-	AM_RANGE(0xf806, 0xf806) AM_READ(tecmo_dswa_l_r )
-	AM_RANGE(0xf807, 0xf807) AM_READ(tecmo_dswa_h_r )
-	AM_RANGE(0xf808, 0xf808) AM_READ(tecmo_dswb_l_r )
-	AM_RANGE(0xf809, 0xf809) AM_READ(tecmo_dswb_h_r )
+	AM_RANGE(0xf806, 0xf806) AM_READ(tecmo_dswa_l_r)
+	AM_RANGE(0xf807, 0xf807) AM_READ(tecmo_dswa_h_r)
+	AM_RANGE(0xf808, 0xf808) AM_READ(tecmo_dswb_l_r)
+	AM_RANGE(0xf809, 0xf809) AM_READ(tecmo_dswb_h_r)
 	AM_RANGE(0xf80f, 0xf80f) AM_READ_PORT("SYS_2")
 	AM_RANGE(0xf800, 0xf802) AM_WRITE(tecmo_fgscroll_w)
 	AM_RANGE(0xf803, 0xf805) AM_WRITE(tecmo_bgscroll_w)
@@ -224,7 +234,7 @@ static ADDRESS_MAP_START( rygar_sound_map, AS_PROGRAM, 8, tecmo_state )
 	AM_RANGE(0xc000, 0xc000) AM_READ(soundlatch_byte_r) AM_DEVWRITE_LEGACY("msm", tecmo_adpcm_start_w)
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(tecmo_adpcm_end_w)
 	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE_LEGACY("msm", tecmo_adpcm_vol_w)
-	AM_RANGE(0xf000, 0xf000) AM_WRITENOP	/* NMI acknowledge */
+	AM_RANGE(0xf000, 0xf000) AM_WRITE(tecmo_nmi_ack_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tecmo_sound_map, AS_PROGRAM, 8, tecmo_state )
@@ -236,7 +246,7 @@ static ADDRESS_MAP_START( tecmo_sound_map, AS_PROGRAM, 8, tecmo_state )
 	AM_RANGE(0xc000, 0xc000) AM_READ(soundlatch_byte_r) AM_DEVWRITE_LEGACY("msm", tecmo_adpcm_start_w)
 	AM_RANGE(0xc400, 0xc400) AM_WRITE(tecmo_adpcm_end_w)
 	AM_RANGE(0xc800, 0xc800) AM_DEVWRITE_LEGACY("msm", tecmo_adpcm_vol_w)
-	AM_RANGE(0xcc00, 0xcc00) AM_WRITENOP	/* NMI acknowledge */
+	AM_RANGE(0xcc00, 0xcc00) AM_WRITE(tecmo_nmi_ack_w)
 ADDRESS_MAP_END
 
 
@@ -1065,6 +1075,9 @@ ROM_START( backfirt )
 	ROM_LOAD( "b16-s2.bin",  0x10000, 0x10000, CRC(6e4052c9) SHA1(e2e3d7221b75cb044449a25a076a93c3def1f11b) )	/* tiles #2 */
 	ROM_LOAD( "b15-s2.bin",  0x20000, 0x10000, CRC(2b6cc20e) SHA1(4815819288753400935836cc1b0b69f4c4b43ddc) )	/* tiles #2 */
 	ROM_LOAD( "b14-s3.bin",  0x30000, 0x08000, CRC(4d29637a) SHA1(28e85925138256b8ce5a1c4a5df5b219b1b6b197) )	/* tiles #2 */ // half size is correct, rom type 27256
+
+	ROM_REGION( 0x8000, "adpcm", ROMREGION_ERASE00 )	/* ADPCM samples */
+// 	ROM_LOAD( "silkworm.1",   0x0000, 0x8000, CRC(5b553644) SHA1(5d39d2251094c17f7b732b4861401b3516fce9b1) )
 ROM_END
 
 ROM_START( gemini )
@@ -1131,9 +1144,10 @@ static DRIVER_INIT( backfirt )
 
 	/* no MSM */
 	machine.device("soundcpu")->memory().space(AS_PROGRAM)->nop_write(0xc000, 0xc000);
-	machine.device("soundcpu")->memory().space(AS_PROGRAM)->nop_write(0xd000, 0xd000);
-	machine.device("soundcpu")->memory().space(AS_PROGRAM)->nop_write(0xe000, 0xe000);
+	machine.device("soundcpu")->memory().space(AS_PROGRAM)->nop_write(0xc400, 0xc400);
+	machine.device("soundcpu")->memory().space(AS_PROGRAM)->nop_write(0xc800, 0xc800);
 }
+
 
 
 
@@ -1145,4 +1159,4 @@ GAME( 1986, rygarj,    rygar,    rygar,    rygar,    rygar,    ROT0,  "Tecmo", "
 GAME( 1987, gemini,    0,        gemini,   gemini,   gemini,   ROT90, "Tecmo", "Gemini Wing (Japan)", 0 ) /* Japan regional warning screen */
 GAME( 1988, silkworm,  0,        silkworm, silkworm, silkworm, ROT0,  "Tecmo", "Silk Worm (World)", 0 )   /* No regional "Warning, if you are playing ..." screen */
 GAME( 1988, silkwormj, silkworm, silkworm, silkworm, silkworm, ROT0,  "Tecmo", "Silk Worm (Japan)", 0 )   /* Japan regional warning screen */
-GAME( 1988, backfirt,  0,        gemini,   backfirt, backfirt, ROT0,  "Tecmo", "Back Fire (Tecmo, bootleg)", 0 )
+GAME( 1988, backfirt,  0,        gemini,   backfirt, backfirt, ROT0,  "Tecmo", "Back Fire (Tecmo, bootleg)", GAME_IMPERFECT_SOUND )

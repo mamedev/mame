@@ -23,6 +23,7 @@ public:
 	required_shared_ptr<UINT8> m_spriteram;
 	DECLARE_WRITE8_MEMBER(tecmo_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(tecmo_sound_command_w);
+	DECLARE_WRITE8_MEMBER(tecmo_nmi_ack_w);
 	DECLARE_WRITE8_MEMBER(tecmo_adpcm_end_w);
 	DECLARE_READ8_MEMBER(tecmo_dswa_l_r);
 	DECLARE_READ8_MEMBER(tecmo_dswa_h_r);
