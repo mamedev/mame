@@ -625,7 +625,10 @@ WRITE8_MEMBER(i8251_device::control_w)
 
 		if (data & (1<<6))
 		{
-			reset();
+            // datasheet says "returns to mode format", not
+            // completely resets the chip.  behavior of DEC Rainbow
+            // backs this up.
+			m_flags |= I8251_EXPECTING_MODE;
 		}
 
 		update_rx_ready();
