@@ -4,12 +4,15 @@
 
 ***************************************************************************/
 
+#include "sound/tc8830f.h"
+
 class timeplt_state : public driver_device
 {
 public:
 	timeplt_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_tc8830f(*this, "tc8830f"),
 		m_colorram(*this, "colorram"),
 		m_videoram(*this, "videoram"),
 		m_spriteram(*this, "spriteram"),
@@ -17,6 +20,7 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
+	optional_device<tc8830f_device> m_tc8830f;
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_colorram;

@@ -442,6 +442,7 @@ SOUNDOBJS += $(SOUNDOBJ)/rf5c400.o
 endif
 
 
+
 #-------------------------------------------------
 # S2636 wave generator
 #-------------------------------------------------
@@ -449,6 +450,8 @@ endif
 ifneq ($(filter S2636,$(SOUNDS)),)
 SOUNDOBJS += $(SOUNDOBJ)/s2636.o
 endif
+
+
 
 #-------------------------------------------------
 # Sega custom sound chips
@@ -472,6 +475,7 @@ endif
 
 $(SOUNDOBJ)/scsp.o:	$(SOUNDSRC)/scsplfo.c
 $(SOUNDOBJ)/aica.o:	$(SOUNDSRC)/aicalfo.c
+
 
 
 #-------------------------------------------------
@@ -562,6 +566,8 @@ ifneq ($(filter S14001A,$(SOUNDS)),)
 SOUNDOBJS += $(SOUNDOBJ)/s14001a.o
 endif
 
+
+
 #-------------------------------------------------
 # Texas Instruments SN76477 analog chip
 #-------------------------------------------------
@@ -616,6 +622,17 @@ endif
 
 $(SOUNDOBJ)/tms5110.o:	$(SOUNDSRC)/tms5110r.c
 $(SOUNDOBJ)/tms5220.o:	$(SOUNDSRC)/tms5220r.c
+
+
+
+#-------------------------------------------------
+# Toshiba TC8830F sample player/recorder
+#-------------------------------------------------
+
+ifneq ($(filter TC8830F,$(SOUNDS)),)
+SOUNDOBJS += $(SOUNDOBJ)/tc8830f.o
+endif
+
 
 
 #-------------------------------------------------
