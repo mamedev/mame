@@ -8,11 +8,15 @@ class timeplt_state : public driver_device
 {
 public:
 	timeplt_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
 		m_colorram(*this, "colorram"),
 		m_videoram(*this, "videoram"),
 		m_spriteram(*this, "spriteram"),
-		m_spriteram2(*this, "spriteram2"){ }
+		m_spriteram2(*this, "spriteram2")
+	{ }
+
+	required_device<cpu_device> m_maincpu;
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_colorram;
@@ -26,8 +30,6 @@ public:
 	/* misc */
 	UINT8    m_nmi_enable;
 
-	/* devices */
-	cpu_device *m_maincpu;
 	DECLARE_WRITE8_MEMBER(timeplt_nmi_enable_w);
 	DECLARE_WRITE8_MEMBER(timeplt_coin_counter_w);
 	DECLARE_READ8_MEMBER(psurge_protection_r);
