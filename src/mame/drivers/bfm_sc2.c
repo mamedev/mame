@@ -2593,6 +2593,15 @@ WRITE8_MEMBER(bfm_sc2_state::sc3_expansion_w)
 }
 #endif
 
+static void bfmdm01_busy(running_machine &machine, int state)
+{
+	Scorpion2_SetSwitchState(machine, 4,4, state?0:1);
+}
+
+static const bfmdm01_interface dm01_interface =
+{
+	bfmdm01_busy
+};
 
 /* machine init (called only once) */
 static MACHINE_RESET( awp_init )
@@ -2606,7 +2615,6 @@ static MACHINE_RESET( awp_init )
 static MACHINE_RESET( dm01_init )
 {
 	on_scorpion2_reset(machine);
-	BFM_dm01_reset(machine);
 }
 
 
@@ -3680,7 +3688,6 @@ static INPUT_PORTS_START( scorpion3 )
 
 INPUT_PORTS_END
 
-
 /* machine driver for scorpion2 board */
 
 static MACHINE_CONFIG_START( scorpion2, bfm_sc2_state )
@@ -3755,6 +3762,24 @@ static void sc2awp_common_init(running_machine &machine,int reels, int decrypt)
 	}
 }
 
+static void sc2awpdmd_common_init(running_machine &machine,int reels, int decrypt)
+{
+	bfm_sc2_state *state = machine.driver_data<bfm_sc2_state>();
+
+	int n;
+	BFM_dm01_config(machine, &dm01_interface);
+	sc2_common_init(machine, decrypt);
+	/* setup n default 96 half step reels */
+
+	state->m_reels=reels;
+
+	for ( n = 0; n < reels; n++ )
+	{
+		stepper_config(machine, n, &starpoint_interface_48step);
+	}
+}
+
+
 static DRIVER_INIT (bbrkfst)
 {
 	bfm_sc2_state *state = machine.driver_data<bfm_sc2_state>();
@@ -3823,7 +3848,7 @@ static DRIVER_INIT (focus)
 static DRIVER_INIT (cpeno1)
 {
 	bfm_sc2_state *state = machine.driver_data<bfm_sc2_state>();
-	sc2awp_common_init(machine,6, 1);
+	sc2awpdmd_common_init(machine,6, 1);
 
 	MechMtr_config(machine,5);
 
@@ -3865,6 +3890,42 @@ static DRIVER_INIT (cpeno1)
 	state->m_has_hopper = 0;
 }
 
+static DRIVER_INIT (ofah)
+{
+	sc2awpdmd_common_init(machine,4, 1);
+
+	Scorpion2_SetSwitchState(machine,4,0,1);	/* pay tube low (1 pound front) */
+	Scorpion2_SetSwitchState(machine,4,1,1);	/* pay tube low (20p) */
+	Scorpion2_SetSwitchState(machine,4,2,1);	/* pay tube low (?1 right) */
+	Scorpion2_SetSwitchState(machine,4,3,1);	/* pay tube low (?1 left) */
+
+	Scorpion2_SetSwitchState(machine,6,0,0);	/* ? percentage key */
+	Scorpion2_SetSwitchState(machine,6,1,1);
+	Scorpion2_SetSwitchState(machine,6,2,0);
+	Scorpion2_SetSwitchState(machine,6,3,1);
+
+	MechMtr_config(machine,3);
+
+}
+
+static DRIVER_INIT (prom)
+{
+	sc2awpdmd_common_init(machine,6, 1);
+
+	Scorpion2_SetSwitchState(machine,4,0,1);	/* pay tube low (1 pound front) */
+	Scorpion2_SetSwitchState(machine,4,1,1);	/* pay tube low (20p) */
+	Scorpion2_SetSwitchState(machine,4,2,1);	/* pay tube low (?1 right) */
+	Scorpion2_SetSwitchState(machine,4,3,1);	/* pay tube low (?1 left) */
+
+	Scorpion2_SetSwitchState(machine,6,0,0);	/* ? percentage key */
+	Scorpion2_SetSwitchState(machine,6,1,1);
+	Scorpion2_SetSwitchState(machine,6,2,0);
+	Scorpion2_SetSwitchState(machine,6,3,1);
+
+	MechMtr_config(machine,3);
+
+}
+
 static DRIVER_INIT (bfmcgslm)
 {
 	bfm_sc2_state *state = machine.driver_data<bfm_sc2_state>();
@@ -3877,7 +3938,8 @@ static DRIVER_INIT (bfmcgslm)
 static DRIVER_INIT (luvjub)
 {
 	bfm_sc2_state *state = machine.driver_data<bfm_sc2_state>();
-	sc2awp_common_init(machine,6, 1);
+	sc2awpdmd_common_init(machine,6, 1);
+
 	MechMtr_config(machine,8);
 	state->m_has_hopper = 0;
 
@@ -7921,32 +7983,34 @@ GAME( 199?, sc2town3p	, sc2town	,  scorpion2_dm01	, drwho		, drwho		, 0,		 "BFM"
 GAME( 199?, sc2town4	, sc2town	,  scorpion2_dm01	, drwho		, drwho		, 0,		 "BFM",      "Round The Town (Bellfruit) (set 5) (Scorpion 2/3)", GAME_FLAGS)
 GAME( 199?, sc2town5	, sc2town	,  scorpion2_dm01	, drwho		, drwho		, 0,		 "BFM",      "Round The Town (Bellfruit) (set 6) (Scorpion 2/3)", GAME_FLAGS)
 
-GAME( 199?, sc2ofool	, 0			,  scorpion2_dm01	, drwho		, drwho		, 0,		 "BFM",      "Only Fools & Horses (Bellfruit) (set 1) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2ofool1	, sc2ofool	,  scorpion2_dm01	, drwho		, drwho		, 0,		 "BFM",      "Only Fools & Horses (Bellfruit) (set 2) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2ofool2	, sc2ofool	,  scorpion2_dm01	, drwho		, drwho		, 0,		 "BFM",      "Only Fools & Horses (Bellfruit) (set 3) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2ofool3	, sc2ofool	,  scorpion2_dm01	, drwho		, drwho		, 0,		 "BFM",      "Only Fools & Horses (Bellfruit) (set 4) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2ofool4	, sc2ofool	,  scorpion2_dm01	, drwho		, drwho		, 0,		 "BFM",      "Only Fools & Horses (Bellfruit) (set 5) (Scorpion 2/3)", GAME_FLAGS)
+GAME( 199?, sc2ofool	, 0			,  scorpion2_dm01	, drwho		, ofah		, 0,		 "BFM",      "Only Fools & Horses (Bellfruit) (set 1) (Scorpion 2/3)", GAME_FLAGS)
+GAME( 199?, sc2ofool1	, sc2ofool	,  scorpion2_dm01	, drwho		, ofah		, 0,		 "BFM",      "Only Fools & Horses (Bellfruit) (set 2) (Scorpion 2/3)", GAME_FLAGS)
+GAME( 199?, sc2ofool2	, sc2ofool	,  scorpion2_dm01	, drwho		, ofah		, 0,		 "BFM",      "Only Fools & Horses (Bellfruit) (set 3) (Scorpion 2/3)", GAME_FLAGS)
+GAME( 199?, sc2ofool3	, sc2ofool	,  scorpion2_dm01	, drwho		, ofah		, 0,		 "BFM",      "Only Fools & Horses (Bellfruit) (set 4) (Scorpion 2/3)", GAME_FLAGS)
+GAME( 199?, sc2ofool4	, sc2ofool	,  scorpion2_dm01	, drwho		, ofah		, 0,		 "BFM",      "Only Fools & Horses (Bellfruit) (set 5) (Scorpion 2/3)", GAME_FLAGS)
 
-GAME( 199?, sc2ptytm	, 0			,  scorpion2_dm01	, drwho		, drwho		, 0,		 "BFM",      "Party Time (Bellfruit) (set 1) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2ptytm1	, sc2ptytm	,  scorpion2_dm01	, drwho		, drwho		, 0,		 "BFM",      "Party Time (Bellfruit) (set 2) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2ptytm1p	, sc2ptytm	,  scorpion2_dm01	, drwho		, drwho		, 0,		 "BFM",      "Party Time (Bellfruit) (set 2, Protocol) (Scorpion 2/3)", GAME_FLAGS)
+GAME( 199?, sc2ptytm	, 0			,  scorpion2_dm01	, drwho		, ofah		, 0,		 "BFM",      "Party Time (Bellfruit) (set 1) (Scorpion 2/3)", GAME_FLAGS)
+GAME( 199?, sc2ptytm1	, sc2ptytm	,  scorpion2_dm01	, drwho		, ofah		, 0,		 "BFM",      "Party Time (Bellfruit) (set 2) (Scorpion 2/3)", GAME_FLAGS)
+GAME( 199?, sc2ptytm1p	, sc2ptytm	,  scorpion2_dm01	, drwho		, ofah		, 0,		 "BFM",      "Party Time (Bellfruit) (set 2, Protocol) (Scorpion 2/3)", GAME_FLAGS)
 
-GAME( 199?, sc2cops		, 0			,  scorpion2_dm01	, drwho		, drwho		, 0,		 "BFM",      "Cops 'n' Robbers (Bellfruit) (set 1) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2copsp	, sc2cops	,  scorpion2_dm01	, drwho		, drwho		, 0,		 "BFM",      "Cops 'n' Robbers (Bellfruit) (set 1, Protocol)  (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2cops1	, sc2cops	,  scorpion2_dm01	, drwho		, drwho		, 0,		 "BFM",      "Cops 'n' Robbers (Bellfruit) (set 2) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2cops1p	, sc2cops	,  scorpion2_dm01	, drwho		, drwho		, 0,		 "BFM",      "Cops 'n' Robbers (Bellfruit) (set 2, Protocol)  (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2cops2	, sc2cops	,  scorpion2_dm01	, drwho		, drwho		, 0,		 "BFM",      "Cops 'n' Robbers (Bellfruit) (set 3) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2cops3	, sc2cops	,  scorpion2_dm01	, drwho		, drwho		, 0,		 "BFM",      "Cops 'n' Robbers (Bellfruit) (set 4)  (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2cops3p	, sc2cops	,  scorpion2_dm01	, drwho		, drwho		, 0,		 "BFM",      "Cops 'n' Robbers (Bellfruit) (set 4, Protocol)  (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2cops4	, sc2cops	,  scorpion2_dm01	, drwho		, drwho		, 0,		 "BFM",      "Cops 'n' Robbers (Bellfruit) (set 5) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2cops5	, sc2cops	,  scorpion2_dm01	, drwho		, drwho		, 0,		 "BFM",      "Cops 'n' Robbers (Bellfruit) (set 6)  (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2copsc	, sc2cops	,  scorpion2_dm01	, drwho		, drwho		, 0,		 "BFM",      "Casino Cops 'n' Robbers (Bellfruit) (set 1) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2copscp	, sc2cops	,  scorpion2_dm01	, drwho		, drwho		, 0,		 "BFM",      "Casino Cops 'n' Robbers (Bellfruit) (set 1, Protocol)  (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2copsc1	, sc2cops	,  scorpion2_dm01	, drwho		, drwho		, 0,		 "BFM",      "Casino Cops 'n' Robbers (Bellfruit) (set 2) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2copsc1p	, sc2cops	,  scorpion2_dm01	, drwho		, drwho		, 0,		 "BFM",      "Casino Cops 'n' Robbers (Bellfruit) (set 2, Protocol)  (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2copsc2	, sc2cops	,  scorpion2_dm01	, drwho		, drwho		, 0,		 "BFM",      "Casino Cops 'n' Robbers (Bellfruit) (set 3) (Scorpion 2/3)", GAME_FLAGS)
+GAME( 199?, sc2cops		, 0			,  scorpion2_dm01	, drwho		, ofah		, 0,		 "BFM",      "Cops 'n' Robbers (Bellfruit) (set 1) (Scorpion 2/3)", GAME_FLAGS)
+GAME( 199?, sc2copsp	, sc2cops	,  scorpion2_dm01	, drwho		, ofah		, 0,		 "BFM",      "Cops 'n' Robbers (Bellfruit) (set 1, Protocol)  (Scorpion 2/3)", GAME_FLAGS)
+GAME( 199?, sc2cops1	, sc2cops	,  scorpion2_dm01	, drwho		, ofah		, 0,		 "BFM",      "Cops 'n' Robbers (Bellfruit) (set 2) (Scorpion 2/3)", GAME_FLAGS)
+GAME( 199?, sc2cops1p	, sc2cops	,  scorpion2_dm01	, drwho		, ofah		, 0,		 "BFM",      "Cops 'n' Robbers (Bellfruit) (set 2, Protocol)  (Scorpion 2/3)", GAME_FLAGS)
+GAME( 199?, sc2cops2	, sc2cops	,  scorpion2_dm01	, drwho		, ofah		, 0,		 "BFM",      "Cops 'n' Robbers (Bellfruit) (set 3) (Scorpion 2/3)", GAME_FLAGS)
+GAME( 199?, sc2cops3	, sc2cops	,  scorpion2_dm01	, drwho		, ofah		, 0,		 "BFM",      "Cops 'n' Robbers (Bellfruit) (set 4)  (Scorpion 2/3)", GAME_FLAGS)
+GAME( 199?, sc2cops3p	, sc2cops	,  scorpion2_dm01	, drwho		, ofah		, 0,		 "BFM",      "Cops 'n' Robbers (Bellfruit) (set 4, Protocol)  (Scorpion 2/3)", GAME_FLAGS)
+GAME( 199?, sc2cops4	, sc2cops	,  scorpion2_dm01	, drwho		, ofah		, 0,		 "BFM",      "Cops 'n' Robbers (Bellfruit) (set 5) (Scorpion 2/3)", GAME_FLAGS)
+GAME( 199?, sc2cops5	, sc2cops	,  scorpion2_dm01	, drwho		, ofah		, 0,		 "BFM",      "Cops 'n' Robbers (Bellfruit) (set 6)  (Scorpion 2/3)", GAME_FLAGS)
 
-GAME( 199?, sc2copdc	, 0			,  scorpion2_dm01	, drwho		, drwho		, 0,		 "BFM",      "Cops 'n' Robbers Club Deluxe (Bellfruit) (set 1, UK, 250GBP Jackpot) (Scorpion 2/3)", GAME_FLAGS)
+//Shows Nudge Now animation on bootup - using right ROMS?
+GAME( 199?, sc2copsc	, sc2cops	,  scorpion2_dm01	, drwho		, ofah		, 0,		 "BFM",      "Casino Cops 'n' Robbers (Bellfruit) (set 1) (Scorpion 2/3)", GAME_FLAGS)
+GAME( 199?, sc2copscp	, sc2cops	,  scorpion2_dm01	, drwho		, ofah		, 0,		 "BFM",      "Casino Cops 'n' Robbers (Bellfruit) (set 1, Protocol)  (Scorpion 2/3)", GAME_FLAGS)
+GAME( 199?, sc2copsc1	, sc2cops	,  scorpion2_dm01	, drwho		, ofah		, 0,		 "BFM",      "Casino Cops 'n' Robbers (Bellfruit) (set 2) (Scorpion 2/3)", GAME_FLAGS)
+GAME( 199?, sc2copsc1p	, sc2cops	,  scorpion2_dm01	, drwho		, ofah		, 0,		 "BFM",      "Casino Cops 'n' Robbers (Bellfruit) (set 2, Protocol)  (Scorpion 2/3)", GAME_FLAGS)
+GAME( 199?, sc2copsc2	, sc2cops	,  scorpion2_dm01	, drwho		, ofah		, 0,		 "BFM",      "Casino Cops 'n' Robbers (Bellfruit) (set 3) (Scorpion 2/3)", GAME_FLAGS)
+
+GAME( 199?, sc2copdc	, 0			,  scorpion2_dm01	, drwho		, ofah		, 0,		 "BFM",      "Cops 'n' Robbers Club Deluxe (Bellfruit) (set 1, UK, 250GBP Jackpot) (Scorpion 2/3)", GAME_FLAGS)
 GAME( 199?, sc2copdcp	, sc2copdc	,  scorpion2_dm01	, drwho		, drwho		, 0,		 "BFM",      "Cops 'n' Robbers Club Deluxe (Bellfruit) (set 1, UK, 250GBP Jackpot, Protocol) (Scorpion 2/3)", GAME_FLAGS)
 GAME( 199?, sc2copdc1	, sc2copdc	,  scorpion2_dm01	, drwho		, drwho		, 0,		 "BFM",      "Cops 'n' Robbers Club Deluxe (Bellfruit) (set 2, UK, 250GBP Jackpot) (Scorpion 2/3)", GAME_FLAGS)
 GAME( 199?, sc2copdc1p	, sc2copdc	,  scorpion2_dm01	, drwho		, drwho		, 0,		 "BFM",      "Cops 'n' Robbers Club Deluxe (Bellfruit) (set 2, UK, 250GBP Jackpot, Protocol) (Scorpion 2/3)", GAME_FLAGS)
@@ -7960,10 +8024,10 @@ GAME( 199?, sc2copdc5	, sc2copdc	,  scorpion2_dm01	, drwho		, drwho		, 0,		 "BFM
 GAME( 199?, sc2copdc5p	, sc2copdc	,  scorpion2_dm01	, drwho		, drwho		, 0,		 "BFM",      "Cops 'n' Robbers Club Deluxe (Bellfruit) (set 6, UK, 200GBP Jackpot, Protocol) (Scorpion 2/3)", GAME_FLAGS)
 GAME( 199?, sc2copdc6	, sc2copdc	,  scorpion2_dm01	, drwho		, drwho		, 0,		 "BFM",      "Cops 'n' Robbers Club Deluxe (Bellfruit) (set 7, UK) (Scorpion 2/3)", GAME_FLAGS)
 
-GAME( 199?, sc2prom		, 0			,  scorpion2_dm01	, drwho		, drwho		, 0,		 "BFM",      "Along The Prom (Bellfruit) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2prem		, 0			,  scorpion2_dm01	, drwho		, drwho		, 0,		 "BFM",      "Premier Club Manager (Bellfruit) (set 1, UK, 250GBP Jackpot) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2premp	, sc2prem	,  scorpion2_dm01	, drwho		, drwho		, 0,		 "BFM",      "Premier Club Manager (Bellfruit) (set 1, UK, 250GBP Jackpot, Protocol) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2prem1	, sc2prem	,  scorpion2_dm01	, drwho		, drwho		, 0,		 "BFM",      "Premier Club Manager (Bellfruit) (set 2, UK) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2prem1p	, sc2prem	,  scorpion2_dm01	, drwho		, drwho		, 0,		 "BFM",      "Premier Club Manager (Bellfruit) (set 2, UK, Protocol) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2prem2	, sc2prem	,  scorpion2_dm01	, drwho		, drwho		, 0,		 "BFM",      "Premier Club Manager (Bellfruit) (set 3, UK) (Scorpion 2/3)", GAME_FLAGS)
+GAME( 199?, sc2prom		, 0			,  scorpion2_dm01	, drwho		, prom		, 0,		 "BFM",      "Along The Prom (Bellfruit) (Scorpion 2/3)", GAME_FLAGS)
+GAME( 199?, sc2prem		, 0			,  scorpion2_dm01	, drwho		, prom		, 0,		 "BFM",      "Premier Club Manager (Bellfruit) (set 1, UK, 250GBP Jackpot) (Scorpion 2/3)", GAME_FLAGS)
+GAME( 199?, sc2premp	, sc2prem	,  scorpion2_dm01	, drwho		, prom		, 0,		 "BFM",      "Premier Club Manager (Bellfruit) (set 1, UK, 250GBP Jackpot, Protocol) (Scorpion 2/3)", GAME_FLAGS)
+GAME( 199?, sc2prem1	, sc2prem	,  scorpion2_dm01	, drwho		, prom		, 0,		 "BFM",      "Premier Club Manager (Bellfruit) (set 2, UK) (Scorpion 2/3)", GAME_FLAGS)
+GAME( 199?, sc2prem1p	, sc2prem	,  scorpion2_dm01	, drwho		, prom		, 0,		 "BFM",      "Premier Club Manager (Bellfruit) (set 2, UK, Protocol) (Scorpion 2/3)", GAME_FLAGS)
+GAME( 199?, sc2prem2	, sc2prem	,  scorpion2_dm01	, drwho		, prom		, 0,		 "BFM",      "Premier Club Manager (Bellfruit) (set 3, UK) (Scorpion 2/3)", GAME_FLAGS)
 

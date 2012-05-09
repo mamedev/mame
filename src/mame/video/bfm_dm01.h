@@ -6,7 +6,14 @@
 #ifndef BFM_DM01
 #define BFM_DM01
 
+typedef struct _bfmdm01_interface bfmdm01_interface;
+struct _bfmdm01_interface
+{
+	void (*busy_func)(running_machine &machine, int state);
+};
 ADDRESS_MAP_EXTERN( bfm_dm01_memmap,8 );
+
+void BFM_dm01_config(running_machine &machine, const bfmdm01_interface *intf);
 
 INTERRUPT_GEN( bfm_dm01_vbl );
 
