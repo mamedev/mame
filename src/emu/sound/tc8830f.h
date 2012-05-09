@@ -14,10 +14,10 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_I5000_SND_ADD(_tag, _clock) \
+#define MCFG_TC8830F_SND_ADD(_tag, _clock) \
 	MCFG_DEVICE_ADD(_tag, TC8830F, _clock)
 
-#define MCFG_I5000_SND_REPLACE(_tag, _clock) \
+#define MCFG_TC8830F_SND_REPLACE(_tag, _clock) \
 	MCFG_DEVICE_REPLACE(_tag, TC8830F, _clock)
 
 
