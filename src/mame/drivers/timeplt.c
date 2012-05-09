@@ -708,5 +708,5 @@ GAME( 1982, timeplta, timeplt, timeplt, timeplt, 0, ROT90,  "Konami (Atari licen
 GAME( 1982, spaceplt, timeplt, timeplt, timeplt, 0, ROT90,  "bootleg", "Space Pilot", GAME_SUPPORTS_SAVE )
 GAME( 1988, psurge,   0,       psurge,  psurge,  0, ROT270, "<unknown>", "Power Surge", GAME_SUPPORTS_SAVE )
 // ROM says manufactured by Peni Soft for these two ... no, I'm not going to add THAT -.-"
-GAME( 1988, chkun,    0,       chkun,   chkun,   0, ROT90,  "<unknown>", "Chance Kun", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND )
-GAME( 1987, bikkuric, 0,       bikkuric,bikkuric,0, ROT90,  "<unknown>", "Bikkuri Card (Japan)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_COLORS)
+GAME( 1988, chkun,    0,       chkun,   chkun,   0, ROT90,  "<unknown>", "Chance Kun", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+GAME( 1987, bikkuric, 0,       bikkuric,bikkuric,0, ROT90,  "<unknown>", "Bikkuri Card (Japan)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_COLORS | GAME_NOT_WORKING )
