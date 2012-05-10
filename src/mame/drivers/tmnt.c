@@ -25,7 +25,7 @@ TODO:
   053936 tilemap that shouldn't be seen are visible. Maybe the tilemap ROM is
   banked, or there are controls to clip the visible region (registers 0x06 and
   0x07 of the 053936) or both.
-- is IPT_VBLANK really vblank or something else? Investigate.
+- is PORT_VBLANK really vblank or something else? Investigate.
 - some slowdowns in lgtnfght when there are many sprites on screen - vblank issue?
 
 Updates:

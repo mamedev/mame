@@ -761,7 +761,7 @@ static INPUT_PORTS_START( zoar )
 //  PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW1:8")
 //  PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 //  PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
-	/* I can't use IPT_VBLANK as players would have almost no time to enter their initials */
+	/* I can't use PORT_VBLANK as players would have almost no time to enter their initials */
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL )
 
 	PORT_START("DSW2")
