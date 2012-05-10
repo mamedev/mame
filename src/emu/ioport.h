@@ -836,7 +836,7 @@ public:
 	running_machine &machine() const { return m_machine; }
 	bool empty() const { return (m_bufbegin == m_bufend); }
 	bool full() const { return ((m_bufend + 1) % m_buffer.count()) == m_bufbegin; }
-	bool can_post() const { return (!m_queue_chars.isnull() || m_keycode_map.count() == 0); }
+	bool can_post() const { return (!m_queue_chars.isnull() || m_keycode_map.count() != 0); }
 	bool is_posting() const { return (!empty() || (!m_charqueue_empty.isnull() && !m_charqueue_empty())); }
 
 	// configuration
@@ -1239,7 +1239,7 @@ public:
 	running_machine &machine() const { return m_machine; }
 	ioport_port *first_port() const { return m_portlist.first(); }
 	bool safe_to_read() const { return m_safe_to_read; }
-	natural_keyboard &natkeyboard() { return m_natkeyboard; }
+	natural_keyboard &natkeyboard() { return *m_natkeyboard; }
 
 	// type helpers
 	input_type_entry *first_type() const { return m_typelist.first(); }
@@ -1308,7 +1308,7 @@ private:
 
 	// specific special global input states
 	simple_list<digital_joystick> m_joystick_list;	// list of digital joysticks
-	natural_keyboard		m_natkeyboard;			// natural keyboard support
+	natural_keyboard		*m_natkeyboard;			// natural keyboard support
 
 	// frame time tracking
 	attotime				m_last_frame_time;		// time of the last frame callback
