@@ -1002,17 +1002,23 @@ natural_keyboard::natural_keyboard(running_machine &machine)
 		debug_console_register_command(machine, "input", CMDFLAG_NONE, 0, 1, 1, execute_input);
 		debug_console_register_command(machine, "dumpkbd", CMDFLAG_NONE, 0, 0, 1, execute_dumpkbd);
 	}
-
-	// posting keys directly only makes sense for a computer
-	if (machine.ioport().has_keyboard())
-	{
-		m_buffer.resize(KEY_BUFFER_SIZE);
-		m_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(natural_keyboard::timer), this));
-		build_codes(machine.ioport());
-	}
 }
 
+//-------------------------------------------------
+//  initialize - initialize natural keyboard
+//  support
+//-------------------------------------------------
 
+void natural_keyboard::initialize()
+{
+	// posting keys directly only makes sense for a computer
+	if (machine().ioport().has_keyboard())
+	{
+		m_buffer.resize(KEY_BUFFER_SIZE);
+		m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(natural_keyboard::timer), this));
+		build_codes(machine().ioport());
+	}
+}
 //-------------------------------------------------
 //  configure - configure callbacks for full-
 //  featured keyboard support
@@ -2605,7 +2611,7 @@ ioport_port_live::ioport_port_live(ioport_port &port)
 ioport_manager::ioport_manager(running_machine &machine)
 	: m_machine(machine),
 	  m_safe_to_read(false),
-	  m_natkeyboard(NULL),
+	  m_natkeyboard(machine),
 	  m_last_frame_time(attotime::zero),
 	  m_last_delta_nsec(0),
 	  m_record_file(machine.options().input_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS),
@@ -2666,7 +2672,7 @@ time_t ioport_manager::initialize()
 					break;
 				}
 
-	m_natkeyboard = global_alloc(natural_keyboard(machine()));
+	m_natkeyboard.initialize();
 	// register callbacks for when we load configurations
 	config_register(machine(), "input", config_saveload_delegate(FUNC(ioport_manager::load_config), this), config_saveload_delegate(FUNC(ioport_manager::save_config), this));
 
@@ -2764,7 +2770,6 @@ void ioport_manager::init_autoselect_devices(int type1, int type2, int type3, co
 
 void ioport_manager::exit()
 {
-	global_free(m_natkeyboard);
 	// close any playback or recording files
 	playback_end();
 	record_end();

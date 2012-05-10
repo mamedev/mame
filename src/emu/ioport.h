@@ -832,6 +832,8 @@ public:
 	// construction/destruction
 	natural_keyboard(running_machine &machine);
 
+	void initialize();
+	
 	// getters and queries
 	running_machine &machine() const { return m_machine; }
 	bool empty() const { return (m_bufbegin == m_bufend); }
@@ -1239,7 +1241,7 @@ public:
 	running_machine &machine() const { return m_machine; }
 	ioport_port *first_port() const { return m_portlist.first(); }
 	bool safe_to_read() const { return m_safe_to_read; }
-	natural_keyboard &natkeyboard() { return *m_natkeyboard; }
+	natural_keyboard &natkeyboard() { return m_natkeyboard; }
 
 	// type helpers
 	input_type_entry *first_type() const { return m_typelist.first(); }
@@ -1308,7 +1310,7 @@ private:
 
 	// specific special global input states
 	simple_list<digital_joystick> m_joystick_list;	// list of digital joysticks
-	natural_keyboard		*m_natkeyboard;			// natural keyboard support
+	natural_keyboard		m_natkeyboard;			// natural keyboard support
 
 	// frame time tracking
 	attotime				m_last_frame_time;		// time of the last frame callback
