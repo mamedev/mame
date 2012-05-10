@@ -102,7 +102,7 @@ static WRITE8_DEVICE_HANDLER(chkun_sound_w)
 	// d5: /R (unused?)
 	// d6: /W
 	if (~data & 0x40)
-		state->m_tc8830f->write_p(data);
+		state->m_tc8830f->write_p(data & 0xf);
 	
 	// d4 (or d7?): /ACL
 	if (~data & 0x10)
@@ -118,6 +118,12 @@ static const ay8910_interface chkun_ay2_interface =
 	DEVCB_HANDLER(chkun_sound_w),
 	DEVCB_NULL
 };
+
+CUSTOM_INPUT_MEMBER(timeplt_state::chkun_hopper_status_r)
+{
+	// temp workaround, needs hopper
+	return machine().rand();
+}
 
 
 
@@ -298,7 +304,7 @@ static INPUT_PORTS_START( chkun )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN ) // hopper status? it gives a "COIN OUT" error when activated
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -307,7 +313,7 @@ static INPUT_PORTS_START( chkun )
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Bet 3B")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, timeplt_state, chkun_hopper_status_r, NULL)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Bet 1B")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Bet 2B")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
@@ -354,7 +360,7 @@ static INPUT_PORTS_START( bikkuric )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN ) // hopper status? it gives a "COIN OUT" error when activated
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -363,7 +369,7 @@ static INPUT_PORTS_START( bikkuric )
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, timeplt_state, chkun_hopper_status_r, NULL)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
@@ -708,5 +714,5 @@ GAME( 1982, timeplta, timeplt, timeplt, timeplt, 0, ROT90,  "Konami (Atari licen
 GAME( 1982, spaceplt, timeplt, timeplt, timeplt, 0, ROT90,  "bootleg", "Space Pilot", GAME_SUPPORTS_SAVE )
 GAME( 1988, psurge,   0,       psurge,  psurge,  0, ROT270, "<unknown>", "Power Surge", GAME_SUPPORTS_SAVE )
 // ROM says manufactured by Peni Soft for these two ... no, I'm not going to add THAT -.-"
-GAME( 1988, chkun,    0,       chkun,   chkun,   0, ROT90,  "<unknown>", "Chance Kun", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
-GAME( 1987, bikkuric, 0,       bikkuric,bikkuric,0, ROT90,  "<unknown>", "Bikkuri Card (Japan)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_COLORS | GAME_NOT_WORKING )
+GAME( 1988, chkun,    0,       chkun,   chkun,   0, ROT90,  "<unknown>", "Chance Kun", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND )
+GAME( 1987, bikkuric, 0,       bikkuric,bikkuric,0, ROT90,  "<unknown>", "Bikkuri Card (Japan)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_COLORS )
