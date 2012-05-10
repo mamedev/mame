@@ -204,7 +204,7 @@ enum
 	XTAL_101_4912MHz	= 101491200,	/* PSX-based Namco System 10 */
 	XTAL_200MHz			= 200000000,	/* Base SH4 CPU (Naomi, Hikaru etc.) */
 
-/* Resonators (There are probably more) */
+/* Resonators (There are probably more. Almost always used for driving OKI sound chips) */
 
 	XTAL_384kHz			= 384000,
 	XTAL_400kHz			= 400000,		/* Used on Great Swordman h/w */
