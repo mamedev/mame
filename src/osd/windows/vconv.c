@@ -141,6 +141,7 @@ static const translation_info ld_translate[] =
 	{ 0,		"-mwindows",				"/subsystem:windows" },
 	{ 0,		"-municode",				"" },
 	{ 0,		"-static-libgcc",			"" },
+	{ 0,		"-static-libstdc++",			"" },
 	{ 0,		"-shared",					"/dll" },
 	{ 0 }
 };
