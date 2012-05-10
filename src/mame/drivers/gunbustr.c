@@ -117,9 +117,11 @@ popmessage(t);
 		{
 			if (ACCESSING_BITS_24_31)
 			{
-				/* game does not write a separate counter for coin 2! maybe in linked mode? */
+				// coin lockout does not work in gunbustrj, perhaps this was a prototype version without proper coin handling?
 				coin_lockout_w(machine(), 0, ~data & 0x01000000);
 				coin_lockout_w(machine(), 1, ~data & 0x02000000);
+
+				// game does not write a separate counter for coin 2! maybe in linked mode?
 				coin_counter_w(machine(), 0, data & 0x04000000);
 				coin_counter_w(machine(), 1, data & 0x04000000);
 				m_coin_word = (data >> 16) &0xffff;
