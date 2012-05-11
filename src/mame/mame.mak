@@ -1207,6 +1207,10 @@ $(MAMEOBJ)/sega.a: \
 	$(DRIVERS)/hshavoc.o \
 	$(DRIVERS)/kopunch.o $(VIDEO)/kopunch.o \
 	$(MACHINE)/megadriv.o \
+	$(MACHINE)/megacd.o \
+	$(MACHINE)/mega32x.o \
+	$(MACHINE)/megasvp.o \
+	$(MACHINE)/megavdp.o \
 	$(MACHINE)/md_cart.o \
 	$(DRIVERS)/megadrvb.o \
 	$(DRIVERS)/megaplay.o \
