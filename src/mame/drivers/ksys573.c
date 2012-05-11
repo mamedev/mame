@@ -5162,7 +5162,7 @@ ROM_START( hyperbb )
 	ROM_REGION( 0x200000, "onboard.0", 0 ) /* onboard flash */
 	ROM_LOAD( "876ea.31m",    0x000000, 0x200000, CRC(a76043cb) SHA1(1c37034298abf3219d0bba29f4fcea8d83782926) )
 	ROM_REGION( 0x200000, "onboard.1", 0 ) /* onboard flash */
-	ROM_LOAD( "876ea.27m",    0x000000, 0x200000, CRC(95a2a257) SHA1(3a8ecaabdf3d993c844bbc424c9fa15be7668462) )
+	ROM_LOAD( "876ea.27m",    0x000000, 0x200000, BAD_DUMP CRC(95a2a257) SHA1(3a8ecaabdf3d993c844bbc424c9fa15be7668462) )
 	ROM_REGION( 0x200000, "onboard.2", 0 ) /* onboard flash */
 	ROM_LOAD( "876ea.31l",    0x000000, 0x200000, CRC(d011c7a5) SHA1(8861b62c8b654b8e719600a37337ae44e6438899) )
 	ROM_REGION( 0x200000, "onboard.3", 0 ) /* onboard flash */
@@ -5170,14 +5170,14 @@ ROM_START( hyperbb )
 	ROM_REGION( 0x200000, "onboard.4", 0 ) /* onboard flash */
 	ROM_LOAD( "876ea.31j",    0x000000, 0x200000, CRC(ae497ebc) SHA1(ef131e60726db94f0d9ceab70bce02c0de080ede) )
 	ROM_REGION( 0x200000, "onboard.5", 0 ) /* onboard flash */
-	ROM_LOAD( "876ea.27j",    0x000000, 0x200000, CRC(0c4d8435) SHA1(cda642ccd5463edacfec582c120d65cf15452fc9) )
+	ROM_LOAD( "876ea.27j",    0x000000, 0x200000, BAD_DUMP CRC(0c4d8435) SHA1(cda642ccd5463edacfec582c120d65cf15452fc9) )
 	ROM_REGION( 0x200000, "onboard.6", 0 ) /* onboard flash */
-	ROM_LOAD( "876ea.31h",    0x000000, 0x200000, CRC(90545167) SHA1(fb58b52a9d94f92afefead7be291301019e263ee) )
+	ROM_LOAD( "876ea.31h",    0x000000, 0x200000, BAD_DUMP CRC(90545167) SHA1(fb58b52a9d94f92afefead7be291301019e263ee) )
 	ROM_REGION( 0x200000, "onboard.7", 0 ) /* onboard flash */
 	ROM_LOAD( "876ea.27h",    0x000000, 0x200000, CRC(49175f99) SHA1(0154f6332ed210b6f0af20ba622133cde0994b7f) )
 
 	ROM_REGION( 0x002000, "m48t58", 0 ) /* timekeeper */
-	ROM_LOAD( "876ea.22h",    0x000000, 0x002000, NO_DUMP )
+	ROM_LOAD( "876ea.22h",    0x000000, 0x002000, CRC(525ecaee) SHA1(f978c4fc614e8a594e97a3ddc7a2a006b7e2b797) )
 ROM_END
 
 ROM_START( hyperbbc )
