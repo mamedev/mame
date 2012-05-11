@@ -850,7 +850,7 @@ GAME( 1988, ar_bios,	0, arcadia, arcadia, none,  ROT0, "Arcadia Systems", "Arcad
 
 
 GAME( 1988, ar_airh,	ar_bios, arcadia, arcadia, airh,  ROT0, "Arcadia Systems", "SportTime Table Hockey (Arcadia, set 1, V 2.1)", 0 )
-GAME( 1988, ar_airh2,	ar_bios, arcadia, arcadia, airh,  ROT0, "Arcadia Systems", "SportTime Table Hockey (Arcadia, set 2)", 0 )
+GAME( 1988, ar_airh2,	ar_airh, arcadia, arcadia, airh,  ROT0, "Arcadia Systems", "SportTime Table Hockey (Arcadia, set 2)", 0 )
 
 GAME( 1988, ar_bowl,	ar_bios, arcadia, arcadia, bowl,  ROT0, "Arcadia Systems", "SportTime Bowling (Arcadia, V 2.1)", 0 )
 
