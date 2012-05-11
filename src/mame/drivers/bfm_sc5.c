@@ -12844,9 +12844,9 @@ GAME( 200?, sc5frcrz	,0,			sc5, sc5, sc5, ROT0, "Mazooma","Fruit Crazy (Mazooma)
 GAME( 200?, sc5frcrza	,sc5czfr,	sc5, sc5, sc5, ROT0, "Mazooma","Fruit Crazy (Mazooma) (Scorpion 5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
 
 // PR1608 AWP CROWN JEWELS         PR1608 CROWN JEWELS SOUNDS11      CROWN JEWELS  S.SITE
-GAME( 200?, sc5crnjw	,0,			sc5, sc5, sc5, ROT0, "BFM","Crown Jewels (PR1608) (Bellfruit) (Scorpion 5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc5crnjwa	,sc5crnjw,	sc5, sc5, sc5, ROT0, "BFM","Crown Jewels (PR1608) (Bellfruit) (Scorpion 5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc5crnjwb	,sc5crnjw,	sc5, sc5, sc5, ROT0, "BFM","Crown Jewels (PR1608) (Bellfruit) (Scorpion 5) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 2004, sc5crnjw	,0,			sc5, sc5, sc5, ROT0, "BFM","Crown Jewels (PR1608) (Bellfruit) (Scorpion 5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 2004, sc5crnjwa	,sc5crnjw,	sc5, sc5, sc5, ROT0, "BFM","Crown Jewels (PR1608) (Bellfruit) (Scorpion 5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 2004, sc5crnjwb	,sc5crnjw,	sc5, sc5, sc5, ROT0, "BFM","Crown Jewels (PR1608) (Bellfruit) (Scorpion 5) (set 3)", GAME_IS_SKELETON_MECHANICAL )
 
 // Z055 CJEWELS         PR000055 CJEWELS 1         CJEWELS AWP
 GAME( 200?, sc5cjqps	,sc5crnjw,	sc5, sc5, sc5, ROT0, "QPS","Crown Jewels (Z055) (QPS) (Scorpion 5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
