@@ -31,6 +31,12 @@ Game serial/model number : M4300006B ?
 I dont have the wiring harness for this board, so dont know if it works.
 One GFX ROM is bad though.
 See A30-26.u23\A30-26.txt for details about the bad ROM.
+To summarise:
+  Dumps from GFX ROM A30-26.u23 were inconsistent. Reads with checksums
+  41A3 and 415F occured a couple of times, and the difference is one byte
+  at offset $0004 (data $CC or $88). Maybe one of these reads is correct
+  or closest to the real ROM. We are using the one with checksum 415F,
+  the other one makes one sprite looks worse.
 
 This is a four board system - Main, Video, ROM, and Sound boards.
 
@@ -1196,7 +1202,7 @@ ROM_START( 40love )
 
 	ROM_REGION( 0x8000, "gfx1", 0 )
 	ROM_LOAD( "a30-25.u22", 0x0000, 0x2000, CRC(15e594cf) SHA1(d2d506a55f6ac2c191e5d5b3127021cde366c71c) )
-	ROM_LOAD( "415f.26", 0x2000, 0x2000, BAD_DUMP CRC(3a45a205) SHA1(0939ecaabbb9be2a0719ef252e3f244299734ba6)  )	/* this actually seems good, but we need to find another one to verify */
+	ROM_LOAD( "a30-26.u23", 0x2000, 0x2000, BAD_DUMP CRC(3a45a205) SHA1(0939ecaabbb9be2a0719ef252e3f244299734ba6)  )	/* this actually seems good, but we need to find another one to verify */
 	ROM_LOAD( "a30-27.u24", 0x4000, 0x2000, CRC(57c67f6f) SHA1(293e5bfa7c859886abd70f78fe2e4b13a3fce3f5) )
 	ROM_LOAD( "a30-28.u25", 0x6000, 0x2000, CRC(d581d067) SHA1(ce132cf2503917f0846b838c6ce4ad4183181bf9) )
 
