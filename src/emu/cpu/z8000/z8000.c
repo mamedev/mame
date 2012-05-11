@@ -195,6 +195,11 @@ INLINE UINT8 RDMEM_B(z8000_state *cpustate, UINT32 addr)
 INLINE UINT16 RDMEM_W(z8000_state *cpustate, UINT32 addr)
 {
 	addr &= ~1;
+    /* hack for m20 driver: BIOS accesses 0x7f0000 and expects a segmentation violation */
+    if (addr >= 0x7f0000) {
+        cpustate->irq_req = Z8000_SEGTRAP;
+        return 0xffff;
+    }
 	return cpustate->program->read_word(addr);
 }
 
@@ -288,6 +293,11 @@ INLINE void set_irq(z8000_state *cpustate, int type)
 {
     switch ((type >> 8) & 255)
     {
+        case Z8000_EPU >> 8:
+            if (cpustate->irq_srv >= Z8000_EPU)
+                return;
+            cpustate->irq_req = type;
+            break;
         case Z8000_TRAP >> 8:
             if (cpustate->irq_srv >= Z8000_TRAP)
                 return; /* double TRAP.. very bad :( */
@@ -332,7 +342,8 @@ if (cpustate->device->type() == Z8001) \
     PUSHW(cpustate, SP, cpustate->pc);        /* save current cpustate->pc */ \
 } while (0)
 
-#define SET_PC(VEC) (cpustate->device->type() == Z8001 ? segmented_addr(RDMEM_L(cpustate, VEC)) : (RDMEM_W(cpustate, VEC)))
+#define GET_PC(VEC) (cpustate->device->type() == Z8001 ? segmented_addr(RDMEM_L(cpustate, VEC + 4)) : RDMEM_W(cpustate, VEC + 2))
+#define GET_FCW(VEC) (cpustate->device->type() == Z8001 ? RDMEM_W(cpustate, VEC + 2) : RDMEM_W(cpustate, VEC))
 
 
 INLINE void Interrupt(z8000_state *cpustate)
@@ -352,6 +363,19 @@ INLINE void Interrupt(z8000_state *cpustate)
     }
 
     /* trap ? */
+    if (cpustate->irq_req & Z8000_EPU)
+    {
+        CHANGE_FCW(cpustate, fcw | F_S_N);/* swap to system stack */
+        PUSH_PC();
+        PUSHW(cpustate, SP, fcw);       /* save current cpustate->fcw */
+        PUSHW(cpustate, SP, cpustate->irq_req);   /* save interrupt/trap type tag */
+        cpustate->irq_srv = cpustate->irq_req;
+        cpustate->irq_req &= ~Z8000_EPU;
+        CHANGE_FCW(cpustate, GET_FCW(EPU));
+        cpustate->pc = GET_PC(EPU);
+        LOG(("Z8K '%s' ext instr trap $%04x\n", cpustate->device->tag(), cpustate->pc));
+    }
+    else
     if (cpustate->irq_req & Z8000_TRAP)
     {
         CHANGE_FCW(cpustate, fcw | F_S_N);/* swap to system stack */
@@ -360,8 +384,9 @@ INLINE void Interrupt(z8000_state *cpustate)
         PUSHW(cpustate, SP, cpustate->irq_req);   /* save interrupt/trap type tag */
         cpustate->irq_srv = cpustate->irq_req;
         cpustate->irq_req &= ~Z8000_TRAP;
-        cpustate->pc = SET_PC(TRAP);
-        LOG(("Z8K '%s' trap $%04x\n", cpustate->device->tag(), cpustate->pc));
+        CHANGE_FCW(cpustate, GET_FCW(TRAP));
+        cpustate->pc = GET_PC(TRAP);
+        LOG(("Z8K '%s' priv instr trap $%04x\n", cpustate->device->tag(), cpustate->pc));
     }
     else
     if (cpustate->irq_req & Z8000_SYSCALL)
@@ -372,7 +397,8 @@ INLINE void Interrupt(z8000_state *cpustate)
         PUSHW(cpustate, SP, cpustate->irq_req);   /* save interrupt/trap type tag */
         cpustate->irq_srv = cpustate->irq_req;
         cpustate->irq_req &= ~Z8000_SYSCALL;
-        cpustate->pc = SET_PC(SYSCALL);
+        CHANGE_FCW(cpustate, GET_FCW(SYSCALL));
+        cpustate->pc = GET_PC(SYSCALL);
         LOG(("Z8K '%s' syscall $%04x\n", cpustate->device->tag(), cpustate->pc));
     }
     else
@@ -384,7 +410,8 @@ INLINE void Interrupt(z8000_state *cpustate)
         PUSHW(cpustate, SP, cpustate->irq_req);   /* save interrupt/trap type tag */
         cpustate->irq_srv = cpustate->irq_req;
         cpustate->irq_req &= ~Z8000_SEGTRAP;
-        cpustate->pc = SET_PC(SEGTRAP);
+        CHANGE_FCW(cpustate, GET_FCW(SEGTRAP));
+        cpustate->pc = GET_PC(SEGTRAP);
         LOG(("Z8K '%s' segtrap $%04x\n", cpustate->device->tag(), cpustate->pc));
     }
     else
@@ -395,11 +422,10 @@ INLINE void Interrupt(z8000_state *cpustate)
         PUSHW(cpustate, SP, fcw);       /* save current cpustate->fcw */
         PUSHW(cpustate, SP, cpustate->irq_req);   /* save interrupt/trap type tag */
         cpustate->irq_srv = cpustate->irq_req;
-        fcw = RDMEM_W(cpustate,  NMI);
-       cpustate->pc = RDMEM_W(cpustate,  NMI + 2);
+        cpustate->pc = RDMEM_W(cpustate,  NMI);
         cpustate->irq_req &= ~Z8000_NMI;
-       CHANGE_FCW(cpustate, fcw);
-        cpustate->pc = SET_PC(NMI);
+        CHANGE_FCW(cpustate, GET_FCW(NMI));
+        cpustate->pc = GET_PC(NMI);
         LOG(("Z8K '%s' NMI $%04x\n", cpustate->device->tag(), cpustate->pc));
     }
     else
@@ -410,10 +436,9 @@ INLINE void Interrupt(z8000_state *cpustate)
         PUSHW(cpustate, SP, fcw);       /* save current cpustate->fcw */
         PUSHW(cpustate, SP, cpustate->irq_req);   /* save interrupt/trap type tag */
         cpustate->irq_srv = cpustate->irq_req;
-        fcw = RDMEM_W(cpustate,  NVI);
-        cpustate->pc = SET_PC(NVI + 2); //RDMEM_W(cpustate,  NVI + 2);
+        cpustate->pc = GET_PC(NVI); //RDMEM_W(cpustate,  NVI + 2);
         cpustate->irq_req &= ~Z8000_NVI;
-       CHANGE_FCW(cpustate, fcw);
+        CHANGE_FCW(cpustate, GET_FCW(NVI));
         LOG(("Z8K '%s' NVI $%04x\n", cpustate->device->tag(), cpustate->pc));
     }
     else
@@ -424,11 +449,10 @@ INLINE void Interrupt(z8000_state *cpustate)
         PUSHW(cpustate, SP, fcw);       /* save current cpustate->fcw */
         PUSHW(cpustate, SP, cpustate->irq_req);   /* save interrupt/trap type tag */
         cpustate->irq_srv = cpustate->irq_req;
-        fcw = RDMEM_W(cpustate,  cpustate->irq_vec);
-        cpustate->pc = SET_PC(VEC00 + (cpustate->device->type() == Z8001 ? 4 : 2) * (cpustate->irq_req & 0xff)); //RDMEM_W(cpustate,  VEC00 + 2 * (cpustate->irq_req & 0xff));
+        cpustate->pc = RDMEM_W(cpustate,  VEC00 + (cpustate->device->type() == Z8001 ? 4 : 2) * (cpustate->irq_req & 0xff));
         cpustate->irq_req &= ~Z8000_VI;
-       CHANGE_FCW(cpustate, fcw);
-        LOG(("Z8K '%s' VI [$%04x/$%04x] fcw $%04x, pc $%04x\n", cpustate->device->tag(), cpustate->irq_vec, VEC00 + 2 * (cpustate->irq_req & 0xff), cpustate->fcw, cpustate->pc));
+        CHANGE_FCW(cpustate, GET_FCW(VI));
+        LOG(("Z8K '%s' VI [$%04x/$%04x] fcw $%04x, pc $%04x\n", cpustate->device->tag(), cpustate->irq_vec, VEC00 + (cpustate->device->type() == Z8001 ? 4 : 2) * (cpustate->irq_req & 0xff), cpustate->fcw, cpustate->pc));
     }
 }
 
@@ -780,6 +804,9 @@ CPU_GET_INFO( z8001 )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "Zilog Z8001");			break;
+
+		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 2;							break;
+		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:			info->i = 8;							break;
 
 		default:										CPU_GET_INFO_CALL(z8002);				break;
 	}

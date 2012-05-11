@@ -167,6 +167,12 @@ INLINE UINT32 POPL(z8000_state *cpustate, UINT8 src)
 #define CHK_SUBW_V if (((~value & dest & ~result) | (value & ~dest & result)) & S16) SET_V
 #define CHK_SUBL_V if (((~value & dest & ~result) | (value & ~dest & result)) & S32) SET_V
 
+/* check for privileged instruction and trap if executed */
+#define CHECK_PRIVILEGED_INSTR() if (!(cpustate->fcw & F_S_N)) { cpustate->irq_req = Z8000_TRAP; return; }
+
+/* if no EPU is present (it isn't), raise an extended intstuction trap */
+#define CHECK_EXT_INSTR()  if (!(cpustate->fcw & F_EPU)) { cpustate->irq_req = Z8000_EPU; return; }
+
 
 /******************************************
  add byte
@@ -1592,6 +1598,7 @@ static void Z0D_ddN0_1001_imm16(z8000_state *cpustate)
  ******************************************/
 static void Z0E_imm8(z8000_state *cpustate)
 {
+    CHECK_EXT_INSTR();
 	GET_IMM8(0);
 	LOG(("Z8K '%s' %04x: ext0e  $%02x\n", cpustate->device->tag(), cpustate->pc, imm8));
     if (cpustate->fcw & F_EPU) {
@@ -1606,6 +1613,7 @@ static void Z0E_imm8(z8000_state *cpustate)
  ******************************************/
 static void Z0F_imm8(z8000_state *cpustate)
 {
+    CHECK_EXT_INSTR();
 	GET_IMM8(0);
 	LOG(("Z8K '%s' %04x: ext0f  $%02x\n", cpustate->device->tag(), cpustate->pc, imm8));
     if (cpustate->fcw & F_EPU) {
@@ -2210,16 +2218,16 @@ static void Z30_0000_dddd_dsp16(z8000_state *cpustate)
 }
 
 /******************************************
- ldb     rbd,rs(imm16)
+ ldb     rbd,rs(idx16)
  flags:  ------
  ******************************************/
 static void Z30_ssN0_dddd_imm16(z8000_state *cpustate)
 {
 	GET_DST(OP0,NIB3);
 	GET_SRC(OP0,NIB2);
-	GET_IMM16(OP1);
-	imm16 = addr_add(cpustate, addr_from_reg(cpustate, src), imm16);
-	cpustate->RB(dst) = RDMEM_B(cpustate,  imm16);
+	GET_IDX16(OP1);
+	idx16 = addr_add(cpustate, addr_from_reg(cpustate, src), idx16);
+	cpustate->RB(dst) = RDMEM_B(cpustate,  idx16);
 }
 
 /******************************************
@@ -2234,16 +2242,16 @@ static void Z31_0000_dddd_dsp16(z8000_state *cpustate)
 }
 
 /******************************************
- ld      rd,rs(imm16)
+ ld      rd,rs(idx16)
  flags:  ------
  ******************************************/
 static void Z31_ssN0_dddd_imm16(z8000_state *cpustate)
 {
 	GET_DST(OP0,NIB3);
 	GET_SRC(OP0,NIB2);
-	GET_IMM16(OP1);
-	imm16 = addr_add(cpustate, addr_from_reg(cpustate, src), imm16);
-	cpustate->RW(dst) = RDMEM_W(cpustate,  imm16);
+	GET_IDX16(OP1);
+	idx16 = addr_add(cpustate, addr_from_reg(cpustate, src), idx16);
+	cpustate->RW(dst) = RDMEM_W(cpustate,  idx16);
 }
 
 /******************************************
@@ -2258,16 +2266,16 @@ static void Z32_0000_ssss_dsp16(z8000_state *cpustate)
 }
 
 /******************************************
- ldb     rd(imm16),rbs
+ ldb     rd(idx16),rbs
  flags:  ------
  ******************************************/
 static void Z32_ddN0_ssss_imm16(z8000_state *cpustate)
 {
 	GET_SRC(OP0,NIB3);
 	GET_DST(OP0,NIB2);
-	GET_IMM16(OP1);
-	imm16 = addr_add(cpustate, addr_from_reg(cpustate, dst), imm16);
-	WRMEM_B(cpustate,  imm16, cpustate->RB(src));
+	GET_IDX16(OP1);
+	idx16 = addr_add(cpustate, addr_from_reg(cpustate, dst), idx16);
+	WRMEM_B(cpustate,  idx16, cpustate->RB(src));
 }
 
 /******************************************
@@ -2282,16 +2290,16 @@ static void Z33_0000_ssss_dsp16(z8000_state *cpustate)
 }
 
 /******************************************
- ld      rd(imm16),rs
+ ld      rd(idx16),rs
  flags:  ------
  ******************************************/
 static void Z33_ddN0_ssss_imm16(z8000_state *cpustate)
 {
 	GET_SRC(OP0,NIB3);
 	GET_DST(OP0,NIB2);
-	GET_IMM16(OP1);
-	imm16 = addr_add(cpustate, addr_from_reg(cpustate,dst), imm16);
-	WRMEM_W(cpustate,  imm16, cpustate->RW(src));
+	GET_IDX16(OP1);
+	idx16 = addr_add(cpustate, addr_from_reg(cpustate,dst), idx16);
+	WRMEM_W(cpustate,  idx16, cpustate->RW(src));
 }
 
 /******************************************
@@ -2306,16 +2314,16 @@ static void Z34_0000_dddd_dsp16(z8000_state *cpustate)
 }
 
 /******************************************
- lda     prd,rs(imm16)
+ lda     prd,rs(idx16)
  flags:  ------
  ******************************************/
 static void Z34_ssN0_dddd_imm16(z8000_state *cpustate)
 {
 	GET_DST(OP0,NIB3);
 	GET_SRC(OP0,NIB2);
-	GET_IMM16(OP1);
-	imm16 = addr_add(cpustate, addr_from_reg(cpustate, src), imm16);
-	addr_to_reg(cpustate, dst, imm16);
+	GET_IDX16(OP1);
+	idx16 = addr_add(cpustate, addr_from_reg(cpustate, src), idx16);
+	addr_to_reg(cpustate, dst, idx16);
 }
 
 /******************************************
@@ -2330,16 +2338,16 @@ static void Z35_0000_dddd_dsp16(z8000_state *cpustate)
 }
 
 /******************************************
- ldl     rrd,rs(imm16)
+ ldl     rrd,rs(idx16)
  flags:  ------
  ******************************************/
 static void Z35_ssN0_dddd_imm16(z8000_state *cpustate)
 {
 	GET_DST(OP0,NIB3);
 	GET_SRC(OP0,NIB2);
-	GET_IMM16(OP1);
-	imm16 = addr_add(cpustate, addr_from_reg(cpustate, src), imm16);
-	cpustate->RL(dst) = RDMEM_L(cpustate,  imm16);
+	GET_IDX16(OP1);
+	idx16 = addr_add(cpustate, addr_from_reg(cpustate, src), idx16);
+	cpustate->RL(dst) = RDMEM_L(cpustate,  idx16);
 }
 
 /******************************************
@@ -2378,16 +2386,16 @@ static void Z37_0000_ssss_dsp16(z8000_state *cpustate)
 }
 
 /******************************************
- ldl     rd(imm16),rrs
+ ldl     rd(idx16),rrs
  flags:  ------
  ******************************************/
 static void Z37_ddN0_ssss_imm16(z8000_state *cpustate)
 {
 	GET_SRC(OP0,NIB3);
 	GET_DST(OP0,NIB2);
-	GET_IMM16(OP1);
-	imm16 = addr_add(cpustate, addr_from_reg(cpustate, dst), imm16);
-	WRMEM_L(cpustate,  imm16, cpustate->RL(src));
+	GET_IDX16(OP1);
+	idx16 = addr_add(cpustate, addr_from_reg(cpustate, dst), idx16);
+	WRMEM_L(cpustate,  idx16, cpustate->RL(src));
 }
 
 /******************************************
@@ -2410,6 +2418,7 @@ static void Z38_imm8(z8000_state *cpustate)
  ******************************************/
 static void Z39_ssN0_0000(z8000_state *cpustate)
 {
+    CHECK_PRIVILEGED_INSTR();
 	GET_SRC(OP0,NIB2);
 	UINT16 fcw;
     if (segmented_mode(cpustate)) {
@@ -2430,6 +2439,7 @@ static void Z39_ssN0_0000(z8000_state *cpustate)
  ******************************************/
 static void Z3A_ssss_0000_0000_aaaa_dddd_x000(z8000_state *cpustate)
 {//@@@@
+    CHECK_PRIVILEGED_INSTR();
     GET_SRC(OP0,NIB2);
     GET_CNT(OP1,NIB1);
     GET_DST(OP1,NIB2);
@@ -2447,6 +2457,7 @@ static void Z3A_ssss_0000_0000_aaaa_dddd_x000(z8000_state *cpustate)
  ******************************************/
 static void Z3A_ssss_0001_0000_aaaa_dddd_x000(z8000_state *cpustate)
 {//@@@@
+    CHECK_PRIVILEGED_INSTR();
     GET_SRC(OP0,NIB2);
     GET_CNT(OP1,NIB1);
     GET_DST(OP1,NIB2);
@@ -2464,6 +2475,7 @@ static void Z3A_ssss_0001_0000_aaaa_dddd_x000(z8000_state *cpustate)
  ******************************************/
 static void Z3A_ssss_0010_0000_aaaa_dddd_x000(z8000_state *cpustate)
 {//@@@@
+    CHECK_PRIVILEGED_INSTR();
     GET_SRC(OP0,NIB2);
     GET_CNT(OP1,NIB1);
     GET_DST(OP1,NIB2);
@@ -2481,6 +2493,7 @@ static void Z3A_ssss_0010_0000_aaaa_dddd_x000(z8000_state *cpustate)
  ******************************************/
 static void Z3A_ssss_0011_0000_aaaa_dddd_x000(z8000_state *cpustate)
 {//@@@@
+    CHECK_PRIVILEGED_INSTR();
     GET_SRC(OP0,NIB2);
     GET_CNT(OP1,NIB1);
     GET_DST(OP1,NIB2);
@@ -2497,6 +2510,7 @@ static void Z3A_ssss_0011_0000_aaaa_dddd_x000(z8000_state *cpustate)
  ******************************************/
 static void Z3A_dddd_0100_imm16(z8000_state *cpustate)
 {
+    CHECK_PRIVILEGED_INSTR();
     GET_DST(OP0,NIB2);
     GET_IMM16(OP1);
     cpustate->RB(dst) = RDPORT_B(cpustate,  0, imm16);
@@ -2508,6 +2522,7 @@ static void Z3A_dddd_0100_imm16(z8000_state *cpustate)
  ******************************************/
 static void Z3A_dddd_0101_imm16(z8000_state *cpustate)
 {
+    CHECK_PRIVILEGED_INSTR();
     GET_DST(OP0,NIB2);
     GET_IMM16(OP1);
     cpustate->RB(dst) = RDPORT_B(cpustate,  1, imm16);
@@ -2519,6 +2534,7 @@ static void Z3A_dddd_0101_imm16(z8000_state *cpustate)
  ******************************************/
 static void Z3A_ssss_0110_imm16(z8000_state *cpustate)
 {
+    CHECK_PRIVILEGED_INSTR();
     GET_SRC(OP0,NIB2);
     GET_IMM16(OP1);
     WRPORT_B(cpustate,  0, imm16, cpustate->RB(src));
@@ -2530,6 +2546,7 @@ static void Z3A_ssss_0110_imm16(z8000_state *cpustate)
  ******************************************/
 static void Z3A_ssss_0111_imm16(z8000_state *cpustate)
 {
+    CHECK_PRIVILEGED_INSTR();
     GET_SRC(OP0,NIB2);
     GET_IMM16(OP1);
     WRPORT_B(cpustate,  1, imm16, cpustate->RB(src));
@@ -2542,6 +2559,7 @@ static void Z3A_ssss_0111_imm16(z8000_state *cpustate)
  ******************************************/
 static void Z3A_ssss_1000_0000_aaaa_dddd_x000(z8000_state *cpustate)
 {//@@@
+    CHECK_PRIVILEGED_INSTR();
 	GET_SRC(OP0,NIB2);
 	GET_CNT(OP1,NIB1);
 	GET_DST(OP1,NIB2);
@@ -2559,6 +2577,7 @@ static void Z3A_ssss_1000_0000_aaaa_dddd_x000(z8000_state *cpustate)
  ******************************************/
 static void Z3A_ssss_1001_0000_aaaa_dddd_x000(z8000_state *cpustate)
 {//@@@
+    CHECK_PRIVILEGED_INSTR();
 	GET_SRC(OP0,NIB2);
 	GET_CNT(OP1,NIB1);
 	GET_DST(OP1,NIB2);
@@ -2576,6 +2595,7 @@ static void Z3A_ssss_1001_0000_aaaa_dddd_x000(z8000_state *cpustate)
  ******************************************/
 static void Z3A_ssss_1010_0000_aaaa_dddd_x000(z8000_state *cpustate)
 {//@@@
+    CHECK_PRIVILEGED_INSTR();
 	GET_SRC(OP0,NIB2);
 	GET_CNT(OP1,NIB1);
 	GET_DST(OP1,NIB2);
@@ -2593,6 +2613,7 @@ static void Z3A_ssss_1010_0000_aaaa_dddd_x000(z8000_state *cpustate)
  ******************************************/
 static void Z3A_ssss_1011_0000_aaaa_dddd_x000(z8000_state *cpustate)
 {//@@@
+    CHECK_PRIVILEGED_INSTR();
 	GET_SRC(OP0,NIB2);
 	GET_CNT(OP1,NIB1);
 	GET_DST(OP1,NIB2);
@@ -2610,6 +2631,7 @@ static void Z3A_ssss_1011_0000_aaaa_dddd_x000(z8000_state *cpustate)
  ******************************************/
 static void Z3B_ssss_0000_0000_aaaa_dddd_x000(z8000_state *cpustate)
 {//@@@
+    CHECK_PRIVILEGED_INSTR();
 	GET_SRC(OP0,NIB2);
     GET_CNT(OP1,NIB1);
 	GET_DST(OP1,NIB2);
@@ -2627,6 +2649,7 @@ static void Z3B_ssss_0000_0000_aaaa_dddd_x000(z8000_state *cpustate)
  ******************************************/
 static void Z3B_ssss_0001_0000_aaaa_dddd_x000(z8000_state *cpustate)
 {//@@@
+    CHECK_PRIVILEGED_INSTR();
 	GET_SRC(OP0,NIB2);
     GET_CNT(OP1,NIB1);
 	GET_DST(OP1,NIB2);
@@ -2644,6 +2667,7 @@ static void Z3B_ssss_0001_0000_aaaa_dddd_x000(z8000_state *cpustate)
  ******************************************/
 static void Z3B_ssss_0010_0000_aaaa_dddd_x000(z8000_state *cpustate)
 {//@@@
+    CHECK_PRIVILEGED_INSTR();
 	GET_SRC(OP0,NIB2);
     GET_CNT(OP1,NIB1);
 	GET_DST(OP1,NIB2);
@@ -2661,6 +2685,7 @@ static void Z3B_ssss_0010_0000_aaaa_dddd_x000(z8000_state *cpustate)
  ******************************************/
 static void Z3B_ssss_0011_0000_aaaa_dddd_x000(z8000_state *cpustate)
 {//@@@
+    CHECK_PRIVILEGED_INSTR();
 	GET_SRC(OP0,NIB2);
     GET_CNT(OP1,NIB1);
 	GET_DST(OP1,NIB2);
@@ -2677,6 +2702,7 @@ static void Z3B_ssss_0011_0000_aaaa_dddd_x000(z8000_state *cpustate)
  ******************************************/
 static void Z3B_dddd_0100_imm16(z8000_state *cpustate)
 {
+    CHECK_PRIVILEGED_INSTR();
     GET_DST(OP0,NIB2);
     GET_IMM16(OP1);
 	cpustate->RW(dst) = RDPORT_W(cpustate,  0, imm16);
@@ -2688,6 +2714,7 @@ static void Z3B_dddd_0100_imm16(z8000_state *cpustate)
  ******************************************/
 static void Z3B_dddd_0101_imm16(z8000_state *cpustate)
 {
+    CHECK_PRIVILEGED_INSTR();
     GET_DST(OP0,NIB2);
     GET_IMM16(OP1);
 	cpustate->RW(dst) = RDPORT_W(cpustate,  1, imm16);
@@ -2699,6 +2726,7 @@ static void Z3B_dddd_0101_imm16(z8000_state *cpustate)
  ******************************************/
 static void Z3B_ssss_0110_imm16(z8000_state *cpustate)
 {
+    CHECK_PRIVILEGED_INSTR();
     GET_SRC(OP0,NIB2);
     GET_IMM16(OP1);
 	WRPORT_W(cpustate,  0, imm16, cpustate->RW(src));
@@ -2710,6 +2738,7 @@ static void Z3B_ssss_0110_imm16(z8000_state *cpustate)
  ******************************************/
 static void Z3B_ssss_0111_imm16(z8000_state *cpustate)
 {
+    CHECK_PRIVILEGED_INSTR();
     GET_SRC(OP0,NIB2);
     GET_IMM16(OP1);
 	WRPORT_W(cpustate,  1, imm16, cpustate->RW(src));
@@ -2722,6 +2751,7 @@ static void Z3B_ssss_0111_imm16(z8000_state *cpustate)
  ******************************************/
 static void Z3B_ssss_1000_0000_aaaa_dddd_x000(z8000_state *cpustate)
 {//@@@
+    CHECK_PRIVILEGED_INSTR();
 	GET_SRC(OP0,NIB2);
     GET_CNT(OP1,NIB1);
 	GET_DST(OP1,NIB2);
@@ -2739,6 +2769,7 @@ static void Z3B_ssss_1000_0000_aaaa_dddd_x000(z8000_state *cpustate)
  ******************************************/
 static void Z3B_ssss_1001_0000_aaaa_dddd_x000(z8000_state *cpustate)
 {//@@@
+    CHECK_PRIVILEGED_INSTR();
 	GET_SRC(OP0,NIB2);
     GET_CNT(OP1,NIB1);
 	GET_DST(OP1,NIB2);
@@ -2756,6 +2787,7 @@ static void Z3B_ssss_1001_0000_aaaa_dddd_x000(z8000_state *cpustate)
  ******************************************/
 static void Z3B_ssss_1010_0000_aaaa_dddd_x000(z8000_state *cpustate)
 {//@@@
+    CHECK_PRIVILEGED_INSTR();
 	GET_SRC(OP0,NIB2);
     GET_CNT(OP1,NIB1);
 	GET_DST(OP1,NIB2);
@@ -2773,6 +2805,7 @@ static void Z3B_ssss_1010_0000_aaaa_dddd_x000(z8000_state *cpustate)
  ******************************************/
 static void Z3B_ssss_1011_0000_aaaa_dddd_x000(z8000_state *cpustate)
 {//@@@
+    CHECK_PRIVILEGED_INSTR();
 	GET_SRC(OP0,NIB2);
     GET_CNT(OP1,NIB1);
 	GET_DST(OP1,NIB2);
@@ -2789,6 +2822,7 @@ static void Z3B_ssss_1011_0000_aaaa_dddd_x000(z8000_state *cpustate)
  ******************************************/
 static void Z3C_ssss_dddd(z8000_state *cpustate)
 {//@@@check
+    CHECK_PRIVILEGED_INSTR();
 	GET_SRC(OP0,NIB2);
 	GET_DST(OP0,NIB3);
 	cpustate->RB(dst) = RDPORT_B(cpustate,  0, RDMEM_W(cpustate,  cpustate->RW(src)));
@@ -2800,6 +2834,7 @@ static void Z3C_ssss_dddd(z8000_state *cpustate)
  ******************************************/
 static void Z3D_ssss_dddd(z8000_state *cpustate)
 {//@@@check
+    CHECK_PRIVILEGED_INSTR();
 	GET_SRC(OP0,NIB2);
 	GET_DST(OP0,NIB3);
 	cpustate->RW(dst) = RDPORT_W(cpustate,  0, RDMEM_W(cpustate,  cpustate->RW(src)));
@@ -2811,6 +2846,7 @@ static void Z3D_ssss_dddd(z8000_state *cpustate)
  ******************************************/
 static void Z3E_dddd_ssss(z8000_state *cpustate)
 {//@@@check
+    CHECK_PRIVILEGED_INSTR();
 	GET_DST(OP0,NIB2);
 	GET_SRC(OP0,NIB3);
 	WRPORT_B(cpustate,  0, RDMEM_W(cpustate,  cpustate->RW(dst)), cpustate->RB(src));
@@ -2822,6 +2858,7 @@ static void Z3E_dddd_ssss(z8000_state *cpustate)
  ******************************************/
 static void Z3F_dddd_ssss(z8000_state *cpustate)
 {//check
+    CHECK_PRIVILEGED_INSTR();
 	GET_DST(OP0,NIB2);
 	GET_SRC(OP0,NIB3);
 	WRPORT_W(cpustate,  0, RDMEM_W(cpustate,  cpustate->RW(dst)), cpustate->RW(src));
@@ -4460,6 +4497,7 @@ static void Z78_imm8(z8000_state *cpustate)
  ******************************************/
 static void Z79_0000_0000_addr(z8000_state *cpustate)
 {
+    CHECK_PRIVILEGED_INSTR();
 	GET_ADDR(OP1);
 	UINT16 fcw;
     //printf("LDPS from 0x%x: old pc: 0x%x\n", addr, cpustate->pc);
@@ -4481,6 +4519,7 @@ static void Z79_0000_0000_addr(z8000_state *cpustate)
  ******************************************/
 static void Z79_ssN0_0000_addr(z8000_state *cpustate)
 {
+    CHECK_PRIVILEGED_INSTR();
 	GET_SRC(OP0,NIB2);
 	GET_ADDR(OP1);
 	UINT16 fcw;
@@ -4502,6 +4541,7 @@ static void Z79_ssN0_0000_addr(z8000_state *cpustate)
  ******************************************/
 static void Z7A_0000_0000(z8000_state *cpustate)
 {
+    CHECK_PRIVILEGED_INSTR();
 	cpustate->irq_req |= Z8000_HALT;
 	if (cpustate->icount > 0) cpustate->icount = 0;
 }
@@ -4513,6 +4553,7 @@ static void Z7A_0000_0000(z8000_state *cpustate)
 static void Z7B_0000_0000(z8000_state *cpustate)
 {
 	UINT16 tag, fcw;
+    CHECK_PRIVILEGED_INSTR();
 	tag = POPW(cpustate, SP);	/* get type tag */
 	fcw = POPW(cpustate, SP);	/* get cpustate->fcw  */
     if (segmented_mode(cpustate))
@@ -4530,6 +4571,7 @@ static void Z7B_0000_0000(z8000_state *cpustate)
  ******************************************/
 static void Z7B_0000_1000(z8000_state *cpustate)
 {
+    CHECK_PRIVILEGED_INSTR();
 	/* set mu-0 line */
 }
 
@@ -4539,6 +4581,7 @@ static void Z7B_0000_1000(z8000_state *cpustate)
  ******************************************/
 static void Z7B_0000_1001(z8000_state *cpustate)
 {
+    CHECK_PRIVILEGED_INSTR();
 	/* reset mu-0 line */
 }
 
@@ -4548,6 +4591,7 @@ static void Z7B_0000_1001(z8000_state *cpustate)
  ******************************************/
 static void Z7B_0000_1010(z8000_state *cpustate)
 {
+    CHECK_PRIVILEGED_INSTR();
 	/* test mu-I line */
 }
 
@@ -4557,6 +4601,7 @@ static void Z7B_0000_1010(z8000_state *cpustate)
  ******************************************/
 static void Z7B_dddd_1101(z8000_state *cpustate)
 {
+    CHECK_PRIVILEGED_INSTR();
 	/* test mu-I line, invert cascade to mu-0  */
 }
 
@@ -4566,6 +4611,7 @@ static void Z7B_dddd_1101(z8000_state *cpustate)
  ******************************************/
 static void Z7C_0000_00ii(z8000_state *cpustate)
 {
+    CHECK_PRIVILEGED_INSTR();
 	GET_IMM2(OP0,NIB3);
 	UINT16 fcw = cpustate->fcw;
 	fcw &= ~(imm2 << 11);
@@ -4578,6 +4624,7 @@ static void Z7C_0000_00ii(z8000_state *cpustate)
  ******************************************/
 static void Z7C_0000_01ii(z8000_state *cpustate)
 {
+    CHECK_PRIVILEGED_INSTR();
 	GET_IMM2(OP0,NIB3);
 	UINT16 fcw = cpustate->fcw;
 	fcw |= imm2 << 11;
@@ -4590,6 +4637,7 @@ static void Z7C_0000_01ii(z8000_state *cpustate)
  ******************************************/
 static void Z7D_dddd_0ccc(z8000_state *cpustate)
 {//@@@
+    CHECK_PRIVILEGED_INSTR();
 	GET_IMM3(OP0,NIB3);
 	GET_DST(OP0,NIB2);
 	switch (imm3) {
@@ -4605,6 +4653,9 @@ static void Z7D_dddd_0ccc(z8000_state *cpustate)
 		case 5:
 			cpustate->RW(dst) = cpustate->psapoff;
 			break;
+		case 6:
+			cpustate->RW(dst) = cpustate->nspseg;
+			break;
 		case 7:
 			cpustate->RW(dst) = cpustate->nspoff;
 			break;
@@ -4619,6 +4670,7 @@ static void Z7D_dddd_0ccc(z8000_state *cpustate)
  ******************************************/
 static void Z7D_ssss_1ccc(z8000_state *cpustate)
 {//@@@
+    CHECK_PRIVILEGED_INSTR();
 	GET_IMM3(OP0,NIB3);
 	GET_SRC(OP0,NIB2);
 	switch (imm3) {
@@ -4637,6 +4689,9 @@ static void Z7D_ssss_1ccc(z8000_state *cpustate)
 			break;
 		case 5:
 			cpustate->psapoff = cpustate->RW(src);
+			break;
+		case 6:
+			cpustate->nspseg = cpustate->RW(src);
 			break;
 		case 7:
 			cpustate->nspoff = cpustate->RW(src);
@@ -4969,6 +5024,7 @@ static void Z8D_imm4_0101(z8000_state *cpustate)
  ******************************************/
 static void Z8E_imm8(z8000_state *cpustate)
 {
+    CHECK_EXT_INSTR();
 	GET_IMM8(0);
 	LOG(("Z8K '%s' %04x: ext8e  $%02x\n", cpustate->device->tag(), cpustate->pc, imm8));
     if (cpustate->fcw & F_EPU) {
@@ -4983,6 +5039,7 @@ static void Z8E_imm8(z8000_state *cpustate)
  ******************************************/
 static void Z8F_imm8(z8000_state *cpustate)
 {
+    CHECK_EXT_INSTR();
 	GET_IMM8(0);
 	LOG(("Z8K '%s' %04x: ext8f  $%02x\n", cpustate->device->tag(), cpustate->pc, imm8));
     if (cpustate->fcw & F_EPU) {
@@ -5007,7 +5064,7 @@ static void Z90_ssss_dddd(z8000_state *cpustate)
  flags:  ------
  ******************************************/
 static void Z91_ddN0_ssss(z8000_state *cpustate)
-{//@@@
+{
     GET_SRC(OP0,NIB3);
     GET_DST(OP0,NIB2);
     PUSHL(cpustate, dst, cpustate->RL(src));

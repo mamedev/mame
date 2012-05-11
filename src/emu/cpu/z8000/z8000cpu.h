@@ -182,6 +182,7 @@
 #define GET_IMM8(o) 	UINT8 imm8 = (UINT8)get_operand(cpustate, o)
 
 #define GET_IMM16(o)	UINT16 imm16 = get_operand(cpustate, o)
+#define GET_IDX16(o)	UINT32 idx16 = get_operand(cpustate, o)
 #define GET_IMM32		UINT32 imm32 = (get_operand(cpustate, 1) << 16) + get_operand(cpustate, 2)
 #define GET_DSP7		UINT8 dsp7 = get_operand(cpustate, 0) & 127
 #define GET_DSP8		INT8 dsp8 = (INT8)get_operand(cpustate, 0)
