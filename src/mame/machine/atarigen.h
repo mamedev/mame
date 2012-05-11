@@ -66,18 +66,18 @@ typedef void (*atarigen_scanline_func)(screen_device &screen, int scanline);
 typedef struct _atarivc_state_desc atarivc_state_desc;
 struct _atarivc_state_desc
 {
-	UINT32 latch1;								/* latch #1 value (-1 means disabled) */
-	UINT32 latch2;								/* latch #2 value (-1 means disabled) */
-	UINT32 rowscroll_enable;					/* true if row-scrolling is enabled */
-	UINT32 palette_bank;						/* which palette bank is enabled */
+	UINT32 latch1;							/* latch #1 value (-1 means disabled) */
+	UINT32 latch2;							/* latch #2 value (-1 means disabled) */
+	UINT32 rowscroll_enable;				/* true if row-scrolling is enabled */
+	UINT32 palette_bank;					/* which palette bank is enabled */
 	UINT32 pf0_xscroll;						/* playfield 1 xscroll */
 	UINT32 pf0_xscroll_raw;					/* playfield 1 xscroll raw value */
 	UINT32 pf0_yscroll;						/* playfield 1 yscroll */
 	UINT32 pf1_xscroll;						/* playfield 2 xscroll */
 	UINT32 pf1_xscroll_raw;					/* playfield 2 xscroll raw value */
 	UINT32 pf1_yscroll;						/* playfield 2 yscroll */
-	UINT32 mo_xscroll;							/* sprite xscroll */
-	UINT32 mo_yscroll;							/* sprite xscroll */
+	UINT32 mo_xscroll;						/* sprite xscroll */
+	UINT32 mo_yscroll;						/* sprite xscroll */
 };
 
 
@@ -101,7 +101,7 @@ public:
 		  m_eeprom32(*this, "eeprom"),
 		  m_playfield(*this, "playfield"),
 		  m_playfield2(*this, "playfield2"),
-		  m_playfield_upper(*this, "playfield_upper"),
+		  m_playfield_upper(*this, "playfield_up"),
 		  m_alpha(*this, "alpha"),
 		  m_alpha2(*this, "alpha2"),
 		  m_xscroll(*this, "xscroll"),
@@ -109,7 +109,8 @@ public:
 		  m_playfield32(*this, "playfield32"),
 		  m_alpha32(*this, "alpha32"),
 		  m_atarivc_data(*this, "atarivc_data"),
-		  m_atarivc_eof_data(*this, "atarivc_eof_data") { }
+		  m_atarivc_eof_data(*this, "atarivc_eof")
+	{ }
 
 	// users must call through to these
 	virtual void machine_start();

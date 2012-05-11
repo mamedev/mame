@@ -162,7 +162,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, relief_state )
 	AM_RANGE(0x3effc0, 0x3effff) AM_READWRITE(relief_atarivc_r, relief_atarivc_w) AM_SHARE("atarivc_data")
 	AM_RANGE(0x3f0000, 0x3f1fff) AM_RAM_WRITE_LEGACY(atarigen_playfield2_latched_msb_w) AM_SHARE("playfield2")
 	AM_RANGE(0x3f2000, 0x3f3fff) AM_RAM_WRITE_LEGACY(atarigen_playfield_latched_lsb_w) AM_SHARE("playfield")
-	AM_RANGE(0x3f4000, 0x3f5fff) AM_RAM_WRITE_LEGACY(atarigen_playfield_dual_upper_w) AM_SHARE("playfield_upper")
+	AM_RANGE(0x3f4000, 0x3f5fff) AM_RAM_WRITE_LEGACY(atarigen_playfield_dual_upper_w) AM_SHARE("playfield_up")
 	AM_RANGE(0x3f6000, 0x3f67ff) AM_READWRITE_LEGACY(atarimo_0_spriteram_r, atarimo_0_spriteram_w)
 	AM_RANGE(0x3f6800, 0x3f8eff) AM_RAM
 	AM_RANGE(0x3f8f00, 0x3f8f7f) AM_RAM AM_SHARE("atarivc_eof")
