@@ -10,7 +10,7 @@
    We're making the assumption that nobody switches modes through
    software. */
 
-#define UPD7759_STANDARD_CLOCK		640000
+#define UPD7759_STANDARD_CLOCK		XTAL_640kHz
 
 typedef struct _upd7759_interface upd7759_interface;
 struct _upd7759_interface
