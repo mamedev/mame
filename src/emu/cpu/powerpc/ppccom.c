@@ -318,6 +318,9 @@ void ppccom_init(powerpc_state *ppc, powerpc_flavor flavor, UINT8 cap, int tb_di
 	ppc->program = device->space(AS_PROGRAM);
 	ppc->direct = &ppc->program->direct();
 	ppc->system_clock = (config != NULL) ? config->bus_frequency : device->clock();
+	ppc->dcr_read_func = (config != NULL) ? config->dcr_read_func : NULL;
+	ppc->dcr_write_func = (config != NULL) ? config->dcr_write_func : NULL;
+
 	ppc->tb_divisor = (ppc->tb_divisor * device->clock() + ppc->system_clock / 2 - 1) / ppc->system_clock;
 	ppc->codexor = 0;
 	if (!(cap & PPCCAP_4XX) && device->space_config()->m_endianness != ENDIANNESS_NATIVE)
@@ -1085,10 +1088,14 @@ void ppccom_execute_mfdcr(powerpc_state *ppc)
 
 	/* default handling */
 	mame_printf_debug("DCR %03X read\n", ppc->param0);
-	if (ppc->param0 < ARRAY_LENGTH(ppc->dcr))
-		ppc->param1 = ppc->dcr[ppc->param0];
-	else
-		ppc->param1 = 0;
+	if (!ppc->dcr_read_func) {
+		if (ppc->param0 < ARRAY_LENGTH(ppc->dcr))
+			ppc->param1 = ppc->dcr[ppc->param0];
+		else
+			ppc->param1 = 0;
+	} else {
+		ppc->param1 = ppc->dcr_read_func(ppc->device,ppc->param0,0xffffffff);
+	}
 }
 
 
@@ -1173,8 +1180,12 @@ void ppccom_execute_mtdcr(powerpc_state *ppc)
 
 	/* default handling */
 	mame_printf_debug("DCR %03X write = %08X\n", ppc->param0, ppc->param1);
-	if (ppc->param0 < ARRAY_LENGTH(ppc->dcr))
-		ppc->dcr[ppc->param0] = ppc->param1;
+	if (!ppc->dcr_write_func) {
+		if (ppc->param0 < ARRAY_LENGTH(ppc->dcr))
+			ppc->dcr[ppc->param0] = ppc->param1;
+	} else {
+		ppc->dcr_write_func(ppc->device,ppc->param0,ppc->param1,0xffffffff);
+	}
 }
 
 

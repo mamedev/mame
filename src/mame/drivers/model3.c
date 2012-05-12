@@ -5123,19 +5123,25 @@ static TIMER_DEVICE_CALLBACK(model3_interrupt)
 static const powerpc_config model3_10 =
 {
 	/* 603e, Stretch, 1.3 */
-	66000000		/* Multiplier 1, Bus = 66MHz, Core = 66MHz */
+	66000000,		/* Multiplier 1, Bus = 66MHz, Core = 66MHz */
+	NULL,
+	NULL
 };
 
 static const powerpc_config model3_15 =
 {
 	/* 603e, Stretch, 1.3 */
-	66000000		/* Multiplier 1.5, Bus = 66MHz, Core = 100MHz */
+	66000000,		/* Multiplier 1.5, Bus = 66MHz, Core = 100MHz */
+	NULL,
+	NULL
 };
 
 static const powerpc_config model3_2x =
 {
 	/* 603e-PID7t, Goldeneye, 2.1 */
-	66000000		/* Multiplier 2.5, Bus = 66MHz, Core = 166MHz */
+	66000000,		/* Multiplier 2.5, Bus = 66MHz, Core = 166MHz */
+	NULL,
+	NULL
 };
 
 static MACHINE_CONFIG_START( model3_10, model3_state )

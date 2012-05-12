@@ -398,7 +398,9 @@ INPUT_PORTS_END
 
 static const powerpc_config ppc603e_config =
 {
-	XTAL_66_6667MHz		/* Multiplier 1.5, Bus = 66MHz, Core = 100MHz */
+	XTAL_66_6667MHz,		/* Multiplier 1.5, Bus = 66MHz, Core = 100MHz */
+	NULL,
+	NULL
 };
 
 static const tlcs900_interface taitopjc_tlcs900_interface =

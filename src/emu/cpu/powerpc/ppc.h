@@ -151,6 +151,8 @@ typedef struct _powerpc_config powerpc_config;
 struct _powerpc_config
 {
 	UINT32		bus_frequency;
+	read32_device_func	dcr_read_func;
+	write32_device_func	dcr_write_func;	
 };
 
 
@@ -169,6 +171,8 @@ void ppc4xx_spu_receive_byte(device_t *device, UINT8 byteval);
 
 DECLARE_LEGACY_CPU_DEVICE(PPC403GA, ppc403ga);
 DECLARE_LEGACY_CPU_DEVICE(PPC403GCX, ppc403gcx);
+
+DECLARE_LEGACY_CPU_DEVICE(PPC405GP, ppc405gp);
 
 DECLARE_LEGACY_CPU_DEVICE(PPC601, ppc601);
 DECLARE_LEGACY_CPU_DEVICE(PPC602, ppc602);

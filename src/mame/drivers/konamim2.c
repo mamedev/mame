@@ -1145,7 +1145,9 @@ INPUT_PORTS_END
 
 static const powerpc_config ppc602_config =
 {
-	33000000			/* Multiplier 2, Bus = 33MHz, Core = 66MHz */
+	33000000,			/* Multiplier 2, Bus = 33MHz, Core = 66MHz */
+	NULL,
+	NULL
 };
 
 static INTERRUPT_GEN(m2)

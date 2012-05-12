@@ -441,6 +441,7 @@ INLINE powerpc_state *get_safe_token(device_t *device)
 	assert(device != NULL);
 	assert(device->type() == PPC403GA ||
 		   device->type() == PPC403GCX ||
+		   device->type() == PPC405GP ||
 		   device->type() == PPC601 ||
 		   device->type() == PPC602 ||
 		   device->type() == PPC603 ||
@@ -4428,6 +4429,41 @@ CPU_GET_INFO( ppc403gcx )
 
 
 
+/*-------------------------------------------------
+    ppc403gcx_init - PowerPC 403GCX-specific
+    initialization
+-------------------------------------------------*/
+
+static CPU_INIT( ppc405gp )
+{
+	ppcdrc_init(PPC_MODEL_405GP, PPCCAP_4XX | PPCCAP_VEA, 1, device, irqcallback);
+}
+
+
+/*-------------------------------------------------
+    ppc403gcx_get_info - PowerPC 403GCX-specific
+    information getter
+-------------------------------------------------*/
+
+CPU_GET_INFO( ppc405gp )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(ppc405gp);			break;
+		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(ppcdrc4xx);		break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							strcpy(info->s, "PowerPC 405GP");		break;
+
+		/* --- everything else is handled generically --- */
+		default:										CPU_GET_INFO_CALL(ppcdrc4xx);		break;
+	}
+}
+
+
 /***************************************************************************
     PPC 6XX VARIANTS
 ***************************************************************************/
@@ -4676,6 +4712,8 @@ CPU_GET_INFO( mpc8240 )
 
 DEFINE_LEGACY_CPU_DEVICE(PPC403GA, ppc403ga);
 DEFINE_LEGACY_CPU_DEVICE(PPC403GCX, ppc403gcx);
+
+DEFINE_LEGACY_CPU_DEVICE(PPC405GP, ppc405gp);
 
 DEFINE_LEGACY_CPU_DEVICE(PPC601, ppc601);
 DEFINE_LEGACY_CPU_DEVICE(PPC602, ppc602);

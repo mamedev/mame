@@ -973,6 +973,52 @@ static CPU_EXIT( ppc403 )
 
 }
 
+static CPU_INIT( ppc405 )
+{
+	const ppc_config *configdata = device->static_config();
+
+	ppc_init();
+
+	/* PPC403 specific opcodes */
+	ppc.optable31[454] = ppc_dccci;
+	ppc.optable31[486] = ppc_dcread;
+	ppc.optable31[262] = ppc_icbt;
+	ppc.optable31[966] = ppc_iccci;
+	ppc.optable31[998] = ppc_icread;
+	ppc.optable31[323] = ppc_mfdcr;
+	ppc.optable31[451] = ppc_mtdcr;
+	ppc.optable31[131] = ppc_wrtee;
+	ppc.optable31[163] = ppc_wrteei;
+
+	// !!! why is rfci here !!!
+	ppc.optable19[51] = ppc_rfci;
+
+	ppc.spu.rx_timer = device->machine().scheduler().timer_alloc(FUNC(ppc403_spu_rx_callback));
+	ppc.spu.tx_timer = device->machine().scheduler().timer_alloc(FUNC(ppc403_spu_tx_callback));
+
+	ppc.read8 = ppc403_read8;
+	ppc.read16 = ppc403_read16;
+	ppc.read32 = ppc403_read32;
+	ppc.write8 = ppc403_write8;
+	ppc.write16 = ppc403_write16;
+	ppc.write32 = ppc403_write32;
+	ppc.read16_unaligned = ppc403_read16_unaligned;
+	ppc.read32_unaligned = ppc403_read32_unaligned;
+	ppc.write16_unaligned = ppc403_write16_unaligned;
+	ppc.write32_unaligned = ppc403_write32_unaligned;
+
+	ppc.irq_callback = irqcallback;
+	ppc.device = device;
+	ppc.program = device->space(AS_PROGRAM);
+
+	ppc.pvr = configdata->pvr;
+}
+
+static CPU_EXIT( ppc405 )
+{
+
+}
+
 static CPU_INIT( ppc603 )
 {
 	const ppc_config *configdata = device->static_config();
@@ -1893,6 +1939,32 @@ CPU_GET_INFO( ppc403 )
 	}
 }
 
+CPU_GET_INFO( ppc405 )
+{
+	switch(state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case CPUINFO_INT_INPUT_LINES:					info->i = 8;							break;
+		case DEVINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;					break;
+		case CPUINFO_INT_REGISTER + PPC_EXIER:			info->i = EXIER;						break;
+		case CPUINFO_INT_REGISTER + PPC_EXISR:			info->i = EXISR;						break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(ppc403);		break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(ppc403);				break;
+		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(ppc403);				break;
+		case CPUINFO_FCT_EXIT:							info->exit = CPU_EXIT_NAME(ppc403);				break;
+		case CPUINFO_FCT_EXECUTE:						info->execute = CPU_EXECUTE_NAME(ppc403);			break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							strcpy(info->s, "PPC403");				break;
+		case CPUINFO_STR_REGISTER + PPC_EXIER:			sprintf(info->s, "EXIER: %08X", EXIER); break;
+		case CPUINFO_STR_REGISTER + PPC_EXISR:			sprintf(info->s, "EXISR: %08X", EXISR); break;
+
+		default:										CPU_GET_INFO_CALL(ppc);				break;
+	}
+}
+
 CPU_GET_INFO( ppc603 )
 {
 	switch(state)
@@ -2097,6 +2169,8 @@ CPU_GET_INFO( ppc604 )
 
 DEFINE_LEGACY_CPU_DEVICE(PPC403GA, ppc403ga);
 DEFINE_LEGACY_CPU_DEVICE(PPC403GCX, ppc403gcx);
+
+DEFINE_LEGACY_CPU_DEVICE(PPC405GP, ppc405gp);
 
 DEFINE_LEGACY_CPU_DEVICE(PPC601, ppc601);
 DEFINE_LEGACY_CPU_DEVICE(PPC602, ppc602);
