@@ -28,7 +28,26 @@
 
     The actual cassettes use a custom player hooked to the BIO board, and are roughly microcassette form factor, but are larger and will not fit in a conventional microcassette player.
     Each cassette has two tracks on it: a clock track and a data track, for a form of synchronous serial. The data is stored in blocks with headers and checksums.
+ 
+    -------------------------------------------------------------
+ 
+    Hamburger doesn't work; no protection details were supplied.
+ 
+    Here is the protection data for DS Telejan and Pro Golf (set 2).
+    This information maps onto the various handlers in machine/decocass.c but it's
+    not at all clear how to create a new one that fits these specs.
+ 
+    DS Telejan:
 
+    Bits $84 are latched
+    Bit $08 is passed through unmodified
+    Bits $73 are the five PROM address inputs
+
+    Pro Golf (set 2):
+
+    Bits $44 are latched
+    Bit $08 is passed through unmodified
+    Bits $B3 are the five PROM address inputs
 
 
  ***********************************************************************/
@@ -1050,6 +1069,27 @@ ROM_START( cprogolf )
 	ROM_LOAD( "cprogolf.cas", 0x0000, 0x8000, CRC(02123cd1) SHA1(e4c630ed293725f23d539cb43beb97953558dabd) )
 ROM_END
 
+ROM_START( cprogolf2 )
+	DECOCASS_BIOS_B_ROMS
+
+    ROM_REGION( 0x00020, "dongle", 0 )	  /* dongle data */
+    ROM_LOAD( "progolf.pro",  0x000000, 0x000020, CRC(d8587be5) SHA1(c118033a4973994a0dcd245c22c53871dc0e98c2) ) 
+
+    ROM_REGION( 0x10000, "cassette", 0 )	  /* (max) 64k for cassette image */
+    ROM_LOAD( "dt-1131-a0.cas", 0x000000, 0x008000, CRC(8408248f) SHA1(8b78c379bf6879916bc9b284d7a0956edfac78be) ) 
+ROM_END
+
+/* 14 */
+ROM_START( cdsteljn )
+	DECOCASS_BIOS_B_ROMS
+
+	ROM_REGION( 0x00020, "dongle", 0 )	  /* dongle data */
+    ROM_LOAD( "telejan.pro",  0x000000, 0x000020, CRC(7a728c15) SHA1(13d9a9e916e483ed89d61a35c47c9d51a2bf8f0d) ) 
+
+	ROM_REGION( 0x10000, "cassette", 0 )	  /* (max) 64k for cassette image */
+    ROM_LOAD( "dt-1144-a3.bin", 0x000000, 0x007300, CRC(1336a912) SHA1(0c64e069713b411da38b43f14306953621726d35) ) 
+ROM_END
+
 /* 15 Lucky Poker */
 ROM_START( cluckypo )
 	DECOCASS_BIOS_B_ROMS
@@ -1195,6 +1235,16 @@ ROM_START( cbtime )
 
 	ROM_REGION( 0x10000, "cassette", 0 )	  /* (max) 64k for cassette image */
 	ROM_LOAD( "cbtime.cas",   0x0000, 0x8000, CRC(56d7dc58) SHA1(34b2513c9ca7ab40f532b6d6d911aa3012113632) )
+ROM_END
+
+ROM_START( chamburg )
+    DECOCASS_BIOS_B_ROMS
+
+    ROM_REGION( 0x01000, "dongle", 0 )	  /* dongle data */
+    ROM_LOAD( "cbtime.pro",   0x000000, 0x001000, CRC(25bec0f0) SHA1(9fb1f9699f37937421e26d4fb8fdbcd21a5ddc5c) ) 
+
+    ROM_REGION( 0x10000, "cassette", 0 )	  /* (max) 64k for cassette image */
+    ROM_LOAD( "dt-1260-a-0.cas", 0x000000, 0x008000, CRC(334fb987) SHA1(c55906bf6059686dd8a587dabbe3fb4d59200ab9) ) 
 ROM_END
 
 /* 27 Burnin' Rubber / Bump 'n' Jump */
@@ -1517,8 +1567,9 @@ static DRIVER_INIT( decocrom )
 /* 10 */ // 1981.?? Ocean to Ocean (medal)
 /* 11 */ GAME( 1981, clocknch, decocass, clocknch, clocknch, decocass, ROT270, "Data East Corporation", "Lock'n'Chase (DECO Cassette)", 0 )
 /* 12 */ // 1981.08 Flash Boy/DECO Kid
-/* 13 */ GAME( 1981, cprogolf, decocass, cprogolf, cprogolf, decocass, ROT270, "Data East Corporation", "Tournament Pro Golf (DECO Cassette)", 0 )
-/* 14 */ // 1981.06 DS Telejan
+/* 13 */ GAME( 1981, cprogolf, decocass, cprogolf, cprogolf, decocass, ROT270, "Data East Corporation", "Tournament Pro Golf (DECO Cassette, set 1)", 0 )
+         GAME( 1981, cprogolf2,cprogolf, cprogolf, cprogolf, decocass, ROT270, "Data East Corporation", "Tournament Pro Golf (DECO Cassette, set 2)", GAME_NOT_WORKING )
+/* 14 */ GAME( 1981, cdsteljn, decocass, cprogolf, decocass, decocass, ROT270, "Data East Corporation", "DS Telejan (DECO Cassette)", GAME_NOT_WORKING ) 
 /* 15 */ GAME( 1981, cluckypo, decocass, cluckypo, decocass, decocass, ROT270, "Data East Corporation", "Lucky Poker (DECO Cassette)", 0 )
 /* 16 */ GAME( 1981, ctisland, decocass, ctisland, decocass, decocrom, ROT270, "Data East Corporation", "Treasure Island (DECO Cassette, set 1)", 0 )
 		 GAME( 1981, ctisland2,ctisland, ctisland, decocass, decocrom, ROT270, "Data East Corporation", "Treasure Island (DECO Cassette, set 2)", 0 )
@@ -1534,6 +1585,7 @@ static DRIVER_INIT( decocrom )
 /* 24 */ // 1982.07 Tsumego Kaisyou
 /* 25 */ // 1982.10 Angler Dangler? (fishing)
 /* 26 */ GAME( 1983, cbtime,   decocass, cbtime,   cbtime,   decocass, ROT270, "Data East Corporation", "Burger Time (DECO Cassette)", 0 )
+         GAME( 1983, chamburg, cbtime,   cbtime,   cbtime,   decocass, ROT270, "Data East Corporation", "Hamburger (DECO Cassette)", GAME_NOT_WORKING )
 /* 27 */ GAME( 1982, cburnrub, decocass, cburnrub, decocass, decocass, ROT270, "Data East Corporation", "Burnin' Rubber (DECO Cassette, set 1)", 0 )
 		 GAME( 1982, cburnrub2,cburnrub, cburnrub, decocass, decocass, ROT270, "Data East Corporation", "Burnin' Rubber (DECO Cassette, set 2)", 0 )
 		 GAME( 1982, cbnj,     cburnrub, cburnrub, decocass, decocass, ROT270, "Data East Corporation", "Bump 'n' Jump (DECO Cassette)", 0 )
