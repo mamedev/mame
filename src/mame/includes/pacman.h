@@ -80,6 +80,7 @@ public:
 	DECLARE_READ8_MEMBER(mspacman_enable_decode_r_0x3ff8);
 	DECLARE_WRITE8_MEMBER(mspacman_enable_decode_w);
 	DECLARE_WRITE8_MEMBER(irq_mask_w);
+	DECLARE_READ8_MEMBER(mspacii_protection_r);
 	DECLARE_READ8_MEMBER(cannonbp_protection_r);
 	DECLARE_WRITE8_MEMBER(pacman_videoram_w);
 	DECLARE_WRITE8_MEMBER(pacman_colorram_w);
