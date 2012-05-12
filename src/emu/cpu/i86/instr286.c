@@ -124,9 +124,9 @@ static UINT32 i80286_selector_address(i80286_state *cpustate,UINT16 sel)
 	return ((IDX(sel)>=limit)||!IDXTBL(sel)?-1:base+IDX(sel));
 }
 
-static int i80286_verify(i80286_state *cpustate, UINT16 selector, i80286_operation operation, UINT8 rights)
+static int i80286_verify(i80286_state *cpustate, UINT16 selector, i80286_operation operation, UINT8 rights, bool valid)
 {
-	if (!IDXTBL(selector)) return GENERAL_PROTECTION_FAULT;
+	if (!IDXTBL(selector) && !valid) return GENERAL_PROTECTION_FAULT;
 	if (!SEGDESC(rights)) return GENERAL_PROTECTION_FAULT;
 
 	switch(operation) {
@@ -168,6 +168,7 @@ static void i80286_data_descriptor_full(i80286_state *cpustate, int reg, UINT16 
 			cpustate->limit[reg]=0;
 			cpustate->base[reg]=0;
 			cpustate->rights[reg]=0;
+			cpustate->valid[reg]=0;
 			return;
 		}
 
@@ -204,6 +205,7 @@ static void i80286_data_descriptor_full(i80286_state *cpustate, int reg, UINT16 
 		cpustate->sregs[reg]=selector;
 		cpustate->base[reg]=selector<<4;
 	}
+	cpustate->valid[reg]=1;
 }
 
 static void i80286_data_descriptor(i80286_state *cpustate, int reg, UINT16 selector)
@@ -552,7 +554,7 @@ static void PREFIX286(_0fpre)(i8086_state *cpustate)
 			else {
 				desc[2] = ReadWord(addr+4);
 				r = RIGHTS(desc);
-				cpustate->ZeroVal = i80286_verify(cpustate, tmp, I80286_READ, RIGHTS(desc));
+				cpustate->ZeroVal = i80286_verify(cpustate, tmp, I80286_READ, RIGHTS(desc), 0);
 				cpustate->ZeroVal = cpustate->ZeroVal || (CODE(r) && CONF(r) ? 0 : (DPL(r)<PMAX(RPL(tmp),CPL)));
 			}
 			break;
@@ -562,7 +564,7 @@ static void PREFIX286(_0fpre)(i8086_state *cpustate)
 			else {
 				desc[2] = ReadWord(addr+4);
 				r = RIGHTS(desc);
-				cpustate->ZeroVal = i80286_verify(cpustate, tmp, I80286_WRITE, RIGHTS(desc));
+				cpustate->ZeroVal = i80286_verify(cpustate, tmp, I80286_WRITE, RIGHTS(desc), 0);
 				cpustate->ZeroVal = cpustate->ZeroVal || (DPL(r)<PMAX(RPL(tmp),CPL));
 			}
 			break;
@@ -795,10 +797,10 @@ static UINT16 i80286_far_return(i8086_state *cpustate, int iret, int bytes)
 
 		// docs say check rpl but windows doesn't like it
 		r = cpustate->rights[DS];
-		if (i80286_verify(cpustate, cpustate->sregs[DS], I80286_READ, r) || (CODE(r) && CONF(r) ? 0 : (DPL(r) < CPL)))
+		if (i80286_verify(cpustate, cpustate->sregs[DS], I80286_READ, r, 0) || (CODE(r) && CONF(r) ? 0 : (DPL(r) < CPL)))
 			i80286_data_descriptor(cpustate, DS, 0);
 		r = cpustate->rights[ES];
-		if (i80286_verify(cpustate, cpustate->sregs[ES], I80286_READ, r) || (CODE(r) && CONF(r) ? 0 : (DPL(r) < CPL)))
+		if (i80286_verify(cpustate, cpustate->sregs[ES], I80286_READ, r, 0) || (CODE(r) && CONF(r) ? 0 : (DPL(r) < CPL)))
 			i80286_data_descriptor(cpustate, ES, 0);
 	} else {
 		cpustate->regs.w[SP] += (iret?6:4) + bytes;
@@ -858,7 +860,7 @@ static void i80286_check_permission(i8086_state *cpustate, UINT8 check_seg, UINT
 	UINT8 rights;
 	if (PM) {
 		rights = cpustate->rights[check_seg];
-		trap = i80286_verify(cpustate, cpustate->sregs[check_seg], operation, rights);
+		trap = i80286_verify(cpustate, cpustate->sregs[check_seg], operation, rights, cpustate->valid[check_seg]);
 		if ((CODE(rights) || !EXPDOWN(rights)) && ((offset+size-1) > cpustate->limit[check_seg])) trap = GENERAL_PROTECTION_FAULT;
 		if (!CODE(rights) && EXPDOWN(rights) && ((offset <= cpustate->limit[check_seg]) || ((offset+size-1) > 0xffff))) trap = GENERAL_PROTECTION_FAULT;
 
