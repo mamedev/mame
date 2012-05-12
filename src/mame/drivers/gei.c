@@ -63,6 +63,10 @@ Artists-Athletes           New Entertainment          TV/Music Alternative
 U.S.A. Trivia              New Sports                 General Facts
  or alt: Adult Sex 2        or alt: Adult Sex 3        or alt: Gay Times
 
+NOTE: Trivia Question rom names are the internal names used. IE: read from the file with
+      a Hex Editor. Any "_alt" extention is used to seperate different roms with the same
+      label or internal name.
+
 */
 
 #include "emu.h"
@@ -635,21 +639,21 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( gselect )
 	PORT_START("DSWA")
-	PORT_DIPNAME( 0x01, 0x01, "Poker: Discard Cards" )
+	PORT_DIPNAME( 0x01, 0x01, "Poker: Discard Cards" )	PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x01, "5" )
 	PORT_DIPSETTING(    0x00, "3" )
-	PORT_DIPNAME( 0x06, 0x06, "Poker: Pay on" )
+	PORT_DIPNAME( 0x06, 0x06, "Poker: Pay on" )		PORT_DIPLOCATION("SW1:2,3")
 	PORT_DIPSETTING(    0x06, "any Pair" )
 	PORT_DIPSETTING(    0x04, "Pair of Eights or better" )
 	PORT_DIPSETTING(    0x02, "Pair of Jacks or better" )
 	PORT_DIPSETTING(    0x00, "Pair of Aces only" )
-	PORT_DIPNAME( 0x08, 0x00, "Maximum Bet" )
+	PORT_DIPNAME( 0x08, 0x00, "Maximum Bet" )		PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x08, "30" )
 	PORT_DIPSETTING(    0x00, "10" )
-	PORT_DIPNAME( 0x10, 0x10, "Poker: Credits needed for 2 Jokers" )
+	PORT_DIPNAME( 0x10, 0x10, "Poker: Credits needed for 2 Jokers" )	PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x10, "8" )
 	PORT_DIPSETTING(    0x00, "4" )
-	PORT_DIPNAME( 0xe0, 0x80, "Payout Percentage" )
+	PORT_DIPNAME( 0xe0, 0x80, "Payout Percentage" )		PORT_DIPLOCATION("SW1:6,7,8")
 	PORT_DIPSETTING(    0xe0, "35" )
 	PORT_DIPSETTING(    0xc0, "40" )
 	PORT_DIPSETTING(    0xa0, "45" )
@@ -694,27 +698,27 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( getrivia )
 	PORT_START("DSWA")
-	PORT_DIPNAME( 0x03, 0x01, "Questions" )
+	PORT_DIPNAME( 0x03, 0x01, "Questions" )		PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x00, "4" )
 	PORT_DIPSETTING(    0x01, "5" )
 /*  PORT_DIPSETTING(    0x02, "5" )*/
 	PORT_DIPSETTING(    0x03, "6" )
-	PORT_DIPNAME( 0x04, 0x00, "Show Answer" )
+	PORT_DIPNAME( 0x04, 0x00, "Show Answer" )	PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x08, 0x00, "Max Coins" )
+	PORT_DIPNAME( 0x08, 0x00, "Max Coins" )		PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x00, "10" )
 	PORT_DIPSETTING(    0x08, "30" )
-	PORT_DIPNAME( 0x10, 0x00, "Timeout" )
+	PORT_DIPNAME( 0x10, 0x00, "Timeout" )		PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x20, 0x00, "Tickets" )
+	PORT_DIPNAME( 0x20, 0x00, "Tickets" )		PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x40, 0x40, "No Coins" )
+	PORT_DIPNAME( 0x40, 0x40, "No Coins" )		PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
@@ -753,7 +757,7 @@ static INPUT_PORTS_START(suprpokr)
 	PORT_INCLUDE(gepoker)
 
 	PORT_MODIFY("DSWA")
-	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage ) )
+	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage ) )	PORT_DIPLOCATION("SW1:1,2,3")
 	PORT_DIPSETTING(    0x00, DEF_STR( 8C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 7C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 6C_1C ) )
@@ -762,26 +766,26 @@ static INPUT_PORTS_START(suprpokr)
 	PORT_DIPSETTING(    0x05, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x06, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x07, DEF_STR( 1C_1C ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unused ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unused ) )	PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "Screen" )
+	PORT_DIPNAME( 0x10, 0x10, "Screen" )		PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x10, "Horizontal" )
 	PORT_DIPSETTING(    0x00, "Vertical" )
-	PORT_DIPNAME( 0x20, 0x20, "Percentage" )
+	PORT_DIPNAME( 0x20, 0x20, "Percentage" )	PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x20, "Dynamic" )
 	PORT_DIPSETTING(    0x00, "Actual" )
-	PORT_DIPNAME( 0x40, 0x40, "Hopper" )
+	PORT_DIPNAME( 0x40, 0x40, "Hopper" )		PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x40, "Disabled" )
 	PORT_DIPSETTING(    0x00, "Enabled" )
-	PORT_DIPNAME( 0x80, 0x80, "If RAM Error" )
+	PORT_DIPNAME( 0x80, 0x80, "If RAM Error" )	PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x80, "Play" )
 	PORT_DIPSETTING(    0x00, "Freeze" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( reelfun )
 	PORT_START("DSWA")
-	PORT_DIPNAME( 0x07, 0x01, "Coinage Multiplier" )
+	PORT_DIPNAME( 0x07, 0x01, "Coinage Multiplier" )	PORT_DIPLOCATION("SW1:1,2,3")
 	PORT_DIPSETTING(    0x07, "7" )
 	PORT_DIPSETTING(    0x06, "6" )
 	PORT_DIPSETTING(    0x05, "5" )
@@ -790,28 +794,28 @@ static INPUT_PORTS_START( reelfun )
 	PORT_DIPSETTING(    0x02, "2" )
 	PORT_DIPSETTING(    0x01, "1" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Coinage ) )
-	PORT_DIPSETTING( 0x08, "Credits per Coin" )
-	PORT_DIPSETTING( 0x00, "Coins per Credit" )
-	PORT_DIPNAME( 0x10, 0x10, "Screen" )
-	PORT_DIPSETTING( 0x10, "Horizontal" )
-	PORT_DIPSETTING( 0x00, "Vertical" )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING( 0x20, DEF_STR( Upright ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING( 0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING( 0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Coinage ) )	PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x08, "Credits per Coin" )
+	PORT_DIPSETTING(    0x00, "Coins per Credit" )
+	PORT_DIPNAME( 0x10, 0x10, "Screen" )		PORT_DIPLOCATION("SW1:5")
+	PORT_DIPSETTING(    0x10, "Horizontal" )
+	PORT_DIPSETTING(    0x00, "Vertical" )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Cabinet ) )	PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_INCLUDE(reelfun_standard)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( findout )
 	PORT_START("DSWA")		/* DSW A */
-	PORT_DIPNAME( 0x07, 0x01, DEF_STR( Coinage ) )
+	PORT_DIPNAME( 0x07, 0x01, DEF_STR( Coinage ) )	PORT_DIPLOCATION("SW1:1,2,3")
 	PORT_DIPSETTING(    0x07, DEF_STR( 7C_1C ) )
 	PORT_DIPSETTING(    0x06, DEF_STR( 6C_1C ) )
 	PORT_DIPSETTING(    0x05, DEF_STR( 5C_1C ) )
@@ -820,28 +824,28 @@ static INPUT_PORTS_START( findout )
 	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0x08, 0x00, "Game Repetition" )
-	PORT_DIPSETTING( 0x08, DEF_STR( No ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x10, 0x10, "Orientation" )
-	PORT_DIPSETTING( 0x10, "Horizontal" )
-	PORT_DIPSETTING( 0x00, "Vertical" )
-	PORT_DIPNAME( 0x20, 0x20, "Buy Letter" )
-	PORT_DIPSETTING( 0x20, DEF_STR( No ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x40, 0x40, "Starting Letter" )
-	PORT_DIPSETTING( 0x40, DEF_STR( No ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x80, 0x80, "Bonus Letter" )
-	PORT_DIPSETTING( 0x80, DEF_STR( No ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x08, 0x00, "Game Repetition" )	PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x10, 0x10, "Orientation" )	PORT_DIPLOCATION("SW1:5")
+	PORT_DIPSETTING(    0x10, "Horizontal" )
+	PORT_DIPSETTING(    0x00, "Vertical" )
+	PORT_DIPNAME( 0x20, 0x20, "Buy Letter" )	PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x40, 0x40, "Starting Letter" )	PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x80, 0x80, "Bonus Letter" )	PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 
 	PORT_INCLUDE(reelfun_standard)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( gt103 )
 	PORT_START("DSWA")		/* DSW A */
-	PORT_DIPNAME( 0x07, 0x01, "Coinage Multiplier" )
+	PORT_DIPNAME( 0x07, 0x01, "Coinage Multiplier" )	PORT_DIPLOCATION("SW1:1,2,3")
 	PORT_DIPSETTING(    0x07, "7" )
 	PORT_DIPSETTING(    0x06, "6" )
 	PORT_DIPSETTING(    0x05, "5" )
@@ -850,48 +854,48 @@ static INPUT_PORTS_START( gt103 )
 	PORT_DIPSETTING(    0x02, "2" )
 	PORT_DIPSETTING(    0x01, "1" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Coinage ) )
-	PORT_DIPSETTING( 0x08, "Credits per Coin" )
-	PORT_DIPSETTING( 0x00, "Coins per Credit" )
-	PORT_DIPNAME( 0x10, 0x10, "Screen" )
-	PORT_DIPSETTING( 0x10, "Horizontal" )
-	PORT_DIPSETTING( 0x00, "Vertical" )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING( 0x20, DEF_STR( Upright ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING( 0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING( 0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Coinage ) )	PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x08, "Credits per Coin" )
+	PORT_DIPSETTING(    0x00, "Coins per Credit" )
+	PORT_DIPNAME( 0x10, 0x10, "Screen" )		PORT_DIPLOCATION("SW1:5")
+	PORT_DIPSETTING(    0x10, "Horizontal" )
+	PORT_DIPSETTING(    0x00, "Vertical" )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Cabinet ) )	PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_INCLUDE(trivia_standard)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( gt103a )
 	PORT_START("DSWA")
-	PORT_DIPNAME( 0x03, 0x01, "Questions" )
+	PORT_DIPNAME( 0x03, 0x01, "Questions" )		PORT_DIPLOCATION("SW1:1,22")
 	PORT_DIPSETTING(    0x00, "4" )
 	PORT_DIPSETTING(    0x01, "5" )
 //  PORT_DIPSETTING(    0x02, "5" )
 	PORT_DIPSETTING(    0x03, "6" )
-	PORT_DIPNAME( 0x04, 0x00, "Show Answer" )
+	PORT_DIPNAME( 0x04, 0x00, "Show Answer" )	PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x08, 0x00, "Max Coins" )
+	PORT_DIPNAME( 0x08, 0x00, "Max Coins" )		PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x08, "30" )
 	PORT_DIPSETTING(    0x00, "10" )
-	PORT_DIPNAME( 0x10, 0x00, "Timeout" )
+	PORT_DIPNAME( 0x10, 0x00, "Timeout" )		PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x20, 0x00, "Tickets" )
+	PORT_DIPNAME( 0x20, 0x00, "Tickets" )		PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x40, 0x40, "No Coins" )
+	PORT_DIPNAME( 0x40, 0x40, "No Coins" )		PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
@@ -934,28 +938,28 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( gt507uk )
 	PORT_START("DSWA")		/* DSW A */
 	PORT_DIPNAME( 0x01, 0x00, "If Ram Error" )
-	PORT_DIPSETTING( 0x01, "Freeze" )
-	PORT_DIPSETTING( 0x00, "Play" )
+	PORT_DIPSETTING(    0x01, "Freeze" )
+	PORT_DIPSETTING(    0x00, "Play" )
 	PORT_DIPNAME( 0x0a, 0x08, "Payout" )
-	PORT_DIPSETTING( 0x0a, "Bank" )
-	PORT_DIPSETTING( 0x08, "N/A" )
-	PORT_DIPSETTING( 0x02, "Credit" )
-	PORT_DIPSETTING( 0x00, "Direct" )
+	PORT_DIPSETTING(    0x0a, "Bank" )
+	PORT_DIPSETTING(    0x08, "N/A" )
+	PORT_DIPSETTING(    0x02, "Credit" )
+	PORT_DIPSETTING(    0x00, "Direct" )
 	PORT_DIPNAME( 0x04, 0x04, "Payout Hardware" )
-	PORT_DIPSETTING( 0x04, "Hopper" )
-	PORT_DIPSETTING( 0x00, "Solenoid" )
+	PORT_DIPSETTING(    0x04, "Hopper" )
+	PORT_DIPSETTING(    0x00, "Solenoid" )
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING( 0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING( 0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING( 0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING( 0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_INCLUDE(trivia_standard)
 
@@ -969,7 +973,7 @@ static INPUT_PORTS_START(geimulti)
 	PORT_INCLUDE(gselect)
 
 	PORT_MODIFY("DSWA")
-	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coinage ) )
+	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coinage ) )	PORT_DIPLOCATION("SW1:1,2,3,4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
 	PORT_DIPSETTING(    0x07, DEF_STR( 7C_1C ) )
 	PORT_DIPSETTING(    0x06, DEF_STR( 6C_1C ) )
@@ -980,22 +984,22 @@ static INPUT_PORTS_START(geimulti)
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Free_Play ) )
 	PORT_DIPSETTING(    0x09, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(	0x0a, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x0a, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x0b, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0x0d, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0x0e, DEF_STR( 1C_6C ) )
 	PORT_DIPSETTING(    0x0f, DEF_STR( 1C_7C ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -1014,7 +1018,7 @@ static INPUT_PORTS_START(sprtauth)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_MODIFY("DSWA")
-	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coinage ) )
+	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coinage ) )	PORT_DIPLOCATION("SW1:1,2,3,4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
 	PORT_DIPSETTING(    0x07, DEF_STR( 7C_1C ) )
 	PORT_DIPSETTING(    0x06, DEF_STR( 6C_1C ) )
@@ -1025,22 +1029,22 @@ static INPUT_PORTS_START(sprtauth)
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Free_Play ) )
 	PORT_DIPSETTING(    0x09, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(	0x0a, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x0a, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x0b, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0x0d, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0x0e, DEF_STR( 1C_6C ) )
 	PORT_DIPSETTING(    0x0f, DEF_STR( 1C_7C ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
@@ -1245,38 +1249,23 @@ ROM_START( jokpoker )
 	ROM_LOAD( "m075.3", 0x02000, 0x1000, CRC(45725bc9) SHA1(9e6dcbec955ef8190f2307ddb367b24b7f34338d) )
 ROM_END
 
-ROM_START( jokpokera )
+
+ROM_START( jokpokera )  /* UMV-7C rom board  */
 	ROM_REGION( 0x24000, "maincpu", 0 )
-	ROM_LOAD( "jpbiwr930-1.bin", 0x00000, 0x2000, CRC(d0f4fec5) SHA1(5fcc72522df66464759d5ba3d5209bc7a3a80002) )  /* rom board UMV-7C */
-	ROM_LOAD( "jpbiwr930-2.bin", 0x02000, 0x2000, CRC(824d1aee) SHA1(6eebde351c3b5bbed3796846d8d651b41ed6f84a) )
+	ROM_LOAD( "jpbiwr930-1.bin", 0x00000, 0x2000, CRC(d0f4fec5) SHA1(5fcc72522df66464759d5ba3d5209bc7a3a80002) )  /* 16.03BI 5-10-85 */
+	ROM_LOAD( "jpbiwr930-2.bin", 0x02000, 0x2000, CRC(824d1aee) SHA1(6eebde351c3b5bbed3796846d8d651b41ed6f84a) )  /* Joker Poker ICB 9-30-86 */
 ROM_END
 
-/*
-Joker Poker BI Version 16.04BI 10-19-88
-
-Standard GEI mainboard
-
-UVM 7S REV A romboard
-*/
-
-ROM_START( jokpokerb )
+ROM_START( jokpokerb ) /* UVM 7S REV A rom board */
 	ROM_REGION( 0x24000, "maincpu", 0 )
-	ROM_LOAD( "jp_bi_10-19-88.e1", 0x00000, 0x2000, CRC(d59a78e2) SHA1(d8463675f30a52e0f93c5ea5c2ee663095d3d5ea) )
-	ROM_LOAD( "jp_bi_10-19-88.e2", 0x02000, 0x2000, CRC(1a34dc80) SHA1(27dff743e661ae7421fef0b046e3ae205b842603) )
+	ROM_LOAD( "jp_bi_10-19-88.e1", 0x00000, 0x2000, CRC(d59a78e2) SHA1(d8463675f30a52e0f93c5ea5c2ee663095d3d5ea) )  /* 16.04BI 10-19-88 */
+	ROM_LOAD( "jp_bi_10-19-88.e2", 0x02000, 0x2000, CRC(1a34dc80) SHA1(27dff743e661ae7421fef0b046e3ae205b842603) )  /* Joker Poker ICB 9-30-86 */
 ROM_END
 
-/*
-Joker Poker BI Version 16.03BI 5-10-85
-
-Standard GEI mainboard
-
-UVM7-C romboard
-*/
-
-ROM_START( jokpokerc )
+ROM_START( jokpokerc )  /* UMV-7C rom board */
 	ROM_REGION( 0x24000, "maincpu", 0 )
-	ROM_LOAD( "jp_bi_5-10-85.1", 0x00000, 0x2000, CRC(d0f4fec5) SHA1(5fcc72522df66464759d5ba3d5209bc7a3a80002) )
-	ROM_LOAD( "jp_bi_5-10-85.2", 0x02000, 0x2000, CRC(9f8bee22) SHA1(8d894d2a07bd18d731b7a54a16bb9b9230c79306) )
+	ROM_LOAD( "jp_bi_5-10-85.1", 0x00000, 0x2000, CRC(d0f4fec5) SHA1(5fcc72522df66464759d5ba3d5209bc7a3a80002) )  /* 16.03BI 5-10-85 */
+	ROM_LOAD( "jp_bi_5-10-85.2", 0x02000, 0x2000, CRC(9f8bee22) SHA1(8d894d2a07bd18d731b7a54a16bb9b9230c79306) )  /* Poker No Raise ICB 9-30-86 */
 ROM_END
 
 /***************************************************
@@ -1563,13 +1552,7 @@ ROM_START( amuse ) /* v50.08 with most roms for IAM dated 8-16-84 */
 	ROM_LOAD( "horserace_iam_3-19-84",     0x20000, 0x4000, CRC(7b9e75cb) SHA1(0db8da6f5f59f57886766bec96102d43796567ef) )
 ROM_END
 
-/*
-
-UVM-8B romboard
-
-*/
-
-ROM_START( amuse1 ) /* v30.08 */
+ROM_START( amuse1 ) /* V30.08  Rom board UMV8-B */
 	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "m108_control_5-16-84",  0x00000, 0x4000, CRC(9dda922f) SHA1(ded42adda8376452e0ac4f771ebb42fd86811dc5) )
 	ROM_LOAD( "m108_hcon_5-16-84",     0x05800, 0x1000, CRC(ade5c42d) SHA1(d3e32ecaeb21a4e5eedd243c42d5914b03f572bd) )
@@ -1580,19 +1563,27 @@ ROM_START( amuse1 ) /* v30.08 */
 ROM_END
 
 
-ROM_START( suprpokr )
+ROM_START( suprpokr )  /* Super Poker Version 10.19S BOBC. Rom board UMV-7C */
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "10-19s-1.e1",  0x00000, 0x4000, CRC(50662b4d) SHA1(967161a755db43d2cfd5ce92e14c5284f1f1f8ad) )
-	ROM_LOAD( "10-19s-1.e2",  0x08000, 0x4000, CRC(22b45aeb) SHA1(006c3072cc44c6fde9b4d15163dc70707bbd5a9c) )
-	ROM_RELOAD( 0xc000, 0x4000 )
+	ROM_LOAD( "supr_pokr_10.19s_#1", 0x00000, 0x4000, CRC(50662b4d) SHA1(967161a755db43d2cfd5ce92e14c5284f1f1f8ad) )
+	ROM_LOAD( "supr_pokr_10.19s_#2", 0x08000, 0x4000, CRC(22b45aeb) SHA1(006c3072cc44c6fde9b4d15163dc70707bbd5a9c) )
+	ROM_RELOAD(                      0x0c000, 0x4000 )
 ROM_END
 
-ROM_START( suprpkr1 )
+ROM_START( suprpokra )  /* Super Poker Version 10.15S BOBC. Rom board UMV-7C */
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "e1.bin",  0x00000, 0x4000, CRC(5cc7c1e0) SHA1(1cdca32c4df7227dab77574abe344b291741139e) )
-	ROM_LOAD( "e2.bin",  0x08000, 0x4000, CRC(e47d6e2a) SHA1(9cabc42275dad8be6cd5b167e381ddb5bf08276d) )
-	ROM_RELOAD( 0xc000, 0x4000 )
+	ROM_LOAD( "supr_pokr_10.15s_#1", 0x00000, 0x4000, CRC(5cc7c1e0) SHA1(1cdca32c4df7227dab77574abe344b291741139e) )
+	ROM_LOAD( "supr_pokr_10.15s_#2", 0x08000, 0x4000, CRC(e47d6e2a) SHA1(9cabc42275dad8be6cd5b167e381ddb5bf08276d) )
+	ROM_RELOAD(                      0x0c000, 0x4000 )
 ROM_END
+
+ROM_START( suprpokrb )  /* Super Poker Version 10.10 BOBC. Rom board UMV-7C */
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "supr_pokr_10.10_#1", 0x00000, 0x4000, CRC(8324471f) SHA1(c38b7a735ef06feea3e8d4ba6dd963e24d38c792) )
+	ROM_LOAD( "supr_pokr_10.10_#2", 0x08000, 0x4000, CRC(a82ca9c5) SHA1(3b0f4ad7d53370dc1f00dec696e993359147a496) )
+	ROM_RELOAD(                     0x0c000, 0x4000 )
+ROM_END
+
 
 ROM_START( reelfun ) /* v7.03 */
 	ROM_REGION( 0x38000, "maincpu", 0 )
@@ -1634,21 +1625,11 @@ ROM_START( gt507uk )
 	ROM_REGION( 0x38000, "maincpu", 0 )
 	ROM_LOAD( "triv_3_2.bin",    0x00000, 0x4000, CRC(2d72a081) SHA1(8aa32acf335d027466799b097e0de66bcf13247f) )
 	ROM_LOAD( "rom_ad.bin",      0x08000, 0x2000, CRC(c81cc847) SHA1(057b7b75a2fe1abf88b23e7b2de230d9f96139f5) )
-	ROM_LOAD( "aerospace",       0x10000, 0x8000, CRC(cb555d46) SHA1(559ae05160d7893ff96311a2177eba039a4cf186) )
+	ROM_LOAD( "aerospace",       0x10000, 0x8000, CRC(cb555d46) SHA1(559ae05160d7893ff96311a2177eba039a4cf186) ) /* Also found in Series #11 set */
 	ROM_LOAD( "english_sport_4", 0x18000, 0x8000, CRC(6ae8a63d) SHA1(c6018141d8bbe0ed7619980bf7da89dd91d7fcc2) )
-	ROM_LOAD( "general_facts",   0x20000, 0x8000, CRC(f921f108) SHA1(fd72282df5cee0e6ab55268b40785b3dc8e3d65b) )
-	ROM_LOAD( "horrors",         0x28000, 0x8000, CRC(5f7b262a) SHA1(047480d6bf5c6d0603d538b84c996bd226f07f77) )
+	ROM_LOAD( "general_facts",   0x20000, 0x8000, CRC(f921f108) SHA1(fd72282df5cee0e6ab55268b40785b3dc8e3d65b) ) /* Also found in Series #11 set */
+	ROM_LOAD( "horrors",         0x28000, 0x8000, CRC(5f7b262a) SHA1(047480d6bf5c6d0603d538b84c996bd226f07f77) ) /* Possiblely Series #13 rom */
 	ROM_LOAD( "pop_music",       0x30000, 0x8000, CRC(884fec7c) SHA1(b389216c17f516df4e15eee46246719dd4acb587) )
-ROM_END
-
-ROM_START( gt5 ) /* v5.06, From a TRIV3D romboard */
-	ROM_REGION( 0x38000, "maincpu", 0 )
-	ROM_LOAD( "program",         0x00000, 0x4000, CRC(e9d6226c) SHA1(42e62c5cafa3f051bf48c18c8c549ffcd4c766c5) )
-	ROM_LOAD( "entertainment_2", 0x10000, 0x8000, CRC(c75c2331) SHA1(9c5947616a4cba2623c599def6cf3b2b1981b681) ) /* rom / question set #15 */
-	ROM_LOAD( "facts_2",         0x18000, 0x8000, CRC(7836ef31) SHA1(6a84cfa39de392eed46a4b37752e00b6d094bbd6) )
-	ROM_LOAD( "new_science_3",   0x20000, 0x8000, CRC(fcbc3bc3) SHA1(2dbdd39dce9dbf53c0954dec44a4f5109243dc60) )
-	ROM_LOAD( "nfl_football",    0x28000, 0x8000, CRC(42eb2849) SHA1(c24e681a508ef8350f7e5d50aea2c31cf70ce5c9) )
-	ROM_LOAD( "adult_sex_6",     0x30000, 0x8000, CRC(d66f35f7) SHA1(81b56756230b27b0903d0c5df30439726526afe2) )
 ROM_END
 
 ROM_START( gtsers8 )
@@ -1673,7 +1654,17 @@ ROM_START( gtsers9 )
 	/* Missing "Artists-Athletes" */
 ROM_END
 
-ROM_START( gtsers10 )
+ROM_START( gtsers10 ) /* TRIV-3 PCB, stickered 256 TRIV #10 8/85 */
+	ROM_REGION( 0x38000, "maincpu", 0 )
+	ROM_LOAD( "prog1_versionc", 0x00000, 0x4000, CRC(340246a4) SHA1(d655e1cf2b1e87a05e87ff6af4b794e6d54a2a52) )
+	ROM_LOAD( "new_general",    0x10000, 0x8000, CRC(ba1f5b92) SHA1(7e94be0ef6904331d3a6b266e5887e9a15c5e7f9) )
+	ROM_LOAD( "new_tv_mash",    0x18000, 0x8000, CRC(f73240c6) SHA1(78020644074da719414133a86a91c1328e5d8929) )
+	ROM_LOAD( "new_entrtnmnt",  0x20000, 0x8000, CRC(0f54340c) SHA1(1ca4c23b542339791a2d8f4a9a857f755feca8a1) )
+	ROM_LOAD( "new_sports",     0x28000, 0x8000, CRC(19eff1a3) SHA1(8e024ae6cc572176c90d819a438ace7b2512dbf2) )
+	ROM_LOAD( "new_science",    0x30000, 0x8000, CRC(2c46e355) SHA1(387ab389abaaea8e870b00039dd884237f7dd9c6) )
+ROM_END
+
+ROM_START( gtsers10a ) /* TRIV-3 PCB, stickered 256 TRIV #10 8/85 */
 	ROM_REGION( 0x38000, "maincpu", 0 )
 	ROM_LOAD( "prog1_versionc", 0x00000, 0x4000, CRC(340246a4) SHA1(d655e1cf2b1e87a05e87ff6af4b794e6d54a2a52) )
 	ROM_LOAD( "new_general",    0x10000, 0x8000, CRC(ba1f5b92) SHA1(7e94be0ef6904331d3a6b266e5887e9a15c5e7f9) )
@@ -1681,7 +1672,6 @@ ROM_START( gtsers10 )
 	ROM_LOAD( "new_entrtnmnt",  0x20000, 0x8000, CRC(0f54340c) SHA1(1ca4c23b542339791a2d8f4a9a857f755feca8a1) )
 	ROM_LOAD( "new_sports",     0x28000, 0x8000, CRC(19eff1a3) SHA1(8e024ae6cc572176c90d819a438ace7b2512dbf2) )
 	ROM_LOAD( "adult_sex_3",    0x30000, 0x8000, CRC(2c46e355) SHA1(387ab389abaaea8e870b00039dd884237f7dd9c6) ) /* Listed as an alternate question set */
-	/* Missing "New Science" */
 ROM_END
 
 ROM_START( gtsers11 )
@@ -1691,43 +1681,64 @@ ROM_START( gtsers11 )
 	ROM_LOAD( "cars-women",     0x18000, 0x8000, CRC(4c5dd1df) SHA1(f3e2146eeab07ec71617c7614c6e8f6bc844e6e3) )
 	ROM_LOAD( "aerospace",      0x20000, 0x8000, CRC(cb555d46) SHA1(559ae05160d7893ff96311a2177eba039a4cf186) )
 	ROM_LOAD( "tv_music",       0x28000, 0x8000, CRC(5138e0fb) SHA1(102146d63752258c2fda95df49289c42b392c838) )
+	ROM_LOAD( "general_facts",  0x30000, 0x8000, CRC(f921f108) SHA1(fd72282df5cee0e6ab55268b40785b3dc8e3d65b) )
+ROM_END
+
+ROM_START( gtsers11a )
+	ROM_REGION( 0x38000, "maincpu", 0 )
+	ROM_LOAD( "prog1_versionc", 0x00000, 0x4000, CRC(340246a4) SHA1(d655e1cf2b1e87a05e87ff6af4b794e6d54a2a52) )
+	ROM_LOAD( "rich-famous",    0x10000, 0x8000, CRC(39e07e4a) SHA1(6e5a0bcefaa1169f313e8818cf50919108b3e121) )
+	ROM_LOAD( "cars-women",     0x18000, 0x8000, CRC(4c5dd1df) SHA1(f3e2146eeab07ec71617c7614c6e8f6bc844e6e3) )
+	ROM_LOAD( "aerospace",      0x20000, 0x8000, CRC(cb555d46) SHA1(559ae05160d7893ff96311a2177eba039a4cf186) )
+	ROM_LOAD( "tv_music",       0x28000, 0x8000, CRC(5138e0fb) SHA1(102146d63752258c2fda95df49289c42b392c838) )
 	ROM_LOAD( "gay_times",      0x30000, 0x8000, CRC(c4f9a8cf) SHA1(9247ecc5708aba263e0365fc43a1a7d0c2b7c391) ) /* Listed as an alternate question set */
-	/* Missing "General Facts" */
 ROM_END
 
 ROM_START( gtsers12 )
 	ROM_REGION( 0x38000, "maincpu", 0 )
 	ROM_LOAD( "prog1_versionc",  0x00000, 0x4000, CRC(340246a4) SHA1(d655e1cf2b1e87a05e87ff6af4b794e6d54a2a52) )
-	ROM_LOAD( "new_science_2",   0x10000, 0x8000, CRC(3bd80fb8) SHA1(9a196595bc5dc6ed5ee5853786839ed4847fa436) )
-	ROM_LOAD( "adult_sex_4",     0x18000, 0x8000, CRC(36a75071) SHA1(f08d31f241e1dc9b94b940cd2872a692f6f8475b) )
+	ROM_LOAD( "new_science_2",   0x10000, 0x8000, CRC(3bd80fb8) SHA1(9a196595bc5dc6ed5ee5853786839ed4847fa436) ) /* Labeled as NEW SCNE 2* */
+	ROM_LOAD( "adult_sex_4",     0x18000, 0x8000, CRC(9c32730e) SHA1(9d060e49a4c1dd8d978619b1c357c9e8238e5c96) ) /* Labeled as ADULT SEX 4* */
 	ROM_LOAD( "cops_&_robbers",  0x20000, 0x8000, CRC(8b367c33) SHA1(013468157bf469c9cf138809fdc45b3ba60a423b) )
 	ROM_LOAD( "famous_quotes",   0x28000, 0x8000, CRC(0a27d8ae) SHA1(427e6ae25e47da7f7f7c3e92a37e330d711da90c) )
 	ROM_LOAD( "vices",           0x30000, 0x8000, CRC(e6069955) SHA1(68f7453f21a4ce1be912141bbe947fbd81d918a3) )
+	/* Missing unknown alternate question? */
 ROM_END
 
-ROM_START( gtsers14 )
+ROM_START( gtsers14 ) /* TRIV-3 PCB, stickered 256 TRIV #14 11/85 */
 	ROM_REGION( 0x38000, "maincpu", 0 )
-	ROM_LOAD( "prog1_versionc",  0x00000, 0x4000, CRC(340246a4) SHA1(d655e1cf2b1e87a05e87ff6af4b794e6d54a2a52) )
+	ROM_LOAD( "program5",        0x00000, 0x4000, CRC(99ddaaa7) SHA1(c929d7b67367f303dadf07d508bc72af19e9c2ef) ) /* Unknown version, but earlier then the 5.06 for Series #15 */
 	ROM_LOAD( "famous_couples",  0x10000, 0x8000, CRC(e0618218) SHA1(ff64fcd6dec83a2271b63c3ae64dc932a3954ec5) )
 	ROM_LOAD( "war_and_peace",   0x18000, 0x8000, CRC(bc709383) SHA1(2fba4c80773abea7bbd826c39378b821cddaa255) )
 	ROM_LOAD( "tv_comedies",     0x20000, 0x8000, CRC(992ae38e) SHA1(312780d651a85a1c433f587ff2ede579456d3fd9) )
 	ROM_LOAD( "the_sixties",     0x28000, 0x8000, CRC(8cfa854e) SHA1(81428c12f99841db1c61b471ac8d00f0c411883b) )
-	/* Missing "New Sports" */
+	/* Missing unknown question rom (and alternate question?) */
 ROM_END
 
-ROM_START( gt103a1 ) /* Need to verify these are actually Series 13 */
+ROM_START( gtsers15 ) /* v5.06, From a TRIV3D romboard */
 	ROM_REGION( 0x38000, "maincpu", 0 )
-	ROM_LOAD( "prog1_versiona",  0x00000, 0x4000, CRC(537d6566) SHA1(282a33e4a9fc54d34094393c00026bf31ccd6ab5) ) /* Currently unverified Series 13 */
+	ROM_LOAD( "program_v5.06",   0x00000, 0x4000, CRC(e9d6226c) SHA1(42e62c5cafa3f051bf48c18c8c549ffcd4c766c5) )
+	ROM_LOAD( "entertainment_2", 0x10000, 0x8000, CRC(c75c2331) SHA1(9c5947616a4cba2623c599def6cf3b2b1981b681) )
+	ROM_LOAD( "facts_2",         0x18000, 0x8000, CRC(7836ef31) SHA1(6a84cfa39de392eed46a4b37752e00b6d094bbd6) )
+	ROM_LOAD( "new_science_3",   0x20000, 0x8000, CRC(fcbc3bc3) SHA1(2dbdd39dce9dbf53c0954dec44a4f5109243dc60) )
+	ROM_LOAD( "nfl_football",    0x28000, 0x8000, CRC(42eb2849) SHA1(c24e681a508ef8350f7e5d50aea2c31cf70ce5c9) )
+	ROM_LOAD( "adult_sex_6",     0x30000, 0x8000, CRC(d66f35f7) SHA1(81b56756230b27b0903d0c5df30439726526afe2) )
+	/* Missing unknown question rom (and alternate question?) */
+ROM_END
+
+ROM_START( gt103a1 ) /* Need to verify which series these belong to */
+	ROM_REGION( 0x38000, "maincpu", 0 )
+	ROM_LOAD( "prog1_versiona",  0x00000, 0x4000, CRC(537d6566) SHA1(282a33e4a9fc54d34094393c00026bf31ccd6ab5) ) /* Currently unverified Series 13 and or alt ? roms */
 	ROM_LOAD( "history-geog",    0x10000, 0x8000, CRC(c9a70fc3) SHA1(4021e5d702844416e8c798ed0a57c9ecd20b1d4b) )
 	ROM_LOAD( "nfl_football",    0x18000, 0x8000, CRC(d676b7cd) SHA1(d652d2441adb500f7af526d110d0335ea453d75b) )
 	ROM_LOAD( "rock_music",      0x20000, 0x8000, CRC(7f11733a) SHA1(d4d0dee75518edf986cb1241ade45ccb4840f088) )
-	ROM_LOAD( "rock-n-roll_alt", 0x28000, 0x8000, CRC(8eb83052) SHA1(93e3c1ae6c2048fb44ecafe1013b6a96da38fa84) )
-	ROM_LOAD( "entertainment",   0x30000, 0x8000, CRC(07068c9f) SHA1(1aedc78d071281ec8b08488cd82655d41a77cf6b) )
+	ROM_LOAD( "entertainment",   0x28000, 0x8000, CRC(07068c9f) SHA1(1aedc78d071281ec8b08488cd82655d41a77cf6b) )
+	ROM_LOAD( "horrors",         0x30000, 0x8000, CRC(5f7b262a) SHA1(047480d6bf5c6d0603d538b84c996bd226f07f77) )
 ROM_END
 
 ROM_START( gt103aa )
 	ROM_REGION( 0x38000, "maincpu", 0 )
-	ROM_LOAD( "t_3a-8_1.bin",      0x00000, 0x4000, CRC(02aef306) SHA1(1ffc10c79a55d41ea36bcaab13cb3f02cb3f9712) )
+	ROM_LOAD( "t_3a-8_1.bin",      0x00000, 0x4000, CRC(02aef306) SHA1(1ffc10c79a55d41ea36bcaab13cb3f02cb3f9712) ) /* "Park" alternate version sets here */
 	ROM_LOAD( "entertainment_alt", 0x10000, 0x8000, CRC(9a6628b9) SHA1(c0cb7e974329d4d5b91f107296d21a674e35a51b) )
 	ROM_LOAD( "general_alt",       0x18000, 0x8000, CRC(df34f7f9) SHA1(329d123eea711d5135dc02dd7b89b220ce8ddd28) )
 	ROM_LOAD( "science_alt",       0x20000, 0x8000, CRC(9eaebd18) SHA1(3a4d787cb006dbb23ce346577cb1bb5e543ba52c) )
@@ -1735,14 +1746,24 @@ ROM_START( gt103aa )
 	ROM_LOAD( "sports_alt2",       0x30000, 0x8000, CRC(40207845) SHA1(2dddb9685dcefabfde07057a639aa9d08da2329e) )
 ROM_END
 
-ROM_START( gt103asx )
+ROM_START( gt103ab )
 	ROM_REGION( 0x38000, "maincpu", 0 )
-	ROM_LOAD( "t_3a-8_1.bin",    0x00000, 0x4000, CRC(02aef306) SHA1(1ffc10c79a55d41ea36bcaab13cb3f02cb3f9712) ) /* Not sure there was ever a specific Adult set  */
-	ROM_LOAD( "adult_sex_2",     0x10000, 0x8000, CRC(0d683f21) SHA1(f47ce3c31c4c5ed02247fa280303e6ae760315df) ) /* These are likely just the collection of adult */
-	ROM_LOAD( "adult_sex_2_alt", 0x18000, 0x8000, CRC(8c0eacc8) SHA1(ddaa25548d161394b41c65a2db57a9fcf793062b) ) /* from all the series combined here. */
-	ROM_LOAD( "adult_sex_3_alt", 0x20000, 0x8000, CRC(63cbd1d6) SHA1(8dcd5546dc8688d6b8404d5cf63d8a59acc9bf4c) )
-	ROM_LOAD( "adult_sex_4",     0x28000, 0x8000, CRC(36a75071) SHA1(f08d31f241e1dc9b94b940cd2872a692f6f8475b) )
-	ROM_LOAD( "adult_sex_5",     0x30000, 0x8000, CRC(fdbc3729) SHA1(7cb7cec4439ddc39de2f7f62c25623cfb869f493) )
+	ROM_LOAD( "t_3a-8_1.rom",      0x00000, 0x4000, CRC(02aef306) SHA1(1ffc10c79a55d41ea36bcaab13cb3f02cb3f9712) ) /* "Park" alternate version sets here */
+	ROM_LOAD( "new_science_2_alt", 0x10000, 0x8000, CRC(3bd80fb8) SHA1(9a196595bc5dc6ed5ee5853786839ed4847fa436) )
+	ROM_LOAD( "adult_sex_2_alt",   0x18000, 0x8000, CRC(8c0eacc8) SHA1(ddaa25548d161394b41c65a2db57a9fcf793062b) )
+	ROM_LOAD( "adult_sex_3_alt",   0x20000, 0x8000, CRC(63cbd1d6) SHA1(8dcd5546dc8688d6b8404d5cf63d8a59acc9bf4c) )
+	ROM_LOAD( "adult_sex_4_alt",   0x28000, 0x8000, CRC(36a75071) SHA1(f08d31f241e1dc9b94b940cd2872a692f6f8475b) )
+	ROM_LOAD( "rock-n-roll_alt",   0x30000, 0x8000, CRC(8eb83052) SHA1(93e3c1ae6c2048fb44ecafe1013b6a96da38fa84) )
+ROM_END
+
+ROM_START( gt103asx ) /* Not sure there was ever an all Adult Trivia version. These are just the collection from all the series combined here */
+	ROM_REGION( 0x38000, "maincpu", 0 )
+	ROM_LOAD( "t_3a-8_1.bin", 0x00000, 0x4000, CRC(02aef306) SHA1(1ffc10c79a55d41ea36bcaab13cb3f02cb3f9712) )
+	ROM_LOAD( "adult_sex_2",  0x10000, 0x8000, CRC(0d683f21) SHA1(f47ce3c31c4c5ed02247fa280303e6ae760315df) ) /* From series 9 */
+	ROM_LOAD( "adult_sex_3",  0x18000, 0x8000, CRC(2c46e355) SHA1(387ab389abaaea8e870b00039dd884237f7dd9c6) ) /* From series 10 as alt ? rom */
+	ROM_LOAD( "adult_sex_4",  0x20000, 0x8000, CRC(36a75071) SHA1(f08d31f241e1dc9b94b940cd2872a692f6f8475b) ) /* From series 12 */
+	ROM_LOAD( "adult_sex_5",  0x28000, 0x8000, CRC(fdbc3729) SHA1(7cb7cec4439ddc39de2f7f62c25623cfb869f493) ) /* Likely from series 13 or 14 as alt ? rom */
+	ROM_LOAD( "adult_sex_6",  0x30000, 0x8000, CRC(d66f35f7) SHA1(81b56756230b27b0903d0c5df30439726526afe2) ) /* From series 15 */
 ROM_END
 
 ROM_START( quiz )
@@ -1884,7 +1905,7 @@ static DRIVER_INIT( geimulti )
 }
 
 GAME( 1982, jokpoker, 0,        gselect,  gselect,  setbank, ROT0, "Greyhound Electronics", "Joker Poker (Version 16.03B)",            GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1983, jokpokera,jokpoker, jokpokera,gselect,  setbank, ROT0, "Greyhound Electronics", "Joker Poker (Version 16.03BI)",           GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1983, jokpokera,jokpoker, jokpokera,gselect,  setbank, ROT0, "Greyhound Electronics", "Joker Poker (Version 16.03BI 5-10-85, Joker Poker ICB 9-30-86)",     GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1983, jokpokerb,jokpoker, jokpokera,gselect,  setbank, ROT0, "Greyhound Electronics", "Joker Poker (Version 16.04BI 10-19-88, Joker Poker ICB 9-30-86)",    GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1983, jokpokerc,jokpoker, jokpokera,gselect,  setbank, ROT0, "Greyhound Electronics", "Joker Poker (Version 16.03BI 5-10-85, Poker No Raise ICB 9-30-86)",  GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1982, superbwl, 0,        gselect,  gselect,  setbank, ROT0, "Greyhound Electronics", "Super Bowl (Version 16.03B)",             GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
@@ -1910,18 +1931,21 @@ GAME( 1984, gtsersb,  gtsers1,  getrivia, getrivia, 0,       ROT0, "Greyhound El
 GAME( 1984, gtsers8,  0,        findout,  gt103a,   0,       ROT0, "Greyhound Electronics", "Trivia (Questions Series 8)",             GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1984, gtsers9,  gtsers8,  findout,  gt103a,   0,       ROT0, "Greyhound Electronics", "Trivia (Questions Series 9)",             GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1984, gtsers10, gtsers8,  findout,  gt103a,   0,       ROT0, "Greyhound Electronics", "Trivia (Questions Series 10)",            GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1984, gtsers10a,gtsers8,  findout,  gt103a,   0,       ROT0, "Greyhound Electronics", "Trivia (Questions Series 10 Alt Question Rom)",GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1984, gtsers11, gtsers8,  findout,  gt103a,   0,       ROT0, "Greyhound Electronics", "Trivia (Questions Series 11)",            GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1984, gtsers11a,gtsers8,  findout,  gt103a,   0,       ROT0, "Greyhound Electronics", "Trivia (Questions Series 11 Alt Question Rom)",GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1984, gtsers12, gtsers8,  findout,  gt103a,   0,       ROT0, "Greyhound Electronics", "Trivia (Questions Series 12)",            GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1984, gtsers14, gtsers8,  findout,  gt103a,   0,       ROT0, "Greyhound Electronics", "Trivia (Questions Series 14)",            GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1984, gt103a1,  gtsers8,  findout,  gt103a,   0,       ROT0, "Greyhound Electronics", "Trivia (Version 1.03a) (alt 1)",          GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1984, gt103aa,  gtsers8,  findout,  gt103a,   0,       ROT0, "Greyhound Electronics", "Trivia (Version 1.03a Alt questions)",    GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1986, gtsers14, gtsers8,  findout,  gt103,    0,       ROT0, "Greyhound Electronics", "Trivia (Questions Series 14)",            GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1986, gtsers15, gtsers8,  findout,  gt103,    0,       ROT0, "Greyhound Electronics", "Trivia (Questions Series 15)",            GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1984, gt103a1,  gtsers8,  findout,  gt103a,   0,       ROT0, "Greyhound Electronics", "Trivia (Unsorted question roms)",         GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1984, gt103aa,  gtsers8,  findout,  gt103a,   0,       ROT0, "Greyhound Electronics", "Trivia (Version 1.03a Alt questions 1)",  GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1984, gt103ab,  gtsers8,  findout,  gt103a,   0,       ROT0, "Greyhound Electronics", "Trivia (Version 1.03a Alt questions 2)",  GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1984, gt103asx, gtsers8,  findout,  gt103a,   0,       ROT0, "Greyhound Electronics", "Trivia (Version 1.03a Sex questions)",    GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 
 GAME( 1985, sextriv1, 0,        getrivia, sextriv1, 0,       ROT0, "Kinky Kit and Game Co.", "Sexual Trivia (Version 1.02SB, set 1)",  GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1985, sextriv2, sextriv1, getrivia, sextriv1, 0,       ROT0, "Kinky Kit and Game Co.", "Sexual Trivia (Version 1.02SB, set 2)",  GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 
 GAME( 1986, gt507uk,  0,        findout,  gt507uk,  0,       ROT0, "Grayhound Electronics", "Trivia (UK Version 5.07)",                GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1986, gt5,      0,        findout,  gt103,    0,       ROT0, "Grayhound Electronics", "Trivia (Version 5.06)",                   GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 
 GAME( 1986, quiz,     0,        findout,  quiz,     0,       ROT0, "bootleg",               "Quiz (Revision 2)",                       GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 
@@ -1932,7 +1956,8 @@ GAME( 1986, reelfun1, reelfun,  findout,  reelfun,  0,       ROT0, "Grayhound El
 GAME( 1987, findout,  0,        findout,  findout,  0,       ROT0, "Elettronolo",           "Find Out (Version 4.04)",                 GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 
 GAME( 1986, suprpokr, 0,        suprpokr, suprpokr, 0,       ROT0, "Grayhound Electronics", "Super Poker (Version 10.19S)",            GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1986, suprpkr1, suprpokr, suprpokr, suprpokr, 0,       ROT0, "Grayhound Electronics", "Super Poker (Version 10.15S)",            GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1986, suprpokra,suprpokr, suprpokr, suprpokr, 0,       ROT0, "Grayhound Electronics", "Super Poker (Version 10.15S)",            GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1986, suprpokrb,suprpokr, suprpokr, suprpokr, 0,       ROT0, "Grayhound Electronics", "Super Poker (Version 10.10)",             GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 
 GAME( 1991, quiz211,  0,        findout,  quiz,     0,       ROT0, "Elettronolo",           "Quiz (Revision 2.11)",                    GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 

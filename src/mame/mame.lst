@@ -10044,15 +10044,19 @@ newsa			// "Jeansole / Poby
 taxidriv		// [1984 Graphic Techno]
 xyonix			// [1989 Philko]
 gt507uk			// (c) 1986 Grayhound Electronics
-gt5				// (c) 1984 Grayhound Electronics
+gt507uk			// (c) 1986 Grayhound Electronics
 gtsers8			// (c) 1984 Greyhound Electronics
 gtsers9			// (c) 1984 Greyhound Electronics
 gtsers10		// (c) 1984 Greyhound Electronics
+gtsers10a		// (c) 1984 Greyhound Electronics
 gtsers11		// (c) 1984 Greyhound Electronics
+gtsers11a		// (c) 1984 Greyhound Electronics
 gtsers12		// (c) 1984 Greyhound Electronics
-gtsers14		// (c) 1984 Greyhound Electronics
+gtsers14		// (c) 1986 Greyhound Electronics
+gtsers15		// (c) 1986 Greyhound Electronics
 gt103a1			// (c) 1984 Greyhound Electronics
 gt103aa			// (c) 1984 Greyhound Electronics
+gt103ab			// (c) 1984 Greyhound Electronics
 gt103asx		// (c) 1984 Greyhound Electronics
 reelfun			// (c) 1986 Grayhound Electronics
 reelfun1		// (c) 1986 Grayhound Electronics
@@ -10061,9 +10065,9 @@ quizvid			// (c) 1986 Greyhound Electronics
 quiz			// (c) 1986 Italian bootleg
 quiz211			// (c) 1986 Italian bootleg
 jokpoker		// (c) 1982 Greyhound Electronics
-jokpokera		// (c) 1982 Greyhound Electronics
-jokpokerb
-jokpokerc
+jokpokera		// (c) 1983 Greyhound Electronics
+jokpokerb		// (c) 1983 Greyhound Electronics
+jokpokerc		// (c) 1983 Greyhound Electronics
 superbwl		// (c) 1982 Greyhound Electronics
 amuse			// (c) 1982 Greyhound Electronics
 amuse1			// (c) 1982 Greyhound Electronics
@@ -10085,7 +10089,8 @@ sextriv2		// (c) 1985 Kinky Kit and Game Co.
 geimulti		// (c) 1992 Grayhound Electronics
 sprtauth		// (c) 1982 Classic Games
 suprpokr		// (c) 1986 Grayhound Electronics
-suprpkr1		// (c) 1986 Grayhound Electronics
+suprpokra		// (c) 1986 Grayhound Electronics
+suprpokrb		// (c) 1986 Grayhound Electronics
 sshot			// (c) 1979 Model Racing
 dribling		// (c) 1983 Model Racing
 driblingo		// (c) 1983 Olympia
