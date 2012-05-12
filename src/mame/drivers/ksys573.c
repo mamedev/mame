@@ -5180,7 +5180,7 @@ ROM_START( hyperbbc )
 	ROM_LOAD( "876ea.22h",    0x000000, 0x002000, CRC(8e11d196) SHA1(e7442fdd611f4290d531b1ebdc9f487e323fd531) )
 ROM_END
 
-ROM_START( hyperbbcj )
+ROM_START( hypbbc2p )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000084, "install_eeprom", 0 ) /* security cart eeprom */
@@ -5190,7 +5190,7 @@ ROM_START( hyperbbcj )
 	DISK_IMAGE_READONLY( "908a02", 0, SHA1(573194ca9938c30415fc88dcc0c0152dd3024d71) )
 ROM_END
 
-ROM_START( hyperbbck )
+ROM_START( hypbbc2pk )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000084, "install_eeprom", 0 ) /* security cart eeprom */
@@ -5421,8 +5421,8 @@ GAME( 1999, ddr3mj,   ddr3mk,   pccard2dyyi,  ddr,       ddrdigital, ROT0, "Kona
 GAME( 1999, ddrsbm,   sys573,   k573dyi,      ddrsolo,   ddrsolo,    ROT0, "Konami", "Dance Dance Revolution Solo Bass Mix (GQ894 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
 GAME( 1999, ddrs2k,   sys573,   k573dyyi,     ddrsolo,   ddrsolo,    ROT0, "Konami", "Dance Dance Revolution Solo 2000 (GC905 VER. AAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.3 */
 GAME( 1999, ddrs2kj,  ddrs2k,   k573dyyi,     ddrsolo,   ddrsolo,    ROT0, "Konami", "Dance Dance Revolution Solo 2000 (GC905 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.2 */
-GAME( 1999, hyperbbcj,sys573,   konami573y,   hyperbbc,  hyperbbc,   ROT0, "Konami", "Hyper Bishi Bashi Champ - 2 Player (GX908 1999/08/24 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1999, hyperbbck,hyperbbcj,konami573y,   hyperbbc,  hyperbbc,   ROT0, "Konami", "Hyper Bishi Bashi Champ - 2 Player (GX908 1999/08/24 VER. KAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1999, hypbbc2p, sys573,   konami573y,   hyperbbc,  hyperbbc,   ROT0, "Konami", "Hyper Bishi Bashi Champ - 2 Player (GX908 1999/08/24 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1999, hypbbc2pk,hypbbc2p, konami573y,   hyperbbc,  hyperbbc,   ROT0, "Konami", "Hyper Bishi Bashi Champ - 2 Player (GX908 1999/08/24 VER. KAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1999, dsfdct,   sys573,   pccard2dyyi,  ddr,       ddrdigital, ROT0, "Konami", "Dancing Stage featuring Dreams Come True (GC910 VER. JCA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
 GAME( 1999, dsfdcta,  dsfdct,   pccard2yyi,   ddr,       ddr,        ROT0, "Konami", "Dancing Stage featuring Dreams Come True (GC910 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1999, drmn2m,   sys573,   k573dxzi,     drmn,      drmndigital,ROT0, "Konami", "DrumMania 2nd Mix (GE912 VER. JAB)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.5 */
