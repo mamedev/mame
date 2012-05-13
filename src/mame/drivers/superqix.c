@@ -259,7 +259,7 @@ READ8_MEMBER(superqix_state::bootleg_mcu_p3_r)
 	}
 	else if ((m_port1 & 0x20) == 0)
 	{
-		return ioport("SYSTEM")->read() | (m_from_mcu_pending << 6) | (m_from_z80_pending << 7);
+		return sqix_system_status_r(space, 0);
 	}
 	else if ((m_port1 & 0x40) == 0)
 	{
@@ -270,7 +270,7 @@ READ8_MEMBER(superqix_state::bootleg_mcu_p3_r)
 	return 0;
 }
 
-READ8_MEMBER(superqix_state::sqixu_mcu_p0_r)
+READ8_MEMBER(superqix_state::sqix_system_status_r)
 {
 	return ioport("SYSTEM")->read() | (m_from_mcu_pending << 6) | (m_from_z80_pending << 7);
 }
@@ -320,7 +320,7 @@ READ8_MEMBER(superqix_state::sqixu_mcu_p3_r)
 READ8_MEMBER(superqix_state::nmi_ack_r)
 {
 	cputag_set_input_line(machine(), "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
-	return 0;
+	return sqix_system_status_r(space, 0);
 }
 
 static READ8_DEVICE_HANDLER( bootleg_in0_r )
@@ -610,19 +610,6 @@ static ADDRESS_MAP_START( sqix_port_map, AS_IO, 8, superqix_state )
 	AM_RANGE(0x8800, 0xf7ff) AM_RAM_WRITE(superqix_bitmapram2_w) AM_SHARE("bitmapram2")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bootleg_port_map, AS_IO, 8, superqix_state )
-	AM_RANGE(0x0000, 0x00ff) AM_RAM_WRITE(paletteram_BBGGRRII_byte_w) AM_SHARE("paletteram")
-	AM_RANGE(0x0401, 0x0401) AM_DEVREAD_LEGACY("ay1", ay8910_r)
-	AM_RANGE(0x0402, 0x0403) AM_DEVWRITE_LEGACY("ay1", ay8910_data_address_w)
-	AM_RANGE(0x0405, 0x0405) AM_DEVREAD_LEGACY("ay2", ay8910_r)
-	AM_RANGE(0x0406, 0x0407) AM_DEVWRITE_LEGACY("ay2", ay8910_data_address_w)
-	AM_RANGE(0x0408, 0x0408) AM_WRITE(bootleg_flipscreen_w)
-	AM_RANGE(0x0410, 0x0410) AM_WRITE(superqix_0410_w)	/* ROM bank, NMI enable, tile bank */
-	AM_RANGE(0x0418, 0x0418) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x0800, 0x77ff) AM_RAM_WRITE(superqix_bitmapram_w) AM_SHARE("bitmapram")
-	AM_RANGE(0x8800, 0xf7ff) AM_RAM_WRITE(superqix_bitmapram2_w) AM_SHARE("bitmapram2")
-ADDRESS_MAP_END
-
 
 static ADDRESS_MAP_START( m68705_map, AS_PROGRAM, 8, superqix_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
@@ -642,7 +629,7 @@ static ADDRESS_MAP_START( bootleg_mcu_io_map, AS_IO, 8, superqix_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sqixu_mcu_io_map, AS_IO, 8, superqix_state )
-	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P0) AM_READ(sqixu_mcu_p0_r)
+	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P0) AM_READ(sqix_system_status_r)
 	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READ_PORT("DSW1")
 	AM_RANGE(MCS51_PORT_P2, MCS51_PORT_P2) AM_WRITE(sqixu_mcu_p2_w)
 	AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_READWRITE(sqixu_mcu_p3_r, mcu_p3_w)
@@ -1007,24 +994,12 @@ static INTERRUPT_GEN( vblank_irq )
 		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static TIMER_DEVICE_CALLBACK( sqix_timer_irq )
+static INTERRUPT_GEN( sqix_timer_irq )
 {
-	superqix_state *state = timer.machine().driver_data<superqix_state>();
-	int scanline = param;
+	superqix_state *state = device->machine().driver_data<superqix_state>();
 
-	/* highly suspicious... */
-	if (((scanline % 64) == 0) && state->m_nmi_mask)
-		device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, ASSERT_LINE);
-}
-
-static TIMER_DEVICE_CALLBACK( sqixbl_timer_irq )
-{
-	superqix_state *state = timer.machine().driver_data<superqix_state>();
-	int scanline = param;
-
-	/* highly suspicious... */
-	if (((scanline % 64) == 0) && state->m_nmi_mask)
-		device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, PULSE_LINE);
+	if (state->m_nmi_mask)
+		device_set_input_line(device, INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 
@@ -1100,12 +1075,12 @@ static MACHINE_CONFIG_START( sqix, superqix_state )
 	MCFG_CPU_ADD("maincpu", Z80, 12000000/2)	/* 6 MHz */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(sqix_port_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", sqix_timer_irq, "screen", 0, 1) /* ??? */
+	MCFG_CPU_PERIODIC_INT(sqix_timer_irq, 4*60) /* ??? */
 
 	MCFG_CPU_ADD("mcu", I8751, 12000000/3)	/* ??? */
 	MCFG_CPU_IO_MAP(bootleg_mcu_io_map)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(30000))
+	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
 	MCFG_MACHINE_START(superqix)
 
@@ -1147,8 +1122,8 @@ static MACHINE_CONFIG_START( sqixbl, superqix_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 12000000/2)	/* 6 MHz */
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_IO_MAP(bootleg_port_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", sqixbl_timer_irq, "screen", 0, 1) /* ??? */
+	MCFG_CPU_IO_MAP(sqix_port_map)
+	MCFG_CPU_PERIODIC_INT(sqix_timer_irq, 4*60) /* ??? */
 
 	MCFG_MACHINE_START(superqix)
 

@@ -43,7 +43,7 @@ public:
 	DECLARE_WRITE8_MEMBER(bootleg_mcu_p1_w);
 	DECLARE_WRITE8_MEMBER(mcu_p3_w);
 	DECLARE_READ8_MEMBER(bootleg_mcu_p3_r);
-	DECLARE_READ8_MEMBER(sqixu_mcu_p0_r);
+	DECLARE_READ8_MEMBER(sqix_system_status_r);
 	DECLARE_WRITE8_MEMBER(sqixu_mcu_p2_w);
 	DECLARE_READ8_MEMBER(sqixu_mcu_p3_r);
 	DECLARE_READ8_MEMBER(nmi_ack_r);
