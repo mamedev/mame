@@ -149,10 +149,10 @@ static WRITE8_HANDLER( mux_w )
 		dm01.scanline[8] &= 0x80;//filter all other bits
 		if ( (row >= 0)  && (row < DM_MAXLINES) )
 		{
-			int p,pos,dots;
+			int p,pos; //,dots;
 			pos =0;
 			p = 0;
-			dots = 0;
+//			dots = 0;
 
 			while ( p < (DM_BYTESPERROW) )
 			{
