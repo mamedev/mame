@@ -255,7 +255,7 @@ Who Dunnit           1988  6809
 INPUT_CHANGED_MEMBER(exidy440_state::coin_inserted)
 {
 	/* if we got a coin, set the IRQ on the main CPU */
-	if (newval == 0)
+	if (newval)
 		cputag_set_input_line(machine(), "maincpu", 0, ASSERT_LINE);
 }
 
