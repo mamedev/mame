@@ -1087,7 +1087,7 @@ ROM_START( cdsteljn )
     ROM_LOAD( "telejan.pro",  0x000000, 0x000020, CRC(7a728c15) SHA1(13d9a9e916e483ed89d61a35c47c9d51a2bf8f0d) ) 
 
 	ROM_REGION( 0x10000, "cassette", 0 )	  /* (max) 64k for cassette image */
-    ROM_LOAD( "dt-1144-a3.bin", 0x000000, 0x007300, CRC(1336a912) SHA1(0c64e069713b411da38b43f14306953621726d35) ) 
+    ROM_LOAD( "dt-1144-a3.cas", 0x000000, 0x007300, CRC(1336a912) SHA1(0c64e069713b411da38b43f14306953621726d35) ) 
 ROM_END
 
 /* 15 Lucky Poker */
