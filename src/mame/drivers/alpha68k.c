@@ -238,16 +238,14 @@ READ16_MEMBER(alpha68k_state::kyros_dip_r)
 
 READ16_MEMBER(alpha68k_state::control_1_r)
 {
-
 	if (m_invert_controls)
 		return ~(ioport("IN0")->read() + (ioport("IN1")->read() << 8));
 
-	return (ioport("IN1")->read() << 8);
+	return ioport("IN0")->read() + (ioport("IN1")->read() << 8);
 }
 
 READ16_MEMBER(alpha68k_state::control_2_r)
 {
-
 	if (m_invert_controls)
 		return ~(ioport("IN3")->read() + ((~(1 << ioport("IN5")->read())) << 8));
 
@@ -262,7 +260,6 @@ READ16_MEMBER(alpha68k_state::control_2_V_r)
 
 READ16_MEMBER(alpha68k_state::control_3_r)
 {
-
 	if (m_invert_controls)
 		return ~(((~(1 << ioport("IN6")->read())) << 8) & 0xff00);
 
@@ -272,7 +269,6 @@ READ16_MEMBER(alpha68k_state::control_3_r)
 /* High 4 bits of CN1 & CN2 */
 READ16_MEMBER(alpha68k_state::control_4_r)
 {
-
 	if (m_invert_controls)
 		return ~((((~(1 << ioport("IN6")->read())) << 4) & 0xf000)
 		 + (((~(1 << ioport("IN5")->read()))) & 0x0f00));
@@ -316,7 +312,6 @@ WRITE16_MEMBER(alpha68k_state::alpha68k_V_sound_w)
 //AT
 WRITE16_MEMBER(alpha68k_state::paddlema_soundlatch_w)
 {
-
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_byte_w(space, 0, data);
@@ -326,7 +321,6 @@ WRITE16_MEMBER(alpha68k_state::paddlema_soundlatch_w)
 
 WRITE16_MEMBER(alpha68k_state::tnextspc_soundlatch_w)
 {
-
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_byte_w(space, 0, data);
@@ -1828,7 +1822,6 @@ static const ay8910_interface ay8910_config =
 
 WRITE8_MEMBER(alpha68k_state::porta_w)
 {
-
 	if(data == 0xff)
 		return; // skip
 
