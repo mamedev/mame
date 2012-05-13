@@ -1087,8 +1087,8 @@ void ppccom_execute_mfdcr(powerpc_state *ppc)
 	}
 
 	/* default handling */
-	mame_printf_debug("DCR %03X read\n", ppc->param0);
 	if (!ppc->dcr_read_func) {
+		mame_printf_debug("DCR %03X read\n", ppc->param0);
 		if (ppc->param0 < ARRAY_LENGTH(ppc->dcr))
 			ppc->param1 = ppc->dcr[ppc->param0];
 		else
@@ -1179,8 +1179,8 @@ void ppccom_execute_mtdcr(powerpc_state *ppc)
 	}
 
 	/* default handling */
-	mame_printf_debug("DCR %03X write = %08X\n", ppc->param0, ppc->param1);
 	if (!ppc->dcr_write_func) {
+		mame_printf_debug("DCR %03X write = %08X\n", ppc->param0, ppc->param1);
 		if (ppc->param0 < ARRAY_LENGTH(ppc->dcr))
 			ppc->dcr[ppc->param0] = ppc->param1;
 	} else {

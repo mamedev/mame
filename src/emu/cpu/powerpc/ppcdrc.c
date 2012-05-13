@@ -4430,7 +4430,7 @@ CPU_GET_INFO( ppc403gcx )
 
 
 /*-------------------------------------------------
-    ppc403gcx_init - PowerPC 403GCX-specific
+    ppc405gp_init - PowerPC 405GP-specific
     initialization
 -------------------------------------------------*/
 
@@ -4441,7 +4441,7 @@ static CPU_INIT( ppc405gp )
 
 
 /*-------------------------------------------------
-    ppc403gcx_get_info - PowerPC 403GCX-specific
+    ppc405gp_get_info - PowerPC 405GP-specific
     information getter
 -------------------------------------------------*/
 

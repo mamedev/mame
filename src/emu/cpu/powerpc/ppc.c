@@ -1950,14 +1950,14 @@ CPU_GET_INFO( ppc405 )
 		case CPUINFO_INT_REGISTER + PPC_EXISR:			info->i = EXISR;						break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(ppc403);		break;
-		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(ppc403);				break;
-		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(ppc403);				break;
-		case CPUINFO_FCT_EXIT:							info->exit = CPU_EXIT_NAME(ppc403);				break;
-		case CPUINFO_FCT_EXECUTE:						info->execute = CPU_EXECUTE_NAME(ppc403);			break;
+		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(ppc405);		break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(ppc405);				break;
+		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(ppc405);				break;
+		case CPUINFO_FCT_EXIT:							info->exit = CPU_EXIT_NAME(ppc405);				break;
+		case CPUINFO_FCT_EXECUTE:						info->execute = CPU_EXECUTE_NAME(ppc405);			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "PPC403");				break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "PPC405");				break;
 		case CPUINFO_STR_REGISTER + PPC_EXIER:			sprintf(info->s, "EXIER: %08X", EXIER); break;
 		case CPUINFO_STR_REGISTER + PPC_EXISR:			sprintf(info->s, "EXISR: %08X", EXISR); break;
 
