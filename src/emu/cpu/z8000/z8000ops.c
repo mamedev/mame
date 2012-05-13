@@ -2825,7 +2825,7 @@ static void Z3C_ssss_dddd(z8000_state *cpustate)
     CHECK_PRIVILEGED_INSTR();
 	GET_SRC(OP0,NIB2);
 	GET_DST(OP0,NIB3);
-	cpustate->RB(dst) = RDPORT_B(cpustate,  0, RDMEM_W(cpustate,  cpustate->RW(src)));
+	cpustate->RB(dst) = RDPORT_B(cpustate,  0, cpustate->RW(src));
 }
 
 /******************************************
@@ -2837,7 +2837,7 @@ static void Z3D_ssss_dddd(z8000_state *cpustate)
     CHECK_PRIVILEGED_INSTR();
 	GET_SRC(OP0,NIB2);
 	GET_DST(OP0,NIB3);
-	cpustate->RW(dst) = RDPORT_W(cpustate,  0, RDMEM_W(cpustate,  cpustate->RW(src)));
+	cpustate->RW(dst) = RDPORT_W(cpustate,  0, cpustate->RW(src));
 }
 
 /******************************************
@@ -2849,7 +2849,7 @@ static void Z3E_dddd_ssss(z8000_state *cpustate)
     CHECK_PRIVILEGED_INSTR();
 	GET_DST(OP0,NIB2);
 	GET_SRC(OP0,NIB3);
-	WRPORT_B(cpustate,  0, RDMEM_W(cpustate,  cpustate->RW(dst)), cpustate->RB(src));
+	WRPORT_B(cpustate,  0, cpustate->RW(dst), cpustate->RB(src));
 }
 
 /******************************************
@@ -2861,7 +2861,7 @@ static void Z3F_dddd_ssss(z8000_state *cpustate)
     CHECK_PRIVILEGED_INSTR();
 	GET_DST(OP0,NIB2);
 	GET_SRC(OP0,NIB3);
-	WRPORT_W(cpustate,  0, RDMEM_W(cpustate,  cpustate->RW(dst)), cpustate->RW(src));
+	WRPORT_W(cpustate,  0, cpustate->RW(dst), cpustate->RW(src));
 }
 
 /******************************************
