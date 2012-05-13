@@ -482,6 +482,8 @@ layout_element::layout_element(running_machine &machine, xml_data_node &elemnode
 			m_maxstate = 262143;
 		if (newcomp.m_type == component::CTYPE_DOTMATRIX)
 			m_maxstate = 255;
+		if (newcomp.m_type == component::CTYPE_DOTMATRIX5DOT)
+			m_maxstate = 31;
 		if (newcomp.m_type == component::CTYPE_SIMPLECOUNTER)
 		{
 			m_maxstate = xml_get_attribute_int_with_subst(machine, *compnode, "maxstate", 999);
@@ -644,8 +646,13 @@ layout_element::component::component(running_machine &machine, xml_data_node &co
 
 	// dotmatrix nodes
 	else if (strcmp(compnode.name, "dotmatrix") == 0)
+	{
 		m_type = CTYPE_DOTMATRIX;
-
+	}
+	else if (strcmp(compnode.name, "dotmatrix5dot") == 0)
+	{
+		m_type = CTYPE_DOTMATRIX5DOT;
+	}
 	// simplecounter nodes
 	else if (strcmp(compnode.name, "simplecounter") == 0)
 	{
@@ -798,7 +805,11 @@ void layout_element::component::draw(running_machine &machine, bitmap_argb32 &de
 			break;
 
 		case CTYPE_DOTMATRIX:
-			draw_dotmatrix(dest, bounds, state);
+			draw_dotmatrix(8, dest, bounds, state);
+			break;
+
+		case CTYPE_DOTMATRIX5DOT:
+			draw_dotmatrix(5, dest, bounds, state);
 			break;
 
 		case CTYPE_SIMPLECOUNTER:
@@ -1720,25 +1731,24 @@ void layout_element::component::draw_led16segsc(bitmap_argb32 &dest, const recta
 
 
 //-------------------------------------------------
-//  draw_dotmatrix - draw a row of 8 dots for a
+//  draw_dotmatrix - draw a row of dots for a
 //  dotmatrix
 //-------------------------------------------------
 
-void layout_element::component::draw_dotmatrix(bitmap_argb32 &dest, const rectangle &bounds, int pattern)
+void layout_element::component::draw_dotmatrix(int dots, bitmap_argb32 &dest, const rectangle &bounds, int pattern)
 {
 	const rgb_t onpen = MAKE_ARGB(0xff, 0xff, 0xff, 0xff);
 	const rgb_t offpen = MAKE_ARGB(0xff, 0x20, 0x20, 0x20);
 
 	// sizes for computation
-	int bmwidth = 2000;
 	int bmheight = 300;
 	int dotwidth = 250;
 
 	// allocate a temporary bitmap for drawing
-	bitmap_argb32 tempbitmap(bmwidth, bmheight);
+	bitmap_argb32 tempbitmap(dotwidth*dots, bmheight);
 	tempbitmap.fill(MAKE_ARGB(0xff, 0x00, 0x00, 0x00));
 
-	for (int i = 0; i < 8; i++)
+	for (int i = 0; i < dots; i++)
 		draw_segment_decimal(tempbitmap, ((dotwidth/2 )+ (i * dotwidth)), bmheight/2, dotwidth, (pattern & (1 << i))?onpen:offpen);
 
 	// resample to the target size
@@ -1814,7 +1824,7 @@ void layout_element::component::draw_segment_vertical(bitmap_argb32 &dest, int m
 
 //-------------------------------------------------
 //  draw_segment_diagonal_1 - draw a diagonal
-//  LED segment that looks like this: /
+//  LED segment that looks like a backslash
 //-------------------------------------------------
 
 void layout_element::component::draw_segment_diagonal_1(bitmap_argb32 &dest, int minx, int maxx, int miny, int maxy, int width, rgb_t color)
@@ -1839,7 +1849,7 @@ void layout_element::component::draw_segment_diagonal_1(bitmap_argb32 &dest, int
 
 //-------------------------------------------------
 //  draw_segment_diagonal_2 - draw a diagonal
-//  LED segment that looks like this:
+//  LED segment that looks like a forward slash
 //-------------------------------------------------
 
 void layout_element::component::draw_segment_diagonal_2(bitmap_argb32 &dest, int minx, int maxx, int miny, int maxy, int width, rgb_t color)

@@ -59,11 +59,12 @@ typedef struct _dm01
 {
 	const bfmdm01_interface *intf;
 	int		 data_avail,
-		        control,	/* motor phase */
+		        control,
 			  xcounter,
 				  busy;
 
 UINT8 scanline[DM_BYTESPERROW],
+		segbuffer[72],
 		comdata;
 
 } bfmdm01;
@@ -148,8 +149,8 @@ static WRITE8_HANDLER( mux_w )
 		dm01.scanline[8] &= 0x80;//filter all other bits
 		if ( (row >= 0)  && (row < DM_MAXLINES) )
 		{
-			int p,dots;
-
+			int p,pos,dots;
+			pos =0;
 			p = 0;
 			dots = 0;
 
@@ -157,25 +158,36 @@ static WRITE8_HANDLER( mux_w )
 			{
 
 				UINT8 d = dm01.scanline[p];
-				if (d & 0x80) dots |= 0x01;
-				else          dots &=~0x01;
-				if (d & 0x40) dots |= 0x02;
-				else          dots &=~0x02;
-				if (d & 0x20) dots |= 0x04;
-				else          dots &=~0x04;
-				if (d & 0x10) dots |= 0x08;
-				else          dots &=~0x08;
-				if (d & 0x08) dots |= 0x10;
-				else          dots &=~0x10;
-				if (d & 0x04) dots |= 0x20;
-				else          dots &=~0x20;
-				if (d & 0x02) dots |= 0x40;
-				else          dots &=~0x40;
-				if (d & 0x01) dots |= 0x80;
-				else          dots &=~0x80;
-				output_set_indexed_value("dotmatrix", p +(9*row), dots);
+				
+				for (int bitpos=0; bitpos <8; bitpos++)
+				{
+					if (d & 1<<(7-bitpos)) dm01.segbuffer[(p*8)+bitpos]=1;
+					else dm01.segbuffer[(p*8)+bitpos]=0;
+				}
+				
 				p++;
 			}
+
+			while ( pos < 13 )
+			{
+				int element =0;
+				for (int dotpos=0; dotpos <5; dotpos++)
+				{
+					if (dm01.segbuffer[(pos*5)+dotpos])
+					{
+						element |= (1<<(dotpos));
+					}
+					else
+					{
+						element &= ~(1<<(dotpos));
+					}
+
+				}
+				output_set_indexed_value("dotmatrix", pos +(13*row), element);
+				pos++;
+			}
+		
+
 		}
 	}
 }

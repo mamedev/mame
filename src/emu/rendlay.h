@@ -121,6 +121,7 @@ private:
 			CTYPE_LED14SEGSC,
 			CTYPE_LED16SEGSC,
 			CTYPE_DOTMATRIX,
+			CTYPE_DOTMATRIX5DOT,
 			CTYPE_SIMPLECOUNTER,
 			CTYPE_REEL,
 			CTYPE_MAX
@@ -139,7 +140,7 @@ private:
 		void draw_led14segsc(bitmap_argb32 &dest, const rectangle &bounds, int pattern);
 		void draw_led16seg(bitmap_argb32 &dest, const rectangle &bounds, int pattern);
 		void draw_led16segsc(bitmap_argb32 &dest, const rectangle &bounds, int pattern);
-		void draw_dotmatrix(bitmap_argb32 &dest, const rectangle &bounds, int pattern);
+		void draw_dotmatrix(int dots,bitmap_argb32 &dest, const rectangle &bounds, int pattern);
 		void draw_segment_horizontal_caps(bitmap_argb32 &dest, int minx, int maxx, int midy, int width, int caps, rgb_t color);
 		void draw_segment_horizontal(bitmap_argb32 &dest, int minx, int maxx, int midy, int width, rgb_t color);
 		void draw_segment_vertical_caps(bitmap_argb32 &dest, int miny, int maxy, int midx, int width, int caps, rgb_t color);
