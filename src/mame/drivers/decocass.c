@@ -1073,10 +1073,10 @@ ROM_START( cprogolfj )
 	DECOCASS_BIOS_A_ROMS
 
 	ROM_REGION( 0x00020, "dongle", 0 )	  /* dongle data */
-	ROM_LOAD( "dp-113 a.dgl",   0x0000, 0x0020, CRC(d8587be5) SHA1(c118033a4973994a0dcd245c22c53871dc0e98c2) )
+	ROM_LOAD( "dp-113_a.dgl",   0x0000, 0x0020, CRC(d8587be5) SHA1(c118033a4973994a0dcd245c22c53871dc0e98c2) )
 
 	ROM_REGION( 0x10000, "cassette", 0 )	  /* (max) 64k for cassette image */
-	ROM_LOAD( "dt-113 a.cas",   0x0000, 0x8000, CRC(8408248f) SHA1(8b78c379bf6879916bc9b284d7a0956edfac78be) )
+	ROM_LOAD( "dt-113_a.cas",   0x0000, 0x8000, CRC(8408248f) SHA1(8b78c379bf6879916bc9b284d7a0956edfac78be) )
 ROM_END
 
 /* 14 */
@@ -1084,7 +1084,7 @@ ROM_START( cdsteljn )
 	DECOCASS_BIOS_A_ROMS
 
 	ROM_REGION( 0x00020, "dongle", 0 )	  /* dongle data */
-	ROM_LOAD( "dp-114 a.dgl",   0x0000, 0x0020, CRC(7a728c15) SHA1(13d9a9e916e483ed89d61a35c47c9d51a2bf8f0d) )
+	ROM_LOAD( "dp-114_a.dgl",   0x0000, 0x0020, CRC(7a728c15) SHA1(13d9a9e916e483ed89d61a35c47c9d51a2bf8f0d) )
 
 	ROM_REGION( 0x10000, "cassette", 0 )	  /* (max) 64k for cassette image */
     ROM_LOAD( "dt-1144-a3.cas", 0x000000, 0x007300, CRC(1336a912) SHA1(0c64e069713b411da38b43f14306953621726d35) ) 
@@ -1241,10 +1241,10 @@ ROM_START( chamburger )
 	DECOCASS_BIOS_A_ROMS
 
 	ROM_REGION( 0x01000, "dongle", 0 )	  /* dongle data */
-	ROM_LOAD( "dp-126 a.dgl",   0x0000, 0x1000, CRC(25bec0f0) SHA1(9fb1f9699f37937421e26d4fb8fdbcd21a5ddc5c) )
+	ROM_LOAD( "dp-126_a.dgl",   0x0000, 0x1000, CRC(25bec0f0) SHA1(9fb1f9699f37937421e26d4fb8fdbcd21a5ddc5c) )
 
 	ROM_REGION( 0x10000, "cassette", 0 )	  /* (max) 64k for cassette image */
-	ROM_LOAD( "dt-126 a.cas",   0x0000, 0x8000, CRC(334fb987) SHA1(c55906bf6059686dd8a587dabbe3fb4d59200ab9) )
+	ROM_LOAD( "dt-126_a.cas",   0x0000, 0x8000, CRC(334fb987) SHA1(c55906bf6059686dd8a587dabbe3fb4d59200ab9) )
 ROM_END
 
 /* 27 Burnin' Rubber / Bump 'n' Jump */
@@ -1325,10 +1325,10 @@ ROM_START( cskater )
 	DECOCASS_BIOS_A_ROMS
 
 	ROM_REGION( 0x01000, "dongle", 0 )	  /* dongle data */
-	ROM_LOAD( "dp-130 a.dgl",   0x0000, 0x1000,  CRC(469e80a8) SHA1(f581cd534ce6faba010c6616538cdf9d96d787da) )
+	ROM_LOAD( "dp-130_a.dgl",   0x0000, 0x1000,  CRC(469e80a8) SHA1(f581cd534ce6faba010c6616538cdf9d96d787da) )
 
 	ROM_REGION( 0x10000, "cassette", 0 )	  /* (max) 64k for cassette image */
-	ROM_LOAD( "dt-130 a.bin",   0x0000, 0x8000,  CRC(1722e5e1) SHA1(e94066ead608df85d3f7310d4a81ba291da4bee6) )
+	ROM_LOAD( "dt-130_a.bin",   0x0000, 0x8000,  CRC(1722e5e1) SHA1(e94066ead608df85d3f7310d4a81ba291da4bee6) )
 ROM_END
 
 /* 31 Pro Bowling */
@@ -1378,10 +1378,10 @@ ROM_START( cpsoccerj )
 	DECOCASS_BIOS_A_ROMS
 
 	ROM_REGION( 0x01000, "dongle", 0 )	  /* dongle data */
-	ROM_LOAD( "dp-133 a.dgl",   0x0000, 0x1000,  CRC(919fabb2) SHA1(3d6a0676cea7b0be0fe69d06e04ca08c36b2851a) )
+	ROM_LOAD( "dp-133_a.dgl",   0x0000, 0x1000,  CRC(919fabb2) SHA1(3d6a0676cea7b0be0fe69d06e04ca08c36b2851a) )
 
 	ROM_REGION( 0x10000, "cassette", 0 )	  /* (max) 64k for cassette image */
-	ROM_LOAD( "dt-133 a.bin",   0x0000, 0x10000, CRC(de682a29) SHA1(2ee0dd8cb7fb595020d730a9da5d9cccda3f1264) )
+	ROM_LOAD( "dt-133_a.bin",   0x0000, 0x10000, CRC(de682a29) SHA1(2ee0dd8cb7fb595020d730a9da5d9cccda3f1264) )
 ROM_END
 
 /* 34 Super Doubles Tennis */
@@ -1389,10 +1389,10 @@ ROM_START( csdtenis )
 	DECOCASS_BIOS_A_ROMS
 
 	ROM_REGION( 0x01000, "dongle", 0 )	  /* dongle data */
-	ROM_LOAD( "dp-134 a.dgl",   0x0000, 0x1000,  CRC(e484d2f5) SHA1(ee4e4c221933d391aeed8ff7182fa931a4e01466) )
+	ROM_LOAD( "dp-134_a.dgl",   0x0000, 0x1000,  CRC(e484d2f5) SHA1(ee4e4c221933d391aeed8ff7182fa931a4e01466) )
 
 	ROM_REGION( 0x10000, "cassette", 0 )	  /* (max) 64k for cassette image */
-	ROM_LOAD( "dt-134 a.bin",   0x0000, 0x10000, CRC(9a69d961) SHA1(f88e267815ca0697708aca0ac9fa6f7664a0519c) )
+	ROM_LOAD( "dt-134_a.bin",   0x0000, 0x10000, CRC(9a69d961) SHA1(f88e267815ca0697708aca0ac9fa6f7664a0519c) )
 ROM_END
 
 /* 37 Zeroize */
@@ -1467,10 +1467,10 @@ ROM_START( coozumou )
 	DECOCASS_BIOS_A_ROMS
 
 	ROM_REGION( 0x08000, "dongle", 0 )	  /* dongle data */
-	ROM_LOAD( "dp-141 a.dgl",   0x0000, 0x8000,  CRC(bc379d2c) SHA1(bab19dcb6d68fdbd547ebab1598353f436321157) )
+	ROM_LOAD( "dp-141_a.dgl",   0x0000, 0x8000,  CRC(bc379d2c) SHA1(bab19dcb6d68fdbd547ebab1598353f436321157) )
 
 	ROM_REGION( 0x10000, "cassette", 0 )	  /* (max) 64k for cassette image */
-	ROM_LOAD( "dt-141 1a.bin",  0x0000, 0x10000, CRC(20c2e86a) SHA1(a18248ba00b847a09df0bea7752a21162af8af76) )
+	ROM_LOAD( "dt-141_1a.bin",  0x0000, 0x10000, CRC(20c2e86a) SHA1(a18248ba00b847a09df0bea7752a21162af8af76) )
 ROM_END
 
 /* 44 Boulder Dash */
