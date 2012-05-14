@@ -256,7 +256,7 @@
 #include "sound/sn76496.h"
 #include "sound/samples.h"
 #include "machine/segacrpt.h"
-#include "machine/8255ppi.h"
+#include "machine/i8255.h"
 #include "audio/segasnd.h"
 #include "includes/zaxxon.h"
 
@@ -436,7 +436,7 @@ static ADDRESS_MAP_START( zaxxon_map, AS_PROGRAM, 8, zaxxon_state )
 	AM_RANGE(0xc000, 0xc002) AM_MIRROR(0x18f8) AM_WRITE(zaxxon_coin_enable_w)
 	AM_RANGE(0xc003, 0xc004) AM_MIRROR(0x18f8) AM_WRITE(zaxxon_coin_counter_w)
 	AM_RANGE(0xc006, 0xc006) AM_MIRROR(0x18f8) AM_WRITE(zaxxon_flipscreen_w)
-	AM_RANGE(0xe03c, 0xe03f) AM_MIRROR(0x1f00) AM_DEVREADWRITE_LEGACY("ppi8255", ppi8255_r, ppi8255_w)
+	AM_RANGE(0xe03c, 0xe03f) AM_MIRROR(0x1f00) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
 	AM_RANGE(0xe0f0, 0xe0f0) AM_MIRROR(0x1f00) AM_WRITE(int_enable_w)
 	AM_RANGE(0xe0f1, 0xe0f1) AM_MIRROR(0x1f00) AM_WRITE(zaxxon_fg_color_w)
 	AM_RANGE(0xe0f8, 0xe0f9) AM_MIRROR(0x1f00) AM_WRITE(zaxxon_bg_position_w)
@@ -476,7 +476,7 @@ static ADDRESS_MAP_START( congo_sound_map, AS_PROGRAM, 8, zaxxon_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_MIRROR(0x1800) AM_RAM
 	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x1fff) AM_DEVWRITE_LEGACY("sn1", sn76496_w)
-	AM_RANGE(0x8000, 0x8003) AM_MIRROR(0x1ffc) AM_DEVREADWRITE_LEGACY("ppi8255", ppi8255_r, ppi8255_w)
+	AM_RANGE(0x8000, 0x8003) AM_MIRROR(0x1ffc) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
 	AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x1fff) AM_DEVWRITE_LEGACY("sn2", sn76496_w)
 ADDRESS_MAP_END
 
@@ -860,25 +860,24 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static const ppi8255_interface zaxxon_ppi_intf =
+static I8255A_INTERFACE( zaxxon_ppi_intf )
 {
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_HANDLER(zaxxon_sound_a_w),
-	DEVCB_HANDLER(zaxxon_sound_b_w),
-	DEVCB_HANDLER(zaxxon_sound_c_w)
+	DEVCB_NULL,							/* Port A read */
+	DEVCB_HANDLER(zaxxon_sound_a_w),	/* Port A write */
+	DEVCB_NULL,							/* Port B read */
+	DEVCB_HANDLER(zaxxon_sound_b_w),	/* Port B write */
+	DEVCB_NULL,							/* Port C read */
+	DEVCB_HANDLER(zaxxon_sound_c_w)		/* Port C write */
 };
 
-
-static const ppi8255_interface congo_ppi_intf =
+static I8255A_INTERFACE( congo_ppi_intf )
 {
-	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_byte_r),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_HANDLER(congo_sound_b_w),
-	DEVCB_HANDLER(congo_sound_c_w)
+	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_byte_r),	/* Port A read */
+	DEVCB_NULL,						/* Port A write */
+	DEVCB_NULL,						/* Port B read */
+	DEVCB_HANDLER(congo_sound_b_w),	/* Port B write */
+	DEVCB_NULL,						/* Port C read */
+	DEVCB_HANDLER(congo_sound_c_w)	/* Port C write */
 };
 
 
@@ -928,7 +927,7 @@ static MACHINE_CONFIG_START( root, zaxxon_state )
 
 	MCFG_MACHINE_START(zaxxon)
 
-	MCFG_PPI8255_ADD( "ppi8255", zaxxon_ppi_intf )
+	MCFG_I8255A_ADD( "ppi8255", zaxxon_ppi_intf )
 
 	/* video hardware */
 	MCFG_GFXDECODE(zaxxon)
@@ -981,7 +980,8 @@ static MACHINE_CONFIG_DERIVED( congo, root )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(congo_map)
 
-	MCFG_PPI8255_RECONFIG( "ppi8255", congo_ppi_intf )
+	MCFG_DEVICE_REMOVE("ppi8255")
+	MCFG_I8255A_ADD( "ppi8255", congo_ppi_intf )
 
 	MCFG_CPU_ADD("audiocpu", Z80, SOUND_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(congo_sound_map)

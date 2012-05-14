@@ -10,7 +10,7 @@
 #include "emu.h"
 #include "cpu/mcs48/mcs48.h"
 #include "includes/segag80r.h"
-#include "machine/8255ppi.h"
+#include "machine/i8255.h"
 #include "machine/i8243.h"
 #include "sound/samples.h"
 #include "sound/tms36xx.h"
@@ -402,20 +402,20 @@ static const samples_interface sega005_samples_interface =
 };
 
 
-static const ppi8255_interface ppi8255_005_intf =
+static I8255A_INTERFACE( ppi8255_005_intf )
 {
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_HANDLER(sega005_sound_a_w),
-	DEVCB_HANDLER(sega005_sound_b_w),
-	DEVCB_NULL
+	DEVCB_NULL,							/* Port A read */
+	DEVCB_HANDLER(sega005_sound_a_w),	/* Port A write */
+	DEVCB_NULL,							/* Port B read */
+	DEVCB_HANDLER(sega005_sound_b_w),	/* Port B write */
+	DEVCB_NULL,							/* Port C read */
+	DEVCB_NULL							/* Port C write */
 };
 
 
 MACHINE_CONFIG_FRAGMENT( 005_sound_board )
 
-	MCFG_PPI8255_ADD( "ppi8255", ppi8255_005_intf )
+	MCFG_I8255A_ADD( "ppi8255", ppi8255_005_intf )
 
 	/* sound hardware */
 	MCFG_SOUND_START(sega005)
@@ -812,20 +812,20 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static const ppi8255_interface monsterb_ppi_intf =
+static I8255A_INTERFACE( monsterb_ppi_intf )
 {
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_HANDLER(n7751_status_r),
-	DEVCB_HANDLER(monsterb_sound_a_w),
-	DEVCB_HANDLER(monsterb_sound_b_w),
-	DEVCB_HANDLER(n7751_command_w)
+	DEVCB_NULL,							/* Port A read */
+	DEVCB_HANDLER(monsterb_sound_a_w),	/* Port A write */
+	DEVCB_NULL,							/* Port B read */
+	DEVCB_HANDLER(monsterb_sound_b_w),	/* Port B write */
+	DEVCB_HANDLER(n7751_status_r),		/* Port C read */
+	DEVCB_HANDLER(n7751_command_w)		/* Port C write */
 };
 
 
 MACHINE_CONFIG_FRAGMENT( monsterb_sound_board )
 
-	MCFG_PPI8255_ADD( "ppi8255", monsterb_ppi_intf )
+	MCFG_I8255A_ADD( "ppi8255", monsterb_ppi_intf )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("audiocpu", N7751, 6000000)

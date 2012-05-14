@@ -111,7 +111,7 @@
 #include "sound/samples.h"
 #include "sound/sp0250.h"
 #include "audio/segasnd.h"
-#include "machine/8255ppi.h"
+#include "machine/i8255.h"
 #include "machine/segacrpt.h"
 #include "machine/segag80.h"
 #include "includes/segag80r.h"
@@ -314,16 +314,15 @@ static WRITE8_DEVICE_HANDLER( sindbadm_SN76496_w )
  *
  *************************************/
 
-static const ppi8255_interface sindbadm_ppi_intf =
+static I8255A_INTERFACE( sindbadm_ppi_intf )
 {
-	DEVCB_NULL,
-	DEVCB_INPUT_PORT("FC"),
-	DEVCB_NULL,
-	DEVCB_HANDLER(sindbadm_soundport_w),
-	DEVCB_NULL,
-	DEVCB_HANDLER(sindbadm_misc_w)
+	DEVCB_NULL,								/* Port A read */
+	DEVCB_HANDLER(sindbadm_soundport_w),	/* Port A write */
+	DEVCB_INPUT_PORT("FC"),					/* Port B read */
+	DEVCB_NULL,								/* Port B write */
+	DEVCB_NULL,								/* Port C read */
+	DEVCB_HANDLER(sindbadm_misc_w)			/* Port C write */
 };
-
 
 
 /*************************************
@@ -354,7 +353,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( main_ppi8255_portmap, AS_IO, 8, segag80r_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE_LEGACY("ppi8255", ppi8255_r, ppi8255_w)
+	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
 	AM_RANGE(0xbe, 0xbf) AM_READWRITE(segag80r_video_port_r, segag80r_video_port_w)
 	AM_RANGE(0xf9, 0xf9) AM_MIRROR(0x04) AM_WRITE(coin_count_w)
 	AM_RANGE(0xf8, 0xfb) AM_READ(mangled_ports_r)
@@ -365,7 +364,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sindbadm_portmap, AS_IO, 8, segag80r_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x42, 0x43) AM_READWRITE(segag80r_video_port_r, segag80r_video_port_w)
-	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE_LEGACY("ppi8255", ppi8255_r, ppi8255_w)
+	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
 	AM_RANGE(0xf8, 0xfb) AM_READ(mangled_ports_r)
 ADDRESS_MAP_END
 
@@ -918,7 +917,7 @@ static MACHINE_CONFIG_DERIVED( sindbadm, g80r_base )
 	MCFG_CPU_IO_MAP(sindbadm_portmap)
 	MCFG_CPU_VBLANK_INT("screen", sindbadm_vblank_start)
 
-	MCFG_PPI8255_ADD( "ppi8255", sindbadm_ppi_intf )
+	MCFG_I8255A_ADD( "ppi8255", sindbadm_ppi_intf )
 
 	/* video hardware */
 	MCFG_GFXDECODE(monsterb)
