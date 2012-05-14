@@ -739,7 +739,7 @@ ROM_END
 
 ROM_START( butasan ) /* English "subtitle" of Butasan for Japanese region.  Original Jaleco PCB */
 	ROM_REGION( 0x30000, "maincpu", 0 ) 					/* Main CPU */
-	ROM_LOAD( "4.t2",    0x00000, 0x10000, CRC(937dabed) SHA1(23058b07cc2973b3b7a4b0bcdab43c3db605a54e) ) /* overdump?  1+2 half identical */
+	ROM_LOAD( "4.t2",    0x00000, 0x08000, CRC(1ba1d8e4) SHA1(ab141a1fbaab9f3ef6788b131833effb32c42930) ) /* M5L27256K-2 (32kb) - 4.4.bin */
 	ROM_LOAD( "3.s2",    0x10000, 0x10000, CRC(a6b3ccc2) SHA1(fcc9db1cd68fd9477d86e63e6906d194d5ee477a) )
 	ROM_LOAD( "2.p2",    0x20000, 0x10000, CRC(96517fa9) SHA1(03ee1f118f109c85b046098c457a90b40e163f3c) )
 
