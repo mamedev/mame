@@ -13257,20 +13257,20 @@ GAME( 200?, sc5dndwif	,sc5dndwi,	sc5, sc5, sc5, ROT0, "BFM","Deal Or No Deal Wha
 GAME( 200?, sc5dndwig	,sc5dndwi,	sc5, sc5, sc5, ROT0, "BFM","Deal Or No Deal What's In Your Box Casino (Bellfruit) (Scorpion 5) (set 8)", GAME_IS_SKELETON_MECHANICAL )
 
 // PR1307 AWP DIAMOND MINE         PR1307 DIAM MINE SOUNDS11
-GAME( 200?, sc5dmine	,0,			sc5, sc5, sc5, ROT0, "BFM","Diamond Mine (Bellfruit) (Scorpion 5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc5dminea	,sc5dmine,	sc5, sc5, sc5, ROT0, "BFM","Diamond Mine (Bellfruit) (Scorpion 5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc5dmineb	,sc5dmine,	sc5, sc5, sc5, ROT0, "BFM","Diamond Mine (Bellfruit) (Scorpion 5) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc5dminec	,sc5dmine,	sc5, sc5, sc5, ROT0, "BFM","Diamond Mine (Bellfruit) (Scorpion 5) (set 4)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc5dmined	,sc5dmine,	sc5, sc5, sc5, ROT0, "BFM","Diamond Mine (Bellfruit) (Scorpion 5) (set 5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc5dminee	,sc5dmine,	sc5, sc5, sc5, ROT0, "BFM","Diamond Mine (Bellfruit) (Scorpion 5) (set 6)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc5dminef	,sc5dmine,	sc5, sc5, sc5, ROT0, "BFM","Diamond Mine (Bellfruit) (Scorpion 5) (set 7)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc5dmineg	,sc5dmine,	sc5, sc5, sc5, ROT0, "BFM","Diamond Mine (Bellfruit) (Scorpion 5) (set 8)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc5dmineh	,sc5dmine,	sc5, sc5, sc5, ROT0, "BFM","Diamond Mine (Bellfruit) (Scorpion 5) (set 9)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc5dminei	,sc5dmine,	sc5, sc5, sc5, ROT0, "BFM","Diamond Mine (Bellfruit) (Scorpion 5) (set 10)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 2002, sc5dmine	,0,			sc5, sc5, sc5, ROT0, "BFM","Diamond Mine (Bellfruit) (Scorpion 5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 2002, sc5dminea	,sc5dmine,	sc5, sc5, sc5, ROT0, "BFM","Diamond Mine (Bellfruit) (Scorpion 5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 2002, sc5dmineb	,sc5dmine,	sc5, sc5, sc5, ROT0, "BFM","Diamond Mine (Bellfruit) (Scorpion 5) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 2002, sc5dminec	,sc5dmine,	sc5, sc5, sc5, ROT0, "BFM","Diamond Mine (Bellfruit) (Scorpion 5) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 2002, sc5dmined	,sc5dmine,	sc5, sc5, sc5, ROT0, "BFM","Diamond Mine (Bellfruit) (Scorpion 5) (set 5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 2002, sc5dminee	,sc5dmine,	sc5, sc5, sc5, ROT0, "BFM","Diamond Mine (Bellfruit) (Scorpion 5) (set 6)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 2002, sc5dminef	,sc5dmine,	sc5, sc5, sc5, ROT0, "BFM","Diamond Mine (Bellfruit) (Scorpion 5) (set 7)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 2002, sc5dmineg	,sc5dmine,	sc5, sc5, sc5, ROT0, "BFM","Diamond Mine (Bellfruit) (Scorpion 5) (set 8)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 2002, sc5dmineh	,sc5dmine,	sc5, sc5, sc5, ROT0, "BFM","Diamond Mine (Bellfruit) (Scorpion 5) (set 9)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 2002, sc5dminei	,sc5dmine,	sc5, sc5, sc5, ROT0, "BFM","Diamond Mine (Bellfruit) (Scorpion 5) (set 10)", GAME_IS_SKELETON_MECHANICAL )
 // PR1307 AWP DIAMOND MINE         PR1307 DIAM MINE SOUNDS11         DIAMOND MINE  S.SITE
-GAME( 200?, sc5dminej	,sc5dmine,	sc5, sc5, sc5, ROT0, "BFM","Diamond Mine (Bellfruit) (Scorpion 5) (set 11)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc5dminek	,sc5dmine,	sc5, sc5, sc5, ROT0, "BFM","Diamond Mine (Bellfruit) (Scorpion 5) (set 12)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc5dminel	,sc5dmine,	sc5, sc5, sc5, ROT0, "BFM","Diamond Mine (Bellfruit) (Scorpion 5) (set 13)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 2002, sc5dminej	,sc5dmine,	sc5, sc5, sc5, ROT0, "BFM","Diamond Mine (Bellfruit) (Scorpion 5) (set 11)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 2002, sc5dminek	,sc5dmine,	sc5, sc5, sc5, ROT0, "BFM","Diamond Mine (Bellfruit) (Scorpion 5) (set 12)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 2002, sc5dminel	,sc5dmine,	sc5, sc5, sc5, ROT0, "BFM","Diamond Mine (Bellfruit) (Scorpion 5) (set 13)", GAME_IS_SKELETON_MECHANICAL )
 
 // PR1394 AWP DOCTOR DOSH SCORP5         PR1309 DOCTOR DOSH SOUNDS11
 GAME( 200?, sc5ddosh	,0,			sc5, sc5, sc5, ROT0, "BFM","Doctor Dosh (Bellfruit) (Scorpion 5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
