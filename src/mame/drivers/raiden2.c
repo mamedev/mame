@@ -1104,7 +1104,7 @@ static MACHINE_RESET(xsedae)
 	sprcpt_init();
 	MACHINE_RESET_CALL(seibu_sound);
 
-	state->membank("mainbank")->set_entry(1);
+	//state->membank("mainbank")->set_entry(1);
 
 	//cop_init();
 }
