@@ -316,7 +316,7 @@
 #include "cpu/z80/z80.h"
 #include "machine/eeprom.h"
 #include "sound/ay8910.h"
-#include "machine/8255ppi.h"
+#include "machine/i8255.h"
 #include "machine/v3021.h"
 #include "video/mc6845.h"
 #include "machine/nvram.h"
@@ -445,17 +445,15 @@ static READ8_DEVICE_HANDLER( ppi0_portc_r )
 	return ((eeprom->read_bit()<<4) & 0x10);
 }
 
-static const ppi8255_interface ppi0intf =
+static I8255A_INTERFACE( ppi8255_intf )
 {
-/*  Init with 0x9a... A, B and high C as input
-    Serial Eprom connected to Port C
-*/
-
-	DEVCB_INPUT_PORT("SYSTEM"),	/* Port A read */
-	DEVCB_INPUT_PORT("INPUT"),	/* Port B read */
+	/*  Init with 0x9a... A, B and high C as input
+	 Serial Eprom connected to Port C */
+	DEVCB_INPUT_PORT("SYSTEM"),						/* Port A read */
+	DEVCB_NULL,										/* Port A write */
+	DEVCB_INPUT_PORT("INPUT"),						/* Port B read */
+	DEVCB_NULL,										/* Port B write */
 	DEVCB_DEVICE_HANDLER("eeprom", ppi0_portc_r),	/* Port C read */
-	DEVCB_NULL,					/* Port A write */
-	DEVCB_NULL,					/* Port B write */
 	DEVCB_DEVICE_HANDLER("eeprom", ppi0_portc_w)	/* Port C write */
 };
 
@@ -570,7 +568,7 @@ static ADDRESS_MAP_START( fortecar_ports, AS_IO, 8, fortecar_state )
 	AM_RANGE(0x21, 0x21) AM_DEVWRITE("crtc", mc6845_device, register_w)
 	AM_RANGE(0x40, 0x40) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
 	AM_RANGE(0x40, 0x41) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
-	AM_RANGE(0x60, 0x63) AM_DEVREADWRITE_LEGACY("fcppi0", ppi8255_r, ppi8255_w)//M5L8255AP
+	AM_RANGE(0x60, 0x63) AM_DEVREADWRITE("fcppi0", i8255_device, read, write)//M5L8255AP
 //  AM_RANGE(0x80, 0x81) //8251A UART
 	AM_RANGE(0xa0, 0xa0) AM_DEVREADWRITE("rtc", v3021_device, read, write)
 	AM_RANGE(0xa1, 0xa1) AM_READ_PORT("DSW")
@@ -701,7 +699,7 @@ static MACHINE_CONFIG_START( fortecar, fortecar_state )
 	MCFG_EEPROM_ADD("eeprom", forte_eeprom_intf)
 	MCFG_EEPROM_DEFAULT_VALUE(0)
 
-	MCFG_PPI8255_ADD("fcppi0", ppi0intf)
+	MCFG_I8255A_ADD( "fcppi0", ppi8255_intf )
 	MCFG_V3021_ADD("rtc")
 
 	MCFG_GFXDECODE(fortecar)

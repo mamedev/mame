@@ -235,7 +235,7 @@
 #include "sound/ay8910.h"
 #include "machine/6522via.h"
 #include "machine/6821pia.h"
-#include "machine/8255ppi.h"
+#include "machine/i8255.h"
 #include "sound/samples.h"
 #include "machine/mc146818.h" // DALLAS1287 is functionally compatible.
 #include "machine/nvram.h"
@@ -897,7 +897,7 @@ static ADDRESS_MAP_START( aristmk4_map, AS_PROGRAM, 8, aristmk4_state )
 	AM_RANGE(0x5201, 0x5201) AM_READ_PORT("5201")
 	AM_RANGE(0x52c0, 0x52c0) AM_READ(bv_p0)
 	AM_RANGE(0x52c1, 0x52c1) AM_READ(bv_p1)
-	AM_RANGE(0x527f, 0x5281) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w)
+	AM_RANGE(0x527f, 0x5281) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
 	AM_RANGE(0x5300, 0x5300) AM_READ_PORT("5300")
 	AM_RANGE(0x5380, 0x5383) AM_DEVREADWRITE("pia6821_0", pia6821_device, read, write)  // RTC data - PORT A , mechanical meters - PORTB ??
 	AM_RANGE(0x5440, 0x5440) AM_WRITE(mlamps) // take win and gamble lamps
@@ -940,7 +940,7 @@ static ADDRESS_MAP_START( aristmk4_poker_map, AS_PROGRAM, 8, aristmk4_state )
 	AM_RANGE(0x5201, 0x5201) AM_READ_PORT("5201")
 	AM_RANGE(0x52c0, 0x52c0) AM_READ(bv_p0)
 	AM_RANGE(0x52c1, 0x52c1) AM_READ(bv_p1)
-	AM_RANGE(0x527f, 0x5281) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w)
+	AM_RANGE(0x527f, 0x5281) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
 	AM_RANGE(0x5300, 0x5300) AM_READ_PORT("5300")
 	AM_RANGE(0x5380, 0x5383) AM_DEVREADWRITE("pia6821_0", pia6821_device, read, write)  // RTC data - PORT A , mechanical meters - PORTB ??
 	AM_RANGE(0x5440, 0x5440) AM_WRITE(mlamps) // take win and gamble lamps
@@ -1574,15 +1574,16 @@ static READ8_DEVICE_HANDLER(pc1_r)
 	return 0;
 }
 
-static const ppi8255_interface ppi8255_intf1 =
+static I8255A_INTERFACE( ppi8255_intf )
 {
-	DEVCB_HANDLER(pa1_r),
-	DEVCB_HANDLER(pb1_r),
-	DEVCB_HANDLER(pc1_r),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
+	DEVCB_HANDLER(pa1_r),				/* Port A read */
+	DEVCB_NULL,							/* Port A write */
+	DEVCB_HANDLER(pb1_r),				/* Port B read */
+	DEVCB_NULL,							/* Port B write */
+	DEVCB_HANDLER(pc1_r),				/* Port C read */
+	DEVCB_NULL							/* Port C write */
 };
+
 
 /* same as Casino Winner HW */
 static PALETTE_INIT( aristmk4 )
@@ -1690,7 +1691,7 @@ static MACHINE_CONFIG_START( aristmk4, aristmk4_state )
 	MCFG_VIDEO_START(aristmk4)
 	MCFG_SCREEN_UPDATE_STATIC(aristmk4)
 
-	MCFG_PPI8255_ADD( "ppi8255_0", ppi8255_intf1 )
+	MCFG_I8255A_ADD( "ppi8255_0", ppi8255_intf )
 	MCFG_VIA6522_ADD("via6522_0", 0, via_interface)	/* 1 MHz.(only 1 or 2 MHz.are valid) */
 	MCFG_PIA6821_ADD("pia6821_0", aristmk4_pia1_intf)
 	MCFG_MC6845_ADD("crtc", C6545_1, MAIN_CLOCK/8, mc6845_intf) // TODO: type is unknown

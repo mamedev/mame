@@ -71,7 +71,7 @@ NOTE: Trivia Question rom names are the internal names used. IE: read from the f
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "machine/8255ppi.h"
+#include "machine/i8255.h"
 #include "machine/ticket.h"
 #include "machine/nvram.h"
 #include "sound/dac.h"
@@ -432,8 +432,8 @@ static ADDRESS_MAP_START( getrivia_map, AS_PROGRAM, 8, gei_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x4800, 0x4803) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w)
-	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE_LEGACY("ppi8255_1", ppi8255_r, ppi8255_w)
+	AM_RANGE(0x4800, 0x4803) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
+	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
 	AM_RANGE(0x600f, 0x600f) AM_WRITE(banksel_5_1_w)
 	AM_RANGE(0x6017, 0x6017) AM_WRITE(banksel_4_1_w)
 	AM_RANGE(0x601b, 0x601b) AM_WRITE(banksel_3_1_w)
@@ -458,8 +458,8 @@ static ADDRESS_MAP_START( gselect_map, AS_PROGRAM, 8, gei_state )
 	AM_RANGE(0x4401, 0x4401) AM_WRITE(banksel_1_2_w)
 	AM_RANGE(0x4402, 0x4402) AM_WRITE(banksel_2_1_w)
 	AM_RANGE(0x4403, 0x4403) AM_WRITE(banksel_2_2_w)
-	AM_RANGE(0x4800, 0x4803) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w)
-	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE_LEGACY("ppi8255_1", ppi8255_r, ppi8255_w)
+	AM_RANGE(0x4800, 0x4803) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
+	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
 	AM_RANGE(0x8000, 0x8002) AM_WRITE(gei_drawctrl_w)
 	AM_RANGE(0xc000, 0xffff) AM_RAM_WRITE(gei_bitmap_w)
 ADDRESS_MAP_END
@@ -469,8 +469,8 @@ static ADDRESS_MAP_START( amuse_map, AS_PROGRAM, 8, gei_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x4800, 0x4803) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w)
-	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE_LEGACY("ppi8255_1", ppi8255_r, ppi8255_w)
+	AM_RANGE(0x4800, 0x4803) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
+	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
 	AM_RANGE(0x606f, 0x606f) AM_WRITE(banksel_5_1_w)
 	AM_RANGE(0x6077, 0x6077) AM_WRITE(banksel_4_1_w)
 	AM_RANGE(0x607b, 0x607b) AM_WRITE(banksel_3_1_w)
@@ -485,8 +485,8 @@ static ADDRESS_MAP_START( gepoker_map, AS_PROGRAM, 8, gei_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x4800, 0x4803) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w)
-	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE_LEGACY("ppi8255_1", ppi8255_r, ppi8255_w)
+	AM_RANGE(0x4800, 0x4803) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
+	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
 	AM_RANGE(0x60ef, 0x60ef) AM_WRITE(banksel_3_1_w)
 	AM_RANGE(0x60f7, 0x60f7) AM_WRITE(banksel_2_2_w)
 	AM_RANGE(0x60fb, 0x60fb) AM_WRITE(banksel_2_1_w)
@@ -506,8 +506,8 @@ static ADDRESS_MAP_START( amuse1_map, AS_PROGRAM, 8, gei_state )
 	AM_RANGE(0x4401, 0x4401) AM_WRITE(banksel_2_1_w)
 	AM_RANGE(0x4402, 0x4402) AM_WRITE(banksel_3_1_w)
 	AM_RANGE(0x4403, 0x4403) AM_WRITE(banksel_4_1_w)
-	AM_RANGE(0x4800, 0x4803) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w)
-	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE_LEGACY("ppi8255_1", ppi8255_r, ppi8255_w)
+	AM_RANGE(0x4800, 0x4803) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
+	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
 	AM_RANGE(0x5800, 0x5fff) AM_ROM
 	AM_RANGE(0x8000, 0x8002) AM_WRITE(gei_drawctrl_w)
 	AM_RANGE(0x8000, 0xbfff) AM_ROM /* space for diagnostic ROM? */
@@ -518,8 +518,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( findout_map, AS_PROGRAM, 8, gei_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x4800, 0x4803) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r,ppi8255_w)
-	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE_LEGACY("ppi8255_1", ppi8255_r,ppi8255_w)
+	AM_RANGE(0x4800, 0x4803) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
+	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
 	/* banked ROMs are enabled by low 6 bits of the address */
 	AM_RANGE(0x601f, 0x601f) AM_WRITE(banksel_main_w)
 	AM_RANGE(0x602f, 0x602f) AM_WRITE(banksel_5_w)
@@ -539,8 +539,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( quizvid_map, AS_PROGRAM, 8, gei_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x4800, 0x4803) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r,ppi8255_w)
-	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE_LEGACY("ppi8255_1", ppi8255_r,ppi8255_w)
+	AM_RANGE(0x4800, 0x4803) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
+	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
 	/* banked ROMs are enabled by low 6 bits of the address */
 	AM_RANGE(0x602f, 0x602f) AM_READ(banksel_5_r)
 	AM_RANGE(0x6037, 0x6037) AM_READ(banksel_4_r)
@@ -557,8 +557,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( suprpokr_map, AS_PROGRAM, 8, gei_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x4800, 0x4803) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w)
-	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE_LEGACY("ppi8255_1", ppi8255_r, ppi8255_w)
+	AM_RANGE(0x4800, 0x4803) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
+	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
 	AM_RANGE(0x6200, 0x6200) AM_WRITE(signature2_w)
 	AM_RANGE(0x6400, 0x6400) AM_READ(signature_r)
 	AM_RANGE(0x8000, 0x8002) AM_WRITE(gei_drawctrl_w)
@@ -569,8 +569,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( geimulti_map, AS_PROGRAM, 8, gei_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x4800, 0x4803) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w)
-	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE_LEGACY("ppi8255_1", ppi8255_r, ppi8255_w)
+	AM_RANGE(0x4800, 0x4803) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
+	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
 	AM_RANGE(0x5800, 0x5fff) AM_ROM
 	AM_RANGE(0x5a00, 0x5cff) AM_WRITE(geimulti_bank_w)
 	AM_RANGE(0x6000, 0x7fff) AM_ROM
@@ -582,8 +582,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sprtauth_map, AS_PROGRAM, 8, gei_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x4800, 0x4803) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w)
-	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE_LEGACY("ppi8255_1", ppi8255_r, ppi8255_w)
+	AM_RANGE(0x4800, 0x4803) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
+	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
 	AM_RANGE(0x5600, 0x5600) AM_READ(signature_r)
 	AM_RANGE(0x5800, 0x5800) AM_WRITE(signature_w)
 	AM_RANGE(0x5a00, 0x5cff) AM_WRITE(geimulti_bank_w)
@@ -1050,65 +1050,56 @@ static INPUT_PORTS_START(sprtauth)
 
 INPUT_PORTS_END
 
-static const ppi8255_interface getrivia_ppi8255_intf[2] =
+static I8255A_INTERFACE( getrivia_ppi8255_0_intf )
 {
-	{
-		DEVCB_INPUT_PORT("DSWA"),	/* Port A read */
-		DEVCB_INPUT_PORT("IN0"),	/* Port B read */
-		DEVCB_NULL,					/* Port C read */
-		DEVCB_NULL,					/* Port A write */
-		DEVCB_NULL,					/* Port B write */
-		DEVCB_HANDLER(sound_w)		/* Port C write */
-	},
-	{
-		DEVCB_INPUT_PORT("IN1"),	/* Port A read */
-		DEVCB_NULL,					/* Port B read */
-		DEVCB_NULL,					/* Port C read */
-		DEVCB_NULL,					/* Port A write */
-		DEVCB_HANDLER(lamps_w),		/* Port B write */
-		DEVCB_HANDLER(lamps2_w)		/* Port C write */
-	}
+	DEVCB_INPUT_PORT("DSWA"),		/* Port A read */
+	DEVCB_NULL,						/* Port A write */
+	DEVCB_INPUT_PORT("IN0"),		/* Port B read */
+	DEVCB_NULL,						/* Port B write */
+	DEVCB_NULL,						/* Port C read */
+	DEVCB_HANDLER(sound_w)			/* Port C write */
 };
-
-static const ppi8255_interface gselect_ppi8255_intf[2] =
+											 
+static I8255A_INTERFACE( getrivia_ppi8255_1_intf )
 {
-	{
-		DEVCB_INPUT_PORT("DSWA"),	/* Port A read */
-		DEVCB_INPUT_PORT("IN0"),	/* Port B read */
-		DEVCB_NULL,					/* Port C read */
-		DEVCB_NULL,					/* Port A write */
-		DEVCB_NULL,					/* Port B write */
-		DEVCB_HANDLER(sound2_w)				/* Port C write */
-	},
-	{
-		DEVCB_INPUT_PORT("IN1"),	/* Port A read */
-		DEVCB_NULL,					/* Port B read */
-		DEVCB_INPUT_PORT("IN2"),	/* Port C read */
-		DEVCB_NULL,					/* Port A write */
-		DEVCB_HANDLER(lamps_w),		/* Port B write */
-		DEVCB_HANDLER(nmi_w)		/* Port C write */
-	}
+	DEVCB_INPUT_PORT("IN1"),		/* Port A read */
+	DEVCB_NULL,						/* Port A write */
+	DEVCB_NULL,						/* Port B read */
+	DEVCB_HANDLER(lamps_w),			/* Port B write */
+	DEVCB_NULL,						/* Port C read */
+	DEVCB_HANDLER(lamps2_w)			/* Port C write */
 };
-
-static const ppi8255_interface findout_ppi8255_intf[2] =
+											 
+static I8255A_INTERFACE( gselect_ppi8255_0_intf )
 {
-	{
-		DEVCB_INPUT_PORT("DSWA"),		/* Port A read */
-		DEVCB_INPUT_PORT("IN0"),		/* Port B read */
-		DEVCB_NULL,						/* Port C read */
-		DEVCB_NULL,						/* Port A write */
-		DEVCB_NULL,						/* Port B write */
-		DEVCB_HANDLER(sound_w),			/* Port C write */
-	},
-	{
-		DEVCB_INPUT_PORT("IN1"),		/* Port A read */
-		DEVCB_NULL,						/* Port B read */
-		DEVCB_HANDLER(portC_r),			/* Port C read */
-		DEVCB_NULL,						/* Port A write */
-		DEVCB_HANDLER(lamps_w),			/* Port B write */
-		DEVCB_NULL						/* Port C write */
-	}
+	DEVCB_INPUT_PORT("DSWA"),		/* Port A read */
+	DEVCB_NULL,						/* Port A write */
+	DEVCB_INPUT_PORT("IN0"),		/* Port B read */
+	DEVCB_NULL,						/* Port B write */
+	DEVCB_NULL,						/* Port C read */
+	DEVCB_HANDLER(sound2_w)			/* Port C write */
 };
+											 
+static I8255A_INTERFACE( gselect_ppi8255_1_intf )
+{
+	DEVCB_INPUT_PORT("IN1"),		/* Port A read */
+	DEVCB_NULL,						/* Port A write */
+	DEVCB_NULL,						/* Port B read */
+	DEVCB_HANDLER(lamps_w),			/* Port B write */
+	DEVCB_INPUT_PORT("IN2"),		/* Port C read */
+	DEVCB_HANDLER(nmi_w)			/* Port C write */
+};
+											 
+static I8255A_INTERFACE( findout_ppi8255_1_intf )
+{
+	DEVCB_INPUT_PORT("IN1"),		/* Port A read */
+	DEVCB_NULL,						/* Port A write */
+	DEVCB_NULL,						/* Port B read */
+	DEVCB_HANDLER(lamps_w),			/* Port B write */
+	DEVCB_HANDLER(portC_r),			/* Port C read */
+	DEVCB_NULL						/* Port C write */
+};
+											 											 
 
 static INTERRUPT_GEN( vblank_irq )
 {
@@ -1137,8 +1128,8 @@ static MACHINE_CONFIG_START( getrivia, gei_state )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_PPI8255_ADD( "ppi8255_0", getrivia_ppi8255_intf[0] )
-	MCFG_PPI8255_ADD( "ppi8255_1", getrivia_ppi8255_intf[1] )
+	MCFG_I8255A_ADD( "ppi8255_0", getrivia_ppi8255_0_intf )
+	MCFG_I8255A_ADD( "ppi8255_1", getrivia_ppi8255_1_intf )
 	MCFG_TICKET_DISPENSER_ADD("ticket", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
 
 	/* sound hardware */
@@ -1153,8 +1144,8 @@ static MACHINE_CONFIG_DERIVED( findout, getrivia )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(findout_map)
 
-	MCFG_PPI8255_RECONFIG( "ppi8255_0", findout_ppi8255_intf[0] )
-	MCFG_PPI8255_RECONFIG( "ppi8255_1", findout_ppi8255_intf[1] )
+	MCFG_DEVICE_REMOVE("ppi8255_1")
+	MCFG_I8255A_ADD( "ppi8255_1", findout_ppi8255_1_intf )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( quizvid, findout )
@@ -1174,8 +1165,10 @@ static MACHINE_CONFIG_DERIVED( gselect, getrivia )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(gselect_map)
 
-	MCFG_PPI8255_RECONFIG( "ppi8255_0", gselect_ppi8255_intf[0] )
-	MCFG_PPI8255_RECONFIG( "ppi8255_1", gselect_ppi8255_intf[1] )
+	MCFG_DEVICE_REMOVE("ppi8255_0")
+	MCFG_DEVICE_REMOVE("ppi8255_1")
+	MCFG_I8255A_ADD( "ppi8255_0", gselect_ppi8255_0_intf )
+	MCFG_I8255A_ADD( "ppi8255_1", gselect_ppi8255_1_intf )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( jokpokera, getrivia )
@@ -1187,7 +1180,8 @@ static MACHINE_CONFIG_DERIVED( jokpokera, getrivia )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(gselect_map)
 
-	MCFG_PPI8255_RECONFIG( "ppi8255_0", gselect_ppi8255_intf[0] )
+	MCFG_DEVICE_REMOVE("ppi8255_0")
+	MCFG_I8255A_ADD( "ppi8255_0", gselect_ppi8255_0_intf )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( amuse, getrivia )

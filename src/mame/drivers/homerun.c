@@ -17,7 +17,7 @@ Todo :
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "machine/8255ppi.h"
+#include "machine/i8255.h"
 #include "sound/2203intf.h"
 #include "includes/homerun.h"
 
@@ -41,15 +41,14 @@ static WRITE8_DEVICE_HANDLER(pc_w)
 }
 
 
-
-static const ppi8255_interface ppi8255_intf =
+static I8255A_INTERFACE( ppi8255_intf )
 {
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_HANDLER(pa_w),
-	DEVCB_HANDLER(pb_w),
-	DEVCB_HANDLER(pc_w)
+	DEVCB_NULL,				/* Port A read */
+	DEVCB_HANDLER(pa_w),	/* Port A write */
+	DEVCB_NULL,				/* Port B read */
+	DEVCB_HANDLER(pb_w),	/* Port B write */
+	DEVCB_NULL,				/* Port C read */
+	DEVCB_HANDLER(pc_w)		/* Port C write */
 };
 
 
@@ -73,7 +72,7 @@ static ADDRESS_MAP_START( homerun_iomap, AS_IO, 8, homerun_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x10) AM_WRITENOP /* ?? */
 	AM_RANGE(0x20, 0x20) AM_WRITENOP /* ?? */
-	AM_RANGE(0x30, 0x33) AM_DEVREADWRITE_LEGACY("ppi8255", ppi8255_r, ppi8255_w)
+	AM_RANGE(0x30, 0x33) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
 	AM_RANGE(0x40, 0x40) AM_READ_PORT("IN0")
 	AM_RANGE(0x50, 0x50) AM_READ_PORT("IN2")
 	AM_RANGE(0x60, 0x60) AM_READ_PORT("IN1")
@@ -229,7 +228,7 @@ static MACHINE_CONFIG_START( homerun, homerun_state )
 	MCFG_MACHINE_START(homerun)
 	MCFG_MACHINE_RESET(homerun)
 
-	MCFG_PPI8255_ADD( "ppi8255", ppi8255_intf )
+	MCFG_I8255A_ADD( "ppi8255", ppi8255_intf )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

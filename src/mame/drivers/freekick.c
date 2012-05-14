@@ -30,7 +30,7 @@ TODO:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "machine/8255ppi.h"
+#include "machine/i8255.h"
 #include "machine/mc8123.h"
 #include "sound/sn76496.h"
 #include "includes/freekick.h"
@@ -180,8 +180,8 @@ static ADDRESS_MAP_START( freekickb_map, AS_PROGRAM, 8, freekick_state )
 	AM_RANGE(0xd000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(freek_videoram_w) AM_SHARE("videoram")	// tilemap
 	AM_RANGE(0xe800, 0xe8ff) AM_RAM AM_SHARE("spriteram")	// sprites
-	AM_RANGE(0xec00, 0xec03) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w)
-	AM_RANGE(0xf000, 0xf003) AM_DEVREADWRITE_LEGACY("ppi8255_1", ppi8255_r, ppi8255_w)
+	AM_RANGE(0xec00, 0xec03) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
+	AM_RANGE(0xf000, 0xf003) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
 	AM_RANGE(0xf800, 0xf800) AM_READ_PORT("IN0") AM_WRITE(flipscreen_w)
 	AM_RANGE(0xf801, 0xf801) AM_READ_PORT("IN1")
 	AM_RANGE(0xf802, 0xf802) AM_READNOP	//MUST return bit 0 = 0, otherwise game resets
@@ -512,26 +512,25 @@ static READ8_DEVICE_HANDLER( snd_rom_r )
 	return state->memregion("user1")->base()[state->m_romaddr & 0x7fff];
 }
 
-static const ppi8255_interface ppi8255_intf[2] =
+static I8255A_INTERFACE( ppi8255_0_intf )
 {
-	{
-		DEVCB_NULL,							/* Port A read */
-		DEVCB_NULL,							/* Port B read */
-		DEVCB_HANDLER(snd_rom_r),			/* Port C read */
-		DEVCB_HANDLER(snd_rom_addr_l_w),	/* Port A write */
-		DEVCB_HANDLER(snd_rom_addr_h_w),	/* Port B write */
-		DEVCB_NULL							/* Port C write */
-	},
-	{
-		DEVCB_INPUT_PORT("DSW1"),			/* Port A read */
-		DEVCB_INPUT_PORT("DSW2"),			/* Port B read */
-		DEVCB_INPUT_PORT("DSW3"),			/* Port C read */
-		DEVCB_NULL,							/* Port A write */
-		DEVCB_NULL,							/* Port B write */
-		DEVCB_NULL							/* Port C write */
-	}
+	DEVCB_NULL,							/* Port A read */
+	DEVCB_HANDLER(snd_rom_addr_l_w),	/* Port A write */
+	DEVCB_NULL,							/* Port B read */
+	DEVCB_HANDLER(snd_rom_addr_h_w),	/* Port B write */
+	DEVCB_HANDLER(snd_rom_r),			/* Port C read */
+	DEVCB_NULL							/* Port C write */
 };
 
+static I8255A_INTERFACE( ppi8255_1_intf )
+{
+	DEVCB_INPUT_PORT("DSW1"),		/* Port A read */
+	DEVCB_NULL,						/* Port A write */
+	DEVCB_INPUT_PORT("DSW2"),		/* Port B read */
+	DEVCB_NULL,						/* Port B write */
+	DEVCB_INPUT_PORT("DSW3"),		/* Port C read */
+	DEVCB_NULL						/* Port C write */
+};
 
 
 /*************************************
@@ -678,8 +677,8 @@ static MACHINE_CONFIG_DERIVED( freekickb, base )
 	MCFG_MACHINE_START(freekick)
 	MCFG_MACHINE_RESET(freekick)
 
-	MCFG_PPI8255_ADD( "ppi8255_0", ppi8255_intf[0] )
-	MCFG_PPI8255_ADD( "ppi8255_1", ppi8255_intf[1] )
+	MCFG_I8255A_ADD( "ppi8255_0", ppi8255_0_intf )
+	MCFG_I8255A_ADD( "ppi8255_1", ppi8255_1_intf )
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_STATIC(freekick)

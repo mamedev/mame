@@ -27,7 +27,7 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "machine/8255ppi.h"
+#include "machine/i8255.h"
 #include "includes/dribling.h"
 
 
@@ -154,9 +154,9 @@ READ8_MEMBER(dribling_state::ioread)
 {
 
 	if (offset & 0x08)
-		return ppi8255_r(m_ppi_0, offset & 3);
+		return m_ppi8255_0->read(space, offset & 3);
 	else if (offset & 0x10)
-		return ppi8255_r(m_ppi_1, offset & 3);
+		return m_ppi8255_1->read(space, offset & 3);
 	return 0xff;
 }
 
@@ -165,9 +165,9 @@ WRITE8_MEMBER(dribling_state::iowrite)
 {
 
 	if (offset & 0x08)
-		ppi8255_w(m_ppi_0, offset & 3, data);
+		m_ppi8255_0->write(space, offset & 3, data);
 	else if (offset & 0x10)
-		ppi8255_w(m_ppi_1, offset & 3, data);
+		m_ppi8255_1->write(space, offset & 3, data);
 	else if (offset & 0x40)
 	{
 		m_dr = m_ds;
@@ -183,26 +183,25 @@ WRITE8_MEMBER(dribling_state::iowrite)
  *
  *************************************/
 
-static const ppi8255_interface ppi8255_intf[2] =
+static I8255A_INTERFACE( ppi8255_0_intf )
 {
-	{
-		DEVCB_HANDLER(dsr_r),
-		DEVCB_HANDLER(input_mux0_r),
-		DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_HANDLER(misc_w)
-	},
-	{
-		DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_INPUT_PORT("IN0"),
-		DEVCB_HANDLER(sound_w),
-		DEVCB_HANDLER(pb_w),
-		DEVCB_HANDLER(shr_w)
-	}
+	DEVCB_HANDLER(dsr_r),				/* Port A read */
+	DEVCB_NULL,							/* Port A write */
+	DEVCB_HANDLER(input_mux0_r),		/* Port B read */
+	DEVCB_NULL,							/* Port B write */
+	DEVCB_NULL,							/* Port C read */
+	DEVCB_HANDLER(misc_w)				/* Port C write */
 };
 
+static I8255A_INTERFACE( ppi8255_1_intf )
+{
+	DEVCB_NULL,							/* Port A read */
+	DEVCB_HANDLER(sound_w),				/* Port A write */
+	DEVCB_NULL,							/* Port B read */
+	DEVCB_HANDLER(pb_w),				/* Port B write */
+	DEVCB_INPUT_PORT("IN0"),			/* Port C read */
+	DEVCB_HANDLER(shr_w)				/* Port C write */
+};
 
 
 /*************************************
@@ -285,10 +284,6 @@ static MACHINE_START( dribling )
 {
 	dribling_state *state = machine.driver_data<dribling_state>();
 
-	state->m_maincpu = machine.device("maincpu");
-	state->m_ppi_0 = machine.device("ppi8255_0");
-	state->m_ppi_1 = machine.device("ppi8255_1");
-
 	state->save_item(NAME(state->m_abca));
 	state->save_item(NAME(state->m_di));
 	state->save_item(NAME(state->m_dr));
@@ -318,8 +313,8 @@ static MACHINE_CONFIG_START( dribling, dribling_state )
 	MCFG_CPU_IO_MAP(io_map)
 	MCFG_CPU_VBLANK_INT("screen", dribling_irq_gen)
 
-	MCFG_PPI8255_ADD( "ppi8255_0", ppi8255_intf[0] )
-	MCFG_PPI8255_ADD( "ppi8255_1", ppi8255_intf[1] )
+	MCFG_I8255A_ADD( "ppi8255_0", ppi8255_0_intf )
+	MCFG_I8255A_ADD( "ppi8255_1", ppi8255_1_intf )
 
 	MCFG_MACHINE_START(dribling)
 	MCFG_MACHINE_RESET(dribling)
@@ -411,6 +406,6 @@ ROM_END
  *
  *************************************/
 
-GAME( 1983, dribling, 0,        dribling, dribling, 0, ROT0, "Model Racing", "Dribbling", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1983, driblingo,dribling, dribling, dribling, 0, ROT0, "Model Racing (Olympia license)", "Dribbling (Olympia)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1983, driblingbr,dribling, dribling, dribling, 0, ROT0, "bootleg (Videomac)", "Dribbling (bootleg, Brazil)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1983, dribling,   0,        dribling, dribling, 0, ROT0, "Model Racing", "Dribbling", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1983, driblingo,  dribling, dribling, dribling, 0, ROT0, "Model Racing (Olympia license)", "Dribbling (Olympia)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1983, driblingbr, dribling, dribling, dribling, 0, ROT0, "bootleg (Videomac)", "Dribbling (bootleg, Brazil)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )

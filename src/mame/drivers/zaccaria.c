@@ -41,7 +41,7 @@ Notes:
 #include "cpu/z80/z80.h"
 #include "cpu/m6800/m6800.h"
 #include "machine/6821pia.h"
-#include "machine/8255ppi.h"
+#include "machine/i8255.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "sound/tms5220.h"
@@ -272,7 +272,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, zaccaria_state )
 	AM_RANGE(0x6c00, 0x6c07) AM_READ(zaccaria_prot2_r)
 	AM_RANGE(0x6e00, 0x6e00) AM_READWRITE(zaccaria_dsw_r, sound_command_w)
 	AM_RANGE(0x7000, 0x77ff) AM_RAM
-	AM_RANGE(0x7800, 0x7803) AM_DEVREADWRITE_LEGACY("ppi8255", ppi8255_r, ppi8255_w)
+	AM_RANGE(0x7800, 0x7803) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
 	AM_RANGE(0x7c00, 0x7c00) AM_READ(watchdog_reset_r)
 	AM_RANGE(0x8000, 0xdfff) AM_ROM
 ADDRESS_MAP_END
@@ -516,13 +516,13 @@ static GFXDECODE_START( zaccaria )
 GFXDECODE_END
 
 
-static const ppi8255_interface ppi8255_config =
+static I8255A_INTERFACE( ppi8255_intf )
 {
 	DEVCB_INPUT_PORT("P1"),				/* Port A read */
-	DEVCB_INPUT_PORT("P2"),				/* Port B read */
-	DEVCB_INPUT_PORT("SYSTEM"),			/* Port C read */
 	DEVCB_NULL,							/* Port A write */
+	DEVCB_INPUT_PORT("P2"),				/* Port B read */
 	DEVCB_NULL,							/* Port B write */
+	DEVCB_INPUT_PORT("SYSTEM"),			/* Port C read */
 	DEVCB_HANDLER(zaccaria_dsw_sel_w)	/* Port C write */
 };
 
@@ -600,7 +600,7 @@ static MACHINE_CONFIG_START( zaccaria, zaccaria_state )
 	MCFG_CPU_PROGRAM_MAP(sound_map_2)
 	MCFG_QUANTUM_TIME(attotime::from_hz(1000000))
 
-	MCFG_PPI8255_ADD( "ppi8255", ppi8255_config )
+	MCFG_I8255A_ADD( "ppi8255", ppi8255_intf )
 	MCFG_PIA6821_ADD( "pia0", pia_0_config )
 	MCFG_PIA6821_ADD( "pia1", pia_1_config )
 

@@ -18,7 +18,7 @@ DIP locations verified for:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "machine/8255ppi.h"
+#include "machine/i8255.h"
 #include "sound/samples.h"
 
 
@@ -45,12 +45,18 @@ class astinvad_state : public driver_device
 {
 public:
 	astinvad_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_ppi8255_0(*this, "ppi8255_0"),
+		m_ppi8255_1(*this, "ppi8255_1"),
 		m_videoram(*this, "videoram"){ }
 
-	UINT8 *    m_colorram;
+	required_device<cpu_device> m_maincpu;
+	optional_device<i8255_device>  m_ppi8255_0;
+	optional_device<i8255_device>  m_ppi8255_1;
 	required_shared_ptr<UINT8> m_videoram;
 
+	UINT8 *    m_colorram;
 	emu_timer  *m_int_timer;
 	UINT8      m_sound_state[2];
 	UINT8      m_screen_flip;
@@ -58,9 +64,6 @@ public:
 	UINT8      m_flip_yoffs;
 	UINT8      m_color_latch;
 
-	device_t *m_maincpu;
-	device_t *m_ppi8255_0;
-	device_t *m_ppi8255_1;
 	samples_device *m_samples;
 	DECLARE_WRITE8_MEMBER(color_latch_w);
 	DECLARE_WRITE8_MEMBER(spaceint_videoram_w);
@@ -81,26 +84,26 @@ public:
 static WRITE8_DEVICE_HANDLER( astinvad_sound1_w );
 static WRITE8_DEVICE_HANDLER( astinvad_sound2_w );
 
-static const ppi8255_interface ppi8255_intf[2] =
+
+static I8255A_INTERFACE( ppi8255_0_intf )
 {
-	{
-		DEVCB_INPUT_PORT("IN0"),
-		DEVCB_INPUT_PORT("IN1"),
-		DEVCB_INPUT_PORT("IN2"),
-		DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_NULL
-	},
-	{
-		DEVCB_NULL,
-		DEVCB_INPUT_PORT("CABINET"),
-		DEVCB_NULL,
-		DEVCB_HANDLER(astinvad_sound1_w),
-		DEVCB_HANDLER(astinvad_sound2_w),
-		DEVCB_NULL
-	}
+	DEVCB_INPUT_PORT("IN0"),			/* Port A read */
+	DEVCB_NULL,							/* Port A write */
+	DEVCB_INPUT_PORT("IN1"),			/* Port B read */
+	DEVCB_NULL,							/* Port B write */
+	DEVCB_INPUT_PORT("IN2"),			/* Port C read */
+	DEVCB_NULL							/* Port C write */
 };
 
+static I8255A_INTERFACE( ppi8255_1_intf )
+{
+	DEVCB_NULL,							/* Port A read */
+	DEVCB_HANDLER(astinvad_sound1_w),	/* Port A write */
+	DEVCB_INPUT_PORT("CABINET"),		/* Port B read */
+	DEVCB_HANDLER(astinvad_sound2_w),	/* Port B write */
+	DEVCB_NULL,							/* Port C read */
+	DEVCB_NULL							/* Port C write */
+};
 
 
 /*************************************
@@ -232,9 +235,6 @@ static MACHINE_START( kamikaze )
 {
 	astinvad_state *state = machine.driver_data<astinvad_state>();
 
-	state->m_maincpu = machine.device("maincpu");
-	state->m_ppi8255_0 = machine.device("ppi8255_0");
-	state->m_ppi8255_1 = machine.device("ppi8255_1");
 	state->m_samples = machine.device<samples_device>("samples");
 
 	state->m_int_timer = machine.scheduler().timer_alloc(FUNC(kamizake_int_gen));
@@ -260,7 +260,6 @@ static MACHINE_START( spaceint )
 {
 	astinvad_state *state = machine.driver_data<astinvad_state>();
 
-	state->m_maincpu = machine.device("maincpu");
 	state->m_samples = machine.device<samples_device>("samples");
 
 	state->save_item(NAME(state->m_screen_flip));
@@ -298,9 +297,9 @@ READ8_MEMBER(astinvad_state::kamikaze_ppi_r)
 
 	/* the address lines are used for /CS; yes, they can overlap! */
 	if (!(offset & 4))
-		result &= ppi8255_r(m_ppi8255_0, offset);
+		result &= m_ppi8255_0->read(space, offset);
 	if (!(offset & 8))
-		result &= ppi8255_r(m_ppi8255_1, offset);
+		result &= m_ppi8255_1->read(space, offset);
 	return result;
 }
 
@@ -310,9 +309,9 @@ WRITE8_MEMBER(astinvad_state::kamikaze_ppi_w)
 
 	/* the address lines are used for /CS; yes, they can overlap! */
 	if (!(offset & 4))
-		ppi8255_w(m_ppi8255_0, offset, data);
+		m_ppi8255_0->write(space, offset, data);
 	if (!(offset & 8))
-		ppi8255_w(m_ppi8255_1, offset, data);
+		m_ppi8255_1->write(space, offset, data);
 }
 
 
@@ -594,8 +593,8 @@ static MACHINE_CONFIG_START( kamikaze, astinvad_state )
 	MCFG_MACHINE_START(kamikaze)
 	MCFG_MACHINE_RESET(kamikaze)
 
-	MCFG_PPI8255_ADD( "ppi8255_0", ppi8255_intf[0] )
-	MCFG_PPI8255_ADD( "ppi8255_1", ppi8255_intf[1] )
+	MCFG_I8255A_ADD( "ppi8255_0", ppi8255_0_intf )
+	MCFG_I8255A_ADD( "ppi8255_1", ppi8255_1_intf )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

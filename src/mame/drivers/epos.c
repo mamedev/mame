@@ -30,7 +30,7 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "machine/8255ppi.h"
+#include "machine/i8255.h"
 #include "sound/ay8910.h"
 #include "includes/epos.h"
 
@@ -87,7 +87,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dealer_io_map, AS_IO, 8, epos_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE_LEGACY("ppi8255", ppi8255_r, ppi8255_w)
+	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
 	AM_RANGE(0x20, 0x24) AM_WRITE(dealer_decrypt_rom)
 	AM_RANGE(0x34, 0x34) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_w)
 	AM_RANGE(0x38, 0x38) AM_READ_PORT("DSW")
@@ -106,15 +106,16 @@ static WRITE8_DEVICE_HANDLER( write_prtc )
 	device->machine().root_device().membank("bank2")->set_entry(data & 0x01);
 }
 
-static const ppi8255_interface ppi8255_intf =
+static I8255A_INTERFACE( ppi8255_intf )
 {
 	DEVCB_INPUT_PORT("INPUTS"),		/* Port A read */
-	DEVCB_NULL,						/* Port B read */
-	DEVCB_NULL,						/* Port C read */
 	DEVCB_NULL,						/* Port A write */
+	DEVCB_NULL,						/* Port B read */
 	DEVCB_NULL,						/* Port B write */
-	DEVCB_HANDLER(write_prtc),		/* Port C write */
+	DEVCB_NULL,						/* Port C read */
+	DEVCB_HANDLER(write_prtc)		/* Port C write */
 };
+
 
 /*************************************
  *
@@ -427,7 +428,7 @@ static MACHINE_CONFIG_START( dealer, epos_state )
 	MCFG_CPU_IO_MAP(dealer_io_map)
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MCFG_PPI8255_ADD( "ppi8255", ppi8255_intf )
+	MCFG_I8255A_ADD( "ppi8255", ppi8255_intf )
 
 	MCFG_MACHINE_START(dealer)
 	MCFG_MACHINE_RESET(epos)

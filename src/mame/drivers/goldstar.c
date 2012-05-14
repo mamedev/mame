@@ -113,7 +113,7 @@
 #include "sound/ay8910.h"
 #include "sound/okim6295.h"
 #include "sound/sn76496.h"
-#include "machine/8255ppi.h"
+#include "machine/i8255.h"
 #include "machine/nvram.h"
 #include "includes/goldstar.h"
 
@@ -192,10 +192,10 @@ static ADDRESS_MAP_START( ncb3_map, AS_PROGRAM, 8, goldstar_state )
 	AM_RANGE(0xf080, 0xf0bf) AM_RAM AM_SHARE("reel2_scroll")
 	AM_RANGE(0xf100, 0xf17f) AM_RAM AM_SHARE("reel3_scroll") // moved compared to goldstar
 
-	AM_RANGE(0xf800, 0xf803) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w)	/* Input Ports */
-	AM_RANGE(0xf810, 0xf813) AM_DEVREADWRITE_LEGACY("ppi8255_1", ppi8255_r, ppi8255_w)	/* Input Ports */
+	AM_RANGE(0xf800, 0xf803) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)	/* Input Ports */
+	AM_RANGE(0xf810, 0xf813) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)	/* Input Ports */
 	AM_RANGE(0xf822, 0xf822) AM_WRITE(goldstar_fa00_w) // hack (connected to ppi output port?, needed for colour banking)
-	AM_RANGE(0xf820, 0xf823) AM_DEVREADWRITE_LEGACY("ppi8255_2", ppi8255_r, ppi8255_w)	/* Input/Output Ports */
+	AM_RANGE(0xf820, 0xf823) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write)	/* Input/Output Ports */
 
 	AM_RANGE(0xf830, 0xf830) AM_DEVREADWRITE_LEGACY("aysnd", ay8910_r, ay8910_data_w)
 	AM_RANGE(0xf840, 0xf840) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)
@@ -301,8 +301,8 @@ static ADDRESS_MAP_START( cm_portmap, AS_IO, 8, goldstar_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x01, 0x01) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
 	AM_RANGE(0x02, 0x03) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_address_w)
-	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w)	/* Inputs */
-	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE_LEGACY("ppi8255_1", ppi8255_r, ppi8255_w)	/* DIP switches */
+	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)	/* Inputs */
+	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)	/* DIP switches */
 	AM_RANGE(0x10, 0x10) AM_WRITE(cm_outport0_w)	/* output port */
 	AM_RANGE(0x11, 0x11) AM_WRITENOP
 	AM_RANGE(0x12, 0x12) AM_WRITE(cm_outport1_w)	/* output port */
@@ -313,8 +313,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cmast91_portmap, AS_IO, 8, goldstar_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w)	/* Input Ports */
-	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE_LEGACY("ppi8255_1", ppi8255_r, ppi8255_w)	/* DIP switches */
+	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)	/* Input Ports */
+	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)	/* DIP switches */
 	AM_RANGE(0x21, 0x21) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
 	AM_RANGE(0x22, 0x23) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_address_w)
 ADDRESS_MAP_END
@@ -324,8 +324,8 @@ static ADDRESS_MAP_START( amcoe1_portmap, AS_IO, 8, goldstar_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x01, 0x01) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
 	AM_RANGE(0x02, 0x03) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_address_w)
-	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w)	/* Input Ports */
-	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE_LEGACY("ppi8255_1", ppi8255_r, ppi8255_w)	/* DIP switches */
+	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)	/* Input Ports */
+	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)	/* DIP switches */
 	AM_RANGE(0x10, 0x10) AM_WRITE(cm_outport0_w)	/* output port */
 	AM_RANGE(0x11, 0x11) AM_WRITENOP
 	AM_RANGE(0x12, 0x12) AM_WRITE(cm_outport1_w)	/* output port */
@@ -337,8 +337,8 @@ static ADDRESS_MAP_START( amcoe2_portmap, AS_IO, 8, goldstar_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x01, 0x01) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
 	AM_RANGE(0x02, 0x03) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_address_w)
-	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w)	/* Input Ports */
-	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE_LEGACY("ppi8255_1", ppi8255_r, ppi8255_w)	/* DIP switches */
+	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)	/* Input Ports */
+	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)	/* DIP switches */
 	AM_RANGE(0x10, 0x10) AM_WRITE(cm_outport0_w)	/* output port */
 	AM_RANGE(0x11, 0x11) AM_WRITENOP
 	AM_RANGE(0x12, 0x12) AM_WRITE(cm_outport1_w)	/* output port */
@@ -371,9 +371,9 @@ static ADDRESS_MAP_START( lucky8_map, AS_PROGRAM, 8, goldstar_state )
 	AM_RANGE(0xb080, 0xb0bf) AM_RAM AM_SHARE("reel2_scroll")
 	AM_RANGE(0xb100, 0xb17f) AM_RAM AM_SHARE("reel3_scroll")
 
-	AM_RANGE(0xb800, 0xb803) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w)	/* Input Ports */
-	AM_RANGE(0xb810, 0xb813) AM_DEVREADWRITE_LEGACY("ppi8255_1", ppi8255_r, ppi8255_w)	/* Input Ports */
-	AM_RANGE(0xb820, 0xb823) AM_DEVREADWRITE_LEGACY("ppi8255_2", ppi8255_r, ppi8255_w)	/* Input/Output Ports */
+	AM_RANGE(0xb800, 0xb803) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)	/* Input Ports */
+	AM_RANGE(0xb810, 0xb813) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)	/* Input Ports */
+	AM_RANGE(0xb820, 0xb823) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write)	/* Input/Output Ports */
 	AM_RANGE(0xb830, 0xb830) AM_DEVREADWRITE_LEGACY("aysnd", ay8910_r, ay8910_data_w)
 	AM_RANGE(0xb840, 0xb840) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)	/* no sound... only use both ports for DSWs */
 	AM_RANGE(0xb850, 0xb850) AM_WRITE(lucky8_outport_w)
@@ -415,9 +415,9 @@ static ADDRESS_MAP_START(magodds_map, AS_PROGRAM, 8, goldstar_state )
 	AM_RANGE(0xb080, 0xb0bf) AM_RAM AM_SHARE("reel2_scroll")
 	AM_RANGE(0xb100, 0xb17f) AM_RAM AM_SHARE("reel3_scroll")
 
-	AM_RANGE(0xb800, 0xb803) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w)	/* Input Ports */
-	AM_RANGE(0xb810, 0xb813) AM_DEVREADWRITE_LEGACY("ppi8255_1", ppi8255_r, ppi8255_w)	/* Input Ports */
-	AM_RANGE(0xb820, 0xb823) AM_DEVREADWRITE_LEGACY("ppi8255_2", ppi8255_r, ppi8255_w)	/* Input/Output Ports */
+	AM_RANGE(0xb800, 0xb803) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)	/* Input Ports */
+	AM_RANGE(0xb810, 0xb813) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)	/* Input Ports */
+	AM_RANGE(0xb820, 0xb823) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write)	/* Input/Output Ports */
 	AM_RANGE(0xb830, 0xb830) AM_DEVREADWRITE_LEGACY("aysnd", ay8910_r, ay8910_data_w)
 	AM_RANGE(0xb840, 0xb840) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)	/* no sound... only use both ports for DSWs */
 	AM_RANGE(0xb850, 0xb850) AM_WRITE(magodds_outb850_w) //lamps
@@ -438,9 +438,9 @@ static ADDRESS_MAP_START( kkotnoli_map, AS_PROGRAM, 8, goldstar_state )
 	AM_RANGE(0xb080, 0xb0bf) AM_RAM AM_SHARE("reel2_scroll")
 	AM_RANGE(0xb100, 0xb17f) AM_RAM AM_SHARE("reel3_scroll")
 
-	AM_RANGE(0xb800, 0xb803) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w)	/* Input Ports */
-	AM_RANGE(0xb810, 0xb813) AM_DEVREADWRITE_LEGACY("ppi8255_1", ppi8255_r, ppi8255_w)	/* Input Ports */
-	AM_RANGE(0xb820, 0xb823) AM_DEVREADWRITE_LEGACY("ppi8255_2", ppi8255_r, ppi8255_w)	/* Input Port */
+	AM_RANGE(0xb800, 0xb803) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)	/* Input Ports */
+	AM_RANGE(0xb810, 0xb813) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)	/* Input Ports */
+	AM_RANGE(0xb820, 0xb823) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write)	/* Input Port */
 	AM_RANGE(0xb830, 0xb830) AM_WRITENOP		/* no ay8910 */
 	AM_RANGE(0xb840, 0xb840) AM_WRITENOP		/* no ay8910 */
 	AM_RANGE(0xb850, 0xb850) AM_WRITE(lucky8_outport_w)
@@ -477,8 +477,8 @@ static ADDRESS_MAP_START( ladylinr_map, AS_PROGRAM, 8, goldstar_state )
 	AM_RANGE(0xb080, 0xb0bf) AM_RAM AM_SHARE("reel2_scroll")
 	AM_RANGE(0xb100, 0xb17f) AM_RAM AM_SHARE("reel3_scroll")
 
-	AM_RANGE(0xb800, 0xb803) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w)	/* Input Ports */
-	AM_RANGE(0xb810, 0xb813) AM_DEVREADWRITE_LEGACY("ppi8255_1", ppi8255_r, ppi8255_w)	/* DSW bank */
+	AM_RANGE(0xb800, 0xb803) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)	/* Input Ports */
+	AM_RANGE(0xb810, 0xb813) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)	/* DSW bank */
 	AM_RANGE(0xb830, 0xb830) AM_DEVREADWRITE_LEGACY("aysnd", ay8910_r, ay8910_data_w)
 	AM_RANGE(0xb840, 0xb840) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)	/* no sound... only use ports */
 	AM_RANGE(0xb850, 0xb850) AM_WRITENOP	/* just turn off the lamps, if exist */
@@ -498,14 +498,14 @@ static ADDRESS_MAP_START( wcat3_map, AS_PROGRAM, 8, goldstar_state )
 	AM_RANGE(0xb080, 0xb0bf) AM_RAM AM_SHARE("reel2_scroll")
 	AM_RANGE(0xb100, 0xb17f) AM_RAM AM_SHARE("reel3_scroll")
 
-	AM_RANGE(0xb800, 0xb803) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w)	/* Input Ports */
-	AM_RANGE(0xb810, 0xb813) AM_DEVREADWRITE_LEGACY("ppi8255_1", ppi8255_r, ppi8255_w)	/* Input Ports */
-	AM_RANGE(0xb820, 0xb823) AM_DEVREADWRITE_LEGACY("ppi8255_2", ppi8255_r, ppi8255_w)	/* Input/Output Ports */
+	AM_RANGE(0xb800, 0xb803) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)	/* Input Ports */
+	AM_RANGE(0xb810, 0xb813) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)	/* Input Ports */
+	AM_RANGE(0xb820, 0xb823) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write)	/* Input/Output Ports */
 	AM_RANGE(0xb830, 0xb830) AM_DEVREADWRITE_LEGACY("aysnd", ay8910_r, ay8910_data_w)
 	AM_RANGE(0xb840, 0xb840) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)	/* no sound... only use both ports for DSWs */
 	AM_RANGE(0xb850, 0xb850) AM_WRITE(lucky8_outport_w)
 	AM_RANGE(0xb870, 0xb870) AM_DEVWRITE_LEGACY("snsnd", sn76496_w)	/* sound */
-//  AM_RANGE(0xc000, 0xc003) AM_DEVREADWRITE_LEGACY("ppi8255_3", ppi8255_r, ppi8255_w) /* Other PPI initialized? */
+//  AM_RANGE(0xc000, 0xc003) AM_DEVREADWRITE("ppi8255_3", i8255_device, read, write) /* Other PPI initialized? */
 	AM_RANGE(0xd000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
@@ -579,8 +579,8 @@ static ADDRESS_MAP_START( unkch_portmap, AS_IO, 8, goldstar_state )
 	AM_RANGE(0x11, 0x11) AM_WRITE(unkcm_0x11_w)
 	AM_RANGE(0x12, 0x12) AM_WRITE(unkcm_0x12_w)
 
-//  AM_RANGE(0x04, 0x07) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w) /* Input Ports */
-//  AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE_LEGACY("ppi8255_1", ppi8255_r, ppi8255_w) /* DIP switches */
+//  AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write) /* Input Ports */
+//  AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write) /* DIP switches */
 //  AM_RANGE(0x10, 0x10) AM_WRITE (cm_outport0_w)   /* output port */
 //  AM_RANGE(0x11, 0x11) AM_WRITENOP
 //  AM_RANGE(0x12, 0x12) AM_WRITE (cm_outport1_w)   /* output port */
@@ -5634,52 +5634,55 @@ GFXDECODE_END
 *      PPI 8255 (x3) Interfaces      *
 *************************************/
 
-static const ppi8255_interface ncb3_ppi8255_intf[3] =
+static I8255A_INTERFACE( ncb3_ppi8255_0_intf )
 {
-	{	/* A, B & C set as input */
-		DEVCB_INPUT_PORT("IN0"),	/* Port A read */
-		DEVCB_INPUT_PORT("IN3"),	/* Port B read */ //Player2 controls, confirmed.
-		DEVCB_NULL,					/* Port C read */
-		DEVCB_NULL,					/* Port A write */
-		DEVCB_NULL,					/* Port B write */
-		DEVCB_NULL					/* Port C write */
-	},
-	{	/* A, B & C set as input */
-		DEVCB_INPUT_PORT("IN1"),	/* Port A read */
-		DEVCB_INPUT_PORT("IN2"),	/* Port B read */
-		DEVCB_INPUT_PORT("DSW1"),	/* Port C read */
-		DEVCB_NULL,					/* Port A write */
-		DEVCB_NULL,					/* Port B write */
-		DEVCB_NULL					/* Port C write */
-	},
-	{	/* A set as input */
-		DEVCB_INPUT_PORT("DSW2"),	/* Port A read */
-		DEVCB_NULL,					/* Port B read */
-		DEVCB_NULL,					/* Port C read */
-		DEVCB_NULL,					/* Port A write */
-		DEVCB_NULL,					/* Port B write */
-		DEVCB_NULL					/* Port C write */
-	}
+	DEVCB_INPUT_PORT("IN0"),		/* Port A read */
+	DEVCB_NULL,						/* Port A write */
+	DEVCB_INPUT_PORT("IN3"),		/* Port B read */ //Player2 controls, confirmed.
+	DEVCB_NULL,						/* Port B write */
+	DEVCB_NULL,						/* Port C read */
+	DEVCB_NULL						/* Port C write */
 };
 
-static const ppi8255_interface cm_ppi8255_intf[2] =
+static I8255A_INTERFACE( ncb3_ppi8255_1_intf )
 {
-	{	/* A, B & C set as input */
-		DEVCB_INPUT_PORT("IN0"),	/* Port A read */
-		DEVCB_INPUT_PORT("IN1"),	/* Port B read */
-		DEVCB_INPUT_PORT("IN2"),	/* Port C read */
-		DEVCB_NULL,					/* Port A write */
-		DEVCB_NULL,					/* Port B write */
-		DEVCB_NULL					/* Port C write */
-	},
-	{	/* A, B & C set as input */
-		DEVCB_INPUT_PORT("DSW1"),	/* Port A read */
-		DEVCB_INPUT_PORT("DSW2"),	/* Port B read */
-		DEVCB_INPUT_PORT("DSW3"),	/* Port C read */
-		DEVCB_NULL,					/* Port A write */
-		DEVCB_NULL,					/* Port B write */
-		DEVCB_NULL					/* Port C write */
-	}
+	DEVCB_INPUT_PORT("IN1"),		/* Port A read */
+	DEVCB_NULL,						/* Port A write */
+	DEVCB_INPUT_PORT("IN2"),		/* Port B read */
+	DEVCB_NULL,						/* Port B write */
+	DEVCB_INPUT_PORT("DSW1"),		/* Port C read */
+	DEVCB_NULL						/* Port C write */
+};
+
+static I8255A_INTERFACE( ncb3_ppi8255_2_intf )
+{
+	DEVCB_INPUT_PORT("DSW2"),		/* Port A read */
+	DEVCB_NULL,						/* Port A write */
+	DEVCB_NULL,						/* Port B read */
+	DEVCB_NULL,						/* Port B write */
+	DEVCB_NULL,						/* Port C read */
+	DEVCB_NULL						/* Port C write */
+};
+
+
+static I8255A_INTERFACE( cm_ppi8255_0_intf )
+{
+	DEVCB_INPUT_PORT("IN0"),		/* Port A read */
+	DEVCB_NULL,						/* Port A write */
+	DEVCB_INPUT_PORT("IN1"),		/* Port B read */
+	DEVCB_NULL,						/* Port B write */
+	DEVCB_INPUT_PORT("IN2"),		/* Port C read */
+	DEVCB_NULL						/* Port C write */
+};
+
+static I8255A_INTERFACE( cm_ppi8255_1_intf )
+{
+	DEVCB_INPUT_PORT("DSW1"),		/* Port A read */
+	DEVCB_NULL,						/* Port A write */
+	DEVCB_INPUT_PORT("DSW2"),		/* Port B read */
+	DEVCB_NULL,						/* Port B write */
+	DEVCB_INPUT_PORT("DSW3"),		/* Port C read */
+	DEVCB_NULL						/* Port C write */
 };
 
 
@@ -5709,81 +5712,86 @@ static WRITE8_DEVICE_HANDLER( system_outputc_w )
 }
 
 
-static const ppi8255_interface lucky8_ppi8255_intf[3] =
+static I8255A_INTERFACE( lucky8_ppi8255_0_intf )
 {
-	{	/* A, B & C set as input */
-		DEVCB_INPUT_PORT("IN0"),	/* Port A read */
-		DEVCB_INPUT_PORT("IN1"),	/* Port B read */
-		DEVCB_INPUT_PORT("IN2"),	/* Port C read */
-		DEVCB_NULL,					/* Port A write */
-		DEVCB_NULL,					/* Port B write */
-		DEVCB_NULL					/* Port C write */
-	},
-	{	/* A, B & C set as input */
-		DEVCB_INPUT_PORT("IN3"),	/* Port A read */
-		DEVCB_INPUT_PORT("IN4"),	/* Port B read */
-		DEVCB_INPUT_PORT("DSW1"),	/* Port C read */
-		DEVCB_NULL,					/* Port A write */
-		DEVCB_NULL,					/* Port B write */
-		DEVCB_NULL					/* Port C write */
-	},
-	{	/* A set as input */
-		DEVCB_INPUT_PORT("DSW2"),	/* Port A read */
-		DEVCB_NULL,					/* Port B read */
-		DEVCB_NULL,					/* Port C read */
-		DEVCB_HANDLER(system_outputa_w),					/* Port A write */
-		DEVCB_HANDLER(system_outputb_w),					/* Port B write */
-		DEVCB_HANDLER(system_outputc_w)			/* Port C write */
-	}
+	DEVCB_INPUT_PORT("IN0"),		/* Port A read */
+	DEVCB_NULL,						/* Port A write */
+	DEVCB_INPUT_PORT("IN1"),		/* Port B read */
+	DEVCB_NULL,						/* Port B write */
+	DEVCB_INPUT_PORT("IN2"),		/* Port C read */
+	DEVCB_NULL						/* Port C write */
 };
 
-static const ppi8255_interface kkotnoli_ppi8255_intf[3] =
+static I8255A_INTERFACE( lucky8_ppi8255_1_intf )
 {
-	{	/* A, B & C set as input */
-		DEVCB_INPUT_PORT("IN0"),	/* Port A read */
-		DEVCB_INPUT_PORT("IN1"),	/* Port B read */
-		DEVCB_INPUT_PORT("IN2"),	/* Port C read */
-		DEVCB_NULL,					/* Port A write */
-		DEVCB_NULL,					/* Port B write */
-		DEVCB_NULL					/* Port C write */
-	},
-	{	/* A, B & C set as input */
-		DEVCB_INPUT_PORT("IN3"),	/* Port A read */
-		DEVCB_INPUT_PORT("IN4"),	/* Port B read */
-		DEVCB_NULL,					/* Port C read */
-		DEVCB_NULL,					/* Port A write */
-		DEVCB_NULL,					/* Port B write */
-		DEVCB_NULL					/* Port C write */
-	},
-	{	/* A set as input */
-		DEVCB_INPUT_PORT("DSW1"),	/* Port A read */
-		DEVCB_NULL,					/* Port B read */
-		DEVCB_NULL,					/* Port C read */
-		DEVCB_NULL,					/* Port A write */
-		DEVCB_NULL,					/* Port B write */
-		DEVCB_NULL					/* Port C write */
-	}
+	DEVCB_INPUT_PORT("IN3"),		/* Port A read */
+	DEVCB_NULL,						/* Port A write */
+	DEVCB_INPUT_PORT("IN4"),		/* Port B read */
+	DEVCB_NULL,						/* Port B write */
+	DEVCB_INPUT_PORT("DSW1"),		/* Port C read */
+	DEVCB_NULL						/* Port C write */
 };
 
-static const ppi8255_interface ladylinr_ppi8255_intf[2] =
+static I8255A_INTERFACE( lucky8_ppi8255_2_intf )
 {
-	{	/* A, B & C set as input */
-		DEVCB_INPUT_PORT("IN0"),	/* Port A read */
-		DEVCB_INPUT_PORT("IN1"),	/* Port B read */
-		DEVCB_INPUT_PORT("IN2"),	/* Port C read */
-		DEVCB_NULL,					/* Port A write */
-		DEVCB_NULL,					/* Port B write */
-		DEVCB_NULL					/* Port C write */
-	},
-	{	/* A set as input */
-		DEVCB_INPUT_PORT("DSW1"),	/* Port A read */
-		DEVCB_NULL,					/* Port B read */
-		DEVCB_NULL,					/* Port C read */
-		DEVCB_NULL,					/* Port A write */
-		DEVCB_NULL,					/* Port B write */
-		DEVCB_NULL					/* Port C write */
-	}
+	DEVCB_INPUT_PORT("DSW2"),			/* Port A read */
+	DEVCB_HANDLER(system_outputa_w),	/* Port A write */
+	DEVCB_NULL,							/* Port B read */
+	DEVCB_HANDLER(system_outputb_w),	/* Port B write */
+	DEVCB_NULL,							/* Port C read */
+	DEVCB_HANDLER(system_outputc_w)		/* Port C write */
 };
+
+static I8255A_INTERFACE( kkotnoli_ppi8255_0_intf )
+{
+	DEVCB_INPUT_PORT("IN0"),		/* Port A read */
+	DEVCB_NULL,						/* Port A write */
+	DEVCB_INPUT_PORT("IN1"),		/* Port B read */
+	DEVCB_NULL,						/* Port B write */
+	DEVCB_INPUT_PORT("IN2"),		/* Port C read */
+	DEVCB_NULL						/* Port C write */
+};
+
+static I8255A_INTERFACE( kkotnoli_ppi8255_1_intf )
+{
+	DEVCB_INPUT_PORT("IN3"),		/* Port A read */
+	DEVCB_NULL,						/* Port A write */
+	DEVCB_INPUT_PORT("IN4"),		/* Port B read */
+	DEVCB_NULL,						/* Port B write */
+	DEVCB_NULL,						/* Port C read */
+	DEVCB_NULL						/* Port C write */
+};
+
+static I8255A_INTERFACE( kkotnoli_ppi8255_2_intf )
+{
+	DEVCB_INPUT_PORT("DSW1"),		/* Port A read */
+	DEVCB_NULL,						/* Port A write */
+	DEVCB_NULL,						/* Port B read */
+	DEVCB_NULL,						/* Port B write */
+	DEVCB_NULL,						/* Port C read */
+	DEVCB_NULL						/* Port C write */
+};
+
+static I8255A_INTERFACE( ladylinr_ppi8255_0_intf )
+{
+	DEVCB_INPUT_PORT("IN0"),		/* Port A read */
+	DEVCB_NULL,						/* Port A write */
+	DEVCB_INPUT_PORT("IN1"),		/* Port B read */
+	DEVCB_NULL,						/* Port B write */
+	DEVCB_INPUT_PORT("IN2"),		/* Port C read */
+	DEVCB_NULL						/* Port C write */
+};
+
+static I8255A_INTERFACE( ladylinr_ppi8255_1_intf )
+{
+	DEVCB_INPUT_PORT("DSW1"),		/* Port A read */
+	DEVCB_NULL,						/* Port A write */
+	DEVCB_NULL,						/* Port B read */
+	DEVCB_NULL,						/* Port B write */
+	DEVCB_NULL,						/* Port C read */
+	DEVCB_NULL						/* Port C write */
+};
+
 
 static const ay8910_interface ay8910_config =
 {
@@ -6007,9 +6015,9 @@ static MACHINE_CONFIG_START( chrygld, goldstar_state )
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* 3x 8255 */
-	MCFG_PPI8255_ADD( "ppi8255_0", ncb3_ppi8255_intf[0] )
-	MCFG_PPI8255_ADD( "ppi8255_1", ncb3_ppi8255_intf[1] )
-	MCFG_PPI8255_ADD( "ppi8255_2", ncb3_ppi8255_intf[2] )
+	MCFG_I8255A_ADD( "ppi8255_0", ncb3_ppi8255_0_intf )
+	MCFG_I8255A_ADD( "ppi8255_1", ncb3_ppi8255_1_intf )
+	MCFG_I8255A_ADD( "ppi8255_2", ncb3_ppi8255_2_intf )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -6048,9 +6056,9 @@ static MACHINE_CONFIG_START( cb3c, goldstar_state )
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* 3x 8255 */
-	MCFG_PPI8255_ADD( "ppi8255_0", ncb3_ppi8255_intf[0] )
-	MCFG_PPI8255_ADD( "ppi8255_1", ncb3_ppi8255_intf[1] )
-	MCFG_PPI8255_ADD( "ppi8255_2", ncb3_ppi8255_intf[2] )
+	MCFG_I8255A_ADD( "ppi8255_0", ncb3_ppi8255_0_intf )
+	MCFG_I8255A_ADD( "ppi8255_1", ncb3_ppi8255_1_intf )
+	MCFG_I8255A_ADD( "ppi8255_2", ncb3_ppi8255_2_intf )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -6088,9 +6096,9 @@ static MACHINE_CONFIG_START( ncb3, goldstar_state )
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* 3x 8255 */
-	MCFG_PPI8255_ADD( "ppi8255_0", ncb3_ppi8255_intf[0] )
-	MCFG_PPI8255_ADD( "ppi8255_1", ncb3_ppi8255_intf[1] )
-	MCFG_PPI8255_ADD( "ppi8255_2", ncb3_ppi8255_intf[2] )
+	MCFG_I8255A_ADD( "ppi8255_0", ncb3_ppi8255_0_intf )
+	MCFG_I8255A_ADD( "ppi8255_1", ncb3_ppi8255_1_intf )
+	MCFG_I8255A_ADD( "ppi8255_2", ncb3_ppi8255_2_intf )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -6129,8 +6137,8 @@ static MACHINE_CONFIG_START( cm, goldstar_state )
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* 2x 8255 */
-	MCFG_PPI8255_ADD( "ppi8255_0", cm_ppi8255_intf[0] )
-	MCFG_PPI8255_ADD( "ppi8255_1", cm_ppi8255_intf[1] )
+	MCFG_I8255A_ADD( "ppi8255_0", cm_ppi8255_0_intf )
+	MCFG_I8255A_ADD( "ppi8255_1", cm_ppi8255_1_intf )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -6169,8 +6177,8 @@ static MACHINE_CONFIG_START( cmnobmp, goldstar_state )
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* 2x 8255 */
-	MCFG_PPI8255_ADD( "ppi8255_0", cm_ppi8255_intf[0] )
-	MCFG_PPI8255_ADD( "ppi8255_1", cm_ppi8255_intf[1] )
+	MCFG_I8255A_ADD( "ppi8255_0", cm_ppi8255_0_intf )
+	MCFG_I8255A_ADD( "ppi8255_1", cm_ppi8255_1_intf )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -6204,8 +6212,8 @@ static MACHINE_CONFIG_START( cmast91, goldstar_state )
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* 2x 8255 */
-	MCFG_PPI8255_ADD( "ppi8255_0", cm_ppi8255_intf[0] )
-	MCFG_PPI8255_ADD( "ppi8255_1", cm_ppi8255_intf[1] )
+	MCFG_I8255A_ADD( "ppi8255_0", cm_ppi8255_0_intf )
+	MCFG_I8255A_ADD( "ppi8255_1", cm_ppi8255_1_intf )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -6246,9 +6254,9 @@ static MACHINE_CONFIG_START( lucky8, goldstar_state )
 	MCFG_CPU_VBLANK_INT("screen", lucky8_irq)
 
 	/* 3x 8255 */
-	MCFG_PPI8255_ADD( "ppi8255_0", lucky8_ppi8255_intf[0] )
-	MCFG_PPI8255_ADD( "ppi8255_1", lucky8_ppi8255_intf[1] )
-	MCFG_PPI8255_ADD( "ppi8255_2", lucky8_ppi8255_intf[2] )
+	MCFG_I8255A_ADD( "ppi8255_0", lucky8_ppi8255_0_intf )
+	MCFG_I8255A_ADD( "ppi8255_1", lucky8_ppi8255_1_intf )
+	MCFG_I8255A_ADD( "ppi8255_2", lucky8_ppi8255_2_intf )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -6285,9 +6293,9 @@ static MACHINE_CONFIG_START( bingowng, goldstar_state )
 	MCFG_CPU_VBLANK_INT("screen", lucky8_irq)
 
 	/* 3x 8255 */
-	MCFG_PPI8255_ADD( "ppi8255_0", lucky8_ppi8255_intf[0] )
-	MCFG_PPI8255_ADD( "ppi8255_1", lucky8_ppi8255_intf[1] )
-	MCFG_PPI8255_ADD( "ppi8255_2", lucky8_ppi8255_intf[2] )
+	MCFG_I8255A_ADD( "ppi8255_0", lucky8_ppi8255_0_intf )
+	MCFG_I8255A_ADD( "ppi8255_1", lucky8_ppi8255_1_intf )
+	MCFG_I8255A_ADD( "ppi8255_2", lucky8_ppi8255_2_intf )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -6324,9 +6332,9 @@ static MACHINE_CONFIG_START( bingownga, goldstar_state )
 	MCFG_CPU_VBLANK_INT("screen", lucky8_irq)
 
 	/* 3x 8255 */
-	MCFG_PPI8255_ADD( "ppi8255_0", lucky8_ppi8255_intf[0] )
-	MCFG_PPI8255_ADD( "ppi8255_1", lucky8_ppi8255_intf[1] )
-	MCFG_PPI8255_ADD( "ppi8255_2", lucky8_ppi8255_intf[2] )
+	MCFG_I8255A_ADD( "ppi8255_0", lucky8_ppi8255_0_intf )
+	MCFG_I8255A_ADD( "ppi8255_1", lucky8_ppi8255_1_intf )
+	MCFG_I8255A_ADD( "ppi8255_2", lucky8_ppi8255_2_intf )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -6380,9 +6388,9 @@ static MACHINE_CONFIG_START( magodds, goldstar_state )
 	MCFG_CPU_VBLANK_INT("screen", lucky8_irq)
 
 	/* 3x 8255 */
-	MCFG_PPI8255_ADD( "ppi8255_0", lucky8_ppi8255_intf[0] )
-	MCFG_PPI8255_ADD( "ppi8255_1", lucky8_ppi8255_intf[1] )
-	MCFG_PPI8255_ADD( "ppi8255_2", lucky8_ppi8255_intf[2] )
+	MCFG_I8255A_ADD( "ppi8255_0", lucky8_ppi8255_0_intf )
+	MCFG_I8255A_ADD( "ppi8255_1", lucky8_ppi8255_1_intf )
+	MCFG_I8255A_ADD( "ppi8255_2", lucky8_ppi8255_2_intf )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -6421,9 +6429,9 @@ static MACHINE_CONFIG_START( kkotnoli, goldstar_state )
 
 
 	/* 3x 8255 */
-	MCFG_PPI8255_ADD( "ppi8255_0", kkotnoli_ppi8255_intf[0] )
-	MCFG_PPI8255_ADD( "ppi8255_1", kkotnoli_ppi8255_intf[1] )
-	MCFG_PPI8255_ADD( "ppi8255_2", kkotnoli_ppi8255_intf[2] )
+	MCFG_I8255A_ADD( "ppi8255_0", kkotnoli_ppi8255_0_intf )
+	MCFG_I8255A_ADD( "ppi8255_1", kkotnoli_ppi8255_1_intf )
+	MCFG_I8255A_ADD( "ppi8255_2", kkotnoli_ppi8255_2_intf )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -6457,8 +6465,8 @@ static MACHINE_CONFIG_START( ladylinr, goldstar_state )
 	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	/* 2x 8255 */
-	MCFG_PPI8255_ADD( "ppi8255_0", ladylinr_ppi8255_intf[0] )
-	MCFG_PPI8255_ADD( "ppi8255_1", ladylinr_ppi8255_intf[1] )
+	MCFG_I8255A_ADD( "ppi8255_0", ladylinr_ppi8255_0_intf )
+	MCFG_I8255A_ADD( "ppi8255_1", ladylinr_ppi8255_1_intf )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -6496,9 +6504,9 @@ static MACHINE_CONFIG_START( wcat3, goldstar_state )
 	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	/* 3x 8255 */
-	MCFG_PPI8255_ADD( "ppi8255_0", lucky8_ppi8255_intf[0] )
-	MCFG_PPI8255_ADD( "ppi8255_1", lucky8_ppi8255_intf[1] )
-	MCFG_PPI8255_ADD( "ppi8255_2", lucky8_ppi8255_intf[2] )
+	MCFG_I8255A_ADD( "ppi8255_0", lucky8_ppi8255_0_intf )
+	MCFG_I8255A_ADD( "ppi8255_1", lucky8_ppi8255_1_intf )
+	MCFG_I8255A_ADD( "ppi8255_2", lucky8_ppi8255_2_intf )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -6538,8 +6546,8 @@ static MACHINE_CONFIG_START( amcoe1, goldstar_state )
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* 2x 8255 */
-	MCFG_PPI8255_ADD( "ppi8255_0", cm_ppi8255_intf[0] )
-	MCFG_PPI8255_ADD( "ppi8255_1", cm_ppi8255_intf[1] )
+	MCFG_I8255A_ADD( "ppi8255_0", cm_ppi8255_0_intf )
+	MCFG_I8255A_ADD( "ppi8255_1", cm_ppi8255_1_intf )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -6577,8 +6585,8 @@ static MACHINE_CONFIG_START( amcoe1a, goldstar_state )
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* 2x 8255 */
-	MCFG_PPI8255_ADD( "ppi8255_0", cm_ppi8255_intf[0] )
-	MCFG_PPI8255_ADD( "ppi8255_1", cm_ppi8255_intf[1] )
+	MCFG_I8255A_ADD( "ppi8255_0", cm_ppi8255_0_intf )
+	MCFG_I8255A_ADD( "ppi8255_1", cm_ppi8255_1_intf )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -6616,8 +6624,8 @@ static MACHINE_CONFIG_START( amcoe2, goldstar_state )
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* 2x 8255 */
-	MCFG_PPI8255_ADD( "ppi8255_0", cm_ppi8255_intf[0] )
-	MCFG_PPI8255_ADD( "ppi8255_1", cm_ppi8255_intf[1] )
+	MCFG_I8255A_ADD( "ppi8255_0", cm_ppi8255_0_intf )
+	MCFG_I8255A_ADD( "ppi8255_1", cm_ppi8255_1_intf )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -6650,8 +6658,8 @@ static MACHINE_CONFIG_START( nfm, goldstar_state )
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* 2x 8255 */
-	MCFG_PPI8255_ADD( "ppi8255_0", cm_ppi8255_intf[0] )
-	MCFG_PPI8255_ADD( "ppi8255_1", cm_ppi8255_intf[1] )
+	MCFG_I8255A_ADD( "ppi8255_0", cm_ppi8255_0_intf )
+	MCFG_I8255A_ADD( "ppi8255_1", cm_ppi8255_1_intf )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -6729,8 +6737,8 @@ static MACHINE_CONFIG_START( pkrmast, goldstar_state )
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* 2x 8255 */
-	MCFG_PPI8255_ADD( "ppi8255_0", cm_ppi8255_intf[0] )
-	MCFG_PPI8255_ADD( "ppi8255_1", cm_ppi8255_intf[1] )
+	MCFG_I8255A_ADD( "ppi8255_0", cm_ppi8255_0_intf )
+	MCFG_I8255A_ADD( "ppi8255_1", cm_ppi8255_1_intf )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -43,7 +43,7 @@ this seems more like 8-bit hardware, maybe it should be v25, not v35...
 #include "emu.h"
 #include "cpu/nec/nec.h"
 #include "sound/ay8910.h"
-#include "machine/8255ppi.h"
+#include "machine/i8255.h"
 
 
 class cb2001_state : public driver_device
@@ -564,8 +564,8 @@ static ADDRESS_MAP_START( cb2001_map, AS_PROGRAM, 16, cb2001_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cb2001_io, AS_IO, 16, cb2001_state )
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE8_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w, 0xffff)	/* Input Ports */
-	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE8_LEGACY("ppi8255_1", ppi8255_r, ppi8255_w, 0xffff)	/* DIP switches */
+	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE8("ppi8255_0", i8255_device, read, write, 0xffff)	/* Input Ports */
+	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE8("ppi8255_1", i8255_device, read, write, 0xffff)	/* DIP switches */
 	AM_RANGE(0x20, 0x21) AM_DEVREAD8_LEGACY("aysnd", ay8910_r, 0xff00)
 	AM_RANGE(0x22, 0x23) AM_DEVWRITE8_LEGACY("aysnd", ay8910_data_address_w, 0xffff)
 
@@ -798,24 +798,24 @@ static PALETTE_INIT(cb2001)
 	}
 }
 
-static const ppi8255_interface cb2001_ppi8255_intf[2] =
+static I8255A_INTERFACE( ppi8255_0_intf )
 {
-	{	/* A, B & C set as input */
-		DEVCB_INPUT_PORT("IN0"),	/* Port A read */
-		DEVCB_INPUT_PORT("IN1"),	/* Port B read */
-		DEVCB_INPUT_PORT("IN2"),	/* Port C read */
-		DEVCB_NULL,					/* Port A write */
-		DEVCB_NULL,					/* Port B write */
-		DEVCB_NULL					/* Port C write */
-	},
-	{	/* A, B & C set as input */
-		DEVCB_INPUT_PORT("DSW1"),	/* Port A read */
-		DEVCB_INPUT_PORT("DSW2"),	/* Port B read */
-		DEVCB_INPUT_PORT("DSW3"),	/* Port C read */
-		DEVCB_NULL,					/* Port A write */
-		DEVCB_NULL,					/* Port B write */
-		DEVCB_NULL					/* Port C write */
-	}
+	DEVCB_INPUT_PORT("IN0"),			/* Port A read */
+	DEVCB_NULL,							/* Port A write */
+	DEVCB_INPUT_PORT("IN1"),			/* Port B read */
+	DEVCB_NULL,							/* Port B write */
+	DEVCB_INPUT_PORT("IN2"),			/* Port C read */
+	DEVCB_NULL							/* Port C write */
+};
+
+static I8255A_INTERFACE( ppi8255_1_intf )
+{
+	DEVCB_INPUT_PORT("DSW1"),			/* Port A read */
+	DEVCB_NULL,							/* Port A write */
+	DEVCB_INPUT_PORT("DSW2"),			/* Port B read */
+	DEVCB_NULL,							/* Port B write */
+	DEVCB_INPUT_PORT("DSW3"),			/* Port C read */
+	DEVCB_NULL							/* Port C write */
 };
 
 static const ay8910_interface cb2001_ay8910_config =
@@ -829,6 +829,7 @@ static const ay8910_interface cb2001_ay8910_config =
 };
 
 static const nec_config cb2001_config = { cb2001_decryption_table, };
+
 static MACHINE_CONFIG_START( cb2001, cb2001_state )
 	MCFG_CPU_ADD("maincpu", V35, 20000000) // CPU91A-011-0016JK004; encrypted cpu like nec v25/35 used in some irem game
 	MCFG_CPU_CONFIG(cb2001_config)
@@ -836,8 +837,8 @@ static MACHINE_CONFIG_START( cb2001, cb2001_state )
 	MCFG_CPU_IO_MAP(cb2001_io)
 	MCFG_CPU_VBLANK_INT("screen", vblank_irq)
 
-	MCFG_PPI8255_ADD( "ppi8255_0", cb2001_ppi8255_intf[0] )
-	MCFG_PPI8255_ADD( "ppi8255_1", cb2001_ppi8255_intf[1] )
+	MCFG_I8255A_ADD( "ppi8255_0", ppi8255_0_intf )
+	MCFG_I8255A_ADD( "ppi8255_1", ppi8255_1_intf )
 
 	MCFG_GFXDECODE(cb2001)
 

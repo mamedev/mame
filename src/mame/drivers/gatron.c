@@ -229,7 +229,7 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/sn76496.h"
-#include "machine/8255ppi.h"
+#include "machine/i8255.h"
 #include "machine/nvram.h"
 #include "poker41.lh"
 #include "pulltabs.lh"
@@ -322,14 +322,14 @@ static WRITE8_DEVICE_HANDLER( output_port_1_w )
 *      Machine Init      *
 *************************/
 
-static const ppi8255_interface ppi8255_intf =
+static I8255A_INTERFACE( ppi8255_intf )
 {
 	DEVCB_INPUT_PORT("IN0"),		/* Port A read */
-	DEVCB_INPUT_PORT("IN1"),		/* Port B read */
-	DEVCB_NULL,						/* Port C read */
 	DEVCB_NULL,						/* Port A write */
+	DEVCB_INPUT_PORT("IN1"),		/* Port B read */
 	DEVCB_NULL,						/* Port B write */
-	DEVCB_HANDLER(output_port_1_w),	/* Port C write */
+	DEVCB_NULL,						/* Port C read */
+	DEVCB_HANDLER(output_port_1_w)	/* Port C write */
 };
 
 
@@ -347,7 +347,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gat_portmap, AS_IO, 8, gatron_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE_LEGACY("ppi8255", ppi8255_r, ppi8255_w)
+	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
 ADDRESS_MAP_END
 
 
@@ -442,7 +442,7 @@ static MACHINE_CONFIG_START( gat, gatron_state )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_PPI8255_ADD( "ppi8255", ppi8255_intf )
+	MCFG_I8255A_ADD( "ppi8255", ppi8255_intf )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
