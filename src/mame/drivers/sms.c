@@ -216,7 +216,7 @@ U145        1Brown          PAL14H4CN
 #include "cpu/i86/i86.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
-#include "machine/8255ppi.h"
+#include "machine/i8255.h"
 #include "machine/nvram.h"
 
 
@@ -408,25 +408,26 @@ static WRITE8_DEVICE_HANDLER(ppi0_b_w)
 	coin_lockout_w(device->machine(), 1, BIT(data,4));
 }
 
-static const ppi8255_interface ppi8255_intf[2] =
+static I8255A_INTERFACE( ppi8255_0_intf )
 {
-	{
-		DEVCB_NULL,					/* Port A read */
-		DEVCB_NULL,					/* Port B read */
-		DEVCB_HANDLER(ppi0_c_r),	/* Port C read */
-		DEVCB_HANDLER(ppi0_a_w),	/* Port A write */
-		DEVCB_HANDLER(ppi0_b_w),	/* Port B write */
-		DEVCB_NULL					/* Port C write */
-	},
-	{
-		DEVCB_INPUT_PORT("IN0"),	/* Port A read */
-		DEVCB_INPUT_PORT("IN1"),	/* Port B read */
-		DEVCB_INPUT_PORT("IN2"),	/* Port C read */
-		DEVCB_NULL,					/* Port A write */
-		DEVCB_NULL,					/* Port B write */
-		DEVCB_NULL					/* Port C write */
-	}
+	DEVCB_NULL,							/* Port A read */
+	DEVCB_HANDLER(ppi0_a_w),			/* Port A write */
+	DEVCB_NULL,							/* Port B read */
+	DEVCB_HANDLER(ppi0_b_w),			/* Port B write */
+	DEVCB_HANDLER(ppi0_c_r),			/* Port C read */
+	DEVCB_NULL							/* Port C write */
 };
+
+static I8255A_INTERFACE( ppi8255_1_intf )
+{
+	DEVCB_INPUT_PORT("IN0"),			/* Port A read */
+	DEVCB_NULL,							/* Port A write */
+	DEVCB_INPUT_PORT("IN1"),			/* Port B read */
+	DEVCB_NULL,							/* Port B write */
+	DEVCB_INPUT_PORT("IN2"),			/* Port C read */
+	DEVCB_NULL							/* Port C write */
+};
+
 
 /*************************************
  *
@@ -497,7 +498,7 @@ static PALETTE_INIT( sms )
 
 static ADDRESS_MAP_START( sms_map, AS_PROGRAM, 8, smsmfg_state )
 	AM_RANGE(0x00000, 0x007ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x00800, 0x00803) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w)
+	AM_RANGE(0x00800, 0x00803) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
 	AM_RANGE(0x01000, 0x01007) AM_WRITE(video_w)
 	AM_RANGE(0x01800, 0x01803) AM_READWRITE(link_r, link_w)
 	AM_RANGE(0x04000, 0x07fff) AM_ROMBANK("bank1")
@@ -509,7 +510,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sureshot_map, AS_PROGRAM, 8, smsmfg_state )
 	AM_RANGE(0x00000, 0x007ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x02000, 0x02007) AM_WRITE(video_w)
-	AM_RANGE(0x03000, 0x03003) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w)
+	AM_RANGE(0x03000, 0x03003) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
 	AM_RANGE(0x03800, 0x03803) AM_READWRITE(link_r, link_w)
 	AM_RANGE(0x08000, 0x0ffff) AM_ROM
 	AM_RANGE(0xf8000, 0xfffff) AM_ROM // mirror for vectors
@@ -518,7 +519,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 8, smsmfg_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x27ff) AM_RAM
-	AM_RANGE(0x3100, 0x3103) AM_DEVREADWRITE_LEGACY("ppi8255_1", ppi8255_r, ppi8255_w)
+	AM_RANGE(0x3100, 0x3103) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
 	AM_RANGE(0x3381, 0x3382) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_address_w)
 	AM_RANGE(0x3400, 0x3400) AM_READ(z80_8088_r)
 	AM_RANGE(0x3500, 0x3501) AM_READWRITE(p03_r, p03_w)
@@ -564,8 +565,8 @@ static MACHINE_CONFIG_START( sms, smsmfg_state )
 	MCFG_MACHINE_START(sms)
 	MCFG_MACHINE_RESET(sms)
 
-	MCFG_PPI8255_ADD( "ppi8255_0", ppi8255_intf[0] )
-	MCFG_PPI8255_ADD( "ppi8255_1", ppi8255_intf[1] )
+	MCFG_I8255A_ADD( "ppi8255_0", ppi8255_0_intf )
+	MCFG_I8255A_ADD( "ppi8255_1", ppi8255_1_intf )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

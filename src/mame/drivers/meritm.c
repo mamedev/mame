@@ -104,7 +104,7 @@ Not all regional versions are available for each Megatouch series
 #include "cpu/z80/z80daisy.h"
 #include "sound/ay8910.h"
 #include "video/v9938.h"
-#include "machine/8255ppi.h"
+#include "machine/i8255.h"
 #include "machine/z80pio.h"
 #include "machine/pc16552d.h"
 #include "machine/microtch.h"
@@ -591,7 +591,7 @@ static ADDRESS_MAP_START( meritm_crt250_io_map, AS_IO, 8, meritm_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("v9938_0", v9938_device, read, write)
 	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE("v9938_1", v9938_device, read, write)
-	AM_RANGE(0x30, 0x33) AM_DEVREADWRITE_LEGACY("ppi8255", ppi8255_r, ppi8255_w)
+	AM_RANGE(0x30, 0x33) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
 	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE_LEGACY("z80pio_0", z80pio_cd_ba_r, z80pio_cd_ba_w)
 	AM_RANGE(0x50, 0x53) AM_DEVREADWRITE_LEGACY("z80pio_1", z80pio_cd_ba_r, z80pio_cd_ba_w)
 	AM_RANGE(0x80, 0x80) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
@@ -603,7 +603,7 @@ static ADDRESS_MAP_START( meritm_crt250_crt258_io_map, AS_IO, 8, meritm_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("v9938_0", v9938_device, read, write)
 	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE("v9938_1", v9938_device, read, write)
-	AM_RANGE(0x30, 0x33) AM_DEVREADWRITE_LEGACY("ppi8255", ppi8255_r, ppi8255_w)
+	AM_RANGE(0x30, 0x33) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
 	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE_LEGACY("z80pio_0", z80pio_cd_ba_r, z80pio_cd_ba_w)
 	AM_RANGE(0x50, 0x53) AM_DEVREADWRITE_LEGACY("z80pio_1", z80pio_cd_ba_r, z80pio_cd_ba_w)
 	AM_RANGE(0x60, 0x67) AM_READWRITE_LEGACY(pc16552d_0_r,pc16552d_0_w)
@@ -624,7 +624,7 @@ static ADDRESS_MAP_START( meritm_io_map, AS_IO, 8, meritm_state )
 	AM_RANGE(0x01, 0x01) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("v9938_0", v9938_device, read, write)
 	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE("v9938_1", v9938_device, read, write)
-	AM_RANGE(0x30, 0x33) AM_DEVREADWRITE_LEGACY("ppi8255", ppi8255_r, ppi8255_w)
+	AM_RANGE(0x30, 0x33) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
 	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE_LEGACY("z80pio_0", z80pio_cd_ba_r, z80pio_cd_ba_w)
 	AM_RANGE(0x50, 0x53) AM_DEVREADWRITE_LEGACY("z80pio_1", z80pio_cd_ba_r, z80pio_cd_ba_w)
 	AM_RANGE(0x60, 0x67) AM_READWRITE_LEGACY(pc16552d_0_r,pc16552d_0_w)
@@ -772,24 +772,24 @@ static WRITE8_DEVICE_HANDLER(meritm_crt250_port_b_w)
 	output_set_value("P1 CANCEL LAMP", !BIT(data,6));
 }
 
-static const ppi8255_interface crt260_ppi8255_intf =
+static I8255A_INTERFACE( crt260_ppi8255_intf )
 {
-	DEVCB_NULL,								/* Port A read */
-	DEVCB_NULL,								/* Port B read */
-	DEVCB_HANDLER(meritm_8255_port_c_r),	/* Port C read */
-	DEVCB_NULL,								/* Port A write (used) */
-	DEVCB_NULL,								/* Port B write (used LMP x DRIVE) */
-	DEVCB_NULL								/* Port C write */
+	DEVCB_NULL,							/* Port A read */
+	DEVCB_NULL,							/* Port A write */
+	DEVCB_NULL,							/* Port B read */
+	DEVCB_NULL,							/* Port B write */
+	DEVCB_HANDLER(meritm_8255_port_c_r),/* Port C read */
+	DEVCB_NULL							/* Port C write */
 };
 
-static const ppi8255_interface crt250_ppi8255_intf =
+static I8255A_INTERFACE( crt250_ppi8255_intf )
 {
-	DEVCB_NULL,								/* Port A read */
-	DEVCB_NULL,								/* Port B read */
-	DEVCB_HANDLER(meritm_8255_port_c_r),	/* Port C read */
-	DEVCB_NULL,								/* Port A write (used) */
-	DEVCB_HANDLER(meritm_crt250_port_b_w),	/* Port B write (used LMP x DRIVE) */
-	DEVCB_NULL								/* Port C write */
+	DEVCB_NULL,							/* Port A read */
+	DEVCB_NULL,							/* Port A write */
+	DEVCB_NULL,							/* Port B read */
+	DEVCB_HANDLER(meritm_crt250_port_b_w),/* Port B write (used LMP x DRIVE) */
+	DEVCB_HANDLER(meritm_8255_port_c_r),/* Port C read */
+	DEVCB_NULL							/* Port C write */
 };
 
 /*************************************
@@ -1062,7 +1062,7 @@ static MACHINE_CONFIG_START( meritm_crt250, meritm_state )
 
 	MCFG_MACHINE_START(meritm_crt250)
 
-	MCFG_PPI8255_ADD( "ppi8255", crt250_ppi8255_intf )
+	MCFG_I8255A_ADD( "ppi8255", crt250_ppi8255_intf )
 
 	MCFG_Z80PIO_ADD( "z80pio_0", SYSTEM_CLK/6, meritm_audio_pio_intf )
 	MCFG_Z80PIO_ADD( "z80pio_1", SYSTEM_CLK/6, meritm_io_pio_intf )
@@ -1119,7 +1119,8 @@ static MACHINE_CONFIG_DERIVED( meritm_crt260, meritm_crt250 )
 	MCFG_CPU_PROGRAM_MAP(meritm_map)
 	MCFG_CPU_IO_MAP(meritm_io_map)
 
-	MCFG_PPI8255_RECONFIG( "ppi8255", crt260_ppi8255_intf )
+	MCFG_DEVICE_REMOVE("ppi8255")
+	MCFG_I8255A_ADD( "ppi8255", crt260_ppi8255_intf )
 
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_msec(1200))	// DS1232, TD connected to VCC
 	MCFG_MACHINE_START(meritm_crt260)

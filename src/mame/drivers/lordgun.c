@@ -41,7 +41,7 @@ Notes:
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
-#include "machine/8255ppi.h"
+#include "machine/i8255.h"
 #include "machine/eeprom.h"
 #include "sound/3812intf.h"
 #include "sound/okim6295.h"
@@ -288,8 +288,8 @@ static ADDRESS_MAP_START( lordgun_map, AS_PROGRAM, 16, lordgun_state )
 	AM_RANGE(0x503c00, 0x503c01) AM_READ(lordgun_gun_0_y_r)
 	AM_RANGE(0x503e00, 0x503e01) AM_READ(lordgun_gun_1_y_r)
 	AM_RANGE(0x504000, 0x504001) AM_WRITE(lordgun_soundlatch_w)
-	AM_RANGE(0x506000, 0x506007) AM_DEVREADWRITE8_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w, 0x00ff)
-	AM_RANGE(0x508000, 0x508007) AM_DEVREADWRITE8_LEGACY("ppi8255_1", ppi8255_r, ppi8255_w, 0x00ff)
+	AM_RANGE(0x506000, 0x506007) AM_DEVREADWRITE8("ppi8255_0", i8255_device, read, write, 0x00ff)
+	AM_RANGE(0x508000, 0x508007) AM_DEVREADWRITE8("ppi8255_1", i8255_device, read, write, 0x00ff)
 	AM_RANGE(0x50a900, 0x50a9ff) AM_RAM	// protection
 ADDRESS_MAP_END
 
@@ -316,8 +316,8 @@ static ADDRESS_MAP_START( aliencha_map, AS_PROGRAM, 16, lordgun_state )
 	AM_RANGE(0x502e00, 0x502e01) AM_WRITEONLY AM_SHARE("scroll_y.3")
 	AM_RANGE(0x503000, 0x503001) AM_WRITE(lordgun_priority_w)
 	AM_RANGE(0x504000, 0x504001) AM_WRITE(lordgun_soundlatch_w)
-	AM_RANGE(0x506000, 0x506007) AM_DEVREADWRITE8_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w, 0x00ff)
-	AM_RANGE(0x508000, 0x508007) AM_DEVREADWRITE8_LEGACY("ppi8255_1", ppi8255_r, ppi8255_w, 0x00ff)
+	AM_RANGE(0x506000, 0x506007) AM_DEVREADWRITE8("ppi8255_0", i8255_device, read, write, 0x00ff)
+	AM_RANGE(0x508000, 0x508007) AM_DEVREADWRITE8("ppi8255_1", i8255_device, read, write, 0x00ff)
 	AM_RANGE(0x50b900, 0x50b9ff) AM_RAM	// protection
 ADDRESS_MAP_END
 
@@ -606,46 +606,46 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-static const ppi8255_interface lordgun_ppi8255_intf[2] =
+static I8255A_INTERFACE( lordgun_ppi8255_0_intf )
 {
-	{
-		DEVCB_INPUT_PORT("DIP"),		// Port A read
-		DEVCB_NULL,						// Port B read
-		DEVCB_INPUT_PORT("SERVICE"),	// Port C read
-		DEVCB_HANDLER(fake_w),			// Port A write
-		DEVCB_HANDLER(lordgun_eeprom_w),// Port B write
-		DEVCB_HANDLER(fake2_w)			// Port C write
-	},
-	{
-		DEVCB_INPUT_PORT("START1"),		// Port A read
-		DEVCB_INPUT_PORT("START2"),		// Port B read
-		DEVCB_INPUT_PORT("COIN"),		// Port C read
-		DEVCB_HANDLER(fake_w),			// Port A write
-		DEVCB_HANDLER(fake_w),			// Port B write
-		DEVCB_HANDLER(fake_w)			// Port C write
-	}
+	DEVCB_INPUT_PORT("DIP"),			/* Port A read */
+	DEVCB_HANDLER(fake_w),				/* Port A write */
+	DEVCB_NULL,							/* Port B read */
+	DEVCB_HANDLER(lordgun_eeprom_w),	/* Port B write */
+	DEVCB_INPUT_PORT("SERVICE"),		/* Port C read */
+	DEVCB_HANDLER(fake2_w)				/* Port C write */
 };
 
-
-static const ppi8255_interface aliencha_ppi8255_intf[2] =
+static I8255A_INTERFACE( lordgun_ppi8255_1_intf )
 {
-	{
-		DEVCB_HANDLER(aliencha_dip_r),		// Port A read
-		DEVCB_NULL,							// Port B read
-		DEVCB_INPUT_PORT("SERVICE"),		// Port C read
-		DEVCB_HANDLER(fake2_w),				// Port A write
-		DEVCB_HANDLER(aliencha_eeprom_w),	// Port B write
-		DEVCB_HANDLER(aliencha_dip_w)		// Port C write
-	},
-	{
-		DEVCB_INPUT_PORT("P1"),				// Port A read
-		DEVCB_INPUT_PORT("P2"),				// Port B read
-		DEVCB_INPUT_PORT("COIN"),			// Port C read
-		DEVCB_HANDLER(fake_w),				// Port A write
-		DEVCB_HANDLER(fake_w),				// Port B write
-		DEVCB_HANDLER(fake_w)				// Port C write
-	}
+	DEVCB_INPUT_PORT("START1"),			/* Port A read */
+	DEVCB_HANDLER(fake_w),				/* Port A write */
+	DEVCB_INPUT_PORT("START2"),			/* Port B read */
+	DEVCB_HANDLER(fake_w),				/* Port B write */
+	DEVCB_INPUT_PORT("COIN"),			/* Port C read */
+	DEVCB_HANDLER(fake_w)				/* Port C write */
 };
+
+static I8255A_INTERFACE( aliencha_ppi8255_0_intf )
+{
+	DEVCB_HANDLER(aliencha_dip_r),		/* Port A read */
+	DEVCB_HANDLER(fake2_w),				/* Port A write */
+	DEVCB_NULL,							/* Port B read */
+	DEVCB_HANDLER(aliencha_eeprom_w),	/* Port B write */
+	DEVCB_INPUT_PORT("SERVICE"),		/* Port C read */
+	DEVCB_HANDLER(aliencha_dip_w)		/* Port C write */
+};
+
+static I8255A_INTERFACE( aliencha_ppi8255_1_intf )
+{
+	DEVCB_INPUT_PORT("P1"),				/* Port A read */
+	DEVCB_HANDLER(fake_w),				/* Port A write */
+	DEVCB_INPUT_PORT("P2"),				/* Port B read */
+	DEVCB_HANDLER(fake_w),				/* Port B write */
+	DEVCB_INPUT_PORT("COIN"),			/* Port C read */
+	DEVCB_HANDLER(fake_w)				/* Port C write */
+};
+
 
 static void soundirq(device_t *device, int state)
 {
@@ -666,8 +666,8 @@ static MACHINE_CONFIG_START( lordgun, lordgun_state )
 	MCFG_CPU_PROGRAM_MAP(lordgun_soundmem_map)
 	MCFG_CPU_IO_MAP(lordgun_soundio_map)
 
-	MCFG_PPI8255_ADD( "ppi8255_0", lordgun_ppi8255_intf[0] )
-	MCFG_PPI8255_ADD( "ppi8255_1", lordgun_ppi8255_intf[1] )
+	MCFG_I8255A_ADD( "ppi8255_0", lordgun_ppi8255_0_intf )
+	MCFG_I8255A_ADD( "ppi8255_1", lordgun_ppi8255_1_intf )
 
 	MCFG_EEPROM_93C46_ADD("eeprom")
 
@@ -709,8 +709,8 @@ static MACHINE_CONFIG_START( aliencha, lordgun_state )
 	MCFG_CPU_PROGRAM_MAP(lordgun_soundmem_map)
 	MCFG_CPU_IO_MAP(aliencha_soundio_map)
 
-	MCFG_PPI8255_ADD( "ppi8255_0", aliencha_ppi8255_intf[0] )
-	MCFG_PPI8255_ADD( "ppi8255_1", aliencha_ppi8255_intf[1] )
+	MCFG_I8255A_ADD( "ppi8255_0", aliencha_ppi8255_0_intf )
+	MCFG_I8255A_ADD( "ppi8255_1", aliencha_ppi8255_1_intf )
 
 	MCFG_EEPROM_93C46_ADD("eeprom")
 

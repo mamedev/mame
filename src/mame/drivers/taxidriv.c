@@ -11,7 +11,7 @@ OTHER: 5 * M5L8255AP
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "machine/8255ppi.h"
+#include "machine/i8255.h"
 #include "includes/taxidriv.h"
 #include "sound/ay8910.h"
 
@@ -105,49 +105,54 @@ static WRITE8_DEVICE_HANDLER( p8910_0b_w )
 	state->m_s4 = data & 1;
 }
 
-
-static const ppi8255_interface ppi8255_intf[5] =
+static I8255A_INTERFACE( ppi8255_0_intf )
 {
-	{
-		DEVCB_HANDLER(p0a_r),		/* Port A read */
-		DEVCB_NULL,					/* Port B read */
-		DEVCB_HANDLER(p0c_r),		/* Port C read */
-		DEVCB_NULL,					/* Port A write */
-		DEVCB_HANDLER(p0b_w),		/* Port B write */
-		DEVCB_HANDLER(p0c_w)		/* Port C write */
-	},
-	{
-		DEVCB_NULL,					/* Port A read */
-		DEVCB_HANDLER(p1b_r),		/* Port B read */
-		DEVCB_HANDLER(p1c_r),		/* Port C read */
-		DEVCB_HANDLER(p1a_w),		/* Port A write */
-		DEVCB_NULL,					/* Port B write */
-		DEVCB_HANDLER(p1c_w)		/* Port C write */
-	},
-	{
-		DEVCB_NULL,					/* Port A read */
-		DEVCB_NULL,					/* Port B read */
-		DEVCB_NULL,					/* Port C read */
-		DEVCB_HANDLER(p2a_w),		/* Port A write */
-		DEVCB_HANDLER(p2b_w),		/* Port B write */
-		DEVCB_HANDLER(p2c_w)		/* Port C write */
-	},
-	{
-		DEVCB_NULL,					/* Port A read */
-		DEVCB_NULL,					/* Port B read */
-		DEVCB_NULL,					/* Port C read */
-		DEVCB_HANDLER(p3a_w),		/* Port A write */
-		DEVCB_HANDLER(p3b_w),		/* Port B write */
-		DEVCB_HANDLER(p3c_w)		/* Port C write */
-	},
-	{
-		DEVCB_NULL,					/* Port A read */
-		DEVCB_NULL,					/* Port B read */
-		DEVCB_NULL,					/* Port C read */
-		DEVCB_HANDLER(p4a_w),		/* Port A write */
-		DEVCB_HANDLER(p4b_w),		/* Port B write */
-		DEVCB_HANDLER(p4c_w)		/* Port C write */
-	}
+	DEVCB_HANDLER(p0a_r),				/* Port A read */
+	DEVCB_NULL,							/* Port A write */
+	DEVCB_NULL,							/* Port B read */
+	DEVCB_HANDLER(p0b_w),				/* Port B write */
+	DEVCB_HANDLER(p0c_r),				/* Port C read */
+	DEVCB_HANDLER(p0c_w)				/* Port C write */
+};
+
+static I8255A_INTERFACE( ppi8255_1_intf )
+{
+	DEVCB_NULL,							/* Port A read */
+	DEVCB_HANDLER(p1a_w),				/* Port A write */
+	DEVCB_HANDLER(p1b_r),				/* Port B read */
+	DEVCB_NULL,							/* Port B write */
+	DEVCB_HANDLER(p1c_r),				/* Port C read */
+	DEVCB_HANDLER(p1c_w)				/* Port C write */
+};
+
+static I8255A_INTERFACE( ppi8255_2_intf )
+{
+	DEVCB_NULL,							/* Port A read */
+	DEVCB_HANDLER(p2a_w),				/* Port A write */
+	DEVCB_NULL,							/* Port B read */
+	DEVCB_HANDLER(p2b_w),				/* Port B write */
+	DEVCB_NULL,							/* Port C read */
+	DEVCB_HANDLER(p2c_w)				/* Port C write */
+};
+
+static I8255A_INTERFACE( ppi8255_3_intf )
+{
+	DEVCB_NULL,							/* Port A read */
+	DEVCB_HANDLER(p3a_w),				/* Port A write */
+	DEVCB_NULL,							/* Port B read */
+	DEVCB_HANDLER(p3b_w),				/* Port B write */
+	DEVCB_NULL,							/* Port C read */
+	DEVCB_HANDLER(p3c_w)				/* Port C write */
+};
+
+static I8255A_INTERFACE( ppi8255_4_intf )
+{
+	DEVCB_NULL,							/* Port A read */
+	DEVCB_HANDLER(p4a_w),				/* Port A write */
+	DEVCB_NULL,							/* Port B read */
+	DEVCB_HANDLER(p4b_w),				/* Port B write */
+	DEVCB_NULL,							/* Port C read */
+	DEVCB_HANDLER(p4c_w)				/* Port C write */
 };
 
 
@@ -166,10 +171,10 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, taxidriv_state )
 	AM_RANGE(0xe400, 0xebff) AM_WRITEONLY AM_SHARE("vram2")	/* bg1 tilemap */
 	AM_RANGE(0xec00, 0xefff) AM_WRITEONLY AM_SHARE("vram0")	/* fg tilemap */
 	AM_RANGE(0xf000, 0xf3ff) AM_WRITEONLY AM_SHARE("vram3")	/* bg2 tilemap */
-	AM_RANGE(0xf400, 0xf403) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w)
-	AM_RANGE(0xf480, 0xf483) AM_DEVREADWRITE_LEGACY("ppi8255_2", ppi8255_r, ppi8255_w)	/* "sprite1" placement */
-	AM_RANGE(0xf500, 0xf503) AM_DEVREADWRITE_LEGACY("ppi8255_3", ppi8255_r, ppi8255_w)	/* "sprite2" placement */
-	AM_RANGE(0xf580, 0xf583) AM_DEVREADWRITE_LEGACY("ppi8255_4", ppi8255_r, ppi8255_w)	/* "sprite3" placement */
+	AM_RANGE(0xf400, 0xf403) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
+	AM_RANGE(0xf480, 0xf483) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write)	/* "sprite1" placement */
+	AM_RANGE(0xf500, 0xf503) AM_DEVREADWRITE("ppi8255_3", i8255_device, read, write)	/* "sprite2" placement */
+	AM_RANGE(0xf580, 0xf583) AM_DEVREADWRITE("ppi8255_4", i8255_device, read, write)	/* "sprite3" placement */
 	//AM_RANGE(0xf780, 0xf781) AM_WRITEONLY     /* more scroll registers? */
 	AM_RANGE(0xf782, 0xf787) AM_WRITEONLY AM_SHARE("scroll")	/* bg scroll (three copies always identical) */
 	AM_RANGE(0xf800, 0xffff) AM_RAM
@@ -179,7 +184,7 @@ static ADDRESS_MAP_START( cpu2_map, AS_PROGRAM, 8, taxidriv_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x6000, 0x67ff) AM_RAM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0xa000, 0xa003) AM_DEVREADWRITE_LEGACY("ppi8255_1", ppi8255_r, ppi8255_w)
+	AM_RANGE(0xa000, 0xa003) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
 	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("DSW0")
 	AM_RANGE(0xe001, 0xe001) AM_READ_PORT("DSW1")
 	AM_RANGE(0xe002, 0xe002) AM_READ_PORT("DSW2")
@@ -389,11 +394,11 @@ static MACHINE_CONFIG_START( taxidriv, taxidriv_state )
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))	/* 100 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
 
-	MCFG_PPI8255_ADD( "ppi8255_0", ppi8255_intf[0] )
-	MCFG_PPI8255_ADD( "ppi8255_1", ppi8255_intf[1] )
-	MCFG_PPI8255_ADD( "ppi8255_2", ppi8255_intf[2] )
-	MCFG_PPI8255_ADD( "ppi8255_3", ppi8255_intf[3] )
-	MCFG_PPI8255_ADD( "ppi8255_4", ppi8255_intf[4] )
+	MCFG_I8255A_ADD( "ppi8255_0", ppi8255_0_intf )
+	MCFG_I8255A_ADD( "ppi8255_1", ppi8255_1_intf )
+	MCFG_I8255A_ADD( "ppi8255_2", ppi8255_2_intf )
+	MCFG_I8255A_ADD( "ppi8255_3", ppi8255_3_intf )
+	MCFG_I8255A_ADD( "ppi8255_4", ppi8255_4_intf )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

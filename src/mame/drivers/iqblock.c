@@ -52,7 +52,7 @@ Grndtour:
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/z180/z180.h"
-#include "machine/8255ppi.h"
+#include "machine/i8255.h"
 #include "includes/iqblock.h"
 #include "sound/2413intf.h"
 
@@ -113,14 +113,14 @@ static WRITE8_DEVICE_HANDLER( port_C_w )
 	/* bit 7 could be a second coin counter, but coin 2 doesn't seem to work... */
 }
 
-static const ppi8255_interface ppi8255_intf =
+static I8255A_INTERFACE( ppi8255_intf )
 {
-	DEVCB_INPUT_PORT("P1"),		/* Port A read */
-	DEVCB_INPUT_PORT("P2"),		/* Port B read */
-	DEVCB_INPUT_PORT("EXTRA"),	/* Port C read */
-	DEVCB_NULL,					/* Port A write */
-	DEVCB_NULL,					/* Port B write */
-	DEVCB_HANDLER(port_C_w)		/* Port C write */
+	DEVCB_INPUT_PORT("P1"),				/* Port A read */
+	DEVCB_NULL,							/* Port A write */
+	DEVCB_INPUT_PORT("P2"),				/* Port B read */
+	DEVCB_NULL,							/* Port B write */
+	DEVCB_INPUT_PORT("EXTRA"),			/* Port C read */
+	DEVCB_HANDLER(port_C_w)				/* Port C write */
 };
 
 
@@ -136,8 +136,7 @@ static ADDRESS_MAP_START( main_portmap, AS_IO, 8, iqblock_state )
 	AM_RANGE(0x6000, 0x603f) AM_WRITE(iqblock_fgscroll_w)
 	AM_RANGE(0x6800, 0x69ff) AM_WRITE(iqblock_fgvideoram_w)	/* initialized up to 6fff... bug or larger tilemap? */
 	AM_RANGE(0x7000, 0x7fff) AM_WRITE(iqblock_bgvideoram_w)
-	AM_RANGE(0x5080, 0x5083) AM_DEVWRITE_LEGACY("ppi8255", ppi8255_w)
-	AM_RANGE(0x5080, 0x5083) AM_DEVREAD_LEGACY("ppi8255", ppi8255_r)
+	AM_RANGE(0x5080, 0x5083) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
 	AM_RANGE(0x5090, 0x5090) AM_READ_PORT("SW0")
 	AM_RANGE(0x50a0, 0x50a0) AM_READ_PORT("SW1")
 	AM_RANGE(0x50b0, 0x50b1) AM_DEVWRITE_LEGACY("ymsnd", ym2413_w) // UM3567_data_port_0_w
@@ -279,7 +278,7 @@ static MACHINE_CONFIG_START( iqblock, iqblock_state )
 	MCFG_CPU_IO_MAP(main_portmap)
 	MCFG_TIMER_ADD_SCANLINE("scantimer", iqblock_irq, "screen", 0, 1)
 
-	MCFG_PPI8255_ADD( "ppi8255", ppi8255_intf )
+	MCFG_I8255A_ADD( "ppi8255", ppi8255_intf )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -41,7 +41,7 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/i86/i86.h"
-#include "machine/8255ppi.h"
+#include "machine/i8255.h"
 #include "sound/ay8910.h"
 #include "rendlay.h"
 #include "includes/tx1.h"
@@ -467,25 +467,24 @@ READ8_MEMBER(tx1_state::bbjr_analog_r)
  *************************************/
 
 /* Buggy Boy uses an 8255 PPI instead of YM2149 ports for inputs! */
-static const ppi8255_interface buggyboy_ppi8255_intf =
+static I8255A_INTERFACE( buggyboy_ppi8255_intf )
 {
-	DEVCB_INPUT_PORT("PPI_PORTA"),
-	DEVCB_NULL,
-	DEVCB_INPUT_PORT("PPI_PORTC"),
-	DEVCB_NULL,
-	DEVCB_HANDLER(bb_coin_cnt_w),
-	DEVCB_NULL,
+	DEVCB_INPUT_PORT("PPI_PORTA"),		/* Port A read */
+	DEVCB_NULL,							/* Port A write */
+	DEVCB_NULL,							/* Port B read */
+	DEVCB_HANDLER(bb_coin_cnt_w),		/* Port B write */
+	DEVCB_INPUT_PORT("PPI_PORTC"),		/* Port C read */
+	DEVCB_NULL							/* Port C write */
 };
 
-
-static const ppi8255_interface tx1_ppi8255_intf =
+static I8255A_INTERFACE( tx1_ppi8255_intf )
 {
-	DEVCB_HANDLER(tx1_ppi_porta_r),
-	DEVCB_HANDLER(tx1_ppi_portb_r),
-	DEVCB_INPUT_PORT("PPI_PORTC"),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_HANDLER(tx1_coin_cnt_w)
+	DEVCB_HANDLER(tx1_ppi_porta_r),		/* Port A read */
+	DEVCB_NULL,							/* Port A write */
+	DEVCB_HANDLER(tx1_ppi_portb_r),		/* Port B read */
+	DEVCB_NULL,							/* Port B write */
+	DEVCB_INPUT_PORT("PPI_PORTC"),		/* Port C read */
+	DEVCB_HANDLER(tx1_coin_cnt_w)		/* Port C write */
 };
 
 
@@ -530,7 +529,7 @@ static ADDRESS_MAP_START( tx1_sound_prg, AS_PROGRAM, 8, tx1_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x3000, 0x37ff) AM_RAM AM_MIRROR(0x800) AM_SHARE("z80_ram")
 	AM_RANGE(0x4000, 0x4000) AM_WRITE(z80_intreq_w)
-	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE_LEGACY("ppi8255", ppi8255_r, ppi8255_w)
+	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
 	AM_RANGE(0x6000, 0x6003) AM_DEVREADWRITE_LEGACY("tx1", tx1_pit8253_r, tx1_pit8253_w)
 	AM_RANGE(0x7000, 0x7fff) AM_WRITE(tx1_ppi_latch_w)
 	AM_RANGE(0xb000, 0xbfff) AM_READWRITE(ts_r, ts_w)
@@ -597,7 +596,7 @@ static ADDRESS_MAP_START( buggyboy_sound_prg, AS_PROGRAM, 8, tx1_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_SHARE("z80_ram")
 	AM_RANGE(0x6000, 0x6001) AM_READ(bb_analog_r)
-	AM_RANGE(0x6800, 0x6803) AM_DEVREADWRITE_LEGACY("ppi8255", ppi8255_r, ppi8255_w)
+	AM_RANGE(0x6800, 0x6803) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
 	AM_RANGE(0x7000, 0x7003) AM_DEVREADWRITE_LEGACY("buggyboy", tx1_pit8253_r, tx1_pit8253_w)
 	AM_RANGE(0x7800, 0x7800) AM_WRITE(z80_intreq_w)
 	AM_RANGE(0xc000, 0xc7ff) AM_READWRITE(ts_r, ts_w)
@@ -706,7 +705,7 @@ static MACHINE_CONFIG_START( tx1, tx1_state )
 	MCFG_MACHINE_RESET(tx1)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_PPI8255_ADD("ppi8255", tx1_ppi8255_intf)
+	MCFG_I8255A_ADD("ppi8255", tx1_ppi8255_intf)
 
 	MCFG_PALETTE_LENGTH(256)
 	MCFG_PALETTE_INIT(tx1)
@@ -758,7 +757,7 @@ static MACHINE_CONFIG_START( buggyboy, tx1_state )
 	MCFG_MACHINE_RESET(buggyboy)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_PPI8255_ADD("ppi8255", buggyboy_ppi8255_intf)
+	MCFG_I8255A_ADD("ppi8255", buggyboy_ppi8255_intf)
 
 	MCFG_DEFAULT_LAYOUT(layout_triphsxs)
 

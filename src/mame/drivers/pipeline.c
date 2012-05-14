@@ -67,7 +67,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
 #include "cpu/z80/z80.h"
 #include "machine/z80ctc.h"
 #include "sound/2203intf.h"
-#include "machine/8255ppi.h"
+#include "machine/i8255.h"
 #include "cpu/z80/z80daisy.h"
 #include "cpu/m6805/m6805.h"
 
@@ -193,8 +193,8 @@ static ADDRESS_MAP_START( cpu0_mem, AS_PROGRAM, 8, pipeline_state )
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x8800, 0x97ff) AM_RAM_WRITE(vram1_w) AM_SHARE("vram1")
 	AM_RANGE(0x9800, 0xa7ff) AM_RAM_WRITE(vram2_w) AM_SHARE("vram2")
-	AM_RANGE(0xb800, 0xb803) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w)
-	AM_RANGE(0xb810, 0xb813) AM_DEVREADWRITE_LEGACY("ppi8255_1", ppi8255_r, ppi8255_w)
+	AM_RANGE(0xb800, 0xb803) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
+	AM_RANGE(0xb810, 0xb813) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
 	AM_RANGE(0xb830, 0xb830) AM_NOP
 	AM_RANGE(0xb840, 0xb840) AM_NOP
 ADDRESS_MAP_END
@@ -202,7 +202,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( cpu1_mem, AS_PROGRAM, 8, pipeline_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xe000, 0xe003) AM_DEVREADWRITE_LEGACY("ppi8255_2", ppi8255_r, ppi8255_w)
+	AM_RANGE(0xe000, 0xe003) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_port, AS_IO, 8, pipeline_state )
@@ -326,32 +326,34 @@ static const z80_daisy_config daisy_chain_sound[] =
 	{ NULL }
 };
 
-static const ppi8255_interface ppi8255_intf[3] =
+static I8255A_INTERFACE( ppi8255_0_intf )
 {
-	{
-		DEVCB_INPUT_PORT("P1"),			/* Port A read */
-		DEVCB_NULL,						/* Port B read */
-		DEVCB_NULL,						/* Port C read */
-		DEVCB_NULL,						/* Port A write */
-		DEVCB_NULL,						/* Port B write */  /* related to sound/music : check code at 0x1c0a */
-		DEVCB_HANDLER(vidctrl_w)		/* Port C write */
-	},
-	{
-		DEVCB_INPUT_PORT("DSW1"),		/* Port A read */
-		DEVCB_INPUT_PORT("DSW2"),		/* Port B read */
-		DEVCB_HANDLER(protection_r),	/* Port C read */
-		DEVCB_NULL,						/* Port A write */
-		DEVCB_NULL,						/* Port B write */
-		DEVCB_HANDLER(protection_w)		/* Port C write */
-	},
-	{
-		DEVCB_NULL,						/* Port A read */
-		DEVCB_NULL,						/* Port B read */
-		DEVCB_NULL,						/* Port C read */
-		DEVCB_NULL,						/* Port A write */
-		DEVCB_NULL,						/* Port B write */
-		DEVCB_NULL						/* Port C write */
-	}
+	DEVCB_INPUT_PORT("P1"),				/* Port A read */
+	DEVCB_NULL,							/* Port A write */
+	DEVCB_NULL,							/* Port B read */
+	DEVCB_NULL,							/* Port B write */  // related to sound/music : check code at 0x1c0a
+	DEVCB_NULL,							/* Port C read */
+	DEVCB_HANDLER(vidctrl_w)			/* Port C write */
+};
+
+static I8255A_INTERFACE( ppi8255_1_intf )
+{
+	DEVCB_INPUT_PORT("DSW1"),			/* Port A read */
+	DEVCB_NULL,							/* Port A write */
+	DEVCB_INPUT_PORT("DSW2"),			/* Port B read */
+	DEVCB_NULL,							/* Port B write */
+	DEVCB_HANDLER(protection_r),		/* Port C read */
+	DEVCB_HANDLER(protection_w)			/* Port C write */
+};
+
+static I8255A_INTERFACE( ppi8255_2_intf )
+{
+	DEVCB_NULL,							/* Port A read */
+	DEVCB_NULL,							/* Port A write */
+	DEVCB_NULL,							/* Port B read */
+	DEVCB_NULL,							/* Port B write */
+	DEVCB_NULL,							/* Port C read */
+	DEVCB_NULL							/* Port C write */
 };
 
 static const ym2203_interface ym2203_config =
@@ -400,9 +402,9 @@ static MACHINE_CONFIG_START( pipeline, pipeline_state )
 
 	MCFG_Z80CTC_ADD( "ctc", 7372800/2 /* same as "audiocpu" */, ctc_intf )
 
-	MCFG_PPI8255_ADD( "ppi8255_0", ppi8255_intf[0] )
-	MCFG_PPI8255_ADD( "ppi8255_1", ppi8255_intf[1] )
-	MCFG_PPI8255_ADD( "ppi8255_2", ppi8255_intf[2] )
+	MCFG_I8255A_ADD( "ppi8255_0", ppi8255_0_intf )
+	MCFG_I8255A_ADD( "ppi8255_1", ppi8255_1_intf )
+	MCFG_I8255A_ADD( "ppi8255_2", ppi8255_2_intf )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

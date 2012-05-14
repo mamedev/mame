@@ -35,7 +35,7 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
-#include "machine/8255ppi.h"
+#include "machine/i8255.h"
 #include "machine/nvram.h"
 
 
@@ -420,8 +420,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( io_map_skylncr, AS_IO, 8, skylncr_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w)	/* Input Ports */
-	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE_LEGACY("ppi8255_1", ppi8255_r, ppi8255_w)	/* Input Ports */
+	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)	/* Input Ports */
+	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)	/* Input Ports */
 
 	AM_RANGE(0x20, 0x20) AM_WRITE(skylncr_coin_w )
 
@@ -657,24 +657,24 @@ INPUT_PORTS_END
 *       PPI 8255 (x2) Interface       *
 **************************************/
 
-static const ppi8255_interface ppi8255_intf[2] =
+static I8255A_INTERFACE( ppi8255_0_intf )
 {
-	{	/* A, B & C set as input */
-		DEVCB_INPUT_PORT("IN1"),	/* Port A read */
-		DEVCB_INPUT_PORT("IN2"),	/* Port B read */
-		DEVCB_INPUT_PORT("DSW1"),	/* Port C read */
-		DEVCB_NULL,					/* Port A write */
-		DEVCB_NULL,					/* Port B write */
-		DEVCB_NULL					/* Port C write */
-	},
-	{	/* A, B & C set as input */
-		DEVCB_INPUT_PORT("DSW2"),	/* Port A read */
-		DEVCB_INPUT_PORT("IN3"),	/* Port B read */
-		DEVCB_INPUT_PORT("IN4"),	/* Port C read */
-		DEVCB_NULL,					/* Port A write */
-		DEVCB_NULL,					/* Port B write */
-		DEVCB_NULL					/* Port C write */
-	}
+	DEVCB_INPUT_PORT("IN1"),			/* Port A read */
+	DEVCB_NULL,							/* Port A write */
+	DEVCB_INPUT_PORT("IN2"),			/* Port B read */
+	DEVCB_NULL,							/* Port B write */
+	DEVCB_INPUT_PORT("DSW1"),			/* Port C read */
+	DEVCB_NULL							/* Port C write */
+};
+
+static I8255A_INTERFACE( ppi8255_1_intf )
+{
+	DEVCB_INPUT_PORT("DSW2"),			/* Port A read */
+	DEVCB_NULL,							/* Port A write */
+	DEVCB_INPUT_PORT("IN3"),			/* Port B read */
+	DEVCB_NULL,							/* Port B write */
+	DEVCB_INPUT_PORT("IN4"),			/* Port C read */
+	DEVCB_NULL							/* Port C write */
 };
 
 
@@ -716,8 +716,8 @@ static MACHINE_CONFIG_START( skylncr, skylncr_state )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* 1x M5M82C255, or 2x PPI8255 */
-	MCFG_PPI8255_ADD( "ppi8255_0", ppi8255_intf[0] )
-	MCFG_PPI8255_ADD( "ppi8255_1", ppi8255_intf[1] )
+	MCFG_I8255A_ADD( "ppi8255_0", ppi8255_0_intf )
+	MCFG_I8255A_ADD( "ppi8255_1", ppi8255_1_intf )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

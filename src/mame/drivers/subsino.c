@@ -212,7 +212,7 @@
 
 #include "emu.h"
 #include "cpu/z180/z180.h"
-#include "machine/8255ppi.h"
+#include "machine/i8255.h"
 #include "machine/subsino.h"
 #include "sound/okim6295.h"
 #include "sound/2413intf.h"

@@ -15,7 +15,7 @@ The ppi at 3000-3003 seems to be a dual port communication thing with the z80.
 #include "cpu/z80/z80.h"
 #include "cpu/m6502/m6502.h"
 #include "video/mc6845.h"
-#include "machine/8255ppi.h"
+#include "machine/i8255.h"
 #include "sound/ay8910.h"
 
 
@@ -73,7 +73,7 @@ static ADDRESS_MAP_START( rgum_map, AS_PROGRAM, 8, rgum_state )
 	AM_RANGE(0x2801, 0x2801) AM_READNOP //read but value discarded?
 	AM_RANGE(0x2803, 0x2803) AM_READNOP
 
-	AM_RANGE(0x3000, 0x3003) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w)
+	AM_RANGE(0x3000, 0x3003) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
 
 	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_SHARE("vram")
 	AM_RANGE(0x5000, 0x57ff) AM_RAM AM_SHARE("cram")
@@ -242,15 +242,16 @@ static const mc6845_interface mc6845_intf =
 	NULL		/* update address callback */
 };
 
-static const ppi8255_interface ppi8255_intf =
+static I8255A_INTERFACE( ppi8255_intf )
 {
-	DEVCB_INPUT_PORT("IN0"),		/* Port A read */
-	DEVCB_INPUT_PORT("IN1"),		/* Port B read */
-	DEVCB_INPUT_PORT("IN2"),		/* Port C read */
-	DEVCB_NULL,		/* Port A write */
-	DEVCB_NULL,		/* Port B write */
-	DEVCB_NULL		/* Port C write */
+	DEVCB_INPUT_PORT("IN0"),			/* Port A read */
+	DEVCB_NULL,							/* Port A write */
+	DEVCB_INPUT_PORT("IN1"),			/* Port B read */
+	DEVCB_NULL,							/* Port B write */
+	DEVCB_INPUT_PORT("IN2"),			/* Port C read */
+	DEVCB_NULL							/* Port C write */
 };
+
 
 static const ay8910_interface ay8910_config =
 {
@@ -278,7 +279,7 @@ static MACHINE_CONFIG_START( rgum, rgum_state )
 
 	MCFG_MC6845_ADD("crtc", MC6845, 24000000/16, mc6845_intf)	/* unknown clock & type, hand tuned to get ~50 fps (?) */
 
-	MCFG_PPI8255_ADD( "ppi8255_0", ppi8255_intf )
+	MCFG_I8255A_ADD( "ppi8255", ppi8255_intf )
 
 	MCFG_GFXDECODE(rgum)
 	MCFG_PALETTE_LENGTH(0x100)

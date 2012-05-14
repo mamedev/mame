@@ -71,7 +71,7 @@ quaquiz2 - no inputs, needs NVRAM
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
 #include "sound/ay8910.h"
-#include "machine/8255ppi.h"
+#include "machine/i8255.h"
 #include "video/tms9927.h"
 #include "machine/nvram.h"
 
@@ -270,20 +270,18 @@ static WRITE8_DEVICE_HANDLER( ppi_portc_hi_w )
  *
  *************************************/
 
-static const ppi8255_interface ppi8255_intf =
+static I8255A_INTERFACE( ppi8255_intf )
 {
-/* PPI 8255 group A & B set to Mode 0.
-   Port A, B and lower 4 bits of C set as Input.
-   High 4 bits of C set as Output
-*/
-	DEVCB_INPUT_PORT("IN0"),		/* Port A read */
-	DEVCB_INPUT_PORT("IN1"),		/* Port B read */
-	DEVCB_INPUT_PORT("IN2"),		/* Port C read (Lower Nibble as Input) */
-	DEVCB_NULL, 					/* Port A write */
-	DEVCB_NULL, 					/* Port B write */
-	DEVCB_HANDLER(ppi_portc_hi_w)	/* Port C write (High nibble as Output) */
+	/* PPI 8255 group A & B set to Mode 0.
+	 Port A, B and lower 4 bits of C set as Input.
+	 High 4 bits of C set as Output */
+	DEVCB_INPUT_PORT("IN0"),			/* Port A read */
+	DEVCB_NULL,							/* Port A write */
+	DEVCB_INPUT_PORT("IN1"),			/* Port B read */
+	DEVCB_NULL,							/* Port B write */
+	DEVCB_INPUT_PORT("IN2"),			/* Port C read */
+	DEVCB_HANDLER(ppi_portc_hi_w)		/* Port C write */
 };
-
 
 
 /*************************************
@@ -300,7 +298,7 @@ static ADDRESS_MAP_START( statriv2_map, AS_PROGRAM, 8, statriv2_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( statriv2_io_map, AS_IO, 8, statriv2_state )
-	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE_LEGACY("ppi", ppi8255_r, ppi8255_w)
+	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
 	AM_RANGE(0x28, 0x2b) AM_READ(question_data_r) AM_WRITEONLY AM_SHARE("question_offset")
 	AM_RANGE(0xb0, 0xb1) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
 	AM_RANGE(0xb1, 0xb1) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
@@ -310,7 +308,7 @@ ADDRESS_MAP_END
 #ifdef UNUSED_CODE
 static ADDRESS_MAP_START( statusbj_io, AS_IO, 8, statriv2_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE_LEGACY("ppi", ppi8255_r, ppi8255_w)
+	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
 	AM_RANGE(0xb0, 0xb1) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
 	AM_RANGE(0xb1, 0xb1) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
 	AM_RANGE(0xc0, 0xcf) AM_DEVREADWRITE_LEGACY("tms", tms9927_r, tms9927_w)
@@ -602,7 +600,7 @@ static MACHINE_CONFIG_START( statriv2, statriv2_state )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* 1x 8255 */
-	MCFG_PPI8255_ADD("ppi", ppi8255_intf)
+	MCFG_I8255A_ADD( "ppi8255", ppi8255_intf )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

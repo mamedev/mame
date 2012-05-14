@@ -57,7 +57,7 @@ mae(forward), migi(right), ushiro(back), hidari(left)
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/msm5205.h"
-#include "machine/8255ppi.h"
+#include "machine/i8255.h"
 
 #include "kungfur.lh"
 
@@ -215,8 +215,8 @@ static ADDRESS_MAP_START( kungfur_map, AS_PROGRAM, 8, kungfur_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE_LEGACY("adpcm1", kungfur_adpcm1_w)
 	AM_RANGE(0x4004, 0x4004) AM_DEVWRITE_LEGACY("adpcm2", kungfur_adpcm2_w)
-	AM_RANGE(0x4008, 0x400b) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w)
-	AM_RANGE(0x400c, 0x400f) AM_DEVREADWRITE_LEGACY("ppi8255_1", ppi8255_r, ppi8255_w)
+	AM_RANGE(0x4008, 0x400b) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
+	AM_RANGE(0x400c, 0x400f) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -259,27 +259,28 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-static const ppi8255_interface ppi8255_intf[2] =
+static I8255A_INTERFACE( ppi8255_0_intf )
 {
 	// $4008 - always $83 (PPI mode 0, ports B & lower C as input)
-	{
-		DEVCB_NULL,
-		DEVCB_INPUT_PORT("IN0"),
-		DEVCB_INPUT_PORT("IN1"),
-		DEVCB_HANDLER(kungfur_output_w),
-		DEVCB_NULL,
-		DEVCB_HANDLER(kungfur_control_w)
-	},
-	// $400c - always $80 (PPI mode 0, all ports as output)
-	{
-		DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_HANDLER(kungfur_latch1_w),
-		DEVCB_HANDLER(kungfur_latch2_w),
-		DEVCB_HANDLER(kungfur_latch3_w)
-	}
+	DEVCB_NULL,							/* Port A read */
+	DEVCB_HANDLER(kungfur_output_w),	/* Port A write */
+	DEVCB_INPUT_PORT("IN0"),			/* Port B read */
+	DEVCB_NULL,							/* Port B write */
+	DEVCB_INPUT_PORT("IN1"),			/* Port C read */
+	DEVCB_HANDLER(kungfur_control_w)	/* Port C write */
 };
+
+static I8255A_INTERFACE( ppi8255_1_intf )
+{
+	// $400c - always $80 (PPI mode 0, all ports as output)
+	DEVCB_NULL,							/* Port A read */
+	DEVCB_HANDLER(kungfur_latch1_w),	/* Port A write */
+	DEVCB_NULL,							/* Port B read */
+	DEVCB_HANDLER(kungfur_latch2_w),	/* Port B write */
+	DEVCB_NULL,							/* Port C read */
+	DEVCB_HANDLER(kungfur_latch3_w)		/* Port C write */
+};
+
 
 static const msm5205_interface msm5205_config_1 =
 {
@@ -318,8 +319,8 @@ static MACHINE_CONFIG_START( kungfur, kungfur_state )
 	MCFG_CPU_PROGRAM_MAP(kungfur_map)
 	MCFG_CPU_PERIODIC_INT(kungfur_irq, 975)		// close approximation
 
-	MCFG_PPI8255_ADD( "ppi8255_0", ppi8255_intf[0] )
-	MCFG_PPI8255_ADD( "ppi8255_1", ppi8255_intf[1] )
+	MCFG_I8255A_ADD( "ppi8255_0", ppi8255_0_intf )
+	MCFG_I8255A_ADD( "ppi8255_1", ppi8255_1_intf )
 
 	MCFG_MACHINE_START(kungfur)
 	MCFG_MACHINE_RESET(kungfur)

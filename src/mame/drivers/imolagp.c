@@ -75,7 +75,7 @@ Known issues:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "machine/8255ppi.h"
+#include "machine/i8255.h"
 #include "sound/ay8910.h"
 
 
@@ -503,14 +503,14 @@ static INTERRUPT_GEN( vblank_irq )
 } /* master_interrupt */
 
 
-static const ppi8255_interface ppi8255_intf =
+static I8255A_INTERFACE( ppi8255_intf )
 {
-	DEVCB_NULL,		/* Port A read */
-	DEVCB_NULL,		/* Port B read */
-	DEVCB_NULL,		/* Port C read */
-	DEVCB_NULL,		/* Port A write */
-	DEVCB_NULL,		/* Port B write */
-	DEVCB_NULL		/* Port C write */
+	DEVCB_NULL,							/* Port A read */
+	DEVCB_NULL,							/* Port A write */
+	DEVCB_NULL,							/* Port B read */
+	DEVCB_NULL,							/* Port B write */
+	DEVCB_NULL,							/* Port C read */
+	DEVCB_NULL,							/* Port C write */
 };
 
 
@@ -569,7 +569,7 @@ static MACHINE_CONFIG_START( imolagp, imolagp_state )
 	MCFG_MACHINE_START(imolagp)
 	MCFG_MACHINE_RESET(imolagp)
 
-	MCFG_PPI8255_ADD( "ppi8255", ppi8255_intf )
+	MCFG_I8255A_ADD( "ppi8255", ppi8255_intf )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

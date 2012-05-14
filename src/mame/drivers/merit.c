@@ -40,7 +40,7 @@ Notes: it's important that "user1" is 0xa0000 bytes with empty space filled
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "machine/8255ppi.h"
+#include "machine/i8255.h"
 #include "sound/ay8910.h"
 #include "video/mc6845.h"
 #include "machine/nvram.h"
@@ -357,8 +357,8 @@ CUSTOM_INPUT_MEMBER(merit_state::rndbit_r)
 static ADDRESS_MAP_START( pitboss_map, AS_PROGRAM, 8, merit_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x67ff) AM_RAM
-	AM_RANGE(0xa000, 0xa003) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w)
-	AM_RANGE(0xc000, 0xc003) AM_DEVREADWRITE_LEGACY("ppi8255_1", ppi8255_r, ppi8255_w)
+	AM_RANGE(0xa000, 0xa003) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
+	AM_RANGE(0xc000, 0xc003) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
 	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0xe001, 0xe001) AM_DEVWRITE("crtc", mc6845_device, register_w)
 	AM_RANGE(0xe800, 0xefff) AM_RAM AM_SHARE("raattr")
@@ -373,8 +373,8 @@ static ADDRESS_MAP_START( casino5_map, AS_PROGRAM, 8, merit_state )
 	AM_RANGE(0x6000, 0x6fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x7000, 0x7000) AM_WRITE(casino5_bank_w)
 	AM_RANGE(0x7001, 0x7fff) AM_RAM
-	AM_RANGE(0xa000, 0xa003) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w)
-	AM_RANGE(0xc000, 0xc003) AM_DEVREADWRITE_LEGACY("ppi8255_1", ppi8255_r, ppi8255_w)
+	AM_RANGE(0xa000, 0xa003) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
+	AM_RANGE(0xc000, 0xc003) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
 	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0xe001, 0xe001) AM_DEVWRITE("crtc", mc6845_device, register_w)
 	AM_RANGE(0xe800, 0xefff) AM_RAM AM_SHARE("raattr")
@@ -385,8 +385,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( bigappg_map, AS_PROGRAM, 8, merit_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xa000, 0xbfff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xc004, 0xc007) AM_DEVREADWRITE_LEGACY("ppi8255_1", ppi8255_r, ppi8255_w)
-	AM_RANGE(0xc008, 0xc00b) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w)
+	AM_RANGE(0xc004, 0xc007) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
+	AM_RANGE(0xc008, 0xc00b) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
 	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0xe001, 0xe001) AM_DEVWRITE("crtc", mc6845_device, register_w)
 	AM_RANGE(0xe800, 0xefff) AM_RAM AM_SHARE("raattr")
@@ -397,8 +397,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( dodge_map, AS_PROGRAM, 8, merit_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xa000, 0xbfff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xc004, 0xc007) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w)
-	AM_RANGE(0xc008, 0xc00b) AM_DEVREADWRITE_LEGACY("ppi8255_1", ppi8255_r, ppi8255_w)
+	AM_RANGE(0xc004, 0xc007) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
+	AM_RANGE(0xc008, 0xc00b) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
 	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0xe001, 0xe001) AM_DEVWRITE("crtc", mc6845_device, register_w)
 	AM_RANGE(0xe800, 0xefff) AM_RAM AM_SHARE("raattr")
@@ -417,8 +417,8 @@ static ADDRESS_MAP_START( trvwhiz_map, AS_PROGRAM, 8, merit_state )
 	AM_RANGE(0x5400, 0x54ff) AM_WRITE(low_offset_w)
 	AM_RANGE(0x5800, 0x58ff) AM_WRITE(med_offset_w)
 	AM_RANGE(0x6000, 0x67ff) AM_RAM
-	AM_RANGE(0xa000, 0xa003) AM_MIRROR(0x1df0) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w)
-	AM_RANGE(0xc000, 0xc003) AM_MIRROR(0x1df0) AM_DEVREADWRITE_LEGACY("ppi8255_1", ppi8255_r, ppi8255_w)
+	AM_RANGE(0xa000, 0xa003) AM_MIRROR(0x1df0) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
+	AM_RANGE(0xc000, 0xc003) AM_MIRROR(0x1df0) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
 	AM_RANGE(0xe000, 0xe000) AM_MIRROR(0x05f0) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0xe001, 0xe001) AM_MIRROR(0x05f0) AM_DEVWRITE("crtc", mc6845_device, register_w)
 	AM_RANGE(0xe800, 0xefff) AM_RAM AM_SHARE("raattr")
@@ -435,8 +435,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( phrcraze_map, AS_PROGRAM, 8, merit_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xa000, 0xbfff) AM_RAM
-	AM_RANGE(0xc008, 0xc00b) AM_MIRROR(0x1df0) AM_DEVREADWRITE_LEGACY("ppi8255_1", ppi8255_r, ppi8255_w)
-	AM_RANGE(0xc00c, 0xc00f) AM_MIRROR(0x1df0) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w)
+	AM_RANGE(0xc008, 0xc00b) AM_MIRROR(0x1df0) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
+	AM_RANGE(0xc00c, 0xc00f) AM_MIRROR(0x1df0) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
 	AM_RANGE(0xce00, 0xceff) AM_READWRITE(questions_r, high_offset_w)
 	AM_RANGE(0xd600, 0xd6ff) AM_WRITE(low_offset_w)
 	AM_RANGE(0xda00, 0xdaff) AM_WRITE(med_offset_w)
@@ -456,8 +456,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( tictac_map, AS_PROGRAM, 8, merit_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
-	AM_RANGE(0xc004, 0xc007) AM_MIRROR(0x1df0) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w)
-	AM_RANGE(0xc008, 0xc00b) AM_MIRROR(0x1df0) AM_DEVREADWRITE_LEGACY("ppi8255_1", ppi8255_r, ppi8255_w)
+	AM_RANGE(0xc004, 0xc007) AM_MIRROR(0x1df0) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
+	AM_RANGE(0xc008, 0xc00b) AM_MIRROR(0x1df0) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
 	AM_RANGE(0xce00, 0xceff) AM_READWRITE(questions_r, high_offset_w)
 	AM_RANGE(0xd600, 0xd6ff) AM_WRITE(low_offset_w)
 	AM_RANGE(0xda00, 0xdaff) AM_WRITE(med_offset_w)
@@ -477,8 +477,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( trvwhziv_map, AS_PROGRAM, 8, merit_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xa000, 0xbfff) AM_RAM
-	AM_RANGE(0xc004, 0xc007) AM_MIRROR(0x1df0) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w)
-	AM_RANGE(0xc008, 0xc00b) AM_MIRROR(0x1df0) AM_DEVREADWRITE_LEGACY("ppi8255_1", ppi8255_r, ppi8255_w)
+	AM_RANGE(0xc004, 0xc007) AM_MIRROR(0x1df0) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
+	AM_RANGE(0xc008, 0xc00b) AM_MIRROR(0x1df0) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
 	AM_RANGE(0xce00, 0xceff) AM_READWRITE(questions_r, high_offset_w)
 	AM_RANGE(0xd600, 0xd6ff) AM_WRITE(low_offset_w)
 	AM_RANGE(0xda00, 0xdaff) AM_WRITE(med_offset_w)
@@ -493,8 +493,8 @@ static ADDRESS_MAP_START( dtrvwz5_map, AS_PROGRAM, 8, merit_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xb000, 0xb0ff) AM_ROM /* protection? code jumps here */
-	AM_RANGE(0xc004, 0xc007) AM_MIRROR(0x1df0) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w)
-	AM_RANGE(0xc008, 0xc00b) AM_MIRROR(0x1df0) AM_DEVREADWRITE_LEGACY("ppi8255_1", ppi8255_r, ppi8255_w)
+	AM_RANGE(0xc004, 0xc007) AM_MIRROR(0x1df0) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
+	AM_RANGE(0xc008, 0xc00b) AM_MIRROR(0x1df0) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
 	AM_RANGE(0xce00, 0xceff) AM_READWRITE(questions_r, high_offset_w)
 	AM_RANGE(0xd600, 0xd6ff) AM_WRITE(low_offset_w)
 	AM_RANGE(0xda00, 0xdaff) AM_WRITE(med_offset_w)
@@ -509,8 +509,8 @@ static ADDRESS_MAP_START( couple_map, AS_PROGRAM, 8, merit_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")
 	AM_RANGE(0xa000, 0xbfff) AM_RAM AM_SHARE("backup_ram")
-	AM_RANGE(0xc004, 0xc007) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w)
-	AM_RANGE(0xc008, 0xc00b) AM_DEVREADWRITE_LEGACY("ppi8255_1", ppi8255_r, ppi8255_w)
+	AM_RANGE(0xc004, 0xc007) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
+	AM_RANGE(0xc008, 0xc00b) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
 	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0xe001, 0xe001) AM_DEVWRITE("crtc", mc6845_device, register_w)
 	AM_RANGE(0xe800, 0xefff) AM_RAM AM_SHARE("raattr")
@@ -1158,45 +1158,36 @@ static INPUT_PORTS_START( couplep )
 INPUT_PORTS_END
 
 
-static const ppi8255_interface ppi8255_intf[2] =
+static I8255A_INTERFACE( ppi8255_0_intf )
 {
-	{
-		DEVCB_INPUT_PORT("IN0"),		/* Port A read */
-		DEVCB_INPUT_PORT("IN1"),		/* Port B read */
-		DEVCB_INPUT_PORT("IN2"),		/* Port C read */
-		DEVCB_NULL,						/* Port A write */
-		DEVCB_NULL,						/* Port B write */
-		DEVCB_NULL						/* Port C write */
-	},
-	{
-		DEVCB_INPUT_PORT("DSW"),		/* Port A read */
-		DEVCB_NULL,						/* Port B read */
-		DEVCB_NULL,						/* Port C read */
-		DEVCB_NULL,						/* Port A write */
-		DEVCB_HANDLER(led1_w),			/* Port B write */
-		DEVCB_HANDLER(misc_w)			/* Port C write */
-	}
+	DEVCB_INPUT_PORT("IN0"),	/* Port A read */
+	DEVCB_NULL,					/* Port A write */
+	DEVCB_INPUT_PORT("IN1"),	/* Port B read */
+	DEVCB_NULL,					/* Port B write */
+	DEVCB_INPUT_PORT("IN2"),	/* Port C read */
+	DEVCB_NULL					/* Port C write */
 };
 
-static const ppi8255_interface ppi8255_couple_intf[2] =
+static I8255A_INTERFACE( ppi8255_1_intf )
 {
-	{
-		DEVCB_INPUT_PORT("IN0"),		/* Port A read */
-		DEVCB_INPUT_PORT("IN1"),		/* Port B read */
-		DEVCB_INPUT_PORT("IN2"),		/* Port C read */
-		DEVCB_NULL,						/* Port A write */
-		DEVCB_NULL,						/* Port B write */
-		DEVCB_NULL						/* Port C write */
-	},
-	{
-		DEVCB_INPUT_PORT("DSW"),		/* Port A read */
-		DEVCB_NULL,						/* Port B read */
-		DEVCB_NULL,						/* Port C read */
-		DEVCB_NULL,						/* Port A write */
-		DEVCB_HANDLER(led1_w),			/* Port B write */
-		DEVCB_HANDLER(misc_couple_w)	/* Port C write */
-	}
+	DEVCB_INPUT_PORT("DSW"),	/* Port A read */
+	DEVCB_NULL,					/* Port A write */
+	DEVCB_NULL,					/* Port B read */
+	DEVCB_HANDLER(led1_w),		/* Port B write */
+	DEVCB_NULL,					/* Port C read */
+	DEVCB_HANDLER(misc_w)		/* Port C write */
 };
+
+static I8255A_INTERFACE( couple_ppi8255_1_intf )
+{
+	DEVCB_INPUT_PORT("DSW"),	/* Port A read */
+	DEVCB_NULL,					/* Port A write */
+	DEVCB_NULL,					/* Port B read */
+	DEVCB_HANDLER(led1_w),		/* Port B write */
+	DEVCB_NULL,					/* Port C read */
+	DEVCB_HANDLER(misc_couple_w)/* Port C write */
+};
+
 
 static const ay8910_interface merit_ay8912_interface =
 {
@@ -1226,8 +1217,8 @@ static MACHINE_CONFIG_START( pitboss, merit_state )
 	MCFG_CPU_PROGRAM_MAP(pitboss_map)
 	MCFG_CPU_IO_MAP(trvwhiz_io_map)
 
-	MCFG_PPI8255_ADD( "ppi8255_0", ppi8255_intf[0] )
-	MCFG_PPI8255_ADD( "ppi8255_1", ppi8255_intf[1] )
+	MCFG_I8255A_ADD( "ppi8255_0", ppi8255_0_intf )
+	MCFG_I8255A_ADD( "ppi8255_1", ppi8255_1_intf )
 
 	MCFG_MACHINE_START(merit)
 	/* video hardware */
@@ -1315,10 +1306,8 @@ static MACHINE_CONFIG_DERIVED( couple, pitboss )
 	MCFG_CPU_PROGRAM_MAP(couple_map)
 	MCFG_CPU_IO_MAP(tictac_io_map)
 
-	MCFG_DEVICE_MODIFY("ppi8255_0")
-	MCFG_DEVICE_CONFIG( ppi8255_couple_intf[0])
-	MCFG_DEVICE_MODIFY("ppi8255_1")
-	MCFG_DEVICE_CONFIG( ppi8255_couple_intf[1])
+	MCFG_DEVICE_REMOVE("ppi8255_1")
+	MCFG_I8255A_ADD( "ppi8255_1", couple_ppi8255_1_intf )
 MACHINE_CONFIG_END
 
 

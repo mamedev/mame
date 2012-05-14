@@ -44,7 +44,7 @@ Notes:
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/z180/z180.h"
-#include "machine/8255ppi.h"
+#include "machine/i8255.h"
 #include "sound/2413intf.h"
 #include "sound/okim6295.h"
 
@@ -1302,7 +1302,7 @@ static ADDRESS_MAP_START( iqblocka_io, AS_IO, 8, igs017_state )
 
 //  AM_RANGE(0x200a, 0x200a) AM_WRITENOP
 
-	AM_RANGE( 0x2010, 0x2013 ) AM_DEVREAD_LEGACY("ppi8255", ppi8255_r)
+	AM_RANGE( 0x2010, 0x2013 ) AM_DEVREAD("ppi8255", i8255_device, read)
 	AM_RANGE( 0x2012, 0x2012 ) AM_WRITE(video_disable_w )
 
 	AM_RANGE( 0x2014, 0x2014 ) AM_WRITE(nmi_enable_w )
@@ -1424,7 +1424,7 @@ static ADDRESS_MAP_START( mgcs, AS_PROGRAM, 16, igs017_state )
 	AM_RANGE( 0x49c002, 0x49c003 ) AM_READ(mgcs_magic_r )
 	AM_RANGE( 0xa02000, 0xa02fff ) AM_READWRITE(spriteram_lsb_r, spriteram_lsb_w ) AM_SHARE("spriteram")
 	AM_RANGE( 0xa03000, 0xa037ff ) AM_RAM_WRITE(mgcs_paletteram_w ) AM_SHARE("paletteram")
-	AM_RANGE( 0xa04020, 0xa04027 ) AM_DEVREAD8_LEGACY("ppi8255", ppi8255_r, 0x00ff )
+	AM_RANGE( 0xa04020, 0xa04027 ) AM_DEVREAD8("ppi8255", i8255_device, read, 0x00ff)
 	AM_RANGE( 0xa04024, 0xa04025 ) AM_WRITE(video_disable_lsb_w )
 	AM_RANGE( 0xa04028, 0xa04029 ) AM_WRITE(irq2_enable_w )
 	AM_RANGE( 0xa0402a, 0xa0402b ) AM_WRITE(irq1_enable_w )
@@ -1521,7 +1521,7 @@ static ADDRESS_MAP_START( sdmg2, AS_PROGRAM, 16, igs017_state )
 	AM_RANGE(0x1f0000, 0x1fffff) AM_RAM
 	AM_RANGE(0x202000, 0x202fff) AM_READWRITE(spriteram_lsb_r, spriteram_lsb_w ) AM_SHARE("spriteram")
 	AM_RANGE(0x203000, 0x2037ff) AM_RAM_WRITE(sdmg2_paletteram_w ) AM_SHARE("paletteram")
-	AM_RANGE(0x204020, 0x204027) AM_DEVREAD8_LEGACY("ppi8255", ppi8255_r, 0x00ff )
+	AM_RANGE(0x204020, 0x204027) AM_DEVREAD8("ppi8255", i8255_device, read, 0x00ff)
 	AM_RANGE(0x204024, 0x204025) AM_WRITE(video_disable_lsb_w )
 	AM_RANGE(0x204028, 0x204029) AM_WRITE(irq2_enable_w )
 	AM_RANGE(0x20402a, 0x20402b) AM_WRITE(irq1_enable_w )
@@ -1643,7 +1643,7 @@ static ADDRESS_MAP_START( mgdha_map, AS_PROGRAM, 16, igs017_state )
 	AM_RANGE(0xa02000, 0xa02fff) AM_READWRITE(spriteram_lsb_r, spriteram_lsb_w ) AM_SHARE("spriteram")
 	AM_RANGE(0xa03000, 0xa037ff) AM_RAM_WRITE(sdmg2_paletteram_w ) AM_SHARE("paletteram")
 //  AM_RANGE(0xa04014, 0xa04015) // written with FF at boot
-	AM_RANGE(0xa04020, 0xa04027) AM_DEVREAD8_LEGACY("ppi8255", ppi8255_r, 0x00ff )
+	AM_RANGE(0xa04020, 0xa04027) AM_DEVREAD8("ppi8255", i8255_device, read, 0x00ff)
 	AM_RANGE(0xa04024, 0xa04025) AM_WRITE(video_disable_lsb_w )
 	AM_RANGE(0xa04028, 0xa04029) AM_WRITE(irq2_enable_w )
 	AM_RANGE(0xa0402a, 0xa0402b) AM_WRITE(irq1_enable_w )
@@ -1735,7 +1735,7 @@ static ADDRESS_MAP_START( tjsb_io, AS_IO, 8, igs017_state )
 
 //  AM_RANGE(0x200a, 0x200a) AM_WRITENOP
 
-	AM_RANGE( 0x2010, 0x2013 ) AM_DEVREAD_LEGACY("ppi8255", ppi8255_r)
+	AM_RANGE( 0x2010, 0x2013 ) AM_DEVREAD("ppi8255", i8255_device, read)
 	AM_RANGE( 0x2012, 0x2012 ) AM_WRITE(video_disable_w )
 
 	AM_RANGE( 0x2014, 0x2014 ) AM_WRITE(nmi_enable_w )
@@ -1819,7 +1819,7 @@ static ADDRESS_MAP_START( lhzb2, AS_PROGRAM, 16, igs017_state )
 	AM_RANGE(0x910002, 0x910003) AM_READ( lhzb2_magic_r )
 	AM_RANGE(0xb02000, 0xb02fff) AM_READWRITE( spriteram_lsb_r, spriteram_lsb_w ) AM_SHARE("spriteram")
 	AM_RANGE(0xb03000, 0xb037ff) AM_RAM_WRITE( lhzb2a_paletteram_w ) AM_SHARE("paletteram")
-	AM_RANGE(0xb04020, 0xb04027) AM_DEVREAD8_LEGACY( "ppi8255", ppi8255_r, 0x00ff )
+	AM_RANGE(0xb04020, 0xb04027) AM_DEVREAD8("ppi8255", i8255_device, read, 0x00ff)
 	AM_RANGE(0xb04024, 0xb04025) AM_WRITE( video_disable_lsb_w )
 	AM_RANGE(0xb04028, 0xb04029) AM_WRITE( irq2_enable_w )
 	AM_RANGE(0xb0402a, 0xb0402b) AM_WRITE( irq1_enable_w )
@@ -2032,7 +2032,7 @@ static ADDRESS_MAP_START( slqz2, AS_PROGRAM, 16, igs017_state )
 	AM_RANGE(0x602002, 0x602003) AM_READ( slqz2_magic_r )
 	AM_RANGE(0x902000, 0x902fff) AM_READWRITE( spriteram_lsb_r, spriteram_lsb_w ) AM_SHARE("spriteram")
 	AM_RANGE(0x903000, 0x9037ff) AM_RAM_WRITE( slqz2_paletteram_w ) AM_SHARE("paletteram")
-	AM_RANGE(0x904020, 0x904027) AM_DEVREAD8_LEGACY( "ppi8255", ppi8255_r, 0x00ff )
+	AM_RANGE(0x904020, 0x904027) AM_DEVREAD8("ppi8255", i8255_device, read, 0x00ff)
 	AM_RANGE(0x904024, 0x904025) AM_WRITE( video_disable_lsb_w )
 	AM_RANGE(0x904028, 0x904029) AM_WRITE( irq2_enable_w )
 	AM_RANGE(0x90402a, 0x90402b) AM_WRITE( irq1_enable_w )
@@ -3018,16 +3018,16 @@ static TIMER_DEVICE_CALLBACK( irqblocka_interrupt )
 
 
 // Dips are read through the 8255
-static const ppi8255_interface iqblocka_ppi8255_intf =
+static I8255A_INTERFACE( iqblocka_ppi8255_intf )
 {
-	DEVCB_INPUT_PORT("DSW1"),	// Port A read
-	DEVCB_INPUT_PORT("DSW2"),	// Port B read
-	DEVCB_INPUT_PORT("DSW3"),	// Port C read
-
-	DEVCB_NULL,					// Port A write
-	DEVCB_NULL,					// Port B write
-	DEVCB_NULL					// Port C write
+	DEVCB_INPUT_PORT("DSW1"),			/* Port A read */
+	DEVCB_NULL,							/* Port A write */
+	DEVCB_INPUT_PORT("DSW2"),			/* Port B read */
+	DEVCB_NULL,							/* Port B write */
+	DEVCB_INPUT_PORT("DSW3"),			/* Port C read */
+	DEVCB_NULL							/* Port C write */
 };
+
 
 static MACHINE_RESET( iqblocka )
 {
@@ -3043,7 +3043,7 @@ static MACHINE_CONFIG_START( iqblocka, igs017_state )
 	MCFG_CPU_IO_MAP(iqblocka_io)
 	MCFG_TIMER_ADD_SCANLINE("scantimer", irqblocka_interrupt, "screen", 0, 1)
 
-	MCFG_PPI8255_ADD( "ppi8255", iqblocka_ppi8255_intf )
+	MCFG_I8255A_ADD( "ppi8255", iqblocka_ppi8255_intf )
 
 	MCFG_MACHINE_RESET(iqblocka)
 
@@ -3096,15 +3096,14 @@ static MACHINE_RESET( mgcs )
 	memset(state->m_igs_magic, 0, sizeof(state->m_igs_magic));
 }
 
-static const ppi8255_interface mgcs_ppi8255_intf =
+static I8255A_INTERFACE( mgcs_ppi8255_intf )
 {
-	DEVCB_INPUT_PORT("COINS"),	// Port A read
-	DEVCB_HANDLER(mgcs_keys_r),	// Port B read
-	DEVCB_NULL,					// Port C read (see code at 1C83A)
-
-	DEVCB_NULL,					// Port A write
-	DEVCB_NULL,					// Port B write
-	DEVCB_NULL					// Port C write
+	DEVCB_INPUT_PORT("COINS"),			/* Port A read */
+	DEVCB_NULL,							/* Port A write */
+	DEVCB_HANDLER(mgcs_keys_r),			/* Port B read */
+	DEVCB_NULL,							/* Port B write */
+	DEVCB_NULL,							/* Port C read */
+	DEVCB_NULL							/* Port C write */
 };
 
 static MACHINE_CONFIG_START( mgcs, igs017_state )
@@ -3114,7 +3113,7 @@ static MACHINE_CONFIG_START( mgcs, igs017_state )
 
 	MCFG_MACHINE_RESET(mgcs)
 
-	MCFG_PPI8255_ADD( "ppi8255", mgcs_ppi8255_intf )
+	MCFG_I8255A_ADD( "ppi8255", mgcs_ppi8255_intf )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -3139,16 +3138,14 @@ MACHINE_CONFIG_END
 
 
 // lhzb2
-
-static const ppi8255_interface lhzb2_ppi8255_intf =
+static I8255A_INTERFACE( lhzb2_ppi8255_intf )
 {
-	DEVCB_INPUT_PORT("COINS"),	// Port A read
-	DEVCB_INPUT_PORT("DSW1"),	// Port B read
-	DEVCB_INPUT_PORT("DSW2"),	// Port C read
-
-	DEVCB_NULL,					// Port A write
-	DEVCB_NULL,					// Port B write
-	DEVCB_NULL					// Port C write
+	DEVCB_INPUT_PORT("COINS"),			/* Port A read */
+	DEVCB_NULL,							/* Port A write */
+	DEVCB_INPUT_PORT("DSW1"),			/* Port B read */
+	DEVCB_NULL,							/* Port B write */
+	DEVCB_INPUT_PORT("DSW2"),			/* Port C read */
+	DEVCB_NULL							/* Port C write */
 };
 
 static MACHINE_CONFIG_START( lhzb2, igs017_state )
@@ -3158,7 +3155,7 @@ static MACHINE_CONFIG_START( lhzb2, igs017_state )
 
 	MCFG_MACHINE_RESET(mgcs)
 
-	MCFG_PPI8255_ADD( "ppi8255", lhzb2_ppi8255_intf )
+	MCFG_I8255A_ADD( "ppi8255", lhzb2_ppi8255_intf )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -3198,7 +3195,7 @@ static MACHINE_CONFIG_START( lhzb2a, igs017_state )
 
 	MCFG_MACHINE_RESET(lhzb2a)
 
-//  MCFG_PPI8255_ADD( "ppi8255", sdmg2_ppi8255_intf )
+//  MCFG_I8255A_ADD( "ppi8255", sdmg2_ppi8255_intf )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -3231,7 +3228,7 @@ static MACHINE_CONFIG_START( slqz2, igs017_state )
 
 	MCFG_MACHINE_RESET(mgcs)
 
-	MCFG_PPI8255_ADD( "ppi8255", lhzb2_ppi8255_intf )
+	MCFG_I8255A_ADD( "ppi8255", lhzb2_ppi8255_intf )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -3256,16 +3253,14 @@ MACHINE_CONFIG_END
 
 
 // sdmg2
-
-static const ppi8255_interface sdmg2_ppi8255_intf =
+static I8255A_INTERFACE( sdmg2_ppi8255_intf )
 {
-	DEVCB_INPUT_PORT("DSW1"),	// Port A read
-	DEVCB_INPUT_PORT("DSW2"),	// Port B read
-	DEVCB_NULL,					// Port C read
-
-	DEVCB_NULL,					// Port A write
-	DEVCB_NULL,					// Port B write
-	DEVCB_NULL					// Port C write
+	DEVCB_INPUT_PORT("DSW1"),			/* Port A read */
+	DEVCB_NULL,							/* Port A write */
+	DEVCB_INPUT_PORT("DSW2"),			/* Port B read */
+	DEVCB_NULL,							/* Port B write */
+	DEVCB_NULL,							/* Port C read */
+	DEVCB_NULL							/* Port C write */
 };
 
 static MACHINE_CONFIG_START( sdmg2, igs017_state )
@@ -3275,7 +3270,7 @@ static MACHINE_CONFIG_START( sdmg2, igs017_state )
 
 	MCFG_MACHINE_RESET(mgcs)
 
-	MCFG_PPI8255_ADD( "ppi8255", sdmg2_ppi8255_intf )
+	MCFG_I8255A_ADD( "ppi8255", sdmg2_ppi8255_intf )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -3312,15 +3307,14 @@ static TIMER_DEVICE_CALLBACK( mgdh_interrupt )
 		device_set_input_line(state->m_maincpu, 3, HOLD_LINE); // lev 3 instead of 2
 }
 
-static const ppi8255_interface mgdh_ppi8255_intf =
+static I8255A_INTERFACE( mgdh_ppi8255_intf )
 {
-	DEVCB_INPUT_PORT("DSW1"),	// Port A read
-	DEVCB_NULL,					// Port B read
-	DEVCB_NULL,					// Port C read
-
-	DEVCB_NULL,					// Port A write
-	DEVCB_NULL,					// Port B write
-	DEVCB_NULL					// Port C write
+	DEVCB_INPUT_PORT("DSW1"),			/* Port A read */
+	DEVCB_NULL,							/* Port A write */
+	DEVCB_NULL,							/* Port B read */
+	DEVCB_NULL,							/* Port B write */
+	DEVCB_NULL,							/* Port C read */
+	DEVCB_NULL							/* Port C write */
 };
 
 static MACHINE_CONFIG_START( mgdha, igs017_state )
@@ -3330,7 +3324,7 @@ static MACHINE_CONFIG_START( mgdha, igs017_state )
 
 	MCFG_MACHINE_RESET(mgcs)
 
-	MCFG_PPI8255_ADD( "ppi8255", mgdh_ppi8255_intf )
+	MCFG_I8255A_ADD( "ppi8255", mgdh_ppi8255_intf )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -3361,7 +3355,7 @@ static MACHINE_CONFIG_START( tjsb, igs017_state )
 	MCFG_CPU_IO_MAP(tjsb_io)
 	MCFG_TIMER_ADD_SCANLINE("scantimer", irqblocka_interrupt, "screen", 0, 1)
 
-	MCFG_PPI8255_ADD( "ppi8255", iqblocka_ppi8255_intf )
+	MCFG_I8255A_ADD( "ppi8255", iqblocka_ppi8255_intf )
 
 	MCFG_MACHINE_RESET(iqblocka)
 

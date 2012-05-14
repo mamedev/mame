@@ -66,7 +66,7 @@ sg1_b.e1       4096     0x92ef3c13      D2732D
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "video/mc6845.h"
-#include "machine/8255ppi.h"
+#include "machine/i8255.h"
 #include "sound/ay8910.h"
 #include "sound/okim6295.h"
 #include "sound/2203intf.h"
@@ -402,8 +402,8 @@ static ADDRESS_MAP_START( slave_map, AS_PROGRAM, 8, kingdrby_state )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0x3000, 0x3fff) AM_ROM //sound rom, tested for the post check
 	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_SHARE("nvram") //backup ram
-	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w)	/* I/O Ports */
-	AM_RANGE(0x6000, 0x6003) AM_DEVREADWRITE_LEGACY("ppi8255_1", ppi8255_r, ppi8255_w)	/* I/O Ports */
+	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)	/* I/O Ports */
+	AM_RANGE(0x6000, 0x6003) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)	/* I/O Ports */
 	AM_RANGE(0x7000, 0x73ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x7400, 0x74ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x7600, 0x7600) AM_DEVWRITE("crtc", mc6845_device, address_w)
@@ -422,8 +422,8 @@ static ADDRESS_MAP_START( slave_1986_map, AS_PROGRAM, 8, kingdrby_state )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0x3000, 0x3fff) AM_ROM //sound rom tested for the post check
 	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_SHARE("nvram") //backup ram
-	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w)	/* I/O Ports */
-//  AM_RANGE(0x6000, 0x6003) AM_DEVREADWRITE_LEGACY("ppi8255_1", ppi8255_r, ppi8255_w) /* I/O Ports */
+	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)	/* I/O Ports */
+//  AM_RANGE(0x6000, 0x6003) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write) /* I/O Ports */
 	AM_RANGE(0x7000, 0x73ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x7400, 0x74ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x7600, 0x7600) AM_DEVWRITE("crtc", mc6845_device, address_w)
@@ -473,27 +473,26 @@ ADDRESS_MAP_END
 *
 *************************************/
 
-static const ppi8255_interface ppi8255_intf[2] =
+static I8255A_INTERFACE( ppi8255_0_intf )
 {
 	/* A & B as input, C (all) as output */
-	{
-		DEVCB_HANDLER(hopper_io_r),	/* Port A read */
-		DEVCB_INPUT_PORT("IN1"),	/* Port B read */
-		DEVCB_NULL,					/* Port C read */
-		DEVCB_NULL,					/* Port A write */
-		DEVCB_NULL,					/* Port B write */
-		DEVCB_HANDLER(hopper_io_w)   /* Port C write */
-	},
+	DEVCB_HANDLER(hopper_io_r),			/* Port A read */
+	DEVCB_NULL,							/* Port A write */
+	DEVCB_INPUT_PORT("IN1"),			/* Port B read */
+	DEVCB_NULL,							/* Port B write */
+	DEVCB_NULL,							/* Port C read */
+	DEVCB_HANDLER(hopper_io_w)			/* Port C write */
+};
 
+static I8255A_INTERFACE( ppi8255_1_intf )
+{
 	/* B & C (lower) as input, A & C (upper) as output */
-	{
-		DEVCB_NULL,					/* Port A read */
-		DEVCB_HANDLER(key_matrix_r),/* Port B read */
-		DEVCB_HANDLER(input_mux_r),	/* Port C read */
-		DEVCB_HANDLER(sound_cmd_w),  /* Port A write */
-		DEVCB_NULL,					/* Port B write */
-		DEVCB_HANDLER(outport2_w)	/* Port C write */
-	}
+	DEVCB_NULL,							/* Port A read */
+	DEVCB_HANDLER(sound_cmd_w),			/* Port A write */
+	DEVCB_HANDLER(key_matrix_r),		/* Port B read */
+	DEVCB_NULL,							/* Port B write */
+	DEVCB_HANDLER(input_mux_r),			/* Port C read */
+	DEVCB_HANDLER(outport2_w)			/* Port C write */
 };
 
 static WRITE8_DEVICE_HANDLER( outportb_w )
@@ -502,28 +501,28 @@ static WRITE8_DEVICE_HANDLER( outportb_w )
 }
 
 
-static const ppi8255_interface ppi8255_1986_intf[2] =
+static I8255A_INTERFACE( ppi8255_1986_0_intf )
 {
 	/* C as input, (all) as output */
-	{
-		DEVCB_NULL,	                        /* Port A read */
-		DEVCB_INPUT_PORT("IN0"),	        /* Port B read */
-		DEVCB_INPUT_PORT("IN1"),			/* Port C read */
-		DEVCB_HANDLER(sound_cmd_w),			/* Port A write */
-		DEVCB_HANDLER(outportb_w),			/* Port B write */
-		DEVCB_NULL						    /* Port C write */
-	},
-
-	/* actually unused */
-	{
-		DEVCB_NULL,					/* Port A read */
-		DEVCB_NULL,					/* Port B read */
-		DEVCB_NULL,					/* Port C read */
-		DEVCB_NULL, 				/* Port A write */
-		DEVCB_NULL,					/* Port B write */
-		DEVCB_NULL					/* Port C write */
-	}
+	DEVCB_NULL,							/* Port A read */
+	DEVCB_HANDLER(sound_cmd_w),			/* Port A write */
+	DEVCB_INPUT_PORT("IN0"),			/* Port B read */
+	DEVCB_HANDLER(outportb_w),			/* Port B write */
+	DEVCB_INPUT_PORT("IN1"),			/* Port C read */
+	DEVCB_NULL							/* Port C write */
 };
+
+static I8255A_INTERFACE( ppi8255_1986_1_intf )
+{
+	/* actually unused */
+	DEVCB_NULL,							/* Port A read */
+	DEVCB_NULL,							/* Port A write */
+	DEVCB_NULL,							/* Port B read */
+	DEVCB_NULL,							/* Port B write */
+	DEVCB_NULL,							/* Port C read */
+	DEVCB_NULL,							/* Port C write */
+};
+
 
 /*************************************
  *
@@ -1030,8 +1029,8 @@ static MACHINE_CONFIG_START( kingdrby, kingdrby_state )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_PPI8255_ADD( "ppi8255_0", ppi8255_intf[0] )
-	MCFG_PPI8255_ADD( "ppi8255_1", ppi8255_intf[1] )
+	MCFG_I8255A_ADD( "ppi8255_0", ppi8255_0_intf )
+	MCFG_I8255A_ADD( "ppi8255_1", ppi8255_1_intf )
 
 	MCFG_GFXDECODE(kingdrby)
 	MCFG_PALETTE_LENGTH(0x200)
@@ -1062,8 +1061,10 @@ static MACHINE_CONFIG_DERIVED( kingdrbb, kingdrby )
 
 	MCFG_PALETTE_INIT(kingdrbb)
 
-	MCFG_PPI8255_RECONFIG( "ppi8255_0", ppi8255_1986_intf[0] )
-	MCFG_PPI8255_RECONFIG( "ppi8255_1", ppi8255_1986_intf[1] )
+	MCFG_DEVICE_REMOVE("ppi8255_0")
+	MCFG_DEVICE_REMOVE("ppi8255_1")
+	MCFG_I8255A_ADD( "ppi8255_0", ppi8255_1986_0_intf )
+	MCFG_I8255A_ADD( "ppi8255_1", ppi8255_1986_1_intf )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( cowrace, kingdrbb )
