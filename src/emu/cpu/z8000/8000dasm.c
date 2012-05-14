@@ -48,9 +48,9 @@
 #include "z8000.h"
 #include "z8000cpu.h"
 
-static int n[12];	/* opcode nibbles */
-static int b[6];	/* opcode bytes */
-static int w[3];	/* opcode words */
+static int n[16];	/* opcode nibbles */
+static int b[8];	/* opcode bytes */
+static int w[4];	/* opcode words */
 
 static void GET_OP(const UINT8 *oprom, int i, unsigned offset)
 {
@@ -80,11 +80,14 @@ static const char *const ints[4] = {
 
 CPU_DISASSEMBLE( z8000 )
 {
-	int new_pc = pc, i, tmp;
+	int new_pc = pc, i, j, tmp;
 	char *dst = buffer;
 	const char *src;
 	Z8000_exec *o;
 	UINT32 flags = 0;
+	UINT32 old_w;
+
+	int segm = device->type() == Z8001;
 
 	/* already initialized? */
 	if(z8000_exec == NULL)
@@ -95,13 +98,13 @@ CPU_DISASSEMBLE( z8000 )
 	switch (pc)
 	{
 		case 0x0000:
-			dst += sprintf(dst, ".word   #$%04x ;RST", w[0]);
+			dst += sprintf(dst, ".word   #%%%04x ;RST", w[0]);
 			break;
 		case 0x0002:
-			dst += sprintf(dst, ".word   #$%04x ;RST FCW", w[0]);
+			dst += sprintf(dst, ".word   #%%%04x ;RST FCW", w[0]);
             break;
 		case 0x0004:
-			dst += sprintf(dst, ".word   #$%04x ;RST PC", w[0]);
+			dst += sprintf(dst, ".word   #%%%04x ;RST PC", w[0]);
             break;
 		default:
 			o = &z8000_exec[w[0]];
@@ -128,15 +131,15 @@ CPU_DISASSEMBLE( z8000 )
 						switch (*src++) {
 							case 'b': /* imm8 (byte) */
 								i = *src++ - '0';
-								dst += sprintf(dst, "#$%02x", b[i]);
+								dst += sprintf(dst, "#%%%02x", b[i]);
 								break;
 							case 'w': /* imm16 (word) */
 								i = *src++ - '0';
-								dst += sprintf(dst, "#$%04x", w[i]);
+								dst += sprintf(dst, "#%%%04x", w[i]);
 								break;
 							case 'l': /* imm32 (long) */
 								i = *src++ - '0';
-								dst += sprintf(dst, "#$%04x%04x", w[i], w[i+1]);
+								dst += sprintf(dst, "#%%%04x%04x", w[i], w[i+1]);
 								break;
 						}
 						break;
@@ -165,7 +168,8 @@ CPU_DISASSEMBLE( z8000 )
 						break;
 					case 'R':
 						src++;
-						tmp = ((n[1] & 0x01) << 16) + (n[3] << 8) + (n[7] & 0x08);
+						//tmp = ((n[1] & 0x01) << 16) + (n[3] << 8) + (n[7] & 0x08);
+						tmp = ((n[1] & 0x01) << 8) + (n[3] << 4) + (n[7] & 0x08);
 						switch (tmp)
 						{
 							case 0x000: dst += sprintf(dst, "inirb "); flags = DASMFLAG_STEP_OVER; break;
@@ -217,14 +221,28 @@ CPU_DISASSEMBLE( z8000 )
 							case 0x1b0: dst += sprintf(dst, "soutd "); break;
 							case 0x1b8: dst += sprintf(dst, "sotdr "); flags = DASMFLAG_STEP_OVER; break;
                             default:
-								dst += sprintf(dst, "??????");
+								dst += sprintf(dst, "unk(0x%x)", tmp);
 						}
                         break;
                     case 'a':
 						/* address */
 						src++;
 						i = *src++ - '0';
-						dst += sprintf(dst, "$%04x", w[i]);
+						if (segm) {
+							if (w[i] & 0x8000) {
+								old_w = w[i];
+								for (j = i; j < o->size; j++)
+									w[j] = w[j + 1];
+								GET_OP(oprom, o->size - 1, new_pc - pc);
+								new_pc += 2;
+								w[i] = ((old_w & 0x7f00) << 16) | (w[i] & 0xffff);
+							}
+							else {
+								w[i] = ((w[i] & 0x7f00) << 16) | (w[i] & 0xff);
+							}
+							dst += sprintf(dst, "<%%%02X>%%%04X", (w[i] >> 24) & 0xff, w[i] & 0xffff);
+						}
+						else dst += sprintf(dst, "%%%04x", w[i]);
 						break;
 					case 'c':
 						/* condition code */
@@ -244,11 +262,9 @@ CPU_DISASSEMBLE( z8000 )
 						switch (i) {
 							case 0: /* disp7 */
 								tmp = new_pc - 2 * (w[0] & 0x7f);
-								dst += sprintf(dst, "#$%04x", tmp);
 								break;
 							case 1: /* disp8 */
 								tmp = new_pc + 2 * (INT8)(w[0] & 0xff);
-								dst += sprintf(dst, "#$%04x", tmp);
 								break;
 							case 2: /* disp12 */
 								tmp = w[0] & 0x7ff;
@@ -256,9 +272,14 @@ CPU_DISASSEMBLE( z8000 )
 									tmp = new_pc + 0x1000 -2 * tmp;
 								else
 									tmp = new_pc + -2 * tmp;
-								dst += sprintf(dst, "#$%04x", tmp);
 								break;
+							default:
+								abort();
 						}
+						if (segm)
+							dst += sprintf(dst, "<%%%02X>%%%04X", (tmp >> 16) & 0xff, tmp & 0xffff);
+						else
+							dst += sprintf(dst, "%%%04x", tmp);
 						break;
 					case 'f':
 						/* flag (setflg/resflg/comflg) */
@@ -272,11 +293,16 @@ CPU_DISASSEMBLE( z8000 )
 						i = *src++ - '0';
 						dst += sprintf(dst, "%s", ints[n[i] & 3]);
 						break;
+					case 'n':
+						/* register count for ldm */
+						src++;
+						dst += sprintf(dst, "%d", n[7] + 1);
+						break;
 					case 'p':
 						/* disp16 (pc relative) */
 						src++;
 						i = *src++ - '0';
-						dst += sprintf(dst, "$%04x", new_pc + w[i]);
+						dst += sprintf(dst, "%%%04x", new_pc + w[i]);
 						break;
 					case 'r':
 						/* register */
