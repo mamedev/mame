@@ -9,7 +9,7 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "machine/8255ppi.h"
+#include "machine/i8255.h"
 #include "includes/scramble.h"
 
 
@@ -50,13 +50,13 @@ CUSTOM_INPUT_MEMBER(scramble_state::darkplnt_custom_r)
 
 /* state of the security PAL (6J) */
 
-static WRITE8_DEVICE_HANDLER( scramble_protection_w )
+WRITE8_DEVICE_HANDLER( scramble_protection_w )
 {
 	scramble_state *state = device->machine().driver_data<scramble_state>();
 	state->m_xb = data;
 }
 
-static READ8_DEVICE_HANDLER( scramble_protection_r )
+READ8_DEVICE_HANDLER( scramble_protection_r )
 {
 	switch (cpu_get_pc(device->machine().device("maincpu")))
 	{
@@ -116,24 +116,26 @@ static void cavelon_banksw(running_machine &machine)
 
 static READ8_HANDLER( cavelon_banksw_r )
 {
+	scramble_state *state = space->machine().driver_data<scramble_state>();
 	cavelon_banksw(space->machine());
 
-	if      ((offset >= 0x0100) && (offset <= 0x0103))
-		return ppi8255_r(space->machine().device("ppi8255_0"), offset - 0x0100);
+	if ((offset >= 0x0100) && (offset <= 0x0103))
+		return state->m_ppi8255_0->read(*space, offset - 0x0100);
 	else if ((offset >= 0x0200) && (offset <= 0x0203))
-		return ppi8255_r(space->machine().device("ppi8255_1"), offset - 0x0200);
+		return state->m_ppi8255_1->read(*space, offset - 0x0200);
 
 	return 0xff;
 }
 
 static WRITE8_HANDLER( cavelon_banksw_w )
 {
+	scramble_state *state = space->machine().driver_data<scramble_state>();
 	cavelon_banksw(space->machine());
 
-	if      ((offset >= 0x0100) && (offset <= 0x0103))
-		ppi8255_w(space->machine().device("ppi8255_0"), offset - 0x0100, data);
+	if ((offset >= 0x0100) && (offset <= 0x0103))
+		state->m_ppi8255_0->write(*space, offset - 0x0100, data);
 	else if ((offset >= 0x0200) && (offset <= 0x0203))
-		ppi8255_w(space->machine().device("ppi8255_1"), offset - 0x0200, data);
+		state->m_ppi8255_1->write(*space, offset - 0x0200, data);
 }
 
 
@@ -147,58 +149,6 @@ WRITE8_HANDLER( hunchbks_mirror_w )
 	space->write_byte(0x1000+offset,data);
 }
 
-const ppi8255_interface scramble_ppi_0_intf =
-{
-	DEVCB_INPUT_PORT("IN0"),		/* Port A read */
-	DEVCB_INPUT_PORT("IN1"),		/* Port B read */
-	DEVCB_INPUT_PORT("IN2"),		/* Port C read */
-	DEVCB_NULL,						/* Port A write */
-	DEVCB_NULL,						/* Port B write */
-	DEVCB_NULL						/* Port C write */
-};
-
-const ppi8255_interface scramble_ppi_1_intf =
-{
-	DEVCB_NULL,												/* Port A read */
-	DEVCB_NULL,												/* Port B read */
-	DEVCB_NULL,												/* Port C read */
-	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_byte_w),	/* Port A write */
-	DEVCB_HANDLER(scramble_sh_irqtrigger_w),				/* Port B write */
-	DEVCB_NULL												/* Port C write */
-};
-
-
-const ppi8255_interface stratgyx_ppi_1_intf =
-{
-	DEVCB_NULL,												/* Port A read */
-	DEVCB_NULL,												/* Port B read */
-	DEVCB_INPUT_PORT("IN3"),								/* Port C read */
-	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_byte_w),	/* Port A write */
-	DEVCB_HANDLER(scramble_sh_irqtrigger_w),				/* Port B write */
-	DEVCB_NULL												/* Port C write */
-};
-
-
-const ppi8255_interface scramble_protection_ppi_1_intf =
-{
-	DEVCB_NULL,												/* Port A read */
-	DEVCB_NULL,												/* Port B read */
-	DEVCB_HANDLER(scramble_protection_r),					/* Port C read */
-	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_byte_w),	/* Port A write */
-	DEVCB_HANDLER(scramble_sh_irqtrigger_w),				/* Port B write */
-	DEVCB_HANDLER(scramble_protection_w)					/* Port C write */
-};
-
-
-const ppi8255_interface mrkougar_ppi_1_intf =
-{
-	DEVCB_NULL,												/* Port A read */
-	DEVCB_NULL,												/* Port B read */
-	DEVCB_NULL,												/* Port C read */
-	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_byte_w),	/* Port A write */
-	DEVCB_HANDLER(mrkougar_sh_irqtrigger_w),				/* Port B write */
-	DEVCB_NULL												/* Port C write */
-};
 
 
 DRIVER_INIT( scramble_ppi )

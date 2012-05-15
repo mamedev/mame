@@ -32,7 +32,7 @@ Notes:
 #include "sound/dac.h"
 #include "sound/flt_rc.h"
 #include "machine/7474.h"
-#include "machine/8255ppi.h"
+#include "machine/i8255.h"
 #include "includes/scramble.h"
 
 
@@ -53,9 +53,9 @@ static ADDRESS_MAP_START( scramble_map, AS_PROGRAM, 8, scramble_state )
 	AM_RANGE(0x6807, 0x6807) AM_WRITE(galaxold_flip_screen_y_w)
 	AM_RANGE(0x7000, 0x7000) AM_READ(watchdog_reset_r)
 	AM_RANGE(0x7800, 0x7800) AM_READ(watchdog_reset_r)
-	AM_RANGE(0x8100, 0x8103) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w)
-	AM_RANGE(0x8110, 0x8113) AM_DEVREAD_LEGACY("ppi8255_0", ppi8255_r)  /* mirror for Frog */
-	AM_RANGE(0x8200, 0x8203) AM_DEVREADWRITE_LEGACY("ppi8255_1", ppi8255_r, ppi8255_w)
+	AM_RANGE(0x8100, 0x8103) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
+	AM_RANGE(0x8110, 0x8113) AM_DEVREAD("ppi8255_0", i8255_device, read)  /* mirror for Frog */
+	AM_RANGE(0x8200, 0x8203) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
 ADDRESS_MAP_END
 
 
@@ -79,12 +79,12 @@ static ADDRESS_MAP_START( turpins_map, AS_PROGRAM, 8, scramble_state )
 	AM_RANGE(0xa806, 0xa806) AM_WRITE(galaxold_flip_screen_x_w)
 	AM_RANGE(0xa807, 0xa807) AM_WRITE(galaxold_flip_screen_y_w)
 	/* don't know where these are */
-//  AM_RANGE(0x8100, 0x8103) AM_WRITE_LEGACY(ppi8255_0_w)
-//  AM_RANGE(0x8200, 0x8203) AM_WRITE_LEGACY(ppi8255_1_w)
+//  AM_RANGE(0x8100, 0x8103) AM_WRITE("ppi8255_0", i8255_device, write)
+//  AM_RANGE(0x8200, 0x8203) AM_WRITE("ppi8255_1", i8255_device, write)
 
 	AM_RANGE(0xb800, 0xb800) AM_READ(watchdog_reset_r)
-//  AM_RANGE(0x8100, 0x8103) AM_READ_LEGACY(ppi8255_0_r)
-//  AM_RANGE(0x8200, 0x8203) AM_READ_LEGACY(ppi8255_1_r)
+//  AM_RANGE(0x8100, 0x8103) AM_READ("ppi8255_0", i8255_device, read)
+//  AM_RANGE(0x8200, 0x8203) AM_READ("ppi8255_1", i8255_device, read)
 
 	AM_RANGE(0xf000, 0xffff) AM_READONLY
 ADDRESS_MAP_END
@@ -92,8 +92,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( ckongs_map, AS_PROGRAM, 8, scramble_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x6bff) AM_RAM
-	AM_RANGE(0x7000, 0x7003) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w)
-	AM_RANGE(0x7800, 0x7803) AM_DEVREADWRITE_LEGACY("ppi8255_1", ppi8255_r, ppi8255_w)
+	AM_RANGE(0x7000, 0x7003) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
+	AM_RANGE(0x7800, 0x7803) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
 	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(galaxold_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x9800, 0x983f) AM_RAM_WRITE(galaxold_attributesram_w) AM_SHARE("attributesram")
 	AM_RANGE(0x9840, 0x985f) AM_RAM AM_SHARE("spriteram")
@@ -107,16 +107,25 @@ static ADDRESS_MAP_START( ckongs_map, AS_PROGRAM, 8, scramble_state )
 ADDRESS_MAP_END
 
 
-static READ8_DEVICE_HANDLER(mars_ppi8255_r)
+READ8_MEMBER(scramble_state::mars_ppi8255_0_r)
 {
-	return ppi8255_r(device, ((offset >> 2) & 0x02) | ((offset >> 1) & 0x01));
+	return m_ppi8255_0->read(space, ((offset >> 2) & 0x02) | ((offset >> 1) & 0x01));
 }
 
-static WRITE8_DEVICE_HANDLER(mars_ppi8255_w)
+READ8_MEMBER(scramble_state::mars_ppi8255_1_r)
 {
-	ppi8255_w(device, ((offset >> 2) & 0x02) | ((offset >> 1) & 0x01), data);
+	return m_ppi8255_1->read(space, ((offset >> 2) & 0x02) | ((offset >> 1) & 0x01));
 }
 
+WRITE8_MEMBER(scramble_state::mars_ppi8255_0_w)
+{
+	m_ppi8255_0->write(space, ((offset >> 2) & 0x02) | ((offset >> 1) & 0x01), data);
+}
+
+WRITE8_MEMBER(scramble_state::mars_ppi8255_1_w)
+{
+	m_ppi8255_1->write(space, ((offset >> 2) & 0x02) | ((offset >> 1) & 0x01), data);
+}
 
 static ADDRESS_MAP_START( mars_map, AS_PROGRAM, 8, scramble_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
@@ -135,8 +144,8 @@ static ADDRESS_MAP_START( mars_map, AS_PROGRAM, 8, scramble_state )
 	AM_RANGE(0x680b, 0x680b) AM_WRITE(galaxold_flip_screen_y_w)
 	AM_RANGE(0x7000, 0x7000) AM_READ(watchdog_reset_r)
 	AM_RANGE(0x7000, 0x7000) AM_READNOP
-	AM_RANGE(0x8100, 0x810f) AM_DEVREADWRITE_LEGACY("ppi8255_0", mars_ppi8255_r, mars_ppi8255_w)
-	AM_RANGE(0x8200, 0x820f) AM_DEVREADWRITE_LEGACY("ppi8255_1", mars_ppi8255_r, mars_ppi8255_w)
+	AM_RANGE(0x8100, 0x810f) AM_READWRITE(mars_ppi8255_0_r, mars_ppi8255_0_w)
+	AM_RANGE(0x8200, 0x820f) AM_READWRITE(mars_ppi8255_1_r, mars_ppi8255_1_w)
 ADDRESS_MAP_END
 
 
@@ -156,9 +165,9 @@ static ADDRESS_MAP_START( newsin7_map, AS_PROGRAM, 8, scramble_state )
 	AM_RANGE(0x6809, 0x6809) AM_WRITE(galaxold_flip_screen_x_w)
 	AM_RANGE(0x680b, 0x680b) AM_WRITE(galaxold_flip_screen_y_w)
 	AM_RANGE(0x7000, 0x7000) AM_READ(watchdog_reset_r)
-	AM_RANGE(0x8200, 0x820f) AM_DEVREADWRITE_LEGACY("ppi8255_1", mars_ppi8255_r, mars_ppi8255_w)
+	AM_RANGE(0x8200, 0x820f) AM_READWRITE(mars_ppi8255_1_r, mars_ppi8255_1_w)
 	AM_RANGE(0xa000, 0xafff) AM_ROM
-	AM_RANGE(0xc100, 0xc10f) AM_DEVREADWRITE_LEGACY("ppi8255_0", mars_ppi8255_r, mars_ppi8255_w)
+	AM_RANGE(0xc100, 0xc10f) AM_READWRITE(mars_ppi8255_0_r, mars_ppi8255_0_w)
 ADDRESS_MAP_END
 
 
@@ -177,8 +186,8 @@ static ADDRESS_MAP_START( mrkougar_map, AS_PROGRAM, 8, scramble_state )
 	AM_RANGE(0x6809, 0x6809) AM_WRITE(galaxold_flip_screen_x_w)
 	AM_RANGE(0x680b, 0x680b) AM_WRITE(galaxold_flip_screen_y_w)
 	AM_RANGE(0x7000, 0x7000) AM_READ(watchdog_reset_r)
-	AM_RANGE(0x8100, 0x810f) AM_DEVREADWRITE_LEGACY("ppi8255_0", mars_ppi8255_r, mars_ppi8255_w)
-	AM_RANGE(0x8200, 0x820f) AM_DEVREADWRITE_LEGACY("ppi8255_1", mars_ppi8255_r, mars_ppi8255_w)
+	AM_RANGE(0x8100, 0x810f) AM_READWRITE(mars_ppi8255_0_r, mars_ppi8255_0_w)
+	AM_RANGE(0x8200, 0x820f) AM_READWRITE(mars_ppi8255_1_r, mars_ppi8255_1_w)
 ADDRESS_MAP_END
 
 
@@ -208,12 +217,12 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hunchbks_map, AS_PROGRAM, 8, scramble_state )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
-	AM_RANGE(0x1210, 0x1213) AM_DEVREADWRITE_LEGACY("ppi8255_1", ppi8255_r, ppi8255_w)
+	AM_RANGE(0x1210, 0x1213) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
 	AM_RANGE(0x1400, 0x143f) AM_RAM_WRITE(galaxold_attributesram_w) AM_SHARE("attributesram")
 	AM_RANGE(0x1440, 0x145f) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x1460, 0x147f) AM_RAM AM_SHARE("bulletsram")
 	AM_RANGE(0x1480, 0x14ff) AM_RAM
-	AM_RANGE(0x1500, 0x1503) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w)
+	AM_RANGE(0x1500, 0x1503) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
 	AM_RANGE(0x1606, 0x1606) AM_WRITE(galaxold_flip_screen_x_w)
 	AM_RANGE(0x1607, 0x1607) AM_WRITE(galaxold_flip_screen_y_w)
 	AM_RANGE(0x1680, 0x1680) AM_READ(watchdog_reset_r)
@@ -243,8 +252,8 @@ static ADDRESS_MAP_START( mimonscr_map, AS_PROGRAM, 8, scramble_state )
 	AM_RANGE(0x6806, 0x6806) AM_WRITE(galaxold_flip_screen_x_w)
 	AM_RANGE(0x6807, 0x6807) AM_WRITE(galaxold_flip_screen_y_w)
 	AM_RANGE(0x7000, 0x7000) AM_READ(watchdog_reset_r)
-	AM_RANGE(0x8100, 0x8103) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w)
-	AM_RANGE(0x8200, 0x8203) AM_DEVREADWRITE_LEGACY("ppi8255_1", ppi8255_r, ppi8255_w)
+	AM_RANGE(0x8100, 0x8103) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
+	AM_RANGE(0x8200, 0x8203) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -1148,6 +1157,59 @@ static GFXDECODE_START( ad2083 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, ad2083_spritelayout,  0, 8 )
 GFXDECODE_END
 
+
+
+I8255A_INTERFACE( scramble_ppi_0_intf )
+{
+	DEVCB_INPUT_PORT("IN0"),		/* Port A read */
+	DEVCB_NULL,						/* Port A write */
+	DEVCB_INPUT_PORT("IN1"),		/* Port B read */
+	DEVCB_NULL,						/* Port B write */
+	DEVCB_INPUT_PORT("IN2"),		/* Port C read */
+	DEVCB_NULL						/* Port C write */
+};
+
+I8255A_INTERFACE( scramble_ppi_1_intf )
+{
+	DEVCB_NULL,								/* Port A read */
+	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_byte_w),/* Port A write */
+	DEVCB_NULL,								/* Port B read */
+	DEVCB_HANDLER(scramble_sh_irqtrigger_w),/* Port B write */
+	DEVCB_NULL,								/* Port C read */
+	DEVCB_NULL								/* Port C write */
+};
+
+I8255A_INTERFACE( stratgyx_ppi_1_intf )
+{
+	DEVCB_NULL,								/* Port A read */
+	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_byte_w),/* Port A write */
+	DEVCB_NULL,								/* Port B read */
+	DEVCB_HANDLER(scramble_sh_irqtrigger_w),/* Port B write */
+	DEVCB_INPUT_PORT("IN3"),				/* Port C read */
+	DEVCB_NULL								/* Port C write */
+};
+
+I8255A_INTERFACE( scramble_protection_ppi_1_intf )
+{
+	DEVCB_NULL,								/* Port A read */
+	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_byte_w),/* Port A write */
+	DEVCB_NULL,								/* Port B read */
+	DEVCB_HANDLER(scramble_sh_irqtrigger_w),/* Port B write */
+	DEVCB_HANDLER(scramble_protection_r),	/* Port C read */
+	DEVCB_HANDLER(scramble_protection_w)	/* Port C write */
+};
+
+I8255A_INTERFACE( mrkougar_ppi_1_intf )
+{
+	DEVCB_NULL,								/* Port A read */
+	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_byte_w),/* Port A write */
+	DEVCB_NULL,								/* Port B read */
+	DEVCB_HANDLER(mrkougar_sh_irqtrigger_w),/* Port B write */
+	DEVCB_NULL,								/* Port C read */
+	DEVCB_NULL								/* Port C write */
+};
+
+
 static const ay8910_interface scramble_ay8910_interface_2 =
 {
 	AY8910_LEGACY_OUTPUT,
@@ -1251,8 +1313,8 @@ static MACHINE_CONFIG_START( scramble, scramble_state )
 
 	MCFG_MACHINE_RESET(scramble)
 
-	MCFG_PPI8255_ADD( "ppi8255_0", scramble_ppi_0_intf )
-	MCFG_PPI8255_ADD( "ppi8255_1", scramble_ppi_1_intf )
+	MCFG_I8255A_ADD( "ppi8255_0", scramble_ppi_0_intf )
+	MCFG_I8255A_ADD( "ppi8255_1", scramble_ppi_1_intf )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1320,7 +1382,8 @@ static MACHINE_CONFIG_DERIVED( mrkougar, scramble )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(mrkougar_map)
 
-	MCFG_PPI8255_RECONFIG( "ppi8255_1", mrkougar_ppi_1_intf )
+	MCFG_DEVICE_REMOVE("ppi8255_1")
+	MCFG_I8255A_ADD( "ppi8255_1", mrkougar_ppi_1_intf )
 
 	/* video hardware */
 	MCFG_GFXDECODE(mrkougar)
@@ -1334,7 +1397,8 @@ static MACHINE_CONFIG_DERIVED( mrkougb, scramble )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(mrkougar_map)
 
-	MCFG_PPI8255_RECONFIG( "ppi8255_1", mrkougar_ppi_1_intf )
+	MCFG_DEVICE_REMOVE("ppi8255_1")
+	MCFG_I8255A_ADD( "ppi8255_1", mrkougar_ppi_1_intf )
 
 	/* video hardware */
 	MCFG_PALETTE_LENGTH(32+64+2+0)	/* 32 for characters, 64 for stars, 2 for bullets, 0/1 for background */

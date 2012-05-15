@@ -34,7 +34,7 @@ Notes/Tidbits:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "machine/8255ppi.h"
+#include "machine/i8255.h"
 #include "machine/7474.h"
 #include "sound/ay8910.h"
 #include "includes/scramble.h"
@@ -50,6 +50,14 @@ public:
 	optional_shared_ptr<UINT8> m_soundram;
 	DECLARE_READ8_MEMBER(scobra_soundram_r);
 	DECLARE_WRITE8_MEMBER(scobra_soundram_w);
+	DECLARE_READ8_MEMBER(scobra_type2_ppi8255_0_r);
+	DECLARE_READ8_MEMBER(scobra_type2_ppi8255_1_r);
+	DECLARE_READ8_MEMBER(hustler_ppi8255_0_r);
+	DECLARE_READ8_MEMBER(hustler_ppi8255_1_r);
+	DECLARE_WRITE8_MEMBER(scobra_type2_ppi8255_0_w);
+	DECLARE_WRITE8_MEMBER(scobra_type2_ppi8255_1_w);
+	DECLARE_WRITE8_MEMBER(hustler_ppi8255_0_w);
+	DECLARE_WRITE8_MEMBER(hustler_ppi8255_1_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(stratgyx_coinage_r);
 };
 
@@ -96,25 +104,15 @@ static const ay8910_interface hustler_ay8910_interface =
 	DEVCB_NULL
 };
 
-static READ8_DEVICE_HANDLER(scobra_type2_ppi8255_r)
-{
-	return ppi8255_r(device, offset >> 2);
-}
+READ8_MEMBER(scobra_state::scobra_type2_ppi8255_0_r){ return m_ppi8255_0->read(space, offset >> 2); }
+READ8_MEMBER(scobra_state::scobra_type2_ppi8255_1_r){ return m_ppi8255_1->read(space, offset >> 2); }
+WRITE8_MEMBER(scobra_state::scobra_type2_ppi8255_0_w){ m_ppi8255_0->write(space, offset >> 2, data); }
+WRITE8_MEMBER(scobra_state::scobra_type2_ppi8255_1_w){ m_ppi8255_1->write(space, offset >> 2, data); }
 
-static WRITE8_DEVICE_HANDLER(scobra_type2_ppi8255_w)
-{
-	ppi8255_w(device, offset >> 2, data);
-}
-
-static READ8_DEVICE_HANDLER(hustler_ppi8255_r)
-{
-	return ppi8255_r(device, offset >> 3);
-}
-
-static WRITE8_DEVICE_HANDLER(hustler_ppi8255_w)
-{
-	ppi8255_w(device, offset >> 3, data);
-}
+READ8_MEMBER(scobra_state::hustler_ppi8255_0_r){ return m_ppi8255_0->read(space, offset >> 3); }
+READ8_MEMBER(scobra_state::hustler_ppi8255_1_r){ return m_ppi8255_1->read(space, offset >> 3); }
+WRITE8_MEMBER(scobra_state::hustler_ppi8255_0_w){ m_ppi8255_0->write(space, offset >> 3, data); }
+WRITE8_MEMBER(scobra_state::hustler_ppi8255_1_w){ m_ppi8255_1->write(space, offset >> 3, data); }
 
 static ADDRESS_MAP_START( type1_map, AS_PROGRAM, 8, scobra_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
@@ -126,8 +124,8 @@ static ADDRESS_MAP_START( type1_map, AS_PROGRAM, 8, scobra_state )
 	AM_RANGE(0x9040, 0x905f) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x9060, 0x907f) AM_RAM AM_SHARE("bulletsram")
 	AM_RANGE(0x9080, 0x90ff) AM_RAM
-	AM_RANGE(0x9800, 0x9803) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w)
-	AM_RANGE(0xa000, 0xa003) AM_DEVREADWRITE_LEGACY("ppi8255_1", ppi8255_r, ppi8255_w)
+	AM_RANGE(0x9800, 0x9803) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
+	AM_RANGE(0xa000, 0xa003) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
 	AM_RANGE(0xa801, 0xa801) AM_WRITE(galaxold_nmi_enable_w)
 	AM_RANGE(0xa802, 0xa802) AM_WRITE(galaxold_coin_counter_w)
 	AM_RANGE(0xa804, 0xa804) AM_WRITE(galaxold_stars_enable_w)
@@ -146,8 +144,8 @@ static ADDRESS_MAP_START( type2_map, AS_PROGRAM, 8, scobra_state )
 	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(galaxold_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x9400, 0x97ff) AM_READWRITE(galaxold_videoram_r, galaxold_videoram_w)	/* mirror */
 	AM_RANGE(0x9800, 0x9800) AM_READ(watchdog_reset_r)
-	AM_RANGE(0xa000, 0xa00f) AM_DEVREADWRITE_LEGACY("ppi8255_0", scobra_type2_ppi8255_r, scobra_type2_ppi8255_w)
-	AM_RANGE(0xa800, 0xa80f) AM_DEVREADWRITE_LEGACY("ppi8255_1", scobra_type2_ppi8255_r, scobra_type2_ppi8255_w)
+	AM_RANGE(0xa000, 0xa00f) AM_READWRITE(scobra_type2_ppi8255_0_r, scobra_type2_ppi8255_0_w)
+	AM_RANGE(0xa800, 0xa80f) AM_READWRITE(scobra_type2_ppi8255_1_r, scobra_type2_ppi8255_1_w)
 	AM_RANGE(0xb000, 0xb000) AM_WRITE(galaxold_stars_enable_w)
 	AM_RANGE(0xb004, 0xb004) AM_WRITE(galaxold_nmi_enable_w)
 	AM_RANGE(0xb006, 0xb006) AM_WRITE(galaxold_coin_counter_0_w)
@@ -169,8 +167,8 @@ static ADDRESS_MAP_START( hustler_map, AS_PROGRAM, 8, scobra_state )
 	AM_RANGE(0xa806, 0xa806) AM_WRITE(galaxold_flip_screen_y_w)
 	AM_RANGE(0xa80e, 0xa80e) AM_WRITENOP	/* coin counters */
 	AM_RANGE(0xb800, 0xb800) AM_READ(watchdog_reset_r)
-	AM_RANGE(0xd000, 0xd01f) AM_DEVREADWRITE_LEGACY("ppi8255_0", hustler_ppi8255_r, hustler_ppi8255_w)
-	AM_RANGE(0xe000, 0xe01f) AM_DEVREADWRITE_LEGACY("ppi8255_1", hustler_ppi8255_r, hustler_ppi8255_w)
+	AM_RANGE(0xd000, 0xd01f) AM_READWRITE(hustler_ppi8255_0_r, hustler_ppi8255_0_w)
+	AM_RANGE(0xe000, 0xe01f) AM_READWRITE(hustler_ppi8255_1_r, hustler_ppi8255_1_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hustlerb_map, AS_PROGRAM, 8, scobra_state )
@@ -186,8 +184,8 @@ static ADDRESS_MAP_START( hustlerb_map, AS_PROGRAM, 8, scobra_state )
 	AM_RANGE(0xa806, 0xa806) AM_WRITE(galaxold_flip_screen_y_w)
 	AM_RANGE(0xa807, 0xa807) AM_WRITE(galaxold_flip_screen_x_w)
 	AM_RANGE(0xb000, 0xb000) AM_READ(watchdog_reset_r)
-	AM_RANGE(0xc100, 0xc103) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w)
-	AM_RANGE(0xc200, 0xc203) AM_DEVREADWRITE_LEGACY("ppi8255_1", ppi8255_r, ppi8255_w)
+	AM_RANGE(0xc100, 0xc103) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
+	AM_RANGE(0xc200, 0xc203) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mimonkey_map, AS_PROGRAM, 8, scobra_state )
@@ -199,8 +197,8 @@ static ADDRESS_MAP_START( mimonkey_map, AS_PROGRAM, 8, scobra_state )
 	AM_RANGE(0x9040, 0x905f) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x9060, 0x907f) AM_RAM AM_SHARE("bulletsram")
 	AM_RANGE(0x9080, 0x90ff) AM_RAM
-	AM_RANGE(0x9800, 0x9803) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w)
-	AM_RANGE(0xa000, 0xa003) AM_DEVREADWRITE_LEGACY("ppi8255_1", ppi8255_r, ppi8255_w)
+	AM_RANGE(0x9800, 0x9803) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
+	AM_RANGE(0xa000, 0xa003) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
 	AM_RANGE(0xa801, 0xa801) AM_WRITE(galaxold_nmi_enable_w)
 	AM_RANGE(0xa800, 0xa802) AM_WRITE(galaxold_gfxbank_w)
 	AM_RANGE(0xa806, 0xa806) AM_WRITE(galaxold_flip_screen_x_w)
@@ -669,8 +667,8 @@ static MACHINE_CONFIG_START( type1, scobra_state )
 
 	MCFG_MACHINE_RESET(scramble)
 
-	MCFG_PPI8255_ADD( "ppi8255_0", scramble_ppi_0_intf )
-	MCFG_PPI8255_ADD( "ppi8255_1", scramble_ppi_1_intf )
+	MCFG_I8255A_ADD( "ppi8255_0", scramble_ppi_0_intf )
+	MCFG_I8255A_ADD( "ppi8255_1", scramble_ppi_1_intf )
 
 	MCFG_7474_ADD("7474_9m_1", "7474_9m_1", galaxold_7474_9m_1_callback, NULL)
 	MCFG_7474_ADD("7474_9m_2", "7474_9m_1", NULL, galaxold_7474_9m_2_q_callback)
@@ -754,8 +752,8 @@ static MACHINE_CONFIG_DERIVED( stratgyx, type2 )
 
 	/* basic machine hardware */
 
-	/* device config overrides */
-	MCFG_PPI8255_RECONFIG( "ppi8255_1", stratgyx_ppi_1_intf )
+	MCFG_DEVICE_REMOVE("ppi8255_1")
+	MCFG_I8255A_ADD( "ppi8255_1", stratgyx_ppi_1_intf )
 
 	/* video hardware */
 	MCFG_PALETTE_LENGTH(32+64+2+8)	/* 32 for characters, 64 for stars, 2 for bullets, 8 for background */
@@ -797,8 +795,8 @@ static MACHINE_CONFIG_START( hustler, scobra_state )
 	MCFG_TIMER_ADD("int_timer", galaxold_interrupt_timer)
 
 	/* device config overrides */
-	MCFG_PPI8255_ADD( "ppi8255_0", scramble_ppi_0_intf )
-	MCFG_PPI8255_ADD( "ppi8255_1", scramble_ppi_1_intf )
+	MCFG_I8255A_ADD( "ppi8255_0", scramble_ppi_0_intf )
+	MCFG_I8255A_ADD( "ppi8255_1", scramble_ppi_1_intf )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

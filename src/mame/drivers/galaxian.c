@@ -417,7 +417,7 @@ TO DO :
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/s2650/s2650.h"
-#include "machine/8255ppi.h"
+#include "machine/i8255.h"
 #include "sound/ay8910.h"
 #include "sound/sn76496.h"
 #include "sound/dac.h"
@@ -622,27 +622,25 @@ static WRITE8_DEVICE_HANDLER( konami_portc_1_w )
 }
 
 
-static const ppi8255_interface konami_ppi8255_0_intf =
+static I8255A_INTERFACE( konami_ppi8255_0_intf )
 {
-	DEVCB_INPUT_PORT("IN0"),			/* Port A read */
-	DEVCB_INPUT_PORT("IN1"),			/* Port B read */
-	DEVCB_INPUT_PORT("IN2"),			/* Port C read */
-	DEVCB_NULL,							/* Port A write */
-	DEVCB_NULL,							/* Port B write */
-	DEVCB_HANDLER(konami_portc_0_w)		/* Port C write */
+	DEVCB_INPUT_PORT("IN0"),		/* Port A read */
+	DEVCB_NULL,						/* Port A write */
+	DEVCB_INPUT_PORT("IN1"),		/* Port B read */
+	DEVCB_NULL,						/* Port B write */
+	DEVCB_INPUT_PORT("IN2"),		/* Port C read */
+	DEVCB_HANDLER(konami_portc_0_w)	/* Port C write */
 };
 
-
-static const ppi8255_interface konami_ppi8255_1_intf =
+static I8255A_INTERFACE( konami_ppi8255_1_intf )
 {
-	DEVCB_NULL,												/* Port A read */
-	DEVCB_NULL,												/* Port B read */
-	DEVCB_INPUT_PORT("IN3"),								/* Port C read */
-	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_byte_w),		/* Port A write */
-	DEVCB_HANDLER(konami_sound_control_w),					/* Port B write */
-	DEVCB_HANDLER(konami_portc_1_w)							/* Port C write */
+	DEVCB_NULL,								/* Port A read */
+	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_byte_w),/* Port A write */
+	DEVCB_NULL,								/* Port B read */
+	DEVCB_HANDLER(konami_sound_control_w),	/* Port B write */
+	DEVCB_INPUT_PORT("IN3"),				/* Port C read */
+	DEVCB_HANDLER(konami_portc_1_w)			/* Port C write */
 };
-
 
 
 /*************************************
@@ -655,8 +653,8 @@ READ8_MEMBER(galaxian_state::theend_ppi8255_r)
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
 	UINT8 result = 0xff;
-	if (offset & 0x0100) result &= ppi8255_r(machine().device("ppi8255_0"), offset & 3);
-	if (offset & 0x0200) result &= ppi8255_r(machine().device("ppi8255_1"), offset & 3);
+	if (offset & 0x0100) result &= m_ppi8255_0->read(space, offset & 3);
+	if (offset & 0x0200) result &= m_ppi8255_1->read(space, offset & 3);
 	return result;
 }
 
@@ -664,8 +662,8 @@ READ8_MEMBER(galaxian_state::theend_ppi8255_r)
 WRITE8_MEMBER(galaxian_state::theend_ppi8255_w)
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
-	if (offset & 0x0100) ppi8255_w(machine().device("ppi8255_0"), offset & 3, data);
-	if (offset & 0x0200) ppi8255_w(machine().device("ppi8255_1"), offset & 3, data);
+	if (offset & 0x0100) m_ppi8255_0->write(space, offset & 3, data);
+	if (offset & 0x0200) m_ppi8255_1->write(space, offset & 3, data);
 }
 
 
@@ -675,14 +673,14 @@ static WRITE8_DEVICE_HANDLER( theend_coin_counter_w )
 }
 
 
-static const ppi8255_interface theend_ppi8255_0_intf =
+static I8255A_INTERFACE( theend_ppi8255_0_intf )
 {
-	DEVCB_INPUT_PORT("IN0"),			/* Port A read */
-	DEVCB_INPUT_PORT("IN1"),			/* Port B read */
-	DEVCB_INPUT_PORT("IN2"),			/* Port C read */
-	DEVCB_NULL,							/* Port A write */
-	DEVCB_NULL,							/* Port B write */
-	DEVCB_HANDLER(theend_coin_counter_w)/* Port C write */
+	DEVCB_INPUT_PORT("IN0"),		/* Port A read */
+	DEVCB_NULL,						/* Port A write */
+	DEVCB_INPUT_PORT("IN1"),		/* Port B read */
+	DEVCB_NULL,						/* Port B write */
+	DEVCB_INPUT_PORT("IN2"),		/* Port C read */
+	DEVCB_HANDLER(theend_coin_counter_w)	/* Port C write */
 };
 
 
@@ -736,16 +734,15 @@ CUSTOM_INPUT_MEMBER(galaxian_state::scramble_protection_alt_r)
 }
 
 
-static const ppi8255_interface scramble_ppi8255_1_intf =
+static I8255A_INTERFACE( scramble_ppi8255_1_intf )
 {
-	DEVCB_NULL,												/* Port A read */
-	DEVCB_NULL,												/* Port B read */
-	DEVCB_HANDLER(scramble_protection_r),					/* Port C read */
-	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_byte_w),		/* Port A write */
-	DEVCB_HANDLER(konami_sound_control_w),					/* Port B write */
-	DEVCB_HANDLER(scramble_protection_w)					/* Port C write */
+	DEVCB_NULL,								/* Port A read */
+	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_byte_w),/* Port A write */
+	DEVCB_NULL,								/* Port B read */
+	DEVCB_HANDLER(konami_sound_control_w),	/* Port B write */
+	DEVCB_HANDLER(scramble_protection_r),	/* Port C read */
+	DEVCB_HANDLER(scramble_protection_w)	/* Port C write */
 };
-
 
 
 /*************************************
@@ -779,7 +776,7 @@ READ8_MEMBER(galaxian_state::sfx_sample_io_r)
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
 	UINT8 result = 0xff;
-	if (offset & 0x04) result &= ppi8255_r(machine().device("ppi8255_2"), offset & 3);
+	if (offset & 0x04) result &= m_ppi8255_2->read(space, offset & 3);
 	return result;
 }
 
@@ -787,7 +784,7 @@ READ8_MEMBER(galaxian_state::sfx_sample_io_r)
 WRITE8_MEMBER(galaxian_state::sfx_sample_io_w)
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
-	if (offset & 0x04) ppi8255_w(machine().device("ppi8255_2"), offset & 3, data);
+	if (offset & 0x04) m_ppi8255_2->write(space, offset & 3, data);
 	if (offset & 0x10) dac_signed_data_w(machine().device("dac"), data);
 }
 
@@ -805,17 +802,15 @@ static WRITE8_DEVICE_HANDLER( sfx_sample_control_w )
 }
 
 
-static const ppi8255_interface sfx_ppi8255_2_intf =
+static I8255A_INTERFACE( sfx_ppi8255_2_intf )
 {
-	DEVCB_DRIVER_MEMBER(driver_device, soundlatch2_byte_r),		/* Port A read */
-	DEVCB_NULL,												/* Port B read */
-	DEVCB_NULL,												/* Port C read */
-	DEVCB_NULL,												/* Port A write */
-	DEVCB_NULL,												/* Port B write */
-	DEVCB_NULL												/* Port C write */
+	DEVCB_DRIVER_MEMBER(driver_device, soundlatch2_byte_r),	/* Port A read */
+	DEVCB_NULL,								/* Port A write */
+	DEVCB_NULL,								/* Port B read */
+	DEVCB_NULL,								/* Port B write */
+	DEVCB_NULL,								/* Port C read */
+	DEVCB_NULL								/* Port C write */
 };
-
-
 
 /*************************************
  *
@@ -879,16 +874,15 @@ static WRITE8_DEVICE_HANDLER( monsterz_portc_1_w )
 {
 }
 
-static const ppi8255_interface monsterz_ppi8255_1_intf =
+static I8255A_INTERFACE( monsterz_ppi8255_1_intf )
 {
-	DEVCB_NULL,												/* Port A read */
-	DEVCB_NULL,												/* Port B read */
-	DEVCB_INPUT_PORT("IN3"),								/* Port C read */
-	DEVCB_HANDLER(monsterz_porta_1_w),						/* Port A write */
-	DEVCB_HANDLER(monsterz_portb_1_w),						/* Port B write */
-	DEVCB_HANDLER(monsterz_portc_1_w)						/* Port C write */
+	DEVCB_NULL,							/* Port A read */
+	DEVCB_HANDLER(monsterz_porta_1_w),	/* Port A write */
+	DEVCB_NULL,							/* Port B read */
+	DEVCB_HANDLER(monsterz_portb_1_w),	/* Port B write */
+	DEVCB_INPUT_PORT("IN3"),			/* Port C read */
+	DEVCB_HANDLER(monsterz_portc_1_w)	/* Port C write */
 };
-
 
 
 /*************************************
@@ -901,8 +895,8 @@ READ8_MEMBER(galaxian_state::frogger_ppi8255_r)
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
 	UINT8 result = 0xff;
-	if (offset & 0x1000) result &= ppi8255_r(machine().device("ppi8255_1"), (offset >> 1) & 3);
-	if (offset & 0x2000) result &= ppi8255_r(machine().device("ppi8255_0"), (offset >> 1) & 3);
+	if (offset & 0x1000) result &= m_ppi8255_1->read(space, (offset >> 1) & 3);
+	if (offset & 0x2000) result &= m_ppi8255_0->read(space, (offset >> 1) & 3);
 	return result;
 }
 
@@ -910,8 +904,8 @@ READ8_MEMBER(galaxian_state::frogger_ppi8255_r)
 WRITE8_MEMBER(galaxian_state::frogger_ppi8255_w)
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
-	if (offset & 0x1000) ppi8255_w(machine().device("ppi8255_1"), (offset >> 1) & 3, data);
-	if (offset & 0x2000) ppi8255_w(machine().device("ppi8255_0"), (offset >> 1) & 3, data);
+	if (offset & 0x1000) m_ppi8255_1->write(space, (offset >> 1) & 3, data);
+	if (offset & 0x2000) m_ppi8255_0->write(space, (offset >> 1) & 3, data);
 }
 
 
@@ -960,8 +954,8 @@ READ8_MEMBER(galaxian_state::frogf_ppi8255_r)
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
 	UINT8 result = 0xff;
-	if (offset & 0x1000) result &= ppi8255_r(machine().device("ppi8255_0"), (offset >> 3) & 3);
-	if (offset & 0x2000) result &= ppi8255_r(machine().device("ppi8255_1"), (offset >> 3) & 3);
+	if (offset & 0x1000) result &= m_ppi8255_0->read(space, (offset >> 3) & 3);
+	if (offset & 0x2000) result &= m_ppi8255_1->read(space, (offset >> 3) & 3);
 	return result;
 }
 
@@ -969,8 +963,8 @@ READ8_MEMBER(galaxian_state::frogf_ppi8255_r)
 WRITE8_MEMBER(galaxian_state::frogf_ppi8255_w)
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
-	if (offset & 0x1000) ppi8255_w(machine().device("ppi8255_0"), (offset >> 3) & 3, data);
-	if (offset & 0x2000) ppi8255_w(machine().device("ppi8255_1"), (offset >> 3) & 3, data);
+	if (offset & 0x1000) m_ppi8255_0->write(space, (offset >> 3) & 3, data);
+	if (offset & 0x2000) m_ppi8255_1->write(space, (offset >> 3) & 3, data);
 }
 
 
@@ -981,10 +975,10 @@ WRITE8_MEMBER(galaxian_state::frogf_ppi8255_w)
  *
  *************************************/
 
-READ8_MEMBER(galaxian_state::turtles_ppi8255_0_r){ return ppi8255_r(machine().device("ppi8255_0"), (offset >> 4) & 3); }
-READ8_MEMBER(galaxian_state::turtles_ppi8255_1_r){ return ppi8255_r(machine().device("ppi8255_1"), (offset >> 4) & 3); }
-WRITE8_MEMBER(galaxian_state::turtles_ppi8255_0_w){ ppi8255_w(machine().device("ppi8255_0"), (offset >> 4) & 3, data); }
-WRITE8_MEMBER(galaxian_state::turtles_ppi8255_1_w){ ppi8255_w(machine().device("ppi8255_1"), (offset >> 4) & 3, data); }
+READ8_MEMBER(galaxian_state::turtles_ppi8255_0_r){ return m_ppi8255_0->read(space, (offset >> 4) & 3); }
+READ8_MEMBER(galaxian_state::turtles_ppi8255_1_r){ return m_ppi8255_1->read(space, (offset >> 4) & 3); }
+WRITE8_MEMBER(galaxian_state::turtles_ppi8255_0_w){ m_ppi8255_0->write(space, (offset >> 4) & 3, data); }
+WRITE8_MEMBER(galaxian_state::turtles_ppi8255_1_w){ m_ppi8255_1->write(space, (offset >> 4) & 3, data); }
 
 
 
@@ -1061,16 +1055,15 @@ static WRITE8_DEVICE_HANDLER( scorpion_digitalker_control_w )
 	digitalker_0_wr_w(device, data & 4 ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static const ppi8255_interface scorpion_ppi8255_1_intf =
+static I8255A_INTERFACE( scorpion_ppi8255_1_intf )
 {
-	DEVCB_NULL,												/* Port A read */
-	DEVCB_NULL,												/* Port B read */
-	DEVCB_HANDLER(scorpion_protection_r),					/* Port C read */
-	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_byte_w),		/* Port A write */
-	DEVCB_HANDLER(konami_sound_control_w),					/* Port B write */
-	DEVCB_HANDLER(scorpion_protection_w)					/* Port C write */
+	DEVCB_NULL,								/* Port A read */
+	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_byte_w),/* Port A write */
+	DEVCB_NULL,								/* Port B read */
+	DEVCB_HANDLER(konami_sound_control_w),	/* Port B write */
+	DEVCB_HANDLER(scorpion_protection_r),	/* Port C read */
+	DEVCB_HANDLER(scorpion_protection_w)	/* Port C write */
 };
-
 
 
 /*************************************
@@ -1339,16 +1332,15 @@ static WRITE8_DEVICE_HANDLER( moonwar_port_select_w )
 }
 
 
-static const ppi8255_interface moonwar_ppi8255_0_intf =
+static I8255A_INTERFACE( moonwar_ppi8255_0_intf )
 {
 	DEVCB_INPUT_PORT("IN0"),				/* Port A read */
-	DEVCB_INPUT_PORT("IN1"),				/* Port B read */
-	DEVCB_INPUT_PORT("IN2"),				/* Port C read */
 	DEVCB_NULL,								/* Port A write */
+	DEVCB_INPUT_PORT("IN1"),				/* Port B read */
 	DEVCB_NULL,								/* Port B write */
+	DEVCB_INPUT_PORT("IN2"),				/* Port C read */
 	DEVCB_HANDLER(moonwar_port_select_w)	/* Port C write */
 };
-
 
 
 /*************************************
@@ -1551,8 +1543,8 @@ static ADDRESS_MAP_START( scobra_map, AS_PROGRAM, 8, galaxian_state )
 	AM_RANGE(0x8000, 0x87ff) AM_MIRROR(0x4000) AM_RAM
 	AM_RANGE(0x8800, 0x8bff) AM_MIRROR(0x4400) AM_RAM_WRITE(galaxian_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x9000, 0x90ff) AM_MIRROR(0x4700) AM_RAM_WRITE(galaxian_objram_w) AM_SHARE("spriteram")
-	AM_RANGE(0x9800, 0x9803) AM_MIRROR(0x47fc) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w)
-	AM_RANGE(0xa000, 0xa003) AM_MIRROR(0x47fc) AM_DEVREADWRITE_LEGACY("ppi8255_1", ppi8255_r, ppi8255_w)
+	AM_RANGE(0x9800, 0x9803) AM_MIRROR(0x47fc) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
+	AM_RANGE(0xa000, 0xa003) AM_MIRROR(0x47fc) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
 	AM_RANGE(0xa801, 0xa801) AM_MIRROR(0x47f8) AM_WRITE(irq_enable_w)
 	AM_RANGE(0xa802, 0xa802) AM_MIRROR(0x47f8) AM_WRITE(coin_count_0_w)
 	AM_RANGE(0xa803, 0xa803) AM_MIRROR(0x47f8) AM_WRITE(scramble_background_enable_w)
@@ -1579,8 +1571,8 @@ static ADDRESS_MAP_START( anteateruk_map, AS_PROGRAM, 8, galaxian_state )
 	AM_RANGE(0x1200, 0x12ff) AM_MIRROR(0x0100) AM_RAM_WRITE(galaxian_objram_w) AM_SHARE("spriteram")
 	AM_RANGE(0x1400, 0x1400) AM_MIRROR(0x03ff) AM_READ(watchdog_reset_r)
 	AM_RANGE(0x4000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc003) AM_MIRROR(0x3efc) AM_DEVREADWRITE_LEGACY("ppi8255_1", ppi8255_r, ppi8255_w)
-	AM_RANGE(0xc100, 0xc103) AM_MIRROR(0x3efc) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w)
+	AM_RANGE(0xc000, 0xc003) AM_MIRROR(0x3efc) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
+	AM_RANGE(0xc100, 0xc103) AM_MIRROR(0x3efc) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
 ADDRESS_MAP_END
 
 
@@ -1590,7 +1582,7 @@ static ADDRESS_MAP_START( anteaterg_map, AS_PROGRAM, 8, galaxian_state )
 	AM_RANGE(0x0400, 0x0bff) AM_RAM
 	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE(galaxian_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x2000, 0x20ff) AM_MIRROR(0x0300) AM_RAM_WRITE(galaxian_objram_w) AM_SHARE("spriteram")
-	AM_RANGE(0x2400, 0x2403) AM_MIRROR(0x01fc) AM_DEVREADWRITE_LEGACY("ppi8255_1", ppi8255_r, ppi8255_w)
+	AM_RANGE(0x2400, 0x2403) AM_MIRROR(0x01fc) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
 	AM_RANGE(0x2601, 0x2601) AM_MIRROR(0x01f8) AM_WRITE(irq_enable_w)
 	AM_RANGE(0x2602, 0x2602) AM_MIRROR(0x01f8) AM_WRITE(coin_count_0_w)
 	AM_RANGE(0x2603, 0x2603) AM_MIRROR(0x01f8) AM_WRITE(scramble_background_enable_w)
@@ -1601,7 +1593,7 @@ static ADDRESS_MAP_START( anteaterg_map, AS_PROGRAM, 8, galaxian_state )
 	AM_RANGE(0x4000, 0xbfff) AM_ROM
 	AM_RANGE(0x7c00, 0x7fff) AM_RAM_WRITE(galaxian_videoram_w) AM_SHARE("videoram")	/* mirror! */
 	AM_RANGE(0xf400, 0xf400) AM_MIRROR(0x01ff) AM_READ(watchdog_reset_r)
-	AM_RANGE(0xf600, 0xf603) AM_MIRROR(0x01fc) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w)
+	AM_RANGE(0xf600, 0xf603) AM_MIRROR(0x01fc) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
 ADDRESS_MAP_END
 
 
@@ -2126,8 +2118,8 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( konami_base, galaxian_base )
 
-	MCFG_PPI8255_ADD( "ppi8255_0", konami_ppi8255_0_intf )
-	MCFG_PPI8255_ADD( "ppi8255_1", konami_ppi8255_1_intf )
+	MCFG_I8255A_ADD( "ppi8255_0", konami_ppi8255_0_intf )
+	MCFG_I8255A_ADD( "ppi8255_1", konami_ppi8255_1_intf )
 MACHINE_CONFIG_END
 
 
@@ -2387,8 +2379,8 @@ static MACHINE_CONFIG_DERIVED( theend, galaxian_base )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(theend_map)
 
-	MCFG_PPI8255_ADD( "ppi8255_0", theend_ppi8255_0_intf )
-	MCFG_PPI8255_ADD( "ppi8255_1", konami_ppi8255_1_intf )
+	MCFG_I8255A_ADD( "ppi8255_0", theend_ppi8255_0_intf )
+	MCFG_I8255A_ADD( "ppi8255_1", konami_ppi8255_1_intf )
 MACHINE_CONFIG_END
 
 
@@ -2399,8 +2391,8 @@ static MACHINE_CONFIG_DERIVED( scramble, galaxian_base )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(theend_map)
 
-	MCFG_PPI8255_ADD( "ppi8255_0", konami_ppi8255_0_intf )
-	MCFG_PPI8255_ADD( "ppi8255_1", scramble_ppi8255_1_intf )
+	MCFG_I8255A_ADD( "ppi8255_0", konami_ppi8255_0_intf )
+	MCFG_I8255A_ADD( "ppi8255_1", scramble_ppi8255_1_intf )
 MACHINE_CONFIG_END
 
 
@@ -2428,8 +2420,10 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( scorpion, theend )
 
-	MCFG_PPI8255_RECONFIG( "ppi8255_0", konami_ppi8255_0_intf )
-	MCFG_PPI8255_RECONFIG( "ppi8255_1", scorpion_ppi8255_1_intf )
+	MCFG_DEVICE_REMOVE("ppi8255_0")
+	MCFG_DEVICE_REMOVE("ppi8255_1")
+	MCFG_I8255A_ADD( "ppi8255_0", konami_ppi8255_0_intf )
+	MCFG_I8255A_ADD( "ppi8255_1", scorpion_ppi8255_1_intf )
 
 	/* extra AY8910 with I/O ports */
 	MCFG_SOUND_ADD("8910.2", AY8910, KONAMI_SOUND_CLOCK/8)
@@ -2455,9 +2449,9 @@ static MACHINE_CONFIG_DERIVED( sfx, galaxian_base )
 	MCFG_CPU_PROGRAM_MAP(sfx_sample_map)
 	MCFG_CPU_IO_MAP(sfx_sample_portmap)
 
-	MCFG_PPI8255_ADD( "ppi8255_0", konami_ppi8255_0_intf )
-	MCFG_PPI8255_ADD( "ppi8255_1", konami_ppi8255_1_intf )
-	MCFG_PPI8255_ADD( "ppi8255_2", sfx_ppi8255_2_intf )
+	MCFG_I8255A_ADD( "ppi8255_0", konami_ppi8255_0_intf )
+	MCFG_I8255A_ADD( "ppi8255_1", konami_ppi8255_1_intf )
+	MCFG_I8255A_ADD( "ppi8255_2", sfx_ppi8255_2_intf )
 
 	/* port on 2nd 8910 is used for communication */
 	MCFG_SOUND_MODIFY("8910.1")
@@ -2475,7 +2469,8 @@ static MACHINE_CONFIG_DERIVED( monsterz, sfx )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(monsterz_map)
 
-	MCFG_PPI8255_RECONFIG( "ppi8255_1", monsterz_ppi8255_1_intf )
+	MCFG_DEVICE_REMOVE("ppi8255_1")
+	MCFG_I8255A_ADD( "ppi8255_1", monsterz_ppi8255_1_intf )
 
 	/* there are likely other differences too, but those can wait until after protection is sorted out */
 
@@ -2518,9 +2513,10 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( moonwar, scobra )
 
-	/* device config overrides */
-	MCFG_PPI8255_RECONFIG( "ppi8255_0", moonwar_ppi8255_0_intf )
-	MCFG_PPI8255_RECONFIG( "ppi8255_1", konami_ppi8255_1_intf )
+	MCFG_DEVICE_REMOVE("ppi8255_0")
+	MCFG_DEVICE_REMOVE("ppi8255_1")
+	MCFG_I8255A_ADD( "ppi8255_0", moonwar_ppi8255_0_intf )
+	MCFG_I8255A_ADD( "ppi8255_1", konami_ppi8255_1_intf )
 
 	MCFG_PALETTE_INIT(moonwar) // bullets are less yellow
 MACHINE_CONFIG_END

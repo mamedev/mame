@@ -4,6 +4,8 @@
 
 ***************************************************************************/
 
+#include "machine/i8255.h"
+
 /* we scale horizontally by 3 to render stars correctly */
 #define GALAXIAN_XSCALE			3
 
@@ -37,9 +39,15 @@ class galaxian_state : public driver_device
 public:
 	galaxian_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_spriteram(*this, "spriteram") ,
-		m_videoram(*this, "videoram"){ }
+		  m_ppi8255_0(*this, "ppi8255_0"),
+		  m_ppi8255_1(*this, "ppi8255_1"),
+		  m_ppi8255_2(*this, "ppi8255_2"),
+		  m_spriteram(*this, "spriteram"),
+		  m_videoram(*this, "videoram"){ }
 
+	optional_device<i8255_device>  m_ppi8255_0;
+	optional_device<i8255_device>  m_ppi8255_1;
+	optional_device<i8255_device>  m_ppi8255_2;
 	required_shared_ptr<UINT8> m_spriteram;
 	required_shared_ptr<UINT8> m_videoram;
 

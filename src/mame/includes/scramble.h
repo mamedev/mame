@@ -1,4 +1,4 @@
-#include "machine/8255ppi.h"
+#include "machine/i8255.h"
 #include "includes/galaxold.h"
 
 class scramble_state : public galaxold_state
@@ -6,8 +6,12 @@ class scramble_state : public galaxold_state
 public:
 	scramble_state(const machine_config &mconfig, device_type type, const char *tag)
 		: galaxold_state(mconfig, type, tag),
+		  m_ppi8255_0(*this, "ppi8255_0"),
+		  m_ppi8255_1(*this, "ppi8255_1"),
 		  m_soundram(*this, "soundram") { }
 
+	optional_device<i8255_device>  m_ppi8255_0;
+	optional_device<i8255_device>  m_ppi8255_1;
 	optional_shared_ptr<UINT8> m_soundram;
 	UINT8 m_cavelon_bank;
 	UINT8 m_security_2B_counter;
@@ -16,21 +20,22 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(ckongs_coinage_r);
 	DECLARE_READ8_MEMBER(hncholms_prot_r);
 	DECLARE_READ8_MEMBER(scramble_soundram_r);
+	DECLARE_READ8_MEMBER(mars_ppi8255_0_r);
+	DECLARE_READ8_MEMBER(mars_ppi8255_1_r);
 	DECLARE_WRITE8_MEMBER(scramble_soundram_w);
 	DECLARE_WRITE8_MEMBER(hotshock_sh_irqtrigger_w);
 	DECLARE_WRITE8_MEMBER(scramble_filter_w);
 	DECLARE_WRITE8_MEMBER(frogger_filter_w);
+	DECLARE_WRITE8_MEMBER(mars_ppi8255_0_w);
+	DECLARE_WRITE8_MEMBER(mars_ppi8255_1_w);
 };
 
 
 /*----------- defined in machine/scramble.c -----------*/
 
-extern const ppi8255_interface scramble_ppi_0_intf;
-extern const ppi8255_interface scramble_ppi_1_intf;
-extern const ppi8255_interface stratgyx_ppi_1_intf;
-extern const ppi8255_interface scramble_protection_ppi_1_intf;
-extern const ppi8255_interface mrkougar_ppi_1_intf;
-
+extern const i8255_interface(scramble_ppi_0_intf);
+extern const i8255_interface(scramble_ppi_1_intf);
+extern const i8255_interface(stratgyx_ppi_1_intf);
 
 DRIVER_INIT( scramble_ppi );
 DRIVER_INIT( stratgyx );
@@ -62,6 +67,9 @@ READ8_HANDLER( triplep_pap_r );
 
 READ8_HANDLER( hunchbks_mirror_r );
 WRITE8_HANDLER( hunchbks_mirror_w );
+
+READ8_DEVICE_HANDLER( scramble_protection_r );
+WRITE8_DEVICE_HANDLER( scramble_protection_w );
 
 
 /*----------- defined in audio/scramble.c -----------*/
