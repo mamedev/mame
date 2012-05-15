@@ -275,33 +275,41 @@ static void duart68681_write_CSR(duart68681_state *duart68681, int ch, UINT8 dat
 	if ( BIT(ACR,7) == 0 )
 	{
 		duart68681->channel[ch].baud_rate = baud_rate_ACR_0[data & 0x0f];
-
-		if (ch == 0)
-		{
-			if ((data & 0xf) == 0xe)
-			{
-				duart68681->channel[ch].baud_rate = duart68681->duart_config->ip3clk/16;
-			}
-			else if ((data & 0xf) == 0xf)
-			{
-				duart68681->channel[ch].baud_rate = duart68681->duart_config->ip3clk;
-			}
-		}
-		else if (ch == 1)
-		{
-			if ((data & 0xf) == 0xe)
-			{
-				duart68681->channel[ch].baud_rate = duart68681->duart_config->ip5clk/16;
-			}
-			else if ((data & 0xf) == 0xf)
-			{
-				duart68681->channel[ch].baud_rate = duart68681->duart_config->ip5clk;
-			}
-		}
 	}
 	else
 	{
 		duart68681->channel[ch].baud_rate = baud_rate_ACR_1[data & 0x0f];
+	}
+
+	if (ch == 0)
+	{
+		if ((data & 0xf) == 0xd)
+		{
+			duart68681->channel[ch].baud_rate = duart68681->CTR.w.l;
+		} 
+		else if ((data & 0xf) == 0xe)
+		{
+			duart68681->channel[ch].baud_rate = duart68681->duart_config->ip3clk/16;
+		}
+		else if ((data & 0xf) == 0xf)
+		{
+			duart68681->channel[ch].baud_rate = duart68681->duart_config->ip3clk;
+		}
+	}
+	else if (ch == 1)
+	{
+		if ((data & 0xf) == 0xd)
+		{
+			duart68681->channel[ch].baud_rate = duart68681->CTR.w.l;
+		} 
+		else if ((data & 0xf) == 0xe)
+		{
+			duart68681->channel[ch].baud_rate = duart68681->duart_config->ip5clk/16;
+		}
+		else if ((data & 0xf) == 0xf)
+		{
+			duart68681->channel[ch].baud_rate = duart68681->duart_config->ip5clk;
+		}
 	}
 	if ( duart68681->channel[ch].baud_rate == 0 )
 	{
