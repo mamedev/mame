@@ -16,16 +16,20 @@
 #include "includes/labyrunr.h"
 
 
-static TIMER_DEVICE_CALLBACK( labyrunr_scanline )
+static INTERRUPT_GEN( labyrunr_vblank_interrupt )
 {
-	labyrunr_state *state = timer.machine().driver_data<labyrunr_state>();
-	int scanline = param;
-
-	if(scanline == 240 && k007121_ctrlram_r(state->m_k007121, 7) & 0x02) // vblank irq
-		device_set_input_line(state->m_maincpu, HD6309_IRQ_LINE, HOLD_LINE);
-	else if(((scanline % 32) == 0) && k007121_ctrlram_r(state->m_k007121, 7) & 0x01) // timer irq
-		device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, PULSE_LINE);
+	labyrunr_state *state = device->machine().driver_data<labyrunr_state>();
+	if (k007121_ctrlram_r(state->m_k007121, 7) & 0x02)
+		device_set_input_line(device, HD6309_IRQ_LINE, HOLD_LINE);
 }
+
+static INTERRUPT_GEN( labyrunr_timer_interrupt )
+{
+	labyrunr_state *state = device->machine().driver_data<labyrunr_state>();
+	if (k007121_ctrlram_r(state->m_k007121, 7) & 0x01)
+		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+}
+
 
 WRITE8_MEMBER(labyrunr_state::labyrunr_bankswitch_w)
 {
@@ -192,7 +196,8 @@ static MACHINE_CONFIG_START( labyrunr, labyrunr_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD6309, 3000000*4)		/* 24MHz/8? */
 	MCFG_CPU_PROGRAM_MAP(labyrunr_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", labyrunr_scanline, "screen", 0, 1)
+	MCFG_CPU_VBLANK_INT("screen", labyrunr_vblank_interrupt)
+	MCFG_CPU_PERIODIC_INT(labyrunr_timer_interrupt, 4*60)
 
 	MCFG_MACHINE_START(labyrunr)
 
