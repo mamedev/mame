@@ -205,7 +205,7 @@ seem to have access to.
 #include "cpu/z80/z80.h"
 #include "cpu/mcs51/mcs51.h"
 #include "machine/z80pio.h"
-#include "machine/8255ppi.h"
+#include "machine/i8255.h"
 #include "machine/segacrpt.h"
 #include "machine/segacrp2.h"
 #include "machine/mc8123.h"
@@ -490,15 +490,13 @@ static WRITE8_DEVICE_HANDLER( sound_control_w )
 
 READ8_MEMBER(system1_state::sound_data_r)
 {
-	ppi8255_device *ppi = machine().device<ppi8255_device>("ppi");
 	z80pio_device *pio = machine().device<z80pio_device>("pio");
 
 	/* if we have an 8255 PPI, get the data from the port and toggle the ack */
-	if (ppi != NULL)
+	if (m_ppi8255 != NULL)
 	{
-		UINT8 initial_value = ppi8255_get_port_c(ppi);
-		ppi8255_set_port_c(ppi, initial_value & ~0x40);
-		ppi8255_set_port_c(ppi, initial_value |  0x40);
+		m_ppi8255->pc6_w(0);
+		m_ppi8255->pc6_w(1);
 		return soundlatch_byte_r(space, offset);
 	}
 
@@ -750,7 +748,7 @@ static ADDRESS_MAP_START( system1_ppi_io_map, AS_IO, 8, system1_state )
 	AM_RANGE(0x0c, 0x0c) AM_MIRROR(0x02) AM_READ_PORT("SWA")	/* DIP2 */
 	AM_RANGE(0x0d, 0x0d) AM_MIRROR(0x02) AM_READ_PORT("SWB")	/* DIP1 some games read it from here... */
 	AM_RANGE(0x10, 0x10) AM_MIRROR(0x03) AM_READ_PORT("SWB")	/* DIP1 ... and some others from here but there are games which check BOTH! */
-	AM_RANGE(0x14, 0x17) AM_DEVREADWRITE_LEGACY("ppi", ppi8255_r, ppi8255_w)
+	AM_RANGE(0x14, 0x17) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
 ADDRESS_MAP_END
 
 /* I/O map for systems with a Z80 PIO chip */
@@ -2101,14 +2099,14 @@ GFXDECODE_END
  *
  *************************************/
 
-static const ppi8255_interface ppi_interface =
+static I8255A_INTERFACE( ppi8255_intf )
 {
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(system1_state, soundport_w),
-	DEVCB_DRIVER_MEMBER(system1_state, videomode_w),
-	DEVCB_HANDLER(sound_control_w)
+	DEVCB_NULL,											/* Port A read */
+	DEVCB_DRIVER_MEMBER(system1_state, soundport_w),	/* Port A write */
+	DEVCB_NULL,											/* Port B read */
+	DEVCB_DRIVER_MEMBER(system1_state, videomode_w),	/* Port B write */
+	DEVCB_NULL,											/* Port C read */
+	DEVCB_HANDLER(sound_control_w)						/* Port C write */
 };
 
 static Z80PIO_INTERFACE( pio_interface )
@@ -2148,7 +2146,7 @@ static MACHINE_CONFIG_START( sys1ppi, system1_state )
 	MCFG_MACHINE_START(system1)
 	MCFG_MACHINE_RESET(system1)
 
-	MCFG_PPI8255_ADD("ppi", ppi_interface)
+	MCFG_I8255A_ADD( "ppi8255", ppi8255_intf )
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)	/* needed for proper hardware collisions */
@@ -2188,7 +2186,7 @@ static MACHINE_CONFIG_DERIVED( sys1pio, sys1ppi )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(system1_pio_io_map)
 
-	MCFG_DEVICE_REMOVE("ppi")
+	MCFG_DEVICE_REMOVE("ppi8255")
 	MCFG_Z80PIO_ADD("pio", MASTER_CLOCK, pio_interface)
 MACHINE_CONFIG_END
 

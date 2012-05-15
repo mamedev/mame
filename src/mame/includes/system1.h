@@ -1,13 +1,17 @@
+#include "machine/i8255.h"
+
 class system1_state : public driver_device
 {
 public:
 	system1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
+		m_ppi8255(*this, "ppi8255"),
 		m_ram(*this, "ram"),
 		m_spriteram(*this, "spriteram"),
 		m_nob_mcu_latch(*this, "nob_mcu_latch"),
 		m_nob_mcu_status(*this, "nob_mcu_status"){ }
 
+	optional_device<i8255_device>  m_ppi8255;
 	required_shared_ptr<UINT8> m_ram;
 	required_shared_ptr<UINT8> m_spriteram;
 	optional_shared_ptr<UINT8> m_nob_mcu_latch;
