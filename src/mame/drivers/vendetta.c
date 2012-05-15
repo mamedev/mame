@@ -503,12 +503,11 @@ static MACHINE_RESET( vendetta )
 static MACHINE_CONFIG_START( vendetta, vendetta_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", KONAMI, 6000000)	/* this is strange, seems an overclock but */
-//  MCFG_CPU_ADD("maincpu", KONAMI, 3000000)   /* is needed to have correct music speed */
+	MCFG_CPU_ADD("maincpu", KONAMI, XTAL_24MHz/8)	/* 052001 (verified on pcb) */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT("screen", vendetta_irq)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 3579545)	/* verified with PCB */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)	/* verified with PCB */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
                             /* interrupts are triggered by the main CPU */
 
@@ -521,7 +520,7 @@ static MACHINE_CONFIG_START( vendetta, vendetta_state )
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_REFRESH_RATE(59.17) /* measured on PCB */
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(13*8, (64-13)*8-1, 2*8, 30*8-1 )
@@ -537,11 +536,11 @@ static MACHINE_CONFIG_START( vendetta, vendetta_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymsnd", YM2151, 3579545)	/* verified with PCB */
+	MCFG_SOUND_ADD("ymsnd", YM2151, XTAL_3_579545MHz)	/* verified with PCB */
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_SOUND_ADD("k053260", K053260, 3579545)	/* verified with PCB */
+	MCFG_SOUND_ADD("k053260", K053260, XTAL_3_579545MHz)	/* verified with PCB */
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.75)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.75)
 MACHINE_CONFIG_END

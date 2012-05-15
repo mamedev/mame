@@ -307,7 +307,7 @@ static const eeprom_interface eeprom_intf =
 static MACHINE_CONFIG_START( simpsons, simpsons_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", KONAMI, XTAL_24MHz/2/4) /* pin 18 of konami cpu is 12Mhz, while pin 17 is 3mhz. Clock probably divided internally by 4  */
+	MCFG_CPU_ADD("maincpu", KONAMI, XTAL_24MHz/8) /* 052001 (verified on pcb) */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT("screen", simpsons_irq)	/* IRQ triggered by the 052109, FIRQ by the sprite hardware */
 
