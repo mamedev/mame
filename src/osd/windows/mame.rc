@@ -43,3 +43,5 @@
 #include "mamevers.rc"
 
 1                       24      MOVEABLE PURE   "mame.man"
+
+IDI_ICON_MAME           ICON    DISCARDABLE     "mame.ico"
