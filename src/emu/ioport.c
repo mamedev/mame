@@ -1660,7 +1660,7 @@ ioport_field::ioport_field(ioport_port &port, ioport_type type, ioport_value def
 	// reset sequences and chars
 	for (input_seq_type seqtype = SEQ_TYPE_STANDARD; seqtype < SEQ_TYPE_TOTAL; seqtype++)
 		m_seq[seqtype].set_default();
-	m_chars[0] = m_chars[1] = m_chars[2] = unicode_char(0);
+	m_chars[0] = m_chars[1] = m_chars[2] = m_chars[3] = unicode_char(0);
 
 	// for DIP switches and configs, look for a default value from the owner
 	if (type == IPT_DIPSWITCH || type == IPT_CONFIG)
@@ -1832,7 +1832,12 @@ ioport_type_class ioport_field::type_class() const
 
 unicode_char ioport_field::keyboard_code(int which) const
 {
-	unicode_char ch = m_chars[which];
+	unicode_char ch;
+	
+	if (which >= ARRAY_LENGTH(m_chars))
+		throw emu_fatalerror("Tried to access keyboard_code with out-of-range index %d\n", which);
+	
+	ch = m_chars[which];
 
 	// special hack to allow for PORT_CODE('\xA3')
 	if (ch >= 0xffffff80 && ch <= 0xffffffff)
@@ -3842,8 +3847,10 @@ void ioport_configurer::field_add_char(unicode_char ch)
 		if (m_curfield->m_chars[index] == 0)
 		{
 			m_curfield->m_chars[index] = ch;
-			break;
+			return;
 		}
+		
+	throw emu_fatalerror("PORT_CHAR(%d) could not be added - maximum amount exceeded\n", ch); 
 }
 
 

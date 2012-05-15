@@ -92,6 +92,7 @@ const device_type SHARP_LH28F400 = &device_creator<sharp_lh28f400_device>;
 const device_type INTEL_E28F008SA = &device_creator<intel_e28f008sa_device>;
 const device_type INTEL_TE28F160 = &device_creator<intel_te28f160_device>;
 const device_type SHARP_UNK128MBIT = &device_creator<sharp_unk128mbit_device>;
+const device_type INTEL_28F320J3D = &device_creator<intel_28f320j3d_device>;
 
 static ADDRESS_MAP_START( memory_map8_512Kb, AS_PROGRAM, 8, intelfsh_device )
 	AM_RANGE(0x00000, 0x00ffff) AM_RAM
@@ -120,6 +121,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( memory_map16_16Mb, AS_PROGRAM, 16, intelfsh_device )
 	AM_RANGE(0x00000, 0x0fffff) AM_RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( memory_map16_32Mb, AS_PROGRAM, 16, intelfsh_device )
+	AM_RANGE(0x00000, 0x1fffff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( memory_map16_64Mb, AS_PROGRAM, 16, intelfsh_device )
@@ -186,6 +191,14 @@ intelfsh_device::intelfsh_device(const machine_config &mconfig, device_type type
 		m_maker_id = MFG_AMD;
 		m_device_id = 0xd5;
 		map = ADDRESS_MAP_NAME( memory_map8_8Mb );
+		break;
+	case FLASH_INTEL_28F320J3D:
+		m_bits = 16;
+		m_size = 0x400000;
+		m_maker_id = MFG_INTEL;
+		m_device_id = 0x16;
+		m_sector_is_4k = true;
+		map = ADDRESS_MAP_NAME( memory_map16_32Mb );
 		break;
 	case FLASH_SHARP_LH28F400:
 	case FLASH_INTEL_E28F400:
@@ -315,6 +328,8 @@ intel_e28f400_device::intel_e28f400_device(const machine_config &mconfig, const 
 sharp_unk128mbit_device::sharp_unk128mbit_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: intelfsh16_device(mconfig, SHARP_UNK128MBIT, "Sharp Unknown 128Mbit Flash", tag, owner, clock, FLASH_SHARP_UNK128MBIT) { }
 
+intel_28f320j3d_device::intel_28f320j3d_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: intelfsh16_device(mconfig, INTEL_28F320J3D, "Intel 28F320J3D Flash", tag, owner, clock, FLASH_INTEL_28F320J3D) { }
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -454,7 +469,7 @@ UINT32 intelfsh_device::read_full(UINT32 address)
 		data = m_status;
 		break;
 	case FM_READAMDID3:
-		if (m_maker_id == 0x04 && m_device_id == 0x35)
+		if (m_maker_id == MFG_FUJITSU && m_device_id == 0x35)
 		{
 			//used in Fujitsu 29DL16X 8bits mode
 			switch (address)
@@ -475,27 +490,39 @@ UINT32 intelfsh_device::read_full(UINT32 address)
 		}
 		break;
 	case FM_READID:
-		switch (address)
+		if (m_maker_id == MFG_INTEL && m_device_id == 0x16)
 		{
-		case 0:	// maker ID
-			data = m_maker_id;
-			break;
-		case 1:	// chip ID
-			data = m_device_id;
-			break;
-		case 2:	// block lock config
-			data = 0; // we don't support this yet
-			break;
-		case 3: // master lock config
-			if (m_flash_master_lock)
+			switch (address)
 			{
-				data = 1;
+				case 0:	data = m_maker_id; break;
+				case 2: data = m_device_id; break;
+				case 4: data = 0; break;
 			}
-			else
+		}
+		else
+		{
+			switch (address)
 			{
-				data = 0;
+			case 0:	// maker ID
+				data = m_maker_id;
+				break;
+			case 1:	// chip ID
+				data = m_device_id;
+				break;
+			case 2:	// block lock config
+				data = 0; // we don't support this yet
+				break;
+			case 3: // master lock config
+				if (m_flash_master_lock)
+				{
+					data = 1;
+				}
+				else
+				{
+					data = 0;
+				}
+				break;
 			}
-			break;
 		}
 		break;
 	case FM_ERASEAMD4:
