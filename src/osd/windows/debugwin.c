@@ -407,7 +407,7 @@ void debugwin_init_windows(running_machine &machine)
 		wc.hInstance		= GetModuleHandle(NULL);
 		wc.lpfnWndProc		= debugwin_window_proc;
 		wc.hCursor			= LoadCursor(NULL, IDC_ARROW);
-		wc.hIcon			= LoadIcon(NULL, IDI_APPLICATION);
+		wc.hIcon			= LoadIcon(wc.hInstance, MAKEINTRESOURCE(2));
 		wc.lpszMenuName		= NULL;
 		wc.hbrBackground	= NULL;
 		wc.style			= 0;

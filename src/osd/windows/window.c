@@ -877,7 +877,7 @@ static void create_window_class(void)
 		wc.hInstance		= GetModuleHandle(NULL);
 		wc.lpfnWndProc		= winwindow_video_window_proc_ui;
 		wc.hCursor			= LoadCursor(NULL, IDC_ARROW);
-		wc.hIcon			= LoadIcon(NULL, IDI_APPLICATION);
+		wc.hIcon			= LoadIcon(wc.hInstance, MAKEINTRESOURCE(2));
 
 		// register the class; fail if we can't
 		if (!RegisterClass(&wc))
