@@ -246,8 +246,15 @@ INLINE UINT16 RDPORT_W(z8000_state *cpustate, int mode, UINT16 addr)
 {
 	if(mode == 0)
 	{
-		return cpustate->io->read_byte((UINT16)(addr)) +
-			  (cpustate->io->read_byte((UINT16)(addr+1)) << 8);
+        if (cpustate->device->type() == Z8001)
+        {
+            return cpustate->io->read_word((UINT16)addr);
+        }
+        else
+        {
+            return cpustate->io->read_byte((UINT16)(addr)) +
+                  (cpustate->io->read_byte((UINT16)(addr+1)) << 8);
+        }
 	}
 	else
 	{
@@ -272,8 +279,15 @@ INLINE void WRPORT_W(z8000_state *cpustate, int mode, UINT16 addr, UINT16 value)
 {
 	if(mode == 0)
 	{
-		cpustate->io->write_byte((UINT16)(addr),value & 0xff);
-		cpustate->io->write_byte((UINT16)(addr+1),(value >> 8) & 0xff);
+        if (cpustate->device->type() == Z8001)
+        {
+            cpustate->io->write_word((UINT16)addr, value);
+        }
+        else
+        {
+            cpustate->io->write_byte((UINT16)(addr),value & 0xff);
+            cpustate->io->write_byte((UINT16)(addr+1),(value >> 8) & 0xff);
+        }
 	}
 	else
 	{
@@ -795,7 +809,7 @@ CPU_GET_INFO( z8001 )
 	{
 		case DEVINFO_INT_DATABUS_WIDTH + AS_PROGRAM:	info->i = 16;					break;
 		case DEVINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM: info->i = 20;					break;
-		case DEVINFO_INT_DATABUS_WIDTH + AS_IO:		info->i = 8;					break;
+		case DEVINFO_INT_DATABUS_WIDTH + AS_IO:		info->i = 16;					break;
 		case DEVINFO_INT_ADDRBUS_WIDTH + AS_IO:		info->i = 16;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
