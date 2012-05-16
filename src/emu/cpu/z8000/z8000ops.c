@@ -2821,7 +2821,7 @@ static void Z3B_ssss_1011_0000_aaaa_dddd_x000(z8000_state *cpustate)
  flags:  ------
  ******************************************/
 static void Z3C_ssss_dddd(z8000_state *cpustate)
-{//@@@check
+{
     CHECK_PRIVILEGED_INSTR();
 	GET_SRC(OP0,NIB2);
 	GET_DST(OP0,NIB3);
@@ -2833,7 +2833,7 @@ static void Z3C_ssss_dddd(z8000_state *cpustate)
  flags:  ------
  ******************************************/
 static void Z3D_ssss_dddd(z8000_state *cpustate)
-{//@@@check
+{
     CHECK_PRIVILEGED_INSTR();
 	GET_SRC(OP0,NIB2);
 	GET_DST(OP0,NIB3);
@@ -2845,7 +2845,7 @@ static void Z3D_ssss_dddd(z8000_state *cpustate)
  flags:  ---V--
  ******************************************/
 static void Z3E_dddd_ssss(z8000_state *cpustate)
-{//@@@check
+{
     CHECK_PRIVILEGED_INSTR();
 	GET_DST(OP0,NIB2);
 	GET_SRC(OP0,NIB3);
@@ -2857,7 +2857,7 @@ static void Z3E_dddd_ssss(z8000_state *cpustate)
  flags:  ---V--
  ******************************************/
 static void Z3F_dddd_ssss(z8000_state *cpustate)
-{//check
+{
     CHECK_PRIVILEGED_INSTR();
 	GET_DST(OP0,NIB2);
 	GET_SRC(OP0,NIB3);
