@@ -130,7 +130,7 @@ ADDRESS_MAP_END
 
 INPUT_CHANGED_MEMBER(metlclsh_state::coin_inserted)
 {
-	if (newval)
+	if (oldval)
 		cputag_set_input_line(machine(), "sub", INPUT_LINE_NMI, ASSERT_LINE);
 }
 

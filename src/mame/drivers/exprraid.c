@@ -278,12 +278,12 @@ ADDRESS_MAP_END
 
 INPUT_CHANGED_MEMBER(exprraid_state::coin_inserted_deco16)
 {
-	device_set_input_line(m_maincpu, DECO16_IRQ_LINE, newval ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(m_maincpu, DECO16_IRQ_LINE, oldval ? ASSERT_LINE : CLEAR_LINE);
 }
 
 INPUT_CHANGED_MEMBER(exprraid_state::coin_inserted_nmi)
 {
-	device_set_input_line(m_maincpu, INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(m_maincpu, INPUT_LINE_NMI, oldval ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static INPUT_PORTS_START( exprraid )
