@@ -275,41 +275,33 @@ static void duart68681_write_CSR(duart68681_state *duart68681, int ch, UINT8 dat
 	if ( BIT(ACR,7) == 0 )
 	{
 		duart68681->channel[ch].baud_rate = baud_rate_ACR_0[data & 0x0f];
+
+		if (ch == 0)
+		{
+			if ((data & 0xf) == 0xe)
+			{
+				duart68681->channel[ch].baud_rate = duart68681->duart_config->ip3clk/16;
+			}
+			else if ((data & 0xf) == 0xf)
+			{
+				duart68681->channel[ch].baud_rate = duart68681->duart_config->ip3clk;
+			}
+		}
+		else if (ch == 1)
+		{
+			if ((data & 0xf) == 0xe)
+			{
+				duart68681->channel[ch].baud_rate = duart68681->duart_config->ip5clk/16;
+			}
+			else if ((data & 0xf) == 0xf)
+			{
+				duart68681->channel[ch].baud_rate = duart68681->duart_config->ip5clk;
+			}
+		}
 	}
 	else
 	{
 		duart68681->channel[ch].baud_rate = baud_rate_ACR_1[data & 0x0f];
-	}
-
-	if (ch == 0)
-	{
-		if ((data & 0xf) == 0xd)
-		{
-			duart68681->channel[ch].baud_rate = duart68681->CTR.w.l;
-		} 
-		else if ((data & 0xf) == 0xe)
-		{
-			duart68681->channel[ch].baud_rate = duart68681->duart_config->ip3clk/16;
-		}
-		else if ((data & 0xf) == 0xf)
-		{
-			duart68681->channel[ch].baud_rate = duart68681->duart_config->ip3clk;
-		}
-	}
-	else if (ch == 1)
-	{
-		if ((data & 0xf) == 0xd)
-		{
-			duart68681->channel[ch].baud_rate = duart68681->CTR.w.l;
-		} 
-		else if ((data & 0xf) == 0xe)
-		{
-			duart68681->channel[ch].baud_rate = duart68681->duart_config->ip5clk/16;
-		}
-		else if ((data & 0xf) == 0xf)
-		{
-			duart68681->channel[ch].baud_rate = duart68681->duart_config->ip5clk;
-		}
 	}
 	if ( duart68681->channel[ch].baud_rate == 0 )
 	{
@@ -570,28 +562,6 @@ READ8_DEVICE_HANDLER(duart68681_r)
 						duart68681->duart_timer->adjust(rate, 0, rate);
 					}
 					break;
-				case 0x06: /* Timer, CLK/1 */
-					{
-						attotime rate = attotime::from_hz(2*device->clock()/(2*16*duart68681->CTR.w.l));
-						duart68681->duart_timer->adjust(rate, 0, rate);
-					}
-					break;
-				case 0x07: /* Timer, CLK/16 */
-					{
-						//double hz;
-						//attotime rate = attotime::from_hz(duart68681->clock) * (16*duart68681->CTR.w.l);
-						attotime rate = attotime::from_hz(2*device->clock()/(2*16*16*duart68681->CTR.w.l));
-						//hz = ATTOSECONDS_TO_HZ(rate.attoseconds);
-
-						// workaround for maygay1b locking up MAME
-						if ((2*device->clock()/(2*16*16*duart68681->CTR.w.l)) == 0)
-						{
-							rate = attotime::from_hz(1);
-						}
-
-						duart68681->duart_timer->adjust(rate, 0, rate);
-					}
-					break;
 			}
 			break;
 		case 0x0f: /* Stop counter command */
@@ -639,8 +609,30 @@ WRITE8_DEVICE_HANDLER(duart68681_w)
 				case 0: case 1: case 2: case 4: case 5: // TODO: handle these cases!
 				logerror( "68681 (%s): Unhandled timer/counter mode %d\n", device->tag(), (data >> 4) & 0x07);
 				break;
-				case 3: case 6: case 7:
+            case 3:
 				break;
+            case 0x06: /* Timer, CLK/1 */       // Timer modes start without reading address 0xe, as per the Freescale 68681 manual
+                {
+                    attotime rate = attotime::from_hz(2*device->clock()/(2*16*duart68681->CTR.w.l));
+                    duart68681->duart_timer->adjust(rate, 0, rate);
+                }
+                break;
+            case 0x07: /* Timer, CLK/16 */
+                {
+                    //double hz;
+                    //attotime rate = attotime::from_hz(duart68681->clock) * (16*duart68681->CTR.w.l);
+                    attotime rate = attotime::from_hz(2*device->clock()/(2*16*16*duart68681->CTR.w.l));
+                    //hz = ATTOSECONDS_TO_HZ(rate.attoseconds);
+
+                    // workaround for maygay1b locking up MAME
+                    if ((2*device->clock()/(2*16*16*duart68681->CTR.w.l)) == 0)
+                    {
+                        rate = attotime::from_hz(1);
+                    }
+
+                    duart68681->duart_timer->adjust(rate, 0, rate);
+                }
+                break;
 			}
 			duart68681_write_CSR(duart68681, 0, duart68681->channel[0].CSR, data);
 			duart68681_write_CSR(duart68681, 1, duart68681->channel[1].CSR, data);
