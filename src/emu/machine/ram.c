@@ -87,7 +87,7 @@ void ram_device::device_validity_check(validity_checker &valid) const
 		mame_printf_error("Invalid default RAM option: %s\n", m_default_size);
 
 	/* command line options are only parsed for the device named RAM_TAG */
-	if (tag() != NULL && strcmp(tag(), RAM_TAG) == 0)
+	if (tag() != NULL && strcmp(tag(), ":" RAM_TAG) == 0)
 	{
 		/* verify command line ram option */
 		ramsize_string = mconfig().options().ram_size();
