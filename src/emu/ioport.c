@@ -251,7 +251,6 @@ public:
 	// read/write
 	void read(ioport_value &result);
 	void write(ioport_value newval);
-	void port_changed_write(ioport_value newval);
 
 private:
 	// internal state
@@ -2456,7 +2455,7 @@ void ioport_port::write(ioport_value data, ioport_value mem_mask)
 	COMBINE_DATA(&m_live->outputvalue);
 	for (dynamic_field *dynfield = m_live->writelist.first(); dynfield != NULL; dynfield = dynfield->next())
 		if (dynfield->field().type() == IPT_OUTPUT)
-			dynfield->write(m_live->outputvalue);
+			dynfield->write(m_live->outputvalue ^ dynfield->field().defvalue());
 }
 
 
@@ -2480,7 +2479,7 @@ void ioport_port::frame_update(ioport_field *mouse_field)
 	ioport_value newvalue = read();
 	for (dynamic_field *dynfield = m_live->writelist.first(); dynfield != NULL; dynfield = dynfield->next())
 		if (dynfield->field().type() != IPT_OUTPUT)
-			dynfield->port_changed_write(newvalue);
+			dynfield->write(newvalue);
 }
 
 
@@ -3997,28 +3996,6 @@ void dynamic_field::write(ioport_value newval)
 		return;
 
 	// if the bits have changed, call the handler
-	newval = ((newval ^ m_field.defvalue()) & m_field.mask()) >> m_shift;
-	if (m_oldval != newval)
-	{
-		m_field.m_write(m_field, m_field.m_write_param, m_oldval, newval);
-		m_oldval = newval;
-	}
-}
-
-
-//-------------------------------------------------
-//  port_changed_write - track a change to a value 
-//  of port changed and call the write callback
-//  if there's something new
-//-------------------------------------------------
-
-void dynamic_field::port_changed_write(ioport_value newval)
-{
-	// skip if not enabled
-	if (!m_field.enabled())
-		return;
-
-	// if the bits have changed, call the handler
 	newval = (newval & m_field.mask()) >> m_shift;
 	if (m_oldval != newval)
 	{
@@ -4026,6 +4003,7 @@ void dynamic_field::port_changed_write(ioport_value newval)
 		m_oldval = newval;
 	}
 }
+
 
 //-------------------------------------------------
 //  analog_field - constructor
