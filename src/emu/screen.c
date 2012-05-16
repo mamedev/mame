@@ -788,7 +788,7 @@ void screen_device::register_screen_bitmap(bitmap_t &bitmap)
 
 int screen_device::vblank_port_read()
 {
-	return vblank();
+	return vblank() ? -1 : 0;
 }
 
 
