@@ -114,7 +114,8 @@ WRITE_LINE_DEVICE_HANDLER( scramble_sh_7474_q_callback )
 {
 	/* the Q bar is connected to the Z80's INT line.  But since INT is complemented, */
 	/* we need to complement Q bar */
-	cputag_set_input_line(device->machine(), "audiocpu", 0, !state ? ASSERT_LINE : CLEAR_LINE);
+	if (device->machine().device("audiocpu"))
+		cputag_set_input_line(device->machine(), "audiocpu", 0, !state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 WRITE8_MEMBER(scramble_state::hotshock_sh_irqtrigger_w)
