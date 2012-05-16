@@ -251,6 +251,7 @@ public:
 	// read/write
 	void read(ioport_value &result);
 	void write(ioport_value newval);
+	void port_changed_write(ioport_value newval);
 
 private:
 	// internal state
@@ -2479,7 +2480,7 @@ void ioport_port::frame_update(ioport_field *mouse_field)
 	ioport_value newvalue = read();
 	for (dynamic_field *dynfield = m_live->writelist.first(); dynfield != NULL; dynfield = dynfield->next())
 		if (dynfield->field().type() != IPT_OUTPUT)
-			dynfield->write(newvalue);
+			dynfield->port_changed_write(newvalue);
 }
 
 
@@ -4004,6 +4005,27 @@ void dynamic_field::write(ioport_value newval)
 	}
 }
 
+
+//-------------------------------------------------
+//  port_changed_write - track a change to a value 
+//  of port changed and call the write callback
+//  if there's something new
+//-------------------------------------------------
+
+void dynamic_field::port_changed_write(ioport_value newval)
+{
+	// skip if not enabled
+	if (!m_field.enabled())
+		return;
+
+	// if the bits have changed, call the handler
+	newval = (newval & m_field.mask()) >> m_shift;
+	if (m_oldval != newval)
+	{
+		m_field.m_write(m_field, m_field.m_write_param, m_oldval, newval);
+		m_oldval = newval;
+	}
+}
 
 //-------------------------------------------------
 //  analog_field - constructor
