@@ -3701,7 +3701,6 @@ READ16_MEMBER(megasys1_state::megasys1A_mcu_hs_r)
 
 WRITE16_MEMBER(megasys1_state::megasys1A_mcu_hs_w)
 {
-
 	// following is hachoo, other games differs slightly
 	// R 0x5f0, if bit 0 == 0 then skips hs seq (debug?)
 	// [0/2]: 0x00ff
@@ -3740,11 +3739,9 @@ static DRIVER_INIT( avspirit )
 	state->m_ip_select_values[3] = 0x33;
 	state->m_ip_select_values[4] = 0x34;
 
-	/* kludge: avspirit has 0x10000 bytes of RAM while edf has 0x20000. The */
-	/* following is needed to make vh_start() pick the correct address */
-	/* for spriteram16. */
-	//TODO:FIX
-	//state->m_ram += 0x10000/2;
+	// has twice less RAM
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->unmap_readwrite(0x060000, 0x06ffff);
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_ram(0x070000, 0x07ffff, state->m_ram);
 }
 
 static DRIVER_INIT( bigstrik )
@@ -3842,7 +3839,6 @@ READ16_MEMBER(megasys1_state::iganinju_mcu_hs_r)
 
 WRITE16_MEMBER(megasys1_state::iganinju_mcu_hs_w)
 {
-
 	// [0/2]: 0x0000
 	// [2/2]: 0x0055
 	// [4/2]: 0x00aa
@@ -3993,8 +3989,6 @@ static DRIVER_INIT( stdragon )
 
 static DRIVER_INIT( stdragona )
 {
-	//UINT16 *RAM;
-
 	phantasm_rom_decode(machine, "maincpu");
 
 	stdragona_gfx_unmangle(machine, "gfx1");
@@ -4025,15 +4019,13 @@ READ16_MEMBER(megasys1_state::monkelf_input_r)
 
 static DRIVER_INIT( monkelf )
 {
+	DRIVER_INIT_CALL(avspirit);
+	
 	megasys1_state *state = machine.driver_data<megasys1_state>();
 	UINT16 *ROM = (UINT16*)state->memregion("maincpu")->base();
 	ROM[0x00744/2] = 0x4e71; // weird check, 0xe000e R is a port-based trap?
 
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xe0000, 0xe000f, read16_delegate(FUNC(megasys1_state::monkelf_input_r),state));
-
-	//TODO:FIX
-	//state->m_ram += 0x10000/2;
-
 }
 
 /*************************************
