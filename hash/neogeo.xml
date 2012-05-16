@@ -8983,7 +8983,7 @@
 
   <software name="garoubl" cloneof="garou">
     <description>Garou - Mark of the Wolves (bootleg)</description>
-    <year>199</year>
+    <year>1999</year>
     <publisher>bootleg</publisher>
     <sharedfeat name="mvsrelease" value="yes" />
     <sharedfeat name="aesrelease" value="no" />
