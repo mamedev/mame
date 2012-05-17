@@ -3915,6 +3915,8 @@ void ioport_configurer::onoff_alloc(const char *name, ioport_value defval, iopor
 	// allocate settings
 	setting_alloc(defval & mask, DEF_STR(Off));
 	setting_alloc(~defval & mask, DEF_STR(On));
+	// clear cursettings set by setting_alloc
+	m_cursetting = NULL;
 }
 
 
