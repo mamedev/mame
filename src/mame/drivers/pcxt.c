@@ -70,7 +70,11 @@ class pcxt_state : public driver_device
 {
 public:
 	pcxt_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_pit8253(*this,"pit8253"),
+		  m_pic8259_1(*this,"pic8259_1"),
+		  m_pic8259_2(*this,"pic8259_2"),
+		  m_dma8237_1(*this,"dma8237_1") { }
 
 	UINT8 m_bg_bank;
 	int m_bank;
@@ -86,11 +90,11 @@ public:
 	UINT8 m_at_pages[0x10];
 	UINT8 m_pc_spkrdata, m_pc_input;
 
-	device_t	*m_pit8253;
-	device_t	*m_pic8259_1;
-	device_t	*m_pic8259_2;
-	device_t	*m_dma8237_1;
-	device_t	*m_dma8237_2;
+	required_device<device_t> m_pit8253;
+	required_device<device_t> m_pic8259_1;
+	required_device<device_t> m_pic8259_2;
+	required_device<device_t> m_dma8237_1;
+
 	DECLARE_READ8_MEMBER(disk_iobank_r);
 	DECLARE_WRITE8_MEMBER(disk_iobank_w);
 	DECLARE_READ8_MEMBER(fdc765_status_r);
@@ -706,11 +710,6 @@ static MACHINE_RESET( filetto )
 	state->m_bank = -1;
 	state->m_lastvalue = -1;
 	device_set_irq_callback(machine.device("maincpu"), irq_callback);
-	state->m_pit8253 = machine.device( "pit8253" );
-	state->m_pic8259_1 = machine.device( "pic8259_1" );
-	state->m_pic8259_2 = machine.device( "pic8259_2" );
-	state->m_dma8237_1 = machine.device( "dma8237_1" );
-	state->m_dma8237_2 = machine.device( "dma8237_2" );
 
 	state->m_pc_spkrdata = 0;
 	state->m_pc_input = 0;
