@@ -484,7 +484,9 @@ layout_element::layout_element(running_machine &machine, xml_data_node &elemnode
 			m_maxstate = 255;
 		if (newcomp.m_type == component::CTYPE_DOTMATRIX5DOT)
 			m_maxstate = 31;
-		if (newcomp.m_type == component::CTYPE_SIMPLECOUNTER)
+		if (newcomp.m_type == component::CTYPE_DOTMATRIXDOT)
+			m_maxstate = 1;
+			if (newcomp.m_type == component::CTYPE_SIMPLECOUNTER)
 		{
 			m_maxstate = xml_get_attribute_int_with_subst(machine, *compnode, "maxstate", 999);
 		}
@@ -653,6 +655,10 @@ layout_element::component::component(running_machine &machine, xml_data_node &co
 	{
 		m_type = CTYPE_DOTMATRIX5DOT;
 	}
+	else if (strcmp(compnode.name, "dotmatrixdot") == 0)
+	{
+		m_type = CTYPE_DOTMATRIXDOT;
+	}
 	// simplecounter nodes
 	else if (strcmp(compnode.name, "simplecounter") == 0)
 	{
@@ -812,6 +818,10 @@ void layout_element::component::draw(running_machine &machine, bitmap_argb32 &de
 			draw_dotmatrix(5, dest, bounds, state);
 			break;
 
+		case CTYPE_DOTMATRIXDOT:
+			draw_dotmatrix(1, dest, bounds, state);
+			break;
+			
 		case CTYPE_SIMPLECOUNTER:
 			draw_simplecounter(machine, dest, bounds, state);
 			break;

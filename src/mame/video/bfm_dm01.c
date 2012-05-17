@@ -29,9 +29,6 @@ Standard dm01 memorymap
 4000-FFFF  | W | D D D D D D D D | ROM (48k)
 -----------+---+-----------------+-----------------------------------------
 
-  NOTE: The board uses only one dot of its last set of eight in a row, as the
-        rest are used for the row counter. Because of the way we do dots, we show
-		the blank ones that are most likely hidden by bezels on the unit.
   TODO: - find out clockspeed of CPU
         - sometimes screen isn't cleared, is the a clear bit missing?
 
@@ -61,10 +58,10 @@ typedef struct _dm01
 	int		 data_avail,
 		        control,
 			  xcounter,
+  		segbuffer[65],
 				  busy;
 
 UINT8 scanline[DM_BYTESPERROW],
-		segbuffer[72],
 		comdata;
 
 } bfmdm01;
@@ -149,10 +146,9 @@ static WRITE8_HANDLER( mux_w )
 		dm01.scanline[8] &= 0x80;//filter all other bits
 		if ( (row >= 0)  && (row < DM_MAXLINES) )
 		{
-			int p,pos; //,dots;
+			int p,pos;
 			pos =0;
 			p = 0;
-//			dots = 0;
 
 			while ( p < (DM_BYTESPERROW) )
 			{
@@ -161,33 +157,19 @@ static WRITE8_HANDLER( mux_w )
 				
 				for (int bitpos=0; bitpos <8; bitpos++)
 				{
-					if (d & 1<<(7-bitpos)) dm01.segbuffer[(p*8)+bitpos]=1;
-					else dm01.segbuffer[(p*8)+bitpos]=0;
+					if (((p*8)+bitpos) <65)
+					{
+						if (d & 1<<(7-bitpos)) dm01.segbuffer[(p*8)+bitpos]=1;
+						else dm01.segbuffer[(p*8)+bitpos]=0;	
+					}
 				}
-				
 				p++;
 			}
 
-			while ( pos < 13 )
+			for (int pos=0;pos<65;pos++)
 			{
-				int element =0;
-				for (int dotpos=0; dotpos <5; dotpos++)
-				{
-					if (dm01.segbuffer[(pos*5)+dotpos])
-					{
-						element |= (1<<(dotpos));
-					}
-					else
-					{
-						element &= ~(1<<(dotpos));
-					}
-
-				}
-				output_set_indexed_value("dotmatrix", pos +(13*row), element);
-				pos++;
-			}
-		
-
+				output_set_indexed_value("dotmatrix", pos +(65*row), dm01.segbuffer[(pos)]);
+			}			
 		}
 	}
 }
