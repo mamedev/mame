@@ -1451,111 +1451,88 @@ static void I386OP(pop_edi)(i386_state *cpustate)			// Opcode 0x5f
 	CYCLES(cpustate,CYCLES_POP_REG_SHORT);
 }
 
-static void I386OP(pop_ds32)(i386_state *cpustate)			// Opcode 0x1f
+static bool I386OP(pop_seg32)(i386_state *cpustate, int segment)
 {
-	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
+	UINT32 ea, offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
+	UINT32 value;
+	bool fault;
 	if(i386_limit_check(cpustate,SS,offset+3) == 0)
 	{
-		cpustate->sreg[DS].selector = POP32(cpustate);
-		if( PROTECTED_MODE ) {
-			i386_load_segment_descriptor(cpustate,DS);
-		} else {
-			i386_load_segment_descriptor(cpustate,DS);
-		}
+		ea = i386_translate(cpustate, SS, offset, 0);
+		value = READ32(cpustate, ea);
+		i386_sreg_load(cpustate,value, segment, &fault);
+		if(fault) return false;
+		if(STACK_32BIT)
+			REG32(ESP) = offset + 4;
+		else
+			REG16(SP) = offset + 4;
 	}
 	else
-		FAULT(FAULT_SS,0)
+	{
+		cpustate->ext = 1;
+		i386_trap_with_error(cpustate,FAULT_SS,0,0,0);
+		return false;
+	}
 	CYCLES(cpustate,CYCLES_POP_SREG);
+	return true;
+}
+
+static void I386OP(pop_ds32)(i386_state *cpustate)			// Opcode 0x1f
+{
+	I386OP(pop_seg32)(cpustate, DS);
 }
 
 static void I386OP(pop_es32)(i386_state *cpustate)			// Opcode 0x07
 {
-	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
-	if(i386_limit_check(cpustate,SS,offset+3) == 0)
-	{
-		cpustate->sreg[ES].selector = POP32(cpustate);
-		if( PROTECTED_MODE ) {
-			i386_load_segment_descriptor(cpustate,ES);
-		} else {
-			i386_load_segment_descriptor(cpustate,ES);
-		}
-	}
-	else
-		FAULT(FAULT_SS,0)
-	CYCLES(cpustate,CYCLES_POP_SREG);
+	I386OP(pop_seg32)(cpustate, ES);
 }
 
 static void I386OP(pop_fs32)(i386_state *cpustate)			// Opcode 0x0f a1
 {
-	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
-	if(i386_limit_check(cpustate,SS,offset+3) == 0)
-	{
-		cpustate->sreg[FS].selector = POP32(cpustate);
-		if( PROTECTED_MODE ) {
-			i386_load_segment_descriptor(cpustate,FS);
-		} else {
-			i386_load_segment_descriptor(cpustate,FS);
-		}
-	}
-	else
-		FAULT(FAULT_SS,0)
-	CYCLES(cpustate,CYCLES_POP_SREG);
+	I386OP(pop_seg32)(cpustate, FS);
 }
 
 static void I386OP(pop_gs32)(i386_state *cpustate)			// Opcode 0x0f a9
 {
-	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
-	if(i386_limit_check(cpustate,SS,offset+3) == 0)
-	{
-		cpustate->sreg[GS].selector = POP32(cpustate);
-		if( PROTECTED_MODE ) {
-			i386_load_segment_descriptor(cpustate,GS);
-		} else {
-			i386_load_segment_descriptor(cpustate,GS);
-		}
-	}
-	else
-		FAULT(FAULT_SS,0)
-	CYCLES(cpustate,CYCLES_POP_SREG);
+	I386OP(pop_seg32)(cpustate, GS);
 }
 
 static void I386OP(pop_ss32)(i386_state *cpustate)			// Opcode 0x17
 {
-	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
+	if(!I386OP(pop_seg32)(cpustate, SS)) return;
 	if(cpustate->IF != 0) // if external interrupts are enabled
 	{
 		cpustate->IF = 0;  // reset IF for the next instruction
 		cpustate->delayed_interrupt_enable = 1;
 	}
-
-	if(i386_limit_check(cpustate,SS,offset+3) == 0)
-	{
-		cpustate->sreg[SS].selector = POP32(cpustate);
-		if( PROTECTED_MODE ) {
-			i386_load_segment_descriptor(cpustate,SS);
-		} else {
-			i386_load_segment_descriptor(cpustate,SS);
-		}
-	}
-	else
-		FAULT(FAULT_SS,0)
-	CYCLES(cpustate,CYCLES_POP_SREG);
 }
 
 static void I386OP(pop_rm32)(i386_state *cpustate)			// Opcode 0x8f
 {
 	UINT8 modrm = FETCH(cpustate);
 	UINT32 value;
-	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
+	UINT32 ea, offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
 	if(i386_limit_check(cpustate,SS,offset+3) == 0)
 	{
+		// be careful here, if the write references the esp register
+		// it expects the post-pop value but esp must be wound back
+		// if the write faults
+		UINT32 temp_sp = REG32(ESP);
 		value = POP32(cpustate);
 
 		if( modrm >= 0xc0 ) {
 			STORE_RM32(modrm, value);
 		} else {
-			UINT32 ea = GetEA(cpustate,modrm,1);
-			WRITE32(cpustate,ea, value);
+			ea = GetEA(cpustate,modrm,1);
+			try
+			{
+				WRITE32(cpustate,ea, value);
+			}
+			catch(UINT64 e)
+			{
+				REG32(ESP) = temp_sp;
+				throw e;
+			}
 		}
 	}
 	else
@@ -3514,13 +3491,7 @@ static void I386OP(load_far_pointer32)(i386_state *cpustate, int s)
 		UINT32 ea = GetEA(cpustate,modrm,0);
 		STORE_REG32(modrm, READ32(cpustate,ea + 0));
 		selector = READ16(cpustate,ea + 4);
-		if(PROTECTED_MODE && !(V8086_MODE))
-			i386_protected_mode_sreg_load(cpustate,selector,s);
-		else
-		{
-			cpustate->sreg[s].selector = selector;
-			i386_load_segment_descriptor(cpustate, s );
-		}
+		i386_sreg_load(cpustate,selector,s,NULL);
 	}
 }
 

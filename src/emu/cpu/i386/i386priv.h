@@ -401,14 +401,14 @@ INLINE UINT32 i386_translate(i386_state *cpustate, int segment, UINT32 ip, int r
 		if(i386_limit_check(cpustate, segment, ip))
 			FAULT_THROW((segment==SS)?FAULT_SS:FAULT_GP, 0);
 		if((rwn == 0) && ((cpustate->sreg[segment].flags & 8) && !(cpustate->sreg[segment].flags & 2)))
-			FAULT_THROW((segment==SS)?FAULT_SS:FAULT_GP, 0);
+			FAULT_THROW(FAULT_GP, 0);
 		if((rwn == 1) && ((cpustate->sreg[segment].flags & 8) || !(cpustate->sreg[segment].flags & 2)))
-			FAULT_THROW((segment==SS)?FAULT_SS:FAULT_GP, 0);
+			FAULT_THROW(FAULT_GP, 0);
 	}
 	return cpustate->sreg[segment].base + ip;
 }
 
-// rwn; read = 0, write = 1, none = -1
+// rwn; read = 0, write = 1, none = -1, read at PL 0 = -2
 INLINE int translate_address(i386_state *cpustate, int rwn, UINT32 *address, UINT32 *error)
 {
 	UINT32 a = *address;
@@ -418,7 +418,7 @@ INLINE int translate_address(i386_state *cpustate, int rwn, UINT32 *address, UIN
 	UINT32 offset = a & 0xfff;
 	UINT32 page_entry;
 	UINT32 ret = 1;
-	bool user = (cpustate->CPL == 3);
+	bool user = (cpustate->CPL == 3) && (rwn >= 0);
 	*error = 0;
 
 	// TODO: cr0 wp bit, 486 and higher
@@ -672,6 +672,61 @@ INLINE UINT64 READ64(i386_state *cpustate,UINT32 ea)
 		address &= cpustate->a20_mask;
 		value = (((UINT64) cpustate->program->read_dword( address+0 )) << 0) |
 				(((UINT64) cpustate->program->read_dword( address+4 )) << 32);
+	}
+	return value;
+}
+INLINE UINT8 READ8PL0(i386_state *cpustate,UINT32 ea)
+{
+	UINT32 address = ea, error;
+
+	if (cpustate->cr[0] & 0x80000000)		// page translation enabled
+	{
+		if(!translate_address(cpustate,-2,&address,&error))
+			PF_THROW(error);
+	}
+
+	address &= cpustate->a20_mask;
+	return cpustate->program->read_byte(address);
+}
+INLINE UINT16 READ16PL0(i386_state *cpustate,UINT32 ea)
+{
+	UINT16 value;
+	UINT32 address = ea, error;
+
+	if( ea & 0x1 ) {		/* Unaligned read */
+		value = (READ8PL0( cpustate, address+0 ) << 0) |
+				(READ8PL0( cpustate, address+1 ) << 8);
+	} else {
+		if (cpustate->cr[0] & 0x80000000)		// page translation enabled
+		{
+			if(!translate_address(cpustate,-2,&address,&error))
+				PF_THROW(error);
+		}
+
+		address &= cpustate->a20_mask;
+		value = cpustate->program->read_word( address );
+	}
+	return value;
+}
+INLINE UINT32 READ32PL0(i386_state *cpustate,UINT32 ea)
+{
+	UINT32 value;
+	UINT32 address = ea, error;
+
+	if( ea & 0x3 ) {		/* Unaligned read */
+		value = (READ8PL0( cpustate, address+0 ) << 0) |
+				(READ8PL0( cpustate, address+1 ) << 8) |
+				(READ8PL0( cpustate, address+2 ) << 16) |
+				(READ8PL0( cpustate, address+3 ) << 24);
+	} else {
+		if (cpustate->cr[0] & 0x80000000)		// page translation enabled
+		{
+			if(!translate_address(cpustate,-2,&address,&error))
+				PF_THROW(error);
+		}
+
+		address &= cpustate->a20_mask;
+		value = cpustate->program->read_dword( address );
 	}
 	return value;
 }
@@ -1080,11 +1135,11 @@ INLINE void check_ioperm(i386_state *cpustate, offs_t port, UINT8 mask)
 		FAULT_THROW(FAULT_GP,0);
 
 	address = cpustate->task.base;
-	IOPB = READ16(cpustate, address+0x66);
-	if((IOPB+(port/8)) >= cpustate->task.limit)
+	IOPB = READ16PL0(cpustate, address+0x66);
+	if((IOPB+(port/8)) > cpustate->task.limit)
 		FAULT_THROW(FAULT_GP,0);
 
-	map = READ8(cpustate, address+IOPB+(port/8));
+	map = READ8PL0(cpustate, address+IOPB+(port/8));
 	map >>= (port%8);
 	if(map & mask)
 		FAULT_THROW(FAULT_GP,0);

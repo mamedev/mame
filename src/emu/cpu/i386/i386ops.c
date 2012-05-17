@@ -781,6 +781,7 @@ static void I386OP(mov_sreg_rm16)(i386_state *cpustate)		// Opcode 0x8e
 {
 	UINT16 selector;
 	UINT8 modrm = FETCH(cpustate);
+	bool fault;
 	int s = (modrm >> 3) & 0x7;
 
 	if( modrm >= 0xc0 ) {
@@ -792,21 +793,14 @@ static void I386OP(mov_sreg_rm16)(i386_state *cpustate)		// Opcode 0x8e
 		CYCLES(cpustate,CYCLES_MOV_MEM_SREG);
 	}
 
-	if(s == SS)
+	i386_sreg_load(cpustate,selector,s,&fault);
+	if((s == SS) && !fault)
 	{
 		if(cpustate->IF != 0) // if external interrupts are enabled
 		{
 			cpustate->IF = 0;  // reset IF for the next instruction
 			cpustate->delayed_interrupt_enable = 1;
 		}
-	}
-
-	if(PROTECTED_MODE && !(V8086_MODE))  // no checks in virtual 8086 mode?
-		i386_protected_mode_sreg_load(cpustate,selector,s);
-	else
-	{
-		cpustate->sreg[s].selector = selector;
-		i386_load_segment_descriptor(cpustate, s );
 	}
 }
 
