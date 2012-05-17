@@ -9,24 +9,6 @@
 #include "includes/gsword.h"
 
 
-static PALETTE_INIT( common )
-{
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
-	int i;
-
-	/* characters */
-	for (i = 0; i < 0x100; i++)
-		colortable_entry_set_value(machine.colortable, i, i);
-
-	/* sprites */
-	for (i = 0x100; i < 0x200; i++)
-	{
-		UINT8 ctabentry = (BITSWAP8(color_prom[i - 0x100],7,6,5,4,0,1,2,3) & 0x0f) | 0x80;
-		colortable_entry_set_value(machine.colortable, i, ctabentry);
-	}
-}
-
-
 PALETTE_INIT( josvolly )
 {
 	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
@@ -48,7 +30,16 @@ PALETTE_INIT( josvolly )
 	/* color_prom now points to the beginning of the lookup table */
 	color_prom += 0x300;
 
-	PALETTE_INIT_CALL(common);
+	/* characters */
+	for (i = 0; i < 0x100; i++)
+		colortable_entry_set_value(machine.colortable, i, i);
+
+	/* sprites */
+	for (i = 0x100; i < 0x200; i++)
+	{
+		UINT8 ctabentry = (BITSWAP8(color_prom[i - 0x100],7,6,5,4,0,1,2,3) & 0x0f) | 0x80;
+		colortable_entry_set_value(machine.colortable, i, ctabentry);
+	}
 }
 
 
@@ -90,7 +81,16 @@ PALETTE_INIT( gsword )
 	/* color_prom now points to the beginning of the lookup table */
 	color_prom += 0x200;
 
-	PALETTE_INIT_CALL(common);
+	/* characters */
+	for (i = 0; i < 0x100; i++)
+		colortable_entry_set_value(machine.colortable, i, i);
+
+	/* sprites */
+	for (i = 0x100; i < 0x200; i++)
+	{
+		UINT8 ctabentry = (BITSWAP8(color_prom[i - 0x100],7,6,5,4,0,1,2,3) & 0x0f) | 0x80;
+		colortable_entry_set_value(machine.colortable, i, ctabentry);
+	}
 }
 
 WRITE8_MEMBER(gsword_state::gsword_videoram_w)
