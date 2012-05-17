@@ -105,6 +105,7 @@ const char info_xml_creator::s_dtd_string[] =
 "\t\t\t<!ATTLIST chip type (cpu|audio) #REQUIRED>\n"
 "\t\t\t<!ATTLIST chip clock CDATA #IMPLIED>\n"
 "\t\t<!ELEMENT display EMPTY>\n"
+"\t\t\t<!ATTLIST display tag CDATA #IMPLIED>\n"
 "\t\t\t<!ATTLIST display type (raster|vector|lcd|unknown) #REQUIRED>\n"
 "\t\t\t<!ATTLIST display rotate (0|90|180|270) #REQUIRED>\n"
 "\t\t\t<!ATTLIST display flipx (yes|no) \"no\">\n"
@@ -318,7 +319,7 @@ void info_xml_creator::output_one()
 	output_device_roms();
 	output_sample();
 	output_chips(m_drivlist.config().root_device(), "");
-	output_display(m_drivlist.config().root_device());
+	output_display(m_drivlist.config().root_device(), "");
 	output_sound(m_drivlist.config().root_device());
 	output_input(portlist);
 	output_switches(portlist, "", IPT_DIPSWITCH, "dipswitch", "dipvalue");
@@ -372,7 +373,7 @@ void info_xml_creator::output_one_device(device_t &device, const char *devtag)
 
 	output_rom(device);
 	output_chips(device, devtag);
-	output_display(device);
+	output_display(device, devtag);
 	if (has_speaker)
 		output_sound(device);
 	if (has_input)
@@ -679,77 +680,84 @@ void info_xml_creator::output_chips(device_t &device, const char *root_tag)
 //  displays
 //-------------------------------------------------
 
-void info_xml_creator::output_display(device_t &device)
+void info_xml_creator::output_display(device_t &device, const char *root_tag)
 {
 	// iterate over screens
 	screen_device_iterator iter(device);
 	for (const screen_device *screendev = iter.first(); screendev != NULL; screendev = iter.next())
 	{
-		fprintf(m_output, "\t\t<display");
-
-		switch (screendev->screen_type())
+		if (strcmp(screendev->tag(), device.tag()))
 		{
-			case SCREEN_TYPE_RASTER:	fprintf(m_output, " type=\"raster\"");	break;
-			case SCREEN_TYPE_VECTOR:	fprintf(m_output, " type=\"vector\"");	break;
-			case SCREEN_TYPE_LCD:		fprintf(m_output, " type=\"lcd\"");		break;
-			default:					fprintf(m_output, " type=\"unknown\"");	break;
+			astring newtag(screendev->tag()), oldtag(":");
+			newtag.substr(newtag.find(oldtag.cat(root_tag)) + oldtag.len());
+			
+			fprintf(m_output, "\t\t<display");
+			fprintf(m_output, " tag=\"%s\"", xml_normalize_string(newtag));
+			
+			switch (screendev->screen_type())
+			{
+				case SCREEN_TYPE_RASTER:	fprintf(m_output, " type=\"raster\"");	break;
+				case SCREEN_TYPE_VECTOR:	fprintf(m_output, " type=\"vector\"");	break;
+				case SCREEN_TYPE_LCD:		fprintf(m_output, " type=\"lcd\"");		break;
+				default:					fprintf(m_output, " type=\"unknown\"");	break;
+			}
+			
+			// output the orientation as a string
+			switch (m_drivlist.driver().flags & ORIENTATION_MASK)
+			{
+				case ORIENTATION_FLIP_X:
+					fprintf(m_output, " rotate=\"0\" flipx=\"yes\"");
+					break;
+				case ORIENTATION_FLIP_Y:
+					fprintf(m_output, " rotate=\"180\" flipx=\"yes\"");
+					break;
+				case ORIENTATION_FLIP_X|ORIENTATION_FLIP_Y:
+					fprintf(m_output, " rotate=\"180\"");
+					break;
+				case ORIENTATION_SWAP_XY:
+					fprintf(m_output, " rotate=\"90\" flipx=\"yes\"");
+					break;
+				case ORIENTATION_SWAP_XY|ORIENTATION_FLIP_X:
+					fprintf(m_output, " rotate=\"90\"");
+					break;
+				case ORIENTATION_SWAP_XY|ORIENTATION_FLIP_Y:
+					fprintf(m_output, " rotate=\"270\"");
+					break;
+				case ORIENTATION_SWAP_XY|ORIENTATION_FLIP_X|ORIENTATION_FLIP_Y:
+					fprintf(m_output, " rotate=\"270\" flipx=\"yes\"");
+					break;
+				default:
+					fprintf(m_output, " rotate=\"0\"");
+					break;
+			}
+			
+			// output width and height only for games that are not vector
+			if (screendev->screen_type() != SCREEN_TYPE_VECTOR)
+			{
+				const rectangle &visarea = screendev->visible_area();
+				fprintf(m_output, " width=\"%d\"", visarea.width());
+				fprintf(m_output, " height=\"%d\"", visarea.height());
+			}
+			
+			// output refresh rate
+			fprintf(m_output, " refresh=\"%f\"", ATTOSECONDS_TO_HZ(screendev->refresh_attoseconds()));
+			
+			// output raw video parameters only for games that are not vector
+			// and had raw parameters specified
+			if (screendev->screen_type() != SCREEN_TYPE_VECTOR && !screendev->oldstyle_vblank_supplied())
+			{
+				int pixclock = screendev->width() * screendev->height() * ATTOSECONDS_TO_HZ(screendev->refresh_attoseconds());
+				
+				fprintf(m_output, " pixclock=\"%d\"", pixclock);
+				fprintf(m_output, " htotal=\"%d\"", screendev->width());
+				fprintf(m_output, " hbend=\"%d\"", screendev->visible_area().min_x);
+				fprintf(m_output, " hbstart=\"%d\"", screendev->visible_area().max_x+1);
+				fprintf(m_output, " vtotal=\"%d\"", screendev->height());
+				fprintf(m_output, " vbend=\"%d\"", screendev->visible_area().min_y);
+				fprintf(m_output, " vbstart=\"%d\"", screendev->visible_area().max_y+1);
+			}
+			fprintf(m_output, " />\n");
 		}
-
-		// output the orientation as a string
-		switch (m_drivlist.driver().flags & ORIENTATION_MASK)
-		{
-			case ORIENTATION_FLIP_X:
-				fprintf(m_output, " rotate=\"0\" flipx=\"yes\"");
-				break;
-			case ORIENTATION_FLIP_Y:
-				fprintf(m_output, " rotate=\"180\" flipx=\"yes\"");
-				break;
-			case ORIENTATION_FLIP_X|ORIENTATION_FLIP_Y:
-				fprintf(m_output, " rotate=\"180\"");
-				break;
-			case ORIENTATION_SWAP_XY:
-				fprintf(m_output, " rotate=\"90\" flipx=\"yes\"");
-				break;
-			case ORIENTATION_SWAP_XY|ORIENTATION_FLIP_X:
-				fprintf(m_output, " rotate=\"90\"");
-				break;
-			case ORIENTATION_SWAP_XY|ORIENTATION_FLIP_Y:
-				fprintf(m_output, " rotate=\"270\"");
-				break;
-			case ORIENTATION_SWAP_XY|ORIENTATION_FLIP_X|ORIENTATION_FLIP_Y:
-				fprintf(m_output, " rotate=\"270\" flipx=\"yes\"");
-				break;
-			default:
-				fprintf(m_output, " rotate=\"0\"");
-				break;
-		}
-
-		// output width and height only for games that are not vector
-		if (screendev->screen_type() != SCREEN_TYPE_VECTOR)
-		{
-			const rectangle &visarea = screendev->visible_area();
-			fprintf(m_output, " width=\"%d\"", visarea.width());
-			fprintf(m_output, " height=\"%d\"", visarea.height());
-		}
-
-		// output refresh rate
-		fprintf(m_output, " refresh=\"%f\"", ATTOSECONDS_TO_HZ(screendev->refresh_attoseconds()));
-
-		// output raw video parameters only for games that are not vector
-		// and had raw parameters specified
-		if (screendev->screen_type() != SCREEN_TYPE_VECTOR && !screendev->oldstyle_vblank_supplied())
-		{
-			int pixclock = screendev->width() * screendev->height() * ATTOSECONDS_TO_HZ(screendev->refresh_attoseconds());
-
-			fprintf(m_output, " pixclock=\"%d\"", pixclock);
-			fprintf(m_output, " htotal=\"%d\"", screendev->width());
-			fprintf(m_output, " hbend=\"%d\"", screendev->visible_area().min_x);
-			fprintf(m_output, " hbstart=\"%d\"", screendev->visible_area().max_x+1);
-			fprintf(m_output, " vtotal=\"%d\"", screendev->height());
-			fprintf(m_output, " vbend=\"%d\"", screendev->visible_area().min_y);
-			fprintf(m_output, " vbstart=\"%d\"", screendev->visible_area().max_y+1);
-		}
-		fprintf(m_output, " />\n");
 	}
 }
 
