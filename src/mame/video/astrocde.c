@@ -32,6 +32,7 @@
 
 static void init_savestate(running_machine &machine);
 static TIMER_CALLBACK( scanline_callback );
+static TIMER_CALLBACK( interrupt_off );
 static void init_sparklestar(running_machine &machine);
 
 
@@ -162,9 +163,11 @@ PALETTE_INIT( profpac )
 VIDEO_START( astrocde )
 {
 	astrocde_state *state = machine.driver_data<astrocde_state>();
-	/* allocate a per-scanline timer */
+
+	/* allocate timers */
 	state->m_scanline_timer = machine.scheduler().timer_alloc(FUNC(scanline_callback));
 	state->m_scanline_timer->adjust(machine.primary_screen->time_until_pos(1), 1);
+	state->m_intoff_timer = machine.scheduler().timer_alloc(FUNC(interrupt_off));
 
 	/* register for save states */
 	init_savestate(machine);
@@ -178,9 +181,11 @@ VIDEO_START( astrocde )
 VIDEO_START( profpac )
 {
 	astrocde_state *state = machine.driver_data<astrocde_state>();
-	/* allocate a per-scanline timer */
+
+	/* allocate timers */
 	state->m_scanline_timer = machine.scheduler().timer_alloc(FUNC(scanline_callback));
 	state->m_scanline_timer->adjust(machine.primary_screen->time_until_pos(1), 1);
+	state->m_intoff_timer = machine.scheduler().timer_alloc(FUNC(interrupt_off));
 
 	/* allocate videoram */
 	state->m_profpac_videoram = auto_alloc_array(machine, UINT16, 0x4000 * 4);
@@ -389,14 +394,14 @@ static void astrocade_trigger_lightpen(running_machine &machine, UINT8 vfeedback
 		if ((state->m_interrupt_enabl & 0x01) == 0)
 		{
 			cputag_set_input_line_and_vector(machine, "maincpu", 0, HOLD_LINE, state->m_interrupt_vector & 0xf0);
-			machine.scheduler().timer_set(machine.primary_screen->time_until_pos(vfeedback), FUNC(interrupt_off));
+			state->m_intoff_timer->adjust(machine.primary_screen->time_until_pos(vfeedback));
 		}
 
 		/* mode 1 means assert for 1 instruction */
 		else
 		{
 			cputag_set_input_line_and_vector(machine, "maincpu", 0, ASSERT_LINE, state->m_interrupt_vector & 0xf0);
-			machine.scheduler().timer_set(machine.device<cpu_device>("maincpu")->cycles_to_attotime(1), FUNC(interrupt_off));
+			state->m_intoff_timer->adjust(machine.device<cpu_device>("maincpu")->cycles_to_attotime(1));
 		}
 
 		/* latch the feedback registers */

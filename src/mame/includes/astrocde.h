@@ -42,6 +42,7 @@ public:
 	UINT8 m_vertical_feedback;
 	UINT8 m_horizontal_feedback;
 	emu_timer *m_scanline_timer;
+	emu_timer *m_intoff_timer;
 	UINT8 m_colors[8];
 	UINT8 m_colorsplit;
 	UINT8 m_bgdata;
