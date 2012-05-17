@@ -445,6 +445,29 @@ static ADDRESS_MAP_START( zaxxon_map, AS_PROGRAM, 8, zaxxon_state )
 ADDRESS_MAP_END
 
 
+/* derived from Zaxxon, different sound hardware */
+static ADDRESS_MAP_START( ixion_map, AS_PROGRAM, 8, zaxxon_state )
+	AM_RANGE(0x0000, 0x5fff) AM_ROM
+	AM_RANGE(0x6000, 0x6fff) AM_RAM
+	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x1c00) AM_RAM_WRITE(zaxxon_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0xa000, 0xa0ff) AM_MIRROR(0x1f00) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0x18fc) AM_READ_PORT("SW00")
+	AM_RANGE(0xc001, 0xc001) AM_MIRROR(0x18fc) AM_READ_PORT("SW01")
+	AM_RANGE(0xc002, 0xc002) AM_MIRROR(0x18fc) AM_READ_PORT("DSW02")
+	AM_RANGE(0xc003, 0xc003) AM_MIRROR(0x18fc) AM_READ_PORT("DSW03")
+	AM_RANGE(0xc100, 0xc100) AM_MIRROR(0x18ff) AM_READ_PORT("SW100")
+	AM_RANGE(0xc000, 0xc002) AM_MIRROR(0x18f8) AM_WRITE(zaxxon_coin_enable_w)
+	AM_RANGE(0xc003, 0xc004) AM_MIRROR(0x18f8) AM_WRITE(zaxxon_coin_counter_w)
+	AM_RANGE(0xc006, 0xc006) AM_MIRROR(0x18f8) AM_WRITE(zaxxon_flipscreen_w)
+	AM_RANGE(0xe03c, 0xe03c) AM_MIRROR(0x1f00) AM_DEVREADWRITE_LEGACY("usbsnd", sega_usb_status_r, sega_usb_data_w)
+	AM_RANGE(0xe0f0, 0xe0f0) AM_MIRROR(0x1f00) AM_WRITE(int_enable_w)
+	AM_RANGE(0xe0f1, 0xe0f1) AM_MIRROR(0x1f00) AM_WRITE(zaxxon_fg_color_w)
+	AM_RANGE(0xe0f8, 0xe0f9) AM_MIRROR(0x1f00) AM_WRITE(zaxxon_bg_position_w)
+	AM_RANGE(0xe0fa, 0xe0fa) AM_MIRROR(0x1f00) AM_WRITE(zaxxon_bg_color_w)
+	AM_RANGE(0xe0fb, 0xe0fb) AM_MIRROR(0x1f00) AM_WRITE(zaxxon_bg_enable_w)
+ADDRESS_MAP_END
+
+
 /* complete memory map derived from schematics */
 static ADDRESS_MAP_START( congo_map, AS_PROGRAM, 8, zaxxon_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
@@ -963,6 +986,11 @@ MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( razmataz, root )
+
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(ixion_map)
+
+	MCFG_DEVICE_REMOVE("ppi8255")
 
 	/* video hardware */
 	MCFG_VIDEO_START(razmataz)
@@ -1542,7 +1570,6 @@ static DRIVER_INIT( razmataz )
 {
 	zaxxon_state *state = machine.driver_data<zaxxon_state>();
 	address_space *pgmspace = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	device_t *usbsnd = machine.device("usbsnd");
 
 	nprinces_decode(machine, "maincpu");
 
@@ -1554,24 +1581,9 @@ static DRIVER_INIT( razmataz )
 	/* unknown behavior expected here */
 	pgmspace->install_read_handler(0xc80a, 0xc80a, read8_delegate(FUNC(zaxxon_state::razmataz_counter_r),state));
 
-	/* connect the universal sound board */
-	pgmspace->install_legacy_readwrite_handler(*usbsnd, 0xe03c, 0xe03c, 0, 0x1f00, FUNC(sega_usb_status_r), FUNC(sega_usb_data_w));
-
 	/* additional state saving */
 	state->save_item(NAME(state->m_razmataz_dial_pos));
 	state->save_item(NAME(state->m_razmataz_counter));
-}
-
-
-static DRIVER_INIT( ixion )
-{
-	address_space *pgmspace = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	device_t *usbsnd = machine.device("usbsnd");
-
-	szaxxon_decode(machine, "maincpu");
-
-	/* connect the universal sound board */
-	pgmspace->install_legacy_readwrite_handler(*usbsnd, 0xe03c, 0xe03c, 0, 0x1f00, FUNC(sega_usb_status_r), FUNC(sega_usb_data_w));
 }
 
 
@@ -1598,7 +1610,7 @@ GAME( 1984, futspy,   0,      futspy,   futspy,   futspy,   ROT90,  "Sega",    "
 /* these games run on modified Zaxxon hardware with no skewing, extra inputs, and a */
 /* G-80 Universal Sound Board */
 GAME( 1983, razmataz, 0,      razmataz, razmataz, razmataz, ROT90,  "Sega",    "Razzmatazz", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1983, ixion,    0,      razmataz, ixion,    ixion,    ROT270, "Sega",    "Ixion (prototype)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE)
+GAME( 1983, ixion,    0,      razmataz, ixion,    szaxxon,  ROT270, "Sega",    "Ixion (prototype)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE)
 
 /* these games run on a slightly newer Zaxxon hardware with more ROM space and a */
 /* custom sprite DMA chip */
