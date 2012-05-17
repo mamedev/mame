@@ -2335,13 +2335,14 @@ static void do_extract_cd(parameters_t &params)
 
 			// output the metadata about the track to the TOC file
 			const cdrom_track_info &trackinfo = toc->tracks[tracknum];
+			astring temp;
             if (mode == MODE_GDI)
             {
-                output_track_metadata(mode, output_toc_file, tracknum, trackinfo, trackbin_name, discoffs, outputoffs);
+                output_track_metadata(mode, output_toc_file, tracknum, trackinfo, core_filename_extract_base(temp,trackbin_name), discoffs, outputoffs);
             }
             else
             {
-                output_track_metadata(mode, output_toc_file, tracknum, trackinfo, *output_bin_file_str, discoffs, outputoffs);
+                output_track_metadata(mode, output_toc_file, tracknum, trackinfo, core_filename_extract_base(temp,*output_bin_file_str), discoffs, outputoffs);
             }
 
             // If this is bin/cue output and the CHD contains subdata, warn the user and don't include
