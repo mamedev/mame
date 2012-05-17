@@ -274,6 +274,7 @@ CPU_DISASSEMBLE( z8000 )
 									tmp = new_pc + -2 * tmp;
 								break;
 							default:
+								tmp = 0;
 								abort();
 						}
 						if (segm)

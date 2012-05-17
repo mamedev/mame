@@ -3744,9 +3744,9 @@ unsigned find_best_partition_order_(
 
 		/* save best parameters and raw_bits */
 		FLAC__format_entropy_coding_method_partitioned_rice_contents_ensure_size(prc, max(6, best_partition_order));
-		memcpy(prc->parameters, private_->partitioned_rice_contents_extra[best_parameters_index].parameters, sizeof(unsigned)*(1<<(best_partition_order)));
+		memcpy(prc->parameters, private_->partitioned_rice_contents_extra[best_parameters_index].parameters, sizeof(unsigned)*((unsigned long long)1<<(best_partition_order)));
 		if(do_escape_coding)
-			memcpy(prc->raw_bits, private_->partitioned_rice_contents_extra[best_parameters_index].raw_bits, sizeof(unsigned)*(1<<(best_partition_order)));
+			memcpy(prc->raw_bits, private_->partitioned_rice_contents_extra[best_parameters_index].raw_bits, sizeof(unsigned)*((unsigned long long)1<<(best_partition_order)));
 		/*
          * Now need to check if the type should be changed to
          * FLAC__ENTROPY_CODING_METHOD_PARTITIONED_RICE2 based on the
