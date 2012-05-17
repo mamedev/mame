@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- *  POKEY chip emulator 4.51
+ *  POKEY chip emulator 4.6
  *  Copyright Nicola Salmoria and the MAME Team
  *
  *  Based on original info found in Ron Fries' Pokey emulator,
@@ -11,6 +11,13 @@
  *  This code is subject to the MAME license, which besides other
  *  things means it is distributed as is, no warranties whatsoever.
  *  For more details read mame.txt that comes with MAME.
+ *
+ *  4.6:
+ *  - changed audio emulation to emulate borrow 3 clock delay and
+ *    proper channel reset. New frequency only becomes effective
+ *    after the counter hits 0. Emulation also treats counters
+ *    as 8 bit counters which are linked now instead of monolytic
+ *    16 bit counters.
  *
  *  4.51:
  *  - changed to use the attotime datatype
@@ -78,11 +85,11 @@
  */
 #define POKEY_DEFAULT_GAIN (32767/11/4)
 
-#define VERBOSE 		0
-#define VERBOSE_SOUND	0
-#define VERBOSE_TIMER	0
-#define VERBOSE_POLY	0
-#define VERBOSE_RAND	0
+#define VERBOSE 		1
+#define VERBOSE_SOUND	1
+#define VERBOSE_TIMER	1
+#define VERBOSE_POLY	1
+#define VERBOSE_RAND	1
 
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
@@ -157,15 +164,14 @@
 typedef struct _pokey_state pokey_state;
 struct _pokey_state
 {
+	INT32 clock_cnt[3];		/* clock counters */
+	INT32 borrow_cnt[4];	/* borrow counters */
+
 	INT32 counter[4];		/* channel counter */
 	INT32 divisor[4];		/* channel divisor (modulo value) */
 	UINT32 volume[4];		/* channel volume - derived */
 	UINT8 output[4];		/* channel output signal (1 active, 0 inactive) */
-	UINT8 audible[4];		/* channel plays an audible tone/effect */
-	UINT32 samplerate_24_8; /* sample rate in 24.8 format */
-	UINT32 samplepos_fract; /* sample position fractional part */
-	UINT32 samplepos_whole; /* sample position whole part */
-	UINT32 polyadjust;		/* polynome adjustment */
+	UINT8 filter_sample[4];  /* hi-pass filter sample */
 	UINT32 p4;              /* poly4 index */
 	UINT32 p5;              /* poly5 index */
 	UINT32 p9;              /* poly9 index */
@@ -221,305 +227,11 @@ struct _pokey_state
 static TIMER_CALLBACK( pokey_timer_expire );
 static TIMER_CALLBACK( pokey_pot_trigger );
 
+#define CLK_1 0
+#define CLK_28 1
+#define CLK_114 2
 
-#define SAMPLE	-1
-
-#define ADJUST_EVENT(chip)												\
-	chip->counter[CHAN1] -= event;										\
-	chip->counter[CHAN2] -= event;										\
-	chip->counter[CHAN3] -= event;										\
-	chip->counter[CHAN4] -= event;										\
-	chip->samplepos_whole -= event;										\
-	chip->polyadjust += event
-
-#if SUPPRESS_INAUDIBLE
-
-#define PROCESS_CHANNEL(chip,ch)                                        \
-	int toggle = 0; 													\
-	ADJUST_EVENT(chip); 												\
-	/* reset the channel counter */ 									\
-	if( chip->audible[ch] )												\
-		chip->counter[ch] = chip->divisor[ch];							\
-	else																\
-		chip->counter[ch] = 0x7fffffff;									\
-	chip->p4 = (chip->p4+chip->polyadjust)%0x0000f;						\
-	chip->p5 = (chip->p5+chip->polyadjust)%0x0001f;						\
-	chip->p9 = (chip->p9+chip->polyadjust)%0x001ff;						\
-	chip->p17 = (chip->p17+chip->polyadjust)%0x1ffff;					\
-	chip->polyadjust = 0;												\
-	if( (chip->AUDC[ch] & NOTPOLY5) || P5(chip) )						\
-	{																	\
-		if( chip->AUDC[ch] & PURE )										\
-			toggle = 1; 												\
-		else															\
-		if( chip->AUDC[ch] & POLY4 )									\
-			toggle = chip->output[ch] == !P4(chip);						\
-		else															\
-		if( chip->AUDCTL & POLY9 )										\
-			toggle = chip->output[ch] == !P9(chip);						\
-		else															\
-			toggle = chip->output[ch] == !P17(chip);					\
-	}																	\
-	if( toggle )														\
-	{																	\
-		if( chip->audible[ch] )											\
-		{																\
-			if( chip->output[ch] )										\
-				sum -= chip->volume[ch];								\
-			else														\
-				sum += chip->volume[ch];								\
-		}																\
-		chip->output[ch] ^= 1;											\
-	}																	\
-	/* is this a filtering channel (3/4) and is the filter active? */	\
-	if( chip->AUDCTL & ((CH1_FILTER|CH2_FILTER) & (0x10 >> ch)) )		\
-    {                                                                   \
-		if( ch >= 2 && chip->output[ch-2] )								\
-        {                                                               \
-			chip->output[ch-2] = 0;										\
-			if( chip->audible[ch] )										\
-				sum -= chip->volume[ch-2];								\
-        }                                                               \
-    }                                                                   \
-
-#else
-
-#define PROCESS_CHANNEL(chip,ch)                                        \
-	int toggle = 0; 													\
-	ADJUST_EVENT(chip); 												\
-	/* reset the channel counter */ 									\
-	chip->counter[ch] = p[chip].divisor[ch];							\
-	chip->p4 = (chip->p4+chip->polyadjust)%0x0000f;						\
-	chip->p5 = (chip->p5+chip->polyadjust)%0x0001f;						\
-	chip->p9 = (chip->p9+chip->polyadjust)%0x001ff;						\
-	chip->p17 = (chip->p17+chip->polyadjust)%0x1ffff;					\
-	chip->polyadjust = 0;												\
-	if( (chip->AUDC[ch] & NOTPOLY5) || P5(chip) )						\
-	{																	\
-		if( chip->AUDC[ch] & PURE )										\
-			toggle = 1; 												\
-		else															\
-		if( chip->AUDC[ch] & POLY4 )									\
-			toggle = chip->output[ch] == !P4(chip);						\
-		else															\
-		if( chip->AUDCTL & POLY9 )										\
-			toggle = chip->output[ch] == !P9(chip);						\
-		else															\
-			toggle = chip->output[ch] == !P17(chip);					\
-	}																	\
-	if( toggle )														\
-	{																	\
-		if( chip->output[ch] )											\
-			sum -= chip->volume[ch];									\
-		else															\
-			sum += chip->volume[ch];									\
-		chip->output[ch] ^= 1;											\
-	}																	\
-	/* is this a filtering channel (3/4) and is the filter active? */	\
-	if( chip->AUDCTL & ((CH1_FILTER|CH2_FILTER) & (0x10 >> ch)) )		\
-    {                                                                   \
-		if( ch >= 2 && chip->output[ch-2] )								\
-        {                                                               \
-			chip->output[ch-2] = 0;										\
-			sum -= chip->volume[ch-2];									\
-        }                                                               \
-    }                                                                   \
-
-#endif
-
-#define PROCESS_SAMPLE(chip)                                            \
-    ADJUST_EVENT(chip);                                                 \
-    /* adjust the sample position */                                    \
-	chip->samplepos_whole++;											\
-	/* store sum of output signals into the buffer */					\
-	*buffer++ = (sum > 0x7fff) ? 0x7fff : sum;							\
-	samples--
-
-#if HEAVY_MACRO_USAGE
-
-/*
- * This version of PROCESS_POKEY repeats the search for the minimum
- * event value without using an index to the channel. That way the
- * PROCESS_CHANNEL macros can be called with fixed values and expand
- * to much more efficient code
- */
-
-#define PROCESS_POKEY(chip) 											\
-	UINT32 sum = 0; 													\
-	if( chip->output[CHAN1] )											\
-		sum += chip->volume[CHAN1];										\
-	if( chip->output[CHAN2] )											\
-		sum += chip->volume[CHAN2];										\
-	if( chip->output[CHAN3] )											\
-		sum += chip->volume[CHAN3];										\
-	if( chip->output[CHAN4] )											\
-		sum += chip->volume[CHAN4];										\
-    while( samples > 0 )                                                 \
-	{																	\
-		if( chip->counter[CHAN1] < chip->samplepos_whole )				\
-		{																\
-			if( chip->counter[CHAN2] <  chip->counter[CHAN1] )			\
-			{															\
-				if( chip->counter[CHAN3] <  chip->counter[CHAN2] )		\
-				{														\
-					if( chip->counter[CHAN4] < chip->counter[CHAN3] )	\
-					{													\
-						UINT32 event = chip->counter[CHAN4];			\
-                        PROCESS_CHANNEL(chip,CHAN4);                    \
-					}													\
-					else												\
-					{													\
-						UINT32 event = chip->counter[CHAN3];			\
-                        PROCESS_CHANNEL(chip,CHAN3);                    \
-					}													\
-				}														\
-				else													\
-				if( chip->counter[CHAN4] < chip->counter[CHAN2] )		\
-				{														\
-					UINT32 event = chip->counter[CHAN4];				\
-                    PROCESS_CHANNEL(chip,CHAN4);                        \
-				}														\
-                else                                                    \
-				{														\
-					UINT32 event = chip->counter[CHAN2];				\
-                    PROCESS_CHANNEL(chip,CHAN2);                        \
-				}														\
-            }                                                           \
-			else														\
-			if( chip->counter[CHAN3] < chip->counter[CHAN1] )			\
-			{															\
-				if( chip->counter[CHAN4] < chip->counter[CHAN3] )		\
-				{														\
-					UINT32 event = chip->counter[CHAN4];				\
-                    PROCESS_CHANNEL(chip,CHAN4);                        \
-				}														\
-                else                                                    \
-				{														\
-					UINT32 event = chip->counter[CHAN3];				\
-                    PROCESS_CHANNEL(chip,CHAN3);                        \
-				}														\
-            }                                                           \
-			else														\
-			if( chip->counter[CHAN4] < chip->counter[CHAN1] )			\
-			{															\
-				UINT32 event = chip->counter[CHAN4];					\
-                PROCESS_CHANNEL(chip,CHAN4);                            \
-			}															\
-            else                                                        \
-			{															\
-				UINT32 event = chip->counter[CHAN1];					\
-                PROCESS_CHANNEL(chip,CHAN1);                            \
-			}															\
-		}																\
-		else															\
-		if( chip->counter[CHAN2] < chip->samplepos_whole )				\
-		{																\
-			if( chip->counter[CHAN3] < chip->counter[CHAN2] )			\
-			{															\
-				if( chip->counter[CHAN4] < chip->counter[CHAN3] )		\
-				{														\
-					UINT32 event = chip->counter[CHAN4];				\
-                    PROCESS_CHANNEL(chip,CHAN4);                        \
-				}														\
-				else													\
-				{														\
-					UINT32 event = chip->counter[CHAN3];				\
-                    PROCESS_CHANNEL(chip,CHAN3);                        \
-				}														\
-			}															\
-			else														\
-			if( chip->counter[CHAN4] < chip->counter[CHAN2] )			\
-			{															\
-				UINT32 event = chip->counter[CHAN4];					\
-                PROCESS_CHANNEL(chip,CHAN4);                            \
-			}															\
-			else														\
-			{															\
-				UINT32 event = chip->counter[CHAN2];					\
-                PROCESS_CHANNEL(chip,CHAN2);                            \
-			}															\
-		}																\
-		else															\
-		if( chip->counter[CHAN3] < chip->samplepos_whole )				\
-        {                                                               \
-			if( chip->counter[CHAN4] < chip->counter[CHAN3] )			\
-			{															\
-				UINT32 event = chip->counter[CHAN4];					\
-                PROCESS_CHANNEL(chip,CHAN4);                            \
-			}															\
-			else														\
-			{															\
-				UINT32 event = chip->counter[CHAN3];					\
-                PROCESS_CHANNEL(chip,CHAN3);                            \
-			}															\
-		}																\
-		else															\
-		if( chip->counter[CHAN4] < chip->samplepos_whole )				\
-		{																\
-			UINT32 event = chip->counter[CHAN4];						\
-            PROCESS_CHANNEL(chip,CHAN4);                                \
-        }                                                               \
-		else															\
-		{																\
-			UINT32 event = chip->samplepos_whole;						\
-			PROCESS_SAMPLE(chip);										\
-		}																\
-	}																	\
-	chip->rtimer->adjust(attotime::never)
-
-#else   /* no HEAVY_MACRO_USAGE */
-/*
- * And this version of PROCESS_POKEY uses event and channel variables
- * so that the PROCESS_CHANNEL macro needs to index memory at runtime.
- */
-
-#define PROCESS_POKEY(chip)                                             \
-	UINT32 sum = 0; 													\
-	if( chip->output[CHAN1] )											\
-		sum += chip->volume[CHAN1];										\
-	if( chip->output[CHAN2] )											\
-		sum += chip->volume[CHAN2];										\
-	if( chip->output[CHAN3] )											\
-		sum += chip->volume[CHAN3];										\
-	if( chip->output[CHAN4] )											\
-        sum += chip->volume[CHAN4];                                     \
-	while( samples > 0 )                                                 \
-	{																	\
-		UINT32 event = chip->samplepos_whole;							\
-		UINT32 channel = SAMPLE;										\
-		if( chip->counter[CHAN1] < event )								\
-        {                                                               \
-			event = chip->counter[CHAN1];								\
-			channel = CHAN1;											\
-		}																\
-		if( chip->counter[CHAN2] < event )								\
-        {                                                               \
-			event = chip->counter[CHAN2];								\
-			channel = CHAN2;											\
-        }                                                               \
-		if( chip->counter[CHAN3] < event )								\
-        {                                                               \
-			event = chip->counter[CHAN3];								\
-			channel = CHAN3;											\
-        }                                                               \
-		if( chip->counter[CHAN4] < event )								\
-        {                                                               \
-			event = chip->counter[CHAN4];								\
-			channel = CHAN4;											\
-        }                                                               \
-        if( channel == SAMPLE )                                         \
-		{																\
-            PROCESS_SAMPLE(chip);                                       \
-        }                                                               \
-		else															\
-		{																\
-			PROCESS_CHANNEL(chip,channel);								\
-		}																\
-	}																	\
-	chip->rtimer->adjust(attotime::never)
-
-#endif
-
+static const int clock_divisors[3] = {1, 28, 114};
 
 INLINE pokey_state *get_safe_token(device_t *device)
 {
@@ -528,12 +240,166 @@ INLINE pokey_state *get_safe_token(device_t *device)
 	return (pokey_state *)downcast<legacy_device_base *>(device)->token();
 }
 
+INLINE void reset_channel(pokey_state *chip, int ch)
+{
+	chip->counter[ch] = chip->AUDF[ch] ^ 0xff;
+}
+
+
+INLINE void process_channel(pokey_state *chip, int ch)
+{
+	int toggle = 0;
+
+	if( (chip->AUDC[ch] & NOTPOLY5) || P5(chip) )
+	{
+		if( chip->AUDC[ch] & PURE )
+			toggle = 1;
+		else
+		if( chip->AUDC[ch] & POLY4 )
+			toggle = chip->output[ch] == !P4(chip);
+		else
+		if( chip->AUDCTL & POLY9 )
+			toggle = chip->output[ch] == !P9(chip);
+		else
+			toggle = chip->output[ch] == !P17(chip);
+	}
+	if( toggle )
+	{
+		chip->output[ch] ^= 1;
+	}
+	/* is this a filtering channel (3/4) and is the filter active? */
+
+	if( chip->AUDCTL & ((CH1_FILTER|CH2_FILTER) & (0x10 >> ch)) )
+    {
+		if( ch >= 2)
+        {
+			chip->filter_sample[ch-2] = chip->output[ch-2];
+        }
+    }
+
+}
+
+/*
+ * http://www.atariage.com/forums/topic/3328-sio-protocol/page__st__100#entry1680190:
+ * I noticed that the Pokey counters have clocked carry (actually, "borrow") positions that delay the
+ * counter by 3 cycles, plus the 1 reset clock. So 16 bit mode has 6 carry delays and a reset clock.
+ * I'm sure this was done because the propagation delays limited the number of cells the subtraction could ripple though.
+ *
+ */
+
+INLINE void inc_chan(pokey_state *chip, int ch)
+{
+	chip->counter[ch] = (chip->counter[ch] + 1) & 0xff;
+	if (chip->counter[ch] == 0 && chip->borrow_cnt[ch] == 0)
+		chip->borrow_cnt[ch] = 3;
+}
+
+INLINE int check_borrow(pokey_state *chip, int ch)
+{
+	if (chip->borrow_cnt[ch] > 0)
+	{
+		chip->borrow_cnt[ch]--;
+		return (chip->borrow_cnt[CHAN1] == 0);
+	}
+	return 0;
+}
 
 static STREAM_UPDATE( pokey_update )
 {
 	pokey_state *chip = (pokey_state *)param;
 	stream_sample_t *buffer = outputs[0];
-	PROCESS_POKEY(chip);
+	int base_clock = (chip->AUDCTL & CLK_15KHZ) ? CLK_114 : CLK_28;
+
+	while( samples > 0 )
+	{
+		int ch, clk;
+		UINT32 sum = 0;
+		int clock_triggered[3] = {0,0,0};
+
+		for (clk = 0; clk < 3; clk++)
+		{
+			chip->clock_cnt[clk]++;
+			if (chip->clock_cnt[clk] >= clock_divisors[clk])
+			{
+				chip->clock_cnt[clk] = 0;
+				clock_triggered[clk] = 1;
+			}
+		}
+
+		chip->p4 = (chip->p4 + 1) % 0x0000f;
+		chip->p5 = (chip->p5 + 1) % 0x0001f;
+		chip->p9 = (chip->p9 + 1) % 0x001ff;
+		chip->p17 = (chip->p17 + 1 ) % 0x1ffff;
+
+
+		clk = (chip->AUDCTL & CH1_HICLK) ? CLK_1 : base_clock;
+		if (clock_triggered[clk])
+			inc_chan(chip, CHAN1);
+
+		clk = (chip->AUDCTL & CH3_HICLK) ? CLK_1 : base_clock;
+		if (clock_triggered[clk])
+			inc_chan(chip, CHAN3);
+
+		if (clock_triggered[base_clock])
+		{
+			if (!(chip->AUDCTL & CH12_JOINED))
+				inc_chan(chip, CHAN2);
+			if (!(chip->AUDCTL & CH34_JOINED))
+				inc_chan(chip, CHAN4);
+		}
+
+		/* do CHAN2 before CHAN1 because CHAN1 may set borrow! */
+		if (check_borrow(chip, CHAN2))
+		{
+			int isJoined = (chip->AUDCTL & CH12_JOINED);
+			if (isJoined)
+				reset_channel(chip, CHAN1);
+			reset_channel(chip, CHAN2);
+			process_channel(chip, CHAN2);
+		}
+
+		if (check_borrow(chip, CHAN1))
+		{
+			int isJoined = (chip->AUDCTL & CH12_JOINED);
+			if (isJoined)
+				inc_chan(chip, CHAN2);
+			else
+				reset_channel(chip, CHAN1);
+			process_channel(chip, CHAN1);
+		}
+
+		/* do CHAN4 before CHAN3 because CHAN3 may set borrow! */
+		if (check_borrow(chip, CHAN4))
+		{
+			int isJoined = (chip->AUDCTL & CH34_JOINED);
+			if (isJoined)
+				reset_channel(chip, CHAN3);
+			reset_channel(chip, CHAN4);
+			process_channel(chip, CHAN4);
+		}
+
+		if (check_borrow(chip, CHAN3))
+		{
+			int isJoined = (chip->AUDCTL & CH34_JOINED);
+			if (isJoined)
+				inc_chan(chip, CHAN4);
+			else
+				reset_channel(chip, CHAN3);
+			process_channel(chip, CHAN3);
+		}
+
+		for (ch = 0; ch < 4; ch++)
+		{
+			sum += (((chip->output[ch] ^ chip->filter_sample[ch]) || (chip->AUDC[ch] & VOLUME_ONLY)) ? chip->volume[ch] : 0 );
+		}
+
+       	/* store sum of output signals into the buffer */
+       	*buffer++ = (sum > 0x7fff) ? 0x7fff : sum;
+       	samples--;
+
+	}
+	chip->rtimer->adjust(attotime::never);
+
 }
 
 
@@ -578,10 +444,8 @@ static void register_for_save(pokey_state *chip, device_t *device)
 	device->save_item(NAME(chip->divisor));
 	device->save_item(NAME(chip->volume));
 	device->save_item(NAME(chip->output));
-	device->save_item(NAME(chip->audible));
-	device->save_item(NAME(chip->samplepos_fract));
-	device->save_item(NAME(chip->samplepos_whole));
-	device->save_item(NAME(chip->polyadjust));
+	device->save_item(NAME(chip->filter_sample));
+	device->save_item(NAME(chip->clock_cnt));
 	device->save_item(NAME(chip->p4));
 	device->save_item(NAME(chip->p5));
 	device->save_item(NAME(chip->p9));
@@ -640,7 +504,6 @@ static DEVICE_START( pokey )
 	rand_init(chip->rand9,   9, 8, 1, 0x00180);
 	rand_init(chip->rand17, 17,16, 1, 0x1c000);
 
-	chip->samplerate_24_8 = (device->clock() << 8) / sample_rate;
 	chip->divisor[CHAN1] = 4;
 	chip->divisor[CHAN2] = 4;
 	chip->divisor[CHAN3] = 4;
@@ -1045,11 +908,15 @@ WRITE8_DEVICE_HANDLER( pokey_w )
 		p->timer[TIMER4]->adjust(attotime::never, p->timer_param[TIMER4]);
 
         /* reset all counters to zero (side effect) */
-		p->polyadjust = 0;
 		p->counter[CHAN1] = 0;
 		p->counter[CHAN2] = 0;
 		p->counter[CHAN3] = 0;
 		p->counter[CHAN4] = 0;
+		/* From the pokey documentation */
+		p->output[CHAN1] = 1;
+		p->output[CHAN2] = 1;
+		p->output[CHAN3] = 0;
+		p->output[CHAN4] = 0;
 
         /* joined chan#1 and chan#2 ? */
 		if( p->AUDCTL & CH12_JOINED )
@@ -1202,21 +1069,8 @@ WRITE8_DEVICE_HANDLER( pokey_w )
 
 		p->volume[CHAN1] = (p->AUDC[CHAN1] & VOLUME_MASK) * POKEY_DEFAULT_GAIN;
         p->divisor[CHAN1] = new_val;
-		if( new_val < p->counter[CHAN1] )
-			p->counter[CHAN1] = new_val;
 		if( p->interrupt_cb && p->timer[TIMER1] )
 			p->timer[TIMER1]->adjust(p->clock_period * new_val, p->timer_param[TIMER1], p->timer_period[TIMER1]);
-		p->audible[CHAN1] = !(
-			(p->AUDC[CHAN1] & VOLUME_ONLY) ||
-			(p->AUDC[CHAN1] & VOLUME_MASK) == 0 ||
-			((p->AUDC[CHAN1] & PURE) && new_val < (p->samplerate_24_8 >> 8)));
-		if( !p->audible[CHAN1] )
-		{
-			p->output[CHAN1] = 1;
-			p->counter[CHAN1] = 0x7fffffff;
-			/* 50% duty cycle should result in half volume */
-            p->volume[CHAN1] >>= 1;
-        }
     }
 
     if( ch_mask & (1 << CHAN2) )
@@ -1238,21 +1092,8 @@ WRITE8_DEVICE_HANDLER( pokey_w )
 
 		p->volume[CHAN2] = (p->AUDC[CHAN2] & VOLUME_MASK) * POKEY_DEFAULT_GAIN;
 		p->divisor[CHAN2] = new_val;
-		if( new_val < p->counter[CHAN2] )
-			p->counter[CHAN2] = new_val;
 		if( p->interrupt_cb && p->timer[TIMER2] )
 			p->timer[TIMER2]->adjust(p->clock_period * new_val, p->timer_param[TIMER2], p->timer_period[TIMER2]);
-		p->audible[CHAN2] = !(
-			(p->AUDC[CHAN2] & VOLUME_ONLY) ||
-			(p->AUDC[CHAN2] & VOLUME_MASK) == 0 ||
-			((p->AUDC[CHAN2] & PURE) && new_val < (p->samplerate_24_8 >> 8)));
-		if( !p->audible[CHAN2] )
-		{
-			p->output[CHAN2] = 1;
-			p->counter[CHAN2] = 0x7fffffff;
-			/* 50% duty cycle should result in half volume */
-			p->volume[CHAN2] >>= 1;
-        }
     }
 
     if( ch_mask & (1 << CHAN3) )
@@ -1267,21 +1108,7 @@ WRITE8_DEVICE_HANDLER( pokey_w )
 
 		p->volume[CHAN3] = (p->AUDC[CHAN3] & VOLUME_MASK) * POKEY_DEFAULT_GAIN;
 		p->divisor[CHAN3] = new_val;
-		if( new_val < p->counter[CHAN3] )
-			p->counter[CHAN3] = new_val;
 		/* channel 3 does not have a timer associated */
-		p->audible[CHAN3] = !(
-			(p->AUDC[CHAN3] & VOLUME_ONLY) ||
-			(p->AUDC[CHAN3] & VOLUME_MASK) == 0 ||
-			((p->AUDC[CHAN3] & PURE) && new_val < (p->samplerate_24_8 >> 8))) ||
-			(p->AUDCTL & CH1_FILTER);
-		if( !p->audible[CHAN3] )
-		{
-			p->output[CHAN3] = 1;
-			p->counter[CHAN3] = 0x7fffffff;
-			/* 50% duty cycle should result in half volume */
-			p->volume[CHAN3] >>= 1;
-        }
     }
 
     if( ch_mask & (1 << CHAN4) )
@@ -1303,22 +1130,8 @@ WRITE8_DEVICE_HANDLER( pokey_w )
 
 		p->volume[CHAN4] = (p->AUDC[CHAN4] & VOLUME_MASK) * POKEY_DEFAULT_GAIN;
 		p->divisor[CHAN4] = new_val;
-		if( new_val < p->counter[CHAN4] )
-			p->counter[CHAN4] = new_val;
 		if( p->interrupt_cb && p->timer[TIMER4] )
 			p->timer[TIMER4]->adjust(p->clock_period * new_val, p->timer_param[TIMER4], p->timer_period[TIMER4]);
-		p->audible[CHAN4] = !(
-			(p->AUDC[CHAN4] & VOLUME_ONLY) ||
-			(p->AUDC[CHAN4] & VOLUME_MASK) == 0 ||
-			((p->AUDC[CHAN4] & PURE) && new_val < (p->samplerate_24_8 >> 8))) ||
-			(p->AUDCTL & CH2_FILTER);
-		if( !p->audible[CHAN4] )
-		{
-			p->output[CHAN4] = 1;
-			p->counter[CHAN4] = 0x7fffffff;
-			/* 50% duty cycle should result in half volume */
-			p->volume[CHAN4] >>= 1;
-        }
     }
 }
 
@@ -1407,7 +1220,7 @@ DEVICE_GET_INFO( pokey )
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "POKEY");						break;
 		case DEVINFO_STR_FAMILY:					strcpy(info->s, "Atari custom");				break;
-		case DEVINFO_STR_VERSION:					strcpy(info->s, "4.51");						break;
+		case DEVINFO_STR_VERSION:					strcpy(info->s, "4.6");						break;
 		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
 		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
