@@ -31,8 +31,6 @@
  
     -------------------------------------------------------------
  
-    Hamburger doesn't work; no protection details were supplied.
- 
     Here is the protection data for DS Telejan and Pro Golf (set 2).
     This information maps onto the various handlers in machine/decocass.c but it's
     not at all clear how to create a new one that fits these specs.
@@ -1069,7 +1067,7 @@ ROM_START( cprogolf )
 	ROM_LOAD( "cprogolf.cas", 0x0000, 0x8000, CRC(02123cd1) SHA1(e4c630ed293725f23d539cb43beb97953558dabd) )
 ROM_END
 
-ROM_START( cprogolfj )
+ROM_START( cprogolfj ) // version 1-A
 	DECOCASS_BIOS_A_ROMS
 
 	ROM_REGION( 0x00020, "dongle", 0 )	  /* dongle data */
@@ -1080,7 +1078,7 @@ ROM_START( cprogolfj )
 ROM_END
 
 /* 14 */
-ROM_START( cdsteljn )
+ROM_START( cdsteljn ) // version 4-A-3
 	DECOCASS_BIOS_A_ROMS
 
 	ROM_REGION( 0x00020, "dongle", 0 )	  /* dongle data */
@@ -1237,7 +1235,7 @@ ROM_START( cbtime )
 	ROM_LOAD( "cbtime.cas",   0x0000, 0x8000, CRC(56d7dc58) SHA1(34b2513c9ca7ab40f532b6d6d911aa3012113632) )
 ROM_END
 
-ROM_START( chamburger )
+ROM_START( chamburger ) // version 0-A-0
 	DECOCASS_BIOS_A_ROMS
 
 	ROM_REGION( 0x01000, "dongle", 0 )	  /* dongle data */
