@@ -136,9 +136,10 @@ WRITE32_MEMBER(feversoc_state::fs_paletteram_w)
 
 READ32_MEMBER(feversoc_state::in0_r)
 {
-
+	UINT32 io0 = (ioport("IN1")->read()&0xffff) << 16;
+	UINT32 io1 = (ioport("IN0")->read()&0xffff) << 0;
 	m_x^=0x40; //vblank? eeprom read bit?
-	return (ioport("IN1")->read()<<16);
+	return io0 | io1 | m_x;
 }
 
 WRITE32_MEMBER(feversoc_state::output_w)
@@ -205,9 +206,7 @@ static INPUT_PORTS_START( feversoc )
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) ) //hopper i/o
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-//  PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) ) //vblank/eeprom read bit?
-//  PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-//  PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // maybe eeprom in / vblank
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED ) //PORT_NAME("Slottle") PORT_CODE(KEYCODE_Z)
 	PORT_DIPNAME( 0x0100, 0x0100, "DIP 1-1" )
 	PORT_DIPSETTING(    0x0100, DEF_STR( Off ) )
