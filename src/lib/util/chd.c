@@ -1406,7 +1406,7 @@ const char *chd_file::error_string(chd_error err)
 		case CHDERR_NOT_SUPPORTED:				return "operation not supported";
 		case CHDERR_METADATA_NOT_FOUND:			return "can't find metadata";
 		case CHDERR_INVALID_METADATA_SIZE:		return "invalid metadata size";
-		case CHDERR_UNSUPPORTED_VERSION:		return "unsupported CHD version";
+		case CHDERR_UNSUPPORTED_VERSION:		return "mismatched DIFF and CHD version";
 		case CHDERR_VERIFY_INCOMPLETE:			return "incomplete verify";
 		case CHDERR_INVALID_METADATA:			return "invalid metadata";
 		case CHDERR_INVALID_STATE:				return "invalid state";
