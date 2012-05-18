@@ -89,7 +89,7 @@
 #define VERBOSE_SOUND	0
 #define VERBOSE_TIMER	0
 #define VERBOSE_POLY	0
-#define VERBOSE_RAND	0
+#define VERBOSE_RAND	1
 
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
@@ -421,6 +421,46 @@ static void poly_init(UINT8 *poly, int size, int left, int right, int add)
 static void rand_init(UINT8 *rng, int size, int left, int right, int add)
 {
     int mask = (1 << size) - 1;
+    int i;
+    UINT32 lfsr = 0;
+
+	LOG_RAND(("rand %d\n", size));
+
+	if (size == 17)
+	{
+	    for( i = 0; i < mask; i++ )
+		{
+	        /* calculate next bit @ 7 */
+	    	int in8 = !((lfsr >> 8) & 1) ^ ((lfsr >> 13) & 1);
+	    	int in = (lfsr & 1);
+	    	lfsr = lfsr >> 1;
+	    	lfsr = (lfsr & 0xff7f) | (in8 << 7);
+	    	lfsr = (in << 16) | lfsr;
+			*rng = (lfsr >> 8)  & 0xff;		/* use bits 0..7 */
+	        LOG_RAND(("%05x: %02x\n", lfsr, *rng));
+	        rng++;
+		}
+	}
+	else
+	{
+	    for( i = 0; i < mask; i++ )
+		{
+	        /* calculate next bit */
+	    	int in = !((lfsr >> 0) & 1) ^ ((lfsr >> 5) & 1);
+	    	lfsr = lfsr >> 1;
+	    	lfsr = (in << 8) | lfsr;
+			*rng = lfsr & 0xff;		/* use bits 0..7 */
+	        LOG_RAND(("%05x: %02x\n", lfsr, *rng));
+	        rng++;
+		}
+	}
+
+}
+
+#if 0
+static void rand_init_old(UINT8 *rng, int size, int left, int right, int add)
+{
+    int mask = (1 << size) - 1;
     int i, x = 0;
 
 	LOG_RAND(("rand %d\n", size));
@@ -436,7 +476,7 @@ static void rand_init(UINT8 *rng, int size, int left, int right, int add)
 		x = ((x << left) + (x >> right) + add) & mask;
 	}
 }
-
+#endif
 
 static void register_for_save(pokey_state *chip, device_t *device)
 {
