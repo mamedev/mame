@@ -155,7 +155,7 @@ READ32_MEMBER(atarigt_state::analog_port0_r)
 	compute_fake_pots(pots);
 	return (pots[0] << 24) | (pots[3] << 8);
 #else
-	return (ioport("AN2")->read() << 8);
+	return (ioport("AN1")->read() << 24) | (ioport("AN2")->read() << 8);
 #endif
 }
 
@@ -167,7 +167,7 @@ READ32_MEMBER(atarigt_state::analog_port1_r)
 	compute_fake_pots(pots);
 	return (pots[2] << 24) | (pots[1] << 8);
 #else
-	return (ioport("AN4")->read() << 8);
+	return (ioport("AN3")->read() << 24) | (ioport("AN4")->read() << 8);
 #endif
 }
 
