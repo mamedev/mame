@@ -11,6 +11,7 @@
 
 #include "emu.h"
 #include "emuopts.h"
+#include "chd.h"
 #include "cpu/mcs48/mcs48.h"
 #include "machine/ldpr8210.h"
 #include "machine/ldv1000.h"
@@ -19,6 +20,47 @@
 #include "pr8210.lh"
 
 
+#define APPNAME					"MAME"
+#define APPNAME_LOWER			"mame"
+#define CONFIGNAME				"mame"
+#define APPLONGNAME				"M.A.M.E."
+#define FULLLONGNAME			"Multiple Arcade Machine Emulator"
+#define CAPGAMENOUN				"GAME"
+#define CAPSTARTGAMENOUN		"Game"
+#define GAMENOUN				"game"
+#define GAMESNOUN				"games"
+#define COPYRIGHT				"Copyright Nicola Salmoria\nand the MAME team\nhttp://mamedev.org"
+#define COPYRIGHT_INFO			"Copyright Nicola Salmoria and the MAME team"
+#define DISCLAIMER				"MAME is an emulator: it reproduces, more or less faithfully, the behaviour of\n" \
+								"several arcade machines. But hardware is useless without software, so an image\n" \
+								"of the ROMs which run on that hardware is required. Such ROMs, like any other\n" \
+								"commercial software, are copyrighted material and it is therefore illegal to\n" \
+								"use them if you don't own the original arcade machine. Needless to say, ROMs\n" \
+								"are not distributed together with MAME. Distribution of MAME together with ROM\n" \
+								"images is a violation of copyright law and should be promptly reported to the\n" \
+								"authors so that appropriate legal action can be taken.\n"
+#define USAGE					"Usage:  %s [%s] [options]"
+#define XML_ROOT			    "mame"
+#define XML_TOP 				"game"
+#define STATE_MAGIC_NUM			"MAMESAVE"
+
+const char * emulator_info::get_appname() { return APPNAME;}
+const char * emulator_info::get_appname_lower() { return APPNAME_LOWER;}
+const char * emulator_info::get_configname() { return CONFIGNAME;}
+const char * emulator_info::get_applongname() { return APPLONGNAME;}
+const char * emulator_info::get_fulllongname() { return FULLLONGNAME;}
+const char * emulator_info::get_capgamenoun() { return CAPGAMENOUN;}
+const char * emulator_info::get_capstartgamenoun() { return CAPSTARTGAMENOUN;}
+const char * emulator_info::get_gamenoun() { return GAMENOUN;}
+const char * emulator_info::get_gamesnoun() { return GAMESNOUN;}
+const char * emulator_info::get_copyright() { return COPYRIGHT;}
+const char * emulator_info::get_copyright_info() { return COPYRIGHT_INFO;}
+const char * emulator_info::get_disclaimer() { return DISCLAIMER;}
+const char * emulator_info::get_usage() { return USAGE;}
+const char * emulator_info::get_xml_root() { return XML_ROOT;}
+const char * emulator_info::get_xml_top() { return XML_TOP;}
+const char * emulator_info::get_state_magic_num() { return STATE_MAGIC_NUM;}
+void emulator_info::printf_usage(const char *par1, const char *par2) { mame_printf_info(USAGE, par1, par2); }
 
 /*************************************
  *
@@ -39,11 +81,10 @@ public:
 	ldplayer_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		  m_last_controls(0),
-		  m_playing(false),
-		  m_laserdisc(*this, "laserdisc") { }
+		  m_playing(false) { }
 
 	// callback hook
-	static chd_file *get_disc_static(device_t *device) { return device->machine().driver_data<ldplayer_state>()->get_disc(); }
+	static chd_file *get_disc_static(device_t *dummy, laserdisc_device &device) { return device.machine().driver_data<ldplayer_state>()->get_disc(); }
 
 protected:
 	// device overrides
@@ -99,7 +140,6 @@ protected:
 	astring m_filename;
 	ioport_value m_last_controls;
 	bool m_playing;
-	required_device<laserdisc_device> m_laserdisc;
 };
 
 
@@ -108,14 +148,15 @@ class pr8210_state : public ldplayer_state
 public:
 	// construction/destruction
 	pr8210_state(const machine_config &mconfig, device_type type, const char *tag)
-		: ldplayer_state(machine, config),
-		  m_bit_timer(timer_alloc(TIMER_ID_BIT)),
+		: ldplayer_state(mconfig, type, tag),
+		  m_laserdisc(*this, "laserdisc"),
 		  m_command_buffer_in(0),
 		  m_command_buffer_out(0) { }
 
 protected:
 	// device overrides
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void machine_start();
 	virtual void machine_reset();
 
 	// command execution hook
@@ -131,6 +172,8 @@ protected:
 		TIMER_ID_BIT_OFF
 	};
 
+	required_device<pioneer_pr8210_device> m_laserdisc;
+
 	// internal state
 	emu_timer *m_bit_timer;
 	UINT32 m_command_buffer_in;
@@ -144,9 +187,12 @@ class ldv1000_state : public ldplayer_state
 public:
 	// construction/destruction
 	ldv1000_state(const machine_config &mconfig, device_type type, const char *tag)
-		: ldplayer_state(machine, config) { }
+		: ldplayer_state(mconfig, type, tag),
+		  m_laserdisc(*this, "laserdisc") { }
 
 protected:
+	required_device<pioneer_ldv1000_device> m_laserdisc;
+
 	// command execution hook
 	virtual void execute_command(int command);
 };
@@ -161,6 +207,7 @@ protected:
 
 chd_file *ldplayer_state::get_disc()
 {
+	bool found = FALSE;
 	// open a path to the ROMs and find the first CHD file
 	file_enumerator path(machine().options().media_path());
 
@@ -182,7 +229,7 @@ chd_file *ldplayer_state::get_disc()
 			file_error filerr = image_file.open(dir->name);
 			if (filerr == FILERR_NONE)
 			{
-				astring fullpath(image_file->fullpath();
+				astring fullpath(image_file.fullpath());
 				image_file.close();
 
 				// try to open the CHD
@@ -190,18 +237,15 @@ chd_file *ldplayer_state::get_disc()
 				if (set_disk_handle(machine(), "laserdisc", fullpath) == CHDERR_NONE)
 				{
 					m_filename.cpy(dir->name);
+					found = TRUE;
 					break;
 				}
 			}
-
-			// close the file on failure
-			auto_free(machine(), image_file);
-			image_file = NULL;
 		}
 	}
 
 	// if we failed, pop a message and exit
-	if (image_file == NULL)
+	if (found == FALSE)
 		throw emu_fatalerror("No valid image file found!\n");
 
 	return get_disk_handle(machine(), "laserdisc");
@@ -358,8 +402,8 @@ void pr8210_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 			// if we have bits, process
 			if (bitsleft != 0)
 			{
-				// assert the line and set a timer for deassertion
-				laserdisc_line_w(m_laserdisc, LASERDISC_LINE_CONTROL, ASSERT_LINE);
+				// assert the line and set a timer for deassertion				
+				m_laserdisc->control_w(ASSERT_LINE);
 				timer_set(attotime::from_usec(250), TIMER_ID_BIT_OFF);
 
 				// space 0 bits apart by 1msec, and 1 bits by 2msec
@@ -380,7 +424,7 @@ void pr8210_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 
 		// deassert the control line
 		case TIMER_ID_BIT_OFF:
-			laserdisc_line_w(m_laserdisc, LASERDISC_LINE_CONTROL, CLEAR_LINE);
+			m_laserdisc->control_w(CLEAR_LINE);
 			break;
 
 		// others to the parent class
@@ -390,6 +434,11 @@ void pr8210_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 	}
 }
 
+void pr8210_state::machine_start()
+{
+	ldplayer_state::machine_start();
+	m_bit_timer = timer_alloc(TIMER_ID_BIT);	
+}
 
 void pr8210_state::machine_reset()
 {
@@ -520,37 +569,37 @@ void ldv1000_state::execute_command(int command)
 	switch (command)
 	{
 		case CMD_SCAN_REVERSE:
-			laserdisc_data_w(m_laserdisc, 0xf8);
+			m_laserdisc->data_w(0xf8);
 			m_playing = true;
 			break;
 
 		case CMD_STEP_REVERSE:
-			laserdisc_data_w(m_laserdisc, 0xfe);
+			m_laserdisc->data_w(0xfe);
 			m_playing = false;
 			break;
 
 		case CMD_SCAN_FORWARD:
-			laserdisc_data_w(m_laserdisc, 0xf0);
+			m_laserdisc->data_w(0xf0);
 			m_playing = true;
 			break;
 
 		case CMD_STEP_FORWARD:
-			laserdisc_data_w(m_laserdisc, 0xf6);
+			m_laserdisc->data_w(0xf6);
 			m_playing = false;
 			break;
 
 		case CMD_PLAY:
-			laserdisc_data_w(m_laserdisc, 0xfd);
+			m_laserdisc->data_w(0xfd);
 			m_playing = true;
 			break;
 
 		case CMD_PAUSE:
-			laserdisc_data_w(m_laserdisc, 0xa0);
+			m_laserdisc->data_w(0xa0);
 			m_playing = false;
 			break;
 
 		case CMD_FRAME_TOGGLE:
-			laserdisc_data_w(m_laserdisc, 0xf1);
+			m_laserdisc->data_w(0xf1);
 			break;
 
 		case CMD_0:
@@ -563,11 +612,11 @@ void ldv1000_state::execute_command(int command)
 		case CMD_7:
 		case CMD_8:
 		case CMD_9:
-			laserdisc_data_w(m_laserdisc, digits[command - CMD_0]);
+			m_laserdisc->data_w(digits[command - CMD_0]);
 			break;
 
 		case CMD_SEARCH:
-			laserdisc_data_w(m_laserdisc, 0xf7);
+			m_laserdisc->data_w(0xf7);
 			m_playing = false;
 			break;
 	}
@@ -618,24 +667,26 @@ INPUT_PORTS_END
  *************************************/
 
 static MACHINE_CONFIG_START( ldplayer_ntsc, ldplayer_state )
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED_CLASS( ldv1000, ldplayer_ntsc, ldv1000_state )
 	MCFG_LASERDISC_LDV1000_ADD("laserdisc")
+	MCFG_LASERDISC_GET_DISC(laserdisc_get_disc_delegate(FUNC(ldplayer_state::get_disc_static), device))
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-	MCFG_LASERDISC_GET_DISC(ldplayer_state::get_disc_static)
+	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED_CLASS( pr8210, ldplayer_ntsc, pr8210_state )
 	MCFG_LASERDISC_PR8210_ADD("laserdisc")
+	MCFG_LASERDISC_GET_DISC(laserdisc_get_disc_delegate(FUNC(ldplayer_state::get_disc_static), device))
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-	MCFG_LASERDISC_GET_DISC(ldplayer_state::get_disc_static)
+	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
 MACHINE_CONFIG_END
 
 

@@ -9,6 +9,9 @@
 #
 ###########################################################################
 
+# add some additional include libraries for the mame files
+INCPATH += \
+	-I$(SRC)/mame \
 
 LDPSRC = $(SRC)/ldplayer
 LDPOBJ = $(OBJ)/ldplayer
