@@ -18,6 +18,71 @@
     Copyright Nicola Salmoria and the MAME Team.
     Visit http://mamedev.org for licensing and usage restrictions.
 
+
+List of Namco System 246 games:
+* Battle Gear 3 (Taito, 2002)
+* Battle Gear 3 Tuned (Taito, 2003)
+* Bloody Roar 3 (Namco / 8ing / Raizing, 2000)
+* Capcom Fighting Jam (Capcom, 2004)
+* Cobra: The Arcade (Namco, 2004)
+* Dragon Chronicles (Namco, 2002)
+* Fate/Unlimited Codes (Capcom / Type-Moon / Cavia / 8ing, 2008)
+* Getchu Play! Tottoko Hamutaro (Banpresto, 2007)
+* Mobile Suit Gundam SEED: Federation Vs. Z.A.F.T. (Capcom / Banpresto, 2005)
+* Mobile Suit Gundam SEED Destiny: Federation Vs. Z.A.F.T. II (Banpresto, 2006)
+* Mobile Suit Gundam Z: AEUG Vs. Titans (Capcom / Banpresto, 2003)
+* Mobile Suit Gundam Z: AEUG Vs. Titans DX (Capcom / Banpresto, 2004)
+* Minnade Kitaeru Zennou Training (Namco, 2006)
+* Netchuu Pro Yakyuu 2002 (Namco, 2002)
+* Pride GP 2003 (Capcom, 2003)
+* Quiz and Variety Sukusuku Inufuku 2 (Namco / AMI / Hamster, 2007)
+* Quiz Mobile Suit Gundam: Tou. Senshi (Banpresto, 2006)
+* Raizin Ping Pong (Taito, 2001)
+* Ridge Racer V: Arcade Battle (Namco, 2000)
+* Sengoku Basara X Cross (Capcom / ARC System Works, 2008)
+* Smash Court Pro Tournament (Namco, 2001)
+* Soul Calibur II (Namco, 2002)
+* Soul Calibur II Ver.D (Namco, 2003)
+* Soul Calibur III Arcade Edition (Namco, 2006)
+* Taiko No Tatsujin 7 (Namco, 2005)
+* Taiko No Tatsujin 8 (Namco, 2006)
+* Technic Beat (Arika, 2002)
+* Tekken 4 (Namco, 2001)
+* Time Crisis 3 (Namco, 2002)
+* Vampire Night (Namco / Sega / WOW Entertainment, 2000)
+* Wangan Midnight (Namco, 2001)
+* Wangan Midnight R (Namco, 2002)
+* Zoids Infinity (Taito, 2004)
+
+List of Namco System 256 Games
+* Chou Dragon Ball Z (Banpresto, 2005)
+* Druaga Online - The Story of Aon (Namco, 2005)
+* Kinnikuman Muscle Grand Prix (Banpresto, 2006)
+* Kinnikuman Muscle Grand Prix 2 (Banpresto, 2007)
+* Kinnikuman Muscle Grand Prix 2 Tokumori (Banpresto, 2008)
+* Mobile Suit Gundam SEED Destiny: Federation Vs. Z.A.F.T. II (Banpresto, 2006)
+* Mobile Suit Gundam: Gundam Vs. Gundam (Banpresto, 2008)
+* Mobile Suit Gundam: Gundam Vs. Gundam Next (Banpresto, 2009)
+* Quiz and Variety Sukusuku Inufuku 2 (Namco / AMI / Hamster, 2007)
+* Sengoku Basara X Cross (Capcom / ARC System Works, 2008)
+* Taiko No Tatsujin 9 (Namco, 2006)
+* Taiko No Tatsujin 10 (Namco, 2007)
+* Taiko No Tatsujin 11 (Namco, 2008)
+* Taiko No Tatsujin 12 (Namco, 2008)
+* Taiko No Tatsujin 12 Don! (Namco, 2009)
+* Taiko No Tatsujin 13 (Namco, 2009)
+* Taiko No Tatsujin 14 (Namco, 2010)
+* Tekken 5 (Namco, 2004)
+* Tekken 5.1 (Namco, 2005)
+* Tekken 5 Dark Resurrection (Namco, 2005)
+* The Battle of YuYu Hakusho (Banpresto, 2006)
+* THE iDOLM@STER (Namco, 2005)
+* Zoids Infinity EX (Taito, 2005)
+* Zoids Infinity EX Plus (Taito, 2006)
+
+List of System Super 256 Games
+* Time Crisis 4 (Namco, 2006)
+
 ***************************************************************************/
 
 
