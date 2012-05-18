@@ -238,7 +238,7 @@ checkman		// (c) 1982 Zilec-Zenitone
 checkmanj		// (c) 1982 Jaleco (Zenitone/Zilec in ROM CM4, and the programmer names)
 dingo			// (c) 1983 Ashby Computers and Graphics LTD. + Jaleco license
 dingoe			// (c) 1983 Ashby Computers and Graphics LTD. + Jaleco license
-blkhole			// TDS (Tokyo Denshi Sekkei)
+blkhole			// TDS (Tokyo Denshi Sekkei) & MINTS
 kingball		// (c) 1980 Namco
 kingballj		// (c) 1980 Namco
 scorpionmc		// bootleg
@@ -1431,7 +1431,7 @@ yosakdona		// (c) 1979 Yosaku To Donbei
 spceking		// (c) 1978 Leijac Corporation (Konami)
 spcewars		// (c) 1978 Sanritsu
 astropal		// (c) 19?? Sidam
-cosmo			// TDS+Mints
+cosmo			// TDS & Mints
 darthvdr		// bootleg
 
 18w				// 653 (c) 1979 Midway
