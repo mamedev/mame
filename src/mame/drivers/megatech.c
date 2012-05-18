@@ -611,13 +611,14 @@ MACHINE_CONFIG_END
 
 
 /* MegaTech Games - Genesis & sms! Games with a timer */
+/* epr-12253b.20 is known to exist (Version 0 - Revision B) */
 
 #define MEGATECH_BIOS \
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF ) \
 	ROM_REGION( 0x10000, "mtbios", 0 ) \
-	ROM_SYSTEM_BIOS( 0, "rev0", "Rev 0" ) \
-	ROMX_LOAD( "epr12664.20", 0x000000, 0x8000, CRC(f71e9526) SHA1(1c7887541d02c41426992d17f8e3db9e03975953), ROM_BIOS(1)) \
-	ROM_SYSTEM_BIOS( 1, "reva", "Rev A" ) \
+	ROM_SYSTEM_BIOS( 0, "ver1", "Ver 1" ) \
+	ROMX_LOAD( "epr-12664.20",  0x000000, 0x8000, CRC(f71e9526) SHA1(1c7887541d02c41426992d17f8e3db9e03975953), ROM_BIOS(1)) \
+	ROM_SYSTEM_BIOS( 1, "ver0", "Ver 0" ) \
 	ROMX_LOAD( "epr-12263a.20", 0x000000, 0x8000, CRC(07c3f423) SHA1(50c28bbc2d4349c820d988ae3f20aae3f808545f), ROM_BIOS(2)) \
 
 /* no games */
