@@ -1104,7 +1104,7 @@ CUSTOM_INPUT_MEMBER(itech8_state::gtg_mux)
 {
 	const char *tag1 = (const char *)param;
 	const char *tag2 = tag1 + strlen(tag1) + 1;
-	return ioport(tag2)->read();
+	return ioport(tag1)->read() & ioport(tag2)->read();
 }
 
 static INPUT_PORTS_START( gtg )

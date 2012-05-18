@@ -173,7 +173,7 @@ static TIMER_CALLBACK( flyball_quarter_callback	)
 /* two physical buttons (start game and stop runner) share the same port bit */
 READ8_MEMBER(flyball_state::flyball_input_r)
 {
-	return ioport("IN1")->read();
+	return ioport("IN0")->read() & ioport("IN1")->read();
 }
 
 READ8_MEMBER(flyball_state::flyball_scanline_r)

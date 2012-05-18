@@ -339,7 +339,7 @@ READ8_MEMBER(mcr_state::solarfox_ip0_r)
 	if (mcr_cocktail_flip)
 		return ioport("ssio:IP0")->read() | 0x08;
 	else
-		return ((ioport("ssio:IP2")->read() & 0x01) << 4);
+		return ((ioport("ssio:IP0")->read() & ~0x14) | 0x08) | ((ioport("ssio:IP0")->read() & 0x08) >> 1) | ((ioport("ssio:IP2")->read() & 0x01) << 4);
 }
 
 
