@@ -1156,7 +1156,7 @@ WRITE16_MEMBER(blitz68k_state::hermit_leds2_w)
 READ16_MEMBER(blitz68k_state::hermit_track_r)
 {
 #ifdef MAME_DEBUG
-//  popmessage("track %02x %02x", ioport("TRACK_Y")->read());
+//  popmessage("track %02x %02x", ioport("TRACK_X")->read(), ioport("TRACK_Y")->read());
 #endif
 
 	return

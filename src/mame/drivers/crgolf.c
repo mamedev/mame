@@ -96,7 +96,7 @@ READ8_MEMBER(crgolf_state::switch_input_r)
 
 READ8_MEMBER(crgolf_state::analog_input_r)
 {
-	return ((ioport("STICK1")->read() & 0xf0)) ^ 0x88;
+	return ((ioport("STICK0")->read() >> 4) | (ioport("STICK1")->read() & 0xf0)) ^ 0x88;
 }
 
 

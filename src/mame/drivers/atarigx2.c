@@ -89,9 +89,9 @@ READ32_MEMBER(atarigx2_state::a2d_data_r)
 	switch (offset)
 	{
 		case 0:
-			return (ioport("A2D1")->read() << 8);
+			return (ioport("A2D0")->read() << 24) | (ioport("A2D1")->read() << 8);
 		case 1:
-			return (ioport("A2D3")->read() << 8);
+			return (ioport("A2D2")->read() << 24) | (ioport("A2D3")->read() << 8);
 	}
 
 	return 0;

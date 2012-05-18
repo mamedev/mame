@@ -732,7 +732,7 @@ READ8_MEMBER(dkong_state::strtheat_inputport_0_r)
     else
     {
         /* Steering Wheel inputs */
-        return (ioport("IN4")->read() & 3);
+        return (ioport("IN0")->read() & ~3) | (ioport("IN4")->read() & 3);
     }
 }
 
@@ -747,7 +747,7 @@ READ8_MEMBER(dkong_state::strtheat_inputport_1_r)
     else
     {
         /* Steering Wheel inputs */
-        return (ioport("IN5")->read() & 3);
+        return (ioport("IN1")->read() & ~3) | (ioport("IN5")->read() & 3);
     }
 }
 
