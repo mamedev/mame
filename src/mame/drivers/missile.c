@@ -714,6 +714,7 @@ static SCREEN_UPDATE_IND16( missile )
 WRITE8_MEMBER(missile_state::missile_w)
 {
 	UINT8 *videoram = m_videoram;
+
 	/* if we're in MADSEL mode, write to video RAM */
 	if (get_madsel(&space))
 	{
@@ -730,7 +731,10 @@ WRITE8_MEMBER(missile_state::missile_w)
 
 	/* POKEY */
 	else if (offset < 0x4800)
-		pokey_w(machine().device("pokey"), offset & 0x0f, data);
+	{
+		pokeyn_device *pokey_dev = downcast<pokeyn_device *>(machine().device("pokey"));
+		pokey_dev->write(*machine().firstcpu->space(), offset, data, 0xff);
+	}
 
 	/* OUT0 */
 	else if (offset < 0x4900)
@@ -790,7 +794,10 @@ READ8_MEMBER(missile_state::missile_r)
 
 	/* POKEY */
 	else if (offset < 0x4800)
-		result = pokey_r(machine().device("pokey"), offset & 0x0f);
+	{
+		pokeyn_device *pokey_dev = downcast<pokeyn_device *>(machine().device("pokey"));
+		result = pokey_dev->read(*machine().firstcpu->space(), offset & 0x0f, 0xff);
+	}
 
 	/* IN0 */
 	else if (offset < 0x4900)
@@ -1046,7 +1053,7 @@ static MACHINE_CONFIG_START( missile, missile_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("pokey", POKEY, MASTER_CLOCK/8)
+	MCFG_SOUND_ADD("pokey", POKEYN, MASTER_CLOCK/8)
 	MCFG_SOUND_CONFIG(pokey_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END

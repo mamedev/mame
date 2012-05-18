@@ -92,4 +92,108 @@ void pokey_kbcode_w (device_t *device, int kbcode, int make);
 
 DECLARE_LEGACY_SOUND_DEVICE(POKEY, pokey);
 
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
+
+
+// ======================> pokey_device
+
+class pokeyn_device : public device_t,
+						public device_sound_interface
+{
+public:
+	// construction/destruction
+	pokeyn_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	DECLARE_READ8_MEMBER( read );
+	DECLARE_WRITE8_MEMBER( write );
+
+protected:
+	// device-level overrides
+	virtual void device_start();
+	virtual void device_reset();
+	virtual void device_post_load();
+	virtual void device_clock_changed();
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+
+	// device_sound_interface overrides
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+
+	// configuration state
+	pokey_interface m_intf;
+
+private:
+
+	void poly_init(UINT8 *poly, int size, int left, int right, int add);
+	void rand_init(UINT8 *rng, int size, int left, int right, int add);
+	inline void process_channel(int ch);
+	inline void reset_channel(int ch);
+	inline void inc_chan(int ch);
+	inline int check_borrow(int ch);
+	void pokey_potgo(void);
+	void write_cmd(int offset, UINT8 data);
+
+
+
+	// internal state
+	sound_stream* m_stream;
+
+	INT32 m_clock_cnt[3];		/* clock counters */
+	INT32 m_borrow_cnt[4];	/* borrow counters */
+
+	INT32 m_counter[4];		/* channel counter */
+	INT32 m_divisor[4];		/* channel divisor (modulo value) */
+	UINT32 m_volume[4];		/* channel volume - derived */
+	UINT8 m_output[4];		/* channel output signal (1 active, 0 inactive) */
+	UINT8 m_filter_sample[4];  /* hi-pass filter sample */
+	UINT32 m_p4;              /* poly4 index */
+	UINT32 m_p5;              /* poly5 index */
+	UINT32 m_p9;              /* poly9 index */
+	UINT32 m_p17;             /* poly17 index */
+	UINT32 m_r9;				/* rand9 index */
+	UINT32 m_r17;             /* rand17 index */
+	UINT32 m_clockmult;		/* clock multiplier */
+	emu_timer *m_timer[3];	/* timers for channel 1,2 and 4 events */
+	attotime m_timer_period[3];	/* computed periods for these timers */
+	int m_timer_param[3];		/* computed parameters for these timers */
+	emu_timer *m_rtimer;     /* timer for calculating the random offset */
+	emu_timer *m_ptimer[8];	/* pot timers */
+	devcb_resolved_read8 m_pot_r[8];
+	devcb_resolved_read8 m_allpot_r;
+	devcb_resolved_read8 m_serin_r;
+	devcb_resolved_write8 m_serout_w;
+	void (*m_interrupt_cb)(device_t *device, int mask);
+	UINT8 m_AUDF[4];          /* AUDFx (D200, D202, D204, D206) */
+	UINT8 m_AUDC[4];			/* AUDCx (D201, D203, D205, D207) */
+	UINT8 m_POTx[8];			/* POTx   (R/D200-D207) */
+	UINT8 m_AUDCTL;			/* AUDCTL (W/D208) */
+	UINT8 m_ALLPOT;			/* ALLPOT (R/D208) */
+	UINT8 m_KBCODE;			/* KBCODE (R/D209) */
+	UINT8 m_RANDOM;			/* RANDOM (R/D20A) */
+	UINT8 m_SERIN;			/* SERIN  (R/D20D) */
+	UINT8 m_SEROUT;			/* SEROUT (W/D20D) */
+	UINT8 m_IRQST;			/* IRQST  (R/D20E) */
+	UINT8 m_IRQEN;			/* IRQEN  (W/D20E) */
+	UINT8 m_SKSTAT;			/* SKSTAT (R/D20F) */
+	UINT8 m_SKCTL;			/* SKCTL  (W/D20F) */
+	attotime m_clock_period;
+	attotime m_ad_time_fast;
+	attotime m_ad_time_slow;
+
+	UINT8 m_poly4[0x0f];
+	UINT8 m_poly5[0x1f];
+	UINT8 m_poly9[0x1ff];
+	UINT8 m_poly17[0x1ffff];
+
+	UINT8 m_rand9[0x1ff];
+	UINT8 m_rand17[0x1ffff];
+
+};
+
+
+// device type definition
+extern const device_type POKEYN;
+
+
 #endif	/* __POKEY_H__ */
