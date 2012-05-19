@@ -196,9 +196,9 @@ static WRITE16_DEVICE_HANDLER( tmaster_oki_bank_w )
 
 ***************************************************************************/
 
-static void duart_irq_handler(device_t *device, UINT8 vector)
+static void duart_irq_handler(device_t *device, int state, UINT8 vector)
 {
-	cputag_set_input_line_and_vector(device->machine(), "maincpu", 4, HOLD_LINE, vector);
+	cputag_set_input_line_and_vector(device->machine(), "maincpu", 4, state, vector);
 };
 
 static void duart_tx(device_t *device, int channel, UINT8 data)

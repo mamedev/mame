@@ -541,9 +541,9 @@ static MACHINE_RESET( m1 )
 
 ///////////////////////////////////////////////////////////////////////////
 
-static void duart_irq_handler(device_t *device, UINT8 state)
+static void duart_irq_handler(device_t *device, int state, UINT8 vector)
 {
-	cputag_set_input_line(device->machine(), "maincpu", M6809_IRQ_LINE, state?ASSERT_LINE:CLEAR_LINE);
+	cputag_set_input_line(device->machine(), "maincpu", M6809_IRQ_LINE, state);
 	LOG(("6809 irq%d \n",state));
 }
 

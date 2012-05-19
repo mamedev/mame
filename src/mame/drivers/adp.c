@@ -265,10 +265,10 @@ if (!screen.machine().input().code_pressed(KEYCODE_O)) // debug: toggle window
 
 ***************************************************************************/
 
-static void duart_irq_handler( device_t *device, UINT8 vector )
+static void duart_irq_handler( device_t *device, int state, UINT8 vector )
 {
-	adp_state *state = device->machine().driver_data<adp_state>();
-	device_set_input_line_and_vector(state->m_maincpu, 4, HOLD_LINE, vector);
+	adp_state *adp = device->machine().driver_data<adp_state>();
+	device_set_input_line_and_vector(adp->m_maincpu, 4, state, vector);
 }
 
 static void duart_tx( device_t *device, int channel, UINT8 data )

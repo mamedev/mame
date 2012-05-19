@@ -6,7 +6,7 @@
 typedef struct _duart68681_config duart68681_config;
 struct _duart68681_config
 {
-	void (*irq_handler)(device_t *device, UINT8 vector);
+	void (*irq_handler)(device_t *device, int state, UINT8 vector);
 	void (*tx_callback)(device_t *device, int channel, UINT8 data);
 	UINT8 (*input_port_read)(device_t *device);
 	void (*output_port_write)(device_t *device, UINT8 data);

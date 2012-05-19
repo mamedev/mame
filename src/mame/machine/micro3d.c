@@ -29,9 +29,9 @@
  *
  *************************************/
 
-void micro3d_duart_irq_handler(device_t *device, UINT8 vector)
+void micro3d_duart_irq_handler(device_t *device, int state, UINT8 vector)
 {
-	cputag_set_input_line_and_vector(device->machine(), "maincpu", 3, HOLD_LINE, vector);
+	cputag_set_input_line_and_vector(device->machine(), "maincpu", 3, state, vector);
 };
 
 void micro3d_duart_tx(device_t *device, int channel, UINT8 data)

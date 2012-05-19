@@ -123,7 +123,7 @@ typedef struct _micro3d_vtx_
 
 
 
-void micro3d_duart_irq_handler(device_t *device, UINT8 vector);
+void micro3d_duart_irq_handler(device_t *device, int state, UINT8 vector);
 UINT8 micro3d_duart_input_r(device_t *device);
 void micro3d_duart_output_w(device_t *device, UINT8 data);
 void micro3d_duart_tx(device_t *device, int channel, UINT8 data);

@@ -926,9 +926,9 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-static void duart_irq_handler(device_t *device, UINT8 vector)
+static void duart_irq_handler(device_t *device, int state, UINT8 vector)
 {
-	cputag_set_input_line_and_vector(device->machine(), "maincpu", 5, ASSERT_LINE, vector);
+	cputag_set_input_line_and_vector(device->machine(), "maincpu", 5, state, vector);
 //  cputag_set_input_line(device->machine(), "maincpu", 5, state ? ASSERT_LINE : CLEAR_LINE);
 };
 

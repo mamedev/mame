@@ -654,17 +654,20 @@ static const ymz280b_interface ymz280b_config =
 
 
 
-void bfm_sc4_duart_irq_handler(device_t *device, UINT8 vector)
+void bfm_sc4_duart_irq_handler(device_t *device, int state, UINT8 vector)
 {
 	// triggers after reel tests on luckb, at the start on dnd...
 	// not sure this is right, causes some games to crash
 	logerror("bfm_sc4_duart_irq_handler\n");
-	m68307_licr2_interrupt((legacy_cpu_device*)device->machine().device("maincpu"));
+    if (state == ASSERT_LINE)
+    {
+        m68307_licr2_interrupt((legacy_cpu_device*)device->machine().device("maincpu"));
+    }
 };
 
 void bfm_sc4_duart_tx(device_t *device, int channel, UINT8 data)
 {
-	logerror("bfm_sc4_duart_irq_handler\n");
+	logerror("bfm_sc4_duart_tx\n");
 };
 
 
@@ -706,10 +709,13 @@ static const duart68681_config bfm_sc4_duart68681_config =
 
 
 
-void m68307_duart_irq_handler(device_t *device, UINT8 vector)
+void m68307_duart_irq_handler(device_t *device, int state, UINT8 vector)
 {
 	logerror("m68307_duart_irq_handler\n");
-	m68307_serial_interrupt((legacy_cpu_device*)device->machine().device("maincpu"), vector);
+    if (state == ASSERT_LINE)
+    {
+        m68307_serial_interrupt((legacy_cpu_device*)device->machine().device("maincpu"), vector);
+    }
 };
 
 void m68307_duart_tx(device_t *device, int channel, UINT8 data)
