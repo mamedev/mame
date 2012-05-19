@@ -145,8 +145,8 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, tunhunt_state )
 	AM_RANGE(0x2400, 0x2400) AM_WRITENOP	/* INT ACK */
 	AM_RANGE(0x2800, 0x2800) AM_WRITE(tunhunt_control_w)
 	AM_RANGE(0x2c00, 0x2fff) AM_WRITEONLY AM_SHARE("spriteram")
-	AM_RANGE(0x3000, 0x300f) AM_DEVREADWRITE_LEGACY("pokey1", pokey_r, pokey_w)
-	AM_RANGE(0x4000, 0x400f) AM_DEVREADWRITE_LEGACY("pokey2", pokey_r, pokey_w)
+	AM_RANGE(0x3000, 0x300f) AM_DEVREADWRITE("pokey1", pokeyn_device, read, write)
+	AM_RANGE(0x4000, 0x400f) AM_DEVREADWRITE("pokey2", pokeyn_device, read, write)
 	AM_RANGE(0x5000, 0x7fff) AM_ROM
 	AM_RANGE(0xfffa, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -323,11 +323,11 @@ static MACHINE_CONFIG_START( tunhunt, tunhunt_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("pokey1", POKEY, 1209600)
+	MCFG_SOUND_ADD("pokey1", POKEYN, 1209600)
 	MCFG_SOUND_CONFIG(pokey_interface_1)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("pokey2", POKEY, 1209600)
+	MCFG_SOUND_ADD("pokey2", POKEYN, 1209600)
 	MCFG_SOUND_CONFIG(pokey_interface_2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END

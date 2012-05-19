@@ -97,8 +97,8 @@ static ADDRESS_MAP_START( runaway_map, AS_PROGRAM, 8, runaway_state )
 	AM_RANGE(0x3000, 0x3007) AM_READ(runaway_input_r)
 	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("4000")
 	AM_RANGE(0x5000, 0x5000) AM_DEVREAD("earom", atari_vg_earom_device, read)
-	AM_RANGE(0x6000, 0x600f) AM_DEVREADWRITE_LEGACY("pokey1", pokey_r,pokey_w)
-	AM_RANGE(0x7000, 0x700f) AM_DEVREADWRITE_LEGACY("pokey2", pokey_r,pokey_w)
+	AM_RANGE(0x6000, 0x600f) AM_DEVREADWRITE("pokey1", pokeyn_device, read, write)
+	AM_RANGE(0x7000, 0x700f) AM_DEVREADWRITE("pokey2", pokeyn_device, read, write)
 	AM_RANGE(0x8000, 0xcfff) AM_ROM
 	AM_RANGE(0xf000, 0xffff) AM_ROM	/* for the interrupt vectors */
 ADDRESS_MAP_END
@@ -373,11 +373,11 @@ static MACHINE_CONFIG_START( runaway, runaway_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("pokey1", POKEY, 12096000 / 8)
+	MCFG_SOUND_ADD("pokey1", POKEYN, 12096000 / 8)
 	MCFG_SOUND_CONFIG(pokey_interface_1)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("pokey2", POKEY, 12096000 / 8)
+	MCFG_SOUND_ADD("pokey2", POKEYN, 12096000 / 8)
 	MCFG_SOUND_CONFIG(pokey_interface_2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
