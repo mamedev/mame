@@ -80,8 +80,12 @@ public:
 	UINT8 m_hopper;
 	UINT16 m_igs_magic[2];
 	UINT8 m_scramble_data;
-	UINT8 m_prot[2];
 	int m_irq1_enable;
+
+	// lhzb2a protection:
+	UINT16 m_prot_regs[2], m_prot_val, m_prot_word, m_prot_m3, m_prot_mf;
+	UINT8 m_prot2;
+
 	int m_irq2_enable;
 	DECLARE_WRITE8_MEMBER(video_disable_w);
 	DECLARE_WRITE16_MEMBER(video_disable_lsb_w);
@@ -116,8 +120,15 @@ public:
 	DECLARE_READ16_MEMBER(lhzb2a_input_r);
 	DECLARE_WRITE16_MEMBER(lhzb2a_input_addr_w);
 	DECLARE_WRITE16_MEMBER(lhzb2a_input_select_w);
-	DECLARE_WRITE16_MEMBER(lhzb2a_magic_w);
-	DECLARE_READ16_MEMBER(lhzb2a_magic_r);
+
+	DECLARE_WRITE16_MEMBER(lhzb2a_prot_w);
+	DECLARE_READ16_MEMBER(lhzb2a_prot_r);
+
+	DECLARE_WRITE16_MEMBER(lhzb2a_prot2_reset_w);
+	DECLARE_WRITE16_MEMBER(lhzb2a_prot2_inc_w);
+	DECLARE_WRITE16_MEMBER(lhzb2a_prot2_dec_w);
+	DECLARE_READ16_MEMBER(lhzb2a_prot2_r);
+
 	DECLARE_WRITE16_MEMBER(lhzb2_magic_w);
 	DECLARE_READ16_MEMBER(lhzb2_magic_r);
 	DECLARE_WRITE16_MEMBER(slqz2_paletteram_w);
@@ -1031,21 +1042,6 @@ static DRIVER_INIT( lhzb2 )
 
 //lhzb2a
 
-static void lhzb2a_patch_rom(running_machine &machine)
-{
-	UINT16 *rom = (UINT16 *)machine.root_device().memregion("maincpu")->base();
-
-	// Prot. checks:
-	rom[0x09c52/2] = 0x6026;	// 009C52: 6726    beq $9c7a
-	rom[0x0c62c/2] = 0x6026;	// 00C62C: 6726    beq $c654
-	rom[0x0ea10/2] = 0x6030;	// 00EA10: 6730    beq $ea42
-	rom[0x23472/2] = 0x6026;	// 023472: 6726    beq $2349a
-	rom[0x6601a/2] = 0x6024;	// 06601A: 6724    beq $66040
-
-	// ROM check:
-	rom[0x32ab6/2] = 0x604e;	// 032AB6: 674E    beq $32b06
-}
-
 static DRIVER_INIT( lhzb2a )
 {
 	int i;
@@ -1106,7 +1102,6 @@ static DRIVER_INIT( lhzb2a )
 
 	lhzb2_decrypt_tiles(machine);
 	lhzb2_decrypt_sprites(machine);
-	lhzb2a_patch_rom(machine);
 }
 
 
@@ -1832,40 +1827,237 @@ ADDRESS_MAP_END
 // lhzb2a
 // To do: what devices are on this PCB?
 
+/***************************************************************************
 
-WRITE16_MEMBER(igs017_state::lhzb2a_magic_w)
+    LHZB2A Protection (similar to that found in igs011.c)
+
+    ---- Protection 1 (parametric bitswaps) ----
+
+    An address base register (xx = F0 at reset) determines where this protection device,
+    as well as game inputs and the address base register itself are mapped in memory:
+    inputs are mapped at xx8000, protection at xx4000 and base register at xxc000.
+
+    The protection involves an internal 16-bit value (val), two mode registers
+    (mode_f = 0..f, mode_3 = 0..3) and 8 x 16-bit registers (word).
+
+    The two modes affect the bitswap, and are set by loading the (same) mode-specific value
+    to all the word registers, and then writing to the mode_f or mode_3 trigger register.
+
+    The bitswap of the internal value is then performed writing to one of 8 trigger registers,
+    according to the modes, trigger register and value written.
+
+    The result is read through a fixed bitswap of the internal value.
+
+    ---- Protection 2 (simple inc,dec + bitswapped read) ----
+
+    The chip holds an internal 8-bit value. It is manipulated by issuing commands,
+    where each command is assigned a specific address range, and is triggered
+    by writing FF to that range. Possible commands:
+
+    - INC:   increment value
+    - DEC:   decrement value
+    - RESET: value = 0
+
+    The protection value is read from an additional address range:
+
+    - READ:  read bitswap(value). Only 4 bits are checked.
+
+***************************************************************************/
+
+// Bitswap protection
+
+WRITE16_MEMBER(igs017_state::lhzb2a_prot_w)
 {
-	COMBINE_DATA(&m_igs_magic[offset]);
+	COMBINE_DATA(&m_prot_regs[offset]);
 
 	if (offset == 0)
 		return;
 
-	switch(m_igs_magic[0])
+	switch(m_prot_regs[0])
 	{
-		// to do: m_prot values
-		default:
-			logerror("%s: warning, writing to igs_magic %02x = %02x\n", machine().describe_context(), m_igs_magic[0], data);
-	}
-}
-
-READ16_MEMBER(igs017_state::lhzb2a_magic_r)
-{
-	switch(m_igs_magic[0])
-	{
-		case 0x03:
+		case 0x40:	// prot_word
 		{
-			UINT8 a = BITSWAP8((UINT16)m_prot[0], 9,9,1,9,2,5,4,7);	// 9 means 0 value
-			UINT8 b = BITSWAP8((UINT16)m_prot[1], 5,2,9,7,9,9,9,9);
-			return a | b;
+			m_prot_word = (m_prot_word << 8) | (m_prot_regs[1] & 0xff);
+			break;
+		}
+		case 0x41:
+		case 0x42:
+		case 0x43:
+		case 0x44:
+		case 0x45:
+		case 0x46:
+		case 0x47:
+			// same value as reg 0x40
+			break;
+
+		case 0x48:	// mode_f
+		{
+			switch (m_prot_word)
+			{
+				case 0x9a96:	m_prot_mf = 0x0;	break;
+				case 0x9a06:	m_prot_mf = 0x1;	break;
+				case 0x9a90:	m_prot_mf = 0x2;	break;
+				case 0x9a00:	m_prot_mf = 0x3;	break;
+				case 0x0a96:	m_prot_mf = 0x4;	break;
+				case 0x0a06:	m_prot_mf = 0x5;	break;
+				case 0x0a90:	m_prot_mf = 0x6;	break;
+				case 0x0a00:	m_prot_mf = 0x7;	break;
+				case 0x9096:	m_prot_mf = 0x8;	break;
+				case 0x9006:	m_prot_mf = 0x9;	break;
+				case 0x9090:	m_prot_mf = 0xa;	break;
+				case 0x9000:	m_prot_mf = 0xb;	break;
+				case 0x0096:	m_prot_mf = 0xc;	break;
+				case 0x0006:	m_prot_mf = 0xd;	break;
+				case 0x0090:	m_prot_mf = 0xe;	break;
+				case 0x0000:	m_prot_mf = 0xf;	break;
+				default:
+					m_prot_mf = 0;
+					logerror("%s: warning, setting mode_f with unknown prot_word = %02x\n", machine().describe_context(), m_prot_word);
+					return;
+			}
+
+			logerror("%s: mode_f = %02x\n", machine().describe_context(), m_prot_mf);
+			break;
+		}
+
+		case 0x50:	// mode_3
+		{
+			switch (m_prot_word & 0xff)
+			{
+				case 0x53:	m_prot_m3 = 0x0;	break;
+				case 0x03:	m_prot_m3 = 0x1;	break;
+				case 0x50:	m_prot_m3 = 0x2;	break;
+				case 0x00:	m_prot_m3 = 0x3;	break;
+				default:
+					m_prot_m3 = 0;
+					logerror("%s: warning, setting mode_3 with unknown prot_word = %02x\n", machine().describe_context(), m_prot_word);
+					return;
+			}
+
+			logerror("%s: mode_3 = %02x\n", machine().describe_context(), m_prot_m3);
+			break;
+		}
+
+		case 0x80:	// do bitswap
+		case 0x81:
+		case 0x82:
+		case 0x83:
+		case 0x84:
+		case 0x85:
+		case 0x86:
+		case 0x87:
+		{
+			UINT16 x  = m_prot_val;
+			UINT16 mf = m_prot_mf;
+
+			UINT16 bit0 = 0;
+			switch (m_prot_m3)
+			{
+				case 0:	bit0 = BIT(~x,12) ^ BIT(~x,15) ^ BIT( x, 8) ^ BIT(~x, 3);	break;
+				case 1:	bit0 = BIT(~x, 6) ^ BIT(~x,15) ^ BIT(~x, 3) ^ BIT(~x, 9);	break;
+				case 2:	bit0 = BIT(~x, 3) ^ BIT(~x,15) ^ BIT(~x, 5) ^ BIT( x, 4);	break;
+				case 3:	bit0 = BIT(~x,15) ^ BIT(~x, 9) ^ BIT( x,12) ^ BIT(~x,11);	break;
+			}
+
+			UINT16 xor0 = BIT(m_prot_regs[1], m_prot_regs[0] - 0x80);
+			bit0 ^= xor0;
+
+			m_prot_val	=	(	 BIT( x,14)					<< 15	) |
+							(	(BIT(~x,13) ^ BIT(mf,3))	<< 14	) |
+							(	 BIT( x,12)					<< 13	) |
+							(	 BIT(~x,11)					<< 12	) |
+							(	(BIT( x,10) ^ BIT(mf,2))	<< 11	) |
+							(	 BIT( x, 9)					<< 10	) |
+							(	 BIT( x, 8)					<<  9	) |
+							(	(BIT(~x, 7) ^ BIT(mf,1))	<<  8	) |
+							(	 BIT( x, 6)					<<  7	) |
+							(	 BIT( x, 5)					<<  6	) |
+							(	(BIT(~x, 4) ^ BIT(mf,0))	<<  5	) |
+							(	 BIT(~x, 3)					<<  4	) |
+							(	 BIT( x, 2)					<<  3	) |
+							(	 BIT(~x, 1)					<<  2	) |
+							(	 BIT( x, 0)					<<  1	) |
+							(	 bit0						<<  0	) ;
+			
+			logerror("%s: exec bitswap - mode_3 %02x, mode_f %02x, xor0 %x, val %04x -> %04x\n", machine().describe_context(), m_prot_m3, m_prot_mf, xor0, x, m_prot_val);
+
+			break;
+		}
+
+		case 0xa0:	// reset
+		{
+			m_prot_val = 0;
+			break;
 		}
 
 		default:
-			logerror("%s: warning, reading with igs_magic = %02x\n", machine().describe_context(), m_igs_magic[0]);
+			logerror("%s: warning, writing to prot_reg %02x = %02x\n", machine().describe_context(), m_prot_regs[0], m_prot_regs[1]);
+	}
+}
+
+READ16_MEMBER(igs017_state::lhzb2a_prot_r)
+{
+	switch(m_prot_regs[0])
+	{
+		case 0x03:	// result
+		{
+			UINT16 x = m_prot_val;
+			UINT16 res	=	(BIT(x, 5) << 7) |
+							(BIT(x, 2) << 6) |
+							(BIT(x, 9) << 5) |
+							(BIT(x, 7) << 4) |
+							(BIT(x,10) << 3) |
+							(BIT(x,13) << 2) |
+							(BIT(x,12) << 1) |
+							(BIT(x,15) << 0) ;
+
+			logerror("%s: read bitswap - val %04x -> %02x\n", machine().describe_context(), m_prot_val, res);
+			return res;
+
+			break;
+		}
+
+		default:
+			logerror("%s: warning, reading with prot_reg = %02x\n", machine().describe_context(), m_prot_regs[0]);
 			break;
 	}
 
 	return 0xffff;
 }
+
+// Protection 2
+
+WRITE16_MEMBER(igs017_state::lhzb2a_prot2_reset_w)
+{
+	m_prot2 = 0x00;
+	logerror("%s: prot2 reset -> %02x\n", machine().describe_context(), m_prot2);
+}
+
+WRITE16_MEMBER(igs017_state::lhzb2a_prot2_inc_w)
+{
+	m_prot2++;
+	logerror("%s: prot2 inc -> %02x\n", machine().describe_context(), m_prot2);
+}
+
+WRITE16_MEMBER(igs017_state::lhzb2a_prot2_dec_w)
+{
+	m_prot2--;
+	logerror("%s: prot2 dec -> %02x\n", machine().describe_context(), m_prot2);
+}
+
+READ16_MEMBER(igs017_state::lhzb2a_prot2_r)
+{
+	UINT8 x		=	m_prot2;
+	UINT8 res	=	(BIT(x, 0) << 7) |
+					(BIT(x, 3) << 5) |
+					(BIT(x, 2) << 4) |
+					(BIT(x, 1) << 2) ;
+
+	logerror("%s: prot2 read, %02x -> %02x\n", machine().describe_context(), m_prot2, res);
+	return res;
+}
+
+
 
 WRITE16_MEMBER(igs017_state::lhzb2a_paletteram_w)
 {
@@ -1921,9 +2113,11 @@ WRITE16_MEMBER(igs017_state::lhzb2a_input_addr_w)
 	m_input_addr = data & 0xff;
 
 	// Add new memory ranges
-	space.install_readwrite_handler (m_input_addr * 0x10000 + 0x4000, m_input_addr * 0x10000 + 0x4003, read16_delegate (FUNC(igs017_state::lhzb2a_magic_r),      this), write16_delegate (FUNC(igs017_state::lhzb2a_magic_w),      this));
+	space.install_readwrite_handler (m_input_addr * 0x10000 + 0x4000, m_input_addr * 0x10000 + 0x4003, read16_delegate (FUNC(igs017_state::lhzb2a_prot_r),      this), write16_delegate (FUNC(igs017_state::lhzb2a_prot_w),      this));
 	space.install_read_handler      (m_input_addr * 0x10000 + 0x8000, m_input_addr * 0x10000 + 0x8005, read16_delegate (FUNC(igs017_state::lhzb2a_input_r),      this));
 	space.install_write_handler     (m_input_addr * 0x10000 + 0xc000, m_input_addr * 0x10000 + 0xc001, write16_delegate(FUNC(igs017_state::lhzb2a_input_addr_w), this));
+
+	logerror("%s: inputs and protection remapped at %02xxxxx\n", machine().describe_context(), m_input_addr);
 }
 
 WRITE16_MEMBER(igs017_state::lhzb2a_input_select_w)
@@ -1946,9 +2140,15 @@ WRITE16_MEMBER(igs017_state::lhzb2a_input_select_w)
 }
 
 static ADDRESS_MAP_START( lhzb2a, AS_PROGRAM, 16, igs017_state )
+	// prot2
+	AM_RANGE(0x003200, 0x003201) AM_WRITE( lhzb2a_prot2_reset_w )
+	AM_RANGE(0x003202, 0x003203) AM_WRITE( lhzb2a_prot2_dec_w )
+	AM_RANGE(0x003206, 0x003207) AM_WRITE( lhzb2a_prot2_inc_w )
+	AM_RANGE(0x00320a, 0x00320b) AM_READ( lhzb2a_prot2_r )
+
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x500000, 0x503fff) AM_RAM
-//  AM_RANGE(0x910000, 0x910003) protection
+//	AM_RANGE(0x910000, 0x910003) accesses appear to be from leftover code where the final checks were disabled
 	AM_RANGE(0xb02000, 0xb02fff) AM_READWRITE( spriteram_lsb_r, spriteram_lsb_w ) AM_SHARE("spriteram")
 	AM_RANGE(0xb03000, 0xb037ff) AM_RAM_WRITE( lhzb2a_paletteram_w ) AM_SHARE("paletteram")
 	AM_RANGE(0xb04024, 0xb04025) AM_WRITE( video_disable_lsb_w )
@@ -2327,12 +2527,14 @@ static INPUT_PORTS_START( lhzb2a )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("COINS")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_SERVICE2  )	// shown in test mode
+	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_UNKNOWN   )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL   )	// hopper switch
 	PORT_SERVICE_NO_TOGGLE( 0x04,   IP_ACTIVE_LOW )	// keep pressed while booting
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_SERVICE1  ) PORT_NAME("Statistics") // press with the above for sound test
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_COIN1     ) PORT_IMPULSE(2)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_OTHER     ) PORT_NAME("Pay Out") PORT_CODE(KEYCODE_O)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_SERVICE3  )	// shown in test mode
+	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN   )
 
 	PORT_START("KEY0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A )
