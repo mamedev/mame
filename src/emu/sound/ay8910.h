@@ -73,6 +73,10 @@ YMZ294: 0 I/O port
 #define YM2149_PIN26_HIGH			(0x00) /* or N/C */
 #define YM2149_PIN26_LOW			(0x10)
 
+
+#define AY8910_INTERFACE(name) \
+	const ay8910_interface (name) =
+
 typedef struct _ay8910_interface ay8910_interface;
 struct _ay8910_interface
 {
