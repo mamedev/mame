@@ -418,8 +418,8 @@ static int drawdd_window_draw(win_window_info *window, HDC dc, int update)
 		{
 			case 0x00ff0000:	software_renderer<UINT32, 0,0,0, 16,8,0, true>::draw_primitives(*window->primlist, dd->blitdesc.lpSurface, dd->blitwidth, dd->blitheight, dd->blitdesc.lPitch / 4);	break;
 			case 0x000000ff:	software_renderer<UINT32, 0,0,0, 0,8,16, true>::draw_primitives(*window->primlist, dd->blitdesc.lpSurface, dd->blitwidth, dd->blitheight, dd->blitdesc.lPitch / 4);	break;
-			case 0xf800:		software_renderer<UINT32, 3,2,3, 11,5,0, true>::draw_primitives(*window->primlist, dd->blitdesc.lpSurface, dd->blitwidth, dd->blitheight, dd->blitdesc.lPitch / 2);	break;
-			case 0x7c00:		software_renderer<UINT32, 3,3,3, 10,5,0, true>::draw_primitives(*window->primlist, dd->blitdesc.lpSurface, dd->blitwidth, dd->blitheight, dd->blitdesc.lPitch / 2);	break;
+			case 0xf800:		software_renderer<UINT16, 3,2,3, 11,5,0, true>::draw_primitives(*window->primlist, dd->blitdesc.lpSurface, dd->blitwidth, dd->blitheight, dd->blitdesc.lPitch / 2);	break;
+			case 0x7c00:		software_renderer<UINT16, 3,3,3, 10,5,0, true>::draw_primitives(*window->primlist, dd->blitdesc.lpSurface, dd->blitwidth, dd->blitheight, dd->blitdesc.lPitch / 2);	break;
 			default:
 				mame_printf_verbose("DirectDraw: Unknown target mode: R=%08X G=%08X B=%08X\n", (int)dd->blitdesc.ddpfPixelFormat.dwRBitMask, (int)dd->blitdesc.ddpfPixelFormat.dwGBitMask, (int)dd->blitdesc.ddpfPixelFormat.dwBBitMask);
 				break;
