@@ -369,8 +369,8 @@ static ADDRESS_MAP_START( bwidow_map, AS_PROGRAM, 8, bwidow_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x2000, 0x27ff) AM_RAM AM_BASE_LEGACY(&avgdvg_vectorram) AM_SIZE_LEGACY(&avgdvg_vectorram_size) AM_REGION("maincpu", 0x2000)
 	AM_RANGE(0x2800, 0x5fff) AM_ROM
-	AM_RANGE(0x6000, 0x67ff) AM_DEVREADWRITE_LEGACY("pokey1", pokey_r, pokey_w)
-	AM_RANGE(0x6800, 0x6fff) AM_DEVREADWRITE_LEGACY("pokey2", pokey_r, pokey_w)
+	AM_RANGE(0x6000, 0x67ff) AM_DEVREADWRITE("pokey1", pokeyn_device, read, write)
+	AM_RANGE(0x6800, 0x6fff) AM_DEVREADWRITE("pokey2", pokeyn_device, read, write)
 	AM_RANGE(0x7000, 0x7000) AM_DEVREAD("earom", atari_vg_earom_device, read)
 	AM_RANGE(0x7800, 0x7800) AM_READ_PORT("IN0")
 	AM_RANGE(0x8000, 0x8000) AM_READ_PORT("IN3")
@@ -399,8 +399,8 @@ static ADDRESS_MAP_START( spacduel_map, AS_PROGRAM, 8, bwidow_state )
 	AM_RANGE(0x0e00, 0x0e00) AM_WRITE(irq_ack_w) /* interrupt acknowledge */
 	AM_RANGE(0x0e80, 0x0e80) AM_DEVWRITE("earom", atari_vg_earom_device, ctrl_w)
 	AM_RANGE(0x0f00, 0x0f3f) AM_DEVWRITE("earom", atari_vg_earom_device, write)
-	AM_RANGE(0x1000, 0x100f) AM_DEVREADWRITE_LEGACY("pokey1", pokey_r, pokey_w)
-	AM_RANGE(0x1400, 0x140f) AM_DEVREADWRITE_LEGACY("pokey2", pokey_r, pokey_w)
+	AM_RANGE(0x1000, 0x100f) AM_DEVREADWRITE("pokey1", pokeyn_device, read, write)
+	AM_RANGE(0x1400, 0x140f) AM_DEVREADWRITE("pokey2", pokeyn_device, read, write)
 	AM_RANGE(0x2000, 0x27ff) AM_RAM AM_BASE_LEGACY(&avgdvg_vectorram) AM_SIZE_LEGACY(&avgdvg_vectorram_size) AM_REGION("maincpu", 0x2000)
 	AM_RANGE(0x2800, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0xffff) AM_ROM
@@ -744,11 +744,11 @@ static MACHINE_CONFIG_START( bwidow, bwidow_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("pokey1", POKEY, MASTER_CLOCK / 8)
+	MCFG_SOUND_ADD("pokey1", POKEYN, MASTER_CLOCK / 8)
 	MCFG_SOUND_CONFIG(pokey_interface_1)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("pokey2", POKEY, MASTER_CLOCK / 8)
+	MCFG_SOUND_ADD("pokey2", POKEYN, MASTER_CLOCK / 8)
 	MCFG_SOUND_CONFIG(pokey_interface_2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END

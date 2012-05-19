@@ -221,9 +221,9 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, foodf_state )
 	AM_RANGE(0x950000, 0x9501ff) AM_MIRROR(0x023e00) AM_WRITE(foodf_paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0x954000, 0x954001) AM_MIRROR(0x023ffe) AM_WRITE(nvram_recall_w)
 	AM_RANGE(0x958000, 0x958001) AM_MIRROR(0x023ffe) AM_READWRITE(watchdog_reset16_r, watchdog_reset16_w)
-	AM_RANGE(0xa40000, 0xa4001f) AM_MIRROR(0x03ffe0) AM_DEVREADWRITE8_LEGACY("pokey2", pokey_r, pokey_w, 0x00ff)
-	AM_RANGE(0xa80000, 0xa8001f) AM_MIRROR(0x03ffe0) AM_DEVREADWRITE8_LEGACY("pokey1", pokey_r, pokey_w, 0x00ff)
-	AM_RANGE(0xac0000, 0xac001f) AM_MIRROR(0x03ffe0) AM_DEVREADWRITE8_LEGACY("pokey3", pokey_r, pokey_w, 0x00ff)
+	AM_RANGE(0xa40000, 0xa4001f) AM_MIRROR(0x03ffe0) AM_DEVREADWRITE8("pokey2", pokeyn_device, read, write, 0x00ff)
+	AM_RANGE(0xa80000, 0xa8001f) AM_MIRROR(0x03ffe0) AM_DEVREADWRITE8("pokey1", pokeyn_device, read, write, 0x00ff)
+	AM_RANGE(0xac0000, 0xac001f) AM_MIRROR(0x03ffe0) AM_DEVREADWRITE8("pokey3", pokeyn_device, read, write, 0x00ff)
 ADDRESS_MAP_END
 
 
@@ -380,14 +380,14 @@ static MACHINE_CONFIG_START( foodf, foodf_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("pokey1", POKEY, MASTER_CLOCK/2/10)
+	MCFG_SOUND_ADD("pokey1", POKEYN, MASTER_CLOCK/2/10)
 	MCFG_SOUND_CONFIG(pokey_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 
-	MCFG_SOUND_ADD("pokey2", POKEY, MASTER_CLOCK/2/10)
+	MCFG_SOUND_ADD("pokey2", POKEYN, MASTER_CLOCK/2/10)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 
-	MCFG_SOUND_ADD("pokey3", POKEY, MASTER_CLOCK/2/10)
+	MCFG_SOUND_ADD("pokey3", POKEYN, MASTER_CLOCK/2/10)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 MACHINE_CONFIG_END
 

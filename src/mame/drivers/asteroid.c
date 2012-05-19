@@ -263,7 +263,7 @@ static ADDRESS_MAP_START( astdelux_map, AS_PROGRAM, 8, asteroid_state )
 	AM_RANGE(0x2000, 0x2007) AM_READ(asteroid_IN0_r)	/* IN0 */
 	AM_RANGE(0x2400, 0x2407) AM_READ(asteroid_IN1_r)	/* IN1 */
 	AM_RANGE(0x2800, 0x2803) AM_READ(asteroid_DSW1_r)	/* DSW1 */
-	AM_RANGE(0x2c00, 0x2c0f) AM_DEVREADWRITE_LEGACY("pokey", pokey_r, pokey_w)
+	AM_RANGE(0x2c00, 0x2c0f) AM_DEVREADWRITE("pokey", pokeyn_device, read, write)
 	AM_RANGE(0x2c40, 0x2c7f) AM_DEVREAD("earom", atari_vg_earom_device, read)
 	AM_RANGE(0x3000, 0x3000) AM_WRITE_LEGACY(avgdvg_go_w)
 	AM_RANGE(0x3200, 0x323f) AM_DEVWRITE("earom", atari_vg_earom_device, write)
@@ -657,7 +657,7 @@ static MACHINE_CONFIG_DERIVED( astdelux, asteroid )
 	MCFG_SOUND_CONFIG_DISCRETE(astdelux)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_SOUND_ADD("pokey", POKEY, MASTER_CLOCK/8)
+	MCFG_SOUND_ADD("pokey", POKEYN, MASTER_CLOCK/8)
 	MCFG_SOUND_CONFIG(pokey_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END

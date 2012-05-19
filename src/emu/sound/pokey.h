@@ -21,6 +21,11 @@
 
 #include "devlegcy.h"
 
+/* uncomment the line below for MESS to avoid breaking compile
+ * please migrate as soon as possible to new device so that we can get rid of the legacy */
+
+//#define OLDDEVICE_FOR_MESS 1
+
 /* CONSTANT DEFINITIONS */
 
 /* POKEY WRITE LOGICALS */
@@ -78,7 +83,7 @@ struct _pokey_interface
 	void (*interrupt_cb)(device_t *device, int mask);
 };
 
-
+#ifdef OLDDEVICE_FOR_MESS
 READ8_DEVICE_HANDLER( pokey_r );
 WRITE8_DEVICE_HANDLER( pokey_w );
 
@@ -92,10 +97,11 @@ void pokey_kbcode_w (device_t *device, int kbcode, int make);
 
 DECLARE_LEGACY_SOUND_DEVICE(POKEY, pokey);
 
+#endif
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
-
 
 // ======================> pokey_device
 
@@ -108,6 +114,13 @@ public:
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
+
+	UINT8 read(offs_t offset);
+	void  write(offs_t offset, UINT8 data);
+
+	void serin_ready(int after);
+	void break_w(int shift);
+	void kbcode_w(int kbcode, int make);
 
 protected:
 	// device-level overrides
@@ -132,9 +145,6 @@ private:
 	inline void inc_chan(int ch);
 	inline int check_borrow(int ch);
 	void pokey_potgo(void);
-	void write_cmd(int offset, UINT8 data);
-
-
 
 	// internal state
 	sound_stream* m_stream;
@@ -190,6 +200,11 @@ private:
 
 // device type definition
 extern const device_type POKEYN;
+
+
+/* fix me: eventually this should be a single device with pokey subdevices */
+READ8_HANDLER( quad_pokeyn_r );
+WRITE8_HANDLER( quad_pokeyn_w );
 
 
 #endif	/* __POKEY_H__ */

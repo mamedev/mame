@@ -159,7 +159,7 @@ static int atari_last;
 
 void a800_handle_keyboard(running_machine &machine)
 {
-	device_t *pokey = machine.device("pokey");
+	pokeyn_device *pokey = machine.device<pokeyn_device>("pokey");
 	int atari_code, count, ipt, i;
 	static const char *const tag[] = {
 		"keyboard_0", "keyboard_1", "keyboard_2", "keyboard_3",
@@ -198,18 +198,18 @@ void a800_handle_keyboard(running_machine &machine)
 
 				if( (atari_code & 0x3f) == AKEY_BREAK )
 				{
-					pokey_break_w(pokey, atari_code & 0x40);
+					pokey->break_w(atari_code & 0x40);
 					return;
 				}
 
-				pokey_kbcode_w(pokey, atari_code, 1);
+				pokey->kbcode_w(atari_code, 1);
 				return;
 			}
 		}
 
 	}
 	/* remove key pressed status bit from skstat */
-	pokey_kbcode_w(pokey, AKEY_NONE, 0);
+	pokey->kbcode_w(AKEY_NONE, 0);
 	atari_last = AKEY_NONE;
 }
 
@@ -244,7 +244,7 @@ void a800_handle_keyboard(running_machine &machine)
 
 void a5200_handle_keypads(running_machine &machine)
 {
-	device_t *pokey = machine.device("pokey");
+	pokeyn_device *pokey = downcast<pokeyn_device *>(machine.device("pokey"));
 	int atari_code, count, ipt, i;
 	static const char *const tag[] = { "keypad_0", "keypad_1", "keypad_2", "keypad_3" };
 
@@ -270,11 +270,11 @@ void a5200_handle_keypads(running_machine &machine)
 
 			if( atari_code == 0 )
 			{
-				pokey_break_w(pokey, atari_code & 0x40);
+				pokey->break_w(atari_code & 0x40);
 				return;
 			}
 
-			pokey_kbcode_w(pokey, (atari_code << 1) | 0x21, 1);
+			pokey->kbcode_w((atari_code << 1) | 0x21, 1);
 			return;
 		}
 
@@ -285,16 +285,16 @@ void a5200_handle_keypads(running_machine &machine)
 	{
 		if (atari_last == 0xfe)
 			return;
-		pokey_kbcode_w(pokey, 0x61, 1);
+		pokey->kbcode_w(0x61, 1);
 		//pokey_break_w(pokey, 0x40);
 		atari_last = 0xfe;
 		return;
 	}
 	else if (atari_last == 0xfe)
-		pokey_kbcode_w(pokey, 0x21, 1);
+		pokey->kbcode_w(0x21, 1);
 
 	/* remove key pressed status bit from skstat */
-	pokey_kbcode_w(pokey, 0xff, 0);
+	pokey->kbcode_w(0xff, 0);
 	atari_last = 0xff;
 }
 
@@ -308,8 +308,8 @@ void a5200_handle_keypads(running_machine &machine)
 
 static void pokey_reset(running_machine &machine)
 {
-	device_t *pokey = machine.device("pokey");
-	pokey_w(pokey,15,0);
+	pokeyn_device *pokey = downcast<pokeyn_device *>(machine.device("pokey"));
+	pokey->write(15,0);
 	atari_last = 0xff;
 }
 

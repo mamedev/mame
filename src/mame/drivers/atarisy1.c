@@ -504,7 +504,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, atarisy1_state )
 	AM_RANGE(0x1810, 0x1810) AM_READWRITE_LEGACY(atarigen_6502_sound_r, atarigen_6502_sound_w)
 	AM_RANGE(0x1820, 0x1820) AM_READ(switch_6502_r)
 	AM_RANGE(0x1824, 0x1825) AM_WRITE(led_w)
-	AM_RANGE(0x1870, 0x187f) AM_DEVREADWRITE_LEGACY("pokey", pokey_r, pokey_w)
+	AM_RANGE(0x1870, 0x187f) AM_DEVREADWRITE("pokey", pokeyn_device, read, write)
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -795,7 +795,7 @@ static MACHINE_CONFIG_START( atarisy1, atarisy1_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
 
-	MCFG_SOUND_ADD("pokey", POKEY, ATARI_CLOCK_14MHz/8)
+	MCFG_SOUND_ADD("pokey", POKEYN, ATARI_CLOCK_14MHz/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
 

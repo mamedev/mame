@@ -550,10 +550,10 @@ static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8, firefox_state )
 	AM_RANGE(0x0880, 0x089f) AM_MIRROR(0x07e0) AM_DEVREADWRITE_LEGACY("riot",riot6532_r, riot6532_w)
 	AM_RANGE(0x1000, 0x1000) AM_READ(main_to_sound_r)
 	AM_RANGE(0x1800, 0x1800) AM_WRITE(sound_to_main_w)
-	AM_RANGE(0x2000, 0x200f) AM_DEVREADWRITE_LEGACY("pokey1", pokey_r, pokey_w)
-	AM_RANGE(0x2800, 0x280f) AM_DEVREADWRITE_LEGACY("pokey2", pokey_r, pokey_w)
-	AM_RANGE(0x3000, 0x300f) AM_DEVREADWRITE_LEGACY("pokey3", pokey_r, pokey_w)
-	AM_RANGE(0x3800, 0x380f) AM_DEVREADWRITE_LEGACY("pokey4", pokey_r, pokey_w)
+	AM_RANGE(0x2000, 0x200f) AM_DEVREADWRITE("pokey1", pokeyn_device, read, write)
+	AM_RANGE(0x2800, 0x280f) AM_DEVREADWRITE("pokey2", pokeyn_device, read, write)
+	AM_RANGE(0x3000, 0x300f) AM_DEVREADWRITE("pokey3", pokeyn_device, read, write)
+	AM_RANGE(0x3800, 0x380f) AM_DEVREADWRITE("pokey4", pokeyn_device, read, write)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -727,19 +727,19 @@ static MACHINE_CONFIG_START( firefox, firefox_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("pokey1", POKEY, MASTER_XTAL/8)
+	MCFG_SOUND_ADD("pokey1", POKEYN, MASTER_XTAL/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.30)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.30)
 
-	MCFG_SOUND_ADD("pokey2", POKEY, MASTER_XTAL/8)
+	MCFG_SOUND_ADD("pokey2", POKEYN, MASTER_XTAL/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.30)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.30)
 
-	MCFG_SOUND_ADD("pokey3", POKEY, MASTER_XTAL/8)
+	MCFG_SOUND_ADD("pokey3", POKEYN, MASTER_XTAL/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.30)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.30)
 
-	MCFG_SOUND_ADD("pokey4", POKEY, MASTER_XTAL/8)
+	MCFG_SOUND_ADD("pokey4", POKEYN, MASTER_XTAL/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.30)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.30)
 

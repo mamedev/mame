@@ -137,7 +137,7 @@ static ADDRESS_MAP_START( irobot_map, AS_PROGRAM, 8, irobot_state )
     AM_RANGE(0x11c0, 0x11c0) AM_WRITE(irobot_rom_banksel_w)
     AM_RANGE(0x1200, 0x12ff) AM_RAM_WRITE(irobot_nvram_w) AM_SHARE("nvram")
     AM_RANGE(0x1300, 0x13ff) AM_READ(irobot_control_r)
-    AM_RANGE(0x1400, 0x143f) AM_READWRITE_LEGACY(quad_pokey_r, quad_pokey_w)
+    AM_RANGE(0x1400, 0x143f) AM_READWRITE_LEGACY(quad_pokeyn_r, quad_pokeyn_w)
     AM_RANGE(0x1800, 0x18ff) AM_WRITE(irobot_paletteram_w)
     AM_RANGE(0x1900, 0x19ff) AM_WRITEONLY            /* Watchdog reset */
     AM_RANGE(0x1a00, 0x1a00) AM_WRITE(irobot_clearfirq_w)
@@ -317,17 +317,17 @@ static MACHINE_CONFIG_START( irobot, irobot_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("pokey1", POKEY, MAIN_CLOCK/8)
+	MCFG_SOUND_ADD("pokey1", POKEYN, MAIN_CLOCK/8)
 	MCFG_SOUND_CONFIG(pokey_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("pokey2", POKEY, MAIN_CLOCK/8)
+	MCFG_SOUND_ADD("pokey2", POKEYN, MAIN_CLOCK/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("pokey3", POKEY, MAIN_CLOCK/8)
+	MCFG_SOUND_ADD("pokey3", POKEYN, MAIN_CLOCK/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("pokey4", POKEY, MAIN_CLOCK/8)
+	MCFG_SOUND_ADD("pokey4", POKEYN, MAIN_CLOCK/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 

@@ -863,7 +863,7 @@ void atarigen_set_ym2413_vol(running_machine &machine, int volume)
 
 void atarigen_set_pokey_vol(running_machine &machine, int volume)
 {
-	atarigen_set_vol(machine, volume, POKEY);
+	atarigen_set_vol(machine, volume, POKEYN);
 }
 
 void atarigen_set_tms5220_vol(running_machine &machine, int volume)

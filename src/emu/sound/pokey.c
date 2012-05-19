@@ -87,9 +87,9 @@
 
 #define VERBOSE 		1
 #define VERBOSE_SOUND	0
-#define VERBOSE_TIMER	0
-#define VERBOSE_POLY	1
-#define VERBOSE_RAND	1
+#define VERBOSE_TIMER	1
+#define VERBOSE_POLY	0
+#define VERBOSE_RAND	0
 
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
@@ -457,26 +457,6 @@ static void rand_init(UINT8 *rng, int size, int left, int right, int add)
 
 }
 
-#if 0
-static void rand_init_old(UINT8 *rng, int size, int left, int right, int add)
-{
-    int mask = (1 << size) - 1;
-    int i, x = 0;
-
-	LOG_RAND(("rand %d\n", size));
-    for( i = 0; i < mask; i++ )
-	{
-		if (size == 17)
-			*rng = x >> 6;	/* use bits 6..13 */
-		else
-			*rng = x;		/* use bits 0..7 */
-        LOG_RAND(("%05x: %02x\n", x, *rng));
-        rng++;
-        /* calculate next bit */
-		x = ((x << left) + (x >> right) + add) & mask;
-	}
-}
-#endif
 
 static void register_for_save(pokey_state *chip, device_t *device)
 {
@@ -1271,10 +1251,11 @@ DEVICE_GET_INFO( pokey )
 	}
 }
 
+#ifdef OLDDEVICE_FOR_MESS
 
 DEFINE_LEGACY_SOUND_DEVICE(POKEY, pokey);
 
-
+#endif
 
 
 
@@ -1481,6 +1462,18 @@ void pokeyn_device::device_timer(emu_timer &timer, device_timer_id id, int param
 				(m_interrupt_cb)(this, IRQ_SEROC);
 		}
 	}
+	else if (id == 5)
+	{
+		/* serin_ready */
+	    if( m_IRQEN & IRQ_SERIN )
+		{
+			/* set the enabled timer irq status bits */
+			m_IRQST |= IRQ_SERIN;
+			/* call back an application supplied function to handle the interrupt */
+			if( m_interrupt_cb )
+				(m_interrupt_cb)(this, IRQ_SERIN);
+		}
+	}
 	else
 		assert_always(FALSE, "Unknown id in pokey_device::device_timer");
 }
@@ -1613,6 +1606,11 @@ void pokeyn_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 
 READ8_MEMBER( pokeyn_device::read )
 {
+	return read(offset);
+}
+
+UINT8 pokeyn_device::read(offs_t offset)
+{
 	int data = 0, pot;
 	UINT32 adjust = 0;
 
@@ -1741,10 +1739,10 @@ READ8_MEMBER( pokeyn_device::read )
 
 WRITE8_MEMBER( pokeyn_device::write )
 {
-	write_cmd(offset, data);
+	write(offset, data);
 }
 
-void pokeyn_device::write_cmd(int offset, UINT8 data)
+void pokeyn_device::write(offs_t offset, UINT8 data)
 {
 	int ch_mask = 0, new_val;
 
@@ -1977,8 +1975,8 @@ void pokeyn_device::write_cmd(int offset, UINT8 data)
 		m_SKCTL = data;
         if( !(data & SK_RESET) )
         {
-            write_cmd(IRQEN_C,  0);
-            write_cmd(SKREST_C, 0);
+            write(IRQEN_C,  0);
+            write(SKREST_C, 0);
         }
         break;
     }
@@ -2070,6 +2068,57 @@ void pokeyn_device::write_cmd(int offset, UINT8 data)
 			m_timer[TIMER4]->adjust(m_clock_period * new_val, m_timer_param[TIMER4], m_timer_period[TIMER4]);
     }
 }
+
+void pokeyn_device::serin_ready(int after)
+{
+	timer_set(m_clock_period * after, 5, 0);
+}
+
+void pokeyn_device::break_w(int shift)
+{
+	if( shift )                     /* shift code ? */
+		m_SKSTAT |= SK_SHIFT;
+	else
+		m_SKSTAT &= ~SK_SHIFT;
+	/* check if the break IRQ is enabled */
+	if( m_IRQEN & IRQ_BREAK )
+	{
+		/* set break IRQ status and call back the interrupt handler */
+		m_IRQST |= IRQ_BREAK;
+		if( m_interrupt_cb )
+			(*m_interrupt_cb)(this, IRQ_BREAK);
+	}
+}
+
+void pokeyn_device::kbcode_w(int kbcode, int make)
+{
+    /* make code ? */
+	if( make )
+	{
+		m_KBCODE = kbcode;
+		m_SKSTAT |= SK_KEYBD;
+		if( kbcode & 0x40 ) 		/* shift code ? */
+			m_SKSTAT |= SK_SHIFT;
+		else
+			m_SKSTAT &= ~SK_SHIFT;
+
+		if( m_IRQEN & IRQ_KEYBD )
+		{
+			/* last interrupt not acknowledged ? */
+			if( m_IRQST & IRQ_KEYBD )
+				m_SKSTAT |= SK_KBERR;
+			m_IRQST |= IRQ_KEYBD;
+			if( m_interrupt_cb )
+				(*m_interrupt_cb)(this, IRQ_KEYBD);
+		}
+	}
+	else
+	{
+		m_KBCODE = kbcode;
+		m_SKSTAT &= ~SK_KEYBD;
+    }
+}
+
 
 
 //-------------------------------------------------
@@ -2220,3 +2269,31 @@ void pokeyn_device::poly_init_9_17(UINT32 *poly, int size)
 	}
 
 }
+
+//-------------------------------------------------
+//  Quad Pokey support - should be in game drivers, really
+//-------------------------------------------------
+
+
+READ8_HANDLER( quad_pokeyn_r )
+{
+	static const char *const devname[4] = { "pokey1", "pokey2", "pokey3", "pokey4" };
+	int pokey_num = (offset >> 3) & ~0x04;
+	int control = (offset & 0x20) >> 2;
+	int pokey_reg = (offset % 8) | control;
+	pokeyn_device *pokey = space->machine().device<pokeyn_device>(devname[pokey_num]);
+
+	return pokey->read(pokey_reg);
+}
+
+WRITE8_HANDLER( quad_pokeyn_w )
+{
+	static const char *const devname[4] = { "pokey1", "pokey2", "pokey3", "pokey4" };
+    int pokey_num = (offset >> 3) & ~0x04;
+    int control = (offset & 0x20) >> 2;
+    int pokey_reg = (offset % 8) | control;
+	pokeyn_device *pokey = space->machine().device<pokeyn_device>(devname[pokey_num]);
+
+    pokey->write(pokey_reg, data);
+}
+

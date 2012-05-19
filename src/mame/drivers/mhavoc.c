@@ -206,9 +206,9 @@ READ8_MEMBER(mhavoc_state::dual_pokey_r)
 	int pokey_reg = (offset % 8) | control;
 
 	if (pokey_num == 0)
-		return pokey_r(machine().device("pokey1"), pokey_reg);
+		return machine().device<pokeyn_device>("pokey1")->read(pokey_reg);
 	else
-		return pokey_r(machine().device("pokey2"), pokey_reg);
+		return machine().device<pokeyn_device>("pokey2")->read(pokey_reg);
 }
 
 
@@ -219,9 +219,9 @@ WRITE8_MEMBER(mhavoc_state::dual_pokey_w)
 	int pokey_reg = (offset % 8) | control;
 
 	if (pokey_num == 0)
-		pokey_w(machine().device("pokey1"), pokey_reg, data);
+		machine().device<pokeyn_device>("pokey1")->write(pokey_reg, data);
 	else
-		pokey_w(machine().device("pokey2"), pokey_reg, data);
+		machine().device<pokeyn_device>("pokey2")->write(pokey_reg, data);
 }
 
 
@@ -265,7 +265,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( gamma_map, AS_PROGRAM, 8, mhavoc_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM								/* Program RAM (2K) */
     AM_RANGE(0x0800, 0x0fff) AM_RAM AM_MIRROR (0x1800)
-	AM_RANGE(0x2000, 0x203f) AM_READWRITE_LEGACY(quad_pokey_r, quad_pokey_w)	/* Quad Pokey read  */
+	AM_RANGE(0x2000, 0x203f) AM_READWRITE_LEGACY(quad_pokeyn_r, quad_pokeyn_w)	/* Quad Pokey read  */
 	AM_RANGE(0x2800, 0x2800) AM_READ_PORT("IN1")				/* Gamma Input Port */
 	AM_RANGE(0x3000, 0x3000) AM_READ(mhavoc_alpha_r)			/* Alpha Comm. Read Port*/
 	AM_RANGE(0x3800, 0x3803) AM_READ_PORT("DIAL")				/* Roller Controller Input*/
@@ -499,17 +499,17 @@ static MACHINE_CONFIG_START( mhavoc, mhavoc_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("pokey1", POKEY, MHAVOC_CLOCK_1_25M)
+	MCFG_SOUND_ADD("pokey1", POKEYN, MHAVOC_CLOCK_1_25M)
 	MCFG_SOUND_CONFIG(pokey_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("pokey2", POKEY, MHAVOC_CLOCK_1_25M)
+	MCFG_SOUND_ADD("pokey2", POKEYN, MHAVOC_CLOCK_1_25M)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("pokey3", POKEY, MHAVOC_CLOCK_1_25M)
+	MCFG_SOUND_ADD("pokey3", POKEYN, MHAVOC_CLOCK_1_25M)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("pokey4", POKEY, MHAVOC_CLOCK_1_25M)
+	MCFG_SOUND_ADD("pokey4", POKEYN, MHAVOC_CLOCK_1_25M)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -532,10 +532,10 @@ static MACHINE_CONFIG_DERIVED( alphaone, mhavoc )
 	MCFG_SCREEN_VISIBLE_AREA(0, 580, 0, 500)
 
 	/* sound hardware */
-	MCFG_SOUND_REPLACE("pokey1", POKEY, MHAVOC_CLOCK_1_25M)
+	MCFG_SOUND_REPLACE("pokey1", POKEYN, MHAVOC_CLOCK_1_25M)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_REPLACE("pokey2", POKEY, MHAVOC_CLOCK_1_25M)
+	MCFG_SOUND_REPLACE("pokey2", POKEYN, MHAVOC_CLOCK_1_25M)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_DEVICE_REMOVE("pokey3")
