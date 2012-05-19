@@ -26,6 +26,8 @@
 
 //#define OLDDEVICE_FOR_MESS 1
 
+//#define POKEY_EXEC_INTERFACE
+
 /* CONSTANT DEFINITIONS */
 
 /* POKEY WRITE LOGICALS */
@@ -106,7 +108,10 @@ DECLARE_LEGACY_SOUND_DEVICE(POKEY, pokey);
 // ======================> pokey_device
 
 class pokeyn_device : public device_t,
-						public device_sound_interface
+					  public device_sound_interface
+#ifdef POKEY_EXEC_INTERFACE
+					  public ,device_execute_interface
+#endif
 {
 public:
 	// construction/destruction
@@ -133,8 +138,15 @@ protected:
 	// device_sound_interface overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 
+#ifdef POKEY_EXEC_INTERFACE
+	virtual void execute_run() { m_icount = 0; } //printf("execute: %d\n", m_icount); m_icount = 0; }
+#endif
+
 	// configuration state
 	pokey_interface m_intf;
+
+	// other internal states
+    int m_icount;
 
 private:
 

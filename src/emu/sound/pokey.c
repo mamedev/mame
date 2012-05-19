@@ -236,7 +236,9 @@ static const int clock_divisors[3] = {1, 28, 114};
 INLINE pokey_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
+#ifdef OLDDEVICE_FOR_MESS
 	assert(device->type() == POKEY);
+#endif
 	return (pokey_state *)downcast<legacy_device_base *>(device)->token();
 }
 
@@ -528,6 +530,7 @@ static DEVICE_START( pokey )
 	chip->divisor[CHAN2] = 4;
 	chip->divisor[CHAN3] = 4;
 	chip->divisor[CHAN4] = 4;
+
 	chip->clockmult = DIV_64;
 	chip->KBCODE = 0x09;		 /* Atari 800 'no key' */
 	chip->SKCTL = SK_RESET;	 /* let the RNG run after reset */
@@ -1284,6 +1287,10 @@ const device_type POKEYN = &device_creator<pokeyn_device>;
 pokeyn_device::pokeyn_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, POKEYN, "POKEYN", tag, owner, clock),
 	  device_sound_interface(mconfig, *this),
+#ifdef POKEY_EXEC_INTERFACE
+	  device_execute_interface(mconfig, *this),
+#endif
+	  m_icount(0),
 	  m_stream(NULL)
 {
 }
@@ -1336,6 +1343,19 @@ void pokeyn_device::device_start()
 	m_timer[1] = timer_alloc(1);
 	m_timer[2] = timer_alloc(1);
 
+	/* reset more internal state */
+	for (i=0; i<4; i++)
+	{
+		m_AUDC[i] = 0;
+		m_AUDF[i] = 0;
+		m_volume[i] = 0;
+		m_borrow_cnt[i] = 0;
+		m_counter[i] = 0;
+		if (i<3) m_clock_cnt[i] = 0;
+		m_filter_sample[i] = 0;
+		m_output[i] = 0;
+	}
+
 	for (i=0; i<8; i++)
 	{
 		m_ptimer[i] = timer_alloc(2);
@@ -1378,7 +1398,14 @@ void pokeyn_device::device_start()
 	save_item(NAME(m_IRQST));
 	save_item(NAME(m_IRQEN));
 	save_item(NAME(m_SKSTAT));
-	save_item(NAME(m_SKCTL));}
+	save_item(NAME(m_SKCTL));
+
+	// set our instruction counter
+#ifdef POKEY_EXEC_INTERFACE
+	m_icountptr = &m_icount;
+#endif
+
+}
 
 
 //-------------------------------------------------
@@ -1589,7 +1616,19 @@ void pokeyn_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 			sum += (((m_output[ch] ^ m_filter_sample[ch]) || (m_AUDC[ch] & VOLUME_ONLY)) ? m_volume[ch] : 0 );
 		}
 
+#if 0
+		{
+			static int old_sum = 0;
+			if (sum != old_sum)
+			{
+				old_sum = sum;
+				printf("sum %d\n", sum);
+			}
+		}
+#endif
+
        	/* store sum of output signals into the buffer */
+
        	*buffer++ = (sum > 0x7fff) ? 0x7fff : sum;
        	samples--;
 
