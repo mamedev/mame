@@ -125,8 +125,8 @@ protected:
 
 private:
 
-	void poly_init(UINT8 *poly, int size, int left, int right, int add);
-	void rand_init(UINT8 *rng, int size, int left, int right, int add);
+	void poly_init_4_5(UINT32 *poly, int size, int xorbit, int invert);
+	void poly_init_9_17(UINT32 *poly, int size);
 	inline void process_channel(int ch);
 	inline void reset_channel(int ch);
 	inline void inc_chan(int ch);
@@ -181,14 +181,10 @@ private:
 	attotime m_ad_time_fast;
 	attotime m_ad_time_slow;
 
-	UINT8 m_poly4[0x0f];
-	UINT8 m_poly5[0x1f];
-	UINT8 m_poly9[0x1ff];
-	UINT8 m_poly17[0x1ffff];
-
-	UINT8 m_rand9[0x1ff];
-	UINT8 m_rand17[0x1ffff];
-
+	UINT32 m_poly4[0x0f];
+	UINT32 m_poly5[0x1f];
+	UINT32 m_poly9[0x1ff];
+	UINT32 m_poly17[0x1ffff];
 };
 
 

@@ -88,7 +88,7 @@
 #define VERBOSE 		1
 #define VERBOSE_SOUND	0
 #define VERBOSE_TIMER	0
-#define VERBOSE_POLY	0
+#define VERBOSE_POLY	1
 #define VERBOSE_RAND	1
 
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
@@ -1333,14 +1333,14 @@ void pokeyn_device::device_start()
 	m_ad_time_slow = (attotime::from_nsec(64000      ) * FREQ_17_EXACT) / clock();
 
 	/* initialize the poly counters */
-	poly_init(m_poly4,   4, 3, 1, 0x00004);
-	poly_init(m_poly5,   5, 3, 2, 0x00008);
-	poly_init(m_poly9,   9, 8, 1, 0x00180);
-	poly_init(m_poly17, 17,16, 1, 0x1c000);
+	poly_init_4_5(m_poly4, 4, 1, 0);
+	poly_init_4_5(m_poly5, 5, 2, 1);
+	//poly_init(m_poly9,   9, 8, 1, 0x00180);
+	//poly_init(m_poly17, 17,16, 1, 0x1c000);
 
-	/* initialize the random arrays */
-	rand_init(m_rand9,   9, 8, 1, 0x00180);
-	rand_init(m_rand17, 17,16, 1, 0x1c000);
+	/* initialize 9 / 17 arrays */
+	poly_init_9_17(m_poly9,   9);
+	poly_init_9_17(m_poly17, 17);
 
 	m_divisor[CHAN1] = 4;
 	m_divisor[CHAN2] = 4;
@@ -1693,12 +1693,12 @@ READ8_MEMBER( pokeyn_device::read )
 		}
 		if( m_AUDCTL & POLY9 )
 		{
-			m_RANDOM = m_rand9[m_r9];
+			m_RANDOM = m_poly9[m_r9] & 0xff;
 			LOG_RAND(("POKEY '%s' adjust %u rand9[$%05x]: $%02x\n", tag(), adjust, m_r9, m_RANDOM));
 		}
 		else
 		{
-			m_RANDOM = m_rand17[m_r17];
+			m_RANDOM = (m_poly17[m_r17] >> 8) & 0xff;
 			LOG_RAND(("POKEY '%s' adjust %u rand17[$%05x]: $%02x\n", tag(), adjust, m_r17, m_RANDOM));
 		}
 		if (adjust > 0)
@@ -2080,18 +2080,18 @@ inline void pokeyn_device::process_channel(int ch)
 {
 	int toggle = 0;
 
-	if( (m_AUDC[ch] & NOTPOLY5) || m_poly5[m_p5] )
+	if( (m_AUDC[ch] & NOTPOLY5) || (m_poly5[m_p5] & 1) )
 	{
 		if( m_AUDC[ch] & PURE )
 			toggle = 1;
 		else
 		if( m_AUDC[ch] & POLY4 )
-			toggle = m_output[ch] == !m_poly4[m_p4];
+			toggle = m_output[ch] == !(m_poly4[m_p4] & 1);
 		else
 		if( m_AUDCTL & POLY9 )
-			toggle = m_output[ch] == !m_poly9[m_p9];
+			toggle = m_output[ch] == !(m_poly9[m_p9] & 1);
 		else
-			toggle = m_output[ch] == !m_poly17[m_p17];
+			toggle = m_output[ch] == !(m_poly17[m_p17] & 1);
 	}
 	if( toggle )
 	{
@@ -2163,36 +2163,60 @@ void pokeyn_device::pokey_potgo(void)
 }
 
 
-void pokeyn_device::poly_init(UINT8 *poly, int size, int left, int right, int add)
+void pokeyn_device::poly_init_4_5(UINT32 *poly, int size, int xorbit, int invert)
 {
 	int mask = (1 << size) - 1;
-    int i, x = 0;
+    int i;
+    UINT32 lfsr = 0;
 
 	LOG_POLY(("poly %d\n", size));
-	for( i = 0; i < mask; i++ )
+    for( i = 0; i < mask; i++ )
 	{
-		*poly++ = x & 1;
-		LOG_POLY(("%05x: %d\n", x, x&1));
         /* calculate next bit */
-		x = ((x << left) + (x >> right) + add) & mask;
+    	int in = !((lfsr >> 0) & 1) ^ ((lfsr >> xorbit) & 1);
+    	lfsr = lfsr >> 1;
+    	lfsr = (in << (size-1)) | lfsr;
+		*poly = lfsr ^ invert;
+        LOG_POLY(("%05x: %02x\n", lfsr, *poly));
+        poly++;
 	}
 }
 
-void pokeyn_device::rand_init(UINT8 *rng, int size, int left, int right, int add)
+void pokeyn_device::poly_init_9_17(UINT32 *poly, int size)
 {
     int mask = (1 << size) - 1;
-    int i, x = 0;
+    int i;
+    UINT32 lfsr = 0;
 
 	LOG_RAND(("rand %d\n", size));
-    for( i = 0; i < mask; i++ )
+
+	if (size == 17)
 	{
-		if (size == 17)
-			*rng = x >> 6;	/* use bits 6..13 */
-		else
-			*rng = x;		/* use bits 0..7 */
-        LOG_RAND(("%05x: %02x\n", x, *rng));
-        rng++;
-        /* calculate next bit */
-		x = ((x << left) + (x >> right) + add) & mask;
+	    for( i = 0; i < mask; i++ )
+		{
+	        /* calculate next bit @ 7 */
+	    	int in8 = !((lfsr >> 8) & 1) ^ ((lfsr >> 13) & 1);
+	    	int in = (lfsr & 1);
+	    	lfsr = lfsr >> 1;
+	    	lfsr = (lfsr & 0xff7f) | (in8 << 7);
+	    	lfsr = (in << 16) | lfsr;
+			*poly = lfsr;
+	        LOG_RAND(("%05x: %02x\n", lfsr, *poly));
+	        poly++;
+		}
 	}
+	else
+	{
+	    for( i = 0; i < mask; i++ )
+		{
+	        /* calculate next bit */
+	    	int in = !((lfsr >> 0) & 1) ^ ((lfsr >> 5) & 1);
+	    	lfsr = lfsr >> 1;
+	    	lfsr = (in << 8) | lfsr;
+			*poly = lfsr;
+	        LOG_RAND(("%05x: %02x\n", lfsr, *poly));
+	        poly++;
+		}
+	}
+
 }

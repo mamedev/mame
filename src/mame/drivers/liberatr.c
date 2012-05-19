@@ -231,8 +231,8 @@ static ADDRESS_MAP_START( liberatr_map, AS_PROGRAM, 8, liberatr_state )
 	AM_RANGE(0x6c05, 0x6c06) AM_WRITE(coin_counter_w)
 	AM_RANGE(0x6c07, 0x6c07) AM_WRITEONLY AM_SHARE("planet_select")
 	AM_RANGE(0x6e00, 0x6e3f) AM_WRITE(earom_w)
-	AM_RANGE(0x7000, 0x701f) AM_DEVREADWRITE_LEGACY("pokey2", pokey_r, pokey_w)
-	AM_RANGE(0x7800, 0x781f) AM_DEVREADWRITE_LEGACY("pokey1", pokey_r, pokey_w)
+	AM_RANGE(0x7000, 0x701f) AM_DEVREADWRITE("pokey2", pokeyn_device, read, write)
+	AM_RANGE(0x7800, 0x781f) AM_DEVREADWRITE("pokey1", pokeyn_device, read, write)
 	AM_RANGE(0x8000, 0xefff) AM_ROM
 	AM_RANGE(0xfffa, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -264,8 +264,8 @@ static ADDRESS_MAP_START( liberat2_map, AS_PROGRAM, 8, liberatr_state )
 	AM_RANGE(0x4c05, 0x4c06) AM_WRITE(coin_counter_w)
 	AM_RANGE(0x4c07, 0x4c07) AM_WRITEONLY AM_SHARE("planet_select")
 	AM_RANGE(0x4e00, 0x4e3f) AM_WRITE(earom_w)
-	AM_RANGE(0x5000, 0x501f) AM_DEVREADWRITE_LEGACY("pokey2", pokey_r, pokey_w)
-	AM_RANGE(0x5800, 0x581f) AM_DEVREADWRITE_LEGACY("pokey1", pokey_r, pokey_w)
+	AM_RANGE(0x5000, 0x501f) AM_DEVREADWRITE("pokey2", pokeyn_device, read, write)
+	AM_RANGE(0x5800, 0x581f) AM_DEVREADWRITE("pokey1", pokeyn_device, read, write)
 	//AM_RANGE(0x6000, 0x601f) AM_WRITE(pokey1_w) /* bug ??? */
 	AM_RANGE(0x6000, 0xbfff) AM_ROM
 	AM_RANGE(0xfffa, 0xffff) AM_ROM
@@ -404,11 +404,11 @@ static MACHINE_CONFIG_START( liberatr, liberatr_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("pokey1", POKEY, MASTER_CLOCK/16) /* 1.25Mhz from Phi2 signal from 6502 */
+	MCFG_SOUND_ADD("pokey1", POKEYN, MASTER_CLOCK/16) /* 1.25Mhz from Phi2 signal from 6502 */
 	MCFG_SOUND_CONFIG(pokey_interface_1)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("pokey2", POKEY, MASTER_CLOCK/16) /* 1.25Mhz from Phi2 signal from 6502 */
+	MCFG_SOUND_ADD("pokey2", POKEYN, MASTER_CLOCK/16) /* 1.25Mhz from Phi2 signal from 6502 */
 	MCFG_SOUND_CONFIG(pokey_interface_2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
