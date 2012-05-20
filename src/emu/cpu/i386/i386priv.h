@@ -496,7 +496,7 @@ INLINE int translate_address(i386_state *cpustate, int rwn, UINT32 *address, UIN
 	if(!ret)
 	{
 		if(rwn != -1)
-			*error |= ((rwn & 1)<<1) | (user<<2);
+			*error |= ((rwn & 1)<<1) | ((cpustate->CPL == 3)<<2);
 		return 0;
 	}
 	return 1;

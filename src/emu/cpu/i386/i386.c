@@ -105,6 +105,9 @@ static void i386_set_descriptor_accessed(i386_state *cpustate, UINT16 selector)
 	// assume the selector is valid, we don't need to check it again
 	UINT32 base, addr, error;
 	UINT8 rights;
+	if(!(selector & ~3))
+		return;
+	
 	if ( selector & 0x4 )
 		base = cpustate->ldtr.base;
 	else
@@ -717,7 +720,7 @@ static void i386_trap(i386_state *cpustate,int irq, int irq_gate, int trap_level
 			DPL = (desc.flags >> 5) & 0x03;  // descriptor privilege level
 //          RPL = segment & 0x03;  // requested privilege level
 
-			if((segment & ~0x07) == 0)
+			if((segment & ~0x03) == 0)
 			{
 				logerror("IRQ: Gate segment is null.\n");
 				FAULT_EXP(FAULT_GP,cpustate->ext)
@@ -2296,15 +2299,6 @@ static void i386_protected_mode_iret(i386_state* cpustate, int operand32)
 			// 16-bit iret can't reach here
 			newESP = READ32(cpustate, ea+12);
 			newSS = READ32(cpustate, ea+16) & 0xffff;
-			memset(&desc, 0, sizeof(desc));
-			desc.selector = newCS;
-			i386_load_protected_mode_segment(cpustate,&desc,NULL);
-			DPL = (desc.flags >> 5) & 0x03;  // descriptor privilege level
-			RPL = newCS & 0x03;
-			memset(&stack, 0, sizeof(stack));
-			stack.selector = newSS;
-			i386_load_protected_mode_segment(cpustate,&stack,NULL);
-
 			/* Return to v86 mode */
 			logerror("IRET (%08x): Returning to Virtual 8086 mode.\n",cpustate->pc);
 			if(CPL != 0)
