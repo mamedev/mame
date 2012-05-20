@@ -199,10 +199,10 @@ void timer_device::device_validity_check(validity_checker &valid) const
 				mame_printf_warning("Scanline timer specified parameters for a periodic timer\n");
 			if (m_param != 0)
 				mame_printf_warning("Scanline timer specified parameter which is ignored\n");
-			if (m_first_vpos < 0)
-				mame_printf_error("Scanline timer specified invalid initial position\n");
-			if (m_increment < 0)
-				mame_printf_error("Scanline timer specified invalid increment\n");
+//			if (m_first_vpos < 0)
+//				mame_printf_error("Scanline timer specified invalid initial position\n");
+//			if (m_increment < 0)
+//				mame_printf_error("Scanline timer specified invalid increment\n");
 			break;
 
 		default:

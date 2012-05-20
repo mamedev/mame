@@ -855,7 +855,7 @@ WRITE32_HANDLER(archimedes_vidc_w)
 	// 0x00 - 0x3c Video Palette Logical Colors (16 colors)
 	// 0x40 Border Color
 	// 0x44 - 0x4c Cursor Palette Logical Colors
-	if (reg >= 0x00 && reg <= 0x4c)
+	if (reg <= 0x4c)
 	{
 		int r,g,b;
 

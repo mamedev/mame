@@ -1746,7 +1746,7 @@ READ32_DEVICE_HANDLER( ide_controller32_pcmcia_r )
 	offset *= 4;
 	size = convert_to_offset_and_size32(&offset, mem_mask);
 
-	if (offset >= 0x000 && offset < 0x008)
+	if (offset < 0x008)
 		res = ide_controller_read(device, 0, offset & 7, size);
 	if (offset >= 0x008 && offset < 0x010)
 		res = ide_controller_read(device, 1, offset & 7, size);
@@ -1763,7 +1763,7 @@ WRITE32_DEVICE_HANDLER( ide_controller32_pcmcia_w )
 	size = convert_to_offset_and_size32(&offset, mem_mask);
 	data = data >> ((offset & 3) * 8);
 
-	if (offset >= 0x000 && offset < 0x008)
+	if (offset < 0x008)
 		ide_controller_write(device, 0, offset & 7, size, data);
 	if (offset >= 0x008 && offset < 0x010)
 		ide_controller_write(device, 1, offset & 7, size, data);

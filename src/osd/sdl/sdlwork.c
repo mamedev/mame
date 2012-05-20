@@ -310,7 +310,7 @@ int osd_work_queue_wait(osd_work_queue *queue, osd_ticks_t timeout)
 void osd_work_queue_free(osd_work_queue *queue)
 {
 	// if we have threads, clean them up
-	if (queue->threads >= 0 && queue->thread != NULL)
+	if (queue->thread != NULL)
 	{
 		int threadnum;
 

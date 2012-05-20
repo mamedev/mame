@@ -753,7 +753,7 @@ static UINT32 opINW(v60_state *cpustate)
 static UINT32 opLDPR(v60_state *cpustate)
 {
 	F12DecodeOperands(cpustate, ReadAMAddress, 2,ReadAM, 2);
-	if (cpustate->op2 >= 0 && cpustate->op2 <= 28)
+	if (cpustate->op2 <= 28)
 	{
 	  if (cpustate->flag1 &&(!(OpRead8(cpustate, cpustate->PC + 1)&0x80 && OpRead8(cpustate, cpustate->PC + 2) == 0xf4 ) ))
 			cpustate->reg[cpustate->op2 + 36] = cpustate->reg[cpustate->op1];
@@ -2096,7 +2096,7 @@ static UINT32 opSHLW(v60_state *cpustate) /* TRUSTED */
 static UINT32 opSTPR(v60_state *cpustate)
 {
 	F12DecodeFirstOperand(cpustate, ReadAM, 2);
-	if (cpustate->op1 >= 0 && cpustate->op1 <= 28)
+	if (cpustate->op1 <= 28)
 		cpustate->modwritevalw = cpustate->reg[cpustate->op1 + 36];
 	else
 	{

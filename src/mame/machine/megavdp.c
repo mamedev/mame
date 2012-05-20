@@ -436,7 +436,7 @@ UINT16 vdp_get_word_from_68k_mem_default(running_machine &machine, UINT32 source
 
 	//printf("vdp_get_word_from_68k_mem_default %08x\n", source);
 
-	if (( source >= 0x000000 ) && ( source <= 0x3fffff ))
+	if ( source <= 0x3fffff )
 	{
 		if (_svp_cpu != NULL)
 		{
