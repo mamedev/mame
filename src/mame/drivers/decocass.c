@@ -29,24 +29,6 @@
     The actual cassettes use a custom player hooked to the BIO board, and are roughly microcassette form factor, but are larger and will not fit in a conventional microcassette player.
     Each cassette has two tracks on it: a clock track and a data track, for a form of synchronous serial. The data is stored in blocks with headers and checksums.
  
-    -------------------------------------------------------------
- 
-    Here is the protection data for DS Telejan and Pro Golf (set 2).
-    This information maps onto the various handlers in machine/decocass.c but it's
-    not at all clear how to create a new one that fits these specs.
- 
-    DS Telejan:
-
-    Bits $84 are latched
-    Bit $08 is passed through unmodified
-    Bits $73 are the five PROM address inputs
-
-    Pro Golf (set 2):
-
-    Bits $44 are latched
-    Bit $08 is passed through unmodified
-    Bits $B3 are the five PROM address inputs
-
 
  ***********************************************************************/
 
