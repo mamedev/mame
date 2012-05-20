@@ -1,22 +1,27 @@
-/*
+/*********************************************************
 
-Chance 32 - Poker Game by PAL Company
+  Chance 32
 
-1x HD46505SP / HD6845SP
-1x Z84C0008PEC
+  PAL System Co, Ltd.
+  Osaka, Japan.
 
-XTAL: 12.000 Mhz
+  Driver by David Haywood, Angelo Salese & Roberto Fresca.
 
 
- todo, fix tilemaps, colours, inputs, hook up oki, add CRTC device
+  1x HD46505SP / HD6845SP
+  1x Z84C0008PEC
 
-*/
+  XTAL: 12.000 Mhz
+
+
+*********************************************************/
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/okim6295.h"
 #include "video/mc6845.h"
 
+#include "chance32.lh"
 
 
 class chance32_state : public driver_device
@@ -42,6 +47,7 @@ public:
 	}
 
 	DECLARE_WRITE8_MEMBER(mux_w);
+	DECLARE_WRITE8_MEMBER(muxout_w);
 	DECLARE_READ8_MEMBER(mux_r);
 
 	tilemap_t *m_fg_tilemap;
@@ -52,6 +58,7 @@ public:
 
 	UINT8 mux_data;
 };
+
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
@@ -91,6 +98,7 @@ VIDEO_START( chance32 )
 	state->m_bg_tilemap->set_flip(TILE_FLIPX|TILE_FLIPY);
 }
 
+
 SCREEN_UPDATE_IND16( chance32 )
 {
 	chance32_state *state = screen.machine().driver_data<chance32_state>();
@@ -107,16 +115,6 @@ SCREEN_UPDATE_IND16( chance32 )
 	return 0;
 }
 
-
-static ADDRESS_MAP_START( chance32_map, AS_PROGRAM, 8, chance32_state )
-	AM_RANGE(0x0000, 0xcfff) AM_ROM
-	AM_RANGE(0xd800, 0xdfff) AM_RAM
-
-	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(paletteram_xGGGGGRRRRRBBBBB_byte_le_w) AM_SHARE("paletteram")
-
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(chance32_fgram_w) AM_SHARE("fgram")
-	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(chance32_bgram_w) AM_SHARE("bgram")
-ADDRESS_MAP_END
 
 WRITE8_MEMBER(chance32_state::mux_w)
 {
@@ -138,9 +136,79 @@ READ8_MEMBER(chance32_state::mux_r)
 	return res;
 }
 
+
+WRITE8_MEMBER(chance32_state::muxout_w)
+{
+/* Muxed Lamps
+
+  There are 2 groups of 7 output lines muxed in port 60h
+  The first bit is the group/mux selector.
+   
+  - bits -
+  7654 3210
+  ---- ---x   Mux selector.
+  ---- --x-   Small / Big lamps.
+  ---- -x--   Big / Small lamps.
+  ---- x---   Hold 5 lamp.
+  ---x ----   Hold 4 lamp.
+  --x- ----   Hold 3 lamp.
+  -x-- ----   Hold 2 lamp.
+  x--- ----   Hold 1 lamp.
+
+  (alt state)
+
+  - bits -
+  7654 3210
+  ---- ---x   Mux selector.
+  ---- --x-   unknown...
+  ---- -x--   Fever lamp
+  ---- x---   Cancel lamp.
+  ---x ----   D-Up / Take lamps.
+  --x- ----   Take / D-Up lamps.
+  -x-- ----   Deal lamp.
+  x--- ----   Bet lamp.
+
+*/
+	if (data & 1)	// bit 0 is the mux selector.
+
+	{
+		output_set_lamp_value(0, (data >> 1) & 1);	/* Lamp 0 - Small / Big */
+		output_set_lamp_value(1, (data >> 2) & 1);	/* Lamp 1 - Big / Small */
+		output_set_lamp_value(2, (data >> 3) & 1);	/* Lamp 2 - Hold 5 */
+		output_set_lamp_value(3, (data >> 4) & 1);	/* Lamp 3 - Hold 4 */
+		output_set_lamp_value(4, (data >> 5) & 1);	/* Lamp 4 - Hold 3 */
+		output_set_lamp_value(5, (data >> 6) & 1);	/* Lamp 5 - Hold 2 */
+		output_set_lamp_value(6, (data >> 7) & 1);	/* Lamp 6 - Hold 1 */
+
+		logerror("Lamps A: %02x\n", data);
+	}
+
+	else
+	{
+		// bit 1 is unknown...
+		output_set_lamp_value(7, (data >> 2) & 1);	/* Lamp 7 - Fever! */
+		output_set_lamp_value(8, (data >> 3) & 1);	/* Lamp 8 - Cancel */
+		output_set_lamp_value(9, (data >> 4) & 1);	/* Lamp 9 - D-Up / Take */
+		output_set_lamp_value(10, (data >> 5) & 1);	/* Lamp 10 - Take / D-Up */
+		output_set_lamp_value(11, (data >> 6) & 1);	/* Lamp 11 - Deal */
+		output_set_lamp_value(12, (data >> 7) & 1);	/* Lamp 12 - Bet */
+
+		logerror("Lamps B: %02x\n", data);
+	}
+}
+
+
+static ADDRESS_MAP_START( chance32_map, AS_PROGRAM, 8, chance32_state )
+	AM_RANGE(0x0000, 0xcfff) AM_ROM
+	AM_RANGE(0xd800, 0xdfff) AM_RAM
+	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(paletteram_xGGGGGRRRRRBBBBB_byte_le_w) AM_SHARE("paletteram")
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(chance32_fgram_w) AM_SHARE("fgram")
+	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(chance32_bgram_w) AM_SHARE("bgram")
+ADDRESS_MAP_END
+
 static ADDRESS_MAP_START( chance32_portmap, AS_IO, 8, chance32_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	//AM_RANGE(0x10, 0x10) AM_WRITENOP // ?
+	AM_RANGE(0x10, 0x10) AM_WRITENOP		// writting bit3 constantly... watchdog? 
 	AM_RANGE(0x13, 0x13) AM_WRITE(mux_w)
 	AM_RANGE(0x20, 0x20) AM_READ_PORT("DSW0")
 	AM_RANGE(0x21, 0x21) AM_READ_PORT("DSW1")
@@ -148,18 +216,15 @@ static ADDRESS_MAP_START( chance32_portmap, AS_IO, 8, chance32_state )
 	AM_RANGE(0x23, 0x23) AM_READ_PORT("DSW3")
 	AM_RANGE(0x24, 0x24) AM_READ_PORT("DSW4")
 	AM_RANGE(0x25, 0x25) AM_READ(mux_r)
-//  AM_RANGE(0x26, 0x26) AM_READ_PORT("UNK") // vblank?
+	AM_RANGE(0x26, 0x26) AM_READ_PORT("UNK") // vblank (other bits are checked for different reasons)
 	AM_RANGE(0x30, 0x30) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0x31, 0x31) AM_DEVWRITE("crtc", mc6845_device, register_w)
 	AM_RANGE(0x50, 0x50) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-//  AM_RANGE(0x60, 0x60) AM_WRITENOP // lamps
-
+	AM_RANGE(0x60, 0x60) AM_WRITE(muxout_w)
 ADDRESS_MAP_END
 
 
-
 static INPUT_PORTS_START( chance32 )
-	PORT_START("UNK")
 
 	PORT_START("DSW0")
 	PORT_DIPNAME( 0x01, 0x00, "DSW0" )
@@ -168,10 +233,10 @@ static INPUT_PORTS_START( chance32 )
 	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x04, 0x00, "Auto Max Bet" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Flip_Screen ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
 	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
@@ -180,12 +245,11 @@ static INPUT_PORTS_START( chance32 )
 	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	PORT_DIPNAME( 0xc0, 0x00, "Maximum Bet" )
+	PORT_DIPSETTING(    0x00, "10" )
+	PORT_DIPSETTING(    0x40, "20" )
+	PORT_DIPSETTING(    0x80, "30" )
+	PORT_DIPSETTING(    0xc0, "50" )
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x00, "DSW1" )
@@ -206,33 +270,33 @@ static INPUT_PORTS_START( chance32 )
 	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, "Auto Hold" )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, "Double-Up Type" )
+	PORT_DIPSETTING(    0x00, "Holds" )
+	PORT_DIPSETTING(    0x80, "Big/Small" )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x01, 0x00, "DSW2" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x07, 0x00, "Remote" )
+	PORT_DIPSETTING(    0x00, "5" )
+	PORT_DIPSETTING(    0x01, "10" )
+	PORT_DIPSETTING(    0x02, "20" )
+	PORT_DIPSETTING(    0x03, "25" )
+	PORT_DIPSETTING(    0x04, "40" )
+	PORT_DIPSETTING(    0x05, "50" )
+	PORT_DIPSETTING(    0x06, "60" )
+	PORT_DIPSETTING(    0x07, "100" )
+	PORT_DIPNAME( 0x38, 0x00, "A-B Coinage Multiplier" )
+	PORT_DIPSETTING(    0x00, "x1" )
+	PORT_DIPSETTING(    0x08, "x2" )
+	PORT_DIPSETTING(    0x10, "x4" )
+	PORT_DIPSETTING(    0x18, "x5" )
+	PORT_DIPSETTING(    0x20, "x6" )
+	PORT_DIPSETTING(    0x28, "x10" )
+	PORT_DIPSETTING(    0x30, "x25" )
+	PORT_DIPSETTING(    0x38, "x50" )
+	PORT_DIPNAME( 0x40, 0x00, "DSW2" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
@@ -269,6 +333,29 @@ static INPUT_PORTS_START( chance32 )
 	PORT_DIPNAME( 0x01, 0x00, "DSW4" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPNAME( 0x06, 0x00, "Bet Limit" )
+	PORT_DIPSETTING(    0x00, "5000" )
+	PORT_DIPSETTING(    0x02, "10000" )
+	PORT_DIPSETTING(    0x04, "20000" )
+	PORT_DIPSETTING(    0x06, "30000" )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+
+	PORT_START("UNK")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")	/* Otherwise is a 'Freeze' DIP switch */ 
 	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
@@ -292,109 +379,46 @@ static INPUT_PORTS_START( chance32 )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_START("IN0")
-	PORT_DIPNAME( 0x01, 0x00, "0" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_POKER_CANCEL )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_GAMBLE_DEAL )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_GAMBLE_D_UP )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_GAMBLE_BOOK )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_POKER_BET )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("IN1")
-	PORT_DIPNAME( 0x01, 0x00, "1" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_POKER_HOLD1 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_POKER_HOLD2 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_POKER_HOLD3 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_POKER_HOLD4 )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_POKER_HOLD5 )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("IN2")
-	PORT_DIPNAME( 0x01, 0x00, "2" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_GAMBLE_LOW )   PORT_NAME("Small / DIP Test (In Book Mode)")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_GAMBLE_PAYOUT )	// payout (hopper jam)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_GAMBLE_TAKE )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_GAMBLE_HIGH )  PORT_NAME("Big")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("IN3")
-	PORT_DIPNAME( 0x01, 0x00, "3" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN1 )	PORT_IMPULSE(3) PORT_NAME("Coin A")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CODE(KEYCODE_R) PORT_NAME("Reset")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN2 )	PORT_IMPULSE(3) PORT_NAME("Coin B")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CODE(KEYCODE_8) PORT_NAME("Flip Screen 1")	/* unknown purpose */
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CODE(KEYCODE_9) PORT_NAME("Flip Screen 2")	/* unknown purpose */
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_GAMBLE_KEYIN)
 INPUT_PORTS_END
+
 
 static const gfx_layout tiles8x8_layout =
 {
@@ -413,7 +437,6 @@ static GFXDECODE_START( chance32 )
 GFXDECODE_END
 
 
-
 static MACHINE_START( chance32 )
 {
 
@@ -423,6 +446,7 @@ static MACHINE_RESET( chance32 )
 {
 
 }
+
 
 static const mc6845_interface mc6845_intf =
 {
@@ -452,13 +476,14 @@ static MACHINE_CONFIG_START( chance32, chance32_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_REFRESH_RATE(52.786)
+//	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(40*16, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 35*16-1, 0, 29*8-1)
 	MCFG_SCREEN_UPDATE_STATIC(chance32)
 
-	MCFG_MC6845_ADD("crtc", H46505, 12000000/14, mc6845_intf)	/* hand tuned to get ~60 fps */
+	MCFG_MC6845_ADD("crtc", H46505, 12000000/16, mc6845_intf)	/* 52.786 Hz (similar to Major Poker) */
 
 	MCFG_GFXDECODE(chance32)
 	MCFG_PALETTE_LENGTH(0x800)
@@ -468,10 +493,10 @@ static MACHINE_CONFIG_START( chance32, chance32_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", 12000000/12, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	/* clock at 1050 kHz match the 8000 Hz samples stored inside the ROM */
+	MCFG_OKIM6295_ADD("oki", XTAL_1_056MHz, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
-
 
 
 ROM_START( chance32 )
@@ -508,7 +533,9 @@ ROM_START( chance32 )
 ROM_END
 
 
+/*************************
+*      Game Drivers      *
+*************************/
 
-
-
-GAME( 19??, chance32,  0,    chance32, chance32,  0, ROT0, "Pal Company", "Chance Thirty Two", GAME_NOT_WORKING )
+/*     YEAR  NAME      PARENT  MACHINE   INPUT     INIT  ROT    COMPANY                FULLNAME            FLAGS  LAYOUT */
+GAMEL( 19??, chance32, 0,      chance32, chance32, 0,    ROT0, "PAL System Co, Ltd.", "Chance Thirty Two", 0,     layout_chance32 )

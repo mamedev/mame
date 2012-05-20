@@ -4000,6 +4000,7 @@ src/mame/layout/cardline.lay svneol=native#text/plain
 src/mame/layout/cbombers.lay svneol=native#text/plain
 src/mame/layout/cdi.lay svneol=native#text/plain
 src/mame/layout/cgold2.lay svneol=native#text/plain
+src/mame/layout/chance32.lay svneol=native#text/plain
 src/mame/layout/changela.lay svneol=native#text/plain
 src/mame/layout/chqflag.lay svneol=native#text/plain
 src/mame/layout/circus.lay svneol=native#text/plain

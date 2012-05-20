@@ -1972,6 +1972,8 @@ $(DRIVERS)/cardline.o:	$(LAYOUT)/cardline.lh
 
 $(DRIVERS)/cdi.o:	$(LAYOUT)/cdi.lh
 
+$(DRIVERS)/chance32.o:	$(LAYOUT)/chance32.lh
+
 $(DRIVERS)/changela.o:	$(LAYOUT)/changela.lh
 
 $(DRIVERS)/chqflag.o:	$(LAYOUT)/chqflag.lh
