@@ -9,7 +9,7 @@
     - fix h8 CPU core bugs, it trips various unhandled opcodes
     - Implement DVD routing and YUV decoding;
     - game timings seem busted, could be due of missing DVD hook-up
-    - csplayh8: inputs doesn't work at all, slower than the others too
+    - csplayh1: inputs doesn't work at all, slower than the others too
 
 ***************************************************************************/
 
@@ -713,7 +713,7 @@ ROM_START( csplayh1 )
     ROM_LOAD16_BYTE( "8.bin", 0x000001, 0x080000, CRC(a8567f1b) SHA1(2a854ef8b1988ad097bbcbeddc4b275ad738e1e1) )
 
 	DISK_REGION( "dvd" )
-	DISK_IMAGE( "csplayh8", 0, SHA1(d6514882c2626e62c5079df9ac68ecb70fc33209) )
+	DISK_IMAGE( "csplayh1", 0, SHA1(d6514882c2626e62c5079df9ac68ecb70fc33209) )
 
 	ROM_REGION( 0x1000, "gal", ROMREGION_ERASE00 )
 	ROM_LOAD( "gal16v8b.ic8", 0x000000, 0x0008c1, NO_DUMP )
