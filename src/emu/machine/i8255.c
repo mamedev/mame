@@ -417,6 +417,7 @@ UINT8 i8255_device::read_pc()
 {
 	UINT8 data = 0;
 	UINT8 mask = 0;
+	UINT8 b_mask = 0x0f;
 
 	// PC upper
 	switch (group_mode(GROUP_A))
@@ -452,6 +453,7 @@ UINT8 i8255_device::read_pc()
 		break;
 
 	case MODE_2:
+		b_mask = 0x07;
 		data |= m_intr[PORT_A] ? 0x08 : 0x00;
 		data |= m_inte2 ? 0x10 : 0x00;
 		data |= m_ibf[PORT_A] ? 0x20 : 0x00;
@@ -467,12 +469,12 @@ UINT8 i8255_device::read_pc()
 		if (port_c_lower_mode() == MODE_OUTPUT)
 		{
 			// read data from output latch
-			data |= m_output[PORT_C] & 0x0f;
+			data |= m_output[PORT_C] & b_mask;
 		}
 		else
 		{
 			// read data from port
-			mask |= 0x0f;
+			mask |= b_mask;
 		}
 		break;
 
@@ -568,21 +570,18 @@ void i8255_device::write_pc(UINT8 data)
 {
 	int changed = 0;
 
-	if (group_mode(GROUP_A) == MODE_0)
+	// PC upper
+	if (group_mode(GROUP_A) == MODE_0 && port_c_upper_mode() == MODE_OUTPUT)
 	{
-		// PC upper
-		if (port_c_upper_mode() == MODE_OUTPUT)
-		{
-			m_output[PORT_C] = (data & 0xf0) | (m_output[PORT_C] & 0x0f);
-			changed = 1;
-		}
+		m_output[PORT_C] = (data & 0xf0) | (m_output[PORT_C] & 0x0f);
+		changed = 1;
+	}
 
-		// PC lower
-		if (port_c_lower_mode() == MODE_OUTPUT)
-		{
-			m_output[PORT_C] = (m_output[PORT_C] & 0xf0) | (data & 0x0f);
-			changed = 1;
-		}
+	// PC lower
+	if (group_mode(GROUP_B) == MODE_0 && port_c_lower_mode() == MODE_OUTPUT)
+	{
+		m_output[PORT_C] = (m_output[PORT_C] & 0xf0) | (data & 0x0f);
+		changed = 1;
 	}
 
 	if (changed)
@@ -600,6 +599,7 @@ void i8255_device::output_pc()
 {
 	UINT8 data = 0;
 	UINT8 mask = 0;
+	UINT8 b_mask = 0x0f;
 
 	// PC upper
 	switch (group_mode(GROUP_A))
@@ -632,6 +632,7 @@ void i8255_device::output_pc()
 		break;
 
 	case MODE_2:
+		b_mask = 0x07;
 		data |= m_intr[PORT_A] ? 0x08 : 0x00;
 		data |= m_ibf[PORT_A] ? 0x20 : 0x00;
 		data |= m_obf[PORT_A] ? 0x80 : 0x00;
@@ -644,12 +645,12 @@ void i8255_device::output_pc()
 	case MODE_0:
 		if (port_c_lower_mode() == MODE_OUTPUT)
 		{
-			mask |= 0x0f;
+			mask |= b_mask;
 		}
 		else
 		{
 			// TTL inputs float high
-			data |= 0x0f;
+			data |= b_mask;
 		}
 		break;
 
@@ -753,6 +754,7 @@ void i8255_device::set_pc_bit(int bit, int state)
 			case 3: set_intr(PORT_A, state); break;
 			case 6: set_inte(PORT_A, state); break;
 			case 7: set_obf(PORT_A, state); break;
+			default: break;
 			}
 		}
 		else
@@ -762,6 +764,7 @@ void i8255_device::set_pc_bit(int bit, int state)
 			case 3: set_intr(PORT_A, state); break;
 			case 4: set_inte(PORT_A, state); break;
 			case 5: set_ibf(PORT_A, state); break;
+			default: break;
 			}
 		}
 		break;
@@ -774,6 +777,7 @@ void i8255_device::set_pc_bit(int bit, int state)
 		case 5: set_ibf(PORT_A, state); break;
 		case 6: set_inte1(state); break;
 		case 7: set_obf(PORT_A, state); break;
+		default: break;
 		}
 		break;
 	}
@@ -790,6 +794,7 @@ void i8255_device::set_pc_bit(int bit, int state)
 				set_ibf(PORT_B, state);
 			break;
 		case 2: set_inte(PORT_B, state); break;
+		default: break;
 		}
 	}
 
