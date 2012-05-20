@@ -3136,6 +3136,35 @@ ROM_START( orunnersu )
 	ROM_LOAD( "mpr15552.bin", 0x200000, 0x200000, CRC(1c4b5e73) SHA1(50a8e9a200575a3522a51bf094aa0e87b90bb0a3) )
 ROM_END
 
+ROM_START( orunnersj )
+	ROM_REGION( 0x200000, "maincpu", 0 ) /* v60 code */
+	ROM_LOAD32_WORD_x4( "epr15616.37", 0x000000, 0x020000, CRC(fb550545) SHA1(2f2c36843b115f5417e1f2ccd4a34ebf91265190) ) /* Need to verify the EPR numbers */
+	ROM_LOAD32_WORD_x4( "epr15617.40", 0x000002, 0x020000, CRC(6bb741e0) SHA1(d92087a2c0b6de4287e569eecf9758615a85d1eb) ) /* Need to verify the EPR numbers */
+	ROM_LOAD32_WORD( "mpr15538.bin",   0x100000, 0x080000, CRC(93958820) SHA1(e19b6f18a5707dbb64ae009d63c05eac5bac4a81) )
+	ROM_LOAD32_WORD( "mpr15539.bin",   0x100002, 0x080000, CRC(219760fa) SHA1(bd62a83de9c9542f6da454a87dc4947492f65c52) )
+
+	ROM_REGION( 0x180000, "soundcpu", 0 ) /* sound CPU */
+	ROM_LOAD( "epr15550.bin", 0x100000, 0x80000, CRC(0205d2ed) SHA1(3475479e1a45fe96eefbe53842758898db7accbf) )
+
+	ROM_REGION( 0x400000, "gfx1", 0 ) /* tiles */
+	ROM_LOAD16_BYTE( "mpr15548.bin", 0x000000, 0x200000, CRC(b6470a66) SHA1(e1544590c02d41f62f82a4d771b893fb0f2734c7) )
+	ROM_LOAD16_BYTE( "mpr15549.bin", 0x000001, 0x200000, CRC(81d12520) SHA1(1555893941e832f00ad3d0b3ad0c34a0d3a1c58a) )
+
+	ROM_REGION32_BE( 0x1000000, "gfx2", 0 ) /* sprites */
+	ROMX_LOAD( "mpr15540.bin", 0x000000, 0x200000, CRC(a10d72b4) SHA1(6d9d5e20be6721b53ce49df4d5a1bbd91f5b3aed) , ROM_SKIP(6)|ROM_GROUPWORD )
+	ROMX_LOAD( "mpr15542.bin", 0x000002, 0x200000, CRC(40952374) SHA1(c669ef52508bc2f49cf812dc86ac98fb535471fa) , ROM_SKIP(6)|ROM_GROUPWORD )
+	ROMX_LOAD( "mpr15544.bin", 0x000004, 0x200000, CRC(39e3df45) SHA1(38a7b21617b45613b05509dda388f8f7770b186c) , ROM_SKIP(6)|ROM_GROUPWORD )
+	ROMX_LOAD( "mpr15546.bin", 0x000006, 0x200000, CRC(e3fcc12c) SHA1(1cf7e05c7873f68789a27a91cddf471df40d7907) , ROM_SKIP(6)|ROM_GROUPWORD )
+	ROMX_LOAD( "mpr15541.bin", 0x800000, 0x200000, CRC(a2003c2d) SHA1(200a2c7d78d3f5f28909267fdcdbddd58c5f5fa2) , ROM_SKIP(6)|ROM_GROUPWORD )
+	ROMX_LOAD( "mpr15543.bin", 0x800002, 0x200000, CRC(933e8e7b) SHA1(0d53286f524f47851a483569dc37e9f6d34cc5f4) , ROM_SKIP(6)|ROM_GROUPWORD )
+	ROMX_LOAD( "mpr15545.bin", 0x800004, 0x200000, CRC(53dd0235) SHA1(4aee5ae1820ff933b6bd8a54bdbf989c0bc95c1a) , ROM_SKIP(6)|ROM_GROUPWORD )
+	ROMX_LOAD( "mpr15547.bin", 0x800006, 0x200000, CRC(edcb2a43) SHA1(f0bcfcc749ca0267f85bf9838164869912944d00) , ROM_SKIP(6)|ROM_GROUPWORD )
+
+	ROM_REGION( 0x400000, "sega", 0 ) /* Sega PCM sound data */
+	ROM_LOAD( "mpr15551.bin", 0x000000, 0x200000, CRC(4894bc73) SHA1(351f5c03fb430fd87df915dfe3a377b5ada622c4) )
+	ROM_LOAD( "mpr15552.bin", 0x200000, 0x200000, CRC(1c4b5e73) SHA1(50a8e9a200575a3522a51bf094aa0e87b90bb0a3) )
+ROM_END
+
 
 /**************************************************************************************************************************
  **************************************************************************************************************************
@@ -4294,6 +4323,7 @@ GAME( 1994, harddunk, 0,        multi32,      harddunk, harddunk, ROT0, "Sega", 
 GAME( 1994, harddunkj,harddunk, multi32,      harddunk, harddunk, ROT0, "Sega",   "Hard Dunk (Japan)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1992, orunners, 0,        multi32,      orunners, orunners, ROT0, "Sega",   "OutRunners (World)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1992, orunnersu,orunners, multi32,      orunners, orunners, ROT0, "Sega",   "OutRunners (US)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1992, orunnersj,orunners, multi32,      orunners, orunners, ROT0, "Sega",   "OutRunners (Japan)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1992, scross,   0,        multi32,      scross,   scross,   ROT0, "Sega",   "Stadium Cross (World)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1992, scrossu,  scross,   multi32,      scross,   scross,   ROT0, "Sega",   "Stadium Cross (US)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1992, titlef,   0,        multi32,      titlef,   titlef,   ROT0, "Sega",   "Title Fight (World)", GAME_IMPERFECT_GRAPHICS )
