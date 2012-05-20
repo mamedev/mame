@@ -1029,10 +1029,10 @@ ROM_START( cterrani )
 	DECOCASS_BIOS_B_ROMS
 
 	ROM_REGION( 0x00020, "dongle", 0 )	  /* dongle data */
-	ROM_LOAD( "de-0061.pro", 0x0000, 0x0020, CRC(e09ae5de) SHA1(7dec067d0739a6dad2607132641b66880a5b7751) )
+	ROM_LOAD( "dp-1040.dgl", 0x0000, 0x0020, CRC(e09ae5de) SHA1(7dec067d0739a6dad2607132641b66880a5b7751) )
 
 	ROM_REGION( 0x10000, "cassette", 0 )	  /* (max) 64k for cassette image */
-	ROM_LOAD( "cterrani.cas", 0x0000, 0x8000, CRC(eb71adbc) SHA1(67becfde39c034d4b8edc2eb100050de102773da) )
+	ROM_LOAD( "dt-1040.cas", 0x0000, 0x8000, CRC(eb71adbc) SHA1(67becfde39c034d4b8edc2eb100050de102773da) )
 ROM_END
 
 /* 07 Astro Fantasia */
@@ -1062,31 +1062,32 @@ ROM_START( clocknch )
 	DECOCASS_BIOS_B_ROMS
 
 	ROM_REGION( 0x00020, "dongle", 0 )	  /* dongle data */
-	ROM_LOAD( "de-0061.pro", 0x0000, 0x0020, CRC(e09ae5de) SHA1(7dec067d0739a6dad2607132641b66880a5b7751) )
+	ROM_LOAD( "dp-1110_b.dgl", 0x0000, 0x0020, CRC(e09ae5de) SHA1(7dec067d0739a6dad2607132641b66880a5b7751) )
 
 	ROM_REGION( 0x10000, "cassette", 0 )	  /* (max) 64k for cassette image */
-	ROM_LOAD( "clocknch.cas", 0x0000, 0x8000, CRC(c9d163a4) SHA1(3ef55a8d8f603059e263776c08eb81f2cf18b75c) )
+	ROM_LOAD( "clocknch.cas",  0x0000, 0x8000, CRC(c9d163a4) SHA1(3ef55a8d8f603059e263776c08eb81f2cf18b75c) )
 ROM_END
 
 /* 13 */
+/* Photo of Dongle shows DP-1130B (the "B" is in a seperate white box then the DP-1130 label) */
 ROM_START( cprogolf )
 	DECOCASS_BIOS_B_ROMS
 
 	ROM_REGION( 0x00020, "dongle", 0 )	  /* dongle data */
-	ROM_LOAD( "de-0061.pro", 0x0000, 0x0020, CRC(e09ae5de) SHA1(7dec067d0739a6dad2607132641b66880a5b7751) )
+	ROM_LOAD( "dp-1130_b.dgl", 0x0000, 0x0020, CRC(e09ae5de) SHA1(7dec067d0739a6dad2607132641b66880a5b7751) )
 
 	ROM_REGION( 0x10000, "cassette", 0 )	  /* (max) 64k for cassette image */
-	ROM_LOAD( "cprogolf.cas", 0x0000, 0x8000, CRC(02123cd1) SHA1(e4c630ed293725f23d539cb43beb97953558dabd) )
+	ROM_LOAD( "cprogolf.cas",  0x0000, 0x8000, CRC(02123cd1) SHA1(e4c630ed293725f23d539cb43beb97953558dabd) )
 ROM_END
 
 ROM_START( cprogolfj ) // version 1-A
 	DECOCASS_BIOS_A_ROMS
 
 	ROM_REGION( 0x00020, "dongle", 0 )	  /* dongle data */
-	ROM_LOAD( "a-0061.dgl",   0x0000, 0x0020, CRC(1bc9fccb) SHA1(ffc59c7660d5c87a8deca294f80260b6bc7c3027) )
+	ROM_LOAD( "a-0061.dgl",   0x0000, 0x0020, CRC(1bc9fccb) SHA1(ffc59c7660d5c87a8deca294f80260b6bc7c3027) ) /* Should be dp-1130a?? */
 
 	ROM_REGION( 0x10000, "cassette", 0 )	  /* (max) 64k for cassette image */
-	ROM_LOAD( "dt-113_a.cas",   0x0000, 0x8000, CRC(8408248f) SHA1(8b78c379bf6879916bc9b284d7a0956edfac78be) )
+	ROM_LOAD( "dt-113_a.cas",   0x0000, 0x8000, CRC(8408248f) SHA1(8b78c379bf6879916bc9b284d7a0956edfac78be) ) /* Should be dt-1130?? */
 ROM_END
 
 /* 14 */
@@ -1094,21 +1095,22 @@ ROM_START( cdsteljn ) // version 4-A-3
 	DECOCASS_BIOS_A_ROMS
 
 	ROM_REGION( 0x00020, "dongle", 0 )	  /* dongle data */
-	ROM_LOAD( "a-0061.dgl",   0x0000, 0x0020, CRC(1bc9fccb) SHA1(ffc59c7660d5c87a8deca294f80260b6bc7c3027) )
+	ROM_LOAD( "a-0061.dgl",   0x0000, 0x0020, CRC(1bc9fccb) SHA1(ffc59c7660d5c87a8deca294f80260b6bc7c3027) ) /* Should be dp-1144a?? */
 
 	ROM_REGION( 0x10000, "cassette", 0 )	  /* (max) 64k for cassette image */
-    ROM_LOAD( "dt-1144-a3.cas", 0x000000, 0x007300, CRC(1336a912) SHA1(0c64e069713b411da38b43f14306953621726d35) ) 
+	ROM_LOAD( "dt-1144-a3.cas", 0x000000, 0x007300, CRC(1336a912) SHA1(0c64e069713b411da38b43f14306953621726d35) ) 
 ROM_END
 
 /* 15 Lucky Poker */
+/* Photo of Dongle shows DP-1150B (the "B" is in a seperate white box then the DP-1150 label) */
 ROM_START( cluckypo )
 	DECOCASS_BIOS_B_ROMS
 
 	ROM_REGION( 0x00020, "dongle", 0 )	  /* dongle data */
-	ROM_LOAD( "de-0061.pro", 0x0000, 0x0020, CRC(e09ae5de) SHA1(7dec067d0739a6dad2607132641b66880a5b7751) )
+	ROM_LOAD( "dp-1150_b.dgl", 0x0000, 0x0020, CRC(e09ae5de) SHA1(7dec067d0739a6dad2607132641b66880a5b7751) )
 
 	ROM_REGION( 0x10000, "cassette", 0 )	  /* (max) 64k for cassette image */
-	ROM_LOAD( "cluckypo.cas", 0x0000, 0x8000, CRC(2070c243) SHA1(cd3af309af8eb27937756c1fe6fd0504be5aaaf5) )
+	ROM_LOAD( "cluckypo.cas",  0x0000, 0x8000, CRC(2070c243) SHA1(cd3af309af8eb27937756c1fe6fd0504be5aaaf5) )
 ROM_END
 
 /* 16 Treasure Island */
@@ -1161,12 +1163,13 @@ ROM_START( ctisland3 )
 ROM_END
 
 /* 18 Explorer */
+/* Photo of Dongle shows DP-1180B (the "B" is in a seperate white box then the DP-1180 label) */
 ROM_START( cexplore )
 	DECOCASS_BIOS_B_ROMS
 
 	ROM_REGION( 0x00020, "dongle", 0 )	  /* dongle data */
 	/* The dongle data is reverse engineered by table analysis */
-	ROM_LOAD( "cexplore.pro", 0x0000, 0x0020, BAD_DUMP CRC(c7a9ac8f) SHA1(b0a566d948f71a4eddcde0dd5e9e69ca96f71c36) )
+	ROM_LOAD( "dp-1180_b.dgl", 0x0000, 0x0020, BAD_DUMP CRC(c7a9ac8f) SHA1(b0a566d948f71a4eddcde0dd5e9e69ca96f71c36) )
 
 	ROM_REGION( 0x10000, "cassette", 0 )	  /* (max) 64k for cassette image */
 	ROM_LOAD( "cexplore.cas", 0x0000, 0x8000, CRC(fae49c66) SHA1(4ae69e2f706fdf30204f0aa1277619395cacc21b) )
@@ -1211,14 +1214,15 @@ ROM_START( ctornado )
 ROM_END
 
 /* 21 Mission-X */
+/* Photo of Dongle shows DP-121B with Cassette DT-1213B (the "3B" is in a seperate white box then the DP-121 label) */
 ROM_START( cmissnx )
 	DECOCASS_BIOS_B_ROMS
 
 	ROM_REGION( 0x00800, "dongle", 0 )	  /* dongle data */
-	ROM_LOAD( "cmissnx.pro",  0x0000, 0x0800, CRC(8a41c071) SHA1(7b16d933707bf21d25dcd11db6a6c28834b11c5b) )
+	ROM_LOAD( "dp-121_b.dgl", 0x0000, 0x0800, CRC(8a41c071) SHA1(7b16d933707bf21d25dcd11db6a6c28834b11c5b) )
 
 	ROM_REGION( 0x10000, "cassette", 0 )	  /* (max) 64k for cassette image */
-	ROM_LOAD( "cmissnx.cas",  0x0000, 0x8000, CRC(3a094e11) SHA1(c355fe14838187cbde19a799e5c60083c82615ac) )
+	ROM_LOAD( "cmissnx.cas",  0x0000, 0x8000, CRC(3a094e11) SHA1(c355fe14838187cbde19a799e5c60083c82615ac) ) /* Is this the 3B version? */
 ROM_END
 
 /* 22 Pro Tennis */
@@ -1237,14 +1241,15 @@ ROM_END
     (dongle data differs for each game)      */
 
 /* 26 Hamburger / Burger Time */
+/* Photo of Dongle shows DP-126B with Cassette DT-1267B (the "7B" is in a seperate white box then the DP-126 label) */
 ROM_START( cbtime )
 	DECOCASS_BIOS_B_ROMS
 
 	ROM_REGION( 0x01000, "dongle", 0 )	  /* dongle data */
-	ROM_LOAD( "cbtime.pro",   0x0000, 0x1000, CRC(25bec0f0) SHA1(9fb1f9699f37937421e26d4fb8fdbcd21a5ddc5c) )
+	ROM_LOAD( "dp-126_b.dgl", 0x0000, 0x1000, CRC(25bec0f0) SHA1(9fb1f9699f37937421e26d4fb8fdbcd21a5ddc5c) )
 
 	ROM_REGION( 0x10000, "cassette", 0 )	  /* (max) 64k for cassette image */
-	ROM_LOAD( "cbtime.cas",   0x0000, 0x8000, CRC(56d7dc58) SHA1(34b2513c9ca7ab40f532b6d6d911aa3012113632) )
+	ROM_LOAD( "cbtime.cas",   0x0000, 0x8000, CRC(56d7dc58) SHA1(34b2513c9ca7ab40f532b6d6d911aa3012113632) ) /* Is this the 7B version? */
 ROM_END
 
 ROM_START( chamburger ) // version 0-A-0
@@ -1258,31 +1263,32 @@ ROM_START( chamburger ) // version 0-A-0
 ROM_END
 
 /* 27 Burnin' Rubber / Bump 'n' Jump */
+/* Photo of Dongle shows DP-127B with Cassette DP-1275B (the "5B" is in a seperate white box then the DP-127 label) */
 ROM_START( cburnrub )
 	DECOCASS_BIOS_B_ROMS
 
 	ROM_REGION( 0x01000, "dongle", 0 )	  /* dongle data */
-	ROM_LOAD( "cburnrub.pro",   0x0000, 0x1000, CRC(9f396832) SHA1(0e302fd094474ac792882948a018c73ce76e0759) )
+	ROM_LOAD( "dp-127_b.pro",   0x0000, 0x1000, CRC(9f396832) SHA1(0e302fd094474ac792882948a018c73ce76e0759) )
 
 	ROM_REGION( 0x10000, "cassette", 0 )	  /* (max) 64k for cassette image */
-	ROM_LOAD( "cburnrub.cas",   0x0000, 0x8000, CRC(4528ac22) SHA1(dc0fcc5e5fd21c1c858a90f43c175e36a24b3c3d) )
+	ROM_LOAD( "cburnrub.cas",   0x0000, 0x8000, CRC(4528ac22) SHA1(dc0fcc5e5fd21c1c858a90f43c175e36a24b3c3d) ) /* Is this the 5B version? */
 ROM_END
 
 ROM_START( cburnrub2 )
 	DECOCASS_BIOS_B_ROMS
 
 	ROM_REGION( 0x01000, "dongle", 0 )	  /* dongle data */
-	ROM_LOAD( "cburnrub.pro",   0x0000, 0x1000, CRC(9f396832) SHA1(0e302fd094474ac792882948a018c73ce76e0759) )
+	ROM_LOAD( "dp-127_b.pro",   0x0000, 0x1000, CRC(9f396832) SHA1(0e302fd094474ac792882948a018c73ce76e0759) )
 
 	ROM_REGION( 0x10000, "cassette", 0 )	  /* (max) 64k for cassette image */
-	ROM_LOAD( "cburnrb2.cas",   0x0000, 0x8000, CRC(84a9ed66) SHA1(a9c536e46b89fc6b9c6271776292fed1241d2f3f) )
+	ROM_LOAD( "cburnrb2.cas",   0x0000, 0x8000, CRC(84a9ed66) SHA1(a9c536e46b89fc6b9c6271776292fed1241d2f3f) ) /* Is this the 5B version? */
 ROM_END
 
 ROM_START( cbnj )
 	DECOCASS_BIOS_B_ROMS
 
 	ROM_REGION( 0x01000, "dongle", 0 )	  /* dongle data */
-	ROM_LOAD( "cburnrub.pro",   0x0000, 0x1000, CRC(9f396832) SHA1(0e302fd094474ac792882948a018c73ce76e0759) )
+	ROM_LOAD( "dp-127_b.pro",   0x0000, 0x1000, CRC(9f396832) SHA1(0e302fd094474ac792882948a018c73ce76e0759) )
 
 	ROM_REGION( 0x10000, "cassette", 0 )	  /* (max) 64k for cassette image */
 	ROM_LOAD( "cbnj.cas",       0x0000, 0x8000, CRC(eed41560) SHA1(85d5df76efac33cd10427f659c4259afabb3daaf) )
@@ -1338,7 +1344,7 @@ ROM_START( cskater )
 	ROM_LOAD( "dp-130_a.dgl",   0x0000, 0x1000,  CRC(469e80a8) SHA1(f581cd534ce6faba010c6616538cdf9d96d787da) )
 
 	ROM_REGION( 0x10000, "cassette", 0 )	  /* (max) 64k for cassette image */
-	ROM_LOAD( "dt-130_a.bin",   0x0000, 0x8000,  CRC(1722e5e1) SHA1(e94066ead608df85d3f7310d4a81ba291da4bee6) )
+	ROM_LOAD( "dt-130_a.cas",   0x0000, 0x8000,  CRC(1722e5e1) SHA1(e94066ead608df85d3f7310d4a81ba291da4bee6) )
 ROM_END
 
 /* 31 Pro Bowling */
@@ -1391,7 +1397,7 @@ ROM_START( cpsoccerj )
 	ROM_LOAD( "dp-133_a.dgl",   0x0000, 0x1000,  CRC(919fabb2) SHA1(3d6a0676cea7b0be0fe69d06e04ca08c36b2851a) )
 
 	ROM_REGION( 0x10000, "cassette", 0 )	  /* (max) 64k for cassette image */
-	ROM_LOAD( "dt-133_a.bin",   0x0000, 0x10000, CRC(de682a29) SHA1(2ee0dd8cb7fb595020d730a9da5d9cccda3f1264) )
+	ROM_LOAD( "dt-133_a.cas",   0x0000, 0x10000, CRC(de682a29) SHA1(2ee0dd8cb7fb595020d730a9da5d9cccda3f1264) )
 ROM_END
 
 /* 34 Super Doubles Tennis */
@@ -1402,7 +1408,7 @@ ROM_START( csdtenis )
 	ROM_LOAD( "dp-134_a.dgl",   0x0000, 0x1000,  CRC(e484d2f5) SHA1(ee4e4c221933d391aeed8ff7182fa931a4e01466) )
 
 	ROM_REGION( 0x10000, "cassette", 0 )	  /* (max) 64k for cassette image */
-	ROM_LOAD( "dt-134_a.bin",   0x0000, 0x10000, CRC(9a69d961) SHA1(f88e267815ca0697708aca0ac9fa6f7664a0519c) )
+	ROM_LOAD( "dt-134_a.cas",   0x0000, 0x10000, CRC(9a69d961) SHA1(f88e267815ca0697708aca0ac9fa6f7664a0519c) )
 ROM_END
 
 /* 37 Zeroize */
@@ -1480,7 +1486,7 @@ ROM_START( coozumou )
 	ROM_LOAD( "dp-141_a.dgl",   0x0000, 0x8000,  CRC(bc379d2c) SHA1(bab19dcb6d68fdbd547ebab1598353f436321157) )
 
 	ROM_REGION( 0x10000, "cassette", 0 )	  /* (max) 64k for cassette image */
-	ROM_LOAD( "dt-141_1a.bin",  0x0000, 0x10000, CRC(20c2e86a) SHA1(a18248ba00b847a09df0bea7752a21162af8af76) )
+	ROM_LOAD( "dt-141_1a.cas",  0x0000, 0x10000, CRC(20c2e86a) SHA1(a18248ba00b847a09df0bea7752a21162af8af76) )
 ROM_END
 
 /* 44 Boulder Dash */
@@ -1578,16 +1584,16 @@ static DRIVER_INIT( decocrom )
 /* 11 */ GAME( 1981, clocknch,  decocass, clocknch, clocknch, decocass, ROT270, "Data East Corporation", "Lock'n'Chase (DECO Cassette)", 0 )
 /* 12 */ // 1981.08 Flash Boy/DECO Kid
 /* 13 */ GAME( 1981, cprogolf,  decocass, cprogolf, cprogolf, decocass, ROT270, "Data East Corporation", "Tournament Pro Golf (DECO Cassette)", 0 )
-         GAME( 1981, cprogolfj, cprogolf, cprogolfj, cprogolf, decocass, ROT270, "Data East Corporation", "Tournament Pro Golf (DECO Cassette, Japan)", 0 )
+         GAME( 1981, cprogolfj, cprogolf, cprogolfj,cprogolf, decocass, ROT270, "Data East Corporation", "Tournament Pro Golf (DECO Cassette, Japan)", 0 )
 /* 14 */ GAME( 1981, cdsteljn,  decocass, cdsteljn, decocass, decocass, ROT270, "Data East Corporation", "DS Telejan (DECO Cassette, Japan)", 0) 
 /* 15 */ GAME( 1981, cluckypo,  decocass, cluckypo, decocass, decocass, ROT270, "Data East Corporation", "Lucky Poker (DECO Cassette)", 0 )
 /* 16 */ GAME( 1981, ctisland,  decocass, ctisland, decocass, decocrom, ROT270, "Data East Corporation", "Treasure Island (DECO Cassette, set 1)", 0 )
-		 GAME( 1981, ctisland2, ctisland, ctisland, decocass, decocrom, ROT270, "Data East Corporation", "Treasure Island (DECO Cassette, set 2)", 0 )
-		 GAME( 1981, ctisland3, ctisland, ctisland, decocass, decocrom, ROT270, "Data East Corporation", "Treasure Island (DECO Cassette, set 3)", GAME_NOT_WORKING ) /* Different Bitswap? */
+         GAME( 1981, ctisland2, ctisland, ctisland, decocass, decocrom, ROT270, "Data East Corporation", "Treasure Island (DECO Cassette, set 2)", 0 )
+         GAME( 1981, ctisland3, ctisland, ctisland, decocass, decocrom, ROT270, "Data East Corporation", "Treasure Island (DECO Cassette, set 3)", GAME_NOT_WORKING ) /* Different Bitswap? */
 /* 17 */ // 1981.10 Bobbitto
 /* 18 */ GAME( 1982, cexplore,  decocass, cexplore, cexplore, decocass, ROT270, "Data East Corporation", "Explorer (DECO Cassette)", GAME_NOT_WORKING )
 /* 19 */ GAME( 1982, cdiscon1,  decocass, cdiscon1, decocass, decocass, ROT270, "Data East Corporation", "Disco No.1 (DECO Cassette)", 0 )
-		 GAME( 1982, csweetht,  cdiscon1, cdiscon1, decocass, decocass, ROT270, "Data East Corporation", "Sweet Heart (DECO Cassette)", 0 )
+         GAME( 1982, csweetht,  cdiscon1, cdiscon1, decocass, decocass, ROT270, "Data East Corporation", "Sweet Heart (DECO Cassette)", 0 )
 /* 20 */ GAME( 1982, ctornado,  decocass, ctornado, ctornado, decocass, ROT270, "Data East Corporation", "Tornado (DECO Cassette)", 0 )
 /* 21 */ GAME( 1982, cmissnx,   decocass, cmissnx,  cmissnx,  decocass, ROT270, "Data East Corporation", "Mission-X (DECO Cassette)", 0 )
 /* 22 */ GAME( 1982, cptennis,  decocass, cptennis, decocass, decocass, ROT270, "Data East Corporation", "Pro Tennis (DECO Cassette)", 0 )
@@ -1597,26 +1603,26 @@ static DRIVER_INIT( decocrom )
 /* 26 */ GAME( 1983, cbtime,    decocass, cbtime,   cbtime,   decocass, ROT270, "Data East Corporation", "Burger Time (DECO Cassette)", 0 )
          GAME( 1982, chamburger,cbtime,   cbtime,   cbtime,   decocass, ROT270, "Data East Corporation", "Hamburger (DECO Cassette, Japan)", 0 )
 /* 27 */ GAME( 1982, cburnrub,  decocass, cburnrub, decocass, decocass, ROT270, "Data East Corporation", "Burnin' Rubber (DECO Cassette, set 1)", 0 )
-		 GAME( 1982, cburnrub2, cburnrub, cburnrub, decocass, decocass, ROT270, "Data East Corporation", "Burnin' Rubber (DECO Cassette, set 2)", 0 )
-		 GAME( 1982, cbnj,      cburnrub, cburnrub, decocass, decocass, ROT270, "Data East Corporation", "Bump 'n' Jump (DECO Cassette)", 0 )
+         GAME( 1982, cburnrub2, cburnrub, cburnrub, decocass, decocass, ROT270, "Data East Corporation", "Burnin' Rubber (DECO Cassette, set 2)", 0 )
+         GAME( 1982, cbnj,      cburnrub, cburnrub, decocass, decocass, ROT270, "Data East Corporation", "Bump 'n' Jump (DECO Cassette)", 0 )
 /* 28 */ GAME( 1983, cgraplop,  decocass, cgraplop, cgraplop, decocass, ROT270, "Data East Corporation", "Cluster Buster / Graplop (DECO Cassette, set 1)", 0 )
-		 GAME( 1983, cgraplop2, cgraplop, cgraplop2,cgraplop, decocass, ROT270, "Data East Corporation", "Cluster Buster / Graplop (DECO Cassette, set 2)", GAME_NOT_WORKING )
+         GAME( 1983, cgraplop2, cgraplop, cgraplop2,cgraplop, decocass, ROT270, "Data East Corporation", "Cluster Buster / Graplop (DECO Cassette, set 2)", GAME_NOT_WORKING )
 /* 29 */ GAME( 1983, clapapa,   decocass, clapapa,  decocass, decocass, ROT270, "Data East Corporation", "Rootin' Tootin' / La-Pa-Pa (DECO Cassette)" , 0) /* Displays 'La-Pa-Pa during attract */
-	     GAME( 1983, clapapa2,  clapapa,  clapapa,  decocass, decocass, ROT270, "Data East Corporation", "Rootin' Tootin' (DECO Cassette)" , 0) /* Displays 'Rootin' Tootin' during attract */
+         GAME( 1983, clapapa2,  clapapa,  clapapa,  decocass, decocass, ROT270, "Data East Corporation", "Rootin' Tootin' (DECO Cassette)" , 0) /* Displays 'Rootin' Tootin' during attract */
 /* 30 */ GAME( 1983, cskater,   decocass, cskater,  cskater,  decocass, ROT270, "Data East Corporation", "Skater (DECO Cassette, Japan)", 0 )
 /* 31 */ GAME( 1983, cprobowl,  decocass, cprobowl, decocass, decocass, ROT270, "Data East Corporation", "Pro Bowling (DECO Cassette)", 0 )
 /* 32 */ GAME( 1983, cnightst,  decocass, cnightst, cnightst, decocass, ROT270, "Data East Corporation", "Night Star (DECO Cassette, set 1)", 0 )
-		 GAME( 1983, cnightst2, cnightst, cnightst, cnightst, decocass, ROT270, "Data East Corporation", "Night Star (DECO Cassette, set 2)", 0 )
+         GAME( 1983, cnightst2, cnightst, cnightst, cnightst, decocass, ROT270, "Data East Corporation", "Night Star (DECO Cassette, set 2)", 0 )
 /* 33 */ GAME( 1983, cpsoccer,  decocass, cpsoccer, cpsoccer, decocass, ROT270, "Data East Corporation", "Pro Soccer (DECO Cassette)", 0 )
-		 GAME( 1983, cpsoccerj, cpsoccer, cpsoccer, cpsoccer, decocass, ROT270, "Data East Corporation", "Pro Soccer (DECO Cassette, Japan)", 0 )
+         GAME( 1983, cpsoccerj, cpsoccer, cpsoccer, cpsoccer, decocass, ROT270, "Data East Corporation", "Pro Soccer (DECO Cassette, Japan)", 0 )
 /* 34 */ GAME( 1983, csdtenis,  decocass, csdtenis, csdtenis, decocass, ROT270, "Data East Corporation", "Super Doubles Tennis (DECO Cassette, Japan)", GAME_WRONG_COLORS )
 /* 35 */ GAME( 1985, cflyball,  decocass, cflyball, decocass, decocass, ROT270, "Data East Corporation", "Flying Ball (DECO Cassette)", 0 )
 /* 36 */ // 1984.04 Genesis/Boomer Rang'r
 /* 37 */ GAME( 1983, czeroize,  decocass, czeroize, decocass, decocass, ROT270, "Data East Corporation", "Zeroize (DECO Cassette)", 0 )
 /* 38 */ GAME( 1984, cscrtry,   decocass, type4,    cscrtry,  decocass, ROT270, "Data East Corporation", "Scrum Try (DECO Cassette, set 1)", 0 )
-		 GAME( 1984, cscrtry2,  cscrtry,  type4,    cscrtry,  decocass, ROT270, "Data East Corporation", "Scrum Try (DECO Cassette, set 2)", 0 )
+         GAME( 1984, cscrtry2,  cscrtry,  type4,    cscrtry,  decocass, ROT270, "Data East Corporation", "Scrum Try (DECO Cassette, set 2)", 0 )
 /* 39 */ GAME( 1984, cppicf,    decocass, cppicf,   decocass, decocass, ROT270, "Data East Corporation", "Peter Pepper's Ice Cream Factory (DECO Cassette, set 1)", 0 )
-		 GAME( 1984, cppicf2,   cppicf,   cppicf,   decocass, decocass, ROT270, "Data East Corporation", "Peter Pepper's Ice Cream Factory (DECO Cassette, set 2)", 0 )
+         GAME( 1984, cppicf2,   cppicf,   cppicf,   decocass, decocass, ROT270, "Data East Corporation", "Peter Pepper's Ice Cream Factory (DECO Cassette, set 2)", 0 )
 /* 40 */ GAME( 1984, cfghtice,  decocass, cfghtice, cfghtice, decocass, ROT270, "Data East Corporation", "Fighting Ice Hockey (DECO Cassette)", 0 )
 /* 41 */ GAME( 1984, coozumou,  decocass, type4,    cscrtry,  decocass, ROT270, "Data East Corporation", "Oozumou - The Grand Sumo (DECO Cassette, Japan)", 0 )
 /* 42 */ // 1984.08 Hellow Gateball // not a typo, this is official spelling
