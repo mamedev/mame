@@ -1433,6 +1433,14 @@ MACHINE_RESET( chwy )
 	state->m_dongle_r = decocass_type1_latch_27_pass_3_inv_2_r;
 }
 
+MACHINE_RESET( cdsteljn )
+{
+	decocass_state *state = machine.driver_data<decocass_state>();
+	decocass_reset_common(machine);
+	LOG(0,("dongle type #1 (A-0061)\n"));
+	state->m_dongle_r = decocass_type1_latch_27_pass_3_inv_2_r;
+}
+
 MACHINE_RESET( cterrani )
 {
 	decocass_state *state = machine.driver_data<decocass_state>();
@@ -1476,6 +1484,16 @@ MACHINE_RESET( cprogolf )
 	decocass_state *state = machine.driver_data<decocass_state>();
 	decocass_reset_common(machine);
 	LOG(0,("dongle type #1 (DE-0061 flip 0-1)\n"));
+	state->m_dongle_r = decocass_type1_latch_26_pass_3_inv_2_r;
+	state->m_type1_inmap = MAKE_MAP(1,0,2,3,4,5,6,7);
+	state->m_type1_outmap = MAKE_MAP(1,0,2,3,4,5,6,7);
+}
+
+MACHINE_RESET( cprogolfj )
+{
+	decocass_state *state = machine.driver_data<decocass_state>();
+	decocass_reset_common(machine);
+	LOG(0,("dongle type #1 (A-0061 flip 0-1)\n"));
 	state->m_dongle_r = decocass_type1_latch_26_pass_3_inv_2_r;
 	state->m_type1_inmap = MAKE_MAP(1,0,2,3,4,5,6,7);
 	state->m_type1_outmap = MAKE_MAP(1,0,2,3,4,5,6,7);

@@ -737,6 +737,18 @@ static MACHINE_CONFIG_DERIVED( ctsttape, decocass )
 	MCFG_MACHINE_RESET(ctsttape)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( cprogolfj, decocass )
+
+	/* basic machine hardware */
+	MCFG_MACHINE_RESET(cprogolfj)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( cdsteljn, decocass )
+
+	/* basic machine hardware */
+	MCFG_MACHINE_RESET(cdsteljn)
+MACHINE_CONFIG_END
+
 
 static MACHINE_CONFIG_DERIVED( chwy, decocass )
 
@@ -1071,7 +1083,7 @@ ROM_START( cprogolfj ) // version 1-A
 	DECOCASS_BIOS_A_ROMS
 
 	ROM_REGION( 0x00020, "dongle", 0 )	  /* dongle data */
-	ROM_LOAD( "dp-113_a.dgl",   0x0000, 0x0020, CRC(d8587be5) SHA1(c118033a4973994a0dcd245c22c53871dc0e98c2) )
+	ROM_LOAD( "a-0061.dgl",   0x0000, 0x0020, CRC(1bc9fccb) SHA1(ffc59c7660d5c87a8deca294f80260b6bc7c3027) )
 
 	ROM_REGION( 0x10000, "cassette", 0 )	  /* (max) 64k for cassette image */
 	ROM_LOAD( "dt-113_a.cas",   0x0000, 0x8000, CRC(8408248f) SHA1(8b78c379bf6879916bc9b284d7a0956edfac78be) )
@@ -1082,7 +1094,7 @@ ROM_START( cdsteljn ) // version 4-A-3
 	DECOCASS_BIOS_A_ROMS
 
 	ROM_REGION( 0x00020, "dongle", 0 )	  /* dongle data */
-	ROM_LOAD( "dp-114_a.dgl",   0x0000, 0x0020, CRC(7a728c15) SHA1(13d9a9e916e483ed89d61a35c47c9d51a2bf8f0d) )
+	ROM_LOAD( "a-0061.dgl",   0x0000, 0x0020, CRC(1bc9fccb) SHA1(ffc59c7660d5c87a8deca294f80260b6bc7c3027) )
 
 	ROM_REGION( 0x10000, "cassette", 0 )	  /* (max) 64k for cassette image */
     ROM_LOAD( "dt-1144-a3.cas", 0x000000, 0x007300, CRC(1336a912) SHA1(0c64e069713b411da38b43f14306953621726d35) ) 
@@ -1566,8 +1578,8 @@ static DRIVER_INIT( decocrom )
 /* 11 */ GAME( 1981, clocknch,  decocass, clocknch, clocknch, decocass, ROT270, "Data East Corporation", "Lock'n'Chase (DECO Cassette)", 0 )
 /* 12 */ // 1981.08 Flash Boy/DECO Kid
 /* 13 */ GAME( 1981, cprogolf,  decocass, cprogolf, cprogolf, decocass, ROT270, "Data East Corporation", "Tournament Pro Golf (DECO Cassette)", 0 )
-         GAME( 1981, cprogolfj, cprogolf, cprogolf, cprogolf, decocass, ROT270, "Data East Corporation", "Tournament Pro Golf (DECO Cassette, Japan)", GAME_NOT_WORKING )
-/* 14 */ GAME( 1981, cdsteljn,  decocass, cprogolf, decocass, decocass, ROT270, "Data East Corporation", "DS Telejan (DECO Cassette, Japan)", GAME_NOT_WORKING ) 
+         GAME( 1981, cprogolfj, cprogolf, cprogolfj, cprogolf, decocass, ROT270, "Data East Corporation", "Tournament Pro Golf (DECO Cassette, Japan)", 0 )
+/* 14 */ GAME( 1981, cdsteljn,  decocass, cdsteljn, decocass, decocass, ROT270, "Data East Corporation", "DS Telejan (DECO Cassette, Japan)", 0) 
 /* 15 */ GAME( 1981, cluckypo,  decocass, cluckypo, decocass, decocass, ROT270, "Data East Corporation", "Lucky Poker (DECO Cassette)", 0 )
 /* 16 */ GAME( 1981, ctisland,  decocass, ctisland, decocass, decocrom, ROT270, "Data East Corporation", "Treasure Island (DECO Cassette, set 1)", 0 )
 		 GAME( 1981, ctisland2, ctisland, ctisland, decocass, decocrom, ROT270, "Data East Corporation", "Treasure Island (DECO Cassette, set 2)", 0 )
