@@ -867,11 +867,11 @@ ROM_START( nzeroteam )
 
 	ROM_REGION( 0x400000, "gfx2", 0 ) /* background gfx */
 	ROM_LOAD( "back-1", 0x000000, 0x100000, CRC(8b7f9219) SHA1(3412b6f8a4fe245e521ddcf185a53f2f4520eb57) ) /* Same as "MUSHA BACK-1" of other Zero Team sets */
-	ROM_LOAD( "back-2", 0x100000, 0x080000, CRC(ce61c952) SHA1(52a843c8ba428b121fab933dd3b313b2894d80ac) ) /* Same as "MUSHA BACK-1" of other Zero Team sets */
+	ROM_LOAD( "back-2", 0x100000, 0x080000, CRC(ce61c952) SHA1(52a843c8ba428b121fab933dd3b313b2894d80ac) ) /* Same as "MUSHA BACK-2" of other Zero Team sets */
 
 	ROM_REGION( 0x800000, "gfx3", 0 ) /* sprite gfx (encrypted) */
 	ROM_LOAD32_WORD( "obj-1", 0x000000, 0x200000, CRC(45be8029) SHA1(adc164f9dede9a86b96a4d709e9cba7d2ad0e564) ) /* Same as "MUSHA OBJ-1" of other Zero Team sets */
-	ROM_LOAD32_WORD( "obj-2", 0x000002, 0x200000, CRC(cb61c19d) SHA1(151a2ce9c32f3321a974819e9b165dddc31c8153) ) /* Same as "MUSHA OBJ-1" of other Zero Team sets */
+	ROM_LOAD32_WORD( "obj-2", 0x000002, 0x200000, CRC(cb61c19d) SHA1(151a2ce9c32f3321a974819e9b165dddc31c8153) ) /* Same as "MUSHA OBJ-2" of other Zero Team sets */
 
 	ROM_REGION( 0x100000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "6.pcm", 0x00000, 0x40000, CRC(48be32b1) SHA1(969d2191a3c46871ee8bf93088b3cecce3eccf0c) ) /* Same as other Zero Team sets */
