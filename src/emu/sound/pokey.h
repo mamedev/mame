@@ -30,38 +30,6 @@
 
 /* CONSTANT DEFINITIONS */
 
-/* POKEY WRITE LOGICALS */
-#define AUDF1_C     0x00
-#define AUDC1_C     0x01
-#define AUDF2_C     0x02
-#define AUDC2_C     0x03
-#define AUDF3_C     0x04
-#define AUDC3_C     0x05
-#define AUDF4_C     0x06
-#define AUDC4_C     0x07
-#define AUDCTL_C    0x08
-#define STIMER_C    0x09
-#define SKREST_C    0x0A
-#define POTGO_C     0x0B
-#define SEROUT_C    0x0D
-#define IRQEN_C     0x0E
-#define SKCTL_C     0x0F
-
-/* POKEY READ LOGICALS */
-#define POT0_C      0x00
-#define POT1_C      0x01
-#define POT2_C      0x02
-#define POT3_C      0x03
-#define POT4_C      0x04
-#define POT5_C      0x05
-#define POT6_C      0x06
-#define POT7_C      0x07
-#define ALLPOT_C    0x08
-#define KBCODE_C    0x09
-#define RANDOM_C    0x0A
-#define SERIN_C     0x0D
-#define IRQST_C     0x0E
-#define SKSTAT_C    0x0F
 
 /* exact 1.79 MHz clock freq (of the Atari 800 that is) */
 #define FREQ_17_EXACT   1789790
@@ -75,6 +43,8 @@
  *  New function pointers for serial input/output and a interrupt callback.
  *****************************************************************************/
 
+class pokeyn_device;
+
 typedef struct _pokey_interface pokey_interface;
 struct _pokey_interface
 {
@@ -82,24 +52,9 @@ struct _pokey_interface
 	devcb_read8 allpot_r;
 	devcb_read8 serin_r;
 	devcb_write8 serout_w;
-	void (*interrupt_cb)(device_t *device, int mask);
+	void (*interrupt_cb)(pokeyn_device *device, int mask);
 };
 
-#ifdef OLDDEVICE_FOR_MESS
-READ8_DEVICE_HANDLER( pokey_r );
-WRITE8_DEVICE_HANDLER( pokey_w );
-
-/* fix me: eventually this should be a single device with pokey subdevices */
-READ8_HANDLER( quad_pokey_r );
-WRITE8_HANDLER( quad_pokey_w );
-
-void pokey_serin_ready (device_t *device, int after);
-void pokey_break_w (device_t *device, int shift);
-void pokey_kbcode_w (device_t *device, int kbcode, int make);
-
-DECLARE_LEGACY_SOUND_DEVICE(POKEY, pokey);
-
-#endif
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -114,6 +69,46 @@ class pokeyn_device : public device_t,
 #endif
 {
 public:
+
+	enum
+	{
+		/* POKEY WRITE LOGICALS */
+		AUDF1_C  =   0x00,
+		AUDC1_C  =   0x01,
+		AUDF2_C  =   0x02,
+		AUDC2_C  =   0x03,
+		AUDF3_C  =   0x04,
+		AUDC3_C  =   0x05,
+		AUDF4_C  =   0x06,
+		AUDC4_C  =   0x07,
+		AUDCTL_C =   0x08,
+		STIMER_C =   0x09,
+		SKREST_C =   0x0A,
+		POTGO_C  =   0x0B,
+		SEROUT_C =   0x0D,
+		IRQEN_C  =   0x0E,
+		SKCTL_C  =   0x0F
+	};
+
+	enum
+	{
+		/* POKEY READ LOGICALS */
+		POT0_C   =  0x00,
+		POT1_C   =  0x01,
+		POT2_C   =  0x02,
+		POT3_C   =  0x03,
+		POT4_C   =  0x04,
+		POT5_C   =  0x05,
+		POT6_C   =  0x06,
+		POT7_C   =  0x07,
+		ALLPOT_C =  0x08,
+		KBCODE_C =  0x09,
+		RANDOM_C =  0x0A,
+		SERIN_C  =  0x0D,
+		IRQST_C  =  0x0E,
+		SKSTAT_C =  0x0F
+	};
+
 	// construction/destruction
 	pokeyn_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
@@ -150,25 +145,54 @@ protected:
 
 private:
 
+
+    class pokey_channel
+    {
+    public:
+    	pokey_channel();
+    	UINT8 m_AUDF;           /* AUDFx (D200, D202, D204, D206) */
+    	UINT8 m_AUDC;			/* AUDCx (D201, D203, D205, D207) */
+    	INT32 m_borrow_cnt;		/* borrow counter */
+    	INT32 m_counter;		/* channel counter */
+    	UINT32 m_volume;		/* channel volume - derived */
+    	UINT8 m_output;			/* channel output signal (1 active, 0 inactive) */
+    	UINT8 m_filter_sample;  /* high-pass filter sample */
+
+    	inline void sample(void)  			{ m_filter_sample = m_output; }
+    	inline void reset_channel(void)	 	{ m_counter = m_AUDF ^ 0xff; }
+    	inline void inc_chan(void)
+    	{
+    		m_counter = (m_counter + 1) & 0xff;
+    		if (m_counter == 0 && m_borrow_cnt == 0)
+    			m_borrow_cnt = 3;
+    	}
+    	inline int check_borrow()
+    	{
+    		if (m_borrow_cnt > 0)
+    		{
+    			m_borrow_cnt--;
+    			return (m_borrow_cnt == 0);
+    		}
+    		return 0;
+    	}
+    };
+
+	static const int POKEY_CHANNELS = 4;
+
 	void poly_init_4_5(UINT32 *poly, int size, int xorbit, int invert);
 	void poly_init_9_17(UINT32 *poly, int size);
 	inline void process_channel(int ch);
-	inline void reset_channel(int ch);
-	inline void inc_chan(int ch);
-	inline int check_borrow(int ch);
 	void pokey_potgo(void);
+	char *audc2str(int val);
+	char *audctl2str(int val);
 
 	// internal state
 	sound_stream* m_stream;
 
-	INT32 m_clock_cnt[3];		/* clock counters */
-	INT32 m_borrow_cnt[4];	/* borrow counters */
+	pokey_channel m_channel[POKEY_CHANNELS];
 
-	INT32 m_counter[4];		/* channel counter */
 	INT32 m_divisor[4];		/* channel divisor (modulo value) */
-	UINT32 m_volume[4];		/* channel volume - derived */
-	UINT8 m_output[4];		/* channel output signal (1 active, 0 inactive) */
-	UINT8 m_filter_sample[4];  /* hi-pass filter sample */
+	INT32 m_clock_cnt[3];		/* clock counters */
 	UINT32 m_p4;              /* poly4 index */
 	UINT32 m_p5;              /* poly5 index */
 	UINT32 m_p9;              /* poly9 index */
@@ -185,9 +209,7 @@ private:
 	devcb_resolved_read8 m_allpot_r;
 	devcb_resolved_read8 m_serin_r;
 	devcb_resolved_write8 m_serout_w;
-	void (*m_interrupt_cb)(device_t *device, int mask);
-	UINT8 m_AUDF[4];          /* AUDFx (D200, D202, D204, D206) */
-	UINT8 m_AUDC[4];			/* AUDCx (D201, D203, D205, D207) */
+	void (*m_interrupt_cb)(pokeyn_device *device, int mask);
 	UINT8 m_POTx[8];			/* POTx   (R/D200-D207) */
 	UINT8 m_AUDCTL;			/* AUDCTL (W/D208) */
 	UINT8 m_ALLPOT;			/* ALLPOT (R/D208) */

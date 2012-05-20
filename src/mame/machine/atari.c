@@ -24,7 +24,7 @@ static void a600xl_mmu(running_machine &machine, UINT8 new_mmu);
 
 static void pokey_reset(running_machine &machine);
 
-void atari_interrupt_cb(device_t *device, int mask)
+void atari_interrupt_cb(pokeyn_device *device, int mask)
 {
 
 	if (VERBOSE_POKEY)

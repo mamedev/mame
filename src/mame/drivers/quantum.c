@@ -80,13 +80,13 @@ READ16_MEMBER(quantum_state::trackball_r)
 
 static READ8_DEVICE_HANDLER( input_1_r )
 {
-	return (device->machine().root_device().ioport("DSW0")->read() << (7 - (offset - POT0_C))) & 0x80;
+	return (device->machine().root_device().ioport("DSW0")->read() << (7 - (offset - pokeyn_device::POT0_C))) & 0x80;
 }
 
 
 static READ8_DEVICE_HANDLER( input_2_r )
 {
-	return (device->machine().root_device().ioport("DSW1")->read() << (7 - (offset - POT0_C))) & 0x80;
+	return (device->machine().root_device().ioport("DSW1")->read() << (7 - (offset - pokeyn_device::POT0_C))) & 0x80;
 }
 
 
