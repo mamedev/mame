@@ -845,7 +845,7 @@ ROM_START( r2dx_v33 )
 ROM_END
 
 /* Different hardware, uses COPX-D3 for protection  */
-ROM_START( nzerotea )
+ROM_START( nzeroteam )
 	ROM_REGION( 0x100000, "mainprg", 0 ) /* v30 main cpu */
 	ROM_LOAD16_BYTE("prg1", 0x000000, 0x80000, CRC(3c7d9410) SHA1(25f2121b6c2be73f11263934266901ed5d64d2ee) )
 	ROM_LOAD16_BYTE("prg2", 0x000001, 0x80000, CRC(6cba032d) SHA1(bf5d488cd578fff09e62e3650efdee7658033e3f) )
