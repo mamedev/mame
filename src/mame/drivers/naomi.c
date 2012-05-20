@@ -5547,6 +5547,9 @@ ROM_START( ninjaslt )
 
     ROM_REGION( 4, "rom_key", 0 )
     ROM_LOAD( "nja3-key.bin", 0x000000, 0x000004, CRC(e6997eb0) SHA1(c866a5069e28939be5a8fc867bc14791decac3c8) )
+
+    ROM_REGION( 0x20000, "jyu_io", 0 )  // H8/3334-based I/O board ROM, eventually should be separated out
+    ROM_LOAD( "jyu1_prg0a.ic3", 0x000000, 0x020000, CRC(aec4dbc1) SHA1(bddd4f345baf7f594998a39c09da18b3834f0ac2) ) 
 ROM_END
 
 // this one's weird: the rom test checksum for IC 1 matches a screenshot from h/w, but on h/w it says ---- instead of BAD.
