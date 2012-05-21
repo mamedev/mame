@@ -563,35 +563,6 @@ void i8255_device::write_mode2(UINT8 data)
 
 
 //-------------------------------------------------
-//  write_pc -
-//-------------------------------------------------
-
-void i8255_device::write_pc(UINT8 data)
-{
-	int changed = 0;
-
-	// PC upper
-	if (group_mode(GROUP_A) == MODE_0 && port_c_upper_mode() == MODE_OUTPUT)
-	{
-		m_output[PORT_C] = (data & 0xf0) | (m_output[PORT_C] & 0x0f);
-		changed = 1;
-	}
-
-	// PC lower
-	if (group_mode(GROUP_B) == MODE_0 && port_c_lower_mode() == MODE_OUTPUT)
-	{
-		m_output[PORT_C] = (m_output[PORT_C] & 0xf0) | (data & 0x0f);
-		changed = 1;
-	}
-
-	if (changed)
-	{
-		output_pc();
-	}
-}
-
-
-//-------------------------------------------------
 //  output_pc -
 //-------------------------------------------------
 
@@ -878,7 +849,8 @@ WRITE8_MEMBER( i8255_device::write )
 	case PORT_C:
 		if (LOG) logerror("I8255 '%s' Port C Write: %02x\n", tag(), data);
 
-		write_pc(data);
+		m_output[PORT_C] = data;
+		output_pc();
 		break;
 
 	case CONTROL:

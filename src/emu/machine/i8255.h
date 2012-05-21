@@ -126,7 +126,6 @@ private:
 	void write_mode0(int port, UINT8 data);
 	void write_mode1(int port, UINT8 data);
 	void write_mode2(UINT8 data);
-	void write_pc(UINT8 data);
 	void output_pc();
 	void set_mode(UINT8 data);
 	void set_pc_bit(int bit, int state);
