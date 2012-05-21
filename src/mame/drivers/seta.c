@@ -13,7 +13,7 @@ Custom :    X1-001A  X1-002A (SDIP64)   Sprites
             X1-004           (SDIP52)   Inputs
             X1-005   X0-005
             X1-006   X0-006
-            X1-007           (SDIP42)   Vide DAC
+            X1-007           (SDIP42)   Video DAC
             X1-010           (QFP80)    Sound: 16 Bit PCM
             X1-011   X1-012  (QFP100)   Tilemaps
             X1-014                      Sprites?
@@ -60,6 +60,7 @@ P0-101-1                94 Pro Mahjong Kiwame                   Athena
 PO-102-A                93 Mad Shark                            Allumer
 PO-107-A (prototype?)   94 Orbs (prototype?)                    American Sammy
 PO-107-A                93 Kero Kero Keroppi no Issyoni Asobou  Sammy Industries  [added Chack'n, Hau]
+P0-111A                 94 Magical Speed                        Allumer
 P0-114-A (SKB-001)      94 Krazy Bowl                           American Sammy
 P0-117-A (DH-01)        95 Extreme Downhill                     Sammy Japan
 P0-117-A?               95 Sokonuke Taisen Game                 Sammy Industries
@@ -2377,6 +2378,42 @@ static ADDRESS_MAP_START( madshark_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0xa00600, 0xa00607) AM_RAM AM_DEVREADWRITE_LEGACY("spritegen", spritectrl_r16, spritectrl_w16)
 	AM_RANGE(0xa80000, 0xa80001) AM_RAM								// ? $4000
 	AM_RANGE(0xb00000, 0xb03fff) AM_RAM AM_DEVREADWRITE_LEGACY("spritegen", spritecode_r16, spritecode_w16)		// Sprites Code + X + Attr
+#if __uPD71054_TIMER
+	AM_RANGE(0xc00000, 0xc00007) AM_WRITE(timer_regs_w)				// ?
+#else
+	AM_RANGE(0xc00000, 0xc00007) AM_WRITENOP						// ?
+#endif
+	AM_RANGE(0xd00000, 0xd03fff) AM_DEVREADWRITE_LEGACY("x1snd", seta_sound_word_r,seta_sound_word_w)	// Sound
+ADDRESS_MAP_END
+
+/* almost identical to kamenrid */
+static ADDRESS_MAP_START( magspeed_map, AS_PROGRAM, 16, seta_state )
+	AM_RANGE(0x000000, 0x07ffff) AM_ROM								// ROM
+	AM_RANGE(0x200000, 0x20ffff) AM_RAM								// RAM
+	AM_RANGE(0x500000, 0x500001) AM_READ_PORT("P1")					// P1
+	AM_RANGE(0x500002, 0x500003) AM_READ_PORT("P2")					// P2
+	AM_RANGE(0x500004, 0x500005) AM_READ_PORT("COINS")				// Coins
+	AM_RANGE(0x500008, 0x50000b) AM_READ(seta_dsw_r)				// DSW
+	AM_RANGE(0x50000c, 0x50000d) AM_WRITE(watchdog_reset16_w)		// Watchdog
+	AM_RANGE(0x500010, 0x500015) AM_RAM_WRITE(msgundam_vregs_w) AM_SHARE("vregs")	// ? Coin Lockout + Video Registers
+	AM_RANGE(0x500018, 0x500019) AM_WRITENOP						// lev 2 irq ack?
+	AM_RANGE(0x50001c, 0x50001d) AM_WRITENOP						// lev 4 irq ack?
+	AM_RANGE(0x600000, 0x600005) AM_WRITENOP						// Leds
+	AM_RANGE(0x600006, 0x600007) AM_WRITENOP						// ?
+	AM_RANGE(0x700000, 0x7003ff) AM_RAM								// Palette RAM (tested)
+	AM_RANGE(0x700400, 0x700fff) AM_RAM AM_SHARE("paletteram")		// Palette
+	AM_RANGE(0x701000, 0x703fff) AM_RAM 							// Palette RAM (tested)
+	AM_RANGE(0x800000, 0x803fff) AM_RAM_WRITE(seta_vram_0_w) AM_SHARE("vram_0")	// VRAM 0&1
+	AM_RANGE(0x804000, 0x807fff) AM_RAM								// tested
+	AM_RANGE(0x880000, 0x883fff) AM_RAM_WRITE(seta_vram_2_w) AM_SHARE("vram_2")	// VRAM 2&3
+	AM_RANGE(0x884000, 0x887fff) AM_RAM								// tested
+	AM_RANGE(0x900000, 0x900005) AM_RAM AM_SHARE("vctrl_0")			// VRAM 0&1 Ctrl
+	AM_RANGE(0x980000, 0x980005) AM_RAM AM_SHARE("vctrl_2")			// VRAM 2&3 Ctrl
+	AM_RANGE(0xa00000, 0xa005ff) AM_RAM AM_DEVREADWRITE_LEGACY("spritegen", spriteylow_r16, spriteylow_w16)		// Sprites Y
+	AM_RANGE(0xa00600, 0xa00607) AM_RAM AM_DEVREADWRITE_LEGACY("spritegen", spritectrl_r16, spritectrl_w16)
+	AM_RANGE(0xa80000, 0xa80001) AM_RAM								// ? $4000
+	AM_RANGE(0xb00000, 0xb03fff) AM_RAM AM_DEVREADWRITE_LEGACY("spritegen", spritecode_r16, spritecode_w16)		// Sprites Code + X + Attr
+	AM_RANGE(0xb04000, 0xb07fff) AM_RAM								// tested
 #if __uPD71054_TIMER
 	AM_RANGE(0xc00000, 0xc00007) AM_WRITE(timer_regs_w)				// ?
 #else
@@ -4827,6 +4864,94 @@ static INPUT_PORTS_START( madshark )
 	PORT_DIPSETTING(      0xc000, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(      0xa000, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_4C ) )
+INPUT_PORTS_END
+
+
+/***************************************************************************
+                                Magical Speed
+***************************************************************************/
+
+static INPUT_PORTS_START( magspeed )
+	PORT_START("P1") // Player 1
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_OTHER   ) PORT_NAME("P1 Card 1") PORT_CODE(KEYCODE_Z)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_OTHER   ) PORT_NAME("P1 Card 2") PORT_CODE(KEYCODE_X)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_OTHER   ) PORT_NAME("P1 Card 3") PORT_CODE(KEYCODE_C)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_OTHER   ) PORT_NAME("P1 Card 4") PORT_CODE(KEYCODE_V)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START1	 )
+
+	PORT_START("P2") // Player 2
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_OTHER   ) PORT_NAME("P2 Card 1") PORT_CODE(KEYCODE_D)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_OTHER   ) PORT_NAME("P2 Card 2") PORT_CODE(KEYCODE_F)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_OTHER   ) PORT_NAME("P2 Card 3") PORT_CODE(KEYCODE_G)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_OTHER   ) PORT_NAME("P2 Card 4") PORT_CODE(KEYCODE_H)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START2	 )
+
+	PORT_START("COINS") // Coins
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(5)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(5)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_TILT     )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN  )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN  )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN  )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN  )
+
+	PORT_START("DSW")	// 2 DSWs - $500009 & B.b
+	PORT_SERVICE( 0x0001, IP_ACTIVE_LOW )
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unused ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unused ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unused ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unused ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unused ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Flip_Screen ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0f00, 0x0f00, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(      0x0500, DEF_STR( 6C_1C ) )
+	PORT_DIPSETTING(      0x0d00, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(      0x0300, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(      0x0b00, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(      0x0800, DEF_STR( 8C_3C ) )
+	PORT_DIPSETTING(      0x0700, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(      0x0400, DEF_STR( 5C_3C ) )
+	PORT_DIPSETTING(      0x0c00, DEF_STR( 3C_2C ) )
+	PORT_DIPSETTING(      0x0f00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(      0x0200, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(      0x0900, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(      0x0100, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(      0x0e00, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(      0x0600, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(      0x0a00, DEF_STR( 1C_6C ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )
+	PORT_DIPNAME( 0x3000, 0x3000, DEF_STR( Difficulty ) )
+	PORT_DIPSETTING(      0x1000, DEF_STR( Easy ) )
+	PORT_DIPSETTING(      0x3000, DEF_STR( Normal ) )
+	PORT_DIPSETTING(      0x2000, DEF_STR( Hard ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )
+	PORT_DIPNAME( 0xc000, 0xc000, "Number of Rounds" )
+	PORT_DIPSETTING(      0x4000, "1" )
+	PORT_DIPSETTING(      0xc000, "2" )
+	PORT_DIPSETTING(      0x8000, DEF_STR( Unused ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Unused ) )
 INPUT_PORTS_END
 
 
@@ -8305,6 +8430,47 @@ static MACHINE_CONFIG_START( madshark, seta_state )
 MACHINE_CONFIG_END
 
 /***************************************************************************
+                                Magical Speed
+***************************************************************************/
+
+/*  magspeed: lev 2 by vblank, lev 4 by timer */
+static MACHINE_CONFIG_START( magspeed, seta_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz */
+	MCFG_CPU_PROGRAM_MAP(magspeed_map)
+	MCFG_CPU_VBLANK_INT("screen", wrofaero_interrupt)
+
+#if	__uPD71054_TIMER
+	MCFG_MACHINE_START( wrofaero )
+#endif	// __uPD71054_TIMER
+
+	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
+
+	/* video hardware */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_UPDATE_STATIC(seta)
+
+	MCFG_GFXDECODE(msgundam)
+	MCFG_PALETTE_LENGTH(512 * 3)	/* sprites, layer2, layer1 */
+
+	MCFG_VIDEO_START(seta_2_layers)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_SOUND_ADD("x1snd", X1_010, 16000000)	/* 16 MHz */
+	MCFG_SOUND_CONFIG(seta_sound_intf)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+MACHINE_CONFIG_END
+
+
+/***************************************************************************
                             Mobile Suit Gundam
 ***************************************************************************/
 
@@ -10188,6 +10354,49 @@ ROM_START( madshark )
 	ROM_LOAD( "fq001007.26", 0x000000, 0x100000, CRC(e4b33c13) SHA1(c4f9532de7a09c80f5a74c3a386e99a0f546846f) )
 ROM_END
 
+/***************************************************************************
+                               Magical Speed
+
+(c)1994 Allumer
+
+PCB P0-111A:
+
+TMP68HC000N-16
+X1-001A
+X1-002A
+
+X1-007
+X1-004
+
+X1-010
+
+2 x DSW8
+JAMMA
+
+***************************************************************************/
+
+ROM_START( magspeed )
+	ROM_REGION( 0x100000, "maincpu", 0 )	/* 68000 Code */
+	ROM_LOAD16_BYTE( "fu001002.201", 0x00000, 0x40000, CRC(bdeb3fcc) SHA1(3a69eae49967fdad1f9bda6a09bffbd824254c92) )
+	ROM_LOAD16_BYTE( "fu001001.200", 0x00001, 0x40000, CRC(9b873d46) SHA1(958502dea9f271249da715cd6b1ea5045369cbb9) )
+
+	ROM_REGION( 0x200000, "gfx1", 0 )	/* Sprites */
+	ROM_LOAD( "fu001004.21", 0x000000, 0x100000, CRC(7582c5a8) SHA1(3754e3bbac8e4a50f5ca28390357f00b7579182d) )
+	ROM_LOAD( "fu001005.22", 0x100000, 0x100000, CRC(fd4b1ff6) SHA1(188b74cdf120e9d6e0fe15b60997383929dfa5cd) )
+
+	ROM_REGION( 0x100000, "user1", 0 )	/* Layers 1+2 */
+	ROM_LOAD( "fu001006.152", 0x000000, 0x100000, CRC(70855139) SHA1(24d635aceb823b0569169c8ecced13ac82c17d6a) )
+
+	ROM_REGION( 0x80000, "gfx2", 0 )	/* Layer 1 */
+	ROM_COPY( "user1", 0x00000, 0x00000, 0x80000 )
+
+	ROM_REGION( 0x80000, "gfx3", 0 )	/* Layer 2 */
+	ROM_COPY( "user1", 0x80000, 0x00000, 0x80000 )
+
+	ROM_REGION( 0x100000, "x1snd", 0 )	/* Samples */
+	ROM_LOAD( "fu001007.26", 0x000000, 0x100000, CRC(173463c2) SHA1(f7afc200662f72b3da149e0d17517c89ad66ef67) )
+ROM_END
+
 ROM_START( utoukond )
 	ROM_REGION( 0x100000, "maincpu", 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "93uta010.3",  0x000000, 0x080000, CRC(c486ef5e) SHA1(36e4ef4805d543216269f1161028d8a436f72284) )
@@ -10754,6 +10963,7 @@ GAME( 1993, wrofaero, 0,        wrofaero, wrofaero, 0,        ROT270, "Yang Chen
 GAME( 1994, eightfrc, 0,        eightfrc, eightfrc, eightfrc, ROT90,  "Tecmo",                  "Eight Forces", 0 )
 GAME( 1994, kiwame,   0,        kiwame,   kiwame,   kiwame,   ROT0,   "Athena",                 "Pro Mahjong Kiwame", 0 )
 GAME( 1994, krzybowl, 0,        krzybowl, krzybowl, 0,        ROT270, "American Sammy",         "Krazy Bowl", 0 )
+GAME( 1994, magspeed, 0,        magspeed, magspeed, 0,        ROT0,   "Allumer",                "Magical Speed", 0 )
 GAME( 1994, orbs,     0,        orbs,     orbs,     0,        ROT0,   "American Sammy",         "Orbs (10/7/94 prototype?)", 0 )
 GAME( 1993, keroppi,  0,        keroppi,  keroppi,  0,        ROT0,   "Sammy Industries",       "Kero Kero Keroppi no Issyoni Asobou (Japan)", 0 )
 GAME( 1995, extdwnhl, 0,        extdwnhl, extdwnhl, 0,        ROT0,   "Sammy Industries Japan", "Extreme Downhill (v1.5)", GAME_IMPERFECT_GRAPHICS )
@@ -10761,4 +10971,3 @@ GAME( 1995, gundhara, 0,        gundhara, gundhara, 0,        ROT270, "Banpresto
 GAME( 1995, sokonuke, 0,        extdwnhl, sokonuke, 0,        ROT0,   "Sammy Industries",       "Sokonuke Taisen Game (Japan)", GAME_IMPERFECT_SOUND )
 GAME( 1995, zombraid, 0,        gundhara, zombraid, zombraid, ROT0,   "American Sammy",         "Zombie Raid (US)", GAME_NO_COCKTAIL )
 GAME( 1996, crazyfgt, 0,        crazyfgt, crazyfgt, crazyfgt, ROT0,   "Subsino",                "Crazy Fight", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-
