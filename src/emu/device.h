@@ -631,8 +631,8 @@ public:
 
 protected:
 	// internal state
-	shared_ptr_type *m_array[_Count];
-	astring m_tag[_Count];
+	shared_ptr_type *m_array[_Count+1];
+	astring m_tag[_Count+1];
 };
 
 // optional shared pointer array finder
