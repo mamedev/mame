@@ -629,6 +629,8 @@ avi_error avi_create(const char *filename, const avi_movie_info *info, avi_file 
 
 	/* write the initial headers */
 	avierr = write_initial_headers(newfile);
+	if (avierr != AVIERR_NONE)
+		goto error;
 
 	*file = newfile;
 	return AVIERR_NONE;
@@ -1324,7 +1326,8 @@ static avi_error read_movie_data(avi_file *file)
 	avierr = find_first_chunk(file, CHUNKTYPE_IDX1, &riff, &idx1);
 	if (avierr == AVIERR_NONE)
 		avierr = parse_idx1_chunk(file, movi.offset + 8, &idx1);
-	avierr = AVIERR_NONE;
+	if (avierr != AVIERR_NONE)
+		goto error;
 
 	/* now extract the movie info */
 	avierr = extract_movie_info(file);
