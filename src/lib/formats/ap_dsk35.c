@@ -436,6 +436,9 @@ UINT8 sony_fetchtrack(const UINT8 *buffer, size_t buffer_len, size_t *pos)
 		(*pos)++;
 		*pos %= (buffer_len * 8);
 	}
+
+//    printf("sony_fetchtrack: pos %ld = %02x\n", *pos/8, data);
+
 	return data;
 }
 
@@ -465,9 +468,10 @@ static UINT32 apple35_get_offset(floppy_image_legacy *floppy, int head, int trac
 
 	if (tag_offset)
 	{
-		*tag_offset = sector_index * 12 + tag->tag_offset;
+		*tag_offset = sector_index * 12;
 		if (*tag_offset >= tag->tag_size)
 			*tag_offset = ~0;
+        *tag_offset += tag->tag_offset;
 	}
 	return sector_index * 0x200 + tag->data_offset;
 }
@@ -477,10 +481,11 @@ static UINT32 apple35_get_offset(floppy_image_legacy *floppy, int head, int trac
 static floperr_t apple35_read_sector(floppy_image_legacy *floppy, int head, int track, int sector, void *buffer, size_t buflen)
 {
 	UINT32 data_offset;
-//  printf("Read sector: T %d S %d H %d\n", track, sector, head);
 	data_offset = apple35_get_offset(floppy, head, track, sector, NULL);
 	if (data_offset == ~0)
+    {
 		return FLOPPY_ERROR_SEEKERROR;
+    }
 	floppy_image_read(floppy, buffer, data_offset, buflen);
 	return FLOPPY_ERROR_SUCCESS;
 }
@@ -507,18 +512,20 @@ static floperr_t apple35_read_sector_td(floppy_image_legacy *floppy, int head, i
 
 	assert(buflen == 524);
 
-//  printf("Read sector TD: T %d S %d H %d\n", track, sector, head);
-
 	/* first read the sector */
 	err = apple35_read_sector(floppy, head, track, sector, ((UINT8 *) buffer) + 12, 512);
 	if (err)
+    {
 		return err;
+    }
 
 	/* read the tag data, if possible */
 	memset(buffer, '\0', 12);
 	apple35_get_offset(floppy, head, track, sector, &tag_offset);
 	if (tag_offset != ~0)
+    {
 		floppy_image_read(floppy, buffer, tag_offset, 12);
+    }
 
 	return FLOPPY_ERROR_SUCCESS;
 }
@@ -616,7 +623,10 @@ static floperr_t apple35_read_track(floppy_image_legacy *floppy, int head, int t
 		/* read the sector */
 		err = apple35_read_sector_td(floppy, head, track, sector, sector_data, ARRAY_LENGTH(sector_data));
 		if (err)
+        {
 			return err;
+        }
+
 		sony_nibblize35(sector_data, nibble_data, checksum);
 
 		for (i = 0; i < ARRAY_LENGTH(blk1); i++)
@@ -644,6 +654,7 @@ static floperr_t apple35_read_track(floppy_image_legacy *floppy, int head, int t
 		for (i = 0; i < ARRAY_LENGTH(blk3); i++)
 			sony_filltrack((UINT8*)buffer, buflen, &pos, blk3[i]);
 	}
+
 	return FLOPPY_ERROR_SUCCESS;
 }
 
@@ -1162,7 +1173,7 @@ LEGACY_FLOPPY_OPTIONS_START( apple35_mac )
 		TRACKS([80])
 		SECTOR_LENGTH([512])
 		FIRST_SECTOR_ID([0]))
-	LEGACY_FLOPPY_OPTION( apple35_dc, "dc,dsk,img,image",	"Apple DiskCopy disk image",	apple35_diskcopy_identify,	apple35_diskcopy_construct, NULL,
+	LEGACY_FLOPPY_OPTION( apple35_dc, "dc,dc42,dsk,img,image",	"Apple DiskCopy disk image",	apple35_diskcopy_identify,	apple35_diskcopy_construct, NULL,
 		HEADS([1]-2)
 		TRACKS([80])
 		SECTOR_LENGTH([512])
