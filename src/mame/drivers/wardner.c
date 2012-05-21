@@ -205,7 +205,7 @@ static ADDRESS_MAP_START( main_program_map, AS_PROGRAM, 8, wardner_state )
 
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1") /* Overlapped RAM/Banked ROM - See below */
 
-	AM_RANGE(0x8000, 0x8fff) AM_WRITE(wardner_sprite_w) AM_SHARE("spriteram")
+	AM_RANGE(0x8000, 0x8fff) AM_WRITE(wardner_sprite_w) AM_SHARE("spriteram8")
 	AM_RANGE(0x9000, 0x9fff) AM_ROM
 	AM_RANGE(0xa000, 0xadff) AM_WRITE(paletteram_xBBBBBGGGGGRRRRR_byte_le_w) AM_SHARE("paletteram")
 	AM_RANGE(0xae00, 0xafff) AM_RAM AM_SHARE("rambase_ae00")
@@ -430,12 +430,12 @@ static MACHINE_CONFIG_START( wardner, wardner_state )
 	MCFG_MC6845_ADD("crtc", HD6845, XTAL_14MHz/4, twincobr_mc6845_intf)	/* 3.5MHz measured on CLKin */
 
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
+	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram8")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_14MHz/2, 446, 0, 320, 286, 0, 240)
 	MCFG_SCREEN_UPDATE_STATIC(toaplan0)
-	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram16_device, vblank_copy_rising)
+	MCFG_SCREEN_VBLANK_DEVICE("spriteram8", buffered_spriteram8_device, vblank_copy_rising)
 
 	MCFG_GFXDECODE(wardner)
 	MCFG_PALETTE_LENGTH(1792)

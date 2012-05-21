@@ -14,7 +14,8 @@ public:
 	twincobr_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
 		m_sharedram(*this, "sharedram"),
-		m_spriteram(*this, "spriteram"){ }
+		m_spriteram8(*this, "spriteram8"),
+		m_spriteram16(*this, "spriteram16"){ }
 
 	int m_toaplan_main_cpu;
 	int m_wardner_membank;
@@ -51,7 +52,8 @@ public:
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
 	tilemap_t *m_tx_tilemap;
-	required_device<buffered_spriteram16_device> m_spriteram;
+	optional_device<buffered_spriteram8_device> m_spriteram8;
+	optional_device<buffered_spriteram16_device> m_spriteram16;
 	DECLARE_WRITE16_MEMBER(twincobr_dsp_addrsel_w);
 	DECLARE_READ16_MEMBER(twincobr_dsp_r);
 	DECLARE_WRITE16_MEMBER(twincobr_dsp_w);

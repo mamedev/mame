@@ -277,7 +277,7 @@ Shark   Zame
 static ADDRESS_MAP_START( main_program_map, AS_PROGRAM, 16, twincobr_state )
 	AM_RANGE(0x000000, 0x02ffff) AM_ROM
 	AM_RANGE(0x030000, 0x033fff) AM_RAM		/* 68K and DSP shared RAM */
-	AM_RANGE(0x040000, 0x040fff) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0x040000, 0x040fff) AM_RAM AM_SHARE("spriteram16")
 	AM_RANGE(0x050000, 0x050dff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x060000, 0x060001) AM_DEVWRITE8("crtc", mc6845_device, address_w, 0x00ff)
 	AM_RANGE(0x060002, 0x060003) AM_DEVWRITE8("crtc", mc6845_device, register_w, 0x00ff)
@@ -583,12 +583,12 @@ static MACHINE_CONFIG_START( twincobr, twincobr_state )
 	MCFG_MC6845_ADD("crtc", HD6845, XTAL_28MHz/8, twincobr_mc6845_intf)	/* 3.5MHz measured on CLKin */
 
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
+	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram16")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_28MHz/4, 446, 0, 320, 286, 0, 240)
 	MCFG_SCREEN_UPDATE_STATIC(toaplan0)
-	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram16_device, vblank_copy_rising)
+	MCFG_SCREEN_VBLANK_DEVICE("spriteram16", buffered_spriteram16_device, vblank_copy_rising)
 
 	MCFG_GFXDECODE(twincobr)
 	MCFG_PALETTE_LENGTH(1792)

@@ -352,13 +352,14 @@ WRITE8_MEMBER(twincobr_state::wardner_videoram_w)
 
 READ8_MEMBER(twincobr_state::wardner_sprite_r)
 {
+	UINT16 *spriteram16 = reinterpret_cast<UINT16 *>(m_spriteram8->live());
 	int shift = (offset & 1) * 8;
-	return m_spriteram->live()[offset/2] >> shift;
+	return spriteram16[offset/2] >> shift;
 }
 
 WRITE8_MEMBER(twincobr_state::wardner_sprite_w)
 {
-	UINT16 *spriteram16 = m_spriteram->live();
+	UINT16 *spriteram16 = reinterpret_cast<UINT16 *>(m_spriteram8->live());
 	if (offset & 1)
 		spriteram16[offset/2] = (spriteram16[offset/2] & 0x00ff) | (data << 8);
 	else
@@ -376,7 +377,7 @@ static void wardner_sprite_priority_hack(running_machine &machine)
 	twincobr_state *state = machine.driver_data<twincobr_state>();
 
 	if (state->m_fgscrollx != state->m_bgscrollx) {
-		UINT16 *buffered_spriteram16 = state->m_spriteram->buffer();
+		UINT16 *buffered_spriteram16 = reinterpret_cast<UINT16 *>(state->m_spriteram8->buffer());
 		if ((state->m_fgscrollx==0x1c9) || (state->m_flip_screen && (state->m_fgscrollx==0x17a))) {	/* in the shop ? */
 			int wardner_hack = buffered_spriteram16[0x0b04/2];
 		/* sprite position 0x6300 to 0x8700 -- hero on shop keeper (normal) */
@@ -453,8 +454,19 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 
 	if (state->m_display_on)
 	{
-		UINT16 *buffered_spriteram16 = state->m_spriteram->buffer();
-		for (offs = 0;offs < state->m_spriteram->bytes()/2;offs += 4)
+		UINT16 *buffered_spriteram16;
+		UINT32 bytes;
+		if (state->m_spriteram16 != NULL)
+		{
+			buffered_spriteram16 = state->m_spriteram16->buffer();
+			bytes = state->m_spriteram16->bytes();
+		}
+		else
+		{
+			buffered_spriteram16 = reinterpret_cast<UINT16 *>(state->m_spriteram8->buffer());
+			bytes = state->m_spriteram8->bytes();
+		}
+		for (offs = 0;offs < bytes/2;offs += 4)
 		{
 			int attribute,sx,sy,flipx,flipy;
 			int sprite, color;
