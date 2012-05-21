@@ -43,6 +43,8 @@ Games on this system include....
 | |Sega Network Taisen Mahjong MJ 3 (Rev B)           | Sega, 2005            | GDROM GDX-0017B |              |
 | |Sega Network Taisen Mahjong MJ 3 (Rev C)           | Sega, 2005            | GDROM GDX-0017C |              |
 |*|Sega Network Taisen Mahjong MJ 3 (Rev D)           | Sega, 2005            | GDROM GDX-0017D |              |
+| |Sega Network Taisen Mahjong MJ 3 (Rev E)           | Sega, 2005            | GDROM GDX-0017E |              |
+|*|Sega Network Taisen Mahjong MJ 3 (Rev F)           | Sega, 2005            | GDROM GDX-0017F | 317-0414-JPN |
 | |Sega Club Golf 2006: Next Tours                    | Sega, 2005            | GDROM GDX-0018  |              |
 |*|Sega Club Golf 2006: Next Tours (Rev A)            | Sega, 2005            | GDROM GDX-0018A |              |
 | |Sega Network Taisen Mahjong MJ 3 Evolution         | Sega, 2006            | GDROM GDX-0021  |              |

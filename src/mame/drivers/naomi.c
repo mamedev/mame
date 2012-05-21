@@ -493,7 +493,7 @@ Touch De Zunou (Rev A)                 840-0166C  not present  2 (512Mb)   prese
 
 
 
-MASK B-F2X (C) Namco 2000
+MASK B (C) Namco 2000
 |-------------------------------------------------------------------------------------|
 |                                                               ----CN2----            -|
 |                                                                                       |
@@ -534,15 +534,16 @@ Notes:
    CN1/2/3  - connectors joining to main board
 
    Games known to use this PCB include....
-                                   Sticker   FL0-FL3   FLASHROMs   X76F100      EPM7064   EPM7064   315-5581      Game
- Game                              on cart   FLASHROM  # of SOP48  IC @ 1F      IC @ 1H   IC @ 2K   IC @ 1M       code       Notes
------------------------------------------------------------------------------------------------------------------------------------------------
+                                   Cart  Sticker   FL0-FL3   FLASHROMs   X76F100      EPM7064   EPM7064   315-5581      Game
+ Game                              Type  on cart   FLASHROM  # of SOP48  IC @ 1F      IC @ 1H   IC @ 2K   IC @ 1M       code (1)   Notes
+----------------------------------------------------------------------------------------------------------------------------------------------------
 /Gun Survivor 2 Biohazard
-\Code: Veronica                    25709801  1 (64Mb)  14 (128Mb)  not present  NAODEC2A  NAODEC1B  317-5075-COM  BHF1
-/Shin Nihon Prowrestling                                                                                                     /FL0 & FL1 have pin55 raised from PCB.
-\Toukon Retsuden 4 Arcade Edition  25349801  2 (64Mb)  15 (128Mb)  not present  NAODEC2A  NAODEC1B  317-5040-COM  TRF1Ver.A  \They are connected togheter and go to pin89 on 2K.
-World Kicks                        25209801  2 (32Mb)  10 (128Mb)  not present  NAODEC2A  NAODEC1A  317-5040-COM  WK3 Ver.A  317-5040-COM is confirmed.
+\Code: Veronica                    F1X   25709801  1 (64Mb)  14 (128Mb)  not present  NAODEC2A  NAODEC1B  317-5075-COM  BHF1
+/Shin Nihon Prowrestling                                                                                                           /FL0 & FL1 have pin55 raised from PCB.
+\Toukon Retsuden 4 Arcade Edition  F2X   25349801  2 (64Mb)  15 (128Mb)  not present  NAODEC2A  NAODEC1B  317-5040-COM  TRF1Ver.A  \They are connected togheter and go to pin89 on 2K.
+World Kicks                        F2X   25209801  2 (32Mb)  10 (128Mb)  not present  NAODEC2A  NAODEC1A  317-5040-COM  WK2 Ver.A
 
+(1) note: the number in the game code has the following meaning: 1 = Japan, 2 = Asia, 3 = US, 4 = World.
 
 
 MASK C (C) Namco 2000
@@ -570,7 +571,7 @@ MASK C (C) Namco 2000
 Notes:
       The female side of the cart PCB only has traces
 
-        JP1 - JUMPER silkscreened OPEN
+        JP1 - JUMPER silkscreened VPEN
          1F - FLASHROM (SOIC8) Xicor X76F100 Secure SerialFlash. Silkscreened X76F100
          2H - oscillator 28.000MHz
          3J - NAODEC3 (QFP100) Cypres CY37128. Silkscreened NAODEC3
@@ -583,12 +584,13 @@ Notes:
    CN1/2/3  - connectors joining to main board
 
    Games known to use this PCB include....
-                           Sticker   FL0-FL3   FLASHROMs   X76F100  CY37128  315-5581      Game
- Game                      on cart   FLASHROM  # of SOP48  IC @ 1F  IC @ 3J  IC @ 1M       code        Notes
---------------------------------------------------------------------------------------------------------------------
-Mazan: Flash of the Blade  25869812  1 (64Mb)   8 (128Mb)  present  NAODEC3  317-0056-COM  MAZ1
-Ninja Assault              25469801  3 (64Mb)   9 (128Mb)  present  NAODEC3  317-5068-COM  NJA3 Ver.A
+                           Cart  Sticker   FL0-FL3   FLASHROMs   X76F100  CY37128  315-5581      Game
+ Game                      Type  on cart   FLASHROM  # of SOP48  IC @ 1F  IC @ 3J  IC @ 1M       code (1)    Notes
+----------------------------------------------------------------------------------------------------------------------
+Mazan: Flash of the Blade  F1X   25869812  1 (64Mb)   8 (128Mb)  present  NAODEC3  317-0266-COM  MAZ2 Ver.A
+Ninja Assault              F2X   25469801  3 (64Mb)   9 (128Mb)  present  NAODEC3  317-5068-COM  NJA3 Ver.A
 
+(1) note: the number in the game code has the following meaning: 1 = Japan, 2 = Asia, 3 = US, 4 = World.
 
 
 
@@ -7938,11 +7940,11 @@ ROM_END
 /* HMG016007 */ GAME( 2001, hmgeo, naomi,   naomim2, naomi,    naomi,    ROT0, "Capcom",          "Heavy Metal Geomatrix (JPN, USA, EUR, ASI, AUS) (Rev A)", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
 
 /* Cart games on Namco custom ROM board */
-/* 25209801 */ GAME( 2000, wldkicks, naomi, naomim2, naomi,    naomi,    ROT0, "Capcom / Namco", "World Kicks (WK1 Ver. A)", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
+/* 25209801 */ GAME( 2000, wldkicks, naomi, naomim2, naomi,    naomi,    ROT0, "Capcom / Namco", "World Kicks (WK2 Ver. A)", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
 /* 25349801 */ GAME( 2000, toukon4,  naomi, naomim2, naomi,    naomi,    ROT0, "Capcom / Namco", "Shin Nihon Pro Wrestling Toukon Retsuden 4 Arcade Edition (TRF1 Ver. A)", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
-/* 25469801 */ GAME( 2000, ninjaslt, naomi, naomim2, naomi,    naomi,    ROT0, "Capcom / Namco", "Ninja Assault (NJA3 Ver. A)", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
-/* 25709801 */ GAME( 2001, gunsur2,  naomi, naomi,   naomi,    naomi,    ROT0, "Capcom / Namco", "Gun Survivor 2 Biohazard Code: Veronica (BHF1 Ver. A)", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
-/* 25869812 */ GAME( 2002, mazan,    naomi, naomim2, naomi,    naomi,    ROT0, "Capcom / Namco", "Mazan: Flash of the Blade (MAZ1 Ver. A)", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
+/* 25469801 */ GAME( 2000, ninjaslt, naomi, naomim2, naomi,    naomi,    ROT0, "Capcom / Namco", "Ninja Assault (NJA3 Ver. A)", GAME_UNEMULATED_PROTECTION|GAME_FLAGS ) 
+/* 25709801 */ GAME( 2001, gunsur2,  naomi, naomi,   naomi,    naomi,    ROT0, "Capcom / Namco", "Gun Survivor 2 Biohazard Code: Veronica (BHF1)", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
+/* 25869812 */ GAME( 2002, mazan,    naomi, naomim2, naomi,    naomi,    ROT0, "Capcom / Namco", "Mazan: Flash of the Blade (MAZ2 Ver. A)", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
 
 /* GDS-xxxx (Sega GD-ROM games) */
 /* 0001  */ GAME( 2000, confmiss,  naomigd,  naomigd, hotd2,    naomigd,    ROT0, "Sega", "Confidential Mission (GDS-0001)", GAME_FLAGS )
